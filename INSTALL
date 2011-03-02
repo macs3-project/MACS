@@ -1,5 +1,5 @@
 INSTALL Guide For MACS
-Time-stamp: <2010-09-01 17:04:09 Tao Liu>
+Time-stamp: <2011-02-22 14:33:00 Tao Liu>
 
 Please check the following instructions to complete your installation.
 
@@ -7,6 +7,22 @@ Please check the following instructions to complete your installation.
 
 Python version must be equal to 2.6 or 2.7 to run MACS. We recommend
 using the version 2.6.5.
+
+* Install under Debian or Ubuntu Linux system
+
+The most convenient way to install MACS is through Debian APT system,
+so that it can be perfectly integrated in the Python environment of
+your operation system. You can easily manage the package, and the
+uninstall is much easier. Download the deb package from MACS download
+page, and type this in the commend line:
+
+$ dpkg -i macs_1.4.0rc2.deb
+
+To uninstall, type:
+
+$ dpkg -r macs_1.4.0rc2
+
+This is tested only in Ubuntu 10.10 and 10.04 LTS.
 
 * Install from source
 
@@ -44,7 +60,7 @@ concept is the same across platforms.
 To set up your PYTHONPATH environment variable, you'll need to add the
 value PREFIX/lib/pythonX.Y/site-packages to your existing
 PYTHONPATH. In this value, X.Y stands for the major–minor version of
-Python you are using (such as 2.4 or 2.5 ; you can find this with
+Python you are using (such as 2.6 or 2.7 ; you can find this with
 sys.version[:3] from a Python command line). PREFIX is the install
 prefix where you installed MACS. If you did not specify a prefix on
 the command line, MACS will be installed using Python's sys.prefix
@@ -53,7 +69,7 @@ value.
 On Linux, using bash, I include the new value in my PYTHONPATH by
 adding this line to my ~/.bashrc :
 
-$ export PYTHONPATH=/home/taoliu/lib/python2.5/site-packages:$PYTHONPATH
+$ export PYTHONPATH=/home/taoliu/lib/python2.6/site-packages:$PYTHONPATH
 
 Using Windows, you need to open up the system properties dialog, and
 locate the tab labeled Environment. Add your value to the PYTHONPATH

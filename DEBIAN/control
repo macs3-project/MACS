@@ -1,0 +1,29 @@
+Package: macs
+Version: 1.4.0rc2
+Priority: optional
+Maintainer: Tao Liu <vladimir.liu@gmail.com>
+Depends: python2.6
+Architecture: all
+Suggests: maq, peakanalyzer
+Section: science
+Homepage: http://liulab.dfci.harvard.edu/MACS/
+Tag: Science, Biology, Bioinformatics, ChIP-seq
+Description: Model-based Analysis for ChIP-Seq
+ With the improvement of sequencing techniques, chromatin
+ immunoprecipitation followed by high throughput sequencing (ChIP-Seq)
+ is getting popular to study genome-wide protein-DNA interactions. To
+ address the lack of powerful ChIP-Seq analysis method, we present a
+ novel algorithm, named Model-based Analysis of ChIP-Seq (MACS), for
+ identifying transcript factor binding sites. MACS captures the
+ influence of genome complexity to evaluate the significance of
+ enriched ChIP regions, and MACS improves the spatial resolution of
+ binding sites through combining the information of both sequencing tag
+ position and orientation. MACS can be easily used for ChIP-Seq data
+ alone, or with control sample with the increase of specificity.
+ .
+ Main Features:
+ .
+   * Predict ChIP fragment size from + and - strand peaks from raw data
+   * Calculate local bias around ChIP peaks using a Poisson model.
+   * Allow multiple reads at the exact same position.
+ .

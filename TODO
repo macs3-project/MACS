@@ -1,0 +1,6 @@
+TODO list for MACS
+Time-stamp: <2009-01-05 17:48:57 Tao Liu>
+
+* Consider the consistency between replicats.
+
+* Program IO in C for the best performance.

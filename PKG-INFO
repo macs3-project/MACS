@@ -1,6 +1,6 @@
 Metadata-Version: 1.0
 Name: MACS
-Version: 1.4.0beta
+Version: 1.4.0rc2
 Summary: Model Based Analysis for ChIP-Seq data
 Home-page: http://liulab.dfci.harvard.edu/MACS/
 Author: Yong Zhang; Tao (Foo) Liu

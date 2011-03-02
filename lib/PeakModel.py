@@ -1,8 +1,9 @@
-# Time-stamp: <2010-07-14 22:58:38 Tao Liu>
+# Time-stamp: <2011-02-14 15:52:04 Tao Liu>
 
 """Module Description
 
-Copyright (c) 2008 Yong Zhang, Tao Liu <taoliu@jimmy.harvard.edu>
+Copyright (c) 2008,2009 Yong Zhang, Tao Liu <taoliu@jimmy.harvard.edu>
+Copyright (c) 2010,2011 Tao Liu <taoliu@jimmy.harvard.edu>
 
 This code is free software; you can redistribute it and/or modify it
 under the terms of the Artistic License (see the file COPYING included

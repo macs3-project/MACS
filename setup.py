@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# Time-stamp: <2010-09-01 17:03:47 Tao Liu>
+# Time-stamp: <2011-02-14 18:24:55 Tao Liu>
 
 """Description
 
@@ -35,15 +35,15 @@ def main():
         sys.exit(1)
 
     setup(name="MACS",
-          version="1.4.0beta",
+          version="1.4.0rc2",
           description="Model Based Analysis for ChIP-Seq data",
           author='Yong Zhang; Tao (Foo) Liu',
           author_email='zy@jimmy.harvard.edu; taoliu@jimmy.harvard.edu',
           url='http://liulab.dfci.harvard.edu/MACS/',
           package_dir={'MACS14' : 'lib'},
           packages=['MACS14', 'MACS14.IO'],
-          scripts=['bin/macs14','bin/elandmulti2bed.py','bin/elandresult2bed.py','bin/elandexport2bed.py',
-                   'bin/sam2bed.py'],
+          scripts=['bin/macs14','bin/elandmulti2bed','bin/elandresult2bed','bin/elandexport2bed',
+                   'bin/sam2bed','bin/wignorm'],
           console=['bin/macs14'],
           app    =['bin/macs14'],
           classifiers=[

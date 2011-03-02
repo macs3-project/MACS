@@ -1,3 +1,70 @@
+2011-02-28  Tao Liu  <taoliu@jimmy.harvard.edu>
+	Small fixes
+
+	* Replaced with a newest WigTrackI class and fixed the wignorm script.
+
+2011-02-21  Tao Liu  <taoliu@jimmy.harvard.edu>
+	Version 1.4.0rc2 (Valentine)
+
+	* --single-wig option is renamed to --single-profile
+
+	* BedGraph output with --bdg or -B option.
+
+	The BedGraph output provides 1bp resolution fragment pileup
+	profile. File size is smaller than wig file. This option can be
+	combined with --single-profile option to produce a bedgraph file
+	for the whole genome. This option can also make --space,
+	--call-subpeaks invalid.
+
+	* Fix the description of --shiftsize to correctly state that the
+	value is 1/2 d (fragment size).
+
+	* Fix a bug in the call to __filter_w_control_tags when control is
+	not available.
+
+	* Fix a bug on --to-small option. Now it works as expected.
+
+	* Fix a bug while counting the tags in candidate peak region, an
+	extra tag may be included. (Thanks to Jake Biesinger!)
+
+	* Fix the bug for the peaks extended outside of chromosome
+	start. If the minus strand tag goes outside of chromosome start
+	after extension of d, it will be thrown out.
+
+	* Post-process script for a combined wig file:
+
+	The "wignorm" command can be called after a full run of MACS14 as
+	a postprocess. wignorm can calculate the local background from the
+	control wig file from MACS14, then use either foldchange,
+	-10*log10(pvalue) from possion test, or difference after asinh
+	transformation as the score to build a single wig track to
+	represent the binding strength. This script will take a
+	significant long time to process.
+
+	* --wigextend has been obsoleted.
+
+2010-09-21  Tao Liu  <taoliu@jimmy.harvard.edu>
+	Version 1.4.0rc1 (Starry Sky)
+
+	* Duplicate reads option
+
+	--keep-dup behavior is changed. Now user can specify how many
+	reads he/she wants to keep at the same genomic location. 'auto' to
+	let MACS decide the number based on binomial distribution, 'all'
+	to let MACS keep all reads.
+
+	* pvalue and FDR fixes (Thanks to Prof. Zhiping Weng)
+
+	By default, MACS will now scale the smaller dataset to the bigger
+	dataset. For instance, if IP has 10 million reads, and Input has 5
+	million, MACS will double the lambda value calculated from Input
+	reads while calling BOTH the positive peaks and negative
+	peaks. This will address the issue caused by unbalanced numbers of
+	reads from IP and Input. If --to-small is turned on, MACS will
+	scale the larger dataset to the smaller one. So from now on, if d
+	is fixed, then the peaks from a MACS call for A vs B should be
+	identical to the negative peaks from a B vs A.
+
 2010-09-01  Tao Liu  <taoliu@jimmy.harvard.edu>
 	Version 1.4.0beta (summer wishes)
 
@@ -58,7 +125,7 @@
 
 	Setup script will stop the installation if python version is not
 	python2.6 or python2.7.
-	
+
 	Local lambda calculation has been changed back. MACS will check
 	peak_region, slocal( default 1K) and llocal (default 10K) for the
 	local bias. The previous 200bps default will cause MACS misses

@@ -1,8 +1,8 @@
-# Time-stamp: <2010-08-01 23:08:08 Tao Liu>
+# Time-stamp: <2011-02-16 00:34:08 Tao Liu>
 
 """Module Description
 
-Copyright (c) 2010 Tao Liu <taoliu@jimmy.harvard.edu>
+Copyright (c) 2010,2011 Tao Liu <taoliu@jimmy.harvard.edu>
 
 This code is free software; you can redistribute it and/or modify it
 under the terms of the BSD License (see the file COPYING included with
@@ -50,8 +50,8 @@ def opt_validate ( optparser ):
         try:
             options.gsize = float(options.gsize)
         except:
-            log.error("Error when interpreting --gsize option: %s" % options.gsize)
-            log.error("Available shortcuts of effective genome sizes are %s" % ",".join(efgsize.keys()))
+            logging.error("Error when interpreting --gsize option: %s" % options.gsize)
+            logging.error("Available shortcuts of effective genome sizes are %s" % ",".join(efgsize.keys()))
             sys.exit(1)
 
 
@@ -139,6 +139,13 @@ def opt_validate ( optparser ):
     #    sys.exit(1)
     #options.lambdaset = lambdaset # overwrite it
 
+    # duplicate reads
+    if options.keepduplicates != "auto" and options.keepduplicates != "all":
+        if not options.keepduplicates.isdigit():
+            logging.error("--keep-dup should be 'auto', 'all' or an integer!")
+            sys.exit(1)
+
+    # small sample?
 
     # shiftsize>0
     if options.shiftsize <=0 :
@@ -215,17 +222,27 @@ def opt_validate ( optparser ):
         #"# unique tag filter is %s" % (tmptxt),\
         ))
 
+    if options.tosmall:
+        options.argtxt += "# Large dataset will be scaled towards smaller dataset.\n"
+    else:
+        options.argtxt += "# Small dataset will be scaled towards larger dataset.\n"
+
+
     if options.cfile:
         options.argtxt += "# Range for calculating regional lambda is: %d bps and %d bps\n" % (options.smalllocal,options.largelocal)
     else:
         options.argtxt += "# Range for calculating regional lambda is: %d bps\n" % (options.largelocal)
 
-    # wig file?
-    subdir = options.name+"_MACS_wiggle"
-    if options.store_wig:
+    # wig or bdg subdir
+    if options.store_wig or options.store_bdg:
+        if options.store_bdg:
+            # bdg has higher priority
+            subdir = options.name+"_MACS_bedGraph"
+        elif options.store_wig:
+            subdir = options.name+"_MACS_wiggle"
         # check subdir
         if os.path.exists(subdir):
-            options.error("./%s exists! Unable to create directory to store wiggle file!!" % (subdir))
+            options.error("./%s exists! Unable to create directory to store profiles!!" % (subdir))
             sys.exit(1)
         else:
             options.wig_dir_tr = subdir+"/treat/"

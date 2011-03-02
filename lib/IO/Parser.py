@@ -1,8 +1,8 @@
-# Time-stamp: <2010-09-01 16:39:50 Tao Liu>
+# Time-stamp: <2011-02-14 15:50:12 Tao Liu>
 
 """Module for all MACS Parser classes for input.
 
-Copyright (c) 2010 Tao Liu <taoliu@jimmy.harvard.edu>
+Copyright (c) 2010,2011 Tao Liu <taoliu@jimmy.harvard.edu>
 
 This code is free software; you can redistribute it and/or modify it
 under the terms of the Artistic License (see the file COPYING included

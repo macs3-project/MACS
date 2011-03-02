@@ -1,8 +1,8 @@
-# Time-stamp: <2009-08-28 16:51:09 Tao Liu>
+# Time-stamp: <2011-02-14 15:49:14 Tao Liu>
 
 """Module Description
 
-Copyright (c) 2008 Tao Liu <taoliu@jimmy.harvard.edu>
+Copyright (c) 2008,2009,2010,2011 Hyunjin Shin, Tao Liu <taoliu@jimmy.harvard.edu>
 
 This code is free software; you can redistribute it and/or modify it
 under the terms of the BSD License (see the file COPYING included with
