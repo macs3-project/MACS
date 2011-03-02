@@ -1,0 +1,4 @@
+include 00README COPYING ChangeLog INSTALL MANIFEST setup.py bin/macs14
+recursive-include lib *.py
+prune test
+prune web

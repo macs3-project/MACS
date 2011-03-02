@@ -1,0 +1,339 @@
+#!/usr/bin/env python
+# Time-stamp: <2010-09-01 17:01:09 Tao Liu>
+
+"""Description: MACS 1.4 main executable
+
+Copyright (c) 2008,2009,2010 Yong Zhang, Tao Liu <taoliu@jimmy.harvard.edu>
+
+This code is free software; you can redistribute it and/or modify it
+under the terms of the Artistic License (see the file COPYING included
+with the distribution).
+
+@status: beta
+@version: $Revision$
+@author:  Yong Zhang, Tao Liu
+@contact: taoliu@jimmy.harvard.edu
+"""
+
+# ------------------------------------
+# python modules
+# ------------------------------------
+
+import os
+import sys
+import logging
+import math
+import re
+from subprocess import Popen,PIPE
+from optparse import OptionParser
+import gzip
+
+# ------------------------------------
+# own python modules
+# ------------------------------------
+from MACS14.OptValidator import opt_validate
+from MACS14.OutputWriter import *
+from MACS14.Prob import binomial_cdf_inv
+from MACS14.PeakModel import PeakModel,NotEnoughPairsException
+from MACS14.PeakDetect import PeakDetect
+from MACS14.Constants import *
+# ------------------------------------
+# Main function
+# ------------------------------------
+def main():
+    """The Main function/pipeline for MACS.
+    
+    """
+    # Parse options...
+    options = opt_validate(prepare_optparser())
+    # end of parsing commandline options
+    info = options.info
+    warn = options.warn
+    debug = options.debug
+    #0 output arguments
+    info("\n"+options.argtxt)
+    
+    #1 Read tag files
+    info("#1 read tag files...")
+    (treat, control) = load_tag_files_options (options)
+    info("#1 tag size = %d" % options.tsize)
+    tagsinfo  = "# tag size is determined as %d bps\n" % (options.tsize)
+
+    t0 = treat.total
+    tagsinfo += "# total tags in treatment: %d\n" % (t0)
+    info("#1  total tags in treatment: %d" % (t0))
+    if not options.keepallduplicates:
+        info("#1 calculate max duplicate tags in single position based on binomal distribution...")
+        treatment_max_dup_tags = cal_max_dup_tags(options.gsize,t0)
+        info("#1  max_dup_tags based on binomal = %d" % (treatment_max_dup_tags))
+        info("#1 filter out redundant tags at the same location and the same strand by allowing at most %d tag(s)" % (treatment_max_dup_tags))
+        treat.filter_dup(treatment_max_dup_tags)
+        t1 = treat.total
+        info("#1  tags after filtering in treatment: %d" % (t1))
+        tagsinfo += "# tags after filtering in treatment: %d\n" % (t1)
+        tagsinfo += "# maximum duplicate tags at the same position in treatment = %d\n" % (treatment_max_dup_tags)
+        info("#1  Redundant rate of treatment: %.2f" % (float(t0-t1)/t0))
+        tagsinfo += "# Redundant rate in treatment: %.2f\n" % (float(t0-t1)/t0)            
+
+    if control:
+        c0 = control.total
+        tagsinfo += "# total tags in control: %d\n" % (c0)
+        info("#1  total tags in control: %d" % (c0))
+        if not options.keepallduplicates:
+            info("#1  for control, calculate max duplicate tags in single position based on binomal distribution...")
+            control_max_dup_tags = cal_max_dup_tags(options.gsize,c0)
+            info("#1  max_dup_tags based on binomal = %d" % (control_max_dup_tags))
+            info("#1 filter out redundant tags at the same location and the same strand by allowing at most %d tag(s)" % (control_max_dup_tags))
+            control.filter_dup(control_max_dup_tags)
+            c1 = control.total
+            info("#1  tags after filtering in control: %d" % (c1))
+            tagsinfo += "# tags after filtering in control: %d\n" % (c1)
+            tagsinfo += "# maximum duplicate tags at the same position in control = %d\n" % (control_max_dup_tags)
+            
+            info("#1  Redundant rate of control: %.2f" % (float(c0-c1)/c0))
+            tagsinfo += "# Redundant rate in control: %.2f\n" % (float(c0-c1)/c0)    
+
+    info("#1 finished!")
+
+    #2 Build Model
+    info("#2 Build Peak Model...")
+
+    if options.nomodel:
+        info("#2 Skipped...")
+        options.d=options.shiftsize*2
+        info("#2 Use %d as shiftsize, %d as fragment length" % (options.shiftsize,options.d))
+        options.scanwindow=2*options.d  # remove the effect of --bw
+    else:
+        try:
+            peakmodel = PeakModel(treatment = treat,
+                                  max_pairnum = MAX_PAIRNUM,
+                                  opt = options
+                                  )
+            info("#2 finished!")
+            debug("#2  Summary Model:")
+            debug("#2   min_tags: %d" % (peakmodel.min_tags))
+            debug("#2   d: %d" % (peakmodel.d))
+            debug("#2   scan_window: %d" % (peakmodel.scan_window))
+            info("#2 predicted fragment length is %d bps" % peakmodel.d)
+            info("#2.2 Generate R script for model : %s" % (options.modelR))
+            model2r_script(peakmodel,options.modelR,options.name)
+            options.d = peakmodel.d
+            options.scanwindow= 2*options.d
+            if not options.offauto and options.d <= 2*options.tsize:
+                options.d=options.shiftsize*2
+                options.scanwindow=2*options.d 
+                warn("#2 Since the d calculated from paired-peaks are smaller than 2*tag length, it may be influenced by unknown sequencing problem. MACS will use %d as shiftsize, %d as fragment length" % (options.shiftsize,options.d))
+                
+        except NotEnoughPairsException:
+            if options.offauto:
+                sys.exit(1)
+            warn("#2 Skipped...")
+            options.d=options.shiftsize*2
+            options.scanwindow=2*options.d 
+            warn("#2 Use %d as shiftsize, %d as fragment length" % (options.shiftsize,options.d))
+
+
+    #3 Call Peaks
+    options.info("#3 Call peaks...")
+    if options.nolambda:
+        options.info("# local lambda is disabled!")
+
+    peakdetect = PeakDetect(treat = treat,
+                            control = control,
+                            opt = options
+                            )
+    peakdetect.call_peaks()
+    diag_result = peakdetect.diag_result()
+    #4 output
+    #4.1 peaks in XLS
+    options.info("#4 Write output xls file... %s" % (options.peakxls))
+    ofhd_xls = open(options.peakxls,"w")
+    ofhd_xls.write("# This file is generated by MACS version %s\n" % (MACS_VERSION))
+    ofhd_xls.write(options.argtxt+"\n")
+
+    ofhd_xls.write(tagsinfo)
+
+    ofhd_xls.write("# d = %d\n" % (options.d))
+    if options.nolambda:
+        ofhd_xls.write("# local lambda is disabled!\n")
+    ofhd_xls.write(peakdetect.toxls())
+    ofhd_xls.close()
+    #4.2 peaks in BED
+    options.info("#4 Write peak bed file... %s" % (options.peakbed))
+    ofhd_bed = open(options.peakbed,"w")
+    #ofhd_bed.write("track name=\"MACS peaks for %s\"\n" % (options.name))
+    ofhd_bed.write(peakdetect.tobed())
+    ofhd_bed.close()
+    #4.2-2 summits in BED
+    options.info("#4 Write summits bed file... %s" % (options.summitbed))
+    ofhd_summits = open(options.summitbed,"w")
+    #ofhd_summits.write("track name=\"MACS summits for %s\"\n" % (options.name))
+    ofhd_summits.write(peakdetect.summitsToBED())
+    ofhd_summits.close()
+    #4.3 negative peaks in XLS
+    if options.cfile:
+        options.info("#4 Write output xls file for negative peaks... %s" % (options.negxls))
+        ofhd_xls = open(options.negxls,"w")
+        ofhd_xls.write(peakdetect.neg_toxls())
+        ofhd_xls.close()
+
+    #4.4 diag result
+    if diag_result:
+        options.info("#4 Write diagnosis result ... %s" % (options.name+"_diag.xls"))
+        diag_write (options.diagxls, diag_result)
+
+    options.info("#5 Done! Check the output files!")
+
+    #6 call PeakSplitter
+    if options.callsubpeaks:
+        options.info("#6 Try to invoke PeakSplitter...")
+        if options.singlewig:
+            wigfilename = os.path.join(options.wig_dir_tr,options.zwig_tr+"_all"+".wig.gz")
+            p = Popen(["PeakSplitter","-p",options.peakbed,"-w",wigfilename,"-o",".","-f"],stdout=PIPE)            
+        else:
+            p = Popen(["PeakSplitter","-p",options.peakbed,"-w",options.wig_dir_tr,"-o",".","-f"],stdout=PIPE)
+        options.info("#6 Please check %s_peaks.subpeaks.bed file for PeakSplitter output!" % options.name)
+        
+
+def prepare_optparser ():
+    """Prepare optparser object. New options will be added in this
+    function first.
+    
+    """
+    usage = """usage: %prog <-t tfile> [-n name] [-g genomesize] [options]
+
+Example: %prog -t ChIP.bam -c Control.bam -f BAM -g h -n test -w --call-subpeaks
+"""
+    description = "%prog -- Model-based Analysis for ChIP-Sequencing"
+
+    optparser = OptionParser(version="%prog %s (summer wishes)" % (MACS_VERSION),description=description,usage=usage,add_help_option=False)
+    optparser.add_option("-h","--help",action="help",help="show this help message and exit.")
+    optparser.add_option("-t","--treatment",dest="tfile",type="string",
+                         help="ChIP-seq treatment files. REQUIRED. When ELANDMULTIPET is selected, you must provide two files separated by comma, e.g. s_1_1_eland_multi.txt,s_1_2_eland_multi.txt")
+    optparser.add_option("-c","--control",dest="cfile",type="string",
+                         help="Control files. When ELANDMULTIPET is selected, you must provide two files separated by comma, e.g. s_2_1_eland_multi.txt,s_2_2_eland_multi.txt")
+    optparser.add_option("-n","--name",dest="name",type="string",
+                         help="Experiment name, which will be used to generate output file names. DEFAULT: \"NA\"",
+                         default="NA")
+    optparser.add_option("-f","--format",dest="format",type="string",
+                         help="Format of tag file, \"AUTO\", \"BED\" or \"ELAND\" or \"ELANDMULTI\" or \"ELANDMULTIPET\" or \"ELANDEXPORT\" or \"SAM\" or \"BAM\" or \"BOWTIE\". The default AUTO option will let MACS decide which format the file is. Please check the definition in 00README file if you choose ELAND/ELANDMULTI/ELANDMULTIPET/ELANDEXPORT/SAM/BAM/BOWTIE. DEFAULT: \"AUTO\"",
+                         default="AUTO")
+    optparser.add_option("-g","--gsize",dest="gsize",type="string",default="hs",
+                         help="Effective genome size. It can be 1.0e+9 or 1000000000, or shortcuts:'hs' for human (2.7e9), 'mm' for mouse (1.87e9), 'ce' for C. elegans (9e7) and 'dm' for fruitfly (1.2e8), Default:hs")
+    optparser.add_option("-s","--tsize",dest="tsize",type="int",default=None,
+                         help="Tag size. This will overide the auto detected tag size. DEFAULT: 25")
+    optparser.add_option("--bw",dest="bw",type="int",default=300,
+                         help="Band width. This value is used while building the shifting model. If --nomodel is set, 2 time of this value will be used as a scanwindow width. DEFAULT: 300")
+    optparser.add_option("-p","--pvalue",dest="pvalue",type="float",default=1e-5,
+                         help="Pvalue cutoff for peak detection. DEFAULT: 1e-5")
+    optparser.add_option("-m","--mfold",dest="mfold",type="string",default="10,30",
+                         help="Select the regions within MFOLD range of high-confidence enrichment ratio against background to build model. The regions must be lower than upper limit, and higher than the lower limit. DEFAULT:10,30")
+    optparser.add_option("-w","--wig",dest="store_wig",action="store_true",
+                          help="Whether or not to save shifted raw tag count at every bp into a wiggle file. WARNING: this process is time/space consuming!!",
+                          default=False)
+    optparser.add_option("--single-wig",dest="singlewig",action="store_true",
+                         help="When set, a single wiggle file will be saved for treatment and input. Default: False")
+    optparser.add_option("--wigextend",dest="wigextend",type="int",
+                         help="If set as an integer, when MACS saves wiggle files, it will extend tag from its middle point to a wigextend size fragment. By default it is modeled d. Use this option if you want to increase the resolution in wiggle file. It doesn't affect peak calling.")
+    optparser.add_option("--space",dest="space",type="int",
+                          help="The resoluation for saving wiggle files, by default, MACS will save the raw tag count every 10 bps. Usable only with '--wig' option.",
+                          default=10)
+    optparser.add_option("--nolambda",dest="nolambda",action="store_true",
+                         help="If True, MACS will use fixed background lambda as local lambda for every peak region. Normally, MACS calculates a dynamic local lambda to reflect the local bias due to potential chromatin structure. ",
+                         default=False)
+    optparser.add_option("--slocal",dest="smalllocal",type="int",default=1000,
+                         help="The small nearby region in basepairs to calculate dynamic lambda. This is used to capture the bias near the peak summit region. Invalid if there is no control data. DEFAULT: 1000 ")
+    optparser.add_option("--llocal",dest="largelocal",type="int",default=None,
+                         help="The large nearby region in basepairs to calculate dynamic lambda. This is used to capture the surround bias. DEFAULT: 10000.")
+    optparser.add_option("--off-auto",dest="offauto",action="store_true",
+                         help="Whether turn off the auto pair model process. If not set, when MACS failed to build paired model, it will use the nomodel settings, the '--shiftsize' parameter to shift and extend each tags. DEFAULT: False",
+                         default=False)
+    optparser.add_option("--nomodel",dest="nomodel",action="store_true",
+                         help="Whether or not to build the shifting model. If True, MACS will not build model. by default it means shifting size = 100, try to set shiftsize to change it. DEFAULT: False",
+                         default=False)
+    optparser.add_option("--shiftsize",dest="shiftsize",type="int",default=100,
+                         help="The arbitrary shift size in bp. When nomodel is true, MACS will regard this value as 'modeled' d. DEFAULT: 100 ")
+    optparser.add_option("--call-subpeaks",dest="callsubpeaks",action="store_true",
+                         help="If set, MACS will invoke Mali Salmon's PeakSplitter soft through system call. If PeakSplitter can't be found, an instruction will be shown for downloading and installing the PeakSplitter package. DEFAULT: False",default=False)
+    optparser.add_option("--keep-dup",dest="keepallduplicates",action="store_true",
+                         help="When set, MACS will keep all duplicate tags at the exact same location -- the same coordination and the same strand. Otherwise, MACS calculates the maximum tags at the exact same location based on binomal distribution, and only keep at most this number of tags at each location. Default: False")
+    optparser.add_option("--petdist",dest="petdist",type="int",default=200,
+                         help="Best distance between Pair-End Tags. Only available when format is 'ELANDMULTIPET'. DEFAULT: 200 ")
+    optparser.add_option("--verbose",dest="verbose",type="int",default=2,
+                         help="Set verbose level. 0: only show critical message, 1: show additional warning message, 2: show process information, 3: show debug messages. DEFAULT:2")
+    optparser.add_option("--diag",dest="diag",action="store_true",
+                         help="Whether or not to produce a diagnosis report. It's up to 9X time consuming. Please check 00README file for detail. DEFAULT: False",default=False)
+    optparser.add_option("--fe-min",dest="femin",type="int",default=0,
+                         help="For diagnostics, min fold enrichment to consider. DEFAULT: 0")
+    optparser.add_option("--fe-max",dest="femax",type="int",
+                         help="For diagnostics, max fold enrichment to consider. DEFAULT: maximum fold enrichment")
+    optparser.add_option("--fe-step",dest="festep",type="int",default=FESTEP,
+                         help="For diagnostics, fold enrichment step.  DEFAULT: 20")
+    return optparser
+   
+def cal_max_dup_tags ( genome_size, tags_number, p=1e-5 ):
+    """Calculate the maximum duplicated tag number based on genome
+    size, total tag number and a p-value based on binomial
+    distribution. Brute force algorithm to calculate reverse CDF no
+    more than MAX_LAMBDA(100000).
+    
+    """
+    return binomial_cdf_inv(1-p,tags_number,1.0/genome_size)
+
+def load_tag_files_options ( options ):
+    """From the options, load treatment tags and control tags (if available).
+
+    """
+    if options.format == "ELANDMULTIPET":
+        options.info("#1 read PET treatment tags...")
+        tp = options.parser(open2(options.tfile[0]),open2(options.tfile[1]),options.petdist)
+        treat = tp.build_fwtrack()
+        ttsize = tp.tsize()
+        if not options.tsize: # override tsize if user specified --tsize
+            options.tsize = ttsize
+        treat.sort()
+        if options.cfile:
+            options.info("#1.2 read input tags...")
+            control = options.parser(open2(options.cfile[0]),open2(options.cfile[1]),options.petdist).build_fwtrack()
+            control.sort()
+        else:
+            control = None
+    else:                               # for most single end sequencing
+        options.info("#1 read treatment tags...")
+        tp = options.parser(open2(options.tfile))
+        
+        ttsize = tp.tsize()
+        if not options.tsize:           # override tsize if user specified --tsize
+            options.tsize = ttsize
+        treat = tp.build_fwtrack()
+        treat.sort()
+        if options.cfile:
+            options.info("#1.2 read input tags...")
+            control = options.parser(open2(options.cfile)).build_fwtrack()
+            control.sort()
+        else:
+            control = None
+    options.info("#1 tag size is determined as %d bps" % options.tsize)
+    return (treat, control)
+
+def open2(path, mode='r', bufsize=-1):
+    # try gzip first
+    f = gzip.open(path, mode)
+    try:
+        f.read(10)
+    except IOError:
+        # not a gzipped file
+        f.close()
+        f = open(path, mode, bufsize)
+    else:
+        f.seek(0)
+    return f
+
+
+
+if __name__ == '__main__':
+    try:
+        main()
+    except KeyboardInterrupt:
+        sys.stderr.write("User interrupt me! ;-) Bye!\n")
+        sys.exit(0)
