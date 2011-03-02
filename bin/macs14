@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# Time-stamp: <2011-02-21 21:21:09 Tao Liu>
+# Time-stamp: <2011-03-02 17:49:59 Tao Liu>
 
 """Description: MACS 1.4 main executable
 
@@ -219,7 +219,7 @@ Example: %prog -t ChIP.bam -c Control.bam -f BAM -g h -n test -w --call-subpeaks
 """
     description = "%prog -- Model-based Analysis for ChIP-Sequencing"
 
-    optparser = OptionParser(version="%prog 1.4.0rc2 20110214 (Valentine)",description=description,usage=usage,add_help_option=False)
+    optparser = OptionParser(version="%prog 1.4 20110310 ()",description=description,usage=usage,add_help_option=False)
     optparser.add_option("-h","--help",action="help",help="show this help message and exit.")
     optparser.add_option("-t","--treatment",dest="tfile",type="string",
                          help="ChIP-seq treatment files. REQUIRED. When ELANDMULTIPET is selected, you must provide two files separated by comma, e.g. s_1_1_eland_multi.txt,s_1_2_eland_multi.txt")
