@@ -1,4 +1,4 @@
-# Time-stamp: <2011-02-14 15:50:12 Tao Liu>
+# Time-stamp: <2011-03-07 11:36:09 Tao Liu>
 
 """Module for all MACS Parser classes for input.
 
@@ -125,7 +125,7 @@ class BEDParser(GenericParser):
             if not fpos or not chromosome:
                 continue
             thisline = thisline.rstrip()
-            thisfields = thisline.split()
+            thisfields = thisline.split('\t')
             s += int(thisfields[2])-int(thisfields[1])
             n += 1
         self.fhd.seek(0)
@@ -162,7 +162,7 @@ class BEDParser(GenericParser):
         thisline = thisline.rstrip()
         if not thisline or thisline[:5]=="track" or thisline[:7]=="browser" or thisline[0]=="#": return ("comment line",None,None)
 
-        thisfields = thisline.split()
+        thisfields = thisline.split('\t')
         chromname = thisfields[0]
         try:
             chromname = chromname[:chromname.rindex(".fa")]
@@ -206,7 +206,7 @@ class ELANDResultParser(GenericParser):
             if not fpos or not chromosome:
                 continue
             thisline = thisline.rstrip()
-            thisfields = thisline.split()
+            thisfields = thisline.split('\t')
             s += len(thisfields[1])
             n += 1
         self.fhd.seek(0)
@@ -236,7 +236,7 @@ class ELANDResultParser(GenericParser):
         thisline = thisline.rstrip()
         if not thisline: return ("blank",None,None)
 
-        thisfields = thisline.split()
+        thisfields = thisline.split('\t')
         thistaglength = len(thisfields[1])
 
         if len(thisfields) <= 6:
@@ -296,7 +296,7 @@ class ELANDMultiParser(GenericParser):
             if not fpos or not chromosome:
                 continue
             thisline = thisline.rstrip()
-            thisfields = thisline.split()
+            thisfields = thisline.split('\t')
             s += len(thisfields[1])
             n += 1
         self.fhd.seek(0)
@@ -328,7 +328,7 @@ class ELANDMultiParser(GenericParser):
         if not thisline: return ("blank",None,None)
 
         #if thisline[0] == "#": return ("comment line",None,None) # comment line is skipped
-        thisfields = thisline.split()
+        thisfields = thisline.split('\t')
         thistagname = thisfields[0]        # name of tag
         thistaglength = len(thisfields[1]) # length of tag
 
@@ -518,9 +518,9 @@ class PairEndELANDMultiParser(GenericParser):
         # >HWI-EAS275_5:4:100:340:1199/1	GTGCTGGTGGAGAGGGCAAACCACATTGACATGCT	2:1:0	chrI.fa:15061365F0,15068562F0,chrIV.fa:4783988R1
         # >HWI-EAS275_5:4:100:340:1199/2	GGTGGTGTGTCCCCCTCTCCACCAGCACTGCGGCT	3:0:0	chrI.fa:15061451R0,15068648R0,15071742R0
 
-        leftfields = leftline.split()
+        leftfields = leftline.split('\t')
         lefttaglength = len(leftfields[1]) # length of tag
-        rightfields = rightline.split()
+        rightfields = rightline.split('\t')
         righttaglength = len(rightfields[1]) # length of tag
 
         if len(rightfields) < 4 or len(leftfields) < 4:
@@ -678,7 +678,7 @@ class SAMParser(GenericParser):
         thisline = thisline.rstrip()
         if not thisline: return ("blank",None,None)
         if thisline[0]=="@": return ("comment line",None,None) # header line started with '@' is skipped
-        thisfields = thisline.split()
+        thisfields = thisline.split('\t')
         thistagname = thisfields[0]         # name of tag
         thisref = thisfields[2]
         bwflag = int(thisfields[1])
@@ -876,7 +876,7 @@ class BowtieParser(GenericParser):
             if not fpos or not chromosome:
                 continue
             thisline = thisline.rstrip()
-            thisfields = thisline.split()
+            thisfields = thisline.split('\t')
             s += len(thisfields[4])
             n += 1
         self.fhd.seek(0)
@@ -953,7 +953,7 @@ class BowtieParser(GenericParser):
         thisline = thisline.rstrip()
         if not thisline: return ("blank",None,None)
         if thisline[0]=="#": return ("comment line",None,None) # comment line is skipped
-        thisfields = thisline.split()
+        thisfields = thisline.split('\t')                      # I hope it will never bring me more trouble
 
         chromname = thisfields[2]
         try:
