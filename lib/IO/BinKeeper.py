@@ -1,4 +1,4 @@
-# Time-stamp: <2011-03-02 17:27:41 Tao Liu>
+# Time-stamp: <2011-03-14 17:52:00 Tao Liu>
 
 """Module Description: BinKeeper for Wiggle-like tracks.
 
@@ -197,7 +197,7 @@ class BinKeeperII:
                 p = i*self.binsize
                 j = bisect.bisect_left(self.cage[startbin][0],p)
                 self.cage[startbin][0].insert(j,p)
-                self.cage[startbin][1].insert(j,(i+1)*self.binsize
+                self.cage[startbin][1].insert(j,(i+1)*self.binsize)
                 self.cage[startbin][2].insert(j,value)
 
                 insort_right(self.cage[i][0],i*self.binsize)

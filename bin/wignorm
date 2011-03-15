@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# Time-stamp: <2011-02-28 02:01:57 Tao Liu>
+# Time-stamp: <2011-03-14 17:09:35 Tao Liu>
 
 """Description: Call peaks from two wiggle file, one for treatment and one for control.
 
@@ -139,8 +139,9 @@ to local bias. The default is 'fc'.""", default="fc")
     tio = WiggleIO.WiggleIO(tfhd)
     info("construct treatment wiggle track object...")
     ttrack = tio.build_wigtrack()
+    tspan = ttrack.span
     tsum = ttrack.summary()[0]
-    lambda_bg = tsum/options.gsize*50
+    lambda_bg = tsum/options.gsize*tspan
     info("background average value: %.2f" % lambda_bg)
 
     info("open control wiggle file...")
@@ -155,7 +156,7 @@ to local bias. The default is 'fc'.""", default="fc")
     ctrack = cio.build_binKeeper()
 
     info("build pvalues based on local lambda calculation...")
-    strack = build_scores(ttrack,ctrack,func=func, w=options.window,space=50,bg=lambda_bg,tc_ratio=tc_ratio)
+    strack = build_scores(ttrack,ctrack,func=func, w=options.window,space=tspan,bg=lambda_bg,tc_ratio=tc_ratio)
 
     info("write scores to wiggle file...")
     strack.write_wig(wfhd,"scores",shift=0)
@@ -197,6 +198,8 @@ def __lambda ( t, c, w = 10000, space=10, tc_ratio = 1.0, bg=0.00001):
 
     ct_ratio: ratio of control and treatment tags
     w : sliding window length
+
+    * Hardcoded 100bps as the slocal region. 'w' is used as the llocal region
     """
     l = len(t[0])
     
