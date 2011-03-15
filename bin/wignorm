@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# Time-stamp: <2011-03-14 17:09:35 Tao Liu>
+# Time-stamp: <2011-03-15 12:32:34 Tao Liu>
 
 """Description: Call peaks from two wiggle file, one for treatment and one for control.
 
@@ -71,7 +71,7 @@ def main():
     optparser.add_option("-n","--name",dest="name",type="string",
                          help="name of output files. *REQUIRED")
     optparser.add_option("-C","--cutoff",dest="cutoff",type="float",
-                         help="Cutoff depends on which method you choose. The default is 1.2 for foldchange",default=1.2)
+                         help="Cutoff depends on which method you choose. If method is pvalue, 50 means pvalue 1e-5. The default is 1.2 for foldchange",default=1.2)
     optparser.add_option("--gsize",dest="gsize",type="int",
                          help="genome size. default: 100000000",default=100000000)
     optparser.add_option("-w","--window",dest="window",type="int",
@@ -86,7 +86,7 @@ def main():
 control data are calculated for each window surrounding every data
 point as the measurement of local bias, the following method will be
 applied to compute a score: 1) pvalue: The score will be the
--log10(poisson pvalue) for each data point. The poisson pvalue =
+-10*log10(poisson pvalue) for each data point. The poisson pvalue =
 CDF(treatment_value, lambda=local_bias); 2) diff: The local bias will
 be deducted from the treatment values as scores after asinh transformation
 . 3) fc: The score will be the fold change/ratio between treatment value
