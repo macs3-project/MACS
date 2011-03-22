@@ -1,4 +1,4 @@
-# Time-stamp: <2011-02-14 15:49:14 Tao Liu>
+# Time-stamp: <2011-03-19 01:31:10 Tao Liu>
 
 """Module Description
 
@@ -297,6 +297,7 @@ def __poisson_cdf_Q_large_lambda (k,a):
            else:
                cdf *= lastexp
                lastexp = 1
+               print cdf
     cdf = 0
     i = k+1
     while next >0:
@@ -570,7 +571,7 @@ def binomial_pdf( x, a, b):
         pdf=float("%.10e" %pdf)
         return pdf
 
-def facotrial (n):
+def factorial (n):
     """N!.
     
     """

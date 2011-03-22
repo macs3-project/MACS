@@ -1,4 +1,4 @@
-# Time-stamp: <2011-02-28 02:05:15 Tao Liu>
+# Time-stamp: <2011-03-21 22:34:43 Tao Liu>
 
 """Module Description
 
@@ -20,7 +20,7 @@ from array import array
 
 from MACS14.OutputWriter import zwig_write,zbdg_write
 from MACS14.IO.FeatIO import PeakIO,WigTrackI
-from MACS14.Prob import poisson_cdf,poisson_cdf_inv
+from MACS14.cProb import poisson_cdf,poisson_cdf_inv
 from MACS14.Constants import *
 
 class PeakDetect:
@@ -623,11 +623,12 @@ class PeakDetect:
             for i in range(len(tags[1])):
                 tags[1][i]-=self.shift_size
             # remove the tags extended outside of chromosome start
-            #while True:
-            #    if tags[1][0]-self.shift_size<0:
-            #        number_removed_tags += 1                    
-            #    else:
-            #        break
+            while True:
+                if tags[1][0]-self.shift_size<0:
+                    number_removed_tags += 1
+                    tags[1].pop(0)
+                else:
+                    break
 
         self.debug("# %d tag(s) extended outside of chromosome start are removed!" % number_removed_tags)
         return

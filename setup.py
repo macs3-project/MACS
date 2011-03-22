@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# Time-stamp: <2011-03-02 17:49:24 Tao Liu>
+# Time-stamp: <2011-03-21 22:35:16 Tao Liu>
 
 """Description
 
@@ -20,19 +20,19 @@ with the distribution).
 import os
 import sys
 from distutils.core import setup, Extension
-try:
-    import py2exe
-except ImportError:
-    pass
-try:
-    import py2app
-except ImportError:
-    pass
+from Cython.Distutils import build_ext
 
 def main():
     if float(sys.version[:3])<2.6 or float(sys.version[:3])>=2.8:
         sys.stderr.write("CRITICAL: Python version must be 2.6 or 2.7!\n")
         sys.exit(1)
+
+    ext_modules = [Extension("MACS14.cProb", ["lib/cProb.pyx"]),
+                   #Extension("MACS14.IO.cWiggleIO", ["lib/IO/cWiggleIO.pyx"]),
+                   #Extension("MACS14.IO.cFeatIO", ["lib/IO/cFeatIO.pyx"]),
+                   #Extension("MACS14.IO.cBinKeeper", ["lib/IO/cBinKeeper.pyx"]),                   
+                   ]
+    
 
     setup(name="MACS",
           version="1.4",
@@ -44,8 +44,6 @@ def main():
           packages=['MACS14', 'MACS14.IO'],
           scripts=['bin/macs14','bin/elandmulti2bed','bin/elandresult2bed','bin/elandexport2bed',
                    'bin/sam2bed','bin/wignorm'],
-          console=['bin/macs14'],
-          app    =['bin/macs14'],
           classifiers=[
               'Development Status :: 4 - experimental',
               'Environment :: Console',
@@ -56,6 +54,8 @@ def main():
               'Operating System :: POSIX',
               'Programming Language :: Python',
               ],
+          cmdclass = {'build_ext': build_ext},
+          ext_modules = ext_modules
           )
 
 if __name__ == '__main__':
