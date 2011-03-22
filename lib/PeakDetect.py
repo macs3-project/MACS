@@ -1,4 +1,4 @@
-# Time-stamp: <2011-02-28 02:05:15 Tao Liu>
+# Time-stamp: <2011-03-21 22:52:27 Tao Liu>
 
 """Module Description
 
@@ -623,11 +623,12 @@ class PeakDetect:
             for i in range(len(tags[1])):
                 tags[1][i]-=self.shift_size
             # remove the tags extended outside of chromosome start
-            #while True:
-            #    if tags[1][0]-self.shift_size<0:
-            #        number_removed_tags += 1                    
-            #    else:
-            #        break
+            while True:
+                if tags[1][0]-self.shift_size<0:
+                    number_removed_tags += 1
+                    tags[1].pop(0)
+                else:
+                    break
 
         self.debug("# %d tag(s) extended outside of chromosome start are removed!" % number_removed_tags)
         return
