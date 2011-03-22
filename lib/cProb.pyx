@@ -1,4 +1,4 @@
-# Time-stamp: <2011-03-20 14:18:38 Tao Liu>
+# Time-stamp: <2011-03-22 15:56:20 Tao Liu>
 
 """Module Description
 
@@ -19,6 +19,8 @@ the distribution).
 # ------------------------------------
 from math import exp
 from math import log
+
+from cpython cimport bool
 # ------------------------------------
 # constants
 # ------------------------------------
