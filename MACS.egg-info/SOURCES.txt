@@ -3,7 +3,9 @@ COPYING
 ChangeLog
 INSTALL
 MANIFEST.in
+README
 TODO
+setup.cfg
 setup.py
 DEBIAN/README.Debian
 DEBIAN/builddeb.sh
@@ -37,3 +39,4 @@ lib/IO/FeatIO.py
 lib/IO/Parser.py
 lib/IO/WiggleIO.py
 lib/IO/__init__.py
+lib/IO/bedGraphIO.py
