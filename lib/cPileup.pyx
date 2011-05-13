@@ -1,4 +1,4 @@
-# Time-stamp: <2011-05-13 00:34:33 Tao Liu>
+# Time-stamp: <2011-05-13 13:15:50 Tao Liu>
 
 """Module Description: For pileup functions.
 
@@ -38,7 +38,7 @@ def pileup_bdg (trackI, d, baseline_value = 0):
 
     Return a bedGraphTrackI object.
     """
-    unsigned int step = 10000000 + 2*d               # step to cache data points.
+    step = 10000000 + 2*d               # step to cache data points.
 
     ret = bedGraphTrackI(baseline_value=baseline_value) # bedGraphTrackI object to be returned.
 

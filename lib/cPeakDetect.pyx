@@ -1,4 +1,4 @@
-# Time-stamp: <2011-05-12 21:53:57 Tao Liu>
+# Time-stamp: <2011-05-13 13:20:38 Tao Liu>
 
 """Module Description
 
@@ -18,9 +18,8 @@ import os
 from array import array
 from copy import deepcopy
 
-from MACS14.OutputWriter import zwig_write,zbdg_write
 from MACS14.IO.cFeatIO import PeakIO,WigTrackI
-from MACS14.cProb import poisson_cdf,poisson_cdf_inv
+from MACS14.cProb import poisson_cdf
 from MACS14.Constants import *
 from MACS14.cPileup import pileup_bdg
 
@@ -242,48 +241,43 @@ class PeakDetect:
         self.info("#3 shift control data")
         # control data needs multiple steps of calculation
         # I need to shift them by 500 bps, then 5000 bps
-        assert self.sregion < self.lregion, "slocal can't be smaller than llocal!"
-        #c1 = self.control               # for slocal
-        #c2 = deepcopy(self.control)     # for llocal
+        assert self.d < self.sregion, "slocal can't be smaller than d!"
+        c1 = self.control               # for d-size local
+        c2 = deepcopy(self.control)     # for slocal
 
-        self.__shift_trackI(self.control,self.sregion/2)
-        #self.__shift_trackI(c1,self.sregion/2)
-        #self.__shift_trackI(c2,self.lregion/2)        
+        #self.__shift_trackI(self.control,self.sregion/2)
+        self.__shift_trackI(c1,self.d/2)
+        self.__shift_trackI(c2,self.sregion/2)        
 
         self.info("#3 merge +/- strand of control data")
-        #c1.merge_plus_minus_locations_naive ()
-        #c2.merge_plus_minus_locations_naive ()        
+        c1.merge_plus_minus_locations_naive ()
+        c2.merge_plus_minus_locations_naive () 
 
         # Now pileup FWTrackII to form a bedGraphTrackI
-        self.info("#3 calculate short local lambda for control data")
-        self.control_btrack = pileup_bdg(self.control,self.sregion)
-        #c1_btrack = pileup_bdg(c1,self.sregion)
-        if self.opt.tocontrol:
-            # if user want to scale everything to control data
-            tmp_v = float(self.d)/self.sregion            
-            self.control_btrack.apply_func(lambda x:float(x)*tmp_v)
-        else:
-            tmp_v = float(self.d)*self.ratio_treat2control/self.sregion
-            self.control_btrack.apply_func(lambda x:float(x)*tmp_v)
-
+        self.info("#3 calculate d local lambda for control data")
+        c1_btrack = pileup_bdg(c1,self.d)
+        if not self.opt.tocontrol:
+            # if user want to scale everything to ChIP data
+            tmp_v = self.ratio_treat2control
+            c1_btrack.apply_func(lambda x:float(x)*tmp_v)
         #del c1
-        #self.info("#3 calculate long local lambda for control data")        
-        #c2_btrack = pileup_bdg(c2,self.lregion)
-        #if self.opt.tocontrol:
-        #    # if user want to scale everything to control data
-        #    tmp_v = float(self.d)/self.sregion
-        #    c2_btrack.apply_func(lambda x:float(x)*tmp_v)
-        #else:
-        #    tmp_v = float(self.d)*self.ratio_treat2control/self.lregion
-        #    c2_btrack.apply_func(lambda x:float(x)*tmp_v)
 
+        self.info("#3 calculate small local lambda for control data")        
+        c2_btrack = pileup_bdg(c2,self.sregion)
+        if self.opt.tocontrol:
+           # if user want to scale everything to control data
+           tmp_v = float(self.d)/self.sregion
+           c2_btrack.apply_func(lambda x:float(x)*tmp_v)
+        else:
+           tmp_v = float(self.d)*self.ratio_treat2control/self.lregion
+           c2_btrack.apply_func(lambda x:float(x)*tmp_v)
         #del c2
 
         # This bedGraphTrackI is a combination considering sregion and
         # lregion, containing the necessary information to calculate
         # local lambda for each genomic location.
-        #self.info("#3 calculate maximum local lambda for control data")
-        #self.control_btrack = c1_btrack.overlie(c2_btrack,func=max) # get the maximum background signal.
+        self.info("#3 calculate maximum local lambda for control data")
+        self.control_btrack = c1_btrack.overlie(c2_btrack,func=max) # get the maximum background signal.
         self.control_btrack.reset_baseline(float(self.d)*self.treat.total/self.gsize) # set the baseline as lambda_bg
         #del c2_btrack
 
@@ -339,7 +333,7 @@ class PeakDetect:
         # Now pileup FWTrackII to form a bedGraphTrackI
         self.info("#3 pileup treatment data")
         self.treat_btrack = pileup_bdg(self.treat,self.d)
-        del self.treat                  # I will only use self.treat_bdg
+        #del self.treat                  # I will only use self.treat_bdg
 
         if self.opt.store_bdg:
             self.info("#3 save tag pileup into bedGraph file...")

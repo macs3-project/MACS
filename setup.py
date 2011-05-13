@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# Time-stamp: <2011-05-13 00:15:21 Tao Liu>
+# Time-stamp: <2011-05-13 10:40:28 Tao Liu>
 
 """Description
 
@@ -29,7 +29,8 @@ def main():
 
     ext_modules = [Extension("MACS14.cProb", ["lib/cProb.pyx"], libraries=["m"]),
                    Extension("MACS14.cPileup", ["lib/cPileup.pyx"]),
-                   Extension("MACS14.IO.cFeatIO", ["lib/IO/cFeatIO.pyx"], libraries=["m"]),
+                   Extension("MACS14.cPeakDetect", ["lib/cPeakDetect.pyx"]),                   
+                   Extension("MACS14.IO.cFeatIO", ["lib/IO/cFeatIO.pyx"],),
                    ]
     
 
