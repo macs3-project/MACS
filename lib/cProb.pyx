@@ -1,4 +1,4 @@
-# Time-stamp: <2011-03-22 15:56:20 Tao Liu>
+# Time-stamp: <2011-05-12 14:24:55 Tao Liu>
 
 """Module Description
 
@@ -17,8 +17,7 @@ the distribution).
 # ------------------------------------
 # python modules
 # ------------------------------------
-from math import exp
-from math import log
+from libc.math cimport exp, log10
 
 from cpython cimport bool
 # ------------------------------------
@@ -43,7 +42,7 @@ def factorial (unsigned int n):
         fact = fact * i
     return fact
 
-def poisson_cdf (unsigned int n, double lam, bool lower=True):
+def poisson_cdf (unsigned int n, double lam, bool lower=False, bool neg_log10=True):
     """Poisson CDF evaluater.
 
     This is a more stable CDF function. It can tolerate large lambda
@@ -56,19 +55,27 @@ def poisson_cdf (unsigned int n, double lam, bool lower=True):
     lower : if lower is False, calculate the upper tail CDF
     """
     cdef unsigned int k = n
+    cdef double p
     if lam <= 0.0:
         raise Exception("Lambda must > 0, however we got %d" % lam)
 
     if lower:
         if lam > 700:
-            return __poisson_cdf_large_lambda (k, lam)
+            p = __poisson_cdf_large_lambda (k, lam)
         else:
-            return __poisson_cdf(k,lam)
+            p = __poisson_cdf(k,lam)
     else:
         if lam > 700:
-            return __poisson_cdf_Q_large_lambda (k, lam)
+            p = __poisson_cdf_Q_large_lambda (k, lam)
         else:
-            return __poisson_cdf_Q(k,lam)
+            p = __poisson_cdf_Q(k,lam)
+    if neg_log10:
+        if p <= 0:
+            return 3100
+        else:
+            return log10(p) * -10
+    else:
+        return p
 
 def __poisson_cdf ( unsigned int k, double a):
     """Poisson CDF For small lambda. If a > 745, this will return

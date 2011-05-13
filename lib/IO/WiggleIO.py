@@ -1,4 +1,4 @@
-# Time-stamp: <2011-02-25 22:22:34 Tao Liu>
+# Time-stamp: <2011-03-22 17:06:58 Tao Liu>
 
 """Module Description
 
@@ -21,7 +21,7 @@ import os
 import sys
 import re
 import shutil
-from MACS14.IO.FeatIO import WigTrackI
+from MACS14.IO.cFeatIO import WigTrackI
 from MACS14.IO.BinKeeper import BinKeeperI
 
 import time

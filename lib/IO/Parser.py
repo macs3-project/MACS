@@ -1,4 +1,4 @@
-# Time-stamp: <2011-03-07 11:36:09 Tao Liu>
+# Time-stamp: <2011-05-10 15:53:05 Tao Liu>
 
 """Module for all MACS Parser classes for input.
 
@@ -21,7 +21,7 @@ import logging
 import struct
 import gzip
 from MACS14.Constants import *
-from MACS14.IO.FeatIO import FWTrackII
+from MACS14.IO.cFeatIO import FWTrackII
 # ------------------------------------
 # constants
 # ------------------------------------
@@ -423,182 +423,6 @@ class ELANDExportParser(GenericParser):
                 raise StrandFormatError(thisline,strand)
         else:
             return (None,None,None)
-
-class PairEndELANDMultiParser(GenericParser):
-    """File Parser Class for two ELAND multi Files for Pair-End sequencing.
-
-    Note this parser can only work for s_N_eland_multi.txt format.
-
-    Each line of the output file contains the following fields: 
-    1. Sequence name 
-    2. Sequence 
-    3. Either NM, QC, RM (as described above) or the following: 
-    4. x:y:z where x, y, and z are the number of exact, single-error, and 2-error matches 
-    found 
-    5. Blank, if no matches found or if too many matches found, or the following: 
-    BAC_plus_vector.fa:163022R1,170128F2,E_coli.fa:3909847R1 
-    This says there are two matches to BAC_plus_vector.fa: one in the reverse direction 
-    starting at position 160322 with one error, one in the forward direction starting at 
-    position 170128 with two errors. There is also a single-error match to E_coli.fa.
-    """
-    def __init__ (self,lfhd,rfhd):
-        self.lfhd = lfhd
-        self.rfhd = rfhd        
-
-    def tsize (self):
-        s = 0
-        n = 0
-        m = 0
-        while n<10 and m<1000:
-            m += 1
-            thisline = self.lfhd.readline()
-            thisline = thisline.rstrip()
-            if not thisline: continue
-            thisfields = thisline.split("\t")
-            s += len(thisfields[1])
-            n += 1
-        self.fhd.seek(0)
-        return int(s/n)
-
-    def build_fwtrack (self, dist=200):
-        """Build FWTrackII from all lines, return a FWTrackII object.
-
-        lfhd: the filehandler for left tag file
-        rfhd: the filehandler for right tag file
-        dist: the best distance between two tags in a pair
-
-        The score system for pairing two tags:
-
-        score = abs(abs(rtag-ltag)-200)+error4lefttag+error4righttag
-
-        the smaller score the better pairing. If the score for a
-        pairing is bigger than 200, this pairing will be discarded.
-
-        Note only the best pair is kept. If there are over two best
-        pairings, this pair of left and right tags will be discarded.
-
-        Note, the orders in left tag file and right tag file must
-        match, i.e., the Nth left tag must has the same name as the
-        Nth right tag.
-
-        Note, remove comment lines beforehand.
-        """
-        fwtrack = FWTrackII()
-        i = 0
-        m = 0
-        lnext = self.lfhd.next
-        rnext = self.rfhd.next
-        self.dist = dist
-        try:
-            while 1:
-                lline = lnext()
-                rline = rnext()
-                (chromname,fpos,strand) = self.__fw_parse_line(lline,rline)
-
-                i+=1
-                if i == 1000000:
-                    m += 1
-                    logging.info(" %d" % (m*1000000))
-                    i=0
-                if not fpos or not chromname:
-                    continue
-
-                try:
-                    chromname = chromname[:chromname.rindex(".fa")]
-                except ValueError:
-                    pass
-                
-                fwtrack.add_loc(chromname,fpos,strand)
-
-        except StopIteration:
-            pass
-        return fwtrack
-    
-    def __fw_parse_line (self, leftline, rightline ):
-        # >HWI-EAS275_5:4:100:340:1199/1	GTGCTGGTGGAGAGGGCAAACCACATTGACATGCT	2:1:0	chrI.fa:15061365F0,15068562F0,chrIV.fa:4783988R1
-        # >HWI-EAS275_5:4:100:340:1199/2	GGTGGTGTGTCCCCCTCTCCACCAGCACTGCGGCT	3:0:0	chrI.fa:15061451R0,15068648R0,15071742R0
-
-        leftfields = leftline.split('\t')
-        lefttaglength = len(leftfields[1]) # length of tag
-        rightfields = rightline.split('\t')
-        righttaglength = len(rightfields[1]) # length of tag
-
-        if len(rightfields) < 4 or len(leftfields) < 4:
-            # one of the tag cann't be mapped to genome
-            return (None,None,None)
-        else:
-            lefthits = self.__parse_line_to_dict(leftfields[3])
-            righthits = self.__parse_line_to_dict(rightfields[3])            
-            parings = []
-
-            for seqname in lefthits.keys():
-                if not righthits.has_key(seqname):
-                    continue
-                else:
-                    leftpses = lefthits[seqname] # pse=position+strand+error
-                    rightpses = righthits[seqname]
-                    for (lp,ls,le) in leftpses:
-                        for (rp,rs,re) in rightpses:
-                            # try to pair them
-                            if ls == 'F':
-                                if rs == 'R':
-                                    score = abs(abs(rp-lp)-self.dist)+le+re
-                                    if score < 200:
-                                        #parings.append((score,seqname,int((lp+rp)/2),0) )
-                                        parings.append((score,seqname,lp,0))
-                                else:
-                                    # strands don't match
-                                    continue
-                            else:
-                                if rs == 'F':
-                                    score = abs(abs(rp-lp)-self.dist)+le+re
-                                    if score < 200:
-                                        #parings.append((score,seqname,int((lp+rp)/2),1) )
-                                        parings.append((score,seqname,lp,1))
-                                else:
-                                    # strands don't match
-                                    continue
-            if not parings:
-                return (None,None,None)
-            parings.sort()
-            if len(parings)>1 and parings[0][0] == parings[1][0]:
-                # >2 best paring, reject!
-                return (None,None,None)
-            else:
-                return parings[0][1:]                                
-                    
-    def __parse_line_to_dict ( self, linestr ):
-        items = linestr.split(',')
-        hits = {}
-        for item in items:
-            if item.find(':') != -1:
-                # a seqname section
-                (n,pse) = item.split(":") # pse=position+strand+error
-                try:
-                    n = n[:n.rindex(".fa")]
-                except ValueError:
-                    pass
-
-                hits[n]=[]
-                try:
-                    sindex = pse.rindex('F')
-                except ValueError:
-                    sindex = pse.rindex('R')
-                p = int(pse[:sindex])
-                s = pse[sindex]
-                e = int(pse[sindex+1:])
-                hits[n].append((p,s,e))
-            else:
-                # only pse section
-                try:
-                    sindex = pse.rindex('F')
-                except ValueError:
-                    sindex = pse.rindex('R')
-                p = int(pse[:sindex])
-                s = pse[sindex]
-                e = int(pse[sindex+1:])
-                hits[n].append((p,s,e))
-        return hits
 
 ### Contributed by Davide, modified by Tao
 class SAMParser(GenericParser):

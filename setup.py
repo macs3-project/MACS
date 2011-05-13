@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# Time-stamp: <2011-03-21 22:35:16 Tao Liu>
+# Time-stamp: <2011-05-13 00:15:21 Tao Liu>
 
 """Description
 
@@ -27,15 +27,14 @@ def main():
         sys.stderr.write("CRITICAL: Python version must be 2.6 or 2.7!\n")
         sys.exit(1)
 
-    ext_modules = [Extension("MACS14.cProb", ["lib/cProb.pyx"]),
-                   #Extension("MACS14.IO.cWiggleIO", ["lib/IO/cWiggleIO.pyx"]),
-                   #Extension("MACS14.IO.cFeatIO", ["lib/IO/cFeatIO.pyx"]),
-                   #Extension("MACS14.IO.cBinKeeper", ["lib/IO/cBinKeeper.pyx"]),                   
+    ext_modules = [Extension("MACS14.cProb", ["lib/cProb.pyx"], libraries=["m"]),
+                   Extension("MACS14.cPileup", ["lib/cPileup.pyx"]),
+                   Extension("MACS14.IO.cFeatIO", ["lib/IO/cFeatIO.pyx"], libraries=["m"]),
                    ]
     
 
     setup(name="MACS",
-          version="1.4",
+          version="1.4.0",
           description="Model Based Analysis for ChIP-Seq data",
           author='Yong Zhang; Tao (Foo) Liu',
           author_email='zy@jimmy.harvard.edu; taoliu@jimmy.harvard.edu',
@@ -43,7 +42,7 @@ def main():
           package_dir={'MACS14' : 'lib'},
           packages=['MACS14', 'MACS14.IO'],
           scripts=['bin/macs14','bin/elandmulti2bed','bin/elandresult2bed','bin/elandexport2bed',
-                   'bin/sam2bed','bin/wignorm'],
+                   'bin/sam2bed','bin/bdgpeakcall'],
           classifiers=[
               'Development Status :: 4 - experimental',
               'Environment :: Console',

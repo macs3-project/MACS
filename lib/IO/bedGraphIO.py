@@ -1,8 +1,8 @@
-# Time-stamp: <2011-03-02 17:28:30 Tao Liu>
+# Time-stamp: <2011-05-11 14:13:48 Tao Liu>
 
-"""Module Description
+"""Module Description:  IO Module for bedGraph file
 
-Copyright (c) 2008 Tao Liu <taoliu@jimmy.harvard.edu>
+Copyright (c) 2011 Tao Liu <taoliu@jimmy.harvard.edu>
 
 This code is free software; you can redistribute it and/or modify it
 under the terms of the BSD License (see the file COPYING included with
@@ -17,14 +17,8 @@ the distribution).
 # ------------------------------------
 # python modules
 # ------------------------------------
-import os
-import sys
-import re
-import shutil
-from MACS14.IO.FeatIO import bedGraphTrackI
-from MACS14.IO.BinKeeper import BinKeeperII
+from MACS14.IO.cFeatIO import bedGraphTrackI
 
-import time
 # ------------------------------------
 # constants
 # ------------------------------------
@@ -40,6 +34,15 @@ import time
 class bedGraphIO:
     """File Parser Class for bedGraph File.
 
+    There are two assumptions in my bedGraphTrackI object:
+
+    1. Continuous: the next region should be after the previous one
+    unless they are on different chromosomes;
+    
+    2. Non-overlapping: the next region should never have overlaps
+    with preceding region.
+
+    If any of the above two criteria is violated, parsering will fail.
     """
     def __init__ (self,f):
         """f must be a filename or a file handler.
@@ -52,11 +55,19 @@ class bedGraphIO:
         else:
             raise Exception("f must be a filename or a file handler.")
 
-    def build_bdgtrack (self):
+    def build_bdgtrack (self, baseline_value=0):
         """Use this function to return a bedGraphTrackI object.
 
+        baseline_value is the value to fill in the regions not defined
+        in bedGraph. For example, if the bedGraph is like:
+
+        chr1  100 200  1
+        chr1  250 350  2
+
+        Then the region chr1:200..250 should be filled with
+        baseline_value. Default of baseline_value is 0.
         """
-        data = bedGraphTrackI()
+        data = bedGraphTrackI(baseline_value=baseline_value)
         add_func = data.add_loc
         for i in self.fhd:
             if i.startswith("track"):
@@ -71,34 +82,4 @@ class bedGraphIO:
         self.fhd.seek(0)
         return data
 
-    def build_binKeeper (self,chromLenDict={},binsize=200):
-        """Use this function to return a dictionary of BinKeeperII
-        objects.
-
-        chromLenDict is a dictionary for chromosome length like
-
-        {'chr1':100000,'chr2':200000}
-
-        bin is in bps. for detail, check BinKeeper.
-        """
-        data = {}
-
-        for i in self.fhd:
-            if i.startswith("track"):
-                continue
-            elif i.startswith("#"):
-                continue
-            elif i.startswith("browse"):
-                continue
-            else:
-                (chrom,startpos,endpos,value)=i.split()
-
-                if not data.has_key(chrom):
-                    chrlength = chromLenDict.setdefault(chrom,250000000) + 10000000
-                    data.setdefault(chrom,BinKeeperII(binsize=binsize,chromosomesize=chrlength))
-
-                data[chrom].add(int(startpos),int(endpos),float(value))
-
-        self.fhd.seek(0)
-        return data
 
