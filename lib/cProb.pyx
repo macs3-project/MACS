@@ -1,4 +1,4 @@
-# Time-stamp: <2011-05-12 14:24:55 Tao Liu>
+# Time-stamp: <2011-05-17 15:35:24 Tao Liu>
 
 """Module Description
 
@@ -17,7 +17,9 @@ the distribution).
 # ------------------------------------
 # python modules
 # ------------------------------------
-from libc.math cimport exp, log10
+from libc.math cimport exp,log,log10
+from math import fabs
+from math import log1p as py_log1p
 
 from cpython cimport bool
 # ------------------------------------
@@ -42,7 +44,7 @@ def factorial (unsigned int n):
         fact = fact * i
     return fact
 
-def poisson_cdf (unsigned int n, double lam, bool lower=False, bool neg_log10=True):
+def poisson_cdf (unsigned int n, double lam, bool lower=False, bool log10=False):
     """Poisson CDF evaluater.
 
     This is a more stable CDF function. It can tolerate large lambda
@@ -52,30 +54,30 @@ def poisson_cdf (unsigned int n, double lam, bool lower=False, bool neg_log10=Tr
     Parameters:
     n     : your observation
     lam   : lambda of poisson distribution
-    lower : if lower is False, calculate the upper tail CDF
+    lower : if lower is False, calculate the upper tail CDF, otherwise, to calculate lower tail; Default is False.
+    log10 : if log10 is True, calculation will be in log space. Default is False.
     """
-    cdef unsigned int k = n
-    cdef double p
-    if lam <= 0.0:
-        raise Exception("Lambda must > 0, however we got %d" % lam)
+    assert lam > 0.0, "Lambda must > 0, however we got %d" % lam
 
+    if log10:
+        if lower:
+            # lower tail
+            return log10_poisson_cdf_P_large_lambda(n, lam)
+        else:
+            # upper tail
+            return log10_poisson_cdf_Q_large_lambda(n, lam)
+        
     if lower:
         if lam > 700:
-            p = __poisson_cdf_large_lambda (k, lam)
+            return __poisson_cdf_large_lambda (n, lam)
         else:
-            p = __poisson_cdf(k,lam)
+            return __poisson_cdf(n,lam)
     else:
+        # upper tail
         if lam > 700:
-            p = __poisson_cdf_Q_large_lambda (k, lam)
+            return __poisson_cdf_Q_large_lambda (n, lam)
         else:
-            p = __poisson_cdf_Q(k,lam)
-    if neg_log10:
-        if p <= 0:
-            return 3100
-        else:
-            return log10(p) * -10
-    else:
-        return p
+            return __poisson_cdf_Q(n,lam)
 
 def __poisson_cdf ( unsigned int k, double a):
     """Poisson CDF For small lambda. If a > 745, this will return
@@ -216,6 +218,85 @@ def __poisson_cdf_Q_large_lambda (unsigned int k, double a):
         cdf *= EXPSTEP
     cdf *= lastexp
     return cdf
+
+cdef double log10_poisson_cdf_P_large_lambda (unsigned int k, double lbd):
+    """Slower Poisson CDF evaluater for lower tail which allow
+    calculation in log space. Better for the pvalue < 10^-310.
+
+    Parameters:
+    k	: observation
+    lbd	: lambda
+
+    ret = -lambda + \ln( \sum_{i=k+1}^{\inf} {lambda^i/i!} = -lambda + \ln( sum{ exp{ln(F)} } ), where F=lambda^m/m!
+    \ln{F(m)} = m*ln{lambda} - \sum_{x=1}^{m}\ln(x)
+    Calculate \ln( sum{exp{N} ) by logspace_add function
+
+    Return the log10(pvalue)
+    """
+    cdef double residue = 0
+    cdef double logx = 0
+    cdef double ln_lbd = log(lbd)
+
+    # first residue
+    cdef int m = k
+    cdef double sum_ln_m = 0
+    cdef int i = 0
+    for i in range(1,m+1):
+        sum_ln_m += log(i)
+    logx = m*ln_lbd - sum_ln_m
+    residue = logx
+
+    while m > 1:
+        m -= 1
+        logy = logx-ln_lbd+log(m)
+        pre_residue = residue
+        residue = logspace_add(pre_residue,logy)
+        if fabs(pre_residue-residue) < 1e-10:
+            break
+        logx = logy
+
+    return round((residue-lbd)/log(10),2)
+
+cdef double log10_poisson_cdf_Q_large_lambda (unsigned int k, double lbd):
+    """Slower Poisson CDF evaluater for upper tail which allow
+    calculation in log space. Better for the pvalue < 10^-310.
+
+    Parameters:
+    k	: observation
+    lbd	: lambda
+
+    ret = -lambda + \ln( \sum_{i=k+1}^{\inf} {lambda^i/i!} = -lambda + \ln( sum{ exp{ln(F)} } ), where F=lambda^m/m!
+    \ln{F(m)} = m*ln{lambda} - \sum_{x=1}^{m}\ln(x)
+    Calculate \ln( sum{exp{N} ) by logspace_add function
+
+    Return the log10(pvalue)
+    """
+    cdef double residue = 0
+    cdef double logx = 0
+    cdef double ln_lbd = log(lbd)
+
+    # first residue
+    cdef int m = k+1
+    cdef double sum_ln_m = 0
+    cdef int i = 0
+    for i in range(1,m+1):
+        sum_ln_m += log(i)
+    logx = m*ln_lbd - sum_ln_m
+    residue = logx
+
+    while True:
+        m += 1
+        logy = logx+ln_lbd-log(m)
+        pre_residue = residue
+        residue = logspace_add(pre_residue,logy)
+        if fabs(pre_residue-residue) < 1e-5:
+            break
+        logx = logy
+
+    return round((residue-lbd)/log(10),2)
+
+cdef double logspace_add (double logx, double logy):
+    return max (logx, logy) + py_log1p (exp (-fabs (logx - logy)));
 
 def poisson_cdf_inv ( double cdf, double lam, int maximum=1000):
     """inverse poisson distribution.

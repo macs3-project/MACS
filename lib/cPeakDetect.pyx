@@ -1,4 +1,4 @@
-# Time-stamp: <2011-05-13 13:20:38 Tao Liu>
+# Time-stamp: <2011-05-17 15:43:42 Tao Liu>
 
 """Module Description
 
@@ -289,7 +289,7 @@ class PeakDetect:
 
         # calculate pvalue scores
         self.info("#3 Calculate pvalue scores...")        
-        self.score_btrack = self.treat_btrack.overlie(self.control_btrack,func=lambda x,y:poisson_cdf(x,y,lower=False,neg_log10=True))
+        self.score_btrack = self.treat_btrack.overlie(self.control_btrack,func=lambda x,y:-10*poisson_cdf(x,y,lower=False,log10=True))
         if self.opt.store_bdg:
             self.info("#3 save the score track into bedGraph file...")
             bdgfhd = open(self.zwig_tr + "_scores.bdg", "w")
@@ -345,7 +345,7 @@ class PeakDetect:
         self.control_btrack.reset_baseline(float(self.d)*self.treat.total/self.gsize) # set the baseline as lambda_bg
 
         l_bd = float(self.d)*self.treat.total/self.gsize
-        self.treat_btrack.apply_func(lambda x:poisson_cdf(x,l_bd,lower=False,neg_log10=True))
+        self.treat_btrack.apply_func(lambda x:-10*poisson_cdf(x,l_bd,lower=False,log10=True))
         self.score_btrack = self.treat_btrack
         if self.opt.store_bdg:
             self.info("#3 save the score track into bedGraph file...")

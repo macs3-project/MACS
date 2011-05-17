@@ -1,4 +1,4 @@
-# Time-stamp: <2011-05-12 23:32:34 Tao Liu>
+# Time-stamp: <2011-05-16 03:24:41 Tao Liu>
 
 """Module for Feature IO classes.
 
@@ -1226,12 +1226,16 @@ class bedGraphTrackI:
                     # when the gap is not allowed, close this peak
                     peak_length = peak_content[-1][1]-peak_content[0][0]
                     if peak_length >= min_length: # if the peak is too small, reject it
+                        tsummit = []
                         summit = None
                         summit_value = None
                         for (tstart,tend,tvalue) in peak_content:
                             if not summit_value or summit_value < tvalue:
-                                summit = int((tend+tstart)/2)
+                                tsummit = [int((tend+tstart)/2),]
                                 summit_value = tvalue
+                            elif summit_value == tvalue:
+                                tsummit.append( int((tend+tstart)/2) )
+                        summit = tsummit[int((len(tsummit)+1)/2)-1 ]
                         peaks.add(chrom,peak_content[0][0],peak_content[-1][1],
                                   summit=summit-peak_content[0][0],peak_height=summit_value) # summit is the relative position to peak start
                     # start a new peak
@@ -1246,8 +1250,8 @@ class bedGraphTrackI:
                     if not summit_value or summit_value < tvalue:
                         summit = int((tend+tstart)/2)
                         summit_value = tvalue
-                    peaks.add(chrom,peak_content[0][0],peak_content[-1][1],
-                              summit=summit-peak_content[0][0],peak_height=summit_value)
+                peaks.add(chrom,peak_content[0][0],peak_content[-1][1],
+                          summit=summit-peak_content[0][0],peak_height=summit_value)
             
         return peaks
 
