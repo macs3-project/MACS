@@ -1,12 +1,12 @@
 #!/usr/bin/env python
-# Time-stamp: <2011-03-20 14:25:18 Tao Liu>
+# Time-stamp: <2011-05-17 16:13:08 Tao Liu>
 
 import os
 import sys
 import unittest
 
 from math import log10
-from MACS14.cProb import *
+from MACS2.cProb import *
 
 # ------------------------------------
 # Main function

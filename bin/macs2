@@ -1,7 +1,7 @@
 #!/usr/bin/env python
-# Time-stamp: <2011-05-13 13:25:08 Tao Liu>
+# Time-stamp: <2011-05-17 16:33:14 Tao Liu>
 
-"""Description: MACS 1.4 main executable
+"""Description: MACS 2 main executable
 
 Copyright (c) 2008,2009 Yong Zhang, Tao Liu <taoliu@jimmy.harvard.edu>
 Copyright (c) 2010,2011 Tao Liu <taoliu@jimmy.harvard.edu>
@@ -32,12 +32,12 @@ import gzip
 # ------------------------------------
 # own python modules
 # ------------------------------------
-from MACS14.OptValidator import opt_validate
-from MACS14.OutputWriter import *
-from MACS14.cProb import binomial_cdf_inv
-from MACS14.PeakModel import PeakModel,NotEnoughPairsException
-from MACS14.cPeakDetect import PeakDetect
-from MACS14.Constants import *
+from MACS2.OptValidator import opt_validate
+from MACS2.OutputWriter import *
+from MACS2.cProb import binomial_cdf_inv
+from MACS2.PeakModel import PeakModel,NotEnoughPairsException
+from MACS2.cPeakDetect import PeakDetect
+from MACS2.Constants import *
 # ------------------------------------
 # Main function
 # ------------------------------------
@@ -217,7 +217,7 @@ Example: %prog -t ChIP.bam -c Control.bam -f BAM -g h -n test -w --call-subpeaks
 """
     description = "%prog -- Model-based Analysis for ChIP-Sequencing"
 
-    optparser = OptionParser(version="%prog 1.4.0 20110510 (Feynman's Birthday)",description=description,usage=usage,add_help_option=False)
+    optparser = OptionParser(version="%prog 2.0 20110517 (tag:alpha)",description=description,usage=usage,add_help_option=False)
     optparser.add_option("-h","--help",action="help",help="show this help message and exit.")
     optparser.add_option("-t","--treatment",dest="tfile",type="string",
                          help="ChIP-seq treatment files. REQUIRED.")

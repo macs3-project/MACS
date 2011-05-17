@@ -1,3 +1,42 @@
+2011-05-17  Tao Liu  <taoliu@jimmy.harvard.edu>
+	MACS Version 2.0 (tag:alpha)
+
+	* Use bedGraph type to store data internally and externally.
+
+	We can have theoretically one-basepair resolution profiles. 10
+	times smaller in filesize and even smaller after converting to
+	bigWig for visualization.
+
+	* Peak calling process modified. Better peak boundary detection.
+
+	Extend ChIP tag to d, and pileup to have a ChIP bedGraph. Extend
+	Control tag to d and 1,000bp, and pileup to two bedGraphs. (1000bp
+	one will be averaged to d size) Then calculate the maximum value
+	of these two tracks and a global background, to have a
+	local-lambda bedGraph.
+
+	Use -10log10poisson_pvalue as scores to generate a score track
+	before peak calling.
+
+	A general peak calling based on a score cutoff, min length of peak
+	and max gap between nearby peaks.
+
+	* Option changes.
+
+	Wiggle file output is removed. Now we only support bedGraph
+	output. The generation of bedGraph is highly recommended since it
+	will not cost extra time. In other words, bedGraph generation is
+	internally run even you don't want to save bedGraphs on disk, due
+	to the peak calling algorithm in MACS v2.
+
+	* cProb.pyx
+
+	We now can calculate poisson pvalue in log space so that the score
+	(-10*log10pvalue) will not have a upper limit of 3100 due to
+	precision of float number.
+
+	* Cython is adopted to speed up Python code.
+
 2011-02-28  Tao Liu  <taoliu@jimmy.harvard.edu>
 	Small fixes
 

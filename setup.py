@@ -1,11 +1,11 @@
 #!/usr/bin/env python
-# Time-stamp: <2011-05-13 10:40:28 Tao Liu>
+# Time-stamp: <2011-05-17 16:00:36 Tao Liu>
 
 """Description
 
 Setup script for MACS -- Model Based Analysis for ChIP-Seq data
 
-Copyright (c) 2008,2009,2010 Tao Liu <taoliu@jimmy.harvard.edu>
+Copyright (c) 2008,2009,2010,2011 Tao Liu <taoliu@jimmy.harvard.edu>
 
 This code is free software; you can redistribute it and/or modify it
 under the terms of the Artistic License (see the file COPYING included
@@ -27,10 +27,10 @@ def main():
         sys.stderr.write("CRITICAL: Python version must be 2.6 or 2.7!\n")
         sys.exit(1)
 
-    ext_modules = [Extension("MACS14.cProb", ["lib/cProb.pyx"], libraries=["m"]),
-                   Extension("MACS14.cPileup", ["lib/cPileup.pyx"]),
-                   Extension("MACS14.cPeakDetect", ["lib/cPeakDetect.pyx"]),                   
-                   Extension("MACS14.IO.cFeatIO", ["lib/IO/cFeatIO.pyx"],),
+    ext_modules = [Extension("MACS2.cProb", ["lib/cProb.pyx"], libraries=["m"]),
+                   Extension("MACS2.cPileup", ["lib/cPileup.pyx"]),
+                   Extension("MACS2.cPeakDetect", ["lib/cPeakDetect.pyx"]),                   
+                   Extension("MACS2.IO.cFeatIO", ["lib/IO/cFeatIO.pyx"],),
                    ]
     
 
@@ -40,10 +40,11 @@ def main():
           author='Yong Zhang; Tao (Foo) Liu',
           author_email='zy@jimmy.harvard.edu; taoliu@jimmy.harvard.edu',
           url='http://liulab.dfci.harvard.edu/MACS/',
-          package_dir={'MACS14' : 'lib'},
-          packages=['MACS14', 'MACS14.IO'],
-          scripts=['bin/macs14','bin/elandmulti2bed','bin/elandresult2bed','bin/elandexport2bed',
-                   'bin/sam2bed','bin/bdgpeakcall'],
+          package_dir={'MACS2' : 'lib'},
+          packages=['MACS2', 'MACS2.IO'],
+          scripts=['bin/macs2',
+                   #'bin/elandmulti2bed','bin/elandresult2bed','bin/elandexport2bed','bin/sam2bed',
+                   'bin/bdgpeakcall'],
           classifiers=[
               'Development Status :: 4 - experimental',
               'Environment :: Console',

@@ -1,4 +1,4 @@
-# Time-stamp: <2011-05-16 03:24:41 Tao Liu>
+# Time-stamp: <2011-05-17 16:10:20 Tao Liu>
 
 """Module for Feature IO classes.
 
@@ -27,7 +27,7 @@ from operator import itemgetter
 
 from libc.math cimport sqrt
 
-from MACS14.Constants import *
+from MACS2.Constants import *
 
 # ------------------------------------
 # constants

@@ -1,4 +1,4 @@
-# Time-stamp: <2011-05-17 15:43:42 Tao Liu>
+# Time-stamp: <2011-05-17 16:09:05 Tao Liu>
 
 """Module Description
 
@@ -18,19 +18,18 @@ import os
 from array import array
 from copy import deepcopy
 
-from MACS14.IO.cFeatIO import PeakIO,WigTrackI
-from MACS14.cProb import poisson_cdf
-from MACS14.Constants import *
-from MACS14.cPileup import pileup_bdg
+from MACS2.IO.cFeatIO import PeakIO,WigTrackI
+from MACS2.cProb import poisson_cdf
+from MACS2.Constants import *
+from MACS2.cPileup import pileup_bdg
 
 class PeakDetect:
     """Class to do the peak calling.
 
     e.g:
-    >>> from MACS14.PeakDetect import PeakDetect
+    >>> from MACS2.cPeakDetect import cPeakDetect
     >>> pd = PeakDetect(treat=treatdata, control=controldata, pvalue=pvalue_cutoff, d=100, scan_window=200, gsize=3000000000)
     >>> pd.call_peaks()
-    >>> print pd.toxls()
     """
     def __init__ (self,opt=None,treat=None, control=None):
         """Initialize the PeakDetect object.

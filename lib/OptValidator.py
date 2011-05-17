@@ -1,4 +1,4 @@
-# Time-stamp: <2011-05-12 15:42:41 Tao Liu>
+# Time-stamp: <2011-05-17 16:06:10 Tao Liu>
 
 """Module Description
 
@@ -23,7 +23,7 @@ import re
 import logging
 from subprocess import Popen, PIPE
 from math import log
-from MACS14.IO.Parser import BEDParser, ELANDResultParser, ELANDMultiParser, ELANDExportParser, SAMParser, BAMParser, BowtieParser,  guess_parser
+from MACS2.IO.Parser import BEDParser, ELANDResultParser, ELANDMultiParser, ELANDExportParser, SAMParser, BAMParser, BowtieParser,  guess_parser
 # ------------------------------------
 # constants
 # ------------------------------------

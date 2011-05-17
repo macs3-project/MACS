@@ -1,4 +1,4 @@
-# Time-stamp: <2011-05-10 15:53:05 Tao Liu>
+# Time-stamp: <2011-05-17 16:10:59 Tao Liu>
 
 """Module for all MACS Parser classes for input.
 
@@ -20,8 +20,8 @@ with the distribution).
 import logging
 import struct
 import gzip
-from MACS14.Constants import *
-from MACS14.IO.cFeatIO import FWTrackII
+from MACS2.Constants import *
+from MACS2.IO.cFeatIO import FWTrackII
 # ------------------------------------
 # constants
 # ------------------------------------
