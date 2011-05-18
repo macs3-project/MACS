@@ -1,4 +1,4 @@
-# Time-stamp: <2011-05-17 16:10:20 Tao Liu>
+# Time-stamp: <2011-05-18 13:44:04 Tao Liu>
 
 """Module for Feature IO classes.
 
@@ -1016,6 +1016,7 @@ class bedGraphTrackI:
             c = self.__data[chromosome]            
             # get the preceding region
             pre_pos = c[0][-1]
+            pre_v   = c[1][-1]
             # to check 1. continuity; 2. non-overlapping
             assert pre_pos < endpos , "bedGraph regions are not continuous."
             assert pre_pos <= startpos , "bedGraph regions have overlappings."
@@ -1024,8 +1025,18 @@ class bedGraphTrackI:
                 # there is a gap, so fill it with baseline_value
                 c[0].append(startpos)
                 c[1].append(self.baseline_value)
-            c[0].append(endpos)
-            c[1].append(value)
+                # then add this region
+                c[0].append(endpos)
+                c[1].append(value)
+            else:
+                # if this region is next to the previous one.
+                if pre_v == value:
+                    # if value is the same, simply extend it.
+                    c[0][-1] = endpos
+                else:
+                    # otherwise, add a new region
+                    c[0].append(endpos)
+                    c[1].append(value)
 
         if value > self.maxvalue:
             self.maxvalue = value
@@ -1070,7 +1081,7 @@ class bedGraphTrackI:
                 value = vnext()
                 if value != self.baseline_value:
                     # never write baseline_value
-                    fhd.write("%s\t%d\t%d\t%.4f\n" % (chrom,pre,pos,value))
+                    fhd.write("%s\t%d\t%d\t%.2f\n" % (chrom,pre,pos,value))
                 pre = pos
 
     def reset_baseline (self, baseline_value):
@@ -1353,7 +1364,9 @@ class bedGraphTrackI:
                        
     def apply_func ( self, func ):
         """Apply function 'func' to every value in this bedGraphTrackI object.
-        
+
+        *Two adjacent regions with same value after applying func will
+        not be merged.
         """
         t = 0
         for (p,s) in self.__data.values():

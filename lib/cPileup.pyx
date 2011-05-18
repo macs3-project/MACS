@@ -1,4 +1,4 @@
-# Time-stamp: <2011-05-17 16:09:16 Tao Liu>
+# Time-stamp: <2011-05-18 14:20:32 Tao Liu>
 
 """Module Description: For pileup functions.
 
@@ -33,7 +33,7 @@ def pileup_bdg (trackI, d, baseline_value = 0):
     A tag is a single genomic location.
 
     trackI  : A FWTrackII object. For example, the shifted tags from PeakDetect object.
-    d       : tag will be extended to 1/2 of this value.
+    d       : tag will be extended to 1/2 of this value to each side, i.e. a 'd' size fragment.
     baseline_value : a value to be filled for missing values.
 
     Return a bedGraphTrackI object.
