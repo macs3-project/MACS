@@ -1,4 +1,4 @@
-# Time-stamp: <2011-05-18 14:20:32 Tao Liu>
+# Time-stamp: <2011-05-19 11:47:21 Tao Liu>
 
 """Module Description: For pileup functions.
 
@@ -20,6 +20,7 @@ the distribution).
 from array import array
 
 from MACS2.IO.cFeatIO import bedGraphTrackI
+from time import time
 from MACS2.Constants import *
 # ------------------------------------
 # constants
@@ -38,76 +39,62 @@ def pileup_bdg (trackI, d, baseline_value = 0):
 
     Return a bedGraphTrackI object.
     """
-    step = 10000000 + 2*d               # step to cache data points.
+    #step = 10000000 + 2*d               # step to cache data points.
 
     ret = bedGraphTrackI(baseline_value=baseline_value) # bedGraphTrackI object to be returned.
+
+    cdef int half_d1 = int(d//2)
+    cdef int half_d2 = d - int(d//2)
 
     chrs = trackI.get_chr_names()       
     for chrom in chrs:
         tags = trackI.get_locations_by_chr(chrom)[0]
         l = len(tags)
-        window_counts = array(BYTE4,[0]*step)
-        startp = -1*d
-        endp   = startp+step
-        index_tag = 0
-		
-        while index_tag<l:
-            s = tags[index_tag]-d/2     # start of tag
-            e = s+d                     # end of tag
-            
-            if e < endp:
-                # project tag to window_counts line
-                ps = s-startp # projection start
-                pe = ps+d     # projection end
-                for i in xrange(ps,pe):
-                    window_counts[i] += 1
-                index_tag += 1
+
+        start_poss = array(BYTE4,[])
+        end_poss   = array(BYTE4,[])
+
+        for i in xrange(len(tags)):
+            # shift to get start positions
+            start_poss.append(tags[i]-half_d1)
+            # shift to get end positions
+            end_poss.append(tags[i]+half_d2) 
+
+        # combine start and end positions
+        i_s = 0                         # index of start_poss
+        i_e = 0                         # index of end_poss
+
+        pileup = 0
+        pre_p = 0
+        while i_s < l and i_e < l:
+            if start_poss[i_s] < end_poss[i_e]:
+                p = start_poss[i_s]
+                if p != pre_p:
+                    ret.add_loc(chrom,pre_p,p,pileup)
+                    pre_p = p
+                pileup += 1
+                i_s += 1
+            elif start_poss[i_s] > end_poss[i_e]:
+                p = end_poss[i_e]
+                if p != pre_p:
+                    ret.add_loc(chrom,pre_p,p,pileup)
+                    pre_p = p
+                pileup -= 1
+                i_e += 1
             else:
-                # write it to zbdg file then reset parameters
-                # keep this tag for next window
-                prev = window_counts[d]
-                left = startp+d
-                right = left+1
-                for i in xrange(d+1,step-d):
-                    if window_counts[i] == prev:
-                        # same value, extend
-                        right += 1
-                    else:
-                        # diff value, close
-                        if prev != 0:
-                            ret.add_loc(chrom,left,right,prev)
-                        prev = window_counts[i]
-                        left = right
-                        right = left + 1
-                # last bin
-                if prev != 0:                
-                    ret.add_loc(chrom,left,right,prev)
-                    
-                # reset
-                window_counts_next = array(BYTE4,[0]*step)
-                # copy d values from the tail of previous window to next window
-                for n,i in enumerate(xrange(step-2*d,step)): # debug
-                    window_counts_next[n] = window_counts[i]
-                window_counts = window_counts_next
-                startp = endp - 2*d
-                endp = startp+step
-        # last window
-        prev = window_counts[d]
-        left = startp+d
-        right = left+1
-        for i in xrange(d+1,step-d):
-            if window_counts[i] == prev:
-                # same value, exrend
-                right += 1
-            else:
-                # diff value, close
-                if prev != 0:                
-                    ret.add_loc(chrom,left,right,prev)
-                prev = window_counts[i]
-                left = right
-                right = left + 1
-        # last bin
-        if prev != 0:        
-            ret.add_loc(chrom,left,right,prev)
-            
+                i_s += 1
+                i_e += 1
+        if i_e < l:
+            # add rest of end positions
+            for p in end_poss[i_e:]:
+                ret.add_loc(chrom,pre_p,p,pileup)
+                pre_p = p
+                pileup -= 1
+        if i_s < l:
+            # add rest of start positions
+            for p in start_poss[i_s:]:
+                ret.add_loc(chrom,pre_p,p,pileup)
+                pre_p = p
+                pileup += 1
+
     return ret

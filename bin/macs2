@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# Time-stamp: <2011-05-17 16:33:14 Tao Liu>
+# Time-stamp: <2011-05-19 12:03:37 Tao Liu>
 
 """Description: MACS 2 main executable
 
@@ -217,7 +217,7 @@ Example: %prog -t ChIP.bam -c Control.bam -f BAM -g h -n test -w --call-subpeaks
 """
     description = "%prog -- Model-based Analysis for ChIP-Sequencing"
 
-    optparser = OptionParser(version="%prog 2.0 20110517 (tag:alpha)",description=description,usage=usage,add_help_option=False)
+    optparser = OptionParser(version="%prog %s" % (MACS_VERSION),description=description,usage=usage,add_help_option=False)
     optparser.add_option("-h","--help",action="help",help="show this help message and exit.")
     optparser.add_option("-t","--treatment",dest="tfile",type="string",
                          help="ChIP-seq treatment files. REQUIRED.")
