@@ -1,4 +1,4 @@
-# Time-stamp: <2011-05-19 23:40:56 Tao Liu>
+# Time-stamp: <2011-05-20 00:18:01 Tao Liu>
 
 """Module for Feature IO classes.
 
@@ -1079,9 +1079,9 @@ class bedGraphTrackI:
             for i in xrange(len(p)):
                 pos = pnext()
                 value = vnext()
-                if value != self.baseline_value:
-                    # never write baseline_value
-                    fhd.write("%s\t%d\t%d\t%.2f\n" % (chrom,pre,pos,value))
+                #if value != self.baseline_value:
+                # never write baseline_value
+                fhd.write("%s\t%d\t%d\t%.2f\n" % (chrom,pre,pos,value))
                 pre = pos
 
     def reset_baseline (self, baseline_value):
