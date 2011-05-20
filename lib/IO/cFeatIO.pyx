@@ -1,4 +1,4 @@
-# Time-stamp: <2011-03-02 17:28:15 Tao Liu>
+# Time-stamp: <2011-05-20 00:18:01 Tao Liu>
 
 """Module for Feature IO classes.
 
@@ -20,20 +20,21 @@ with the distribution).
 import re
 import sys
 import logging
-import struct
+
 from array import array
 from random import sample as random_sample
 from operator import itemgetter
-from math import sqrt
 
-from MACS14.Constants import *
+from libc.math cimport sqrt
+
+from MACS2.Constants import *
 
 # ------------------------------------
 # constants
 # ------------------------------------
 __version__ = "FeatIO $Revision$"
 __author__ = "Tao Liu <taoliu@jimmy.harvard.edu>"
-__doc__ = "PeakIO, FWTrackI, TrackI, and WigTrackI classes"
+__doc__ = "PeakIO, FWTrackII, TrackI, and WigTrackI classes"
 
 # ------------------------------------
 # Misc functions
@@ -43,17 +44,17 @@ __doc__ = "PeakIO, FWTrackI, TrackI, and WigTrackI classes"
 # ------------------------------------
 # Classes
 # ------------------------------------
-
 class PeakIO:
     """IO for peak information.
 
     """
+
     def __init__ (self):
         self.peaks = {}
     
-    def add (self, chromosome, start, end, summit=None, 
-             peak_height=None, number_tags=None, 
-             pvalue=None, fold_enrichment=None, fdr=None):
+    def add (self, char * chromosome, long start, long end, long summit = 0, 
+             double peak_height=0, int number_tags=0, 
+             double pvalue=0, double fold_enrichment=0, double fdr=0):
         """items: (peak start,peak end, peak length, peak summit, peak
         height, number of tags in peak region, peak pvalue, peak
         fold_enrichment, fdr) <-- tuple type
@@ -64,11 +65,11 @@ class PeakIO:
                                        peak_height,number_tags,
                                        pvalue,fold_enrichment,fdr))
 
-    def filter_pvalue (self, pvalue_cut ):
+    def filter_pvalue (self, double pvalue_cut ):
         peaks = self.peaks
         new_peaks = {}
-        chrs = peaks.keys()
-        chrs.sort()
+        chrs = sorted(peaks.keys())
+        
         for chrom in chrs:
             new_peaks[chrom]=[p for p in peaks[chrom] if p[6] >= pvalue_cut]
         self.peaks = new_peaks
@@ -129,13 +130,99 @@ class PeakIO:
         
     
     def tobed (self):
+        """Print out peaks in BED5 format.
+
+        Five columns are chromosome, peak start, peak end, peak name, and peak height.
+
+        items: (peak start,peak end, peak length, peak summit, peak
+        height, number of tags in peak region, peak pvalue, peak
+        fold_enrichment, fdr) <-- tuple type
+        """
         text = ""
         chrs = self.peaks.keys()
         chrs.sort()
+        n_peak = 0
         for chrom in chrs:
             for peak in self.peaks[chrom]:
-                text+= "%s\t%d\t%d\n" % (chrom,peak[0],peak[1])
+                n_peak += 1
+                text+= "%s\t%d\t%d\tpeak_%d\t%.2f\n" % (chrom,peak[0],peak[1],n_peak,peak[4])
         return text
+
+    def to_summits_bed (self):
+        """Print out peak summits in BED5 format.
+
+        Five columns are chromosome, summit start, summit end, peak name, and peak height.
+
+        items: (peak start,peak end, peak length, peak summit, peak
+        height, number of tags in peak region, peak pvalue, peak
+        fold_enrichment, fdr) <-- tuple type
+        """
+        text = ""
+        chrs = self.peaks.keys()
+        chrs.sort()
+        n_peak = 0
+        for chrom in chrs:
+            for peak in self.peaks[chrom]:
+                n_peak += 1
+                summit_p = peak[0]+peak[3]
+                text+= "%s\t%d\t%d\tpeak_%d\t%.2f\n" % (chrom,summit_p,summit_p+1,n_peak,peak[4])
+        return text
+
+    def write_to_bed (self, fhd, name_prefix="peak_", score_column=4):
+        """Write peaks in BED5 format in a file handler. Score (5th
+        column) is decided by score_column setting. Check the
+        following list. Name column ( 4th column) is made by putting
+        name_prefix together with an ascending number.
+
+        Five columns are chromosome, peak start, peak end, peak name, and peak score.
+
+        items in peak object:
+        0. peak start
+        1. peak end
+        2. peak length
+        3. peak summit
+        4. peak height
+        5. number of tags in peak region
+        6. peak pvalue
+        7. peak fold_enrichment
+        8. fdr
+        """
+        chrs = self.peaks.keys()
+        chrs.sort()
+        n_peak = 0
+        for chrom in chrs:
+            for peak in self.peaks[chrom]:
+                n_peak += 1
+                fhd.write( "%s\t%d\t%d\t%s%d\t%.2f\n" % (chrom,peak[0],peak[1],name_prefix,n_peak,peak[score_column]) )
+
+
+    def write_to_summit_bed (self, fhd, name_prefix="peak_", score_column=4):
+        """Write peak summits in BED5 format in a file handler. Score
+        (5th column) is decided by score_column setting. Check the
+        following list. Name column ( 4th column) is made by putting
+        name_prefix together with an ascending number.
+
+        Five columns are chromosome, summit start, summit end, peak name, and peak score.
+
+        items in peak object:
+        0. peak start
+        1. peak end
+        2. peak length
+        3. peak summit
+        4. peak height
+        5. number of tags in peak region
+        6. peak pvalue
+        7. peak fold_enrichment
+        8. fdr
+        """
+        chrs = self.peaks.keys()
+        chrs.sort()
+        n_peak = 0
+        for chrom in chrs:
+            for peak in self.peaks[chrom]:
+                n_peak += 1
+                summit_p = peak[0]+peak[3]
+                fhd.write( "%s\t%d\t%d\t%s%d\t%.2f\n" % (chrom,summit_p,summit_p+1,name_prefix,n_peak,peak[score_column]) )
 
     def towig (self):
         text = ""
@@ -194,7 +281,7 @@ class PeakIO:
                         prev_peak = peaks_chr[i]
             if prev_peak:
                 n_append(prev_peak)
-        del peaks
+        #del peaks
         self.peaks = new_peaks
         return True
 
@@ -255,7 +342,7 @@ class FWTrackII:
         self.total = 0                  # total tags
         self.annotation = anno   # need to be figured out
 
-    def add_loc (self, chromosome, fiveendpos, strand):
+    def add_loc (self, char * chromosome, long fiveendpos, int strand):
         """Add a location to the list according to the sequence name.
         
         chromosome -- mostly the chromosome name
@@ -264,6 +351,7 @@ class FWTrackII:
         """
         if not self.__locations.has_key(chromosome):
             self.__locations[chromosome] = [array(BYTE4,[]),array(BYTE4,[])] # for (+strand, -strand)
+            #self.__locations[chromosome] = [ plus , minus] # for (+strand, -strand)
         self.__locations[chromosome][strand].append(fiveendpos)
         self.total+=1
 
@@ -427,262 +515,6 @@ class FWTrackII:
                 for i in self.__locations[k][1]:
                     t += "%d\t1\n" % i
         return t
-
-class FWTrackI:
-    """Fixed Width Ranges along the whole genome (commonly with the
-    same annotation type), which are stored in a dict.
-
-    Locations are stored and organized by sequence names (chr names) in a
-    dict. They can be sorted by calling self.sort() function.
-
-    Example:
-       >>> tabfile = TabFile('tag.bed',format='bed',mode='r')
-       >>> track = FWTrackI()
-       >>> for (chromosome,rg) in tabfile:
-       ...    track.add_location(chromosome,rg)
-       >>> track.get_locations_by_chr['chr1'] # all locations in chr1 
-    """
-    def __init__ (self,fw=0,anno=""):
-        """fw is the fixed-width for all locations
-        """
-        self.fw = fw
-        self.__locations = {}           # locations
-        self.__counts = {}              # number of tags at the same location
-        self.__well_merged = False
-        self.total = 0					# total tags
-        self.total_unique = 0		# total unique tags
-        self.annotation = anno   # need to be figured out
-
-    def add_loc (self, chromosome, fiveendpos, strand):
-        """Add a location to the list according to the sequence name.
-        
-        chromosome -- mostly the chromosome name
-        fiveendpos -- 5' end pos, left for plus strand, right for neg strand
-        strand     -- 0: plus, 1: minus
-        """
-        if not self.__locations.has_key(chromosome):
-            self.__locations[chromosome] = [array(BYTE4,[]),array(BYTE4,[])] # for (+strand, -strand)
-            self.__counts[chromosome] = [array(UBYTE2,[]),array(UBYTE2,[])] # for (+,-)
-        self.__locations[chromosome][strand].append(fiveendpos)
-        self.__counts[chromosome][strand].append(1)
-        self.total+=1
-
-    def get_locations_by_chr (self, chromosome):
-        """Return a tuple of two lists of locations for certain chromosome.
-
-        """
-        if self.__locations.has_key(chromosome):
-            return self.__locations[chromosome]
-        else:
-            raise Exception("No such chromosome name (%s) in TrackI object!\n" % (chromosome))
-
-    def get_counts_by_chr (self, chromosome):
-        """Return a tuple of two lists of counts for certain chromosome.
-
-        """
-        if self.__counts.has_key(chromosome):
-            return self.__counts[chromosome]
-        else:
-            raise Exception("No such chromosome name (%s) in TrackI object!\n" % (chromosome))
-
-    def get_loc_counts_by_chr (self, chromosome):
-        """Return a tuple of two lists of (loc,count) for certain chromosome.
-
-        """
-        if self.__counts.has_key(chromosome):
-            return (zip(self.__locations[chromosome][0],self.__counts[chromosome][0]),
-                    zip(self.__locations[chromosome][1],self.__counts[chromosome][1]))
-        else:
-            raise Exception("No such chromosome name (%s) in TrackI object!\n" % (chromosome))
-
-    def get_chr_names (self):
-        """Return all the chromosome names stored in this track object.
-        """
-        l = self.__locations.keys()
-        l.sort()
-        return l
-
-    def length (self):
-        """Total sequenced length = total number of tags * width of tag		
-        """
-        return self.total*self.fw
-
-    def sort (self):
-        """Naive sorting for locations.
-        
-        """
-        for k in self.__locations.keys():
-            g0 = itemgetter(0)
-            g1 = itemgetter(1)
-            (tmparrayplus,tmparrayminus) = self.get_loc_counts_by_chr(k)
-            sortedtmparrayplus = sorted(tmparrayplus,key=g0)
-            self.__locations[k][0] = [g0(x) for x in sortedtmparrayplus]
-            self.__counts[k][0] = [g1(x) for x in sortedtmparrayplus]
-            sortedtmparrayminus = sorted(tmparrayminus,key=g0)
-            self.__locations[k][1] = [g0(x) for x in sortedtmparrayminus]
-            self.__counts[k][1] = [g1(x) for x in sortedtmparrayminus]
-
-    def merge_overlap (self):
-        """merge the SAME locations. Record the duplicate number in self.__counts{}
-
-        Run it right after you add all data into this object.
-        
-        *Note: different with the merge_overlap() in TrackI class,
-        which merges the overlapped locations.
-        """
-        self.total = 0
-        self.total_unique = 0
-        for k in self.__locations.keys(): # for each chromosome
-            # + strand
-            plus = sorted(self.__locations[k][0])
-            if len(plus) <1:
-                logging.warning("NO records for chromosome %s, plus strand!" % (k))
-                new_plus = []
-                new_plus_c = []
-            else:
-                (new_plus,new_plus_c) = (array(BYTE4,[plus[0]]),array(UBYTE2,[1]))
-            
-                pappend = new_plus.append
-                pcappend = new_plus_c.append
-                n = 0                # the position in new list
-                for p in plus[1:]:
-                    if p == new_plus[n]:
-                        try:
-                            new_plus_c[n]+=1
-                        except OverflowError:
-                            logging.warning("> 65535 + strand tags mapped to position %d on chromosome %s!" % (p,k))
-                            new_plus_c[n]=65535
-
-                    else:
-                        pappend(p)
-                        pcappend(1)
-                        n += 1
-                self.total_unique +=  len(new_plus)
-                self.total += sum(new_plus_c)
-            # - strand
-            minus = sorted(self.__locations[k][1])
-            if len(minus) <1:
-                logging.warning("NO records for chromosome %s, minus strand!" % (k))
-                new_minus = []
-                new_minus_c = []
-            else:
-                (new_minus,new_minus_c) = (array(BYTE4,[minus[0]]),array(UBYTE2,[1]))
-            
-                mappend = new_minus.append
-                mcappend = new_minus_c.append
-                n = 0                # the position in new list
-                for p in minus[1:]:
-                    if p == new_minus[n]:
-                        try:
-                            new_minus_c[n]+=1
-                        except OverflowError:
-                            logging.warning("> 65535 - strand tags mapped to position %d on chromosome %s!" % (p,k))
-                            new_minus_c[n]=65535
-                    else:
-                        mappend(p)
-                        mcappend(1)
-                        n += 1
-                self.total_unique +=  len(new_minus)
-                self.total += sum(new_minus_c)
-
-            self.__locations[k]=[new_plus,new_minus]
-            self.__counts[k]=[new_plus_c,new_minus_c]
-            self.__well_merged = True
-		
-    def merge_plus_minus_locations_w_duplicates (self,maxnum=None):
-        """Merge minus strand locations to plus strand. The duplicates
-        on a single strand is defined in 'maxnum'. If maxnum is None,
-        then keep all the duplicates.
-                
-        Side effect: Reset the counts. self.total_unique is set to
-        None. This object is changed.
-        """
-        self.total_unique = None
-        self.total = 0
-        for chrom in self.__locations.keys():
-            (plus_tags,minus_tags) = self.__locations[chrom]
-            (plus_counts,minus_counts) = self.__counts[chrom]
-
-            new_plus_tags = array(BYTE4,[])
-            new_plus_counts = array(UBYTE2,[])
-
-            ip = 0
-            im = 0
-            lenp = len(plus_tags)
-            lenm = len(minus_tags)
-            while ip < lenp and im < lenm:
-                if plus_tags[ip] < minus_tags[im]:
-                    for i in xrange(plus_counts[ip]):
-                        if maxnum and i+1>maxnum:
-                            break
-                        new_plus_tags.append(plus_tags[ip])
-                        new_plus_counts.append(1)
-                    ip += 1
-                else:
-                    for i in xrange(minus_counts[im]):
-                        if maxnum and i+1>maxnum:
-                            break
-                        new_plus_tags.append(minus_tags[im])
-                        new_plus_counts.append(1)                        
-                    im += 1
-            for im2 in xrange(im,lenm):
-                # add rest of minus tags
-                for i in xrange(minus_counts[im2]):
-                    if maxnum and i+1>maxnum:
-                        break
-                    new_plus_tags.append(minus_tags[im2])
-                    new_plus_counts.append(1)
-                    
-            for ip2 in xrange(ip,lenp):
-                # add rest of minus tags
-                for i in xrange(plus_counts[ip2]):
-                    if maxnum and i+1>maxnum:
-                        break
-                    new_plus_tags.append(plus_tags[ip2])
-                    new_plus_counts.append(1)
-                    
-            self.__locations[chrom] = [new_plus_tags,[]]
-            self.__counts[chrom] = [new_plus_counts,[]]
-            self.total += len(new_plus_tags)
-
-    def sample (self, percent):
-        """Sample the tags for a given percentage.
-
-        Warning: the current object is changed!
-        
-        Side effect: self.total_unique is set to None, and counts are unset.
-        """
-        self.total = 0
-        self.total_unique = None
-        for key in self.__locations.keys():
-            num = int(len(self.__locations[key][0])*percent)
-            self.__locations[key][0]=array(BYTE4,sorted(random_sample(self.__locations[key][0],num)))
-            num = int(len(self.__locations[key][1])*percent)
-            self.__locations[key][1]=array(BYTE4,sorted(random_sample(self.__locations[key][1],num)))
-            self.total += len(self.__locations[key][0]) + len(self.__locations[key][1])
-            self.__counts[key] = [[],[]]
-            
-    def __str__ (self):
-        return self.__to_wiggle()
-        
-    def __to_wiggle (self):
-        """Use a lot of memory!
-        
-        """
-        t = "track type=wiggle_0 name=\"tag list\" description=\"%s\"\n" % (self.annotation)
-        for k in self.__locations.keys():
-            (tmparrayplus,tmparrayminus) = self.get_loc_counts_by_chr(k)
-
-            if self.__locations[k][0]:
-                t += "variableStep chrom=%s span=%d strand=0\n" % (k,self.fw)
-                for (i,j) in tmparrayplus:
-                    t += "%d\t%d\n" % (i,j)
-            if self.__locations[k][1]:
-                t += "variableStep chrom=%s span=%d strand=1\n" % (k,self.fw)
-                for (i,j) in tmparrayminus:
-                    t += "%d\t%d\n" % (i,j)
-        return t
-
 
 class WigTrackI:
     """Designed only for wig files generated by MACS/pMA2C/MAT(future
@@ -1126,54 +958,96 @@ class WigTrackI:
             t += len(p)
         return t
 
-
 class bedGraphTrackI:
     """Class for bedGraph type data.
 
-    In bedGraph, data are represented as non-overlapping regions in
-    the whole genome. I keep this assumption in all the functions. If
-    data has overlaps, some functions will definitely give incorrect result.
+    In bedGraph, data are represented as continuous non-overlapping
+    regions in the whole genome. I keep this assumption in all the
+    functions. If data has overlaps, some functions will definitely
+    give incorrect results.
+
+    1. Continuous: the next region should be after the previous one
+    unless they are on different chromosomes;
+    
+    2. Non-overlapping: the next region should never have overlaps
+    with preceding region.
+
+    The way to memorize bedGraph data is to remember the transition
+    points together with values of their preceding regions. The last
+    data point may exceed chromosome end, unless a chromosome
+    dictionary is given. Remember the coordinations in bedGraph and
+    this class is 0-indexed and right-open.
     
     """
-    def __init__ (self):
+    def __init__ (self, baseline_value=0):
+        """
+        baseline_value is the value to fill in the regions not defined
+        in bedGraph. For example, if the bedGraph is like:
+
+        chr1  100 200  1
+        chr1  250 350  2
+
+        Then the region chr1:200..250 should be filled with baseline_value.
+        
+        """
         self.__data = {}
         self.maxvalue =-10000
         self.minvalue = 10000
+        self.baseline_value = baseline_value
 
     def add_loc (self,chromosome,startpos,endpos,value):
+        """Add a chr-start-end-value block into __data dictionary.
+
+        """
+        # basic assumption, end pos should > start pos
+        assert endpos > startpos, "endpos %d can't be smaller than start pos %d" % (endpos,startpos)
+        
         if not self.__data.has_key(chromosome):
-            self.__data[chromosome] = [array(BYTE4,[]),array(BYTE4,[]),array(FBYTE4,[])] # for (startpos,endpos,value)
-        self.__data[chromosome][0].append(startpos)
-        self.__data[chromosome][1].append(endpos)
-        self.__data[chromosome][2].append(value)        
+            self.__data[chromosome] = [array(BYTE4,[]),array(FBYTE4,[])] # for (endpos,value)
+            c = self.__data[chromosome]
+            if startpos:
+                # start pos is not 0, then add two blocks, the first
+                # with "baseline_value"; the second with "value"
+                c[0].append(startpos)
+                c[1].append(self.baseline_value)
+            c[0].append(endpos)
+            c[1].append(value)
+        else:
+            c = self.__data[chromosome]            
+            # get the preceding region
+            pre_pos = c[0][-1]
+            pre_v   = c[1][-1]
+            # to check 1. continuity; 2. non-overlapping
+            assert pre_pos < endpos , "bedGraph regions are not continuous."
+            assert pre_pos <= startpos , "bedGraph regions have overlappings."
+            
+            if startpos != pre_pos:
+                # there is a gap, so fill it with baseline_value
+                c[0].append(startpos)
+                c[1].append(self.baseline_value)
+                # then add this region
+                c[0].append(endpos)
+                c[1].append(value)
+            else:
+                # if this region is next to the previous one.
+                if pre_v == value:
+                    # if value is the same, simply extend it.
+                    c[0][-1] = endpos
+                else:
+                    # otherwise, add a new region
+                    c[0].append(endpos)
+                    c[1].append(value)
+
         if value > self.maxvalue:
             self.maxvalue = value
         if value < self.minvalue:
             self.minvalue = value
-        
-    def sort (self):
-        """Naive sorting for tags. Sort the data by the start
-        position.
-
-        """
-        for k in self.__data.keys():
-            (ps,pe,v) = self.__data[k]
-            pv = zip(ps,pe,v)
-            pv = sorted(pv)
-            self.__data[k] = [array(BYTE4,[]),array(BYTE4,[]),array(FBYTE4,[])]
-            psappend = self.__data[k][0].append
-            peappend = self.__data[k][1].append            
-            vappend = self.__data[k][2].append
-            for (tps,tpe,tv) in pv:
-                psappend(tps)
-                peappend(tpe)                
-                vappend(tv)
 
     def get_data_by_chr (self, chromosome):
         """Return array of counts by chromosome.
 
         The return value is a tuple:
-        ([start pos],[end pos],[value])
+        ([end pos],[value])
         """
         if self.__data.has_key(chromosome):
             return self.__data[chromosome]
@@ -1187,79 +1061,114 @@ class bedGraphTrackI:
         l = set(self.__data.keys())
         return l
 
-    def write_bedGraph (self, fhd, name):
+    def write_bedGraph (self, fhd, name, description):
         """Write all data to fhd in Wiggle Format.
+
+        fhd: a filehandler to save bedGraph.
+        name/description: the name and description in track line.
 
         shift will be used to shift the coordinates. default: 0
         """
-        fhd.write("track type=bedGraph name=\"%s\" description=\"%s\"\n" % (name,name))
+        #fhd.write("track type=bedGraph name=\"%s\" description=\"%s\"\n" % (name,description))
         chrs = self.get_chr_names()
         for chrom in chrs:
-            (ps,pe,v) = self.__data[chrom]
-            psnext = iter(ps).next
-            penext = iter(pe).next            
-            vnext = iter(v).next            
-            for i in xrange(len(ps)):
-                startpos = psnext()
-                endpos = penext()
-                score = snext()
-                fhd.write("%d\t%d\t%.4f\n" % (startpos,endpos,score))                
+            (p,v) = self.__data[chrom]
+            pnext = iter(p).next
+            vnext = iter(v).next
+            pre = 0
+            for i in xrange(len(p)):
+                pos = pnext()
+                value = vnext()
+                #if value != self.baseline_value:
+                # never write baseline_value
+                fhd.write("%s\t%d\t%d\t%.2f\n" % (chrom,pre,pos,value))
+                pre = pos
 
+    def reset_baseline (self, baseline_value):
+        """Reset baseline value to baseline_value.
+
+        So any region between self.baseline_value and baseline_value
+        will be set to baseline_value.
+        
+        """
+        self.baseline_value = baseline_value
+        self.filter_score(cutoff=baseline_value)
+        self.merge_regions()
+
+    def merge_regions (self):
+        """Merge nearby regions with the same value.
+        
+        """
+        chrs = set(self.__data.keys())
+        for chrom in chrs:
+            (p,v) = self.__data[chrom]
+            pnext = iter(p).next
+            vnext = iter(v).next
+
+            # new arrays
+            new_pos = array(BYTE4,[pnext(),])
+            new_value = array(FBYTE4,[vnext(),])
+
+            newpa = new_pos.append
+            newva = new_value.append
+            
+            new_pre_pos = new_pos[0]
+            new_pre_value = new_value[0]
+
+            for i in xrange(1,len(p)):
+                pos = pnext()
+                value = vnext()
+                if value == new_pre_value:
+                    new_pos[-1] = pos
+                else:
+                    # add new region
+                    newpa(pos)
+                    newva(value)
+                    new_pre_pos = pos
+                    new_pre_value = value
+            self.__data[chrom] = [new_pos,new_value]
+        return True
+                
     def filter_score (self, cutoff=0):
-        """Filter using a score cutoff. Return a new bedGraph.
-        
+        """Filter using a score cutoff. Any region lower than score
+        cutoff will be set to self.baseline_value.
+
+        Self will be modified.
         """
         ret = bedGraphTrackI()
         chrs = set(self.__data.keys())
         for chrom in chrs:
-            (ps,pe,s) = self.__data[chrom]
+            (p,v) = self.__data[chrom]
+            pnext = iter(p).next
+            vnext = iter(v).next
 
-            ret.__data[chrom] = [array(BYTE4,[]),array(BYTE4,[]),array(FBYTE4,[])]
-            (nps,npe,ns) = ret.__data[chrom] # new pos start, new pos end, new score
-            npsa = nps.append
-            npea = npe.append
-            nsa = ns.append
+            # new arrays
+            new_pos = array(BYTE4,[])
+            new_value = array(FBYTE4,[])
+            new_pre_pos = 0
+            new_pre_value = None
 
-            psnext = iter(ps).next
-            penext = iter(pe).next            
-            snext = iter(s).next            
-            for i in xrange(len(ps)):
-                startpos = psnext()
-                endpos = penext()                
-                score = snext()
-                if score > cutoff:
-                    npsa(startpos)
-                    npea(endpos)
-                    nsa(score)
-        return ret
+            for i in xrange(len(p)):
+                pos = pnext()
+                value = vnext()
 
-    def filter_score_below (self, cutoff=0):
-        """Keep points below a score cutoff. Return a new bedGraphTrackI.
-        
-        """
-        ret = bedGraphTrackI()
-        chrs = set(self.__data.keys())
-        for chrom in chrs:
-            (ps,pe,s) = self.__data[chrom]
-
-            ret.__data[chrom] = [array(BYTE4,[]),array(BYTE4,[]),array(FBYTE4,[])]
-            (nps,npe,ns) = ret.__data[chrom] # new pos start, new pos end, new score
-            npsa = nps.append
-            npea = npe.append
-            nsa = ns.append
-
-            psnext = iter(ps).next
-            penext = iter(pe).next            
-            snext = iter(s).next            
-            for i in xrange(len(ps)):
-                startpos = psnext()
-                endpos = penext()                
-                score = snext()
-                if score < cutoff:
-                    npsa(startpos)
-                    npea(endpos)
-                    nsa(score)
-        return ret
+                if value < cutoff:
+                    # this region will be set to baseline_value
+                    if new_pre_value == self.baseline_value:
+                        # if preceding region is at baseline, extend it
+                        new_pos[-1] = pos
+                    else:
+                        # else add a new baseline region
+                        new_pos.append(pos)
+                        new_value.append(self.baseline_value)
+                else:
+                    # put it into new arrays
+                    new_pos.append(pos)
+                    new_value.append(value)
+                new_pre_pos = new_pos[-1]
+                new_pre_value = new_value[-1]
+            self.__data[chrom]=[new_pos,new_value]
+        return True
 
     def summary (self):
         """Calculate the sum, max, min, mean, and std. Return a tuple for (sum, max, min, mean, std).
@@ -1269,148 +1178,223 @@ class bedGraphTrackI:
         sum_v = 0
         max_v = -100000
         min_v = 100000
-        for (s,e,v) in self.__data.values():
+        for (p,v) in self.__data.values():
             # for each chromosome
-            for i in range(len(s)):
+            pre_p = 0
+            for i in range(len(p)):
                 # for each region
-                l = e[i]-s[i]
+                l = p[i]-pre_p
                 sum_v += v[i]*l
                 n_v += l
+                pre_p = p[i]
             max_v = max(max(v),max_v)
             min_v = min(min(v),min_v)
         mean_v = float(sum_v)/n_v
         variance = 0.0
-        for (s,e,v) in self.__data.values():
-            for vv in v:
-                tmp = vv-mean_v
-                variance += tmp*tmp
+        for (p,v) in self.__data.values():
+            for i in range(len(p)):
+                # for each region
+                tmp = v[i]-mean_v
+                l = p[i]-pre_p
+                variance += tmp*tmp*l
+                pre_p = p[i]
+
         variance /= float(n_v-1)
         std_v = sqrt(variance)
         return (sum_v, max_v, min_v, mean_v, std_v)
 
-    def null_model_summary (self, sample_step=100):
-        """Calculate the sum, max, min, mean, and std. Return a tuple for (sum, max, min, mean, std).
-
-        This is for NULL model which is a symetric normal distribution
-        based on sample% of the whole data set.
-        """
-        # sample data step
-        data_step = sample_step
-
-        null_list = array(FBYTE4,[])
-        na = null_list.append
-        for (s,e,v) in self.__data.values():
-            i = 0
-            for vv in v:
-                i+=1
-                if i==data_step:
-                    na(vv)
-                    i=0
-        
-        sum_v = sum(null_list)
-        mean_v = sum_v/float(len(null_list))
-
-        null_list_len = len(null_list)
-        null_list = sorted(null_list)
-        median_index1 = (null_list_len - 1) / 2
-        median_index2 = null_list_len / 2
-        median_v = (null_list[median_index1]+null_list[median_index2])/2.0
-
-        # make right part of nullList
-
-        for i in xrange(null_list_len/2):
-            null_list[null_list_len-i-1] = 2* median_v - null_list[i]
-        
-        std_v = std(null_list)
-
-        return (sum_v,max(null_list),min(null_list),median_v,std_v)
-
-    def normalize (self,null=False,sample_step=10):
-        """Normalize values centered at 0 and variance as 1.
-
-        If null is True, it will use the null list to calculate mean and std.
-        When null is True, sample_percent will be passed to null_model to sample the data.
-        """
-        if null:
-            (sum_v,max_v,min_v,mean_v,std_v) = self.null_model_summary(sample_step=sample_step)
-        else:
-            (sum_v,max_v,min_v,mean_v,std_v) = self.summary()
-        for (ps,pe,v) in self.__data.values():
-            for i in range(len(v)):
-                v[i] = float(v[i]-mean_v)/std_v
-        return (sum_v, max_v, min_v, mean_v, std_v)
-                
-
     def call_peaks (self, cutoff=1, up_limit=1e310, min_length=200, max_gap=50):
-        """This function try to find some region within which, scores
-        are continuously higher than a cutoff.
+        """This function try to find regions within which, scores
+        are continuously higher than a given cutoff.
 
-        cutoff:  cutoff of value, default 1
-        min_length :  minimum peak length, default 200
-        gap   :  maximum gap to merge nearby peaks
+        This function is NOT using sliding-windows. Instead, any
+        regions in bedGraph above certain cutoff will be detected,
+        then merged if the gap between nearby two regions are below
+        max_gap. After this, peak is reported if its length is above
+        min_length.
+
+        cutoff:  cutoff of value, default 1.
+        up_limit: the highest acceptable value. Default 10^{310}
+          * so only allow peak with value >=cutoff and <=up_limit
+        min_length :  minimum peak length, default 200.
+        gap   :  maximum gap to merge nearby peaks, default 50.
         """
         chrs = self.get_chr_names()
         peaks = PeakIO()                      # dictionary to save peaks
         for chrom in chrs:
-            (pss,pse,ss) = self.get_data_by_chr(chrom)
-            pssn = iter(pss).next         # assign the next function to a virable to speed up
-            pesn = iter(pes).next            
-            ssn = iter(ss).next
+            (ps,vs) = self.get_data_by_chr(chrom) # arrays for position and values
+            psn = iter(ps).next         # assign the next function to a viable to speed up
+            vsn = iter(vs).next
             x = 0
+            pre_p = 0                   # remember previous position
             while True:
                 # find the first region above cutoff
                 try:                    # try to read the first data range for this chrom
-                    ps = pssn()
-                    pe = pesn()                    
-                    s = ssn()
+                    p = psn()
+                    v = vsn()
                 except:
                     break
                 x += 1                  # index for the next point
-                if s >= cutoff and s<=up_limit:
-                    peak_content = [(ps,pe,s),]
+                if v >= cutoff and v <= up_limit:
+                    peak_content = [(pre_p,p,v),]
+                    pre_p = p
                     break               # found the first range above cutoff
+                else:
+                    pre_p = p
 
             for i in range(x,len(ps)):
-                ps = pssn()
-                pe = pesn()
-                s = ssn()                
-                if s < cutoff or s > up_limit:
+                # continue scan the rest regions
+                p = psn()
+                v = vsn()
+                if v < cutoff or v > up_limit: # not be detected as 'peak'
+                    pre_p = p
                     continue
                 # for points above cutoff
                 # if the gap is allowed
-                if ps - peak_content[-1][1] <= max_gap:
-                    peak_content.append((ps,pe,s))
+                if pre_p - peak_content[-1][1] <= max_gap:
+                    peak_content.append((pre_p,p,v))
                 else:
                     # when the gap is not allowed, close this peak
                     peak_length = peak_content[-1][1]-peak_content[0][0]
                     if peak_length >= min_length: # if the peak is too small, reject it
+                        tsummit = []
                         summit = None
-                        summit_score = None
-                        for (tstart,tend,tscore) in peak_content:
-                            if not summit_score or summit_score < tscore:
-                                summit = int((tend+tstart)/2)
-                                summit_score = tscore
+                        summit_value = None
+                        for (tstart,tend,tvalue) in peak_content:
+                            if not summit_value or summit_value < tvalue:
+                                tsummit = [int((tend+tstart)/2),]
+                                summit_value = tvalue
+                            elif summit_value == tvalue:
+                                tsummit.append( int((tend+tstart)/2) )
+                        summit = tsummit[int((len(tsummit)+1)/2)-1 ]
                         peaks.add(chrom,peak_content[0][0],peak_content[-1][1],
-                                  summit=summit-peak_content[0][0],score=summit_score)
+                                  summit=summit-peak_content[0][0],peak_height=summit_value) # summit is the relative position to peak start
                     # start a new peak
-                    peak_content = [(ps,pe,s),]
+                    peak_content = [(pre_p,p,v),]
+                pre_p = p
+                
             # save the last peak
             if peak_length >= min_length: # if the peak is too small, reject it
                 summit = None
-                summit_score = None
-                for (tstart,tend,tscore) in peak_content:
-                    if not summit_score or summit_score < tscore:
+                summit_value = None
+                for (tstart,tend,tvalue) in peak_content:
+                    if not summit_value or summit_value < tvalue:
                         summit = int((tend+tstart)/2)
-                        summit_score = tscore
-                    peaks.add(chrom,peak_content[0][0],peak_content[-1][1],
-                              summit=summit-peak_content[0][0],score=summit_score)
+                        summit_value = tvalue
+                peaks.add(chrom,peak_content[0][0],peak_content[-1][1],
+                          summit=summit-peak_content[0][0],peak_height=summit_value)
             
         return peaks
 
     def total (self):
+        """Return the number of regions in this object.
+
+        """
         t = 0
-        chrs = set(self.__data.keys())
-        for chrom in chrs:
-            (ps,pe,s) = self.__data[chrom]
-            t += len(ps)
+        for (p,s) in self.__data.values():
+            t += len(p)
         return t
+
+
+    def overlie (self, bdgTrack2, func=max ):
+        """Calculate two bedGraphTrackI objects by letting self
+        overlying bdgTrack2, with user-defined functions.
+
+        Transition positions from both bedGraphTrackI objects will be
+        considered and combined. For example:
+
+           #1 bedGraph (self)   |      #2 bedGraph
+        -----------------------------------------------
+        chr1  0    100  0       | chr1    0    150  1
+        chr1  100  200  3       | chr1    150  250  2
+        chr1  200  300  4       | chr1    250  300  4
+
+        these two bedGraphs will be combined to have five transition
+        points: 100, 150, 200, 250, and 300. So in order to calculate
+        two bedGraphs, I pair values within the following regions
+        like:
+
+        chr   s   e     (#1,#2)   applied_func_max
+        -----------------------------------------------
+        chr1  0   100   (0,1)     1
+        chr1  100 150   (3,1)     3
+        chr1  150 200   (3,2)     3
+        chr1  200 250   (4,2)     4
+        chr1  250 300   (4,4)     4
+
+        Then the given 'func' will be applied on each 2-tuple as func(#1,#2)
+
+
+        Return value is a bedGraphTrackI object.
+        """
+        assert isinstance(bdgTrack2,bedGraphTrackI), "bdgTrack2 is not a bedGraphTrackI object"
+
+        ret = bedGraphTrackI()
+        retadd = ret.add_loc
+        
+        chr1 = set(self.get_chr_names())
+        chr2 = set(bdgTrack2.get_chr_names())
+        common_chr = chr1.intersection(chr2)
+        for chrom in common_chr:
+            (p1s,v1s) = self.get_data_by_chr(chrom) # arrays for position and values
+            p1n = iter(p1s).next         # assign the next function to a viable to speed up
+            v1n = iter(v1s).next
+
+            (p2s,v2s) = bdgTrack2.get_data_by_chr(chrom) # arrays for position and values
+            p2n = iter(p2s).next         # assign the next function to a viable to speed up
+            v2n = iter(v2s).next
+
+            pre_p = 0                   # remember the previous position in the new bedGraphTrackI object ret
+            
+            try:
+                p1 = p1n()
+                v1 = v1n()
+
+                p2 = p2n()
+                v2 = v2n()
+
+                while True:
+                    if p1 < p2:
+                        # clip a region from pre_p to p1, then set pre_p as p1.
+                        retadd(chrom,pre_p,p1,func(v1,v2))
+                        pre_p = p1
+                        # call for the next p1 and v1
+                        p1 = p1n()
+                        v1 = v1n()
+                    elif p2 < p1:
+                        # clip a region from pre_p to p2, then set pre_p as p2.
+                        retadd(chrom,pre_p,p2,func(v1,v2))
+                        pre_p = p2
+                        # call for the next p2 and v2
+                        p2 = p2n()
+                        v2 = v2n()
+                    elif p1 == p2:
+                        # from pre_p to p1 or p2, then set pre_p as p1 or p2.
+                        retadd(chrom,pre_p,p1,func(v1,v2))
+                        pre_p = p1
+                        # call for the next p1, v1, p2, v2.
+                        p1 = p1n()
+                        v1 = v1n()
+                        p2 = p2n()
+                        v2 = v2n()
+            except StopIteration:
+                # meet the end of either bedGraphTrackI, simply exit
+                pass
+        
+        ret.merge_regions()
+        return ret
+                       
+    def apply_func ( self, func ):
+        """Apply function 'func' to every value in this bedGraphTrackI object.
+
+        *Two adjacent regions with same value after applying func will
+        not be merged.
+        """
+        t = 0
+        for (p,s) in self.__data.values():
+            for i in xrange(len(s)):
+                s[i] = func(s[i])
+        self.maxvalue = func(self.maxvalue)
+        self.minvalue = func(self.minvalue)
+        return True
+        

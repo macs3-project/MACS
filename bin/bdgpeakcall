@@ -1,0 +1,93 @@
+#!/usr/bin/env python
+# Time-stamp: <2011-05-17 16:05:32 Tao Liu>
+
+"""Module Description
+
+Copyright (c) 2008 Tao Liu <taoliu@jimmy.harvard.edu>
+
+This code is free software; you can redistribute it and/or modify it
+under the terms of the BSD License (see the file COPYING included with
+the distribution).
+
+@status:  experimental
+@version: $Revision$
+@author:  Tao Liu
+@contact: taoliu@jimmy.harvard.edu
+"""
+
+# ------------------------------------
+# python modules
+# ------------------------------------
+
+import os
+import sys
+import re
+import logging
+from optparse import OptionParser
+from MACS2.IO import bedGraphIO
+# ------------------------------------
+# constants
+# ------------------------------------
+logging.basicConfig(level=20,
+                    format='%(levelname)-5s @ %(asctime)s: %(message)s ',
+                    datefmt='%a, %d %b %Y %H:%M:%S',
+                    stream=sys.stderr,
+                    filemode="w"
+                    )
+
+# ------------------------------------
+# Misc functions
+# ------------------------------------
+error   = logging.critical		# function alias
+warn    = logging.warning
+debug   = logging.debug
+info    = logging.info
+# ------------------------------------
+# Classes
+# ------------------------------------
+
+# ------------------------------------
+# Main function
+# ------------------------------------
+def main():
+    usage = "usage: %prog <-i bedGraph> [-c -10log10(pvalue)] [-l MIN] [-g MAX] [-o PREFIX]"
+    description = "Call peaks from MACS pvalue score bedGraph output, with customized settings."
+    
+    optparser = OptionParser(version="%prog 0.1",description=description,usage=usage,add_help_option=False)
+    optparser.add_option("-h","--help",action="help",help="Show this help message and exit.")
+    optparser.add_option("-i","--ifile",dest="ifile",type="string",
+                         help="MACS pvalue score bedGraph")
+    optparser.add_option("-c","--cutoff",dest="cutoff",type="float",
+                         help="Cutoff depends on which method you choose. If method is pvalue, 50 means pvalue 1e-5. DEFAULT: 50",default=50)
+    optparser.add_option("-l","--min-length",dest="minlen",type="int",
+                         help="minimum length of peak, better to set it as d value. DEFAULT: 200",default=200)
+    optparser.add_option("-g","--max-gap",dest="maxgap",type="int",
+                         help="maximum gap between significant points in a peak, better to set it as tag size. DEFAULT: 30",default=30)
+    optparser.add_option("-o","--o-prefix",dest="oprefix",
+                         help="output file prefix, DEFAULT: peak") 
+    (options,args) = optparser.parse_args()
+
+    if not options.ifile:
+        optparser.print_help()
+        sys.exit(-1)
+
+    info("Read and build bedGraph...")
+    bio = bedGraphIO.bedGraphIO(options.ifile)
+    btrack = bio.build_bdgtrack(baseline_value=0)
+    info("Call peaks from bedGraph...")    
+    peaks = btrack.call_peaks(cutoff=options.cutoff,min_length=options.minlen,max_gap=options.maxgap)
+
+    info("Write peaks...")
+    pf = open ("%s_c%.0f_l%d_g%d_peaks.bed" % (options.oprefix,options.cutoff,options.minlen,options.maxgap),"w")
+    sf = open ("%s_c%.0f_l%d_g%d_summits.bed" % (options.oprefix,options.cutoff,options.minlen,options.maxgap),"w")    
+    peaks.write_to_bed(pf,name_prefix=options.oprefix+"_peak_")
+    peaks.write_to_summit_bed(sf,name_prefix=options.oprefix+"_summit_")
+
+    
+if __name__ == '__main__':
+    try:
+        main()
+    except KeyboardInterrupt:
+        sys.stderr.write("User interrupt me! ;-) See you!\n")
+        sys.exit(0)
+

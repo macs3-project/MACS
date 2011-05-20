@@ -1,4 +1,4 @@
-# Time-stamp: <2011-02-16 22:16:16 Tao Liu>
+# Time-stamp: <2011-05-17 16:06:34 Tao Liu>
 
 """Module Description
 
@@ -20,7 +20,7 @@ the distribution).
 import os
 import sys
 from array import array
-from MACS14.Constants import *
+from MACS2.Constants import *
 
 # ------------------------------------
 # constants
