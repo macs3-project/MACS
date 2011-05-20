@@ -1,5 +1,5 @@
 INSTALL Guide For MACS
-Time-stamp: <2011-02-22 14:33:00 Tao Liu>
+Time-stamp: <2011-05-20 18:09:13 Tao Liu>
 
 Please check the following instructions to complete your installation.
 
@@ -16,11 +16,11 @@ your operation system. You can easily manage the package, and the
 uninstall is much easier. Download the deb package from MACS download
 page, and type this in the commend line:
 
-$ dpkg -i macs_1.4.0rc2.deb
+$ dpkg -i macs_1.4.0.deb
 
 To uninstall, type:
 
-$ dpkg -r macs_1.4.0rc2
+$ dpkg -r macs_1.4.0
 
 This is tested only in Ubuntu 10.10 and 10.04 LTS.
 
