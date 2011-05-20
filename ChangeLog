@@ -1,5 +1,27 @@
+2011-05-19  Tao Liu  <taoliu@jimmy.harvard.edu>
+	MACS Version 2.0.1 (tag:alpha)
+
+	* cPileup.pyx, cPeakDetect.pyx and peak calling process
+
+	Jie suggested me a brilliant simple method to pileup fragments
+	into bedGraph track. It works extremely faster than the previous
+	function, i.e, faster than MACS1.3 or MACS1.4. So I can include
+	large local lambda calculation in MACSv2 now. Now I generate three
+	bedGraphs for d-size local bias, slocal-size and llocal-size local
+	bias, and calculate the maximum local bias as local lambda
+	bedGraph track.
+
+	Minor: add_loc in bedGraphTrackI now can correctly merge the
+	region with its preceding region if their value are the same.
+
+	* macs2
+
+	Add an option to shift control tags before extension. By default,
+	control tags will be extended to both sides regardless of strand
+	information.
+
 2011-05-17  Tao Liu  <taoliu@jimmy.harvard.edu>
-	MACS Version 2.0 (tag:alpha)
+	MACS Version 2.0.0 (tag:alpha)
 
 	* Use bedGraph type to store data internally and externally.
 

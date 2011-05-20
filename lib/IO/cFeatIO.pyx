@@ -1,4 +1,4 @@
-# Time-stamp: <2011-05-18 13:44:04 Tao Liu>
+# Time-stamp: <2011-05-19 23:40:56 Tao Liu>
 
 """Module for Feature IO classes.
 
@@ -1000,7 +1000,7 @@ class bedGraphTrackI:
 
         """
         # basic assumption, end pos should > start pos
-        assert endpos > startpos
+        assert endpos > startpos, "endpos %d can't be smaller than start pos %d" % (endpos,startpos)
         
         if not self.__data.has_key(chromosome):
             self.__data[chromosome] = [array(BYTE4,[]),array(FBYTE4,[])] # for (endpos,value)
@@ -1091,23 +1091,43 @@ class bedGraphTrackI:
         will be set to baseline_value.
         
         """
-        # first, set any region lower than new baseline_value to
-        # self.baseline_value.
-
-
-        # then replace value of self.baseline_value with baseline_value
-        #chrs = self.__data.keys()
-        #for chrom in chrs:
-        #    (p,v) = self.__data[chrom]
-        #    pnext = iter(p).next
-        #    vnext = iter(v).next
-        #    for i in xrange(len(p)):
-        #        pos = pnext()
-        #        value = vnext()
-        #        if value == self.baseline_value:
-        #            v[i] == baseline_value
         self.baseline_value = baseline_value
         self.filter_score(cutoff=baseline_value)
+        self.merge_regions()
+
+    def merge_regions (self):
+        """Merge nearby regions with the same value.
+        
+        """
+        chrs = set(self.__data.keys())
+        for chrom in chrs:
+            (p,v) = self.__data[chrom]
+            pnext = iter(p).next
+            vnext = iter(v).next
+
+            # new arrays
+            new_pos = array(BYTE4,[pnext(),])
+            new_value = array(FBYTE4,[vnext(),])
+
+            newpa = new_pos.append
+            newva = new_value.append
+            
+            new_pre_pos = new_pos[0]
+            new_pre_value = new_value[0]
+
+            for i in xrange(1,len(p)):
+                pos = pnext()
+                value = vnext()
+                if value == new_pre_value:
+                    new_pos[-1] = pos
+                else:
+                    # add new region
+                    newpa(pos)
+                    newva(value)
+                    new_pre_pos = pos
+                    new_pre_value = value
+            self.__data[chrom] = [new_pos,new_value]
+        return True
                 
     def filter_score (self, cutoff=0):
         """Filter using a score cutoff. Any region lower than score
@@ -1308,7 +1328,7 @@ class bedGraphTrackI:
         Return value is a bedGraphTrackI object.
         """
         assert isinstance(bdgTrack2,bedGraphTrackI), "bdgTrack2 is not a bedGraphTrackI object"
-        
+
         ret = bedGraphTrackI()
         retadd = ret.add_loc
         
@@ -1360,6 +1380,8 @@ class bedGraphTrackI:
             except StopIteration:
                 # meet the end of either bedGraphTrackI, simply exit
                 pass
+        
+        ret.merge_regions()
         return ret
                        
     def apply_func ( self, func ):
@@ -1372,5 +1394,7 @@ class bedGraphTrackI:
         for (p,s) in self.__data.values():
             for i in xrange(len(s)):
                 s[i] = func(s[i])
+        self.maxvalue = func(self.maxvalue)
+        self.minvalue = func(self.minvalue)
         return True
         

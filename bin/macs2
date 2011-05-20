@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# Time-stamp: <2011-05-19 12:03:37 Tao Liu>
+# Time-stamp: <2011-05-19 23:10:56 Tao Liu>
 
 """Description: MACS 2 main executable
 
@@ -217,7 +217,7 @@ Example: %prog -t ChIP.bam -c Control.bam -f BAM -g h -n test -w --call-subpeaks
 """
     description = "%prog -- Model-based Analysis for ChIP-Sequencing"
 
-    optparser = OptionParser(version="%prog %s" % (MACS_VERSION),description=description,usage=usage,add_help_option=False)
+    optparser = OptionParser(version="%prog "+MACS_VERSION,description=description,usage=usage,add_help_option=False)
     optparser.add_option("-h","--help",action="help",help="show this help message and exit.")
     optparser.add_option("-t","--treatment",dest="tfile",type="string",
                          help="ChIP-seq treatment files. REQUIRED.")
@@ -243,9 +243,9 @@ Example: %prog -t ChIP.bam -c Control.bam -f BAM -g h -n test -w --call-subpeaks
                          help="If True, MACS will use fixed background lambda as local lambda for every peak region. Normally, MACS calculates a dynamic local lambda to reflect the local bias due to potential chromatin structure. ",
                          default=False)
     optparser.add_option("--slocal",dest="smalllocal",type="int",default=1000,
-                         help="The small nearby region in basepairs to calculate dynamic lambda. This is used to capture the bias near the peak summit region. Invalid if there is no control data. DEFAULT: 1000 ")
+                         help="The small nearby region in basepairs to calculate dynamic lambda. This is used to capture the bias near the peak summit region. Invalid if there is no control data. If you set this to 0, MACS will skip slocal lambda calculation. *Note* that MACS will always perform a d-size local lambda calculation. The final local bias should be the maximum of the lambda value from d, slocal, and llocal size windows. DEFAULT: 1000 ")
     optparser.add_option("--llocal",dest="largelocal",type="int",default=10000,
-                         help="The large nearby region in basepairs to calculate dynamic lambda. This is used to capture the surround bias. DEFAULT: 10000.")
+                         help="The large nearby region in basepairs to calculate dynamic lambda. This is used to capture the surround bias. If you set this to 0, MACS will skip llocal lambda calculation. *Note* that MACS will always perform a d-size local lambda calculation. The final local bias should be the maximum of the lambda value from d, slocal, and llocal size windows. DEFAULT: 10000.")
     optparser.add_option("--off-auto",dest="offauto",action="store_true",
                          help="Whether turn off the auto pair model process. If not set, when MACS failed to build paired model, it will use the nomodel settings, the '--shiftsize' parameter to shift and extend each tags. DEFAULT: False",
                          default=False)
@@ -258,6 +258,8 @@ Example: %prog -t ChIP.bam -c Control.bam -f BAM -g h -n test -w --call-subpeaks
                          help="It controls the MACS behavior towards duplicate tags at the exact same location -- the same coordination and the same strand. The default 'auto' option makes MACS calculate the maximum tags at the exact same location based on binomal distribution using 1e-5 as pvalue cutoff; and the 'all' option keeps every tags. If an integer is given, at most this number of tags will be kept at the same location. Default: auto")
     optparser.add_option("--to-control",dest="tocontrol",action="store_true",default=False,
                          help="When set, scale the ChIP data towards Control data, by default, the control will be scaled towards ChIP. DEFAULT: False")
+    optparser.add_option("--shift-control",dest="shiftcontrol",action="store_true",default=False,
+                         help="When set, control tags will be shifted just as ChIP tags according to their strand before the extension of d, slocal and llocal. By default, control tags are extended centered at their current positions regardless of strand. You may consider to turn this option on while comparing two ChIP datasets of the same factor. DEFAULT: False")
     optparser.add_option("-B","--bdg",dest="store_bdg",action="store_true",
                           help="Whether or not to save extended fragment pileup, local lambda and score tracks at every bp into a bedGraph file. DEFAULT: False",
                           default=False)
@@ -291,9 +293,10 @@ def load_tag_files_options ( options ):
     options.info("#1 read treatment tags...")
     tp = options.parser(open2(options.tfile))
         
-    ttsize = tp.tsize()
     if not options.tsize:           # override tsize if user specified --tsize
+        ttsize = tp.tsize()
         options.tsize = ttsize
+
     treat = tp.build_fwtrack()
     treat.sort()
     if options.cfile:

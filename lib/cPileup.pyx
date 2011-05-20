@@ -1,4 +1,4 @@
-# Time-stamp: <2011-05-19 11:47:21 Tao Liu>
+# Time-stamp: <2011-05-19 23:20:16 Tao Liu>
 
 """Module Description: For pileup functions.
 
@@ -56,9 +56,9 @@ def pileup_bdg (trackI, d, baseline_value = 0):
 
         for i in xrange(len(tags)):
             # shift to get start positions
-            start_poss.append(tags[i]-half_d1)
+            start_poss.append(max(0,tags[i]-half_d1)) # prevent coordinates < 0
             # shift to get end positions
-            end_poss.append(tags[i]+half_d2) 
+            end_poss.append(max(0,tags[i]+half_d2))
 
         # combine start and end positions
         i_s = 0                         # index of start_poss
@@ -87,14 +87,17 @@ def pileup_bdg (trackI, d, baseline_value = 0):
         if i_e < l:
             # add rest of end positions
             for p in end_poss[i_e:]:
-                ret.add_loc(chrom,pre_p,p,pileup)
-                pre_p = p
+                if p != pre_p:                
+                    ret.add_loc(chrom,pre_p,p,pileup)
+                    pre_p = p
                 pileup -= 1
         if i_s < l:
-            # add rest of start positions
+            # add rest of start positions ( I don't think this will happen )
+            raise Exception("start positions can't be the only things left!")
             for p in start_poss[i_s:]:
-                ret.add_loc(chrom,pre_p,p,pileup)
-                pre_p = p
+                if p != pre_p:
+                    ret.add_loc(chrom,pre_p,p,pileup)
+                    pre_p = p
                 pileup += 1
 
     return ret

@@ -1,4 +1,4 @@
-# Time-stamp: <2011-05-17 16:09:05 Tao Liu>
+# Time-stamp: <2011-05-19 23:12:45 Tao Liu>
 
 """Module Description
 
@@ -213,9 +213,9 @@ class PeakDetect:
         Finally, a poisson CDF is applied to calculate one-side pvalue
         for enrichment.
         """
-        self.ratio_treat2control = float(self.treat.total)/self.control.total
-        #if self.ratio_treat2control > 2 or self.ratio_treat2control < 0.5:
-        #    self.warn("Treatment tags and Control tags are uneven! FDR may be wrong!")
+        treat_total   = self.treat.total
+        control_total = self.control.total
+        self.ratio_treat2control = float(treat_total)/control_total
 
         self.info("#3 shift treatment data")
         self.__shift_trackI(self.treat,self.shift_size)
@@ -235,50 +235,65 @@ class PeakDetect:
             self.info("#3 save tag pileup into bedGraph file...")
             bdgfhd = open(self.zwig_tr + "_pileup.bdg", "w")
             self.treat_btrack.write_bedGraph(bdgfhd,name=self.zwig_tr,description="Fragment pileup at each bp from MACS version %s" % MACS_VERSION)
-
         
         self.info("#3 shift control data")
         # control data needs multiple steps of calculation
         # I need to shift them by 500 bps, then 5000 bps
-        assert self.d < self.sregion, "slocal can't be smaller than d!"
-        c1 = self.control               # for d-size local
-        c2 = deepcopy(self.control)     # for slocal
+        assert self.d <= self.sregion, "slocal can't be smaller than d!"
+        assert self.sregion <= self.lregion , "llocal can't be smaller than slocal!"
 
-        #self.__shift_trackI(self.control,self.sregion/2)
-        self.__shift_trackI(c1,self.d/2)
-        self.__shift_trackI(c2,self.sregion/2)        
-
-        self.info("#3 merge +/- strand of control data")
-        c1.merge_plus_minus_locations_naive ()
-        c2.merge_plus_minus_locations_naive () 
-
+        # d-size local
+        self.info("#3 calculate d local lambda for control data")        
+        c_tmp = deepcopy(self.control)     # for d-size local
+        if self.opt.shiftcontrol:
+            self.__shift_trackI(c_tmp,self.d/2)
+        c_tmp.merge_plus_minus_locations_naive ()
         # Now pileup FWTrackII to form a bedGraphTrackI
-        self.info("#3 calculate d local lambda for control data")
-        c1_btrack = pileup_bdg(c1,self.d)
+        c_tmp_btrack = pileup_bdg(c_tmp,self.d)
         if not self.opt.tocontrol:
             # if user want to scale everything to ChIP data
             tmp_v = self.ratio_treat2control
-            c1_btrack.apply_func(lambda x:float(x)*tmp_v)
-        #del c1
-
-        self.info("#3 calculate small local lambda for control data")        
-        c2_btrack = pileup_bdg(c2,self.sregion)
-        if self.opt.tocontrol:
-           # if user want to scale everything to control data
-           tmp_v = float(self.d)/self.sregion
-           c2_btrack.apply_func(lambda x:float(x)*tmp_v)
         else:
-           tmp_v = float(self.d)*self.ratio_treat2control/self.lregion
-           c2_btrack.apply_func(lambda x:float(x)*tmp_v)
-        #del c2
+            tmp_v = 1
+        c_tmp_btrack.apply_func(lambda x:float(x)*tmp_v)
+        self.control_btrack = c_tmp_btrack
 
-        # This bedGraphTrackI is a combination considering sregion and
-        # lregion, containing the necessary information to calculate
-        # local lambda for each genomic location.
-        self.info("#3 calculate maximum local lambda for control data")
-        self.control_btrack = c1_btrack.overlie(c2_btrack,func=max) # get the maximum background signal.
-        self.control_btrack.reset_baseline(float(self.d)*self.treat.total/self.gsize) # set the baseline as lambda_bg
-        #del c2_btrack
+        # slocal size local
+        if self.sregion:
+            self.info("#3 calculate small local lambda for control data")        
+            c_tmp = deepcopy(self.control)     # for d-size local
+            if self.opt.shiftcontrol:
+                self.__shift_trackI(c_tmp,self.sregion)
+            
+            c_tmp.merge_plus_minus_locations_naive ()
+            # Now pileup FWTrackII to form a bedGraphTrackI
+            c_tmp_btrack = pileup_bdg(c_tmp,self.sregion)
+            if not self.opt.tocontrol:
+                # if user want to scale everything to ChIP data
+                tmp_v = float(self.d)/self.sregion*self.ratio_treat2control
+            else:
+                tmp_v = float(self.d)/self.sregion
+            c_tmp_btrack.apply_func(lambda x:float(x)*tmp_v)
+            self.control_btrack = self.control_btrack.overlie(c_tmp_btrack,func=max)
+
+        # llocal size local
+        if self.lregion and self.lregion > self.sregion:
+            self.info("#3 calculate large local lambda for control data")        
+            c_tmp = deepcopy(self.control)     # for d-size local
+            if self.opt.shiftcontrol:
+                self.__shift_trackI(c_tmp,self.lregion)
+            c_tmp.merge_plus_minus_locations_naive ()
+            # Now pileup FWTrackII to form a bedGraphTrackI
+            c_tmp_btrack = pileup_bdg(c_tmp,self.lregion)
+            if not self.opt.tocontrol:
+                # if user want to scale everything to ChIP data
+                tmp_v = float(self.d)/self.lregion*self.ratio_treat2control
+            else:
+                tmp_v = float(self.d)/self.lregion            
+            c_tmp_btrack.apply_func(lambda x:float(x)*tmp_v)
+            self.control_btrack = self.control_btrack.overlie(c_tmp_btrack,func=max)
+
+        self.control_btrack.reset_baseline(float(self.d)*treat_total/self.gsize) # set the baseline as lambda_bg
 
         if self.opt.store_bdg:
             self.info("#3 save local lambda into bedGraph file...")
