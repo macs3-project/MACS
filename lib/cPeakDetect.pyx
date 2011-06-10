@@ -1,4 +1,4 @@
-# Time-stamp: <2011-05-19 23:12:45 Tao Liu>
+# Time-stamp: <2011-05-26 14:19:18 Tao Liu>
 
 """Module Description
 
@@ -337,7 +337,18 @@ class PeakDetect:
         Finally, a poisson CDF is applied to calculate one-side pvalue
         for enrichment.
         """
-
+        # llocal size local
+        if self.lregion:
+            self.info("#3 calculate large local lambda from treatment data")
+            c_tmp = deepcopy(self.treat)
+            self.__shift_trackI(c_tmp,self.lregion)
+            c_tmp.merge_plus_minus_locations_naive ()
+            # Now pileup FWTrackII to form a bedGraphTrackI
+            c_tmp_btrack = pileup_bdg(c_tmp,self.lregion)
+            tmp_v = float(self.d)/self.lregion
+            c_tmp_btrack.apply_func(lambda x:float(x)*tmp_v)
+            self.control_btrack = self.control_btrack.overlie(c_tmp_btrack,func=max)
+ 
         self.info("#3 shift treatment data")
         self.__shift_trackI(self.treat,self.shift_size)
 

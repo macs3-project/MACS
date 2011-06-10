@@ -1,7 +1,7 @@
 #!/usr/bin/env python
-# Time-stamp: <2011-05-17 16:05:32 Tao Liu>
+# Time-stamp: <2011-06-10 15:31:25 Tao Liu>
 
-"""Module Description
+"""Description: Naive call peaks from a single bedGraph track for scores.
 
 Copyright (c) 2008 Tao Liu <taoliu@jimmy.harvard.edu>
 
@@ -50,7 +50,7 @@ info    = logging.info
 # Main function
 # ------------------------------------
 def main():
-    usage = "usage: %prog <-i bedGraph> [-c -10log10(pvalue)] [-l MIN] [-g MAX] [-o PREFIX]"
+    usage = "usage: %prog <-i bedGraph> [-c CUTOFF] [-l MIN] [-g MAX] [-o PREFIX]"
     description = "Call peaks from MACS pvalue score bedGraph output, with customized settings."
     
     optparser = OptionParser(version="%prog 0.1",description=description,usage=usage,add_help_option=False)
@@ -58,7 +58,7 @@ def main():
     optparser.add_option("-i","--ifile",dest="ifile",type="string",
                          help="MACS pvalue score bedGraph")
     optparser.add_option("-c","--cutoff",dest="cutoff",type="float",
-                         help="Cutoff depends on which method you choose. If method is pvalue, 50 means pvalue 1e-5. DEFAULT: 50",default=50)
+                         help="Cutoff depends on which method you used for score track. If the file contains pvalue scores from MACS2, score 50 means pvalue 1e-5. DEFAULT: 50",default=50)
     optparser.add_option("-l","--min-length",dest="minlen",type="int",
                          help="minimum length of peak, better to set it as d value. DEFAULT: 200",default=200)
     optparser.add_option("-g","--max-gap",dest="maxgap",type="int",
@@ -69,7 +69,7 @@ def main():
 
     if not options.ifile:
         optparser.print_help()
-        sys.exit(-1)
+        sys.exit()
 
     info("Read and build bedGraph...")
     bio = bedGraphIO.bedGraphIO(options.ifile)

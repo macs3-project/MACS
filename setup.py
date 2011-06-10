@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# Time-stamp: <2011-05-23 21:11:57 Tao Liu>
+# Time-stamp: <2011-06-10 16:00:24 Tao Liu>
 
 """Description
 
@@ -36,7 +36,7 @@ def main():
     
 
     setup(name="MACS",
-          version="2.0.1",
+          version="2.0.2",
           description="Model Based Analysis for ChIP-Seq data",
           author='Yong Zhang; Tao (Foo) Liu',
           author_email='zy@jimmy.harvard.edu; taoliu@jimmy.harvard.edu',
@@ -45,6 +45,7 @@ def main():
           packages=['MACS2', 'MACS2.IO'],
           scripts=['bin/macs2',
                    #'bin/elandmulti2bed','bin/elandresult2bed','bin/elandexport2bed','bin/sam2bed',
+                   'bin/bdgcmp',
                    'bin/bdgpeakcall'],
           classifiers=[
               'Development Status :: 4 - experimental',
