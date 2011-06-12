@@ -1,4 +1,4 @@
-# Time-stamp: <2011-05-19 23:20:16 Tao Liu>
+# Time-stamp: <2011-06-12 15:28:26 Tao Liu>
 
 """Module Description: For pileup functions.
 
@@ -27,15 +27,17 @@ from MACS2.Constants import *
 # ------------------------------------
 # to determine the byte size
 
-def pileup_bdg (trackI, d, baseline_value = 0):
+def pileup_bdg (trackI, d, baseline_value = 0, directional=True):
     """Pileup tags into bedGraphTrackI object with extension. Tag will
-    be extended towards both sides with 1/2 of d.
+    be extended towards 3' side with size of d if directional is Ture,
+    or both sides with d/2 if directional is False.
 
     A tag is a single genomic location.
 
-    trackI  : A FWTrackII object. For example, the shifted tags from PeakDetect object.
-    d       : tag will be extended to 1/2 of this value to each side, i.e. a 'd' size fragment.
+    trackI  : A FWTrackII object with raw plus and minus 5' end positions
+    d       : tag will be extended to this value to 3' direction, unless directional is False.
     baseline_value : a value to be filled for missing values.
+    directional: if False, the strand or direction of tag will be ignored, so that extenstion will be both sides with d/2.
 
     Return a bedGraphTrackI object.
     """
@@ -43,24 +45,47 @@ def pileup_bdg (trackI, d, baseline_value = 0):
 
     ret = bedGraphTrackI(baseline_value=baseline_value) # bedGraphTrackI object to be returned.
 
-    cdef int half_d1 = int(d//2)
-    cdef int half_d2 = d - int(d//2)
-
     chrs = trackI.get_chr_names()       
+
+    if directional:
+        # only extend to 3' side
+        five_shift = 0
+        three_shift = d
+    else:
+        # both sides
+        five_shift = int(d/2)
+        three_shift = d - five_shift
+
     for chrom in chrs:
-        tags = trackI.get_locations_by_chr(chrom)[0]
-        l = len(tags)
+        (plus_tags,minus_tags) = trackI.get_locations_by_chr(chrom)
+        
+        l = len(plus_tags)+len(minus_tags)
 
-        start_poss = array(BYTE4,[])
-        end_poss   = array(BYTE4,[])
+        start_poss = array(BYTE4,[])    # store all start positions
+        end_poss   = array(BYTE4,[])    # store all end positions
 
-        for i in xrange(len(tags)):
-            # shift to get start positions
-            start_poss.append(max(0,tags[i]-half_d1)) # prevent coordinates < 0
-            # shift to get end positions
-            end_poss.append(max(0,tags[i]+half_d2))
+        # for plus tags
+        for i in xrange(len(plus_tags)):
+            # shift to get start positions. To 5' side.
+            start_poss.append(max(0,plus_tags[i]-five_shift)) # prevent coordinates < 0
+            # shift to get end positions by extending to d. To 3' side.
+            end_poss.append(max(0,plus_tags[i]+three_shift))
 
-        # combine start and end positions
+        # for minus tags
+        for i in xrange(len(minus_tags)):
+            # shift to get start positions by extending to d. To 3' side.
+            start_poss.append(max(0,minus_tags[i]-three_shift)) # prevent coordinates < 0
+            # shift to get end positions. To 5' side.
+            end_poss.append(max(0,minus_tags[i]+five_shift))
+            
+        # sort
+        start_poss.sort()
+        end_poss.sort()
+
+        # Pileup by go through start positions and end positions,
+        # while seeing start position, pileup ++
+        # while seeing end position, pileup --
+        #
         i_s = 0                         # index of start_poss
         i_e = 0                         # index of end_poss
 

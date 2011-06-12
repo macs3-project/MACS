@@ -1,4 +1,4 @@
-# Time-stamp: <2011-05-26 14:19:18 Tao Liu>
+# Time-stamp: <2011-06-12 15:20:38 Tao Liu>
 
 """Module Description
 
@@ -17,6 +17,7 @@ with the distribution).
 import os
 from array import array
 from copy import deepcopy
+import gc                               # use garbage collectior
 
 from MACS2.IO.cFeatIO import PeakIO,WigTrackI
 from MACS2.cProb import poisson_cdf
@@ -217,19 +218,13 @@ class PeakDetect:
         control_total = self.control.total
         self.ratio_treat2control = float(treat_total)/control_total
 
-        self.info("#3 shift treatment data")
-        self.__shift_trackI(self.treat,self.shift_size)
-
-        self.info("#3 merge +/- strand of treatment data")
-        self.treat.merge_plus_minus_locations_naive ()
-
         # Now pileup FWTrackII to form a bedGraphTrackI
-        self.info("#3 pileup treatment data")
+        self.info("#3 pileup treatment data by extending tags towards 3' to %d length" % self.d)
         self.treat_btrack = pileup_bdg(self.treat,self.d)
 
         if self.opt.tocontrol:
             # if user want to scale everything to control data
-            self.treat_btrack.apply_func(lambda x:float(x)/self.ratio_treat2control)            
+            self.treat_btrack.apply_func(lambda x:float(x)/self.ratio_treat2control) 
 
         if self.opt.store_bdg:
             self.info("#3 save tag pileup into bedGraph file...")
@@ -244,12 +239,9 @@ class PeakDetect:
 
         # d-size local
         self.info("#3 calculate d local lambda for control data")        
-        c_tmp = deepcopy(self.control)     # for d-size local
-        if self.opt.shiftcontrol:
-            self.__shift_trackI(c_tmp,self.d/2)
-        c_tmp.merge_plus_minus_locations_naive ()
+
         # Now pileup FWTrackII to form a bedGraphTrackI
-        c_tmp_btrack = pileup_bdg(c_tmp,self.d)
+        c_tmp_btrack = pileup_bdg(self.control,self.d,directional=self.opt.shiftcontrol)
         if not self.opt.tocontrol:
             # if user want to scale everything to ChIP data
             tmp_v = self.ratio_treat2control
@@ -261,13 +253,8 @@ class PeakDetect:
         # slocal size local
         if self.sregion:
             self.info("#3 calculate small local lambda for control data")        
-            c_tmp = deepcopy(self.control)     # for d-size local
-            if self.opt.shiftcontrol:
-                self.__shift_trackI(c_tmp,self.sregion)
-            
-            c_tmp.merge_plus_minus_locations_naive ()
             # Now pileup FWTrackII to form a bedGraphTrackI
-            c_tmp_btrack = pileup_bdg(c_tmp,self.sregion)
+            c_tmp_btrack = pileup_bdg(self.control,self.sregion,directional=self.opt.shiftcontrol)
             if not self.opt.tocontrol:
                 # if user want to scale everything to ChIP data
                 tmp_v = float(self.d)/self.sregion*self.ratio_treat2control
@@ -279,12 +266,8 @@ class PeakDetect:
         # llocal size local
         if self.lregion and self.lregion > self.sregion:
             self.info("#3 calculate large local lambda for control data")        
-            c_tmp = deepcopy(self.control)     # for d-size local
-            if self.opt.shiftcontrol:
-                self.__shift_trackI(c_tmp,self.lregion)
-            c_tmp.merge_plus_minus_locations_naive ()
             # Now pileup FWTrackII to form a bedGraphTrackI
-            c_tmp_btrack = pileup_bdg(c_tmp,self.lregion)
+            c_tmp_btrack = pileup_bdg(c_tmp,self.lregion,directional=self.opt.shiftcontrol)
             if not self.opt.tocontrol:
                 # if user want to scale everything to ChIP data
                 tmp_v = float(self.d)/self.lregion*self.ratio_treat2control
