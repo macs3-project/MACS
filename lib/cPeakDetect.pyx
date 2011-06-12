@@ -1,4 +1,4 @@
-# Time-stamp: <2011-06-12 15:20:38 Tao Liu>
+# Time-stamp: <2011-06-12 15:42:09 Tao Liu>
 
 """Module Description
 
@@ -267,7 +267,7 @@ class PeakDetect:
         if self.lregion and self.lregion > self.sregion:
             self.info("#3 calculate large local lambda for control data")        
             # Now pileup FWTrackII to form a bedGraphTrackI
-            c_tmp_btrack = pileup_bdg(c_tmp,self.lregion,directional=self.opt.shiftcontrol)
+            c_tmp_btrack = pileup_bdg(self.control,self.lregion,directional=self.opt.shiftcontrol)
             if not self.opt.tocontrol:
                 # if user want to scale everything to ChIP data
                 tmp_v = float(self.d)/self.lregion*self.ratio_treat2control
@@ -323,25 +323,15 @@ class PeakDetect:
         # llocal size local
         if self.lregion:
             self.info("#3 calculate large local lambda from treatment data")
-            c_tmp = deepcopy(self.treat)
-            self.__shift_trackI(c_tmp,self.lregion)
-            c_tmp.merge_plus_minus_locations_naive ()
             # Now pileup FWTrackII to form a bedGraphTrackI
-            c_tmp_btrack = pileup_bdg(c_tmp,self.lregion)
+            c_tmp_btrack = pileup_bdg(self.treat,self.lregion,directional=self.opt.shiftcontrol)
             tmp_v = float(self.d)/self.lregion
             c_tmp_btrack.apply_func(lambda x:float(x)*tmp_v)
             self.control_btrack = self.control_btrack.overlie(c_tmp_btrack,func=max)
  
-        self.info("#3 shift treatment data")
-        self.__shift_trackI(self.treat,self.shift_size)
-
-        self.info("#3 merge +/- strand of treatment data")
-        self.treat.merge_plus_minus_locations_naive ()
-
         # Now pileup FWTrackII to form a bedGraphTrackI
         self.info("#3 pileup treatment data")
         self.treat_btrack = pileup_bdg(self.treat,self.d)
-        #del self.treat                  # I will only use self.treat_bdg
 
         if self.opt.store_bdg:
             self.info("#3 save tag pileup into bedGraph file...")
