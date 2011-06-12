@@ -1,4 +1,4 @@
-# Time-stamp: <2011-06-12 15:28:26 Tao Liu>
+# Time-stamp: <2011-06-12 15:37:24 Tao Liu>
 
 """Module Description: For pileup functions.
 
@@ -79,8 +79,8 @@ def pileup_bdg (trackI, d, baseline_value = 0, directional=True):
             end_poss.append(max(0,minus_tags[i]+five_shift))
             
         # sort
-        start_poss.sort()
-        end_poss.sort()
+        start_poss = sorted(start_poss)
+        end_poss = sorted(end_poss)
 
         # Pileup by go through start positions and end positions,
         # while seeing start position, pileup ++
