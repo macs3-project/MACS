@@ -1,4 +1,4 @@
-# Time-stamp: <2011-06-12 15:42:09 Tao Liu>
+# Time-stamp: <2011-06-12 21:18:23 Tao Liu>
 
 """Module Description
 
@@ -281,11 +281,10 @@ class PeakDetect:
         if self.opt.store_bdg:
             self.info("#3 save local lambda into bedGraph file...")
             bdgfhd = open(self.zwig_ctl + "_lambda.bdg", "w")
-            # be ware that if the local lambda is lambda_bg, it will not be written in bdg file.
             self.control_btrack.write_bedGraph(bdgfhd,name=self.zwig_ctl,description="Maximum local lambda at each bp from MACS version %s" % MACS_VERSION)
 
         # calculate pvalue scores
-        self.info("#3 Calculate pvalue scores...")        
+        self.info("#3 Calculate pvalue scores...")
         self.score_btrack = self.treat_btrack.overlie(self.control_btrack,func=lambda x,y:-10*poisson_cdf(x,y,lower=False,log10=True))
         if self.opt.store_bdg:
             self.info("#3 save the score track into bedGraph file...")
