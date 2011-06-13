@@ -1,3 +1,17 @@
+2011-06-12  Tao Liu  <taoliu@jimmy.harvard.edu>
+	MACS version 2.0.2 (tag:alpha)
+
+	* macs2
+
+	Add an error check to see if there is no common chromosome names
+	from treatment file and control file
+
+	* cPeakDetect.pyx, cFeatIO.pyx, cPileup.pyx
+
+	Reduce memory usage by removing deepcopy() calls.
+
+	* Modify README documents and others.
+
 2011-05-19  Tao Liu  <taoliu@jimmy.harvard.edu>
 	MACS Version 2.0.1 (tag:alpha)
 
