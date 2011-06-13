@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# Time-stamp: <2011-06-12 22:47:36 Tao Liu>
+# Time-stamp: <2011-06-12 23:17:38 Tao Liu>
 
 """Description: MACS 2 main executable
 
@@ -51,6 +51,7 @@ def main():
     info = options.info
     warn = options.warn
     debug = options.debug
+    error = options.error
     #0 output arguments
     info("\n"+options.argtxt)
     
