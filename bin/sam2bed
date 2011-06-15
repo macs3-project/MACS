@@ -49,9 +49,9 @@ def __fw_parse_line ( thisline,bed_fhd ):
         pass
 
     if bwflag & 16:
-        bed_fhd.write( "%s\t%d\t%d\t%s\t%d\t%s\n" % (thisref,int(thisfields[3])-1,int(thisfields[3])-1+len(thisfields[9]),thisfields[0],0,"+") )
-    else:
         bed_fhd.write( "%s\t%d\t%d\t%s\t%d\t%s\n" % (thisref,int(thisfields[3])-1,int(thisfields[3])-1+len(thisfields[9]),thisfields[0],0,"-") )
+    else:
+        bed_fhd.write( "%s\t%d\t%d\t%s\t%d\t%s\n" % (thisref,int(thisfields[3])-1,int(thisfields[3])-1+len(thisfields[9]),thisfields[0],0,"+") )
 
 
 class StrandFormatError(Exception):
