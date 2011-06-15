@@ -1,4 +1,4 @@
-# Time-stamp: <2011-06-12 15:37:24 Tao Liu>
+# Time-stamp: <2011-06-15 12:10:49 Tao Liu>
 
 """Module Description: For pileup functions.
 
@@ -27,7 +27,7 @@ from MACS2.Constants import *
 # ------------------------------------
 # to determine the byte size
 
-def pileup_bdg (trackI, d, baseline_value = 0, directional=True):
+def pileup_bdg (trackI, d, baseline_value = 0, directional=True, halfextension=True):
     """Pileup tags into bedGraphTrackI object with extension. Tag will
     be extended towards 3' side with size of d if directional is Ture,
     or both sides with d/2 if directional is False.
@@ -38,6 +38,7 @@ def pileup_bdg (trackI, d, baseline_value = 0, directional=True):
     d       : tag will be extended to this value to 3' direction, unless directional is False.
     baseline_value : a value to be filled for missing values.
     directional: if False, the strand or direction of tag will be ignored, so that extenstion will be both sides with d/2.
+    halfextension: only make a fragment of d/2 size centered at fragment center
 
     Return a bedGraphTrackI object.
     """
@@ -49,12 +50,20 @@ def pileup_bdg (trackI, d, baseline_value = 0, directional=True):
 
     if directional:
         # only extend to 3' side
-        five_shift = 0
-        three_shift = d
+        if halfextension:
+            five_shift = int(d*-0.25)  # five shift is used to move cursor towards 5' direction to find the start of fragment
+            three_shift = int(d*0.75) # three shift is used to move cursor towards 3' direction to find the end of fragment
+        else:
+            five_shift = 0
+            three_shift = d
     else:
         # both sides
-        five_shift = int(d/2)
-        three_shift = d - five_shift
+        if halfextension:
+            five_shift = int(d*0.25)
+            three_shift = five_shift
+        else:
+            five_shift = int(d/2)
+            three_shift = d - five_shift            
 
     for chrom in chrs:
         (plus_tags,minus_tags) = trackI.get_locations_by_chr(chrom)
