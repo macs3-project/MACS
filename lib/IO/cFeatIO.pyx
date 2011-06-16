@@ -1,4 +1,4 @@
-# Time-stamp: <2011-05-20 00:18:01 Tao Liu>
+# Time-stamp: <2011-06-15 22:55:47 Tao Liu>
 
 """Module for Feature IO classes.
 
@@ -1001,6 +1001,11 @@ class bedGraphTrackI:
         """
         # basic assumption, end pos should > start pos
         assert endpos > startpos, "endpos %d can't be smaller than start pos %d" % (endpos,startpos)
+
+        if endpos <= 0:
+            return
+        if startpos < 0:
+            startpos = 0
         
         if not self.__data.has_key(chromosome):
             self.__data[chromosome] = [array(BYTE4,[]),array(FBYTE4,[])] # for (endpos,value)

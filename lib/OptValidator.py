@@ -1,4 +1,4 @@
-# Time-stamp: <2011-05-23 21:11:02 Tao Liu>
+# Time-stamp: <2011-06-15 23:34:48 Tao Liu>
 
 """Module Description
 
@@ -177,5 +177,7 @@ def opt_validate ( optparser ):
     else:
         options.argtxt += "# Range for calculating regional lambda is: %d bps\n" % (options.largelocal)
 
+    if options.halfext:
+        options.argtxt += "# MACS will make 1/2d size fragments\n"
 
     return options
