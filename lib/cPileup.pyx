@@ -1,4 +1,4 @@
-# Time-stamp: <2011-06-15 12:10:49 Tao Liu>
+# Time-stamp: <2011-06-15 22:43:05 Tao Liu>
 
 """Module Description: For pileup functions.
 
@@ -76,16 +76,20 @@ def pileup_bdg (trackI, d, baseline_value = 0, directional=True, halfextension=T
         # for plus tags
         for i in xrange(len(plus_tags)):
             # shift to get start positions. To 5' side.
-            start_poss.append(max(0,plus_tags[i]-five_shift)) # prevent coordinates < 0
+            #start_poss.append(max(0,plus_tags[i]-five_shift)) # prevent coordinates < 0
+            start_poss.append(plus_tags[i]-five_shift) 
             # shift to get end positions by extending to d. To 3' side.
-            end_poss.append(max(0,plus_tags[i]+three_shift))
+            #end_poss.append(max(0,plus_tags[i]+three_shift))
+            end_poss.append(plus_tags[i]+three_shift)
 
         # for minus tags
         for i in xrange(len(minus_tags)):
             # shift to get start positions by extending to d. To 3' side.
-            start_poss.append(max(0,minus_tags[i]-three_shift)) # prevent coordinates < 0
+            #start_poss.append(max(0,minus_tags[i]-three_shift)) # prevent coordinates < 0
+            start_poss.append(minus_tags[i]-three_shift)
             # shift to get end positions. To 5' side.
-            end_poss.append(max(0,minus_tags[i]+five_shift))
+            #end_poss.append(max(0,minus_tags[i]+five_shift))
+            end_poss.append(minus_tags[i]+five_shift)
             
         # sort
         start_poss = sorted(start_poss)
@@ -99,7 +103,7 @@ def pileup_bdg (trackI, d, baseline_value = 0, directional=True, halfextension=T
         i_e = 0                         # index of end_poss
 
         pileup = 0
-        pre_p = 0
+        pre_p = min(start_poss[0],end_poss[0])
         while i_s < l and i_e < l:
             if start_poss[i_s] < end_poss[i_e]:
                 p = start_poss[i_s]
