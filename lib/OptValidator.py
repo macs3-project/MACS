@@ -1,4 +1,4 @@
-# Time-stamp: <2011-06-15 23:34:48 Tao Liu>
+# Time-stamp: <2011-06-19 16:54:21 Tao Liu>
 
 """Module Description
 
@@ -97,8 +97,8 @@ def opt_validate ( optparser ):
         logging.error("--shiftsize must > 0!")
         sys.exit(1)
 
-    # -10*log10 pvalue
-    options.log_pvalue = log(options.pvalue,10)*-10
+    # -*log10 pvalue
+    options.log_pvalue = log(options.pvalue,10)*-1
     
     # uppercase the format string 
     options.format = options.format.upper()
@@ -134,6 +134,7 @@ def opt_validate ( optparser ):
     #options.negxls  = options.name+"_negative_peaks.xls"
     #options.diagxls = options.name+"_diag.xls"
     options.modelR  = options.name+"_model.r"
+    options.pqtable  = options.name+"_pq_table.txt"    
 
     # logging object
     logging.basicConfig(level=(4-options.verbose)*10,

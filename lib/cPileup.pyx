@@ -1,4 +1,4 @@
-# Time-stamp: <2011-06-15 22:43:05 Tao Liu>
+# Time-stamp: <2011-06-19 16:14:57 Tao Liu>
 
 """Module Description: For pileup functions.
 
@@ -19,8 +19,7 @@ the distribution).
 # ------------------------------------
 from array import array
 
-from MACS2.IO.cFeatIO import bedGraphTrackI
-from time import time
+from MACS2.IO.cBedGraph import bedGraphTrackI
 from MACS2.Constants import *
 # ------------------------------------
 # constants

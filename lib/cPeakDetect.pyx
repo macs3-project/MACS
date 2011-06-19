@@ -1,4 +1,4 @@
-# Time-stamp: <2011-06-15 18:02:44 Tao Liu>
+# Time-stamp: <2011-06-19 17:15:00 Tao Liu>
 
 """Module Description
 
@@ -19,10 +19,11 @@ from array import array
 from copy import deepcopy
 import gc                               # use garbage collectior
 
-from MACS2.IO.cFeatIO import PeakIO,WigTrackI
-from MACS2.cProb import poisson_cdf
+from MACS2.IO.cPeakIO import PeakIO
+
 from MACS2.Constants import *
 from MACS2.cPileup import pileup_bdg
+from libc.math cimport log10
 
 class PeakDetect:
     """Class to do the peak calling.
@@ -46,13 +47,12 @@ class PeakDetect:
         self.ratio_treat2control = None
         self.peaks = None
         self.final_peaks = None
-        #self.final_negative_peaks = None
 
         #self.femax = opt.femax
         #self.femin = opt.femin
         #self.festep = opt.festep
                 
-        self.pvalue = opt.log_pvalue
+        self.pvalue = opt.log_pvalue    # -log10pvalue
         self.d = opt.d
         self.shift_size = self.d/2
         self.scan_window = opt.scanwindow
@@ -93,103 +93,32 @@ class PeakDetect:
     #     else:                           # w/o control
     #         return self.__diag_wo_control()
 
-    # def toxls (self):
-    #     """Save the peak results in a tab-delimited plain text file
-    #     with suffix .xls.
+    def toxls (self):
+        """Save the peak results in a tab-delimited plain text file
+        with suffix .xls.
         
-    #     """
-    #     text = ""
-    #     if self.control and self.peaks:
-    #         text += "\t".join(("chr","start", "end",  "length",  "summit", "tags", "-10*log10(pvalue)", "fold_enrichment", "FDR(%)"))+"\n"
-    #     elif self.peaks:
-    #         text += "\t".join(("chr","start", "end",  "length",  "summit", "tags", "-10*log10(pvalue)", "fold_enrichment"))+"\n"
-    #     else:
-    #         return None
-        
-    #     chrs = self.peaks.keys()
-    #     chrs.sort()
-    #     for chrom in chrs:
-    #         for peak in self.peaks[chrom]:
-    #             text += "%s\t%d\t%d\t%d" % (chrom,peak[0]+1,peak[1],peak[2])
-    #             peak_summit_relative_pos = peak[3]-peak[0]
-    #             text += "\t%d" % (peak_summit_relative_pos)
-    #             text += "\t%d\t%.2f" % (peak[5],peak[6])
-    #             text += "\t%.2f" % (peak[7])
-    #             if self.control:
-    #                 if peak[8]>=100:
-    #                     text += "\t100"
-    #                 else:
-    #                     text += "\t%.2f" % (peak[8])
-    #             text+= "\n"
-    #     return text
+        """
+        text = ""
+        if self.peaks:
+            text += "\t".join(("chr","start", "end",  "length",  "abs_summit", "pileup", "-log10(pvalue)", "fold_enrichment", "-log10(qvalue)"))+"\n"
+            #text += "\t".join(("chr","start", "end",  "length",  "abs_summit", "-log10(pvalue)","-log10(qvalue)"))+"\n"
+        else:
+            return None
 
-    # def neg_toxls (self):
-    #     text = ""
-    #     text += "\t".join(("chr","start", "end",  "length",  "summit", "tags", "-10*log10(pvalue)","fold_enrichment"))+"\n"
-    #     chrs = self.final_negative_peaks.keys()
-    #     chrs.sort()
-    #     for chrom in chrs:
-    #         for peak in self.final_negative_peaks[chrom]:
-    #             text += "%s\t%d\t%d\t%d" % (chrom,peak[0]+1,peak[1],peak[2])
-    #             peak_summit_relative_pos = peak[3]-peak[0]+1
-    #             text += "\t%d" % (peak_summit_relative_pos)
-    #             text += "\t%d\t%.2f" % (peak[5],peak[6])
-    #             text += "\t%.2f" % (peak[7])
-    #             text+= "\n"
-    #     return text
-
-    # def __add_fdr (self, final, negative): 
-    #     """
-    #     A peak info type is a: dictionary
-
-    #     key value: chromosome
-
-    #     items: (peak start,peak end, peak length, peak summit, peak
-    #     height, number of tags in peak region, peak pvalue, peak
-    #     fold_enrichment, fdr) <-- tuple type
-    #     """
-    #     pvalue2fdr = {}
-    #     pvalues_final = []
-    #     pvalues_negative = []
-    #     chrs = final.keys()
-    #     a = pvalues_final.append
-    #     for chrom in chrs:
-    #         for i in final[chrom]:
-    #             a(i[6]) # i[6] is pvalue in peak info
-    #             pvalue2fdr[i[6]]=None
-    #     chrs = negative.keys()
-    #     a = pvalues_negative.append
-    #     for chrom in chrs:
-    #         for i in negative[chrom]:
-    #             a(i[6])
-    #     pvalues_final.sort(reverse=True)
-    #     pvalues_final_l = len(pvalues_final)
-    #     pvalues_negative.sort(reverse=True)
-    #     pvalues_negative_l = len(pvalues_negative)        
-    #     pvalues = pvalue2fdr.keys()
-    #     pvalues.sort(reverse=True)
-    #     index_p2f_pos = 0
-    #     index_p2f_neg = 0
-    #     for p in pvalues:
-    #         while index_p2f_pos<pvalues_final_l and p<=pvalues_final[index_p2f_pos]:
-    #             index_p2f_pos += 1
-    #         n_final = index_p2f_pos
-
-    #         while  index_p2f_neg<pvalues_negative_l and p<=pvalues_negative[index_p2f_neg]:
-    #             index_p2f_neg += 1
-    #         n_negative = index_p2f_neg
-    #         pvalue2fdr[p] = 100.0 * n_negative / n_final
-
-    #     new_info = {}
-    #     chrs = final.keys()
-    #     for chrom in chrs:
-    #         new_info[chrom] = []
-    #         for i in final[chrom]:
-    #             tmp = list(i)
-    #             tmp.append(pvalue2fdr[i[6]])
-    #             new_info[chrom].append(tuple(tmp))      # i[6] is pvalue in peak info
-    #     return new_info
-
+        peaks = self.peaks.peaks
+        chrs = peaks.keys()
+        chrs.sort()
+        for chrom in chrs:
+            for peak in peaks[chrom]:
+                #[start,end,end-start,summit,peak_height,number_tags,pvalue,fold_change,qvalue]
+                text += "%s\t%d\t%d\t%d" % (chrom,peak[0]+1,peak[1],peak[2])
+                text += "\t%d" % (peak[3]+1) # summit position
+                text += "\t%.2f" % (peak[5]) # pileup height at summit
+                text += "\t%.2f" % (peak[6]) # -log10pvalue at summit
+                text += "\t%.2f" % (peak[7]) # fold change at summit                
+                text += "\t%.2f" % (peak[8]) # -log10qvalue at summit
+                text+= "\n"
+        return text
 
     def __call_peaks_w_control (self):
         """To call peaks with control data.
@@ -220,18 +149,12 @@ class PeakDetect:
 
         # Now pileup FWTrackII to form a bedGraphTrackI
         self.info("#3 pileup treatment data by extending tags towards 3' to %d length" % self.d)
-        self.treat_btrack = pileup_bdg(self.treat,self.d,halfextension=self.opt.halfext)
+        treat_btrack = pileup_bdg(self.treat,self.d,halfextension=self.opt.halfext)
 
         if self.opt.tocontrol:
             # if user want to scale everything to control data
-            self.treat_btrack.apply_func(lambda x:float(x)/self.ratio_treat2control) 
+            treat_btrack.apply_func(lambda x:float(x)/self.ratio_treat2control) 
 
-        if self.opt.store_bdg:
-            self.info("#3 save tag pileup into bedGraph file...")
-            bdgfhd = open(self.zwig_tr + "_pileup.bdg", "w")
-            self.treat_btrack.write_bedGraph(bdgfhd,name=self.zwig_tr,description="Fragment pileup at each bp from MACS version %s" % MACS_VERSION)
-        
-        self.info("#3 shift control data")
         # control data needs multiple steps of calculation
         # I need to shift them by 500 bps, then 5000 bps
         assert self.d <= self.sregion, "slocal can't be smaller than d!"
@@ -248,7 +171,7 @@ class PeakDetect:
         else:
             tmp_v = 1
         c_tmp_btrack.apply_func(lambda x:float(x)*tmp_v)
-        self.control_btrack = c_tmp_btrack
+        control_btrack = c_tmp_btrack
 
         # slocal size local
         if self.sregion:
@@ -261,7 +184,7 @@ class PeakDetect:
             else:
                 tmp_v = float(self.d)/self.sregion
             c_tmp_btrack.apply_func(lambda x:float(x)*tmp_v)
-            self.control_btrack = self.control_btrack.overlie(c_tmp_btrack,func=max)
+            control_btrack = control_btrack.overlie(c_tmp_btrack,func=max)
 
         # llocal size local
         if self.lregion and self.lregion > self.sregion:
@@ -274,26 +197,63 @@ class PeakDetect:
             else:
                 tmp_v = float(self.d)/self.lregion            
             c_tmp_btrack.apply_func(lambda x:float(x)*tmp_v)
-            self.control_btrack = self.control_btrack.overlie(c_tmp_btrack,func=max)
+            control_btrack = control_btrack.overlie(c_tmp_btrack,func=max)
 
-        self.control_btrack.reset_baseline(float(self.d)*treat_total/self.gsize) # set the baseline as lambda_bg
-
-        if self.opt.store_bdg:
-            self.info("#3 save local lambda into bedGraph file...")
-            bdgfhd = open(self.zwig_ctl + "_lambda.bdg", "w")
-            self.control_btrack.write_bedGraph(bdgfhd,name=self.zwig_ctl,description="Maximum local lambda at each bp from MACS version %s" % MACS_VERSION)
+        control_btrack.reset_baseline(float(self.d)*treat_total/self.gsize) # set the baseline as lambda_bg
 
         # calculate pvalue scores
-        self.info("#3 Calculate pvalue scores...")
-        self.score_btrack = self.treat_btrack.overlie(self.control_btrack,func=lambda x,y:-10*poisson_cdf(x,y,lower=False,log10=True))
-        if self.opt.store_bdg:
-            self.info("#3 save the score track into bedGraph file...")
-            bdgfhd = open(self.zwig_tr + "_scores.bdg", "w")
-            self.score_btrack.write_bedGraph(bdgfhd,name=self.zwig_tr+"_Scores",description="-10log10 pvalue scores at each bp from MACS version %s" % MACS_VERSION)
+        self.info("#3 Build score track ...")
+        score_btrack = treat_btrack.make_scoreTrack_for_macs(control_btrack)
+        treat_btrack = None             # clean them
+        control_btrack = None
+        gc.collect()                    # full collect garbage
 
+        self.info("#3 Calculate qvalues ...")
+        pqtable = score_btrack.make_pq_table()
+        
+        self.info("#3 Saving p-value to q-value table ...")
+        pqfhd = open(self.opt.pqtable,"w")
+        pqfhd.write( "-log10pvalue\t-log10qvalue\n" )
+        for p in sorted(pqtable.keys()):
+            q = pqtable[p]
+            pqfhd.write("%.2f\t%.2f\n" % (p/100.0,q/100.0))
+        pqfhd.close()
+
+        self.info("#3 Assign qvalues ...")
+        score_btrack.assign_qvalue( pqtable )
+                
         # call peaks
-        self.info("#3 Call peaks with given score cutoff: %.2f ..." % self.pvalue)        
-        peaks = self.score_btrack.call_peaks(cutoff=self.pvalue,min_length=self.d,max_gap=self.opt.tsize)
+        self.info("#3 Call peaks with given -log10pvalue cutoff: %.2f ..." % self.pvalue)        
+        peaks = score_btrack.call_peaks(cutoff=self.pvalue*100,min_length=self.d,max_gap=self.opt.tsize,colname='-100logp')
+
+        if self.opt.store_bdg:
+           self.info("#3 save tag pileup into bedGraph file...")
+           bdgfhd = open(self.zwig_tr + "_pileup.bdg", "w")
+           score_btrack.write_bedGraph( bdgfhd,
+                                        self.zwig_tr,
+                                        "Fragment pileup at each bp from MACS version %s" % MACS_VERSION,
+                                        "sample" )
+        
+           self.info("#3 save local lambda into bedGraph file...")
+           bdgfhd = open(self.zwig_ctl + "_lambda.bdg", "w")
+           score_btrack.write_bedGraph( bdgfhd,
+                                        self.zwig_ctl,
+                                        "Maximum local lambda at each bp from MACS version %s" % MACS_VERSION,
+                                        "control" )
+
+           self.info("#3 save the -log10pvalue score track into bedGraph file...")
+           bdgfhd = open(self.zwig_tr + "_pvalue.bdg", "w")
+           score_btrack.write_bedGraph( bdgfhd,
+                                        self.zwig_tr+"_-log10pvalue",
+                                        "-log10 pvalue scores at each bp from MACS version %s" % MACS_VERSION,
+                                        "-100logp")
+            
+           self.info("#3 save the -log10qvalue score track into bedGraph file...")
+           bdgfhd = open(self.zwig_tr + "_qvalue.bdg", "w")
+           score_btrack.write_bedGraph( bdgfhd,
+                                        self.zwig_tr+"_-log10qvalue",
+                                        "-log10 qvalue scores at each bp from MACS version %s" % MACS_VERSION,
+                                        "-100logq")
         return peaks
 
     def __call_peaks_wo_control (self):
@@ -326,24 +286,24 @@ class PeakDetect:
             c_tmp_btrack = pileup_bdg(self.treat,self.lregion,directional=self.opt.shiftcontrol,halfextension=self.opt.halfext)
             tmp_v = float(self.d)/self.lregion
             c_tmp_btrack.apply_func(lambda x:float(x)*tmp_v)
-            self.control_btrack = self.control_btrack.overlie(c_tmp_btrack,func=max)
+            control_btrack = control_btrack.overlie(c_tmp_btrack,func=max)
  
         # Now pileup FWTrackII to form a bedGraphTrackI
         self.info("#3 pileup treatment data")
-        self.treat_btrack = pileup_bdg(self.treat,self.d,halfextension=self.opt.halfext)
+        treat_btrack = pileup_bdg(self.treat,self.d,halfextension=self.opt.halfext)
 
         if self.opt.store_bdg:
             self.info("#3 save tag pileup into bedGraph file...")
             bdgfhd = open(self.zwig_tr + "_pileup.bdg", "w")
-            self.treat_btrack.write_bedGraph(bdgfhd,name=self.zwig_tr,description="Fragment pileup at each bp from MACS version %s" % MACS_VERSION)
+            treat_btrack.write_bedGraph(bdgfhd,name=self.zwig_tr,description="Fragment pileup at each bp from MACS version %s" % MACS_VERSION)
 
         # calculate pvalue scores
         self.info("#3 Calculate pvalue scores...")
-        self.control_btrack.reset_baseline(float(self.d)*self.treat.total/self.gsize) # set the baseline as lambda_bg
+        control_btrack.reset_baseline(float(self.d)*self.treat.total/self.gsize) # set the baseline as lambda_bg
 
         l_bd = float(self.d)*self.treat.total/self.gsize
-        self.treat_btrack.apply_func(lambda x:-10*poisson_cdf(x,l_bd,lower=False,log10=True))
-        self.score_btrack = self.treat_btrack
+        treat_btrack.apply_func(lambda x:-10*poisson_cdf(x,l_bd,lower=False,log10=True))
+        self.score_btrack = treat_btrack
         if self.opt.store_bdg:
             self.info("#3 save the score track into bedGraph file...")
             bdgfhd = open(self.zwig_tr + "_scores.bdg", "w")
@@ -354,36 +314,6 @@ class PeakDetect:
         peaks = self.score_btrack.call_peaks(cutoff=self.pvalue,min_length=self.d,max_gap=self.opt.tsize)
         return peaks
 
-    def __shift_trackI (self, trackI, shift_size):
-        """Shift trackI data to right (for plus strand) or left (for
-        minus strand).
-
-        shift_size is self.shift_size for treatment data; or
-        self.sregion and self.lregion for control data.
-
-        trackI will be modified
-        """
-        chrs = trackI.get_chr_names()
-        number_removed_tags = 0
-        for chrom in chrs:
-            tags = trackI.get_locations_by_chr(chrom)
-            # plus
-            for i in range(len(tags[0])):
-                tags[0][i]+=shift_size
-            # minus
-            for i in range(len(tags[1])):
-                tags[1][i]-=shift_size
-            # remove the tags extended outside of chromosome start
-            while True:
-                if tags[1][0]-shift_size<0:
-                    number_removed_tags += 1
-                    tags[1].pop(0)
-                else:
-                    break
-
-        self.debug("# %d tag(s) extended outside of chromosome start are removed!" % number_removed_tags)
-        return trackI
-    
     # def __diag_w_control (self):
     #     # sample
     #     sample_peaks = {}

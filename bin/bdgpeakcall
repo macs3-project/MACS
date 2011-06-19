@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# Time-stamp: <2011-06-10 15:31:25 Tao Liu>
+# Time-stamp: <2011-06-17 00:39:25 Tao Liu>
 
 """Description: Naive call peaks from a single bedGraph track for scores.
 
@@ -25,6 +25,8 @@ import re
 import logging
 from optparse import OptionParser
 from MACS2.IO import bedGraphIO
+from math import log as mlog
+from math import log10 as mlog10
 # ------------------------------------
 # constants
 # ------------------------------------
@@ -74,6 +76,37 @@ def main():
     info("Read and build bedGraph...")
     bio = bedGraphIO.bedGraphIO(options.ifile)
     btrack = bio.build_bdgtrack(baseline_value=0)
+
+    info("making pvalue list...")
+    value_list = btrack.make_value_list()
+    info("write to file...")
+    tmpfhd = open("tmpvalue.txt","w")
+    for (v,l) in value_list:
+        tmpfhd.write("%.2f\t%d\n" % (v,l))
+    tmpfhd.close()
+
+    m = sum(value_list['l'])
+    print "total length:",m
+    k = 1
+    c = mlog(m)+0.57721566490153286060
+    f = mlog10(c)+mlog10(m)
+    print "f",f
+    pre_v = -1e310
+    info("write to pvalue to qvalue file...")
+    tmpfhd = open("tmp_pvalue2qvalue.txt","w")
+    for i in xrange(value_list.size-1,-1,-1):
+        v,l = value_list[i]
+        if v != pre_v:
+            # new value
+            print v,k,f-mlog10(k)
+            q = (f-mlog10(k)+(v/-10))*-10
+            tmpfhd.write("%.2f\t%.2f\n" % ( v,q ))
+            pre_v = v
+        k+=l
+    tmpfhd.close()
+        
+        
+
     info("Call peaks from bedGraph...")    
     peaks = btrack.call_peaks(cutoff=options.cutoff,min_length=options.minlen,max_gap=options.maxgap)
 

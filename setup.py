@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# Time-stamp: <2011-06-10 16:00:24 Tao Liu>
+# Time-stamp: <2011-06-19 15:48:55 Tao Liu>
 
 """Description
 
@@ -30,13 +30,16 @@ def main():
     ext_modules = [Extension("MACS2.cProb", ["lib/cProb.pyx"], libraries=["m"]),
                    Extension("MACS2.IO.cParser",["lib/IO/cParser.pyx"]),
                    Extension("MACS2.cPileup", ["lib/cPileup.pyx"]),
-                   Extension("MACS2.cPeakDetect", ["lib/cPeakDetect.pyx"]),                   
-                   Extension("MACS2.IO.cFeatIO", ["lib/IO/cFeatIO.pyx"],),
+                   Extension("MACS2.cPeakDetect", ["lib/cPeakDetect.pyx"]),
+                   Extension("MACS2.IO.cPeakIO", ["lib/IO/cPeakIO.pyx"],),
+                   Extension("MACS2.IO.cFixWidthTrack", ["lib/IO/cFixWidthTrack.pyx"],),
+                   Extension("MACS2.IO.cBedGraph", ["lib/IO/cBedGraph.pyx"], libraries=["m"]),
+                   Extension("MACS2.IO.cScoreTrack", ["lib/IO/cScoreTrack.pyx"],),                   
                    ]
     
 
     setup(name="MACS",
-          version="2.0.2",
+          version="2.0.3",
           description="Model Based Analysis for ChIP-Seq data",
           author='Yong Zhang; Tao (Foo) Liu',
           author_email='zy@jimmy.harvard.edu; taoliu@jimmy.harvard.edu',
@@ -44,7 +47,6 @@ def main():
           package_dir={'MACS2' : 'lib'},
           packages=['MACS2', 'MACS2.IO'],
           scripts=['bin/macs2',
-                   #'bin/elandmulti2bed','bin/elandresult2bed','bin/elandexport2bed','bin/sam2bed',
                    'bin/bdgcmp',
                    'bin/bdgpeakcall'],
           classifiers=[

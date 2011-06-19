@@ -1,4 +1,4 @@
-# Time-stamp: <2011-05-23 21:09:22 Tao Liu>
+# Time-stamp: <2011-06-19 16:12:55 Tao Liu>
 
 """Module for all MACS Parser classes for input.
 
@@ -21,7 +21,7 @@ import logging
 import struct
 import gzip
 from MACS2.Constants import *
-from MACS2.IO.cFeatIO import FWTrackII
+from MACS2.IO.cFixWidthTrack import FWTrackII
 # ------------------------------------
 # constants
 # ------------------------------------
