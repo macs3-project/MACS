@@ -1,4 +1,4 @@
-# Time-stamp: <2011-06-19 18:53:41 Tao Liu>
+# Time-stamp: <2011-06-19 20:38:00 Tao Liu>
 
 """Module for Feature IO classes.
 
@@ -120,7 +120,6 @@ class scoreTrackI:
 
         shift will be used to shift the coordinates. default: 0
         """
-        #fhd.write("track type=bedGraph name=\"%s\" description=\"%s\"\n" % (name,description))
         if colname not in ['sample','control','-100logp','-100logq']:
             raise Exception("%s not supported!" % colname)
         if colname in ['-100logp', '-100logq']:
@@ -131,22 +130,15 @@ class scoreTrackI:
             l = self.pointer[chrom]
             pre = 0
             pos   = d['pos']
-            #if flag100:
-            #    value = d[colname]/100.0
-            #else:
-            #    value = d[colname]
-            value = d[colname]
             if flag100:
-                for i in xrange( l ):
-                    fhd.write("%s\t%d\t%d\t%.2f\n" % (chrom,pre,pos[i],value[i]/100.0))
-                    pre = pos[i]
+                value = d[colname]/100.0
             else:
-                for i in xrange( l ):
-                    fhd.write("%s\t%d\t%d\t%.2f\n" % (chrom,pre,pos[i],value[i]))
-                    pre = pos[i]
+                value = d[colname]
+            for i in xrange( l ):
+                fhd.write("%s\t%d\t%d\t%.2f\n" % (chrom,pre,pos[i],value[i]))
+                pre = pos[i]
+
         return True
-
-
 
     def __calculate_fold_change ( self, chrom, index ):
         """From 'sample' and 'control' columns, calculate foldchanges.
