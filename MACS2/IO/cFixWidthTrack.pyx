@@ -1,4 +1,4 @@
-# Time-stamp: <2011-06-19 15:35:20 Tao Liu>
+# Time-stamp: <2011-06-20 17:31:41 Tao Liu>
 
 """Module for FWTrack classes.
 
@@ -23,7 +23,6 @@ from array import array
 from random import sample as random_sample
 
 from MACS2.Constants import *
-from MACS2.cProb import poisson_cdf
 
 # ------------------------------------
 # constants

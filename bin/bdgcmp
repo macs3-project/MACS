@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# Time-stamp: <2011-06-10 16:00:01 Tao Liu>
+# Time-stamp: <2011-06-20 17:13:12 Tao Liu>
 
 import os
 import sys
@@ -42,7 +42,7 @@ def main():
     optparser.add_option("-o","--output",dest="ofile",type="string",
                          help="Required: The output bedGraph file to write scores.")
     optparser.add_option("-m","--method",dest="method",type="string",
-                         help="Method to use while calculating a score in any bin by comparing treatment value and control value. Available choices are: ppois, substract, divide which represent Poisson Pvalue (-10*log10(pvalue) form) using control as lambda and treatment as observation, substraction from treatment, fold change which may be problematic if there are zero in control. Default option is ppois.",default="ppois")
+                         help="Method to use while calculating a score in any bin by comparing treatment value and control value. Available choices are: ppois, substract, divide which represent Poisson Pvalue (-log10(pvalue) form) using control as lambda and treatment as observation, substraction from treatment, fold change which may be problematic if there are zero in control. Default option is ppois.",default="ppois")
     (options,args) = optparser.parse_args()
 
     if not options.tfile or not options.cfile or not options.ofile:
@@ -66,7 +66,7 @@ def main():
     info("Calculate scores comparing treatment and control by %s..." % method)
     # build score track
     if method == 'ppois':
-        sbtrack = tbtrack.overlie(cbtrack,func=lambda x,y:-10*poisson_cdf(x,y,lower=False,log10=True))
+        sbtrack = tbtrack.overlie(cbtrack,func=lambda x,y:-1*poisson_cdf(x,y,False,True))
     elif method == 'substract':
         sbtrack = tbtrack.overlie(cbtrack,func=lambda x,y:x-y)
     elif method == 'divide':

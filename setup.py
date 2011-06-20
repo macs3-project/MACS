@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# Time-stamp: <2011-06-19 15:48:55 Tao Liu>
+# Time-stamp: <2011-06-20 17:27:48 Tao Liu>
 
 """Description
 
@@ -27,14 +27,14 @@ def main():
         sys.stderr.write("CRITICAL: Python version must be 2.6 or 2.7!\n")
         sys.exit(1)
 
-    ext_modules = [Extension("MACS2.cProb", ["lib/cProb.pyx"], libraries=["m"]),
-                   Extension("MACS2.IO.cParser",["lib/IO/cParser.pyx"]),
-                   Extension("MACS2.cPileup", ["lib/cPileup.pyx"]),
-                   Extension("MACS2.cPeakDetect", ["lib/cPeakDetect.pyx"]),
-                   Extension("MACS2.IO.cPeakIO", ["lib/IO/cPeakIO.pyx"],),
-                   Extension("MACS2.IO.cFixWidthTrack", ["lib/IO/cFixWidthTrack.pyx"],),
-                   Extension("MACS2.IO.cBedGraph", ["lib/IO/cBedGraph.pyx"], libraries=["m"]),
-                   Extension("MACS2.IO.cScoreTrack", ["lib/IO/cScoreTrack.pyx"],),                   
+    ext_modules = [Extension("MACS2.cProb", ["MACS2/cProb.pyx"], libraries=["m"]),
+                   Extension("MACS2.IO.cParser",["MACS2/IO/cParser.pyx"]),
+                   Extension("MACS2.cPileup", ["MACS2/cPileup.pyx"]),
+                   Extension("MACS2.cPeakDetect", ["MACS2/cPeakDetect.pyx"]),
+                   Extension("MACS2.IO.cPeakIO", ["MACS2/IO/cPeakIO.pyx"],),
+                   Extension("MACS2.IO.cFixWidthTrack", ["MACS2/IO/cFixWidthTrack.pyx"],),
+                   Extension("MACS2.IO.cBedGraph", ["MACS2/IO/cBedGraph.pyx"], libraries=["m"]),
+                   Extension("MACS2.IO.cScoreTrack", ["MACS2/IO/cScoreTrack.pyx"],),                   
                    ]
     
 
@@ -44,7 +44,7 @@ def main():
           author='Yong Zhang; Tao (Foo) Liu',
           author_email='zy@jimmy.harvard.edu; taoliu@jimmy.harvard.edu',
           url='http://liulab.dfci.harvard.edu/MACS/',
-          package_dir={'MACS2' : 'lib'},
+          package_dir={'MACS2' : 'MACS2'},
           packages=['MACS2', 'MACS2.IO'],
           scripts=['bin/macs2',
                    'bin/bdgcmp',

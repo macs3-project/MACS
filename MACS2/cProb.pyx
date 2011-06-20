@@ -1,4 +1,4 @@
-# Time-stamp: <2011-05-17 15:35:24 Tao Liu>
+# Time-stamp: <2011-06-20 17:34:31 Tao Liu>
 
 """Module Description
 
@@ -17,9 +17,9 @@ the distribution).
 # ------------------------------------
 # python modules
 # ------------------------------------
-from libc.math cimport exp,log,log10
+from libc.math cimport exp,log,log10 #,fabs,log1p
 from math import fabs
-from math import log1p as py_log1p
+from math import log1p #as py_log1p
 
 from cpython cimport bool
 # ------------------------------------
@@ -32,7 +32,7 @@ cdef double EXPSTEP  = exp(-1*LSTEP)
 # Misc functions
 # ------------------------------------
 
-def factorial (unsigned int n):
+cpdef factorial ( unsigned int n ):
     """Calculate N!.
     
     """
@@ -40,11 +40,11 @@ def factorial (unsigned int n):
     cdef unsigned long i
     if n < 0:
         return 0
-    for i in xrange(2,n+1):
+    for i in xrange( 2,n+1 ):
         fact = fact * i
     return fact
 
-def poisson_cdf (unsigned int n, double lam, bool lower=False, bool log10=False):
+cpdef poisson_cdf ( unsigned int n, double lam, bool lower=False, bool log10=False ):
     """Poisson CDF evaluater.
 
     This is a more stable CDF function. It can tolerate large lambda
@@ -79,7 +79,7 @@ def poisson_cdf (unsigned int n, double lam, bool lower=False, bool log10=False)
         else:
             return __poisson_cdf_Q(n,lam)
 
-def __poisson_cdf ( unsigned int k, double a):
+cdef __poisson_cdf ( unsigned int k, double a ):
     """Poisson CDF For small lambda. If a > 745, this will return
     incorrect result.
 
@@ -102,7 +102,7 @@ def __poisson_cdf ( unsigned int k, double a):
     else:
         return cdf
     
-def __poisson_cdf_large_lambda ( unsigned int k, double a ):
+cdef __poisson_cdf_large_lambda ( unsigned int k, double a ):
     """Slower poisson cdf for large lambda ( > 700 )
 
     Parameters:
@@ -138,7 +138,7 @@ def __poisson_cdf_large_lambda ( unsigned int k, double a ):
     cdf *= lastexp
     return cdf
 
-def __poisson_cdf_Q (unsigned int k, double a):
+cdef __poisson_cdf_Q ( unsigned int k, double a ):
     """internal Poisson CDF evaluater for upper tail with small
     lambda.
 
@@ -167,7 +167,7 @@ def __poisson_cdf_Q (unsigned int k, double a):
         i+=1
     return cdf
 
-def __poisson_cdf_Q_large_lambda (unsigned int k, double a):
+cdef __poisson_cdf_Q_large_lambda ( unsigned int k, double a ):
     """Slower internal Poisson CDF evaluater for upper tail with large
     lambda.
 
@@ -219,7 +219,7 @@ def __poisson_cdf_Q_large_lambda (unsigned int k, double a):
     cdf *= lastexp
     return cdf
 
-cdef double log10_poisson_cdf_P_large_lambda (unsigned int k, double lbd):
+cdef double log10_poisson_cdf_P_large_lambda ( unsigned int k, double lbd ):
     """Slower Poisson CDF evaluater for lower tail which allow
     calculation in log space. Better for the pvalue < 10^-310.
 
@@ -257,7 +257,7 @@ cdef double log10_poisson_cdf_P_large_lambda (unsigned int k, double lbd):
 
     return round((residue-lbd)/log(10),2)
 
-cdef double log10_poisson_cdf_Q_large_lambda (unsigned int k, double lbd):
+cdef double log10_poisson_cdf_Q_large_lambda ( unsigned int k, double lbd ):
     """Slower Poisson CDF evaluater for upper tail which allow
     calculation in log space. Better for the pvalue < 10^-310.
 
@@ -295,10 +295,10 @@ cdef double log10_poisson_cdf_Q_large_lambda (unsigned int k, double lbd):
 
     return round((residue-lbd)/log(10),2)
 
-cdef double logspace_add (double logx, double logy):
-    return max (logx, logy) + py_log1p (exp (-fabs (logx - logy)));
+cdef double logspace_add ( double logx, double logy ):
+    return max (logx, logy) + log1p (exp (-fabs (logx - logy)));
 
-def poisson_cdf_inv ( double cdf, double lam, int maximum=1000):
+cpdef poisson_cdf_inv ( double cdf, double lam, int maximum=1000 ):
     """inverse poisson distribution.
 
     cdf : the CDF
@@ -330,7 +330,7 @@ def poisson_cdf_inv ( double cdf, double lam, int maximum=1000):
     
     return maximum
 
-def poisson_cdf_Q_inv ( double cdf, double lam, int maximum=1000):
+cpdef poisson_cdf_Q_inv ( double cdf, double lam, int maximum=1000 ):
     """inverse poisson distribution.
 
     cdf : the CDF
@@ -362,7 +362,7 @@ def poisson_cdf_Q_inv ( double cdf, double lam, int maximum=1000):
     
     return maximum
 
-def poisson_pdf ( unsigned int k, double a ):
+cpdef poisson_pdf ( unsigned int k, double a ):
     """Poisson PDF.
 
     PDF(K,A) is the probability that the number of events observed in
@@ -374,7 +374,7 @@ def poisson_pdf ( unsigned int k, double a ):
     return exp(-a) * pow (a, k, None) / factorial (k)
     
 
-def binomial_coef ( long n, long k):
+cdef binomial_coef ( long n, long k ):
     """BINOMIAL_COEF computes the Binomial coefficient C(N,K)
 
     n,k are integers.
@@ -394,7 +394,7 @@ def binomial_coef ( long n, long k):
             cnk = cnk * (mx+i) / i
     return cnk
 
-def binomial_cdf ( long x, long a, double b, lower=True):
+cpdef binomial_cdf ( long x, long a, double b, bool lower=True ):
     """ BINOMIAL_CDF compute the binomial CDF.
 
     CDF(x)(A,B) is the probability of at most X successes in A trials,
@@ -405,7 +405,7 @@ def binomial_cdf ( long x, long a, double b, lower=True):
     else:
         return _binomial_cdf_r (x,a,b)
 
-def _binomial_cdf_r ( long x, long a, double b):
+cdef _binomial_cdf_r ( long x, long a, double b ):
     """ Binomial CDF for upper tail.
 
     """
@@ -457,7 +457,7 @@ def _binomial_cdf_r ( long x, long a, double b):
         return cdf
 
 
-def _binomial_cdf_f ( long x, long a, double b):
+cdef _binomial_cdf_f ( long x, long a, double b ):
     """ Binomial CDF for lower tail.
 
     """    
@@ -504,7 +504,7 @@ def _binomial_cdf_f ( long x, long a, double b):
         cdf = float("%.10e" %cdf)
         return cdf
 
-def binomial_cdf_inv ( double cdf, long a, double b ):
+cpdef binomial_cdf_inv ( double cdf, long a, double b ):
     """BINOMIAL_CDF_INV inverts the binomial CDF. For lower tail only!
 
     """
@@ -521,7 +521,7 @@ def binomial_cdf_inv ( double cdf, long a, double b ):
             return x
     return a
     
-def binomial_pdf( long x, long a, double b ):
+cpdef binomial_pdf( long x, long a, double b ):
     """binomial PDF by H. Gene Shin
     
     """

@@ -1,4 +1,4 @@
-# Time-stamp: <2011-06-19 20:38:00 Tao Liu>
+# Time-stamp: <2011-06-20 18:19:25 Tao Liu>
 
 """Module for Feature IO classes.
 
@@ -23,7 +23,7 @@ from numpy import int64,int32,float32
 from libc.math cimport sqrt,log10
 
 from MACS2.Constants import *
-from MACS2.cProb import poisson_cdf
+from MACS2.cProb cimport poisson_cdf
 from MACS2.IO.cPeakIO import PeakIO
 
 # ------------------------------------
@@ -89,7 +89,7 @@ class scoreTrackI:
         c = self.data[chromosome]
         i = self.pointer[chromosome]
         # get the preceding region
-        c[i] = (endpos,sample,control,int(-100*poisson_cdf(sample,control,lower=False,log10=True)),0)
+        c[i] = (endpos,sample,control,int(-100*poisson_cdf(sample,control,False,True)),0)
         self.pointer[chromosome] += 1
 
     def get_data_by_chr (self, chromosome):
@@ -124,6 +124,8 @@ class scoreTrackI:
             raise Exception("%s not supported!" % colname)
         if colname in ['-100logp', '-100logq']:
             flag100 = True              # for pvalue or qvalue, divide them by 100 while writing to bedGraph file
+        else:
+            flag100 = False
         chrs = self.get_chr_names()
         for chrom in chrs:
             d = self.data[chrom]
@@ -287,16 +289,24 @@ class scoreTrackI:
                         # char * chromosome, long start, long end, long summit = 0, 
                         # double peak_height=0, int pileup=0, 
                         # double pvalue=0, double fold_change=0, double qvalue=0
-                        peaks.add( chrom,
-                                   peak_content[0][0],
-                                   peak_content[-1][1],
-                                   summit      = summit,
-                                   peak_height = summit_value,
-                                   pileup      = sample[ index ],
-                                   pvalue      = pvalue[ index ]/100.0,
-                                   fold_change = sample[ index ]/control[ index ],
-                                   qvalue      = qvalue[ index ]/100.0,
-                                   )
+                        try:
+                            peaks.add( chrom,
+                                       peak_content[0][0],
+                                       peak_content[-1][1],
+                                       summit      = summit,
+                                       peak_height = summit_value,
+                                       pileup      = sample[ index ],
+                                       pvalue      = pvalue[ index ]/100.0,
+                                       fold_change = sample[ index ]/control[ index ],
+                                       qvalue      = qvalue[ index ]/100.0,
+                                       )
+                        except IndexError:
+                            print "index:",index
+                            print "pointer:",length
+                            print "sample:",sample.size
+                            print "control:",control.size                            
+                            print "pvalue:",pvalue.size
+                            print "qvalue:",qvalue.size
                     # start a new peak
                     peak_content = [ ( pre_p, p, v, i ), ]
                 pre_p = p
@@ -318,16 +328,24 @@ class scoreTrackI:
                 summit = tsummit[ middle_summit ]
                 index  = tsummit_index[ middle_summit ]
 
-                peaks.add( chrom,
-                           peak_content[0][0],
-                           peak_content[-1][1],
-                           summit      = summit,
-                           peak_height = summit_value,
-                           pileup      = sample[ index ],
-                           pvalue      = pvalue[ index ]/100.0,
-                           fold_change = sample[ index ]/control[ index ],
-                           qvalue      = qvalue[ index ]/100.0,
-                           )
+                try:
+                    peaks.add( chrom,
+                               peak_content[0][0],
+                               peak_content[-1][1],
+                               summit      = summit,
+                               peak_height = summit_value,
+                               pileup      = sample[ index ],
+                               pvalue      = pvalue[ index ]/100.0,
+                               fold_change = sample[ index ]/control[ index ],
+                               qvalue      = qvalue[ index ]/100.0,
+                               )
+                except IndexError:
+                    print "index:",index
+                    print "pointer:",length
+                    print "sample:",sample.size
+                    print "control:",control.size                            
+                    print "pvalue:",pvalue.size
+                    print "qvalue:",qvalue.size
             
         return peaks
 

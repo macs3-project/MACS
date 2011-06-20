@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# Time-stamp: <2011-06-17 00:39:25 Tao Liu>
+# Time-stamp: <2011-06-20 17:14:01 Tao Liu>
 
 """Description: Naive call peaks from a single bedGraph track for scores.
 
@@ -60,7 +60,7 @@ def main():
     optparser.add_option("-i","--ifile",dest="ifile",type="string",
                          help="MACS pvalue score bedGraph")
     optparser.add_option("-c","--cutoff",dest="cutoff",type="float",
-                         help="Cutoff depends on which method you used for score track. If the file contains pvalue scores from MACS2, score 50 means pvalue 1e-5. DEFAULT: 50",default=50)
+                         help="Cutoff depends on which method you used for score track. If the file contains pvalue scores from MACS2, score 5 means pvalue 1e-5. DEFAULT: 5",default=5)
     optparser.add_option("-l","--min-length",dest="minlen",type="int",
                          help="minimum length of peak, better to set it as d value. DEFAULT: 200",default=200)
     optparser.add_option("-g","--max-gap",dest="maxgap",type="int",
@@ -99,7 +99,7 @@ def main():
         if v != pre_v:
             # new value
             print v,k,f-mlog10(k)
-            q = (f-mlog10(k)+(v/-10))*-10
+            q = (f-mlog10(k)+(v/-10))*-1
             tmpfhd.write("%.2f\t%.2f\n" % ( v,q ))
             pre_v = v
         k+=l
