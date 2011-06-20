@@ -1,3 +1,47 @@
+2011-06-19  Tao Liu  <taoliu@jimmy.harvard.edu>
+	MACS version 2.0.3 (tag:alpha)
+
+	* Rich output with qvalue, fold enrichment, and pileup height
+
+	Calculate q-values using a refined Benjamini–Hochberg–Yekutieli
+	procedure:
+
+	http://en.wikipedia.org/wiki/False_discovery_rate#Dependent_tests
+
+	Now we have a similiar xls output file as before. The differences
+	from previous file are:
+
+	1. Summit now is absolute summit, instead of relative summit
+	   position;
+	2. 'Pileup' is previous 'tag' column. It's the extended fragment
+	   pileup at the peak summit;
+	3. We now use '-log10(pvalue)' instead of '-10log10(pvalue)', so
+	   5.00 means 1e-5, simple and less confusing.
+	4. FDR column becomes '-log10(qvalue)' column.
+	5. The pileup, -log10pvalue, fold_enrichment and -log10qvalue are
+	   the values at the peak summit.
+
+	* Extra output files
+
+	NAME_pqtable.txt contains pvalue and qvalue relationships.
+
+	NAME_treat_pvalue.bdg and NAME_treat_qvalue.bdg store -log10pvalue
+	and -log10qvalue scores in BedGraph format. Nearby regions with
+	the same value are not merged.
+
+	* Separation of FeatIO.py
+
+	Its content has been divided into cPeakIO.pyx, cBedGraph.pyx, and
+	cFixWidthTrack.pyx. A modified bedGraphTrackI class was
+	implemented to store pileup, local lambda, pvalue, and qvalue
+	alltogether in cScoreTrack.pyx.
+
+	* Experimental option --half-ext
+
+	Suggested by NPS algorithm, I added an experimental option
+	--half-ext to let MACS only extends ChIP fragment around its
+	middle point for only 1/2 d.
+
 2011-06-12  Tao Liu  <taoliu@jimmy.harvard.edu>
 	MACS version 2.0.2 (tag:alpha)
 

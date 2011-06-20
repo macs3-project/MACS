@@ -1,5 +1,5 @@
-README for MACS (2.0.2)
-Time-stamp: <2011-06-12 23:35:17 Tao Liu>
+README for MACS (2.0.3)
+Time-stamp: <2011-06-19 21:48:30 Tao Liu>
 
 * Introduction
 
@@ -23,7 +23,7 @@ Please check the file 'INSTALL' in the distribution.
 
 Usage: macs2 <-t tfile> [-n name] [-g genomesize] [options]
 
-Example: macs2 -t ChIP.bam -c Control.bam -f BAM -g h -n test -w --call-subpeaks
+Example: macs2 -t ChIP.bam -c Control.bam -f BAM -g hs -n test -B
 
 
 macs2 -- Model-based Analysis for ChIP-Sequencing
@@ -113,6 +113,8 @@ Options:
                         regardless of strand. You may consider to turn this
                         option on while comparing two ChIP datasets of the
                         same factor. DEFAULT: False
+  --half-ext            When set, MACS extends 1/2 d size for each fragment
+                        centered at its middle point. DEFAULT: False
   -B, --bdg             Whether or not to save extended fragment pileup, local
                         lambda and score tracks at every bp into a bedGraph
                         file. DEFAULT: False
@@ -393,11 +395,19 @@ treatment dataset.
 ** -B/--bdg
 
 If this flag is on, MACS will store the fragment pileup, control
-lambda and scores in bedGraph files. The bedGraph files will be stored
-in current directory named NAME+'_treat_pileup.bdg' for treatment
-data, NAME+'_control_lambda.bdg' for local lambda values from control,
-and NAME_'_treat_scores.bdg' for Poisson pvalue scores (in
--10log10(pvalue) form)
+lambda, -log10pvalue and -log10qvalue scores in bedGraph files. The
+bedGraph files will be stored in current directory named
+NAME+'_treat_pileup.bdg' for treatment data,
+NAME+'_control_lambda.bdg' for local lambda values from control,
+NAME+'_treat_pvalue.bdg' for Poisson pvalue scores (in -log10(pvalue)
+form), and NAME+'_treat_qvalue.bdg' for q-value scores from
+Benjamini–Hochberg–Yekutieli procedure
+<http://en.wikipedia.org/wiki/False_discovery_rate#Dependent_tests>
+
+** --half-ext (experimental option)
+
+When this flag is on, MACS will only extend each tag with 1/2 d
+(predicted ChIP fragment size) instead of full d. 
 
 ** -w/--wig is obsolete.
 
@@ -443,28 +453,23 @@ let MACS choose the following fold enrichment ranges to consider:
  1. NAME_peaks.xls is a tabular file which contains information about
  called peaks. You can open it in excel and sort/filter using excel
  functions. Information include: chromosome name, start position of
- peak, end position of peak, length of peak region, peak summit
- position related to the start position of peak region, number of tags
- in peak region, -10*log10(pvalue) for the peak region (e.g. pvalue
- =1e-10, then this value should be 100), fold enrichment for this
- region against random Poisson distribution with local lambda, FDR in
- percentage. Coordinates in XLS is 1-based which is different with BED
- format. (not available currently)
+ peak, end position of peak, length of peak region, absolute peak
+ summit position, pileup height at peak summit, -log10(pvalue) for the
+ peak summit (e.g. pvalue =1e-10, then this value should be 10), fold
+ enrichment for this peak summit against random Poisson distribution
+ with local lambda, -log10(qvalue) at peak summit. Coordinates in XLS
+ is 1-based which is different with BED format.
 
  2. NAME_peaks.bed is BED format file which contains the peak
  locations. You can load it to UCSC genome browser or Affymetrix IGB
  software.
 
  3. NAME_summits.bed is in BED format, which contains the peak summits
- locations for every peaks. The 5th column in this file is the summit
- height of fragment pileup. If you want to find the motifs at the
- binding sites, this file is recommended.
+ locations for every peaks. The 5th column in this file is
+ -log10pvalue the same as NAME_peaks.bed. If you want to find the
+ motifs at the binding sites, this file is recommended.
 
- 4. NAME_negative_peaks.xls is a tabular file which contains
- information about negative peaks. Negative peaks are called by
- swapping the ChIP-seq and control channel. (not available currently)
-
- 5. NAME_model.r is an R script which you can use to produce a PDF
+ 4. NAME_model.r is an R script which you can use to produce a PDF
  image about the model based on your data. Load it to R by:
 
 $ R --vanilla < NAME_model.r
@@ -472,18 +477,18 @@ $ R --vanilla < NAME_model.r
 Then a pdf file NAME_model.pdf will be generated in your current
 directory. Note, R is required to draw this figure.
 
- 6. The .bdg.gz files are in bedGraph format which can be imported to
- UCSC genome browser or be converted into even smaller bigWig files.
+ 5. The .bdg files are in bedGraph format which can be imported to
+ UCSC genome browser or be converted into even smaller bigWig
+ files. Four kinds of bdg files include treat_pileup, control_lambda,
+ treat_pvalue, and treat_qvalue. 
 
- 7. NAME_diag.xls is the diagnosis report. First column is for various
+ 6. NAME_diag.xls is the diagnosis report. First column is for various
  fold_enrichment ranges; the second column is number of peaks for that fc
  range; after 3rd columns are the percentage of peaks covered after
  sampling 90%, 80%, 70% ... and 20% of the total tags. (not available currently)
 
- 8. NAME_peaks.subpeaks.bed is a text file which IS NOT in BED
- format. This file is generated by PeakSplitter
- (<http://www.ebi.ac.uk/bertone/software/PeakSplitter_Cpp_usage.txt>)
- when --call-subpeaks option is set. (not available currently)
+ 7. NAME_pqtable.txt store the -log10pvalue and -log10qvalue
+ relationships.
 
 * Other useful links
 
@@ -500,7 +505,7 @@ Check the two scripts within MACSv2 package:
  1. bdgcmp can be used on *_treat_pileup.bdg and *_control_lambda.bdg
  or bedGraph files from other resources to calculate score track;
 
- 2. bdgpeakcall can be used on *_treat_score.bdg or the file generated
- from bdgcmp or bedGraph file from other resources to call peaks with
- given cutoff, maximum-gap between nearby mergable peaks and
- minimum-lenght of peak.
+ 2. bdgpeakcall can be used on *_treat_pvalue.bdg or the file
+ generated from bdgcmp or bedGraph file from other resources to call
+ peaks with given cutoff, maximum-gap between nearby mergable peaks
+ and minimum-lenght of peak.
