@@ -150,12 +150,12 @@ With the improvement of sequencing techniques, chromatin
 immunoprecipitation followed by high throughput sequencing (ChIP-Seq)
 is getting popular to study genome-wide protein-DNA interactions. To
 address the lack of powerful ChIP-Seq analysis method, we present a
-novel algorithm, named Model-based Analysis of ChIP-Seq (\s-1MACS\s0), for
-identifying transcript factor binding sites. \s-1MACS\s0 captures the
+novel algorithm, named Model-based Analysis of ChIP-Seq (MACS), for
+identifying transcript factor binding sites. MACS captures the
 influence of genome complexity to evaluate the significance of
-enriched ChIP regions, and \s-1MACS\s0 improves the spatial resolution of
+enriched ChIP regions, and MACS improves the spatial resolution of
 binding sites through combining the information of both sequencing tag
-position and orientation. \s-1MACS\s0 can be easily used for ChIP-Seq data
+position and orientation. MACS can be easily used for ChIP-Seq data
 alone, or with control sample with the increase of specificity.
 .SS "2 Install"
 .IX Subsection "2 Install"
@@ -226,7 +226,7 @@ See also \*(L"\-\-fe\-min\*(R"
 .PP
 \&\fB3.1.1 \-t/\-\-treatment \s-1FILENAME\s0\fR
 .PP
-This is the only \s-1REQUIRED\s0 parameter for \s-1MACS\s0 . If the format is
+This is the only \s-1REQUIRED\s0 parameter for MACS . If the format is
 \&\s-1ELANDMULTIPET\s0, user must provide two treatment files separated by
 comma, e.g. s_1_1_eland_multi.txt,s_1_2_eland_multi.txt.
 .PP
@@ -238,7 +238,7 @@ for \-t/\-\-treatment.
 .PP
 \&\fB3.1.3 \-n/\-\-name\fR
 .PP
-The name string of the experiment. \s-1MACS\s0 will use this string \s-1NAME\s0 to
+The name string of the experiment. MACS will use this string \s-1NAME\s0 to
 create output files like 'NAME_peaks.xls', 'NAME_negative_peaks.xls',
 \&'NAME_peaks.bed' , 'NAME_summits.bed', 'NAME_model.r' and so on. So
 please avoid any confliction between these filenames and your existing
@@ -248,7 +248,7 @@ files.
 .PP
 Format of tag file, can be \*(L"\s-1ELAND\s0\*(R", \*(L"\s-1BED\s0\*(R", \*(L"\s-1ELANDMULTI\s0\*(R",
 \&\*(L"\s-1ELANDEXPORT\s0\*(R", \*(L"\s-1ELANDMULTIPET\s0\*(R" (for pair-end tags), \*(L"\s-1SAM\s0\*(R", \*(L"\s-1BAM\s0\*(R" or
-\&\*(L"\s-1BOWTIE\s0\*(R". Default is \*(L"\s-1AUTO\s0\*(R" which will allow \s-1MACS\s0 to decide the format
+\&\*(L"\s-1BOWTIE\s0\*(R". Default is \*(L"\s-1AUTO\s0\*(R" which will allow MACS to decide the format
 automatically. Please use \*(L"\s-1AUTO\s0\*(R" only when you combine different
 formats of files.
 .PP
@@ -328,7 +328,7 @@ If you use \s-1ELANDMULTIPET\s0, you may need to modify\*(--petdist parameter.
 .PP
 If the format is \s-1BAM/SAM\s0, please check the definition in
 (http://samtools.sourceforge.net/samtools.shtml).  Pair-end mapping
-results can be saved in a single \s-1BAM\s0 file, if so, \s-1MACS\s0 will
+results can be saved in a single \s-1BAM\s0 file, if so, MACS will
 automatically keep the left mate(5' end) tag.
 .PP
 If the format is \s-1BOWTIE\s0, you need to provide the \s-1ASCII\s0 bowtie
@@ -375,12 +375,12 @@ end of the read.
 Notes:
 .PP
 1) For \s-1BED\s0 format, the 6th column of strand information is required
-by \s-1MACS\s0. And please pay attention that the coordinates in \s-1BED\s0 format
+by MACS. And please pay attention that the coordinates in \s-1BED\s0 format
 is zero-based and half-open
 (http://genome.ucsc.edu/FAQ/FAQtracks#tracks1).
 .PP
 2) For plain \s-1ELAND\s0 format, only matches with match type U0, U1 or
-U2 is accepted by \s-1MACS\s0, i.e. only the unique match for a sequence
+U2 is accepted by MACS, i.e. only the unique match for a sequence
 with less than 3 errors is involed in calculation. If multiple hits of
 a single tag are included in your raw \s-1ELAND\s0 file, please remove the
 redundancy to keep the best hit for that sequencing tag.
@@ -392,14 +392,14 @@ this, under Unix/Mac or Cygwin (for windows \s-1OS\s0), type:
 $ cat replicate1.bed replicate2.bed replicate3.bed > all_replicates.bed
 .PP
 4) \s-1ELAND\s0 export format support sometimes may not work on your
-datasets, because people may mislabel the 11th and 12th column. \s-1MACS\s0
+datasets, because people may mislabel the 11th and 12th column. MACS
 uses 11th column as the sequence name which should be the chromosome
 names.
 .PP
 \&\fB3.1.5 \-petdist=PETDIST\fR
 .PP
 Best distance between Pair-End Tags. Only available when format is
-\&'\s-1ELANDMULTIPE\s0'. Default is 200bps. When \s-1MACS\s0 reads mapped positions
+\&'\s-1ELANDMULTIPE\s0'. Default is 200bps. When MACS reads mapped positions
 for 5' tag and 3' tag, it will decide the best pairing for them using
 this best distance parameter. A simple scoring system is used as
 following,
@@ -429,7 +429,7 @@ assembly. Here are all precompiled parameters for effective genome size:
 .PP
 \&\fB3.1.7 \-s/\-\-tsize\fR
 .PP
-The size of sequencing tags. If you don't specify it, \s-1MACS\s0 will try to
+The size of sequencing tags. If you don't specify it, MACS will try to
 use the first 10 sequences from your input treatment file to determine
 the tag size. Specifying it will override the automatic determined tag
 size.
@@ -452,22 +452,22 @@ high-confidence enrichment ratio against background to build
 model. The regions must be lower than upper limit, and higher than the
 lower limit of fold enrichment. \s-1DEFAULT:10\s0,30 means using all regions
 not too low (>10) and not too high (<30) to build paired-peaks
-model. If \s-1MACS\s0 can not find more than 100 regions to build model, it
+model. If MACS can not find more than 100 regions to build model, it
 will use the\*(--shiftsize parameter to continue the peak detection.
 .PP
 Check related _\-\-off\-auto_ and _\-\-shiftsize_ for detail.
 .PP
 \&\fB3.1.11 \-nolambda\fR
 .PP
-With this flag on, \s-1MACS\s0 will use the background lambda as local
-lambda. This means \s-1MACS\s0 will not consider the local bias at peak
+With this flag on, MACS will use the background lambda as local
+lambda. This means MACS will not consider the local bias at peak
 candidate regions.
 .PP
 \&\fB3.1.12 \-slocal,\-\-llocal\fR
 .PP
 These two parameters control which two levels of regions will be
 checked around the peak regions to calculate the maximum lambda as
-local lambda. By default, \s-1MACS\s0 considers 1000bp for small local
+local lambda. By default, MACS considers 1000bp for small local
 region(\-\-slocal), and 10000bps for large local region(\-\-llocal) which
 captures the bias from a long range effect like an open chromatin
 domain. You can tweak these according to your project. Remember that
@@ -477,28 +477,28 @@ kill the significant peak.
 \&\fB3.1.13 \-off\-auto\fR
 .PP
 Whether turn off the auto paired-peak model process. If not set, when
-\&\s-1MACS\s0 failed to build paired model, it will use the nomodel settings,
+\&MACS failed to build paired model, it will use the nomodel settings,
 the '\-\-shiftsize' parameter to shift and extend each tags. If set,
-\&\s-1MACS\s0 will be terminated if paried-peak model is failed.
+\&MACS will be terminated if paried-peak model is failed.
 .PP
 \&\fB3.1.14 \-nomodel\fR
 .PP
-While on, \s-1MACS\s0 will bypass building the shifting model.
+While on, MACS will bypass building the shifting model.
 .PP
 \&\fB3.1.15 \-shiftsize\fR
 .PP
-While '\-\-nomodel' is set, \s-1MACS\s0 uses this parameter to shift tags to
+While '\-\-nomodel' is set, MACS uses this parameter to shift tags to
 their midpoint. For example, if the size of binding region for your
 transcription factor is 200 bp, and you want to bypass the model
-building by \s-1MACS\s0 , this parameter can be set as 100. This option is
-only valid when\*(--nomodel is set or when \s-1MACS\s0 fails to build
+building by MACS , this parameter can be set as 100. This option is
+only valid when\*(--nomodel is set or when MACS fails to build
 paired-peak model.
 .PP
 \&\fB3.1.16 \-keep\-dup\fR
 .PP
-It controls the \s-1MACS\s0 behavior towards duplicate tags at the exact same
+It controls the MACS behavior towards duplicate tags at the exact same
 location\*(--the same coordination and the same strand. The default
-\&'auto' option makes \s-1MACS\s0 calculate the maximum tags at the exact same
+\&'auto' option makes MACS calculate the maximum tags at the exact same
 location based on binomal distribution using 1e\-5 as pvalue cutoff;
 and the 'all' option keeps every tags.  If an integer is given, at
 most this number of tags will be kept at the same location. Default:
@@ -511,7 +511,7 @@ default, the smaller dataset will be scaled towards the larger dataset.
 .PP
 \&\fB3.1.18 \-w/\-\-wig\fR
 .PP
-If this flag is on, \s-1MACS\s0 will store the fragment pileup in wiggle
+If this flag is on, MACS will store the fragment pileup in wiggle
 format for every chromosome. The gzipped wiggle files will be stored
 in subdirectories named \s-1NAME+\s0'_MACS_wiggle/treat' for treatment data
 and \s-1NAME+\s0'_MACS_wiggle/control' for control data.\-\-single\-profile
@@ -520,7 +520,7 @@ genome.
 .PP
 \&\fB3.1.19 \-B/\-\-bdg\fR
 .PP
-If this flag is on, \s-1MACS\s0 will store the fragment pileup in bedGraph
+If this flag is on, MACS will store the fragment pileup in bedGraph
 format for every chromosome. The bedGraph file is in general much
 smaller than wiggle file. However, The process will take a little bit
 longer than \-w option, since theoratically 1bp resolution data will be
@@ -532,7 +532,7 @@ genome.
 .PP
 \&\fB3.1.20 \-S/\-\-single\-profile (formerly\*(--single\-wig)\fR
 .PP
-If this flag is on, \s-1MACS\s0 will store the fragment pileup in wiggle or
+If this flag is on, MACS will store the fragment pileup in wiggle or
 bedGraph format for the whole genome instead of for every
 chromosomes. The gzipped wiggle files will be stored in subdirectories
 named \s-1EXPERIMENT_NAME+\s0'_MACS_wiggle'+'_MACS_wiggle/treat/'
@@ -545,17 +545,17 @@ named \s-1EXPERIMENT_NAME+\s0'_MACS_wiggle'+'_MACS_wiggle/treat/'
 \&\fB3.1.21 \-space=SPACE\fR
 .PP
 By default, the resoluation for saving wiggle files is 10 bps,i.e.,
-\&\s-1MACS\s0 will save the raw tag count every 10 bps. You can change it along
+\&MACS will save the raw tag count every 10 bps. You can change it along
 with '\-\-wig' option.
 .PP
 Note this option doesn't work if \-B/\-\-bdg is on.
 .PP
 \&\fB3.1.22 \-call\-subpeaks\fR
 .PP
-If set, \s-1MACS\s0 will invoke Mali Salmon's PeakSplitter software through
+If set, MACS will invoke Mali Salmon's PeakSplitter software through
 system call. If PeakSplitter can't be found, an instruction will be
 shown for downloading and installing the PeakSplitter package. The
-PeakSplitter can refine the \s-1MACS\s0 peaks and split the wide peaks into
+PeakSplitter can refine the MACS peaks and split the wide peaks into
 smaller subpeaks. For more information, please check the following
 \&\s-1URL:\s0
 .PP
@@ -565,7 +565,7 @@ Note this option doesn't work if \-B/\-\-bdg is on.
 .PP
 \&\fB3.1.23 \-verbose\fR
 .PP
-If you don't want to see any message during the running of \s-1MACS\s0 , set
+If you don't want to see any message during the running of MACS , set
 it to 0. But the \s-1CRITICAL\s0 messages will never be hidden. If you want
 to see rich information like how many peaks are called for every
 chromosome, you can set it to 3 or larger than 3.
@@ -580,7 +580,7 @@ funtion is only in beta stage.
 .PP
 For diagnostics, \s-1FEMIN\s0 and \s-1FEMAX\s0 are the minimum and maximum fold
 enrichment to consider, and \s-1FESTEP\s0 is the interval of fold enrichment.
-For example, \*(L"\-\-fe\-min 0\-\-fe\-max 40\-\-fe\-step 10\*(R" will let \s-1MACS\s0 choose
+For example, \*(L"\-\-fe\-min 0\-\-fe\-max 40\-\-fe\-step 10\*(R" will let MACS choose
 the following fold enrichment ranges to consider: [0,10), [10,20),
 [20,30) and [30,40).
 .SS "4 Output files"

@@ -1,3 +1,16 @@
+2011-06-19  Tao Liu  <taoliu@jimmy.harvard.edu>
+	Version 1.4.0
+
+	* Parser.py
+
+	Change all split() to split('\t'), so that MACS now split columns
+	in input reads alignment file only using tab.
+
+	* elandexport2bed.py, elandmulti2bed.py, elandresult2bed.py, sam2bed.py
+
+	.py are all removed, so the commands are elandexport2bed,
+	elandmulti2bed, elandresult2bed and sam2bed.
+
 2011-02-28  Tao Liu  <taoliu@jimmy.harvard.edu>
 	Small fixes
 
