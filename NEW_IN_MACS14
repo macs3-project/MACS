@@ -1,0 +1,57 @@
+New in MACS 1.4.0 ( between MACS 1.3.7.1 )
+
+* Model building: The default behavior in the model building step is
+  changed. When MACS can't find enough pairs to build model or the
+  modeled fragment length is less than 2 times of tag length
+  (implemented in beta version), MACS will use 2 times of --shiftsize
+  value as fragment length in the later analysis. --off-auto can turn
+  off this behavior.
+
+* Redundant tag filtering: MACS now can allow multiple reads at the
+  same position. The maximum allowed number of tags at the exact same
+  location is calculated from the sequencing depth and genome size
+  using a binomial distribution, for both TREAMENT and CONTROL
+  separately. Now user can specify how many reads he/she wants to keep
+  at the same genomic location. 'auto' to let MACS decide the number
+  based on binomial distribution, 'all' to let MACS keep all reads.
+
+* Scaling between channels: --to-small. Default behavior is to always
+  scale smaller datasets ( ChIP or control ) towards the bigger
+  one. When --to-small is on, bigger dataset will be scaled down
+  towards smaller one.
+
+* Peak summits and subpeaks: An extra summit position output
+  NAME_summits.bed is provided. An option '--call-subpeaks' will
+  invoke PeakSplitter developed by Mali Salmon to split wide peaks
+  into smaller subpeaks.
+
+* Automatically detect tag size. However to specify the correct tag
+  size can avoid unexpected mistakes.
+
+* Sniff -- automatic format detection on input files. However to
+  specify the correct file format can avoid unexpected mistakes.
+
+* Short names for effective genome size option, for human, mouse,
+  C. elegans and fruitfly.
+
+* Local lambda regions. --lambdaset is replaced by --slocal and
+  --llocal which mean the small local region and large local
+  region. MACS will check peak_region, slocal( default 1K) and llocal
+  (default 10K) for the local bias.
+
+* --bw has no effect on the scan-window size now. It only affects the
+    paired-peaks model process.
+	
+* elandexport2bed.py, elandmulti2bed.py, elandresult2bed.py,
+  sam2bed.py extension '.py' are all removed, so the commands are
+  elandexport2bed, elandmulti2bed, elandresult2bed and sam2bed.
+
+* Single wiggle file or bedGraph file output
+
+* The description of --shiftsize to correctly state that the value is
+  1/2 d (fragment size).
+
+* Post-process script for a combined wig file with -10log10pvalue
+  scores.
+
+* And tons of bugs are fixed.
