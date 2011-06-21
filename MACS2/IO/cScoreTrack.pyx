@@ -1,4 +1,4 @@
-# Time-stamp: <2011-06-21 00:15:13 Tao Liu>
+# Time-stamp: <2011-06-21 01:15:33 Tao Liu>
 
 """Module for Feature IO classes.
 
@@ -304,6 +304,8 @@ class scoreTrackI:
                 pre_p = p
                 
             # save the last peak
+            if not peak_content:
+                continue
             peak_length = peak_content[ -1 ][ 1 ] - peak_content[ 0 ][ 0 ]
             if peak_length <= min_length: # if the peak is too small, reject it
                 summit_pos = None
