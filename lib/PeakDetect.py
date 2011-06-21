@@ -1,4 +1,4 @@
-# Time-stamp: <2011-03-21 22:52:27 Tao Liu>
+# Time-stamp: <2011-06-20 22:19:39 Tao Liu>
 
 """Module Description
 
@@ -419,7 +419,7 @@ class PeakDetect:
 
                 #window_size_4_lambda = min(self.first_lambda_region,max(peak_length,self.scan_window))
                 window_size_4_lambda = max(peak_length,self.scan_window)
-                lambda_bg = lambda_bg0/self.scan_window*window_size_4_lambda                
+                lambda_bg = lambda_bg0/self.scan_window*window_size_4_lambda*t_ratio               
                 if self.nolambda:
                     # skip local lambda
                     local_lambda = lambda_bg
