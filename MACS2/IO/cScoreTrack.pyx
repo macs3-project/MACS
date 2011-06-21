@@ -1,4 +1,4 @@
-# Time-stamp: <2011-06-21 01:15:33 Tao Liu>
+# Time-stamp: <2011-06-21 16:19:12 Tao Liu>
 
 """Module for Feature IO classes.
 
@@ -158,7 +158,7 @@ class scoreTrackI:
         Step2: Sort them
         Step3: Apply AFDR method to adjust pvalue and get qvalue for each pvalue
 
-        Return a dictionary of -100log10pvalue -100log10qvalue relationships.
+        Return a dictionary of {-100log10pvalue:(-100log10qvalue,rank)} relationships.
         """
         n = self.total()
         value_list = np.empty( n, dtype = [('v', '<f4'), ('l', '<i4')])
@@ -180,18 +180,19 @@ class scoreTrackI:
         # sort
         value_list.sort(order='v')
         
-        pvalue2qvalue = {}
+        pvalue2qvalue = {}              # pvalue:(qvalue,rank)
         m = sum(value_list['l'])
-        k = 1
+        k = 1                           # rank
         c = log10(m)+0.57721566490153286060
         f = log10(c)+log10(m)
         pre_v = -1e310
+        pre_l = 0
         for i in xrange(value_list.size-1,-1,-1):
             (v,l) = value_list[i]
             if v != pre_v:
                 # new value
-                q = (f-log10(k)+(v/-100.00))*-100 # q is -100*log10(qvalue), we keep saving integars here.
-                pvalue2qvalue[v] = max(0,q) # trick: keep 2 decimals, and make value integar better for key in hash
+                q = int(f-log10(k)+(v/-100.00))*-100 # q is -100*log10(qvalue), we keep saving integars here.
+                pvalue2qvalue[v] = (max(0,q),k) 
                 pre_v = v
             k+=l
 
@@ -207,7 +208,7 @@ class scoreTrackI:
             pvalue = self.data[chrom]['-100logp']
             qvalue = self.data[chrom]['-100logq']
             for i in xrange( self.pointer[chrom] ):
-                qvalue[i] = pvalue2qvalue[pvalue[i]]
+                qvalue[i] = pvalue2qvalue[pvalue[i]][0]
         return True
 
     def call_peaks (self, cutoff=50, min_length=200, max_gap=50, colname='-100logp'):

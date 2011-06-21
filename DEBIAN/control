@@ -1,5 +1,5 @@
 Package: macs
-Version: 2.0
+Version: 2.0.4
 Priority: optional
 Maintainer: Tao Liu <vladimir.liu@gmail.com>
 Depends: python2.6, cython
