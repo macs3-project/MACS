@@ -1,4 +1,4 @@
-# Time-stamp: <2011-06-20 18:19:25 Tao Liu>
+# Time-stamp: <2011-06-21 00:15:13 Tao Liu>
 
 """Module for Feature IO classes.
 
@@ -230,24 +230,24 @@ class scoreTrackI:
         chrs  = self.get_chr_names()
         peaks = PeakIO()                      # dictionary to save peaks
         for chrom in chrs:
-            length = self.pointer[chrom]
-            d   = self.get_data_by_chr( chrom ) # arrays for position and values
-            pos = d[ 'pos' ]
-            score   = d[ colname ]
-            sample  = d[ 'sample' ]
-            control = d[ 'control' ]
-            pvalue  = d[ '-100logp' ]
-            qvalue  = d[ '-100logq' ]
+            chrom_pointer = self.pointer[chrom]
+            chrom_d       = self.get_data_by_chr( chrom ) # arrays for position and values
+            chrom_pos     = chrom_d[ 'pos' ]
+            chrom_score   = chrom_d[ colname ]
+            chrom_sample  = chrom_d[ 'sample' ]
+            chrom_control = chrom_d[ 'control' ]
+            chrom_pvalue  = chrom_d[ '-100logp' ]
+            chrom_qvalue  = chrom_d[ '-100logq' ]
 
             x     = 0
             pre_p = 0                   # remember previous position
-            while True and x < length:
+            peak_content = None         # to store points above cutoff
+            
+            while True and x < chrom_pointer:
                 # find the first region above cutoff
-                try:                    # try to read the first data range for this chrom
-                    p = pos[x]
-                    v = score[x]
-                except:
-                    break
+                # try to read the first data range for this chrom
+                p = chrom_pos[ x ]
+                v = chrom_score[ x ]
                 x += 1                  # index for the next point
                 if v >= cutoff:
                     peak_content = [ ( pre_p, p, v, x ), ] # remember the index too...
@@ -256,10 +256,10 @@ class scoreTrackI:
                 else:
                     pre_p = p
 
-            for i in xrange( x, length ):
+            for i in xrange( x, chrom_pointer ):
                 # continue scan the rest regions
-                p =   pos[ i ]
-                v = score[ i ]
+                p = chrom_pos[ i ]
+                v = chrom_score[ i ]
                 if v < cutoff:
                     pre_p = p
                     continue
@@ -271,81 +271,66 @@ class scoreTrackI:
                     # when the gap is not allowed, close this peak
                     peak_length = peak_content[ -1 ][ 1 ] - peak_content[ 0 ][ 0 ]
                     if peak_length >= min_length: # if the peak is too small, reject it
-                        tsummit = []
-                        summit = None
+                        tmpsummit = []
+                        summit_pos   = None
                         summit_value = None
-                        for (tstart,tend,tvalue,tindex) in peak_content:
-                            if not summit_value or summit_value < tvalue:
-                                tsummit = [ int(( tend+tstart )/2), ]
-                                tsummit_index = [ tindex, ]
-                                summit_value = tvalue
-                            elif summit_value == tvalue:
+                        for (tmpstart,tmpend,tmpvalue,tmpindex) in peak_content:
+                            if not summit_value or summit_value < tmpvalue:
+                                tmpsummit = [ int(( tmpend+tmpstart )/2), ]
+                                tmpsummit_index = [ tmpindex, ]
+                                summit_value = tmpvalue
+                            elif summit_value == tmpvalue:
                                 # remember continuous summit values
-                                tsummit.append( int( (tend+tstart)/2 ) )
-                                tsummit_index.append( tindex )
-                        middle_summit = int( ( len(tsummit)+1 )/2 )-1
-                        summit = tsummit[ middle_summit ]
-                        index  = tsummit_index[ middle_summit ]
+                                tmpsummit.append( int( (tmpend+tmpstart)/2 ) )
+                                tmpsummit_index.append( tmpindex )
+                        middle_summit = int( ( len(tmpsummit)+1 )/2 )-1
+                        summit_pos    = tmpsummit[ middle_summit ]
+                        summit_index  = tmpsummit_index[ middle_summit ]
                         # char * chromosome, long start, long end, long summit = 0, 
                         # double peak_height=0, int pileup=0, 
                         # double pvalue=0, double fold_change=0, double qvalue=0
-                        try:
-                            peaks.add( chrom,
-                                       peak_content[0][0],
-                                       peak_content[-1][1],
-                                       summit      = summit,
-                                       peak_height = summit_value,
-                                       pileup      = sample[ index ],
-                                       pvalue      = pvalue[ index ]/100.0,
-                                       fold_change = sample[ index ]/control[ index ],
-                                       qvalue      = qvalue[ index ]/100.0,
-                                       )
-                        except IndexError:
-                            print "index:",index
-                            print "pointer:",length
-                            print "sample:",sample.size
-                            print "control:",control.size                            
-                            print "pvalue:",pvalue.size
-                            print "qvalue:",qvalue.size
+                        peaks.add( chrom,
+                                   peak_content[0][0],
+                                   peak_content[-1][1],
+                                   summit      = summit_pos,
+                                   peak_height = summit_value,
+                                   pileup      = chrom_sample[ summit_index ],
+                                   pvalue      = chrom_pvalue[ summit_index ]/100.0,
+                                   fold_change = chrom_sample[ summit_index ]/chrom_control[ summit_index ],
+                                   qvalue      = chrom_qvalue[ summit_index ]/100.0,
+                                   )
                     # start a new peak
                     peak_content = [ ( pre_p, p, v, i ), ]
                 pre_p = p
                 
             # save the last peak
-            if peak_length >= min_length: # if the peak is too small, reject it
-                summit = None
+            peak_length = peak_content[ -1 ][ 1 ] - peak_content[ 0 ][ 0 ]
+            if peak_length <= min_length: # if the peak is too small, reject it
+                summit_pos = None
                 summit_value = None
-                for (tstart,tend,tvalue,tindex) in peak_content:
-                    if not summit_value or summit_value < tvalue:
-                        tsummit = [ int(( tend+tstart )/2), ]
-                        tsummit_index = [ tindex, ]
-                        summit_value = tvalue
-                    elif summit_value == tvalue:
+                for (tmpstart,tmpend,tmpvalue,tmpindex) in peak_content:
+                    if not summit_value or summit_value < tmpvalue:
+                        tmpsummit = [ int(( tmpend+tmpstart )/2), ]
+                        tmpsummit_index = [ tmpindex, ]
+                        summit_value = tmpvalue
+                    elif summit_value == tmpvalue:
                         # remember continuous summit values
-                        tsummit.append( int( (tend+tstart)/2 ) )
-                        tsummit_index.append( tindex )
-                middle_summit = int( ( len(tsummit)+1 )/2 )-1
-                summit = tsummit[ middle_summit ]
-                index  = tsummit_index[ middle_summit ]
+                        tmpsummit.append( int( (tmpend+tmpstart)/2 ) )
+                        tmpsummit_index.append( tmpindex )
+                middle_summit = int( ( len(tmpsummit)+1 )/2 )-1
+                summit_pos    = tmpsummit[ middle_summit ]
+                summit_index  = tmpsummit_index[ middle_summit ]
 
-                try:
-                    peaks.add( chrom,
-                               peak_content[0][0],
-                               peak_content[-1][1],
-                               summit      = summit,
-                               peak_height = summit_value,
-                               pileup      = sample[ index ],
-                               pvalue      = pvalue[ index ]/100.0,
-                               fold_change = sample[ index ]/control[ index ],
-                               qvalue      = qvalue[ index ]/100.0,
-                               )
-                except IndexError:
-                    print "index:",index
-                    print "pointer:",length
-                    print "sample:",sample.size
-                    print "control:",control.size                            
-                    print "pvalue:",pvalue.size
-                    print "qvalue:",qvalue.size
+                peaks.add( chrom,
+                           peak_content[0][0],
+                           peak_content[-1][1],
+                           summit      = summit_pos,
+                           peak_height = summit_value,
+                           pileup      = chrom_sample[ summit_index ],
+                           pvalue      = chrom_pvalue[ summit_index ]/100.0,
+                           fold_change = chrom_sample[ summit_index ]/chrom_control[ summit_index ],
+                           qvalue      = chrom_qvalue[ summit_index ]/100.0,
+                           )
             
         return peaks
 

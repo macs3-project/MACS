@@ -1,4 +1,4 @@
-# Time-stamp: <2011-06-19 17:15:00 Tao Liu>
+# Time-stamp: <2011-06-21 00:11:45 Tao Liu>
 
 """Module Description
 
@@ -153,7 +153,10 @@ class PeakDetect:
 
         if self.opt.tocontrol:
             # if user want to scale everything to control data
-            treat_btrack.apply_func(lambda x:float(x)/self.ratio_treat2control) 
+            lambda_bg = float(self.d)*treat_total/self.gsize/self.ratio_treat2control
+            treat_btrack.apply_func(lambda x:float(x)/self.ratio_treat2control)
+        else:
+            lambda_bg = float(self.d)*treat_total/self.gsize
 
         # control data needs multiple steps of calculation
         # I need to shift them by 500 bps, then 5000 bps
@@ -199,7 +202,7 @@ class PeakDetect:
             c_tmp_btrack.apply_func(lambda x:float(x)*tmp_v)
             control_btrack = control_btrack.overlie(c_tmp_btrack,func=max)
 
-        control_btrack.reset_baseline(float(self.d)*treat_total/self.gsize) # set the baseline as lambda_bg
+        control_btrack.reset_baseline(lambda_bg) # set the baseline as lambda_bg
 
         # calculate pvalue scores
         self.info("#3 Build score track ...")
