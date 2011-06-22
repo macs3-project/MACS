@@ -1,4 +1,4 @@
-# Time-stamp: <2011-06-21 16:19:12 Tao Liu>
+# Time-stamp: <2011-06-22 14:17:43 Tao Liu>
 
 """Module for Feature IO classes.
 
@@ -191,7 +191,7 @@ class scoreTrackI:
             (v,l) = value_list[i]
             if v != pre_v:
                 # new value
-                q = int(f-log10(k)+(v/-100.00))*-100 # q is -100*log10(qvalue), we keep saving integars here.
+                q = int((f-log10(k)+(v/-100.00))*-100) # q is -100*log10(qvalue), we keep saving integars here.
                 pvalue2qvalue[v] = (max(0,q),k) 
                 pre_v = v
             k+=l
