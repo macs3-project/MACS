@@ -1,4 +1,4 @@
-# Time-stamp: <2011-06-22 17:27:04 Tao Liu>
+# Time-stamp: <2011-06-22 18:53:59 Tao Liu>
 
 """Module for PeakIO IO classes.
 
@@ -245,6 +245,7 @@ class PeakIO:
         chrs = self.peaks.keys()
         chrs.sort()
         n_peak = 0
+        fhd.write("track type=narrowPeak nextItemButton=on\n")
         for chrom in chrs:
             for peak in self.peaks[chrom]:
                 n_peak += 1
