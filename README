@@ -1,5 +1,5 @@
 README for MACS (2.0.3)
-Time-stamp: <2011-06-19 21:48:30 Tao Liu>
+Time-stamp: <2011-06-22 18:19:50 Tao Liu>
 
 * Introduction
 
@@ -464,12 +464,18 @@ let MACS choose the following fold enrichment ranges to consider:
  locations. You can load it to UCSC genome browser or Affymetrix IGB
  software.
 
- 3. NAME_summits.bed is in BED format, which contains the peak summits
+ 3. NAME_peaks.narrowPeak is BED6+4 format file which contains the
+ peak locations together with peak summit, pvalue and qvalue. You can
+ load it to UCSC genome browser. Definition of some specific columns
+ are: 5th: -log10pvalue, 7th: fold-change, 8th: -log10pvalue, 9th:
+ -log10qvalue, 10th: relative summit position to peak start.
+
+ 4. NAME_summits.bed is in BED format, which contains the peak summits
  locations for every peaks. The 5th column in this file is
  -log10pvalue the same as NAME_peaks.bed. If you want to find the
  motifs at the binding sites, this file is recommended.
 
- 4. NAME_model.r is an R script which you can use to produce a PDF
+ 5. NAME_model.r is an R script which you can use to produce a PDF
  image about the model based on your data. Load it to R by:
 
 $ R --vanilla < NAME_model.r
@@ -477,17 +483,17 @@ $ R --vanilla < NAME_model.r
 Then a pdf file NAME_model.pdf will be generated in your current
 directory. Note, R is required to draw this figure.
 
- 5. The .bdg files are in bedGraph format which can be imported to
+ 6. The .bdg files are in bedGraph format which can be imported to
  UCSC genome browser or be converted into even smaller bigWig
  files. Four kinds of bdg files include treat_pileup, control_lambda,
  treat_pvalue, and treat_qvalue. 
 
- 6. NAME_diag.xls is the diagnosis report. First column is for various
+ 7. NAME_diag.xls is the diagnosis report. First column is for various
  fold_enrichment ranges; the second column is number of peaks for that fc
  range; after 3rd columns are the percentage of peaks covered after
  sampling 90%, 80%, 70% ... and 20% of the total tags. (not available currently)
 
- 7. NAME_pqtable.txt store the -log10pvalue and -log10qvalue
+ 8. NAME_pqtable.txt store the -log10pvalue and -log10qvalue
  relationships.
 
 * Other useful links

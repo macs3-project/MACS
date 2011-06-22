@@ -1,4 +1,4 @@
-# Time-stamp: <2011-06-19 17:53:37 Tao Liu>
+# Time-stamp: <2011-06-22 17:27:04 Tao Liu>
 
 """Module for PeakIO IO classes.
 
@@ -89,6 +89,8 @@ class PeakIO:
         for chrom in chrs:
             x += len(peaks[chrom])
         return x
+   
+        
     
     def tobed (self):
         """Print out peaks in BED5 format.
@@ -135,7 +137,8 @@ class PeakIO:
         following list. Name column ( 4th column) is made by putting
         name_prefix together with an ascending number.
 
-        Five columns are chromosome, peak start, peak end, peak name, and peak score.
+        Five columns are chromosome, peak start, peak end, peak name,
+        and peak score.
 
         items in peak object:
         0. peak start
@@ -184,6 +187,74 @@ class PeakIO:
                 n_peak += 1
                 summit_p = peak[3]
                 fhd.write( "%s\t%d\t%d\t%s%d\t%.2f\n" % (chrom,summit_p,summit_p+1,name_prefix,n_peak,peak[score_column]) )
+
+    def write_to_narrowPeak (self, fhd, name_prefix="peak_", score_column=4):
+        """Print out peaks in narrowPeak format.
+
+        This format is designed for ENCODE project, and basically a
+        BED6+4 format.
+
+        +-----------+------+----------------------------------------+
+        |field      |type  |description                             |
+        +-----------+------+----------------------------------------+
+        |chrom      |string|Name of the chromosome                  |
+        +-----------+------+----------------------------------------+
+        |chromStart |int   |The starting position of the feature in |
+        |           |      |the chromosome. The first base in a     |
+        |           |      |chromosome is numbered 0.               |
+        +-----------+------+----------------------------------------+
+        |chromEnd   |int   |The ending position of the feature in   |
+        |           |      |the chromosome or scaffold. The chromEnd|
+        |           |      |base is not included in the display of  |
+        |           |      |the feature.  For example, the first 100|
+        |           |      |bases of a chromosome are defined as    |
+        |           |      |chromStart=0, chromEnd=100, and span the|
+        |           |      |bases numbered 0-99.                    |
+        +-----------+------+----------------------------------------+
+        |name       |string|Name given to a region (preferably      |
+        |           |      |unique). Use '.' if no name is assigned.|
+        +-----------+------+----------------------------------------+
+        |score      |int   |Indicates how dark the peak will be     |
+        |(pvalue in |      |displayed in the browser (1-1000). If   |
+        |MACS2)     |      |'0', the DCC will assign this based on  |
+        |           |      |signal value. Ideally average           |
+        |           |      |signalValue per base spread between     |
+        |           |      |100-1000.                               |
+        +-----------+------+----------------------------------------+
+        |strand     |char  |+/- to denote strand or orientation     |
+        |(always .) |      |(whenever applicable). Use '.' if no    |
+        |           |      |orientation is assigned.                |
+        +-----------+------+----------------------------------------+
+        |signalValue|float |Measurement of overall (usually,        |
+        |(fc)       |      |average) enrichment for the region.     |
+        +-----------+------+----------------------------------------+
+        |pValue     |float |Measurement of statistical signficance  |
+        |           |      |(-log10). Use -1 if no pValue is        |
+        |           |      |assigned.                               |
+        +-----------+------+----------------------------------------+
+        |qValue     |float |Measurement of statistical significance |
+        |           |      |using false discovery rate. Use -1 if no|
+        |           |      |qValue is assigned.                     |
+        +-----------+------+----------------------------------------+
+        |peak       |int   |Point-source called for this peak;      |
+        |           |      |0-based offset from chromStart. Use -1  |
+        |           |      |if no point-source called.              |
+        +-----------+------+----------------------------------------+
+        
+        """
+        chrs = self.peaks.keys()
+        chrs.sort()
+        n_peak = 0
+        for chrom in chrs:
+            for peak in self.peaks[chrom]:
+                n_peak += 1
+                # items in peak: (peak start,peak end, peak length,
+                # peak summit, peak height, number of tags in peak
+                # region, peak pvalue, peak fold_enrichment, qvalue)
+                fhd.write( "%s\t%d\t%d\t%s%d\t%.2f\t.\t%.2f\t%.2f\t%.2f\t%d\n"
+                           %
+                           (chrom,peak[0],peak[1],name_prefix,n_peak,peak[score_column],
+                            peak[7],peak[6],peak[8],peak[3]-peak[0]) )
 
     def merge_overlap ( self ):
         """peak_candidates[chrom] = [(peak_start,peak_end,peak_length,peak_summit,peak_height,number_cpr_tags)...]
