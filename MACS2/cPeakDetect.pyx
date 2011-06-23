@@ -1,4 +1,4 @@
-# Time-stamp: <2011-06-23 04:02:22 Tao Liu>
+# Time-stamp: <2011-06-23 04:25:13 Tao Liu>
 
 """Module Description
 
@@ -294,7 +294,7 @@ class PeakDetect:
             c_tmp_btrack = pileup_bdg(self.treat,self.lregion,directional=self.opt.shiftcontrol,halfextension=self.opt.halfext)
             tmp_v = float(self.d)/self.lregion
             c_tmp_btrack.apply_func(lambda x:float(x)*tmp_v)
-            control_btrack = control_btrack.overlie(c_tmp_btrack,func=max)
+            control_btrack = c_tmp_btrack
  
         # Now pileup FWTrackII to form a bedGraphTrackI
         self.info("#3 pileup treatment data")
