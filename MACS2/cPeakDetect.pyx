@@ -1,4 +1,4 @@
-# Time-stamp: <2011-06-22 19:16:11 Tao Liu>
+# Time-stamp: <2011-06-23 04:02:22 Tao Liu>
 
 """Module Description
 
@@ -53,6 +53,7 @@ class PeakDetect:
         #self.festep = opt.festep
                 
         self.pvalue = opt.log_pvalue    # -log10pvalue
+        self.qvalue = opt.log_qvalue    # -log10qvalue
         self.d = opt.d
         self.shift_size = self.d/2
         self.scan_window = opt.scanwindow
@@ -226,9 +227,13 @@ class PeakDetect:
         score_btrack.assign_qvalue( pqtable )
                 
         # call peaks
-        self.info("#3 Call peaks with given -log10pvalue cutoff: %.2f ..." % self.pvalue)        
-        peaks = score_btrack.call_peaks(cutoff=self.pvalue*100,min_length=self.d,max_gap=self.opt.tsize,colname='-100logp')
-
+        if self.pvalue:
+            self.info("#3 Call peaks with given -log10pvalue cutoff: %.2f ..." % self.pvalue)        
+            peaks = score_btrack.call_peaks(cutoff=self.pvalue*100,min_length=self.d,max_gap=self.opt.tsize,colname='-100logp')
+        elif self.qvalue:
+            self.info("#3 Call peaks with given -log10qvalue cutoff: %.2f ..." % self.qvalue)        
+            peaks = score_btrack.call_peaks(cutoff=self.qvalue*100,min_length=self.d,max_gap=self.opt.tsize,colname='-100logq')
+            
         if self.opt.store_bdg:
            self.info("#3 save tag pileup into bedGraph file...")
            bdgfhd = open(self.zwig_tr + "_pileup.bdg", "w")

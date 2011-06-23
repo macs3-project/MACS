@@ -1,4 +1,4 @@
-# Time-stamp: <2011-06-23 03:26:14 Tao Liu>
+# Time-stamp: <2011-06-23 04:01:15 Tao Liu>
 
 """Module Description
 
@@ -97,8 +97,13 @@ def opt_validate ( optparser ):
         logging.error("--shiftsize must > 0!")
         sys.exit(1)
 
-    # -*log10 pvalue
-    options.log_pvalue = log(options.pvalue,10)*-1
+    if options.qvalue:
+        # if set, ignore pvalue cutoff
+        options.log_qvalue = log(options.qvalue,10)*-1
+        options.log_pvalue = None
+    else:
+        options.log_qvalue = None
+        options.log_pvalue = log(options.pvalue,10)*-1
     
     # uppercase the format string 
     options.format = options.format.upper()
@@ -165,10 +170,13 @@ def opt_validate ( optparser ):
         #"# tag size = %d" % (options.tsize),\
         "# band width = %d" % (options.bw),\
         "# model fold = %s" % (options.mfold),\
-        "# pvalue cutoff = %.2e\n" % (options.pvalue),\
-        #"# unique tag filter is %s" % (tmptxt),\
         ))
 
+    if options.qvalue:
+        options.argtxt +=  "# qvalue cutoff = %.2e\n" % (options.qvalue)
+    else:
+        options.argtxt +=  "# pvalue cutoff = %.2e\n" % (options.pvalue)
+        
     if options.tocontrol:
         options.argtxt += "# ChIP dataset will be scaled towards Control dataset.\n"
     else:
