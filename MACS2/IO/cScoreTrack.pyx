@@ -1,4 +1,4 @@
-# Time-stamp: <2011-06-22 18:31:44 Tao Liu>
+# Time-stamp: <2011-06-22 19:15:09 Tao Liu>
 
 """Module for Feature IO classes.
 
@@ -184,7 +184,7 @@ class scoreTrackI:
         k = 1                           # rank
         c = log10(m)+0.57721566490153286060
         f = log10(c)+log10(m)
-        pre_v = -1e310
+        pre_v = -1e100
         pre_k = 0
         pre_l = 0
         pvalue2qvalue = {pre_v:[0,k,0]}              # pvalue:[qvalue,rank,above_cutoff]
@@ -194,10 +194,12 @@ class scoreTrackI:
                 # new value
                 q = int((f-log10(k)+(v/-100.00))*-100) # q is -100*log10(qvalue), we keep saving integars here.
                 pvalue2qvalue[v] = [max(0,q),k, 0]
-                pvalue2qvalue[pre_v][2] = k-1
+                pvalue2qvalue[pre_v][2] = k-pvalue2qvalue[pre_v][1]
                 pre_v = v
             k+=l
-        pvalue2qvalue[pre_v][2] = k-1
+        pvalue2qvalue[pre_v][2] = k-pvalue2qvalue[pre_v][1]
+        # pop the first -1e100 one
+        pvalue2qvalue.pop(-1e100)
 
         return pvalue2qvalue
 

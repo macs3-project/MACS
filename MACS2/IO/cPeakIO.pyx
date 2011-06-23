@@ -1,4 +1,4 @@
-# Time-stamp: <2011-06-22 18:53:59 Tao Liu>
+# Time-stamp: <2011-06-23 03:25:57 Tao Liu>
 
 """Module for PeakIO IO classes.
 
@@ -216,7 +216,7 @@ class PeakIO:
         +-----------+------+----------------------------------------+
         |score      |int   |Indicates how dark the peak will be     |
         |(pvalue in |      |displayed in the browser (1-1000). If   |
-        |MACS2)     |      |'0', the DCC will assign this based on  |
+        |MACS2 * 10)|      |'0', the DCC will assign this based on  |
         |           |      |signal value. Ideally average           |
         |           |      |signalValue per base spread between     |
         |           |      |100-1000.                               |
@@ -254,7 +254,7 @@ class PeakIO:
                 # region, peak pvalue, peak fold_enrichment, qvalue)
                 fhd.write( "%s\t%d\t%d\t%s%d\t%.2f\t.\t%.2f\t%.2f\t%.2f\t%d\n"
                            %
-                           (chrom,peak[0],peak[1],name_prefix,n_peak,peak[score_column],
+                           (chrom,peak[0],peak[1],name_prefix,n_peak,int(10*peak[score_column]),
                             peak[7],peak[6],peak[8],peak[3]-peak[0]) )
 
     def merge_overlap ( self ):

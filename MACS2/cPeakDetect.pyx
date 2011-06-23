@@ -1,4 +1,4 @@
-# Time-stamp: <2011-06-22 16:59:57 Tao Liu>
+# Time-stamp: <2011-06-22 19:16:11 Tao Liu>
 
 """Module Description
 
@@ -216,7 +216,7 @@ class PeakDetect:
         
         self.info("#3 Saving p-value to q-value table ...")
         pqfhd = open(self.opt.pqtable,"w")
-        pqfhd.write( "-log10pvalue\t-log10qvalue\trank\tpositives\n" )
+        pqfhd.write( "-log10pvalue\t-log10qvalue\trank\tbasepairs\n" )
         for p in sorted(pqtable.keys(),reverse=True):
             q = pqtable[p]
             pqfhd.write("%.2f\t%.2f\t%d\t%d\n" % (p/100.0,q[0]/100.0,q[1],q[2]))
