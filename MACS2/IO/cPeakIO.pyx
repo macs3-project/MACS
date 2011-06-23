@@ -1,4 +1,4 @@
-# Time-stamp: <2011-06-23 03:25:57 Tao Liu>
+# Time-stamp: <2011-06-23 12:36:15 Tao Liu>
 
 """Module for PeakIO IO classes.
 
@@ -215,9 +215,9 @@ class PeakIO:
         |           |      |unique). Use '.' if no name is assigned.|
         +-----------+------+----------------------------------------+
         |score      |int   |Indicates how dark the peak will be     |
-        |(pvalue in |      |displayed in the browser (1-1000). If   |
-        |MACS2 * 10)|      |'0', the DCC will assign this based on  |
-        |           |      |signal value. Ideally average           |
+        |(-logpvalue|      |displayed in the browser (1-1000). If   |
+        |in MACS2 * |      |'0', the DCC will assign this based on  |
+        |10)        |      |signal value. Ideally average           |
         |           |      |signalValue per base spread between     |
         |           |      |100-1000.                               |
         +-----------+------+----------------------------------------+
@@ -252,7 +252,7 @@ class PeakIO:
                 # items in peak: (peak start,peak end, peak length,
                 # peak summit, peak height, number of tags in peak
                 # region, peak pvalue, peak fold_enrichment, qvalue)
-                fhd.write( "%s\t%d\t%d\t%s%d\t%.2f\t.\t%.2f\t%.2f\t%.2f\t%d\n"
+                fhd.write( "%s\t%d\t%d\t%s%d\t%d\t.\t%.2f\t%.2f\t%.2f\t%d\n"
                            %
                            (chrom,peak[0],peak[1],name_prefix,n_peak,int(10*peak[score_column]),
                             peak[7],peak[6],peak[8],peak[3]-peak[0]) )

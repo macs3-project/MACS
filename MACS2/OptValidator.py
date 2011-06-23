@@ -1,4 +1,4 @@
-# Time-stamp: <2011-06-23 04:01:15 Tao Liu>
+# Time-stamp: <2011-06-23 12:37:28 Tao Liu>
 
 """Module Description
 
@@ -169,7 +169,7 @@ def opt_validate ( optparser ):
         "# effective genome size = %.2e" % (options.gsize),\
         #"# tag size = %d" % (options.tsize),\
         "# band width = %d" % (options.bw),\
-        "# model fold = %s" % (options.mfold),\
+        "# model fold = %s\n" % (options.mfold),\
         ))
 
     if options.qvalue:

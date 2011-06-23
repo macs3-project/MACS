@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# Time-stamp: <2011-06-23 04:05:56 Tao Liu>
+# Time-stamp: <2011-06-23 12:34:55 Tao Liu>
 
 """Description: MACS 2 main executable
 
@@ -185,19 +185,23 @@ def main():
     ofhd_xls.write(peakdetect.toxls())
     ofhd_xls.close()
     #4.2 peaks in BED
+    if options.log_pvalue:
+        score_column = 6
+    elif options.log_qvalue:
+        score_column = 8
     options.info("#4 Write peak bed file... %s" % (options.peakbed))
     ofhd_bed = open(options.peakbed,"w")
-    peakdetect.peaks.write_to_bed (ofhd_bed, name_prefix="MACS_peak_", score_column=4)
+    peakdetect.peaks.write_to_bed (ofhd_bed, name_prefix="MACS_peak_", score_column=score_column)
     ofhd_bed.close()
     #4.2 peaks in narrowPeak
     options.info("#4 Write peak in narrowPeak format file... %s" % (options.peakNarrowPeak))
     ofhd_bed = open(options.peakNarrowPeak,"w")
-    peakdetect.peaks.write_to_narrowPeak (ofhd_bed, name_prefix="MACS_peak_", score_column=4)
+    peakdetect.peaks.write_to_narrowPeak (ofhd_bed, name_prefix="MACS_peak_", score_column=score_column)
     ofhd_bed.close()
     #4.2-2 summits in BED
     options.info("#4 Write summits bed file... %s" % (options.summitbed))
     ofhd_summits = open(options.summitbed,"w")
-    peakdetect.peaks.write_to_summit_bed (ofhd_summits, name_prefix="MACS_summit_", score_column=4)
+    peakdetect.peaks.write_to_summit_bed (ofhd_summits, name_prefix="MACS_summit_", score_column=score_column)
     ofhd_summits.close()
     # #4.3 negative peaks in XLS
     # if options.cfile:
