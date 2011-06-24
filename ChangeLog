@@ -6,8 +6,8 @@
 	Fix a bug, correctly assign lambda_bg while --to-small is
 	set. Thanks Junya Seo!
 
-	Fix a bug to allow minus strand containing NO tags at all. Thanks
-	Vaibhav Jain!
+	Fix a bug to allow minus strand containing NO tags at all. Thank
+	Vaibhav Jain for bringing up this problem!
 
 2011-06-19  Tao Liu  <taoliu@jimmy.harvard.edu>
 	Version 1.4.0
