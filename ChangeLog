@@ -9,6 +9,9 @@
 	Fix a bug to allow minus strand containing NO tags at all. Thank
 	Vaibhav Jain for bringing up this problem!
 
+	Correctly use user-specified tag size while -s/--tsize is
+	set. Thank Shunmin He for the bug report!
+
 2011-06-19  Tao Liu  <taoliu@jimmy.harvard.edu>
 	Version 1.4.0
 

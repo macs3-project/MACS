@@ -1,5 +1,5 @@
 README for MACS (1.4.1)
-Time-stamp: <2011-06-24 16:36:15 Tao Liu>
+Time-stamp: <2011-06-27 16:04:50 Tao Liu>
 
 * Introduction
 
@@ -59,7 +59,7 @@ Options:
                         fruitfly (1.2e8), Default:hs
   -s TSIZE, --tsize=TSIZE
                         Tag size. This will overide the auto detected tag
-                        size. DEFAULT: 25
+                        size.
   --bw=BW               Band width. This value is only used while building the
                         shifting model. DEFAULT: 300
   -p PVALUE, --pvalue=PVALUE
@@ -325,7 +325,7 @@ assembly. Here are all precompiled parameters for effective genome size:
 
 *** -s/--tsize
 
-The size of sequencing tags. If you don't specify it, MACS will try to
+The size of sequencing tags. If you DON'T specify it, MACS will try to
 use the first 10 sequences from your input treatment file to determine
 the tag size. Specifying it will override the automatic determined tag
 size.
@@ -496,7 +496,8 @@ let MACS choose the following fold enrichment ranges to consider:
 
  2. NAME_peaks.bed is BED format file which contains the peak
  locations. You can load it to UCSC genome browser or Affymetrix IGB
- software.
+ software. The 5th column in this file is the -10*log10pvalue of peak
+ region.
 
  3. NAME_summits.bed is in BED format, which contains the peak summits
  locations for every peaks. The 5th column in this file is the summit
