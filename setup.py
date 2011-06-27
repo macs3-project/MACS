@@ -11,7 +11,7 @@ This code is free software; you can redistribute it and/or modify it
 under the terms of the Artistic License (see the file COPYING included
 with the distribution).
 
-@status:  beta
+@status:  stable
 @version: $Revision$
 @author:  Tao Liu
 @contact: taoliu@jimmy.harvard.edu
@@ -47,7 +47,7 @@ def main():
           console=['bin/macs14'],
           app    =['bin/macs14'],
           classifiers=[
-              'Development Status :: 4 - experimental',
+              'Development Status :: 5 - productive',
               'Environment :: Console',
               'Intended Audience :: Developers',
               'License :: OSI Approved :: Artistic License',
