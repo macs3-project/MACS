@@ -13,13 +13,15 @@
 	Fix bugs to correctly deal with peakless chromosomes. Thanks
 	Vaibhav Jain!
 
+	Use AFDR for independent tests instead.
+
 	* encodePeak
 
 	Now MACS can output peak coordinates together with pvalue, qvalue,
 	summit positions in a single encodePeak format (designed for
 	ENCODE project) file. This file can be loaded to UCSC
 	browser. Definition of some specific columns are: 5th:
-	-log10pvalue*10, 7th: fold-change, 8th: -log10pvalue, 9th:
+	int(-log10pvalue*10), 7th: fold-change, 8th: -log10pvalue, 9th:
 	-log10qvalue, 10th: relative summit position to peak start.
 
 

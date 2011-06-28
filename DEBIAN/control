@@ -1,8 +1,8 @@
-Package: macs
+Package: macs2
 Version: 2.0.4
 Priority: optional
 Maintainer: Tao Liu <vladimir.liu@gmail.com>
-Depends: python2.6, cython
+Depends: python2.6, cython (>=0.13), numpy (>=1.3) 
 Architecture: all
 Suggests: maq, peakanalyzer
 Section: science
