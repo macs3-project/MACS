@@ -1,4 +1,4 @@
-# Time-stamp: <2011-06-23 04:25:13 Tao Liu>
+# Time-stamp: <2011-06-28 20:37:41 Tao Liu>
 
 """Module Description
 
@@ -161,8 +161,11 @@ class PeakDetect:
 
         # control data needs multiple steps of calculation
         # I need to shift them by 500 bps, then 5000 bps
-        assert self.d <= self.sregion, "slocal can't be smaller than d!"
-        assert self.sregion <= self.lregion , "llocal can't be smaller than slocal!"
+        if self.sregion:
+            assert self.d <= self.sregion, "slocal can't be smaller than d!"
+        if self.lregion:
+            assert self.d <= self.lregion , "llocal can't be smaller than d!"            
+            assert self.sregion <= self.lregion , "llocal can't be smaller than slocal!"
 
         # d-size local
         self.info("#3 calculate d local lambda for control data")        
