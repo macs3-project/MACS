@@ -1,5 +1,5 @@
-README for MACS (2.0.3)
-Time-stamp: <2011-06-23 03:26:45 Tao Liu>
+README for MACS (2.0.4)
+Time-stamp: <2011-06-30 16:57:17 Tao Liu>
 
 * Introduction
 
@@ -493,8 +493,8 @@ directory. Note, R is required to draw this figure.
  range; after 3rd columns are the percentage of peaks covered after
  sampling 90%, 80%, 70% ... and 20% of the total tags. (not available currently)
 
- 8. NAME_pqtable.txt store the -log10pvalue and -log10qvalue
- relationships.
+ 8. NAME_pqtable.txt store the -log10pvalue, -log10qvalue, rank of
+  this pvalue, and number of bp having this pvalue.
 
 * Other useful links
 

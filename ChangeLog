@@ -6,7 +6,7 @@
 	Fix a bug, correctly assign lambda_bg while --to-small is
 	set. Thanks Junya Seo!
 
-	Add rank column to pvalue-qvalue table.
+	Add rank and num of bp columns to pvalue-qvalue table.
 
 	* cScoreTrack.py
 

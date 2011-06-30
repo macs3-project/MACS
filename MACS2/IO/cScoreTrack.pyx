@@ -1,4 +1,4 @@
-# Time-stamp: <2011-06-28 11:52:21 Tao Liu>
+# Time-stamp: <2011-06-30 16:54:20 Tao Liu>
 
 """Module for Feature IO classes.
 
@@ -187,7 +187,7 @@ class scoreTrackI:
         pre_v = -1e100
         pre_k = 0
         pre_l = 0
-        pvalue2qvalue = {pre_v:[0,k,0]}              # pvalue:[qvalue,rank,above_cutoff]
+        pvalue2qvalue = {pre_v:[0,k,0]}              # pvalue:[qvalue,rank,bp_with_this_pvalue]
         for i in xrange(value_list.size-1,-1,-1):
             (v,l) = value_list[i]
             if v != pre_v:
