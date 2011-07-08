@@ -1,4 +1,4 @@
-# Time-stamp: <2011-06-30 16:54:20 Tao Liu>
+# Time-stamp: <2011-07-07 23:40:02 Tao Liu>
 
 """Module for Feature IO classes.
 
@@ -299,11 +299,11 @@ class scoreTrackI:
                                    peak_content[0][0],
                                    peak_content[-1][1],
                                    summit      = summit_pos,
-                                   peak_height = summit_value,
+                                   peak_score  = summit_value,
                                    pileup      = chrom_sample[ summit_index ],
-                                   pvalue      = chrom_pvalue[ summit_index ]/100.0,
+                                   pscore      = chrom_pvalue[ summit_index ]/100.0,
                                    fold_change = chrom_sample[ summit_index ]/chrom_control[ summit_index ],
-                                   qvalue      = chrom_qvalue[ summit_index ]/100.0,
+                                   qscore      = chrom_qvalue[ summit_index ]/100.0,
                                    )
                     # start a new peak
                     peak_content = [ ( pre_p, p, v, i ), ]
@@ -333,11 +333,11 @@ class scoreTrackI:
                            peak_content[0][0],
                            peak_content[-1][1],
                            summit      = summit_pos,
-                           peak_height = summit_value,
+                           peak_score  = summit_value,
                            pileup      = chrom_sample[ summit_index ],
-                           pvalue      = chrom_pvalue[ summit_index ]/100.0,
+                           pscore      = chrom_pvalue[ summit_index ]/100.0,
                            fold_change = chrom_sample[ summit_index ]/chrom_control[ summit_index ],
-                           qvalue      = chrom_qvalue[ summit_index ]/100.0,
+                           qscore      = chrom_qvalue[ summit_index ]/100.0,
                            )
             
         return peaks

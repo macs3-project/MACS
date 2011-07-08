@@ -1,4 +1,4 @@
-# Time-stamp: <2011-06-19 17:09:12 Tao Liu>
+# Time-stamp: <2011-07-07 17:15:40 Tao Liu>
 
 """Module for Feature IO classes.
 
@@ -225,7 +225,6 @@ class bedGraphTrackI:
 
         Self will be modified.
         """
-        ret = bedGraphTrackI()
         chrs = set(self.__data.keys())
         for chrom in chrs:
             (p,v) = self.__data[chrom]
@@ -385,6 +384,20 @@ class bedGraphTrackI:
             t += len(p)
         return t
 
+    def set_single_value (self, new_value):
+        """Change all the values in bedGraph to the same new_value,
+        return a new bedGraphTrackI.
+        
+        """
+        ret = bedGraphTrackI()
+        chroms = set(self.get_chr_names())
+        for chrom in chroms:
+            (p1,v1) = self.get_data_by_chr(chrom) # arrays for position and values
+            # maximum p
+            max_p = max(p1)
+            # add a region from 0 to max_p
+            ret.add_loc(chrom,0,max_p,new_value)
+        return ret
 
     def overlie (self, bdgTrack2, func=max ):
         """Calculate two bedGraphTrackI objects by letting self

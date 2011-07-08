@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# Time-stamp: <2011-06-29 11:07:23 Tao Liu>
+# Time-stamp: <2011-07-07 23:40:35 Tao Liu>
 
 """Description: MACS 2 main executable
 
@@ -186,9 +186,9 @@ def main():
     ofhd_xls.close()
     #4.2 peaks in BED
     if options.log_pvalue:
-        score_column = 6
+        score_column = "pscore"
     elif options.log_qvalue:
-        score_column = 8
+        score_column = "qscore"
     options.info("#4 Write peak bed file... %s" % (options.peakbed))
     ofhd_bed = open(options.peakbed,"w")
     peakdetect.peaks.write_to_bed (ofhd_bed, name_prefix="MACS_peak_", score_column=score_column)

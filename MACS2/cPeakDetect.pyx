@@ -1,4 +1,4 @@
-# Time-stamp: <2011-06-28 20:37:41 Tao Liu>
+# Time-stamp: <2011-07-07 23:45:58 Tao Liu>
 
 """Module Description
 
@@ -112,12 +112,12 @@ class PeakDetect:
         for chrom in chrs:
             for peak in peaks[chrom]:
                 #[start,end,end-start,summit,peak_height,number_tags,pvalue,fold_change,qvalue]
-                text += "%s\t%d\t%d\t%d" % (chrom,peak[0]+1,peak[1],peak[2])
-                text += "\t%d" % (peak[3]+1) # summit position
-                text += "\t%.2f" % (peak[5]) # pileup height at summit
-                text += "\t%.2f" % (peak[6]) # -log10pvalue at summit
-                text += "\t%.2f" % (peak[7]) # fold change at summit                
-                text += "\t%.2f" % (peak[8]) # -log10qvalue at summit
+                text += "%s\t%d\t%d\t%d" % (chrom,peak["start"]+1,peak["end"],peak["length"])
+                text += "\t%d" % (peak["summit"]+1) # summit position
+                text += "\t%.2f" % (peak["pileup"]) # pileup height at summit
+                text += "\t%.2f" % (peak["pscore"]) # -log10pvalue at summit
+                text += "\t%.2f" % (peak["fc"]) # fold change at summit                
+                text += "\t%.2f" % (peak["qscore"]) # -log10qvalue at summit
                 text+= "\n"
         return text
 
@@ -290,39 +290,86 @@ class PeakDetect:
         Finally, a poisson CDF is applied to calculate one-side pvalue
         for enrichment.
         """
+        # global lambda
+        treat_total   = self.treat.total
+        lambda_bg = float(self.d)*treat_total/self.gsize
+
+        # Now pileup FWTrackII to form a bedGraphTrackI
+        self.info("#3 pileup treatment data by extending tags towards 3' to %d length" % self.d)
+        treat_btrack = pileup_bdg(self.treat,self.d,halfextension=self.opt.halfext)        
+        
         # llocal size local
+        self.info("#3 calculate d local lambda from treatment data")
+        
         if self.lregion:
             self.info("#3 calculate large local lambda from treatment data")
             # Now pileup FWTrackII to form a bedGraphTrackI
-            c_tmp_btrack = pileup_bdg(self.treat,self.lregion,directional=self.opt.shiftcontrol,halfextension=self.opt.halfext)
+            control_btrack = pileup_bdg(self.treat,self.lregion,directional=self.opt.shiftcontrol,halfextension=self.opt.halfext)
             tmp_v = float(self.d)/self.lregion
-            c_tmp_btrack.apply_func(lambda x:float(x)*tmp_v)
-            control_btrack = c_tmp_btrack
- 
-        # Now pileup FWTrackII to form a bedGraphTrackI
-        self.info("#3 pileup treatment data")
-        treat_btrack = pileup_bdg(self.treat,self.d,halfextension=self.opt.halfext)
-
-        if self.opt.store_bdg:
-            self.info("#3 save tag pileup into bedGraph file...")
-            bdgfhd = open(self.zwig_tr + "_pileup.bdg", "w")
-            treat_btrack.write_bedGraph(bdgfhd,name=self.zwig_tr,description="Fragment pileup at each bp from MACS version %s" % MACS_VERSION)
-
+            control_btrack.apply_func(lambda x:float(x)*tmp_v)
+            control_btrack.reset_baseline(lambda_bg) # set the baseline as lambda_bg
+        else:
+            # I need to fake a control_btrack
+            control_btrack = treat_btrack.set_single_value(lambda_bg)
+            
         # calculate pvalue scores
-        self.info("#3 Calculate pvalue scores...")
-        control_btrack.reset_baseline(float(self.d)*self.treat.total/self.gsize) # set the baseline as lambda_bg
+        self.info("#3 Build score track ...")
+        score_btrack = treat_btrack.make_scoreTrack_for_macs(control_btrack)
+        treat_btrack = None             # clean them
+        control_btrack = None
+        gc.collect()                    # full collect garbage
 
-        l_bd = float(self.d)*self.treat.total/self.gsize
-        treat_btrack.apply_func(lambda x:-10*poisson_cdf(x,l_bd,lower=False,log10=True))
-        self.score_btrack = treat_btrack
-        if self.opt.store_bdg:
-            self.info("#3 save the score track into bedGraph file...")
-            bdgfhd = open(self.zwig_tr + "_scores.bdg", "w")
-            self.score_btrack.write_bedGraph(bdgfhd,name=self.zwig_tr+"_Scores",description="-10log10 pvalue scores at each bp from MACS version %s" % MACS_VERSION)
+        self.info("#3 Calculate qvalues ...")
+        pqtable = score_btrack.make_pq_table()
+        
+        self.info("#3 Saving p-value to q-value table ...")
+        pqfhd = open(self.opt.pqtable,"w")
+        pqfhd.write( "-log10pvalue\t-log10qvalue\trank\tbasepairs\n" )
+        for p in sorted(pqtable.keys(),reverse=True):
+            q = pqtable[p]
+            pqfhd.write("%.2f\t%.2f\t%d\t%d\n" % (p/100.0,q[0]/100.0,q[1],q[2]))
+        pqfhd.close()
+
+        self.info("#3 Assign qvalues ...")
+        score_btrack.assign_qvalue( pqtable )            
 
         # call peaks
-        self.info("#3 Call peaks with given score cutoff: %.2f ..." % self.pvalue)        
-        peaks = self.score_btrack.call_peaks(cutoff=self.pvalue,min_length=self.d,max_gap=self.opt.tsize)
+        if self.pvalue:
+            self.info("#3 Call peaks with given -log10pvalue cutoff: %.2f ..." % self.pvalue)        
+            peaks = score_btrack.call_peaks(cutoff=self.pvalue*100,min_length=self.d,max_gap=self.opt.tsize,colname='-100logp')
+        elif self.qvalue:
+            self.info("#3 Call peaks with given -log10qvalue cutoff: %.2f ..." % self.qvalue)        
+            peaks = score_btrack.call_peaks(cutoff=self.qvalue*100,min_length=self.d,max_gap=self.opt.tsize,colname='-100logq')
+
+        if self.opt.store_bdg:
+           self.info("#3 save tag pileup into bedGraph file...")
+           bdgfhd = open(self.zwig_tr + "_pileup.bdg", "w")
+           score_btrack.write_bedGraph( bdgfhd,
+                                        self.zwig_tr,
+                                        "Fragment pileup at each bp from MACS version %s" % MACS_VERSION,
+                                        "sample" )
+
+           if self.lregion:
+               self.info("#3 save local lambda into bedGraph file...")
+               bdgfhd = open(self.zwig_ctl + "_lambda.bdg", "w")
+               score_btrack.write_bedGraph( bdgfhd,
+                                            self.zwig_ctl,
+                                            "Maximum local lambda at each bp from MACS version %s" % MACS_VERSION,
+                                            "control" )
+
+           self.info("#3 save the -log10pvalue score track into bedGraph file...")
+           bdgfhd = open(self.zwig_tr + "_pvalue.bdg", "w")
+           score_btrack.write_bedGraph( bdgfhd,
+                                        self.zwig_tr+"_-log10pvalue",
+                                        "-log10 pvalue scores at each bp from MACS version %s" % MACS_VERSION,
+                                        "-100logp")
+            
+           self.info("#3 save the -log10qvalue score track into bedGraph file...")
+           bdgfhd = open(self.zwig_tr + "_qvalue.bdg", "w")
+           score_btrack.write_bedGraph( bdgfhd,
+                                        self.zwig_tr+"_-log10qvalue",
+                                        "-log10 qvalue scores at each bp from MACS version %s" % MACS_VERSION,
+                                        "-100logq")
         return peaks
 
     # def __diag_w_control (self):
