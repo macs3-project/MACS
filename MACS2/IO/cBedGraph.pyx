@@ -1,4 +1,4 @@
-# Time-stamp: <2011-07-07 17:15:40 Tao Liu>
+# Time-stamp: <2011-07-08 13:52:49 Tao Liu>
 
 """Module for Feature IO classes.
 
@@ -28,6 +28,8 @@ from libc.math cimport sqrt
 from MACS2.Constants import *
 from MACS2.cProb import poisson_cdf
 from MACS2.IO.cScoreTrack import scoreTrackI
+from MACS2.IO.cPeakIO import PeakIO
+
 
 # ------------------------------------
 # constants
@@ -356,13 +358,23 @@ class bedGraphTrackI:
                             elif summit_value == tvalue:
                                 tsummit.append( int((tend+tstart)/2) )
                         summit = tsummit[int((len(tsummit)+1)/2)-1 ]
-                        peaks.add(chrom,peak_content[0][0],peak_content[-1][1],
-                                  summit=summit,peak_height=summit_value)
+                        peaks.add( chrom,
+                                   peak_content[0][0],
+                                   peak_content[-1][1],
+                                   summit      = summit,
+                                   peak_score  = summit_value,
+                                   pileup      = 0,
+                                   pscore      = 0,
+                                   fold_change = 0,
+                                   qscore      = 0
+                                   )
                     # start a new peak
                     peak_content = [(pre_p,p,v),]
                 pre_p = p
                 
             # save the last peak
+            if not peak_content:
+                continue
             if peak_length >= min_length: # if the peak is too small, reject it
                 summit = None
                 summit_value = None
@@ -370,8 +382,16 @@ class bedGraphTrackI:
                     if not summit_value or summit_value < tvalue:
                         summit = int((tend+tstart)/2)
                         summit_value = tvalue
-                peaks.add(chrom,peak_content[0][0],peak_content[-1][1],
-                          summit=summit-peak_content[0][0],peak_height=summit_value)
+                        peaks.add( chrom,
+                                   peak_content[0][0],
+                                   peak_content[-1][1],
+                                   summit      = summit,
+                                   peak_score  = summit_value,
+                                   pileup      = 0,
+                                   pscore      = 0,
+                                   fold_change = 0,
+                                   qscore      = 0
+                                   )
             
         return peaks
 

@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# Time-stamp: <2011-06-20 17:14:01 Tao Liu>
+# Time-stamp: <2011-07-08 13:45:06 Tao Liu>
 
 """Description: Naive call peaks from a single bedGraph track for scores.
 
@@ -53,7 +53,7 @@ info    = logging.info
 # ------------------------------------
 def main():
     usage = "usage: %prog <-i bedGraph> [-c CUTOFF] [-l MIN] [-g MAX] [-o PREFIX]"
-    description = "Call peaks from MACS pvalue score bedGraph output, with customized settings."
+    description = "Call peaks from MACS pvalue or qscore score bedGraph output, with customized settings."
     
     optparser = OptionParser(version="%prog 0.1",description=description,usage=usage,add_help_option=False)
     optparser.add_option("-h","--help",action="help",help="Show this help message and exit.")
@@ -77,45 +77,17 @@ def main():
     bio = bedGraphIO.bedGraphIO(options.ifile)
     btrack = bio.build_bdgtrack(baseline_value=0)
 
-    info("making pvalue list...")
-    value_list = btrack.make_value_list()
-    info("write to file...")
-    tmpfhd = open("tmpvalue.txt","w")
-    for (v,l) in value_list:
-        tmpfhd.write("%.2f\t%d\n" % (v,l))
-    tmpfhd.close()
-
-    m = sum(value_list['l'])
-    print "total length:",m
-    k = 1
-    c = mlog(m)+0.57721566490153286060
-    f = mlog10(c)+mlog10(m)
-    print "f",f
-    pre_v = -1e310
-    info("write to pvalue to qvalue file...")
-    tmpfhd = open("tmp_pvalue2qvalue.txt","w")
-    for i in xrange(value_list.size-1,-1,-1):
-        v,l = value_list[i]
-        if v != pre_v:
-            # new value
-            print v,k,f-mlog10(k)
-            q = (f-mlog10(k)+(v/-10))*-1
-            tmpfhd.write("%.2f\t%.2f\n" % ( v,q ))
-            pre_v = v
-        k+=l
-    tmpfhd.close()
-        
-        
-
     info("Call peaks from bedGraph...")    
     peaks = btrack.call_peaks(cutoff=options.cutoff,min_length=options.minlen,max_gap=options.maxgap)
 
     info("Write peaks...")
     pf = open ("%s_c%.0f_l%d_g%d_peaks.bed" % (options.oprefix,options.cutoff,options.minlen,options.maxgap),"w")
-    sf = open ("%s_c%.0f_l%d_g%d_summits.bed" % (options.oprefix,options.cutoff,options.minlen,options.maxgap),"w")    
-    peaks.write_to_bed(pf,name_prefix=options.oprefix+"_peak_")
-    peaks.write_to_summit_bed(sf,name_prefix=options.oprefix+"_summit_")
-
+    sf = open ("%s_c%.0f_l%d_g%d_summits.bed" % (options.oprefix,options.cutoff,options.minlen,options.maxgap),"w")
+    nf = open ("%s_c%.0f_l%d_g%d_peaks.encodePeak" % (options.oprefix,options.cutoff,options.minlen,options.maxgap),"w")        
+    peaks.write_to_bed(pf,name_prefix=options.oprefix+"_peak_", score_column="score")
+    peaks.write_to_summit_bed(sf,name_prefix=options.oprefix+"_summit_", score_column="score")
+    peaks.write_to_narrowPeak(nf, name_prefix=options.oprefix+"_encodePeak", score_column="score")
+    info("Done")
     
 if __name__ == '__main__':
     try:

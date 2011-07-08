@@ -1,11 +1,18 @@
 2011-07-07  Tao Liu  <vladimir.liu@gmail.com>
 	MACS version 2.0.5 (tag:alpha)
 
-	* macs2, MACS2/cPeakDetect.py, MACS2/IO/cScoreTrack.pyx,
+	* bin/macs2, MACS2/cPeakDetect.py, MACS2/IO/cScoreTrack.pyx,
 	MACS2/IO/cPeakIO.pyx
 
 	Use hash to store peak information. Add back the feature to deal
 	with data without control.
+
+	Fix bug which incorrectly allows small peaks at the end of
+	chromosomes.
+
+	* bin/bdgpeakcall, bin/bdgcmp
+
+	Fix bugs. bdgpeakcall can output encodePeak format.
 
 2011-06-22  Tao Liu  <taoliu@jimmy.harvard.edu>
 	MACS version 2.0.4 (tag:alpha)
