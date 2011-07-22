@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# Time-stamp: <2011-07-22 07:50:45 Tao Liu>
+# Time-stamp: <2011-07-22 13:43:52 Tao Liu>
 
 """Description: Naive call peaks from a single bedGraph track for scores.
 
@@ -72,7 +72,7 @@ def main():
                          help="minimum length of peak, better to set it as d value. DEFAULT: 200",default=200)
     optparser.add_option("-g","--max-gap",dest="maxgap",type="int",
                          help="maximum gap between significant points in a peak, better to set it as tag size. DEFAULT: 30",default=30)
-    optparser.add_option("-o","--o-prefix",dest="oprefix",
+    optparser.add_option("-o","--o-prefix",dest="oprefix",default="peak",type="string",
                          help="output file prefix, DEFAULT: peak") 
     (options,args) = optparser.parse_args()
 
@@ -95,7 +95,7 @@ def main():
     c2c1_btrack = c2c1_bio.build_bdgtrack(baseline_value=0)
 
     info("Combine four score tracks...")
-    comp_btrack = make_compositeScoreTrack(c1i1_btrack,c2i2_btrack,c1i1_btrack,c2i2_btrack)
+    comp_btrack = make_compositeScoreTrack(c1i1_btrack,c2i2_btrack,c1c2_btrack,c2c1_btrack)
 
     info("Call consistent peaks ...")    
     consistent_peaks = comp_btrack.call_consistent(cutoff=options.cutoff,min_length=options.minlen,max_gap=options.maxgap)

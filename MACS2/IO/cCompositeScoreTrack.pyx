@@ -1,4 +1,4 @@
-# Time-stamp: <2011-07-22 08:08:19 Tao Liu>
+# Time-stamp: <2011-07-22 14:47:21 Tao Liu>
 
 """Module for Composite Score Track IO classes.
 
@@ -25,6 +25,7 @@ from libc.math cimport sqrt,log10
 from MACS2.Constants import *
 from MACS2.cProb cimport poisson_cdf
 from MACS2.IO.cPeakIO import PeakIO
+from MACS2.IO.cBedGraph import bedGraphTrackI
 
 # ------------------------------------
 # constants
@@ -157,10 +158,14 @@ class compositeScoreTrackI:
             for i in xrange( x, chrom_pointer ):
                 # continue scan the rest regions
                 p = chrom_pos[ i ]
-                v = chrom_score[ i ]
+                vc1i1 = chrom_sc1i1[ i ]
+                vc2i2 = chrom_sc2i2[ i ]
+                vc1c2 = chrom_sc1c2[ i ]
+                vc2c1 = chrom_sc2c1[ i ]
                 if vc1i1 < cutoff or vc2i2 < cutoff or vc1c2 > cutoff or vc2c1 > cutoff:
                     pre_p = p
                     continue
+
                 # for points met all criteria
                 # if the gap is allowed
                 if pre_p - peak_content[ -1 ][ 1 ] <= max_gap:
@@ -240,7 +245,8 @@ class compositeScoreTrackI:
             for i in xrange( x, chrom_pointer ):
                 # continue scan the rest regions
                 p = chrom_pos[ i ]
-                v = chrom_score[ i ]
+                vc1i1 = chrom_sc1i1[ i ]
+                vc1c2 = chrom_sc1c2[ i ]
                 if vc1i1 < cutoff or vc1c2 < cutoff:
                     pre_p = p
                     continue
@@ -301,7 +307,6 @@ class compositeScoreTrackI:
             chrom_pos     = chrom_d[ 'pos' ]
             chrom_sc2i2   = chrom_d[ 'sc2i2' ]
             chrom_sc2c1 = chrom_d[ 'sc2c1' ]
-
             x     = 0                   # index in compositeScoreTrackI
             pre_p = 0                   # remember previous position
             peak_content = None         # to store points above cutoff
@@ -323,7 +328,8 @@ class compositeScoreTrackI:
             for i in xrange( x, chrom_pointer ):
                 # continue scan the rest regions
                 p = chrom_pos[ i ]
-                v = chrom_score[ i ]
+                vc2i2 = chrom_sc2i2[ i ]
+                vc2c1 = chrom_sc2c1[ i ]
                 if vc2i2 < cutoff or vc2c1 < cutoff:
                     pre_p = p
                     continue
@@ -375,6 +381,9 @@ class compositeScoreTrackI:
             t += self.pointer[chrom]
         return t
 
+    #def dump ( self ):
+    #
+    #
 
 def make_compositeScoreTrack (bdgTrack1, bdgTrack2, bdgTrack3, bdgTrack4 ):
     """A modified overlie function for MACS DIFF.
@@ -390,8 +399,8 @@ def make_compositeScoreTrack (bdgTrack1, bdgTrack2, bdgTrack3, bdgTrack4 ):
 
     chr1 = set(bdgTrack1.get_chr_names())
     chr2 = set(bdgTrack2.get_chr_names())
-    chr3 = set(bdgTrack1.get_chr_names())
-    chr4 = set(bdgTrack2.get_chr_names())    
+    chr3 = set(bdgTrack3.get_chr_names())
+    chr4 = set(bdgTrack4.get_chr_names())    
     
     common_chr = chr1.intersection(chr2).intersection(chr3).intersection(chr4)
     for chrom in common_chr:
@@ -405,12 +414,12 @@ def make_compositeScoreTrack (bdgTrack1, bdgTrack2, bdgTrack3, bdgTrack4 ):
         v2n = iter(v2s).next
 
         (p3s,v3s) = bdgTrack3.get_data_by_chr(chrom) # arrays for position and values
-        p1n = iter(p1s).next         # assign the next function to a viable to speed up
-        v1n = iter(v1s).next
+        p3n = iter(p3s).next         # assign the next function to a viable to speed up
+        v3n = iter(v3s).next
 
         (p4s,v4s) = bdgTrack4.get_data_by_chr(chrom) # arrays for position and values
-        p2n = iter(p4s).next         # assign the next function to a viable to speed up
-        v2n = iter(v4s).next
+        p4n = iter(p4s).next         # assign the next function to a viable to speed up
+        v4n = iter(v4s).next
 
         chrom_max_len = len(p1s)+len(p2s)+len(p3s)+len(p4s) # this is the maximum number of locations needed to be recorded in scoreTrackI for this chromosome.
             
@@ -433,7 +442,7 @@ def make_compositeScoreTrack (bdgTrack1, bdgTrack2, bdgTrack3, bdgTrack4 ):
             
             while True:
                 min_p = min( p1, p2, p3, p4 )
-                retadd( chrom, p1, v1, v2, v3, v4 )
+                retadd( chrom, min_p, v1, v2, v3, v4 )
                 pre_p = min_p
 
                 if p1 == min_p:
@@ -453,3 +462,4 @@ def make_compositeScoreTrack (bdgTrack1, bdgTrack2, bdgTrack3, bdgTrack4 ):
             pass
         
     return ret
+
