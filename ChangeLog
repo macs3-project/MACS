@@ -1,3 +1,22 @@
+2011-07-22  Tao Liu  <vladimir.liu@gmail.com>
+	MACS version 2.0.6 (tag:alpha)
+
+	* bin/macsdiff
+
+	A script to call differential regions. A naive way is introduced
+	to find the regions where:
+
+	1. signal from condition 1 is larger than input 1 and condition 2 --
+	unique region in condition 1;
+	2. signal from condition 2 is larger than input 2 and condition 1
+	-- unique region in condition 2;
+	3. signal from condition 1 is larger than input 1, signal from
+	condition 2 is larger than input 2, however either signal from
+	condition 1 or 2 is not larger than the other.
+
+	Here 'larger' means the pvalue or qvalue from a Poisson test is
+	under certain cutoff.
+
 2011-07-07  Tao Liu  <vladimir.liu@gmail.com>
 	MACS version 2.0.5 (tag:alpha)
 

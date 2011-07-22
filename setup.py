@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# Time-stamp: <2011-07-07 23:41:30 Tao Liu>
+# Time-stamp: <2011-07-22 01:59:34 Tao Liu>
 
 """Description
 
@@ -34,12 +34,13 @@ def main():
                    Extension("MACS2.IO.cPeakIO", ["MACS2/IO/cPeakIO.pyx"],),
                    Extension("MACS2.IO.cFixWidthTrack", ["MACS2/IO/cFixWidthTrack.pyx"],),
                    Extension("MACS2.IO.cBedGraph", ["MACS2/IO/cBedGraph.pyx"], libraries=["m"]),
-                   Extension("MACS2.IO.cScoreTrack", ["MACS2/IO/cScoreTrack.pyx"],),                   
+                   Extension("MACS2.IO.cScoreTrack", ["MACS2/IO/cScoreTrack.pyx"],),
+                   Extension("MACS2.IO.cCompositeScoreTrack", ["MACS2/IO/cCompositeScoreTrack.pyx"],),
                    ]
     
 
     setup(name="MACS",
-          version="2.0.5",
+          version="2.0.6",
           description="Model Based Analysis for ChIP-Seq data",
           author='Yong Zhang; Tao (Foo) Liu',
           author_email='zy@jimmy.harvard.edu; taoliu@jimmy.harvard.edu',
@@ -47,6 +48,7 @@ def main():
           package_dir={'MACS2' : 'MACS2'},
           packages=['MACS2', 'MACS2.IO'],
           scripts=['bin/macs2',
+                   'bin/macsdiff',
                    'bin/bdgcmp',
                    'bin/bdgpeakcall'],
           classifiers=[

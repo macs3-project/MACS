@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# Time-stamp: <2011-07-07 23:40:35 Tao Liu>
+# Time-stamp: <2011-07-13 21:46:25 Tao Liu>
 
 """Description: MACS 2 main executable
 
@@ -280,8 +280,8 @@ Example: %prog -t ChIP.bam -c Control.bam -f BAM -g h -n test -w --call-subpeaks
                          help="The arbitrary shift size in bp. When nomodel is true, MACS will use this value as 1/2 of fragment size. DEFAULT: 100 ")
     optparser.add_option("--keep-dup",dest="keepduplicates",type="string",default="auto",
                          help="It controls the MACS behavior towards duplicate tags at the exact same location -- the same coordination and the same strand. The default 'auto' option makes MACS calculate the maximum tags at the exact same location based on binomal distribution using 1e-5 as pvalue cutoff; and the 'all' option keeps every tags. If an integer is given, at most this number of tags will be kept at the same location. Default: auto")
-    optparser.add_option("--to-control",dest="tocontrol",action="store_true",default=False,
-                         help="When set, scale the ChIP data towards Control data, by default, the control will be scaled towards ChIP. DEFAULT: False")
+#    optparser.add_option("--to-control",dest="tocontrol",action="store_true",default=False,
+#                         help="When set, scale the ChIP data towards Control data, by default, the control will be scaled towards ChIP. DEFAULT: False")
     optparser.add_option("--shift-control",dest="shiftcontrol",action="store_true",default=False,
                          help="When set, control tags will be shifted just as ChIP tags according to their strand before the extension of d, slocal and llocal. By default, control tags are extended centered at their current positions regardless of strand. You may consider to turn this option on while comparing two ChIP datasets of different condition but the same factor. DEFAULT: False")
     optparser.add_option("--half-ext",dest="halfext",action="store_true",default=False,
