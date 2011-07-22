@@ -1,4 +1,4 @@
-# Time-stamp: <2011-07-22 02:00:11 Tao Liu>
+# Time-stamp: <2011-07-22 08:08:19 Tao Liu>
 
 """Module for Composite Score Track IO classes.
 
@@ -376,7 +376,7 @@ class compositeScoreTrackI:
         return t
 
 
-def make_compositeScoreTrack (bdgtrack1, bdgtrack2, bdgtrack3, bdgtrack4 ):
+def make_compositeScoreTrack (bdgTrack1, bdgTrack2, bdgTrack3, bdgTrack4 ):
     """A modified overlie function for MACS DIFF.
     
     """
