@@ -1,4 +1,4 @@
-# Time-stamp: <2011-07-22 14:47:21 Tao Liu>
+# Time-stamp: <2011-07-23 01:13:35 Tao Liu>
 
 """Module for Composite Score Track IO classes.
 
@@ -371,6 +371,155 @@ class compositeScoreTrackI:
                            qscore      = 0,
                            )
         return peaks
+
+
+    def call_diff_regions (self, cutoff=50, min_length=200, max_gap=50):
+        """This function try to find regions within which, scores
+        are continuously higher than a given cutoff.
+
+        Consistent peaks are those met all the following criteria
+
+        1. sc1i1 >= cutoff
+        2. sc2i2 >= cutoff
+        3. sc1c2 <= cutoff
+        4. sc2c1 <= cutoff
+        """
+        chrs  = self.get_chr_names()
+        consistent_peaks = PeakIO()                      # dictionary to save peaks
+        condition1_peaks = PeakIO()                      # dictionary to save peaks
+        condition2_peaks = PeakIO()                      # dictionary to save peaks        
+        for chrom in chrs:
+            chrom_pointer = self.pointer[chrom]
+            chrom_d       = self.get_data_by_chr( chrom ) # arrays for position and values
+            chrom_pos     = chrom_d[ 'pos' ]
+            chrom_sc1i1   = chrom_d[ 'sc1i1' ]
+            chrom_sc2i2  = chrom_d[ 'sc2i2' ]
+            chrom_sc1c2 = chrom_d[ 'sc1c2' ]
+            chrom_sc2c1  = chrom_d[ 'sc2c1' ]
+
+            x     = 0                   # index in compositeScoreTrackI
+            pre_p = 0                   # remember previous position
+            consistent_peak_content = None         # to store points above cutoff
+            condition1_peak_content = None         # to store points above cutoff
+            condition2_peak_content = None         # to store points above cutoff            
+            
+            for i in xrange( x, chrom_pointer ):
+                # continue scan the rest regions
+                p = chrom_pos[ i ]
+                vc1i1 = chrom_sc1i1[ i ]
+                vc2i2 = chrom_sc2i2[ i ]
+                vc1c2 = chrom_sc1c2[ i ]
+                vc2c1 = chrom_sc2c1[ i ]
+
+                if vc1i1 >= cutoff and vc2i2 >= cutoff and vc1c2 <= cutoff and vc2c1 <= cutoff:
+                    # for points met all criteria
+                    # if the gap is allowed
+                    if not consistent_peak_content:
+                        consistent_peak_content = [ ( pre_p, p, 0, i ) ]
+                    if pre_p - consistent_peak_content[ -1 ][ 1 ] <= max_gap:
+                        consistent_peak_content.append( ( pre_p, p, 0, i ) )
+                    else:
+                        # when the gap is not allowed, close this peak
+                        peak_length = consistent_peak_content[ -1 ][ 1 ] - consistent_peak_content[ 0 ][ 0 ]
+                        if peak_length >= min_length: # if the peak is too small, reject it
+                            consistent_peaks.add( chrom,
+                                                  consistent_peak_content[0][0],
+                                                  consistent_peak_content[-1][1],
+                                                  summit      = 0,
+                                                  peak_score  = 0,
+                                                  pileup      = 0,
+                                                  pscore      = 0,
+                                                  fold_change = 0,
+                                                  qscore      = 0,
+                                                  )
+                        # start a new peak
+                        consistent_peak_content = [ ( pre_p, p, 0, i ), ]
+                elif vc1i1 >= cutoff and vc1c2 >= cutoff:
+                    if not condition1_peak_content:
+                        condition1_peak_content = [ ( pre_p, p, 0, i ) ]
+                    if pre_p - condition1_peak_content[ -1 ][ 1 ] <= max_gap:
+                        condition1_peak_content.append( ( pre_p, p, 0, i ) )
+                    else:
+                        # when the gap is not allowed, close this peak
+                        peak_length = condition1_peak_content[ -1 ][ 1 ] - condition1_peak_content[ 0 ][ 0 ]
+                        if peak_length >= min_length: # if the peak is too small, reject it
+                            condition1_peaks.add( chrom,
+                                                  condition1_peak_content[0][0],
+                                                  condition1_peak_content[-1][1],
+                                                  summit      = 0,
+                                                  peak_score  = 0,
+                                                  pileup      = 0,
+                                                  pscore      = 0,
+                                                  fold_change = 0,
+                                                  qscore      = 0,
+                                                  )
+                        # start a new peak
+                        condition1_peak_content = [ ( pre_p, p, 0, i ), ]
+                elif vc2i2 >= cutoff and vc2c1 >= cutoff:
+                    if not condition2_peak_content:
+                        condition2_peak_content = [ ( pre_p, p, 0, i ) ]
+                    if pre_p - condition2_peak_content[ -1 ][ 1 ] <= max_gap:
+                        condition2_peak_content.append( ( pre_p, p, 0, i ) )
+                    else:
+                        # when the gap is not allowed, close this peak
+                        peak_length = condition2_peak_content[ -1 ][ 1 ] - condition2_peak_content[ 0 ][ 0 ]
+                        if peak_length >= min_length: # if the peak is too small, reject it
+                            condition2_peaks.add( chrom,
+                                                  condition2_peak_content[0][0],
+                                                  condition2_peak_content[-1][1],
+                                                  summit      = 0,
+                                                  peak_score  = 0,
+                                                  pileup      = 0,
+                                                  pscore      = 0,
+                                                  fold_change = 0,
+                                                  qscore      = 0,
+                                                  )
+                        # start a new peak
+                        condition2_peak_content = [ ( pre_p, p, 0, i ), ]
+                pre_p = p
+            
+            # save the last regions
+            if consistent_peak_content:
+                peak_length = consistent_peak_content[ -1 ][ 1 ] - consistent_peak_content[ 0 ][ 0 ]
+                if peak_length >= min_length: # if the peak is too small, reject it
+                    consistent_peaks.add( chrom,
+                                          consistent_peak_content[0][0],
+                                          consistent_peak_content[-1][1],
+                                          summit      = 0,
+                                          peak_score  = 0,
+                                          pileup      = 0,
+                                          pscore      = 0,
+                                          fold_change = 0,
+                                          qscore      = 0,
+                                          )
+            elif condition1_peak_content:
+                peak_length = condition1_peak_content[ -1 ][ 1 ] - condition1_peak_content[ 0 ][ 0 ]
+                if peak_length >= min_length: # if the peak is too small, reject it
+                    condition1_peaks.add( chrom,
+                                          condition1_peak_content[0][0],
+                                          condition1_peak_content[-1][1],
+                                          summit      = 0,
+                                          peak_score  = 0,
+                                          pileup      = 0,
+                                          pscore      = 0,
+                                          fold_change = 0,
+                                          qscore      = 0,
+                                          )
+            elif condition2_peak_content:
+                peak_length = condition2_peak_content[ -1 ][ 1 ] - condition2_peak_content[ 0 ][ 0 ]
+                if peak_length >= min_length: # if the peak is too small, reject it
+                    condition2_peaks.add( chrom,
+                                          condition2_peak_content[0][0],
+                                          condition2_peak_content[-1][1],
+                                          summit      = 0,
+                                          peak_score  = 0,
+                                          pileup      = 0,
+                                          pscore      = 0,
+                                          fold_change = 0,
+                                          qscore      = 0,
+                                          )
+
+        return ( consistent_peaks, condition1_peaks, condition2_peaks )
 
     def total ( self ):
         """Return the number of regions in this object.

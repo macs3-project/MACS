@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# Time-stamp: <2011-07-22 13:43:52 Tao Liu>
+# Time-stamp: <2011-07-24 00:50:22 Tao Liu>
 
 """Description: Naive call peaks from a single bedGraph track for scores.
 
@@ -97,12 +97,13 @@ def main():
     info("Combine four score tracks...")
     comp_btrack = make_compositeScoreTrack(c1i1_btrack,c2i2_btrack,c1c2_btrack,c2c1_btrack)
 
-    info("Call consistent peaks ...")    
-    consistent_peaks = comp_btrack.call_consistent(cutoff=options.cutoff,min_length=options.minlen,max_gap=options.maxgap)
-    info("Call condition 1 unique peaks ...")    
-    condition1_peaks = comp_btrack.call_condition1_unique(cutoff=options.cutoff,min_length=options.minlen,max_gap=options.maxgap)
-    info("Call condition 2 unique peaks ...")    
-    condition2_peaks = comp_btrack.call_condition2_unique(cutoff=options.cutoff,min_length=options.minlen,max_gap=options.maxgap)    
+    info("Call differential regions ...")
+    #consistent_peaks = comp_btrack.call_consistent(cutoff=options.cutoff,min_length=options.minlen,max_gap=options.maxgap)
+    #info("Call condition 1 unique peaks ...")    
+    #condition1_peaks = comp_btrack.call_condition1_unique(cutoff=options.cutoff,min_length=options.minlen,max_gap=options.maxgap)
+    #info("Call condition 2 unique peaks ...")    
+    #condition2_peaks = comp_btrack.call_condition2_unique(cutoff=options.cutoff,min_length=options.minlen,max_gap=options.maxgap)
+    ( consistent_peaks, condition1_peaks, condition2_peaks ) = comp_btrack.call_diff_regions(cutoff=options.cutoff,min_length=options.minlen,max_gap=options.maxgap)
 
     info("Write peaks...")
     consistent_f = open ("%s_c%.0f_l%d_g%d_consistent_peaks.bed" % (options.oprefix,options.cutoff,options.minlen,options.maxgap),"w")
