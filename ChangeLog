@@ -1,4 +1,4 @@
-2011-07-22  Tao Liu  <vladimir.liu@gmail.com>
+2011-07-25  Tao Liu  <vladimir.liu@gmail.com>
 	MACS version 2.0.6 (tag:alpha)
 
 	* bin/macsdiff
@@ -16,6 +16,9 @@
 
 	Here 'larger' means the pvalue or qvalue from a Poisson test is
 	under certain cutoff.
+
+	(I will make another script to wrap up mulitple scripts for
+	differential calling)
 
 2011-07-07  Tao Liu  <vladimir.liu@gmail.com>
 	MACS version 2.0.5 (tag:alpha)
