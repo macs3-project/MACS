@@ -1,4 +1,4 @@
-# Time-stamp: <2011-08-18 14:31:39 Tao Liu>
+# Time-stamp: <2011-08-18 16:17:24 Tao Liu>
 
 """Module Description
 
@@ -305,7 +305,7 @@ def opt_validate_diff ( optparser ):
         "# ChIP-seq file for condition 1 = %s" % (options.tfile1),\
         "# ChIP-seq file for condition 2 = %s" % (options.tfile2),\
         "# control file for condition 1 = %s" % (options.cfile1),\
-        "# control file for condition 2 = %s" % (options.cfile1),\
+        "# control file for condition 2 = %s" % (options.cfile2),\
         "# effective genome size = %.2e" % (options.gsize),\
         "# band width = %d" % (options.bw),\
         "# model fold = %s\n" % (options.mfold),\
