@@ -1,5 +1,5 @@
-README for MACS (2.0.6)
-Time-stamp: <2011-07-24 20:51:11 Tao Liu>
+README for MACS (2.0.7)
+Time-stamp: <2011-08-18 14:42:11 Tao Liu>
 
 * Introduction
 
@@ -19,7 +19,7 @@ alone, or with control sample with the increase of specificity.
 
 Please check the file 'INSTALL' in the distribution.
 
-* Usage
+* Usage of macs2
 
 Usage: macs2 <-t tfile> [-n name] [-g genomesize] [options]
 
@@ -496,6 +496,10 @@ directory. Note, R is required to draw this figure.
  8. NAME_pqtable.txt store the -log10pvalue, -log10qvalue, rank of
   this pvalue, and number of bp having this pvalue.
 
+* Usage of macs2diff
+
+Will update it later...
+
 * Other useful links
 
 Cistrome web server for ChIP-chip/seq analysis: http://cistrome.org/ap/
@@ -506,7 +510,7 @@ UCSC toolkits: http://hgdownload.cse.ucsc.edu/admin/exe/
 
 * Tips of fine-tuning peak calling
 
-Check the two scripts within MACSv2 package:
+Check the three scripts within MACSv2 package:
 
  1. bdgcmp can be used on *_treat_pileup.bdg and *_control_lambda.bdg
  or bedGraph files from other resources to calculate score track;
@@ -514,4 +518,10 @@ Check the two scripts within MACSv2 package:
  2. bdgpeakcall can be used on *_treat_pvalue.bdg or the file
  generated from bdgcmp or bedGraph file from other resources to call
  peaks with given cutoff, maximum-gap between nearby mergable peaks
- and minimum-lenght of peak.
+ and minimum length of peak.
+
+ 3. Differential calling tool -- bdgdiff, can be used on 4 bedgraph
+ files which are scores between treatment 1 and control 1, treatment 2
+ and control 2, treatment 1 and treatment 2, treatment 2 and treatment
+ 1. It will output the consistent and unique sites according to
+ parameter settings for minimum length, maximum gap and cutoff.
