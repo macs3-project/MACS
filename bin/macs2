@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# Time-stamp: <2011-07-13 21:46:25 Tao Liu>
+# Time-stamp: <2011-08-17 17:20:16 Tao Liu>
 
 """Description: MACS 2 main executable
 
@@ -23,8 +23,6 @@ with the distribution).
 import os
 import sys
 import logging
-import math
-import re
 from subprocess import Popen,PIPE
 from optparse import OptionParser
 import gzip
@@ -235,16 +233,16 @@ def prepare_optparser ():
     """
     usage = """usage: %prog <-t tfile> [-n name] [-g genomesize] [options]
 
-Example: %prog -t ChIP.bam -c Control.bam -f BAM -g h -n test -w --call-subpeaks
+Example: %prog -t ChIP.bam -c Control.bam -f BAM -g hs -n test -B -q 0.01
 """
     description = "%prog -- Model-based Analysis for ChIP-Sequencing"
 
     optparser = OptionParser(version="%prog "+MACS_VERSION,description=description,usage=usage,add_help_option=False)
     optparser.add_option("-h","--help",action="help",help="show this help message and exit.")
     optparser.add_option("-t","--treatment",dest="tfile",type="string",
-                         help="ChIP-seq treatment files. REQUIRED.")
+                         help="ChIP-seq treatment file. REQUIRED.")
     optparser.add_option("-c","--control",dest="cfile",type="string",
-                         help="Control files.")
+                         help="Control file.")
     optparser.add_option("-n","--name",dest="name",type="string",
                          help="Experiment name, which will be used to generate output file names. DEFAULT: \"NA\"",
                          default="NA")

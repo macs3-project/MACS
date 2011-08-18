@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# Time-stamp: <2011-07-24 00:50:22 Tao Liu>
+# Time-stamp: <2011-08-18 12:44:10 Tao Liu>
 
 """Description: Naive call peaks from a single bedGraph track for scores.
 
@@ -26,8 +26,7 @@ import logging
 from optparse import OptionParser
 from MACS2.IO import bedGraphIO
 from MACS2.IO.cCompositeScoreTrack import *
-from math import log as mlog
-from math import log10 as mlog10
+
 # ------------------------------------
 # constants
 # ------------------------------------

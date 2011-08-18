@@ -1,4 +1,4 @@
-# Time-stamp: <2011-07-08 13:52:49 Tao Liu>
+# Time-stamp: <2011-08-18 12:39:30 Tao Liu>
 
 """Module for Feature IO classes.
 
@@ -29,7 +29,6 @@ from MACS2.Constants import *
 from MACS2.cProb import poisson_cdf
 from MACS2.IO.cScoreTrack import scoreTrackI
 from MACS2.IO.cPeakIO import PeakIO
-
 
 # ------------------------------------
 # constants
@@ -587,3 +586,32 @@ class bedGraphTrackI:
         
         #ret.merge_regions()
         return ret
+
+def scoreTracktoBedGraph (scoretrack, colname):
+    """Produce a bedGraphTrackI object with certain column as scores.
+    
+    colname: can be 'sample','control','-100logp','-100logq'
+    
+    """
+    bdgtrack = bedGraphTrackI( baseline_value = 0 )
+    if colname not in ['sample','control','-100logp','-100logq']:
+        raise Exception("%s not supported!" % colname)
+    if colname in ['-100logp', '-100logq']:
+        flag100 = True              # for pvalue or qvalue, divide them by 100 while writing to bedGraph file
+    else:
+        flag100 = False
+    chrs = scoretrack.get_chr_names()
+    for chrom in chrs:
+        d = scoretrack.data[chrom]
+        l = scoretrack.pointer[chrom]
+        pre = 0
+        pos   = d['pos']
+        if flag100:
+            value = d[colname]/100.0
+        else:
+            value = d[colname]
+        for i in xrange( l ):
+            bdgtrack.add_loc( chrom, pre, pos[i] ,value[i] )
+            pre = pos[i]
+
+    return bdgtrack

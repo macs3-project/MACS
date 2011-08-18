@@ -1,4 +1,4 @@
-# Time-stamp: <2011-07-08 13:54:50 Tao Liu>
+# Time-stamp: <2011-08-18 12:31:17 Tao Liu>
 
 """Module for Feature IO classes.
 
@@ -25,6 +25,7 @@ from libc.math cimport sqrt,log10
 from MACS2.Constants import *
 from MACS2.cProb cimport poisson_cdf
 from MACS2.IO.cPeakIO import PeakIO
+#from MACS2.IO.cBedGraph import bedGraphTrackI
 
 # ------------------------------------
 # constants
@@ -118,7 +119,6 @@ class scoreTrackI:
 
         colname: can be 'sample','control','-100logp','-100logq'
 
-        shift will be used to shift the coordinates. default: 0
         """
         if colname not in ['sample','control','-100logp','-100logq']:
             raise Exception("%s not supported!" % colname)

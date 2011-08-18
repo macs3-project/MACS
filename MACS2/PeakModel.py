@@ -1,4 +1,4 @@
-# Time-stamp: <2011-02-14 15:52:04 Tao Liu>
+# Time-stamp: <2011-08-17 17:27:18 Tao Liu>
 
 """Module Description
 
@@ -40,7 +40,7 @@ class NotEnoughPairsException(Exception):
 class PeakModel:
     """Peak Model class.
     """
-    def __init__ (self, opt=None, treatment=None, max_pairnum=500, gz = 0, umfold=30, lmfold=10, bw=200, ts = 25, bg=0):
+    def __init__ (self, opt=None, treatment=None, max_pairnum=500, gz = 0, umfold=30, lmfold=10, bw=200, ts = 25, bg=0, quiet=False):
         self.treatment = treatment
         if opt:
             self.gz = opt.gsize
@@ -63,7 +63,12 @@ class PeakModel:
             self.debug = lambda x: sys.stderr.write(x+"\n")
             self.warn  = lambda x: sys.stderr.write(x+"\n")
             self.error = lambda x: sys.stderr.write(x+"\n")
-			
+        if quiet:
+            self.info = lambda x: None
+            self.debug = lambda x: None
+            self.warn = lambda x: None
+            self.error = lambda x: None
+            
         self.max_pairnum = max_pairnum
         self.summary = ""
         self.plus_line = None

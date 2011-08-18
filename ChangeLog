@@ -1,3 +1,27 @@
+2011-08-18  Tao Liu  <taoliu@jimmy.harvard.edu>
+	MACS version 2.0.7 (tag:alpha)
+
+	* bin/macsdiff renamed to bin/bdgdiff
+
+	Now this script will work as a low-level finetuning tool as bdgcmp
+	and bdgpeakcall.
+
+	* bin/macs2diff
+
+	A new script to take treatment and control files from two
+	condition, calculate fragment size, use local poisson to get
+	pvalues and BH process to get qvalues, then combine 4-ways result
+	to call differential sites.
+
+	This script can use upto 4 cpus to speed up 4-ways calculation. (
+	I am trying multiprocessing in python. )
+
+	* MACS2/Constants.py, MACS2/IO/cBedGraph.pyx,
+	MACS2/IO/cScoreTrack.pyx, MACS2/OptValidator.py,
+	MACS2/PeakModel.py, MACS2/cPeakDetect.pyx
+
+	All above files are modified for the new macs2diff script.
+
 2011-07-25  Tao Liu  <vladimir.liu@gmail.com>
 	MACS version 2.0.6 (tag:alpha)
 

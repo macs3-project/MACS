@@ -1,4 +1,4 @@
-# Time-stamp: <2011-07-07 23:45:58 Tao Liu>
+# Time-stamp: <2011-08-18 11:59:08 Tao Liu>
 
 """Module Description
 
@@ -25,19 +25,120 @@ from MACS2.Constants import *
 from MACS2.cPileup import pileup_bdg
 from libc.math cimport log10
 
+def compare_treatment_vs_control ( treat, control, fragment_size, gsize, halfext=False, slocal=0, llocal=0, tocontrol=False, shiftcontrol=False ):
+    """To compare treatment vs control tags tracks with tag extension
+    ,local poisson test, and Benjamini-Hochberg adjustment. Return
+    scoreTrackI object.
+
+    While calculating pvalue:
+
+    First, t and c will be adjusted by the ratio between total
+    reads in treatment and total reads in control, depending on
+    --to-control option.
+
+    Then, t and c will be multiplied by the smallest peak size --
+    self.d.
+
+    Next, a poisson CDF is applied to calculate one-side pvalue
+    for enrichment.
+
+    Finally, BH process will be applied to adjust pvalue to qvalue.
+    """
+    treat_total   = treat.total
+    control_total = control.total
+    ratio_treat2control = float(treat_total)/control_total
+
+    # Now pileup FWTrackII to form a bedGraphTrackI
+    treat_btrack = pileup_bdg(treat,fragment_size,halfextension=halfext)
+
+    if tocontrol:
+        # if user want to scale everything to control data
+        lambda_bg = float(fragment_size)*treat_total/gsize/ratio_treat2control
+        treat_btrack.apply_func(lambda x:float(x)/ratio_treat2control)
+    else:
+        lambda_bg = float(fragment_size)*treat_total/gsize
+
+    # control data needs multiple steps of calculation
+    # I need to shift them by 500 bps, then 5000 bps
+    if slocal:
+        assert fragment_size <= slocal, "slocal can't be smaller than d!"
+    if llocal:
+        assert fragment_size <= llocal , "llocal can't be smaller than d!"            
+        assert slocal <= llocal , "llocal can't be smaller than slocal!"
+
+    # d-size local
+    
+    # Now pileup FWTrackII to form a bedGraphTrackI
+    c_tmp_btrack = pileup_bdg(control, fragment_size, directional=shiftcontrol, halfextension=halfext)
+    if not tocontrol:
+        # if user want to scale everything to ChIP data
+        tmp_v = ratio_treat2control
+    else:
+        tmp_v = 1
+
+    c_tmp_btrack.apply_func(lambda x:float(x)*tmp_v)
+    control_btrack = c_tmp_btrack
+
+    # slocal size local
+    if slocal:
+        # Now pileup FWTrackII to form a bedGraphTrackI
+        c_tmp_btrack = pileup_bdg(control, slocal, directional=shiftcontrol, halfextension=halfext)
+        if not tocontrol:
+            # if user want to scale everything to ChIP data
+            tmp_v = float(fragment_size)/slocal*ratio_treat2control
+        else:
+            tmp_v = float(fragment_size)/slocal
+        c_tmp_btrack.apply_func(lambda x:float(x)*tmp_v)
+        control_btrack = control_btrack.overlie(c_tmp_btrack,func=max)
+
+    # llocal size local
+    if llocal and llocal > slocal:
+        # Now pileup FWTrackII to form a bedGraphTrackI
+        c_tmp_btrack = pileup_bdg(control, llocal, directional=shiftcontrol, halfextension=halfext)
+        if not tocontrol:
+            # if user want to scale everything to ChIP data
+            tmp_v = float(fragment_size)/llocal*ratio_treat2control
+        else:
+            tmp_v = float(fragment_size)/llocal            
+        c_tmp_btrack.apply_func(lambda x:float(x)*tmp_v)
+        control_btrack = control_btrack.overlie(c_tmp_btrack,func=max)
+
+    control_btrack.reset_baseline(lambda_bg) # set the baseline as lambda_bg
+
+    # calculate pvalue scores
+    score_btrack = treat_btrack.make_scoreTrack_for_macs(control_btrack)
+    treat_btrack = None             # clean them
+    control_btrack = None
+    gc.collect()                    # full collect garbage
+
+    # calculate and assign qvalues
+    pqtable = score_btrack.make_pq_table()
+        
+    #self.info("#3 Saving p-value to q-value table ...")
+    #pqfhd = open(self.opt.pqtable,"w")
+    #pqfhd.write( "-log10pvalue\t-log10qvalue\trank\tbasepairs\n" )
+    #for p in sorted(pqtable.keys(),reverse=True):
+    #    q = pqtable[p]
+    #    pqfhd.write("%.2f\t%.2f\t%d\t%d\n" % (p/100.0,q[0]/100.0,q[1],q[2]))
+    #pqfhd.close()
+    
+    score_btrack.assign_qvalue( pqtable )
+                
+    return score_btrack
+
 class PeakDetect:
     """Class to do the peak calling.
 
     e.g:
     >>> from MACS2.cPeakDetect import cPeakDetect
-    >>> pd = PeakDetect(treat=treatdata, control=controldata, pvalue=pvalue_cutoff, d=100, scan_window=200, gsize=3000000000)
+    >>> pd = PeakDetect(treat=treatdata, control=controldata, pvalue=pvalue_cutoff, d=100, gsize=3000000000)
     >>> pd.call_peaks()
     """
-    def __init__ (self,opt=None,treat=None, control=None):
+    def __init__ (self,opt = None,treat = None, control = None, d = None, slocal = None, llocal = None, shiftcontrol = None):
         """Initialize the PeakDetect object.
 
         """
-        self.opt  = opt
+        self.opt = opt
         self.info = opt.info
         self.debug = opt.debug
         self.warn = opt.warn
@@ -54,15 +155,29 @@ class PeakDetect:
                 
         self.pvalue = opt.log_pvalue    # -log10pvalue
         self.qvalue = opt.log_qvalue    # -log10qvalue
-        self.d = opt.d
+        if d != None:
+            self.d = d
+        else:
+            self.d = self.opt.d
         self.shift_size = self.d/2
-        self.scan_window = opt.scanwindow
         self.gsize = opt.gsize
         
         self.nolambda = opt.nolambda
 
-        self.sregion = opt.smalllocal
-        self.lregion = opt.largelocal
+        if slocal != None:
+            self.sregion = slocal
+        else:
+            self.sregion = opt.smalllocal
+
+        if llocal != None:
+            self.lregion = llocal
+        else:
+            self.lregion = opt.largelocal
+
+        if shiftcontrol != None:
+            self.shiftcontrol = shiftcontrol
+        else:
+            self.shiftcontrol = opt.shiftcontrol
 
         if (self.nolambda):
             self.info("#3 !!!! DYNAMIC LAMBDA IS DISABLED !!!!")
@@ -171,7 +286,7 @@ class PeakDetect:
         self.info("#3 calculate d local lambda for control data")        
 
         # Now pileup FWTrackII to form a bedGraphTrackI
-        c_tmp_btrack = pileup_bdg(self.control,self.d,directional=self.opt.shiftcontrol,halfextension=self.opt.halfext)
+        c_tmp_btrack = pileup_bdg(self.control,self.d,directional=self.shiftcontrol,halfextension=self.opt.halfext)
         if not self.opt.tocontrol:
             # if user want to scale everything to ChIP data
             tmp_v = self.ratio_treat2control
@@ -184,7 +299,7 @@ class PeakDetect:
         if self.sregion:
             self.info("#3 calculate small local lambda for control data")        
             # Now pileup FWTrackII to form a bedGraphTrackI
-            c_tmp_btrack = pileup_bdg(self.control,self.sregion,directional=self.opt.shiftcontrol,halfextension=self.opt.halfext)
+            c_tmp_btrack = pileup_bdg(self.control,self.sregion,directional=self.shiftcontrol,halfextension=self.opt.halfext)
             if not self.opt.tocontrol:
                 # if user want to scale everything to ChIP data
                 tmp_v = float(self.d)/self.sregion*self.ratio_treat2control
@@ -197,7 +312,7 @@ class PeakDetect:
         if self.lregion and self.lregion > self.sregion:
             self.info("#3 calculate large local lambda for control data")        
             # Now pileup FWTrackII to form a bedGraphTrackI
-            c_tmp_btrack = pileup_bdg(self.control,self.lregion,directional=self.opt.shiftcontrol,halfextension=self.opt.halfext)
+            c_tmp_btrack = pileup_bdg(self.control,self.lregion,directional=self.shiftcontrol,halfextension=self.opt.halfext)
             if not self.opt.tocontrol:
                 # if user want to scale everything to ChIP data
                 tmp_v = float(self.d)/self.lregion*self.ratio_treat2control
@@ -218,13 +333,13 @@ class PeakDetect:
         self.info("#3 Calculate qvalues ...")
         pqtable = score_btrack.make_pq_table()
         
-        self.info("#3 Saving p-value to q-value table ...")
-        pqfhd = open(self.opt.pqtable,"w")
-        pqfhd.write( "-log10pvalue\t-log10qvalue\trank\tbasepairs\n" )
-        for p in sorted(pqtable.keys(),reverse=True):
-            q = pqtable[p]
-            pqfhd.write("%.2f\t%.2f\t%d\t%d\n" % (p/100.0,q[0]/100.0,q[1],q[2]))
-        pqfhd.close()
+        #self.info("#3 Saving p-value to q-value table ...")
+        #pqfhd = open(self.opt.pqtable,"w")
+        #pqfhd.write( "-log10pvalue\t-log10qvalue\trank\tbasepairs\n" )
+        #for p in sorted(pqtable.keys(),reverse=True):
+        #    q = pqtable[p]
+        #    pqfhd.write("%.2f\t%.2f\t%d\t%d\n" % (p/100.0,q[0]/100.0,q[1],q[2]))
+        #pqfhd.close()
 
         self.info("#3 Assign qvalues ...")
         score_btrack.assign_qvalue( pqtable )
@@ -304,7 +419,7 @@ class PeakDetect:
         if self.lregion:
             self.info("#3 calculate large local lambda from treatment data")
             # Now pileup FWTrackII to form a bedGraphTrackI
-            control_btrack = pileup_bdg(self.treat,self.lregion,directional=self.opt.shiftcontrol,halfextension=self.opt.halfext)
+            control_btrack = pileup_bdg(self.treat,self.lregion,directional=self.shiftcontrol,halfextension=self.opt.halfext)
             tmp_v = float(self.d)/self.lregion
             control_btrack.apply_func(lambda x:float(x)*tmp_v)
             control_btrack.reset_baseline(lambda_bg) # set the baseline as lambda_bg
@@ -322,13 +437,13 @@ class PeakDetect:
         self.info("#3 Calculate qvalues ...")
         pqtable = score_btrack.make_pq_table()
         
-        self.info("#3 Saving p-value to q-value table ...")
-        pqfhd = open(self.opt.pqtable,"w")
-        pqfhd.write( "-log10pvalue\t-log10qvalue\trank\tbasepairs\n" )
-        for p in sorted(pqtable.keys(),reverse=True):
-            q = pqtable[p]
-            pqfhd.write("%.2f\t%.2f\t%d\t%d\n" % (p/100.0,q[0]/100.0,q[1],q[2]))
-        pqfhd.close()
+        #self.info("#3 Saving p-value to q-value table ...")
+        #pqfhd = open(self.opt.pqtable,"w")
+        #pqfhd.write( "-log10pvalue\t-log10qvalue\trank\tbasepairs\n" )
+        #for p in sorted(pqtable.keys(),reverse=True):
+        #    q = pqtable[p]
+        #    pqfhd.write("%.2f\t%.2f\t%d\t%d\n" % (p/100.0,q[0]/100.0,q[1],q[2]))
+        #pqfhd.close()
 
         self.info("#3 Assign qvalues ...")
         score_btrack.assign_qvalue( pqtable )            
