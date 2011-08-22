@@ -1,4 +1,4 @@
-# Time-stamp: <2011-08-18 16:17:24 Tao Liu>
+# Time-stamp: <2011-08-21 21:36:31 Tao Liu>
 
 """Module Description
 
@@ -97,13 +97,13 @@ def opt_validate ( optparser ):
         logging.error("--shiftsize must > 0!")
         sys.exit(1)
 
-    if options.qvalue:
-        # if set, ignore pvalue cutoff
-        options.log_qvalue = log(options.qvalue,10)*-1
-        options.log_pvalue = None
-    else:
+    if options.pvalue:
+        # if set, ignore qvalue cutoff
         options.log_qvalue = None
         options.log_pvalue = log(options.pvalue,10)*-1
+    else:
+        options.log_qvalue = log(options.qvalue,10)*-1
+        options.log_pvalue = None
     
     # uppercase the format string 
     options.format = options.format.upper()
@@ -152,10 +152,10 @@ def opt_validate ( optparser ):
         "# model fold = %s\n" % (options.mfold),\
         ))
 
-    if options.qvalue:
-        options.argtxt +=  "# qvalue cutoff = %.2e\n" % (options.qvalue)
-    else:
+    if options.pvalue:
         options.argtxt +=  "# pvalue cutoff = %.2e\n" % (options.pvalue)
+    else:
+        options.argtxt +=  "# qvalue cutoff = %.2e\n" % (options.qvalue)
 
     options.tocontrol = False
     if options.tocontrol:
@@ -259,14 +259,14 @@ def opt_validate_diff ( optparser ):
         logging.error("--shiftsize must > 0!")
         sys.exit(1)
 
-    if options.qvalue:
-        # if set, ignore pvalue cutoff
-        options.log_qvalue = log(options.qvalue,10)*-1
-        options.log_pvalue = None
-    else:
+    if options.pvalue:
+        # if set, ignore qvalue cutoff
         options.log_qvalue = None
         options.log_pvalue = log(options.pvalue,10)*-1
-    
+    else:
+        options.log_qvalue = log(options.qvalue,10)*-1
+        options.log_pvalue = None
+
     # uppercase the format string 
     options.format = options.format.upper()
 
@@ -311,10 +311,10 @@ def opt_validate_diff ( optparser ):
         "# model fold = %s\n" % (options.mfold),\
         ))
 
-    if options.qvalue:
-        options.argtxt +=  "# qvalue cutoff = %.2e\n" % (options.qvalue)
-    else:
+    if options.pvalue:
         options.argtxt +=  "# pvalue cutoff = %.2e\n" % (options.pvalue)
+    else:
+        options.argtxt +=  "# qvalue cutoff = %.2e\n" % (options.qvalue)
 
     options.tocontrol = False
     if options.tocontrol:

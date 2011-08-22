@@ -1,4 +1,4 @@
-2011-08-18  Tao Liu  <taoliu@jimmy.harvard.edu>
+2011-08-21  Tao Liu  <taoliu@jimmy.harvard.edu>
 	MACS version 2.0.7 (tag:alpha)
 
 	* bin/macsdiff renamed to bin/bdgdiff
@@ -21,6 +21,11 @@
 	MACS2/PeakModel.py, MACS2/cPeakDetect.pyx
 
 	All above files are modified for the new macs2diff script.
+
+	* bin/macs2, bin/macs2diff, MACS2/OptValidator.py
+
+	Now q-value 0.01 is the default cutoff. If -p is specified,
+	p-value cutoff will be used instead.
 
 2011-07-25  Tao Liu  <vladimir.liu@gmail.com>
 	MACS version 2.0.6 (tag:alpha)

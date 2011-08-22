@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# Time-stamp: <2011-08-18 14:29:35 Tao Liu>
+# Time-stamp: <2011-08-21 21:34:59 Tao Liu>
 
 """Module Description
 
@@ -78,10 +78,10 @@ Example: %prog --t1 CTCF_GM12878.bam --c1 Control_GM12878.bam --t2 CTCF_K562.bam
                          help="Tag size. This will overide the auto detected tag size. DEFAULT: Not set")
     optparser.add_option("--bw",dest="bw",type="int",default=300,
                          help="Band width. This value is only used while building the shifting model. DEFAULT: 300")
-    optparser.add_option("-p","--pvalue",dest="pvalue",type="float",default=1e-5,
-                         help="Pvalue cutoff for peak detection. DEFAULT: 1e-5")
-    optparser.add_option("-q","--qvalue",dest="qvalue",type="float",
-                         help="FDR (q-value) cutoff for peak detection. When set (e.g. -q 0.05 or -q 1e-5), pvalue cutoff will be ignored. Default is not set.")
+    optparser.add_option("-q","--qvalue",dest="qvalue",type="float",default=0.01
+                         help="Minimum FDR (q-value) cutoff for peak detection. DEFAULT: 0.01 ")
+    optparser.add_option("-p","--pvalue",dest="pvalue",type="float",
+                         help="Pvalue cutoff for peak detection. When set (e.g. -q 0.05 or -q 1e-5), qvalue cutoff will be ignored. Default is not set.")
     optparser.add_option("-m","--mfold",dest="mfold",type="string",default="10,30",
                          help="Select the regions within MFOLD range of high-confidence enrichment ratio against background to build model. The regions must be lower than upper limit, and higher than the lower limit. DEFAULT:10,30")
     optparser.add_option("--nolambda",dest="nolambda",action="store_true",
