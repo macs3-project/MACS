@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# Time-stamp: <2011-08-21 21:43:20 Tao Liu>
+# Time-stamp: <2011-08-21 23:07:19 Tao Liu>
 
 """Module Description
 
@@ -102,7 +102,7 @@ Example: %prog --t1 CTCF_GM12878.bam --c1 Control_GM12878.bam --t2 CTCF_K562.bam
     optparser.add_option("--keep-dup",dest="keepduplicates",type="string",default="auto",
                          help="It controls the MACS behavior towards duplicate tags at the exact same location -- the same coordination and the same strand. The default 'auto' option makes MACS calculate the maximum tags at the exact same location based on binomal distribution using 1e-5 as pvalue cutoff; and the 'all' option keeps every tags. If an integer is given, at most this number of tags will be kept at the same location. Default: auto")
     optparser.add_option("-B","--bdg",dest="store_bdg",action="store_true",
-                          help="Whether or not to save extended fragment pileup, local lambda and score tracks at every bp into a bedGraph file. DEFAULT: False",
+                          help="Whether or not to save p/qvalue (depending on whether pvalue or qvalue is used) score tracks at every bp into a bedGraph file. DEFAULT: False",
                           default=False)
     optparser.add_option("--minlen",dest="minlen",type="int",
                          help="The minimum length for differential calling. By default, it will be decided as the middle of fragment sizes of treatment 1 andtreatment 2. Must be an integar larger than 0.")    
