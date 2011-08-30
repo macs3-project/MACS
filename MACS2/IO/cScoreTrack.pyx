@@ -1,4 +1,4 @@
-# Time-stamp: <2011-08-18 12:31:17 Tao Liu>
+# Time-stamp: <2011-08-29 20:19:17 Tao Liu>
 
 """Module for Feature IO classes.
 
@@ -187,15 +187,18 @@ class scoreTrackI:
         pre_v = -1e100
         pre_k = 0
         pre_l = 0
+        pre_q = 1e100                       # save the previous q-value
         pvalue2qvalue = {pre_v:[0,k,0]}              # pvalue:[qvalue,rank,bp_with_this_pvalue]
         for i in xrange(value_list.size-1,-1,-1):
             (v,l) = value_list[i]
             if v != pre_v:
                 # new value
                 q = v+int((log10(k)+f)*100) # we save integars here.
-                pvalue2qvalue[v] = [max(0,q),k, 0]
+                q = max(0,min(pre_q,q))           # make q-score monotonic
+                pvalue2qvalue[v] = [q, k, 0]
                 pvalue2qvalue[pre_v][2] = k-pvalue2qvalue[pre_v][1]
                 pre_v = v
+                pre_q = q
             k+=l
         pvalue2qvalue[pre_v][2] = k-pvalue2qvalue[pre_v][1]
         # pop the first -1e100 one

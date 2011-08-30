@@ -1,4 +1,4 @@
-# Time-stamp: <2011-08-18 11:59:08 Tao Liu>
+# Time-stamp: <2011-08-29 20:37:00 Tao Liu>
 
 """Module Description
 
@@ -114,14 +114,6 @@ def compare_treatment_vs_control ( treat, control, fragment_size, gsize, halfext
     # calculate and assign qvalues
     pqtable = score_btrack.make_pq_table()
         
-    #self.info("#3 Saving p-value to q-value table ...")
-    #pqfhd = open(self.opt.pqtable,"w")
-    #pqfhd.write( "-log10pvalue\t-log10qvalue\trank\tbasepairs\n" )
-    #for p in sorted(pqtable.keys(),reverse=True):
-    #    q = pqtable[p]
-    #    pqfhd.write("%.2f\t%.2f\t%d\t%d\n" % (p/100.0,q[0]/100.0,q[1],q[2]))
-    #pqfhd.close()
-    
     score_btrack.assign_qvalue( pqtable )
                 
     return score_btrack
@@ -333,13 +325,13 @@ class PeakDetect:
         self.info("#3 Calculate qvalues ...")
         pqtable = score_btrack.make_pq_table()
         
-        #self.info("#3 Saving p-value to q-value table ...")
-        #pqfhd = open(self.opt.pqtable,"w")
-        #pqfhd.write( "-log10pvalue\t-log10qvalue\trank\tbasepairs\n" )
-        #for p in sorted(pqtable.keys(),reverse=True):
-        #    q = pqtable[p]
-        #    pqfhd.write("%.2f\t%.2f\t%d\t%d\n" % (p/100.0,q[0]/100.0,q[1],q[2]))
-        #pqfhd.close()
+        self.info("#3 Saving p-value to q-value table ...")
+        pqfhd = open(self.opt.pqtable,"w")
+        pqfhd.write( "-log10pvalue\t-log10qvalue\trank\tbasepairs\n" )
+        for p in sorted(pqtable.keys(),reverse=True):
+            q = pqtable[p]
+            pqfhd.write("%.2f\t%.2f\t%d\t%d\n" % (p/100.0,q[0]/100.0,q[1],q[2]))
+        pqfhd.close()
 
         self.info("#3 Assign qvalues ...")
         score_btrack.assign_qvalue( pqtable )

@@ -1,9 +1,9 @@
 #!/usr/bin/env python
-# Time-stamp: <2011-08-18 12:44:10 Tao Liu>
+# Time-stamp: <2011-08-23 12:22:55 Tao Liu>
 
-"""Description: Naive call peaks from a single bedGraph track for scores.
+"""Description: Naive call differential peaks from 4 bedGraph tracks for scores.
 
-Copyright (c) 2008 Tao Liu <taoliu@jimmy.harvard.edu>
+Copyright (c) 2011 Tao Liu <taoliu@jimmy.harvard.edu>
 
 This code is free software; you can redistribute it and/or modify it
 under the terms of the BSD License (see the file COPYING included with
@@ -52,19 +52,19 @@ info    = logging.info
 # Main function
 # ------------------------------------
 def main():
-    usage = "usage: %prog <-i bedGraph> [-c CUTOFF] [-l MIN] [-g MAX] [-o PREFIX]"
+    usage = "usage: %prog <--s1 bedGraph> <--s2 bedGraph> <--s12 bedGraph> <--s21 bedGraph> [-c CUTOFF] [-l MIN] [-g MAX] [-o PREFIX]"
     description = "Call differential regions from four bedGraph files of pair-wise p/qvalue, with customized settings. Please read the descriptions of options carefully."
     
     optparser = OptionParser(version="%prog 0.1",description=description,usage=usage,add_help_option=False)
     optparser.add_option("-h","--help",action="help",help="Show this help message and exit.")
-    optparser.add_option("--s1",dest="sc1i1bdg",type="string",
-                         help="MACS p/qvalue score bedGraph, condition 1 ChIP against condition 1 Input.")
-    optparser.add_option("--s2",dest="sc2i2bdg",type="string",
-                         help="MACS p/qvalue score bedGraph, condition 2 ChIP against condition 2 Input.")
-    optparser.add_option("--s12",dest="sc1c2bdg",type="string",
-                         help="MACS p/qvalue score bedGraph, condition 1 ChIP against condition 2 ChIP.")
-    optparser.add_option("--s21",dest="sc2c1bdg",type="string",
-                         help="MACS p/qvalue score bedGraph, condition 2 ChIP against condition 1 ChIP.")    
+    optparser.add_option("--s1",dest="st1c1bdg",type="string",
+                         help="MACS p/qvalue score bedGraph, condition 1 ChIP treatment against condition 1 control input.")
+    optparser.add_option("--s2",dest="st2c2bdg",type="string",
+                         help="MACS p/qvalue score bedGraph, condition 2 ChIP treatment against condition 2 control input.")
+    optparser.add_option("--s12",dest="st1t2bdg",type="string",
+                         help="MACS p/qvalue score bedGraph, condition 1 ChIP treatment against condition 2 ChIP treatment.")
+    optparser.add_option("--s21",dest="st2t1bdg",type="string",
+                         help="MACS p/qvalue score bedGraph, condition 2 ChIP treatment against condition 1 ChIP treatment.")
     optparser.add_option("-c","--cutoff",dest="cutoff",type="float",
                          help="Cutoff depends on which method you used for score track. If the file contains p/qvalue scores from MACS2, score 5 means p/qvalue 1e-5. DEFAULT: 5",default=5)
     optparser.add_option("-l","--min-length",dest="minlen",type="int",
@@ -75,33 +75,28 @@ def main():
                          help="output file prefix, DEFAULT: peak") 
     (options,args) = optparser.parse_args()
 
-    if not (options.sc1i1bdg and options.sc2i2bdg and options.sc1c2bdg and options.sc2c1bdg):
+    if not (options.st1c1bdg and options.st2c2bdg and options.st1t2bdg and options.st2t1bdg):
         optparser.print_help()
         sys.exit()
 
     info("Read and build bedGraph...")
-    info("Score of condition 1 ChIP vs condition 1 Input...")
-    c1i1_bio = bedGraphIO.bedGraphIO(options.sc1i1bdg)
-    c1i1_btrack = c1i1_bio.build_bdgtrack(baseline_value=0)
-    info("Score of condition 2 ChIP vs condition 2 Input...")
-    c2i2_bio = bedGraphIO.bedGraphIO(options.sc2i2bdg)
-    c2i2_btrack = c2i2_bio.build_bdgtrack(baseline_value=0)
-    info("Score of condition 1 ChIP vs condition 2 ChIP...")
-    c1c2_bio = bedGraphIO.bedGraphIO(options.sc1c2bdg)
-    c1c2_btrack = c1c2_bio.build_bdgtrack(baseline_value=0)
-    info("Score of condition 2 ChIP vs condition 1 ChIP...")
-    c2c1_bio = bedGraphIO.bedGraphIO(options.sc2c1bdg)
-    c2c1_btrack = c2c1_bio.build_bdgtrack(baseline_value=0)
+    info("Score of condition 1 treatment vs condition 1 control...")
+    t1c1_bio = bedGraphIO.bedGraphIO(options.st1c1bdg)
+    t1c1_btrack = t1c1_bio.build_bdgtrack(baseline_value=0)
+    info("Score of condition 2 treatment vs condition 2 control...")
+    t2c2_bio = bedGraphIO.bedGraphIO(options.st2c2bdg)
+    t2c2_btrack = t2c2_bio.build_bdgtrack(baseline_value=0)
+    info("Score of condition 1 treatment vs condition 2 treatment...")
+    t1t2_bio = bedGraphIO.bedGraphIO(options.st1t2bdg)
+    t1t2_btrack = t1t2_bio.build_bdgtrack(baseline_value=0)
+    info("Score of condition 2 treatment vs condition 1 treatment...")
+    t2t1_bio = bedGraphIO.bedGraphIO(options.st2t1bdg)
+    t2t1_btrack = t2t1_bio.build_bdgtrack(baseline_value=0)
 
     info("Combine four score tracks...")
-    comp_btrack = make_compositeScoreTrack(c1i1_btrack,c2i2_btrack,c1c2_btrack,c2c1_btrack)
+    comp_btrack = make_compositeScoreTrack(t1c1_btrack,t2c2_btrack,t1t2_btrack,t2t1_btrack)
 
     info("Call differential regions ...")
-    #consistent_peaks = comp_btrack.call_consistent(cutoff=options.cutoff,min_length=options.minlen,max_gap=options.maxgap)
-    #info("Call condition 1 unique peaks ...")    
-    #condition1_peaks = comp_btrack.call_condition1_unique(cutoff=options.cutoff,min_length=options.minlen,max_gap=options.maxgap)
-    #info("Call condition 2 unique peaks ...")    
-    #condition2_peaks = comp_btrack.call_condition2_unique(cutoff=options.cutoff,min_length=options.minlen,max_gap=options.maxgap)
     ( consistent_peaks, condition1_peaks, condition2_peaks ) = comp_btrack.call_diff_regions(cutoff=options.cutoff,min_length=options.minlen,max_gap=options.maxgap)
 
     info("Write peaks...")
