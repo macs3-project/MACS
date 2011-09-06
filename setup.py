@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# Time-stamp: <2011-08-29 20:37:18 Tao Liu>
+# Time-stamp: <2011-09-06 16:42:13 Tao Liu>
 
 """Description
 
@@ -49,6 +49,7 @@ def main():
           packages=['MACS2', 'MACS2.IO'],
           scripts=['bin/macs2',
                    'bin/macs2diff',
+                   'bin/filterdup',
                    'bin/bdgdiff',
                    'bin/bdgcmp',
                    'bin/bdgpeakcall',

@@ -1,4 +1,4 @@
-# Time-stamp: <2011-06-20 17:31:41 Tao Liu>
+# Time-stamp: <2011-09-06 16:57:34 Tao Liu>
 
 """Module for FWTrack classes.
 
@@ -21,7 +21,7 @@ import logging
 
 from array import array
 from random import sample as random_sample
-
+from sys import stdout as sysstdout
 from MACS2.Constants import *
 
 # ------------------------------------
@@ -128,6 +128,8 @@ class FWTrackII:
                         n += 1
                         if n <= maxnum:
                             pappend(p)
+                        else:
+                            logging.debug("Duplicate reads found at %s:%d at + strand" % (k,p) )
                     else:
                         current_loc = p
                         pappend(p)
@@ -148,6 +150,8 @@ class FWTrackII:
                         n += 1
                         if n <= maxnum:
                             mappend(p)
+                        else:
+                            logging.debug("Duplicate reads found at %s:%d at - strand" % (k,p) )                            
                     else:
                         current_loc = p
                         mappend(p)
@@ -230,4 +234,22 @@ class FWTrackII:
                 for i in self.__locations[k][1]:
                     t += "%d\t1\n" % i
         return t
+
+    def print_to_bed (self, fhd=None):
+        """Output FWTrackII to BED format files. If fhd is given,
+        write to a file, otherwise, output to standard output.
+        
+        """
+        if not fhd:
+            fhd = sysstdout
+        assert isinstance(fhd, file)
+        assert self.fw > 0, "FWTrackII object .fw should be set larger than 0!"
+        for k in self.__locations.keys():
+            if self.__locations[k][0]:
+                for i in self.__locations[k][0]:
+                    fhd.write("%s\t%d\t%d\t.\t.\t%s\n" % (k,i,int(i+self.fw),"+") )
+            if self.__locations[k][1]:
+                for i in self.__locations[k][1]:
+                    fhd.write("%s\t%d\t%d\t.\t.\t%s\n" % (k,int(i-self.fw),i,"-") )
+        return
 

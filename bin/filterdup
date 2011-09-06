@@ -1,0 +1,161 @@
+#!/usr/bin/env python
+# Time-stamp: <2011-09-06 17:01:39 Tao Liu>
+
+"""Description: Filter duplicate reads depending on sequencing depth.
+
+Copyright (c) 2011 Tao Liu <taoliu@jimmy.harvard.edu>
+
+This code is free software; you can redistribute it and/or modify it
+under the terms of the Artistic License (see the file COPYING included
+with the distribution).
+
+@status: release candidate
+@version: $Id$
+@author:  Yong Zhang, Tao Liu
+@contact: taoliu@jimmy.harvard.edu
+"""
+
+# ------------------------------------
+# python modules
+# ------------------------------------
+
+import os
+import sys
+import logging
+from subprocess import Popen,PIPE
+from optparse import OptionParser
+import gzip
+
+# ------------------------------------
+# own python modules
+# ------------------------------------
+from MACS2.OptValidator import opt_validate_filterdup as opt_validate
+from MACS2.cProb import binomial_cdf_inv
+from MACS2.Constants import *
+# ------------------------------------
+# Main function
+# ------------------------------------
+def main():
+    """The Main function/pipeline for duplication filter.
+    
+    """
+    # Parse options...
+    options = opt_validate(prepare_optparser())
+    # end of parsing commandline options
+    info = options.info
+    warn = options.warn
+    debug = options.debug
+    error = options.error
+    #0 check output file
+    if options.outputfile:
+        assert not os.path.exists(options.outputfile), "%s already exists, please check!" % options.outputfile
+        outfhd = open(options.outputfile,"w")
+    else:
+        outfhd = sys.stdout
+    
+    #1 Read tag files
+    info("read tag files...")
+    fwtrack = load_tag_files_options (options)
+    
+    info("tag size = %d" % options.tsize)
+    fwtrack.fw = options.tsize
+
+    t0 = fwtrack.total
+    info(" total tags in alignment file: %d" % (t0))
+    if options.keepduplicates != "all":
+        if options.keepduplicates == "auto":
+            info("calculate max duplicate tags in single position based on binomal distribution...")
+            max_dup_tags = cal_max_dup_tags(options.gsize,t0)
+            info(" max_dup_tags based on binomal = %d" % (max_dup_tags))
+            info("filter out redundant tags at the same location and the same strand by allowing at most %d tag(s)" % (max_dup_tags))
+        else:
+            info("user defined the maximum tags...")
+            max_dup_tags = int(options.keepduplicates)
+            info("filter out redundant tags at the same location and the same strand by allowing at most %d tag(s)" % (max_dup_tags))
+
+        fwtrack.filter_dup(max_dup_tags)
+        t1 = fwtrack.total
+        info(" tags after filtering in alignment file: %d" % (t1))
+        info(" Redundant rate of alignment file: %.2f" % (float(t0-t1)/t0))
+    info("Write to BED file")
+    fwtrack.print_to_bed(fhd=outfhd)
+    info("finished! Check %s." % options.outputfile)
+
+def prepare_optparser ():
+    """Prepare optparser object. New options will be added in this
+    function first.
+    
+    """
+    usage = "usage: %prog <-t file> [-o outputfile] [-g genomesize] [options]"
+    description = "%prog -- Filter duplicate reads like in MACS. This script can also be used to convert ELAND result, ELAND multi, ELAND export, SAM, BAM, BOWTIE map formats to BED format."
+
+    optparser = OptionParser(version="%prog "+FILTERDUP_VERSION,description=description,usage=usage,add_help_option=False)
+    optparser.add_option("-h","--help",action="help",help="show this help message and exit.")
+    optparser.add_option("-t",dest="tfile",type="string",
+                         help="Sequencing alignment file. REQUIRED.")
+    optparser.add_option("-o",dest="outputfile",type="string",
+                         help="Output BED file name. If not specified, will write to standard output. DEFAULT: stdout",
+                         default=None)
+    optparser.add_option("-f","--format",dest="format",type="string",
+                         help="Format of tag file, \"AUTO\", \"BED\" or \"ELAND\" or \"ELANDMULTI\" or \"ELANDEXPORT\" or \"SAM\" or \"BAM\" or \"BOWTIE\". The default AUTO option will let %prog decide which format the file is. Please check the definition in 00README file if you choose ELAND/ELANDMULTI/ELANDEXPORT/SAM/BAM/BOWTIE. DEFAULT: \"AUTO\"",
+                         default="AUTO")
+    optparser.add_option("-g","--gsize",dest="gsize",type="string",default="hs",
+                         help="Effective genome size. It can be 1.0e+9 or 1000000000, or shortcuts:'hs' for human (2.7e9), 'mm' for mouse (1.87e9), 'ce' for C. elegans (9e7) and 'dm' for fruitfly (1.2e8), DEFAULT:hs")
+    optparser.add_option("-s","--tsize",dest="tsize",type="int",default=None,
+                         help="Tag size. This will overide the auto detected tag size. DEFAULT: Not set")
+    optparser.add_option("-p","--pvalue",dest="pvalue",type="float",
+                         help="Pvalue cutoff for binomial distribution test. DEFAULT:1e-5")
+    optparser.add_option("--keep-dup",dest="keepduplicates",type="string",default="auto",
+                         help="It controls the %prog behavior towards duplicate tags at the exact same location -- the same coordination and the same strand. The default 'auto' option makes %prog calculate the maximum tags at the exact same location based on binomal distribution using given -p as pvalue cutoff; and the 'all' option keeps every tags (useful if you only want to convert formats). If an integer is given, at most this number of tags will be kept at the same location. Default: auto")
+    optparser.add_option("--verbose",dest="verbose",type="int",default=2,
+                         help="Set verbose level. 0: only show critical message, 1: show additional warning message, 2: show process information, 3: show debug messages. If you want to know where are the duplicate reads, use 3. DEFAULT:2")
+    return optparser
+   
+def cal_max_dup_tags ( genome_size, tags_number, p=1e-5 ):
+    """Calculate the maximum duplicated tag number based on genome
+    size, total tag number and a p-value based on binomial
+    distribution. Brute force algorithm to calculate reverse CDF no
+    more than MAX_LAMBDA(100000).
+    
+    """
+    return binomial_cdf_inv(1-p,tags_number,1.0/genome_size)
+
+def load_tag_files_options ( options ):
+    """From the options, load alignment tags.
+
+    """
+    options.info("read alignment tags...")
+    tp = options.parser(open2(options.tfile))
+
+    if not options.tsize:           # override tsize if user specified --tsize
+        ttsize = tp.tsize()
+        options.tsize = ttsize
+
+    treat = tp.build_fwtrack()
+    treat.sort()
+
+    options.info("tag size is determined as %d bps" % options.tsize)
+    return treat
+
+def open2(path, mode='r', bufsize=-1):
+    # try gzip first
+    f = gzip.open(path, mode)
+    try:
+        f.read(10)
+    except IOError:
+        # not a gzipped file
+        f.close()
+        f = open(path, mode, bufsize)
+    else:
+        f.seek(0)
+    return f
+
+if __name__ == '__main__':
+    try:
+        main()
+    except KeyboardInterrupt:
+        sys.stderr.write("User interrupt me! ;-) Bye!\n")
+        sys.exit(0)
+    except AssertionError as e:
+        sys.stderr.write(e.message+"\n")
+        sys.exit(0)

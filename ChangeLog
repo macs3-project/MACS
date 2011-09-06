@@ -1,9 +1,16 @@
-2011-08-29  Tao Liu  <taoliu@jimmy.harvard.edu>
-	MACS version 2.0.8 (not tagged:alpha)
+2011-09-06  Tao Liu  <taoliu@jimmy.harvard.edu>
+	MACS version 2.0.8 (not tagged:alpha, it's not the final 2.0.8!!)
 
 	* MACS2/IO/cScoreTrack.pyx
 
 	Fix q-value calculation to generate forcefully monotonic values.
+
+	* bin/eland*2bed, bin/sam2bed and bin/filterdup
+
+	They are combined to one more powerful script called
+	"filterdup". The script filterdup can filter duplicated reads
+	according to sequencing depth and genome size. The script can also
+	convert any format supported by MACS to BED format.
 
 2011-08-21  Tao Liu  <taoliu@jimmy.harvard.edu>
 	MACS version 2.0.7 (tag:alpha)
