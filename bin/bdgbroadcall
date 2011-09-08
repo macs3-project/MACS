@@ -1,7 +1,7 @@
 #!/usr/bin/env python
-# Time-stamp: <2011-09-07 23:29:30 Tao Liu>
+# Time-stamp: <2011-09-08 11:37:06 Tao Liu>
 
-"""Description: Naive call broad peaks from a single bedGraph track for scores.
+"""Description: Fine-tuning script to call broad peaks from a single bedGraph track for scores.
 
 Copyright (c) 2011 Tao Liu <taoliu@jimmy.harvard.edu>
 
@@ -19,14 +19,10 @@ the distribution).
 # python modules
 # ------------------------------------
 
-import os
 import sys
-import re
 import logging
 from optparse import OptionParser
 from MACS2.IO import bedGraphIO
-from math import log as mlog
-from math import log10 as mlog10
 # ------------------------------------
 # constants
 # ------------------------------------
@@ -52,7 +48,7 @@ info    = logging.info
 # Main function
 # ------------------------------------
 def main():
-    usage = "usage: %prog <-i bedGraph> [-c CUTOFF] [-l MIN] [-g MAX] [-o PREFIX]"
+    usage = "usage: %prog <-i bedGraph> [-c CUTOFF1] [-C CUTOFF2] [-l MIN] [-g MAX1] [-G MAX2] [-o PREFIX]"
     description = "Call broad peaks from MACS pvalue or qscore score bedGraph output, with customized settings. Output two files for narrow peaks in encodePeak format, and one for broad peaks in bed12 format."
     
     optparser = OptionParser(version="%prog 0.1",description=description,usage=usage,add_help_option=False)
@@ -61,12 +57,14 @@ def main():
                          help="MACS pvalue score bedGraph")
     optparser.add_option("-c","--cutoff-peak",dest="cutoffpeak",type="float",
                          help="Cutoff for peaks depending on which method you used for score track. If the file contains qvalue scores from MACS2, score 2 means qvalue 0.01. DEFAULT: 2",default=2)
-    optparser.add_option("-d","--cutoff-low",dest="cutofflink",type="float",
-                         help="Cutoff for linkage regions/low abundance regions depending on which method you used for score track. If the file contains qvalue scores from MACS2, score 1 means qvalue 0.1, and score 0.3 means qvalue 0.5. DEFAULT: 5",default=1)
+    optparser.add_option("-C","--cutoff-link",dest="cutofflink",type="float",
+                         help="Cutoff for linking regions/low abundance regions depending on which method you used for score track. If the file contains qvalue scores from MACS2, score 1 means qvalue 0.1, and score 0.3 means qvalue 0.5. DEFAULT: 5",default=1)
     optparser.add_option("-l","--min-length",dest="minlen",type="int",
                          help="minimum length of peak, better to set it as d value. DEFAULT: 200",default=200)
-    optparser.add_option("-g","--max-gap",dest="maxgap",type="int",
+    optparser.add_option("-g","--lvl1-max-gap",dest="lvl1maxgap",type="int",
                          help="maximum gap between significant peaks, better to set it as tag size. DEFAULT: 30",default=30)
+    optparser.add_option("-G","--lvl2-max-gap",dest="lvl2maxgap",type="int",
+                         help="maximum linking between significant peaks, better to set it as tag size. DEFAULT: 30",default=800)
     optparser.add_option("-o","--o-prefix",dest="oprefix",default="peak",
                          help="output file prefix, DEFAULT: peak") 
     (options,args) = optparser.parse_args()
@@ -80,13 +78,13 @@ def main():
     btrack = bio.build_bdgtrack(baseline_value=0)
 
     info("Call peaks from bedGraph...")
-    (peaks,bpeaks) = btrack.call_broadpeaks (lvl1_cutoff=options.cutoffpeak, lvl2_cutoff=options.cutofflink, min_length=options.minlen, lvl1_max_gap=options.maxgap, lvl2_max_gap=options.minlen*2)
+    (peaks,bpeaks) = btrack.call_broadpeaks (lvl1_cutoff=options.cutoffpeak, lvl2_cutoff=options.cutofflink, min_length=options.minlen, lvl1_max_gap=options.lvl1maxgap, lvl2_max_gap=options.lvl2maxgap)
 
     info("Write peaks...")
     #pf = open ("%s_c%.0f_l%d_g%d_peaks.bed" % (options.oprefix,options.cutoffpeak,options.minlen,options.maxgap),"w")
     #sf = open ("%s_c%.0f_l%d_g%d_summits.bed" % (options.oprefix,options.cutoffpeak,options.minlen,options.maxgap),"w")
     nf = open ("%s_c%.0f_l%d_g%d_peaks.encodePeak" % (options.oprefix,options.cutoffpeak,options.minlen,options.maxgap),"w")
-    bf = open ("%s_c1%.0f_c2%.0f_l%d_g%d_broad.bed" % (options.oprefix,options.cutoffpeak,options.cutofflink,options.minlen,options.maxgap),"w")        
+    bf = open ("%s_c%.0f_C%.0f_l%d_g%d_G%d_broad.bed" % (options.oprefix,options.cutoffpeak,options.cutofflink,options.minlen,options.lvl1maxgap,lvl12maxgap),"w")        
     #peaks.write_to_bed(pf,name_prefix=options.oprefix+"_peak_", score_column="score")
     #peaks.write_to_summit_bed(sf,name_prefix=options.oprefix+"_summit_", score_column="score")
     peaks.write_to_narrowPeak(nf, name_prefix=options.oprefix+"_encodePeak", score_column="score")
