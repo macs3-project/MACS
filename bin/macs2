@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# Time-stamp: <2011-09-08 00:38:10 Tao Liu>
+# Time-stamp: <2011-09-08 15:49:30 Tao Liu>
 
 """Description: MACS 2 main executable
 
@@ -197,10 +197,11 @@ def main():
     peakdetect.peaks.write_to_narrowPeak (ofhd_bed, name_prefix="MACS_peak_", score_column=score_column)
     ofhd_bed.close()
     #4.2 broad peaks in bed12
-    options.info("#4 Write broad peak in bed12 format file... %s" % (options.peakBroadPeak))
-    ofhd_bed = open(options.peakBroadPeak,"w")
-    peakdetect.broadpeaks.write_to_gappedPeak (ofhd_bed, name_prefix="MACS_peak_", name=options.name, description=options.name)
-    ofhd_bed.close()
+    if options.broad:
+        options.info("#4 Write broad peak in bed12 format file... %s" % (options.peakBroadPeak))
+        ofhd_bed = open(options.peakBroadPeak,"w")
+        peakdetect.broadpeaks.write_to_gappedPeak (ofhd_bed, name_prefix="MACS_peak_", name=options.name, description=options.name)
+        ofhd_bed.close()
     #4.2-2 summits in BED
     options.info("#4 Write summits bed file... %s" % (options.summitbed))
     ofhd_summits = open(options.summitbed,"w")
