@@ -1,4 +1,4 @@
-# Time-stamp: <2011-08-29 20:37:00 Tao Liu>
+# Time-stamp: <2011-09-08 00:25:51 Tao Liu>
 
 """Module Description
 
@@ -185,9 +185,15 @@ class PeakDetect:
         self.final_peaks and self.final_negative_peaks.
         """
         if self.control:                # w/ control
-            self.peaks = self.__call_peaks_w_control ()
+            if self.opt.broad:
+                (self.peaks,self.broadpeaks) = self.__call_peaks_w_control()
+            else:
+                self.peaks = self.__call_peaks_w_control ()
         else:                           # w/o control
-            self.peaks = self.__call_peaks_wo_control ()
+            if self.opt.broad:
+                (self.peaks,self.broadpeaks) = self.__call_peaks_wo_control()
+            else:
+                self.peaks = self.__call_peaks_wo_control ()
         return self.peaks
 
     # def diag_result (self):
@@ -338,11 +344,21 @@ class PeakDetect:
                 
         # call peaks
         if self.pvalue:
-            self.info("#3 Call peaks with given -log10pvalue cutoff: %.2f ..." % self.pvalue)        
-            peaks = score_btrack.call_peaks(cutoff=self.pvalue*100,min_length=self.d,max_gap=self.opt.tsize,colname='-100logp')
+            if self.opt.broad:
+                self.info("#3 Call broad peaks with given level1 -log10pvalue cutoff and level2: %.2f, %.2f..." % (self.pvalue,self.opt.linkingcutoff) )
+                peaks = score_btrack.call_broadpeaks(lvl1_cutoff=self.pvalue*100,lvl2_cutoff=self.opt.linkingcutoff*100,min_length=self.d,
+                                                     lvl1_max_gap=self.opt.tsize,lvl2_max_gap=self.d*4,colname='-100logp')
+            else:
+                self.info("#3 Call peaks with given -log10pvalue cutoff: %.2f ..." % self.pvalue)                
+                peaks = score_btrack.call_peaks(cutoff=self.pvalue*100,min_length=self.d,max_gap=self.opt.tsize,colname='-100logp')
         elif self.qvalue:
-            self.info("#3 Call peaks with given -log10qvalue cutoff: %.2f ..." % self.qvalue)        
-            peaks = score_btrack.call_peaks(cutoff=self.qvalue*100,min_length=self.d,max_gap=self.opt.tsize,colname='-100logq')
+            if self.opt.broad:
+                self.info("#3 Call broad peaks with given level1 -log10qvalue cutoff and level2: %.2f, %.2f..." % (self.qvalue,self.opt.linkingcutoff) )
+                peaks = score_btrack.call_broadpeaks(lvl1_cutoff=self.qvalue*100,lvl2_cutoff=self.opt.linkingcutoff*100,min_length=self.d,
+                                                     lvl1_max_gap=self.opt.tsize,lvl2_max_gap=self.d*4,colname='-100logq')
+            else:
+                self.info("#3 Call peaks with given -log10qvalue cutoff: %.2f ..." % self.qvalue)        
+                peaks = score_btrack.call_peaks(cutoff=self.qvalue*100,min_length=self.d,max_gap=self.opt.tsize,colname='-100logq')
             
         if self.opt.store_bdg:
            self.info("#3 save tag pileup into bedGraph file...")
@@ -442,11 +458,21 @@ class PeakDetect:
 
         # call peaks
         if self.pvalue:
-            self.info("#3 Call peaks with given -log10pvalue cutoff: %.2f ..." % self.pvalue)        
-            peaks = score_btrack.call_peaks(cutoff=self.pvalue*100,min_length=self.d,max_gap=self.opt.tsize,colname='-100logp')
+            if self.opt.broad:
+                self.info("#3 Call broad peaks with given level1 -log10pvalue cutoff and level2: %.2f, %.2f..." % (self.pvalue,self.opt.linkingcutoff) )
+                peaks = score_btrack.call_broadpeaks(lvl1_cutoff=self.pvalue*100,lvl2_cutoff=self.opt.linkingcutoff*100,min_length=self.d,
+                                                     lvl1_max_gap=self.opt.tsize,lvl2_max_gap=self.d*4,colname='-100logp')
+            else:
+                self.info("#3 Call peaks with given -log10pvalue cutoff: %.2f ..." % self.pvalue)                
+                peaks = score_btrack.call_peaks(cutoff=self.pvalue*100,min_length=self.d,max_gap=self.opt.tsize,colname='-100logp')
         elif self.qvalue:
-            self.info("#3 Call peaks with given -log10qvalue cutoff: %.2f ..." % self.qvalue)        
-            peaks = score_btrack.call_peaks(cutoff=self.qvalue*100,min_length=self.d,max_gap=self.opt.tsize,colname='-100logq')
+            if self.opt.broad:
+                self.info("#3 Call broad peaks with given level1 -log10qvalue cutoff and level2: %.2f, %.2f..." % (self.qvalue,self.opt.linkingcutoff) )
+                peaks = score_btrack.call_broadpeaks(lvl1_cutoff=self.qvalue*100,lvl2_cutoff=self.opt.linkingcutoff*100,min_length=self.d,
+                                                     lvl1_max_gap=self.opt.tsize,lvl2_max_gap=self.d*4,colname='-100logq')
+            else:
+                self.info("#3 Call peaks with given -log10qvalue cutoff: %.2f ..." % self.qvalue)        
+                peaks = score_btrack.call_peaks(cutoff=self.qvalue*100,min_length=self.d,max_gap=self.opt.tsize,colname='-100logq')
 
         if self.opt.store_bdg:
            self.info("#3 save tag pileup into bedGraph file...")

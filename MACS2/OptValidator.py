@@ -1,4 +1,4 @@
-# Time-stamp: <2011-09-06 16:52:13 Tao Liu>
+# Time-stamp: <2011-09-08 00:35:32 Tao Liu>
 
 """Module Description
 
@@ -104,6 +104,8 @@ def opt_validate ( optparser ):
     else:
         options.log_qvalue = log(options.qvalue,10)*-1
         options.log_pvalue = None
+    if options.broad:
+        options.linkingcutoff = log(options.linkingcutoff,10)*-1
     
     # uppercase the format string 
     options.format = options.format.upper()
@@ -118,7 +120,8 @@ def opt_validate ( optparser ):
     # output filenames
     options.peakxls = options.name+"_peaks.xls"
     options.peakbed = options.name+"_peaks.bed"
-    options.peakNarrowPeak = options.name+"_peaks.encodePeak"    
+    options.peakNarrowPeak = options.name+"_peaks.encodePeak"
+    options.peakBroadPeak = options.name+"_broad_peaks.bed"
     options.summitbed = options.name+"_summits.bed"
     options.zwig_tr = options.name+"_treat"
     options.zwig_ctl= options.name+"_control"
