@@ -1,4 +1,4 @@
-# Time-stamp: <2011-07-07 23:44:30 Tao Liu>
+# Time-stamp: <2011-09-07 18:42:01 Tao Liu>
 
 """Module for PeakIO IO classes.
 
@@ -282,78 +282,121 @@ class PeakIO:
                            (chrom,peak["start"],peak["end"],name_prefix,n_peak,int(10*peak[score_column]),
                             peak["fc"],peak["pscore"],peak["qscore"],peak["summit"]-peak["start"]) )
 
-    # def merge_overlap ( self ):
-    #     """peak_candidates[chrom] = [(peak_start,peak_end,peak_length,peak_summit,peak_height,number_cpr_tags)...]
 
-    #     """
-    #     peaks = self.peaks
-    #     new_peaks = {}
-    #     chrs = peaks.keys()
-    #     chrs.sort()
-    #     for chrom in chrs:
-    #         new_peaks[chrom]=[]
-    #         n_append = new_peaks[chrom].append
-    #         prev_peak = None
-    #         peaks_chr = peaks[chrom]
-    #         for i in xrange(len(peaks_chr)):
-    #             if not prev_peak:
-    #                 prev_peak = peaks_chr[i]
-    #                 continue
-    #             else:
-    #                 if peaks_chr[i][0] <= prev_peak[1]:
-    #                     s_new_peak = prev_peak[0]
-    #                     e_new_peak = peaks_chr[i][1]
-    #                     l_new_peak = e_new_peak-s_new_peak
-    #                     if peaks_chr[i][4] > prev_peak[4]:
-    #                         summit_new_peak = peaks_chr[i][3]
-    #                         h_new_peak = peaks_chr[i][4]
-    #                     else:
-    #                         summit_new_peak = prev_peak[3]
-    #                         h_new_peak = prev_peak[4]
-    #                     prev_peak = [s_new_peak,e_new_peak,l_new_peak,summit_new_peak,h_new_peak,peaks_chr[i][5]+prev_peak[5]]
-    #                 else:
-    #                     n_append(prev_peak)
-    #                     prev_peak = peaks_chr[i]
-    #         if prev_peak:
-    #             n_append(prev_peak)
-    #     #del peaks
-    #     self.peaks = new_peaks
-    #     return True
+###
+                
+class BroadPeakIO:
+    """IO for broad peak information.
 
-    # def overlap_with_other_peaks (self, peaks2, cover=0):
-    #     """Peaks2 is a PeakIO object or dictionary with can be
-    #     initialzed as a PeakIO. check __init__ for PeakIO for detail.
+    """
 
-    #     return how many peaks are intersected by peaks2 by percentage
-    #     coverage on peaks2(if 50%, cover = 0.5).
-    #     """
-    #     peaks1 = self.peaks
-    #     if isinstance(peaks2,PeakIO):
-    #         peaks2 = peaks2.peaks
-    #     total_num = 0
-    #     chrs1 = peaks1.keys()
-    #     chrs2 = peaks2.keys()
-    #     for k in chrs1:
-    #         if not chrs2.count(k):
-    #             continue
-    #         rl1_k = iter(peaks1[k])
-    #         rl2_k = iter(peaks2[k])
-    #         tmp_n = False
-    #         try:
-    #             r1 = rl1_k.next()
-    #             r2 = rl2_k.next()
-    #             while (True):
-    #                 if r2[0] < r1[1] and r1[0] < r2[1]:
-    #                     a = sorted([r1[0],r1[1],r2[0],r2[1]])
-    #                     if float(a[2]-a[1]+1)/r2[2] > cover:
-    #                         if not tmp_n:
-    #                             total_num+=1
-    #                             tmp_n = True
-    #                 if r1[1] < r2[1]:
-    #                     r1 = rl1_k.next()
-    #                     tmp_n = False
-    #                 else:
-    #                     r2 = rl2_k.next()
-    #         except StopIteration:
-    #             continue
-    #     return total_num
+    def __init__ (self):
+        self.peaks = {}
+    
+    def add (self, char * chromosome, long start, long end, long score = 0,
+             long thickStart=0, long thickEnd=0,
+             long blockNum=0, char *blockSizes="", 
+             char * blockStarts="" ):
+        """items
+        chromosome : chromosome name,
+        start      : broad region start,
+        end        : broad region end,
+        score      : average score in all blocks,
+        thickStart : start of highly enriched region,
+        thickEnd   : end of highly enriched region,
+        blockNum   : number of blocks,
+        blockSizes : sizes of blocks,
+        blockStarts: starts of blocks
+        """
+        if not self.peaks.has_key(chromosome):
+            self.peaks[chromosome]=[]
+        self.peaks[chromosome].append({"start":start,
+                                       "end":end,
+                                       "score":score,
+                                       "thickStart":thickStart,
+                                       "thickEnd":thickEnd,
+                                       "blockNum":blockNum,
+                                       "blockSizes":blockSizes,
+                                       "blockStarts":blockStarts,
+                                       }
+                                      )
+
+    def total (self):
+        peaks = self.peaks
+        chrs = peaks.keys()
+        chrs.sort()
+        x = 0
+        for chrom in chrs:
+            x += len(peaks[chrom])
+        return x
+  
+    def write_to_gappedPeak (self, fhd, name_prefix="peak_", name="peak", description="peak description"):
+        """Print out peaks in bed12 format.
+
+        This format is basically a BED12 format.
+
+        +--------------+------+----------------------------------------+
+        |field         |type  |description                             |
+        +--------------+------+----------------------------------------+
+        |chrom         |string|Name of the chromosome                  |
+        +--------------+------+----------------------------------------+
+        |chromStart    |int   |The starting position of the feature in |
+        |              |      |the chromosome. The first base in a     |
+        |              |      |chromosome is numbered 0.               |
+        +--------------+------+----------------------------------------+
+        |chromEnd      |int   |The ending position of the feature in   |
+        |              |      |the chromosome or scaffold. The chromEnd|
+        |              |      |base is not included in the display of  |
+        |              |      |the feature.  For example, the first 100|
+        |              |      |bases of a chromosome are defined as    |
+        |              |      |chromStart=0, chromEnd=100, and span the|
+        |              |      |bases numbered 0-99.                    |
+        +--------------+------+----------------------------------------+
+        |name          |string|Name given to a region (preferably      |
+        |              |      |unique). Use '.' if no name is assigned.|
+        +--------------+------+----------------------------------------+
+        |score         |int   |Indicates how dark the peak will be     |
+        |(always use   |      |displayed in the browser (1-1000). If   |
+        |1000 for      |      |'0', the DCC will assign this based on  |
+        |the           |      |signal value. Ideally average           |
+        |thickest      |      |signalValue per base spread between     |
+        |color)        |      |100-1000.                               |
+        +--------------+------+----------------------------------------+
+        |strand        |char  |+/- to denote strand or orientation     |
+        |(always .)    |      |(whenever applicable). Use '.' if no    |
+        |              |      |orientation is assigned.                |
+        +--------------+------+----------------------------------------+
+        |thickStart    |int   | The starting position at which the     |
+        |              |      |feature is drawn thickly. Mark the start|
+        |              |      |of highly enriched regions.             |
+        |              |      |                                        |
+        +--------------+------+----------------------------------------+
+        |thickEnd      |int   | The ending position at which the       |
+        |              |      |feature is drawn thickly. Mark the end  |
+        |              |      |of highly enriched regions.             |
+        +--------------+------+----------------------------------------+
+        |itemRGB       |string| Not used. Set it as 0.                 |
+        +--------------+------+----------------------------------------+
+        |blockCounts   |int   | The number of blocks (exons) in the BED|
+        |              |      |line.                                   |
+        +--------------+------+----------------------------------------+
+        |blockSizes    |string| A comma-separated list of the block    |
+        |              |      |sizes.                                  |
+        +--------------+------+----------------------------------------+
+        |blockStarts   |string| A comma-separated list of block starts.|
+        +--------------+------+----------------------------------------+
+       
+        """
+        chrs = self.peaks.keys()
+        chrs.sort()
+        n_peak = 0
+        fhd.write("track name=\"%s\" description=\"%s\" type=bed nextItemButton=on\n" % (name, description) )
+        for chrom in chrs:
+            for peak in self.peaks[chrom]:
+                n_peak += 1
+                fhd.write( "%s\t%d\t%d\t%s%d\t%d\t.\t%d\t%d\t0\t%d\t%s\t%s\n"
+                           %
+                           (chrom,peak["start"],peak["end"],name_prefix,n_peak,int(peak["score"]),
+                            peak["thickStart"],peak["thickEnd"],
+                            peak["blockNum"],peak["blockSizes"],peak["blockStarts"] ) )
+

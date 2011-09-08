@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# Time-stamp: <2011-09-06 16:42:13 Tao Liu>
+# Time-stamp: <2011-09-07 18:40:26 Tao Liu>
 
 """Description
 
@@ -53,6 +53,7 @@ def main():
                    'bin/bdgdiff',
                    'bin/bdgcmp',
                    'bin/bdgpeakcall',
+                   'bin/bdgbroadcall',
                    ],
           classifiers=[
               'Development Status :: 4 - experimental',

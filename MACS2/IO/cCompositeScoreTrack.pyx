@@ -1,4 +1,4 @@
-# Time-stamp: <2011-07-23 01:13:35 Tao Liu>
+# Time-stamp: <2011-09-07 14:27:41 Tao Liu>
 
 """Module for Composite Score Track IO classes.
 
@@ -43,9 +43,9 @@ __doc__ = "scoreTrackI classes"
 # ------------------------------------
 
 class compositeScoreTrackI:
-    """Class for composite scoreGraph type data. Modified from
-    bedGraphTrackI. The only difference is that we store pvalue score,
-    qvalue score and foldchange together.
+    """Class for composite scoreGraph type data for two
+    conditions. Modified from bedGraphTrackI. The only difference is
+    that we store pvalue score, qvalue score and foldchange together.
 
     In bedGraph, data are represented as continuous non-overlapping
     regions in the whole genome. I keep this assumption in all the

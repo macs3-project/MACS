@@ -1,4 +1,4 @@
-# Time-stamp: <2011-08-18 12:39:30 Tao Liu>
+# Time-stamp: <2011-09-07 23:19:25 Tao Liu>
 
 """Module for Feature IO classes.
 
@@ -28,7 +28,7 @@ from libc.math cimport sqrt
 from MACS2.Constants import *
 from MACS2.cProb import poisson_cdf
 from MACS2.IO.cScoreTrack import scoreTrackI
-from MACS2.IO.cPeakIO import PeakIO
+from MACS2.IO.cPeakIO import PeakIO, BroadPeakIO
 
 # ------------------------------------
 # constants
@@ -391,8 +391,86 @@ class bedGraphTrackI:
                                    fold_change = 0,
                                    qscore      = 0
                                    )
-            
         return peaks
+
+    def call_broadpeaks (self, lvl1_cutoff=500, lvl2_cutoff=100, min_length=200, lvl1_max_gap=50, lvl2_max_gap=400):
+        """This function try to find enriched regions within which,
+        scores are continuously higher than a given cutoff for level
+        1, and link them using the gap above level 2 cutoff with a
+        maximum length of lvl2_max_gap.
+
+        lvl1_cutoff:  cutoff of value at enriched regions, default 500.
+        lvl2_cutoff:  cutoff of value at linkage regions, default 100.        
+        min_length :  minimum peak length, default 200.
+        lvl1_max_gap   :  maximum gap to merge nearby enriched peaks, default 50.
+        lvl2_max_gap   :  maximum length of linkage regions, default 400.        
+        colname: can be 'sample','control','-100logp','-100logq'. Cutoff will be applied to the specified column.
+
+        Return both general PeakIO object for highly enriched regions
+        and gapped broad regions in BroadPeakIO.
+        """
+        assert lvl1_cutoff > lvl2_cutoff, "level 1 cutoff should be larger than level 2."
+        assert lvl1_max_gap < lvl2_max_gap, "level 2 maximum gap should be larger than level 1."        
+        lvl1_peaks = self.call_peaks(cutoff=lvl1_cutoff, min_length=min_length, max_gap=lvl1_max_gap)
+        lvl2_peaks = self.call_peaks(cutoff=lvl2_cutoff, min_length=min_length, max_gap=lvl2_max_gap)
+        chrs = lvl1_peaks.peaks.keys()
+        broadpeaks = BroadPeakIO()
+        # use lvl2_peaks as linking regions between lvl1_peaks
+        for chrom in chrs:
+            lvl1peakschrom = lvl1_peaks.peaks[chrom]
+            lvl2peakschrom = lvl2_peaks.peaks[chrom]
+            lvl1peakschrom_next = iter(lvl1peakschrom).next
+            tmppeakset = []             # to temporarily store lvl1 region inside a lvl2 region
+            # our assumption is lvl1 regions should be included in lvl2 regions
+            try:
+                lvl1 = lvl1peakschrom_next()
+            except StopIteration:
+                break
+            for lvl2 in lvl2peakschrom:
+                # for each lvl2 peak, find all lvl1 peaks inside
+                try:
+                    while True:
+                        if lvl2["start"] <= lvl1["start"]  and lvl1["end"] <= lvl2["end"]:
+                            tmppeakset.append(lvl1)
+                        else:
+                            if tmppeakset:
+                                self.__add_broadpeak ( broadpeaks, chrom, lvl2, tmppeakset)
+                            tmppeakset = []
+                            break
+                        lvl1 = lvl1peakschrom_next()
+                except StopIteration:
+                    if tmppeakset:
+                        self.__add_broadpeak ( broadpeaks, chrom, lvl2, tmppeakset)                    
+                    break
+        
+        return lvl1_peaks, broadpeaks
+
+    def __add_broadpeak (self, bpeaks, chrom, lvl2peak, lvl1peakset):
+        """Internal function to create broad peak.
+        
+        """
+        start      = lvl2peak["start"]
+        end        = lvl2peak["end"]
+        thickStart = lvl1peakset[0]["start"]
+        thickEnd   = lvl1peakset[-1]["end"]
+        blockNum   = len(lvl1peakset)
+        blockSizes = ",".join( map(lambda x:str(x["length"]),lvl1peakset) )
+        blockStarts = ",".join( map(lambda x:str(x["start"]-start),lvl1peakset) )
+        if lvl2peak["start"] != thickStart:
+            # add 1bp mark for the start of lvl2 peak
+            blockNum += 1
+            blockSizes = "1,"+blockSizes
+            blockStarts = "0,"+blockStarts
+        if lvl2peak["end"] != thickEnd:
+            # add 1bp mark for the end of lvl2 peak            
+            blockNum += 1
+            blockSizes = blockSizes+",1"
+            blockStarts = blockStarts+","+str(end-start-1)
+        
+        bpeaks.add(chrom, start, end, score=1000, thickStart=thickStart, thickEnd=thickEnd,
+                   blockNum = blockNum, blockSizes = blockSizes, blockStarts = blockStarts)
+        return bpeaks
+
 
     def total (self):
         """Return the number of regions in this object.
@@ -523,7 +601,7 @@ class bedGraphTrackI:
     def make_scoreTrack_for_macs (self, bdgTrack2 ):
         """A modified overlie function for MACS v2.
 
-        Return value (-1000*log10pvalue as integer, a trick) is a bedGraphTrackI object.
+        Return value is a bedGraphTrackI object.
         """
         assert isinstance(bdgTrack2,bedGraphTrackI), "bdgTrack2 is not a bedGraphTrackI object"
 

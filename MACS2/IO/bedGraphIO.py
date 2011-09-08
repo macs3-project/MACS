@@ -1,4 +1,4 @@
-# Time-stamp: <2011-06-19 19:02:32 Tao Liu>
+# Time-stamp: <2011-09-07 22:28:15 Tao Liu>
 
 """Module Description:  IO Module for bedGraph file
 
