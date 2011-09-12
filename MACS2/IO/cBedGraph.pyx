@@ -1,4 +1,4 @@
-# Time-stamp: <2011-09-07 23:19:25 Tao Liu>
+# Time-stamp: <2011-09-11 23:47:59 Tao Liu>
 
 """Module for Feature IO classes.
 
@@ -467,7 +467,7 @@ class bedGraphTrackI:
             blockSizes = blockSizes+",1"
             blockStarts = blockStarts+","+str(end-start-1)
         
-        bpeaks.add(chrom, start, end, score=1000, thickStart=thickStart, thickEnd=thickEnd,
+        bpeaks.add(chrom, start, end, score=lvl2peak["score"], thickStart=thickStart, thickEnd=thickEnd,
                    blockNum = blockNum, blockSizes = blockSizes, blockStarts = blockStarts)
         return bpeaks
 
