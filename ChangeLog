@@ -1,5 +1,12 @@
-2011-09-06  Tao Liu  <taoliu@jimmy.harvard.edu>
-	MACS version 2.0.8 (not tagged:alpha, it's not the final 2.0.8!!)
+2011-09-15  Tao Liu  <taoliu@jimmy.harvard.edu>
+	MACS version 2.0.8 (tag:alpha)
+
+	* bin/macs2, bin/bdgbroadcall, MACS2/IO/cScoreTrack.pyx, MACS2/IO/cBedGraph.pyx
+
+	New script bdgbroadcall and the extra option '--broad' for macs2
+	script, can be used to call broad regions with a loose cutoff to
+	link nearby significant regions. The output is represented as
+	BED12 format.
 
 	* MACS2/IO/cScoreTrack.pyx
 

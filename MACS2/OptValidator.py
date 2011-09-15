@@ -1,4 +1,4 @@
-# Time-stamp: <2011-09-08 00:35:32 Tao Liu>
+# Time-stamp: <2011-09-15 15:03:08 Tao Liu>
 
 """Module Description
 
@@ -105,7 +105,7 @@ def opt_validate ( optparser ):
         options.log_qvalue = log(options.qvalue,10)*-1
         options.log_pvalue = None
     if options.broad:
-        options.linkingcutoff = log(options.linkingcutoff,10)*-1
+        options.log_broadcutoff = log(options.broadcutoff,10)*-1
     
     # uppercase the format string 
     options.format = options.format.upper()
@@ -170,6 +170,11 @@ def opt_validate ( optparser ):
         options.argtxt += "# Range for calculating regional lambda is: %d bps and %d bps\n" % (options.smalllocal,options.largelocal)
     else:
         options.argtxt += "# Range for calculating regional lambda is: %d bps\n" % (options.largelocal)
+
+    if options.broad:
+        options.argtxt += "# Broad region calling is on\n"
+    else:
+        options.argtxt += "# Broad region calling is off\n"
 
     if options.halfext:
         options.argtxt += "# MACS will make 1/2d size fragments\n"

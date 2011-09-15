@@ -1,4 +1,4 @@
-# Time-stamp: <2011-09-08 00:25:51 Tao Liu>
+# Time-stamp: <2011-09-15 14:58:21 Tao Liu>
 
 """Module Description
 
@@ -145,8 +145,8 @@ class PeakDetect:
         #self.femin = opt.femin
         #self.festep = opt.festep
                 
-        self.pvalue = opt.log_pvalue    # -log10pvalue
-        self.qvalue = opt.log_qvalue    # -log10qvalue
+        self.log_pvalue = opt.log_pvalue    # -log10pvalue
+        self.log_qvalue = opt.log_qvalue    # -log10qvalue
         if d != None:
             self.d = d
         else:
@@ -343,22 +343,22 @@ class PeakDetect:
         score_btrack.assign_qvalue( pqtable )
                 
         # call peaks
-        if self.pvalue:
+        if self.log_pvalue:
             if self.opt.broad:
-                self.info("#3 Call broad peaks with given level1 -log10pvalue cutoff and level2: %.2f, %.2f..." % (self.pvalue,self.opt.linkingcutoff) )
-                peaks = score_btrack.call_broadpeaks(lvl1_cutoff=self.pvalue*100,lvl2_cutoff=self.opt.linkingcutoff*100,min_length=self.d,
+                self.info("#3 Call broad peaks with given level1 -log10pvalue cutoff and level2: %.2f, %.2f..." % (self.log_pvalue,self.opt.log_broadcutoff) )
+                peaks = score_btrack.call_broadpeaks(lvl1_cutoff=self.log_pvalue*100,lvl2_cutoff=self.opt.log_broadcutoff*100,min_length=self.d,
                                                      lvl1_max_gap=self.opt.tsize,lvl2_max_gap=self.d*4,colname='-100logp')
             else:
-                self.info("#3 Call peaks with given -log10pvalue cutoff: %.2f ..." % self.pvalue)                
-                peaks = score_btrack.call_peaks(cutoff=self.pvalue*100,min_length=self.d,max_gap=self.opt.tsize,colname='-100logp')
-        elif self.qvalue:
+                self.info("#3 Call peaks with given -log10pvalue cutoff: %.2f ..." % self.log_pvalue)                
+                peaks = score_btrack.call_peaks(cutoff=self.log_pvalue*100,min_length=self.d,max_gap=self.opt.tsize,colname='-100logp')
+        elif self.log_qvalue:
             if self.opt.broad:
-                self.info("#3 Call broad peaks with given level1 -log10qvalue cutoff and level2: %.2f, %.2f..." % (self.qvalue,self.opt.linkingcutoff) )
-                peaks = score_btrack.call_broadpeaks(lvl1_cutoff=self.qvalue*100,lvl2_cutoff=self.opt.linkingcutoff*100,min_length=self.d,
+                self.info("#3 Call broad peaks with given level1 -log10qvalue cutoff and level2: %f, %f..." % (self.log_qvalue,self.opt.log_broadcutoff) )
+                peaks = score_btrack.call_broadpeaks(lvl1_cutoff=self.log_qvalue*100,lvl2_cutoff=self.opt.log_broadcutoff*100,min_length=self.d,
                                                      lvl1_max_gap=self.opt.tsize,lvl2_max_gap=self.d*4,colname='-100logq')
             else:
-                self.info("#3 Call peaks with given -log10qvalue cutoff: %.2f ..." % self.qvalue)        
-                peaks = score_btrack.call_peaks(cutoff=self.qvalue*100,min_length=self.d,max_gap=self.opt.tsize,colname='-100logq')
+                self.info("#3 Call peaks with given -log10qvalue cutoff: %.2f ..." % self.log_qvalue)        
+                peaks = score_btrack.call_peaks(cutoff=self.log_qvalue*100,min_length=self.d,max_gap=self.opt.tsize,colname='-100logq')
             
         if self.opt.store_bdg:
            self.info("#3 save tag pileup into bedGraph file...")
@@ -457,22 +457,22 @@ class PeakDetect:
         score_btrack.assign_qvalue( pqtable )            
 
         # call peaks
-        if self.pvalue:
+        if self.log_pvalue:
             if self.opt.broad:
-                self.info("#3 Call broad peaks with given level1 -log10pvalue cutoff and level2: %.2f, %.2f..." % (self.pvalue,self.opt.linkingcutoff) )
-                peaks = score_btrack.call_broadpeaks(lvl1_cutoff=self.pvalue*100,lvl2_cutoff=self.opt.linkingcutoff*100,min_length=self.d,
+                self.info("#3 Call broad peaks with given level1 -log10pvalue cutoff and level2: %.2f, %.2f..." % (self.log_pvalue,self.opt.log_broadcutoff) )
+                peaks = score_btrack.call_broadpeaks(lvl1_cutoff=self.log_pvalue*100,lvl2_cutoff=self.opt.log_broadcutoff*100,min_length=self.d,
                                                      lvl1_max_gap=self.opt.tsize,lvl2_max_gap=self.d*4,colname='-100logp')
             else:
-                self.info("#3 Call peaks with given -log10pvalue cutoff: %.2f ..." % self.pvalue)                
-                peaks = score_btrack.call_peaks(cutoff=self.pvalue*100,min_length=self.d,max_gap=self.opt.tsize,colname='-100logp')
-        elif self.qvalue:
+                self.info("#3 Call peaks with given -log10pvalue cutoff: %.2f ..." % self.log_pvalue)                
+                peaks = score_btrack.call_peaks(cutoff=self.log_pvalue*100,min_length=self.d,max_gap=self.opt.tsize,colname='-100logp')
+        elif self.log_qvalue:
             if self.opt.broad:
-                self.info("#3 Call broad peaks with given level1 -log10qvalue cutoff and level2: %.2f, %.2f..." % (self.qvalue,self.opt.linkingcutoff) )
-                peaks = score_btrack.call_broadpeaks(lvl1_cutoff=self.qvalue*100,lvl2_cutoff=self.opt.linkingcutoff*100,min_length=self.d,
+                self.info("#3 Call broad peaks with given level1 -log10qvalue cutoff and level2: %.2f, %.2f..." % (self.log_qvalue,self.opt.log_broadcutoff) )
+                peaks = score_btrack.call_broadpeaks(lvl1_cutoff=self.log_qvalue*100,lvl2_cutoff=self.opt.log_broadcutoff*100,min_length=self.d,
                                                      lvl1_max_gap=self.opt.tsize,lvl2_max_gap=self.d*4,colname='-100logq')
             else:
-                self.info("#3 Call peaks with given -log10qvalue cutoff: %.2f ..." % self.qvalue)        
-                peaks = score_btrack.call_peaks(cutoff=self.qvalue*100,min_length=self.d,max_gap=self.opt.tsize,colname='-100logq')
+                self.info("#3 Call peaks with given -log10qvalue cutoff: %.2f ..." % self.log_qvalue)        
+                peaks = score_btrack.call_peaks(cutoff=self.log_qvalue*100,min_length=self.d,max_gap=self.opt.tsize,colname='-100logq')
 
         if self.opt.store_bdg:
            self.info("#3 save tag pileup into bedGraph file...")

@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# Time-stamp: <2011-09-08 15:49:30 Tao Liu>
+# Time-stamp: <2011-09-15 14:46:34 Tao Liu>
 
 """Description: MACS 2 main executable
 
@@ -271,9 +271,9 @@ or example for broad peak calling: %prog -t ChIP.bam -c Control.bam --broad -g h
                           help="Whether or not to save extended fragment pileup, local lambda and score tracks at every bp into a bedGraph file. DEFAULT: False",
                           default=False)
     optparser.add_option("--broad",dest="broad",action="store_true",
-                         help="If set, MACS will try to call broad peaks by linking nearby highly enriched regions as SICER. The linking region is controlled by another cutoff through --linking-cutoff. The maximum linking region length is 4 times of d from MACS. DEFAULT: False",default=False)
-    optparser.add_option("--linking-cutoff",dest="linkingcutoff",type="float",default=0.1,
-                         help="Cutoff for linking region. This option is not available whiel --broad is set. If -p is set, this is a pvalue cutoff, otherwise, it's a qvalue cutoff. DEFAULT: 0.1 ")
+                         help="If set, MACS will try to call broad peaks by linking nearby highly enriched regions. The linking region is controlled by another cutoff through --linking-cutoff. The maximum linking region length is 4 times of d from MACS. DEFAULT: False",default=False)
+    optparser.add_option("--broad-cutoff",dest="broadcutoff",type="float",default=0.1,
+                         help="Cutoff for broad region. This option is not available unless --broad is set. If -p is set, this is a pvalue cutoff, otherwise, it's a qvalue cutoff. DEFAULT: 0.1 ")
     optparser.add_option("--verbose",dest="verbose",type="int",default=2,
                          help="Set verbose level. 0: only show critical message, 1: show additional warning message, 2: show process information, 3: show debug messages. DEFAULT:2")
     return optparser

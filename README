@@ -1,5 +1,5 @@
-README for MACS (2.0.7)
-Time-stamp: <2011-08-18 14:42:11 Tao Liu>
+README for MACS (2.0.8)
+Time-stamp: <2011-09-15 15:18:39 Tao Liu>
 
 * Introduction
 
@@ -23,7 +23,7 @@ Please check the file 'INSTALL' in the distribution.
 
 Usage: macs2 <-t tfile> [-n name] [-g genomesize] [options]
 
-Example: macs2 -t ChIP.bam -c Control.bam -f BAM -g hs -n test -B
+Example: macs2 -t ChIP.bam -c Control.bam -f BAM -g hs -n test -B -q 0.01
 
 
 macs2 -- Model-based Analysis for ChIP-Sequencing
@@ -32,9 +32,9 @@ Options:
   --version             show program's version number and exit
   -h, --help            show this help message and exit.
   -t TFILE, --treatment=TFILE
-                        ChIP-seq treatment files. REQUIRED.
+                        ChIP-seq treatment file. REQUIRED.
   -c CFILE, --control=CFILE
-                        Control files.
+                        Control file.
   -n NAME, --name=NAME  Experiment name, which will be used to generate output
                         file names. DEFAULT: "NA"
   -f FORMAT, --format=FORMAT
@@ -55,8 +55,13 @@ Options:
                         size. DEFAULT: Not set
   --bw=BW               Band width. This value is only used while building the
                         shifting model. DEFAULT: 300
+  -q QVALUE, --qvalue=QVALUE
+                        Minimum FDR (q-value) cutoff for peak detection.
+                        DEFAULT: 0.01
   -p PVALUE, --pvalue=PVALUE
-                        Pvalue cutoff for peak detection. DEFAULT: 1e-5
+                        Pvalue cutoff for peak detection. When set (e.g. -q
+                        0.05 or -q 1e-5), qvalue cutoff will be ignored.
+                        Default is not set.
   -m MFOLD, --mfold=MFOLD
                         Select the regions within MFOLD range of high-
                         confidence enrichment ratio against background to
@@ -103,31 +108,38 @@ Options:
                         pvalue cutoff; and the 'all' option keeps every tags.
                         If an integer is given, at most this number of tags
                         will be kept at the same location. Default: auto
-  --to-control          When set, scale the ChIP data towards Control data, by
-                        default, the control will be scaled towards ChIP.
-                        DEFAULT: False
   --shift-control       When set, control tags will be shifted just as ChIP
                         tags according to their strand before the extension of
                         d, slocal and llocal. By default, control tags are
                         extended centered at their current positions
                         regardless of strand. You may consider to turn this
-                        option on while comparing two ChIP datasets of the
-                        same factor. DEFAULT: False
+                        option on while comparing two ChIP datasets of
+                        different condition but the same factor. DEFAULT:
+                        False
   --half-ext            When set, MACS extends 1/2 d size for each fragment
                         centered at its middle point. DEFAULT: False
   -B, --bdg             Whether or not to save extended fragment pileup, local
                         lambda and score tracks at every bp into a bedGraph
                         file. DEFAULT: False
+  --broad               If set, MACS will try to call broad peaks by linking
+                        nearby highly enriched regions as SICER. The linking
+                        region is controlled by another cutoff through
+                        --linking-cutoff. The maximum linking region length is
+                        4 times of d from MACS. DEFAULT: False
+  --linking-cutoff=LINKINGCUTOFF
+                        Cutoff for linking region. This option is not
+                        available whiel --broad is set. If -p is set, this is
+                        a pvalue cutoff, otherwise, it's a qvalue cutoff.
+                        DEFAULT: 0.1
   --verbose=VERBOSE     Set verbose level. 0: only show critical message, 1:
                         show additional warning message, 2: show process
                         information, 3: show debug messages. DEFAULT:2
-
 
 ** Parameters:
 
 *** -t/--treatment FILENAME
 
-This is the only REQUIRED parameter for MACS. Y
+This is the only REQUIRED parameter for MACS.
 
 *** -c/--control
 
@@ -270,6 +282,8 @@ this, under Unix/Mac or Cygwin (for windows OS), type:
 
 $ cat replicate1.bed replicate2.bed replicate3.bed > all_replicates.bed
 
+For BAM or SAM files, samtools can be used to combine replicates.
+
 4) ELAND export format support sometimes may not work on your
 datasets, because people may mislabel the 11th and 12th column. MACS
 uses 11th column as the sequence name which should be the chromosome
@@ -315,15 +329,19 @@ size.
 
 *** --bw
 
-The band width which is used to scan the genome for model
+The band width which is used to scan the genome ONLY for model
 building. You can set this parameter as the sonication fragment size
 expected from wet experiment. The previous side effect on the peak
 detection process has been removed. So this parameter only affects the
 model building.
 
+*** -q/--qvalue
+
+The qvalue cutoff to call significant regions. Default is 0.01.
+
 *** -p/--pvalue
 
-The pvalue cutoff. Default is 1e-5.
+The pvalue cutoff. If -p is specified, MACS2 will use pvalue instead of qvalue.
 
 *** -m/--mfold
 
@@ -383,6 +401,21 @@ location based on binomal distribution using 1e-5 as pvalue cutoff;
 and the 'all' option keeps every tags.  If an integer is given, at
 most this number of tags will be kept at the same location. Default:
 auto
+
+** --broad              
+
+When this flag is on, MACS will try to composite broad regions in
+BED12 ( a gene-model-like format ) by putting nearby highly enriched
+regions into a broad region with loose cutoff. The broad region is
+controlled by another cutoff through --broad-cutoff. The maximum
+length of broad region length is 4 times of d from MACS. DEFAULT:
+False
+
+** --broad-cutoff
+
+Cutoff for broad region. This option is not available unless --broad
+is set. If -p is set, this is a pvalue cutoff, otherwise, it's a
+qvalue cutoff.  DEFAULT: 0.1
 
 ** --to-small is obsolete, check --to-control
 
@@ -462,20 +495,38 @@ let MACS choose the following fold enrichment ranges to consider:
 
  2. NAME_peaks.bed is BED format file which contains the peak
  locations. You can load it to UCSC genome browser or Affymetrix IGB
- software.
+ software. The file can be loaded directly to UCSC genome
+ browser. Remove the beginning track line if you want to analyze it by
+ other tools.
 
  3. NAME_peaks.encodePeak is BED6+4 format file which contains the
  peak locations together with peak summit, pvalue and qvalue. You can
  load it to UCSC genome browser. Definition of some specific columns
  are: 5th: -log10pvalue*10, 7th: fold-change, 8th: -log10pvalue, 9th:
- -log10qvalue, 10th: relative summit position to peak start.
+ -log10qvalue, 10th: relative summit position to peak start. The file
+ can be loaded directly to UCSC genome browser. Remove the beginning
+ track line if you want to analyze it by other tools.
 
  4. NAME_summits.bed is in BED format, which contains the peak summits
  locations for every peaks. The 5th column in this file is
  -log10pvalue the same as NAME_peaks.bed. If you want to find the
- motifs at the binding sites, this file is recommended.
+ motifs at the binding sites, this file is recommended. The file can
+ be loaded directly to UCSC genome browser. Remove the beginning track
+ line if you want to analyze it by other tools.
 
- 5. NAME_model.r is an R script which you can use to produce a PDF
+ 5. NAME_broad_peaks.bed is in BED12 format which contains both the
+ broad region and narrow peaks. The 5th column is 100*-log10pvalue, to
+ be more compatible to UCSC standard. Tht 7th is the start of the
+ first narrow peak in the region, and the 8th column is the end. The
+ 9th column should be RGB color key, however, we keep 0 here to use
+ the default color, so change it if you want. The 10th column tells
+ how many blocks including the starting 1bp and ending 1bp of broad
+ regions. The 11th column shows the length of each blocks, and 12th
+ for the starts of each blocks. The file can be loaded directly to
+ UCSC genome browser. Remove the beginning track line if you want to
+ analyze it by other tools.
+
+ 6. NAME_model.r is an R script which you can use to produce a PDF
  image about the model based on your data. Load it to R by:
 
 $ R --vanilla < NAME_model.r
@@ -483,15 +534,10 @@ $ R --vanilla < NAME_model.r
 Then a pdf file NAME_model.pdf will be generated in your current
 directory. Note, R is required to draw this figure.
 
- 6. The .bdg files are in bedGraph format which can be imported to
+ 7. The .bdg files are in bedGraph format which can be imported to
  UCSC genome browser or be converted into even smaller bigWig
  files. Four kinds of bdg files include treat_pileup, control_lambda,
  treat_pvalue, and treat_qvalue. 
-
- 7. NAME_diag.xls is the diagnosis report. First column is for various
- fold_enrichment ranges; the second column is number of peaks for that fc
- range; after 3rd columns are the percentage of peaks covered after
- sampling 90%, 80%, 70% ... and 20% of the total tags. (not available currently)
 
  8. NAME_pqtable.txt store the -log10pvalue, -log10qvalue, rank of
   this pvalue, and number of bp having this pvalue.
@@ -518,7 +564,8 @@ Check the three scripts within MACSv2 package:
  2. bdgpeakcall can be used on *_treat_pvalue.bdg or the file
  generated from bdgcmp or bedGraph file from other resources to call
  peaks with given cutoff, maximum-gap between nearby mergable peaks
- and minimum length of peak.
+ and minimum length of peak. bdgbroadcall works similarly to
+ bdgpeakcall, however it will output _broad_peaks.bed in BED12 format.
 
  3. Differential calling tool -- bdgdiff, can be used on 4 bedgraph
  files which are scores between treatment 1 and control 1, treatment 2
