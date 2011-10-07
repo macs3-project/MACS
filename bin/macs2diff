@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# Time-stamp: <2011-08-21 23:07:19 Tao Liu>
+# Time-stamp: <2011-10-06 23:28:36 Tao Liu>
 
 """Module Description
 
@@ -97,7 +97,7 @@ Example: %prog --t1 CTCF_GM12878.bam --c1 Control_GM12878.bam --t2 CTCF_K562.bam
     optparser.add_option("--nomodel",dest="nomodel",action="store_true",
                          help="Whether or not to build the shifting model. If True, MACS will not build model. by default it means shifting size = 100, try to set shiftsize to change it. DEFAULT: False",
                          default=False)
-    optparser.add_option("--shiftsize",dest="shiftsize",type="int",default=100,
+9    optparser.add_option("--shiftsize",dest="shiftsize",type="int",default=100,
                          help="The arbitrary shift size in bp. When nomodel is true, MACS will use this value as 1/2 of fragment size. DEFAULT: 100 ")
     optparser.add_option("--keep-dup",dest="keepduplicates",type="string",default="auto",
                          help="It controls the MACS behavior towards duplicate tags at the exact same location -- the same coordination and the same strand. The default 'auto' option makes MACS calculate the maximum tags at the exact same location based on binomal distribution using 1e-5 as pvalue cutoff; and the 'all' option keeps every tags. If an integer is given, at most this number of tags will be kept at the same location. Default: auto")
@@ -196,7 +196,7 @@ def remove_duplicates ( taskoptions):
     return tagsinfo
 
 def macs2pqvalues ( task_options ):
-    ( name, treat, control, diff_options, slocal, llocal, shiftcontrol ) = task_options
+    ( name, treat, control, diff_options, slocal, llocal, tocontrol, shiftcontrol ) = task_options
     if diff_options.nomodel:
         d = diff_options.shiftsize * 2
     else:
@@ -220,7 +220,7 @@ def macs2pqvalues ( task_options ):
 
     scoretrack = compare_treatment_vs_control ( treat, control, d, diff_options.gsize,
                                                 halfext=False, slocal=slocal, llocal=llocal,
-                                                tocontrol=False, shiftcontrol=shiftcontrol )
+                                                tocontrol=tocontrol, shiftcontrol=shiftcontrol )
 
     if diff_options.log_qvalue:
         bdgtrack = scoreTracktoBedGraph( scoretrack, colname='-100logq' )
@@ -277,11 +277,28 @@ def main():
     #3 Build Model
     info("#3 do 4-way comparisons ...")
     pool = multiprocessing.Pool(options.nprocesses)
-    # extra parameters passed to macs2run are 1) slocal, 2) llocal, 3) whether or not 'shift control';
-    tasks = [ ('t1c1', treat1, control1, options, options.smalllocal, options.largelocal, False),
-              ('t2c2', treat2, control2, options, options.smalllocal, options.largelocal, False),
-              ('t1t2', treat1, treat2, options, 0, 0, True),
-              ('t2t1', treat2, treat1, options, 0, 0, True) ]
+
+    # I wish to do something correct... When t1 and t2 have different
+    # sequencing depth, the direction of the scaling is very
+    # tricky. At least, we should keep the direction the same while
+    # comparing t1 vs t2 or t2 vs t1. It means, to always scale t1 to
+    # t2 or t2 to t1. To be safe (specific), we scale larger dataset
+    # to smaller one.
+
+    if treat1.total > treat2.total:
+        tocontrol1 = True         # tocontrol1: whether scale t1 to t2
+        tocontrol2 = False        # tocontrol1: whether scale t2 to t1
+    else:
+        tocontrol1 = False
+        tocontrol2 = True        
+    
+    # extra parameters passed to macs2run are 1) slocal, 2) llocal, 3)
+    # whether or not scale 'treatment' towards 'control', 4) whether
+    # or not 'shift control';
+    tasks = [ ('t1c1', treat1, control1, options, options.smalllocal, options.largelocal, False, False),
+              ('t2c2', treat2, control2, options, options.smalllocal, options.largelocal, False, False),
+              ('t1t2', treat1, treat2, options, 0, 0, tocontrol1, True),
+              ('t2t1', treat2, treat1, options, 0, 0, tocontrol2, True) ]
     results =  pool.map( macs2pqvalues, tasks )
     pool.close()
     pool.join()
