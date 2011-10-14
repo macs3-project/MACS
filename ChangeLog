@@ -1,3 +1,15 @@
+2011-10-15  Tao Liu  <taoliu@jimmy.harvard.edu>
+	MACS version 2.0.9 (not yet tag:alpha)
+
+	* bin/macs2, bin/macs2diff
+
+	Now, the default scaling while treatment and input are unbalanced
+	has been adjusted. By default, larger sample will be scaled down
+	linearly to match the smaller sample. In this way, background
+	noise will be reduced more than real signals, so we expect to have
+	more specific results than the other way around (i.e. --to-large
+	is set).
+
 2011-09-15  Tao Liu  <taoliu@jimmy.harvard.edu>
 	MACS version 2.0.8 (tag:alpha)
 

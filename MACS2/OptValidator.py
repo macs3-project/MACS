@@ -1,4 +1,4 @@
-# Time-stamp: <2011-09-15 15:03:08 Tao Liu>
+# Time-stamp: <2011-10-13 16:26:00 Tao Liu>
 
 """Module Description
 
@@ -160,11 +160,10 @@ def opt_validate ( optparser ):
     else:
         options.argtxt +=  "# qvalue cutoff = %.2e\n" % (options.qvalue)
 
-    options.tocontrol = False
-    if options.tocontrol:
-        options.argtxt += "# ChIP dataset will be scaled towards Control dataset.\n"
+    if options.tolarge:
+        options.argtxt += "# Smaller dataset will be scaled towards larger dataset.\n"
     else:
-        options.argtxt += "# Control dataset will be scaled towards ChIP dataset.\n"
+        options.argtxt += "# Larger dataset will be scaled towards smaller dataset.\n"
 
     if options.cfile:
         options.argtxt += "# Range for calculating regional lambda is: %d bps and %d bps\n" % (options.smalllocal,options.largelocal)
@@ -324,11 +323,10 @@ def opt_validate_diff ( optparser ):
     else:
         options.argtxt +=  "# qvalue cutoff = %.2e\n" % (options.qvalue)
 
-    options.tocontrol = False
-    if options.tocontrol:
-        options.argtxt += "# ChIP dataset will be scaled towards Control dataset.\n"
+    if options.tolarge:
+        options.argtxt += "# Smaller dataset will be scaled towards larger dataset.\n"
     else:
-        options.argtxt += "# Control dataset will be scaled towards ChIP dataset.\n"
+        options.argtxt += "# Larger dataset will be scaled towards smaller dataset.\n"
 
     if options.cfile1 or options.cfile2:
         options.argtxt += "# Range for calculating regional lambda is: %d bps and %d bps\n" % (options.smalllocal,options.largelocal)
