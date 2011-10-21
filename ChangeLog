@@ -1,7 +1,7 @@
 2011-10-15  Tao Liu  <taoliu@jimmy.harvard.edu>
-	MACS version 2.0.9 (not yet tag:alpha)
+	MACS version 2.0.9 (tag:alpha)
 
-	* bin/macs2, bin/macs2diff
+	* Scaling issue
 
 	Now, the default scaling while treatment and input are unbalanced
 	has been adjusted. By default, larger sample will be scaled down
@@ -9,6 +9,20 @@
 	noise will be reduced more than real signals, so we expect to have
 	more specific results than the other way around (i.e. --to-large
 	is set).
+
+	* Peak summit
+
+	Now, MACS will decide peak summits according to pileup height
+	instead of qvalue scores. In this way, the summit may be more
+	accurate. 
+
+	* Diff score
+
+	MACS calculate qvalue scores as differential scores. When compare
+	two conditions (saying A and B), the maximum qscore for comparing
+	A to B -- maxqscore_a2b, and for comparing B to A --maxqscore_b2a
+	will be computed. If maxqscore_a2b is bigger, the diff score is
+	+maxqscore_a2b, otherwise, diff score is -1*maxqscore_b2a.
 
 2011-09-15  Tao Liu  <taoliu@jimmy.harvard.edu>
 	MACS version 2.0.8 (tag:alpha)
