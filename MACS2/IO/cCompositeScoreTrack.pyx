@@ -1,4 +1,4 @@
-# Time-stamp: <2011-09-07 14:27:41 Tao Liu>
+# Time-stamp: <2011-10-21 01:49:32 Tao Liu>
 
 """Module for Composite Score Track IO classes.
 
@@ -374,15 +374,10 @@ class compositeScoreTrackI:
 
 
     def call_diff_regions (self, cutoff=50, min_length=200, max_gap=50):
-        """This function try to find regions within which, scores
-        are continuously higher than a given cutoff.
+        """A function to call differential regions and common regions together.
 
-        Consistent peaks are those met all the following criteria
-
-        1. sc1i1 >= cutoff
-        2. sc2i2 >= cutoff
-        3. sc1c2 <= cutoff
-        4. sc2c1 <= cutoff
+        Return: common_regions, condition1_unique, and condition2_unique regions
+        
         """
         chrs  = self.get_chr_names()
         consistent_peaks = PeakIO()                      # dictionary to save peaks
@@ -415,78 +410,116 @@ class compositeScoreTrackI:
                     # for points met all criteria
                     # if the gap is allowed
                     if not consistent_peak_content:
-                        consistent_peak_content = [ ( pre_p, p, 0, i ) ]
+                        consistent_peak_content = [ ( pre_p, p, vc1i1, vc2i2, vc1c2, vc2c1, i ), ] # for consistent region, summit is decided by condition 1
                     if pre_p - consistent_peak_content[ -1 ][ 1 ] <= max_gap:
-                        consistent_peak_content.append( ( pre_p, p, 0, i ) )
+                        consistent_peak_content.append( ( pre_p, p, vc1i1, vc2i2, vc1c2, vc2c1, i ) )
                     else:
                         # when the gap is not allowed, close this peak
+                        # this is common region.
+                        
                         peak_length = consistent_peak_content[ -1 ][ 1 ] - consistent_peak_content[ 0 ][ 0 ]
                         if peak_length >= min_length: # if the peak is too small, reject it
+
+                            # the absolute of peak score or the diff
+                            # score is the maximum of max[vc1c2,] and
+                            # max[vc2c1,]. If max[vc1c2,] is bigger,
+                            # the sign for peak score is
+                            # '+'. Otherwise, the sign is '-'
+
+                            m_c1c2 = max([x[4] for x in consistent_peak_content ])
+                            m_c2c1 = max([x[5] for x in consistent_peak_content ])                            
+                            if m_c1c2 >= m_c2c1:
+                                diff_score = m_c1c2
+                            else:
+                                diff_score = -1* m_c2c1
+
                             consistent_peaks.add( chrom,
                                                   consistent_peak_content[0][0],
                                                   consistent_peak_content[-1][1],
                                                   summit      = 0,
-                                                  peak_score  = 0,
+                                                  peak_score  = diff_score,
                                                   pileup      = 0,
                                                   pscore      = 0,
                                                   fold_change = 0,
                                                   qscore      = 0,
                                                   )
                         # start a new peak
-                        consistent_peak_content = [ ( pre_p, p, 0, i ), ]
+                        consistent_peak_content = [ ( pre_p, p, vc1i1, vc2i2, vc1c2, vc2c1, i ), ]
                 elif vc1i1 >= cutoff and vc1c2 >= cutoff:
                     if not condition1_peak_content:
-                        condition1_peak_content = [ ( pre_p, p, 0, i ) ]
+                        condition1_peak_content = [ ( pre_p, p, vc1i1, vc2i2, vc1c2, vc2c1, i ),  ]
                     if pre_p - condition1_peak_content[ -1 ][ 1 ] <= max_gap:
-                        condition1_peak_content.append( ( pre_p, p, 0, i ) )
+                        condition1_peak_content.append( ( pre_p, p, vc1i1, vc2i2, vc1c2, vc2c1, i )  )
                     else:
                         # when the gap is not allowed, close this peak
+                        # this is condition1 unique region
                         peak_length = condition1_peak_content[ -1 ][ 1 ] - condition1_peak_content[ 0 ][ 0 ]
                         if peak_length >= min_length: # if the peak is too small, reject it
+                            # the absolute of peak score or the diff
+                            # score is the maximum of max[vc1c2,] and
+                            # max[vc2c1,]. If max[vc1c2,] is bigger,
+                            # the sign for peak score is
+                            # '+'. Otherwise, the sign is '-'
+
+                            diff_score = max([x[4] for x in condition1_peak_content ])
+                            #m_c2c1 = max([x[5] in condition2_peak_content ])                            
+                            #if m_c1c2 >= mc2c1:
+                            ##    diff_score = m_c1c2
+                            #else:
+                            #    diff_score = -1* m_c2c1
+
                             condition1_peaks.add( chrom,
                                                   condition1_peak_content[0][0],
                                                   condition1_peak_content[-1][1],
                                                   summit      = 0,
-                                                  peak_score  = 0,
+                                                  peak_score  = diff_score,
                                                   pileup      = 0,
                                                   pscore      = 0,
                                                   fold_change = 0,
                                                   qscore      = 0,
                                                   )
                         # start a new peak
-                        condition1_peak_content = [ ( pre_p, p, 0, i ), ]
+                        condition1_peak_content = [ ( pre_p, p, vc1i1, vc2i2, vc1c2, vc2c1, i ), ]
                 elif vc2i2 >= cutoff and vc2c1 >= cutoff:
                     if not condition2_peak_content:
-                        condition2_peak_content = [ ( pre_p, p, 0, i ) ]
+                        condition2_peak_content = [ ( pre_p, p, vc1i1, vc2i2, vc1c2, vc2c1, i ), ]
                     if pre_p - condition2_peak_content[ -1 ][ 1 ] <= max_gap:
-                        condition2_peak_content.append( ( pre_p, p, 0, i ) )
+                        condition2_peak_content.append( ( pre_p, p, vc1i1, vc2i2, vc1c2, vc2c1, i ) )
                     else:
                         # when the gap is not allowed, close this peak
+                        # condition 2 unique peaks
                         peak_length = condition2_peak_content[ -1 ][ 1 ] - condition2_peak_content[ 0 ][ 0 ]
                         if peak_length >= min_length: # if the peak is too small, reject it
+                            diff_score = -1 * max([x[5] for x in condition2_peak_content ])
                             condition2_peaks.add( chrom,
                                                   condition2_peak_content[0][0],
                                                   condition2_peak_content[-1][1],
                                                   summit      = 0,
-                                                  peak_score  = 0,
+                                                  peak_score  = diff_score,
                                                   pileup      = 0,
                                                   pscore      = 0,
                                                   fold_change = 0,
                                                   qscore      = 0,
                                                   )
                         # start a new peak
-                        condition2_peak_content = [ ( pre_p, p, 0, i ), ]
+                        condition2_peak_content = [ ( pre_p, p, vc1i1, vc2i2, vc1c2, vc2c1, i ), ]
                 pre_p = p
             
             # save the last regions
             if consistent_peak_content:
                 peak_length = consistent_peak_content[ -1 ][ 1 ] - consistent_peak_content[ 0 ][ 0 ]
                 if peak_length >= min_length: # if the peak is too small, reject it
+                    m_c1c2 = max([x[4] for x in consistent_peak_content ])
+                    m_c2c1 = max([x[5] for x in consistent_peak_content ])                            
+                    if m_c1c2 >= mc2c1:
+                        diff_score = m_c1c2
+                    else:
+                        diff_score = -1* m_c2c1                    
                     consistent_peaks.add( chrom,
                                           consistent_peak_content[0][0],
                                           consistent_peak_content[-1][1],
                                           summit      = 0,
-                                          peak_score  = 0,
+                                          peak_score  = diff_score,
                                           pileup      = 0,
                                           pscore      = 0,
                                           fold_change = 0,
@@ -495,11 +528,12 @@ class compositeScoreTrackI:
             elif condition1_peak_content:
                 peak_length = condition1_peak_content[ -1 ][ 1 ] - condition1_peak_content[ 0 ][ 0 ]
                 if peak_length >= min_length: # if the peak is too small, reject it
+                    diff_score = max([x[4] for x in condition1_peak_content ])
                     condition1_peaks.add( chrom,
                                           condition1_peak_content[0][0],
                                           condition1_peak_content[-1][1],
                                           summit      = 0,
-                                          peak_score  = 0,
+                                          peak_score  = diff_score,
                                           pileup      = 0,
                                           pscore      = 0,
                                           fold_change = 0,
@@ -508,6 +542,7 @@ class compositeScoreTrackI:
             elif condition2_peak_content:
                 peak_length = condition2_peak_content[ -1 ][ 1 ] - condition2_peak_content[ 0 ][ 0 ]
                 if peak_length >= min_length: # if the peak is too small, reject it
+                    diff_score = -1 * max([x[5] for x in condition2_peak_content ])                    
                     condition2_peaks.add( chrom,
                                           condition2_peak_content[0][0],
                                           condition2_peak_content[-1][1],

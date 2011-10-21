@@ -1,4 +1,4 @@
-# Time-stamp: <2011-09-11 23:47:41 Tao Liu>
+# Time-stamp: <2011-10-21 01:58:53 Tao Liu>
 
 """Module for Feature IO classes.
 
@@ -233,6 +233,7 @@ class scoreTrackI:
         min_length :  minimum peak length, default 200.
         gap   :  maximum gap to merge nearby peaks, default 50.
         colname: can be 'sample','control','-100logp','-100logq'. Cutoff will be applied to the specified column.
+        ptrack:  an optional track for pileup heights. If it's not None, use it to find summits. Otherwise, use self/scoreTrack.
         """
         assert (colname in [ 'sample', 'control', '-100logp', '-100logq' ]), "%s not supported!" % colname
 
@@ -257,9 +258,10 @@ class scoreTrackI:
                 # try to read the first data range for this chrom
                 p = chrom_pos[ x ]
                 v = chrom_score[ x ]
+                summit_v = chrom_sample[ x ] # I will use pileup height to find summit instead of other kinds of scores                
                 x += 1                  # index for the next point
                 if v >= cutoff:
-                    peak_content = [ ( pre_p, p, v, x ), ] # remember the index too...
+                    peak_content = [ ( pre_p, p, v, summit_v, x ), ] # remember the index too...
                     pre_p = p
                     break               # found the first range above cutoff
                 else:
@@ -269,13 +271,14 @@ class scoreTrackI:
                 # continue scan the rest regions
                 p = chrom_pos[ i ]
                 v = chrom_score[ i ]
-                if v < cutoff:
+                summit_v = chrom_sample[ i ] # I will use pileup height to find summit instead of other kinds of scores
+                if v < cutoff:               # But score is still used to find boundaries
                     pre_p = p
                     continue
                 # for points above cutoff
                 # if the gap is allowed
                 if pre_p - peak_content[ -1 ][ 1 ] <= max_gap:
-                    peak_content.append( ( pre_p, p, v, i ) )
+                    peak_content.append( ( pre_p, p, v, summit_v, i ) ) # put chunks above cutoff in a temporary list
                 else:
                     # when the gap is not allowed, close this peak
                     peak_length = peak_content[ -1 ][ 1 ] - peak_content[ 0 ][ 0 ]
@@ -283,16 +286,16 @@ class scoreTrackI:
                         tmpsummit = []
                         summit_pos   = None
                         summit_value = None
-                        for (tmpstart,tmpend,tmpvalue,tmpindex) in peak_content:
-                            if not summit_value or summit_value < tmpvalue:
+                        for (tmpstart,tmpend,tmpvalue,tmpsummitvalue, tmpindex) in peak_content:
+                            if not summit_value or summit_value < tmpsummitvalue:
                                 tmpsummit = [ int(( tmpend+tmpstart )/2), ]
                                 tmpsummit_index = [ tmpindex, ]
-                                summit_value = tmpvalue
-                            elif summit_value == tmpvalue:
+                                summit_value = tmpsummitvalue
+                            elif summit_value == tmpsummitvalue:
                                 # remember continuous summit values
                                 tmpsummit.append( int( (tmpend+tmpstart)/2 ) )
                                 tmpsummit_index.append( tmpindex )
-                        middle_summit = int( ( len(tmpsummit)+1 )/2 )-1
+                        middle_summit = int( ( len(tmpsummit)+1 )/2 )-1 # the middle of all highest points in peak region is defined as summit
                         summit_pos    = tmpsummit[ middle_summit ]
                         summit_index  = tmpsummit_index[ middle_summit ]
                         # char * chromosome, long start, long end, long summit = 0, 
@@ -302,14 +305,14 @@ class scoreTrackI:
                                    peak_content[0][0],
                                    peak_content[-1][1],
                                    summit      = summit_pos,
-                                   peak_score  = summit_value,
-                                   pileup      = chrom_sample[ summit_index ],
+                                   peak_score  = chrom_score [ summit_index ],
+                                   pileup      = chrom_sample[ summit_index ], # should be the same as summit_value
                                    pscore      = chrom_pvalue[ summit_index ]/100.0,
                                    fold_change = chrom_sample[ summit_index ]/chrom_control[ summit_index ],
                                    qscore      = chrom_qvalue[ summit_index ]/100.0,
                                    )
                     # start a new peak
-                    peak_content = [ ( pre_p, p, v, i ), ]
+                    peak_content = [ ( pre_p, p, v, summit_v, i ), ]
                 pre_p = p
                 
             # save the last peak
@@ -317,14 +320,15 @@ class scoreTrackI:
                 continue
             peak_length = peak_content[ -1 ][ 1 ] - peak_content[ 0 ][ 0 ]
             if peak_length >= min_length: # if the peak is too small, reject it
+                tmpsummit = []
                 summit_pos = None
                 summit_value = None
-                for (tmpstart,tmpend,tmpvalue,tmpindex) in peak_content:
-                    if not summit_value or summit_value < tmpvalue:
+                for (tmpstart,tmpend,tmpvalue,tmpsummitvalue, tmpindex) in peak_content:
+                    if not summit_value or summit_value < tmpsummitvalue:
                         tmpsummit = [ int(( tmpend+tmpstart )/2), ]
                         tmpsummit_index = [ tmpindex, ]
-                        summit_value = tmpvalue
-                    elif summit_value == tmpvalue:
+                        summit_value = tmpsummitvalue
+                    elif summit_value == tmpsummitvalue:
                         # remember continuous summit values
                         tmpsummit.append( int( (tmpend+tmpstart)/2 ) )
                         tmpsummit_index.append( tmpindex )
@@ -336,8 +340,8 @@ class scoreTrackI:
                            peak_content[0][0],
                            peak_content[-1][1],
                            summit      = summit_pos,
-                           peak_score  = summit_value,
-                           pileup      = chrom_sample[ summit_index ],
+                           peak_score  = chrom_score [ summit_index ],
+                           pileup      = chrom_sample[ summit_index ], # should be the same as summit_value
                            pscore      = chrom_pvalue[ summit_index ]/100.0,
                            fold_change = chrom_sample[ summit_index ]/chrom_control[ summit_index ],
                            qscore      = chrom_qvalue[ summit_index ]/100.0,
