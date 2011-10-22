@@ -1,4 +1,4 @@
-# Time-stamp: <2011-10-21 01:49:32 Tao Liu>
+# Time-stamp: <2011-10-22 11:40:53 Tao Liu>
 
 """Module for Composite Score Track IO classes.
 
@@ -463,7 +463,7 @@ class compositeScoreTrackI:
 
                             diff_score = max([x[4] for x in condition1_peak_content ])
                             #m_c2c1 = max([x[5] in condition2_peak_content ])                            
-                            #if m_c1c2 >= mc2c1:
+                            #if m_c1c2 >= m_c2c1:
                             ##    diff_score = m_c1c2
                             #else:
                             #    diff_score = -1* m_c2c1
@@ -511,7 +511,7 @@ class compositeScoreTrackI:
                 if peak_length >= min_length: # if the peak is too small, reject it
                     m_c1c2 = max([x[4] for x in consistent_peak_content ])
                     m_c2c1 = max([x[5] for x in consistent_peak_content ])                            
-                    if m_c1c2 >= mc2c1:
+                    if m_c1c2 >= m_c2c1:
                         diff_score = m_c1c2
                     else:
                         diff_score = -1* m_c2c1                    
