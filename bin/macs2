@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# Time-stamp: <2011-10-13 22:12:16 Tao Liu>
+# Time-stamp: <2011-10-27 21:32:52 Tao Liu>
 
 """Description: MACS 2 main executable
 
@@ -163,24 +163,25 @@ def main():
         options.info("# local lambda is disabled!")
 
     # decide options.tocontrol according to options.tolarge
-    if options.tolarge:
-        if t1 > c1:
-            # treatment has more tags than control, since tolarge is
-            # true, we will scale control to treatment.
-            options.tocontrol = False
+    if control:
+        if options.tolarge:
+            if t1 > c1:
+                # treatment has more tags than control, since tolarge is
+                # true, we will scale control to treatment.
+                options.tocontrol = False
+            else:
+                # treatment has less tags than control, since tolarge is
+                # true, we will scale treatment to control.
+                options.tocontrol = True
         else:
-            # treatment has less tags than control, since tolarge is
-            # true, we will scale treatment to control.
-            options.tocontrol = True
-    else:
-        if t1 > c1:
-            # treatment has more tags than control, since tolarge is
-            # false, we will scale treatment to control.
-            options.tocontrol = True
-        else:
-            # treatment has less tags than control, since tolarge is
-            # false, we will scale control to treatment.
-            options.tocontrol = False
+            if t1 > c1:
+                # treatment has more tags than control, since tolarge is
+                # false, we will scale treatment to control.
+                options.tocontrol = True
+            else:
+                # treatment has less tags than control, since tolarge is
+                # false, we will scale control to treatment.
+                options.tocontrol = False
 
     peakdetect = PeakDetect(treat = treat,
                             control = control,
