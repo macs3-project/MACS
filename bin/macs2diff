@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# Time-stamp: <2011-10-06 23:41:21 Tao Liu>
+# Time-stamp: <2011-11-02 14:56:55 Tao Liu>
 
 """Module Description
 
@@ -91,8 +91,8 @@ Example: %prog --t1 CTCF_GM12878.bam --c1 Control_GM12878.bam --t2 CTCF_K562.bam
                          help="The small nearby region in basepairs to calculate dynamic lambda. This is used to capture the bias near the peak summit region. Invalid if there is no control data. If you set this to 0, MACS will skip slocal lambda calculation. *Note* that MACS will always perform a d-size local lambda calculation. The final local bias should be the maximum of the lambda value from d, slocal, and llocal size windows. DEFAULT: 1000 ")
     optparser.add_option("--llocal",dest="largelocal",type="int",default=10000,
                          help="The large nearby region in basepairs to calculate dynamic lambda. This is used to capture the surround bias. If you set this to 0, MACS will skip llocal lambda calculation. *Note* that MACS will always perform a d-size local lambda calculation. The final local bias should be the maximum of the lambda value from d, slocal, and llocal size windows. DEFAULT: 10000.")
-    optparser.add_option("--off-auto",dest="offauto",action="store_true",
-                         help="Whether turn off the auto pair model process. If not set, when MACS failed to build paired model, it will use the nomodel settings, the '--shiftsize' parameter to shift and extend each tags. DEFAULT: False",
+    optparser.add_option("--auto-bimodal",dest="onauto",action="store_true",
+                         help="Whether turn on the auto pair model process. If set, when MACS failed to build paired model, it will use the nomodel settings, the '--shiftsize' parameter to shift and extend each tags. Not to use this automate fixation is a default behavior now. DEFAULT: False",
                          default=False)
     optparser.add_option("--nomodel",dest="nomodel",action="store_true",
                          help="Whether or not to build the shifting model. If True, MACS will not build model. by default it means shifting size = 100, try to set shiftsize to change it. DEFAULT: False",
@@ -208,11 +208,11 @@ def macs2pqvalues ( task_options ):
                                   )
 
             d = peakmodel.d
-            if not diff_options.offauto and d <= 2 * diff_options.tsize:
+            if diff_options.onauto and d <= 2 * diff_options.tsize:
                 d = diff_options.shiftsize * 2
                 
         except NotEnoughPairsException:
-            if diff_options.offauto:
+            if not diff_options.onauto:
                 sys.exit(1)
             d = diff_options.shiftsize * 2
 

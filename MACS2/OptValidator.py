@@ -1,4 +1,4 @@
-# Time-stamp: <2011-10-14 01:03:07 Tao Liu>
+# Time-stamp: <2011-11-02 14:21:20 Tao Liu>
 
 """Module Description
 
@@ -160,10 +160,13 @@ def opt_validate ( optparser ):
     else:
         options.argtxt +=  "# qvalue cutoff = %.2e\n" % (options.qvalue)
 
-    if options.tolarge:
-        options.argtxt += "# Smaller dataset will be scaled towards larger dataset.\n"
+    if options.downsample:
+        options.argtxt += "# Larger dataset will be randomly sampled towards smaller dataset.\n"
     else:
-        options.argtxt += "# Larger dataset will be scaled towards smaller dataset.\n"
+        if options.tolarge:
+            options.argtxt += "# Smaller dataset will be scaled towards larger dataset.\n"
+        else:
+            options.argtxt += "# Larger dataset will be scaled towards smaller dataset.\n"
 
     if options.cfile:
         options.argtxt += "# Range for calculating regional lambda is: %d bps and %d bps\n" % (options.smalllocal,options.largelocal)
@@ -394,6 +397,77 @@ def opt_validate_filterdup ( optparser ):
 
     # uppercase the format string 
     options.format = options.format.upper()
+
+    # logging object
+    logging.basicConfig(level=(4-options.verbose)*10,
+                        format='%(levelname)-5s @ %(asctime)s: %(message)s ',
+                        datefmt='%a, %d %b %Y %H:%M:%S',
+                        stream=sys.stderr,
+                        filemode="w"
+                        )
+	
+    options.error   = logging.critical		# function alias
+    options.warn    = logging.warning
+    options.debug   = logging.debug
+    options.info    = logging.info
+
+    return options
+
+
+def opt_validate_randsample ( optparser ):
+    """Validate options from a OptParser object.
+
+    Ret: Validated options object.
+    """
+    (options,args) = optparser.parse_args()
+
+    # treatment file
+    if not options.tfile:       # only required argument
+        optparser.print_help()
+        sys.exit(1)
+
+    # format
+
+    options.gzip_flag = False           # if the input is gzip file
+    
+    options.format = options.format.upper()
+    if options.format == "ELAND":
+        options.parser = ELANDResultParser
+    elif options.format == "BED":
+        options.parser = BEDParser
+    elif options.format == "ELANDMULTI":
+        options.parser = ELANDMultiParser
+    elif options.format == "ELANDEXPORT":
+        options.parser = ELANDExportParser
+    elif options.format == "SAM":
+        options.parser = SAMParser
+    elif options.format == "BAM":
+        options.parser = BAMParser
+        options.gzip_flag = True
+    elif options.format == "BOWTIE":
+        options.parser = BowtieParser
+    elif options.format == "AUTO":
+        options.parser = guess_parser
+    else:
+        logging.error("Format \"%s\" cannot be recognized!" % (options.format))
+        sys.exit(1)
+    
+    # uppercase the format string 
+    options.format = options.format.upper()
+
+    # percentage or number
+    if options.percentage and options.number:
+        logging.error("Can't specify -p and -n at the same time! Please check your options and retry!")
+        sys.exit(1)
+    else:
+        if options.percentage:
+            if options.percentage > 100.0:
+                logging.error("Percentage can't be bigger than 100.0. Please check your options and retry!")
+                sys.exit(1)
+        elif options.number:
+            if options.number <= 0:
+                logging.error("Number of tags can't be smaller than or equal to 0. Please check your options and retry!")
+                sys.exit(1)
 
     # logging object
     logging.basicConfig(level=(4-options.verbose)*10,

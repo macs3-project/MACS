@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# Time-stamp: <2011-10-13 22:58:49 Tao Liu>
+# Time-stamp: <2011-11-02 12:27:16 Tao Liu>
 
 """Description
 
@@ -50,6 +50,7 @@ def main():
           scripts=['bin/macs2',
                    'bin/macs2diff',
                    'bin/filterdup',
+                   'bin/randsample',
                    'bin/bdgdiff',
                    'bin/bdgcmp',
                    'bin/bdgpeakcall',

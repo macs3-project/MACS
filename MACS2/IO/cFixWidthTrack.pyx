@@ -1,4 +1,4 @@
-# Time-stamp: <2011-09-06 16:57:34 Tao Liu>
+# Time-stamp: <2011-11-02 00:08:20 Tao Liu>
 
 """Module for FWTrack classes.
 
@@ -203,7 +203,7 @@ class FWTrackII:
             self.total += len(new_plus_tags)
 
 		
-    def sample (self, percent):
+    def sample_percent (self, percent):
         """Sample the tags for a given percentage.
 
         Warning: the current object is changed!
@@ -215,6 +215,20 @@ class FWTrackII:
             num = int(len(self.__locations[key][1])*percent)
             self.__locations[key][1]=array(BYTE4,sorted(random_sample(self.__locations[key][1],num)))
             self.total += len(self.__locations[key][0]) + len(self.__locations[key][1])
+
+    def sample_num (self, num):
+        """Sample the tags for a given percentage.
+
+        Warning: the current object is changed!
+        """
+        percent = float(num)/self.total
+        self.total = 0
+        for key in self.__locations.keys():
+            num = int(len(self.__locations[key][0])*percent)
+            self.__locations[key][0]=array(BYTE4,sorted(random_sample(self.__locations[key][0],num)))
+            num = int(len(self.__locations[key][1])*percent)
+            self.__locations[key][1]=array(BYTE4,sorted(random_sample(self.__locations[key][1],num)))
+            self.total += len(self.__locations[key][0]) + len(self.__locations[key][1])            
             
     def __str__ (self):
         return self.__to_wiggle()

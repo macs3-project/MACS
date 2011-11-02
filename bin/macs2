@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# Time-stamp: <2011-10-27 21:32:52 Tao Liu>
+# Time-stamp: <2011-11-02 15:03:03 Tao Liu>
 
 """Description: MACS 2 main executable
 
@@ -143,45 +143,61 @@ def main():
             model2r_script(peakmodel,options.modelR,options.name)
             options.d = peakmodel.d
             options.scanwindow= 2*options.d
-            if not options.offauto and options.d <= 2*options.tsize:
+            if options.onauto and options.d <= 2*options.tsize:
                 options.d=options.shiftsize*2
                 options.scanwindow=2*options.d 
-                warn("#2 Since the d calculated from paired-peaks are smaller than 2*tag length, it may be influenced by unknown sequencing problem. MACS will use %d as shiftsize, %d as fragment length" % (options.shiftsize,options.d))
+                warn("#2 Since the d calculated from paired-peaks are smaller than 2*tag length, it may be influenced by unknown sequencing problem. MACS will use %d as shiftsize, %d as fragment length. NOTE: if the d calculated is still acceptable, please do not use --auto-bimodal option!" % (options.shiftsize,options.d))
                 
         except NotEnoughPairsException:
-            if options.offauto:
+            if not options.onauto:
                 sys.exit(1)
             warn("#2 Skipped...")
             options.d=options.shiftsize*2
             options.scanwindow=2*options.d 
-            warn("#2 Use %d as shiftsize, %d as fragment length" % (options.shiftsize,options.d))
+            warn("#2 Since --auto-bimodal is set, MACS will use %d as shiftsize, %d as fragment length" % (options.shiftsize,options.d))
 
 
     #3 Call Peaks
-    options.info("#3 Call peaks...")
+    info("#3 Call peaks...")
     if options.nolambda:
-        options.info("# local lambda is disabled!")
+        info("# local lambda is disabled!")
 
     # decide options.tocontrol according to options.tolarge
     if control:
-        if options.tolarge:
+        if options.downsample:
+            # use random sampling to balance treatment and control
+            info("#3 User prefers to use random sampling instead of linear scaling.")
             if t1 > c1:
-                # treatment has more tags than control, since tolarge is
-                # true, we will scale control to treatment.
-                options.tocontrol = False
-            else:
-                # treatment has less tags than control, since tolarge is
-                # true, we will scale treatment to control.
-                options.tocontrol = True
+                info("#3 MACS is random sampling treatment tags...")
+                warn("#3 Your results may not be reproducible due to the random sampling!")
+                treatment.sample_num(c1)
+                info("#3 %d tags from treatment are kept" % treatment.total)                
+            elif c1 > t1: 
+                info("#3 MACS is random sampling control tags...")
+                warn("#3 Your results may not be reproducible due to the random sampling!")                
+                control.sample_num(t1)
+                info("#3 %d tags from control are kept" % control.total)
+            # set options.tocontrol although it would;t matter now
+            options.tocontrol = False
         else:
-            if t1 > c1:
-                # treatment has more tags than control, since tolarge is
-                # false, we will scale treatment to control.
-                options.tocontrol = True
+            if options.tolarge:
+                if t1 > c1:
+                    # treatment has more tags than control, since tolarge is
+                    # true, we will scale control to treatment.
+                    options.tocontrol = False
+                else:
+                    # treatment has less tags than control, since tolarge is
+                    # true, we will scale treatment to control.
+                    options.tocontrol = True
             else:
-                # treatment has less tags than control, since tolarge is
-                # false, we will scale control to treatment.
-                options.tocontrol = False
+                if t1 > c1:
+                    # treatment has more tags than control, since tolarge is
+                    # false, we will scale treatment to control.
+                    options.tocontrol = True
+                else:
+                    # treatment has less tags than control, since tolarge is
+                    # false, we will scale control to treatment.
+                    options.tocontrol = False
 
     peakdetect = PeakDetect(treat = treat,
                             control = control,
@@ -191,7 +207,7 @@ def main():
     #diag_result = peakdetect.diag_result()
     #4 output
     #4.1 peaks in XLS
-    options.info("#4 Write output xls file... %s" % (options.peakxls))
+    info("#4 Write output xls file... %s" % (options.peakxls))
     ofhd_xls = open(options.peakxls,"w")
     ofhd_xls.write("# This file is generated by MACS version %s\n" % (MACS_VERSION))
     ofhd_xls.write(options.argtxt+"\n")
@@ -208,23 +224,23 @@ def main():
         score_column = "pscore"
     elif options.log_qvalue:
         score_column = "qscore"
-    options.info("#4 Write peak bed file... %s" % (options.peakbed))
+    info("#4 Write peak bed file... %s" % (options.peakbed))
     ofhd_bed = open(options.peakbed,"w")
     peakdetect.peaks.write_to_bed (ofhd_bed, name_prefix="MACS_peak_", score_column=score_column)
     ofhd_bed.close()
     #4.2 peaks in narrowPeak
-    options.info("#4 Write peak in narrowPeak format file... %s" % (options.peakNarrowPeak))
+    info("#4 Write peak in narrowPeak format file... %s" % (options.peakNarrowPeak))
     ofhd_bed = open(options.peakNarrowPeak,"w")
     peakdetect.peaks.write_to_narrowPeak (ofhd_bed, name_prefix="MACS_peak_", score_column=score_column)
     ofhd_bed.close()
     #4.2 broad peaks in bed12
     if options.broad:
-        options.info("#4 Write broad peak in bed12 format file... %s" % (options.peakBroadPeak))
+        info("#4 Write broad peak in bed12 format file... %s" % (options.peakBroadPeak))
         ofhd_bed = open(options.peakBroadPeak,"w")
         peakdetect.broadpeaks.write_to_gappedPeak (ofhd_bed, name_prefix="MACS_peak_", name=options.name, description=options.name)
         ofhd_bed.close()
     #4.2-2 summits in BED
-    options.info("#4 Write summits bed file... %s" % (options.summitbed))
+    info("#4 Write summits bed file... %s" % (options.summitbed))
     ofhd_summits = open(options.summitbed,"w")
     peakdetect.peaks.write_to_summit_bed (ofhd_summits, name_prefix="MACS_summit_", score_column=score_column)
     ofhd_summits.close()
@@ -274,8 +290,8 @@ or example for broad peak calling: %prog -t ChIP.bam -c Control.bam --broad -g h
                          help="The small nearby region in basepairs to calculate dynamic lambda. This is used to capture the bias near the peak summit region. Invalid if there is no control data. If you set this to 0, MACS will skip slocal lambda calculation. *Note* that MACS will always perform a d-size local lambda calculation. The final local bias should be the maximum of the lambda value from d, slocal, and llocal size windows. DEFAULT: 1000 ")
     optparser.add_option("--llocal",dest="largelocal",type="int",default=10000,
                          help="The large nearby region in basepairs to calculate dynamic lambda. This is used to capture the surround bias. If you set this to 0, MACS will skip llocal lambda calculation. *Note* that MACS will always perform a d-size local lambda calculation. The final local bias should be the maximum of the lambda value from d, slocal, and llocal size windows. DEFAULT: 10000.")
-    optparser.add_option("--off-auto",dest="offauto",action="store_true",
-                         help="Whether turn off the auto pair model process. If not set, when MACS failed to build paired model, it will use the nomodel settings, the '--shiftsize' parameter to shift and extend each tags. DEFAULT: False",
+    optparser.add_option("--auto-bimodal",dest="onauto",action="store_true",
+                         help="Whether turn on the auto pair model process. If set, when MACS failed to build paired model, it will use the nomodel settings, the '--shiftsize' parameter to shift and extend each tags. Not to use this automate fixation is a default behavior now. DEFAULT: False",
                          default=False)
     optparser.add_option("--nomodel",dest="nomodel",action="store_true",
                          help="Whether or not to build the shifting model. If True, MACS will not build model. by default it means shifting size = 100, try to set shiftsize to change it. DEFAULT: False",
@@ -286,6 +302,8 @@ or example for broad peak calling: %prog -t ChIP.bam -c Control.bam --broad -g h
                          help="It controls the MACS behavior towards duplicate tags at the exact same location -- the same coordination and the same strand. The default 'auto' option makes MACS calculate the maximum tags at the exact same location based on binomal distribution using 1e-5 as pvalue cutoff; and the 'all' option keeps every tags. If an integer is given, at most this number of tags will be kept at the same location. Default: auto")
     optparser.add_option("--to-large",dest="tolarge",action="store_true",default=False,
                          help="When set, scale the small sample up to the bigger sample. By default, the bigger dataset will be scaled down towards the smaller dataset, which will lead to smaller p/qvalues and more specific results. Keep in mind that scaling down will bring down background noise more. DEFAULT: False")
+    optparser.add_option("--down-sample",dest="downsample",action="store_true",default=False,
+                         help="When set, random sampling method will scale down the bigger sample. By default, MACS uses linear scaling. Warning: This option will make your result unstable and irreproducible since each time, random reads would be selected. Consider to use 'randsample' script instead. DEFAULT: False")
     optparser.add_option("--shift-control",dest="shiftcontrol",action="store_true",default=False,
                          help="When set, control tags will be shifted just as ChIP tags according to their strand before the extension of d, slocal and llocal. By default, control tags are extended centered at their current positions regardless of strand. You may consider to turn this option on while comparing two ChIP datasets of different condition but the same factor. DEFAULT: False")
     optparser.add_option("--half-ext",dest="halfext",action="store_true",default=False,

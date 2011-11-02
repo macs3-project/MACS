@@ -1,5 +1,5 @@
 INSTALL Guide For MACS
-Time-stamp: <2011-05-17 16:15:02 Tao Liu>
+Time-stamp: <2011-11-02 15:22:30 Tao Liu>
 
 Please check the following instructions to complete your installation.
 
@@ -8,7 +8,7 @@ Please check the following instructions to complete your installation.
 Python version must be equal to 2.6 or 2.7 to run MACS. We recommend
 using the version 2.6.5.
 
-Cython (>=0.14.1) is required to run MACS v2.
+Cython (>=0.14.1) is required to run MACS v2. 
 
 * Install under Debian or Ubuntu Linux system
 
@@ -18,11 +18,11 @@ your operation system. You can easily manage the package, and the
 uninstall is much easier. Download the deb package from MACS download
 page, and type this in the commend line:
 
-$ dpkg -i macs_1.4.0rc2.deb
+$ dpkg -i macs_2.0.9.deb
 
 To uninstall, type:
 
-$ dpkg -r macs_1.4.0rc2
+$ dpkg -r macs_2.0.9
 
 This is tested only in Ubuntu 10.10 and 10.04 LTS.
 

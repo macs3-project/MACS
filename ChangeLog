@@ -1,5 +1,14 @@
-2011-10-15  Tao Liu  <taoliu@jimmy.harvard.edu>
+2011-11-2  Tao Liu  <taoliu@jimmy.harvard.edu>
 	MACS version 2.0.9 (tag:alpha)
+
+	* Auto fixation on predicted d is turned off by default!
+
+	Previous --off-auto is now default. MACS will not automatically
+	fix d less than 2 times of tag size according to
+	--shiftsize. While tag size is getting longer nowadays, it would
+	be easier to have d less than 2 times of tag size, however d may
+	still be meaningful and useful. Please judge it using your own
+	wisdom.
 
 	* Scaling issue
 
@@ -9,6 +18,16 @@
 	noise will be reduced more than real signals, so we expect to have
 	more specific results than the other way around (i.e. --to-large
 	is set).
+
+	Also, an alternative option to randomly sample larger data
+	(--down-sample) is provided to replace default linear
+	scaling. However, this option will cause results irresproducible,
+	so be careful. 
+
+	* randsample script
+
+	A new script 'randsample'  is added, which can randomly sample
+	certain percentage or number of tags.
 
 	* Peak summit
 

@@ -1,5 +1,5 @@
-README for MACS (2.0.8)
-Time-stamp: <2011-09-15 15:18:39 Tao Liu>
+README for MACS (2.0.9)
+Time-stamp: <2011-11-02 15:21:38 Tao Liu>
 
 * Introduction
 
@@ -24,6 +24,9 @@ Please check the file 'INSTALL' in the distribution.
 Usage: macs2 <-t tfile> [-n name] [-g genomesize] [options]
 
 Example: macs2 -t ChIP.bam -c Control.bam -f BAM -g hs -n test -B -q 0.01
+
+or example for broad peak calling: macs2 -t ChIP.bam -c Control.bam --broad -g hs
+
 
 
 macs2 -- Model-based Analysis for ChIP-Sequencing
@@ -87,10 +90,11 @@ Options:
                         local bias should be the maximum of the lambda value
                         from d, slocal, and llocal size windows. DEFAULT:
                         10000.
-  --off-auto            Whether turn off the auto pair model process. If not
-                        set, when MACS failed to build paired model, it will
-                        use the nomodel settings, the '--shiftsize' parameter
-                        to shift and extend each tags. DEFAULT: False
+  --auto-bimodal        Whether turn on the auto pair model process. If set,
+                        when MACS failed to build paired model, it will use
+                        the nomodel settings, the '--shiftsize' parameter to
+                        shift and extend each tags. Not to use this automate
+                        fixation is a default behavior now. DEFAULT: False
   --nomodel             Whether or not to build the shifting model. If True,
                         MACS will not build model. by default it means
                         shifting size = 100, try to set shiftsize to change
@@ -108,6 +112,18 @@ Options:
                         pvalue cutoff; and the 'all' option keeps every tags.
                         If an integer is given, at most this number of tags
                         will be kept at the same location. Default: auto
+  --to-large            When set, scale the small sample up to the bigger
+                        sample. By default, the bigger dataset will be scaled
+                        down towards the smaller dataset, which will lead to
+                        smaller p/qvalues and more specific results. Keep in
+                        mind that scaling down will bring down background
+                        noise more. DEFAULT: False
+  --down-sample         When set, random sampling method will scale down the
+                        bigger sample. By default, MACS uses linear scaling.
+                        Warning: This option will make your result unstable
+                        and irreproducible since each time, random reads would
+                        be selected. Consider to use 'randsample' script
+                        instead. DEFAULT: False
   --shift-control       When set, control tags will be shifted just as ChIP
                         tags according to their strand before the extension of
                         d, slocal and llocal. By default, control tags are
@@ -122,15 +138,14 @@ Options:
                         lambda and score tracks at every bp into a bedGraph
                         file. DEFAULT: False
   --broad               If set, MACS will try to call broad peaks by linking
-                        nearby highly enriched regions as SICER. The linking
-                        region is controlled by another cutoff through
-                        --linking-cutoff. The maximum linking region length is
-                        4 times of d from MACS. DEFAULT: False
-  --linking-cutoff=LINKINGCUTOFF
-                        Cutoff for linking region. This option is not
-                        available whiel --broad is set. If -p is set, this is
-                        a pvalue cutoff, otherwise, it's a qvalue cutoff.
-                        DEFAULT: 0.1
+                        nearby highly enriched regions. The linking region is
+                        controlled by another cutoff through --linking-cutoff.
+                        The maximum linking region length is 4 times of d from
+                        MACS. DEFAULT: False
+  --broad-cutoff=BROADCUTOFF
+                        Cutoff for broad region. This option is not available
+                        unless --broad is set. If -p is set, this is a pvalue
+                        cutoff, otherwise, it's a qvalue cutoff. DEFAULT: 0.1
   --verbose=VERBOSE     Set verbose level. 0: only show critical message, 1:
                         show additional warning message, 2: show process
                         information, 3: show debug messages. DEFAULT:2
@@ -337,7 +352,9 @@ model building.
 
 *** -q/--qvalue
 
-The qvalue cutoff to call significant regions. Default is 0.01.
+The qvalue (minimum FDR) cutoff to call significant regions. Default
+is 0.01. For broad marks, you can try 0.05 as cutoff. Q-values are
+calculated from p-values using Benjamini-Hochberg procedure.
 
 *** -p/--pvalue
 
@@ -417,13 +434,20 @@ Cutoff for broad region. This option is not available unless --broad
 is set. If -p is set, this is a pvalue cutoff, otherwise, it's a
 qvalue cutoff.  DEFAULT: 0.1
 
-** --to-small is obsolete, check --to-control
+** --to-large
 
-** --to-control
+When set, linearly scale the smaller dataset to the same depth as
+larger dataset, by default, the smaller dataset will be scaled towards
+the larger dataset. Beware, to scale up small data would cause more
+false positives.
 
-When set, scale the treatment dataset to the same depth as control
-dataset, by default, the control dataset will be scaled towards the
-treatment dataset.
+** --down-sample
+
+When set, random sampling method will scale down the bigger sample. By
+default, MACS uses linear scaling. This option will make the results
+unstable and irreproducible since each time, random reads would be
+selected, especially the numbers (pileup, pvalue, qvalue) would
+change. Consider to use 'randsample' script before MACS2 runs instead.
 
 ** -B/--bdg
 
