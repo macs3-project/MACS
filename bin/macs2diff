@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# Time-stamp: <2011-11-02 14:56:55 Tao Liu>
+# Time-stamp: <2011-11-03 01:18:43 Tao Liu>
 
 """Module Description
 
@@ -84,6 +84,9 @@ Example: %prog --t1 CTCF_GM12878.bam --c1 Control_GM12878.bam --t2 CTCF_K562.bam
                          help="Pvalue cutoff for peak detection. When set (e.g. -q 0.05 or -q 1e-5), qvalue cutoff will be ignored. Default is not set.")
     optparser.add_option("-m","--mfold",dest="mfold",type="string",default="10,30",
                          help="Select the regions within MFOLD range of high-confidence enrichment ratio against background to build model. The regions must be lower than upper limit, and higher than the lower limit. DEFAULT:10,30")
+    optparser.add_option("--diff-d",dest="same_d",action="store_false",
+                         help="If set, MACS will use different fragment sizes for two conditions. It may not be a fair comparison, so please use it with caution! Default: False",
+                         default=True)    
     optparser.add_option("--nolambda",dest="nolambda",action="store_true",
                          help="If True, MACS will use fixed background lambda as local lambda for every peak region. Normally, MACS calculates a dynamic local lambda to reflect the local bias due to potential chromatin structure. ",
                          default=False)
@@ -195,8 +198,8 @@ def remove_duplicates ( taskoptions):
         tagsinfo += "# Redundant rate in %s: %.2f\n" % ( name, float( t0-t1 )/t0 )
     return tagsinfo
 
-def macs2pqvalues ( task_options ):
-    ( name, treat, control, diff_options, slocal, llocal, tocontrol, shiftcontrol ) = task_options
+def macs2bimodal ( task_options ):
+    ( name, treat, control, diff_options ) = task_options
     if diff_options.nomodel:
         d = diff_options.shiftsize * 2
     else:
@@ -216,6 +219,11 @@ def macs2pqvalues ( task_options ):
                 sys.exit(1)
             d = diff_options.shiftsize * 2
 
+    return d
+
+def macs2pqvalues ( task_options ):
+    ( name, treat, control, d, diff_options, slocal, llocal, tocontrol, shiftcontrol ) = task_options
+
     diff_options.halfext = False
 
     scoretrack = compare_treatment_vs_control ( treat, control, d, diff_options.gsize,
@@ -231,7 +239,7 @@ def macs2pqvalues ( task_options ):
 
     scoretrack = None
     
-    return (bdgtrack,d)
+    return bdgtrack
 
 
 # ------------------------------------
@@ -276,7 +284,6 @@ def main():
 
     #3 Build Model
     info("#3 do 4-way comparisons ...")
-    pool = multiprocessing.Pool(options.nprocesses)
 
     # I wish to do something correct... When t1 and t2 have different
     # sequencing depth, the direction of the scaling is very
@@ -295,21 +302,46 @@ def main():
     # extra parameters passed to macs2run are 1) slocal, 2) llocal, 3)
     # whether or not scale 'treatment' towards 'control', 4) whether
     # or not 'shift control';
-    tasks = [ ('t1c1', treat1, control1, options, options.smalllocal, options.largelocal, False, False),
-              ('t2c2', treat2, control2, options, options.smalllocal, options.largelocal, False, False),
-              ('t1t2', treat1, treat2, options, 0, 0, tocontrol1, True),
-              ('t2t1', treat2, treat1, options, 0, 0, tocontrol2, True) ]
-    results =  pool.map( macs2pqvalues, tasks )
+    bimodal_tasks = [ ('t1c1', treat1, control1, options),
+                      ('t2c2', treat2, control2, options) ]
+
+    pool = multiprocessing.Pool(options.nprocesses)
+    results =  pool.map( macs2bimodal, bimodal_tasks )
     pool.close()
     pool.join()
-    ( (t1c1,d1),(t2c2,d2),(t1t2,d3),(t2t1,d4) ) = results
-    #print results
-    info("#3 4-way comparisons done!")
+    (d1,d2) = results
     info("#3 Fragment size for treatment 1 is %s bps" % d1)
     info("#3 Fragment size for treatment 2 is %s bps" % d2)
+
+    if options.same_d:
+        # use the same d
+        d = int((d1+d2)/2)
+        info("#3 The middle value of above two fragment sizes will be used as universal d in differential calling: %s bps" % d)        
+        cmp_tasks = [ ('t1c1', treat1, control1, d, options, options.smalllocal, options.largelocal, False, False),
+                      ('t2c2', treat2, control2, d, options, options.smalllocal, options.largelocal, False, False),
+                      ('t1t2', treat1, treat2, d, options, 0, 0, tocontrol1, True),
+                      ('t2t1', treat2, treat1, d, options, 0, 0, tocontrol2, True) ]
+    else:
+        cmp_tasks = [ ('t1c1', treat1, control1, d1, options, options.smalllocal, options.largelocal, False, False),
+                      ('t2c2', treat2, control2, d2, options, options.smalllocal, options.largelocal, False, False),
+                      ('t1t2', treat1, treat2, d1, options, 0, 0, tocontrol1, True),
+                      ('t2t1', treat2, treat1, d2, options, 0, 0, tocontrol2, True) ]
+    pool = multiprocessing.Pool(options.nprocesses)
+    results =  pool.map( macs2pqvalues, cmp_tasks )
+    pool.close()
+    pool.join()
+    ( t1c1,t2c2,t1t2,t2t1 ) = results
+    #print results
+    info("#3 4-way comparisons done!")
+
+    # combine t1t2 and t2t1 tracks
+    info("#3 combine differential score track")
+    diff_track = t1t2.overlie(t2t1,func=lambda x,y: x-y)
+    info("#3 done")
+
     if not options.minlen:
         minlen = int((d1+d2)/2)
-        info("#3 The middle value of above two fragment sizes will be used as minimum length in differenial calling: %s bps" % minlen)
+        info("#3 The middle value of  two fragment sizes will be used as minimum length in differenial calling: %s bps" % minlen)
     else:
         minlen = max(1,options.minlen)
         info("#3 User specified minimum length for differential calling" % minlen)        
@@ -323,12 +355,15 @@ def main():
             t2c2.write_bedGraph(open("%s_t2c2_qvalue.bdg" % options.name,"w"),
                                 name="%s t2c2 qvalue" % options.name,
                                 description="%s qvalues calculated by comparing treatment2 and control2" % options.name)
-            t1t2.write_bedGraph(open("%s_t1t2_qvalue.bdg" % options.name,"w"),
-                                name="%s t1t2 qvalue" % options.name,
-                                description="%s qvalues calculated by comparing treatment1 and treatment2" % options.name)
-            t2t1.write_bedGraph(open("%s_t2t1_qvalue.bdg" % options.name,"w"),
-                                name="%s t2t1 qvalue" % options.name,
-                                description="%s qvalues calculated by comparing treatment2 and treatment1" % options.name)    
+            diff_track.write_bedGraph(open("%s_diff_qvalue.bdg" % options.name,"w"),
+                                      name="%s diff score qvalue" % options.name,
+                                      description="%s qvalues calculated by comparing treatment1 and treatment2" % options.name)            
+            #t1t2.write_bedGraph(open("%s_t1t2_qvalue.bdg" % options.name,"w"),
+            #                    name="%s t1t2 qvalue" % options.name,
+            #                    description="%s qvalues calculated by comparing treatment1 and treatment2" % options.name)
+            #t2t1.write_bedGraph(open("%s_t2t1_qvalue.bdg" % options.name,"w"),
+            #                    name="%s t2t1 qvalue" % options.name,
+            #                    description="%s qvalues calculated by comparing treatment2 and treatment1" % options.name)    
         elif options.log_pvalue:
             info("#3 saving pvalues")
             t1c1.write_bedGraph(open("%s_t1c1_pvalue.bdg" % options.name,"w"),
@@ -337,12 +372,15 @@ def main():
             t2c2.write_bedGraph(open("%s_t2c2_pvalue.bdg" % options.name,"w"),
                                 name="%s t2c2 pvalue" % options.name,
                                 description="%s pvalues calculated by comparing treatment2 and control2" % options.name)
-            t1t2.write_bedGraph(open("%s_t1t2_pvalue.bdg" % options.name,"w"),
-                                name="%s t1t2 pvalue" % options.name,
-                                description="%s pvalues calculated by comparing treatment1 and treatment2" % options.name)
-            t2t1.write_bedGraph(open("%s_t2t1_pvalue.bdg" % options.name,"w"),
-                                name="%s t2t1 pvalue" % options.name,
-                                description="%s pvalues calculated by comparing treatment2 and treatment1" % options.name)
+            diff_track.write_bedGraph(open("%s_diff_pvalue.bdg" % options.name,"w"),
+                                      name="%s diff score pvalue" % options.name,
+                                      description="%s pvalues calculated by comparing treatment1 and treatment2" % options.name)            
+            #t1t2.write_bedGraph(open("%s_t1t2_pvalue.bdg" % options.name,"w"),
+            #                    name="%s t1t2 pvalue" % options.name,
+            #                    description="%s pvalues calculated by comparing treatment1 and treatment2" % options.name)
+            #t2t1.write_bedGraph(open("%s_t2t1_pvalue.bdg" % options.name,"w"),
+            #                    name="%s t2t1 pvalue" % options.name,
+            #                    description="%s pvalues calculated by comparing treatment2 and treatment1" % options.name)
         else:
             raise Exception("p or q value cutoff not set?!")
         info("#3 Please check the *.bdg files in the same directory!")

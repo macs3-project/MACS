@@ -1,3 +1,24 @@
+2011-11-03  Tao Liu  <taoliu@jimmy.harvard.edu>
+	MACS version 2.0.10 (tag:alpha still working)
+
+	* Fragment size prediction in macs2diff
+
+	Now by default, macs2diff will try to use the average fragment
+	size from both condition 1 and condition 2 for tag extension and
+	peak calling. Previously, by default, it will use different sizes
+	unless --nomodel is specified.
+
+	Technically, I separate model building processes out. So macs2diff
+	will build fragment sizes for condition 1 and 2 in parallel (2
+	processes maximum), then perform 4-way comparisons in parallel (4
+	processes maximum).
+
+	* Diff score
+
+	Combine two p/qscore tracks together. At regions where condition 1
+	is higher than condition 2, score would be positive, otherwise,
+	negative.
+
 2011-11-2  Tao Liu  <taoliu@jimmy.harvard.edu>
 	MACS version 2.0.9 (tag:alpha)
 
