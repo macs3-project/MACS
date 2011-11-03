@@ -1,4 +1,4 @@
-include 00README COPYING ChangeLog INSTALL MANIFEST setup.py bin/macs2 bin/bdgpeakcall bin/bdgcmp
+include README COPYING ChangeLog INSTALL MANIFEST setup.py bin/macs2 bin/macs2diff bin/bdgpeakcall bin/bdgbroadcall bin/bdgcmp bin/filterdup bin/randsample
 recursive-include MACS2 *.py *.pyx
 prune test
 prune web

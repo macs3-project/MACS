@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# Time-stamp: <2011-07-08 14:41:19 Tao Liu>
+# Time-stamp: <2011-11-03 00:20:58 Tao Liu>
 
 import os
 import sys
@@ -49,7 +49,7 @@ def main():
         optparser.print_help()
         sys.exit()
 
-    available_methods = ['ppois','substract','divide']
+    available_methods = ['ppois','substract','divide','multiply']
     if options.method not in available_methods:
         sys.stderr.write("Method can only be %s" % ",".join(available_methods))
     else:
@@ -70,7 +70,9 @@ def main():
     elif method == 'substract':
         sbtrack = tbtrack.overlie(cbtrack,func=lambda x,y:x-y)
     elif method == 'divide':
-        sbtrack = tbtrack.overlie(cbtrack,func=lambda x,y:float(x)/y)        
+        sbtrack = tbtrack.overlie(cbtrack,func=lambda x,y:float(x)/y)
+    elif method == 'multiply':
+        sbtrack = tbtrack.overlie(cbtrack,func=lambda x,y:float(x)*y)
     else:
         raise Exception("Can't reach here!")
 
