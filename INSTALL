@@ -1,5 +1,5 @@
 INSTALL Guide For MACS
-Time-stamp: <2011-11-02 15:22:30 Tao Liu>
+Time-stamp: <2011-11-04 14:24:00 Tao Liu>
 
 Please check the following instructions to complete your installation.
 
@@ -8,7 +8,7 @@ Please check the following instructions to complete your installation.
 Python version must be equal to 2.6 or 2.7 to run MACS. We recommend
 using the version 2.6.5.
 
-Cython (>=0.14.1) is required to run MACS v2. 
+Cython (>=0.14.1) and Numpy (>=1.3.0) are required to run MACS v2. 
 
 * Install under Debian or Ubuntu Linux system
 
