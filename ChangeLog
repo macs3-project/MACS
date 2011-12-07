@@ -1,3 +1,21 @@
+2011-12-07  Tao Liu  <taoliu@jimmy.harvard.edu>
+	Version 1.4.2
+
+	* Default options changes
+
+	1. --to-small is replaced by --to-large. Now the default behavior
+	is to scale down larger sample. In this way, results would be more
+	specific, because noises would increase slower than real enriched
+	regions.
+
+	2. --off-auto is replaced by --on-auto. Now the auto-fix of
+	modeled fragment size is turned off by default. Previously, if the
+	d from MACS is smaller than 2 times of read length, MACS will use
+	2 times of --shiftsize setting instead. This may lead to unwanted
+	result, especially when sequencing read length gets longer. It has
+	been turned off by default now, if you still want this feature,
+	please use '--off-auto' and '--shiftsize' with desired number.
+
 2011-06-21  Tao Liu  <taoliu@jimmy.harvard.edu>
 	Version 1.4.1
 

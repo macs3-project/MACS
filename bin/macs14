@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# Time-stamp: <2011-06-27 15:41:55 Tao Liu>
+# Time-stamp: <2011-12-07 16:01:17 Tao Liu>
 
 """Description: MACS 1.4 main executable
 
@@ -133,13 +133,13 @@ def main():
             model2r_script(peakmodel,options.modelR,options.name)
             options.d = peakmodel.d
             options.scanwindow= 2*options.d
-            if not options.offauto and options.d <= 2*options.tsize:
+            if options.onauto and options.d <= 2*options.tsize:
                 options.d=options.shiftsize*2
                 options.scanwindow=2*options.d 
                 warn("#2 Since the d calculated from paired-peaks are smaller than 2*tag length, it may be influenced by unknown sequencing problem. MACS will use %d as shiftsize, %d as fragment length" % (options.shiftsize,options.d))
                 
         except NotEnoughPairsException:
-            if options.offauto:
+            if options.onauto:
                 sys.exit(1)
             warn("#2 Skipped...")
             options.d=options.shiftsize*2
@@ -251,8 +251,8 @@ Example: %prog -t ChIP.bam -c Control.bam -f BAM -g h -n test -w --call-subpeaks
                          help="The small nearby region in basepairs to calculate dynamic lambda. This is used to capture the bias near the peak summit region. Invalid if there is no control data. DEFAULT: 1000 ")
     optparser.add_option("--llocal",dest="largelocal",type="int",default=None,
                          help="The large nearby region in basepairs to calculate dynamic lambda. This is used to capture the surround bias. DEFAULT: 10000.")
-    optparser.add_option("--off-auto",dest="offauto",action="store_true",
-                         help="Whether turn off the auto pair model process. If not set, when MACS failed to build paired model, it will use the nomodel settings, the '--shiftsize' parameter to shift and extend each tags. DEFAULT: False",
+    optparser.add_option("--on-auto",dest="onauto",action="store_true",
+                         help="Whether turn on the auto pair model process. If set, when MACS failed to build paired model, it will use the nomodel settings, the '--shiftsize' parameter to shift and extend each tags. DEFAULT: False",
                          default=False)
     optparser.add_option("--nomodel",dest="nomodel",action="store_true",
                          help="Whether or not to build the shifting model. If True, MACS will not build model. by default it means shifting size = 100, try to set shiftsize to change it. DEFAULT: False",
@@ -261,8 +261,8 @@ Example: %prog -t ChIP.bam -c Control.bam -f BAM -g h -n test -w --call-subpeaks
                          help="The arbitrary shift size in bp. When nomodel is true, MACS will use this value as 1/2 of fragment size. DEFAULT: 100 ")
     optparser.add_option("--keep-dup",dest="keepduplicates",type="string",default="auto",
                          help="It controls the MACS behavior towards duplicate tags at the exact same location -- the same coordination and the same strand. The default 'auto' option makes MACS calculate the maximum tags at the exact same location based on binomal distribution using 1e-5 as pvalue cutoff; and the 'all' option keeps every tags. If an integer is given, at most this number of tags will be kept at the same location. Default: auto")
-    optparser.add_option("--to-small",dest="tosmall",action="store_true",default=False,
-                         help="When set, scale the larger dataset down to the smaller dataset, by default, the smaller dataset will be scaled towards the larger dataset. DEFAULT: False")
+    optparser.add_option("--to-large",dest="tolarge",action="store_true",default=False,
+                         help="When set, scale the small sample up to the bigger sample. By default, the bigger dataset will be scaled down towards the smaller dataset, which will lead to smaller pvalues and more specific results. Keep in mind that scaling down will bring down background noise more. DEFAULT: False")
     optparser.add_option("-w","--wig",dest="store_wig",action="store_true",
                           help="Whether or not to save extended fragment pileup at every WIGEXTEND bps into a wiggle file. When --single-profile is on, only one file for the whole genome is saved. WARNING: this process is time/space consuming!!",
                           default=False)

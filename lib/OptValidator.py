@@ -1,4 +1,4 @@
-# Time-stamp: <2011-02-16 00:34:08 Tao Liu>
+# Time-stamp: <2011-12-07 16:27:09 Tao Liu>
 
 """Module Description
 
@@ -221,6 +221,8 @@ def opt_validate ( optparser ):
         "# pvalue cutoff = %.2e\n" % (options.pvalue),\
         #"# unique tag filter is %s" % (tmptxt),\
         ))
+
+    options.tosmall = not options.tolarge
 
     if options.tosmall:
         options.argtxt += "# Large dataset will be scaled towards smaller dataset.\n"
