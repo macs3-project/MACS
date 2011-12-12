@@ -1,4 +1,4 @@
-# Time-stamp: <2011-10-21 01:58:53 Tao Liu>
+# Time-stamp: <2011-12-12 03:23:21 Tao Liu>
 
 """Module for Feature IO classes.
 
@@ -25,6 +25,7 @@ from libc.math cimport sqrt,log10
 from MACS2.Constants import *
 from MACS2.cProb cimport poisson_cdf
 from MACS2.IO.cPeakIO import PeakIO, BroadPeakIO
+import logging
 #from MACS2.IO.cBedGraph import bedGraphTrackI
 
 # ------------------------------------
@@ -37,6 +38,17 @@ __doc__ = "scoreTrackI classes"
 # ------------------------------------
 # Misc functions
 # ------------------------------------
+
+pscore_dict = {}
+
+def get_pscore ( observed, expectation ):
+    key_value = (observed, expectation)
+    if pscore_dict.has_key(key_value):
+        return pscore_dict[key_value]
+    else:
+        score = int(-100*poisson_cdf(observed,expectation,False,True))
+        pscore_dict[(observed,expectation)] = score
+        return score
 
 # ------------------------------------
 # Classes
@@ -90,7 +102,8 @@ class scoreTrackI:
         c = self.data[chromosome]
         i = self.pointer[chromosome]
         # get the preceding region
-        c[i] = (endpos,sample,control,int(-100*poisson_cdf(sample,control,False,True)),0)
+        #c[i] = (endpos,sample,control,int(-100*poisson_cdf(sample,control,False,True)),0)
+        c[i] = (endpos,sample,control,get_pscore(sample,control),0)
         self.pointer[chromosome] += 1
 
     def get_data_by_chr (self, chromosome):
@@ -160,47 +173,68 @@ class scoreTrackI:
 
         Return a dictionary of {-100log10pvalue:(-100log10qvalue,rank)} relationships.
         """
+        logging.info("####test#### start make_pq")
         n = self.total()
-        value_list = np.empty( n, dtype = [('v', '<f4'), ('l', '<i4')])
-
-        i = 0                           # index for value_list
+        #value_list = np.empty( n, dtype = [('v', '<f4'), ('l', '<i4')])
+        value_dict = {}
+        #i = 0                           # index for value_list
         for chrom in self.data.keys():
             # for each chromosome
             pre_p  = 0
-            pos    = self.data[chrom][ 'pos' ]
-            value  = self.data[chrom][ '-100logp' ]
+            pos    = iter(self.data[chrom][ 'pos' ]).next
+            value  = iter(self.data[chrom][ '-100logp' ]).next
             length = self.pointer[chrom]
-            for j in xrange( length ):
+            j = 0
+            while j<length:
+                this_p = pos()
+                this_v = value()
+                #value_list[i] = (this_v,this_p-pre_p)
+                #i += 1
+                if value_dict.has_key(this_v):
+                    value_dict[this_v] += this_p-pre_p
+                else:
+                    value_dict[this_v] = this_p-pre_p
+                j += 1
+                pre_p = this_p
+
+            #for j in xrange( length ):
                 # for each region
-                this_l = pos[j]-pre_p
-                this_v = value[j]
-                value_list[i] = (this_v,this_l)
-                pre_p = pos[j]
-                i += 1
+                #this_l = pos[j]-pre_p
+                #this_v = value[j]
+                #value_list[i] = (this_v,this_l)
+                #value_list[i] = (value[j],pos[j]-pre_p)
+                #pre_p = pos[j]
+                #i += 1
         # sort
-        value_list.sort(order='v')
+        logging.info("####test#### finish value_dict")
+        #value_list.sort(order='v')
+        #logging.info("####test#### finish sorting value_list")                
         
-        N = sum(value_list['l'])
+        #N = sum(value_list['l'])
+        N = sum(value_dict.values())
         k = 1                           # rank
         #S_q = S_p + log10(k)-log10(N)
         f = -log10(N)
         pre_v = -1e100
-        pre_k = 0
         pre_l = 0
         pre_q = 1e100                       # save the previous q-value
         pvalue2qvalue = {pre_v:[0,k,0]}              # pvalue:[qvalue,rank,bp_with_this_pvalue]
-        for i in xrange(value_list.size-1,-1,-1):
-            (v,l) = value_list[i]
-            if v != pre_v:
-                # new value
-                q = v+int((log10(k)+f)*100) # we save integars here.
-                q = max(0,min(pre_q,q))           # make q-score monotonic
-                pvalue2qvalue[v] = [q, k, 0]
-                pvalue2qvalue[pre_v][2] = k-pvalue2qvalue[pre_v][1]
-                pre_v = v
-                pre_q = q
+        logging.info("####test#### start matching pvalue to qvalue")
+        for v in sorted(value_dict.keys(),reverse=True):
+            l = value_dict[v]
+            #for i in xrange(value_list.size-1,-1,-1):
+            #(v,l) = value_list[i]
+            #if v != pre_v:
+            #    # new value
+            q = v+int((log10(k)+f)*100) # we save integars here.
+            q = max(0,min(pre_q,q))           # make q-score monotonic
+            pvalue2qvalue[v] = [q, k, 0]
+            pvalue2qvalue[pre_v][2] = k-pvalue2qvalue[pre_v][1]
+            pre_v = v
+            pre_q = q
             k+=l
         pvalue2qvalue[pre_v][2] = k-pvalue2qvalue[pre_v][1]
+        logging.info("####test#### finish building pqtable")        
         # pop the first -1e100 one
         pvalue2qvalue.pop(-1e100)
 
