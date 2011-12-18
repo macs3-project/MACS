@@ -16,6 +16,8 @@
 	been turned off by default now, if you still want this feature,
 	please use '--off-auto' and '--shiftsize' with desired number.
 
+	* PeakSplitter for bedGraph output as well
+
 2011-06-21  Tao Liu  <taoliu@jimmy.harvard.edu>
 	Version 1.4.1
 

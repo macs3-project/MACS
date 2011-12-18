@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# Time-stamp: <2011-12-07 16:01:17 Tao Liu>
+# Time-stamp: <2011-12-15 12:13:10 Tao Liu>
 
 """Description: MACS 1.4 main executable
 
@@ -203,6 +203,14 @@ def main():
         options.info("#6 Try to invoke PeakSplitter...")
         if options.single_profile:
             wigfilename = os.path.join(options.wig_dir_tr,options.zwig_tr+"_all"+".wig.gz")
+            p = Popen(["PeakSplitter","-p",options.peakbed,"-w",wigfilename,"-o",".","-f"],stdout=PIPE)            
+        else:
+            p = Popen(["PeakSplitter","-p",options.peakbed,"-w",options.wig_dir_tr,"-o",".","-f"],stdout=PIPE)
+        options.info("#6 Please check %s_peaks.subpeaks.bed file for PeakSplitter output!" % options.name)
+    elif options.callsubpeaks and options.store_bdg:
+        options.info("#6 Try to invoke PeakSplitter...")
+        if options.single_profile:
+            wigfilename = os.path.join(options.wig_dir_tr,options.zwig_tr+"_all"+".bdg.gz")
             p = Popen(["PeakSplitter","-p",options.peakbed,"-w",wigfilename,"-o",".","-f"],stdout=PIPE)            
         else:
             p = Popen(["PeakSplitter","-p",options.peakbed,"-w",options.wig_dir_tr,"-o",".","-f"],stdout=PIPE)

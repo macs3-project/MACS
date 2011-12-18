@@ -1,4 +1,4 @@
-# Time-stamp: <2011-12-07 16:27:09 Tao Liu>
+# Time-stamp: <2011-12-15 12:39:02 Tao Liu>
 
 """Module Description
 
@@ -167,8 +167,8 @@ def opt_validate ( optparser ):
     
     # check callsubpeaks option should be combined with store_wig
     if options.callsubpeaks:
-        if not options.store_wig:
-            logging.error("In order to use --call-subpeaks, you need to set --wig as well!")
+        if not (options.store_wig or options.store_bdg):
+            logging.error("In order to use --call-subpeaks, you need to set --wig or --bdg as well!")
             sys.exit(1)
         try:
             p = Popen(["PeakSplitter","--version"],stdout=PIPE,stderr=PIPE)
