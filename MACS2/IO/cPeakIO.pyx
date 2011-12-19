@@ -1,4 +1,4 @@
-# Time-stamp: <2011-10-21 00:43:25 Tao Liu>
+# Time-stamp: <2011-11-29 13:27:42 Tao Liu>
 
 """Module for PeakIO IO classes.
 
@@ -281,6 +281,46 @@ class PeakIO:
                            %
                            (chrom,peak["start"],peak["end"],name_prefix,n_peak,int(10*peak[score_column]),
                             peak["fc"],peak["pscore"],peak["qscore"],peak["summit"]-peak["start"]) )
+
+
+    def overlap_with_other_peaks (self, peaks2, cover=0):
+        """Peaks2 is a PeakIO object or dictionary with can be
+        initialzed as a PeakIO. check __init__ for PeakIO for detail.
+
+        return how many peaks are intersected by peaks2 by percentage
+        coverage on peaks2(if 50%, cover = 0.5).
+        """
+        peaks1 = self.peaks
+        if isinstance(peaks2,PeakIO):
+            peaks2 = peaks2.peaks
+        total_num = 0
+        chrs1 = peaks1.keys()
+        chrs2 = peaks2.keys()
+        for k in chrs1:
+            if not chrs2.count(k):
+                continue
+            rl1_k = iter(peaks1[k])
+            rl2_k = iter(peaks2[k])
+            tmp_n = False
+            try:
+                r1 = rl1_k.next()
+                r2 = rl2_k.next()
+                while (True):
+                    if r2[0] < r1[1] and r1[0] < r2[1]:
+                        a = sorted([r1[0],r1[1],r2[0],r2[1]])
+                        if float(a[2]-a[1]+1)/r2[2] > cover:
+                            if not tmp_n:
+                                total_num+=1
+                                tmp_n = True
+                    if r1[1] < r2[1]:
+                        r1 = rl1_k.next()
+                        tmp_n = False
+                    else:
+                        r2 = rl2_k.next()
+            except StopIteration:
+                continue
+        return total_num
+
 
 
 ###

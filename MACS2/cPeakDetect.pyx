@@ -1,4 +1,4 @@
-# Time-stamp: <2011-10-20 23:50:30 Tao Liu>
+# Time-stamp: <2011-12-11 13:51:01 Tao Liu>
 
 """Module Description
 
@@ -303,6 +303,7 @@ class PeakDetect:
                 tmp_v = float(self.d)/self.sregion*self.ratio_treat2control
             else:
                 tmp_v = float(self.d)/self.sregion
+            self.info("#3 applying...")
             c_tmp_btrack.apply_func(lambda x:float(x)*tmp_v)
             control_btrack = control_btrack.overlie(c_tmp_btrack,func=max)
 
@@ -315,8 +316,10 @@ class PeakDetect:
                 # if user want to scale everything to ChIP data
                 tmp_v = float(self.d)/self.lregion*self.ratio_treat2control
             else:
-                tmp_v = float(self.d)/self.lregion            
+                tmp_v = float(self.d)/self.lregion
+                
             c_tmp_btrack.apply_func(lambda x:float(x)*tmp_v)
+            self.info("#3 applying...")            
             control_btrack = control_btrack.overlie(c_tmp_btrack,func=max)
 
         control_btrack.reset_baseline(lambda_bg) # set the baseline as lambda_bg

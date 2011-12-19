@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# Time-stamp: <2011-11-03 01:18:43 Tao Liu>
+# Time-stamp: <2011-11-30 12:25:30 Tao Liu>
 
 """Module Description
 
@@ -344,7 +344,7 @@ def main():
         info("#3 The middle value of  two fragment sizes will be used as minimum length in differenial calling: %s bps" % minlen)
     else:
         minlen = max(1,options.minlen)
-        info("#3 User specified minimum length for differential calling" % minlen)        
+        info("#3 User specified minimum length for differential calling: %d" % minlen)        
     if options.store_bdg:
         info("#3 save score to bedGraph files")
         if options.log_qvalue:

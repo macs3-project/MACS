@@ -1,6 +1,22 @@
 2011-11-03  Tao Liu  <taoliu@jimmy.harvard.edu>
 	MACS version 2.0.10 (tag:alpha still working)
 
+	* Speed up p-value and q-value calculation
+
+	This part is ten times faster now. I am using a dictionary to
+	cache p-value results from Poisson CDF function. A bit more memory
+	will be used to increase speed. I hope this dictionary would not
+	explode since the possible pairs of ChIP signal and control lambda
+	are hugely redundant. Also, I rewrited part of q-value
+	calculation.
+
+	* Post-processing on differential calls
+
+	After macs2diff finds differential binding sites between two
+	conditions, it will try to annotate the peak calls from one of two
+	conditions, describe the changes ...
+
+
 	* Fragment size prediction in macs2diff
 
 	Now by default, macs2diff will try to use the average fragment

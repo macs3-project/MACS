@@ -1,4 +1,4 @@
-# Time-stamp: <2011-12-12 03:23:21 Tao Liu>
+# Time-stamp: <2011-12-12 12:33:49 Tao Liu>
 
 """Module for Feature IO classes.
 
@@ -173,7 +173,7 @@ class scoreTrackI:
 
         Return a dictionary of {-100log10pvalue:(-100log10qvalue,rank)} relationships.
         """
-        logging.info("####test#### start make_pq")
+        #logging.info("####test#### start make_pq")
         n = self.total()
         #value_list = np.empty( n, dtype = [('v', '<f4'), ('l', '<i4')])
         value_dict = {}
@@ -206,7 +206,7 @@ class scoreTrackI:
                 #pre_p = pos[j]
                 #i += 1
         # sort
-        logging.info("####test#### finish value_dict")
+        #logging.info("####test#### finish value_dict")
         #value_list.sort(order='v')
         #logging.info("####test#### finish sorting value_list")                
         
@@ -219,7 +219,7 @@ class scoreTrackI:
         pre_l = 0
         pre_q = 1e100                       # save the previous q-value
         pvalue2qvalue = {pre_v:[0,k,0]}              # pvalue:[qvalue,rank,bp_with_this_pvalue]
-        logging.info("####test#### start matching pvalue to qvalue")
+        #logging.info("####test#### start matching pvalue to qvalue")
         for v in sorted(value_dict.keys(),reverse=True):
             l = value_dict[v]
             #for i in xrange(value_list.size-1,-1,-1):
@@ -234,7 +234,7 @@ class scoreTrackI:
             pre_q = q
             k+=l
         pvalue2qvalue[pre_v][2] = k-pvalue2qvalue[pre_v][1]
-        logging.info("####test#### finish building pqtable")        
+        #logging.info("####test#### finish building pqtable")        
         # pop the first -1e100 one
         pvalue2qvalue.pop(-1e100)
 
@@ -287,7 +287,7 @@ class scoreTrackI:
             pre_p = 0                   # remember previous position
             peak_content = None         # to store points above cutoff
             
-            while True and x < chrom_pointer:
+            while x < chrom_pointer:
                 # find the first region above cutoff
                 # try to read the first data range for this chrom
                 p = chrom_pos[ x ]

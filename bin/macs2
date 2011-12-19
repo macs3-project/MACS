@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# Time-stamp: <2011-11-02 15:03:03 Tao Liu>
+# Time-stamp: <2011-12-16 14:25:45 Tao Liu>
 
 """Description: MACS 2 main executable
 
@@ -170,8 +170,8 @@ def main():
             if t1 > c1:
                 info("#3 MACS is random sampling treatment tags...")
                 warn("#3 Your results may not be reproducible due to the random sampling!")
-                treatment.sample_num(c1)
-                info("#3 %d tags from treatment are kept" % treatment.total)                
+                treat.sample_num(c1)
+                info("#3 %d tags from treatment are kept" % treat.total)                
             elif c1 > t1: 
                 info("#3 MACS is random sampling control tags...")
                 warn("#3 Your results may not be reproducible due to the random sampling!")                
