@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# Time-stamp: <2011-12-16 14:25:45 Tao Liu>
+# Time-stamp: <2011-12-28 14:25:22 Tao Liu>
 
 """Description: MACS 2 main executable
 
@@ -33,7 +33,7 @@ import gzip
 from MACS2.OptValidator import opt_validate
 from MACS2.OutputWriter import *
 from MACS2.cProb import binomial_cdf_inv
-from MACS2.PeakModel import PeakModel,NotEnoughPairsException
+from MACS2.cPeakModel import PeakModel,NotEnoughPairsException
 from MACS2.cPeakDetect import PeakDetect
 from MACS2.Constants import *
 # ------------------------------------

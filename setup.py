@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# Time-stamp: <2011-11-03 11:04:32 Tao Liu>
+# Time-stamp: <2011-12-28 14:25:44 Tao Liu>
 
 """Description
 
@@ -30,6 +30,7 @@ def main():
     ext_modules = [Extension("MACS2.cProb", ["MACS2/cProb.pyx"], libraries=["m"]),
                    Extension("MACS2.IO.cParser",["MACS2/IO/cParser.pyx"]),
                    Extension("MACS2.cPileup", ["MACS2/cPileup.pyx"]),
+                   Extension("MACS2.cPeakModel", ["MACS2/cPeakModel.pyx"]),                   
                    Extension("MACS2.cPeakDetect", ["MACS2/cPeakDetect.pyx"]),
                    Extension("MACS2.IO.cPeakIO", ["MACS2/IO/cPeakIO.pyx"],),
                    Extension("MACS2.IO.cFixWidthTrack", ["MACS2/IO/cFixWidthTrack.pyx"],),

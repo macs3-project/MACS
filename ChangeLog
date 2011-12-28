@@ -1,4 +1,4 @@
-2011-11-03  Tao Liu  <taoliu@jimmy.harvard.edu>
+2011-12-28  Tao Liu  <taoliu@jimmy.harvard.edu>
 	MACS version 2.0.10 (tag:alpha still working)
 
 	* Speed up p-value and q-value calculation
@@ -10,12 +10,17 @@
 	are hugely redundant. Also, I rewrited part of q-value
 	calculation.
 
+	* Speed up peak detection
+
+	This part is about hundred of times faster now.  Optimizations
+	include using Numpy functions as much as possible, and making loop
+	body as small as possible.
+
 	* Post-processing on differential calls
 
 	After macs2diff finds differential binding sites between two
 	conditions, it will try to annotate the peak calls from one of two
 	conditions, describe the changes ...
-
 
 	* Fragment size prediction in macs2diff
 

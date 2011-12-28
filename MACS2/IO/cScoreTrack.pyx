@@ -1,4 +1,4 @@
-# Time-stamp: <2011-12-12 12:33:49 Tao Liu>
+# Time-stamp: <2011-12-28 02:25:13 Tao Liu>
 
 """Module for Feature IO classes.
 
@@ -26,6 +26,9 @@ from MACS2.Constants import *
 from MACS2.cProb cimport poisson_cdf
 from MACS2.IO.cPeakIO import PeakIO, BroadPeakIO
 import logging
+
+#from time import time as ttime
+
 #from MACS2.IO.cBedGraph import bedGraphTrackI
 
 # ------------------------------------
@@ -197,23 +200,8 @@ class scoreTrackI:
                 j += 1
                 pre_p = this_p
 
-            #for j in xrange( length ):
-                # for each region
-                #this_l = pos[j]-pre_p
-                #this_v = value[j]
-                #value_list[i] = (this_v,this_l)
-                #value_list[i] = (value[j],pos[j]-pre_p)
-                #pre_p = pos[j]
-                #i += 1
-        # sort
-        #logging.info("####test#### finish value_dict")
-        #value_list.sort(order='v')
-        #logging.info("####test#### finish sorting value_list")                
-        
-        #N = sum(value_list['l'])
         N = sum(value_dict.values())
         k = 1                           # rank
-        #S_q = S_p + log10(k)-log10(N)
         f = -log10(N)
         pre_v = -1e100
         pre_l = 0
@@ -222,10 +210,6 @@ class scoreTrackI:
         #logging.info("####test#### start matching pvalue to qvalue")
         for v in sorted(value_dict.keys(),reverse=True):
             l = value_dict[v]
-            #for i in xrange(value_list.size-1,-1,-1):
-            #(v,l) = value_list[i]
-            #if v != pre_v:
-            #    # new value
             q = v+int((log10(k)+f)*100) # we save integars here.
             q = max(0,min(pre_q,q))           # make q-score monotonic
             pvalue2qvalue[v] = [q, k, 0]
@@ -273,115 +257,90 @@ class scoreTrackI:
 
         chrs  = self.get_chr_names()
         peaks = PeakIO()                      # dictionary to save peaks
+
+        #tloop = 0
+
+        cutoff = int(cutoff)
+        
         for chrom in chrs:
             chrom_pointer = self.pointer[chrom]
-            chrom_d       = self.get_data_by_chr( chrom ) # arrays for position and values
-            chrom_pos     = chrom_d[ 'pos' ]
-            chrom_score   = chrom_d[ colname ]
-            chrom_sample  = chrom_d[ 'sample' ]
-            chrom_control = chrom_d[ 'control' ]
-            chrom_pvalue  = chrom_d[ '-100logp' ]
-            chrom_qvalue  = chrom_d[ '-100logq' ]
+            peak_content = []           # to store points above cutoff
 
-            x     = 0
-            pre_p = 0                   # remember previous position
-            peak_content = None         # to store points above cutoff
+            #t0 = ttime()
+            above_cutoff = np.nonzero( self.data[chrom][colname] >= cutoff )[0] # indices where score is above cutoff
+            above_cutoff_flag = self.data[chrom][colname] >= cutoff
+            above_cutoff_v = self.data[chrom][colname][above_cutoff] # scores where score is above cutoff
+
+            above_cutoff_endpos = self.data[chrom]['pos'][above_cutoff] # end positions of regions where score is above cutoff
+            above_cutoff_startpos = self.data[chrom]['pos'][above_cutoff_flag[1:]] # start positions of regions where score is above cutoff
+            above_cutoff_sv= self.data[chrom]['sample'][above_cutoff] # sample pileup height where score is above cutoff
+
+            if above_cutoff_v.size == 0:
+                continue
+
+            if above_cutoff[0] == 0:
+                # first element > cutoff, insert first point in the chromosome
+                np.insert(above_cutoff_startpos,0,0)
+
+            # first bit of region above cutoff
+            peak_content.append( (above_cutoff_startpos[0], above_cutoff_endpos[0], above_cutoff_v[0], above_cutoff_sv[0], above_cutoff[0]) )
+            for i in xrange(1,above_cutoff_startpos.size):
+                if above_cutoff_startpos[i] - peak_content[-1][1] <= max_gap:
+                    # append
+                    peak_content.append( (above_cutoff_startpos[i], above_cutoff_endpos[i], above_cutoff_v[i], above_cutoff_sv[i], above_cutoff[i]) )
+                else:
+                    # close
+                    self.__close_peak(peak_content, peaks, min_length, chrom, colname )
+                    peak_content = [(above_cutoff_startpos[i], above_cutoff_endpos[i], above_cutoff_v[i], above_cutoff_sv[i], above_cutoff[i]),]
             
-            while x < chrom_pointer:
-                # find the first region above cutoff
-                # try to read the first data range for this chrom
-                p = chrom_pos[ x ]
-                v = chrom_score[ x ]
-                summit_v = chrom_sample[ x ] # I will use pileup height to find summit instead of other kinds of scores                
-                x += 1                  # index for the next point
-                if v >= cutoff:
-                    peak_content = [ ( pre_p, p, v, summit_v, x ), ] # remember the index too...
-                    pre_p = p
-                    break               # found the first range above cutoff
-                else:
-                    pre_p = p
-
-            for i in xrange( x, chrom_pointer ):
-                # continue scan the rest regions
-                p = chrom_pos[ i ]
-                v = chrom_score[ i ]
-                summit_v = chrom_sample[ i ] # I will use pileup height to find summit instead of other kinds of scores
-                if v < cutoff:               # But score is still used to find boundaries
-                    pre_p = p
-                    continue
-                # for points above cutoff
-                # if the gap is allowed
-                if pre_p - peak_content[ -1 ][ 1 ] <= max_gap:
-                    peak_content.append( ( pre_p, p, v, summit_v, i ) ) # put chunks above cutoff in a temporary list
-                else:
-                    # when the gap is not allowed, close this peak
-                    peak_length = peak_content[ -1 ][ 1 ] - peak_content[ 0 ][ 0 ]
-                    if peak_length >= min_length: # if the peak is too small, reject it
-                        tmpsummit = []
-                        summit_pos   = None
-                        summit_value = None
-                        for (tmpstart,tmpend,tmpvalue,tmpsummitvalue, tmpindex) in peak_content:
-                            if not summit_value or summit_value < tmpsummitvalue:
-                                tmpsummit = [ int(( tmpend+tmpstart )/2), ]
-                                tmpsummit_index = [ tmpindex, ]
-                                summit_value = tmpsummitvalue
-                            elif summit_value == tmpsummitvalue:
-                                # remember continuous summit values
-                                tmpsummit.append( int( (tmpend+tmpstart)/2 ) )
-                                tmpsummit_index.append( tmpindex )
-                        middle_summit = int( ( len(tmpsummit)+1 )/2 )-1 # the middle of all highest points in peak region is defined as summit
-                        summit_pos    = tmpsummit[ middle_summit ]
-                        summit_index  = tmpsummit_index[ middle_summit ]
-                        # char * chromosome, long start, long end, long summit = 0, 
-                        # double peak_height=0, int pileup=0, 
-                        # double pvalue=0, double fold_change=0, double qvalue=0
-                        peaks.add( chrom,
-                                   peak_content[0][0],
-                                   peak_content[-1][1],
-                                   summit      = summit_pos,
-                                   peak_score  = chrom_score [ summit_index ],
-                                   pileup      = chrom_sample[ summit_index ], # should be the same as summit_value
-                                   pscore      = chrom_pvalue[ summit_index ]/100.0,
-                                   fold_change = chrom_sample[ summit_index ]/chrom_control[ summit_index ],
-                                   qscore      = chrom_qvalue[ summit_index ]/100.0,
-                                   )
-                    # start a new peak
-                    peak_content = [ ( pre_p, p, v, summit_v, i ), ]
-                pre_p = p
-                
+            #tloop += ttime() - t0
             # save the last peak
             if not peak_content:
                 continue
-            peak_length = peak_content[ -1 ][ 1 ] - peak_content[ 0 ][ 0 ]
-            if peak_length >= min_length: # if the peak is too small, reject it
-                tmpsummit = []
-                summit_pos = None
-                summit_value = None
-                for (tmpstart,tmpend,tmpvalue,tmpsummitvalue, tmpindex) in peak_content:
-                    if not summit_value or summit_value < tmpsummitvalue:
-                        tmpsummit = [ int(( tmpend+tmpstart )/2), ]
-                        tmpsummit_index = [ tmpindex, ]
-                        summit_value = tmpsummitvalue
-                    elif summit_value == tmpsummitvalue:
-                        # remember continuous summit values
-                        tmpsummit.append( int( (tmpend+tmpstart)/2 ) )
-                        tmpsummit_index.append( tmpindex )
-                middle_summit = int( ( len(tmpsummit)+1 )/2 )-1
-                summit_pos    = tmpsummit[ middle_summit ]
-                summit_index  = tmpsummit_index[ middle_summit ]
+            else:
+                self.__close_peak(peak_content, peaks, min_length, chrom, colname )
 
-                peaks.add( chrom,
-                           peak_content[0][0],
-                           peak_content[-1][1],
-                           summit      = summit_pos,
-                           peak_score  = chrom_score [ summit_index ],
-                           pileup      = chrom_sample[ summit_index ], # should be the same as summit_value
-                           pscore      = chrom_pvalue[ summit_index ]/100.0,
-                           fold_change = chrom_sample[ summit_index ]/chrom_control[ summit_index ],
-                           qscore      = chrom_qvalue[ summit_index ]/100.0,
-                           )
-            
+        #print "loop: %.2f" % tloop
         return peaks
+
+    def __close_peak (self, peak_content, peaks, min_length, chrom, colname):
+        peak_length = peak_content[ -1 ][ 1 ] - peak_content[ 0 ][ 0 ]
+        if peak_length >= min_length: # if the peak is too small, reject it
+            tmpsummit = []
+            summit_pos   = None
+            summit_value = None
+            for (tmpstart,tmpend,tmpvalue,tmpsummitvalue, tmpindex) in peak_content:
+                if not summit_value or summit_value < tmpsummitvalue:
+                    tmpsummit = [ int(( tmpend+tmpstart )/2), ]
+                    tmpsummit_index = [ tmpindex, ]
+                    summit_value = tmpsummitvalue
+                elif summit_value == tmpsummitvalue:
+                    # remember continuous summit values
+                    tmpsummit.append( int( (tmpend+tmpstart)/2 ) )
+                    tmpsummit_index.append( tmpindex )
+            middle_summit = int( ( len(tmpsummit)+1 )/2 )-1 # the middle of all highest points in peak region is defined as summit
+            summit_pos    = tmpsummit[ middle_summit ]
+            summit_index  = tmpsummit_index[ middle_summit ]
+            # char * chromosome, long start, long end, long summit = 0, 
+            # double peak_height=0, int pileup=0, 
+            # double pvalue=0, double fold_change=0, double qvalue=0
+            peaks.add( chrom,
+                       peak_content[0][0],
+                       peak_content[-1][1],
+                       summit      = summit_pos,
+                       peak_score  = self.data[chrom][colname][ summit_index ],
+                       pileup      = self.data[chrom]['sample'][ summit_index ], # should be the same as summit_value
+                       pscore      = self.data[chrom]['-100logp'][ summit_index ]/100.0,
+                       fold_change = self.data[chrom]['sample'][ summit_index ]/self.data[chrom]['control'][ summit_index ],
+                       qscore      = self.data[chrom]['-100logq'][ summit_index ]/100.0,
+                       #peak_score  = chrom_score [ summit_index ],
+                       #pileup      = chrom_sample[ summit_index ], # should be the same as summit_value
+                       #pscore      = chrom_pvalue[ summit_index ]/100.0,
+                       #fold_change = chrom_sample[ summit_index ]/chrom_control[ summit_index ],
+                       #qscore      = chrom_qvalue[ summit_index ]/100.0,
+                       )
+            # start a new peak
+            return True
 
     def call_broadpeaks (self, lvl1_cutoff=500, lvl2_cutoff=100, min_length=200, lvl1_max_gap=50, lvl2_max_gap=400, colname='-100logq'):
         """This function try to find enriched regions within which,

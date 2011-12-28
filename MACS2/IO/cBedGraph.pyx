@@ -1,4 +1,4 @@
-# Time-stamp: <2011-12-11 20:45:23 Tao Liu>
+# Time-stamp: <2011-12-23 11:54:33 Tao Liu>
 
 """Module for Feature IO classes.
 
@@ -81,6 +81,53 @@ class bedGraphTrackI:
         self.baseline_value = baseline_value
 
     def add_loc (self,chromosome,startpos,endpos,value):
+        """Add a chr-start-end-value block into __data dictionary.
+
+        Difference between safe_add_loc: no check.
+
+        """
+        # basic assumption, end pos should > start pos
+        #assert endpos > startpos, "endpos %d can't be smaller than start pos %d" % (endpos,startpos)
+
+        if endpos <= 0:
+            return
+        if startpos < 0:
+            startpos = 0
+        
+        if not self.__data.has_key(chromosome):
+            self.__data[chromosome] = [array(BYTE4,[]),array(FBYTE4,[])] # for (endpos,value)
+            c = self.__data[chromosome]
+            if startpos:
+                # start pos is not 0, then add two blocks, the first
+                # with "baseline_value"; the second with "value"
+                c[0].append(startpos)
+                c[1].append(self.baseline_value)
+            c[0].append(endpos)
+            c[1].append(value)
+        else:
+            c = self.__data[chromosome]            
+            # get the preceding region
+            #pre_pos = c[0][-1]
+            pre_v   = c[1][-1]
+            # to check 1. continuity; 2. non-overlapping
+            #assert pre_pos < endpos , "bedGraph regions are not continuous."
+            #assert pre_pos <= startpos , "bedGraph regions have overlappings."
+            
+            # if this region is next to the previous one.
+            if pre_v == value:
+                # if value is the same, simply extend it.
+                c[0][-1] = endpos
+            else:
+                # otherwise, add a new region
+                c[0].append(endpos)
+                c[1].append(value)
+
+        #if value > self.maxvalue:
+        #    self.maxvalue = value
+        #if value < self.minvalue:
+        #    self.minvalue = value
+
+    def safe_add_loc (self,chromosome,startpos,endpos,value):
         """Add a chr-start-end-value block into __data dictionary.
 
         """
@@ -580,7 +627,7 @@ class bedGraphTrackI:
                 # meet the end of either bedGraphTrackI, simply exit
                 pass
         
-        ret.merge_regions()
+        #ret.merge_regions()
         return ret
                        
     def apply_func ( self, func ):
