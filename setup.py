@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# Time-stamp: <2011-12-28 14:25:44 Tao Liu>
+# Time-stamp: <2011-12-29 15:41:20 Tao Liu>
 
 """Description
 
@@ -33,6 +33,7 @@ def main():
                    Extension("MACS2.cPeakModel", ["MACS2/cPeakModel.pyx"]),                   
                    Extension("MACS2.cPeakDetect", ["MACS2/cPeakDetect.pyx"]),
                    Extension("MACS2.IO.cPeakIO", ["MACS2/IO/cPeakIO.pyx"],),
+                   Extension("MACS2.IO.cBedGraphIO", ["MACS2/IO/cBedGraphIO.pyx"],),                   
                    Extension("MACS2.IO.cFixWidthTrack", ["MACS2/IO/cFixWidthTrack.pyx"],),
                    Extension("MACS2.IO.cBedGraph", ["MACS2/IO/cBedGraph.pyx"], libraries=["m"]),
                    Extension("MACS2.IO.cScoreTrack", ["MACS2/IO/cScoreTrack.pyx"],),

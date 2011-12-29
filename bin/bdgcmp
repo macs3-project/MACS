@@ -1,12 +1,12 @@
 #!/usr/bin/env python
-# Time-stamp: <2011-11-03 00:20:58 Tao Liu>
+# Time-stamp: <2011-12-29 16:36:12 Tao Liu>
 
 import os
 import sys
 import logging
 from optparse import OptionParser
 
-from MACS2.IO import bedGraphIO
+from MACS2.IO import cBedGraphIO
 from MACS2.cProb import poisson_cdf
 
 # ------------------------------------
@@ -29,6 +29,17 @@ info    = logging.info
 # ------------------------------------
 # Main function
 # ------------------------------------
+pscore_dict = {}
+
+def get_pscore ( observed, expectation ):
+    key_value = (observed, expectation)
+    if pscore_dict.has_key(key_value):
+        return pscore_dict[key_value]
+    else:
+        score = -1*poisson_cdf(observed,expectation,False,True)
+        pscore_dict[(observed,expectation)] = score
+        return score
+
 def main():
     usage = "usage: %prog <-t TREATMENT.BEDGRAPH> <-c CONTROL.BEDGRAPH> <-o OUTPUT.BEDGRAPH> [-m METHOD] "
     description = "Calculate scores using certain method by comparing a bedGraph file from treatment and a file from control representing local bias."
@@ -56,17 +67,17 @@ def main():
         method = options.method
 
     info("Read and build treatment bedGraph...")
-    tbio = bedGraphIO.bedGraphIO(options.tfile)
+    tbio = cBedGraphIO.bedGraphIO(options.tfile)
     tbtrack = tbio.build_bdgtrack()
 
     info("Read and build control bedGraph...")
-    cbio = bedGraphIO.bedGraphIO(options.cfile)
+    cbio = cBedGraphIO.bedGraphIO(options.cfile)
     cbtrack = cbio.build_bdgtrack()
 
     info("Calculate scores comparing treatment and control by %s..." % method)
     # build score track
     if method == 'ppois':
-        sbtrack = tbtrack.overlie(cbtrack,func=lambda x,y:-1*poisson_cdf(x,y,False,True))
+        sbtrack = tbtrack.overlie(cbtrack,func=lambda x,y:get_pscore(x,y))
     elif method == 'substract':
         sbtrack = tbtrack.overlie(cbtrack,func=lambda x,y:x-y)
     elif method == 'divide':

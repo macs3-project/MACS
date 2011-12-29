@@ -1,4 +1,4 @@
-# Time-stamp: <2011-09-07 22:28:15 Tao Liu>
+# Time-stamp: <2011-12-29 16:15:03 Tao Liu>
 
 """Module Description:  IO Module for bedGraph file
 
@@ -17,7 +17,7 @@ the distribution).
 # ------------------------------------
 # python modules
 # ------------------------------------
-from MACS2.IO.cBedGraph import bedGraphTrackI
+from MACS2.IO.cBedGraph import bedGraphTrackI,bedGraphTrackII
 
 # ------------------------------------
 # constants
@@ -67,8 +67,10 @@ class bedGraphIO:
         Then the region chr1:200..250 should be filled with
         baseline_value. Default of baseline_value is 0.
         """
-        data = bedGraphTrackI(baseline_value=baseline_value)
+        data = bedGraphTrackII(baseline_value=baseline_value)
         add_func = data.add_loc
+        chrom_itemcount = {}
+        # get a summary of how many data points for each chromosome
         for i in self.fhd:
             if i.startswith("track"):
                 continue
@@ -78,8 +80,27 @@ class bedGraphIO:
                 continue
             else:
                 (chrom,startpos,endpos,value)=i.split()
-                add_func(chrom,int(startpos),int(endpos),float(value))
+                chrom_itemcount[chrom] = chrom_itemcount.get(chrom,0)+1
+
+        # initiate
+        for chrom in chrom_itemcount.keys():
+            data.add_chromosome(chrom,chrom_itemcount[chrom])
+
+        self.fhd.seek(0)
+        
+        for i in self.fhd:
+            if i.startswith("track"):
+                continue
+            elif i.startswith("#"):
+                continue
+            elif i.startswith("browse"):
+                continue
+            else:
+                (chrom,startpos,endpos,value)=i.split()
+                add_func(chrom,int(endpos),float(value))
+        data.finalize()
         self.fhd.seek(0)
         return data
+
 
 
