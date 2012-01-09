@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# Time-stamp: <2011-12-28 14:25:22 Tao Liu>
+# Time-stamp: <2012-01-09 15:17:38 Tao Liu>
 
 """Description: MACS 2 main executable
 
@@ -90,7 +90,9 @@ def main():
         tagsinfo += "# tags after filtering in treatment: %d\n" % (t1)
         tagsinfo += "# maximum duplicate tags at the same position in treatment = %d\n" % (treatment_max_dup_tags)
         info("#1  Redundant rate of treatment: %.2f" % (float(t0-t1)/t0))
-        tagsinfo += "# Redundant rate in treatment: %.2f\n" % (float(t0-t1)/t0)            
+        tagsinfo += "# Redundant rate in treatment: %.2f\n" % (float(t0-t1)/t0)
+    else:
+        t1 = treat.total
 
     if control:
         c0 = control.total
@@ -114,7 +116,9 @@ def main():
             tagsinfo += "# maximum duplicate tags at the same position in control = %d\n" % (control_max_dup_tags)
             
             info("#1  Redundant rate of control: %.2f" % (float(c0-c1)/c0))
-            tagsinfo += "# Redundant rate in control: %.2f\n" % (float(c0-c1)/c0)    
+            tagsinfo += "# Redundant rate in control: %.2f\n" % (float(c0-c1)/c0)
+        else:
+            c1 = control.total
         
             
     info("#1 finished!")
