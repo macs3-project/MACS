@@ -1,4 +1,4 @@
-# Time-stamp: <2011-12-29 11:58:58 Tao Liu>
+# Time-stamp: <2012-01-06 15:10:29 Tao Liu>
 
 """Module for Feature IO classes.
 
@@ -90,7 +90,7 @@ class scoreTrackI:
 
     def add_chromosome ( self, chrom, chrom_max_len ):
         if not self.data.has_key(chrom):
-            self.data[chrom] = np.zeros(chrom_max_len,dtype=[('pos','int64'),
+            self.data[chrom] = np.zeros(chrom_max_len,dtype=[('pos','int32'),
                                                              ('sample','float32'),
                                                              ('control','float32'),
                                                              ('-100logp','int32'),

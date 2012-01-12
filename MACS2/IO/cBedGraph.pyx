@@ -1,4 +1,4 @@
-# Time-stamp: <2011-12-29 17:03:32 Tao Liu>
+# Time-stamp: <2012-01-09 23:51:48 Tao Liu>
 
 """Module for Feature IO classes.
 
@@ -751,7 +751,7 @@ class bedGraphTrackII:
 
     def add_chromosome ( self, chrom, chrom_max_len ):
         if not self.data.has_key(chrom):
-            self.data[chrom] = np.zeros(chrom_max_len,dtype=[('pos','int64'),
+            self.data[chrom] = np.zeros(chrom_max_len,dtype=[('pos','int32'),
                                                              ('value','float32')])
             self.pointer[chrom] = 0
 
@@ -880,7 +880,6 @@ class bedGraphTrackII:
 
             above_cutoff_endpos = self.data[chrom]['pos'][above_cutoff] # end positions of regions where score is above cutoff
             above_cutoff_startpos = self.data[chrom]['pos'][above_cutoff_flag[1:]] # start positions of regions where score is above cutoff
-            #above_cutoff_sv= self.data[chrom]['sample'][above_cutoff] # sample pileup height where score is above cutoff
 
             if above_cutoff_v.size == 0:
                 continue
