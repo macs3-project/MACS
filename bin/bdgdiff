@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# Time-stamp: <2011-08-23 12:22:55 Tao Liu>
+# Time-stamp: <2012-01-23 16:23:23 Tao Liu>
 
 """Description: Naive call differential peaks from 4 bedGraph tracks for scores.
 
@@ -24,8 +24,11 @@ import sys
 import re
 import logging
 from optparse import OptionParser
-from MACS2.IO import bedGraphIO
+from MACS2.IO.cBedGraphIO import bedGraphIO,genericBedIO
+from MACS2.IO.cPeakIO import Region
 from MACS2.IO.cCompositeScoreTrack import *
+from MACS2.cStat import *
+#from math import log10
 
 # ------------------------------------
 # constants
@@ -52,21 +55,25 @@ info    = logging.info
 # Main function
 # ------------------------------------
 def main():
-    usage = "usage: %prog <--s1 bedGraph> <--s2 bedGraph> <--s12 bedGraph> <--s21 bedGraph> [-c CUTOFF] [-l MIN] [-g MAX] [-o PREFIX]"
-    description = "Call differential regions from four bedGraph files of pair-wise p/qvalue, with customized settings. Please read the descriptions of options carefully."
+    usage = "usage: %prog <-b union.bed> <--s1 bedGraph> <--s2 bedGraph> <--s12 bedGraph> <--s21 bedGraph> [-c CUTOFF] [-l MIN] [-g MAX] [-o PREFIX]"
+    description = "Call differential regions from four bedGraph files of ChIP pileup 1/2 and control signal 1/2, with customized settings. Please read the descriptions of options carefully."
     
     optparser = OptionParser(version="%prog 0.1",description=description,usage=usage,add_help_option=False)
     optparser.add_option("-h","--help",action="help",help="Show this help message and exit.")
-    optparser.add_option("--s1",dest="st1c1bdg",type="string",
-                         help="MACS p/qvalue score bedGraph, condition 1 ChIP treatment against condition 1 control input.")
-    optparser.add_option("--s2",dest="st2c2bdg",type="string",
-                         help="MACS p/qvalue score bedGraph, condition 2 ChIP treatment against condition 2 control input.")
-    optparser.add_option("--s12",dest="st1t2bdg",type="string",
-                         help="MACS p/qvalue score bedGraph, condition 1 ChIP treatment against condition 2 ChIP treatment.")
-    optparser.add_option("--s21",dest="st2t1bdg",type="string",
-                         help="MACS p/qvalue score bedGraph, condition 2 ChIP treatment against condition 1 ChIP treatment.")
-    optparser.add_option("-c","--cutoff",dest="cutoff",type="float",
-                         help="Cutoff depends on which method you used for score track. If the file contains p/qvalue scores from MACS2, score 5 means p/qvalue 1e-5. DEFAULT: 5",default=5)
+    optparser.add_option("--bed1",dest="peak1",type="string",
+                         help="Peak regions of condition 1")
+    optparser.add_option("--bed2",dest="peak2",type="string",
+                         help="Peak regions of condition 2")    
+    optparser.add_option("--t1",dest="t1bdg",type="string",
+                         help="MACS pileup bedGraph for condition 1.")
+    optparser.add_option("--t2",dest="t2bdg",type="string",
+                         help="MACS pileup bedGraph for condition 2.")
+    optparser.add_option("--c1",dest="c1bdg",type="string",
+                         help="MACS pileup bedGraph for condition 1.")                         
+    optparser.add_option("--c2",dest="c2bdg",type="string",
+                         help="MACS pileup bedGraph for condition 2. If --c2 is not specified, use --c1 for condition 2. If both --c1 and --c2 are not specified, no control is used.")
+    optparser.add_option("-C","--cutoff",dest="cutoff",type="float",
+                         help="Cutoff of q-value. Score 5 means q-value 1e-5. DEFAULT: 5",default=5)
     optparser.add_option("-l","--min-length",dest="minlen",type="int",
                          help="minimum length of peak, better to set it as d value. DEFAULT: 200",default=200)
     optparser.add_option("-g","--max-gap",dest="maxgap",type="int",
@@ -75,37 +82,76 @@ def main():
                          help="output file prefix, DEFAULT: peak") 
     (options,args) = optparser.parse_args()
 
-    if not (options.st1c1bdg and options.st2c2bdg and options.st1t2bdg and options.st2t1bdg):
+    if not (options.t1bdg and options.t2bdg and options.peak1 and options.peak2) or (not options.c1bdg and not options.c2bdg):
         optparser.print_help()
         sys.exit()
 
+    info("Read and build PeakIO...")
+    info("Peak of condition 1 treatment...")
+
+    t1_peakio = genericBedIO(options.peak1)
+    t1_peak = t1_peakio.build_bedtrack()
+    #t1_peak.apply_func(lambda x:int(x!=0))
+
+    info("Peak of condition 2 treatment...")
+
+    t2_peakio = genericBedIO(options.peak2)
+    t2_peak = t2_peakio.build_bedtrack()
+    #t2_peak.apply_func(lambda x:int(x!=0))
+    union_peak = t1_peak.overlie(t2_peak)
+    #t1_peak.write_bedGraph(file("1","w"),"1","1")
+    #t2_peak.write_bedGraph(file("2","w"),"2","2")
+    #union_peak.write_bedGraph(file("3","w"),"3","3")
+
     info("Read and build bedGraph...")
-    info("Score of condition 1 treatment vs condition 1 control...")
-    t1c1_bio = bedGraphIO.bedGraphIO(options.st1c1bdg)
-    t1c1_btrack = t1c1_bio.build_bdgtrack(baseline_value=0)
-    info("Score of condition 2 treatment vs condition 2 control...")
-    t2c2_bio = bedGraphIO.bedGraphIO(options.st2c2bdg)
-    t2c2_btrack = t2c2_bio.build_bdgtrack(baseline_value=0)
-    info("Score of condition 1 treatment vs condition 2 treatment...")
-    t1t2_bio = bedGraphIO.bedGraphIO(options.st1t2bdg)
-    t1t2_btrack = t1t2_bio.build_bdgtrack(baseline_value=0)
-    info("Score of condition 2 treatment vs condition 1 treatment...")
-    t2t1_bio = bedGraphIO.bedGraphIO(options.st2t1bdg)
-    t2t1_btrack = t2t1_bio.build_bdgtrack(baseline_value=0)
+    info("Pileup of condition 1 treatment...")
+    t1_bio = bedGraphIO(options.t1bdg)
+    t1_btrack = t1_bio.build_bdgtrack(baseline_value=0)
+    info("Pileup of condition 2 treatment...")
+    t2_bio = bedGraphIO(options.t2bdg)
+    t2_btrack = t2_bio.build_bdgtrack(baseline_value=0)
 
-    info("Combine four score tracks...")
-    comp_btrack = make_compositeScoreTrack(t1c1_btrack,t2c2_btrack,t1t2_btrack,t2t1_btrack)
 
-    info("Call differential regions ...")
-    ( consistent_peaks, condition1_peaks, condition2_peaks ) = comp_btrack.call_diff_regions(cutoff=options.cutoff,min_length=options.minlen,max_gap=options.maxgap)
+    if not options.c1bdg and options.c2bdg:
+        options.c1bdg = options.c2bdg
+        info("Control lambda of condition 1 control...")
+        c2_bio = bedGraphIO(options.c2bdg)
+        c2_btrack = c2_bio.build_bdgtrack(baseline_value=0)
+        c1_btrack = c2_btrack
+    elif not options.c2bdg and options.c1bdg:
+        options.c2bdg = options.c1bdg
+        info("Control lambda of condition 2 control...")
+        c1_bio = bedGraphIO(options.c1bdg)
+        c1_btrack = c1_bio.build_bdgtrack(baseline_value=0)
+        c2_btrack = c1_btrack
+    else:
+        info("Control lambda of condition 1 control...")        
+        c1_bio = bedGraphIO(options.c1bdg)
+        c1_btrack = c1_bio.build_bdgtrack(baseline_value=0)
+        info("Control lambda of condition 2 control...")                
+        c2_bio = bedGraphIO(options.c2bdg)
+        c2_btrack = c2_bio.build_bdgtrack(baseline_value=0)
 
-    info("Write peaks...")
-    consistent_f = open ("%s_c%.0f_l%d_g%d_consistent_peaks.bed" % (options.oprefix,options.cutoff,options.minlen,options.maxgap),"w")
-    condition1_f = open ("%s_c%.0f_l%d_g%d_condition1_unique_peaks.bed" % (options.oprefix,options.cutoff,options.minlen,options.maxgap),"w")
-    condition2_f = open ("%s_c%.0f_l%d_g%d_condition2_unique_peaks.bed" % (options.oprefix,options.cutoff,options.minlen,options.maxgap),"w")    
-    consistent_peaks.write_to_bed(consistent_f,name_prefix=options.oprefix+"_consistent_peak_", score_column="score")
-    condition1_peaks.write_to_bed(condition1_f,name_prefix=options.oprefix+"_condition1_unique_peak_", score_column="score")
-    condition2_peaks.write_to_bed(condition2_f,name_prefix=options.oprefix+"_condition2_unique_peak_", score_column="score")    
+    # fold change track
+    f1_track = t1_btrack.overlie(c1_btrack,func=lambda x,y:float(x)/y)
+    f2_track = t2_btrack.overlie(c2_btrack,func=lambda x,y:float(x)/y)
+    del c1_btrack
+    del c2_btrack
+    # t1_track and t2_track, f1_track and f2_track are kept
+
+    # Model P_e
+    
+    v1 = t1_btrack.extract_value(t1_peak)
+    v1hist = sorted(histogram(v1,minv=0,binsize=1).items())
+    #for (v,l) in v1hist:
+    #     print v,l
+    #f1_track.write_bedGraph(file("o","w"),"","")
+    v2 = f1_track.extract_value(t1_peak)
+    v2hist = sorted(histogram(v2,minv=0,binsize=100).items())
+    for (v,l) in v2hist:
+         print "%.0f\t%d" % (v,l)
+    
+    
     info("Done")
     
 if __name__ == '__main__':

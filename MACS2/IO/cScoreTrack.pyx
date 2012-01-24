@@ -1,4 +1,4 @@
-# Time-stamp: <2012-01-06 15:10:29 Tao Liu>
+# Time-stamp: <2012-01-24 15:57:02 Tao Liu>
 
 """Module for Feature IO classes.
 
@@ -258,29 +258,25 @@ class scoreTrackI:
         chrs  = self.get_chr_names()
         peaks = PeakIO()                      # dictionary to save peaks
 
-        #tloop = 0
-
         cutoff = int(cutoff)
         
         for chrom in chrs:
             chrom_pointer = self.pointer[chrom]
             peak_content = []           # to store points above cutoff
 
-            #t0 = ttime()
             above_cutoff = np.nonzero( self.data[chrom][colname] >= cutoff )[0] # indices where score is above cutoff
-            above_cutoff_flag = self.data[chrom][colname] >= cutoff
             above_cutoff_v = self.data[chrom][colname][above_cutoff] # scores where score is above cutoff
 
             above_cutoff_endpos = self.data[chrom]['pos'][above_cutoff] # end positions of regions where score is above cutoff
-            above_cutoff_startpos = self.data[chrom]['pos'][above_cutoff_flag[1:]] # start positions of regions where score is above cutoff
+            above_cutoff_startpos = self.data[chrom]['pos'][above_cutoff-1] # start positions of regions where score is above cutoff
             above_cutoff_sv= self.data[chrom]['sample'][above_cutoff] # sample pileup height where score is above cutoff
 
             if above_cutoff_v.size == 0:
                 continue
 
             if above_cutoff[0] == 0:
-                # first element > cutoff, insert first point in the chromosome
-                np.insert(above_cutoff_startpos,0,0)
+                # first element > cutoff, fix the first point as 0. otherwise it would be the last item in data[chrom]['pos']
+                above_cutoff_startpos[0] = 0
 
             # first bit of region above cutoff
             peak_content.append( (above_cutoff_startpos[0], above_cutoff_endpos[0], above_cutoff_v[0], above_cutoff_sv[0], above_cutoff[0]) )
@@ -293,14 +289,12 @@ class scoreTrackI:
                     self.__close_peak(peak_content, peaks, min_length, chrom, colname )
                     peak_content = [(above_cutoff_startpos[i], above_cutoff_endpos[i], above_cutoff_v[i], above_cutoff_sv[i], above_cutoff[i]),]
             
-            #tloop += ttime() - t0
             # save the last peak
             if not peak_content:
                 continue
             else:
                 self.__close_peak(peak_content, peaks, min_length, chrom, colname )
 
-        #print "loop: %.2f" % tloop
         return peaks
 
     def __close_peak (self, peak_content, peaks, min_length, chrom, colname):
@@ -321,9 +315,6 @@ class scoreTrackI:
             middle_summit = int( ( len(tmpsummit)+1 )/2 )-1 # the middle of all highest points in peak region is defined as summit
             summit_pos    = tmpsummit[ middle_summit ]
             summit_index  = tmpsummit_index[ middle_summit ]
-            # char * chromosome, long start, long end, long summit = 0, 
-            # double peak_height=0, int pileup=0, 
-            # double pvalue=0, double fold_change=0, double qvalue=0
             peaks.add( chrom,
                        peak_content[0][0],
                        peak_content[-1][1],
@@ -333,11 +324,6 @@ class scoreTrackI:
                        pscore      = self.data[chrom]['-100logp'][ summit_index ]/100.0,
                        fold_change = self.data[chrom]['sample'][ summit_index ]/self.data[chrom]['control'][ summit_index ],
                        qscore      = self.data[chrom]['-100logq'][ summit_index ]/100.0,
-                       #peak_score  = chrom_score [ summit_index ],
-                       #pileup      = chrom_sample[ summit_index ], # should be the same as summit_value
-                       #pscore      = chrom_pvalue[ summit_index ]/100.0,
-                       #fold_change = chrom_sample[ summit_index ]/chrom_control[ summit_index ],
-                       #qscore      = chrom_qvalue[ summit_index ]/100.0,
                        )
             # start a new peak
             return True
@@ -393,7 +379,74 @@ class scoreTrackI:
                     break
         
         return lvl1_peaks, broadpeaks
+
+    def call_broadpeaks2 (self, lvl1_cutoff=500, lvl2_cutoff=100, min_length=200, lvl1_max_gap=50, lvl2_max_gap=400, colname='-100logq'):
+        """This function try to find enriched regions within which,
+        scores are continuously higher than a given cutoff for level
+        1, and link them using the gap above level 2 cutoff with a
+        maximum length of lvl2_max_gap.
+
+        lvl1_cutoff:  cutoff of value at enriched regions, default 500.
+        lvl2_cutoff:  cutoff of value at linkage regions, default 100.        
+        min_length :  minimum peak length, default 200.
+        lvl1_max_gap   :  maximum gap to merge nearby enriched peaks, default 50.
+        lvl2_max_gap   :  maximum length of linkage regions, default 400.        
+        colname: can be 'sample','control','-100logp','-100logq'. Cutoff will be applied to the specified column.
+
+        Return both general PeakIO object for highly enriched regions
+        and gapped broad regions in BroadPeakIO.
+        """
+
+        assert (colname in [ 'sample', 'control', '-100logp', '-100logq' ]), "%s not supported!" % colname
+
+        chrs  = self.get_chr_names()
+        bpeaks = BroadPeakIO()                      # dictionary to save broad peaks
+
+        lvl2_cutoff = int(lvl2_cutoff)  # for broad regions
         
+        for chrom in chrs:
+            chrom_pointer = self.pointer[chrom]
+            lvl2_peak_content = []           # to store points above cutoff
+
+            above_cutoff = np.nonzero( self.data[chrom][colname] >= lvl2_cutoff )[0] # indices where score is above cutoff
+            above_cutoff_v = self.data[chrom][colname][above_cutoff] # scores where score is above cutoff
+
+            above_cutoff_endpos = self.data[chrom]['pos'][above_cutoff] # end positions of regions where score is above cutoff
+            above_cutoff_startpos = self.data[chrom]['pos'][above_cutoff-1] # start positions of regions where score is above cutoff
+            above_cutoff_sv= self.data[chrom]['sample'][above_cutoff] # sample pileup height where score is above cutoff
+
+            if above_cutoff_v.size == 0:
+                continue
+
+            if above_cutoff[0] == 0:
+                # first element > cutoff, fix the first point as 0. otherwise it would be the last item in data[chrom]['pos']
+                above_cutoff_startpos[0] = 0
+
+            # first bit of region above cutoff
+            lvl2_peak_content.append( (above_cutoff_startpos[0], above_cutoff_endpos[0], above_cutoff_v[0], above_cutoff_sv[0], above_cutoff[0]) )
+            for i in xrange(1,above_cutoff_startpos.size):
+                if above_cutoff_startpos[i] - peak_content[-1][1] <= lvl2_max_gap:
+                    # append
+                    lvl2_peak_content.append( (above_cutoff_startpos[i], above_cutoff_endpos[i], above_cutoff_v[i], above_cutoff_sv[i], above_cutoff[i]) )
+                else:
+                    # close
+                    self.__close_broad_peak(lvl2_peak_content, bpeaks, lvl1_max_gap, lvl1_cutoff, colname, min_length, chrom )
+                    lvl2_peak_content = [(above_cutoff_startpos[i], above_cutoff_endpos[i], above_cutoff_v[i], above_cutoff_sv[i], above_cutoff[i]),]
+            
+            # save the last peak
+            if not peak_content:
+                continue
+            else:
+                self.__close_broad_peak(lvl2_peak_content, bpeaks, lvl1_max_gap, lvl1_cutoff, colname, min_length, chrom )                
+        return bpeaks
+
+    def __close_broad_peak( self, lvl2_peak_content, bpeaks, lvl1_max_gap, lvl1_cutoff, colname, min_length, chrom ):
+        """ Finalize broad peak. Use 
+
+        """
+        pass
+
+
     def __add_broadpeak (self, bpeaks, chrom, lvl2peak, lvl1peakset):
         """Internal function to create broad peak.
         
@@ -428,3 +481,4 @@ class scoreTrackI:
         for chrom in self.data.keys():
             t += self.pointer[chrom]
         return t
+

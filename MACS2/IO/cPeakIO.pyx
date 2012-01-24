@@ -1,4 +1,4 @@
-# Time-stamp: <2011-11-29 13:27:42 Tao Liu>
+# Time-stamp: <2012-01-12 22:19:21 Tao Liu>
 
 """Module for PeakIO IO classes.
 
@@ -321,6 +321,62 @@ class PeakIO:
                 continue
         return total_num
 
+class Region:
+    """For plain region of chrom, start and end
+    """
+    def __init__ (self):
+        self.regions= {}
+        self.__flag_sorted = False
+
+    def add_loc ( self, chrom, start, end ):
+        if self.regions.has_key(chrom):
+            self.regions[chrom].append( (start,end) )
+        else:
+            self.regions[chrom] = [(start,end), ]
+        self.__flag_sorted = False            
+        return
+
+    def sort (self):
+        for chrom in self.regions.keys():
+            self.regions[chrom].sort()
+        self.__flag_sorted = True
+    
+    def merge_overlap ( self ):
+        if not self.__flag_sorted:
+            self.sort()
+        regions = self.regions
+        new_regions = {}
+        chrs = regions.keys()
+        chrs.sort()
+        for chrom in chrs:
+            new_regions[chrom]=[]
+            n_append = new_regions[chrom].append
+            prev_region = None
+            regions_chr = regions[chrom]
+            for i in xrange(len(regions_chr)):
+                if not prev_region:
+                    prev_region = regions_chr[i]
+                    continue
+                else:
+                    if regions_chr[i][0] <= prev_region[1]:
+                        s_new_region = prev_region[0]
+                        e_new_region = regions_chr[i][1]
+                        prev_region = (s_new_region,e_new_region)
+                    else:
+                        n_append(prev_region)
+                        prev_region = regions_chr[i]
+            if prev_region:
+                n_append(prev_region)
+        self.regions = new_regions
+        self.sort()
+        return True
+
+    def write_to_bed (self, fhd ):
+        chrs = self.regions.keys()
+        chrs.sort()
+        for chrom in chrs:
+            for region in self.regions[chrom]:
+                fhd.write( "%s\t%d\t%d\n" % (chrom,region[0],region[1] ) )
 
 
 ###

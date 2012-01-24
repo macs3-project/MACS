@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# Time-stamp: <2011-12-29 16:36:12 Tao Liu>
+# Time-stamp: <2012-01-12 17:20:38 Tao Liu>
 
 import os
 import sys
@@ -7,6 +7,7 @@ import logging
 from optparse import OptionParser
 
 from MACS2.IO import cBedGraphIO
+from MACS2.IO.cBedGraph import scoreTracktoBedGraph
 from MACS2.cProb import poisson_cdf
 
 # ------------------------------------
@@ -53,14 +54,14 @@ def main():
     optparser.add_option("-o","--output",dest="ofile",type="string",
                          help="Required: The output bedGraph file to write scores.")
     optparser.add_option("-m","--method",dest="method",type="string",
-                         help="Method to use while calculating a score in any bin by comparing treatment value and control value. Available choices are: ppois, substract, divide which represent Poisson Pvalue (-log10(pvalue) form) using control as lambda and treatment as observation, substraction from treatment, fold change which may be problematic if there are zero in control. Default option is ppois.",default="ppois")
+                         help="Method to use while calculating a score in any bin by comparing treatment value and control value. Available choices are: ppois, qpois, substract, divide, multiply which represent Poisson Pvalue (-log10(pvalue) form) using control as lambda and treatment as observation, q-value through a BH process for poisson pvalues, substraction from treatment, fold change which may be problematic if there are zero in control. Default option is ppois.",default="ppois")
     (options,args) = optparser.parse_args()
 
     if not options.tfile or not options.cfile or not options.ofile:
         optparser.print_help()
         sys.exit()
 
-    available_methods = ['ppois','substract','divide','multiply']
+    available_methods = ['ppois','substract','divide','multiply','qpois']
     if options.method not in available_methods:
         sys.stderr.write("Method can only be %s" % ",".join(available_methods))
     else:
@@ -77,7 +78,13 @@ def main():
     info("Calculate scores comparing treatment and control by %s..." % method)
     # build score track
     if method == 'ppois':
-        sbtrack = tbtrack.overlie(cbtrack,func=lambda x,y:get_pscore(x,y))
+        sbtrack = tbtrack.make_scoreTrack_for_macs(cbtrack)
+        sbtrack = scoreTracktoBedGraph(sbtrack,'-100logp')        
+    elif method == 'qpois':
+        sbtrack = tbtrack.make_scoreTrack_for_macs(cbtrack)
+        pqtable = sbtrack.make_pq_table()
+        sbtrack.assign_qvalue(pqtable)
+        sbtrack = scoreTracktoBedGraph(sbtrack,'-100logq')
     elif method == 'substract':
         sbtrack = tbtrack.overlie(cbtrack,func=lambda x,y:x-y)
     elif method == 'divide':

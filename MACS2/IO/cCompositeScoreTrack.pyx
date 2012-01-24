@@ -1,4 +1,4 @@
-# Time-stamp: <2012-01-06 16:16:39 Tao Liu>
+# Time-stamp: <2012-01-24 15:58:35 Tao Liu>
 
 """Module for Composite Score Track IO classes.
 
@@ -255,19 +255,17 @@ class compositeScoreTrackII:
 
             #t0 = ttime()
             above_cutoff = np.nonzero( self.data[chrom][colname] >= cutoff )[0] # indices where score is above cutoff
-            above_cutoff_flag = self.data[chrom][colname] >= cutoff
             above_cutoff_v = self.data[chrom][colname][above_cutoff] # scores where score is above cutoff
 
             above_cutoff_endpos = self.data[chrom]['pos'][above_cutoff] # end positions of regions where score is above cutoff
-            above_cutoff_startpos = self.data[chrom]['pos'][above_cutoff_flag[1:]] # start positions of regions where score is above cutoff
+            above_cutoff_startpos = self.data[chrom]['pos'][above_cutoff-1] # start positions of regions where score is above cutoff
             above_cutoff_sv= self.data[chrom]['sample'][above_cutoff] # sample pileup height where score is above cutoff
 
             if above_cutoff_v.size == 0:
                 continue
 
             if above_cutoff[0] == 0:
-                # first element > cutoff, insert first point in the chromosome
-                np.insert(above_cutoff_startpos,0,0)
+                above_cutoff_startpos[0] = 0
 
             # first bit of region above cutoff
             peak_content.append( (above_cutoff_startpos[0], above_cutoff_endpos[0], above_cutoff_v[0], above_cutoff_sv[0], above_cutoff[0]) )
@@ -960,6 +958,91 @@ def make_compositeScoreTrack (bdgTrack1, bdgTrack2, bdgTrack3, bdgTrack4 ):
     chr2 = set(bdgTrack2.get_chr_names())
     chr3 = set(bdgTrack3.get_chr_names())
     chr4 = set(bdgTrack4.get_chr_names())    
+    
+    common_chr = chr1.intersection(chr2).intersection(chr3).intersection(chr4)
+    for chrom in common_chr:
+            
+        (p1s,v1s) = bdgTrack1.get_data_by_chr(chrom) # arrays for position and values
+        p1n = iter(p1s).next         # assign the next function to a viable to speed up
+        v1n = iter(v1s).next
+
+        (p2s,v2s) = bdgTrack2.get_data_by_chr(chrom) # arrays for position and values
+        p2n = iter(p2s).next         # assign the next function to a viable to speed up
+        v2n = iter(v2s).next
+
+        (p3s,v3s) = bdgTrack3.get_data_by_chr(chrom) # arrays for position and values
+        p3n = iter(p3s).next         # assign the next function to a viable to speed up
+        v3n = iter(v3s).next
+
+        (p4s,v4s) = bdgTrack4.get_data_by_chr(chrom) # arrays for position and values
+        p4n = iter(p4s).next         # assign the next function to a viable to speed up
+        v4n = iter(v4s).next
+
+        chrom_max_len = len(p1s)+len(p2s)+len(p3s)+len(p4s) # this is the maximum number of locations needed to be recorded in scoreTrackI for this chromosome.
+            
+        ret.add_chromosome(chrom,chrom_max_len)
+
+        pre_p = 0                   # remember the previous position in the new bedGraphTrackI object ret
+            
+        try:
+            p1 = p1n()
+            v1 = v1n()
+
+            p2 = p2n()
+            v2 = v2n()
+
+            p3 = p3n()
+            v3 = v3n()
+
+            p4 = p4n()
+            v4 = v4n()
+            
+            while True:
+                min_p = min( p1, p2, p3, p4 )
+                retadd( chrom, min_p, v1, v2, v3, v4 )
+                pre_p = min_p
+
+                if p1 == min_p:
+                    p1 = p1n()
+                    v1 = v1n()
+                if p2 == min_p:
+                    p2 = p2n()
+                    v2 = v2n()
+                if p3 == min_p:
+                    p3 = p3n()
+                    v3 = v3n()
+                if p4 == min_p:
+                    p4 = p4n()
+                    v4 = v4n()                                        
+        except StopIteration:
+            # meet the end of either bedGraphTrackI, simply exit
+            pass
+        
+    return ret
+
+
+
+def make_compositeScoreTrack2 (bdgTrack1, bdgTrack2, bdgTrack3, bdgTrack4 ):
+    """A modified overlie function for MACS DIFF.
+    
+    """
+    assert isinstance(bdgTrack1,bedGraphTrackI), "bdgTrack1 is not a bedGraphTrackI object"
+    assert isinstance(bdgTrack2,bedGraphTrackI), "bdgTrack2 is not a bedGraphTrackI object"
+    assert isinstance(bdgTrack3,bedGraphTrackI), "bdgTrack3 is not a bedGraphTrackI object"
+    assert isinstance(bdgTrack4,bedGraphTrackI), "bdgTrack4 is not a bedGraphTrackI object"    
+    
+    ret = compositeScoreTrackII()
+    retadd = ret.add
+
+    score_btrack1 = bdgTrack1.make_scoreTrack_for_macs( bdgTrack3 )
+    pqtable1 = score_btrack1.make_pq_table()
+    score_btrack1.assign_qvalue(pqtable1)
+    
+    score_btrack2 = bdgTrack2.make_scoreTrack_for_macs( bdgTrack4 )
+    pqtable2 = score_btrack2.make_pq_table()
+    score_btrack2.assign_qvalue(pqtable2)    
+
+    
     
     common_chr = chr1.intersection(chr2).intersection(chr3).intersection(chr4)
     for chrom in common_chr:
