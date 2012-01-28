@@ -16,6 +16,9 @@
 	been turned off by default now, if you still want this feature,
 	please use '--off-auto' and '--shiftsize' with desired number.
 
+	3. --keep-dup is by default 1. To keep only one tag per position,
+	always performs better than keep multiple, from our internal tests.
+
 	* PeakSplitter for bedGraph output as well
 
 2011-06-21  Tao Liu  <taoliu@jimmy.harvard.edu>
