@@ -660,10 +660,8 @@ class BAMParser(GenericParser):
                 return (None, -1, None)   # not a proper pair
             if bwflag & 8:
                 return (None, -1, None)   # the mate is unmapped
-            p1pos = thisstart
-            p2pos = struct.unpack('<i', data[24:28])[0]
-            if p1pos > p2pos:
-                # this pair is the farthest one, skip it
+            if bwflag & 128:
+                # this is not the first read in a pair
                 return (None, -1, None)
         # In case of paired-end we have now skipped all possible "bad" pairs
         # in case of proper pair we have skipped the rightmost one... if the leftmost pair comes
