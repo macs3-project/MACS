@@ -1,4 +1,4 @@
-# Time-stamp: <2011-12-28 14:25:12 Tao Liu>
+# Time-stamp: <2012-02-04 22:30:51 Tao Liu>
 
 """Module Description
 
@@ -15,6 +15,7 @@ with the distribution).
 @contact: taoliu@jimmy.harvard.edu
 """
 import sys, time, random
+import numpy as np
 
 def median (nums):
     """Calculate Median.
@@ -97,14 +98,18 @@ class PeakModel:
         num_paired_peakpos = 0
         num_paired_peakpos_remained = self.max_pairnum
         num_paired_peakpos_picked = 0
+        # select only num_paired_peakpos_remained pairs.
         for c in paired_peakpos.keys():
             num_paired_peakpos +=len(paired_peakpos[c])
-            if num_paired_peakpos_remained == 0:
-                paired_peakpos.pop(c)
-            else:
-                paired_peakpos[c] = paired_peakpos[c][:num_paired_peakpos_remained]
-                num_paired_peakpos_remained -=  len(paired_peakpos[c])
-                num_paired_peakpos_picked += len(paired_peakpos[c])
+        #     if num_paired_peakpos_remained == 0:
+        #         paired_peakpos.pop(c)
+        #     else:
+        #         paired_peakpos[c] = paired_peakpos[c][:num_paired_peakpos_remained]
+        #         num_paired_peakpos_remained -=  len(paired_peakpos[c])
+        #         num_paired_peakpos_picked += len(paired_peakpos[c])
+        # TL: Now I want to use everything
+
+        num_paired_peakpos_picked = num_paired_peakpos
 
         self.info("#2 number of paired peaks: %d" % (num_paired_peakpos))
         if num_paired_peakpos < 100:
@@ -134,8 +139,8 @@ Summary of Peak Model:
         Modify self.(d, model_shift size and scan_window size. and extra, plus_line, minus_line and shifted_line for plotting).
         """
         window_size = 1+2*self.peaksize
-        self.plus_line = [0]*window_size
-        self.minus_line = [0]*window_size
+        self.plus_line = np.zeros(window_size)#[0]*window_size
+        self.minus_line = np.zeros(window_size)#[0]*window_size
         for chrom in paired_peakpos.keys():
             paired_peakpos_chrom = paired_peakpos[chrom]
             tags = self.treatment.get_locations_by_chr(chrom)
@@ -148,33 +153,45 @@ Summary of Peak Model:
             self.minus_line = self.__model_add_line (paired_peakpos_chrom, tags_minus,self.minus_line)
 
         # find top 
-        plus_tops = []
-        minus_tops = []
-        plus_max = max(self.plus_line)
-        minus_max = max(self.minus_line)
-        for i in range(window_size):
-            if self.plus_line[i] == plus_max:
-                plus_tops.append(i)
-            if self.minus_line[i] == minus_max:
-                minus_tops.append(i)
-        self.d = minus_tops[len(minus_tops)/2] - plus_tops[len(plus_tops)/2] + 1
-        shift_size = self.d/2
+        # plus_tops = []
+        # minus_tops = []
+        # plus_max = max(self.plus_line)
+        # minus_max = max(self.minus_line)
+        # for i in range(window_size):
+        #     if self.plus_line[i] == plus_max:
+        #         plus_tops.append(i)
+        #     if self.minus_line[i] == minus_max:
+        #         minus_tops.append(i)
+        # self.d = minus_tops[len(minus_tops)/2] - plus_tops[len(plus_tops)/2] + 1
+        # shift_size = self.d/2
         # find the median point
         #plus_median = median(self.plus_line) 
-        #minus_median = median(self.minus_line)       
+        #minus_median = median(self.minus_line)
 
+        # Now I use cross-correlation to find the best d
+
+        ycorr = np.correlate(self.minus_line,self.plus_line,mode="full")[window_size-1:]
+        xcorr = np.linspace(0, len(ycorr)-1, num=len(ycorr))
+        # best cross-correlation point
+        self.d = np.where(ycorr==max(ycorr))[0][0]
+        # all local maximums could be alternative ds.
+        self.alternative_d = xcorr[np.r_[True, ycorr[1:] > ycorr[:-1]] & np.r_[ycorr[:-1] > ycorr[1:], True]]
+        self.ycorr = ycorr
+        self.xcorr = xcorr
+
+        shift_size = self.d/2
         
         self.scan_window = max(self.d,self.tsize)*2
         # a shifted model
         self.shifted_line = [0]*window_size
-        plus_shifted = [0]*shift_size
-        plus_shifted.extend(self.plus_line[:-1*shift_size])
-        minus_shifted = self.minus_line[shift_size:]
-        minus_shifted.extend([0]*shift_size)
+        #plus_shifted = [0]*shift_size
+        #plus_shifted.extend(self.plus_line[:-1*shift_size])
+        #minus_shifted = self.minus_line[shift_size:]
+        #minus_shifted.extend([0]*shift_size)
         #print "d:",self.d,"shift_size:",shift_size
         #print len(self.plus_line),len(self.minus_line),len(plus_shifted),len(minus_shifted),len(self.shifted_line)
-        for i in range(window_size):
-            self.shifted_line[i]=minus_shifted[i]+plus_shifted[i]
+        #for i in range(window_size):
+        #    self.shifted_line[i]=minus_shifted[i]+plus_shifted[i]
         return True
 
     def __model_add_line (self, pos1, pos2, line):

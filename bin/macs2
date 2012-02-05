@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# Time-stamp: <2012-01-09 15:17:38 Tao Liu>
+# Time-stamp: <2012-02-04 22:20:36 Tao Liu>
 
 """Description: MACS 2 main executable
 
@@ -143,6 +143,7 @@ def main():
             debug("#2   d: %d" % (peakmodel.d))
             debug("#2   scan_window: %d" % (peakmodel.scan_window))
             info("#2 predicted fragment length is %d bps" % peakmodel.d)
+            info("#2 alternative fragment length(s) may be %s bps" % ','.join(map(str,peakmodel.alternative_d)))
             info("#2.2 Generate R script for model : %s" % (options.modelR))
             model2r_script(peakmodel,options.modelR,options.name)
             options.d = peakmodel.d
@@ -219,6 +220,7 @@ def main():
     ofhd_xls.write(tagsinfo)
 
     ofhd_xls.write("# d = %d\n" % (options.d))
+    ofhd_xls.write("# alternative fragment length(s) may be %s bps\n" % ','.join(map(str,peakmodel.alternative_d)))    
     if options.nolambda:
         ofhd_xls.write("# local lambda is disabled!\n")
     ofhd_xls.write(peakdetect.toxls())
