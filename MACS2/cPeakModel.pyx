@@ -1,4 +1,4 @@
-# Time-stamp: <2012-02-04 22:30:51 Tao Liu>
+# Time-stamp: <2012-02-05 20:41:02 Tao Liu>
 
 """Module Description
 
@@ -227,6 +227,8 @@ Summary of Peak Model:
                     if i>=0 and i<len(line):
                         line[i]+=1
                 i2+=1
+        s = sum(line)
+        line = line/s
         return line
             
     def __paired_peaks (self):
