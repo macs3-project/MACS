@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# Time-stamp: <2012-02-04 22:20:36 Tao Liu>
+# Time-stamp: <2012-02-07 00:55:07 Tao Liu>
 
 """Description: MACS 2 main executable
 
@@ -148,10 +148,15 @@ def main():
             model2r_script(peakmodel,options.modelR,options.name)
             options.d = peakmodel.d
             options.scanwindow= 2*options.d
-            if options.onauto and options.d <= 2*options.tsize:
-                options.d=options.shiftsize*2
-                options.scanwindow=2*options.d 
-                warn("#2 Since the d calculated from paired-peaks are smaller than 2*tag length, it may be influenced by unknown sequencing problem. MACS will use %d as shiftsize, %d as fragment length. NOTE: if the d calculated is still acceptable, please do not use --auto-bimodal option!" % (options.shiftsize,options.d))
+            if options.d <= 2*options.tsize:
+                warn("#2 Since the d calculated from paired-peaks are smaller than 2*tag length, it may be influenced by unknown sequencing problem!" % (options.shiftsize,options.d))
+                if options.onauto:
+                    options.d=options.shiftsize*2
+                    options.scanwindow=2*options.d 
+                    warn("#2 MACS will use %d as shiftsize, %d as fragment length. NOTE: if the d calculated is still acceptable, please do not use --fix-bimodal option!" % (options.shiftsize,options.d))
+                else:
+                    warn("#2 You may need to consider one of the other alternative d(s): %s" %  ','.join(map(str,peakmodel.alternative_d)))
+                    warn("#2 You can restart the process with --nomodel --shiftsize XXX with your choice or an arbitrary number. Nontheless, MACS will continute computing.")
                 
         except NotEnoughPairsException:
             if not options.onauto:
@@ -159,7 +164,7 @@ def main():
             warn("#2 Skipped...")
             options.d=options.shiftsize*2
             options.scanwindow=2*options.d 
-            warn("#2 Since --auto-bimodal is set, MACS will use %d as shiftsize, %d as fragment length" % (options.shiftsize,options.d))
+            warn("#2 Since --fix-bimodal is set, MACS will use %d as shiftsize, %d as fragment length" % (options.shiftsize,options.d))
 
 
     #3 Call Peaks
@@ -296,7 +301,7 @@ or example for broad peak calling: %prog -t ChIP.bam -c Control.bam --broad -g h
                          help="The small nearby region in basepairs to calculate dynamic lambda. This is used to capture the bias near the peak summit region. Invalid if there is no control data. If you set this to 0, MACS will skip slocal lambda calculation. *Note* that MACS will always perform a d-size local lambda calculation. The final local bias should be the maximum of the lambda value from d, slocal, and llocal size windows. DEFAULT: 1000 ")
     optparser.add_option("--llocal",dest="largelocal",type="int",default=10000,
                          help="The large nearby region in basepairs to calculate dynamic lambda. This is used to capture the surround bias. If you set this to 0, MACS will skip llocal lambda calculation. *Note* that MACS will always perform a d-size local lambda calculation. The final local bias should be the maximum of the lambda value from d, slocal, and llocal size windows. DEFAULT: 10000.")
-    optparser.add_option("--auto-bimodal",dest="onauto",action="store_true",
+    optparser.add_option("--fix-bimodal",dest="onauto",action="store_true",
                          help="Whether turn on the auto pair model process. If set, when MACS failed to build paired model, it will use the nomodel settings, the '--shiftsize' parameter to shift and extend each tags. Not to use this automate fixation is a default behavior now. DEFAULT: False",
                          default=False)
     optparser.add_option("--nomodel",dest="nomodel",action="store_true",

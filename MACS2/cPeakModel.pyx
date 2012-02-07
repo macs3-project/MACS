@@ -1,4 +1,4 @@
-# Time-stamp: <2012-02-06 22:48:57 Tao Liu>
+# Time-stamp: <2012-02-07 11:25:43 Tao Liu>
 
 """Module Description
 
@@ -152,36 +152,24 @@ Summary of Peak Model:
             #  add minus_line
             self.minus_line = self.__model_add_line (paired_peakpos_chrom, tags_minus,self.minus_line, plus_strand=0)
 
-        #print self.plus_line
-        #print self.minus_line
-        # find top 
-        # plus_tops = []
-        # minus_tops = []
-        # plus_max = max(self.plus_line)
-        # minus_max = max(self.minus_line)
-        # for i in range(window_size):
-        #     if self.plus_line[i] == plus_max:
-        #         plus_tops.append(i)
-        #     if self.minus_line[i] == minus_max:
-        #         minus_tops.append(i)
-        # self.d = minus_tops[len(minus_tops)/2] - plus_tops[len(plus_tops)/2] + 1
-        # shift_size = self.d/2
-        # find the median point
-        #plus_median = median(self.plus_line) 
-        #minus_median = median(self.minus_line)
-
         # Now I use cross-correlation to find the best d
         
         # normalize first
         minus_data = (self.minus_line - self.minus_line.mean())/(self.minus_line.std()*len(self.minus_line))
         plus_data = (self.plus_line - self.plus_line.mean())/(self.plus_line.std()*len(self.plus_line))
-        
+
+        # cross-correlation
         ycorr = np.correlate(minus_data,plus_data,mode="full")[window_size-1:window_size+self.peaksize]
         xcorr = np.linspace(0, len(ycorr)-1, num=len(ycorr))
         # best cross-correlation point
         self.d = np.where(ycorr==max(ycorr))[0][0]
         # all local maximums could be alternative ds.
         self.alternative_d = xcorr[np.r_[True, ycorr[1:] > ycorr[:-1]] & np.r_[ycorr[:-1] > ycorr[1:], True]]
+        # get rid of the last local maximum if it's at the right end of curve.
+        if self.alternative_d[-1] == self.peaksize:
+            self.alternative_d = np.resize(self.alternative_d,self.alternative_d.size-1)
+        assert self.alternative_d.size > 0, "No proper d can be found! Tweak --mfold?"
+        
         self.ycorr = ycorr
         self.xcorr = xcorr
 
