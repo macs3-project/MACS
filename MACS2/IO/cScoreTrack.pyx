@@ -1,4 +1,4 @@
-# Time-stamp: <2012-01-24 15:57:02 Tao Liu>
+# Time-stamp: <2012-02-07 20:00:05 Tao Liu>
 
 """Module for Feature IO classes.
 
@@ -481,4 +481,263 @@ class scoreTrackI:
         for chrom in self.data.keys():
             t += self.pointer[chrom]
         return t
+
+
+class MDTrackI:
+    """
+    """
+    def __init__ (self):
+        """Different with bedGraphTrackI, missing values are simply
+        replaced with 0.
+        
+        """
+        self.data = {}
+        self.pointer = {}
+
+    def add_chromosome ( self, chrom, chrom_max_len ):
+        if not self.data.has_key(chrom):
+            self.data[chrom] = np.zeros(chrom_max_len,dtype=[('pos','int32'),
+                                                             ('M','float32'), # log-ratio
+                                                             ('D','float32'), # absolute difference
+                                                             ('P','float32'), # probability
+                                                             ('O','float32'), # odds
+                                                             ])
+            self.pointer[chrom] = 0
+
+    def add (self,chromosome,endpos,M,D):
+        """Add a chr-endpos-sample-control block into data
+        dictionary. At the mean time, calculate pvalues.
+
+        """
+        c = self.data[chromosome]
+        i = self.pointer[chromosome]
+        # get the preceding region
+        c[i] = (endpos,M,D,0,0)
+        self.pointer[chromosome] += 1
+
+    def get_data_by_chr (self, chromosome):
+        """Return array of counts by chromosome.
+
+        The return value is a tuple:
+        ([end pos],[value])
+        """
+        if self.data.has_key(chromosome):
+            return self.data[chromosome]
+        else:
+            return None
+
+    def get_chr_names (self):
+        """Return all the chromosome names stored.
+        
+        """
+        l = set(self.data.keys())
+        return l
+
+    def write_bedGraph (self, fhd, name, description, colname):
+        """Write all data to fhd in Wiggle Format.
+
+        fhd: a filehandler to save bedGraph.
+        name/description: the name and description in track line.
+
+        colname: can be 'sample','control','-100logp','-100logq'
+
+        """
+        if colname not in ['M','D','P','O']:
+            raise Exception("%s not supported!" % colname)
+        chrs = self.get_chr_names()
+        for chrom in chrs:
+            d = self.data[chrom]
+            l = self.pointer[chrom]
+            pre = 0
+            pos   = d['pos']
+            value = d[colname]
+            for i in xrange( l ):
+                fhd.write("%s\t%d\t%d\t%.2f\n" % (chrom,pre,pos[i],value[i]))
+                pre = pos[i]
+
+        return True
+
+    def call_peaks (self, cutoff=500, min_length=200, max_gap=50, colname='P'):
+        """This function try to find regions within which, scores
+        are continuously higher than a given cutoff.
+
+        This function is NOT using sliding-windows. Instead, any
+        regions in bedGraph above certain cutoff will be detected,
+        then merged if the gap between nearby two regions are below
+        max_gap. After this, peak is reported if its length is above
+        min_length.
+
+        cutoff:  cutoff of value, default 1.
+        min_length :  minimum peak length, default 200.
+        gap   :  maximum gap to merge nearby peaks, default 50.
+        colname: can be 'sample','control','-100logp','-100logq'. Cutoff will be applied to the specified column.
+        ptrack:  an optional track for pileup heights. If it's not None, use it to find summits. Otherwise, use self/scoreTrack.
+        """
+        assert (colname in [ 'M', 'D', 'P', 'O' ]), "%s not supported!" % colname
+
+        chrs  = self.get_chr_names()
+        peaks = PeakIO()                      # dictionary to save peaks
+
+        cutoff = int(cutoff)
+        
+        for chrom in chrs:
+            chrom_pointer = self.pointer[chrom]
+            peak_content = []           # to store points above cutoff
+
+            above_cutoff = np.nonzero( self.data[chrom][colname] >= cutoff )[0] # indices where score is above cutoff
+            above_cutoff_v = self.data[chrom][colname][above_cutoff] # scores where score is above cutoff
+
+            above_cutoff_endpos = self.data[chrom]['pos'][above_cutoff] # end positions of regions where score is above cutoff
+            above_cutoff_startpos = self.data[chrom]['pos'][above_cutoff-1] # start positions of regions where score is above cutoff
+            above_cutoff_sv= self.data[chrom]['sample'][above_cutoff] # sample pileup height where score is above cutoff
+
+            if above_cutoff_v.size == 0:
+                continue
+
+            if above_cutoff[0] == 0:
+                # first element > cutoff, fix the first point as 0. otherwise it would be the last item in data[chrom]['pos']
+                above_cutoff_startpos[0] = 0
+
+            # first bit of region above cutoff
+            peak_content.append( (above_cutoff_startpos[0], above_cutoff_endpos[0], above_cutoff_v[0], above_cutoff_sv[0], above_cutoff[0]) )
+            for i in xrange(1,above_cutoff_startpos.size):
+                if above_cutoff_startpos[i] - peak_content[-1][1] <= max_gap:
+                    # append
+                    peak_content.append( (above_cutoff_startpos[i], above_cutoff_endpos[i], above_cutoff_v[i], above_cutoff_sv[i], above_cutoff[i]) )
+                else:
+                    # close
+                    self.__close_peak(peak_content, peaks, min_length, chrom, colname )
+                    peak_content = [(above_cutoff_startpos[i], above_cutoff_endpos[i], above_cutoff_v[i], above_cutoff_sv[i], above_cutoff[i]),]
+            
+            # save the last peak
+            if not peak_content:
+                continue
+            else:
+                self.__close_peak(peak_content, peaks, min_length, chrom, colname )
+
+        return peaks
+
+    def __close_peak (self, peak_content, peaks, min_length, chrom, colname):
+        peak_length = peak_content[ -1 ][ 1 ] - peak_content[ 0 ][ 0 ]
+        if peak_length >= min_length: # if the peak is too small, reject it
+            tmpsummit = []
+            summit_pos   = None
+            summit_value = None
+            for (tmpstart,tmpend,tmpvalue,tmpsummitvalue, tmpindex) in peak_content:
+                if not summit_value or summit_value < tmpsummitvalue:
+                    tmpsummit = [ int(( tmpend+tmpstart )/2), ]
+                    tmpsummit_index = [ tmpindex, ]
+                    summit_value = tmpsummitvalue
+                elif summit_value == tmpsummitvalue:
+                    # remember continuous summit values
+                    tmpsummit.append( int( (tmpend+tmpstart)/2 ) )
+                    tmpsummit_index.append( tmpindex )
+            middle_summit = int( ( len(tmpsummit)+1 )/2 )-1 # the middle of all highest points in peak region is defined as summit
+            summit_pos    = tmpsummit[ middle_summit ]
+            summit_index  = tmpsummit_index[ middle_summit ]
+            peaks.add( chrom,
+                       peak_content[0][0],
+                       peak_content[-1][1],
+                       summit      = summit_pos,
+                       peak_score  = self.data[chrom][colname][ summit_index ],
+                       pileup      = 0,
+                       pscore      = 0,
+                       fold_change = 0,
+                       qscore      = 0,
+                       )
+            # start a new peak
+            return True
+
+        return bpeaks
+
+    def total ( self ):
+        """Return the number of regions in this object.
+
+        """
+        t = 0
+        for chrom in self.data.keys():
+            t += self.pointer[chrom]
+        return t
+
+    def extract_MDvalue ( self, bdgTrack2 ):
+        """It's like overlie function. THe overlapped regions between
+        bdgTrack2 and self, will be recorded. The values from self in
+        the overlapped regions will be outputed in a single array for
+        follow statistics.
+
+        """
+        #assert isinstance(bdgTrack2,bedGraphTrackI), "bdgTrack2 is not a bedGraphTrackI object"
+
+        ret = [array(FBYTE4,[]),array(FBYTE4,[]),array(BYTE4,[])] # M,D,length
+        madd = ret[0].append
+        dadd = ret[1].append        
+        ladd = ret[2].append
+        
+        chr1 = set(self.get_chr_names())
+        chr2 = set(bdgTrack2.get_chr_names())
+        common_chr = chr1.intersection(chr2)
+        for chrom in common_chr:
+            chrom_data = self.get_data_by_chr(chrom) # arrays for position and values
+            p1n = chrom_data['pos'].flat.next
+            m1n = chrom_data['M'].flat.next
+            d1n = chrom_data['D'].flat.next
+
+            (p2s,v2s) = bdgTrack2.get_data_by_chr(chrom) # arrays for position and values
+            p2n = iter(p2s).next         # assign the next function to a viable to speed up
+            v2n = iter(v2s).next
+
+            pre_p = 0                   # remember the previous position in the new bedGraphTrackI object ret
+            
+            try:
+                p1 = p1n()
+                m1 = m1n()
+                d1 = d1n()
+
+                p2 = p2n()
+                v2 = v2n()
+
+                while True:
+                    if p1 < p2:
+                        # clip a region from pre_p to p1, then set pre_p as p1.
+                        if v2>0:
+                            madd(m1)
+                            dadd(d1)                            
+                            ladd(p1-pre_p)                        
+                        pre_p = p1
+                        # call for the next p1 and v1
+                        p1 = p1n()
+                        m1 = m1n()
+                        d1 = d1n()
+                    elif p2 < p1:
+                        # clip a region from pre_p to p2, then set pre_p as p2.
+                        if v2>0:
+                            madd(m1)
+                            dadd(d1)                            
+                            ladd(p2-pre_p)                        
+                        pre_p = p2
+                        # call for the next p2 and v2
+                        p2 = p2n()
+                        v2 = v2n()
+                    elif p1 == p2:
+                        # from pre_p to p1 or p2, then set pre_p as p1 or p2.
+                        if v2>0:
+                            madd(m1)
+                            dadd(d1)                            
+                            ladd(p1-pre_p)
+                        pre_p = p1
+                        # call for the next p1, v1, p2, v2.
+                        p1 = p1n()
+                        m1 = m1n()
+                        d1 = d1n()
+                        p2 = p2n()
+                        v2 = v2n()
+            except StopIteration:
+                # meet the end of either bedGraphTrackI, simply exit
+                pass
+
+        # convert to np.array
+        ret = np.array([ret[0],ret[1],ret[2]]).transpose()
+        #ret = ret[ret[0,0,:].argsort()]
+        return ret
+
 

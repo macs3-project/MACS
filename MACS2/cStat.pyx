@@ -1,4 +1,4 @@
-# Time-stamp: <2012-01-20 16:50:23 Tao Liu>
+# Time-stamp: <2012-02-07 20:08:05 Tao Liu>
 
 """Module Description
 
@@ -64,6 +64,32 @@ def histogram ( vl, breaks=None, minv=None, maxv=None, binsize=None):
             k = (v - minv)//binsize*binsize + minv
             #print k
             ret[ k ] += int(l)
+
+    return ret
+
+def histogram2D ( md ):
+    """Return histogram statistics.
+
+    Parameters:
+
+    vl: 2D numpy.array as [ [value, length], [value, length], ...]
+    
+    breaks: if breaks is not None and a valid integar, split [min,max]
+    of values in vl into number of equal sized bins. Otherwise, no
+    binning is involved.
+
+    Return Value:
+    Counter object
+
+
+    when breaks is not None, key values in Counter is the start points
+    of each bin.
+    
+    """
+    ret = Counter()
+
+    for (m, d, l) in md:
+        ret[ (m,d) ] += int(l)
 
     return ret
 

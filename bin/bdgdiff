@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# Time-stamp: <2012-01-23 16:23:23 Tao Liu>
+# Time-stamp: <2012-02-07 23:10:45 Tao Liu>
 
 """Description: Naive call differential peaks from 4 bedGraph tracks for scores.
 
@@ -28,7 +28,7 @@ from MACS2.IO.cBedGraphIO import bedGraphIO,genericBedIO
 from MACS2.IO.cPeakIO import Region
 from MACS2.IO.cCompositeScoreTrack import *
 from MACS2.cStat import *
-#from math import log10
+from math import log
 
 # ------------------------------------
 # constants
@@ -67,11 +67,9 @@ def main():
     optparser.add_option("--t1",dest="t1bdg",type="string",
                          help="MACS pileup bedGraph for condition 1.")
     optparser.add_option("--t2",dest="t2bdg",type="string",
-                         help="MACS pileup bedGraph for condition 2.")
-    optparser.add_option("--c1",dest="c1bdg",type="string",
-                         help="MACS pileup bedGraph for condition 1.")                         
-    optparser.add_option("--c2",dest="c2bdg",type="string",
-                         help="MACS pileup bedGraph for condition 2. If --c2 is not specified, use --c1 for condition 2. If both --c1 and --c2 are not specified, no control is used.")
+                         help="MACS pileup bedGraph for condition 2.")                         
+    optparser.add_option("-Z","--zero",dest="zerocount",type="float",
+                         help="The arbitrary number representing regions with zero count. *PLEASE DONE CHANGE IT*. DEFAULT: 0.01",default=0.01)
     optparser.add_option("-C","--cutoff",dest="cutoff",type="float",
                          help="Cutoff of q-value. Score 5 means q-value 1e-5. DEFAULT: 5",default=5)
     optparser.add_option("-l","--min-length",dest="minlen",type="int",
@@ -82,7 +80,7 @@ def main():
                          help="output file prefix, DEFAULT: peak") 
     (options,args) = optparser.parse_args()
 
-    if not (options.t1bdg and options.t2bdg and options.peak1 and options.peak2) or (not options.c1bdg and not options.c2bdg):
+    if not (options.t1bdg and options.t2bdg and options.peak1 and options.peak2):
         optparser.print_help()
         sys.exit()
 
@@ -106,54 +104,50 @@ def main():
     info("Read and build bedGraph...")
     info("Pileup of condition 1 treatment...")
     t1_bio = bedGraphIO(options.t1bdg)
-    t1_btrack = t1_bio.build_bdgtrack(baseline_value=0)
+    t1_btrack = t1_bio.build_bdgtrack(baseline_value=options.zerocount)
+    # set zerocount to options.zerocount
+    t1_btrack.filter_score(options.zerocount)
     info("Pileup of condition 2 treatment...")
     t2_bio = bedGraphIO(options.t2bdg)
-    t2_btrack = t2_bio.build_bdgtrack(baseline_value=0)
+    t2_btrack = t2_bio.build_bdgtrack(baseline_value=options.zerocount)
+    # set zerocount to options.zerocount
+    t2_btrack.filter_score(options.zerocount)    
 
-
-    if not options.c1bdg and options.c2bdg:
-        options.c1bdg = options.c2bdg
-        info("Control lambda of condition 1 control...")
-        c2_bio = bedGraphIO(options.c2bdg)
-        c2_btrack = c2_bio.build_bdgtrack(baseline_value=0)
-        c1_btrack = c2_btrack
-    elif not options.c2bdg and options.c1bdg:
-        options.c2bdg = options.c1bdg
-        info("Control lambda of condition 2 control...")
-        c1_bio = bedGraphIO(options.c1bdg)
-        c1_btrack = c1_bio.build_bdgtrack(baseline_value=0)
-        c2_btrack = c1_btrack
-    else:
-        info("Control lambda of condition 1 control...")        
-        c1_bio = bedGraphIO(options.c1bdg)
-        c1_btrack = c1_bio.build_bdgtrack(baseline_value=0)
-        info("Control lambda of condition 2 control...")                
-        c2_bio = bedGraphIO(options.c2bdg)
-        c2_btrack = c2_bio.build_bdgtrack(baseline_value=0)
-
-    # fold change track
-    f1_track = t1_btrack.overlie(c1_btrack,func=lambda x,y:float(x)/y)
-    f2_track = t2_btrack.overlie(c2_btrack,func=lambda x,y:float(x)/y)
-    del c1_btrack
-    del c2_btrack
-    # t1_track and t2_track, f1_track and f2_track are kept
+    # fold change track M
+    info("Build M (log ratio) track...")
+    M_track = t1_btrack.overlie(t2_btrack,func=lambda x,y:abs(log(float(x+1)/(y+1))))
+    # absolute difference track D
+    info("Build D (absolute difference) track...")    
+    D_track = t1_btrack.overlie(t2_btrack,func=lambda x,y:abs(float(x)-float(y)))
+    del t1_btrack
+    del t2_btrack
 
     # Model P_e
-    
-    v1 = t1_btrack.extract_value(t1_peak)
-    v1hist = sorted(histogram(v1,minv=0,binsize=1).items())
+    #info("Extract M in union peak regions...")
+    #v1 = M_track.extract_value(union_peak)
+    #v1hist = sorted(histogram(v1,minv=-10,maxv=10,breaks=20).items())
     #for (v,l) in v1hist:
-    #     print v,l
-    #f1_track.write_bedGraph(file("o","w"),"","")
-    v2 = f1_track.extract_value(t1_peak)
-    v2hist = sorted(histogram(v2,minv=0,binsize=100).items())
-    for (v,l) in v2hist:
-         print "%.0f\t%d" % (v,l)
-    
+    #    print v,l
+    #M_track.write_bedGraph(file("M","w"),"","")
+    #info("Extract D in union peak regions...")    
+    #v2 = D_track.extract_value(union_peak)
+    #v2hist = sorted(histogram(v2,minv=0,breaks=10).items())
+    #for (v,l) in v2hist:
+    #     print "%.0f\t%d" % (v,l)
+    #D_track.write_bedGraph(file("D","w"),"","")
+
+    # combine
+    info("Combine M and D...")
+    md_track = M_track.make_scoreTrack_for_macs2diff(D_track)
+    info("Extract M and D in union peak regions...")        
+    md = md_track.extract_MDvalue(union_peak)
+    info("Histogram of (M,D)...")    
+    mdhist = sorted(histogram2D(md).items())
+    for (i,j) in mdhist:
+         print "%.2f\t%.2f\t%d" % (i[0],i[1],j)
     
     info("Done")
-    
+
 if __name__ == '__main__':
     try:
         main()
