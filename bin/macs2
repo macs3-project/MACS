@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# Time-stamp: <2012-02-09 12:03:24 hanfei>
+# Time-stamp: <2012-02-09 12:12:51 hanfei>
 
 """Description: MACS 2 main executable
 
@@ -225,7 +225,7 @@ def main():
     ofhd_xls.write(tagsinfo)
 
     ofhd_xls.write("# d = %d\n" % (options.d))
-    if option.nomodel:
+    if options.nomodel:
         pass
     else:
         ofhd_xls.write("# alternative fragment length(s) may be %s bps\n" % ','.join(map(str,peakmodel.alternative_d)))    
