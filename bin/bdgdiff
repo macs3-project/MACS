@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# Time-stamp: <2012-02-07 23:10:45 Tao Liu>
+# Time-stamp: <2012-02-09 16:23:35 Tao Liu>
 
 """Description: Naive call differential peaks from 4 bedGraph tracks for scores.
 
@@ -68,14 +68,16 @@ def main():
                          help="MACS pileup bedGraph for condition 1.")
     optparser.add_option("--t2",dest="t2bdg",type="string",
                          help="MACS pileup bedGraph for condition 2.")                         
-    optparser.add_option("-Z","--zero",dest="zerocount",type="float",
-                         help="The arbitrary number representing regions with zero count. *PLEASE DONE CHANGE IT*. DEFAULT: 0.01",default=0.01)
+    #optparser.add_option("-Z","--offset",dest="offset",type="float",
+    #                     help="The arbitrary number added to comparison to avoid zero counts. *PLEASE DONE CHANGE IT*. DEFAULT: 1",default=1)
     optparser.add_option("-C","--cutoff",dest="cutoff",type="float",
-                         help="Cutoff of q-value. Score 5 means q-value 1e-5. DEFAULT: 5",default=5)
-    optparser.add_option("-l","--min-length",dest="minlen",type="int",
-                         help="minimum length of peak, better to set it as d value. DEFAULT: 200",default=200)
-    optparser.add_option("-g","--max-gap",dest="maxgap",type="int",
-                         help="maximum gap between significant points in a peak, better to set it as tag size. DEFAULT: 30",default=30)
+                         help="Cutoff for GFOLD. DEFAULT: 0.01",default=0.01)
+    optparser.add_option("--MCMC",dest="do_MCMC",action="store_true",
+                         help="Turn on MCMC simulation, will be quite slow",default=False)
+    # optparser.add_option("-l","--min-length",dest="minlen",type="int",
+    #                      help="minimum length of peak, better to set it as d value. DEFAULT: 200",default=200)
+    # optparser.add_option("-g","--max-gap",dest="maxgap",type="int",
+    #                      help="maximum gap between significant points in a peak, better to set it as tag size. DEFAULT: 30",default=30)
     optparser.add_option("-o","--o-prefix",dest="oprefix",default="peak",type="string",
                          help="output file prefix, DEFAULT: peak") 
     (options,args) = optparser.parse_args()
@@ -104,28 +106,90 @@ def main():
     info("Read and build bedGraph...")
     info("Pileup of condition 1 treatment...")
     t1_bio = bedGraphIO(options.t1bdg)
-    t1_btrack = t1_bio.build_bdgtrack(baseline_value=options.zerocount)
+    t1_btrack = t1_bio.build_bdgtrack(baseline_value=0)#options.zerocount)
     # set zerocount to options.zerocount
-    t1_btrack.filter_score(options.zerocount)
+    #t1_btrack.filter_score(options.zerocount)
     info("Pileup of condition 2 treatment...")
     t2_bio = bedGraphIO(options.t2bdg)
-    t2_btrack = t2_bio.build_bdgtrack(baseline_value=options.zerocount)
+    t2_btrack = t2_bio.build_bdgtrack(baseline_value=0)#options.zerocount)
     # set zerocount to options.zerocount
-    t2_btrack.filter_score(options.zerocount)    
+    #t2_btrack.filter_score(options.zerocount)    
+
+    n1 = t1_btrack.summary()[0]/1000000.0
+    n2 = t2_btrack.summary()[0]/1000000.0
+
+    #offset = options.offset
+
+    # combine two tracks
+    info("Combine tracks...")
+    comb_track = t1_btrack.make_scoreTrack_for_macs2diff(t2_btrack)
+
+    info("Extract average values in union regions...")
+    v1 = comb_track.extract_average(union_peak)
+
+    if n1 > n2:
+        r1 = n1/n2
+        r2 = 1
+    else:
+        r1 = 1
+        r2 = n2/n1
+
+    for i in xrange(len(v1[0])):
+        #print v1[0][i],v1[1][i]/n1,v1[2][i]/n2
+        v1[1][i] = v1[1][i]/r1
+        v1[2][i] = v1[2][i]/r2        
+
+    c = options.cutoff
+
+    info("Convert gfold...")
+    gfolds = convert_gfold(v1,cutoff=c,mcmc=options.do_MCMC)
+
+    # sort by gfold
+    gfolds.sort(cmp=lambda x,y:cmp(x[1],y[1]))
+
+    ofhd = open(options.oprefix+"_diff.bed","w")
+
+    for (rid, gf) in gfolds:
+        if gf != 0:
+            (chrom,start,end) = rid.split('.')
+            #print chrom,start,end,'.',gf
+            ofhd.write( "%s\t%s\t%s\t%s\t%.5f\n" % (chrom,start,end,'.',gf) )
+
+    ofhd.close()
+
+    ofhd = open(options.oprefix+"_diff.txt","w")
+
+    gf_dict = dict(gfolds)
+
+    for i in xrange(len(v1[0])):
+        #print v1[0][i],v1[1][i]/n1,v1[2][i]/n2
+        gftmp = gf_dict[v1[0][i]]
+        tmp1 = v1[1][i]
+        tmp2 = v1[2][i]
+        ofhd.write("%s\t%.2f\t%.2f\t%.5f\n" % (v1[0][i],tmp1,tmp2,gftmp))
+
+    ofhd.close()
+    
 
     # fold change track M
-    info("Build M (log ratio) track...")
-    M_track = t1_btrack.overlie(t2_btrack,func=lambda x,y:abs(log(float(x+1)/(y+1))))
-    # absolute difference track D
-    info("Build D (absolute difference) track...")    
-    D_track = t1_btrack.overlie(t2_btrack,func=lambda x,y:abs(float(x)-float(y)))
-    del t1_btrack
-    del t2_btrack
+    # info("Build M (log ratio) track...")
+    # M_track = t1_btrack.overlie(t2_btrack,func=lambda x,y:(log(float(x+offset)/(y+offset))))
+    # # absolute difference track D
+    # info("Build D (absolute difference) track...")    
+    # D_track = t1_btrack.overlie(t2_btrack,func=lambda x,y:(float(x)-float(y)))
+    # del t1_btrack
+    # del t2_btrack
 
-    # Model P_e
-    #info("Extract M in union peak regions...")
-    #v1 = M_track.extract_value(union_peak)
-    #v1hist = sorted(histogram(v1,minv=-10,maxv=10,breaks=20).items())
+    # # Model P_e
+    # info("Extract M in union peak regions...")
+    # v1 = M_track.extract_value(union_peak)
+
+    # for i in xrange(len(v1[0])):
+    #     print v1[0][i],v1[1][i],v1[2][i]
+    
+    #ret = np.array([v1[1],v2[2]]).transpose()
+    #ret = ret[ret[:,0].argsort()]
+    #v1hist = sorted(histogram(ret,minv=-10,maxv=10,breaks=20).items())
     #for (v,l) in v1hist:
     #    print v,l
     #M_track.write_bedGraph(file("M","w"),"","")
@@ -137,16 +201,20 @@ def main():
     #D_track.write_bedGraph(file("D","w"),"","")
 
     # combine
-    info("Combine M and D...")
-    md_track = M_track.make_scoreTrack_for_macs2diff(D_track)
-    info("Extract M and D in union peak regions...")        
-    md = md_track.extract_MDvalue(union_peak)
-    info("Histogram of (M,D)...")    
-    mdhist = sorted(histogram2D(md).items())
-    for (i,j) in mdhist:
-         print "%.2f\t%.2f\t%d" % (i[0],i[1],j)
+    # info("Combine M and D...")
+    # md_track = M_track.make_scoreTrack_for_macs2diff(D_track)
+    # info("Extract M and D in union peak regions...")        
+    # md = md_track.extract_MDvalue(union_peak)
+    # info("Histogram of (M,D)...")    
+    # mdhist = sorted(histogram2D(md).items())
+    # for (i,j) in mdhist:
+    #      print "%.2f\t%.2f\t%d" % (i[0],i[1],j)
+    #ms = np.array([md.transpose()[0],md.transpose()[2]]).transpose()
+    #v2hist = sorted(histogram(ms,breaks=20).items())
+    #for (v,l) in v2hist:
+    #    print "%.2f\t%d" % (v,l)
     
-    info("Done")
+    #info("Done")
 
 if __name__ == '__main__':
     try:

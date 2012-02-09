@@ -1,4 +1,4 @@
-# Time-stamp: <2012-02-08 21:37:53 Tao Liu>
+# Time-stamp: <2012-02-09 03:45:46 Tao Liu>
 
 """Module for Feature IO classes.
 
@@ -26,7 +26,7 @@ import numpy as np
 from libc.math cimport sqrt
 
 from MACS2.Constants import *
-from MACS2.IO.cScoreTrack import scoreTrackI,MDTrackI
+from MACS2.IO.cScoreTrack import scoreTrackI,CombinedTwoTrack
 from MACS2.IO.cPeakIO import PeakIO, BroadPeakIO
 
 # ------------------------------------
@@ -339,7 +339,7 @@ class bedGraphTrackI:
 
         variance /= float(n_v-1)
         std_v = sqrt(variance)
-        return (sum_v, max_v, min_v, mean_v, std_v)
+        return (sum_v, n_v, max_v, min_v, mean_v, std_v)
 
     def call_peaks (self, cutoff=1, up_limit=1e310, min_length=200, max_gap=50):
         """This function try to find regions within which, scores
@@ -359,8 +359,9 @@ class bedGraphTrackI:
         """
         chrs = self.get_chr_names()
         peaks = PeakIO()                      # dictionary to save peaks
-        peak_content = None
         for chrom in chrs:
+            peak_content = None
+            peak_length = 0
             (ps,vs) = self.get_data_by_chr(chrom) # arrays for position and values
             psn = iter(ps).next         # assign the next function to a viable to speed up
             vsn = iter(vs).next
@@ -656,11 +657,13 @@ class bedGraphTrackI:
         """
         assert isinstance(bdgTrack2,bedGraphTrackI), "bdgTrack2 is not a bedGraphTrackI object"
 
-        region_id = []
-        ret = [array(FBYTE4,[]),array(BYTE4,[])]
-        radd = region_id.append
-        vadd = ret[0].append
-        ladd = ret[1].append
+        ret = [[],array(FBYTE4,[]),array(BYTE4,[])] # 1: region in
+                                                    # bdgTrack2; 2:
+                                                    # value; 3: length
+                                                    # with the value
+        radd = ret[0].append
+        vadd = ret[1].append
+        ladd = ret[2].append
         
         chr1 = set(self.get_chr_names())
         chr2 = set(bdgTrack2.get_chr_names())
@@ -687,6 +690,7 @@ class bedGraphTrackI:
                     if p1 < p2:
                         # clip a region from pre_p to p1, then set pre_p as p1.
                         if v2>0:
+                            radd(chrom+"."+str(pre_p)+"."+str(p1))
                             vadd(v1)
                             ladd(p1-pre_p)                        
                         pre_p = p1
@@ -696,6 +700,7 @@ class bedGraphTrackI:
                     elif p2 < p1:
                         # clip a region from pre_p to p2, then set pre_p as p2.
                         if v2>0:
+                            radd(chrom+"."+str(pre_p)+"."+str(p2))
                             vadd(v1)
                             ladd(p2-pre_p)                        
                         pre_p = p2
@@ -705,6 +710,7 @@ class bedGraphTrackI:
                     elif p1 == p2:
                         # from pre_p to p1 or p2, then set pre_p as p1 or p2.
                         if v2>0:
+                            radd(chrom+"."+str(pre_p)+"."+str(p1))
                             vadd(v1)
                             ladd(p1-pre_p)
                         pre_p = p1
@@ -720,8 +726,8 @@ class bedGraphTrackI:
         # convert to np.array
         #print ret[0]
         #print ret[1]
-        ret = np.array([ret[0],ret[1]]).transpose()
-        ret = ret[ret[:,0].argsort()]
+        #ret = np.array([ret[0],ret[1]]).transpose()
+        #ret = ret[ret[:,0].argsort()]
         return ret
 
     def make_scoreTrack_for_macs (self, bdgTrack2 ):
@@ -787,7 +793,8 @@ class bedGraphTrackI:
             except StopIteration:
                 # meet the end of either bedGraphTrackI, simply exit
                 pass
-        
+
+        ret.finalize()
         #ret.merge_regions()
         return ret
 
@@ -798,7 +805,7 @@ class bedGraphTrackI:
         """
         assert isinstance(bdgTrack2,bedGraphTrackI), "bdgTrack2 is not a bedGraphTrackI object"
 
-        ret = MDTrackI()
+        ret = CombinedTwoTrack()
         retadd = ret.add
         
         chr1 = set(self.get_chr_names())
@@ -854,7 +861,8 @@ class bedGraphTrackI:
             except StopIteration:
                 # meet the end of either bedGraphTrackI, simply exit
                 pass
-        
+
+        ret.finalize()
         #ret.merge_regions()
         return ret
 
