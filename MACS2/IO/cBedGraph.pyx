@@ -1,4 +1,4 @@
-# Time-stamp: <2012-02-07 18:36:37 Tao Liu>
+# Time-stamp: <2012-02-08 21:37:53 Tao Liu>
 
 """Module for Feature IO classes.
 
@@ -359,6 +359,7 @@ class bedGraphTrackI:
         """
         chrs = self.get_chr_names()
         peaks = PeakIO()                      # dictionary to save peaks
+        peak_content = None
         for chrom in chrs:
             (ps,vs) = self.get_data_by_chr(chrom) # arrays for position and values
             psn = iter(ps).next         # assign the next function to a viable to speed up
@@ -655,7 +656,9 @@ class bedGraphTrackI:
         """
         assert isinstance(bdgTrack2,bedGraphTrackI), "bdgTrack2 is not a bedGraphTrackI object"
 
+        region_id = []
         ret = [array(FBYTE4,[]),array(BYTE4,[])]
+        radd = region_id.append
         vadd = ret[0].append
         ladd = ret[1].append
         
