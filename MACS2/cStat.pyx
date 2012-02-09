@@ -1,4 +1,4 @@
-# Time-stamp: <2012-02-09 16:23:22 Tao Liu>
+# Time-stamp: <2012-02-09 17:08:36 Tao Liu>
 
 """Module Description
 
@@ -18,7 +18,7 @@ the distribution).
 # python modules
 # ------------------------------------
 
-from collections import Counter
+#from collections import Counter
 from array import array as pyarray
 from MACS2.Constants import *
 from random import gammavariate as rgamma
@@ -32,71 +32,71 @@ import pymc
 # ------------------------------------
 # Misc functions
 # ------------------------------------
-def histogram ( vl, breaks=None, minv=None, maxv=None, binsize=None):
-    """Return histogram statistics.
+# def histogram ( vl, breaks=None, minv=None, maxv=None, binsize=None):
+#     """Return histogram statistics.
 
-    Parameters:
+#     Parameters:
 
-    vl: 2D numpy.array as [ [value, length], [value, length], ...]
+#     vl: 2D numpy.array as [ [value, length], [value, length], ...]
     
-    breaks: if breaks is not None and a valid integar, split [min,max]
-    of values in vl into number of equal sized bins. Otherwise, no
-    binning is involved.
+#     breaks: if breaks is not None and a valid integar, split [min,max]
+#     of values in vl into number of equal sized bins. Otherwise, no
+#     binning is involved.
 
-    Return Value:
-    Counter object
+#     Return Value:
+#     Counter object
 
 
-    when breaks is not None, key values in Counter is the start points
-    of each bin.
+#     when breaks is not None, key values in Counter is the start points
+#     of each bin.
     
-    """
-    assert breaks == None or isinstance(breaks,int)
+#     """
+#     assert breaks == None or isinstance(breaks,int)
     
-    ret = Counter()
+#     ret = Counter()
 
-    if breaks == None and binsize == None:
-        for (v,l) in vl:
-            ret[v] += int(l)
-    else:
-        if maxv == None:
-            maxv = vl[:,0].max()
-        if minv == None:
-            minv = vl[:,0].min()
-        if binsize == None:
-            binsize = (maxv-minv)/breaks
-        for (v,l) in vl:
-            k = (v - minv)//binsize*binsize + minv
-            #print k
-            ret[ k ] += int(l)
+#     if breaks == None and binsize == None:
+#         for (v,l) in vl:
+#             ret[v] += int(l)
+#     else:
+#         if maxv == None:
+#             maxv = vl[:,0].max()
+#         if minv == None:
+#             minv = vl[:,0].min()
+#         if binsize == None:
+#             binsize = (maxv-minv)/breaks
+#         for (v,l) in vl:
+#             k = (v - minv)//binsize*binsize + minv
+#             #print k
+#             ret[ k ] += int(l)
 
-    return ret
+#     return ret
 
-def histogram2D ( md ):
-    """Return histogram statistics.
+# def histogram2D ( md ):
+#     """Return histogram statistics.
 
-    Parameters:
+#     Parameters:
 
-    vl: 2D numpy.array as [ [value, length], [value, length], ...]
+#     vl: 2D numpy.array as [ [value, length], [value, length], ...]
     
-    breaks: if breaks is not None and a valid integar, split [min,max]
-    of values in vl into number of equal sized bins. Otherwise, no
-    binning is involved.
+#     breaks: if breaks is not None and a valid integar, split [min,max]
+#     of values in vl into number of equal sized bins. Otherwise, no
+#     binning is involved.
 
-    Return Value:
-    Counter object
+#     Return Value:
+#     Counter object
 
 
-    when breaks is not None, key values in Counter is the start points
-    of each bin.
+#     when breaks is not None, key values in Counter is the start points
+#     of each bin.
     
-    """
-    ret = Counter()
+#     """
+#     ret = Counter()
 
-    for (m, d, l) in md:
-        ret[ (m,d) ] += int(l)
+#     for (m, d, l) in md:
+#         ret[ (m,d) ] += int(l)
 
-    return ret
+#     return ret
 
 def MCMCGammaSamplingRatio (sample_number, alpha1, alpha2, beta1, beta2):
     gamma1 = pymc.Gamma('G1',alpha1,beta1)
