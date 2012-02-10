@@ -1,0 +1,108 @@
+#!/usr/bin/env python
+# Time-stamp: <2012-02-10 18:01:49 Tao Liu>
+
+"""Module Description
+
+Copyright (c) 2008 Tao Liu <taoliu@jimmy.harvard.edu>
+
+This code is free software; you can redistribute it and/or modify it
+under the terms of the BSD License (see the file COPYING included with
+the distribution).
+
+@status:  experimental
+@version: $Revision$
+@author:  Tao Liu
+@contact: taoliu@jimmy.harvard.edu
+"""
+
+# ------------------------------------
+# python modules
+# ------------------------------------
+
+import os
+import sys
+from array import array as pyarray
+from optparse import OptionParser
+import pymc
+from math import log
+
+# ------------------------------------
+# constants
+# ------------------------------------
+
+# ------------------------------------
+# Misc functions
+# ------------------------------------
+
+# ------------------------------------
+# Classes
+# ------------------------------------
+
+# ------------------------------------
+# Main function
+# ------------------------------------
+def main():
+    usage = "usage: %prog [options]"
+    description = "MCMC to calculate ratios between two Posterior Poisson with a given probability cutoff c."
+    
+    optparser = OptionParser(version="%prog 0.1",description=description,usage=usage,add_help_option=False)
+    optparser.add_option("-h","--help",action="help",help="Show this help message and exit.")
+    optparser.add_option("-m","--min",dest="mincount",type="int",
+                         help="Minimum of pileup height. >=0. Default: 0", default=0)
+    optparser.add_option("-M","--max",dest="maxcount",type="int",
+                         help="Maximum of pileup height. <=100. Default: 100", default=100)
+    optparser.add_option("-N","--samplesize",dest="samplesize",type="int",
+                         help="Sampling size for MCMC. First 500 will be burned out. So must > 500. Default: 100000", default=100000)
+    optparser.add_option("-c","--cutoff",dest="cutoff",type="float",
+                         help="Cutoff, must be <1. Default: 0.01", default=0.01)
+    optparser.add_option("-o","--ofile",dest="ofile",
+                         help="output file") 
+    (options,args) = optparser.parse_args()
+    if options.mincount < 0 or options.maxcount > 100 or options.samplesize <= 500 or options.cutoff>=1 or not options.ofile:
+        optparser.print_help()
+        sys.exit(1)
+
+    ofhd = file(options.ofile,"w")
+
+    sample_number = options.samplesize
+    cutoff = options.cutoff
+
+    gfold = pyarray('f',[])
+
+    for i in xrange(options.mincount,options.maxcount+1):
+        for j in xrange(options.mincount,options.maxcount+1):        
+            P_X = MCMCGammaSamplingRatio(sample_number,i+1,j+1,1,1)
+            P_X = sorted(P_X)
+            c = int(sample_number * cutoff)
+            if i > j:
+                # X >= 0
+                ret = max(0,P_X[c])
+            else:
+                # X < 0
+                ret = min(0,P_X[-1*c])        
+            gfold.append(ret)
+
+    gfold.tofile(ofhd)
+    ofhd.close()
+
+def MCMCGammaSamplingRatio (sample_number, alpha1, alpha2, beta1, beta2):
+    gamma1 = pymc.Gamma('G1',alpha1,beta1)
+    gamma2 = pymc.Gamma('G2',alpha2,beta2)
+    logratio = pymc.log(gamma1)-pymc.log(gamma2)
+    model  = pymc.MCMC([gamma1,gamma2])
+    model.seed()
+    #model.sample(iter=int(sample_number*1.5), burn=int(sample_number/2), progress_bar=False)
+    model.sample(iter=sample_number, progress_bar=False, burn=500)    
+    x1 = gamma1.trace()
+    x2 = gamma2.trace()
+    return map(lambda x,y:log(x,2)-log(y,2), x1, x2)
+
+    
+
+
+if __name__ == '__main__':
+    try:
+        main()
+    except KeyboardInterrupt:
+        sys.stderr.write("User interrupt me! ;-) See you!\n")
+        sys.exit(0)
