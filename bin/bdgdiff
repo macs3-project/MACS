@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# Time-stamp: <2012-02-10 17:14:00 Tao Liu>
+# Time-stamp: <2012-02-11 16:14:00 Tao Liu>
 
 """Description: Naive call differential peaks from 4 bedGraph tracks for scores.
 
@@ -28,6 +28,7 @@ from MACS2.IO.cBedGraphIO import bedGraphIO,genericBedIO
 from MACS2.IO.cPeakIO import Region
 from MACS2.IO.cCompositeScoreTrack import *
 from MACS2.cStat import *
+from MACS2.data import PreCompiledGFold as PCGF
 from math import log
 
 # ------------------------------------
@@ -71,7 +72,7 @@ def main():
     #optparser.add_option("-Z","--offset",dest="offset",type="float",
     #                     help="The arbitrary number added to comparison to avoid zero counts. *PLEASE DONE CHANGE IT*. DEFAULT: 1",default=1)
     optparser.add_option("-C","--cutoff",dest="cutoff",type="float",
-                         help="Cutoff for GFOLD. DEFAULT: 0.01",default=0.01)
+                         help="Cutoff for GFOLD. Can only be 0.05,0.01,0.005 or 0.001. DEFAULT: 0.01",default=0.01)
     optparser.add_option("--MCMC",dest="do_MCMC",action="store_true",
                          help="Turn on MCMC simulation, will be quite slow",default=False)
     # optparser.add_option("-l","--min-length",dest="minlen",type="int",
@@ -85,6 +86,12 @@ def main():
     if not (options.t1bdg and options.t2bdg and options.peak1 and options.peak2):
         optparser.print_help()
         sys.exit()
+
+    if options.cutoff in [0.05,0.01,0.005,0.001]:
+        gfolds_c = PCGF(options.cutoff)
+    else:
+        error("-C can only be 0.05, 0.01, 0.005, or 0.001!")
+        sys.exit(1)
 
     info("Read and build PeakIO...")
     info("Peak of condition 1 treatment...")
@@ -127,19 +134,27 @@ def main():
     info("Extract average values in union regions...")
     v1 = comb_track.extract_average(union_peak)
 
-    residue_n1_to_n2 = log(n2,2)-log2(n1,2) # a residue to be added to gfold regarding to sequencing depth.
+    if n1 > n2:
+        r1 = n1/n2
+        r2 = 1
+    else:
+        r1 = 1
+        r2 = n2/n1
+    for i in xrange(len(v1[0])):
+        v1[1][i] = v1[1][i]/r1          # actual values are Pileup Per Peak Per Million reads (PPPPM)
+        v1[2][i] = v1[2][i]/r2        
 
-    c = options.cutoff
 
-    info("Convert gfold...")
-    gfolds = convert_gfold(v1,cutoff=c,mcmc=options.do_MCMC)
+    #info("Convert gfold...")
+    info("Extract gfold values from precompile array...")
+    gfolds = convert_gfold(v1, gfolds_c) #,cutoff=c,mcmc=options.do_MCMC)
 
     # sort by gfold
     gfolds.sort(cmp=lambda x,y:cmp(x[1],y[1]))
 
     # add residue
-    for i in xrange(len(gfolds)):
-        gfolds[i][1]+=residue_n1_to_n2
+    #for i in xrange(len(gfolds)):
+    #    gfolds[i][1]+=residue_n1_to_n2
     
     ofhd = open(options.oprefix+"_diff.bed","w")
 

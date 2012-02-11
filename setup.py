@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# Time-stamp: <2012-02-10 17:37:13 Tao Liu>
+# Time-stamp: <2012-02-11 15:24:31 Tao Liu>
 
 """Description
 
@@ -50,7 +50,8 @@ def main():
           author_email='zy@jimmy.harvard.edu; taoliu@jimmy.harvard.edu',
           url='http://liulab.dfci.harvard.edu/MACS/',
           package_dir={'MACS2' : 'MACS2'},
-          packages=['MACS2', 'MACS2.IO'],
+          packages=['MACS2', 'MACS2.IO', 'MACS2.data'],
+          package_data={'MACS2': ['data/*.dat']},          
           scripts=['bin/macs2',
                    'bin/macs2diff',
                    'bin/filterdup',

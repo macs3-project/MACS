@@ -1,4 +1,4 @@
-# Time-stamp: <2012-02-09 17:08:36 Tao Liu>
+# Time-stamp: <2012-02-11 16:07:23 Tao Liu>
 
 """Module Description
 
@@ -148,14 +148,20 @@ def get_gfold ( v1, v2, cutoff, mcmc=False ):
     gfold_dict[(v1,v2)] = ret
     return ret
 
-def convert_gfold ( v, cutoff = 0.01, mcmc=False ):
+#def convert_gfold ( v, cutoff = 0.01, precompiled_gfold=None, mcmc=False ):
+def convert_gfold ( v, precompiled_gfold):
     ret = []
+    retadd = ret.append
+    get_func = precompiled_gfold.get
     for i in xrange(len(v[0])):
         rid= v[0][i]
         v1 = v[1][i]
         v2 = v[2][i]
-        gf = get_gfold (v1,v2,cutoff, mcmc=mcmc)
-        ret.append((rid,gf))
+        try:
+            gf = get_func (v1,v2)
+        except IndexError:
+            raise Exception("Value is over 100 or below 0! v1:%.2f and v2:%.2f" % (v1,v2) )
+        retadd([rid,gf])
     return ret
 
 # ------------------------------------
