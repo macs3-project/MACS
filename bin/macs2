@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# Time-stamp: <2012-02-09 12:12:51 hanfei>
+# Time-stamp: <2012-02-13 13:51:25 hanfei>
 
 """Description: MACS 2 main executable
 
@@ -149,7 +149,7 @@ def main():
             options.d = peakmodel.d
             options.scanwindow= 2*options.d
             if options.d <= 2*options.tsize:
-                warn("#2 Since the d calculated from paired-peaks are smaller than 2*tag length, it may be influenced by unknown sequencing problem!" % (options.shiftsize,options.d))
+                warn("#2 Since the d calculated from paired-peaks are smaller than 2*tag length, it may be influenced by unknown sequencing problem!")
                 if options.onauto:
                     options.d=options.shiftsize*2
                     options.scanwindow=2*options.d 
