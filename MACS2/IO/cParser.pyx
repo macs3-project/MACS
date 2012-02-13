@@ -515,11 +515,9 @@ class SAMParser(GenericParser):
                 return (None, None, None)   # not a proper pair
             if bwflag & 8:
                 return (None, None, None)   # the mate is unmapped
-            p1pos = int(thisfields[3]) - 1
-            p2pos = int(thisfields[7]) - 1
-            if p1pos > p2pos:
-                # this pair is the farthest one, skip it
-                return (None, None, None)
+            if bwflag & 128:
+                # this is not the first read in a pair
+                return (None, -1, None)
         # In case of paired-end we have now skipped all possible "bad" pairs
         # in case of proper pair we have skipped the rightmost one... if the leftmost pair comes
         # we can treat it as a single read, so just check the strand and calculate its
@@ -663,6 +661,7 @@ class BAMParser(GenericParser):
             if bwflag & 128:
                 # this is not the first read in a pair
                 return (None, -1, None)
+                
         # In case of paired-end we have now skipped all possible "bad" pairs
         # in case of proper pair we have skipped the rightmost one... if the leftmost pair comes
         # we can treat it as a single read, so just check the strand and calculate its
