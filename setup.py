@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# Time-stamp: <2012-02-11 15:24:31 Tao Liu>
+# Time-stamp: <2012-02-15 17:25:50 Tao Liu>
 
 """Description
 
@@ -60,7 +60,7 @@ def main():
                    'bin/bdgcmp',
                    'bin/bdgpeakcall',
                    'bin/bdgbroadcall',
-                   'bin/MCMCPostPoisRatios',
+                   'bin/MLEPostPoisRatios',
                    ],
           classifiers=[
               'Development Status :: 4 - experimental',
