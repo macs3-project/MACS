@@ -1,4 +1,4 @@
-available_c = ['0.05','0.01','0.005','0.001']
+available_c = ['0.05','0.01']
 
 from array import array as pyarray
 import os
@@ -22,7 +22,7 @@ class PreCompiledGFold:
         c = str(c)
         if c in available_c:
             self.gfolds = pyarray('f',[])
-            self.gfolds.fromfile(file(os.path.join(path,'g'+str(c)+'.dat'),'rb'),10201) # 10201=101*101
+            self.gfolds.fromfile(file(os.path.join(path,'g'+str(c)+'.dat'),'rb'),1002001) # 1002001=1001*1001
         else:
             raise InvalidCError(c)
     

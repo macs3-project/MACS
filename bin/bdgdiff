@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# Time-stamp: <2012-02-11 16:14:00 Tao Liu>
+# Time-stamp: <2012-02-17 02:14:20 Tao Liu>
 
 """Description: Naive call differential peaks from 4 bedGraph tracks for scores.
 
@@ -72,7 +72,7 @@ def main():
     #optparser.add_option("-Z","--offset",dest="offset",type="float",
     #                     help="The arbitrary number added to comparison to avoid zero counts. *PLEASE DONE CHANGE IT*. DEFAULT: 1",default=1)
     optparser.add_option("-C","--cutoff",dest="cutoff",type="float",
-                         help="Cutoff for GFOLD. Can only be 0.05,0.01,0.005 or 0.001. DEFAULT: 0.01",default=0.01)
+                         help="Cutoff for GFOLD. Can only be 0.05,or 0.01. DEFAULT: 0.01",default=0.01)
     optparser.add_option("--MCMC",dest="do_MCMC",action="store_true",
                          help="Turn on MCMC simulation, will be quite slow",default=False)
     # optparser.add_option("-l","--min-length",dest="minlen",type="int",
@@ -87,10 +87,10 @@ def main():
         optparser.print_help()
         sys.exit()
 
-    if options.cutoff in [0.05,0.01,0.005,0.001]:
+    if options.cutoff in [0.05,0.01]:
         gfolds_c = PCGF(options.cutoff)
     else:
-        error("-C can only be 0.05, 0.01, 0.005, or 0.001!")
+        error("-C can only be 0.05, or 0.01!")
         sys.exit(1)
 
     info("Read and build PeakIO...")
@@ -147,7 +147,7 @@ def main():
 
     #info("Convert gfold...")
     info("Extract gfold values from precompile array...")
-    gfolds = convert_gfold(v1, gfolds_c) #,cutoff=c,mcmc=options.do_MCMC)
+    gfolds = convert_gfold(v1, gfolds_c, cutoff=options.cutoff,mcmc=options.do_MCMC)
 
     # sort by gfold
     gfolds.sort(cmp=lambda x,y:cmp(x[1],y[1]))

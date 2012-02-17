@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# Time-stamp: <2012-02-15 17:41:27 Tao Liu>
+# Time-stamp: <2012-02-17 02:00:00 Tao Liu>
 
 """Module Description
 
@@ -71,7 +71,7 @@ def main():
 
     for i in xrange(options.mincount,options.maxcount+1):
         for j in xrange(options.mincount,options.maxcount+1):        
-            P_X = GammaSamplingRatio(sample_number,i+1,j+1,1,1)
+            P_X = MLEPoissonPosteriorRatio(sample_number,500,i,j)
             P_X = sorted(P_X)
             c = int(sample_number * cutoff)
             if i > j:
@@ -85,14 +85,26 @@ def main():
     gfold.tofile(ofhd)
     ofhd.close()
 
-def GammaSamplingRatio (sample_number, alpha1, alpha2, beta1, beta2):
+def MLEPoissonPosteriorRatio (sample_number, burn, count1, count2):
+    """MLE method to calculate ratio distribution of two Posterior Poisson distributions.
+
+    MLE of Posterior Poisson is Gamma(k+1,1) if there is only one observation k.
+
+    sample_number: number of sampling. It must be greater than burn, however there is no check.
+    burn: number of samples being burned.
+    count1: observed counts of condition 1
+    count2: observed counts of condition 2
+
+    return: list of log2-ratios
+    """
     ratios = pyarray('f',[])
     ra = ratios.append
     for i in xrange(sample_number):
-        x1 = rgamma(alpha1,beta1)
-        x2 = rgamma(alpha2,beta2)
+        x1 = rgamma(count1+1,1)
+        x2 = rgamma(count2+1,1)
         ra( log(x1,2) - log(x2,2) )
-    return ratios[500:]
+    return ratios[int(burn):]
+
 
 if __name__ == '__main__':
     try:

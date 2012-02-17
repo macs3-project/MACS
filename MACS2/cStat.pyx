@@ -1,8 +1,8 @@
-# Time-stamp: <2012-02-11 16:07:23 Tao Liu>
+# Time-stamp: <2012-02-17 02:01:07 Tao Liu>
 
 """Module Description
 
-Copyright (c) 2008 Tao Liu <taoliu@jimmy.harvard.edu>
+Copyright (c) 2012 Tao Liu <taoliu@jimmy.harvard.edu>
 
 This code is free software; you can redistribute it and/or modify it
 under the terms of the BSD License (see the file COPYING included with
@@ -28,6 +28,10 @@ import pymc
 # ------------------------------------
 # constants
 # ------------------------------------
+
+LOG2E = log(2.718281828459045,2)        # for converting natural log to log2
+
+gfold_dict = {}                         # temporarily save all precomputed gfold
 
 # ------------------------------------
 # Misc functions
@@ -98,44 +102,60 @@ import pymc
 
 #     return ret
 
-def MCMCGammaSamplingRatio (sample_number, alpha1, alpha2, beta1, beta2):
-    gamma1 = pymc.Gamma('G1',alpha1,beta1)
-    gamma2 = pymc.Gamma('G2',alpha2,beta2)
-    logratio = pymc.log(gamma1)-pymc.log(gamma2)
-    model  = pymc.MCMC([gamma1,gamma2])
-    model.seed()
-    #model.sample(iter=int(sample_number*1.5), burn=int(sample_number/2), progress_bar=False)
-    model.sample(iter=sample_number, progress_bar=False)    
-    x1 = gamma1.trace()
-    x2 = gamma2.trace()
-    return map(lambda x,y:log(x,2)-log(y,2), x1, x2)
+def MCMCPoissonPosteriorRatio (sample_number, burn, count1, count2):
+    """MCMC method to calculate ratio distribution of two Posterior Poisson distributions.
 
-def SimpleGammaSamplingRatio ( sample_number, alpha1, alpha2, beta1, beta2):
-    ret = pyarray(FBYTE4,[])
+    sample_number: number of sampling. It must be greater than burn, however there is no check.
+    burn: number of samples being burned.
+    count1: observed counts of condition 1
+    count2: observed counts of condition 2
 
-    for i in xrange(sample_number):
-        y1 = rgamma(alpha1,beta1)
-        y2 = rgamma(alpha2,beta2)
-        ret.append(log(y1,2)-log(y2,2))
+    return: list of log2-ratios
+    """
+    lam1 = pymc.Uniform('U1',0,10000)   # prior of lambda is uniform distribution
+    lam2 = pymc.Uniform('U2',0,10000)   # prior of lambda is uniform distribution    
+    poi1 = pymc.Poisson('P1',lam1,value=count1,observed=True) # Poisson with observed value count1
+    poi2 = pymc.Poisson('P2',lam2,value=count2,observed=True) # Poisson with observed value count2   
+    ratio = pymc.log(lam1)-pymc.log(lam2)
+    mcmcmodel  = pymc.MCMC([lam1,poi1,lam2,poi2,ratio])
+    mcmcmodel.sample(iter=sample_number, progress_bar=False, burn=burn)    
+    return map(lambda x:x*LOG2E, ratio.trace())
 
-    return ret
-
-gfold_dict = {}
 rseed(10)
 
+def MLEPoissonPosteriorRatio (sample_number, burn, count1, count2):
+    """MLE method to calculate ratio distribution of two Posterior Poisson distributions.
+
+    MLE of Posterior Poisson is Gamma(k+1,1) if there is only one observation k.
+
+    sample_number: number of sampling. It must be greater than burn, however there is no check.
+    burn: number of samples being burned.
+    count1: observed counts of condition 1
+    count2: observed counts of condition 2
+
+    return: list of log2-ratios
+    """
+    ratios = pyarray('f',[])
+    ra = ratios.append
+    for i in xrange(sample_number):
+        x1 = rgamma(count1+1,1)
+        x2 = rgamma(count2+1,1)
+        ra( log(x1,2) - log(x2,2) )
+    return ratios[int(burn):]
+
 def get_gfold ( v1, v2, cutoff, mcmc=False ):
-    sample_number = 1000
+    sample_number = 5000
+    burn = 500
 
     if gfold_dict.has_key((v1,v2)):
         return gfold_dict[(v1,v2)]
 
     if mcmc:
-        P_X = MCMCGammaSamplingRatio(sample_number,v1+1,v2+1,1,1)
+        P_X = MCMCPoissonPosteriorRatio(sample_number,burn,v1,v2)
     else:
-        P_X = SimpleGammaSamplingRatio(sample_number,v1+1,v2+1,1,1)
+        P_X = MLEPoissonPosteriorRatio(sample_number,burn,v1,v2)
 
     P_X = sorted(P_X)
-
 
     i = int(sample_number * cutoff)
     
@@ -149,7 +169,11 @@ def get_gfold ( v1, v2, cutoff, mcmc=False ):
     return ret
 
 #def convert_gfold ( v, cutoff = 0.01, precompiled_gfold=None, mcmc=False ):
-def convert_gfold ( v, precompiled_gfold):
+def convert_gfold ( v, precompiled_gfold, cutoff=0.01, mcmc=False):
+    """Take (name, count1, count2), try to extract precompiled gfold
+    from precompiled_gfold.get; if failed, calculate the gfold using
+    MCMC if mcmc is True, or simple MLE solution if mcmc is False.
+    """
     ret = []
     retadd = ret.append
     get_func = precompiled_gfold.get
@@ -160,7 +184,7 @@ def convert_gfold ( v, precompiled_gfold):
         try:
             gf = get_func (v1,v2)
         except IndexError:
-            raise Exception("Value is over 100 or below 0! v1:%.2f and v2:%.2f" % (v1,v2) )
+            gf = get_gfold(v1,v2,cutoff,mcmc=mcmc)
         retadd([rid,gf])
     return ret
 
