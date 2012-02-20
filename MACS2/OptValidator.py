@@ -78,6 +78,11 @@ def opt_validate ( optparser ):
     elif options.format == "BAM":
         options.parser = BAMParser
         options.gzip_flag = True
+    elif options.format == "BAMPE":
+        options.parser=BAMPEParser
+        options.gzip_flag = True
+        options.nomodel = True
+        options.halfext = True
     elif options.format == "BOWTIE":
         options.parser = BowtieParser
     elif options.format == "AUTO":

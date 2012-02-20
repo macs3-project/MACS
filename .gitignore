@@ -2,6 +2,8 @@ MANIFEST
 build/*
 dist/*
 *.pyc
+.pydevproject
+.project
 *.c
 *~
 test/*
