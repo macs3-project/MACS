@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# Time-stamp: <2012-01-09 15:17:38 Tao Liu>
+# Time-stamp: <2012-02-07 11:32:10 Tao Liu>
 
 """Description: MACS 2 main executable
 
@@ -143,14 +143,20 @@ def main():
             debug("#2   d: %d" % (peakmodel.d))
             debug("#2   scan_window: %d" % (peakmodel.scan_window))
             info("#2 predicted fragment length is %d bps" % peakmodel.d)
+            info("#2 alternative fragment length(s) may be %s bps" % ','.join(map(str,peakmodel.alternative_d)))
             info("#2.2 Generate R script for model : %s" % (options.modelR))
             model2r_script(peakmodel,options.modelR,options.name)
             options.d = peakmodel.d
             options.scanwindow= 2*options.d
-            if options.onauto and options.d <= 2*options.tsize:
-                options.d=options.shiftsize*2
-                options.scanwindow=2*options.d 
-                warn("#2 Since the d calculated from paired-peaks are smaller than 2*tag length, it may be influenced by unknown sequencing problem. MACS will use %d as shiftsize, %d as fragment length. NOTE: if the d calculated is still acceptable, please do not use --auto-bimodal option!" % (options.shiftsize,options.d))
+            if options.d <= 2*options.tsize:
+                warn("#2 Since the d calculated from paired-peaks are smaller than 2*tag length, it may be influenced by unknown sequencing problem!" % (options.shiftsize,options.d))
+                if options.onauto:
+                    options.d=options.shiftsize*2
+                    options.scanwindow=2*options.d 
+                    warn("#2 MACS will use %d as shiftsize, %d as fragment length. NOTE: if the d calculated is still acceptable, please do not use --fix-bimodal option!" % (options.shiftsize,options.d))
+                else:
+                    warn("#2 You may need to consider one of the other alternative d(s): %s" %  ','.join(map(str,peakmodel.alternative_d)))
+                    warn("#2 You can restart the process with --nomodel --shiftsize XXX with your choice or an arbitrary number. Nontheless, MACS will continute computing.")
                 
         except NotEnoughPairsException:
             if not options.onauto:
@@ -158,7 +164,7 @@ def main():
             warn("#2 Skipped...")
             options.d=options.shiftsize*2
             options.scanwindow=2*options.d 
-            warn("#2 Since --auto-bimodal is set, MACS will use %d as shiftsize, %d as fragment length" % (options.shiftsize,options.d))
+            warn("#2 Since --fix-bimodal is set, MACS will use %d as shiftsize, %d as fragment length" % (options.shiftsize,options.d))
 
 
     #3 Call Peaks
@@ -219,6 +225,7 @@ def main():
     ofhd_xls.write(tagsinfo)
 
     ofhd_xls.write("# d = %d\n" % (options.d))
+    ofhd_xls.write("# alternative fragment length(s) may be %s bps\n" % ','.join(map(str,peakmodel.alternative_d)))    
     if options.nolambda:
         ofhd_xls.write("# local lambda is disabled!\n")
     ofhd_xls.write(peakdetect.toxls())
@@ -285,7 +292,7 @@ or example for broad peak calling: %prog -t ChIP.bam -c Control.bam --broad -g h
                          help="Minimum FDR (q-value) cutoff for peak detection. DEFAULT: 0.01 ")
     optparser.add_option("-p","--pvalue",dest="pvalue",type="float",
                          help="Pvalue cutoff for peak detection. When set (e.g. -q 0.05 or -q 1e-5), qvalue cutoff will be ignored. Default is not set.")
-    optparser.add_option("-m","--mfold",dest="mfold",type="string",default="10,30",
+    optparser.add_option("-m","--mfold",dest="mfold",type="string",default="5,50",
                          help="Select the regions within MFOLD range of high-confidence enrichment ratio against background to build model. The regions must be lower than upper limit, and higher than the lower limit. DEFAULT:10,30")
     optparser.add_option("--nolambda",dest="nolambda",action="store_true",
                          help="If True, MACS will use fixed background lambda as local lambda for every peak region. Normally, MACS calculates a dynamic local lambda to reflect the local bias due to potential chromatin structure. ",
@@ -294,7 +301,7 @@ or example for broad peak calling: %prog -t ChIP.bam -c Control.bam --broad -g h
                          help="The small nearby region in basepairs to calculate dynamic lambda. This is used to capture the bias near the peak summit region. Invalid if there is no control data. If you set this to 0, MACS will skip slocal lambda calculation. *Note* that MACS will always perform a d-size local lambda calculation. The final local bias should be the maximum of the lambda value from d, slocal, and llocal size windows. DEFAULT: 1000 ")
     optparser.add_option("--llocal",dest="largelocal",type="int",default=10000,
                          help="The large nearby region in basepairs to calculate dynamic lambda. This is used to capture the surround bias. If you set this to 0, MACS will skip llocal lambda calculation. *Note* that MACS will always perform a d-size local lambda calculation. The final local bias should be the maximum of the lambda value from d, slocal, and llocal size windows. DEFAULT: 10000.")
-    optparser.add_option("--auto-bimodal",dest="onauto",action="store_true",
+    optparser.add_option("--fix-bimodal",dest="onauto",action="store_true",
                          help="Whether turn on the auto pair model process. If set, when MACS failed to build paired model, it will use the nomodel settings, the '--shiftsize' parameter to shift and extend each tags. Not to use this automate fixation is a default behavior now. DEFAULT: False",
                          default=False)
     optparser.add_option("--nomodel",dest="nomodel",action="store_true",

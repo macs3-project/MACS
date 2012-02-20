@@ -1,4 +1,4 @@
-# Time-stamp: <2012-01-24 15:57:02 Tao Liu>
+# Time-stamp: <2012-02-09 03:29:51 Tao Liu>
 
 """Module for Feature IO classes.
 
@@ -108,6 +108,12 @@ class scoreTrackI:
         #c[i] = (endpos,sample,control,int(-100*poisson_cdf(sample,control,False,True)),0)
         c[i] = (endpos,sample,control,get_pscore(sample,control),0)
         self.pointer[chromosome] += 1
+
+    def finalize (self):
+        for chrom in self.data.keys():
+            d = self.data[chrom]
+            l = self.pointer[chrom]
+            d.resize(l,refcheck=False)
 
     def get_data_by_chr (self, chromosome):
         """Return array of counts by chromosome.
@@ -482,3 +488,202 @@ class scoreTrackI:
             t += self.pointer[chrom]
         return t
 
+
+class CombinedTwoTrack:
+    """
+    """
+    def __init__ (self):
+        """Different with bedGraphTrackI, missing values are simply
+        replaced with 0.
+        
+        """
+        self.data = {}
+        self.pointer = {}
+
+    def add_chromosome ( self, chrom, chrom_max_len ):
+        if not self.data.has_key(chrom):
+            self.data[chrom] = np.zeros(chrom_max_len,dtype=[('pos','int32'),
+                                                             ('V1','float32'), # value for the first track
+                                                             ('V2','float32'), # value for the second track
+                                                             ])
+            self.pointer[chrom] = 0
+
+    def add (self,chromosome,endpos,V1,V2):
+        """Add a chr-endpos-sample-control block into data
+        dictionary. At the mean time, calculate pvalues.
+
+        """
+        c = self.data[chromosome]
+        i = self.pointer[chromosome]
+        # get the preceding region
+        c[i] = (endpos,V1,V2)
+        self.pointer[chromosome] += 1
+
+    def finalize (self):
+        for chrom in self.data.keys():
+            d = self.data[chrom]
+            l = self.pointer[chrom]
+            d.resize(l,refcheck=False)
+
+    def get_data_by_chr (self, chromosome):
+        """Return array of counts by chromosome.
+
+        The return value is a tuple:
+        ([end pos],[value])
+        """
+        if self.data.has_key(chromosome):
+            return self.data[chromosome]
+        else:
+            return None
+
+    def get_chr_names (self):
+        """Return all the chromosome names stored.
+        
+        """
+        l = set(self.data.keys())
+        return l
+
+    def write_bedGraph (self, fhd, name, description, colname):
+        """Write all data to fhd in Wiggle Format.
+
+        fhd: a filehandler to save bedGraph.
+        name/description: the name and description in track line.
+
+        colname: can be 'sample','control','-100logp','-100logq'
+
+        """
+        if colname not in ['V1','V2']:
+            raise Exception("%s not supported!" % colname)
+        chrs = self.get_chr_names()
+        for chrom in chrs:
+            d = self.data[chrom]
+            l = self.pointer[chrom]
+            pre = 0
+            pos   = d['pos']
+            value = d[colname]
+            for i in xrange( l ):
+                fhd.write("%s\t%d\t%d\t%.2f\n" % (chrom,pre,pos[i],value[i]))
+                pre = pos[i]
+
+        return True
+
+    def total ( self ):
+        """Return the number of regions in this object.
+
+        """
+        t = 0
+        for chrom in self.data.keys():
+            t += self.pointer[chrom]
+        return t
+
+    def extract_value ( self, bdgTrack2 ):
+        """It's like overlie function. THe overlapped regions between
+        bdgTrack2 and self, will be recorded. The values from self in
+        the overlapped regions will be outputed in a single array for
+        follow statistics.
+
+        """
+        #assert isinstance(bdgTrack2,bedGraphTrackI), "bdgTrack2 is not a bedGraphTrackI object"
+
+        ret = [[],array(FBYTE4,[]),array(FBYTE4,[]),array(BYTE4,[])] # region,V1,V1,length
+        radd = ret[0].append
+        v1add = ret[1].append
+        v2add = ret[2].append        
+        ladd = ret[3].append
+        
+        chr1 = set(self.get_chr_names())
+        chr2 = set(bdgTrack2.get_chr_names())
+        common_chr = chr1.intersection(chr2)
+        for chrom in common_chr:
+            chrom_data = self.get_data_by_chr(chrom) # arrays for position and values
+            p1n = chrom_data['pos'].flat.next
+            v11n = chrom_data['V1'].flat.next
+            v21n = chrom_data['V2'].flat.next
+
+            (p2s,v2s) = bdgTrack2.get_data_by_chr(chrom) # arrays for position and values
+            p2n = iter(p2s).next         # assign the next function to a viable to speed up
+            v2n = iter(v2s).next
+
+            pre_p = 0                   # remember the previous position in the new bedGraphTrackI object ret
+            
+            try:
+                p1 = p1n()
+                v11 = v11n()
+                v21 = v21n()                
+
+                p2 = p2n()
+                v2 = v2n()
+
+                while True:
+                    if p1 < p2:
+                        # clip a region from pre_p to p1, then set pre_p as p1.
+                        if v2>0:
+                            radd(chrom+"."+str(pre_p)+"."+str(p1))
+                            v1add(v11)
+                            v2add(v21)                            
+                            ladd(p1-pre_p)                        
+                        pre_p = p1
+                        # call for the next p1 and v1
+                        p1 = p1n()
+                        v11 = v11n()
+                        v21 = v21n()
+                    elif p2 < p1:
+                        # clip a region from pre_p to p2, then set pre_p as p2.
+                        if v2>0:
+                            radd(chrom+"."+str(pre_p)+"."+str(p2))
+                            v1add(v11)
+                            v2add(v21)                            
+                            ladd(p2-pre_p)                        
+                        pre_p = p2
+                        # call for the next p2 and v2
+                        p2 = p2n()
+                        v2 = v2n()
+                    elif p1 == p2:
+                        # from pre_p to p1 or p2, then set pre_p as p1 or p2.
+                        if v2>0:
+                            radd(chrom+"."+str(pre_p)+"."+str(p1))
+                            v1add(v11)
+                            v2add(v21)                            
+                            ladd(p1-pre_p)                        
+                        pre_p = p1
+                        # call for the next p1, v1, p2, v2.
+                        p1 = p1n()
+                        v11 = v11n()
+                        v21 = v21n()
+                        p2 = p2n()
+                        v2 = v2n()
+            except StopIteration:
+                # meet the end of either bedGraphTrackI, simply exit
+                pass
+
+        # convert to np.array
+        #ret = np.array([ret[0],ret[1],ret[2]]).transpose()
+        #ret = ret[ret[0,0,:].argsort()]
+        return ret
+
+
+    def extract_average (self, bdgTrack2):
+        (rarray,v1array,v2array,larray)  = self.extract_value(bdgTrack2)
+        ret = [[],array(FBYTE4,[]),array(FBYTE4,[])] # region,V1,V1
+        radd = ret[0].append
+        v1add = ret[1].append
+        v2add = ret[2].append
+        cur_region = [None,None,None,None,None]      # chrom, start, end, s1, s2
+        for i in xrange(len(rarray)):
+            (chrom,start,end) = rarray[i].split('.')
+            if chrom == cur_region[0] and start == cur_region[2]:
+                cur_region[2] =  end
+                cur_region[3] += v1array[i]*larray[i]
+                cur_region[4] += v2array[i]*larray[i]
+            else:
+                if cur_region[0]:
+                    l = int(cur_region[2])-int(cur_region[1])
+                    radd(cur_region[0]+"."+str(cur_region[1])+"."+str(cur_region[2]))
+                    v1add(cur_region[3]/float(l))
+                    v2add(cur_region[4]/float(l))                    
+                cur_region = [chrom, start, end, v1array[i]*larray[i], v2array[i]*larray[i]]
+
+        radd(cur_region[0]+"."+str(cur_region[1])+"."+str(cur_region[2]))
+        v1add(cur_region[3]/float(l))
+        v2add(cur_region[4]/float(l))
+        return ret

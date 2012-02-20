@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# Time-stamp: <2012-01-20 16:36:53 Tao Liu>
+# Time-stamp: <2012-02-15 17:25:50 Tao Liu>
 
 """Description
 
@@ -29,7 +29,8 @@ def main():
 
     ext_modules = [Extension("MACS2.cProb", ["MACS2/cProb.pyx"], libraries=["m"]),
                    Extension("MACS2.IO.cParser",["MACS2/IO/cParser.pyx"]),
-                   Extension("MACS2.cStat", ["MACS2/cStat.pyx"]),                   
+                   Extension("MACS2.cStat", ["MACS2/cStat.pyx"]),
+                   Extension("MACS2.cTimeSeries", ["MACS2/cTimeSeries.pyx"]),                   
                    Extension("MACS2.cPileup", ["MACS2/cPileup.pyx"]),
                    Extension("MACS2.cPeakModel", ["MACS2/cPeakModel.pyx"]),                   
                    Extension("MACS2.cPeakDetect", ["MACS2/cPeakDetect.pyx"]),
@@ -49,7 +50,8 @@ def main():
           author_email='zy@jimmy.harvard.edu; taoliu@jimmy.harvard.edu',
           url='http://liulab.dfci.harvard.edu/MACS/',
           package_dir={'MACS2' : 'MACS2'},
-          packages=['MACS2', 'MACS2.IO'],
+          packages=['MACS2', 'MACS2.IO', 'MACS2.data'],
+          package_data={'MACS2': ['data/*.dat']},          
           scripts=['bin/macs2',
                    'bin/macs2diff',
                    'bin/filterdup',
@@ -58,6 +60,7 @@ def main():
                    'bin/bdgcmp',
                    'bin/bdgpeakcall',
                    'bin/bdgbroadcall',
+                   'bin/MLEPostPoisRatios',
                    ],
           classifiers=[
               'Development Status :: 4 - experimental',

@@ -1,6 +1,13 @@
 2011-12-28  Tao Liu  <taoliu@jimmy.harvard.edu>
 	MACS version 2.0.10 (tag:alpha still working)
 
+	* Use cross-correlation to calculate fragment size
+
+	First, all pairs will be used in prediction for fragment
+	size. Previously, only no more than 1000 pairs are used. Second,
+	cross-correlation is used to find the best phase difference
+	between + and - tag pileups. 
+
 	* Speed up p-value and q-value calculation
 
 	This part is ten times faster now. I am using a dictionary to

@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# Time-stamp: <2012-01-23 16:23:23 Tao Liu>
+# Time-stamp: <2012-02-17 02:14:20 Tao Liu>
 
 """Description: Naive call differential peaks from 4 bedGraph tracks for scores.
 
@@ -28,7 +28,8 @@ from MACS2.IO.cBedGraphIO import bedGraphIO,genericBedIO
 from MACS2.IO.cPeakIO import Region
 from MACS2.IO.cCompositeScoreTrack import *
 from MACS2.cStat import *
-#from math import log10
+from MACS2.data import PreCompiledGFold as PCGF
+from math import log
 
 # ------------------------------------
 # constants
@@ -67,24 +68,30 @@ def main():
     optparser.add_option("--t1",dest="t1bdg",type="string",
                          help="MACS pileup bedGraph for condition 1.")
     optparser.add_option("--t2",dest="t2bdg",type="string",
-                         help="MACS pileup bedGraph for condition 2.")
-    optparser.add_option("--c1",dest="c1bdg",type="string",
-                         help="MACS pileup bedGraph for condition 1.")                         
-    optparser.add_option("--c2",dest="c2bdg",type="string",
-                         help="MACS pileup bedGraph for condition 2. If --c2 is not specified, use --c1 for condition 2. If both --c1 and --c2 are not specified, no control is used.")
+                         help="MACS pileup bedGraph for condition 2.")                         
+    #optparser.add_option("-Z","--offset",dest="offset",type="float",
+    #                     help="The arbitrary number added to comparison to avoid zero counts. *PLEASE DONE CHANGE IT*. DEFAULT: 1",default=1)
     optparser.add_option("-C","--cutoff",dest="cutoff",type="float",
-                         help="Cutoff of q-value. Score 5 means q-value 1e-5. DEFAULT: 5",default=5)
-    optparser.add_option("-l","--min-length",dest="minlen",type="int",
-                         help="minimum length of peak, better to set it as d value. DEFAULT: 200",default=200)
-    optparser.add_option("-g","--max-gap",dest="maxgap",type="int",
-                         help="maximum gap between significant points in a peak, better to set it as tag size. DEFAULT: 30",default=30)
+                         help="Cutoff for GFOLD. Can only be 0.05,or 0.01. DEFAULT: 0.01",default=0.01)
+    optparser.add_option("--MCMC",dest="do_MCMC",action="store_true",
+                         help="Turn on MCMC simulation, will be quite slow",default=False)
+    # optparser.add_option("-l","--min-length",dest="minlen",type="int",
+    #                      help="minimum length of peak, better to set it as d value. DEFAULT: 200",default=200)
+    # optparser.add_option("-g","--max-gap",dest="maxgap",type="int",
+    #                      help="maximum gap between significant points in a peak, better to set it as tag size. DEFAULT: 30",default=30)
     optparser.add_option("-o","--o-prefix",dest="oprefix",default="peak",type="string",
                          help="output file prefix, DEFAULT: peak") 
     (options,args) = optparser.parse_args()
 
-    if not (options.t1bdg and options.t2bdg and options.peak1 and options.peak2) or (not options.c1bdg and not options.c2bdg):
+    if not (options.t1bdg and options.t2bdg and options.peak1 and options.peak2):
         optparser.print_help()
         sys.exit()
+
+    if options.cutoff in [0.05,0.01]:
+        gfolds_c = PCGF(options.cutoff)
+    else:
+        error("-C can only be 0.05, or 0.01!")
+        sys.exit(1)
 
     info("Read and build PeakIO...")
     info("Peak of condition 1 treatment...")
@@ -106,54 +113,72 @@ def main():
     info("Read and build bedGraph...")
     info("Pileup of condition 1 treatment...")
     t1_bio = bedGraphIO(options.t1bdg)
-    t1_btrack = t1_bio.build_bdgtrack(baseline_value=0)
+    t1_btrack = t1_bio.build_bdgtrack(baseline_value=0)#options.zerocount)
+    # set zerocount to options.zerocount
+    #t1_btrack.filter_score(options.zerocount)
     info("Pileup of condition 2 treatment...")
     t2_bio = bedGraphIO(options.t2bdg)
-    t2_btrack = t2_bio.build_bdgtrack(baseline_value=0)
+    t2_btrack = t2_bio.build_bdgtrack(baseline_value=0)#options.zerocount)
+    # set zerocount to options.zerocount
+    #t2_btrack.filter_score(options.zerocount)    
 
+    n1 = t1_btrack.summary()[0]/1000000.0
+    n2 = t2_btrack.summary()[0]/1000000.0
 
-    if not options.c1bdg and options.c2bdg:
-        options.c1bdg = options.c2bdg
-        info("Control lambda of condition 1 control...")
-        c2_bio = bedGraphIO(options.c2bdg)
-        c2_btrack = c2_bio.build_bdgtrack(baseline_value=0)
-        c1_btrack = c2_btrack
-    elif not options.c2bdg and options.c1bdg:
-        options.c2bdg = options.c1bdg
-        info("Control lambda of condition 2 control...")
-        c1_bio = bedGraphIO(options.c1bdg)
-        c1_btrack = c1_bio.build_bdgtrack(baseline_value=0)
-        c2_btrack = c1_btrack
+    #offset = options.offset
+
+    # combine two tracks
+    info("Combine tracks...")
+    comb_track = t1_btrack.make_scoreTrack_for_macs2diff(t2_btrack)
+
+    info("Extract average values in union regions...")
+    v1 = comb_track.extract_average(union_peak)
+
+    if n1 > n2:
+        r1 = n1/n2
+        r2 = 1
     else:
-        info("Control lambda of condition 1 control...")        
-        c1_bio = bedGraphIO(options.c1bdg)
-        c1_btrack = c1_bio.build_bdgtrack(baseline_value=0)
-        info("Control lambda of condition 2 control...")                
-        c2_bio = bedGraphIO(options.c2bdg)
-        c2_btrack = c2_bio.build_bdgtrack(baseline_value=0)
+        r1 = 1
+        r2 = n2/n1
+    for i in xrange(len(v1[0])):
+        v1[1][i] = v1[1][i]/r1          # actual values are Pileup Per Peak Per Million reads (PPPPM)
+        v1[2][i] = v1[2][i]/r2        
 
-    # fold change track
-    f1_track = t1_btrack.overlie(c1_btrack,func=lambda x,y:float(x)/y)
-    f2_track = t2_btrack.overlie(c2_btrack,func=lambda x,y:float(x)/y)
-    del c1_btrack
-    del c2_btrack
-    # t1_track and t2_track, f1_track and f2_track are kept
 
-    # Model P_e
+    #info("Convert gfold...")
+    info("Extract gfold values from precompile array...")
+    gfolds = convert_gfold(v1, gfolds_c, cutoff=options.cutoff,mcmc=options.do_MCMC)
+
+    # sort by gfold
+    gfolds.sort(cmp=lambda x,y:cmp(x[1],y[1]))
+
+    # add residue
+    #for i in xrange(len(gfolds)):
+    #    gfolds[i][1]+=residue_n1_to_n2
     
-    v1 = t1_btrack.extract_value(t1_peak)
-    v1hist = sorted(histogram(v1,minv=0,binsize=1).items())
-    #for (v,l) in v1hist:
-    #     print v,l
-    #f1_track.write_bedGraph(file("o","w"),"","")
-    v2 = f1_track.extract_value(t1_peak)
-    v2hist = sorted(histogram(v2,minv=0,binsize=100).items())
-    for (v,l) in v2hist:
-         print "%.0f\t%d" % (v,l)
-    
-    
-    info("Done")
-    
+    ofhd = open(options.oprefix+"_diff.bed","w")
+
+    for (rid, gf) in gfolds:
+        if gf != 0:
+            (chrom,start,end) = rid.split('.')
+            #print chrom,start,end,'.',gf
+            ofhd.write( "%s\t%s\t%s\t%s\t%.5f\n" % (chrom,start,end,'.',gf) )
+
+    ofhd.close()
+
+    ofhd = open(options.oprefix+"_diff.txt","w")
+
+    gf_dict = dict(gfolds)
+
+    for i in xrange(len(v1[0])):
+        #print v1[0][i],v1[1][i]/n1,v1[2][i]/n2
+        gftmp = gf_dict[v1[0][i]]
+        tmp1 = v1[1][i]
+        tmp2 = v1[2][i]
+        ofhd.write("%s\t%.2f\t%.2f\t%.5f\n" % (v1[0][i],tmp1,tmp2,gftmp))
+
+    ofhd.close()
+
 if __name__ == '__main__':
     try:
         main()
