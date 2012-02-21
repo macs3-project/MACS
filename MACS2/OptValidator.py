@@ -23,7 +23,7 @@ import re
 import logging
 from subprocess import Popen, PIPE
 from math import log
-from MACS2.IO.cParser import BEDParser, ELANDResultParser, ELANDMultiParser, ELANDExportParser, SAMParser, BAMParser, BowtieParser,  guess_parser
+from MACS2.IO.cParser import BEDParser, ELANDResultParser, ELANDMultiParser, ELANDExportParser, SAMParser, BAMParser, BAMPEParser, BowtieParser,  guess_parser
 # ------------------------------------
 # constants
 # ------------------------------------
@@ -82,7 +82,6 @@ def opt_validate ( optparser ):
         options.parser=BAMPEParser
         options.gzip_flag = True
         options.nomodel = True
-        options.halfext = True
     elif options.format == "BOWTIE":
         options.parser = BowtieParser
     elif options.format == "AUTO":

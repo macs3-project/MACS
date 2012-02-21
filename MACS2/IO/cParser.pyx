@@ -40,6 +40,7 @@ def guess_parser ( fhd ):
                    "ELANDEXPORT":ELANDExportParser,
                    "SAM":SAMParser,
                    "BAM":BAMParser,
+                   "BAMPE": BAMPEParser,
                    "BOWTIE":BowtieParser
                    }
     order_list = ("BAM",
@@ -537,6 +538,7 @@ class SAMParser(GenericParser):
 
 class BAMPEParser(GenericParser):
     """File Parser Class for BAM File containing paired-end reads
+    Only counts valid pairs, discards everything else
     Uses the midpoint of every read and calculates the average fragment size
     on the fly instead of modeling it
 
@@ -570,7 +572,10 @@ class BAMPEParser(GenericParser):
             return False
             
     def tsize(self):
-        if self.d is None: self.build_fwtrack()
+        if hasattr(self, 'd') and self.d is not None:
+            pass
+        else:
+            self.build_fwtrack()
         return self.d
 #    def tsize(self):
 #        fseek = self.fhd.seek
@@ -632,55 +637,60 @@ class BAMPEParser(GenericParser):
             fseek(ftell() + 4)
         
         d = float(0)
+        # for convenience, only count valid pairs
         while 1:
             try:
                 entrylength = struct.unpack('<i', fread(4))[0]
             except struct.error:
                 break
             (chrid,fpos,strand,tlen) = self.__fw_binary_parse(fread(entrylength))
-            d = i * d + tlen / (i + 1)            
+            if tlen is None: continue
+            d = (d * i + abs(tlen)) / (i + 1) # keep track of avg fragment size
             i+=1
             if i == 1000000:
                 m += 1
                 logging.info(" %d" % (m*1000000))
                 i=0
-            if fpos >= 0:
-                fwtrack.add_loc(references[chrid],fpos,strand)
+            fwtrack.add_loc(references[chrid],fpos,strand)
         self.d = int(d)
+        assert d>=0, "Something went wrong (average fragment size was negative)"
         self.fhd.close()
         self.fwtrack = fwtrack
         
     def build_fwtrack (self):
-        if self.fwtrack is None: self.__build_fwtrack()
+        if hasattr(self, 'fwtrack') and self.fwtrack is not None:
+            pass
+        else:
+            self.__build_fwtrack()
         return self.fwtrack
     
     def __fw_binary_parse (self, data ):
         # we skip lot of the available information in data (i.e. tag name, quality etc etc)
-        if not data: return (None,-1,None)
+        if not data: return (None,-1,None,None)
 
         thisref = struct.unpack('<i', data[0:4])[0]
         thisstart = struct.unpack('<i', data[4:8])[0]
         (cigar, bwflag) = struct.unpack('<hh', data[12:16])
-        tlen = struct.unpack('<i', data[29:32])
+        tlen = struct.unpack('<i', data[28:32])[0]
         midpoint = thisstart + tlen / 2
         if bwflag & 4 or bwflag & 512 or bwflag & 1024:
-            return (None, -1, None)       #unmapped sequence or bad sequence
+            return (None, -1, None, None)       #unmapped sequence or bad sequence
         if bwflag & 1:
             # paired read. We should only keep sequence if the mate is mapped
             # and if this is the left mate, all is within  the flag! 
             if not bwflag & 2:
-                return (None, -1, None)   # not a proper pair
+                return (None, -1, None, None)   # not a proper pair
             if bwflag & 8:
-                return (None, -1, None)   # the mate is unmapped
+                return (None, -1, None, None)   # the mate is unmapped
             if bwflag & 128:
                 # this is not the first read in a pair
-                return (None, -1, None)
+                return (None, -1, None, None)
                 
         # In case of paired-end we have now skipped all possible "bad" pairs
         # in case of proper pair we have skipped the rightmost one... if the leftmost pair comes
         # we can treat it as a single read, so just check the strand and calculate its
         # start position... hope I'm right!
-        thisstrand = bwflag & 16
+        thisstrand = bool(bwflag & 16)
 
         return (thisref, midpoint, thisstrand, tlen)
 
