@@ -29,3 +29,11 @@ class PreCompiledGFold:
     def get ( self, v1, v2 ):
         i = int(round(v1)*101+round(v2))
         return self.gfolds[i]
+
+class FakePreCompiledGFold:
+    def __init__ ( self, c ):
+        self.gfolds = None
+    
+    def get ( self, v1, v2 ):
+        raise IndexError
+    

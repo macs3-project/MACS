@@ -1,4 +1,4 @@
-# Time-stamp: <2012-02-17 02:01:07 Tao Liu>
+# Time-stamp: <2012-02-22 17:59:26 Tao Liu>
 
 """Module Description
 
@@ -25,6 +25,7 @@ from random import gammavariate as rgamma
 from random import seed as rseed
 from math import log
 import pymc
+from pymc import deterministic
 # ------------------------------------
 # constants
 # ------------------------------------
@@ -102,6 +103,7 @@ gfold_dict = {}                         # temporarily save all precomputed gfold
 
 #     return ret
 
+
 def MCMCPoissonPosteriorRatio (sample_number, burn, count1, count2):
     """MCMC method to calculate ratio distribution of two Posterior Poisson distributions.
 
@@ -115,9 +117,11 @@ def MCMCPoissonPosteriorRatio (sample_number, burn, count1, count2):
     lam1 = pymc.Uniform('U1',0,10000)   # prior of lambda is uniform distribution
     lam2 = pymc.Uniform('U2',0,10000)   # prior of lambda is uniform distribution    
     poi1 = pymc.Poisson('P1',lam1,value=count1,observed=True) # Poisson with observed value count1
-    poi2 = pymc.Poisson('P2',lam2,value=count2,observed=True) # Poisson with observed value count2   
-    ratio = pymc.log(lam1)-pymc.log(lam2)
-    mcmcmodel  = pymc.MCMC([lam1,poi1,lam2,poi2,ratio])
+    poi2 = pymc.Poisson('P2',lam2,value=count2,observed=True) # Poisson with observed value count2
+    @deterministic
+    def ratio (l1=lam1,l2=lam2):
+        return log(l1) - log(l2)
+    mcmcmodel  = pymc.MCMC([ratio,lam1,poi1,lam2,poi2])
     mcmcmodel.sample(iter=sample_number, progress_bar=False, burn=burn)    
     return map(lambda x:x*LOG2E, ratio.trace())
 
@@ -143,33 +147,46 @@ def MLEPoissonPosteriorRatio (sample_number, burn, count1, count2):
         ra( log(x1,2) - log(x2,2) )
     return ratios[int(burn):]
 
-def get_gfold ( v1, v2, cutoff, mcmc=False ):
-    sample_number = 5000
-    burn = 500
-
+def get_gfold ( v1, v2, precompiled_get=None, cutoff=0.01, sample_number=1000, burn=100, offset=0, mcmc=False):    
+    # try cached gfold in this module first
     if gfold_dict.has_key((v1,v2)):
         return gfold_dict[(v1,v2)]
 
-    if mcmc:
-        P_X = MCMCPoissonPosteriorRatio(sample_number,burn,v1,v2)
-    else:
-        P_X = MLEPoissonPosteriorRatio(sample_number,burn,v1,v2)
+    # calculate ratio+offset
 
-    P_X = sorted(P_X)
-
-    i = int(sample_number * cutoff)
-    
-    if v1 > v2:
-        # X >= 0
-        ret = max(0,P_X[i])
-    else:
-        # X < 0
-        ret = min(0,P_X[-1*i])        
+    # first, get the value from precompiled table
+    try:
+        V = precompiled_get( v1, v2 )
+        if v1 > v2:
+            # X >= 0
+            ret = max(0,V+offset)
+        elif v1 < v2:
+            # X < 0
+            ret = min(0,V+offset)        
+        
+    except IndexError:
+        if mcmc:
+            P_X = MCMCPoissonPosteriorRatio(sample_number,burn,v1,v2)
+            P_X = sorted(P_X)
+            i = int( (sample_number-burn) * cutoff)
+        else:
+            P_X = MLEPoissonPosteriorRatio(sample_number,0,v1,v2)
+            P_X = sorted(P_X)
+            i = int(sample_number * cutoff)            
+        
+        if v1 > v2:
+            # X >= 0
+            ret = max(0,P_X[i]+offset)
+        elif v1 < v2:
+            # X < 0
+            ret = min(0,P_X[-1*i]+offset)
+        else:
+            ret = 0
     gfold_dict[(v1,v2)] = ret
     return ret
 
 #def convert_gfold ( v, cutoff = 0.01, precompiled_gfold=None, mcmc=False ):
-def convert_gfold ( v, precompiled_gfold, cutoff=0.01, mcmc=False):
+def convert_gfold ( v, precompiled_gfold, sample_number=5000, burn=500, offset=0, cutoff=0.01, mcmc=False):
     """Take (name, count1, count2), try to extract precompiled gfold
     from precompiled_gfold.get; if failed, calculate the gfold using
     MCMC if mcmc is True, or simple MLE solution if mcmc is False.
@@ -184,7 +201,8 @@ def convert_gfold ( v, precompiled_gfold, cutoff=0.01, mcmc=False):
         try:
             gf = get_func (v1,v2)
         except IndexError:
-            gf = get_gfold(v1,v2,cutoff,mcmc=mcmc)
+            # calculate gfold from MCMC or MLE
+            gf = get_gfold(v1,v2,precompiled_get=get_func,cutoff=cutoff,sample_number=sample_number,burn=burn,offset=offset,mcmc=mcmc)
         retadd([rid,gf])
     return ret
 

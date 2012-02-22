@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# Time-stamp: <2012-02-17 02:01:19 Tao Liu>
+# Time-stamp: <2012-02-22 14:54:53 Tao Liu>
 
 """Module Description
 
@@ -24,6 +24,7 @@ import sys
 from array import array as pyarray
 from optparse import OptionParser
 import pymc
+from pymc import deterministic
 from math import log
 
 # ------------------------------------
@@ -71,28 +72,42 @@ def main():
 
     for i in xrange(options.mincount,options.maxcount+1):
         for j in xrange(options.mincount,options.maxcount+1):        
-            P_X = MCMCPoissonPosteriaRatio(sample_number,500,i,j)
-            P_X = sorted(P_X)
+            P_X = MCMCPoissonPosteriorRatio(sample_number,1000,i,j)
             c = int(sample_number * cutoff)
+            #print i,j,P_X[c],P_X[-1*c]
             if i > j:
                 # X >= 0
                 ret = max(0,P_X[c])
             else:
                 # X < 0
-                ret = min(0,P_X[-1*c])        
+                ret = min(0,P_X[-1*c])
+            print i,j,ret
             gfold.append(ret)
 
     gfold.tofile(ofhd)
     ofhd.close()
 
-def MCMCPoissonPosteriaRatio (sample_number, burn, count1, count2):
+def MCMCPoissonPosteriorRatio (sample_number, burn, count1, count2):
+    """MCMC method to calculate ratio distribution of two Posterior Poisson distributions.
+
+    sample_number: number of sampling. It must be greater than burn, however there is no check.
+    burn: number of samples being burned.
+    count1: observed counts of condition 1
+    count2: observed counts of condition 2
+
+    return: list of log2-ratios
+    """
     lam1 = pymc.Uniform('U1',0,10000)   # prior of lambda is uniform distribution
     lam2 = pymc.Uniform('U2',0,10000)   # prior of lambda is uniform distribution    
     poi1 = pymc.Poisson('P1',lam1,value=count1,observed=True) # Poisson with observed value count1
-    poi2 = pymc.Poisson('P2',lam2,value=count2,observed=True) # Poisson with observed value count2   
-    ratio = pymc.log(lam1)-pymc.log(lam2)
-    mcmcmodel  = pymc.MCMC([lam1,poi1,lam2,poi2,ratio])
-    mcmcmodel.sample(iter=sample_number, progress_bar=False, burn=burn)    
+    poi2 = pymc.Poisson('P2',lam2,value=count2,observed=True) # Poisson with observed value count2
+    @deterministic
+    def ratio (l1=lam1,l2=lam2):
+        return log(l1) - log(l2)
+    mcmcmodel  = pymc.MCMC([ratio,lam1,lam2,poi1,poi2])
+    mcmcmodel.sample(iter=sample_number, progress_bar=False, burn=burn)
+    #print mcmcmodel.stats()
+    #sys.exit(1)
     return map(lambda x:x*LOG2E, ratio.trace())
 
 if __name__ == '__main__':

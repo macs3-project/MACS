@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# Time-stamp: <2012-02-17 02:14:20 Tao Liu>
+# Time-stamp: <2012-02-22 17:49:01 Tao Liu>
 
 """Description: Naive call differential peaks from 4 bedGraph tracks for scores.
 
@@ -28,7 +28,8 @@ from MACS2.IO.cBedGraphIO import bedGraphIO,genericBedIO
 from MACS2.IO.cPeakIO import Region
 from MACS2.IO.cCompositeScoreTrack import *
 from MACS2.cStat import *
-from MACS2.data import PreCompiledGFold as PCGF
+#from MACS2.data import PreCompiledGFold as PCGF
+from MACS2.data import FakePreCompiledGFold as PCGF
 from math import log
 
 # ------------------------------------
@@ -69,16 +70,10 @@ def main():
                          help="MACS pileup bedGraph for condition 1.")
     optparser.add_option("--t2",dest="t2bdg",type="string",
                          help="MACS pileup bedGraph for condition 2.")                         
-    #optparser.add_option("-Z","--offset",dest="offset",type="float",
-    #                     help="The arbitrary number added to comparison to avoid zero counts. *PLEASE DONE CHANGE IT*. DEFAULT: 1",default=1)
     optparser.add_option("-C","--cutoff",dest="cutoff",type="float",
                          help="Cutoff for GFOLD. Can only be 0.05,or 0.01. DEFAULT: 0.01",default=0.01)
-    optparser.add_option("--MCMC",dest="do_MCMC",action="store_true",
-                         help="Turn on MCMC simulation, will be quite slow",default=False)
-    # optparser.add_option("-l","--min-length",dest="minlen",type="int",
-    #                      help="minimum length of peak, better to set it as d value. DEFAULT: 200",default=200)
-    # optparser.add_option("-g","--max-gap",dest="maxgap",type="int",
-    #                      help="maximum gap between significant points in a peak, better to set it as tag size. DEFAULT: 30",default=30)
+    #optparser.add_option("--MCMC",dest="do_MCMC",action="store_true",
+    #                     help="Turn on MCMC simulation, will be quite slow",default=False)
     optparser.add_option("-o","--o-prefix",dest="oprefix",default="peak",type="string",
                          help="output file prefix, DEFAULT: peak") 
     (options,args) = optparser.parse_args()
@@ -87,95 +82,91 @@ def main():
         optparser.print_help()
         sys.exit()
 
+    options.do_MCMC = False
+    
+    # load precompiled matrix
     if options.cutoff in [0.05,0.01]:
         gfolds_c = PCGF(options.cutoff)
     else:
         error("-C can only be 0.05, or 0.01!")
         sys.exit(1)
 
-    info("Read and build PeakIO...")
+    info("Read peak files...")
     info("Peak of condition 1 treatment...")
 
     t1_peakio = genericBedIO(options.peak1)
     t1_peak = t1_peakio.build_bedtrack()
-    #t1_peak.apply_func(lambda x:int(x!=0))
 
     info("Peak of condition 2 treatment...")
 
     t2_peakio = genericBedIO(options.peak2)
     t2_peak = t2_peakio.build_bedtrack()
-    #t2_peak.apply_func(lambda x:int(x!=0))
+
+    # get union peak regions
     union_peak = t1_peak.overlie(t2_peak)
-    #t1_peak.write_bedGraph(file("1","w"),"1","1")
-    #t2_peak.write_bedGraph(file("2","w"),"2","2")
-    #union_peak.write_bedGraph(file("3","w"),"3","3")
 
     info("Read and build bedGraph...")
     info("Pileup of condition 1 treatment...")
     t1_bio = bedGraphIO(options.t1bdg)
-    t1_btrack = t1_bio.build_bdgtrack(baseline_value=0)#options.zerocount)
-    # set zerocount to options.zerocount
-    #t1_btrack.filter_score(options.zerocount)
+    t1_btrack = t1_bio.build_bdgtrack(baseline_value=0)
+
     info("Pileup of condition 2 treatment...")
     t2_bio = bedGraphIO(options.t2bdg)
-    t2_btrack = t2_bio.build_bdgtrack(baseline_value=0)#options.zerocount)
-    # set zerocount to options.zerocount
-    #t2_btrack.filter_score(options.zerocount)    
+    t2_btrack = t2_bio.build_bdgtrack(baseline_value=0)
 
+    # calculate sum of all signals in million
     n1 = t1_btrack.summary()[0]/1000000.0
     n2 = t2_btrack.summary()[0]/1000000.0
-
-    #offset = options.offset
+    offset = -log(n1,2)+log(n2,2)
+    info("Offset is %.2f" % offset)
 
     # combine two tracks
     info("Combine tracks...")
     comb_track = t1_btrack.make_scoreTrack_for_macs2diff(t2_btrack)
 
     info("Extract average values in union regions...")
-    v1 = comb_track.extract_average(union_peak)
+    data_in_union = comb_track.extract_average(union_peak) # ([id,...],[count1,...],[count2,...])
 
-    if n1 > n2:
-        r1 = n1/n2
-        r2 = 1
-    else:
-        r1 = 1
-        r2 = n2/n1
-    for i in xrange(len(v1[0])):
-        v1[1][i] = v1[1][i]/r1          # actual values are Pileup Per Peak Per Million reads (PPPPM)
-        v1[2][i] = v1[2][i]/r2        
-
+    # if n1 > n2:
+    #     r1 = n1/n2
+    #     r2 = 1
+    # else:
+    #     r1 = 1
+    #     r2 = n2/n1
+    # for i in xrange(len(data_in_union[0])):
+    #     data_in_union[1][i] = data_in_union[1][i]/r1 # actual values are Pileup Per Peak Per Million reads (PPPPM)
+    #     data_in_union[2][i] = data_in_union[2][i]/r2
 
     #info("Convert gfold...")
-    info("Extract gfold values from precompile array...")
-    gfolds = convert_gfold(v1, gfolds_c, cutoff=options.cutoff,mcmc=options.do_MCMC)
+    info( "Calculate gfold ..." )
+    gfolds = convert_gfold(data_in_union, gfolds_c, offset=offset, cutoff=options.cutoff,mcmc=options.do_MCMC)
 
     # sort by gfold
     gfolds.sort(cmp=lambda x,y:cmp(x[1],y[1]))
 
-    # add residue
-    #for i in xrange(len(gfolds)):
-    #    gfolds[i][1]+=residue_n1_to_n2
-    
+    # write differential regions with gfold>0
+
+    info( "Write differential regions to %s ..." % (options.oprefix+"_diff.bed") )
     ofhd = open(options.oprefix+"_diff.bed","w")
 
     for (rid, gf) in gfolds:
+        #print rid, gf
         if gf != 0:
             (chrom,start,end) = rid.split('.')
-            #print chrom,start,end,'.',gf
             ofhd.write( "%s\t%s\t%s\t%s\t%.5f\n" % (chrom,start,end,'.',gf) )
 
     ofhd.close()
 
+    info( "Write gfold values for each region to %s ..." % (options.oprefix+"_diff.txt") )
     ofhd = open(options.oprefix+"_diff.txt","w")
 
     gf_dict = dict(gfolds)
 
-    for i in xrange(len(v1[0])):
-        #print v1[0][i],v1[1][i]/n1,v1[2][i]/n2
-        gftmp = gf_dict[v1[0][i]]
-        tmp1 = v1[1][i]
-        tmp2 = v1[2][i]
-        ofhd.write("%s\t%.2f\t%.2f\t%.5f\n" % (v1[0][i],tmp1,tmp2,gftmp))
+    for i in xrange(len(data_in_union[0])):
+        gftmp = gf_dict[data_in_union[0][i]]
+        tmp1 = data_in_union[1][i]
+        tmp2 = data_in_union[2][i]
+        ofhd.write("%s\t%.2f\t%.2f\t%.5f\n" % (data_in_union[0][i],tmp1,tmp2,gftmp))
 
     ofhd.close()
 
