@@ -1,4 +1,4 @@
-# Time-stamp: <2012-02-22 17:59:26 Tao Liu>
+# Time-stamp: <2012-02-23 11:46:30 Tao Liu>
 
 """Module Description
 
@@ -162,26 +162,28 @@ def get_gfold ( v1, v2, precompiled_get=None, cutoff=0.01, sample_number=1000, b
             ret = max(0,V+offset)
         elif v1 < v2:
             # X < 0
-            ret = min(0,V+offset)        
+            ret = min(0,V+offset)
+        else:
+            ret = 0.0
         
     except IndexError:
         if mcmc:
             P_X = MCMCPoissonPosteriorRatio(sample_number,burn,v1,v2)
-            P_X = sorted(P_X)
             i = int( (sample_number-burn) * cutoff)
         else:
             P_X = MLEPoissonPosteriorRatio(sample_number,0,v1,v2)
-            P_X = sorted(P_X)
             i = int(sample_number * cutoff)            
+
+        P_X = map(lambda x:x+offset,sorted(P_X))
+        P_X_mean = float(sum(P_X))/len(P_X)
         
-        if v1 > v2:
+        if P_X_mean >= 0:
             # X >= 0
-            ret = max(0,P_X[i]+offset)
-        elif v1 < v2:
+            ret = max(0,P_X[i])
+        elif P_X_mean < 0:
             # X < 0
-            ret = min(0,P_X[-1*i]+offset)
-        else:
-            ret = 0
+            ret = min(0,P_X[-1*i])
+
     gfold_dict[(v1,v2)] = ret
     return ret
 
@@ -196,13 +198,10 @@ def convert_gfold ( v, precompiled_gfold, sample_number=5000, burn=500, offset=0
     get_func = precompiled_gfold.get
     for i in xrange(len(v[0])):
         rid= v[0][i]
-        v1 = v[1][i]
-        v2 = v[2][i]
-        try:
-            gf = get_func (v1,v2)
-        except IndexError:
-            # calculate gfold from MCMC or MLE
-            gf = get_gfold(v1,v2,precompiled_get=get_func,cutoff=cutoff,sample_number=sample_number,burn=burn,offset=offset,mcmc=mcmc)
+        v1 = int(v[1][i])
+        v2 = int(v[2][i])
+        # calculate gfold from precompiled table, MCMC or MLE
+        gf = get_gfold(v1,v2,precompiled_get=get_func,cutoff=cutoff,sample_number=sample_number,burn=burn,offset=offset,mcmc=mcmc)
         retadd([rid,gf])
     return ret
 

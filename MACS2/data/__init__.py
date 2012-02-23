@@ -1,4 +1,6 @@
 available_c = ['0.05','0.01']
+row_size = 1001
+table_size = row_size*row_size
 
 from array import array as pyarray
 import os
@@ -22,12 +24,12 @@ class PreCompiledGFold:
         c = str(c)
         if c in available_c:
             self.gfolds = pyarray('f',[])
-            self.gfolds.fromfile(file(os.path.join(path,'g'+str(c)+'.dat'),'rb'),1002001) # 1002001=1001*1001
+            self.gfolds.fromfile(file(os.path.join(path,'g'+str(c)+'.dat'),'rb'),table_size)
         else:
             raise InvalidCError(c)
     
     def get ( self, v1, v2 ):
-        i = int(round(v1)*101+round(v2))
+        i = int(round(v1)*row_size+round(v2))
         return self.gfolds[i]
 
 class FakePreCompiledGFold:

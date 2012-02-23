@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# Time-stamp: <2012-02-22 17:49:01 Tao Liu>
+# Time-stamp: <2012-02-23 11:54:43 Tao Liu>
 
 """Description: Naive call differential peaks from 4 bedGraph tracks for scores.
 
@@ -115,10 +115,12 @@ def main():
     t2_btrack = t2_bio.build_bdgtrack(baseline_value=0)
 
     # calculate sum of all signals in million
-    n1 = t1_btrack.summary()[0]/1000000.0
-    n2 = t2_btrack.summary()[0]/1000000.0
+    t1_sum = t1_btrack.summary()[0]
+    t2_sum = t2_btrack.summary()[0]    
+    n1 = t1_sum/1000000.0
+    n2 = t2_sum/1000000.0
     offset = -log(n1,2)+log(n2,2)
-    info("Offset is %.2f" % offset)
+    info("t1 sum: %.1f, t2 sum: %.1f, Offset is %.2f" % (t1_sum,t2_sum,offset))
 
     # combine two tracks
     info("Combine tracks...")
@@ -140,7 +142,7 @@ def main():
     #info("Convert gfold...")
     info( "Calculate gfold ..." )
     gfolds = convert_gfold(data_in_union, gfolds_c, offset=offset, cutoff=options.cutoff,mcmc=options.do_MCMC)
-
+    
     # sort by gfold
     gfolds.sort(cmp=lambda x,y:cmp(x[1],y[1]))
 
@@ -150,7 +152,6 @@ def main():
     ofhd = open(options.oprefix+"_diff.bed","w")
 
     for (rid, gf) in gfolds:
-        #print rid, gf
         if gf != 0:
             (chrom,start,end) = rid.split('.')
             ofhd.write( "%s\t%s\t%s\t%s\t%.5f\n" % (chrom,start,end,'.',gf) )
@@ -166,7 +167,7 @@ def main():
         gftmp = gf_dict[data_in_union[0][i]]
         tmp1 = data_in_union[1][i]
         tmp2 = data_in_union[2][i]
-        ofhd.write("%s\t%.2f\t%.2f\t%.5f\n" % (data_in_union[0][i],tmp1,tmp2,gftmp))
+        ofhd.write("%s\t%.5f\t%.5f\t%.5f\n" % (data_in_union[0][i],tmp1/n1,tmp2/n2,gftmp))
 
     ofhd.close()
 
