@@ -17,10 +17,12 @@ with the distribution).
 import os
 from array import array
 from copy import deepcopy
+import subprocess
+from tempfile import mkstemp
 import gc                               # use garbage collectior
 
 from MACS2.IO.cPeakIO import PeakIO
-
+from MACS2.IO.cBedGraphIO import bedGraphIO
 from MACS2.Constants import *
 from MACS2.cPileup import pileup_bdg
 from libc.math cimport log10
@@ -133,8 +135,7 @@ class PeakDetect:
     >>> pd.call_peaks()
     """
     def __init__ (self,opt = None,treat = None, control = None, d = None,
-                  slocal = None, llocal = None, shiftcontrol = None,
-                  never_directional = False):
+                  slocal = None, llocal = None, shiftcontrol = None):
         """Initialize the PeakDetect object.
 
         """
@@ -148,6 +149,20 @@ class PeakDetect:
         self.ratio_treat2control = None
         self.peaks = None
         self.final_peaks = None
+        if opt.format == 'BAMPE':
+            self.info('#3b using genomeCoverageBed to calculate true fragment distribution in treatment')
+            never_directional = True
+            args = str.split("genomeCoverageBed -bg -ibam %s" % opt.tfile)
+            tmpfhd, tmpfname = mkstemp()
+            p = subprocess.Popen(args, stdout = tmpfhd)
+            p.wait()
+            self.info('#3b ...importing bedGraph data')
+            self.true_treat = bedGraphIO(tmpfname).build_bdgtrack()
+            self.info('#3b ...cleaning up temporary file')
+            os.remove(tmpfname)
+        else:
+            never_directional = False
+            self.true_treat = None
         self.never_directional = never_directional
 
         #self.femax = opt.femax
@@ -439,16 +454,22 @@ class PeakDetect:
         treat_directional = not self.never_directional
         control_directional = treat_directional and self.shiftcontrol
         # global lambda
-        treat_total   = self.treat.total
-        lambda_bg = float(self.d)*treat_total/self.gsize
+        if self.true_treat is None:
+            treat_total = self.treat.total
+            lambda_bg = float(self.d)*treat_total/self.gsize
+        else:
+            treat_total = self.true_treat.summary()[0]
+            lambda_bg = treat_total / self.gsize
 
         # Now pileup FWTrackII to form a bedGraphTrackI
-        if treat_directional:
-            self.info("#3 pileup treatment data by extending tags towards 3' to %d length" % self.d)
+        if self.true_treat is None:
+            if treat_directional:
+                self.info("#3 pileup treatment data by extending tags towards 3' to %d length" % self.d)
+            else:
+                self.info("#3 pileup treatment data by extending tags both directions by %d length" % (self.d / 2))
         else:
-            self.info("#3 pileup treatment data by extending tags both directions by %d length" % (self.d / 2))
-        treat_btrack = pileup_bdg(self.treat,self.d,directional=treat_directional,
-                                  halfextension=self.opt.halfext)        
+            treat_btrack = pileup_bdg(self.treat,self.d,directional=treat_directional,
+                                      halfextension=self.opt.halfext)        
         
         # llocal size local
         self.info("#3 calculate d local lambda from treatment data")
@@ -467,8 +488,12 @@ class PeakDetect:
             control_btrack = treat_btrack.set_single_value(lambda_bg)
             
         # calculate pvalue scores
-        self.info("#3 Build score track ...")
-        score_btrack = treat_btrack.make_scoreTrack_for_macs(control_btrack)
+        if self.true_treat is not None:
+            self.info("#3 Build score track using true treatment data ...")
+            score_btrack = self.true_treat.make_scoreTrack_for_macs(control_btrack)
+        else:
+            self.info("#3 Build score track ...")
+            score_btrack = treat_btrack.make_scoreTrack_for_macs(control_btrack)
         treat_btrack = None             # clean them
         control_btrack = None
         gc.collect()                    # full collect garbage

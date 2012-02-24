@@ -212,11 +212,10 @@ def main():
                     # treatment has less tags than control, since tolarge is
                     # false, we will scale control to treatment.
                     options.tocontrol = False
-
+                    
     peakdetect = PeakDetect(treat = treat,
                             control = control,
                             opt = options,
-                            never_directional = options.format == 'BAMPE'
                             )
     peakdetect.call_peaks()
     #diag_result = peakdetect.diag_result()
