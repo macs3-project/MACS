@@ -1,4 +1,4 @@
-# Time-stamp: <2012-02-23 11:46:30 Tao Liu>
+# Time-stamp: <2012-02-23 14:42:52 Tao Liu>
 
 """Module Description
 
@@ -120,10 +120,10 @@ def MCMCPoissonPosteriorRatio (sample_number, burn, count1, count2):
     poi2 = pymc.Poisson('P2',lam2,value=count2,observed=True) # Poisson with observed value count2
     @deterministic
     def ratio (l1=lam1,l2=lam2):
-        return log(l1) - log(l2)
+        return log(l1,2) - log(l2,2)
     mcmcmodel  = pymc.MCMC([ratio,lam1,poi1,lam2,poi2])
     mcmcmodel.sample(iter=sample_number, progress_bar=False, burn=burn)    
-    return map(lambda x:x*LOG2E, ratio.trace())
+    return ratio.trace()
 
 rseed(10)
 

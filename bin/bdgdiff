@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# Time-stamp: <2012-02-23 11:54:43 Tao Liu>
+# Time-stamp: <2012-02-27 00:21:59 Tao Liu>
 
 """Description: Naive call differential peaks from 4 bedGraph tracks for scores.
 
@@ -71,7 +71,7 @@ def main():
     optparser.add_option("--t2",dest="t2bdg",type="string",
                          help="MACS pileup bedGraph for condition 2.")                         
     optparser.add_option("-C","--cutoff",dest="cutoff",type="float",
-                         help="Cutoff for GFOLD. Can only be 0.05,or 0.01. DEFAULT: 0.01",default=0.01)
+                         help="Cutoff for GFOLD. Can only be 0.05, or 0.01. DEFAULT: 0.01",default=0.01)
     #optparser.add_option("--MCMC",dest="do_MCMC",action="store_true",
     #                     help="Turn on MCMC simulation, will be quite slow",default=False)
     optparser.add_option("-o","--o-prefix",dest="oprefix",default="peak",type="string",
@@ -82,7 +82,7 @@ def main():
         optparser.print_help()
         sys.exit()
 
-    options.do_MCMC = False
+    options.do_MCMC = True
     
     # load precompiled matrix
     if options.cutoff in [0.05,0.01]:
@@ -135,9 +135,9 @@ def main():
     # else:
     #     r1 = 1
     #     r2 = n2/n1
-    # for i in xrange(len(data_in_union[0])):
-    #     data_in_union[1][i] = data_in_union[1][i]/r1 # actual values are Pileup Per Peak Per Million reads (PPPPM)
-    #     data_in_union[2][i] = data_in_union[2][i]/r2
+    for i in xrange(len(data_in_union[0])):
+        data_in_union[1][i] = int(data_in_union[1][i]) # actual values are Pileup Per Peak Per Million reads (PPPPM)
+        data_in_union[2][i] = int(data_in_union[2][i])
 
     #info("Convert gfold...")
     info( "Calculate gfold ..." )
