@@ -1,4 +1,4 @@
-# Time-stamp: <2012-02-23 14:42:52 Tao Liu>
+# Time-stamp: <2012-02-26 22:20:54 Tao Liu>
 
 """Module Description
 
@@ -29,6 +29,7 @@ from pymc import deterministic
 # ------------------------------------
 # constants
 # ------------------------------------
+import numpy.random as numpyrand
 
 LOG2E = log(2.718281828459045,2)        # for converting natural log to log2
 
@@ -122,10 +123,10 @@ def MCMCPoissonPosteriorRatio (sample_number, burn, count1, count2):
     def ratio (l1=lam1,l2=lam2):
         return log(l1,2) - log(l2,2)
     mcmcmodel  = pymc.MCMC([ratio,lam1,poi1,lam2,poi2])
+    mcmcmodel.use_step_method(pymc.AdaptiveMetropolis,[ratio,lam1,lam2,poi1,poi2], delay=20000)
     mcmcmodel.sample(iter=sample_number, progress_bar=False, burn=burn)    
     return ratio.trace()
 
-rseed(10)
 
 def MLEPoissonPosteriorRatio (sample_number, burn, count1, count2):
     """MLE method to calculate ratio distribution of two Posterior Poisson distributions.
@@ -139,6 +140,7 @@ def MLEPoissonPosteriorRatio (sample_number, burn, count1, count2):
 
     return: list of log2-ratios
     """
+    rseed(1)
     ratios = pyarray('f',[])
     ra = ratios.append
     for i in xrange(sample_number):
@@ -147,7 +149,7 @@ def MLEPoissonPosteriorRatio (sample_number, burn, count1, count2):
         ra( log(x1,2) - log(x2,2) )
     return ratios[int(burn):]
 
-def get_gfold ( v1, v2, precompiled_get=None, cutoff=0.01, sample_number=1000, burn=100, offset=0, mcmc=False):    
+def get_gfold ( v1, v2, precompiled_get=None, cutoff=0.01, sample_number=10000, burn=500, offset=0, mcmc=False):    
     # try cached gfold in this module first
     if gfold_dict.has_key((v1,v2)):
         return gfold_dict[(v1,v2)]
@@ -168,6 +170,7 @@ def get_gfold ( v1, v2, precompiled_get=None, cutoff=0.01, sample_number=1000, b
         
     except IndexError:
         if mcmc:
+            numpyrand.seed([10])
             P_X = MCMCPoissonPosteriorRatio(sample_number,burn,v1,v2)
             i = int( (sample_number-burn) * cutoff)
         else:
@@ -183,12 +186,15 @@ def get_gfold ( v1, v2, precompiled_get=None, cutoff=0.01, sample_number=1000, b
         elif P_X_mean < 0:
             # X < 0
             ret = min(0,P_X[-1*i])
+            
+        #print v1,v2,P_X_mean,'-',offset,ret,i,P_X[i],P_X[-i]
+    
 
     gfold_dict[(v1,v2)] = ret
     return ret
 
 #def convert_gfold ( v, cutoff = 0.01, precompiled_gfold=None, mcmc=False ):
-def convert_gfold ( v, precompiled_gfold, sample_number=5000, burn=500, offset=0, cutoff=0.01, mcmc=False):
+def convert_gfold ( v, precompiled_gfold, sample_number=15000, burn=5000, offset=0, cutoff=0.01, mcmc=False):
     """Take (name, count1, count2), try to extract precompiled gfold
     from precompiled_gfold.get; if failed, calculate the gfold using
     MCMC if mcmc is True, or simple MLE solution if mcmc is False.
