@@ -1,4 +1,4 @@
-# Time-stamp: <2012-02-09 03:29:51 Tao Liu>
+# Time-stamp: <2012-02-28 17:15:29 Tao Liu>
 
 """Module for Feature IO classes.
 
@@ -20,7 +20,7 @@ with the distribution).
 import numpy as np
 from numpy import int64,int32,float32
 
-from libc.math cimport sqrt,log10
+from libc.math cimport sqrt,log10,log
 
 from MACS2.Constants import *
 from MACS2.cProb cimport poisson_cdf
@@ -52,6 +52,22 @@ def get_pscore ( observed, expectation ):
         score = int(-100*poisson_cdf(observed,expectation,False,True))
         pscore_dict[(observed,expectation)] = score
         return score
+
+lnLR_dict = {}
+
+def logLR ( x, y ):
+    key_value = ( x, y )
+    if lnLR_dict.has_key(key_value):
+        return lnLR_dict[key_value]
+    else:
+        if x > y:
+            s = 100*int(x*(log(x+1)-log(y+1))+y-x)
+        elif x < y:
+            s = 100*int(-1*x*(log(x+1)-log(y+1))-y+x)
+        else:
+            s = 0
+        lnLR_dict[key_value] = s
+        return s
 
 # ------------------------------------
 # Classes
@@ -94,7 +110,8 @@ class scoreTrackI:
                                                              ('sample','float32'),
                                                              ('control','float32'),
                                                              ('-100logp','int32'),
-                                                             ('-100logq','int32')])
+                                                             ('-100logq','int32'),
+                                                             ('100lnLR','int32'),])
             self.pointer[chrom] = 0
 
     def add (self,chromosome,endpos,sample,control):
@@ -106,7 +123,7 @@ class scoreTrackI:
         i = self.pointer[chromosome]
         # get the preceding region
         #c[i] = (endpos,sample,control,int(-100*poisson_cdf(sample,control,False,True)),0)
-        c[i] = (endpos,sample,control,get_pscore(sample,control),0)
+        c[i] = (endpos,sample,control,get_pscore(sample,control),0,logLR(sample,control))
         self.pointer[chromosome] += 1
 
     def finalize (self):
@@ -142,9 +159,9 @@ class scoreTrackI:
         colname: can be 'sample','control','-100logp','-100logq'
 
         """
-        if colname not in ['sample','control','-100logp','-100logq']:
+        if colname not in ['sample','control','-100logp','-100logq','100lnLR']:
             raise Exception("%s not supported!" % colname)
-        if colname in ['-100logp', '-100logq']:
+        if colname in ['-100logp', '-100logq','100lnLR']:
             flag100 = True              # for pvalue or qvalue, divide them by 100 while writing to bedGraph file
         else:
             flag100 = False
@@ -259,7 +276,7 @@ class scoreTrackI:
         colname: can be 'sample','control','-100logp','-100logq'. Cutoff will be applied to the specified column.
         ptrack:  an optional track for pileup heights. If it's not None, use it to find summits. Otherwise, use self/scoreTrack.
         """
-        assert (colname in [ 'sample', 'control', '-100logp', '-100logq' ]), "%s not supported!" % colname
+        assert (colname in [ 'sample', 'control', '-100logp', '-100logq', '100lnLR' ]), "%s not supported!" % colname
 
         chrs  = self.get_chr_names()
         peaks = PeakIO()                      # dictionary to save peaks
@@ -403,7 +420,7 @@ class scoreTrackI:
         and gapped broad regions in BroadPeakIO.
         """
 
-        assert (colname in [ 'sample', 'control', '-100logp', '-100logq' ]), "%s not supported!" % colname
+        assert (colname in [ 'sample', 'control', '-100logp', '-100logq', '100lnLR' ]), "%s not supported!" % colname
 
         chrs  = self.get_chr_names()
         bpeaks = BroadPeakIO()                      # dictionary to save broad peaks

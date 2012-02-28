@@ -1,4 +1,4 @@
-# Time-stamp: <2011-12-28 14:24:45 Tao Liu>
+# Time-stamp: <2012-02-28 16:45:05 Tao Liu>
 
 """Module Description
 
@@ -396,6 +396,13 @@ class PeakDetect:
                                         self.zwig_tr+"_-log10qvalue",
                                         "-log10 qvalue scores at each bp from MACS version %s" % MACS_VERSION,
                                         "-100logq")
+           
+           self.info("#3 save the ln likelihood ratio track into bedGraph file...")
+           bdgfhd = open(self.zwig_tr + "_lnLR.bdg", "w")
+           score_btrack.write_bedGraph( bdgfhd,
+                                        self.zwig_tr+"_-lnLR",
+                                        "ln likelihood ratio scores at each bp from MACS version %s" % MACS_VERSION,
+                                        "100lnLR")
         return peaks
 
     def __call_peaks_wo_control (self):

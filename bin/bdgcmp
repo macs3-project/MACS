@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# Time-stamp: <2012-01-12 17:20:38 Tao Liu>
+# Time-stamp: <2012-02-28 15:48:57 Tao Liu>
 
 import os
 import sys
@@ -9,6 +9,7 @@ from optparse import OptionParser
 from MACS2.IO import cBedGraphIO
 from MACS2.IO.cBedGraph import scoreTracktoBedGraph
 from MACS2.cProb import poisson_cdf
+from math import log as mlog
 
 # ------------------------------------
 # constants
@@ -41,6 +42,14 @@ def get_pscore ( observed, expectation ):
         pscore_dict[(observed,expectation)] = score
         return score
 
+def logLR ( x, y ):
+    if x > y:
+        return x*(mlog(x+1)-mlog(y+1))+y-x
+    elif x < y:
+        return -1*x*(mlog(x+1)-mlog(y+1))-y+x
+    else:
+        return 0
+
 def main():
     usage = "usage: %prog <-t TREATMENT.BEDGRAPH> <-c CONTROL.BEDGRAPH> <-o OUTPUT.BEDGRAPH> [-m METHOD] "
     description = "Calculate scores using certain method by comparing a bedGraph file from treatment and a file from control representing local bias."
@@ -54,14 +63,14 @@ def main():
     optparser.add_option("-o","--output",dest="ofile",type="string",
                          help="Required: The output bedGraph file to write scores.")
     optparser.add_option("-m","--method",dest="method",type="string",
-                         help="Method to use while calculating a score in any bin by comparing treatment value and control value. Available choices are: ppois, qpois, substract, divide, multiply which represent Poisson Pvalue (-log10(pvalue) form) using control as lambda and treatment as observation, q-value through a BH process for poisson pvalues, substraction from treatment, fold change which may be problematic if there are zero in control. Default option is ppois.",default="ppois")
+                         help="Method to use while calculating a score in any bin by comparing treatment value and control value. Available choices are: ppois, qpois, substract, divide, and logLR,. They represent Poisson Pvalue (-log10(pvalue) form) using control as lambda and treatment as observation, q-value through a BH process for poisson pvalues, substraction from treatment, fold change which may be problematic if there are zero in control and log likelihood between ChIP-enriched model and open chromatin model. Default option is ppois.",default="ppois")
     (options,args) = optparser.parse_args()
 
     if not options.tfile or not options.cfile or not options.ofile:
         optparser.print_help()
         sys.exit()
 
-    available_methods = ['ppois','substract','divide','multiply','qpois']
+    available_methods = ['ppois','substract','divide','logLR','qpois']
     if options.method not in available_methods:
         sys.stderr.write("Method can only be %s" % ",".join(available_methods))
     else:
@@ -89,8 +98,8 @@ def main():
         sbtrack = tbtrack.overlie(cbtrack,func=lambda x,y:x-y)
     elif method == 'divide':
         sbtrack = tbtrack.overlie(cbtrack,func=lambda x,y:float(x)/y)
-    elif method == 'multiply':
-        sbtrack = tbtrack.overlie(cbtrack,func=lambda x,y:float(x)*y)
+    elif method == 'logLR':             # log likelihood
+        sbtrack = tbtrack.overlie(cbtrack,func=logLR)
     else:
         raise Exception("Can't reach here!")
 

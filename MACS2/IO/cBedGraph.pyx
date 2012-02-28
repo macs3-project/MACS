@@ -1,4 +1,4 @@
-# Time-stamp: <2012-02-09 03:45:46 Tao Liu>
+# Time-stamp: <2012-02-28 16:23:13 Tao Liu>
 
 """Module for Feature IO classes.
 
@@ -24,6 +24,7 @@ from array import array
 import numpy as np
 
 from libc.math cimport sqrt
+from libc.math cimport log
 
 from MACS2.Constants import *
 from MACS2.IO.cScoreTrack import scoreTrackI,CombinedTwoTrack
