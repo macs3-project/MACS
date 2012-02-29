@@ -1,4 +1,4 @@
-# Time-stamp: <2012-02-28 17:15:29 Tao Liu>
+# Time-stamp: <2012-02-29 14:57:25 Tao Liu>
 
 """Module for Feature IO classes.
 
@@ -43,6 +43,8 @@ __doc__ = "scoreTrackI classes"
 # ------------------------------------
 
 pscore_dict = {}
+LOG10_E = 0.43429448190325176
+
 
 def get_pscore ( observed, expectation ):
     key_value = (observed, expectation)
@@ -53,20 +55,25 @@ def get_pscore ( observed, expectation ):
         pscore_dict[(observed,expectation)] = score
         return score
 
-lnLR_dict = {}
+logLR_dict = {}
 
 def logLR ( x, y ):
+    """Calculate log10 Likelihood between H1 ( enriched ) and H0 (
+    chromatin bias ). Then store the values in integar form =
+    100*logLR. Set minus sign for depletion.
+    
+    """
     key_value = ( x, y )
-    if lnLR_dict.has_key(key_value):
-        return lnLR_dict[key_value]
+    if logLR_dict.has_key(key_value):
+        return logLR_dict[key_value]
     else:
         if x > y:
-            s = 100*int(x*(log(x+1)-log(y+1))+y-x)
+            s = int( (x*(log(x+1)-log(y+1))+y-x)*LOG10_E*100 )
         elif x < y:
-            s = 100*int(-1*x*(log(x+1)-log(y+1))-y+x)
+            s = int( (-1*x*(log(x+1)-log(y+1))-y+x)*LOG10_E*100 )
         else:
             s = 0
-        lnLR_dict[key_value] = s
+        logLR_dict[key_value] = s
         return s
 
 # ------------------------------------
@@ -111,7 +118,7 @@ class scoreTrackI:
                                                              ('control','float32'),
                                                              ('-100logp','int32'),
                                                              ('-100logq','int32'),
-                                                             ('100lnLR','int32'),])
+                                                             ('100logLR','int32'),])
             self.pointer[chrom] = 0
 
     def add (self,chromosome,endpos,sample,control):
@@ -159,9 +166,9 @@ class scoreTrackI:
         colname: can be 'sample','control','-100logp','-100logq'
 
         """
-        if colname not in ['sample','control','-100logp','-100logq','100lnLR']:
+        if colname not in ['sample','control','-100logp','-100logq','100logLR']:
             raise Exception("%s not supported!" % colname)
-        if colname in ['-100logp', '-100logq','100lnLR']:
+        if colname in ['-100logp', '-100logq','100logLR']:
             flag100 = True              # for pvalue or qvalue, divide them by 100 while writing to bedGraph file
         else:
             flag100 = False
@@ -170,6 +177,7 @@ class scoreTrackI:
             d = self.data[chrom]
             l = self.pointer[chrom]
             pre = 0
+            pre_v = None
             pos   = d['pos']
             if flag100:
                 value = d[colname]/100.0
@@ -276,7 +284,7 @@ class scoreTrackI:
         colname: can be 'sample','control','-100logp','-100logq'. Cutoff will be applied to the specified column.
         ptrack:  an optional track for pileup heights. If it's not None, use it to find summits. Otherwise, use self/scoreTrack.
         """
-        assert (colname in [ 'sample', 'control', '-100logp', '-100logq', '100lnLR' ]), "%s not supported!" % colname
+        assert (colname in [ 'sample', 'control', '-100logp', '-100logq', '100logLR' ]), "%s not supported!" % colname
 
         chrs  = self.get_chr_names()
         peaks = PeakIO()                      # dictionary to save peaks
@@ -420,7 +428,7 @@ class scoreTrackI:
         and gapped broad regions in BroadPeakIO.
         """
 
-        assert (colname in [ 'sample', 'control', '-100logp', '-100logq', '100lnLR' ]), "%s not supported!" % colname
+        assert (colname in [ 'sample', 'control', '-100logp', '-100logq', '100logLR' ]), "%s not supported!" % colname
 
         chrs  = self.get_chr_names()
         bpeaks = BroadPeakIO()                      # dictionary to save broad peaks

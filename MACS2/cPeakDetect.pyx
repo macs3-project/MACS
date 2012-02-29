@@ -1,4 +1,4 @@
-# Time-stamp: <2012-02-28 16:45:05 Tao Liu>
+# Time-stamp: <2012-02-29 13:43:05 Tao Liu>
 
 """Module Description
 
@@ -398,11 +398,11 @@ class PeakDetect:
                                         "-100logq")
            
            self.info("#3 save the ln likelihood ratio track into bedGraph file...")
-           bdgfhd = open(self.zwig_tr + "_lnLR.bdg", "w")
+           bdgfhd = open(self.zwig_tr + "_logLR.bdg", "w")
            score_btrack.write_bedGraph( bdgfhd,
-                                        self.zwig_tr+"_-lnLR",
-                                        "ln likelihood ratio scores at each bp from MACS version %s" % MACS_VERSION,
-                                        "100lnLR")
+                                        self.zwig_tr+"_-logLR",
+                                        "log10 likelihood ratio scores at each bp from MACS version %s" % MACS_VERSION,
+                                        "100logLR")
         return peaks
 
     def __call_peaks_wo_control (self):
