@@ -21,6 +21,9 @@
 
 	* PeakSplitter for bedGraph output as well
 
+	* SAMParser and BAMParser fixed for paired-end sequencing
+	data. Thanks to Benjamin Schiller!
+
 2011-06-21  Tao Liu  <taoliu@jimmy.harvard.edu>
 	Version 1.4.1
 
