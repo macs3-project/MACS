@@ -1,4 +1,4 @@
-# Time-stamp: <2011-03-07 11:36:09 Tao Liu>
+# Time-stamp: <2012-03-05 15:11:06 Tao Liu>
 
 """Module for all MACS Parser classes for input.
 
@@ -691,11 +691,11 @@ class SAMParser(GenericParser):
                 return (None, None, None)   # not a proper pair
             if bwflag & 8:
                 return (None, None, None)   # the mate is unmapped
-            p1pos = int(thisfields[3]) - 1
-            p2pos = int(thisfields[7]) - 1
-            if p1pos > p2pos:
-                # this pair is the farthest one, skip it
-                return (None, None, None)
+            # From Benjamin Schiller https://github.com/benjschiller
+            if bwflag & 128:
+                # this is not the first read in a pair
+                return (None, -1, None)
+            # end of the patch
         # In case of paired-end we have now skipped all possible "bad" pairs
         # in case of proper pair we have skipped the rightmost one... if the leftmost pair comes
         # we can treat it as a single read, so just check the strand and calculate its
@@ -836,11 +836,11 @@ class BAMParser(GenericParser):
                 return (None, -1, None)   # not a proper pair
             if bwflag & 8:
                 return (None, -1, None)   # the mate is unmapped
-            p1pos = thisstart
-            p2pos = struct.unpack('<i', data[24:28])[0]
-            if p1pos > p2pos:
-                # this pair is the farthest one, skip it
+            # From Benjamin Schiller https://github.com/benjschiller
+            if bwflag & 128:
+                # this is not the first read in a pair
                 return (None, -1, None)
+            # end of the patch
         # In case of paired-end we have now skipped all possible "bad" pairs
         # in case of proper pair we have skipped the rightmost one... if the leftmost pair comes
         # we can treat it as a single read, so just check the strand and calculate its
