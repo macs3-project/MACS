@@ -75,10 +75,8 @@ def main():
     info("#1  total tags in treatment: %d" % (t0))
     if options.keepduplicates != "all":
         if options.keepduplicates == "auto":
-            info("#1 calculate max duplicate tags in single position based on binomal distribution...")
-            treatment_max_dup_tags = cal_max_dup_tags(options.gsize,t0)
-            info("#1  max_dup_tags based on binomal = %d" % (treatment_max_dup_tags))
-            info("#1 filter out redundant tags at the same location and the same strand by allowing at most %d tag(s)" % (treatment_max_dup_tags))
+            info("#1 BAMPE mode does not filter duplicates. Use samtools rmdup if needed ...")
+            t1 = treat.total
         else:
             info("#1 user defined the maximum tags...")
             treatment_max_dup_tags = int(options.keepduplicates)
@@ -100,10 +98,12 @@ def main():
         info("#1  total tags in control: %d" % (c0))
         if options.keepduplicates != "all":
             if options.keepduplicates == "auto":
-                info("#1  for control, calculate max duplicate tags in single position based on binomal distribution...")
-                control_max_dup_tags = cal_max_dup_tags(options.gsize,c0)
-                info("#1  max_dup_tags based on binomal = %d" % (control_max_dup_tags))
-                info("#1 filter out redundant tags at the same location and the same strand by allowing at most %d tag(s)" % (control_max_dup_tags))
+                if options.format == 'BAMPE':
+                else:
+                    info("#1  for control, calculate max duplicate tags in single position based on binomal distribution...")
+                    control_max_dup_tags = cal_max_dup_tags(options.gsize,c0)
+                    info("#1  max_dup_tags based on binomal = %d" % (control_max_dup_tags))
+                    info("#1 filter out redundant tags at the same location and the same strand by allowing at most %d tag(s)" % (control_max_dup_tags))
             else:
                 info("#1 user defined the maximum tags...")
                 control_max_dup_tags = int(options.keepduplicates)
