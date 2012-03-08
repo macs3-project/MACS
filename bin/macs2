@@ -290,7 +290,7 @@ or example for broad peak calling: %prog -t ChIP.bam -c Control.bam --broad -g h
     optparser.add_option("-g","--gsize",dest="gsize",type="string",default="hs",
                          help="Effective genome size. It can be 1.0e+9 or 1000000000, or shortcuts:'hs' for human (2.7e9), 'mm' for mouse (1.87e9), 'ce' for C. elegans (9e7) and 'dm' for fruitfly (1.2e8), Default:hs")
     optparser.add_option("-s","--tsize",dest="tsize",type="int",default=None,
-                         help="Tag size. This will overide the auto detected tag size. DEFAULT: Not set")
+                         help="Tag size. This will override the auto detected tag size. DEFAULT: Not set")
     optparser.add_option("--bw",dest="bw",type="int",default=300,
                          help="Band width. This value is only used while building the shifting model. DEFAULT: 300")
     optparser.add_option("-q","--qvalue",dest="qvalue",type="float",default=0.01,
@@ -329,6 +329,8 @@ or example for broad peak calling: %prog -t ChIP.bam -c Control.bam --broad -g h
                           default=False)
     optparser.add_option("--broad",dest="broad",action="store_true",
                          help="If set, MACS will try to call broad peaks by linking nearby highly enriched regions. The linking region is controlled by another cutoff through --linking-cutoff. The maximum linking region length is 4 times of d from MACS. DEFAULT: False",default=False)
+    optparser.add_option("--call-summits",dest="call_summits",action="store_true",
+                         help="If set, MACS will use a more sophisticated approach to find all summits in each enriched peak region. DEFAULT: False",default=False)
     optparser.add_option("--broad-cutoff",dest="broadcutoff",type="float",default=0.1,
                          help="Cutoff for broad region. This option is not available unless --broad is set. If -p is set, this is a pvalue cutoff, otherwise, it's a qvalue cutoff. DEFAULT: 0.1 ")
     optparser.add_option("--verbose",dest="verbose",type="int",default=2,

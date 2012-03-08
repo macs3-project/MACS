@@ -19,8 +19,10 @@ with the distribution).
 # ------------------------------------
 import numpy as np
 from numpy import int64,int32,float32
+from scipy.signal import fftconvolve
 
 from libc.math cimport sqrt,log10
+from operator import itemgetter
 
 from MACS2.Constants import *
 from MACS2.cProb cimport poisson_cdf
@@ -243,7 +245,8 @@ class scoreTrackI:
                 qvalue[i] = pvalue2qvalue[pvalue[i]][0]
         return True
 
-    def call_peaks (self, cutoff=500, min_length=200, max_gap=50, colname='-100logp'):
+    def call_peaks (self, cutoff=500, min_length=200, max_gap=50, colname='-100logp',
+                    call_summits=False):
         """This function try to find regions within which, scores
         are continuously higher than a given cutoff.
 
@@ -265,6 +268,9 @@ class scoreTrackI:
         peaks = PeakIO()                      # dictionary to save peaks
 
         cutoff = int(cutoff)
+        
+        if call_summits: close_peak = self.__close_peak2
+        else: close_peak = self.__close_peak
         
         for chrom in chrs:
             chrom_pointer = self.pointer[chrom]
@@ -292,18 +298,108 @@ class scoreTrackI:
                     peak_content.append( (above_cutoff_startpos[i], above_cutoff_endpos[i], above_cutoff_v[i], above_cutoff_sv[i], above_cutoff[i]) )
                 else:
                     # close
-                    self.__close_peak(peak_content, peaks, min_length, chrom, colname )
+                    close_peak(peak_content, peaks, min_length, chrom, colname, smoothlen=max_gap/2 )
                     peak_content = [(above_cutoff_startpos[i], above_cutoff_endpos[i], above_cutoff_v[i], above_cutoff_sv[i], above_cutoff[i]),]
             
             # save the last peak
             if not peak_content:
                 continue
             else:
-                self.__close_peak(peak_content, peaks, min_length, chrom, colname )
+                close_peak(peak_content, peaks, min_length, chrom, colname, smoothlen=max_gap/2 )
 
         return peaks
+       
+    def __close_peak2 (self, peak_content, peaks, min_length, chrom, colname, smoothlen=50):
+        # this is where the summits are called, need to fix this
+        end, start = peak_content[ -1 ][ 1 ], peak_content[ 0 ][ 0 ]
+        if end - start < min_length: return # if the peak is too small, reject it
+        #for (start,end,value,summitvalue,index) in peak_content:
+        peakdata = np.zeros(end - start, dtype='float32')
+        peakindices = np.zeros(end - start, dtype='int32')
+        for (tmpstart,tmpend,tmpvalue,tmpsummitvalue, tmpindex) in peak_content:
+            i, j = tmpstart-start, tmpend-start
+            peakdata[i:j] = self.data[chrom]['sample'][tmpindex]
+            peakindices[i:j] = tmpindex
+        # apply smoothing window of tsize / 2
+        w = np.ones(smoothlen, dtype='float32')
+        smoothdata = fftconvolve(w/w.sum(), peakdata, mode='same')
+        # find maxima and minima
+        local_extrema = np.where(np.diff(np.sign(np.diff(smoothdata))))[0]+1
+        # get only maxima by requiring it be greater than the mean
+        # might be better to take another derivative instead
+        plateau_offsets = np.intersect1d(local_extrema,
+                                         np.where(peakdata>peakdata.mean())[0])
+        # sometimes peak summits are plateaus, so check for adjacent coordinates
+        # and take the middle ones if needed
+        if len(plateau_offsets)==0:
+        #####################################################################
+        # ***failsafe if no summits so far***                               #
+            summit_offset_groups = [[(end - start) / 2]]                    #
+        ##################################################################### 
+        elif len(plateau_offsets) == 1:
+            summit_offset_groups = [[plateau_offsets[0]]]
+        else:
+            previous_offset = plateau_offsets[0]
+            summit_offset_groups = [[previous_offset]]
+            for offset in plateau_offsets:
+                if offset == previous_offset + 1:
+                    summit_offset_groups[-1].append(offset)
+                else:
+                    summit_offset_groups.append([offset])
+        summit_offsets = []
+        for offset_group in summit_offset_groups:
+            summit_offsets.append(offset_group[len(offset_group) / 2])
+        summit_indices = peakindices[summit_offsets]
+        # also purge offsets that have the same summit_index
+        unique_offsets = []        
+        summit_offsets = np.fromiter(summit_offsets, dtype='int32')
+        for index in np.unique(summit_indices):
+            those_index_indices = np.where(summit_indices == index)[0]
+            those_offsets = summit_offsets[those_index_indices]
+            unique_offsets.append(int(those_offsets.mean()))
+        # also require a valley of at least 0.6 * taller peak
+        # in every adjacent two peaks or discard the lesser one
+        # this behavior is like PeakSplitter
+        better_offsets = []
+        previous_offset = unique_offsets.pop()
+        while True:
+            if len(unique_offsets) == 0:
+                better_offsets.append(previous_offset)
+                break
+            else:
+                this_offset = unique_offsets.pop()
+                this_h, prev_h = peakdata[[this_offset, previous_offset]]
+                if this_h > prev_h:
+                    prev_is_taller = False
+                    min_valley = 0.6 * this_h
+                else:
+                    prev_is_taller = True
+                    min_valley = 0.6 * prev_h
+                s = slice(this_offset, previous_offset)
+                valley = np.where(peakdata[s] < min_valley)[0]
+                if len(valley) > 0: better_offsets.append(previous_offset)
+                else:
+                    if prev_is_taller: continue # discard this peak
+                    # else: discard previous peak by ignoring it
+                previous_offset = this_offset
+        better_indices = peakindices[better_offsets]
+        assert len(better_offsets) > 0, "Lost peak summit(s)"
+        for summit_offset, summit_index in zip(better_offsets, better_indices):
+            peaks.add( chrom,
+                       start,
+                       end,
+                       summit      = start + summit_offset,
+                       peak_score  = self.data[chrom][colname][ summit_index ],
+                       pileup      = self.data[chrom]['sample'][ summit_index ], # should be the same as summit_value
+                       pscore      = self.data[chrom]['-100logp'][ summit_index ]/100.0,
+                       fold_change = self.data[chrom]['sample'][ summit_index ]/self.data[chrom]['control'][ summit_index ],
+                       qscore      = self.data[chrom]['-100logq'][ summit_index ]/100.0,
+                       )
+        # start a new peak
+        return True
 
-    def __close_peak (self, peak_content, peaks, min_length, chrom, colname):
+    def __close_peak (self, peak_content, peaks, min_length, chrom, colname, smoothlen=None):
+        # this is where the summits are called, need to fix this
         peak_length = peak_content[ -1 ][ 1 ] - peak_content[ 0 ][ 0 ]
         if peak_length >= min_length: # if the peak is too small, reject it
             tmpsummit = []

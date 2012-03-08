@@ -381,6 +381,7 @@ class PeakDetect:
         score_btrack.assign_qvalue( pqtable )
                 
         # call peaks
+        call_summits = self.opt.call_summits
         if self.log_pvalue:
             if self.opt.broad:
                 self.info("#3 Call broad peaks with given level1 -log10pvalue cutoff and level2: %.2f, %.2f..." % (self.log_pvalue,self.opt.log_broadcutoff) )
@@ -388,7 +389,7 @@ class PeakDetect:
                                                      lvl1_max_gap=self.opt.tsize,lvl2_max_gap=self.d*4,colname='-100logp')
             else:
                 self.info("#3 Call peaks with given -log10pvalue cutoff: %.2f ..." % self.log_pvalue)                
-                peaks = score_btrack.call_peaks(cutoff=self.log_pvalue*100,min_length=self.d,max_gap=self.opt.tsize,colname='-100logp')
+                peaks = score_btrack.call_peaks(cutoff=self.log_pvalue*100,min_length=self.d,max_gap=self.opt.tsize,colname='-100logp',call_summits=call_summits)
         elif self.log_qvalue:
             if self.opt.broad:
                 self.info("#3 Call broad peaks with given level1 -log10qvalue cutoff and level2: %f, %f..." % (self.log_qvalue,self.opt.log_broadcutoff) )
@@ -396,35 +397,38 @@ class PeakDetect:
                                                      lvl1_max_gap=self.opt.tsize,lvl2_max_gap=self.d*4,colname='-100logq')
             else:
                 self.info("#3 Call peaks with given -log10qvalue cutoff: %.2f ..." % self.log_qvalue)        
-                peaks = score_btrack.call_peaks(cutoff=self.log_qvalue*100,min_length=self.d,max_gap=self.opt.tsize,colname='-100logq')
+                peaks = score_btrack.call_peaks(cutoff=self.log_qvalue*100,min_length=self.d,max_gap=self.opt.tsize,colname='-100logq',call_summits=call_summits)
             
         if self.opt.store_bdg:
+           name = self.opt.name or 'Unknown'
            self.info("#3 save tag pileup into bedGraph file...")
            bdgfhd = open(self.zwig_tr + "_pileup.bdg", "w")
+           if self.true_treat is None: desc = "Fragment pileup"
+           else: desc = "True fragment distribution"
            score_btrack.write_bedGraph( bdgfhd,
                                         self.zwig_tr,
-                                        "Fragment pileup at each bp from MACS version %s" % MACS_VERSION,
+                                        "%s for %s from MACS v%s" % (desc, name, MACS_VERSION),
                                         "sample" )
         
            self.info("#3 save local lambda into bedGraph file...")
            bdgfhd = open(self.zwig_ctl + "_lambda.bdg", "w")
            score_btrack.write_bedGraph( bdgfhd,
                                         self.zwig_ctl,
-                                        "Maximum local lambda at each bp from MACS version %s" % MACS_VERSION,
+                                        "Maximum local lambda for \"%s\" from MACS v%s" % (name, MACS_VERSION),
                                         "control" )
 
            self.info("#3 save the -log10pvalue score track into bedGraph file...")
            bdgfhd = open(self.zwig_tr + "_pvalue.bdg", "w")
            score_btrack.write_bedGraph( bdgfhd,
                                         self.zwig_tr+"_-log10pvalue",
-                                        "-log10 pvalue scores at each bp from MACS version %s" % MACS_VERSION,
+                                        "-log10 pvalue scores for \"%s\" from MACS v%s" % (name, MACS_VERSION),
                                         "-100logp")
             
            self.info("#3 save the -log10qvalue score track into bedGraph file...")
            bdgfhd = open(self.zwig_tr + "_qvalue.bdg", "w")
            score_btrack.write_bedGraph( bdgfhd,
                                         self.zwig_tr+"_-log10qvalue",
-                                        "-log10 qvalue scores at each bp from MACS version %s" % MACS_VERSION,
+                                        "-log10 qvalue scores for \"%s\" from MACS v%s" % (name, MACS_VERSION),
                                         "-100logq")
         return peaks
 
@@ -513,6 +517,8 @@ class PeakDetect:
         score_btrack.assign_qvalue( pqtable )            
 
         # call peaks
+        call_summits = self.opt.call_summits
+        if call_summits: self.info("#3 Will call summits inside each peak ...")
         if self.log_pvalue:
             if self.opt.broad:
                 self.info("#3 Call broad peaks with given level1 -log10pvalue cutoff and level2: %.2f, %.2f..." % (self.log_pvalue,self.opt.log_broadcutoff) )
@@ -520,7 +526,7 @@ class PeakDetect:
                                                      lvl1_max_gap=self.opt.tsize,lvl2_max_gap=self.d*4,colname='-100logp')
             else:
                 self.info("#3 Call peaks with given -log10pvalue cutoff: %.2f ..." % self.log_pvalue)                
-                peaks = score_btrack.call_peaks(cutoff=self.log_pvalue*100,min_length=self.d,max_gap=self.opt.tsize,colname='-100logp')
+                peaks = score_btrack.call_peaks(cutoff=self.log_pvalue*100,min_length=self.d,max_gap=self.opt.tsize,colname='-100logp',call_summits=call_summits)
         elif self.log_qvalue:
             if self.opt.broad:
                 self.info("#3 Call broad peaks with given level1 -log10qvalue cutoff and level2: %.2f, %.2f..." % (self.log_qvalue,self.opt.log_broadcutoff) )
@@ -528,14 +534,17 @@ class PeakDetect:
                                                      lvl1_max_gap=self.opt.tsize,lvl2_max_gap=self.d*4,colname='-100logq')
             else:
                 self.info("#3 Call peaks with given -log10qvalue cutoff: %.2f ..." % self.log_qvalue)        
-                peaks = score_btrack.call_peaks(cutoff=self.log_qvalue*100,min_length=self.d,max_gap=self.opt.tsize,colname='-100logq')
+                peaks = score_btrack.call_peaks(cutoff=self.log_qvalue*100,min_length=self.d,max_gap=self.opt.tsize,colname='-100logq',call_summits=call_summits)
 
         if self.opt.store_bdg:
+           name = self.opt.name or 'Unknown'
            self.info("#3 save tag pileup into bedGraph file...")
            bdgfhd = open(self.zwig_tr + "_pileup.bdg", "w")
+           if self.true_treat is None: desc = "Fragment pileup"
+           else: desc = "True fragment distribution"
            score_btrack.write_bedGraph( bdgfhd,
                                         self.zwig_tr,
-                                        "Fragment pileup at each bp from MACS version %s" % MACS_VERSION,
+                                        "%s for %s from MACS v%s" % (desc, name, MACS_VERSION),
                                         "sample" )
 
            if self.lregion:
@@ -543,21 +552,21 @@ class PeakDetect:
                bdgfhd = open(self.zwig_ctl + "_lambda.bdg", "w")
                score_btrack.write_bedGraph( bdgfhd,
                                             self.zwig_ctl,
-                                            "Maximum local lambda at each bp from MACS version %s" % MACS_VERSION,
+                                            "Maximum local lambda for \"%s\" from MACS v%s" % (name, MACS_VERSION),
                                             "control" )
 
            self.info("#3 save the -log10pvalue score track into bedGraph file...")
            bdgfhd = open(self.zwig_tr + "_pvalue.bdg", "w")
            score_btrack.write_bedGraph( bdgfhd,
                                         self.zwig_tr+"_-log10pvalue",
-                                        "-log10 pvalue scores at each bp from MACS version %s" % MACS_VERSION,
+                                        "-log10 pvalue scores for \"%s\" from MACS v%s" % (name, MACS_VERSION),
                                         "-100logp")
             
            self.info("#3 save the -log10qvalue score track into bedGraph file...")
            bdgfhd = open(self.zwig_tr + "_qvalue.bdg", "w")
            score_btrack.write_bedGraph( bdgfhd,
                                         self.zwig_tr+"_-log10qvalue",
-                                        "-log10 qvalue scores at each bp from MACS version %s" % MACS_VERSION,
+                                        "-log10 qvalue scores for \"%s\" from MACS v%s" % (name, MACS_VERSION),
                                         "-100logq")
         return peaks
 
