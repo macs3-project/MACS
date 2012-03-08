@@ -1,4 +1,4 @@
-# Time-stamp: <2012-02-28 16:23:13 Tao Liu>
+# Time-stamp: <2012-03-07 01:32:39 Tao Liu>
 
 """Module for Feature IO classes.
 
@@ -216,6 +216,7 @@ class bedGraphTrackI:
             pnext = iter(p).next
             vnext = iter(v).next
             pre = 0
+
             for i in xrange(len(p)):
                 pos = pnext()
                 value = vnext()

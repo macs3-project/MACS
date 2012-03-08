@@ -1,4 +1,4 @@
-2011-12-28  Tao Liu  <taoliu@jimmy.harvard.edu>
+2012-03-05  Tao Liu  <taoliu@jimmy.harvard.edu>
 	MACS version 2.0.10 (tag:alpha still working)
 
 	* Use cross-correlation to calculate fragment size
@@ -6,7 +6,7 @@
 	First, all pairs will be used in prediction for fragment
 	size. Previously, only no more than 1000 pairs are used. Second,
 	cross-correlation is used to find the best phase difference
-	between + and - tag pileups. 
+	between + and - tag pileups.
 
 	* Speed up p-value and q-value calculation
 
@@ -46,6 +46,11 @@
 	Combine two p/qscore tracks together. At regions where condition 1
 	is higher than condition 2, score would be positive, otherwise,
 	negative.
+
+	* SAMParser and BAMParser 
+
+	Bug fixed for paired-end sequencing data. Thanks to Benjamin
+	Schiller!
 
 2011-11-2  Tao Liu  <taoliu@jimmy.harvard.edu>
 	MACS version 2.0.9 (tag:alpha)

@@ -1,4 +1,4 @@
-# Time-stamp: <2012-02-29 14:57:25 Tao Liu>
+# Time-stamp: <2012-03-08 00:26:39 Tao Liu>
 
 """Module for Feature IO classes.
 
@@ -177,15 +177,22 @@ class scoreTrackI:
             d = self.data[chrom]
             l = self.pointer[chrom]
             pre = 0
-            pre_v = None
             pos   = d['pos']
             if flag100:
                 value = d[colname]/100.0
             else:
                 value = d[colname]
-            for i in xrange( l ):
-                fhd.write("%s\t%d\t%d\t%.2f\n" % (chrom,pre,pos[i],value[i]))
-                pre = pos[i]
+            pre_v = value[0]
+            for i in xrange( 1, l ):
+                v = value[i]
+                p = pos[i-1]
+                if pre_v != v: 
+                    fhd.write("%s\t%d\t%d\t%.2f\n" % (chrom,pre,p,pre_v))
+                    pre_v = v
+                    pre = p
+            p = pos[-1]
+            # last one
+            fhd.write("%s\t%d\t%d\t%.2f\n" % (chrom,pre,p,pre_v))            
 
         return True
 

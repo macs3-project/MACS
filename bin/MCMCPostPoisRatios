@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# Time-stamp: <2012-02-22 14:54:53 Tao Liu>
+# Time-stamp: <2012-02-27 12:20:36 Tao Liu>
 
 """Module Description
 
@@ -44,7 +44,7 @@ LOG2E = log(2.718281828459045,2)
 # ------------------------------------
 def main():
     usage = "usage: %prog [options]"
-    description = "MCMC to calculate ratios between two Posterior Poisson with a given probability cutoff c."
+    description = "MCMC to calculate ratios between two Posterior Poisson with a given probability cutoff c. Left tail, right tail according to cutoff 0.01 and 0.05, and mean value will be stored in a table, then compress the table in gzip file."
     
     optparser = OptionParser(version="%prog 0.1",description=description,usage=usage,add_help_option=False)
     optparser.add_option("-h","--help",action="help",help="Show this help message and exit.")
@@ -53,11 +53,13 @@ def main():
     optparser.add_option("-M","--max",dest="maxcount",type="int",
                          help="Maximum of pileup height. <=10000. Default: 100", default=100)
     optparser.add_option("-N","--samplesize",dest="samplesize",type="int",
-                         help="Sampling size for MCMC. First 500 will be burned out. So must > 500. Default: 100000", default=100000)
+                         help="Sampling size for MCMC. Default: 15000", default=15000)
+    optparser.add_option("-B","--burn",dest="burnsize",type="int",
+                         help="Burn step for MCMC. First this number of samples will be trashed. Default: 5000", default=5000)
     optparser.add_option("-c","--cutoff",dest="cutoff",type="float",
                          help="Cutoff, must be <1. Default: 0.01", default=0.01)
     optparser.add_option("-o","--ofile",dest="ofile",
-                         help="output file") 
+                         help="output file, a gzip file.") 
     (options,args) = optparser.parse_args()
     if options.mincount < 0 or options.maxcount > 10000 or options.samplesize <= 500 or options.cutoff>=1 or not options.ofile:
         optparser.print_help()

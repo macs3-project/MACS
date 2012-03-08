@@ -1,4 +1,4 @@
-# Time-stamp: <2012-02-07 11:25:43 Tao Liu>
+# Time-stamp: <2012-03-05 15:40:00 Tao Liu>
 
 """Module Description
 
@@ -101,12 +101,6 @@ class PeakModel:
         # select only num_paired_peakpos_remained pairs.
         for c in paired_peakpos.keys():
             num_paired_peakpos +=len(paired_peakpos[c])
-        #     if num_paired_peakpos_remained == 0:
-        #         paired_peakpos.pop(c)
-        #     else:
-        #         paired_peakpos[c] = paired_peakpos[c][:num_paired_peakpos_remained]
-        #         num_paired_peakpos_remained -=  len(paired_peakpos[c])
-        #         num_paired_peakpos_picked += len(paired_peakpos[c])
         # TL: Now I want to use everything
 
         num_paired_peakpos_picked = num_paired_peakpos
@@ -141,6 +135,7 @@ Summary of Peak Model:
         window_size = 1+2*self.peaksize
         self.plus_line = np.zeros(window_size)#[0]*window_size
         self.minus_line = np.zeros(window_size)#[0]*window_size
+        self.info("start model_add_line...")
         for chrom in paired_peakpos.keys():
             paired_peakpos_chrom = paired_peakpos[chrom]
             tags = self.treatment.get_locations_by_chr(chrom)
@@ -152,6 +147,7 @@ Summary of Peak Model:
             #  add minus_line
             self.minus_line = self.__model_add_line (paired_peakpos_chrom, tags_minus,self.minus_line, plus_strand=0)
 
+        self.info("start X-correlation...")
         # Now I use cross-correlation to find the best d
         
         # normalize first
@@ -178,6 +174,9 @@ Summary of Peak Model:
         self.scan_window = max(self.d,self.tsize)*2
         # a shifted model
         self.shifted_line = [0]*window_size
+
+        self.info("end of X-cor")
+        
         #plus_shifted = [0]*shift_size
         #plus_shifted.extend(self.plus_line[:-1*shift_size])
         #minus_shifted = self.minus_line[shift_size:]
