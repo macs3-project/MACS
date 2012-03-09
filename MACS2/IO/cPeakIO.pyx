@@ -122,33 +122,51 @@ class PeakIO:
             x += len(peaks[chrom])
         return x
   
-    def _to_bed(self, name_prefix="peak_", score_column="score",
-                      print_func=print):
+    def _to_bed(self, name_prefix="%s_peak_", name="MACS",
+                description="%s", score_column="score",
+                print_func=print, trackline=False):
         """
         generalization of tobed and write_to_bed
         """
         chrs = self.peaks.keys()
         chrs.sort()
         n_peak = 0
+        try: peakprefix = name_prefix % name
+        except: peakprefix = name_prefix
+        try: desc = description % name
+        except: desc = description
+        trackcontents = (name.replace("\"", "\\\""), desc.replace("\"", "\\\""))
+        if trackline:
+            try: print_func('track name="%s" description="%s" visibility=1' % trackcontents)
+            except: print_func('track name=MACS description=Unknown') 
         for chrom in chrs:
             for end, group in groupby(self.peaks[chrom], key=itemgetter("end")):
                 n_peak += 1
                 peaks = list(group)
                 if len(peaks) > 1:
                     for i, peak in enumerate(peaks):
-                        print_func("%s\t%d\t%d\t%s%d%s\t%.2f\n" % (chrom,peak["start"],peak["end"],name_prefix,n_peak,subpeak_letters(i),peak[score_column]))
+                        print_func("%s\t%d\t%d\t%s%d%s\t%.2f\n" % (chrom,peak["start"],peak["end"],peakprefix,n_peak,subpeak_letters(i),peak[score_column]))
                 else:
                     peak = peaks[0]
-                    print_func("%s\t%d\t%d\t%s%d\t%.2f\n" % (chrom,peak["start"],peak["end"],name_prefix,n_peak,peak[score_column])) 
+                    print_func("%s\t%d\t%d\t%s%d\t%.2f\n" % (chrom,peak["start"],peak["end"],peakprefix,n_peak,peak[score_column])) 
 
-    def _to_summits_bed(self, name_prefix="peak_", score_column="score",
-                        print_func=print):
+    def _to_summits_bed(self, name_prefix="%s_peak_", name="MACS",
+                        description = "%s", score_column="score",
+                        print_func=print, trackline=False):
         """ 
         generalization of to_summits_bed and write_to_summit_bed
         """
         chrs = self.peaks.keys()
         chrs.sort()
         n_peak = 0
+        try: peakprefix = name_prefix % name
+        except: peakprefix = name_prefix
+        try: desc = description % name
+        except: desc = description
+        trackcontents = (name.replace("\"", "\\\""), desc.replace("\"", "\\\""))
+        if trackline:
+            try: print_func('track name="%s" description="%s" visibility=1' % trackcontents)
+            except: print_func('track name=MACS description=Unknown') 
         for chrom in chrs:
             for end, group in groupby(self.peaks[chrom], key=itemgetter("end")):
                 n_peak += 1
@@ -156,11 +174,11 @@ class PeakIO:
                 if len(peaks) > 1:
                     for i, peak in enumerate(peaks):
                         summit_p = peak["summit"]
-                        print_func("%s\t%d\t%d\t%s%d%s\t%.2f\n" % (chrom,summit_p,summit_p+1,name_prefix,n_peak,subpeak_letters(i),peak[score_column]))
+                        print_func("%s\t%d\t%d\t%s%d%s\t%.2f\n" % (chrom,summit_p,summit_p+1,peakprefix,n_peak,subpeak_letters(i),peak[score_column]))
                 else:
                     peak = peaks[0]
                     summit_p = peak["summit"]
-                    print_func("%s\t%d\t%d\t%s%d\t%.2f\n" % (chrom,summit_p,summit_p+1,name_prefix,n_peak,peak[score_column]))
+                    print_func("%s\t%d\t%d\t%s%d\t%.2f\n" % (chrom,summit_p,summit_p+1,peakprefix,n_peak,peak[score_column]))
 
     def tobed (self):
         """Print out peaks in BED5 format.

@@ -89,6 +89,12 @@ class scoreTrackI:
         """
         self.data = {}
         self.pointer = {}
+        self.trackline = False
+        
+    def enable_trackline(self):
+        """Turn on trackline with bedgraph output
+        """
+        self.trackline = True
 
     def add_chromosome ( self, chrom, chrom_max_len ):
         if not self.data.has_key(chrom):
@@ -144,6 +150,9 @@ class scoreTrackI:
         colname: can be 'sample','control','-100logp','-100logq'
 
         """
+        if self.trackline:
+            # this line is REQUIRED by the wiggle format for UCSC browser
+            fhd.write("track type=bedGraph name=\"%s\" description=\"%s\"\n" % (name,description))
         if colname not in ['sample','control','-100logp','-100logq']:
             raise Exception("%s not supported!" % colname)
         if colname in ['-100logp', '-100logq']:
@@ -351,7 +360,7 @@ class scoreTrackI:
             summit_offsets.append(offset_group[len(offset_group) / 2])
         summit_indices = peakindices[summit_offsets]
         # also purge offsets that have the same summit_index
-        unique_offsets = []        
+        unique_offsets = []
         summit_offsets = np.fromiter(summit_offsets, dtype='int32')
         for index in np.unique(summit_indices):
             those_index_indices = np.where(summit_indices == index)[0]
