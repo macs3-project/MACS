@@ -198,6 +198,7 @@ class scoreTrackI:
         #value_list = np.empty( n, dtype = [('v', '<f4'), ('l', '<i4')])
         value_dict = {}
         #i = 0                           # index for value_list
+        # this is a table of how many positions each p value occurs at
         for chrom in self.data.keys():
             # for each chromosome
             pre_p  = 0
@@ -208,6 +209,7 @@ class scoreTrackI:
             while j<length:
                 this_p = pos()
                 this_v = value()
+                assert this_v == this_v, "NaN at %d" % pos
                 #value_list[i] = (this_v,this_p-pre_p)
                 #i += 1
                 if value_dict.has_key(this_v):
@@ -222,12 +224,12 @@ class scoreTrackI:
         f = -log10(N)
         pre_v = -1e100
         pre_l = 0
-        pre_q = 1e100                       # save the previous q-value
-        pvalue2qvalue = {pre_v:[0,k,0]}              # pvalue:[qvalue,rank,bp_with_this_pvalue]
+        pre_q = 1e100 # save the previous q-value
+        pvalue2qvalue = {pre_v:[0,k,0]} # pvalue:[qvalue,rank,bp_with_this_pvalue]
         #logging.info("####test#### start matching pvalue to qvalue")
         for v in sorted(value_dict.keys(),reverse=True):
             l = value_dict[v]
-            q = v+int((log10(k)+f)*100) # we save integars here.
+            q = v + int((log10(k) + f) * 100) # we save integers here.
             q = max(0,min(pre_q,q))           # make q-score monotonic
             pvalue2qvalue[v] = [q, k, 0]
             pvalue2qvalue[pre_v][2] = k-pvalue2qvalue[pre_v][1]
