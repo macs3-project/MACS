@@ -201,7 +201,7 @@ class bedGraphTrackI:
         l = set(self.__data.keys())
         return l
 
-    def write_bedGraph (self, fhd, name, description):
+    def write_bedGraph (self, fhd, name, description, trackline=True):
         """Write all data to fhd in Wiggle Format.
 
         fhd: a filehandler to save bedGraph.
@@ -209,7 +209,8 @@ class bedGraphTrackI:
 
         shift will be used to shift the coordinates. default: 0
         """
-        #fhd.write("track type=bedGraph name=\"%s\" description=\"%s\"\n" % (name,description))
+        if trackline:
+            fhd.write("track type=bedGraph name=\"%s\" description=\"%s\" visibility=2 alwaysZero=on\n" % (name,description))
         chrs = self.get_chr_names()
         for chrom in chrs:
             (p,v) = self.__data[chrom]

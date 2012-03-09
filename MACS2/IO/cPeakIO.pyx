@@ -13,11 +13,16 @@ with the distribution).
 @author:  Tao Liu
 @contact: taoliu@jimmy.harvard.edu
 """
-
+##############################################################################
+# ** NOTE ** THIS MODULE USES python v3-style print() not v2 print keyword   #
+##############################################################################
+from __future__ import print_function # this line must be first
 # ------------------------------------
 # python modules
 # ------------------------------------
 from MACS2.Constants import *
+from itertools import groupby
+from operator import itemgetter
 
 # ------------------------------------
 # constants
@@ -29,7 +34,12 @@ __doc__ = "PeakIO class"
 # ------------------------------------
 # Misc functions
 # ------------------------------------
-
+def subpeak_letters(i):
+    if i < 26:
+        return chr(97+i)
+    else:
+        return subpeak_letters(i / 26) + chr(97 + (i % 26))
+    
 # ------------------------------------
 # Classes
 # ------------------------------------
@@ -112,6 +122,64 @@ class PeakIO:
             x += len(peaks[chrom])
         return x
   
+    def _to_bed(self, name_prefix="%s_peak_", name="MACS",
+                description="%s", score_column="score",
+                print_func=print, trackline=False):
+        """
+        generalization of tobed and write_to_bed
+        """
+        chrs = self.peaks.keys()
+        chrs.sort()
+        n_peak = 0
+        try: peakprefix = name_prefix % name
+        except: peakprefix = name_prefix
+        try: desc = description % name
+        except: desc = description
+        trackcontents = (name.replace("\"", "\\\""), desc.replace("\"", "\\\""))
+        if trackline:
+            try: print_func('track name="%s" description="%s" visibility=1' % trackcontents)
+            except: print_func('track name=MACS description=Unknown') 
+        for chrom in chrs:
+            for end, group in groupby(self.peaks[chrom], key=itemgetter("end")):
+                n_peak += 1
+                peaks = list(group)
+                if len(peaks) > 1:
+                    for i, peak in enumerate(peaks):
+                        print_func("%s\t%d\t%d\t%s%d%s\t%.2f\n" % (chrom,peak["start"],peak["end"],peakprefix,n_peak,subpeak_letters(i),peak[score_column]))
+                else:
+                    peak = peaks[0]
+                    print_func("%s\t%d\t%d\t%s%d\t%.2f\n" % (chrom,peak["start"],peak["end"],peakprefix,n_peak,peak[score_column])) 
+
+    def _to_summits_bed(self, name_prefix="%s_peak_", name="MACS",
+                        description = "%s", score_column="score",
+                        print_func=print, trackline=False):
+        """ 
+        generalization of to_summits_bed and write_to_summit_bed
+        """
+        chrs = self.peaks.keys()
+        chrs.sort()
+        n_peak = 0
+        try: peakprefix = name_prefix % name
+        except: peakprefix = name_prefix
+        try: desc = description % name
+        except: desc = description
+        trackcontents = (name.replace("\"", "\\\""), desc.replace("\"", "\\\""))
+        if trackline:
+            try: print_func('track name="%s" description="%s" visibility=1' % trackcontents)
+            except: print_func('track name=MACS description=Unknown') 
+        for chrom in chrs:
+            for end, group in groupby(self.peaks[chrom], key=itemgetter("end")):
+                n_peak += 1
+                peaks = list(group)
+                if len(peaks) > 1:
+                    for i, peak in enumerate(peaks):
+                        summit_p = peak["summit"]
+                        print_func("%s\t%d\t%d\t%s%d%s\t%.2f\n" % (chrom,summit_p,summit_p+1,peakprefix,n_peak,subpeak_letters(i),peak[score_column]))
+                else:
+                    peak = peaks[0]
+                    summit_p = peak["summit"]
+                    print_func("%s\t%d\t%d\t%s%d\t%.2f\n" % (chrom,summit_p,summit_p+1,peakprefix,n_peak,peak[score_column]))
+
     def tobed (self):
         """Print out peaks in BED5 format.
 
@@ -127,15 +195,7 @@ class PeakIO:
         fc:fold_change,
         qscore:qvalue
         """
-        text = ""
-        chrs = self.peaks.keys()
-        chrs.sort()
-        n_peak = 0
-        for chrom in chrs:
-            for peak in self.peaks[chrom]:
-                n_peak += 1
-                text+= "%s\t%d\t%d\tpeak_%d\t%.2f\n" % (chrom,peak["start"],peak["end"],n_peak,peak["score"])
-        return text
+        return self._to_bed(name_prefix="peak_", score_column="score")
 
     def to_summits_bed (self):
         """Print out peak summits in BED5 format.
@@ -143,18 +203,10 @@ class PeakIO:
         Five columns are chromosome, summit start, summit end, peak name, and peak height.
 
         """
-        text = ""
-        chrs = self.peaks.keys()
-        chrs.sort()
-        n_peak = 0
-        for chrom in chrs:
-            for peak in self.peaks[chrom]:
-                n_peak += 1
-                summit_p = peak["summit"]
-                text+= "%s\t%d\t%d\tpeak_%d\t%.2f\n" % (chrom,summit_p,summit_p+1,n_peak,peak["score"])
-        return text
+        return self._to_summits_bed(name_prefix="peak_", score_column="score")
 
-    def write_to_bed (self, fhd, name_prefix="peak_", score_column="score"):
+    def write_to_bed (self, fhd, name_prefix="peak_", name="MACS",
+                        description = "%s", score_column="score", trackline=False):
         """Write peaks in BED5 format in a file handler. Score (5th
         column) is decided by score_column setting. Check the
         following list. Name column ( 4th column) is made by putting
@@ -175,16 +227,12 @@ class PeakIO:
         fc:fold_change,
         qscore:qvalue        
         """
-        chrs = self.peaks.keys()
-        chrs.sort()
-        n_peak = 0
-        for chrom in chrs:
-            for peak in self.peaks[chrom]:
-                n_peak += 1
-                fhd.write( "%s\t%d\t%d\t%s%d\t%.2f\n" % (chrom,peak["start"],peak["end"],name_prefix,n_peak,peak[score_column]) )
+        return self._to_bed(name_prefix=name_prefix, name=name,
+                            description=description, score_column=score_column,
+                            print_func=fhd.write, trackline=trackline)
 
-
-    def write_to_summit_bed (self, fhd, name_prefix="peak_", score_column="score"):
+    def write_to_summit_bed (self, fhd, name_prefix="peak_", name="MACS",
+                             description = "%s", score_column="score", trackline=False):
         """Write peak summits in BED5 format in a file handler. Score
         (5th column) is decided by score_column setting. Check the
         following list. Name column ( 4th column) is made by putting
@@ -204,16 +252,11 @@ class PeakIO:
         fc:fold_change,
         qscore:qvalue
         """
-        chrs = self.peaks.keys()
-        chrs.sort()
-        n_peak = 0
-        for chrom in chrs:
-            for peak in self.peaks[chrom]:
-                n_peak += 1
-                summit_p = peak["summit"]
-                fhd.write( "%s\t%d\t%d\t%s%d\t%.2f\n" % (chrom,summit_p,summit_p+1,name_prefix,n_peak,peak[score_column]) )
+        return self._to_summits_bed(name_prefix=name_prefix, name=name,
+                                    description=description, score_column=score_column,
+                            print_func=fhd.write, trackline=trackline)
 
-    def write_to_narrowPeak (self, fhd, name_prefix="peak_", score_column="score"):
+    def write_to_narrowPeak (self, fhd, name_prefix="peak_", name=None, score_column="score"):
         """Print out peaks in narrowPeak format.
 
         This format is designed for ENCODE project, and basically a
@@ -271,6 +314,8 @@ class PeakIO:
         chrs.sort()
         n_peak = 0
         fhd.write("track type=narrowPeak nextItemButton=on\n")
+        try: peakprefix = name_prefix % name
+        except: peakprefix = name_prefix
         for chrom in chrs:
             for peak in self.peaks[chrom]:
                 n_peak += 1
@@ -279,7 +324,7 @@ class PeakIO:
                 # region, peak pvalue, peak fold_enrichment, qvalue)
                 fhd.write( "%s\t%d\t%d\t%s%d\t%d\t.\t%.2f\t%.2f\t%.2f\t%d\n"
                            %
-                           (chrom,peak["start"],peak["end"],name_prefix,n_peak,int(10*peak[score_column]),
+                           (chrom,peak["start"],peak["end"],peakprefix,n_peak,int(10*peak[score_column]),
                             peak["fc"],peak["pscore"],peak["qscore"],peak["summit"]-peak["start"]) )
 
 
@@ -459,6 +504,46 @@ class DiffPeakIO:
             x += len(peaks[chrom])
         return x
   
+    def _to_bed(self, name_prefix="peak_", score_column="score",
+                      print_func=print):
+        """
+        generalization of tobed and write_to_bed
+        """
+        chrs = self.peaks.keys()
+        chrs.sort()
+        n_peak = 0
+        for chrom in chrs:
+            for end, group in groupby(self.peaks[chrom], key=itemgetter("end")):
+                n_peak += 1
+                peaks = list(group)
+                if len(peaks) > 1:
+                    for i, peak in enumerate(peaks):
+                        print_func("%s\t%d\t%d\t%s%d%s\t%.2f\n" % (chrom,peak["start"],peak["end"],name_prefix,n_peak,subpeak_letters(i),peak[score_column]))
+                else:
+                    peak = peaks[0]
+                    print_func("%s\t%d\t%d\t%s%d\t%.2f\n" % (chrom,peak["start"],peak["end"],name_prefix,n_peak,peak[score_column])) 
+
+    def _to_summits_bed(self, name_prefix="peak_", score_column="score",
+                        print_func=print):
+        """ 
+        generalization of to_summits_bed and write_to_summit_bed
+        """
+        chrs = self.peaks.keys()
+        chrs.sort()
+        n_peak = 0
+        for chrom in chrs:
+            for end, group in groupby(self.peaks[chrom], key=itemgetter("end")):
+                n_peak += 1
+                peaks = list(group)
+                if len(peaks) > 1:
+                    for i, peak in enumerate(peaks):
+                        summit_p = peak["summit"]
+                        print_func("%s\t%d\t%d\t%s%d%s\t%.2f\n" % (chrom,summit_p,summit_p+1,name_prefix,n_peak,subpeak_letters(i),peak[score_column]))
+                else:
+                    peak = peaks[0]
+                    summit_p = peak["summit"]
+                    print_func("%s\t%d\t%d\t%s%d\t%.2f\n" % (chrom,summit_p,summit_p+1,name_prefix,n_peak,peak[score_column]))
+  
     def tobed (self):
         """Print out peaks in BED5 format.
 
@@ -474,15 +559,7 @@ class DiffPeakIO:
         fc:fold_change,
         qscore:qvalue
         """
-        text = ""
-        chrs = self.peaks.keys()
-        chrs.sort()
-        n_peak = 0
-        for chrom in chrs:
-            for peak in self.peaks[chrom]:
-                n_peak += 1
-                text+= "%s\t%d\t%d\tpeak_%d\t%.2f\n" % (chrom,peak["start"],peak["end"],n_peak,peak["score"])
-        return text
+        return self._to_bed(name_prefix="peak_", score_column="score")
 
     def to_summits_bed (self):
         """Print out peak summits in BED5 format.
@@ -490,16 +567,7 @@ class DiffPeakIO:
         Five columns are chromosome, summit start, summit end, peak name, and peak height.
 
         """
-        text = ""
-        chrs = self.peaks.keys()
-        chrs.sort()
-        n_peak = 0
-        for chrom in chrs:
-            for peak in self.peaks[chrom]:
-                n_peak += 1
-                summit_p = peak["summit"]
-                text+= "%s\t%d\t%d\tpeak_%d\t%.2f\n" % (chrom,summit_p,summit_p+1,n_peak,peak["score"])
-        return text
+        return self._to_summits_bed(name_prefix="peak_", score_column="score")
 
     def write_to_bed (self, fhd, name_prefix="peak_", score_column="score"):
         """Write peaks in BED5 format in a file handler. Score (5th
@@ -522,14 +590,8 @@ class DiffPeakIO:
         fc:fold_change,
         qscore:qvalue        
         """
-        chrs = self.peaks.keys()
-        chrs.sort()
-        n_peak = 0
-        for chrom in chrs:
-            for peak in self.peaks[chrom]:
-                n_peak += 1
-                fhd.write( "%s\t%d\t%d\t%s%d\t%.2f\n" % (chrom,peak["start"],peak["end"],name_prefix,n_peak,peak[score_column]) )
-
+        return self._to_bed(name_prefix=name_prefix, score_column=score_column,
+                            print_func=fhd.write)
 
     def write_to_summit_bed (self, fhd, name_prefix="peak_", score_column="score"):
         """Write peak summits in BED5 format in a file handler. Score
@@ -551,14 +613,8 @@ class DiffPeakIO:
         fc:fold_change,
         qscore:qvalue
         """
-        chrs = self.peaks.keys()
-        chrs.sort()
-        n_peak = 0
-        for chrom in chrs:
-            for peak in self.peaks[chrom]:
-                n_peak += 1
-                summit_p = peak["summit"]
-                fhd.write( "%s\t%d\t%d\t%s%d\t%.2f\n" % (chrom,summit_p,summit_p+1,name_prefix,n_peak,peak[score_column]) )
+        return self._to_summits_bed(name_prefix=name_prefix, score_column=score_column,
+                            print_func=fhd.write)
 
     def write_to_narrowPeak (self, fhd, name_prefix="peak_", score_column="score"):
         """Print out peaks in narrowPeak format.
