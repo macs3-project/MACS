@@ -18,6 +18,7 @@ import os
 from array import array
 from copy import deepcopy
 from itertools import groupby
+from operator import itemgetter
 import subprocess
 from tempfile import mkstemp
 import gc                               # use garbage collectior
@@ -265,24 +266,33 @@ class PeakDetect:
         chrs.sort()
         n_peak = 0
         for chrom in chrs:
-            for end, group in groupby(self.peaks[chrom], key=itemgetter("end")):
+            for end, group in groupby(peaks[chrom], key=itemgetter("end")):
                 n_peak += 1
                 peaks = list(group)
                 if len(peaks) > 1:
                     for i, peak in enumerate(peaks):
                         peakname = "%s%d%s" % (peakprefix, n_peak, subpeak_letters(i))
+                        #[start,end,end-start,summit,peak_height,number_tags,pvalue,fold_change,qvalue]
+                        write("%s\t%d\t%d\t%d" % (chrom,peak["start"]+1,peak["end"],peak["length"]))
+                        write("\t%d" % (peak["summit"]+1)) # summit position
+                        write("\t%.2f" % (peak["pileup"])) # pileup height at summit
+                        write("\t%.2f" % (peak["pscore"])) # -log10pvalue at summit
+                        write("\t%.2f" % (peak["fc"])) # fold change at summit                
+                        write("\t%.2f" % (peak["qscore"])) # -log10qvalue at summit
+                        write("\t%s" % peakname)
+                        write("\n")
                 else:
                     peak = peaks[0]
                     peakname = "%s%d" % (peakprefix, n_peak)
-                #[start,end,end-start,summit,peak_height,number_tags,pvalue,fold_change,qvalue]
-                write("%s\t%d\t%d\t%d" % (chrom,peak["start"]+1,peak["end"],peak["length"]))
-                write("\t%d" % (peak["summit"]+1)) # summit position
-                write("\t%.2f" % (peak["pileup"])) # pileup height at summit
-                write("\t%.2f" % (peak["pscore"])) # -log10pvalue at summit
-                write("\t%.2f" % (peak["fc"])) # fold change at summit                
-                write("\t%.2f" % (peak["qscore"])) # -log10qvalue at summit
-                write("\t%s" % peakname)
-                write("\n")
+                    #[start,end,end-start,summit,peak_height,number_tags,pvalue,fold_change,qvalue]
+                    write("%s\t%d\t%d\t%d" % (chrom,peak["start"]+1,peak["end"],peak["length"]))
+                    write("\t%d" % (peak["summit"]+1)) # summit position
+                    write("\t%.2f" % (peak["pileup"])) # pileup height at summit
+                    write("\t%.2f" % (peak["pscore"])) # -log10pvalue at summit
+                    write("\t%.2f" % (peak["fc"])) # fold change at summit                
+                    write("\t%.2f" % (peak["qscore"])) # -log10qvalue at summit
+                    write("\t%s" % peakname)
+                    write("\n")
         return
 
     def __call_peaks_w_control (self):
