@@ -34,6 +34,12 @@ def subpeak_letters(i):
     else:
         return subpeak_letters(i / 26) + chr(97 + (i % 26))
 
+def subpeak_letters(i):
+    if i < 26:
+        return chr(97+i)
+    else:
+        return subpeak_letters(i / 26) + chr(97 + (i % 26))
+
 def compare_treatment_vs_control(treat, control, fragment_size, gsize,
                                  never_directional=False, halfext=False,
                                  slocal=0, llocal=0,
