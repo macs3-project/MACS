@@ -205,7 +205,8 @@ class PeakIO:
         """
         return self._to_summits_bed(name_prefix="peak_", score_column="score")
 
-    def write_to_bed (self, fhd, name_prefix="peak_", score_column="score"):
+    def write_to_bed (self, fhd, name_prefix="peak_", name="MACS",
+                        description = "%s", score_column="score"):
         """Write peaks in BED5 format in a file handler. Score (5th
         column) is decided by score_column setting. Check the
         following list. Name column ( 4th column) is made by putting
@@ -226,10 +227,12 @@ class PeakIO:
         fc:fold_change,
         qscore:qvalue        
         """
-        return self._to_bed(name_prefix=name_prefix, score_column=score_column,
+        return self._to_bed(name_prefix=name_prefix, name=name,
+                            description=description, score_column=score_column,
                             print_func=fhd.write)
 
-    def write_to_summit_bed (self, fhd, name_prefix="peak_", score_column="score"):
+    def write_to_summit_bed (self, fhd, name_prefix="peak_", name="MACS",
+                             description = "%s", score_column="score"):
         """Write peak summits in BED5 format in a file handler. Score
         (5th column) is decided by score_column setting. Check the
         following list. Name column ( 4th column) is made by putting
@@ -249,7 +252,8 @@ class PeakIO:
         fc:fold_change,
         qscore:qvalue
         """
-        return self._to_summits_bed(name_prefix=name_prefix, score_column=score_column,
+        return self._to_summits_bed(name_prefix=name_prefix, name=name,
+                                    description=description, score_column=score_column,
                             print_func=fhd.write)
 
     def write_to_narrowPeak (self, fhd, name_prefix="peak_", score_column="score"):
