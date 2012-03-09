@@ -209,7 +209,7 @@ class bedGraphTrackI:
         shift will be used to shift the coordinates. default: 0
         """
         if trackline:
-            fhd.write("track type=bedGraph name=\"%s\" description=\"%s\"\n" % (name,description))
+            fhd.write("track type=bedGraph name=\"%s\" description=\"%s\" visibility=2 alwaysZero=on\n" % (name,description))
         chrs = self.get_chr_names()
         for chrom in chrs:
             (p,v) = self.__data[chrom]

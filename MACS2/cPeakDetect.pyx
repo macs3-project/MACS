@@ -17,6 +17,7 @@ with the distribution).
 import os
 from array import array
 from copy import deepcopy
+from itertools import groupby
 import subprocess
 from tempfile import mkstemp
 import gc                               # use garbage collectior
@@ -26,6 +27,12 @@ from MACS2.IO.cBedGraphIO import bedGraphIO
 from MACS2.Constants import *
 from MACS2.cPileup import pileup_bdg
 from libc.math cimport log10
+
+def subpeak_letters(i):
+    if i < 26:
+        return chr(97+i)
+    else:
+        return subpeak_letters(i / 26) + chr(97 + (i % 26))
 
 def compare_treatment_vs_control(treat, control, fragment_size, gsize,
                                  never_directional=False, halfext=False,
@@ -115,6 +122,7 @@ def compare_treatment_vs_control(treat, control, fragment_size, gsize,
 
     # calculate pvalue scores
     score_btrack = treat_btrack.make_scoreTrack_for_macs(control_btrack)
+    if self.opt.trackline: score_btrack.enable_trackline()
     treat_btrack = None             # clean them
     control_btrack = None
     gc.collect()                    # full collect garbage
@@ -231,23 +239,35 @@ class PeakDetect:
     #     else:                           # w/o control
     #         return self.__diag_wo_control()
 
-    def toxls (self, ofhd):
+    def toxls (self, ofhd, name_prefix="%s_peak_", name="MACS"):
         """Save the peak results in a tab-delimited plain text file
         with suffix .xls.
         
         """
         write = ofhd.write
         if self.peaks:
-            write("\t".join(("chr","start", "end",  "length",  "abs_summit", "pileup", "-log10(pvalue)", "fold_enrichment", "-log10(qvalue)"))+"\n")
+            write("\t".join(("chr","start", "end",  "length",  "abs_summit", "pileup", "-log10(pvalue)", "fold_enrichment", "-log10(qvalue)", "name"))+"\n")
             #text += "\t".join(("chr","start", "end",  "length",  "abs_summit", "-log10(pvalue)","-log10(qvalue)"))+"\n"
         else:
             return
+        
+        try: peakprefix = name_prefix % name
+        except: peakprefix = name_prefix
 
         peaks = self.peaks.peaks
         chrs = peaks.keys()
         chrs.sort()
+        n_peak = 0
         for chrom in chrs:
-            for peak in peaks[chrom]:
+            for end, group in groupby(self.peaks[chrom], key=itemgetter("end")):
+                n_peak += 1
+                peaks = list(group)
+                if len(peaks) > 1:
+                    for i, peak in enumerate(peaks):
+                        peakname = "%s%d%s" % (peakprefix, n_peak, subpeak_letters(i))
+                else:
+                    peak = peaks[0]
+                    peakname = "%s%d" % (peakprefix, n_peak)
                 #[start,end,end-start,summit,peak_height,number_tags,pvalue,fold_change,qvalue]
                 write("%s\t%d\t%d\t%d" % (chrom,peak["start"]+1,peak["end"],peak["length"]))
                 write("\t%d" % (peak["summit"]+1)) # summit position
@@ -255,6 +275,7 @@ class PeakDetect:
                 write("\t%.2f" % (peak["pscore"])) # -log10pvalue at summit
                 write("\t%.2f" % (peak["fc"])) # fold change at summit                
                 write("\t%.2f" % (peak["qscore"])) # -log10qvalue at summit
+                write("\t%s" % peakname)
                 write("\n")
         return
 
@@ -362,6 +383,7 @@ class PeakDetect:
         # calculate pvalue scores
         self.info("#3 Build score track ...")
         score_btrack = treat_btrack.make_scoreTrack_for_macs(control_btrack)
+        if self.opt.trackline: score_btrack.enable_trackline()
         treat_btrack = None             # clean them
         control_btrack = None
         gc.collect()                    # full collect garbage

@@ -23,6 +23,7 @@ with the distribution).
 import os
 import sys
 import logging
+import time
 from subprocess import Popen,PIPE
 from optparse import OptionParser
 import gzip
@@ -99,6 +100,8 @@ def main():
         if options.keepduplicates != "all":
             if options.keepduplicates == "auto":
                 if options.format == 'BAMPE':
+                    info("#1 BAMPE mode does not filter duplicates. Use samtools rmdup if needed ...")
+                    c1 = control.total
                 else:
                     info("#1  for control, calculate max duplicate tags in single position based on binomal distribution...")
                     control_max_dup_tags = cal_max_dup_tags(options.gsize,c0)
@@ -242,23 +245,23 @@ def main():
         score_column = "qscore"
     info("#4 Write peak bed file... %s" % (options.peakbed))
     ofhd_bed = open(options.peakbed,"w")
-    peakdetect.peaks.write_to_bed (ofhd_bed, name_prefix="MACS_peak_", score_column=score_column)
+    peakdetect.peaks.write_to_bed (ofhd_bed, name_prefix="%s_peak_", name = options.name, description="Peaks for %s (Made with MACS v2, " + time.strftime("%x") + ")", score_column=score_column, trackline=options.trackline)
     ofhd_bed.close()
     #4.2 peaks in narrowPeak
     info("#4 Write peak in narrowPeak format file... %s" % (options.peakNarrowPeak))
     ofhd_bed = open(options.peakNarrowPeak,"w")
-    peakdetect.peaks.write_to_narrowPeak (ofhd_bed, name_prefix="MACS_peak_", score_column=score_column)
+    peakdetect.peaks.write_to_narrowPeak (ofhd_bed, name_prefix="%s_peak_", name=options.name, score_column=score_column)
     ofhd_bed.close()
     #4.2 broad peaks in bed12
     if options.broad:
         info("#4 Write broad peak in bed12 format file... %s" % (options.peakBroadPeak))
         ofhd_bed = open(options.peakBroadPeak,"w")
-        peakdetect.broadpeaks.write_to_gappedPeak (ofhd_bed, name_prefix="MACS_peak_", name=options.name, description=options.name)
+        peakdetect.broadpeaks.write_to_gappedPeak (ofhd_bed, name_prefix="%s_peak_", name=options.name, description=options.name)
         ofhd_bed.close()
     #4.2-2 summits in BED
     info("#4 Write summits bed file... %s" % (options.summitbed))
     ofhd_summits = open(options.summitbed,"w")
-    peakdetect.peaks.write_to_summit_bed (ofhd_summits, name_prefix="MACS_summit_", score_column=score_column)
+    peakdetect.peaks.write_to_summit_bed (ofhd_summits, name_prefix="%s_peak_", name=options.name, description="Summits for %s (Made with MACS v2, " + time.strftime("%x") + ")", score_column=score_column, trackline=options.trackline)
     ofhd_summits.close()
 
 def prepare_optparser ():
@@ -333,6 +336,8 @@ or example for broad peak calling: %prog -t ChIP.bam -c Control.bam --broad -g h
                          help="If set, MACS will use a more sophisticated approach to find all summits in each enriched peak region. DEFAULT: False",default=False)
     optparser.add_option("--broad-cutoff",dest="broadcutoff",type="float",default=0.1,
                          help="Cutoff for broad region. This option is not available unless --broad is set. If -p is set, this is a pvalue cutoff, otherwise, it's a qvalue cutoff. DEFAULT: 0.1 ")
+    optparser.add_option("--no-trackline", dest="trackline", action="store_false", default=True,
+                         help="Tells MACS not to include trackline with bedGraph files. The trackline is required by UCSC.")
     optparser.add_option("--verbose",dest="verbose",type="int",default=2,
                          help="Set verbose level. 0: only show critical message, 1: show additional warning message, 2: show process information, 3: show debug messages. DEFAULT:2")
     return optparser
