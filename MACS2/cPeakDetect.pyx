@@ -543,6 +543,7 @@ class PeakDetect:
         else:
             self.info("#3 Build score track ...")
             score_btrack = treat_btrack.make_scoreTrack_for_macs(control_btrack)
+        if self.opt.trackline: score_btrack.enable_trackline()
         treat_btrack = None             # clean them
         control_btrack = None
         gc.collect()                    # full collect garbage

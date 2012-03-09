@@ -54,6 +54,7 @@ def get_pscore ( observed, expectation ):
         return pscore_dict[key_value]
     else:
         score = int(-100*poisson_cdf(observed,expectation,False,True))
+        if not score == score: score = 1 #if score is NaN, it's 1
         pscore_dict[(observed,expectation)] = score
         return score
 
@@ -245,9 +246,10 @@ class scoreTrackI:
                 #value_list[i] = (this_v,this_p-pre_p)
                 #i += 1
                 if value_dict.has_key(this_v):
-                    value_dict[this_v] += this_p-pre_p
+#                    print this_v, value_dict[this_v], this_p-pre_p
+                    value_dict[this_v] += long(this_p-pre_p)
                 else:
-                    value_dict[this_v] = this_p-pre_p
+                    value_dict[this_v] = long(this_p-pre_p)
                 j += 1
                 pre_p = this_p
 

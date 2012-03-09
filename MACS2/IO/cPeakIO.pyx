@@ -137,7 +137,7 @@ class PeakIO:
         except: desc = description
         trackcontents = (name.replace("\"", "\\\""), desc.replace("\"", "\\\""))
         if trackline:
-            try: print_func('track name="%s" description="%s" visibility=1' % trackcontents)
+            try: print_func('track name="%s" description="%s" visibility=1\n' % trackcontents)
             except: print_func('track name=MACS description=Unknown') 
         for chrom in chrs:
             for end, group in groupby(self.peaks[chrom], key=itemgetter("end")):
@@ -165,7 +165,7 @@ class PeakIO:
         except: desc = description
         trackcontents = (name.replace("\"", "\\\""), desc.replace("\"", "\\\""))
         if trackline:
-            try: print_func('track name="%s" description="%s" visibility=1' % trackcontents)
+            try: print_func('track name="%s" description="%s" visibility=1\n' % trackcontents)
             except: print_func('track name=MACS description=Unknown') 
         for chrom in chrs:
             for end, group in groupby(self.peaks[chrom], key=itemgetter("end")):
