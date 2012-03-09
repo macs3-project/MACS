@@ -261,7 +261,9 @@ def main():
     #4.2-2 summits in BED
     info("#4 Write summits bed file... %s" % (options.summitbed))
     ofhd_summits = open(options.summitbed,"w")
-    peakdetect.peaks.write_to_summit_bed (ofhd_summits, name_prefix="%s_peak_", name=options.name, description="Summits for %s (Made with MACS v2, " + time.strftime("%x") + ")", score_column=score_column, trackline=options.trackline)
+    peakdetect.peaks.write_to_summit_bed (ofhd_summits, name_prefix="%s_peak_", name=options.name,
+                                          description="Summits for %s (Made with MACS v2, " + time.strftime("%x") + ")",
+                                          score_column=score_column, trackline=options.trackline )
     ofhd_summits.close()
 
 def prepare_optparser ():

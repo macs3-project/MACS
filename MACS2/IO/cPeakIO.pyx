@@ -206,7 +206,7 @@ class PeakIO:
         return self._to_summits_bed(name_prefix="peak_", score_column="score")
 
     def write_to_bed (self, fhd, name_prefix="peak_", name="MACS",
-                        description = "%s", score_column="score"):
+                        description = "%s", score_column="score", trackline=False):
         """Write peaks in BED5 format in a file handler. Score (5th
         column) is decided by score_column setting. Check the
         following list. Name column ( 4th column) is made by putting
@@ -229,10 +229,10 @@ class PeakIO:
         """
         return self._to_bed(name_prefix=name_prefix, name=name,
                             description=description, score_column=score_column,
-                            print_func=fhd.write)
+                            print_func=fhd.write, trackline=trackline)
 
     def write_to_summit_bed (self, fhd, name_prefix="peak_", name="MACS",
-                             description = "%s", score_column="score"):
+                             description = "%s", score_column="score", trackline=False):
         """Write peak summits in BED5 format in a file handler. Score
         (5th column) is decided by score_column setting. Check the
         following list. Name column ( 4th column) is made by putting
@@ -254,9 +254,9 @@ class PeakIO:
         """
         return self._to_summits_bed(name_prefix=name_prefix, name=name,
                                     description=description, score_column=score_column,
-                            print_func=fhd.write)
+                            print_func=fhd.write, trackline=trackline)
 
-    def write_to_narrowPeak (self, fhd, name_prefix="peak_", score_column="score"):
+    def write_to_narrowPeak (self, fhd, name_prefix="peak_", name=None, score_column="score"):
         """Print out peaks in narrowPeak format.
 
         This format is designed for ENCODE project, and basically a
@@ -314,6 +314,8 @@ class PeakIO:
         chrs.sort()
         n_peak = 0
         fhd.write("track type=narrowPeak nextItemButton=on\n")
+        try: peakprefix = name_prefix % name
+        except: peakprefix = name_prefix
         for chrom in chrs:
             for peak in self.peaks[chrom]:
                 n_peak += 1
@@ -322,7 +324,7 @@ class PeakIO:
                 # region, peak pvalue, peak fold_enrichment, qvalue)
                 fhd.write( "%s\t%d\t%d\t%s%d\t%d\t.\t%.2f\t%.2f\t%.2f\t%d\n"
                            %
-                           (chrom,peak["start"],peak["end"],name_prefix,n_peak,int(10*peak[score_column]),
+                           (chrom,peak["start"],peak["end"],peakprefix,n_peak,int(10*peak[score_column]),
                             peak["fc"],peak["pscore"],peak["qscore"],peak["summit"]-peak["start"]) )
 
 
