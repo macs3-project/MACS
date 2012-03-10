@@ -1,4 +1,4 @@
-# Time-stamp: <2011-06-19 16:14:57 Tao Liu>
+# Time-stamp: <2012-03-09 18:38:36 Tao Liu>
 
 """Module Description: For pileup functions.
 
@@ -21,12 +21,15 @@ from array import array
 
 from MACS2.IO.cBedGraph import bedGraphTrackI
 from MACS2.Constants import *
+
+from cpython cimport bool
+
 # ------------------------------------
 # constants
 # ------------------------------------
 # to determine the byte size
 
-def pileup_bdg (trackI, d, baseline_value = 0, directional=True, halfextension=True):
+def pileup_bdg (trackI, int d, int baseline_value = 0, bool directional=True, bool halfextension=True):
     """Pileup tags into bedGraphTrackI object with extension. Tag will
     be extended towards 3' side with size of d if directional is Ture,
     or both sides with d/2 if directional is False.
@@ -41,7 +44,7 @@ def pileup_bdg (trackI, d, baseline_value = 0, directional=True, halfextension=T
 
     Return a bedGraphTrackI object.
     """
-    #step = 10000000 + 2*d               # step to cache data points.
+    cdef long five_shift, three_shift, l, i, j, i_s, i_e, p, pileup
 
     ret = bedGraphTrackI(baseline_value=baseline_value) # bedGraphTrackI object to be returned.
 
@@ -50,19 +53,19 @@ def pileup_bdg (trackI, d, baseline_value = 0, directional=True, halfextension=T
     if directional:
         # only extend to 3' side
         if halfextension:
-            five_shift = int(d*-0.25)  # five shift is used to move cursor towards 5' direction to find the start of fragment
-            three_shift = int(d*0.75) # three shift is used to move cursor towards 3' direction to find the end of fragment
+            five_shift = d/-4  # five shift is used to move cursor towards 5' direction to find the start of fragment
+            three_shift = d*3/4 # three shift is used to move cursor towards 3' direction to find the end of fragment
         else:
             five_shift = 0
             three_shift = d
     else:
         # both sides
         if halfextension:
-            five_shift = int(d*0.25)
+            five_shift = d/4
             three_shift = five_shift
         else:
-            five_shift = int(d/2)
-            three_shift = d - five_shift            
+            five_shift = d/2
+            three_shift = d - five_shift
 
     for chrom in chrs:
         (plus_tags,minus_tags) = trackI.get_locations_by_chr(chrom)
@@ -75,19 +78,15 @@ def pileup_bdg (trackI, d, baseline_value = 0, directional=True, halfextension=T
         # for plus tags
         for i in xrange(len(plus_tags)):
             # shift to get start positions. To 5' side.
-            #start_poss.append(max(0,plus_tags[i]-five_shift)) # prevent coordinates < 0
             start_poss.append(plus_tags[i]-five_shift) 
             # shift to get end positions by extending to d. To 3' side.
-            #end_poss.append(max(0,plus_tags[i]+three_shift))
             end_poss.append(plus_tags[i]+three_shift)
 
         # for minus tags
         for i in xrange(len(minus_tags)):
             # shift to get start positions by extending to d. To 3' side.
-            #start_poss.append(max(0,minus_tags[i]-three_shift)) # prevent coordinates < 0
             start_poss.append(minus_tags[i]-three_shift)
             # shift to get end positions. To 5' side.
-            #end_poss.append(max(0,minus_tags[i]+five_shift))
             end_poss.append(minus_tags[i]+five_shift)
             
         # sort
