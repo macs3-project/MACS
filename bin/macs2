@@ -257,7 +257,7 @@ def main():
     #4.2 peaks in narrowPeak
     info("#4 Write peak in narrowPeak format file... %s" % (options.peakNarrowPeak))
     ofhd_bed = open(options.peakNarrowPeak,"w")
-    peakdetect.peaks.write_to_narrowPeak (ofhd_bed, name_prefix="%s_peak_", name=options.name, score_column=score_column)
+    peakdetect.peaks.write_to_narrowPeak (ofhd_bed, name_prefix="%s_peak_", name=options.name, score_column=score_column, trackline=options.trackline )
     ofhd_bed.close()
     #4.2 broad peaks in bed12
     if options.broad:

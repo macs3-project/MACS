@@ -60,7 +60,11 @@ def main():
     optparser.add_option("-l","--min-length",dest="minlen",type="int",
                          help="minimum length of peak, better to set it as d value. DEFAULT: 200",default=200)
     optparser.add_option("-g","--max-gap",dest="maxgap",type="int",
-                         help="maximum gap between significant points in a peak, better to set it as tag size. DEFAULT: 30",default=30)
+                         help="maximum gap between significant points in a peak, better to set it as fragment size. DEFAULT: 300",default=300)
+    optparser.add_option("--call-summits",dest="call_summits",action="store_true",
+                         help="If set, MACS will use a more sophisticated approach to find all summits in each enriched peak region. DEFAULT: False",default=False)
+    optparser.add_option("--no-trackline", dest="trackline", action="store_false", default=True,
+                         help="Tells MACS not to include trackline with bedGraph files. The trackline is required by UCSC.")
     optparser.add_option("-o","--o-prefix",dest="oprefix",default="peak",
                          help="output file prefix, DEFAULT: peak") 
     (options,args) = optparser.parse_args()
@@ -74,11 +78,11 @@ def main():
     btrack = bio.build_bdgtrack(baseline_value=0)
 
     info("Call peaks from bedGraph...")    
-    peaks = btrack.call_peaks(cutoff=options.cutoff,min_length=options.minlen,max_gap=options.maxgap)
+    peaks = btrack.call_peaks(cutoff=options.cutoff,min_length=options.minlen,max_gap=options.maxgap, call_summits=options.call_summits)
 
     info("Write peaks...")
     nf = open ("%s_c%.1f_l%d_g%d_peaks.encodePeak" % (options.oprefix,options.cutoff,options.minlen,options.maxgap),"w")        
-    peaks.write_to_narrowPeak(nf, name_prefix=options.oprefix+"_encodePeak", score_column="score")
+    peaks.write_to_narrowPeak(nf, name_prefix=options.oprefix+"_encodePeak", score_column="score", trackline=options.trackline)
     info("Done")
     
 if __name__ == '__main__':

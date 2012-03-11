@@ -428,7 +428,7 @@ class scoreTrackI:
                     # else: discard previous peak by ignoring it
                 previous_offset = this_offset
         better_indices = peakindices[better_offsets]
-        assert len(better_offsets) > 0, "Lost peak summit(s)"
+        assert len(better_offsets) > 0, "Lost peak summit(s) near %s %d" % (chrom, start) 
         for summit_offset, summit_index in zip(better_offsets, better_indices):
             peaks.add( chrom,
                        start,

@@ -256,7 +256,7 @@ class PeakIO:
                                     description=description, score_column=score_column,
                             print_func=fhd.write, trackline=trackline)
 
-    def write_to_narrowPeak (self, fhd, name_prefix="peak_", name=None, score_column="score"):
+    def write_to_narrowPeak (self, fhd, name_prefix="peak_", name=None, score_column="score", trackline=True):
         """Print out peaks in narrowPeak format.
 
         This format is designed for ENCODE project, and basically a
@@ -313,9 +313,10 @@ class PeakIO:
         chrs = self.peaks.keys()
         chrs.sort()
         n_peak = 0
-        fhd.write("track type=narrowPeak nextItemButton=on\n")
         try: peakprefix = name_prefix % name
         except: peakprefix = name_prefix
+        if trackline:
+            fhd.write("track type=narrowPeak name=\"%s\" description=\"%s\" nextItemButton=on\n" % (name, name))
         for chrom in chrs:
             for peak in self.peaks[chrom]:
                 n_peak += 1
