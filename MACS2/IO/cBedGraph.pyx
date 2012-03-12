@@ -1,4 +1,4 @@
-# Time-stamp: <2012-03-12 15:11:43 Tao Liu>
+# Time-stamp: <2012-03-12 15:16:27 Tao Liu>
 
 """Module for Feature IO classes.
 
@@ -442,7 +442,7 @@ class bedGraphTrackI:
                 summit_value = 0
                 for (tstart,tend,tvalue) in peak_content:
                     if not summit_value or summit_value < tvalue:
-                        summit = int((tend+tstart)/2)
+                        tsummit = [int((tend+tstart)/2),]
                         summit_value = tvalue
                     elif summit_value == tvalue:
                         tsummit.append( int((tend+tstart)/2) )
