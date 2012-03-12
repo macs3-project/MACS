@@ -1,4 +1,4 @@
-# Time-stamp: <2012-01-06 16:59:05 Tao Liu>
+# Time-stamp: <2012-03-11 01:23:37 Tao Liu>
 
 """Module for FWTrack classes.
 
@@ -49,7 +49,7 @@ class FWTrackII:
     Locations are stored and organized by sequence names (chr names) in a
     dict. They can be sorted by calling self.sort() function.
     """
-    def __init__ (self,fw=0,anno=""):
+    def __init__ (self, int fw=0, char * anno=""):
         """fw is the fixed-width for all locations.
         
         """
@@ -59,7 +59,7 @@ class FWTrackII:
         self.total = 0                  # total tags
         self.annotation = anno   # need to be figured out
 
-    def add_loc (self, char * chromosome, long fiveendpos, int strand):
+    def add_loc (self, str chromosome, int fiveendpos, int strand):
         """Add a location to the list according to the sequence name.
         
         chromosome -- mostly the chromosome name
@@ -72,7 +72,7 @@ class FWTrackII:
         self.__locations[chromosome][strand].append(fiveendpos)
         self.total+=1
 
-    def get_locations_by_chr (self, chromosome):
+    def get_locations_by_chr (self, str chromosome):
         """Return a tuple of two lists of locations for certain chromosome.
 
         """
@@ -97,6 +97,8 @@ class FWTrackII:
         """Naive sorting for locations.
         
         """
+        cdef str k
+
         for k in self.__locations.keys():
             (tmparrayplus,tmparrayminus) = self.get_locations_by_chr(k)
             self.__locations[k][0] = sorted(tmparrayplus)
@@ -107,11 +109,14 @@ class FWTrackII:
                 logging.warning("NO records for chromosome %s, minus strand!" % (k))
         self.__sorted = True
 
-    def filter_dup (self,maxnum):
+    def filter_dup ( self, maxnum ):
         """Filter the duplicated reads.
 
         Run it right after you add all data into this object.
         """
+        cdef int p, m, n, current_loc
+        cdef str k
+        
         if not self.__sorted:
             self.sort()
         self.total = 0
@@ -165,6 +170,8 @@ class FWTrackII:
         """Merge plus and minus strand locations
         
         """
+        cdef str chrom
+        
         for chrom in self.__locations.keys():
             #(plus_tags,minus_tags) = self.__locations[chrom]
             self.__locations[chrom][0].extend(self.__locations[chrom][1])
@@ -178,6 +185,9 @@ class FWTrackII:
         slower than merge_plus_minus_locations_naive which only
         concatenate the two lists then sort it again! I am so discouraged!
         """
+        cdef long ip, im, lenp, lenm
+        cdef str chrom
+        
         if not self.__sorted:
             self.sort()
         for chrom in self.__locations.keys():
@@ -205,32 +215,43 @@ class FWTrackII:
             self.total += len(new_plus_tags)
 
 		
-    def sample_percent (self, percent):
+    def sample_percent (self, double percent):
         """Sample the tags for a given percentage.
 
         Warning: the current object is changed!
         """
+        cdef long num
+        cdef str key
+        
         self.total = 0
         for key in self.__locations.keys():
-            num = int(len(self.__locations[key][0])*percent)
-            self.__locations[key][0]=array(BYTE4,sorted(random_sample(self.__locations[key][0],num)))
-            num = int(len(self.__locations[key][1])*percent)
-            self.__locations[key][1]=array(BYTE4,sorted(random_sample(self.__locations[key][1],num)))
-            self.total += len(self.__locations[key][0]) + len(self.__locations[key][1])
+            num = long( len( self.__locations[key][0] ) * percent )
+            self.__locations[key][0] = array( BYTE4,
+                                              sorted( random_sample( self.__locations[key][0], num ) ) )
+            num = long( len( self.__locations[key][0] ) * percent )
+            self.__locations[key][1] = array( BYTE4,
+                                              sorted( random_sample( self.__locations[key][1], num ) ) )
+            self.total += len( self.__locations[key][0] ) + len( self.__locations[key][1] )
 
-    def sample_num (self, num):
+    def sample_num (self, long samplesize):
         """Sample the tags for a given percentage.
 
         Warning: the current object is changed!
         """
-        percent = float(num)/self.total
+        cdef double percent
+        cdef long num
+        cdef str key
+
+        percent = double(samplesize)/self.total
         self.total = 0
         for key in self.__locations.keys():
-            num = int(len(self.__locations[key][0])*percent)
-            self.__locations[key][0]=array(BYTE4,sorted(random_sample(self.__locations[key][0],num)))
-            num = int(len(self.__locations[key][1])*percent)
-            self.__locations[key][1]=array(BYTE4,sorted(random_sample(self.__locations[key][1],num)))
-            self.total += len(self.__locations[key][0]) + len(self.__locations[key][1])            
+            num = long( len( self.__locations[key][0] ) * percent )
+            self.__locations[key][0] = array( BYTE4,
+                                              sorted( random_sample( self.__locations[key][0], num ) ) )
+            num = long( len( self.__locations[key][1] ) * percent )
+            self.__locations[key][1] = array( BYTE4,
+                                              sorted( random_sample( self.__locations[key][1], num ) ) )
+            self.total += len( self.__locations[key][0] ) + len( self.__locations[key][1] )
             
     def __str__ (self):
         return self.__to_wiggle()
@@ -239,6 +260,9 @@ class FWTrackII:
         """Use a lot of memory!
         
         """
+        cdef int i
+        cdef str k, t
+        
         t = "track type=wiggle_0 name=\"tag list\" description=\"%s\"\n" % (self.annotation)
         for k in self.__locations.keys():
             if self.__locations[k][0]:
@@ -256,6 +280,9 @@ class FWTrackII:
         write to a file, otherwise, output to standard output.
         
         """
+        cdef int i
+        cdef str k
+        
         if not fhd:
             fhd = sysstdout
         assert isinstance(fhd, file)
@@ -266,307 +293,6 @@ class FWTrackII:
                     fhd.write("%s\t%d\t%d\t.\t.\t%s\n" % (k,i,int(i+self.fw),"+") )
             if self.__locations[k][1]:
                 for i in self.__locations[k][1]:
-                    fhd.write("%s\t%d\t%d\t.\t.\t%s\n" % (k,int(i-self.fw),i,"-") )
-        return
-
-
-class FWTrackIII:
-    """Fixed Width Locations Track class version III along the whole
-    genome (commonly with the same annotation type), which are stored
-    in a dict. I implemented it using Numpy array.
-
-    Locations are stored and organized by sequence names (chr names) in a
-    dict. They can be sorted by calling self.sort() function.
-    """
-    def __init__ (self,fw=0,anno=""):
-        """fw is the fixed-width for all locations.
-        
-        """
-        self.fw = fw
-        self.__locations = {}           # locations on plus/minus strand
-        self.__pointer = {}             # pointer of the index of last item for each chromosome
-        self.__tmp_iter = {}            # temporary iterator for self.__locations
-        self.__sorted = False
-        self.total = 0                  # total tags
-        
-        self.unique_positions = None    # total unique positions on
-                                        # genome, considering strand
-                                        # as well, not set till
-                                        # filterdup() or unique() is run.
-
-        self.annotation = anno          # need to be figured out
-
-    def add_loc (self, char * chromosome, long fiveendpos, int strand):
-        """Add a location to the list according to the sequence name.
-        
-        chromosome -- mostly the chromosome name
-        fiveendpos -- 5' end pos, left for plus strand, right for neg strand
-        strand     -- 0: plus, 1: minus
-        """
-        if not self.__locations.has_key(chromosome):
-            self.__add_chromosome(chromosome)
-        try:
-            self.__locations[chromosome][strand][self.__pointer[chromosome][strand]] = fiveendpos
-        except IndexError:
-            self.__extend_chromosome_strand(chromosome,strand)
-            self.__locations[chromosome][strand][self.__pointer[chromosome][strand]] = fiveendpos
-        self.__pointer[chromosome][strand] += 1
-        self.total+=1
-
-    def __add_chromosome (self, char * chromosome):
-        assert not self.__locations.has_key(chromosome)
-        assert not self.__tmp_iter.has_key(chromosome)
-        assert not self.__pointer.has_key(chromosome)
-        
-        self.__locations[chromosome] = [ np.empty(BUFFER_SIZE,dtype='int32'), # + strand
-                                         np.empty(BUFFER_SIZE,dtype='int32') ]# - strand
-        self.__pointer[chromosome] = [ 0 , 0 ]
-        return
-
-    def __extend_chromosome_strand(self, char * chromosome, int strand):
-        tmp = self.__locations[chromosome][strand]
-        tmp.resize( tmp.size + BUFFER_SIZE )
-        return
-
-    def finalize ( self ):
-        """Finalize all np arrays in __locations. Do this once all
-        locations are added.
-
-        """
-        tmp_sum = 0
-        for k in self.__locations.keys():
-            (lp,lm) = self.__pointer[k]
-            self.__locations[k][0].resize(lp,refcheck=False)
-            self.__locations[k][1].resize(lm,refcheck=False)
-            tmp_sum +=  self.__locations[k][0].size + self.__locations[k][1].size
-        assert tmp_sum == self.total
-        return
-
-    def get_locations_by_chr (self, chromosome):
-        """Return a tuple of two lists of locations for certain chromosome.
-
-        """
-        if self.__locations.has_key(chromosome):
-            return self.__locations[chromosome]
-        else:
-            raise Exception("No such chromosome name (%s) in FWTrackIII object!\n" % (chromosome))
-
-    def get_chr_names (self):
-        """Return all the chromosome names stored in this track object.
-        """
-        l = self.__locations.keys()
-        l.sort()
-        return l
-
-    def length (self):
-        """Total sequenced length = total number of tags * width of tag		
-        """
-        return self.total*self.fw
-
-    def sort (self):
-        """Naive sorting for locations.
-        
-        """
-        for k in self.__locations.keys():
-            (tmparrayplus,tmparrayminus) = self.get_locations_by_chr(k)
-            tmparrayplus.sort()
-            tmparrayminus.sort()
-            #self.__locations[k][0] = sorted(tmparrayplus)
-            if self.__pointer[k][0] < 1:
-                logging.warning("NO records for chromosome %s, plus strand!" % (k))
-            #self.__locations[k][1] = sorted(tmparrayminus)
-            if self.__pointer[k][1] < 1:
-                logging.warning("NO records for chromosome %s, minus strand!" % (k))
-        self.__sorted = True
-
-    def unique (self):
-        """Calculate unique positions
-
-        Run it right after you add all data into this object. or
-        whenever self.unique_positions is reset.
-        """
-        if not self.__sorted:
-            self.sort()
-        unique_positions = 0
-        for k in self.__locations.keys(): # for each chromosome
-            # + strand
-            plus = self.__locations[k][0]
-            plus_length = self.__pointer[k][0]
-            if plus.size >= 1:
-                current_loc = plus[0]
-                unique_positions += 1
-                for p in plus[1:plus_length]:
-                    if p != current_loc:
-                        current_loc = p
-                        unique_positions += 1                        
-            # - strand
-            minus = self.__locations[k][1]
-            minus_length = self.__pointer[k][1]
-            if minus.size >= 1:
-                current_loc = minus[0]
-                unique_positions += 1                
-                for p in minus[1:minus_length]:
-                    if p != current_loc:
-                        current_loc = p
-                        unique_positions += 1                        
-        self.unique_positions = unique_positions
-        return self.unique_positions
-
-    def filter_dup (self,maxnum):
-        """Filter the duplicated reads.
-
-        Run it right after you add all data into this object.
-        """
-        if not self.__sorted:
-            self.sort()
-        self.total = 0
-        self.unique_positions = 0
-        for k in self.__locations.keys(): # for each chromosome
-            # + strand
-            plus = self.__locations[k][0]
-            plus_length = self.__pointer[k][0]
-            if plus.size < 1:           # nothing on plus strand
-                new_plus = []
-            else:
-                new_plus = np.empty(plus_length,'int32')# array(BYTE4,[plus[0]])
-                new_plus_pointer = 0
-                n = 1                # the number of tags in the current location
-                current_loc = plus[0]
-                new_plus[new_plus_pointer] = current_loc
-                self.unique_positions += 1
-                for p in plus[1:plus_length]:
-                    if p == current_loc:
-                        # same position
-                        n += 1
-                        if n <= maxnum:
-                            new_plus[new_plus_pointer] = p
-                            new_plus_pointer += 1
-                        else:
-                            logging.debug("Duplicate reads found at %s:%d at + strand" % (k,p) )
-                    else:
-                        current_loc = p
-                        self.unique_positions += 1                        
-                        new_plus[new_plus_pointer] = p
-                        new_plus_pointer += 1
-                        n = 1
-                self.total +=  new_plus_pointer
-
-            # - strand
-            minus = self.__locations[k][1]
-            minus_length = self.__pointer[k][1]
-            if minus.size < 1:           # nothing on minus strand
-                new_minus = []
-            else:
-                new_minus = np.empty(minus_length,'int32')# array(BYTE4,[minus[0]])
-                new_minus_pointer = 0
-                n = 1                # the number of tags in the current location
-                current_loc = minus[0]
-                new_minus[new_minus_pointer] = current_loc                
-                self.unique_positions += 1
-                for p in minus[1:minus_length]:
-                    if p == current_loc:
-                        n += 1
-                        if n <= maxnum:
-                            new_minus[new_minus_pointer] = p
-                            new_minus_pointer += 1
-                        else:
-                            logging.debug("Duplicate reads found at %s:%d at + strand" % (k,p) )
-                    else:
-                        current_loc = p
-                        self.unique_positions += 1                        
-                        new_minus[new_minus_pointer] = p
-                        new_minus_pointer += 1
-                        n = 1
-                self.total +=  new_minus_pointer
-
-            self.__locations[k]=[ new_plus,new_minus ]
-            self.__pointer[k]=[ new_plus_pointer,new_minus_pointer ]
-        self.finalize()
-
-    def merge_plus_minus_locations_naive (self):
-        """Merge plus and minus strand locations to plus strand array
-        
-        """
-        for chrom in self.__locations.keys():
-            #(plus_tags,minus_tags) = self.__locations[chrom]
-            self.__locations[chrom][0] = np.concatenate(self.__locations[chrom][0],
-                                                        self.__locations[chrom][1])
-            self.__locations[chrom][0].sort()
-            self.__locations[chrom][1] = []
-
-    def sample_percent (self, percent):
-        """Sample the tags for a given percentage.
-
-        Warning: the current object is changed!
-        """
-        assert percent <= 1
-        self.total = 0
-        for key in self.__locations.keys():
-            #plus
-            num = self.__pointer[key][0]
-            indexes = np.arange(num)
-            np.random.shuffle(indexes)
-            indexes = indexes[:(num*percent)]
-            self.__locations[key][0] = self.__locations[key][0][indexes]
-            self.__pointer[key][0] = indexes.size
-            self.total += indexes.size            
-            # minus
-            num = self.__pointer[key][1]
-            indexes = np.arange(num)
-            np.random.shuffle(indexes)
-            indexes = indexes[:(num*percent)]
-            self.__locations[key][1] = self.__locations[key][1][indexes]
-            self.__pointer[key][1] = indexes.size
-            self.total += indexes.size
-        self.unique_positions = None    # unset this value
-        self.finalize()
-        self.sort()
-        
-    def sample_num (self, num):
-        """Sample the tags for a given percentage.
-
-        Warning: the current object is changed!
-        """
-        percent = float(num)/self.total
-        self.sample_percent ( percent )
-        
-    def __str__ (self):
-        return self.__to_wiggle()
-        
-    def __to_wiggle (self):
-        """Use a lot of memory!
-        
-        """
-        t = "track type=wiggle_0 name=\"tag list\" description=\"%s\"\n" % (self.annotation)
-        for k in self.__locations.keys():
-            if self.__locations[k][0]:
-                l = self.__pointer[k][0]
-                t += "variableStep chrom=%s span=%d strand=0\n" % (k,self.fw)
-                for i in self.__locations[k][0][:l]:
-                    t += "%d\t1\n" % i
-            if self.__locations[k][1]:
-                l = self.__pointer[k][1]      
-                t += "variableStep chrom=%s span=%d strand=1\n" % (k,self.fw)
-                for i in self.__locations[k][1][:l]:
-                    t += "%d\t1\n" % i
-        return t
-
-    def print_to_bed (self, fhd=None):
-        """Output FWTrackIII to BED format files. If fhd is given,
-        write to a file, otherwise, output to standard output.
-        
-        """
-        if not fhd:
-            fhd = sysstdout
-        assert isinstance(fhd, file)
-        assert self.fw > 0, "FWTrackIII object .fw should be set larger than 0!"
-        for k in self.__locations.keys():
-            (lp,ln) = self.__pointer[k]
-            if self.__locations[k][0]:
-                for i in self.__locations[k][0][:lp]:
-                    fhd.write("%s\t%d\t%d\t.\t.\t%s\n" % (k,i,int(i+self.fw),"+") )
-            if self.__locations[k][1]:
-                for i in self.__locations[k][1][:ln]:
                     fhd.write("%s\t%d\t%d\t.\t.\t%s\n" % (k,int(i-self.fw),i,"-") )
         return
 

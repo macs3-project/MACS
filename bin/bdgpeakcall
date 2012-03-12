@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# Time-stamp: <2011-12-29 16:14:49 Tao Liu>
+# Time-stamp: <2012-03-11 00:14:07 Tao Liu>
 
 """Description: Naive call peaks from a single bedGraph track for scores.
 
@@ -74,7 +74,7 @@ def main():
     btrack = bio.build_bdgtrack(baseline_value=0)
 
     info("Call peaks from bedGraph...")    
-    peaks = btrack.call_peaks(cutoff=options.cutoff,min_length=options.minlen,max_gap=options.maxgap)
+    peaks = btrack.call_peaks(cutoff=float(options.cutoff),min_length=int(options.minlen),max_gap=int(options.maxgap))
 
     info("Write peaks...")
     nf = open ("%s_c%.1f_l%d_g%d_peaks.encodePeak" % (options.oprefix,options.cutoff,options.minlen,options.maxgap),"w")        

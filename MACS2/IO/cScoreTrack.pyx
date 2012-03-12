@@ -1,4 +1,4 @@
-# Time-stamp: <2012-03-08 00:26:39 Tao Liu>
+# Time-stamp: <2012-03-12 15:05:15 Tao Liu>
 
 """Module for Feature IO classes.
 
@@ -46,8 +46,15 @@ pscore_dict = {}
 LOG10_E = 0.43429448190325176
 
 
-def get_pscore ( observed, expectation ):
-    key_value = (observed, expectation)
+cdef get_pscore ( int observed, double expectation ):
+    """Get p-value score from Poisson test. First check existing
+    table, if failed, call poisson_cdf function, then store the result
+    in table.
+    
+    """
+    cdef int score
+    
+    key_value = ( observed, expectation )
     if pscore_dict.has_key(key_value):
         return pscore_dict[key_value]
     else:
@@ -57,12 +64,13 @@ def get_pscore ( observed, expectation ):
 
 logLR_dict = {}
 
-def logLR ( x, y ):
+cdef logLR ( double x, double y ):
     """Calculate log10 Likelihood between H1 ( enriched ) and H0 (
     chromatin bias ). Then store the values in integar form =
     100*logLR. Set minus sign for depletion.
     
     """
+    cdef int s
     key_value = ( x, y )
     if logLR_dict.has_key(key_value):
         return logLR_dict[key_value]
@@ -111,7 +119,7 @@ class scoreTrackI:
         self.data = {}
         self.pointer = {}
 
-    def add_chromosome ( self, chrom, chrom_max_len ):
+    def add_chromosome ( self, str chrom, int chrom_max_len ):
         if not self.data.has_key(chrom):
             self.data[chrom] = np.zeros(chrom_max_len,dtype=[('pos','int32'),
                                                              ('sample','float32'),
@@ -121,11 +129,12 @@ class scoreTrackI:
                                                              ('100logLR','int32'),])
             self.pointer[chrom] = 0
 
-    def add (self,chromosome,endpos,sample,control):
+    def add (self, str chromosome, int endpos, int sample, double control):
         """Add a chr-endpos-sample-control block into data
         dictionary. At the mean time, calculate pvalues.
 
         """
+        cdef int i
         c = self.data[chromosome]
         i = self.pointer[chromosome]
         # get the preceding region
@@ -134,12 +143,15 @@ class scoreTrackI:
         self.pointer[chromosome] += 1
 
     def finalize (self):
+        cdef str chrom
+        cdef int l
+
         for chrom in self.data.keys():
             d = self.data[chrom]
             l = self.pointer[chrom]
             d.resize(l,refcheck=False)
 
-    def get_data_by_chr (self, chromosome):
+    def get_data_by_chr (self, str chromosome):
         """Return array of counts by chromosome.
 
         The return value is a tuple:
@@ -157,7 +169,7 @@ class scoreTrackI:
         l = set(self.data.keys())
         return l
 
-    def write_bedGraph (self, fhd, name, description, colname):
+    def write_bedGraph (self, fhd, str name, str description, str colname):
         """Write all data to fhd in Wiggle Format.
 
         fhd: a filehandler to save bedGraph.
@@ -166,6 +178,10 @@ class scoreTrackI:
         colname: can be 'sample','control','-100logp','-100logq'
 
         """
+        cdef str chrom
+        cdef int l, pre, i, p 
+        cdef float pre_v, v
+        
         if colname not in ['sample','control','-100logp','-100logq','100logLR']:
             raise Exception("%s not supported!" % colname)
         if colname in ['-100logp', '-100logq','100logLR']:
@@ -183,7 +199,7 @@ class scoreTrackI:
             else:
                 value = d[colname]
             pre_v = value[0]
-            for i in xrange( 1, l ):
+            for i in range( 1, l ):
                 v = value[i]
                 p = pos[i-1]
                 if pre_v != v: 
@@ -196,15 +212,6 @@ class scoreTrackI:
 
         return True
 
-    def __calculate_fold_change ( self, chrom, index ):
-        """From 'sample' and 'control' columns, calculate foldchanges.
-
-        chrom: chromosome name
-        index: index in data[chrom]
-        
-        """
-        return self.data[chrom]['sample'][index]/self.data[chrom]['control'][index]
-
     def make_pq_table ( self ):
         """Make pvalue-qvalue table.
 
@@ -214,6 +221,11 @@ class scoreTrackI:
 
         Return a dictionary of {-100log10pvalue:(-100log10qvalue,rank)} relationships.
         """
+        cdef int n, pre_p, this_p, length, j, k, pre_l, l
+        cdef long N
+        cdef float this_v, f, pre_v, pre_q, v, q
+        cdef str chrom
+        
         #logging.info("####test#### start make_pq")
         n = self.total()
         #value_list = np.empty( n, dtype = [('v', '<f4'), ('l', '<i4')])
@@ -522,7 +534,8 @@ class scoreTrackI:
 
 
 class CombinedTwoTrack:
-    """
+    """ For differential peak calling.
+    
     """
     def __init__ (self):
         """Different with bedGraphTrackI, missing values are simply

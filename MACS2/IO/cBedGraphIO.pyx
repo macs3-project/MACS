@@ -1,4 +1,4 @@
-# Time-stamp: <2012-01-23 15:19:24 Tao Liu>
+# Time-stamp: <2012-03-11 01:07:40 Tao Liu>
 
 """Module Description:  IO Module for bedGraph file
 
@@ -44,7 +44,7 @@ class bedGraphIO:
 
     If any of the above two criteria is violated, parsering will fail.
     """
-    def __init__ (self,f):
+    def __init__ ( self, f ):
         """f must be a filename or a file handler.
         
         """
@@ -55,7 +55,7 @@ class bedGraphIO:
         else:
             raise Exception("f must be a filename or a file handler.")
 
-    def build_bdgtrack (self, baseline_value=0):
+    def build_bdgtrack (self, double baseline_value=0):
         """Use this function to return a bedGraphTrackI object.
 
         baseline_value is the value to fill in the regions not defined
@@ -67,6 +67,8 @@ class bedGraphIO:
         Then the region chr1:200..250 should be filled with
         baseline_value. Default of baseline_value is 0.
         """
+        cdef str i, chrom, startpos, endpos, value
+        
         data = bedGraphTrackI(baseline_value=baseline_value)
         add_func = data.add_loc
         chrom_itemcount = {}

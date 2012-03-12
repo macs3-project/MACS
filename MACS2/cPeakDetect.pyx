@@ -1,4 +1,4 @@
-# Time-stamp: <2012-02-29 13:43:05 Tao Liu>
+# Time-stamp: <2012-03-10 14:59:46 Tao Liu>
 
 """Module Description
 
@@ -303,9 +303,9 @@ class PeakDetect:
                 tmp_v = float(self.d)/self.sregion*self.ratio_treat2control
             else:
                 tmp_v = float(self.d)/self.sregion
-            #self.info("#3 applying...")
+            self.info("#3 applying...")
             c_tmp_btrack.apply_func(lambda x:float(x)*tmp_v)
-            #self.info("#3 overlie...")            
+            self.info("#3 overlie...")            
             control_btrack = control_btrack.overlie(c_tmp_btrack,func=max)
 
         # llocal size local
@@ -318,9 +318,9 @@ class PeakDetect:
                 tmp_v = float(self.d)/self.lregion*self.ratio_treat2control
             else:
                 tmp_v = float(self.d)/self.lregion
-            #self.info("#3 applying...")
+            self.info("#3 applying...")
             c_tmp_btrack.apply_func(lambda x:float(x)*tmp_v)
-            #self.info("#3 overlie...")            
+            self.info("#3 overlie...")            
             control_btrack = control_btrack.overlie(c_tmp_btrack,func=max)
 
         c_tmp_btrack = None

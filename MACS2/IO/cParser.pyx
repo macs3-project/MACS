@@ -1,4 +1,4 @@
-# Time-stamp: <2012-03-05 15:11:17 Tao Liu>
+# Time-stamp: <2012-03-11 01:11:55 Tao Liu>
 
 """Module for all MACS Parser classes for input.
 
@@ -115,6 +115,7 @@ class BEDParser(GenericParser):
         self.fhd = fhd
 
     def tsize (self):
+        cdef int s, n, m, fpos
         s = 0
         n = 0
         m = 0
@@ -129,7 +130,7 @@ class BEDParser(GenericParser):
             s += int(thisfields[2])-int(thisfields[1])
             n += 1
         self.fhd.seek(0)
-        return int(s/n)
+        return s/n
 
     def build_fwtrack (self):
         """Build FWTrackII from all lines, return a FWTrackII object.
@@ -143,6 +144,8 @@ class BEDParser(GenericParser):
         if do_merge is False, it will not merge the same location after
         the track is built.
         """
+        cdef int i, m, fpos
+        
         fwtrack = FWTrackII()
         i = 0
         m = 0
@@ -216,7 +219,11 @@ class ELANDResultParser(GenericParser):
         """Build FWTrackII from all lines, return a FWTrackII object.
 
         """
+        cdef str thisline, chromosome
+        cdef int fpos, i, m, strand
+        
         fwtrack = FWTrackII()
+        fwtrackadd = fwtrack.add_loc
         i = 0
         m = 0
         for thisline in self.fhd:
@@ -228,7 +235,7 @@ class ELANDResultParser(GenericParser):
                 i=0
             if not fpos or not chromosome:
                 continue
-            fwtrack.add_loc(chromosome,fpos,strand)
+            fwtrackadd(chromosome,fpos,strand)
         return fwtrack
     
     def __fw_parse_line (self, thisline ):
