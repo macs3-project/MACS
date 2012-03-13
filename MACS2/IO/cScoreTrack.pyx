@@ -1,4 +1,4 @@
-# Time-stamp: <2012-03-13 16:23:59 Tao Liu>
+# Time-stamp: <2012-03-13 16:55:40 Tao Liu>
 
 """Module for Feature IO classes.
 
@@ -21,7 +21,6 @@ import numpy as np
 from numpy import int64,int32,float32
 
 from libc.math cimport log10,log, M_LOG10E
-from MACS2.math cimport log10f, logf
 
 from MACS2.Constants import *
 from MACS2.cProb cimport poisson_cdf
