@@ -1,4 +1,4 @@
-# Time-stamp: <2012-01-12 22:19:21 Tao Liu>
+# Time-stamp: <2012-03-13 16:50:32 Tao Liu>
 
 """Module for PeakIO IO classes.
 
@@ -41,7 +41,7 @@ class PeakIO:
     def __init__ (self):
         self.peaks = {}
     
-    def add (self, char * chromosome, long start, long end, long summit = 0, 
+    def add (self, str chromosome, long start, long end, long summit = 0, 
              double peak_score=0, int pileup=0, 
              double pscore=0, double fold_change=0, double qscore=0):
         """items:
@@ -68,6 +68,8 @@ class PeakIO:
                                        "qscore":qscore})
 
     def filter_pscore (self, double pscore_cut ):
+        cdef str chrom
+        
         peaks = self.peaks
         new_peaks = {}
         chrs = sorted(peaks.keys())
@@ -77,6 +79,8 @@ class PeakIO:
         self.peaks = new_peaks
 
     def filter_qscore (self, double qscore_cut ):
+        cdef str chrom
+
         peaks = self.peaks
         new_peaks = {}
         chrs = sorted(peaks.keys())
@@ -154,7 +158,7 @@ class PeakIO:
                 text+= "%s\t%d\t%d\tpeak_%d\t%.2f\n" % (chrom,summit_p,summit_p+1,n_peak,peak["score"])
         return text
 
-    def write_to_bed (self, fhd, name_prefix="peak_", score_column="score"):
+    def write_to_bed (self, fhd, str name_prefix="peak_", str score_column="score"):
         """Write peaks in BED5 format in a file handler. Score (5th
         column) is decided by score_column setting. Check the
         following list. Name column ( 4th column) is made by putting
@@ -175,6 +179,9 @@ class PeakIO:
         fc:fold_change,
         qscore:qvalue        
         """
+        cdef str chrom
+        cdef int n_peak
+        
         chrs = self.peaks.keys()
         chrs.sort()
         n_peak = 0
@@ -184,7 +191,7 @@ class PeakIO:
                 fhd.write( "%s\t%d\t%d\t%s%d\t%.2f\n" % (chrom,peak["start"],peak["end"],name_prefix,n_peak,peak[score_column]) )
 
 
-    def write_to_summit_bed (self, fhd, name_prefix="peak_", score_column="score"):
+    def write_to_summit_bed (self, fhd, str name_prefix="peak_", str score_column="score"):
         """Write peak summits in BED5 format in a file handler. Score
         (5th column) is decided by score_column setting. Check the
         following list. Name column ( 4th column) is made by putting
@@ -204,6 +211,9 @@ class PeakIO:
         fc:fold_change,
         qscore:qvalue
         """
+        cdef int n_peak, summit_p
+        cdef str chrom
+        
         chrs = self.peaks.keys()
         chrs.sort()
         n_peak = 0
@@ -213,7 +223,7 @@ class PeakIO:
                 summit_p = peak["summit"]
                 fhd.write( "%s\t%d\t%d\t%s%d\t%.2f\n" % (chrom,summit_p,summit_p+1,name_prefix,n_peak,peak[score_column]) )
 
-    def write_to_narrowPeak (self, fhd, name_prefix="peak_", score_column="score"):
+    def write_to_narrowPeak (self, fhd, str name_prefix="peak_", str score_column="score"):
         """Print out peaks in narrowPeak format.
 
         This format is designed for ENCODE project, and basically a
@@ -267,6 +277,9 @@ class PeakIO:
         +-----------+------+----------------------------------------+
         
         """
+        cdef int n_peak
+        cdef str chrom
+
         chrs = self.peaks.keys()
         chrs.sort()
         n_peak = 0
@@ -283,13 +296,17 @@ class PeakIO:
                             peak["fc"],peak["pscore"],peak["qscore"],peak["summit"]-peak["start"]) )
 
 
-    def overlap_with_other_peaks (self, peaks2, cover=0):
+    def overlap_with_other_peaks (self, peaks2, double cover=0):
         """Peaks2 is a PeakIO object or dictionary with can be
         initialzed as a PeakIO. check __init__ for PeakIO for detail.
 
         return how many peaks are intersected by peaks2 by percentage
         coverage on peaks2(if 50%, cover = 0.5).
         """
+        cdef int total_num
+        cdef list chrs1, chrs2, a
+        cdef str k
+        
         peaks1 = self.peaks
         if isinstance(peaks2,PeakIO):
             peaks2 = peaks2.peaks
@@ -328,7 +345,7 @@ class Region:
         self.regions= {}
         self.__flag_sorted = False
 
-    def add_loc ( self, chrom, start, end ):
+    def add_loc ( self, str chrom, int start, int end ):
         if self.regions.has_key(chrom):
             self.regions[chrom].append( (start,end) )
         else:
@@ -337,23 +354,30 @@ class Region:
         return
 
     def sort (self):
+        cdef str chrom
+
         for chrom in self.regions.keys():
             self.regions[chrom].sort()
         self.__flag_sorted = True
     
     def merge_overlap ( self ):
+        cdef str chrom
+        cdef int s_new_region, e_new_region, i, j
+        
         if not self.__flag_sorted:
             self.sort()
         regions = self.regions
         new_regions = {}
         chrs = regions.keys()
         chrs.sort()
-        for chrom in chrs:
+        for i in range(len(chrs)):
+            chrom = chrs[i]
+        #for chrom in chrs:
             new_regions[chrom]=[]
             n_append = new_regions[chrom].append
             prev_region = None
             regions_chr = regions[chrom]
-            for i in xrange(len(regions_chr)):
+            for i in range(len(regions_chr)):
                 if not prev_region:
                     prev_region = regions_chr[i]
                     continue
@@ -372,9 +396,13 @@ class Region:
         return True
 
     def write_to_bed (self, fhd ):
+        cdef int i
+        cdef str chrom
+        
         chrs = self.regions.keys()
         chrs.sort()
-        for chrom in chrs:
+        for i in range( len(chrs) ):
+            chrom = chrs[i]
             for region in self.regions[chrom]:
                 fhd.write( "%s\t%d\t%d\n" % (chrom,region[0],region[1] ) )
 
@@ -388,7 +416,7 @@ class DiffPeakIO:
     def __init__ (self):
         self.peaks = {}
     
-    def add (self, char * chromosome, long start, long end, long summit = 0, 
+    def add (self, str chromosome, long start, long end, long summit = 0, 
              double diff_score=0, int pileup=0, 
              double pscore=0, double fold_change=0, double qscore=0):
         """items:
@@ -501,7 +529,7 @@ class DiffPeakIO:
                 text+= "%s\t%d\t%d\tpeak_%d\t%.2f\n" % (chrom,summit_p,summit_p+1,n_peak,peak["score"])
         return text
 
-    def write_to_bed (self, fhd, name_prefix="peak_", score_column="score"):
+    def write_to_bed (self, fhd, str name_prefix="peak_", str score_column="score"):
         """Write peaks in BED5 format in a file handler. Score (5th
         column) is decided by score_column setting. Check the
         following list. Name column ( 4th column) is made by putting
@@ -531,7 +559,7 @@ class DiffPeakIO:
                 fhd.write( "%s\t%d\t%d\t%s%d\t%.2f\n" % (chrom,peak["start"],peak["end"],name_prefix,n_peak,peak[score_column]) )
 
 
-    def write_to_summit_bed (self, fhd, name_prefix="peak_", score_column="score"):
+    def write_to_summit_bed (self, fhd, str name_prefix="peak_", str score_column="score"):
         """Write peak summits in BED5 format in a file handler. Score
         (5th column) is decided by score_column setting. Check the
         following list. Name column ( 4th column) is made by putting
@@ -560,7 +588,7 @@ class DiffPeakIO:
                 summit_p = peak["summit"]
                 fhd.write( "%s\t%d\t%d\t%s%d\t%.2f\n" % (chrom,summit_p,summit_p+1,name_prefix,n_peak,peak[score_column]) )
 
-    def write_to_narrowPeak (self, fhd, name_prefix="peak_", score_column="score"):
+    def write_to_narrowPeak (self, fhd, str name_prefix="peak_", str score_column="score"):
         """Print out peaks in narrowPeak format.
 
         This format is designed for ENCODE project, and basically a
@@ -669,6 +697,9 @@ class BroadPeakIO:
                                       )
 
     def total (self):
+        cdef str chrom
+        cdef long x
+        
         peaks = self.peaks
         chrs = peaks.keys()
         chrs.sort()
@@ -677,7 +708,7 @@ class BroadPeakIO:
             x += len(peaks[chrom])
         return x
   
-    def write_to_gappedPeak (self, fhd, name_prefix="peak_", name="peak", description="peak description"):
+    def write_to_gappedPeak (self, fhd, str name_prefix="peak_", str name="peak", str description="peak description"):
         """Print out peaks in bed12 format.
 
         This format is basically a BED12 format.

@@ -1,4 +1,4 @@
-# Time-stamp: <2012-03-07 02:05:11 Tao Liu>
+# Time-stamp: <2012-03-13 15:46:20 Tao Liu>
 
 """Module Description
 
@@ -17,7 +17,7 @@ the distribution).
 # ------------------------------------
 # python modules
 # ------------------------------------
-from libc.math cimport exp,log,log10 #,fabs,log1p
+from libc.math cimport exp,log,log10, M_LN10 #,fabs,log1p
 from math import fabs
 from math import log1p #as py_log1p
 
@@ -255,7 +255,7 @@ cdef double log10_poisson_cdf_P_large_lambda ( unsigned int k, double lbd ):
             break
         logx = logy
 
-    return round((residue-lbd)/log(10),2)
+    return round((residue-lbd)/M_LN10,2)
 
 cdef double log10_poisson_cdf_Q_large_lambda ( unsigned int k, double lbd ):
     """Slower Poisson CDF evaluater for upper tail which allow
