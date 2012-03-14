@@ -1,4 +1,4 @@
-# Time-stamp: <2012-03-13 16:14:05 Tao Liu>
+# Time-stamp: <2012-03-13 21:01:08 Tao Liu>
 
 """Module for Feature IO classes.
 
@@ -288,7 +288,7 @@ class bedGraphTrackI:
             new_pos = array(BYTE4,[])
             new_value = array(FBYTE4,[])
             new_pre_pos = 0
-            new_pre_value = None
+            new_pre_value = 0
 
             for i in xrange(len(p)):
                 pos = pnext()
@@ -319,7 +319,8 @@ class bedGraphTrackI:
         cdef long n_v
         cdef double sum_v, max_v, min_v, mean_v, variance, tmp, std_v
         cdef int pre_p, l, i
-        
+
+        pre_p = 0
         n_v = 0
         sum_v = 0
         max_v = -100000

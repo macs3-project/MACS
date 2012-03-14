@@ -1,4 +1,4 @@
-# Time-stamp: <2012-03-11 01:11:55 Tao Liu>
+# Time-stamp: <2012-03-13 21:34:34 Tao Liu>
 
 """Module for all MACS Parser classes for input.
 
@@ -469,6 +469,9 @@ class SAMParser(GenericParser):
         self.fhd = fhd
 
     def tsize (self):
+        cdef int s, n, m, fpos, strand
+        cdef str thisline, chromosome
+        
         s = 0
         n = 0
         m = 0
@@ -577,6 +580,9 @@ class BAMParser(GenericParser):
             return False
             
     def tsize(self):
+        cdef int x, header_len, nc, nlength, n
+        cdef double s
+        
         fseek = self.fhd.seek
         fread = self.fhd.read
         ftell = self.fhd.tell
@@ -615,6 +621,9 @@ class BAMParser(GenericParser):
 
         Note only the unique match for a tag is kept.
         """
+        cdef int i, m, header_len, nc, x, nlength
+        cdef int entrylength, fpos, strand, chrid
+        
         fwtrack = FWTrackII()
         i = 0
         m = 0
@@ -635,7 +644,7 @@ class BAMParser(GenericParser):
             # jump over chromosome size, we don't need it
             fseek(ftell() + 4)
         
-        while 1:
+        while True:
             try:
                 entrylength = struct.unpack('<i', fread(4))[0]
             except struct.error:
@@ -652,6 +661,9 @@ class BAMParser(GenericParser):
         return fwtrack
     
     def __fw_binary_parse (self, data ):
+        cdef int thisref, thisstart, thisstrand
+        cdef short cigar, bwflag
+        
         # we skip lot of the available information in data (i.e. tag name, quality etc etc)
         if not data: return (None,-1,None)
 

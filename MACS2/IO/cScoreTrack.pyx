@@ -1,4 +1,4 @@
-# Time-stamp: <2012-03-13 16:55:40 Tao Liu>
+# Time-stamp: <2012-03-13 17:14:15 Tao Liu>
 
 """Module for Feature IO classes.
 
@@ -20,7 +20,7 @@ with the distribution).
 import numpy as np
 from numpy import int64,int32,float32
 
-from libc.math cimport log10,log, M_LOG10E
+from libc.math cimport log10,log
 
 from MACS2.Constants import *
 from MACS2.cProb cimport poisson_cdf
@@ -43,7 +43,7 @@ __doc__ = "scoreTrackI classes"
 # ------------------------------------
 
 pscore_dict = {}
-#LOG10_E = 0.43429448190325176
+LOG10_E = 0.43429448190325176
 
 
 cdef get_pscore ( int observed, double expectation ):
@@ -76,9 +76,9 @@ cdef logLR ( double x, double y ):
         return logLR_dict[key_value]
     else:
         if x > y:
-            s = int( (x*(log(x+1)-log(y+1))+y-x)*M_LOG10E*100 )
+            s = int( (x*(log(x+1)-log(y+1))+y-x)*LOG10_E*100 )
         elif x < y:
-            s = int( (-1*x*(log(x+1)-log(y+1))-y+x)*M_LOG10E*100 )
+            s = int( (-1*x*(log(x+1)-log(y+1))-y+x)*LOG10_E*100 )
         else:
             s = 0
         logLR_dict[key_value] = s
