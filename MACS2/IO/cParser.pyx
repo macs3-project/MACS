@@ -1,4 +1,4 @@
-# Time-stamp: <2012-03-13 21:34:34 Tao Liu>
+# Time-stamp: <2012-03-14 16:36:20 Tao Liu>
 
 """Module for all MACS Parser classes for input.
 
@@ -665,24 +665,24 @@ class BAMParser(GenericParser):
         cdef short cigar, bwflag
         
         # we skip lot of the available information in data (i.e. tag name, quality etc etc)
-        if not data: return (None,-1,None)
+        if not data: return (-1,-1,-1)
 
         thisref = struct.unpack('<i', data[0:4])[0]
         thisstart = struct.unpack('<i', data[4:8])[0]
         (cigar, bwflag) = struct.unpack('<hh', data[12:16])
         if bwflag & 4 or bwflag & 512 or bwflag & 1024:
-            return (None, -1, None)       #unmapped sequence or bad sequence
+            return (-1, -1, -1)       #unmapped sequence or bad sequence
         if bwflag & 1:
             # paired read. We should only keep sequence if the mate is mapped
             # and if this is the left mate, all is within  the flag! 
             if not bwflag & 2:
-                return (None, -1, None)   # not a proper pair
+                return (-1, -1, -1)   # not a proper pair
             if bwflag & 8:
-                return (None, -1, None)   # the mate is unmapped
+                return (-1, -1, -1)   # the mate is unmapped
             # From Benjamin Schiller https://github.com/benjschiller
             if bwflag & 128:
                 # this is not the first read in a pair
-                return (None, -1, None)
+                return (-1, -1, -1)
             # end of the patch
         # In case of paired-end we have now skipped all possible "bad" pairs
         # in case of proper pair we have skipped the rightmost one... if the leftmost pair comes
