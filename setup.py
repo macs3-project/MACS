@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# Time-stamp: <2012-03-18 13:00:11 Tao Liu>
+# Time-stamp: <2012-03-18 13:27:59 Tao Liu>
 
 """Description
 
@@ -23,8 +23,8 @@ from distutils.core import setup, Extension
 from Cython.Distutils import build_ext
 
 def main():
-    if float(sys.version[:3])<2.6 or float(sys.version[:3])>=2.8:
-        sys.stderr.write("CRITICAL: Python version must be 2.6 or 2.7!\n")
+    if float(sys.version[:3])<2.7 or float(sys.version[:3])>=2.8:
+        sys.stderr.write("CRITICAL: Python version must be 2.7!\n")
         sys.exit(1)
 
     ext_modules = [Extension("MACS2.cProb", ["MACS2/cProb.pyx"], libraries=["m"]),
