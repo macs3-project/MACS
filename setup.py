@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# Time-stamp: <2012-03-13 16:24:33 Tao Liu>
+# Time-stamp: <2012-03-18 13:00:11 Tao Liu>
 
 """Description
 
@@ -31,7 +31,7 @@ def main():
                    #Extension("MACS2.math",["MACS2/math.pxd"]),
                    Extension("MACS2.IO.cParser",["MACS2/IO/cParser.pyx"]),
                    #Extension("MACS2.cStat", ["MACS2/cStat.pyx"]),
-                   Extension("MACS2.cTimeSeries", ["MACS2/cTimeSeries.pyx"]),                   
+                   #Extension("MACS2.cTimeSeries", ["MACS2/cTimeSeries.pyx"]),                   
                    Extension("MACS2.cPileup", ["MACS2/cPileup.pyx"]),
                    Extension("MACS2.cPeakModel", ["MACS2/cPeakModel.pyx"]),                   
                    Extension("MACS2.cPeakDetect", ["MACS2/cPeakDetect.pyx"]),

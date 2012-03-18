@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# Time-stamp: <2012-02-28 17:35:53 Tao Liu>
+# Time-stamp: <2012-03-18 12:56:22 Tao Liu>
 
 """Description: MACS 2 main executable
 
@@ -348,7 +348,7 @@ def load_tag_files_options ( options ):
 
     """
     options.info("#1 read treatment tags...")
-    tp = options.parser(open2(options.tfile))
+    tp = options.parser(options.tfile)
         
     if not options.tsize:           # override tsize if user specified --tsize
         ttsize = tp.tsize()
@@ -358,27 +358,12 @@ def load_tag_files_options ( options ):
     treat.sort()
     if options.cfile:
         options.info("#1.2 read input tags...")
-        control = options.parser(open2(options.cfile)).build_fwtrack()
+        control = options.parser(options.cfile).build_fwtrack()
         control.sort()
     else:
         control = None
     options.info("#1 tag size is determined as %d bps" % options.tsize)
     return (treat, control)
-
-def open2(path, mode='r', bufsize=-1):
-    # try gzip first
-    f = gzip.open(path, mode)
-    try:
-        f.read(10)
-    except IOError:
-        # not a gzipped file
-        f.close()
-        f = open(path, mode, bufsize)
-    else:
-        f.seek(0)
-    return f
-
-
 
 if __name__ == '__main__':
     try:

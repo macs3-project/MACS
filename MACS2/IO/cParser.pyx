@@ -1,4 +1,4 @@
-# Time-stamp: <2012-03-14 16:36:20 Tao Liu>
+# Time-stamp: <2012-03-18 12:53:34 Tao Liu>
 
 """Module for all MACS Parser classes for input.
 
@@ -19,7 +19,9 @@ with the distribution).
 # ------------------------------------
 import logging
 import struct
+from struct import unpack
 import gzip
+import io
 from MACS2.Constants import *
 from MACS2.IO.cFixWidthTrack import FWTrackII
 # ------------------------------------
@@ -52,225 +54,276 @@ def guess_parser ( fhd ):
                   )
     
     for f in order_list:
-        p = parser_dict[f](fhd)
+        p = parser_dict[ f ]( fhd )
         s = p.sniff()
         if s:
-            logging.info("Detected format is: %s" % (f) )
+            logging.info( "Detected format is: %s" % ( f ) )
+            if p.gzipped:
+                logging.info( "* Input file is gzipped." )
             return p
-    raise Exception("Can't detect format!")
+        else:
+            p.close()
+    raise Exception( "Can't detect format!" )
 
 # ------------------------------------
 # Classes
 # ------------------------------------
-class StrandFormatError(Exception):
+class StrandFormatError( Exception ):
     """Exception about strand format error.
 
     Example:
     raise StrandFormatError('Must be F or R','X')
     """
-    def __init__ (self, string, strand):
+    def __init__ ( self, string, strand ):
         self.strand = strand
         self.string = string
         
-    def __str__ (self):
-        return repr( "Strand information can not be recognized in this line: \"%s\",\"%s\"" % (self.string,self.strand) )
+    def __str__ ( self ):
+        return repr( "Strand information can not be recognized in this line: \"%s\",\"%s\"" % ( self.string, self.strand ) )
         
 class GenericParser:
     """Generic Parser class.
 
-    Inherit this to write your own parser.
+    Inherit this class to write your own parser. In most cases, you need to override:
+
+    1. __tlen_parse_line which returns tag length of a line
+    2.  __fw_parse_line which returns tuple of ( chromosome, 5'position, strand )
     """
-    def __init__ (self, fhd):
-        self.fhd = fhd
-        return
+    def __init__ ( self, str filename ):
+        """Open input file. Determine whether it's a gzipped file.
 
-    def tsize(self):
-        return
+        'filename' must be a string object.
 
-    def build_fwtrack (self):
-        return 
+        This function initialize the following attributes:
 
-    def __fw_parse_line (self, thisline ):
-        return
+        1. self.filename: the filename for input file.
+        2. self.gzipped: a boolean indicating whether input file is gzipped.
+        3. self.fhd: buffered I/O stream of input file
+        """
+        self.filename = filename
+        self.gzipped = True
+        self.tag_size = -1
+        # try gzip first
+        f = gzip.open( filename )
+        try:
+            f.read( 10 )
+        except IOError:
+            # not a gzipped file
+            self.gzipped = False
+        f.close
+        if self.gzipped:
+            # open with gzip.open, then wrap it with BufferedReader!
+            self.fhd = io.BufferedReader( gzip.open( filename, mode='rb' ) )
+        else:
+            self.fhd = io.open( filename, mode='rb' ) # binary mode! I don't expect unicode here!
 
-    def sniff (self):
+    def tsize( self ):
+        """General function to detect tag size.
+
+        * Although it can be used by most parsers, it must be
+          rewritten by BAMParser!
+        """
+        cdef int s, n, m, this_taglength
+        
+        if self.tag_size != -1:
+            # if we have already calculated tag size (!= -1),  return it.
+            return self.tag_size
+        
+        s = 0
+        n = 0                           # number of successful/valid read alignments
+        m = 0                           # number of trials
+
+        # try 10k times or retrieve 10 successfule alignments
+        while n < 10 and m < 10000:
+            m += 1
+            thisline = self.fhd.readline()
+            this_taglength = self.__tlen_parse_line( thisline )
+            if this_taglength > 0:
+                # this_taglength == 0 means this line doesn't contain
+                # successful alignment.
+                s += this_taglength
+                n += 1
+        # done
+        self.fhd.seek( 0 )
+        self.tag_size = s/n
+        return self.tag_size
+
+    def __tlen_parse_line ( self, str thisline ):
+        """Abstract function to detect tag length.
+        
+        """
+        return 0
+    
+    def build_fwtrack ( self ):
+        """Generic function to build FWTrackII object. 
+
+        * BAMParser for binary BAM format should have a different one.
+        """
+        cdef int i, m, fpos, strand
+        cdef str chromosome
+        
+        fwtrack = FWTrackII()
+        i = 0
+        m = 0
+        for thisline in self.fhd:
+            ( chromosome, fpos, strand ) = self.__fw_parse_line( thisline )
+            i+=1
+            if i == 1000000:
+                m += 1
+                logging.info( " %d" % ( m*1000000 ) )
+                i=0
+            if fpos < 0 or not chromosome:
+                # normally __fw_parse_line will return -1 if the line
+                # contains no successful alignment.
+                continue
+            fwtrack.add_loc( chromosome, fpos, strand )
+
+        # close file stream.
+        self.close()
+        return fwtrack
+
+    def __fw_parse_line ( self, str thisline ):
+        """Abstract function to parse chromosome, 5' end position and
+        strand.
+        
+        """
+        cdef str chromosome = ""
+        cdef int fpos = -1
+        cdef int strand = -1
+        return ( chromosome, fpos, strand )
+
+    def sniff ( self ):
+        """Detect whether this parser is the correct parser for input
+        file.
+
+        Rule: try to find the tag size using this parser, if error
+        occurs or tag size is too small or too big, check is failed.
+
+        * BAMParser has a different sniff function.
+        """
+        cdef int t
+        
         try:
             t = self.tsize()
         except:
-            self.fhd.seek(0)
+            self.fhd.seek( 0 )
             return False
         else:
-            if t<=10 or t>=10000:
-                self.fhd.seek(0)
+            if t <= 10 or t >= 10000:
+                self.fhd.seek( 0 )
                 return False
             else:
-                self.fhd.seek(0)
-                return t
+                self.fhd.seek( 0 )
+                return True
+            
+    def close ( self ):
+        """Run this when this Parser will be never used.
 
-class BEDParser(GenericParser):
+        Close file I/O stream.
+        """
+        self.fhd.close()
+
+class BEDParser( GenericParser ):
     """File Parser Class for tabular File.
 
     """
-    def __init__ (self,fhd):
-        self.fhd = fhd
+    def __tlen_parse_line ( self, str thisline ):
+        """Parse 5' and 3' position, then calculate tag length.
 
-    def tsize (self):
-        cdef int s, n, m, fpos
-        s = 0
-        n = 0
-        m = 0
-        while n<10 and m<1000:
-            m += 1
-            thisline = self.fhd.readline()
-            (chromosome,fpos,strand) = self.__fw_parse_line(thisline)
-            if not fpos or not chromosome:
-                continue
-            thisline = thisline.rstrip()
-            thisfields = thisline.split('\t')
-            s += int(thisfields[2])-int(thisfields[1])
-            n += 1
-        self.fhd.seek(0)
-        return s/n
-
-    def build_fwtrack (self):
-        """Build FWTrackII from all lines, return a FWTrackII object.
-
-        Note: All locations will be merged (exclude the same
-        location) then sorted after the track is built.
-
-        If both_strand is True, it will store strand information in
-        FWTrackII object.
-
-        if do_merge is False, it will not merge the same location after
-        the track is built.
         """
-        cdef int i, m, fpos
-        
-        fwtrack = FWTrackII()
-        i = 0
-        m = 0
-        for thisline in self.fhd:
-            (chromosome,fpos,strand) = self.__fw_parse_line(thisline)
-            i+=1
-            if i == 1000000:
-                m += 1
-                logging.info(" %d" % (m*1000000))
-                i=0
-            if not fpos or not chromosome:
-                continue
-            fwtrack.add_loc(chromosome,fpos,strand)
-        return fwtrack
-    
-    def __fw_parse_line (self, thisline ):
         thisline = thisline.rstrip()
-        if not thisline or thisline[:5]=="track" or thisline[:7]=="browser" or thisline[0]=="#": return ("comment line",None,None)
+        if not thisline \
+           or thisline[ :5 ] == "track" \
+           or thisline[ :7 ] == "browser"\
+           or thisline[ 0 ] == "#":
+            return 0
 
-        thisfields = thisline.split('\t')
-        chromname = thisfields[0]
+        thisfields = thisline.split( '\t' )
+        return int( thisfields[ 2 ] )-int( thisfields[ 1 ] )
+    
+    def __fw_parse_line ( self, str thisline ):
+        cdef list thisfields
+        cdef str chromname
+        
+        thisline = thisline.rstrip()
+        if not thisline or thisline[ :5 ] == "track" \
+           or thisline[ :7 ] == "browser" \
+           or thisline[ 0 ] == "#":
+            return ( "", -1, -1 )
+
+        thisfields = thisline.split( '\t' )
+        chromname = thisfields[ 0 ]
         try:
-            chromname = chromname[:chromname.rindex(".fa")]
+            chromname = chromname[ :chromname.rindex( ".fa" ) ]
         except ValueError:
             pass
 
-        if len(thisfields) < 6 : # default pos strand if no strand
+        if len( thisfields ) < 6 : # default pos strand if no strand
                                  # info can be found
-            return (chromname,
-                    int(thisfields[1]),
-                    0)
+            return ( chromname,
+                     int( thisfields[ 1 ] ),
+                     0 )
         else:
-            if thisfields[5] == "+":
-                return (chromname,
-                        int(thisfields[1]),
-                        0)
-            elif thisfields[5] == "-":
-                return (chromname,
-                        int(thisfields[2]),
-                        1)
+            if thisfields[ 5 ] == "+":
+                return ( chromname,
+                         int( thisfields[ 1 ] ),
+                         0 )
+            elif thisfields[ 5 ] == "-":
+                return ( chromname,
+                         int( thisfields[ 2 ] ),
+                         1 )
             else:
-                raise StrandFormatError(thisline,thisfields[5])
+                raise StrandFormatError( thisline, thisfields[ 5 ] )
 
-class ELANDResultParser(GenericParser):
+class ELANDResultParser( GenericParser ):
     """File Parser Class for tabular File.
 
     """
-    def __init__ (self,fhd):
-        """
-        """
-        self.fhd = fhd
-
-    def tsize (self):
-        s = 0
-        n = 0
-        m = 0
-        while n<10 and m<1000:
-            m += 1
-            thisline = self.fhd.readline()
-            (chromosome,fpos,strand) = self.__fw_parse_line(thisline)
-            if not fpos or not chromosome:
-                continue
-            thisline = thisline.rstrip()
-            thisfields = thisline.split('\t')
-            s += len(thisfields[1])
-            n += 1
-        self.fhd.seek(0)
-        return int(s/n)
-
-    def build_fwtrack (self):
-        """Build FWTrackII from all lines, return a FWTrackII object.
+    def __tlen_parse_line ( self, str thisline ):
+        """Parse tag sequence, then tag length.
 
         """
-        cdef str thisline, chromosome
-        cdef int fpos, i, m, strand
-        
-        fwtrack = FWTrackII()
-        fwtrackadd = fwtrack.add_loc
-        i = 0
-        m = 0
-        for thisline in self.fhd:
-            (chromosome,fpos,strand) = self.__fw_parse_line(thisline)
-            i+=1
-            if i == 1000000:
-                m += 1
-                logging.info(" %d" % (m*1000000))
-                i=0
-            if not fpos or not chromosome:
-                continue
-            fwtrackadd(chromosome,fpos,strand)
-        return fwtrack
-    
-    def __fw_parse_line (self, thisline ):
+        thisline = thisline.rstrip()
+        if not thisline: return 0
+        thisfields = thisline.split( '\t' )
+        return int( len( thisfields[ 1 ] ) )
+
+    def __fw_parse_line ( self, str thisline ):
+        cdef str chromname, strand
+        cdef int thistaglength
         #if thisline.startswith("#") or thisline.startswith("track") or thisline.startswith("browser"): return ("comment line",None,None) # comment line is skipped
         thisline = thisline.rstrip()
-        if not thisline: return ("blank",None,None)
+        if not thisline: return ( "", -1, -1 )
 
-        thisfields = thisline.split('\t')
-        thistaglength = len(thisfields[1])
+        thisfields = thisline.split( '\t' )
+        thistaglength = len( thisfields[ 1 ] )
 
-        if len(thisfields) <= 6:
-            return ("blank",None,None)
+        if len( thisfields ) <= 6:
+            return ( "", -1, -1 )
 
         try:
-            chromname = thisfields[6]
-            chromname = chromname[:chromname.rindex(".fa")]
+            chromname = thisfields[ 6 ]
+            chromname = chromname[ :chromname.rindex( ".fa" ) ]
         except ValueError:
             pass
 
-        if thisfields[2] == "U0" or thisfields[2]=="U1" or thisfields[2]=="U2":
-            strand = thisfields[8]
+        if thisfields[ 2 ] == "U0" or thisfields[ 2 ] == "U1" or thisfields[ 2 ] == "U2":
+            # allow up to 2 mismatches...
+            strand = thisfields[ 8 ]
             if strand == "F":
-                return (chromname,
-                        int(thisfields[7])-1,
-                        0)
+                return ( chromname,
+                         int( thisfields[ 7 ] ) - 1,
+                         0 )
             elif strand == "R":
-                return (chromname,
-                        int(thisfields[7])+thistaglength-1,
-                        1)
+                return ( chromname,
+                         int( thisfields[ 7 ] ) + thistaglength - 1,
+                         1 )
             else:
-                raise StrandFormatError(thisline,strand)
+                raise StrandFormatError( thisline, strand )
         else:
-            return (None,None,None)
+            return ( "", -1, -1 )
 
-class ELANDMultiParser(GenericParser):
+class ELANDMultiParser( GenericParser ):
     """File Parser Class for ELAND multi File.
 
     Note this parser can only work for s_N_eland_multi.txt format.
@@ -287,152 +340,101 @@ class ELANDMultiParser(GenericParser):
     starting at position 160322 with one error, one in the forward direction starting at 
     position 170128 with two errors. There is also a single-error match to E_coli.fa.
     """
-    def __init__ (self,fhd):
-        """
-        """
-        self.fhd = fhd
+    def __tlen_parse_line ( self, str thisline ):
+        """Parse tag sequence, then tag length.
 
-    def tsize (self, strict = False):
-        s = 0
-        n = 0
-        m = 0
-        while n<10 and m<1000:
-            m += 1
-            thisline = self.fhd.readline()
-            (chromosome,fpos,strand) = self.__fw_parse_line(thisline)
-            if not fpos or not chromosome:
-                continue
-            thisline = thisline.rstrip()
-            thisfields = thisline.split('\t')
-            s += len(thisfields[1])
-            n += 1
-        self.fhd.seek(0)
-        return int(s/n)
-
-    def build_fwtrack (self):
-        """Build FWTrackII from all lines, return a FWTrackII object.
-
-        Note only the unique match for a tag is kept.
         """
-        fwtrack = FWTrackII()
-        i = 0
-        m = 0
-        for thisline in self.fhd:
-            (chromosome,fpos,strand) = self.__fw_parse_line(thisline)
-            i+=1
-            if i == 1000000:
-                m += 1
-                logging.info(" %d" % (m*1000000))
-                i=0
-            if not fpos or not chromosome:
-                continue
-            fwtrack.add_loc(chromosome,fpos,strand)
-        return fwtrack
-    
-    def __fw_parse_line (self, thisline ):
-        if not thisline: return (None,None,None)
         thisline = thisline.rstrip()
-        if not thisline: return ("blank",None,None)
+        if not thisline: return 0
+        thisfields = thisline.split( '\t' )
+        return int( len( thisfields[ 1 ] ) )
 
-        #if thisline[0] == "#": return ("comment line",None,None) # comment line is skipped
-        thisfields = thisline.split('\t')
-        thistagname = thisfields[0]        # name of tag
-        thistaglength = len(thisfields[1]) # length of tag
+    def __fw_parse_line ( self, str thisline ):
+        cdef list thisfields
+        cdef str thistagname, pos, strand
+        cdef int thistaglength, thistaghits
+        
+        if not thisline: return ( "", -1, -1 )
+        thisline = thisline.rstrip()
+        if not thisline: return ( "", -1, -1 )
 
-        if len(thisfields) < 4:
-            return (None,None,None)
+        #if thisline[ 0 ] == "#": return ( "", -1, -1 ) # comment line is skipped
+        
+        thisfields = thisline.split( '\t' )
+        thistagname = thisfields[ 0 ]        # name of tag
+        thistaglength = len( thisfields[ 1 ] ) # length of tag
+
+        if len( thisfields ) < 4:
+            return ( "", -1, -1 )
         else:
-            thistaghits = sum(map(int,thisfields[2].split(':')))
+            thistaghits = sum( map( int, thisfields[ 2 ].split( ':' ) ) )
             if thistaghits > 1:
                 # multiple hits
-                return (None,None,None)
+                return ( "", -1, -1 )
             else:
-                (chromname,pos) = thisfields[3].split(':')
+                ( chromname, pos ) = thisfields[ 3 ].split( ':' )
 
                 try:
-                    chromname = chromname[:chromname.rindex(".fa")]
+                    chromname = chromname[ :chromname.rindex( ".fa" ) ]
                 except ValueError:
                     pass
                 
-                strand  = pos[-2]
+                strand  = pos[ -2 ]
                 if strand == "F":
-                    return (chromname,
-                            int(pos[:-2])-1,
-                            0)
+                    return ( chromname,
+                             int( pos[ :-2 ] )-1,
+                             0 )
                 elif strand == "R":
-                    return (chromname,
-                            int(pos[:-2])+thistaglength-1,
-                            1)
+                    return ( chromname,
+                             int( pos[ :-2 ] ) + thistaglength - 1,
+                             1 )
                 else:
-                    raise StrandFormatError(thisline,strand)
+                    raise StrandFormatError( thisline,strand )
 
 
-class ELANDExportParser(GenericParser):
+class ELANDExportParser( GenericParser ):
     """File Parser Class for ELAND Export File.
 
     """
-    def __init__ (self,fhd):
-        self.fhd = fhd
+    def __tlen_parse_line ( self, str thisline ):
+        """Parse tag sequence, then tag length.
 
-    def tsize (self):
-        s = 0
-        n = 0
-        m = 0
-        while n<10 and m<1000:
-            m += 1
-            thisline = self.fhd.readline()
-            (chromosome,fpos,strand) = self.__fw_parse_line(thisline)
-            if not fpos or not chromosome:
-                continue
-            thisline = thisline.rstrip()
-            thisfields = thisline.split("\t")
-            s += len(thisfields[8])
-            n += 1
-        self.fhd.seek(0)
-        return int(s/n)
-
-    def build_fwtrack (self):
-        """Build FWTrackII from all lines, return a FWTrackII object.
-
-        Note only the unique match for a tag is kept.
         """
-        fwtrack = FWTrackII()
-        i = 0
-        m = 0
-        for thisline in self.fhd:
-            (chromosome,fpos,strand) = self.__fw_parse_line(thisline)
-            i+=1
-            if i == 1000000:
-                m += 1
-                logging.info(" %d" % (m*1000000))
-                i=0
-            if not fpos or not chromosome:
-                continue
-            fwtrack.add_loc(chromosome,fpos,strand)
-        return fwtrack
-    
-    def __fw_parse_line (self, thisline ):
+        thisline = thisline.rstrip()
+        if not thisline: return 0
+        thisfields = thisline.split( '\t' )
+        if len( thisfields ) > 12 and thisfields[ 12 ]:
+            # a successful alignment has over 12 columns
+            return int( len( thisfields[ 8 ] ) )
+        else:
+            return 0
+        
+    def __fw_parse_line ( self, str thisline ):
+        cdef list thisfields
+        cdef str thisname, strand
+        cdef int thistaglength
+        
         #if thisline.startswith("#") : return ("comment line",None,None) # comment line is skipped
         thisline = thisline.rstrip()
-        if not thisline: return ("blank",None,None)
+        if not thisline: return ( "", -1, -1 )
     
-        thisfields = thisline.split("\t")
+        thisfields = thisline.split( "\t" )
 
-        if len(thisfields) > 12 and thisfields[12]:
-            thisname = ":".join(thisfields[0:6])
-            thistaglength = len(thisfields[8])
-            strand = thisfields[13]
+        if len(thisfields) > 12 and thisfields[ 12 ]:
+            thisname = ":".join( thisfields[ 0:6 ] )
+            thistaglength = len( thisfields[ 8 ] )
+            strand = thisfields[ 13 ]
             if strand == "F":
-                return (thisfields[10],int(thisfields[12])-1,0)
+                return ( thisfields[ 10 ], int( thisfields[ 12 ] ) - 1, 0 )
             elif strand == "R":
-                return (thisfields[10],int(thisfields[12])+thistaglength-1,1)
+                return ( thisfields[ 10 ], int( thisfields[ 12 ] ) + thistaglength - 1, 1 )
             else:
-                raise StrandFormatError(thisline,strand)
+                raise StrandFormatError( thisline, strand )
         else:
-            return (None,None,None)
+            return ( -1, -1, -1 )
 
 ### Contributed by Davide, modified by Tao
-class SAMParser(GenericParser):
+class SAMParser( GenericParser ):
     """File Parser Class for SAM File.
 
     Each line of the output file contains at least: 
@@ -463,72 +465,59 @@ class SAMParser(GenericParser):
     512	does not pass quality check
     1024	PCR or optical duplicate
     """
-    def __init__ (self,fhd):
-        """
-        """
-        self.fhd = fhd
 
-    def tsize (self):
-        cdef int s, n, m, fpos, strand
-        cdef str thisline, chromosome
+    def __tlen_parse_line ( self, str thisline ):
+        """Parse tag sequence, then tag length.
+
+        """
+        cdef list thisfields
+        cdef int bwflag
         
-        s = 0
-        n = 0
-        m = 0
-        while n<10 and m<1000:
-            m += 1
-            thisline = self.fhd.readline()
-            (chromosome,fpos,strand) = self.__fw_parse_line(thisline)
-            if not fpos or not chromosome:
-                continue
-            thisline = thisline.rstrip()
-            thisfields = thisline.split("\t")
-            s += len(thisfields[9])
-            n += 1
-        self.fhd.seek(0)
-        return int(s/n)
-
-    def build_fwtrack (self):
-        """Build FWTrackII from all lines, return a FWTrackII object.
-
-        Note only the unique match for a tag is kept.
-        """
-        fwtrack = FWTrackII()
-        i = 0
-        m = 0
-        for thisline in self.fhd:
-            (chromosome,fpos,strand) = self.__fw_parse_line(thisline)
-            i+=1
-            if i == 1000000:
-                m += 1
-                logging.info(" %d" % (m*1000000))
-                i=0
-            if not fpos or not chromosome:
-                continue
-            fwtrack.add_loc(chromosome,fpos,strand)
-        return fwtrack
-    
-    def __fw_parse_line (self, thisline ):
         thisline = thisline.rstrip()
-        if not thisline: return ("blank",None,None)
-        if thisline[0]=="@": return ("comment line",None,None) # header line started with '@' is skipped
-        thisfields = thisline.split('\t')
-        thistagname = thisfields[0]         # name of tag
-        thisref = thisfields[2]
-        bwflag = int(thisfields[1])
+        if not thisline: return 0
+        if thisline[ 0 ] == "@": return 0 # header line started with '@' is skipped
+        thisfields = thisline.split( '\t' )
+        bwflag = int( thisfields[ 1 ] )
         if bwflag & 4 or bwflag & 512 or bwflag & 1024:
-            return (None, None, None)       #unmapped sequence or bad sequence
+            return 0       #unmapped sequence or bad sequence
         if bwflag & 1:
             # paired read. We should only keep sequence if the mate is mapped
             # and if this is the left mate, all is within  the flag! 
             if not bwflag & 2:
-                return (None, None, None)   # not a proper pair
+                return 0   # not a proper pair
             if bwflag & 8:
-                return (None, None, None)   # the mate is unmapped
+                return 0   # the mate is unmapped
             # From Benjamin Schiller https://github.com/benjschiller
             if bwflag & 128:
                 # this is not the first read in a pair
-                return (None, -1, None)
+                return 0
+        return len( thisfields[ 9 ] )
+
+    def __fw_parse_line ( self, thisline ):
+        cdef list thisfields
+        cdef str thistagname, thisref
+        cdef int bwflag, thisstrand, thisstart
+
+        thisline = thisline.rstrip()
+        if not thisline: return ( "", -1, -1 )
+        if thisline[ 0 ] == "@": return ( "", -1, -1 ) # header line started with '@' is skipped
+        thisfields = thisline.split( '\t' )
+        thistagname = thisfields[ 0 ]         # name of tag
+        thisref = thisfields[ 2 ]
+        bwflag = int( thisfields[ 1 ] )
+        if bwflag & 4 or bwflag & 512 or bwflag & 1024:
+            return ( "", -1, -1 )       #unmapped sequence or bad sequence
+        if bwflag & 1:
+            # paired read. We should only keep sequence if the mate is mapped
+            # and if this is the left mate, all is within  the flag! 
+            if not bwflag & 2:
+                return ( "", -1, -1 )   # not a proper pair
+            if bwflag & 8:
+                return ( "", -1, -1 )   # the mate is unmapped
+            # From Benjamin Schiller https://github.com/benjschiller
+            if bwflag & 128:
+                # this is not the first read in a pair
+                return ( "", -1, -1 )
             # end of the patch
         # In case of paired-end we have now skipped all possible "bad" pairs
         # in case of proper pair we have skipped the rightmost one... if the leftmost pair comes
@@ -536,18 +525,18 @@ class SAMParser(GenericParser):
         # start position... hope I'm right!
         if bwflag & 16:
             thisstrand = 1
-            thisstart = int(thisfields[3]) - 1 + len(thisfields[9])	#reverse strand should be shifted len(query) bp 
+            thisstart = int( thisfields[ 3 ] ) - 1 + len( thisfields[ 9 ] )	#reverse strand should be shifted len(query) bp 
         else:
             thisstrand = 0
-            thisstart = int(thisfields[3]) - 1	
+            thisstart = int( thisfields[ 3 ] ) - 1	
 
         try:
-            thisref = thisref[:thisref.rindex(".fa")]
+            thisref = thisref[ :thisref.rindex( ".fa" ) ]
         except ValueError:
             pass
-        return (thisref, thisstart, thisstrand)
+        return ( thisref, thisstart, thisstrand )
 
-class BAMParser(GenericParser):
+class BAMParser( GenericParser ):
     """File Parser Class for BAM File.
 
     File is gzip-compatible and binary.
@@ -568,61 +557,75 @@ class BAMParser(GenericParser):
     512	does not pass quality check
     1024	PCR or optical duplicate
     """
-    def __init__ (self,fhd):
-        """
-        """
-        self.fhd = fhd
 
-    def sniff(self):
-        if self.fhd.read(3) == "BAM":
-            return True
+    def sniff( self ):
+        """Check the first 3 bytes of BAM file. If it's 'BAM', check
+        is success.
+
+        """
+        if self.fhd.read( 3 ) == "BAM":
+            if self.tsize() > 0:
+                self.fhd.seek( 0 )
+                return True
+            else:
+                self.fhd.seek( 0 )
+                raise Exception( "File is not of a valid BAM format!" )                
+                return False            
         else:
+            self.fhd.seek( 0 )
             return False
             
-    def tsize(self):
+    def tsize( self ):
+        """Get tag size from BAM file -- read l_seq field.
+
+        Refer to: http://samtools.sourceforge.net/SAM1.pdf
+
+        * This may not work for BAM file from bedToBAM (bedtools),
+        since the l_seq field seems to be 0.
+        """
+        
         cdef int x, header_len, nc, nlength, n
         cdef double s
-        
+
+        if self.tag_size != -1:
+            # if we have already calculated tag size (!= -1),  return it.
+            return self.tag_size
+
         fseek = self.fhd.seek
         fread = self.fhd.read
         ftell = self.fhd.tell
         # move to pos 4, there starts something
-        fseek(4)
-        header_len =  struct.unpack('<i', fread(4))[0]
-        fseek(header_len + ftell())
+        fseek( 4 )
+        header_len =  unpack( '<i', fread( 4 ) )[ 0 ]
+        fseek( header_len + ftell() )
         # get the number of chromosome
-        nc = struct.unpack('<i', fread(4))[0]
-        #print nc
-        for x in range(nc):
+        nc = unpack( '<i', fread( 4 ) )[ 0 ]
+        for x in range( nc ):
             # read each chromosome name
-            nlength = struct.unpack('<i', fread(4))[0]
+            nlength = unpack( '<i' , fread( 4 ) )[ 0 ]
             # jump over chromosome size, we don't need it
-            fread(nlength)
-            fseek(ftell() + 4)
+            fread( nlength )
+            fseek( ftell() + 4 )
         s = 0
         n = 0
-        while n<10:
-            #print n
-            entrylength = struct.unpack('<i', fread(4))[0]
-            #print entrylength
-            data = fread(entrylength)
-            #print n
-            #(chrid,fpos,strand) = self.__fw_binary_parse(fread(entrylength))
-            s += struct.unpack('<i', data[16:20])[0]
-            #print n
+        while n < 10:
+            entrylength = unpack( '<i', fread( 4 ) )[ 0 ]
+            data = fread( entrylength )
+            a = unpack( '<i', data[16:20] )[ 0 ]
+            s += a
             n += 1
-            #print s,n
-        fseek(0)
-        logging.info("tag size: %d" % int(s/n))
-        return int(s/n)
+        fseek( 0 )
+        self.tag_size = int( s/n )
+        return self.tag_size
 
-    def build_fwtrack (self):
+    def build_fwtrack ( self ):
         """Build FWTrackII from all lines, return a FWTrackII object.
 
         Note only the unique match for a tag is kept.
         """
         cdef int i, m, header_len, nc, x, nlength
         cdef int entrylength, fpos, strand, chrid
+        cdef list references
         
         fwtrack = FWTrackII()
         i = 0
@@ -633,30 +636,30 @@ class BAMParser(GenericParser):
         ftell = self.fhd.tell
         # move to pos 4, there starts something
         fseek(4)
-        header_len =  struct.unpack('<i', fread(4))[0]
-        fseek(header_len + ftell())
+        header_len =  unpack( '<i', fread( 4 ) )[ 0 ]
+        fseek( header_len + ftell() )
         # get the number of chromosome
-        nc = struct.unpack('<i', fread(4))[0]
-        for x in range(nc):
+        nc = unpack( '<i', fread( 4 ) )[ 0 ]
+        for x in range( nc ):
             # read each chromosome name
-            nlength = struct.unpack('<i', fread(4))[0]
-            references.append(fread(nlength)[:-1])
+            nlength = unpack( '<i', fread( 4 ) )[ 0 ]
+            references.append( fread( nlength )[ :-1 ] )
             # jump over chromosome size, we don't need it
-            fseek(ftell() + 4)
+            fseek( ftell() + 4 )
         
         while True:
             try:
-                entrylength = struct.unpack('<i', fread(4))[0]
+                entrylength = unpack( '<i', fread( 4 ) )[ 0 ]
             except struct.error:
                 break
-            (chrid,fpos,strand) = self.__fw_binary_parse(fread(entrylength))                    
+            ( chrid, fpos, strand ) = self.__fw_binary_parse( fread( entrylength ) )
             i+=1
             if i == 1000000:
                 m += 1
-                logging.info(" %d" % (m*1000000))
-                i=0
+                logging.info( " %d" % ( m*1000000 ) )
+                i = 0
             if fpos >= 0:
-                fwtrack.add_loc(references[chrid],fpos,strand)
+                fwtrack.add_loc( references[ chrid ], fpos, strand )
         self.fhd.close()
         return fwtrack
     
@@ -665,94 +668,58 @@ class BAMParser(GenericParser):
         cdef short cigar, bwflag
         
         # we skip lot of the available information in data (i.e. tag name, quality etc etc)
-        if not data: return (-1,-1,-1)
+        if not data: return ( -1, -1, -1 )
 
-        thisref = struct.unpack('<i', data[0:4])[0]
-        thisstart = struct.unpack('<i', data[4:8])[0]
-        (cigar, bwflag) = struct.unpack('<hh', data[12:16])
+        thisref = unpack( '<i', data[ 0:4 ] )[ 0 ]
+        thisstart = unpack( '<i', data[ 4:8 ] )[ 0 ]
+        ( cigar, bwflag ) = unpack( '<hh' , data[ 12:16 ] )
         if bwflag & 4 or bwflag & 512 or bwflag & 1024:
-            return (-1, -1, -1)       #unmapped sequence or bad sequence
+            return ( -1, -1, -1 )       #unmapped sequence or bad sequence
         if bwflag & 1:
             # paired read. We should only keep sequence if the mate is mapped
             # and if this is the left mate, all is within  the flag! 
             if not bwflag & 2:
-                return (-1, -1, -1)   # not a proper pair
+                return ( -1, -1, -1 )   # not a proper pair
             if bwflag & 8:
-                return (-1, -1, -1)   # the mate is unmapped
+                return ( -1, -1, -1 )   # the mate is unmapped
             # From Benjamin Schiller https://github.com/benjschiller
             if bwflag & 128:
                 # this is not the first read in a pair
-                return (-1, -1, -1)
+                return ( -1, -1, -1 )
             # end of the patch
         # In case of paired-end we have now skipped all possible "bad" pairs
         # in case of proper pair we have skipped the rightmost one... if the leftmost pair comes
         # we can treat it as a single read, so just check the strand and calculate its
         # start position... hope I'm right!
+        l = unpack( '<i', data[ 16:20 ] )[ 0 ]
         if bwflag & 16:
             thisstrand = 1
-            thisstart = thisstart + struct.unpack('<i', data[16:20])[0]	#reverse strand should be shifted len(query) bp 
+            thisstart = thisstart + unpack( '<i', data[ 16:20 ] )[ 0 ]	#reverse strand should be shifted len(query) bp 
         else:
             thisstrand = 0
 
-        return (thisref, thisstart, thisstrand)
+        return ( thisref, thisstart, thisstrand )
 
 ### End ###
 
-class BowtieParser(GenericParser):
+class BowtieParser( GenericParser ):
     """File Parser Class for map files from Bowtie or MAQ's maqview
     program.
 
     """
-    def __init__ (self,fhd):
+    def __tlen_parse_line ( self, str thisline ):
+        """Parse tag sequence, then tag length.
+
         """
-        """
-        self.fhd = fhd
+        cdef list thisfields
+        
+        thisline = thisline.rstrip()
+        if not thisline: return ( "", -1, -1 )
+        if thisline[ 0 ]=="#": return ( "", -1 , -1 ) # comment line is skipped
+        thisfields = thisline.split( '\t' ) # I hope it will never bring me more trouble
+        return int( len( thisfields[ 4 ] ) )
 
-    def tsize (self):
-        s = 0
-        n = 0
-        m = 0
-        while n<10 and m<1000:
-            m += 1
-            thisline = self.fhd.readline()
-            (chromosome,fpos,strand) = self.__fw_parse_line(thisline)
-            if not fpos or not chromosome:
-                continue
-            thisline = thisline.rstrip()
-            thisfields = thisline.split('\t')
-            s += len(thisfields[4])
-            n += 1
-        self.fhd.seek(0)
-        return int(s/n)
-
-    def build_fwtrack (self):
-        """Build FWTrackII from all lines, return a FWTrackII object.
-
-        Note: All locations will be merged (exclude the same
-        location) then sorted after the track is built.
-
-        If both_strand is True, it will store strand information in
-        FWTrackII object.
-
-        if do_merge is False, it will not merge the same location after
-        the track is built.
-        """
-        fwtrack = FWTrackII()
-        i = 0
-        m = 0
-        for thisline in self.fhd:
-            (chromosome,fpos,strand) = self.__fw_parse_line(thisline)
-            i+=1
-            if i == 1000000:
-                m += 1
-                logging.info(" %d" % (m*1000000))
-                i=0
-            if not fpos or not chromosome:
-                continue
-            fwtrack.add_loc(chromosome,fpos,strand)
-        return fwtrack
-    
-    def __fw_parse_line (self, thisline ):
+    def __fw_parse_line (self, str thisline ):
         """
         The following definition comes from bowtie website:
         
@@ -784,7 +751,7 @@ class BowtieParser(GenericParser):
         this column is generally not a good proxy for that number
         (e.g., the number in this column may be '0' while the number
         of other alignments with the same number of mismatches might
-        be large). This column was previously described as"Reserved".
+        be large). This column was previously described as 'Reserved'.
 
         8. Comma-separated list of mismatch descriptors. If there are
         no mismatches in the alignment, this field is empty. A single
@@ -793,25 +760,28 @@ class BowtieParser(GenericParser):
         (5') end of the read.
 
         """
+        cdef list thisfields
+        cdef str chromname
+        
         thisline = thisline.rstrip()
-        if not thisline: return ("blank",None,None)
-        if thisline[0]=="#": return ("comment line",None,None) # comment line is skipped
-        thisfields = thisline.split('\t')                      # I hope it will never bring me more trouble
+        if not thisline: return ( "", -1, -1 )
+        if thisline[ 0 ]=="#": return ( "", -1, -1 ) # comment line is skipped
+        thisfields = thisline.split( '\t' ) # I hope it will never bring me more trouble
 
-        chromname = thisfields[2]
+        chromname = thisfields[ 2 ]
         try:
-            chromname = chromname[:chromname.rindex(".fa")]
+            chromname = chromname[ :chromname.rindex( ".fa" ) ]
         except ValueError:
             pass
 
-            if thisfields[1] == "+":
-                return (chromname,
-                        int(thisfields[3]),
-                        0)
-            elif thisfields[1] == "-":
-                return (chromname,
-                        int(thisfields[3])+len(thisfields[4]),
-                        1)
+            if thisfields[ 1 ] == "+":
+                return ( chromname,
+                         int( thisfields[ 3 ] ),
+                         0 )
+            elif thisfields[ 1 ] == "-":
+                return ( chromname,
+                         int( thisfields[ 3 ] ) + len( thisfields[ 4 ] ),
+                         1 )
             else:
-                raise StrandFormatError(thisline,thisfields[1])
+                raise StrandFormatError( thisline, thisfields[ 1 ] )
 

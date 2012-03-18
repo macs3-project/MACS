@@ -2,7 +2,6 @@ MANIFEST
 build/*
 dist/*
 *.pyc
-*.c
 *~
 test/*.wig
 test/*.bed

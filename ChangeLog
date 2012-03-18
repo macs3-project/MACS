@@ -1,6 +1,14 @@
 2012-03-12  Tao Liu  <taoliu@jimmy.harvard.edu>
 	MACS version 2.0.10 (tag:alpha still working)
 
+	* Parser optimization
+
+	cParser.pyx is rewritten to use io.BufferedReader to speed
+	up. Speed is doubled.
+
+	Code is reorganized -- most of functions are inherited from
+	GenericParser class.
+
 	* Use cross-correlation to calculate fragment size
 
 	First, all pairs will be used in prediction for fragment
