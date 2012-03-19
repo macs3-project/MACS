@@ -1,7 +1,7 @@
 ====
 README for MACS (1.4.2)
 ====
-Time-stamp: <2012-03-19 16:55:00 Tao Liu>
+Time-stamp: <2012-03-19 17:12:25 Tao Liu>
 
 Introduction
 ====
@@ -69,15 +69,15 @@ each line MUST represents only ONE tag, with fields of:
 1. Sequence name (derived from file name and line number if format is not Fasta)
 2. Sequence
 3. Type of match: 
- NM - no match found.
- QC - no matching done: QC failure (too many Ns basically).
- RM - no matching done: repeat masked (may be seen if repeatFile.txt was specified).
- U0 - Best match found was a unique exact match.
- U1 - Best match found was a unique 1-error match. 
- U2 - Best match found was a unique 2-error match. 
- R0 - Multiple exact matches found.
- R1 - Multiple 1-error matches found, no exact matches.
- R2 - Multiple 2-error matches found, no exact or 1-error matches.
+:NM: no match found.
+:QC: no matching done: QC failure (too many Ns basically).
+:RM: no matching done: repeat masked (may be seen if repeatFile.txt was specified).
+:U0: Best match found was a unique exact match.
+:U1: Best match found was a unique 1-error match. 
+:U2: Best match found was a unique 2-error match. 
+:R0: Multiple exact matches found.
+:R1: Multiple 1-error matches found, no exact matches.
+:R2: Multiple 2-error matches found, no exact or 1-error matches.
 4. Number of exact matches found.
 5. Number of 1-error matches found.
 6. Number of 2-error matches found.
@@ -130,60 +130,49 @@ Here is the definition for Bowtie output in ASCII characters I copied
 from the above webpage:
 
 1.  Name of read that aligned
-
-2. Orientation of read in the alignment, - for reverse
-complement, + otherwise
-
-3. Name of reference sequence where alignment occurs, or ordinal ID
-if no name was provided
-
-4. 0-based offset into the forward reference strand where leftmost
-character of the alignment occurs
-
+2. Orientation of read in the alignment, - for reverse complement, + otherwise
+3. Name of reference sequence where alignment occurs, or ordinal ID if no name was provided
+4. 0-based offset into the forward reference strand where leftmost character of the alignment occurs
 5. Read sequence (reverse-complemented if orientation is -)
-
 6. ASCII-encoded read qualities (reversed if orientation is -). The
-encoded quality values are on the Phred scale and the encoding is
-ASCII-offset by 33 (ASCII char !).
-
+    encoded quality values are on the Phred scale and the encoding is
+    ASCII-offset by 33 (ASCII char !).
 7. Number of other instances where the same read aligns against the
-same reference characters as were aligned against in this
-alignment. This is not the number of other places the read aligns
-with the same number of mismatches. The number in this column is
-generally not a good proxy for that number (e.g., the number in
-this column may be '0' while the number of other alignments with
-the same number of mismatches might be large). This column was
-previously described as "Reserved".
-
+    same reference characters as were aligned against in this
+    alignment. This is not the number of other places the read aligns
+    with the same number of mismatches. The number in this column is
+    generally not a good proxy for that number (e.g., the number in
+    this column may be '0' while the number of other alignments with
+    the same number of mismatches might be large). This column was
+    previously described as "Reserved".
 8. Comma-separated list of mismatch descriptors. If there are no
-mismatches in the alignment, this field is empty. A single
-descriptor has the format offset:reference-base>read-base. The
-offset is expressed as a 0-based offset from the high-quality (5')
-end of the read.
+    mismatches in the alignment, this field is empty. A single
+    descriptor has the format offset:reference-base>read-base. The
+    offset is expressed as a 0-based offset from the high-quality (5')
+    end of the read.
 
 Notes:
 
-1) For BED format, the 6th column of strand information is required by
-MACS. And please pay attention that the coordinates in BED format is
-zero-based and half-open
-(http://genome.ucsc.edu/FAQ/FAQtracks#tracks1).
+1. For BED format, the 6th column of strand information is required by
+    MACS. And please pay attention that the coordinates in BED format
+    is zero-based and half-open (http://genome.ucsc.edu/FAQ/FAQtracks#tracks1).
+2. For plain ELAND format, only matches with match type U0, U1 or U2
+    is accepted by MACS, i.e. only the unique match for a sequence
+    with less than 3 errors is involed in calculation. If multiple
+    hits of a single tag are included in your raw ELAND file, please
+    remove the redundancy to keep the best hit for that sequencing
+    tag.
+3. For the experiment with several replicates, it is recommended to
+    concatenate several ChIP-seq treatment files into a single
+    file. To do this, under Unix/Mac or Cygwin (for windows OS),
+    type::
 
-2) For plain ELAND format, only matches with match type U0, U1 or U2 is
-accepted by MACS, i.e. only the unique match for a sequence with less
-than 3 errors is involed in calculation. If multiple hits of a single
-tag are included in your raw ELAND file, please remove the redundancy
-to keep the best hit for that sequencing tag.
+       cat replicate1.bed replicate2.bed replicate3.bed > all_replicates.bed
 
-3) For the experiment with several replicates, it is recommended to
-concatenate several ChIP-seq treatment files into a single file. To do
-this, under Unix/Mac or Cygwin (for windows OS), type::
-
-  cat replicate1.bed replicate2.bed replicate3.bed > all_replicates.bed
-
-4) ELAND export format support sometimes may not work on your
-datasets, because people may mislabel the 11th and 12th column. MACS
-uses 11th column as the sequence name which should be the chromosome
-names.
+4. ELAND export format support sometimes may not work on your
+    datasets, because people may mislabel the 11th and 12th
+    column. MACS uses 11th column as the sequence name which should be
+    the chromosome names.
 
 --petdist=PETDIST 
 ~~~~
@@ -398,53 +387,54 @@ Output files
 ----
 
 1. NAME_peaks.xls is a tabular file which contains information about
-called peaks. You can open it in excel and sort/filter using excel
-functions. Information include: chromosome name, start position of
-peak, end position of peak, length of peak region, peak summit
-position related to the start position of peak region, number of tags
-in peak region, -10*log10(pvalue) for the peak region (e.g. pvalue
-=1e-10, then this value should be 100), fold enrichment for this
-region against random Poisson distribution with local lambda, FDR in
-percentage. Coordinates in XLS is 1-based which is different with BED
-format.
+    called peaks. You can open it in excel and sort/filter using excel
+    functions. Information include: chromosome name, start position of
+    peak, end position of peak, length of peak region, peak summit
+    position related to the start position of peak region, number of
+    tags in peak region, -10*log10(pvalue) for the peak region
+    (e.g. pvalue =1e-10, then this value should be 100), fold
+    enrichment for this region against random Poisson distribution
+    with local lambda, FDR in percentage. Coordinates in XLS is
+    1-based which is different with BED format.
 
 2. NAME_peaks.bed is BED format file which contains the peak
-locations. You can load it to UCSC genome browser or Affymetrix IGB
-software. The 5th column in this file is the -10*log10pvalue of peak
-region.
+    locations. You can load it to UCSC genome browser or Affymetrix
+    IGB software. The 5th column in this file is the -10*log10pvalue
+    of peak region.
 
 3. NAME_summits.bed is in BED format, which contains the peak summits
-locations for every peaks. The 5th column in this file is the summit
-height of fragment pileup. If you want to find the motifs at the
-binding sites, this file is recommended.
+    locations for every peaks. The 5th column in this file is the
+    summit height of fragment pileup. If you want to find the motifs
+    at the binding sites, this file is recommended.
 
 4. NAME_negative_peaks.xls is a tabular file which contains
-information about negative peaks. Negative peaks are called by
-swapping the ChIP-seq and control channel.
+    information about negative peaks. Negative peaks are called by
+    swapping the ChIP-seq and control channel.
 
 5. NAME_model.r is an R script which you can use to produce a PDF
-image about the model based on your data. Load it to R by::
+    image about the model based on your data. Load it to R by::
 
-  R --vanilla < NAME_model.r
+       R --vanilla < NAME_model.r
 
-Then a pdf file NAME_model.pdf will be generated in your current
-directory. Note, R is required to draw this figure.
+    Then a pdf file NAME_model.pdf will be generated in your current
+    directory. Note, R is required to draw this figure.
 
 6. NAME_treat/control_afterfiting.wig.gz files in NAME_MACS_wiggle
-directory are wiggle format files which can be imported to UCSC genome
-browser/GMOD/Affy IGB. The .bdg.gz files are in bedGraph format which
-can also be imported to UCSC genome browser or be converted into even
-smaller bigWig files.
+    directory are wiggle format files which can be imported to UCSC
+    genome browser/GMOD/Affy IGB. The .bdg.gz files are in bedGraph
+    format which can also be imported to UCSC genome browser or be
+    converted into even smaller bigWig files.
 
 7. NAME_diag.xls is the diagnosis report. First column is for various
-fold_enrichment ranges; the second column is number of peaks for that
-fc range; after 3rd columns are the percentage of peaks covered after
-sampling 90%, 80%, 70% ... and 20% of the total tags.
+    fold_enrichment ranges; the second column is number of peaks for
+    that fc range; after 3rd columns are the percentage of peaks
+    covered after sampling 90%, 80%, 70% ... and 20% of the total
+    tags.
 
 8. NAME_peaks.subpeaks.bed is a text file which IS NOT in BED
-format. This file is generated by PeakSplitter
-(<http://www.ebi.ac.uk/bertone/software/PeakSplitter_Cpp_usage.txt>)
-when --call-subpeaks option is set.
+    format. This file is generated by PeakSplitter
+    (<http://www.ebi.ac.uk/bertone/software/PeakSplitter_Cpp_usage.txt>)
+    when --call-subpeaks option is set.
 
 Other useful links
 ====
