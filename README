@@ -1,5 +1,5 @@
-README for MACS (1.4.1)
-Time-stamp: <2011-06-27 16:04:50 Tao Liu>
+README for MACS (1.4.2)
+Time-stamp: <2012-03-19 02:49:22 Tao Liu>
 
 * Introduction
 
@@ -80,10 +80,10 @@ Options:
   --llocal=LARGELOCAL   The large nearby region in basepairs to calculate
                         dynamic lambda. This is used to capture the surround
                         bias. DEFAULT: 10000.
-  --off-auto            Whether turn off the auto pair model process. If not
-                        set, when MACS failed to build paired model, it will
-                        use the nomodel settings, the '--shiftsize' parameter
-                        to shift and extend each tags. DEFAULT: False
+  --on-auto             Whether turn on the auto pair model process. If set,
+                        when MACS failed to build paired model, it will use
+                        the nomodel settings, the '--shiftsize' parameter to
+                        shift and extend each tags. DEFAULT: False
   --nomodel             Whether or not to build the shifting model. If True,
                         MACS will not build model. by default it means
                         shifting size = 100, try to set shiftsize to change
@@ -100,10 +100,13 @@ Options:
                         location based on binomal distribution using 1e-5 as
                         pvalue cutoff; and the 'all' option keeps every tags.
                         If an integer is given, at most this number of tags
-                        will be kept at the same location. Default: auto
-  --to-small            When set, scale the larger dataset down to the smaller
-                        dataset, by default, the smaller dataset will be
-                        scaled towards the larger dataset. DEFAULT: False
+                        will be kept at the same location. Default: 1
+  --to-large            When set, scale the small sample up to the bigger
+                        sample. By default, the bigger dataset will be scaled
+                        down towards the smaller dataset, which will lead to
+                        smaller pvalues and more specific results. Keep in
+                        mind that scaling down will bring down background
+                        noise more. DEFAULT: False
   -w, --wig             Whether or not to save extended fragment pileup at
                         every WIGEXTEND bps into a wiggle file. When --single-
                         profile is on, only one file for the whole genome is
@@ -371,11 +374,11 @@ chromatin domain. You can tweak these according to your
 project. Remember that if the region is set too small, a sharp spike
 in the input data may kill the significant peak.
 
-** --off-auto
+** --on-auto
 
-Whether turn off the auto paired-peak model process. If not set, when
-MACS failed to build paired model, it will use the nomodel settings,
-the '--shiftsize' parameter to shift and extend each tags. If set,
+Whether turn on the auto paired-peak model process. If set, when MACS
+failed to build paired model, it will use the nomodel settings, the
+'--shiftsize' parameter to shift and extend each tags. If not set,
 MACS will be terminated if paried-peak model is failed.
 
 ** --nomodel
@@ -399,12 +402,12 @@ location -- the same coordination and the same strand. The default
 location based on binomal distribution using 1e-5 as pvalue cutoff;
 and the 'all' option keeps every tags.  If an integer is given, at
 most this number of tags will be kept at the same location. Default:
-auto
+1.
 
-** --to-small 
+** --to-large 
 
-When set scale the larger dataset down to the smaller dataset, by
-default, the smaller dataset will be scaled towards the larger
+When not set, scale the larger dataset down to the smaller dataset;
+when set, the smaller dataset will be scaled towards the larger
 dataset.
 
 ** -w/--wig
