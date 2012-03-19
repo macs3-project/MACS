@@ -1,5 +1,5 @@
 Package: macs
-Version: 1.4.1
+Version: 1.4.2
 Priority: optional
 Maintainer: Tao Liu <vladimir.liu@gmail.com>
 Depends: python2.6
