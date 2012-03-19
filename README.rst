@@ -1,7 +1,7 @@
 ====
 README for MACS (1.4.2)
 ====
-Time-stamp: <2012-03-19 16:50:40 Tao Liu>
+Time-stamp: <2012-03-19 16:55:00 Tao Liu>
 
 Introduction
 ====
@@ -66,9 +66,9 @@ The BED format is defined in "http://genome.ucsc.edu/FAQ/FAQformat#format1".
 If the format is ELAND, the file must be ELAND result output file,
 each line MUST represents only ONE tag, with fields of:
 
- 1. Sequence name (derived from file name and line number if format is not Fasta)
- 2. Sequence
- 3. Type of match: 
+1. Sequence name (derived from file name and line number if format is not Fasta)
+2. Sequence
+3. Type of match: 
  NM - no match found.
  QC - no matching done: QC failure (too many Ns basically).
  RM - no matching done: repeat masked (may be seen if repeatFile.txt was specified).
@@ -78,32 +78,32 @@ each line MUST represents only ONE tag, with fields of:
  R0 - Multiple exact matches found.
  R1 - Multiple 1-error matches found, no exact matches.
  R2 - Multiple 2-error matches found, no exact or 1-error matches.
- 4. Number of exact matches found.
- 5. Number of 1-error matches found.
- 6. Number of 2-error matches found.
- Rest of fields are only seen if a unique best match was found (i.e. the match code in field 3 begins with "U").
- 7. Genome file in which match was found.
- 8. Position of match (bases in file are numbered starting at 1).
- 9. Direction of match (F=forward strand, R=reverse).
- 10. How N characters in read were interpreted: ("."=not applicable, "D"=deletion, "I"=insertion).
- Rest of fields are only seen in the case of a unique inexact match (i.e. the match code was U1 or U2).
- 11. Position and type of first substitution error (e.g. 12A: base 12 was A, not whatever is was in read).
- 12. Position and type of first substitution error, as above. 
+4. Number of exact matches found.
+5. Number of 1-error matches found.
+6. Number of 2-error matches found.
+Rest of fields are only seen if a unique best match was found (i.e. the match code in field 3 begins with "U").
+7. Genome file in which match was found.
+8. Position of match (bases in file are numbered starting at 1).
+9. Direction of match (F=forward strand, R=reverse).
+10. How N characters in read were interpreted: ("."=not applicable, "D"=deletion, "I"=insertion).
+Rest of fields are only seen in the case of a unique inexact match (i.e. the match code was U1 or U2).
+11. Position and type of first substitution error (e.g. 12A: base 12 was A, not whatever is was in read).
+12. Position and type of first substitution error, as above. 
 
 If the format is ELANDMULTI, the file must be ELAND output file from
 multiple-match mode, each line MUST represents only ONE tag, with
 fields of:
 
- 1. Sequence name 
- 2. Sequence 
- 3. Either NM, QC, RM (as described above) or the following: 
- 4. x:y:z where x, y, and z are the number of exact, single-error, and 2-error matches found
- 5. Blank, if no matches found or if too many matches found, or the following:
-    BAC_plus_vector.fa:163022R1,170128F2,E_coli.fa:3909847R1 This says
-    there are two matches to BAC_plus_vector.fa: one in the reverse
-    direction starting at position 160322 with one error, one in the
-    forward direction starting at position 170128 with two
-    errors. There is also a single-error match to E_coli.fa.
+1. Sequence name 
+2. Sequence 
+3. Either NM, QC, RM (as described above) or the following: 
+4. x:y:z where x, y, and z are the number of exact, single-error, and 2-error matches found
+5. Blank, if no matches found or if too many matches found, or the
+following: BAC_plus_vector.fa:163022R1,170128F2,E_coli.fa:3909847R1
+This says there are two matches to BAC_plus_vector.fa: one in the
+reverse direction starting at position 160322 with one error, one in
+the forward direction starting at position 170128 with two
+errors. There is also a single-error match to E_coli.fa.
 
 If the data is from Pair-End sequencing. You can sepecify the format
 as ELANDMULTIPET ( stands for ELAND Multiple-match Pair-End Tags),
@@ -129,37 +129,37 @@ read. Check the bowtie manual for detail if you want at
 Here is the definition for Bowtie output in ASCII characters I copied
 from the above webpage:
 
-   1.  Name of read that aligned
+1.  Name of read that aligned
 
-   2. Orientation of read in the alignment, - for reverse
-   complement, + otherwise
+2. Orientation of read in the alignment, - for reverse
+complement, + otherwise
 
-   3. Name of reference sequence where alignment occurs, or ordinal ID
-   if no name was provided
+3. Name of reference sequence where alignment occurs, or ordinal ID
+if no name was provided
 
-   4. 0-based offset into the forward reference strand where leftmost
-   character of the alignment occurs
+4. 0-based offset into the forward reference strand where leftmost
+character of the alignment occurs
 
-   5. Read sequence (reverse-complemented if orientation is -)
+5. Read sequence (reverse-complemented if orientation is -)
 
-   6. ASCII-encoded read qualities (reversed if orientation is -). The
-   encoded quality values are on the Phred scale and the encoding is
-   ASCII-offset by 33 (ASCII char !).
+6. ASCII-encoded read qualities (reversed if orientation is -). The
+encoded quality values are on the Phred scale and the encoding is
+ASCII-offset by 33 (ASCII char !).
 
-   7. Number of other instances where the same read aligns against the
-   same reference characters as were aligned against in this
-   alignment. This is not the number of other places the read aligns
-   with the same number of mismatches. The number in this column is
-   generally not a good proxy for that number (e.g., the number in
-   this column may be '0' while the number of other alignments with
-   the same number of mismatches might be large). This column was
-   previously described as "Reserved".
+7. Number of other instances where the same read aligns against the
+same reference characters as were aligned against in this
+alignment. This is not the number of other places the read aligns
+with the same number of mismatches. The number in this column is
+generally not a good proxy for that number (e.g., the number in
+this column may be '0' while the number of other alignments with
+the same number of mismatches might be large). This column was
+previously described as "Reserved".
 
-   8. Comma-separated list of mismatch descriptors. If there are no
-   mismatches in the alignment, this field is empty. A single
-   descriptor has the format offset:reference-base>read-base. The
-   offset is expressed as a 0-based offset from the high-quality (5')
-   end of the read.
+8. Comma-separated list of mismatch descriptors. If there are no
+mismatches in the alignment, this field is empty. A single
+descriptor has the format offset:reference-base>read-base. The
+offset is expressed as a 0-based offset from the high-quality (5')
+end of the read.
 
 Notes:
 
@@ -397,54 +397,54 @@ let MACS choose the following fold enrichment ranges to consider:
 Output files
 ----
 
- 1. NAME_peaks.xls is a tabular file which contains information about
- called peaks. You can open it in excel and sort/filter using excel
- functions. Information include: chromosome name, start position of
- peak, end position of peak, length of peak region, peak summit
- position related to the start position of peak region, number of tags
- in peak region, -10*log10(pvalue) for the peak region (e.g. pvalue
- =1e-10, then this value should be 100), fold enrichment for this
- region against random Poisson distribution with local lambda, FDR in
- percentage. Coordinates in XLS is 1-based which is different with BED
- format.
+1. NAME_peaks.xls is a tabular file which contains information about
+called peaks. You can open it in excel and sort/filter using excel
+functions. Information include: chromosome name, start position of
+peak, end position of peak, length of peak region, peak summit
+position related to the start position of peak region, number of tags
+in peak region, -10*log10(pvalue) for the peak region (e.g. pvalue
+=1e-10, then this value should be 100), fold enrichment for this
+region against random Poisson distribution with local lambda, FDR in
+percentage. Coordinates in XLS is 1-based which is different with BED
+format.
 
- 2. NAME_peaks.bed is BED format file which contains the peak
- locations. You can load it to UCSC genome browser or Affymetrix IGB
- software. The 5th column in this file is the -10*log10pvalue of peak
- region.
+2. NAME_peaks.bed is BED format file which contains the peak
+locations. You can load it to UCSC genome browser or Affymetrix IGB
+software. The 5th column in this file is the -10*log10pvalue of peak
+region.
 
- 3. NAME_summits.bed is in BED format, which contains the peak summits
- locations for every peaks. The 5th column in this file is the summit
- height of fragment pileup. If you want to find the motifs at the
- binding sites, this file is recommended.
+3. NAME_summits.bed is in BED format, which contains the peak summits
+locations for every peaks. The 5th column in this file is the summit
+height of fragment pileup. If you want to find the motifs at the
+binding sites, this file is recommended.
 
- 4. NAME_negative_peaks.xls is a tabular file which contains
- information about negative peaks. Negative peaks are called by
- swapping the ChIP-seq and control channel.
+4. NAME_negative_peaks.xls is a tabular file which contains
+information about negative peaks. Negative peaks are called by
+swapping the ChIP-seq and control channel.
 
- 5. NAME_model.r is an R script which you can use to produce a PDF
- image about the model based on your data. Load it to R by::
+5. NAME_model.r is an R script which you can use to produce a PDF
+image about the model based on your data. Load it to R by::
 
   R --vanilla < NAME_model.r
 
-  Then a pdf file NAME_model.pdf will be generated in your current
-  directory. Note, R is required to draw this figure.
+Then a pdf file NAME_model.pdf will be generated in your current
+directory. Note, R is required to draw this figure.
 
- 6. NAME_treat/control_afterfiting.wig.gz files in NAME_MACS_wiggle
- directory are wiggle format files which can be imported to UCSC
- genome browser/GMOD/Affy IGB. The .bdg.gz files are in bedGraph
- format which can also be imported to UCSC genome browser or be
- converted into even smaller bigWig files.
+6. NAME_treat/control_afterfiting.wig.gz files in NAME_MACS_wiggle
+directory are wiggle format files which can be imported to UCSC genome
+browser/GMOD/Affy IGB. The .bdg.gz files are in bedGraph format which
+can also be imported to UCSC genome browser or be converted into even
+smaller bigWig files.
 
- 7. NAME_diag.xls is the diagnosis report. First column is for various
- fold_enrichment ranges; the second column is number of peaks for that fc
- range; after 3rd columns are the percentage of peaks covered after
- sampling 90%, 80%, 70% ... and 20% of the total tags.
+7. NAME_diag.xls is the diagnosis report. First column is for various
+fold_enrichment ranges; the second column is number of peaks for that
+fc range; after 3rd columns are the percentage of peaks covered after
+sampling 90%, 80%, 70% ... and 20% of the total tags.
 
- 8. NAME_peaks.subpeaks.bed is a text file which IS NOT in BED
- format. This file is generated by PeakSplitter
- (<http://www.ebi.ac.uk/bertone/software/PeakSplitter_Cpp_usage.txt>)
- when --call-subpeaks option is set.
+8. NAME_peaks.subpeaks.bed is a text file which IS NOT in BED
+format. This file is generated by PeakSplitter
+(<http://www.ebi.ac.uk/bertone/software/PeakSplitter_Cpp_usage.txt>)
+when --call-subpeaks option is set.
 
 Other useful links
 ====
