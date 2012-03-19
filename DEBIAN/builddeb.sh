@@ -21,5 +21,5 @@ python2.6 setup.py install --prefix=debian/usr/ --install-layout=deb
 #for f in `ls debian/usr/bin/*.py`;do mv ${f} ${f/.py/};done
 for f in `find debian/usr/lib/ -name '*.pyc'`;do rm -f ${f};done
 fakeroot dpkg-deb --build debian
-mv debian.deb macs_1.4.1.deb
+mv debian.deb macs_1.4.2.deb
 echo "finished!"
