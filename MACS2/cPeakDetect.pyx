@@ -269,7 +269,7 @@ class PeakDetect:
             for end, group in groupby(peaks[chrom], key=itemgetter("end")):
                 n_peak += 1
                 these_peaks = list(group)
-                if len(peaks) > 1:
+                if len(these_peaks) > 1:
                     for i, peak in enumerate(these_peaks):
                         peakname = "%s%d%s" % (peakprefix, n_peak, subpeak_letters(i))
                         #[start,end,end-start,summit,peak_height,number_tags,pvalue,fold_change,qvalue]
