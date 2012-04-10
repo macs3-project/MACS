@@ -1,4 +1,4 @@
-# Time-stamp: <2011-11-02 14:21:20 Tao Liu>
+# Time-stamp: <2012-04-10 17:56:07 Tao Liu>
 
 """Module Description
 
@@ -36,13 +36,11 @@ efgsize = {"hs":2.7e9,
 # ------------------------------------
 # Misc functions
 # ------------------------------------
-def opt_validate ( optparser ):
+def opt_validate ( options ):
     """Validate options from a OptParser object.
 
     Ret: Validated options object.
     """
-    (options,args) = optparser.parse_args()
-
     # gsize
     try:
         options.gsize = efgsize[options.gsize]
@@ -54,14 +52,7 @@ def opt_validate ( optparser ):
             logging.error("Available shortcuts of effective genome sizes are %s" % ",".join(efgsize.keys()))
             sys.exit(1)
 
-
-    # treatment file
-    if not options.tfile:       # only required argument
-        optparser.print_help()
-        sys.exit(1)
-
     # format
-
     options.gzip_flag = False           # if the input is gzip file
     
     options.format = options.format.upper()
@@ -93,7 +84,7 @@ def opt_validate ( optparser ):
             sys.exit(1)
 
     # shiftsize>0
-    if options.shiftsize <=0 :
+    if options.shiftsize <= 0 :
         logging.error("--shiftsize must > 0!")
         sys.exit(1)
 
@@ -111,10 +102,10 @@ def opt_validate ( optparser ):
     options.format = options.format.upper()
 
     # upper and lower mfold
-    try:
-        (options.lmfold,options.umfold) = map(int, options.mfold.split(","))
-    except:
-        logging.error("mfold format error! Your input is '%s'. It should be like '10,30'." % options.mfold)
+    options.lmfold = options.mfold[0]
+    options.umfold = options.mfold[1]
+    if options.lmfold > options.umfold:
+        logging.error("Upper limit of mfold should be greater than lower limit!" % options.mfold)
         sys.exit(1)
     
     # output filenames
@@ -336,16 +327,13 @@ def opt_validate_diff ( optparser ):
     else:
         options.argtxt += "# Range for calculating regional lambda is: %d bps\n" % (options.largelocal)
 
-
     return options
 
-def opt_validate_filterdup ( optparser ):
+def opt_validate_filterdup ( options ):
     """Validate options from a OptParser object.
 
     Ret: Validated options object.
     """
-    (options,args) = optparser.parse_args()
-
     # gsize
     try:
         options.gsize = efgsize[options.gsize]
@@ -356,12 +344,6 @@ def opt_validate_filterdup ( optparser ):
             logging.error("Error when interpreting --gsize option: %s" % options.gsize)
             logging.error("Available shortcuts of effective genome sizes are %s" % ",".join(efgsize.keys()))
             sys.exit(1)
-
-
-    # treatment file
-    if not options.tfile:       # only required argument
-        optparser.print_help()
-        sys.exit(1)
 
     # format
 
@@ -413,19 +395,11 @@ def opt_validate_filterdup ( optparser ):
 
     return options
 
-
-def opt_validate_randsample ( optparser ):
+def opt_validate_randsample ( options ):
     """Validate options from a OptParser object.
 
     Ret: Validated options object.
     """
-    (options,args) = optparser.parse_args()
-
-    # treatment file
-    if not options.tfile:       # only required argument
-        optparser.print_help()
-        sys.exit(1)
-
     # format
 
     options.gzip_flag = False           # if the input is gzip file
@@ -456,18 +430,14 @@ def opt_validate_randsample ( optparser ):
     options.format = options.format.upper()
 
     # percentage or number
-    if options.percentage and options.number:
-        logging.error("Can't specify -p and -n at the same time! Please check your options and retry!")
-        sys.exit(1)
-    else:
-        if options.percentage:
-            if options.percentage > 100.0:
-                logging.error("Percentage can't be bigger than 100.0. Please check your options and retry!")
-                sys.exit(1)
-        elif options.number:
-            if options.number <= 0:
-                logging.error("Number of tags can't be smaller than or equal to 0. Please check your options and retry!")
-                sys.exit(1)
+    if options.percentage:
+        if options.percentage > 100.0:
+            logging.error("Percentage can't be bigger than 100.0. Please check your options and retry!")
+            sys.exit(1)
+    elif options.number:
+        if options.number <= 0:
+            logging.error("Number of tags can't be smaller than or equal to 0. Please check your options and retry!")
+            sys.exit(1)
 
     # logging object
     logging.basicConfig(level=(4-options.verbose)*10,

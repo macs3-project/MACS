@@ -1,10 +1,7 @@
-#!/usr/bin/env python
-# Time-stamp: <2012-02-29 14:42:57 Tao Liu>
+# Time-stamp: <2012-04-10 17:50:40 Tao Liu>
 
-import os
 import sys
 import logging
-from optparse import OptionParser
 
 from MACS2.IO import cBedGraphIO
 from MACS2.IO.cBedGraph import scoreTracktoBedGraph
@@ -64,32 +61,7 @@ def logLR ( x, y ):
         logLR_dict[key_value] = s
         return s
 
-def main():
-    usage = "usage: %prog <-t TREATMENT.BEDGRAPH> <-c CONTROL.BEDGRAPH> <-o OUTPUT.BEDGRAPH> [-m METHOD] "
-    description = "Calculate scores using certain method by comparing a bedGraph file from treatment and a file from control representing local bias."
-    
-    optparser = OptionParser(version="%prog 0.1",description=description,usage=usage,add_help_option=False)
-    optparser.add_option("-h","--help",action="help",help="Show this help message and exit.")
-    optparser.add_option("-t","--tfile",dest="tfile",type="string",
-                         help="Required: Treatment bedGraph file, e.g. *_treat_pileup.bdg from MACSv2")
-    optparser.add_option("-c","--cfile",dest="cfile",type="string",
-                         help="Required: Control bedGraph file, e.g. *_control_lambda.bdg from MACSv2")
-    optparser.add_option("-o","--output",dest="ofile",type="string",
-                         help="Required: The output bedGraph file to write scores.")
-    optparser.add_option("-m","--method",dest="method",type="string",
-                         help="Method to use while calculating a score in any bin by comparing treatment value and control value. Available choices are: ppois, qpois, substract, divide, and logLR,. They represent Poisson Pvalue (-log10(pvalue) form) using control as lambda and treatment as observation, q-value through a BH process for poisson pvalues, substraction from treatment, fold change which may be problematic if there are zero in control and log10 likelihood between ChIP-enriched model and open chromatin model. Default option is ppois.",default="ppois")
-    (options,args) = optparser.parse_args()
-
-    if not options.tfile or not options.cfile or not options.ofile:
-        optparser.print_help()
-        sys.exit()
-
-    available_methods = ['ppois','substract','divide','logLR','qpois']
-    if options.method not in available_methods:
-        sys.stderr.write("Method can only be %s" % ",".join(available_methods))
-    else:
-        method = options.method
-
+def run( options ):
     info("Read and build treatment bedGraph...")
     tbio = cBedGraphIO.bedGraphIO(options.tfile)
     tbtrack = tbio.build_bdgtrack()
@@ -97,6 +69,8 @@ def main():
     info("Read and build control bedGraph...")
     cbio = cBedGraphIO.bedGraphIO(options.cfile)
     cbtrack = cbio.build_bdgtrack()
+
+    method = options.method
 
     info("Calculate scores comparing treatment and control by %s..." % method)
     # build score track
@@ -121,7 +95,3 @@ def main():
     ofhd = open(options.ofile,"w")
 
     sbtrack.write_bedGraph(ofhd,name="%s_Scores" % (method.upper()),description="Scores calculated by %s" % (method.upper()))
-    
-
-if __name__ == '__main__':
-    main()

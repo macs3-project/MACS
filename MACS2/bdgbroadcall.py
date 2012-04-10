@@ -1,5 +1,4 @@
-#!/usr/bin/env python
-# Time-stamp: <2012-02-29 02:08:01 Tao Liu>
+# Time-stamp: <2012-04-10 17:33:16 Tao Liu>
 
 """Description: Fine-tuning script to call broad peaks from a single bedGraph track for scores.
 
@@ -21,7 +20,6 @@ the distribution).
 
 import sys
 import logging
-from optparse import OptionParser
 from MACS2.IO import cBedGraphIO
 # ------------------------------------
 # constants
@@ -47,32 +45,7 @@ info    = logging.info
 # ------------------------------------
 # Main function
 # ------------------------------------
-def main():
-    usage = "usage: %prog <-i bedGraph> [-c CUTOFF1] [-C CUTOFF2] [-l MIN] [-g MAX1] [-G MAX2] [-o PREFIX]"
-    description = "Call broad peaks from MACS pvalue or qscore score bedGraph output, with customized settings. Output two files for narrow peaks in encodePeak format, and one for broad peaks in bed12 format."
-    
-    optparser = OptionParser(version="%prog 0.1",description=description,usage=usage,add_help_option=False)
-    optparser.add_option("-h","--help",action="help",help="Show this help message and exit.")
-    optparser.add_option("-i","--ifile",dest="ifile",type="string",
-                         help="MACS pvalue score bedGraph")
-    optparser.add_option("-c","--cutoff-peak",dest="cutoffpeak",type="float",
-                         help="Cutoff for peaks depending on which method you used for score track. If the file contains qvalue scores from MACS2, score 2 means qvalue 0.01. DEFAULT: 2",default=2)
-    optparser.add_option("-C","--cutoff-link",dest="cutofflink",type="float",
-                         help="Cutoff for linking regions/low abundance regions depending on which method you used for score track. If the file contains qvalue scores from MACS2, score 1 means qvalue 0.1, and score 0.3 means qvalue 0.5. DEFAULT: 5",default=1)
-    optparser.add_option("-l","--min-length",dest="minlen",type="int",
-                         help="minimum length of peak, better to set it as d value. DEFAULT: 200",default=200)
-    optparser.add_option("-g","--lvl1-max-gap",dest="lvl1maxgap",type="int",
-                         help="maximum gap between significant peaks, better to set it as tag size. DEFAULT: 30",default=30)
-    optparser.add_option("-G","--lvl2-max-gap",dest="lvl2maxgap",type="int",
-                         help="maximum linking between significant peaks, better to set it as 4 times of d value. DEFAULT: 800",default=800)
-    optparser.add_option("-o","--o-prefix",dest="oprefix",default="peak",
-                         help="output file prefix, DEFAULT: peak") 
-    (options,args) = optparser.parse_args()
-
-    if not options.ifile:
-        optparser.print_help()
-        sys.exit()
-
+def run( options ):
     info("Read and build bedGraph...")
     bio = cBedGraphIO.bedGraphIO(options.ifile)
     btrack = bio.build_bdgtrack(baseline_value=0)
@@ -87,11 +60,3 @@ def main():
     #peaks.write_to_narrowPeak(nf, name_prefix=options.oprefix+"_encodePeak", score_column="score")
     bpeaks[1].write_to_gappedPeak(bf, name_prefix=options.oprefix+"_broadRegion")    
     info("Done")
-    
-if __name__ == '__main__':
-    try:
-        main()
-    except KeyboardInterrupt:
-        sys.stderr.write("User interrupt me! ;-) See you!\n")
-        sys.exit(0)
-

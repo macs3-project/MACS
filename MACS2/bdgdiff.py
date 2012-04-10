@@ -1,5 +1,4 @@
-#!/usr/bin/env python
-# Time-stamp: <2012-02-27 00:21:59 Tao Liu>
+# Time-stamp: <2012-04-10 17:37:06 Tao Liu>
 
 """Description: Naive call differential peaks from 4 bedGraph tracks for scores.
 
@@ -19,11 +18,8 @@ the distribution).
 # python modules
 # ------------------------------------
 
-import os
 import sys
-import re
 import logging
-from optparse import OptionParser
 from MACS2.IO.cBedGraphIO import bedGraphIO,genericBedIO
 from MACS2.IO.cPeakIO import Region
 from MACS2.IO.cCompositeScoreTrack import *
@@ -56,40 +52,11 @@ info    = logging.info
 # ------------------------------------
 # Main function
 # ------------------------------------
-def main():
-    usage = "usage: %prog <-b union.bed> <--s1 bedGraph> <--s2 bedGraph> <--s12 bedGraph> <--s21 bedGraph> [-c CUTOFF] [-l MIN] [-g MAX] [-o PREFIX]"
-    description = "Call differential regions from four bedGraph files of ChIP pileup 1/2 and control signal 1/2, with customized settings. Please read the descriptions of options carefully."
-    
-    optparser = OptionParser(version="%prog 0.1",description=description,usage=usage,add_help_option=False)
-    optparser.add_option("-h","--help",action="help",help="Show this help message and exit.")
-    optparser.add_option("--bed1",dest="peak1",type="string",
-                         help="Peak regions of condition 1")
-    optparser.add_option("--bed2",dest="peak2",type="string",
-                         help="Peak regions of condition 2")    
-    optparser.add_option("--t1",dest="t1bdg",type="string",
-                         help="MACS pileup bedGraph for condition 1.")
-    optparser.add_option("--t2",dest="t2bdg",type="string",
-                         help="MACS pileup bedGraph for condition 2.")                         
-    optparser.add_option("-C","--cutoff",dest="cutoff",type="float",
-                         help="Cutoff for GFOLD. Can only be 0.05, or 0.01. DEFAULT: 0.01",default=0.01)
-    #optparser.add_option("--MCMC",dest="do_MCMC",action="store_true",
-    #                     help="Turn on MCMC simulation, will be quite slow",default=False)
-    optparser.add_option("-o","--o-prefix",dest="oprefix",default="peak",type="string",
-                         help="output file prefix, DEFAULT: peak") 
-    (options,args) = optparser.parse_args()
-
-    if not (options.t1bdg and options.t2bdg and options.peak1 and options.peak2):
-        optparser.print_help()
-        sys.exit()
-
+def run( options ):
     options.do_MCMC = True
     
     # load precompiled matrix
-    if options.cutoff in [0.05,0.01]:
-        gfolds_c = PCGF(options.cutoff)
-    else:
-        error("-C can only be 0.05, or 0.01!")
-        sys.exit(1)
+    gfolds_c = PCGF(options.cutoff)
 
     info("Read peak files...")
     info("Peak of condition 1 treatment...")
@@ -170,11 +137,4 @@ def main():
         ofhd.write("%s\t%.5f\t%.5f\t%.5f\n" % (data_in_union[0][i],tmp1/n1,tmp2/n2,gftmp))
 
     ofhd.close()
-
-if __name__ == '__main__':
-    try:
-        main()
-    except KeyboardInterrupt:
-        sys.stderr.write("User interrupt me! ;-) See you!\n")
-        sys.exit(0)
 

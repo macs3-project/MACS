@@ -1,5 +1,4 @@
-#!/usr/bin/env python
-# Time-stamp: <2012-03-11 00:14:07 Tao Liu>
+# Time-stamp: <2012-04-10 17:33:25 Tao Liu>
 
 """Description: Naive call peaks from a single bedGraph track for scores.
 
@@ -18,10 +17,8 @@ the distribution).
 # ------------------------------------
 # python modules
 # ------------------------------------
-
 import sys
 import logging
-from optparse import OptionParser
 from MACS2.IO import cBedGraphIO
 # ------------------------------------
 # constants
@@ -47,28 +44,7 @@ info    = logging.info
 # ------------------------------------
 # Main function
 # ------------------------------------
-def main():
-    usage = "usage: %prog <-i bedGraph> [-c CUTOFF] [-l MIN] [-g MAX] [-o PREFIX]"
-    description = "Call peaks from MACS pvalue or qscore score bedGraph output, with customized settings. Output encodePeak format peaks, combining peak boundaries, peak summits."
-    
-    optparser = OptionParser(version="%prog 0.1",description=description,usage=usage,add_help_option=False)
-    optparser.add_option("-h","--help",action="help",help="Show this help message and exit.")
-    optparser.add_option("-i","--ifile",dest="ifile",type="string",
-                         help="MACS pvalue score bedGraph")
-    optparser.add_option("-c","--cutoff",dest="cutoff",type="float",
-                         help="Cutoff depends on which method you used for score track. If the file contains pvalue scores from MACS2, score 5 means pvalue 1e-5. DEFAULT: 5",default=5)
-    optparser.add_option("-l","--min-length",dest="minlen",type="int",
-                         help="minimum length of peak, better to set it as d value. DEFAULT: 200",default=200)
-    optparser.add_option("-g","--max-gap",dest="maxgap",type="int",
-                         help="maximum gap between significant points in a peak, better to set it as tag size. DEFAULT: 30",default=30)
-    optparser.add_option("-o","--o-prefix",dest="oprefix",default="peak",
-                         help="output file prefix, DEFAULT: peak") 
-    (options,args) = optparser.parse_args()
-
-    if not options.ifile:
-        optparser.print_help()
-        sys.exit()
-
+def run( options ):
     info("Read and build bedGraph...")
     bio = cBedGraphIO.bedGraphIO(options.ifile)
     btrack = bio.build_bdgtrack(baseline_value=0)
@@ -81,10 +57,3 @@ def main():
     peaks.write_to_narrowPeak(nf, name_prefix=options.oprefix+"_encodePeak", score_column="score")
     info("Done")
     
-if __name__ == '__main__':
-    try:
-        main()
-    except KeyboardInterrupt:
-        sys.stderr.write("User interrupt me! ;-) See you!\n")
-        sys.exit(0)
-

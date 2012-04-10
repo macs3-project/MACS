@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# Time-stamp: <2012-03-18 13:27:59 Tao Liu>
+# Time-stamp: <2012-04-09 14:39:58 Tao Liu>
 
 """Description
 
@@ -22,12 +22,20 @@ import sys
 from distutils.core import setup, Extension
 from Cython.Distutils import build_ext
 
+try: 
+    from numpy import get_include as numpy_get_include 
+    numpy_include_dir = [numpy_get_include()] 
+except: 
+    numpy_include_dir = [] 
+
+
 def main():
     if float(sys.version[:3])<2.7 or float(sys.version[:3])>=2.8:
         sys.stderr.write("CRITICAL: Python version must be 2.7!\n")
         sys.exit(1)
 
-    ext_modules = [Extension("MACS2.cProb", ["MACS2/cProb.pyx"], libraries=["m"]),
+    ext_modules = [#Extension("MACS2.hashtable", ["MACS2/hashtable.pyx","MACS2/khash.pxd"],libraries=["khash"],include_dirs=["MACS2/",numpy_get_include()]),
+                   Extension("MACS2.cProb", ["MACS2/cProb.pyx"], libraries=["m"]),
                    #Extension("MACS2.math",["MACS2/math.pxd"]),
                    Extension("MACS2.IO.cParser",["MACS2/IO/cParser.pyx"]),
                    #Extension("MACS2.cStat", ["MACS2/cStat.pyx"]),
@@ -53,7 +61,8 @@ def main():
           package_dir={'MACS2' : 'MACS2'},
           packages=['MACS2', 'MACS2.IO', 'MACS2.data'],
           package_data={'MACS2': ['data/*.dat']},          
-          scripts=['bin/macs2',
+          scripts=['bin/macs2main',
+                   'bin/macs2',
                    'bin/macs2diff',
                    'bin/filterdup',
                    'bin/randsample',

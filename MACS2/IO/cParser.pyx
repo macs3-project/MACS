@@ -1,4 +1,5 @@
-# Time-stamp: <2012-03-18 12:53:34 Tao Liu>
+# cython: profile=True
+# Time-stamp: <2012-04-10 17:07:06 Tao Liu>
 
 """Module for all MACS Parser classes for input.
 
@@ -563,14 +564,16 @@ class BAMParser( GenericParser ):
         is success.
 
         """
-        if self.fhd.read( 3 ) == "BAM":
-            if self.tsize() > 0:
+        magic_header = self.fhd.read( 3 )
+        if magic_header == "BAM":
+            tsize  = self.tsize()
+            if tsize > 0:
                 self.fhd.seek( 0 )
                 return True
             else:
                 self.fhd.seek( 0 )
-                raise Exception( "File is not of a valid BAM format!" )                
-                return False            
+                raise Exception( "File is not of a valid BAM format! %d" % tsize )
+            return False
         else:
             self.fhd.seek( 0 )
             return False

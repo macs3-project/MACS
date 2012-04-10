@@ -1,4 +1,5 @@
-# Time-stamp: <2012-03-13 17:14:15 Tao Liu>
+# cython: profile=True
+# Time-stamp: <2012-03-18 17:02:00 Tao Liu>
 
 """Module for Feature IO classes.
 
@@ -219,7 +220,7 @@ class scoreTrackI:
         Step2: Sort them
         Step3: Apply AFDR method to adjust pvalue and get qvalue for each pvalue
 
-        Return a dictionary of {-100log10pvalue:(-100log10qvalue,rank)} relationships.
+        Return a dictionary of {-100log10pvalue:(-100log10qvalue,rank,basepairs)} relationships.
         """
         cdef int n, pre_p, this_p, length, j, pre_l, l, this_v, pre_v, v
         cdef long N, k, q, pre_q
@@ -279,14 +280,19 @@ class scoreTrackI:
 
         pvalue2qvalue: a dictionary of -100log10pvalue:-100log10qvalue
         """
-        cdef int i
+        cdef long i,l,j
         cdef str chrom
+        chroms = self.data.keys()
+
+        g = pvalue2qvalue.get
         
-        for chrom in self.data.keys():
+        for j in range( len(chroms) ):
+            chrom = chroms[j]
             pvalue = self.data[chrom]['-100logp']
             qvalue = self.data[chrom]['-100logq']
-            for i in range( self.pointer[chrom] ):
-                qvalue[i] = pvalue2qvalue[pvalue[i]][0]
+            l = self.pointer[chrom]
+            for i in range( l ):
+                qvalue[i] = g(pvalue[i])[0]
         return True
 
     def call_peaks (self, int cutoff=500, int min_length=200, int max_gap=50, str colname='-100logp'):
