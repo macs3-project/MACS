@@ -1,6 +1,6 @@
-"""
+/*
 Copied from Pandas: https://github.com/pydata/pandas/blob/master/pandas/src/khash.h
-"""
+*/
 /* The MIT License
 
    Copyright (c) 2008, 2009, 2011 by Attractive Chaos <attractor@live.co.uk>
