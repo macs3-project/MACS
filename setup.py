@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# Time-stamp: <2012-04-10 21:09:52 Tao Liu>
+# Time-stamp: <2012-04-12 03:10:33 Tao Liu>
 
 """Description
 
@@ -54,8 +54,9 @@ def main():
                        Extension("MACS2.IO.cBedGraphIO", ["MACS2/IO/cBedGraphIO.pyx"],),                   
                        Extension("MACS2.IO.cFixWidthTrack", ["MACS2/IO/cFixWidthTrack.pyx"],),
                        Extension("MACS2.IO.cBedGraph", ["MACS2/IO/cBedGraph.pyx"], libraries=["m"]),
-                       Extension("MACS2.IO.cScoreTrack", ["MACS2/IO/cScoreTrack.pyx"],),
+                       Extension("MACS2.IO.cScoreTrack", ["MACS2/IO/cScoreTrack.pyx"]), #include_dirs=["MACS2/",numpy_get_include()]),
                        Extension("MACS2.IO.cCompositeScoreTrack", ["MACS2/IO/cCompositeScoreTrack.pyx"],),
+                       Extension("MACS2.hashtable", ["MACS2/hashtable.pyx"],include_dirs=["MACS2/",numpy_get_include()]),
                        ]
         #Extension("MACS2.hashtable", ["MACS2/hashtable.pyx","MACS2/khash.pxd"],libraries=["khash"],include_dirs=["MACS2/",numpy_get_include()]),
     else:
@@ -70,6 +71,7 @@ def main():
                        Extension("MACS2.IO.cBedGraph", ["MACS2/IO/cBedGraph.c"], libraries=["m"]),
                        Extension("MACS2.IO.cScoreTrack", ["MACS2/IO/cScoreTrack.c"],),
                        Extension("MACS2.IO.cCompositeScoreTrack", ["MACS2/IO/cCompositeScoreTrack.c"],),
+                       Extension("MACS2.hashtable", ["MACS2/hashtable.c"],include_dirs=["MACS2/",numpy_get_include()]),                       
                        ]
 
     setup(name="MACS",
