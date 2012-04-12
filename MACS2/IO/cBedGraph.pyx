@@ -1,5 +1,5 @@
 # cython: profile=True
-# Time-stamp: <2012-04-10 22:07:20 Tao Liu>
+# Time-stamp: <2012-04-12 10:22:19 Tao Liu>
 
 """Module for Feature IO classes.
 
@@ -81,6 +81,11 @@ class bedGraphTrackI:
         self.maxvalue =-10000
         self.minvalue = 10000
         self.baseline_value = baseline_value
+
+    def add_a_chromosome ( self, chrom, d ):
+        """Unsafe method. Only to be used by cPileup.pyx.
+        """
+        self.__data[chrom] = d
 
     def add_loc ( self, str chromosome, int startpos, int endpos, double value ):
         """Add a chr-start-end-value block into __data dictionary.

@@ -1,4 +1,4 @@
-# Time-stamp: <2012-04-11 18:29:08 Tao Liu>
+# Time-stamp: <2012-04-12 11:06:08 Tao Liu>
 
 """Module Description: For pileup functions.
 
@@ -75,7 +75,7 @@ def pileup_bdg (trackI, int d, int baseline_value = 0, bool directional = True, 
         
         ( start_poss, end_poss ) = start_and_end_poss( plus_tags, minus_tags, five_shift, three_shift )
 
-        ret.__data[chrom] = pileup_a_chromosome ( start_poss, end_poss, l, scale_factor )
+        ret.add_a_chromosome( chrom, pileup_a_chromosome ( start_poss, end_poss, l, scale_factor ) )
 
         # free mem?
         start_poss = None
@@ -149,7 +149,7 @@ def pileup_w_multiple_d_bdg ( trackI, d_s, int baseline_value = 0, bool directio
             else:
                 prev_pileup = tmp_pileup
 
-        ret.__data[chrom] = prev_pileup
+        ret.add_a_chromosome( chrom, prev_pileup )
         start_poss = None
         end_poss = None        
 
