@@ -1,4 +1,4 @@
-# Time-stamp: <2012-03-11 01:07:40 Tao Liu>
+# Time-stamp: <2012-04-10 22:07:57 Tao Liu>
 
 """Module Description:  IO Module for bedGraph file
 
@@ -17,6 +17,8 @@ the distribution).
 # ------------------------------------
 # python modules
 # ------------------------------------
+import io
+
 from MACS2.IO.cBedGraph import bedGraphTrackI,bedRegionTrackI
 
 # ------------------------------------
@@ -49,7 +51,7 @@ class bedGraphIO:
         
         """
         if type(f) == str:
-            self.fhd = open(f,"r")
+            self.fhd = io.open(f,"rb")
         elif type(f) == file:
             self.fhd = f
         else:
@@ -144,6 +146,8 @@ class genericBedIO:
         Then the region chr1:200..250 should be filled with
         baseline_value. Default of baseline_value is 0.
         """
+        cdef str i
+        
         data = bedRegionTrackI() #(baseline_value=baseline_value)
         add_func = data.safe_add_loc
         chrom_itemcount = {}

@@ -1,4 +1,4 @@
-# Time-stamp: <2012-03-10 14:59:46 Tao Liu>
+# Time-stamp: <2012-04-12 02:05:11 Tao Liu>
 
 """Module Description
 
@@ -15,6 +15,7 @@ with the distribution).
 @contact: taoliu@jimmy.harvard.edu
 """
 import os
+import io
 from array import array
 from copy import deepcopy
 import gc                               # use garbage collectior
@@ -22,7 +23,7 @@ import gc                               # use garbage collectior
 from MACS2.IO.cPeakIO import PeakIO
 
 from MACS2.Constants import *
-from MACS2.cPileup import pileup_bdg
+from MACS2.cPileup import pileup_bdg, pileup_w_multiple_d_bdg
 from libc.math cimport log10
 
 def compare_treatment_vs_control ( treat, control, fragment_size, gsize, halfext=False, slocal=0, llocal=0, tocontrol=False, shiftcontrol=False ):
@@ -263,16 +264,17 @@ class PeakDetect:
 
         # Now pileup FWTrackII to form a bedGraphTrackI
         self.info("#3 pileup treatment data by extending tags towards 3' to %d length" % self.d)
-        treat_btrack = pileup_bdg(self.treat,self.d,halfextension=self.opt.halfext)
 
         if self.opt.tocontrol:
             # if user want to scale everything to control data
             lambda_bg = float(self.d)*treat_total/self.gsize/self.ratio_treat2control
-            treat_btrack.apply_func(lambda x:float(x)/self.ratio_treat2control)
+            treat_btrack = pileup_bdg(self.treat,self.d,halfextension=self.opt.halfext,scale_factor=1/self.ratio_treat2control)
         else:
             lambda_bg = float(self.d)*treat_total/self.gsize
+            treat_btrack = pileup_bdg(self.treat,self.d,halfextension=self.opt.halfext,scale_factor=1.0)            
 
         # control data needs multiple steps of calculation
+        self.info("#3 calculate local lambda from control data")
         # I need to shift them by 500 bps, then 5000 bps
         if self.sregion:
             assert self.d <= self.sregion, "slocal can't be smaller than d!"
@@ -280,53 +282,47 @@ class PeakDetect:
             assert self.d <= self.lregion , "llocal can't be smaller than d!"            
             assert self.sregion <= self.lregion , "llocal can't be smaller than slocal!"
 
-        # d-size local
-        self.info("#3 calculate d local lambda for control data")        
+        # Now prepare a list of extension sizes
+        d_s = [ self.d ]
+        # And a list of scaling factors
+        scale_factor_s = []
 
-        # Now pileup FWTrackII to form a bedGraphTrackI
-        c_tmp_btrack = pileup_bdg(self.control,self.d,directional=self.shiftcontrol,halfextension=self.opt.halfext)
+        # d
         if not self.opt.tocontrol:
             # if user want to scale everything to ChIP data
             tmp_v = self.ratio_treat2control
         else:
             tmp_v = 1
-        c_tmp_btrack.apply_func(lambda x:float(x)*tmp_v)
-        control_btrack = c_tmp_btrack
+        scale_factor_s.append( tmp_v )            
 
         # slocal size local
         if self.sregion:
-            self.info("#3 calculate small local lambda for control data")        
-            # Now pileup FWTrackII to form a bedGraphTrackI
-            c_tmp_btrack = pileup_bdg(self.control,self.sregion,directional=self.shiftcontrol,halfextension=self.opt.halfext)
+            d_s.append( self.sregion )
             if not self.opt.tocontrol:
                 # if user want to scale everything to ChIP data
                 tmp_v = float(self.d)/self.sregion*self.ratio_treat2control
             else:
                 tmp_v = float(self.d)/self.sregion
-            self.info("#3 applying...")
-            c_tmp_btrack.apply_func(lambda x:float(x)*tmp_v)
-            self.info("#3 overlie...")            
-            control_btrack = control_btrack.overlie(c_tmp_btrack,func=max)
+            scale_factor_s.append( tmp_v )                            
 
         # llocal size local
         if self.lregion and self.lregion > self.sregion:
-            self.info("#3 calculate large local lambda for control data")        
-            # Now pileup FWTrackII to form a bedGraphTrackI
-            c_tmp_btrack = pileup_bdg(self.control,self.lregion,directional=self.shiftcontrol,halfextension=self.opt.halfext)
+            d_s.append( self.lregion )
             if not self.opt.tocontrol:
                 # if user want to scale everything to ChIP data
                 tmp_v = float(self.d)/self.lregion*self.ratio_treat2control
             else:
                 tmp_v = float(self.d)/self.lregion
-            self.info("#3 applying...")
-            c_tmp_btrack.apply_func(lambda x:float(x)*tmp_v)
-            self.info("#3 overlie...")            
-            control_btrack = control_btrack.overlie(c_tmp_btrack,func=max)
+            scale_factor_s.append( tmp_v )                            
 
-        c_tmp_btrack = None
+        # pileup using different extension sizes and scaling factors
+        control_btrack = pileup_w_multiple_d_bdg(self.control,d_s,directional=self.shiftcontrol,halfextension=self.opt.halfext,scale_factor_s=scale_factor_s)
+
+        # free mem
         self.treat = None
         self.control = None
-
+        gc.collect()                    # full collect garbage
+        
         control_btrack.reset_baseline(lambda_bg) # set the baseline as lambda_bg
 
         # calculate pvalue scores

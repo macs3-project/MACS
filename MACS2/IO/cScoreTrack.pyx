@@ -1,5 +1,5 @@
 # cython: profile=True
-# Time-stamp: <2012-03-18 17:02:00 Tao Liu>
+# Time-stamp: <2012-04-12 02:15:52 Tao Liu>
 
 """Module for Feature IO classes.
 
@@ -26,6 +26,9 @@ from libc.math cimport log10,log
 from MACS2.Constants import *
 from MACS2.cProb cimport poisson_cdf
 from MACS2.IO.cPeakIO import PeakIO, BroadPeakIO
+
+from MACS2.hashtable import Int64HashTable
+
 import logging
 
 #from time import time as ttime
@@ -222,7 +225,7 @@ class scoreTrackI:
 
         Return a dictionary of {-100log10pvalue:(-100log10qvalue,rank,basepairs)} relationships.
         """
-        cdef int n, pre_p, this_p, length, j, pre_l, l, this_v, pre_v, v
+        cdef long n, pre_p, this_p, length, j, pre_l, l, this_v, pre_v, v
         cdef long N, k, q, pre_q
         cdef double f
         cdef str chrom
@@ -280,11 +283,17 @@ class scoreTrackI:
 
         pvalue2qvalue: a dictionary of -100log10pvalue:-100log10qvalue
         """
-        cdef long i,l,j
+        cdef long i,l,j,p
         cdef str chrom
         chroms = self.data.keys()
 
+        # convert pvalue2qvalue to a simple dict
+        s_p2q = Int64HashTable()
         g = pvalue2qvalue.get
+        for i in pvalue2qvalue.keys():
+            s_p2q.set_item(i,g(i)[0])
+
+        g = s_p2q.get_item
         
         for j in range( len(chroms) ):
             chrom = chroms[j]
@@ -292,7 +301,7 @@ class scoreTrackI:
             qvalue = self.data[chrom]['-100logq']
             l = self.pointer[chrom]
             for i in range( l ):
-                qvalue[i] = g(pvalue[i])[0]
+                qvalue[i] = g(pvalue[i])
         return True
 
     def call_peaks (self, int cutoff=500, int min_length=200, int max_gap=50, str colname='-100logp'):

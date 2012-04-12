@@ -1,7 +1,8 @@
-# Time-stamp: <2012-04-10 17:50:40 Tao Liu>
+# Time-stamp: <2012-04-10 21:37:35 Tao Liu>
 
 import sys
 import logging
+import io
 
 from MACS2.IO import cBedGraphIO
 from MACS2.IO.cBedGraph import scoreTracktoBedGraph
@@ -92,6 +93,6 @@ def run( options ):
         raise Exception("Can't reach here!")
 
     info("Write to output bedGraph...")
-    ofhd = open(options.ofile,"w")
+    ofhd = io.open(options.ofile,"wb")
 
     sbtrack.write_bedGraph(ofhd,name="%s_Scores" % (method.upper()),description="Scores calculated by %s" % (method.upper()))

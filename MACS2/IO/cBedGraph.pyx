@@ -1,5 +1,5 @@
 # cython: profile=True
-# Time-stamp: <2012-03-18 15:22:35 Tao Liu>
+# Time-stamp: <2012-04-10 22:07:20 Tao Liu>
 
 """Module for Feature IO classes.
 
@@ -90,6 +90,7 @@ class bedGraphTrackI:
         are continuous without gaps.
 
         """
+        cdef float pre_v
         # basic assumption, end pos should > start pos
 
         if endpos <= 0:
@@ -201,7 +202,7 @@ class bedGraphTrackI:
         shift will be used to shift the coordinates. default: 0
         """
         #fhd.write("track type=bedGraph name=\"%s\" description=\"%s\"\n" % (name,description))
-        cdef int pre, pos
+        cdef int pre, pos, i
         cdef double value
         cdef str chrom
         
@@ -235,7 +236,7 @@ class bedGraphTrackI:
         """Merge nearby regions with the same value.
         
         """
-        cdef int new_pre_pos, pos
+        cdef int new_pre_pos, pos, i
         cdef double new_pre_value, value
         cdef str chrom
         
@@ -275,7 +276,7 @@ class bedGraphTrackI:
 
         Self will be modified.
         """
-        cdef int new_pre_pos, pos
+        cdef int new_pre_pos, pos, i
         cdef double new_pre_value, value
         cdef str chrom
         
