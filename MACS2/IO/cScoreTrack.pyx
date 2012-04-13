@@ -1,5 +1,5 @@
 # cython: profile=True
-# Time-stamp: <2012-04-12 02:15:52 Tao Liu>
+# Time-stamp: <2012-04-12 12:35:41 Tao Liu>
 
 """Module for Feature IO classes.
 
@@ -75,18 +75,18 @@ cdef logLR ( double x, double y ):
     
     """
     cdef int s
-    key_value = ( x, y )
-    if logLR_dict.has_key(key_value):
-        return logLR_dict[key_value]
+    #key_value = ( x, y )
+    #if logLR_dict.has_key(key_value):
+    #    return logLR_dict[key_value]
+    #else:
+    if x > y:
+        s = int( (x*(log(x+1)-log(y+1))+y-x)*LOG10_E*100 )
+    elif x < y:
+        s = int( (-1*x*(log(x+1)-log(y+1))-y+x)*LOG10_E*100 )
     else:
-        if x > y:
-            s = int( (x*(log(x+1)-log(y+1))+y-x)*LOG10_E*100 )
-        elif x < y:
-            s = int( (-1*x*(log(x+1)-log(y+1))-y+x)*LOG10_E*100 )
-        else:
-            s = 0
-        logLR_dict[key_value] = s
-        return s
+        s = 0
+    #logLR_dict[key_value] = s
+    return s
 
 # ------------------------------------
 # Classes

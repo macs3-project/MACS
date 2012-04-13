@@ -1,5 +1,5 @@
 # cython: profile=True
-# Time-stamp: <2012-03-18 15:22:26 Tao Liu>
+# Time-stamp: <2012-04-12 18:16:28 Tao Liu>
 
 """Module for FWTrack classes.
 
@@ -59,6 +59,7 @@ class FWTrackII:
         self.__sorted = False
         self.total = 0                  # total tags
         self.annotation = anno   # need to be figured out
+
 
     def add_loc (self, str chromosome, int fiveendpos, int strand):
         """Add a location to the list according to the sequence name.

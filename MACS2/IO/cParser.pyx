@@ -1,5 +1,5 @@
 # cython: profile=True
-# Time-stamp: <2012-04-10 17:07:06 Tao Liu>
+# Time-stamp: <2012-04-13 02:18:49 Tao Liu>
 
 """Module for all MACS Parser classes for input.
 
@@ -25,6 +25,18 @@ import gzip
 import io
 from MACS2.Constants import *
 from MACS2.IO.cFixWidthTrack import FWTrackII
+
+cdef extern from "stdlib.h":
+    ctypedef unsigned int size_t
+    size_t strlen(char *s)
+    void *malloc(size_t size)
+    void *calloc(size_t n, size_t size)
+    void free(void *ptr)
+    int strcmp(char *a, char *b)
+    char * strcpy(char *a, char *b)
+    long atol(char *str)
+    int atoi(char *str)
+
 # ------------------------------------
 # constants
 # ------------------------------------
@@ -160,23 +172,34 @@ class GenericParser:
 
         * BAMParser for binary BAM format should have a different one.
         """
-        cdef int i, m, fpos, strand
+        cdef long i, m, fpos, strand
         cdef str chromosome
         
         fwtrack = FWTrackII()
         i = 0
         m = 0
         for thisline in self.fhd:
+            #thisfields = thisline.rstrip().split( '\t' )
+            #chromname = thisfields[ 0 ]
+            #if not strcmp(thisfields[ 5 ],"+"):
+            #    fwtrack.add_loc ( chromname,
+            #                      atol( thisfields[ 1 ] ),
+            #                      0 )
+            #elif not strcmp(thisfields[ 5 ], "-"):
+            #    fwtrack.add_loc ( chromname,
+            #                      atol( thisfields[ 2 ] ),
+            #                      1 )
+            #
             ( chromosome, fpos, strand ) = self.__fw_parse_line( thisline )
             i+=1
-            if i == 1000000:
-                m += 1
-                logging.info( " %d" % ( m*1000000 ) )
-                i=0
             if fpos < 0 or not chromosome:
                 # normally __fw_parse_line will return -1 if the line
                 # contains no successful alignment.
                 continue
+            if i == 1000000:
+                m += 1
+                logging.info( " %d" % ( m*1000000 ) )
+                i=0
             fwtrack.add_loc( chromosome, fpos, strand )
 
         # close file stream.
@@ -240,41 +263,44 @@ class BEDParser( GenericParser ):
             return 0
 
         thisfields = thisline.split( '\t' )
-        return int( thisfields[ 2 ] )-int( thisfields[ 1 ] )
+        return atoi( thisfields[ 2 ] )-atoi( thisfields[ 1 ] )
     
     def __fw_parse_line ( self, str thisline ):
-        cdef list thisfields
-        cdef str chromname
+        #cdef list thisfields
+        cdef char * chromname
         
         thisline = thisline.rstrip()
+
         if not thisline or thisline[ :5 ] == "track" \
-           or thisline[ :7 ] == "browser" \
-           or thisline[ 0 ] == "#":
-            return ( "", -1, -1 )
+            or thisline[ :7 ] == "browser" \
+            or thisline[ 0 ] == "#":
+             return ( "", -1, -1 )
 
         thisfields = thisline.split( '\t' )
         chromname = thisfields[ 0 ]
-        try:
-            chromname = chromname[ :chromname.rindex( ".fa" ) ]
-        except ValueError:
-            pass
+        #try:
+        ##    chromname = chromname[ :chromname.rindex( ".fa" ) ]
+        #except ValueError:
+        #    pass
 
-        if len( thisfields ) < 6 : # default pos strand if no strand
-                                 # info can be found
-            return ( chromname,
-                     int( thisfields[ 1 ] ),
-                     0 )
-        else:
-            if thisfields[ 5 ] == "+":
+        try:
+            if not strcmp(thisfields[ 5 ],"+"):
                 return ( chromname,
-                         int( thisfields[ 1 ] ),
+                         atoi( thisfields[ 1 ] ),
                          0 )
-            elif thisfields[ 5 ] == "-":
+            elif not strcmp(thisfields[ 5 ], "-"):
                 return ( chromname,
-                         int( thisfields[ 2 ] ),
+                         atoi( thisfields[ 2 ] ),
                          1 )
             else:
                 raise StrandFormatError( thisline, thisfields[ 5 ] )
+        except IndexError:
+            # default pos strand if no strand
+            # info can be found            
+            return ( chromname,
+                     atoi( thisfields[ 1 ] ),
+                     0 )
+            
 
 class ELANDResultParser( GenericParser ):
     """File Parser Class for tabular File.
@@ -287,7 +313,7 @@ class ELANDResultParser( GenericParser ):
         thisline = thisline.rstrip()
         if not thisline: return 0
         thisfields = thisline.split( '\t' )
-        return int( len( thisfields[ 1 ] ) )
+        return len( thisfields[ 1 ] )
 
     def __fw_parse_line ( self, str thisline ):
         cdef str chromname, strand
@@ -313,11 +339,11 @@ class ELANDResultParser( GenericParser ):
             strand = thisfields[ 8 ]
             if strand == "F":
                 return ( chromname,
-                         int( thisfields[ 7 ] ) - 1,
+                         atoi( thisfields[ 7 ] ) - 1,
                          0 )
             elif strand == "R":
                 return ( chromname,
-                         int( thisfields[ 7 ] ) + thistaglength - 1,
+                         atoi( thisfields[ 7 ] ) + thistaglength - 1,
                          1 )
             else:
                 raise StrandFormatError( thisline, strand )
@@ -348,7 +374,7 @@ class ELANDMultiParser( GenericParser ):
         thisline = thisline.rstrip()
         if not thisline: return 0
         thisfields = thisline.split( '\t' )
-        return int( len( thisfields[ 1 ] ) )
+        return len( thisfields[ 1 ] )
 
     def __fw_parse_line ( self, str thisline ):
         cdef list thisfields
@@ -406,7 +432,7 @@ class ELANDExportParser( GenericParser ):
         thisfields = thisline.split( '\t' )
         if len( thisfields ) > 12 and thisfields[ 12 ]:
             # a successful alignment has over 12 columns
-            return int( len( thisfields[ 8 ] ) )
+            return len( thisfields[ 8 ] )
         else:
             return 0
         
@@ -426,9 +452,9 @@ class ELANDExportParser( GenericParser ):
             thistaglength = len( thisfields[ 8 ] )
             strand = thisfields[ 13 ]
             if strand == "F":
-                return ( thisfields[ 10 ], int( thisfields[ 12 ] ) - 1, 0 )
+                return ( thisfields[ 10 ], atoi( thisfields[ 12 ] ) - 1, 0 )
             elif strand == "R":
-                return ( thisfields[ 10 ], int( thisfields[ 12 ] ) + thistaglength - 1, 1 )
+                return ( thisfields[ 10 ], atoi( thisfields[ 12 ] ) + thistaglength - 1, 1 )
             else:
                 raise StrandFormatError( thisline, strand )
         else:
@@ -478,7 +504,7 @@ class SAMParser( GenericParser ):
         if not thisline: return 0
         if thisline[ 0 ] == "@": return 0 # header line started with '@' is skipped
         thisfields = thisline.split( '\t' )
-        bwflag = int( thisfields[ 1 ] )
+        bwflag = atoi( thisfields[ 1 ] )
         if bwflag & 4 or bwflag & 512 or bwflag & 1024:
             return 0       #unmapped sequence or bad sequence
         if bwflag & 1:
@@ -505,7 +531,7 @@ class SAMParser( GenericParser ):
         thisfields = thisline.split( '\t' )
         thistagname = thisfields[ 0 ]         # name of tag
         thisref = thisfields[ 2 ]
-        bwflag = int( thisfields[ 1 ] )
+        bwflag = atoi( thisfields[ 1 ] )
         if bwflag & 4 or bwflag & 512 or bwflag & 1024:
             return ( "", -1, -1 )       #unmapped sequence or bad sequence
         if bwflag & 1:
@@ -526,10 +552,10 @@ class SAMParser( GenericParser ):
         # start position... hope I'm right!
         if bwflag & 16:
             thisstrand = 1
-            thisstart = int( thisfields[ 3 ] ) - 1 + len( thisfields[ 9 ] )	#reverse strand should be shifted len(query) bp 
+            thisstart = atoi( thisfields[ 3 ] ) - 1 + atoi( thisfields[ 9 ] )	#reverse strand should be shifted len(query) bp 
         else:
             thisstrand = 0
-            thisstart = int( thisfields[ 3 ] ) - 1	
+            thisstart = atoi( thisfields[ 3 ] ) - 1	
 
         try:
             thisref = thisref[ :thisref.rindex( ".fa" ) ]
@@ -720,7 +746,7 @@ class BowtieParser( GenericParser ):
         if not thisline: return ( "", -1, -1 )
         if thisline[ 0 ]=="#": return ( "", -1 , -1 ) # comment line is skipped
         thisfields = thisline.split( '\t' ) # I hope it will never bring me more trouble
-        return int( len( thisfields[ 4 ] ) )
+        return len( thisfields[ 4 ] )
 
     def __fw_parse_line (self, str thisline ):
         """
@@ -779,11 +805,11 @@ class BowtieParser( GenericParser ):
 
             if thisfields[ 1 ] == "+":
                 return ( chromname,
-                         int( thisfields[ 3 ] ),
+                         atoi( thisfields[ 3 ] ),
                          0 )
             elif thisfields[ 1 ] == "-":
                 return ( chromname,
-                         int( thisfields[ 3 ] ) + len( thisfields[ 4 ] ),
+                         atoi( thisfields[ 3 ] ) + atoi( thisfields[ 4 ] ),
                          1 )
             else:
                 raise StrandFormatError( thisline, thisfields[ 1 ] )
