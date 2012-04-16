@@ -282,7 +282,7 @@ class PeakDetect:
                         write("\t%s" % peakname)
                         write("\n")
                 else:
-                    peak = peaks[0]
+                    peak = these_peaks[0]
                     peakname = "%s%d" % (peakprefix, n_peak)
                     #[start,end,end-start,summit,peak_height,number_tags,pvalue,fold_change,qvalue]
                     write("%s\t%d\t%d\t%d" % (chrom,peak["start"]+1,peak["end"],peak["length"]))

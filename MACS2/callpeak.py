@@ -21,6 +21,7 @@ with the distribution).
 
 import sys
 import logging
+from time import strftime
 
 # ------------------------------------
 # own python modules
@@ -246,7 +247,7 @@ def run( args ):
         score_column = "qscore"
     info("#4 Write peak bed file... %s" % (options.peakbed))
     ofhd_bed = open(options.peakbed,"w")
-    peakdetect.peaks.write_to_bed (ofhd_bed, name_prefix="%s_peak_", name = options.name, description="Peaks for %s (Made with MACS v2, " + time.strftime("%x") + ")", score_column=score_column, trackline=options.trackline)
+    peakdetect.peaks.write_to_bed (ofhd_bed, name_prefix="%s_peak_", name = options.name, description="Peaks for %s (Made with MACS v2, " + strftime("%x") + ")", score_column=score_column, trackline=options.trackline)
     ofhd_bed.close()
     #4.2 peaks in narrowPeak
     info("#4 Write peak in narrowPeak format file... %s" % (options.peakNarrowPeak))
@@ -263,7 +264,7 @@ def run( args ):
     info("#4 Write summits bed file... %s" % (options.summitbed))
     ofhd_summits = open(options.summitbed,"w")
     peakdetect.peaks.write_to_summit_bed (ofhd_summits, name_prefix="%s_peak_", name=options.name,
-                                          description="Summits for %s (Made with MACS v2, " + time.strftime("%x") + ")",
+                                          description="Summits for %s (Made with MACS v2, " + strftime("%x") + ")",
                                           score_column=score_column, trackline=options.trackline )
     ofhd_summits.close()
 
