@@ -97,7 +97,6 @@ class bedGraphTrackI:
 
         """
         cdef float pre_v
-        cdef float pre_v
         # basic assumption, end pos should > start pos
         if endpos <= 0:
             return
@@ -360,8 +359,8 @@ class bedGraphTrackI:
         std_v = sqrt(variance)
         return (sum_v, n_v, max_v, min_v, mean_v, std_v)
 
-        def call_peaks (self, double cutoff=1, double up_limit=1e310, int min_length=200, int max_gap=50
-                    call_summits=False):
+    def call_peaks (self, double cutoff=1, double up_limit=1e310, int min_length=200, int max_gap=50,
+                call_summits=False):
         """This function try to find regions within which, scores
         are continuously higher than a given cutoff.
 

@@ -27,15 +27,13 @@ try:
     import Cython.Distutils
     command_classes['build_ext'] = Cython.Distutils.build_ext
     has_cython = True
-except:
+except ImportError:
     has_cython = False
-
-has_cython = False    
 
 try: 
     from numpy import get_include as numpy_get_include 
     numpy_include_dir = [numpy_get_include()] 
-except: 
+except ImportError:
     numpy_include_dir = [] 
 
 

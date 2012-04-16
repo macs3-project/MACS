@@ -734,7 +734,6 @@ class BAMParser(GenericParser):
             else:
                 self.fhd.seek( 0 )
                 raise Exception( "File is not of a valid BAM format! %d" % tsize )
-            return False
         else:
             self.fhd.seek( 0 )
             return False
