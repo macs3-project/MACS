@@ -1,9 +1,11 @@
 #!/usr/bin/env python
-# Time-stamp: <2012-04-12 03:10:33 Tao Liu>
+# Time-stamp: <2012-04-12 03:09:58 Tao Liu>
 
-"""Description
+"""Description: 
 
 Setup script for MACS -- Model Based Analysis for ChIP-Seq data
+
+Use this when you need Cython regenerate .c files.
 
 Copyright (c) 2008,2009,2010,2011 Tao Liu <taoliu@jimmy.harvard.edu>
 
@@ -29,8 +31,6 @@ try:
     has_cython = True
 except:
     has_cython = False
-
-has_cython = False    
 
 try: 
     from numpy import get_include as numpy_get_include 

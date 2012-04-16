@@ -1,4 +1,5 @@
-# Time-stamp: <2012-03-08 00:26:39 Tao Liu>
+# cython: profile=True
+# Time-stamp: <2012-04-12 02:15:52 Tao Liu>
 
 """Module for Feature IO classes.
 
@@ -27,6 +28,9 @@ from operator import itemgetter
 from MACS2.Constants import *
 from MACS2.cProb cimport poisson_cdf
 from MACS2.IO.cPeakIO import PeakIO, BroadPeakIO
+
+from MACS2.hashtable import Int64HashTable
+
 import logging
 
 #from time import time as ttime
@@ -48,8 +52,15 @@ pscore_dict = {}
 LOG10_E = 0.43429448190325176
 
 
-def get_pscore ( observed, expectation ):
-    key_value = (observed, expectation)
+cdef get_pscore ( int observed, double expectation ):
+    """Get p-value score from Poisson test. First check existing
+    table, if failed, call poisson_cdf function, then store the result
+    in table.
+    
+    """
+    cdef int score
+    
+    key_value = ( observed, expectation )
     if pscore_dict.has_key(key_value):
         return pscore_dict[key_value]
     else:
@@ -60,12 +71,13 @@ def get_pscore ( observed, expectation ):
 
 logLR_dict = {}
 
-def logLR ( x, y ):
+cdef logLR ( double x, double y ):
     """Calculate log10 Likelihood between H1 ( enriched ) and H0 (
     chromatin bias ). Then store the values in integar form =
     100*logLR. Set minus sign for depletion.
     
     """
+    cdef int s
     key_value = ( x, y )
     if logLR_dict.has_key(key_value):
         return logLR_dict[key_value]
@@ -120,7 +132,7 @@ class scoreTrackI:
         """
         self.trackline = True
 
-    def add_chromosome ( self, chrom, chrom_max_len ):
+    def add_chromosome ( self, str chrom, int chrom_max_len ):
         if not self.data.has_key(chrom):
             self.data[chrom] = np.zeros(chrom_max_len,dtype=[('pos','int32'),
                                                              ('sample','float32'),
@@ -130,11 +142,12 @@ class scoreTrackI:
                                                              ('100logLR','int32'),])
             self.pointer[chrom] = 0
 
-    def add (self,chromosome,endpos,sample,control):
+    def add (self, str chromosome, int endpos, int sample, double control):
         """Add a chr-endpos-sample-control block into data
         dictionary. At the mean time, calculate pvalues.
 
         """
+        cdef int i
         c = self.data[chromosome]
         i = self.pointer[chromosome]
         # get the preceding region
@@ -143,12 +156,15 @@ class scoreTrackI:
         self.pointer[chromosome] += 1
 
     def finalize (self):
+        cdef str chrom
+        cdef int l
+
         for chrom in self.data.keys():
             d = self.data[chrom]
             l = self.pointer[chrom]
             d.resize(l,refcheck=False)
 
-    def get_data_by_chr (self, chromosome):
+    def get_data_by_chr (self, str chromosome):
         """Return array of counts by chromosome.
 
         The return value is a tuple:
@@ -166,7 +182,7 @@ class scoreTrackI:
         l = set(self.data.keys())
         return l
 
-    def write_bedGraph (self, fhd, name, description, colname):
+    def write_bedGraph (self, fhd, str name, str description, str colname):
         """Write all data to fhd in Wiggle Format.
 
         fhd: a filehandler to save bedGraph.
@@ -175,9 +191,13 @@ class scoreTrackI:
         colname: can be 'sample','control','-100logp','-100logq'
 
         """
+        cdef str chrom
+        cdef int l, pre, i, p 
+        cdef double pre_v, v
         if self.trackline:
             # this line is REQUIRED by the wiggle format for UCSC browser
             fhd.write("track type=bedGraph name=\"%s\" description=\"%s\"\n" % (name,description))
+        
         if colname not in ['sample','control','-100logp','-100logq','100logLR']:
             raise Exception("%s not supported!" % colname)
         if colname in ['-100logp', '-100logq','100logLR']:
@@ -195,7 +215,7 @@ class scoreTrackI:
             else:
                 value = d[colname]
             pre_v = value[0]
-            for i in xrange( 1, l ):
+            for i in range( 1, l ):
                 v = value[i]
                 p = pos[i-1]
                 if pre_v != v: 
@@ -208,15 +228,6 @@ class scoreTrackI:
 
         return True
 
-    def __calculate_fold_change ( self, chrom, index ):
-        """From 'sample' and 'control' columns, calculate foldchanges.
-
-        chrom: chromosome name
-        index: index in data[chrom]
-        
-        """
-        return self.data[chrom]['sample'][index]/self.data[chrom]['control'][index]
-
     def make_pq_table ( self ):
         """Make pvalue-qvalue table.
 
@@ -224,8 +235,13 @@ class scoreTrackI:
         Step2: Sort them
         Step3: Apply AFDR method to adjust pvalue and get qvalue for each pvalue
 
-        Return a dictionary of {-100log10pvalue:(-100log10qvalue,rank)} relationships.
+        Return a dictionary of {-100log10pvalue:(-100log10qvalue,rank,basepairs)} relationships.
         """
+        cdef long n, pre_p, this_p, length, j, pre_l, l, this_v, pre_v, v
+        cdef long N, k, q, pre_q
+        cdef double f
+        cdef str chrom
+        
         #logging.info("####test#### start make_pq")
         n = self.total()
         #value_list = np.empty( n, dtype = [('v', '<f4'), ('l', '<i4')])
@@ -256,10 +272,10 @@ class scoreTrackI:
         N = sum(value_dict.values())
         k = 1                           # rank
         f = -log10(N)
-        pre_v = -1e100
+        pre_v = -2147483647
         pre_l = 0
-        pre_q = 1e100 # save the previous q-value
-        pvalue2qvalue = {pre_v:[0,k,0]} # pvalue:[qvalue,rank,bp_with_this_pvalue]
+        pre_q = 2147483647              # save the previous q-value
+        pvalue2qvalue = {pre_v:[0,k,0]}              # pvalue:[qvalue,rank,bp_with_this_pvalue]
         #logging.info("####test#### start matching pvalue to qvalue")
         for v in sorted(value_dict.keys(),reverse=True):
             l = value_dict[v]
@@ -273,24 +289,37 @@ class scoreTrackI:
         pvalue2qvalue[pre_v][2] = k-pvalue2qvalue[pre_v][1]
         #logging.info("####test#### finish building pqtable")        
         # pop the first -1e100 one
-        pvalue2qvalue.pop(-1e100)
+        pvalue2qvalue.pop(-2147483647)
 
         return pvalue2qvalue
 
-    def assign_qvalue ( self , pvalue2qvalue ):
+    def assign_qvalue ( self , dict pvalue2qvalue ):
         """Assign -100log10qvalue to every point.
 
         pvalue2qvalue: a dictionary of -100log10pvalue:-100log10qvalue
         """
-        t = 0
-        for chrom in self.data.keys():
+        cdef long i,l,j,p
+        cdef str chrom
+        chroms = self.data.keys()
+
+        # convert pvalue2qvalue to a simple dict
+        s_p2q = Int64HashTable()
+        g = pvalue2qvalue.get
+        for i in pvalue2qvalue.keys():
+            s_p2q.set_item(i,g(i)[0])
+
+        g = s_p2q.get_item
+        
+        for j in range( len(chroms) ):
+            chrom = chroms[j]
             pvalue = self.data[chrom]['-100logp']
             qvalue = self.data[chrom]['-100logq']
-            for i in xrange( self.pointer[chrom] ):
-                qvalue[i] = pvalue2qvalue[pvalue[i]][0]
+            l = self.pointer[chrom]
+            for i in range( l ):
+                qvalue[i] = g(pvalue[i])
         return True
 
-    def call_peaks (self, cutoff=500, min_length=200, max_gap=50, colname='-100logp',
+    def call_peaks (self, int cutoff=500, int min_length=200, int max_gap=50, str colname='-100logp',
                     call_summits=False):
         """This function try to find regions within which, scores
         are continuously higher than a given cutoff.
@@ -307,18 +336,18 @@ class scoreTrackI:
         colname: can be 'sample','control','-100logp','-100logq'. Cutoff will be applied to the specified column.
         ptrack:  an optional track for pileup heights. If it's not None, use it to find summits. Otherwise, use self/scoreTrack.
         """
+        cdef int i
+        cdef str chrom
+        
         assert (colname in [ 'sample', 'control', '-100logp', '-100logq', '100logLR' ]), "%s not supported!" % colname
 
         chrs  = self.get_chr_names()
         peaks = PeakIO()                      # dictionary to save peaks
 
-        cutoff = int(cutoff)
-        
         if call_summits: close_peak = self.__close_peak2
         else: close_peak = self.__close_peak
         
         for chrom in chrs:
-            chrom_pointer = self.pointer[chrom]
             peak_content = []           # to store points above cutoff
 
             above_cutoff = np.nonzero( self.data[chrom][colname] >= cutoff )[0] # indices where score is above cutoff
@@ -337,7 +366,7 @@ class scoreTrackI:
 
             # first bit of region above cutoff
             peak_content.append( (above_cutoff_startpos[0], above_cutoff_endpos[0], above_cutoff_v[0], above_cutoff_sv[0], above_cutoff[0]) )
-            for i in xrange(1,above_cutoff_startpos.size):
+            for i in range( 1,above_cutoff_startpos.size ):
                 if above_cutoff_startpos[i] - peak_content[-1][1] <= max_gap:
                     # append
                     peak_content.append( (above_cutoff_startpos[i], above_cutoff_endpos[i], above_cutoff_v[i], above_cutoff_sv[i], above_cutoff[i]) )
@@ -444,16 +473,24 @@ class scoreTrackI:
         # start a new peak
         return True
 
-    def __close_peak (self, peak_content, peaks, min_length, chrom, colname, smoothlen=None):
-        # this is where the summits are called, need to fix this
+    def __close_peak (self, peak_content, peaks, int min_length, str chrom, str colname, smoothlen=None):
+        """Close the peak region, output peak boundaries, peak summit
+        and scores, then add the peak to peakIO object.
+
+        """
+        cdef int summit_pos, tmpstart, tmpend, tmpindex, middle_summit, summit_index, i
+        cdef double summit_value, tmpvalue, tmpsummitvalue
+
         peak_length = peak_content[ -1 ][ 1 ] - peak_content[ 0 ][ 0 ]
         if peak_length >= min_length: # if the peak is too small, reject it
             tmpsummit = []
-            summit_pos   = None
-            summit_value = None
-            for (tmpstart,tmpend,tmpvalue,tmpsummitvalue, tmpindex) in peak_content:
+            summit_pos   = 0
+            summit_value = summit_pos
+            for i in range(len(peak_content)):
+                (tmpstart,tmpend,tmpvalue,tmpsummitvalue, tmpindex) = peak_content[i]
+                #for (tmpstart,tmpend,tmpvalue,tmpsummitvalue, tmpindex) in peak_content:
                 if not summit_value or summit_value < tmpsummitvalue:
-                    tmpsummit = [ int(( tmpend+tmpstart )/2), ]
+                    tmpsummit = [ ( tmpend+tmpstart )/2, ]
                     tmpsummit_index = [ tmpindex, ]
                     summit_value = tmpsummitvalue
                 elif summit_value == tmpsummitvalue:
@@ -476,7 +513,9 @@ class scoreTrackI:
             # start a new peak
             return True
 
-    def call_broadpeaks (self, lvl1_cutoff=500, lvl2_cutoff=100, min_length=200, lvl1_max_gap=50, lvl2_max_gap=400, colname='-100logq'):
+    def call_broadpeaks (self, int lvl1_cutoff=500, int lvl2_cutoff=100,
+                         int min_length=200, int lvl1_max_gap=50, int lvl2_max_gap=400,
+                         str colname='-100logq'):
         """This function try to find enriched regions within which,
         scores are continuously higher than a given cutoff for level
         1, and link them using the gap above level 2 cutoff with a
@@ -492,6 +531,9 @@ class scoreTrackI:
         Return both general PeakIO object for highly enriched regions
         and gapped broad regions in BroadPeakIO.
         """
+        cdef int i
+        cdef str chrom
+        
         assert lvl1_cutoff > lvl2_cutoff, "level 1 cutoff should be larger than level 2."
         assert lvl1_max_gap < lvl2_max_gap, "level 2 maximum gap should be larger than level 1."        
         lvl1_peaks = self.call_peaks(cutoff=lvl1_cutoff, min_length=min_length, max_gap=lvl1_max_gap, colname=colname)
@@ -509,8 +551,9 @@ class scoreTrackI:
                 lvl1 = lvl1peakschrom_next()
             except StopIteration:
                 break
-            for lvl2 in lvl2peakschrom:
+            for i in range( len(lvl2peakschrom) ):
                 # for each lvl2 peak, find all lvl1 peaks inside
+                lvl2 = lvl2peakschrom[i]
                 try:
                     while True:
                         if lvl2["start"] <= lvl1["start"]  and lvl1["end"] <= lvl2["end"]:
@@ -528,82 +571,86 @@ class scoreTrackI:
         
         return lvl1_peaks, broadpeaks
 
-    def call_broadpeaks2 (self, lvl1_cutoff=500, lvl2_cutoff=100, min_length=200, lvl1_max_gap=50, lvl2_max_gap=400, colname='-100logq'):
-        """This function try to find enriched regions within which,
-        scores are continuously higher than a given cutoff for level
-        1, and link them using the gap above level 2 cutoff with a
-        maximum length of lvl2_max_gap.
+    # def call_broadpeaks2 (self, int lvl1_cutoff=500, int lvl2_cutoff=100, int min_length=200,
+    #                       int lvl1_max_gap=50, int lvl2_max_gap=400, str colname='-100logq'):
+    #     """This function try to find enriched regions within which,
+    #     scores are continuously higher than a given cutoff for level
+    #     1, and link them using the gap above level 2 cutoff with a
+    #     maximum length of lvl2_max_gap.
 
-        lvl1_cutoff:  cutoff of value at enriched regions, default 500.
-        lvl2_cutoff:  cutoff of value at linkage regions, default 100.        
-        min_length :  minimum peak length, default 200.
-        lvl1_max_gap   :  maximum gap to merge nearby enriched peaks, default 50.
-        lvl2_max_gap   :  maximum length of linkage regions, default 400.        
-        colname: can be 'sample','control','-100logp','-100logq'. Cutoff will be applied to the specified column.
+    #     lvl1_cutoff:  cutoff of value at enriched regions, default 500.
+    #     lvl2_cutoff:  cutoff of value at linkage regions, default 100.        
+    #     min_length :  minimum peak length, default 200.
+    #     lvl1_max_gap   :  maximum gap to merge nearby enriched peaks, default 50.
+    #     lvl2_max_gap   :  maximum length of linkage regions, default 400.        
+    #     colname: can be 'sample','control','-100logp','-100logq'. Cutoff will be applied to the specified column.
 
-        Return both general PeakIO object for highly enriched regions
-        and gapped broad regions in BroadPeakIO.
-        """
+    #     Return both general PeakIO object for highly enriched regions
+    #     and gapped broad regions in BroadPeakIO.
+    #     """
 
-        assert (colname in [ 'sample', 'control', '-100logp', '-100logq', '100logLR' ]), "%s not supported!" % colname
+    #     assert (colname in [ 'sample', 'control', '-100logp', '-100logq', '100logLR' ]), "%s not supported!" % colname
 
-        chrs  = self.get_chr_names()
-        bpeaks = BroadPeakIO()                      # dictionary to save broad peaks
+    #     chrs  = self.get_chr_names()
+    #     bpeaks = BroadPeakIO()                      # dictionary to save broad peaks
 
-        lvl2_cutoff = int(lvl2_cutoff)  # for broad regions
+    #     lvl2_cutoff = int(lvl2_cutoff)  # for broad regions
         
-        for chrom in chrs:
-            chrom_pointer = self.pointer[chrom]
-            lvl2_peak_content = []           # to store points above cutoff
+    #     for chrom in chrs:
+    #         chrom_pointer = self.pointer[chrom]
+    #         lvl2_peak_content = []           # to store points above cutoff
 
-            above_cutoff = np.nonzero( self.data[chrom][colname] >= lvl2_cutoff )[0] # indices where score is above cutoff
-            above_cutoff_v = self.data[chrom][colname][above_cutoff] # scores where score is above cutoff
+    #         above_cutoff = np.nonzero( self.data[chrom][colname] >= lvl2_cutoff )[0] # indices where score is above cutoff
+    #         above_cutoff_v = self.data[chrom][colname][above_cutoff] # scores where score is above cutoff
 
-            above_cutoff_endpos = self.data[chrom]['pos'][above_cutoff] # end positions of regions where score is above cutoff
-            above_cutoff_startpos = self.data[chrom]['pos'][above_cutoff-1] # start positions of regions where score is above cutoff
-            above_cutoff_sv= self.data[chrom]['sample'][above_cutoff] # sample pileup height where score is above cutoff
+    #         above_cutoff_endpos = self.data[chrom]['pos'][above_cutoff] # end positions of regions where score is above cutoff
+    #         above_cutoff_startpos = self.data[chrom]['pos'][above_cutoff-1] # start positions of regions where score is above cutoff
+    #         above_cutoff_sv= self.data[chrom]['sample'][above_cutoff] # sample pileup height where score is above cutoff
 
-            if above_cutoff_v.size == 0:
-                continue
+    #         if above_cutoff_v.size == 0:
+    #             continue
 
-            if above_cutoff[0] == 0:
-                # first element > cutoff, fix the first point as 0. otherwise it would be the last item in data[chrom]['pos']
-                above_cutoff_startpos[0] = 0
+    #         if above_cutoff[0] == 0:
+    #             # first element > cutoff, fix the first point as 0. otherwise it would be the last item in data[chrom]['pos']
+    #             above_cutoff_startpos[0] = 0
 
-            # first bit of region above cutoff
-            lvl2_peak_content.append( (above_cutoff_startpos[0], above_cutoff_endpos[0], above_cutoff_v[0], above_cutoff_sv[0], above_cutoff[0]) )
-            for i in xrange(1,above_cutoff_startpos.size):
-                if above_cutoff_startpos[i] - peak_content[-1][1] <= lvl2_max_gap:
-                    # append
-                    lvl2_peak_content.append( (above_cutoff_startpos[i], above_cutoff_endpos[i], above_cutoff_v[i], above_cutoff_sv[i], above_cutoff[i]) )
-                else:
-                    # close
-                    self.__close_broad_peak(lvl2_peak_content, bpeaks, lvl1_max_gap, lvl1_cutoff, colname, min_length, chrom )
-                    lvl2_peak_content = [(above_cutoff_startpos[i], above_cutoff_endpos[i], above_cutoff_v[i], above_cutoff_sv[i], above_cutoff[i]),]
+    #         # first bit of region above cutoff
+    #         lvl2_peak_content.append( (above_cutoff_startpos[0], above_cutoff_endpos[0], above_cutoff_v[0], above_cutoff_sv[0], above_cutoff[0]) )
+    #         for i in xrange(1,above_cutoff_startpos.size):
+    #             if above_cutoff_startpos[i] - peak_content[-1][1] <= lvl2_max_gap:
+    #                 # append
+    #                 lvl2_peak_content.append( (above_cutoff_startpos[i], above_cutoff_endpos[i], above_cutoff_v[i], above_cutoff_sv[i], above_cutoff[i]) )
+    #             else:
+    #                 # close
+    #                 self.__close_broad_peak(lvl2_peak_content, bpeaks, lvl1_max_gap, lvl1_cutoff, colname, min_length, chrom )
+    #                 lvl2_peak_content = [(above_cutoff_startpos[i], above_cutoff_endpos[i], above_cutoff_v[i], above_cutoff_sv[i], above_cutoff[i]),]
             
-            # save the last peak
-            if not peak_content:
-                continue
-            else:
-                self.__close_broad_peak(lvl2_peak_content, bpeaks, lvl1_max_gap, lvl1_cutoff, colname, min_length, chrom )                
-        return bpeaks
+    #         # save the last peak
+    #         if not peak_content:
+    #             continue
+    #         else:
+    #             self.__close_broad_peak(lvl2_peak_content, bpeaks, lvl1_max_gap, lvl1_cutoff, colname, min_length, chrom )                
+    #     return bpeaks
 
-    def __close_broad_peak( self, lvl2_peak_content, bpeaks, lvl1_max_gap, lvl1_cutoff, colname, min_length, chrom ):
-        """ Finalize broad peak. Use 
+    # def __close_broad_peak( self, lvl2_peak_content, bpeaks, lvl1_max_gap, lvl1_cutoff, colname, min_length, chrom ):
+    #     """ Finalize broad peak. Use 
 
-        """
-        pass
+    #     """
+    #     pass
 
 
-    def __add_broadpeak (self, bpeaks, chrom, lvl2peak, lvl1peakset):
+    def __add_broadpeak (self, bpeaks, str chrom, lvl2peak, lvl1peakset):
         """Internal function to create broad peak.
         
         """
+        cdef int blockNum, thickStart, thickEnd, start, end
+        cdef str blockSizes, blockStarts
+        
         start      = lvl2peak["start"]
         end        = lvl2peak["end"]
         thickStart = lvl1peakset[0]["start"]
         thickEnd   = lvl1peakset[-1]["end"]
-        blockNum   = len(lvl1peakset)
+        blockNum   = int(len(lvl1peakset))
         blockSizes = ",".join( map(lambda x:str(x["length"]),lvl1peakset) )
         blockStarts = ",".join( map(lambda x:str(x["start"]-start),lvl1peakset) )
         if lvl2peak["start"] != thickStart:
@@ -625,6 +672,9 @@ class scoreTrackI:
         """Return the number of regions in this object.
 
         """
+        cdef long t
+        cdef str chrom
+        
         t = 0
         for chrom in self.data.keys():
             t += self.pointer[chrom]
@@ -632,7 +682,8 @@ class scoreTrackI:
 
 
 class CombinedTwoTrack:
-    """
+    """ For differential peak calling.
+    
     """
     def __init__ (self):
         """Different with bedGraphTrackI, missing values are simply
@@ -642,7 +693,7 @@ class CombinedTwoTrack:
         self.data = {}
         self.pointer = {}
 
-    def add_chromosome ( self, chrom, chrom_max_len ):
+    def add_chromosome ( self, str chrom, int chrom_max_len ):
         if not self.data.has_key(chrom):
             self.data[chrom] = np.zeros(chrom_max_len,dtype=[('pos','int32'),
                                                              ('V1','float32'), # value for the first track
@@ -650,24 +701,27 @@ class CombinedTwoTrack:
                                                              ])
             self.pointer[chrom] = 0
 
-    def add (self,chromosome,endpos,V1,V2):
+    def add ( self, str chromosome, int endpos, double V1, double V2 ):
         """Add a chr-endpos-sample-control block into data
         dictionary. At the mean time, calculate pvalues.
 
         """
+        cdef list c
+        cdef int i
         c = self.data[chromosome]
         i = self.pointer[chromosome]
         # get the preceding region
         c[i] = (endpos,V1,V2)
         self.pointer[chromosome] += 1
 
-    def finalize (self):
+    def finalize ( self ):
+        cdef str chrom
         for chrom in self.data.keys():
             d = self.data[chrom]
             l = self.pointer[chrom]
             d.resize(l,refcheck=False)
 
-    def get_data_by_chr (self, chromosome):
+    def get_data_by_chr (self, str chromosome):
         """Return array of counts by chromosome.
 
         The return value is a tuple:
@@ -682,10 +736,11 @@ class CombinedTwoTrack:
         """Return all the chromosome names stored.
         
         """
+        cdef set l
         l = set(self.data.keys())
         return l
 
-    def write_bedGraph (self, fhd, name, description, colname):
+    def write_bedGraph (self, fhd, str name, str description, str colname):
         """Write all data to fhd in Wiggle Format.
 
         fhd: a filehandler to save bedGraph.
@@ -694,6 +749,10 @@ class CombinedTwoTrack:
         colname: can be 'sample','control','-100logp','-100logq'
 
         """
+        cdef str chrom
+        cdef set chrs
+        cdef int pre, i, l
+        
         if colname not in ['V1','V2']:
             raise Exception("%s not supported!" % colname)
         chrs = self.get_chr_names()
@@ -703,7 +762,7 @@ class CombinedTwoTrack:
             pre = 0
             pos   = d['pos']
             value = d[colname]
-            for i in xrange( l ):
+            for i in range( l ):
                 fhd.write("%s\t%d\t%d\t%.2f\n" % (chrom,pre,pos[i],value[i]))
                 pre = pos[i]
 
@@ -713,6 +772,8 @@ class CombinedTwoTrack:
         """Return the number of regions in this object.
 
         """
+        cdef long t
+        cdef str chrom
         t = 0
         for chrom in self.data.keys():
             t += self.pointer[chrom]
@@ -725,6 +786,11 @@ class CombinedTwoTrack:
         follow statistics.
 
         """
+        cdef set chr1, chr2, common_chr
+        cdef str chrom
+        cdef int pre_p, p1, p2
+        cdef double v11, v21, v2
+        
         #assert isinstance(bdgTrack2,bedGraphTrackI), "bdgTrack2 is not a bedGraphTrackI object"
 
         ret = [[],array(FBYTE4,[]),array(FBYTE4,[]),array(BYTE4,[])] # region,V1,V1,length
@@ -805,13 +871,16 @@ class CombinedTwoTrack:
 
 
     def extract_average (self, bdgTrack2):
+        cdef int i, l
+        cdef str chrom, start, end
+        
         (rarray,v1array,v2array,larray)  = self.extract_value(bdgTrack2)
         ret = [[],array(FBYTE4,[]),array(FBYTE4,[])] # region,V1,V1
         radd = ret[0].append
         v1add = ret[1].append
         v2add = ret[2].append
         cur_region = [None,None,None,None,None]      # chrom, start, end, s1, s2
-        for i in xrange(len(rarray)):
+        for i in range(len(rarray)):
             (chrom,start,end) = rarray[i].split('.')
             if chrom == cur_region[0] and start == cur_region[2]:
                 cur_region[2] =  end

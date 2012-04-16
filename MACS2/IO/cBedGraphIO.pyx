@@ -1,4 +1,4 @@
-# Time-stamp: <2012-01-23 15:19:24 Tao Liu>
+# Time-stamp: <2012-04-10 22:07:57 Tao Liu>
 
 """Module Description:  IO Module for bedGraph file
 
@@ -17,6 +17,8 @@ the distribution).
 # ------------------------------------
 # python modules
 # ------------------------------------
+import io
+
 from MACS2.IO.cBedGraph import bedGraphTrackI,bedRegionTrackI
 
 # ------------------------------------
@@ -44,18 +46,18 @@ class bedGraphIO:
 
     If any of the above two criteria is violated, parsering will fail.
     """
-    def __init__ (self,f):
+    def __init__ ( self, f ):
         """f must be a filename or a file handler.
         
         """
         if type(f) == str:
-            self.fhd = open(f,"r")
+            self.fhd = io.open(f,"rb")
         elif type(f) == file:
             self.fhd = f
         else:
             raise Exception("f must be a filename or a file handler.")
 
-    def build_bdgtrack (self, baseline_value=0):
+    def build_bdgtrack (self, double baseline_value=0):
         """Use this function to return a bedGraphTrackI object.
 
         baseline_value is the value to fill in the regions not defined
@@ -67,6 +69,8 @@ class bedGraphIO:
         Then the region chr1:200..250 should be filled with
         baseline_value. Default of baseline_value is 0.
         """
+        cdef str i, chrom, startpos, endpos, value
+        
         data = bedGraphTrackI(baseline_value=baseline_value)
         add_func = data.add_loc
         chrom_itemcount = {}
@@ -142,6 +146,8 @@ class genericBedIO:
         Then the region chr1:200..250 should be filled with
         baseline_value. Default of baseline_value is 0.
         """
+        cdef str i
+        
         data = bedRegionTrackI() #(baseline_value=baseline_value)
         add_func = data.safe_add_loc
         chrom_itemcount = {}

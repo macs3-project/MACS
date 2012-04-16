@@ -4,7 +4,6 @@ dist/*
 *.pyc
 .pydevproject
 .project
-*.c
 *~
-test/*
-/build
+test/*.wig
+test/*.bed

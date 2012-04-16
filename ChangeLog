@@ -1,5 +1,13 @@
-2012-03-05  Tao Liu  <taoliu@jimmy.harvard.edu>
+2012-03-12  Tao Liu  <taoliu@jimmy.harvard.edu>
 	MACS version 2.0.10 (tag:alpha still working)
+
+	* Parser optimization
+
+	cParser.pyx is rewritten to use io.BufferedReader to speed
+	up. Speed is doubled.
+
+	Code is reorganized -- most of functions are inherited from
+	GenericParser class.
 
 	* Use cross-correlation to calculate fragment size
 
@@ -47,10 +55,16 @@
 	is higher than condition 2, score would be positive, otherwise,
 	negative.
 
-	* SAMParser and BAMParser 
+	* SAMParser and BAMParser
 
 	Bug fixed for paired-end sequencing data. Thanks to Benjamin
 	Schiller!
+
+	* BedGraph.pyx
+
+	Fixed a bug while calling peaks from BedGraph file. It previously
+	mistakenly output same peaks multiple times at the end of
+	chromosome.
 
 2011-11-2  Tao Liu  <taoliu@jimmy.harvard.edu>
 	MACS version 2.0.9 (tag:alpha)

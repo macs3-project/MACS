@@ -1,4 +1,5 @@
-# Time-stamp: <2012-03-07 01:32:39 Tao Liu>
+# cython: profile=True
+# Time-stamp: <2012-04-12 10:22:19 Tao Liu>
 
 """Module for Feature IO classes.
 
@@ -65,7 +66,7 @@ class bedGraphTrackI:
     this class is 0-indexed and right-open.
     
     """
-    def __init__ (self, baseline_value=0):
+    def __init__ (self, double baseline_value=0):
         """
         baseline_value is the value to fill in the regions not defined
         in bedGraph. For example, if the bedGraph is like:
@@ -81,7 +82,13 @@ class bedGraphTrackI:
         self.minvalue = 10000
         self.baseline_value = baseline_value
 
-    def add_loc (self,chromosome,startpos,endpos,value):
+    def add_a_chromosome ( self, chrom, d ):
+        """Unsafe method. Only to be used by cPileup.pyx.
+        """
+        self.__data[chrom] = d
+
+    # chromosomes are too long for ints
+    def add_loc ( self, str chromosome, long startpos, long endpos, double value ):
         """Add a chr-start-end-value block into __data dictionary.
 
         Difference between safe_add_loc: no check, but faster. Save
@@ -89,9 +96,9 @@ class bedGraphTrackI:
         are continuous without gaps.
 
         """
+        cdef float pre_v
+        cdef float pre_v
         # basic assumption, end pos should > start pos
-        #assert endpos > startpos, "endpos %d can't be smaller than start pos %d" % (endpos,startpos)
-
         if endpos <= 0:
             return
         if startpos < 0:
@@ -110,12 +117,7 @@ class bedGraphTrackI:
         else:
             c = self.__data[chromosome]            
             # get the preceding region
-            #pre_pos = c[0][-1]
-            pre_v   = c[1][-1]
-            # to check 1. continuity; 2. non-overlapping
-            #assert pre_pos < endpos , "bedGraph regions are not continuous."
-            #assert pre_pos <= startpos , "bedGraph regions have overlappings."
-            
+            pre_v   = c[1][-1]            
             # if this region is next to the previous one.
             if pre_v == value:
                 # if value is the same, simply extend it.
@@ -124,13 +126,9 @@ class bedGraphTrackI:
                 # otherwise, add a new region
                 c[0].append(endpos)
                 c[1].append(value)
-
-        #if value > self.maxvalue:
-        #    self.maxvalue = value
-        #if value < self.minvalue:
-        #    self.minvalue = value
-
-    def safe_add_loc (self,chromosome,startpos,endpos,value):
+    
+    # chroms are too long for ints
+    def safe_add_loc ( self, str chromosome, int startpos, int endpos, double value):
         """Add a chr-start-end-value block into __data dictionary.
 
         """
@@ -183,7 +181,7 @@ class bedGraphTrackI:
         if value < self.minvalue:
             self.minvalue = value
 
-    def get_data_by_chr (self, chromosome):
+    def get_data_by_chr (self, str chromosome):
         """Return array of counts by chromosome.
 
         The return value is a tuple:
@@ -201,7 +199,8 @@ class bedGraphTrackI:
         l = set(self.__data.keys())
         return l
 
-    def write_bedGraph (self, fhd, name, description, trackline=True):
+    # need default for trackline, this method is already fast
+    def write_bedGraph (self, fhd, str name, str description, trackline=True):
         """Write all data to fhd in Wiggle Format.
 
         fhd: a filehandler to save bedGraph.
@@ -209,6 +208,10 @@ class bedGraphTrackI:
 
         shift will be used to shift the coordinates. default: 0
         """
+        cdef int pre, pos, i
+        cdef double value
+        cdef str chrom
+        
         if trackline:
             fhd.write("track type=bedGraph name=\"%s\" description=\"%s\" visibility=2 alwaysZero=on\n" % (name,description))
         chrs = self.get_chr_names()
@@ -226,7 +229,7 @@ class bedGraphTrackI:
                 fhd.write("%s\t%d\t%d\t%.2f\n" % (chrom,pre,pos,value))
                 pre = pos
 
-    def reset_baseline (self, baseline_value):
+    def reset_baseline (self, double baseline_value):
         """Reset baseline value to baseline_value.
 
         So any region between self.baseline_value and baseline_value
@@ -241,6 +244,10 @@ class bedGraphTrackI:
         """Merge nearby regions with the same value.
         
         """
+        cdef int new_pre_pos, pos, i
+        cdef double new_pre_value, value
+        cdef str chrom
+        
         chrs = set(self.__data.keys())
         for chrom in chrs:
             (p,v) = self.__data[chrom]
@@ -271,12 +278,16 @@ class bedGraphTrackI:
             self.__data[chrom] = [new_pos,new_value]
         return True
                 
-    def filter_score (self, cutoff=0):
+    def filter_score (self, double cutoff=0):
         """Filter using a score cutoff. Any region lower than score
         cutoff will be set to self.baseline_value.
 
         Self will be modified.
         """
+        cdef int new_pre_pos, pos, i
+        cdef double new_pre_value, value
+        cdef str chrom
+        
         chrs = set(self.__data.keys())
         for chrom in chrs:
             (p,v) = self.__data[chrom]
@@ -287,7 +298,7 @@ class bedGraphTrackI:
             new_pos = array(BYTE4,[])
             new_value = array(FBYTE4,[])
             new_pre_pos = 0
-            new_pre_value = None
+            new_pre_value = 0
 
             for i in xrange(len(p)):
                 pos = pnext()
@@ -315,6 +326,11 @@ class bedGraphTrackI:
         """Calculate the sum, max, min, mean, and std. Return a tuple for (sum, max, min, mean, std).
         
         """
+        cdef long n_v
+        cdef double sum_v, max_v, min_v, mean_v, variance, tmp, std_v
+        cdef int pre_p, l, i
+
+        pre_p = 0
         n_v = 0
         sum_v = 0
         max_v = -100000
@@ -330,7 +346,7 @@ class bedGraphTrackI:
                 pre_p = p[i]
             max_v = max(max(v),max_v)
             min_v = min(min(v),min_v)
-        mean_v = float(sum_v)/n_v
+        mean_v = sum_v/n_v
         variance = 0.0
         for (p,v) in self.__data.values():
             for i in range(len(p)):
@@ -344,7 +360,7 @@ class bedGraphTrackI:
         std_v = sqrt(variance)
         return (sum_v, n_v, max_v, min_v, mean_v, std_v)
 
-    def call_peaks (self, cutoff=1, up_limit=1e310, min_length=200, max_gap=50,
+        def call_peaks (self, double cutoff=1, double up_limit=1e310, int min_length=200, int max_gap=50
                     call_summits=False):
         """This function try to find regions within which, scores
         are continuously higher than a given cutoff.
@@ -361,6 +377,10 @@ class bedGraphTrackI:
         min_length :  minimum peak length, default 200.
         gap   :  maximum gap to merge nearby peaks, default 50.
         """
+        cdef int peak_length, x, pre_p, p, i, summit, tstart, tend
+        cdef double v, summit_value, tvalue
+        cdef str chrom
+        
         if call_summits: close_peak = self.__close_peak2
         else: close_peak = self.__close_peak
         chrs = self.get_chr_names()
@@ -534,7 +554,8 @@ class bedGraphTrackI:
             # start a new peak
             return True
 
-    def call_broadpeaks (self, lvl1_cutoff=500, lvl2_cutoff=100, min_length=200, lvl1_max_gap=50, lvl2_max_gap=400):
+    def call_broadpeaks (self, double lvl1_cutoff=500, double lvl2_cutoff=100, int min_length=200,
+                         int lvl1_max_gap=50, int lvl2_max_gap=400):
         """This function try to find enriched regions within which,
         scores are continuously higher than a given cutoff for level
         1, and link them using the gap above level 2 cutoff with a
@@ -550,6 +571,8 @@ class bedGraphTrackI:
         Return both general PeakIO object for highly enriched regions
         and gapped broad regions in BroadPeakIO.
         """
+        cdef str chrom
+        
         assert lvl1_cutoff > lvl2_cutoff, "level 1 cutoff should be larger than level 2."
         assert lvl1_max_gap < lvl2_max_gap, "level 2 maximum gap should be larger than level 1."        
         lvl1_peaks = self.call_peaks(cutoff=lvl1_cutoff, min_length=min_length, max_gap=lvl1_max_gap)
@@ -590,6 +613,9 @@ class bedGraphTrackI:
         """Internal function to create broad peak.
         
         """
+        cdef long start, end, thickStart, thickEnd, blockNum
+        cdef str blockSizes, blockStarts
+        
         start      = lvl2peak["start"]
         end        = lvl2peak["end"]
         thickStart = lvl1peakset[0]["start"]
@@ -617,16 +643,20 @@ class bedGraphTrackI:
         """Return the number of regions in this object.
 
         """
+        cdef long t
         t = 0
         for (p,s) in self.__data.values():
             t += len(p)
         return t
 
-    def set_single_value (self, new_value):
+    def set_single_value (self, double new_value):
         """Change all the values in bedGraph to the same new_value,
         return a new bedGraphTrackI.
         
         """
+        cdef str chrom
+        cdef int max_p
+        
         ret = bedGraphTrackI()
         chroms = set(self.get_chr_names())
         for chrom in chroms:
@@ -668,6 +698,10 @@ class bedGraphTrackI:
 
         Return value is a bedGraphTrackI object.
         """
+        cdef int pre_p, p1, p2
+        cdef double v1, v2
+        cdef str chrom
+        
         assert isinstance(bdgTrack2,bedGraphTrackI), "bdgTrack2 is not a bedGraphTrackI object"
 
         ret = bedGraphTrackI()
@@ -676,6 +710,7 @@ class bedGraphTrackI:
         chr1 = set(self.get_chr_names())
         chr2 = set(bdgTrack2.get_chr_names())
         common_chr = chr1.intersection(chr2)
+
         for chrom in common_chr:
             (p1s,v1s) = self.get_data_by_chr(chrom) # arrays for position and values
             p1n = iter(p1s).next         # assign the next function to a viable to speed up
@@ -721,9 +756,7 @@ class bedGraphTrackI:
             except StopIteration:
                 # meet the end of either bedGraphTrackI, simply exit
                 pass
-        
         return ret
-
 
     def apply_func ( self, func ):
         """Apply function 'func' to every value in this bedGraphTrackI object.
@@ -731,7 +764,8 @@ class bedGraphTrackI:
         *Two adjacent regions with same value after applying func will
         not be merged.
         """
-        t = 0
+        cdef int i
+        
         for (p,s) in self.__data.values():
             for i in xrange(len(s)):
                 s[i] = func(s[i])
@@ -746,6 +780,10 @@ class bedGraphTrackI:
         follow statistics.
 
         """
+        cdef int pre_p, p1, p2
+        cdef double v1, v2
+        cdef str chrom
+        
         assert isinstance(bdgTrack2,bedGraphTrackI), "bdgTrack2 is not a bedGraphTrackI object"
 
         ret = [[],array(FBYTE4,[]),array(BYTE4,[])] # 1: region in
@@ -814,11 +852,6 @@ class bedGraphTrackI:
                 # meet the end of either bedGraphTrackI, simply exit
                 pass
 
-        # convert to np.array
-        #print ret[0]
-        #print ret[1]
-        #ret = np.array([ret[0],ret[1]]).transpose()
-        #ret = ret[ret[:,0].argsort()]
         return ret
 
     def make_scoreTrack_for_macs (self, bdgTrack2 ):
@@ -826,6 +859,10 @@ class bedGraphTrackI:
 
         Return value is a bedGraphTrackI object.
         """
+        cdef int pre_p, p1, p2
+        cdef double v1, v2
+        cdef str chrom
+        
         assert isinstance(bdgTrack2,bedGraphTrackI), "bdgTrack2 is not a bedGraphTrackI object"
 
         ret = scoreTrackI()
@@ -894,6 +931,10 @@ class bedGraphTrackI:
 
         Return value is a bedGraphTrackI object.
         """
+        cdef int pre_p, p1, p2
+        cdef double v1, v2
+        cdef str chrom
+        
         assert isinstance(bdgTrack2,bedGraphTrackI), "bdgTrack2 is not a bedGraphTrackI object"
 
         ret = CombinedTwoTrack()
@@ -1355,12 +1396,15 @@ class bedGraphTrackI:
 #         return ret
 
 
-def scoreTracktoBedGraph (scoretrack, colname):
+def scoreTracktoBedGraph (scoretrack, str colname):
     """Produce a bedGraphTrackI object with certain column as scores.
     
     colname: can be 'sample','control','-100logp','-100logq'
     
     """
+    cdef int pre, i
+    cdef str chrom
+    
     bdgtrack = bedGraphTrackI( baseline_value = 0 )
     if colname not in ['sample','control','-100logp','-100logq']:
         raise Exception("%s not supported!" % colname)
@@ -1385,16 +1429,23 @@ def scoreTracktoBedGraph (scoretrack, colname):
     return bdgtrack
 
 class bedRegionTrackI (bedGraphTrackI):
+    """A similar class to bedGraphTrackI, but is designed to save
+    traditional 3-fields BED format data.
+
+    """
     def __init__ (self):
         self.__data = {}
         self.maxvalue = 1
         self.minvalue = 0
         self.baseline_value = 0
 
-    def safe_add_loc (self,chromosome,startpos,endpos):
+    def safe_add_loc (self, str chromosome, int startpos, int endpos):
         """Add a chr-start-end-value block into __data dictionary.
 
         """
+        cdef int pre_pos
+        cdef double pre_v
+        
         # basic assumption, end pos should > start pos
         assert endpos > startpos, "endpos %d can't be smaller than start pos %d" % (endpos,startpos)
 
