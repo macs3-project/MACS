@@ -1,4 +1,5 @@
-# Time-stamp: <2012-03-05 15:40:00 Tao Liu>
+# cython: profile=True
+# Time-stamp: <2012-04-18 11:47:16 Tao Liu>
 
 """Module Description
 
@@ -107,7 +108,7 @@ class PeakModel:
 
         self.info("#2 number of paired peaks: %d" % (num_paired_peakpos))
         if num_paired_peakpos < 100:
-            self.error("Too few paired peaks (%d) so I can not build the model! Broader your MFOLD range parameter may erase this error. If it still can't build the model, please use --nomodel and --shiftsize 100 instead." % (num_paired_peakpos))
+            self.error("Too few paired peaks (%d) so I can not build the model! Broader your MFOLD range parameter may erase this error. If it still can't build the model, we suggest to use --nomodel and --shiftsize 73 or other fixed number instead." % (num_paired_peakpos))
             self.error("Process for pairing-model is terminated!")
             raise NotEnoughPairsException("No enough pairs to build model")
         elif num_paired_peakpos < self.max_pairnum:

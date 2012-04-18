@@ -1,4 +1,5 @@
-# Time-stamp: <2012-03-13 16:50:32 Tao Liu>
+# cython: profile=True
+# Time-stamp: <2012-04-13 17:09:07 Tao Liu>
 
 """Module for PeakIO IO classes.
 

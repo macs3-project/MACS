@@ -1,5 +1,5 @@
 # cython: profile=True
-# Time-stamp: <2012-04-12 12:35:41 Tao Liu>
+# Time-stamp: <2012-04-13 17:41:47 Tao Liu>
 
 """Module for Feature IO classes.
 
@@ -19,7 +19,8 @@ with the distribution).
 # python modules
 # ------------------------------------
 import numpy as np
-from numpy import int64,int32,float32
+cimport numpy as np
+from np import int64,int32,float32
 
 from libc.math cimport log10,log
 
@@ -45,6 +46,9 @@ __doc__ = "scoreTrackI classes"
 # ------------------------------------
 # Misc functions
 # ------------------------------------
+cdef inline int int_max(int a, int b): return a if a >= b else b
+cdef inline int int_min(int a, int b): return a if a <= b else b
+
 
 pscore_dict = {}
 LOG10_E = 0.43429448190325176
@@ -143,7 +147,13 @@ class scoreTrackI:
         i = self.pointer[chromosome]
         # get the preceding region
         #c[i] = (endpos,sample,control,int(-100*poisson_cdf(sample,control,False,True)),0)
-        c[i] = (endpos,sample,control,get_pscore(sample,control),0,logLR(sample,control))
+        a = c[i]
+        a['pos'] = endpos
+        a['sample'] = sample
+        a['control'] = control
+        a['-100logp'] = get_pscore(sample,control)
+        a['100logLR'] = logLR(sample,control)
+        #c[i] = (endpos,sample,control,get_pscore(sample,control),0,logLR(sample,control))
         self.pointer[chromosome] += 1
 
     def finalize (self):
