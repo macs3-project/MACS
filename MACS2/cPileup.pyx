@@ -1,5 +1,5 @@
 # cython: profile=True
-# Time-stamp: <2012-04-19 17:49:46 Tao Liu>
+# Time-stamp: <2012-04-19 18:11:17 Tao Liu>
 
 """Module Description: For pileup functions.
 
@@ -31,7 +31,9 @@ from cpython cimport bool
 # ------------------------------------
 # 
 
-cdef inline int long_max(long a, long b): return a if a >= b else b
+cdef inline int int_max(int a, int b): return a if a >= b else b
+cdef inline long long_max(long a, long b): return a if a >= b else b
+cdef inline float float_max(float a, float b): return a if a >= b else b
 
 
 def pileup_bdg (trackI, int d, int baseline_value = 0, bool directional = True, bool halfextension = True, float scale_factor = 1):
@@ -169,7 +171,7 @@ cdef start_and_end_poss ( plus_tags, minus_tags, long five_shift, long three_shi
     for i in xrange(len(plus_tags)):
         # shift to get start positions. To 5' side.
         # since start positions may be smaller than 0, take the max with 0
-        start_poss.append(long_max(plus_tags[i]-five_shift,0)) 
+        start_poss.append(int_max(plus_tags[i]-five_shift,0)) 
         # shift to get end positions by extending to d. To 3' side.
         end_poss.append(plus_tags[i]+three_shift)
 
@@ -177,7 +179,7 @@ cdef start_and_end_poss ( plus_tags, minus_tags, long five_shift, long three_shi
     for i in xrange(len(minus_tags)):
         # shift to get start positions by extending to d. To 3' side.
         # since start positions may be smaller than 0, take the max with 0        
-        start_poss.append(long_max(minus_tags[i]-three_shift,0))
+        start_poss.append(int_max(minus_tags[i]-three_shift,0))
         # shift to get end positions. To 5' side.
         end_poss.append(minus_tags[i]+five_shift)
             
@@ -274,7 +276,7 @@ cdef max_over_two_pv_array ( tmparray1, tmparray2 ):
             if p1 < p2:
                 # clip a region from pre_p to p1, then set pre_p as p1.
                 tmppadd( p1 )
-                tmpvadd( max(v1,v2) )
+                tmpvadd( float_max(v1,v2) )
                 pre_p = p1
                 # call for the next p1 and v1
                 p1 = p1n()
@@ -282,7 +284,7 @@ cdef max_over_two_pv_array ( tmparray1, tmparray2 ):
             elif p2 < p1:
                 # clip a region from pre_p to p2, then set pre_p as p2.
                 tmppadd( p2 )
-                tmpvadd( max(v1,v2) )
+                tmpvadd( float_max(v1,v2) )
                 pre_p = p2
                 # call for the next p2 and v2
                 p2 = p2n()
@@ -290,7 +292,7 @@ cdef max_over_two_pv_array ( tmparray1, tmparray2 ):
             elif p1 == p2:
                 # from pre_p to p1 or p2, then set pre_p as p1 or p2.
                 tmppadd( p1 )
-                tmpvadd( max(v1,v2) )
+                tmpvadd( float_max(v1,v2) )
                 pre_p = p1
                 # call for the next p1, v1, p2, v2.
                 p1 = p1n()
