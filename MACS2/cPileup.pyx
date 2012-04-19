@@ -1,5 +1,5 @@
 # cython: profile=True
-# Time-stamp: <2012-04-13 17:06:46 Tao Liu>
+# Time-stamp: <2012-04-19 17:49:46 Tao Liu>
 
 """Module Description: For pileup functions.
 
@@ -27,9 +27,12 @@ from MACS2.Constants import *
 from cpython cimport bool
 
 # ------------------------------------
-# constants
+# functions
 # ------------------------------------
-# to determine the byte size
+# 
+
+cdef inline int long_max(long a, long b): return a if a >= b else b
+
 
 def pileup_bdg (trackI, int d, int baseline_value = 0, bool directional = True, bool halfextension = True, float scale_factor = 1):
     """Pileup tags into bedGraphTrackI object with extension. Tag will
@@ -165,14 +168,16 @@ cdef start_and_end_poss ( plus_tags, minus_tags, long five_shift, long three_shi
     # for plus tags
     for i in xrange(len(plus_tags)):
         # shift to get start positions. To 5' side.
-        start_poss.append(plus_tags[i]-five_shift) 
+        # since start positions may be smaller than 0, take the max with 0
+        start_poss.append(long_max(plus_tags[i]-five_shift,0)) 
         # shift to get end positions by extending to d. To 3' side.
         end_poss.append(plus_tags[i]+three_shift)
 
     # for minus tags
     for i in xrange(len(minus_tags)):
         # shift to get start positions by extending to d. To 3' side.
-        start_poss.append(minus_tags[i]-three_shift)
+        # since start positions may be smaller than 0, take the max with 0        
+        start_poss.append(long_max(minus_tags[i]-three_shift,0))
         # shift to get end positions. To 5' side.
         end_poss.append(minus_tags[i]+five_shift)
             
@@ -237,7 +242,7 @@ cdef pileup_a_chromosome ( start_poss, end_poss, long l, float scale_factor = 1 
     if i_s < l:
         # add rest of start positions ( I don't think this will happen )
         raise Exception("start positions can't be the only things left!")
-    
+
     return tmp
 
 cdef max_over_two_pv_array ( tmparray1, tmparray2 ):

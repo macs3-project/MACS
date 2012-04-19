@@ -1,5 +1,5 @@
 # cython: profile=True
-# Time-stamp: <2012-04-13 17:41:47 Tao Liu>
+# Time-stamp: <2012-04-19 17:32:02 Tao Liu>
 
 """Module for Feature IO classes.
 
@@ -20,7 +20,7 @@ with the distribution).
 # ------------------------------------
 import numpy as np
 cimport numpy as np
-from np import int64,int32,float32
+#from np import int64,int32,float32
 
 from libc.math cimport log10,log
 
