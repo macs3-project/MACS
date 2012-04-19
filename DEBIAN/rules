@@ -29,8 +29,8 @@ install: build
 	dh_installdirs
 
 	# Add here commands to install the package into debian/comix.
-	mkdir -p $(CURDIR)/debian/macs/usr
-	python2.6 setup.py install --prefix $(CURDIR)/debian/macs/usr
+	mkdir -p $(CURDIR)/debian/macs2/usr
+	python2.7 setup.py install --prefix $(CURDIR)/debian/macs2/usr
 
 
 # Build architecture-independent files here.
