@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# Time-stamp: <2012-04-11 17:37:38 Tao Liu>
+# Time-stamp: <2012-04-22 23:46:56 Tao Liu>
 
 """Module Description: Test functions for pileup functions.
 
@@ -33,6 +33,7 @@ class Test_pileup(unittest.TestCase):
 
     """
     def setUp(self):
+        self.maxDiff = None
         self.chrom = "chr1"
         self.plus_pos = ( 0, 1, 3, 4, 5 )
         self.minus_pos = ( 5, 6, 8, 9, 10 )
@@ -46,6 +47,13 @@ class Test_pileup(unittest.TestCase):
                         ( 8, 9, 2.0 ),                            
                         ( 9, 10, 1.0 )
                         ]
+        self.expect2 = [(0, 1, 12.0),
+                        (1, 3, 14.0),
+                        (3, 4, 16.0),
+                        (4, 6, 18.0),
+                        (6, 8, 16.0),
+                        (8, 9, 14.0),
+                        (9, 10, 12.0)]
 
         self.d_s = [ 5, 10, 100 ]
         self.scale_factor_s = [ 0.5, 1, 2 ]
@@ -97,7 +105,7 @@ class Test_pileup(unittest.TestCase):
                 self.result.append( (pre,pos,value) )
                 pre = pos
         # check result
-        self.assertEqual(self.result, self.expect)
+        self.assertEqual(self.result, self.expect2)
         
 
 if __name__ == '__main__':
