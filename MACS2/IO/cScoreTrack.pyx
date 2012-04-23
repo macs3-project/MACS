@@ -1,5 +1,5 @@
 # cython: profile=True
-# Time-stamp: <2012-04-19 17:32:02 Tao Liu>
+# Time-stamp: <2012-04-23 04:47:17 Tao Liu>
 
 """Module for Feature IO classes.
 
@@ -21,6 +21,8 @@ with the distribution).
 import numpy as np
 cimport numpy as np
 #from np import int64,int32,float32
+
+from array import array
 
 from libc.math cimport log10,log
 
@@ -129,12 +131,20 @@ class scoreTrackI:
 
     def add_chromosome ( self, str chrom, int chrom_max_len ):
         if not self.data.has_key(chrom):
-            self.data[chrom] = np.zeros(chrom_max_len,dtype=[('pos','int32'),
-                                                             ('sample','float32'),
-                                                             ('control','float32'),
-                                                             ('-100logp','int32'),
-                                                             ('-100logq','int32'),
-                                                             ('100logLR','int32'),])
+            self.data[chrom] = {'pos':array(BYTE4,[]),
+                                'sample':array(FBYTE4,[]),
+                                'control':array(FBYTE4,[]),                                
+                                '-100logp':array(BYTE4,[]),
+                                '-100logq':array(BYTE4,[]),
+                                '100logLR':array(BYTE4,[]),
+                                }
+            
+            #self.data[chrom] = np.zeros(chrom_max_len,dtype=[('pos','int32'),
+            #                                                 ('sample','float32'),
+            #                                                 ('control','float32'),
+            #                                                 ('-100logp','int32'),
+            #                                                 ('-100logq','int32'),
+            #                                                 ('100logLR','int32'),])
             self.pointer[chrom] = 0
 
     def add (self, str chromosome, int endpos, int sample, double control):
@@ -143,27 +153,14 @@ class scoreTrackI:
 
         """
         cdef int i
-        c = self.data[chromosome]
+        a = self.data[chromosome]
         i = self.pointer[chromosome]
         # get the preceding region
-        #c[i] = (endpos,sample,control,int(-100*poisson_cdf(sample,control,False,True)),0)
-        a = c[i]
-        a['pos'] = endpos
-        a['sample'] = sample
-        a['control'] = control
-        a['-100logp'] = get_pscore(sample,control)
-        a['100logLR'] = logLR(sample,control)
-        #c[i] = (endpos,sample,control,get_pscore(sample,control),0,logLR(sample,control))
-        self.pointer[chromosome] += 1
-
-    def finalize (self):
-        cdef str chrom
-        cdef int l
-
-        for chrom in self.data.keys():
-            d = self.data[chrom]
-            l = self.pointer[chrom]
-            d.resize(l,refcheck=False)
+        a['pos'].append(endpos)
+        a['sample'].append(sample)
+        a['control'].append(control)
+        a['-100logp'].append(get_pscore(sample,control))
+        a['100logLR'].append(logLR(sample,control))
 
     def get_data_by_chr (self, str chromosome):
         """Return array of counts by chromosome.
@@ -607,7 +604,7 @@ class CombinedTwoTrack:
         dictionary. At the mean time, calculate pvalues.
 
         """
-        cdef list c
+        cdef np.ndarray c
         cdef int i
         c = self.data[chromosome]
         i = self.pointer[chromosome]

@@ -1,4 +1,4 @@
-# Time-stamp: <2012-04-23 01:41:54 Tao Liu>
+# Time-stamp: <2012-04-23 04:53:32 Tao Liu>
 
 """Module Description: Fast/smaller array using C code
 
@@ -39,6 +39,9 @@ cdef extern from "stdlib.h":
 
 cdef int compare_int(const_void *a, const_void *b):
     return (<int *>a)[0] - (<int *>b)[0]
+
+cdef int compare_float(const_void *a, const_void *b):
+    return 1 if (<float *>a)[0] > (<float *>b)[0] else 0
 
 # ------------------------------------
 # Classes
@@ -126,7 +129,7 @@ cdef class FloatArray:
         return self.d[i]
 
     cpdef sort (self):
-        qsort(self.d, self.m, sizeof(float) , compare_int)
+        qsort(self.d, self.m, sizeof(float) , compare_float)
 
     cpdef resize (self, long new_size):
         self.m = new_size
