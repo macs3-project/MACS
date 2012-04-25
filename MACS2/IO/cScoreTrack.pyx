@@ -1,5 +1,5 @@
 # cython: profile=True
-# Time-stamp: <2012-04-25 17:34:06 Tao Liu>
+# Time-stamp: <2012-04-25 18:28:21 Tao Liu>
 
 """Module for Feature IO classes.
 
@@ -51,6 +51,7 @@ cdef inline int int_min(int a, int b): return a if a <= b else b
 
 pscore_dict = {}
 LOG10_E = 0.43429448190325176
+pscore_khashtable = Int64HashTable()
 
 cdef get_pscore ( int observed, double expectation ):
     """Get p-value score from Poisson test. First check existing
@@ -59,16 +60,25 @@ cdef get_pscore ( int observed, double expectation ):
     
     """
     cdef int score
+    cdef long key_value
     
-    key_value = ( observed, expectation )
-    if pscore_dict.has_key(key_value):
-        return pscore_dict[key_value]
-    else:
+    #key_value = ( observed, expectation )
+    key_value = hash( (observed, expectation ) )
+    try:
+        return pscore_khashtable.get_item(key_value)
+    except KeyError:
         score = int(-100*poisson_cdf(observed,expectation,False,True))
-        pscore_dict[(observed,expectation)] = score
-    return score
+        pscore_khashtable.set_item(key_value, score)
+        return score
+    #if pscore_dict.has_key(key_value):
+    #    return pscore_dict[key_value]
+    #else:
+    #    score = int(-100*poisson_cdf(observed,expectation,False,True))
+    #    pscore_dict[(observed,expectation)] = score
+    #return score
 
 logLR_dict = {}
+logLR_khashtable = Int64HashTable()
 
 cdef logLR ( double x, double y ):
     """Calculate log10 Likelihood between H1 ( enriched ) and H0 (
@@ -77,17 +87,20 @@ cdef logLR ( double x, double y ):
     
     """
     cdef int s
-    key_value = ( x, y )
-    if logLR_dict.has_key(key_value):
-        return logLR_dict[key_value]
-    else:
+    cdef long key_value
+    
+    #key_value = ( x, y )
+    key_value = hash( (x, y ) )
+    try:
+        return logLR_khashtable.get_item( key_value )
+    except KeyError:
         if x > y:
             s = int( (x*(log(x+1)-log(y+1))+y-x)*LOG10_E*100 )
         elif x < y:
             s = int( (-1*x*(log(x+1)-log(y+1))-y+x)*LOG10_E*100 )
         else:
             s = 0
-        logLR_dict[key_value] = s
+        logLR_khashtable.set_item(key_value, s)
         return s
 
 # ------------------------------------
