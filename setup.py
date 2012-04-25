@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# Time-stamp: <2012-04-25 11:17:56 Tao Liu>
+# Time-stamp: <2012-04-25 18:47:55 Tao Liu>
 
 """Description
 
@@ -39,19 +39,19 @@ def main():
         sys.stderr.write("CRITICAL: Python version must be 2.7!\n")
         sys.exit(1)
 
-    ext_modules = [Extension("MACS2.cProb", ["MACS2/cProb.pyx"], libraries=["m"]),
-                   Extension("MACS2.IO.cParser",["MACS2/IO/cParser.pyx"]),
-                   Extension("MACS2.cPileup", ["MACS2/cPileup.pyx"], include_dirs=numpy_include_dir ),
-                   Extension("MACS2.cArray", ["MACS2/cArray.pyx"]),                       
-                   Extension("MACS2.cPeakModel", ["MACS2/cPeakModel.pyx"], include_dirs=numpy_include_dir),                   
-                   Extension("MACS2.cPeakDetect", ["MACS2/cPeakDetect.pyx"]),
-                   Extension("MACS2.IO.cPeakIO", ["MACS2/IO/cPeakIO.pyx"],),
-                   Extension("MACS2.IO.cBedGraphIO", ["MACS2/IO/cBedGraphIO.pyx"],),                   
-                   Extension("MACS2.IO.cFixWidthTrack", ["MACS2/IO/cFixWidthTrack.pyx"], include_dirs=numpy_include_dir),
-                   Extension("MACS2.IO.cBedGraph", ["MACS2/IO/cBedGraph.pyx"], libraries=["m"]),
-                   Extension("MACS2.IO.cScoreTrack", ["MACS2/IO/cScoreTrack.pyx"], include_dirs=numpy_include_dir ),
-                   Extension("MACS2.IO.cCompositeScoreTrack", ["MACS2/IO/cCompositeScoreTrack.pyx"],),
-                   Extension("MACS2.hashtable", ["MACS2/hashtable.pyx"],include_dirs=["MACS2/",numpy_get_include()]),
+    ext_modules = [Extension("MACS2.cProb", ["MACS2/cProb.c"], libraries=["m"]),
+                   Extension("MACS2.IO.cParser",["MACS2/IO/cParser.c"]),
+                   Extension("MACS2.cPileup", ["MACS2/cPileup.c"], include_dirs=numpy_include_dir ),
+                   Extension("MACS2.cArray", ["MACS2/cArray.c"]),                       
+                   Extension("MACS2.cPeakModel", ["MACS2/cPeakModel.c"], include_dirs=numpy_include_dir),                   
+                   Extension("MACS2.cPeakDetect", ["MACS2/cPeakDetect.c"]),
+                   Extension("MACS2.IO.cPeakIO", ["MACS2/IO/cPeakIO.c"],),
+                   Extension("MACS2.IO.cBedGraphIO", ["MACS2/IO/cBedGraphIO.c"],),                   
+                   Extension("MACS2.IO.cFixWidthTrack", ["MACS2/IO/cFixWidthTrack.c"], include_dirs=numpy_include_dir),
+                   Extension("MACS2.IO.cBedGraph", ["MACS2/IO/cBedGraph.c"], libraries=["m"]),
+                   Extension("MACS2.IO.cScoreTrack", ["MACS2/IO/cScoreTrack.c"], include_dirs=numpy_include_dir ),
+                   Extension("MACS2.IO.cCompositeScoreTrack", ["MACS2/IO/cCompositeScoreTrack.c"],),
+                   Extension("MACS2.hashtable", ["MACS2/hashtable.c"],include_dirs=["MACS2/",numpy_get_include()]),
                    ]
     
     setup(name="MACS",
