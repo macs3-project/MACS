@@ -1,5 +1,5 @@
 # cython: profile=True
-# Time-stamp: <2012-04-13 16:45:13 Tao Liu>
+# Time-stamp: <2012-04-24 21:06:59 Tao Liu>
 
 """Module Description
 
@@ -25,7 +25,7 @@ from MACS2.IO.cPeakIO import PeakIO
 
 from MACS2.Constants import *
 from MACS2.cPileup import pileup_bdg, pileup_w_multiple_d_bdg
-from libc.math cimport log10
+#from MACS2.cPileup_old import pileup_bdg, pileup_w_multiple_d_bdg
 
 def compare_treatment_vs_control ( treat, control, fragment_size, gsize, halfext=False, slocal=0, llocal=0, tocontrol=False, shiftcontrol=False ):
     """To compare treatment vs control tags tracks with tag extension
@@ -320,18 +320,18 @@ class PeakDetect:
         control_btrack = pileup_w_multiple_d_bdg(self.control,d_s,directional=self.shiftcontrol,halfextension=self.opt.halfext,scale_factor_s=scale_factor_s)
 
         # free mem
-        self.treat = None
-        self.control = None
-        gc.collect()                    # full collect garbage
+        #self.treat = None
+        #self.control = None
+        #gc.collect()                    # full collect garbage
         
         control_btrack.reset_baseline(lambda_bg) # set the baseline as lambda_bg
 
         # calculate pvalue scores
         self.info("#3 Build score track ...")
         score_btrack = treat_btrack.make_scoreTrack_for_macs(control_btrack)
-        treat_btrack = None             # clean them
-        control_btrack = None
-        gc.collect()                    # full collect garbage
+        #treat_btrack = None             # clean them
+        #control_btrack = None
+        #gc.collect()                    # full collect garbage
 
         self.info("#3 Calculate qvalues ...")
         pqtable = score_btrack.make_pq_table()

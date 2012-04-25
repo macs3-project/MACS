@@ -1,5 +1,5 @@
 # cython: profile=True
-# Time-stamp: <2012-04-23 04:41:38 Tao Liu>
+# Time-stamp: <2012-04-24 18:46:50 Tao Liu>
 
 """Module Description: For pileup functions.
 
@@ -24,6 +24,9 @@ from array import array
 from MACS2.IO.cBedGraph import bedGraphTrackI
 from MACS2.Constants import *
 from MACS2.cArray import IntArray
+
+import numpy as np
+cimport numpy as np
 
 from cpython cimport bool
 
@@ -89,6 +92,10 @@ def pileup_bdg (trackI, int d, int baseline_value = 0, bool directional = True, 
 
         ret.add_a_chromosome( chrom, pileup_a_chromosome ( start_poss, end_poss, l, scale_factor ) )
 
+        start_poss.resize(100000, refcheck=False)
+        start_poss.resize(0, refcheck=False)
+        end_poss.resize(100000, refcheck=False)
+        end_poss.resize(0, refcheck=False)                
         # free mem?
         #del(start_poss)
         #del(end_poss)
@@ -164,6 +171,10 @@ def pileup_w_multiple_d_bdg ( trackI, d_s, int baseline_value = 0, bool directio
             # free mem
             #del(start_poss)
             #del(end_poss)
+            start_poss.resize(100000, refcheck=False)
+            start_poss.resize(0, refcheck=False)
+            end_poss.resize(100000, refcheck=False)
+            end_poss.resize(0, refcheck=False)                            
             
             if prev_pileup:
                 prev_pileup = max_over_two_pv_array ( prev_pileup, tmp_pileup )
@@ -176,34 +187,29 @@ def pileup_w_multiple_d_bdg ( trackI, d_s, int baseline_value = 0, bool directio
 
 cdef start_and_end_poss ( plus_tags, minus_tags, long five_shift, long three_shift ):
     cdef long i
-    cdef long lp = len(plus_tags)
-    cdef long lm = len(minus_tags)
+    cdef long lp = plus_tags.shape[0]
+    cdef long lm = minus_tags.shape[0]
     cdef long l = lp + lm
 
-    start_poss = IntArray( l )
-    end_poss   = IntArray( l )
-    
-    # for plus tags
-    for i in xrange(lp):
-        # shift to get start positions. To 5' side.
-        # since start positions may be smaller than 0, take the max with 0
-        start_poss.put ( int_max(plus_tags[i]-five_shift,0) )
+    start_poss = np.concatenate( ( plus_tags-five_shift, minus_tags-three_shift ) )
+    end_poss   = np.concatenate( ( plus_tags+three_shift, minus_tags+five_shift ) )    
 
-        # shift to get end positions by extending to d. To 3' side.
-        end_poss.put( plus_tags[i]+three_shift )
-        
-    # for minus tags
-    for i in xrange(lm):
-        # shift to get start positions by extending to d. To 3' side.
-        # since start positions may be smaller than 0, take the max with 0
-        start_poss.put( int_max(minus_tags[i]-three_shift,0) )
-
-        # shift to get end positions. To 5' side.
-        end_poss.put( minus_tags[i]+five_shift )
-            
     # sort
     start_poss.sort()
     end_poss.sort()
+    
+    # fix negative coordinations
+    for i in range( start_poss.shape[0] ):
+        if start_poss[i] < 0:
+            start_poss[i] = 0
+        else:
+            break
+
+    for i in range( end_poss.shape[0] ):
+        if end_poss[i] < 0:
+            end_poss[i] = 0
+        else:
+            break        
 
     return (start_poss, end_poss)
 
@@ -221,7 +227,7 @@ cdef pileup_a_chromosome ( start_poss, end_poss, long l, float scale_factor = 1 
     i_e = 0                         # index of end_poss
 
     pileup = 0
-    pre_p = min(start_poss.get(0),end_poss.get(0))
+    pre_p = min(start_poss[0],end_poss[0])
     if pre_p != 0:
         # the first chunk of 0
         tmppadd( pre_p )
@@ -230,8 +236,8 @@ cdef pileup_a_chromosome ( start_poss, end_poss, long l, float scale_factor = 1 
     pre_v = pileup
     
     while i_s < l and i_e < l:
-        a = start_poss.get(i_s)
-        b = end_poss.get(i_e)
+        a = start_poss[i_s]
+        b = end_poss[i_e]
         if a < b:
             p = a
             if p != pre_p:
@@ -256,7 +262,7 @@ cdef pileup_a_chromosome ( start_poss, end_poss, long l, float scale_factor = 1 
     if i_e < l:
         # add rest of end positions
         for i in range(i_e, l):
-            p = end_poss.get(i)
+            p = end_poss[i]
             #for p in end_poss[i_e:]:
             if p != pre_p:
                 tmppadd( p )

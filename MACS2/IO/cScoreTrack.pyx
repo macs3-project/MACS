@@ -1,5 +1,5 @@
 # cython: profile=True
-# Time-stamp: <2012-04-23 04:47:17 Tao Liu>
+# Time-stamp: <2012-04-23 15:19:31 Tao Liu>
 
 """Module for Feature IO classes.
 
@@ -21,8 +21,6 @@ with the distribution).
 import numpy as np
 cimport numpy as np
 #from np import int64,int32,float32
-
-from array import array
 
 from libc.math cimport log10,log
 
@@ -51,10 +49,8 @@ __doc__ = "scoreTrackI classes"
 cdef inline int int_max(int a, int b): return a if a >= b else b
 cdef inline int int_min(int a, int b): return a if a <= b else b
 
-
 pscore_dict = {}
 LOG10_E = 0.43429448190325176
-
 
 cdef get_pscore ( int observed, double expectation ):
     """Get p-value score from Poisson test. First check existing
@@ -70,7 +66,7 @@ cdef get_pscore ( int observed, double expectation ):
     else:
         score = int(-100*poisson_cdf(observed,expectation,False,True))
         pscore_dict[(observed,expectation)] = score
-        return score
+    return score
 
 logLR_dict = {}
 
@@ -81,18 +77,18 @@ cdef logLR ( double x, double y ):
     
     """
     cdef int s
-    #key_value = ( x, y )
-    #if logLR_dict.has_key(key_value):
-    #    return logLR_dict[key_value]
-    #else:
-    if x > y:
-        s = int( (x*(log(x+1)-log(y+1))+y-x)*LOG10_E*100 )
-    elif x < y:
-        s = int( (-1*x*(log(x+1)-log(y+1))-y+x)*LOG10_E*100 )
+    key_value = ( x, y )
+    if logLR_dict.has_key(key_value):
+        return logLR_dict[key_value]
     else:
-        s = 0
-    #logLR_dict[key_value] = s
-    return s
+        if x > y:
+            s = int( (x*(log(x+1)-log(y+1))+y-x)*LOG10_E*100 )
+        elif x < y:
+            s = int( (-1*x*(log(x+1)-log(y+1))-y+x)*LOG10_E*100 )
+        else:
+            s = 0
+        logLR_dict[key_value] = s
+        return s
 
 # ------------------------------------
 # Classes
@@ -131,36 +127,34 @@ class scoreTrackI:
 
     def add_chromosome ( self, str chrom, int chrom_max_len ):
         if not self.data.has_key(chrom):
-            self.data[chrom] = {'pos':array(BYTE4,[]),
-                                'sample':array(FBYTE4,[]),
-                                'control':array(FBYTE4,[]),                                
-                                '-100logp':array(BYTE4,[]),
-                                '-100logq':array(BYTE4,[]),
-                                '100logLR':array(BYTE4,[]),
-                                }
-            
-            #self.data[chrom] = np.zeros(chrom_max_len,dtype=[('pos','int32'),
-            #                                                 ('sample','float32'),
-            #                                                 ('control','float32'),
-            #                                                 ('-100logp','int32'),
-            #                                                 ('-100logq','int32'),
-            #                                                 ('100logLR','int32'),])
+            self.data[chrom] = np.zeros(chrom_max_len,dtype=[('pos','int32'),
+                                                             ('sample','float32'),
+                                                             ('control','float32'),
+                                                             ('-100logp','int32'),
+                                                             ('-100logq','int32'),
+                                                             ('100logLR','int32'),])
             self.pointer[chrom] = 0
 
     def add (self, str chromosome, int endpos, int sample, double control):
         """Add a chr-endpos-sample-control block into data
-        dictionary. At the mean time, calculate pvalues.
+        dictionary. At the mean time, calculate pvalues and log
+        likelihood.
 
         """
         cdef int i
-        a = self.data[chromosome]
+        c = self.data[chromosome]
         i = self.pointer[chromosome]
-        # get the preceding region
-        a['pos'].append(endpos)
-        a['sample'].append(sample)
-        a['control'].append(control)
-        a['-100logp'].append(get_pscore(sample,control))
-        a['100logLR'].append(logLR(sample,control))
+        c[i] = (endpos,sample,control,get_pscore(sample,control),0,logLR(sample,control))
+        self.pointer[chromosome] += 1
+
+    def finalize (self):
+        cdef str chrom
+        cdef int l
+
+        for chrom in self.data.keys():
+            d = self.data[chrom]
+            l = self.pointer[chrom]
+            d.resize(l,refcheck=False)
 
     def get_data_by_chr (self, str chromosome):
         """Return array of counts by chromosome.
@@ -604,7 +598,7 @@ class CombinedTwoTrack:
         dictionary. At the mean time, calculate pvalues.
 
         """
-        cdef np.ndarray c
+        cdef list c
         cdef int i
         c = self.data[chromosome]
         i = self.pointer[chromosome]

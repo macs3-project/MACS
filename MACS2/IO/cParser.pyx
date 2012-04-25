@@ -1,5 +1,5 @@
 # cython: profile=True
-# Time-stamp: <2012-04-13 16:45:11 Tao Liu>
+# Time-stamp: <2012-04-24 18:26:04 Tao Liu>
 
 """Module for all MACS Parser classes for input.
 
@@ -24,7 +24,7 @@ from struct import unpack
 import gzip
 import io
 from MACS2.Constants import *
-from MACS2.IO.cFixWidthTrack import FWTrackII
+from MACS2.IO.cFixWidthTrack import FWTrackII, FWTrackIII
 
 cdef extern from "stdlib.h":
     ctypedef unsigned int size_t
@@ -123,7 +123,7 @@ class GenericParser:
         except IOError:
             # not a gzipped file
             self.gzipped = False
-        f.close
+        f.close()
         if self.gzipped:
             # open with gzip.open, then wrap it with BufferedReader!
             self.fhd = io.BufferedReader( gzip.open( filename, mode='rb' ) )
@@ -175,21 +175,10 @@ class GenericParser:
         cdef long i, m, fpos, strand
         cdef str chromosome
         
-        fwtrack = FWTrackII()
+        fwtrack = FWTrackIII()
         i = 0
         m = 0
         for thisline in self.fhd:
-            #thisfields = thisline.rstrip().split( '\t' )
-            #chromname = thisfields[ 0 ]
-            #if not strcmp(thisfields[ 5 ],"+"):
-            #    fwtrack.add_loc ( chromname,
-            #                      atol( thisfields[ 1 ] ),
-            #                      0 )
-            #elif not strcmp(thisfields[ 5 ], "-"):
-            #    fwtrack.add_loc ( chromname,
-            #                      atol( thisfields[ 2 ] ),
-            #                      1 )
-            #
             ( chromosome, fpos, strand ) = self.__fw_parse_line( thisline )
             i+=1
             if fpos < 0 or not chromosome:
@@ -202,6 +191,7 @@ class GenericParser:
                 i=0
             fwtrack.add_loc( chromosome, fpos, strand )
 
+        fwtrack.finalize()
         # close file stream.
         self.close()
         return fwtrack

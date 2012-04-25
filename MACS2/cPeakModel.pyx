@@ -1,5 +1,5 @@
 # cython: profile=True
-# Time-stamp: <2012-04-18 11:47:16 Tao Liu>
+# Time-stamp: <2012-04-25 16:04:23 Tao Liu>
 
 """Module Description
 
@@ -17,6 +17,9 @@ with the distribution).
 """
 import sys, time, random
 import numpy as np
+cimport numpy as np
+from array import array
+from MACS2.Constants import *
 
 def median (nums):
     """Calculate Median.
@@ -133,9 +136,13 @@ Summary of Peak Model:
 
         Modify self.(d, model_shift size and scan_window size. and extra, plus_line, minus_line and shifted_line for plotting).
         """
+        cdef int window_size
+        
         window_size = 1+2*self.peaksize
-        self.plus_line = np.zeros(window_size)#[0]*window_size
-        self.minus_line = np.zeros(window_size)#[0]*window_size
+        #self.plus_line = np.zeros(window_size, dtype="int32")#[0]*window_size
+        #self.minus_line = np.zeros(window_size, dtype="int32")#[0]*window_size
+        self.plus_line =[0]*window_size
+        self.minus_line = [0]*window_size        
         self.info("start model_add_line...")
         for chrom in paired_peakpos.keys():
             paired_peakpos_chrom = paired_peakpos[chrom]
@@ -144,16 +151,18 @@ Summary of Peak Model:
             tags_minus = tags[1]
             # every paired peak has plus line and minus line
             #  add plus_line
-            self.plus_line = self.__model_add_line (paired_peakpos_chrom, tags_plus,self.plus_line, plus_strand=1)
+            self.plus_line = self.__model_add_line (paired_peakpos_chrom, tags_plus, self.plus_line, plus_strand=1)
             #  add minus_line
-            self.minus_line = self.__model_add_line (paired_peakpos_chrom, tags_minus,self.minus_line, plus_strand=0)
+            self.minus_line = self.__model_add_line (paired_peakpos_chrom, tags_minus, self.minus_line, plus_strand=0)
 
         self.info("start X-correlation...")
         # Now I use cross-correlation to find the best d
+        plus_line = np.asarray(self.plus_line,dtype="int32")
+        minus_line = np.asarray(self.minus_line,dtype="int32")        
         
         # normalize first
-        minus_data = (self.minus_line - self.minus_line.mean())/(self.minus_line.std()*len(self.minus_line))
-        plus_data = (self.plus_line - self.plus_line.mean())/(self.plus_line.std()*len(self.plus_line))
+        minus_data = (minus_line - minus_line.mean())/(minus_line.std()*len(minus_line))
+        plus_data = (plus_line - plus_line.mean())/(plus_line.std()*len(plus_line))
 
         # cross-correlation
         ycorr = np.correlate(minus_data,plus_data,mode="full")[window_size-1:window_size+self.peaksize]
@@ -188,21 +197,23 @@ Summary of Peak Model:
         #    self.shifted_line[i]=minus_shifted[i]+plus_shifted[i]
         return True
 
-    def __model_add_line (self, pos1, pos2, line, plus_strand=1):
+    def __model_add_line (self, pos1, pos2, line, int plus_strand=1):
         """Project each pos in pos2 which is included in
         [pos1-self.peaksize,pos1+self.peaksize] to the line.
 
         pos1: paired centers
-        pos2: tags of certain strand
+        pos2: tags of certain strand -- a numpy.array object
 
         """
+        cdef int i1, i2, i2_prev, i1_max, i2_max, last_p2, psize_adjusted1, psize_adjusted2, p1, p2
+        
         i1 = 0                  # index for pos1
         i2 = 0                  # index for pos2
         i2_prev = 0             # index for pos2 in previous pos1
                                 # [pos1-self.peaksize,pos1+self.peaksize]
                                 # region
         i1_max = len(pos1)
-        i2_max = len(pos2)
+        i2_max = pos2.shape[0]
         last_p2 = -1
         flag_find_overlap = False
 
@@ -231,6 +242,69 @@ Summary of Peak Model:
                     if i>=0 and i<len(line):
                         line[i]+=1
                 i2+=1
+        return line
+    
+    def __model_add_line2 (self, pos1, np.ndarray pos2, np.ndarray line, plus_strand=1):
+        """Project each pos in pos2 which is included in
+        [pos1-self.peaksize,pos1+self.peaksize] to the line.
+
+        pos1: paired centers
+        pos2: tags of certain strand
+
+        """
+        cdef int i1, i2, i2_prev, i1_max, i2_max, last_p2, psize_adjusted1, psize_adjusted2, start, end
+        cdef long i
+        
+        i1 = 0                  # index for pos1
+        i2 = 0                  # index for pos2
+        i2_prev = 0             # index for pos2 in previous pos1
+                                # [pos1-self.peaksize,pos1+self.peaksize]
+                                # region
+        i1_max = len(pos1)
+        leftposs = np.asarray(pos1,dtype="int32") - psize_adjusted1
+        rightposs= np.asarray(pos1,dtype="int32") + psize_adjusted1
+        i2_max = pos2.shape[0]
+        last_p2 = -1
+        flag_find_overlap = False
+
+        psize_adjusted1 = self.peaksize + self.tsize
+        psize_adjusted2 = self.peaksize - self.tsize        
+
+        p1 = pos1[i1]
+        p2 = pos2[i2]
+        if not plus_strand:
+            p2 -= self.tsize
+
+        try:
+            while True:
+                if p1-psize_adjusted1 > p2: # move pos2
+                    i2 += 1
+                    p2 = pos2[i2]
+                    if not plus_strand:
+                        p2 -= self.tsize
+                elif p1+psize_adjusted1 < p2: # move pos1
+                    i1 += 1
+                    p1 = pos1[i1]
+                    i2 = i2_prev    # search minus peaks from previous index
+                    p2 = pos2[i2]
+                    if not plus_strand:
+                        p2 -= self.tsize                
+                    flag_find_overlap = False
+                else:               # overlap!
+                    if not flag_find_overlap:
+                        flag_find_overlap = True
+                        i2_prev = i2 # only the first index is recorded
+                    # project
+                    start = max( p2-p1+self.peaksize, 0 )
+                    end   = min( p2-p1+self.peaksize+self.tsize, line.shape[0] )
+                    for i in range( start, end ):
+                        line[ i ] += 1
+                    i2+=1
+                    p2 = pos2[i2]
+                    if not plus_strand:
+                        p2 -= self.tsize
+        except IndexError:
+            pass
         return line
             
     def __paired_peaks (self):
@@ -262,7 +336,7 @@ Summary of Peak Model:
         ip = 0                  # index for plus peaks
         im = 0                  # index for minus peaks
         im_prev = 0             # index for minus peaks in previous plus peak
-        pair_centers = []
+        pair_centers = array(BYTE4,[])
         ip_max = len(pluspeaks)
         im_max = len(minuspeaks)
         flag_find_overlap = False
@@ -293,29 +367,34 @@ Summary of Peak Model:
 
         Return peak positions and the tag number in peak region by a tuple list [(pos,num)].
         """
+        cdef long i
+        cdef int pos
+        
         peak_info = []    # store peak pos in every peak region and
                           # unique tag number in every peak region
-        if len(taglist)<2:
+        if taglist.shape[0] < 2:
             return peak_info
         pos = taglist[0]
 
-        current_tag_list = [pos]   # list to find peak pos
+        #current_tag_list = array(BYTE4, [pos])   # list to find peak pos
+        current_tag_list = [pos]
 
-        for i in range(1,len(taglist)):
+        for i in range( 1, taglist.shape[0] ):
             pos = taglist[i]
 
-            if (pos-current_tag_list[0]+1) > self.peaksize: # call peak in current_tag_list
+            if ( pos - current_tag_list[0]+1 ) > self.peaksize: # call peak in current_tag_list when the region is long enough
                 # a peak will be called if tag number is ge min tags.
                 if len(current_tag_list) >= self.min_tags and len(current_tag_list) <= self.max_tags:
-                    peak_info.append((self.__naive_peak_pos(current_tag_list,plus_strand),len(current_tag_list)))
-                current_tag_list = [] # reset current_tag_list
+                    peak_info.append( ( self.__naive_peak_pos(current_tag_list,plus_strand), len(current_tag_list) ) )
+                #current_tag_list = array(BYTE4, []) # reset current_tag_list
+                current_tag_list = []
 
             current_tag_list.append(pos)   # add pos while 1. no
                                            # need to call peak;
                                            # 2. current_tag_list is []
         return peak_info
 
-    def __naive_peak_pos (self, pos_list, plus_strand ):
+    def __naive_peak_pos (self, pos_list, int plus_strand ):
         """Naively calculate the position of peak.
 
         plus_strand: 1, plus; 0, minus
@@ -326,14 +405,21 @@ Summary of Peak Model:
         #    tpos = pos_list + self.tsize/2
         #else:
         #    tpos = pos_list - self.tsize/2
+        cdef int peak_length, start, pos, i, pp, top_p_num
         
         peak_length = pos_list[-1]+1-pos_list[0]+self.tsize
         if plus_strand:
             start = pos_list[0] 
         else:
             start = pos_list[0] - self.tsize
+
+        #horizon_line = np.zeros(peak_length, dtype="int32") # the line for tags to be projected
+        
         horizon_line = [0]*peak_length # the line for tags to be projected
-        for pos in pos_list:
+        #horizon_line = array('i',[0]*peak_length)
+        #for pos in pos_list:
+        for i in range(len(pos_list)):
+            pp = pos_list[i]
             if plus_strand:
                 for pp in range(int(pos-start),int(pos-start+self.tsize)): # projected point
                     horizon_line[pp] += 1
@@ -341,12 +427,51 @@ Summary of Peak Model:
                 for pp in range(int(pos-start-self.tsize),int(pos-start)): # projected point
                     horizon_line[pp] += 1
 
+        # # top indices
+        # top_indices = np.where(horizon_line == horizon_line.max())[0]
+        # #print top_indices+start
+        # print top_indices[ int(top_indices.shape[0]/2) ] + start
+        # return top_indices[ int(top_indices.shape[0]/2) ] + start
+
+
         top_pos = []            # to record the top positions. Maybe > 1
         top_p_num = 0           # the maximum number of projected points
         for pp in range(peak_length): # find the peak posistion as the highest point
-            if horizon_line[pp] > top_p_num:
-                top_p_num = horizon_line[pp]
-                top_pos = [pp]
-            elif horizon_line[pp] == top_p_num:
-                top_pos.append(pp)
+           if horizon_line[pp] > top_p_num:
+               top_p_num = horizon_line[pp]
+               top_pos = [pp]
+           elif horizon_line[pp] == top_p_num:
+               top_pos.append(pp)
+        #print top_pos[int(len(top_pos)/2)]+start
         return (top_pos[int(len(top_pos)/2)]+start)
+
+    def __naive_peak_pos2 (self, pos_list, int plus_strand ):
+        """Naively calculate the position of peak.
+
+        plus_strand: 1, plus; 0, minus
+
+        return the highest peak summit position.
+        """
+        cdef int peak_length, start, pos, i, pp, top_p_num
+        
+        peak_length = pos_list[-1]+1-pos_list[0]+self.tsize
+        if plus_strand:
+            start = pos_list[0] 
+        else:
+            start = pos_list[0] - self.tsize
+        horizon_line = np.zeros(peak_length, dtype="int32") # the line for tags to be projected
+        for i in range(len(pos_list)):
+            pos = pos_list[i]
+            if plus_strand:
+                for pp in range(int(pos-start),int(pos-start+self.tsize)): # projected point
+                    horizon_line[pp] += 1
+            else:
+                for pp in range(int(pos-start-self.tsize),int(pos-start)): # projected point
+                    horizon_line[pp] += 1
+
+        # top indices
+        #print pos_list
+        print horizon_line
+        top_indices = np.where(horizon_line == horizon_line.max())[0]
+        #print top_indices+start
+        return top_indices[ int(top_indices.shape[0]/2) ] + start
