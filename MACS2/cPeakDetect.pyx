@@ -1,5 +1,5 @@
 # cython: profile=True
-# Time-stamp: <2012-04-24 21:06:59 Tao Liu>
+# Time-stamp: <2012-04-25 17:04:40 Tao Liu>
 
 """Module Description
 
@@ -317,14 +317,14 @@ class PeakDetect:
             scale_factor_s.append( tmp_v )                            
 
         # pileup using different extension sizes and scaling factors
-        control_btrack = pileup_w_multiple_d_bdg(self.control,d_s,directional=self.shiftcontrol,halfextension=self.opt.halfext,scale_factor_s=scale_factor_s)
+        control_btrack = pileup_w_multiple_d_bdg(self.control,d_s,baseline_value=lambda_bg,directional=self.shiftcontrol,halfextension=self.opt.halfext,scale_factor_s=scale_factor_s)
 
         # free mem
         #self.treat = None
         #self.control = None
         #gc.collect()                    # full collect garbage
         
-        control_btrack.reset_baseline(lambda_bg) # set the baseline as lambda_bg
+        #control_btrack.reset_baseline(lambda_bg) # set the baseline as lambda_bg
 
         # calculate pvalue scores
         self.info("#3 Build score track ...")

@@ -1,5 +1,5 @@
 # cython: profile=True
-# Time-stamp: <2012-04-23 15:19:31 Tao Liu>
+# Time-stamp: <2012-04-25 17:34:06 Tao Liu>
 
 """Module for Feature IO classes.
 
@@ -127,34 +127,46 @@ class scoreTrackI:
 
     def add_chromosome ( self, str chrom, int chrom_max_len ):
         if not self.data.has_key(chrom):
-            self.data[chrom] = np.zeros(chrom_max_len,dtype=[('pos','int32'),
-                                                             ('sample','float32'),
-                                                             ('control','float32'),
-                                                             ('-100logp','int32'),
-                                                             ('-100logq','int32'),
-                                                             ('100logLR','int32'),])
+            # self.data[chrom] = np.zeros(chrom_max_len,dtype=[('pos','int32'),
+            #                                                 ('sample','float32'),
+            #                                                 ('control','float32'),
+            #                                                 ('-100logp','int32'),
+            #                                                 ('-100logq','int32'),
+            #                                                 ('100logLR','int32'),])
+            self.data[chrom] = { 'pos': np.zeros(chrom_max_len, dtype="int32"),
+                                 'sample': np.zeros(chrom_max_len, dtype="float32"),
+                                 'control': np.zeros(chrom_max_len, dtype="float32"),
+                                 '-100logp': np.zeros(chrom_max_len, dtype="int32"),
+                                 '-100logq': np.zeros(chrom_max_len, dtype="int32"),
+                                 '100logLR': np.zeros(chrom_max_len, dtype="int32") }
             self.pointer[chrom] = 0
 
-    def add (self, str chromosome, int endpos, int sample, double control):
+    def add (self, str chromosome, int endpos, int sample, float control):
         """Add a chr-endpos-sample-control block into data
         dictionary. At the mean time, calculate pvalues and log
         likelihood.
 
         """
         cdef int i
-        c = self.data[chromosome]
+        #print chromosome, endpos, sample, control
         i = self.pointer[chromosome]
-        c[i] = (endpos,sample,control,get_pscore(sample,control),0,logLR(sample,control))
+        c = self.data[chromosome]
+        c['pos'][i] = endpos
+        c['sample'][i] = sample
+        c['control'][i] = control
+        c['-100logp'][i] = get_pscore(sample,control)
+        c['100logLR'][i] = logLR(sample,control)        
         self.pointer[chromosome] += 1
 
     def finalize (self):
-        cdef str chrom
+        cdef str chrom, k
         cdef int l
 
         for chrom in self.data.keys():
             d = self.data[chrom]
             l = self.pointer[chrom]
-            d.resize(l,refcheck=False)
+            for k in d.keys():
+                d[k].resize(l,refcheck=False)
 
     def get_data_by_chr (self, str chromosome):
         """Return array of counts by chromosome.

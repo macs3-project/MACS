@@ -1,5 +1,5 @@
 # cython: profile=True
-# Time-stamp: <2012-04-12 10:22:19 Tao Liu>
+# Time-stamp: <2012-04-25 18:11:11 Tao Liu>
 
 """Module for Feature IO classes.
 
@@ -87,7 +87,7 @@ class bedGraphTrackI:
         """
         self.__data[chrom] = d
 
-    def add_loc ( self, str chromosome, int startpos, int endpos, double value ):
+    def add_loc ( self, str chromosome, int startpos, int endpos, float value ):
         """Add a chr-start-end-value block into __data dictionary.
 
         Difference between safe_add_loc: no check, but faster. Save

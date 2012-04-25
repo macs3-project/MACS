@@ -1,5 +1,5 @@
 # cython: profile=True
-# Time-stamp: <2012-04-24 18:46:50 Tao Liu>
+# Time-stamp: <2012-04-25 17:33:03 Tao Liu>
 
 """Module Description: For pileup functions.
 
@@ -90,7 +90,7 @@ def pileup_bdg (trackI, int d, int baseline_value = 0, bool directional = True, 
         #print start_poss[0]
         #print end_poss[0]
 
-        ret.add_a_chromosome( chrom, pileup_a_chromosome ( start_poss, end_poss, l, scale_factor ) )
+        ret.add_a_chromosome( chrom, pileup_a_chromosome ( start_poss, end_poss, l, scale_factor, baseline_value ) )
 
         start_poss.resize(100000, refcheck=False)
         start_poss.resize(0, refcheck=False)
@@ -102,7 +102,7 @@ def pileup_bdg (trackI, int d, int baseline_value = 0, bool directional = True, 
 
     return ret
 
-def pileup_w_multiple_d_bdg ( trackI, d_s, int baseline_value = 0, bool directional = True, bool halfextension = True, scale_factor_s = [] ):
+def pileup_w_multiple_d_bdg ( trackI, d_s, float baseline_value = 0, bool directional = True, bool halfextension = True, scale_factor_s = [] ):
     """Pileup tags into bedGraphTrackI object with extension. Tag will
     be extended towards 3' side with size of d if directional is Ture,
     or both sides with d/2 if directional is False.
@@ -165,8 +165,9 @@ def pileup_w_multiple_d_bdg ( trackI, d_s, int baseline_value = 0, bool directio
             #start_poss = build_start_poss( plus_tags, minus_tags, five_shift, three_shift, l )
             #end_poss = build_end_poss( plus_tags, minus_tags, five_shift, three_shift, l )
             (start_poss, end_poss) = start_and_end_poss( plus_tags, minus_tags, five_shift, three_shift )
-            
-            tmp_pileup = pileup_a_chromosome ( start_poss, end_poss, l, scale_factor )
+
+            #print chrom, baseline_value
+            tmp_pileup = pileup_a_chromosome ( start_poss, end_poss, l, scale_factor, baseline_value )
 
             # free mem
             #del(start_poss)
@@ -213,7 +214,7 @@ cdef start_and_end_poss ( plus_tags, minus_tags, long five_shift, long three_shi
 
     return (start_poss, end_poss)
 
-cdef pileup_a_chromosome ( start_poss, end_poss, long l, float scale_factor = 1 ):
+cdef pileup_a_chromosome ( start_poss, end_poss, long l, float scale_factor = 1, float baseline_value = 0 ):
     """Return pileup of one chromosome.
 
     """
@@ -228,10 +229,12 @@ cdef pileup_a_chromosome ( start_poss, end_poss, long l, float scale_factor = 1 
 
     pileup = 0
     pre_p = min(start_poss[0],end_poss[0])
+    #print pre_p
     if pre_p != 0:
         # the first chunk of 0
         tmppadd( pre_p )
-        tmpvadd( 0 )
+        tmpvadd( float_max(0,baseline_value) )
+        #print float_max(0,baseline_value) 
         
     pre_v = pileup
     
@@ -242,7 +245,7 @@ cdef pileup_a_chromosome ( start_poss, end_poss, long l, float scale_factor = 1 
             p = a
             if p != pre_p:
                 tmppadd( p )
-                tmpvadd( pileup * scale_factor )
+                tmpvadd( float_max(pileup * scale_factor, baseline_value) )
                 #ret.add_loc(chrom,pre_p,p,pileup)
                 pre_p = p
             pileup += 1
@@ -251,7 +254,7 @@ cdef pileup_a_chromosome ( start_poss, end_poss, long l, float scale_factor = 1 
             p = b
             if p != pre_p:
                 tmppadd( p )
-                tmpvadd( pileup * scale_factor ) 
+                tmpvadd( float_max(pileup * scale_factor, baseline_value) ) 
                 #ret.add_loc(chrom,pre_p,p,pileup)
                 pre_p = p
             pileup -= 1
@@ -266,7 +269,7 @@ cdef pileup_a_chromosome ( start_poss, end_poss, long l, float scale_factor = 1 
             #for p in end_poss[i_e:]:
             if p != pre_p:
                 tmppadd( p )
-                tmpvadd( pileup * scale_factor )
+                tmpvadd( float_max(pileup * scale_factor, baseline_value) )
                 #ret.add_loc(chrom,pre_p,p,pileup)
                 pre_p = p
             pileup -= 1

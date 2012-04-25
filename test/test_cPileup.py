@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# Time-stamp: <2012-04-22 23:46:56 Tao Liu>
+# Time-stamp: <2012-04-25 17:19:57 Tao Liu>
 
 """Module Description: Test functions for pileup functions.
 
@@ -22,7 +22,7 @@ import unittest
 
 from math import log10
 from MACS2.cPileup import *
-from MACS2.IO.cFixWidthTrack import FWTrackII
+from MACS2.IO.cFixWidthTrack import FWTrackIII
 
 # ------------------------------------
 # Main function
@@ -47,25 +47,26 @@ class Test_pileup(unittest.TestCase):
                         ( 8, 9, 2.0 ),                            
                         ( 9, 10, 1.0 )
                         ]
-        self.expect2 = [(0, 1, 12.0),
+        self.expect2 = [(0, 1, 13.0),
                         (1, 3, 14.0),
                         (3, 4, 16.0),
                         (4, 6, 18.0),
                         (6, 8, 16.0),
                         (8, 9, 14.0),
-                        (9, 10, 12.0)]
+                        (9, 10, 13.0)]
 
         self.d_s = [ 5, 10, 100 ]
         self.scale_factor_s = [ 0.5, 1, 2 ]
 
     def test_pileup(self):
         # build FWTrackII
-        self.fwtrack2 = FWTrackII()
+        self.fwtrack2 = FWTrackIII()
         for i in self.plus_pos:
             self.fwtrack2.add_loc(self.chrom, i, 0)
         for i in self.minus_pos:
             self.fwtrack2.add_loc(self.chrom, i, 1)            
-
+        self.fwtrack2.finalize()
+        
         self.pileup = pileup_bdg(self.fwtrack2, self.d, halfextension=False, scale_factor = self.scale_factor)
         self.result = []
         chrs = self.pileup.get_chr_names()
@@ -84,14 +85,14 @@ class Test_pileup(unittest.TestCase):
 
     def test_pileup_w_multiple_d_bdg ( self ):
         # build FWTrackII
-        self.fwtrack2 = FWTrackII()
+        self.fwtrack2 = FWTrackIII()
         for i in self.plus_pos:
             self.fwtrack2.add_loc(self.chrom, i, 0)
         for i in self.minus_pos:
             self.fwtrack2.add_loc(self.chrom, i, 1)            
-
+        self.fwtrack2.finalize()
         # pileup test
-        self.pileup = pileup_w_multiple_d_bdg(self.fwtrack2, self.d_s, halfextension=False, scale_factor_s = self.scale_factor_s)
+        self.pileup = pileup_w_multiple_d_bdg(self.fwtrack2, self.d_s, baseline_value=13, halfextension=False, scale_factor_s = self.scale_factor_s)
         self.result = []
         chrs = self.pileup.get_chr_names()
         for chrom in chrs:
