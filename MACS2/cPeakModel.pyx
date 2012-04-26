@@ -1,5 +1,5 @@
 # cython: profile=True
-# Time-stamp: <2012-04-25 16:04:23 Tao Liu>
+# Time-stamp: <2012-04-25 22:01:43 Tao Liu>
 
 """Module Description
 
@@ -405,7 +405,7 @@ Summary of Peak Model:
         #    tpos = pos_list + self.tsize/2
         #else:
         #    tpos = pos_list - self.tsize/2
-        cdef int peak_length, start, pos, i, pp, top_p_num
+        cdef int peak_length, start, pos, i, pp, top_p_num, s, e
         
         peak_length = pos_list[-1]+1-pos_list[0]+self.tsize
         if plus_strand:
@@ -421,10 +421,14 @@ Summary of Peak Model:
         for i in range(len(pos_list)):
             pp = pos_list[i]
             if plus_strand:
-                for pp in range(int(pos-start),int(pos-start+self.tsize)): # projected point
+                s = max(pos-start,0)
+                e = min(pos-start+self.tsize,peak_length)
+                for pp in range(s,e): # projected point
                     horizon_line[pp] += 1
             else:
-                for pp in range(int(pos-start-self.tsize),int(pos-start)): # projected point
+                s = max(pos-start-self.tsize,0)
+                e = min(pos-start,peak_length)
+                for pp in range(s,e): # projected point
                     horizon_line[pp] += 1
 
         # # top indices
