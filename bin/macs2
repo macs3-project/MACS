@@ -235,9 +235,9 @@ def add_bdgpeakcall_parser( subparsers ):
                                        help = "maximum gap between significant points in a peak, better to set it as tag size. DEFAULT: 30", default = 30 )
     argparser_bdgpeakcall.add_argument( "-o", "--o-prefix", dest = "oprefix", default = "peak", type = str,
                                         help = "output file prefix, DEFAULT: peak" )
-    argparser_bdgpeakcall.add_argument( "--call-summits", dest="call_summits", action="store_true",
+    group_callpeak.add_argument( "--call-summits", dest="call_summits", action="store_true",
                          help="If set, MACS will use a more sophisticated approach to find all summits in each enriched peak region. DEFAULT: False",default=False)
-    argparser_bdgpeakcall.add_argument("--no-trackline", dest="trackline", action="store_false", default=True,
+    group_callpeak.add_argument("--no-trackline", dest="trackline", action="store_false", default=True,
                          help="Tells MACS not to include trackline with bedGraph files. The trackline is required by UCSC.")
     return
 

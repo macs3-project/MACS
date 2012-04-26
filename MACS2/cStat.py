@@ -22,7 +22,7 @@ from array import array as pyarray
 from MACS2.Constants import *
 from random import gammavariate as rgamma
 from random import seed as rseed
-from math import log
+from cmath import log
 import pymc
 from pymc import deterministic
 # ------------------------------------
