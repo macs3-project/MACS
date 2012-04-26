@@ -1,5 +1,5 @@
 # cython: profile=True
-# Time-stamp: <2012-04-25 22:01:43 Tao Liu>
+# Time-stamp: <2012-04-25 22:07:02 Tao Liu>
 
 """Module Description
 
@@ -205,7 +205,7 @@ Summary of Peak Model:
         pos2: tags of certain strand -- a numpy.array object
 
         """
-        cdef int i1, i2, i2_prev, i1_max, i2_max, last_p2, psize_adjusted1, psize_adjusted2, p1, p2
+        cdef int i1, i2, i2_prev, i1_max, i2_max, last_p2, psize_adjusted1, psize_adjusted2, p1, p2, length_l, s, e
         
         i1 = 0                  # index for pos1
         i2 = 0                  # index for pos2
@@ -216,6 +216,8 @@ Summary of Peak Model:
         i2_max = pos2.shape[0]
         last_p2 = -1
         flag_find_overlap = False
+
+        length_l = len(line)
 
         psize_adjusted1 = self.peaksize + self.tsize
         psize_adjusted2 = self.peaksize - self.tsize        
@@ -238,9 +240,11 @@ Summary of Peak Model:
                     i2_prev = i2 # only the first index is recorded
                 # project
                 #for i in range(p2-p1+self.peaksize,p2-p1+self.peaksize+self.tsize):
-                for i in range(p2-p1+self.peaksize,p2-p1+self.peaksize+self.tsize):
-                    if i>=0 and i<len(line):
-                        line[i]+=1
+                s = max(p2-p1+self.peaksize, 0)
+                e = min(p2-p1+self.peaksize+self.tsize, length_l)
+                for i in range(s,e):
+                    #if i>=0 and i<length_l:
+                    line[i]+=1
                 i2+=1
         return line
     
