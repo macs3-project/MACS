@@ -1,5 +1,5 @@
 # cython: profile=True
-# Time-stamp: <2012-04-24 18:26:04 Tao Liu>
+# Time-stamp: <2012-04-27 03:25:24 Tao Liu>
 
 """Module for all MACS Parser classes for input.
 
@@ -646,7 +646,7 @@ class BAMParser( GenericParser ):
         cdef int entrylength, fpos, strand, chrid
         cdef list references
         
-        fwtrack = FWTrackII()
+        fwtrack = FWTrackIII()
         i = 0
         m = 0
         references = []
