@@ -22,6 +22,7 @@ with the distribution).
 
 import sys
 import logging
+from time import strftime
 
 # ------------------------------------
 # own python modules
@@ -69,7 +70,11 @@ def run( args ):
     t0 = treat.total
     tagsinfo += "# total tags in treatment: %d\n" % (t0)
     info("#1  total tags in treatment: %d" % (t0))
-    if options.keepduplicates != "all":
+    if options.format == 'BAMPE':
+        ## This is going to change
+        info("#1 BAMPE mode does not filter duplicates yet. Use samtools rmdup if needed ...")
+        t1 = treat.total
+    elif options.keepduplicates != "all":
         if options.keepduplicates == "auto":
             info("#1 calculate max duplicate tags in single position based on binomal distribution...")
             treatment_max_dup_tags = cal_max_dup_tags(options.gsize,t0)
@@ -94,7 +99,10 @@ def run( args ):
         c0 = control.total
         tagsinfo += "# total tags in control: %d\n" % (c0)
         info("#1  total tags in control: %d" % (c0))
-        if options.keepduplicates != "all":
+        if options.format == 'BAMPE':
+            info("#1 BAMPE mode does not filter duplicates. Use samtools rmdup if needed ...")
+            c1 = control.total
+        elif options.keepduplicates != "all":
             if options.keepduplicates == "auto":
                 info("#1  for control, calculate max duplicate tags in single position based on binomal distribution...")
                 control_max_dup_tags = cal_max_dup_tags(options.gsize,c0)
@@ -124,7 +132,11 @@ def run( args ):
 
     if options.nomodel:
         info("#2 Skipped...")
-        options.d=options.shiftsize*2
+        if options.format == 'BAMPE':
+            options.shiftsize = 0
+            options.d = options.tsize
+        else:
+            options.d=options.shiftsize*2
         info("#2 Use %d as shiftsize, %d as fragment length" % (options.shiftsize,options.d))
         options.scanwindow=2*options.d  # remove the effect of --bw
     else:
@@ -228,7 +240,8 @@ def run( args ):
         pass
     if options.nolambda:
         ofhd_xls.write("# local lambda is disabled!\n")
-    ofhd_xls.write(peakdetect.toxls())
+    # pass write method so we can print too, and include name
+    peakdetect.toxls(ofhd_xls, name = options.name)
     ofhd_xls.close()
     #4.2 peaks in BED
     if options.log_pvalue:
@@ -237,23 +250,25 @@ def run( args ):
         score_column = "qscore"
     info("#4 Write peak bed file... %s" % (options.peakbed))
     ofhd_bed = open(options.peakbed,"w")
-    peakdetect.peaks.write_to_bed (ofhd_bed, name_prefix="MACS_peak_", score_column=score_column)
+    peakdetect.peaks.write_to_bed (ofhd_bed, name_prefix="%s_peak_", name = options.name, description="Peaks for %s (Made with MACS v2, " + strftime("%x") + ")", score_column=score_column, trackline=options.trackline)
     ofhd_bed.close()
     #4.2 peaks in narrowPeak
     info("#4 Write peak in narrowPeak format file... %s" % (options.peakNarrowPeak))
     ofhd_bed = open(options.peakNarrowPeak,"w")
-    peakdetect.peaks.write_to_narrowPeak (ofhd_bed, name_prefix="MACS_peak_", score_column=score_column)
+    peakdetect.peaks.write_to_narrowPeak (ofhd_bed, name_prefix="%s_peak_", name=options.name, score_column=score_column, trackline=options.trackline )
     ofhd_bed.close()
     #4.2 broad peaks in bed12
     if options.broad:
         info("#4 Write broad peak in bed12 format file... %s" % (options.peakBroadPeak))
         ofhd_bed = open(options.peakBroadPeak,"w")
-        peakdetect.broadpeaks.write_to_gappedPeak (ofhd_bed, name_prefix="MACS_peak_", name=options.name, description=options.name)
+        peakdetect.broadpeaks.write_to_gappedPeak (ofhd_bed, name_prefix="%s_peak_", name=options.name, description=options.name, trackline=options.trackline)
         ofhd_bed.close()
     #4.2-2 summits in BED
     info("#4 Write summits bed file... %s" % (options.summitbed))
     ofhd_summits = open(options.summitbed,"w")
-    peakdetect.peaks.write_to_summit_bed (ofhd_summits, name_prefix="MACS_summit_", score_column=score_column)
+    peakdetect.peaks.write_to_summit_bed (ofhd_summits, name_prefix="%s_peak_", name=options.name,
+                                          description="Summits for %s (Made with MACS v2, " + strftime("%x") + ")",
+                                          score_column=score_column, trackline=options.trackline )
     ofhd_summits.close()
 
 def cal_max_dup_tags ( genome_size, tags_number, p=1e-5 ):

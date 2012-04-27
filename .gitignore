@@ -1,5 +1,5 @@
-MACS2/c*.c
-MACS2/IO/c*.c
+MACS2/*.c
+MACS2/IO/*.c
 MANIFEST
 build/*
 dist/*
