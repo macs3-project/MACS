@@ -1,5 +1,5 @@
 # cython: profile=True
-# Time-stamp: <2012-04-27 03:25:24 Tao Liu>
+# Time-stamp: <2012-04-27 03:46:07 Tao Liu>
 
 """Module for all MACS Parser classes for input.
 
@@ -680,6 +680,7 @@ class BAMParser( GenericParser ):
             if fpos >= 0:
                 fwtrack.add_loc( references[ chrid ], fpos, strand )
         self.fhd.close()
+        fwtrack.finalize()
         return fwtrack
     
     def __fw_binary_parse (self, data ):
