@@ -401,7 +401,8 @@ class FWTrackII:
         """
         cdef int p, m, n, current_loc
         cdef str k
-        
+
+        if maxnum < 0: return                
         if not self.__sorted:
             self.sort()
         self.total = 0
