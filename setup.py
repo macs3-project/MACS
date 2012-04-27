@@ -55,7 +55,7 @@ def main():
                    ]
     
     setup(name="MACS",
-          version="2.0.10",
+          version="2.0.11",
           description="Model Based Analysis for ChIP-Seq data",
           author='Tao Liu',
           author_email='vladimir.liu@gmail.com',

@@ -1,4 +1,4 @@
-MACS_VERSION = "2.0.10 20120305 (tag:alpha)"
+MACS_VERSION = "2.0.11 20120427 (tag:alpha)"
 MACSDIFF_VERSION = "1.0.4 20110212 (tag:alpha)"
 FILTERDUP_VERSION = "1.0.0 20110906"
 RANDSAMPLE_VERSION = "1.0.0 20111102"
@@ -32,4 +32,3 @@ elif array('d',[1]).itemsize == 4:
     FBYTE4 = 'd'
 else:
     raise Exception("FBYTE4 type cannot be determined!")
-

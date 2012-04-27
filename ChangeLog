@@ -1,3 +1,20 @@
+2012-04-27 Benjamin Schiller <benjamin.schiller@ucsf.edu>
+    MACS version 2.0.11 (tag:alpha still working)
+
+    * Introduced BAMPEParser *
+    Reads PE data directly, requires bedtools for now
+    
+    * Introduced --call-summits *
+    Uses signal processing methods to call overlapping peaks
+
+    * Added --no-trackline *
+    By default, files have descriptive tracklines now
+
+    * Changes to output *
+    cPeakDetect.pyx has full support for new print/write methods and
+    --call-peaks, BAMPEParser, and use of paired-end data
+
+
 2012-03-12  Tao Liu  <taoliu@jimmy.harvard.edu>
 	MACS version 2.0.10 (tag:alpha still working)
 

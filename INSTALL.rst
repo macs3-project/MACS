@@ -34,11 +34,11 @@ your operation system. You can easily manage the package, and the
 uninstallation is much easier. Download the *deb* package from MACS
 download page, and type this in the commend line::
 
- $ dpkg -i macs_2.0.10.deb
+ $ dpkg -i macs_2.0.11.deb
 
 To uninstall, type::
 
- $ dpkg -r macs_2.0.10
+ $ dpkg -r macs_2.0.11
 
 This is tested only in Ubuntu >= 10.04 LTS.
 
