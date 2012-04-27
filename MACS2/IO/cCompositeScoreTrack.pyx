@@ -1,4 +1,5 @@
-# Time-stamp: <2012-01-24 15:58:35 Tao Liu>
+# cython: profile=True
+# Time-stamp: <2012-04-13 17:09:23 Tao Liu>
 
 """Module for Composite Score Track IO classes.
 

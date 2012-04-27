@@ -1,4 +1,5 @@
-# Time-stamp: <2012-04-10 22:07:57 Tao Liu>
+# cython: profile=True
+# Time-stamp: <2012-04-13 17:08:58 Tao Liu>
 
 """Module Description:  IO Module for bedGraph file
 
@@ -24,7 +25,18 @@ from MACS2.IO.cBedGraph import bedGraphTrackI,bedRegionTrackI
 # ------------------------------------
 # constants
 # ------------------------------------
-
+cdef extern from "stdlib.h":
+    ctypedef unsigned int size_t
+    size_t strlen(char *s)
+    void *malloc(size_t size)
+    void *calloc(size_t n, size_t size)
+    void free(void *ptr)
+    int strcmp(char *a, char *b)
+    char * strcpy(char *a, char *b)
+    long atol(char *str)
+    int atoi(char *str)
+    double atof(char *str)
+    
 # ------------------------------------
 # Misc functions
 # ------------------------------------
@@ -69,7 +81,7 @@ class bedGraphIO:
         Then the region chr1:200..250 should be filled with
         baseline_value. Default of baseline_value is 0.
         """
-        cdef str i, chrom, startpos, endpos, value
+        cdef str i
         
         data = bedGraphTrackI(baseline_value=baseline_value)
         add_func = data.add_loc
@@ -100,8 +112,8 @@ class bedGraphIO:
             elif i.startswith("browse"):
                 continue
             else:
-                (chrom,startpos,endpos,value)=i.split()
-                add_func(chrom,int(startpos),int(endpos),float(value))
+                fs =i.split()
+                add_func(fs[0],atoi(fs[1]),atoi(fs[2]),atof(fs[3]))
         #data.finalize()
         self.fhd.seek(0)
         return data
@@ -155,8 +167,8 @@ class genericBedIO:
         self.fhd.seek(0)
         
         for i in self.fhd:
-            (chrom,startpos,endpos,name,value)=i.split()
-            add_func(chrom,int(startpos),int(endpos)) #,float(value))
+            fs = i.split()
+            add_func(fs[0],atoi(fs[1]),atoi(fs[2])) #,float(value))
         self.fhd.seek(0)
         return data
 

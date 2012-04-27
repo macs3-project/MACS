@@ -1,5 +1,5 @@
 # cython: profile=True
-# Time-stamp: <2012-04-12 10:22:19 Tao Liu>
+# Time-stamp: <2012-04-25 18:11:11 Tao Liu>
 
 """Module for Feature IO classes.
 
@@ -26,6 +26,7 @@ import numpy as np
 
 from libc.math cimport sqrt
 from libc.math cimport log
+from cpython cimport bool
 
 from MACS2.Constants import *
 from MACS2.IO.cScoreTrack import scoreTrackI,CombinedTwoTrack
@@ -98,6 +99,7 @@ class bedGraphTrackI:
         """
         cdef float pre_v
         # basic assumption, end pos should > start pos
+        
         if endpos <= 0:
             return
         if startpos < 0:
@@ -116,7 +118,8 @@ class bedGraphTrackI:
         else:
             c = self.__data[chromosome]            
             # get the preceding region
-            pre_v   = c[1][-1]            
+            pre_v   = c[1][-1]
+            
             # if this region is next to the previous one.
             if pre_v == value:
                 # if value is the same, simply extend it.
@@ -127,7 +130,7 @@ class bedGraphTrackI:
                 c[1].append(value)
     
     # chroms are too long for ints
-    def safe_add_loc ( self, str chromosome, int startpos, int endpos, double value):
+    def safe_add_loc ( self, str chromosome, long startpos, long endpos, double value):
         """Add a chr-start-end-value block into __data dictionary.
 
         """
@@ -199,7 +202,7 @@ class bedGraphTrackI:
         return l
 
     # need default for trackline, this method is already fast
-    def write_bedGraph (self, fhd, str name, str description, trackline=True):
+    def write_bedGraph (self, fhd, str name, str description, bool trackline=True):
         """Write all data to fhd in Wiggle Format.
 
         fhd: a filehandler to save bedGraph.

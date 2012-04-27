@@ -1,4 +1,5 @@
-# Time-stamp: <2012-04-12 11:06:08 Tao Liu>
+# cython: profile=True
+# Time-stamp: <2012-04-25 17:33:03 Tao Liu>
 
 """Module Description: For pileup functions.
 
@@ -22,13 +23,20 @@ from array import array
 
 from MACS2.IO.cBedGraph import bedGraphTrackI
 from MACS2.Constants import *
+from MACS2.cArray import IntArray
+
+import numpy as np
+cimport numpy as np
 
 from cpython cimport bool
 
 # ------------------------------------
-# constants
+# functions
 # ------------------------------------
-# to determine the byte size
+
+cdef inline int int_max(int a, int b): return a if a >= b else b
+cdef inline long long_max(long a, long b): return a if a >= b else b
+cdef inline float float_max(float a, float b): return a if a >= b else b
 
 def pileup_bdg (trackI, int d, int baseline_value = 0, bool directional = True, bool halfextension = True, float scale_factor = 1):
     """Pileup tags into bedGraphTrackI object with extension. Tag will
@@ -46,6 +54,8 @@ def pileup_bdg (trackI, int d, int baseline_value = 0, bool directional = True, 
     Return a bedGraphTrackI object.
     """
     cdef long five_shift, three_shift, l, i, j, i_s, i_e, p, pileup, pre_p
+    #cdef int * start_poss
+    #cdef int * end_poss    
 
     ret = bedGraphTrackI(baseline_value=baseline_value) # bedGraphTrackI object to be returned.
 
@@ -72,18 +82,27 @@ def pileup_bdg (trackI, int d, int baseline_value = 0, bool directional = True, 
         (plus_tags,minus_tags) = trackI.get_locations_by_chr(chrom)
 
         l = len(plus_tags)+len(minus_tags)        
+
+        #start_poss = build_start_poss( plus_tags, minus_tags, five_shift, three_shift, l )
+        #end_poss = build_end_poss( plus_tags, minus_tags, five_shift, three_shift, l )
         
         ( start_poss, end_poss ) = start_and_end_poss( plus_tags, minus_tags, five_shift, three_shift )
+        #print start_poss[0]
+        #print end_poss[0]
 
-        ret.add_a_chromosome( chrom, pileup_a_chromosome ( start_poss, end_poss, l, scale_factor ) )
+        ret.add_a_chromosome( chrom, pileup_a_chromosome ( start_poss, end_poss, l, scale_factor, baseline_value ) )
 
+        start_poss.resize(100000, refcheck=False)
+        start_poss.resize(0, refcheck=False)
+        end_poss.resize(100000, refcheck=False)
+        end_poss.resize(0, refcheck=False)                
         # free mem?
-        start_poss = None
-        end_poss = None        
+        #del(start_poss)
+        #del(end_poss)
 
     return ret
 
-def pileup_w_multiple_d_bdg ( trackI, d_s, int baseline_value = 0, bool directional = True, bool halfextension = True, scale_factor_s = [] ):
+def pileup_w_multiple_d_bdg ( trackI, d_s, float baseline_value = 0, bool directional = True, bool halfextension = True, scale_factor_s = [] ):
     """Pileup tags into bedGraphTrackI object with extension. Tag will
     be extended towards 3' side with size of d if directional is Ture,
     or both sides with d/2 if directional is False.
@@ -100,6 +119,8 @@ def pileup_w_multiple_d_bdg ( trackI, d_s, int baseline_value = 0, bool directio
     """
     cdef long d, five_shift, three_shift, l, i, j, i_s, i_e, p, pileup, pre_p
     cdef float scale_factor
+    #cdef int * start_poss
+    #cdef int * end_poss
 
     assert len(d_s) == len(scale_factor_s), "Arguments d_s and scale_factor_s should have the same length!"
 
@@ -141,51 +162,64 @@ def pileup_w_multiple_d_bdg ( trackI, d_s, int baseline_value = 0, bool directio
             three_shift = three_shift_s[i]
             scale_factor = scale_factor_s[i]
 
-            ( start_poss, end_poss ) = start_and_end_poss( plus_tags, minus_tags, five_shift, three_shift )
+            #start_poss = build_start_poss( plus_tags, minus_tags, five_shift, three_shift, l )
+            #end_poss = build_end_poss( plus_tags, minus_tags, five_shift, three_shift, l )
+            (start_poss, end_poss) = start_and_end_poss( plus_tags, minus_tags, five_shift, three_shift )
 
-            tmp_pileup = pileup_a_chromosome ( start_poss, end_poss, l, scale_factor )
+            #print chrom, baseline_value
+            tmp_pileup = pileup_a_chromosome ( start_poss, end_poss, l, scale_factor, baseline_value )
+
+            # free mem
+            #del(start_poss)
+            #del(end_poss)
+            start_poss.resize(100000, refcheck=False)
+            start_poss.resize(0, refcheck=False)
+            end_poss.resize(100000, refcheck=False)
+            end_poss.resize(0, refcheck=False)                            
+            
             if prev_pileup:
                 prev_pileup = max_over_two_pv_array ( prev_pileup, tmp_pileup )
             else:
                 prev_pileup = tmp_pileup
 
         ret.add_a_chromosome( chrom, prev_pileup )
-        start_poss = None
-        end_poss = None        
 
     return ret
 
 cdef start_and_end_poss ( plus_tags, minus_tags, long five_shift, long three_shift ):
     cdef long i
-    
-    start_poss = array(BYTE4,[])    # store all start positions
-    end_poss   = array(BYTE4,[])    # store all end positions
+    cdef long lp = plus_tags.shape[0]
+    cdef long lm = minus_tags.shape[0]
+    cdef long l = lp + lm
 
-    # for plus tags
-    for i in xrange(len(plus_tags)):
-        # shift to get start positions. To 5' side.
-        start_poss.append(plus_tags[i]-five_shift) 
-        # shift to get end positions by extending to d. To 3' side.
-        end_poss.append(plus_tags[i]+three_shift)
+    start_poss = np.concatenate( ( plus_tags-five_shift, minus_tags-three_shift ) )
+    end_poss   = np.concatenate( ( plus_tags+three_shift, minus_tags+five_shift ) )    
 
-    # for minus tags
-    for i in xrange(len(minus_tags)):
-        # shift to get start positions by extending to d. To 3' side.
-        start_poss.append(minus_tags[i]-three_shift)
-        # shift to get end positions. To 5' side.
-        end_poss.append(minus_tags[i]+five_shift)
-            
     # sort
-    start_poss = sorted(start_poss)
-    end_poss = sorted(end_poss)
+    start_poss.sort()
+    end_poss.sort()
+    
+    # fix negative coordinations
+    for i in range( start_poss.shape[0] ):
+        if start_poss[i] < 0:
+            start_poss[i] = 0
+        else:
+            break
 
-    return ( start_poss, end_poss )
+    for i in range( end_poss.shape[0] ):
+        if end_poss[i] < 0:
+            end_poss[i] = 0
+        else:
+            break        
 
-cdef pileup_a_chromosome ( start_poss, end_poss, long l, float scale_factor = 1 ):
+    return (start_poss, end_poss)
+
+cdef pileup_a_chromosome ( start_poss, end_poss, long l, float scale_factor = 1, float baseline_value = 0 ):
     """Return pileup of one chromosome.
 
     """
-    cdef long i_s, i_e, p, pileup, pre_p
+    cdef long i_s, i_e, p, pileup, pre_p, i
+    cdef int a, b
     
     tmp = [array(BYTE4,[]),array(FBYTE4,[])] # for (endpos,value)
     tmppadd = tmp[0].append
@@ -195,28 +229,32 @@ cdef pileup_a_chromosome ( start_poss, end_poss, long l, float scale_factor = 1 
 
     pileup = 0
     pre_p = min(start_poss[0],end_poss[0])
+    #print pre_p
     if pre_p != 0:
         # the first chunk of 0
         tmppadd( pre_p )
-        tmpvadd( 0 )
+        tmpvadd( float_max(0,baseline_value) )
+        #print float_max(0,baseline_value) 
         
     pre_v = pileup
     
     while i_s < l and i_e < l:
-        if start_poss[i_s] < end_poss[i_e]:
-            p = start_poss[i_s]
+        a = start_poss[i_s]
+        b = end_poss[i_e]
+        if a < b:
+            p = a
             if p != pre_p:
                 tmppadd( p )
-                tmpvadd( pileup * scale_factor )
+                tmpvadd( float_max(pileup * scale_factor, baseline_value) )
                 #ret.add_loc(chrom,pre_p,p,pileup)
                 pre_p = p
             pileup += 1
             i_s += 1
-        elif start_poss[i_s] > end_poss[i_e]:
-            p = end_poss[i_e]
+        elif a > b:
+            p = b
             if p != pre_p:
                 tmppadd( p )
-                tmpvadd( pileup * scale_factor ) 
+                tmpvadd( float_max(pileup * scale_factor, baseline_value) ) 
                 #ret.add_loc(chrom,pre_p,p,pileup)
                 pre_p = p
             pileup -= 1
@@ -226,17 +264,19 @@ cdef pileup_a_chromosome ( start_poss, end_poss, long l, float scale_factor = 1 
             i_e += 1
     if i_e < l:
         # add rest of end positions
-        for p in end_poss[i_e:]:
+        for i in range(i_e, l):
+            p = end_poss[i]
+            #for p in end_poss[i_e:]:
             if p != pre_p:
                 tmppadd( p )
-                tmpvadd( pileup * scale_factor )
+                tmpvadd( float_max(pileup * scale_factor, baseline_value) )
                 #ret.add_loc(chrom,pre_p,p,pileup)
                 pre_p = p
             pileup -= 1
     if i_s < l:
         # add rest of start positions ( I don't think this will happen )
         raise Exception("start positions can't be the only things left!")
-    
+
     return tmp
 
 cdef max_over_two_pv_array ( tmparray1, tmparray2 ):
@@ -268,7 +308,7 @@ cdef max_over_two_pv_array ( tmparray1, tmparray2 ):
             if p1 < p2:
                 # clip a region from pre_p to p1, then set pre_p as p1.
                 tmppadd( p1 )
-                tmpvadd( max(v1,v2) )
+                tmpvadd( float_max(v1,v2) )
                 pre_p = p1
                 # call for the next p1 and v1
                 p1 = p1n()
@@ -276,7 +316,7 @@ cdef max_over_two_pv_array ( tmparray1, tmparray2 ):
             elif p2 < p1:
                 # clip a region from pre_p to p2, then set pre_p as p2.
                 tmppadd( p2 )
-                tmpvadd( max(v1,v2) )
+                tmpvadd( float_max(v1,v2) )
                 pre_p = p2
                 # call for the next p2 and v2
                 p2 = p2n()
@@ -284,7 +324,7 @@ cdef max_over_two_pv_array ( tmparray1, tmparray2 ):
             elif p1 == p2:
                 # from pre_p to p1 or p2, then set pre_p as p1 or p2.
                 tmppadd( p1 )
-                tmpvadd( max(v1,v2) )
+                tmpvadd( float_max(v1,v2) )
                 pre_p = p1
                 # call for the next p1, v1, p2, v2.
                 p1 = p1n()
@@ -295,3 +335,5 @@ cdef max_over_two_pv_array ( tmparray1, tmparray2 ):
         # meet the end of either bedGraphTrackI, simply exit
         pass
     return tmp
+
+

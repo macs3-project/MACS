@@ -5,8 +5,8 @@ Time-stamp: <2012-04-11 12:06:28 Tao Liu>
 
 Please check the following instructions to complete your installation.
 
-Prerequisite
-============
+Prerequisites
+=============
 
 Python version must be equal to *2.7* to run MACS. I recommend
 using the version *2.7.2*.

@@ -5,7 +5,7 @@ RANDSAMPLE_VERSION = "1.0.0 20111102"
 MAX_PAIRNUM = 1000
 MAX_LAMBDA  = 100000
 FESTEP      = 20
-BUFFER_SIZE = 1000000                   # np array will increase at step of 1 million items
+BUFFER_SIZE = 100000                   # np array will increase at step of 1 million items
 
 from array import array
 
