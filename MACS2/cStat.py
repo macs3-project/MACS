@@ -22,7 +22,7 @@ from array import array as pyarray
 from MACS2.Constants import *
 from random import gammavariate as rgamma
 from random import seed as rseed
-from cmath import log
+from math import log
 import pymc
 from pymc import deterministic
 # ------------------------------------
@@ -37,10 +37,6 @@ gfold_dict = {}                         # temporarily save all precomputed gfold
 # ------------------------------------
 # Misc functions
 # ------------------------------------
-
-# BUGFIX FOR PYMC ARGUMENT CHANGE
-from inspect import getargspec
-PROGRESS_BAR_ENABLED = 'progress_bar' in getargspec(pymc.MCMC.sample)[0]
 
 def MCMCPoissonPosteriorRatio (sample_number, burn, count1, count2):
     """MCMC method to calculate ratio distribution of two Posterior Poisson distributions.
@@ -61,10 +57,7 @@ def MCMCPoissonPosteriorRatio (sample_number, burn, count1, count2):
         return log(l1,2) - log(l2,2)
     mcmcmodel  = pymc.MCMC([ratio,lam1,poi1,lam2,poi2])
     mcmcmodel.use_step_method(pymc.AdaptiveMetropolis,[ratio,lam1,lam2,poi1,poi2], delay=20000)
-    if PROGRESS_BAR_ENABLED:
-        mcmcmodel.sample(iter=sample_number, progress_bar=False, burn=burn)    
-    else:
-        mcmcmodel.sample(iter=sample_number, burn=burn)    
+    mcmcmodel.sample(iter=sample_number, progress_bar=False, burn=burn)    
     return ratio.trace()
 
 

@@ -2,8 +2,6 @@ MANIFEST
 build/*
 dist/*
 *.pyc
-.pydevproject
-.project
 *~
 test/*.wig
 test/*.bed

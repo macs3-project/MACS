@@ -31,8 +31,6 @@ from math import log
 # constants
 # ------------------------------------
 LOG2E = log(2.718281828459045,2)
-# BUGFIX FOR PYMC
-PROGRESS_BAR_ENABLED = 'progress_bar' in getargspec(pymc.MCMC.sample)[0]
 # ------------------------------------
 # Misc functions
 # ------------------------------------
@@ -108,11 +106,8 @@ def MCMCPoissonPosteriorRatio (sample_number, burn, count1, count2):
     @deterministic
     def ratio (l1=lam1,l2=lam2):
         return log(l1) - log(l2)
-    mcmcmodel  = pymc.MCMC([ratio,lam1,lam2,poi1,poi2])a
-    if PROGRESS_BAR_ENABLED:
-        mcmcmodel.sample(iter=sample_number, progress_bar=False, burn=burn)
-    else:
-        mcmcmodel.sample(iter=sample_number, burn=burn)
+    mcmcmodel  = pymc.MCMC([ratio,lam1,lam2,poi1,poi2])
+    mcmcmodel.sample(iter=sample_number, progress_bar=False, burn=burn)
     #print mcmcmodel.stats()
     #sys.exit(1)
     return map(lambda x:x*LOG2E, ratio.trace())
