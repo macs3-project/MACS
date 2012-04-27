@@ -1,7 +1,11 @@
+MACS2/c*.c
+MACS2/IO/c*.c
 MANIFEST
 build/*
 dist/*
 *.pyc
+.pydevproject
+.project
 *~
 test/*.wig
 test/*.bed
