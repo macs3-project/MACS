@@ -23,6 +23,10 @@ with the distribution).
 import os
 import sys
 import logging
+import time
+from subprocess import Popen,PIPE
+#from optparse import OptionParser
+import gzip
 import argparse as ap
 
 # ------------------------------------
@@ -81,7 +85,8 @@ def prepare_argparser ():
 # """
     description = "%(prog)s -- Model-based Analysis for ChIP-Sequencing"
     epilog = "For command line options of each command, type: %(prog)s COMMAND -h"
-    #\nCheck community site: http://groups.google.com/group/macs-announcement/\nSource code: https://github.com/taoliu/MACS/"
+    #Check community site: http://groups.google.com/group/macs-announcement/
+    #Source code: https://github.com/taoliu/MACS/"
     # top-level parser
     argparser = ap.ArgumentParser( description = description, epilog = epilog ) #, usage = usage )
     argparser.add_argument("--version", action="version", version="%(prog)s "+MACS_VERSION)
@@ -89,7 +94,6 @@ def prepare_argparser ():
 
     # command for 'callpeak'
     add_callpeak_parser( subparsers )
-
     # command for 'bdgpeakcall'
     add_bdgpeakcall_parser( subparsers )
 
@@ -122,8 +126,10 @@ def add_callpeak_parser( subparsers ):
     group_input.add_argument( "-c", "--control", dest = "cfile", type = str,
                                     help = "Control file.")
     group_input.add_argument( "-f", "--format", dest = "format", type = str,
-                              choices = ("AUTO", "BAM", "SAM", "BED", "ELAND", "ELANDMULTI", "ELANDEXPORT", "BOWTIE"),
-                              help = "Format of tag file, \"AUTO\", \"BED\" or \"ELAND\" or \"ELANDMULTI\" or \"ELANDEXPORT\" or \"SAM\" or \"BAM\" or \"BOWTIE\". The default AUTO option will let MACS decide which format the file is. Please check the definition in 00README file if you choose ELAND/ELANDMULTI/ELANDEXPORT/SAM/BAM/BOWTIE. DEFAULT: \"AUTO\"",
+                              choices = ("AUTO", "BAM", "SAM", "BED", "ELAND",
+                                         "ELANDMULTI", "ELANDEXPORT", "BOWTIE",
+                                          "BAMPE"),
+                              help = "Format of tag file, \"AUTO\", \"BED\" or \"ELAND\" or \"ELANDMULTI\" or \"ELANDEXPORT\" or \"SAM\" or \"BAM\" or \"BOWTIE\" or \"BAMPE\". The default AUTO option will let MACS decide which format the file is. Please check the definition in 00README file if you choose ELAND/ELANDMULTI/ELANDEXPORT/SAM/BAM/BOWTIE. DEFAULT: \"AUTO\"",
                               default = "AUTO" )
     group_input.add_argument( "-g", "--gsize", dest = "gsize", type = str, default = "hs",
                               help = "Effective genome size. It can be 1.0e+9 or 1000000000, or shortcuts:'hs' for human (2.7e9), 'mm' for mouse (1.87e9), 'ce' for C. elegans (9e7) and 'dm' for fruitfly (1.2e8), Default:hs" )
@@ -186,7 +192,11 @@ def add_callpeak_parser( subparsers ):
                                  help = "If set, MACS will try to call broad peaks by linking nearby highly enriched regions. The linking region is controlled by another cutoff through --linking-cutoff. The maximum linking region length is 4 times of d from MACS. DEFAULT: False", default = False )
     group_callpeak.add_argument( "--broad-cutoff", dest = "broadcutoff", type = float, default = 0.1,
                                  help = "Cutoff for broad region. This option is not available unless --broad is set. If -p is set, this is a pvalue cutoff, otherwise, it's a qvalue cutoff. DEFAULT: 0.1 " )
-    
+    group_callpeak.add_argument( "--call-summits", dest="call_summits", action="store_true",
+                         help="If set, MACS will use a more sophisticated approach to find all summits in each enriched peak region. DEFAULT: False",default=False)
+    group_callpeak.add_argument("--no-trackline", dest="trackline", action="store_false", default=True,
+                         help="Tells MACS not to include trackline with bedGraph files. The trackline is required by UCSC.")
+ 
     return
 
 def add_filterdup_parser( subparsers ):
@@ -228,6 +238,10 @@ def add_bdgpeakcall_parser( subparsers ):
                                        help = "maximum gap between significant points in a peak, better to set it as tag size. DEFAULT: 30", default = 30 )
     argparser_bdgpeakcall.add_argument( "-o", "--o-prefix", dest = "oprefix", default = "peak", type = str,
                                         help = "output file prefix, DEFAULT: peak" )
+    argparser_bdgpeakcall.add_argument( "--call-summits", dest="call_summits", action="store_true",
+                         help="If set, MACS will use a more sophisticated approach to find all summits in each enriched peak region. DEFAULT: False",default=False)
+    argparser_bdgpeakcall.add_argument("--no-trackline", dest="trackline", action="store_false", default=True,
+                         help="Tells MACS not to include trackline with bedGraph files. The trackline is required by UCSC.")
     return
 
 def add_bdgbroadcall_parser( subparsers ):
