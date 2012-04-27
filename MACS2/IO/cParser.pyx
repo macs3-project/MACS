@@ -469,19 +469,19 @@ class SAMParser( GenericParser ):
     11. Query quality
     
     The bitwise flag is made like this:
-    dec	meaning
-    ---	-------
-    1	paired read
-    2	proper pair
-    4	query unmapped
-    8	mate unmapped
-    16	strand of the query (1 -> reverse)
-    32	strand of the mate
-    64	first read in pair
-    128	second read in pair
-    256	alignment is not primary
-    512	does not pass quality check
-    1024	PCR or optical duplicate
+    dec    meaning
+    ---    -------
+    1    paired read
+    2    proper pair
+    4    query unmapped
+    8    mate unmapped
+    16    strand of the query (1 -> reverse)
+    32    strand of the mate
+    64    first read in pair
+    128    second read in pair
+    256    alignment is not primary
+    512    does not pass quality check
+    1024    PCR or optical duplicate
     """
 
     def __tlen_parse_line ( self, str thisline ):
@@ -543,10 +543,10 @@ class SAMParser( GenericParser ):
         # start position... hope I'm right!
         if bwflag & 16:
             thisstrand = 1
-            thisstart = atoi( thisfields[ 3 ] ) - 1 + atoi( thisfields[ 9 ] )	#reverse strand should be shifted len(query) bp 
+            thisstart = atoi( thisfields[ 3 ] ) - 1 + atoi( thisfields[ 9 ] )    #reverse strand should be shifted len(query) bp 
         else:
             thisstrand = 0
-            thisstart = atoi( thisfields[ 3 ] ) - 1	
+            thisstart = atoi( thisfields[ 3 ] ) - 1    
 
         try:
             thisref = thisref[ :thisref.rindex( ".fa" ) ]
@@ -561,19 +561,19 @@ class BAMParser( GenericParser ):
     Information available is the same that is in SAM format.
     
     The bitwise flag is made like this:
-    dec	meaning
-    ---	-------
-    1	paired read
-    2	proper pair
-    4	query unmapped
-    8	mate unmapped
-    16	strand of the query (1 -> reverse)
-    32	strand of the mate
-    64	first read in pair
-    128	second read in pair
-    256	alignment is not primary
-    512	does not pass quality check
-    1024	PCR or optical duplicate
+    dec    meaning
+    ---    -------
+    1    paired read
+    2    proper pair
+    4    query unmapped
+    8    mate unmapped
+    16    strand of the query (1 -> reverse)
+    32    strand of the mate
+    64    first read in pair
+    128    second read in pair
+    256    alignment is not primary
+    512    does not pass quality check
+    1024    PCR or optical duplicate
     """
 
     def sniff( self ):
@@ -714,7 +714,7 @@ class BAMParser( GenericParser ):
         l = unpack( '<i', data[ 16:20 ] )[ 0 ]
         if bwflag & 16:
             thisstrand = 1
-            thisstart = thisstart + unpack( '<i', data[ 16:20 ] )[ 0 ]	#reverse strand should be shifted len(query) bp 
+            thisstart = thisstart + unpack( '<i', data[ 16:20 ] )[ 0 ]    #reverse strand should be shifted len(query) bp 
         else:
             thisstrand = 0
 
