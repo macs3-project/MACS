@@ -50,10 +50,10 @@ def run( options ):
     btrack = bio.build_bdgtrack(baseline_value=0)
 
     info("Call peaks from bedGraph...")    
-    peaks = btrack.call_peaks(cutoff=float(options.cutoff),min_length=int(options.minlen),max_gap=int(options.maxgap))
+    peaks = btrack.call_peaks(cutoff=float(options.cutoff),min_length=int(options.minlen),max_gap=int(options.maxgap),call_summits=options.call_summits)
 
     info("Write peaks...")
     nf = open ("%s_c%.1f_l%d_g%d_peaks.encodePeak" % (options.oprefix,options.cutoff,options.minlen,options.maxgap),"w")        
-    peaks.write_to_narrowPeak(nf, name_prefix=options.oprefix+"_encodePeak", score_column="score")
+    peaks.write_to_narrowPeak(nf, name_prefix=options.oprefix+"_encodePeak", score_column="score", trackline=options.trackline)
     info("Done")
     
