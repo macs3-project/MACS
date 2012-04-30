@@ -1,5 +1,5 @@
 # cython: profile=True
-# Time-stamp: <2012-04-25 22:07:02 Tao Liu>
+# Time-stamp: <2012-04-30 04:12:33 Tao Liu>
 
 """Module Description
 
@@ -136,7 +136,7 @@ Summary of Peak Model:
 
         Modify self.(d, model_shift size and scan_window size. and extra, plus_line, minus_line and shifted_line for plotting).
         """
-        cdef int window_size
+        cdef int window_size, i
         
         window_size = 1+2*self.peaksize
         #self.plus_line = np.zeros(window_size, dtype="int32")#[0]*window_size
@@ -165,16 +165,22 @@ Summary of Peak Model:
         plus_data = (plus_line - plus_line.mean())/(plus_line.std()*len(plus_line))
 
         # cross-correlation
-        ycorr = np.correlate(minus_data,plus_data,mode="full")[window_size-1:window_size+self.peaksize]
-        xcorr = np.linspace(0, len(ycorr)-1, num=len(ycorr))
+        ycorr = np.correlate(minus_data,plus_data,mode="full")[window_size-self.peaksize:window_size+self.peaksize]
+        xcorr = np.linspace(len(ycorr)//2*-1, len(ycorr)//2, num=len(ycorr))
         # best cross-correlation point
-        self.d = np.where(ycorr==max(ycorr))[0][0]
+        self.d = xcorr[np.where(ycorr==max(ycorr))[0][0]]+self.tsize
         # all local maximums could be alternative ds.
-        self.alternative_d = xcorr[np.r_[True, ycorr[1:] > ycorr[:-1]] & np.r_[ycorr[:-1] > ycorr[1:], True]]
+        alternative_d = xcorr[np.r_[True, ycorr[1:] > ycorr[:-1]] & np.r_[ycorr[:-1] > ycorr[1:], True]]
         # get rid of the last local maximum if it's at the right end of curve.
-        if self.alternative_d[-1] == self.peaksize:
-            self.alternative_d = np.resize(self.alternative_d,self.alternative_d.size-1)
-        assert self.alternative_d.size > 0, "No proper d can be found! Tweak --mfold?"
+        self.alternative_d = []
+        for i in alternative_d:
+            if i == self.peaksize:
+                pass
+            elif i == -1*self.peaksize:
+                pass
+            else:
+                self.alternative_d.append(i+self.tsize)
+        assert len(self.alternative_d) > 0, "No proper d can be found! Tweak --mfold?"
         
         self.ycorr = ycorr
         self.xcorr = xcorr
