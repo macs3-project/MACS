@@ -1,5 +1,3 @@
-MACS2/*.c
-MACS2/IO/*.c
 MANIFEST
 build/*
 dist/*
