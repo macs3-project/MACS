@@ -1,4 +1,4 @@
-# Time-stamp: <2012-02-05 00:20:45 Tao Liu>
+# Time-stamp: <2012-04-30 17:25:08 Tao Liu>
 
 """Module Description
 
@@ -246,7 +246,7 @@ def model2r_script(model,filename,name):
     m = model.minus_line
     ycorr = model.ycorr
     xcorr = model.xcorr
-    alt_d = model.alternative_d
+    alt_d = [x-model.tsize for x in model.alternative_d]
     #s = model.shifted_line
     d = model.d
     w = len(p)
@@ -273,10 +273,10 @@ pdf('%s_model.pdf',height=6,width=6)
 plot(x,p,type='l',col=c('red'),main='Peak Model',xlab='Distance to the middle',ylab='Percentage')
 lines(x,m,col=c('blue'))
 legend('topleft',c('forward tags','reverse tags'),lty=c(1,1,1),col=c('red','blue'))
-plot(xcorr,ycorr,type='l',col=c('black'),main='Cross-Correlation',xlab='Distance between + and - tags',ylab='Correlation')
+plot(xcorr,ycorr,type='l',col=c('black'),main='Cross-Correlation',xlab='Lag between + and - tags',ylab='Correlation')
 abline(v=altd,lty=2,col=c('red'))
-legend('topright','alternative d',lty=2,col='red')
-legend('right','alt d(s) : %s',bty='n')
+legend('topright','alternative lags',lty=2,col='red')
+legend('right','alt lag(s) : %s',bty='n')
 dev.off()
 """ % (','.join(map(str,norm_p)),
        ','.join(map(str,norm_m)),
