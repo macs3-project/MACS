@@ -1,5 +1,5 @@
 Package: macs2
-Version: 2.0.11
+Version: 2.0.10
 Priority: optional
 Maintainer: Tao Liu <vladimir.liu@gmail.com>
 Depends: python2.7, python2.7-numpy (>=1.3) 

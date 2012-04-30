@@ -1,5 +1,5 @@
 # cython: profile=True
-# Time-stamp: <2012-04-25 17:33:03 Tao Liu>
+# Time-stamp: <2012-04-29 21:43:17 Tao Liu>
 
 """Module Description: For pileup functions.
 
@@ -23,7 +23,6 @@ from array import array
 
 from MACS2.IO.cBedGraph import bedGraphTrackI
 from MACS2.Constants import *
-from MACS2.cArray import IntArray
 
 import numpy as np
 cimport numpy as np
@@ -83,22 +82,15 @@ def pileup_bdg (trackI, int d, int baseline_value = 0, bool directional = True, 
 
         l = len(plus_tags)+len(minus_tags)        
 
-        #start_poss = build_start_poss( plus_tags, minus_tags, five_shift, three_shift, l )
-        #end_poss = build_end_poss( plus_tags, minus_tags, five_shift, three_shift, l )
-        
         ( start_poss, end_poss ) = start_and_end_poss( plus_tags, minus_tags, five_shift, three_shift )
-        #print start_poss[0]
-        #print end_poss[0]
 
         ret.add_a_chromosome( chrom, pileup_a_chromosome ( start_poss, end_poss, l, scale_factor, baseline_value ) )
 
+        # free mem
         start_poss.resize(100000, refcheck=False)
         start_poss.resize(0, refcheck=False)
         end_poss.resize(100000, refcheck=False)
         end_poss.resize(0, refcheck=False)                
-        # free mem?
-        #del(start_poss)
-        #del(end_poss)
 
     return ret
 
@@ -186,7 +178,7 @@ def pileup_w_multiple_d_bdg ( trackI, d_s, float baseline_value = 0, bool direct
 
     return ret
 
-cdef start_and_end_poss ( plus_tags, minus_tags, long five_shift, long three_shift ):
+cdef start_and_end_poss ( np.ndarray plus_tags, np.ndarray minus_tags, long five_shift, long three_shift ):
     cdef long i
     cdef long lp = plus_tags.shape[0]
     cdef long lm = minus_tags.shape[0]
@@ -214,7 +206,7 @@ cdef start_and_end_poss ( plus_tags, minus_tags, long five_shift, long three_shi
 
     return (start_poss, end_poss)
 
-cdef pileup_a_chromosome ( start_poss, end_poss, long l, float scale_factor = 1, float baseline_value = 0 ):
+cdef pileup_a_chromosome ( np.ndarray start_poss, np.ndarray end_poss, long l, float scale_factor = 1, float baseline_value = 0 ):
     """Return pileup of one chromosome.
 
     """
@@ -234,7 +226,6 @@ cdef pileup_a_chromosome ( start_poss, end_poss, long l, float scale_factor = 1,
         # the first chunk of 0
         tmppadd( pre_p )
         tmpvadd( float_max(0,baseline_value) )
-        #print float_max(0,baseline_value) 
         
     pre_v = pileup
     
@@ -246,7 +237,6 @@ cdef pileup_a_chromosome ( start_poss, end_poss, long l, float scale_factor = 1,
             if p != pre_p:
                 tmppadd( p )
                 tmpvadd( float_max(pileup * scale_factor, baseline_value) )
-                #ret.add_loc(chrom,pre_p,p,pileup)
                 pre_p = p
             pileup += 1
             i_s += 1
@@ -255,7 +245,6 @@ cdef pileup_a_chromosome ( start_poss, end_poss, long l, float scale_factor = 1,
             if p != pre_p:
                 tmppadd( p )
                 tmpvadd( float_max(pileup * scale_factor, baseline_value) ) 
-                #ret.add_loc(chrom,pre_p,p,pileup)
                 pre_p = p
             pileup -= 1
             i_e += 1

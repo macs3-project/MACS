@@ -1,5 +1,5 @@
 # cython: profile=True
-# Time-stamp: <2012-04-27 03:46:07 Tao Liu>
+# Time-stamp: <2012-04-29 17:19:11 Tao Liu>
 
 """Module for all MACS Parser classes for input.
 
@@ -25,6 +25,7 @@ import gzip
 import io
 from MACS2.Constants import *
 from MACS2.IO.cFixWidthTrack import FWTrackIII
+from libc.stdint cimport uint32_t, uint64_t
 
 cdef extern from "stdlib.h":
     ctypedef unsigned int size_t
@@ -192,6 +193,7 @@ class GenericParser:
                 i=0
             fwtrack.add_loc( chromosome, fpos, strand )
 
+        # close fwtrack and sort
         fwtrack.finalize()
         # close file stream.
         self.close()

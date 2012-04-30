@@ -1,5 +1,5 @@
 # cython: profile=True
-# Time-stamp: <2012-04-25 18:11:11 Tao Liu>
+# Time-stamp: <2012-04-29 21:59:33 Tao Liu>
 
 """Module for Feature IO classes.
 
@@ -23,6 +23,7 @@ import logging
 from array import array
 
 import numpy as np
+np_convolve = np.convolve
 
 from libc.math cimport sqrt
 from libc.math cimport log
@@ -444,7 +445,7 @@ class bedGraphTrackI:
             peakindices[i:j] = tmpindex
         # apply smoothing window of tsize / 2
         w = np.ones(smoothlen, dtype='float32')
-        smoothdata = fftconvolve(w/w.sum(), peakdata, mode='same')
+        smoothdata = np_convolve(w/w.sum(), peakdata, mode='same')
         # find maxima and minima
         local_extrema = np.where(np.diff(np.sign(np.diff(smoothdata))))[0]+1
         # get only maxima by requiring it be greater than the mean

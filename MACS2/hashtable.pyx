@@ -110,7 +110,7 @@ cdef class Int64HashTable:
     def __dealloc__(self):
         kh_destroy_int64(self.table)
 
-    cdef inline bint has_key(self, int64_t val):
+    cpdef inline bint has_key(self, int64_t val):
         cdef khiter_t k
         k = kh_get_int64(self.table, val)
         return k != self.table.n_buckets

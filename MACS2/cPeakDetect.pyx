@@ -1,5 +1,5 @@
 # cython: profile=True
-# Time-stamp: <2012-04-25 17:04:40 Tao Liu>
+# Time-stamp: <2012-04-29 21:05:41 Tao Liu>
 
 """Module Description
 
@@ -318,6 +318,8 @@ class PeakDetect:
         Finally, a poisson CDF is applied to calculate one-side pvalue
         for enrichment.
         """
+        cdef int i
+        
         treat_total   = self.treat.total
         control_total = self.control.total
         self.ratio_treat2control = float(treat_total)/control_total
@@ -413,8 +415,11 @@ class PeakDetect:
         pqfhd = open(self.opt.pqtable,"w")
         pqfhd.write( "-log10pvalue\t-log10qvalue\trank\tbasepairs\n" )
         for p in sorted(pqtable.keys(),reverse=True):
+        #for i in range(pqtable.shape[0]):
+            #t = pqtable[i]
             q = pqtable[p]
             pqfhd.write("%.2f\t%.2f\t%d\t%d\n" % (p/100.0,q[0]/100.0,q[1],q[2]))
+            #pqfhd.write("%.2f\t%.2f\t%d\t%d\n" % (t[0]/100.0,t[1]/100.0,t[2],t[3]))            
         pqfhd.close()
 
         self.info("#3 Assign qvalues ...")

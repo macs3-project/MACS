@@ -1,5 +1,5 @@
 # cython: profile=True
-# Time-stamp: <2012-04-13 17:09:07 Tao Liu>
+# Time-stamp: <2012-04-29 17:27:17 Tao Liu>
 
 """Module for PeakIO IO classes.
 
@@ -35,7 +35,7 @@ __doc__ = "PeakIO class"
 # ------------------------------------
 # Misc functions
 # ------------------------------------
-def subpeak_letters(i):
+cdef subpeak_letters( int i):
     if i < 26:
         return chr(97+i)
     else:

@@ -1,22 +1,18 @@
-2012-04-27 Benjamin Schiller <benjamin.schiller@ucsf.edu>
-    MACS version 2.0.11 (tag:alpha still working)
+2012-04-29 Benjamin Schiller <benjamin.schiller@ucsf.edu>,  Tao Liu  <taoliu@jimmy.harvard.edu>
+	MACS version 2.0.10 (tag:alpha not released)
 
-    * Introduced BAMPEParser *
-    Reads PE data directly, requires bedtools for now
-    
-    * Introduced --call-summits *
-    Uses signal processing methods to call overlapping peaks
+	* Introduced BAMPEParser *
+	Reads PE data directly, requires bedtools for now
 
-    * Added --no-trackline *
-    By default, files have descriptive tracklines now
+	* Introduced --call-summits *
+	Uses signal processing methods to call overlapping peaks
 
-    * Changes to output *
-    cPeakDetect.pyx has full support for new print/write methods and
-    --call-peaks, BAMPEParser, and use of paired-end data
+	* Added --no-trackline *
+	By default, files have descriptive tracklines now
 
-
-2012-03-12  Tao Liu  <taoliu@jimmy.harvard.edu>
-	MACS version 2.0.10 (tag:alpha still working)
+	* Changes to output *
+	cPeakDetect.pyx has full support for new print/write methods and
+	--call-peaks, BAMPEParser, and use of paired-end data
 
 	* Parser optimization
 
@@ -74,8 +70,7 @@
 
 	* SAMParser and BAMParser
 
-	Bug fixed for paired-end sequencing data. Thanks to Benjamin
-	Schiller!
+	Bug fixed for paired-end sequencing data.
 
 	* BedGraph.pyx
 

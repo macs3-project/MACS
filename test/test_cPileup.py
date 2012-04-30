@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# Time-stamp: <2012-04-25 17:19:57 Tao Liu>
+# Time-stamp: <2012-04-29 18:25:30 Tao Liu>
 
 """Module Description: Test functions for pileup functions.
 
@@ -85,7 +85,7 @@ class Test_pileup(unittest.TestCase):
 
     def test_pileup_w_multiple_d_bdg ( self ):
         # build FWTrackII
-        self.fwtrack2 = FWTrackIII()
+        self.fwtrack2 = FWTrackIII(fw=5)
         for i in self.plus_pos:
             self.fwtrack2.add_loc(self.chrom, i, 0)
         for i in self.minus_pos:

@@ -1,5 +1,5 @@
 # cython: profile=True
-# Time-stamp: <2012-04-24 18:20:50 Tao Liu>
+# Time-stamp: <2012-04-29 18:04:37 Tao Liu>
 
 """Module for FWTrack classes.
 
@@ -24,8 +24,7 @@ from array import array
 from random import sample as random_sample
 import sys
 from MACS2.Constants import *
-
-#from MACS2.cArray import IntArray
+from libc.stdint cimport uint32_t, uint64_t, int32_t, int64_t
 
 import numpy as np
 cimport numpy as np
@@ -53,7 +52,7 @@ class FWTrackIII:
     Locations are stored and organized by sequence names (chr names) in a
     dict. They can be sorted by calling self.sort() function.
     """
-    def __init__ (self, int fw=0, char * anno=""):
+    def __init__ (self, int32_t fw=0, char * anno=""):
         """fw is the fixed-width for all locations.
         
         """
@@ -65,7 +64,7 @@ class FWTrackIII:
         self.annotation = anno   # need to be figured out
 
 
-    def add_loc ( self, str chromosome, int fiveendpos, int strand ):
+    def add_loc ( self, str chromosome, int32_t fiveendpos, int32_t strand ):
         """Add a location to the list according to the sequence name.
         
         chromosome -- mostly the chromosome name
@@ -73,7 +72,7 @@ class FWTrackIII:
         strand     -- 0: plus, 1: minus
         """
         if not self.__locations.has_key(chromosome):
-            self.__locations[chromosome] = [ np.zeros(BUFFER_SIZE, dtype='int32'), np.zeros(BUFFER_SIZE, dtype='int32') ]
+            self.__locations[chromosome] = [ np.zeros(BUFFER_SIZE, dtype='int32'), np.zeros(BUFFER_SIZE, dtype='int32') ] # [plus,minus strand]
             self.__pointer[chromosome] = [ 0, 0 ]
         try:
             self.__locations[chromosome][strand][self.__pointer[chromosome][strand]] = fiveendpos
@@ -90,14 +89,14 @@ class FWTrackIII:
     def finalize ( self ):
         """ Resize np arrays for 5' positions and sort them in place """
         
-        cdef int i
+        cdef int32_t i
         cdef str c
         
         self.total+=0
 
         chrnames = self.get_chr_names()
 
-        for i in xrange(len(chrnames)):
+        for i in range(len(chrnames)):
             c = chrnames[i]
             self.__locations[c][0].resize( self.__pointer[c][0], refcheck=False )
             self.__locations[c][0].sort()
@@ -133,26 +132,28 @@ class FWTrackIII:
         """Naive sorting for locations.
         
         """
-        cdef int i
+        cdef int32_t i
         cdef str c
 
         chrnames = self.get_chr_names()
 
-        for i in xrange(len(chrnames)):
+        for i in range(len(chrnames)):
             c = chrnames[i]
             self.__locations[c][0].sort()
             self.__locations[c][1].sort()
 
         self.__sorted = True
 
-    def filter_dup ( self, int maxnum ):
+    def filter_dup ( self, int32_t maxnum = -1 ):
         """Filter the duplicated reads.
 
         Run it right after you add all data into this object.
         """
-        cdef int p, m, n, current_loc, i_chrom
-        cdef long i_old, i_new          # index for old array, and index for new one
+        cdef int32_t p, m, n, current_loc, i_chrom
+        cdef int32_t i_old, i_new          # index for old array, and index for new one
         cdef str k
+
+        if maxnum < 0: return           # do nothing
         
         if not self.__sorted:
             self.sort()
@@ -246,7 +247,7 @@ class FWTrackIII:
 
         Warning: the current object is changed!
         """
-        cdef long num, i_chrom
+        cdef int32_t num, i_chrom      # num: number of reads allowed on a certain chromosome
         cdef str key
         
         self.total = 0
@@ -259,13 +260,13 @@ class FWTrackIII:
             
             key = chrnames[ i_chrom ]
         
-            num = long( round(self.__locations[key][0].shape[0] * percent, 2 ) )
+            num = <int32_t>round(self.__locations[key][0].shape[0] * percent, 2 )
             np.random.shuffle( self.__locations[key][0] )
             self.__locations[key][0].resize( num )
             self.__locations[key][0].sort()
             self.__pointer[key][0] = self.__locations[key][0].shape[0]
 
-            num = long( round(self.__locations[key][1].shape[0] * percent, 2 ) )
+            num = <int32_t>round(self.__locations[key][1].shape[0] * percent, 2 )
             np.random.shuffle( self.__locations[key][1] )
             self.__locations[key][1].resize( num )
             self.__locations[key][1].sort()
@@ -274,14 +275,12 @@ class FWTrackIII:
             self.total += self.__pointer[key][0] + self.__pointer[key][1]
         return
 
-    def sample_num (self, long samplesize):
+    def sample_num (self, uint64_t samplesize):
         """Sample the tags for a given percentage.
 
         Warning: the current object is changed!
         """
         cdef float percent
-        cdef long num
-        cdef str key
 
         percent = float(samplesize)/self.total
         self.sample_percent ( percent )
@@ -292,9 +291,7 @@ class FWTrackIII:
         write to a file, otherwise, output to standard output.
         
         """
-        cdef long i
-        cdef long i_chrom
-        cdef int p
+        cdef int32_t i, i_chrom, p
         cdef str k
         
         if not fhd:

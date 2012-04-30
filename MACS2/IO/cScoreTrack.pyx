@@ -1,5 +1,5 @@
 # cython: profile=True
-# Time-stamp: <2012-04-25 18:28:21 Tao Liu>
+# Time-stamp: <2012-04-29 21:59:02 Tao Liu>
 
 """Module for Feature IO classes.
 
@@ -20,12 +20,14 @@ with the distribution).
 # ------------------------------------
 import numpy as np
 cimport numpy as np
+
+from array import array as pyarray
+
 from cpython cimport bool
-#from np import int64,int32,float32
-from scipy.signal import fftconvolve
+#from scipy.signal import fftconvolve
+np_convolve = np.convolve
 
 from libc.math cimport log10,log
-from operator import itemgetter
 
 from MACS2.Constants import *
 from MACS2.cProb cimport poisson_cdf
@@ -34,10 +36,6 @@ from MACS2.IO.cPeakIO import PeakIO, BroadPeakIO
 from MACS2.hashtable import Int64HashTable
 
 import logging
-
-#from time import time as ttime
-
-#from MACS2.IO.cBedGraph import bedGraphTrackI
 
 # ------------------------------------
 # constants
@@ -52,7 +50,6 @@ __doc__ = "scoreTrackI classes"
 cdef inline int int_max(int a, int b): return a if a >= b else b
 cdef inline int int_min(int a, int b): return a if a <= b else b
 
-pscore_dict = {}
 LOG10_E = 0.43429448190325176
 pscore_khashtable = Int64HashTable()
 
@@ -80,7 +77,6 @@ cdef get_pscore ( int observed, double expectation ):
     #    pscore_dict[(observed,expectation)] = score
     #return score
 
-logLR_dict = {}
 logLR_khashtable = Int64HashTable()
 
 cdef logLR ( double x, double y ):
@@ -149,12 +145,6 @@ class scoreTrackI:
 
     def add_chromosome ( self, str chrom, int chrom_max_len ):
         if not self.data.has_key(chrom):
-            # self.data[chrom] = np.zeros(chrom_max_len,dtype=[('pos','int32'),
-            #                                                 ('sample','float32'),
-            #                                                 ('control','float32'),
-            #                                                 ('-100logp','int32'),
-            #                                                 ('-100logq','int32'),
-            #                                                 ('100logLR','int32'),])
             self.data[chrom] = { 'pos': np.zeros(chrom_max_len, dtype="int32"),
                                  'sample': np.zeros(chrom_max_len, dtype="float32"),
                                  'control': np.zeros(chrom_max_len, dtype="float32"),
@@ -270,51 +260,57 @@ class scoreTrackI:
         
         #logging.info("####test#### start make_pq")
         n = self.total()
-        #value_list = np.empty( n, dtype = [('v', '<f4'), ('l', '<i4')])
-        value_dict = {}
-        #i = 0                           # index for value_list
+        value_dict = Int64HashTable()
+        unique_values = pyarray(BYTE4,[])
         # this is a table of how many positions each p value occurs at
         for chrom in self.data.keys():
             # for each chromosome
             pre_p  = 0
-            pos    = iter(self.data[chrom][ 'pos' ]).next
-            value  = iter(self.data[chrom][ '-100logp' ]).next
+            pos    = self.data[chrom][ 'pos' ]
+            value  = self.data[chrom][ '-100logp' ]
             length = self.pointer[chrom]
-            j = 0
-            while j<length:
-                this_p = pos()
-                this_v = value()
+            for j in range(length):
+                this_p = pos[j]
+                this_v = value[j]
                 assert this_v == this_v, "NaN at %d" % pos
-                #value_list[i] = (this_v,this_p-pre_p)
-                #i += 1
                 if value_dict.has_key(this_v):
-                    value_dict[this_v] += long(this_p - pre_p)
+                    value_dict.set_item(this_v, value_dict.get_item(this_v) + this_p - pre_p)
                 else:
-                    value_dict[this_v] = long(this_p - pre_p)
-                j += 1
+                    value_dict.set_item(this_v, this_p - pre_p)
+                    unique_values.append(this_v)
                 pre_p = this_p
 
-        N = sum(value_dict.values())
+        N = 0
+        for i in range(len(unique_values)):
+            N += value_dict.get_item(unique_values[i])
         k = 1                           # rank
         f = -log10(N)
         pre_v = -2147483647
         pre_l = 0
         pre_q = 2147483647              # save the previous q-value
         pvalue2qvalue = {pre_v:[0,k,0]}              # pvalue:[qvalue,rank,bp_with_this_pvalue]
+        #pvalue2qvalue = np.zeros( (len(unique_values)+1,4), dtype='int64' )
+        #pvalue2qvalue[0] = (pre_v, 0, k, 0)
         #logging.info("####test#### start matching pvalue to qvalue")
-        for v in sorted(value_dict.keys(),reverse=True):
-            l = value_dict[v]
+        unique_values = sorted(unique_values,reverse=True)
+        for i in range(len(unique_values)):
+            v = unique_values[i]
+            l = value_dict.get_item(v)
             q = v + int((log10(k) + f) * 100) # we save integers here.
             q = max(0,min(pre_q,q))           # make q-score monotonic
+            #pvalue2qvalue[i+1] = (v, q, k, 0)
+            #pvalue2qvalue[i][3] = k - pvalue2qvalue[i][2]
             pvalue2qvalue[v] = [q, k, 0]
             pvalue2qvalue[pre_v][2] = k-pvalue2qvalue[pre_v][1]
             pre_v = v
             pre_q = q
             k+=l
+        #pvalue2qvalue[i+1][3] = k - pvalue2qvalue[i][2]
         pvalue2qvalue[pre_v][2] = k-pvalue2qvalue[pre_v][1]
         #logging.info("####test#### finish building pqtable")        
         # pop the first -1e100 one
         pvalue2qvalue.pop(-2147483647)
+        #pvalue2qvalue = pvalue2qvalue[1:]
 
         return pvalue2qvalue
 
@@ -329,9 +325,11 @@ class scoreTrackI:
 
         # convert pvalue2qvalue to a simple dict
         s_p2q = Int64HashTable()
-        g = pvalue2qvalue.get
+        #g = pvalue2qvalue.get
         for i in pvalue2qvalue.keys():
-            s_p2q.set_item(i,g(i)[0])
+        #for i in range(pvalue2qvalue.shape[0]):
+            s_p2q.set_item(i,pvalue2qvalue[i][0])
+            #s_p2q.set_item(pvalue2qvalue[i][0],pvalue2qvalue[i][1])
 
         g = s_p2q.get_item
         
@@ -421,7 +419,7 @@ class scoreTrackI:
             peakindices[i:j] = tmpindex
         # apply smoothing window of tsize / 2
         w = np.ones(smoothlen, dtype='float32')
-        smoothdata = fftconvolve(w/w.sum(), peakdata, mode='same')
+        smoothdata = np_convolve(w/w.sum(), peakdata, mode='same')
         # find maxima and minima
         local_extrema = np.where(np.diff(np.sign(np.diff(smoothdata))))[0]+1
         # get only maxima by requiring it be greater than the mean
