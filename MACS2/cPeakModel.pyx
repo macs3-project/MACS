@@ -1,5 +1,5 @@
 # cython: profile=True
-# Time-stamp: <2012-04-30 04:12:33 Tao Liu>
+# Time-stamp: <2012-04-30 05:52:49 Tao Liu>
 
 """Module Description
 
@@ -177,6 +177,8 @@ Summary of Peak Model:
             if i == self.peaksize:
                 pass
             elif i == -1*self.peaksize:
+                pass
+            elif i <= -1*self.tsize:
                 pass
             else:
                 self.alternative_d.append(i+self.tsize)
