@@ -1,5 +1,5 @@
 # cython: profile=True
-# Time-stamp: <2012-04-29 21:05:41 Tao Liu>
+# Time-stamp: <2012-04-30 17:37:49 Tao Liu>
 
 """Module Description
 
@@ -36,6 +36,7 @@ def subpeak_letters(i):
     else:
         return subpeak_letters(i / 26) + chr(97 + (i % 26))
 
+# actually I didn't use this function... 
 def compare_treatment_vs_control(treat, control, fragment_size, gsize,
                                  never_directional=False, halfext=False,
                                  slocal=0, llocal=0,
@@ -78,6 +79,7 @@ def compare_treatment_vs_control(treat, control, fragment_size, gsize,
     else:
         lambda_bg = float(fragment_size)*treat_total/gsize
 
+
     # control data needs multiple steps of calculation
     # I need to shift them by 500 bps, then 5000 bps
     if slocal:
@@ -86,51 +88,53 @@ def compare_treatment_vs_control(treat, control, fragment_size, gsize,
         assert fragment_size <= llocal , "llocal can't be smaller than d!"            
         assert slocal <= llocal , "llocal can't be smaller than slocal!"
 
-    # d-size local
-    
-    # Now pileup FWTrackII to form a bedGraphTrackI
-    c_tmp_btrack = pileup_bdg(control, fragment_size, directional=control_directional, halfextension=halfext)
-    if not tocontrol:
+    # Now prepare a list of extension sizes
+    d_s = [ fragment_size ]
+    # And a list of scaling factors
+    scale_factor_s = []
+
+    # d
+    if not self.opt.tocontrol:
         # if user want to scale everything to ChIP data
-        tmp_v = ratio_treat2control
+        tmp_v = self.ratio_treat2control
     else:
         tmp_v = 1
-
-    c_tmp_btrack.apply_func(lambda x:float(x)*tmp_v)
-    control_btrack = c_tmp_btrack
+    scale_factor_s.append( tmp_v )
 
     # slocal size local
     if slocal:
+        d_s.append( slocal )
         # Now pileup FWTrackII to form a bedGraphTrackI
-        c_tmp_btrack = pileup_bdg(control, slocal, directional=control_directional, halfextension=halfext)
-        if not tocontrol:
+        c_tmp_btrack = pileup_bdg(self.control,slocal,directional=control_directional,halfextension=self.opt.halfext)
+        if not self.opt.tocontrol:
             # if user want to scale everything to ChIP data
-            tmp_v = float(fragment_size)/slocal*ratio_treat2control
+            tmp_v = float(fragment_size)/slocal*self.ratio_treat2control
         else:
             tmp_v = float(fragment_size)/slocal
-        c_tmp_btrack.apply_func(lambda x:float(x)*tmp_v)
-        control_btrack = control_btrack.overlie(c_tmp_btrack,func=max)
+        scale_factor_s.append( tmp_v )
 
     # llocal size local
     if llocal and llocal > slocal:
-        # Now pileup FWTrackII to form a bedGraphTrackI
-        c_tmp_btrack = pileup_bdg(control, llocal, directional=control_directional, halfextension=halfext)
-        if not tocontrol:
+        d_s.append( llocal )
+        if not self.opt.tocontrol:
             # if user want to scale everything to ChIP data
-            tmp_v = float(fragment_size)/llocal*ratio_treat2control
+            tmp_v = float(fragment_size)/llocal*self.ratio_treat2control
         else:
-            tmp_v = float(fragment_size)/llocal            
-        c_tmp_btrack.apply_func(lambda x:float(x)*tmp_v)
-        control_btrack = control_btrack.overlie(c_tmp_btrack,func=max)
+            tmp_v = float(fragment_size)/llocal
+        scale_factor_s.append( tmp_v )                            
 
-    control_btrack.reset_baseline(lambda_bg) # set the baseline as lambda_bg
+    # pileup using different extension sizes and scaling factors
+    control_btrack = pileup_w_multiple_d_bdg(self.control,d_s,
+                                             baseline_value=lambda_bg,
+                                             directional=control_directional,
+                                             halfextension=self.opt.halfext,
+                                             scale_factor_s=scale_factor_s)
 
     # calculate pvalue scores
     score_btrack = treat_btrack.make_scoreTrack_for_macs(control_btrack)
-    if self.opt.trackline: score_btrack.enable_trackline()
-    treat_btrack = None             # clean them
-    control_btrack = None
-    gc.collect()                    # full collect garbage
+    #treat_btrack = None             # clean them
+    #control_btrack = None
+    #gc.collect()                    # full collect garbage
 
     # calculate and assign qvalues
     pqtable = score_btrack.make_pq_table()

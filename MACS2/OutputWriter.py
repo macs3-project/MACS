@@ -1,4 +1,4 @@
-# Time-stamp: <2012-04-30 17:25:08 Tao Liu>
+# Time-stamp: <2012-04-30 17:32:38 Tao Liu>
 
 """Module Description
 
@@ -275,14 +275,14 @@ lines(x,m,col=c('blue'))
 legend('topleft',c('forward tags','reverse tags'),lty=c(1,1,1),col=c('red','blue'))
 plot(xcorr,ycorr,type='l',col=c('black'),main='Cross-Correlation',xlab='Lag between + and - tags',ylab='Correlation')
 abline(v=altd,lty=2,col=c('red'))
-legend('topright','alternative lags',lty=2,col='red')
+legend('topleft','alternative lag(s)',lty=2,col='red')
 legend('right','alt lag(s) : %s',bty='n')
 dev.off()
 """ % (','.join(map(str,norm_p)),
        ','.join(map(str,norm_m)),
        ','.join(map(str,ycorr)),
        ','.join(map(str,xcorr)),
-       ','.join(map(str,alt_d)),
+       ', '.join(map(str,alt_d)),
        name,
        ','.join(map(str,alt_d))
        ))
