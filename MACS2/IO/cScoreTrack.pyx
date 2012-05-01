@@ -230,6 +230,7 @@ class scoreTrackI:
                 value = d[colname]/100.0
             else:
                 value = d[colname]
+            if len(value) == 0: continue
             pre_v = value[0]
             for i in range( 1, l ):
                 v = value[i]
@@ -269,7 +270,7 @@ class scoreTrackI:
             pos    = self.data[chrom][ 'pos' ]
             value  = self.data[chrom][ '-100logp' ]
             length = self.pointer[chrom]
-            for j in range(length):
+            for j in xrange(length):
                 this_p = pos[j]
                 this_v = value[j]
                 assert this_v == this_v, "NaN at %d" % pos
@@ -281,7 +282,7 @@ class scoreTrackI:
                 pre_p = this_p
 
         N = 0
-        for i in range(len(unique_values)):
+        for i in xrange(len(unique_values)):
             N += value_dict.get_item(unique_values[i])
         k = 1                           # rank
         f = -log10(N)
@@ -293,7 +294,7 @@ class scoreTrackI:
         #pvalue2qvalue[0] = (pre_v, 0, k, 0)
         #logging.info("####test#### start matching pvalue to qvalue")
         unique_values = sorted(unique_values,reverse=True)
-        for i in range(len(unique_values)):
+        for i in xrange(len(unique_values)):
             v = unique_values[i]
             l = value_dict.get_item(v)
             q = v + int((log10(k) + f) * 100) # we save integers here.

@@ -592,7 +592,7 @@ class BAMParser( GenericParser ):
             else:
                 self.fhd.seek( 0 )
                 raise Exception( "File is not of a valid BAM format! %d" % tsize )
-            return False
+#            return False
         else:
             self.fhd.seek( 0 )
             return False
@@ -724,6 +724,129 @@ class BAMParser( GenericParser ):
         return ( thisref, thisstart, thisstrand )
 
 ### End ###
+#class BAMPEParser(BAMParser):
+#    """File Parser Class for BAM File containing paired-end reads
+#    Only counts valid pairs, discards everything else
+#    Uses the midpoint of every read and calculates the average fragment size
+#    on the fly instead of modeling it
+#
+#    File is gzip-compatible and binary.
+#    Information available is the same that is in SAM format.
+#    
+#    The bitwise flag is made like this:
+#    dec    meaning
+#    ---    -------
+#    1    paired read
+#    2    proper pair
+#    4    query unmapped
+#    8    mate unmapped
+#    16    strand of the query (1 -> reverse)
+#    32    strand of the mate
+#    64    first read in pair
+#    128    second read in pair
+#    256    alignment is not primary
+#    512    does not pass quality check
+#    1024    PCR or optical duplicate
+#    """
+#    def tsize(self):
+#        if hasattr(self, 'd') and self.d is not None:
+#            pass
+#        else:
+#            self.build_fwtrack()
+#        return self.d
+#
+#    def __build_fwtrack (self):
+#        """Build FWTrackIII from all lines, return a FWTrackIII object.
+#
+#        Note only the unique match for a tag is kept.
+#        """
+#        cdef int i, m, header_len, nc, x, nlength
+#        cdef int entrylength, fpos, strand, chrid
+#        cdef list references
+#        cdef float d
+#        
+#        fwtrack = FWTrackIII()
+#        i = 0
+#        m = 0
+#        references = []
+#        fseek = self.fhd.seek
+#        fread = self.fhd.read
+#        ftell = self.fhd.tell
+#        # move to pos 4, there starts something
+#        fseek(4)
+#        header_len =  struct.unpack('<i', fread(4))[0]
+#        fseek(header_len + ftell())
+#        # get the number of chromosome
+#        nc = struct.unpack('<i', fread(4))[0]
+#        for x in range(nc):
+#            # read each chromosome name
+#            nlength = struct.unpack('<i', fread(4))[0]
+#            references.append(fread(nlength)[:-1])
+#            # jump over chromosome size, we don't need it
+#            fseek(ftell() + 4)
+#        
+#        d = 0
+#        # for convenience, only count valid pairs
+#        while True:
+#            try:
+#                entrylength = struct.unpack('<i', fread(4))[0]
+#            except struct.error:
+#                break
+#            (chrid,fpos,strand,tlen) = self.__fw_binary_parse(fread(entrylength))
+#            if chrid < 0: continue
+#            d = (d * i + abs(tlen)) / (i + 1) # keep track of avg fragment size
+#            i+=1
+#            if i == 1000000:
+#                m += 1
+#                logging.info(" %d" % (m*1000000))
+#                i=0
+#            fwtrack.add_loc(references[chrid],fpos,strand)
+#        self.d = int(d)
+#        assert d >= 0, "Something went wrong (average fragment size was negative)"
+#        self.fhd.close()
+#        self.fwtrack = fwtrack
+#        
+#    def build_fwtrack (self):
+#        if hasattr(self, 'fwtrack') and self.fwtrack is not None:
+#            pass
+#        else:
+#            self.__build_fwtrack()
+#        return self.fwtrack
+#    
+#    def __fw_binary_parse (self, data ):
+#        cdef int thisref, thisstart, thisstrand, tlen, midpoint
+#        cdef short cigar, bwflag
+#        
+#        # we skip lot of the available information in data (i.e. tag name, quality etc etc)
+#        if not data: return (-1,-1,-1,0)
+#
+#        thisref = struct.unpack('<i', data[0:4])[0]
+#        thisstart = struct.unpack('<i', data[4:8])[0]
+#        (cigar, bwflag) = struct.unpack('<hh', data[12:16])
+#        tlen = struct.unpack('<i', data[28:32])[0]
+#        midpoint = thisstart + tlen / 2
+#        if bwflag & 4 or bwflag & 512 or bwflag & 1024:
+#            return (-1, -1, -1, 0)       #unmapped sequence or bad sequence
+#        if bwflag & 1:
+#            # paired read. We should only keep sequence if the mate is mapped
+#            # and if this is the left mate, all is within  the flag! 
+#            if not bwflag & 2:
+#                return (-1, -1, -1, 0)  # not a proper pair
+#            if bwflag & 8:
+#                return (-1, -1, -1, 0)  # the mate is unmapped
+#            if bwflag & 128:
+#                # this is not the first read in a pair
+#                return (-1, -1, -1, 0)
+#                
+#        # In case of paired-end we have now skipped all possible "bad" pairs
+#        # in case of proper pair we have skipped the rightmost one... if the leftmost pair comes
+#        # we can treat it as a single read, so just check the strand and calculate its
+#        # start position... hope I'm right!
+#        thisstrand = bool(bwflag & 16)
+#
+#        return (thisref, midpoint, thisstrand, tlen)
+#
+#### End ###
 class BAMPEParser(BAMParser):
     """File Parser Class for BAM File containing paired-end reads
     Only counts valid pairs, discards everything else
@@ -748,24 +871,17 @@ class BAMPEParser(BAMParser):
     512    does not pass quality check
     1024    PCR or optical duplicate
     """
-    def tsize(self):
-        if hasattr(self, 'd') and self.d is not None:
-            pass
-        else:
-            self.build_fwtrack()
-        return self.d
 
-    def __build_fwtrack (self):
+    def build_fwtracks (self):
         """Build FWTrackIII from all lines, return a FWTrackIII object.
-
-        Note only the unique match for a tag is kept.
         """
         cdef int i, m, header_len, nc, x, nlength
-        cdef int entrylength, fpos, strand, chrid
+        cdef int entrylength, fposF, fposR, fpos2, chrid
         cdef list references
         cdef float d
         
-        fwtrack = FWTrackIII()
+        fwtrackF = FWTrackIII()
+        fwtrackR = FWTrackIII()
         i = 0
         m = 0
         references = []
@@ -792,59 +908,57 @@ class BAMPEParser(BAMParser):
                 entrylength = struct.unpack('<i', fread(4))[0]
             except struct.error:
                 break
-            (chrid,fpos,strand,tlen) = self.__fw_binary_parse(fread(entrylength))
+            (chrid,fposF,tlen) = self.__fw_binary_parse(fread(entrylength))
             if chrid < 0: continue
+            fposR = fposF + tlen
+            if fposR < fposF: fposF, fposR = fposR, fposF
             d = (d * i + abs(tlen)) / (i + 1) # keep track of avg fragment size
             i+=1
             if i == 1000000:
                 m += 1
                 logging.info(" %d" % (m*1000000))
                 i=0
-            fwtrack.add_loc(references[chrid],fpos,strand)
+            fwtrackF.add_loc(references[chrid], fposF, 0)
+            fwtrackR.add_loc(references[chrid], fposR, 0)
+        self.n = m * 1000000 + i
         self.d = int(d)
         assert d >= 0, "Something went wrong (average fragment size was negative)"
         self.fhd.close()
-        self.fwtrack = fwtrack
+        fwtrackF.finalize()
+        fwtrackR.finalize()
+        return (fwtrackF, fwtrackR)
         
-    def build_fwtrack (self):
-        if hasattr(self, 'fwtrack') and self.fwtrack is not None:
-            pass
-        else:
-            self.__build_fwtrack()
-        return self.fwtrack
-    
     def __fw_binary_parse (self, data ):
-        cdef int thisref, thisstart, thisstrand
+        cdef int thisref, thisstart, thisend, thisstrand, tlen
         cdef short cigar, bwflag
         
         # we skip lot of the available information in data (i.e. tag name, quality etc etc)
-        if not data: return (-1,-1,-1,0)
+        if not data: return (-1, -1, 0)
 
         thisref = struct.unpack('<i', data[0:4])[0]
         thisstart = struct.unpack('<i', data[4:8])[0]
         (cigar, bwflag) = struct.unpack('<hh', data[12:16])
         tlen = struct.unpack('<i', data[28:32])[0]
-        midpoint = thisstart + tlen / 2
+        
         if bwflag & 4 or bwflag & 512 or bwflag & 1024:
-            return (-1, -1, -1, 0)       #unmapped sequence or bad sequence
+            return (-1, -1, 0)       #unmapped sequence or bad sequence
         if bwflag & 1:
             # paired read. We should only keep sequence if the mate is mapped
             # and if this is the left mate, all is within  the flag! 
             if not bwflag & 2:
-                return (-1, -1, -1, 0)  # not a proper pair
+                return (-1, -1, 0)  # not a proper pair
             if bwflag & 8:
-                return (-1, -1, -1, 0)  # the mate is unmapped
+                return (-1, -1, 0)  # the mate is unmapped
             if bwflag & 128:
                 # this is not the first read in a pair
-                return (-1, -1, -1, 0)
+                return (-1, -1, 0)
                 
         # In case of paired-end we have now skipped all possible "bad" pairs
         # in case of proper pair we have skipped the rightmost one... if the leftmost pair comes
         # we can treat it as a single read, so just check the strand and calculate its
         # start position... hope I'm right!
-        thisstrand = bool(bwflag & 16)
 
-        return (thisref, midpoint, thisstrand, tlen)
+        return (thisref, thisstart, tlen)
 
 ### End ###
 

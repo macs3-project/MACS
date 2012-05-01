@@ -21,13 +21,13 @@ from copy import deepcopy
 from itertools import groupby
 from operator import itemgetter
 import subprocess
-from tempfile import mkstemp
 import gc                               # use garbage collectior
 
 from MACS2.IO.cPeakIO import PeakIO
 from MACS2.IO.cBedGraphIO import bedGraphIO
 from MACS2.Constants import *
-from MACS2.cPileup import pileup_bdg, pileup_w_multiple_d_bdg
+from MACS2.cPileup import pileup_bdg, pileup_w_multiple_d_bdg, pileup_frag_bdg,\
+                          pileup_and_ext_frag_bdg, pileup_frag_w_multiple_d_bdg   
 #from MACS2.cPileup_old import pileup_bdg, pileup_w_multiple_d_bdg
 
 def subpeak_letters(i):
@@ -37,7 +37,7 @@ def subpeak_letters(i):
         return subpeak_letters(i / 26) + chr(97 + (i % 26))
 
 def compare_treatment_vs_control(treat, control, fragment_size, gsize,
-                                 never_directional=False, halfext=False,
+                                 halfext=False,
                                  slocal=0, llocal=0,
                                  tocontrol=False, shiftcontrol=False):
     """To compare treatment vs control tags tracks with tag extension
@@ -58,18 +58,20 @@ def compare_treatment_vs_control(treat, control, fragment_size, gsize,
 
     Finally, BH process will be applied to adjust pvalue to qvalue.
     """
-    treat_total   = treat.total
-    control_total = control.total
+    if self.PE_MODE:
+        treat_total   = treat[0].total
+        control_total = control[0].total
+    else:
+        treat_total   = treat.total
+        control_total = control.total
     ratio_treat2control = float(treat_total)/control_total
-    # These two decide if we should shift treatment, control
-    # treat shift is disabled for paired-end data using never_directional kwarg
-    # control shifting requires both shiftcontrol AND not never_directional
-    treat_directional = not never_directional
-    control_directional = treat_directional and shiftcontrol
 
-    # Now pileup FWTrackII to form a bedGraphTrackI
-    treat_btrack = pileup_bdg(treat,fragment_size, directional = treat_directional,
-                              halfextension=halfext)
+    # Now pileup FWTrackIII to form a bedGraphTrackI
+    if self.PE_MODE:
+        treat_btrack = pileup_bdg(treat[0], treat[1], fragment_size)
+    else:
+        treat_btrack = pileup_bdg(treat, fragment_size, directional=True,
+                                  halfextension=halfext)
 
     if tocontrol:
         # if user want to scale everything to control data
@@ -86,44 +88,52 @@ def compare_treatment_vs_control(treat, control, fragment_size, gsize,
         assert fragment_size <= llocal , "llocal can't be smaller than d!"            
         assert slocal <= llocal , "llocal can't be smaller than slocal!"
 
-    # d-size local
-    
-    # Now pileup FWTrackII to form a bedGraphTrackI
-    c_tmp_btrack = pileup_bdg(control, fragment_size, directional=control_directional, halfextension=halfext)
+    # Now prepare a list of extension sizes
+    d_s = [ fragment_size ]
+    # And a list of scaling factors
+    scale_factor_s = []
+
+    # d
     if not tocontrol:
         # if user want to scale everything to ChIP data
         tmp_v = ratio_treat2control
     else:
-        tmp_v = 1
-
-    c_tmp_btrack.apply_func(lambda x:float(x)*tmp_v)
-    control_btrack = c_tmp_btrack
+        tmp_v = 1.0
+    scale_factor_s.append( tmp_v )
 
     # slocal size local
     if slocal:
-        # Now pileup FWTrackII to form a bedGraphTrackI
-        c_tmp_btrack = pileup_bdg(control, slocal, directional=control_directional, halfextension=halfext)
+        d_s.append( slocal )
         if not tocontrol:
             # if user want to scale everything to ChIP data
             tmp_v = float(fragment_size)/slocal*ratio_treat2control
         else:
             tmp_v = float(fragment_size)/slocal
-        c_tmp_btrack.apply_func(lambda x:float(x)*tmp_v)
-        control_btrack = control_btrack.overlie(c_tmp_btrack,func=max)
+        scale_factor_s.append( tmp_v )
 
     # llocal size local
     if llocal and llocal > slocal:
-        # Now pileup FWTrackII to form a bedGraphTrackI
-        c_tmp_btrack = pileup_bdg(control, llocal, directional=control_directional, halfextension=halfext)
+        d_s.append( llocal )
         if not tocontrol:
             # if user want to scale everything to ChIP data
             tmp_v = float(fragment_size)/llocal*ratio_treat2control
         else:
-            tmp_v = float(fragment_size)/llocal            
-        c_tmp_btrack.apply_func(lambda x:float(x)*tmp_v)
-        control_btrack = control_btrack.overlie(c_tmp_btrack,func=max)
+            tmp_v = float(fragment_size)/llocal
+        scale_factor_s.append( tmp_v )                            
 
-    control_btrack.reset_baseline(lambda_bg) # set the baseline as lambda_bg
+    # pileup using different extension sizes and scaling factors
+    if self.PE_MODE:
+        control_btrack = pileup_frag_w_multiple_d_bdg(control[0], control[1],
+                                            d_s[1:],
+                                            baseline_value=lambda_bg,
+                                            scale_factor_s=scale_factor_s[1:],
+                                            scale_factor_0=scale_factor_s[0])
+    else:
+        control_btrack = pileup_w_multiple_d_bdg(control, d_s,
+                                             baseline_value=lambda_bg,
+                                             directional=shiftcontrol,
+                                             halfextension=halfext,
+                                             scale_factor_s=scale_factor_s)
 
     # calculate pvalue scores
     score_btrack = treat_btrack.make_scoreTrack_for_macs(control_btrack)
@@ -162,21 +172,7 @@ class PeakDetect:
         self.ratio_treat2control = None
         self.peaks = None
         self.final_peaks = None
-        if opt.format == 'BAMPE':
-            self.info('#3b using genomeCoverageBed to calculate true fragment distribution in treatment')
-            never_directional = True
-            args = str.split("genomeCoverageBed -bg -ibam %s" % opt.tfile)
-            tmpfhd, tmpfname = mkstemp()
-            p = subprocess.Popen(args, stdout = tmpfhd)
-            p.wait()
-            self.info('#3b ...importing bedGraph data')
-            self.true_treat = bedGraphIO(tmpfname).build_bdgtrack()
-            self.info('#3b ...cleaning up temporary file')
-            os.remove(tmpfname)
-        else:
-            never_directional = False
-            self.true_treat = None
-        self.never_directional = never_directional
+        self.PE_MODE = opt.format == 'BAMPE'
 
         #self.femax = opt.femax
         #self.femin = opt.femin
@@ -320,27 +316,36 @@ class PeakDetect:
         """
         cdef int i
         
-        treat_total   = self.treat.total
-        control_total = self.control.total
-        self.ratio_treat2control = float(treat_total)/control_total
-        treat_directional = not self.never_directional
-        control_directional = treat_directional and self.shiftcontrol
-
-        # Now pileup FWTrackII to form a bedGraphTrackI
-        if treat_directional:
-            self.info("#3 pileup treatment data by extending tags towards 3' to %d length" % self.d)
+        if self.PE_MODE:
+            treat_total   = self.treat[0].total
+            control_total = self.control[0].total
+            self.info("#3 pileup treatment data")
         else:
-            self.info("#3 pileup treatment data by extending tags both directions by %d length" % (self.d / 2))
+            treat_total   = self.treat.total
+            control_total = self.control.total
+            self.info("#3 pileup treatment data by extending tags towards 3' to %d length" % self.d)
+        self.ratio_treat2control = float(treat_total)/control_total
+
 
         if self.opt.tocontrol:
             # if user want to scale everything to control data
             lambda_bg = float(self.d)*treat_total/self.gsize/self.ratio_treat2control
-            treat_btrack = pileup_bdg(self.treat,self.d, directional=treat_directional,
-                                      halfextension=self.opt.halfext,scale_factor=1/self.ratio_treat2control)
+            if self.PE_MODE:
+                treat_btrack = pileup_frag_bdg(self.treat[0], self.treat[1],
+                                        scale_factor=1/self.ratio_treat2control)
+            else:
+                treat_btrack = pileup_bdg(self.treat, self.d, directional=True,
+                                          halfextension=self.opt.halfext,
+                                        scale_factor=1/self.ratio_treat2control)
         else:
             lambda_bg = float(self.d)*treat_total/self.gsize
-            treat_btrack = pileup_bdg(self.treat,self.d,directional=treat_directional,
-                                      halfextension=self.opt.halfext,scale_factor=1.0)
+            if self.PE_MODE:
+                treat_btrack = pileup_frag_bdg(self.treat[0], self.treat[1],
+                                               scale_factor=1.0)
+            else:
+                treat_btrack = pileup_bdg(self.treat,self.d,directional=True,
+                                          halfextension=self.opt.halfext,
+                                          scale_factor=1.0)
 
         # control data needs multiple steps of calculation
         self.info("#3 calculate local lambda from control data")
@@ -367,8 +372,6 @@ class PeakDetect:
         # slocal size local
         if self.sregion:
             d_s.append( self.sregion )
-            # Now pileup FWTrackII to form a bedGraphTrackI
-            c_tmp_btrack = pileup_bdg(self.control,self.sregion,directional=control_directional,halfextension=self.opt.halfext)
             if not self.opt.tocontrol:
                 # if user want to scale everything to ChIP data
                 tmp_v = float(self.d)/self.sregion*self.ratio_treat2control
@@ -387,9 +390,17 @@ class PeakDetect:
             scale_factor_s.append( tmp_v )                            
 
         # pileup using different extension sizes and scaling factors
-        control_btrack = pileup_w_multiple_d_bdg(self.control,d_s,
+        if self.PE_MODE:
+            control_btrack = pileup_frag_w_multiple_d_bdg(self.control[0],
+                                            self.control[1],
+                                            d_s[1:],
+                                            baseline_value=lambda_bg,
+                                            scale_factor_s=scale_factor_s[1:],
+                                            scale_factor_0=scale_factor_s[0])
+        else:
+            control_btrack = pileup_w_multiple_d_bdg(self.control, d_s,
                                                  baseline_value=lambda_bg,
-                                                 directional=control_directional,
+                                                 directional=self.shiftcontrol,
                                                  halfextension=self.opt.halfext,
                                                  scale_factor_s=scale_factor_s)
 
@@ -448,8 +459,10 @@ class PeakDetect:
            name = self.opt.name or 'Unknown'
            self.info("#3 save tag pileup into bedGraph file...")
            bdgfhd = open(self.zwig_tr + "_pileup.bdg", "w")
-           if self.true_treat is None: desc = "Fragment pileup"
-           else: desc = "True fragment distribution"
+           if self.PE_MODE:
+               desc = "True fragment distribution"
+           else:
+               desc = "Fragment pileup"
            score_btrack.write_bedGraph( bdgfhd,
                                         self.zwig_tr,
                                         "%s for %s from MACS v%s" % (desc, name, MACS_VERSION),
@@ -507,53 +520,50 @@ class PeakDetect:
         Finally, a poisson CDF is applied to calculate one-side pvalue
         for enrichment.
         """
-        # These two decide if we should shift treatment, control
-        # treat shift is disabled for paired-end data using never_directional kwarg
-        # control shifting requires both shiftcontrol AND not never_directional
-        treat_directional = not self.never_directional
-        control_directional = treat_directional and self.shiftcontrol
         # global lambda
-        if self.true_treat is None:
+        if self.PE_MODE:
+            # should we support halfext?
+            if self.opt.halfext: warn('halfextension not supported in PE mode')
+            treat_total = self.treat[0].total
+            self.info("#3 pileup treatment data")
+            # this an estimator, we should maybe test it for accuracy?
+            lambda_bg = float(self.d) * treat_total / self.gsize
+            # Now pileup FWTrackIII to form a bedGraphTrackI
+            treat_btrack = pileup_frag_bdg(self.treat[0], self.treat[1])
+        else:
             treat_total = self.treat.total
-            lambda_bg = float(self.d)*treat_total/self.gsize
-        else:
-            treat_total = self.true_treat.summary()[0]
-            # already extending tags
-            lambda_bg = treat_total / self.gsize
-
-        # Now pileup FWTrackII to form a bedGraphTrackI
-        if self.true_treat is None:
-            if treat_directional:
-                self.info("#3 pileup treatment data by extending tags towards 3' to %d length" % self.d)
-            else:
-                self.info("#3 pileup treatment data by extending tags both directions by %d length" % (self.d / 2))
-        else:
-            treat_btrack = pileup_bdg(self.treat,self.d,directional=treat_directional,
+            lambda_bg = float(self.d) * treat_total / self.gsize
+            self.info("#3 pileup treatment data by extending tags towards 3' to %d length" % self.d)
+            # Now pileup FWTrackIII to form a bedGraphTrackI
+            treat_btrack = pileup_bdg(self.treat, self.d, directional=True,
                                       halfextension=self.opt.halfext)        
-        
         # llocal size local
-        self.info("#3 calculate d local lambda from treatment data")
+        # self.info("#3 calculate d local lambda from treatment data")
+        # nothing done here. should this match w control??
         
         if self.lregion:
+            tmp_v = float(self.d) / self.lregion
             self.info("#3 calculate large local lambda from treatment data")
-            # Now pileup FWTrackII to form a bedGraphTrackI
-            control_btrack = pileup_bdg(self.treat,self.lregion,
-                                        directional=control_directional,
-                                        halfextension=self.opt.halfext)
-            tmp_v = float(self.d)/self.lregion
-            control_btrack.apply_func(lambda x:float(x)*tmp_v)
-            control_btrack.reset_baseline(lambda_bg) # set the baseline as lambda_bg
+            # Now pileup FWTrackIII to form a bedGraphTrackI
+            if self.PE_MODE:
+                control_btrack = pileup_and_ext_frag_bdg(self.treat[0],
+                                                self.treat[1],
+                                                self.lregion,
+                                                baseline_value = lambda_bg,
+                                                scale_factor = tmp_v)
+            else:
+                control_btrack = pileup_bdg(self.treat,self.lregion,
+                                            directional=self.shiftcontrol,
+                                            halfextension=self.opt.halfext,
+                                            baseline_value = lambda_bg,
+                                            scale_factor = tmp_v)
         else:
             # I need to fake a control_btrack
             control_btrack = treat_btrack.set_single_value(lambda_bg)
-            
+
         # calculate pvalue scores
-        if self.true_treat is not None:
-            self.info("#3 Build score track using true treatment data ...")
-            score_btrack = self.true_treat.make_scoreTrack_for_macs(control_btrack)
-        else:
-            self.info("#3 Build score track ...")
-            score_btrack = treat_btrack.make_scoreTrack_for_macs(control_btrack)
+        self.info("#3 Build score track ...")
+        score_btrack = treat_btrack.make_scoreTrack_for_macs(control_btrack)
         if self.opt.trackline: score_btrack.enable_trackline()
         treat_btrack = None             # clean them
         control_btrack = None
@@ -597,8 +607,10 @@ class PeakDetect:
            name = self.opt.name or 'Unknown'
            self.info("#3 save tag pileup into bedGraph file...")
            bdgfhd = open(self.zwig_tr + "_pileup.bdg", "w")
-           if self.true_treat is None: desc = "Fragment pileup"
-           else: desc = "True fragment distribution"
+           if self.PE_MODE:
+               desc = "True fragment distribution"
+           else:
+               desc = "Fragment pileup"
            score_btrack.write_bedGraph( bdgfhd,
                                         self.zwig_tr,
                                         "%s for %s from MACS v%s" % (desc, name, MACS_VERSION),

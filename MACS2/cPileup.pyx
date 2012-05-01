@@ -37,14 +37,94 @@ cdef inline int int_max(int a, int b): return a if a >= b else b
 cdef inline long long_max(long a, long b): return a if a >= b else b
 cdef inline float float_max(float a, float b): return a if a >= b else b
 
-def pileup_bdg (trackI, int d, int baseline_value = 0, bool directional = True, bool halfextension = True, float scale_factor = 1):
+# baseline_value needs to be float not int, otherwise we cause error in 
+# poisson CDF
+def pileup_frag_bdg (trackI, trackII, float baseline_value = 0, float scale_factor = 1.0):
+    """Pileup fragments into bedGraphTrackI object.
+
+    A fragment is represent by a 5' and 3' end on the plus strand
+
+    trackI  : A FWTrackIII object with raw plus 5' end positions
+    trackI  : A FWTrackIII object with raw plus 3' end positions
+    baseline_value : a value to be filled for missing values.
+    halfextension: only make a fragment of d/2 size centered at fragment center
+
+    Return a bedGraphTrackI object.
+    """
+    cdef long five_shift, three_shift, l, i, j, i_s, i_e, p, pre_p
+    ret = bedGraphTrackI(baseline_value=baseline_value) # bedGraphTrackI object to be returned.
+    chrs = trackI.get_chr_names()
+    for chrom in chrs:
+        starts = trackI.get_locations_by_chr(chrom)[0]
+        ends = trackII.get_locations_by_chr(chrom)[0]
+        l = len(starts)
+        assert len(ends) == l, "tracks do not have the same length"
+        pileup = pileup_a_chromosome(starts, ends, l, scale_factor, 
+                                     baseline_value)
+        ret.add_a_chromosome(chrom, pileup)
+    return ret
+
+def pileup_and_ext_frag_bdg (trackI, trackII, int d, float baseline_value = 0, float scale_factor = 1):
+    """Pileup fragments into bedGraphTrackI object with extension. Fragment will
+    be extended both directions from midpoint by distance d/2, or the original
+    width will be used if d = 0
+
+    A tag is a single genomic location.
+
+    trackI  : A FWTrackIII object with raw plus 5' end positions
+    trackI  : A FWTrackIII object with raw plus 3' end positions
+    d       : fragments will be extended by 1/2 this value in both directions
+              from their midpoint
+    baseline_value : a value to be filled for missing values.
+
+    Return a bedGraphTrackI object.
+    """
+    cdef long five_shift, three_shift, l, i, j, i_s, i_e, p, pre_p
+    ret = bedGraphTrackI(baseline_value=baseline_value) # bedGraphTrackI object to be returned.
+    chrs = trackI.get_chr_names()       
+
+    five_shift = d/2
+    three_shift = d - five_shift
+
+    for chrom in chrs:
+        starts = trackI.get_locations_by_chr(chrom)[0]
+        ends = trackII.get_locations_by_chr(chrom)[0]
+        l = len(starts)
+        assert len(ends) == l, "tracks do not have the same length"        
+        midpoints = (starts + ends) / 2
+
+        start_poss = midpoints - five_shift
+        end_poss   = midpoints + three_shift    
+    
+        # fix negative coordinations
+        for i in xrange( start_poss.shape[0] ):
+            if start_poss[i] < 0: start_poss[i] = 0
+            else: break
+    
+        for i in xrange( end_poss.shape[0] ):
+            if end_poss[i] < 0: end_poss[i] = 0
+            else: break        
+
+        pileup = pileup_a_chromosome ( start_poss, end_poss, l, scale_factor,
+                                       baseline_value )
+        ret.add_a_chromosome( chrom, pileup )
+
+        # free mem
+        start_poss.resize(100000, refcheck=False)
+        start_poss.resize(0, refcheck=False)
+        end_poss.resize(100000, refcheck=False)
+        end_poss.resize(0, refcheck=False)                
+
+    return ret
+
+def pileup_bdg (trackI, int d, float baseline_value = 0, bool directional = True, bool halfextension = True, float scale_factor = 1):
     """Pileup tags into bedGraphTrackI object with extension. Tag will
     be extended towards 3' side with size of d if directional is Ture,
     or both sides with d/2 if directional is False.
 
     A tag is a single genomic location.
 
-    trackI  : A FWTrackII object with raw plus and minus 5' end positions
+    trackI  : A FWTrackIII object with raw plus and minus 5' end positions
     d       : tag will be extended to this value to 3' direction, unless directional is False.
     baseline_value : a value to be filled for missing values.
     directional: if False, the strand or direction of tag will be ignored, so that extenstion will be both sides with d/2.
@@ -52,7 +132,7 @@ def pileup_bdg (trackI, int d, int baseline_value = 0, bool directional = True, 
 
     Return a bedGraphTrackI object.
     """
-    cdef long five_shift, three_shift, l, i, j, i_s, i_e, p, pileup, pre_p
+    cdef long five_shift, three_shift, l, i, j, i_s, i_e, p, pre_p
     #cdef int * start_poss
     #cdef int * end_poss    
 
@@ -101,7 +181,7 @@ def pileup_w_multiple_d_bdg ( trackI, d_s, float baseline_value = 0, bool direct
 
     A tag is a single genomic location.
 
-    trackI  : A FWTrackII object with raw plus and minus 5' end positions
+    trackI  : A FWTrackIII object with raw plus and minus 5' end positions
     d       : tag will be extended to this value to 3' direction, unless directional is False.
     baseline_value : a value to be filled for missing values.
     directional: if False, the strand or direction of tag will be ignored, so that extenstion will be both sides with d/2.
@@ -109,7 +189,7 @@ def pileup_w_multiple_d_bdg ( trackI, d_s, float baseline_value = 0, bool direct
 
     Return a bedGraphTrackI object.
     """
-    cdef long d, five_shift, three_shift, l, i, j, i_s, i_e, p, pileup, pre_p
+    cdef long d, five_shift, three_shift, l, i, j, i_s, i_e, p, pre_p
     cdef float scale_factor
     #cdef int * start_poss
     #cdef int * end_poss
@@ -148,7 +228,7 @@ def pileup_w_multiple_d_bdg ( trackI, d_s, float baseline_value = 0, bool direct
 
         prev_pileup = None
 
-        for i in range(len(d_s)):
+        for i in xrange(len(d_s)):
             
             five_shift = five_shift_s[i]
             three_shift = three_shift_s[i]
@@ -178,6 +258,72 @@ def pileup_w_multiple_d_bdg ( trackI, d_s, float baseline_value = 0, bool direct
 
     return ret
 
+def pileup_frag_w_multiple_d_bdg ( trackI, trackII, d_s, float baseline_value = 0, bool directional = True, scale_factor_s = [],
+                                   scale_factor_0 = 1.0 ):
+    """Pileup fragments into bedGraphTrackI object with extension. Tag will
+    be extended by d / 2 in both directions from midpoint
+
+    trackI  : A FWTrackIII object with raw plus and minus 5' end positions
+    d_s       : tag will be extended by 1/2 this value in both directions by
+                each d
+    baseline_value : a value to be filled for missing values.
+    scale_factor_s: same length as d_s, scale factor for each d
+    scale_factor_0: scale factor for original fragments
+
+    Return a bedGraphTrackI object.
+    """
+    cdef long d, five_shift, three_shift, l, i, j, i_s, i_e, p, pre_p
+    cdef float scale_factor
+    #cdef int * start_poss
+    #cdef int * end_poss
+
+    assert len(d_s) == len(scale_factor_s), "Arguments d_s and scale_factor_s should have the same length!"
+
+    ret = bedGraphTrackI(baseline_value=baseline_value) # bedGraphTrackI object to be returned.
+
+    chrs = trackI.get_chr_names()       
+
+    five_shift_s = [d / 2 for d in d_s]
+    three_shift_s = [d - d / 2 for d in d_s]
+
+    for chrom in chrs:
+        starts = trackI.get_locations_by_chr(chrom)[0]
+        ends = trackII.get_locations_by_chr(chrom)[0]
+        l = len(starts)
+        assert len(ends) == l, "tracks do not have the same length"        
+        midpoints = (starts + ends) / 2
+
+        prev_pileup = pileup_a_chromosome ( starts, ends, l, scale_factor_0, baseline_value )
+
+        for i in range(len(d_s)):
+            five_shift = five_shift_s[i]
+            three_shift = three_shift_s[i]
+            scale_factor = scale_factor_s[i]
+
+            start_poss = plus_tags - five_shift
+            end_poss   = plus_tags + three_shift    
+
+            #print chrom, baseline_value
+            tmp_pileup = pileup_a_chromosome ( start_poss, end_poss, l, scale_factor, baseline_value )
+
+            # free mem
+            #del(start_poss)
+            #del(end_poss)
+            start_poss.resize(100000, refcheck=False)
+            start_poss.resize(0, refcheck=False)
+            end_poss.resize(100000, refcheck=False)
+            end_poss.resize(0, refcheck=False)                            
+            
+            if prev_pileup:
+                prev_pileup = max_over_two_pv_array ( prev_pileup, tmp_pileup )
+            else:
+                prev_pileup = tmp_pileup
+
+        ret.add_a_chromosome( chrom, prev_pileup )
+
+    return ret
+
+
 cdef start_and_end_poss ( np.ndarray plus_tags, np.ndarray minus_tags, long five_shift, long three_shift ):
     cdef long i
     cdef long lp = plus_tags.shape[0]
@@ -192,13 +338,13 @@ cdef start_and_end_poss ( np.ndarray plus_tags, np.ndarray minus_tags, long five
     end_poss.sort()
     
     # fix negative coordinations
-    for i in range( start_poss.shape[0] ):
+    for i in xrange( start_poss.shape[0] ):
         if start_poss[i] < 0:
             start_poss[i] = 0
         else:
             break
 
-    for i in range( end_poss.shape[0] ):
+    for i in xrange( end_poss.shape[0] ):
         if end_poss[i] < 0:
             end_poss[i] = 0
         else:
@@ -215,11 +361,12 @@ cdef pileup_a_chromosome ( np.ndarray start_poss, np.ndarray end_poss, long l, f
     
     tmp = [array(BYTE4,[]),array(FBYTE4,[])] # for (endpos,value)
     tmppadd = tmp[0].append
-    tmpvadd = tmp[1].append    
+    tmpvadd = tmp[1].append
     i_s = 0                         # index of start_poss
     i_e = 0                         # index of end_poss
 
     pileup = 0
+    if start_poss.shape[0] == 0: return tmp
     pre_p = min(start_poss[0],end_poss[0])
     #print pre_p
     if pre_p != 0:
@@ -230,6 +377,7 @@ cdef pileup_a_chromosome ( np.ndarray start_poss, np.ndarray end_poss, long l, f
     pre_v = pileup
     
     while i_s < l and i_e < l:
+        # i_s is not incrementing
         a = start_poss[i_s]
         b = end_poss[i_e]
         if a < b:
@@ -253,7 +401,7 @@ cdef pileup_a_chromosome ( np.ndarray start_poss, np.ndarray end_poss, long l, f
             i_e += 1
     if i_e < l:
         # add rest of end positions
-        for i in range(i_e, l):
+        for i in xrange(i_e, l):
             p = end_poss[i]
             #for p in end_poss[i_e:]:
             if p != pre_p:

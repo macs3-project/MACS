@@ -80,8 +80,8 @@ class bedGraphTrackI:
         
         """
         self.__data = {}
-        self.maxvalue =-10000
-        self.minvalue = 10000
+        self.maxvalue = 10000 # these were swapped
+        self.minvalue = -10000 # ^
         self.baseline_value = baseline_value
 
     def add_a_chromosome ( self, chrom, d ):

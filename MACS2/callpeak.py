@@ -33,9 +33,21 @@ from MACS2.cProb import binomial_cdf_inv
 from MACS2.cPeakModel import PeakModel,NotEnoughPairsException
 from MACS2.cPeakDetect import PeakDetect
 from MACS2.Constants import *
+from MACS2.cFilterPE import filter_pe_dup
 # ------------------------------------
 # Main function
 # ------------------------------------
+def check_names(treat, control):
+    """check common chromosome names"""
+    tchrnames = set(treat.get_chr_names())
+    cchrnames = set(control.get_chr_names())
+    commonnames = tchrnames.intersection(cchrnames)
+    if len(commonnames)==0:
+        error("No common chromosome names can be found from treatment and control! Check your input files! MACS will quit...")
+        error("Chromosome names in treatment: %s" % ",".join(sorted(tchrnames)))
+        error("Chromosome names in control: %s" % ",".join(sorted(cchrnames)))
+        sys.exit()
+
 def run( args ):
     """The Main function/pipeline for MACS.
     
@@ -49,82 +61,92 @@ def run( args ):
     error = options.error
     #0 output arguments
     info("\n"+options.argtxt)
+    PE_MODE = options.format == 'BAMPE'
+    if PE_MODE: tag = 'fragment' # call things fragments not tags
+    else: tag = 'tag'
     
     #1 Read tag files
-    info("#1 read tag files...")
-    (treat, control) = load_tag_files_options (options)
-    # check common chromosome names
-    if control:
-        tchrnames = set(treat.get_chr_names())
-        cchrnames = set(control.get_chr_names())
-        commonnames = tchrnames.intersection(cchrnames)
-        if len(commonnames)==0:
-            error("No common chromosome names can be found from treatment and control! Check your input files! MACS will quit...")
-            error("Chromosome names in treatment: %s" % ",".join(sorted(tchrnames)))
-            error("Chromosome names in control: %s" % ",".join(sorted(cchrnames)))
-            sys.exit()
+    info("#1 read %s files...", tag)
+    if PE_MODE:
+        (treat, control) = load_frag_files_options (options)
+        if control is not None: check_names(treat[0], control[0])
+    else:
+        (treat, control) = load_tag_files_options (options)
+        if control is not None: check_names(treat, control)
     
-    info("#1 tag size = %d" % options.tsize)
-    tagsinfo  = "# tag size is determined as %d bps\n" % (options.tsize)
+    info("#1 %s size = %d", tag, options.tsize)
+    tagsinfo  = "# %s size is determined as %d bps\n" % (tag, options.tsize)
 
-    t0 = treat.total
-    tagsinfo += "# total tags in treatment: %d\n" % (t0)
-    info("#1  total tags in treatment: %d" % (t0))
-    if options.format == 'BAMPE':
-        ## This is going to change
-        info("#1 BAMPE mode does not filter duplicates yet. Use samtools rmdup if needed ...")
-        t1 = treat.total
-    elif options.keepduplicates != "all":
+    if PE_MODE: t0 = treat[0].total
+    else: t0 = treat.total
+    tagsinfo += "# total %ss in treatment: %d\n" % (tag, t0)
+    info("#1  total %ss in treatment: %d", tag, t0)
+    if options.keepduplicates != "all":
         if options.keepduplicates == "auto":
-            info("#1 calculate max duplicate tags in single position based on binomal distribution...")
+            info("#1 calculate max duplicate %ss in single position based on binomal distribution...", tag)
             treatment_max_dup_tags = cal_max_dup_tags(options.gsize,t0)
             info("#1  max_dup_tags based on binomal = %d" % (treatment_max_dup_tags))
-            info("#1 filter out redundant tags at the same location and the same strand by allowing at most %d tag(s)" % (treatment_max_dup_tags))
         else:
-            info("#1 user defined the maximum tags...")
+            info("#1 user defined the maximum %ss...", tag)
             treatment_max_dup_tags = int(options.keepduplicates)
-            info("#1 filter out redundant tags at the same location and the same strand by allowing at most %d tag(s)" % (treatment_max_dup_tags))
-
-        treat.filter_dup(treatment_max_dup_tags)
-        t1 = treat.total
-        info("#1  tags after filtering in treatment: %d" % (t1))
-        tagsinfo += "# tags after filtering in treatment: %d\n" % (t1)
-        tagsinfo += "# maximum duplicate tags at the same position in treatment = %d\n" % (treatment_max_dup_tags)
-        info("#1  Redundant rate of treatment: %.2f" % (float(t0-t1)/t0))
+        if PE_MODE:
+            info("#1 filter out redundant fragments with same ends by allowing at most %d identical fragment(s)", treatment_max_dup_tags)
+            treat = filter_pe_dup(treat, maxnum=treatment_max_dup_tags)
+            t1 = treat[0].total
+        else:
+            info("#1 filter out redundant tags at the same location and the same strand by allowing at most %d tag(s)", treatment_max_dup_tags)
+            treat.filter_dup(treatment_max_dup_tags)
+            t1 = treat.total
+        info("#1  %ss after filtering in treatment: %d", tag, t1)
+        tagsinfo += "# %ss after filtering in treatment: %d\n" % (tag, t1)
+        if PE_MODE:
+            tagsinfo += "# maximum duplicate fragments in treatment = %d\n" % (treatment_max_dup_tags)
+        else:
+            tagsinfo += "# maximum duplicate tags at the same position in treatment = %d\n" % (treatment_max_dup_tags)
+        info("#1  Redundant rate of treatment: %.2f", float(t0 - t1) / t0)
         tagsinfo += "# Redundant rate in treatment: %.2f\n" % (float(t0-t1)/t0)
     else:
-        t1 = treat.total
+        if PE_MODE:
+            t1 = treat[0].total
+        else:
+            t1 = treat.total
 
-    if control:
-        c0 = control.total
-        tagsinfo += "# total tags in control: %d\n" % (c0)
-        info("#1  total tags in control: %d" % (c0))
-        if options.format == 'BAMPE':
-            info("#1 BAMPE mode does not filter duplicates. Use samtools rmdup if needed ...")
-            c1 = control.total
-        elif options.keepduplicates != "all":
+    if control is not None:
+        if PE_MODE: c0 = control[0].total
+        else: c0 = control.total
+        tagsinfo += "# total %ss in control: %d\n" % (tag, c0)
+        info("#1  total %ss in control: %d", tag, c0)
+        if options.keepduplicates != "all":
             if options.keepduplicates == "auto":
-                info("#1  for control, calculate max duplicate tags in single position based on binomal distribution...")
+                info("#1  for control, calculate max duplicate %ss in single position based on binomal distribution...", tag)
                 control_max_dup_tags = cal_max_dup_tags(options.gsize,c0)
                 info("#1  max_dup_tags based on binomal = %d" % (control_max_dup_tags))
-                info("#1 filter out redundant tags at the same location and the same strand by allowing at most %d tag(s)" % (control_max_dup_tags))
             else:
-                info("#1 user defined the maximum tags...")
+                info("#1 user defined the maximum %ss...", tag)
                 control_max_dup_tags = int(options.keepduplicates)
-                info("#1 filter out redundant tags at the same location and the same strand by allowing at most %d tag(s)" % (treatment_max_dup_tags))
+            if PE_MODE:
+                info("#1 filter out redundant fragments with same ends by allowing at most %d identical fragment(s)", treatment_max_dup_tags)
+                control = filter_pe_dup(treat, maxnum=treatment_max_dup_tags)
+                c1 = control[0].total
+            else:
+                info("#1 filter out redundant tags at the same location and the same strand by allowing at most %d tag(s)", treatment_max_dup_tags)
+                control.filter_dup(treatment_max_dup_tags)
+                c1 = control.total
             
-            control.filter_dup(control_max_dup_tags)
-            c1 = control.total
-            info("#1  tags after filtering in control: %d" % (c1))
-            tagsinfo += "# tags after filtering in control: %d\n" % (c1)
-            tagsinfo += "# maximum duplicate tags at the same position in control = %d\n" % (control_max_dup_tags)
+            info("#1  %ss after filtering in control: %d", tag, c1)
+            tagsinfo += "# %s after filtering in control: %d\n" % (tag, c1)
+            if PE_MODE:
+                tagsinfo += "# maximum duplicate fragments in control = %d\n" % (treatment_max_dup_tags)
+            else:
+                tagsinfo += "# maximum duplicate tags at the same position in control = %d\n" % (treatment_max_dup_tags)
             
             info("#1  Redundant rate of control: %.2f" % (float(c0-c1)/c0))
             tagsinfo += "# Redundant rate in control: %.2f\n" % (float(c0-c1)/c0)
         else:
-            c1 = control.total
-        
-            
+            if PE_MODE:
+                c1 = control[0].total
+            else:
+                c1 = control.total
     info("#1 finished!")
 
     #2 Build Model
@@ -132,7 +154,7 @@ def run( args ):
 
     if options.nomodel:
         info("#2 Skipped...")
-        if options.format == 'BAMPE':
+        if PE_MODE:
             options.shiftsize = 0
             options.d = options.tsize
         else:
@@ -186,15 +208,21 @@ def run( args ):
             # use random sampling to balance treatment and control
             info("#3 User prefers to use random sampling instead of linear scaling.")
             if t1 > c1:
-                info("#3 MACS is random sampling treatment tags...")
+                info("#3 MACS is random sampling treatment %ss...", tag)
                 warn("#3 Your results may not be reproducible due to the random sampling!")
-                treat.sample_num(c1)
-                info("#3 %d tags from treatment are kept" % treat.total)                
+                if PE_MODE:
+                    raise NotImplementedError
+                else:
+                    treat.sample_num(c1)
+                info("#3 %d tags from treatment are kept", treat.total)                
             elif c1 > t1: 
-                info("#3 MACS is random sampling control tags...")
-                warn("#3 Your results may not be reproducible due to the random sampling!")                
-                control.sample_num(t1)
-                info("#3 %d tags from control are kept" % control.total)
+                info("#3 MACS is random sampling control %ss...", tag)
+                warn("#3 Your results may not be reproducible due to the random sampling!")
+                if PE_MODE:
+                    raise NotImplementedError
+                else:
+                    control.sample_num(t1)
+                info("#3 %d %ss from control are kept", control.total, tag)
             # set options.tocontrol although it would;t matter now
             options.tocontrol = False
         else:
@@ -280,6 +308,27 @@ def cal_max_dup_tags ( genome_size, tags_number, p=1e-5 ):
     """
     return binomial_cdf_inv(1-p,tags_number,1.0/genome_size)
 
+def load_frag_files_options ( options ):
+    """From the options, load treatment fragments and control fragments (if available).
+
+    """
+    options.info("#1 read treatment fragments...")
+    tp = options.parser(options.tfile)
+    
+    treat = tp.build_fwtracks() # treat = (treat_for, treat_rev)
+    treat[0].sort()
+    treat[1].sort()
+    options.tsize = tp.d
+    if options.cfile:
+        options.info("#1.2 read input fragments...")
+        control = options.parser(options.cfile).build_fwtrack()
+        control[0].sort()
+        control[1].sort()
+    else:
+        control = None
+    options.info("#1 mean fragment size is determined as %d bps" % options.tsize)
+    return (treat, control)
+
 def load_tag_files_options ( options ):
     """From the options, load treatment tags and control tags (if available).
 
@@ -287,12 +336,12 @@ def load_tag_files_options ( options ):
     options.info("#1 read treatment tags...")
     tp = options.parser(options.tfile)
         
+    treat = (tp.build_fwtrack())
+    treat.sort()
     if not options.tsize:           # override tsize if user specified --tsize
         ttsize = tp.tsize()
         options.tsize = ttsize
-
-    treat = tp.build_fwtrack()
-    treat.sort()
+    
     if options.cfile:
         options.info("#1.2 read input tags...")
         control = options.parser(options.cfile).build_fwtrack()
@@ -301,4 +350,3 @@ def load_tag_files_options ( options ):
         control = None
     options.info("#1 tag size is determined as %d bps" % options.tsize)
     return (treat, control)
-
