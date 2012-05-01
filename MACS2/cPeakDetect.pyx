@@ -1,5 +1,5 @@
 # cython: profile=True
-# Time-stamp: <2012-04-29 21:05:41 Tao Liu>
+# Time-stamp: <2012-04-30 17:37:49 Tao Liu>
 
 """Module Description
 
@@ -30,14 +30,15 @@ from MACS2.cPileup import pileup_bdg, pileup_w_multiple_d_bdg, pileup_frag_bdg,\
                           pileup_and_ext_frag_bdg, pileup_frag_w_multiple_d_bdg   
 #from MACS2.cPileup_old import pileup_bdg, pileup_w_multiple_d_bdg
 
-def subpeak_letters(i):
+cdef str subpeak_letters(short i):
     if i < 26:
         return chr(97+i)
     else:
         return subpeak_letters(i / 26) + chr(97 + (i % 26))
 
+# actually I didn't use this function... 
 def compare_treatment_vs_control(treat, control, fragment_size, gsize,
-                                 halfext=False,
+                                 halfext=False, PE_MODE=False,
                                  slocal=0, llocal=0,
                                  tocontrol=False, shiftcontrol=False):
     """To compare treatment vs control tags tracks with tag extension
@@ -58,7 +59,7 @@ def compare_treatment_vs_control(treat, control, fragment_size, gsize,
 
     Finally, BH process will be applied to adjust pvalue to qvalue.
     """
-    if self.PE_MODE:
+    if PE_MODE:
         treat_total   = treat[0].total
         control_total = control[0].total
     else:
@@ -67,7 +68,7 @@ def compare_treatment_vs_control(treat, control, fragment_size, gsize,
     ratio_treat2control = float(treat_total)/control_total
 
     # Now pileup FWTrackIII to form a bedGraphTrackI
-    if self.PE_MODE:
+    if PE_MODE:
         treat_btrack = pileup_bdg(treat[0], treat[1], fragment_size)
     else:
         treat_btrack = pileup_bdg(treat, fragment_size, directional=True,
@@ -79,6 +80,7 @@ def compare_treatment_vs_control(treat, control, fragment_size, gsize,
         treat_btrack.apply_func(lambda x:float(x)/ratio_treat2control)
     else:
         lambda_bg = float(fragment_size)*treat_total/gsize
+
 
     # control data needs multiple steps of calculation
     # I need to shift them by 500 bps, then 5000 bps
@@ -96,7 +98,7 @@ def compare_treatment_vs_control(treat, control, fragment_size, gsize,
     # d
     if not tocontrol:
         # if user want to scale everything to ChIP data
-        tmp_v = ratio_treat2control
+        tmp_v = self.ratio_treat2control
     else:
         tmp_v = 1.0
     scale_factor_s.append( tmp_v )
@@ -106,7 +108,7 @@ def compare_treatment_vs_control(treat, control, fragment_size, gsize,
         d_s.append( slocal )
         if not tocontrol:
             # if user want to scale everything to ChIP data
-            tmp_v = float(fragment_size)/slocal*ratio_treat2control
+            tmp_v = float(fragment_size)/slocal*self.ratio_treat2control
         else:
             tmp_v = float(fragment_size)/slocal
         scale_factor_s.append( tmp_v )
@@ -116,13 +118,13 @@ def compare_treatment_vs_control(treat, control, fragment_size, gsize,
         d_s.append( llocal )
         if not tocontrol:
             # if user want to scale everything to ChIP data
-            tmp_v = float(fragment_size)/llocal*ratio_treat2control
+            tmp_v = float(fragment_size)/llocal*self.ratio_treat2control
         else:
             tmp_v = float(fragment_size)/llocal
         scale_factor_s.append( tmp_v )                            
 
     # pileup using different extension sizes and scaling factors
-    if self.PE_MODE:
+    if PE_MODE:
         control_btrack = pileup_frag_w_multiple_d_bdg(control[0], control[1],
                                             d_s[1:],
                                             baseline_value=lambda_bg,
@@ -137,10 +139,9 @@ def compare_treatment_vs_control(treat, control, fragment_size, gsize,
 
     # calculate pvalue scores
     score_btrack = treat_btrack.make_scoreTrack_for_macs(control_btrack)
-    if self.opt.trackline: score_btrack.enable_trackline()
-    treat_btrack = None             # clean them
-    control_btrack = None
-    gc.collect()                    # full collect garbage
+    #treat_btrack = None             # clean them
+    #control_btrack = None
+    #gc.collect()                    # full collect garbage
 
     # calculate and assign qvalues
     pqtable = score_btrack.make_pq_table()
