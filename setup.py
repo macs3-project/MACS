@@ -40,15 +40,15 @@ def main():
         sys.exit(1)
 
     ext_modules = [Extension("MACS2.cProb", ["MACS2/cProb.c"], libraries=["m"]),
-                   Extension("MACS2.IO.cParser",["MACS2/IO/cParser.c"]),
+                   Extension("MACS2.IO.cParser",["MACS2/IO/cParser.c"], include_dirs=numpy_include_dir),
                    Extension("MACS2.cPileup", ["MACS2/cPileup.c"], include_dirs=numpy_include_dir ),
                    Extension("MACS2.cArray", ["MACS2/cArray.c"]),                       
                    Extension("MACS2.cPeakModel", ["MACS2/cPeakModel.c"], include_dirs=numpy_include_dir),                   
                    Extension("MACS2.cPeakDetect", ["MACS2/cPeakDetect.c"]),
-                   Extension("MACS2.cFilterPE", ["MACS2/cFilterPE.c"], include_dirs=numpy_include_dir),
                    Extension("MACS2.IO.cPeakIO", ["MACS2/IO/cPeakIO.c"],),
                    Extension("MACS2.IO.cBedGraphIO", ["MACS2/IO/cBedGraphIO.c"],),                   
                    Extension("MACS2.IO.cFixWidthTrack", ["MACS2/IO/cFixWidthTrack.c"], include_dirs=numpy_include_dir),
+                   Extension("MACS2.IO.cPairedEndTrack", ["MACS2/IO/cPairedEndTrack.c"], include_dirs=numpy_include_dir),
                    Extension("MACS2.IO.cBedGraph", ["MACS2/IO/cBedGraph.c"], libraries=["m"]),
                    Extension("MACS2.IO.cScoreTrack", ["MACS2/IO/cScoreTrack.c"], include_dirs=numpy_include_dir ),
                    Extension("MACS2.IO.cCompositeScoreTrack", ["MACS2/IO/cCompositeScoreTrack.c"],),

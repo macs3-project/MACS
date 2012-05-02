@@ -37,86 +37,7 @@ cdef inline int int_max(int a, int b): return a if a >= b else b
 cdef inline long long_max(long a, long b): return a if a >= b else b
 cdef inline float float_max(float a, float b): return a if a >= b else b
 
-# baseline_value needs to be float not int, otherwise we cause error in 
-# poisson CDF
-def pileup_frag_bdg (trackI, trackII, float baseline_value = 0, float scale_factor = 1.0):
-    """Pileup fragments into bedGraphTrackI object.
-
-    A fragment is represent by a 5' and 3' end on the plus strand
-
-    trackI  : A FWTrackIII object with raw plus 5' end positions
-    trackI  : A FWTrackIII object with raw plus 3' end positions
-    baseline_value : a value to be filled for missing values.
-    halfextension: only make a fragment of d/2 size centered at fragment center
-
-    Return a bedGraphTrackI object.
-    """
-    cdef long five_shift, three_shift, l, i, j, i_s, i_e, p, pre_p
-    ret = bedGraphTrackI(baseline_value=baseline_value) # bedGraphTrackI object to be returned.
-    chrs = trackI.get_chr_names()
-    for chrom in chrs:
-        starts = trackI.get_locations_by_chr(chrom)[0]
-        ends = trackII.get_locations_by_chr(chrom)[0]
-        l = len(starts)
-        assert len(ends) == l, "tracks do not have the same length"
-        pileup = pileup_a_chromosome(starts, ends, l, scale_factor, 
-                                     baseline_value)
-        ret.add_a_chromosome(chrom, pileup)
-    return ret
-
-def pileup_and_ext_frag_bdg (trackI, trackII, int d, float baseline_value = 0, float scale_factor = 1):
-    """Pileup fragments into bedGraphTrackI object with extension. Fragment will
-    be extended both directions from midpoint by distance d/2, or the original
-    width will be used if d = 0
-
-    A tag is a single genomic location.
-
-    trackI  : A FWTrackIII object with raw plus 5' end positions
-    trackI  : A FWTrackIII object with raw plus 3' end positions
-    d       : fragments will be extended by 1/2 this value in both directions
-              from their midpoint
-    baseline_value : a value to be filled for missing values.
-
-    Return a bedGraphTrackI object.
-    """
-    cdef long five_shift, three_shift, l, i, j, i_s, i_e, p, pre_p
-    ret = bedGraphTrackI(baseline_value=baseline_value) # bedGraphTrackI object to be returned.
-    chrs = trackI.get_chr_names()       
-
-    five_shift = d/2
-    three_shift = d - five_shift
-
-    for chrom in chrs:
-        starts = trackI.get_locations_by_chr(chrom)[0]
-        ends = trackII.get_locations_by_chr(chrom)[0]
-        l = len(starts)
-        assert len(ends) == l, "tracks do not have the same length"        
-        midpoints = (starts + ends) / 2
-
-        start_poss = midpoints - five_shift
-        end_poss   = midpoints + three_shift    
-    
-        # fix negative coordinations
-        for i in xrange( start_poss.shape[0] ):
-            if start_poss[i] < 0: start_poss[i] = 0
-            else: break
-    
-        for i in xrange( end_poss.shape[0] ):
-            if end_poss[i] < 0: end_poss[i] = 0
-            else: break        
-
-        pileup = pileup_a_chromosome ( start_poss, end_poss, l, scale_factor,
-                                       baseline_value )
-        ret.add_a_chromosome( chrom, pileup )
-
-        # free mem
-        start_poss.resize(100000, refcheck=False)
-        start_poss.resize(0, refcheck=False)
-        end_poss.resize(100000, refcheck=False)
-        end_poss.resize(0, refcheck=False)                
-
-    return ret
-
+## Fixed-width functions ##
 def pileup_bdg (trackI, int d, float baseline_value = 0, bool directional = True, bool halfextension = True, float scale_factor = 1):
     """Pileup tags into bedGraphTrackI object with extension. Tag will
     be extended towards 3' side with size of d if directional is Ture,
@@ -258,14 +179,91 @@ def pileup_w_multiple_d_bdg ( trackI, d_s, float baseline_value = 0, bool direct
 
     return ret
 
-def pileup_frag_w_multiple_d_bdg ( trackI, trackII, d_s, float baseline_value = 0, bool directional = True, scale_factor_s = [],
-                                   scale_factor_0 = 1.0 ):
-    """Pileup fragments into bedGraphTrackI object with extension. Tag will
+## Paired-end functions ##
+
+# baseline_value needs to be float not int, otherwise we cause error in 
+# poisson CDF
+def pileup_frag_bdg (trackI, float baseline_value = 0, float scale_factor = 1.0):
+    """Pileup fragments into bedGraphTrackI object.
+
+    trackI  : A PETrackI object with genomic locations
+    baseline_value : a value to be filled for missing values.
+    scale_factor : value to be multiplied at each position
+
+    Return a bedGraphTrackI object.
+    """
+    cdef long five_shift, three_shift, l, i, j, i_s, i_e, p, pre_p
+    ret = bedGraphTrackI(baseline_value=baseline_value) # bedGraphTrackI object to be returned.
+    chrs = trackI.get_chr_names()
+    for chrom in chrs:
+        starts = trackI.get_locations_by_chr(chrom)[:,0]
+        ends = trackI.get_locations_by_chr(chrom)[:,1]
+        l = len(starts)
+        assert len(ends) == l, "tracks do not have the same length"
+        pileup = pileup_a_chromosome(starts, ends, l, scale_factor, 
+                                     baseline_value)
+        ret.add_a_chromosome(chrom, pileup)
+    return ret
+
+def pileup_and_ext_frag_bdg (trackI, int d, float baseline_value = 0, float scale_factor = 1):
+    """Pileup fragments into bedGraphTrackI object with extension. Fragment will
+    be extended both directions from midpoint by distance d/2, or the original
+    width will be used if d = 0
+
+    trackI  : A PETrackI object with genomic locations
+    d       : fragments will be extended by 1/2 this value in both directions
+              from their midpoint
+    baseline_value : a value to be filled for missing values.
+    scale_factor : value to be multiplied at each position
+
+    Return a bedGraphTrackI object.
+    """
+    cdef long five_shift, three_shift, l, i, j, i_s, i_e, p, pre_p
+    ret = bedGraphTrackI(baseline_value=baseline_value) # bedGraphTrackI object to be returned.
+    chrs = trackI.get_chr_names()       
+
+    five_shift = d/2
+    three_shift = d - five_shift
+
+    for chrom in chrs:
+        starts = trackI.get_locations_by_chr(chrom)[:,0]
+        ends = trackI.get_locations_by_chr(chrom)[:,1]
+        l = len(starts)
+        assert len(ends) == l, "tracks do not have the same length"        
+        midpoints = (starts + ends) / 2
+
+        start_poss = midpoints - five_shift
+        end_poss   = midpoints + three_shift    
+    
+        # fix negative coordinations
+        for i in xrange( start_poss.shape[0] ):
+            if start_poss[i] < 0: start_poss[i] = 0
+            else: break
+    
+        for i in xrange( end_poss.shape[0] ):
+            if end_poss[i] < 0: end_poss[i] = 0
+            else: break        
+
+        pileup = pileup_a_chromosome ( start_poss, end_poss, l, scale_factor,
+                                       baseline_value )
+        ret.add_a_chromosome( chrom, pileup )
+
+        # free mem
+        start_poss.resize(100000, refcheck=False)
+        start_poss.resize(0, refcheck=False)
+        end_poss.resize(100000, refcheck=False)
+        end_poss.resize(0, refcheck=False)                
+
+    return ret
+
+def pileup_frag_w_multiple_d_bdg ( trackI, d_s = [], float baseline_value = 0, 
+                                   scale_factor_s = [], scale_factor_0 = 1.0 ):
+    """Pileup fragments into bedGraphTrackI object with extension. Fragment will
     be extended by d / 2 in both directions from midpoint
 
-    trackI  : A FWTrackIII object with raw plus and minus 5' end positions
+    trackI  : A PETrackI object
     d_s       : tag will be extended by 1/2 this value in both directions by
-                each d
+                each d and multiplied by corresponding scale_factor
     baseline_value : a value to be filled for missing values.
     scale_factor_s: same length as d_s, scale factor for each d
     scale_factor_0: scale factor for original fragments
@@ -287,8 +285,8 @@ def pileup_frag_w_multiple_d_bdg ( trackI, trackII, d_s, float baseline_value = 
     three_shift_s = [d - d / 2 for d in d_s]
 
     for chrom in chrs:
-        starts = trackI.get_locations_by_chr(chrom)[0]
-        ends = trackII.get_locations_by_chr(chrom)[0]
+        starts = trackI.get_locations_by_chr(chrom)[:,0]
+        ends = trackI.get_locations_by_chr(chrom)[:,1]
         l = len(starts)
         assert len(ends) == l, "tracks do not have the same length"        
         midpoints = (starts + ends) / 2
