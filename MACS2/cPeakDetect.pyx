@@ -1,5 +1,5 @@
 # cython: profile=True
-# Time-stamp: <2012-05-01 18:17:23 Tao Liu>
+# Time-stamp: <2012-05-01 21:56:08 Tao Liu>
 
 """Module Description
 
@@ -603,10 +603,10 @@ class PeakDetect:
                        desc1, "sample")]
             
             if self.lregion:
-                tracks.append((self.zwig_ctl + "_lambda.bdg"
+                tracks.append((self.zwig_ctl + "_lambda.bdg",
                                self.zwig_ctl,
                                "Maximum local lambda", "control" ))
-                
+            
             tracks.append((self.zwig_tr + "_pvalue.bdg",
                            self.zwig_tr + "_-log10pvalue",
                            "-log10 pvalue scores", "-100logp"))
@@ -615,11 +615,11 @@ class PeakDetect:
                            self.zwig_tr + "_-log10qvalue",
                            "-log10 qvalue scores", "-100logq"))
            
-           for filename, title, desc, scorecol in tracks:
-               self.info("#3 save the %s track into bedGraph file..." % desc)
-               with open(filename, 'w') as bdgfhd:
-                   score_btrack.write_bedGraph(bdgfhd, title,
-                                               trackdesc % desc, scorecol)
+            for filename, title, desc, scorecol in tracks:
+                self.info("#3 save the %s track into bedGraph file..." % desc)
+                with open(filename, 'w') as bdgfhd:
+                    score_btrack.write_bedGraph(bdgfhd, title,
+                                                trackdesc % desc, scorecol)
        
         return peaks
 

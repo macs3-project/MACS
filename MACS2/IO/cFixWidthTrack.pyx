@@ -1,5 +1,5 @@
 # cython: profile=True
-# Time-stamp: <2012-04-29 18:04:37 Tao Liu>
+# Time-stamp: <2012-05-01 21:52:01 Tao Liu>
 
 """Module for FWTrack classes.
 
@@ -26,6 +26,7 @@ import sys
 from copy import copy
 from MACS2.Constants import *
 from libc.stdint cimport uint32_t, uint64_t, int32_t, int64_t
+from cpython cimport bool
 
 import numpy as np
 cimport numpy as np
@@ -145,7 +146,7 @@ class FWTrackIII:
 
         self.__sorted = True
 
-    def filter_dup ( self, int32_t maxnum = -1 ):
+    def filter_dup ( self, int32_t maxnum = -1, bool copyself = False ):
         """Filter the duplicated reads.
 
         Run it right after you add all data into this object.
@@ -155,11 +156,15 @@ class FWTrackIII:
         cdef str k
 
         if maxnum < 0: return           # do nothing
-        
+
         if not self.__sorted:
             self.sort()
 
-        selfcopy = copy(self)
+        if copyself:
+            selfcopy = copy(self)
+        else:
+            selfcopy = self
+        
         selfcopy.total = 0
 
         chrnames = self.get_chr_names()
