@@ -1,5 +1,5 @@
 # cython: profile=True
-# Time-stamp: <2012-05-01 18:19:56 Tao Liu>
+# Time-stamp: <2012-05-02 16:46:19 Tao Liu>
 
 """Module for Feature IO classes.
 
@@ -856,8 +856,15 @@ class bedGraphTrackI:
 
         return ret
 
-    def make_scoreTrack_for_macs (self, bdgTrack2 ):
+    def make_scoreTrack_for_macs (self, bdgTrack2, float effective_depth_in_million = 1.0 ):
         """A modified overlie function for MACS v2.
+
+        effective_depth_in_million: sequencing depth in million after
+                                    duplicates being filtered. If
+                                    treatment is scaled down to
+                                    control sample size, then this
+                                    should be control sample size in
+                                    million. And vice versa.
 
         Return value is a bedGraphTrackI object.
         """
@@ -867,7 +874,7 @@ class bedGraphTrackI:
         
         assert isinstance(bdgTrack2,bedGraphTrackI), "bdgTrack2 is not a bedGraphTrackI object"
 
-        ret = scoreTrackI()
+        ret = scoreTrackI( effective_depth_in_million = effective_depth_in_million )
         retadd = ret.add
         
         chr1 = set(self.get_chr_names())
