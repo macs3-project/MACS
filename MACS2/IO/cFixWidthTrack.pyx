@@ -20,9 +20,10 @@ with the distribution).
 # ------------------------------------
 import logging
 
-from array import array
+#from array import array
 from random import sample as random_sample
 import sys
+from copy import copy
 from MACS2.Constants import *
 from libc.stdint cimport uint32_t, uint64_t, int32_t, int64_t
 
@@ -157,7 +158,9 @@ class FWTrackIII:
         
         if not self.__sorted:
             self.sort()
-        self.total = 0
+
+        selfcopy = copy(self)
+        selfcopy.total = 0
 
         chrnames = self.get_chr_names()
         
@@ -168,12 +171,12 @@ class FWTrackIII:
             k = chrnames[ i_chrom ]
             # + strand
             i_new = 0
-            plus = self.__locations[k][0]
+            plus = selfcopy.__locations[k][0]
             size = plus.shape[0]
             if len(plus) < 1:
                 new_plus = plus         # do nothing
             else:
-                new_plus = np.zeros( self.__pointer[k][0],dtype='int32' )
+                new_plus = np.zeros( selfcopy.__pointer[k][0],dtype='int32' )
                 new_plus[ i_new ] = plus[ i_new ] # first item
                 i_new += 1
                 n = 1                # the number of tags in the current location
@@ -193,8 +196,8 @@ class FWTrackIII:
                         i_new += 1                        
                         n = 1
                 new_plus.resize( i_new )
-                self.total +=  new_plus.shape[0]
-                self.__pointer[k][0] = new_plus.shape[0]
+                selfcopy.total +=  new_plus.shape[0]
+                selfcopy.__pointer[k][0] = new_plus.shape[0]
                 # free memory?
                 # I know I should shrink it to 0 size directly,
                 # however, on Mac OSX, it seems directly assigning 0
@@ -205,12 +208,12 @@ class FWTrackIII:
 
             # - strand
             i_new = 0
-            minus = self.__locations[k][1]
+            minus = selfcopy.__locations[k][1]
             size = minus.shape[0]
             if len(minus) < 1:
                 new_minus = minus         # do nothing
             else:
-                new_minus = np.zeros( self.__pointer[k][1],dtype='int32' )
+                new_minus = np.zeros( selfcopy.__pointer[k][1],dtype='int32' )
                 new_minus[ i_new ] = minus[ i_new ] # first item
                 i_new += 1
                 n = 1                # the number of tags in the current location
@@ -230,8 +233,8 @@ class FWTrackIII:
                         i_new += 1                        
                         n = 1
                 new_minus.resize( i_new )                        
-                self.total +=  new_minus.shape[0]
-                self.__pointer[k][1] = new_minus.shape[0]                
+                selfcopy.total +=  new_minus.shape[0]
+                selfcopy.__pointer[k][1] = new_minus.shape[0]                
                 # free memory ?
                 # I know I should shrink it to 0 size directly,
                 # however, on Mac OSX, it seems directly assigning 0
@@ -240,7 +243,8 @@ class FWTrackIII:
                 minus.resize( 0, refcheck=False )
                 # hope there would be no mem leak...                
             
-            self.__locations[k]=[new_plus,new_minus]
+            selfcopy.__locations[k]=[new_plus,new_minus]
+        return selfcopy
 
     def sample_percent (self, float percent):
         """Sample the tags for a given percentage.

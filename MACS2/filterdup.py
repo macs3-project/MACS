@@ -69,7 +69,7 @@ def run( o_options ):
             max_dup_tags = int(options.keepduplicates)
             info("filter out redundant tags at the same location and the same strand by allowing at most %d tag(s)" % (max_dup_tags))
 
-        fwtrack.filter_dup(max_dup_tags)
+        fwtrack = fwtrack.filter_dup(max_dup_tags)
         t1 = fwtrack.total
         info(" tags after filtering in alignment file: %d" % (t1))
         info(" Redundant rate of alignment file: %.2f" % (float(t0-t1)/t0))

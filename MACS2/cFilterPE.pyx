@@ -19,6 +19,7 @@ from logging import debug
 import numpy as np
 cimport numpy as np
 from libc.stdint cimport uint32_t, uint64_t, int32_t, int64_t
+from copy import deepcopy
 
 def filter_pe_dup ( treat, int maxnum=-1 ):
     """Filter the duplicated reads.
@@ -28,10 +29,12 @@ def filter_pe_dup ( treat, int maxnum=-1 ):
     cdef int32_t i_chrom, i, start, end, n, current_start, current_end
     cdef uint64_t i_old, i_new
     cdef str k
-    treatF, treatR = treat
-    assert treatF.total == treatR.total, "Different number of fragment starts and ends"
+    assert treat[0].total == treat[1].total, "Different number of fragment starts and ends"
 
     if maxnum < 0: return # condition to return if not filtering
+    
+    treatF = deepcopy(treat[0])
+    treatR = deepcopy(treat[1])
     if not treatF.__sorted: treatF.sort()
     if not treatR.__sorted: treatR.sort()
     treatF.total = 0

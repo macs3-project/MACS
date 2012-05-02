@@ -52,17 +52,17 @@ class Test_FWTrackIII(unittest.TestCase):
         self.assertEqual( fw.length(), 17*self.fw )
 
         # filter out more than 3 tags
-        fw.filter_dup( 3 )
+        fw = fw.filter_dup( 3 )
         # one chrY:85:0 should be removed
         self.assertEqual( fw.total, 16 )
 
         # filter out more than 2 tags
-        fw.filter_dup( 2 )
+        fw = fw.filter_dup( 2 )
         # then, one chrY:85:0 and one chrY:80:- should be removed
         self.assertEqual( fw.total, 14 )
 
         # filter out more than 1 tag
-        fw.filter_dup( 1 )
+        fw = fw.filter_dup( 1 )
         # then, one chrY:85:0 and one chrY:80:1, one chrY:90:1 should be removed
         self.assertEqual( fw.total, 11 )        
 
