@@ -47,7 +47,7 @@ __doc__ = "FWTrackII class"
 # ------------------------------------
 
 class FWTrackIII:
-    """Fixed Width Locations Track class II along the whole genome
+    """Fixed Width Locations Track class III along the whole genome
     (commonly with the same annotation type), which are stored in a
     dict.
 
@@ -66,7 +66,7 @@ class FWTrackIII:
         self.annotation = anno   # need to be figured out
 
 
-    def add_loc ( self, str chromosome, int32_t fiveendpos, int32_t strand ):
+    def add_loc ( self, str chromosome, int32_t fiveendpos, int strand ):
         """Add a location to the list according to the sequence name.
         
         chromosome -- mostly the chromosome name
@@ -94,7 +94,7 @@ class FWTrackIII:
         cdef int32_t i
         cdef str c
         
-        self.total+=0
+        self.total+=0 # ??
 
         chrnames = self.get_chr_names()
 
@@ -146,7 +146,7 @@ class FWTrackIII:
 
         self.__sorted = True
 
-    def filter_dup ( self, int32_t maxnum = -1, bool copyself = False ):
+    def filter_dup ( self, int32_t maxnum = -1, bool keep_original = False ):
         """Filter the duplicated reads.
 
         Run it right after you add all data into this object.
@@ -160,7 +160,7 @@ class FWTrackIII:
         if not self.__sorted:
             self.sort()
 
-        if copyself:
+        if keep_original:
             selfcopy = copy(self)
         else:
             selfcopy = self

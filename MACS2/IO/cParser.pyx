@@ -25,7 +25,11 @@ import gzip
 import io
 from MACS2.Constants import *
 from MACS2.IO.cFixWidthTrack import FWTrackIII
-from libc.stdint cimport uint32_t, uint64_t
+from MACS2.IO.cPairedEndTrack import PETrackI
+from libc.stdint cimport uint32_t, uint64_t, int32_t
+
+import numpy as np
+cimport numpy as np
 
 cdef extern from "stdlib.h":
     ctypedef unsigned int size_t
@@ -871,16 +875,16 @@ class BAMPEParser(BAMParser):
     1024    PCR or optical duplicate
     """
 
-    def build_fwtracks (self):
+    def build_petrack (self):
         """Build FWTrackIII from all lines, return a FWTrackIII object.
         """
         cdef int i, m, header_len, nc, x, nlength
-        cdef int entrylength, fposF, fposR, fpos2, chrid
+        cdef int entrylength, fpos, chrid, tlen
         cdef list references
         cdef float d
+        cdef np.ndarray loc = np.zeros([1,2], np.int32)
         
-        fwtrackF = FWTrackIII()
-        fwtrackR = FWTrackIII()
+        petrack = PETrackI()
         i = 0
         m = 0
         references = []
@@ -902,30 +906,34 @@ class BAMPEParser(BAMParser):
         
         d = 0
         # for convenience, only count valid pairs
+        add_loc = petrack.add_loc
+        loc = np.zeros(shape=(1,2), dtype='int32')
         while True:
             try:
                 entrylength = struct.unpack('<i', fread(4))[0]
             except struct.error:
                 break
-            (chrid,fposF,tlen) = self.__fw_binary_parse(fread(entrylength))
+            (chrid,fpos,tlen) = self.__fw_binary_parse(fread(entrylength))
             if chrid < 0: continue
-            fposR = fposF + tlen
-            if fposR < fposF: fposF, fposR = fposR, fposF
+            if tlen > 0:
+                loc[0,0] = fpos
+                loc[0,1] = fpos + tlen
+            else:
+                loc[0,0] = fpos + tlen
+                loc[0,1] = fpos
             d = (d * i + abs(tlen)) / (i + 1) # keep track of avg fragment size
             i+=1
             if i == 1000000:
                 m += 1
                 logging.info(" %d" % (m*1000000))
                 i=0
-            fwtrackF.add_loc(references[chrid], fposF, 0)
-            fwtrackR.add_loc(references[chrid], fposR, 0)
+            add_loc(references[chrid], loc)
         self.n = m * 1000000 + i
         self.d = int(d)
-        assert d >= 0, "Something went wrong (average fragment size was negative)"
+        assert d >= 0, "Something went wrong (mean fragment size was negative)"
         self.fhd.close()
-        fwtrackF.finalize()
-        fwtrackR.finalize()
-        return (fwtrackF, fwtrackR)
+        petrack.finalize()
+        return petrack
         
     def __fw_binary_parse (self, data ):
         cdef int thisref, thisstart, thisend, thisstrand, tlen

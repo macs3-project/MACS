@@ -1,5 +1,5 @@
 # cython: profile=True
-# Time-stamp: <2012-05-02 17:05:58 Tao Liu>
+# Time-stamp: <2012-05-02 17:56:20 Tao Liu>
 
 """Module Description
 
@@ -62,12 +62,8 @@ def compare_treatment_vs_control(treat, control, fragment_size, gsize,
     """
     cdef float effective_depth_in_million
     
-    if PE_MODE:
-        treat_total   = treat[0].total
-        control_total = control[0].total
-    else:
-        treat_total   = treat.total
-        control_total = control.total
+    treat_total   = treat.total
+    control_total = control.total
     ratio_treat2control = float(treat_total)/control_total
 
     # Now pileup FWTrackIII to form a bedGraphTrackI
@@ -178,7 +174,7 @@ class PeakDetect:
         self.ratio_treat2control = None
         self.peaks = None
         self.final_peaks = None
-        self.PE_MODE = opt.format == 'BAMPE'
+        self.PE_MODE = opt.PE_MODE
 
         #self.femax = opt.femax
         #self.femin = opt.femin
@@ -324,26 +320,25 @@ class PeakDetect:
         cdef float lambda_bg, effective_depth_in_million
 
         if self.PE_MODE:
-            treat_total   = self.treat[0].total
-            control_total = self.control[0].total
-            self.info("#3 pileup treatment data")
+            treat_total   = self.treat.length()
+            control_total = self.control.length()           
         else:
             treat_total   = self.treat.total
             control_total = self.control.total
-            self.info("#3 pileup treatment data by extending tags towards 3' to %d length" % self.d)
         self.ratio_treat2control = float(treat_total)/control_total
 
         if self.opt.tocontrol:
             # if MACS decides to scale treatment to control data because treatment is bigger
-        
             effective_depth_in_million = control_total / 1000000.0
         
-            lambda_bg = float(self.d)*treat_total/self.gsize/self.ratio_treat2control
-
             if self.PE_MODE:
-                treat_btrack = pileup_frag_bdg(self.treat[0], self.treat[1],
-                                               scale_factor=1/self.ratio_treat2control)
+                self.info("#3 pileup treatment data")
+                lambda_bg = treat_total/self.gsize/self.ratio_treat2control
+                treat_btrack = pileup_frag_bdg(self.treat,
+                                        scale_factor=1/self.ratio_treat2control)
             else:
+                self.info("#3 pileup treatment data by extending tags towards 3' to %d length" % self.d)
+                lambda_bg = float(self.d)*treat_total/self.gsize/self.ratio_treat2control
                 treat_btrack = pileup_bdg(self.treat, self.d, directional=True,
                                           halfextension=self.opt.halfext,
                                           scale_factor=1/self.ratio_treat2control)
@@ -351,12 +346,11 @@ class PeakDetect:
             # if MACS decides to scale control to treatment because control sample is bigger
             effective_depth_in_million = treat_total / 1000000.0
             
-            lambda_bg = float(self.d)*treat_total/self.gsize
-
             if self.PE_MODE:
-                treat_btrack = pileup_frag_bdg(self.treat[0], self.treat[1],
-                                               scale_factor=1.0)
+                lambda_bg = treat.total/self.gsize
+                treat_btrack = pileup_frag_bdg(self.treat, scale_factor=1.0)
             else:
+                lambda_bg = float(self.d)*treat_total/self.gsize
                 treat_btrack = pileup_bdg(self.treat,self.d,directional=True,
                                           halfextension=self.opt.halfext,
                                           scale_factor=1.0)
@@ -405,12 +399,11 @@ class PeakDetect:
 
         # pileup using different extension sizes and scaling factors
         if self.PE_MODE:
-            control_btrack = pileup_frag_w_multiple_d_bdg(self.control[0],
-                                                          self.control[1],
-                                                          d_s[1:],
-                                                          baseline_value=lambda_bg,
-                                                          scale_factor_s=scale_factor_s[1:],
-                                                          scale_factor_0=scale_factor_s[0])
+            control_btrack = pileup_frag_w_multiple_d_bdg(self.control,
+                                            d_s[1:],
+                                            baseline_value=lambda_bg,
+                                            scale_factor_s=scale_factor_s[1:],
+                                            scale_factor_0=scale_factor_s[0])
         else:
             control_btrack = pileup_w_multiple_d_bdg(self.control, d_s,
                                                      baseline_value=lambda_bg,
@@ -527,20 +520,23 @@ class PeakDetect:
         """
         cdef float effective_depth_in_million
 
+        if self.PE_MODE:
+            treat_total = self.treat.length()
+        else:
+            treat_total = self.treat.total
+
         effective_depth_in_million = treat_total / 1000000.0
 
         # global lambda
         if self.PE_MODE:
             # should we support halfext?
             if self.opt.halfext: warn('halfextension not supported in PE mode')
-            treat_total = self.treat[0].total
             self.info("#3 pileup treatment data")
             # this an estimator, we should maybe test it for accuracy?
-            lambda_bg = float(self.d) * treat_total / self.gsize
+            lambda_bg = treat_total / self.gsize
             # Now pileup FWTrackIII to form a bedGraphTrackI
-            treat_btrack = pileup_frag_bdg(self.treat[0], self.treat[1])
+            treat_btrack = pileup_frag_bdg(self.treat)
         else:
-            treat_total = self.treat.total
             lambda_bg = float(self.d) * treat_total / self.gsize
             self.info("#3 pileup treatment data by extending tags towards 3' to %d length" % self.d)
             # Now pileup FWTrackIII to form a bedGraphTrackI
@@ -555,8 +551,7 @@ class PeakDetect:
             self.info("#3 calculate large local lambda from treatment data")
             # Now pileup FWTrackIII to form a bedGraphTrackI
             if self.PE_MODE:
-                control_btrack = pileup_and_ext_frag_bdg(self.treat[0],
-                                                self.treat[1],
+                control_btrack = pileup_and_ext_frag_bdg(self.treat,
                                                 self.lregion,
                                                 baseline_value = lambda_bg,
                                                 scale_factor = tmp_v)
@@ -615,6 +610,8 @@ class PeakDetect:
         if self.opt.store_bdg:
             name = self.opt.name or 'Unknown'
             trackdesc = "%s for \"%s\" from MACS v%s" % ("%s", name, MACS_VERSION)
+            if self.PE_MODE: desc1 = "fragment pileup"
+            else: desc1 = "tag pileup"
             # tracks [(filename, name, desc, scorecol), ...]
             tracks = [(self.zwig_tr + "_pileup.bdg", self.zwig_tr,
                        desc1, "sample")]
