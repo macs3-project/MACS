@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# Time-stamp: <2012-04-24 18:17:48 Tao Liu>
+# Time-stamp: <2012-05-01 15:32:55 Tao Liu>
 
 import os
 import sys
@@ -79,7 +79,7 @@ class Test_FWTrackIII(unittest.TestCase):
         fw.sample_num( 10 )
         self.assertEqual( fw.total, 9 )
         
-    def test_sample_num(self):
+    def test_sample_percent(self):
         # make sure the shuffled sequence does not lose any elements
         fw = FWTrackIII(fw=self.fw)
         for ( c, p, s ) in self.input_regions:

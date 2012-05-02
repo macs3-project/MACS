@@ -1,5 +1,5 @@
 # cython: profile=True
-# Time-stamp: <2012-04-30 17:37:49 Tao Liu>
+# Time-stamp: <2012-05-01 18:17:23 Tao Liu>
 
 """Module Description
 
@@ -98,7 +98,7 @@ def compare_treatment_vs_control(treat, control, fragment_size, gsize,
     # d
     if not tocontrol:
         # if user want to scale everything to ChIP data
-        tmp_v = self.ratio_treat2control
+        tmp_v = ratio_treat2control
     else:
         tmp_v = 1.0
     scale_factor_s.append( tmp_v )
@@ -108,7 +108,7 @@ def compare_treatment_vs_control(treat, control, fragment_size, gsize,
         d_s.append( slocal )
         if not tocontrol:
             # if user want to scale everything to ChIP data
-            tmp_v = float(fragment_size)/slocal*self.ratio_treat2control
+            tmp_v = float(fragment_size)/slocal*ratio_treat2control
         else:
             tmp_v = float(fragment_size)/slocal
         scale_factor_s.append( tmp_v )
@@ -118,7 +118,7 @@ def compare_treatment_vs_control(treat, control, fragment_size, gsize,
         d_s.append( llocal )
         if not tocontrol:
             # if user want to scale everything to ChIP data
-            tmp_v = float(fragment_size)/llocal*self.ratio_treat2control
+            tmp_v = float(fragment_size)/llocal*ratio_treat2control
         else:
             tmp_v = float(fragment_size)/llocal
         scale_factor_s.append( tmp_v )                            

@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# Time-stamp: <2012-04-28 12:53:18 Tao Liu>
+# Time-stamp: <2012-05-01 18:39:35 Tao Liu>
 
 """Description: 
 
@@ -51,7 +51,7 @@ def main():
                        Extension("MACS2.cArray", ["MACS2/cArray.pyx"]),                       
                        Extension("MACS2.cPeakModel", ["MACS2/cPeakModel.pyx"], include_dirs=numpy_include_dir),                   
                        Extension("MACS2.cPeakDetect", ["MACS2/cPeakDetect.pyx"]),
-                       Extension("MACS2.cFilterPE", ["MACS2/cFilterPE.pyx"]),
+                       Extension("MACS2.cFilterPE", ["MACS2/cFilterPE.pyx"], include_dirs=numpy_include_dir),
                        Extension("MACS2.IO.cPeakIO", ["MACS2/IO/cPeakIO.pyx"],),
                        Extension("MACS2.IO.cBedGraphIO", ["MACS2/IO/cBedGraphIO.pyx"],),                   
                        Extension("MACS2.IO.cFixWidthTrack", ["MACS2/IO/cFixWidthTrack.pyx"], include_dirs=numpy_include_dir),
@@ -67,7 +67,7 @@ def main():
                        Extension("MACS2.cArray", ["MACS2/cArray.c"]),                                              
                        Extension("MACS2.cPeakModel", ["MACS2/cPeakModel.c"], include_dirs=numpy_include_dir),                   
                        Extension("MACS2.cPeakDetect", ["MACS2/cPeakDetect.c"]),
-                       Extension("MACS2.cFilterPE", ["MACS2/cFilterPE.c"]),
+                       Extension("MACS2.cFilterPE", ["MACS2/cFilterPE.c"], include_dirs=numpy_include_dir),
                        Extension("MACS2.IO.cPeakIO", ["MACS2/IO/cPeakIO.c"],),
                        Extension("MACS2.IO.cBedGraphIO", ["MACS2/IO/cBedGraphIO.c"],),                   
                        Extension("MACS2.IO.cFixWidthTrack", ["MACS2/IO/cFixWidthTrack.c"], include_dirs=numpy_include_dir),

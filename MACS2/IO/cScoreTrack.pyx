@@ -1,5 +1,5 @@
 # cython: profile=True
-# Time-stamp: <2012-04-29 21:59:02 Tao Liu>
+# Time-stamp: <2012-05-01 18:15:11 Tao Liu>
 
 """Module for Feature IO classes.
 
@@ -922,4 +922,35 @@ class CombinedTwoTrack:
         radd(cur_region[0]+"."+str(cur_region[1])+"."+str(cur_region[2]))
         v1add(cur_region[3]/float(l))
         v2add(cur_region[4]/float(l))
+        return ret
+
+    def extract_sum (self, bdgTrack2):
+        """Get sum values in each region defined in bdgTrack2.
+        
+        """
+        cdef int i
+        cdef str chrom, start, end
+        
+        (rarray,v1array,v2array,larray)  = self.extract_value(bdgTrack2)
+        ret = [[],array(FBYTE4,[]),array(FBYTE4,[])] # region,V1,V1
+        radd = ret[0].append
+        v1add = ret[1].append
+        v2add = ret[2].append
+        cur_region = [None,None,None,None,None]      # chrom, start, end, s1, s2
+        for i in range(len(rarray)):
+            (chrom,start,end) = rarray[i].split('.')
+            if chrom == cur_region[0] and start == cur_region[2]:
+                cur_region[2] =  end
+                cur_region[3] += v1array[i]*larray[i]
+                cur_region[4] += v2array[i]*larray[i]
+            else:
+                if cur_region[0]:
+                    radd(cur_region[0]+"."+str(cur_region[1])+"."+str(cur_region[2]))
+                    v1add(cur_region[3])
+                    v2add(cur_region[4])                    
+                cur_region = [chrom, start, end, v1array[i]*larray[i], v2array[i]*larray[i]]
+
+        radd(cur_region[0]+"."+str(cur_region[1])+"."+str(cur_region[2]))
+        v1add(cur_region[3])
+        v2add(cur_region[4])
         return ret

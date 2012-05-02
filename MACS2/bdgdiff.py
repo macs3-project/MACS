@@ -1,4 +1,4 @@
-# Time-stamp: <2012-04-10 17:37:06 Tao Liu>
+# Time-stamp: <2012-04-30 17:42:07 Tao Liu>
 
 """Description: Naive call differential peaks from 4 bedGraph tracks for scores.
 
@@ -84,7 +84,7 @@ def run( options ):
     # calculate sum of all signals in million
     t1_sum = t1_btrack.summary()[0]
     t2_sum = t2_btrack.summary()[0]    
-    n1 = t1_sum/1000000.0
+    n1 = t1_sum/1000000.0               # signal per million
     n2 = t2_sum/1000000.0
     offset = -log(n1,2)+log(n2,2)
     info("t1 sum: %.1f, t2 sum: %.1f, Offset is %.2f" % (t1_sum,t2_sum,offset))

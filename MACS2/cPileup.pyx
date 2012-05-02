@@ -1,5 +1,5 @@
 # cython: profile=True
-# Time-stamp: <2012-04-29 21:43:17 Tao Liu>
+# Time-stamp: <2012-05-01 18:34:03 Tao Liu>
 
 """Module Description: For pileup functions.
 
@@ -377,7 +377,6 @@ cdef pileup_a_chromosome ( np.ndarray start_poss, np.ndarray end_poss, long l, f
     pre_v = pileup
     
     while i_s < l and i_e < l:
-        # i_s is not incrementing
         a = start_poss[i_s]
         b = end_poss[i_e]
         if a < b:

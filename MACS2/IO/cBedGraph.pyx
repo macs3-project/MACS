@@ -1,5 +1,5 @@
 # cython: profile=True
-# Time-stamp: <2012-04-29 21:59:33 Tao Liu>
+# Time-stamp: <2012-05-01 18:19:56 Tao Liu>
 
 """Module for Feature IO classes.
 
@@ -80,8 +80,8 @@ class bedGraphTrackI:
         
         """
         self.__data = {}
-        self.maxvalue = 10000 # these were swapped
-        self.minvalue = -10000 # ^
+        self.maxvalue = -10000000 # initial maximum value is tiny since I want safe_add_loc to update it
+        self.minvalue = 10000000  # initial minimum value is large since I want safe_add_loc to update it
         self.baseline_value = baseline_value
 
     def add_a_chromosome ( self, chrom, d ):
