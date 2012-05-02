@@ -315,12 +315,13 @@ def load_tag_files_options ( options ):
     """
     options.info("#1 read treatment tags...")
     tp = options.parser(options.tfile)
-        
-    treat = (tp.build_fwtrack())
-    treat.sort()
+
     if not options.tsize:           # override tsize if user specified --tsize
         ttsize = tp.tsize()
         options.tsize = ttsize
+
+    treat = (tp.build_fwtrack())
+    treat.sort()
     
     if options.cfile:
         options.info("#1.2 read input tags...")

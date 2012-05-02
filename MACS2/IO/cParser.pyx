@@ -643,19 +643,18 @@ class BAMParser( GenericParser ):
         self.tag_size = int( s/n )
         return self.tag_size
 
-    def build_fwtrack ( self ):
-        """Build FWTrackIII from all lines, return a FWTrackIII object.
-
-        Note only the unique match for a tag is kept.
+    def get_references( self ):
         """
-        cdef int i, m, header_len, nc, x, nlength
-        cdef int entrylength, fpos, strand, chrid
-        cdef list references
+        read in references from BAM header
         
-        fwtrack = FWTrackIII()
-        i = 0
-        m = 0
+        return a tuple (references (list of names),
+                        rlengths (dict of lengths)
+        """
+        cdef int header_len, x, nc, nlength
+        cdef str refname
+        
         references = []
+        rlengths = {}
         fseek = self.fhd.seek
         fread = self.fhd.read
         ftell = self.fhd.tell
@@ -668,9 +667,30 @@ class BAMParser( GenericParser ):
         for x in range( nc ):
             # read each chromosome name
             nlength = unpack( '<i', fread( 4 ) )[ 0 ]
-            references.append( fread( nlength )[ :-1 ] )
-            # jump over chromosome size, we don't need it
-            fseek( ftell() + 4 )
+            refname = fread( nlength )[ :-1 ]
+            references.append( refname )
+            # don't jump over chromosome size
+            # we can use it to avoid falling of chrom ends during peak calling
+            rlengths[refname] = unpack( '<i', fread( 4 ) )[ 0 ]
+        return (references, rlengths)
+
+    def build_fwtrack ( self ):
+        """Build FWTrackIII from all lines, return a FWTrackIII object.
+
+        Note only the unique match for a tag is kept.
+        """
+        cdef int i, m
+        cdef int entrylength, fpos, strand, chrid
+        cdef list references
+        cdef dict rlengths
+        
+        fwtrack = FWTrackIII()
+        i = 0
+        m = 0
+        references, rlengths = self.get_references()
+        fseek = self.fhd.seek
+        fread = self.fhd.read
+        ftell = self.fhd.tell
         
         while True:
             try:
@@ -687,6 +707,7 @@ class BAMParser( GenericParser ):
                 fwtrack.add_loc( references[ chrid ], fpos, strand )
         self.fhd.close()
         fwtrack.finalize()
+        fwtrack.rlengths = rlengths
         return fwtrack
     
     def __fw_binary_parse (self, data ):
@@ -878,31 +899,20 @@ class BAMPEParser(BAMParser):
     def build_petrack (self):
         """Build FWTrackIII from all lines, return a FWTrackIII object.
         """
-        cdef int i, m, header_len, nc, x, nlength
+        cdef int i, m
         cdef int entrylength, fpos, chrid, tlen
         cdef list references
+        cdef dict rlengths
         cdef float d
         cdef np.ndarray loc = np.zeros([1,2], np.int32)
         
         petrack = PETrackI()
         i = 0
         m = 0
-        references = []
+        references, rlengths = self.get_references()
         fseek = self.fhd.seek
         fread = self.fhd.read
         ftell = self.fhd.tell
-        # move to pos 4, there starts something
-        fseek(4)
-        header_len =  struct.unpack('<i', fread(4))[0]
-        fseek(header_len + ftell())
-        # get the number of chromosome
-        nc = struct.unpack('<i', fread(4))[0]
-        for x in range(nc):
-            # read each chromosome name
-            nlength = struct.unpack('<i', fread(4))[0]
-            references.append(fread(nlength)[:-1])
-            # jump over chromosome size, we don't need it
-            fseek(ftell() + 4)
         
         d = 0
         # for convenience, only count valid pairs
@@ -933,6 +943,7 @@ class BAMPEParser(BAMParser):
         assert d >= 0, "Something went wrong (mean fragment size was negative)"
         self.fhd.close()
         petrack.finalize()
+        petrack.rlengths = rlengths
         return petrack
         
     def __fw_binary_parse (self, data ):

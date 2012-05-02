@@ -64,6 +64,7 @@ class FWTrackIII:
         self.__sorted = False
         self.total = 0                  # total tags
         self.annotation = anno   # need to be figured out
+        self.rlengths = None
 
 
     def add_loc ( self, str chromosome, int32_t fiveendpos, int strand ):
