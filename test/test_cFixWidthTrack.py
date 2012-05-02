@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# Time-stamp: <2012-05-01 15:32:55 Tao Liu>
+# Time-stamp: <2012-05-01 22:09:55 Tao Liu>
 
 import os
 import sys
@@ -52,19 +52,29 @@ class Test_FWTrackIII(unittest.TestCase):
         self.assertEqual( fw.length(), 17*self.fw )
 
         # filter out more than 3 tags
-        fw = fw.filter_dup( 3 )
+        fw2 = fw.filter_dup( 3, copyself = True )
         # one chrY:85:0 should be removed
-        self.assertEqual( fw.total, 16 )
+        self.assertEqual( fw.total, 17 )
+        self.assertEqual( fw2.total, 16 )
+        fw = fw2
 
         # filter out more than 2 tags
-        fw = fw.filter_dup( 2 )
+        fw2 = fw.filter_dup( 2, copyself = True )        
         # then, one chrY:85:0 and one chrY:80:- should be removed
-        self.assertEqual( fw.total, 14 )
-
+        self.assertEqual( fw.total, 16 )
+        self.assertEqual( fw2.total, 14 )
+        fw = fw2
+        
         # filter out more than 1 tag
-        fw = fw.filter_dup( 1 )
+        fw2 = fw.filter_dup( 1, copyself = True )
         # then, one chrY:85:0 and one chrY:80:1, one chrY:90:1 should be removed
-        self.assertEqual( fw.total, 11 )        
+        self.assertEqual( fw.total, 14 )
+        self.assertEqual( fw2.total, 11 )
+
+        # last test for inplace filtering
+        fw.filter_dup( 1 )
+        self.assertEqual( fw.total, 11 )
+        
 
     def test_sample_num(self):
         # make sure the shuffled sequence does not lose any elements
