@@ -1,5 +1,5 @@
 # cython: profile=True
-# Time-stamp: <2012-05-01 21:52:01 Tao Liu>
+# Time-stamp: <2012-05-02 01:07:31 Tao Liu>
 
 """Module for FWTrack classes.
 
@@ -21,7 +21,7 @@ with the distribution).
 import logging
 
 #from array import array
-from random import sample as random_sample
+#from random import sample as random_sample
 import sys
 from copy import copy
 from MACS2.Constants import *

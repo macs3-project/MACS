@@ -1,4 +1,4 @@
-# Time-stamp: <2012-04-10 17:56:07 Tao Liu>
+# Time-stamp: <2012-05-02 16:38:42 Tao Liu>
 
 """Module Description
 
@@ -177,6 +177,9 @@ def opt_validate ( options ):
 
     if options.halfext:
         options.argtxt += "# MACS will make 1/2d size fragments\n"
+
+    if options.do_SPMR and options.store_bdg:
+        options.argtxt += "# MACS will save fragment pileup signal per million reads\n"        
 
     return options
 

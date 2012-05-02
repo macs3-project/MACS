@@ -1,5 +1,5 @@
 # cython: profile=True
-# Time-stamp: <2012-05-01 18:15:11 Tao Liu>
+# Time-stamp: <2012-05-02 16:56:21 Tao Liu>
 
 """Module for Feature IO classes.
 
@@ -129,14 +129,21 @@ class scoreTrackI:
     this class is 0-indexed and right-open.
     
     """
-    def __init__ (self):
+    def __init__ (self, float effective_depth_in_million = 1.0):
         """Different with bedGraphTrackI, missing values are simply
         replaced with 0.
-        
+
+        effective_depth_in_million: sequencing depth in million after
+                                    duplicates being filtered. If
+                                    treatment is scaled down to
+                                    control sample size, then this
+                                    should be control sample size in
+                                    million. And vice versa.
         """
         self.data = {}
         self.pointer = {}
         self.trackline = False
+        self.effective_depth_in_million = effective_depth_in_million
         
     def enable_trackline(self):
         """Turn on trackline with bedgraph output
@@ -153,7 +160,7 @@ class scoreTrackI:
                                  '100logLR': np.zeros(chrom_max_len, dtype="int32") }
             self.pointer[chrom] = 0
 
-    def add (self, str chromosome, int endpos, int sample, float control):
+    def add (self, str chromosome, int endpos, float sample, float control):
         """Add a chr-endpos-sample-control block into data
         dictionary. At the mean time, calculate pvalues and log
         likelihood.
@@ -166,7 +173,7 @@ class scoreTrackI:
         c['pos'][i] = endpos
         c['sample'][i] = sample
         c['control'][i] = control
-        c['-100logp'][i] = get_pscore(sample,control)
+        c['-100logp'][i] = get_pscore(int(sample),control)
         c['100logLR'][i] = logLR(sample,control)        
         self.pointer[chromosome] += 1
 
@@ -198,51 +205,57 @@ class scoreTrackI:
         l = set(self.data.keys())
         return l
 
-    def write_bedGraph (self, fhd, str name, str description, str colname):
+    def write_bedGraph ( self, fhd, str name, str description, str colname, bool do_SPMR = False ):
         """Write all data to fhd in Wiggle Format.
 
         fhd: a filehandler to save bedGraph.
+
         name/description: the name and description in track line.
 
-        colname: can be 'sample','control','-100logp','-100logq'
+        colname: can be 'sample','control','-100logp','-100logq', '100logLR'
 
+        do_SPMR: only effective when writing sample/control tracks. When True, save SPMR instead.
+        
         """
         cdef str chrom
         cdef int l, pre, i, p 
-        cdef double pre_v, v
+        cdef float pre_v, v, scale_factor
         if self.trackline:
             # this line is REQUIRED by the wiggle format for UCSC browser
-            fhd.write("track type=bedGraph name=\"%s\" description=\"%s\"\n" % (name,description))
+            fhd.write( "track type=bedGraph name=\"%s\" description=\"%s\"\n" % ( name,description ) )
         
-        if colname not in ['sample','control','-100logp','-100logq','100logLR']:
-            raise Exception("%s not supported!" % colname)
-        if colname in ['-100logp', '-100logq','100logLR']:
-            flag100 = True              # for pvalue or qvalue, divide them by 100 while writing to bedGraph file
-        else:
-            flag100 = False
+        if colname not in [ 'sample', 'control', '-100logp', '-100logq', '100logLR' ]:
+            raise Exception( "%s not supported!" % colname )
+
+        if colname in [ '-100logp', '-100logq', '100logLR' ]:
+            scale_factor = 0.1              # for pvalue or qvalue, divide them by 100 while writing to bedGraph file
+        elif colname in [ 'sample', 'control' ]:
+            if do_SPMR:
+                logging.info( "MACS will save SPMR for fragment pileup using effective depth of %.2f million" % self.effective_depth_in_million )
+                scale_factor = 1.0/self.effective_depth_in_million
+            else:
+                scale_factor = 1
+        
         chrs = self.get_chr_names()
         for chrom in chrs:
-            d = self.data[chrom]
-            l = self.pointer[chrom]
+            d = self.data[ chrom ]
+            l = self.pointer[ chrom ]
             pre = 0
-            pos   = d['pos']
-            if flag100:
-                value = d[colname]/100.0
-            else:
-                value = d[colname]
-            if len(value) == 0: continue
-            pre_v = value[0]
+            pos   = d[ 'pos' ]
+            value = d[ colname ] * scale_factor
+            if value.shape[ 0 ] == 0: continue # skip if there's no data
+            pre_v = value[ 0 ]
             for i in range( 1, l ):
-                v = value[i]
-                p = pos[i-1]
+                v = value[ i ]
+                p = pos[ i-1 ]
                 if pre_v != v: 
-                    fhd.write("%s\t%d\t%d\t%.2f\n" % (chrom,pre,p,pre_v))
+                    fhd.write( "%s\t%d\t%d\t%.2f\n" % ( chrom, pre, p, pre_v ) )
                     pre_v = v
                     pre = p
-            p = pos[-1]
+            p = pos[ -1 ]
             # last one
-            fhd.write("%s\t%d\t%d\t%.2f\n" % (chrom,pre,p,pre_v))            
-
+            fhd.write( "%s\t%d\t%d\t%.2f\n" % ( chrom, pre, p, pre_v ) )
+            
         return True
 
     def make_pq_table ( self ):

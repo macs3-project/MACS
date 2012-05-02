@@ -1,5 +1,5 @@
 # cython: profile=True
-# Time-stamp: <2012-05-01 21:56:08 Tao Liu>
+# Time-stamp: <2012-05-02 17:05:58 Tao Liu>
 
 """Module Description
 
@@ -15,12 +15,13 @@ with the distribution).
 @author:  Yong Zhang, Tao Liu
 @contact: taoliu@jimmy.harvard.edu
 """
-import os
-from array import array
-from copy import deepcopy
+#import os
+#from array import array
+#from copy import deepcopy
 from itertools import groupby
 from operator import itemgetter
-import subprocess
+import io
+#import subprocess
 import gc                               # use garbage collectior
 
 from MACS2.IO.cPeakIO import PeakIO
@@ -59,6 +60,8 @@ def compare_treatment_vs_control(treat, control, fragment_size, gsize,
 
     Finally, BH process will be applied to adjust pvalue to qvalue.
     """
+    cdef float effective_depth_in_million
+    
     if PE_MODE:
         treat_total   = treat[0].total
         control_total = control[0].total
@@ -78,8 +81,10 @@ def compare_treatment_vs_control(treat, control, fragment_size, gsize,
         # if user want to scale everything to control data
         lambda_bg = float(fragment_size)*treat_total/gsize/ratio_treat2control
         treat_btrack.apply_func(lambda x:float(x)/ratio_treat2control)
+        effective_depth_in_million = control_total / 1000000.0        
     else:
         lambda_bg = float(fragment_size)*treat_total/gsize
+        effective_depth_in_million = treat_total / 1000000.0        
 
 
     # control data needs multiple steps of calculation
@@ -138,7 +143,7 @@ def compare_treatment_vs_control(treat, control, fragment_size, gsize,
                                              scale_factor_s=scale_factor_s)
 
     # calculate pvalue scores
-    score_btrack = treat_btrack.make_scoreTrack_for_macs(control_btrack)
+    score_btrack = treat_btrack.make_scoreTrack_for_macs( control_btrack , effective_depth_in_million = effective_depth_in_million )
     #treat_btrack = None             # clean them
     #control_btrack = None
     #gc.collect()                    # full collect garbage
@@ -316,7 +321,8 @@ class PeakDetect:
         for enrichment.
         """
         cdef int i
-        
+        cdef float lambda_bg, effective_depth_in_million
+
         if self.PE_MODE:
             treat_total   = self.treat[0].total
             control_total = self.control[0].total
@@ -327,19 +333,26 @@ class PeakDetect:
             self.info("#3 pileup treatment data by extending tags towards 3' to %d length" % self.d)
         self.ratio_treat2control = float(treat_total)/control_total
 
-
         if self.opt.tocontrol:
-            # if user want to scale everything to control data
+            # if MACS decides to scale treatment to control data because treatment is bigger
+        
+            effective_depth_in_million = control_total / 1000000.0
+        
             lambda_bg = float(self.d)*treat_total/self.gsize/self.ratio_treat2control
+
             if self.PE_MODE:
                 treat_btrack = pileup_frag_bdg(self.treat[0], self.treat[1],
-                                        scale_factor=1/self.ratio_treat2control)
+                                               scale_factor=1/self.ratio_treat2control)
             else:
                 treat_btrack = pileup_bdg(self.treat, self.d, directional=True,
                                           halfextension=self.opt.halfext,
-                                        scale_factor=1/self.ratio_treat2control)
+                                          scale_factor=1/self.ratio_treat2control)
         else:
+            # if MACS decides to scale control to treatment because control sample is bigger
+            effective_depth_in_million = treat_total / 1000000.0
+            
             lambda_bg = float(self.d)*treat_total/self.gsize
+
             if self.PE_MODE:
                 treat_btrack = pileup_frag_bdg(self.treat[0], self.treat[1],
                                                scale_factor=1.0)
@@ -393,17 +406,17 @@ class PeakDetect:
         # pileup using different extension sizes and scaling factors
         if self.PE_MODE:
             control_btrack = pileup_frag_w_multiple_d_bdg(self.control[0],
-                                            self.control[1],
-                                            d_s[1:],
-                                            baseline_value=lambda_bg,
-                                            scale_factor_s=scale_factor_s[1:],
-                                            scale_factor_0=scale_factor_s[0])
+                                                          self.control[1],
+                                                          d_s[1:],
+                                                          baseline_value=lambda_bg,
+                                                          scale_factor_s=scale_factor_s[1:],
+                                                          scale_factor_0=scale_factor_s[0])
         else:
             control_btrack = pileup_w_multiple_d_bdg(self.control, d_s,
-                                                 baseline_value=lambda_bg,
-                                                 directional=self.shiftcontrol,
-                                                 halfextension=self.opt.halfext,
-                                                 scale_factor_s=scale_factor_s)
+                                                     baseline_value=lambda_bg,
+                                                     directional=self.shiftcontrol,
+                                                     halfextension=self.opt.halfext,
+                                                     scale_factor_s=scale_factor_s)
 
         # free mem
         #self.treat = None
@@ -414,7 +427,7 @@ class PeakDetect:
 
         # calculate pvalue scores
         self.info("#3 Build score track ...")
-        score_btrack = treat_btrack.make_scoreTrack_for_macs(control_btrack)
+        score_btrack = treat_btrack.make_scoreTrack_for_macs( control_btrack, effective_depth_in_million = effective_depth_in_million )
         if self.opt.trackline: score_btrack.enable_trackline()
         #treat_btrack = None             # clean them
         #control_btrack = None
@@ -424,7 +437,7 @@ class PeakDetect:
         pqtable = score_btrack.make_pq_table()
         
         self.info("#3 Saving p-value to q-value table ...")
-        pqfhd = open(self.opt.pqtable,"w")
+        pqfhd = io.open(self.opt.pqtable,"wb")
         pqfhd.write( "-log10pvalue\t-log10qvalue\trank\tbasepairs\n" )
         for p in sorted(pqtable.keys(),reverse=True):
         #for i in range(pqtable.shape[0]):
@@ -484,9 +497,9 @@ class PeakDetect:
            
            for filename, title, desc, scorecol in tracks:
                self.info("#3 save the %s track into bedGraph file..." % desc)
-               with open(filename, 'w') as bdgfhd:
+               with io.open(filename, 'wb') as bdgfhd:
                    score_btrack.write_bedGraph(bdgfhd, title,
-                                               trackdesc % desc, scorecol)
+                                               trackdesc % desc, scorecol, do_SPMR = self.opt.do_SPMR) # do_SPMR doesn't have effect on p/q/logLR values.
         return peaks
 
     def __call_peaks_wo_control (self):
@@ -512,6 +525,10 @@ class PeakDetect:
         Finally, a poisson CDF is applied to calculate one-side pvalue
         for enrichment.
         """
+        cdef float effective_depth_in_million
+
+        effective_depth_in_million = treat_total / 1000000.0
+
         # global lambda
         if self.PE_MODE:
             # should we support halfext?
@@ -555,7 +572,7 @@ class PeakDetect:
 
         # calculate pvalue scores
         self.info("#3 Build score track ...")
-        score_btrack = treat_btrack.make_scoreTrack_for_macs(control_btrack)
+        score_btrack = treat_btrack.make_scoreTrack_for_macs( control_btrack, effective_depth_in_million = effective_depth_in_million )
         if self.opt.trackline: score_btrack.enable_trackline()
         treat_btrack = None             # clean them
         control_btrack = None
@@ -619,7 +636,7 @@ class PeakDetect:
                 self.info("#3 save the %s track into bedGraph file..." % desc)
                 with open(filename, 'w') as bdgfhd:
                     score_btrack.write_bedGraph(bdgfhd, title,
-                                                trackdesc % desc, scorecol)
+                                                trackdesc % desc, scorecol, do_SPMR = self.opt.do_SPMR) # do_SPMR doesn't have effect on p/q/logLR values.
        
         return peaks
 
