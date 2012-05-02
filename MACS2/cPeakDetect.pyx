@@ -458,44 +458,35 @@ class PeakDetect:
             
         if self.opt.store_bdg:
            name = self.opt.name or 'Unknown'
-           self.info("#3 save tag pileup into bedGraph file...")
-           bdgfhd = open(self.zwig_tr + "_pileup.bdg", "w")
-           if self.PE_MODE:
-               desc = "True fragment distribution"
-           else:
-               desc = "Fragment pileup"
-           score_btrack.write_bedGraph( bdgfhd,
-                                        self.zwig_tr,
-                                        "%s for %s from MACS v%s" % (desc, name, MACS_VERSION),
-                                        "sample" )
-        
-           self.info("#3 save local lambda into bedGraph file...")
-           bdgfhd = open(self.zwig_ctl + "_lambda.bdg", "w")
-           score_btrack.write_bedGraph( bdgfhd,
-                                        self.zwig_ctl,
-                                        "Maximum local lambda for \"%s\" from MACS v%s" % (name, MACS_VERSION),
-                                        "control" )
-
-           self.info("#3 save the -log10pvalue score track into bedGraph file...")
-           bdgfhd = open(self.zwig_tr + "_pvalue.bdg", "w")
-           score_btrack.write_bedGraph( bdgfhd,
-                                        self.zwig_tr+"_-log10pvalue",
-                                        "-log10 pvalue scores for \"%s\" from MACS v%s" % (name, MACS_VERSION),
-                                        "-100logp")
-            
-           self.info("#3 save the -log10qvalue score track into bedGraph file...")
-           bdgfhd = open(self.zwig_tr + "_qvalue.bdg", "w")
-           score_btrack.write_bedGraph( bdgfhd,
-                                        self.zwig_tr+"_-log10qvalue",
-                                        "-log10 qvalue scores for \"%s\" from MACS v%s" % (name, MACS_VERSION),
-                                        "-100logq")
+           trackdesc = "%s for \"%s\" from MACS v%s" % ("%s", name, MACS_VERSION)
+           if self.PE_MODE: desc1 = "fragment pileup"
+           else: desc1 = "tag pileup"
            
-           self.info("#3 save the ln likelihood ratio track into bedGraph file...")
-           bdgfhd = open(self.zwig_tr + "_logLR.bdg", "w")
-           score_btrack.write_bedGraph( bdgfhd,
-                                        self.zwig_tr+"_-logLR",
-                                        "log10 likelihood ratio scores at each bp from MACS version %s" % MACS_VERSION,
-                                        "100logLR")
+           # tracks [(filename, name, desc, scorecol), ...]
+           tracks = [(self.zwig_tr + "_pileup.bdg", self.zwig_tr,
+                      desc1, "sample"),
+                     
+                     (self.zwig_ctl + "_lambda.bdg", self.zwig_ctl,
+                      "Maximum local lambda", "control"),
+                     
+                     (self.zwig_tr + "_pvalue.bdg",
+                      self.zwig_tr + "_-log10pvalue",
+                      "-log10 pvalue scores", "-100logp"),
+                     
+                     (self.zwig_tr + "_qvalue.bdg",
+                      self.zwig_tr + "_-log10qvalue",
+                      "-log10 qvalue scores", "-100logq"),
+                     
+                     (self.zwig_tr + "_logLR.bdg",
+                      self.zwig_tr + "_-logLR",
+                      "log10 likelihood ratio scores", "100logLR")
+                    ]
+           
+           for filename, title, desc, scorecol in tracks:
+               self.info("#3 save the %s track into bedGraph file..." % desc)
+               with open(filename, 'w') as bdgfhd:
+                   score_btrack.write_bedGraph(bdgfhd, title,
+                                               trackdesc % desc, scorecol)
         return peaks
 
     def __call_peaks_wo_control (self):
@@ -605,39 +596,31 @@ class PeakDetect:
                 peaks = score_btrack.call_peaks(cutoff=self.log_qvalue*100,min_length=self.d,max_gap=self.opt.tsize,colname='-100logq',call_summits=call_summits)
 
         if self.opt.store_bdg:
-           name = self.opt.name or 'Unknown'
-           self.info("#3 save tag pileup into bedGraph file...")
-           bdgfhd = open(self.zwig_tr + "_pileup.bdg", "w")
-           if self.PE_MODE:
-               desc = "True fragment distribution"
-           else:
-               desc = "Fragment pileup"
-           score_btrack.write_bedGraph( bdgfhd,
-                                        self.zwig_tr,
-                                        "%s for %s from MACS v%s" % (desc, name, MACS_VERSION),
-                                        "sample" )
-
-           if self.lregion:
-               self.info("#3 save local lambda into bedGraph file...")
-               bdgfhd = open(self.zwig_ctl + "_lambda.bdg", "w")
-               score_btrack.write_bedGraph( bdgfhd,
-                                            self.zwig_ctl,
-                                            "Maximum local lambda for \"%s\" from MACS v%s" % (name, MACS_VERSION),
-                                            "control" )
-
-           self.info("#3 save the -log10pvalue score track into bedGraph file...")
-           bdgfhd = open(self.zwig_tr + "_pvalue.bdg", "w")
-           score_btrack.write_bedGraph( bdgfhd,
-                                        self.zwig_tr+"_-log10pvalue",
-                                        "-log10 pvalue scores for \"%s\" from MACS v%s" % (name, MACS_VERSION),
-                                        "-100logp")
+            name = self.opt.name or 'Unknown'
+            trackdesc = "%s for \"%s\" from MACS v%s" % ("%s", name, MACS_VERSION)
+            # tracks [(filename, name, desc, scorecol), ...]
+            tracks = [(self.zwig_tr + "_pileup.bdg", self.zwig_tr,
+                       desc1, "sample")]
             
-           self.info("#3 save the -log10qvalue score track into bedGraph file...")
-           bdgfhd = open(self.zwig_tr + "_qvalue.bdg", "w")
-           score_btrack.write_bedGraph( bdgfhd,
-                                        self.zwig_tr+"_-log10qvalue",
-                                        "-log10 qvalue scores for \"%s\" from MACS v%s" % (name, MACS_VERSION),
-                                        "-100logq")
+            if self.lregion:
+                tracks.append((self.zwig_ctl + "_lambda.bdg"
+                               self.zwig_ctl,
+                               "Maximum local lambda", "control" ))
+                
+            tracks.append((self.zwig_tr + "_pvalue.bdg",
+                           self.zwig_tr + "_-log10pvalue",
+                           "-log10 pvalue scores", "-100logp"))
+                     
+            tracks.append((self.zwig_tr + "_qvalue.bdg",
+                           self.zwig_tr + "_-log10qvalue",
+                           "-log10 qvalue scores", "-100logq"))
+           
+           for filename, title, desc, scorecol in tracks:
+               self.info("#3 save the %s track into bedGraph file..." % desc)
+               with open(filename, 'w') as bdgfhd:
+                   score_btrack.write_bedGraph(bdgfhd, title,
+                                               trackdesc % desc, scorecol)
+       
         return peaks
 
     # def __diag_w_control (self):
