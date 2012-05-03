@@ -2,7 +2,7 @@ Package: macs
 Version: 1.4.2
 Priority: optional
 Maintainer: Tao Liu <vladimir.liu@gmail.com>
-Depends: python2.6
+Depends: python (>=2.6)
 Architecture: all
 Suggests: maq, peakanalyzer
 Section: science
