@@ -17,7 +17,7 @@ gzip --best debian/usr/share/man/man1/macs14.1
 gzip --best -c DEBIAN/changelog > debian/usr/share/doc/macs/changelog.gz
 echo "MACS Debian maintainer and upstream author are identical.\nTherefore see also normal changelog file for Debian changes." > debian/usr/share/doc/macs/changelog.Debian
 gzip --best debian/usr/share/doc/macs/changelog.Debian
-python2.6 setup.py install --prefix=debian/usr/ --install-layout=deb
+python setup.py install --prefix=debian/usr/ --install-layout=deb
 #for f in `ls debian/usr/bin/*.py`;do mv ${f} ${f/.py/};done
 for f in `find debian/usr/lib/ -name '*.pyc'`;do rm -f ${f};done
 fakeroot dpkg-deb --build debian
