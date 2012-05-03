@@ -1,5 +1,5 @@
 # cython: profile=True
-# Time-stamp: <2012-05-02 16:46:19 Tao Liu>
+# Time-stamp: <2012-05-03 00:14:13 Tao Liu>
 
 """Module for Feature IO classes.
 
@@ -208,9 +208,10 @@ class bedGraphTrackI:
 
         shift will be used to shift the coordinates. default: 0
         """
-        cdef int pre, pos, i
-        cdef double value
-        cdef str chrom
+        cdef:
+            int pre, pos, i
+            double value
+            str chrom
         
         if trackline:
             fhd.write("track type=bedGraph name=\"%s\" description=\"%s\" visibility=2 alwaysZero=on\n" % (name,description))
@@ -244,9 +245,10 @@ class bedGraphTrackI:
         """Merge nearby regions with the same value.
         
         """
-        cdef int new_pre_pos, pos, i
-        cdef double new_pre_value, value
-        cdef str chrom
+        cdef:
+            int new_pre_pos, pos, i
+            double new_pre_value, value
+            str chrom
         
         chrs = set(self.__data.keys())
         for chrom in chrs:
@@ -284,9 +286,10 @@ class bedGraphTrackI:
 
         Self will be modified.
         """
-        cdef int new_pre_pos, pos, i
-        cdef double new_pre_value, value
-        cdef str chrom
+        cdef:
+            int new_pre_pos, pos, i
+            double new_pre_value, value
+            str chrom
         
         chrs = set(self.__data.keys())
         for chrom in chrs:
@@ -326,9 +329,10 @@ class bedGraphTrackI:
         """Calculate the sum, max, min, mean, and std. Return a tuple for (sum, max, min, mean, std).
         
         """
-        cdef long n_v
-        cdef double sum_v, max_v, min_v, mean_v, variance, tmp, std_v
-        cdef int pre_p, l, i
+        cdef:
+            long n_v
+            double sum_v, max_v, min_v, mean_v, variance, tmp, std_v
+            int pre_p, l, i
 
         pre_p = 0
         n_v = 0
@@ -377,9 +381,10 @@ class bedGraphTrackI:
         min_length :  minimum peak length, default 200.
         gap   :  maximum gap to merge nearby peaks, default 50.
         """
-        cdef int peak_length, x, pre_p, p, i, summit, tstart, tend
-        cdef double v, summit_value, tvalue
-        cdef str chrom
+        cdef:
+            int peak_length, x, pre_p, p, i, summit, tstart, tend
+            double v, summit_value, tvalue
+            str chrom
         
         if call_summits: close_peak = self.__close_peak2
         else: close_peak = self.__close_peak
@@ -523,8 +528,9 @@ class bedGraphTrackI:
         return True
     
     def __close_peak (self, peak_content, peaks, int min_length, str chrom, int smoothlen=0):
-        cdef int peak_length, pre_p, p, i, summit_pos, tstart, tend
-        cdef double v, summit_value, tvalue
+        cdef:
+            int peak_length, pre_p, p, i, summit_pos, tstart, tend
+            double v, summit_value, tvalue
 
         peak_length = peak_content[ -1 ][ 1 ] - peak_content[ 0 ][ 0 ]
         if peak_length >= min_length: # if the peak is too small, reject it
@@ -615,8 +621,9 @@ class bedGraphTrackI:
         """Internal function to create broad peak.
         
         """
-        cdef long start, end, thickStart, thickEnd, blockNum
-        cdef str blockSizes, blockStarts
+        cdef:
+            long start, end, thickStart, thickEnd, blockNum
+            str blockSizes, blockStarts
         
         start      = lvl2peak["start"]
         end        = lvl2peak["end"]
@@ -656,8 +663,9 @@ class bedGraphTrackI:
         return a new bedGraphTrackI.
         
         """
-        cdef str chrom
-        cdef int max_p
+        cdef:
+            str chrom
+            int max_p
         
         ret = bedGraphTrackI()
         chroms = set(self.get_chr_names())
@@ -700,9 +708,10 @@ class bedGraphTrackI:
 
         Return value is a bedGraphTrackI object.
         """
-        cdef int pre_p, p1, p2
-        cdef double v1, v2
-        cdef str chrom
+        cdef:
+            int pre_p, p1, p2
+            double v1, v2
+            str chrom
         
         assert isinstance(bdgTrack2,bedGraphTrackI), "bdgTrack2 is not a bedGraphTrackI object"
 
@@ -782,9 +791,10 @@ class bedGraphTrackI:
         follow statistics.
 
         """
-        cdef int pre_p, p1, p2
-        cdef double v1, v2
-        cdef str chrom
+        cdef:
+            int pre_p, p1, p2
+            double v1, v2
+            str chrom
         
         assert isinstance(bdgTrack2,bedGraphTrackI), "bdgTrack2 is not a bedGraphTrackI object"
 
@@ -868,9 +878,10 @@ class bedGraphTrackI:
 
         Return value is a bedGraphTrackI object.
         """
-        cdef int pre_p, p1, p2
-        cdef double v1, v2
-        cdef str chrom
+        cdef:
+            int pre_p, p1, p2
+            double v1, v2
+            str chrom
         
         assert isinstance(bdgTrack2,bedGraphTrackI), "bdgTrack2 is not a bedGraphTrackI object"
 
@@ -940,9 +951,10 @@ class bedGraphTrackI:
 
         Return value is a bedGraphTrackI object.
         """
-        cdef int pre_p, p1, p2
-        cdef double v1, v2
-        cdef str chrom
+        cdef:
+            int pre_p, p1, p2
+            double v1, v2
+            str chrom
         
         assert isinstance(bdgTrack2,bedGraphTrackI), "bdgTrack2 is not a bedGraphTrackI object"
 
@@ -1411,8 +1423,9 @@ def scoreTracktoBedGraph (scoretrack, str colname):
     colname: can be 'sample','control','-100logp','-100logq'
     
     """
-    cdef int pre, i
-    cdef str chrom
+    cdef:
+        int pre, i
+        str chrom
     
     bdgtrack = bedGraphTrackI( baseline_value = 0 )
     if colname not in ['sample','control','-100logp','-100logq']:
@@ -1452,8 +1465,9 @@ class bedRegionTrackI (bedGraphTrackI):
         """Add a chr-start-end-value block into __data dictionary.
 
         """
-        cdef int pre_pos
-        cdef double pre_v
+        cdef:
+            int pre_pos
+            double pre_v
         
         # basic assumption, end pos should > start pos
         assert endpos > startpos, "endpos %d can't be smaller than start pos %d" % (endpos,startpos)

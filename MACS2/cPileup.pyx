@@ -1,5 +1,5 @@
  # cython: profile=True
-# Time-stamp: <2012-05-01 18:34:03 Tao Liu>
+# Time-stamp: <2012-05-02 22:37:23 Tao Liu>
 
 """Module Description: For pileup functions.
 
@@ -24,10 +24,10 @@ from array import array
 from MACS2.IO.cBedGraph import bedGraphTrackI
 from MACS2.Constants import *
 
-from libc.stdint cimport int32_t
-
 import numpy as np
 cimport numpy as np
+
+from numpy cimport int32_t
 
 from cpython cimport bool
 
@@ -55,8 +55,9 @@ def pileup_bdg (trackI, int d, float baseline_value = 0, bool directional = True
 
     Return a bedGraphTrackI object.
     """
-    cdef long five_shift, three_shift, l, i, j, i_s, i_e, p, pre_p
-    cdef int32_t rlength = 2147483647
+    cdef:
+        long five_shift, three_shift, l, i, j, i_s, i_e, p, pre_p
+        int32_t rlength = 2147483647
     #cdef int * start_poss
     #cdef int * end_poss    
 
@@ -114,9 +115,10 @@ def pileup_w_multiple_d_bdg ( trackI, d_s, float baseline_value = 0, bool direct
 
     Return a bedGraphTrackI object.
     """
-    cdef long d, five_shift, three_shift, l, i, j, i_s, i_e, p, pre_p
-    cdef int32_t rlength = 2147483647
-    cdef float scale_factor
+    cdef:
+        long d, five_shift, three_shift, l, i, j, i_s, i_e, p, pre_p
+        int32_t rlength = 2147483647
+        float scale_factor
     #cdef int * start_poss
     #cdef int * end_poss
 
@@ -198,8 +200,10 @@ def pileup_frag_bdg (trackI, float baseline_value = 0, float scale_factor = 1.0,
 
     Return a bedGraphTrackI object.
     """
-    cdef long five_shift, three_shift, l, i, j, i_s, i_e, p, pre_p
-    cdef int32_t rlength = 2147483647
+    cdef:
+        long five_shift, three_shift, l, i, j, i_s, i_e, p, pre_p
+        int32_t rlength = 2147483647
+        
     ret = bedGraphTrackI(baseline_value=baseline_value) # bedGraphTrackI object to be returned.
     chrs = trackI.get_chr_names()
     for chrom in chrs:
@@ -225,8 +229,10 @@ def pileup_and_ext_frag_bdg (trackI, int d, float baseline_value = 0, float scal
 
     Return a bedGraphTrackI object.
     """
-    cdef long five_shift, three_shift, l, i, j, i_s, i_e, p, pre_p
-    cdef int32_t rlength = 2147483647
+    cdef:
+        long five_shift, three_shift, l, i, j, i_s, i_e, p, pre_p
+        int32_t rlength = 2147483647
+        
     ret = bedGraphTrackI(baseline_value=baseline_value) # bedGraphTrackI object to be returned.
     chrs = trackI.get_chr_names()       
 
@@ -275,9 +281,10 @@ def pileup_frag_w_multiple_d_bdg ( trackI, list d_s = [], float baseline_value =
 
     Return a bedGraphTrackI object.
     """
-    cdef long d, five_shift, three_shift, l, i, j, i_s, i_e, p, pre_p
-    cdef float scale_factor
-    cdef int32_t rlength = 2147483647
+    cdef:
+        long d, five_shift, three_shift, l, i, j, i_s, i_e, p, pre_p
+        float scale_factor
+        int32_t rlength = 2147483647
     #cdef int * start_poss
     #cdef int * end_poss
 
@@ -334,10 +341,11 @@ def pileup_frag_w_multiple_d_bdg ( trackI, list d_s = [], float baseline_value =
 
 
 cdef start_and_end_poss ( np.ndarray plus_tags, np.ndarray minus_tags, long five_shift, long three_shift, int32_t rlength = 2147483647):
-    cdef long i
-    cdef long lp = plus_tags.shape[0]
-    cdef long lm = minus_tags.shape[0]
-    cdef long l = lp + lm
+    cdef:
+        long i
+        long lp = plus_tags.shape[0]
+        long lm = minus_tags.shape[0]
+        long l = lp + lm
 
     start_poss = np.concatenate( ( plus_tags-five_shift, minus_tags-three_shift ) )
     end_poss   = np.concatenate( ( plus_tags+three_shift, minus_tags+five_shift ) )    
@@ -352,7 +360,7 @@ cdef start_and_end_poss ( np.ndarray plus_tags, np.ndarray minus_tags, long five
 
     return (start_poss, end_poss)
 
-cdef fix_coordinates(np.ndarray poss, int32_t rlength = 2147483647):
+cdef np.ndarray fix_coordinates(np.ndarray poss, int32_t rlength = 2147483647):
     cdef long i
     
     for i in range( poss.shape[0] ):
@@ -361,11 +369,9 @@ cdef fix_coordinates(np.ndarray poss, int32_t rlength = 2147483647):
         else:
             break
         
-    i = -1
-    while True:
+    for i in range( poss.shape[0]-1, -1, -1 ):
         if poss[i] > rlength:
             poss[i] = rlength
-            i -= 1
         else:
             break
     return poss
@@ -374,8 +380,9 @@ cdef pileup_a_chromosome ( np.ndarray start_poss, np.ndarray end_poss, long l, f
     """Return pileup of one chromosome.
 
     """
-    cdef long i_s, i_e, p, pileup, pre_p, i
-    cdef int a, b
+    cdef:
+        long i_s, i_e, i
+        int a, b, p, pre_p, pileup
     
     tmp = [array(BYTE4,[]),array(FBYTE4,[])] # for (endpos,value)
     tmppadd = tmp[0].append
@@ -434,8 +441,9 @@ cdef pileup_a_chromosome ( np.ndarray start_poss, np.ndarray end_poss, long l, f
     return tmp
 
 cdef max_over_two_pv_array ( tmparray1, tmparray2 ):
-    cdef int pre_p, p1, p2
-    cdef double v1, v2
+    cdef:
+        int pre_p, p1, p2
+        float v1, v2
 
     tmp = [array(BYTE4,[]),array(FBYTE4,[])] # for (endpos,value)
     tmppadd = tmp[0].append

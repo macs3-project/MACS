@@ -1,5 +1,5 @@
 # cython: profile=True
-# Time-stamp: <2012-05-01 18:25:38 Tao Liu>
+# Time-stamp: <2012-05-03 00:08:24 Tao Liu>
 
 """Module for all MACS Parser classes for input.
 
@@ -26,10 +26,10 @@ import io
 from MACS2.Constants import *
 from MACS2.IO.cFixWidthTrack import FWTrackIII
 from MACS2.IO.cPairedEndTrack import PETrackI
-from libc.stdint cimport uint32_t, uint64_t, int32_t
 
 import numpy as np
 cimport numpy as np
+from numpy cimport uint32_t, uint64_t, int32_t
 
 cdef extern from "stdlib.h":
     ctypedef unsigned int size_t
@@ -142,16 +142,16 @@ class GenericParser:
         * Although it can be used by most parsers, it must be
           rewritten by BAMParser!
         """
-        cdef int s, n, m, this_taglength
+        cdef:
+            int s = 0
+            int n = 0     # number of successful/valid read alignments
+            int m = 0     # number of trials
+            int this_taglength
         
         if self.tag_size != -1:
             # if we have already calculated tag size (!= -1),  return it.
             return self.tag_size
         
-        s = 0
-        n = 0                           # number of successful/valid read alignments
-        m = 0                           # number of trials
-
         # try 10k times or retrieve 10 successfule alignments
         while n < 10 and m < 10000:
             m += 1
@@ -171,15 +171,16 @@ class GenericParser:
         """Abstract function to detect tag length.
         
         """
-        return 0
+        raise NotImplemented
     
     def build_fwtrack ( self ):
         """Generic function to build FWTrackIII object. 
 
         * BAMParser for binary BAM format should have a different one.
         """
-        cdef long i, m, fpos, strand
-        cdef str chromosome
+        cdef:
+            long i, m, fpos, strand
+            str chromosome
         
         fwtrack = FWTrackIII()
         i = 0
@@ -313,8 +314,9 @@ class ELANDResultParser( GenericParser ):
         return len( thisfields[ 1 ] )
 
     def __fw_parse_line ( self, str thisline ):
-        cdef str chromname, strand
-        cdef int thistaglength
+        cdef:
+            str chromname, strand
+            int thistaglength
         #if thisline.startswith("#") or thisline.startswith("track") or thisline.startswith("browser"): return ("comment line",None,None) # comment line is skipped
         thisline = thisline.rstrip()
         if not thisline: return ( "", -1, -1 )
@@ -374,9 +376,10 @@ class ELANDMultiParser( GenericParser ):
         return len( thisfields[ 1 ] )
 
     def __fw_parse_line ( self, str thisline ):
-        cdef list thisfields
-        cdef str thistagname, pos, strand
-        cdef int thistaglength, thistaghits
+        cdef:
+            list thisfields
+            str thistagname, pos, strand
+            int thistaglength, thistaghits
         
         if not thisline: return ( "", -1, -1 )
         thisline = thisline.rstrip()
@@ -434,9 +437,10 @@ class ELANDExportParser( GenericParser ):
             return 0
         
     def __fw_parse_line ( self, str thisline ):
-        cdef list thisfields
-        cdef str thisname, strand
-        cdef int thistaglength
+        cdef:
+            list thisfields
+            str thisname, strand
+            int thistaglength
         
         #if thisline.startswith("#") : return ("comment line",None,None) # comment line is skipped
         thisline = thisline.rstrip()
@@ -494,8 +498,9 @@ class SAMParser( GenericParser ):
         """Parse tag sequence, then tag length.
 
         """
-        cdef list thisfields
-        cdef int bwflag
+        cdef:
+            list thisfields
+            int bwflag
         
         thisline = thisline.rstrip()
         if not thisline: return 0
@@ -518,9 +523,10 @@ class SAMParser( GenericParser ):
         return len( thisfields[ 9 ] )
 
     def __fw_parse_line ( self, thisline ):
-        cdef list thisfields
-        cdef str thistagname, thisref
-        cdef int bwflag, thisstrand, thisstart
+        cdef:
+            list thisfields
+            str thistagname, thisref
+            int bwflag, thisstrand, thisstart
 
         thisline = thisline.rstrip()
         if not thisline: return ( "", -1, -1 )
@@ -609,8 +615,10 @@ class BAMParser( GenericParser ):
         since the l_seq field seems to be 0.
         """
         
-        cdef int x, header_len, nc, nlength, n
-        cdef double s
+        cdef:
+            int x, header_len, nc, nlength
+            int n = 0                   # successful read of tag size
+            double s = 0                # sum of tag sizes
 
         if self.tag_size != -1:
             # if we have already calculated tag size (!= -1),  return it.
@@ -631,8 +639,6 @@ class BAMParser( GenericParser ):
             # jump over chromosome size, we don't need it
             fread( nlength )
             fseek( ftell() + 4 )
-        s = 0
-        n = 0
         while n < 10:
             entrylength = unpack( '<i', fread( 4 ) )[ 0 ]
             data = fread( entrylength )
@@ -650,8 +656,9 @@ class BAMParser( GenericParser ):
         return a tuple (references (list of names),
                         rlengths (dict of lengths)
         """
-        cdef int header_len, x, nc, nlength
-        cdef str refname
+        cdef:
+            int header_len, x, nc, nlength
+            str refname
         
         references = []
         rlengths = {}
@@ -679,14 +686,14 @@ class BAMParser( GenericParser ):
 
         Note only the unique match for a tag is kept.
         """
-        cdef int i, m
-        cdef int entrylength, fpos, strand, chrid
-        cdef list references
-        cdef dict rlengths
+        cdef:
+            int i = 0
+            int m = 0
+            int entrylength, fpos, strand, chrid
+            list references
+            dict rlengths
         
         fwtrack = FWTrackIII()
-        i = 0
-        m = 0
         references, rlengths = self.get_references()
         fseek = self.fhd.seek
         fread = self.fhd.read
@@ -711,8 +718,9 @@ class BAMParser( GenericParser ):
         return fwtrack
     
     def __fw_binary_parse (self, data ):
-        cdef int thisref, thisstart, thisstrand
-        cdef short cigar, bwflag
+        cdef:
+            int thisref, thisstart, thisstrand
+            short cigar, bwflag
         
         # we skip lot of the available information in data (i.e. tag name, quality etc etc)
         if not data: return ( -1, -1, -1 )
@@ -899,22 +907,22 @@ class BAMPEParser(BAMParser):
     def build_petrack (self):
         """Build FWTrackIII from all lines, return a FWTrackIII object.
         """
-        cdef int i, m
-        cdef int entrylength, fpos, chrid, tlen
-        cdef list references
-        cdef dict rlengths
-        cdef float d
-        cdef np.ndarray loc = np.zeros([1,2], np.int32)
+        cdef:
+            int i = 0
+            int m = 0
+            int entrylength, fpos, chrid, tlen
+            list references
+            dict rlengths
+            float d = 0
+            np.ndarray loc = np.zeros([1,2], np.int32)
         
         petrack = PETrackI()
-        i = 0
-        m = 0
+
         references, rlengths = self.get_references()
         fseek = self.fhd.seek
         fread = self.fhd.read
         ftell = self.fhd.tell
         
-        d = 0
         # for convenience, only count valid pairs
         add_loc = petrack.add_loc
         loc = np.zeros(shape=(1,2), dtype='int32')
@@ -947,8 +955,9 @@ class BAMPEParser(BAMParser):
         return petrack
         
     def __fw_binary_parse (self, data ):
-        cdef int thisref, thisstart, thisend, thisstrand, tlen
-        cdef short cigar, bwflag
+        cdef:
+            int thisref, thisstart, thisend, thisstrand, tlen
+            short cigar, bwflag
         
         # we skip lot of the available information in data (i.e. tag name, quality etc etc)
         if not data: return (-1, -1, 0)
@@ -1038,8 +1047,9 @@ class BowtieParser( GenericParser ):
         (5') end of the read.
 
         """
-        cdef list thisfields
-        cdef str chromname
+        cdef:
+            list thisfields
+            str chromname
         
         thisline = thisline.rstrip()
         if not thisline: return ( "", -1, -1 )

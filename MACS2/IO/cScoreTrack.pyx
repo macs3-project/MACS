@@ -1,5 +1,5 @@
 # cython: profile=True
-# Time-stamp: <2012-05-02 16:56:21 Tao Liu>
+# Time-stamp: <2012-05-03 00:17:02 Tao Liu>
 
 """Module for Feature IO classes.
 
@@ -59,8 +59,9 @@ cdef get_pscore ( int observed, double expectation ):
     in table.
     
     """
-    cdef int score
-    cdef long key_value
+    cdef:
+        int score
+        long key_value
     
     #key_value = ( observed, expectation )
     key_value = hash( (observed, expectation ) )
@@ -85,8 +86,9 @@ cdef logLR ( double x, double y ):
     100*logLR. Set minus sign for depletion.
     
     """
-    cdef int s
-    cdef long key_value
+    cdef:
+        int s
+        long key_value
     
     #key_value = ( x, y )
     key_value = hash( (x, y ) )
@@ -178,8 +180,9 @@ class scoreTrackI:
         self.pointer[chromosome] += 1
 
     def finalize (self):
-        cdef str chrom, k
-        cdef int l
+        cdef:
+            str chrom, k
+            int l
 
         for chrom in self.data.keys():
             d = self.data[chrom]
@@ -217,9 +220,11 @@ class scoreTrackI:
         do_SPMR: only effective when writing sample/control tracks. When True, save SPMR instead.
         
         """
-        cdef str chrom
-        cdef int l, pre, i, p 
-        cdef float pre_v, v, scale_factor
+        cdef:
+            str chrom
+            int l, pre, i, p 
+            float pre_v, v, scale_factor
+            
         if self.trackline:
             # this line is REQUIRED by the wiggle format for UCSC browser
             fhd.write( "track type=bedGraph name=\"%s\" description=\"%s\"\n" % ( name,description ) )
@@ -267,10 +272,11 @@ class scoreTrackI:
 
         Return a dictionary of {-100log10pvalue:(-100log10qvalue,rank,basepairs)} relationships.
         """
-        cdef long n, pre_p, this_p, length, j, pre_l, l, this_v, pre_v, v
-        cdef long N, k, q, pre_q
-        cdef double f
-        cdef str chrom
+        cdef:
+            long n, pre_p, this_p, length, j, pre_l, l, this_v, pre_v, v
+            long N, k, q, pre_q
+            double f
+            str chrom
         
         #logging.info("####test#### start make_pq")
         n = self.total()
@@ -333,8 +339,10 @@ class scoreTrackI:
 
         pvalue2qvalue: a dictionary of -100log10pvalue:-100log10qvalue
         """
-        cdef long i,l,j,p
-        cdef str chrom
+        cdef:
+            long i,l,j,p
+            str chrom
+            
         chroms = self.data.keys()
 
         # convert pvalue2qvalue to a simple dict
@@ -373,8 +381,9 @@ class scoreTrackI:
         colname: can be 'sample','control','-100logp','-100logq'. Cutoff will be applied to the specified column.
         ptrack:  an optional track for pileup heights. If it's not None, use it to find summits. Otherwise, use self/scoreTrack.
         """
-        cdef int i
-        cdef str chrom
+        cdef:
+            int i
+            str chrom
         
         assert (colname in [ 'sample', 'control', '-100logp', '-100logq', '100logLR' ]), "%s not supported!" % colname
 
@@ -515,8 +524,9 @@ class scoreTrackI:
         and scores, then add the peak to peakIO object.
 
         """
-        cdef int summit_pos, tstart, tend, tmpindex, summit_index, i, midindex
-        cdef double summit_value, tvalue, tsummitvalue
+        cdef:
+            int summit_pos, tstart, tend, tmpindex, summit_index, i, midindex
+            double summit_value, tvalue, tsummitvalue
 
         peak_length = peak_content[ -1 ][ 1 ] - peak_content[ 0 ][ 0 ]
         if peak_length >= min_length: # if the peak is too small, reject it
@@ -569,8 +579,9 @@ class scoreTrackI:
         Return both general PeakIO object for highly enriched regions
         and gapped broad regions in BroadPeakIO.
         """
-        cdef int i
-        cdef str chrom
+        cdef:
+            int i
+            str chrom
         
         assert lvl1_cutoff > lvl2_cutoff, "level 1 cutoff should be larger than level 2."
         assert lvl1_max_gap < lvl2_max_gap, "level 2 maximum gap should be larger than level 1."        
@@ -681,8 +692,9 @@ class scoreTrackI:
         """Internal function to create broad peak.
         
         """
-        cdef int blockNum, thickStart, thickEnd, start, end
-        cdef str blockSizes, blockStarts
+        cdef:
+            int blockNum, thickStart, thickEnd, start, end
+            str blockSizes, blockStarts
         
         start      = lvl2peak["start"]
         end        = lvl2peak["end"]
@@ -710,8 +722,9 @@ class scoreTrackI:
         """Return the number of regions in this object.
 
         """
-        cdef long t
-        cdef str chrom
+        cdef:
+            long t
+            str chrom
         
         t = 0
         for chrom in self.data.keys():
@@ -744,8 +757,10 @@ class CombinedTwoTrack:
         dictionary. At the mean time, calculate pvalues.
 
         """
-        cdef list c
-        cdef int i
+        cdef:
+            list c
+            int i
+            
         c = self.data[chromosome]
         i = self.pointer[chromosome]
         # get the preceding region
@@ -754,6 +769,7 @@ class CombinedTwoTrack:
 
     def finalize ( self ):
         cdef str chrom
+        
         for chrom in self.data.keys():
             d = self.data[chrom]
             l = self.pointer[chrom]
@@ -775,6 +791,7 @@ class CombinedTwoTrack:
         
         """
         cdef set l
+        
         l = set(self.data.keys())
         return l
 
@@ -787,9 +804,10 @@ class CombinedTwoTrack:
         colname: can be 'sample','control','-100logp','-100logq'
 
         """
-        cdef str chrom
-        cdef set chrs
-        cdef int pre, i, l
+        cdef:
+            str chrom
+            set chrs
+            int pre, i, l
         
         if colname not in ['V1','V2']:
             raise Exception("%s not supported!" % colname)
@@ -810,8 +828,10 @@ class CombinedTwoTrack:
         """Return the number of regions in this object.
 
         """
-        cdef long t
-        cdef str chrom
+        cdef:
+            long t
+            str chrom
+            
         t = 0
         for chrom in self.data.keys():
             t += self.pointer[chrom]
@@ -824,10 +844,11 @@ class CombinedTwoTrack:
         follow statistics.
 
         """
-        cdef set chr1, chr2, common_chr
-        cdef str chrom
-        cdef int pre_p, p1, p2
-        cdef double v11, v21, v2
+        cdef:
+            set chr1, chr2, common_chr
+            str chrom
+            int pre_p, p1, p2
+            double v11, v21, v2
         
         #assert isinstance(bdgTrack2,bedGraphTrackI), "bdgTrack2 is not a bedGraphTrackI object"
 
@@ -909,8 +930,9 @@ class CombinedTwoTrack:
 
 
     def extract_average (self, bdgTrack2):
-        cdef int i, l
-        cdef str chrom, start, end
+        cdef:
+            int i, l
+            str chrom, start, end
         
         (rarray,v1array,v2array,larray)  = self.extract_value(bdgTrack2)
         ret = [[],array(FBYTE4,[]),array(FBYTE4,[])] # region,V1,V1
@@ -941,8 +963,9 @@ class CombinedTwoTrack:
         """Get sum values in each region defined in bdgTrack2.
         
         """
-        cdef int i
-        cdef str chrom, start, end
+        cdef:
+            int i
+            str chrom, start, end
         
         (rarray,v1array,v2array,larray)  = self.extract_value(bdgTrack2)
         ret = [[],array(FBYTE4,[]),array(FBYTE4,[])] # region,V1,V1
