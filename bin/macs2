@@ -77,10 +77,10 @@ def prepare_argparser ():
     
     """
 #     usage = """%(prog)s [-h] [--version] COMMAND
-
+    
 # Please specify a command from the following list:
 # {callpeak,filterdup,bdgpeakcall,bdgcmp,randsample,bdgdiff,bdgbroadcall}
-
+    
 # Type %(prog)s -h to see a summary of available commands.
 # """
     description = "%(prog)s -- Model-based Analysis for ChIP-Sequencing"
@@ -91,12 +91,12 @@ def prepare_argparser ():
     argparser = ap.ArgumentParser( description = description, epilog = epilog ) #, usage = usage )
     argparser.add_argument("--version", action="version", version="%(prog)s "+MACS_VERSION)
     subparsers = argparser.add_subparsers( dest = 'subcommand_name' ) #help="sub-command help")
-
+    
     # command for 'callpeak'
     add_callpeak_parser( subparsers )
     # command for 'bdgpeakcall'
     add_bdgpeakcall_parser( subparsers )
-
+    
     # command for 'bdgbroadcall'
     add_bdgbroadcall_parser( subparsers )
     
@@ -108,7 +108,7 @@ def prepare_argparser ():
     
     # command for 'filterdup'
     add_filterdup_parser( subparsers )
-
+    
     # command for 'bdgdiff'
     add_bdgdiff_parser( subparsers )    
     
@@ -118,7 +118,7 @@ def add_callpeak_parser( subparsers ):
     """Add main function 'peak calling' argument parsers.
     """
     argparser_callpeak = subparsers.add_parser("callpeak", help="Main MACS2 Function: Call peaks from alignment results.")
-
+    
     # group for input files
     group_input = argparser_callpeak.add_argument_group( "Input files arguments" )
     group_input.add_argument( "-t", "--treatment", dest = "tfile", type = str, required = True,
@@ -135,7 +135,7 @@ def add_callpeak_parser( subparsers ):
                               help = "Effective genome size. It can be 1.0e+9 or 1000000000, or shortcuts:'hs' for human (2.7e9), 'mm' for mouse (1.87e9), 'ce' for C. elegans (9e7) and 'dm' for fruitfly (1.2e8), Default:hs" )
     group_input.add_argument( "--keep-dup", dest = "keepduplicates", type = str, default = "1",
                               help = "It controls the MACS behavior towards duplicate tags at the exact same location -- the same coordination and the same strand. The default 'auto' option makes MACS calculate the maximum tags at the exact same location based on binomal distribution using 1e-5 as pvalue cutoff; and the 'all' option keeps every tags. If an integer is given, at most this number of tags will be kept at the same location. Default: 1" )
-
+    
     # group for output files
     group_output = argparser_callpeak.add_argument_group( "Output arguments" )
     group_output.add_argument( "-n", "--name", dest = "name", type = str,
@@ -159,7 +159,7 @@ def add_callpeak_parser( subparsers ):
                                 help = "Band width for picking regions to compute fragment size. This value is only used while building the shifting model. DEFAULT: 300")
     group_bimodal.add_argument( "-m", "--mfold", dest = "mfold", type = int, default = [5,50], nargs = 2,
                                 help = "Select the regions within MFOLD range of high-confidence enrichment ratio against background to build model. Fold-enrichment in regions must be lower than upper limit, and higher than the lower limit. Use as \"-m 10 30\". DEFAULT:5 50" )
-
+    
     group_bimodal.add_argument( "--fix-bimodal", dest = "onauto", action = "store_true",
                                 help = "Whether turn on the auto pair model process. If set, when MACS failed to build paired model, it will use the nomodel settings, the '--shiftsize' parameter to shift and extend each tags. Not to use this automate fixation is a default behavior now. DEFAULT: False",
                                 default = False )
@@ -168,7 +168,7 @@ def add_callpeak_parser( subparsers ):
                                 default = False )
     group_bimodal.add_argument( "--shiftsize", dest = "shiftsize", type = int, default = 100,
                                 help = "The arbitrary shift size in bp. When nomodel is true, MACS will use this value as 1/2 of fragment size. DEFAULT: 100 " )
-
+    
     # General options.
     group_callpeak = argparser_callpeak.add_argument_group( "Peak calling arguments" )    
     p_or_q_group = group_callpeak.add_mutually_exclusive_group()
@@ -199,7 +199,7 @@ def add_callpeak_parser( subparsers ):
                                  help = "Cutoff for broad region. This option is not available unless --broad is set. If -p is set, this is a pvalue cutoff, otherwise, it's a qvalue cutoff. DEFAULT: 0.1 " )
     group_callpeak.add_argument( "--call-summits", dest="call_summits", action="store_true",
                          help="If set, MACS will use a more sophisticated approach to find all summits in each enriched peak region. DEFAULT: False",default=False)
- 
+    
     return
 
 def add_filterdup_parser( subparsers ):

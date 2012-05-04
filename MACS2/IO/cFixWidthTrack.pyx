@@ -163,6 +163,8 @@ class FWTrackIII:
 
         if keep_original:
             selfcopy = copy(self)
+            selfcopy.__locations = copy(self.__locations) 
+            selfcopy.__pointer = copy(self.__pointer)
         else:
             selfcopy = self
         

@@ -72,7 +72,7 @@ def run( args ):
     
     info("#1 %s size = %d", tag, options.tsize)
     tagsinfo  = "# %s size is determined as %d bps\n" % (tag, options.tsize)
-
+    
     t0 = treat.total
     tagsinfo += "# total %ss in treatment: %d\n" % (tag, t0)
     info("#1  total %ss in treatment: %d", tag, t0)
