@@ -134,8 +134,8 @@ def opt_validate ( options ):
                         stream=sys.stderr,
                         filemode="w"
                         )
-	
-    options.error   = logging.critical		# function alias
+    
+    options.error   = logging.critical        # function alias
     options.warn    = logging.warning
     options.debug   = logging.debug
     options.info    = logging.info
@@ -302,8 +302,8 @@ def opt_validate_diff ( optparser ):
                         stream=sys.stderr,
                         filemode="w"
                         )
-	
-    options.error   = logging.critical		# function alias
+    
+    options.error   = logging.critical        # function alias
     options.warn    = logging.warning
     options.debug   = logging.debug
     options.info    = logging.info
@@ -396,8 +396,8 @@ def opt_validate_filterdup ( options ):
                         stream=sys.stderr,
                         filemode="w"
                         )
-	
-    options.error   = logging.critical		# function alias
+    
+    options.error   = logging.critical        # function alias
     options.warn    = logging.warning
     options.debug   = logging.debug
     options.info    = logging.info
@@ -455,8 +455,8 @@ def opt_validate_randsample ( options ):
                         stream=sys.stderr,
                         filemode="w"
                         )
-	
-    options.error   = logging.critical		# function alias
+    
+    options.error   = logging.critical        # function alias
     options.warn    = logging.warning
     options.debug   = logging.debug
     options.info    = logging.info

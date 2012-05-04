@@ -78,9 +78,9 @@ def run( args ):
     info("#1  total %ss in treatment: %d", tag, t0)
     if options.keepduplicates != "all":
         if options.keepduplicates == "auto":
-            info("#1 calculate max duplicate %ss in single position based on binomal distribution...", tag)
+            info("#1 calculate max duplicate %ss in single position based on binomial distribution...", tag)
             treatment_max_dup_tags = cal_max_dup_tags(options.gsize,t0)
-            info("#1  max_dup_tags based on binomal = %d" % (treatment_max_dup_tags))
+            info("#1  max_dup_tags based on binomial = %d" % (treatment_max_dup_tags))
         else:
             info("#1 user defined the maximum %ss...", tag)
             treatment_max_dup_tags = int(options.keepduplicates)
@@ -99,7 +99,7 @@ def run( args ):
         info("#1  Redundant rate of treatment: %.2f", float(t0 - t1) / t0)
         tagsinfo += "# Redundant rate in treatment: %.2f\n" % (float(t0-t1)/t0)
     else:
-        t1 = treat.total
+        t1 = t0
 
     if control is not None:
         c0 = control.total
@@ -107,9 +107,9 @@ def run( args ):
         info("#1  total %ss in control: %d", tag, c0)
         if options.keepduplicates != "all":
             if options.keepduplicates == "auto":
-                info("#1  for control, calculate max duplicate %ss in single position based on binomal distribution...", tag)
+                info("#1  for control, calculate max duplicate %ss in single position based on binomial distribution...", tag)
                 control_max_dup_tags = cal_max_dup_tags(options.gsize,c0)
-                info("#1  max_dup_tags based on binomal = %d" % (control_max_dup_tags))
+                info("#1  max_dup_tags based on binomial = %d" % (control_max_dup_tags))
             else:
                 info("#1 user defined the maximum %ss...", tag)
                 control_max_dup_tags = int(options.keepduplicates)
@@ -130,7 +130,7 @@ def run( args ):
             info("#1  Redundant rate of control: %.2f" % (float(c0-c1)/c0))
             tagsinfo += "# Redundant rate in control: %.2f\n" % (float(c0-c1)/c0)
         else:
-            c1 = control.total
+            c1 = c0
     info("#1 finished!")
 
     #2 Build Model

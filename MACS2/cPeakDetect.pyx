@@ -60,15 +60,17 @@ def compare_treatment_vs_control(treat, control, fragment_size, gsize,
 
     Finally, BH process will be applied to adjust pvalue to qvalue.
     """
+    # raise DeprecationWarning ?
     cdef float effective_depth_in_million
     
     treat_total   = treat.total
     control_total = control.total
     ratio_treat2control = float(treat_total)/control_total
 
+
     # Now pileup FWTrackIII to form a bedGraphTrackI
     if PE_MODE:
-        treat_btrack = pileup_bdg(treat[0], treat[1], fragment_size)
+        treat_btrack = pileup_bdg(treat, fragment_size)
     else:
         treat_btrack = pileup_bdg(treat, fragment_size, directional=True,
                                   halfextension=halfext)
@@ -126,7 +128,7 @@ def compare_treatment_vs_control(treat, control, fragment_size, gsize,
 
     # pileup using different extension sizes and scaling factors
     if PE_MODE:
-        control_btrack = pileup_frag_w_multiple_d_bdg(control[0], control[1],
+        control_btrack = pileup_frag_w_multiple_d_bdg(control,
                                             d_s[1:],
                                             baseline_value=lambda_bg,
                                             scale_factor_s=scale_factor_s[1:],
@@ -321,7 +323,7 @@ class PeakDetect:
 
         if self.PE_MODE:
             treat_total   = self.treat.length()
-            control_total = self.control.length()           
+            control_total = self.control.length()
         else:
             treat_total   = self.treat.total
             control_total = self.control.total
@@ -524,7 +526,7 @@ class PeakDetect:
             treat_total = self.treat.length()
         else:
             treat_total = self.treat.total
-
+        
         effective_depth_in_million = treat_total / 1000000.0
 
         # global lambda
@@ -541,7 +543,7 @@ class PeakDetect:
             self.info("#3 pileup treatment data by extending tags towards 3' to %d length" % self.d)
             # Now pileup FWTrackIII to form a bedGraphTrackI
             treat_btrack = pileup_bdg(self.treat, self.d, directional=True,
-                                      halfextension=self.opt.halfext)        
+                                      halfextension=self.opt.halfext)
         # llocal size local
         # self.info("#3 calculate d local lambda from treatment data")
         # nothing done here. should this match w control??
