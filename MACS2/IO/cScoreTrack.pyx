@@ -1,5 +1,5 @@
 # cython: profile=True
-# Time-stamp: <2012-05-03 00:17:02 Tao Liu>
+# Time-stamp: <2012-05-07 22:26:52 Tao Liu>
 
 """Module for Feature IO classes.
 
@@ -103,6 +103,16 @@ cdef logLR ( double x, double y ):
             s = 0
         logLR_khashtable.set_item(key_value, s)
         return s
+
+cdef float foldenrichment ( float x, float y ):
+    """ return fold enrichment with +1 pseudocount.
+    """
+    return (x+1)/(y+1)
+
+cdef float substraction ( float x, float y):
+    """ return substraction.
+    """
+    return x - y
 
 # ------------------------------------
 # Classes
@@ -990,3 +1000,861 @@ class CombinedTwoTrack:
         v1add(cur_region[3])
         v2add(cur_region[4])
         return ret
+
+cdef class scoreTrackII:
+    """Class for scoreGraph type data. Modified from scoreTrackI. The
+    difference is that we store a single score data, not
+    p/q/loglikelihood altogether. Score (the 4th) column is calculated
+    through calling change_method() function. Individual scores for
+    filling PeakIO object are calculated by prepare_peakIO_scores()
+    function.
+
+    I want to save mem and simplify calculation in this new class.
+
+    """
+    cdef:
+        dict data                       # dictionary for data of each chromosome
+        dict datalength                 # length of data array of each chromosome
+        bool trackline                  # whether trackline should be saved in bedGraph
+        double treat_edm                 # seq depth in million of treatment
+        double ctrl_edm                  # seq depth in million of control
+        char scoring_method              # method for calculating scores.
+        char normalization_method        # scale to control? scale to treatment? both scale to 1million reads?
+
+    
+    def __init__ (self, float treat_depth, float ctrl_depth ):
+        """Initialize.
+
+        effective_depth_in_million: sequencing depth in million after
+                                    duplicates being filtered. If
+                                    treatment is scaled down to
+                                    control sample size, then this
+                                    should be control sample size in
+                                    million. And vice versa.
+
+        
+        """
+        self.data = {}           # for each chromosome, there is a l*4
+                                 # matrix. First column: end position
+                                 # of a region; Second: treatment
+                                 # pileup; third: control pileup;
+                                 # forth: score * 100 ( can be
+                                 # p/q-value/likelihood
+                                 # ratio/fold-enrichment/substraction
+                                 #  depending on -c setting)
+        self.datalength = {}
+        self.trackline = False
+        self.treat_edm = treat_depth
+        self.ctrl_edm = ctrl_depth
+        #scoring_method:  p: -log10 pvalue;
+        #                 q: -log10 qvalue;
+        #                 l: log10 likelihood ratio ( minus for depletion )
+        #                 f: log10 fold enrichment
+        #                 d: substraction
+        #                 m: fragment pileup per million reads
+        #                 N: not set
+        self.scoring_method = ord("N")
+
+        #normalization_method: T: scale to depth of treatment;
+        #                      C: scale to depth of control;
+        #                      M: scale to depth of 1 million;
+        #                      N: not set/ raw pileup
+        self.normalization_method = ord("N")
+        
+    cpdef enable_trackline(self):
+        """Turn on trackline with bedgraph output
+        """
+        self.trackline = True
+
+    cpdef add_chromosome ( self, str chrom, int chrom_max_len ):
+        """
+        chrom: chromosome name
+        chrom_max_len: maximum number of data points in this chromosome
+        
+        """
+        if not self.data.has_key(chrom):
+            self.data[chrom] = np.zeros( ( chrom_max_len, 4 ), dtype="int32" ) # remember col #4 is score * 100, I use integar here.
+            self.datalength[chrom] = 0
+
+    cpdef add (self, str chromosome, int endpos, int sample, int control):
+        """Add a chr-endpos-sample-control block into data
+        dictionary.
+
+        *Warning* Need to add regions continuously.
+        """
+        cdef int i
+        i = self.datalength[chromosome]
+        c = self.data[chromosome]
+        c[ i, 0 ] = endpos
+        c[ i, 1 ] = sample
+        c[ i, 2 ] = control
+        self.datalength[chromosome] += 1
+
+    cpdef finalize ( self ):
+        """
+        Adjust array size of each chromosome.
+
+        """
+        cdef:
+            str chrom, k
+            int l
+
+        for chrom in self.data.keys():
+            d = self.data[chrom]
+            l = self.datalength[chrom]
+            for k in d.keys():
+                d[k].resize( (l,4), refcheck = False )
+        return
+
+    cpdef sort ( self, int column = 1 ):
+        """ Sort data for each chromosome, by certain column.
+
+        column: 1: position, 2: sample, 3: control, 4: score
+
+        Default: sort by positions.
+        """
+        for chrom in self.data.keys():
+            d = self.data[chrom]
+            d.view('int32,int32,int32,int32').sort(axis=0,order=column-1)
+        return
+
+    cpdef get_data_by_chr (self, str chromosome):
+        """Return array of counts by chromosome.
+
+        The return value is a tuple:
+        ([end pos],[value])
+        """
+        if self.data.has_key(chromosome):
+            return self.data[chromosome]
+        else:
+            return None
+
+    cpdef get_chr_names (self):
+        """Return all the chromosome names stored.
+        
+        """
+        l = set(self.data.keys())
+        return l
+
+    cpdef change_normalization_method ( self, char normalization_method ):
+        """
+        normalization_method: T: scale to depth of treatment;
+                             C: scale to depth of control;
+                             M: scale to depth of 1 million;
+                             N: not set/ raw pileup        
+        """
+        if normalization_method == 'T':
+            if self.normalization_method == 'T': # do nothing
+                pass
+            elif self.normalization_method == 'C':
+                self.normalize( self.treat_edm/self.ctrl_edm, self.treat_edm/self.ctrl_edm )
+            elif  self.normalization_method == 'M':
+                self.normalize( self.treat_edm, self.treat_edm )
+            elif self.normalization_method == 'N':
+                self.normalize( 1, self.treat_edm/self.ctrl_edm )
+            else:
+                raise NotImplemented
+            self.normalization_method = 'T'
+        elif normalization_method == 'C':
+            if self.normalization_method == 'T':
+                self.normalize( self.ctrl_edm/self.treat_edm, self.ctrl_edm/self.treat_edm )
+            elif self.normalization_method == 'C': # do nothing
+                pass
+            elif  self.normalization_method == 'M':
+                self.normalize( self.ctrl_edm, self.ctrl_edm )
+            elif self.normalization_method == 'N':
+                self.normalize( self.ctrl_edm/self.treat_edm, 1 )
+            else:
+                raise NotImplemented
+            self.normalization_method = 'C'                
+        elif normalization_method == 'M':
+            if self.normalization_method == 'T':
+                self.normalize( 1/self.treat_edm, 1/self.treat_edm )
+            elif self.normalization_method == 'C':
+                self.normalize( 1/self.ctrl_edm, 1/self.ctrl_edm )
+            elif  self.normalization_method == 'M': # do nothing
+                pass
+            elif self.normalization_method == 'N':
+                self.normalize( 1/self.treat_edm, 1/self.ctrl_edm )
+            else:
+                raise NotImplemented
+            self.normalization_method = 'M'                
+        elif normalization_method == 'N':
+            if self.normalization_method == 'T':
+                self.normalize( self.treat_edm, self.treat_edm )
+            elif self.normalization_method == 'C':
+                self.normalize( self.ctrl_edm, self.ctrl_edm )
+            elif  self.normalization_method == 'M':
+                self.normalize( self.treat_edm, self.ctrl_edm )
+            elif self.normalization_method == 'N': # do nothing
+                pass
+            else:
+                raise NotImplemented
+            self.normalization_method = 'N'            
+
+    cdef normalize ( self, double treat_scale, double control_scale ):
+        cdef:
+            np.ndarray d
+            long l, i
+        
+        for chrom in self.data.keys():
+            d = self.data[chrom]
+            l = self.datalength[chrom]
+            for i in range(l):
+                d[ i, 1 ] *= treat_scale
+                d[ i, 2 ] *= control_scale                
+        return
+
+    cpdef change_score_method (self, char scoring_method):
+        """
+        scoring_method:  p: -log10 pvalue;
+                         q: -log10 qvalue;
+                         l: log10 likelihood ratio ( minus for depletion )
+                         f: log10 fold enrichment
+                         d: substraction
+                         m: fragment pileup per million reads
+        """
+        if scoring_method == 'p':
+            self.compute_pvalue()
+        elif scoring_method == 'q':
+            #if not already calculated p, compute pvalue first
+            if self.scoring_method != 'p':
+                self.compute_pvalue()
+            self.compute_qvalue()
+        elif scoring_method == 'l':
+            self.compute_likelihood()
+        elif scoring_method == 'f':
+            self.compute_foldenrichment()
+        elif scoring_method == 'd':
+            self.compute_substraction()
+        elif scoring_method == 'm':
+            self.compute_SPMR()
+        else:
+            raise NotImplemented
+            
+    cdef compute_pvalue ( self ):
+        cdef:
+            np.ndarray d
+            long l, i
+            float t_edm = self.treat_edm
+            float c_edm = self.ctrl_edm
+        
+        for chrom in self.data.keys():
+            d = self.data[chrom]
+            l = self.datalength[chrom]
+            for i in range(l):
+                d[ i, 3 ] =  get_pscore( d[ i, 1] / t_edm, d[ i, 2] / c_edm )
+        self.scoring_method = 'p'
+        return 
+
+    cdef compute_qvalue ( self ):
+        cdef:
+            dict pqtable
+            long i,l,j,p
+            str chrom
+            
+        # pvalue should be computed first!
+        assert self.scoring_method == 'p'
+        # make pqtable
+        pqtable = self.make_pq_table()
+        
+        # convert p to q
+
+        # convert pvalue2qvalue to a simple dict
+        s_p2q = Int64HashTable()
+        #g = pvalue2qvalue.get
+        for i in pqtable.keys():
+        #for i in range(pvalue2qvalue.shape[0]):
+            s_p2q.set_item(i,pqtable[i][0])
+
+        g = s_p2q.get_item
+        
+        for chrom in self.data.keys():
+            d = self.data[chrom]
+            l = self.datalength[chrom]
+            for i in range(l):
+                d[ i, 3 ] =  g( d[ i, 3 ])
+        
+        self.scoring_method = 'q'
+        return
+
+    cdef dict make_pq_table ( self ):
+        """Make pvalue-qvalue table.
+
+        Step1: get all pvalue and length of block with this pvalue
+        Step2: Sort them
+        Step3: Apply AFDR method to adjust pvalue and get qvalue for each pvalue
+
+        Return a dictionary of {-100log10pvalue:(-100log10qvalue,rank,basepairs)} relationships.
+        """
+        cdef:
+            long n, pre_p, this_p, length, j, pre_l, l, this_v, pre_v, v
+            long N, k, q, pre_q
+            double f
+            str chrom
+            np.ndarray d_chrom
+            dict pvalue2qvalue
+
+        assert self.scoring_method == 'p'
+        
+        n = self.total()
+        value_dict = Int64HashTable()
+        unique_values = pyarray(BYTE4,[])
+        # this is a table of how many positions each p value occurs at
+        for chrom in self.data.keys():
+            # for each chromosome
+            pre_p  = 0
+            d_chrom = self.data[chrom]
+            length = self.datalength[chrom]
+            for j in xrange(length):
+                this_p = d_chrom[ j, 0 ]
+                this_v = d_chrom[ j, 3 ]
+                assert this_v == this_v, "NaN at %d" % pos
+                if value_dict.has_key(this_v):
+                    value_dict.set_item(this_v, value_dict.get_item(this_v) + this_p - pre_p)
+                else:
+                    value_dict.set_item(this_v, this_p - pre_p)
+                    unique_values.append(this_v)
+                pre_p = this_p
+
+        N = 0
+        for i in xrange(len(unique_values)):
+            N += value_dict.get_item(unique_values[i])
+        k = 1                           # rank
+        f = -log10(N)
+        pre_v = -2147483647
+        pre_l = 0
+        pre_q = 2147483647              # save the previous q-value
+        pvalue2qvalue = {pre_v:[0,k,0]}              # pvalue:[qvalue,rank,bp_with_this_pvalue]
+        unique_values = sorted(unique_values,reverse=True)
+        for i in xrange(len(unique_values)):
+            v = unique_values[i]
+            l = value_dict.get_item(v)
+            q = v + int((log10(k) + f) * 100) # we save integers here.
+            q = max(0,min(pre_q,q))           # make q-score monotonic
+            pvalue2qvalue[v] = [q, k, 0]
+            pvalue2qvalue[pre_v][2] = k-pvalue2qvalue[pre_v][1]
+            pre_v = v
+            pre_q = q
+            k+=l
+        pvalue2qvalue[pre_v][2] = k-pvalue2qvalue[pre_v][1]
+        # pop the first -1e100 one
+        pvalue2qvalue.pop(-2147483647)
+
+        return pvalue2qvalue
+
+    cdef compute_likelihood ( self ):
+        cdef:
+            np.ndarray d
+            long l, i
+        
+        for chrom in self.data.keys():
+            d = self.data[chrom]
+            l = self.datalength[chrom]
+            for i in range(l):
+                d[ i, 3 ] =  logLR( d[ i, 1], d[ i, 2] )
+        return 
+
+    cdef compute_foldenrichment ( self ):
+        cdef:
+            np.ndarray d
+            long l, i
+        
+        for chrom in self.data.keys():
+            d = self.data[chrom]
+            l = self.datalength[chrom]
+            for i in range(l):
+                d[ i, 3 ] =  int ( 100 * d[ i, 1] / d[ i, 2]  )
+        self.scoring_method = 'l'
+        return
+
+    cdef compute_substraction ( self ):
+        cdef:
+            np.ndarray d
+            long l, i
+        
+        for chrom in self.data.keys():
+            d = self.data[chrom]
+            l = self.datalength[chrom]
+            for i in range(l):
+                d[ i, 3 ] =  100 * int ( d[ i, 1] - d[ i, 2] )
+        self.scoring_method = 'd'
+        return
+
+    cdef compute_SPMR ( self ):
+        cdef:
+            np.ndarray d
+            long l, i
+            float scale
+        if self.normalization_method == 'T' or self.normalization_method == 'N':
+            scale = self.treat_edm
+        elif self.normalization_method == 'C':
+            scale = self.ctrl_edm
+        elif self.normalization_method == 'M':
+            scale = 1
+        
+        for chrom in self.data.keys():
+            d = self.data[chrom]
+            l = self.datalength[chrom]
+            for i in range(l):
+                d[ i, 3 ] =  100 * d[ i, 1] / scale # two digit precision may not be enough...
+        self.scoring_method = 'm'
+        return
+
+    # def write_bedGraph ( self, fhd, str name, str description, str colname, bool do_SPMR = False ):
+    #     """Write all data to fhd in Wiggle Format.
+
+    #     fhd: a filehandler to save bedGraph.
+
+    #     name/description: the name and description in track line.
+
+    #     colname: can be 'sample','control','-100logp','-100logq', '100logLR'
+
+    #     do_SPMR: only effective when writing sample/control tracks. When True, save SPMR instead.
+        
+    #     """
+    #     cdef:
+    #         str chrom
+    #         int l, pre, i, p 
+    #         float pre_v, v, scale_factor
+            
+    #     if self.trackline:
+    #         # this line is REQUIRED by the wiggle format for UCSC browser
+    #         fhd.write( "track type=bedGraph name=\"%s\" description=\"%s\"\n" % ( name,description ) )
+        
+    #     if colname not in [ 'sample', 'control', '-100logp', '-100logq', '100logLR' ]:
+    #         raise Exception( "%s not supported!" % colname )
+
+    #     if colname in [ '-100logp', '-100logq', '100logLR' ]:
+    #         scale_factor = 0.1              # for pvalue or qvalue, divide them by 100 while writing to bedGraph file
+    #     elif colname in [ 'sample', 'control' ]:
+    #         if do_SPMR:
+    #             logging.info( "MACS will save SPMR for fragment pileup using effective depth of %.2f million" % self.effective_depth_in_million )
+    #             scale_factor = 1.0/self.effective_depth_in_million
+    #         else:
+    #             scale_factor = 1
+        
+    #     chrs = self.get_chr_names()
+    #     for chrom in chrs:
+    #         d = self.data[ chrom ]
+    #         l = self.pointer[ chrom ]
+    #         pre = 0
+    #         pos   = d[ 'pos' ]
+    #         value = d[ colname ] * scale_factor
+    #         if value.shape[ 0 ] == 0: continue # skip if there's no data
+    #         pre_v = value[ 0 ]
+    #         for i in range( 1, l ):
+    #             v = value[ i ]
+    #             p = pos[ i-1 ]
+    #             if pre_v != v: 
+    #                 fhd.write( "%s\t%d\t%d\t%.2f\n" % ( chrom, pre, p, pre_v ) )
+    #                 pre_v = v
+    #                 pre = p
+    #         p = pos[ -1 ]
+    #         # last one
+    #         fhd.write( "%s\t%d\t%d\t%.2f\n" % ( chrom, pre, p, pre_v ) )
+            
+    #     return True
+
+    # def make_pq_table ( self ):
+    #     """Make pvalue-qvalue table.
+
+    #     Step1: get all pvalue and length of block with this pvalue
+    #     Step2: Sort them
+    #     Step3: Apply AFDR method to adjust pvalue and get qvalue for each pvalue
+
+    #     Return a dictionary of {-100log10pvalue:(-100log10qvalue,rank,basepairs)} relationships.
+    #     """
+    #     cdef:
+    #         long n, pre_p, this_p, length, j, pre_l, l, this_v, pre_v, v
+    #         long N, k, q, pre_q
+    #         double f
+    #         str chrom
+        
+    #     #logging.info("####test#### start make_pq")
+    #     n = self.total()
+    #     value_dict = Int64HashTable()
+    #     unique_values = pyarray(BYTE4,[])
+    #     # this is a table of how many positions each p value occurs at
+    #     for chrom in self.data.keys():
+    #         # for each chromosome
+    #         pre_p  = 0
+    #         pos    = self.data[chrom][ 'pos' ]
+    #         value  = self.data[chrom][ '-100logp' ]
+    #         length = self.pointer[chrom]
+    #         for j in xrange(length):
+    #             this_p = pos[j]
+    #             this_v = value[j]
+    #             assert this_v == this_v, "NaN at %d" % pos
+    #             if value_dict.has_key(this_v):
+    #                 value_dict.set_item(this_v, value_dict.get_item(this_v) + this_p - pre_p)
+    #             else:
+    #                 value_dict.set_item(this_v, this_p - pre_p)
+    #                 unique_values.append(this_v)
+    #             pre_p = this_p
+
+    #     N = 0
+    #     for i in xrange(len(unique_values)):
+    #         N += value_dict.get_item(unique_values[i])
+    #     k = 1                           # rank
+    #     f = -log10(N)
+    #     pre_v = -2147483647
+    #     pre_l = 0
+    #     pre_q = 2147483647              # save the previous q-value
+    #     pvalue2qvalue = {pre_v:[0,k,0]}              # pvalue:[qvalue,rank,bp_with_this_pvalue]
+    #     #pvalue2qvalue = np.zeros( (len(unique_values)+1,4), dtype='int64' )
+    #     #pvalue2qvalue[0] = (pre_v, 0, k, 0)
+    #     #logging.info("####test#### start matching pvalue to qvalue")
+    #     unique_values = sorted(unique_values,reverse=True)
+    #     for i in xrange(len(unique_values)):
+    #         v = unique_values[i]
+    #         l = value_dict.get_item(v)
+    #         q = v + int((log10(k) + f) * 100) # we save integers here.
+    #         q = max(0,min(pre_q,q))           # make q-score monotonic
+    #         #pvalue2qvalue[i+1] = (v, q, k, 0)
+    #         #pvalue2qvalue[i][3] = k - pvalue2qvalue[i][2]
+    #         pvalue2qvalue[v] = [q, k, 0]
+    #         pvalue2qvalue[pre_v][2] = k-pvalue2qvalue[pre_v][1]
+    #         pre_v = v
+    #         pre_q = q
+    #         k+=l
+    #     #pvalue2qvalue[i+1][3] = k - pvalue2qvalue[i][2]
+    #     pvalue2qvalue[pre_v][2] = k-pvalue2qvalue[pre_v][1]
+    #     #logging.info("####test#### finish building pqtable")        
+    #     # pop the first -1e100 one
+    #     pvalue2qvalue.pop(-2147483647)
+    #     #pvalue2qvalue = pvalue2qvalue[1:]
+
+    #     return pvalue2qvalue
+
+    # def assign_qvalue ( self , dict pvalue2qvalue ):
+    #     """Assign -100log10qvalue to every point.
+
+    #     pvalue2qvalue: a dictionary of -100log10pvalue:-100log10qvalue
+    #     """
+    #     cdef:
+    #         long i,l,j,p
+    #         str chrom
+            
+    #     chroms = self.data.keys()
+
+    #     # convert pvalue2qvalue to a simple dict
+    #     s_p2q = Int64HashTable()
+    #     #g = pvalue2qvalue.get
+    #     for i in pvalue2qvalue.keys():
+    #     #for i in range(pvalue2qvalue.shape[0]):
+    #         s_p2q.set_item(i,pvalue2qvalue[i][0])
+    #         #s_p2q.set_item(pvalue2qvalue[i][0],pvalue2qvalue[i][1])
+
+    #     g = s_p2q.get_item
+        
+    #     for j in range( len(chroms) ):
+    #         chrom = chroms[j]
+    #         pvalue = self.data[chrom]['-100logp']
+    #         qvalue = self.data[chrom]['-100logq']
+    #         l = self.pointer[chrom]
+    #         for i in range( l ):
+    #             qvalue[i] = g(pvalue[i])
+    #     return True
+
+    # def call_peaks (self, int cutoff=500, int min_length=200, int max_gap=50, str colname='-100logp',
+    #                 bool call_summits=False):
+    #     """This function try to find regions within which, scores
+    #     are continuously higher than a given cutoff.
+
+    #     This function is NOT using sliding-windows. Instead, any
+    #     regions in bedGraph above certain cutoff will be detected,
+    #     then merged if the gap between nearby two regions are below
+    #     max_gap. After this, peak is reported if its length is above
+    #     min_length.
+
+    #     cutoff:  cutoff of value, default 1.
+    #     min_length :  minimum peak length, default 200.
+    #     gap   :  maximum gap to merge nearby peaks, default 50.
+    #     colname: can be 'sample','control','-100logp','-100logq'. Cutoff will be applied to the specified column.
+    #     ptrack:  an optional track for pileup heights. If it's not None, use it to find summits. Otherwise, use self/scoreTrack.
+    #     """
+    #     cdef:
+    #         int i
+    #         str chrom
+        
+    #     assert (colname in [ 'sample', 'control', '-100logp', '-100logq', '100logLR' ]), "%s not supported!" % colname
+
+    #     chrs  = self.get_chr_names()
+    #     peaks = PeakIO()                      # dictionary to save peaks
+
+    #     if call_summits: close_peak = self.__close_peak2
+    #     else: close_peak = self.__close_peak
+        
+    #     for chrom in chrs:
+    #         peak_content = []           # to store points above cutoff
+
+    #         above_cutoff = np.nonzero( self.data[chrom][colname] >= cutoff )[0] # indices where score is above cutoff
+    #         above_cutoff_v = self.data[chrom][colname][above_cutoff] # scores where score is above cutoff
+
+    #         above_cutoff_endpos = self.data[chrom]['pos'][above_cutoff] # end positions of regions where score is above cutoff
+    #         above_cutoff_startpos = self.data[chrom]['pos'][above_cutoff-1] # start positions of regions where score is above cutoff
+    #         above_cutoff_sv= self.data[chrom]['sample'][above_cutoff] # sample pileup height where score is above cutoff
+
+    #         if above_cutoff_v.size == 0:
+    #             continue
+
+    #         if above_cutoff[0] == 0:
+    #             # first element > cutoff, fix the first point as 0. otherwise it would be the last item in data[chrom]['pos']
+    #             above_cutoff_startpos[0] = 0
+
+    #         # first bit of region above cutoff
+    #         peak_content.append( (above_cutoff_startpos[0], above_cutoff_endpos[0], above_cutoff_v[0], above_cutoff_sv[0], above_cutoff[0]) )
+    #         for i in range( 1,above_cutoff_startpos.size ):
+    #             if above_cutoff_startpos[i] - peak_content[-1][1] <= max_gap:
+    #                 # append
+    #                 peak_content.append( (above_cutoff_startpos[i], above_cutoff_endpos[i], above_cutoff_v[i], above_cutoff_sv[i], above_cutoff[i]) )
+    #             else:
+    #                 # close
+    #                 close_peak(peak_content, peaks, min_length, chrom, colname, smoothlen=max_gap/2 )
+    #                 peak_content = [(above_cutoff_startpos[i], above_cutoff_endpos[i], above_cutoff_v[i], above_cutoff_sv[i], above_cutoff[i]),]
+            
+    #         # save the last peak
+    #         if not peak_content:
+    #             continue
+    #         else:
+    #             close_peak(peak_content, peaks, min_length, chrom, colname, smoothlen=max_gap/2 )
+
+    #     return peaks
+       
+    # def __close_peak2 (self, peak_content, peaks, min_length, chrom, colname, smoothlen=50):
+    #     # this is where the summits are called, need to fix this
+    #     end, start = peak_content[ -1 ][ 1 ], peak_content[ 0 ][ 0 ]
+    #     if end - start < min_length: return # if the peak is too small, reject it
+    #     #for (start,end,value,summitvalue,index) in peak_content:
+    #     peakdata = np.zeros(end - start, dtype='float32')
+    #     peakindices = np.zeros(end - start, dtype='int32')
+    #     for (tmpstart,tmpend,tmpvalue,tmpsummitvalue, tmpindex) in peak_content:
+    #         i, j = tmpstart-start, tmpend-start
+    #         peakdata[i:j] = self.data[chrom]['sample'][tmpindex]
+    #         peakindices[i:j] = tmpindex
+    #     # apply smoothing window of tsize / 2
+    #     w = np.ones(smoothlen, dtype='float32')
+    #     smoothdata = np_convolve(w/w.sum(), peakdata, mode='same')
+    #     # find maxima and minima
+    #     local_extrema = np.where(np.diff(np.sign(np.diff(smoothdata))))[0]+1
+    #     # get only maxima by requiring it be greater than the mean
+    #     # might be better to take another derivative instead
+    #     plateau_offsets = np.intersect1d(local_extrema,
+    #                                      np.where(peakdata>peakdata.mean())[0])
+    #     # sometimes peak summits are plateaus, so check for adjacent coordinates
+    #     # and take the middle ones if needed
+    #     if len(plateau_offsets)==0:
+    #     #####################################################################
+    #     # ***failsafe if no summits so far***                               #
+    #         summit_offset_groups = [[(end - start) / 2]]                    #
+    #     ##################################################################### 
+    #     elif len(plateau_offsets) == 1:
+    #         summit_offset_groups = [[plateau_offsets[0]]]
+    #     else:
+    #         previous_offset = plateau_offsets[0]
+    #         summit_offset_groups = [[previous_offset]]
+    #         for offset in plateau_offsets:
+    #             if offset == previous_offset + 1:
+    #                 summit_offset_groups[-1].append(offset)
+    #             else:
+    #                 summit_offset_groups.append([offset])
+    #     summit_offsets = []
+    #     for offset_group in summit_offset_groups:
+    #         summit_offsets.append(offset_group[len(offset_group) / 2])
+    #     summit_indices = peakindices[summit_offsets]
+    #     # also purge offsets that have the same summit_index
+    #     unique_offsets = []
+    #     summit_offsets = np.fromiter(summit_offsets, dtype='int32')
+    #     for index in np.unique(summit_indices):
+    #         those_index_indices = np.where(summit_indices == index)[0]
+    #         those_offsets = summit_offsets[those_index_indices]
+    #         unique_offsets.append(int(those_offsets.mean()))
+    #     # also require a valley of at least 0.6 * taller peak
+    #     # in every adjacent two peaks or discard the lesser one
+    #     # this behavior is like PeakSplitter
+    #     better_offsets = []
+    #     previous_offset = unique_offsets.pop()
+    #     while True:
+    #         if len(unique_offsets) == 0:
+    #             better_offsets.append(previous_offset)
+    #             break
+    #         else:
+    #             this_offset = unique_offsets.pop()
+    #             this_h, prev_h = peakdata[[this_offset, previous_offset]]
+    #             if this_h > prev_h:
+    #                 prev_is_taller = False
+    #                 min_valley = 0.6 * this_h
+    #             else:
+    #                 prev_is_taller = True
+    #                 min_valley = 0.6 * prev_h
+    #             s = slice(this_offset, previous_offset)
+    #             valley = np.where(peakdata[s] < min_valley)[0]
+    #             if len(valley) > 0: better_offsets.append(previous_offset)
+    #             else:
+    #                 if prev_is_taller: continue # discard this peak
+    #                 # else: discard previous peak by ignoring it
+    #             previous_offset = this_offset
+    #     better_offsets.reverse()
+    #     better_indices = peakindices[better_offsets]
+    #     assert len(better_offsets) > 0, "Lost peak summit(s) near %s %d" % (chrom, start) 
+    #     for summit_offset, summit_index in zip(better_offsets, better_indices):
+    #         peaks.add( chrom,
+    #                    start,
+    #                    end,
+    #                    summit      = start + summit_offset,
+    #                    peak_score  = self.data[chrom][colname][ summit_index ],
+    #                    pileup      = self.data[chrom]['sample'][ summit_index ], # should be the same as summit_value
+    #                    pscore      = self.data[chrom]['-100logp'][ summit_index ]/100.0,
+    #                    fold_change = self.data[chrom]['sample'][ summit_index ]/self.data[chrom]['control'][ summit_index ],
+    #                    qscore      = self.data[chrom]['-100logq'][ summit_index ]/100.0,
+    #                    )
+    #     # start a new peak
+    #     return True
+
+    # def __close_peak (self, peak_content, peaks, int min_length, str chrom, str colname, int smoothlen=0):
+    #     """Close the peak region, output peak boundaries, peak summit
+    #     and scores, then add the peak to peakIO object.
+
+    #     """
+    #     cdef:
+    #         int summit_pos, tstart, tend, tmpindex, summit_index, i, midindex
+    #         double summit_value, tvalue, tsummitvalue
+
+    #     peak_length = peak_content[ -1 ][ 1 ] - peak_content[ 0 ][ 0 ]
+    #     if peak_length >= min_length: # if the peak is too small, reject it
+    #         tsummit = []
+    #         summit_pos   = 0
+    #         summit_value = summit_pos
+    #         for i in xrange(len(peak_content)):
+    #             (tstart,tend,tvalue,tsummitvalue, tindex) = peak_content[i]
+    #             #for (tstart,tend,tvalue,tsummitvalue, tindex) in peak_content:
+    #             if not summit_value or summit_value < tsummitvalue:
+    #                 tsummit = [(tend + tstart) / 2, ]
+    #                 tsummit_index = [ tindex, ]
+    #                 summit_value = tsummitvalue
+    #             elif summit_value == tsummitvalue:
+    #                 # remember continuous summit values
+    #                 tsummit.append(int((tend + tstart) / 2))
+    #                 tsummit_index.append( tindex )
+    #         # the middle of all highest points in peak region is defined as summit
+    #         midindex = int((len(tsummit) + 1) / 2) - 1
+    #         summit_pos    = tsummit[ midindex ]
+    #         summit_index  = tsummit_index[ midindex ]
+    #         peaks.add( chrom,
+    #                    peak_content[0][0],
+    #                    peak_content[-1][1],
+    #                    summit      = summit_pos,
+    #                    peak_score  = self.data[chrom][colname][ summit_index ],
+    #                    pileup      = self.data[chrom]['sample'][ summit_index ], # should be the same as summit_value
+    #                    pscore      = self.data[chrom]['-100logp'][ summit_index ]/100.0,
+    #                    fold_change = self.data[chrom]['sample'][ summit_index ]/self.data[chrom]['control'][ summit_index ],
+    #                    qscore      = self.data[chrom]['-100logq'][ summit_index ]/100.0,
+    #                    )
+    #         # start a new peak
+    #         return True
+
+    # def call_broadpeaks (self, int lvl1_cutoff=500, int lvl2_cutoff=100,
+    #                      int min_length=200, int lvl1_max_gap=50, int lvl2_max_gap=400,
+    #                      str colname='-100logq'):
+    #     """This function try to find enriched regions within which,
+    #     scores are continuously higher than a given cutoff for level
+    #     1, and link them using the gap above level 2 cutoff with a
+    #     maximum length of lvl2_max_gap.
+
+    #     lvl1_cutoff:  cutoff of value at enriched regions, default 500.
+    #     lvl2_cutoff:  cutoff of value at linkage regions, default 100.        
+    #     min_length :  minimum peak length, default 200.
+    #     lvl1_max_gap   :  maximum gap to merge nearby enriched peaks, default 50.
+    #     lvl2_max_gap   :  maximum length of linkage regions, default 400.        
+    #     colname: can be 'sample','control','-100logp','-100logq'. Cutoff will be applied to the specified column.
+
+    #     Return both general PeakIO object for highly enriched regions
+    #     and gapped broad regions in BroadPeakIO.
+    #     """
+    #     cdef:
+    #         int i
+    #         str chrom
+        
+    #     assert lvl1_cutoff > lvl2_cutoff, "level 1 cutoff should be larger than level 2."
+    #     assert lvl1_max_gap < lvl2_max_gap, "level 2 maximum gap should be larger than level 1."        
+    #     lvl1_peaks = self.call_peaks(cutoff=lvl1_cutoff, min_length=min_length, max_gap=lvl1_max_gap, colname=colname)
+    #     lvl2_peaks = self.call_peaks(cutoff=lvl2_cutoff, min_length=min_length, max_gap=lvl2_max_gap, colname=colname)
+    #     chrs = lvl1_peaks.peaks.keys()
+    #     broadpeaks = BroadPeakIO()
+    #     # use lvl2_peaks as linking regions between lvl1_peaks
+    #     for chrom in chrs:
+    #         lvl1peakschrom = lvl1_peaks.peaks[chrom]
+    #         lvl2peakschrom = lvl2_peaks.peaks[chrom]
+    #         lvl1peakschrom_next = iter(lvl1peakschrom).next
+    #         tmppeakset = []             # to temporarily store lvl1 region inside a lvl2 region
+    #         # our assumption is lvl1 regions should be included in lvl2 regions
+    #         try:
+    #             lvl1 = lvl1peakschrom_next()
+    #         except StopIteration:
+    #             break
+    #         for i in range( len(lvl2peakschrom) ):
+    #             # for each lvl2 peak, find all lvl1 peaks inside
+    #             lvl2 = lvl2peakschrom[i]
+    #             try:
+    #                 while True:
+    #                     if lvl2["start"] <= lvl1["start"]  and lvl1["end"] <= lvl2["end"]:
+    #                         tmppeakset.append(lvl1)
+    #                     else:
+    #                         if tmppeakset:
+    #                             self.__add_broadpeak ( broadpeaks, chrom, lvl2, tmppeakset)
+    #                         tmppeakset = []
+    #                         break
+    #                     lvl1 = lvl1peakschrom_next()
+    #             except StopIteration:
+    #                 if tmppeakset:
+    #                     self.__add_broadpeak ( broadpeaks, chrom, lvl2, tmppeakset)                    
+    #                 break
+        
+    #     return lvl1_peaks, broadpeaks
+
+
+    # def __add_broadpeak (self, bpeaks, str chrom, lvl2peak, lvl1peakset):
+    #     """Internal function to create broad peak.
+        
+    #     """
+    #     cdef:
+    #         int blockNum, thickStart, thickEnd, start, end
+    #         str blockSizes, blockStarts
+        
+    #     start      = lvl2peak["start"]
+    #     end        = lvl2peak["end"]
+    #     thickStart = lvl1peakset[0]["start"]
+    #     thickEnd   = lvl1peakset[-1]["end"]
+    #     blockNum   = int(len(lvl1peakset))
+    #     blockSizes = ",".join( map(lambda x:str(x["length"]),lvl1peakset) )
+    #     blockStarts = ",".join( map(lambda x:str(x["start"]-start),lvl1peakset) )
+    #     if lvl2peak["start"] != thickStart:
+    #         # add 1bp mark for the start of lvl2 peak
+    #         blockNum += 1
+    #         blockSizes = "1,"+blockSizes
+    #         blockStarts = "0,"+blockStarts
+    #     if lvl2peak["end"] != thickEnd:
+    #         # add 1bp mark for the end of lvl2 peak            
+    #         blockNum += 1
+    #         blockSizes = blockSizes+",1"
+    #         blockStarts = blockStarts+","+str(end-start-1)
+        
+    #     bpeaks.add(chrom, start, end, score=lvl2peak["score"], thickStart=thickStart, thickEnd=thickEnd,
+    #                blockNum = blockNum, blockSizes = blockSizes, blockStarts = blockStarts)
+    #     return bpeaks
+
+    cdef long total ( self ):
+        """Return the number of regions in this object.
+
+        """
+        cdef:
+            long t
+            str chrom
+        
+        t = 0
+        for chrom in self.data.keys():
+            t += self.datalength[chrom]
+        return t
+
+
