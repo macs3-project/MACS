@@ -1,5 +1,5 @@
 # cython: profile=True
-# Time-stamp: <2012-05-07 22:26:52 Tao Liu>
+# Time-stamp: <2012-05-08 21:44:03 Tao Liu>
 
 """Module for Feature IO classes.
 
@@ -53,7 +53,7 @@ cdef inline int int_min(int a, int b): return a if a <= b else b
 LOG10_E = 0.43429448190325176
 pscore_khashtable = Int64HashTable()
 
-cdef get_pscore ( int observed, double expectation ):
+cdef int get_pscore ( int observed, double expectation ):
     """Get p-value score from Poisson test. First check existing
     table, if failed, call poisson_cdf function, then store the result
     in table.
@@ -80,7 +80,7 @@ cdef get_pscore ( int observed, double expectation ):
 
 logLR_khashtable = Int64HashTable()
 
-cdef logLR ( double x, double y ):
+cdef int logLR ( double x, double y ):
     """Calculate log10 Likelihood between H1 ( enriched ) and H0 (
     chromatin bias ). Then store the values in integar form =
     100*logLR. Set minus sign for depletion.
@@ -1037,11 +1037,11 @@ cdef class scoreTrackII:
         self.data = {}           # for each chromosome, there is a l*4
                                  # matrix. First column: end position
                                  # of a region; Second: treatment
-                                 # pileup; third: control pileup;
-                                 # forth: score * 100 ( can be
+                                 # pileup * 100; third: control pileup
+                                 # * 100; forth: score * 100 ( can be
                                  # p/q-value/likelihood
                                  # ratio/fold-enrichment/substraction
-                                 #  depending on -c setting)
+                                 # depending on -c setting)
         self.datalength = {}
         self.trackline = False
         self.treat_edm = treat_depth
@@ -1073,7 +1073,7 @@ cdef class scoreTrackII:
         
         """
         if not self.data.has_key(chrom):
-            self.data[chrom] = np.zeros( ( chrom_max_len, 4 ), dtype="int32" ) # remember col #4 is score * 100, I use integar here.
+            self.data[chrom] = np.zeros( ( chrom_max_len, 4 ), dtype="int32" ) # remember col #2-4 is actual value * 100, I use integar here.
             self.datalength[chrom] = 0
 
     cpdef add (self, str chromosome, int endpos, int sample, int control):
@@ -1086,8 +1086,8 @@ cdef class scoreTrackII:
         i = self.datalength[chromosome]
         c = self.data[chromosome]
         c[ i, 0 ] = endpos
-        c[ i, 1 ] = sample
-        c[ i, 2 ] = control
+        c[ i, 1 ] = sample * 100
+        c[ i, 2 ] = control * 100
         self.datalength[chromosome] += 1
 
     cpdef finalize ( self ):
@@ -1137,7 +1137,10 @@ cdef class scoreTrackII:
         return l
 
     cpdef change_normalization_method ( self, char normalization_method ):
-        """
+        """Change/set normalization method. However, I do not
+        recommend change this back and forward, since some precision
+        issue will happen -- I only keep two digits.
+        
         normalization_method: T: scale to depth of treatment;
                              C: scale to depth of control;
                              M: scale to depth of 1 million;
@@ -1233,21 +1236,23 @@ cdef class scoreTrackII:
             raise NotImplemented
             
     cdef compute_pvalue ( self ):
+        """Compute -log_{10}(pvalue)
+        """
         cdef:
             np.ndarray d
             long l, i
-            float t_edm = self.treat_edm
-            float c_edm = self.ctrl_edm
         
         for chrom in self.data.keys():
             d = self.data[chrom]
             l = self.datalength[chrom]
             for i in range(l):
-                d[ i, 3 ] =  get_pscore( d[ i, 1] / t_edm, d[ i, 2] / c_edm )
+                d[ i, 3 ] =  get_pscore( d[ i, 1] / 100, d[ i, 2] / 100.0 )
         self.scoring_method = 'p'
         return 
 
     cdef compute_qvalue ( self ):
+        """Compute -log_{10}(qvalue)
+        """
         cdef:
             dict pqtable
             long i,l,j,p
@@ -1352,7 +1357,7 @@ cdef class scoreTrackII:
             d = self.data[chrom]
             l = self.datalength[chrom]
             for i in range(l):
-                d[ i, 3 ] =  logLR( d[ i, 1], d[ i, 2] )
+                d[ i, 3 ] =  logLR( d[ i, 1]/100.0, d[ i, 2]/100.0 )
         return 
 
     cdef compute_foldenrichment ( self ):
@@ -1377,7 +1382,7 @@ cdef class scoreTrackII:
             d = self.data[chrom]
             l = self.datalength[chrom]
             for i in range(l):
-                d[ i, 3 ] =  100 * int ( d[ i, 1] - d[ i, 2] )
+                d[ i, 3 ] =  int ( d[ i, 1] - d[ i, 2] )
         self.scoring_method = 'd'
         return
 
@@ -1397,165 +1402,53 @@ cdef class scoreTrackII:
             d = self.data[chrom]
             l = self.datalength[chrom]
             for i in range(l):
-                d[ i, 3 ] =  100 * d[ i, 1] / scale # two digit precision may not be enough...
+                d[ i, 3 ] =  d[ i, 1] / scale # two digit precision may not be enough...
         self.scoring_method = 'm'
         return
 
-    # def write_bedGraph ( self, fhd, str name, str description, str colname, bool do_SPMR = False ):
-    #     """Write all data to fhd in Wiggle Format.
+    cpdef write_bedGraph ( self, fhd, str name, str description, short column = 3 ):
+        """Write all data to fhd in bedGraph Format.
 
-    #     fhd: a filehandler to save bedGraph.
+        fhd: a filehandler to save bedGraph.
 
-    #     name/description: the name and description in track line.
+        name/description: the name and description in track line.
 
-    #     colname: can be 'sample','control','-100logp','-100logq', '100logLR'
+        colname: can be 1: chip, 2: control, 3: score
 
-    #     do_SPMR: only effective when writing sample/control tracks. When True, save SPMR instead.
+        """
+        cdef:
+            str chrom
+            int l, pre, i, p 
+            float pre_v, v
+            float scale = 100.0
+
+        assert column in range( 1, 4 ), "column should be between 1, 2 or 3."
         
-    #     """
-    #     cdef:
-    #         str chrom
-    #         int l, pre, i, p 
-    #         float pre_v, v, scale_factor
+        write = fhd.write
+
+        if self.trackline:
+            # this line is REQUIRED by the wiggle format for UCSC browser
+            write( "track type=bedGraph name=\"%s\" description=\"%s\"\n" % ( name, description ) )
+        
+        chrs = self.get_chr_names()
+        for chrom in chrs:
+            d = self.data[ chrom ]
+            l = self.datalength[ chrom ]
+            pre = 0
+            if d.shape[ 0 ] == 0: continue # skip if there's no data
+            pre_v = d[ 0, column ] / scale
+            for i in range( 1, l ):
+                v = d[ i, column ] / scale
+                p = d[ i-1, 0 ]
+                if pre_v != v: 
+                    write( "%s\t%d\t%d\t%.2f\n" % ( chrom, pre, p, pre_v ) )
+                    pre_v = v
+                    pre = p
+            p = d[ -1, 0 ]
+            # last one
+            write( "%s\t%d\t%d\t%.2f\n" % ( chrom, pre, p, pre_v ) )
             
-    #     if self.trackline:
-    #         # this line is REQUIRED by the wiggle format for UCSC browser
-    #         fhd.write( "track type=bedGraph name=\"%s\" description=\"%s\"\n" % ( name,description ) )
-        
-    #     if colname not in [ 'sample', 'control', '-100logp', '-100logq', '100logLR' ]:
-    #         raise Exception( "%s not supported!" % colname )
-
-    #     if colname in [ '-100logp', '-100logq', '100logLR' ]:
-    #         scale_factor = 0.1              # for pvalue or qvalue, divide them by 100 while writing to bedGraph file
-    #     elif colname in [ 'sample', 'control' ]:
-    #         if do_SPMR:
-    #             logging.info( "MACS will save SPMR for fragment pileup using effective depth of %.2f million" % self.effective_depth_in_million )
-    #             scale_factor = 1.0/self.effective_depth_in_million
-    #         else:
-    #             scale_factor = 1
-        
-    #     chrs = self.get_chr_names()
-    #     for chrom in chrs:
-    #         d = self.data[ chrom ]
-    #         l = self.pointer[ chrom ]
-    #         pre = 0
-    #         pos   = d[ 'pos' ]
-    #         value = d[ colname ] * scale_factor
-    #         if value.shape[ 0 ] == 0: continue # skip if there's no data
-    #         pre_v = value[ 0 ]
-    #         for i in range( 1, l ):
-    #             v = value[ i ]
-    #             p = pos[ i-1 ]
-    #             if pre_v != v: 
-    #                 fhd.write( "%s\t%d\t%d\t%.2f\n" % ( chrom, pre, p, pre_v ) )
-    #                 pre_v = v
-    #                 pre = p
-    #         p = pos[ -1 ]
-    #         # last one
-    #         fhd.write( "%s\t%d\t%d\t%.2f\n" % ( chrom, pre, p, pre_v ) )
-            
-    #     return True
-
-    # def make_pq_table ( self ):
-    #     """Make pvalue-qvalue table.
-
-    #     Step1: get all pvalue and length of block with this pvalue
-    #     Step2: Sort them
-    #     Step3: Apply AFDR method to adjust pvalue and get qvalue for each pvalue
-
-    #     Return a dictionary of {-100log10pvalue:(-100log10qvalue,rank,basepairs)} relationships.
-    #     """
-    #     cdef:
-    #         long n, pre_p, this_p, length, j, pre_l, l, this_v, pre_v, v
-    #         long N, k, q, pre_q
-    #         double f
-    #         str chrom
-        
-    #     #logging.info("####test#### start make_pq")
-    #     n = self.total()
-    #     value_dict = Int64HashTable()
-    #     unique_values = pyarray(BYTE4,[])
-    #     # this is a table of how many positions each p value occurs at
-    #     for chrom in self.data.keys():
-    #         # for each chromosome
-    #         pre_p  = 0
-    #         pos    = self.data[chrom][ 'pos' ]
-    #         value  = self.data[chrom][ '-100logp' ]
-    #         length = self.pointer[chrom]
-    #         for j in xrange(length):
-    #             this_p = pos[j]
-    #             this_v = value[j]
-    #             assert this_v == this_v, "NaN at %d" % pos
-    #             if value_dict.has_key(this_v):
-    #                 value_dict.set_item(this_v, value_dict.get_item(this_v) + this_p - pre_p)
-    #             else:
-    #                 value_dict.set_item(this_v, this_p - pre_p)
-    #                 unique_values.append(this_v)
-    #             pre_p = this_p
-
-    #     N = 0
-    #     for i in xrange(len(unique_values)):
-    #         N += value_dict.get_item(unique_values[i])
-    #     k = 1                           # rank
-    #     f = -log10(N)
-    #     pre_v = -2147483647
-    #     pre_l = 0
-    #     pre_q = 2147483647              # save the previous q-value
-    #     pvalue2qvalue = {pre_v:[0,k,0]}              # pvalue:[qvalue,rank,bp_with_this_pvalue]
-    #     #pvalue2qvalue = np.zeros( (len(unique_values)+1,4), dtype='int64' )
-    #     #pvalue2qvalue[0] = (pre_v, 0, k, 0)
-    #     #logging.info("####test#### start matching pvalue to qvalue")
-    #     unique_values = sorted(unique_values,reverse=True)
-    #     for i in xrange(len(unique_values)):
-    #         v = unique_values[i]
-    #         l = value_dict.get_item(v)
-    #         q = v + int((log10(k) + f) * 100) # we save integers here.
-    #         q = max(0,min(pre_q,q))           # make q-score monotonic
-    #         #pvalue2qvalue[i+1] = (v, q, k, 0)
-    #         #pvalue2qvalue[i][3] = k - pvalue2qvalue[i][2]
-    #         pvalue2qvalue[v] = [q, k, 0]
-    #         pvalue2qvalue[pre_v][2] = k-pvalue2qvalue[pre_v][1]
-    #         pre_v = v
-    #         pre_q = q
-    #         k+=l
-    #     #pvalue2qvalue[i+1][3] = k - pvalue2qvalue[i][2]
-    #     pvalue2qvalue[pre_v][2] = k-pvalue2qvalue[pre_v][1]
-    #     #logging.info("####test#### finish building pqtable")        
-    #     # pop the first -1e100 one
-    #     pvalue2qvalue.pop(-2147483647)
-    #     #pvalue2qvalue = pvalue2qvalue[1:]
-
-    #     return pvalue2qvalue
-
-    # def assign_qvalue ( self , dict pvalue2qvalue ):
-    #     """Assign -100log10qvalue to every point.
-
-    #     pvalue2qvalue: a dictionary of -100log10pvalue:-100log10qvalue
-    #     """
-    #     cdef:
-    #         long i,l,j,p
-    #         str chrom
-            
-    #     chroms = self.data.keys()
-
-    #     # convert pvalue2qvalue to a simple dict
-    #     s_p2q = Int64HashTable()
-    #     #g = pvalue2qvalue.get
-    #     for i in pvalue2qvalue.keys():
-    #     #for i in range(pvalue2qvalue.shape[0]):
-    #         s_p2q.set_item(i,pvalue2qvalue[i][0])
-    #         #s_p2q.set_item(pvalue2qvalue[i][0],pvalue2qvalue[i][1])
-
-    #     g = s_p2q.get_item
-        
-    #     for j in range( len(chroms) ):
-    #         chrom = chroms[j]
-    #         pvalue = self.data[chrom]['-100logp']
-    #         qvalue = self.data[chrom]['-100logq']
-    #         l = self.pointer[chrom]
-    #         for i in range( l ):
-    #             qvalue[i] = g(pvalue[i])
-    #     return True
+        return True
 
     # def call_peaks (self, int cutoff=500, int min_length=200, int max_gap=50, str colname='-100logp',
     #                 bool call_summits=False):
