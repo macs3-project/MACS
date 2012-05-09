@@ -425,27 +425,39 @@ class scoreTrackI:
             if not peak_content:
                 continue
             else:
-                close_peak(peak_content, peaks, min_length, chrom, colname, smoothlen=max_gap/2 )
+                close_peak(peak_content, peaks, int min_length, str chrom, str colname, int smoothlen=max_gap/2 )
 
         return peaks
        
-    def __close_peak2 (self, peak_content, peaks, min_length, chrom, colname, smoothlen=50):
+    def __close_peak2 (self, peak_content, peaks, int min_length, str chrom, str colname, int smoothlen=50):
+        cdef:
+            int summit_pos, tstart, tend, tmpindex, summit_index, i, midindex
+            int start, end
+            double summit_value, tvalue, tsummitvalue
+            np.ndarray[np.float32, ndim=1] w
+            np.ndarray[np.float32, ndim=1] peakdata
+            np.ndarray[np.int32, ndim=1] peakindices
+            
         # this is where the summits are called, need to fix this
-        end, start = peak_content[ -1 ][ 1 ], peak_content[ 0 ][ 0 ]
+        end = peak_content[ -1 ][ 1 ]
+        start = peak_content[ 0 ][ 0 ]
+        peak_length = end - start
         if end - start < min_length: return # if the peak is too small, reject it
         #for (start,end,value,summitvalue,index) in peak_content:
         peakdata = np.zeros(end - start, dtype='float32')
         peakindices = np.zeros(end - start, dtype='int32')
-        for (tmpstart,tmpend,tmpvalue,tmpsummitvalue, tmpindex) in peak_content:
-            i, j = tmpstart-start, tmpend-start
+        for (tstart,tend,tvalue,tsummitvalue, tmpindex) in peak_content:
+            i = tstart - start
+            j = tend - start
             peakdata[i:j] = self.data[chrom]['sample'][tmpindex]
             peakindices[i:j] = tmpindex
         # apply smoothing window of tsize / 2
         w = np.ones(smoothlen, dtype='float32')
         smoothdata = np_convolve(w/w.sum(), peakdata, mode='same')
-        # find maxima and minima
-        local_extrema = np.where(np.diff(np.sign(np.diff(smoothdata))))[0]+1
-        # get only maxima by requiring it be greater than the mean
+        # find maxima, minima, and inflection points
+        # discard minima and keep inflection points iff > mean
+        local_extrema = find_non_minima(smoothdata)
+        useful_local_extrema.resize(i)
         # might be better to take another derivative instead
         plateau_offsets = np.intersect1d(local_extrema,
                                          np.where(peakdata>peakdata.mean())[0])
@@ -990,3 +1002,13 @@ class CombinedTwoTrack:
         v1add(cur_region[3])
         v2add(cur_region[4])
         return ret
+
+cdef find_non_minima(np.ndarray[np.float32, ndim=1] data):
+    np.ndarray[np.int32] ret = np.zeros(data.shape[0], 'int32'):
+    int i = 0
+    int size = ret.shape[0]
+    for i in range(0, data.shape[0]):
+        if i == size:
+            ret.resize(ret.shape[0] + BUFFER_SIZE)
+    return ret
+
