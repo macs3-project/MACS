@@ -214,7 +214,8 @@ class bedGraphTrackI:
             str chrom
         
         if trackline:
-            fhd.write("track type=bedGraph name=\"%s\" description=\"%s\" visibility=2 alwaysZero=on\n" % (name,description))
+            trackcontents = (name.replace("\"", "\\\""), desc.replace("\"", "\\\""))
+            fhd.write("track type=bedGraph name=\"%s\" description=\"%s\" visibility=2 alwaysZero=on\n" % trackcontents)
         chrs = self.get_chr_names()
         for chrom in chrs:
             (p,v) = self.__data[chrom]

@@ -1,5 +1,5 @@
 # cython: profile=True
-# Time-stamp: <2012-05-10 02:47:21 Tao Liu>
+# Time-stamp: <2012-05-10 03:18:25 Tao Liu>
 
 """Module for Feature IO classes.
 
@@ -82,7 +82,7 @@ logLR_khashtable = Int64HashTable()
 
 cdef int logLR ( double x, double y ):
     """Calculate log10 Likelihood between H1 ( enriched ) and H0 (
-    chromatin bias ). Then store the values in integar form =
+    chromatin bias ). Then store the values in integer form =
     100*logLR. Set minus sign for depletion.
     
     """
@@ -435,87 +435,84 @@ class scoreTrackI:
             if not peak_content:
                 continue
             else:
-                close_peak(peak_content, peaks, min_length, chrom, colname, smoothlen=max_gap/2 )
+                close_peak(peak_content, peaks, min_length, chrom,
+                           colname, smoothlen=max_gap/2 )
 
         return peaks
        
-    def __close_peak2 (self, peak_content, peaks, min_length, chrom, colname, smoothlen=50):
+    def __close_peak2 (self, peak_content, peaks, int min_length, str chrom, str colname, int smoothlen=50):
+        cdef:
+            int summit_pos, tstart, tend, tmpindex, summit_index, summit_offset
+            int start, end, i, j
+            double summit_value, tvalue, tsummitvalue
+            np.ndarray[np.float32_t, ndim=1] w
+            np.ndarray[np.float32_t, ndim=1] peakdata
+            np.ndarray[np.float32_t, ndim=1] smoothdata
+            np.ndarray[np.int32_t, ndim=1] peakindices
+            np.ndarray[np.int32_t, ndim=1] summit_indices
+            
         # this is where the summits are called, need to fix this
-        end, start = peak_content[ -1 ][ 1 ], peak_content[ 0 ][ 0 ]
-        if end - start < min_length: return # if the peak is too small, reject it
-        #for (start,end,value,summitvalue,index) in peak_content:
+        end = peak_content[ -1 ][ 1 ]
+        start = peak_content[ 0 ][ 0 ]
+        peak_length = end - start
+        if end - start < min_length: return # if the region is too small, reject it
+
         peakdata = np.zeros(end - start, dtype='float32')
         peakindices = np.zeros(end - start, dtype='int32')
-        for (tmpstart,tmpend,tmpvalue,tmpsummitvalue, tmpindex) in peak_content:
-            i, j = tmpstart-start, tmpend-start
+        for (tstart,tend,tvalue,tsummitvalue, tmpindex) in peak_content:
+            i = tstart - start
+            j = tend - start
             peakdata[i:j] = self.data[chrom]['sample'][tmpindex]
             peakindices[i:j] = tmpindex
-        # apply smoothing window of tsize / 2
-        w = np.ones(smoothlen, dtype='float32')
-        smoothdata = np_convolve(w/w.sum(), peakdata, mode='same')
-        # find maxima and minima
-        local_extrema = np.where(np.diff(np.sign(np.diff(smoothdata))))[0]+1
-        # get only maxima by requiring it be greater than the mean
-        # might be better to take another derivative instead
-        plateau_offsets = np.intersect1d(local_extrema,
-                                         np.where(peakdata>peakdata.mean())[0])
-        # sometimes peak summits are plateaus, so check for adjacent coordinates
-        # and take the middle ones if needed
-        if len(plateau_offsets)==0:
-        #####################################################################
-        # ***failsafe if no summits so far***                               #
-            summit_offset_groups = [[(end - start) / 2]]                    #
-        ##################################################################### 
-        elif len(plateau_offsets) == 1:
-            summit_offset_groups = [[plateau_offsets[0]]]
-        else:
-            previous_offset = plateau_offsets[0]
-            summit_offset_groups = [[previous_offset]]
-            for offset in plateau_offsets:
-                if offset == previous_offset + 1:
-                    summit_offset_groups[-1].append(offset)
-                else:
-                    summit_offset_groups.append([offset])
-        summit_offsets = []
-        for offset_group in summit_offset_groups:
-            summit_offsets.append(offset_group[len(offset_group) / 2])
+        # apply smoothing window of smoothlen
+        w = np.ones(smoothlen, dtype='float32') / smoothlen
+        smoothdata = np_convolve(w, peakdata, mode='same')
+        summit_offsets = find_maxima(smoothdata, min_length)
+        # ***failsafe if no summits so far*** #
+        if summit_offsets.shape[0] == 0:
+            summit_offsets = np.asarray([peak_length / 2], dtype='int32')
         summit_indices = peakindices[summit_offsets]
-        # also purge offsets that have the same summit_index
-        unique_offsets = []
-        summit_offsets = np.fromiter(summit_offsets, dtype='int32')
-        for index in np.unique(summit_indices):
-            those_index_indices = np.where(summit_indices == index)[0]
-            those_offsets = summit_offsets[those_index_indices]
-            unique_offsets.append(int(those_offsets.mean()))
+        # this case shouldn't occur anymore because we've disallowed plateaus
+        # purge offsets that have the same summit_index
+#        unique_offsets = []
+#        for index in np.unique(summit_indices):
+#            those_index_indices = np.where(summit_indices == index)[0]
+#            those_offsets = summit_offsets[those_index_indices]
+#            unique_offsets.append(int(those_offsets.mean()))
+           
+        ## DISABLE PEAKSPLITTER BEHAVIOR FOR NOW ##
+        # I think requiring spatial consistency is better than requiring valleys
+        
         # also require a valley of at least 0.6 * taller peak
         # in every adjacent two peaks or discard the lesser one
         # this behavior is like PeakSplitter
-        better_offsets = []
-        previous_offset = unique_offsets.pop()
-        while True:
-            if len(unique_offsets) == 0:
-                better_offsets.append(previous_offset)
-                break
-            else:
-                this_offset = unique_offsets.pop()
-                this_h, prev_h = peakdata[[this_offset, previous_offset]]
-                if this_h > prev_h:
-                    prev_is_taller = False
-                    min_valley = 0.6 * this_h
-                else:
-                    prev_is_taller = True
-                    min_valley = 0.6 * prev_h
-                s = slice(this_offset, previous_offset)
-                valley = np.where(peakdata[s] < min_valley)[0]
-                if len(valley) > 0: better_offsets.append(previous_offset)
-                else:
-                    if prev_is_taller: continue # discard this peak
-                    # else: discard previous peak by ignoring it
-                previous_offset = this_offset
-        better_offsets.reverse()
-        better_indices = peakindices[better_offsets]
-        assert len(better_offsets) > 0, "Lost peak summit(s) near %s %d" % (chrom, start) 
-        for summit_offset, summit_index in zip(better_offsets, better_indices):
+#        better_offsets = []
+#        previous_offset = unique_offsets.pop()
+#        while True:
+#            if len(unique_offsets) == 0:
+#                better_offsets.append(previous_offset)
+#                break
+#            else:
+#                this_offset = unique_offsets.pop()
+#                this_h, prev_h = peakdata[[this_offset, previous_offset]]
+#                if this_h > prev_h:
+#                    prev_is_taller = False
+#                    min_valley = 0.6 * this_h
+#                else:
+#                    prev_is_taller = True
+#                    min_valley = 0.6 * prev_h
+#                s = slice(this_offset, previous_offset)
+#                valley = np.where(peakdata[s] < min_valley)[0]
+#                if len(valley) > 0: better_offsets.append(previous_offset)
+#                else:
+#                    if prev_is_taller: continue # discard this peak
+#                    # else: discard previous peak by ignoring it
+#                previous_offset = this_offset
+#        better_offsets.reverse()
+#        better_indices = peakindices[better_offsets]
+#        assert len(better_offsets) > 0, "Lost peak summit(s) near %s %d" % (chrom, start) 
+#        for summit_offset, summit_index in zip(better_offsets, better_indices):
+        for summit_offset, summit_index in zip(summit_offsets, summit_indices):
             peaks.add( chrom,
                        start,
                        end,
@@ -1001,6 +998,102 @@ class CombinedTwoTrack:
         v2add(cur_region[4])
         return ret
 
+cdef find_maxima(np.ndarray[np.float32_t, ndim=1] smoothdata, int min_length):
+    cdef:
+        float peaksplit_p = 0.6
+        int pos = 0
+        int n_subpeak = 0
+        bool direction = (smoothdata[1] > smoothdata[0])
+        bool new_direction
+        int dir_i = 1 # how long we're increasing / decreasing
+        int plateau_i = 0
+        int last_peak_pos = -1
+        float last_peak_value = 0.0 
+        int last_peak_i = 0
+        int this_peak_pos
+        float this_peak_value
+        
+        int half_l = min_length / 2
+        int quarter_l = min_length / 4
+        np.ndarray[np.int32_t, ndim=1] ret = np.zeros(smoothdata.shape[0], 'int32')
+        int rsize = ret.shape[0]
+        
+    for pos in range(1, smoothdata.shape[0] - 1):
+        # find new_direction
+        if smoothdata[pos + 1] > smoothdata[pos]:
+            new_direction = True
+        elif smoothdata[pos + 1] < smoothdata[pos]:
+            new_direction = False
+        else:
+            # we're on a plateau
+            # new_direction = direction
+            plateau_i += 1
+            if plateau_i > half_l: # don't allow very long plateaus
+                dir_i = 0
+                last_peak_pos = -1
+            continue
+            
+        if direction == new_direction:
+            # discard plateau, this was a saddle point
+            plateau_i = 0
+            # we're still increasing/decreasing
+            dir_i += 1
+            continue
+        
+        elif (not direction) and new_direction:
+            this_peak_pos = pos - plateau_i / 2
+            # minimum (decreasing to increasing)
+            if not last_peak_pos == -1:
+                # both sides > quarter_l
+                if last_peak_i >= quarter_l and dir_i >= quarter_l:
+                    # save this peak
+                    ret[n_subpeak] = last_peak_pos
+                    last_peak_pos = -1
+                    n_subpeak += 1
+                elif last_peak_i < quarter_l and dir_i >= quarter_l:
+                    # discard this peak
+                    last_peak_pos = -1
+                elif smoothdata[this_peak_pos] > peaksplit_p * last_peak_value:
+                    # just keep going
+                    plateau_i = 0
+                    dir_i += 1
+                    continue
+                else:
+                    # discard last peak
+                    last_peak_pos = -1
+                
+            direction = new_direction   # change direction
+            plateau_i = 0               # minimal plateaus are not interesting
+            dir_i = 0
+        else:
+            # maximum (increasing to decreasing)
+            # maxima plateaus need to be centered
+            this_peak_pos = pos - plateau_i / 2
+            this_peak_value = smoothdata[this_peak_pos]
+            if last_peak_pos == -1:
+                last_peak_pos = this_peak_pos
+                last_peak_i = dir_i
+                last_peak_value = this_peak_value
+            elif this_peak_value > last_peak_value:
+                last_peak_i += dir_i
+                last_peak_pos = this_peak_pos
+                last_peak_value = this_peak_value
+            else:
+                dir_i += 1
+                plateau_i = 0
+                continue
+                        
+            plateau_i = 0              # reset plateau_i
+            direction = new_direction  # change direction
+            dir_i = 0                  # reset dir_i
+            
+    if dir_i >= quarter_l:
+        if not last_peak_pos == -1:
+            ret[n_subpeak] = last_peak_pos
+            n_subpeak += 1
+    ret.resize(n_subpeak, refcheck = False)
+    return ret
+
 cdef class scoreTrackII:
     """Class for scoreGraph type data. Modified from scoreTrackI. The
     difference is that we store a single score data, not
@@ -1014,15 +1107,17 @@ cdef class scoreTrackII:
     """
     cdef:
         dict data                       # dictionary for data of each chromosome
+        dict data_stderr                # dictionary for data stderr for each chromosome
         dict datalength                 # length of data array of each chromosome
         bool trackline                  # whether trackline should be saved in bedGraph
+        bool stderr_on                  # whether to calculate stderr
         double treat_edm                 # seq depth in million of treatment
         double ctrl_edm                  # seq depth in million of control
         char scoring_method              # method for calculating scores.
         char normalization_method        # scale to control? scale to treatment? both scale to 1million reads?
 
     
-    def __init__ (self, float treat_depth, float ctrl_depth ):
+    def __init__ (self, float treat_depth, float ctrl_depth, bool stderr_on = False ):
         """Initialize.
 
         effective_depth_in_million: sequencing depth in million after
@@ -1042,6 +1137,7 @@ cdef class scoreTrackII:
                                  # p/q-value/likelihood
                                  # ratio/fold-enrichment/substraction
                                  # depending on -c setting)
+        self.stderr_on = stderr_on
         self.datalength = {}
         self.trackline = False
         self.treat_edm = treat_depth
@@ -1073,7 +1169,7 @@ cdef class scoreTrackII:
         
         """
         if not self.data.has_key(chrom):
-            self.data[chrom] = np.zeros( ( chrom_max_len, 4 ), dtype="int32" ) # remember col #2-4 is actual value * 100, I use integar here.
+            self.data[chrom] = np.zeros( ( chrom_max_len, 4 ), dtype="int32" ) # remember col #2-4 is actual value * 100, I use integer here.
             self.datalength[chrom] = 0
 
     cpdef add (self, str chromosome, int endpos, int sample, int control):
@@ -1483,7 +1579,7 @@ cdef class scoreTrackII:
         #if call_summits: close_peak = self.__close_peak2
         #else:
         # temporarily not use subpeak method
-        close_peak = self.__close_peak
+        #close_peak = self.__close_peak
         
         for chrom in chrs:
             peak_content = []           # to store points above cutoff
@@ -1516,14 +1612,14 @@ cdef class scoreTrackII:
                     peak_content.append( (above_cutoff_startpos[i], above_cutoff_endpos[i], above_cutoff_v[i], above_cutoff_sv[i], above_cutoff[i]) )
                 else:
                     # close
-                    close_peak(peak_content, peaks, min_length, chrom, colname, smoothlen=max_gap/2 )
+                    self.close_peak(peak_content, peaks, min_length, chrom, colname, smoothlen=max_gap/2 )
                     peak_content = [(above_cutoff_startpos[i], above_cutoff_endpos[i], above_cutoff_v[i], above_cutoff_sv[i], above_cutoff[i]),]
             
             # save the last peak
             if not peak_content:
                 continue
             else:
-                close_peak(peak_content, peaks, min_length, chrom, colname, smoothlen=max_gap/2 )
+                self.close_peak(peak_content, peaks, min_length, chrom, colname, smoothlen=max_gap/2 )
 
         return peaks
        
@@ -1769,5 +1865,4 @@ cdef class scoreTrackII:
         for chrom in self.data.keys():
             t += self.datalength[chrom]
         return t
-
 
