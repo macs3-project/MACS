@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# Time-stamp: <2012-05-08 21:49:57 Tao Liu>
+# Time-stamp: <2012-05-10 11:31:55 Tao Liu>
 
 import os
 import sys
@@ -24,7 +24,7 @@ class Test_ScoreTrackII(unittest.TestCase):
         self.p_result = [6327, 38, 7, 0, 709]
         self.q_result = [6095, 0, 0, 0 ,581]
         self.l_result = [5720, 0, -39, -379, 436]
-        self.f_result = [1000, 100, 75, 25, 400]
+        self.f_result = [918, 100, 76, 28, 350] # note, pseudo count 1 would be introduced.
         self.d_result = [9000, 0, -500, -1500, 1500]
         self.m_result = [1000, 100, 150, 50, 200]
         # for norm
@@ -65,6 +65,17 @@ chrY	10	60	0.38
 chrY	60	110	0.07
 chrY	110	160	0.00
 chrY	160	210	7.09
+"""
+        # for peak calls
+        self.peak1 = """chrY	0	60	peak_1	63.27
+chrY	160	210	peak_2	7.09
+"""
+        self.summit1 = """chrY	5	6	peak_1	63.27
+chrY	185	186	peak_2	7.09
+"""
+        self.xls1    ="""chr	start	end	length	abs_summit	pileup	-log10(pvalue)	fold_enrichment	-log10(qvalue)	name
+chrY	1	60	60	6	100.00	63.27	9.18	-1.00	MACS_peak_1
+chrY	161	210	50	186	20.00	7.09	3.50	-1.00	MACS_peak_2
 """
         
     def assertEqual_float ( self, a, b, roundn = 5 ):
@@ -139,7 +150,27 @@ chrY	160	210	7.09
         strio = StringIO.StringIO()        
         s1.write_bedGraph( strio, "NAME", "DESC", 3 )
         self.assertEqual( strio.getvalue(), self.bdg3 )
-        
+
+    def test_callpeak ( self ):
+        s1 = scoreTrackII( self.treat_edm, self.ctrl_edm )
+        s1.add_chromosome( "chrY", 5 )
+        for a in self.test_regions1:
+            s1.add( a[0],a[1],a[2],a[3] )
+
+        s1.change_score_method( ord('p') )
+        p = s1.call_peaks( cutoff = 10, min_length=10, max_gap=10 )
+        strio = StringIO.StringIO()
+        p.write_to_bed( strio, trackline = False )
+        self.assertEqual( strio.getvalue(), self.peak1 )
+
+        strio = StringIO.StringIO()
+        p.write_to_summit_bed( strio, trackline = False )
+        self.assertEqual( strio.getvalue(), self.summit1 )
+
+        strio = StringIO.StringIO()
+        p.write_to_xls( strio )
+        self.assertEqual( strio.getvalue(), self.xls1 )        
+
 
 if __name__ == '__main__':
     unittest.main()

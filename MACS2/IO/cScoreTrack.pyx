@@ -1,5 +1,5 @@
 # cython: profile=True
-# Time-stamp: <2012-05-10 03:18:25 Tao Liu>
+# Time-stamp: <2012-05-10 19:05:19 Tao Liu>
 
 """Module for Feature IO classes.
 
@@ -243,7 +243,7 @@ class scoreTrackI:
             raise Exception( "%s not supported!" % colname )
 
         if colname in [ '-100logp', '-100logq', '100logLR' ]:
-            scale_factor = 0.1              # for pvalue or qvalue, divide them by 100 while writing to bedGraph file
+            scale_factor = 0.01              # for pvalue or qvalue, divide them by 100 while writing to bedGraph file
         elif colname in [ 'sample', 'control' ]:
             if do_SPMR:
                 logging.info( "MACS will save SPMR for fragment pileup using effective depth of %.2f million" % self.effective_depth_in_million )
@@ -1534,7 +1534,7 @@ cdef class scoreTrackII:
         for chrom in chrs:
             d = self.data[ chrom ]
             pos = d[ :, 0 ]
-            value = d[ :, 3 ]
+            value = d[ :, column ]
             l = self.datalength[ chrom ]
             pre = 0
             if d.shape[ 0 ] == 0: continue # skip if there's no data
@@ -1562,7 +1562,7 @@ cdef class scoreTrackII:
         max_gap. After this, peak is reported if its length is above
         min_length.
 
-        cutoff:  cutoff of value, default 1.
+        cutoff:  cutoff of value, default 500. Note, the values stored in this class are actual value * 100, so 500 means 5.
         min_length :  minimum peak length, default 200.
         gap   :  maximum gap to merge nearby peaks, default 50.
         ptrack:  an optional track for pileup heights. If it's not None, use it to find summits. Otherwise, use self/scoreTrack.
@@ -1612,14 +1612,14 @@ cdef class scoreTrackII:
                     peak_content.append( (above_cutoff_startpos[i], above_cutoff_endpos[i], above_cutoff_v[i], above_cutoff_sv[i], above_cutoff[i]) )
                 else:
                     # close
-                    self.close_peak(peak_content, peaks, min_length, chrom, colname, smoothlen=max_gap/2 )
+                    self.__close_peak(peak_content, peaks, min_length, chrom, max_gap/2 )
                     peak_content = [(above_cutoff_startpos[i], above_cutoff_endpos[i], above_cutoff_v[i], above_cutoff_sv[i], above_cutoff[i]),]
             
             # save the last peak
             if not peak_content:
                 continue
             else:
-                self.close_peak(peak_content, peaks, min_length, chrom, colname, smoothlen=max_gap/2 )
+                self.__close_peak(peak_content, peaks, min_length, chrom, max_gap/2 )
 
         return peaks
        
@@ -1713,7 +1713,7 @@ cdef class scoreTrackII:
     #     # start a new peak
     #     return True
 
-    cdef __close_peak (self, list peak_content, peaks, int min_length, str chrom, str colname, int smoothlen=0):
+    cdef __close_peak (self, list peak_content, peaks, int min_length, str chrom, int smoothlen=0):
         """Close the peak region, output peak boundaries, peak summit
         and scores, then add the peak to peakIO object.
 
@@ -1749,14 +1749,14 @@ cdef class scoreTrackII:
             else:
                 # if q value is not computed, use -1
                 qscore = -1
-            
+
             peaks.add( chrom,
                        peak_content[0][0],
                        peak_content[-1][1],
                        summit      = summit_pos,
-                       peak_score  = self.data[chrom][colname][ summit_index ],
-                       pileup      = self.data[chrom][ summit_index, 1 ], # should be the same as summit_value
-                       pscore      = get_pscore(self.data[chrom][ summit_index, 1 ], self.data[chrom][ summit_index, 2 ] ) /100.0,
+                       peak_score  = self.data[chrom][ summit_index, 3 ] / 100.0,
+                       pileup      = self.data[chrom][ summit_index, 1 ] / 100.0, # should be the same as summit_value
+                       pscore      = get_pscore(self.data[chrom][ summit_index, 1 ] / 100, self.data[chrom][ summit_index, 2 ] / 100.0 ) /100.0,
                        fold_change = float ( self.data[chrom][ summit_index, 1 ] + 100 ) / ( self.data[chrom][ summit_index, 2 ] + 100 ),
                        qscore      = qscore,
                        )
