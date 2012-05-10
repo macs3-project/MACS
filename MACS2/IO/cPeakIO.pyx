@@ -1,5 +1,5 @@
 # cython: profile=True
-# Time-stamp: <2012-04-29 17:27:17 Tao Liu>
+# Time-stamp: <2012-05-10 11:21:06 Tao Liu>
 
 """Module for PeakIO IO classes.
 
@@ -260,7 +260,7 @@ class PeakIO:
         """
         return self._to_summits_bed(name_prefix=name_prefix, name=name,
                                     description=description, score_column=score_column,
-                            print_func=fhd.write, trackline=trackline)
+                                    print_func=fhd.write, trackline=trackline)
 
     def write_to_narrowPeak (self, fhd, name_prefix="peak_", name="peak", score_column="score", trackline=True):
         """Print out peaks in narrowPeak format.
@@ -336,6 +336,51 @@ class PeakIO:
                            %
                            (chrom,peak["start"],peak["end"],peakprefix,n_peak,int(10*peak[score_column]),
                             peak["fc"],peak["pscore"],peak["qscore"],peak["summit"]-peak["start"]) )
+
+    def write_to_xls (self, ofhd, name_prefix="%s_peak_", name="MACS"):
+        """Save the peak results in a tab-delimited plain text file
+        with suffix .xls.
+        
+        """
+        write = ofhd.write
+        write("\t".join(("chr","start", "end",  "length",  "abs_summit", "pileup", "-log10(pvalue)", "fold_enrichment", "-log10(qvalue)", "name"))+"\n")
+        
+        try: peakprefix = name_prefix % name
+        except: peakprefix = name_prefix
+
+        peaks = self.peaks
+        chrs = peaks.keys()
+        chrs.sort()
+        n_peak = 0
+        for chrom in chrs:
+            for end, group in groupby(peaks[chrom], key=itemgetter("end")):
+                n_peak += 1
+                these_peaks = list(group)
+                if len(these_peaks) > 1:
+                    for i, peak in enumerate(these_peaks):
+                        peakname = "%s%d%s" % (peakprefix, n_peak, subpeak_letters(i))
+                        #[start,end,end-start,summit,peak_height,number_tags,pvalue,fold_change,qvalue]
+                        write("%s\t%d\t%d\t%d" % (chrom,peak["start"]+1,peak["end"],peak["length"]))
+                        write("\t%d" % (peak["summit"]+1)) # summit position
+                        write("\t%.2f" % (peak["pileup"])) # pileup height at summit
+                        write("\t%.2f" % (peak["pscore"])) # -log10pvalue at summit
+                        write("\t%.2f" % (peak["fc"])) # fold change at summit                
+                        write("\t%.2f" % (peak["qscore"])) # -log10qvalue at summit
+                        write("\t%s" % peakname)
+                        write("\n")
+                else:
+                    peak = these_peaks[0]
+                    peakname = "%s%d" % (peakprefix, n_peak)
+                    #[start,end,end-start,summit,peak_height,number_tags,pvalue,fold_change,qvalue]
+                    write("%s\t%d\t%d\t%d" % (chrom,peak["start"]+1,peak["end"],peak["length"]))
+                    write("\t%d" % (peak["summit"]+1)) # summit position
+                    write("\t%.2f" % (peak["pileup"])) # pileup height at summit
+                    write("\t%.2f" % (peak["pscore"])) # -log10pvalue at summit
+                    write("\t%.2f" % (peak["fc"])) # fold change at summit                
+                    write("\t%.2f" % (peak["qscore"])) # -log10qvalue at summit
+                    write("\t%s" % peakname)
+                    write("\n")
+        return
 
 
     def overlap_with_other_peaks (self, peaks2, double cover=0):
