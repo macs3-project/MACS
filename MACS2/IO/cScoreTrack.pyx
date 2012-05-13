@@ -25,7 +25,8 @@ from array import array as pyarray
 
 from cpython cimport bool
 #from scipy.signal import fftconvolve
-np_convolve = np.convolve
+from MACS2.cSignal import maxima, enforce_valleys
+#np_convolve = np.convolve
 
 from libc.math cimport log10,log
 
@@ -375,7 +376,7 @@ class scoreTrackI:
         return True
 
     def call_peaks (self, int cutoff=500, int min_length=200, int max_gap=50, str colname='-100logp',
-                    bool call_summits=False):
+                    bool call_summits=False, int smoothlen=51):
         """This function try to find regions within which, scores
         are continuously higher than a given cutoff.
 
@@ -428,7 +429,7 @@ class scoreTrackI:
                     peak_content.append( (above_cutoff_startpos[i], above_cutoff_endpos[i], above_cutoff_v[i], above_cutoff_sv[i], above_cutoff[i]) )
                 else:
                     # close
-                    close_peak(peak_content, peaks, min_length, chrom, colname, smoothlen=max_gap/2 )
+                    close_peak(peak_content, peaks, min_length, chrom, colname, smoothlen=smoothlen )
                     peak_content = [(above_cutoff_startpos[i], above_cutoff_endpos[i], above_cutoff_v[i], above_cutoff_sv[i], above_cutoff[i]),]
             
             # save the last peak
@@ -440,16 +441,15 @@ class scoreTrackI:
 
         return peaks
        
-    def __close_peak2 (self, peak_content, peaks, int min_length, str chrom, str colname, int smoothlen=50):
+    def __close_peak2 (self, peak_content, peaks, int min_length, str chrom, str colname, int smoothlen=51,
+                       float min_valley = 0.8):
         cdef:
             int summit_pos, tstart, tend, tmpindex, summit_index, summit_offset
             int start, end, i, j
             double summit_value, tvalue, tsummitvalue
-            np.ndarray[np.float32_t, ndim=1] w
+#            np.ndarray[np.float32_t, ndim=1] w
             np.ndarray[np.float32_t, ndim=1] peakdata
-            np.ndarray[np.float32_t, ndim=1] smoothdata
-            np.ndarray[np.int32_t, ndim=1] peakindices
-            np.ndarray[np.int32_t, ndim=1] summit_indices
+            np.ndarray[np.int32_t, ndim=1] peakindices, valid_summit_indices, summit_offsets, valid_summit_offsets
             
         # this is where the summits are called, need to fix this
         end = peak_content[ -1 ][ 1 ]
@@ -465,13 +465,17 @@ class scoreTrackI:
             peakdata[i:j] = self.data[chrom]['sample'][tmpindex]
             peakindices[i:j] = tmpindex
         # apply smoothing window of smoothlen
-        w = np.ones(smoothlen, dtype='float32') / smoothlen
-        smoothdata = np_convolve(w, peakdata, mode='same')
-        summit_offsets = find_maxima(smoothdata, min_length)
+#        w = np.ones(smoothlen, dtype='float32') / smoothlen
+#        if smoothlen > 0:
+#            smoothdata = np_convolve(w, peakdata, mode='same')
+#        else:
+#            smoothdata = peakdata.copy()
+        summit_offsets = maxima(peakdata, smoothlen)
         # ***failsafe if no summits so far*** #
         if summit_offsets.shape[0] == 0:
             summit_offsets = np.asarray([peak_length / 2], dtype='int32')
-        summit_indices = peakindices[summit_offsets]
+        valid_summit_offsets = enforce_valleys(peakdata, summit_offsets, min_valley = min_valley)
+        valid_summit_indices = peakindices[valid_summit_offsets]
         # this case shouldn't occur anymore because we've disallowed plateaus
         # purge offsets that have the same summit_index
 #        unique_offsets = []
@@ -512,7 +516,7 @@ class scoreTrackI:
 #        better_indices = peakindices[better_offsets]
 #        assert len(better_offsets) > 0, "Lost peak summit(s) near %s %d" % (chrom, start) 
 #        for summit_offset, summit_index in zip(better_offsets, better_indices):
-        for summit_offset, summit_index in zip(summit_offsets, summit_indices):
+        for summit_offset, summit_index in zip(valid_summit_offsets, valid_summit_indices):
             peaks.add( chrom,
                        start,
                        end,
@@ -998,101 +1002,95 @@ class CombinedTwoTrack:
         v2add(cur_region[4])
         return ret
 
-cdef find_maxima(np.ndarray[np.float32_t, ndim=1] smoothdata, int min_length):
-    cdef:
-        float peaksplit_p = 0.6
-        int pos = 0
-        int n_subpeak = 0
-        bool direction = (smoothdata[1] > smoothdata[0])
-        bool new_direction
-        int dir_i = 1 # how long we're increasing / decreasing
-        int plateau_i = 0
-        int last_peak_pos = -1
-        float last_peak_value = 0.0 
-        int last_peak_i = 0
-        int this_peak_pos
-        float this_peak_value
-        
-        int half_l = min_length / 2
-        int quarter_l = min_length / 4
-        np.ndarray[np.int32_t, ndim=1] ret = np.zeros(smoothdata.shape[0], 'int32')
-        int rsize = ret.shape[0]
-        
-    for pos in range(1, smoothdata.shape[0] - 1):
-        # find new_direction
-        if smoothdata[pos + 1] > smoothdata[pos]:
-            new_direction = True
-        elif smoothdata[pos + 1] < smoothdata[pos]:
-            new_direction = False
-        else:
-            # we're on a plateau
-            # new_direction = direction
-            plateau_i += 1
-            if plateau_i > half_l: # don't allow very long plateaus
-                dir_i = 0
-                last_peak_pos = -1
-            continue
-            
-        if direction == new_direction:
-            # discard plateau, this was a saddle point
-            plateau_i = 0
-            # we're still increasing/decreasing
-            dir_i += 1
-            continue
-        
-        elif (not direction) and new_direction:
-            this_peak_pos = pos - plateau_i / 2
-            # minimum (decreasing to increasing)
-            if not last_peak_pos == -1:
-                # both sides > quarter_l
-                if last_peak_i >= quarter_l and dir_i >= quarter_l:
-                    # save this peak
-                    ret[n_subpeak] = last_peak_pos
-                    last_peak_pos = -1
-                    n_subpeak += 1
-                elif last_peak_i < quarter_l and dir_i >= quarter_l:
-                    # discard this peak
-                    last_peak_pos = -1
-                elif smoothdata[this_peak_pos] > peaksplit_p * last_peak_value:
-                    # just keep going
-                    plateau_i = 0
-                    dir_i += 1
-                    continue
-                else:
-                    # discard last peak
-                    last_peak_pos = -1
-                
-            direction = new_direction   # change direction
-            plateau_i = 0               # minimal plateaus are not interesting
-            dir_i = 0
-        else:
-            # maximum (increasing to decreasing)
-            # maxima plateaus need to be centered
-            this_peak_pos = pos - plateau_i / 2
-            this_peak_value = smoothdata[this_peak_pos]
-            if last_peak_pos == -1:
-                last_peak_pos = this_peak_pos
-                last_peak_i = dir_i
-                last_peak_value = this_peak_value
-            elif this_peak_value > last_peak_value:
-                last_peak_i += dir_i
-                last_peak_pos = this_peak_pos
-                last_peak_value = this_peak_value
-            else:
-                dir_i += 1
-                plateau_i = 0
-                continue
-                        
-            plateau_i = 0              # reset plateau_i
-            direction = new_direction  # change direction
-            dir_i = 0                  # reset dir_i
-            
-    if dir_i >= quarter_l:
-        if not last_peak_pos == -1:
-            ret[n_subpeak] = last_peak_pos
-            n_subpeak += 1
-    ret.resize(n_subpeak, refcheck = False)
-    return ret
+#cdef find_maxima(np.ndarray[np.float32_t, ndim=1] smoothdata, int min_length):
+#    cdef:
+#        float peaksplit_p = 0.6
+#        int pos, this_peak_pos
+#        int n_subpeak = 0
+#        bool going_up = True
+#        bool direction = (smoothdata[1] > smoothdata[0])
+#        bool new_direction
+#        int fw_i, rev_i  # how long we're going the right/wrong direction
+#        int plateau_i = 0
+#        int last_peak_pos = -1
+#        float last_peak_value, this_peak_value
+#        int last_peak_i = 0
+#        int half_l = min_length / 2
+#        int quarter_l = min_length / 4
+#        np.ndarray[np.int32_t, ndim=1] ret = np.zeros(smoothdata.shape[0], 'int32')
+#        int rsize = ret.shape[0]
+#        
+#    for pos in range(1, smoothdata.shape[0] - 1):
+#        # find new_direction
+#        if smoothdata[pos + 1] > smoothdata[pos]:
+#            new_direction = True
+#        elif smoothdata[pos + 1] < smoothdata[pos]:
+#            new_direction = False
+#        else: # unlikely for floats
+#            # we're on a plateau
+#            plateau_i += 1
+#            if plateau_i > half_l: # don't allow very long plateaus
+#                fw_i = 0
+#                rev_i = 0
+#                last_peak_pos = -1
+#            continue
+#       
+#        # increment fw/rev counter
+#        if direction == going_up:
+#            fw_i += 1
+#        else:
+#            rev_i += 1
+#       
+#        # decide if we're still going up or down 
+#        if rev_i > fw_i:
+#            last_peak_pos = -1
+#            fw_i = rev_i
+#            rev_i = 0
+##            print 'reversed at %d' % pos
+#            going_up = not going_up
+#                
+#        if (not direction) and new_direction: # decreasing -> increasing
+#            direction = new_direction
+#            # minimum (decreasing to increasing)
+#            if not going_up and not last_peak_pos == -1:               
+#                if fw_i >= quarter_l:                # right side long enough                
+#                    # try calling a peak
+#                    if last_peak_i >= quarter_l:       # left side long enough
+#                        # save this peak
+#                        ret[n_subpeak] = last_peak_pos
+#                        last_peak_pos = -1
+#                        n_subpeak += 1
+#                        fw_i = 0
+#                        rev_i = 0
+#                        going_up = True
+#                    else:                             # left side too short
+#                        last_peak_pos = -1            # discard this peak
+#        elif direction and (not new_direction):   # increasing -> decreasing
+#            direction = new_direction
+#            # maxima plateaus need to be centered
+#            this_peak_pos = pos - plateau_i / 2
+#            plateau_i = 0
+#            # maximum (increasing to decreasing)
+#            if not going_up:
+#                continue
+#            this_peak_value = smoothdata[this_peak_pos]
+#            if last_peak_pos == -1 or this_peak_value > last_peak_value:
+#                if last_peak_pos == -1: last_peak_i = fw_i
+#                else: last_peak_i += fw_i
+#                last_peak_pos = this_peak_pos
+#                last_peak_value = this_peak_value
+#                fw_i = 0
+#                rev_i = 0
+#                going_up = False
+#            else: # this is not a peak at all
+#                continue
+#        plateau_i = 0
+#            
+#    if not going_up and fw_i >= quarter_l and not last_peak_pos == -1:
+#            ret[n_subpeak] = last_peak_pos
+#            n_subpeak += 1
+#    ret.resize(n_subpeak, refcheck = False)
+#    return ret
 
 cdef class scoreTrackII:
     """Class for scoreGraph type data. Modified from scoreTrackI. The
