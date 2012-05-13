@@ -1,5 +1,5 @@
 # cython: profile=True
-# Time-stamp: <2012-05-08 21:44:03 Tao Liu>
+# Time-stamp: <2012-05-10 19:05:19 Tao Liu>
 
 """Module for Feature IO classes.
 
@@ -105,15 +105,15 @@ cdef int logLR ( double x, double y ):
         logLR_khashtable.set_item(key_value, s)
         return s
 
-cdef float foldenrichment ( float x, float y ):
+cdef int get_foldenrichment ( float x, float y ):
     """ return fold enrichment with +1 pseudocount.
     """
-    return (x+1)/(y+1)
+    return int( (x+1)/(y+1) )
 
-cdef float substraction ( float x, float y):
+cdef int get_substraction ( float x, float y):
     """ return substraction.
     """
-    return x - y
+    return int( x - y )
 
 # ------------------------------------
 # Classes
@@ -244,7 +244,7 @@ class scoreTrackI:
             raise Exception( "%s not supported!" % colname )
 
         if colname in [ '-100logp', '-100logq', '100logLR' ]:
-            scale_factor = 0.1              # for pvalue or qvalue, divide them by 100 while writing to bedGraph file
+            scale_factor = 0.01              # for pvalue or qvalue, divide them by 100 while writing to bedGraph file
         elif colname in [ 'sample', 'control' ]:
             if do_SPMR:
                 logging.info( "MACS will save SPMR for fragment pileup using effective depth of %.2f million" % self.effective_depth_in_million )
@@ -1452,6 +1452,7 @@ cdef class scoreTrackII:
             l = self.datalength[chrom]
             for i in range(l):
                 d[ i, 3 ] =  logLR( d[ i, 1]/100.0, d[ i, 2]/100.0 )
+        self.scoring_method = 'l'
         return 
 
     cdef compute_foldenrichment ( self ):
@@ -1463,8 +1464,10 @@ cdef class scoreTrackII:
             d = self.data[chrom]
             l = self.datalength[chrom]
             for i in range(l):
-                d[ i, 3 ] =  int ( 100 * d[ i, 1] / d[ i, 2]  )
-        self.scoring_method = 'l'
+                #d[ i, 3] = get_foldenrichment ( 100.0 * d[ i, 1], d[ i, 2] ):
+                # add pseudo count 1 = 100 in the #2 and #3 column
+                d[ i, 3 ] =  int ( 100.0 * (d[ i, 1] + 100) / (d[ i, 2] + 100)  )
+        self.scoring_method = 'f'
         return
 
     cdef compute_substraction ( self ):
@@ -1515,6 +1518,7 @@ cdef class scoreTrackII:
             int l, pre, i, p 
             float pre_v, v
             float scale = 100.0
+            np.ndarray d, pos, value
 
         assert column in range( 1, 4 ), "column should be between 1, 2 or 3."
         
@@ -1527,87 +1531,95 @@ cdef class scoreTrackII:
         chrs = self.get_chr_names()
         for chrom in chrs:
             d = self.data[ chrom ]
+            pos = d[ :, 0 ]
+            value = d[ :, column ]
             l = self.datalength[ chrom ]
             pre = 0
             if d.shape[ 0 ] == 0: continue # skip if there's no data
-            pre_v = d[ 0, column ] / scale
+            pre_v = value[ 0 ] / scale
             for i in range( 1, l ):
-                v = d[ i, column ] / scale
-                p = d[ i-1, 0 ]
+                v = value[ i ] / scale
+                p = pos[ i-1 ]
                 if pre_v != v: 
                     write( "%s\t%d\t%d\t%.2f\n" % ( chrom, pre, p, pre_v ) )
                     pre_v = v
                     pre = p
-            p = d[ -1, 0 ]
+            p = pos[ -1 ]
             # last one
             write( "%s\t%d\t%d\t%.2f\n" % ( chrom, pre, p, pre_v ) )
             
         return True
 
-    # def call_peaks (self, int cutoff=500, int min_length=200, int max_gap=50, str colname='-100logp',
-    #                 bool call_summits=False):
-    #     """This function try to find regions within which, scores
-    #     are continuously higher than a given cutoff.
+    cpdef call_peaks (self, int cutoff=500, int min_length=200, int max_gap=50, bool call_summits=False):
+        """This function try to find regions within which, scores
+        are continuously higher than a given cutoff.
 
-    #     This function is NOT using sliding-windows. Instead, any
-    #     regions in bedGraph above certain cutoff will be detected,
-    #     then merged if the gap between nearby two regions are below
-    #     max_gap. After this, peak is reported if its length is above
-    #     min_length.
+        This function is NOT using sliding-windows. Instead, any
+        regions in bedGraph above certain cutoff will be detected,
+        then merged if the gap between nearby two regions are below
+        max_gap. After this, peak is reported if its length is above
+        min_length.
 
-    #     cutoff:  cutoff of value, default 1.
-    #     min_length :  minimum peak length, default 200.
-    #     gap   :  maximum gap to merge nearby peaks, default 50.
-    #     colname: can be 'sample','control','-100logp','-100logq'. Cutoff will be applied to the specified column.
-    #     ptrack:  an optional track for pileup heights. If it's not None, use it to find summits. Otherwise, use self/scoreTrack.
-    #     """
-    #     cdef:
-    #         int i
-    #         str chrom
+        cutoff:  cutoff of value, default 500. Note, the values stored in this class are actual value * 100, so 500 means 5.
+        min_length :  minimum peak length, default 200.
+        gap   :  maximum gap to merge nearby peaks, default 50.
+        ptrack:  an optional track for pileup heights. If it's not None, use it to find summits. Otherwise, use self/scoreTrack.
+        """
+        cdef:
+            int i
+            str chrom
+            np.ndarray pos, sample, control, value, above_cutoff, above_cutoff_v, above_cutoff_endpos, above_cutoff_startpos, above_cutoff_sv
+            list peak_content
         
-    #     assert (colname in [ 'sample', 'control', '-100logp', '-100logq', '100logLR' ]), "%s not supported!" % colname
+        chrs  = self.get_chr_names()
+        peaks = PeakIO()                      # dictionary to save peaks
 
-    #     chrs  = self.get_chr_names()
-    #     peaks = PeakIO()                      # dictionary to save peaks
-
-    #     if call_summits: close_peak = self.__close_peak2
-    #     else: close_peak = self.__close_peak
+        #if call_summits: close_peak = self.__close_peak2
+        #else:
+        # temporarily not use subpeak method
+        #close_peak = self.__close_peak
         
-    #     for chrom in chrs:
-    #         peak_content = []           # to store points above cutoff
+        for chrom in chrs:
+            peak_content = []           # to store points above cutoff
 
-    #         above_cutoff = np.nonzero( self.data[chrom][colname] >= cutoff )[0] # indices where score is above cutoff
-    #         above_cutoff_v = self.data[chrom][colname][above_cutoff] # scores where score is above cutoff
+            pos = self.data[chrom][ :, 0 ]
+            sample = self.data[chrom][ :, 1 ]
+            control = self.data[chrom][ :, 2 ]            
+            value = self.data[chrom][ :, 3 ]
 
-    #         above_cutoff_endpos = self.data[chrom]['pos'][above_cutoff] # end positions of regions where score is above cutoff
-    #         above_cutoff_startpos = self.data[chrom]['pos'][above_cutoff-1] # start positions of regions where score is above cutoff
-    #         above_cutoff_sv= self.data[chrom]['sample'][above_cutoff] # sample pileup height where score is above cutoff
+            above_cutoff = np.nonzero( value >= cutoff )[0] # indices where score is above cutoff
+            above_cutoff_v = value[above_cutoff] # scores where score is above cutoff
 
-    #         if above_cutoff_v.size == 0:
-    #             continue
+            above_cutoff_endpos = pos[above_cutoff] # end positions of regions where score is above cutoff
+            above_cutoff_startpos = pos[above_cutoff-1] # start positions of regions where score is above cutoff
+            above_cutoff_sv= sample[above_cutoff] # sample pileup height where score is above cutoff
 
-    #         if above_cutoff[0] == 0:
-    #             # first element > cutoff, fix the first point as 0. otherwise it would be the last item in data[chrom]['pos']
-    #             above_cutoff_startpos[0] = 0
+            if above_cutoff_v.size == 0:
+                # nothing above cutoff
+                continue
 
-    #         # first bit of region above cutoff
-    #         peak_content.append( (above_cutoff_startpos[0], above_cutoff_endpos[0], above_cutoff_v[0], above_cutoff_sv[0], above_cutoff[0]) )
-    #         for i in range( 1,above_cutoff_startpos.size ):
-    #             if above_cutoff_startpos[i] - peak_content[-1][1] <= max_gap:
-    #                 # append
-    #                 peak_content.append( (above_cutoff_startpos[i], above_cutoff_endpos[i], above_cutoff_v[i], above_cutoff_sv[i], above_cutoff[i]) )
-    #             else:
-    #                 # close
-    #                 close_peak(peak_content, peaks, min_length, chrom, colname, smoothlen=max_gap/2 )
-    #                 peak_content = [(above_cutoff_startpos[i], above_cutoff_endpos[i], above_cutoff_v[i], above_cutoff_sv[i], above_cutoff[i]),]
+            if above_cutoff[0] == 0:
+                # first element > cutoff, fix the first point as 0. otherwise it would be the last item in data[chrom]['pos']
+                above_cutoff_startpos[0] = 0
+
+            # first bit of region above cutoff
+            peak_content.append( (above_cutoff_startpos[0], above_cutoff_endpos[0], above_cutoff_v[0], above_cutoff_sv[0], above_cutoff[0]) )
+            for i in range( 1,above_cutoff_startpos.size ):
+                if above_cutoff_startpos[i] - peak_content[-1][1] <= max_gap:
+                    # append
+                    peak_content.append( (above_cutoff_startpos[i], above_cutoff_endpos[i], above_cutoff_v[i], above_cutoff_sv[i], above_cutoff[i]) )
+                else:
+                    # close
+                    self.__close_peak(peak_content, peaks, min_length, chrom, max_gap/2 )
+                    peak_content = [(above_cutoff_startpos[i], above_cutoff_endpos[i], above_cutoff_v[i], above_cutoff_sv[i], above_cutoff[i]),]
             
-    #         # save the last peak
-    #         if not peak_content:
-    #             continue
-    #         else:
-    #             close_peak(peak_content, peaks, min_length, chrom, colname, smoothlen=max_gap/2 )
+            # save the last peak
+            if not peak_content:
+                continue
+            else:
+                self.__close_peak(peak_content, peaks, min_length, chrom, max_gap/2 )
 
-    #     return peaks
+        return peaks
        
     # def __close_peak2 (self, peak_content, peaks, min_length, chrom, colname, smoothlen=50):
     #     # this is where the summits are called, need to fix this
@@ -1699,47 +1711,55 @@ cdef class scoreTrackII:
     #     # start a new peak
     #     return True
 
-    # def __close_peak (self, peak_content, peaks, int min_length, str chrom, str colname, int smoothlen=0):
-    #     """Close the peak region, output peak boundaries, peak summit
-    #     and scores, then add the peak to peakIO object.
+    cdef __close_peak (self, list peak_content, peaks, int min_length, str chrom, int smoothlen=0):
+        """Close the peak region, output peak boundaries, peak summit
+        and scores, then add the peak to peakIO object.
 
-    #     """
-    #     cdef:
-    #         int summit_pos, tstart, tend, tmpindex, summit_index, i, midindex
-    #         double summit_value, tvalue, tsummitvalue
+        peaks: a PeakIO object
 
-    #     peak_length = peak_content[ -1 ][ 1 ] - peak_content[ 0 ][ 0 ]
-    #     if peak_length >= min_length: # if the peak is too small, reject it
-    #         tsummit = []
-    #         summit_pos   = 0
-    #         summit_value = summit_pos
-    #         for i in xrange(len(peak_content)):
-    #             (tstart,tend,tvalue,tsummitvalue, tindex) = peak_content[i]
-    #             #for (tstart,tend,tvalue,tsummitvalue, tindex) in peak_content:
-    #             if not summit_value or summit_value < tsummitvalue:
-    #                 tsummit = [(tend + tstart) / 2, ]
-    #                 tsummit_index = [ tindex, ]
-    #                 summit_value = tsummitvalue
-    #             elif summit_value == tsummitvalue:
-    #                 # remember continuous summit values
-    #                 tsummit.append(int((tend + tstart) / 2))
-    #                 tsummit_index.append( tindex )
-    #         # the middle of all highest points in peak region is defined as summit
-    #         midindex = int((len(tsummit) + 1) / 2) - 1
-    #         summit_pos    = tsummit[ midindex ]
-    #         summit_index  = tsummit_index[ midindex ]
-    #         peaks.add( chrom,
-    #                    peak_content[0][0],
-    #                    peak_content[-1][1],
-    #                    summit      = summit_pos,
-    #                    peak_score  = self.data[chrom][colname][ summit_index ],
-    #                    pileup      = self.data[chrom]['sample'][ summit_index ], # should be the same as summit_value
-    #                    pscore      = self.data[chrom]['-100logp'][ summit_index ]/100.0,
-    #                    fold_change = self.data[chrom]['sample'][ summit_index ]/self.data[chrom]['control'][ summit_index ],
-    #                    qscore      = self.data[chrom]['-100logq'][ summit_index ]/100.0,
-    #                    )
-    #         # start a new peak
-    #         return True
+        """
+        cdef:
+            int summit_pos, tstart, tend, tmpindex, summit_index, i, midindex
+            double summit_value, tvalue, tsummitvalue
+
+        peak_length = peak_content[ -1 ][ 1 ] - peak_content[ 0 ][ 0 ]
+        if peak_length >= min_length: # if the peak is too small, reject it
+            tsummit = []
+            summit_pos   = 0
+            summit_value = summit_pos
+            for i in range(len(peak_content)):
+                (tstart,tend,tvalue,tsummitvalue, tindex) = peak_content[i]
+                #for (tstart,tend,tvalue,tsummitvalue, tindex) in peak_content:
+                if not summit_value or summit_value < tsummitvalue:
+                    tsummit = [(tend + tstart) / 2, ]
+                    tsummit_index = [ tindex, ]
+                    summit_value = tsummitvalue
+                elif summit_value == tsummitvalue:
+                    # remember continuous summit values
+                    tsummit.append(int((tend + tstart) / 2))
+                    tsummit_index.append( tindex )
+            # the middle of all highest points in peak region is defined as summit
+            midindex = int((len(tsummit) + 1) / 2) - 1
+            summit_pos    = tsummit[ midindex ]
+            summit_index  = tsummit_index[ midindex ]
+            if self.scoring_method == 'q':
+                qscore = self.data[chrom][ summit_index, 3 ] / 100.0
+            else:
+                # if q value is not computed, use -1
+                qscore = -1
+
+            peaks.add( chrom,
+                       peak_content[0][0],
+                       peak_content[-1][1],
+                       summit      = summit_pos,
+                       peak_score  = self.data[chrom][ summit_index, 3 ] / 100.0,
+                       pileup      = self.data[chrom][ summit_index, 1 ] / 100.0, # should be the same as summit_value
+                       pscore      = get_pscore(self.data[chrom][ summit_index, 1 ] / 100, self.data[chrom][ summit_index, 2 ] / 100.0 ) /100.0,
+                       fold_change = float ( self.data[chrom][ summit_index, 1 ] + 100 ) / ( self.data[chrom][ summit_index, 2 ] + 100 ),
+                       qscore      = qscore,
+                       )
+            # start a new peak
+            return
 
     # def call_broadpeaks (self, int lvl1_cutoff=500, int lvl2_cutoff=100,
     #                      int min_length=200, int lvl1_max_gap=50, int lvl2_max_gap=400,
