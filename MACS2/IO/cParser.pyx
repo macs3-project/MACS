@@ -933,12 +933,8 @@ class BAMPEParser(BAMParser):
                 break
             (chrid,fpos,tlen) = self.__fw_binary_parse(fread(entrylength))
             if chrid < 0: continue
-            if tlen > 0:
-                loc[0,0] = fpos
-                loc[0,1] = fpos + tlen
-            else:
-                loc[0,0] = fpos + tlen
-                loc[0,1] = fpos
+            loc[0,0] = fpos
+            loc[0,1] = fpos + tlen
             d = (d * i + abs(tlen)) / (i + 1) # keep track of avg fragment size
             i+=1
             if i == 1000000:
@@ -957,15 +953,15 @@ class BAMPEParser(BAMParser):
     def __fw_binary_parse (self, data ):
         cdef:
             int thisref, thisstart, thisend, thisstrand, tlen
-            short cigar, bwflag
+            int pos, nextpos
+            short bwflag
         
         # we skip lot of the available information in data (i.e. tag name, quality etc etc)
         if not data: return (-1, -1, 0)
 
         thisref = struct.unpack('<i', data[0:4])[0]
-        thisstart = struct.unpack('<i', data[4:8])[0]
-        (cigar, bwflag) = struct.unpack('<hh', data[12:16])
-        tlen = struct.unpack('<i', data[28:32])[0]
+        pos = struct.unpack('<i', data[4:8])[0]
+        bwflag = struct.unpack('<hh', data[12:16])[1]
         
         if bwflag & 4 or bwflag & 512 or bwflag & 1024:
             return (-1, -1, 0)       #unmapped sequence or bad sequence
@@ -979,6 +975,10 @@ class BAMPEParser(BAMParser):
             if bwflag & 128:
                 # this is not the first read in a pair
                 return (-1, -1, 0)
+            
+        nextpos = struct.unpack('<i', data[24:28])[0]
+        tlen = abs(struct.unpack('<i', data[28:32])[0])
+        thisstart = min(pos, nextpos)
                 
         # In case of paired-end we have now skipped all possible "bad" pairs
         # in case of proper pair we have skipped the rightmost one... if the leftmost pair comes
