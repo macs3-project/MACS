@@ -126,25 +126,80 @@ class PETrackI:
 
         self.__sorted = True
 
+    def get_dups(self ):
+        """return a track of only the duplicated reads
+        """
+        cdef:
+            int32_t i_chrom, n, start, end
+            np.ndarray loc = np.zeros([1,2], np.int32)
+            np.ndarray current_loc = np.zeros([1,2], np.int32)
+            uint64_t i_old, i_new
+            str k
+                
+        if not self.__sorted: self.sort()
+        
+        selfcopy = copy(self)
+        selfcopy.__locations = {}
+        selfcopy.__pointer = {}
+            
+        selfcopy.total = 0
+        chrnames = self.get_chr_names()
+        
+        for i_chrom in range(len(chrnames)): # for each chromosome
+            k = chrnames [ i_chrom ]
+            selfcopy.__locations[k] = self.__locations[k].copy()
+            selfcopy.__pointer[k] = self.__locations[k].copy()
+            i_new = 0
+            locs = selfcopy.__locations[k]
+            size = locs.shape[0]
+            if size < 1:
+                new_locs = locs
+            else:
+                new_locs = np.zeros((selfcopy.__pointer[k], 2), dtype='int32')
+                new_locs[i_new, :] = locs[i_new, :]
+            
+                current_loc = locs[0,:]
+                for i_old in range(1, size):
+                    loc = locs[i_old, :]
+                    if (loc == current_loc).all():
+                        new_locs[i_new, :] = loc
+                        i_new += 1
+                    else:
+                        current_loc = loc
+                new_locs.resize( (i_new, 2) )
+                new_size = new_locs.shape[0]
+                selfcopy.total += new_size
+           # free memory?
+            # I know I should shrink it to 0 size directly,
+            # however, on Mac OSX, it seems directly assigning 0
+            # doesn't do a thing.
+            locs.resize( 100000, refcheck=False )
+            locs.resize( 0, refcheck=False )
+            # hope there would be no mem leak...
+    
+            selfcopy.__locations[k] = new_locs
+        return selfcopy
+
     def filter_dup ( self, int maxnum=-1, bool keep_original=False):
         """Filter the duplicated reads.
     
         Run it right after you add all data into this object.
         """
-        cdef int32_t i_chrom, n, start, end
-        cdef np.ndarray loc = np.zeros([1,2], np.int32)
-        cdef np.ndarray current_loc = np.zeros([1,2], np.int32)
-        cdef uint64_t i_old, i_new
-        cdef str k
-    
+        cdef:
+            int32_t i_chrom, n, start, end
+            np.ndarray loc = np.zeros([1,2], np.int32)
+            np.ndarray current_loc = np.zeros([1,2], np.int32)
+            uint64_t i_old, i_new
+            str k
+                
         if maxnum < 0: return # condition to return if not filtering
         
         if not self.__sorted: self.sort()
         
         if keep_original:
             selfcopy = copy(self)
-            selfcopy.__locations = copy(self.__locations) 
-            selfcopy.__pointer = copy(self.__pointer)
+            selfcopy.__locations = {}
+            selfcopy.__pointer = {}
         else:
             selfcopy = self
             
@@ -153,6 +208,9 @@ class PETrackI:
         
         for i_chrom in range(len(chrnames)): # for each chromosome
             k = chrnames [ i_chrom ]
+            if keep_original:
+                selfcopy.__locations[k] = self.__locations[k].copy()
+                selfcopy.__pointer[k] = self.__locations[k].copy()
             i_new = 0
             locs = selfcopy.__locations[k]
             size = locs.shape[0]
@@ -164,7 +222,7 @@ class PETrackI:
                 n = 1                # the number of tags in the current location
             
                 current_loc = locs[0,:]
-                for i_old in xrange(1, size):
+                for i_old in range(1, size):
                     loc = locs[i_old, :]
                     if (loc == current_loc).all():
                         n += 1
