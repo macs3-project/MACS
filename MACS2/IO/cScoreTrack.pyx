@@ -25,7 +25,7 @@ from array import array as pyarray
 
 from cpython cimport bool
 #from scipy.signal import fftconvolve
-from MACS2.cSignal import maxima, enforce_valleys
+from MACS2.cSignal import maxima, enforce_valleys, enforce_peakyness
 #np_convolve = np.convolve
 
 from libc.math cimport log10,log
@@ -238,7 +238,8 @@ class scoreTrackI:
             
         if self.trackline:
             # this line is REQUIRED by the wiggle format for UCSC browser
-            fhd.write( "track type=bedGraph name=\"%s\" description=\"%s\"\n" % ( name,description ) )
+            trackcontents = (name.replace("\"", "\\\""), desc.replace("\"", "\\\""))
+            fhd.write( "track type=bedGraph name=\"%s\" description=\"%s\"\n" % trackcontents )
         
         if colname not in [ 'sample', 'control', '-100logp', '-100logq', '100logLR' ]:
             raise Exception( "%s not supported!" % colname )
@@ -442,14 +443,14 @@ class scoreTrackI:
         return peaks
        
     def __close_peak2 (self, peak_content, peaks, int min_length, str chrom, str colname, int smoothlen=51,
-                       float min_valley = 0.8):
+                       float min_valley = 0.9):
         cdef:
             int summit_pos, tstart, tend, tmpindex, summit_index, summit_offset
             int start, end, i, j
             double summit_value, tvalue, tsummitvalue
 #            np.ndarray[np.float32_t, ndim=1] w
             np.ndarray[np.float32_t, ndim=1] peakdata
-            np.ndarray[np.int32_t, ndim=1] peakindices, valid_summit_indices, summit_offsets, valid_summit_offsets
+            np.ndarray[np.int32_t, ndim=1] peakindices, summit_offsets
             
         # this is where the summits are called, need to fix this
         end = peak_content[ -1 ][ 1 ]
@@ -474,8 +475,9 @@ class scoreTrackI:
         # ***failsafe if no summits so far*** #
         if summit_offsets.shape[0] == 0:
             summit_offsets = np.asarray([peak_length / 2], dtype='int32')
-        valid_summit_offsets = enforce_valleys(peakdata, summit_offsets, min_valley = min_valley)
-        valid_summit_indices = peakindices[valid_summit_offsets]
+        summit_offsets = enforce_peakyness(peakdata, summit_offsets)
+#        summit_offsets = enforce_valleys(peakdata, summit_offsets, min_valley = min_valley)
+        summit_indices = peakindices[summit_offsets]
         # this case shouldn't occur anymore because we've disallowed plateaus
         # purge offsets that have the same summit_index
 #        unique_offsets = []
@@ -516,7 +518,7 @@ class scoreTrackI:
 #        better_indices = peakindices[better_offsets]
 #        assert len(better_offsets) > 0, "Lost peak summit(s) near %s %d" % (chrom, start) 
 #        for summit_offset, summit_index in zip(better_offsets, better_indices):
-        for summit_offset, summit_index in zip(valid_summit_offsets, valid_summit_indices):
+        for summit_offset, summit_index in zip(summit_offsets, summit_indices):
             peaks.add( chrom,
                        start,
                        end,
