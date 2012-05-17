@@ -913,7 +913,8 @@ class BAMPEParser(BAMParser):
             int entrylength, fpos, chrid, tlen
             list references
             dict rlengths
-            float d = 0
+            float d = 0.0
+#            double dsquared = 0.0
             np.ndarray loc = np.zeros([1,2], np.int32)
         
         petrack = PETrackI()
@@ -936,6 +937,7 @@ class BAMPEParser(BAMParser):
             loc[0,0] = fpos
             loc[0,1] = fpos + tlen
             d = (d * i + abs(tlen)) / (i + 1) # keep track of avg fragment size
+#            dsquared = (dsquared * i + tlen**2) / (i + 1) # keep track of avg squared
             i+=1
             if i == 1000000:
                 m += 1
@@ -944,6 +946,7 @@ class BAMPEParser(BAMParser):
             add_loc(references[chrid], loc)
         self.n = m * 1000000 + i
         self.d = int(d)
+#        self.variance = int(dsquared - d**2)
         assert d >= 0, "Something went wrong (mean fragment size was negative)"
         self.fhd.close()
         petrack.finalize()
