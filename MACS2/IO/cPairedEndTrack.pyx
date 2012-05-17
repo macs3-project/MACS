@@ -126,6 +126,36 @@ class PETrackI:
 
         self.__sorted = True
 
+
+    def pmf( self ):
+        """return a 1-D numpy array of the probabilities of observing each
+        fragment size, indices are the bin number (first bin is 0)
+        """
+        cdef:
+           np.ndarray[np.int64_t, ndim=1] counts = np.zeros(BUFFER_SIZE, dtype='int64')
+           np.ndarray[np.float64_t, ndim=1] pmf
+           np.ndarray[np.int64_t, ndim=1] bins
+           np.ndarray[np.int32_t, ndim=1] sizes, locs
+           str c
+           int i, bins_len
+           int max_bins = 0
+           list chrnames = self.get_chr_names()
+
+        for i in range(len(chrnames)):
+            c = chrnames[i]
+            locs = self.__locations[c]
+            sizes = locs[:, 1] - locs[:, 0] # +1 ?? irrelevant for use
+            bins = np.bincount(sizes).astype('int64')
+            bins_len = bins.shape[0]
+            if bins_len > max_bins: max_bins = bins_len
+            if counts.shape[0] < max_bins:
+                    counts.resize(max_bins, refcheck=False)
+            counts += bins
+        
+        counts.resize(max_bins, refcheck=False)
+        pmf = counts.astype('float64') / counts.astype('float64').sum()
+        return 
+
     def get_dups(self ):
         """return a track of only the duplicated reads
         """
