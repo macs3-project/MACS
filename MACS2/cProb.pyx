@@ -21,6 +21,10 @@ the distribution).
 from libc.math cimport exp,log,log10, M_LN10 #,fabs,log1p
 from math import fabs
 from math import log1p #as py_log1p
+from math import sqrt
+
+import numpy as np
+cimport numpy as np
 
 from cpython cimport bool
 # ------------------------------------
@@ -29,6 +33,16 @@ from cpython cimport bool
 cdef int LSTEP = 200
 cdef double EXPTHRES = exp(LSTEP)
 cdef double EXPSTEP  = exp(-1*LSTEP)
+
+# ------------------------------------
+# Normal distribution functions
+# ------------------------------------
+# x is the value, u is the mean, v is the variance
+cpdef pnorm(int x, int u, int v):
+    """The probability of X=x when X=Norm(u,v)
+    """
+    return 1.0/sqrt(2.0 * 3.141592653589793 * <float>v) * exp(-<float>(x-u)**2 / (2.0 * <float>v))
+
 # ------------------------------------
 # Misc functions
 # ------------------------------------
@@ -405,6 +419,28 @@ cpdef binomial_cdf ( long x, long a, double b, bool lower=True ):
         return _binomial_cdf_f (x,a,b)
     else:
         return _binomial_cdf_r (x,a,b)
+
+cpdef binomial_sf ( long x, long a, double b, bool lower=True ):
+    """ BINOMIAL_SF compute the binomial survival function (1-CDF)
+
+    SF(x)(A,B) is the probability of more than X successes in A trials,
+    given that the probability of success on a single trial is B.
+    """
+    if lower:
+        return 1.0 - _binomial_cdf_f (x,a,b)
+    else:
+        return 1.0 - _binomial_cdf_r (x,a,b)
+
+cpdef pduplication (np.ndarray[np.float64_t] pmf, int N_obs):
+    """return the probability of a duplicate fragment given a pmf
+    and a number of observed fragments N_obs
+    """
+    cdef:
+        n = pmf.shape[0]
+        float p, sf = 0.0
+    for p in pmf:
+        sf += binomial_sf(2, N_obs, p)
+    return sf / <float>n
 
 cdef _binomial_cdf_r ( long x, long a, double b ):
     """ Binomial CDF for upper tail.
