@@ -446,15 +446,20 @@ class scoreTrackI:
                        float min_valley = 0.9):
         cdef:
             int summit_pos, tstart, tend, tmpindex, summit_index, summit_offset
-            int start, end, i, j
+            int start, end, i, j, start_boundary
             double summit_value, tvalue, tsummitvalue
 #            np.ndarray[np.float32_t, ndim=1] w
             np.ndarray[np.float32_t, ndim=1] peakdata
             np.ndarray[np.int32_t, ndim=1] peakindices, summit_offsets
             
-        # this is where the summits are called, need to fix this
-        end = peak_content[ -1 ][ 1 ]
-        start = peak_content[ 0 ][ 0 ]
+        # Add 10 bp padding to peak region so that we can get true minima
+        end = peak_content[ -1 ][ 1 ] + 10
+        start = peak_content[ 0 ][ 0 ] - 10
+        if start < 0:
+            start_boundary = 10 + start
+            start = 0
+        else:
+            start_boundary = 10
         peak_length = end - start
         if end - start < min_length: return # if the region is too small, reject it
 
@@ -472,10 +477,20 @@ class scoreTrackI:
 #        else:
 #            smoothdata = peakdata.copy()
         summit_offsets = maxima(peakdata, smoothlen)
-        # ***failsafe if no summits so far*** #
         if summit_offsets.shape[0] == 0:
-            summit_offsets = np.asarray([peak_length / 2], dtype='int32')
+            # **failsafe** if no summits, fall back on old approach #
+            return self.__close_peak(peak_content, peaks, min_length, chrom, colname)
+        else:
+            # remove maxima that occurred in padding
+            i = np.searchsorted(summit_offsets, start_boundary)
+            j = np.searchsorted(summit_offsets, peak_length + start_boundary, 'right')
+            summit_offsets = summit_offsets[i:j]
+        
         summit_offsets = enforce_peakyness(peakdata, summit_offsets)
+        if summit_offsets.shape[0] == 0:
+            # **failsafe** if no summits, fall back on old approach #
+            return self.__close_peak(peak_content, peaks, min_length, chrom, colname)
+        
 #        summit_offsets = enforce_valleys(peakdata, summit_offsets, min_valley = min_valley)
         summit_indices = peakindices[summit_offsets]
         # this case shouldn't occur anymore because we've disallowed plateaus
