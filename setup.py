@@ -39,7 +39,7 @@ def main():
         sys.stderr.write("CRITICAL: Python version must be 2.7!\n")
         sys.exit(1)
 
-    ext_modules = [Extension("MACS2.cProb", ["MACS2/cProb.c"], libraries=["m"]),
+    ext_modules = [Extension("MACS2.cProb", ["MACS2/cProb.c"], libraries=["m"], include_dirs=numpy_include_dir ),
                    Extension("MACS2.IO.cParser",["MACS2/IO/cParser.c"], include_dirs=numpy_include_dir),
                    Extension("MACS2.cPileup", ["MACS2/cPileup.c"], include_dirs=numpy_include_dir ),
                    Extension("MACS2.cArray", ["MACS2/cArray.c"]),                       

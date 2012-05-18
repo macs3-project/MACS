@@ -45,7 +45,7 @@ def main():
         sys.exit(1)
 
     if has_cython:
-        ext_modules = [Extension("MACS2.cProb", ["MACS2/cProb.pyx"], libraries=["m"]),
+        ext_modules = [Extension("MACS2.cProb", ["MACS2/cProb.pyx"], libraries=["m"], include_dirs=numpy_include_dir ),
                        Extension("MACS2.IO.cParser",["MACS2/IO/cParser.pyx"], include_dirs=numpy_include_dir),
                        Extension("MACS2.cPileup", ["MACS2/cPileup.pyx"], include_dirs=numpy_include_dir ),
                        Extension("MACS2.cArray", ["MACS2/cArray.pyx"]),                       
@@ -62,7 +62,7 @@ def main():
                        Extension("MACS2.hashtable", ["MACS2/hashtable.pyx"],include_dirs=["MACS2/",numpy_get_include()]),
                        ]
     else:
-        ext_modules = [Extension("MACS2.cProb", ["MACS2/cProb.c"], libraries=["m"]),
+        ext_modules = [Extension("MACS2.cProb", ["MACS2/cProb.c"], libraries=["m"], include_dirs=numpy_include_dir ),
                        Extension("MACS2.IO.cParser",["MACS2/IO/cParser.c"], include_dirs=numpy_include_dir),
                        Extension("MACS2.cPileup", ["MACS2/cPileup.c"], include_dirs=numpy_include_dir),
                        Extension("MACS2.cSignal", ["MACS2/cSignal.c"], include_dirs=numpy_include_dir),
