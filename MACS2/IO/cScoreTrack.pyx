@@ -402,6 +402,7 @@ class scoreTrackI:
         chrs  = self.get_chr_names()
         peaks = PeakIO()                      # dictionary to save peaks
 
+        self.cutoff = cutoff
         if call_summits: close_peak = self.__close_peak2
         else: close_peak = self.__close_peak
         
@@ -493,46 +494,9 @@ class scoreTrackI:
         
 #        summit_offsets = enforce_valleys(peakdata, summit_offsets, min_valley = min_valley)
         summit_indices = peakindices[summit_offsets]
-        # this case shouldn't occur anymore because we've disallowed plateaus
-        # purge offsets that have the same summit_index
-#        unique_offsets = []
-#        for index in np.unique(summit_indices):
-#            those_index_indices = np.where(summit_indices == index)[0]
-#            those_offsets = summit_offsets[those_index_indices]
-#            unique_offsets.append(int(those_offsets.mean()))
-           
-        ## DISABLE PEAKSPLITTER BEHAVIOR FOR NOW ##
-        # I think requiring spatial consistency is better than requiring valleys
-        
-        # also require a valley of at least 0.6 * taller peak
-        # in every adjacent two peaks or discard the lesser one
-        # this behavior is like PeakSplitter
-#        better_offsets = []
-#        previous_offset = unique_offsets.pop()
-#        while True:
-#            if len(unique_offsets) == 0:
-#                better_offsets.append(previous_offset)
-#                break
-#            else:
-#                this_offset = unique_offsets.pop()
-#                this_h, prev_h = peakdata[[this_offset, previous_offset]]
-#                if this_h > prev_h:
-#                    prev_is_taller = False
-#                    min_valley = 0.6 * this_h
-#                else:
-#                    prev_is_taller = True
-#                    min_valley = 0.6 * prev_h
-#                s = slice(this_offset, previous_offset)
-#                valley = np.where(peakdata[s] < min_valley)[0]
-#                if len(valley) > 0: better_offsets.append(previous_offset)
-#                else:
-#                    if prev_is_taller: continue # discard this peak
-#                    # else: discard previous peak by ignoring it
-#                previous_offset = this_offset
-#        better_offsets.reverse()
-#        better_indices = peakindices[better_offsets]
-#        assert len(better_offsets) > 0, "Lost peak summit(s) near %s %d" % (chrom, start) 
-#        for summit_offset, summit_index in zip(better_offsets, better_indices):
+        peak_scores  = self.data[chrom][colname][ summit_indices ]
+        if not (peak_scores > self.cutoff).all():
+            return self.__close_peak(peak_content, peaks, min_length, chrom, colname)
         for summit_offset, summit_index in zip(summit_offsets, summit_indices):
             peaks.add( chrom,
                        start,
