@@ -1,5 +1,5 @@
 # cython: profile=True
-# Time-stamp: <2012-05-18 17:54:35 Tao Liu>
+# Time-stamp: <2012-05-21 13:39:45 Tao Liu>
 
 """Module for Feature IO classes.
 
@@ -238,7 +238,7 @@ class scoreTrackI:
             
         if self.trackline:
             # this line is REQUIRED by the wiggle format for UCSC browser
-            trackcontents = (name.replace("\"", "\\\""), desc.replace("\"", "\\\""))
+            trackcontents = (name.replace("\"", "\\\""), description.replace("\"", "\\\""))
             fhd.write( "track type=bedGraph name=\"%s\" description=\"%s\"\n" % trackcontents )
         
         if colname not in [ 'sample', 'control', '-100logp', '-100logq', '100logLR' ]:
