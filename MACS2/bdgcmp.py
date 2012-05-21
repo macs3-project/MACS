@@ -1,4 +1,4 @@
-# Time-stamp: <2012-04-10 21:37:35 Tao Liu>
+# Time-stamp: <2012-05-18 17:55:00 Tao Liu>
 
 import sys
 import logging
@@ -62,6 +62,9 @@ def logLR ( x, y ):
         logLR_dict[key_value] = s
         return s
 
+def logFE ( x, y ):
+    return mlog( (x+1.0)/(y+1.0) )*LOG10_E
+
 def run( options ):
     info("Read and build treatment bedGraph...")
     tbio = cBedGraphIO.bedGraphIO(options.tfile)
@@ -71,28 +74,31 @@ def run( options ):
     cbio = cBedGraphIO.bedGraphIO(options.cfile)
     cbtrack = cbio.build_bdgtrack()
 
+    sbtrack = tbtrack.make_scoreTrackII_for_macs( cbtrack )
+
     method = options.method
 
     info("Calculate scores comparing treatment and control by %s..." % method)
     # build score track
     if method == 'ppois':
-        sbtrack = tbtrack.make_scoreTrack_for_macs(cbtrack)
-        sbtrack = scoreTracktoBedGraph(sbtrack,'-100logp')        
+        sbtrack.change_score_method( ord('p') )
     elif method == 'qpois':
-        sbtrack = tbtrack.make_scoreTrack_for_macs(cbtrack)
-        pqtable = sbtrack.make_pq_table()
-        sbtrack.assign_qvalue(pqtable)
-        sbtrack = scoreTracktoBedGraph(sbtrack,'-100logq')
+        sbtrack.change_score_method( ord('q') )        
     elif method == 'substract':
+        sbtrack.change_score_method( ord('d') )        
         sbtrack = tbtrack.overlie(cbtrack,func=lambda x,y:x-y)
-    elif method == 'divide':
-        sbtrack = tbtrack.overlie(cbtrack,func=lambda x,y:float(x)/y)
+    elif method == 'logFE':
+        sbtrack.change_score_method( ord('f') )
     elif method == 'logLR':             # log likelihood
-        sbtrack = tbtrack.overlie(cbtrack,func=logLR)
+        sbtrack.change_score_method( ord('l') )
     else:
         raise Exception("Can't reach here!")
 
     info("Write to output bedGraph...")
     ofhd = io.open(options.ofile,"wb")
 
-    sbtrack.write_bedGraph(ofhd,name="%s_Scores" % (method.upper()),description="Scores calculated by %s" % (method.upper()))
+    #r = sbtrack.get_data_by_chr("chr22")
+
+    #print r
+
+    sbtrack.write_bedGraph(ofhd,name="%s_Scores" % (method.upper()),description="Scores calculated by %s" % (method.upper()), column = 3)

@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# Time-stamp: <2012-05-10 11:31:55 Tao Liu>
+# Time-stamp: <2012-05-18 15:40:56 Tao Liu>
 
 import os
 import sys
@@ -24,7 +24,7 @@ class Test_ScoreTrackII(unittest.TestCase):
         self.p_result = [6327, 38, 7, 0, 709]
         self.q_result = [6095, 0, 0, 0 ,581]
         self.l_result = [5720, 0, -39, -379, 436]
-        self.f_result = [918, 100, 76, 28, 350] # note, pseudo count 1 would be introduced.
+        self.f_result = [96, 0, -11, -54, 54] # note, pseudo count 1 would be introduced.
         self.d_result = [9000, 0, -500, -1500, 1500]
         self.m_result = [1000, 100, 150, 50, 200]
         # for norm

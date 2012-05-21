@@ -1,5 +1,5 @@
 # cython: profile=True
-# Time-stamp: <2012-05-10 19:05:19 Tao Liu>
+# Time-stamp: <2012-05-18 17:54:35 Tao Liu>
 
 """Module for Feature IO classes.
 
@@ -105,10 +105,10 @@ cdef int logLR ( double x, double y ):
         logLR_khashtable.set_item(key_value, s)
         return s
 
-cdef int get_foldenrichment ( float x, float y ):
-    """ return fold enrichment with +1 pseudocount.
+cdef int get_logFE ( float x, float y ):
+    """ return 100* log10 fold enrichment with +1 pseudocount.
     """
-    return int( (x+1)/(y+1) )
+    return int( log10( (x+1.0)/(y+1.0) ) * 100 )
 
 cdef int get_substraction ( float x, float y):
     """ return substraction.
@@ -920,7 +920,6 @@ class CombinedTwoTrack:
         #ret = ret[ret[0,0,:].argsort()]
         return ret
 
-
     def extract_average (self, bdgTrack2):
         cdef:
             int i, l
@@ -1099,7 +1098,8 @@ cdef class scoreTrackII:
     def __init__ (self, float treat_depth, float ctrl_depth, bool stderr_on = False ):
         """Initialize.
 
-        effective_depth_in_million: sequencing depth in million after
+        treat_depth and ctrl_depth are effective depth in million:
+                                    sequencing depth in million after
                                     duplicates being filtered. If
                                     treatment is scaled down to
                                     control sample size, then this
@@ -1151,7 +1151,7 @@ cdef class scoreTrackII:
             self.data[chrom] = np.zeros( ( chrom_max_len, 4 ), dtype="int32" ) # remember col #2-4 is actual value * 100, I use integer here.
             self.datalength[chrom] = 0
 
-    cpdef add (self, str chromosome, int endpos, int sample, int control):
+    cpdef add (self, str chromosome, int endpos, float sample, float control):
         """Add a chr-endpos-sample-control block into data
         dictionary.
 
@@ -1161,8 +1161,8 @@ cdef class scoreTrackII:
         i = self.datalength[chromosome]
         c = self.data[chromosome]
         c[ i, 0 ] = endpos
-        c[ i, 1 ] = sample * 100
-        c[ i, 2 ] = control * 100
+        c[ i, 1 ] = round(sample,2) * 100
+        c[ i, 2 ] = round(control,2) * 100
         self.datalength[chromosome] += 1
 
     cpdef finalize ( self ):
@@ -1177,8 +1177,7 @@ cdef class scoreTrackII:
         for chrom in self.data.keys():
             d = self.data[chrom]
             l = self.datalength[chrom]
-            for k in d.keys():
-                d[k].resize( (l,4), refcheck = False )
+            d.resize( (l,4), refcheck = False )
         return
 
     cpdef sort ( self, int column = 1 ):
@@ -1217,9 +1216,9 @@ cdef class scoreTrackII:
         issue will happen -- I only keep two digits.
         
         normalization_method: T: scale to depth of treatment;
-                             C: scale to depth of control;
-                             M: scale to depth of 1 million;
-                             N: not set/ raw pileup        
+                              C: scale to depth of control;
+                              M: scale to depth of 1 million;
+                              N: not set/ raw pileup        
         """
         if normalization_method == 'T':
             if self.normalization_method == 'T': # do nothing
@@ -1424,6 +1423,9 @@ cdef class scoreTrackII:
         return pvalue2qvalue
 
     cdef compute_likelihood ( self ):
+        """Calculate log10 likelihood.
+        
+        """
         cdef:
             np.ndarray d
             long l, i
@@ -1437,6 +1439,9 @@ cdef class scoreTrackII:
         return 
 
     cdef compute_foldenrichment ( self ):
+        """Calculate log10 fold enrichment ( with 1 pseudocount ).
+
+        """
         cdef:
             np.ndarray d
             long l, i
@@ -1445,9 +1450,7 @@ cdef class scoreTrackII:
             d = self.data[chrom]
             l = self.datalength[chrom]
             for i in range(l):
-                #d[ i, 3] = get_foldenrichment ( 100.0 * d[ i, 1], d[ i, 2] ):
-                # add pseudo count 1 = 100 in the #2 and #3 column
-                d[ i, 3 ] =  int ( 100.0 * (d[ i, 1] + 100) / (d[ i, 2] + 100)  )
+                d[ i, 3] = get_logFE ( d[ i, 1]/100.0, d[ i, 2]/100.0 )
         self.scoring_method = 'f'
         return
 
