@@ -65,6 +65,7 @@ class FWTrackIII:
         self.total = 0                  # total tags
         self.annotation = anno   # need to be figured out
         self.rlengths = None
+        self.dups = None
 
 
     def add_loc ( self, str chromosome, int32_t fiveendpos, int strand ):
@@ -147,7 +148,112 @@ class FWTrackIII:
 
         self.__sorted = True
 
-    def filter_dup ( self, int32_t maxnum = -1, bool keep_original = False ):
+    def separate_dups( self, maxint = 1 ):
+        """Separate the duplicated reads into a different track
+        stored at self.dup
+        """
+        cdef int32_t p, m, n, current_loc, i_chrom
+        cdef uint64_t i_old, i_new          # index for old array, and index for new one
+        cdef uint64_t i_dup
+        cdef str k
+
+        if not self.__sorted:
+            self.sort()
+
+        self.dups = copy(self)
+        self.dups.__locations = {}
+        self.dups.__pointer = {}
+        self.dups.total = 0
+        self.total = 0
+
+        chrnames = self.get_chr_names()
+        
+        for i_chrom in range( len(chrnames) ):
+            # for each chromosome.
+            # This loop body is too big, I may need to split code later...
+            
+            k = chrnames[ i_chrom ]
+            self.__locations[k] = self.__locations[k].copy()
+            self.__pointer[k] = self.__pointer[k].copy()
+            # + strand
+            i_new = 0
+            i_dup = 0
+            plus = selfcopy.__locations[k][0]
+            size = plus.shape[0]
+            if len(plus) < 1:
+                new_plus = plus         # do nothing
+            else:
+                new_plus = np.zeros( self.__pointer[k][0],dtype='int32' )
+                dup_plus = np.zeros( self.__pointer[k][0],dtype='int32' )
+                new_plus[ i_new ] = plus[ i_new ] # first item
+                i_new += 1
+                current_loc = plus[0]
+                for i_old in range( 1, size ):
+                    p = plus[ i_old ]
+                    if p == current_loc:
+                        dup_plus [ i_dup ] = p
+                        i_dup += 1
+                    else:
+                        current_loc = p
+                        new_plus[ i_new ] = p
+                        i_new += 1                        
+                new_plus.resize( i_new )
+                dup_plus.resize( i_dup )
+                self.total +=  new_plus.shape[0]
+                self.dups.total += dup_plus.shape[0]
+                self.__pointer[k][0] = new_plus.shape[0]
+                self.dups.__pointer[k][0] = dup_plus.shape[0]
+                # free memory?
+                # I know I should shrink it to 0 size directly,
+                # however, on Mac OSX, it seems directly assigning 0
+                # doesn't do a thing.
+                plus.resize( 100000, refcheck=False )
+                plus.resize( 0, refcheck=False )
+                # hope there would be no mem leak...
+
+            # - strand
+            i_new = 0
+            i_dup = 0
+            minus = self.__locations[k][1]
+            size = minus.shape[0]
+            if len(minus) < 1:
+                new_minus = minus         # do nothing
+            else:
+                new_minus = np.zeros( self.__pointer[k][1],dtype='int32' )
+                dup_minus = np.zeros( self.__pointer[k][1],dtype='int32' )
+                new_minus[ i_new ] = minus[ i_new ] # first item
+                i_new += 1
+                current_loc = minus[0]
+                n = 1
+                for i_old in range( 1, size ):
+                    p = minus[ i_old ]
+                    if p == current_loc: n += 1
+                    if n > maxint:
+                        dup_minus [ i_dup ] = p
+                        i_dup += 1
+                    else:
+                        current_loc = p
+                        new_minus[ i_new ] = p
+                        i_new += 1                        
+                new_minus.resize( i_new ) 
+                dup_minus.resize( i_dup )                       
+                self.total +=  new_minus.shape[0]
+                self.dups.total +=  dup_minus.shape[0]
+                self.__pointer[k][1] = new_minus.shape[0]                
+                self.dups.__pointer[k][1] = dup_minus.shape[0]                
+                # free memory ?
+                # I know I should shrink it to 0 size directly,
+                # however, on Mac OSX, it seems directly assigning 0
+                # doesn't do a thing.
+                minus.resize( 100000, refcheck=False )
+                minus.resize( 0, refcheck=False )
+                # hope there would be no mem leak...                
+            
+            self.__locations[k]=[new_plus, new_minus]
+        return
+
+    def filter_dup ( self, int32_t maxnum = -1, bool keep_original = False,
+                     bool keep_dups = False ):
         """Filter the duplicated reads.
 
         Run it right after you add all data into this object.
@@ -179,7 +285,7 @@ class FWTrackIII:
             k = chrnames[ i_chrom ]
             if keep_original:
                 selfcopy.__locations[k] = self.__locations[k].copy()
-                selfcopy.__pointer[k] = self.__locations[k].copy()
+                selfcopy.__pointer[k] = self.__pointer[k].copy()
             # + strand
             i_new = 0
             plus = selfcopy.__locations[k][0]
