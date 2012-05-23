@@ -76,6 +76,15 @@ def run( args ):
     t0 = treat.total
     tagsinfo += "# total %ss in treatment: %d\n" % (tag, t0)
     info("#1  total %ss in treatment: %d", tag, t0)
+    # not ready yet
+#    options.filteringmodel = True
+#    if options.filteringmodel:
+#        treat.separate_dups()
+#        t0 = treat.total + treat.dups.total
+#        t1 = treat.total
+#        info("#1  Redundant rate of treatment: %.2f", float(t0 - t1) / t0)
+#        tagsinfo += "# Redundant rate in treatment: %.2f\n" % (float(t0-t1)/t0)
+#    elif options.keepduplicates != "all":
     if options.keepduplicates != "all":
         if options.keepduplicates == "auto":
             info("#1 calculate max duplicate %ss in single position based on binomial distribution...", tag)
@@ -105,7 +114,14 @@ def run( args ):
         c0 = control.total
         tagsinfo += "# total %ss in control: %d\n" % (tag, c0)
         info("#1  total %ss in control: %d", tag, c0)
-        if options.keepduplicates != "all":
+        # not ready yet
+        if options.filteringmodel:
+            control.separate_dups()
+            c0 = treat.total + treat.dups.total
+            c1 = treat.total
+            info("#1  Redundant rate of treatment: %.2f", float(c0 - c1) / c0)
+            tagsinfo += "# Redundant rate in treatment: %.2f\n" % (float(c0-c1)/c0)
+        elif options.keepduplicates != "all":
             if options.keepduplicates == "auto":
                 info("#1  for control, calculate max duplicate %ss in single position based on binomial distribution...", tag)
                 control_max_dup_tags = cal_max_dup_tags(options.gsize,c0)
@@ -305,6 +321,7 @@ def load_frag_files_options ( options ):
     else:
         control = None
     options.info("#1 mean fragment size is determined as %d bp from treatment" % options.tsize)
+#    options.info("#1 fragment size variance is determined as %d bp from treatment" % tp.variance)
     if control is not None:
         options.info("#1 note: mean fragment size in control is %d bp -- value ignored" % control_d)
     return (treat, control)
