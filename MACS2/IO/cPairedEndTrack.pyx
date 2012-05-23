@@ -44,6 +44,7 @@ class PETrackI:
         self.total = 0           # total tags
         self.annotation = anno   # need to be figured out
         self.rlengths = None
+        self.dups = None
 
 
     def add_loc ( self, str chromosome, np.ndarray[int32_t, ndim=2] loc):
@@ -156,49 +157,117 @@ class PETrackI:
         pmf = counts.astype('float64') / counts.astype('float64').sum()
         return 
 
-    def get_dups(self ):
-        """return a track of only the duplicated reads
+#    def get_dups( self ):
+#        """return a track of only the duplicated reads
+#        """
+#        cdef:
+#            int32_t i_chrom, n, start, end
+#            np.ndarray loc = np.zeros([1,2], np.int32)
+#            np.ndarray current_loc = np.zeros([1,2], np.int32)
+#            uint64_t i_old, i_new
+#            str k
+#                
+#        if not self.__sorted: self.sort()
+#        
+#        selfcopy = copy(self)
+#        selfcopy.__locations = {}
+#        selfcopy.__pointer = {}
+#            
+#        selfcopy.total = 0
+#        chrnames = self.get_chr_names()
+#        
+#        for i_chrom in range(len(chrnames)): # for each chromosome
+#            k = chrnames [ i_chrom ]
+#            selfcopy.__locations[k] = self.__locations[k].copy()
+#            selfcopy.__pointer[k] = self.__pointer[k].copy()
+#            i_new = 0
+#            locs = selfcopy.__locations[k]
+#            size = locs.shape[0]
+#            if size < 1:
+#                new_locs = locs
+#            else:
+#                new_locs = np.zeros((selfcopy.__pointer[k], 2), dtype='int32')
+#                new_locs[i_new, :] = locs[i_new, :]
+#            
+#                current_loc = locs[0,:]
+#                for i_old in range(1, size):
+#                    loc = locs[i_old, :]
+#                    if (loc == current_loc).all():
+#                        new_locs[i_new, :] = loc
+#                        i_new += 1
+#                    else:
+#                        current_loc = loc
+#                new_locs.resize( (i_new, 2) )
+#                new_size = new_locs.shape[0]
+#                selfcopy.total += new_size
+#           # free memory?
+#            # I know I should shrink it to 0 size directly,
+#            # however, on Mac OSX, it seems directly assigning 0
+#            # doesn't do a thing.
+#            locs.resize( 100000, refcheck=False )
+#            locs.resize( 0, refcheck=False )
+#            # hope there would be no mem leak...
+#    
+#            selfcopy.__locations[k] = new_locs
+#        return selfcopy
+
+    def separate_dups ( self , maxint = 1 ):
+        """Filter the duplicated reads.
+    
+        Run it right after you add all data into this object.
         """
         cdef:
             int32_t i_chrom, n, start, end
             np.ndarray loc = np.zeros([1,2], np.int32)
             np.ndarray current_loc = np.zeros([1,2], np.int32)
-            uint64_t i_old, i_new
+            uint64_t i_old, i_new, i_dup
             str k
-                
+                        
         if not self.__sorted: self.sort()
         
-        selfcopy = copy(self)
-        selfcopy.__locations = {}
-        selfcopy.__pointer = {}
-            
-        selfcopy.total = 0
+        self.dups = copy(self)
+        self.dups.__locations = {}
+        self.dups.__pointer = {}
+        self.dups.total = 0
+        self.total = 0
+                    
         chrnames = self.get_chr_names()
         
         for i_chrom in range(len(chrnames)): # for each chromosome
             k = chrnames [ i_chrom ]
-            selfcopy.__locations[k] = self.__locations[k].copy()
-            selfcopy.__pointer[k] = self.__locations[k].copy()
+            self.dups.__locations[k] = self.__locations[k].copy()
+            self.dups.__pointer[k] = self.__pointer[k].copy()
             i_new = 0
-            locs = selfcopy.__locations[k]
+            i_dup = 0
+            locs = self.__locations[k]
             size = locs.shape[0]
             if size < 1:
                 new_locs = locs
             else:
-                new_locs = np.zeros((selfcopy.__pointer[k], 2), dtype='int32')
+                new_locs = np.zeros((self.__pointer[k], 2), dtype='int32')
+                dup_locs = np.zeros((self.dups.__pointer[k], 2), dtype='int32')
                 new_locs[i_new, :] = locs[i_new, :]
+                n = 1
             
                 current_loc = locs[0,:]
                 for i_old in range(1, size):
                     loc = locs[i_old, :]
-                    if (loc == current_loc).all():
-                        new_locs[i_new, :] = loc
-                        i_new += 1
+                    if (loc == current_loc).all(): n += 1
+                    if n > maxint:
+                        dup_locs[ i_dup ]= loc
+                        i_dup += 1
                     else:
                         current_loc = loc
+                        new_locs[i_new, :] = loc
+                        i_new += 1
                 new_locs.resize( (i_new, 2) )
+                dup_locs.resize( (i_dup, 2) )
                 new_size = new_locs.shape[0]
-                selfcopy.total += new_size
+                dup_size = dup_locs.shape[0]
+                self.__pointer[k] = new_size
+                self.dups.__pointer[k] = dup_size
+                self.total += new_size
+                self.dups.total += dup_size
            # free memory?
             # I know I should shrink it to 0 size directly,
             # however, on Mac OSX, it seems directly assigning 0
@@ -207,9 +276,9 @@ class PETrackI:
             locs.resize( 0, refcheck=False )
             # hope there would be no mem leak...
     
-            selfcopy.__locations[k] = new_locs
-        return selfcopy
-
+            self.__locations[k] = new_locs
+        return
+    
     def filter_dup ( self, int maxnum=-1, bool keep_original=False):
         """Filter the duplicated reads.
     
@@ -240,7 +309,7 @@ class PETrackI:
             k = chrnames [ i_chrom ]
             if keep_original:
                 selfcopy.__locations[k] = self.__locations[k].copy()
-                selfcopy.__pointer[k] = self.__locations[k].copy()
+                selfcopy.__pointer[k] = self.__pointer[k].copy()
             i_new = 0
             locs = selfcopy.__locations[k]
             size = locs.shape[0]
@@ -269,6 +338,7 @@ class PETrackI:
                         n = 1
                 new_locs.resize( (i_new, 2) )
                 new_size = new_locs.shape[0]
+                selfcopy.__pointer[k] = new_size
                 selfcopy.total += new_size
            # free memory?
             # I know I should shrink it to 0 size directly,
