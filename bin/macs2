@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# Time-stamp: <2012-05-02 16:38:16 Tao Liu>
+# Time-stamp: <2012-05-18 13:41:52 Tao Liu>
 
 """Description: MACS 2 main executable
 
@@ -142,7 +142,7 @@ def add_callpeak_parser( subparsers ):
                                help = "Experiment name, which will be used to generate output file names. DEFAULT: \"NA\"", 
                                default = "NA" )
     group_output.add_argument( "-B", "--bdg", dest = "store_bdg", action = "store_true",
-                               help = "Whether or not to save extended fragment pileup, local lambda and score tracks at every bp into a bedGraph file. DEFAULT: False",
+                               help = "Whether or not to save extended fragment pileup, local lambda and score tracks (three files) at every bp into a bedGraph file. MACS2 can generate score track for log p/q-value/likelihood/fold enrichment or substraction, depending on the criteria to call peaks. DEFAULT: False",
                                default = False )
     group_output.add_argument( "--verbose", dest = "verbose", type = int, default = 2,
                                help = "Set verbose level of runtime message. 0: only show critical message, 1: show additional warning message, 2: show process information, 3: show debug messages. DEFAULT:2" )
@@ -281,8 +281,8 @@ def add_bdgcmp_parser( subparsers ):
     argparser_bdgcmp.add_argument( "-o", "--output", dest = "ofile", type = str, required = True,
                                    help = "The output bedGraph file to write scores. REQUIRED" )
     argparser_bdgcmp.add_argument( "-m", "--method", dest = "method", type = str,
-                                   choices = ( "ppois", "qpois", "substract", "divide", "logLR" ),
-                                   help = "Method to use while calculating a score in any bin by comparing treatment value and control value. Available choices are: ppois, qpois, substract, divide, and logLR,. They represent Poisson Pvalue (-log10(pvalue) form) using control as lambda and treatment as observation, q-value through a BH process for poisson pvalues, substraction from treatment, fold change which may be problematic if there are zero in control and log10 likelihood between ChIP-enriched model and open chromatin model. Default option is ppois.",default="ppois")
+                                   choices = ( "ppois", "qpois", "substract", "logFE", "logLR" ),
+                                   help = "Method to use while calculating a score in any bin by comparing treatment value and control value. Available choices are: ppois, qpois, substract, logFE, and logLR,. They represent Poisson Pvalue (-log10(pvalue) form) using control as lambda and treatment as observation, q-value through a BH process for poisson pvalues, substraction from treatment, log10 fold enrichment which may be problematic if there are zero in control and log10 likelihood between ChIP-enriched model and open chromatin model. Default option is ppois.",default="ppois")
     return
     
 def add_randsample_parser( subparsers ):
