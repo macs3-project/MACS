@@ -1,4 +1,4 @@
-# Time-stamp: <2012-05-18 17:55:00 Tao Liu>
+# Time-stamp: <2012-05-24 12:40:40 Tao Liu>
 
 import sys
 import logging
@@ -31,39 +31,39 @@ info    = logging.info
 # ------------------------------------
 # Main function
 # ------------------------------------
-pscore_dict = {}
+# pscore_dict = {}
 
-def get_pscore ( observed, expectation ):
-    key_value = (observed, expectation)
-    if pscore_dict.has_key(key_value):
-        return pscore_dict[key_value]
-    else:
-        score = -1*poisson_cdf(observed,expectation,False,True)
-        pscore_dict[(observed,expectation)] = score
-        return score
+# def get_pscore ( observed, expectation ):
+#     key_value = (observed, expectation)
+#     if pscore_dict.has_key(key_value):
+#         return pscore_dict[key_value]
+#     else:
+#         score = -1*poisson_cdf(observed,expectation,False,True)
+#         pscore_dict[(observed,expectation)] = score
+#         return score
 
-logLR_dict = {}
+# logLR_dict = {}
 
-def logLR ( x, y ):
-    """Calculate log10 Likelihood between H1 ( enriched ) and H0 (
-    chromatin bias ). Then set minus sign for depletion.
+# def logLR ( x, y ):
+#     """Calculate log10 Likelihood between H1 ( enriched ) and H0 (
+#     chromatin bias ). Then set minus sign for depletion.
     
-    """
-    key_value = ( x, y )
-    if logLR_dict.has_key(key_value):
-        return logLR_dict[key_value]
-    else:
-        if x > y:
-            s = (x*(mlog(x+1)-mlog(y+1))+y-x)*LOG10_E
-        elif x < y:
-            s = (-1*x*(mlog(x+1)-mlog(y+1))-y+x)*LOG10_E
-        else:
-            s = 0
-        logLR_dict[key_value] = s
-        return s
+#     """
+#     key_value = ( x, y )
+#     if logLR_dict.has_key(key_value):
+#         return logLR_dict[key_value]
+#     else:
+#         if x > y:
+#             s = (x*(mlog(x+1)-mlog(y+1))+y-x)*LOG10_E
+#         elif x < y:
+#             s = (-1*x*(mlog(x+1)-mlog(y+1))-y+x)*LOG10_E
+#         else:
+#             s = 0
+#         logLR_dict[key_value] = s
+#         return s
 
-def logFE ( x, y ):
-    return mlog( (x+1.0)/(y+1.0) )*LOG10_E
+# def logFE ( x, y ):
+#     return mlog( (x+1.0)/(y+1.0) )*LOG10_E
 
 def run( options ):
     info("Read and build treatment bedGraph...")
@@ -89,6 +89,8 @@ def run( options ):
         sbtrack = tbtrack.overlie(cbtrack,func=lambda x,y:x-y)
     elif method == 'logFE':
         sbtrack.change_score_method( ord('f') )
+    elif method == 'FE':
+        sbtrack.change_score_method( ord('F') )        
     elif method == 'logLR':             # log likelihood
         sbtrack.change_score_method( ord('l') )
     else:

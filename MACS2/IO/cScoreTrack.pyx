@@ -1,5 +1,5 @@
 # cython: profile=True
-# Time-stamp: <2012-05-21 13:39:45 Tao Liu>
+# Time-stamp: <2012-05-24 13:37:07 Tao Liu>
 
 """Module for Feature IO classes.
 
@@ -1125,6 +1125,7 @@ cdef class scoreTrackII:
         #                 q: -log10 qvalue;
         #                 l: log10 likelihood ratio ( minus for depletion )
         #                 f: log10 fold enrichment
+        #                 F: linear fold enrichment        
         #                 d: substraction
         #                 m: fragment pileup per million reads
         #                 N: not set
@@ -1288,6 +1289,7 @@ cdef class scoreTrackII:
                          q: -log10 qvalue;
                          l: log10 likelihood ratio ( minus for depletion )
                          f: log10 fold enrichment
+                         F: linear fold enrichment
                          d: substraction
                          m: fragment pileup per million reads
         """
@@ -1301,6 +1303,8 @@ cdef class scoreTrackII:
         elif scoring_method == 'l':
             self.compute_likelihood()
         elif scoring_method == 'f':
+            self.compute_logFE()
+        elif scoring_method == 'F':
             self.compute_foldenrichment()
         elif scoring_method == 'd':
             self.compute_substraction()
@@ -1438,7 +1442,7 @@ cdef class scoreTrackII:
         self.scoring_method = 'l'
         return 
 
-    cdef compute_foldenrichment ( self ):
+    cdef compute_logFE ( self ):
         """Calculate log10 fold enrichment ( with 1 pseudocount ).
 
         """
@@ -1452,6 +1456,22 @@ cdef class scoreTrackII:
             for i in range(l):
                 d[ i, 3] = get_logFE ( d[ i, 1]/100.0, d[ i, 2]/100.0 )
         self.scoring_method = 'f'
+        return
+
+    cdef compute_foldenrichment ( self ):
+        """Calculate linear scale fold enrichment ( with 1 pseudocount ).
+
+        """
+        cdef:
+            np.ndarray d
+            long l, i
+        
+        for chrom in self.data.keys():
+            d = self.data[chrom]
+            l = self.datalength[chrom]
+            for i in range(l):
+                d[ i, 3] =  100 * ( d[ i, 1] + 1.0 )/( d[ i, 2] + 1.0 )
+        self.scoring_method = 'F'
         return
 
     cdef compute_substraction ( self ):
