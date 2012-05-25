@@ -1,5 +1,5 @@
 # cython: profile=True
-# Time-stamp: <2012-04-13 16:45:26 Tao Liu>
+# Time-stamp: <2012-05-24 21:51:10 Tao Liu>
 
 """Description: MACS 2 main executable
 
@@ -115,13 +115,14 @@ def run( args ):
         tagsinfo += "# total %ss in control: %d\n" % (tag, c0)
         info("#1  total %ss in control: %d", tag, c0)
         # not ready yet
-        if options.filteringmodel:
-            control.separate_dups()
-            c0 = treat.total + treat.dups.total
-            c1 = treat.total
-            info("#1  Redundant rate of treatment: %.2f", float(c0 - c1) / c0)
-            tagsinfo += "# Redundant rate in treatment: %.2f\n" % (float(c0-c1)/c0)
-        elif options.keepduplicates != "all":
+        #if options.filteringmodel:
+        #    control.separate_dups()
+        #    c0 = treat.total + treat.dups.total
+        #    c1 = treat.total
+        #    info("#1  Redundant rate of treatment: %.2f", float(c0 - c1) / c0)
+        #    tagsinfo += "# Redundant rate in treatment: %.2f\n" % (float(c0-c1)/c0)
+        #elif options.keepduplicates != "all":
+        if options.keepduplicates != "all":
             if options.keepduplicates == "auto":
                 info("#1  for control, calculate max duplicate %ss in single position based on binomial distribution...", tag)
                 control_max_dup_tags = cal_max_dup_tags(options.gsize,c0)
