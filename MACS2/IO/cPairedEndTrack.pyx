@@ -21,12 +21,13 @@ cimport numpy as np
 from libc.stdint cimport uint32_t, uint64_t, int32_t, int64_t
 from copy import copy
 from cpython cimport bool
+cimport cython
 
 import sys
 
 # Let numpy enforce PE-ness using ndarray, gives bonus speedup when sorting
 # PE data doesn't have strandedness
-class PETrackI:
+cdef class PETrackI:
     """Paired End Locations Track class I along the whole genome
     (commonly with the same annotation type), which are stored in a
     dict.
@@ -34,38 +35,53 @@ class PETrackI:
     Locations are stored and organized by sequence names (chr names) in a
     dict. They can be sorted by calling self.sort() function.
     """
+    cdef public dict __locations
+    cdef public dict __pointer
+    cdef public bool __sorted
+    cdef public unsigned long total
+    cdef public dict __dup_locations
+    cdef public dict __dup_pointer
+    cdef public bool __dup_sorted
+    cdef public unsigned long dup_total
+    cdef public object annotation
+    cdef public object rlengths
+    cdef public object dups
+    
     def __init__ (self, char * anno=""):
         """fw is the fixed-width for all locations.
         
         """
         self.__locations = {}    # location pairs
         self.__pointer = {}      # location pairs
+        self.__dup_locations = {}    # location pairs
+        self.__dup_pointer = {}      # location pairs
         self.__sorted = False
+        self.__dup_sorted = False
         self.total = 0           # total tags
+        self.dup_total = 0           # total tags
         self.annotation = anno   # need to be figured out
         self.rlengths = None
-        self.dups = None
-
-
-    def add_loc ( self, str chromosome, np.ndarray[int32_t, ndim=2] loc):
+        
+    cpdef add_loc ( self, str chromosome, int start, int end):
         """Add a location to the list according to the sequence name.
         
         chromosome -- mostly the chromosome name
         fiveendpos -- 5' end pos, left for plus strand, right for neg strand
         """
         if not self.__locations.has_key(chromosome):
-            self.__locations[chromosome] = np.zeros(shape=(BUFFER_SIZE, 2),
-                                                    dtype='int32')
+            self.__locations[chromosome] = np.zeros(shape=(BUFFER_SIZE, 2), dtype='int32')
             self.__pointer[chromosome] = 0
         try:
-            self.__locations[chromosome][self.__pointer[chromosome],:] = loc 
+            self.__locations[chromosome][self.__pointer[chromosome],0] = start
+            self.__locations[chromosome][self.__pointer[chromosome],1] = end
             self.__pointer[chromosome] += 1
         except IndexError:
             self.__expand__ ( self.__locations[chromosome] )
-            self.__locations[chromosome][self.__pointer[chromosome],:] = loc
+            self.__locations[chromosome][self.__pointer[chromosome],0] = start
+            self.__locations[chromosome][self.__pointer[chromosome],1] = end
             self.__pointer[chromosome] += 1
 
-    def __expand__ ( self, np.ndarray arr ):
+    cpdef __expand__ ( self, np.ndarray arr ):
         arr.resize((arr.shape[0] + BUFFER_SIZE, 2), refcheck = False )
         return
 
@@ -97,29 +113,30 @@ class PETrackI:
         else:
             raise Exception("No such chromosome name (%s) in TrackI object!\n" % (chromosome))
 
-    def get_chr_names ( self ):
+    cpdef list get_chr_names ( self ):
         """Return all the chromosome names stored in this track object.
         """
         l = self.__locations.keys()
         l.sort()
         return l
 
-    def length ( self ):
+    cpdef length ( self ):
         """Total sequenced length = sum(end-start+1) over chroms   
         """
-        cdef uint64_t l
+        cdef:
+            long l = 0
+            np.ndarray[np.int32_t, ndim=2] v
         for v in self.__locations.values():
             l += (v[:,1] - v[:,0] + 1).sum() 
         return l
 
-    def sort ( self ):
+    cpdef sort ( self ):
         """Naive sorting for locations.
         
         """
         cdef uint32_t i
         cdef str c
-
-        chrnames = self.get_chr_names()
+        cdef list chrnames = self.get_chr_names()
 
         for i in range(len(chrnames)):
             c = chrnames[i]
@@ -127,6 +144,24 @@ class PETrackI:
 
         self.__sorted = True
 
+#    def centered_fake_fragments(track, int d):
+#        """Return a copy of the PETrackI object so that its locations are all
+#        the same fixed distance d about the center of each fragment 
+#        """
+#        new = PETrackI()
+#        new.__pointer = deepcopy(self.__pointer)
+#        new.rlengths = deepcopy(self.rlengths)
+#        new.total = self.total
+#        new.__sorted = self.__sorted
+#        new.__locations = {}
+#        
+#        five_shift = d / 2
+#        three_shift = d - five_shift
+#        for k, v in self.__locations.items():
+#            midpoints = (v[:,0] + v[:,1]) / 2
+#            new.__locations[k] = np.vstack((midpoints - five_shift,
+#                                             midpoints + three_shift))  
+#        return new
 
     def pmf( self ):
         """return a 1-D numpy array of the probabilities of observing each
@@ -155,88 +190,33 @@ class PETrackI:
         
         counts.resize(max_bins, refcheck=False)
         pmf = counts.astype('float64') / counts.astype('float64').sum()
-        return 
+        return pmf
 
-#    def get_dups( self ):
-#        """return a track of only the duplicated reads
-#        """
-#        cdef:
-#            int32_t i_chrom, n, start, end
-#            np.ndarray loc = np.zeros([1,2], np.int32)
-#            np.ndarray current_loc = np.zeros([1,2], np.int32)
-#            uint64_t i_old, i_new
-#            str k
-#                
-#        if not self.__sorted: self.sort()
-#        
-#        selfcopy = copy(self)
-#        selfcopy.__locations = {}
-#        selfcopy.__pointer = {}
-#            
-#        selfcopy.total = 0
-#        chrnames = self.get_chr_names()
-#        
-#        for i_chrom in range(len(chrnames)): # for each chromosome
-#            k = chrnames [ i_chrom ]
-#            selfcopy.__locations[k] = self.__locations[k].copy()
-#            selfcopy.__pointer[k] = self.__pointer[k].copy()
-#            i_new = 0
-#            locs = selfcopy.__locations[k]
-#            size = locs.shape[0]
-#            if size < 1:
-#                new_locs = locs
-#            else:
-#                new_locs = np.zeros((selfcopy.__pointer[k], 2), dtype='int32')
-#                new_locs[i_new, :] = locs[i_new, :]
-#            
-#                current_loc = locs[0,:]
-#                for i_old in range(1, size):
-#                    loc = locs[i_old, :]
-#                    if (loc == current_loc).all():
-#                        new_locs[i_new, :] = loc
-#                        i_new += 1
-#                    else:
-#                        current_loc = loc
-#                new_locs.resize( (i_new, 2) )
-#                new_size = new_locs.shape[0]
-#                selfcopy.total += new_size
-#           # free memory?
-#            # I know I should shrink it to 0 size directly,
-#            # however, on Mac OSX, it seems directly assigning 0
-#            # doesn't do a thing.
-#            locs.resize( 100000, refcheck=False )
-#            locs.resize( 0, refcheck=False )
-#            # hope there would be no mem leak...
-#    
-#            selfcopy.__locations[k] = new_locs
-#        return selfcopy
-
-    def separate_dups ( self , maxint = 1 ):
+    @cython.boundscheck(False) # do not check that np indices are valid
+    def separate_dups ( self , int maxint = 1 ):
         """Filter the duplicated reads.
     
         Run it right after you add all data into this object.
         """
         cdef:
-            int32_t i_chrom, n, start, end
-            np.ndarray loc = np.zeros([1,2], np.int32)
-            np.ndarray current_loc = np.zeros([1,2], np.int32)
-            uint64_t i_old, i_new, i_dup
+            int i_chrom, n, start, end, size
+#            np.ndarray[np.int32_t, ndim=1] loc #= np.zeros([1,2], np.int32)
+#            np.ndarray[np.int32_t, ndim=1] current_loc #= np.zeros([1,2], np.int32)
+            int loc_start, loc_end, current_loc_start, current_loc_end
+            np.ndarray[np.int32_t, ndim=2] locs, new_locs, dup_locs
+            unsigned long i_old, i_new, i_dup, new_size, dup_size
+            list chrnames = self.get_chr_names()
             str k
                         
         if not self.__sorted: self.sort()
         
-        self.dups = copy(self)
-        self.dups.__locations = {}
-        self.dups.__pointer = {}
-        self.dups.total = 0
+        self.__dup_pointer = copy(self.__pointer)
+        self.dup_total = 0
         self.total = 0
-                    
-        chrnames = self.get_chr_names()
-        
+
         for i_chrom in range(len(chrnames)): # for each chromosome
             k = chrnames [ i_chrom ]
-            self.dups.__locations[k] = self.__locations[k].copy()
-            self.dups.__pointer[k] = self.__pointer[k].copy()
+#            dups.__locations[k] = self.__locations[k].copy()
             i_new = 0
             i_dup = 0
             locs = self.__locations[k]
@@ -245,29 +225,119 @@ class PETrackI:
                 new_locs = locs
             else:
                 new_locs = np.zeros((self.__pointer[k], 2), dtype='int32')
-                dup_locs = np.zeros((self.dups.__pointer[k], 2), dtype='int32')
-                new_locs[i_new, :] = locs[i_new, :]
+                dup_locs = np.zeros((self.__pointer[k], 2), dtype='int32')
+                i_new += 1
                 n = 1
             
-                current_loc = locs[0,:]
+                current_loc_start = locs[0,0]
+                current_loc_end = locs[0,1]
+                new_locs[i_new, 0] = current_loc_start
+                new_locs[i_new, 1] = current_loc_end
                 for i_old in range(1, size):
-                    loc = locs[i_old, :]
-                    if (loc == current_loc).all(): n += 1
+                    loc_start = locs[i_old, 0]
+                    loc_end = locs[i_old, 1]
+                    all_same = ((loc_start == current_loc_start) and
+                                (loc_end == current_loc_end)) 
+                    if all_same:
+                        n += 1
+                    else:
+                        current_loc_start = loc_start
+                        current_loc_end = loc_end
+                        n = 1
                     if n > maxint:
-                        dup_locs[ i_dup ]= loc
+                        dup_locs[i_dup , 0] = loc_start
+                        dup_locs[i_dup , 1] = loc_end
                         i_dup += 1
                     else:
-                        current_loc = loc
-                        new_locs[i_new, :] = loc
+                        new_locs[i_new, 0] = loc_start
+                        new_locs[i_new, 1] = loc_end
                         i_new += 1
+                new_locs.resize( (i_new, 2) , refcheck = False)
+                dup_locs.resize( (i_dup, 2) , refcheck = False)
+                self.total += i_new
+                self.dup_total += i_dup
+                self.__pointer[k] = i_new
+                self.__dup_pointer[k] = i_dup
+                # unnecessary
+#                new_size = new_locs.shape[0]
+#                dup_size = dup_locs.shape[0]
+#                self.__pointer[k] = new_size
+#                dups.__pointer[k] = dup_size
+           # free memory?
+            # I know I should shrink it to 0 size directly,
+            # however, on Mac OSX, it seems directly assigning 0
+            # doesn't do a thing.
+            locs.resize( 100000, refcheck=False )
+            locs.resize( 0, refcheck=False )
+            # hope there would be no mem leak...
+    
+            self.__locations[k] = new_locs
+            self.__dup_locations[k] = dup_locs
+        return
+    
+    @cython.boundscheck(False) # do not check that np indices are valid
+    def filter_dup ( self, int maxnum=-1):
+        """Filter the duplicated reads.
+    
+        Run it right after you add all data into this object.
+        """
+        cdef:
+            int i_chrom, n, start, end
+#            np.ndarray[np.int32_t, ndim=1] loc #= np.zeros([1,2], np.int32)
+#            np.ndarray[np.int32_t, ndim=1] current_loc #= np.zeros([1,2], np.int32)
+            int loc_start, loc_end, current_loc_start, current_loc_end
+            unsigned long i_old, i_new, size, new_size
+            str k
+            np.ndarray locs, new_locs
+                
+        if maxnum < 0: return # condition to return if not filtering
+        
+        if not self.__sorted: self.sort()
+        
+        self.total = 0
+        chrnames = self.get_chr_names()
+        
+        for i_chrom in range(len(chrnames)): # for each chromosome
+            k = chrnames [ i_chrom ]
+            i_new = 0
+            locs = self.__locations[k]
+            size = locs.shape[0]
+            if size < 1:
+                new_locs = locs
+            else:
+                new_locs = np.zeros((self.__pointer[k], 2), dtype='int32')
+                i_new += 1
+                n = 1                # the number of tags in the current location
+            
+                current_loc_start = locs[0,0]
+                current_loc_end = locs[0,1]
+                new_locs[i_new, 0] = current_loc_start
+                new_locs[i_new, 1] = current_loc_end
+                for i_old in range(1, size):
+                    loc_start = locs[i_old, 0]
+                    loc_end = locs[i_old, 1]
+                    all_same = ((loc_start == current_loc_start) and
+                                (loc_end == current_loc_end))
+                    if all_same:
+                        n += 1
+                        if n <= maxnum:
+                            new_locs[i_new, 0] = loc_start
+                            new_locs[i_new, 1] = loc_end
+                            i_new += 1
+#                        else:
+#                            start, end = loc
+#                            debug("Duplicate fragments found at %s:%d-%d" % (k, start, end) )
+                    else:
+                        current_loc_start = loc_start
+                        current_loc_end = loc_end
+                        new_locs[i_new, 0] = loc_start
+                        new_locs[i_new, 1] = loc_end
+                        i_new += 1
+                        n = 1
                 new_locs.resize( (i_new, 2) )
-                dup_locs.resize( (i_dup, 2) )
                 new_size = new_locs.shape[0]
-                dup_size = dup_locs.shape[0]
                 self.__pointer[k] = new_size
-                self.dups.__pointer[k] = dup_size
                 self.total += new_size
-                self.dups.total += dup_size
            # free memory?
             # I know I should shrink it to 0 size directly,
             # however, on Mac OSX, it seems directly assigning 0
@@ -278,78 +348,6 @@ class PETrackI:
     
             self.__locations[k] = new_locs
         return
-    
-    def filter_dup ( self, int maxnum=-1, bool keep_original=False):
-        """Filter the duplicated reads.
-    
-        Run it right after you add all data into this object.
-        """
-        cdef:
-            int32_t i_chrom, n, start, end
-            np.ndarray loc = np.zeros([1,2], np.int32)
-            np.ndarray current_loc = np.zeros([1,2], np.int32)
-            uint64_t i_old, i_new
-            str k
-                
-        if maxnum < 0: return # condition to return if not filtering
-        
-        if not self.__sorted: self.sort()
-        
-        if keep_original:
-            selfcopy = copy(self)
-            selfcopy.__locations = {}
-            selfcopy.__pointer = {}
-        else:
-            selfcopy = self
-            
-        selfcopy.total = 0
-        chrnames = self.get_chr_names()
-        
-        for i_chrom in range(len(chrnames)): # for each chromosome
-            k = chrnames [ i_chrom ]
-            if keep_original:
-                selfcopy.__locations[k] = self.__locations[k].copy()
-                selfcopy.__pointer[k] = self.__pointer[k].copy()
-            i_new = 0
-            locs = selfcopy.__locations[k]
-            size = locs.shape[0]
-            if size < 1:
-                new_locs = locs
-            else:
-                new_locs = np.zeros((selfcopy.__pointer[k], 2), dtype='int32')
-                new_locs[i_new, :] = locs[i_new, :]
-                n = 1                # the number of tags in the current location
-            
-                current_loc = locs[0,:]
-                for i_old in range(1, size):
-                    loc = locs[i_old, :]
-                    if (loc == current_loc).all():
-                        n += 1
-                        if n <= maxnum:
-                            new_locs[i_new, :] = loc
-                            i_new += 1
-                        else:
-                            start, end = loc
-                            debug("Duplicate fragments found at %s:%d-%d" % (k, start, end) )
-                    else:
-                        current_loc = loc
-                        new_locs[i_new, :] = loc
-                        i_new += 1
-                        n = 1
-                new_locs.resize( (i_new, 2) )
-                new_size = new_locs.shape[0]
-                selfcopy.__pointer[k] = new_size
-                selfcopy.total += new_size
-           # free memory?
-            # I know I should shrink it to 0 size directly,
-            # however, on Mac OSX, it seems directly assigning 0
-            # doesn't do a thing.
-            locs.resize( 100000, refcheck=False )
-            locs.resize( 0, refcheck=False )
-            # hope there would be no mem leak...
-    
-            selfcopy.__locations[k] = new_locs
-        return selfcopy
 
     def sample_percent (self, float percent):
         """Sample the tags for a given percentage.

@@ -27,6 +27,7 @@ from copy import copy
 from MACS2.Constants import *
 from libc.stdint cimport uint32_t, uint64_t, int32_t, int64_t
 from cpython cimport bool
+cimport cython
 
 import numpy as np
 cimport numpy as np
@@ -46,7 +47,7 @@ __doc__ = "FWTrackII class"
 # Classes
 # ------------------------------------
 
-class FWTrackIII:
+cdef class FWTrackIII:
     """Fixed Width Locations Track class III along the whole genome
     (commonly with the same annotation type), which are stored in a
     dict.
@@ -54,21 +55,37 @@ class FWTrackIII:
     Locations are stored and organized by sequence names (chr names) in a
     dict. They can be sorted by calling self.sort() function.
     """
+    cdef public dict __locations
+    cdef public dict __pointer
+    cdef public bool __sorted
+    cdef public long total
+    cdef public dict __dup_locations
+    cdef public dict __dup_pointer
+    cdef public bool __dup_sorted
+    cdef public unsigned long dup_total
+    cdef public object annotation
+    cdef public object rlengths
+    cdef public object dups
+    cdef public int fw
+    
     def __init__ (self, int32_t fw=0, char * anno=""):
         """fw is the fixed-width for all locations.
         
         """
         self.fw = fw
-        self.__locations = {}           # plus strand locations
-        self.__pointer = {}           # plus strand locations
+        self.__locations = {}    # location pairs
+        self.__pointer = {}      # location pairs
+        self.__dup_locations = {}    # location pairs
+        self.__dup_pointer = {}      # location pairs
         self.__sorted = False
-        self.total = 0                  # total tags
+        self.__dup_sorted = False
+        self.total = 0           # total tags
+        self.dup_total = 0           # total tags
         self.annotation = anno   # need to be figured out
         self.rlengths = None
-        self.dups = None
 
 
-    def add_loc ( self, str chromosome, int32_t fiveendpos, int strand ):
+    cpdef add_loc ( self, str chromosome, int32_t fiveendpos, int strand ):
         """Add a location to the list according to the sequence name.
         
         chromosome -- mostly the chromosome name
@@ -86,7 +103,7 @@ class FWTrackIII:
             self.__locations[chromosome][strand][self.__pointer[chromosome][strand]] = fiveendpos
             self.__pointer[chromosome][strand] += 1
 
-    def __expand__ ( self, np.ndarray arr ):
+    cpdef __expand__ ( self, np.ndarray arr ):
         arr.resize( arr.size + BUFFER_SIZE, refcheck = False )
         return
 
@@ -148,22 +165,23 @@ class FWTrackIII:
 
         self.__sorted = True
 
+    @cython.boundscheck(False) # do not check that np indices are valid
     def separate_dups( self, maxint = 1 ):
         """Separate the duplicated reads into a different track
         stored at self.dup
         """
-        cdef int32_t p, m, n, current_loc, i_chrom
-        cdef uint64_t i_old, i_new          # index for old array, and index for new one
-        cdef uint64_t i_dup
-        cdef str k
+        cdef:
+            int p, m, n, current_loc, i_chrom
+            unsigned long i_old, i_new          # index for old array, and index for new one
+            unsigned long i_dup, size, new_size, dup_size
+            str k
+            np.ndarray plus, new_plus, dup_plus, minus, new_minus, dup_minus
 
         if not self.__sorted:
             self.sort()
 
-        self.dups = copy(self)
-        self.dups.__locations = {}
-        self.dups.__pointer = {}
-        self.dups.total = 0
+        self.__dup_pointer = copy(self.__pointer)
+        self.dup_total = 0
         self.total = 0
 
         chrnames = self.get_chr_names()
@@ -173,12 +191,11 @@ class FWTrackIII:
             # This loop body is too big, I may need to split code later...
             
             k = chrnames[ i_chrom ]
-            self.__locations[k] = self.__locations[k].copy()
-            self.__pointer[k] = self.__pointer[k].copy()
+#            dups.__locations[k] = self.__locations[k].copy()
             # + strand
             i_new = 0
             i_dup = 0
-            plus = selfcopy.__locations[k][0]
+            plus = self.__locations[k][0]
             size = plus.shape[0]
             if len(plus) < 1:
                 new_plus = plus         # do nothing
@@ -191,18 +208,27 @@ class FWTrackIII:
                 for i_old in range( 1, size ):
                     p = plus[ i_old ]
                     if p == current_loc:
+                        n += 1
+                    else:
+                        current_loc = p
+                        n = 1
+                    if n > maxint:
                         dup_plus [ i_dup ] = p
                         i_dup += 1
                     else:
-                        current_loc = p
                         new_plus[ i_new ] = p
-                        i_new += 1                        
+                        i_new += 1           
                 new_plus.resize( i_new )
                 dup_plus.resize( i_dup )
-                self.total +=  new_plus.shape[0]
-                self.dups.total += dup_plus.shape[0]
-                self.__pointer[k][0] = new_plus.shape[0]
-                self.dups.__pointer[k][0] = dup_plus.shape[0]
+                self.total += i_new
+                self.dup_total += i_dup
+                self.__pointer[k][0] = i_new
+                self.__dup_pointer[k][0] = i_dup
+                # unnecessary shape calls
+#                self.total +=  new_plus.shape[0]
+#                dups.total += dup_plus.shape[0]
+#                self.__pointer[k][0] = new_plus.shape[0]
+#                dups.__pointer[k][0] = dup_plus.shape[0]
                 # free memory?
                 # I know I should shrink it to 0 size directly,
                 # however, on Mac OSX, it seems directly assigning 0
@@ -227,20 +253,28 @@ class FWTrackIII:
                 n = 1
                 for i_old in range( 1, size ):
                     p = minus[ i_old ]
-                    if p == current_loc: n += 1
+                    if p == current_loc:
+                        n += 1
+                    else:
+                        current_loc = p
+                        n = 1
                     if n > maxint:
                         dup_minus [ i_dup ] = p
                         i_dup += 1
                     else:
-                        current_loc = p
                         new_minus[ i_new ] = p
                         i_new += 1                        
-                new_minus.resize( i_new ) 
-                dup_minus.resize( i_dup )                       
-                self.total +=  new_minus.shape[0]
-                self.dups.total +=  dup_minus.shape[0]
-                self.__pointer[k][1] = new_minus.shape[0]                
-                self.dups.__pointer[k][1] = dup_minus.shape[0]                
+                new_minus.resize( i_new , refcheck = False) 
+                dup_minus.resize( i_dup , refcheck = False) 
+                # shape calls unnecessary                      
+                self.total +=  i_new
+                self.dup_total +=  i_dup
+                self.__pointer[k][1] = i_new                
+                self.__dup_pointer[k][1] = i_dup                
+#                self.total +=  new_minus.shape[0]
+#                dups.total +=  dup_minus.shape[0]
+#                self.__pointer[k][1] = new_minus.shape[0]                
+#                dups.__pointer[k][1] = dup_minus.shape[0]                
                 # free memory ?
                 # I know I should shrink it to 0 size directly,
                 # however, on Mac OSX, it seems directly assigning 0
@@ -250,31 +284,28 @@ class FWTrackIII:
                 # hope there would be no mem leak...                
             
             self.__locations[k]=[new_plus, new_minus]
+            self.__dup_locations[k]=[dup_plus, dup_minus]
         return
 
-    def filter_dup ( self, int32_t maxnum = -1, bool keep_original = False,
-                     bool keep_dups = False ):
+    @cython.boundscheck(False) # do not check that np indices are valid
+    def filter_dup ( self, int32_t maxnum = -1):
         """Filter the duplicated reads.
 
         Run it right after you add all data into this object.
         """
-        cdef int32_t p, m, n, current_loc, i_chrom
-        cdef uint64_t i_old, i_new          # index for old array, and index for new one
-        cdef str k
+        cdef:
+            int p, m, n, current_loc, i_chrom
+            # index for old array, and index for new one
+            unsigned long i_old, i_new, size, new_size 
+            str k
+            np.ndarray plus, new_plus, dup_plus, minus, new_minus, dup_minus
 
         if maxnum < 0: return           # do nothing
 
         if not self.__sorted:
             self.sort()
 
-        if keep_original:
-            selfcopy = copy(self)
-            selfcopy.__locations = {}
-            selfcopy.__pointer = {}
-        else:
-            selfcopy = self
-        
-        selfcopy.total = 0
+        self.total = 0
 
         chrnames = self.get_chr_names()
         
@@ -283,17 +314,14 @@ class FWTrackIII:
             # This loop body is too big, I may need to split code later...
             
             k = chrnames[ i_chrom ]
-            if keep_original:
-                selfcopy.__locations[k] = self.__locations[k].copy()
-                selfcopy.__pointer[k] = self.__pointer[k].copy()
             # + strand
             i_new = 0
-            plus = selfcopy.__locations[k][0]
+            plus = self.__locations[k][0]
             size = plus.shape[0]
             if len(plus) < 1:
                 new_plus = plus         # do nothing
             else:
-                new_plus = np.zeros( selfcopy.__pointer[k][0],dtype='int32' )
+                new_plus = np.zeros( self.__pointer[k][0],dtype='int32' )
                 new_plus[ i_new ] = plus[ i_new ] # first item
                 i_new += 1
                 n = 1                # the number of tags in the current location
@@ -313,8 +341,10 @@ class FWTrackIII:
                         i_new += 1                        
                         n = 1
                 new_plus.resize( i_new )
-                selfcopy.total +=  new_plus.shape[0]
-                selfcopy.__pointer[k][0] = new_plus.shape[0]
+                self.total +=  i_new
+                self.__pointer[k][0] = i_new
+#                self.total +=  new_plus.shape[0]
+#                self.__pointer[k][0] = new_plus.shape[0]
                 # free memory?
                 # I know I should shrink it to 0 size directly,
                 # however, on Mac OSX, it seems directly assigning 0
@@ -325,12 +355,12 @@ class FWTrackIII:
 
             # - strand
             i_new = 0
-            minus = selfcopy.__locations[k][1]
+            minus = self.__locations[k][1]
             size = minus.shape[0]
             if len(minus) < 1:
                 new_minus = minus         # do nothing
             else:
-                new_minus = np.zeros( selfcopy.__pointer[k][1],dtype='int32' )
+                new_minus = np.zeros( self.__pointer[k][1],dtype='int32' )
                 new_minus[ i_new ] = minus[ i_new ] # first item
                 i_new += 1
                 n = 1                # the number of tags in the current location
@@ -349,9 +379,11 @@ class FWTrackIII:
                         new_minus[ i_new ] = p
                         i_new += 1                        
                         n = 1
-                new_minus.resize( i_new )                        
-                selfcopy.total +=  new_minus.shape[0]
-                selfcopy.__pointer[k][1] = new_minus.shape[0]                
+                new_minus.resize( i_new )
+                self.total +=  i_new
+                self.__pointer[k][1] = i_new                
+#                self.total +=  new_minus.shape[0]
+#                self.__pointer[k][1] = new_minus.shape[0]                
                 # free memory ?
                 # I know I should shrink it to 0 size directly,
                 # however, on Mac OSX, it seems directly assigning 0
@@ -360,8 +392,8 @@ class FWTrackIII:
                 minus.resize( 0, refcheck=False )
                 # hope there would be no mem leak...                
             
-            selfcopy.__locations[k]=[new_plus,new_minus]
-        return selfcopy
+            self.__locations[k]=[new_plus,new_minus]
+        return
 
     def sample_percent (self, float percent):
         """Sample the tags for a given percentage.

@@ -2,21 +2,21 @@ from cpython cimport bool
 
 cpdef factorial ( unsigned int n )
 
-cpdef poisson_cdf ( unsigned int n, double lam, bool lower = ?, bool log10 = ? )
+cpdef double poisson_cdf ( unsigned int n, double lam, bool lower = ?, bool log10 = ? )
 
-cdef __poisson_cdf ( unsigned int k, double a )
+cdef inline double __poisson_cdf ( unsigned int k, double a )
     
-cdef __poisson_cdf_large_lambda ( unsigned int k, double a )
+cdef inline double __poisson_cdf_large_lambda ( unsigned int k, double a )
 
-cdef __poisson_cdf_Q ( unsigned int k, double a )
+cdef inline double __poisson_cdf_Q ( unsigned int k, double a )
 
-cdef __poisson_cdf_Q_large_lambda ( unsigned int k, double a )
+cdef inline double __poisson_cdf_Q_large_lambda ( unsigned int k, double a )
 
-cdef double log10_poisson_cdf_P_large_lambda ( unsigned int k, double lbd )
+cdef inline double log10_poisson_cdf_P_large_lambda ( unsigned int k, double lbd )
 
-cdef double log10_poisson_cdf_Q_large_lambda ( unsigned int k, double lbd )
+cdef inline double log10_poisson_cdf_Q_large_lambda ( unsigned int k, double lbd )
 
-cdef double logspace_add ( double logx, double logy )
+cdef inline double logspace_add ( double logx, double logy )
 
 cpdef poisson_cdf_inv ( double cdf, double lam, int maximum = ? )
 
