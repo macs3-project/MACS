@@ -1,5 +1,5 @@
 # cython: profile=True
-# Time-stamp: <2012-05-24 13:37:07 Tao Liu>
+# Time-stamp: <2012-05-29 21:47:53 Tao Liu>
 
 """Module for Feature IO classes.
 
@@ -34,7 +34,7 @@ from MACS2.Constants import *
 from MACS2.cProb cimport poisson_cdf
 from MACS2.IO.cPeakIO import PeakIO, BroadPeakIO
 
-from MACS2.hashtable import Int64HashTable
+from MACS2.hashtable import Int64HashTable, Float64HashTable
 
 import logging
 
@@ -54,14 +54,14 @@ cdef inline int int_min(int a, int b): return a if a <= b else b
 LOG10_E = 0.43429448190325176
 pscore_khashtable = Int64HashTable()
 
-cdef int get_pscore ( int observed, double expectation ):
+cdef double get_pscore ( int observed, double expectation ):
     """Get p-value score from Poisson test. First check existing
     table, if failed, call poisson_cdf function, then store the result
     in table.
     
     """
     cdef:
-        int score
+        float score
         long key_value
     
     #key_value = ( observed, expectation )
@@ -69,7 +69,7 @@ cdef int get_pscore ( int observed, double expectation ):
     try:
         return pscore_khashtable.get_item(key_value)
     except KeyError:
-        score = int(-100*poisson_cdf(observed,expectation,False,True))
+        score = -1*poisson_cdf(observed,expectation,False,True)
         pscore_khashtable.set_item(key_value, score)
         return score
     #if pscore_dict.has_key(key_value):
@@ -81,14 +81,14 @@ cdef int get_pscore ( int observed, double expectation ):
 
 logLR_khashtable = Int64HashTable()
 
-cdef int logLR ( double x, double y ):
+cdef double logLR ( double x, double y ):
     """Calculate log10 Likelihood between H1 ( enriched ) and H0 (
     chromatin bias ). Then store the values in integer form =
     100*logLR. Set minus sign for depletion.
     
     """
     cdef:
-        int s
+        float s
         long key_value
     
     #key_value = ( x, y )
@@ -97,18 +97,18 @@ cdef int logLR ( double x, double y ):
         return logLR_khashtable.get_item( key_value )
     except KeyError:
         if x > y:
-            s = int( (x*(log(x+1)-log(y+1))+y-x)*LOG10_E*100 )
+            s = (x*(log(x+1)-log(y+1))+y-x)*LOG10_E
         elif x < y:
-            s = int( (-1*x*(log(x+1)-log(y+1))-y+x)*LOG10_E*100 )
+            s = (-1*x*(log(x+1)-log(y+1))-y+x)*LOG10_E*100
         else:
             s = 0
         logLR_khashtable.set_item(key_value, s)
         return s
 
-cdef int get_logFE ( float x, float y ):
+cdef double get_logFE ( float x, float y ):
     """ return 100* log10 fold enrichment with +1 pseudocount.
     """
-    return int( log10( (x+1.0)/(y+1.0) ) * 100 )
+    return log10( (x+1.0)/(y+1.0) )
 
 cdef int get_substraction ( float x, float y):
     """ return substraction.
@@ -1111,8 +1111,8 @@ cdef class scoreTrackII:
         self.data = {}           # for each chromosome, there is a l*4
                                  # matrix. First column: end position
                                  # of a region; Second: treatment
-                                 # pileup * 100; third: control pileup
-                                 # * 100; forth: score * 100 ( can be
+                                 # pileup; third: control pileup ;
+                                 # forth: score ( can be
                                  # p/q-value/likelihood
                                  # ratio/fold-enrichment/substraction
                                  # depending on -c setting)
@@ -1149,21 +1149,30 @@ cdef class scoreTrackII:
         
         """
         if not self.data.has_key(chrom):
-            self.data[chrom] = np.zeros( ( chrom_max_len, 4 ), dtype="int32" ) # remember col #2-4 is actual value * 100, I use integer here.
+            #self.data[chrom] = np.zeros( ( chrom_max_len, 4 ), dtype="int32" ) # remember col #2-4 is actual value * 100, I use integer here.
+            self.data[chrom] = [ np.zeros( chrom_max_len, dtype="int32" ), # pos
+                                 np.zeros( chrom_max_len, dtype="float32" ), # pileup at each interval, in float format
+                                 np.zeros( chrom_max_len, dtype="float32" ), # control at each interval, in float format
+                                 np.zeros( chrom_max_len, dtype="float32" ) ] # score at each interval, in float format
             self.datalength[chrom] = 0
 
-    cpdef add (self, str chromosome, int endpos, float sample, float control):
+    cpdef add (self, str chromosome, int endpos, float chip, float control):
         """Add a chr-endpos-sample-control block into data
         dictionary.
+
+        chromosome: chromosome name in string
+        endpos    : end position of each interval in integer
+        chip      : ChIP pileup value of each interval in float
+        control   : Control pileup value of each interval in float
 
         *Warning* Need to add regions continuously.
         """
         cdef int i
         i = self.datalength[chromosome]
         c = self.data[chromosome]
-        c[ i, 0 ] = endpos
-        c[ i, 1 ] = round(sample,2) * 100
-        c[ i, 2 ] = round(control,2) * 100
+        c[0][ i ] = endpos
+        c[1][ i ] = chip
+        c[2][ i ] = control
         self.datalength[chromosome] += 1
 
     cpdef finalize ( self ):
@@ -1178,20 +1187,27 @@ cdef class scoreTrackII:
         for chrom in self.data.keys():
             d = self.data[chrom]
             l = self.datalength[chrom]
-            d.resize( (l,4), refcheck = False )
+            d[0].resize( l, refcheck = False )
+            d[1].resize( l, refcheck = False )
+            d[2].resize( l, refcheck = False )
+            d[3].resize( l, refcheck = False )            
         return
 
-    cpdef sort ( self, int column = 1 ):
-        """ Sort data for each chromosome, by certain column.
+    # cpdef sort ( self, int column = 1 ):
+    #     """ Sort data for each chromosome, by certain column.
 
-        column: 1: position, 2: sample, 3: control, 4: score
+    #     column: 1: position, 2: sample, 3: control, 4: score
 
-        Default: sort by positions.
-        """
-        for chrom in self.data.keys():
-            d = self.data[chrom]
-            d.view('int32,int32,int32,int32').sort(axis=0,order=column-1)
-        return
+    #     Default: sort by positions.
+    #     """
+    #     cdef:
+    #         str chrom
+            
+        
+    #     for chrom in self.data.keys():
+    #         d = self.data[chrom]
+    #         d.view('int32,int32,int32,int32').sort(axis=0,order=column-1)
+    #     return
 
     cpdef get_data_by_chr (self, str chromosome):
         """Return array of counts by chromosome.
@@ -1272,15 +1288,16 @@ cdef class scoreTrackII:
 
     cdef normalize ( self, double treat_scale, double control_scale ):
         cdef:
-            np.ndarray d
+            np.ndarray p, c
             long l, i
         
         for chrom in self.data.keys():
-            d = self.data[chrom]
+            p = self.data[chrom][1]
+            c = self.data[chrom][2]
             l = self.datalength[chrom]
             for i in range(l):
-                d[ i, 1 ] *= treat_scale
-                d[ i, 2 ] *= control_scale                
+                p[ i ] *= treat_scale
+                c[ i ] *= control_scale                
         return
 
     cpdef change_score_method (self, char scoring_method):
@@ -1317,14 +1334,17 @@ cdef class scoreTrackII:
         """Compute -log_{10}(pvalue)
         """
         cdef:
-            np.ndarray d
+            np.ndarray[np.float32_t] p, c, v 
             long l, i
+            str chrom
         
         for chrom in self.data.keys():
-            d = self.data[chrom]
+            p = self.data[chrom][1]
+            c = self.data[chrom][2]
+            v = self.data[chrom][3]
             l = self.datalength[chrom]
             for i in range(l):
-                d[ i, 3 ] =  get_pscore( d[ i, 1] / 100, d[ i, 2] / 100.0 )
+                v[ i ] =  get_pscore( int(p[ i ]) , c[ i ] )
         self.scoring_method = 'p'
         return 
 
@@ -1333,8 +1353,9 @@ cdef class scoreTrackII:
         """
         cdef:
             dict pqtable
-            long i,l,j,p
+            long i,l,j
             str chrom
+            np.ndarray p, c, v
             
         # pvalue should be computed first!
         assert self.scoring_method == 'p'
@@ -1344,7 +1365,7 @@ cdef class scoreTrackII:
         # convert p to q
 
         # convert pvalue2qvalue to a simple dict
-        s_p2q = Int64HashTable()
+        s_p2q = Float64HashTable()
         #g = pvalue2qvalue.get
         for i in pqtable.keys():
         #for i in range(pvalue2qvalue.shape[0]):
@@ -1353,10 +1374,12 @@ cdef class scoreTrackII:
         g = s_p2q.get_item
         
         for chrom in self.data.keys():
-            d = self.data[chrom]
+            p = self.data[chrom][1]
+            c = self.data[chrom][2]
+            v = self.data[chrom][3]
             l = self.datalength[chrom]
             for i in range(l):
-                d[ i, 3 ] =  g( d[ i, 3 ])
+                v[ i ] =  g( v[ i ])
         
         self.scoring_method = 'q'
         return
@@ -1368,30 +1391,33 @@ cdef class scoreTrackII:
         Step2: Sort them
         Step3: Apply AFDR method to adjust pvalue and get qvalue for each pvalue
 
-        Return a dictionary of {-100log10pvalue:(-100log10qvalue,rank,basepairs)} relationships.
+        Return a dictionary of {-log10pvalue:(-log10qvalue,rank,basepairs)} relationships.
         """
         cdef:
-            long n, pre_p, this_p, length, j, pre_l, l, this_v, pre_v, v
-            long N, k, q, pre_q
+            long n, pre_p, this_p, length, j, pre_l, l
+            double this_v, pre_v, v, q, pre_q
+            long N, k
             double f
             str chrom
-            np.ndarray d_chrom
+            np.ndarray v_chrom, pos_chrom
             dict pvalue2qvalue
 
         assert self.scoring_method == 'p'
         
         n = self.total()
-        value_dict = Int64HashTable()
-        unique_values = pyarray(BYTE4,[])
+        value_dict = Float64HashTable()
+        unique_values = pyarray(FBYTE4,[])
         # this is a table of how many positions each p value occurs at
         for chrom in self.data.keys():
             # for each chromosome
             pre_p  = 0
-            d_chrom = self.data[chrom]
+            #d_chrom = self.data[chrom]
+            pos_chrom = self.data[chrom][0]
+            v_chrom = self.data[chrom][3]            
             length = self.datalength[chrom]
             for j in xrange(length):
-                this_p = d_chrom[ j, 0 ]
-                this_v = d_chrom[ j, 3 ]
+                this_p = pos_chrom[ j ]
+                this_v = v_chrom[ j ]
                 assert this_v == this_v, "NaN at %d" % pos
                 if value_dict.has_key(this_v):
                     value_dict.set_item(this_v, value_dict.get_item(this_v) + this_p - pre_p)
@@ -1413,7 +1439,7 @@ cdef class scoreTrackII:
         for i in xrange(len(unique_values)):
             v = unique_values[i]
             l = value_dict.get_item(v)
-            q = v + int((log10(k) + f) * 100) # we save integers here.
+            q = v + (log10(k) + f) # we save integers here.
             q = max(0,min(pre_q,q))           # make q-score monotonic
             pvalue2qvalue[v] = [q, k, 0]
             pvalue2qvalue[pre_v][2] = k-pvalue2qvalue[pre_v][1]
@@ -1431,14 +1457,22 @@ cdef class scoreTrackII:
         
         """
         cdef:
-            np.ndarray d
+            #np.ndarray v, p, c
             long l, i
+            str chrom
+            float v1, v2
         
         for chrom in self.data.keys():
-            d = self.data[chrom]
+            p = self.data[chrom][ 1 ].flat.next
+            c = self.data[chrom][ 2 ].flat.next
+            v = self.data[chrom][ 3 ]
             l = self.datalength[chrom]
+            v1 = 2
+            v2 = 1
             for i in range(l):
-                d[ i, 3 ] =  logLR( d[ i, 1]/100.0, d[ i, 2]/100.0 )
+                v1 = p() 
+                v2 = c()
+                v[ i ] =  logLR( v1, v2 )  #logLR( d[ i, 1]/100.0, d[ i, 2]/100.0 )
         self.scoring_method = 'l'
         return 
 
@@ -1447,14 +1481,16 @@ cdef class scoreTrackII:
 
         """
         cdef:
-            np.ndarray d
+            np.ndarray p, c, v
             long l, i
         
         for chrom in self.data.keys():
-            d = self.data[chrom]
+            p = self.data[chrom][1]
+            c = self.data[chrom][2]
+            v = self.data[chrom][3]
             l = self.datalength[chrom]
             for i in range(l):
-                d[ i, 3] = get_logFE ( d[ i, 1]/100.0, d[ i, 2]/100.0 )
+                v[ i ] = get_logFE ( p[ i ], c[ i ] )
         self.scoring_method = 'f'
         return
 
@@ -1463,33 +1499,37 @@ cdef class scoreTrackII:
 
         """
         cdef:
-            np.ndarray d
+            np.ndarray p, c, v
             long l, i
         
         for chrom in self.data.keys():
-            d = self.data[chrom]
+            p = self.data[chrom][1]
+            c = self.data[chrom][2]
+            v = self.data[chrom][3]
             l = self.datalength[chrom]
             for i in range(l):
-                d[ i, 3] =  100 * ( d[ i, 1] + 1.0 )/( d[ i, 2] + 1.0 )
+                v[ i ] =  ( p[ i ] + 1.0 )/( c[ i ] + 1.0 )
         self.scoring_method = 'F'
         return
 
     cdef compute_substraction ( self ):
         cdef:
-            np.ndarray d
+            np.ndarray p, c, v
             long l, i
         
         for chrom in self.data.keys():
-            d = self.data[chrom]
+            p = self.data[chrom][1]
+            c = self.data[chrom][2]
+            v = self.data[chrom][3]
             l = self.datalength[chrom]
             for i in range(l):
-                d[ i, 3 ] =  int ( d[ i, 1] - d[ i, 2] )
+                v[ i ] = p[ i ] - c[ i ]
         self.scoring_method = 'd'
         return
 
     cdef compute_SPMR ( self ):
         cdef:
-            np.ndarray d
+            np.ndarray p, v
             long l, i
             float scale
         if self.normalization_method == 'T' or self.normalization_method == 'N':
@@ -1500,10 +1540,11 @@ cdef class scoreTrackII:
             scale = 1
         
         for chrom in self.data.keys():
-            d = self.data[chrom]
+            p = self.data[chrom][1]
+            v = self.data[chrom][3]
             l = self.datalength[chrom]
             for i in range(l):
-                d[ i, 3 ] =  d[ i, 1] / scale # two digit precision may not be enough...
+                v[ i ] =  p[ i ] / scale # two digit precision may not be enough...
         self.scoring_method = 'm'
         return
 
@@ -1521,8 +1562,7 @@ cdef class scoreTrackII:
             str chrom
             int l, pre, i, p 
             float pre_v, v
-            float scale = 100.0
-            np.ndarray d, pos, value
+            np.ndarray pos, value
 
         assert column in range( 1, 4 ), "column should be between 1, 2 or 3."
         
@@ -1534,15 +1574,14 @@ cdef class scoreTrackII:
         
         chrs = self.get_chr_names()
         for chrom in chrs:
-            d = self.data[ chrom ]
-            pos = d[ :, 0 ]
-            value = d[ :, column ]
+            pos = self.data[ chrom ][ 0 ]
+            value = self.data[ chrom ][ column ]
             l = self.datalength[ chrom ]
             pre = 0
-            if d.shape[ 0 ] == 0: continue # skip if there's no data
-            pre_v = value[ 0 ] / scale
+            if pos.shape[ 0 ] == 0: continue # skip if there's no data
+            pre_v = value[ 0 ]
             for i in range( 1, l ):
-                v = value[ i ] / scale
+                v = value[ i ]
                 p = pos[ i-1 ]
                 if pre_v != v: 
                     write( "%s\t%d\t%d\t%.2f\n" % ( chrom, pre, p, pre_v ) )
@@ -1586,10 +1625,10 @@ cdef class scoreTrackII:
         for chrom in chrs:
             peak_content = []           # to store points above cutoff
 
-            pos = self.data[chrom][ :, 0 ]
-            sample = self.data[chrom][ :, 1 ]
-            control = self.data[chrom][ :, 2 ]            
-            value = self.data[chrom][ :, 3 ]
+            pos = self.data[chrom][ 0 ]
+            sample = self.data[chrom][ 1 ]
+            control = self.data[chrom][ 2 ]            
+            value = self.data[chrom][ 3 ]
 
             above_cutoff = np.nonzero( value >= cutoff )[0] # indices where score is above cutoff
             above_cutoff_v = value[above_cutoff] # scores where score is above cutoff
@@ -1756,10 +1795,10 @@ cdef class scoreTrackII:
                        peak_content[0][0],
                        peak_content[-1][1],
                        summit      = summit_pos,
-                       peak_score  = self.data[chrom][ summit_index, 3 ] / 100.0,
-                       pileup      = self.data[chrom][ summit_index, 1 ] / 100.0, # should be the same as summit_value
-                       pscore      = get_pscore(self.data[chrom][ summit_index, 1 ] / 100, self.data[chrom][ summit_index, 2 ] / 100.0 ) /100.0,
-                       fold_change = float ( self.data[chrom][ summit_index, 1 ] + 100 ) / ( self.data[chrom][ summit_index, 2 ] + 100 ),
+                       peak_score  = self.data[chrom][ 3 ][ summit_index ] / 100.0,
+                       pileup      = self.data[chrom][ 1 ][ summit_index ] / 100.0, # should be the same as summit_value
+                       pscore      = get_pscore(self.data[chrom][ 1 ][ summit_index ] / 100, self.data[chrom][ 2 ][ summit_index ] / 100.0 ) /100.0,
+                       fold_change = float ( self.data[chrom][ 1 ][ summit_index ] + 100 ) / ( self.data[chrom][ 2 ][ summit_index ] + 100 ),
                        qscore      = qscore,
                        )
             # start a new peak

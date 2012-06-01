@@ -1,4 +1,4 @@
-# Time-stamp: <2012-05-24 12:40:40 Tao Liu>
+# Time-stamp: <2012-05-24 13:55:23 Tao Liu>
 
 import sys
 import logging
@@ -74,6 +74,7 @@ def run( options ):
     cbio = cBedGraphIO.bedGraphIO(options.cfile)
     cbtrack = cbio.build_bdgtrack()
 
+    info("Build scoreTrackII...")
     sbtrack = tbtrack.make_scoreTrackII_for_macs( cbtrack )
 
     method = options.method

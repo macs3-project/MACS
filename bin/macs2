@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# Time-stamp: <2012-05-24 12:39:57 Tao Liu>
+# Time-stamp: <2012-05-30 14:50:00 Tao Liu>
 
 """Description: MACS 2 main executable
 
@@ -121,10 +121,10 @@ def add_callpeak_parser( subparsers ):
     
     # group for input files
     group_input = argparser_callpeak.add_argument_group( "Input files arguments" )
-    group_input.add_argument( "-t", "--treatment", dest = "tfile", type = str, required = True,
-                              help = "ChIP-seq treatment file. REQUIRED." )
-    group_input.add_argument( "-c", "--control", dest = "cfile", type = str,
-                                    help = "Control file.")
+    group_input.add_argument( "-t", "--treatment", dest = "tfile", type = str, required = True, nargs = "+",
+                              help = "ChIP-seq treatment file. If multiple files are given as '-t A B C', then they will all be read and combined. REQUIRED." )
+    group_input.add_argument( "-c", "--control", dest = "cfile", type = str, nargs = "*",
+                                    help = "Control file. If multiple files are given as '-c A B C', then they will all be read and combined.")
     group_input.add_argument( "-f", "--format", dest = "format", type = str,
                               choices = ("AUTO", "BAM", "SAM", "BED", "ELAND",
                                          "ELANDMULTI", "ELANDEXPORT", "BOWTIE",
@@ -146,8 +146,8 @@ def add_callpeak_parser( subparsers ):
                                default = False )
     group_output.add_argument( "--verbose", dest = "verbose", type = int, default = 2,
                                help = "Set verbose level of runtime message. 0: only show critical message, 1: show additional warning message, 2: show process information, 3: show debug messages. DEFAULT:2" )
-    group_output.add_argument( "--no-trackline", dest="trackline", action="store_false", default = True,
-                               help = "Tells MACS not to include trackline with bedGraph files. The trackline is required by UCSC. Require -B to be set. Default: keep trackline." )
+    group_output.add_argument( "--trackline", dest="trackline", action="store_true", default = False,
+                               help = "Tells MACS to include trackline with bedGraph files. To include this trackline while displaying bedGraph at UCSC genome browser, can show name and description of the file as well. However my suggestion is to convert bedGraph to bigWig, then show the smaller and faster binary bigWig file at UCSC genome browser, as well as downstream analysis. Require -B to be set. Default: Not include trackline." )
     
     group_output.add_argument( "--SPMR", dest = "do_SPMR", action = "store_true", default = False,
                                help = "If True, MACS will save signal per million reads for fragment pileup profiles. Require -B to be set. Default: False" )    

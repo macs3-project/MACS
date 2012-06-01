@@ -1,5 +1,5 @@
 # cython: profile=True
-# Time-stamp: <2012-05-24 21:51:10 Tao Liu>
+# Time-stamp: <2012-05-30 12:06:17 Tao Liu>
 
 """Description: MACS 2 main executable
 
@@ -308,6 +308,7 @@ def load_frag_files_options ( options ):
 
     """
     options.info("#1 read treatment fragments...")
+    
     tp = options.parser(options.tfile)
     
     treat = tp.build_petrack()
