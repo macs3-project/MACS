@@ -59,7 +59,7 @@ cpdef factorial ( unsigned int n ):
         fact = fact * i
     return fact
 
-cpdef poisson_cdf ( unsigned int n, double lam, bool lower=False, bool log10=False ):
+cpdef double poisson_cdf ( unsigned int n, double lam, bool lower=False, bool log10=False ):
     """Poisson CDF evaluater.
 
     This is a more stable CDF function. It can tolerate large lambda
@@ -94,7 +94,7 @@ cpdef poisson_cdf ( unsigned int n, double lam, bool lower=False, bool log10=Fal
         else:
             return __poisson_cdf_Q(n,lam)
 
-cdef __poisson_cdf ( unsigned int k, double a ):
+cdef inline double __poisson_cdf ( unsigned int k, double a ):
     """Poisson CDF For small lambda. If a > 745, this will return
     incorrect result.
 
@@ -103,7 +103,7 @@ cdef __poisson_cdf ( unsigned int k, double a ):
     a	: lambda
     """
     if k < 0:
-        return 0                        # special cases
+        return 0.0                        # special cases
     cdef double nextcdf = exp( -1 * a )
     cdef double cdf = nextcdf
     cdef unsigned int i
@@ -112,12 +112,12 @@ cdef __poisson_cdf ( unsigned int k, double a ):
         lastcdf = nextcdf
         nextcdf = lastcdf * a / i
         cdf = cdf + nextcdf
-    if cdf > 1:
-        return 1
+    if cdf > 1.0:
+        return 1.0
     else:
         return cdf
     
-cdef __poisson_cdf_large_lambda ( unsigned int k, double a ):
+cdef inline double __poisson_cdf_large_lambda ( unsigned int k, double a ):
     """Slower poisson cdf for large lambda ( > 700 )
 
     Parameters:
@@ -126,7 +126,7 @@ cdef __poisson_cdf_large_lambda ( unsigned int k, double a ):
     """
     assert a > 700
     if k < 0:
-        return 0                        # special cases
+        return 0.0                        # special cases
     cdef int num_parts = int(a/LSTEP)
     cdef double lastexp = exp(-1 * (a % LSTEP) )
     cdef double nextcdf = EXPSTEP
@@ -153,7 +153,7 @@ cdef __poisson_cdf_large_lambda ( unsigned int k, double a ):
     cdf *= lastexp
     return cdf
 
-cdef __poisson_cdf_Q ( unsigned int k, double a ):
+cdef inline double __poisson_cdf_Q ( unsigned int k, double a ):
     """internal Poisson CDF evaluater for upper tail with small
     lambda.
 
@@ -164,7 +164,7 @@ cdef __poisson_cdf_Q ( unsigned int k, double a ):
     cdef unsigned int i
 
     if k < 0:
-        return 1                        # special cases
+        return 1.0                        # special cases
     cdef double nextcdf
     nextcdf = exp( -1 * a )
     cdef double lastcdf
@@ -173,16 +173,16 @@ cdef __poisson_cdf_Q ( unsigned int k, double a ):
         lastcdf = nextcdf
         nextcdf = lastcdf * a / i
 
-    cdef double cdf = 0
+    cdef double cdf = 0.0
     i = k+1
-    while nextcdf >0:
+    while nextcdf >0.0:
         lastcdf = nextcdf
         nextcdf = lastcdf * a / i
         cdf += nextcdf
         i+=1
     return cdf
 
-cdef __poisson_cdf_Q_large_lambda ( unsigned int k, double a ):
+cdef inline double __poisson_cdf_Q_large_lambda ( unsigned int k, double a ):
     """Slower internal Poisson CDF evaluater for upper tail with large
     lambda.
 
@@ -192,7 +192,7 @@ cdef __poisson_cdf_Q_large_lambda ( unsigned int k, double a ):
     """
     assert a > 700
     if k < 0:
-        return 1                        # special cases
+        return 1.0                        # special cases
     cdef unsigned int num_parts = int(a/LSTEP)
     cdef double lastexp = exp(-1 * (a % LSTEP) )
     cdef double nextcdf = EXPSTEP
@@ -213,9 +213,9 @@ cdef __poisson_cdf_Q_large_lambda ( unsigned int k, double a ):
                raise Exception("Unexpected error")
                #cdf *= lastexp
                #lastexp = 1
-    cdef double cdf = 0
+    cdef double cdf = 0.0
     i = k+1
-    while nextcdf >0:
+    while nextcdf >0.0:
         lastcdf = nextcdf
         nextcdf = lastcdf * a / i
         cdf += nextcdf
@@ -234,7 +234,7 @@ cdef __poisson_cdf_Q_large_lambda ( unsigned int k, double a ):
     cdf *= lastexp
     return cdf
 
-cdef double log10_poisson_cdf_P_large_lambda ( unsigned int k, double lbd ):
+cdef inline double log10_poisson_cdf_P_large_lambda ( unsigned int k, double lbd ):
     """Slower Poisson CDF evaluater for lower tail which allow
     calculation in log space. Better for the pvalue < 10^-310.
 
@@ -272,7 +272,7 @@ cdef double log10_poisson_cdf_P_large_lambda ( unsigned int k, double lbd ):
 
     return round((residue-lbd)/M_LN10,2)
 
-cdef double log10_poisson_cdf_Q_large_lambda ( unsigned int k, double lbd ):
+cdef inline double log10_poisson_cdf_Q_large_lambda ( unsigned int k, double lbd ):
     """Slower Poisson CDF evaluater for upper tail which allow
     calculation in log space. Better for the pvalue < 10^-310.
 
@@ -310,7 +310,7 @@ cdef double log10_poisson_cdf_Q_large_lambda ( unsigned int k, double lbd ):
 
     return round((residue-lbd)/log(10),2)
 
-cdef double logspace_add ( double logx, double logy ):
+cdef inline double logspace_add ( double logx, double logy ):
     return max (logx, logy) + log1p (exp (-fabs (logx - logy)));
 
 cpdef poisson_cdf_inv ( double cdf, double lam, int maximum=1000 ):

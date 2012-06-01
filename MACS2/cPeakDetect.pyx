@@ -27,8 +27,7 @@ import gc                               # use garbage collectior
 from MACS2.IO.cPeakIO import PeakIO
 from MACS2.IO.cBedGraphIO import bedGraphIO
 from MACS2.Constants import *
-from MACS2.cPileup import pileup_bdg, pileup_w_multiple_d_bdg, pileup_frag_bdg,\
-                          pileup_and_ext_frag_bdg, pileup_frag_w_multiple_d_bdg   
+from MACS2.cPileup import unified_pileup_bdg   
 #from MACS2.cPileup_old import pileup_bdg, pileup_w_multiple_d_bdg
 
 cdef str subpeak_letters(short i):
@@ -38,125 +37,122 @@ cdef str subpeak_letters(short i):
         return subpeak_letters(i / 26) + chr(97 + (i % 26))
 
 # actually I didn't use this function... 
-def compare_treatment_vs_control(treat, control, fragment_size, gsize,
-                                 halfext=False, PE_MODE=False,
-                                 slocal=0, llocal=0,
-                                 tocontrol=False, shiftcontrol=False):
-    """To compare treatment vs control tags tracks with tag extension
-    ,local poisson test, and Benjamini-Hochberg adjustment. Return
-    scoreTrackI object.
-
-    While calculating pvalue:
-
-    First, t and c will be adjusted by the ratio between total
-    reads in treatment and total reads in control, depending on
-    --to-control option.
-
-    Then, t and c will be multiplied by the smallest peak size --
-    self.d.
-
-    Next, a poisson CDF is applied to calculate one-side pvalue
-    for enrichment.
-
-    Finally, BH process will be applied to adjust pvalue to qvalue.
-    """
-    # raise DeprecationWarning ?
-    cdef float effective_depth_in_million
-    
-    treat_total   = treat.total
-    control_total = control.total
-    ratio_treat2control = float(treat_total)/control_total
-
-
-    # Now pileup FWTrackIII to form a bedGraphTrackI
-    if PE_MODE:
-        treat_btrack = pileup_bdg(treat, fragment_size)
-    else:
-        treat_btrack = pileup_bdg(treat, fragment_size, directional=True,
-                                  halfextension=halfext)
-
-    if tocontrol:
-        # if user want to scale everything to control data
-        lambda_bg = float(fragment_size)*treat_total/gsize/ratio_treat2control
-        treat_btrack.apply_func(lambda x:float(x)/ratio_treat2control)
-        effective_depth_in_million = control_total / 1000000.0        
-    else:
-        lambda_bg = float(fragment_size)*treat_total/gsize
-        effective_depth_in_million = treat_total / 1000000.0        
-
-
-    # control data needs multiple steps of calculation
-    # I need to shift them by 500 bps, then 5000 bps
-    if slocal:
-        assert fragment_size <= slocal, "slocal can't be smaller than d!"
-    if llocal:
-        assert fragment_size <= llocal , "llocal can't be smaller than d!"            
-        assert slocal <= llocal , "llocal can't be smaller than slocal!"
-
-    # Now prepare a list of extension sizes
-    d_s = [ fragment_size ]
-    # And a list of scaling factors
-    scale_factor_s = []
-
-    # d
-    if not tocontrol:
-        # if user want to scale everything to ChIP data
-        tmp_v = ratio_treat2control
-    else:
-        tmp_v = 1.0
-    scale_factor_s.append( tmp_v )
-
-    # slocal size local
-    if slocal:
-        d_s.append( slocal )
-        if not tocontrol:
-            # if user want to scale everything to ChIP data
-            tmp_v = float(fragment_size)/slocal*ratio_treat2control
-        else:
-            tmp_v = float(fragment_size)/slocal
-        scale_factor_s.append( tmp_v )
-
-    # llocal size local
-    if llocal and llocal > slocal:
-        d_s.append( llocal )
-        if not tocontrol:
-            # if user want to scale everything to ChIP data
-            tmp_v = float(fragment_size)/llocal*ratio_treat2control
-        else:
-            tmp_v = float(fragment_size)/llocal
-        scale_factor_s.append( tmp_v )                            
-
-    # pileup using different extension sizes and scaling factors
-    if PE_MODE:
-        control_btrack = pileup_frag_w_multiple_d_bdg(control,
-                                            d_s[1:],
-                                            baseline_value=lambda_bg,
-                                            scale_factor_s=scale_factor_s[1:],
-                                            scale_factor_0=scale_factor_s[0])
-    else:
-        control_btrack = pileup_w_multiple_d_bdg(control, d_s,
-                                             baseline_value=lambda_bg,
-                                             directional=shiftcontrol,
-                                             halfextension=halfext,
-                                             scale_factor_s=scale_factor_s)
-
-    # calculate pvalue scores
-    score_btrack = treat_btrack.make_scoreTrack_for_macs( control_btrack , effective_depth_in_million = effective_depth_in_million )
-    #treat_btrack = None             # clean them
-    #control_btrack = None
-    #gc.collect()                    # full collect garbage
-
-    # calculate and assign qvalues
-    pqtable = score_btrack.make_pq_table()
-        
-    score_btrack.assign_qvalue( pqtable )
-                
-    return score_btrack
+#def compare_treatment_vs_control(treat, control, fragment_size, gsize,
+#                                 halfext=False, PE_MODE=False,
+#                                 slocal=0, llocal=0,
+#                                 tocontrol=False, shiftcontrol=False):
+#    """To compare treatment vs control tags tracks with tag extension
+#    ,local poisson test, and Benjamini-Hochberg adjustment. Return
+#    scoreTrackI object.
+#
+#    While calculating pvalue:
+#
+#    First, t and c will be adjusted by the ratio between total
+#    reads in treatment and total reads in control, depending on
+#    --to-control option.
+#
+#    Then, t and c will be multiplied by the smallest peak size --
+#    self.d.
+#
+#    Next, a poisson CDF is applied to calculate one-side pvalue
+#    for enrichment.
+#
+#    Finally, BH process will be applied to adjust pvalue to qvalue.
+#    """
+#    # raise DeprecationWarning ?
+#    cdef float effective_depth_in_million
+#    
+#    treat_total   = treat.total
+#    control_total = control.total
+#    ratio_treat2control = float(treat_total)/control_total
+#
+#
+#    # Now pileup FWTrackIII to form a bedGraphTrackI
+#    treat_btrack = pileup_bdg(treat, fragment_size, directional=True,
+#                              halfextension=halfext)
+#
+#    if tocontrol:
+#        # if user want to scale everything to control data
+#        lambda_bg = float(fragment_size)*treat_total/gsize/ratio_treat2control
+#        treat_btrack.apply_func(lambda x:float(x)/ratio_treat2control)
+#        effective_depth_in_million = control_total / 1000000.0        
+#    else:
+#        lambda_bg = float(fragment_size)*treat_total/gsize
+#        effective_depth_in_million = treat_total / 1000000.0        
+#
+#
+#    # control data needs multiple steps of calculation
+#    # I need to shift them by 500 bps, then 5000 bps
+#    if slocal:
+#        assert fragment_size <= slocal, "slocal can't be smaller than d!"
+#    if llocal:
+#        assert fragment_size <= llocal , "llocal can't be smaller than d!"            
+#        assert slocal <= llocal , "llocal can't be smaller than slocal!"
+#
+#    # Now prepare a list of extension sizes
+#    d_s = [ fragment_size ]
+#    # And a list of scaling factors
+#    scale_factor_s = []
+#
+#    # d
+#    if not tocontrol:
+#        # if user want to scale everything to ChIP data
+#        tmp_v = ratio_treat2control
+#    else:
+#        tmp_v = 1.0
+#    scale_factor_s.append( tmp_v )
+#
+#    # slocal size local
+#    if slocal:
+#        d_s.append( slocal )
+#        if not tocontrol:
+#            # if user want to scale everything to ChIP data
+#            tmp_v = float(fragment_size)/slocal*ratio_treat2control
+#        else:
+#            tmp_v = float(fragment_size)/slocal
+#        scale_factor_s.append( tmp_v )
+#
+#    # llocal size local
+#    if llocal and llocal > slocal:
+#        d_s.append( llocal )
+#        if not tocontrol:
+#            # if user want to scale everything to ChIP data
+#            tmp_v = float(fragment_size)/llocal*ratio_treat2control
+#        else:
+#            tmp_v = float(fragment_size)/llocal
+#        scale_factor_s.append( tmp_v )                            
+#
+#    # pileup using different extension sizes and scaling factors
+#    if PE_MODE:
+#        control_btrack = pileup_frag_w_multiple_d_bdg(control,
+#                                            d_s[1:],
+#                                            baseline_value=lambda_bg,
+#                                            scale_factor_s=scale_factor_s[1:],
+#                                            scale_factor_0=scale_factor_s[0])
+#    else:
+#        control_btrack = pileup_w_multiple_d_bdg(control, d_s,
+#                                             baseline_value=lambda_bg,
+#                                             directional=shiftcontrol,
+#                                             halfextension=halfext,
+#                                             scale_factor_s=scale_factor_s)
+#
+#    # calculate pvalue scores
+#    score_btrack = treat_btrack.make_scoreTrack_for_macs( control_btrack , effective_depth_in_million = effective_depth_in_million )
+#    #treat_btrack = None             # clean them
+#    #control_btrack = None
+#    #gc.collect()                    # full collect garbage
+#
+#    # calculate and assign qvalues
+#    pqtable = score_btrack.make_pq_table()
+#        
+#    score_btrack.assign_qvalue( pqtable )
+#                
+#    return score_btrack
 
 class PeakDetect:
     """Class to do the peak calling.
 
-    e.g:
+    e.g
     >>> from MACS2.cPeakDetect import cPeakDetect
     >>> pd = PeakDetect(treat=treatdata, control=controldata, pvalue=pvalue_cutoff, d=100, gsize=3000000000)
     >>> pd.call_peaks()
@@ -324,9 +320,11 @@ class PeakDetect:
         if self.PE_MODE:
             treat_total   = self.treat.length()
             control_total = self.control.length()
+            d = None
         else:
             treat_total   = self.treat.total
             control_total = self.control.total
+            d = self.d
         self.ratio_treat2control = float(treat_total)/control_total
 
         if self.opt.tocontrol:
@@ -336,26 +334,24 @@ class PeakDetect:
             if self.PE_MODE:
                 self.info("#3 pileup treatment data")
                 lambda_bg = treat_total/self.gsize/self.ratio_treat2control
-                treat_btrack = pileup_frag_bdg(self.treat,
-                                        scale_factor=1/self.ratio_treat2control)
             else:
                 self.info("#3 pileup treatment data by extending tags towards 3' to %d length" % self.d)
                 lambda_bg = float(self.d)*treat_total/self.gsize/self.ratio_treat2control
-                treat_btrack = pileup_bdg(self.treat, self.d, directional=True,
-                                          halfextension=self.opt.halfext,
-                                          scale_factor=1/self.ratio_treat2control)
+            treat_btrack = unified_pileup_bdg(self.treat, d,
+                                              1/self.ratio_treat2control,
+                                              directional=True,
+                                              halfextension=self.opt.halfext)
         else:
             # if MACS decides to scale control to treatment because control sample is bigger
             effective_depth_in_million = treat_total / 1000000.0
             
             if self.PE_MODE:
                 lambda_bg = treat.total/self.gsize
-                treat_btrack = pileup_frag_bdg(self.treat, scale_factor=1.0)
             else:
                 lambda_bg = float(self.d)*treat_total/self.gsize
-                treat_btrack = pileup_bdg(self.treat,self.d,directional=True,
-                                          halfextension=self.opt.halfext,
-                                          scale_factor=1.0)
+            treat_btrack = unified_pileup_bdg(self.treat, d, scale_factor=1.0,
+                                              directional=True,
+                                              halfextension=self.opt.halfext)
 
         # control data needs multiple steps of calculation
         self.info("#3 calculate local lambda from control data")
@@ -373,10 +369,10 @@ class PeakDetect:
 
         # d
         if not self.opt.tocontrol:
-            # if user want to scale everything to ChIP data
+            # if user wants to scale everything to ChIP data
             tmp_v = self.ratio_treat2control
         else:
-            tmp_v = 1
+            tmp_v = 1.0
         scale_factor_s.append( tmp_v )
 
         # slocal size local
@@ -400,18 +396,10 @@ class PeakDetect:
             scale_factor_s.append( tmp_v )                            
 
         # pileup using different extension sizes and scaling factors
-        if self.PE_MODE:
-            control_btrack = pileup_frag_w_multiple_d_bdg(self.control,
-                                            d_s[1:],
+        control_btrack = unified_pileup_bdg(self.control, d_s, scale_factor_s,
                                             baseline_value=lambda_bg,
-                                            scale_factor_s=scale_factor_s[1:],
-                                            scale_factor_0=scale_factor_s[0])
-        else:
-            control_btrack = pileup_w_multiple_d_bdg(self.control, d_s,
-                                                     baseline_value=lambda_bg,
-                                                     directional=self.shiftcontrol,
-                                                     halfextension=self.opt.halfext,
-                                                     scale_factor_s=scale_factor_s)
+                                            directional=self.shiftcontrol,
+                                            halfextension=self.opt.halfext)
 
         # free mem
         #self.treat = None
@@ -524,8 +512,10 @@ class PeakDetect:
 
         if self.PE_MODE:
             treat_total = self.treat.length()
+            d = None
         else:
             treat_total = self.treat.total
+            d = self.d
         
         effective_depth_in_million = treat_total / 1000000.0
 
@@ -536,14 +526,13 @@ class PeakDetect:
             self.info("#3 pileup treatment data")
             # this an estimator, we should maybe test it for accuracy?
             lambda_bg = treat_total / self.gsize
-            # Now pileup FWTrackIII to form a bedGraphTrackI
-            treat_btrack = pileup_frag_bdg(self.treat)
         else:
-            lambda_bg = float(self.d) * treat_total / self.gsize
+            lambda_bg = float(d) * treat_total / self.gsize
             self.info("#3 pileup treatment data by extending tags towards 3' to %d length" % self.d)
             # Now pileup FWTrackIII to form a bedGraphTrackI
-            treat_btrack = pileup_bdg(self.treat, self.d, directional=True,
-                                      halfextension=self.opt.halfext)
+        treat_btrack = unified_pileup_bdg(self.treat, d, 1.0,
+                                          directional=True,
+                                          halfextension=self.opt.halfext)
         # llocal size local
         # self.info("#3 calculate d local lambda from treatment data")
         # nothing done here. should this match w control??
@@ -552,17 +541,10 @@ class PeakDetect:
             tmp_v = float(self.d) / self.lregion
             self.info("#3 calculate large local lambda from treatment data")
             # Now pileup FWTrackIII to form a bedGraphTrackI
-            if self.PE_MODE:
-                control_btrack = pileup_and_ext_frag_bdg(self.treat,
-                                                self.lregion,
-                                                baseline_value = lambda_bg,
-                                                scale_factor = tmp_v)
-            else:
-                control_btrack = pileup_bdg(self.treat,self.lregion,
-                                            directional=self.shiftcontrol,
-                                            halfextension=self.opt.halfext,
-                                            baseline_value = lambda_bg,
-                                            scale_factor = tmp_v)
+            control_btrack = unified_pileup_bdg(self.treat, self.lregion, tmp_v,
+                                                directional=self.shiftcontrol,
+                                                halfextension=self.opt.halfext,
+                                                baseline_value = lambda_bg)
         else:
             # I need to fake a control_btrack
             control_btrack = treat_btrack.set_single_value(lambda_bg)

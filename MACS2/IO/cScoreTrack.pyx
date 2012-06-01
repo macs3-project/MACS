@@ -34,7 +34,7 @@ from MACS2.Constants import *
 from MACS2.cProb cimport poisson_cdf
 from MACS2.IO.cPeakIO import PeakIO, BroadPeakIO
 
-from MACS2.hashtable import Int64HashTable
+from MACS2.hashtable import Int64HashTable, Float64HashTable
 
 import logging
 
@@ -54,23 +54,25 @@ cdef inline int int_min(int a, int b): return a if a <= b else b
 LOG10_E = 0.43429448190325176
 pscore_khashtable = Int64HashTable()
 
-cdef int get_pscore ( int observed, double expectation ):
+# Would be better to use Float64HashTable if methods are implemented
+cdef inline double get_pscore ( int observed, double expectation ):
     """Get p-value score from Poisson test. First check existing
     table, if failed, call poisson_cdf function, then store the result
     in table.
     
     """
     cdef:
-        int score
+        double score
         long key_value
     
     #key_value = ( observed, expectation )
     key_value = hash( (observed, expectation ) )
     try:
-        return pscore_khashtable.get_item(key_value)
+        return <double>pscore_khashtable.get_item(key_value)
     except KeyError:
-        score = int(-100*poisson_cdf(observed,expectation,False,True))
-        pscore_khashtable.set_item(key_value, score)
+#        score = int(-100*poisson_cdf(observed,expectation,False,True))
+        score = -100.0*poisson_cdf(observed,expectation,False,True)
+        pscore_khashtable.set_item(key_value, <long>score)
         return score
     #if pscore_dict.has_key(key_value):
     #    return pscore_dict[key_value]
@@ -81,7 +83,7 @@ cdef int get_pscore ( int observed, double expectation ):
 
 logLR_khashtable = Int64HashTable()
 
-cdef int logLR ( double x, double y ):
+cdef inline int logLR ( double x, double y ):
     """Calculate log10 Likelihood between H1 ( enriched ) and H0 (
     chromatin bias ). Then store the values in integer form =
     100*logLR. Set minus sign for depletion.
@@ -105,12 +107,12 @@ cdef int logLR ( double x, double y ):
         logLR_khashtable.set_item(key_value, s)
         return s
 
-cdef int get_logFE ( float x, float y ):
+cdef inline int get_logFE ( float x, float y ):
     """ return 100* log10 fold enrichment with +1 pseudocount.
     """
     return int( log10( (x+1.0)/(y+1.0) ) * 100 )
 
-cdef int get_substraction ( float x, float y):
+cdef inline int get_substraction ( float x, float y):
     """ return substraction.
     """
     return int( x - y )
@@ -119,7 +121,7 @@ cdef int get_substraction ( float x, float y):
 # Classes
 # ------------------------------------
 
-class scoreTrackI:
+cdef class scoreTrackI:
     """Class for scoreGraph type data. Modified from
     bedGraphTrackI. The only difference is that we store pvalue score,
     qvalue score and foldchange together.
@@ -142,6 +144,12 @@ class scoreTrackI:
     this class is 0-indexed and right-open.
     
     """
+    cdef public dict data
+    cdef public dict pointer
+    cdef public bool trackline
+    cdef public float effective_depth_in_million
+    cdef float cutoff
+        
     def __init__ (self, float effective_depth_in_million = 1.0):
         """Different with bedGraphTrackI, missing values are simply
         replaced with 0.
@@ -168,25 +176,30 @@ class scoreTrackI:
             self.data[chrom] = { 'pos': np.zeros(chrom_max_len, dtype="int32"),
                                  'sample': np.zeros(chrom_max_len, dtype="float32"),
                                  'control': np.zeros(chrom_max_len, dtype="float32"),
-                                 '-100logp': np.zeros(chrom_max_len, dtype="int32"),
-                                 '-100logq': np.zeros(chrom_max_len, dtype="int32"),
-                                 '100logLR': np.zeros(chrom_max_len, dtype="int32") }
+#                                 '-100logp': np.zeros(chrom_max_len, dtype="int32"),
+#                                 '-100logq': np.zeros(chrom_max_len, dtype="int32"),
+#                                 '100logLR': np.zeros(chrom_max_len, dtype="int32") }
+                                 '-100logp': np.zeros(chrom_max_len, dtype="float32"),
+                                 '-100logq': np.zeros(chrom_max_len, dtype="float32"),
+                                 '100logLR': np.zeros(chrom_max_len, dtype="float32") }
             self.pointer[chrom] = 0
 
-    def add (self, str chromosome, int endpos, float sample, float control):
+    cpdef add (self, str chromosome, int endpos, float sample, float control):
         """Add a chr-endpos-sample-control block into data
         dictionary. At the mean time, calculate pvalues and log
         likelihood.
 
         """
-        cdef int i
+        cdef:
+            int i
+            dict c
         #print chromosome, endpos, sample, control
         i = self.pointer[chromosome]
         c = self.data[chromosome]
         c['pos'][i] = endpos
         c['sample'][i] = sample
         c['control'][i] = control
-        c['-100logp'][i] = get_pscore(int(sample),control)
+        c['-100logp'][i] = get_pscore(<int>sample, control)
         c['100logLR'][i] = logLR(sample,control)        
         self.pointer[chromosome] += 1
 
@@ -212,14 +225,15 @@ class scoreTrackI:
         else:
             return None
 
-    def get_chr_names (self):
+    cpdef set get_chr_names (self):
         """Return all the chromosome names stored.
         
         """
-        l = set(self.data.keys())
+        cdef set l = set(self.data.keys())
         return l
 
-    def write_bedGraph ( self, fhd, str name, str description, str colname, bool do_SPMR = False ):
+    def write_bedGraph ( self, object fhd, str name, str description, str colname,
+                         bool do_SPMR = False ):
         """Write all data to fhd in Wiggle Format.
 
         fhd: a filehandler to save bedGraph.
@@ -232,14 +246,18 @@ class scoreTrackI:
         
         """
         cdef:
-            str chrom
+            str chrom, line
             int l, pre, i, p 
             float pre_v, v, scale_factor
+            dict d
+            np.ndarray[np.int32_t, ndim=1] pos
+            np.ndarray[np.float32_t, ndim=1] value
             
+        write = fhd.write
         if self.trackline:
             # this line is REQUIRED by the wiggle format for UCSC browser
             trackcontents = (name.replace("\"", "\\\""), description.replace("\"", "\\\""))
-            fhd.write( "track type=bedGraph name=\"%s\" description=\"%s\"\n" % trackcontents )
+            write( "track type=bedGraph name=\"%s\" description=\"%s\"\n" % trackcontents )
         
         if colname not in [ 'sample', 'control', '-100logp', '-100logq', '100logLR' ]:
             raise Exception( "%s not supported!" % colname )
@@ -251,10 +269,11 @@ class scoreTrackI:
                 logging.info( "MACS will save SPMR for fragment pileup using effective depth of %.2f million" % self.effective_depth_in_million )
                 scale_factor = 1.0/self.effective_depth_in_million
             else:
-                scale_factor = 1
+                scale_factor = 1.0
         
         chrs = self.get_chr_names()
         for chrom in chrs:
+            line  = "%s" % chrom  + "\t%d\t%d\t%.2f\n"
             d = self.data[ chrom ]
             l = self.pointer[ chrom ]
             pre = 0
@@ -266,12 +285,12 @@ class scoreTrackI:
                 v = value[ i ]
                 p = pos[ i-1 ]
                 if pre_v != v: 
-                    fhd.write( "%s\t%d\t%d\t%.2f\n" % ( chrom, pre, p, pre_v ) )
+                    write( line % ( pre, p, pre_v ) )
                     pre_v = v
                     pre = p
             p = pos[ -1 ]
             # last one
-            fhd.write( "%s\t%d\t%d\t%.2f\n" % ( chrom, pre, p, pre_v ) )
+            write( line % ( pre, p, pre_v ) )
             
         return True
 
@@ -299,7 +318,7 @@ class scoreTrackI:
             # for each chromosome
             pre_p  = 0
             pos    = self.data[chrom][ 'pos' ]
-            value  = self.data[chrom][ '-100logp' ]
+            value  = self.data[chrom][ '-100logp' ].astype('int64')
             length = self.pointer[chrom]
             for j in xrange(length):
                 this_p = pos[j]
@@ -443,7 +462,7 @@ class scoreTrackI:
 
         return peaks
        
-    def __close_peak2 (self, peak_content, peaks, int min_length, str chrom, str colname, int smoothlen=51,
+    cpdef bool __close_peak2 (self, peak_content, peaks, int min_length, str chrom, str colname, int smoothlen=51,
                        float min_valley = 0.9):
         cdef:
             int summit_pos, tstart, tend, tmpindex, summit_index, summit_offset
@@ -511,7 +530,7 @@ class scoreTrackI:
         # start a new peak
         return True
 
-    def __close_peak (self, peak_content, peaks, int min_length, str chrom, str colname, int smoothlen=0):
+    cpdef bool __close_peak (self, peak_content, peaks, int min_length, str chrom, str colname, int smoothlen=0):
         """Close the peak region, output peak boundaries, peak summit
         and scores, then add the peak to peakIO object.
 
@@ -800,18 +819,21 @@ class CombinedTwoTrack:
             str chrom
             set chrs
             int pre, i, l
+            np.ndarray[np.int32_t, ndim=1] pos
+            np.ndarray[np.float32_t, ndim=1] value
         
         if colname not in ['V1','V2']:
             raise Exception("%s not supported!" % colname)
         chrs = self.get_chr_names()
+        write = fhd.write
         for chrom in chrs:
             d = self.data[chrom]
             l = self.pointer[chrom]
-            pre = 0
             pos   = d['pos']
             value = d[colname]
+            pre = 0
             for i in range( l ):
-                fhd.write("%s\t%d\t%d\t%.2f\n" % (chrom,pre,pos[i],value[i]))
+                write("%s\t%d\t%d\t%.2f\n" % (chrom,pre,pos[i],value[i]))
                 pre = pos[i]
 
         return True
@@ -1085,17 +1107,15 @@ cdef class scoreTrackII:
     """
     cdef:
         dict data                       # dictionary for data of each chromosome
-        dict data_stderr                # dictionary for data stderr for each chromosome
         dict datalength                 # length of data array of each chromosome
         bool trackline                  # whether trackline should be saved in bedGraph
-        bool stderr_on                  # whether to calculate stderr
         double treat_edm                 # seq depth in million of treatment
         double ctrl_edm                  # seq depth in million of control
         char scoring_method              # method for calculating scores.
         char normalization_method        # scale to control? scale to treatment? both scale to 1million reads?
 
     
-    def __init__ (self, float treat_depth, float ctrl_depth, bool stderr_on = False ):
+    def __init__ (self, float treat_depth, float ctrl_depth ):
         """Initialize.
 
         treat_depth and ctrl_depth are effective depth in million:
@@ -1116,7 +1136,6 @@ cdef class scoreTrackII:
                                  # p/q-value/likelihood
                                  # ratio/fold-enrichment/substraction
                                  # depending on -c setting)
-        self.stderr_on = stderr_on
         self.datalength = {}
         self.trackline = False
         self.treat_edm = treat_depth
