@@ -1,5 +1,5 @@
 # cython: profile=True
-# Time-stamp: <2012-06-01 15:42:46 Tao Liu>
+# Time-stamp: <2012-06-01 16:01:05 Tao Liu>
 
 """Module for Feature IO classes.
 
@@ -1372,6 +1372,7 @@ cdef class scoreTrackII:
         cdef:
             dict pqtable
             long i,l,j
+            double k
             str chrom
             np.ndarray p, c, v
             
@@ -1384,10 +1385,8 @@ cdef class scoreTrackII:
 
         # convert pvalue2qvalue to a simple dict
         s_p2q = Float64HashTable()
-        #g = pvalue2qvalue.get
-        for i in pqtable.keys():
-        #for i in range(pvalue2qvalue.shape[0]):
-            s_p2q.set_item(i,pqtable[i][0])
+        for k in pqtable.keys():
+            s_p2q.set_item(k,pqtable[k][0])
 
         g = s_p2q.get_item
         
