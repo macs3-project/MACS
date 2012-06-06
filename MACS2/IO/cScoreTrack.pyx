@@ -1,5 +1,5 @@
 # cython: profile=True
-# Time-stamp: <2012-06-05 15:34:25 Tao Liu>
+# Time-stamp: <2012-06-06 12:47:15 Tao Liu>
 
 """Module for Feature IO classes.
 
@@ -96,9 +96,9 @@ cdef inline double logLR ( double x, double y ):
         return logLR_khashtable.get_item( key_value )
     except KeyError:
         if x > y:
-            s = (x*(log(x+1)-log(y+1))+y-x)*LOG10_E
+            s = (x*(log(x)-log(y))+y-x)*LOG10_E
         elif x < y:
-            s = (x*(-log(x+1)+log(y+1))-y+x)*LOG10_E
+            s = (x*(-log(x)+log(y))-y+x)*LOG10_E
         else:
             s = 0
         logLR_khashtable.set_item(key_value, s)
@@ -107,7 +107,7 @@ cdef inline double logLR ( double x, double y ):
 cdef inline double get_logFE ( float x, float y ):
     """ return 100* log10 fold enrichment with +1 pseudocount.
     """
-    return log10( (x+1.0)/(y+1.0) )
+    return log10( x/y )
 
 cdef inline float get_substraction ( float x, float y):
     """ return substraction.
@@ -1112,9 +1112,10 @@ cdef class scoreTrackII:
         double ctrl_edm                  # seq depth in million of control
         char scoring_method              # method for calculating scores.
         char normalization_method        # scale to control? scale to treatment? both scale to 1million reads?
+        float pseudocount                # the pseudocount used to calcuate logLR, FE or logFE
 
     
-    def __init__ (self, float treat_depth, float ctrl_depth, bool stderr_on = False ):
+    def __init__ (self, float treat_depth, float ctrl_depth, bool stderr_on = False, float pseudocount = 1.0 ):
         """Initialize.
 
         treat_depth and ctrl_depth are effective depth in million:
@@ -1124,8 +1125,14 @@ cdef class scoreTrackII:
                                     control sample size, then this
                                     should be control sample size in
                                     million. And vice versa.
+                                    
+        pseudocount: a pseudocount used to calculate logLR, FE or
+                     logFE. Please note this value will not be changed
+                     with normalization method. So if you really want
+                     to set pseudocount 1 per million reads, set it
+                     after you normalize treat and control by million
+                     reads by `change_normalizetion_method(ord('M'))`.
 
-        
         """
         self.data = {}           # for each chromosome, there is a l*4
                                  # matrix. First column: end position
@@ -1154,8 +1161,13 @@ cdef class scoreTrackII:
         #                      M: scale to depth of 1 million;
         #                      N: not set/ raw pileup
         self.normalization_method = ord("N")
+
+        self.pseudocount = pseudocount
+
+    cpdef set_pseudocount( self, float pseudocount ):
+        self.pseudocount = pseudocount
         
-    cpdef enable_trackline(self):
+    cpdef enable_trackline( self ):
         """Turn on trackline with bedgraph output
         """
         self.trackline = True
@@ -1315,7 +1327,7 @@ cdef class scoreTrackII:
             l = self.datalength[chrom]
             for i in range(l):
                 p[ i ] *= treat_scale
-                c[ i ] *= control_scale                
+                c[ i ] *= control_scale
         return
 
     cpdef change_score_method (self, char scoring_method):
@@ -1478,6 +1490,9 @@ cdef class scoreTrackII:
             long l, i
             str chrom
             float v1, v2
+            float pseudocount
+
+        pseudocount = self.pseudocount
         
         for chrom in self.data.keys():
             p = self.data[chrom][ 1 ].flat.next
@@ -1489,7 +1504,7 @@ cdef class scoreTrackII:
             for i in range(l):
                 v1 = p() 
                 v2 = c()
-                v[ i ] =  logLR( v1, v2 )  #logLR( d[ i, 1]/100.0, d[ i, 2]/100.0 )
+                v[ i ] =  logLR( v1 + pseudocount, v2 + pseudocount )  #logLR( d[ i, 1]/100.0, d[ i, 2]/100.0 )
         self.scoring_method = 'l'
         return 
 
@@ -1500,6 +1515,9 @@ cdef class scoreTrackII:
         cdef:
             np.ndarray p, c, v
             long l, i
+            float pseudocount
+
+        pseudocount = self.pseudocount
         
         for chrom in self.data.keys():
             p = self.data[chrom][1]
@@ -1507,7 +1525,7 @@ cdef class scoreTrackII:
             v = self.data[chrom][3]
             l = self.datalength[chrom]
             for i in range(l):
-                v[ i ] = get_logFE ( p[ i ], c[ i ] )
+                v[ i ] = get_logFE ( p[ i ] + pseudocount, c[ i ] + pseudocount)
         self.scoring_method = 'f'
         return
 
@@ -1518,6 +1536,9 @@ cdef class scoreTrackII:
         cdef:
             np.ndarray p, c, v
             long l, i
+            float pseudocount
+
+        pseudocount = self.pseudocount
         
         for chrom in self.data.keys():
             p = self.data[chrom][1]
@@ -1525,7 +1546,7 @@ cdef class scoreTrackII:
             v = self.data[chrom][3]
             l = self.datalength[chrom]
             for i in range(l):
-                v[ i ] =  ( p[ i ] + 1.0 )/( c[ i ] + 1.0 )
+                v[ i ] =  ( p[ i ] + pseudocount )/( c[ i ] + pseudocount )
         self.scoring_method = 'F'
         return
 
@@ -1725,7 +1746,7 @@ cdef class scoreTrackII:
                        peak_score  = self.data[chrom][ 3 ][ summit_index ],
                        pileup      = self.data[chrom][ 1 ][ summit_index ], # should be the same as summit_value
                        pscore      = get_pscore(self.data[chrom][ 1 ][ summit_index ], self.data[chrom][ 2 ][ summit_index ]),
-                       fold_change = float ( self.data[chrom][ 1 ][ summit_index ] +1 ) / ( self.data[chrom][ 2 ][ summit_index ] + 1 ),
+                       fold_change = float ( self.data[chrom][ 1 ][ summit_index ] + self.pseudocount ) / ( self.data[chrom][ 2 ][ summit_index ] + self.pseudocount ),
                        qscore      = qscore,
                        )
             # start a new peak

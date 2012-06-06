@@ -1,4 +1,4 @@
-# Time-stamp: <2012-06-05 23:59:16 Tao Liu>
+# Time-stamp: <2012-06-06 12:56:37 Tao Liu>
 
 import sys
 import logging
@@ -31,52 +31,32 @@ info    = logging.info
 # ------------------------------------
 # Main function
 # ------------------------------------
-# pscore_dict = {}
-
-# def get_pscore ( observed, expectation ):
-#     key_value = (observed, expectation)
-#     if pscore_dict.has_key(key_value):
-#         return pscore_dict[key_value]
-#     else:
-#         score = -1*poisson_cdf(observed,expectation,False,True)
-#         pscore_dict[(observed,expectation)] = score
-#         return score
-
-# logLR_dict = {}
-
-# def logLR ( x, y ):
-#     """Calculate log10 Likelihood between H1 ( enriched ) and H0 (
-#     chromatin bias ). Then set minus sign for depletion.
-    
-#     """
-#     key_value = ( x, y )
-#     if logLR_dict.has_key(key_value):
-#         return logLR_dict[key_value]
-#     else:
-#         if x > y:
-#             s = (x*(mlog(x+1)-mlog(y+1))+y-x)*LOG10_E
-#         elif x < y:
-#             s = (-1*x*(mlog(x+1)-mlog(y+1))-y+x)*LOG10_E
-#         else:
-#             s = 0
-#         logLR_dict[key_value] = s
-#         return s
-
-# def logFE ( x, y ):
-#     return mlog( (x+1.0)/(y+1.0) )*LOG10_E
 
 def run( options ):
     info("Read and build treatment bedGraph...")
     tbio = cBedGraphIO.bedGraphIO(options.tfile)
     tbtrack = tbio.build_bdgtrack()
 
+    treat_depth = options.tdepth
+
     info("Read and build control bedGraph...")
     cbio = cBedGraphIO.bedGraphIO(options.cfile)
     cbtrack = cbio.build_bdgtrack()
 
-    info("Build scoreTrackII...")
-    sbtrack = tbtrack.make_scoreTrackII_for_macs( cbtrack )
+    ctrl_depth = options.cdepth
 
+    info("Build scoreTrackII...")
+    sbtrack = tbtrack.make_scoreTrackII_for_macs( cbtrack, depth1 = treat_depth, depth2 = ctrl_depth )
+    # normalize by depth
+    if abs(treat_depth-1) > 1e-6 or abs(ctrl_depth-1) > 1e-6:
+        # if depth of treat and control is 1.0 ( files are generated
+        # by MACS2 --SPMR ), no need for the following step.
+        info("Normalize by sequencing depth of million reads...")
+        sbtrack.change_normalization_method( ord('M') )
+    sbtrack.set_pseudocount( options.pseudocount )
+    
+    #def make_scoreTrackII_for_macs (self, bdgTrack2, float depth1 = 1.0, float depth2 = 1.0 ):
+    
     method = options.method
 
     info("Calculate scores comparing treatment and control by %s..." % method)
@@ -87,7 +67,6 @@ def run( options ):
         sbtrack.change_score_method( ord('q') )        
     elif method == 'substract':
         sbtrack.change_score_method( ord('d') )        
-        sbtrack = tbtrack.overlie(cbtrack,func=lambda x,y:x-y)
     elif method == 'logFE':
         sbtrack.change_score_method( ord('f') )
     elif method == 'FE':
@@ -97,7 +76,7 @@ def run( options ):
     else:
         raise Exception("Can't reach here!")
 
-    info("Write to output bedGraph...")
+    info("Write bedGraph of scores...")
     ofhd = io.open(options.ofile,"wb")
 
     #r = sbtrack.get_data_by_chr("chr22")
@@ -105,4 +84,4 @@ def run( options ):
     #print r
 
     sbtrack.write_bedGraph(ofhd,name="%s_Scores" % (method.upper()),description="Scores calculated by %s" % (method.upper()), column = 3)
-    info("Finished! Please check %s" % (options.tfile))
+    info("Finished! Please check %s!" % (options.ofile))
