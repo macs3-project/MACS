@@ -1,5 +1,5 @@
 # cython: profile=True
-# Time-stamp: <2012-06-06 12:47:15 Tao Liu>
+# Time-stamp: <2012-06-06 14:57:02 Tao Liu>
 
 """Module for Feature IO classes.
 
@@ -109,8 +109,8 @@ cdef inline double get_logFE ( float x, float y ):
     """
     return log10( x/y )
 
-cdef inline float get_substraction ( float x, float y):
-    """ return substraction.
+cdef inline float get_subtraction ( float x, float y):
+    """ return subtraction.
     """
     return x - y
 
@@ -1140,7 +1140,7 @@ cdef class scoreTrackII:
                                  # pileup; third: control pileup ;
                                  # forth: score ( can be
                                  # p/q-value/likelihood
-                                 # ratio/fold-enrichment/substraction
+                                 # ratio/fold-enrichment/subtraction
                                  # depending on -c setting)
         self.datalength = {}
         self.trackline = False
@@ -1151,7 +1151,7 @@ cdef class scoreTrackII:
         #                 l: log10 likelihood ratio ( minus for depletion )
         #                 f: log10 fold enrichment
         #                 F: linear fold enrichment        
-        #                 d: substraction
+        #                 d: subtraction
         #                 m: fragment pileup per million reads
         #                 N: not set
         self.scoring_method = ord("N")
@@ -1337,7 +1337,7 @@ cdef class scoreTrackII:
                          l: log10 likelihood ratio ( minus for depletion )
                          f: log10 fold enrichment
                          F: linear fold enrichment
-                         d: substraction
+                         d: subtraction
                          m: fragment pileup per million reads
         """
         if scoring_method == 'p':
@@ -1354,7 +1354,7 @@ cdef class scoreTrackII:
         elif scoring_method == 'F':
             self.compute_foldenrichment()
         elif scoring_method == 'd':
-            self.compute_substraction()
+            self.compute_subtraction()
         elif scoring_method == 'm':
             self.compute_SPMR()
         else:
@@ -1550,7 +1550,7 @@ cdef class scoreTrackII:
         self.scoring_method = 'F'
         return
 
-    cdef compute_substraction ( self ):
+    cdef compute_subtraction ( self ):
         cdef:
             np.ndarray p, c, v
             long l, i

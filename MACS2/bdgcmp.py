@@ -1,4 +1,4 @@
-# Time-stamp: <2012-06-06 12:56:37 Tao Liu>
+# Time-stamp: <2012-06-06 14:55:12 Tao Liu>
 
 import sys
 import logging
@@ -65,7 +65,7 @@ def run( options ):
         sbtrack.change_score_method( ord('p') )
     elif method == 'qpois':
         sbtrack.change_score_method( ord('q') )        
-    elif method == 'substract':
+    elif method == 'subtract':
         sbtrack.change_score_method( ord('d') )        
     elif method == 'logFE':
         sbtrack.change_score_method( ord('f') )
