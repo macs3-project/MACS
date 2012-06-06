@@ -1,5 +1,5 @@
 # cython: profile=True
-# Time-stamp: <2012-05-18 16:38:04 Tao Liu>
+# Time-stamp: <2012-06-06 00:33:46 Tao Liu>
 
 """Module for Feature IO classes.
 
@@ -387,8 +387,9 @@ class bedGraphTrackI:
             double v, summit_value, tvalue
             str chrom
         
-        if call_summits: close_peak = self.__close_peak2
-        else: close_peak = self.__close_peak
+        #if call_summits: close_peak = self.__close_peak2
+        #else: close_peak = self.__close_peak
+        close_peak = self.__close_peak
         chrs = self.get_chr_names()
         peaks = PeakIO()                      # dictionary to save peaks
         for chrom in chrs:
@@ -427,7 +428,7 @@ class bedGraphTrackI:
                     peak_content.append((pre_p,p,v))
                 else:
                     # when the gap is not allowed, close this peak
-                    close_peak(peak_content, peaks, min_length, chrom, smoothlen=max_gap / 2 )
+                    close_peak(peak_content, peaks, min_length, chrom) #, smoothlen=max_gap / 2 )
                     # start a new peak
                     peak_content = [(pre_p,p,v),]
                 pre_p = p
@@ -435,134 +436,126 @@ class bedGraphTrackI:
             # save the last peak
             if not peak_content:
                 continue
-            close_peak(peak_content, peaks, min_length, chrom, smoothlen=max_gap / 2 )
+            close_peak(peak_content, peaks, min_length, chrom) #, smoothlen=max_gap / 2 )
         return peaks
-   
-    def __close_peak2 (self, peak_content, peaks, int min_length, str chrom, int smoothlen=50):
-        # this is where the summits are called, need to fix this
-        end, start = peak_content[ -1 ][ 1 ], peak_content[ 0 ][ 0 ]
-        if end - start < min_length: return # if the peak is too small, reject it
-        #for (start,end,value,summitvalue,index) in peak_content:
-        peakdata = np.zeros(end - start, dtype='float32')
-        peakindices = np.zeros(end - start, dtype='int32')
-        for (tmpstart,tmpend,tmpvalue,tmpsummitvalue, tmpindex) in peak_content:
-            i, j = tmpstart-start, tmpend-start
-            peakdata[i:j] = self.data[chrom]['sample'][tmpindex]
-            peakindices[i:j] = tmpindex
-        # apply smoothing window of tsize / 2
-        w = np.ones(smoothlen, dtype='float32')
-        smoothdata = np_convolve(w/w.sum(), peakdata, mode='same')
-        # find maxima and minima
-        local_extrema = np.where(np.diff(np.sign(np.diff(smoothdata))))[0]+1
-        # get only maxima by requiring it be greater than the mean
-        # might be better to take another derivative instead
-        plateau_offsets = np.intersect1d(local_extrema,
-                                         np.where(peakdata>peakdata.mean())[0])
-        # sometimes peak summits are plateaus, so check for adjacent coordinates
-        # and take the middle ones if needed
-        if len(plateau_offsets)==0:
-        #####################################################################
-        # ***failsafe if no summits so far***                               #
-            summit_offset_groups = [[(end - start) / 2]]                    #
-        ##################################################################### 
-        elif len(plateau_offsets) == 1:
-            summit_offset_groups = [[plateau_offsets[0]]]
-        else:
-            previous_offset = plateau_offsets[0]
-            summit_offset_groups = [[previous_offset]]
-            for offset in plateau_offsets:
-                if offset == previous_offset + 1:
-                    summit_offset_groups[-1].append(offset)
-                else:
-                    summit_offset_groups.append([offset])
-        summit_offsets = []
-        for offset_group in summit_offset_groups:
-            summit_offsets.append(offset_group[len(offset_group) / 2])
-        summit_indices = peakindices[summit_offsets]
-        # also purge offsets that have the same summit_index
-        unique_offsets = []
-        summit_offsets = np.fromiter(summit_offsets, dtype='int32')
-        for index in np.unique(summit_indices):
-            those_index_indices = np.where(summit_indices == index)[0]
-            those_offsets = summit_offsets[those_index_indices]
-            unique_offsets.append(int(those_offsets.mean()))
-        # also require a valley of at least 0.6 * taller peak
-        # in every adjacent two peaks or discard the lesser one
-        # this behavior is like PeakSplitter
-        better_offsets = []
-        previous_offset = unique_offsets.pop()
-        while True:
-            if len(unique_offsets) == 0:
-                better_offsets.append(previous_offset)
-                break
-            else:
-                this_offset = unique_offsets.pop()
-                this_h, prev_h = peakdata[[this_offset, previous_offset]]
-                if this_h > prev_h:
-                    prev_is_taller = False
-                    min_valley = 0.6 * this_h
-                else:
-                    prev_is_taller = True
-                    min_valley = 0.6 * prev_h
-                s = slice(this_offset, previous_offset)
-                valley = np.where(peakdata[s] < min_valley)[0]
-                if len(valley) > 0: better_offsets.append(previous_offset)
-                else:
-                    if prev_is_taller: continue # discard this peak
-                    # else: discard previous peak by ignoring it
-                previous_offset = this_offset
-        better_offsets.reverse()
-        better_indices = peakindices[better_offsets]
-        assert len(better_offsets) > 0, "Lost peak summit(s) near %s %d" % (chrom, start) 
-        for summit_offset, summit_index in zip(better_offsets, better_indices):
-            peaks.add( chrom,
-                       start,
-                       end,
-                       summit      = start + summit_offset,
-                       peak_score  = peakdata[summit_offset],
-                       pileup      = 0,
-                       pscore      = 0,
-                       fold_change = 0,
-                       qscore      = 0,
-                       )
-        # start a new peak
-        return True
-    
-    def __close_peak (self, peak_content, peaks, int min_length, str chrom, int smoothlen=0):
-        cdef:
-            int peak_length, pre_p, p, i, summit_pos, tstart, tend
-            double v, summit_value, tvalue
 
-        peak_length = peak_content[ -1 ][ 1 ] - peak_content[ 0 ][ 0 ]
+    def __close_peak( self, peak_content, peaks, int min_length, str chrom ):
+        
+        peak_length = peak_content[-1][1]-peak_content[0][0]
         if peak_length >= min_length: # if the peak is too small, reject it
             tsummit = []
-            summit_pos   = 0
+            summit = 0
             summit_value = 0
-            for (tstart, tend, tvalue, summit_value, tmpindex) in peak_content:
-                if not summit_value or summit_value < tmpsummitvalue:
-                    tsummit = [ int(( tmpend+tmpstart )/2), ]
-                    tmpsummit_index = [ tmpindex, ]
-                    summit_value = tmpsummitvalue
-                elif summit_value == tmpsummitvalue:
-                    # remember continuous summit values
-                    tmpsummit.append( int( (tmpend+tmpstart)/2 ) )
-                    tmpsummit_index.append( tmpindex )
-            middle_summit = int( ( len(tmpsummit)+1 )/2 )-1 # the middle of all highest points in peak region is defined as summit
-            summit_pos    = tmpsummit[ middle_summit ]
-            summit_index  = tmpsummit_index[ middle_summit ]
-            peaks.add( chrom,
-                       peak_content[0][0],
-                       peak_content[-1][1],
-                       summit      = summit_pos,
-                       peak_score  = summit_value,
-                       pileup      = 0,
-                       pscore      = 0,
-                       fold_change = 0,
-                       qscore      = 0,
-                       )
-            # start a new peak
+            for (tstart,tend,tvalue) in peak_content:
+                if not summit_value or summit_value < tvalue:
+                    tsummit = [int((tend+tstart)/2),]
+                    summit_value = tvalue
+                elif summit_value == tvalue:
+                    tsummit.append( int((tend+tstart)/2) )
+                    summit = tsummit[int((len(tsummit)+1)/2)-1 ]
+                    peaks.add( chrom,
+                               peak_content[0][0],
+                               peak_content[-1][1],
+                               summit      = summit,
+                               peak_score  = summit_value,
+                               pileup      = 0,
+                               pscore      = 0,
+                               fold_change = 0,
+                               qscore      = 0
+                               )
             return True
-
+                    
+   
+    # def __close_peak2 (self, peak_content, peaks, int min_length, str chrom, int smoothlen=50):
+    #     # this is where the summits are called, need to fix this
+    #     end, start = peak_content[ -1 ][ 1 ], peak_content[ 0 ][ 0 ]
+    #     if end - start < min_length: return # if the peak is too small, reject it
+    #     #for (start,end,value,summitvalue,index) in peak_content:
+    #     peakdata = np.zeros(end - start, dtype='float32')
+    #     peakindices = np.zeros(end - start, dtype='int32')
+    #     for (tmpstart,tmpend,tmpvalue,tmpsummitvalue, tmpindex) in peak_content:
+    #         i, j = tmpstart-start, tmpend-start
+    #         peakdata[i:j] = self.data[chrom]['sample'][tmpindex]
+    #         peakindices[i:j] = tmpindex
+    #     # apply smoothing window of tsize / 2
+    #     w = np.ones(smoothlen, dtype='float32')
+    #     smoothdata = np_convolve(w/w.sum(), peakdata, mode='same')
+    #     # find maxima and minima
+    #     local_extrema = np.where(np.diff(np.sign(np.diff(smoothdata))))[0]+1
+    #     # get only maxima by requiring it be greater than the mean
+    #     # might be better to take another derivative instead
+    #     plateau_offsets = np.intersect1d(local_extrema,
+    #                                      np.where(peakdata>peakdata.mean())[0])
+    #     # sometimes peak summits are plateaus, so check for adjacent coordinates
+    #     # and take the middle ones if needed
+    #     if len(plateau_offsets)==0:
+    #     #####################################################################
+    #     # ***failsafe if no summits so far***                               #
+    #         summit_offset_groups = [[(end - start) / 2]]                    #
+    #     ##################################################################### 
+    #     elif len(plateau_offsets) == 1:
+    #         summit_offset_groups = [[plateau_offsets[0]]]
+    #     else:
+    #         previous_offset = plateau_offsets[0]
+    #         summit_offset_groups = [[previous_offset]]
+    #         for offset in plateau_offsets:
+    #             if offset == previous_offset + 1:
+    #                 summit_offset_groups[-1].append(offset)
+    #             else:
+    #                 summit_offset_groups.append([offset])
+    #     summit_offsets = []
+    #     for offset_group in summit_offset_groups:
+    #         summit_offsets.append(offset_group[len(offset_group) / 2])
+    #     summit_indices = peakindices[summit_offsets]
+    #     # also purge offsets that have the same summit_index
+    #     unique_offsets = []
+    #     summit_offsets = np.fromiter(summit_offsets, dtype='int32')
+    #     for index in np.unique(summit_indices):
+    #         those_index_indices = np.where(summit_indices == index)[0]
+    #         those_offsets = summit_offsets[those_index_indices]
+    #         unique_offsets.append(int(those_offsets.mean()))
+    #     # also require a valley of at least 0.6 * taller peak
+    #     # in every adjacent two peaks or discard the lesser one
+    #     # this behavior is like PeakSplitter
+    #     better_offsets = []
+    #     previous_offset = unique_offsets.pop()
+    #     while True:
+    #         if len(unique_offsets) == 0:
+    #             better_offsets.append(previous_offset)
+    #             break
+    #         else:
+    #             this_offset = unique_offsets.pop()
+    #             this_h, prev_h = peakdata[[this_offset, previous_offset]]
+    #             if this_h > prev_h:
+    #                 prev_is_taller = False
+    #                 min_valley = 0.6 * this_h
+    #             else:
+    #                 prev_is_taller = True
+    #                 min_valley = 0.6 * prev_h
+    #             s = slice(this_offset, previous_offset)
+    #             valley = np.where(peakdata[s] < min_valley)[0]
+    #             if len(valley) > 0: better_offsets.append(previous_offset)
+    #             else:
+    #                 if prev_is_taller: continue # discard this peak
+    #                 # else: discard previous peak by ignoring it
+    #             previous_offset = this_offset
+    #     better_offsets.reverse()
+    #     better_indices = peakindices[better_offsets]
+    #     assert len(better_offsets) > 0, "Lost peak summit(s) near %s %d" % (chrom, start) 
+    #     for summit_offset, summit_index in zip(better_offsets, better_indices):
+    #         peaks.add( chrom,
+    #                    start,
+    #                    end,
+    #                    summit      = start + summit_offset,
+    #                    peak_score  = peakdata[summit_offset],
+    #                    pileup      = 0,
+    #                    pscore      = 0,
+    #                    fold_change = 0,
+    #                    qscore      = 0,
+    #                    )
+    #     # start a new peak
+    #     return True
+    
     def call_broadpeaks (self, double lvl1_cutoff=500, double lvl2_cutoff=100, int min_length=200,
                          int lvl1_max_gap=50, int lvl2_max_gap=400):
         """This function try to find enriched regions within which,
