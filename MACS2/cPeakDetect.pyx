@@ -1,5 +1,5 @@
 # cython: profile=True
-# Time-stamp: <2012-06-05 23:34:05 Tao Liu>
+# Time-stamp: <2012-06-06 01:29:26 Tao Liu>
 
 """Module Description
 
@@ -470,7 +470,7 @@ class PeakDetect:
            for filename, title, desc, scorecol in tracks:
                self.info("#3 save the %s track into bedGraph file..." % desc)
                if self.opt.do_SPMR:
-                   score_btrack.change_normalization_method('M') # scale down to million reads
+                   score_btrack.change_normalization_method(ord('M')) # scale down to million reads
                with io.open(filename, 'wb') as bdgfhd:
                    score_btrack.write_bedGraph(bdgfhd, title,
                                                trackdesc % desc, scorecol) # do_SPMR doesn't have effect on p/q/logLR values.
@@ -603,7 +603,7 @@ class PeakDetect:
             for filename, title, desc, scorecol in tracks:
                 self.info("#3 save the %s track into bedGraph file..." % desc)
                 if self.opt.do_SPMR:
-                    score_btrack.change_normalization_method('M') # scale down to million reads
+                    score_btrack.change_normalization_method(ord('M')) # scale down to million reads
                 with open(filename, 'w') as bdgfhd:
                     score_btrack.write_bedGraph(bdgfhd, title,
                                                 trackdesc % desc, scorecol) # do_SPMR doesn't have effect on p/q/logLR values.
