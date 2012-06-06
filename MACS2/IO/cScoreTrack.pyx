@@ -1,5 +1,5 @@
 # cython: profile=True
-# Time-stamp: <2012-06-01 16:01:05 Tao Liu>
+# Time-stamp: <2012-06-05 15:34:25 Tao Liu>
 
 """Module for Feature IO classes.
 
@@ -1565,7 +1565,7 @@ cdef class scoreTrackII:
         self.scoring_method = 'm'
         return
 
-    cpdef write_bedGraph ( self, fhd, str name, str description, short column = 3 ):
+    cpdef write_bedGraph ( self, fhd, str name, str description, short column = 3):
         """Write all data to fhd in bedGraph Format.
 
         fhd: a filehandler to save bedGraph.
@@ -1610,7 +1610,7 @@ cdef class scoreTrackII:
             
         return True
 
-    cpdef call_peaks (self, int cutoff=500, int min_length=200, int max_gap=50, bool call_summits=False):
+    cpdef call_peaks (self, float cutoff=5.0, int min_length=200, int max_gap=50, bool call_summits=False):
         """This function try to find regions within which, scores
         are continuously higher than a given cutoff.
 
@@ -1620,7 +1620,7 @@ cdef class scoreTrackII:
         max_gap. After this, peak is reported if its length is above
         min_length.
 
-        cutoff:  cutoff of value, default 500. Note, the values stored in this class are actual value * 100, so 500 means 5.
+        cutoff:  cutoff of value, default 5. For -log10pvalue, it means 10^-5.
         min_length :  minimum peak length, default 200.
         gap   :  maximum gap to merge nearby peaks, default 50.
         ptrack:  an optional track for pileup heights. If it's not None, use it to find summits. Otherwise, use self/scoreTrack.
@@ -1680,96 +1680,6 @@ cdef class scoreTrackII:
                 self.__close_peak(peak_content, peaks, min_length, chrom, max_gap/2 )
 
         return peaks
-       
-    # def __close_peak2 (self, peak_content, peaks, min_length, chrom, colname, smoothlen=50):
-    #     # this is where the summits are called, need to fix this
-    #     end, start = peak_content[ -1 ][ 1 ], peak_content[ 0 ][ 0 ]
-    #     if end - start < min_length: return # if the peak is too small, reject it
-    #     #for (start,end,value,summitvalue,index) in peak_content:
-    #     peakdata = np.zeros(end - start, dtype='float32')
-    #     peakindices = np.zeros(end - start, dtype='int32')
-    #     for (tmpstart,tmpend,tmpvalue,tmpsummitvalue, tmpindex) in peak_content:
-    #         i, j = tmpstart-start, tmpend-start
-    #         peakdata[i:j] = self.data[chrom]['sample'][tmpindex]
-    #         peakindices[i:j] = tmpindex
-    #     # apply smoothing window of tsize / 2
-    #     w = np.ones(smoothlen, dtype='float32')
-    #     smoothdata = np_convolve(w/w.sum(), peakdata, mode='same')
-    #     # find maxima and minima
-    #     local_extrema = np.where(np.diff(np.sign(np.diff(smoothdata))))[0]+1
-    #     # get only maxima by requiring it be greater than the mean
-    #     # might be better to take another derivative instead
-    #     plateau_offsets = np.intersect1d(local_extrema,
-    #                                      np.where(peakdata>peakdata.mean())[0])
-    #     # sometimes peak summits are plateaus, so check for adjacent coordinates
-    #     # and take the middle ones if needed
-    #     if len(plateau_offsets)==0:
-    #     #####################################################################
-    #     # ***failsafe if no summits so far***                               #
-    #         summit_offset_groups = [[(end - start) / 2]]                    #
-    #     ##################################################################### 
-    #     elif len(plateau_offsets) == 1:
-    #         summit_offset_groups = [[plateau_offsets[0]]]
-    #     else:
-    #         previous_offset = plateau_offsets[0]
-    #         summit_offset_groups = [[previous_offset]]
-    #         for offset in plateau_offsets:
-    #             if offset == previous_offset + 1:
-    #                 summit_offset_groups[-1].append(offset)
-    #             else:
-    #                 summit_offset_groups.append([offset])
-    #     summit_offsets = []
-    #     for offset_group in summit_offset_groups:
-    #         summit_offsets.append(offset_group[len(offset_group) / 2])
-    #     summit_indices = peakindices[summit_offsets]
-    #     # also purge offsets that have the same summit_index
-    #     unique_offsets = []
-    #     summit_offsets = np.fromiter(summit_offsets, dtype='int32')
-    #     for index in np.unique(summit_indices):
-    #         those_index_indices = np.where(summit_indices == index)[0]
-    #         those_offsets = summit_offsets[those_index_indices]
-    #         unique_offsets.append(int(those_offsets.mean()))
-    #     # also require a valley of at least 0.6 * taller peak
-    #     # in every adjacent two peaks or discard the lesser one
-    #     # this behavior is like PeakSplitter
-    #     better_offsets = []
-    #     previous_offset = unique_offsets.pop()
-    #     while True:
-    #         if len(unique_offsets) == 0:
-    #             better_offsets.append(previous_offset)
-    #             break
-    #         else:
-    #             this_offset = unique_offsets.pop()
-    #             this_h, prev_h = peakdata[[this_offset, previous_offset]]
-    #             if this_h > prev_h:
-    #                 prev_is_taller = False
-    #                 min_valley = 0.6 * this_h
-    #             else:
-    #                 prev_is_taller = True
-    #                 min_valley = 0.6 * prev_h
-    #             s = slice(this_offset, previous_offset)
-    #             valley = np.where(peakdata[s] < min_valley)[0]
-    #             if len(valley) > 0: better_offsets.append(previous_offset)
-    #             else:
-    #                 if prev_is_taller: continue # discard this peak
-    #                 # else: discard previous peak by ignoring it
-    #             previous_offset = this_offset
-    #     better_offsets.reverse()
-    #     better_indices = peakindices[better_offsets]
-    #     assert len(better_offsets) > 0, "Lost peak summit(s) near %s %d" % (chrom, start) 
-    #     for summit_offset, summit_index in zip(better_offsets, better_indices):
-    #         peaks.add( chrom,
-    #                    start,
-    #                    end,
-    #                    summit      = start + summit_offset,
-    #                    peak_score  = self.data[chrom][colname][ summit_index ],
-    #                    pileup      = self.data[chrom]['sample'][ summit_index ], # should be the same as summit_value
-    #                    pscore      = self.data[chrom]['-100logp'][ summit_index ]/100.0,
-    #                    fold_change = self.data[chrom]['sample'][ summit_index ]/self.data[chrom]['control'][ summit_index ],
-    #                    qscore      = self.data[chrom]['-100logq'][ summit_index ]/100.0,
-    #                    )
-    #     # start a new peak
-    #     return True
 
     cdef __close_peak (self, list peak_content, peaks, int min_length, str chrom, int smoothlen=0):
         """Close the peak region, output peak boundaries, peak summit
@@ -1803,7 +1713,7 @@ cdef class scoreTrackII:
             summit_pos    = tsummit[ midindex ]
             summit_index  = tsummit_index[ midindex ]
             if self.scoring_method == 'q':
-                qscore = self.data[chrom][ summit_index, 3 ] / 100.0
+                qscore = self.data[chrom][3][ summit_index ]
             else:
                 # if q value is not computed, use -1
                 qscore = -1
@@ -1812,105 +1722,15 @@ cdef class scoreTrackII:
                        peak_content[0][0],
                        peak_content[-1][1],
                        summit      = summit_pos,
-                       peak_score  = self.data[chrom][ 3 ][ summit_index ] / 100.0,
-                       pileup      = self.data[chrom][ 1 ][ summit_index ] / 100.0, # should be the same as summit_value
-                       pscore      = get_pscore(self.data[chrom][ 1 ][ summit_index ] / 100, self.data[chrom][ 2 ][ summit_index ] / 100.0 ) /100.0,
-                       fold_change = float ( self.data[chrom][ 1 ][ summit_index ] + 100 ) / ( self.data[chrom][ 2 ][ summit_index ] + 100 ),
+                       peak_score  = self.data[chrom][ 3 ][ summit_index ],
+                       pileup      = self.data[chrom][ 1 ][ summit_index ], # should be the same as summit_value
+                       pscore      = get_pscore(self.data[chrom][ 1 ][ summit_index ], self.data[chrom][ 2 ][ summit_index ]),
+                       fold_change = float ( self.data[chrom][ 1 ][ summit_index ] +1 ) / ( self.data[chrom][ 2 ][ summit_index ] + 1 ),
                        qscore      = qscore,
                        )
             # start a new peak
             return
-
-    # def call_broadpeaks (self, int lvl1_cutoff=500, int lvl2_cutoff=100,
-    #                      int min_length=200, int lvl1_max_gap=50, int lvl2_max_gap=400,
-    #                      str colname='-100logq'):
-    #     """This function try to find enriched regions within which,
-    #     scores are continuously higher than a given cutoff for level
-    #     1, and link them using the gap above level 2 cutoff with a
-    #     maximum length of lvl2_max_gap.
-
-    #     lvl1_cutoff:  cutoff of value at enriched regions, default 500.
-    #     lvl2_cutoff:  cutoff of value at linkage regions, default 100.        
-    #     min_length :  minimum peak length, default 200.
-    #     lvl1_max_gap   :  maximum gap to merge nearby enriched peaks, default 50.
-    #     lvl2_max_gap   :  maximum length of linkage regions, default 400.        
-    #     colname: can be 'sample','control','-100logp','-100logq'. Cutoff will be applied to the specified column.
-
-    #     Return both general PeakIO object for highly enriched regions
-    #     and gapped broad regions in BroadPeakIO.
-    #     """
-    #     cdef:
-    #         int i
-    #         str chrom
         
-    #     assert lvl1_cutoff > lvl2_cutoff, "level 1 cutoff should be larger than level 2."
-    #     assert lvl1_max_gap < lvl2_max_gap, "level 2 maximum gap should be larger than level 1."        
-    #     lvl1_peaks = self.call_peaks(cutoff=lvl1_cutoff, min_length=min_length, max_gap=lvl1_max_gap, colname=colname)
-    #     lvl2_peaks = self.call_peaks(cutoff=lvl2_cutoff, min_length=min_length, max_gap=lvl2_max_gap, colname=colname)
-    #     chrs = lvl1_peaks.peaks.keys()
-    #     broadpeaks = BroadPeakIO()
-    #     # use lvl2_peaks as linking regions between lvl1_peaks
-    #     for chrom in chrs:
-    #         lvl1peakschrom = lvl1_peaks.peaks[chrom]
-    #         lvl2peakschrom = lvl2_peaks.peaks[chrom]
-    #         lvl1peakschrom_next = iter(lvl1peakschrom).next
-    #         tmppeakset = []             # to temporarily store lvl1 region inside a lvl2 region
-    #         # our assumption is lvl1 regions should be included in lvl2 regions
-    #         try:
-    #             lvl1 = lvl1peakschrom_next()
-    #         except StopIteration:
-    #             break
-    #         for i in range( len(lvl2peakschrom) ):
-    #             # for each lvl2 peak, find all lvl1 peaks inside
-    #             lvl2 = lvl2peakschrom[i]
-    #             try:
-    #                 while True:
-    #                     if lvl2["start"] <= lvl1["start"]  and lvl1["end"] <= lvl2["end"]:
-    #                         tmppeakset.append(lvl1)
-    #                     else:
-    #                         if tmppeakset:
-    #                             self.__add_broadpeak ( broadpeaks, chrom, lvl2, tmppeakset)
-    #                         tmppeakset = []
-    #                         break
-    #                     lvl1 = lvl1peakschrom_next()
-    #             except StopIteration:
-    #                 if tmppeakset:
-    #                     self.__add_broadpeak ( broadpeaks, chrom, lvl2, tmppeakset)                    
-    #                 break
-        
-    #     return lvl1_peaks, broadpeaks
-
-
-    # def __add_broadpeak (self, bpeaks, str chrom, lvl2peak, lvl1peakset):
-    #     """Internal function to create broad peak.
-        
-    #     """
-    #     cdef:
-    #         int blockNum, thickStart, thickEnd, start, end
-    #         str blockSizes, blockStarts
-        
-    #     start      = lvl2peak["start"]
-    #     end        = lvl2peak["end"]
-    #     thickStart = lvl1peakset[0]["start"]
-    #     thickEnd   = lvl1peakset[-1]["end"]
-    #     blockNum   = int(len(lvl1peakset))
-    #     blockSizes = ",".join( map(lambda x:str(x["length"]),lvl1peakset) )
-    #     blockStarts = ",".join( map(lambda x:str(x["start"]-start),lvl1peakset) )
-    #     if lvl2peak["start"] != thickStart:
-    #         # add 1bp mark for the start of lvl2 peak
-    #         blockNum += 1
-    #         blockSizes = "1,"+blockSizes
-    #         blockStarts = "0,"+blockStarts
-    #     if lvl2peak["end"] != thickEnd:
-    #         # add 1bp mark for the end of lvl2 peak            
-    #         blockNum += 1
-    #         blockSizes = blockSizes+",1"
-    #         blockStarts = blockStarts+","+str(end-start-1)
-        
-    #     bpeaks.add(chrom, start, end, score=lvl2peak["score"], thickStart=thickStart, thickEnd=thickEnd,
-    #                blockNum = blockNum, blockSizes = blockSizes, blockStarts = blockStarts)
-    #     return bpeaks
-
     cdef long total ( self ):
         """Return the number of regions in this object.
 
@@ -1924,3 +1744,87 @@ cdef class scoreTrackII:
             t += self.datalength[chrom]
         return t
 
+    cpdef tuple call_broadpeaks (self, float lvl1_cutoff=5.0, float lvl2_cutoff=1.0, int min_length=200, int lvl1_max_gap=50, int lvl2_max_gap=400):
+        """This function try to find enriched regions within which,
+        scores are continuously higher than a given cutoff for level
+        1, and link them using the gap above level 2 cutoff with a
+        maximum length of lvl2_max_gap.
+
+        lvl1_cutoff:  cutoff of value at enriched regions, default 5.0.
+        lvl2_cutoff:  cutoff of value at linkage regions, default 1.0.        
+        min_length :  minimum peak length, default 200.
+        lvl1_max_gap   :  maximum gap to merge nearby enriched peaks, default 50.
+        lvl2_max_gap   :  maximum length of linkage regions, default 400.        
+
+        Return both general PeakIO object for highly enriched regions
+        and gapped broad regions in BroadPeakIO.
+        """
+        cdef:
+            int i
+            str chrom
+        
+        assert lvl1_cutoff > lvl2_cutoff, "level 1 cutoff should be larger than level 2."
+        assert lvl1_max_gap < lvl2_max_gap, "level 2 maximum gap should be larger than level 1."        
+        lvl1_peaks = self.call_peaks(cutoff=lvl1_cutoff, min_length=min_length, max_gap=lvl1_max_gap)
+        lvl2_peaks = self.call_peaks(cutoff=lvl2_cutoff, min_length=min_length, max_gap=lvl2_max_gap)
+        chrs = lvl1_peaks.peaks.keys()
+        broadpeaks = BroadPeakIO()
+        # use lvl2_peaks as linking regions between lvl1_peaks
+        for chrom in chrs:
+            lvl1peakschrom = lvl1_peaks.peaks[chrom]
+            lvl2peakschrom = lvl2_peaks.peaks[chrom]
+            lvl1peakschrom_next = iter(lvl1peakschrom).next
+            tmppeakset = []             # to temporarily store lvl1 region inside a lvl2 region
+            # our assumption is lvl1 regions should be included in lvl2 regions
+            try:
+                lvl1 = lvl1peakschrom_next()
+            except StopIteration:
+                break
+            for i in range( len(lvl2peakschrom) ):
+                # for each lvl2 peak, find all lvl1 peaks inside
+                lvl2 = lvl2peakschrom[i]
+                try:
+                    while True:
+                        if lvl2["start"] <= lvl1["start"]  and lvl1["end"] <= lvl2["end"]:
+                            tmppeakset.append(lvl1)
+                        else:
+                            if tmppeakset:
+                                self.__add_broadpeak ( broadpeaks, chrom, lvl2, tmppeakset)
+                            tmppeakset = []
+                            break
+                        lvl1 = lvl1peakschrom_next()
+                except StopIteration:
+                    if tmppeakset:
+                        self.__add_broadpeak ( broadpeaks, chrom, lvl2, tmppeakset)  
+                    break
+        return lvl1_peaks, broadpeaks
+
+    def __add_broadpeak (self, bpeaks, str chrom, dict lvl2peak, list lvl1peakset):
+        """Internal function to create broad peak.
+        """
+        
+        cdef:
+            int blockNum, thickStart, thickEnd, start, end
+            str blockSizes, blockStarts
+
+        start      = lvl2peak["start"]
+        end        = lvl2peak["end"]
+        thickStart = lvl1peakset[0]["start"]
+        thickEnd   = lvl1peakset[-1]["end"]
+        blockNum   = int(len(lvl1peakset))
+        blockSizes = ",".join( map(lambda x:str(x["length"]),lvl1peakset) )
+        blockStarts = ",".join( map(lambda x:str(x["start"]-start),lvl1peakset) )
+        if lvl2peak["start"] != thickStart:
+            # add 1bp mark for the start of lvl2 peak
+            blockNum += 1
+            blockSizes = "1,"+blockSizes
+            blockStarts = "0,"+blockStarts
+        if lvl2peak["end"] != thickEnd:
+            # add 1bp mark for the end of lvl2 peak            
+            blockNum += 1
+            blockSizes = blockSizes+",1"
+            blockStarts = blockStarts+","+str(end-start-1)
+        
+        bpeaks.add(chrom, start, end, score=lvl2peak["score"], thickStart=thickStart, thickEnd=thickEnd,
+                   blockNum = blockNum, blockSizes = blockSizes, blockStarts = blockStarts)
+        return bpeaks

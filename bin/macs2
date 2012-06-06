@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# Time-stamp: <2012-05-30 14:50:00 Tao Liu>
+# Time-stamp: <2012-06-05 22:46:40 Tao Liu>
 
 """Description: MACS 2 main executable
 
@@ -175,7 +175,7 @@ def add_callpeak_parser( subparsers ):
     p_or_q_group.add_argument( "-q", "--qvalue", dest = "qvalue", type = float, default = 0.05,
                                help = "Minimum FDR (q-value) cutoff for peak detection. DEFAULT: 0.05. -q and -p are mutually exclusive." )
     p_or_q_group.add_argument( "-p", "--pvalue", dest = "pvalue", type = float,
-                               help = "Pvalue cutoff for peak detection. DEFAULT: not set. -q and -p are mutually exclusive." )
+                               help = "Pvalue cutoff for peak detection. DEFAULT: not set. -q and -p are mutually exclusive. If pvalue cutoff is set, qvalue will not be calculated and reported as -1 in the final .xls file." )
     # about scaling
     group_callpeak.add_argument( "--to-large", dest = "tolarge", action = "store_true", default = False,
                                 help = "When set, scale the small sample up to the bigger sample. By default, the bigger dataset will be scaled down towards the smaller dataset, which will lead to smaller p/qvalues and more specific results. Keep in mind that scaling down will bring down background noise more. DEFAULT: False" )

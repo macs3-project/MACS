@@ -1,5 +1,5 @@
 # cython: profile=True
-# Time-stamp: <2012-05-02 17:56:20 Tao Liu>
+# Time-stamp: <2012-06-05 23:34:05 Tao Liu>
 
 """Module Description
 
@@ -349,7 +349,7 @@ class PeakDetect:
                 lambda_bg = treat.total/self.gsize
             else:
                 lambda_bg = float(self.d)*treat_total/self.gsize
-            treat_btrack = unified_pileup_bdg(self.treat, d, scale_factor=1.0,
+            treat_btrack = unified_pileup_bdg(self.treat, d, scale_factors=1.0,
                                               directional=True,
                                               halfextension=self.opt.halfext)
 
@@ -410,47 +410,48 @@ class PeakDetect:
 
         # calculate pvalue scores
         self.info("#3 Build score track ...")
-        score_btrack = treat_btrack.make_scoreTrack_for_macs( control_btrack, effective_depth_in_million = effective_depth_in_million )
+        score_btrack = treat_btrack.make_scoreTrackII_for_macs( control_btrack, effective_depth_in_million, effective_depth_in_million )
         if self.opt.trackline: score_btrack.enable_trackline()
         #treat_btrack = None             # clean them
         #control_btrack = None
         #gc.collect()                    # full collect garbage
 
-        self.info("#3 Calculate qvalues ...")
-        pqtable = score_btrack.make_pq_table()
-        
-        self.info("#3 Saving p-value to q-value table ...")
-        pqfhd = io.open(self.opt.pqtable,"wb")
-        pqfhd.write( "-log10pvalue\t-log10qvalue\trank\tbasepairs\n" )
-        for p in sorted(pqtable.keys(),reverse=True):
+        #self.info("#3 Saving p-value to q-value table ...")
+        #pqfhd = io.open(self.opt.pqtable,"wb")
+        #pqfhd.write( "-log10pvalue\t-log10qvalue\trank\tbasepairs\n" )
+        #for p in sorted(pqtable.keys(),reverse=True):
         #for i in range(pqtable.shape[0]):
-            #t = pqtable[i]
-            q = pqtable[p]
-            pqfhd.write("%.2f\t%.2f\t%d\t%d\n" % (p/100.0,q[0]/100.0,q[1],q[2]))
-            #pqfhd.write("%.2f\t%.2f\t%d\t%d\n" % (t[0]/100.0,t[1]/100.0,t[2],t[3]))            
-        pqfhd.close()
+        #    #t = pqtable[i]
+        #    q = pqtable[p]
+        #    pqfhd.write("%.2f\t%.2f\t%d\t%d\n" % (p/100.0,q[0]/100.0,q[1],q[2]))
+        #    #pqfhd.write("%.2f\t%.2f\t%d\t%d\n" % (t[0]/100.0,t[1]/100.0,t[2],t[3]))            
+        #pqfhd.close()
 
-        self.info("#3 Assign qvalues ...")
-        score_btrack.assign_qvalue( pqtable )
+        #self.info("#3 Assign qvalues ...")
+        #score_btrack.assign_qvalue( pqtable )
                 
         # call peaks
         call_summits = self.opt.call_summits
         if self.log_pvalue:
+            self.info("#3 Calculate pvalues ...")
+            score_btrack.change_score_method ( ord('p') )
             if self.opt.broad:
                 self.info("#3 Call broad peaks with given level1 -log10pvalue cutoff and level2: %.2f, %.2f..." % (self.log_pvalue,self.opt.log_broadcutoff) )
-                peaks = score_btrack.call_broadpeaks(lvl1_cutoff=self.log_pvalue*100,lvl2_cutoff=self.opt.log_broadcutoff*100,min_length=self.d,
-                                                     lvl1_max_gap=self.opt.tsize,lvl2_max_gap=self.d*4,colname='-100logp')
+                peaks = score_btrack.call_broadpeaks(lvl1_cutoff=self.log_pvalue,lvl2_cutoff=self.opt.log_broadcutoff,min_length=self.d,
+                                                     lvl1_max_gap=self.opt.tsize,lvl2_max_gap=self.d*4)
             else:
-                self.info("#3 Call peaks with given -log10pvalue cutoff: %.2f ..." % self.log_pvalue)                
-                peaks = score_btrack.call_peaks(cutoff=self.log_pvalue*100,min_length=self.d,max_gap=self.opt.tsize,colname='-100logp',call_summits=call_summits)
+                self.info("#3 Call peaks with given -log10pvalue cutoff: %.2f ..." % self.log_pvalue)
+                peaks = score_btrack.call_peaks(cutoff=self.log_pvalue,min_length=self.d,max_gap=self.opt.tsize,call_summits=call_summits)
         elif self.log_qvalue:
+            self.info("#3 Calculate qvalues ...")
+            score_btrack.change_score_method ( ord('q') )            
             if self.opt.broad:
                 self.info("#3 Call broad peaks with given level1 -log10qvalue cutoff and level2: %f, %f..." % (self.log_qvalue,self.opt.log_broadcutoff) )
-                peaks = score_btrack.call_broadpeaks(lvl1_cutoff=self.log_qvalue*100,lvl2_cutoff=self.opt.log_broadcutoff*100,min_length=self.d,
-                                                     lvl1_max_gap=self.opt.tsize,lvl2_max_gap=self.d*4,colname='-100logq')
+                peaks = score_btrack.call_broadpeaks(lvl1_cutoff=self.log_qvalue,lvl2_cutoff=self.opt.log_broadcutoff,min_length=self.d,
+                                                     lvl1_max_gap=self.opt.tsize,lvl2_max_gap=self.d*4)
             else:
                 self.info("#3 Call peaks with given -log10qvalue cutoff: %.2f ..." % self.log_qvalue)        
-                peaks = score_btrack.call_peaks(cutoff=self.log_qvalue*100,min_length=self.d,max_gap=self.opt.tsize,colname='-100logq',call_summits=call_summits)
+                peaks = score_btrack.call_peaks(cutoff=self.log_qvalue,min_length=self.d,max_gap=self.opt.tsize,call_summits=call_summits)
             
         if self.opt.store_bdg:
            name = self.opt.name or 'Unknown'
@@ -460,29 +461,19 @@ class PeakDetect:
            
            # tracks [(filename, name, desc, scorecol), ...]
            tracks = [(self.zwig_tr + "_pileup.bdg", self.zwig_tr,
-                      desc1, "sample"),
+                      desc1, 1),
                      
                      (self.zwig_ctl + "_lambda.bdg", self.zwig_ctl,
-                      "Maximum local lambda", "control"),
-                     
-                     (self.zwig_tr + "_pvalue.bdg",
-                      self.zwig_tr + "_-log10pvalue",
-                      "-log10 pvalue scores", "-100logp"),
-                     
-                     (self.zwig_tr + "_qvalue.bdg",
-                      self.zwig_tr + "_-log10qvalue",
-                      "-log10 qvalue scores", "-100logq"),
-                     
-                     (self.zwig_tr + "_logLR.bdg",
-                      self.zwig_tr + "_-logLR",
-                      "log10 likelihood ratio scores", "100logLR")
+                      "Maximum local lambda", 2),
                     ]
            
            for filename, title, desc, scorecol in tracks:
                self.info("#3 save the %s track into bedGraph file..." % desc)
+               if self.opt.do_SPMR:
+                   score_btrack.change_normalization_method('M') # scale down to million reads
                with io.open(filename, 'wb') as bdgfhd:
                    score_btrack.write_bedGraph(bdgfhd, title,
-                                               trackdesc % desc, scorecol, do_SPMR = self.opt.do_SPMR) # do_SPMR doesn't have effect on p/q/logLR values.
+                                               trackdesc % desc, scorecol) # do_SPMR doesn't have effect on p/q/logLR values.
         return peaks
 
     def __call_peaks_wo_control (self):
@@ -575,21 +566,25 @@ class PeakDetect:
         call_summits = self.opt.call_summits
         if call_summits: self.info("#3 Going to call summits inside each peak ...")
         if self.log_pvalue:
+            self.info("#3 Calculate pvalues ...")
+            score_btrack.change_score_method ( ord('p') )            
             if self.opt.broad:
                 self.info("#3 Call broad peaks with given level1 -log10pvalue cutoff and level2: %.2f, %.2f..." % (self.log_pvalue,self.opt.log_broadcutoff) )
-                peaks = score_btrack.call_broadpeaks(lvl1_cutoff=self.log_pvalue*100,lvl2_cutoff=self.opt.log_broadcutoff*100,min_length=self.d,
-                                                     lvl1_max_gap=self.opt.tsize,lvl2_max_gap=self.d*4,colname='-100logp')
+                peaks = score_btrack.call_broadpeaks(lvl1_cutoff=self.log_pvalue,lvl2_cutoff=self.opt.log_broadcutoff,min_length=self.d,
+                                                     lvl1_max_gap=self.opt.tsize,lvl2_max_gap=self.d*4)
             else:
                 self.info("#3 Call peaks with given -log10pvalue cutoff: %.2f ..." % self.log_pvalue)                
-                peaks = score_btrack.call_peaks(cutoff=self.log_pvalue*100,min_length=self.d,max_gap=self.opt.tsize,colname='-100logp',call_summits=call_summits)
+                peaks = score_btrack.call_peaks(cutoff=self.log_pvalue,min_length=self.d,max_gap=self.opt.tsize,call_summits=call_summits)
         elif self.log_qvalue:
+            self.info("#3 Calculate qvalues ...")
+            score_btrack.change_score_method ( ord('q') )            
             if self.opt.broad:
                 self.info("#3 Call broad peaks with given level1 -log10qvalue cutoff and level2: %.2f, %.2f..." % (self.log_qvalue,self.opt.log_broadcutoff) )
-                peaks = score_btrack.call_broadpeaks(lvl1_cutoff=self.log_qvalue*100,lvl2_cutoff=self.opt.log_broadcutoff*100,min_length=self.d,
-                                                     lvl1_max_gap=self.opt.tsize,lvl2_max_gap=self.d*4,colname='-100logq')
+                peaks = score_btrack.call_broadpeaks(lvl1_cutoff=self.log_qvalue,lvl2_cutoff=self.opt.log_broadcutoff,min_length=self.d,
+                                                     lvl1_max_gap=self.opt.tsize,lvl2_max_gap=self.d*4)
             else:
                 self.info("#3 Call peaks with given -log10qvalue cutoff: %.2f ..." % self.log_qvalue)        
-                peaks = score_btrack.call_peaks(cutoff=self.log_qvalue*100,min_length=self.d,max_gap=self.opt.tsize,colname='-100logq',call_summits=call_summits)
+                peaks = score_btrack.call_peaks(cutoff=self.log_qvalue,min_length=self.d,max_gap=self.opt.tsize,call_summits=call_summits)
 
         if self.opt.store_bdg:
             name = self.opt.name or 'Unknown'
@@ -598,26 +593,20 @@ class PeakDetect:
             else: desc1 = "tag pileup"
             # tracks [(filename, name, desc, scorecol), ...]
             tracks = [(self.zwig_tr + "_pileup.bdg", self.zwig_tr,
-                       desc1, "sample")]
+                       desc1, 1)]
             
             if self.lregion:
                 tracks.append((self.zwig_ctl + "_lambda.bdg",
                                self.zwig_ctl,
-                               "Maximum local lambda", "control" ))
+                               "Maximum local lambda", 2 ))
             
-            tracks.append((self.zwig_tr + "_pvalue.bdg",
-                           self.zwig_tr + "_-log10pvalue",
-                           "-log10 pvalue scores", "-100logp"))
-                     
-            tracks.append((self.zwig_tr + "_qvalue.bdg",
-                           self.zwig_tr + "_-log10qvalue",
-                           "-log10 qvalue scores", "-100logq"))
-           
             for filename, title, desc, scorecol in tracks:
                 self.info("#3 save the %s track into bedGraph file..." % desc)
+                if self.opt.do_SPMR:
+                    score_btrack.change_normalization_method('M') # scale down to million reads
                 with open(filename, 'w') as bdgfhd:
                     score_btrack.write_bedGraph(bdgfhd, title,
-                                                trackdesc % desc, scorecol, do_SPMR = self.opt.do_SPMR) # do_SPMR doesn't have effect on p/q/logLR values.
+                                                trackdesc % desc, scorecol) # do_SPMR doesn't have effect on p/q/logLR values.
        
         return peaks
 

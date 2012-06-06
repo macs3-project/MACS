@@ -1,5 +1,5 @@
 # cython: profile=True
-# Time-stamp: <2012-05-03 00:08:24 Tao Liu>
+# Time-stamp: <2012-06-05 23:11:39 Tao Liu>
 
 """Module for all MACS Parser classes for input.
 
@@ -55,16 +55,7 @@ __doc__ = "All Parser classes"
 # Misc functions
 # ------------------------------------
 
-def guess_parser ( fhd ):
-    parser_dict = {"BED":BEDParser,
-                   "ELAND":ELANDResultParser,
-                   "ELANDMULTI":ELANDMultiParser,
-                   "ELANDEXPORT":ELANDExportParser,
-                   "SAM":SAMParser,
-                   "BAM":BAMParser,
-                   "BAMPE": BAMPEParser,
-                   "BOWTIE":BowtieParser
-                   }
+cpdef guess_parser ( fhd ):
     order_list = ("BAM",
                   "BED",
                   "ELAND",
@@ -73,9 +64,22 @@ def guess_parser ( fhd ):
                   "SAM",
                   "BOWTIE",
                   )
-    
+
     for f in order_list:
-        p = parser_dict[ f ]( fhd )
+        if f == 'BED':
+            p = BEDParser( fhd )
+        elif f == "ELAND":
+            p = ELANDResultParser( fhd )
+        elif f ==  "ELANDMULTI":
+            p = ELANDMultiParser( fhd )
+        elif f == "ELANDEXPORT":
+            p = ELANDExportParser( fhd )
+        elif f == "SAM":
+            p = SAMParser( fhd )
+        elif f == "BAM":
+            p = BAMParser( fhd )
+        elif f == "BOWTIE":
+            p = BowtieParser( fhd )
         s = p.sniff()
         if s:
             logging.info( "Detected format is: %s" % ( f ) )
@@ -181,7 +185,9 @@ cdef class GenericParser:
         raise NotImplemented
     
     def build_fwtrack ( self ):
-        """Generic function to build FWTrackIII object. 
+        """Generic function to build FWTrackIII object. Create a new
+        FWTrackIII object. If you want to append new records to an
+        existing FWTrackIII object, try append_fwtrack function.
 
         * BAMParser for binary BAM format should have a different one.
         """
@@ -210,6 +216,32 @@ cdef class GenericParser:
         # close file stream.
         self.close()
         return fwtrack
+
+    def append_fwtrack ( self, fwtrack ):
+        """Add more records to an existing FWTrackIII object. 
+
+        """
+        i = 0
+        m = 0
+        for thisline in self.fhd:
+            ( chromosome, fpos, strand ) = self.__fw_parse_line( thisline )
+            i+=1
+            if fpos < 0 or not chromosome:
+                # normally __fw_parse_line will return -1 if the line
+                # contains no successful alignment.
+                continue
+            if i == 1000000:
+                m += 1
+                logging.info( " %d" % ( m*1000000 ) )
+                i=0
+            fwtrack.add_loc( chromosome, fpos, strand )
+
+        # close fwtrack and sort
+        fwtrack.finalize()
+        self.close()
+        return fwtrack
+        
+
 
     def __fw_parse_line ( self, str thisline ):
         """Abstract function to parse chromosome, 5' end position and
@@ -252,7 +284,7 @@ cdef class GenericParser:
         """
         self.fhd.close()
 
-class BEDParser( GenericParser ):
+cdef class BEDParser( GenericParser ):
     """File Parser Class for tabular File.
 
     """
@@ -307,7 +339,7 @@ class BEDParser( GenericParser ):
                      0 )
             
 
-class ELANDResultParser( GenericParser ):
+cdef class ELANDResultParser( GenericParser ):
     """File Parser Class for tabular File.
 
     """
@@ -356,7 +388,7 @@ class ELANDResultParser( GenericParser ):
         else:
             return ( "", -1, -1 )
 
-class ELANDMultiParser( GenericParser ):
+cdef class ELANDMultiParser( GenericParser ):
     """File Parser Class for ELAND multi File.
 
     Note this parser can only work for s_N_eland_multi.txt format.
@@ -426,7 +458,7 @@ class ELANDMultiParser( GenericParser ):
                     raise StrandFormatError( thisline,strand )
 
 
-class ELANDExportParser( GenericParser ):
+cdef class ELANDExportParser( GenericParser ):
     """File Parser Class for ELAND Export File.
 
     """
@@ -469,7 +501,7 @@ class ELANDExportParser( GenericParser ):
             return ( -1, -1, -1 )
 
 ### Contributed by Davide, modified by Tao
-class SAMParser( GenericParser ):
+cdef class SAMParser( GenericParser ):
     """File Parser Class for SAM File.
 
     Each line of the output file contains at least: 
@@ -723,6 +755,41 @@ cdef class BAMParser( GenericParser ):
         fwtrack.finalize()
         fwtrack.rlengths = rlengths
         return fwtrack
+
+    def append_fwtrack ( self, fwtrack ):
+        """Build FWTrackIII from all lines, return a FWTrackIII object.
+
+        Note only the unique match for a tag is kept.
+        """
+        cdef:
+            int i = 0
+            int m = 0
+            int entrylength, fpos, strand, chrid
+            list references
+            dict rlengths
+        
+        references, rlengths = self.get_references()
+        fseek = self.fhd.seek
+        fread = self.fhd.read
+        ftell = self.fhd.tell
+        
+        while True:
+            try:
+                entrylength = unpack( '<i', fread( 4 ) )[ 0 ]
+            except struct.error:
+                break
+            ( chrid, fpos, strand ) = self.__fw_binary_parse( fread( entrylength ) )
+            i+=1
+            if i == 1000000:
+                m += 1
+                logging.info( " %d" % ( m*1000000 ) )
+                i = 0
+            if fpos >= 0:
+                fwtrack.add_loc( references[ chrid ], fpos, strand )
+        self.fhd.close()
+        fwtrack.finalize()
+        fwtrack.rlengths = rlengths
+        return fwtrack
     
     cpdef tuple __fw_binary_parse (self, data ):
         cdef:
@@ -837,6 +904,53 @@ cdef class BAMPEParser(BAMParser):
         petrack.finalize()
         petrack.rlengths = rlengths
         return petrack
+
+    cpdef append_petrack (self, petrack):
+        """Build FWTrackIII from all lines, return a FWTrackIII object.
+        """
+        cdef:
+            int i = 0
+            int m = 0
+            int entrylength, fpos, chrid, tlen
+            int *asint
+            list references
+            dict rlengths
+            float d = 0.0
+            char *rawread, *rawentrylength
+            _BAMPEParsed read
+        
+        references, rlengths = self.get_references()
+        fseek = self.fhd.seek
+        fread = self.fhd.read
+        ftell = self.fhd.tell
+        
+        # for convenience, only count valid pairs
+        add_loc = petrack.add_loc
+        info = logging.info
+        unpack = struct.unpack
+        err = struct.error
+        while True:
+            try: entrylength = unpack('<i', fread(4))[0]
+            except err: break
+            rawread = <bytes>fread(32)
+#            rawread = <bytes>fread(entrylength)
+            read = self.__pe_binary_parse(rawread)
+            fseek(entrylength - 32, 1)
+            if read.ref == -1: continue
+            d = (d * i + abs(read.tlen)) / (i + 1) # keep track of avg fragment size
+            i+=1
+            if i == 1000000:
+                m += 1
+                info(" %d" % (m*1000000))
+                i=0
+            petrack.add_loc(references[read.ref], read.start, read.start + read.tlen)
+        self.n = m * 1000000 + i
+        self.d = int(d)
+        assert d >= 0, "Something went wrong (mean fragment size was negative)"
+        self.fhd.close()
+        petrack.finalize()
+        petrack.rlengths = rlengths
+        return petrack
         
     cdef _BAMPEParsed __pe_binary_parse (self, char *data):
         cdef:
@@ -893,7 +1007,7 @@ cdef struct _BAMPEParsed:
 
 ### End ###
 
-class BowtieParser( GenericParser ):
+cdef class BowtieParser( GenericParser ):
     """File Parser Class for map files from Bowtie or MAQ's maqview
     program.
 

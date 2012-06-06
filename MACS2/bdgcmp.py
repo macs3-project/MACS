@@ -1,4 +1,4 @@
-# Time-stamp: <2012-05-24 13:55:23 Tao Liu>
+# Time-stamp: <2012-06-05 23:59:16 Tao Liu>
 
 import sys
 import logging
@@ -105,3 +105,4 @@ def run( options ):
     #print r
 
     sbtrack.write_bedGraph(ofhd,name="%s_Scores" % (method.upper()),description="Scores calculated by %s" % (method.upper()), column = 3)
+    info("Finished! Please check %s" % (options.tfile))

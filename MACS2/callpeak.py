@@ -1,5 +1,5 @@
 # cython: profile=True
-# Time-stamp: <2012-05-30 12:06:17 Tao Liu>
+# Time-stamp: <2012-06-04 15:26:37 Tao Liu>
 
 """Description: MACS 2 main executable
 
@@ -310,18 +310,30 @@ def load_frag_files_options ( options ):
 
     """
     options.info("#1 read treatment fragments...")
-    
-    tp = options.parser(options.tfile)
-    
+
+    tp = options.parser(options.tfile[0])
     treat = tp.build_petrack()
     treat.sort()
+    if len(options.tfile) > 1:
+        # multiple input
+        for tfile in options.tfile[1:]:
+            tp = options.parser(tfile)
+            treat = tp.append_petrack( treat )
+            treat.sort()
+
     options.tsize = tp.d
     if options.cfile:
         options.info("#1.2 read input fragments...")
-        cp = options.parser(options.cfile)
+        cp = options.parser(options.cfile[0])
         control = cp.build_petrack()
         control_d = cp.d
         control.sort()
+        if len(options.cfile) > 1:
+            # multiple input
+            for cfile in options.cfile[1:]:
+                cp = options.parser(cfile)
+                control = cp.append_petrack( control )
+                control.sort()
     else:
         control = None
     options.info("#1 mean fragment size is determined as %d bp from treatment" % options.tsize)
@@ -335,19 +347,29 @@ def load_tag_files_options ( options ):
 
     """
     options.info("#1 read treatment tags...")
-    tp = options.parser(options.tfile)
-
+    tp = options.parser(options.tfile[0])
     if not options.tsize:           # override tsize if user specified --tsize
         ttsize = tp.tsize()
         options.tsize = ttsize
-
     treat = (tp.build_fwtrack())
     treat.sort()
+    if len(options.tfile) > 1:
+        # multiple input
+        for tfile in options.tfile[1:]:
+            tp = options.parser(tfile)
+            treat = tp.append_fwtrack( treat )
+            treat.sort()
     
     if options.cfile:
         options.info("#1.2 read input tags...")
-        control = options.parser(options.cfile).build_fwtrack()
+        control = options.parser(options.cfile[0]).build_fwtrack()
         control.sort()
+        if len(options.cfile) > 1:
+            # multiple input
+            for cfile in options.cfile[1:]:
+                cp = options.parser(cfile)
+                control = cp.append_fwtrack( control )
+                control.sort()
     else:
         control = None
     options.info("#1 tag size is determined as %d bps" % options.tsize)

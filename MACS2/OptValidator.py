@@ -1,4 +1,4 @@
-# Time-stamp: <2012-05-02 16:38:42 Tao Liu>
+# Time-stamp: <2012-06-05 22:38:35 Tao Liu>
 
 """Module Description
 
@@ -154,6 +154,7 @@ def opt_validate ( options ):
 
     if options.pvalue:
         options.argtxt +=  "# pvalue cutoff = %.2e\n" % (options.pvalue)
+        options.argtxt +=  "# qvalue will not be calculated and reported as -1 in the final output.\n"
     else:
         options.argtxt +=  "# qvalue cutoff = %.2e\n" % (options.qvalue)
 
@@ -323,6 +324,7 @@ def opt_validate_diff ( optparser ):
 
     if options.pvalue:
         options.argtxt +=  "# pvalue cutoff = %.2e\n" % (options.pvalue)
+        options.argtxt +=  "# qvalue will not be calculated and reported as -1 in the final output.\n"
     else:
         options.argtxt +=  "# qvalue cutoff = %.2e\n" % (options.qvalue)
 
