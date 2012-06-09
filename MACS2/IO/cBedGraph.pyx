@@ -1,5 +1,5 @@
 # cython: profile=True
-# Time-stamp: <2012-06-06 11:17:01 Tao Liu>
+# Time-stamp: <2012-06-08 17:13:11 Tao Liu>
 
 """Module for Feature IO classes.
 
@@ -30,7 +30,7 @@ from libc.math cimport log
 from cpython cimport bool
 
 from MACS2.Constants import *
-from MACS2.IO.cScoreTrack import scoreTrackI,scoreTrackII,CombinedTwoTrack
+from MACS2.IO.cScoreTrack import scoreTrackII,CombinedTwoTrack
 from MACS2.IO.cPeakIO import PeakIO, BroadPeakIO
 
 # ------------------------------------
@@ -128,6 +128,20 @@ class bedGraphTrackI:
                 # otherwise, add a new region
                 c[0].append(endpos)
                 c[1].append(value)
+
+    def destroy ( self ):
+        """ destroy content, free memory.
+        """
+        cdef:
+            set chrs
+            str chromosome
+            
+        chrs = self.get_chr_names()
+        for chromosome in chrs:
+            if self.__data.has_key(chromosome):
+                self.__data[chromosome] = [None, None]
+                self.__data.pop(chromosome)
+        return True
 
     def safe_add_loc ( self, str chromosome, int startpos, int endpos, double value):
         """Add a chr-start-end-value block into __data dictionary.
@@ -858,86 +872,6 @@ class bedGraphTrackI:
                 # meet the end of either bedGraphTrackI, simply exit
                 pass
 
-        return ret
-
-    def make_scoreTrack_for_macs (self, bdgTrack2, float effective_depth_in_million = 1.0 ):
-        """A modified overlie function for MACS v2.
-
-        effective_depth_in_million: sequencing depth in million after
-                                    duplicates being filtered. If
-                                    treatment is scaled down to
-                                    control sample size, then this
-                                    should be control sample size in
-                                    million. And vice versa.
-
-        Return value is a bedGraphTrackI object.
-        """
-        cdef:
-            int pre_p, p1, p2
-            double v1, v2
-            str chrom
-        
-        assert isinstance(bdgTrack2,bedGraphTrackI), "bdgTrack2 is not a bedGraphTrackI object"
-
-        ret = scoreTrackI( effective_depth_in_million = effective_depth_in_million )
-        retadd = ret.add
-        
-        chr1 = set(self.get_chr_names())
-        chr2 = set(bdgTrack2.get_chr_names())
-        common_chr = chr1.intersection(chr2)
-        for chrom in common_chr:
-            
-            (p1s,v1s) = self.get_data_by_chr(chrom) # arrays for position and values
-            p1n = iter(p1s).next         # assign the next function to a viable to speed up
-            v1n = iter(v1s).next
-
-            (p2s,v2s) = bdgTrack2.get_data_by_chr(chrom) # arrays for position and values
-            p2n = iter(p2s).next         # assign the next function to a viable to speed up
-            v2n = iter(v2s).next
-
-            chrom_max_len = len(p1s)+len(p2s) # this is the maximum number of locations needed to be recorded in scoreTrackI for this chromosome.
-            
-            ret.add_chromosome(chrom,chrom_max_len)
-
-            pre_p = 0                   # remember the previous position in the new bedGraphTrackI object ret
-            
-            try:
-                p1 = p1n()
-                v1 = v1n()
-
-                p2 = p2n()
-                v2 = v2n()
-
-                while True:
-                    if p1 < p2:
-                        # clip a region from pre_p to p1, then set pre_p as p1.
-                        retadd( chrom, p1, v1, v2 )
-                        pre_p = p1
-                        # call for the next p1 and v1
-                        p1 = p1n()
-                        v1 = v1n()
-                    elif p2 < p1:
-                        # clip a region from pre_p to p2, then set pre_p as p2.
-                        retadd( chrom, p2, v1, v2 )
-                        pre_p = p2
-                        # call for the next p2 and v2
-                        p2 = p2n()
-                        v2 = v2n()
-                    elif p1 == p2:
-                        # from pre_p to p1 or p2, then set pre_p as p1 or p2.
-                        retadd( chrom, p1, v1, v2 )
-                        pre_p = p1
-                        # call for the next p1, v1, p2, v2.
-                        p1 = p1n()
-                        v1 = v1n()
-                        p2 = p2n()
-                        v2 = v2n()
-            except StopIteration:
-                # meet the end of either bedGraphTrackI, simply exit
-                pass
-
-        ret.finalize()
-        #ret.merge_regions()
         return ret
 
     def make_scoreTrackII_for_macs (self, bdgTrack2, float depth1 = 1.0, float depth2 = 1.0 ):

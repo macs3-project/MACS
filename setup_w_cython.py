@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# Time-stamp: <2012-05-01 18:39:35 Tao Liu>
+# Time-stamp: <2012-06-07 11:21:01 Tao Liu>
 
 """Description: 
 
@@ -91,8 +91,8 @@ def main():
           packages=['MACS2', 'MACS2.IO', 'MACS2.data'],
           package_data={'MACS2': ['data/*.dat']},          
           scripts=['bin/macs2',
-                   'bin/MLEPostPoisRatios',
-                   'bin/MCMCPostPoisRatios',                   
+                   #'bin/MLEPostPoisRatios',
+                   #'bin/MCMCPostPoisRatios',                   
                    ],
           classifiers=[
               'Development Status :: 4 - experimental',
