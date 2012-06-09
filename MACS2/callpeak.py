@@ -1,5 +1,5 @@
 # cython: profile=True
-# Time-stamp: <2012-06-04 15:26:37 Tao Liu>
+# Time-stamp: <2012-06-09 16:22:18 Tao Liu>
 
 """Description: MACS 2 main executable
 
@@ -36,15 +36,15 @@ from MACS2.Constants import *
 # ------------------------------------
 # Main function
 # ------------------------------------
-def check_names(treat, control):
+def check_names(treat, control, error_stream):
     """check common chromosome names"""
     tchrnames = set(treat.get_chr_names())
     cchrnames = set(control.get_chr_names())
     commonnames = tchrnames.intersection(cchrnames)
     if len(commonnames)==0:
-        error("No common chromosome names can be found from treatment and control! Check your input files! MACS will quit...")
-        error("Chromosome names in treatment: %s" % ",".join(sorted(tchrnames)))
-        error("Chromosome names in control: %s" % ",".join(sorted(cchrnames)))
+        error_stream("No common chromosome names can be found from treatment and control! Check your input files! MACS will quit...")
+        error_stream("Chromosome names in treatment: %s" % ",".join(sorted(tchrnames)))
+        error_stream("Chromosome names in control: %s" % ",".join(sorted(cchrnames)))
         sys.exit()
 
 def run( args ):
@@ -68,7 +68,7 @@ def run( args ):
     info("#1 read %s files...", tag)
     if options.PE_MODE: (treat, control) = load_frag_files_options (options)
     else:       (treat, control) = load_tag_files_options  (options)
-    if control is not None: check_names(treat, control)
+    if control is not None: check_names(treat, control, error)
     
     info("#1 %s size = %d", tag, options.tsize)
     tagsinfo  = "# %s size is determined as %d bps\n" % (tag, options.tsize)
@@ -351,7 +351,7 @@ def load_tag_files_options ( options ):
     if not options.tsize:           # override tsize if user specified --tsize
         ttsize = tp.tsize()
         options.tsize = ttsize
-    treat = (tp.build_fwtrack())
+    treat = tp.build_fwtrack()
     treat.sort()
     if len(options.tfile) > 1:
         # multiple input

@@ -1,5 +1,5 @@
 # cython: profile=True
-# Time-stamp: <2012-06-08 00:13:43 Tao Liu>
+# Time-stamp: <2012-06-09 15:24:04 Tao Liu>
 
 """Module for Feature IO classes.
 
@@ -966,7 +966,6 @@ cdef class scoreTrackII:
         peaks = PeakIO()                      # dictionary to save peaks
 
         self.cutoff = cutoff
-        print self.cutoff
         for chrom in chrs:
             peak_content = []           # to store points above cutoff
 

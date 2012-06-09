@@ -1,5 +1,5 @@
 # cython: profile=True
-# Time-stamp: <2012-06-07 17:55:57 Tao Liu>
+# Time-stamp: <2012-06-09 16:07:17 Tao Liu>
 
 """Module for FWTrack classes.
 
@@ -102,6 +102,7 @@ cdef class FWTrackIII:
             self.__expand__ ( self.__locations[chromosome][strand] )
             self.__locations[chromosome][strand][self.__pointer[chromosome][strand]] = fiveendpos
             self.__pointer[chromosome][strand] += 1
+        #print chromosome
 
     cpdef __expand__ ( self, np.ndarray arr ):
         arr.resize( arr.size + BUFFER_SIZE, refcheck = False )
@@ -113,7 +114,7 @@ cdef class FWTrackIII:
         cdef int32_t i
         cdef str c
         
-        self.total+=0 # ??
+        self.total = 0
 
         chrnames = self.get_chr_names()
 

@@ -1,5 +1,5 @@
 # cython: profile=True
-# Time-stamp: <2012-06-05 23:11:39 Tao Liu>
+# Time-stamp: <2012-06-09 16:39:02 Tao Liu>
 
 """Module for all MACS Parser classes for input.
 
@@ -26,6 +26,16 @@ import io
 from MACS2.Constants import *
 from MACS2.IO.cFixWidthTrack import FWTrackIII
 from MACS2.IO.cPairedEndTrack import PETrackI
+
+cdef public bint HAS_PYSAM
+
+try:
+    import pysam
+    HAS_PYSAM = True
+except:
+    HAS_PYSAM = False
+
+#HAS_PYSAM=False
 
 from cpython cimport bool
 
@@ -626,26 +636,88 @@ cdef class BAMParser( GenericParser ):
     512	does not pass quality check
     1024	PCR or optical duplicate
     """
+    def __init__ ( self, str filename ):
+        """Open input file. Determine whether it's a gzipped file.
+
+        'filename' must be a string object.
+
+        This function initialize the following attributes:
+
+        1. self.filename: the filename for input file.
+        2. self.gzipped: a boolean indicating whether input file is gzipped.
+        3. self.fhd: buffered I/O stream of input file
+        """
+        self.filename = filename
+        self.gzipped = True
+        self.tag_size = -1
+        if HAS_PYSAM:
+            self.fhd = pysam.Samfile(filename)
+        else:
+            # try gzip first
+            f = gzip.open( filename )
+            try:
+                f.read( 10 )
+            except IOError:
+                # not a gzipped file
+                self.gzipped = False
+            f.close()
+            if self.gzipped:
+                # open with gzip.open, then wrap it with BufferedReader!
+                self.fhd = io.BufferedReader( gzip.open( filename, mode='rb' ) )
+            else:
+                self.fhd = io.open( filename, mode='rb' ) # binary mode! I don't expect unicode here!
 
     def sniff( self ):
         """Check the first 3 bytes of BAM file. If it's 'BAM', check
         is success.
 
         """
-        magic_header = self.fhd.read( 3 )
-        if magic_header == "BAM":
-            tsize  = self.tsize()
-            if tsize > 0:
-                self.fhd.seek( 0 )
+        if HAS_PYSAM:
+            try:
+                self.fhd.tell()
+            except:
+                return False
+            else:
                 return True
+        else:
+            magic_header = self.fhd.read( 3 )
+            if magic_header == "BAM":
+                tsize  = self.tsize()
+                if tsize > 0:
+                    self.fhd.seek( 0 )
+                    return True
+                else:
+                    self.fhd.seek( 0 )
+                    raise Exception( "File is not of a valid BAM format! %d" % tsize )
             else:
                 self.fhd.seek( 0 )
-                raise Exception( "File is not of a valid BAM format! %d" % tsize )
+                return False
+
+    cpdef int tsize ( self ):
+        if HAS_PYSAM:
+            return self.__tsize_w_pysam()
         else:
-            self.fhd.seek( 0 )
-            return False
-            
-    def tsize( self ):
+            return self.__tsize_wo_pysam()
+
+    cdef int __tsize_w_pysam( self ):
+        cdef:
+            int n = 0                   # successful read of tag size
+            double s = 0                # sum of tag sizes
+
+        if self.tag_size != -1:
+            # if we have already calculated tag size (!= -1),  return it.
+            return self.tag_size
+
+        for n in range( 1, 11, 1 ):
+            try:
+                s += self.fhd.next().qlen
+            except:
+                break
+        self.tag_size = int( s/n )
+        self.fhd.reset()
+        return self.tag_size
+
+    cdef int __tsize_wo_pysam( self ):
         """Get tag size from BAM file -- read l_seq field.
 
         Refer to: http://samtools.sourceforge.net/SAM1.pdf
@@ -689,6 +761,27 @@ cdef class BAMParser( GenericParser ):
         return self.tag_size
 
     cpdef tuple get_references( self ):
+        if HAS_PYSAM:
+            return self.__get_references_w_pysam()
+        else:
+            return self.__get_references_wo_pysam()
+
+    cdef tuple __get_references_w_pysam( self ):
+        """
+        read in references from BAM header
+        
+        return a tuple (references (list of names),
+                        rlengths (dict of lengths)
+        """
+        cdef:
+            list references = []
+            dict rlengths = {}
+
+        references = list(self.fhd.references)
+        rlengths = dict( zip( references, self.fhd.lengths ) )
+        return (references, rlengths)
+        
+    cdef tuple __get_references_wo_pysam( self ):
         """
         read in references from BAM header
         
@@ -720,7 +813,51 @@ cdef class BAMParser( GenericParser ):
             rlengths[refname] = unpack( '<i', fread( 4 ) )[ 0 ]
         return (references, rlengths)
 
-    def build_fwtrack ( self ):
+    cpdef build_fwtrack ( self ):
+        if HAS_PYSAM:
+            return self.__build_fwtrack_w_pysam()
+        else:
+            return self.__build_fwtrack_wo_pysam()
+
+    cdef __build_fwtrack_w_pysam ( self ):
+        cdef:
+            int i = 0
+            int m = 0
+            int fpos, strand, chrid
+            list references
+            dict rlengths
+        
+        fwtrack = FWTrackIII()
+        self.fhd.reset()
+        references, rlengths = self.get_references()
+        while True:
+            try:
+                a  =  self.fhd.next()
+            except StopIteration:
+                break
+            chrid = a.tid
+            if a.is_unmapped or (a.is_paired and (not a.is_proper_pair or a.is_read2)):
+                fpos = -1
+            else:
+                if a.is_reverse:
+                    strand = 1              # minus strand
+                    fpos = a.pos + a.rlen     # rightmost position
+                else:
+                    strand = 0              # plus strand
+                    fpos = a.pos
+            i+=1
+            if i == 1000000:
+                m += 1
+                logging.info( " %d" % ( m*1000000 ) )
+                i = 0
+            if fpos >= 0:
+                fwtrack.add_loc( references[ chrid ], fpos, strand )
+        self.fhd.close()
+        fwtrack.finalize()
+        fwtrack.rlengths = rlengths
+        return fwtrack
+
+    cdef __build_fwtrack_wo_pysam ( self ):
         """Build FWTrackIII from all lines, return a FWTrackIII object.
 
         Note only the unique match for a tag is kept.
@@ -756,7 +893,51 @@ cdef class BAMParser( GenericParser ):
         fwtrack.rlengths = rlengths
         return fwtrack
 
-    def append_fwtrack ( self, fwtrack ):
+    cpdef append_fwtrack ( self, fwtrack ):
+        if HAS_PYSAM:
+            return self.__append_fwtrack_w_pysam( fwtrack )
+        else:
+            return self.__append_fwtrack_wo_pysam( fwtrack )
+
+    cdef __append_fwtrack_w_pysam ( self, fwtrack ):
+        cdef:
+            int i = 0
+            int m = 0
+            int fpos, strand, chrid
+            list references
+            dict rlengths
+        
+        self.fhd.reset()
+        references, rlengths = self.get_references()
+        while True:
+            try:
+                a  =  self.fhd.next()
+            except StopIteration:
+                break
+            chrid = a.tid
+            if a.is_unmapped or (a.is_paired and (not a.is_proper_pair or a.is_read2)):
+                fpos = -1
+            else:
+                if a.is_reverse:
+                    strand = 1              # minus strand
+                    fpos = a.pos + a.rlen     # rightmost position
+                else:
+                    strand = 0              # plus strand
+                    fpos = a.pos
+            i+=1
+            if i == 1000000:
+                m += 1
+                logging.info( " %d" % ( m*1000000 ) )
+                i = 0
+            if fpos >= 0:
+                fwtrack.add_loc( references[ chrid ], fpos, strand )
+        self.fhd.close()
+        fwtrack.finalize()
+        if isinstance( fwtrack.rlengths, dict ):
+            fwtrack.rlengths.update(rlengths)
+        return fwtrack
+
+    cdef __append_fwtrack_wo_pysam ( self, fwtrack ):
         """Build FWTrackIII from all lines, return a FWTrackIII object.
 
         Note only the unique match for a tag is kept.
@@ -1091,3 +1272,176 @@ cdef class BowtieParser( GenericParser ):
             else:
                 raise StrandFormatError( thisline, thisfields[ 1 ] )
 
+cdef class PySAMParser:
+    """Parser using PySAM to parse SAM or BAM
+
+    """
+    cdef str filename
+    cdef bool gzipped
+    cdef int tag_size
+    cdef object fhd
+    
+    def __init__ ( self, str filename ):
+        """Open input file. Determine whether it's a gzipped file.
+
+        'filename' must be a string object.
+
+        This function initialize the following attributes:
+
+        1. self.filename: the filename for input file.
+        2. self.gzipped: a boolean indicating whether input file is gzipped.
+        3. self.fhd: buffered I/O stream of input file
+        """
+        self.filename = filename
+        self.gzipped = True
+        self.tag_size = -1
+        # try gzip first
+        f = gzip.open( filename )
+        try:
+            f.read( 10 )
+        except IOError:
+            # not a gzipped file
+            self.gzipped = False
+        f.close()
+        if self.gzipped:
+            # open with gzip.open, then wrap it with BufferedReader!
+            self.fhd = io.BufferedReader( gzip.open( filename, mode='rb' ) )
+        else:
+            self.fhd = io.open( filename, mode='rb' ) # binary mode! I don't expect unicode here!
+
+    def tsize( self ):
+        """General function to detect tag size.
+
+        * Although it can be used by most parsers, it must be
+          rewritten by BAMParser!
+        """
+        cdef:
+            int s = 0
+            int n = 0     # number of successful/valid read alignments
+            int m = 0     # number of trials
+            int this_taglength
+        
+        if self.tag_size != -1:
+            # if we have already calculated tag size (!= -1),  return it.
+            return self.tag_size
+        
+        # try 10k times or retrieve 10 successfule alignments
+        while n < 10 and m < 10000:
+            m += 1
+            thisline = self.fhd.readline()
+            this_taglength = self.__tlen_parse_line( thisline )
+            if this_taglength > 0:
+                # this_taglength == 0 means this line doesn't contain
+                # successful alignment.
+                s += this_taglength
+                n += 1
+        # done
+        self.fhd.seek( 0 )
+        self.tag_size = s/n
+        return self.tag_size
+
+    def __tlen_parse_line ( self, str thisline ):
+        """Abstract function to detect tag length.
+        
+        """
+        raise NotImplemented
+    
+    def build_fwtrack ( self ):
+        """Generic function to build FWTrackIII object. Create a new
+        FWTrackIII object. If you want to append new records to an
+        existing FWTrackIII object, try append_fwtrack function.
+
+        * BAMParser for binary BAM format should have a different one.
+        """
+        cdef:
+            long i, m, fpos, strand
+            str chromosome
+        
+        fwtrack = FWTrackIII()
+        i = 0
+        m = 0
+        for thisline in self.fhd:
+            ( chromosome, fpos, strand ) = self.__fw_parse_line( thisline )
+            i+=1
+            if fpos < 0 or not chromosome:
+                # normally __fw_parse_line will return -1 if the line
+                # contains no successful alignment.
+                continue
+            if i == 1000000:
+                m += 1
+                logging.info( " %d" % ( m*1000000 ) )
+                i=0
+            fwtrack.add_loc( chromosome, fpos, strand )
+
+        # close fwtrack and sort
+        fwtrack.finalize()
+        # close file stream.
+        self.close()
+        return fwtrack
+
+    def append_fwtrack ( self, fwtrack ):
+        """Add more records to an existing FWTrackIII object. 
+
+        """
+        i = 0
+        m = 0
+        for thisline in self.fhd:
+            ( chromosome, fpos, strand ) = self.__fw_parse_line( thisline )
+            i+=1
+            if fpos < 0 or not chromosome:
+                # normally __fw_parse_line will return -1 if the line
+                # contains no successful alignment.
+                continue
+            if i == 1000000:
+                m += 1
+                logging.info( " %d" % ( m*1000000 ) )
+                i=0
+            fwtrack.add_loc( chromosome, fpos, strand )
+
+        # close fwtrack and sort
+        fwtrack.finalize()
+        self.close()
+        return fwtrack
+        
+
+
+    def __fw_parse_line ( self, str thisline ):
+        """Abstract function to parse chromosome, 5' end position and
+        strand.
+        
+        """
+        cdef str chromosome = ""
+        cdef int fpos = -1
+        cdef int strand = -1
+        return ( chromosome, fpos, strand )
+
+    def sniff ( self ):
+        """Detect whether this parser is the correct parser for input
+        file.
+
+        Rule: try to find the tag size using this parser, if error
+        occurs or tag size is too small or too big, check is failed.
+
+        * BAMParser has a different sniff function.
+        """
+        cdef int t
+        
+        try:
+            t = self.tsize()
+        except:
+            self.fhd.seek( 0 )
+            return False
+        else:
+            if t <= 10 or t >= 10000:
+                self.fhd.seek( 0 )
+                return False
+            else:
+                self.fhd.seek( 0 )
+                return True
+            
+    def close ( self ):
+        """Run this when this Parser will be never used.
+
+        Close file I/O stream.
+        """
+        self.fhd.close()
