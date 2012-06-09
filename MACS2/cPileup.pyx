@@ -1,5 +1,5 @@
  # cython: profile=True
-# Time-stamp: <2012-06-04 16:46:42 Tao Liu>
+# Time-stamp: <2012-06-08 17:08:15 Tao Liu>
 
 """Module Description: For pileup functions.
 
@@ -46,12 +46,12 @@ cdef inline float float_max(float a, float b): return a if a >= b else b
 cdef INT_MAX = <int>((<unsigned int>-1)>>1)
 
 # Unified pileup function #
-def unified_pileup_bdg(track,
-                       ds,
-                       scale_factors = 1.0,
-                       baseline_value = 0.0,
-                       directional = True, 
-                       halfextension = True):
+cpdef unified_pileup_bdg(track,
+                         ds,
+                         scale_factors,
+                         float baseline_value = 0.0,
+                         bint directional = True, 
+                         bint halfextension = True):
     
     chrs = track.get_chr_names()
     if track.rlengths is None:
@@ -82,7 +82,7 @@ def unified_pileup_bdg(track,
             raise ValueError("track must be of type FWTrackIII or PETrackI")
 
 ## Fixed-width functions ##
-cpdef pileup_bdg_se(object trackI, int d,
+cdef pileup_bdg_se(object trackI, int d,
                     float scale_factor = 1.0,
                     float baseline_value = 0.0,
                     bool directional = True,
@@ -147,7 +147,7 @@ cpdef pileup_bdg_se(object trackI, int d,
 
     return ret
 
-cpdef pileup_w_multiple_d_bdg(object trackI, list d_s, list scale_factor_s = [],
+cdef pileup_w_multiple_d_bdg(object trackI, list d_s, list scale_factor_s = [],
                               float baseline_value = 0.0,
                               bool directional = True,
                               bool halfextension = True):
@@ -238,7 +238,7 @@ cpdef pileup_w_multiple_d_bdg(object trackI, list d_s, list scale_factor_s = [],
 
 # baseline_value needs to be float not int, otherwise we cause error in 
 # poisson CDF
-cpdef pileup_bdg_pe(object trackI, float scale_factor, float baseline_value):
+cdef pileup_bdg_pe(object trackI, float scale_factor, float baseline_value):
     """Pileup fragments into bedGraphTrackI object.
 
     trackI  : A PETrackI object with genomic locations
@@ -262,7 +262,7 @@ cpdef pileup_bdg_pe(object trackI, float scale_factor, float baseline_value):
                                                         baseline_value))
     return ret
 
-cpdef pileup_bdg_pe_w_ext (object trackI, int d, float scale_factor = 1.0,
+cdef pileup_bdg_pe_w_ext (object trackI, int d, float scale_factor = 1.0,
                            float baseline_value = 0.0):
     """Pileup fragments into bedGraphTrackI object with extension. Fragment will
     be extended both directions from midpoint by distance d/2, or the original
@@ -312,7 +312,7 @@ cpdef pileup_bdg_pe_w_ext (object trackI, int d, float scale_factor = 1.0,
 
     return ret
 
-cpdef pileup_w_multiple_d_bdg_pe ( object trackI, list d_s = [],  
+cdef pileup_w_multiple_d_bdg_pe ( object trackI, list d_s = [],  
                                    list scale_factor_s = [],
                                    float baseline_value = 0):
     """Pileup fragments into bedGraphTrackI object with extension. Fragment will

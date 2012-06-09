@@ -1,5 +1,5 @@
 # cython: profile=True
-# Time-stamp: <2012-06-06 01:29:26 Tao Liu>
+# Time-stamp: <2012-06-08 17:17:17 Tao Liu>
 
 """Module Description
 
@@ -35,119 +35,6 @@ cdef str subpeak_letters(short i):
         return chr(97+i)
     else:
         return subpeak_letters(i / 26) + chr(97 + (i % 26))
-
-# actually I didn't use this function... 
-#def compare_treatment_vs_control(treat, control, fragment_size, gsize,
-#                                 halfext=False, PE_MODE=False,
-#                                 slocal=0, llocal=0,
-#                                 tocontrol=False, shiftcontrol=False):
-#    """To compare treatment vs control tags tracks with tag extension
-#    ,local poisson test, and Benjamini-Hochberg adjustment. Return
-#    scoreTrackI object.
-#
-#    While calculating pvalue:
-#
-#    First, t and c will be adjusted by the ratio between total
-#    reads in treatment and total reads in control, depending on
-#    --to-control option.
-#
-#    Then, t and c will be multiplied by the smallest peak size --
-#    self.d.
-#
-#    Next, a poisson CDF is applied to calculate one-side pvalue
-#    for enrichment.
-#
-#    Finally, BH process will be applied to adjust pvalue to qvalue.
-#    """
-#    # raise DeprecationWarning ?
-#    cdef float effective_depth_in_million
-#    
-#    treat_total   = treat.total
-#    control_total = control.total
-#    ratio_treat2control = float(treat_total)/control_total
-#
-#
-#    # Now pileup FWTrackIII to form a bedGraphTrackI
-#    treat_btrack = pileup_bdg(treat, fragment_size, directional=True,
-#                              halfextension=halfext)
-#
-#    if tocontrol:
-#        # if user want to scale everything to control data
-#        lambda_bg = float(fragment_size)*treat_total/gsize/ratio_treat2control
-#        treat_btrack.apply_func(lambda x:float(x)/ratio_treat2control)
-#        effective_depth_in_million = control_total / 1000000.0        
-#    else:
-#        lambda_bg = float(fragment_size)*treat_total/gsize
-#        effective_depth_in_million = treat_total / 1000000.0        
-#
-#
-#    # control data needs multiple steps of calculation
-#    # I need to shift them by 500 bps, then 5000 bps
-#    if slocal:
-#        assert fragment_size <= slocal, "slocal can't be smaller than d!"
-#    if llocal:
-#        assert fragment_size <= llocal , "llocal can't be smaller than d!"            
-#        assert slocal <= llocal , "llocal can't be smaller than slocal!"
-#
-#    # Now prepare a list of extension sizes
-#    d_s = [ fragment_size ]
-#    # And a list of scaling factors
-#    scale_factor_s = []
-#
-#    # d
-#    if not tocontrol:
-#        # if user want to scale everything to ChIP data
-#        tmp_v = ratio_treat2control
-#    else:
-#        tmp_v = 1.0
-#    scale_factor_s.append( tmp_v )
-#
-#    # slocal size local
-#    if slocal:
-#        d_s.append( slocal )
-#        if not tocontrol:
-#            # if user want to scale everything to ChIP data
-#            tmp_v = float(fragment_size)/slocal*ratio_treat2control
-#        else:
-#            tmp_v = float(fragment_size)/slocal
-#        scale_factor_s.append( tmp_v )
-#
-#    # llocal size local
-#    if llocal and llocal > slocal:
-#        d_s.append( llocal )
-#        if not tocontrol:
-#            # if user want to scale everything to ChIP data
-#            tmp_v = float(fragment_size)/llocal*ratio_treat2control
-#        else:
-#            tmp_v = float(fragment_size)/llocal
-#        scale_factor_s.append( tmp_v )                            
-#
-#    # pileup using different extension sizes and scaling factors
-#    if PE_MODE:
-#        control_btrack = pileup_frag_w_multiple_d_bdg(control,
-#                                            d_s[1:],
-#                                            baseline_value=lambda_bg,
-#                                            scale_factor_s=scale_factor_s[1:],
-#                                            scale_factor_0=scale_factor_s[0])
-#    else:
-#        control_btrack = pileup_w_multiple_d_bdg(control, d_s,
-#                                             baseline_value=lambda_bg,
-#                                             directional=shiftcontrol,
-#                                             halfextension=halfext,
-#                                             scale_factor_s=scale_factor_s)
-#
-#    # calculate pvalue scores
-#    score_btrack = treat_btrack.make_scoreTrack_for_macs( control_btrack , effective_depth_in_million = effective_depth_in_million )
-#    #treat_btrack = None             # clean them
-#    #control_btrack = None
-#    #gc.collect()                    # full collect garbage
-#
-#    # calculate and assign qvalues
-#    pqtable = score_btrack.make_pq_table()
-#        
-#    score_btrack.assign_qvalue( pqtable )
-#                
-#    return score_btrack
 
 class PeakDetect:
     """Class to do the peak calling.
@@ -250,7 +137,6 @@ class PeakDetect:
         write = ofhd.write
         if self.peaks:
             write("\t".join(("chr","start", "end",  "length",  "abs_summit", "pileup", "-log10(pvalue)", "fold_enrichment", "-log10(qvalue)", "name"))+"\n")
-            #text += "\t".join(("chr","start", "end",  "length",  "abs_summit", "-log10(pvalue)","-log10(qvalue)"))+"\n"
         else:
             return
         
@@ -344,7 +230,7 @@ class PeakDetect:
         else:
             # if MACS decides to scale control to treatment because control sample is bigger
             effective_depth_in_million = treat_total / 1000000.0
-            
+            self.info("#3 pileup treatment data")            
             if self.PE_MODE:
                 lambda_bg = treat.total/self.gsize
             else:
@@ -401,35 +287,13 @@ class PeakDetect:
                                             directional=self.shiftcontrol,
                                             halfextension=self.opt.halfext)
 
-        # free mem
-        #self.treat = None
-        #self.control = None
-        #gc.collect()                    # full collect garbage
-        
-        #control_btrack.reset_baseline(lambda_bg) # set the baseline as lambda_bg
-
         # calculate pvalue scores
         self.info("#3 Build score track ...")
         score_btrack = treat_btrack.make_scoreTrackII_for_macs( control_btrack, effective_depth_in_million, effective_depth_in_million )
         if self.opt.trackline: score_btrack.enable_trackline()
-        #treat_btrack = None             # clean them
-        #control_btrack = None
-        #gc.collect()                    # full collect garbage
+        treat_btrack.destroy()             # clean them
+        control_btrack.destroy()        
 
-        #self.info("#3 Saving p-value to q-value table ...")
-        #pqfhd = io.open(self.opt.pqtable,"wb")
-        #pqfhd.write( "-log10pvalue\t-log10qvalue\trank\tbasepairs\n" )
-        #for p in sorted(pqtable.keys(),reverse=True):
-        #for i in range(pqtable.shape[0]):
-        #    #t = pqtable[i]
-        #    q = pqtable[p]
-        #    pqfhd.write("%.2f\t%.2f\t%d\t%d\n" % (p/100.0,q[0]/100.0,q[1],q[2]))
-        #    #pqfhd.write("%.2f\t%.2f\t%d\t%d\n" % (t[0]/100.0,t[1]/100.0,t[2],t[3]))            
-        #pqfhd.close()
-
-        #self.info("#3 Assign qvalues ...")
-        #score_btrack.assign_qvalue( pqtable )
-                
         # call peaks
         call_summits = self.opt.call_summits
         if self.log_pvalue:
@@ -459,7 +323,6 @@ class PeakDetect:
            if self.PE_MODE: desc1 = "fragment pileup"
            else: desc1 = "tag pileup"
            
-           # tracks [(filename, name, desc, scorecol), ...]
            tracks = [(self.zwig_tr + "_pileup.bdg", self.zwig_tr,
                       desc1, 1),
                      
@@ -514,18 +377,17 @@ class PeakDetect:
         if self.PE_MODE:
             # should we support halfext?
             if self.opt.halfext: warn('halfextension not supported in PE mode')
-            self.info("#3 pileup treatment data")
             # this an estimator, we should maybe test it for accuracy?
             lambda_bg = treat_total / self.gsize
         else:
             lambda_bg = float(d) * treat_total / self.gsize
             self.info("#3 pileup treatment data by extending tags towards 3' to %d length" % self.d)
             # Now pileup FWTrackIII to form a bedGraphTrackI
+
         treat_btrack = unified_pileup_bdg(self.treat, d, 1.0,
                                           directional=True,
                                           halfextension=self.opt.halfext)
-        # llocal size local
-        # self.info("#3 calculate d local lambda from treatment data")
+        # slocal and d-size local bias are not calculated!
         # nothing done here. should this match w control??
         
         if self.lregion:
@@ -542,29 +404,13 @@ class PeakDetect:
 
         # calculate pvalue scores
         self.info("#3 Build score track ...")
-        score_btrack = treat_btrack.make_scoreTrack_for_macs( control_btrack, effective_depth_in_million = effective_depth_in_million )
+        score_btrack = treat_btrack.make_scoreTrackII_for_macs( control_btrack, effective_depth_in_million, effective_depth_in_million )
         if self.opt.trackline: score_btrack.enable_trackline()
-        treat_btrack = None             # clean them
-        control_btrack = None
-        gc.collect()                    # full collect garbage
-
-        self.info("#3 Calculate qvalues ...")
-        pqtable = score_btrack.make_pq_table()
-        
-        #self.info("#3 Saving p-value to q-value table ...")
-        #pqfhd = open(self.opt.pqtable,"w")
-        #pqfhd.write( "-log10pvalue\t-log10qvalue\trank\tbasepairs\n" )
-        #for p in sorted(pqtable.keys(),reverse=True):
-        #    q = pqtable[p]
-        #    pqfhd.write("%.2f\t%.2f\t%d\t%d\n" % (p/100.0,q[0]/100.0,q[1],q[2]))
-        #pqfhd.close()
-
-        self.info("#3 Assign qvalues ...")
-        score_btrack.assign_qvalue( pqtable )            
+        treat_btrack.destroy()             # clean them
+        control_btrack.destroy()
 
         # call peaks
         call_summits = self.opt.call_summits
-        if call_summits: self.info("#3 Going to call summits inside each peak ...")
         if self.log_pvalue:
             self.info("#3 Calculate pvalues ...")
             score_btrack.change_score_method ( ord('p') )            
