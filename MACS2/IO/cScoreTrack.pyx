@@ -1113,6 +1113,7 @@ cdef class scoreTrackII:
         char scoring_method              # method for calculating scores.
         char normalization_method        # scale to control? scale to treatment? both scale to 1million reads?
         float pseudocount                # the pseudocount used to calcuate logLR, FE or logFE
+        float cutoff
 
     
     def __init__ (self, float treat_depth, float ctrl_depth, bool stderr_on = False, float pseudocount = 1.0 ):
@@ -1655,11 +1656,8 @@ cdef class scoreTrackII:
         chrs  = self.get_chr_names()
         peaks = PeakIO()                      # dictionary to save peaks
 
-        #if call_summits: close_peak = self.__close_peak2
-        #else:
-        # temporarily not use subpeak method
-        #close_peak = self.__close_peak
-        
+        self.cutoff = cutoff
+        print self.cutoff
         for chrom in chrs:
             peak_content = []           # to store points above cutoff
 
@@ -1691,18 +1689,25 @@ cdef class scoreTrackII:
                     peak_content.append( (above_cutoff_startpos[i], above_cutoff_endpos[i], above_cutoff_v[i], above_cutoff_sv[i], above_cutoff[i]) )
                 else:
                     # close
-                    self.__close_peak(peak_content, peaks, min_length, chrom, max_gap/2 )
+                    if call_summits:
+                        self.__close_peak2(peak_content, peaks, min_length, chrom, max_gap/2 )
+                    else:
+                        self.__close_peak(peak_content, peaks, min_length, chrom, max_gap/2 )
                     peak_content = [(above_cutoff_startpos[i], above_cutoff_endpos[i], above_cutoff_v[i], above_cutoff_sv[i], above_cutoff[i]),]
             
             # save the last peak
             if not peak_content:
                 continue
             else:
-                self.__close_peak(peak_content, peaks, min_length, chrom, max_gap/2 )
+                if call_summits:
+                    self.__close_peak2(peak_content, peaks, min_length, chrom, max_gap/2 )
+                else:
+                    self.__close_peak(peak_content, peaks, min_length, chrom, max_gap/2 )
 
         return peaks
 
-    cdef __close_peak (self, list peak_content, peaks, int min_length, str chrom, int smoothlen=0):
+    cdef bool __close_peak (self, list peak_content, peaks, int min_length,
+                            str chrom, int smoothlen=0):
         """Close the peak region, output peak boundaries, peak summit
         and scores, then add the peak to peakIO object.
 
@@ -1750,7 +1755,83 @@ cdef class scoreTrackII:
                        qscore      = qscore,
                        )
             # start a new peak
-            return
+            return True
+
+    cdef bool __close_peak2 (self, list peak_content, peaks, int min_length,
+                             str chrom, int smoothlen=51,
+                             float min_valley = 0.9):
+        cdef:
+            int summit_pos, tstart, tend, tmpindex, summit_index, summit_offset
+            int start, end, i, j, start_boundary
+            double summit_value, tvalue, tsummitvalue
+#            np.ndarray[np.float32_t, ndim=1] w
+            np.ndarray[np.float32_t, ndim=1] peakdata
+            np.ndarray[np.int32_t, ndim=1] peakindices, summit_offsets
+            
+        # Add 10 bp padding to peak region so that we can get true minima
+        end = peak_content[ -1 ][ 1 ] + 10
+        start = peak_content[ 0 ][ 0 ] - 10
+        if start < 0:
+            start_boundary = 10 + start
+            start = 0
+        else:
+            start_boundary = 10
+        peak_length = end - start
+        if end - start < min_length: return # if the region is too small, reject it
+
+        peakdata = np.zeros(end - start, dtype='float32')
+        peakindices = np.zeros(end - start, dtype='int32')
+        for (tstart,tend,tvalue,tsvalue, tmpindex) in peak_content:
+            i = tstart - start + start_boundary
+            j = tend - start + start_boundary
+            peakdata[i:j] = tsvalue
+            peakindices[i:j] = tmpindex
+        # apply smoothing window of smoothlen
+#        w = np.ones(smoothlen, dtype='float32') / smoothlen
+#        if smoothlen > 0:
+#            smoothdata = np_convolve(w, peakdata, mode='same')
+#        else:
+#            smoothdata = peakdata.copy()
+        summit_offsets = maxima(peakdata, smoothlen)
+        if summit_offsets.shape[0] == 0:
+            # **failsafe** if no summits, fall back on old approach #
+            return self.__close_peak(peak_content, peaks, min_length, chrom)
+        else:
+            # remove maxima that occurred in padding
+            i = np.searchsorted(summit_offsets, start_boundary)
+            j = np.searchsorted(summit_offsets, peak_length + start_boundary, 'right')
+            summit_offsets = summit_offsets[i:j]
+        
+        summit_offsets = enforce_peakyness(peakdata, summit_offsets)
+        if summit_offsets.shape[0] == 0:
+            # **failsafe** if no summits, fall back on old approach #
+            return self.__close_peak(peak_content, peaks, min_length, chrom)
+        
+#        summit_offsets = enforce_valleys(peakdata, summit_offsets, min_valley = min_valley)
+        summit_indices = peakindices[summit_offsets]
+        summit_offsets -= start_boundary
+
+        peak_scores  = self.data[chrom][3][ summit_indices ]
+        if not (peak_scores > self.cutoff).all():
+            return self.__close_peak(peak_content, peaks, min_length, chrom)
+        for summit_offset, summit_index in zip(summit_offsets, summit_indices):
+            if self.scoring_method == 'q':
+                qscore = self.data[chrom][3][ summit_index ]
+            else:
+                # if q value is not computed, use -1
+                qscore = -1
+            peaks.add( chrom,
+                       start,
+                       end,
+                       summit      = start + summit_offset,
+                       peak_score  = self.data[chrom][3][ summit_index ],
+                       pileup      = self.data[chrom][1][ summit_index ], # should be the same as summit_value
+                       pscore      = get_pscore(self.data[chrom][ 1 ][ summit_index ], self.data[chrom][ 2 ][ summit_index ]),
+                       fold_change = float ( self.data[chrom][ 1 ][ summit_index ] + self.pseudocount ) / ( self.data[chrom][ 2 ][ summit_index ] + self.pseudocount ),
+                       qscore      = qscore,
+                       )
+        # start a new peak
+        return True
         
     cdef long total ( self ):
         """Return the number of regions in this object.

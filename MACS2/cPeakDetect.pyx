@@ -332,6 +332,7 @@ class PeakDetect:
             effective_depth_in_million = control_total / 1000000.0
         
             if self.PE_MODE:
+                if self.opt.halfext: warn('halfextension not supported in PE mode')
                 self.info("#3 pileup treatment data")
                 lambda_bg = treat_total/self.gsize/self.ratio_treat2control
             else:
@@ -346,6 +347,7 @@ class PeakDetect:
             effective_depth_in_million = treat_total / 1000000.0
             
             if self.PE_MODE:
+                if self.opt.halfext: warn('halfextension not supported in PE mode')
                 lambda_bg = treat.total/self.gsize
             else:
                 lambda_bg = float(self.d)*treat_total/self.gsize
@@ -410,7 +412,10 @@ class PeakDetect:
 
         # calculate pvalue scores
         self.info("#3 Build score track ...")
-        score_btrack = treat_btrack.make_scoreTrackII_for_macs( control_btrack, effective_depth_in_million, effective_depth_in_million )
+        score_btrack = treat_btrack.make_scoreTrackII_for_macs(
+                           control_btrack,
+                           effective_depth_in_million,
+                           effective_depth_in_million )
         if self.opt.trackline: score_btrack.enable_trackline()
         #treat_btrack = None             # clean them
         #control_btrack = None
@@ -432,6 +437,7 @@ class PeakDetect:
                 
         # call peaks
         call_summits = self.opt.call_summits
+        if call_summits: self.info("#3 Going to call summits inside each peak ...")
         if self.log_pvalue:
             self.info("#3 Calculate pvalues ...")
             score_btrack.change_score_method ( ord('p') )
@@ -499,7 +505,7 @@ class PeakDetect:
         Finally, a poisson CDF is applied to calculate one-side pvalue
         for enrichment.
         """
-        cdef float effective_depth_in_million
+        cdef float lambda_bg, effective_depth_in_million
 
         if self.PE_MODE:
             treat_total = self.treat.length()
@@ -542,15 +548,15 @@ class PeakDetect:
 
         # calculate pvalue scores
         self.info("#3 Build score track ...")
-        score_btrack = treat_btrack.make_scoreTrack_for_macs( control_btrack, effective_depth_in_million = effective_depth_in_million )
+        score_btrack = treat_btrack.make_scoreTrackII_for_macs(
+                           control_btrack,
+                           effective_depth_in_million,
+                           effective_depth_in_million )
         if self.opt.trackline: score_btrack.enable_trackline()
         treat_btrack = None             # clean them
         control_btrack = None
         gc.collect()                    # full collect garbage
-
-        self.info("#3 Calculate qvalues ...")
-        pqtable = score_btrack.make_pq_table()
-        
+       
         #self.info("#3 Saving p-value to q-value table ...")
         #pqfhd = open(self.opt.pqtable,"w")
         #pqfhd.write( "-log10pvalue\t-log10qvalue\trank\tbasepairs\n" )
@@ -558,9 +564,6 @@ class PeakDetect:
         #    q = pqtable[p]
         #    pqfhd.write("%.2f\t%.2f\t%d\t%d\n" % (p/100.0,q[0]/100.0,q[1],q[2]))
         #pqfhd.close()
-
-        self.info("#3 Assign qvalues ...")
-        score_btrack.assign_qvalue( pqtable )            
 
         # call peaks
         call_summits = self.opt.call_summits
