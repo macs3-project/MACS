@@ -54,7 +54,6 @@ def main():
                    Extension("MACS2.IO.cScoreTrack", ["MACS2/IO/cScoreTrack.c"], include_dirs=numpy_include_dir ),
                    Extension("MACS2.IO.cCompositeScoreTrack", ["MACS2/IO/cCompositeScoreTrack.c"],),
                    Extension("MACS2.hashtable", ["MACS2/hashtable.c"],
-                             depends = ["MACS2/khash.h"],
                              include_dirs=["MACS2/",numpy_get_include()]),
                    ]
     

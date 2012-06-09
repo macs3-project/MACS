@@ -1,5 +1,5 @@
 include README COPYING ChangeLog INSTALL MANIFEST setup.py bin/macs2 bin/macs2diff bin/bdgpeakcall bin/bdgbroadcall bin/bdgcmp bin/filterdup bin/randsample
-recursive-include MACS2 *.py *.pyx
+recursive-include MACS2 *.py *.pyx *.pxd *.h
 recursive-include data *.dat
 prune test
 prune web
