@@ -56,6 +56,9 @@ def unified_pileup_bdg(track,
     chrs = track.get_chr_names()
     if track.rlengths is None:
         track.rlengths = dict([(k, INT_MAX) for k in chrs])
+    else:
+        rlengths2 = dict([(k, track.rlengths[k]) for k in chrs])
+        track.rlengths = rlengths2
     if type(ds) is list:
         # multiple pileup
         if isinstance(track, FWTrackIII):
