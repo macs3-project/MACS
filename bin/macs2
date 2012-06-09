@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# Time-stamp: <2012-05-24 12:39:57 Tao Liu>
+# Time-stamp: <2012-06-06 15:41:18 Tao Liu>
 
 """Description: MACS 2 main executable
 
@@ -121,10 +121,10 @@ def add_callpeak_parser( subparsers ):
     
     # group for input files
     group_input = argparser_callpeak.add_argument_group( "Input files arguments" )
-    group_input.add_argument( "-t", "--treatment", dest = "tfile", type = str, required = True,
-                              help = "ChIP-seq treatment file. REQUIRED." )
-    group_input.add_argument( "-c", "--control", dest = "cfile", type = str,
-                                    help = "Control file.")
+    group_input.add_argument( "-t", "--treatment", dest = "tfile", type = str, required = True, nargs = "+",
+                              help = "ChIP-seq treatment file. If multiple files are given as '-t A B C', then they will all be read and combined. REQUIRED." )
+    group_input.add_argument( "-c", "--control", dest = "cfile", type = str, nargs = "*",
+                                    help = "Control file. If multiple files are given as '-c A B C', then they will all be read and combined.")
     group_input.add_argument( "-f", "--format", dest = "format", type = str,
                               choices = ("AUTO", "BAM", "SAM", "BED", "ELAND",
                                          "ELANDMULTI", "ELANDEXPORT", "BOWTIE",
@@ -142,12 +142,12 @@ def add_callpeak_parser( subparsers ):
                                help = "Experiment name, which will be used to generate output file names. DEFAULT: \"NA\"", 
                                default = "NA" )
     group_output.add_argument( "-B", "--bdg", dest = "store_bdg", action = "store_true",
-                               help = "Whether or not to save extended fragment pileup, local lambda and score tracks (three files) at every bp into a bedGraph file. MACS2 can generate score track for log p/q-value/likelihood/fold enrichment or substraction, depending on the criteria to call peaks. DEFAULT: False",
+                               help = "Whether or not to save extended fragment pileup, and local lambda tracks (two files) at every bp into a bedGraph file. DEFAULT: False",
                                default = False )
     group_output.add_argument( "--verbose", dest = "verbose", type = int, default = 2,
                                help = "Set verbose level of runtime message. 0: only show critical message, 1: show additional warning message, 2: show process information, 3: show debug messages. DEFAULT:2" )
-    group_output.add_argument( "--no-trackline", dest="trackline", action="store_false", default = True,
-                               help = "Tells MACS not to include trackline with bedGraph files. The trackline is required by UCSC. Require -B to be set. Default: keep trackline." )
+    group_output.add_argument( "--trackline", dest="trackline", action="store_true", default = False,
+                               help = "Tells MACS to include trackline with bedGraph files. To include this trackline while displaying bedGraph at UCSC genome browser, can show name and description of the file as well. However my suggestion is to convert bedGraph to bigWig, then show the smaller and faster binary bigWig file at UCSC genome browser, as well as downstream analysis. Require -B to be set. Default: Not include trackline." )
     
     group_output.add_argument( "--SPMR", dest = "do_SPMR", action = "store_true", default = False,
                                help = "If True, MACS will save signal per million reads for fragment pileup profiles. Require -B to be set. Default: False" )    
@@ -175,7 +175,7 @@ def add_callpeak_parser( subparsers ):
     p_or_q_group.add_argument( "-q", "--qvalue", dest = "qvalue", type = float, default = 0.05,
                                help = "Minimum FDR (q-value) cutoff for peak detection. DEFAULT: 0.05. -q and -p are mutually exclusive." )
     p_or_q_group.add_argument( "-p", "--pvalue", dest = "pvalue", type = float,
-                               help = "Pvalue cutoff for peak detection. DEFAULT: not set. -q and -p are mutually exclusive." )
+                               help = "Pvalue cutoff for peak detection. DEFAULT: not set. -q and -p are mutually exclusive. If pvalue cutoff is set, qvalue will not be calculated and reported as -1 in the final .xls file." )
     # about scaling
     group_callpeak.add_argument( "--to-large", dest = "tolarge", action = "store_true", default = False,
                                 help = "When set, scale the small sample up to the bigger sample. By default, the bigger dataset will be scaled down towards the smaller dataset, which will lead to smaller p/qvalues and more specific results. Keep in mind that scaling down will bring down background noise more. DEFAULT: False" )
@@ -278,11 +278,17 @@ def add_bdgcmp_parser( subparsers ):
                                    help = "Treatment bedGraph file, e.g. *_treat_pileup.bdg from MACSv2. REQUIRED")
     argparser_bdgcmp.add_argument( "-c", "--cfile", dest = "cfile", type = str, required = True,
                                    help = "Control bedGraph file, e.g. *_control_lambda.bdg from MACSv2. REQUIRED")
+    argparser_bdgcmp.add_argument( "-T", "--tdepth", dest = "tdepth", type = float, default = 1.0,
+                                   help = "The sequencing depth in million for treatment bedGraph file. e.g. If bedGraph is generated by MACS2 with --SPMR option, you can set 1.0 here. If bedGraph is generated by MACS2 without --SPMR option, you can set it as the depth of smaller/larger sample according to your MACS2 setting. If you don't want any normalization on sequencing depth, please set both -T and -C as 1.0. DEFAULT: 1.0")
+    argparser_bdgcmp.add_argument( "-C", "--cdepth", dest = "cdepth", type = float, default = 1.0,
+                                   help = "The sequencing depth in million for control bedGraph file. e.g. If bedGraph is generated by MACS2 with --SPMR option, you can set 1.0 here. If bedGraph is generated by MACS2 without --SPMR option, you can set it as the depth of smaller/larger sample according to your MACS2 setting. If you don't want any normalization on sequencing depth, please set both -T and -C as 1.0. DEFAULT: 1.0")                                   
+    argparser_bdgcmp.add_argument( "-p", "--pseudocount", dest = "pseudocount", type = float, default = 0.0,
+                                   help = "The pseudocount used for calculating logLR, logFE or FE. The count will be applied after normalization of sequencing depth. DEFAULT: 0.0, no pseudocount is applied.")     
     argparser_bdgcmp.add_argument( "-o", "--output", dest = "ofile", type = str, required = True,
                                    help = "The output bedGraph file to write scores. REQUIRED" )
     argparser_bdgcmp.add_argument( "-m", "--method", dest = "method", type = str,
-                                   choices = ( "ppois", "qpois", "substract", "logFE", "FE", "logLR" ),
-                                   help = "Method to use while calculating a score in any bin by comparing treatment value and control value. Available choices are: ppois, qpois, substract, logFE, and logLR,. They represent Poisson Pvalue (-log10(pvalue) form) using control as lambda and treatment as observation, q-value through a BH process for poisson pvalues, substraction from treatment, linear scale fold enrichment, log10 fold enrichment, log10 likelihood between ChIP-enriched model and open chromatin model (with pseudocount +1). Default option is ppois.",default="ppois")
+                                   choices = ( "ppois", "qpois", "subtract", "logFE", "FE", "logLR" ),
+                                   help = "Method to use while calculating a score in any bin by comparing treatment value and control value. Available choices are: ppois, qpois, subtract, logFE, and logLR,. They represent Poisson Pvalue (-log10(pvalue) form) using control as lambda and treatment as observation, q-value through a BH process for poisson pvalues, subtraction from treatment, linear scale fold enrichment, log10 fold enrichment, log10 likelihood between ChIP-enriched model and open chromatin model (with or without pseudocount). Default option is ppois.",default="ppois")
     return
     
 def add_randsample_parser( subparsers ):

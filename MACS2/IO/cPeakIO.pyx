@@ -1,5 +1,5 @@
 # cython: profile=True
-# Time-stamp: <2012-05-10 11:21:06 Tao Liu>
+# Time-stamp: <2012-06-05 20:46:06 Tao Liu>
 
 """Module for PeakIO IO classes.
 
@@ -364,7 +364,7 @@ class PeakIO:
                         write("\t%d" % (peak["summit"]+1)) # summit position
                         write("\t%.2f" % (peak["pileup"])) # pileup height at summit
                         write("\t%.2f" % (peak["pscore"])) # -log10pvalue at summit
-                        write("\t%.2f" % (peak["fc"])) # fold change at summit                
+                        write("\t%.2f" % (peak["fc"])) # fold change at summit
                         write("\t%.2f" % (peak["qscore"])) # -log10qvalue at summit
                         write("\t%s" % peakname)
                         write("\n")
@@ -376,8 +376,8 @@ class PeakIO:
                     write("\t%d" % (peak["summit"]+1)) # summit position
                     write("\t%.2f" % (peak["pileup"])) # pileup height at summit
                     write("\t%.2f" % (peak["pscore"])) # -log10pvalue at summit
-                    write("\t%.2f" % (peak["fc"])) # fold change at summit                
-                    write("\t%.2f" % (peak["qscore"])) # -log10qvalue at summit
+                    write("\t%.2f" % (peak["fc"])) # fold change at summit
+                    write("\t%.2f" % (peak["qscore"])) # -log10qvalue at summit                    
                     write("\t%s" % peakname)
                     write("\n")
         return

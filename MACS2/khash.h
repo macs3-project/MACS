@@ -605,8 +605,8 @@ KHASH_SET_INIT_PYOBJECT(pyset)
 
 KHASH_MAP_INIT_STR(str, Py_ssize_t)
 
-KHASH_MAP_INIT_INT(int32, Py_ssize_t)
-KHASH_MAP_INIT_INT64(int64, Py_ssize_t)
-KHASH_MAP_INIT_FLOAT64(float64, Py_ssize_t)
+KHASH_MAP_INIT_INT(int32, Py_ssize_t) 
+KHASH_MAP_INIT_INT64(int64, khfloat64_t)  /* I want this hash to store float type values*/
+KHASH_MAP_INIT_FLOAT64(float64, khfloat64_t) /* I want this hash to store float type values*/
 
 #endif /* __AC_KHASH_H */

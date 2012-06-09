@@ -1,5 +1,5 @@
  # cython: profile=True
-# Time-stamp: <2012-05-02 22:37:23 Tao Liu>
+# Time-stamp: <2012-06-04 16:46:42 Tao Liu>
 
 """Module Description: For pileup functions.
 
@@ -168,9 +168,8 @@ cpdef pileup_w_multiple_d_bdg(object trackI, list d_s, list scale_factor_s = [],
     cdef:
         long d, five_shift, three_shift, l, i  
         float scale_factor
-        dict chrlengths = trackI.rlengths 
-    #cdef int * start_poss
-    #cdef int * end_poss
+        dict chrlengths = trackI.rlengths
+        Ends ends
 
     assert len(d_s) == len(scale_factor_s), "Arguments d_s and scale_factor_s should have the same length!"
 
