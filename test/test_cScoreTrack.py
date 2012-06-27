@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# Time-stamp: <2012-06-01 16:10:30 Tao Liu>
+# Time-stamp: <2012-06-09 16:44:48 Tao Liu>
 
 import os
 import sys
@@ -86,6 +86,8 @@ chrY	161	210	50	186	20.00	7.09	3.50	-1.00	MACS_peak_2
         s1.add_chromosome( "chrY", 5 )
         for a in self.test_regions1:
             s1.add( a[0],a[1],a[2],a[3] )
+
+        s1.set_pseudocount ( 1.0 )
 
         s1.change_score_method( ord('p') )
         r = s1.get_data_by_chr("chrY")

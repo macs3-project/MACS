@@ -1,5 +1,5 @@
- # cython: profile=True
-# Time-stamp: <2012-06-08 17:08:15 Tao Liu>
+# cython: profile=True
+# Time-stamp: <2012-06-22 09:54:26 Tao Liu>
 
 """Module Description: For pileup functions.
 
@@ -41,10 +41,6 @@ cdef inline int int_max(int a, int b): return a if a >= b else b
 cdef inline long long_max(long a, long b): return a if a >= b else b
 cdef inline float float_max(float a, float b): return a if a >= b else b
 
-#cdef extern from "limits.h":
-#    cdef int INT_MAX
-cdef INT_MAX = <int>((<unsigned int>-1)>>1)
-
 # Unified pileup function #
 cpdef unified_pileup_bdg(track,
                          ds,
@@ -54,11 +50,11 @@ cpdef unified_pileup_bdg(track,
                          bint halfextension = True):
     
     chrs = track.get_chr_names()
-    if track.rlengths is None:
-        track.rlengths = dict([(k, INT_MAX) for k in chrs])
-    else:
-        rlengths2 = dict([(k, track.rlengths[k]) for k in chrs])
-        track.rlengths = rlengths2
+    # if track.rlengths is None:
+    #     track.rlengths = dict([(k, INT_MAX) for k in chrs])
+    # else:
+    #     rlengths2 = dict([(k, track.rlengths[k]) for k in chrs])
+    #     track.rlengths = rlengths2
     if type(ds) is list:
         # multiple pileup
         if isinstance(track, FWTrackIII):
@@ -110,7 +106,7 @@ cdef pileup_bdg_se(object trackI, int d,
         str chrom
         Ends ends
         np.ndarray[np.int32_t, ndim=1] plus_tags, minus_tags
-        dict chrlengths = trackI.rlengths 
+        dict chrlengths = trackI.get_rlengths ()
     #cdef int * start_poss
     #cdef int * end_poss    
 
@@ -171,7 +167,7 @@ cdef pileup_w_multiple_d_bdg(object trackI, list d_s, list scale_factor_s = [],
     cdef:
         long d, five_shift, three_shift, l, i  
         float scale_factor
-        dict chrlengths = trackI.rlengths
+        dict chrlengths = trackI.get_rlengths()
         Ends ends
 
     assert len(d_s) == len(scale_factor_s), "Arguments d_s and scale_factor_s should have the same length!"
@@ -254,7 +250,7 @@ cdef pileup_bdg_pe(object trackI, float scale_factor, float baseline_value):
         int rlength
         str chrom
         np.ndarray[np.int32_t, ndim=2] locs
-        dict chrlengths = trackI.rlengths 
+        dict chrlengths = trackI.get_rlengths ()
         
     ret = bedGraphTrackI(baseline_value=baseline_value) # bedGraphTrackI object to be returned.
     for chrom in sorted(chrlengths.keys()):
@@ -285,7 +281,7 @@ cdef pileup_bdg_pe_w_ext (object trackI, int d, float scale_factor = 1.0,
         str chrom
         np.ndarray[np.int32_t, ndim=2] locs
         np.ndarray[np.int32_t, ndim=1] start_poss, end_poss
-        dict chrlengths = trackI.rlengths 
+        dict chrlengths = trackI.get_rlengths ()
         
     ret = bedGraphTrackI(baseline_value=baseline_value) # bedGraphTrackI object to be returned.
 
@@ -333,7 +329,7 @@ cdef pileup_w_multiple_d_bdg_pe ( object trackI, list d_s = [],
     cdef:
         long d, five_shift, three_shift, l, i
         float scale_factor
-        dict chrlengths = trackI.rlengths 
+        dict chrlengths = trackI.get_rlengths ()
     #cdef int * start_poss
     #cdef int * end_poss
 
@@ -403,7 +399,7 @@ cdef start_and_end_poss ( np.ndarray plus_tags, np.ndarray minus_tags,
     start_poss.sort()
     end_poss.sort()
     
-    # fix negative coordinations and over end of chromosomes
+    # fix negative coordinations and those extends over end of chromosomes
     ends = Ends()
     ends.startposs = fix_coordinates(start_poss, rlength)
     ends.endposs = fix_coordinates(end_poss, rlength)
@@ -494,9 +490,18 @@ cdef pileup_a_chromosome ( np.ndarray start_poss, np.ndarray end_poss, float sca
     return tmp
 
 cdef max_over_two_pv_array ( tmparray1, tmparray2 ):
+    """Merge two position-value arrays. For intersection regions, take
+    the maximum value within region.
+
+    """
+
+    
     cdef:
         int pre_p, p1, p2
         float v1, v2
+        list tmp
+        long l1, l2, l
+        
 
     tmp = [array(BYTE4,[]),array(FBYTE4,[])] # for (endpos,value)
     tmppadd = tmp[0].append
@@ -505,13 +510,15 @@ cdef max_over_two_pv_array ( tmparray1, tmparray2 ):
     (p1s,v1s) = tmparray1
     p1n = iter(p1s).next         # assign the next function to a viable to speed up
     v1n = iter(v1s).next
+    l1  = len(p1s)
 
     (p2s,v2s) = tmparray2
     p2n = iter(p2s).next         # assign the next function to a viable to speed up
     v2n = iter(v2s).next
-
+    l2  = len(p2s)
+    
     pre_p = 0                   # remember the previous position in the new bedGraphTrackI object ret
-            
+
     try:
         p1 = p1n()
         v1 = v1n()

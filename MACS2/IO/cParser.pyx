@@ -1,5 +1,5 @@
 # cython: profile=True
-# Time-stamp: <2012-06-09 16:39:02 Tao Liu>
+# Time-stamp: <2012-06-11 17:04:46 Tao Liu>
 
 """Module for all MACS Parser classes for input.
 
@@ -854,7 +854,7 @@ cdef class BAMParser( GenericParser ):
                 fwtrack.add_loc( references[ chrid ], fpos, strand )
         self.fhd.close()
         fwtrack.finalize()
-        fwtrack.rlengths = rlengths
+        fwtrack.set_rlengths( rlengths )
         return fwtrack
 
     cdef __build_fwtrack_wo_pysam ( self ):
@@ -890,7 +890,7 @@ cdef class BAMParser( GenericParser ):
                 fwtrack.add_loc( references[ chrid ], fpos, strand )
         self.fhd.close()
         fwtrack.finalize()
-        fwtrack.rlengths = rlengths
+        fwtrack.set_rlengths( rlengths )
         return fwtrack
 
     cpdef append_fwtrack ( self, fwtrack ):
@@ -934,7 +934,7 @@ cdef class BAMParser( GenericParser ):
         self.fhd.close()
         fwtrack.finalize()
         if isinstance( fwtrack.rlengths, dict ):
-            fwtrack.rlengths.update(rlengths)
+            fwtrack.set_rlengths(rlengths)
         return fwtrack
 
     cdef __append_fwtrack_wo_pysam ( self, fwtrack ):
@@ -969,7 +969,7 @@ cdef class BAMParser( GenericParser ):
                 fwtrack.add_loc( references[ chrid ], fpos, strand )
         self.fhd.close()
         fwtrack.finalize()
-        fwtrack.rlengths = rlengths
+        fwtrack.set_rlengths( rlengths )
         return fwtrack
     
     cpdef tuple __fw_binary_parse (self, data ):
@@ -1083,7 +1083,7 @@ cdef class BAMPEParser(BAMParser):
         assert d >= 0, "Something went wrong (mean fragment size was negative)"
         self.fhd.close()
         petrack.finalize()
-        petrack.rlengths = rlengths
+        petrack.set_rlengths( rlengths )
         return petrack
 
     cpdef append_petrack (self, petrack):
@@ -1130,7 +1130,7 @@ cdef class BAMPEParser(BAMParser):
         assert d >= 0, "Something went wrong (mean fragment size was negative)"
         self.fhd.close()
         petrack.finalize()
-        petrack.rlengths = rlengths
+        petrack.set_rlengths( rlengths )
         return petrack
         
     cdef _BAMPEParsed __pe_binary_parse (self, char *data):
