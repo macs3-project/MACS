@@ -1,5 +1,5 @@
 # cython: profile=True
-# Time-stamp: <2012-04-29 18:04:37 Tao Liu>
+# Time-stamp: <2012-07-02 15:52:20 Tao Liu>
 
 """Module for filter duplicate tags from paired-end data
 
@@ -25,6 +25,9 @@ cimport cython
 
 import sys
 
+cdef INT_MAX = <int>((<unsigned int>-1)>>1)
+
+
 # Let numpy enforce PE-ness using ndarray, gives bonus speedup when sorting
 # PE data doesn't have strandedness
 cdef class PETrackI:
@@ -44,7 +47,7 @@ cdef class PETrackI:
     cdef public bool __dup_sorted
     cdef public unsigned long dup_total
     cdef public object annotation
-    cdef public object rlengths
+    cdef public dict rlengths
     cdef public object dups
     
     def __init__ (self, char * anno=""):
@@ -60,7 +63,7 @@ cdef class PETrackI:
         self.total = 0           # total tags
         self.dup_total = 0           # total tags
         self.annotation = anno   # need to be figured out
-        self.rlengths = None
+        self.rlengths = {}
         
     cpdef add_loc ( self, str chromosome, int start, int end):
         """Add a location to the list according to the sequence name.
@@ -84,6 +87,38 @@ cdef class PETrackI:
     cpdef __expand__ ( self, np.ndarray arr ):
         arr.resize((arr.shape[0] + BUFFER_SIZE, 2), refcheck = False )
         return
+
+    cpdef bint set_rlengths ( self, dict rlengths ):
+        """Set reference chromosome lengths dictionary.
+
+        Only the chromosome existing in this fwtrack object will be updated.
+
+        If chromosome in this fwtrack is not covered by given
+        rlengths, and it has no associated length, it will be set as
+        maximum integer.
+        """
+        cdef:
+            set valid_chroms, missed_chroms
+            str chrom
+
+        valid_chroms = set(self.__locations.keys()).intersection(rlengths.keys())
+        for chrom in valid_chroms:
+            self.rlengths[chrom] = rlengths[chrom]
+        missed_chroms = set(self.__locations.keys()).difference(rlengths.keys())
+        for chrom in missed_chroms:
+            self.rlength[chrom] = INT_MAX
+        return True
+
+    cpdef dict get_rlengths ( self ):
+        """Get reference chromosome lengths dictionary.
+
+        If self.rlength is empty, create a new dict where the length of
+        chromosome will be set as the maximum integer.
+        """
+        if not self.rlengths:
+            self.rlengths = dict([(k, INT_MAX) for k in self.__locations.keys()])
+        return self.rlengths
+    
 
     def finalize ( self ):
         """ Resize np arrays for 5' positions and sort them in place """

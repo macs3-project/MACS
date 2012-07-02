@@ -1,5 +1,5 @@
 # cython: profile=True
-# Time-stamp: <2012-06-22 09:54:26 Tao Liu>
+# Time-stamp: <2012-07-02 15:57:48 Tao Liu>
 
 """Module Description: For pileup functions.
 
@@ -348,12 +348,12 @@ cdef pileup_w_multiple_d_bdg_pe ( object trackI, list d_s = [],
         midpoints = locs[:,0] + (locs[:,1] - locs[:,0]) / 2
 
         prev_pileup = pileup_a_chromosome(locs[:,0], locs[:,1],
-                                          scale_factors[0], baseline_value)
+                                          scale_factor_s[0], baseline_value)
 
         for i in range(len(five_shift_s)):
             five_shift = five_shift_s[i]
             three_shift = three_shift_s[i]
-            scale_factor = scale_factors[i + 1]
+            scale_factor = scale_factor_s[i + 1]
 
             # fix negative coordinations
             start_poss = midpoints - five_shift

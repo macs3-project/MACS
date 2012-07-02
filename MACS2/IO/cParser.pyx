@@ -1,5 +1,5 @@
 # cython: profile=True
-# Time-stamp: <2012-06-11 17:04:46 Tao Liu>
+# Time-stamp: <2012-07-02 15:29:27 Tao Liu>
 
 """Module for all MACS Parser classes for input.
 
@@ -35,7 +35,7 @@ try:
 except:
     HAS_PYSAM = False
 
-#HAS_PYSAM=False
+HAS_PYSAM=False
 
 from cpython cimport bool
 
@@ -1037,7 +1037,91 @@ cdef class BAMPEParser(BAMParser):
     cdef public int n
     cdef public int d
 
-    cpdef build_petrack (self):
+    cpdef build_petrack ( self ):
+        if HAS_PYSAM:
+            return self.__build_petrack_w_pysam()
+        else:
+            return self.__build_petrack_wo_pysam()
+
+    cdef __build_petrack_w_pysam ( self ):
+        return
+#         cdef:
+#             int i = 0
+#             int m = 0
+#             int entrylength, fpos, chrid, tlen
+#             int *asint
+#             list references
+#             dict rlengths
+#             float d = 0.0
+#             char *rawread, *rawentrylength
+#             _BAMPEParsed read
+        
+#         petrack = PETrackI()
+#         self.fhd.reset()
+
+#         references, rlengths = self.get_references()
+#         while True:
+#             try:
+#                 a = self.fhd.next()
+#             except StopIteration:
+#                 break
+#             chrid = a.tid
+#             if a.is_paired:
+#                 # not from paired-end sequencing? Pass
+                
+#             if a.is_unmapped or (a.is_paired and (not a.is_proper_pair or a.is_read2)):
+#                 fpos = -1
+#             else:
+#                 if a.is_reverse:
+#                     strand = 1              # minus strand
+#                     fpos = a.pos + a.rlen     # rightmost position
+#                 else:
+#                     strand = 0              # plus strand
+#                     fpos = a.pos
+#             i+=1
+#             if i == 1000000:
+#                 m += 1
+#                 logging.info( " %d" % ( m*1000000 ) )
+#                 i = 0
+#             if fpos >= 0:
+#                 fwtrack.add_loc( references[ chrid ], fpos, strand )
+#         self.fhd.close()
+#         fwtrack.finalize()
+#         fwtrack.set_rlengths( rlengths )
+#         return fwtrack
+            
+            
+#         # for convenience, only count valid pairs
+#         add_loc = petrack.add_loc
+#         info = logging.info
+#         unpack = struct.unpack
+#         err = struct.error
+#         while True:
+#             try: entrylength = unpack('<i', fread(4))[0]
+#             except err: break
+#             rawread = <bytes>fread(32)
+# #            rawread = <bytes>fread(entrylength)
+#             read = self.__pe_binary_parse(rawread)
+#             fseek(entrylength - 32, 1)
+#             if read.ref == -1: continue
+#             d = (d * i + abs(read.tlen)) / (i + 1) # keep track of avg fragment size
+#             i+=1
+            
+#             if i == 1000000:
+#                 m += 1
+#                 info(" %d" % (m*1000000))
+#                 i=0
+#             petrack.add_loc(references[read.ref], read.start, read.start + read.tlen)
+#         self.n = m * 1000000 + i
+#         self.d = int(d)
+#         assert d >= 0, "Something went wrong (mean fragment size was negative)"
+#         self.fhd.close()
+#         petrack.finalize()
+#         petrack.set_rlengths( rlengths )
+#         return petrack
+
+
+    cdef __build_petrack_wo_pysam ( self ):
         """Build FWTrackIII from all lines, return a FWTrackIII object.
         """
         cdef:
@@ -1073,6 +1157,7 @@ cdef class BAMPEParser(BAMParser):
             if read.ref == -1: continue
             d = (d * i + abs(read.tlen)) / (i + 1) # keep track of avg fragment size
             i+=1
+            
             if i == 1000000:
                 m += 1
                 info(" %d" % (m*1000000))
