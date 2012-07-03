@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# Time-stamp: <2012-06-07 11:20:48 Tao Liu>
+# Time-stamp: <2012-07-03 15:10:55 Tao Liu>
 
 """Description
 
@@ -57,8 +57,8 @@ def main():
                              include_dirs=["MACS2/",numpy_get_include()]),
                    ]
     
-    setup(name="MACS",
-          version="2.0.10",
+    setup(name="MACS2",
+          version="2.0.10.07032012",
           description="Model Based Analysis for ChIP-Seq data",
           author='Tao Liu',
           author_email='vladimir.liu@gmail.com',
@@ -67,18 +67,20 @@ def main():
           packages=['MACS2', 'MACS2.IO', 'MACS2.data'],
           package_data={'MACS2': ['data/*.dat']},          
           scripts=['bin/macs2',
-                   #'bin/MLEPostPoisRatios',
-                   #'bin/MCMCPostPoisRatios',                   
                    ],
           classifiers=[
-              'Development Status :: 4 - experimental',
+              'Development Status :: 4 - Beta',
               'Environment :: Console',
               'Intended Audience :: Developers',
+              'Intended Audience :: Science/Research',              
               'License :: OSI Approved :: Artistic License',
               'Operating System :: MacOS :: MacOS X',
-              'Operating System :: Microsoft :: Windows',
               'Operating System :: POSIX',
+              'Topic :: Scientific/Engineering :: Bio-Informatics',
               'Programming Language :: Python',
+              ],
+          install_requires=[
+              'numpy>=1.6',
               ],
           cmdclass = command_classes,
           ext_modules = ext_modules

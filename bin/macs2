@@ -1,7 +1,7 @@
 #!/usr/bin/env python
-# Time-stamp: <2012-06-06 15:41:18 Tao Liu>
+# Time-stamp: <2012-07-03 14:30:48 Tao Liu>
 
-"""Description: MACS 2 main executable
+"""Description: MACS v2 main executable.
 
 Copyright (c) 2008,2009 Yong Zhang, Tao Liu <taoliu@jimmy.harvard.edu>
 Copyright (c) 2010,2011 Tao Liu <taoliu@jimmy.harvard.edu>
@@ -20,24 +20,14 @@ with the distribution).
 # python modules
 # ------------------------------------
 
-import os
 import sys
-import logging
-import time
-from subprocess import Popen,PIPE
-#from optparse import OptionParser
-import gzip
 import argparse as ap
 
 # ------------------------------------
 # own python modules
 # ------------------------------------
-from MACS2.OptValidator import opt_validate
-from MACS2.OutputWriter import *
-from MACS2.cProb import binomial_cdf_inv
-from MACS2.cPeakModel import PeakModel,NotEnoughPairsException
-from MACS2.cPeakDetect import PeakDetect
 from MACS2.Constants import *
+
 # ------------------------------------
 # Main function
 # ------------------------------------
@@ -76,13 +66,6 @@ def prepare_argparser ():
     function first.
     
     """
-#     usage = """%(prog)s [-h] [--version] COMMAND
-    
-# Please specify a command from the following list:
-# {callpeak,filterdup,bdgpeakcall,bdgcmp,randsample,bdgdiff,bdgbroadcall}
-    
-# Type %(prog)s -h to see a summary of available commands.
-# """
     description = "%(prog)s -- Model-based Analysis for ChIP-Sequencing"
     epilog = "For command line options of each command, type: %(prog)s COMMAND -h"
     #Check community site: http://groups.google.com/group/macs-announcement/
