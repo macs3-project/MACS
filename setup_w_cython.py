@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# Time-stamp: <2012-07-03 15:11:12 Tao Liu>
+# Time-stamp: <2012-07-13 09:41:42 Tao Liu>
 
 """Description: 
 
@@ -105,7 +105,7 @@ def main():
               ],
           install_requires=[
               'numpy>=1.6',
-              ],              ],
+              ],
           cmdclass = command_classes,
           ext_modules = ext_modules
           )

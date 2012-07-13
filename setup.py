@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# Time-stamp: <2012-07-03 15:10:55 Tao Liu>
+# Time-stamp: <2012-07-05 18:06:31 Tao Liu>
 
 """Description
 
@@ -31,8 +31,6 @@ except:
     numpy_include_dir = []
     sys.stderr.write("CRITICAL:Numpy must be installed!\n")
     sys.exit(1)
-
-
 
 def main():
     if float(sys.version[:3])<2.7 or float(sys.version[:3])>=2.8:

@@ -1,5 +1,5 @@
 # cython: profile=True
-# Time-stamp: <2012-06-11 17:34:42 Tao Liu>
+# Time-stamp: <2012-07-13 09:34:16 Tao Liu>
 
 """Module Description
 
@@ -234,7 +234,7 @@ class PeakDetect:
             self.info("#3 pileup treatment data")            
             if self.PE_MODE:
                 if self.opt.halfext: warn('halfextension not supported in PE mode')
-                lambda_bg = treat.total/self.gsize
+                lambda_bg = treat_total/self.gsize
             else:
                 lambda_bg = float(self.d)*treat_total/self.gsize
             treat_btrack = unified_pileup_bdg(self.treat, d, scale_factors=1.0,
