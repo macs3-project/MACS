@@ -1,5 +1,5 @@
 # cython: profile=True
-# Time-stamp: <2012-06-11 17:25:12 Tao Liu>
+# Time-stamp: <2012-07-26 17:09:12 Tao Liu>
 
 """Module for FWTrack classes.
 
@@ -431,7 +431,7 @@ cdef class FWTrackIII:
                 # hope there would be no mem leak...                
             
             self.__locations[k]=[new_plus,new_minus]
-        return
+        return self
 
     cpdef sample_percent (self, float percent):
         """Sample the tags for a given percentage.

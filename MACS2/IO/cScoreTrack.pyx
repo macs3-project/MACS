@@ -1,5 +1,5 @@
 # cython: profile=True
-# Time-stamp: <2012-06-22 14:39:05 Tao Liu>
+# Time-stamp: <2012-07-26 19:30:10 Tao Liu>
 
 """Module for Feature IO classes.
 
@@ -1238,3 +1238,426 @@ cdef class scoreTrackII:
         bpeaks.add(chrom, start, end, score=lvl2peak["score"], thickStart=thickStart, thickEnd=thickEnd,
                    blockNum = blockNum, blockSizes = blockSizes, blockStarts = blockStarts)
         return bpeaks
+
+
+cdef class TwoConditionScores:
+    cdef:
+        dict data                       # dictionary for data of each chromosome
+        dict datalength                 # length of data array of each chromosome
+        float cond1_depth                 # seq depth in million of treatment
+        float cond2_depth                  # seq depth in million of control
+        float pseudocount                # the pseudocount used to calcuate LLR
+        float cutoff
+        object t1bdg, c1bdg, t2bdg, c2bdg
+    
+    def __init__ (self, t1bdg, c1bdg, t2bdg, c2bdg, float cond1_depth, float cond2_depth, float pseudocount = 0.01 ):
+        self.data = {}           # for each chromosome, there is a l*4
+                                 # matrix. First column: end position
+                                 # of a region; Second: treatment
+                                 # pileup; third: control pileup ;
+                                 # forth: score ( can be
+                                 # p/q-value/likelihood
+                                 # ratio/fold-enrichment/subtraction
+                                 # depending on -c setting)
+        self.datalength = {}
+        self.cond1_depth = cond1_depth
+        self.cond2_depth = cond2_depth
+        self.pseudocount = pseudocount
+        self.t1bdg = t1bdg
+        self.c1bdg = c1bdg
+        self.t2bdg = t2bdg
+        self.c2bdg = c2bdg
+
+    cpdef set_pseudocount( self, float pseudocount ):
+        self.pseudocount = pseudocount
+        
+    cpdef build ( self ):
+        cdef:
+            set common_chrs
+            str chrname
+        # common chromosome names
+        common_chrs = self.get_common_chrs()
+        for chrname in common_chrs:
+            (cond1_treat_ps, cond1_treat_vs) = self.t1bdg.get_data_by_chr(chrname)
+            (cond1_control_ps, cond1_control_vs) = self.c1bdg.get_data_by_chr(chrname)
+            (cond2_treat_ps, cond2_treat_vs) = self.t2bdg.get_data_by_chr(chrname)
+            (cond2_control_ps, cond2_control_vs) = self.c2bdg.get_data_by_chr(chrname)
+            chrom_max_len = len(cond1_treat_ps) + len(cond1_control_ps) +\
+                            len(cond2_treat_ps) + len(cond2_control_ps)
+            self.add_chromosome( chrname, chrom_max_len )
+            self.build_chromosome( chrname,
+                                   cond1_treat_ps, cond1_control_ps,
+                                   cond2_treat_ps, cond2_control_ps,
+                                   cond1_treat_vs, cond1_control_vs,
+                                   cond2_treat_vs, cond2_control_vs )
+
+    cdef build_chromosome( self, chrname,
+                           cond1_treat_ps, cond1_control_ps,
+                           cond2_treat_ps, cond2_control_ps,
+                           cond1_treat_vs, cond1_control_vs,
+                           cond2_treat_vs, cond2_control_vs ):
+                                           
+
+        c1tpn = iter(cond1_treat_ps).next
+        c1cpn = iter(cond1_control_ps).next
+        c2tpn = iter(cond2_treat_ps).next
+        c2cpn = iter(cond2_control_ps).next
+        c1tvn = iter(cond1_treat_vs).next
+        c1cvn = iter(cond1_control_vs).next
+        c2tvn = iter(cond2_treat_vs).next
+        c2cvn = iter(cond2_control_vs).next
+
+        pre_p = 0
+
+        try:
+            c1tp = c1tpn()
+            c1tv = c1tvn()
+            
+            c1cp = c1cpn()
+            c1cv = c1cvn()
+
+            c2tp = c2tpn()
+            c2tv = c2tvn()
+            
+            c2cp = c2cpn()
+            c2cv = c2cvn()            
+
+            while True:
+                minp = min(c1tp, c1cp, c2tp, c2cp)
+                self.add( chrname, pre_p, c1tv, c1cv, c2tv, c2cv )
+                pre_p = minp
+                if c1tp == minp:
+                    c1tp = c1tpn()
+                    c1tv = c1tvn()
+                if c1cp == minp:
+                    c1cp = c1cpn()
+                    c1cv = c1cvn()
+                if c2tp == minp:
+                    c2tp = c2tpn()
+                    c2tv = c2tvn()
+                if c2cp == minp:
+                    c2cp = c2cpn()
+                    c2cv = c2cvn()                    
+        except StopIteration:
+            # meet the end of either bedGraphTrackI, simply exit
+            pass
+
+    def get_common_chrs ( self ):
+        t1chrs = self.t1bdg.get_chr_names()
+        c1chrs = self.c1bdg.get_chr_names()
+        t2chrs = self.t2bdg.get_chr_names()
+        c2chrs = self.c2bdg.get_chr_names()        
+        common = reduce(lambda x,y:x.intersection(y), (t1chrs,c1chrs,t2chrs,c2chrs))
+        return common
+
+    cdef add_chromosome ( self, str chrom, int chrom_max_len ):
+        """
+        chrom: chromosome name
+        chrom_max_len: maximum number of data points in this chromosome
+        
+        """
+        if not self.data.has_key(chrom):
+            self.data[chrom] = [ np.zeros( chrom_max_len, dtype="int32" ), # pos
+                                 np.zeros( chrom_max_len, dtype="float32" ), # LLR t1 vs c1
+                                 np.zeros( chrom_max_len, dtype="float32" ), # LLR t2 vs c2
+                                 np.zeros( chrom_max_len, dtype="float32" )] # LLR t1 vs t2
+                                 #np.zeros( chrom_max_len, dtype="float32" )] # LLR t2 vs t1
+            self.datalength[chrom] = 0
+
+    cdef add (self, str chromosome, int endpos, float t1, float c1, float t2, float c2):
+        """Add a chr-endpos-sample-control block into data
+        dictionary.
+
+        chromosome: chromosome name in string
+        endpos    : end position of each interval in integer
+        chip      : ChIP pileup value of each interval in float
+        control   : Control pileup value of each interval in float
+
+        *Warning* Need to add regions continuously.
+        """
+        cdef int i
+        i = self.datalength[chromosome]
+        c = self.data[chromosome]
+        c[0][ i ] = endpos
+        c[1][ i ] = logLR( t1+self.pseudocount, c1+self.pseudocount )
+        c[2][ i ] = logLR( t2+self.pseudocount, c2+self.pseudocount )
+        c[3][ i ] = logLR( t1+self.pseudocount, t2+self.pseudocount )
+        #c[4][ i ] = logLR( t2+self.pseudocount, t1+self.pseudocount )
+        self.datalength[chromosome] += 1
+
+    cpdef finalize ( self ):
+        """
+        Adjust array size of each chromosome.
+
+        """
+        cdef:
+            str chrom, k
+            int l
+
+        for chrom in self.data.keys():
+            d = self.data[chrom]
+            l = self.datalength[chrom]
+            d[0].resize( l, refcheck = False )
+            d[1].resize( l, refcheck = False )
+            d[2].resize( l, refcheck = False )
+            d[3].resize( l, refcheck = False )            
+        return
+
+    # cpdef sort ( self, int column = 1 ):
+    #     """ Sort data for each chromosome, by certain column.
+
+    #     column: 1: position, 2: sample, 3: control, 4: score
+
+    #     Default: sort by positions.
+    #     """
+    #     cdef:
+    #         str chrom
+            
+        
+    #     for chrom in self.data.keys():
+    #         d = self.data[chrom]
+    #         d.view('int32,int32,int32,int32').sort(axis=0,order=column-1)
+    #     return
+
+    cpdef get_data_by_chr (self, str chromosome):
+        """Return array of counts by chromosome.
+
+        The return value is a tuple:
+        ([end pos],[value])
+        """
+        if self.data.has_key(chromosome):
+            return self.data[chromosome]
+        else:
+            return None
+
+    cpdef get_chr_names (self):
+        """Return all the chromosome names stored.
+        
+        """
+        l = set(self.data.keys())
+        return l
+
+    cpdef write_bedGraph ( self, fhd, str name, str description, short column = 3):
+        """Write all data to fhd in bedGraph Format.
+
+        fhd: a filehandler to save bedGraph.
+
+        name/description: the name and description in track line.
+
+        colname: can be 1: chip, 2: control, 3: score
+
+        """
+        cdef:
+            str chrom
+            int l, pre, i, p 
+            float pre_v, v
+            np.ndarray pos, value
+
+        assert column in range( 1, 4 ), "column should be between 1, 2 or 3."
+        
+        write = fhd.write
+
+        if self.trackline:
+            # this line is REQUIRED by the wiggle format for UCSC browser
+            write( "track type=bedGraph name=\"%s\" description=\"%s\"\n" % ( name, description ) )
+        
+        chrs = self.get_chr_names()
+        for chrom in chrs:
+            pos = self.data[ chrom ][ 0 ]
+            value = self.data[ chrom ][ column ]
+            l = self.datalength[ chrom ]
+            pre = 0
+            if pos.shape[ 0 ] == 0: continue # skip if there's no data
+            pre_v = value[ 0 ]
+            for i in range( 1, l ):
+                v = value[ i ]
+                p = pos[ i-1 ]
+                if pre_v != v: 
+                    write( "%s\t%d\t%d\t%.2f\n" % ( chrom, pre, p, pre_v ) )
+                    pre_v = v
+                    pre = p
+            p = pos[ -1 ]
+            # last one
+            write( "%s\t%d\t%d\t%.2f\n" % ( chrom, pre, p, pre_v ) )
+            
+        return True
+
+    cpdef call_peaks (self, float cutoff=3.0, int min_length=200, int max_gap=0, bool call_summits=False):
+        """This function try to find regions within which, scores
+        are continuously higher than a given cutoff.
+
+        This function is NOT using sliding-windows. Instead, any
+        regions in bedGraph above certain cutoff will be detected,
+        then merged if the gap between nearby two regions are below
+        max_gap. After this, peak is reported if its length is above
+        min_length.
+
+        cutoff:  cutoff of value, default 3. For log10 LR, it means 1000 or -1000.
+        min_length :  minimum peak length, default 200.
+        gap   :  maximum gap to merge nearby peaks, default 50.
+        ptrack:  an optional track for pileup heights. If it's not None, use it to find summits. Otherwise, use self/scoreTrack.
+        """
+        cdef:
+            int i
+            str chrom
+            np.ndarray pos, sample, control, value, above_cutoff, above_cutoff_v, above_cutoff_endpos, above_cutoff_startpos, above_cutoff_sv
+            list peak_content
+        
+        chrs  = self.get_chr_names()
+        cat1_peaks = PeakIO()       # dictionary to save peaks
+        cat2_peaks = PeakIO()       # dictionary to save peaks
+        cat3_peaks = PeakIO()       # dictionary to save peaks
+        cat4_peaks = PeakIO()       # dictionary to save peaks        
+
+        self.cutoff = cutoff
+        for chrom in chrs:
+            peak_content = []           # to store points above cutoff
+
+            pos = self.data[chrom][ 0 ]
+            t1vsc1 = self.data[chrom][ 1 ]
+            t2vsc2 = self.data[chrom][ 2 ]            
+            t1vst2 = self.data[chrom][ 3 ]
+
+            cond1_sig = t1vsc1 >= cutoff
+            cond2_sig = t2vsc2 >= cutoff
+            cond1_sig_cond2 = t1vst2 >= cutoff
+            cond2_sig_cond1 = t1vst2 <= -1*cutoff
+
+            cat1_above_cutoff = np.nonzero( cond1_sig & (1-cond2_sig) & cond1_sig_cond2 )[0] # indices where score is above cutoff
+            cat2_above_cutoff = np.nonzero( cond2_sig & (1-cond1_sig) & cond2_sig_cond1 )[0] # indices where score is above cutoff
+            cat3_above_cutoff = np.nonzero( cond1_sig & cond2_sig & cond1_sig_cond2 )[0] # indices where score is above cutoff
+            cat4_above_cutoff = np.nonzero( cond1_sig & cond2_sig & cond2_sig_cond1 )[0] # indices where score is above cutoff            
+
+            cat1_above_cutoff_endpos = pos[cat1_above_cutoff] # end positions of regions where score is above cutoff
+            cat1_above_cutoff_startpos = pos[cat1_above_cutoff-1] # start positions of regions where score is above cutoff
+            cat2_above_cutoff_endpos = pos[cat2_above_cutoff] # end positions of regions where score is above cutoff
+            cat2_above_cutoff_startpos = pos[cat2_above_cutoff-1] # start positions of regions where score is above cutoff
+            cat3_above_cutoff_endpos = pos[cat3_above_cutoff] # end positions of regions where score is above cutoff
+            cat3_above_cutoff_startpos = pos[cat3_above_cutoff-1] # start positions of regions where score is above cutoff
+            cat4_above_cutoff_endpos = pos[cat4_above_cutoff] # end positions of regions where score is above cutoff
+            cat4_above_cutoff_startpos = pos[cat4_above_cutoff-1] # start positions of regions where score is above cutoff            
+
+            if cat1_above_cutoff_startpos.size > 0:
+                peak_content = []
+                # cat 1 is not empty
+                if cat1_above_cutoff[0] == 0:
+                    # first element > cutoff, fix the first point as 0. otherwise it would be the last item in data[chrom]['pos']
+                    cat1_above_cutoff_startpos[0] = 0
+                # first bit of region above cutoff
+                peak_content.append( (cat1_above_cutoff_startpos[0], cat1_above_cutoff_endpos[0]) )
+                for i in range( 1, cat1_above_cutoff_startpos.size ):
+                    if cat1_above_cutoff_startpos[i] - peak_content[-1][1] <= max_gap:
+                        # append
+                        peak_content.append( (cat1_above_cutoff_startpos[i], cat1_above_cutoff_endpos[i] ) )
+                    else:
+                        # close
+                        cat1_peaks.add( chrom, peak_content[0][0], peak_content[-1][1],
+                                        summit = 0, peak_score  = 0, pileup = 0, pscore = 0, 
+                                        fold_change = 0, qscore = 0,
+                                        )
+                        peak_content = [(cat1_above_cutoff_startpos[i], cat1_above_cutoff_endpos[i]),]
+                # save the last peak
+                if not peak_content:
+                    continue
+                else:
+                    cat1_peaks.add( chrom, peak_content[0][0], peak_content[-1][1],
+                                    summit = 0, peak_score  = 0, pileup = 0, pscore = 0, 
+                                    fold_change = 0, qscore = 0, 
+                                    )
+            if cat2_above_cutoff_startpos.size > 0:
+                peak_content = []
+                # cat 1 is not empty
+                if cat2_above_cutoff[0] == 0:
+                    # first element > cutoff, fix the first point as 0. otherwise it would be the last item in data[chrom]['pos']
+                    cat2_above_cutoff_startpos[0] = 0
+                # first bit of region above cutoff
+                peak_content.append( (cat2_above_cutoff_startpos[0], cat2_above_cutoff_endpos[0]) )
+                for i in range( 1, cat2_above_cutoff_startpos.size ):
+                    if cat2_above_cutoff_startpos[i] - peak_content[-1][1] <= max_gap:
+                        # append
+                        peak_content.append( (cat2_above_cutoff_startpos[i], cat2_above_cutoff_endpos[i] ) )
+                    else:
+                        # close
+                        cat2_peaks.add( chrom, peak_content[0][0], peak_content[-1][1],
+                                        summit = 0, peak_score  = 0, pileup = 0, pscore = 0, 
+                                        fold_change = 0, qscore = 0, 
+                                        )
+                        peak_content = [(cat2_above_cutoff_startpos[i], cat2_above_cutoff_endpos[i]),]
+                # save the last peak
+                if not peak_content:
+                    continue
+                else:
+                    cat2_peaks.add( chrom, peak_content[0][0], peak_content[-1][1],
+                                    summit = 0, peak_score  = 0, pileup = 0, pscore = 0, 
+                                    fold_change = 0, qscore = 0, 
+                                    )
+            if cat3_above_cutoff_startpos.size > 0:
+                peak_content = []
+                # cat 1 is not empty
+                if cat3_above_cutoff[0] == 0:
+                    # first element > cutoff, fix the first point as 0. otherwise it would be the last item in data[chrom]['pos']
+                    cat3_above_cutoff_startpos[0] = 0
+                # first bit of region above cutoff
+                peak_content.append( (cat3_above_cutoff_startpos[0], cat3_above_cutoff_endpos[0]) )
+                for i in range( 1, cat3_above_cutoff_startpos.size ):
+                    if cat3_above_cutoff_startpos[i] - peak_content[-1][1] <= max_gap:
+                        # append
+                        peak_content.append( (cat3_above_cutoff_startpos[i], cat3_above_cutoff_endpos[i] ) )
+                    else:
+                        # close
+                        cat3_peaks.add( chrom, peak_content[0][0], peak_content[-1][1],
+                                        summit = 0, peak_score  = 0, pileup = 0, pscore = 0, 
+                                        fold_change = 0, qscore = 0, 
+                                        )
+                        peak_content = [(cat3_above_cutoff_startpos[i], cat3_above_cutoff_endpos[i]),]
+                # save the last peak
+                if not peak_content:
+                    continue
+                else:
+                    cat3_peaks.add( chrom, peak_content[0][0], peak_content[-1][1],
+                                    summit = 0, peak_score  = 0, pileup = 0, pscore = 0, 
+                                    fold_change = 0, qscore = 0, 
+                                    )
+            if cat4_above_cutoff_startpos.size > 0:
+                peak_content = []
+                # cat 1 is not empty
+                if cat4_above_cutoff[0] == 0:
+                    # first element > cutoff, fix the first point as 0. otherwise it would be the last item in data[chrom]['pos']
+                    cat4_above_cutoff_startpos[0] = 0
+                # first bit of region above cutoff
+                peak_content.append( (cat4_above_cutoff_startpos[0], cat4_above_cutoff_endpos[0]) )
+                for i in range( 1, cat4_above_cutoff_startpos.size ):
+                    if cat4_above_cutoff_startpos[i] - peak_content[-1][1] <= max_gap:
+                        # append
+                        peak_content.append( (cat4_above_cutoff_startpos[i], cat4_above_cutoff_endpos[i] ) )
+                    else:
+                        # close
+                        cat4_peaks.add( chrom, peak_content[0][0], peak_content[-1][1],
+                                        summit = 0, peak_score  = 0, pileup = 0, pscore = 0, 
+                                        fold_change = 0, qscore = 0, 
+                                        )
+                        peak_content = [(cat4_above_cutoff_startpos[i], cat4_above_cutoff_endpos[i]),]
+                # save the last peak
+                if not peak_content:
+                    continue
+                else:
+                    cat4_peaks.add( chrom, peak_content[0][0], peak_content[-1][1],
+                                    summit = 0, peak_score  = 0, pileup = 0, pscore = 0, 
+                                    fold_change = 0, qscore = 0, 
+                                    )
+
+        return cat1_peaks, cat2_peaks, cat3_peaks, cat4_peaks
+
+    cdef long total ( self ):
+        """Return the number of regions in this object.
+
+        """
+        cdef:
+            long t
+            str chrom
+        
+        t = 0
+        for chrom in self.data.keys():
+            t += self.datalength[chrom]
+        return t
+
