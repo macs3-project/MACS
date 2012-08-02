@@ -1,5 +1,5 @@
 # cython: profile=True
-# Time-stamp: <2012-07-02 15:52:20 Tao Liu>
+# Time-stamp: <2012-08-01 18:08:26 Tao Liu>
 
 """Module for filter duplicate tags from paired-end data
 
@@ -402,7 +402,7 @@ cdef class PETrackI:
             
             key = chrnames[ i_chrom ]
         
-            num = <uint32_t>round(self.__locations[key].shape[0] * percent, 2 )
+            num = <uint32_t>round(self.__locations[key].shape[0] * percent, 5 )
             np.random.shuffle( self.__locations[key] )
             self.__locations[key].resize( (num, 2) )
             self.__locations[key].sort(0)

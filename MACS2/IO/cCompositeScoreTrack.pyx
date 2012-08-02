@@ -1,5 +1,5 @@
 # cython: profile=True
-# Time-stamp: <2012-04-13 17:09:23 Tao Liu>
+# Time-stamp: <2012-08-01 18:09:29 Tao Liu>
 
 """Module for Composite Score Track IO classes.
 
@@ -141,7 +141,7 @@ class compositeScoreTrackII:
             else:
                 value = d[colname]
             for i in xrange( l ):
-                fhd.write("%s\t%d\t%d\t%.2f\n" % (chrom,pre,pos[i],value[i]))
+                fhd.write("%s\t%d\t%d\t%.5f\n" % (chrom,pre,pos[i],value[i]))
                 pre = pos[i]
 
         return True

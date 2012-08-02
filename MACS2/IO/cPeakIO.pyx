@@ -1,5 +1,5 @@
 # cython: profile=True
-# Time-stamp: <2012-06-05 20:46:06 Tao Liu>
+# Time-stamp: <2012-08-01 18:05:02 Tao Liu>
 
 """Module for PeakIO IO classes.
 
@@ -150,10 +150,10 @@ class PeakIO:
                 peaks = list(group)
                 if len(peaks) > 1:
                     for i, peak in enumerate(peaks):
-                        print_func("%s\t%d\t%d\t%s%d%s\t%.2f\n" % (chrom,peak["start"],peak["end"],peakprefix,n_peak,subpeak_letters(i),peak[score_column]))
+                        print_func("%s\t%d\t%d\t%s%d%s\t%.5f\n" % (chrom,peak["start"],peak["end"],peakprefix,n_peak,subpeak_letters(i),peak[score_column]))
                 else:
                     peak = peaks[0]
-                    print_func("%s\t%d\t%d\t%s%d\t%.2f\n" % (chrom,peak["start"],peak["end"],peakprefix,n_peak,peak[score_column])) 
+                    print_func("%s\t%d\t%d\t%s%d\t%.5f\n" % (chrom,peak["start"],peak["end"],peakprefix,n_peak,peak[score_column])) 
 
     def _to_summits_bed(self, name_prefix="%s_peak_", name="MACS",
                         description = "%s", score_column="score",
@@ -179,11 +179,11 @@ class PeakIO:
                 if len(peaks) > 1:
                     for i, peak in enumerate(peaks):
                         summit_p = peak["summit"]
-                        print_func("%s\t%d\t%d\t%s%d%s\t%.2f\n" % (chrom,summit_p,summit_p+1,peakprefix,n_peak,subpeak_letters(i),peak[score_column]))
+                        print_func("%s\t%d\t%d\t%s%d%s\t%.5f\n" % (chrom,summit_p,summit_p+1,peakprefix,n_peak,subpeak_letters(i),peak[score_column]))
                 else:
                     peak = peaks[0]
                     summit_p = peak["summit"]
-                    print_func("%s\t%d\t%d\t%s%d\t%.2f\n" % (chrom,summit_p,summit_p+1,peakprefix,n_peak,peak[score_column]))
+                    print_func("%s\t%d\t%d\t%s%d\t%.5f\n" % (chrom,summit_p,summit_p+1,peakprefix,n_peak,peak[score_column]))
 
     def tobed (self):
         """Print out peaks in BED5 format.
@@ -332,7 +332,7 @@ class PeakIO:
                 # items in peak: (peak start,peak end, peak length,
                 # peak summit, peak height, number of tags in peak
                 # region, peak pvalue, peak fold_enrichment, qvalue)
-                fhd.write( "%s\t%d\t%d\t%s%d\t%d\t.\t%.2f\t%.2f\t%.2f\t%d\n"
+                fhd.write( "%s\t%d\t%d\t%s%d\t%d\t.\t%.5f\t%.5f\t%.5f\t%d\n"
                            %
                            (chrom,peak["start"],peak["end"],peakprefix,n_peak,int(10*peak[score_column]),
                             peak["fc"],peak["pscore"],peak["qscore"],peak["summit"]-peak["start"]) )
@@ -362,10 +362,10 @@ class PeakIO:
                         #[start,end,end-start,summit,peak_height,number_tags,pvalue,fold_change,qvalue]
                         write("%s\t%d\t%d\t%d" % (chrom,peak["start"]+1,peak["end"],peak["length"]))
                         write("\t%d" % (peak["summit"]+1)) # summit position
-                        write("\t%.2f" % (peak["pileup"])) # pileup height at summit
-                        write("\t%.2f" % (peak["pscore"])) # -log10pvalue at summit
-                        write("\t%.2f" % (peak["fc"])) # fold change at summit
-                        write("\t%.2f" % (peak["qscore"])) # -log10qvalue at summit
+                        write("\t%.5f" % (peak["pileup"])) # pileup height at summit
+                        write("\t%.5f" % (peak["pscore"])) # -log10pvalue at summit
+                        write("\t%.5f" % (peak["fc"])) # fold change at summit
+                        write("\t%.5f" % (peak["qscore"])) # -log10qvalue at summit
                         write("\t%s" % peakname)
                         write("\n")
                 else:
@@ -374,10 +374,10 @@ class PeakIO:
                     #[start,end,end-start,summit,peak_height,number_tags,pvalue,fold_change,qvalue]
                     write("%s\t%d\t%d\t%d" % (chrom,peak["start"]+1,peak["end"],peak["length"]))
                     write("\t%d" % (peak["summit"]+1)) # summit position
-                    write("\t%.2f" % (peak["pileup"])) # pileup height at summit
-                    write("\t%.2f" % (peak["pscore"])) # -log10pvalue at summit
-                    write("\t%.2f" % (peak["fc"])) # fold change at summit
-                    write("\t%.2f" % (peak["qscore"])) # -log10qvalue at summit                    
+                    write("\t%.5f" % (peak["pileup"])) # pileup height at summit
+                    write("\t%.5f" % (peak["pscore"])) # -log10pvalue at summit
+                    write("\t%.5f" % (peak["fc"])) # fold change at summit
+                    write("\t%.5f" % (peak["qscore"])) # -log10qvalue at summit                    
                     write("\t%s" % peakname)
                     write("\n")
         return
@@ -597,10 +597,10 @@ class DiffPeakIO:
                 peaks = list(group)
                 if len(peaks) > 1:
                     for i, peak in enumerate(peaks):
-                        print_func("%s\t%d\t%d\t%s%d%s\t%.2f\n" % (chrom,peak["start"],peak["end"],peakprefix,n_peak,subpeak_letters(i),peak[score_column]))
+                        print_func("%s\t%d\t%d\t%s%d%s\t%.5f\n" % (chrom,peak["start"],peak["end"],peakprefix,n_peak,subpeak_letters(i),peak[score_column]))
                 else:
                     peak = peaks[0]
-                    print_func("%s\t%d\t%d\t%s%d\t%.2f\n" % (chrom,peak["start"],peak["end"],peakprefix,n_peak,peak[score_column])) 
+                    print_func("%s\t%d\t%d\t%s%d\t%.5f\n" % (chrom,peak["start"],peak["end"],peakprefix,n_peak,peak[score_column])) 
 
     def _to_summits_bed(self, name_prefix="%s_peak_", name="MACS",
                         description = "%s", score_column="score",
@@ -626,11 +626,11 @@ class DiffPeakIO:
                 if len(peaks) > 1:
                     for i, peak in enumerate(peaks):
                         summit_p = peak["summit"]
-                        print_func("%s\t%d\t%d\t%s%d%s\t%.2f\n" % (chrom,summit_p,summit_p+1,name_prefix,n_peak,subpeak_letters(i),peak[score_column]))
+                        print_func("%s\t%d\t%d\t%s%d%s\t%.5f\n" % (chrom,summit_p,summit_p+1,name_prefix,n_peak,subpeak_letters(i),peak[score_column]))
                 else:
                     peak = peaks[0]
                     summit_p = peak["summit"]
-                    print_func("%s\t%d\t%d\t%s%d\t%.2f\n" % (chrom,summit_p,summit_p+1,name_prefix,n_peak,peak[score_column]))
+                    print_func("%s\t%d\t%d\t%s%d\t%.5f\n" % (chrom,summit_p,summit_p+1,name_prefix,n_peak,peak[score_column]))
   
     def tobed (self):
         """Print out peaks in BED5 format.
@@ -773,7 +773,7 @@ class DiffPeakIO:
                 # items in peak: (peak start,peak end, peak length,
                 # peak summit, peak height, number of tags in peak
                 # region, peak pvalue, peak fold_enrichment, qvalue)
-                fhd.write( "%s\t%d\t%d\t%s%d\t%d\t.\t%.2f\t%.2f\t%.2f\t%d\n"
+                fhd.write( "%s\t%d\t%d\t%s%d\t%d\t.\t%.5f\t%.5f\t%.5f\t%d\n"
                            %
                            (chrom,peak["start"],peak["end"],peakprefix,n_peak,int(10*peak[score_column]),
                             peak["fc"],peak["pscore"],peak["qscore"],peak["summit"]-peak["start"]) )

@@ -1,5 +1,5 @@
 # cython: profile=True
-# Time-stamp: <2012-07-26 19:30:10 Tao Liu>
+# Time-stamp: <2012-08-01 18:04:20 Tao Liu>
 
 """Module for Feature IO classes.
 
@@ -208,7 +208,7 @@ class CombinedTwoTrack:
             value = d[colname]
             pre = 0
             for i in range( l ):
-                write("%s\t%d\t%d\t%.2f\n" % (chrom,pre,pos[i],value[i]))
+                write("%s\t%d\t%d\t%.5f\n" % (chrom,pre,pos[i],value[i]))
                 pre = pos[i]
 
         return True
@@ -932,12 +932,12 @@ cdef class scoreTrackII:
                 v = value[ i ]
                 p = pos[ i-1 ]
                 if pre_v != v: 
-                    write( "%s\t%d\t%d\t%.2f\n" % ( chrom, pre, p, pre_v ) )
+                    write( "%s\t%d\t%d\t%.5f\n" % ( chrom, pre, p, pre_v ) )
                     pre_v = v
                     pre = p
             p = pos[ -1 ]
             # last one
-            write( "%s\t%d\t%d\t%.2f\n" % ( chrom, pre, p, pre_v ) )
+            write( "%s\t%d\t%d\t%.5f\n" % ( chrom, pre, p, pre_v ) )
             
         return True
 
@@ -1473,12 +1473,12 @@ cdef class TwoConditionScores:
                 v = value[ i ]
                 p = pos[ i-1 ]
                 if pre_v != v: 
-                    write( "%s\t%d\t%d\t%.2f\n" % ( chrom, pre, p, pre_v ) )
+                    write( "%s\t%d\t%d\t%.5f\n" % ( chrom, pre, p, pre_v ) )
                     pre_v = v
                     pre = p
             p = pos[ -1 ]
             # last one
-            write( "%s\t%d\t%d\t%.2f\n" % ( chrom, pre, p, pre_v ) )
+            write( "%s\t%d\t%d\t%.5f\n" % ( chrom, pre, p, pre_v ) )
             
         return True
 

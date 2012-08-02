@@ -1,5 +1,5 @@
 # cython: profile=True
-# Time-stamp: <2012-06-08 17:13:11 Tao Liu>
+# Time-stamp: <2012-08-01 18:09:13 Tao Liu>
 
 """Module for Feature IO classes.
 
@@ -242,7 +242,7 @@ class bedGraphTrackI:
                 value = vnext()
                 #if value != self.baseline_value:
                 # never write baseline_value
-                fhd.write("%s\t%d\t%d\t%.2f\n" % (chrom,pre,pos,value))
+                fhd.write("%s\t%d\t%d\t%.5f\n" % (chrom,pre,pos,value))
                 pre = pos
 
     def reset_baseline (self, double baseline_value):

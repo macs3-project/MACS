@@ -1,5 +1,5 @@
 # cython: profile=True
-# Time-stamp: <2012-07-26 17:09:12 Tao Liu>
+# Time-stamp: <2012-08-01 18:08:12 Tao Liu>
 
 """Module for FWTrack classes.
 
@@ -452,13 +452,13 @@ cdef class FWTrackIII:
             
             key = chrnames[ i_chrom ]
         
-            num = <int32_t>round(self.__locations[key][0].shape[0] * percent, 2 )
+            num = <int32_t>round(self.__locations[key][0].shape[0] * percent, 5 )
             np.random.shuffle( self.__locations[key][0] )
             self.__locations[key][0].resize( num )
             self.__locations[key][0].sort()
             self.__pointer[key][0] = self.__locations[key][0].shape[0]
 
-            num = <int32_t>round(self.__locations[key][1].shape[0] * percent, 2 )
+            num = <int32_t>round(self.__locations[key][1].shape[0] * percent, 5 )
             np.random.shuffle( self.__locations[key][1] )
             self.__locations[key][1].resize( num )
             self.__locations[key][1].sort()

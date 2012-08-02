@@ -1,5 +1,5 @@
 # cython: profile=True
-# Time-stamp: <2012-07-13 09:34:16 Tao Liu>
+# Time-stamp: <2012-08-01 18:07:28 Tao Liu>
 
 """Module Description
 
@@ -157,10 +157,10 @@ class PeakDetect:
                         #[start,end,end-start,summit,peak_height,number_tags,pvalue,fold_change,qvalue]
                         write("%s\t%d\t%d\t%d" % (chrom,peak["start"]+1,peak["end"],peak["length"]))
                         write("\t%d" % (peak["summit"]+1)) # summit position
-                        write("\t%.2f" % (peak["pileup"])) # pileup height at summit
-                        write("\t%.2f" % (peak["pscore"])) # -log10pvalue at summit
-                        write("\t%.2f" % (peak["fc"])) # fold change at summit                
-                        write("\t%.2f" % (peak["qscore"])) # -log10qvalue at summit
+                        write("\t%.5f" % (peak["pileup"])) # pileup height at summit
+                        write("\t%.5f" % (peak["pscore"])) # -log10pvalue at summit
+                        write("\t%.5f" % (peak["fc"])) # fold change at summit                
+                        write("\t%.5f" % (peak["qscore"])) # -log10qvalue at summit
                         write("\t%s" % peakname)
                         write("\n")
                 else:
@@ -169,10 +169,10 @@ class PeakDetect:
                     #[start,end,end-start,summit,peak_height,number_tags,pvalue,fold_change,qvalue]
                     write("%s\t%d\t%d\t%d" % (chrom,peak["start"]+1,peak["end"],peak["length"]))
                     write("\t%d" % (peak["summit"]+1)) # summit position
-                    write("\t%.2f" % (peak["pileup"])) # pileup height at summit
-                    write("\t%.2f" % (peak["pscore"])) # -log10pvalue at summit
-                    write("\t%.2f" % (peak["fc"])) # fold change at summit                
-                    write("\t%.2f" % (peak["qscore"])) # -log10qvalue at summit
+                    write("\t%.5f" % (peak["pileup"])) # pileup height at summit
+                    write("\t%.5f" % (peak["pscore"])) # -log10pvalue at summit
+                    write("\t%.5f" % (peak["fc"])) # fold change at summit                
+                    write("\t%.5f" % (peak["qscore"])) # -log10qvalue at summit
                     write("\t%s" % peakname)
                     write("\n")
         return
@@ -306,11 +306,11 @@ class PeakDetect:
             self.info("#3 Calculate pvalues ...")
             score_btrack.change_score_method ( ord('p') )
             if self.opt.broad:
-                self.info("#3 Call broad peaks with given level1 -log10pvalue cutoff and level2: %.2f, %.2f..." % (self.log_pvalue,self.opt.log_broadcutoff) )
+                self.info("#3 Call broad peaks with given level1 -log10pvalue cutoff and level2: %.5f, %.5f..." % (self.log_pvalue,self.opt.log_broadcutoff) )
                 peaks = score_btrack.call_broadpeaks(lvl1_cutoff=self.log_pvalue,lvl2_cutoff=self.opt.log_broadcutoff,min_length=self.d,
                                                      lvl1_max_gap=self.opt.tsize,lvl2_max_gap=self.d*4)
             else:
-                self.info("#3 Call peaks with given -log10pvalue cutoff: %.2f ..." % self.log_pvalue)
+                self.info("#3 Call peaks with given -log10pvalue cutoff: %.5f ..." % self.log_pvalue)
                 peaks = score_btrack.call_peaks(cutoff=self.log_pvalue,min_length=self.d,max_gap=self.opt.tsize,call_summits=call_summits)
         elif self.log_qvalue:
             self.info("#3 Calculate qvalues ...")
@@ -320,7 +320,7 @@ class PeakDetect:
                 peaks = score_btrack.call_broadpeaks(lvl1_cutoff=self.log_qvalue,lvl2_cutoff=self.opt.log_broadcutoff,min_length=self.d,
                                                      lvl1_max_gap=self.opt.tsize,lvl2_max_gap=self.d*4)
             else:
-                self.info("#3 Call peaks with given -log10qvalue cutoff: %.2f ..." % self.log_qvalue)        
+                self.info("#3 Call peaks with given -log10qvalue cutoff: %.5f ..." % self.log_qvalue)        
                 peaks = score_btrack.call_peaks(cutoff=self.log_qvalue,min_length=self.d,max_gap=self.opt.tsize,call_summits=call_summits)
             
         if self.opt.store_bdg:
@@ -421,21 +421,21 @@ class PeakDetect:
             self.info("#3 Calculate pvalues ...")
             score_btrack.change_score_method ( ord('p') )            
             if self.opt.broad:
-                self.info("#3 Call broad peaks with given level1 -log10pvalue cutoff and level2: %.2f, %.2f..." % (self.log_pvalue,self.opt.log_broadcutoff) )
+                self.info("#3 Call broad peaks with given level1 -log10pvalue cutoff and level2: %.5f, %.5f..." % (self.log_pvalue,self.opt.log_broadcutoff) )
                 peaks = score_btrack.call_broadpeaks(lvl1_cutoff=self.log_pvalue,lvl2_cutoff=self.opt.log_broadcutoff,min_length=self.d,
                                                      lvl1_max_gap=self.opt.tsize,lvl2_max_gap=self.d*4)
             else:
-                self.info("#3 Call peaks with given -log10pvalue cutoff: %.2f ..." % self.log_pvalue)                
+                self.info("#3 Call peaks with given -log10pvalue cutoff: %.5f ..." % self.log_pvalue)                
                 peaks = score_btrack.call_peaks(cutoff=self.log_pvalue,min_length=self.d,max_gap=self.opt.tsize,call_summits=call_summits)
         elif self.log_qvalue:
             self.info("#3 Calculate qvalues ...")
             score_btrack.change_score_method ( ord('q') )            
             if self.opt.broad:
-                self.info("#3 Call broad peaks with given level1 -log10qvalue cutoff and level2: %.2f, %.2f..." % (self.log_qvalue,self.opt.log_broadcutoff) )
+                self.info("#3 Call broad peaks with given level1 -log10qvalue cutoff and level2: %.5f, %.5f..." % (self.log_qvalue,self.opt.log_broadcutoff) )
                 peaks = score_btrack.call_broadpeaks(lvl1_cutoff=self.log_qvalue,lvl2_cutoff=self.opt.log_broadcutoff,min_length=self.d,
                                                      lvl1_max_gap=self.opt.tsize,lvl2_max_gap=self.d*4)
             else:
-                self.info("#3 Call peaks with given -log10qvalue cutoff: %.2f ..." % self.log_qvalue)        
+                self.info("#3 Call peaks with given -log10qvalue cutoff: %.5f ..." % self.log_qvalue)        
                 peaks = score_btrack.call_peaks(cutoff=self.log_qvalue,min_length=self.d,max_gap=self.opt.tsize,call_summits=call_summits)
 
         if self.opt.store_bdg:

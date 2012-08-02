@@ -1,5 +1,5 @@
 # cython: profile=True
-# Time-stamp: <2012-04-13 17:08:16 Tao Liu>
+# Time-stamp: <2012-08-01 18:06:19 Tao Liu>
 
 """Module Description
 
@@ -270,7 +270,7 @@ cdef inline double log10_poisson_cdf_P_large_lambda ( unsigned int k, double lbd
             break
         logx = logy
 
-    return round((residue-lbd)/M_LN10,2)
+    return round((residue-lbd)/M_LN10,5)
 
 cdef inline double log10_poisson_cdf_Q_large_lambda ( unsigned int k, double lbd ):
     """Slower Poisson CDF evaluater for upper tail which allow
@@ -308,7 +308,7 @@ cdef inline double log10_poisson_cdf_Q_large_lambda ( unsigned int k, double lbd
             break
         logx = logy
 
-    return round((residue-lbd)/log(10),2)
+    return round((residue-lbd)/log(10),5)
 
 cdef inline double logspace_add ( double logx, double logy ):
     return max (logx, logy) + log1p (exp (-fabs (logx - logy)));

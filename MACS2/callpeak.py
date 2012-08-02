@@ -1,5 +1,5 @@
 # cython: profile=True
-# Time-stamp: <2012-06-09 16:22:18 Tao Liu>
+# Time-stamp: <2012-08-02 11:16:47 Tao Liu>
 
 """Description: MACS 2 main executable
 
@@ -140,7 +140,7 @@ def run( args ):
             c1 = control.total
             
             info("#1  %ss after filtering in control: %d", tag, c1)
-            tagsinfo += "# %s after filtering in control: %d\n" % (tag, c1)
+            tagsinfo += "# %ss after filtering in control: %d\n" % (tag, c1)
             if options.PE_MODE:
                 tagsinfo += "# maximum duplicate fragments in control = %d\n" % (treatment_max_dup_tags)
             else:
