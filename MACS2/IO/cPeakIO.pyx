@@ -1,5 +1,5 @@
 # cython: profile=True
-# Time-stamp: <2012-08-01 18:05:02 Tao Liu>
+# Time-stamp: <2012-08-10 00:42:37 Tao Liu>
 
 """Module for PeakIO IO classes.
 
@@ -311,13 +311,14 @@ class PeakIO:
         |           |      |qValue is assigned.                     |
         +-----------+------+----------------------------------------+
         |peak       |int   |Point-source called for this peak;      |
-        |           |      |0-based offset from chromStart. Use -1  |
+l        |           |      |0-based offset from chromStart. Use -1  |
         |           |      |if no point-source called.              |
         +-----------+------+----------------------------------------+
         
         """
         cdef int n_peak
         cdef str chrom
+        cdef long s
 
         chrs = self.peaks.keys()
         chrs.sort()
@@ -332,10 +333,14 @@ class PeakIO:
                 # items in peak: (peak start,peak end, peak length,
                 # peak summit, peak height, number of tags in peak
                 # region, peak pvalue, peak fold_enrichment, qvalue)
+                if peak["summit"] == -1:
+                    s = -1
+                else:
+                    s = peak["summit"] - peak["start"]
                 fhd.write( "%s\t%d\t%d\t%s%d\t%d\t.\t%.5f\t%.5f\t%.5f\t%d\n"
                            %
                            (chrom,peak["start"],peak["end"],peakprefix,n_peak,int(10*peak[score_column]),
-                            peak["fc"],peak["pscore"],peak["qscore"],peak["summit"]-peak["start"]) )
+                            peak["fc"],peak["pscore"],peak["qscore"],s) )
 
     def write_to_xls (self, ofhd, name_prefix="%s_peak_", name="MACS"):
         """Save the peak results in a tab-delimited plain text file

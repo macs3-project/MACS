@@ -1,5 +1,5 @@
 # cython: profile=True
-# Time-stamp: <2012-08-01 18:04:20 Tao Liu>
+# Time-stamp: <2012-08-10 00:54:44 Tao Liu>
 
 """Module for Feature IO classes.
 
@@ -1552,7 +1552,7 @@ cdef class TwoConditionScores:
                     else:
                         # close
                         cat1_peaks.add( chrom, peak_content[0][0], peak_content[-1][1],
-                                        summit = 0, peak_score  = 0, pileup = 0, pscore = 0, 
+                                        summit = -1, peak_score  = 0, pileup = 0, pscore = 0, 
                                         fold_change = 0, qscore = 0,
                                         )
                         peak_content = [(cat1_above_cutoff_startpos[i], cat1_above_cutoff_endpos[i]),]
@@ -1561,7 +1561,7 @@ cdef class TwoConditionScores:
                     continue
                 else:
                     cat1_peaks.add( chrom, peak_content[0][0], peak_content[-1][1],
-                                    summit = 0, peak_score  = 0, pileup = 0, pscore = 0, 
+                                    summit = -1, peak_score  = 0, pileup = 0, pscore = 0, 
                                     fold_change = 0, qscore = 0, 
                                     )
             if cat2_above_cutoff_startpos.size > 0:
@@ -1579,7 +1579,7 @@ cdef class TwoConditionScores:
                     else:
                         # close
                         cat2_peaks.add( chrom, peak_content[0][0], peak_content[-1][1],
-                                        summit = 0, peak_score  = 0, pileup = 0, pscore = 0, 
+                                        summit = -1, peak_score  = 0, pileup = 0, pscore = 0, 
                                         fold_change = 0, qscore = 0, 
                                         )
                         peak_content = [(cat2_above_cutoff_startpos[i], cat2_above_cutoff_endpos[i]),]
@@ -1588,7 +1588,7 @@ cdef class TwoConditionScores:
                     continue
                 else:
                     cat2_peaks.add( chrom, peak_content[0][0], peak_content[-1][1],
-                                    summit = 0, peak_score  = 0, pileup = 0, pscore = 0, 
+                                    summit = -1, peak_score  = 0, pileup = 0, pscore = 0, 
                                     fold_change = 0, qscore = 0, 
                                     )
             if cat3_above_cutoff_startpos.size > 0:
@@ -1606,7 +1606,7 @@ cdef class TwoConditionScores:
                     else:
                         # close
                         cat3_peaks.add( chrom, peak_content[0][0], peak_content[-1][1],
-                                        summit = 0, peak_score  = 0, pileup = 0, pscore = 0, 
+                                        summit = -1, peak_score  = 0, pileup = 0, pscore = 0, 
                                         fold_change = 0, qscore = 0, 
                                         )
                         peak_content = [(cat3_above_cutoff_startpos[i], cat3_above_cutoff_endpos[i]),]
@@ -1615,7 +1615,7 @@ cdef class TwoConditionScores:
                     continue
                 else:
                     cat3_peaks.add( chrom, peak_content[0][0], peak_content[-1][1],
-                                    summit = 0, peak_score  = 0, pileup = 0, pscore = 0, 
+                                    summit = -1, peak_score  = 0, pileup = 0, pscore = 0, 
                                     fold_change = 0, qscore = 0, 
                                     )
             if cat4_above_cutoff_startpos.size > 0:
@@ -1633,7 +1633,7 @@ cdef class TwoConditionScores:
                     else:
                         # close
                         cat4_peaks.add( chrom, peak_content[0][0], peak_content[-1][1],
-                                        summit = 0, peak_score  = 0, pileup = 0, pscore = 0, 
+                                        summit = -1, peak_score  = 0, pileup = 0, pscore = 0, 
                                         fold_change = 0, qscore = 0, 
                                         )
                         peak_content = [(cat4_above_cutoff_startpos[i], cat4_above_cutoff_endpos[i]),]
@@ -1642,7 +1642,7 @@ cdef class TwoConditionScores:
                     continue
                 else:
                     cat4_peaks.add( chrom, peak_content[0][0], peak_content[-1][1],
-                                    summit = 0, peak_score  = 0, pileup = 0, pscore = 0, 
+                                    summit = -1, peak_score  = 0, pileup = 0, pscore = 0, 
                                     fold_change = 0, qscore = 0, 
                                     )
 
