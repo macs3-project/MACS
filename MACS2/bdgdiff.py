@@ -1,4 +1,4 @@
-# Time-stamp: <2012-08-10 03:47:10 Tao Liu>
+# Time-stamp: <2012-08-10 04:22:42 Tao Liu>
 
 """Description: Naive call differential peaks from 4 bedGraph tracks for scores.
 
@@ -88,8 +88,8 @@ def run( options ):
     cat2.write_to_narrowPeak(nf, name_prefix=options.oprefix+"_encodePeak", score_column="score")
     nf = open ("%s_c%.1f_cat3_peaks.encodePeak" % (options.oprefix,options.cutoff),"w")        
     cat3.write_to_narrowPeak(nf, name_prefix=options.oprefix+"_encodePeak", score_column="score")
-    nf = open ("%s_c%.1f_cat4_peaks.encodePeak" % (options.oprefix,options.cutoff),"w")        
-    cat4.write_to_narrowPeak(nf, name_prefix=options.oprefix+"_encodePeak", score_column="score")    
+    #nf = open ("%s_c%.1f_cat4_peaks.encodePeak" % (options.oprefix,options.cutoff),"w")        
+    #cat4.write_to_narrowPeak(nf, name_prefix=options.oprefix+"_encodePeak", score_column="score")    
     info("Done")
 
     

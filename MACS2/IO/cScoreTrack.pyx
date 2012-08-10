@@ -1,5 +1,5 @@
 # cython: profile=True
-# Time-stamp: <2012-08-10 01:38:08 Tao Liu>
+# Time-stamp: <2012-08-10 04:22:32 Tao Liu>
 
 """Module for Feature IO classes.
 
@@ -1507,7 +1507,7 @@ cdef class TwoConditionScores:
         cat1_peaks = PeakIO()       # dictionary to save peaks
         cat2_peaks = PeakIO()       # dictionary to save peaks
         cat3_peaks = PeakIO()       # dictionary to save peaks
-        cat4_peaks = PeakIO()       # dictionary to save peaks        
+        #cat4_peaks = PeakIO()       # dictionary to save peaks        
 
         self.cutoff = cutoff
         for chrom in chrs:
@@ -1523,10 +1523,12 @@ cdef class TwoConditionScores:
             cond1_sig_cond2 = t1vst2 >= cutoff
             cond2_sig_cond1 = t1vst2 <= -1*cutoff
 
-            cat1_above_cutoff = np.nonzero( cond1_sig & (1-cond2_sig) & cond1_sig_cond2 )[0] # indices where score is above cutoff
-            cat2_above_cutoff = np.nonzero( cond2_sig & (1-cond1_sig) & cond2_sig_cond1 )[0] # indices where score is above cutoff
-            cat3_above_cutoff = np.nonzero( cond1_sig & cond2_sig & cond1_sig_cond2 )[0] # indices where score is above cutoff
-            cat4_above_cutoff = np.nonzero( cond1_sig & cond2_sig & cond2_sig_cond1 )[0] # indices where score is above cutoff            
+            #cat1_above_cutoff = np.nonzero( cond1_sig & (1-cond2_sig) & cond1_sig_cond2 )[0] # indices where score is above cutoff
+            cat1_above_cutoff = np.nonzero( cond1_sig & cond1_sig_cond2 )[0] # indices where score is above cutoff
+            #cat2_above_cutoff = np.nonzero( cond2_sig & (1-cond1_sig) & cond2_sig_cond1 )[0] # indices where score is above cutoff
+            cat2_above_cutoff = np.nonzero( cond2_sig & cond2_sig_cond1 )[0] # indices where score is above cutoff
+            cat3_above_cutoff = np.nonzero( cond1_sig & cond2_sig & (1-cond1_sig_cond2) & (1-cond2_sig_cond1) )[0] # indices where score is above cutoff
+            #cat4_above_cutoff = np.nonzero( cond1_sig & cond2_sig & cond2_sig_cond1 )[0] # indices where score is above cutoff            
 
             cat1_above_cutoff_endpos = pos[cat1_above_cutoff] # end positions of regions where score is above cutoff
             cat1_above_cutoff_startpos = pos[cat1_above_cutoff-1] # start positions of regions where score is above cutoff
@@ -1534,8 +1536,8 @@ cdef class TwoConditionScores:
             cat2_above_cutoff_startpos = pos[cat2_above_cutoff-1] # start positions of regions where score is above cutoff
             cat3_above_cutoff_endpos = pos[cat3_above_cutoff] # end positions of regions where score is above cutoff
             cat3_above_cutoff_startpos = pos[cat3_above_cutoff-1] # start positions of regions where score is above cutoff
-            cat4_above_cutoff_endpos = pos[cat4_above_cutoff] # end positions of regions where score is above cutoff
-            cat4_above_cutoff_startpos = pos[cat4_above_cutoff-1] # start positions of regions where score is above cutoff            
+            #cat4_above_cutoff_endpos = pos[cat4_above_cutoff] # end positions of regions where score is above cutoff
+            #cat4_above_cutoff_startpos = pos[cat4_above_cutoff-1] # start positions of regions where score is above cutoff            
 
             if cat1_above_cutoff_startpos.size > 0:
                 peak_content = []
@@ -1624,37 +1626,37 @@ cdef class TwoConditionScores:
                                         summit = -1, peak_score  = 0, pileup = 0, pscore = 0, 
                                         fold_change = 0, qscore = 0, 
                                         )
-            if cat4_above_cutoff_startpos.size > 0:
-                peak_content = []
-                # cat 1 is not empty
-                if cat4_above_cutoff[0] == 0:
-                    # first element > cutoff, fix the first point as 0. otherwise it would be the last item in data[chrom]['pos']
-                    cat4_above_cutoff_startpos[0] = 0
-                # first bit of region above cutoff
-                peak_content.append( (cat4_above_cutoff_startpos[0], cat4_above_cutoff_endpos[0]) )
-                for i in range( 1, cat4_above_cutoff_startpos.size ):
-                    if cat4_above_cutoff_startpos[i] - peak_content[-1][1] <= max_gap:
-                        # append
-                        peak_content.append( (cat4_above_cutoff_startpos[i], cat4_above_cutoff_endpos[i] ) )
-                    else:
-                        # close
-                        if peak_content[ -1 ][ 1 ] - peak_content[ 0 ][ 0 ] >= min_length:                        
-                            cat4_peaks.add( chrom, peak_content[0][0], peak_content[-1][1],
-                                            summit = -1, peak_score  = 0, pileup = 0, pscore = 0, 
-                                            fold_change = 0, qscore = 0, 
-                                            )
-                        peak_content = [(cat4_above_cutoff_startpos[i], cat4_above_cutoff_endpos[i]),]
-                # save the last peak
-                if not peak_content:
-                    continue
-                else:
-                    if peak_content[ -1 ][ 1 ] - peak_content[ 0 ][ 0 ] >= min_length:
-                        cat4_peaks.add( chrom, peak_content[0][0], peak_content[-1][1],
-                                        summit = -1, peak_score  = 0, pileup = 0, pscore = 0, 
-                                        fold_change = 0, qscore = 0, 
-                                        )
+            # if cat4_above_cutoff_startpos.size > 0:
+            #     peak_content = []
+            #     # cat 1 is not empty
+            #     if cat4_above_cutoff[0] == 0:
+            #         # first element > cutoff, fix the first point as 0. otherwise it would be the last item in data[chrom]['pos']
+            #         cat4_above_cutoff_startpos[0] = 0
+            #     # first bit of region above cutoff
+            #     peak_content.append( (cat4_above_cutoff_startpos[0], cat4_above_cutoff_endpos[0]) )
+            #     for i in range( 1, cat4_above_cutoff_startpos.size ):
+            #         if cat4_above_cutoff_startpos[i] - peak_content[-1][1] <= max_gap:
+            #             # append
+            #             peak_content.append( (cat4_above_cutoff_startpos[i], cat4_above_cutoff_endpos[i] ) )
+            #         else:
+            #             # close
+            #             if peak_content[ -1 ][ 1 ] - peak_content[ 0 ][ 0 ] >= min_length:                        
+            #                 cat4_peaks.add( chrom, peak_content[0][0], peak_content[-1][1],
+            #                                 summit = -1, peak_score  = 0, pileup = 0, pscore = 0, 
+            #                                 fold_change = 0, qscore = 0, 
+            #                                 )
+            #             peak_content = [(cat4_above_cutoff_startpos[i], cat4_above_cutoff_endpos[i]),]
+            #     # save the last peak
+            #     if not peak_content:
+            #         continue
+            #     else:
+            #         if peak_content[ -1 ][ 1 ] - peak_content[ 0 ][ 0 ] >= min_length:
+            #             cat4_peaks.add( chrom, peak_content[0][0], peak_content[-1][1],
+            #                             summit = -1, peak_score  = 0, pileup = 0, pscore = 0, 
+            #                             fold_change = 0, qscore = 0, 
+            #                             )
 
-        return cat1_peaks, cat2_peaks, cat3_peaks, cat4_peaks
+        return cat1_peaks, cat2_peaks, cat3_peaks#, cat4_peaks
 
     cdef long total ( self ):
         """Return the number of regions in this object.
