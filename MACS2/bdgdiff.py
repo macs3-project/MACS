@@ -1,4 +1,4 @@
-# Time-stamp: <2012-07-26 19:37:27 Tao Liu>
+# Time-stamp: <2012-08-10 02:06:23 Tao Liu>
 
 """Description: Naive call differential peaks from 4 bedGraph tracks for scores.
 
@@ -79,7 +79,7 @@ def run( options ):
                                                         depth2 )
     twoconditionscore.build()
     twoconditionscore.finalize()
-    (cat1,cat2,cat3,cat4) = twoconditionscore.call_peaks()
+    (cat1,cat2,cat3,cat4) = twoconditionscore.call_peaks(min_length=options.minlen)
 
     info("Write peaks...")
     nf = open ("%s_c%.1f_cat1_peaks.encodePeak" % (options.oprefix,options.cutoff),"w")        
