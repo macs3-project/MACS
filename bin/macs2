@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# Time-stamp: <2012-08-10 02:05:51 Tao Liu>
+# Time-stamp: <2012-08-10 03:25:30 Tao Liu>
 
 """Description: MACS v2 main executable.
 
@@ -309,7 +309,7 @@ def add_bdgdiff_parser( subparsers ):
     argparser_bdgdiff.add_argument( "--c2", dest="c2bdg", type = str, required = True,
                                     help = "MACS control lambda bedGraph for condition 2. REQUIRED" )
     argparser_bdgdiff.add_argument( "-C", "--cutoff", dest = "cutoff", type = float,
-                                    help = "Cutoff of log10 likelihood ratio cutoff. DEFAULT: 3 (likelihood ratio=1000)", default = 3 )
+                                    help = "Cutoff of log10 likelihood ratio cutoff. DEFAULT: 1.0 (likelihood ratio=10)", default = 1.0 )
     argparser_bdgdiff.add_argument( "-m", "--min-len", dest = "minlen", type = int,
                                     help = "Minimum length of differential region. DEFAULT: 200", default = 200 )
     argparser_bdgdiff.add_argument( "-o", "--o-prefix", dest = "oprefix", default = "diffpeak", type = str,
