@@ -931,7 +931,7 @@ cdef class scoreTrackII:
             for i in range( 1, l ):
                 v = value[ i ]
                 p = pos[ i-1 ]
-                if pre_v != v: 
+                if ('%.5f' % pre_v) != ('%.5f' % v): 
                     write( "%s\t%d\t%d\t%.5f\n" % ( chrom, pre, p, pre_v ) )
                     pre_v = v
                     pre = p
