@@ -203,14 +203,12 @@ class PeakDetect:
         cdef int i
         cdef float lambda_bg, effective_depth_in_million
 
-        if self.PE_MODE:
-            treat_total   = self.treat.length()
-            control_total = self.control.length()
-            d = None
-        else:
-            treat_total   = self.treat.total
-            control_total = self.control.total
-            d = self.d
+        if self.PE_MODE: d = None
+        else: d = self.d
+        treat_total   = self.treat.total
+        control_total = self.control.total
+        treat_length = self.treat.length()
+        control_length = self.control.length()
         self.ratio_treat2control = float(treat_total)/control_total
 
         if self.opt.tocontrol:
@@ -220,10 +218,12 @@ class PeakDetect:
             if self.PE_MODE:
                 if self.opt.halfext: warn('halfextension not supported in PE mode')
                 self.info("#3 pileup treatment data")
-                lambda_bg = treat_total/self.gsize/self.ratio_treat2control
+                lambda_bg = control_length / self.gsize
             else:
                 self.info("#3 pileup treatment data by extending tags towards 3' to %d length" % self.d)
-                lambda_bg = float(self.d)*treat_total/self.gsize/self.ratio_treat2control
+                # unnecessary numerical error
+                # treat_total / treat2control = control_total
+                lambda_bg = float(self.d) * control_total / self.gsize
             treat_btrack = unified_pileup_bdg(self.treat, d,
                                               1/self.ratio_treat2control,
                                               directional=True,
@@ -234,9 +234,9 @@ class PeakDetect:
             self.info("#3 pileup treatment data")            
             if self.PE_MODE:
                 if self.opt.halfext: warn('halfextension not supported in PE mode')
-                lambda_bg = treat_total/self.gsize
+                lambda_bg = treat_length / self.gsize
             else:
-                lambda_bg = float(self.d)*treat_total/self.gsize
+                lambda_bg = float(self.d) * treat_total / self.gsize
             treat_btrack = unified_pileup_bdg(self.treat, d, scale_factors=1.0,
                                               directional=True,
                                               halfextension=self.opt.halfext)
@@ -370,12 +370,10 @@ class PeakDetect:
         """
         cdef float lambda_bg, effective_depth_in_million
 
-        if self.PE_MODE:
-            treat_total = self.treat.length()
-            d = None
-        else:
-            treat_total = self.treat.total
-            d = self.d
+        if self.PE_MODE: d = None
+        else: d = self.d
+        treat_length = self.treat.length()
+        treat_total = self.treat.total
         
         effective_depth_in_million = treat_total / 1000000.0
 
@@ -384,7 +382,7 @@ class PeakDetect:
             # should we support halfext?
             if self.opt.halfext: warn('halfextension not supported in PE mode')
             # this an estimator, we should maybe test it for accuracy?
-            lambda_bg = treat_total / self.gsize
+            lambda_bg = treat_length / self.gsize
         else:
             lambda_bg = float(d) * treat_total / self.gsize
             self.info("#3 pileup treatment data by extending tags towards 3' to %d length" % self.d)
