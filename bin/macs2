@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# Time-stamp: <2012-08-10 03:25:30 Tao Liu>
+# Time-stamp: <2012-09-14 06:12:27 Tao Liu>
 
 """Description: MACS v2 main executable.
 
@@ -40,25 +40,36 @@ def main():
     args = argparser.parse_args()
     subcommand  = args.subcommand_name
     if subcommand == "callpeak":
+        # General call peak
         from MACS2.callpeak import run
         run( args )
     elif subcommand == "bdgpeakcall":
+        # call peak from bedGraph
         from MACS2.bdgpeakcall import run
         run( args )
     elif subcommand == "bdgbroadcall":
+        # call broad peak from bedGraph
         from MACS2.bdgbroadcall import run
         run( args )
     elif subcommand == "bdgcmp":
+        # compare treatment and control to make enrichment scores
         from MACS2.bdgcmp import run
         run( args )
     elif subcommand == "randsample":
+        # randomly sample sequencing reads, and save as bed file
         from MACS2.randsample import run
         run( args )
     elif subcommand == "filterdup":
+        # filter out duplicate reads, and save as bed file
         from MACS2.filterdup import run
         run( args )
     elif subcommand == "bdgdiff":
+        # differential calling
         from MACS2.bdgdiff import run
+        run( args )
+    elif subcommand == "refinepeak":
+        # refine peak summits
+        from MACS2.refinepeak import run
         run( args )
 
 def prepare_argparser ():
@@ -93,7 +104,10 @@ def prepare_argparser ():
     add_filterdup_parser( subparsers )
     
     # command for 'bdgdiff'
-    add_bdgdiff_parser( subparsers )    
+    add_bdgdiff_parser( subparsers )
+    
+    # command for 'refinepeak'
+    add_refinepeak_parser( subparsers )    
     
     return argparser
 
@@ -112,7 +126,7 @@ def add_callpeak_parser( subparsers ):
                               choices = ("AUTO", "BAM", "SAM", "BED", "ELAND",
                                          "ELANDMULTI", "ELANDEXPORT", "BOWTIE",
                                           "BAMPE"),
-                              help = "Format of tag file, \"AUTO\", \"BED\" or \"ELAND\" or \"ELANDMULTI\" or \"ELANDEXPORT\" or \"SAM\" or \"BAM\" or \"BOWTIE\" or \"BAMPE\". The default AUTO option will let MACS decide which format the file is. Please check the definition in 00README file if you choose ELAND/ELANDMULTI/ELANDEXPORT/SAM/BAM/BOWTIE. DEFAULT: \"AUTO\"",
+                              help = "Format of tag file, \"AUTO\", \"BED\" or \"ELAND\" or \"ELANDMULTI\" or \"ELANDEXPORT\" or \"SAM\" or \"BAM\" or \"BOWTIE\" or \"BAMPE\". The default AUTO option will let MACS decide which format the file is. Please check the definition in README file if you choose ELAND/ELANDMULTI/ELANDEXPORT/SAM/BAM/BOWTIE. DEFAULT: \"AUTO\"",
                               default = "AUTO" )
     group_input.add_argument( "-g", "--gsize", dest = "gsize", type = str, default = "hs",
                               help = "Effective genome size. It can be 1.0e+9 or 1000000000, or shortcuts:'hs' for human (2.7e9), 'mm' for mouse (1.87e9), 'ce' for C. elegans (9e7) and 'dm' for fruitfly (1.2e8), Default:hs" )
@@ -195,7 +209,7 @@ def add_filterdup_parser( subparsers ):
                                       default = "stdout" )
     argparser_filterdup.add_argument( "-f", "--format", dest = "format", type = str,
                                       choices=("AUTO","BAM","SAM","BED","ELAND","ELANDMULTI","ELANDEXPORT","BOWTIE"),
-                                      help = "Format of tag file, \"AUTO\", \"BED\" or \"ELAND\" or \"ELANDMULTI\" or \"ELANDEXPORT\" or \"SAM\" or \"BAM\" or \"BOWTIE\". The default AUTO option will let '%(prog)s' decide which format the file is. Please check the definition in 00README file if you choose ELAND/ELANDMULTI/ELANDEXPORT/SAM/BAM/BOWTIE. DEFAULT: \"AUTO\"",
+                                      help = "Format of tag file, \"AUTO\", \"BED\" or \"ELAND\" or \"ELANDMULTI\" or \"ELANDEXPORT\" or \"SAM\" or \"BAM\" or \"BOWTIE\". The default AUTO option will let '%(prog)s' decide which format the file is. Please check the definition in README file if you choose ELAND/ELANDMULTI/ELANDEXPORT/SAM/BAM/BOWTIE. DEFAULT: \"AUTO\"",
                                       default = "AUTO" )
     argparser_filterdup.add_argument( "-g", "--gsize", dest = "gsize", type = str, default = "hs",
                                       help = "Effective genome size. It can be 1.0e+9 or 1000000000, or shortcuts:'hs' for human (2.7e9), 'mm' for mouse (1.87e9), 'ce' for C. elegans (9e7) and 'dm' for fruitfly (1.2e8), DEFAULT:hs" )
@@ -291,7 +305,7 @@ def add_randsample_parser( subparsers ):
                                        help = "Tag size. This will overide the auto detected tag size. DEFAULT: Not set")
     argparser_randsample.add_argument( "-f", "--format", dest = "format", type = str,
                                        choices=("AUTO","BAM","SAM","BED","ELAND","ELANDMULTI","ELANDEXPORT","BOWTIE"),                                       
-                                       help = "Format of tag file, \"AUTO\", \"BED\" or \"ELAND\" or \"ELANDMULTI\" or \"ELANDEXPORT\" or \"SAM\" or \"BAM\" or \"BOWTIE\". The default AUTO option will %(prog)s decide which format the file is. Please check the definition in 00README file if you choose ELAND/ELANDMULTI/ELANDEXPORT/SAM/BAM/BOWTIE. DEFAULT: \"AUTO\"",
+                                       help = "Format of tag file, \"AUTO\", \"BED\" or \"ELAND\" or \"ELANDMULTI\" or \"ELANDEXPORT\" or \"SAM\" or \"BAM\" or \"BOWTIE\". The default AUTO option will %(prog)s decide which format the file is. Please check the definition in README file if you choose ELAND/ELANDMULTI/ELANDEXPORT/SAM/BAM/BOWTIE. DEFAULT: \"AUTO\"",
                                        default = "AUTO" )
     argparser_randsample.add_argument( "--verbose", dest = "verbose", type = int, default = 2,
                                        help = "Set verbose level. 0: only show critical message, 1: show additional warning message, 2: show process information, 3: show debug messages. If you want to know where are the duplicate reads, use 3. DEFAULT:2" )
@@ -319,6 +333,29 @@ def add_bdgdiff_parser( subparsers ):
     argparser_bdgdiff.add_argument( "--depth2", dest = "depth2", type = float, default = 1.0,
                                     help = "Sequence depth of condition 2 in million reads. Default: 1 (if you use 'macs2 callpeak --SPMR' to generate bdg files." )
     return
+
+def add_refinepeak_parser( subparsers ):
+    argparser_refinepeak = subparsers.add_parser( "refinepeak",
+                                                 help = "(Experimental) Take raw reads alignment, refine peak summits and give scores measuring balance of forward-backward tags. Inspired by SPP." )
+    argparser_refinepeak.add_argument( "-b", dest = "bedfile", type = str, required = True,
+                                      help = "Candidate peak file in BED format. REQUIRED." )
+    argparser_refinepeak.add_argument( "-i", dest = "ifile", type = str, required = True,
+                                      help = "Sequencing alignment file of treatment/ChIP. REQUIRED." )
+    argparser_refinepeak.add_argument( "-f", "--format", dest = "format", type = str,
+                                      choices=("AUTO","BAM","SAM","BED","ELAND","ELANDMULTI","ELANDEXPORT","BOWTIE"),
+                                      help = "Format of tag file, \"AUTO\", \"BED\" or \"ELAND\" or \"ELANDMULTI\" or \"ELANDEXPORT\" or \"SAM\" or \"BAM\" or \"BOWTIE\". The default AUTO option will let '%(prog)s' decide which format the file is. Please check the definition in README file if you choose ELAND/ELANDMULTI/ELANDEXPORT/SAM/BAM/BOWTIE. DEFAULT: \"AUTO\"",
+                                      default = "AUTO" )
+    argparser_refinepeak.add_argument( "-c", "--cutoff" , dest = "cutoff", type = float,
+                                        help = "Cutoff  DEFAULT: 5", default = 5 )
+    argparser_refinepeak.add_argument( "-w", "--window-size", dest= "windowsize", help = 'Scan window size on both side of the summit (default: 200bp)',
+                                        type = int, default = 200)
+    argparser_refinepeak.add_argument( "-o", "--o-prefix", dest = "oprefix", default = "peak", type = str,
+                                        help = "Prefix for output file, DEFAULT: peak" )
+    argparser_refinepeak.add_argument( "--verbose", dest = "verbose", type = int, default = 2,
+                                       help = "Set verbose level. 0: only show critical message, 1: show additional warning message, 2: show process information, 3: show debug messages. If you want to know where are the duplicate reads, use 3. DEFAULT:2" )
+    
+    return
+
 
 if __name__ == '__main__':
     try:

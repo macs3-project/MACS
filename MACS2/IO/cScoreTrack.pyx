@@ -1,5 +1,5 @@
 # cython: profile=True
-# Time-stamp: <2012-08-10 04:22:32 Tao Liu>
+# Time-stamp: <2012-09-13 16:22:41 Tao Liu>
 
 """Module for Feature IO classes.
 
@@ -931,7 +931,8 @@ cdef class scoreTrackII:
             for i in range( 1, l ):
                 v = value[ i ]
                 p = pos[ i-1 ]
-                if ('%.5f' % pre_v) != ('%.5f' % v): 
+                #if ('%.5f' % pre_v) != ('%.5f' % v):
+                if abs(pre_v - v) > 1e-5: # precision is 5 digits
                     write( "%s\t%d\t%d\t%.5f\n" % ( chrom, pre, p, pre_v ) )
                     pre_v = v
                     pre = p

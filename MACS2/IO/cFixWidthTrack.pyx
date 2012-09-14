@@ -1,5 +1,5 @@
 # cython: profile=True
-# Time-stamp: <2012-08-01 18:08:12 Tao Liu>
+# Time-stamp: <2012-09-14 06:11:57 Tao Liu>
 
 """Module for FWTrack classes.
 
@@ -514,3 +514,96 @@ cdef class FWTrackIII:
                 fhd.write("%s\t%d\t%d\t.\t.\t%s\n" % (k,p-self.fw,p,"-") )
         return
     
+    cpdef tuple extract_region_tags ( self, str chromosome, int32_t startpos, int32_t endpos ):
+        cdef:
+            int32_t i, pos
+            np.ndarray rt_plus, rt_minus
+            list temp
+
+        if not self.__sorted: self.sort()
+        
+        chrnames = self.get_chr_names()
+        assert chromosome in chrnames, "chromosome %s can't be found in the FWTrackIII object." % chromosome
+        
+        (plus, minus) = self.__locations[chromosome]
+
+        temp = []
+        for i in range(plus.shape[0]):
+            pos = plus[i]
+            if pos < startpos:
+                continue
+            elif pos > endpos:
+                break
+            else:
+                temp.append(pos)
+        rt_plus = np.array(temp)
+
+        temp = []
+        for i in range(minus.shape[0]):
+            pos = minus[i]
+            if pos < startpos:
+                continue
+            elif pos > endpos:
+                break
+            else:
+                temp.append(pos)
+        rt_minus = np.array(temp)
+        return (rt_plus, rt_minus)
+
+    cpdef extract_region_tags_from_peaks ( self, peaks, func ):
+        """Extract tags in peak, then apply func on extracted tags.
+        
+        """
+        
+        cdef:
+            int32_t m, i, j, pre_i, pre_j, pos, startpos, endpos
+            np.ndarray plus, minus, rt_plus, rt_minus
+            str chrom
+            list temp, retval
+
+        pchrnames = sorted(peaks.peaks.keys())
+        retval = []
+        if not self.__sorted: self.sort()
+        
+        chrnames = self.get_chr_names()
+        #assert chromosome in chrnames, "chromosome %s can't be found in the FWTrackIII object." % chromosome
+
+        for chrom in pchrnames:
+            assert chrom in chrnames, "chromosome %s can't be found in the FWTrackIII object." % chrom
+            (plus, minus) = self.__locations[chrom]
+            cpeaks = peaks.peaks[chrom]
+            prev_i = 0
+            prev_j = 0
+            for m in range(len(cpeaks)):
+                startpos = cpeaks[m]["start"]
+                endpos   = cpeaks[m]["end"]
+
+                temp = []
+                for i in range(prev_i,plus.shape[0]):
+                    pos = plus[i]
+                    if pos < startpos:
+                        continue
+                    elif pos > endpos:
+                        prev_i = i
+                        break
+                    else:
+                        temp.append(pos)
+                rt_plus = np.array(temp)
+                
+                temp = []
+                for j in range(prev_j,minus.shape[0]):
+                    pos = minus[j]
+                    if pos < startpos:
+                        continue
+                    elif pos > endpos:
+                        prev_j = j
+                        break
+                    else:
+                        temp.append(pos)
+                rt_minus = np.array(temp)
+
+                retval.append( func(chrom, rt_plus, rt_minus, startpos, endpos) )
+                
+        return retval
+
+                

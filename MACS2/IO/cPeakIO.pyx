@@ -1,5 +1,5 @@
 # cython: profile=True
-# Time-stamp: <2012-08-10 00:42:37 Tao Liu>
+# Time-stamp: <2012-09-14 05:07:33 Tao Liu>
 
 """Module for PeakIO IO classes.
 
@@ -77,6 +77,20 @@ class PeakIO:
                                        "pscore":pscore,
                                        "fc":fold_change,
                                        "qscore":qscore})
+
+    def get_data_from_chrom (self, str chrom):
+        return self.peaks[chrom]
+
+    def get_chr_names (self):
+        return self.peaks.keys()
+
+    def sort ( self ):
+        # sort by position
+        chrs = sorted(self.peaks.keys())
+        for chrom in chrs:
+            self.peaks[chrom].sort(key=lambda x:x["start"])
+        return
+        
 
     def filter_pscore (self, double pscore_cut ):
         cdef str chrom
