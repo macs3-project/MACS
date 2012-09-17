@@ -1,5 +1,5 @@
 # cython: profile=True
-# Time-stamp: <2012-09-14 05:07:33 Tao Liu>
+# Time-stamp: <2012-09-14 16:42:20 Tao Liu>
 
 """Module for PeakIO IO classes.
 
@@ -54,7 +54,8 @@ class PeakIO:
     
     def add (self, str chromosome, long start, long end, long summit = 0, 
              double peak_score=0, int pileup=0, 
-             double pscore=0, double fold_change=0, double qscore=0):
+             double pscore=0, double fold_change=0, double qscore=0,
+             str name="NA"):
         """items:
         start:start
         end:end,
@@ -76,7 +77,8 @@ class PeakIO:
                                        "pileup":pileup,
                                        "pscore":pscore,
                                        "fc":fold_change,
-                                       "qscore":qscore})
+                                       "qscore":qscore,
+                                       "name":name})
 
     def get_data_from_chrom (self, str chrom):
         return self.peaks[chrom]

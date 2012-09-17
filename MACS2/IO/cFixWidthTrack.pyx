@@ -1,5 +1,5 @@
 # cython: profile=True
-# Time-stamp: <2012-09-14 06:11:57 Tao Liu>
+# Time-stamp: <2012-09-17 03:48:31 Tao Liu>
 
 """Module for FWTrack classes.
 
@@ -550,7 +550,7 @@ cdef class FWTrackIII:
         rt_minus = np.array(temp)
         return (rt_plus, rt_minus)
 
-    cpdef extract_region_tags_from_peaks ( self, peaks, func ):
+    cpdef compute_region_tags_from_peaks ( self, peaks, func, int window_size = 100, float cutoff = 5 ):
         """Extract tags in peak, then apply func on extracted tags.
         
         """
@@ -558,7 +558,7 @@ cdef class FWTrackIII:
         cdef:
             int32_t m, i, j, pre_i, pre_j, pos, startpos, endpos
             np.ndarray plus, minus, rt_plus, rt_minus
-            str chrom
+            str chrom, name
             list temp, retval
 
         pchrnames = sorted(peaks.peaks.keys())
@@ -575,8 +575,9 @@ cdef class FWTrackIII:
             prev_i = 0
             prev_j = 0
             for m in range(len(cpeaks)):
-                startpos = cpeaks[m]["start"]
-                endpos   = cpeaks[m]["end"]
+                startpos = cpeaks[m]["start"] - window_size
+                endpos   = cpeaks[m]["end"] + window_size
+                name     = cpeaks[m]["name"]
 
                 temp = []
                 for i in range(prev_i,plus.shape[0]):
@@ -602,7 +603,18 @@ cdef class FWTrackIII:
                         temp.append(pos)
                 rt_minus = np.array(temp)
 
-                retval.append( func(chrom, rt_plus, rt_minus, startpos, endpos) )
+                retval.append( func(chrom, rt_plus, rt_minus, startpos, endpos, name = name, window_size = window_size, cutoff = cutoff) )
+                # rewind window_size
+                for i in range(prev_i, 0, -1):
+                    if plus[prev_i] - plus[i] >= window_size:
+                        break
+                prev_i = i
+
+                for j in range(prev_j, 0, -1):
+                    if minus[prev_j] - minus[j] >= window_size:
+                        break
+                prev_j = j                
+                # end of a loop
                 
         return retval
 

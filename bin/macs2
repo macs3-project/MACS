@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# Time-stamp: <2012-09-14 06:12:27 Tao Liu>
+# Time-stamp: <2012-09-17 03:03:12 Tao Liu>
 
 """Description: MACS v2 main executable.
 
@@ -347,7 +347,7 @@ def add_refinepeak_parser( subparsers ):
                                       default = "AUTO" )
     argparser_refinepeak.add_argument( "-c", "--cutoff" , dest = "cutoff", type = float,
                                         help = "Cutoff  DEFAULT: 5", default = 5 )
-    argparser_refinepeak.add_argument( "-w", "--window-size", dest= "windowsize", help = 'Scan window size on both side of the summit (default: 200bp)',
+    argparser_refinepeak.add_argument( "-w", "--window-size", dest= "windowsize", help = 'Scan window size on both side of the summit (default: 100bp)',
                                         type = int, default = 200)
     argparser_refinepeak.add_argument( "-o", "--o-prefix", dest = "oprefix", default = "peak", type = str,
                                         help = "Prefix for output file, DEFAULT: peak" )
