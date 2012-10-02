@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# Time-stamp: <2012-09-17 03:03:12 Tao Liu>
+# Time-stamp: <2012-10-02 18:23:15 Tao Liu>
 
 """Description: MACS v2 main executable.
 
@@ -71,6 +71,10 @@ def main():
         # refine peak summits
         from MACS2.refinepeak import run
         run( args )
+    elif subcommand == "predictd":
+        # predict d or fragment size
+        from MACS2.predictd import run
+        run( args )
 
 def prepare_argparser ():
     """Prepare optparser object. New options will be added in this
@@ -107,7 +111,10 @@ def prepare_argparser ():
     add_bdgdiff_parser( subparsers )
     
     # command for 'refinepeak'
-    add_refinepeak_parser( subparsers )    
+    add_refinepeak_parser( subparsers )
+
+    # command for 'predictd'
+    add_predictd_parser( subparsers )        
     
     return argparser
 
@@ -355,6 +362,38 @@ def add_refinepeak_parser( subparsers ):
                                        help = "Set verbose level. 0: only show critical message, 1: show additional warning message, 2: show process information, 3: show debug messages. If you want to know where are the duplicate reads, use 3. DEFAULT:2" )
     
     return
+
+def add_predictd_parser( subparsers ):
+    """Add main function 'predictd' argument parsers.
+    """
+    argparser_predictd = subparsers.add_parser("predictd", help="Predict d or fragment size from alignment results. *Will NOT filter duplicates*")
+    
+    # group for input files
+    argparser_predictd.add_argument( "-i", "--ifile", dest = "ifile", type = str, required = True, nargs = "+",
+                                     help = "ChIP-seq alignment file. If multiple files are given as '-t A B C', then they will all be read and combined. Note that pair-end data is not supposed to work with this command. REQUIRED." )
+    argparser_predictd.add_argument( "-f", "--format", dest = "format", type = str,
+                                     choices = ("AUTO", "BAM", "SAM", "BED", "ELAND",
+                                                "ELANDMULTI", "ELANDEXPORT", "BOWTIE",
+                                                "BAMPE"),
+                                     help = "Format of tag file, \"AUTO\", \"BED\" or \"ELAND\" or \"ELANDMULTI\" or \"ELANDEXPORT\" or \"SAM\" or \"BAM\" or \"BOWTIE\". The default AUTO option will let MACS decide which format the file is. Please check the definition in README file if you choose ELAND/ELANDMULTI/ELANDEXPORT/SAM/BAM/BOWTIE. DEFAULT: \"AUTO\"",
+                                     default = "AUTO" )
+    argparser_predictd.add_argument( "-g", "--gsize", dest = "gsize", type = str, default = "hs",
+                                     help = "Effective genome size. It can be 1.0e+9 or 1000000000, or shortcuts:'hs' for human (2.7e9), 'mm' for mouse (1.87e9), 'ce' for C. elegans (9e7) and 'dm' for fruitfly (1.2e8), Default:hs" )
+    # group for bimodal
+    argparser_predictd.add_argument( "-s", "--tsize",  dest = "tsize", type = int, default = None,
+                                     help = "Tag size. This will overide the auto detected tag size. DEFAULT: Not set")
+    argparser_predictd.add_argument( "--bw", dest = "bw", type = int, default = 300,
+                                     help = "Band width for picking regions to compute fragment size. This value is only used while building the shifting model. DEFAULT: 300")
+    argparser_predictd.add_argument( "-m", "--mfold", dest = "mfold", type = int, default = [5,50], nargs = 2,
+                                     help = "Select the regions within MFOLD range of high-confidence enrichment ratio against background to build model. Fold-enrichment in regions must be lower than upper limit, and higher than the lower limit. Use as \"-m 10 30\". DEFAULT:5 50" )
+    # group for output files
+    argparser_predictd.add_argument( "--rfile", dest = "rfile", type = str, default = "predictd",
+                                     help = "PREFIX of filename of R script for drawing X-correlation figure. DEFAULT:'predictd' and R file will be predicted_model.R" )
+    argparser_predictd.add_argument( "--verbose", dest = "verbose", type = int, default = 2,
+                                     help = "Set verbose level of runtime message. 0: only show critical message, 1: show additional warning message, 2: show process information, 3: show debug messages. DEFAULT:2" )
+    
+    return
+
 
 
 if __name__ == '__main__':

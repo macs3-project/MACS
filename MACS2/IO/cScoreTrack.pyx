@@ -1,5 +1,5 @@
 # cython: profile=True
-# Time-stamp: <2012-09-13 16:22:41 Tao Liu>
+# Time-stamp: <2012-09-25 15:00:19 Tao Liu>
 
 """Module for Feature IO classes.
 
@@ -1473,13 +1473,51 @@ cdef class TwoConditionScores:
             for i in range( 1, l ):
                 v = value[ i ]
                 p = pos[ i-1 ]
-                if pre_v != v: 
+                if abs(pre_v - v)>=1e-6: 
                     write( "%s\t%d\t%d\t%.5f\n" % ( chrom, pre, p, pre_v ) )
                     pre_v = v
                     pre = p
             p = pos[ -1 ]
             # last one
             write( "%s\t%d\t%d\t%.5f\n" % ( chrom, pre, p, pre_v ) )
+            
+        return True
+
+    cpdef write_matrix ( self, fhd, str name, str description ):
+        """Write all data to fhd into five columns Format:
+
+        col1: chr_start_end
+        col2: t1 vs c1
+        col3: t2 vs c2
+        col4: t1 vs t2
+        col5: t2 vs t1
+
+        fhd: a filehandler to save the matrix.
+
+        """
+        cdef:
+            str chrom
+            int l, pre, i, p 
+            float v1, v2, v3, v4
+            np.ndarray pos, value
+
+        write = fhd.write
+
+        chrs = self.get_chr_names()
+        for chrom in chrs:
+            pos = self.data[ chrom ][ 0 ]
+            value = self.data[ chrom ][ column ]
+            l = self.datalength[ chrom ]
+            pre = 0
+            if pos.shape[ 0 ] == 0: continue # skip if there's no data
+            for i in range( 0, l ):
+                v1 = self.data[ i ][ 1 ]
+                v2 = self.data[ i ][ 2 ]
+                v3 = self.data[ i ][ 3 ]
+                v4 = self.data[ i ][ 4 ]                
+                p = pos[ i ]
+                write( "%s:%d_%d\t%.5f\t%.5f\t%.5f\t%.5f\n" % ( chrom, pre, p, v1, v2, v3, v4 ) )
+                pre = p
             
         return True
 
@@ -1505,9 +1543,9 @@ cdef class TwoConditionScores:
             list peak_content
         
         chrs  = self.get_chr_names()
-        cat1_peaks = PeakIO()       # dictionary to save peaks
-        cat2_peaks = PeakIO()       # dictionary to save peaks
-        cat3_peaks = PeakIO()       # dictionary to save peaks
+        cat1_peaks = PeakIO()       # dictionary to save peaks significant at condition 1
+        cat2_peaks = PeakIO()       # dictionary to save peaks significant at condition 2
+        cat3_peaks = PeakIO()       # dictionary to save peaks significant in both conditions
         #cat4_peaks = PeakIO()       # dictionary to save peaks        
 
         self.cutoff = cutoff

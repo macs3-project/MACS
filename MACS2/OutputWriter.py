@@ -1,4 +1,4 @@
-# Time-stamp: <2012-04-30 17:32:38 Tao Liu>
+# Time-stamp: <2012-10-02 17:14:25 Tao Liu>
 
 """Module Description
 
@@ -239,14 +239,13 @@ def zbdg_write (trackI, subdir, fileprefix, d, log=None, single=False):
         os.system("gzip "+f)
 
 
-
 def model2r_script(model,filename,name):
     rfhd = open(filename,"w")
     p = model.plus_line
     m = model.minus_line
     ycorr = model.ycorr
     xcorr = model.xcorr
-    alt_d = [x-model.tsize for x in model.alternative_d]
+    alt_d = model.alternative_d
     #s = model.shifted_line
     d = model.d
     w = len(p)

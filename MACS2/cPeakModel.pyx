@@ -1,5 +1,5 @@
 # cython: profile=True
-# Time-stamp: <2012-04-30 05:52:49 Tao Liu>
+# Time-stamp: <2012-10-02 18:02:01 Tao Liu>
 
 """Module Description
 
@@ -141,7 +141,7 @@ Summary of Peak Model:
         window_size = 1+2*self.peaksize
         #self.plus_line = np.zeros(window_size, dtype="int32")#[0]*window_size
         #self.minus_line = np.zeros(window_size, dtype="int32")#[0]*window_size
-        self.plus_line =[0]*window_size
+        self.plus_line = [0]*window_size
         self.minus_line = [0]*window_size        
         self.info("start model_add_line...")
         for chrom in paired_peakpos.keys():
@@ -158,7 +158,9 @@ Summary of Peak Model:
         self.info("start X-correlation...")
         # Now I use cross-correlation to find the best d
         plus_line = np.asarray(self.plus_line,dtype="int32")
-        minus_line = np.asarray(self.minus_line,dtype="int32")        
+        minus_line = np.asarray(self.minus_line,dtype="int32")
+        #plus_line = self.plus_line
+        #minus_line = self.minus_line
         
         # normalize first
         minus_data = (minus_line - minus_line.mean())/(minus_line.std()*len(minus_line))
@@ -167,21 +169,17 @@ Summary of Peak Model:
         # cross-correlation
         ycorr = np.correlate(minus_data,plus_data,mode="full")[window_size-self.peaksize:window_size+self.peaksize]
         xcorr = np.linspace(len(ycorr)//2*-1, len(ycorr)//2, num=len(ycorr))
+
+        # smooth correlation values to get rid of local maximums from small fluctuations. 
+        ycorr = smooth(ycorr, window="flat") # window size is by default 11.
+
         # best cross-correlation point
-        self.d = xcorr[np.where(ycorr==max(ycorr))[0][0]]+self.tsize
+        self.d = xcorr[np.where(ycorr==max(ycorr))[0][0]] #+self.tsize
         # all local maximums could be alternative ds.
-        alternative_d = xcorr[np.r_[True, ycorr[1:] > ycorr[:-1]] & np.r_[ycorr[:-1] > ycorr[1:], True]]
+        i_l_max = np.r_[False, ycorr[1:] > ycorr[:-1]] & np.r_[ycorr[:-1] > ycorr[1:], False]
+        self.alternative_d = map(int,xcorr[i_l_max])
         # get rid of the last local maximum if it's at the right end of curve.
-        self.alternative_d = []
-        for i in alternative_d:
-            if i == self.peaksize:
-                pass
-            elif i == -1*self.peaksize:
-                pass
-            elif i <= -1*self.tsize:
-                pass
-            else:
-                self.alternative_d.append(i+self.tsize)
+        
         assert len(self.alternative_d) > 0, "No proper d can be found! Tweak --mfold?"
         
         self.ycorr = ycorr
@@ -191,18 +189,10 @@ Summary of Peak Model:
         
         self.scan_window = max(self.d,self.tsize)*2
         # a shifted model
-        self.shifted_line = [0]*window_size
+        #self.shifted_line = [0]*window_size
 
         self.info("end of X-cor")
         
-        #plus_shifted = [0]*shift_size
-        #plus_shifted.extend(self.plus_line[:-1*shift_size])
-        #minus_shifted = self.minus_line[shift_size:]
-        #minus_shifted.extend([0]*shift_size)
-        #print "d:",self.d,"shift_size:",shift_size
-        #print len(self.plus_line),len(self.minus_line),len(plus_shifted),len(minus_shifted),len(self.shifted_line)
-        #for i in range(window_size):
-        #    self.shifted_line[i]=minus_shifted[i]+plus_shifted[i]
         return True
 
     def __model_add_line (self, pos1, pos2, line, int plus_strand=1):
@@ -211,6 +201,7 @@ Summary of Peak Model:
 
         pos1: paired centers
         pos2: tags of certain strand -- a numpy.array object
+        line: numpy array object where we pileup tags
 
         """
         cdef int i1, i2, i2_prev, i1_max, i2_max, last_p2, psize_adjusted1, psize_adjusted2, p1, p2, length_l, s, e
@@ -228,14 +219,16 @@ Summary of Peak Model:
         length_l = len(line)
 
         psize_adjusted1 = self.peaksize + self.tsize
-        psize_adjusted2 = self.peaksize - self.tsize        
 
         while i1<i1_max and i2<i2_max:
             p1 = pos1[i1]
-            if plus_strand:
-                p2 = pos2[i2]
-            else:
-                p2 = pos2[i2] - self.tsize
+            #if plus_strand:
+            #    p2 = pos2[i2]
+            #else:
+            #    p2 = pos2[i2] - self.tsize
+
+            p2 = pos2[i2] - self.tsize
+                
             if p1-psize_adjusted1 > p2: # move pos2
                 i2 += 1
             elif p1+psize_adjusted1 < p2: # move pos1
@@ -250,75 +243,13 @@ Summary of Peak Model:
                 #for i in range(p2-p1+self.peaksize,p2-p1+self.peaksize+self.tsize):
                 s = max(p2-p1+self.peaksize, 0)
                 e = min(p2-p1+self.peaksize+self.tsize, length_l)
+                #line[s:e] += 1
                 for i in range(s,e):
                     #if i>=0 and i<length_l:
                     line[i]+=1
                 i2+=1
         return line
     
-    def __model_add_line2 (self, pos1, np.ndarray pos2, np.ndarray line, plus_strand=1):
-        """Project each pos in pos2 which is included in
-        [pos1-self.peaksize,pos1+self.peaksize] to the line.
-
-        pos1: paired centers
-        pos2: tags of certain strand
-
-        """
-        cdef int i1, i2, i2_prev, i1_max, i2_max, last_p2, psize_adjusted1, psize_adjusted2, start, end
-        cdef long i
-        
-        i1 = 0                  # index for pos1
-        i2 = 0                  # index for pos2
-        i2_prev = 0             # index for pos2 in previous pos1
-                                # [pos1-self.peaksize,pos1+self.peaksize]
-                                # region
-        i1_max = len(pos1)
-        leftposs = np.asarray(pos1,dtype="int32") - psize_adjusted1
-        rightposs= np.asarray(pos1,dtype="int32") + psize_adjusted1
-        i2_max = pos2.shape[0]
-        last_p2 = -1
-        flag_find_overlap = False
-
-        psize_adjusted1 = self.peaksize + self.tsize
-        psize_adjusted2 = self.peaksize - self.tsize        
-
-        p1 = pos1[i1]
-        p2 = pos2[i2]
-        if not plus_strand:
-            p2 -= self.tsize
-
-        try:
-            while True:
-                if p1-psize_adjusted1 > p2: # move pos2
-                    i2 += 1
-                    p2 = pos2[i2]
-                    if not plus_strand:
-                        p2 -= self.tsize
-                elif p1+psize_adjusted1 < p2: # move pos1
-                    i1 += 1
-                    p1 = pos1[i1]
-                    i2 = i2_prev    # search minus peaks from previous index
-                    p2 = pos2[i2]
-                    if not plus_strand:
-                        p2 -= self.tsize                
-                    flag_find_overlap = False
-                else:               # overlap!
-                    if not flag_find_overlap:
-                        flag_find_overlap = True
-                        i2_prev = i2 # only the first index is recorded
-                    # project
-                    start = max( p2-p1+self.peaksize, 0 )
-                    end   = min( p2-p1+self.peaksize+self.tsize, line.shape[0] )
-                    for i in range( start, end ):
-                        line[ i ] += 1
-                    i2+=1
-                    p2 = pos2[i2]
-                    if not plus_strand:
-                        p2 -= self.tsize
-        except IndexError:
-            pass
-        return line
-            
     def __paired_peaks (self):
         """Call paired peaks from fwtrackI object.
 
@@ -491,3 +422,61 @@ Summary of Peak Model:
         top_indices = np.where(horizon_line == horizon_line.max())[0]
         #print top_indices+start
         return top_indices[ int(top_indices.shape[0]/2) ] + start
+
+# smooth function from SciPy cookbook: http://www.scipy.org/Cookbook/SignalSmooth
+def smooth(x,window_len=11,window='hanning'):
+    """smooth the data using a window with requested size.
+    
+    This method is based on the convolution of a scaled window with the signal.
+    The signal is prepared by introducing reflected copies of the signal 
+    (with the window size) in both ends so that transient parts are minimized
+    in the begining and end part of the output signal.
+    
+    input:
+        x: the input signal 
+        window_len: the dimension of the smoothing window; should be an odd integer
+        window: the type of window from 'flat', 'hanning', 'hamming', 'bartlett', 'blackman'
+            flat window will produce a moving average smoothing.
+
+    output:
+        the smoothed signal
+        
+    example:
+
+    t=linspace(-2,2,0.1)
+    x=sin(t)+randn(len(t))*0.1
+    y=smooth(x)
+    
+    see also: 
+    
+    numpy.hanning, numpy.hamming, numpy.bartlett, numpy.blackman, numpy.convolve
+    scipy.signal.lfilter
+ 
+    TODO: the window parameter could be the window itself if an array instead of a string
+    NOTE: length(output) != length(input), to correct this: return y[(window_len/2-1):-(window_len/2)] instead of just y.
+    """
+
+    if x.ndim != 1:
+        raise ValueError, "smooth only accepts 1 dimension arrays."
+
+    if x.size < window_len:
+        raise ValueError, "Input vector needs to be bigger than window size."
+
+
+    if window_len<3:
+        return x
+
+
+    if not window in ['flat', 'hanning', 'hamming', 'bartlett', 'blackman']:
+        raise ValueError, "Window is on of 'flat', 'hanning', 'hamming', 'bartlett', 'blackman'"
+
+
+    s=np.r_[x[window_len-1:0:-1],x,x[-1:-window_len:-1]]
+    #print(len(s))
+    if window == 'flat': #moving average
+        w=np.ones(window_len,'d')
+    else:
+        w=eval('np.'+window+'(window_len)')
+
+    y=np.convolve(w/w.sum(),s,mode='valid')
+    return y[(window_len/2):-(window_len/2)]
