@@ -1,4 +1,4 @@
-# Time-stamp: <2012-04-10 17:54:20 Tao Liu>
+# Time-stamp: <2012-10-03 12:18:11 Tao Liu>
 
 """Description: Filter duplicate reads depending on sequencing depth.
 
@@ -91,7 +91,7 @@ def load_tag_files_options ( options ):
 
     """
     options.info("read alignment tags...")
-    tp = options.parser(options.tfile)
+    tp = options.parser(options.ifile)
 
     if not options.tsize:           # override tsize if user specified --tsize
         ttsize = tp.tsize()

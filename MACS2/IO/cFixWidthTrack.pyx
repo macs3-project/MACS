@@ -1,5 +1,5 @@
 # cython: profile=True
-# Time-stamp: <2012-09-17 03:48:31 Tao Liu>
+# Time-stamp: <2012-10-03 17:10:26 Tao Liu>
 
 """Module for FWTrack classes.
 
@@ -86,7 +86,7 @@ cdef class FWTrackIII:
         self.total = 0           # total tags
         self.dup_total = 0           # total tags
         self.annotation = anno   # need to be figured out
-        self.rlengths = {}
+        self.rlengths = {}       # lengths of reference sequences, e.g. each chromosome in a genome
 
 
     cpdef add_loc ( self, str chromosome, int32_t fiveendpos, int strand ):

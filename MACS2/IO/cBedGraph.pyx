@@ -1,5 +1,5 @@
 # cython: profile=True
-# Time-stamp: <2012-08-01 18:09:13 Tao Liu>
+# Time-stamp: <2012-10-03 17:13:06 Tao Liu>
 
 """Module for Feature IO classes.
 
@@ -228,7 +228,7 @@ class bedGraphTrackI:
             str chrom
         
         if trackline:
-            trackcontents = (name.replace("\"", "\\\""), desc.replace("\"", "\\\""))
+            trackcontents = (name.replace("\"", "\\\""), description.replace("\"", "\\\""))
             fhd.write("track type=bedGraph name=\"%s\" description=\"%s\" visibility=2 alwaysZero=on\n" % trackcontents)
         chrs = self.get_chr_names()
         for chrom in chrs:
