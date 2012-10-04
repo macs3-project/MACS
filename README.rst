@@ -1,7 +1,7 @@
-=====================
-README for MACS (2.1)
-=====================
-Time-stamp: <2012-10-03 18:27:53 Tao Liu>
+========================
+README for MACS (2.0.10)
+========================
+Time-stamp: <2012-10-04 11:59:13 Tao Liu>
 
 Introduction
 ============
@@ -41,6 +41,22 @@ Usage of MACS2
 :Example for broad peak calling: ``macs2 -t ChIP.bam -c Control.bam --broad -g hs``
 
 There are seven major functions available in MACS serving as sub-commands.
+
+    :callpeak:            Main MACS2 Function to `Call peaks`_ from alignment results.
+    :bdgpeakcall:         Call peaks from bedGraph output.
+    :bdgbroadcall:        Call broad peaks from bedGraph output.
+    :bdgcmp:              Deduct noise by comparing two signal tracks in bedGraph.
+    :bdgdiff:             Differential peak detection based on paired four bedgraph files.
+    :filterdup:           Remove duplicate reads at the same position, then convert acceptable format to BED format.
+    :predictd:            Predict d or fragment size from alignment results.
+    :pileup:              Pileup aligned reads with a given extension
+                          size (fragment size or d in MACS language). Note there will be no
+                          step for duplicate reads filtering or sequencing depth scaling, so you may need to do certain post-
+                          processing.
+    :randsample:          Randomly sample number/percentage of total reads.
+    :refinepeak:          (Experimental) Take raw reads alignment, refine peak
+                          summits and give scores measuring balance of forward-
+                          backward tags. Inspired by SPP.
 
 Call peaks
 ~~~~~~~~~~
@@ -456,10 +472,8 @@ Output files
 Other useful links
 ==================
 
-:Cistrome web server for ChIP-chip/seq analysis: http://cistrome.org/ap/
-
-:bedTools: -- a super useful toolkits for genome annotation files: http://code.google.com/p/bedtools/
-
+:Cistrome, a web server for ChIP-chip/seq analysis: http://cistrome.org/ap/
+:bedTools, a super useful toolkits for genome annotation files: http://code.google.com/p/bedtools/
 :UCSC toolkits: http://hgdownload.cse.ucsc.edu/admin/exe/
 
 Tips of fine-tuning peak calling
