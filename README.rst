@@ -1,7 +1,7 @@
 ========================
 README for MACS (2.0.10)
 ========================
-Time-stamp: <2012-10-04 11:59:13 Tao Liu>
+Time-stamp: <2012-10-04 12:07:12 Tao Liu>
 
 Introduction
 ============
@@ -42,19 +42,19 @@ Usage of MACS2
 
 There are seven major functions available in MACS serving as sub-commands.
 
-    :callpeak:            Main MACS2 Function to `Call peaks`_ from alignment results.
-    :bdgpeakcall:         Call peaks from bedGraph output.
-    :bdgbroadcall:        Call broad peaks from bedGraph output.
-    :bdgcmp:              Deduct noise by comparing two signal tracks in bedGraph.
-    :bdgdiff:             Differential peak detection based on paired four bedgraph files.
-    :filterdup:           Remove duplicate reads at the same position, then convert acceptable format to BED format.
-    :predictd:            Predict d or fragment size from alignment results.
-    :pileup:              Pileup aligned reads with a given extension
+:callpeak:            Main MACS2 Function to `Call peaks`_ from alignment results.
+:bdgpeakcall:         Call peaks from bedGraph output.
+:bdgbroadcall:        Call broad peaks from bedGraph output.
+:bdgcmp:              Deduct noise by comparing two signal tracks in bedGraph.
+:bdgdiff:             Differential peak detection based on paired four bedgraph files.
+:filterdup:           Remove duplicate reads at the same position, then convert acceptable format to BED format.
+:predictd:            Predict d or fragment size from alignment results.
+:pileup:              Pileup aligned reads with a given extension
                           size (fragment size or d in MACS language). Note there will be no
                           step for duplicate reads filtering or sequencing depth scaling, so you may need to do certain post-
                           processing.
-    :randsample:          Randomly sample number/percentage of total reads.
-    :refinepeak:          (Experimental) Take raw reads alignment, refine peak
+:randsample:          Randomly sample number/percentage of total reads.
+:refinepeak:          (Experimental) Take raw reads alignment, refine peak
                           summits and give scores measuring balance of forward-
                           backward tags. Inspired by SPP.
 
@@ -70,37 +70,36 @@ Parameters
 
 - -t/--treatment FILENAME
 
- This is the only REQUIRED parameter for MACS. File can be in any
- supported format specified by --format option. Check --format for
- detail. If you have more than one alignment files, you can supply
- them as ```-t A B C```. MACS will pool up all these files together.
+This is the only REQUIRED parameter for MACS. File can be in any
+supported format specified by --format option. Check --format for
+detail. If you have more than one alignment files, you can supply
+them as ```-t A B C```. MACS will pool up all these files together.
 
 - -c/--control
 
- The control or mock data file. Please follow the same direction as for
- -t/--treatment.
+The control or mock data file. Please follow the same direction as for
+-t/--treatment.
 
 - -n/--name
 
- The name string of the experiment. MACS will use this string NAME to
- create output files like 'NAME_peaks.xls', 'NAME_negative_peaks.xls',
- 'NAME_peaks.bed' , 'NAME_summits.bed', 'NAME_model.r' and so on. So
- please avoid any confliction between these filenames and your
- existing files.
+The name string of the experiment. MACS will use this string NAME to
+create output files like 'NAME_peaks.xls', 'NAME_negative_peaks.xls',
+'NAME_peaks.bed' , 'NAME_summits.bed', 'NAME_model.r' and so on. So
+please avoid any confliction between these filenames and your
+existing files.
 
 - -f/--format FORMAT
 
- Format of tag file, can be "ELAND", "BED", "ELANDMULTI",
- "ELANDEXPORT", "ELANDMULTIPET" (for pair-end tags), "SAM", "BAM" or
- "BOWTIE". Default is "AUTO" which will allow MACS to decide the
- format automatically. Please use "AUTO" only when you combine
- different formats of files.
+Format of tag file, can be "ELAND", "BED", "ELANDMULTI",
+"ELANDEXPORT", "ELANDMULTIPET" (for pair-end tags), "SAM", "BAM" or
+"BOWTIE". Default is "AUTO" which will allow MACS to decide the
+format automatically. Please use "AUTO" only when you combine
+different formats of files.
 
- The BED format is defined in
- "http://genome.ucsc.edu/FAQ/FAQformat#format1".
+The BED format can be found at `UCSC genome browser website <http://genome.ucsc.edu/FAQ/FAQformat#format1>`_.
 
- If the format is ELAND, the file must be ELAND result output file,
- each line MUST represents only ONE tag, with fields of:
+If the format is ELAND, the file must be ELAND result output file,
+each line MUST represents only ONE tag, with fields of:
 
  1. Sequence name (derived from file name and line number if format is not Fasta)
  2. Sequence
@@ -132,9 +131,9 @@ Parameters
      was A, not whatever is was in read).
  12. Position and type of first substitution error, as above. 
 
- If the format is ELANDMULTI, the file must be ELAND output file from
- multiple-match mode, each line MUST represents only ONE tag, with
- fields of:
+If the format is ELANDMULTI, the file must be ELAND output file from
+multiple-match mode, each line MUST represents only ONE tag, with
+fields of:
 
  1. Sequence name 
  2. Sequence 
@@ -147,21 +146,21 @@ Parameters
     forward direction starting at position 170128 with two
     errors. There is also a single-error match to E_coli.fa.
 
- If the format is BAM/SAM, please check the definition in
- (http://samtools.sourceforge.net/samtools.shtml).  Pair-end mapping
- results can be saved in a single BAM file, if so, MACS will
- automatically keep the left mate(5' end) tag. However, when format
- BAMPET is specified, MACS will use the real fragments inferred from
- alignment results for reads pileup.
+If the format is BAM/SAM, please check the definition in
+(http://samtools.sourceforge.net/samtools.shtml).  Pair-end mapping
+results can be saved in a single BAM file, if so, MACS will
+automatically keep the left mate(5' end) tag. However, when format
+BAMPET is specified, MACS will use the real fragments inferred from
+alignment results for reads pileup.
 
- If the format is BOWTIE, you need to provide the ASCII bowtie output
- file with the suffix '.map'. Please note that, you need to make sure
- that in the bowtie output, you only keep one location for one
- read. Check the bowtie manual for detail if you want at
- (http://bowtie-bio.sourceforge.net/manual.shtml)
+If the format is BOWTIE, you need to provide the ASCII bowtie output
+file with the suffix '.map'. Please note that, you need to make sure
+that in the bowtie output, you only keep one location for one
+read. Check the bowtie manual for detail if you want at
+(http://bowtie-bio.sourceforge.net/manual.shtml)
 
- Here is the definition for Bowtie output in ASCII characters I copied
- from the above webpage:
+Here is the definition for Bowtie output in ASCII characters I copied
+from the above webpage:
 
  1. Name of read that aligned
  2. Orientation of read in the alignment, '-' for reverse complement, '+'
@@ -188,43 +187,43 @@ Parameters
     offset is expressed as a 0-based offset from the high-quality (5')
     end of the read.
 
- Notes:
+Notes:
 
- 1) For BED format, the 6th column of strand information is required
- by MACS. And please pay attention that the coordinates in BED format
- is zero-based and half-open
- (http://genome.ucsc.edu/FAQ/FAQtracks#tracks1).
+1) For BED format, the 6th column of strand information is required by
+MACS. And please pay attention that the coordinates in BED format is
+zero-based and half-open
+(http://genome.ucsc.edu/FAQ/FAQtracks#tracks1).
 
- 2) For plain ELAND format, only matches with match type U0, U1 or U2
- is accepted by MACS, i.e. only the unique match for a sequence with
- less than 3 errors is involed in calculation. If multiple hits of a
- single tag are included in your raw ELAND file, please remove the
- redundancy to keep the best hit for that sequencing tag.
+2) For plain ELAND format, only matches with match type U0, U1 or U2
+is accepted by MACS, i.e. only the unique match for a sequence with
+less than 3 errors is involed in calculation. If multiple hits of a
+single tag are included in your raw ELAND file, please remove the
+redundancy to keep the best hit for that sequencing tag.
 
- 3) For the experiment with several replicates, it is recommended to
- concatenate several ChIP-seq treatment files into a single file. To
- do this, under Unix/Mac or Cygwin (for windows OS), type:
+3) For the experiment with several replicates, it is recommended to
+concatenate several ChIP-seq treatment files into a single file. To
+do this, under Unix/Mac or Cygwin (for windows OS), type:
 
- ```$ cat replicate1.bed replicate2.bed replicate3.bed > all_replicates.bed```
+```$ cat replicate1.bed replicate2.bed replicate3.bed > all_replicates.bed```
 
- For BAM or SAM files, samtools can be used to combine replicates.
+For BAM or SAM files, samtools can be used to combine replicates.
 
- 4) ELAND export format support sometimes may not work on your
- datasets, because people may mislabel the 11th and 12th column. MACS
- uses 11th column as the sequence name which should be the chromosome
- names.
+4) ELAND export format support sometimes may not work on your
+datasets, because people may mislabel the 11th and 12th column. MACS
+uses 11th column as the sequence name which should be the chromosome
+names.
 
 - -g/--gsize
 
- PLEASE assign this parameter to fit your needs!
+PLEASE assign this parameter to fit your needs!
 
- It's the mappable genome size or effective genome size which is
- defined as the genome size which can be sequenced. Because of the
- repetitive features on the chromsomes, the actual mappable genome
- size will be smaller than the original size, about 90% or 70% of the
- genome size. The default hs -- 2.7e9 is recommended for UCSC human
- hg18 assembly. Here are all precompiled parameters for effective
- genome size:
+It's the mappable genome size or effective genome size which is
+defined as the genome size which can be sequenced. Because of the
+repetitive features on the chromsomes, the actual mappable genome size
+will be smaller than the original size, about 90% or 70% of the genome
+size. The default hs -- 2.7e9 is recommended for UCSC human hg18
+assembly. Here are all precompiled parameters for effective genome
+size:
 
  :hs: 2.7e9
  :mm: 1.87e9
