@@ -1,5 +1,5 @@
 # cython: profile=True
-# Time-stamp: <2012-10-18 14:26:52 Tao Liu>
+# Time-stamp: <2012-10-19 17:10:49 Tao Liu>
 
 """Module for Feature IO classes.
 
@@ -466,7 +466,7 @@ class bedGraphTrackI:
                     summit_value = tvalue
                 elif summit_value == tvalue:
                     tsummit.append( int((tend+tstart)/2) )
-                    summit = tsummit[int((len(tsummit)+1)/2)-1 ]
+            summit = tsummit[int((len(tsummit)+1)/2)-1 ]
             peaks.add( chrom,
                        peak_content[0][0],
                        peak_content[-1][1],
