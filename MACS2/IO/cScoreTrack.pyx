@@ -1,5 +1,5 @@
 # cython: profile=True
-# Time-stamp: <2012-09-25 15:00:19 Tao Liu>
+# Time-stamp: <2012-10-18 15:46:03 Tao Liu>
 
 """Module for Feature IO classes.
 
@@ -1251,7 +1251,7 @@ cdef class TwoConditionScores:
         float cutoff
         object t1bdg, c1bdg, t2bdg, c2bdg
     
-    def __init__ (self, t1bdg, c1bdg, t2bdg, c2bdg, float cond1_depth, float cond2_depth, float pseudocount = 0.01 ):
+    def __init__ (self, t1bdg, c1bdg, t2bdg, c2bdg, float cond1_depth = 1.0, float cond2_depth = 1.0, float pseudocount = 0.01 ):
         self.data = {}           # for each chromosome, there is a l*4
                                  # matrix. First column: end position
                                  # of a region; Second: treatment
@@ -1380,9 +1380,9 @@ cdef class TwoConditionScores:
         i = self.datalength[chromosome]
         c = self.data[chromosome]
         c[0][ i ] = endpos
-        c[1][ i ] = logLR( t1+self.pseudocount, c1+self.pseudocount )
-        c[2][ i ] = logLR( t2+self.pseudocount, c2+self.pseudocount )
-        c[3][ i ] = logLR( t1+self.pseudocount, t2+self.pseudocount )
+        c[1][ i ] = logLR( (t1+self.pseudocount)*self.cond1_depth, (c1+self.pseudocount)*self.cond1_depth )
+        c[2][ i ] = logLR( (t2+self.pseudocount)*self.cond2_depth, (c2+self.pseudocount)*self.cond2_depth )
+        c[3][ i ] = logLR( (t1+self.pseudocount)*self.cond1_depth, (t2+self.pseudocount)*self.cond2_depth )
         #c[4][ i ] = logLR( t2+self.pseudocount, t1+self.pseudocount )
         self.datalength[chromosome] += 1
 
