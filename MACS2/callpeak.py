@@ -1,5 +1,5 @@
 # cython: profile=True
-# Time-stamp: <2012-08-02 11:16:47 Tao Liu>
+# Time-stamp: <2012-10-03 16:00:49 Tao Liu>
 
 """Description: MACS 2 main executable
 
@@ -162,7 +162,7 @@ def run( args ):
             options.d = options.tsize
         else:
             options.d=options.shiftsize*2
-        info("#2 Use %d as shiftsize, %d as fragment length" % (options.shiftsize,options.d))
+        info("#2 Use %d as fragment length" % (options.d))
         options.scanwindow=2*options.d  # remove the effect of --bw
     else:
         try:

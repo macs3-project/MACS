@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# Time-stamp: <2012-08-10 03:25:30 Tao Liu>
+# Time-stamp: <2012-10-18 14:39:59 Tao Liu>
 
 """Description: MACS v2 main executable.
 
@@ -40,25 +40,44 @@ def main():
     args = argparser.parse_args()
     subcommand  = args.subcommand_name
     if subcommand == "callpeak":
+        # General call peak
         from MACS2.callpeak import run
         run( args )
     elif subcommand == "bdgpeakcall":
+        # call peak from bedGraph
         from MACS2.bdgpeakcall import run
         run( args )
     elif subcommand == "bdgbroadcall":
+        # call broad peak from bedGraph
         from MACS2.bdgbroadcall import run
         run( args )
     elif subcommand == "bdgcmp":
+        # compare treatment and control to make enrichment scores
         from MACS2.bdgcmp import run
         run( args )
     elif subcommand == "randsample":
+        # randomly sample sequencing reads, and save as bed file
         from MACS2.randsample import run
         run( args )
     elif subcommand == "filterdup":
+        # filter out duplicate reads, and save as bed file
         from MACS2.filterdup import run
         run( args )
     elif subcommand == "bdgdiff":
+        # differential calling
         from MACS2.bdgdiff import run
+        run( args )
+    elif subcommand == "refinepeak":
+        # refine peak summits
+        from MACS2.refinepeak import run
+        run( args )
+    elif subcommand == "predictd":
+        # predict d or fragment size
+        from MACS2.predictd import run
+        run( args )
+    elif subcommand == "pileup":
+        # pileup alignment results with a given extension method
+        from MACS2.pileup import run
         run( args )
 
 def prepare_argparser ():
@@ -77,6 +96,7 @@ def prepare_argparser ():
     
     # command for 'callpeak'
     add_callpeak_parser( subparsers )
+
     # command for 'bdgpeakcall'
     add_bdgpeakcall_parser( subparsers )
     
@@ -86,14 +106,23 @@ def prepare_argparser ():
     # command for 'bdgcmp'
     add_bdgcmp_parser( subparsers )
     
-    # command for 'randsample'
-    add_randsample_parser( subparsers )
-    
+    # command for 'bdgdiff'
+    add_bdgdiff_parser( subparsers )
+
     # command for 'filterdup'
     add_filterdup_parser( subparsers )
     
-    # command for 'bdgdiff'
-    add_bdgdiff_parser( subparsers )    
+    # command for 'predictd'
+    add_predictd_parser( subparsers )
+
+    # command for 'pileup'
+    add_pileup_parser( subparsers )    
+
+    # command for 'randsample'
+    add_randsample_parser( subparsers )
+    
+    # command for 'refinepeak'
+    add_refinepeak_parser( subparsers )
     
     return argparser
 
@@ -112,7 +141,7 @@ def add_callpeak_parser( subparsers ):
                               choices = ("AUTO", "BAM", "SAM", "BED", "ELAND",
                                          "ELANDMULTI", "ELANDEXPORT", "BOWTIE",
                                           "BAMPE"),
-                              help = "Format of tag file, \"AUTO\", \"BED\" or \"ELAND\" or \"ELANDMULTI\" or \"ELANDEXPORT\" or \"SAM\" or \"BAM\" or \"BOWTIE\" or \"BAMPE\". The default AUTO option will let MACS decide which format the file is. Please check the definition in 00README file if you choose ELAND/ELANDMULTI/ELANDEXPORT/SAM/BAM/BOWTIE. DEFAULT: \"AUTO\"",
+                              help = "Format of tag file, \"AUTO\", \"BED\" or \"ELAND\" or \"ELANDMULTI\" or \"ELANDEXPORT\" or \"SAM\" or \"BAM\" or \"BOWTIE\" or \"BAMPE\". The default AUTO option will let MACS decide which format the file is. Please check the definition in README file if you choose ELAND/ELANDMULTI/ELANDEXPORT/SAM/BAM/BOWTIE. DEFAULT: \"AUTO\"",
                               default = "AUTO" )
     group_input.add_argument( "-g", "--gsize", dest = "gsize", type = str, default = "hs",
                               help = "Effective genome size. It can be 1.0e+9 or 1000000000, or shortcuts:'hs' for human (2.7e9), 'mm' for mouse (1.87e9), 'ce' for C. elegans (9e7) and 'dm' for fruitfly (1.2e8), Default:hs" )
@@ -144,13 +173,18 @@ def add_callpeak_parser( subparsers ):
                                 help = "Select the regions within MFOLD range of high-confidence enrichment ratio against background to build model. Fold-enrichment in regions must be lower than upper limit, and higher than the lower limit. Use as \"-m 10 30\". DEFAULT:5 50" )
     
     group_bimodal.add_argument( "--fix-bimodal", dest = "onauto", action = "store_true",
-                                help = "Whether turn on the auto pair model process. If set, when MACS failed to build paired model, it will use the nomodel settings, the '--shiftsize' parameter to shift and extend each tags. Not to use this automate fixation is a default behavior now. DEFAULT: False",
+                                help = "Whether turn on the auto pair model process. If set, when MACS failed to build paired model, it will use the nomodel settings, the --exsize or --shiftsize parameter to shift and extend each tags. Not to use this automate fixation is a default behavior now. DEFAULT: False",
                                 default = False )
     group_bimodal.add_argument( "--nomodel", dest = "nomodel", action = "store_true",
-                                help = "Whether or not to build the shifting model. If True, MACS will not build model. by default it means shifting size = 100, try to set shiftsize to change it. DEFAULT: False",
+                                help = "Whether or not to build the shifting model. If True, MACS will not build model. by default it means shifting size = 100, try to set extsize or shiftsize to change it. DEFAULT: False",
                                 default = False )
-    group_bimodal.add_argument( "--shiftsize", dest = "shiftsize", type = int, default = 100,
-                                help = "The arbitrary shift size in bp. When nomodel is true, MACS will use this value as 1/2 of fragment size. DEFAULT: 100 " )
+
+    s_or_e_group = group_bimodal.add_mutually_exclusive_group() # shiftsize or extsize?
+    
+    s_or_e_group.add_argument( "--extsize", dest = "extsize", type = int, default = 200,
+                               help = "The arbitrary extension size in bp. When nomodel is true, MACS will use this value as fragment size to extend each read towards 3' end, then pile them up. It's exactly twice the number of legacy shiftsize. In previous language, each read is moved 3' direction to middle of fragment by 1/2 d, then extended to both direction with 1/2 d. This is equivalent to say each read is extended towards 3' into a d size fragment. DEFAULT: 200. --extsize and --shiftsize are mutually exclusive." )    
+    s_or_e_group.add_argument( "--shiftsize", dest = "shiftsize", type = int,
+                               help = "(Legacy) The arbitrary shift size in bp. When nomodel is true, MACS will use this value as 1/2 of fragment size. Check --extsize for more information. DEFAULT: not set. --extsize and --shiftsize are mutually exclusive." )
     
     # General options.
     group_callpeak = argparser_callpeak.add_argument_group( "Peak calling arguments" )    
@@ -188,14 +222,14 @@ def add_callpeak_parser( subparsers ):
 def add_filterdup_parser( subparsers ):
     argparser_filterdup = subparsers.add_parser( "filterdup",
                                                  help = "Remove duplicate reads at the same position, then convert acceptable format to BED format." )
-    argparser_filterdup.add_argument( "-t", dest = "tfile", type = str, required = True,
+    argparser_filterdup.add_argument( "-i", dest = "ifile", type = str, required = True,
                                       help = "Sequencing alignment file. REQUIRED." )
     argparser_filterdup.add_argument( "-o", dest = "outputfile", type = str,
                                       help = "Output BED file name. If not specified, will write to standard output. DEFAULT: stdout",
                                       default = "stdout" )
     argparser_filterdup.add_argument( "-f", "--format", dest = "format", type = str,
                                       choices=("AUTO","BAM","SAM","BED","ELAND","ELANDMULTI","ELANDEXPORT","BOWTIE"),
-                                      help = "Format of tag file, \"AUTO\", \"BED\" or \"ELAND\" or \"ELANDMULTI\" or \"ELANDEXPORT\" or \"SAM\" or \"BAM\" or \"BOWTIE\". The default AUTO option will let '%(prog)s' decide which format the file is. Please check the definition in 00README file if you choose ELAND/ELANDMULTI/ELANDEXPORT/SAM/BAM/BOWTIE. DEFAULT: \"AUTO\"",
+                                      help = "Format of tag file, \"AUTO\", \"BED\" or \"ELAND\" or \"ELANDMULTI\" or \"ELANDEXPORT\" or \"SAM\" or \"BAM\" or \"BOWTIE\". The default AUTO option will let '%(prog)s' decide which format the file is. Please check the definition in README file if you choose ELAND/ELANDMULTI/ELANDEXPORT/SAM/BAM/BOWTIE. DEFAULT: \"AUTO\"",
                                       default = "AUTO" )
     argparser_filterdup.add_argument( "-g", "--gsize", dest = "gsize", type = str, default = "hs",
                                       help = "Effective genome size. It can be 1.0e+9 or 1000000000, or shortcuts:'hs' for human (2.7e9), 'mm' for mouse (1.87e9), 'ce' for C. elegans (9e7) and 'dm' for fruitfly (1.2e8), DEFAULT:hs" )
@@ -224,8 +258,8 @@ def add_bdgpeakcall_parser( subparsers ):
                                        help = "maximum gap between significant points in a peak, better to set it as tag size. DEFAULT: 30", default = 30 )
     argparser_bdgpeakcall.add_argument( "-o", "--o-prefix", dest = "oprefix", default = "peak", type = str,
                                         help = "output file prefix, DEFAULT: peak" )
-    argparser_bdgpeakcall.add_argument( "--call-summits", dest="call_summits", action="store_true",
-                         help="If set, MACS will use a more sophisticated approach to find all summits in each enriched peak region. DEFAULT: False",default=False)
+    argparser_bdgpeakcall.add_argument( "--call-summits", dest="call_summits", action="store_true", help=ap.SUPPRESS, default=False)
+#                         help="If set, MACS will use a more sophisticated approach to find all summits in each enriched peak region. DEFAULT: False",default=False)
     argparser_bdgpeakcall.add_argument("--no-trackline", dest="trackline", action="store_false", default=True,
                          help="Tells MACS not to include trackline with bedGraph files. The trackline is required by UCSC.")
     return
@@ -291,7 +325,7 @@ def add_randsample_parser( subparsers ):
                                        help = "Tag size. This will overide the auto detected tag size. DEFAULT: Not set")
     argparser_randsample.add_argument( "-f", "--format", dest = "format", type = str,
                                        choices=("AUTO","BAM","SAM","BED","ELAND","ELANDMULTI","ELANDEXPORT","BOWTIE"),                                       
-                                       help = "Format of tag file, \"AUTO\", \"BED\" or \"ELAND\" or \"ELANDMULTI\" or \"ELANDEXPORT\" or \"SAM\" or \"BAM\" or \"BOWTIE\". The default AUTO option will %(prog)s decide which format the file is. Please check the definition in 00README file if you choose ELAND/ELANDMULTI/ELANDEXPORT/SAM/BAM/BOWTIE. DEFAULT: \"AUTO\"",
+                                       help = "Format of tag file, \"AUTO\", \"BED\" or \"ELAND\" or \"ELANDMULTI\" or \"ELANDEXPORT\" or \"SAM\" or \"BAM\" or \"BOWTIE\". The default AUTO option will %(prog)s decide which format the file is. Please check the definition in README file if you choose ELAND/ELANDMULTI/ELANDEXPORT/SAM/BAM/BOWTIE. DEFAULT: \"AUTO\"",
                                        default = "AUTO" )
     argparser_randsample.add_argument( "--verbose", dest = "verbose", type = int, default = 2,
                                        help = "Set verbose level. 0: only show critical message, 1: show additional warning message, 2: show process information, 3: show debug messages. If you want to know where are the duplicate reads, use 3. DEFAULT:2" )
@@ -319,6 +353,81 @@ def add_bdgdiff_parser( subparsers ):
     argparser_bdgdiff.add_argument( "--depth2", dest = "depth2", type = float, default = 1.0,
                                     help = "Sequence depth of condition 2 in million reads. Default: 1 (if you use 'macs2 callpeak --SPMR' to generate bdg files." )
     return
+
+def add_refinepeak_parser( subparsers ):
+    argparser_refinepeak = subparsers.add_parser( "refinepeak",
+                                                 help = "(Experimental) Take raw reads alignment, refine peak summits and give scores measuring balance of forward-backward tags. Inspired by SPP." )
+    argparser_refinepeak.add_argument( "-b", dest = "bedfile", type = str, required = True,
+                                      help = "Candidate peak file in BED format. REQUIRED." )
+    argparser_refinepeak.add_argument( "-i", dest = "ifile", type = str, required = True,
+                                      help = "Sequencing alignment file of treatment/ChIP. REQUIRED." )
+    argparser_refinepeak.add_argument( "-f", "--format", dest = "format", type = str,
+                                      choices=("AUTO","BAM","SAM","BED","ELAND","ELANDMULTI","ELANDEXPORT","BOWTIE"),
+                                      help = "Format of tag file, \"AUTO\", \"BED\" or \"ELAND\" or \"ELANDMULTI\" or \"ELANDEXPORT\" or \"SAM\" or \"BAM\" or \"BOWTIE\". The default AUTO option will let '%(prog)s' decide which format the file is. Please check the definition in README file if you choose ELAND/ELANDMULTI/ELANDEXPORT/SAM/BAM/BOWTIE. DEFAULT: \"AUTO\"",
+                                      default = "AUTO" )
+    argparser_refinepeak.add_argument( "-c", "--cutoff" , dest = "cutoff", type = float,
+                                        help = "Cutoff  DEFAULT: 5", default = 5 )
+    argparser_refinepeak.add_argument( "-w", "--window-size", dest= "windowsize", help = 'Scan window size on both side of the summit (default: 100bp)',
+                                        type = int, default = 200)
+    argparser_refinepeak.add_argument( "-o", "--o-prefix", dest = "oprefix", default = "peak", type = str,
+                                        help = "Prefix for output file, DEFAULT: peak" )
+    argparser_refinepeak.add_argument( "--verbose", dest = "verbose", type = int, default = 2,
+                                       help = "Set verbose level. 0: only show critical message, 1: show additional warning message, 2: show process information, 3: show debug messages. If you want to know where are the duplicate reads, use 3. DEFAULT:2" )
+    
+    return
+
+def add_predictd_parser( subparsers ):
+    """Add main function 'predictd' argument parsers.
+    """
+    argparser_predictd = subparsers.add_parser("predictd", help="Predict d or fragment size from alignment results. *Will NOT filter duplicates*")
+    
+    # group for input files
+    argparser_predictd.add_argument( "-i", "--ifile", dest = "ifile", type = str, required = True, nargs = "+",
+                                     help = "ChIP-seq alignment file. If multiple files are given as '-t A B C', then they will all be read and combined. Note that pair-end data is not supposed to work with this command. REQUIRED." )
+    argparser_predictd.add_argument( "-f", "--format", dest = "format", type = str,
+                                     choices = ("AUTO", "BAM", "SAM", "BED", "ELAND",
+                                                "ELANDMULTI", "ELANDEXPORT", "BOWTIE",
+                                                "BAMPE"),
+                                     help = "Format of tag file, \"AUTO\", \"BED\" or \"ELAND\" or \"ELANDMULTI\" or \"ELANDEXPORT\" or \"SAM\" or \"BAM\" or \"BOWTIE\". The default AUTO option will let MACS decide which format the file is. Please check the definition in README file if you choose ELAND/ELANDMULTI/ELANDEXPORT/SAM/BAM/BOWTIE. DEFAULT: \"AUTO\"",
+                                     default = "AUTO" )
+    argparser_predictd.add_argument( "-g", "--gsize", dest = "gsize", type = str, default = "hs",
+                                     help = "Effective genome size. It can be 1.0e+9 or 1000000000, or shortcuts:'hs' for human (2.7e9), 'mm' for mouse (1.87e9), 'ce' for C. elegans (9e7) and 'dm' for fruitfly (1.2e8), Default:hs" )
+    # group for bimodal
+    argparser_predictd.add_argument( "-s", "--tsize",  dest = "tsize", type = int, default = None,
+                                     help = "Tag size. This will overide the auto detected tag size. DEFAULT: Not set")
+    argparser_predictd.add_argument( "--bw", dest = "bw", type = int, default = 300,
+                                     help = "Band width for picking regions to compute fragment size. This value is only used while building the shifting model. DEFAULT: 300")
+    argparser_predictd.add_argument( "-m", "--mfold", dest = "mfold", type = int, default = [5,50], nargs = 2,
+                                     help = "Select the regions within MFOLD range of high-confidence enrichment ratio against background to build model. Fold-enrichment in regions must be lower than upper limit, and higher than the lower limit. Use as \"-m 10 30\". DEFAULT:5 50" )
+    # group for output files
+    argparser_predictd.add_argument( "--rfile", dest = "rfile", type = str, default = "predictd",
+                                     help = "PREFIX of filename of R script for drawing X-correlation figure. DEFAULT:'predictd' and R file will be predicted_model.R" )
+    argparser_predictd.add_argument( "--verbose", dest = "verbose", type = int, default = 2,
+                                     help = "Set verbose level of runtime message. 0: only show critical message, 1: show additional warning message, 2: show process information, 3: show debug messages. DEFAULT:2" )
+    
+    return
+
+def add_pileup_parser( subparsers ):
+    argparser_pileup = subparsers.add_parser( "pileup",
+                                              help = "Pileup aligned reads with a given extension size (fragment size or d in MACS language). Note there will be no step for duplicate reads filtering or sequencing depth scaling, so you may need to do certain pre/post-processing." )
+    argparser_pileup.add_argument( "-i", "--ifile", dest = "ifile", type = str, required = True, nargs = "+",
+                                   help = "ChIP-seq alignment file. If multiple files are given as '-t A B C', then they will all be read and combined. Note that pair-end data is not supposed to work with this command. REQUIRED." )
+    argparser_pileup.add_argument( "-o", dest = "outputfile", type = str,
+                                   help = "Output bedGraph file name. If not specified, will write to standard output. DEFAULT: stdout",
+                                   default = "stdout" )
+    argparser_pileup.add_argument( "-f", "--format", dest = "format", type = str,
+                                   choices=("AUTO","BAM","SAM","BED","ELAND","ELANDMULTI","ELANDEXPORT","BOWTIE"),
+                                   help = "Format of tag file, \"AUTO\", \"BED\" or \"ELAND\" or \"ELANDMULTI\" or \"ELANDEXPORT\" or \"SAM\" or \"BAM\" or \"BOWTIE\". The default AUTO option will let '%(prog)s' decide which format the file is. Please check the definition in README file if you choose ELAND/ELANDMULTI/ELANDEXPORT/SAM/BAM/BOWTIE. DEFAULT: \"AUTO\"",
+                                   default = "AUTO" )
+    argparser_pileup.add_argument( "-B", "--both-direction", dest = "bothdirection", action = "store_true", default = False,
+                                   help = "By default, any read will be extended towards downstream direction by extension size. So it's [0,size-1] (1-based index system) for plus strand read and [-size+1,0] for minus strand read where position 0 is 5' end of the aligned read. Default behavior can simulate MACS2 way of piling up ChIP sample reads where extension size is set as fragment size/d. If this option is set as on, aligned reads will be extended in both upstream and downstream directions by extension size. It means [-size,size] where 0 is the 5' end of a aligned read. It can partially simulate MACS2 way of piling up control reads. However MACS2 local bias is calculated by maximizing the expected pileup over a ChIP fragment size/d estimated from 10kb, 1kb, d and whole genome background. DEFAULT: False" )
+    
+    argparser_pileup.add_argument( "--extsize", dest = "extsize", type = int, default = 200,
+                                   help = "The extension size in bps. Each alignment read will become a EXTSIZE of fragment, then be piled up. Check description for -B for detail. It's twice the `shiftsize` in old MACSv1 language. DEFAULT: 200 " )
+    argparser_pileup.add_argument( "--verbose", dest = "verbose", type = int, default = 2,
+                                      help = "Set verbose level. 0: only show critical message, 1: show additional warning message, 2: show process information, 3: show debug messages. If you want to know where are the duplicate reads, use 3. DEFAULT:2" )
+    return
+
 
 if __name__ == '__main__':
     try:

@@ -1,4 +1,4 @@
-2012-04-29 Benjamin Schiller <benjamin.schiller@ucsf.edu>,  Tao Liu  <taoliu@jimmy.harvard.edu>
+2012-09-13 Benjamin Schiller <benjamin.schiller@ucsf.edu>,  Tao Liu  <taoliu@jimmy.harvard.edu>
 	MACS version 2.0.10 (tag:alpha not released)
 
 	* Introduced BAMPEParser *
@@ -9,6 +9,12 @@
 
 	* Added --no-trackline *
 	By default, files have descriptive tracklines now
+
+	* new refinepeak command (experimental)
+	This new function will use a similar method in SPP (wtd), to
+	analyze raw tag distribution in peak region, then redefine the
+	peak summit where plus and minus tags are evenly distributed
+	around.
 
 	* Changes to output *
 	cPeakDetect.pyx has full support for new print/write methods and

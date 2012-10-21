@@ -1,7 +1,7 @@
 =====================
 README for MACS (2.1)
 =====================
-Time-stamp: <2012-07-03 16:52:45 Tao Liu>
+Time-stamp: <2012-08-02 19:34:52 Tao Liu>
 
 Introduction
 ============
@@ -23,7 +23,7 @@ Install
 
 Please check the file 'INSTALL' in the distribution.
 
-Usage of macs2
+Usage of MACS2
 ==============
 
 Usage::
@@ -37,7 +37,8 @@ or example for broad peak calling: ``macs2 -t ChIP.bam -c Control.bam --broad -g
 
 There are seven major functions available in MACS serving as sub-commands.
 
-
+Call peaks
+~~~~~~~~~~
 ** Parameters:
 
 *** -t/--treatment FILENAME

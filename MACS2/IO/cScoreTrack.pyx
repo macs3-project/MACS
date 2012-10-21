@@ -1,5 +1,5 @@
 # cython: profile=True
-# Time-stamp: <2012-08-10 04:22:32 Tao Liu>
+# Time-stamp: <2012-10-18 15:46:03 Tao Liu>
 
 """Module for Feature IO classes.
 
@@ -936,7 +936,8 @@ cdef class scoreTrackII:
             for i in range( 1, l ):
                 v = value[ i ]
                 p = pos[ i-1 ]
-                if ('%.5f' % pre_v) != ('%.5f' % v): 
+                #if ('%.5f' % pre_v) != ('%.5f' % v):
+                if abs(pre_v - v) > 1e-5: # precision is 5 digits
                     write( "%s\t%d\t%d\t%.5f\n" % ( chrom, pre, p, pre_v ) )
                     pre_v = v
                     pre = p
@@ -1256,7 +1257,7 @@ cdef class TwoConditionScores:
         object t1bdg, c1bdg, t2bdg, c2bdg
         dict pvalue_stat1, pvalue_stat2, pvalue_stat3
     
-    def __init__ (self, t1bdg, c1bdg, t2bdg, c2bdg, float cond1_depth, float cond2_depth, float pseudocount = 0.01 ):
+    def __init__ (self, t1bdg, c1bdg, t2bdg, c2bdg, float cond1_depth = 1.0, float cond2_depth = 1.0, float pseudocount = 0.01 ):
         self.data = {}           # for each chromosome, there is a l*4
                                  # matrix. First column: end position
                                  # of a region; Second: treatment
@@ -1388,9 +1389,9 @@ cdef class TwoConditionScores:
         i = self.datalength[chromosome]
         c = self.data[chromosome]
         c[0][ i ] = endpos
-        c[1][ i ] = logLR( t1+self.pseudocount, c1+self.pseudocount )
-        c[2][ i ] = logLR( t2+self.pseudocount, c2+self.pseudocount )
-        c[3][ i ] = logLR( t1+self.pseudocount, t2+self.pseudocount )
+        c[1][ i ] = logLR( (t1+self.pseudocount)*self.cond1_depth, (c1+self.pseudocount)*self.cond1_depth )
+        c[2][ i ] = logLR( (t2+self.pseudocount)*self.cond2_depth, (c2+self.pseudocount)*self.cond2_depth )
+        c[3][ i ] = logLR( (t1+self.pseudocount)*self.cond1_depth, (t2+self.pseudocount)*self.cond2_depth )
         #c[4][ i ] = logLR( t2+self.pseudocount, t1+self.pseudocount )
         self.datalength[chromosome] += 1
 
@@ -1632,13 +1633,51 @@ cdef class TwoConditionScores:
             for i in range( 1, l ):
                 v = value[ i ]
                 p = pos[ i-1 ]
-                if pre_v != v: 
+                if abs(pre_v - v)>=1e-6: 
                     write( "%s\t%d\t%d\t%.5f\n" % ( chrom, pre, p, pre_v ) )
                     pre_v = v
                     pre = p
             p = pos[ -1 ]
             # last one
             write( "%s\t%d\t%d\t%.5f\n" % ( chrom, pre, p, pre_v ) )
+            
+        return True
+
+    cpdef write_matrix ( self, fhd, str name, str description ):
+        """Write all data to fhd into five columns Format:
+
+        col1: chr_start_end
+        col2: t1 vs c1
+        col3: t2 vs c2
+        col4: t1 vs t2
+        col5: t2 vs t1
+
+        fhd: a filehandler to save the matrix.
+
+        """
+        cdef:
+            str chrom
+            int l, pre, i, p 
+            float v1, v2, v3, v4
+            np.ndarray pos, value
+
+        write = fhd.write
+
+        chrs = self.get_chr_names()
+        for chrom in chrs:
+            pos = self.data[ chrom ][ 0 ]
+            value = self.data[ chrom ][ column ]
+            l = self.datalength[ chrom ]
+            pre = 0
+            if pos.shape[ 0 ] == 0: continue # skip if there's no data
+            for i in range( 0, l ):
+                v1 = self.data[ i ][ 1 ]
+                v2 = self.data[ i ][ 2 ]
+                v3 = self.data[ i ][ 3 ]
+                v4 = self.data[ i ][ 4 ]                
+                p = pos[ i ]
+                write( "%s:%d_%d\t%.5f\t%.5f\t%.5f\t%.5f\n" % ( chrom, pre, p, v1, v2, v3, v4 ) )
+                pre = p
             
         return True
 
@@ -1667,9 +1706,9 @@ cdef class TwoConditionScores:
             list peak_content
         
         chrs  = self.get_chr_names()
-        cat1_peaks = PeakIO()       # dictionary to save peaks
-        cat2_peaks = PeakIO()       # dictionary to save peaks
-        cat3_peaks = PeakIO()       # dictionary to save peaks
+        cat1_peaks = PeakIO()       # dictionary to save peaks significant at condition 1
+        cat2_peaks = PeakIO()       # dictionary to save peaks significant at condition 2
+        cat3_peaks = PeakIO()       # dictionary to save peaks significant in both conditions
         #cat4_peaks = PeakIO()       # dictionary to save peaks        
 
         self.cutoff = cutoff

@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# Time-stamp: <2012-08-01 18:28:05 Tao Liu>
+# Time-stamp: <2012-09-14 06:15:35 Tao Liu>
 
 """Description
 
@@ -56,14 +56,14 @@ def main():
                    ]
     
     setup(name="MACS2",
-          version="2.0.10.08012012",
+          version="2.0.10.09132012",
           description="Model Based Analysis for ChIP-Seq data",
           author='Tao Liu',
           author_email='vladimir.liu@gmail.com',
           url='http://github.com/taoliu/MACS/',
           package_dir={'MACS2' : 'MACS2'},
-          packages=['MACS2', 'MACS2.IO', 'MACS2.data'],
-          package_data={'MACS2': ['data/*.dat']},          
+          packages=['MACS2', 'MACS2.IO'],#, 'MACS2.data'],
+          #package_data={'MACS2': ['data/*.dat']},          
           scripts=['bin/macs2',
                    ],
           classifiers=[

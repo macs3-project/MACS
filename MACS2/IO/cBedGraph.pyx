@@ -1,5 +1,5 @@
 # cython: profile=True
-# Time-stamp: <2012-08-01 18:09:13 Tao Liu>
+# Time-stamp: <2012-10-19 17:10:49 Tao Liu>
 
 """Module for Feature IO classes.
 
@@ -228,7 +228,7 @@ class bedGraphTrackI:
             str chrom
         
         if trackline:
-            trackcontents = (name.replace("\"", "\\\""), desc.replace("\"", "\\\""))
+            trackcontents = (name.replace("\"", "\\\""), description.replace("\"", "\\\""))
             fhd.write("track type=bedGraph name=\"%s\" description=\"%s\" visibility=2 alwaysZero=on\n" % trackcontents)
         chrs = self.get_chr_names()
         for chrom in chrs:
@@ -466,17 +466,17 @@ class bedGraphTrackI:
                     summit_value = tvalue
                 elif summit_value == tvalue:
                     tsummit.append( int((tend+tstart)/2) )
-                    summit = tsummit[int((len(tsummit)+1)/2)-1 ]
-                    peaks.add( chrom,
-                               peak_content[0][0],
-                               peak_content[-1][1],
-                               summit      = summit,
-                               peak_score  = summit_value,
-                               pileup      = 0,
-                               pscore      = 0,
-                               fold_change = 0,
-                               qscore      = 0
-                               )
+            summit = tsummit[int((len(tsummit)+1)/2)-1 ]
+            peaks.add( chrom,
+                       peak_content[0][0],
+                       peak_content[-1][1],
+                       summit      = summit,
+                       peak_score  = summit_value,
+                       pileup      = 0,
+                       pscore      = 0,
+                       fold_change = 0,
+                       qscore      = 0
+                       )
             return True
                     
    
