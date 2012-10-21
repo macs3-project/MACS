@@ -1721,13 +1721,9 @@ cdef class TwoConditionScores:
             t1vst2 = self.data[chrom][ 3 ]
 
             logcutoff = -log10(cutoff)
-            print "Log-Cutoff:", logcutoff
             cond1_sig = t1vsc1 >= logcutoff
             cond2_sig = t2vsc2 >= logcutoff
             cond1_sig_cond2 = t1vst2 >= logcutoff
-            print np.where(cond1_sig)[0]
-            print np.where(cond2_sig)[0]
-            print np.where(cond1_sig_cond2)[0]
 
             and_ = np.logical_and
             not_ = np.logical_not
