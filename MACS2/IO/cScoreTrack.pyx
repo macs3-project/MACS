@@ -23,10 +23,15 @@ cimport numpy as np
 
 from array import array as pyarray
 
+from operator import itemgetter
+
 from cpython cimport bool
 #from scipy.signal import fftconvolve
 from MACS2.cSignal import maxima, enforce_valleys, enforce_peakyness
 #np_convolve = np.convolve
+
+# Experimental
+from scipy.stats import chi2
 
 from libc.math cimport log10,log
 
@@ -714,7 +719,7 @@ cdef class scoreTrackII:
         self.scoring_method = 'q'
         return
 
-    cdef dict make_pq_table ( self ):
+    cpdef dict make_pq_table ( self ):
         """Make pvalue-qvalue table.
 
         Step1: get all pvalue and length of block with this pvalue
@@ -1249,6 +1254,7 @@ cdef class TwoConditionScores:
         float pseudocount                # the pseudocount used to calcuate LLR
         float cutoff
         object t1bdg, c1bdg, t2bdg, c2bdg
+        dict pvalue_stat1, pvalue_stat2, pvalue_stat3
     
     def __init__ (self, t1bdg, c1bdg, t2bdg, c2bdg, float cond1_depth, float cond2_depth, float pseudocount = 0.01 ):
         self.data = {}           # for each chromosome, there is a l*4
@@ -1263,6 +1269,9 @@ cdef class TwoConditionScores:
         self.cond1_depth = cond1_depth
         self.cond2_depth = cond2_depth
         self.pseudocount = pseudocount
+        self.pvalue_stat1 = {}
+        self.pvalue_stat2 = {}
+        self.pvalue_stat3 = {}
         self.t1bdg = t1bdg
         self.c1bdg = c1bdg
         self.t2bdg = t2bdg
@@ -1402,6 +1411,157 @@ cdef class TwoConditionScores:
             d[2].resize( l, refcheck = False )
             d[3].resize( l, refcheck = False )            
         return
+    
+    cpdef compute_pvalue( self ):
+        """Compute -log_{10}(pvalue)
+        """
+        cdef:
+            np.ndarray[np.float32_t] v1, v2, v3
+            np.ndarray[np.int32_t] pos
+            long l, i, prev_pos
+            str chrom
+        rv = chi2(1) # a chi-squared distribution with one degree of freedom
+        sf = rv.sf
+        log10 = np.log10
+        for chrom in self.data.keys():
+            prev_pos = 0
+            pos = self.data[chrom][0]
+            l = self.datalength[chrom]
+            self.data[chrom][1] = -log10(sf(2 * self.data[chrom][1] / LOG10_E)).astype('float32')
+            self.data[chrom][2] = -log10(sf(2 * self.data[chrom][2] / LOG10_E)).astype('float32')
+            self.data[chrom][3] = -log10(sf(2 * np.abs(self.data[chrom][3]) / LOG10_E)).astype('float32')
+            v1 = self.data[chrom][1]
+            v2 = self.data[chrom][2]
+            v3 = self.data[chrom][3]
+            for i in range(l):
+                try:
+                    self.pvalue_stat1[v1[ i ]] += pos[ i ] - prev_pos
+                except:
+                    self.pvalue_stat1[v1[ i ]] = pos[ i ] - prev_pos
+                try:
+                    self.pvalue_stat2[v2[ i ]] += pos[ i ] - prev_pos
+                except:
+                    self.pvalue_stat2[v2[ i ]] = pos[ i ] - prev_pos
+                try:
+                    self.pvalue_stat3[v3[ i ]] += pos[ i ] - prev_pos
+                except:
+                    self.pvalue_stat3[v3[ i ]] = pos[ i ] - prev_pos
+                prev_pos = pos[ i ]
+            
+    cpdef compute_qvalue ( self ):
+        """Compute -log_{10}(qvalue)
+        """
+        cdef:
+            dict pqtable
+            tuple pqtables
+            long i,l,j
+            double k
+            str chrom
+            np.ndarray p, c, v
+            
+        # make pqtables
+        # not sure if we should pool all the p-values or treat each comparison
+        # separately, but doing the latter for now
+        pqtables = self.make_pq_tables()
+        
+        # convert p to q
+
+        # convert pvalue2qvalue to a simple dict based on khash
+        # khash has big advantage while checking keys for millions of times.
+        for table_index in range(3):
+            pqtable = pqtables[table_index]
+            s_p2q = Float64HashTable()
+            for k in pqtable.keys():
+                s_p2q.set_item(k,pqtable[k])
+    
+            g = s_p2q.get_item
+            
+            for chrom in self.data.keys():
+                v = self.data[chrom][table_index + 1]
+                l = self.datalength[chrom]
+                for i in range(l):
+                    v[ i ] =  g( v[ i ])
+        
+        return
+
+    # borrowed from CombinedTwoTrack
+    cdef tuple make_pq_tables ( self ):
+        """Make pvalue-qvalue table.
+
+        Step1: get all pvalue and length of block with this pvalue
+        Step2: Sort them
+        Step3: Apply AFDR method to adjust pvalue and get qvalue for each pvalue
+
+        Return a dictionary of {-log10pvalue:(-log10qvalue,rank,basepairs)} relationships.
+        """
+        cdef:
+            long pre_l, l, i
+            double pre_v, v, q, pre_q
+            long N, k
+            double f
+            str chrom
+            dict pvalue2qvalue1, pvalue2qvalue2, pvalue2qvalue3
+            dict value_dict
+            list unique_values
+
+        value_dict = self.pvalue_stat1
+        N = sum(value_dict.values())
+        k = 1                           # rank
+        f = -log10(N)
+        pre_v = -2147483647
+        pre_l = 0
+        pre_q = 2147483647              # save the previous q-value
+        pvalue2qvalue1 = {}#Float64HashTable()
+        unique_values = sorted(value_dict.keys(), reverse=True) #sorted(unique_values,reverse=True)
+        for i in range(len(unique_values)):
+            v = unique_values[i]
+            l = value_dict[v]
+            q = v + (log10(k) + f)
+            q = max(0,min(pre_q,q))           # make q-score monotonic
+            pvalue2qvalue1[ v ] = q
+            pre_v = v
+            pre_q = q
+            k+=l
+            
+        value_dict = self.pvalue_stat2
+        N = sum(value_dict.values())
+        k = 1                           # rank
+        f = -log10(N)
+        pre_v = -2147483647
+        pre_l = 0
+        pre_q = 2147483647              # save the previous q-value
+        pvalue2qvalue2 = {}#Float64HashTable()
+        unique_values = sorted(value_dict.keys(), reverse=True) #sorted(unique_values,reverse=True)
+        for i in range(len(unique_values)):
+            v = unique_values[i]
+            l = value_dict[v]
+            q = v + (log10(k) + f)
+            q = max(0,min(pre_q,q))           # make q-score monotonic
+            pvalue2qvalue2[ v ] = q
+            pre_v = v
+            pre_q = q
+            k+=l
+ 
+        value_dict = self.pvalue_stat3
+        N = sum(value_dict.values())
+        k = 1                           # rank
+        f = -log10(N)
+        pre_v = -2147483647
+        pre_l = 0
+        pre_q = 2147483647              # save the previous q-value
+        pvalue2qvalue3 = {}#Float64HashTable()
+        unique_values = sorted(value_dict.keys(), reverse=True) #sorted(unique_values,reverse=True)
+        for i in range(len(unique_values)):
+            v = unique_values[i]
+            l = value_dict[v]
+            q = v + (log10(k) + f)
+            q = max(0,min(pre_q,q))           # make q-score monotonic
+            pvalue2qvalue3[ v ] = q
+            pre_v = v
+            pre_q = q
+            k+=l
+            
+        return (pvalue2qvalue1, pvalue2qvalue2, pvalue2qvalue3) 
 
     # cpdef sort ( self, int column = 1 ):
     #     """ Sort data for each chromosome, by certain column.
@@ -1482,7 +1642,8 @@ cdef class TwoConditionScores:
             
         return True
 
-    cpdef call_peaks (self, float cutoff=3.0, int min_length=200, int max_gap=0, bool call_summits=False):
+    cpdef call_peaks (self, float cutoff=0.05, int min_length=200,
+                      int max_gap=0, bool call_summits=False):
         """This function try to find regions within which, scores
         are continuously higher than a given cutoff.
 
@@ -1500,7 +1661,9 @@ cdef class TwoConditionScores:
         cdef:
             int i
             str chrom
-            np.ndarray pos, sample, control, value, above_cutoff, above_cutoff_v, above_cutoff_endpos, above_cutoff_startpos, above_cutoff_sv
+            np.ndarray pos, sample, control, value, above_cutoff, \
+                       above_cutoff_v, above_cutoff_endpos, \
+                       above_cutoff_startpos, above_cutoff_sv
             list peak_content
         
         chrs  = self.get_chr_names()
@@ -1518,18 +1681,24 @@ cdef class TwoConditionScores:
             t2vsc2 = self.data[chrom][ 2 ]            
             t1vst2 = self.data[chrom][ 3 ]
 
-            cond1_sig = t1vsc1 >= cutoff
-            cond2_sig = t2vsc2 >= cutoff
-            cond1_sig_cond2 = t1vst2 >= cutoff
-            cond2_sig_cond1 = t1vst2 <= -1*cutoff
+            logcutoff = -log10(cutoff)
+            print "Log-Cutoff:", logcutoff
+            cond1_sig = t1vsc1 >= logcutoff
+            cond2_sig = t2vsc2 >= logcutoff
+            cond1_sig_cond2 = t1vst2 >= logcutoff
+            print np.where(cond1_sig)[0]
+            print np.where(cond2_sig)[0]
+            print np.where(cond1_sig_cond2)[0]
 
-            #cat1_above_cutoff = np.nonzero( cond1_sig & (1-cond2_sig) & cond1_sig_cond2 )[0] # indices where score is above cutoff
-            cat1_above_cutoff = np.nonzero( cond1_sig & cond1_sig_cond2 )[0] # indices where score is above cutoff
-            #cat2_above_cutoff = np.nonzero( cond2_sig & (1-cond1_sig) & cond2_sig_cond1 )[0] # indices where score is above cutoff
-            cat2_above_cutoff = np.nonzero( cond2_sig & cond2_sig_cond1 )[0] # indices where score is above cutoff
-            cat3_above_cutoff = np.nonzero( cond1_sig & cond2_sig & (1-cond1_sig_cond2) & (1-cond2_sig_cond1) )[0] # indices where score is above cutoff
-            #cat4_above_cutoff = np.nonzero( cond1_sig & cond2_sig & cond2_sig_cond1 )[0] # indices where score is above cutoff            
-
+            and_ = np.logical_and
+            not_ = np.logical_not
+            # indices where score is above cutoff
+            cat1_above_cutoff = np.where(and_(and_(cond1_sig, not_(cond2_sig)),
+                                              cond1_sig_cond2))[0]
+            cat2_above_cutoff = np.where(and_(and_(cond2_sig, not_(cond1_sig)),
+                                              cond1_sig_cond2))[0]
+            cat3_above_cutoff = np.where(and_(and_(cond1_sig, cond2_sig),
+                                              cond1_sig_cond2))[0]
             cat1_above_cutoff_endpos = pos[cat1_above_cutoff] # end positions of regions where score is above cutoff
             cat1_above_cutoff_startpos = pos[cat1_above_cutoff-1] # start positions of regions where score is above cutoff
             cat2_above_cutoff_endpos = pos[cat2_above_cutoff] # end positions of regions where score is above cutoff
@@ -1539,24 +1708,28 @@ cdef class TwoConditionScores:
             #cat4_above_cutoff_endpos = pos[cat4_above_cutoff] # end positions of regions where score is above cutoff
             #cat4_above_cutoff_startpos = pos[cat4_above_cutoff-1] # start positions of regions where score is above cutoff            
 
+            # should we actually save these statistics???
+
             if cat1_above_cutoff_startpos.size > 0:
+                qscores = t1vst2[cat1_above_cutoff]
                 peak_content = []
                 # cat 1 is not empty
                 if cat1_above_cutoff[0] == 0:
                     # first element > cutoff, fix the first point as 0. otherwise it would be the last item in data[chrom]['pos']
                     cat1_above_cutoff_startpos[0] = 0
                 # first bit of region above cutoff
-                peak_content.append( (cat1_above_cutoff_startpos[0], cat1_above_cutoff_endpos[0]) )
+                peak_content.append( (cat1_above_cutoff_startpos[0], cat1_above_cutoff_endpos[0], qscores[0]) )
                 for i in range( 1, cat1_above_cutoff_startpos.size ):
                     if cat1_above_cutoff_startpos[i] - peak_content[-1][1] <= max_gap:
                         # append
-                        peak_content.append( (cat1_above_cutoff_startpos[i], cat1_above_cutoff_endpos[i] ) )
+                        peak_content.append( (cat1_above_cutoff_startpos[i], cat1_above_cutoff_endpos[i], qscores[i] ) )
                     else:
                         # close
                         if peak_content[ -1 ][ 1 ] - peak_content[ 0 ][ 0 ] >= min_length:
+                            best_qscore = min(map(itemgetter(2), peak_content))
                             cat1_peaks.add( chrom, peak_content[0][0], peak_content[-1][1],
                                             summit = -1, peak_score  = 0, pileup = 0, pscore = 0, 
-                                            fold_change = 0, qscore = 0,
+                                            fold_change = 0, qscore = best_qscore,
                                             )
                         peak_content = [(cat1_above_cutoff_startpos[i], cat1_above_cutoff_endpos[i]),]
                 # save the last peak
@@ -1564,99 +1737,78 @@ cdef class TwoConditionScores:
                     continue
                 else:
                     if peak_content[ -1 ][ 1 ] - peak_content[ 0 ][ 0 ] >= min_length:                    
+                        best_qscore = min(map(itemgetter(2), peak_content))
                         cat1_peaks.add( chrom, peak_content[0][0], peak_content[-1][1],
                                         summit = -1, peak_score  = 0, pileup = 0, pscore = 0, 
-                                        fold_change = 0, qscore = 0, 
+                                        fold_change = 0, qscore = best_qscore, 
                                         )
             if cat2_above_cutoff_startpos.size > 0:
+                qscores = t1vst2[cat2_above_cutoff]
                 peak_content = []
                 # cat 1 is not empty
                 if cat2_above_cutoff[0] == 0:
                     # first element > cutoff, fix the first point as 0. otherwise it would be the last item in data[chrom]['pos']
                     cat2_above_cutoff_startpos[0] = 0
                 # first bit of region above cutoff
-                peak_content.append( (cat2_above_cutoff_startpos[0], cat2_above_cutoff_endpos[0]) )
+                peak_content.append( (cat2_above_cutoff_startpos[0], cat2_above_cutoff_endpos[0], qscores[0]) )
                 for i in range( 1, cat2_above_cutoff_startpos.size ):
                     if cat2_above_cutoff_startpos[i] - peak_content[-1][1] <= max_gap:
                         # append
-                        peak_content.append( (cat2_above_cutoff_startpos[i], cat2_above_cutoff_endpos[i] ) )
+                        peak_content.append( (cat2_above_cutoff_startpos[i], cat2_above_cutoff_endpos[i], qscores[i] ) )
                     else:
                         # close
                         if peak_content[ -1 ][ 1 ] - peak_content[ 0 ][ 0 ] >= min_length:                        
+                            best_qscore = min(map(itemgetter(2), peak_content))
                             cat2_peaks.add( chrom, peak_content[0][0], peak_content[-1][1],
                                             summit = -1, peak_score  = 0, pileup = 0, pscore = 0, 
-                                            fold_change = 0, qscore = 0, 
+                                            fold_change = 0, qscore = best_qscore, 
                                             )
-                        peak_content = [(cat2_above_cutoff_startpos[i], cat2_above_cutoff_endpos[i]),]
+                        peak_content = [(cat2_above_cutoff_startpos[i], cat2_above_cutoff_endpos[i], qscores[i]),]
                 # save the last peak
                 if not peak_content:
                     continue
                 else:
                     if peak_content[ -1 ][ 1 ] - peak_content[ 0 ][ 0 ] >= min_length:                    
+                        best_qscore = min(map(itemgetter(2), peak_content))
                         cat2_peaks.add( chrom, peak_content[0][0], peak_content[-1][1],
                                         summit = -1, peak_score  = 0, pileup = 0, pscore = 0, 
-                                        fold_change = 0, qscore = 0, 
+                                        fold_change = 0, qscore = best_qscore, 
                                         )
+
             if cat3_above_cutoff_startpos.size > 0:
+                qscores = t1vst2[cat3_above_cutoff]
                 peak_content = []
                 # cat 1 is not empty
                 if cat3_above_cutoff[0] == 0:
                     # first element > cutoff, fix the first point as 0. otherwise it would be the last item in data[chrom]['pos']
                     cat3_above_cutoff_startpos[0] = 0
                 # first bit of region above cutoff
-                peak_content.append( (cat3_above_cutoff_startpos[0], cat3_above_cutoff_endpos[0]) )
+                peak_content.append( (cat3_above_cutoff_startpos[0], cat3_above_cutoff_endpos[0], qscores[0]) )
                 for i in range( 1, cat3_above_cutoff_startpos.size ):
                     if cat3_above_cutoff_startpos[i] - peak_content[-1][1] <= max_gap:
                         # append
-                        peak_content.append( (cat3_above_cutoff_startpos[i], cat3_above_cutoff_endpos[i] ) )
+                        peak_content.append( (cat3_above_cutoff_startpos[i], cat3_above_cutoff_endpos[i], qscores[i] ) )
                     else:
                         # close
                         if peak_content[ -1 ][ 1 ] - peak_content[ 0 ][ 0 ] >= min_length:                        
+                            best_qscore = min(map(itemgetter(2), peak_content))
                             cat3_peaks.add( chrom, peak_content[0][0], peak_content[-1][1],
                                             summit = -1, peak_score  = 0, pileup = 0, pscore = 0, 
-                                            fold_change = 0, qscore = 0, 
+                                            fold_change = 0, qscore = best_qscore, 
                                             )
-                        peak_content = [(cat3_above_cutoff_startpos[i], cat3_above_cutoff_endpos[i]),]
+                        peak_content = [(cat3_above_cutoff_startpos[i], cat3_above_cutoff_endpos[i], qscores[i]),]
                 # save the last peak
                 if not peak_content:
                     continue
                 else:
                     if peak_content[ -1 ][ 1 ] - peak_content[ 0 ][ 0 ] >= min_length:
+                        best_qscore = min(map(itemgetter(2), peak_content))
                         cat3_peaks.add( chrom, peak_content[0][0], peak_content[-1][1],
                                         summit = -1, peak_score  = 0, pileup = 0, pscore = 0, 
-                                        fold_change = 0, qscore = 0, 
+                                        fold_change = 0, qscore = best_qscore, 
                                         )
-            # if cat4_above_cutoff_startpos.size > 0:
-            #     peak_content = []
-            #     # cat 1 is not empty
-            #     if cat4_above_cutoff[0] == 0:
-            #         # first element > cutoff, fix the first point as 0. otherwise it would be the last item in data[chrom]['pos']
-            #         cat4_above_cutoff_startpos[0] = 0
-            #     # first bit of region above cutoff
-            #     peak_content.append( (cat4_above_cutoff_startpos[0], cat4_above_cutoff_endpos[0]) )
-            #     for i in range( 1, cat4_above_cutoff_startpos.size ):
-            #         if cat4_above_cutoff_startpos[i] - peak_content[-1][1] <= max_gap:
-            #             # append
-            #             peak_content.append( (cat4_above_cutoff_startpos[i], cat4_above_cutoff_endpos[i] ) )
-            #         else:
-            #             # close
-            #             if peak_content[ -1 ][ 1 ] - peak_content[ 0 ][ 0 ] >= min_length:                        
-            #                 cat4_peaks.add( chrom, peak_content[0][0], peak_content[-1][1],
-            #                                 summit = -1, peak_score  = 0, pileup = 0, pscore = 0, 
-            #                                 fold_change = 0, qscore = 0, 
-            #                                 )
-            #             peak_content = [(cat4_above_cutoff_startpos[i], cat4_above_cutoff_endpos[i]),]
-            #     # save the last peak
-            #     if not peak_content:
-            #         continue
-            #     else:
-            #         if peak_content[ -1 ][ 1 ] - peak_content[ 0 ][ 0 ] >= min_length:
-            #             cat4_peaks.add( chrom, peak_content[0][0], peak_content[-1][1],
-            #                             summit = -1, peak_score  = 0, pileup = 0, pscore = 0, 
-            #                             fold_change = 0, qscore = 0, 
-            #                             )
 
-        return cat1_peaks, cat2_peaks, cat3_peaks#, cat4_peaks
+        return cat1_peaks, cat2_peaks, cat3_peaks
 
     cdef long total ( self ):
         """Return the number of regions in this object.

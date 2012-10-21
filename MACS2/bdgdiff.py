@@ -79,6 +79,8 @@ def run( options ):
                                                         depth2 )
     twoconditionscore.build()
     twoconditionscore.finalize()
+    twoconditionscore.compute_pvalue()
+    twoconditionscore.compute_qvalue()
     #(cat1,cat2,cat3,cat4) = twoconditionscore.call_peaks(min_length=options.minlen, cutoff=options.cutoff)
     (cat1,cat2,cat3) = twoconditionscore.call_peaks(min_length=options.minlen, cutoff=options.cutoff)
 
