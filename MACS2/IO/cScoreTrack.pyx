@@ -1766,7 +1766,7 @@ cdef class TwoConditionScores:
                                             summit = -1, peak_score  = 0, pileup = 0, pscore = 0, 
                                             fold_change = 0, qscore = best_qscore,
                                             )
-                        peak_content = [(cat1_above_cutoff_startpos[i], cat1_above_cutoff_endpos[i]),]
+                        peak_content = [(cat1_above_cutoff_startpos[i], cat1_above_cutoff_endpos[i], qscores[i]),]
                 # save the last peak
                 if not peak_content:
                     continue
