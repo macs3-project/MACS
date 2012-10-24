@@ -86,7 +86,7 @@ cdef inline double get_pscore ( int observed, double expectation ):
 
 logLR_khashtable = Int64HashTable()
 
-cdef inline double logLR ( double x, double y ):
+cdef inline double oldlogLR ( double x, double y ):
     """Calculate log10 Likelihood between H1 ( enriched ) and H0 (
     chromatin bias ). Then store the values in integer form =
     100*logLR. Set minus sign for depletion.
@@ -106,6 +106,30 @@ cdef inline double logLR ( double x, double y ):
             s = (x*(-log(x)+log(y))-y+x)*LOG10_E
         else:
             s = 0
+        logLR_khashtable.set_item(key_value, s)
+        return s
+
+cdef inline double logLR ( double x, double y ):
+    """Calculate log10 Likelihood between H1 ( enriched ) and H0 (
+    chromatin bias ). Then store the values in integer form =
+    100*logLR. Set minus sign for depletion.
+    
+    """
+    cdef:
+        double s
+        long key_value
+    
+    key_value = hash( (x, y ) )
+    try:
+        return logLR_khashtable.get_item( key_value )
+    except KeyError:
+        if x==y:
+            s = 0
+        elif y > x:
+            y, x = x, y
+            s = -(x*(log(x)-log(y))+y-x)*LOG10_E
+        else:
+            s = (x*(log(x)-log(y))+y-x)*LOG10_E
         logLR_khashtable.set_item(key_value, s)
         return s
 
@@ -1272,7 +1296,6 @@ cdef class TwoConditionScores:
         self.pseudocount = pseudocount
         self.pvalue_stat1 = {}
         self.pvalue_stat2 = {}
-        self.pvalue_stat3 = {}
         self.t1bdg = t1bdg
         self.c1bdg = c1bdg
         self.t2bdg = t2bdg
@@ -1413,7 +1436,7 @@ cdef class TwoConditionScores:
             d[3].resize( l, refcheck = False )            
         return
     
-    cpdef compute_pvalue( self ):
+    cpdef compute_all_pvalues( self ):
         """Compute -log_{10}(pvalue)
         """
         cdef:
@@ -1443,13 +1466,9 @@ cdef class TwoConditionScores:
                     self.pvalue_stat2[v2[ i ]] += pos[ i ] - prev_pos
                 except:
                     self.pvalue_stat2[v2[ i ]] = pos[ i ] - prev_pos
-                try:
-                    self.pvalue_stat3[v3[ i ]] += pos[ i ] - prev_pos
-                except:
-                    self.pvalue_stat3[v3[ i ]] = pos[ i ] - prev_pos
                 prev_pos = pos[ i ]
             
-    cpdef compute_qvalue ( self ):
+    cpdef compute_track_qvalues ( self ):
         """Compute -log_{10}(qvalue)
         """
         cdef:
@@ -1469,7 +1488,7 @@ cdef class TwoConditionScores:
 
         # convert pvalue2qvalue to a simple dict based on khash
         # khash has big advantage while checking keys for millions of times.
-        for table_index in range(3):
+        for table_index in range(2):
             pqtable = pqtables[table_index]
             s_p2q = Float64HashTable()
             for k in pqtable.keys():
@@ -1484,6 +1503,73 @@ cdef class TwoConditionScores:
                     v[ i ] =  g( v[ i ])
         
         return
+
+    cpdef compute_category_qvalues ( self, dict category ):
+        """Compute -log_{10}(qvalue)
+        """
+        cdef:
+            dict value_dict, pqtable
+            list unique_values
+            long i,l,j
+            np.ndarray p, c, v, data
+            long pre_l
+            double pre_v, unique_v, q, pre_q
+            long N, k
+            double f, pvalue
+        
+        # make pqtable for category
+        value_dict = {}
+        for chrom in self.data.keys():
+            if category[chrom].size == 0: continue
+
+            pos = self.data[chrom][0]
+            data = self.data[chrom][3]
+            for j in range(category[chrom].size):
+                i = category[chrom][j]
+                try:
+                    value_dict[data[i]] += pos[i + 1] - pos[i]
+                except IndexError:
+                    if not value_dict.has_key(data[i]):
+                        value_dict[data[i]] = 0
+                except KeyError:
+                    value_dict[data[i]] = pos[i + 1] - pos[i]
+
+        N = sum(value_dict.values())
+        k = 1                           # rank
+        f = -log10(N)
+        pre_v = -2147483647
+        pre_l = 0
+        pre_q = 2147483647              # save the previous q-value
+        pqtable = {}#Float64HashTable()
+        unique_values = sorted(value_dict.keys(), reverse=True) #sorted(unique_values,reverse=True)
+        for i in range(len(unique_values)):
+            unique_v = unique_values[i]
+            l = value_dict[unique_v]
+            q = unique_v + (log10(k) + f)
+            q = max(0,min(pre_q,q))           # make q-score monotonic
+            pqtable[ unique_v ] = q
+            pre_v = unique_v
+            pre_q = q
+            k+=l
+        
+        # convert p to q
+
+        # convert pvalue2qvalue to a simple dict based on khash
+        # khash has big advantage while checking keys for millions of times.
+        s_p2q = Float64HashTable()
+        for pvalue in pqtable.keys():
+            s_p2q.set_item(pvalue,pqtable[pvalue])
+
+        g = s_p2q.get_item
+        
+        qvalues = {}
+        for chrom in self.data.keys():
+            v = self.data[chrom][3][category[chrom]]
+            qvalues[chrom] = v.copy()
+            for i in range(v.size):
+                qvalues[chrom][ i ] =  g( v[ i ])
+        
+        return qvalues
 
     # borrowed from CombinedTwoTrack
     cdef tuple make_pq_tables ( self ):
@@ -1501,7 +1587,7 @@ cdef class TwoConditionScores:
             long N, k
             double f
             str chrom
-            dict pvalue2qvalue1, pvalue2qvalue2, pvalue2qvalue3
+            dict pvalue2qvalue1, pvalue2qvalue2
             dict value_dict
             list unique_values
 
@@ -1543,26 +1629,7 @@ cdef class TwoConditionScores:
             pre_q = q
             k+=l
  
-        value_dict = self.pvalue_stat3
-        N = sum(value_dict.values())
-        k = 1                           # rank
-        f = -log10(N)
-        pre_v = -2147483647
-        pre_l = 0
-        pre_q = 2147483647              # save the previous q-value
-        pvalue2qvalue3 = {}#Float64HashTable()
-        unique_values = sorted(value_dict.keys(), reverse=True) #sorted(unique_values,reverse=True)
-        for i in range(len(unique_values)):
-            v = unique_values[i]
-            l = value_dict[v]
-            q = v + (log10(k) + f)
-            q = max(0,min(pre_q,q))           # make q-score monotonic
-            pvalue2qvalue3[ v ] = q
-            pre_v = v
-            pre_q = q
-            k+=l
-            
-        return (pvalue2qvalue1, pvalue2qvalue2, pvalue2qvalue3) 
+        return (pvalue2qvalue1, pvalue2qvalue2) 
 
     # cpdef sort ( self, int column = 1 ):
     #     """ Sort data for each chromosome, by certain column.
@@ -1703,6 +1770,7 @@ cdef class TwoConditionScores:
             np.ndarray pos, sample, control, value, above_cutoff, \
                        above_cutoff_v, above_cutoff_endpos, \
                        above_cutoff_startpos, above_cutoff_sv
+            np.ndarray[np.float32_t] cat1_qvalues, cat2_qvalues, cat3_qvalues
             list peak_content
         
         chrs  = self.get_chr_names()
@@ -1712,28 +1780,47 @@ cdef class TwoConditionScores:
         #cat4_peaks = PeakIO()       # dictionary to save peaks        
 
         self.cutoff = cutoff
+        logcutoff = -log10(cutoff)
+        cat1 = {}
+        cat2 = {}
+        cat3 = {}
+        cat1_qvalues_by_chrom = {}
+        cat2_qvalues_by_chrom = {}
+        cat3_qvalues_by_chrom = {}
+        for chrom in chrs:
+            t1vsc1 = self.data[chrom][ 1 ]
+            t2vsc2 = self.data[chrom][ 2 ]            
+            and_ = np.logical_and
+            not_ = np.logical_not
+            cond1_sig = t1vsc1 >= logcutoff
+            cond2_sig = t2vsc2 >= logcutoff
+            # indices where score is above cutoff
+            cat1[chrom] = np.where(and_(cond1_sig,       not_(cond2_sig)))[0]
+            cat2[chrom] = np.where(and_(not_(cond1_sig), cond2_sig))[0]
+            cat3[chrom] = np.where(and_(cond1_sig,       cond2_sig))[0]
+
+        # qvalue conversion for each category to improve statistical power
+        cat1_qvalues_by_chrom = self.compute_category_qvalues(cat1)
+        cat2_qvalues_by_chrom = self.compute_category_qvalues(cat2)
+        cat3_qvalues_by_chrom = self.compute_category_qvalues(cat3)
+
         for chrom in chrs:
             peak_content = []           # to store points above cutoff
 
             pos = self.data[chrom][ 0 ]
-            t1vsc1 = self.data[chrom][ 1 ]
-            t2vsc2 = self.data[chrom][ 2 ]            
             t1vst2 = self.data[chrom][ 3 ]
 
-            logcutoff = -log10(cutoff)
-            cond1_sig = t1vsc1 >= logcutoff
-            cond2_sig = t2vsc2 >= logcutoff
-            cond1_sig_cond2 = t1vst2 >= logcutoff
+            cat1_qvalues = cat1_qvalues_by_chrom[chrom]
+            cat2_qvalues = cat2_qvalues_by_chrom[chrom]
+            cat3_qvalues = cat3_qvalues_by_chrom[chrom]
 
-            and_ = np.logical_and
-            not_ = np.logical_not
-            # indices where score is above cutoff
-            cat1_above_cutoff = np.where(and_(and_(cond1_sig, not_(cond2_sig)),
-                                              cond1_sig_cond2))[0]
-            cat2_above_cutoff = np.where(and_(and_(cond2_sig, not_(cond1_sig)),
-                                              cond1_sig_cond2))[0]
-            cat3_above_cutoff = np.where(and_(and_(cond1_sig, cond2_sig),
-                                              cond1_sig_cond2))[0]
+
+            where_cat1_above_cutoff = cat1_qvalues >= logcutoff
+            where_cat2_above_cutoff = cat2_qvalues >= logcutoff
+            where_cat3_above_cutoff = cat3_qvalues >= logcutoff
+            cat1_above_cutoff = cat1[chrom][where_cat1_above_cutoff]
+            cat2_above_cutoff = cat2[chrom][where_cat2_above_cutoff]
+            cat3_above_cutoff = cat3[chrom][where_cat2_above_cutoff]
             cat1_above_cutoff_endpos = pos[cat1_above_cutoff] # end positions of regions where score is above cutoff
             cat1_above_cutoff_startpos = pos[cat1_above_cutoff-1] # start positions of regions where score is above cutoff
             cat2_above_cutoff_endpos = pos[cat2_above_cutoff] # end positions of regions where score is above cutoff
