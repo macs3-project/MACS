@@ -1,5 +1,5 @@
 # cython: profile=True
-# Time-stamp: <2012-10-18 15:46:03 Tao Liu>
+# Time-stamp: <2012-10-23 18:01:38 Tao Liu>
 
 """Module for Feature IO classes.
 
@@ -102,6 +102,30 @@ cdef inline double logLR ( double x, double y ):
         else:
             s = 0
         logLR_khashtable.set_item(key_value, s)
+        return s
+
+logLR2_khashtable = Int64HashTable()
+
+cdef inline double logLR2 ( double x, double y ):
+    """Calculate log10 Likelihood between H1 ( cond1 ) and H0 (
+    cond2 ).
+
+    """
+    cdef:
+        double s
+        long key_value
+    
+    key_value = hash( (x, y ) )
+    try:
+        return logLR2_khashtable.get_item( key_value )
+    except KeyError:
+        if x > y:
+            s = (x*(log(x)-log(y))+y-x)*LOG10_E
+        elif x < y:
+            s = (y*(log(y)-log(x))+y-x)*LOG10_E
+        else:
+            s = 0
+        logLR2_khashtable.set_item(key_value, s)
         return s
 
 cdef inline double get_logFE ( float x, float y ):
@@ -1382,7 +1406,7 @@ cdef class TwoConditionScores:
         c[0][ i ] = endpos
         c[1][ i ] = logLR( (t1+self.pseudocount)*self.cond1_depth, (c1+self.pseudocount)*self.cond1_depth )
         c[2][ i ] = logLR( (t2+self.pseudocount)*self.cond2_depth, (c2+self.pseudocount)*self.cond2_depth )
-        c[3][ i ] = logLR( (t1+self.pseudocount)*self.cond1_depth, (t2+self.pseudocount)*self.cond2_depth )
+        c[3][ i ] = logLR2( (t1+self.pseudocount)*self.cond1_depth, (t2+self.pseudocount)*self.cond2_depth ) # call different LR function which allow fair cond2 vs cond1 comparison
         #c[4][ i ] = logLR( t2+self.pseudocount, t1+self.pseudocount )
         self.datalength[chromosome] += 1
 
