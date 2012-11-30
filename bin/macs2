@@ -43,6 +43,10 @@ def main():
         # General call peak
         from MACS2.callpeak import run
         run( args )
+    elif subcommand == "diffpeak":
+        # differential peak calling w/ bedgraphs + optional peak regions
+        from MACS2.diffpeak import run
+        run( args )
     elif subcommand == "bdgpeakcall":
         # call peak from bedGraph
         from MACS2.bdgpeakcall import run
@@ -97,6 +101,9 @@ def prepare_argparser ():
     # command for 'callpeak'
     add_callpeak_parser( subparsers )
 
+    # command for 'diffpeak'
+    add_diffpeak_parser( subparsers )
+    
     # command for 'bdgpeakcall'
     add_bdgpeakcall_parser( subparsers )
     
@@ -217,6 +224,68 @@ def add_callpeak_parser( subparsers ):
     group_callpeak.add_argument( "--call-summits", dest="call_summits", action="store_true",
                          help="If set, MACS will use a more sophisticated approach to find all summits in each enriched peak region. DEFAULT: False",default=False)
     
+    return
+
+def add_diffpeak_parser( subparsers ):
+    """Add main function 'peak calling' argument parsers.
+    """
+    argparser_diffpeak = subparsers.add_parser("diffpeak", help="MACS2 Differential Peak Function: Call peaks from bedgraphs (or use optional peak regions) and determine peaks of differential occupancy")
+    
+
+    # group for input files
+    group_input = argparser_diffpeak.add_argument_group( "Input files arguments" )
+    group_input.add_argument( "--t1", dest = "t1bdg", type = str, required = True,
+                                    help = "MACS pileup bedGraph for condition 1. REQUIRED" )
+    group_input.add_argument( "--t2", dest="t2bdg", type = str, required = True,
+                                    help = "MACS pileup bedGraph for condition 2. REQUIRED" )
+    group_input.add_argument( "--c1", dest = "c1bdg", type = str, required = True,
+                                    help = "MACS control lambda bedGraph for condition 1. REQUIRED" )
+    group_input.add_argument( "--c2", dest="c2bdg", type = str, required = True,
+                                    help = "MACS control lambda bedGraph for condition 2. REQUIRED" )
+    group_input.add_argument( "--depth1", dest = "depth1", type = float, default = 1.0,
+                                    help = "Sequence depth of condition 1 in million reads. Default: 1 (if you use 'macs2 callpeak --SPMR' to generate bdg files." )
+    group_input.add_argument( "--depth2", dest = "depth2", type = float, default = 1.0,
+                                    help = "Sequence depth of condition 2 in million reads. Default: 1 (if you use 'macs2 callpeak --SPMR' to generate bdg files." )
+    group_input.add_argument( "--peak-regions", dest="peakregions", type = str, required = False,
+                                    help = "Peak regions as previously called by MACS. If absent, peaks will be found a second time." )
+    group_input.add_argument( "-f", "--format", dest = "format", type = str,
+                              choices = ("AUTO", "BED", "XLS"),
+                              help = "Format of peak regions file, \"AUTO\", \"BED\" or \"XLS\". The default AUTO option will let MACS decide which format the file is based on the file extension. DEFAULT: \"AUTO\"",
+                              default = "AUTO" )
+    
+    # group for output files
+    group_output = argparser_diffpeak.add_argument_group( "Output arguments" )
+#    argparser_diffpeak.add_argument( "-o", "--o-prefix", dest = "oprefix", default = "diffpeak", type = str,
+#                                help = "output file prefix, DEFAULT: diffpeak" )
+    group_output.add_argument( "-n", "--name", dest = "name", type = str,
+                               help = "Experiment name, which will be used to generate output file names. DEFAULT: \"diffpeak\"", 
+                               default = "diffpeak" )
+    group_output.add_argument( "-B", "--bdg", dest = "store_bdg", action = "store_true",
+                               help = "Whether or not to save basewise p/qvalues from every peak region into a bedGraph file. DEFAULT: False",
+                               default = False )
+    group_output.add_argument( "--verbose", dest = "verbose", type = int, default = 2,
+                               help = "Set verbose level of runtime message. 0: only show critical message, 1: show additional warning message, 2: show process information, 3: show debug messages. DEFAULT:2" )
+    group_output.add_argument( "--trackline", dest="trackline", action="store_true", default = False,
+                               help = "Tells MACS to include trackline with bedGraph files. To include this trackline while displaying bedGraph at UCSC genome browser, can show name and description of the file as well. However my suggestion is to convert bedGraph to bigWig, then show the smaller and faster binary bigWig file at UCSC genome browser, as well as downstream analysis. Require -B to be set. Default: Not include trackline." )
+    
+    # General options.
+    group_diffpeak = argparser_diffpeak.add_argument_group( "Peak calling arguments" )    
+    p_or_q_group = group_diffpeak.add_mutually_exclusive_group()
+    p_or_q_group.add_argument( "-q", "--qvalue", dest = "diff_qvalue", type = float, default = 0.05,
+                               help = "Minimum FDR (q-value) cutoff for differences. DEFAULT: 0.05. -q and -p are mutually exclusive." )
+    p_or_q_group.add_argument( "-p", "--pvalue", dest = "diff_pvalue", type = float,
+                               help = "Pvalue cutoff for differences. DEFAULT: not set. -q and -p are mutually exclusive." )
+    p_or_q_group2 = group_diffpeak.add_mutually_exclusive_group()
+    p_or_q_group2.add_argument( "--peaks-qvalue", dest = "peaks_qvalue", type = float, default = 0.05,
+                               help = "Minimum FDR (q-value) cutoff for peak detection. DEFAULT: 0.05. --peaks-qvalue and --peaks-pvalue are mutually exclusive." )
+    p_or_q_group2.add_argument( "--peaks-pvalue", dest = "peaks_pvalue", type = float,
+                               help = "Pvalue cutoff for peak detection. DEFAULT: not set. --peaks-qvalue and --peaks-pvalue are mutually exclusive." )
+    group_diffpeak.add_argument( "-m", "--peak-min-len", dest = "pminlen", type = int,
+                                    help = "Minimum length of peak regions. DEFAULT: 200", default = 200 )
+    group_diffpeak.add_argument( "--diff-min-len", dest = "dminlen", type = int,
+                                    help = "Minimum length of differential region (must overlap a valid peak). DEFAULT: 50", default = 50 )
+    group_diffpeak.add_argument( "--ignore-duplicate-peaks", dest="ignore_duplicate_peaks", action="store_false",
+                         help="If set, MACS will ignore duplicate regions with identical coordinates. Helpful if --call-summits was set. DEFAULT: True",default=True)
     return
 
 def add_filterdup_parser( subparsers ):
