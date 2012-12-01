@@ -2668,7 +2668,7 @@ cdef class DiffScoreTrackI:
             str chrom
         for chrom in self.diff_peaks.keys():
             for start,end in self.diff_peaks[chrom]:
-                print '%s\t%d\t%d' % (chrom, self.pos[start], self.pos[end])
+                print '%s\t%d\t%d' % (chrom, self.pos[chrom][start], self.pos[chrom][end])
         return
 
     cdef long total ( self ):
