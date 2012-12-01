@@ -1947,7 +1947,7 @@ cdef class TwoConditionScores:
 cdef class DiffScoreTrackI:
     cdef:
         dict pos, t1, c1, t2, c2, tvsc1, tvsc2, t1vs2, tlogLR
-        dict in_peaks, where_peaks, diff_peaks
+        dict where_peaks, diff_peaks
         dict datalength                 # length of data array of each chromosome
         float cond1_depth                 # seq depth in million of treatment
         float cond2_depth                  # seq depth in million of control
@@ -1966,7 +1966,6 @@ cdef class DiffScoreTrackI:
         self.tvsc2 = {}
         self.t1vs2 = {}
         self.tlogLR = {}
-        self.in_peaks = {}
         self.where_peaks = {}
         self.diff_peaks = {}
         self.datalength = {}
@@ -2261,7 +2260,6 @@ cdef class DiffScoreTrackI:
                 for i in range(1, above_cutoff.size):
                     this_start = above_cutoff_endpos[i - 1]
                     this_end = above_cutoff_endpos[i]
-                    print "%d (%d), %d (%d)\t\t%d\t%d" %(this_start, i, first_start, first_i, this_end, last_end)
                     if first_i == -1:
                         first_i = i
                         first_start = this_start
@@ -2280,28 +2278,32 @@ cdef class DiffScoreTrackI:
             above_cutoff_endpos = pos[above_cutoff] # end positions of regions where score is above cutoff
             above_cutoff_startpos = pos[above_cutoff-1] # start positions of regions where score is above cutoff
 
-            first_i = -1
+            # Do zero manually
+            first_i = 0
+            this_start = pos[above_cutoff[0] - 1]
+            this_end = above_cutoff_endpos[0]
+            if this_start > this_end:
+                this_start = 0
+            first_start = this_start
+            last_end = this_end
             if above_cutoff.size > 1:
-                if above_cutoff_startpos[0] > above_cutoff_endpos[0]: above_cutoff_startpos[0] = 0
-                first_i = 0
-                for i in range(1, above_cutoff_startpos.size):
+                for i in range(1, above_cutoff.size):
+                    this_start = above_cutoff_endpos[i - 1]
+                    this_end = above_cutoff_endpos[i]
                     if first_i == -1:
                         first_i = i
-                    if above_cutoff_startpos[i] - above_cutoff_endpos[i - 1] <= max_gap:
-                        continue
-                    else:
-                        length = above_cutoff_endpos[i - 1] - above_cutoff_startpos[first_i]
-                        if length >= min_length:
-                            in_peaks[first_i:i] = True # not including i
+                        first_start = this_start
+                    if (this_end - last_end) > max_gap:
+                        if (last_end - first_start) >= min_length:
+                            in_peaks[above_cutoff[first_i]:above_cutoff[i - 1]] = True
                         first_i = -1
+                    last_end = this_end
             
             if not first_i == -1:
-                length = above_cutoff_endpos[i - 1] - above_cutoff_startpos[first_i]
-                if length >= min_length:
-                    in_peaks[first_i:(i+1)] = True # including i
+                if last_end - first_start >= min_length:
+                    in_peaks[above_cutoff[first_i]:above_cutoff[i - 1]] = True
 
-            self.in_peaks[chrom] = in_peaks
-            self.where_peaks[chrom] = np.where(self.in_peaks[chrom])[0]
+            self.where_peaks[chrom] = np.where(in_peaks)[0]
         
         return
 
@@ -2613,7 +2615,7 @@ cdef class DiffScoreTrackI:
             if score_method == 'q':
                 diff_qvalues = diff_qvalues_by_chrom[chrom]
             elif score_method == 'p':
-                diff_qvalues = self.t1vs2[chrom][self.in_peaks[chrom]]
+                diff_qvalues = self.t1vs2[chrom][self.where_peaks[chrom]]
             else:
                 raise NotImplementedError
 
