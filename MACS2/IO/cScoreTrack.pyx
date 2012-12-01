@@ -2233,7 +2233,7 @@ cdef class DiffScoreTrackI:
         gap   :  maximum gap to merge nearby peaks, default 50.
         """
         cdef:
-            int i, first_i, length, i_skipped
+            int i, first_i, length
             str chrom
             np.ndarray pos, sample, control, value, above_cutoff, above_cutoff_v, above_cutoff_endpos, above_cutoff_startpos, above_cutoff_sv
             np.ndarray in_peaks
@@ -2250,18 +2250,15 @@ cdef class DiffScoreTrackI:
 
             print "Regions > cutoff: %d" % above_cutoff.size
             first_i = -1
-            i_skipped = 0
             if above_cutoff.size > 1:
                 if above_cutoff_startpos[0] > above_cutoff_endpos[0]: above_cutoff_startpos[0] = 0
                 first_i = 0
                 for i in range(1, above_cutoff_startpos.size):
                     if first_i == -1:
                         first_i = i
-                    if above_cutoff_startpos[i] - above_cutoff_endpos[i - 1 - i_skipped] <= max_gap:
-                        i_skipped += 1
+                    if above_cutoff_startpos[i] - above_cutoff_endpos[i - 1] <= max_gap:
                         continue
                     else:
-                        i_skipped = 0
                         length = above_cutoff_endpos[i - 1] - above_cutoff_startpos[first_i]
                         if length >= min_length:
                             in_peaks[first_i:i] = True
@@ -2278,7 +2275,6 @@ cdef class DiffScoreTrackI:
             above_cutoff_startpos = pos[above_cutoff-1] # start positions of regions where score is above cutoff
 
             first_i = -1
-            i_skipped = 0
             if above_cutoff.size > 1:
                 if above_cutoff_startpos[0] > above_cutoff_endpos[0]: above_cutoff_startpos[0] = 0
                 first_i = 0
@@ -2286,10 +2282,8 @@ cdef class DiffScoreTrackI:
                     if first_i == -1:
                         first_i = i
                     if above_cutoff_startpos[i] - above_cutoff_endpos[i - 1] <= max_gap:
-                        i_skipped += 1
                         continue
                     else:
-                        i_skipped = 0
                         length = above_cutoff_endpos[i - 1] - above_cutoff_startpos[first_i]
                         if length >= min_length:
                             in_peaks[first_i:i] = True # not including i
@@ -2585,7 +2579,7 @@ cdef class DiffScoreTrackI:
         ptrack:  an optional track for pileup heights. If it's not None, use it to find summits. Otherwise, use self/scoreTrack.
         """
         cdef:
-            int i, first_i, length, i_skipped
+            int i, first_i, length
             str chrom
             np.ndarray pos, sample, control, value, above_cutoff, \
                        above_cutoff_v, above_cutoff_endpos, \
@@ -2625,7 +2619,6 @@ cdef class DiffScoreTrackI:
             # save original indices so that we can output everything
             first_i = -1
             n_diff_peaks = 0
-            i_skipped = 0
             diff_peaks = np.ndarray((above_cutoff.size, 2), dtype='int64')
             print above_cutoff.size
             if above_cutoff.size > 1:
@@ -2635,11 +2628,9 @@ cdef class DiffScoreTrackI:
                 for i in range(1, above_cutoff_startpos.size):
                     if first_i == -1:
                         first_i = i
-                    if above_cutoff_startpos[i] - above_cutoff_endpos[i - 1 - i_skipped] <= max_gap:
-                        i_skipped += 1
+                    if above_cutoff_startpos[i] - above_cutoff_endpos[i - 1] <= max_gap:
                         continue
                     else:
-                        i_skipped = 0
                         length = above_cutoff_endpos[i - 1] - above_cutoff_startpos[first_i]
                         if length >= min_length:
                             diff_peaks[n_diff_peaks,0] = first_i
