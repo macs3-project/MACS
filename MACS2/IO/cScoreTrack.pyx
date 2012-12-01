@@ -2399,8 +2399,10 @@ cdef class DiffScoreTrackI:
                 i = where_peaks[j]
                 try:
                     if (prev_i + 1) == i:
+                        print pos[i], pos[i]-pos[prev_i]
                         value_dict[stat[i]] += pos[i] - pos[prev_i]
                     else:
+                        print pos[i], pos[i]-pos[i-1]
                         value_dict[stat[i]] += pos[i] - pos[i - 1]
                 except IndexError:
                     if not value_dict.has_key(stat[i]):
