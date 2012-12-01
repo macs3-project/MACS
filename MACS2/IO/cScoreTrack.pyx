@@ -2146,7 +2146,10 @@ cdef class DiffScoreTrackI:
             v = self.tvsc1[chrom]
             l = self.datalength[chrom]
             for i in range(l):
-                v[ i ] =  get_pscore( int(p[ i ]) , c[ i ] )
+                if c[i] > p[i]:
+                    v[i] = 1
+                else:
+                    v[ i ] =  get_pscore( int(p[ i ]) , c[ i ] )
                 try:
                     self.pvalue_stat1[v[ i ]] += pos[ i ] - prev_pos
                 except:
@@ -2161,7 +2164,10 @@ cdef class DiffScoreTrackI:
             v = self.tvsc2[chrom]
             l = self.datalength[chrom]
             for i in range(l):
-                v[ i ] =  get_pscore( int(p[ i ]) , c[ i ] )
+                if c[i] > p[i]:
+                    v[i] = 1
+                else:
+                    v[ i ] =  get_pscore( int(p[ i ]) , c[ i ] )
                 try:
                     self.pvalue_stat2[v[ i ]] += pos[ i ] - prev_pos
                 except:
