@@ -2271,7 +2271,7 @@ cdef class DiffScoreTrackI:
             
             if not first_i == -1:
                 if last_end - first_start >= min_length:
-                    in_peaks[above_cutoff[first_i]:above_cutoff[i - 1]] = True
+                    in_peaks[above_cutoff[first_i]:above_cutoff[i]] = True
             
             value = self.tvsc2[chrom]
             above_cutoff = np.nonzero( value >= cutoff )[0] # indices where score is above cutoff
@@ -2301,7 +2301,7 @@ cdef class DiffScoreTrackI:
             
             if not first_i == -1:
                 if last_end - first_start >= min_length:
-                    in_peaks[above_cutoff[first_i]:above_cutoff[i - 1]] = True
+                    in_peaks[above_cutoff[first_i]:above_cutoff[i]] = True
 
             self.where_peaks[chrom] = np.where(in_peaks)[0]
         
@@ -2641,7 +2641,7 @@ cdef class DiffScoreTrackI:
                     if (this_end - last_end) > max_gap:
                         if (last_end - first_start) >= min_length:
                             diff_peaks[n_diff_peaks,0] = first_i
-                            diff_peaks[n_diff_peaks,1] = i
+                            diff_peaks[n_diff_peaks,1] = i - 1
                             n_diff_peaks += 1
                         first_i = -1
                     last_end = this_end
@@ -2681,7 +2681,7 @@ cdef class DiffScoreTrackI:
             str chrom
         for chrom in self.diff_peaks.keys():
             for start,end in self.diff_peaks[chrom]:
-                print '%s\t%d\t%d' % (chrom, self.pos[chrom][start], self.pos[chrom][end])
+                print '%s\t%d\t%d' % (chrom, self.pos[chrom][start-1], self.pos[chrom][end])
         return
 
     cdef long total ( self ):
