@@ -2409,7 +2409,7 @@ cdef class DiffScoreTrackI:
                     if (prev_i + 1) == i:
                         value_dict[stat[i]] = pos[i] - pos[prev_i]
                     else:
-                        value_dict[stat[i]] += pos[i] - pos[i - 1]
+                        value_dict[stat[i]] = pos[i] - pos[i - 1]
                 prev_i = i
 
         N = sum(value_dict.values())
