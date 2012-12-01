@@ -2626,7 +2626,7 @@ cdef class DiffScoreTrackI:
                     above_cutoff_startpos[0] = 0
                 first_i = 0
                 for i in range(1, above_cutoff_startpos.size):
-                    print i, first_i
+                    print "%d (%d), %d (%d)" %(above_cutoff_pos[i], i, above_cutoff_pos[first_i], first_i)
                     if first_i == -1:
                         first_i = i
                     if above_cutoff_startpos[i] - above_cutoff_endpos[i - 1] <= max_gap:
