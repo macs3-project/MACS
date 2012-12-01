@@ -2230,12 +2230,11 @@ cdef class DiffScoreTrackI:
             int i, first_i, length
             str chrom
             np.ndarray pos, sample, control, value, above_cutoff, above_cutoff_v, above_cutoff_endpos, above_cutoff_startpos, above_cutoff_sv
-            np.ndarray in_peaks1, in_peaks2
+            np.ndarray in_peaks
         
         self.cutoff = cutoff
         for chrom in self.pos.keys():
-            in_peaks1 = np.zeros(self.datalength[chrom], dtype=np.bool)
-            in_peaks2 = np.zeros(self.datalength[chrom], dtype=np.bool)
+            in_peaks = np.zeros(self.datalength[chrom], dtype=np.bool)
 
             pos = self.pos[chrom]
             value = self.tvsc1[chrom]
@@ -2254,13 +2253,13 @@ cdef class DiffScoreTrackI:
                     if not above_cutoff_startpos[i] - above_cutoff_endpos[i - 1] <= max_gap:
                         length = above_cutoff_endpos[i - 1] - above_cutoff_startpos[first_i]
                         if length >= min_length:
-                            in_peaks1[first_i:i] = True
+                            in_peaks[first_i:i] = True
                         first_i = -1
             
             if not first_i == -1:
                 length = above_cutoff_endpos[i - 1] - above_cutoff_startpos[first_i]
                 if length >= min_length:
-                    in_peaks1[first_i:(i+1)] = True
+                    in_peaks[first_i:(i+1)] = True
             
             value = self.tvsc2[chrom]
             above_cutoff = np.nonzero( value >= cutoff )[0] # indices where score is above cutoff
@@ -2277,15 +2276,15 @@ cdef class DiffScoreTrackI:
                     if not above_cutoff_startpos[i] - above_cutoff_endpos[i - 1] <= max_gap:
                         length = above_cutoff_endpos[i - 1] - above_cutoff_startpos[first_i]
                         if length >= min_length:
-                            in_peaks2[first_i:i] = True # not including i
+                            in_peaks[first_i:i] = True # not including i
                         first_i = -1
             
             if not first_i == -1:
                 length = above_cutoff_endpos[i - 1] - above_cutoff_startpos[first_i]
                 if length >= min_length:
-                    in_peaks2[first_i:(i+1)] = True # including i
+                    in_peaks[first_i:(i+1)] = True # including i
 
-            self.in_peaks[chrom] = np.logical_or(in_peaks1, in_peaks2)
+            self.in_peaks[chrom] = in_peaks
             self.where_peaks[chrom] = np.where(self.in_peaks[chrom])[0]
         
         return
@@ -2398,13 +2397,15 @@ cdef class DiffScoreTrackI:
             where_peaks = self.where_peaks[chrom]
             for j in range(where_peaks.size):
                 i = where_peaks[j]
+                if not (prev_i + 1) == i: continue
                 try:
-                    value_dict[stat[i]] += pos[i] - pos[i - 1]
+                    value_dict[stat[i]] += pos[i] - pos[prev_i]
                 except IndexError:
                     if not value_dict.has_key(stat[i]):
                         value_dict[stat[i]] = 0
                 except KeyError:
-                    value_dict[stat[i]] = pos[i] - pos[i - 1]
+                    value_dict[stat[i]] = pos[i] - pos[prev_i]
+                prev_i = i
 
         N = sum(value_dict.values())
         k = 1                           # rank
