@@ -2398,14 +2398,19 @@ cdef class DiffScoreTrackI:
             prev_i = -1
             for j in range(where_peaks.size):
                 i = where_peaks[j]
-                if not (prev_i + 1) == i: continue
                 try:
-                    value_dict[stat[i]] += pos[i] - pos[prev_i]
+                    if (prev_i + 1) == i:
+                        value_dict[stat[i]] += pos[i] - pos[prev_i]
+                    else:
+                        value_dict[stat[i]] += pos[i] - pos[i - 1]
                 except IndexError:
                     if not value_dict.has_key(stat[i]):
                         value_dict[stat[i]] = 0
                 except KeyError:
-                    value_dict[stat[i]] = pos[i] - pos[prev_i]
+                    if (prev_i + 1) == i:
+                        value_dict[stat[i]] = pos[i] - pos[prev_i]
+                    else:
+                        value_dict[stat[i]] += pos[i] - pos[i - 1]
                 prev_i = i
 
         N = sum(value_dict.values())
