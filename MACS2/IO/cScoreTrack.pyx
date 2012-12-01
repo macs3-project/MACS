@@ -2249,22 +2249,24 @@ cdef class DiffScoreTrackI:
             above_cutoff_endpos = pos[above_cutoff] # end positions of regions where score is above cutoff
 
             print "Regions > cutoff: %d" % above_cutoff.size
-            first_i = -1
-            first_start = -1
-            last_end = -1
+            # Do zero manually
+            first_i = 0
+            this_start = pos[above_cutoff[0] - 1]
+            this_end = above_cutoff_endpos[0]
+            if this_start > this_end:
+                this_start = 0
+            first_start = this_start
+            last_end = this_end
             if above_cutoff.size > 1:
-                for i in range(above_cutoff.size):
+                for i in range(1, above_cutoff.size):
                     this_start = above_cutoff_endpos[i - 1]
                     this_end = above_cutoff_endpos[i]
                     print "%d (%d), %d (%d)" %(this_start, i, first_start, first_i)
                     if first_i == -1:
                         first_i = i
-                        if this_start > this_end:
-                            first_startpos = 0
-                        else:
-                            first_start = this_start
-                    if not this_start - last_end <= max_gap:
-                        if last_end - first_start >= min_length:
+                        first_start = this_start
+                    if (this_start - last_end) > max_gap:
+                        if (last_end - first_start) >= min_length:
                             in_peaks[above_cutoff[first_i]:above_cutoff[i - 1]] = True
                         first_i = -1
                     last_end = this_end
