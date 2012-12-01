@@ -2617,6 +2617,8 @@ cdef class DiffScoreTrackI:
                             diff_peaks[n_diff_peaks,0] = first_i
                             diff_peaks[n_diff_peaks,1] = i - 1
                             n_diff_peaks += 1
+                        else:
+                            print "Discarding peak %s %d %d" % (chrom, above_cutoff_startpos[first_i], above_cutoff_endpos[i-1])
                         first_i = -1
             
             if not first_i == -1:
