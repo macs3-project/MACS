@@ -2389,7 +2389,6 @@ cdef class DiffScoreTrackI:
         # make pqtable for category
         value_dict = {}
         for chrom in self.t1vs2.keys():
-            print self.pos[chrom][0:2]
             if self.t1vs2[chrom].size == 0: continue
 
             pos = self.pos[chrom]
@@ -2443,10 +2442,10 @@ cdef class DiffScoreTrackI:
         
         qvalues = {}
         for chrom in self.t1vs2.keys():
-            v = self.t1vs2[chrom][self.in_peaks[chrom]]
+            v = self.t1vs2[chrom][self.where_peaks[chrom]]
             qvalues[chrom] = v.copy()
             for i in range(v.size):
-                qvalues[chrom][ i ] =  g( v[ i ])
+                qvalues[chrom][ i ] =  g(v[ i ])
         
         return qvalues
 
