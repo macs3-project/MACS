@@ -2379,7 +2379,7 @@ cdef class DiffScoreTrackI:
         cdef:
             dict value_dict, pqtable
             list unique_values
-            long i,l,j
+            long i,l,j,prev_i
             np.ndarray p, c, v, data
             long pre_l
             double pre_v, unique_v, q, pre_q
@@ -2395,6 +2395,7 @@ cdef class DiffScoreTrackI:
             pos = self.pos[chrom]
             stat = self.t1vs2[chrom]
             where_peaks = self.where_peaks[chrom]
+            prev_i = -1
             for j in range(where_peaks.size):
                 i = where_peaks[j]
                 if not (prev_i + 1) == i: continue
