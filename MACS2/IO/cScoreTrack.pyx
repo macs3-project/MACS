@@ -2626,7 +2626,7 @@ cdef class DiffScoreTrackI:
                     above_cutoff_startpos[0] = 0
                 first_i = 0
                 for i in range(1, above_cutoff_startpos.size):
-                    print "%d (%d), %d (%d)" %(above_cutoff_pos[i], i, above_cutoff_pos[first_i], first_i)
+                    print "%d (%d), %d (%d)" %(above_cutoff_startpos[i], i, above_cutoff_startpos[first_i], first_i)
                     if first_i == -1:
                         first_i = i
                     if above_cutoff_startpos[i] - above_cutoff_endpos[i - 1] <= max_gap:
@@ -2635,7 +2635,7 @@ cdef class DiffScoreTrackI:
                         length = above_cutoff_endpos[i - 1] - above_cutoff_startpos[first_i]
                         if length >= min_length:
                             diff_peaks[n_diff_peaks,0] = first_i
-                            diff_peaks[n_diff_peaks,1] = i - 1
+                            diff_peaks[n_diff_peaks,1] = i
                             n_diff_peaks += 1
                         first_i = -1
            
@@ -2643,7 +2643,7 @@ cdef class DiffScoreTrackI:
                 length = above_cutoff_endpos[i - 1] - above_cutoff_startpos[first_i]
                 if length >= min_length:
                     diff_peaks[n_diff_peaks,0] = first_i
-                    diff_peaks[n_diff_peaks,1] = i - 1
+                    diff_peaks[n_diff_peaks,1] = i
                     n_diff_peaks += 1
 
             print diff_peaks
