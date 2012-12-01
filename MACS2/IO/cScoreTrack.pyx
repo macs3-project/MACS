@@ -2616,7 +2616,6 @@ cdef class DiffScoreTrackI:
             else:
                 raise NotImplementedError
 
-            is_above_cutoff = 
             above_cutoff = qpos[np.nonzero(diff_qvalues >= cutoff)[0]]
             above_cutoff_endpos = pos[above_cutoff] # end positions of regions where score is above cutoff
 
