@@ -2265,7 +2265,7 @@ cdef class DiffScoreTrackI:
                     if first_i == -1:
                         first_i = i
                         first_start = this_start
-                    if (this_start - last_end) > max_gap:
+                    if (this_end - last_end) > max_gap:
                         if (last_end - first_start) >= min_length:
                             in_peaks[above_cutoff[first_i]:above_cutoff[i - 1]] = True
                         first_i = -1
