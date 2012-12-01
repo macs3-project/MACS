@@ -2593,7 +2593,6 @@ cdef class DiffScoreTrackI:
                        above_cutoff_v, above_cutoff_endpos, \
                        above_cutoff_startpos, above_cutoff_sv
             np.ndarray[np.int64_t, ndim=2] diff_peaks
-            list peak_content
         
         chrs  = self.get_chr_names()
 
@@ -2606,8 +2605,6 @@ cdef class DiffScoreTrackI:
             raise NotImplementedError
 
         for chrom in chrs:
-            peak_content = []           # to store points above cutoff
-
             pos = self.pos[chrom]
             qpos = self.where_peaks[chrom]
             t1vst2 = self.t1vs2[chrom]
@@ -2619,37 +2616,39 @@ cdef class DiffScoreTrackI:
             else:
                 raise NotImplementedError
 
-            is_above_cutoff = diff_qvalues >= cutoff
-            above_cutoff = qpos[np.nonzero(is_above_cutoff)[0]]
+            is_above_cutoff = 
+            above_cutoff = qpos[np.nonzero(diff_qvalues >= cutoff)[0]]
             above_cutoff_endpos = pos[above_cutoff] # end positions of regions where score is above cutoff
-            above_cutoff_startpos = pos[above_cutoff-1] # start positions of regions where score is above cutoff
 
-            # save original indices so that we can output everything
-            first_i = -1
+            print "Regions > cutoff: %d" % above_cutoff.size
+            # Do zero manually
             n_diff_peaks = 0
             diff_peaks = np.ndarray((above_cutoff.size, 2), dtype='int64')
-            print above_cutoff.size
+            first_i = 0
+            this_start = pos[above_cutoff[0] - 1]
+            this_end = above_cutoff_endpos[0]
+            if this_start > this_end:
+                this_start = 0
+            first_start = this_start
+            last_end = this_end
             if above_cutoff.size > 1:
-                if above_cutoff_startpos[0] > above_cutoff_startpos[1]:
-                    above_cutoff_startpos[0] = 0
-                first_i = 0
-                for i in range(1, above_cutoff_startpos.size):
-                    print "%d (%d), %d (%d)" %(above_cutoff_startpos[i], i, above_cutoff_startpos[first_i], first_i)
+                print "%d (%d), %d (%d)" %(this_end, i, first_start, first_i)
+                for i in range(1, above_cutoff.size):
+                    this_start = above_cutoff_endpos[i - 1]
+                    this_end = above_cutoff_endpos[i]
                     if first_i == -1:
                         first_i = i
-                    if above_cutoff_startpos[i] - above_cutoff_endpos[i - 1] <= max_gap:
-                        continue
-                    else:
-                        length = above_cutoff_endpos[i - 1] - above_cutoff_startpos[first_i]
-                        if length >= min_length:
+                        first_start = this_start
+                    if (this_end - last_end) > max_gap:
+                        if (last_end - first_start) >= min_length:
                             diff_peaks[n_diff_peaks,0] = first_i
                             diff_peaks[n_diff_peaks,1] = i
                             n_diff_peaks += 1
                         first_i = -1
-           
+                    last_end = this_end
+            
             if not first_i == -1:
-                length = above_cutoff_endpos[i - 1] - above_cutoff_startpos[first_i]
-                if length >= min_length:
+                if last_end - first_start >= min_length:
                     diff_peaks[n_diff_peaks,0] = first_i
                     diff_peaks[n_diff_peaks,1] = i
                     n_diff_peaks += 1
