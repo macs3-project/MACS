@@ -2261,7 +2261,7 @@ cdef class DiffScoreTrackI:
                 for i in range(1, above_cutoff.size):
                     this_start = above_cutoff_endpos[i - 1]
                     this_end = above_cutoff_endpos[i]
-                    print "%d (%d), %d (%d)" %(this_start, i, first_start, first_i)
+                    print "%d (%d), %d (%d)\t\t%d\t%d" %(this_start, i, first_start, first_i, this_end, last_end)
                     if first_i == -1:
                         first_i = i
                         first_start = this_start
