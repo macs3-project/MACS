@@ -2643,7 +2643,7 @@ cdef class DiffScoreTrackI:
                 length = above_cutoff_endpos[i - 1] - above_cutoff_startpos[first_i]
                 if length >= min_length:
                     diff_peaks[n_diff_peaks,0] = first_i
-                    diff_peaks[n_diff_peaks,1] = i
+                    diff_peaks[n_diff_peaks,1] = i - 1
                     n_diff_peaks += 1
 
             print diff_peaks
@@ -2664,7 +2664,7 @@ cdef class DiffScoreTrackI:
             for end in self.where_peaks[chrom]:
                 i += 1
                 if i == max: break
-                print '%s\t%d' % (chrom, self.pos[chrom][end])
+                print '%s\t%d (%d)' % (chrom, self.pos[chrom][end], end)
         return
     
     cpdef print_diff_peaks(self):
