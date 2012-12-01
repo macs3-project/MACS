@@ -2234,6 +2234,7 @@ cdef class DiffScoreTrackI:
         """
         cdef:
             int i, first_i, length
+            int first_start, this_start, this_end, last_end
             str chrom
             np.ndarray pos, sample, control, value, above_cutoff, above_cutoff_v, above_cutoff_endpos, above_cutoff_startpos, above_cutoff_sv
             np.ndarray in_peaks
@@ -2246,29 +2247,31 @@ cdef class DiffScoreTrackI:
             value = self.tvsc1[chrom]
             above_cutoff = np.nonzero( value >= cutoff )[0] # indices where score is above cutoff
             above_cutoff_endpos = pos[above_cutoff] # end positions of regions where score is above cutoff
-            above_cutoff_startpos = pos[above_cutoff-1] # start positions of regions where score is above cutoff
 
             print "Regions > cutoff: %d" % above_cutoff.size
             first_i = -1
+            first_start = -1
+            last_end = -1
             if above_cutoff.size > 1:
-                if above_cutoff_startpos[0] > above_cutoff_endpos[0]: above_cutoff_startpos[0] = 0
-                first_i = 0
-                for i in range(1, above_cutoff_startpos.size):
-                    print "%d (%d), %d (%d)" %(above_cutoff_startpos[i], i, above_cutoff_startpos[first_i], first_i)
+                for i in range(above_cutoff.size):
+                    this_start = above_cutoff_endpos[i - 1]
+                    this_end = above_cutoff_endpos[i]
+                    print "%d (%d), %d (%d)" %(this_start, i, first_start, first_i)
                     if first_i == -1:
                         first_i = i
-                    if above_cutoff_startpos[i] - above_cutoff_endpos[i - 1] <= max_gap:
-                        continue
-                    else:
-                        length = above_cutoff_endpos[i - 1] - above_cutoff_startpos[first_i]
-                        if length >= min_length:
-                            in_peaks[first_i:i] = True
+                        if this_start > this_end:
+                            first_startpos = 0
+                        else:
+                            first_start = this_start
+                    if not this_start - last_end <= max_gap:
+                        if last_end - first_start >= min_length:
+                            in_peaks[above_cutoff[first_i]:above_cutoff[i - 1]] = True
                         first_i = -1
+                    last_end = this_end
             
             if not first_i == -1:
-                length = above_cutoff_endpos[i - 1] - above_cutoff_startpos[first_i]
-                if length >= min_length:
-                    in_peaks[first_i:(i+1)] = True
+                if last_end - first_start >= min_length:
+                    in_peaks[above_cutoff[first_i]:above_cutoff[i - 1]] = True
             
             value = self.tvsc2[chrom]
             above_cutoff = np.nonzero( value >= cutoff )[0] # indices where score is above cutoff
