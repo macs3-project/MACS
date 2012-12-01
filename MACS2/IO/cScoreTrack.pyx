@@ -2254,6 +2254,8 @@ cdef class DiffScoreTrackI:
                         length = above_cutoff_endpos[i - 1] - above_cutoff_startpos[first_i]
                         if length >= min_length:
                             in_peaks1[first_i:i] = True
+                        else:
+                            print "Discarding peak %s %d %d" % (chrom, above_cutoff_startpos[first_i], above_cutoff_endpos[i-1])
                         first_i = -1
             
             if not first_i == -1:
