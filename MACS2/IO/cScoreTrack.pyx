@@ -2617,7 +2617,6 @@ cdef class DiffScoreTrackI:
                 raise NotImplementedError
 
             above_cutoff = qpos[np.nonzero(diff_qvalues >= cutoff)[0]]
-            above_cutoff_endpos = pos[above_cutoff] # end positions of regions where score is above cutoff
 
             print "Regions > cutoff: %d" % above_cutoff.size
             # Do zero manually
@@ -2625,7 +2624,7 @@ cdef class DiffScoreTrackI:
             diff_peaks = np.ndarray((above_cutoff.size, 2), dtype='int64')
             first_i = 0
             this_start = pos[above_cutoff[0] - 1]
-            this_end = above_cutoff_endpos[0]
+            this_end = pos[above_cutoff[0]]
             if this_start > this_end:
                 this_start = 0
             first_start = this_start
@@ -2633,23 +2632,23 @@ cdef class DiffScoreTrackI:
             if above_cutoff.size > 1:
                 print "%d (%d), %d (%d)" %(this_end, i, first_start, first_i)
                 for i in range(1, above_cutoff.size):
-                    this_start = above_cutoff_endpos[i - 1]
-                    this_end = above_cutoff_endpos[i]
+                    this_start = pos[above_cutoff[i] - 1]
+                    this_end = pos[above_cutoff[i]]
                     if first_i == -1:
                         first_i = i
                         first_start = this_start
                     if (this_end - last_end) > max_gap:
                         if (last_end - first_start) >= min_length:
-                            diff_peaks[n_diff_peaks,0] = first_i
-                            diff_peaks[n_diff_peaks,1] = i - 1
+                            diff_peaks[n_diff_peaks,0] = above_cutoff[first_i]
+                            diff_peaks[n_diff_peaks,1] = above_cutoff[i - 1]
                             n_diff_peaks += 1
                         first_i = -1
                     last_end = this_end
             
             if not first_i == -1:
                 if last_end - first_start >= min_length:
-                    diff_peaks[n_diff_peaks,0] = first_i
-                    diff_peaks[n_diff_peaks,1] = i
+                    diff_peaks[n_diff_peaks,0] = above_cutoff[first_i]
+                    diff_peaks[n_diff_peaks,1] = above_cuotff[i]
                     n_diff_peaks += 1
 
             print diff_peaks
