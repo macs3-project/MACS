@@ -225,6 +225,30 @@ def diff_opt_validate ( options ):
         options.log_pvalue = None
         options.score_method = 'q'
     
+    # output filenames
+    options.peakxls = options.name+"_diff_peaks.xls"
+    
+    options.argtxt = "\n".join((
+        "# ARGUMENTS LIST:",\
+        "# name = %s" % (options.name),\
+        "# format = %s" % (options.format),\
+        "# ChIP-seq file 1 = %s" % (options.t1),\
+        "# control file 1 = %s" % (options.c1),\
+        "# ChIP-seq file 2 = %s" % (options.t2),\
+        "# control file 2 = %s" % (options.c2),\
+        ))
+
+    if options.peaks_pvalue:
+        options.argtxt +=  "# treat/control pvalue cutoff = %.2e\n" % (options.pvalue)
+        options.argtxt +=  "# treat/control qvalue will not be calculated and reported as -1 in the final output.\n"
+    else:
+        options.argtxt +=  "# treat/control qvalue cutoff = %.2e\n" % (options.qvalue)
+        
+    if options.diff_pvalue:
+        options.argtxt +=  "# differential pvalue cutoff = %.2e\n" % (options.pvalue)
+        options.argtxt +=  "# differential qvalue will not be calculated and reported as -1 in the final output.\n"
+    else:
+        options.argtxt +=  "# differential qvalue cutoff = %.2e\n" % (options.qvalue)
 
     # logging object
     logging.basicConfig(level=(4-options.verbose)*10,

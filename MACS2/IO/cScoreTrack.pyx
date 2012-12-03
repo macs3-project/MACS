@@ -1965,6 +1965,7 @@ cdef class DiffScoreTrackI:
         self.c2 = {}
         self.tvsc2 = {}
         self.t1vs2 = {}
+        self.diff_qvalues = {}
         self.tlogLR = {}
         self.where_peaks = {}
         self.diff_peaks = {}
@@ -2460,14 +2461,14 @@ cdef class DiffScoreTrackI:
 
         g = s_p2q.get_item
         
-        qvalues = {}
         for chrom in self.t1vs2.keys():
             v = self.t1vs2[chrom][self.where_peaks[chrom]]
-            qvalues[chrom] = v.copy()
+            qvalues = v.copy()
             for i in range(v.size):
-                qvalues[chrom][ i ] =  g(v[ i ])
+                qvalues[ i ] =  g(v[ i ])
+            self.diff_qvalues[chrom] = qvalues
         
-        return qvalues
+        return
 
     cpdef get_data_by_chr (self, str chromosome):
         """Return array of counts by chromosome.
@@ -2599,8 +2600,8 @@ cdef class DiffScoreTrackI:
         self.cutoff = cutoff
 
         # qvalue conversion for each category to improve statistical power
-        diff_qvalues_by_chrom = self.compute_diff_pvalues()
-        diff_qvalues_by_chrom = self.compute_diff_qvalues()
+        self.compute_diff_pvalues()
+        self.compute_diff_qvalues()
         if not (score_method == 'q' or score_method == 'p'):
             raise NotImplementedError
 
@@ -2610,18 +2611,19 @@ cdef class DiffScoreTrackI:
             t1vst2 = self.t1vs2[chrom]
 
             if score_method == 'q':
-                diff_qvalues = diff_qvalues_by_chrom[chrom]
+                diff_qvalues = self.diff_qvalues[chrom]
             elif score_method == 'p':
                 diff_qvalues = self.t1vs2[chrom][self.where_peaks[chrom]]
             else:
                 raise NotImplementedError
 
             above_cutoff = qpos[np.nonzero(diff_qvalues >= cutoff)[0]]
+            # we're going to recalculate this a few times, hopefully it's fast
 
-            print "Regions > cutoff: %d" % above_cutoff.size
+            # peaks are stored as start_i, end_i (0-based, genomic half-open)
             # Do zero manually
             n_diff_peaks = 0
-            diff_peaks = np.ndarray((above_cutoff.size, 2), dtype='int64')
+            diff_peaks = np.ndarray((above_cutoff.size, 2), dtype='int32')
             first_i = 0
             this_start = pos[above_cutoff[0] - 1]
             this_end = pos[above_cutoff[0]]
@@ -2630,7 +2632,7 @@ cdef class DiffScoreTrackI:
             first_start = this_start
             last_end = this_end
             if above_cutoff.size > 1:
-                print "%d (%d), %d (%d)" %(this_end, i, first_start, first_i)
+                #print "%d (%d), %d (%d)" %(this_end, i, first_start, first_i)
                 for i in range(1, above_cutoff.size):
                     this_start = pos[above_cutoff[i] - 1]
                     this_end = pos[above_cutoff[i]]
@@ -2639,23 +2641,20 @@ cdef class DiffScoreTrackI:
                         first_start = this_start
                     if (this_end - last_end) > max_gap:
                         if (last_end - first_start) >= min_length:
-                            diff_peaks[n_diff_peaks,0] = above_cutoff[first_i]
-                            diff_peaks[n_diff_peaks,1] = above_cutoff[i - 1]
+                            diff_peaks[n_diff_peaks,0] = first_i
+                            diff_peaks[n_diff_peaks,1] = i - 1
                             n_diff_peaks += 1
                         first_i = -1
                     last_end = this_end
             
             if not first_i == -1:
                 if last_end - first_start >= min_length:
-                    diff_peaks[n_diff_peaks,0] = above_cutoff[first_i]
-                    diff_peaks[n_diff_peaks,1] = above_cuotff[i]
+                    diff_peaks[n_diff_peaks,0] = first_i
+                    diff_peaks[n_diff_peaks,1] = i
                     n_diff_peaks += 1
 
-            print diff_peaks
             diff_peaks.resize((n_diff_peaks, 2), refcheck=False)
-            print diff_peaks
             self.diff_peaks[chrom] = diff_peaks
-            print chrom, n_diff_peaks
         return
     
     cpdef print_some_peaks(self, int max = 10):
@@ -2681,6 +2680,98 @@ cdef class DiffScoreTrackI:
         for chrom in self.diff_peaks.keys():
             for start,end in self.diff_peaks[chrom]:
                 print '%s\t%d\t%d' % (chrom, self.pos[chrom][start-1], self.pos[chrom][end])
+        return
+
+    def toxls (self, ofhd, name_prefix="%s_peak_", name="MACS"):
+        """Save the peak results in a tab-delimited plain text file
+        with suffix .xls.
+        
+        """
+        write = ofhd.write
+        write("# values are maxmimum in region")
+        write("# log10_fold_change is positive if t1 > t2")
+        tc_method = self.track_score_method
+        if self.peaks:
+            write("\t".join(("chr", "start", "end", "length",
+                             "log10.fold.change", "-log10.diff.pvalue",
+                             "-log10.diff.qvalue",
+                             "diff.log10LR", "name",
+                             "treat1", "control1", "log10.fold.enrichment1",
+                             "-log10.%svalue1" % tc_method,
+                             "treat2", "control2", "log10.fold.enrichment2",
+                             "-log10.%svalue2" % tc_method))+"\n")
+        else:
+            return
+        
+        try: peakprefix = name_prefix % name
+        except: peakprefix = name_prefix
+
+        log10 = np.log10
+        median = np.median
+        n_peak = 0
+        for chrom in sorted(self.diff_peaks.keys()):
+            pos = self.pos[chrom]
+            t1 = self.t1[chrom]
+            t2 = self.t2[chrom]
+            c1 = self.c1[chrom]
+            c2 = self.c2[chrom]
+            t1vsc1 = self.t1vsc1[chrom]
+            t2vsc2 = self.t2vsc2[chrom]
+            diff_pvalues = self.t1vs2[chrom]
+            diff_qvalues = self.diff_qvalues[chrom]
+            diff_logLR = self.tlogR[chrom]
+            qpos = self.where_peaks[chrom]
+            above_cutoff = qpos[np.nonzero(diff_qvalues >= self.cutoff)[0]]
+            for first_i, last_i in self.diff_peaks[chrom]:
+                n_peak += 1
+                start_i = above_cutoff[first_i] - 1
+                end_i = above_cutoff[last_i]
+                start = pos[chrom][start_i]
+                end = pos[chrom][end_i]
+                t1s = t1[start_i:end_i]
+                c1s = c1[start_i:end_i]
+                t2s = t2[start_i:end_i]
+                c2s = c2[start_i:end_i]
+                fold_changes = t1s / t2s
+                median_fold_change = median(fold_changes)
+                if log10(median_fold_change) > 0:
+                    log10_fold_change = log10(t1s / t2s).max()
+                else:
+                    log10_fold_change = log10(t1s / t2s).min()
+                this_dpvalue = diff_pvalues[start_i:end_i].max()
+                this_dqvalue = diff_qvalues[first_i:last_i)].max()
+                this_dlogLR = dlogLR[start_i:end_i].max()
+                if start > end: start = 0
+                peakname = "%s%d" % (peakprefix, n_peak)
+                max_t1 = t1s.max()
+                max_c1 = c1s.max()
+                if t1 > c1: log10_fe1 = log10(t1s / c1s).max()
+                else: log10_fe1 = log10(t1s / c1s).min()
+                max_t2 = t1s.max()
+                max_c2 = c1s.max()
+                if t1 > c1: log10_fe2 = log10(t2s / c2s).max()
+                else: log10_fe2 = log10(t2s / c2s).min()
+                tc_value1 = t1vsc1[start_i:end_i].max()
+                tc_value2 = t2vsc2[start_i:end_i].max()
+                #chr,start,end,length, log10fold_change, diff.pvalue, diff.qvalue,
+                #diff.logLR, name,
+                #treat1, control1, fold_enrichment1, -log10(p/qvalue1)
+                #treat2, control2, fold_enrichment2, -log10(p/qvalue2)
+                write("%s\t%d\t%d\t%d" % (chrom, start+1, end, end - start))
+                write("\t%.5f" % log10_fold_change)
+                write("\t%.5f" % this_dpvalue)
+                write("\t%.5f" % this_dqvalue)
+                write("\t%.5f" % this_dlogLR)
+                write("\t%s" % peakname)
+                write("\t%.5f" % max_t1)
+                write("\t%.5f" % max_c1)
+                write("\t%.5f" % log10_fe1)
+                write("\t%.5f" % tc_value1)
+                write("\t%.5f" % max_t2)
+                write("\t%.5f" % max_c2)
+                write("\t%.5f" % log10_fe2)
+                write("\t%.5f" % tc_value2)
+                write("\n")
         return
 
     cdef long total ( self ):
