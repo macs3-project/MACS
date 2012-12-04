@@ -2680,12 +2680,12 @@ cdef class DiffScoreTrackI:
                 i += 1
                 if i == max: break
                 print '%s\t%d (%d)' % (chrom, self.pos[chrom][end], end)
-            i = self.pos[chrom].searchsorted(49551000)
-            j = self.pos[chrom].searchsorted(49553000)
-            print i, j
-            for x in range(i,j):
-                print self.pos[chrom][x], self.t1[chrom][x], self.c1[chrom][x], self.tvsc1[chrom][x], \
-                self.t2[chrom][x], self.c2[chrom][x], self.tvsc2[chrom][x]
+#            i = self.pos[chrom].searchsorted(49551000)
+#            j = self.pos[chrom].searchsorted(49553000)
+#            print i, j
+#            for x in range(i,j):
+#                print self.pos[chrom][x], self.t1[chrom][x], self.c1[chrom][x], self.tvsc1[chrom][x], \
+#                self.t2[chrom][x], self.c2[chrom][x], self.tvsc2[chrom][x]
         return
     
     cpdef print_diff_peaks(self):
@@ -2777,8 +2777,8 @@ cdef class DiffScoreTrackI:
                 max_c2 = c1s.max()
                 if t1 > c1: log10_fe2 = log10(t2s / c2s).max()
                 else: log10_fe2 = log10(t2s / c2s).min()
-                tc_value1 = tvsc1[pos_start:pos_end].max()
-                tc_value2 = tvsc2[pos_start:pos_end].max()
+                tc_value1 = tvsc1[pos_start:(pos_end+1)].max()
+                tc_value2 = tvsc2[pos_start:(pos_end+1)].max()
                 #chr,start,end,length, log10fold_change, diff.pvalue, diff.qvalue,
                 #diff.logLR, name,
                 #treat1, control1, fold_enrichment1, -log10(p/qvalue1)
