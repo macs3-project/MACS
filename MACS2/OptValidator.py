@@ -232,23 +232,23 @@ def diff_opt_validate ( options ):
         "# ARGUMENTS LIST:",\
         "# name = %s" % (options.name),\
         "# format = %s" % (options.format),\
-        "# ChIP-seq file 1 = %s" % (options.t1),\
-        "# control file 1 = %s" % (options.c1),\
-        "# ChIP-seq file 2 = %s" % (options.t2),\
-        "# control file 2 = %s" % (options.c2),\
+        "# ChIP-seq file 1 = %s" % (options.t1bdg),\
+        "# control file 1 = %s" % (options.c1bdg),\
+        "# ChIP-seq file 2 = %s" % (options.t2bdg),\
+        "# control file 2 = %s" % (options.c2bdg),\
         ))
 
     if options.peaks_pvalue:
-        options.argtxt +=  "# treat/control pvalue cutoff = %.2e\n" % (options.pvalue)
-        options.argtxt +=  "# treat/control qvalue will not be calculated and reported as -1 in the final output.\n"
+        options.argtxt +=  "# treat/control -log10(pvalue) cutoff = %.2e\n" % (options.peaks_log_pvalue)
+        options.argtxt +=  "# treat/control -log10(qvalue) will not be calculated and reported as -1 in the final output.\n"
     else:
-        options.argtxt +=  "# treat/control qvalue cutoff = %.2e\n" % (options.qvalue)
+        options.argtxt +=  "# treat/control -log10(qvalue) cutoff = %.2e\n" % (options.peaks_log_qvalue)
         
     if options.diff_pvalue:
-        options.argtxt +=  "# differential pvalue cutoff = %.2e\n" % (options.pvalue)
+        options.argtxt +=  "# differential pvalue cutoff = %.2e\n" % (options.log_pvalue)
         options.argtxt +=  "# differential qvalue will not be calculated and reported as -1 in the final output.\n"
     else:
-        options.argtxt +=  "# differential qvalue cutoff = %.2e\n" % (options.qvalue)
+        options.argtxt +=  "# differential qvalue cutoff = %.2e\n" % (options.log_qvalue)
 
     # logging object
     logging.basicConfig(level=(4-options.verbose)*10,

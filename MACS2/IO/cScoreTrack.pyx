@@ -2711,18 +2711,15 @@ cdef class DiffScoreTrackI:
         write = ofhd.write
         write("# values are maxmimum in region")
         write("# log10_fold_change is positive if t1 > t2")
-        tc_method = self.track_score_method
-        if self.peaks:
-            write("\t".join(("chr", "start", "end", "length",
-                             "log10.fold.change", "-log10.diff.pvalue",
-                             "-log10.diff.qvalue",
-                             "diff.log10LR", "name",
-                             "treat1", "control1", "log10.fold.enrichment1",
-                             "-log10.%svalue1" % tc_method,
-                             "treat2", "control2", "log10.fold.enrichment2",
-                             "-log10.%svalue2" % tc_method))+"\n")
-        else:
-            return
+        tc_method = self.track_scoring_method
+        write("\t".join(("chr", "start", "end", "length",
+                         "log10.fold.change", "-log10.diff.pvalue",
+                         "-log10.diff.qvalue",
+                         "diff.log10LR", "name",
+                         "treat1", "control1", "log10.fold.enrichment1",
+                         "-log10.%svalue1" % tc_method,
+                         "treat2", "control2", "log10.fold.enrichment2",
+                         "-log10.%svalue2" % tc_method))+"\n")
         
         try: peakprefix = name_prefix % name
         except: peakprefix = name_prefix
@@ -2740,18 +2737,18 @@ cdef class DiffScoreTrackI:
             tvsc2 = self.tvsc2[chrom]
             diff_pvalues = self.t1vs2[chrom]
             diff_qvalues = self.diff_qvalues[chrom]
-            diff_logLR = self.tlogR[chrom]
+            diff_logLR = self.tlogLR[chrom]
             qpos = self.where_peaks[chrom]
-            above_cutoff = qpos[np.nonzero(diff_qvalues >= self.cutoff)[0]]
+            above_cutoff = np.where(diff_qvalues >= self.cutoff)[0]
             for first_i, last_i in self.diff_peaks[chrom]:
                 n_peak += 1
                 start_i = above_cutoff[first_i]
                 end_i = above_cutoff[last_i]
                 pos_start = qpos[start_i] - 1
-                pos_end = qpos[end_j]
+                pos_end = qpos[end_i]
                 
-                start = pos[chrom][pos_start]
-                end = pos[chrom][pos_end]
+                start = pos[pos_start]
+                end = pos[pos_end]
                 if start > end:
                     start = 0
                     pos_start = 0
@@ -2760,22 +2757,21 @@ cdef class DiffScoreTrackI:
                 t2s = t2[pos_start:(pos_end+1)]
                 c2s = c2[pos_start:(pos_end+1)]
                 fold_changes = t1s / t2s
-                median_fold_change = median(fold_changes)
-                if log10(median_fold_change) > 0:
-                    log10_fold_change = log10(t1s / t2s).max()
+                if log10(median(fold_changes)) > 0:
+                    log10_fold_change = log10(fold_changes).max()
                 else:
-                    log10_fold_change = log10(t1s / t2s).min()
+                    log10_fold_change = log10(fold_changes).min()
                 this_dpvalue = diff_pvalues[pos_start:(pos_end+1)].max()
                 this_dqvalue = diff_qvalues[first_i:(last_i+1)].max()
-                this_dlogLR = dlogLR[pos_start:(pos_end+1)].max()
+                this_dlogLR = diff_logLR[pos_start:(pos_end+1)].max()
                 peakname = "%s%d" % (peakprefix, n_peak)
                 max_t1 = t1s.max()
                 max_c1 = c1s.max()
-                if t1 > c1: log10_fe1 = log10(t1s / c1s).max()
+                if max_t1 > max_c1: log10_fe1 = log10(t1s / c1s).max()
                 else: log10_fe1 = log10(t1s / c1s).min()
                 max_t2 = t1s.max()
                 max_c2 = c1s.max()
-                if t1 > c1: log10_fe2 = log10(t2s / c2s).max()
+                if max_t1 > max_c1: log10_fe2 = log10(t2s / c2s).max()
                 else: log10_fe2 = log10(t2s / c2s).min()
                 tc_value1 = tvsc1[pos_start:(pos_end+1)].max()
                 tc_value2 = tvsc2[pos_start:(pos_end+1)].max()
