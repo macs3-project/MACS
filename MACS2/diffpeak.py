@@ -101,7 +101,7 @@ def run( args ):
     if options.track_score_method == 'p':
         diffscore.call_peaks(cutoff = options.peaks_log_pvalue,
                              min_length = options.pminlen)
-    if options.track_score_method == 'q':
+    elif options.track_score_method == 'q':
         diffscore.call_peaks(cutoff = options.peaks_log_qvalue,
                              min_length = options.pminlen)
     else:

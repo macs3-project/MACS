@@ -32,7 +32,7 @@ from MACS2.cSignal import maxima, enforce_valleys, enforce_peakyness
 # Experimental
 from scipy.stats import chi2
 
-from libc.math cimport log10,log
+from libc.math cimport log10,log, floor, ceil
 
 from MACS2.Constants import *
 from MACS2.cProb cimport poisson_cdf
@@ -85,6 +85,20 @@ cdef inline double get_pscore ( int observed, double expectation ):
 
 logLR_khashtable = Int64HashTable()
 
+cdef double get_interpolated_pscore ( double observed, double expectation ):
+    cdef:
+        double pscore
+        double observed_floor, observed_ceil, step
+        double floor_pscore, ceil_pscore
+    observed_floor = floor(observed)
+    observed_ceil = ceil(observed)
+    step = observed - observed_floor
+    floor_pscore = get_pscore( int(observed_floor), expectation)
+    ceil_pscore = get_pscore( int(observed_ceil), expectation)
+    pscore = (ceil_pscore - floor_pscore) * (observed - observed_floor) + \
+             floor_pscore
+    return pscore
+    
 cdef inline double oldlogLR ( double x, double y ):
     """Calculate log10 Likelihood between H1 ( enriched ) and H0 (
     chromatin bias ). Then store the values in integer form =
@@ -122,13 +136,10 @@ cdef inline double logLR ( double x, double y ):
     try:
         return logLR_khashtable.get_item( key_value )
     except KeyError:
-        if x==y:
-            s = 0
-        elif y > x:
-            y, x = x, y
-            s = -(x*(log(x)-log(y))+y-x)*LOG10_E
-        else:
-            s = (x*(log(x)-log(y))+y-x)*LOG10_E
+        if y > x: y, x = x, y
+        if x==y: s = 0
+        
+        else: s = (x*(log(x)-log(y))+y-x)*LOG10_E
         logLR_khashtable.set_item(key_value, s)
         return s
     
@@ -1791,8 +1802,8 @@ cdef class TwoConditionScores:
             t2vsc2 = self.data[chrom][ 2 ]            
             and_ = np.logical_and
             not_ = np.logical_not
-            cond1_sig = t1vsc1 >= logcutoff
-            cond2_sig = t2vsc2 >= logcutoff
+            cond1_sig = tvsc1 >= logcutoff
+            cond2_sig = tvsc2 >= logcutoff
             # indices where score is above cutoff
             cat1[chrom] = np.where(and_(cond1_sig,       not_(cond2_sig)))[0]
             cat2[chrom] = np.where(and_(not_(cond1_sig), cond2_sig))[0]
@@ -1947,7 +1958,7 @@ cdef class TwoConditionScores:
 cdef class DiffScoreTrackI:
     cdef:
         dict pos, t1, c1, t2, c2, tvsc1, tvsc2, t1vs2, tlogLR
-        dict where_peaks, diff_peaks
+        dict where_peaks, diff_peaks, diff_qvalues
         dict datalength                 # length of data array of each chromosome
         float cond1_depth                 # seq depth in million of treatment
         float cond2_depth                  # seq depth in million of control
@@ -2063,7 +2074,7 @@ cdef class DiffScoreTrackI:
             self.t2[chrom] = np.zeros( chrom_max_len, dtype="float32" ) # t2
             self.c2[chrom] = np.zeros( chrom_max_len, dtype="float32" ) # c2
             self.tvsc2[chrom] = np.zeros( chrom_max_len, dtype="float32" ) # c1
-            self.t1vs2[chrom] = np.ones( chrom_max_len, dtype="float32" ) # c1
+            self.t1vs2[chrom] = np.zeros(chrom_max_len, dtype="float32" ) # c1
             self.tlogLR[chrom] = np.ndarray( chrom_max_len, dtype="float32")
             self.datalength[chrom] = 0
 
@@ -2081,10 +2092,10 @@ cdef class DiffScoreTrackI:
         cdef int i
         i = self.datalength[chromosome]
         self.pos[chromosome][ i ] = endpos
-        self.t1[chromosome][ i ] = t1 *self.cond1_depth
-        self.c1[chromosome][ i ] = c2 *self.cond1_depth
-        self.t2[chromosome][ i ] = t2 *self.cond2_depth
-        self.c2[chromosome][ i ] = c2 *self.cond2_depth
+        self.t1[chromosome][ i ] = t1 * self.cond1_depth
+        self.c1[chromosome][ i ] = c1 * self.cond1_depth
+        self.t2[chromosome][ i ] = t2 * self.cond2_depth
+        self.c2[chromosome][ i ] = c2 * self.cond2_depth
         self.datalength[chromosome] += 1
 
     cpdef finalize ( self ):
@@ -2149,7 +2160,7 @@ cdef class DiffScoreTrackI:
                 if c[i] > p[i]:
                     v[i] = 1
                 else:
-                    v[ i ] =  get_pscore( int(p[ i ]) , c[ i ] )
+                    v[ i ] =  get_interpolated_pscore(p[i], c[i])
                 try:
                     self.pvalue_stat1[v[ i ]] += pos[ i ] - prev_pos
                 except:
@@ -2167,7 +2178,7 @@ cdef class DiffScoreTrackI:
                 if c[i] > p[i]:
                     v[i] = 1
                 else:
-                    v[ i ] =  get_pscore( int(p[ i ]) , c[ i ] )
+                    v[ i ] =  get_interpolated_pscore(p[i], c[i])
                 try:
                     self.pvalue_stat2[v[ i ]] += pos[ i ] - prev_pos
                 except:
@@ -2248,7 +2259,7 @@ cdef class DiffScoreTrackI:
             above_cutoff = np.nonzero( value >= cutoff )[0] # indices where score is above cutoff
             above_cutoff_endpos = pos[above_cutoff] # end positions of regions where score is above cutoff
 
-            print "Regions > cutoff: %d" % above_cutoff.size
+#            print "Regions > cutoff: %d" % above_cutoff.size
             # Do zero manually
             first_i = 0
             this_start = pos[above_cutoff[0] - 1]
@@ -2264,9 +2275,11 @@ cdef class DiffScoreTrackI:
                     if first_i == -1:
                         first_i = i
                         first_start = this_start
-                    if (this_end - last_end) > max_gap:
+                    elif (this_end - last_end) > max_gap:
                         if (last_end - first_start) >= min_length:
                             in_peaks[above_cutoff[first_i]:above_cutoff[i - 1]] = True
+#                        else:
+#                            print "Rejected", pos[above_cutoff[first_i]-1], pos[above_cutoff[i - 1]]
                         first_i = -1
                     last_end = this_end
             
@@ -2294,7 +2307,7 @@ cdef class DiffScoreTrackI:
                     if first_i == -1:
                         first_i = i
                         first_start = this_start
-                    if (this_end - last_end) > max_gap:
+                    elif (this_end - last_end) > max_gap:
                         if (last_end - first_start) >= min_length:
                             in_peaks[above_cutoff[first_i]:above_cutoff[i - 1]] = True
                         first_i = -1
@@ -2305,6 +2318,7 @@ cdef class DiffScoreTrackI:
                     in_peaks[above_cutoff[first_i]:above_cutoff[i]] = True
 
             self.where_peaks[chrom] = np.where(in_peaks)[0]
+#            print "Total peakage in bp", in_peaks.sum()
         
         return
 
@@ -2375,21 +2389,19 @@ cdef class DiffScoreTrackI:
         cdef:
             str chrom
             int i
-            float cond1_d, cond2_d, pseudocount
+            float pseudocount
             np.ndarray[np.float32_t] t1, t2, v
         rv = chi2(1) # a chi-squared distribution with one degree of freedom
         sf = rv.sf
         log10 = np.log10
-        cond1_d = self.cond1_depth
-        cond2_d = self.cond2_depth
         pseudocount = self.pseudocount
         for chrom in self.pos.keys():
             t1 = self.t1[chrom]
             t2 = self.t2[chrom]
             v = self.tlogLR[chrom]
             for i in range(self.pos[chrom].size): 
-                v[i] = logLR(cond1_d * (t1[i] + pseudocount),
-                             cond2_d * (t2[i] + pseudocount))
+                v[i] = logLR((t1[i] + pseudocount),
+                             (t2[i] + pseudocount))
             self.t1vs2[chrom] = -log10(sf(2 * v / LOG10_E)).astype('float32')
     
     cpdef compute_diff_qvalues ( self ):
@@ -2417,20 +2429,16 @@ cdef class DiffScoreTrackI:
             for j in range(where_peaks.size):
                 i = where_peaks[j]
                 try:
-                    if (prev_i + 1) == i:
-                        if pos[i]-pos[prev_i] > 1000: print pos[i], pos[i]-pos[prev_i]
-                        value_dict[stat[i]] += pos[i] - pos[prev_i]
-                    else:
-                        if pos[i]-pos[i-1] > 1000: print pos[i], pos[i]-pos[i-1], "i-"
-                        value_dict[stat[i]] += pos[i] - pos[i - 1]
+#                    if (prev_i + 1) == i:
+#                        if pos[i]-pos[prev_i] > 1000: print pos[i], pos[i]-pos[prev_i]
+#                    else:
+#                        if pos[i]-pos[i-1] > 1000: print pos[i], pos[i]-pos[i-1], "i-"
+                    value_dict[stat[i]] += pos[i] - pos[i - 1]
                 except IndexError:
                     if not value_dict.has_key(stat[i]):
                         value_dict[stat[i]] = 0
                 except KeyError:
-                    if (prev_i + 1) == i:
-                        value_dict[stat[i]] = pos[i] - pos[prev_i]
-                    else:
-                        value_dict[stat[i]] = pos[i] - pos[i - 1]
+                    value_dict[stat[i]] = pos[i] - pos[i - 1]
                 prev_i = i
 
         N = sum(value_dict.values())
@@ -2593,7 +2601,7 @@ cdef class DiffScoreTrackI:
             np.ndarray pos, sample, control, value, above_cutoff, \
                        above_cutoff_v, above_cutoff_endpos, \
                        above_cutoff_startpos, above_cutoff_sv
-            np.ndarray[np.int64_t, ndim=2] diff_peaks
+            np.ndarray[np.int32_t, ndim=2] diff_peaks
         
         chrs  = self.get_chr_names()
 
@@ -2632,18 +2640,20 @@ cdef class DiffScoreTrackI:
             first_start = this_start
             last_end = this_end
             if above_cutoff.size > 1:
-                #print "%d (%d), %d (%d)" %(this_end, i, first_start, first_i)
+#                print "%d (%d), %d (%d)" %(this_end, i, first_start, first_i)
                 for i in range(1, above_cutoff.size):
                     this_start = pos[above_cutoff[i] - 1]
                     this_end = pos[above_cutoff[i]]
                     if first_i == -1:
                         first_i = i
                         first_start = this_start
-                    if (this_end - last_end) > max_gap:
+                    elif (this_end - last_end) > max_gap:
                         if (last_end - first_start) >= min_length:
                             diff_peaks[n_diff_peaks,0] = first_i
                             diff_peaks[n_diff_peaks,1] = i - 1
                             n_diff_peaks += 1
+#                        else:
+#                            print "Rejectedd", pos[above_cutoff[first_i]-1], pos[above_cutoff[i - 1]]
                         first_i = -1
                     last_end = this_end
             
@@ -2654,6 +2664,7 @@ cdef class DiffScoreTrackI:
                     n_diff_peaks += 1
 
             diff_peaks.resize((n_diff_peaks, 2), refcheck=False)
+#            print n_diff_peaks, "diff peaks"
             self.diff_peaks[chrom] = diff_peaks
         return
     
@@ -2669,6 +2680,12 @@ cdef class DiffScoreTrackI:
                 i += 1
                 if i == max: break
                 print '%s\t%d (%d)' % (chrom, self.pos[chrom][end], end)
+            i = self.pos[chrom].searchsorted(49551000)
+            j = self.pos[chrom].searchsorted(49553000)
+            print i, j
+            for x in range(i,j):
+                print self.pos[chrom][x], self.t1[chrom][x], self.c1[chrom][x], self.tvsc1[chrom][x], \
+                self.t2[chrom][x], self.c2[chrom][x], self.tvsc2[chrom][x]
         return
     
     cpdef print_diff_peaks(self):
@@ -2678,8 +2695,12 @@ cdef class DiffScoreTrackI:
             int start, end
             str chrom
         for chrom in self.diff_peaks.keys():
-            for start,end in self.diff_peaks[chrom]:
-                print '%s\t%d\t%d' % (chrom, self.pos[chrom][start-1], self.pos[chrom][end])
+            qpos = self.where_peaks[chrom]
+            for i, j in self.diff_peaks[chrom]:
+                above_cutoff = qpos[np.nonzero(self.diff_qvalues[chrom] >= self.cutoff)[0]]
+                print '%s\t%d\t%d' % (chrom, 
+                                      self.pos[chrom][above_cutoff[i]-1],
+                                      self.pos[chrom][above_cutoff[j]] )
         return
 
     def toxls (self, ofhd, name_prefix="%s_peak_", name="MACS"):
@@ -2715,8 +2736,8 @@ cdef class DiffScoreTrackI:
             t2 = self.t2[chrom]
             c1 = self.c1[chrom]
             c2 = self.c2[chrom]
-            t1vsc1 = self.t1vsc1[chrom]
-            t2vsc2 = self.t2vsc2[chrom]
+            tvsc1 = self.tvsc1[chrom]
+            tvsc2 = self.tvsc2[chrom]
             diff_pvalues = self.t1vs2[chrom]
             diff_qvalues = self.diff_qvalues[chrom]
             diff_logLR = self.tlogR[chrom]
@@ -2724,24 +2745,29 @@ cdef class DiffScoreTrackI:
             above_cutoff = qpos[np.nonzero(diff_qvalues >= self.cutoff)[0]]
             for first_i, last_i in self.diff_peaks[chrom]:
                 n_peak += 1
-                start_i = above_cutoff[first_i] - 1
+                start_i = above_cutoff[first_i]
                 end_i = above_cutoff[last_i]
-                start = pos[chrom][start_i]
-                end = pos[chrom][end_i]
-                t1s = t1[start_i:end_i]
-                c1s = c1[start_i:end_i]
-                t2s = t2[start_i:end_i]
-                c2s = c2[start_i:end_i]
+                pos_start = qpos[start_i] - 1
+                pos_end = qpos[end_j]
+                
+                start = pos[chrom][pos_start]
+                end = pos[chrom][pos_end]
+                if start > end:
+                    start = 0
+                    pos_start = 0
+                t1s = t1[pos_start:(pos_end+1)]
+                c1s = c1[pos_start:(pos_end+1)]
+                t2s = t2[pos_start:(pos_end+1)]
+                c2s = c2[pos_start:(pos_end+1)]
                 fold_changes = t1s / t2s
                 median_fold_change = median(fold_changes)
                 if log10(median_fold_change) > 0:
                     log10_fold_change = log10(t1s / t2s).max()
                 else:
                     log10_fold_change = log10(t1s / t2s).min()
-                this_dpvalue = diff_pvalues[start_i:end_i].max()
-                this_dqvalue = diff_qvalues[first_i:last_i)].max()
-                this_dlogLR = dlogLR[start_i:end_i].max()
-                if start > end: start = 0
+                this_dpvalue = diff_pvalues[pos_start:(pos_end+1)].max()
+                this_dqvalue = diff_qvalues[first_i:(last_i+1)].max()
+                this_dlogLR = dlogLR[pos_start:(pos_end+1)].max()
                 peakname = "%s%d" % (peakprefix, n_peak)
                 max_t1 = t1s.max()
                 max_c1 = c1s.max()
@@ -2751,8 +2777,8 @@ cdef class DiffScoreTrackI:
                 max_c2 = c1s.max()
                 if t1 > c1: log10_fe2 = log10(t2s / c2s).max()
                 else: log10_fe2 = log10(t2s / c2s).min()
-                tc_value1 = t1vsc1[start_i:end_i].max()
-                tc_value2 = t2vsc2[start_i:end_i].max()
+                tc_value1 = tvsc1[pos_start:pos_end].max()
+                tc_value2 = tvsc2[pos_start:pos_end].max()
                 #chr,start,end,length, log10fold_change, diff.pvalue, diff.qvalue,
                 #diff.logLR, name,
                 #treat1, control1, fold_enrichment1, -log10(p/qvalue1)
