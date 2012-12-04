@@ -54,6 +54,8 @@ __doc__ = "scoreTrackI classes"
 # ------------------------------------
 cdef inline int int_max(int a, int b): return a if a >= b else b
 cdef inline int int_min(int a, int b): return a if a <= b else b
+def do_nothing(*args, **kwargs):
+    pass
 
 LOG10_E = 0.43429448190325176
 pscore_khashtable = Int64HashTable()
@@ -2703,28 +2705,43 @@ cdef class DiffScoreTrackI:
                                       self.pos[chrom][above_cutoff[j]] )
         return
 
-    def toxls (self, ofhd, name_prefix="%s_peak_", name="MACS"):
+    def write_peaks(self, xls=None, bed=None, name_prefix="%s_peak_", name="MACS",
+                    description='%s', trackline=True):
         """Save the peak results in a tab-delimited plain text file
         with suffix .xls.
         
         """
-        write = ofhd.write
-        write("# values are maxmimum in region")
-        write("# log10_fold_change is positive if t1 > t2")
+        if xls is not None:
+            xlswrite = xls.write
+        else:
+            xlswrite = do_nothing
+        if bed is not None:
+            bedwrite = bed.write
+        else:
+            bedwrite = do_nothing
+        xlswrite("# values are maxmimum in region")
+        xlswrite("# log10_fold_change is positive if t1 > t2")
         tc_method = self.track_scoring_method
-        write("\t".join(("chr", "start", "end", "length",
-                         "log10.fold.change", "-log10.diff.pvalue",
+        xlswrite("\t".join(("chr", "start", "end", "length",
+                         "log2.fold.change", "-log10.diff.pvalue",
                          "-log10.diff.qvalue",
                          "diff.log10LR", "name",
-                         "treat1", "control1", "log10.fold.enrichment1",
+                         "treat1", "control1", "log2.fold.enrichment1",
                          "-log10.%svalue1" % tc_method,
-                         "treat2", "control2", "log10.fold.enrichment2",
+                         "treat2", "control2", "log2.fold.enrichment2",
                          "-log10.%svalue2" % tc_method))+"\n")
         
         try: peakprefix = name_prefix % name
         except: peakprefix = name_prefix
+        try: desc = description % name
+        except: desc = description
+        trackcontents = (name.replace("\"", "\\\""), desc.replace("\"", "\\\""))
+        if trackline:
+            try: bedwrite('track name="%s (peaks)" description="%s" visibility=1\n' % trackcontents)
+            except: bedwrite('track name=MACS description=Unknown') 
 
         log10 = np.log10
+        log2 = np.log2
         median = np.median
         n_peak = 0
         for chrom in sorted(self.diff_peaks.keys()):
@@ -2757,45 +2774,113 @@ cdef class DiffScoreTrackI:
                 t2s = t2[pos_start:(pos_end+1)]
                 c2s = c2[pos_start:(pos_end+1)]
                 fold_changes = t1s / t2s
-                if log10(median(fold_changes)) > 0:
-                    log10_fold_change = log10(fold_changes).max()
+                if log2(median(fold_changes)) > 0:
+                    log2_fold_change = log2(fold_changes).max()
                 else:
-                    log10_fold_change = log10(fold_changes).min()
+                    log2_fold_change = log2(fold_changes).min()
                 this_dpvalue = diff_pvalues[pos_start:(pos_end+1)].max()
                 this_dqvalue = diff_qvalues[first_i:(last_i+1)].max()
                 this_dlogLR = diff_logLR[pos_start:(pos_end+1)].max()
                 peakname = "%s%d" % (peakprefix, n_peak)
                 max_t1 = t1s.max()
                 max_c1 = c1s.max()
-                if max_t1 > max_c1: log10_fe1 = log10(t1s / c1s).max()
-                else: log10_fe1 = log10(t1s / c1s).min()
+                if max_t1 > max_c1: log2_fe1 = log2(t1s / c1s).max()
+                else: log2_fe1 = log2(t1s / c1s).min()
                 max_t2 = t1s.max()
                 max_c2 = c1s.max()
-                if max_t1 > max_c1: log10_fe2 = log10(t2s / c2s).max()
-                else: log10_fe2 = log10(t2s / c2s).min()
+                if max_t1 > max_c1: log2_fe2 = log2(t2s / c2s).max()
+                else: log2_fe2 = log2(t2s / c2s).min()
                 tc_value1 = tvsc1[pos_start:(pos_end+1)].max()
                 tc_value2 = tvsc2[pos_start:(pos_end+1)].max()
                 #chr,start,end,length, log10fold_change, diff.pvalue, diff.qvalue,
                 #diff.logLR, name,
                 #treat1, control1, fold_enrichment1, -log10(p/qvalue1)
                 #treat2, control2, fold_enrichment2, -log10(p/qvalue2)
-                write("%s\t%d\t%d\t%d" % (chrom, start+1, end, end - start))
-                write("\t%.5f" % log10_fold_change)
-                write("\t%.5f" % this_dpvalue)
-                write("\t%.5f" % this_dqvalue)
-                write("\t%.5f" % this_dlogLR)
-                write("\t%s" % peakname)
-                write("\t%.5f" % max_t1)
-                write("\t%.5f" % max_c1)
-                write("\t%.5f" % log10_fe1)
-                write("\t%.5f" % tc_value1)
-                write("\t%.5f" % max_t2)
-                write("\t%.5f" % max_c2)
-                write("\t%.5f" % log10_fe2)
-                write("\t%.5f" % tc_value2)
-                write("\n")
+                xlswrite("%s\t%d\t%d\t%d" % (chrom, start+1, end, end - start))
+                xlswrite("\t%.5f" % log2_fold_change)
+                xlswrite("\t%.5f" % this_dpvalue)
+                xlswrite("\t%.5f" % this_dqvalue)
+                xlswrite("\t%.5f" % this_dlogLR)
+                xlswrite("\t%s" % peakname)
+                xlswrite("\t%.5f" % max_t1)
+                xlswrite("\t%.5f" % max_c1)
+                xlswrite("\t%.5f" % log2_fe1)
+                xlswrite("\t%.5f" % tc_value1)
+                xlswrite("\t%.5f" % max_t2)
+                xlswrite("\t%.5f" % max_c2)
+                xlswrite("\t%.5f" % log2_fe2)
+                xlswrite("\t%.5f" % tc_value2)
+                xlswrite("\n")
+                bedwrite("%s\t%d\t%d\t%s\t%.5f\n" %
+                         (chrom, start, end, peakname,
+                          this_dqvalue))
         return
 
+    def write_bedgraphs(self, logLR=None, pvalue=None, logFC=None,
+                          str name="MACS",
+                          str description='%s', bool trackline=True):
+        """Write logLR and diff pvalue data to in Wiggle Format.
+
+        fhd: a filehandler to save bedGraph.
+        name/description: the name and description in track line.
+
+        shift will be used to shift the coordinates. default: 0
+        """
+        cdef:
+            int i
+            str chrom
+            np.ndarray[np.int32_t] pos 
+            np.ndarray[np.float32_t] value
+        
+        isfinite = np.isfinite
+        if trackline:
+            trackcontents = (name.replace("\"", "\\\""), description.replace("\"", "\\\""))
+            if logLR is not None:
+                logLR.write("track type=bedGraph name=\"%s\" description=\"log10-likelihood ratio %s\" visibility=2 alwaysZero=on\n" % trackcontents)
+            if pvalue is not None:
+                pvalue.write("track type=bedGraph name=\"%s\" description=\"-log10(pvalue)%s\" visibility=2 alwaysZero=on\n" % trackcontents)
+            if logFC is not None:
+                logFC.write("track type=bedGraph name=\"%s\" description=\"log10(sample1/sample2) %s\" visibility=2 alwaysZero=on\n" % trackcontents)
+                
+        if logLR is not None:
+            for chrom in self.tlogLR.keys():
+                pos = self.pos[chrom]
+                value = self.tlogLR[chrom]
+                if pos.size > 0:
+                    if isfinite(value[0]):
+                        logLR.write("%s\t%d\t%d\t%.5f\n" % (chrom, 0, pos[0],
+                                                      value[0]))
+                    for i in range(1, pos.size):
+                        if isfinite(value[i]):
+                            logLR.write("%s\t%d\t%d\t%.5f\n" % (chrom, pos[i-1], pos[i],
+                                                          value[i]))
+                    
+        if pvalue is not None:
+            for chrom in self.t1vs2.keys():
+                pos = self.pos[chrom]
+                value = self.t1vs2[chrom]
+                if pos.size > 0:
+                    if isfinite(value[0]):
+                        pvalue.write("%s\t%d\t%d\t%.5f\n" % (chrom, 0, pos[0],
+                                                      value[0]))
+                    for i in range(1, pos.size):
+                        if isfinite(value[i]):
+                            pvalue.write("%s\t%d\t%d\t%.5f\n" % (chrom, pos[i-1], pos[i],
+                                                                 value[i]))
+                    
+        if logFC is not None:
+            for chrom in self.pos.keys():
+                pos = self.pos[chrom]
+                value = np.log2(self.t1[chrom] / self.t2[chrom])
+                if pos.size > 0:
+                    if isfinite(value[0]):
+                        logFC.write("%s\t%d\t%d\t%.5f\n" % (chrom, 0, pos[0],
+                                                      value[0]))
+                    for i in range(1, pos.size):
+                        if isfinite(value[i]):
+                            logFC.write("%s\t%d\t%d\t%.5f\n" % (chrom, pos[i-1], pos[i],
+                                                          value[i]))
+                
     cdef long total ( self ):
         """Return the number of regions in this object.
 

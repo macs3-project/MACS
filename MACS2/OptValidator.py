@@ -227,6 +227,10 @@ def diff_opt_validate ( options ):
     
     # output filenames
     options.peakxls = options.name+"_peaks.xls"
+    options.peakbed = options.name+"_peaks.bed"
+    options.bdglogLR = options.name+"_logLR.bdg"
+    options.bdgpvalue = options.name+"_logLR.bdg"
+    options.bdglogFC = options.name+"_logLR.bdg"
     
     options.argtxt = "\n".join((
         "# ARGUMENTS LIST:",\
