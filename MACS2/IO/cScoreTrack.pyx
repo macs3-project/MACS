@@ -2262,15 +2262,15 @@ cdef class DiffScoreTrackI:
             above_cutoff_endpos = pos[above_cutoff] # end positions of regions where score is above cutoff
 
 #            print "Regions > cutoff: %d" % above_cutoff.size
-            # Do zero manually
-            first_i = 0
-            this_start = pos[above_cutoff[0] - 1]
-            this_end = above_cutoff_endpos[0]
-            if this_start > this_end:
-                this_start = 0
-            first_start = this_start
-            last_end = this_end
             if above_cutoff.size > 1:
+                # Do zero manually
+                first_i = 0
+                this_start = pos[above_cutoff[0] - 1]
+                this_end = above_cutoff_endpos[0]
+                if this_start > this_end:
+                    this_start = 0
+                first_start = this_start
+                last_end = this_end
                 for i in range(1, above_cutoff.size):
                     this_start = above_cutoff_endpos[i - 1]
                     this_end = above_cutoff_endpos[i]
@@ -2285,24 +2285,24 @@ cdef class DiffScoreTrackI:
                         first_i = -1
                     last_end = this_end
             
-            if not first_i == -1:
-                if last_end - first_start >= min_length:
-                    in_peaks[above_cutoff[first_i]:above_cutoff[i]] = True
+                if not first_i == -1:
+                    if last_end - first_start >= min_length:
+                        in_peaks[above_cutoff[first_i]:above_cutoff[i]] = True
             
             value = self.tvsc2[chrom]
             above_cutoff = np.nonzero( value >= cutoff )[0] # indices where score is above cutoff
             above_cutoff_endpos = pos[above_cutoff] # end positions of regions where score is above cutoff
             above_cutoff_startpos = pos[above_cutoff-1] # start positions of regions where score is above cutoff
 
-            # Do zero manually
-            first_i = 0
-            this_start = pos[above_cutoff[0] - 1]
-            this_end = above_cutoff_endpos[0]
-            if this_start > this_end:
-                this_start = 0
-            first_start = this_start
-            last_end = this_end
             if above_cutoff.size > 1:
+                # Do zero manually
+                first_i = 0
+                this_start = pos[above_cutoff[0] - 1]
+                this_end = above_cutoff_endpos[0]
+                if this_start > this_end:
+                    this_start = 0
+                first_start = this_start
+                last_end = this_end
                 for i in range(1, above_cutoff.size):
                     this_start = above_cutoff_endpos[i - 1]
                     this_end = above_cutoff_endpos[i]
@@ -2315,9 +2315,9 @@ cdef class DiffScoreTrackI:
                         first_i = -1
                     last_end = this_end
             
-            if not first_i == -1:
-                if last_end - first_start >= min_length:
-                    in_peaks[above_cutoff[first_i]:above_cutoff[i]] = True
+                if not first_i == -1:
+                    if last_end - first_start >= min_length:
+                        in_peaks[above_cutoff[first_i]:above_cutoff[i]] = True
 
             self.where_peaks[chrom] = np.where(in_peaks)[0]
 #            print "Total peakage in bp", in_peaks.sum()
@@ -2631,17 +2631,17 @@ cdef class DiffScoreTrackI:
             # we're going to recalculate this a few times, hopefully it's fast
 
             # peaks are stored as start_i, end_i (0-based, genomic half-open)
-            # Do zero manually
             n_diff_peaks = 0
             diff_peaks = np.ndarray((above_cutoff.size, 2), dtype='int32')
-            first_i = 0
-            this_start = pos[above_cutoff[0] - 1]
-            this_end = pos[above_cutoff[0]]
-            if this_start > this_end:
-                this_start = 0
-            first_start = this_start
-            last_end = this_end
             if above_cutoff.size > 1:
+                # Do zero manually
+                first_i = 0
+                this_start = pos[above_cutoff[0] - 1]
+                this_end = pos[above_cutoff[0]]
+                if this_start > this_end:
+                    this_start = 0
+                first_start = this_start
+                last_end = this_end
 #                print "%d (%d), %d (%d)" %(this_end, i, first_start, first_i)
                 for i in range(1, above_cutoff.size):
                     this_start = pos[above_cutoff[i] - 1]
@@ -2659,11 +2659,11 @@ cdef class DiffScoreTrackI:
                         first_i = -1
                     last_end = this_end
             
-            if not first_i == -1:
-                if last_end - first_start >= min_length:
-                    diff_peaks[n_diff_peaks,0] = first_i
-                    diff_peaks[n_diff_peaks,1] = i
-                    n_diff_peaks += 1
+                if not first_i == -1:
+                    if last_end - first_start >= min_length:
+                        diff_peaks[n_diff_peaks,0] = first_i
+                        diff_peaks[n_diff_peaks,1] = i
+                        n_diff_peaks += 1
 
             diff_peaks.resize((n_diff_peaks, 2), refcheck=False)
 #            print n_diff_peaks, "diff peaks"
