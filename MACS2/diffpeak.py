@@ -61,7 +61,6 @@ def run( args ):
     """
     # Parse options...
     options = diff_opt_validate( args )
-    print options
     #0 output arguments
 #    info("\n"+options.argtxt)
  

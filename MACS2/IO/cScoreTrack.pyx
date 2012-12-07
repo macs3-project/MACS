@@ -2719,8 +2719,8 @@ cdef class DiffScoreTrackI:
             bedwrite = bed.write
         else:
             bedwrite = do_nothing
-        xlswrite("# values are maxmimum in region")
-        xlswrite("# log10_fold_change is positive if t1 > t2")
+        xlswrite("# values are maxmimum in region\n")
+        xlswrite("# log10_fold_change is positive if t1 > t2\n")
         tc_method = self.track_scoring_method
         xlswrite("\t".join(("chr", "start", "end", "length",
                          "log2.fold.change", "-log10.diff.pvalue",
