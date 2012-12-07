@@ -124,6 +124,30 @@ cdef inline double oldlogLR ( double x, double y ):
         logLR_khashtable.set_item(key_value, s)
         return s
 
+cdef inline double logLR_adjusted (double t1, double t2,
+                                   doubel c1, double c2):
+    """Calculate log10 Likelihood between H1 ( enriched ) and H0 (
+    chromatin bias ). Then store the values in integer form =
+    100*logLR. Set minus sign for depletion.
+    
+    """
+    cdef:
+        double s, x, y
+        long key_value
+    
+    x = t1 - c1 - c2
+    y = t2 - c1 - c2
+    key_value = hash( (x, y) )
+    try:
+        return logLR_khashtable.get_item( key_value )
+    except KeyError:
+        if y > x: y, x = x, y
+        if x==y: s = 0
+        
+        else: s = (x*(log(x)-log(y))+y-x)*LOG10_E
+        logLR_khashtable.set_item(key_value, s)
+        return s
+    
 cdef inline double logLR ( double x, double y ):
     """Calculate log10 Likelihood between H1 ( enriched ) and H0 (
     chromatin bias ). Then store the values in integer form =
@@ -2402,8 +2426,8 @@ cdef class DiffScoreTrackI:
             t2 = self.t2[chrom]
             v = self.tlogLR[chrom]
             for i in range(self.pos[chrom].size): 
-                v[i] = logLR((t1[i] + pseudocount),
-                             (t2[i] + pseudocount))
+                v[i] = logLR_adjusted((t1[i] + pseudocount),
+                                      (t2[i] + pseudocount))
             self.t1vs2[chrom] = -log10(sf(2 * v / LOG10_E)).astype('float32')
     
     cpdef compute_diff_qvalues ( self ):
