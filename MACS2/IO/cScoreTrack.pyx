@@ -2423,11 +2423,14 @@ cdef class DiffScoreTrackI:
         pseudocount = self.pseudocount
         for chrom in self.pos.keys():
             t1 = self.t1[chrom]
+            c1 = self.c1[chrom]
             t2 = self.t2[chrom]
+            c2 = self.c2[chrom]
             v = self.tlogLR[chrom]
             for i in range(self.pos[chrom].size): 
                 v[i] = logLR_adjusted((t1[i] + pseudocount),
-                                      (t2[i] + pseudocount))
+                                      (t2[i] + pseudocount),
+                                      c1[i], c2[i])
             self.t1vs2[chrom] = -log10(sf(2 * v / LOG10_E)).astype('float32')
     
     cpdef compute_diff_qvalues ( self ):
