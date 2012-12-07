@@ -66,6 +66,12 @@ def run( args ):
  
     ofile_prefix = options.name
     
+    # check if tag files exist
+    with open(options.t1bdg) as file: pass
+    with open(options.c1bdg) as file: pass
+    with open(options.t2bdg) as file: pass
+    with open(options.c2bdg) as file: pass
+    
     #1 Read tag files
     info("Read and build treatment 1 bedGraph...")
     t1bio = cBedGraphIO.bedGraphIO(options.t1bdg)
