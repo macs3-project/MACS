@@ -135,8 +135,8 @@ cdef inline double logLR_adjusted (double t1, double t2,
         double s, x, y
         long key_value
     
-    x = t1 - c1 - c2
-    y = t2 - c1 - c2
+    x = max(0,t1 - c1 - c2)
+    y = max(0,t2 - c1 - c2)
     key_value = hash( (x, y) )
     try:
         return logLR_khashtable.get_item( key_value )
