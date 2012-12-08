@@ -124,8 +124,7 @@ cdef inline double oldlogLR ( double x, double y ):
         logLR_khashtable.set_item(key_value, s)
         return s
 
-cdef inline double logLR_adjusted (double t1, double t2,
-                                   double c1, double c2):
+cdef inline double logLR_adjusted (int x, int y):
     """Calculate log10 Likelihood between H1 ( enriched ) and H0 (
     chromatin bias ). Then store the values in integer form =
     100*logLR. Set minus sign for depletion.
@@ -135,17 +134,15 @@ cdef inline double logLR_adjusted (double t1, double t2,
         double s, x, y
         long key_value
     
-    x = max(0,t1 - c1 - c2)
-    y = max(0,t2 - c1 - c2)
     key_value = hash( (x, y) )
     try:
-        return logLR_khashtable.get_item( key_value )
+        return logLR_int_khashtable.get_item( key_value )
     except KeyError:
         if y > x: y, x = x, y
         if x==y: s = 0
         
         else: s = (x*(log(x)-log(y))+y-x)*LOG10_E
-        logLR_khashtable.set_item(key_value, s)
+        logLR_int_khashtable.set_item(key_value, s)
         return s
     
 cdef inline double logLR ( double x, double y ):
@@ -1993,7 +1990,7 @@ cdef class DiffScoreTrackI:
         dict pvalue_stat1, pvalue_stat2
         str track_scoring_method
     
-    def __init__ (self, t1bdg, c1bdg, t2bdg, c2bdg, float cond1_depth = 1.0, float cond2_depth = 1.0, float pseudocount = 0.01 ):
+    def __init__ (self, t1bdg, c1bdg, t2bdg, c2bdg, float cond1_depth = 1.0, float cond2_depth = 1.0, int pseudocount = 1 ):
         self.pos = {}
         self.t1 = {}
         self.c1 = {}
@@ -2032,7 +2029,7 @@ cdef class DiffScoreTrackI:
                                    cond1_treat_vs, cond1_control_vs,
                                    cond2_treat_vs, cond2_control_vs )
             
-    cpdef set_pseudocount( self, float pseudocount ):
+    cpdef set_pseudocount( self, int pseudocount ):
         self.pseudocount = pseudocount
 
     cdef build_chromosome( self, chrname,
@@ -2186,7 +2183,7 @@ cdef class DiffScoreTrackI:
                 if c[i] > p[i]:
                     v[i] = 1
                 else:
-                    v[ i ] =  get_interpolated_pscore(p[i], c[i])
+                    v[ i ] =  get_pscore(p[i], c[i])
                 try:
                     self.pvalue_stat1[v[ i ]] += pos[ i ] - prev_pos
                 except:
@@ -2415,7 +2412,7 @@ cdef class DiffScoreTrackI:
         cdef:
             str chrom
             int i
-            float pseudocount
+            int pseudocount
             np.ndarray[np.float32_t] t1, t2, v
         rv = chi2(1) # a chi-squared distribution with one degree of freedom
         sf = rv.sf
@@ -2428,9 +2425,8 @@ cdef class DiffScoreTrackI:
             c2 = self.c2[chrom]
             v = self.tlogLR[chrom]
             for i in range(self.pos[chrom].size): 
-                v[i] = logLR_adjusted((t1[i] + pseudocount),
-                                      (t2[i] + pseudocount),
-                                      c1[i], c2[i])
+                v[i] = logLR_adjusted((int(t1[i]) + pseudocount),
+                                      (int(t2[i]) + pseudocount))
             self.t1vs2[chrom] = -log10(sf(2 * v / LOG10_E)).astype('float32')
     
     cpdef compute_diff_qvalues ( self ):
