@@ -125,7 +125,7 @@ cdef inline double oldlogLR ( double x, double y ):
         return s
 
 cdef inline double logLR_adjusted (double t1, double t2,
-                                   doubel c1, double c2):
+                                   double c1, double c2):
     """Calculate log10 Likelihood between H1 ( enriched ) and H0 (
     chromatin bias ). Then store the values in integer form =
     100*logLR. Set minus sign for depletion.
