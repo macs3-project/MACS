@@ -131,7 +131,7 @@ cdef inline double logLR_adjusted (int x, int y):
     
     """
     cdef:
-        double s, x, y
+        double s
         long key_value
     
     key_value = hash( (x, y) )
@@ -2183,7 +2183,7 @@ cdef class DiffScoreTrackI:
                 if c[i] > p[i]:
                     v[i] = 1
                 else:
-                    v[ i ] =  get_pscore(p[i], c[i])
+                    v[ i ] =  get_pscore(p[i] + pseudocount, c[i])
                 try:
                     self.pvalue_stat1[v[ i ]] += pos[ i ] - prev_pos
                 except:
