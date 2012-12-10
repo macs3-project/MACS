@@ -24,6 +24,7 @@ from __future__ import print_function # this line must be first
 from MACS2.Constants import *
 from itertools import groupby
 from operator import itemgetter
+import re
 
 # ------------------------------------
 # constants
@@ -52,9 +53,9 @@ class PeakIO:
     def __init__ (self):
         self.peaks = {}
     
-    def add (self, str chromosome, long start, long end, long summit = 0, 
-             double peak_score=0, int pileup=0, 
-             double pscore=0, double fold_change=0, double qscore=0,
+    def add (self, str chromosome, int start, int end, int summit = 0, 
+             float peak_score=0, float pileup=0, 
+             float pscore=0, float fold_change=0, float qscore=0,
              str name="NA"):
         """items:
         start:start
@@ -445,6 +446,58 @@ l        |           |      |0-based offset from chromStart. Use -1  |
             except StopIteration:
                 continue
         return total_num
+
+    def read_from_xls (self, ofhd):
+        """Save the peak results in a tab-delimited plain text file
+        with suffix .xls.
+        
+        """
+        cdef:
+            str line = '#'
+            str chrom = ''
+            int n_peak = 0
+            int start, end, length, summit
+            float pileup, pscore, fc, qscore
+        while line.startswith('#'):
+            line = ofhd.readline()
+        
+        # sanity check
+        columns = line.rstrip().split('\t')
+        for a,b in zip(columns, ("chr","start", "end",  "length",  "abs_summit", "pileup", "-log10(pvalue)", "fold_enrichment", "-log10(qvalue)", "name"))
+            if not a==b: raise NotImplementedError('column %s not recognized', a)
+
+        add = self.add
+        for i, line in enumerate(ofhd.readlines())
+            if not chrom == line[0]:
+                chrom = line[0]
+                peaks = self.peaks[chrom]
+            peak = {}
+            chrom = line[0]
+            start = int(line[1]) - 1
+            end = int(line[2])
+            length = int(line[3])
+            if end - start != length:
+                raise UserWarning('Malformed peak at line %d:\n%s' % (i, line))
+            summit = int(line[4]) - 1
+            pileup = float(line[5])
+            pscore = float(line[6])
+            fc = float(line[7])
+            qscore = float(line[8])
+            peakname = line[9]
+            
+        def parse_peakname(peakname):
+            """returns peaknumber, subpeak  
+            """
+            cdef:
+                str peak_id, peaknumber, subpeak
+            peak_id = peakname.split('_')[-1]
+            x = re.split('(\D.*)', peak_id)
+            peaknumber = int(x[0])
+            try:
+                subpeak = x[1]
+            except IndexError:
+                subpeak = ''
+            return (peaknumber, subpeak)
 
 class Region:
     """For plain region of chrom, start and end
