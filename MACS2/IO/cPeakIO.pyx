@@ -453,37 +453,43 @@ l        |           |      |0-based offset from chromStart. Use -1  |
         
         """
         cdef:
-            str line = '#'
+            str line = ''
             str chrom = ''
             int n_peak = 0
             int start, end, length, summit
             float pileup, pscore, fc, qscore
-        while line.startswith('#'):
+            list fields
+        while True:
+            if not (line.startswith('#') or line.strip() == ''): break
             line = ofhd.readline()
         
         # sanity check
         columns = line.rstrip().split('\t')
-        for a,b in zip(columns, ("chr","start", "end",  "length",  "abs_summit", "pileup", "-log10(pvalue)", "fold_enrichment", "-log10(qvalue)", "name"))
+        for a,b in zip(columns, ("chr","start", "end",  "length", "abs_summit",
+                                 "pileup", "-log10(pvalue)", "fold_enrichment",
+                                 "-log10(qvalue)", "name")):
             if not a==b: raise NotImplementedError('column %s not recognized', a)
 
         add = self.add
-        for i, line in enumerate(ofhd.readlines())
-            if not chrom == line[0]:
-                chrom = line[0]
-                peaks = self.peaks[chrom]
+        split = str.split
+        rstrip = str.rstrip
+        for i, line in enumerate(ofhd.readlines()):
+            fields = split(line, '\t')
             peak = {}
-            chrom = line[0]
-            start = int(line[1]) - 1
-            end = int(line[2])
-            length = int(line[3])
+            chrom = fields[0]
+            start = int(fields[1]) - 1
+            end = int(fields[2])
+            length = int(fields[3])
             if end - start != length:
                 raise UserWarning('Malformed peak at line %d:\n%s' % (i, line))
-            summit = int(line[4]) - 1
-            pileup = float(line[5])
-            pscore = float(line[6])
-            fc = float(line[7])
-            qscore = float(line[8])
-            peakname = line[9]
+            summit = int(fields[4]) - 1
+            pileup = float(fields[5])
+            pscore = float(fields[6])
+            fc = float(fields[7])
+            qscore = float(fields[8])
+            peakname = rstrip(fields[9])
+            add(chrom, start, end, summit, qscore, pileup, pscore, fc, qscore,
+                peakname)
             
         def parse_peakname(peakname):
             """returns peaknumber, subpeak  
