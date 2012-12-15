@@ -242,16 +242,20 @@ def add_diffpeak_parser( subparsers ):
                                     help = "MACS control lambda bedGraph for condition 1. REQUIRED" )
     group_input.add_argument( "--c2", dest="c2bdg", type = str, required = True,
                                     help = "MACS control lambda bedGraph for condition 2. REQUIRED" )
+    group_input.add_argument( "--peaks1", dest = "peaks1", type = str, default='',
+                                    help = "MACS peaks.xls file for condition 1. Optional but must specify peaks2 if present" )
+    group_input.add_argument( "--peaks2", dest="peaks2", type = str, default='',
+                                    help = "MACS peaks.xls file for condition 2. Optional but must specify peaks1 if present" )
     group_input.add_argument( "--depth1", dest = "depth1", type = float, default = 1.0,
                                     help = "Sequence depth of condition 1 in million reads. Default: 1 (if you use 'macs2 callpeak --SPMR' to generate bdg files." )
     group_input.add_argument( "--depth2", dest = "depth2", type = float, default = 1.0,
                                     help = "Sequence depth of condition 2 in million reads. Default: 1 (if you use 'macs2 callpeak --SPMR' to generate bdg files." )
     group_input.add_argument( "--peak-regions", dest="peakregions", type = str, required = False,
                                     help = "Peak regions as previously called by MACS. If absent, peaks will be found a second time." )
-    group_input.add_argument( "-f", "--format", dest = "format", type = str,
-                              choices = ("AUTO", "BED", "XLS"),
-                              help = "Format of peak regions file, \"AUTO\", \"BED\" or \"XLS\". The default AUTO option will let MACS decide which format the file is based on the file extension. DEFAULT: \"AUTO\"",
-                              default = "AUTO" )
+#    group_input.add_argument( "-f", "--format", dest = "format", type = str,
+#                              choices = ("AUTO", "BED", "XLS"),
+#                              help = "Format of peak regions file, \"AUTO\", \"BED\" or \"XLS\". The default AUTO option will let MACS decide which format the file is based on the file extension. DEFAULT: \"AUTO\"",
+#                              default = "AUTO" )
     
     # group for output files
     group_output = argparser_diffpeak.add_argument_group( "Output arguments" )
@@ -283,7 +287,7 @@ def add_diffpeak_parser( subparsers ):
     group_diffpeak.add_argument( "-m", "--peak-min-len", dest = "pminlen", type = int,
                                     help = "Minimum length of peak regions. DEFAULT: 200", default = 200 )
     group_diffpeak.add_argument( "--diff-min-len", dest = "dminlen", type = int,
-                                    help = "Minimum length of differential region (must overlap a valid peak). DEFAULT: 50", default = 50 )
+                                    help = "Minimum length of differential region (must overlap a valid peak). DEFAULT: 50", default = 100 )
     group_diffpeak.add_argument( "--ignore-duplicate-peaks", dest="ignore_duplicate_peaks", action="store_false",
                          help="If set, MACS will ignore duplicate regions with identical coordinates. Helpful if --call-summits was set. DEFAULT: True",default=True)
     return

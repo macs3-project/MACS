@@ -491,19 +491,19 @@ l        |           |      |0-based offset from chromStart. Use -1  |
             add(chrom, start, end, summit, qscore, pileup, pscore, fc, qscore,
                 peakname)
             
-        def parse_peakname(peakname):
-            """returns peaknumber, subpeak  
-            """
-            cdef:
-                str peak_id, peaknumber, subpeak
-            peak_id = peakname.split('_')[-1]
-            x = re.split('(\D.*)', peak_id)
-            peaknumber = int(x[0])
-            try:
-                subpeak = x[1]
-            except IndexError:
-                subpeak = ''
-            return (peaknumber, subpeak)
+cpdef parse_peakname(peakname):
+    """returns peaknumber, subpeak  
+    """
+    cdef:
+        str peak_id, peaknumber, subpeak
+    peak_id = peakname.split('_')[-1]
+    x = re.split('(\D.*)', peak_id)
+    peaknumber = int(x[0])
+    try:
+        subpeak = x[1]
+    except IndexError:
+        subpeak = ''
+    return (peaknumber, subpeak)
 
 class Region:
     """For plain region of chrom, start and end

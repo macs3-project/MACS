@@ -1,3 +1,4 @@
+# cython: profile=True
 # Time-stamp: <2012-10-18 15:46:03 Tao Liu>
 
 """Module for Feature IO classes.
@@ -21,6 +22,7 @@ import numpy as np
 cimport numpy as np
 
 from array import array as pyarray
+from copy import copy
 
 from operator import itemgetter
 
@@ -32,11 +34,14 @@ from MACS2.cSignal import maxima, enforce_valleys, enforce_peakyness
 # Experimental
 from scipy.stats import chi2
 
+from cython.parallel import parallel, prange
+cimport cython
+
 from libc.math cimport log10,log, floor, ceil
 
-from MACS2.Constants import *
+from MACS2.Constants import BYTE4, FBYTE4, array
 from MACS2.cProb cimport poisson_cdf
-from MACS2.IO.cPeakIO import PeakIO, BroadPeakIO
+from MACS2.IO.cPeakIO import PeakIO, BroadPeakIO, parse_peakname
 
 from MACS2.hashtable import Int64HashTable, Float64HashTable
 
@@ -136,13 +141,13 @@ cdef inline double logLR_adjusted (int x, int y):
     
     key_value = hash( (x, y) )
     try:
-        return logLR_int_khashtable.get_item( key_value )
+        return logLR_khashtable.get_item( key_value )
     except KeyError:
         if y > x: y, x = x, y
         if x==y: s = 0
         
         else: s = (x*(log(x)-log(y))+y-x)*LOG10_E
-        logLR_int_khashtable.set_item(key_value, s)
+        logLR_khashtable.set_item(key_value, s)
         return s
     
 cdef inline double logLR ( double x, double y ):
@@ -1743,7 +1748,7 @@ cdef class TwoConditionScores:
             
         return True
 
-    cpdef write_matrix ( self, fhd, str name, str description ):
+    cpdef write_matrix ( self, fhd, str name, str description, short column = 3 ):
         """Write all data to fhd into five columns Format:
 
         col1: chr_start_end
@@ -1782,7 +1787,7 @@ cdef class TwoConditionScores:
         return True
 
     cpdef call_peaks (self, float cutoff=0.05, int min_length=200,
-                      int max_gap=0, bool call_summits=False):
+                      bool call_summits=False):
         """This function try to find regions within which, scores
         are continuously higher than a given cutoff.
 
@@ -1805,7 +1810,8 @@ cdef class TwoConditionScores:
                        above_cutoff_startpos, above_cutoff_sv
             np.ndarray[np.float32_t] cat1_qvalues, cat2_qvalues, cat3_qvalues
             list peak_content
-        
+            int max_gap
+        max_gap = min_length / 4
         chrs  = self.get_chr_names()
         cat1_peaks = PeakIO()       # dictionary to save peaks significant at condition 1
         cat2_peaks = PeakIO()       # dictionary to save peaks significant at condition 2
@@ -1821,8 +1827,8 @@ cdef class TwoConditionScores:
         cat2_qvalues_by_chrom = {}
         cat3_qvalues_by_chrom = {}
         for chrom in chrs:
-            t1vsc1 = self.data[chrom][ 1 ]
-            t2vsc2 = self.data[chrom][ 2 ]            
+            tvsc1 = self.data[chrom][ 1 ]
+            tvsc2 = self.data[chrom][ 2 ]            
             and_ = np.logical_and
             not_ = np.logical_not
             cond1_sig = tvsc1 >= logcutoff
@@ -1982,10 +1988,12 @@ cdef class DiffScoreTrackI:
     cdef:
         dict pos, t1, c1, t2, c2, tvsc1, tvsc2, t1vs2, tlogLR
         dict where_peaks, diff_peaks, diff_qvalues
+        dict which_peaks1, which_peaks2
+        object p1io, p2io
         dict datalength                 # length of data array of each chromosome
-        float cond1_depth                 # seq depth in million of treatment
-        float cond2_depth                  # seq depth in million of control
-        float pseudocount                # the pseudocount used to calcuate LLR
+        float cond1_depth               # seq depth in million of treatment
+        float cond2_depth               # seq depth in million of control
+        int pseudocount                 # the pseudocount used to calcuate LLR
         float cutoff
         dict pvalue_stat1, pvalue_stat2
         str track_scoring_method
@@ -2002,6 +2010,8 @@ cdef class DiffScoreTrackI:
         self.diff_qvalues = {}
         self.tlogLR = {}
         self.where_peaks = {}
+        self.which_peaks1 = {}
+        self.which_peaks2 = {}
         self.diff_peaks = {}
         self.datalength = {}
         self.cond1_depth = cond1_depth
@@ -2082,7 +2092,101 @@ cdef class DiffScoreTrackI:
         except StopIteration:
             # meet the end of either bedGraphTrackI, simply exit
             pass
-
+    
+    # REQUIRES Cython >= 0.16
+    cpdef rebuild_chromosomes( self ):
+        cdef:
+#            np.ndarray[np.int32_t] pos, pos_copy
+#            np.ndarray[np.float32_t] t1, c1, t2, c2
+#            np.ndarray[np.float32_t] t1_copy, c1_copy, t2_copy, c2_copy
+            int[:] pos, pos_copy
+            float[:] t1, c1, t2, c2
+            float[:] t1_copy, c1_copy, t2_copy, c2_copy
+            int i, j, i_new, n, k
+            str chrom
+            np.ndarray[np.int32_t] peaks
+            int datalength
+        for chrom in self.pos.keys():
+            try:
+                peaks1 = self.p1io.get_data_from_chrom(chrom)
+            except KeyError: peask1 = []
+            try:
+                peaks2 = self.p2io.get_data_from_chrom(chrom)
+            except KeyError: peaks2 = []
+            peaks = np.unique(np.array(map(itemgetter('start'), peaks1) +
+                             map(itemgetter('end'), peaks1) +
+                             map(itemgetter('start'), peaks2) +
+                             map(itemgetter('end'), peaks2),
+                             dtype='int32'))
+            n = peaks.size
+            datalength = self.datalength[chrom]
+            # resize the originals
+            self.pos[chrom].resize(datalength + n, refcheck=False)
+            self.t1[chrom].resize(datalength + n, refcheck=False)
+            self.c1[chrom].resize(datalength + n, refcheck=False)
+            self.t2[chrom].resize(datalength + n, refcheck=False)
+            self.c2[chrom].resize(datalength + n, refcheck=False)
+            pos = self.pos[chrom]
+            t1 = self.t1[chrom]
+            c1 = self.c1[chrom]
+            t2 = self.t2[chrom]
+            c2 = self.c2[chrom]
+            pos_copy = np.ndarray(datalength, 'int32')
+            t1_copy = np.ndarray(datalength, 'float32')
+            c1_copy = np.ndarray(datalength, 'float32')
+            t2_copy = np.ndarray(datalength, 'float32')
+            c2_copy = np.ndarray(datalength, 'float32')
+            # GIL not needed here, provides speedup
+            with cython.boundscheck(False):
+                with nogil, parallel():
+                    for i in prange(datalength):
+#            for i in range(datalength):
+                        pos_copy[i] = pos[i]
+                        t1_copy[i] = t1[i]
+                        c1_copy[i] = c1[i]
+                        t2_copy[i] = t2[i]
+                        c2_copy[i] = c2[i]
+            
+                j = 0
+                i_new = 0
+                for i in range(datalength):
+                    while True:
+                        if j == n: break
+                        if peaks[j] < pos_copy[i]:
+                            pos[i_new] = peaks[j]
+                            j += 1
+                            t1[i_new] = t1_copy[i]
+                            t2[i_new] = t2_copy[i]
+                            c1[i_new] = c1_copy[i]
+                            c2[i_new] = c2_copy[i]
+                            i_new += 1
+                        elif peaks[j] == pos[i]:
+                            j += 1
+                            break
+                        else: # pos[i] < peaks[j], keep increasing pos
+                            break
+                    # this would just copy the array without the above loop
+                    if j == n: break
+                    pos[i_new] = pos_copy[i]
+                    t1[i_new] = t1_copy[i]
+                    t2[i_new] = t2_copy[i]
+                    c1[i_new] = c1_copy[i]
+                    c2[i_new] = c2_copy[i]
+                    i_new += 1
+#            pos_copy.resize(0, refcheck=False)
+#            t1_copy.resize(0, refcheck=False)
+#            t2_copy.resize(0, refcheck=False)
+#            c1_copy.resize(0, refcheck=False)
+#            c1_copy.resize(0, refcheck=False)
+            # j should never be greater than n - 1 if we used MACS2
+            self.pos[chrom].resize(i_new, refcheck=False)
+            self.t1[chrom].resize(i_new, refcheck=False)
+            self.c1[chrom].resize(i_new, refcheck=False)
+            self.t2[chrom].resize(i_new, refcheck=False)
+            self.c2[chrom].resize(i_new, refcheck=False)
+            self.datalength[chrom] = i_new # resize everything last
+        self.finalize()
+        
     cdef add_chromosome ( self, str chrom, int chrom_max_len ):
         """
         chrom: chromosome name
@@ -2172,6 +2276,7 @@ cdef class DiffScoreTrackI:
             long l, i, prev_pos
             str chrom
         
+        pseudocount = self.pseudocount
         for chrom in self.pos.keys():
             prev_pos = 0
             pos = self.pos[chrom]
@@ -2251,6 +2356,10 @@ cdef class DiffScoreTrackI:
         
         self.track_scoring_method = 'q'
         return
+    
+    cpdef break_on_peaks(self, p1io, p2io):
+        """Introduce breaks at peak regions as needed
+        """
     
     cpdef call_peaks (self, float cutoff=2.0, int min_length=200, int max_gap=50):
         """This function try to find regions within which, scores
@@ -2345,6 +2454,82 @@ cdef class DiffScoreTrackI:
         
         return
 
+    cpdef store_peaks(self, p1io, p2io):
+        self.p1io = p1io
+        self.p2io = p2io
+        
+    cpdef annotate_peaks(self):
+        cdef:
+            str chrom
+            int i, i_max, ii, j, j_max
+            np.ndarray[np.int32_t] pos, where_peaks, which_peaks1, which_peaks2
+            np.ndarray[np.int32_t] p1starts, p1ends, p2starts, p2ends
+        for chrom in self.pos.keys():
+            pos = self.pos[chrom]
+            i_max = self.datalength[chrom]
+            
+            which_peaks1 = -np.ones(self.datalength[chrom], dtype='int32')
+            which_peaks2 = -np.ones(self.datalength[chrom], dtype='int32')
+            try:
+                data = self.p1io.get_data_from_chrom(chrom)
+            except KeyError: data = []
+            p1starts = np.array(map(itemgetter("start"), data), 'int32')
+            p1ends = np.array(map(itemgetter("end"), data), 'int32')
+            j = 0
+            j_max = p1starts.size
+            for i in range(i_max - 1):
+                if j == j_max: break
+                if pos[i] == p1starts[j]:
+                # then the i + 1 fragment starts with the correct value
+                    # find the end
+                    end = p1ends[j]
+                    for ii in range(i + 1, i_max - 1):
+                        if pos[ii] == end:
+                            break
+                        # assert pos[ii] < end, "something went wrong"
+                    # ii end = true end, but ii is still part of peak
+                    which_peaks1[(i + 1):(ii + 1)] = j
+                    j += 1
+                    # skip additional subpeaks
+                    while True:
+                        if j == j_max: break
+                        if p1ends[j] == p1ends[j - 1]: j += 1
+                        else: break
+                    
+            try:
+                data = self.p2io.get_data_from_chrom(chrom)
+            except KeyError: data = []
+            p2starts = np.array(map(itemgetter("start"), data), 'int32')
+            p2ends = np.array(map(itemgetter("end"), data), 'int32')
+            j = 0
+            j_max = p2starts.size
+            for i in range(i_max - 1):
+                if j == j_max: break
+                if pos[i] == p2starts[j]:
+                # then the i + 1 fragment starts with the correct value
+                    # find the end
+                    end = p2ends[j]
+                    for ii in range(i + 1, i_max - 1):
+                        if pos[ii] == end:
+                            break
+                        # assert pos[ii] < end, "something went wrong"
+                    # ii end = true end, but ii is still part of peak
+                    which_peaks2[(i + 1):(ii + 1)] = j
+                    j += 1
+                    # skip additional subpeaks
+                    while True:
+                        if j == j_max: break
+                        if p2ends[j] == p2ends[j - 1]: j += 1
+                        else: break
+            
+            where_peaks = np.where( (which_peaks1 + which_peaks2) > 0 )[0].astype('int32')
+            self.where_peaks[chrom] = where_peaks
+            self.which_peaks1[chrom] = which_peaks1[where_peaks]
+            self.which_peaks2[chrom] = which_peaks2[where_peaks]
+            # note that we skipped peaks which have the same start end
+            # we'll find them again later using groupby
+        
+
     cpdef tuple make_treatcontrol_pq_tables ( self ):
         """Make pvalue-qvalue table.
 
@@ -2411,7 +2596,7 @@ cdef class DiffScoreTrackI:
         """
         cdef:
             str chrom
-            int i
+            int i, chrom_length
             int pseudocount
             np.ndarray[np.float32_t] t1, t2, v
         rv = chi2(1) # a chi-squared distribution with one degree of freedom
@@ -2424,10 +2609,11 @@ cdef class DiffScoreTrackI:
             t2 = self.t2[chrom]
             c2 = self.c2[chrom]
             v = self.tlogLR[chrom]
-            for i in range(self.pos[chrom].size): 
-                v[i] = logLR_adjusted((int(t1[i]) + pseudocount),
-                                      (int(t2[i]) + pseudocount))
-            self.t1vs2[chrom] = -log10(sf(2 * v / LOG10_E)).astype('float32')
+            with cython.boundscheck(False):
+                for i in range(self.pos[chrom].size): 
+                    v[i] = logLR_adjusted(<int>t1[i] + pseudocount,
+                                          <int>t2[i] + pseudocount)
+                self.t1vs2[chrom] = -log10(sf(2 * v / LOG10_E)).astype('float32')
     
     cpdef compute_diff_qvalues ( self ):
         """Compute -log_{10}(qvalue)
@@ -2566,46 +2752,47 @@ cdef class DiffScoreTrackI:
             
         return True
 
-    cpdef write_matrix ( self, fhd, str name, str description ):
-        """Write all data to fhd into five columns Format:
+#    cpdef write_matrix ( self, fhd, str name, str description ):
+#        """Write all data to fhd into five columns Format:
+#
+#        col1: chr_start_end
+#        col2: t1 vs c1
+#        col3: t2 vs c2
+#        col4: t1 vs t2
+#        col5: t2 vs t1
+#
+#        fhd: a filehandler to save the matrix.
+#
+#        """
+#        cdef:
+#            str chrom
+#            int l, pre, i, p 
+#            float v1, v2, v3, v4
+#            np.ndarray pos, value
+#
+#        write = fhd.write
+#
+#        chrs = self.get_chr_names()
+#        for chrom in chrs:
+#            pos = self.data[ chrom ][ 0 ]
+#            value = self.data[ chrom ][ column ]
+#            l = self.datalength[ chrom ]
+#            pre = 0
+#            if pos.shape[ 0 ] == 0: continue # skip if there's no data
+#            for i in range( 0, l ):
+#                v1 = self.data[ i ][ 1 ]
+#                v2 = self.data[ i ][ 2 ]
+#                v3 = self.data[ i ][ 3 ]
+#                v4 = self.data[ i ][ 4 ]                
+#                p = pos[ i ]
+#                write( "%s:%d_%d\t%.5f\t%.5f\t%.5f\t%.5f\n" % ( chrom, pre, p, v1, v2, v3, v4 ) )
+#                pre = p
+#            
+#        return True
 
-        col1: chr_start_end
-        col2: t1 vs c1
-        col3: t2 vs c2
-        col4: t1 vs t2
-        col5: t2 vs t1
-
-        fhd: a filehandler to save the matrix.
-
-        """
-        cdef:
-            str chrom
-            int l, pre, i, p 
-            float v1, v2, v3, v4
-            np.ndarray pos, value
-
-        write = fhd.write
-
-        chrs = self.get_chr_names()
-        for chrom in chrs:
-            pos = self.data[ chrom ][ 0 ]
-            value = self.data[ chrom ][ column ]
-            l = self.datalength[ chrom ]
-            pre = 0
-            if pos.shape[ 0 ] == 0: continue # skip if there's no data
-            for i in range( 0, l ):
-                v1 = self.data[ i ][ 1 ]
-                v2 = self.data[ i ][ 2 ]
-                v3 = self.data[ i ][ 3 ]
-                v4 = self.data[ i ][ 4 ]                
-                p = pos[ i ]
-                write( "%s:%d_%d\t%.5f\t%.5f\t%.5f\t%.5f\n" % ( chrom, pre, p, v1, v2, v3, v4 ) )
-                pre = p
-            
-        return True
-
+    @cython.boundscheck(False)
     cpdef call_diff_peaks (self, float cutoff=2.0, int min_length=50,
-                      int max_gap=20, str score_method='q'):
+                           str score_method='q'):
         """This function try to find regions within which, scores
         are continuously higher than a given cutoff.
 
@@ -2623,10 +2810,11 @@ cdef class DiffScoreTrackI:
         cdef:
             int i, first_i, length
             str chrom
-            np.ndarray pos, sample, control, value, above_cutoff, \
-                       above_cutoff_v, above_cutoff_endpos, \
-                       above_cutoff_startpos, above_cutoff_sv
+            np.ndarray[np.int32_t] pos, above_cutoff, qpos
+            np.ndarray[np.float32_t] t1vst2, diff_qvalues
             np.ndarray[np.int32_t, ndim=2] diff_peaks
+            int max_gap
+        max_gap = min_length / 4
         
         chrs  = self.get_chr_names()
 
@@ -2734,6 +2922,10 @@ cdef class DiffScoreTrackI:
         with suffix .xls.
         
         """
+        if (len(self.which_peaks1.keys()) + len(self.which_peaks2.keys())) > 0: 
+            return self.write_peaks2(xls=xls, bed=bed, name_prefix=name_prefix, 
+                              name=name, description=description,
+                              trackline=trackline)
         if xls is not None:
             xlswrite = xls.write
         else:
@@ -2838,6 +3030,239 @@ cdef class DiffScoreTrackI:
                          (chrom, start, end, peakname,
                           this_dqvalue))
         return
+    
+    
+    def write_peaks2(self, xls=None, bed=None, name_prefix="%s_peak_", name="MACS",
+                    description='%s', trackline=True):
+        """Save the peak results in a tab-delimited plain text file
+        with suffix .xls.
+        
+        """
+        cdef:
+            list peaks1, peaks2
+            dict peak1, peak2
+            np.ndarray[np.int32_t] peaks1_selection, peaks2_selection
+            np.ndarray[np.int32_t] i_peaks1, i_peaks2
+            np.ndarray[np.int32_t] pos, which_peaks1, which_peaks2
+            np.ndarray[np.float32_t] t1, c1, t2, c2, tvsc1, tvsc2
+            np.ndarray[np.float32_t] diff_pvalues, diff_qvalues, diff_logLR
+            np.ndarray[np.int32_t] qpos, above_cutoff
+            int start_i, end_i, first_i, last_i
+            int i1, i2
+            int qpos_i
+            int peak1_pos_i, peak2_pos_i
+            int peak_i, peak_ii, peak1_i, peak2_i
+            int npeaks1, npeaks2
+            int peak1_selection_i, peak2_selection_i
+            int n_peak
+            bool peak1_present, peak2_present
+            float this_dpvalue, this_dqvalue, this_dlogLR
+            float pseudocount
+        assert len(self.which_peaks1.keys()) + len(self.which_peaks2.keys()) > 0, "No information on peaks"
+        logging.captureWarnings(True) 
+        pseudocount = float(self.pseudocount)
+        if xls is not None:
+            xlswrite = xls.write
+        else:
+            xlswrite = do_nothing
+        if bed is not None:
+            bedwrite = bed.write
+        else:
+            bedwrite = do_nothing
+        xlswrite("# summit is defined as greatest summit from greatest sample in region \n")
+        xlswrite("# values are reported for the summit, except for \n")
+        xlswrite("# fold_enrichment, sample/control qvalues, peaknames, which are copied from the peak info \n")
+        xlswrite("# values are NOT reported in SPMR if depth was specified\n")
+        xlswrite("# differential values are reported at the taller sample peak\n")
+        xlswrite("# log10_fold_change is positive if t1 > t2\n")
+        xlswrite("\t".join(("chr", "start", "end", "length", "summit",
+                         "log2.fold.change","log2.fold.change.w.psuedocounts",
+                         "-log10.diff.pvalue",
+                         "-log10.diff.qvalue",
+                         "diff.log10LR", "name",
+                         "treat1", "control1", "log2.fold.enrichment1",
+                         "-log10.qvalue1", "peakname1", "summit1",
+                         "treat2", "control2", "log2.fold.enrichment2",
+                         "-log10.qvalue2", "peakname2", "summit2",
+                         ))+"\n")
+        
+        try: peakprefix = name_prefix % name
+        except: peakprefix = name_prefix
+        try: desc = description % name
+        except: desc = description
+        trackcontents = (name.replace("\"", "\\\""), desc.replace("\"", "\\\""))
+        if trackline:
+            try: bedwrite('track name="%s (peaks)" description="%s" visibility=1\n' % trackcontents)
+            except: bedwrite('track name=MACS description=Unknown') 
+
+        log10 = np.log10
+        log2 = np.log2
+        median = np.median
+        n_peak = 0
+        for chrom in sorted(self.diff_peaks.keys()):
+            peak1_pos_i = 0
+            peak2_pos_i = 0
+            qpos_i = 0
+            pos = self.pos[chrom]
+            qpos = self.where_peaks[chrom]
+            which_peaks1 = self.which_peaks1[chrom]
+            which_peaks2 = self.which_peaks2[chrom]
+            try: peaks1 = self.p1io.get_data_from_chrom(chrom)
+            except KeyError: peaks1 = []
+            npeaks1 = len(peaks1)
+            try: peaks2 = self.p2io.get_data_from_chrom(chrom)
+            except KeyError: peaks2 = []
+            npeaks2 = len(peaks2)
+            t1 = self.t1[chrom]
+            t2 = self.t2[chrom]
+            c1 = self.c1[chrom]
+            c2 = self.c2[chrom]
+            tvsc1 = self.tvsc1[chrom]
+            tvsc2 = self.tvsc2[chrom]
+            diff_pvalues = self.t1vs2[chrom]
+            diff_qvalues = self.diff_qvalues[chrom]
+            diff_logLR = self.tlogLR[chrom]
+            above_cutoff = np.where(diff_qvalues >= self.cutoff)[0].astype('int32')
+            # use some extra memory so we don't have to reallocate every time
+            peaks1_selection = np.ndarray(npeaks1, 'int32')
+            peaks2_selection = np.ndarray(npeaks2, 'int32')
+            for first_i, last_i in self.diff_peaks[chrom]:
+                # this is going to be one entry
+                n_peak += 1
+                start_i = above_cutoff[first_i]
+                end_i = above_cutoff[last_i]
+                pos_start = qpos[start_i] - 1
+                pos_end = qpos[end_i]
+                i_peaks1 = np.unique(which_peaks1[start_i:(end_i + 1)]).astype('int32')
+                try:
+                    if i_peaks1[0] == -1: i_peaks1 = i_peaks1[1:]
+                except IndexError: pass
+                i_peaks2 = np.unique(which_peaks2[start_i:(end_i + 1)]).astype('int32')
+                try:
+                    if i_peaks2[0] == -1: i_peaks2 = i_peaks2[1:]
+                except IndexError: pass
+
+                # get additional subpeaks as needed
+                # i1 is the number of subpeaks in peaks1
+                i1 = _get_all_subpeaks(peaks1, i_peaks1, peaks1_selection)
+#                i1 = peaks1_selection
+                i2 = _get_all_subpeaks(peaks1, i_peaks1, peaks2_selection)
+#                i2 = peaks2_selection.size
+#                i2 = 0
+#                for peak_i in i_peaks2:
+#                    start = peaks2[peak_i]["start"]
+##                    these_peaks2.append( peaks2[peak_i] )
+#                    peaks2_selection[i2] = peak_i
+#                    i2 += 1
+#                    for peak_ii in range(peak_i + 1, npeaks2):
+#                        if start == peaks2[peak_ii]["start"]:
+##                            these_peaks1.append( peaks2[peak_ii] )
+#                            peaks2_selection[i2] = peak_i
+#                            i2 += 1
+#                        else: break
+                # find the best overlapping subpeak
+                if i1 > 0:
+                    peak1_present = True
+                    peak1_selection_i = 0
+                    for j in range(1, i1):
+                        if peaks1[peaks1_selection[j]]["summit"] > peaks1[peaks1_selection[peak1_selection_i]]:
+                            peak1_selection_i = j
+                    peak1_i = peaks1_selection[peak1_selection_i]
+                    peak1 = peaks1[peak1_i]
+                    peak1_pos_i = peak1_pos_i + pos[peak1_pos_i:].searchsorted(peak1["summit"])
+                else: peak1_present = False
+                
+                if i2 > 0:
+                    peak2_present = True
+                    peak2_selection_i = 0
+                    for j in range(1, i2):
+                        if peaks2[peaks2_selection[j]]["summit"] > peaks2[peaks2_selection[peak2_selection_i]]:
+                            peak2_selection_i = j
+                    peak2_i = peaks2_selection[peak2_selection_i]
+                    peak2 = peaks2[peak2_i]
+                    peak2_pos_i = peak2_pos_i + pos[peak2_pos_i:].searchsorted(peak2["summit"])
+                else: peak2_present = False
+                
+                if not peak1_present:
+                    peak_pos_i = peak2_pos_i 
+                elif not peak2_present:
+                    peak_pos_i = peak1_pos_i
+                else: # peak in both samples
+                    if t1[peak1_pos_i] > t2[peak2_pos_i]:
+                        peak_pos_i = peak1_pos_i
+                    else:
+                        peak_pos_i = peak2_pos_i
+                
+                # back to differential peak region
+                start = pos[pos_start]
+                end = pos[pos_end]
+                if start > end:
+                    start = 0
+                    pos_start = 0
+                log2_fold_change = log2(t1[peak_pos_i]) - log2(t2[peak_pos_i])
+                log2_fold_change_w_pc = log2(t1[peak_pos_i] + pseudocount) - \
+                                        log2(t2[peak_pos_i] + pseudocount)
+                this_dpvalue = diff_pvalues[peak_pos_i]
+                qpos_i = qpos[qpos_i:].searchsorted(peak_pos_i)
+                this_dqvalue = diff_qvalues[qpos_i]
+#                this_dqvalue = diff_qvalues[qpos.searchsorted(peak_pos_i)]
+                this_dlogLR = diff_logLR[peak_pos_i]
+#                fold_changes = t1s / t2s
+#                if log2(median(fold_changes)) > 0:
+#                    log2_fold_change = log2(fold_changes).max()
+#                else:
+#                    log2_fold_change = log2(fold_changes).min()
+#                this_dpvalue = diff_pvalues[pos_start:(pos_end+1)].max()
+#                this_dqvalue = diff_qvalues[first_i:(last_i+1)].max()
+#                this_dlogLR = diff_logLR[pos_start:(pos_end+1)].max()
+                peakname = "%s%d" % (peakprefix, n_peak)
+                
+#                max_t1 = t1s.max()
+#                max_c1 = c1s.max()
+#                if max_t1 > max_c1: log2_fe1 = log2(t1s / c1s).max()
+#                else: log2_fe1 = log2(t1s / c1s).min()
+#                max_t2 = t2s.max()
+#                max_c2 = c2s.max()
+#                if max_t1 > max_c1: log2_fe2 = log2(t2s / c2s).max()
+#                else: log2_fe2 = log2(t2s / c2s).min()
+#                tc_value1 = tvsc1[pos_start:(pos_end+1)].max()
+#                tc_value2 = tvsc2[pos_start:(pos_end+1)].max()
+                tc_value1 = tvsc1[peak_pos_i]
+                tc_value2 = tvsc2[peak_pos_i]
+                #chr,start,end,length, log10fold_change, diff.pvalue, diff.qvalue,
+                #diff.logLR, name,
+                #treat1, control1, fold_enrichment1, -log10(p/qvalue1)
+                #treat2, control2, fold_enrichment2, -log10(p/qvalue2)
+                xlswrite("%s\t%d\t%d\t%d" % (chrom, start+1, end, end - start))
+                xlswrite("\t%d" % pos[peak_pos_i])
+                xlswrite("\t%.5f" % log2_fold_change)
+                xlswrite("\t%.5f" % log2_fold_change_w_pc)
+                xlswrite("\t%.5f" % this_dpvalue)
+                xlswrite("\t%.5f" % this_dqvalue)
+                xlswrite("\t%.5f" % this_dlogLR)
+                xlswrite("\t%s" % peakname)
+                xlswrite("\t%.5f" % t1[peak_pos_i])
+                xlswrite("\t%.5f" % c1[peak_pos_i])
+                if peak1_present:
+                    xlswrite("\t%.5f" % log2(peak1["fc"]))
+                    xlswrite("\t%.5f" % peak1["qscore"])
+                    xlswrite("\t%s" % peak1["name"])
+                    xlswrite("\t%d" % peak1["summit"])
+                else: xlswrite("\tNA\tNA\tNA\tNA")
+                xlswrite("\t%.5f" % t2[peak_pos_i])
+                xlswrite("\t%.5f" % c2[peak_pos_i])
+                if peak2_present:
+                    xlswrite("\t%.5f" % log2(peak2["fc"]))
+                    xlswrite("\t%.5f" % peak2["qscore"])
+                    xlswrite("\t%s" % peak2["name"])
+                    xlswrite("\t%d" % peak2["summit"])
+                else: xlswrite("\tNA\tNA\tNA\tNA")
+                xlswrite("\n")
+                bedwrite("%s\t%d\t%d\t%s\t%.5f\n" %
+                         (chrom, start, end, peakname,
+                          this_dqvalue))
+        logging.captureWarnings(False)
+        return
 
     def write_bedgraphs(self, logLR=None, pvalue=None, logFC=None,
                           str name="MACS",
@@ -2917,3 +3342,27 @@ cdef class DiffScoreTrackI:
             t += self.datalength[chrom]
         return t
 
+cdef inline int _get_all_subpeaks(list peaks,
+                                 np.ndarray[np.int32_t] i_peaks,
+                                 np.ndarray[np.int32_t] peaks_selection):
+    """return the number of subpeaks, modify peaks_selection in place"""
+    cdef:
+        int i
+        int peak_i, peak_ii
+        int start, start2
+    i = 0
+    for peak_i in i_peaks:
+        start = peaks[peak_i]["start"]
+        #these_peaks1.append( peaks1[peak_i] )
+        peaks_selection[i] = peak_i
+        i += 1
+        peak_ii = peak_i + 1
+        while True:
+            try: start2 = peaks[peak_ii]["start"]
+            except IndexError: break
+            if start == start2:
+                peaks_selection[i] = peak_ii
+                i += 1
+                peak_ii += 1
+            else: break
+    return i

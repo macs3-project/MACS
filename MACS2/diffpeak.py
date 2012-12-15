@@ -29,6 +29,7 @@ from time import strftime
 # ------------------------------------
 from MACS2.IO import cBedGraphIO
 from MACS2.IO import cScoreTrack
+from MACS2.IO import cPeakIO
 from MACS2.OptValidator import diff_opt_validate
 from MACS2.OutputWriter import *
 from MACS2.cProb import binomial_cdf_inv
@@ -72,6 +73,18 @@ def run( args ):
     with open(options.t2bdg) as file: pass
     with open(options.c2bdg) as file: pass
     
+    if not options.peaks1 == '':
+        info("Read peaks for condition 1...")
+        p1io = cPeakIO.PeakIO()
+        with open(options.peaks1, 'rU') as f:
+            p1io.read_from_xls(f)
+
+    if not options.peaks2 == '':
+        info("Read peaks for condition 2...")
+        p2io = cPeakIO.PeakIO()
+        with open(options.peaks2, 'rU') as f:
+            p2io.read_from_xls(f)
+    
     #1 Read tag files
     info("Read and build treatment 1 bedGraph...")
     t1bio = cBedGraphIO.bedGraphIO(options.t1bdg)
@@ -102,16 +115,25 @@ def run( args ):
                                              depth1,
                                              depth2 )
     diffscore.finalize()
-    diffscore.set_track_score_method(options.track_score_method)
-    if options.track_score_method == 'p':
-        diffscore.call_peaks(cutoff = options.peaks_log_pvalue,
-                             min_length = options.pminlen)
-    elif options.track_score_method == 'q':
-        diffscore.call_peaks(cutoff = options.peaks_log_qvalue,
-                             min_length = options.pminlen)
+    if options.call_peaks:
+        diffscore.set_track_score_method(options.track_score_method)
+        info("Calling peaks")
+        if options.track_score_method == 'p':
+            diffscore.call_peaks(cutoff = options.peaks_log_pvalue,
+                                 min_length = options.pminlen)
+        elif options.track_score_method == 'q':
+            diffscore.call_peaks(cutoff = options.peaks_log_qvalue,
+                                 min_length = options.pminlen)
+        else:
+            raise NotImplementedError
     else:
-        raise NotImplementedError
+        info("Using existing peaks")
+        diffscore.store_peaks(p1io, p2io)
+        info("Rebuilding chromosomes")
+        diffscore.rebuild_chromosomes()
+        diffscore.annotate_peaks()
     
+    info("Calling differentially occupied peaks")
     if options.score_method == 'p':
         diffscore.call_diff_peaks(cutoff = options.log_pvalue,
                                   min_length = options.dminlen,

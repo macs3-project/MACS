@@ -21,6 +21,7 @@ import sys
 import os
 import re
 import logging
+from argparse import ArgumentError
 from subprocess import Popen, PIPE
 from math import log
 from MACS2.IO.cParser import BEDParser, ELANDResultParser, ELANDMultiParser, \
@@ -194,17 +195,15 @@ def diff_opt_validate ( options ):
     # format
     options.gzip_flag = False           # if the input is gzip file
     
-    options.format = options.format.upper()
+#    options.format = options.format.upper()
     # fox this stuff
-    if True: pass
-    elif options.format == "AUTO":
-        options.parser = guess_parser
-    else:
-        logging.error("Format \"%s\" cannot be recognized!" % (options.format))
-        sys.exit(1)
+#    if True: pass
+#    elif options.format == "AUTO":
+#        options.parser = guess_parser
+#    else:
+#        logging.error("Format \"%s\" cannot be recognized!" % (options.format))
+#        sys.exit(1)
     
-    # duplicate peaks
-
     if options.peaks_pvalue:
         # if set, ignore qvalue cutoff
         options.peaks_log_qvalue = None
@@ -226,27 +225,52 @@ def diff_opt_validate ( options ):
         options.score_method = 'q'
     
     # output filenames
-    options.peakxls = options.name+"_peaks.xls"
-    options.peakbed = options.name+"_peaks.bed"
+    options.peakxls = options.name+"_diffpeaks.xls"
+    options.peakbed = options.name+"_diffpeaks.bed"
+    options.peak1xls = options.name+"_diffpeaks_by_peaks1.xls"
+    options.peak1bed = options.name+"_diffpeaks_by_peaks1.bed"
+    options.peak2xls = options.name+"_diffpeaks_by_peaks2.xls"
+    options.peak2bed = options.name+"_diffpeaks_by_peaks2.bed"
     options.bdglogLR = options.name+"_logLR.bdg"
     options.bdgpvalue = options.name+"_logLR.bdg"
     options.bdglogFC = options.name+"_logLR.bdg"
     
-    options.argtxt = "\n".join((
-        "# ARGUMENTS LIST:",\
-        "# name = %s" % (options.name),\
-        "# format = %s" % (options.format),\
-        "# ChIP-seq file 1 = %s" % (options.t1bdg),\
-        "# control file 1 = %s" % (options.c1bdg),\
-        "# ChIP-seq file 2 = %s" % (options.t2bdg),\
-        "# control file 2 = %s" % (options.c2bdg),\
-        ))
-
-    if options.peaks_pvalue:
-        options.argtxt +=  "# treat/control -log10(pvalue) cutoff = %.2e\n" % (options.peaks_log_pvalue)
-        options.argtxt +=  "# treat/control -log10(qvalue) will not be calculated and reported as -1 in the final output.\n"
+    options.call_peaks = True
+    if not (options.peaks1 == '' or options.peaks2 == ''):
+        if options.peaks1 == '':
+            raise ArgumentError('peaks1', 'Must specify both peaks1 and peaks2, or neither (to call peaks again)')
+        elif options.peaks2 == '':
+            raise ArgumentError('peaks2', 'Must specify both peaks1 and peaks2, or neither (to call peaks again)')
+        options.call_peaks = False
+        options.argtxt = "\n".join((
+            "# ARGUMENTS LIST:",\
+            "# name = %s" % (options.name),\
+#            "# format = %s" % (options.format),\
+            "# ChIP-seq file 1 = %s" % (options.t1bdg),\
+            "# control file 1 = %s" % (options.c1bdg),\
+            "# ChIP-seq file 2 = %s" % (options.t2bdg),\
+            "# control file 2 = %s" % (options.c2bdg),\
+            "# Peaks, condition 1 = %s" % (options.peaks1),\
+            "# Peaks, condition 2 = %s" % (options.peaks2),\
+            ""
+            ))
     else:
-        options.argtxt +=  "# treat/control -log10(qvalue) cutoff = %.2e\n" % (options.peaks_log_qvalue)
+        options.argtxt = "\n".join((
+            "# ARGUMENTS LIST:",\
+            "# name = %s" % (options.name),\
+            "# format = %s" % (options.format),\
+            "# ChIP-seq file 1 = %s" % (options.t1bdg),\
+            "# control file 1 = %s" % (options.c1bdg),\
+            "# ChIP-seq file 2 = %s" % (options.t2bdg),\
+            "# control file 2 = %s" % (options.c2bdg),\
+            ""
+            ))
+         
+        if options.peaks_pvalue:
+            options.argtxt +=  "# treat/control -log10(pvalue) cutoff = %.2e\n" % (options.peaks_log_pvalue)
+            options.argtxt +=  "# treat/control -log10(qvalue) will not be calculated and reported as -1 in the final output.\n"
+        else:
+            options.argtxt +=  "# treat/control -log10(qvalue) cutoff = %.2e\n" % (options.peaks_log_qvalue)
         
     if options.diff_pvalue:
         options.argtxt +=  "# differential pvalue cutoff = %.2e\n" % (options.log_pvalue)
