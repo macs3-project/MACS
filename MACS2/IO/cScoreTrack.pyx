@@ -3156,7 +3156,7 @@ cdef class DiffScoreTrackI:
                 # i1 is the number of subpeaks in peaks1
                 i1 = _get_all_subpeaks(peaks1, i_peaks1, peaks1_selection)
 #                i1 = peaks1_selection
-                i2 = _get_all_subpeaks(peaks1, i_peaks1, peaks2_selection)
+                i2 = _get_all_subpeaks(peaks2, i_peaks2, peaks2_selection)
 #                i2 = peaks2_selection.size
 #                i2 = 0
 #                for peak_i in i_peaks2:
@@ -3175,7 +3175,8 @@ cdef class DiffScoreTrackI:
                     peak1_present = True
                     peak1_selection_i = 0
                     for j in range(1, i1):
-                        if peaks1[peaks1_selection[j]]["summit"] > peaks1[peaks1_selection[peak1_selection_i]]:
+                        if peaks1[peaks1_selection[j]]["pileup"] > \
+                           peaks1[peaks1_selection[peak1_selection_i]]["pileup"]:
                             peak1_selection_i = j
                     peak1_i = peaks1_selection[peak1_selection_i]
                     peak1 = peaks1[peak1_i]
@@ -3186,7 +3187,8 @@ cdef class DiffScoreTrackI:
                     peak2_present = True
                     peak2_selection_i = 0
                     for j in range(1, i2):
-                        if peaks2[peaks2_selection[j]]["summit"] > peaks2[peaks2_selection[peak2_selection_i]]:
+                        if peaks2[peaks2_selection[j]]["pileup"] > \
+                           peaks2[peaks2_selection[peak2_selection_i]]["pileup"]:
                             peak2_selection_i = j
                     peak2_i = peaks2_selection[peak2_selection_i]
                     peak2 = peaks2[peak2_i]
