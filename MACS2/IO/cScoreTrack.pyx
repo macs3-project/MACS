@@ -1997,6 +1997,7 @@ cdef class DiffScoreTrackI:
         float cutoff
         dict pvalue_stat1, pvalue_stat2
         str track_scoring_method
+        str diff_scoring_method
     
     def __init__ (self, t1bdg, c1bdg, t2bdg, c2bdg, float cond1_depth = 1.0, float cond2_depth = 1.0, int pseudocount = 1 ):
         self.pos = {}
@@ -2814,6 +2815,7 @@ cdef class DiffScoreTrackI:
             np.ndarray[np.float32_t] t1vst2, diff_qvalues
             np.ndarray[np.int32_t, ndim=2] diff_peaks
             int max_gap
+            int n_peaks, bigN
         max_gap = min_length / 4
         
         chrs  = self.get_chr_names()
@@ -2823,10 +2825,13 @@ cdef class DiffScoreTrackI:
         # qvalue conversion for each category to improve statistical power
         self.compute_diff_pvalues()
         self.compute_diff_qvalues()
+        self.diff_scoring_method = score_method
         if not (score_method == 'q' or score_method == 'p'):
             raise NotImplementedError
 
+        bigN = 0
         for chrom in chrs:
+            n_diff_peaks = 0
             pos = self.pos[chrom]
             qpos = self.where_peaks[chrom]
             t1vst2 = self.t1vs2[chrom]
@@ -2842,8 +2847,7 @@ cdef class DiffScoreTrackI:
             # we're going to recalculate this a few times, hopefully it's fast
 
             # peaks are stored as start_i, end_i (0-based, genomic half-open)
-            n_diff_peaks = 0
-            diff_peaks = np.ndarray((above_cutoff.size, 2), dtype='int32')
+            diff_peaks = np.ndarray((above_cutoff.size, 3), dtype='int32')
             if above_cutoff.size > 1:
                 # Do zero manually
                 first_i = 0
@@ -2865,6 +2869,7 @@ cdef class DiffScoreTrackI:
                             diff_peaks[n_diff_peaks,0] = first_i
                             diff_peaks[n_diff_peaks,1] = i - 1
                             n_diff_peaks += 1
+                            diff_peaks[n_diff_peaks,2] = bigN + n_diff_peaks + 1
 #                        else:
 #                            print "Rejectedd", pos[above_cutoff[first_i]-1], pos[above_cutoff[i - 1]]
                         first_i = -1
@@ -2875,8 +2880,10 @@ cdef class DiffScoreTrackI:
                         diff_peaks[n_diff_peaks,0] = first_i
                         diff_peaks[n_diff_peaks,1] = i
                         n_diff_peaks += 1
+                        diff_peaks[n_diff_peaks,2] = bigN + n_diff_peaks + 1
 
-            diff_peaks.resize((n_diff_peaks, 2), refcheck=False)
+            bigN += n_diff_peaks
+            diff_peaks.resize((n_diff_peaks, 3), refcheck=False)
 #            print n_diff_peaks, "diff peaks"
             self.diff_peaks[chrom] = diff_peaks
         return
@@ -2922,7 +2929,7 @@ cdef class DiffScoreTrackI:
         with suffix .xls.
         
         """
-        if (len(self.which_peaks1.keys()) + len(self.which_peaks2.keys())) > 0: 
+        if self.has_peakio: 
             return self.write_peaks2(xls=xls, bed=bed, name_prefix=name_prefix, 
                               name=name, description=description,
                               trackline=trackline)
@@ -2940,7 +2947,7 @@ cdef class DiffScoreTrackI:
         xlswrite("\t".join(("chr", "start", "end", "length",
                          "log2.fold.change", "-log10.diff.pvalue",
                          "-log10.diff.qvalue",
-                         "diff.log10LR", "name",
+                         "diff.log10LR", "diff.peakname",
                          "treat1", "control1", "log2.fold.enrichment1",
                          "-log10.%svalue1" % tc_method,
                          "treat2", "control2", "log2.fold.enrichment2",
@@ -2958,7 +2965,6 @@ cdef class DiffScoreTrackI:
         log10 = np.log10
         log2 = np.log2
         median = np.median
-        n_peak = 0
         for chrom in sorted(self.diff_peaks.keys()):
             pos = self.pos[chrom]
             t1 = self.t1[chrom]
@@ -2971,9 +2977,13 @@ cdef class DiffScoreTrackI:
             diff_qvalues = self.diff_qvalues[chrom]
             diff_logLR = self.tlogLR[chrom]
             qpos = self.where_peaks[chrom]
-            above_cutoff = np.where(diff_qvalues >= self.cutoff)[0]
-            for first_i, last_i in self.diff_peaks[chrom]:
-                n_peak += 1
+#            above_cutoff = np.where(diff_qvalues >= self.cutoff)[0]
+            if self.diff_scoring_method == 'q':
+                above_cutoff = np.where(self.diff_qvalues[chrom] >= 
+                                        self.cutoff)[0].astype('int32')
+            elif self.diff_scoring_method == 'p':
+                above_cutoff = np.where(self.t1vs2[chrom][self.where_peaks[chrom]] >= self.cutoff)[0].astype('int32')
+            for first_i, last_i, n_peak in self.diff_peaks[chrom]:
                 start_i = above_cutoff[first_i]
                 end_i = above_cutoff[last_i]
                 pos_start = qpos[start_i] - 1
@@ -3044,7 +3054,7 @@ cdef class DiffScoreTrackI:
             np.ndarray[np.int32_t] peaks1_selection, peaks2_selection
             np.ndarray[np.int32_t] i_peaks1, i_peaks2
             np.ndarray[np.int32_t] pos, which_peaks1, which_peaks2
-            np.ndarray[np.float32_t] t1, c1, t2, c2, tvsc1, tvsc2
+            np.ndarray[np.float32_t] t1, c1, t2, c2
             np.ndarray[np.float32_t] diff_pvalues, diff_qvalues, diff_logLR
             np.ndarray[np.int32_t] qpos, above_cutoff
             int start_i, end_i, first_i, last_i
@@ -3058,7 +3068,7 @@ cdef class DiffScoreTrackI:
             bool peak1_present, peak2_present
             float this_dpvalue, this_dqvalue, this_dlogLR
             float pseudocount
-        assert len(self.which_peaks1.keys()) + len(self.which_peaks2.keys()) > 0, "No information on peaks"
+        assert self.has_peakio(), "No information on peaks"
         logging.captureWarnings(True) 
         pseudocount = float(self.pseudocount)
         if xls is not None:
@@ -3074,12 +3084,12 @@ cdef class DiffScoreTrackI:
         xlswrite("# fold_enrichment, sample/control qvalues, peaknames, which are copied from the peak info \n")
         xlswrite("# values are NOT reported in SPMR if depth was specified\n")
         xlswrite("# differential values are reported at the taller sample peak\n")
-        xlswrite("# log10_fold_change is positive if t1 > t2\n")
+        xlswrite("# log2_fold_change is positive if t1 > t2\n")
         xlswrite("\t".join(("chr", "start", "end", "length", "summit",
                          "log2.fold.change","log2.fold.change.w.psuedocounts",
                          "-log10.diff.pvalue",
                          "-log10.diff.qvalue",
-                         "diff.log10LR", "name",
+                         "diff.log10LR", "diff.peakname",
                          "treat1", "control1", "log2.fold.enrichment1",
                          "-log10.qvalue1", "peakname1", "summit1",
                          "treat2", "control2", "log2.fold.enrichment2",
@@ -3098,7 +3108,6 @@ cdef class DiffScoreTrackI:
         log10 = np.log10
         log2 = np.log2
         median = np.median
-        n_peak = 0
         for chrom in sorted(self.diff_peaks.keys()):
             peak1_pos_i = 0
             peak2_pos_i = 0
@@ -3117,18 +3126,19 @@ cdef class DiffScoreTrackI:
             t2 = self.t2[chrom]
             c1 = self.c1[chrom]
             c2 = self.c2[chrom]
-            tvsc1 = self.tvsc1[chrom]
-            tvsc2 = self.tvsc2[chrom]
             diff_pvalues = self.t1vs2[chrom]
             diff_qvalues = self.diff_qvalues[chrom]
             diff_logLR = self.tlogLR[chrom]
-            above_cutoff = np.where(diff_qvalues >= self.cutoff)[0].astype('int32')
+            if self.diff_scoring_method == 'q':
+                above_cutoff = np.where(self.diff_qvalues[chrom] >= 
+                                        self.cutoff)[0].astype('int32')
+            elif self.diff_scoring_method == 'p':
+                above_cutoff = np.where(self.t1vs2[chrom][self.where_peaks[chrom]] >= self.cutoff)[0].astype('int32')
             # use some extra memory so we don't have to reallocate every time
             peaks1_selection = np.ndarray(npeaks1, 'int32')
             peaks2_selection = np.ndarray(npeaks2, 'int32')
-            for first_i, last_i in self.diff_peaks[chrom]:
+            for first_i, last_i, n_peak in self.diff_peaks[chrom]:
                 # this is going to be one entry
-                n_peak += 1
                 start_i = above_cutoff[first_i]
                 end_i = above_cutoff[last_i]
                 pos_start = qpos[start_i] - 1
@@ -3227,8 +3237,6 @@ cdef class DiffScoreTrackI:
 #                else: log2_fe2 = log2(t2s / c2s).min()
 #                tc_value1 = tvsc1[pos_start:(pos_end+1)].max()
 #                tc_value2 = tvsc2[pos_start:(pos_end+1)].max()
-                tc_value1 = tvsc1[peak_pos_i]
-                tc_value2 = tvsc2[peak_pos_i]
                 #chr,start,end,length, log10fold_change, diff.pvalue, diff.qvalue,
                 #diff.logLR, name,
                 #treat1, control1, fold_enrichment1, -log10(p/qvalue1)
@@ -3263,6 +3271,214 @@ cdef class DiffScoreTrackI:
                           this_dqvalue))
         logging.captureWarnings(False)
         return
+
+    def has_peakio(self):
+        """see whether peaks1 or peaks2 are stored"""
+        return (len(self.which_peaks1.keys()) + len(self.which_peaks2.keys())) > 0
+    
+
+    def write_peaks_by_summit(self, xls1, xls2,
+                                name_prefix="%s_peak_", name="MACS"):
+        """write a file with information about each summit and differential
+        occupancy (separately for condition 1 and condition 2)
+        """
+        assert self.has_peakio(), "No information on peaks"
+        try: peakprefix = name_prefix % name
+        except: peakprefix = name_prefix
+        xls1.write("# the peak with the closest summit from the other sample is reported if a peak overlaps the summit\n")
+        xls1.write("# log2_fold_change is positive if t1 > t2\n")
+        xls2.write("# the peak with the closest summit from the other sample is reported if a peak overlaps the summit\n")
+        xls2.write("# log2_fold_change is positive if t2 > t1\n")
+        xls1.write("\t".join(("chr", "start", "end", "length", "summit",
+                         "log2.fold.change","log2.fold.change.w.psuedocounts",
+                         "-log10.diff.pvalue",
+                         "-log10.diff.qvalue",
+                         "diff.log10LR", "diff.peakname",
+                         "treat1", "control1", "log2.fold.enrichment1",
+                         "-log10.qvalue1", "peakname1", "summit1",
+                         "treat2", "control2", "log2.fold.enrichment2",
+                         "-log10.qvalue2", "peakname2", "summit2",
+                         ))+"\n")
+        xls2.write("\t".join(("chr", "start", "end", "length", "summit",
+                         "log2.fold.change","log2.fold.change.w.psuedocounts",
+                         "-log10.diff.pvalue",
+                         "-log10.diff.qvalue",
+                         "diff.log10LR", "diff.peakname",
+                         "treat2", "control2", "log2.fold.enrichment2",
+                         "-log10.qvalue2", "peakname2", "summit2",
+                         "treat1", "control1", "log2.fold.enrichment1",
+                         "-log10.qvalue1", "peakname1", "summit1",
+                         ))+"\n")
+        self._write_peaks_by_summit(xls1, self.p1io, self.p2io,
+                                    self.which_peaks2, False,
+                                    self.t1, self.c1,
+                                    self.t2, self.c2, peakprefix)
+        self._write_peaks_by_summit(xls2, self.p2io, self.p1io,
+                                    self.which_peaks1, True,
+                                    self.t2, self.c2,
+                                    self.t1, self.c1, peakprefix)
+        
+    cdef _write_peaks_by_summit(self, xls, p1io, p2io,
+                                dict which_peaks2,
+                                bool flip_fc,
+                                dict t1_by_chrom,
+                                dict c1_by_chrom,
+                                dict t2_by_chrom,
+                                dict c2_by_chrom,
+                                str peakprefix):
+        cdef:
+            list peaks1, peaks2
+            str chrom
+            int i, j, d, w, d_max, w_max, p, n_peaks, n
+            int datalength
+            int peak_i, peak_j
+            int summit, start, end, length
+            float this_dpvalue, this_dqvalue, this_dlogLR, score_value
+            float pseudocount
+            np.ndarray[np.float32_t] t1, t2, c1, c2
+            np.ndarray[np.int32_t] pos, which_peaks, summits1
+            np.ndarray[np.float32_t] diff_pvalues, diff_qvalues, diff_logLR
+            np.ndarray[np.int32_t, ndim=2] diff_peaks
+        log2 = np.log2
+        logging.captureWarnings(True) 
+        pseudocount = float(self.pseudocount)
+        for chrom in p1io.get_chr_names():
+            write = xls.write
+            try: datalength = self.datalength[chrom]
+            except KeyError: datalength = 0
+            if datalength < 2:
+                # we are missing data on this chromosome, just write original peaks
+                ### FIX ME ###
+                continue
+            peaks1 = p1io.get_data_from_chrom(chrom)
+            try: peaks2 = p2io.get_data_from_chrom(chrom)
+            except KeyError: peaks2 = []
+            summits1 = np.array(map(itemgetter('summit'), peaks1),
+                                dtype='int32')
+            # note, summits should be unique and should be in order
+            pos = self.pos[chrom]
+            where_peaks = self.where_peaks[chrom]
+            w = 0
+            w_max = where_peaks.size
+            which_peaks = which_peaks2[chrom]
+            n_peaks = len(peaks2)
+            t1 = t1_by_chrom[chrom]
+            t2 = t2_by_chrom[chrom]
+            c1 = c1_by_chrom[chrom]
+            c2 = c2_by_chrom[chrom]
+            diff_peaks = self.diff_peaks[chrom].copy()
+            d_max = diff_peaks.shape[0]
+            diff_pvalues = self.t1vs2[chrom]
+            diff_qvalues = self.diff_qvalues[chrom]
+            diff_logLR = self.tlogLR[chrom]
+            if self.diff_scoring_method == 'q':
+                above_cutoff = np.where(self.diff_qvalues[chrom] >= 
+                                        self.cutoff)[0].astype('int32')
+            elif self.diff_scoring_method == 'p':
+                above_cutoff = np.where(self.t1vs2[chrom][self.where_peaks[chrom]] >= self.cutoff)[0].astype('int32')
+            # change to coordinates for diff peak now
+            for d in range(d_max):
+                start = diff_peaks[d, 0]
+                end = diff_peaks[d, 1]
+                diff_peaks[d, 0] = pos[where_peaks[above_cutoff[start]] - 1]
+                diff_peaks[d, 1] = pos[where_peaks[above_cutoff[end]]]
+            d = 0
+            i = 0
+            for j in range(summits1.size):
+                if i == datalength: break #shouldn't happen
+                summit = summits1[j]
+                while True:
+                    if i == datalength: break # shouldn't happen
+                    elif summit >= pos[i]: i += 1
+                    else:
+                        # write record
+                        peak = peaks1[j]
+                        # check if this is a differentially occupied peak
+                        while True:
+                            if w == w_max - 1: break
+                            elif summit < where_peaks[w]:
+                                break
+                            else:
+                                w += 1
+#                        print w, where_peaks[w], summit
+                        start = peak["start"] + 1
+                        end = peak["end"]
+                        length = peak["length"]
+                        write("%s\t%d\t%d\t%d" % (chrom,start,end,length))
+                        write("\t%d" % (summit)) # summit position
+                        # only if summit >= diff_peaks[d, 0] and
+                        # summit < diff_peaks[d, 1]
+                        this_dpvalue = diff_pvalues[i]
+                        this_dqvalue = diff_qvalues[w]
+                        if self.diff_scoring_method == 'p':
+                            score_value = this_dpvalue
+                        elif self.diff_scoring_method == 'q':
+                            score_value = this_dqvalue
+                        log2_fold_change = log2(t1[i]) - log2(t2[i])
+                        log2_fold_change_w_pc = log2(t1[i] + pseudocount) - \
+                                                log2(t2[i] + pseudocount)
+                        this_dlogLR = diff_logLR[i]
+                        if flip_fc:
+                            write("\t%.5f" % -log2_fold_change)
+                            write("\t%.5f" % -log2_fold_change_w_pc)
+                        else:
+                            write("\t%.5f" % log2_fold_change)
+                            write("\t%.5f" % log2_fold_change_w_pc)
+                        write("\t%.5f" % this_dpvalue)
+                        write("\t%.5f" % this_dqvalue)
+                        write("\t%.5f" % this_dlogLR)
+#                        print i, w, w_max, d, d_max
+                        # this part to figure out which differential peak
+                        while True:
+                            if d == d_max - 1: break
+                            elif summit < diff_peaks[d, 1]:
+                                break
+                            else:
+                                d += 1
+#                        print d, d_max, diff_peaks[d,:], summit
+                        if score_value >= self.cutoff:
+                            if summit >= diff_peaks[d, 0]:
+                                diffpeakname = "%s%d" % (peakprefix, diff_peaks[d, 2])
+                                write("\t%s" % diffpeakname)
+                            else:
+                                write("\tNA")
+                        else:
+                            write("\tNA")
+                        # this part spits out stuff for sample 1
+                        write("\t%.5f" % t1[i])
+                        write("\t%.5f" % c1[i])
+                        write("\t%.5f" % log2(peak["fc"]))
+                        write("\t%.5f" % peak["qscore"])
+                        write("\t%s" % peak["name"])
+                        write("\t%d" % summit)
+                        # this stuff for peak 2
+                        write("\t%.5f" % t2[i])
+                        write("\t%.5f" % c2[i])
+                        if where_peaks[w] > end:
+                            peak_i = -1
+                        else:
+                            peak_i = which_peaks[w - 1]
+                        if peak_i == -1:
+                            write("\tNA\tNA\tNA\tNA")
+                        else:
+                            # find the closest summit2 to this region
+                            peak2_summit = peaks2[peak_i]["summit"]
+                            peak_j = peak_i + 1
+                            for peak_j in range(peak_i + 1, n_peaks):
+                                if peaks2[peak_j]["end"] != end: break
+                            peak2_summits = np.array(map(itemgetter("summit"),
+                                                         peaks2[peak_i:peak_j]),
+                                                     dtype='int32')
+                            peak_i += np.abs(peak2_summits - summit).argmin()
+                            peak2 = peaks2[peak_i]
+                            write("\t%.5f" % log2(peak2["fc"]))
+                            write("\t%.5f" % peak2["qscore"])
+                            write("\t%s" % peak2["name"])
+                            write("\t%d" % peak2["summit"])
+                                
+                        write("\n")
+                        break
+                
 
     def write_bedgraphs(self, logLR=None, pvalue=None, logFC=None,
                           str name="MACS",
