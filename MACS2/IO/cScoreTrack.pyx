@@ -2484,7 +2484,7 @@ cdef class DiffScoreTrackI:
                 # then the i + 1 fragment starts with the correct value
                     # find the end
                     end = p1ends[j]
-                    for ii in range(i + 1, i_max - 1):
+                    for ii in range(i + 1, i_max):
                         if pos[ii] == end:
                             break
                         # assert pos[ii] < end, "something went wrong"
@@ -2523,7 +2523,8 @@ cdef class DiffScoreTrackI:
                         if p2ends[j] == p2ends[j - 1]: j += 1
                         else: break
             
-            where_peaks = np.where( (which_peaks1 + which_peaks2) > 0 )[0].astype('int32')
+            where_peaks = np.where(np.logical_or(which_peaks1 >= 0,
+                                                 which_peaks2 >= 0))[0].astype('int32')
             self.where_peaks[chrom] = where_peaks
             self.which_peaks1[chrom] = which_peaks1[where_peaks]
             self.which_peaks2[chrom] = which_peaks2[where_peaks]
@@ -3350,8 +3351,24 @@ cdef class DiffScoreTrackI:
             except KeyError: datalength = 0
             if datalength < 2:
                 # we are missing data on this chromosome, just write original peaks
-                ### FIX ME ###
-                continue
+                peaks1 = p1io.get_data_from_chrom(chrom)
+                for peak in peaks1:
+                    start = peak["start"] + 1
+                    end = peak["end"]
+                    length = peak["length"]
+                    write("%s\t%d\t%d\t%d" % (chrom,start,end,length))
+                    write("\t%d" % peak["summit"] + 1) # summit position
+                    write("\tNA\tNA\tNA\tNA\tNA\tNA")
+                    # this part spits out stuff for sample 1
+                    write("\t%.5f" % peak["pileup"])
+                    write("\tNA")
+                    write("\t%.5f" % log2(peak["fc"]))
+                    write("\t%.5f" % peak["qscore"])
+                    write("\t%s" % peak["name"])
+                    write("\t%d" % peak["summit"] + 1)
+                    # this stuff for peak 2
+                    write("\tNA\tNA\tNA\tNA\tNA\tNA")
+                    write("\n")
             peaks1 = p1io.get_data_from_chrom(chrom)
             try: peaks2 = p2io.get_data_from_chrom(chrom)
             except KeyError: peaks2 = []
@@ -3362,6 +3379,10 @@ cdef class DiffScoreTrackI:
             where_peaks = self.where_peaks[chrom]
             w = 0
             w_max = where_peaks.size
+            if w_max == 0:
+                print summits1
+                print peaks1
+                print peaks2
             which_peaks = which_peaks2[chrom]
             n_peaks = len(peaks2)
             t1 = t1_by_chrom[chrom]
@@ -3377,7 +3398,7 @@ cdef class DiffScoreTrackI:
                 above_cutoff = np.where(self.diff_qvalues[chrom] >= 
                                         self.cutoff)[0].astype('int32')
             elif self.diff_scoring_method == 'p':
-                above_cutoff = np.where(self.t1vs2[chrom][self.where_peaks[chrom]] >= self.cutoff)[0].astype('int32')
+                above_cutoff = np.where(self.t1vs2[chrom][where_peaks] >= self.cutoff)[0].astype('int32')
             # change to coordinates for diff peak now
             for d in range(d_max):
                 start = diff_peaks[d, 0]
@@ -3397,8 +3418,12 @@ cdef class DiffScoreTrackI:
                         peak = peaks1[j]
                         # check if this is a differentially occupied peak
                         while True:
+                            try: where_peaks[w]
+                            except IndexError:
+                                print chrom, w, w_max
+                                print where_peaks
                             if w == w_max - 1: break
-                            elif summit < where_peaks[w]:
+                            elif summit < pos[where_peaks[w]]:
                                 break
                             else:
                                 w += 1
@@ -3407,7 +3432,7 @@ cdef class DiffScoreTrackI:
                         end = peak["end"]
                         length = peak["length"]
                         write("%s\t%d\t%d\t%d" % (chrom,start,end,length))
-                        write("\t%d" % (summit)) # summit position
+                        write("\t%d" % summit + 1) # summit position
                         # only if summit >= diff_peaks[d, 0] and
                         # summit < diff_peaks[d, 1]
                         this_dpvalue = diff_pvalues[i]
@@ -3452,14 +3477,14 @@ cdef class DiffScoreTrackI:
                         write("\t%.5f" % log2(peak["fc"]))
                         write("\t%.5f" % peak["qscore"])
                         write("\t%s" % peak["name"])
-                        write("\t%d" % summit)
+                        write("\t%d" % summit + 1)
                         # this stuff for peak 2
                         write("\t%.5f" % t2[i])
                         write("\t%.5f" % c2[i])
-                        if where_peaks[w] > end:
+                        if pos[where_peaks[w]] > end:
                             peak_i = -1
                         else:
-                            peak_i = which_peaks[w - 1]
+                            peak_i = which_peaks[w]
                         if peak_i == -1:
                             write("\tNA\tNA\tNA\tNA")
                         else:
@@ -3476,7 +3501,7 @@ cdef class DiffScoreTrackI:
                             write("\t%.5f" % log2(peak2["fc"]))
                             write("\t%.5f" % peak2["qscore"])
                             write("\t%s" % peak2["name"])
-                            write("\t%d" % peak2["summit"])
+                            write("\t%d" % peak2["summit"] + 1)
                                 
                         write("\n")
                         break
