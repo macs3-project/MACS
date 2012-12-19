@@ -152,10 +152,10 @@ def run( args ):
     ofhd_bed = open(options.peakbed,"w")
 
     # pass write method so we can print too, and include name
-#    diffscore.write_peaks(xls=ofhd_xls, bed=ofhd_bed,
-#                    name = options.name, name_prefix="%s_peak_",
-#                    description="Peaks for %s (Made with MACS v2, " + strftime("%x") + ")",
-#                    trackline=options.trackline)
+    diffscore.write_peaks(xls=ofhd_xls, bed=ofhd_bed,
+                    name = options.name, name_prefix="%s_peak_",
+                    description="Peaks for %s (Made with MACS v2, " + strftime("%x") + ")",
+                    trackline=options.trackline)
     ofhd_xls.close()
     ofhd_bed.close()
     
