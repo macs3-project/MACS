@@ -2110,7 +2110,7 @@ cdef class DiffScoreTrackI:
         for chrom in self.pos.keys():
             try:
                 peaks1 = self.p1io.get_data_from_chrom(chrom)
-            except KeyError: peask1 = []
+            except KeyError: peaks1 = []
             try:
                 peaks2 = self.p2io.get_data_from_chrom(chrom)
             except KeyError: peaks2 = []
