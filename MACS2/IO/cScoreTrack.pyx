@@ -2831,7 +2831,7 @@ cdef class DiffScoreTrackI:
             raise NotImplementedError
 
         bigN = 1
-        for chrom in chrs:
+        for chrom in sorted(chrs):
             n_diff_peaks = 0
             pos = self.pos[chrom]
             qpos = self.where_peaks[chrom]
@@ -2895,7 +2895,7 @@ cdef class DiffScoreTrackI:
         cdef:
             int start, end, i
             str chrom
-        for chrom in self.diff_peaks.keys():
+        for chrom in sorted(self.diff_peaks.keys()):
             i = 0
             for end in self.where_peaks[chrom]:
                 i += 1
@@ -2915,7 +2915,7 @@ cdef class DiffScoreTrackI:
         cdef:
             int start, end
             str chrom
-        for chrom in self.diff_peaks.keys():
+        for chrom in sorted(self.diff_peaks.keys()):
             qpos = self.where_peaks[chrom]
             for i, j in self.diff_peaks[chrom]:
                 above_cutoff = qpos[np.nonzero(self.diff_qvalues[chrom] >= self.cutoff)[0]]
@@ -3338,6 +3338,7 @@ cdef class DiffScoreTrackI:
             int summit, start, end, length
             float this_dpvalue, this_dqvalue, this_dlogLR, score_value
             float pseudocount
+            float log2_fold_change, log2_fold_change_w_pc
             np.ndarray[np.float32_t] t1, t2, c1, c2
             np.ndarray[np.int32_t] pos, which_peaks, summits1
             np.ndarray[np.float32_t] diff_pvalues, diff_qvalues, diff_logLR
@@ -3345,7 +3346,7 @@ cdef class DiffScoreTrackI:
         log2 = np.log2
         logging.captureWarnings(True) 
         pseudocount = float(self.pseudocount)
-        for chrom in p1io.get_chr_names():
+        for chrom in sorted(p1io.get_chr_names()):
             write = xls.write
             try: datalength = self.datalength[chrom]
             except KeyError: datalength = 0
@@ -3380,10 +3381,6 @@ cdef class DiffScoreTrackI:
             where_peaks = self.where_peaks[chrom]
             w = 0
             w_max = where_peaks.size
-            if w_max == 0:
-                print summits1
-                print peaks1
-                print peaks2
             which_peaks = which_peaks2[chrom]
             n_peaks = len(peaks2)
             t1 = t1_by_chrom[chrom]
@@ -3537,7 +3534,7 @@ cdef class DiffScoreTrackI:
                 logFC.write("track type=bedGraph name=\"%s\" description=\"log10(sample1/sample2) %s\" visibility=2 alwaysZero=on\n" % trackcontents)
                 
         if logLR is not None:
-            for chrom in self.tlogLR.keys():
+            for chrom in sorted(self.tlogLR.keys()):
                 pos = self.pos[chrom]
                 value = self.tlogLR[chrom]
                 if pos.size > 0:
@@ -3550,7 +3547,7 @@ cdef class DiffScoreTrackI:
                                                           value[i]))
                     
         if pvalue is not None:
-            for chrom in self.t1vs2.keys():
+            for chrom in sorted(self.t1vs2.keys()):
                 pos = self.pos[chrom]
                 value = self.t1vs2[chrom]
                 if pos.size > 0:
@@ -3563,7 +3560,7 @@ cdef class DiffScoreTrackI:
                                                                  value[i]))
                     
         if logFC is not None:
-            for chrom in self.pos.keys():
+            for chrom in sorted(self.pos.keys()):
                 pos = self.pos[chrom]
                 value = np.log2(self.t1[chrom] / self.t2[chrom])
                 if pos.size > 0:
