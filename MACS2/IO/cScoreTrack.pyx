@@ -2830,7 +2830,7 @@ cdef class DiffScoreTrackI:
         if not (score_method == 'q' or score_method == 'p'):
             raise NotImplementedError
 
-        bigN = 0
+        bigN = 1
         for chrom in chrs:
             n_diff_peaks = 0
             pos = self.pos[chrom]
@@ -2869,8 +2869,8 @@ cdef class DiffScoreTrackI:
                         if (last_end - first_start) >= min_length:
                             diff_peaks[n_diff_peaks,0] = first_i
                             diff_peaks[n_diff_peaks,1] = i - 1
+                            diff_peaks[n_diff_peaks,2] = bigN + n_diff_peaks
                             n_diff_peaks += 1
-                            diff_peaks[n_diff_peaks,2] = bigN + n_diff_peaks + 1
 #                        else:
 #                            print "Rejectedd", pos[above_cutoff[first_i]-1], pos[above_cutoff[i - 1]]
                         first_i = -1
@@ -2880,8 +2880,8 @@ cdef class DiffScoreTrackI:
                     if last_end - first_start >= min_length:
                         diff_peaks[n_diff_peaks,0] = first_i
                         diff_peaks[n_diff_peaks,1] = i
+                        diff_peaks[n_diff_peaks,2] = bigN + n_diff_peaks
                         n_diff_peaks += 1
-                        diff_peaks[n_diff_peaks,2] = bigN + n_diff_peaks + 1
 
             bigN += n_diff_peaks
             diff_peaks.resize((n_diff_peaks, 3), refcheck=False)
@@ -3369,6 +3369,7 @@ cdef class DiffScoreTrackI:
                     # this stuff for peak 2
                     write("\tNA\tNA\tNA\tNA\tNA\tNA")
                     write("\n")
+                continue
             peaks1 = p1io.get_data_from_chrom(chrom)
             try: peaks2 = p2io.get_data_from_chrom(chrom)
             except KeyError: peaks2 = []
@@ -3405,6 +3406,9 @@ cdef class DiffScoreTrackI:
                 end = diff_peaks[d, 1]
                 diff_peaks[d, 0] = pos[where_peaks[above_cutoff[start]] - 1]
                 diff_peaks[d, 1] = pos[where_peaks[above_cutoff[end]]]
+            if d_max > 0:
+                if diff_peaks[0, 0] > diff_peaks[0, 1]:
+                    diff_peaks[0, 0] = 0
             d = 0
             i = 0
             for j in range(summits1.size):
@@ -3418,10 +3422,6 @@ cdef class DiffScoreTrackI:
                         peak = peaks1[j]
                         # check if this is a differentially occupied peak
                         while True:
-                            try: where_peaks[w]
-                            except IndexError:
-                                print chrom, w, w_max
-                                print where_peaks
                             if w == w_max - 1: break
                             elif summit < pos[where_peaks[w]]:
                                 break
@@ -3432,7 +3432,7 @@ cdef class DiffScoreTrackI:
                         end = peak["end"]
                         length = peak["length"]
                         write("%s\t%d\t%d\t%d" % (chrom,start,end,length))
-                        write("\t%d" % summit + 1) # summit position
+                        write("\t%d" % (summit + 1)) # summit position
                         # only if summit >= diff_peaks[d, 0] and
                         # summit < diff_peaks[d, 1]
                         this_dpvalue = diff_pvalues[i]
@@ -3440,7 +3440,7 @@ cdef class DiffScoreTrackI:
                         if self.diff_scoring_method == 'p':
                             score_value = this_dpvalue
                         elif self.diff_scoring_method == 'q':
-                            score_value = this_dqvalue
+                            score_value = this_dqvalue       
                         log2_fold_change = log2(t1[i]) - log2(t2[i])
                         log2_fold_change_w_pc = log2(t1[i] + pseudocount) - \
                                                 log2(t2[i] + pseudocount)
@@ -3457,15 +3457,18 @@ cdef class DiffScoreTrackI:
 #                        print i, w, w_max, d, d_max
                         # this part to figure out which differential peak
                         while True:
-                            if d == d_max - 1: break
+                            if d == d_max - 1 or d_max == 0: break
                             elif summit < diff_peaks[d, 1]:
                                 break
                             else:
                                 d += 1
 #                        print d, d_max, diff_peaks[d,:], summit
                         if score_value >= self.cutoff:
-                            if summit >= diff_peaks[d, 0]:
-                                diffpeakname = "%s%d" % (peakprefix, diff_peaks[d, 2])
+                            if d_max == 0:
+                                write("\tNA")
+                            elif summit >= diff_peaks[d, 0]:
+                                diffpeakname = "%s%d" % (peakprefix,
+                                                         diff_peaks[d, 2])
                                 write("\t%s" % diffpeakname)
                             else:
                                 write("\tNA")
@@ -3477,7 +3480,7 @@ cdef class DiffScoreTrackI:
                         write("\t%.5f" % log2(peak["fc"]))
                         write("\t%.5f" % peak["qscore"])
                         write("\t%s" % peak["name"])
-                        write("\t%d" % summit + 1)
+                        write("\t%d" % (summit + 1))
                         # this stuff for peak 2
                         write("\t%.5f" % t2[i])
                         write("\t%.5f" % c2[i])
@@ -3501,7 +3504,7 @@ cdef class DiffScoreTrackI:
                             write("\t%.5f" % log2(peak2["fc"]))
                             write("\t%.5f" % peak2["qscore"])
                             write("\t%s" % peak2["name"])
-                            write("\t%d" % peak2["summit"] + 1)
+                            write("\t%d" % (peak2["summit"] + 1))
                                 
                         write("\n")
                         break
