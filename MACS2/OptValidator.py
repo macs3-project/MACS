@@ -21,6 +21,7 @@ import sys
 import os
 import re
 import logging
+from argparse import ArgumentError
 from subprocess import Popen, PIPE
 from math import log
 from MACS2.IO.cParser import BEDParser, ELANDResultParser, ELANDMultiParser, \
@@ -186,6 +187,109 @@ def opt_validate ( options ):
 
     return options
 
+def diff_opt_validate ( options ):
+    """Validate options from a OptParser object.
+
+    Ret: Validated options object.
+    """
+    # format
+    options.gzip_flag = False           # if the input is gzip file
+    
+#    options.format = options.format.upper()
+    # fox this stuff
+#    if True: pass
+#    elif options.format == "AUTO":
+#        options.parser = guess_parser
+#    else:
+#        logging.error("Format \"%s\" cannot be recognized!" % (options.format))
+#        sys.exit(1)
+    
+    if options.peaks_pvalue:
+        # if set, ignore qvalue cutoff
+        options.peaks_log_qvalue = None
+        options.peaks_log_pvalue = log(options.peaks_pvalue,10)*-1
+        options.track_score_method = 'p'
+    else:
+        options.peaks_log_qvalue = log(options.peaks_qvalue,10)*-1
+        options.peaks_log_pvalue = None
+        options.track_score_method = 'q'
+
+    if options.diff_pvalue:
+        # if set, ignore qvalue cutoff
+        options.log_qvalue = None
+        options.log_pvalue = log(options.diff_pvalue,10)*-1
+        options.score_method = 'p'
+    else:
+        options.log_qvalue = log(options.diff_qvalue,10)*-1
+        options.log_pvalue = None
+        options.score_method = 'q'
+    
+    # output filenames
+    options.peakxls = options.name+"_diffpeaks.xls"
+    options.peakbed = options.name+"_diffpeaks.bed"
+    options.peak1xls = options.name+"_diffpeaks_by_peaks1.xls"
+    options.peak2xls = options.name+"_diffpeaks_by_peaks2.xls"
+    options.bdglogLR = options.name+"_logLR.bdg"
+    options.bdgpvalue = options.name+"_logLR.bdg"
+    options.bdglogFC = options.name+"_logLR.bdg"
+    
+    options.call_peaks = True
+    if not (options.peaks1 == '' or options.peaks2 == ''):
+        if options.peaks1 == '':
+            raise ArgumentError('peaks1', 'Must specify both peaks1 and peaks2, or neither (to call peaks again)')
+        elif options.peaks2 == '':
+            raise ArgumentError('peaks2', 'Must specify both peaks1 and peaks2, or neither (to call peaks again)')
+        options.call_peaks = False
+        options.argtxt = "\n".join((
+            "# ARGUMENTS LIST:",\
+            "# name = %s" % (options.name),\
+#            "# format = %s" % (options.format),\
+            "# ChIP-seq file 1 = %s" % (options.t1bdg),\
+            "# control file 1 = %s" % (options.c1bdg),\
+            "# ChIP-seq file 2 = %s" % (options.t2bdg),\
+            "# control file 2 = %s" % (options.c2bdg),\
+            "# Peaks, condition 1 = %s" % (options.peaks1),\
+            "# Peaks, condition 2 = %s" % (options.peaks2),\
+            ""
+            ))
+    else:
+        options.argtxt = "\n".join((
+            "# ARGUMENTS LIST:",\
+            "# name = %s" % (options.name),\
+            "# format = %s" % (options.format),\
+            "# ChIP-seq file 1 = %s" % (options.t1bdg),\
+            "# control file 1 = %s" % (options.c1bdg),\
+            "# ChIP-seq file 2 = %s" % (options.t2bdg),\
+            "# control file 2 = %s" % (options.c2bdg),\
+            ""
+            ))
+         
+        if options.peaks_pvalue:
+            options.argtxt +=  "# treat/control -log10(pvalue) cutoff = %.2e\n" % (options.peaks_log_pvalue)
+            options.argtxt +=  "# treat/control -log10(qvalue) will not be calculated and reported as -1 in the final output.\n"
+        else:
+            options.argtxt +=  "# treat/control -log10(qvalue) cutoff = %.2e\n" % (options.peaks_log_qvalue)
+        
+    if options.diff_pvalue:
+        options.argtxt +=  "# differential pvalue cutoff = %.2e\n" % (options.log_pvalue)
+        options.argtxt +=  "# differential qvalue will not be calculated and reported as -1 in the final output.\n"
+    else:
+        options.argtxt +=  "# differential qvalue cutoff = %.2e\n" % (options.log_qvalue)
+
+    # logging object
+    logging.basicConfig(level=(4-options.verbose)*10,
+                        format='%(levelname)-5s @ %(asctime)s: %(message)s ',
+                        datefmt='%a, %d %b %Y %H:%M:%S',
+                        stream=sys.stderr,
+                        filemode="w"
+                        )
+    
+    options.error   = logging.critical        # function alias
+    options.warn    = logging.warning
+    options.debug   = logging.debug
+    options.info    = logging.info
+
+    return options
 
 def opt_validate_diff ( optparser ):
     """Validate options from a OptParser object. (temporarily not used at all)

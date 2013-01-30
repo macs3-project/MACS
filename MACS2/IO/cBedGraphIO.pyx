@@ -81,7 +81,9 @@ class bedGraphIO:
         Then the region chr1:200..250 should be filled with
         baseline_value. Default of baseline_value is 0.
         """
-        cdef str i
+        cdef:
+            str i
+            list fs
         
         data = bedGraphTrackI(baseline_value=baseline_value)
         add_func = data.add_loc
@@ -104,6 +106,7 @@ class bedGraphIO:
 
         self.fhd.seek(0)
         
+        split = str.split
         for i in self.fhd:
             if i.startswith("track"):
                 continue
@@ -112,7 +115,7 @@ class bedGraphIO:
             elif i.startswith("browse"):
                 continue
             else:
-                fs =i.split()
+                fs = split(i)
                 add_func(fs[0],atoi(fs[1]),atoi(fs[2]),atof(fs[3]))
         #data.finalize()
         self.fhd.seek(0)

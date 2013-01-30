@@ -47,7 +47,7 @@ __doc__ = "bedGraphTrackI class"
 # ------------------------------------
 # Classes
 # ------------------------------------
-class bedGraphTrackI:
+cdef class bedGraphTrackI:
     """Class for bedGraph type data.
 
     In bedGraph, data are represented as continuous non-overlapping
@@ -68,6 +68,12 @@ class bedGraphTrackI:
     this class is 0-indexed and right-open.
     
     """
+    cdef:
+        dict __data
+        double maxvalue
+        double minvalue
+        double baseline_value
+        
     def __init__ (self, double baseline_value=0):
         """
         baseline_value is the value to fill in the regions not defined
@@ -89,7 +95,7 @@ class bedGraphTrackI:
         """
         self.__data[chrom] = d
 
-    def add_loc ( self, str chromosome, int startpos, int endpos, float value ):
+    cpdef add_loc ( self, str chromosome, int startpos, int endpos, float value ):
         """Add a chr-start-end-value block into __data dictionary.
 
         Difference between safe_add_loc: no check, but faster. Save
