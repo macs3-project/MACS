@@ -23,7 +23,7 @@ cdef np.ndarray[np.int32_t, ndim=1] internal_minima(np.ndarray[np.float32_t, ndi
         return ret
     else:
         ret = np.zeros(n - 1, 'int32')
-        pos1 = maxima[i]
+        pos1 = maxima[0]
         for i in range(n - 1):
             pos2 = maxima[i + 1]
             ret[i] = np.where(signal[pos1:pos2] == signal[pos1:pos2].min())[0][0] + pos1
