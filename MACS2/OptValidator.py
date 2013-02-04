@@ -256,7 +256,7 @@ def diff_opt_validate ( options ):
         options.argtxt = "\n".join((
             "# ARGUMENTS LIST:",\
             "# name = %s" % (options.name),\
-            "# format = %s" % (options.format),\
+#            "# format = %s" % (options.format),\
             "# ChIP-seq file 1 = %s" % (options.t1bdg),\
             "# control file 1 = %s" % (options.c1bdg),\
             "# ChIP-seq file 2 = %s" % (options.t2bdg),\
