@@ -1,4 +1,4 @@
-# Time-stamp: <2012-10-03 16:57:46 Tao Liu>
+# Time-stamp: <2013-02-24 16:05:27 Tao Liu>
 
 """Module Description
 
@@ -91,10 +91,12 @@ def opt_validate ( options ):
             sys.exit(1)
 
     # shiftsize>0
-    if options.extsize:
-        options.shiftsize = options.extsize/2
+    if options.shiftsize:               # only if --shiftsize is set, it's true
+        options.extsize = 2 * options.shiftsize
+    else:                               # if --shiftsize is not set
+        options.shiftsize = options.extsize / 2
     if options.shiftsize <= 0 :
-        logging.error("--shiftsize must > 0!")
+        logging.error("--extsize must > 1 and --shiftsize must > 0!")
         sys.exit(1)
 
     if options.pvalue:
