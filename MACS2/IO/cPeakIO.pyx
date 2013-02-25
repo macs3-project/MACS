@@ -1,5 +1,5 @@
 # cython: profile=True
-# Time-stamp: <2013-02-25 11:16:44 Tao Liu>
+# Time-stamp: <2013-02-25 12:19:13 Tao Liu>
 
 """Module for PeakIO IO classes.
 
@@ -346,7 +346,7 @@ l        |           |      |0-based offset from chromStart. Use -1  |
         if trackline:
             write("track type=narrowPeak name=\"%s\" description=\"%s\" nextItemButton=on\n" % (name, name))
         for chrom in chrs:
-            for end, group in groupby(peaks[chrom], key=itemgetter("end")):
+            for end, group in groupby(self.peaks[chrom], key=itemgetter("end")):
                 n_peak += 1
                 these_peaks = list(group)
                 if len(these_peaks) > 1: # from call-summits
