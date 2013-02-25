@@ -1,5 +1,5 @@
 # cython: profile=True
-# Time-stamp: <2012-07-02 15:29:27 Tao Liu>
+# Time-stamp: <2013-02-22 13:59:07 Tao Liu>
 
 """Module for all MACS Parser classes for input.
 
@@ -360,7 +360,10 @@ cdef class ELANDResultParser( GenericParser ):
         thisline = thisline.rstrip()
         if not thisline: return 0
         thisfields = thisline.split( '\t' )
-        return len( thisfields[ 1 ] )
+        if thisfields[1].isdigit():
+            return 0
+        else:
+            return len( thisfields[ 1 ] )
 
     def __fw_parse_line ( self, str thisline ):
         cdef:
@@ -371,7 +374,7 @@ cdef class ELANDResultParser( GenericParser ):
         if not thisline: return ( "", -1, -1 )
 
         thisfields = thisline.split( '\t' )
-        thistaglength = len( thisfields[ 1 ] )
+        thistaglength = strlen( thisfields[ 1 ] )
 
         if len( thisfields ) <= 6:
             return ( "", -1, -1 )
@@ -422,7 +425,10 @@ cdef class ELANDMultiParser( GenericParser ):
         thisline = thisline.rstrip()
         if not thisline: return 0
         thisfields = thisline.split( '\t' )
-        return len( thisfields[ 1 ] )
+        if thisfields[1].isdigit():
+            return 0
+        else:
+            return len( thisfields[ 1 ] )
 
     def __fw_parse_line ( self, str thisline ):
         cdef:
@@ -604,7 +610,7 @@ cdef class SAMParser( GenericParser ):
         # start position... hope I'm right!
         if bwflag & 16:
             thisstrand = 1
-            thisstart = atoi( thisfields[ 3 ] ) - 1 + atoi( thisfields[ 9 ] )	#reverse strand should be shifted len(query) bp 
+            thisstart = atoi( thisfields[ 3 ] ) - 1 + strlen( thisfields[ 9 ] )	#reverse strand should be shifted len(query) bp 
         else:
             thisstrand = 0
             thisstart = atoi( thisfields[ 3 ] ) - 1
@@ -1001,7 +1007,7 @@ cdef class BAMParser( GenericParser ):
         # in case of proper pair we have skipped the rightmost one... if the leftmost pair comes
         # we can treat it as a single read, so just check the strand and calculate its
         # start position... hope I'm right!
-        l = unpack( '<i', data[ 16:20 ] )[ 0 ]
+	# l = unpack( '<i', data[ 16:20 ] )[ 0 ]
         if bwflag & 16:
             thisstrand = 1
             thisstart = thisstart + unpack( '<i', data[ 16:20 ] )[ 0 ]	#reverse strand should be shifted len(query) bp 
@@ -1352,7 +1358,7 @@ cdef class BowtieParser( GenericParser ):
                          0 )
             elif thisfields[ 1 ] == "-":
                 return ( chromname,
-                         atoi( thisfields[ 3 ] ) + atoi( thisfields[ 4 ] ),
+                         atoi( thisfields[ 3 ] ) + strlen( thisfields[ 4 ] ),
                          1 )
             else:
                 raise StrandFormatError( thisline, thisfields[ 1 ] )

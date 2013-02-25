@@ -1,5 +1,5 @@
 # cython: profile=True
-# Time-stamp: <2012-09-14 16:42:20 Tao Liu>
+# Time-stamp: <2013-02-25 11:16:44 Tao Liu>
 
 """Module for PeakIO IO classes.
 
@@ -340,24 +340,38 @@ l        |           |      |0-based offset from chromStart. Use -1  |
         chrs = self.peaks.keys()
         chrs.sort()
         n_peak = 0
+        write = fhd.write
         try: peakprefix = name_prefix % name
         except: peakprefix = name_prefix
         if trackline:
-            fhd.write("track type=narrowPeak name=\"%s\" description=\"%s\" nextItemButton=on\n" % (name, name))
+            write("track type=narrowPeak name=\"%s\" description=\"%s\" nextItemButton=on\n" % (name, name))
         for chrom in chrs:
-            for peak in self.peaks[chrom]:
+            for end, group in groupby(peaks[chrom], key=itemgetter("end")):
                 n_peak += 1
-                # items in peak: (peak start,peak end, peak length,
-                # peak summit, peak height, number of tags in peak
-                # region, peak pvalue, peak fold_enrichment, qvalue)
-                if peak["summit"] == -1:
-                    s = -1
+                these_peaks = list(group)
+                if len(these_peaks) > 1: # from call-summits
+                    for i, peak in enumerate(these_peaks):
+                        peakname = "%s%d%s" % (peakprefix, n_peak, subpeak_letters(i))
+                        if peak["summit"] == -1:
+                            s = -1
+                        else:
+                            s = peak["summit"] - peak["start"]
+                        fhd.write( "%s\t%d\t%d\t%s\t%d\t.\t%.5f\t%.5f\t%.5f\t%d\n"
+                                   %
+                                   (chrom,peak["start"],peak["end"],peakname,int(10*peak[score_column]),
+                                    peak["fc"],peak["pscore"],peak["qscore"],s) )
                 else:
-                    s = peak["summit"] - peak["start"]
-                fhd.write( "%s\t%d\t%d\t%s%d\t%d\t.\t%.5f\t%.5f\t%.5f\t%d\n"
-                           %
-                           (chrom,peak["start"],peak["end"],peakprefix,n_peak,int(10*peak[score_column]),
-                            peak["fc"],peak["pscore"],peak["qscore"],s) )
+                    peak = these_peaks[0]
+                    peakname = "%s%d" % (peakprefix, n_peak)
+                    if peak["summit"] == -1:
+                        s = -1
+                    else:
+                        s = peak["summit"] - peak["start"]
+                    fhd.write( "%s\t%d\t%d\t%s\t%d\t.\t%.5f\t%.5f\t%.5f\t%d\n"
+                               %
+                               (chrom,peak["start"],peak["end"],peakname,int(10*peak[score_column]),
+                                peak["fc"],peak["pscore"],peak["qscore"],s) )
+        return
 
     def write_to_xls (self, ofhd, name_prefix="%s_peak_", name="MACS"):
         """Save the peak results in a tab-delimited plain text file

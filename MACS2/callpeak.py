@@ -1,5 +1,5 @@
 # cython: profile=True
-# Time-stamp: <2012-10-03 16:00:49 Tao Liu>
+# Time-stamp: <2013-02-25 11:22:31 Tao Liu>
 
 """Description: MACS 2 main executable
 
@@ -295,6 +295,9 @@ def run( args ):
                                           description="Summits for %s (Made with MACS v2, " + strftime("%x") + ")",
                                           score_column=score_column, trackline=options.trackline )
     ofhd_summits.close()
+
+    #4.3 call refinepeak if needed.
+
 
 def cal_max_dup_tags ( genome_size, tags_number, p=1e-5 ):
     """Calculate the maximum duplicated tag number based on genome
