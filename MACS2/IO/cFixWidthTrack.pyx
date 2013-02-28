@@ -1,5 +1,5 @@
 # cython: profile=True
-# Time-stamp: <2012-11-13 10:20:57 Tao Liu>
+# Time-stamp: <2013-02-28 18:01:52 Tao Liu>
 
 """Module for FWTrack classes.
 
@@ -24,6 +24,8 @@ import logging
 #from random import sample as random_sample
 import sys
 from copy import copy
+from collections import Counter
+
 from MACS2.Constants import *
 from libc.stdint cimport uint32_t, uint64_t, int32_t, int64_t
 from cpython cimport bool
@@ -553,20 +555,35 @@ cdef class FWTrackIII:
     cpdef compute_region_tags_from_peaks ( self, peaks, func, int window_size = 100, float cutoff = 5 ):
         """Extract tags in peak, then apply func on extracted tags.
         
+        peaks: redefined regions to extract raw tags in PeakIO type: check cPeakIO.pyx.
+
+        func:  a function to compute *something* from tags found in a predefined region
+
+        window_size: this will be passed to func.
+
+        cutoff: this will be passed to func.
+
+        func needs the fixed number of parameters, so it's not flexible. Here is an example:
+
+        wtd_find_summit(chrom, plus, minus, peak_start, peak_end, name , window_size, cutoff):
+
         """
         
         cdef:
             int32_t m, i, j, pre_i, pre_j, pos, startpos, endpos
             np.ndarray plus, minus, rt_plus, rt_minus
             str chrom, name
-            list temp, retval
+            list temp, retval, pchrnames
 
         pchrnames = sorted(peaks.peaks.keys())
         retval = []
+
+        # this object should be sorted
         if not self.__sorted: self.sort()
+        # PeakIO object should be sorted
+        peaks.sort()
         
         chrnames = self.get_chr_names()
-        #assert chromosome in chrnames, "chromosome %s can't be found in the FWTrackIII object." % chromosome
 
         for chrom in pchrnames:
             assert chrom in chrnames, "chromosome %s can't be found in the FWTrackIII object." % chrom
@@ -618,4 +635,118 @@ cdef class FWTrackIII:
                 
         return retval
 
+    cpdef refine_peak_from_tags_distribution ( self, peaks, int window_size = 100, float cutoff = 5 ):
+        """Extract tags in peak, then apply func on extracted tags.
+        
+        peaks: redefined regions to extract raw tags in PeakIO type: check cPeakIO.pyx.
+
+        window_size: this will be passed to func.
+
+        cutoff: this will be passed to func.
+
+        func needs the fixed number of parameters, so it's not flexible. Here is an example:
+
+        wtd_find_summit(chrom, plus, minus, peak_start, peak_end, name , window_size, cutoff):
+
+        """
+        
+        cdef:
+            int32_t m, i, j, pre_i, pre_j, pos, startpos, endpos
+            np.ndarray plus, minus, rt_plus, rt_minus
+            str chrom, name
+            list temp, retval, pchrnames
+
+        pchrnames = sorted(peaks.peaks.keys())
+        retval = []
+
+        # this object should be sorted
+        if not self.__sorted: self.sort()
+        # PeakIO object should be sorted
+        peaks.sort()
+        
+        chrnames = self.get_chr_names()
+
+        for chrom in pchrnames:
+            assert chrom in chrnames, "chromosome %s can't be found in the FWTrackIII object." % chrom
+            (plus, minus) = self.__locations[chrom]
+            cpeaks = peaks.peaks[chrom]
+            prev_i = 0
+            prev_j = 0
+            for m in range(len(cpeaks)):
+                startpos = cpeaks[m]["start"] - window_size
+                endpos   = cpeaks[m]["end"] + window_size
+                name     = cpeaks[m]["name"]
+
+                temp = []
+                for i in range(prev_i,plus.shape[0]):
+                    pos = plus[i]
+                    if pos < startpos:
+                        continue
+                    elif pos > endpos:
+                        prev_i = i
+                        break
+                    else:
+                        temp.append(pos)
+                rt_plus = np.array(temp)
                 
+                temp = []
+                for j in range(prev_j,minus.shape[0]):
+                    pos = minus[j]
+                    if pos < startpos:
+                        continue
+                    elif pos > endpos:
+                        prev_j = j
+                        break
+                    else:
+                        temp.append(pos)
+                rt_minus = np.array(temp)
+
+                retval.append( self.wtd_find_summit(chrom, rt_plus, rt_minus, startpos, endpos, name = name, window_size = window_size, cutoff = cutoff) )
+                # rewind window_size
+                for i in range(prev_i, 0, -1):
+                    if plus[prev_i] - plus[i] >= window_size:
+                        break
+                prev_i = i
+
+                for j in range(prev_j, 0, -1):
+                    if minus[prev_j] - minus[j] >= window_size:
+                        break
+                prev_j = j                
+                # end of a loop
+                
+        return retval
+
+                
+    cdef wtd_find_summit(chrom, list plus, list minus, int32_t peak_start, int32_t peak_end, str name = "peak", int32_t window_size=100, float cutoff = 5):
+        """internal function to be called by refine_peak_from_tags_distribution()
+
+        """
+
+        left_sum = lambda strand, pos, width = window_size: sum([strand[x] for x in strand if x <= pos and x >= pos - width])
+        right_sum = lambda strand, pos, width = window_size: sum([strand[x] for x in strand if x >= pos and x <= pos + width])
+        left_forward = lambda strand, pos: strand.get(pos,0) - strand.get(pos-window_size, 0)
+        right_forward = lambda strand, pos: strand.get(pos + window_size, 0) - strand.get(pos, 0)
+        
+        watson, crick = (Counter(plus), Counter(minus))
+        watson_left = left_sum(watson, peak_start)
+        crick_left = left_sum(crick, peak_start)
+        watson_right = right_sum(watson, peak_start)
+        crick_right = right_sum(crick, peak_start)
+
+        wtd_list = []
+        for j in range(peak_start, peak_end+1):
+            wtd_list.append(2 * (watson_left * crick_right)**0.5 - watson_right - crick_left)
+            watson_left += left_forward(watson, j)
+            watson_right += right_forward(watson, j)
+            crick_left += left_forward(crick, j)
+            crick_right += right_forward(crick,j)
+
+        wtd_max_val = max(wtd_list)
+        wtd_max_pos = wtd_list.index(wtd_max_val) + peak_start
+
+        #return (chrom, wtd_max_pos, wtd_max_pos+1, wtd_max_val)
+
+        if wtd_max_val > cutoff:
+            return (chrom, wtd_max_pos, wtd_max_pos+1, name+"_R" , wtd_max_val) # 'R'efined
+        else:
+            return (chrom, wtd_max_pos, wtd_max_pos+1, name+"_F" , wtd_max_val) # 'F'ailed
