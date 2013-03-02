@@ -1,5 +1,5 @@
 # cython: profile=True
-# Time-stamp: <2013-02-28 18:01:52 Tao Liu>
+# Time-stamp: <2013-03-01 15:16:23 Tao Liu>
 
 """Module for FWTrack classes.
 
@@ -66,6 +66,7 @@ cdef class FWTrackIII:
         dict __dup_locations
         dict __dup_pointer
         bool __dup_sorted
+        bool __destroyed
         dict rlengths
         public long total
         public unsigned long dup_total
@@ -89,6 +90,33 @@ cdef class FWTrackIII:
         self.dup_total = 0           # total tags
         self.annotation = anno   # need to be figured out
         self.rlengths = {}       # lengths of reference sequences, e.g. each chromosome in a genome
+        self.__destroyed = False
+
+    cpdef destroy ( self ):
+        """Destroy this object and release mem.
+        """
+        cdef:
+            set chrs
+            str chromosome
+            
+        chrs = set(self.get_chr_names())
+        for chromosome in chrs:
+            if self.__locations.has_key(chromosome):
+                self.__locations[chromosome][0].resize( 100000, refcheck=False )
+                self.__locations[chromosome][0].resize( 0, refcheck=False )
+                self.__locations[chromosome][1].resize( 100000, refcheck=False )
+                self.__locations[chromosome][1].resize( 0, refcheck=False )
+                self.__locations[chromosome] = [None, None]
+                self.__locations.pop(chromosome)
+            if self.__dup_locations.has_key(chromosome):
+                self.__dup_locations[chromosome][0].resize( 100000, refcheck=False )
+                self.__dup_locations[chromosome][0].resize( 0, refcheck=False )
+                self.__dup_locations[chromosome][1].resize( 100000, refcheck=False )
+                self.__dup_locations[chromosome][1].resize( 0, refcheck=False )
+                self.__dup_locations[chromosome] = [None, None]
+                self.__dup_locations.pop(chromosome)
+        self.__destroyed = True
+        return True
 
 
     cpdef add_loc ( self, str chromosome, int32_t fiveendpos, int strand ):
@@ -701,7 +729,7 @@ cdef class FWTrackIII:
                         temp.append(pos)
                 rt_minus = np.array(temp)
 
-                retval.append( self.wtd_find_summit(chrom, rt_plus, rt_minus, startpos, endpos, name = name, window_size = window_size, cutoff = cutoff) )
+                retval.append( wtd_find_summit(chrom, rt_plus, rt_minus, startpos, endpos, name, window_size, cutoff) )
                 # rewind window_size
                 for i in range(prev_i, 0, -1):
                     if plus[prev_i] - plus[i] >= window_size:
@@ -716,37 +744,53 @@ cdef class FWTrackIII:
                 
         return retval
 
-                
-    cdef wtd_find_summit(chrom, list plus, list minus, int32_t peak_start, int32_t peak_end, str name = "peak", int32_t window_size=100, float cutoff = 5):
-        """internal function to be called by refine_peak_from_tags_distribution()
 
-        """
+cdef inline int left_sum ( data, int pos, int width ):
+    """
+    """
+    return sum([strand[x] for x in strand if x <= pos and x >= pos - width])
 
-        left_sum = lambda strand, pos, width = window_size: sum([strand[x] for x in strand if x <= pos and x >= pos - width])
-        right_sum = lambda strand, pos, width = window_size: sum([strand[x] for x in strand if x >= pos and x <= pos + width])
-        left_forward = lambda strand, pos: strand.get(pos,0) - strand.get(pos-window_size, 0)
-        right_forward = lambda strand, pos: strand.get(pos + window_size, 0) - strand.get(pos, 0)
+cdef inline int right_sum ( data, int pos, int width ):
+    """
+    """
+    return sum([strand[x] for x in strand if x >= pos and x <= pos + width])
+
+cdef inline int left_forward ( data, int pos ):
+    return strand.get(pos,0) - strand.get(pos-window_size, 0)
+
+cdef inline int right_forward ( data, int pos ):
+    return strand.get(pos + window_size, 0) - strand.get(pos, 0)
+
+cdef wtd_find_summit(chrom, list plus, list minus, int32_t peak_start, int32_t peak_end, str name, int32_t window_size, float cutoff):
+    """internal function to be called by refine_peak_from_tags_distribution()
+
+    """
+
+    #left_sum = lambda strand, pos, width = window_size: sum([strand[x] for x in strand if x <= pos and x >= pos - width])
+    #right_sum = lambda strand, pos, width = window_size: sum([strand[x] for x in strand if x >= pos and x <= pos + width])
+    #left_forward = lambda strand, pos: strand.get(pos,0) - strand.get(pos-window_size, 0)
+    #right_forward = lambda strand, pos: strand.get(pos + window_size, 0) - strand.get(pos, 0)
         
-        watson, crick = (Counter(plus), Counter(minus))
-        watson_left = left_sum(watson, peak_start)
-        crick_left = left_sum(crick, peak_start)
-        watson_right = right_sum(watson, peak_start)
-        crick_right = right_sum(crick, peak_start)
+    watson, crick = (Counter(plus), Counter(minus))
+    watson_left = self.left_sum(watson, peak_start, window_size)
+    crick_left = self.left_sum(crick, peak_start, window_size)
+    watson_right = self.right_sum(watson, peak_start)
+    crick_right = self.right_sum(crick, peak_start)
 
-        wtd_list = []
-        for j in range(peak_start, peak_end+1):
-            wtd_list.append(2 * (watson_left * crick_right)**0.5 - watson_right - crick_left)
-            watson_left += left_forward(watson, j)
-            watson_right += right_forward(watson, j)
-            crick_left += left_forward(crick, j)
-            crick_right += right_forward(crick,j)
+    wtd_list = []
+    for j in range(peak_start, peak_end+1):
+        wtd_list.append(2 * (watson_left * crick_right)**0.5 - watson_right - crick_left)
+        watson_left += left_forward(watson, j)
+        watson_right += right_forward(watson, j)
+        crick_left += left_forward(crick, j)
+        crick_right += right_forward(crick,j)
 
-        wtd_max_val = max(wtd_list)
-        wtd_max_pos = wtd_list.index(wtd_max_val) + peak_start
+    wtd_max_val = max(wtd_list)
+    wtd_max_pos = wtd_list.index(wtd_max_val) + peak_start
 
-        #return (chrom, wtd_max_pos, wtd_max_pos+1, wtd_max_val)
+    #return (chrom, wtd_max_pos, wtd_max_pos+1, wtd_max_val)
 
-        if wtd_max_val > cutoff:
-            return (chrom, wtd_max_pos, wtd_max_pos+1, name+"_R" , wtd_max_val) # 'R'efined
-        else:
-            return (chrom, wtd_max_pos, wtd_max_pos+1, name+"_F" , wtd_max_val) # 'F'ailed
+    if wtd_max_val > cutoff:
+        return (chrom, wtd_max_pos, wtd_max_pos+1, name+"_R" , wtd_max_val) # 'R'efined
+    else:
+        return (chrom, wtd_max_pos, wtd_max_pos+1, name+"_F" , wtd_max_val) # 'F'ailed
