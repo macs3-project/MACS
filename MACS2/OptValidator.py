@@ -1,4 +1,4 @@
-# Time-stamp: <2013-03-03 21:47:41 Tao Liu>
+# Time-stamp: <2013-03-03 23:43:40 Tao Liu>
 
 """Module Description
 
@@ -183,8 +183,8 @@ def opt_validate ( options ):
 
     if options.refine_peaks:
         options.argtxt += "# Refining peak for read balance is on\n"
-    else:
-        options.argtxt += "# Refining peak for read balance is off\n"        
+    if options.call_summits:
+        options.argtxt += "# Searching for subpeak summits is on\n"        
 
     if options.halfext:
         options.argtxt += "# MACS will make 1/2d size fragments\n"

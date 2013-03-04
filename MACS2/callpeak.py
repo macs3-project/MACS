@@ -1,5 +1,5 @@
 # cython: profile=True
-# Time-stamp: <2013-03-03 22:01:21 Tao Liu>
+# Time-stamp: <2013-03-04 00:46:02 Tao Liu>
 
 """Description: MACS 2 main executable
 
@@ -300,10 +300,10 @@ def run( args ):
     if options.refine_peaks:
         info("#5 now put back duplicate reads, then calculate reads balance to refine peak summits...")
         treat.addback_dups()
-        refined_peaks = treat.refine_peak_from_tags_distribution ( peakdetect.peaks, options.d, 5, options.name )
-        refinedpeakfile = open(options.name+"_refined_peaks.bed", "w")
-        refinedpeakfile.write( "\n".join( map(lambda x: "%s\t%d\t%d\t%s\t%.2f" % x, refined_peaks) ) )
-        info("Check refined peaks at file: %s" % options.name+"_refinepeak.bed")
+        refined_peaks = treat.refine_peak_from_tags_distribution ( peakdetect.peaks, options.d, 5 )
+        refinedpeakfile = open(options.name+"_refined_peaks.encodePeak", "w")
+        refined_peaks.write_to_narrowPeak (refinedpeakfile, name_prefix="%s_refined_peak_", name=options.name, score_column=score_column, trackline=options.trackline )
+        info("Check refined peaks at file: %s" % options.name+"_refine_peaks.encodePeak")
 
     info("Done!")
     

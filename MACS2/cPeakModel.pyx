@@ -1,5 +1,5 @@
 # cython: profile=True
-# Time-stamp: <2013-02-24 16:01:52 Tao Liu>
+# Time-stamp: <2013-03-04 00:10:59 Tao Liu>
 
 """Module Description
 
@@ -21,7 +21,7 @@ cimport numpy as np
 from array import array
 from MACS2.Constants import *
 
-def median (nums):
+cpdef median (nums):
     """Calculate Median.
 
     Parameters:
@@ -424,7 +424,7 @@ Summary of Peak Model:
         return top_indices[ int(top_indices.shape[0]/2) ] + start
 
 # smooth function from SciPy cookbook: http://www.scipy.org/Cookbook/SignalSmooth
-def smooth(x,window_len=11,window='hanning'):
+cpdef smooth(x, int window_len=11, str window='hanning'):
     """smooth the data using a window with requested size.
     
     This method is based on the convolution of a scaled window with the signal.
