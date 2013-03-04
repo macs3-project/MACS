@@ -1,4 +1,4 @@
-# Time-stamp: <2012-09-17 03:52:43 Tao Liu>
+# Time-stamp: <2013-02-24 18:29:25 Tao Liu>
 
 """Description: Filter duplicate reads depending on sequencing depth.
 
@@ -51,13 +51,6 @@ def run( o_options ):
 
     outputfile = open(options.oprefix+"_refinepeak.bed", "w")
 
-    
-    #if options.outputfile != "stdout":
-    #    assert not os.path.exists(options.outputfile), "%s already exists, please check!" % options.outputfile
-    #    outfhd = open(options.outputfile,"w")
-    #else:
-    #    outfhd = sys.stdout
-
     peakio = file(options.bedfile)
     peaks = PeakIO()
     for l in peakio:
@@ -66,29 +59,14 @@ def run( o_options ):
 
     peaks.sort()
     
-    #for l in peakio:
-    #l = peakio.readline()
-    #fs = l.rstrip().split()
-    #print fs
-    
     #1 Read tag files
     info("read tag files...")
     fwtrack = load_tag_files_options (options)
     
-    #info("tag size = %d" % options.tsize)
-    #fwtrack.fw = options.tsize
-
     retval = fwtrack.compute_region_tags_from_peaks( peaks, find_summit, window_size = options.windowsize, cutoff = options.cutoff )
     outputfile.write( "\n".join( map(lambda x: "%s\t%d\t%d\t%s\t%.2f" % x , retval) ) )
     info("Done!")
     info("Check output file: %s" % options.oprefix+"_refinepeak.bed")
-
-    #for l in peakio:
-    #    fs = l.rstrip().split()
-    #    
-    #    (p,m) = fwtrack.extract_region_tags( fs[0], int(fs[1])-options.windowsize, int(fs[2])+options.windowsize )
-    #    print p.shape[0],m.shape[0]
-
 
 def find_summit(chrom, plus, minus, peak_start, peak_end, name = "peak", window_size=100, cutoff = 5):
     

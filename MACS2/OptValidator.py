@@ -1,4 +1,4 @@
-# Time-stamp: <2013-02-24 16:05:27 Tao Liu>
+# Time-stamp: <2013-03-03 21:47:41 Tao Liu>
 
 """Module Description
 
@@ -180,6 +180,11 @@ def opt_validate ( options ):
         options.argtxt += "# Broad region calling is on\n"
     else:
         options.argtxt += "# Broad region calling is off\n"
+
+    if options.refine_peaks:
+        options.argtxt += "# Refining peak for read balance is on\n"
+    else:
+        options.argtxt += "# Refining peak for read balance is off\n"        
 
     if options.halfext:
         options.argtxt += "# MACS will make 1/2d size fragments\n"

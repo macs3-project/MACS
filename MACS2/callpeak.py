@@ -1,5 +1,5 @@
 # cython: profile=True
-# Time-stamp: <2013-02-25 11:22:31 Tao Liu>
+# Time-stamp: <2013-03-03 22:01:21 Tao Liu>
 
 """Description: MACS 2 main executable
 
@@ -297,8 +297,16 @@ def run( args ):
     ofhd_summits.close()
 
     #4.3 call refinepeak if needed.
+    if options.refine_peaks:
+        info("#5 now put back duplicate reads, then calculate reads balance to refine peak summits...")
+        treat.addback_dups()
+        refined_peaks = treat.refine_peak_from_tags_distribution ( peakdetect.peaks, options.d, 5, options.name )
+        refinedpeakfile = open(options.name+"_refined_peaks.bed", "w")
+        refinedpeakfile.write( "\n".join( map(lambda x: "%s\t%d\t%d\t%s\t%.2f" % x, refined_peaks) ) )
+        info("Check refined peaks at file: %s" % options.name+"_refinepeak.bed")
 
-
+    info("Done!")
+    
 def cal_max_dup_tags ( genome_size, tags_number, p=1e-5 ):
     """Calculate the maximum duplicated tag number based on genome
     size, total tag number and a p-value based on binomial

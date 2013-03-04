@@ -1,5 +1,5 @@
 # cython: profile=True
-# Time-stamp: <2013-03-01 15:16:23 Tao Liu>
+# Time-stamp: <2013-03-03 22:47:36 Tao Liu>
 
 """Module for FWTrack classes.
 
@@ -67,6 +67,7 @@ cdef class FWTrackIII:
         dict __dup_pointer
         bool __dup_sorted
         bool __destroyed
+        bool __dup_separated
         dict rlengths
         public long total
         public unsigned long dup_total
@@ -86,6 +87,7 @@ cdef class FWTrackIII:
         self.__dup_pointer = {}      # location pairs
         self.__sorted = False
         self.__dup_sorted = False
+        self.__dup_separated = False
         self.total = 0           # total tags
         self.dup_total = 0           # total tags
         self.annotation = anno   # need to be figured out
@@ -353,6 +355,69 @@ cdef class FWTrackIII:
             
             self.__locations[k]=[new_plus, new_minus]
             self.__dup_locations[k]=[dup_plus, dup_minus]
+
+        self.__dup_separated = True
+        
+        return
+
+    @cython.boundscheck(False) # do not check that np indices are valid
+    cpdef addback_dups( self ):
+        """Add back the duplicate reads stored in self.__dup_locations to self.__locations
+        """
+        cdef:
+            int p, m, n, current_loc, i_chrom
+            unsigned long i_old, i_new          # index for old array, and index for new one
+            unsigned long i_dup, size, new_size, dup_size
+            str k
+            np.ndarray plus, new_plus, dup_plus, minus, new_minus, dup_minus
+
+        if not self.__sorted:
+            self.sort()
+
+        assert self.__dup_separated == True, "need to run separate_dups first."
+        self.total = 0
+
+        chrnames = self.get_chr_names()
+        
+        for i_chrom in range( len(chrnames) ):
+            # for each chromosome.
+            # This loop body is too big, I may need to split code later...
+            k = chrnames[ i_chrom ]
+            plus = self.__locations[k][0]
+            dup_plus = self.__dup_locations[k][0]
+            minus = self.__locations[k][1]
+            dup_minus = self.__dup_locations[k][1]
+            
+            # concatenate
+            new_plus = np.concatenate((plus, dup_plus))
+            new_minus= np.concatenate((minus, dup_minus))
+
+            # clean old data
+            plus.resize( 100000, refcheck=False )
+            plus.resize( 0, refcheck=False )
+            dup_plus.resize( 100000, refcheck=False )
+            dup_plus.resize( 0, refcheck=False )
+            minus.resize( 100000, refcheck=False )
+            minus.resize( 0, refcheck=False )
+            dup_minus.resize( 100000, refcheck=False )
+            dup_minus.resize( 0, refcheck=False )            
+
+            # sort then assign
+            new_plus.sort()
+            new_minus.sort()
+            self.__locations[k][0] = new_plus
+            self.__locations[k][1] = new_minus
+            self.__dup_locations[k][0] = None
+            self.__dup_locations[k][1] = None            
+
+            self.__pointer[k][0] = plus.shape[0]
+            self.__pointer[k][1] = minus.shape[0]
+            self.__dup_pointer[k][0] = 0
+            self.__dup_pointer[k][1] = 0            
+            self.total +=  plus.shape[0] + minus.shape[0]
+
+        self.dup_total =  0
+        self.__dup_separated = False
         return
 
     @cython.boundscheck(False) # do not check that np indices are valid
@@ -360,6 +425,10 @@ cdef class FWTrackIII:
         """Filter the duplicated reads.
 
         Run it right after you add all data into this object.
+
+        Note, this function will *throw out* duplicates
+        permenantly. If you want to keep them, use separate_dups
+        instead.
         """
         cdef:
             int p, m, n, current_loc, i_chrom
@@ -663,7 +732,7 @@ cdef class FWTrackIII:
                 
         return retval
 
-    cpdef refine_peak_from_tags_distribution ( self, peaks, int window_size = 100, float cutoff = 5 ):
+    cpdef refine_peak_from_tags_distribution ( self, peaks, int window_size = 100, float cutoff = 5, str name = "refined_peak" ):
         """Extract tags in peak, then apply func on extracted tags.
         
         peaks: redefined regions to extract raw tags in PeakIO type: check cPeakIO.pyx.
@@ -679,9 +748,9 @@ cdef class FWTrackIII:
         """
         
         cdef:
-            int32_t m, i, j, pre_i, pre_j, pos, startpos, endpos
+            int32_t m, i, j, pre_i, pre_j, pos, startpos, endpos, n_peaks
             np.ndarray plus, minus, rt_plus, rt_minus
-            str chrom, name
+            str chrom, peak_name
             list temp, retval, pchrnames
 
         pchrnames = sorted(peaks.peaks.keys())
@@ -694,6 +763,8 @@ cdef class FWTrackIII:
         
         chrnames = self.get_chr_names()
 
+        n_peaks = 1
+        
         for chrom in pchrnames:
             assert chrom in chrnames, "chromosome %s can't be found in the FWTrackIII object." % chrom
             (plus, minus) = self.__locations[chrom]
@@ -703,8 +774,6 @@ cdef class FWTrackIII:
             for m in range(len(cpeaks)):
                 startpos = cpeaks[m]["start"] - window_size
                 endpos   = cpeaks[m]["end"] + window_size
-                name     = cpeaks[m]["name"]
-
                 temp = []
                 for i in range(prev_i,plus.shape[0]):
                     pos = plus[i]
@@ -729,7 +798,10 @@ cdef class FWTrackIII:
                         temp.append(pos)
                 rt_minus = np.array(temp)
 
-                retval.append( wtd_find_summit(chrom, rt_plus, rt_minus, startpos, endpos, name, window_size, cutoff) )
+                peak_name = name + "_" + str(n_peaks)
+                retval.append( wtd_find_summit(chrom, rt_plus, rt_minus, startpos, endpos, peak_name, window_size, cutoff) )
+                n_peaks += 1
+                
                 # rewind window_size
                 for i in range(prev_i, 0, -1):
                     if plus[prev_i] - plus[i] >= window_size:
@@ -741,49 +813,42 @@ cdef class FWTrackIII:
                         break
                 prev_j = j                
                 # end of a loop
-                
         return retval
 
 
 cdef inline int left_sum ( data, int pos, int width ):
     """
     """
-    return sum([strand[x] for x in strand if x <= pos and x >= pos - width])
+    return sum([data[x] for x in data if x <= pos and x >= pos - width])
 
 cdef inline int right_sum ( data, int pos, int width ):
     """
     """
-    return sum([strand[x] for x in strand if x >= pos and x <= pos + width])
+    return sum([data[x] for x in data if x >= pos and x <= pos + width])
 
-cdef inline int left_forward ( data, int pos ):
-    return strand.get(pos,0) - strand.get(pos-window_size, 0)
+cdef inline int left_forward ( data, int pos, int window_size ):
+    return data.get(pos,0) - data.get(pos-window_size, 0)
 
-cdef inline int right_forward ( data, int pos ):
-    return strand.get(pos + window_size, 0) - strand.get(pos, 0)
+cdef inline int right_forward ( data, int pos, int window_size ):
+    return data.get(pos + window_size, 0) - data.get(pos, 0)
 
-cdef wtd_find_summit(chrom, list plus, list minus, int32_t peak_start, int32_t peak_end, str name, int32_t window_size, float cutoff):
+cdef wtd_find_summit(chrom, np.ndarray plus, np.ndarray minus, int32_t peak_start, int32_t peak_end, str name, int32_t window_size, float cutoff):
     """internal function to be called by refine_peak_from_tags_distribution()
 
     """
-
-    #left_sum = lambda strand, pos, width = window_size: sum([strand[x] for x in strand if x <= pos and x >= pos - width])
-    #right_sum = lambda strand, pos, width = window_size: sum([strand[x] for x in strand if x >= pos and x <= pos + width])
-    #left_forward = lambda strand, pos: strand.get(pos,0) - strand.get(pos-window_size, 0)
-    #right_forward = lambda strand, pos: strand.get(pos + window_size, 0) - strand.get(pos, 0)
-        
     watson, crick = (Counter(plus), Counter(minus))
-    watson_left = self.left_sum(watson, peak_start, window_size)
-    crick_left = self.left_sum(crick, peak_start, window_size)
-    watson_right = self.right_sum(watson, peak_start)
-    crick_right = self.right_sum(crick, peak_start)
+    watson_left = left_sum(watson, peak_start, window_size)
+    crick_left = left_sum(crick, peak_start, window_size)
+    watson_right = right_sum(watson, peak_start, window_size)
+    crick_right = right_sum(crick, peak_start, window_size)
 
     wtd_list = []
     for j in range(peak_start, peak_end+1):
         wtd_list.append(2 * (watson_left * crick_right)**0.5 - watson_right - crick_left)
-        watson_left += left_forward(watson, j)
-        watson_right += right_forward(watson, j)
-        crick_left += left_forward(crick, j)
-        crick_right += right_forward(crick,j)
+        watson_left += left_forward(watson, j, window_size)
+        watson_right += right_forward(watson, j, window_size)
+        crick_left += left_forward(crick, j, window_size)
+        crick_right += right_forward(crick, j, window_size)
 
     wtd_max_val = max(wtd_list)
     wtd_max_pos = wtd_list.index(wtd_max_val) + peak_start
