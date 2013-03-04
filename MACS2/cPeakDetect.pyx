@@ -1,5 +1,5 @@
 # cython: profile=True
-# Time-stamp: <2013-03-03 21:43:18 Tao Liu>
+# Time-stamp: <2013-03-04 15:32:36 Tao Liu>
 
 """Module Description
 
@@ -416,8 +416,9 @@ class PeakDetect:
         if self.opt.trackline: score_btrack.enable_trackline()
         treat_btrack.destroy()             # clean them
         control_btrack.destroy()
-
-        self.treat.destroy()    # clean and release mem
+        if not self.opt.refine_peaks:
+            # if we don't refine peaks, no need to keep this object.
+            self.treat.destroy()    # clean and release mem
 
         # call peaks
         call_summits = self.opt.call_summits

@@ -1,5 +1,5 @@
 # cython: profile=True
-# Time-stamp: <2013-03-04 00:46:02 Tao Liu>
+# Time-stamp: <2013-03-04 14:52:10 Tao Liu>
 
 """Description: MACS 2 main executable
 
@@ -303,7 +303,7 @@ def run( args ):
         refined_peaks = treat.refine_peak_from_tags_distribution ( peakdetect.peaks, options.d, 5 )
         refinedpeakfile = open(options.name+"_refined_peaks.encodePeak", "w")
         refined_peaks.write_to_narrowPeak (refinedpeakfile, name_prefix="%s_refined_peak_", name=options.name, score_column=score_column, trackline=options.trackline )
-        info("Check refined peaks at file: %s" % options.name+"_refine_peaks.encodePeak")
+        info("Check refined peaks at file: %s" % options.name+"_refined_peaks.encodePeak")
 
     info("Done!")
     

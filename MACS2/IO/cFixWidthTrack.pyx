@@ -1,5 +1,5 @@
 # cython: profile=True
-# Time-stamp: <2013-03-04 00:50:31 Tao Liu>
+# Time-stamp: <2013-03-04 15:39:20 Tao Liu>
 
 """Module for FWTrack classes.
 
@@ -28,6 +28,7 @@ from collections import Counter
 
 from MACS2.Constants import *
 from MACS2.cPeakModel import smooth
+from MACS2.IO.cPeakIO import PeakIO
 
 from libc.stdint cimport uint32_t, uint64_t, int32_t, int64_t
 from cpython cimport bool
@@ -753,8 +754,8 @@ cdef class FWTrackIII:
             int32_t m, i, j, pre_i, pre_j, pos, startpos, endpos #, n_peaks
             np.ndarray plus, minus, rt_plus, rt_minus
             str chrom #, peak_name
-            list temp, retval, pchrnames
-            bool passflag
+            list temp, retval, pchrnames, cpeaks, npeaks
+            np.ndarray adjusted_summits, passflags
 
         pchrnames = sorted(peaks.peaks.keys())
         retval = []
@@ -767,11 +768,15 @@ cdef class FWTrackIII:
         chrnames = self.get_chr_names()
 
         #n_peaks = 1
+        ret_peaks = PeakIO()
         
         for chrom in pchrnames:
-            assert chrom in chrnames, "chromosome %s can't be found in the FWTrackIII object." % chrom
+            assert chrom in chrnames, "chromosome %s can't be found in the FWTrackIII object. %s" % (chrom, str(chrnames))
             (plus, minus) = self.__locations[chrom]
             cpeaks = peaks.peaks[chrom]
+            ret_peaks.peaks[chrom] = []
+            npeaks = ret_peaks.peaks[chrom]
+            
             prev_i = 0
             prev_j = 0
             for m in range(len(cpeaks)):
@@ -803,12 +808,21 @@ cdef class FWTrackIII:
                 rt_minus = np.array(temp)
 
                 #peak_name = name + "_" + str(n_peaks)
-                (adjusted_summit, passflag) = wtd_find_summit(chrom, rt_plus, rt_minus, startpos, endpos, window_size, cutoff)
-                thispeak["summit"] = adjusted_summit
-                if passflag:
-                    thispeak["name"] = "passed"
-                else:
-                    thispeak["name"] = "failed"
+                (adjusted_summits, passflags) = wtd_find_summit(chrom, rt_plus, rt_minus, startpos, endpos, window_size, cutoff)
+                # those local maxima above cutoff will be defined as good summits
+                for i in range(len(adjusted_summits)):
+                    adjusted_summit = adjusted_summits[i]
+                    passflag = passflags[i]
+                    if passflag:
+                        tmppeak = copy(thispeak)
+                        tmppeak["summit"] = adjusted_summit
+                        npeaks.append(tmppeak)
+                    
+                #thispeak["summit"] = adjusted_summit
+                #if passflag:
+                #    thispeak["name"] = "passed"
+                #else:
+                #    thispeak["name"] = "failed"
                 #retval.append( wtd_find_summit(chrom, rt_plus, rt_minus, startpos, endpos, peak_name, window_size, cutoff) )
                 #n_peaks += 1
                 
@@ -823,7 +837,7 @@ cdef class FWTrackIII:
                         break
                 prev_j = j                
                 # end of a loop
-        return peaks
+        return ret_peaks
 
 
 cdef inline int32_t left_sum ( data, int pos, int width ):
@@ -881,9 +895,11 @@ cdef wtd_find_summit(chrom, np.ndarray plus, np.ndarray minus, int32_t search_st
 
     #return (chrom, wtd_max_pos, wtd_max_pos+1, wtd_max_val)
 
-    if wtd_max_val > cutoff:
-        return (wtd_max_pos, True)
-        #return (chrom, wtd_max_pos, wtd_max_pos+1, name+"_R" , wtd_max_val) # 'R'efined
-    else:
-        return (wtd_max_pos, False)
-        #return (chrom, wtd_max_pos, wtd_max_pos+1, name+"_F" , wtd_max_val) # 'F'ailed
+    return (wtd_other_max_pos, wtd_other_max_val > cutoff)
+
+    #if wtd_max_val > cutoff:
+    #    return (wtd_max_pos, True)
+    #    #return (chrom, wtd_max_pos, wtd_max_pos+1, name+"_R" , wtd_max_val) # 'R'efined
+    #else:
+    #    return (wtd_max_pos, False)
+    #    #return (chrom, wtd_max_pos, wtd_max_pos+1, name+"_F" , wtd_max_val) # 'F'ailed
