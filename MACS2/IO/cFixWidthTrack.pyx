@@ -1,5 +1,5 @@
 # cython: profile=True
-# Time-stamp: <2013-03-04 15:39:20 Tao Liu>
+# Time-stamp: <2013-03-04 16:05:56 Tao Liu>
 
 """Module for FWTrack classes.
 
@@ -890,8 +890,9 @@ cdef wtd_find_summit(chrom, np.ndarray plus, np.ndarray minus, int32_t search_st
     wtd_max_val = wtd_list[wtd_max_pos]
     wtd_max_pos += search_start
     # search for other local maxima
-    wtd_other_max_val = np.r_[False, wtd_list[1:] > wtd_list[:-1]] & np.r_[wtd_list[:-1] > wtd_list[1:], False]
-    wtd_other_max_pos = wtd_list[wtd_other_max_val] + search_start
+    wtd_other_max_pos = np.arange(len(wtd_list))[np.r_[False, wtd_list[1:] > wtd_list[:-1]] & np.r_[wtd_list[:-1] > wtd_list[1:], False]]
+    wtd_other_max_val = wtd_list[wtd_other_max_pos]
+    wtd_other_max_pos = wtd_other_max_pos + search_start
 
     #return (chrom, wtd_max_pos, wtd_max_pos+1, wtd_max_val)
 
