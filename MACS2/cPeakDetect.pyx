@@ -1,5 +1,5 @@
 # cython: profile=True
-# Time-stamp: <2013-03-04 15:32:36 Tao Liu>
+# Time-stamp: <2013-03-05 16:10:39 Tao Liu>
 
 """Module Description
 
@@ -60,6 +60,7 @@ class PeakDetect:
         self.peaks = None
         self.final_peaks = None
         self.PE_MODE = opt.PE_MODE
+        self.scoretrack = None
 
         #self.femax = opt.femax
         #self.femin = opt.femin
@@ -291,11 +292,11 @@ class PeakDetect:
 
         # calculate pvalue scores
         self.info("#3 Build score track ...")
-        score_btrack = treat_btrack.make_scoreTrackII_for_macs(
-                           control_btrack,
-                           effective_depth_in_million,
-                           effective_depth_in_million )
-        if self.opt.trackline: score_btrack.enable_trackline()
+        self.scoretrack = treat_btrack.make_scoreTrackII_for_macs(
+                          control_btrack,
+                          effective_depth_in_million,
+                          effective_depth_in_million )
+        if self.opt.trackline: self.scoretrack.enable_trackline()
         treat_btrack.destroy()             # clean them
         control_btrack.destroy()        
         if not self.opt.refine_peaks:
@@ -308,24 +309,24 @@ class PeakDetect:
         if call_summits: self.info("#3 Going to call summits inside each peak ...")
         if self.log_pvalue:
             self.info("#3 Calculate pvalues ...")
-            score_btrack.change_score_method ( ord('p') )
+            self.scoretrack.change_score_method ( ord('p') )
             if self.opt.broad:
                 self.info("#3 Call broad peaks with given level1 -log10pvalue cutoff and level2: %.5f, %.5f..." % (self.log_pvalue,self.opt.log_broadcutoff) )
-                peaks = score_btrack.call_broadpeaks(lvl1_cutoff=self.log_pvalue,lvl2_cutoff=self.opt.log_broadcutoff,min_length=self.d,
-                                                     lvl1_max_gap=self.opt.tsize,lvl2_max_gap=self.d*4)
+                peaks = self.scoretrack.call_broadpeaks(lvl1_cutoff=self.log_pvalue,lvl2_cutoff=self.opt.log_broadcutoff,min_length=self.d,
+                                                        lvl1_max_gap=self.opt.tsize,lvl2_max_gap=self.d*4)
             else:
                 self.info("#3 Call peaks with given -log10pvalue cutoff: %.5f ..." % self.log_pvalue)
-                peaks = score_btrack.call_peaks(cutoff=self.log_pvalue,min_length=self.d,max_gap=self.opt.tsize,call_summits=call_summits)
+                peaks = self.scoretrack.call_peaks(cutoff=self.log_pvalue,min_length=self.d,max_gap=self.opt.tsize,call_summits=call_summits)
         elif self.log_qvalue:
             self.info("#3 Calculate qvalues ...")
-            score_btrack.change_score_method ( ord('q') )            
+            self.scoretrack.change_score_method ( ord('q') )            
             if self.opt.broad:
                 self.info("#3 Call broad peaks with given level1 -log10qvalue cutoff and level2: %f, %f..." % (self.log_qvalue,self.opt.log_broadcutoff) )
-                peaks = score_btrack.call_broadpeaks(lvl1_cutoff=self.log_qvalue,lvl2_cutoff=self.opt.log_broadcutoff,min_length=self.d,
-                                                     lvl1_max_gap=self.opt.tsize,lvl2_max_gap=self.d*4)
+                peaks = self.scoretrack.call_broadpeaks(lvl1_cutoff=self.log_qvalue,lvl2_cutoff=self.opt.log_broadcutoff,min_length=self.d,
+                                                        lvl1_max_gap=self.opt.tsize,lvl2_max_gap=self.d*4)
             else:
                 self.info("#3 Call peaks with given -log10qvalue cutoff: %.5f ..." % self.log_qvalue)        
-                peaks = score_btrack.call_peaks(cutoff=self.log_qvalue,min_length=self.d,max_gap=self.opt.tsize,call_summits=call_summits)
+                peaks = self.scoretrack.call_peaks(cutoff=self.log_qvalue,min_length=self.d,max_gap=self.opt.tsize,call_summits=call_summits)
             
         if self.opt.store_bdg:
            name = self.opt.name or 'Unknown'
@@ -343,10 +344,10 @@ class PeakDetect:
            for filename, title, desc, scorecol in tracks:
                self.info("#3 save the %s track into bedGraph file..." % desc)
                if self.opt.do_SPMR:
-                   score_btrack.change_normalization_method(ord('M')) # scale down to million reads
+                   self.scoretrack.change_normalization_method(ord('M')) # scale down to million reads
                with io.open(filename, 'wb') as bdgfhd:
-                   score_btrack.write_bedGraph(bdgfhd, title,
-                                               trackdesc % desc, scorecol) # do_SPMR doesn't have effect on p/q/logLR values.
+                   self.scoretrack.write_bedGraph(bdgfhd, title,
+                                                  trackdesc % desc, scorecol) # do_SPMR doesn't have effect on p/q/logLR values.
         return peaks
 
     def __call_peaks_wo_control (self):
@@ -412,8 +413,8 @@ class PeakDetect:
 
         # calculate pvalue scores
         self.info("#3 Build score track ...")
-        score_btrack = treat_btrack.make_scoreTrackII_for_macs( control_btrack, effective_depth_in_million, effective_depth_in_million )
-        if self.opt.trackline: score_btrack.enable_trackline()
+        self.scoretrack = treat_btrack.make_scoreTrackII_for_macs( control_btrack, effective_depth_in_million, effective_depth_in_million )
+        if self.opt.trackline: self.scoretrack.enable_trackline()
         treat_btrack.destroy()             # clean them
         control_btrack.destroy()
         if not self.opt.refine_peaks:
@@ -424,24 +425,24 @@ class PeakDetect:
         call_summits = self.opt.call_summits
         if self.log_pvalue:
             self.info("#3 Calculate pvalues ...")
-            score_btrack.change_score_method ( ord('p') )            
+            self.scoretrack.change_score_method ( ord('p') )            
             if self.opt.broad:
                 self.info("#3 Call broad peaks with given level1 -log10pvalue cutoff and level2: %.5f, %.5f..." % (self.log_pvalue,self.opt.log_broadcutoff) )
-                peaks = score_btrack.call_broadpeaks(lvl1_cutoff=self.log_pvalue,lvl2_cutoff=self.opt.log_broadcutoff,min_length=self.d,
-                                                     lvl1_max_gap=self.opt.tsize,lvl2_max_gap=self.d*4)
+                peaks = self.scoretrack.call_broadpeaks(lvl1_cutoff=self.log_pvalue,lvl2_cutoff=self.opt.log_broadcutoff,min_length=self.d,
+                                                        lvl1_max_gap=self.opt.tsize,lvl2_max_gap=self.d*4)
             else:
                 self.info("#3 Call peaks with given -log10pvalue cutoff: %.5f ..." % self.log_pvalue)                
-                peaks = score_btrack.call_peaks(cutoff=self.log_pvalue,min_length=self.d,max_gap=self.opt.tsize,call_summits=call_summits)
+                peaks = self.scoretrack.call_peaks(cutoff=self.log_pvalue,min_length=self.d,max_gap=self.opt.tsize,call_summits=call_summits)
         elif self.log_qvalue:
             self.info("#3 Calculate qvalues ...")
-            score_btrack.change_score_method ( ord('q') )            
+            self.scoretrack.change_score_method ( ord('q') )            
             if self.opt.broad:
                 self.info("#3 Call broad peaks with given level1 -log10qvalue cutoff and level2: %.5f, %.5f..." % (self.log_qvalue,self.opt.log_broadcutoff) )
-                peaks = score_btrack.call_broadpeaks(lvl1_cutoff=self.log_qvalue,lvl2_cutoff=self.opt.log_broadcutoff,min_length=self.d,
-                                                     lvl1_max_gap=self.opt.tsize,lvl2_max_gap=self.d*4)
+                peaks = self.scoretrack.call_broadpeaks(lvl1_cutoff=self.log_qvalue,lvl2_cutoff=self.opt.log_broadcutoff,min_length=self.d,
+                                                        lvl1_max_gap=self.opt.tsize,lvl2_max_gap=self.d*4)
             else:
                 self.info("#3 Call peaks with given -log10qvalue cutoff: %.5f ..." % self.log_qvalue)        
-                peaks = score_btrack.call_peaks(cutoff=self.log_qvalue,min_length=self.d,max_gap=self.opt.tsize,call_summits=call_summits)
+                peaks = self.scoretrack.call_peaks(cutoff=self.log_qvalue,min_length=self.d,max_gap=self.opt.tsize,call_summits=call_summits)
 
         if self.opt.store_bdg:
             name = self.opt.name or 'Unknown'
@@ -460,10 +461,10 @@ class PeakDetect:
             for filename, title, desc, scorecol in tracks:
                 self.info("#3 save the %s track into bedGraph file..." % desc)
                 if self.opt.do_SPMR:
-                    score_btrack.change_normalization_method(ord('M')) # scale down to million reads
+                    self.scoretrack.change_normalization_method(ord('M')) # scale down to million reads
                 with open(filename, 'w') as bdgfhd:
-                    score_btrack.write_bedGraph(bdgfhd, title,
-                                                trackdesc % desc, scorecol) # do_SPMR doesn't have effect on p/q/logLR values.
+                    self.scoretrack.write_bedGraph(bdgfhd, title,
+                                                   trackdesc % desc, scorecol) # do_SPMR doesn't have effect on p/q/logLR values.
        
         return peaks
 

@@ -1,5 +1,5 @@
 # cython: profile=True
-# Time-stamp: <2013-03-03 21:34:43 Tao Liu>
+# Time-stamp: <2013-03-05 16:43:29 Tao Liu>
 
 """Module for Feature IO classes.
 
@@ -771,8 +771,6 @@ cdef class scoreTrackII:
         g = s_p2q.get_item
         
         for chrom in self.data.keys():
-            #p = self.data[chrom][1]
-            #c = self.data[chrom][2]
             v = self.data[chrom][3]
             l = self.datalength[chrom]
             for i in range(l):
@@ -803,29 +801,6 @@ cdef class scoreTrackII:
 
         assert self.scoring_method == 'p'
 
-        # value_dict = {} #Float64HashTable()
-        # #unique_values = pyarray(FBYTE4,[])
-        # # this is a table of how many positions each p value occurs at
-        # chroms = self.data.keys()
-        # for chrom in self.data.keys():
-        #     # for each chromosome
-        #     pre_p  = 0
-        #     #d_chrom = self.data[chrom]
-        #     pos_chrom = self.data[chrom][0]
-        #     v_chrom = self.data[chrom][3]            
-        #     length = self.datalength[chrom]
-        #     for j in range(length):
-        #         this_p = pos_chrom[ j ]
-        #         this_v = v_chrom[ j ]
-        #         #assert this_v == this_v, "NaN at %d" % pos
-        #         if value_dict.has_key(this_v):
-        #             #value_dict.set_item(this_v, value_dict.get_item(this_v) + this_p - pre_p)
-        #             value_dict[this_v] += this_p - pre_p
-        #         else:
-        #             #value_dict.set_item(this_v, this_p - pre_p)
-        #             value_dict[this_v] = this_p - pre_p
-        #             #unique_values.append(this_v)
-        #         pre_p = this_p
         value_dict = self.pvalue_stat
         #logging.info("####test#### 2")
         N = sum(value_dict.values())
@@ -836,26 +811,21 @@ cdef class scoreTrackII:
         pre_v = -2147483647
         pre_l = 0
         pre_q = 2147483647              # save the previous q-value
-        #pvalue2qvalue = {pre_v:[0,k,0]}              # pvalue:[qvalue,rank,bp_with_this_pvalue]
+
         pvalue2qvalue = {}#Float64HashTable()
         unique_values = sorted(value_dict.keys(), reverse=True) #sorted(unique_values,reverse=True)
         for i in range(len(unique_values)):
             v = unique_values[i]
-            #l = value_dict.get_item(v)
+
             l = value_dict[v]
             q = v + (log10(k) + f)
             q = max(0,min(pre_q,q))           # make q-score monotonic
-            #pvalue2qvalue[v] = [q, k, 0]
-            #pvalue2qvalue.set_item( v, q )
+
             pvalue2qvalue[ v ] = q
-            #pvalue2qvalue[pre_v][2] = k-pvalue2qvalue[pre_v][1]
+
             pre_v = v
             pre_q = q
             k+=l
-        #pvalue2qvalue[pre_v][2] = k-pvalue2qvalue[pre_v][1]
-        # pop the first -1e100 one
-        #pvalue2qvalue.pop(-2147483647)
-        #logging.info("####test#### 3")
         return pvalue2qvalue
 
     cdef compute_likelihood ( self ):
@@ -977,6 +947,7 @@ cdef class scoreTrackII:
             str chrom
             int l, pre, i, p 
             float pre_v, v
+            set chrs
             np.ndarray pos, value
 
         assert column in range( 1, 4 ), "column should be between 1, 2 or 3."
@@ -1008,6 +979,65 @@ cdef class scoreTrackII:
             write( "%s\t%d\t%d\t%.5f\n" % ( chrom, pre, p, pre_v ) )
             
         return True
+
+    @cython.boundscheck(False)
+    cpdef reassign_peaks ( self, peaks ):
+        """Re-assign values of score, pileup, pscore, qscore, fold
+        change to predefined peaks.
+
+        peaks should be a PeakIO object.
+
+        *Note* assume positions in scoreTrackIII object are sorted
+         from small to large.
+
+        """
+        cdef:
+            str chrom
+            set chrs
+            int i, j, t_index, tmp_summit, l
+            float cutoff
+
+        assert isinstance( peaks, PeakIO ), "peaks must be a PeakIO object!"
+        
+        ret_peaks = PeakIO()
+
+        peaks.sort()
+        
+        chrs = self.get_chr_names()
+        for chrom in chrs:
+            cpeaks = peaks.peaks[chrom]
+            ret_peaks.peaks[chrom] = []
+            npeaks = ret_peaks.peaks[chrom]
+
+            pos = self.data[chrom][ 0 ]
+            sample = self.data[chrom][ 1 ]
+            control = self.data[chrom][ 2 ]            
+            value = self.data[chrom][ 3 ]
+
+            l = pos.shape[0]
+
+            t_index = 0
+
+            for i in range(len(cpeaks)):
+                thispeak = cpeaks[i]
+                # we need to assign values for each peak -- actuall peak summit
+                tmp_summit = thispeak["summit"]
+                while t_index < l and pos[t_index] < tmp_summit:
+                    t_index += 1
+                # find the summit
+                if value[t_index] >= cutoff:
+                    tmppeak = copy(thispeak)
+                    tmppeak["score"] = value[t_index]
+                    tmppeak["pileup"]= sample[t_index]
+                    tmppeak["pscore"]= get_pscore(sample[ t_index ], control[ t_index ])
+                    if self.scoring_method == 'q':
+                        tmppeak["qscore"]= value[ t_index ]
+                    else:
+                        tmppeak["qscore"]= -1
+                    tmppeak["fc"] = float ( sample[ t_index ] + self.pseudocount ) / ( control[ t_index ] + self.pseudocount )
+                    npeaks.append(tmppeak)
+
+        return ret_peaks
 
     cpdef call_peaks (self, float cutoff=5.0, int min_length=200, int max_gap=50, bool call_summits=False):
         """This function try to find regions within which, scores
@@ -2095,6 +2125,7 @@ cdef class DiffScoreTrackI:
             pass
     
     # REQUIRES Cython >= 0.16
+    @cython.boundscheck(False)
     cpdef rebuild_chromosomes( self ):
         cdef:
 #            np.ndarray[np.int32_t] pos, pos_copy
@@ -3586,8 +3617,8 @@ cdef class DiffScoreTrackI:
         return t
 
 cdef inline int _get_all_subpeaks(list peaks,
-                                 np.ndarray[np.int32_t] i_peaks,
-                                 np.ndarray[np.int32_t] peaks_selection):
+                                  np.ndarray[np.int32_t] i_peaks,
+                                  np.ndarray[np.int32_t] peaks_selection):
     """return the number of subpeaks, modify peaks_selection in place"""
     cdef:
         int i

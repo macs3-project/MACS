@@ -1,5 +1,5 @@
 # cython: profile=True
-# Time-stamp: <2013-03-04 16:05:56 Tao Liu>
+# Time-stamp: <2013-03-05 15:31:41 Tao Liu>
 
 """Module for FWTrack classes.
 
@@ -27,7 +27,7 @@ from copy import copy
 from collections import Counter
 
 from MACS2.Constants import *
-from MACS2.cPeakModel import smooth
+from MACS2.cSignal import *
 from MACS2.IO.cPeakIO import PeakIO
 
 from libc.stdint cimport uint32_t, uint64_t, int32_t, int64_t
@@ -874,7 +874,7 @@ cdef wtd_find_summit(chrom, np.ndarray plus, np.ndarray minus, int32_t search_st
     wtd_list = np.zeros( search_end - search_start + 1, dtype="float32")
     i = 0
     for j in range(search_start, search_end+1):
-        wtd_list[i] = (2 * (watson_left * crick_right)**0.5 - watson_right - crick_left)
+        wtd_list[i] = max((2 * (watson_left * crick_right)**0.5 - watson_right - crick_left),0) # minimum score is 0
         watson_left += left_forward(watson, j, window_size)
         watson_right += right_forward(watson, j, window_size)
         crick_left += left_forward(crick, j, window_size)
@@ -885,12 +885,17 @@ cdef wtd_find_summit(chrom, np.ndarray plus, np.ndarray minus, int32_t search_st
     #wtd_max_pos = wtd_list.index(wtd_max_val) + search_start
 
     # smooth
-    wtd_list = smooth(wtd_list, window="flat") # window size is by default 11.
-    wtd_max_pos = np.where(wtd_list==max(wtd_list))[0][0]
-    wtd_max_val = wtd_list[wtd_max_pos]
-    wtd_max_pos += search_start
+    #wtd_list = smooth(wtd_list, window="flat") # window size is by default 11.
+    #wtd_max_pos = np.where(wtd_list==max(wtd_list))[0][0]
+    #wtd_max_val = wtd_list[wtd_max_pos]
+    #wtd_max_pos += search_start
     # search for other local maxima
-    wtd_other_max_pos = np.arange(len(wtd_list))[np.r_[False, wtd_list[1:] > wtd_list[:-1]] & np.r_[wtd_list[:-1] > wtd_list[1:], False]]
+    #wtd_other_max_pos = np.arange(len(wtd_list))[np.r_[False, wtd_list[1:] > wtd_list[:-1]] & np.r_[wtd_list[:-1] > wtd_list[1:], False]]
+    #wtd_other_max_val = wtd_list[wtd_other_max_pos]
+    #wtd_other_max_pos = wtd_other_max_pos + search_start
+
+    wtd_other_max_pos = maxima(wtd_list, window_size = window_size)
+    wtd_other_max_pos = enforce_peakyness( wtd_list, wtd_other_max_pos )
     wtd_other_max_val = wtd_list[wtd_other_max_pos]
     wtd_other_max_pos = wtd_other_max_pos + search_start
 

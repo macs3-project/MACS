@@ -1,4 +1,4 @@
-# Time-stamp: <2013-03-03 23:43:40 Tao Liu>
+# Time-stamp: <2013-03-05 16:53:49 Tao Liu>
 
 """Module Description
 
@@ -99,6 +99,11 @@ def opt_validate ( options ):
         logging.error("--extsize must > 1 and --shiftsize must > 0!")
         sys.exit(1)
 
+    # refine_peaks, call_summits can't be combined with --broad
+    if options.broad and (options.refine_peaks or options.call_summits):
+        logging.error("--broad can't be combined with --refine-peaks or --call-summits!")
+        sys.exit(1)
+
     if options.pvalue:
         # if set, ignore qvalue cutoff
         options.log_qvalue = None
@@ -184,7 +189,7 @@ def opt_validate ( options ):
     if options.refine_peaks:
         options.argtxt += "# Refining peak for read balance is on\n"
     if options.call_summits:
-        options.argtxt += "# Searching for subpeak summits is on\n"        
+        options.argtxt += "# Searching for subpeak summits is on\n"
 
     if options.halfext:
         options.argtxt += "# MACS will make 1/2d size fragments\n"

@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# Time-stamp: <2013-03-03 23:19:05 Tao Liu>
+# Time-stamp: <2013-03-05 16:50:59 Tao Liu>
 
 """Description: MACS v2 main executable.
 
@@ -227,9 +227,9 @@ def add_callpeak_parser( subparsers ):
     postprocess_group = group_callpeak.add_mutually_exclusive_group()
     
     postprocess_group.add_argument( "--call-summits", dest="call_summits", action="store_true",
-                                    help="If set, MACS will use a more sophisticated approach to find all summits in each enriched peak region. DEFAULT: False",default=False)
+                                    help="If set, MACS will use a more sophisticated signal processing approach to find subpeak summits in each enriched peak region. DEFAULT: False",default=False)
     postprocess_group.add_argument( "--refine-peaks", dest="refine_peaks", action="store_true",
-                                    help="If set, MACS will refine peak summits by measuring balance of waston/crick tags. Note, duplicate reads will be put back while calculating read balance. And more memory will be used. Default: False", default=False )
+                                    help="If set, MACS will refine peak summits by measuring balance of waston/crick tags. Those peaks without balancing tags will be disgarded. Peak summits will be redefined and reassgined with scores. Note, duplicate reads will be put back while calculating read balance. And more memory will be used. Default: False", default=False )
     
     return
 

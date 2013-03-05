@@ -1,5 +1,5 @@
 # cython: profile=True
-# Time-stamp: <2013-03-04 16:06:03 Tao Liu>
+# Time-stamp: <2013-03-05 16:49:06 Tao Liu>
 
 """Description: MACS 2 main executable
 
@@ -247,6 +247,19 @@ def run( args ):
                             opt = options
                             )
     peakdetect.call_peaks()
+
+    #call refinepeak if needed.
+    if options.refine_peaks:
+        info("#3 now put back duplicate reads...")
+        treat.addback_dups()
+        info("#3 calculate reads balance to refine peak summits...")
+        refined_peaks = treat.refine_peak_from_tags_distribution ( peakdetect.peaks, options.d, 0 )
+        info("#3 reassign scores for newly refined peak summits...")
+        peakdetect.peaks = peakdetect.scoretrack.reassign_peaks( refined_peaks ) # replace
+        #info("#3 write to file: %s ..." % options.name+"_refined_peaks.encodePeak" )
+        #refinedpeakfile = open(options.name+"_refined_peaks.encodePeak", "w")
+        #refined_peaks.write_to_narrowPeak (refinedpeakfile, name_prefix="%s_refined_peak_", name=options.name, score_column=score_column, trackline=options.trackline )
+
     #diag_result = peakdetect.diag_result()
     #4 output
     #4.1 peaks in XLS
@@ -296,14 +309,7 @@ def run( args ):
                                           score_column=score_column, trackline=options.trackline )
     ofhd_summits.close()
 
-    #4.3 call refinepeak if needed.
-    if options.refine_peaks:
-        info("#5 now put back duplicate reads, then calculate reads balance to refine peak summits...")
-        treat.addback_dups()
-        refined_peaks = treat.refine_peak_from_tags_distribution ( peakdetect.peaks, options.d, 5 )
-        refinedpeakfile = open(options.name+"_refined_peaks.encodePeak", "w")
-        refined_peaks.write_to_narrowPeak (refinedpeakfile, name_prefix="%s_refined_peak_", name=options.name, score_column=score_column, trackline=options.trackline )
-        info("Check refined peaks at file: %s" % options.name+"_refined_peaks.encodePeak")
+
 
     info("Done!")
     
