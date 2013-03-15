@@ -2974,6 +2974,7 @@ cdef class DiffScoreTrackI:
         else:
             bedwrite = do_nothing
         xlswrite("# values are maxmimum in region\n")
+        xls2.write("# Depth multiplier used: %f (treat/control values are after multiplication)\n") % self.cond1_depth
         xlswrite("# log10_fold_change is positive if t1 > t2\n")
         tc_method = self.track_scoring_method
         xlswrite("\t".join(("chr", "start", "end", "length",
@@ -2992,7 +2993,7 @@ cdef class DiffScoreTrackI:
         trackcontents = (name.replace("\"", "\\\""), desc.replace("\"", "\\\""))
         if trackline:
             try: bedwrite('track name="%s (peaks)" description="%s" visibility=1\n' % trackcontents)
-            except: bedwrite('track name=MACS description=Unknown') 
+            except: bedwrite('track name=MACS description=Unknown\n') 
 
         log10 = np.log10
         log2 = np.log2
@@ -3114,7 +3115,7 @@ cdef class DiffScoreTrackI:
         xlswrite("# summit is defined as greatest summit from greatest sample in region \n")
         xlswrite("# values are reported for the summit, except for \n")
         xlswrite("# fold_enrichment, sample/control qvalues, peaknames, which are copied from the peak info \n")
-        xlswrite("# values are NOT reported in SPMR if depth was specified\n")
+        xlswrite("# Depth multiplier used: %f (treat/control values are after multiplication)\n") % self.cond1_depth
         xlswrite("# differential values are reported at the taller sample peak\n")
         xlswrite("# log2_fold_change is positive if t1 > t2\n")
         xlswrite("\t".join(("chr", "start", "end", "length", "summit",
@@ -3135,7 +3136,7 @@ cdef class DiffScoreTrackI:
         trackcontents = (name.replace("\"", "\\\""), desc.replace("\"", "\\\""))
         if trackline:
             try: bedwrite('track name="%s (peaks)" description="%s" visibility=1\n' % trackcontents)
-            except: bedwrite('track name=MACS description=Unknown') 
+            except: bedwrite('track name=MACS description=Unknown\n') 
 
         log10 = np.log10
         log2 = np.log2
@@ -3319,8 +3320,10 @@ cdef class DiffScoreTrackI:
         assert self.has_peakio(), "No information on peaks"
         try: peakprefix = name_prefix % name
         except: peakprefix = name_prefix
+        xls1.write("# Depth multiplier used: %f (treat/control values are after multiplication)\n") % self.cond1_depth
         xls1.write("# the peak with the closest summit from the other sample is reported if a peak overlaps the summit\n")
         xls1.write("# log2_fold_change is positive if t1 > t2\n")
+        xls2.write("# Depth multiplier used: %f (treat/control values are after multiplication)\n") % self.cond2_depth
         xls2.write("# the peak with the closest summit from the other sample is reported if a peak overlaps the summit\n")
         xls2.write("# log2_fold_change is positive if t2 > t1\n")
         xls1.write("\t".join(("chr", "start", "end", "length", "summit",

@@ -94,7 +94,7 @@ def run( args ):
     c1bio = cBedGraphIO.bedGraphIO(options.c1bdg)
     c1btrack = c1bio.build_bdgtrack()
 
-    depth1 = options.depth1
+    depth = options.depth
 
     info("Read and build treatment 2 bedGraph...")
     t2bio = cBedGraphIO.bedGraphIO(options.t2bdg)
@@ -104,16 +104,13 @@ def run( args ):
     c2bio = cBedGraphIO.bedGraphIO(options.c2bdg)
     c2btrack = c2bio.build_bdgtrack()
     
-    depth2 = options.depth2
-
     #3 Call Peaks
 
     diffscore = cScoreTrack.DiffScoreTrackI( t1btrack,
                                              c1btrack,
                                              t2btrack,
                                              c2btrack,
-                                             depth1,
-                                             depth2 )
+                                             depth, depth )
     diffscore.finalize()
     if options.call_peaks:
         diffscore.set_track_score_method(options.track_score_method)
