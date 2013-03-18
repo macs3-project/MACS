@@ -1,5 +1,5 @@
 # cython: profile=True
-# Time-stamp: <2013-03-05 16:43:29 Tao Liu>
+# Time-stamp: <2013-03-18 16:44:28 Tao Liu>
 
 """Module for Feature IO classes.
 
@@ -2974,7 +2974,7 @@ cdef class DiffScoreTrackI:
         else:
             bedwrite = do_nothing
         xlswrite("# values are maxmimum in region\n")
-        xls2.write("# Depth multiplier used: %f (treat/control values are after multiplication)\n") % self.cond1_depth
+        xlswrite("# Depth multiplier used: %f (treat/control values are after multiplication)\n") % self.cond1_depth
         xlswrite("# log10_fold_change is positive if t1 > t2\n")
         tc_method = self.track_scoring_method
         xlswrite("\t".join(("chr", "start", "end", "length",
