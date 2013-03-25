@@ -1,5 +1,5 @@
 # cython: profile=True
-# Time-stamp: <2012-08-01 18:08:26 Tao Liu>
+# Time-stamp: <2013-03-25 02:57:11 Tao Liu>
 
 """Module for filter duplicate tags from paired-end data
 
@@ -83,6 +83,11 @@ cdef class PETrackI:
             self.__locations[chromosome][self.__pointer[chromosome],0] = start
             self.__locations[chromosome][self.__pointer[chromosome],1] = end
             self.__pointer[chromosome] += 1
+
+    cpdef destroy ( self ):
+        """Destroy this object and release mem.
+        """
+        return True
 
     cpdef __expand__ ( self, np.ndarray arr ):
         arr.resize((arr.shape[0] + BUFFER_SIZE, 2), refcheck = False )
