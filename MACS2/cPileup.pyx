@@ -1,5 +1,5 @@
 # cython: profile=True
-# Time-stamp: <2012-07-02 15:57:48 Tao Liu>
+# Time-stamp: <2013-03-26 17:45:05 Tao Liu>
 
 """Module Description: For pileup functions.
 
@@ -48,15 +48,18 @@ cpdef unified_pileup_bdg(track,
                          float baseline_value = 0.0,
                          bint directional = True, 
                          bint halfextension = True):
-    
+    """This function will call corresponding function for FWTrackIII
+    or PETrackI to pileup fragments.
+
+    It will call pileup_w_multiple_d* functions for control input, then
+    calculate maximum values; or call normal pileup functions for
+    treatment data.
+
+    """
+
     chrs = track.get_chr_names()
-    # if track.rlengths is None:
-    #     track.rlengths = dict([(k, INT_MAX) for k in chrs])
-    # else:
-    #     rlengths2 = dict([(k, track.rlengths[k]) for k in chrs])
-    #     track.rlengths = rlengths2
     if type(ds) is list:
-        # multiple pileup
+        # multiple pileup (e.g. control with 1k, 10k and d extension)
         if isinstance(track, FWTrackIII):
             return pileup_w_multiple_d_bdg(track, ds, scale_factors,
                                            baseline_value,
@@ -67,10 +70,11 @@ cpdef unified_pileup_bdg(track,
         else:
             raise ValueError("track must be of type FWTrackIII or PETrackI")
     else:
+        # single extension (e.g. treatment data)
         if isinstance(track, FWTrackIII):
             return pileup_bdg_se(track, ds, scale_factors,
-                                              baseline_value,
-                                              directional, halfextension)
+                                 baseline_value,
+                                 directional, halfextension)
         elif isinstance(track, PETrackI):
             if ds is None:
                 return pileup_bdg_pe(track, scale_factors, baseline_value)
@@ -107,8 +111,6 @@ cdef pileup_bdg_se(object trackI, int d,
         Ends ends
         np.ndarray[np.int32_t, ndim=1] plus_tags, minus_tags
         dict chrlengths = trackI.get_rlengths ()
-    #cdef int * start_poss
-    #cdef int * end_poss    
 
     ret = bedGraphTrackI(baseline_value=baseline_value) # bedGraphTrackI object to be returned.
 
@@ -209,16 +211,11 @@ cdef pileup_w_multiple_d_bdg(object trackI, list d_s, list scale_factor_s = [],
             three_shift = three_shift_s[i]
             scale_factor = scale_factor_s[i]
 
-            #start_poss = build_start_poss( plus_tags, minus_tags, five_shift, three_shift, l )
-            #end_poss = build_end_poss( plus_tags, minus_tags, five_shift, three_shift, l )
             ends = start_and_end_poss( plus_tags, minus_tags, five_shift, three_shift, rlength )
 
-            #print chrom, baseline_value
             tmp_pileup = pileup_a_chromosome ( ends.startposs, ends.endposs, scale_factor, baseline_value )
 
             # free mem
-            #del(start_poss)
-            #del(end_poss)
             ends.startposs.resize(100000, refcheck=False)
             ends.startposs.resize(0, refcheck=False)
             ends.endposs.resize(100000, refcheck=False)
@@ -330,8 +327,6 @@ cdef pileup_w_multiple_d_bdg_pe ( object trackI, list d_s = [],
         long d, five_shift, three_shift, l, i
         float scale_factor
         dict chrlengths = trackI.get_rlengths ()
-    #cdef int * start_poss
-    #cdef int * end_poss
 
     assert len(d_s) == len(scale_factor_s), "Arguments d_s and scale_factor_s should have the same length!"
 
@@ -366,8 +361,6 @@ cdef pileup_w_multiple_d_bdg_pe ( object trackI, list d_s = [],
                                              baseline_value)
 
             # free mem
-            #del(start_poss)
-            #del(end_poss)
             start_poss.resize(100000, refcheck=False)
             start_poss.resize(0, refcheck=False)
             end_poss.resize(100000, refcheck=False)
@@ -427,6 +420,9 @@ cdef np.ndarray[np.int32_t, ndim=1] fix_coordinates(np.ndarray[np.int32_t, ndim=
 cdef pileup_a_chromosome ( np.ndarray start_poss, np.ndarray end_poss, float scale_factor = 1, float baseline_value = 0 ):
     """Return pileup of one chromosome.
 
+    A super-fast and simple algorithm proposed by Jie Wang. It will
+    take sorted start positions and end positions, then compute pileup
+    values.
     """
     cdef:
         long i_s, i_e, i
