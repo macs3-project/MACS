@@ -1,4 +1,4 @@
-# Time-stamp: <2012-04-10 17:33:25 Tao Liu>
+# Time-stamp: <2013-03-19 12:00:07 Tao Liu>
 
 """Description: Naive call peaks from a single bedGraph track for scores.
 
@@ -53,7 +53,7 @@ def run( options ):
     peaks = btrack.call_peaks(cutoff=float(options.cutoff),min_length=int(options.minlen),max_gap=int(options.maxgap),call_summits=options.call_summits)
 
     info("Write peaks...")
-    nf = open ("%s_c%.1f_l%d_g%d_peaks.encodePeak" % (options.oprefix,options.cutoff,options.minlen,options.maxgap),"w")        
-    peaks.write_to_narrowPeak(nf, name_prefix=options.oprefix+"_encodePeak", score_column="score", trackline=options.trackline)
+    nf = open ("%s_c%.1f_l%d_g%d_peaks.narrowPeak" % (options.oprefix,options.cutoff,options.minlen,options.maxgap),"w")        
+    peaks.write_to_narrowPeak(nf, name_prefix=options.oprefix+"_narrowPeak", score_column="score", trackline=options.trackline)
     info("Done")
     

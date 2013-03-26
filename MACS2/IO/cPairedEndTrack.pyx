@@ -1,5 +1,5 @@
 # cython: profile=True
-# Time-stamp: <2013-03-25 02:57:11 Tao Liu>
+# Time-stamp: <2013-03-26 15:51:16 Tao Liu>
 
 """Module for filter duplicate tags from paired-end data
 
@@ -49,6 +49,7 @@ cdef class PETrackI:
     cdef public object annotation
     cdef public dict rlengths
     cdef public object dups
+    cdef bool   __destroyed
     
     def __init__ (self, char * anno=""):
         """fw is the fixed-width for all locations.
@@ -87,6 +88,28 @@ cdef class PETrackI:
     cpdef destroy ( self ):
         """Destroy this object and release mem.
         """
+        cdef:
+            set chrs
+            str chromosome
+            
+        chrs = set(self.get_chr_names())
+        for chromosome in chrs:
+            if self.__locations.has_key(chromosome):
+                self.__locations[chromosome][0].resize( 100000, refcheck=False )
+                self.__locations[chromosome][0].resize( 0, refcheck=False )
+                self.__locations[chromosome][1].resize( 100000, refcheck=False )
+                self.__locations[chromosome][1].resize( 0, refcheck=False )
+                self.__locations[chromosome] = [None, None]
+                self.__locations.pop(chromosome)
+            if self.__dup_locations.has_key(chromosome):
+                self.__dup_locations[chromosome][0].resize( 100000, refcheck=False )
+                self.__dup_locations[chromosome][0].resize( 0, refcheck=False )
+                self.__dup_locations[chromosome][1].resize( 100000, refcheck=False )
+                self.__dup_locations[chromosome][1].resize( 0, refcheck=False )
+                self.__dup_locations[chromosome] = [None, None]
+                self.__dup_locations.pop(chromosome)
+        self.__destroyed = True
+
         return True
 
     cpdef __expand__ ( self, np.ndarray arr ):

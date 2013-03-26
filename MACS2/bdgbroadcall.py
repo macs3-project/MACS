@@ -1,4 +1,4 @@
-# Time-stamp: <2012-04-10 17:33:16 Tao Liu>
+# Time-stamp: <2013-03-19 12:00:28 Tao Liu>
 
 """Description: Fine-tuning script to call broad peaks from a single bedGraph track for scores.
 
@@ -56,7 +56,6 @@ def run( options ):
 
     info("Write peaks...")
     #nf = open ("%s_c%.1f_l%d_g%d_peaks.encodePeak" % (options.oprefix,options.cutoffpeak,options.minlen,options.lvl1maxgap),"w")
-    bf = open ("%s_c%.1f_C%.2f_l%d_g%d_G%d_broad.bed" % (options.oprefix,options.cutoffpeak,options.cutofflink,options.minlen,options.lvl1maxgap,options.lvl2maxgap),"w")        
-    #peaks.write_to_narrowPeak(nf, name_prefix=options.oprefix+"_encodePeak", score_column="score")
+    bf = open ("%s_c%.1f_C%.2f_l%d_g%d_G%d_broad.bed12" % (options.oprefix,options.cutoffpeak,options.cutofflink,options.minlen,options.lvl1maxgap,options.lvl2maxgap),"w")        
     bpeaks[1].write_to_gappedPeak(bf, name_prefix=options.oprefix+"_broadRegion")    
     info("Done")

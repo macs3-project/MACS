@@ -1,13 +1,25 @@
+2013-03-05  Tao Liu  <vladimir.liu@gmail.com>
+	MACS version 2.0.10 20130306 (tag:alpha)
+
+	* diffpeak module New module to detect differential binding sites
+	with more statistics.
+
+	* Introduced --refine-peaks
+	Calculates reads balancing to refine peak summits
+
+	* Ouput file names prefix
+	Correct encodePeak to narrowPeak, broadPeak to bed12. 
+
 2012-09-13 Benjamin Schiller <benjamin.schiller@ucsf.edu>,  Tao Liu  <taoliu@jimmy.harvard.edu>
 	MACS version 2.0.10 (tag:alpha not released)
 
-	* Introduced BAMPEParser *
+	* Introduced BAMPEParser
 	Reads PE data directly, requires bedtools for now
 
-	* Introduced --call-summits *
+	* Introduced --call-summits
 	Uses signal processing methods to call overlapping peaks
 
-	* Added --no-trackline *
+	* Added --no-trackline
 	By default, files have descriptive tracklines now
 
 	* new refinepeak command (experimental)
