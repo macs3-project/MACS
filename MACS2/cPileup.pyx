@@ -1,5 +1,5 @@
 # cython: profile=True
-# Time-stamp: <2013-03-26 17:45:05 Tao Liu>
+# Time-stamp: <2013-03-28 13:23:40 Tao Liu>
 
 """Module Description: For pileup functions.
 
@@ -138,7 +138,7 @@ cdef pileup_bdg_se(object trackI, int d,
 
         ends = start_and_end_poss( plus_tags, minus_tags, five_shift, three_shift , rlength)
 
-        ret.add_a_chromosome( chrom, pileup_a_chromosome ( ends.startposs, ends.endposs, scale_factor, baseline_value ) )
+        ret.add_a_chromosome( chrom, quick_pileup ( ends.startposs, ends.endposs, scale_factor, baseline_value ) )
 
         # free mem
         ends.startposs.resize(100000, refcheck=False)
@@ -213,7 +213,7 @@ cdef pileup_w_multiple_d_bdg(object trackI, list d_s, list scale_factor_s = [],
 
             ends = start_and_end_poss( plus_tags, minus_tags, five_shift, three_shift, rlength )
 
-            tmp_pileup = pileup_a_chromosome ( ends.startposs, ends.endposs, scale_factor, baseline_value )
+            tmp_pileup = quick_pileup ( ends.startposs, ends.endposs, scale_factor, baseline_value )
 
             # free mem
             ends.startposs.resize(100000, refcheck=False)
@@ -253,9 +253,9 @@ cdef pileup_bdg_pe(object trackI, float scale_factor, float baseline_value):
     for chrom in sorted(chrlengths.keys()):
         rlength = chrlengths[chrom]
         locs = trackI.get_locations_by_chr(chrom)
-        ret.add_a_chromosome(chrom, pileup_a_chromosome(locs[:,0], locs[:,1],
-                                                        scale_factor, 
-                                                        baseline_value))
+        ret.add_a_chromosome(chrom, quick_pileup(locs[:,0], locs[:,1],
+                                                 scale_factor, 
+                                                 baseline_value))
     return ret
 
 cdef pileup_bdg_pe_w_ext (object trackI, int d, float scale_factor = 1.0,
@@ -296,8 +296,8 @@ cdef pileup_bdg_pe_w_ext (object trackI, int d, float scale_factor = 1.0,
         end_poss = midpoints + three_shift
         end_poss = fix_coordinates( end_poss, rlength) 
 
-        pileup = pileup_a_chromosome ( start_poss, end_poss, scale_factor,
-                                       baseline_value )
+        pileup = quick_pileup ( start_poss, end_poss, scale_factor,
+                                baseline_value )
         ret.add_a_chromosome( chrom, pileup )
 
         # free mem
@@ -342,8 +342,8 @@ cdef pileup_w_multiple_d_bdg_pe ( object trackI, list d_s = [],
         locs = trackI.get_locations_by_chr(chrom)
         midpoints = locs[:,0] + (locs[:,1] - locs[:,0]) / 2
 
-        prev_pileup = pileup_a_chromosome(locs[:,0], locs[:,1],
-                                          scale_factor_s[0], baseline_value)
+        prev_pileup = quick_pileup(locs[:,0], locs[:,1],
+                                   scale_factor_s[0], baseline_value)
 
         for i in range(len(five_shift_s)):
             five_shift = five_shift_s[i]
@@ -357,8 +357,8 @@ cdef pileup_w_multiple_d_bdg_pe ( object trackI, list d_s = [],
             end_poss = fix_coordinates( end_poss, rlength) 
 
             #print chrom, baseline_value
-            tmp_pileup = pileup_a_chromosome(start_poss, end_poss, scale_factor,
-                                             baseline_value)
+            tmp_pileup = quick_pileup(start_poss, end_poss, scale_factor,
+                                      baseline_value)
 
             # free mem
             start_poss.resize(100000, refcheck=False)
@@ -417,12 +417,24 @@ cdef np.ndarray[np.int32_t, ndim=1] fix_coordinates(np.ndarray[np.int32_t, ndim=
     
     return poss
 
-cdef pileup_a_chromosome ( np.ndarray start_poss, np.ndarray end_poss, float scale_factor = 1, float baseline_value = 0 ):
-    """Return pileup of one chromosome.
+# general pileup function
+
+cdef quick_pileup ( np.ndarray start_poss, np.ndarray end_poss, float scale_factor = 1, float baseline_value = 0 ):
+    """Return pileup given start and end positions of fragments.
 
     A super-fast and simple algorithm proposed by Jie Wang. It will
     take sorted start positions and end positions, then compute pileup
-    values.
+    values. 
+
+    It will return a pileup result in similar structure as
+    bedGraph. There are two python arrays:
+    
+    [end positions, values] or [p,v]
+
+    Two arrays have the same length and can be matched by index. End
+    position at index x (p[x]) record continuous value of v[x] from
+    p[x-1] to p[x].
+
     """
     cdef:
         long i_s, i_e, i
@@ -485,9 +497,14 @@ cdef pileup_a_chromosome ( np.ndarray start_poss, np.ndarray end_poss, float sca
 
     return tmp
 
+# general function to calculate maximum between two arrays.
+
 cdef max_over_two_pv_array ( tmparray1, tmparray2 ):
     """Merge two position-value arrays. For intersection regions, take
     the maximum value within region.
+
+    tmparray1 and tmparray2 are [p,v] type lists, same as the output
+    from quick_pileup function.
 
     """
 

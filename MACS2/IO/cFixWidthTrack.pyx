@@ -1,5 +1,5 @@
 # cython: profile=True
-# Time-stamp: <2013-03-05 15:31:41 Tao Liu>
+# Time-stamp: <2013-03-28 16:36:34 Tao Liu>
 
 """Module for FWTrack classes.
 
@@ -29,6 +29,7 @@ from collections import Counter
 from MACS2.Constants import *
 from MACS2.cSignal import *
 from MACS2.IO.cPeakIO import PeakIO
+from MACS2.cPileup import Ends, start_and_end_poss, quick_pileup, max_over_two_pv_array
 
 from libc.stdint cimport uint32_t, uint64_t, int32_t, int64_t
 from cpython cimport bool
@@ -839,6 +840,68 @@ cdef class FWTrackIII:
                 # end of a loop
         return ret_peaks
 
+    cpdef pileup_a_chromosome ( self, str chrom, list ds, list scale_factors, float baseline_value = 0.0, bint directional = True, bint halfextension = True ):
+        """pileup a certain chromosome, return [p,v] (end position and value) list.
+        
+        ds             : tag will be extended to this value to 3' direction,
+                         unless directional is False. Can contain multiple extension
+                         values. Final pileup will the maximum.
+        scale_factors  : linearly scale the pileup value applied to each d in ds. The list should have the same length as ds.
+        baseline_value : a value to be filled for missing values, and will be the minimum pileup.
+        directional    : if False, the strand or direction of tag will be ignored, so that extenstion will be both sides with d/2.
+        halfextension  : only make a fragment of d/2 size centered at fragment center        
+        """
+        cdef:
+            long d
+            long five_shift, three_shift  # adjustment to 5' end and 3' end positions to make a fragment
+            int rlength
+            Ends ends
+            np.ndarray[np.int32_t, ndim=1] plus_tags, minus_tags
+            list five_shift_s = []
+            list three_shift_s = []
+            list tmp_pileup, prev_pileup
+
+        assert len(ds) == len(scale_factors), "ds and scale_factors must have the same length!"
+
+        # adjust extension length according to 'directional' and 'halfextension' setting.
+        for d in ds:
+            if directional:
+                # only extend to 3' side
+                if halfextension:
+                    five_shift_s.append(d/-4)  # five shift is used to move cursor towards 5' direction to find the start of fragment
+                    three_shift_s.append(d*3/4) # three shift is used to move cursor towards 3' direction to find the end of fragment
+                else:
+                    five_shift_s.append(0)
+                    three_shift_s.append(d)
+            else:
+                # both sides
+                if halfextension:
+                    five_shift_s.append(d/4)
+                    three_shift_s.append(d/4)
+                else:
+                    five_shift_s.append(d/2)
+                    three_shift_s.append(d - d/2)
+
+        prev_pileup = None
+        for i in range(len(ds)):
+            five_shift = five_shift_s[i]
+            three_shift = three_shift_s[i]
+            scale_factor = scale_factor_s[i]
+
+            ends = start_and_end_poss( plus_tags, minus_tags, five_shift, three_shift, rlength )
+            tmp_pileup = quick_pileup ( ends.startposs, ends.endposs, scale_factor, baseline_value )
+
+            # free mem
+            ends.startposs.resize(100000, refcheck=False)
+            ends.startposs.resize(0, refcheck=False)
+            ends.endposs.resize(100000, refcheck=False)
+            ends.endposs.resize(0, refcheck=False)                            
+            
+            if prev_pileup:
+                prev_pileup = max_over_two_pv_array ( prev_pileup, tmp_pileup )
+            else:
+                prev_pileup = tmp_pileup
+        return prev_pileup
 
 cdef inline int32_t left_sum ( data, int pos, int width ):
     """
