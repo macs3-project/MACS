@@ -1,5 +1,5 @@
 # cython: profile=True
-# Time-stamp: <2013-04-03 17:07:57 Tao Liu>
+# Time-stamp: <2013-04-04 17:55:14 Tao Liu>
 
 """Module for PeakIO IO classes.
 
@@ -491,7 +491,7 @@ l        |           |      |0-based offset from chromStart. Use -1  |
                         #[start,end,end-start,summit,peak_height,number_tags,pvalue,fold_change,qvalue]
                         write("%s\t%d\t%d\t%d" % (chrom,peak['start']+1,peak['end'],peak['length']))
                         write("\t%d" % (peak['summit']+1)) # summit position
-                        write("\t%.5f" % (peak['pileup'])) # pileup height at summit
+                        write("\t%.2f" % (peak['pileup'])) # pileup height at summit
                         write("\t%.5f" % (peak['pscore'])) # -log10pvalue at summit
                         write("\t%.5f" % (peak['fc'])) # fold change at summit
                         write("\t%.5f" % (peak['qscore'])) # -log10qvalue at summit
@@ -503,7 +503,7 @@ l        |           |      |0-based offset from chromStart. Use -1  |
                     #[start,end,end-start,summit,peak_height,number_tags,pvalue,fold_change,qvalue]
                     write("%s\t%d\t%d\t%d" % (chrom,peak['start']+1,peak['end'],peak['length']))
                     write("\t%d" % (peak['summit']+1)) # summit position
-                    write("\t%.5f" % (peak['pileup'])) # pileup height at summit
+                    write("\t%.2f" % (peak['pileup'])) # pileup height at summit
                     write("\t%.5f" % (peak['pscore'])) # -log10pvalue at summit
                     write("\t%.5f" % (peak['fc'])) # fold change at summit
                     write("\t%.5f" % (peak['qscore'])) # -log10qvalue at summit                    

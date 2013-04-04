@@ -1,5 +1,5 @@
 # cython: profile=True
-# Time-stamp: <2013-04-04 17:44:31 Tao Liu>
+# Time-stamp: <2013-04-04 18:10:29 Tao Liu>
 
 """Module for Calculate Scores.
 
@@ -700,7 +700,7 @@ cdef class ScoreCalculator:
         cdef:
             int summit_pos, tstart, tend, tmpindex, summit_index, summit_offset
             int start, end, i, j, start_boundary, m, n
-            double summit_value, tvalue, tsummitvalue
+            double summit_value, tvalue, tsummitvalue, tmp_p_score, tmp_q_score
             np.ndarray[np.float32_t, ndim=1] peakdata
             np.ndarray[np.int32_t, ndim=1] peakindices, summit_offsets
             double ttreat_p, tctrl_p, tscore, summit_treat, summit_ctrl            
@@ -745,23 +745,26 @@ cdef class ScoreCalculator:
         summit_indices = peakindices[summit_offsets] # indices are those point to peak_content
         summit_offsets -= start_boundary
 
-        peak_scores  = peakdata[ summit_offsets ]
-        if not (peak_scores > self.cutoff).all(): # fall back to old method
-            return self.__close_peak_wo_subpeaks(peak_content, peaks, min_length, chrom)
+        #peak_scores  = peakdata[ summit_offsets ]
+        #if not (peak_scores > self.cutoff).all(): # fall back to old method
+        #    return self.__close_peak_wo_subpeaks(peak_content, peaks, min_length, chrom)
         for summit_offset, summit_index in zip(summit_offsets, summit_indices):
 
             summit_treat = peak_content[ summit_index ][ 2 ]
             summit_ctrl = peak_content[ summit_index ][ 3 ]            
-            
+
+            tmp_p_score = get_pscore( int(summit_treat), summit_ctrl )
+            tmp_q_score = self.pqtable[ tmp_p_score ]
+
             peaks.add( chrom,
                        start,
                        end,
                        summit      = start + summit_offset,
-                       peak_score  = peakdata[ summit_offset ],
-                       pileup      = summit_treat,
-                       pscore      = get_pscore( int(summit_treat), summit_ctrl ), # pvalue
+                       peak_score  = tmp_q_score,
+                       pileup      = peakdata[ summit_offset ],
+                       pscore      = tmp_p_score,
                        fold_change = float ( summit_treat + self.pseudocount ) / ( summit_ctrl + self.pseudocount ), # fold change
-                       qscore      = peakdata[ summit_offset ]
+                       qscore      = tmp_q_score
                        )
         # start a new peak
         return True
