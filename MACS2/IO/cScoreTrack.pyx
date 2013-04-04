@@ -1,5 +1,5 @@
 # cython: profile=True
-# Time-stamp: <2013-03-18 16:44:28 Tao Liu>
+# Time-stamp: <2013-04-02 13:55:46 Tao Liu>
 
 """Module for Feature IO classes.
 
@@ -802,6 +802,11 @@ cdef class scoreTrackII:
         assert self.scoring_method == 'p'
 
         value_dict = self.pvalue_stat
+
+        for p in sorted(self.pvalue_stat.keys()):
+            print p,self.pvalue_stat[v]
+
+
         #logging.info("####test#### 2")
         N = sum(value_dict.values())
         #for i in range(len(unique_values)):
@@ -1128,7 +1133,7 @@ cdef class scoreTrackII:
         if peak_length >= min_length: # if the peak is too small, reject it
             tsummit = []
             summit_pos   = 0
-            summit_value = summit_pos
+            summit_value = 0
             for i in range(len(peak_content)):
                 (tstart,tend,tvalue,tsummitvalue, tindex) = peak_content[i]
                 #for (tstart,tend,tvalue,tsummitvalue, tindex) in peak_content:

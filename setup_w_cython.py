@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# Time-stamp: <2013-03-05 16:56:01 Tao Liu>
+# Time-stamp: <2013-04-04 14:26:09 Tao Liu>
 
 """Description: 
 
@@ -58,7 +58,7 @@ def main():
                        Extension("MACS2.IO.cPairedEndTrack", ["MACS2/IO/cPairedEndTrack.pyx"], include_dirs=numpy_include_dir),
                        Extension("MACS2.IO.cBedGraph", ["MACS2/IO/cBedGraph.pyx"], libraries=["m"]),
                        Extension("MACS2.IO.cScoreTrack", ["MACS2/IO/cScoreTrack.pyx"], include_dirs=numpy_include_dir ),
-                       Extension("MACS2.IO.cCompositeScoreTrack", ["MACS2/IO/cCompositeScoreTrack.pyx"],),
+                       Extension("MACS2.IO.cScoreCalculate", ["MACS2/IO/cScoreCalculate.pyx"], include_dirs=numpy_include_dir),
                        Extension("MACS2.hashtable", ["MACS2/hashtable.pyx"],
                                  include_dirs=["MACS2/",numpy_get_include()]),
                        ]
@@ -76,13 +76,13 @@ def main():
                        Extension("MACS2.IO.cPairedEndTrack", ["MACS2/IO/cPairedEndTrack.c"], include_dirs=numpy_include_dir),
                        Extension("MACS2.IO.cBedGraph", ["MACS2/IO/cBedGraph.c"], libraries=["m"]),
                        Extension("MACS2.IO.cScoreTrack", ["MACS2/IO/cScoreTrack.c"], include_dirs=numpy_include_dir),
-                       Extension("MACS2.IO.cCompositeScoreTrack", ["MACS2/IO/cCompositeScoreTrack.c"],),
+                       Extension("MACS2.IO.cScoreCalculate", ["MACS2/IO/cScoreCalculate.c"], include_dirs=numpy_include_dir),
                        Extension("MACS2.hashtable", ["MACS2/hashtable.c"],
                                  include_dirs=["MACS2/",numpy_get_include()]),                       
                        ]
 
     setup(name="MACS",
-          version="2.0.10.20130306",
+          version="2.0.10.20130404",
           description="Model Based Analysis for ChIP-Seq data",
           author='Tao Liu',
           author_email='vladimir.liu@gmail.com',

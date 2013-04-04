@@ -1,5 +1,5 @@
 # cython: profile=True
-# Time-stamp: <2013-02-22 13:59:07 Tao Liu>
+# Time-stamp: <2013-04-04 13:36:42 Tao Liu>
 
 """Module for all MACS Parser classes for input.
 
@@ -1168,7 +1168,7 @@ cdef class BAMPEParser(BAMParser):
                 m += 1
                 info(" %d" % (m*1000000))
                 i=0
-            petrack.add_loc(references[read.ref], read.start, read.start + read.tlen)
+            add_loc(references[read.ref], read.start, read.start + read.tlen)
         self.n = m * 1000000 + i
         self.d = int(d)
         assert d >= 0, "Something went wrong (mean fragment size was negative)"
@@ -1178,7 +1178,7 @@ cdef class BAMPEParser(BAMParser):
         return petrack
 
     cpdef append_petrack (self, petrack):
-        """Build FWTrackIII from all lines, return a FWTrackIII object.
+        """Build PETrackI from all lines, return a PETrackI object.
         """
         cdef:
             int i = 0
@@ -1215,7 +1215,7 @@ cdef class BAMPEParser(BAMParser):
                 m += 1
                 info(" %d" % (m*1000000))
                 i=0
-            petrack.add_loc(references[read.ref], read.start, read.start + read.tlen)
+            add_loc(references[read.ref], read.start, read.start + read.tlen)
         self.n = m * 1000000 + i
         self.d = int(d)
         assert d >= 0, "Something went wrong (mean fragment size was negative)"

@@ -1,5 +1,5 @@
 # cython: profile=True
-# Time-stamp: <2013-03-26 15:51:16 Tao Liu>
+# Time-stamp: <2013-04-04 14:17:55 Tao Liu>
 
 """Module for filter duplicate tags from paired-end data
 
@@ -23,6 +23,7 @@ from copy import copy
 from cpython cimport bool
 cimport cython
 
+from MACS2.cPileup import quick_pileup, max_over_two_pv_array
 import sys
 
 cdef INT_MAX = <int>((<unsigned int>-1)>>1)
@@ -73,7 +74,7 @@ cdef class PETrackI:
         fiveendpos -- 5' end pos, left for plus strand, right for neg strand
         """
         if not self.__locations.has_key(chromosome):
-            self.__locations[chromosome] = np.zeros(shape=(BUFFER_SIZE, 2), dtype='int32')
+            self.__locations[chromosome] = np.zeros(shape=(BUFFER_SIZE, 2), dtype='int32') # note: [,0] is the leftmost end, [,1] is the rightmost end of fragment.
             self.__pointer[chromosome] = 0
         try:
             self.__locations[chromosome][self.__pointer[chromosome],0] = start
@@ -479,3 +480,28 @@ cdef class PETrackI:
 
         return
     
+    cpdef pileup_a_chromosome ( self, str chrom, list scale_factor_s, float baseline_value = 0.0 ):
+        """pileup a certain chromosome, return [p,v] (end position and value) list.
+        
+        scale_factor_s  : linearly scale the pileup value applied to each d in ds. The list should have the same length as ds.
+        baseline_value : a value to be filled for missing values, and will be the minimum pileup.
+        """
+        cdef:
+            list tmp_pileup, prev_pileup
+            float scale_factor
+            
+        if not self.__sorted: self.sort()
+
+        prev_pileup = None
+
+        for i in range(len(scale_factor_s)):
+            scale_factor = scale_factor_s[i]
+
+            tmp_pileup = quick_pileup ( self.__locations[chrom][:,0], self.__locations[chrom][:,1], scale_factor, baseline_value )
+
+            if prev_pileup:
+                prev_pileup = max_over_two_pv_array ( prev_pileup, tmp_pileup )
+            else:
+                prev_pileup = tmp_pileup
+
+        return prev_pileup

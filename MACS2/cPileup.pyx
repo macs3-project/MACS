@@ -1,5 +1,5 @@
 # cython: profile=True
-# Time-stamp: <2013-03-28 13:23:40 Tao Liu>
+# Time-stamp: <2013-04-04 14:18:21 Tao Liu>
 
 """Module Description: For pileup functions.
 
@@ -76,15 +76,15 @@ cpdef unified_pileup_bdg(track,
                                  baseline_value,
                                  directional, halfextension)
         elif isinstance(track, PETrackI):
-            if ds is None:
+            if ds is None:      # do not extend pair end library
                 return pileup_bdg_pe(track, scale_factors, baseline_value)
-            else:
+            else:               # still extend pair end library centered at middle point of fragment.
                 return pileup_bdg_pe_w_ext(track, ds, scale_factors,
                                            baseline_value)
         else:
             raise ValueError("track must be of type FWTrackIII or PETrackI")
 
-## Fixed-width functions ##
+## Fixed-width functions for single end library##
 cdef pileup_bdg_se(object trackI, int d,
                     float scale_factor = 1.0,
                     float baseline_value = 0.0,
@@ -399,8 +399,7 @@ cdef start_and_end_poss ( np.ndarray plus_tags, np.ndarray minus_tags,
 
     return ends
 
-cdef np.ndarray[np.int32_t, ndim=1] fix_coordinates(np.ndarray[np.int32_t, ndim=1] poss,
-                                                    int rlength):
+cdef np.ndarray[np.int32_t, ndim=1] fix_coordinates(np.ndarray[np.int32_t, ndim=1] poss, int rlength):
     cdef long i
     
     for i in range( poss.shape[0] ):
@@ -419,9 +418,112 @@ cdef np.ndarray[np.int32_t, ndim=1] fix_coordinates(np.ndarray[np.int32_t, ndim=
 
 # general pileup function
 
-cdef quick_pileup ( np.ndarray start_poss, np.ndarray end_poss, float scale_factor = 1, float baseline_value = 0 ):
-    """Return pileup given start and end positions of fragments.
+cpdef se_all_in_one_pileup ( np.ndarray plus_tags, np.ndarray minus_tags, long five_shift, long three_shift, int rlength, float scale_factor, float baseline_value ):
+    """Return pileup given 5' end of fragment at plus or minus strand
+    separately, and given shift at both direction to recover a
+    fragment. This function is for single end sequencing library
+    only. Please directly use 'quick_pileup' function for Pair-end
+    library.
+    
+    It contains a super-fast and simple algorithm proposed by Jie
+    Wang. It will take sorted start positions and end positions, then
+    compute pileup values.
 
+    It will return a pileup result in similar structure as
+    bedGraph. There are two python arrays:
+    
+    [end positions, values] or '[p,v] array' in other description for
+    functions within MACS2.
+
+    Two arrays have the same length and can be matched by index. End
+    position at index x (p[x]) record continuous value of v[x] from
+    p[x-1] to p[x].
+
+    """
+    cdef:
+        long i_s, i_e, i
+        int a, b, p, pre_p, pileup
+        list tmp
+        long lp = plus_tags.shape[0]
+        long lm = minus_tags.shape[0]
+        long l = lp + lm
+        np.ndarray start_poss, end_poss
+
+    start_poss = np.concatenate( ( plus_tags-five_shift, minus_tags-three_shift ) )
+    end_poss   = np.concatenate( ( plus_tags+three_shift, minus_tags+five_shift ) )    
+
+    # sort
+    start_poss.sort()
+    end_poss.sort()
+
+    # fix negative coordinations and those extends over end of chromosomes
+    start_poss = fix_coordinates(start_poss, rlength)
+    end_poss = fix_coordinates(end_poss, rlength)
+
+    tmp = [array(BYTE4,[]),array(FBYTE4,[])] # for (endpos,value)
+    tmppadd = tmp[0].append
+    tmpvadd = tmp[1].append
+    i_s = 0                         # index of start_poss
+    i_e = 0                         # index of end_poss
+
+    pileup = 0
+    if start_poss.shape[0] == 0: return tmp
+    pre_p = min(start_poss[0],end_poss[0])
+
+    if pre_p != 0:
+        # the first chunk of 0
+        tmppadd( pre_p )
+        tmpvadd( float_max(0,baseline_value) )
+        
+    pre_v = pileup
+    
+    while i_s < l and i_e < l:
+        a = start_poss[i_s]
+        b = end_poss[i_e]
+        if a < b:
+            p = a
+            if p != pre_p:
+                tmppadd( p )
+                tmpvadd( float_max(pileup * scale_factor, baseline_value) )
+                pre_p = p
+            pileup += 1
+            i_s += 1
+        elif a > b:
+            p = b
+            if p != pre_p:
+                tmppadd( p )
+                tmpvadd( float_max(pileup * scale_factor, baseline_value) ) 
+                pre_p = p
+            pileup -= 1
+            i_e += 1
+        else:
+            i_s += 1
+            i_e += 1
+
+    if i_e < l:
+        # add rest of end positions
+        for i in range(i_e, l):
+            p = end_poss[i]
+            #for p in end_poss[i_e:]:
+            if p != pre_p:
+                tmppadd( p )
+                tmpvadd( float_max(pileup * scale_factor, baseline_value) )
+                #ret.add_loc(chrom,pre_p,p,pileup)
+                pre_p = p
+            pileup -= 1
+
+    # clean mem
+    start_poss.resize(100000, refcheck=False)
+    start_poss.resize(0, refcheck=False)
+    end_poss.resize(100000, refcheck=False)
+    end_poss.resize(0, refcheck=False)                            
+    
+    return tmp
+
+
+cpdef quick_pileup ( np.ndarray start_poss, np.ndarray end_poss, float scale_factor, float baseline_value ):
+    """Return pileup given start and end positions of fragments.
+    
     A super-fast and simple algorithm proposed by Jie Wang. It will
     take sorted start positions and end positions, then compute pileup
     values. 
@@ -439,8 +541,11 @@ cdef quick_pileup ( np.ndarray start_poss, np.ndarray end_poss, float scale_fact
     cdef:
         long i_s, i_e, i
         int a, b, p, pre_p, pileup
-        long l = end_poss.shape[0]
-    
+        list tmp
+        long lp = plus_tags.shape[0]
+        long lm = minus_tags.shape[0]
+        long l = lp + lm
+
     tmp = [array(BYTE4,[]),array(FBYTE4,[])] # for (endpos,value)
     tmppadd = tmp[0].append
     tmpvadd = tmp[1].append
@@ -491,15 +596,14 @@ cdef quick_pileup ( np.ndarray start_poss, np.ndarray end_poss, float scale_fact
                 #ret.add_loc(chrom,pre_p,p,pileup)
                 pre_p = p
             pileup -= 1
-#    if i_s < l:
-#        # add rest of start positions ( I don't think this will happen )
-#        raise Exception("start positions can't be the only things left!")
-
+    #    if i_s < l:
+    #        # add rest of start positions ( I don't think this will happen )
+    #        raise Exception("start positions can't be the only things left!")
     return tmp
 
 # general function to calculate maximum between two arrays.
 
-cdef max_over_two_pv_array ( tmparray1, tmparray2 ):
+cpdef max_over_two_pv_array ( tmparray1, tmparray2 ):
     """Merge two position-value arrays. For intersection regions, take
     the maximum value within region.
 

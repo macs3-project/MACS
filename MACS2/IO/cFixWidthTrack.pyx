@@ -1,5 +1,5 @@
 # cython: profile=True
-# Time-stamp: <2013-03-28 16:36:34 Tao Liu>
+# Time-stamp: <2013-04-04 14:17:05 Tao Liu>
 
 """Module for FWTrack classes.
 
@@ -29,7 +29,7 @@ from collections import Counter
 from MACS2.Constants import *
 from MACS2.cSignal import *
 from MACS2.IO.cPeakIO import PeakIO
-from MACS2.cPileup import Ends, start_and_end_poss, quick_pileup, max_over_two_pv_array
+from MACS2.cPileup import se_all_in_one_pileup, max_over_two_pv_array
 
 from libc.stdint cimport uint32_t, uint64_t, int32_t, int64_t
 from cpython cimport bool
@@ -76,7 +76,6 @@ cdef class FWTrackIII:
         public long total
         public unsigned long dup_total
         public object annotation
-
         public object dups
         public int fw
     
@@ -210,7 +209,7 @@ cdef class FWTrackIII:
         else:
             raise Exception("No such chromosome name (%s) in TrackI object!\n" % (chromosome))
 
-    cpdef get_chr_names ( self ):
+    cpdef list get_chr_names ( self ):
         """Return all the chromosome names stored in this track object.
         """
         l = self.__locations.keys()
@@ -239,7 +238,7 @@ cdef class FWTrackIII:
 
         self.__sorted = True
 
-    @cython.boundscheck(False) # do not check that np indices are valid
+    @cython.boundscheck(False)
     cpdef separate_dups( self, maxint = 1 ):
         """Separate the duplicated reads into a different track
         stored at self.dup
@@ -840,13 +839,13 @@ cdef class FWTrackIII:
                 # end of a loop
         return ret_peaks
 
-    cpdef pileup_a_chromosome ( self, str chrom, list ds, list scale_factors, float baseline_value = 0.0, bint directional = True, bint halfextension = True ):
+    cpdef pileup_a_chromosome ( self, str chrom, list ds, list scale_factor_s, float baseline_value = 0.0, bint directional = True, bint halfextension = True ):
         """pileup a certain chromosome, return [p,v] (end position and value) list.
         
         ds             : tag will be extended to this value to 3' direction,
                          unless directional is False. Can contain multiple extension
                          values. Final pileup will the maximum.
-        scale_factors  : linearly scale the pileup value applied to each d in ds. The list should have the same length as ds.
+        scale_factor_s  : linearly scale the pileup value applied to each d in ds. The list should have the same length as ds.
         baseline_value : a value to be filled for missing values, and will be the minimum pileup.
         directional    : if False, the strand or direction of tag will be ignored, so that extenstion will be both sides with d/2.
         halfextension  : only make a fragment of d/2 size centered at fragment center        
@@ -854,14 +853,14 @@ cdef class FWTrackIII:
         cdef:
             long d
             long five_shift, three_shift  # adjustment to 5' end and 3' end positions to make a fragment
-            int rlength
-            Ends ends
-            np.ndarray[np.int32_t, ndim=1] plus_tags, minus_tags
+            dict chrlengths = self.get_rlengths ()
+            long rlength = chrlengths[chrom]
+            object ends
             list five_shift_s = []
             list three_shift_s = []
             list tmp_pileup, prev_pileup
 
-        assert len(ds) == len(scale_factors), "ds and scale_factors must have the same length!"
+        assert len(ds) == len(scale_factor_s), "ds and scale_factor_s must have the same length!"
 
         # adjust extension length according to 'directional' and 'halfextension' setting.
         for d in ds:
@@ -883,20 +882,14 @@ cdef class FWTrackIII:
                     three_shift_s.append(d - d/2)
 
         prev_pileup = None
+
         for i in range(len(ds)):
             five_shift = five_shift_s[i]
             three_shift = three_shift_s[i]
             scale_factor = scale_factor_s[i]
-
-            ends = start_and_end_poss( plus_tags, minus_tags, five_shift, three_shift, rlength )
-            tmp_pileup = quick_pileup ( ends.startposs, ends.endposs, scale_factor, baseline_value )
-
-            # free mem
-            ends.startposs.resize(100000, refcheck=False)
-            ends.startposs.resize(0, refcheck=False)
-            ends.endposs.resize(100000, refcheck=False)
-            ends.endposs.resize(0, refcheck=False)                            
             
+            tmp_pileup = se_all_in_one_pileup ( self.__locations[chrom][0], self.__locations[chrom][1], five_shift, three_shift, rlength, scale_factor, baseline_value )
+
             if prev_pileup:
                 prev_pileup = max_over_two_pv_array ( prev_pileup, tmp_pileup )
             else:

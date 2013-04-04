@@ -1,5 +1,5 @@
 # cython: profile=True
-# Time-stamp: <2013-03-05 16:49:06 Tao Liu>
+# Time-stamp: <2013-04-02 16:43:01 Tao Liu>
 
 """Description: MACS 2 main executable
 
@@ -279,7 +279,7 @@ def run( args ):
     if options.nolambda:
         ofhd_xls.write("# local lambda is disabled!\n")
     # pass write method so we can print too, and include name
-    peakdetect.toxls(ofhd_xls, name = options.name)
+    peakdetect.peaks.write_to_xls(ofhd_xls, name = options.name)
     ofhd_xls.close()
     #4.2 peaks in BED
     if options.log_pvalue:

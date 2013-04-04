@@ -1,5 +1,5 @@
 # cython: profile=True
-# Time-stamp: <2013-03-05 16:10:39 Tao Liu>
+# Time-stamp: <2013-04-04 14:12:21 Tao Liu>
 
 """Module Description
 
@@ -28,6 +28,7 @@ from MACS2.IO.cPeakIO import PeakIO
 from MACS2.IO.cBedGraphIO import bedGraphIO
 from MACS2.Constants import *
 from MACS2.cPileup import unified_pileup_bdg   
+from MACS2.IO.cScoreCalculate import ScoreCalculator
 #from MACS2.cPileup_old import pileup_bdg, pileup_w_multiple_d_bdg
 
 cdef str subpeak_letters(short i):
@@ -117,67 +118,6 @@ class PeakDetect:
                 self.peaks = self.__call_peaks_wo_control ()
         return self.peaks
 
-    # def diag_result (self):
-    #     """Run the diagnosis process on sequencing saturation.
-        
-    #     """
-    #     if not self.diag:
-    #         return None
-    #     if self.control:                # w/ control
-    #         return self.__diag_w_control()
-    #     else:                           # w/o control
-    #         return self.__diag_wo_control()
-
-    # This function allows writing to anything with a write method
-    # maybe should pass write method instead of fhd?
-    def toxls (self, ofhd, name_prefix="%s_peak_", name="MACS"):
-        """Save the peak results in a tab-delimited plain text file
-        with suffix .xls.
-        
-        """
-        write = ofhd.write
-        if self.peaks:
-            write("\t".join(("chr","start", "end",  "length",  "abs_summit", "pileup", "-log10(pvalue)", "fold_enrichment", "-log10(qvalue)", "name"))+"\n")
-        else:
-            return
-        
-        try: peakprefix = name_prefix % name
-        except: peakprefix = name_prefix
-
-        peaks = self.peaks.peaks
-        chrs = peaks.keys()
-        chrs.sort()
-        n_peak = 0
-        for chrom in chrs:
-            for end, group in groupby(peaks[chrom], key=itemgetter("end")):
-                n_peak += 1
-                these_peaks = list(group)
-                if len(these_peaks) > 1:
-                    for i, peak in enumerate(these_peaks):
-                        peakname = "%s%d%s" % (peakprefix, n_peak, subpeak_letters(i))
-                        #[start,end,end-start,summit,peak_height,number_tags,pvalue,fold_change,qvalue]
-                        write("%s\t%d\t%d\t%d" % (chrom,peak["start"]+1,peak["end"],peak["length"]))
-                        write("\t%d" % (peak["summit"]+1)) # summit position
-                        write("\t%.5f" % (peak["pileup"])) # pileup height at summit
-                        write("\t%.5f" % (peak["pscore"])) # -log10pvalue at summit
-                        write("\t%.5f" % (peak["fc"])) # fold change at summit                
-                        write("\t%.5f" % (peak["qscore"])) # -log10qvalue at summit
-                        write("\t%s" % peakname)
-                        write("\n")
-                else:
-                    peak = these_peaks[0]
-                    peakname = "%s%d" % (peakprefix, n_peak)
-                    #[start,end,end-start,summit,peak_height,number_tags,pvalue,fold_change,qvalue]
-                    write("%s\t%d\t%d\t%d" % (chrom,peak["start"]+1,peak["end"],peak["length"]))
-                    write("\t%d" % (peak["summit"]+1)) # summit position
-                    write("\t%.5f" % (peak["pileup"])) # pileup height at summit
-                    write("\t%.5f" % (peak["pscore"])) # -log10pvalue at summit
-                    write("\t%.5f" % (peak["fc"])) # fold change at summit                
-                    write("\t%.5f" % (peak["qscore"])) # -log10qvalue at summit
-                    write("\t%s" % peakname)
-                    write("\n")
-        return
-
     def __call_peaks_w_control (self):
         """To call peaks with control data.
 
@@ -203,6 +143,8 @@ class PeakDetect:
         """
         cdef int i
         cdef float lambda_bg, effective_depth_in_million
+        cdef float treat_scale, d
+        cdef list ctrl_scale_s, ctrl_d_s
 
         if self.PE_MODE: d = None
         else: d = self.d
@@ -215,36 +157,21 @@ class PeakDetect:
         if self.opt.tocontrol:
             # if MACS decides to scale treatment to control data because treatment is bigger
             effective_depth_in_million = control_total / 1000000.0
-        
             if self.PE_MODE:
-                if self.opt.halfext: warn('halfextension not supported in PE mode')
-                self.info("#3 pileup treatment data")
                 lambda_bg = control_length / self.gsize
             else:
-                self.info("#3 pileup treatment data by extending tags towards 3' to %d length" % self.d)
-                # unnecessary numerical error
-                # treat_total / treat2control = control_total
                 lambda_bg = float(self.d) * control_total / self.gsize
-            treat_btrack = unified_pileup_bdg(self.treat, d,
-                                              1/self.ratio_treat2control,
-                                              directional=True,
-                                              halfextension=self.opt.halfext)
+            treat_scale = 1/self.ratio_treat2control
         else:
             # if MACS decides to scale control to treatment because control sample is bigger
             effective_depth_in_million = treat_total / 1000000.0
-            self.info("#3 pileup treatment data")            
             if self.PE_MODE:
-                if self.opt.halfext: warn('halfextension not supported in PE mode')
                 lambda_bg = treat_length / self.gsize
             else:
                 lambda_bg = float(self.d) * treat_total / self.gsize
-            treat_btrack = unified_pileup_bdg(self.treat, d, scale_factors=1.0,
-                                              directional=True,
-                                              halfextension=self.opt.halfext)
+            treat_scale = 1.0
 
-        # control data needs multiple steps of calculation
-        self.info("#3 calculate local lambda from control data")
-        # I need to shift them by 500 bps, then 5000 bps
+        # prepare d_s for control data
         if self.sregion:
             assert self.d <= self.sregion, "slocal can't be smaller than d!"
         if self.lregion:
@@ -252,9 +179,9 @@ class PeakDetect:
             assert self.sregion <= self.lregion , "llocal can't be smaller than slocal!"
 
         # Now prepare a list of extension sizes
-        d_s = [ self.d ]
-        # And a list of scaling factors
-        scale_factor_s = []
+        ctrl_d_s = [ d ]   # note, d doesn't make sense in PE mode.
+        # And a list of scaling factors for control
+        ctrl_scale_s = []
 
         # d
         if not self.opt.tocontrol:
@@ -262,92 +189,65 @@ class PeakDetect:
             tmp_v = self.ratio_treat2control
         else:
             tmp_v = 1.0
-        scale_factor_s.append( tmp_v )
+        ctrl_scale_s.append( tmp_v )
 
         # slocal size local
         if self.sregion:
-            d_s.append( self.sregion )
+            ctrl_d_s.append( self.sregion )
             if not self.opt.tocontrol:
                 # if user want to scale everything to ChIP data
                 tmp_v = float(self.d)/self.sregion*self.ratio_treat2control
             else:
                 tmp_v = float(self.d)/self.sregion
-            scale_factor_s.append( tmp_v )
+            ctrl_scale_s.append( tmp_v )
 
         # llocal size local
         if self.lregion and self.lregion > self.sregion:
-            d_s.append( self.lregion )
+            ctrl_d_s.append( self.lregion )
             if not self.opt.tocontrol:
                 # if user want to scale everything to ChIP data
                 tmp_v = float(self.d)/self.lregion*self.ratio_treat2control
             else:
                 tmp_v = float(self.d)/self.lregion
-            scale_factor_s.append( tmp_v )                            
+            ctrl_scale_s.append( tmp_v )                            
 
-        # pileup using different extension sizes and scaling factors
-        control_btrack = unified_pileup_bdg(self.control, d_s, scale_factor_s,
-                                            baseline_value=lambda_bg,
-                                            directional=self.shiftcontrol,
-                                            halfextension=self.opt.halfext)
+        scorecalculator = ScoreCalculator( self.treat, self.control, effective_depth_in_million , effective_depth_in_million,
+                                           d = d, ctrl_d_s = ctrl_d_s, 
+                                           treat_scale_factor = treat_scale, 
+                                           ctrl_scale_factor_s = ctrl_scale_s,
+                                           halfextension = self.opt.halfext,
+                                           lambda_bg = lambda_bg,
+                                           shiftcontrol = self.shiftcontrol,
+                                           save_bedGraph = self.opt.store_bdg,
+                                           bedGraph_filename_prefix = self.opt.name)
 
-        # calculate pvalue scores
-        self.info("#3 Build score track ...")
-        self.scoretrack = treat_btrack.make_scoreTrackII_for_macs(
-                          control_btrack,
-                          effective_depth_in_million,
-                          effective_depth_in_million )
-        if self.opt.trackline: self.scoretrack.enable_trackline()
-        treat_btrack.destroy()             # clean them
-        control_btrack.destroy()        
-        if not self.opt.refine_peaks:
-            # if we don't refine peaks, no need to keep this object.
-            self.treat.destroy()    # clean and release mem
-            self.control.destroy()
+        if self.opt.trackline: scorecalculator.enable_trackline()
 
         # call peaks
         call_summits = self.opt.call_summits
         if call_summits: self.info("#3 Going to call summits inside each peak ...")
+
         if self.log_pvalue:
-            self.info("#3 Calculate pvalues ...")
-            self.scoretrack.change_score_method ( ord('p') )
             if self.opt.broad:
                 self.info("#3 Call broad peaks with given level1 -log10pvalue cutoff and level2: %.5f, %.5f..." % (self.log_pvalue,self.opt.log_broadcutoff) )
-                peaks = self.scoretrack.call_broadpeaks(lvl1_cutoff=self.log_pvalue,lvl2_cutoff=self.opt.log_broadcutoff,min_length=self.d,
+                peaks = scorecalculator.call_broadpeaks(['p',], lvl1_cutoff_s=[self.log_pvalue,],lvl2_cutoff_s=[self.opt.log_broadcutoff,],min_length=self.d,
                                                         lvl1_max_gap=self.opt.tsize,lvl2_max_gap=self.d*4)
             else:
                 self.info("#3 Call peaks with given -log10pvalue cutoff: %.5f ..." % self.log_pvalue)
-                peaks = self.scoretrack.call_peaks(cutoff=self.log_pvalue,min_length=self.d,max_gap=self.opt.tsize,call_summits=call_summits)
+                peaks = scorecalculator.call_peaks( ['p',], [self.log_pvalue,],
+                                                    min_length=self.d,
+                                                    max_gap=self.opt.tsize,
+                                                    call_summits=call_summits)
         elif self.log_qvalue:
-            self.info("#3 Calculate qvalues ...")
-            self.scoretrack.change_score_method ( ord('q') )            
             if self.opt.broad:
                 self.info("#3 Call broad peaks with given level1 -log10qvalue cutoff and level2: %f, %f..." % (self.log_qvalue,self.opt.log_broadcutoff) )
-                peaks = self.scoretrack.call_broadpeaks(lvl1_cutoff=self.log_qvalue,lvl2_cutoff=self.opt.log_broadcutoff,min_length=self.d,
+                peaks = scorecalculator.call_broadpeaks(['q',], lvl1_cutoff_s=[self.log_qvalue,],lvl2_cutoff_s=[self.opt.log_broadcutoff,],min_length=self.d,
                                                         lvl1_max_gap=self.opt.tsize,lvl2_max_gap=self.d*4)
             else:
-                self.info("#3 Call peaks with given -log10qvalue cutoff: %.5f ..." % self.log_qvalue)        
-                peaks = self.scoretrack.call_peaks(cutoff=self.log_qvalue,min_length=self.d,max_gap=self.opt.tsize,call_summits=call_summits)
-            
-        if self.opt.store_bdg:
-           name = self.opt.name or 'Unknown'
-           trackdesc = "%s for \"%s\" from MACS v%s" % ("%s", name, MACS_VERSION)
-           if self.PE_MODE: desc1 = "fragment pileup"
-           else: desc1 = "tag pileup"
-           
-           tracks = [(self.zwig_tr + "_pileup.bdg", self.zwig_tr,
-                      desc1, 1),
-                     
-                     (self.zwig_ctl + "_lambda.bdg", self.zwig_ctl,
-                      "Maximum local lambda", 2),
-                    ]
-           
-           for filename, title, desc, scorecol in tracks:
-               self.info("#3 save the %s track into bedGraph file..." % desc)
-               if self.opt.do_SPMR:
-                   self.scoretrack.change_normalization_method(ord('M')) # scale down to million reads
-               with io.open(filename, 'wb') as bdgfhd:
-                   self.scoretrack.write_bedGraph(bdgfhd, title,
-                                                  trackdesc % desc, scorecol) # do_SPMR doesn't have effect on p/q/logLR values.
+                peaks = scorecalculator.call_peaks( ['q',], [self.log_qvalue,],
+                                                    min_length=self.d,
+                                                    max_gap=self.opt.tsize,
+                                                    call_summits=call_summits)
         return peaks
 
     def __call_peaks_wo_control (self):
@@ -374,6 +274,9 @@ class PeakDetect:
         for enrichment.
         """
         cdef float lambda_bg, effective_depth_in_million
+        cdef float treat_scale = 1
+        cdef float d
+        cdef list ctrl_scale_s, ctrl_d_s
 
         if self.PE_MODE: d = None
         else: d = self.d
@@ -383,89 +286,63 @@ class PeakDetect:
         effective_depth_in_million = treat_total / 1000000.0
 
         # global lambda
-        if self.PE_MODE:
-            # should we support halfext?
-            if self.opt.halfext: warn('halfextension not supported in PE mode')
-            # this an estimator, we should maybe test it for accuracy?
-            lambda_bg = treat_length / self.gsize
-        else:
-            lambda_bg = float(d) * treat_total / self.gsize
-            self.info("#3 pileup treatment data by extending tags towards 3' to %d length" % self.d)
-            # Now pileup FWTrackIII to form a bedGraphTrackI
+        #if self.PE_MODE:
+        #    # should we support halfext?
+        #    if self.opt.halfext: warn('halfextension not supported in PE mode')
+        #    # this an estimator, we should maybe test it for accuracy?
+        #    lambda_bg = treat_length / self.gsize
+        #else:
+        lambda_bg = float(d) * treat_total / self.gsize
+        treat_scale = 1.0
 
-        treat_btrack = unified_pileup_bdg(self.treat, d, 1.0,
-                                          directional=True,
-                                          halfextension=self.opt.halfext)
         # slocal and d-size local bias are not calculated!
         # nothing done here. should this match w control??
         
         if self.lregion:
-            tmp_v = float(self.d) / self.lregion
-            self.info("#3 calculate large local lambda from treatment data")
-            # Now pileup FWTrackIII to form a bedGraphTrackI
-            control_btrack = unified_pileup_bdg(self.treat, self.lregion, tmp_v,
-                                                directional=self.shiftcontrol,
-                                                halfextension=self.opt.halfext,
-                                                baseline_value = lambda_bg)
+            ctrl_scale_s = [ float(self.d) / self.lregion, ]
+            ctrl_d_s     = [ self.lregion, ]
         else:
-            # I need to fake a control_btrack
-            control_btrack = treat_btrack.set_single_value(lambda_bg)
+            ctrl_scale_s = []
+            ctrl_d_s     = []
+
+        scorecalculator = ScoreCalculator( self.treat, None, effective_depth_in_million , effective_depth_in_million,
+                                           d = d, ctrl_d_s = ctrl_d_s, 
+                                           treat_scale_factor = treat_scale, 
+                                           ctrl_scale_factor_s = ctrl_scale_s,
+                                           halfextension = self.opt.halfext,
+                                           lambda_bg = lambda_bg,
+                                           shiftcontrol = self.shiftcontrol,
+                                           save_bedGraph = self.opt.store_bdg,
+                                           bedGraph_filename_prefix = self.opt.name)
 
         # calculate pvalue scores
-        self.info("#3 Build score track ...")
-        self.scoretrack = treat_btrack.make_scoreTrackII_for_macs( control_btrack, effective_depth_in_million, effective_depth_in_million )
         if self.opt.trackline: self.scoretrack.enable_trackline()
-        treat_btrack.destroy()             # clean them
-        control_btrack.destroy()
-        if not self.opt.refine_peaks:
-            # if we don't refine peaks, no need to keep this object.
-            self.treat.destroy()    # clean and release mem
 
         # call peaks
         call_summits = self.opt.call_summits
+        if call_summits: self.info("#3 Going to call summits inside each peak ...")
+
         if self.log_pvalue:
-            self.info("#3 Calculate pvalues ...")
-            self.scoretrack.change_score_method ( ord('p') )            
             if self.opt.broad:
                 self.info("#3 Call broad peaks with given level1 -log10pvalue cutoff and level2: %.5f, %.5f..." % (self.log_pvalue,self.opt.log_broadcutoff) )
-                peaks = self.scoretrack.call_broadpeaks(lvl1_cutoff=self.log_pvalue,lvl2_cutoff=self.opt.log_broadcutoff,min_length=self.d,
+                peaks = scorecalculator.call_broadpeaks(['p',], lvl1_cutoff_s=[self.log_pvalue,],lvl2_cutoff_s=[self.opt.log_broadcutoff,],min_length=self.d,
                                                         lvl1_max_gap=self.opt.tsize,lvl2_max_gap=self.d*4)
             else:
-                self.info("#3 Call peaks with given -log10pvalue cutoff: %.5f ..." % self.log_pvalue)                
-                peaks = self.scoretrack.call_peaks(cutoff=self.log_pvalue,min_length=self.d,max_gap=self.opt.tsize,call_summits=call_summits)
+                self.info("#3 Call peaks with given -log10pvalue cutoff: %.5f ..." % self.log_pvalue)
+                peaks = scorecalculator.call_peaks( ['p',], [self.log_pvalue,],
+                                                    min_length=self.d,
+                                                    max_gap=self.opt.tsize,
+                                                    call_summits=call_summits)
         elif self.log_qvalue:
-            self.info("#3 Calculate qvalues ...")
-            self.scoretrack.change_score_method ( ord('q') )            
             if self.opt.broad:
-                self.info("#3 Call broad peaks with given level1 -log10qvalue cutoff and level2: %.5f, %.5f..." % (self.log_qvalue,self.opt.log_broadcutoff) )
-                peaks = self.scoretrack.call_broadpeaks(lvl1_cutoff=self.log_qvalue,lvl2_cutoff=self.opt.log_broadcutoff,min_length=self.d,
+                self.info("#3 Call broad peaks with given level1 -log10qvalue cutoff and level2: %f, %f..." % (self.log_qvalue,self.opt.log_broadcutoff) )
+                peaks = scorecalculator.call_broadpeaks(['q',], lvl1_cutoff_s=[self.log_qvalue,],lvl2_cutoff_s=[self.opt.log_broadcutoff,],min_length=self.d,
                                                         lvl1_max_gap=self.opt.tsize,lvl2_max_gap=self.d*4)
             else:
-                self.info("#3 Call peaks with given -log10qvalue cutoff: %.5f ..." % self.log_qvalue)        
-                peaks = self.scoretrack.call_peaks(cutoff=self.log_qvalue,min_length=self.d,max_gap=self.opt.tsize,call_summits=call_summits)
-
-        if self.opt.store_bdg:
-            name = self.opt.name or 'Unknown'
-            trackdesc = "%s for \"%s\" from MACS v%s" % ("%s", name, MACS_VERSION)
-            if self.PE_MODE: desc1 = "fragment pileup"
-            else: desc1 = "tag pileup"
-            # tracks [(filename, name, desc, scorecol), ...]
-            tracks = [(self.zwig_tr + "_pileup.bdg", self.zwig_tr,
-                       desc1, 1)]
-            
-            if self.lregion:
-                tracks.append((self.zwig_ctl + "_lambda.bdg",
-                               self.zwig_ctl,
-                               "Maximum local lambda", 2 ))
-            
-            for filename, title, desc, scorecol in tracks:
-                self.info("#3 save the %s track into bedGraph file..." % desc)
-                if self.opt.do_SPMR:
-                    self.scoretrack.change_normalization_method(ord('M')) # scale down to million reads
-                with open(filename, 'w') as bdgfhd:
-                    self.scoretrack.write_bedGraph(bdgfhd, title,
-                                                   trackdesc % desc, scorecol) # do_SPMR doesn't have effect on p/q/logLR values.
-       
+                peaks = scorecalculator.call_peaks( ['q',], [self.log_qvalue,],
+                                                    min_length=self.d,
+                                                    max_gap=self.opt.tsize,
+                                                    call_summits=call_summits)
         return peaks
 
     # def __diag_w_control (self):
