@@ -1,5 +1,5 @@
 # cython: profile=True
-# Time-stamp: <2013-04-04 14:12:21 Tao Liu>
+# Time-stamp: <2013-04-04 16:58:58 Tao Liu>
 
 """Module Description
 
@@ -146,7 +146,7 @@ class PeakDetect:
         cdef float treat_scale, d
         cdef list ctrl_scale_s, ctrl_d_s
 
-        if self.PE_MODE: d = None
+        if self.PE_MODE: d = 0  # in PE_mode, d is not used
         else: d = self.d
         treat_total   = self.treat.total
         control_total = self.control.total

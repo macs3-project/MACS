@@ -1,5 +1,5 @@
 # cython: profile=True
-# Time-stamp: <2013-04-04 14:15:43 Tao Liu>
+# Time-stamp: <2013-04-04 17:44:31 Tao Liu>
 
 """Module for Calculate Scores.
 
@@ -350,7 +350,7 @@ cdef class ScoreCalculator:
             self.chr_pos_treat_ctrl[1].resize(0,refcheck=False)
             self.chr_pos_treat_ctrl[2].resize(0,refcheck=False)            
         if self.PE_mode:
-            treat_pv = self.treat.pileup_a_chromosome ( chrom, [self.treat.scale_facotr,], baseline_value = 0.0 )
+            treat_pv = self.treat.pileup_a_chromosome ( chrom, [self.treat_scale_factor,], baseline_value = 0.0 )
         else:
             treat_pv = self.treat.pileup_a_chromosome( chrom, [self.d,], [self.treat_scale_factor,], baseline_value = 0.0,
                                                        directional = True, halfextension = self.halfextension )

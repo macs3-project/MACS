@@ -1,5 +1,5 @@
 # cython: profile=True
-# Time-stamp: <2013-04-04 14:18:21 Tao Liu>
+# Time-stamp: <2013-04-04 17:50:43 Tao Liu>
 
 """Module Description: For pileup functions.
 
@@ -521,8 +521,8 @@ cpdef se_all_in_one_pileup ( np.ndarray plus_tags, np.ndarray minus_tags, long f
     return tmp
 
 
-cpdef quick_pileup ( np.ndarray start_poss, np.ndarray end_poss, float scale_factor, float baseline_value ):
-    """Return pileup given start and end positions of fragments.
+cpdef quick_pileup ( np.ndarray plus_tags, np.ndarray minus_tags, float scale_factor, float baseline_value ):
+    """Return pileup given plus strand and minus strand positions of fragments.
     
     A super-fast and simple algorithm proposed by Jie Wang. It will
     take sorted start positions and end positions, then compute pileup
@@ -549,12 +549,12 @@ cpdef quick_pileup ( np.ndarray start_poss, np.ndarray end_poss, float scale_fac
     tmp = [array(BYTE4,[]),array(FBYTE4,[])] # for (endpos,value)
     tmppadd = tmp[0].append
     tmpvadd = tmp[1].append
-    i_s = 0                         # index of start_poss
-    i_e = 0                         # index of end_poss
+    i_s = 0                         # index of plus_tags
+    i_e = 0                         # index of minus_tags
 
     pileup = 0
-    if start_poss.shape[0] == 0: return tmp
-    pre_p = min(start_poss[0],end_poss[0])
+    if plus_tags.shape[0] == 0: return tmp
+    pre_p = min(plus_tags[0],minus_tags[0])
     #print pre_p
     if pre_p != 0:
         # the first chunk of 0
@@ -563,9 +563,9 @@ cpdef quick_pileup ( np.ndarray start_poss, np.ndarray end_poss, float scale_fac
         
     pre_v = pileup
     
-    while i_s < l and i_e < l:
-        a = start_poss[i_s]
-        b = end_poss[i_e]
+    while i_s < lp and i_e < lm:
+        a = plus_tags[i_s]
+        b = minus_tags[i_e]
         if a < b:
             p = a
             if p != pre_p:
@@ -585,11 +585,11 @@ cpdef quick_pileup ( np.ndarray start_poss, np.ndarray end_poss, float scale_fac
         else:
             i_s += 1
             i_e += 1
-    if i_e < l:
+    if i_e < lm:
         # add rest of end positions
-        for i in range(i_e, l):
-            p = end_poss[i]
-            #for p in end_poss[i_e:]:
+        for i in range(i_e, lm):
+            p = minus_tags[i]
+            #for p in minus_tags[i_e:]:
             if p != pre_p:
                 tmppadd( p )
                 tmpvadd( float_max(pileup * scale_factor, baseline_value) )
