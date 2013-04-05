@@ -1,5 +1,5 @@
 # cython: profile=True
-# Time-stamp: <2013-04-04 18:10:29 Tao Liu>
+# Time-stamp: <2013-04-05 15:40:48 Tao Liu>
 
 """Module for Calculate Scores.
 
@@ -77,6 +77,15 @@ cdef inline np.ndarray apply_multiple_cutoffs ( list multiple_score_arrays, list
     for i in range(1,len(multiple_score_arrays)):
         ret += multiple_score_arrays[i] > multiple_cutoffs[i]
 
+    return ret
+
+cdef inline list get_from_multiple_scores ( list multiple_score_arrays, int index ):
+    cdef:
+        list ret = []
+        int i
+
+    for i in range(len(multiple_score_arrays)):
+        ret.append(multiple_score_arrays[i][index])
     return ret
 
 
@@ -572,7 +581,7 @@ cdef class ScoreCalculator:
             np.ndarray pos_array, treat_array, ctrl_array
             np.ndarray above_cutoff_index_array
             list score_array_s          # list to keep different types of scores
-            list peak_content
+            list peak_content           #  to store information for a chunk in a peak region, it contains lists of: 1. left position; 2. right position; 3. treatment value; 4. control value; 5. list of scores at this chunk
 
         assert len(scoring_function_s) == len(score_cutoff_s), "number of functions and cutoffs should be the same!"
         
@@ -614,43 +623,44 @@ cdef class ScoreCalculator:
             above_cutoff_startpos[0] = 0
 
         # first bit of region above cutoff
-        peak_content.append( (above_cutoff_startpos[0], above_cutoff_endpos[0], treat_array[above_cutoff_index_array[0]], ctrl_array[above_cutoff_index_array[0]]) )
+        peak_content.append( (above_cutoff_startpos[0], above_cutoff_endpos[0], treat_array[above_cutoff_index_array[0]], ctrl_array[above_cutoff_index_array[0]], get_from_multiple_scores( score_array_s, above_cutoff_index_array[i])) )
         for i in range( 1,above_cutoff_startpos.size ):
             if above_cutoff_startpos[i] - peak_content[-1][1] <= max_gap:
                 # append
-                peak_content.append( (above_cutoff_startpos[i], above_cutoff_endpos[i], treat_array[above_cutoff_index_array[i]], ctrl_array[above_cutoff_index_array[i]] ) )
+                peak_content.append( (above_cutoff_startpos[i], above_cutoff_endpos[i], treat_array[above_cutoff_index_array[i]], ctrl_array[above_cutoff_index_array[i]], get_from_multiple_scores( score_array_s, above_cutoff_index_array[i]) ) )
             else:
                 # close
                 if call_summits:
                     self.__close_peak_with_subpeaks (peak_content, peaks, min_length, chrom, max_gap/2 )
                 else:
                     self.__close_peak_wo_subpeaks   (peak_content, peaks, min_length, chrom, max_gap/2 )
-                peak_content = [ (above_cutoff_startpos[i], above_cutoff_endpos[i], treat_array[above_cutoff_index_array[i]], ctrl_array[above_cutoff_index_array[i]] ), ]
+                peak_content = [ (above_cutoff_startpos[i], above_cutoff_endpos[i], treat_array[above_cutoff_index_array[i]], ctrl_array[above_cutoff_index_array[i]], get_from_multiple_scores( score_array_s, above_cutoff_index_array[i]) ), ]
             
         # save the last peak
         if not peak_content:
             return peaks
         else:
             if call_summits:
-                self.__close_peak_with_subpeaks (peak_content, peaks, min_length, chrom, max_gap/2 )
+                self.__close_peak_with_subpeaks (peak_content, peaks, min_length, chrom, max_gap/2, score_cutoff_s ) # smooth length is 1/2 max-gap
             else:
-                self.__close_peak_wo_subpeaks   (peak_content, peaks, min_length, chrom, max_gap/2 )            
+                self.__close_peak_wo_subpeaks   (peak_content, peaks, min_length, chrom, max_gap/2, score_cutoff_s ) # smooth length is 1/2 max-gap
 
         return peaks
 
     cdef bool __close_peak_wo_subpeaks (self, list peak_content, peaks, int min_length,
-                                          str chrom, int smoothlen=0):
+                                          str chrom, int smoothlen=0, list score_cutoff_s=[]):
         """Close the peak region, output peak boundaries, peak summit
         and scores, then add the peak to peakIO object.
 
-        peak_content contains [start, end, treat_p, ctrl_p]
+        peak_content contains [start, end, treat_p, ctrl_p, list_scores]
 
         peaks: a PeakIO object
 
         """
         cdef:
             int summit_pos, tstart, tend, tmpindex, summit_index, i, midindex
-            double treat_v, ctrl_v, tsummitvalue, ttreat_p, tctrl_p, tscore, summit_treat, summit_ctrl
+            double treat_v, ctrl_v, tsummitvalue, ttreat_p, tctrl_p, tscore, summit_treat, summit_ctrl, summit_p_score, summit_q_score
+            list tlist_scores_p
 
         peak_length = peak_content[ -1 ][ 1 ] - peak_content[ 0 ][ 0 ]
         if peak_length >= min_length: # if the peak is too small, reject it
@@ -658,8 +668,8 @@ cdef class ScoreCalculator:
             summit_pos   = 0
             summit_value = 0
             for i in range(len(peak_content)):
-                (tstart, tend, ttreat_p, tctrl_p) = peak_content[i]
-                tscore = self.pqtable[ get_pscore(int(ttreat_p), tctrl_p) ] # use qscore as general score to find summit
+                (tstart, tend, ttreat_p, tctrl_p, tlist_scores_p) = peak_content[i]
+                tscore = ttreat_p #self.pqtable[ get_pscore(int(ttreat_p), tctrl_p) ] # use qscore as general score to find summit
                 if not summit_value or summit_value < tscore:
                     tsummit = [(tend + tstart) / 2, ]
                     tsummit_index = [ i, ]
@@ -676,22 +686,30 @@ cdef class ScoreCalculator:
             summit_treat = peak_content[ summit_index ][ 2 ]
             summit_ctrl = peak_content[ summit_index ][ 3 ]            
             
+            # this is a double-check to see if the summit can pass cutoff values.
+            for i in range(len(score_cutoff_s)):
+                if score_cutoff_s[i] > peak_content[ summit_index ][ 4 ][i]:
+                    return False # not passed, then disgard this peak.
+
+            summit_p_score = get_pscore( int(summit_treat), summit_ctrl )
+            summit_q_score = self.pqtable[ summit_p_score ]
+
             peaks.add( chrom,           # chromosome
                        peak_content[0][0], # start
                        peak_content[-1][1], # end
                        summit      = summit_pos, # summit position
-                       peak_score  = summit_value, # score at summit
+                       peak_score  = summit_q_score, # score at summit
                        pileup      = summit_treat, # pileup
-                       pscore      = get_pscore( int(summit_treat), summit_ctrl ), # pvalue
+                       pscore      = summit_p_score, # pvalue
                        fold_change = float ( summit_treat + self.pseudocount ) / ( summit_ctrl + self.pseudocount ), # fold change
-                       qscore      = self.pqtable[ get_pscore( int(summit_treat), summit_ctrl ) ] # qvalue
+                       qscore      = summit_q_score # qvalue
                        )
             # start a new peak
             return True
 
     cdef bool __close_peak_with_subpeaks (self, list peak_content, peaks, int min_length,
-                                         str chrom, int smoothlen=51,
-                                         float min_valley = 0.9):
+                                         str chrom, int smoothlen=51, list score_cutoff_s=[],
+                                         float min_valley = 0.9 ):
         """Algorithm implemented by Ben, to profile the pileup signals
         within a peak region then find subpeak summits. This method is
         highly recommended for TFBS or DNAase I sites.
@@ -700,10 +718,11 @@ cdef class ScoreCalculator:
         cdef:
             int summit_pos, tstart, tend, tmpindex, summit_index, summit_offset
             int start, end, i, j, start_boundary, m, n
-            double summit_value, tvalue, tsummitvalue, tmp_p_score, tmp_q_score
+            double summit_value, tvalue, tsummitvalue
             np.ndarray[np.float32_t, ndim=1] peakdata
             np.ndarray[np.int32_t, ndim=1] peakindices, summit_offsets
-            double ttreat_p, tctrl_p, tscore, summit_treat, summit_ctrl            
+            double ttreat_p, tctrl_p, tscore, summit_treat, summit_ctrl, summit_p_score, summit_q_score
+            list tlist_scores_p
             
         # Add 10 bp padding to peak region so that we can get true minima
         end = peak_content[ -1 ][ 1 ] + 10
@@ -719,7 +738,7 @@ cdef class ScoreCalculator:
         peakdata = np.zeros(end - start, dtype='float32') # save the scores (qscore) for each position in this region
         peakindices = np.zeros(end - start, dtype='int32') # save the indices for each position in this region
         for i in range(len(peak_content)):
-            (tstart, tend, ttreat_p, tctrl_p) = peak_content[i]
+            (tstart, tend, ttreat_p, tctrl_p, tlist_scores_p) = peak_content[i]
             #tscore = self.pqtable[ get_pscore(int(ttreat_p), tctrl_p) ] # use qscore as general score to find summit
             tscore = ttreat_p # use pileup as general score to find summit
             m = tstart - start + start_boundary
@@ -753,18 +772,22 @@ cdef class ScoreCalculator:
             summit_treat = peak_content[ summit_index ][ 2 ]
             summit_ctrl = peak_content[ summit_index ][ 3 ]            
 
-            tmp_p_score = get_pscore( int(summit_treat), summit_ctrl )
-            tmp_q_score = self.pqtable[ tmp_p_score ]
+            summit_p_score = get_pscore( int(summit_treat), summit_ctrl )
+            summit_q_score = self.pqtable[ summit_p_score ]
+
+            for i in range(len(score_cutoff_s)):
+                if score_cutoff_s[i] > peak_content[ summit_index ][ 4 ][i]:
+                    return False # not passed, then disgard this summit.
 
             peaks.add( chrom,
                        start,
                        end,
                        summit      = start + summit_offset,
-                       peak_score  = tmp_q_score,
-                       pileup      = peakdata[ summit_offset ],
-                       pscore      = tmp_p_score,
+                       peak_score  = summit_q_score,
+                       pileup      = summit_treat,
+                       pscore      = summit_p_score,
                        fold_change = float ( summit_treat + self.pseudocount ) / ( summit_ctrl + self.pseudocount ), # fold change
-                       qscore      = tmp_q_score
+                       qscore      = summit_q_score
                        )
         # start a new peak
         return True
