@@ -1,5 +1,5 @@
 # cython: profile=True
-# Time-stamp: <2013-04-04 17:50:43 Tao Liu>
+# Time-stamp: <2013-04-08 16:25:15 Tao Liu>
 
 """Module Description: For pileup functions.
 
@@ -609,16 +609,13 @@ cpdef max_over_two_pv_array ( tmparray1, tmparray2 ):
 
     tmparray1 and tmparray2 are [p,v] type lists, same as the output
     from quick_pileup function.
-
     """
-
     
     cdef:
         int pre_p, p1, p2
         float v1, v2
         list tmp
         long l1, l2, l
-        
 
     tmp = [array(BYTE4,[]),array(FBYTE4,[])] # for (endpos,value)
     tmppadd = tmp[0].append

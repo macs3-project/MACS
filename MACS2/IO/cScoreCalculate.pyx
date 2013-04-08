@@ -1,5 +1,5 @@
 # cython: profile=True
-# Time-stamp: <2013-04-05 15:40:48 Tao Liu>
+# Time-stamp: <2013-04-08 17:34:07 Tao Liu>
 
 """Module for Calculate Scores.
 
@@ -210,7 +210,7 @@ cdef class ScoreCalculator:
     cdef:
         str chrom                        # name of chromosome
         char scoring_method              # method for calculating scores.
-        dict pqtable                     # remember pvalue->qvalue convertion
+        object pqtable                     # remember pvalue->qvalue convertion
         bool pvalue_all_done             # whether the pvalue of whole genome is all calculated. If yes, it's OK to calculate q-value.
         bool trackline                   # whether trackline should be saved in bedGraph
         double treat_edm                 # seq depth in million of treatment
@@ -235,6 +235,7 @@ cdef class ScoreCalculator:
         object bedGraph_ctrl
         bool no_lambda_flag
         bool PE_mode
+        #object hpqtable
 
     def __init__ (self, treat, ctrl, float treat_depth, float ctrl_depth, 
                   int d = 200, list ctrl_d_s = [200, 1000, 10000], 
@@ -299,7 +300,7 @@ cdef class ScoreCalculator:
         self.halfextension = halfextension
         self.shiftcontrol = shiftcontrol
         self.lambda_bg = lambda_bg
-        self.pqtable = {}
+        self.pqtable = None
         self.save_bedGraph = save_bedGraph
         self.bedGraph_filename_prefix =  bedGraph_filename_prefix
 
@@ -307,22 +308,6 @@ cdef class ScoreCalculator:
             self.no_lambda_flag = True
         else:
             self.no_lambda_flag = False
-
-        #scoring_method:  p: -log10 pvalue;
-        #                 q: -log10 qvalue;
-        #                 l: log10 likelihood ratio ( minus for depletion )
-        #                 f: log10 fold enrichment
-        #                 F: linear fold enrichment        
-        #                 d: subtraction
-        #                 m: fragment pileup per million reads
-        #                 N: not set
-        self.scoring_method = ord("N")
-
-        #normalization_method: T: scale to depth of treatment;
-        #                      C: scale to depth of control;
-        #                      M: scale to depth of 1 million;
-        #                      N: not set/ raw pileup
-        self.normalization_method = ord("N")
 
         self.pseudocount = pseudocount
 
@@ -462,7 +447,7 @@ cdef class ScoreCalculator:
             s[i] = cal_func( array1[i], array2[i] )
         return s
 
-    cdef dict __cal_pvalue_qvalue_table ( self ):
+    cdef object __cal_pvalue_qvalue_table ( self ):
         """After this function is called, self.pqtable is built. All
         chromosomes will be iterated. So it will take some time.
         
@@ -475,6 +460,8 @@ cdef class ScoreCalculator:
             double this_v, pre_v, v, q, pre_q
             long N, k
             double f
+            long nhcal = 0
+            long npcal = 0
             list unique_values
         
         for chrom in self.chromosomes:
@@ -488,13 +475,20 @@ cdef class ScoreCalculator:
                 #if ctrl_array[i] == 0:
                 #    print "cal c p:", chrom, i, pos_array[i], treat_array[i], ctrl_array[i] 
                 this_v = get_pscore( int(treat_array[i]), ctrl_array[i] )
+                npcal += 1
                 if pvalue_stat.has_key(this_v):
                     pvalue_stat[ this_v ] += pos_array[ i ] - prev_p 
+                    nhcal += 1
                 else:
                     pvalue_stat[ this_v ] = pos_array[ i ] - prev_p 
+                    nhcal += 1
                 #print pos_array[ i ], prev_p, pos_array[ i ] - prev_p
                 prev_p = pos_array[ i ]
     
+        logging.info ( "calculate pvalue for %d times" % npcal )
+        logging.info ( "access hash for %d times" % nhcal )
+        nhval = 0
+
         N = sum(pvalue_stat.values()) # total length
         k = 1                           # rank
         f = -log10(N)
@@ -502,17 +496,22 @@ cdef class ScoreCalculator:
         pre_l = 0
         pre_q = 2147483647              # save the previous q-value
 
-        self.pqtable = {}
+        #self.pqtable = {}
+        self.pqtable = Float64HashTable()
         unique_values = sorted(pvalue_stat.keys(), reverse=True) #sorted(unique_values,reverse=True)
         for i in range(len(unique_values)):
             v = unique_values[i]
             l = pvalue_stat[v]
             q = v + (log10(k) + f)
             q = max(0,min(pre_q,q))           # make q-score monotonic
-            self.pqtable[ v ] = q
+            self.pqtable.set_item(v, q)
+            #self.pqtable[ v ] = q
             pre_v = v
             pre_q = q
             k+=l
+            
+            nhcal += 1
+        logging.info( "access pq hash for %d times" % nhcal )
         
         return self.pqtable
 

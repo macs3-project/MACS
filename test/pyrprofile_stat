@@ -1,0 +1,21 @@
+#!/usr/bin/env python
+# Time-stamp: <2013-04-08 16:06:29 Tao Liu>
+
+import sys
+import pstats
+# ------------------------------------
+# Main function
+# ------------------------------------
+def main():
+    if len(sys.argv) < 3:
+        sys.stderr.write("need 2 paras: %s <prof file> <time|calls|cumulative|...>\n" % sys.argv[0])
+        sys.exit(1)
+
+    p = pstats.Stats(sys.argv[1])
+    sort_term = sys.argv[2]
+
+    p.strip_dirs().sort_stats(sort_term).print_stats(20)
+
+
+if __name__ == '__main__':
+    main()

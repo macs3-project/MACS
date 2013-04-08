@@ -1,12 +1,12 @@
 2013-04-04  Tao Liu  <vladimir.liu@gmail.com>
 	MACS version 2.0.10 20130404 (tag:alpha)
 
-	* Memory usage is decreased to about 1/4
+	* Memory usage is decreased to about 1/4-1/5 of previous usage
 	Now, the internal data structure and algorithm are both
 	re-organized, so that intermediate data wouldn't be saved in
 	memory. Intead they will be calculated on the fly. New MACS2 will
-	spend longer time however it will use less memory so can be more
-	usable on small mem servers.
+	spend longer time (1.5 to 2 times) however it will use less memory
+	so can be more usable on small mem servers.
 
 2013-03-05  Tao Liu  <vladimir.liu@gmail.com>
 	MACS version 2.0.10 20130306 (tag:alpha)
