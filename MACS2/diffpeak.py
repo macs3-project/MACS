@@ -1,4 +1,3 @@
-# cython: profile=True
 # Time-stamp: <2012-10-03 16:00:49 Tao Liu>
 
 """Description: MACS 2 main executable

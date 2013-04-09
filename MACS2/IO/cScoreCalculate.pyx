@@ -1,5 +1,4 @@
-# cython: profile=True
-# Time-stamp: <2013-04-09 15:45:01 Tao Liu>
+# Time-stamp: <2013-04-09 15:49:21 Tao Liu>
 
 """Module for Calculate Scores.
 

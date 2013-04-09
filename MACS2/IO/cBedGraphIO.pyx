@@ -1,5 +1,4 @@
-# cython: profile=True
-# Time-stamp: <2012-04-13 17:08:58 Tao Liu>
+# Time-stamp: <2013-04-09 15:50:29 Tao Liu>
 
 """Module Description:  IO Module for bedGraph file
 

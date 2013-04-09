@@ -1,4 +1,3 @@
-# cython: profile=True
 # Time-stamp: <2013-04-09 15:32:25 Tao Liu>
 
 """Module Description: For pileup functions.
