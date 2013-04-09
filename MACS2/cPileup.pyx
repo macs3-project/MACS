@@ -1,5 +1,5 @@
 # cython: profile=True
-# Time-stamp: <2013-04-08 16:25:15 Tao Liu>
+# Time-stamp: <2013-04-09 15:32:25 Tao Liu>
 
 """Module Description: For pileup functions.
 
@@ -417,7 +417,6 @@ cdef np.ndarray[np.int32_t, ndim=1] fix_coordinates(np.ndarray[np.int32_t, ndim=
     return poss
 
 # general pileup function
-
 cpdef se_all_in_one_pileup ( np.ndarray plus_tags, np.ndarray minus_tags, long five_shift, long three_shift, int rlength, float scale_factor, float baseline_value ):
     """Return pileup given 5' end of fragment at plus or minus strand
     separately, and given shift at both direction to recover a
@@ -476,39 +475,45 @@ cpdef se_all_in_one_pileup ( np.ndarray plus_tags, np.ndarray minus_tags, long f
         tmpvadd( float_max(0,baseline_value) )
         
     pre_v = pileup
-    
-    while i_s < l and i_e < l:
-        a = start_poss[i_s]
-        b = end_poss[i_e]
-        if a < b:
-            p = a
-            if p != pre_p:
-                tmppadd( p )
-                tmpvadd( float_max(pileup * scale_factor, baseline_value) )
-                pre_p = p
-            pileup += 1
-            i_s += 1
-        elif a > b:
-            p = b
-            if p != pre_p:
-                tmppadd( p )
-                tmpvadd( float_max(pileup * scale_factor, baseline_value) ) 
-                pre_p = p
-            pileup -= 1
-            i_e += 1
-        else:
-            i_s += 1
-            i_e += 1
+
+    a = start_poss[i_s]
+    b = end_poss[i_e]
+
+    try:
+        while 1:
+            if a < b:
+                p = a
+                if p != pre_p:
+                    tmppadd( p )
+                    tmpvadd( float_max(pileup * scale_factor, baseline_value) )
+                    pre_p = p
+                pileup += 1
+                i_s += 1
+                a = start_poss[i_s]            
+            elif a > b:
+                p = b
+                if p != pre_p:
+                    tmppadd( p )
+                    tmpvadd( float_max(pileup * scale_factor, baseline_value) ) 
+                    pre_p = p
+                pileup -= 1
+                i_e += 1
+                b = end_poss[i_e]
+            else:
+                i_s += 1
+                i_e += 1
+                a = start_poss[i_s]
+                b = end_poss[i_e]
+    except IndexError:
+        pass
 
     if i_e < l:
         # add rest of end positions
         for i in range(i_e, l):
             p = end_poss[i]
-            #for p in end_poss[i_e:]:
             if p != pre_p:
                 tmppadd( p )
                 tmpvadd( float_max(pileup * scale_factor, baseline_value) )
-                #ret.add_loc(chrom,pre_p,p,pileup)
                 pre_p = p
             pileup -= 1
 
@@ -517,6 +522,96 @@ cpdef se_all_in_one_pileup ( np.ndarray plus_tags, np.ndarray minus_tags, long f
     start_poss.resize(0, refcheck=False)
     end_poss.resize(100000, refcheck=False)
     end_poss.resize(0, refcheck=False)                            
+    
+    return tmp
+
+
+cpdef se_all_in_one_pileup2 ( np.ndarray plus_tags, np.ndarray minus_tags, long five_shift, long three_shift, int rlength, float scale_factor, float baseline_value ):
+    """Return pileup given 5' end of fragment at plus or minus strand
+    separately, and given shift at both direction to recover a
+    fragment. This function is for single end sequencing library
+    only. Please directly use 'quick_pileup' function for Pair-end
+    library.
+    
+    It contains a super-fast and simple algorithm proposed by Jie
+    Wang. It will take sorted start positions and end positions, then
+    compute pileup values.
+
+    It will return a pileup result in similar structure as
+    bedGraph. There are two python arrays:
+    
+    [end positions, values] or '[p,v] array' in other description for
+    functions within MACS2.
+
+    Two arrays have the same length and can be matched by index. End
+    position at index x (p[x]) record continuous value of v[x] from
+    p[x-1] to p[x].
+
+    """
+    cdef:
+        long i_s, i_e, i, j
+        int a, b, p, pre_p, pileup
+        list tmp
+        long lp = plus_tags.shape[0]
+        long lm = minus_tags.shape[0]
+        np.ndarray start_poss, end_poss, alldata, parray, varray
+
+    alldata = np.zeros( 2*(lp+lm), dtype = [("pos", "int32"),("v","int8")] )
+    alldata["pos"][:lp] = plus_tags-five_shift
+    alldata["pos"][lp:lp+lm] = minus_tags-three_shift
+    alldata["v"][:lp+lm] = 1
+
+    alldata["pos"][lp+lm:lp+lp+lm] = plus_tags+three_shift
+    alldata["pos"][lp+lp+lm:] = minus_tags+five_shift
+    alldata["v"][lp+lm:] = -1
+
+    # sort
+    alldata.sort( order = "pos" )
+
+    #print alldata
+
+    # fix coordinates
+    for i in range( alldata.shape[0] ):
+        if alldata[i][0] < 0:
+            alldata[i][0] = 0
+        else:
+            break
+        
+    for i in range( alldata.shape[0]-1, -1, -1 ):
+        if alldata[i][0] > rlength:
+            alldata[i][0] = rlength
+        else:
+            break
+    
+    tmp = [array(BYTE4,[]),array(FBYTE4,[])] # for (endpos,value)
+    tmppadd = tmp[0].append
+    tmpvadd = tmp[1].append
+    i_s = 0                         # index of start_poss
+    i_e = 0                         # index of end_poss
+
+    parray = alldata["pos"]
+    varray = alldata["v"]
+
+    pileup = 0
+    if alldata.shape[0] == 0: return tmp
+
+    pre_p = parray[0]
+
+    if pre_p != 0:
+        # the first chunk of 0
+        tmppadd( pre_p )
+        tmpvadd( float_max(0,baseline_value) )
+
+    for i in range( alldata.shape[0] ):
+        p = parray[ i ]
+        if p != pre_p:
+            tmppadd( p )
+            tmpvadd( float_max(pileup * scale_factor, baseline_value) )
+            pre_p = p
+        pileup += varray[ i ]
+
+    alldata.resize(100000, refcheck=False)
+    alldata.resize(0, refcheck=False)
     
     return tmp
 

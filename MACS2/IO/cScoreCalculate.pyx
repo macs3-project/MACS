@@ -1,5 +1,5 @@
 # cython: profile=True
-# Time-stamp: <2013-04-08 17:34:07 Tao Liu>
+# Time-stamp: <2013-04-09 15:45:01 Tao Liu>
 
 """Module for Calculate Scores.
 
@@ -48,6 +48,8 @@ from MACS2.IO.cPairedEndTrack import PETrackI
 from MACS2.hashtable import Int64HashTable, Float64HashTable
 
 import logging
+
+from time import time as ttime
 
 # ------------------------------------
 # constants
@@ -463,14 +465,23 @@ cdef class ScoreCalculator:
             long nhcal = 0
             long npcal = 0
             list unique_values
+            double t0, t1, t 
+
+        logging.debug ( "Start to calculate pvalue stat..." )
         
+        t = 0
         for chrom in self.chromosomes:
             prev_p = 0
-            #logging.info("#3 pileup %s" % chrom)
+
+            #t0 = ttime()
+
             self.__pileup_treat_ctrl_a_chromosome( chrom )
             [pos_array, treat_array, ctrl_array] = self.chr_pos_treat_ctrl
 
-            #logging.info("#3 add up pvalue regions for %s" % chrom)
+            #t1 = ttime()
+            #t += t1 - t0
+            #t0 = t1
+
             for i in range(pos_array.shape[0]):
                 #if ctrl_array[i] == 0:
                 #    print "cal c p:", chrom, i, pos_array[i], treat_array[i], ctrl_array[i] 
@@ -482,11 +493,14 @@ cdef class ScoreCalculator:
                 else:
                     pvalue_stat[ this_v ] = pos_array[ i ] - prev_p 
                     nhcal += 1
+
                 #print pos_array[ i ], prev_p, pos_array[ i ] - prev_p
                 prev_p = pos_array[ i ]
-    
-        logging.info ( "calculate pvalue for %d times" % npcal )
-        logging.info ( "access hash for %d times" % nhcal )
+
+
+        logging.debug ( "make pvalue_stat cost %.5f seconds" % t )
+        logging.debug ( "calculate pvalue for %d times" % npcal )
+        logging.debug ( "access hash for %d times" % nhcal )
         nhval = 0
 
         N = sum(pvalue_stat.values()) # total length
@@ -504,14 +518,14 @@ cdef class ScoreCalculator:
             l = pvalue_stat[v]
             q = v + (log10(k) + f)
             q = max(0,min(pre_q,q))           # make q-score monotonic
-            self.pqtable.set_item(v, q)
-            #self.pqtable[ v ] = q
+            #self.pqtable.set_item(v, q)
+            self.pqtable[ v ] = q
             pre_v = v
             pre_q = q
             k+=l
             
             nhcal += 1
-        logging.info( "access pq hash for %d times" % nhcal )
+        logging.debug( "access pq hash for %d times" % nhcal )
         
         return self.pqtable
 
