@@ -1,4 +1,4 @@
-# Time-stamp: <2013-04-09 15:52:10 Tao Liu>
+# Time-stamp: <2013-04-12 16:21:43 Tao Liu>
 
 """Description: MACS 2 main executable
 
@@ -248,16 +248,16 @@ def run( args ):
     peakdetect.call_peaks()
 
     #call refinepeak if needed.
-    if options.refine_peaks:
-        info("#3 now put back duplicate reads...")
-        treat.addback_dups()
-        info("#3 calculate reads balance to refine peak summits...")
-        refined_peaks = treat.refine_peak_from_tags_distribution ( peakdetect.peaks, options.d, 0 )
-        info("#3 reassign scores for newly refined peak summits...")
-        peakdetect.peaks = peakdetect.scoretrack.reassign_peaks( refined_peaks ) # replace
-        #info("#3 write to file: %s ..." % options.name+"_refined_peaks.encodePeak" )
-        #refinedpeakfile = open(options.name+"_refined_peaks.encodePeak", "w")
-        #refined_peaks.write_to_narrowPeak (refinedpeakfile, name_prefix="%s_refined_peak_", name=options.name, score_column=score_column, trackline=options.trackline )
+    # if options.refine_peaks:
+    #     info("#3 now put back duplicate reads...")
+    #     treat.addback_dups()
+    #     info("#3 calculate reads balance to refine peak summits...")
+    #     refined_peaks = treat.refine_peak_from_tags_distribution ( peakdetect.peaks, options.d, 0 )
+    #     info("#3 reassign scores for newly refined peak summits...")
+    #     peakdetect.peaks = peakdetect.scoretrack.reassign_peaks( refined_peaks ) # replace
+    #     #info("#3 write to file: %s ..." % options.name+"_refined_peaks.encodePeak" )
+    #     #refinedpeakfile = open(options.name+"_refined_peaks.encodePeak", "w")
+    #     #refined_peaks.write_to_narrowPeak (refinedpeakfile, name_prefix="%s_refined_peak_", name=options.name, score_column=score_column, trackline=options.trackline )
 
     #diag_result = peakdetect.diag_result()
     #4 output

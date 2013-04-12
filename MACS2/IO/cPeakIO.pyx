@@ -1,4 +1,4 @@
-# Time-stamp: <2013-04-09 15:49:29 Tao Liu>
+# Time-stamp: <2013-04-12 16:08:56 Tao Liu>
 
 """Module for PeakIO IO classes.
 
@@ -95,6 +95,28 @@ cdef class PeakContent:
         elif a == "name":
             return self.name
 
+    def __setitem__ ( self, a, v ):
+        if a == "start":
+            self.start = v
+        elif a == "end":
+            self.end = v
+        elif a == "length":
+            self.length = v
+        elif a == "summit":
+            self.summit = v
+        elif a == "score":
+            self.score = v
+        elif a == "pileup":
+            self.pileup = v
+        elif a == "pscore":
+            self.pscore = v
+        elif a == "fc":
+            self.fc = v
+        elif a == "qscore":
+            self.qscore = v
+        elif a == "name":
+            self.name = v
+
 cdef class PeakIO:
     """IO for peak information.
 
@@ -123,6 +145,11 @@ cdef class PeakIO:
         if not self.peaks.has_key(chromosome):
             self.peaks[chromosome]=[]
         self.peaks[chromosome].append(PeakContent( start, end, summit, peak_score, pileup, pscore, fold_change, qscore, name))
+
+    cpdef add_PeakContent ( self, str chromosome, object peakcontent ):
+        if not self.peaks.has_key(chromosome):
+            self.peaks[chromosome]=[]
+        self.peaks[chromosome].append(peakcontent)
 
     def get_data_from_chrom (self, str chrom):
         return self.peaks[chrom]

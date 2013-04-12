@@ -1,4 +1,4 @@
-# Time-stamp: <2013-04-09 15:51:16 Tao Liu>
+# Time-stamp: <2013-04-12 16:14:50 Tao Liu>
 
 """Module Description
 
@@ -27,8 +27,7 @@ from MACS2.IO.cPeakIO import PeakIO
 from MACS2.IO.cBedGraphIO import bedGraphIO
 from MACS2.Constants import *
 from MACS2.cPileup import unified_pileup_bdg   
-from MACS2.IO.cScoreCalculate import ScoreCalculator
-#from MACS2.cPileup_old import pileup_bdg, pileup_w_multiple_d_bdg
+from MACS2.IO.cCallPeakUnit import CallerFromAlignments
 
 cdef str subpeak_letters(short i):
     if i < 26:
@@ -210,15 +209,15 @@ class PeakDetect:
                 tmp_v = float(self.d)/self.lregion
             ctrl_scale_s.append( tmp_v )                            
 
-        scorecalculator = ScoreCalculator( self.treat, self.control, effective_depth_in_million , effective_depth_in_million,
-                                           d = d, ctrl_d_s = ctrl_d_s, 
-                                           treat_scale_factor = treat_scale, 
-                                           ctrl_scale_factor_s = ctrl_scale_s,
-                                           halfextension = self.opt.halfext,
-                                           lambda_bg = lambda_bg,
-                                           shiftcontrol = self.shiftcontrol,
-                                           save_bedGraph = self.opt.store_bdg,
-                                           bedGraph_filename_prefix = self.opt.name)
+        scorecalculator = CallerFromAlignments( self.treat, self.control,
+                                                d = d, ctrl_d_s = ctrl_d_s, 
+                                                treat_scaling_factor = treat_scale, 
+                                                ctrl_scaling_factor_s = ctrl_scale_s,
+                                                halfextension = self.opt.halfext,
+                                                lambda_bg = lambda_bg,
+                                                shiftcontrol = self.shiftcontrol,
+                                                save_bedGraph = self.opt.store_bdg,
+                                                bedGraph_filename_prefix = self.opt.name)
 
         if self.opt.trackline: scorecalculator.enable_trackline()
 
@@ -304,15 +303,15 @@ class PeakDetect:
             ctrl_scale_s = []
             ctrl_d_s     = []
 
-        scorecalculator = ScoreCalculator( self.treat, None, effective_depth_in_million , effective_depth_in_million,
-                                           d = d, ctrl_d_s = ctrl_d_s, 
-                                           treat_scale_factor = treat_scale, 
-                                           ctrl_scale_factor_s = ctrl_scale_s,
-                                           halfextension = self.opt.halfext,
-                                           lambda_bg = lambda_bg,
-                                           shiftcontrol = self.shiftcontrol,
-                                           save_bedGraph = self.opt.store_bdg,
-                                           bedGraph_filename_prefix = self.opt.name)
+        scorecalculator = CallerFromAlignments( self.treat, None, 
+                                                d = d, ctrl_d_s = ctrl_d_s, 
+                                                treat_scaling_factor = treat_scale, 
+                                                ctrl_scaling_factor_s = ctrl_scale_s,
+                                                halfextension = self.opt.halfext,
+                                                lambda_bg = lambda_bg,
+                                                shiftcontrol = self.shiftcontrol,
+                                                save_bedGraph = self.opt.store_bdg,
+                                                bedGraph_filename_prefix = self.opt.name)
 
         # calculate pvalue scores
         if self.opt.trackline: self.scoretrack.enable_trackline()

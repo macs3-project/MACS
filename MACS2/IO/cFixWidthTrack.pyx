@@ -1,4 +1,4 @@
-# Time-stamp: <2013-04-09 15:49:37 Tao Liu>
+# Time-stamp: <2013-04-12 16:18:37 Tao Liu>
 
 """Module for FWTrack classes.
 
@@ -674,7 +674,7 @@ cdef class FWTrackIII:
             str chrom, name
             list temp, retval, pchrnames
 
-        pchrnames = sorted(peaks.peaks.keys())
+        pchrnames = peaks.get_chr_names()
         retval = []
 
         # this object should be sorted
@@ -687,7 +687,7 @@ cdef class FWTrackIII:
         for chrom in pchrnames:
             assert chrom in chrnames, "chromosome %s can't be found in the FWTrackIII object." % chrom
             (plus, minus) = self.__locations[chrom]
-            cpeaks = peaks.peaks[chrom]
+            cpeaks = peaks.get_data_from_chrom(chrom)
             prev_i = 0
             prev_j = 0
             for m in range(len(cpeaks)):
@@ -753,10 +753,10 @@ cdef class FWTrackIII:
             int32_t m, i, j, pre_i, pre_j, pos, startpos, endpos #, n_peaks
             np.ndarray plus, minus, rt_plus, rt_minus
             str chrom #, peak_name
-            list temp, retval, pchrnames, cpeaks, npeaks
+            list temp, retval, pchrnames, cpeaks
             np.ndarray adjusted_summits, passflags
 
-        pchrnames = sorted(peaks.peaks.keys())
+        pchrnames = sorted(peaks.get_chr_names())
         retval = []
 
         # this object should be sorted
@@ -772,9 +772,9 @@ cdef class FWTrackIII:
         for chrom in pchrnames:
             assert chrom in chrnames, "chromosome %s can't be found in the FWTrackIII object. %s" % (chrom, str(chrnames))
             (plus, minus) = self.__locations[chrom]
-            cpeaks = peaks.peaks[chrom]
-            ret_peaks.peaks[chrom] = []
-            npeaks = ret_peaks.peaks[chrom]
+            cpeaks = peaks.get_data_from_chrom(chrom)
+            #ret_peaks.peaks[chrom] = []
+            #npeaks = ret_peaks.peaks[chrom]
             
             prev_i = 0
             prev_j = 0
@@ -815,7 +815,7 @@ cdef class FWTrackIII:
                     if passflag:
                         tmppeak = copy(thispeak)
                         tmppeak["summit"] = adjusted_summit
-                        npeaks.append(tmppeak)
+                        ret_peaks.add_PeakContent(chrom, tmppeak)
                     
                 #thispeak["summit"] = adjusted_summit
                 #if passflag:
