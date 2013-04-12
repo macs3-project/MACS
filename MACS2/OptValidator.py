@@ -1,4 +1,4 @@
-# Time-stamp: <2013-03-19 11:59:30 Tao Liu>
+# Time-stamp: <2013-04-12 17:14:38 Tao Liu>
 
 """Module Description
 
@@ -100,8 +100,12 @@ def opt_validate ( options ):
         sys.exit(1)
 
     # refine_peaks, call_summits can't be combined with --broad
-    if options.broad and (options.refine_peaks or options.call_summits):
-        logging.error("--broad can't be combined with --refine-peaks or --call-summits!")
+    #if options.broad and (options.refine_peaks or options.call_summits):
+    #    logging.error("--broad can't be combined with --refine-peaks or --call-summits!")
+    #    sys.exit(1)
+
+    if options.broad and options.call_summits:
+        logging.error("--broad can't be combined with --call-summits!")
         sys.exit(1)
 
     if options.pvalue:
@@ -186,8 +190,8 @@ def opt_validate ( options ):
     else:
         options.argtxt += "# Broad region calling is off\n"
 
-    if options.refine_peaks:
-        options.argtxt += "# Refining peak for read balance is on\n"
+    #if options.refine_peaks:
+    #    options.argtxt += "# Refining peak for read balance is on\n"
     if options.call_summits:
         options.argtxt += "# Searching for subpeak summits is on\n"
 
