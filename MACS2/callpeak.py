@@ -1,4 +1,4 @@
-# Time-stamp: <2013-04-15 14:06:05 Tao Liu>
+# Time-stamp: <2013-04-15 18:05:14 Tao Liu>
 
 """Description: MACS 2 main executable
 
@@ -211,12 +211,18 @@ def run( args ):
             info("#3 User prefers to use random sampling instead of linear scaling.")
             if t1 > c1:
                 info("#3 MACS is random sampling treatment %ss...", tag)
-                warn("#3 Your results may not be reproducible due to the random sampling!")
+                if options.seed < 0:
+                    warn("#3 Your results may not be reproducible due to the random sampling!")
+                else:
+                    info("#3 Random seed (%d) is used." % options.seed)
                 treat.sample_num(c1, options.seed)
-                info("#3 %d tags from treatment are kept", treat.total)                
+                info("#3 %d Tags from treatment are kept", treat.total)                
             elif c1 > t1: 
                 info("#3 MACS is random sampling control %ss...", tag)
-                warn("#3 Your results may not be reproducible due to the random sampling!")
+                if options.seed < 0:
+                    warn("#3 Your results may not be reproducible due to the random sampling!")
+                else:
+                    info("#3 Random seed (%d) is used." % options.seed)
                 control.sample_num(t1, options.seed)
                 info("#3 %d %ss from control are kept", control.total, tag)
             # set options.tocontrol although it would;t matter now
