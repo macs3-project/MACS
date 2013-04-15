@@ -1,4 +1,4 @@
-# Time-stamp: <2012-04-10 17:28:57 Tao Liu>
+# Time-stamp: <2013-04-15 14:08:12 Tao Liu>
 
 """Description: Random sample certain number/percentage of tags.
 
@@ -62,8 +62,11 @@ def run( options0 ):
         info(" Number of tags you want to keep: %.2e" % (options.number))
         options.percentage = float(options.number)/t0*100
     info(" Percentage of tags you want to keep: %.2f%%" % (options.percentage))
-    
-    fwtrack.sample_percent(options.percentage/100.0)
+
+    if options.seed >= 0:
+        info(" Random seed has been set as: %d" % options.seed )
+
+    fwtrack.sample_percent(options.percentage/100.0, options.seed )
 
     info(" tags after random sampling in alignment file: %d" % (fwtrack.total))
 

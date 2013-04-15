@@ -1,4 +1,4 @@
-# Time-stamp: <2013-04-12 16:18:37 Tao Liu>
+# Time-stamp: <2013-04-15 13:52:01 Tao Liu>
 
 """Module for FWTrack classes.
 
@@ -534,7 +534,7 @@ cdef class FWTrackIII:
             self.__locations[k]=[new_plus,new_minus]
         return self
 
-    cpdef sample_percent (self, float percent):
+    cpdef sample_percent (self, float percent, int seed = -1 ):
         """Sample the tags for a given percentage.
 
         Warning: the current object is changed!
@@ -547,6 +547,9 @@ cdef class FWTrackIII:
 
         chrnames = self.get_chr_names()
         
+        if seed >= 0:
+            np.random.seed(seed)
+
         for i_chrom in range( len(chrnames) ):
             # for each chromosome.
             # This loop body is too big, I may need to split code later...
@@ -568,7 +571,7 @@ cdef class FWTrackIII:
             self.total += self.__pointer[key][0] + self.__pointer[key][1]
         return
 
-    cpdef sample_num (self, uint64_t samplesize):
+    cpdef sample_num (self, uint64_t samplesize, int seed = -1):
         """Sample the tags for a given percentage.
 
         Warning: the current object is changed!
@@ -577,7 +580,7 @@ cdef class FWTrackIII:
             float percent
 
         percent = float(samplesize)/self.total
-        self.sample_percent ( percent )
+        self.sample_percent ( percent, seed )
         return
 
     cpdef print_to_bed (self, fhd=None):

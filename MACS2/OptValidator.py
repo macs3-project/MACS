@@ -1,4 +1,4 @@
-# Time-stamp: <2013-04-12 17:14:38 Tao Liu>
+# Time-stamp: <2013-04-15 14:09:06 Tao Liu>
 
 """Module Description
 
@@ -174,6 +174,8 @@ def opt_validate ( options ):
 
     if options.downsample:
         options.argtxt += "# Larger dataset will be randomly sampled towards smaller dataset.\n"
+        if options.seed >= 0:
+            options.argtxt += "# Random seed has been set as: %d\n" % options.seed
     else:
         if options.tolarge:
             options.argtxt += "# Smaller dataset will be scaled towards larger dataset.\n"

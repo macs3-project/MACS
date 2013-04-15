@@ -1,4 +1,4 @@
-# Time-stamp: <2013-04-12 16:21:43 Tao Liu>
+# Time-stamp: <2013-04-15 14:06:05 Tao Liu>
 
 """Description: MACS 2 main executable
 
@@ -212,12 +212,12 @@ def run( args ):
             if t1 > c1:
                 info("#3 MACS is random sampling treatment %ss...", tag)
                 warn("#3 Your results may not be reproducible due to the random sampling!")
-                treat.sample_num(c1)
+                treat.sample_num(c1, options.seed)
                 info("#3 %d tags from treatment are kept", treat.total)                
             elif c1 > t1: 
                 info("#3 MACS is random sampling control %ss...", tag)
                 warn("#3 Your results may not be reproducible due to the random sampling!")
-                control.sample_num(t1)
+                control.sample_num(t1, options.seed)
                 info("#3 %d %ss from control are kept", control.total, tag)
             # set options.tocontrol although it would;t matter now
             options.tocontrol = False
