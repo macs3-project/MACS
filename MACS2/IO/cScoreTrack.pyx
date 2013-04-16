@@ -1,4 +1,4 @@
-# Time-stamp: <2013-04-09 15:49:51 Tao Liu>
+# Time-stamp: <2013-04-16 14:21:16 Tao Liu>
 
 """Module for Feature IO classes.
 
@@ -802,9 +802,8 @@ cdef class scoreTrackII:
 
         value_dict = self.pvalue_stat
 
-        for p in sorted(self.pvalue_stat.keys()):
-            print p,self.pvalue_stat[v]
-
+        #for p in sorted(self.pvalue_stat.keys()):
+        #    print p,self.pvalue_stat[p]
 
         #logging.info("####test#### 2")
         N = sum(value_dict.values())

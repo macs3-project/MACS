@@ -1,4 +1,4 @@
-# Time-stamp: <2013-04-09 15:49:57 Tao Liu>
+# Time-stamp: <2013-04-16 14:26:46 Tao Liu>
 
 """Module for Feature IO classes.
 
@@ -598,12 +598,12 @@ cdef class bedGraphTrackI:
         assert lvl1_max_gap < lvl2_max_gap, "level 2 maximum gap should be larger than level 1."        
         lvl1_peaks = self.call_peaks(cutoff=lvl1_cutoff, min_length=min_length, max_gap=lvl1_max_gap)
         lvl2_peaks = self.call_peaks(cutoff=lvl2_cutoff, min_length=min_length, max_gap=lvl2_max_gap)
-        chrs = lvl1_peaks.peaks.keys()
+        chrs = lvl1_peaks.get_chr_names()
         broadpeaks = BroadPeakIO()
         # use lvl2_peaks as linking regions between lvl1_peaks
         for chrom in chrs:
-            lvl1peakschrom = lvl1_peaks.peaks[chrom]
-            lvl2peakschrom = lvl2_peaks.peaks[chrom]
+            lvl1peakschrom = lvl1_peaks.get_data_from_chrom(chrom)
+            lvl2peakschrom = lvl2_peaks.get_data_from_chrom(chrom)
             lvl1peakschrom_next = iter(lvl1peakschrom).next
             tmppeakset = []             # to temporarily store lvl1 region inside a lvl2 region
             # our assumption is lvl1 regions should be included in lvl2 regions
