@@ -1,4 +1,4 @@
-# Time-stamp: <2013-04-16 14:20:40 Tao Liu>
+# Time-stamp: <2013-04-19 15:34:41 Tao Liu>
 
 """Module for Calculate Scores.
 
@@ -696,7 +696,7 @@ cdef class CallerFromAlignments:
             above_cutoff_startpos[0] = 0
 
         # first bit of region above cutoff
-        peak_content.append( (above_cutoff_startpos[0], above_cutoff_endpos[0], treat_array[above_cutoff_index_array[0]], ctrl_array[above_cutoff_index_array[0]], get_from_multiple_scores( score_array_s, above_cutoff_index_array[i])) )
+        peak_content.append( (above_cutoff_startpos[0], above_cutoff_endpos[0], treat_array[above_cutoff_index_array[0]], ctrl_array[above_cutoff_index_array[0]], get_from_multiple_scores( score_array_s, above_cutoff_index_array[0])) )
         for i in range( 1,above_cutoff_startpos.size ):
             if above_cutoff_startpos[i] - peak_content[-1][1] <= max_gap:
                 # append
@@ -1117,15 +1117,15 @@ cdef class CallerFromAlignments:
             above_cutoff_startpos[0] = 0
 
         # first bit of region above cutoff
-        peak_content.append( (above_cutoff_startpos[0], above_cutoff_endpos[0], treat_array[above_cutoff_index_array[0]], ctrl_array[above_cutoff_index_array[0]]) )
+        peak_content.append( (above_cutoff_startpos[0], above_cutoff_endpos[0], treat_array[above_cutoff_index_array[0]], ctrl_array[above_cutoff_index_array[0]], get_from_multiple_scores( score_array_s, above_cutoff_index_array[0])) )
         for i in range( 1,above_cutoff_startpos.size ):
             if above_cutoff_startpos[i] - peak_content[-1][1] <= lvl1_max_gap:
                 # append
-                peak_content.append( (above_cutoff_startpos[i], above_cutoff_endpos[i], treat_array[above_cutoff_index_array[i]], ctrl_array[above_cutoff_index_array[i]] ) )
+                peak_content.append( (above_cutoff_startpos[i], above_cutoff_endpos[i], treat_array[above_cutoff_index_array[i]], ctrl_array[above_cutoff_index_array[i]], get_from_multiple_scores( score_array_s, above_cutoff_index_array[i]) ) )
             else:
                 # close
                 self.__close_peak_wo_subpeaks   (peak_content, lvl1peaks, min_length, chrom, lvl1_max_gap/2 )
-                peak_content = [ (above_cutoff_startpos[i], above_cutoff_endpos[i], treat_array[above_cutoff_index_array[i]], ctrl_array[above_cutoff_index_array[i]] ), ]
+                peak_content = [ (above_cutoff_startpos[i], above_cutoff_endpos[i], treat_array[above_cutoff_index_array[i]], ctrl_array[above_cutoff_index_array[i]], get_from_multiple_scores( score_array_s, above_cutoff_index_array[i]) ), ]
             
         # save the last peak
         if peak_content:
@@ -1147,15 +1147,15 @@ cdef class CallerFromAlignments:
             above_cutoff_startpos[0] = 0
 
         # first bit of region above cutoff
-        peak_content.append( (above_cutoff_startpos[0], above_cutoff_endpos[0], treat_array[above_cutoff_index_array[0]], ctrl_array[above_cutoff_index_array[0]]) )
+        peak_content.append( (above_cutoff_startpos[0], above_cutoff_endpos[0], treat_array[above_cutoff_index_array[0]], ctrl_array[above_cutoff_index_array[0]], get_from_multiple_scores( score_array_s, above_cutoff_index_array[0])) )
         for i in range( 1,above_cutoff_startpos.size ):
             if above_cutoff_startpos[i] - peak_content[-1][1] <= lvl2_max_gap:
                 # append
-                peak_content.append( (above_cutoff_startpos[i], above_cutoff_endpos[i], treat_array[above_cutoff_index_array[i]], ctrl_array[above_cutoff_index_array[i]] ) )
+                peak_content.append( (above_cutoff_startpos[i], above_cutoff_endpos[i], treat_array[above_cutoff_index_array[i]], ctrl_array[above_cutoff_index_array[i]], get_from_multiple_scores( score_array_s, above_cutoff_index_array[i]) ) )
             else:
                 # close
                 self.__close_peak_wo_subpeaks   (peak_content, lvl2peaks, min_length, chrom, lvl2_max_gap/2 )
-                peak_content = [ (above_cutoff_startpos[i], above_cutoff_endpos[i], treat_array[above_cutoff_index_array[i]], ctrl_array[above_cutoff_index_array[i]] ), ]
+                peak_content = [ (above_cutoff_startpos[i], above_cutoff_endpos[i], treat_array[above_cutoff_index_array[i]], ctrl_array[above_cutoff_index_array[i]], get_from_multiple_scores( score_array_s, above_cutoff_index_array[i]) ), ]
             
         # save the last peak
         if peak_content:
