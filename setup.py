@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# Time-stamp: <2013-04-15 15:07:16 Tao Liu>
+# Time-stamp: <2013-04-19 12:42:03 Tao Liu>
 
 """Description
 
@@ -78,7 +78,7 @@ def main():
               ],
           install_requires=[
               'numpy>=1.6',
-              'scipy>=0.11',
+              'scipy',
               ],
           cmdclass = command_classes,
           ext_modules = ext_modules
