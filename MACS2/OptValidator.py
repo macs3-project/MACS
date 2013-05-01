@@ -1,4 +1,4 @@
-# Time-stamp: <2013-04-15 14:09:06 Tao Liu>
+# Time-stamp: <2013-05-01 17:18:52 Tao Liu>
 
 """Module Description
 
@@ -155,6 +155,7 @@ def opt_validate ( options ):
     options.info    = logging.info
 
     options.argtxt = "\n".join((
+        "# Command line: %s" % " ".join(sys.argv[1:]),\
         "# ARGUMENTS LIST:",\
         "# name = %s" % (options.name),\
         "# format = %s" % (options.format),\

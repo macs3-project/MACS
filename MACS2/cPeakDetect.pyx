@@ -1,4 +1,4 @@
-# Time-stamp: <2013-04-12 16:14:50 Tao Liu>
+# Time-stamp: <2013-04-22 13:46:04 Tao Liu>
 
 """Module Description
 
@@ -217,7 +217,8 @@ class PeakDetect:
                                                 lambda_bg = lambda_bg,
                                                 shiftcontrol = self.shiftcontrol,
                                                 save_bedGraph = self.opt.store_bdg,
-                                                bedGraph_filename_prefix = self.opt.name)
+                                                bedGraph_filename_prefix = self.opt.name,
+                                                save_SPMR = self.opt.do_SPMR)
 
         if self.opt.trackline: scorecalculator.enable_trackline()
 
@@ -311,7 +312,8 @@ class PeakDetect:
                                                 lambda_bg = lambda_bg,
                                                 shiftcontrol = self.shiftcontrol,
                                                 save_bedGraph = self.opt.store_bdg,
-                                                bedGraph_filename_prefix = self.opt.name)
+                                                bedGraph_filename_prefix = self.opt.name,
+                                                save_SPMR = self.opt.do_SPMR )
 
         # calculate pvalue scores
         if self.opt.trackline: self.scoretrack.enable_trackline()

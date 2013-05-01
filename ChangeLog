@@ -1,5 +1,5 @@
-2013-04-15  Tao Liu  <vladimir.liu@gmail.com>
-	MACS version 2.0.10 20130415 (tag:alpha)
+2013-05-01  Tao Liu  <vladimir.liu@gmail.com>
+	MACS version 2.0.10 20130501 (tag:alpha)
 
 	* Memory usage is decreased to about 1/4-1/5 of previous usage
 	Now, the internal data structure and algorithm are both

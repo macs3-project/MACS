@@ -1,4 +1,4 @@
-# Time-stamp: <2013-04-19 15:34:41 Tao Liu>
+# Time-stamp: <2013-05-01 14:10:02 Tao Liu>
 
 """Module for Calculate Scores.
 
@@ -57,7 +57,7 @@ from time import time as ttime
 # constants
 # ------------------------------------
 __version__ = "scoreCalculate $Revision$"
-__author__ = "Tao Liu <taoliu@jimmy.harvard.edu>"
+__author__ = "Tao Liu <vladimir.liu@gmail.com>"
 __doc__ = "scoreTrackI classes"
 
 # ------------------------------------
@@ -288,6 +288,7 @@ cdef class CallerFromAlignments:
         bool halfextension               # whether or not extend both sides at sequencing ends
         bool trackline                   # whether trackline should be saved in bedGraph
         bool save_bedGraph               # whether to save pileup and local bias in bedGraph files
+        bool save_SPMR                   # whether to save pileup normalized by sequencing depth in million reads
         bool no_lambda_flag              # whether ignore local bias, and to use global bias instead
         bool PE_mode                     # whether it's in PE mode, will be detected during initiation
         # temporary data buffer
@@ -310,7 +311,8 @@ cdef class CallerFromAlignments:
                   float lambda_bg = 0, 
                   bool shiftcontrol = False,
                   bool save_bedGraph = False,
-                  str  bedGraph_filename_prefix = ""):
+                  str  bedGraph_filename_prefix = "",
+                  bool save_SPMR = False):
         """Initialize.
 
         A calculator is unique to each comparison of treat and
@@ -364,6 +366,7 @@ cdef class CallerFromAlignments:
         self.lambda_bg = lambda_bg
         self.pqtable = None
         self.save_bedGraph = save_bedGraph
+        self.save_SPMR = save_SPMR
         self.bedGraph_filename_prefix =  bedGraph_filename_prefix
 
         if not self.ctrl_d_s or not self.ctrl_scaling_factor_s:
@@ -619,6 +622,12 @@ cdef class CallerFromAlignments:
             logging.info ("#3 In the peak calling step, the following will be performed simultaneously:")
             logging.info ("#3   Write bedGraph files for treatment pileup (after scaling if necessary)... %s" % self.bedGraph_filename_prefix + "_treat_pileup.bdg")
             logging.info ("#3   Write bedGraph files for control lambda (after scaling if necessary)... %s" % self.bedGraph_filename_prefix + "_control_lambda.bdg")
+            if self.save_SPMR:
+                logging.info ( "#3   --SPMR is requested, so pileup will be normalized by sequencing depth in million reads." )
+            elif self.treat_scaling_factor == 1:
+                logging.info ( "#3   Pileup will be based on sequencing depth in treatment." )
+            else:
+                logging.info ( "#3   Pileup will be based on sequencing depth in control." )
 
             if self.trackline:
                 # this line is REQUIRED by the wiggle format for UCSC browser
@@ -638,7 +647,7 @@ cdef class CallerFromAlignments:
         return peaks
 
     cdef __chrom_call_peak_using_certain_criteria ( self, peaks, str chrom, list scoring_function_s, list score_cutoff_s, int min_length, 
-                                                   int max_gap, bool call_summits, bool save_bedGraph):
+                                                   int max_gap, bool call_summits, bool save_bedGraph ):
         """ Call peaks for a chromosome.
 
         Combination of criteria is allowed here.
@@ -927,8 +936,19 @@ cdef class CallerFromAlignments:
             int l, i
             int p, pre_p_t, pre_p_c # current position, previous position for treat, previous position for control
             float pre_v_t, pre_v_c, v_t, v_c # previous value for treat, for control, current value for treat, for control
+            float denominator # 1 if save_SPMR is false, or depth in million if save_SPMR is true. Note, while piling up and calling peaks, treatment and control have been scaled to the same depth, so we need to find what this 'depth' is.
 
         [pos_array, treat_array, ctrl_array] = self.chr_pos_treat_ctrl
+
+        if self.save_SPMR:
+            if self.treat_scaling_factor == 1:
+                # in this case, control has been asked to be scaled to depth of treatment
+                denominator  = self.treat.total/1e6
+            else:
+                # in this case, treatment has been asked to be scaled to depth of control
+                denominator  = self.ctrl.total/1e6
+        else:
+            denominator = 1.0
 
         l = pos_array.shape[ 0 ]
 
@@ -941,12 +961,12 @@ cdef class CallerFromAlignments:
         
         pre_p_t = 0
         pre_p_c = 0
-        pre_v_t = treat_array[ 0 ]
-        pre_v_c = ctrl_array [ 0 ]
+        pre_v_t = treat_array[ 0 ]/denominator
+        pre_v_c = ctrl_array [ 0 ]/denominator
         
         for i in range( 1, l ):
-            v_t = treat_array[ i ]
-            v_c = ctrl_array [ i ]
+            v_t = treat_array[ i ]/denominator
+            v_c = ctrl_array [ i ]/denominator
             p   = pos_array  [ i-1 ]
 
             if abs(pre_v_t - v_t) > 1e-5: # precision is 5 digits
