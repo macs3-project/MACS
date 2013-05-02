@@ -1,4 +1,4 @@
-# Time-stamp: <2013-04-16 14:21:16 Tao Liu>
+# Time-stamp: <2013-05-02 00:53:49 Tao Liu>
 
 """Module for Feature IO classes.
 
@@ -2484,7 +2484,7 @@ cdef class DiffScoreTrackI:
                     if last_end - first_start >= min_length:
                         in_peaks[above_cutoff[first_i]:above_cutoff[i]] = True
 
-            self.where_peaks[chrom] = np.where(in_peaks)[0]
+            self.where_peaks[chrom] = np.where(in_peaks)[0].astype('int32')
 #            print "Total peakage in bp", in_peaks.sum()
         
         return
