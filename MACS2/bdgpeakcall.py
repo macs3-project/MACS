@@ -54,6 +54,6 @@ def run( options ):
 
     info("Write peaks...")
     nf = open ("%s_c%.1f_l%d_g%d_peaks.narrowPeak" % (options.oprefix,options.cutoff,options.minlen,options.maxgap),"w")        
-    peaks.write_to_narrowPeak(nf, name_prefix=options.oprefix+"_narrowPeak", score_column="score", trackline=options.trackline)
+    peaks.write_to_narrowPeak(nf, name=options.oprefix, name_prefix=options.oprefix+"_narrowPeak", score_column="score", trackline=options.trackline)
     info("Done")
     
