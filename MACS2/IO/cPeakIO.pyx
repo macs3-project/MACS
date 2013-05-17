@@ -1,4 +1,4 @@
-# Time-stamp: <2013-04-12 16:08:56 Tao Liu>
+# Time-stamp: <2013-05-17 15:42:41 Tao Liu>
 
 """Module for PeakIO IO classes.
 
@@ -243,7 +243,7 @@ cdef class PeakIO:
                         #[start,end,end-start,summit,peak_height,number_tags,pvalue,fold_change,qvalue]
                         print_func("%s\t%d\t%d\t%d" % (chrom,peak['start']+1,peak['end'],peak['length']))
                         print_func("\t%d" % (peak['summit']+1)) # summit position
-                        print_func("\t%.2f" % (peak['pileup'])) # pileup height at summit
+                        print_func("\t%.2f" % (round(peak['pileup'],2))) # pileup height at summit
                         print_func("\t%.5f" % (peak['pscore'])) # -log10pvalue at summit
                         print_func("\t%.5f" % (peak['fc'])) # fold change at summit                
                         print_func("\t%.5f" % (peak['qscore'])) # -log10qvalue at summit
@@ -255,7 +255,7 @@ cdef class PeakIO:
                     #[start,end,end-start,summit,peak_height,number_tags,pvalue,fold_change,qvalue]
                     print_func("%s\t%d\t%d\t%d" % (chrom,peak['start']+1,peak['end'],peak['length']))
                     print_func("\t%d" % (peak['summit']+1)) # summit position
-                    print_func("\t%.5f" % (peak['pileup'])) # pileup height at summit
+                    print_func("\t%.2f" % (round(peak['pileup'],2))) # pileup height at summit
                     print_func("\t%.5f" % (peak['pscore'])) # -log10pvalue at summit
                     print_func("\t%.5f" % (peak['fc'])) # fold change at summit                
                     print_func("\t%.5f" % (peak['qscore'])) # -log10qvalue at summit
@@ -495,6 +495,9 @@ l        |           |      |0-based offset from chromStart. Use -1  |
     def write_to_xls (self, ofhd, name_prefix="%s_peak_", name="MACS"):
         """Save the peak results in a tab-delimited plain text file
         with suffix .xls.
+
+
+        wait... why I have two write_to_xls in this class?
         
         """
         write = ofhd.write
@@ -517,7 +520,7 @@ l        |           |      |0-based offset from chromStart. Use -1  |
                         #[start,end,end-start,summit,peak_height,number_tags,pvalue,fold_change,qvalue]
                         write("%s\t%d\t%d\t%d" % (chrom,peak['start']+1,peak['end'],peak['length']))
                         write("\t%d" % (peak['summit']+1)) # summit position
-                        write("\t%.2f" % (peak['pileup'])) # pileup height at summit
+                        write("\t%.2f" % (round(peak['pileup'],2))) # pileup height at summit
                         write("\t%.5f" % (peak['pscore'])) # -log10pvalue at summit
                         write("\t%.5f" % (peak['fc'])) # fold change at summit
                         write("\t%.5f" % (peak['qscore'])) # -log10qvalue at summit
@@ -529,7 +532,7 @@ l        |           |      |0-based offset from chromStart. Use -1  |
                     #[start,end,end-start,summit,peak_height,number_tags,pvalue,fold_change,qvalue]
                     write("%s\t%d\t%d\t%d" % (chrom,peak['start']+1,peak['end'],peak['length']))
                     write("\t%d" % (peak['summit']+1)) # summit position
-                    write("\t%.2f" % (peak['pileup'])) # pileup height at summit
+                    write("\t%.2f" % (round(peak['pileup'],2))) # pileup height at summit
                     write("\t%.5f" % (peak['pscore'])) # -log10pvalue at summit
                     write("\t%.5f" % (peak['fc'])) # fold change at summit
                     write("\t%.5f" % (peak['qscore'])) # -log10qvalue at summit                    
