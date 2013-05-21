@@ -1,4 +1,4 @@
-# Time-stamp: <2013-05-21 16:51:59 Tao Liu>
+# Time-stamp: <2013-05-21 17:28:59 Tao Liu>
 
 """Module for Calculate Scores.
 
@@ -937,7 +937,6 @@ cdef class CallerFromAlignments:
             int p, pre_p_t, pre_p_c # current position, previous position for treat, previous position for control
             float pre_v_t, pre_v_c, v_t, v_c # previous value for treat, for control, current value for treat, for control
             float denominator # 1 if save_SPMR is false, or depth in million if save_SPMR is true. Note, while piling up and calling peaks, treatment and control have been scaled to the same depth, so we need to find what this 'depth' is.
-            int tmp_n
 
         [pos_array, treat_array, ctrl_array] = self.chr_pos_treat_ctrl
 
@@ -1049,7 +1048,6 @@ cdef class CallerFromAlignments:
         broadpeaks = BroadPeakIO()
         # use lvl2_peaks as linking regions between lvl1_peaks
         for chrom in chrs:
-            tmp_n = 0           # test
             lvl1peakschrom = lvl1peaks.get_data_from_chrom(chrom)
             lvl2peakschrom = lvl2peaks.get_data_from_chrom(chrom)
             lvl1peakschrom_next = iter(lvl1peakschrom).next
@@ -1072,16 +1070,13 @@ cdef class CallerFromAlignments:
                             #if tmppeakset:
                             # make a hierarchical broad peak 
                             self.__add_broadpeak ( broadpeaks, chrom, lvl2, tmppeakset)
-                            tmp_n += 1
                             tmppeakset = []
                             break
                             
                 except StopIteration:
                     if tmppeakset:
                         self.__add_broadpeak ( broadpeaks, chrom, lvl2, tmppeakset)  
-                        tmp_n += 1
                     break
-            print chrom, len(lvl1peakschrom), len(lvl2peakschrom), tmp_n
         return lvl1peaks, broadpeaks
 
     cdef __chrom_call_broadpeak_using_certain_criteria ( self, lvl1peaks, lvl2peaks, str chrom, list scoring_function_s, list lvl1_cutoff_s, list lvl2_cutoff_s,

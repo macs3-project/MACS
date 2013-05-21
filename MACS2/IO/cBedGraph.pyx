@@ -1,4 +1,4 @@
-# Time-stamp: <2013-04-16 14:26:46 Tao Liu>
+# Time-stamp: <2013-05-21 17:19:46 Tao Liu>
 
 """Module for Feature IO classes.
 
@@ -617,12 +617,14 @@ cdef class bedGraphTrackI:
                     while True:
                         if lvl2["start"] <= lvl1["start"]  and lvl1["end"] <= lvl2["end"]:
                             tmppeakset.append(lvl1)
+                            lvl1 = lvl1peakschrom_next()
+                            continue
                         else:
-                            if tmppeakset:
-                                self.__add_broadpeak ( broadpeaks, chrom, lvl2, tmppeakset)
+                            #if tmppeakset:
+                            self.__add_broadpeak ( broadpeaks, chrom, lvl2, tmppeakset)
                             tmppeakset = []
                             break
-                        lvl1 = lvl1peakschrom_next()
+
                 except StopIteration:
                     if tmppeakset:
                         self.__add_broadpeak ( broadpeaks, chrom, lvl2, tmppeakset)                    
@@ -635,26 +637,30 @@ cdef class bedGraphTrackI:
         
         """
         cdef:
-            long start, end, thickStart, thickEnd, blockNum
-            str blockSizes, blockStarts
+            long start, end, blockNum
+            str blockSizes, blockStarts, thickStart, thickEnd
         
         start      = lvl2peak["start"]
         end        = lvl2peak["end"]
-        thickStart = lvl1peakset[0]["start"]
-        thickEnd   = lvl1peakset[-1]["end"]
+        if not lvl1peakset:
+            bpeaks.add(chrom, start, end, score=lvl2peak["score"], thickStart=".", thickEnd=".",
+                       blockNum = 0, blockSizes = ".", blockStarts = ".")
+            return bpeaks            
+        thickStart = str(lvl1peakset[0]["start"])
+        thickEnd   = str(lvl1peakset[-1]["end"])
         blockNum   = len(lvl1peakset)
         blockSizes = ",".join( map(lambda x:str(x["length"]),lvl1peakset) )
         blockStarts = ",".join( map(lambda x:str(x["start"]-start),lvl1peakset) )
-        if lvl2peak["start"] != thickStart:
-            # add 1bp mark for the start of lvl2 peak
-            blockNum += 1
-            blockSizes = "1,"+blockSizes
-            blockStarts = "0,"+blockStarts
-        if lvl2peak["end"] != thickEnd:
-            # add 1bp mark for the end of lvl2 peak            
-            blockNum += 1
-            blockSizes = blockSizes+",1"
-            blockStarts = blockStarts+","+str(end-start-1)
+        #if lvl2peak["start"] != thickStart:
+        #    # add 1bp mark for the start of lvl2 peak
+        #    blockNum += 1
+        #    blockSizes = "1,"+blockSizes
+        #    blockStarts = "0,"+blockStarts
+        #if lvl2peak["end"] != thickEnd:
+        #    # add 1bp mark for the end of lvl2 peak            
+        #    blockNum += 1
+        #    blockSizes = blockSizes+",1"
+        #    blockStarts = blockStarts+","+str(end-start-1)
         
         bpeaks.add(chrom, start, end, score=lvl2peak["score"], thickStart=thickStart, thickEnd=thickEnd,
                    blockNum = blockNum, blockSizes = blockSizes, blockStarts = blockStarts)
