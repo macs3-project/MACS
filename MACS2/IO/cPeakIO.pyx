@@ -1,4 +1,4 @@
-# Time-stamp: <2013-05-17 15:42:41 Tao Liu>
+# Time-stamp: <2013-05-21 16:50:41 Tao Liu>
 
 """Module for PeakIO IO classes.
 
@@ -715,16 +715,16 @@ cdef class BroadPeakContent:
         long start,
         long end
         long score
-        long thickStart
-        long thickEnd
+        str thickStart
+        str thickEnd
         long blockNum
         str  blockSizes
         str  blockStarts
 
     def __init__ ( self, long start, long end, long score = 0,
-                   long thickStart=0, long thickEnd=0,
-                   long blockNum=0, str blockSizes="", 
-                   str blockStarts=""):
+                   str thickStart=".", str thickEnd=".",
+                   long blockNum=0, str blockSizes=".", 
+                   str blockStarts="."):
         self.start = start
         self.end = end
         self.score = score
@@ -763,19 +763,19 @@ cdef class BroadPeakIO:
         self.peaks = {}
     
     def add (self, char * chromosome, long start, long end, long score = 0,
-             long thickStart=0, long thickEnd=0,
-             long blockNum=0, str blockSizes="", 
-             str blockStarts="" ):
+             str thickStart=".", str thickEnd=".",
+             long blockNum=0, str blockSizes=".", 
+             str blockStarts="." ):
         """items
         chromosome : chromosome name,
         start      : broad region start,
         end        : broad region end,
         score      : average score in all blocks,
-        thickStart : start of highly enriched region,
-        thickEnd   : end of highly enriched region,
-        blockNum   : number of blocks,
-        blockSizes : sizes of blocks,
-        blockStarts: starts of blocks
+        thickStart : start of highly enriched region, # could be '.'
+        thickEnd   : end of highly enriched region,   # could be '.'
+        blockNum   : number of blocks,                # could be 0
+        blockSizes : sizes of blocks,                 # could be '.'
+        blockStarts: starts of blocks                 # could be '.'
         """
         if not self.peaks.has_key(chromosome):
             self.peaks[chromosome]=[]
@@ -862,7 +862,7 @@ cdef class BroadPeakIO:
         for chrom in chrs:
             for peak in self.peaks[chrom]:
                 n_peak += 1
-                fhd.write( "%s\t%d\t%d\t%s%d\t%d\t.\t%d\t%d\t0\t%d\t%s\t%s\n"
+                fhd.write( "%s\t%d\t%d\t%s%d\t%d\t.\t%s\t%s\t0\t%d\t%s\t%s\n"
                            %
                            (chrom,peak["start"],peak["end"],peakprefix,n_peak,int(peak["score"]),
                             peak["thickStart"],peak["thickEnd"],

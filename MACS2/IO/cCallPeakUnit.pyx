@@ -1,4 +1,4 @@
-# Time-stamp: <2013-05-01 14:10:02 Tao Liu>
+# Time-stamp: <2013-05-21 16:51:59 Tao Liu>
 
 """Module for Calculate Scores.
 
@@ -937,6 +937,7 @@ cdef class CallerFromAlignments:
             int p, pre_p_t, pre_p_c # current position, previous position for treat, previous position for control
             float pre_v_t, pre_v_c, v_t, v_c # previous value for treat, for control, current value for treat, for control
             float denominator # 1 if save_SPMR is false, or depth in million if save_SPMR is true. Note, while piling up and calling peaks, treatment and control have been scaled to the same depth, so we need to find what this 'depth' is.
+            int tmp_n
 
         [pos_array, treat_array, ctrl_array] = self.chr_pos_treat_ctrl
 
@@ -1048,6 +1049,7 @@ cdef class CallerFromAlignments:
         broadpeaks = BroadPeakIO()
         # use lvl2_peaks as linking regions between lvl1_peaks
         for chrom in chrs:
+            tmp_n = 0           # test
             lvl1peakschrom = lvl1peaks.get_data_from_chrom(chrom)
             lvl2peakschrom = lvl2peaks.get_data_from_chrom(chrom)
             lvl1peakschrom_next = iter(lvl1peakschrom).next
@@ -1064,16 +1066,22 @@ cdef class CallerFromAlignments:
                     while True:
                         if lvl2["start"] <= lvl1["start"]  and lvl1["end"] <= lvl2["end"]:
                             tmppeakset.append(lvl1)
+                            lvl1 = lvl1peakschrom_next()
+                            continue
                         else:
-                            if tmppeakset:
-                                self.__add_broadpeak ( broadpeaks, chrom, lvl2, tmppeakset)
+                            #if tmppeakset:
+                            # make a hierarchical broad peak 
+                            self.__add_broadpeak ( broadpeaks, chrom, lvl2, tmppeakset)
+                            tmp_n += 1
                             tmppeakset = []
                             break
-                        lvl1 = lvl1peakschrom_next()
+                            
                 except StopIteration:
                     if tmppeakset:
                         self.__add_broadpeak ( broadpeaks, chrom, lvl2, tmppeakset)  
+                        tmp_n += 1
                     break
+            print chrom, len(lvl1peakschrom), len(lvl2peakschrom), tmp_n
         return lvl1peaks, broadpeaks
 
     cdef __chrom_call_broadpeak_using_certain_criteria ( self, lvl1peaks, lvl2peaks, str chrom, list scoring_function_s, list lvl1_cutoff_s, list lvl2_cutoff_s,
@@ -1098,8 +1106,6 @@ cdef class CallerFromAlignments:
         assert len(scoring_function_s) == len(lvl1_cutoff_s), "number of functions and cutoffs should be the same!"
         assert len(scoring_function_s) == len(lvl2_cutoff_s), "number of functions and cutoffs should be the same!"
         
-        peak_content = []           # to store points above cutoff
-
         # first, build pileup, self.chr_pos_treat_ctrl
         self.__pileup_treat_ctrl_a_chromosome( chrom )
         [pos_array, treat_array, ctrl_array] = self.chr_pos_treat_ctrl
@@ -1122,6 +1128,8 @@ cdef class CallerFromAlignments:
                 score_array_s.append( self.__cal_subtraction( treat_array, ctrl_array ) )
 
         # lvl1 : strong peaks
+        peak_content = []           # to store points above cutoff
+
         # get the regions with scores above cutoffs
         above_cutoff = np.nonzero( apply_multiple_cutoffs(score_array_s,lvl1_cutoff_s) )[0] # this is not an optimized method. It would be better to store score array in a 2-D ndarray?
         above_cutoff_index_array = np.arange(pos_array.shape[0])[above_cutoff] # indices
@@ -1152,6 +1160,8 @@ cdef class CallerFromAlignments:
             self.__close_peak_wo_subpeaks   (peak_content, lvl1peaks, min_length, chrom, lvl1_max_gap/2 )            
 
         # lvl2 : weak peaks
+        peak_content = []           # to store points above cutoff
+
         # get the regions with scores above cutoffs
         above_cutoff = np.nonzero( apply_multiple_cutoffs(score_array_s,lvl2_cutoff_s) )[0] # this is not an optimized method. It would be better to store score array in a 2-D ndarray?
         above_cutoff_index_array = np.arange(pos_array.shape[0])[above_cutoff] # indices
@@ -1185,30 +1195,37 @@ cdef class CallerFromAlignments:
 
     cdef __add_broadpeak (self, bpeaks, str chrom, object lvl2peak, list lvl1peakset):
         """Internal function to create broad peak.
+
+        *Note* lvl1peakset might be empty
         """
         
         cdef:
-            int blockNum, thickStart, thickEnd, start, end
-            str blockSizes, blockStarts
+            int blockNum, start, end
+            str blockSizes, blockStarts, thickStart, thickEnd, 
 
         start      = lvl2peak["start"]
         end        = lvl2peak["end"]
-        thickStart = lvl1peakset[0]["start"]
-        thickEnd   = lvl1peakset[-1]["end"]
+        if not lvl1peakset:
+            bpeaks.add(chrom, start, end, score=lvl2peak["score"], thickStart=".", thickEnd=".",
+                       blockNum = 0, blockSizes = ".", blockStarts = ".")
+            return bpeaks
+
+        thickStart = str(lvl1peakset[0]["start"])
+        thickEnd   = str(lvl1peakset[-1]["end"])
         blockNum   = int(len(lvl1peakset))
         blockSizes = ",".join(map(str,map(itemgetter("length"),lvl1peakset))) #join( map(lambda x:str(x["length"]),lvl1peakset) )
         blockStarts = ",".join(getitem_then_subtract(lvl1peakset, start))     #join( map(lambda x:str(x["start"]-start),lvl1peakset) )
         #print blockSizes, blockStarts
-        if lvl2peak["start"] != thickStart:
-            # add 1bp mark for the start of lvl2 peak
-            blockNum += 1
-            blockSizes = "1,"+blockSizes
-            blockStarts = "0,"+blockStarts
-        if lvl2peak["end"] != thickEnd:
-            # add 1bp mark for the end of lvl2 peak            
-            blockNum += 1
-            blockSizes = blockSizes+",1"
-            blockStarts = blockStarts+","+str(end-start-1)
+        #if lvl2peak["start"] != thickStart:
+        #    # add 1bp mark for the start of lvl2 peak
+        #    blockNum += 1
+        #    blockSizes = "1,"+blockSizes
+        #    blockStarts = "0,"+blockStarts
+        #if lvl2peak["end"] != thickEnd:
+        #    # add 1bp mark for the end of lvl2 peak            
+        #    blockNum += 1
+        #    blockSizes = blockSizes+",1"
+        #    blockStarts = blockStarts+","+str(end-start-1)
         
         bpeaks.add(chrom, start, end, score=lvl2peak["score"], thickStart=thickStart, thickEnd=thickEnd,
                    blockNum = blockNum, blockSizes = blockSizes, blockStarts = blockStarts)
