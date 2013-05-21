@@ -1,3 +1,9 @@
+2013-05-21  Tao Liu  <vladimir.liu@gmail.com>
+	MACS version 2.0.10 20130520 (tag:alpha)
+
+	* broad peak calling modules are modified in order to report all
+	relexed regions even there is no strong enrichment inside.
+
 2013-05-01  Tao Liu  <vladimir.liu@gmail.com>
 	MACS version 2.0.10 20130501 (tag:alpha)
 
