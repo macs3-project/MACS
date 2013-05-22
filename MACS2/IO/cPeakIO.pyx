@@ -1,4 +1,4 @@
-# Time-stamp: <2013-05-21 16:50:41 Tao Liu>
+# Time-stamp: <2013-05-22 00:04:08 Tao Liu>
 
 """Module for PeakIO IO classes.
 
@@ -862,9 +862,14 @@ cdef class BroadPeakIO:
         for chrom in chrs:
             for peak in self.peaks[chrom]:
                 n_peak += 1
-                fhd.write( "%s\t%d\t%d\t%s%d\t%d\t.\t%s\t%s\t0\t%d\t%s\t%s\n"
-                           %
-                           (chrom,peak["start"],peak["end"],peakprefix,n_peak,int(peak["score"]),
-                            peak["thickStart"],peak["thickEnd"],
-                            peak["blockNum"],peak["blockSizes"],peak["blockStarts"] ) )
+                if peak["thickStart"] == ".":
+                    fhd.write( "%s\t%d\t%d\t%s%d\t%d\t.\n"
+                               %
+                               (chrom,peak["start"],peak["end"],peakprefix,n_peak,int(peak["score"] ) ) )
+                else:
+                    fhd.write( "%s\t%d\t%d\t%s%d\t%d\t.\t%s\t%s\t0\t%d\t%s\t%s\n"
+                               %
+                               (chrom,peak["start"],peak["end"],peakprefix,n_peak,int(peak["score"]),
+                                peak["thickStart"],peak["thickEnd"],
+                                peak["blockNum"],peak["blockSizes"],peak["blockStarts"] ) )
 
