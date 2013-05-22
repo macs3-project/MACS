@@ -1,4 +1,4 @@
-# Time-stamp: <2013-05-21 17:19:46 Tao Liu>
+# Time-stamp: <2013-05-21 23:53:15 Tao Liu>
 
 """Module for Feature IO classes.
 
@@ -593,6 +593,8 @@ cdef class bedGraphTrackI:
         and gapped broad regions in BroadPeakIO.
         """
         cdef str chrom
+        cdef int i, j
+        #cdef int tmp_n
         
         assert lvl1_cutoff > lvl2_cutoff, "level 1 cutoff should be larger than level 2."
         assert lvl1_max_gap < lvl2_max_gap, "level 2 maximum gap should be larger than level 1."        
@@ -602,6 +604,7 @@ cdef class bedGraphTrackI:
         broadpeaks = BroadPeakIO()
         # use lvl2_peaks as linking regions between lvl1_peaks
         for chrom in chrs:
+            #tmp_n = 0
             lvl1peakschrom = lvl1_peaks.get_data_from_chrom(chrom)
             lvl2peakschrom = lvl2_peaks.get_data_from_chrom(chrom)
             lvl1peakschrom_next = iter(lvl1peakschrom).next
@@ -609,27 +612,28 @@ cdef class bedGraphTrackI:
             # our assumption is lvl1 regions should be included in lvl2 regions
             try:
                 lvl1 = lvl1peakschrom_next()
-            except StopIteration:
-                break
-            for lvl2 in lvl2peakschrom:
-                # for each lvl2 peak, find all lvl1 peaks inside
-                try:
+                for i in range( len(lvl2peakschrom) ):
+                    # for each lvl2 peak, find all lvl1 peaks inside
+                    lvl2 = lvl2peakschrom[i]
                     while True:
                         if lvl2["start"] <= lvl1["start"]  and lvl1["end"] <= lvl2["end"]:
                             tmppeakset.append(lvl1)
                             lvl1 = lvl1peakschrom_next()
-                            continue
                         else:
-                            #if tmppeakset:
                             self.__add_broadpeak ( broadpeaks, chrom, lvl2, tmppeakset)
+                            #tmp_n += 1
                             tmppeakset = []
                             break
+            except StopIteration:
+                self.__add_broadpeak ( broadpeaks, chrom, lvl2, tmppeakset)                    
+                #tmp_n += 1
+                tmppeakset = []
+                for j in range( i+1, len(lvl2peakschrom) ):
+                    self.__add_broadpeak ( broadpeaks, chrom, lvl2peakschrom[j], tmppeakset)
+                    #tmp_n += 1
+            
+            #print len(lvl1peakschrom), len(lvl2peakschrom), tmp_n
 
-                except StopIteration:
-                    if tmppeakset:
-                        self.__add_broadpeak ( broadpeaks, chrom, lvl2, tmppeakset)                    
-                    break
-        
         return lvl1_peaks, broadpeaks
 
     def __add_broadpeak (self, bpeaks, chrom, lvl2peak, lvl1peakset):
