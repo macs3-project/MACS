@@ -1,7 +1,7 @@
 ========================
 README for MACS (2.0.10)
 ========================
-Time-stamp: <2012-10-04 12:07:12 Tao Liu>
+Time-stamp: <2013-05-22 17:40:13 Tao Liu>
 
 Introduction
 ============
@@ -47,12 +47,13 @@ There are seven major functions available in MACS serving as sub-commands.
 :bdgbroadcall:        Call broad peaks from bedGraph output.
 :bdgcmp:              Deduct noise by comparing two signal tracks in bedGraph.
 :bdgdiff:             Differential peak detection based on paired four bedgraph files.
+:diffpeak:            Another differential peak detection based on paired four bedgraph files, with more statistics.
 :filterdup:           Remove duplicate reads at the same position, then convert acceptable format to BED format.
 :predictd:            Predict d or fragment size from alignment results.
 :pileup:              Pileup aligned reads with a given extension
-                          size (fragment size or d in MACS language). Note there will be no
-                          step for duplicate reads filtering or sequencing depth scaling, so you may need to do certain post-
-                          processing.
+                      size (fragment size or d in MACS language). Note there will be no
+                      step for duplicate reads filtering or sequencing depth scaling, so you may need to do certain post-
+                      processing.
 :randsample:          Randomly sample number/percentage of total reads.
 :refinepeak:          (Experimental) Take raw reads alignment, refine peak
                           summits and give scores measuring balance of forward-
@@ -68,19 +69,22 @@ will see a full description of commandline options.
 Parameters
 ----------
 
-- -t/--treatment FILENAME
+-t/--treatment FILENAME
+```````````````````````
 
 This is the only REQUIRED parameter for MACS. File can be in any
 supported format specified by --format option. Check --format for
 detail. If you have more than one alignment files, you can supply
 them as ```-t A B C```. MACS will pool up all these files together.
 
-- -c/--control
+-c/--control
+````````````
 
 The control or mock data file. Please follow the same direction as for
 -t/--treatment.
 
-- -n/--name
+-n/--name
+`````````
 
 The name string of the experiment. MACS will use this string NAME to
 create output files like 'NAME_peaks.xls', 'NAME_negative_peaks.xls',
@@ -88,7 +92,8 @@ create output files like 'NAME_peaks.xls', 'NAME_negative_peaks.xls',
 please avoid any confliction between these filenames and your
 existing files.
 
-- -f/--format FORMAT
+-f/--format FORMAT
+``````````````````
 
 Format of tag file, can be "ELAND", "BED", "ELANDMULTI",
 "ELANDEXPORT", "ELANDMULTIPET" (for pair-end tags), "SAM", "BAM" or
@@ -150,7 +155,7 @@ If the format is BAM/SAM, please check the definition in
 (http://samtools.sourceforge.net/samtools.shtml).  Pair-end mapping
 results can be saved in a single BAM file, if so, MACS will
 automatically keep the left mate(5' end) tag. However, when format
-BAMPET is specified, MACS will use the real fragments inferred from
+BAMPE is specified, MACS will use the real fragments inferred from
 alignment results for reads pileup.
 
 If the format is BOWTIE, you need to provide the ASCII bowtie output
@@ -213,7 +218,8 @@ datasets, because people may mislabel the 11th and 12th column. MACS
 uses 11th column as the sequence name which should be the chromosome
 names.
 
-- -g/--gsize
+-g/--gsize
+``````````
 
 PLEASE assign this parameter to fit your needs!
 
@@ -230,14 +236,16 @@ size:
  :ce: 9e7
  :dm: 1.2e8
 
-- -s/--tsize
+-s/--tsize
+``````````
 
  The size of sequencing tags. If you don't specify it, MACS will try
  to use the first 10 sequences from your input treatment file to
  determine the tag size. Specifying it will override the automatic
  determined tag size.
 
-- --bw
+--bw
+````
 
  The band width which is used to scan the genome ONLY for model
  building. You can set this parameter as the sonication fragment size
@@ -245,18 +253,21 @@ size:
  detection process has been removed. So this parameter only affects
  the model building.
 
-- -q/--qvalue
+-q/--qvalue
+```````````
 
  The qvalue (minimum FDR) cutoff to call significant regions. Default
  is 0.01. For broad marks, you can try 0.05 as cutoff. Q-values are
  calculated from p-values using Benjamini-Hochberg procedure.
 
-- -p/--pvalue
+-p/--pvalue
+```````````
 
  The pvalue cutoff. If -p is specified, MACS2 will use pvalue instead
  of qvalue.
 
-- -m/--mfold
+-m/--mfold
+``````````
 
  This parameter is used to select the regions within MFOLD range of
  high-confidence enrichment ratio against background to build
@@ -269,13 +280,15 @@ size:
 
  Check related *--off-auto* and *--shiftsize* for detail.
 
-- --nolambda
+--nolambda
+``````````
 
  With this flag on, MACS will use the background lambda as local
  lambda. This means MACS will not consider the local bias at peak
  candidate regions.
 
-- --slocal, --llocal
+--slocal, --llocal
+``````````````````
 
  These two parameters control which two levels of regions will be
  checked around the peak regions to calculate the maximum lambda as
@@ -286,18 +299,21 @@ size:
  if the region is set too small, a sharp spike in the input data may
  kill the significant peak.
 
-- --off-auto
+--off-auto
+``````````
 
  Whether turn off the auto paired-peak model process. If not set, when
  MACS failed to build paired model, it will use the nomodel settings,
  the '--shiftsize' parameter to shift and extend each tags. If set,
  MACS will be terminated if paried-peak model is failed.
 
-- --nomodel
+--nomodel
+`````````
 
  While on, MACS will bypass building the shifting model.
 
-- --shiftsize
+--shiftsize
+```````````
 
  While '--nomodel' is set, MACS uses this parameter to shift tags to
  their midpoint. For example, if the size of binding region for your
@@ -306,7 +322,8 @@ size:
  only valid when --nomodel is set or when MACS fails to build
  paired-peak model.
 
--  --keep-dup
+--keep-dup
+``````````
 
  It controls the MACS behavior towards duplicate tags at the exact
  same location -- the same coordination and the same strand. The
@@ -316,7 +333,8 @@ size:
  is given, at most this number of tags will be kept at the same
  location. Default: auto
 
-- --broad              
+--broad
+```````
 
  When this flag is on, MACS will try to composite broad regions in
  BED12 ( a gene-model-like format ) by putting nearby highly enriched
@@ -325,20 +343,23 @@ size:
  length of broad region length is 4 times of d from MACS. DEFAULT:
  False
 
-- --broad-cutoff
+--broad-cutoff
+``````````````
 
  Cutoff for broad region. This option is not available unless --broad
  is set. If -p is set, this is a pvalue cutoff, otherwise, it's a
  qvalue cutoff.  DEFAULT: 0.1
 
-- --to-large
+--to-large
+``````````
 
  When set, linearly scale the smaller dataset to the same depth as
  larger dataset, by default, the smaller dataset will be scaled
  towards the larger dataset. Beware, to scale up small data would
  cause more false positives.
 
-- --down-sample
+--down-sample
+`````````````
 
  When set, random sampling method will scale down the bigger
  sample. By default, MACS uses linear scaling. This option will make
@@ -347,7 +368,8 @@ size:
  would change. Consider to use 'randsample' script before MACS2 runs
  instead.
 
-- -B/--bdg
+-B/--bdg
+````````
 
  If this flag is on, MACS will store the fragment pileup, control
  lambda, -log10pvalue and -log10qvalue scores in bedGraph files. The
@@ -359,44 +381,48 @@ size:
  Benjamini–Hochberg–Yekutieli procedure
  <http://en.wikipedia.org/wiki/False_discovery_rate#Dependent_tests>
 
-- --half-ext (experimental option)
+--half-ext
+``````````
 
  When this flag is on, MACS will only extend each tag with 1/2 d
  (predicted ChIP fragment size) instead of full d.
 
-- -w/--wig is obsolete.
+-w/--wig is obsolete.
+`````````````````````
 
-- -S/--single-profile is obsolete.
+-S/--single-profile is obsolete.
+````````````````````````````````
 
-- --space=SPACE is obsolete since we don't generate wiggle file.
+--space=SPACE is obsolete since we don't generate wiggle file.
+``````````````````````````````````````````````````````````````
 
-- --call-subpeaks is currently not functional.
+--call-summits
+``````````````
 
- If set, MACS will invoke Mali Salmon's PeakSplitter software through
- system call. If PeakSplitter can't be found, an instruction will be
- shown for downloading and installing the PeakSplitter package. The
- PeakSplitter can refine the MACS peaks and split the wide peaks into
- smaller subpeaks. For more information, please check the following
- URL:
+ MACS will now reanalyze the shape of signal profile (p or q-score
+ depending on cutoff setting) to deconvolve subpeaks within each peak
+ called from general procedure. It's highly recommended to detect
+ adjacent binding events. While used, the output subpeaks of a big
+ peak region will have the same peak boundaries, and different scores
+ and peak summit positions.
 
- http://www.ebi.ac.uk/bertone/software/PeakSplitter_Cpp_usage.txt
-
- Note this option doesn't work if -B/--bdg is on.
-
-- --verbose
+--verbose
+`````````
 
  If you don't want to see any message during the running of MACS, set
  it to 0. But the CRITICAL messages will never be hidden. If you want
  to see rich information like how many peaks are called for every
  chromosome, you can set it to 3 or larger than 3.
 
-- --diag is currently not functional.
+--diag is currently not functional.
+```````````````````````````````````
 
  A diagnosis report can be generated through this option. This report
  can help you get an assumption about the sequencing saturation. This
  funtion is only in beta stage.
 
-- --fe-min, --fe-max & --fe-step are currently not functional.
+--fe-min, --fe-max & --fe-step are currently not functional.
+````````````````````````````````````````````````````````````
 
  For diagnostics, FEMIN and FEMAX are the minimum and maximum fold
  enrichment to consider, and FESTEP is the interval of fold
