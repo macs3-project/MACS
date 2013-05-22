@@ -1,7 +1,7 @@
 ========================
 README for MACS (2.0.10)
 ========================
-Time-stamp: <2013-05-22 17:40:13 Tao Liu>
+Time-stamp: <2013-05-22 17:44:33 Tao Liu>
 
 Introduction
 ============
@@ -106,50 +106,50 @@ The BED format can be found at `UCSC genome browser website <http://genome.ucsc.
 If the format is ELAND, the file must be ELAND result output file,
 each line MUST represents only ONE tag, with fields of:
 
- 1. Sequence name (derived from file name and line number if format is not Fasta)
- 2. Sequence
- 3. Type of match:
+1. Sequence name (derived from file name and line number if format is not Fasta)
+2. Sequence
+3. Type of match:
 
-    :NM: no match found.
-    :QC: no matching done: QC failure (too many Ns basically).
-    :RM: no matching done: repeat masked (may be seen if repeatFile.txt was specified).
-    :U0: Best match found was a unique exact match.
-    :U1: Best match found was a unique 1-error match. 
-    :U2: Best match found was a unique 2-error match. 
-    :R0: Multiple exact matches found.
-    :R1: Multiple 1-error matches found, no exact matches.
-    :R2: Multiple 2-error matches found, no exact or 1-error matches.
+:NM: no match found.
+:QC: no matching done: QC failure (too many Ns basically).
+:RM: no matching done: repeat masked (may be seen if repeatFile.txt was specified).
+:U0: Best match found was a unique exact match.
+:U1: Best match found was a unique 1-error match. 
+:U2: Best match found was a unique 2-error match. 
+:R0: Multiple exact matches found.
+:R1: Multiple 1-error matches found, no exact matches.
+:R2: Multiple 2-error matches found, no exact or 1-error matches.
 
- 4. Number of exact matches found.
- 5. Number of 1-error matches found.
- 6. Number of 2-error matches found.  
-    Rest of fields are only seen if a unique best match was found
-    (i.e. the match code in field 3 begins with "U").
- 7. Genome file in which match was found.
- 8. Position of match (bases in file are numbered starting at 1).
- 9. Direction of match (F=forward strand, R=reverse).
- 10. How N characters in read were interpreted: ("."=not applicable,
-     "D"=deletion, "I"=insertion). Rest of fields are only seen in
-     the case of a unique inexact match (i.e. the match code was U1 or
-     U2).
- 11. Position and type of first substitution error (e.g. 12A: base 12
-     was A, not whatever is was in read).
- 12. Position and type of first substitution error, as above. 
+4. Number of exact matches found.
+5. Number of 1-error matches found.
+6. Number of 2-error matches found.  
+   Rest of fields are only seen if a unique best match was found
+   (i.e. the match code in field 3 begins with "U").
+7. Genome file in which match was found.
+8. Position of match (bases in file are numbered starting at 1).
+9. Direction of match (F=forward strand, R=reverse).
+10. How N characters in read were interpreted: ("."=not applicable,
+    "D"=deletion, "I"=insertion). Rest of fields are only seen in
+    the case of a unique inexact match (i.e. the match code was U1 or
+    U2).
+11. Position and type of first substitution error (e.g. 12A: base 12
+    was A, not whatever is was in read).
+12. Position and type of first substitution error, as above. 
 
 If the format is ELANDMULTI, the file must be ELAND output file from
 multiple-match mode, each line MUST represents only ONE tag, with
 fields of:
 
- 1. Sequence name 
- 2. Sequence 
- 3. Either NM, QC, RM (as described above) or the following: 
- 4. x:y:z where x, y, and z are the number of exact, single-error, and 2-error matches found
- 5. Blank, if no matches found or if too many matches found, or the following:
-    BAC_plus_vector.fa:163022R1,170128F2,E_coli.fa:3909847R1 This says
-    there are two matches to BAC_plus_vector.fa: one in the reverse
-    direction starting at position 160322 with one error, one in the
-    forward direction starting at position 170128 with two
-    errors. There is also a single-error match to E_coli.fa.
+1. Sequence name 
+2. Sequence 
+3. Either NM, QC, RM (as described above) or the following: 
+4. x:y:z where x, y, and z are the number of exact, single-error, and 2-error matches found
+5. Blank, if no matches found or if too many matches found, or the following:
+   BAC_plus_vector.fa:163022R1,170128F2,E_coli.fa:3909847R1 This says
+   there are two matches to BAC_plus_vector.fa: one in the reverse
+   direction starting at position 160322 with one error, one in the
+   forward direction starting at position 170128 with two
+   errors. There is also a single-error match to E_coli.fa.
 
 If the format is BAM/SAM, please check the definition in
 (http://samtools.sourceforge.net/samtools.shtml).  Pair-end mapping
@@ -167,30 +167,30 @@ read. Check the bowtie manual for detail if you want at
 Here is the definition for Bowtie output in ASCII characters I copied
 from the above webpage:
 
- 1. Name of read that aligned
- 2. Orientation of read in the alignment, '-' for reverse complement, '+'
-    otherwise
- 3. Name of reference sequence where alignment occurs, or ordinal ID
-    if no name was provided
- 4. 0-based offset into the forward reference strand where leftmost
-    character of the alignment occurs
- 5. Read sequence (reverse-complemented if orientation is -)
- 6. ASCII-encoded read qualities (reversed if orientation is -). The
-    encoded quality values are on the Phred scale and the encoding is
-    ASCII-offset by 33 (ASCII char !).
- 7. Number of other instances where the same read aligns against the
-    same reference characters as were aligned against in this
-    alignment. This is not the number of other places the read aligns
-    with the same number of mismatches. The number in this column is
-    generally not a good proxy for that number (e.g., the number in
-    this column may be '0' while the number of other alignments with
-    the same number of mismatches might be large). This column was
-    previously described as "Reserved".
- 8. Comma-separated list of mismatch descriptors. If there are no
-    mismatches in the alignment, this field is empty. A single
-    descriptor has the format offset:reference-base>read-base. The
-    offset is expressed as a 0-based offset from the high-quality (5')
-    end of the read.
+1. Name of read that aligned
+2. Orientation of read in the alignment, '-' for reverse complement, '+'
+   otherwise
+3. Name of reference sequence where alignment occurs, or ordinal ID
+   if no name was provided
+4. 0-based offset into the forward reference strand where leftmost
+   character of the alignment occurs
+5. Read sequence (reverse-complemented if orientation is -)
+6. ASCII-encoded read qualities (reversed if orientation is -). The
+   encoded quality values are on the Phred scale and the encoding is
+   ASCII-offset by 33 (ASCII char !).
+7. Number of other instances where the same read aligns against the
+   same reference characters as were aligned against in this
+   alignment. This is not the number of other places the read aligns
+   with the same number of mismatches. The number in this column is
+   generally not a good proxy for that number (e.g., the number in
+   this column may be '0' while the number of other alignments with
+   the same number of mismatches might be large). This column was
+   previously described as "Reserved".
+8. Comma-separated list of mismatch descriptors. If there are no
+   mismatches in the alignment, this field is empty. A single
+   descriptor has the format offset:reference-base>read-base. The
+   offset is expressed as a 0-based offset from the high-quality (5')
+   end of the read.
 
 Notes:
 
@@ -231,161 +231,161 @@ size. The default hs -- 2.7e9 is recommended for UCSC human hg18
 assembly. Here are all precompiled parameters for effective genome
 size:
 
- :hs: 2.7e9
- :mm: 1.87e9
- :ce: 9e7
- :dm: 1.2e8
+:hs: 2.7e9
+:mm: 1.87e9
+:ce: 9e7
+:dm: 1.2e8
 
 -s/--tsize
 ``````````
 
- The size of sequencing tags. If you don't specify it, MACS will try
- to use the first 10 sequences from your input treatment file to
- determine the tag size. Specifying it will override the automatic
- determined tag size.
+The size of sequencing tags. If you don't specify it, MACS will try
+to use the first 10 sequences from your input treatment file to
+determine the tag size. Specifying it will override the automatic
+determined tag size.
 
 --bw
 ````
 
- The band width which is used to scan the genome ONLY for model
- building. You can set this parameter as the sonication fragment size
- expected from wet experiment. The previous side effect on the peak
- detection process has been removed. So this parameter only affects
- the model building.
+The band width which is used to scan the genome ONLY for model
+building. You can set this parameter as the sonication fragment size
+expected from wet experiment. The previous side effect on the peak
+detection process has been removed. So this parameter only affects
+the model building.
 
 -q/--qvalue
 ```````````
 
- The qvalue (minimum FDR) cutoff to call significant regions. Default
- is 0.01. For broad marks, you can try 0.05 as cutoff. Q-values are
- calculated from p-values using Benjamini-Hochberg procedure.
+The qvalue (minimum FDR) cutoff to call significant regions. Default
+is 0.01. For broad marks, you can try 0.05 as cutoff. Q-values are
+calculated from p-values using Benjamini-Hochberg procedure.
 
 -p/--pvalue
 ```````````
 
- The pvalue cutoff. If -p is specified, MACS2 will use pvalue instead
- of qvalue.
+The pvalue cutoff. If -p is specified, MACS2 will use pvalue instead
+of qvalue.
 
 -m/--mfold
 ``````````
 
- This parameter is used to select the regions within MFOLD range of
- high-confidence enrichment ratio against background to build
- model. The regions must be lower than upper limit, and higher than
- the lower limit of fold enrichment. DEFAULT:10,30 means using all
- regions not too low (>10) and not too high (<30) to build
- paired-peaks model. If MACS can not find more than 100 regions to
- build model, it will use the --shiftsize parameter to continue the
- peak detection.
+This parameter is used to select the regions within MFOLD range of
+high-confidence enrichment ratio against background to build
+model. The regions must be lower than upper limit, and higher than
+the lower limit of fold enrichment. DEFAULT:10,30 means using all
+regions not too low (>10) and not too high (<30) to build
+paired-peaks model. If MACS can not find more than 100 regions to
+build model, it will use the --shiftsize parameter to continue the
+peak detection.
 
- Check related *--off-auto* and *--shiftsize* for detail.
+Check related *--off-auto* and *--shiftsize* for detail.
 
 --nolambda
 ``````````
 
- With this flag on, MACS will use the background lambda as local
- lambda. This means MACS will not consider the local bias at peak
- candidate regions.
+With this flag on, MACS will use the background lambda as local
+lambda. This means MACS will not consider the local bias at peak
+candidate regions.
 
 --slocal, --llocal
 ``````````````````
 
- These two parameters control which two levels of regions will be
- checked around the peak regions to calculate the maximum lambda as
- local lambda. By default, MACS considers 1000bp for small local
- region(--slocal), and 10000bps for large local region(--llocal) which
- captures the bias from a long range effect like an open chromatin
- domain. You can tweak these according to your project. Remember that
- if the region is set too small, a sharp spike in the input data may
- kill the significant peak.
+These two parameters control which two levels of regions will be
+checked around the peak regions to calculate the maximum lambda as
+local lambda. By default, MACS considers 1000bp for small local
+region(--slocal), and 10000bps for large local region(--llocal) which
+captures the bias from a long range effect like an open chromatin
+domain. You can tweak these according to your project. Remember that
+if the region is set too small, a sharp spike in the input data may
+kill the significant peak.
 
 --off-auto
 ``````````
 
- Whether turn off the auto paired-peak model process. If not set, when
- MACS failed to build paired model, it will use the nomodel settings,
- the '--shiftsize' parameter to shift and extend each tags. If set,
- MACS will be terminated if paried-peak model is failed.
+Whether turn off the auto paired-peak model process. If not set, when
+MACS failed to build paired model, it will use the nomodel settings,
+the '--shiftsize' parameter to shift and extend each tags. If set,
+MACS will be terminated if paried-peak model is failed.
 
 --nomodel
 `````````
 
- While on, MACS will bypass building the shifting model.
+While on, MACS will bypass building the shifting model.
 
 --shiftsize
 ```````````
 
- While '--nomodel' is set, MACS uses this parameter to shift tags to
- their midpoint. For example, if the size of binding region for your
- transcription factor is 200 bp, and you want to bypass the model
- building by MACS, this parameter can be set as 100. This option is
- only valid when --nomodel is set or when MACS fails to build
- paired-peak model.
+While '--nomodel' is set, MACS uses this parameter to shift tags to
+their midpoint. For example, if the size of binding region for your
+transcription factor is 200 bp, and you want to bypass the model
+building by MACS, this parameter can be set as 100. This option is
+only valid when --nomodel is set or when MACS fails to build
+paired-peak model.
 
 --keep-dup
 ``````````
 
- It controls the MACS behavior towards duplicate tags at the exact
- same location -- the same coordination and the same strand. The
- default 'auto' option makes MACS calculate the maximum tags at the
- exact same location based on binomal distribution using 1e-5 as
- pvalue cutoff; and the 'all' option keeps every tags.  If an integer
- is given, at most this number of tags will be kept at the same
- location. Default: auto
+It controls the MACS behavior towards duplicate tags at the exact
+same location -- the same coordination and the same strand. The
+default 'auto' option makes MACS calculate the maximum tags at the
+exact same location based on binomal distribution using 1e-5 as
+pvalue cutoff; and the 'all' option keeps every tags.  If an integer
+is given, at most this number of tags will be kept at the same
+location. Default: auto
 
 --broad
 ```````
 
- When this flag is on, MACS will try to composite broad regions in
- BED12 ( a gene-model-like format ) by putting nearby highly enriched
- regions into a broad region with loose cutoff. The broad region is
- controlled by another cutoff through --broad-cutoff. The maximum
- length of broad region length is 4 times of d from MACS. DEFAULT:
- False
+When this flag is on, MACS will try to composite broad regions in
+BED12 ( a gene-model-like format ) by putting nearby highly enriched
+regions into a broad region with loose cutoff. The broad region is
+controlled by another cutoff through --broad-cutoff. The maximum
+length of broad region length is 4 times of d from MACS. DEFAULT:
+False
 
 --broad-cutoff
 ``````````````
 
- Cutoff for broad region. This option is not available unless --broad
- is set. If -p is set, this is a pvalue cutoff, otherwise, it's a
- qvalue cutoff.  DEFAULT: 0.1
+Cutoff for broad region. This option is not available unless --broad
+is set. If -p is set, this is a pvalue cutoff, otherwise, it's a
+qvalue cutoff.  DEFAULT: 0.1
 
 --to-large
 ``````````
 
- When set, linearly scale the smaller dataset to the same depth as
- larger dataset, by default, the smaller dataset will be scaled
- towards the larger dataset. Beware, to scale up small data would
- cause more false positives.
+When set, linearly scale the smaller dataset to the same depth as
+larger dataset, by default, the smaller dataset will be scaled
+towards the larger dataset. Beware, to scale up small data would
+cause more false positives.
 
 --down-sample
 `````````````
 
- When set, random sampling method will scale down the bigger
- sample. By default, MACS uses linear scaling. This option will make
- the results unstable and irreproducible since each time, random reads
- would be selected, especially the numbers (pileup, pvalue, qvalue)
- would change. Consider to use 'randsample' script before MACS2 runs
- instead.
+When set, random sampling method will scale down the bigger
+sample. By default, MACS uses linear scaling. This option will make
+the results unstable and irreproducible since each time, random reads
+would be selected, especially the numbers (pileup, pvalue, qvalue)
+would change. Consider to use 'randsample' script before MACS2 runs
+instead.
 
 -B/--bdg
 ````````
 
- If this flag is on, MACS will store the fragment pileup, control
- lambda, -log10pvalue and -log10qvalue scores in bedGraph files. The
- bedGraph files will be stored in current directory named
- NAME+'_treat_pileup.bdg' for treatment data,
- NAME+'_control_lambda.bdg' for local lambda values from control,
- NAME+'_treat_pvalue.bdg' for Poisson pvalue scores (in -log10(pvalue)
- form), and NAME+'_treat_qvalue.bdg' for q-value scores from
- Benjamini–Hochberg–Yekutieli procedure
- <http://en.wikipedia.org/wiki/False_discovery_rate#Dependent_tests>
+If this flag is on, MACS will store the fragment pileup, control
+lambda, -log10pvalue and -log10qvalue scores in bedGraph files. The
+bedGraph files will be stored in current directory named
+NAME+'_treat_pileup.bdg' for treatment data,
+NAME+'_control_lambda.bdg' for local lambda values from control,
+NAME+'_treat_pvalue.bdg' for Poisson pvalue scores (in -log10(pvalue)
+form), and NAME+'_treat_qvalue.bdg' for q-value scores from
+Benjamini–Hochberg–Yekutieli procedure
+<http://en.wikipedia.org/wiki/False_discovery_rate#Dependent_tests>
 
 --half-ext
 ``````````
 
- When this flag is on, MACS will only extend each tag with 1/2 d
- (predicted ChIP fragment size) instead of full d.
+When this flag is on, MACS will only extend each tag with 1/2 d
+(predicted ChIP fragment size) instead of full d.
 
 -w/--wig is obsolete.
 `````````````````````
@@ -399,100 +399,100 @@ size:
 --call-summits
 ``````````````
 
- MACS will now reanalyze the shape of signal profile (p or q-score
- depending on cutoff setting) to deconvolve subpeaks within each peak
- called from general procedure. It's highly recommended to detect
- adjacent binding events. While used, the output subpeaks of a big
- peak region will have the same peak boundaries, and different scores
- and peak summit positions.
+MACS will now reanalyze the shape of signal profile (p or q-score
+depending on cutoff setting) to deconvolve subpeaks within each peak
+called from general procedure. It's highly recommended to detect
+adjacent binding events. While used, the output subpeaks of a big
+peak region will have the same peak boundaries, and different scores
+and peak summit positions.
 
 --verbose
 `````````
 
- If you don't want to see any message during the running of MACS, set
- it to 0. But the CRITICAL messages will never be hidden. If you want
- to see rich information like how many peaks are called for every
- chromosome, you can set it to 3 or larger than 3.
+If you don't want to see any message during the running of MACS, set
+it to 0. But the CRITICAL messages will never be hidden. If you want
+to see rich information like how many peaks are called for every
+chromosome, you can set it to 3 or larger than 3.
 
 --diag is currently not functional.
 ```````````````````````````````````
 
- A diagnosis report can be generated through this option. This report
- can help you get an assumption about the sequencing saturation. This
- funtion is only in beta stage.
+A diagnosis report can be generated through this option. This report
+can help you get an assumption about the sequencing saturation. This
+funtion is only in beta stage.
 
 --fe-min, --fe-max & --fe-step are currently not functional.
 ````````````````````````````````````````````````````````````
 
- For diagnostics, FEMIN and FEMAX are the minimum and maximum fold
- enrichment to consider, and FESTEP is the interval of fold
- enrichment. For example, "--fe-min 0 --fe-max 40 --fe-step 10" will
- let MACS choose the following fold enrichment ranges to consider:
- [0,10), [10,20), [20,30) and [30,40).
+For diagnostics, FEMIN and FEMAX are the minimum and maximum fold
+enrichment to consider, and FESTEP is the interval of fold
+enrichment. For example, "--fe-min 0 --fe-max 40 --fe-step 10" will
+let MACS choose the following fold enrichment ranges to consider:
+[0,10), [10,20), [20,30) and [30,40).
 
 Output files
 ~~~~~~~~~~~~
 
- 1. NAME_peaks.xls is a tabular file which contains information about
-    called peaks. You can open it in excel and sort/filter using excel
-    functions. Information include: chromosome name, start position of
-    peak, end position of peak, length of peak region, absolute peak
-    summit position, pileup height at peak summit, -log10(pvalue) for
-    the peak summit (e.g. pvalue =1e-10, then this value should be
-    10), fold enrichment for this peak summit against random Poisson
-    distribution with local lambda, -log10(qvalue) at peak
-    summit. Coordinates in XLS is 1-based which is different with BED
-    format.
+1. NAME_peaks.xls is a tabular file which contains information about
+   called peaks. You can open it in excel and sort/filter using excel
+   functions. Information include: chromosome name, start position of
+   peak, end position of peak, length of peak region, absolute peak
+   summit position, pileup height at peak summit, -log10(pvalue) for
+   the peak summit (e.g. pvalue =1e-10, then this value should be
+   10), fold enrichment for this peak summit against random Poisson
+   distribution with local lambda, -log10(qvalue) at peak
+   summit. Coordinates in XLS is 1-based which is different with BED
+   format.
 
- 2. NAME_peaks.bed is BED format file which contains the peak
-    locations. You can load it to UCSC genome browser or Affymetrix
-    IGB software. The file can be loaded directly to UCSC genome
-    browser. Remove the beginning track line if you want to analyze it
-    by other tools.
+2. NAME_peaks.bed is BED format file which contains the peak
+   locations. You can load it to UCSC genome browser or Affymetrix
+   IGB software. The file can be loaded directly to UCSC genome
+   browser. Remove the beginning track line if you want to analyze it
+   by other tools.
 
- 3. NAME_peaks.encodePeak is BED6+4 format file which contains the
-    peak locations together with peak summit, pvalue and qvalue. You
-    can load it to UCSC genome browser. Definition of some specific
-    columns are: 5th: integer score for display, 7th: fold-change,
-    8th: -log10pvalue, 9th: -log10qvalue, 10th: relative summit
-    position to peak start. The file can be loaded directly to UCSC
-    genome browser. Remove the beginning track line if you want to
-    analyze it by other tools.
+3. NAME_peaks.narrowPeak is BED6+4 format file which contains the
+   peak locations together with peak summit, pvalue and qvalue. You
+   can load it to UCSC genome browser. Definition of some specific
+   columns are: 5th: integer score for display, 7th: fold-change,
+   8th: -log10pvalue, 9th: -log10qvalue, 10th: relative summit
+   position to peak start. The file can be loaded directly to UCSC
+   genome browser. Remove the beginning track line if you want to
+   analyze it by other tools.
 
- 4. NAME_summits.bed is in BED format, which contains the peak summits
-    locations for every peaks. The 5th column in this file is
-    -log10pvalue the same as NAME_peaks.bed. If you want to find the
-    motifs at the binding sites, this file is recommended. The file
-    can be loaded directly to UCSC genome browser. Remove the
-    beginning track line if you want to analyze it by other tools.
+4. NAME_summits.bed is in BED format, which contains the peak summits
+   locations for every peaks. The 5th column in this file is
+   -log10pvalue the same as NAME_peaks.bed. If you want to find the
+   motifs at the binding sites, this file is recommended. The file
+   can be loaded directly to UCSC genome browser. Remove the
+   beginning track line if you want to analyze it by other tools.
 
- 5. NAME_broad_peaks.bed is in BED12 format which contains both the
-    broad region and narrow peaks. The 5th column is 100*-log10pvalue,
-    to be more compatible to UCSC standard. Tht 7th is the start of
-    the first narrow peak in the region, and the 8th column is the
-    end. The 9th column should be RGB color key, however, we keep 0
-    here to use the default color, so change it if you want. The 10th
-    column tells how many blocks including the starting 1bp and ending
-    1bp of broad regions. The 11th column shows the length of each
-    blocks, and 12th for the starts of each blocks. The file can be
-    loaded directly to UCSC genome browser. Remove the beginning track
-    line if you want to analyze it by other tools.
+5. NAME_broad_peaks.bed is in BED12 format which contains both the
+   broad region and narrow peaks. The 5th column is 100*-log10pvalue,
+   to be more compatible to UCSC standard. Tht 7th is the start of
+   the first narrow peak in the region, and the 8th column is the
+   end. The 9th column should be RGB color key, however, we keep 0
+   here to use the default color, so change it if you want. The 10th
+   column tells how many blocks including the starting 1bp and ending
+   1bp of broad regions. The 11th column shows the length of each
+   blocks, and 12th for the starts of each blocks. The file can be
+   loaded directly to UCSC genome browser. Remove the beginning track
+   line if you want to analyze it by other tools.
 
- 6. NAME_model.r is an R script which you can use to produce a PDF
-    image about the model based on your data. Load it to R by:
+6. NAME_model.r is an R script which you can use to produce a PDF
+   image about the model based on your data. Load it to R by:
 
-    ```$ R --vanilla < NAME_model.r```
+   ```$ R --vanilla < NAME_model.r```
 
-    Then a pdf file NAME_model.pdf will be generated in your current
-    directory. Note, R is required to draw this figure.
+   Then a pdf file NAME_model.pdf will be generated in your current
+   directory. Note, R is required to draw this figure.
 
- 7. The .bdg files are in bedGraph format which can be imported to
-    UCSC genome browser or be converted into even smaller bigWig
-    files. Four kinds of bdg files include treat_pileup,
-    control_lambda, treat_pvalue, and treat_qvalue.
+7. The .bdg files are in bedGraph format which can be imported to
+   UCSC genome browser or be converted into even smaller bigWig
+   files. Four kinds of bdg files include treat_pileup,
+   control_lambda, treat_pvalue, and treat_qvalue.
 
- 8. NAME_pqtable.txt store the -log10pvalue, -log10qvalue, rank of
-    this pvalue, and number of bp having this pvalue.
+8. NAME_pqtable.txt store the -log10pvalue, -log10qvalue, rank of
+   this pvalue, and number of bp having this pvalue.
 
 Other useful links
 ==================
@@ -506,20 +506,20 @@ Tips of fine-tuning peak calling
 
 Check the three scripts within MACSv2 package:
 
- 1. bdgcmp can be used on ```*_treat_pileup.bdg``` and
-    ```*_control_lambda.bdg``` or bedGraph files from other resources
-    to calculate score track.
+1. bdgcmp can be used on ```*_treat_pileup.bdg``` and
+   ```*_control_lambda.bdg``` or bedGraph files from other resources
+   to calculate score track.
 
- 2. bdgpeakcall can be used on ```*_treat_pvalue.bdg``` or the file
-    generated from bdgcmp or bedGraph file from other resources to
-    call peaks with given cutoff, maximum-gap between nearby mergable
-    peaks and minimum length of peak. bdgbroadcall works similarly to
-    bdgpeakcall, however it will output _broad_peaks.bed in BED12
-    format.
+2. bdgpeakcall can be used on ```*_treat_pvalue.bdg``` or the file
+   generated from bdgcmp or bedGraph file from other resources to
+   call peaks with given cutoff, maximum-gap between nearby mergable
+   peaks and minimum length of peak. bdgbroadcall works similarly to
+   bdgpeakcall, however it will output _broad_peaks.bed in BED12
+   format.
 
- 3. Differential calling tool -- bdgdiff, can be used on 4 bedgraph
-    files which are scores between treatment 1 and control 1,
-    treatment 2 and control 2, treatment 1 and treatment 2, treatment
-    2 and treatment 1. It will output the consistent and unique sites
-    according to parameter settings for minimum length, maximum gap
-    and cutoff.
+3. Differential calling tool -- bdgdiff, can be used on 4 bedgraph
+   files which are scores between treatment 1 and control 1,
+   treatment 2 and control 2, treatment 1 and treatment 2, treatment
+   2 and treatment 1. It will output the consistent and unique sites
+   according to parameter settings for minimum length, maximum gap
+   and cutoff.
