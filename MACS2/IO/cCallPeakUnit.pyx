@@ -1,4 +1,4 @@
-# Time-stamp: <2013-05-21 23:52:53 Tao Liu>
+# Time-stamp: <2013-05-26 11:13:23 Tao Liu>
 
 """Module for Calculate Scores.
 
@@ -346,7 +346,7 @@ cdef class CallerFromAlignments:
 
         if isinstance(treat, FWTrackIII):
             self.PE_mode = False
-        elif isinstance(ctrl, PETrackI):
+        elif isinstance(treat, PETrackI):
             self.PE_mode = True
         else:
             raise Exception("Should be FWTrackIII or PETrackI object!")

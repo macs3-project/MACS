@@ -1,4 +1,4 @@
-# Time-stamp: <2013-04-22 13:46:04 Tao Liu>
+# Time-stamp: <2013-05-26 11:11:14 Tao Liu>
 
 """Module Description
 
@@ -277,7 +277,7 @@ class PeakDetect:
         cdef float d
         cdef list ctrl_scale_s, ctrl_d_s
 
-        if self.PE_MODE: d = None
+        if self.PE_MODE: d = 0
         else: d = self.d
         treat_length = self.treat.length()
         treat_total = self.treat.total
