@@ -1,4 +1,4 @@
-# Time-stamp: <2013-05-26 11:13:23 Tao Liu>
+# Time-stamp: <2013-05-28 00:23:51 Tao Liu>
 
 """Module for Calculate Scores.
 
@@ -413,9 +413,11 @@ cdef class CallerFromAlignments:
         else:
             treat_pv = self.treat.pileup_a_chromosome( chrom, [self.d,], [self.treat_scaling_factor,], baseline_value = 0.0,
                                                        directional = True, halfextension = self.halfextension )
+
         if not self.no_lambda_flag:
             if self.PE_mode:
-                ctrl_pv = self.ctrl.pileup_a_chromosome( chrom, self.ctrl_scaling_factor_s, baseline_value = self.lambda_bg )
+                #print self.ctrl_d_s, self.ctrl_scaling_factor_s
+                ctrl_pv = self.ctrl.pileup_a_chromosome_c( chrom, self.ctrl_d_s, self.ctrl_scaling_factor_s, baseline_value = self.lambda_bg )
             else:
                 ctrl_pv = self.ctrl.pileup_a_chromosome( chrom, self.ctrl_d_s, self.ctrl_scaling_factor_s,
                                                          baseline_value = self.lambda_bg,
@@ -534,7 +536,7 @@ cdef class CallerFromAlignments:
         
         t = 0
         for chrom in self.chromosomes:
-            prev_p = 0
+            pre_p = 0
 
             #t0 = ttime()
 
@@ -551,20 +553,30 @@ cdef class CallerFromAlignments:
                 this_v = get_pscore( int(treat_array[i]), ctrl_array[i] )
                 npcal += 1
                 if pvalue_stat.has_key(this_v):
-                    pvalue_stat[ this_v ] += pos_array[ i ] - prev_p 
+                    #if this_v == 1.9496:
+                    #    print chrom, pvalue_stat[this_v], this_v, pos_array[i], pre_p
+                    pvalue_stat[ this_v ] += pos_array[ i ] - pre_p
+                    #if pvalue_stat[ this_v] <= 0:
+                    #    print chrom, this_v, pos_array[i], pre_p
+                    #    raise Exception("stop here")
+                
                     nhcal += 1
                 else:
-                    pvalue_stat[ this_v ] = pos_array[ i ] - prev_p 
+                    pvalue_stat[ this_v ] = pos_array[ i ] - pre_p 
                     nhcal += 1
 
-                #print pos_array[ i ], prev_p, pos_array[ i ] - prev_p
-                prev_p = pos_array[ i ]
+                #print pos_array[ i ], pre_p, pos_array[ i ] - pre_p
+                pre_p = pos_array[ i ]
 
 
         logging.debug ( "make pvalue_stat cost %.5f seconds" % t )
         logging.debug ( "calculate pvalue for %d times" % npcal )
         logging.debug ( "access hash for %d times" % nhcal )
         nhval = 0
+
+        #for v in sorted(pvalue_stat.keys()):
+        #    if pvalue_stat[v]<=0:
+        #        print v, pvalue_stat[v]
 
         N = sum(pvalue_stat.values()) # total length
         k = 1                           # rank
@@ -579,6 +591,7 @@ cdef class CallerFromAlignments:
         for i in range(len(unique_values)):
             v = unique_values[i]
             l = pvalue_stat[v]
+            #print "v",v,"l",l,"k",k,"f",f
             q = v + (log10(k) + f)
             q = max(0,min(pre_q,q))           # make q-score monotonic
             #self.pqtable.set_item(v, q)

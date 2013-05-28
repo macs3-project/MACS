@@ -1,4 +1,4 @@
-# Time-stamp: <2013-05-26 11:11:14 Tao Liu>
+# Time-stamp: <2013-05-28 00:20:44 Tao Liu>
 
 """Module Description
 
@@ -209,6 +209,14 @@ class PeakDetect:
                 tmp_v = float(self.d)/self.lregion
             ctrl_scale_s.append( tmp_v )                            
 
+        if self.PE_MODE:        # first d/scale are useless.
+            ctrl_d_s = ctrl_d_s[1:]
+            ctrl_scale_s = ctrl_scale_s[1:]
+
+        if self.nolambda:
+            ctrl_d_s = []
+            ctrl_scale_s = []
+
         scorecalculator = CallerFromAlignments( self.treat, self.control,
                                                 d = d, ctrl_d_s = ctrl_d_s, 
                                                 treat_scaling_factor = treat_scale, 
@@ -285,20 +293,23 @@ class PeakDetect:
         effective_depth_in_million = treat_total / 1000000.0
 
         # global lambda
-        #if self.PE_MODE:
+        if self.PE_MODE:
         #    # should we support halfext?
         #    if self.opt.halfext: warn('halfextension not supported in PE mode')
         #    # this an estimator, we should maybe test it for accuracy?
-        #    lambda_bg = treat_length / self.gsize
-        #else:
-        lambda_bg = float(d) * treat_total / self.gsize
+            lambda_bg = treat_length / self.gsize
+        else:
+            lambda_bg = float(d) * treat_total / self.gsize
         treat_scale = 1.0
 
         # slocal and d-size local bias are not calculated!
         # nothing done here. should this match w control??
         
-        if self.lregion:
-            ctrl_scale_s = [ float(self.d) / self.lregion, ]
+        if not self.nolambda:
+            if self.PE_MODE:
+                ctrl_scale_s = [ float(treat_length) / (self.lregion*treat_total*2), ]
+            else:
+                ctrl_scale_s = [ float(self.d) / self.lregion, ]
             ctrl_d_s     = [ self.lregion, ]
         else:
             ctrl_scale_s = []

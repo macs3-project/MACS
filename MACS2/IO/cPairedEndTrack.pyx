@@ -1,4 +1,4 @@
-# Time-stamp: <2013-04-09 15:50:38 Tao Liu>
+# Time-stamp: <2013-05-27 21:28:58 Tao Liu>
 
 """Module for filter duplicate tags from paired-end data
 
@@ -22,7 +22,7 @@ from copy import copy
 from cpython cimport bool
 cimport cython
 
-from MACS2.cPileup import quick_pileup, max_over_two_pv_array
+from MACS2.cPileup import quick_pileup, max_over_two_pv_array, se_all_in_one_pileup
 import sys
 
 cdef INT_MAX = <int>((<unsigned int>-1)>>1)
@@ -61,8 +61,8 @@ cdef class PETrackI:
         self.__dup_pointer = {}      # location pairs
         self.__sorted = False
         self.__dup_sorted = False
-        self.total = 0           # total tags
-        self.dup_total = 0           # total tags
+        self.total = 0           # total fragments
+        self.dup_total = 0           # total fragments
         self.annotation = anno   # need to be figured out
         self.rlengths = {}
         
@@ -154,7 +154,7 @@ cdef class PETrackI:
         cdef int32_t i
         cdef str c
         
-        self.total += 0 #??
+        self.total = 0 #??
 
         chrnames = self.get_chr_names()
 
@@ -504,3 +504,42 @@ cdef class PETrackI:
                 prev_pileup = tmp_pileup
 
         return prev_pileup
+
+    cpdef pileup_a_chromosome_c ( self, str chrom, list ds, list scale_factor_s, float baseline_value = 0.0 ):
+        """pileup a certain chromosome, return [p,v] (end position and value) list.
+
+        This function is for control track. Basically, here is a simplified function from FixWidthTrack.
+        
+        ds             : tag will be extended to this value to 3' direction,
+                         unless directional is False. Can contain multiple extension
+                         values. Final pileup will the maximum.
+        scale_factor_s  : linearly scale the pileup value applied to each d in ds. The list should have the same length as ds.
+        baseline_value : a value to be filled for missing values, and will be the minimum pileup.
+        """
+        cdef:
+            list tmp_pileup, prev_pileup
+            float scale_factor
+            long d, five_shift, three_shift
+            long rlength = self.get_rlengths()[chrom]
+
+        if not self.__sorted: self.sort()
+
+        assert len(ds) == len(scale_factor_s), "ds and scale_factor_s must have the same length!"
+
+        prev_pileup = None
+
+        for i in range(len(scale_factor_s)):
+            d = ds[i]
+            scale_factor = scale_factor_s[i]
+            five_shift = d/2
+            three_shift= d/2
+
+            tmp_pileup = se_all_in_one_pileup ( self.__locations[chrom][:,0], self.__locations[chrom][:,1], five_shift, three_shift, rlength, scale_factor, baseline_value )
+
+            if prev_pileup:
+                prev_pileup = max_over_two_pv_array ( prev_pileup, tmp_pileup )
+            else:
+                prev_pileup = tmp_pileup
+
+        return prev_pileup
+
