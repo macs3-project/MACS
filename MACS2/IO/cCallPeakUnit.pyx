@@ -1,4 +1,4 @@
-# Time-stamp: <2013-05-28 00:23:51 Tao Liu>
+# Time-stamp: <2013-05-28 10:03:16 Tao Liu>
 
 """Module for Calculate Scores.
 
@@ -416,7 +416,6 @@ cdef class CallerFromAlignments:
 
         if not self.no_lambda_flag:
             if self.PE_mode:
-                #print self.ctrl_d_s, self.ctrl_scaling_factor_s
                 ctrl_pv = self.ctrl.pileup_a_chromosome_c( chrom, self.ctrl_d_s, self.ctrl_scaling_factor_s, baseline_value = self.lambda_bg )
             else:
                 ctrl_pv = self.ctrl.pileup_a_chromosome( chrom, self.ctrl_d_s, self.ctrl_scaling_factor_s,

@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# Time-stamp: <2013-05-01 17:19:09 Tao Liu>
+# Time-stamp: <2013-05-28 10:56:27 Tao Liu>
 
 """Description: MACS v2 main executable.
 
@@ -253,8 +253,8 @@ def add_diffpeak_parser( subparsers ):
                                     help = "MACS peaks.xls file for condition 1. Optional but must specify peaks2 if present" )
     group_input.add_argument( "--peaks2", dest="peaks2", type = str, default='',
                                     help = "MACS peaks.xls file for condition 2. Optional but must specify peaks1 if present" )
-    group_input.add_argument( "-d", "--depth-multiplier", dest = "depth", type = float, default = 1.0,
-                                    help = "Sequence depth in million reads. Default: 1 (if you use 'macs2 callpeak --SPMR' to generate bdg files, we recommend using the smaller depth as a multiplier)" )
+    group_input.add_argument( "-d", "--depth-multiplier", dest = "depth", type = float, default = [1.0], nargs = "+",
+                                    help = "Sequence depth in million reads. If two depths are different, use '-d X -d Y' for X million reads in condition 1 and Y million reads in condition 2. If they are same, use '-d X' for X million reads in both condition 1 and condition 2 (e.g. the bedGraph files are from 'callpeak --SPMR'). Default: 1 (if you use 'macs2 callpeak --SPMR' to generate bdg files, we recommend using the smaller depth as a multiplier)" )
 #    group_input.add_argument( "-f", "--format", dest = "format", type = str,
 #                              choices = ("AUTO", "BED", "XLS"),
 #                              help = "Format of peak regions file, \"AUTO\", \"BED\" or \"XLS\". The default AUTO option will let MACS decide which format the file is based on the file extension. DEFAULT: \"AUTO\"",

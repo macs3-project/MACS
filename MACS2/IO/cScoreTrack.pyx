@@ -1,4 +1,4 @@
-# Time-stamp: <2013-05-02 00:53:49 Tao Liu>
+# Time-stamp: <2013-05-28 10:43:51 Tao Liu>
 
 """Module for Feature IO classes.
 
@@ -3034,7 +3034,7 @@ cdef class DiffScoreTrackI:
                 c1s = c1[pos_start:(pos_end+1)]
                 t2s = t2[pos_start:(pos_end+1)]
                 c2s = c2[pos_start:(pos_end+1)]
-                fold_changes = t1s / t2s
+                fold_changes = (t1s+self.pseudocount) / (t2s+self.pseudocount)
                 if log2(median(fold_changes)) > 0:
                     log2_fold_change = log2(fold_changes).max()
                 else:
@@ -3086,7 +3086,7 @@ cdef class DiffScoreTrackI:
         """
         cdef:
             list peaks1, peaks2
-            dict peak1, peak2
+            object peak1, peak2
             np.ndarray[np.int32_t] peaks1_selection, peaks2_selection
             np.ndarray[np.int32_t] i_peaks1, i_peaks2
             np.ndarray[np.int32_t] pos, which_peaks1, which_peaks2
@@ -3118,7 +3118,7 @@ cdef class DiffScoreTrackI:
         xlswrite("# summit is defined as greatest summit from greatest sample in region \n")
         xlswrite("# values are reported for the summit, except for \n")
         xlswrite("# fold_enrichment, sample/control qvalues, peaknames, which are copied from the peak info \n")
-        xlswrite("# Depth multiplier used: %f (treat/control values are after multiplication)\n") % self.cond1_depth
+        xlswrite("# Depth multiplier used: %f (treat/control values are after multiplication)\n" % self.cond1_depth)
         xlswrite("# differential values are reported at the taller sample peak\n")
         xlswrite("# log2_fold_change is positive if t1 > t2\n")
         xlswrite("\t".join(("chr", "start", "end", "length", "summit",
@@ -3247,7 +3247,8 @@ cdef class DiffScoreTrackI:
                 if start > end:
                     start = 0
                     pos_start = 0
-                log2_fold_change = log2(t1[peak_pos_i]) - log2(t2[peak_pos_i])
+                #log2_fold_change = log2(t1[peak_pos_i]) - log2(t2[peak_pos_i]) # it will fail if some value is zero.
+                
                 log2_fold_change_w_pc = log2(t1[peak_pos_i] + pseudocount) - \
                                         log2(t2[peak_pos_i] + pseudocount)
                 this_dpvalue = diff_pvalues[peak_pos_i]
@@ -3281,7 +3282,7 @@ cdef class DiffScoreTrackI:
                 #treat2, control2, fold_enrichment2, -log10(p/qvalue2)
                 xlswrite("%s\t%d\t%d\t%d" % (chrom, start+1, end, end - start))
                 xlswrite("\t%d" % pos[peak_pos_i])
-                xlswrite("\t%.5f" % log2_fold_change)
+                #xlswrite("\t%.5f" % log2_fold_change)
                 xlswrite("\t%.5f" % log2_fold_change_w_pc)
                 xlswrite("\t%.5f" % this_dpvalue)
                 xlswrite("\t%.5f" % this_dqvalue)
@@ -3323,10 +3324,10 @@ cdef class DiffScoreTrackI:
         assert self.has_peakio(), "No information on peaks"
         try: peakprefix = name_prefix % name
         except: peakprefix = name_prefix
-        xls1.write("# Depth multiplier used: %f (treat/control values are after multiplication)\n") % self.cond1_depth
+        xls1.write("# Depth multiplier used: %f (treat/control values are after multiplication)\n" % self.cond1_depth)
         xls1.write("# the peak with the closest summit from the other sample is reported if a peak overlaps the summit\n")
         xls1.write("# log2_fold_change is positive if t1 > t2\n")
-        xls2.write("# Depth multiplier used: %f (treat/control values are after multiplication)\n") % self.cond2_depth
+        xls2.write("# Depth multiplier used: %f (treat/control values are after multiplication)\n" % self.cond2_depth)
         xls2.write("# the peak with the closest summit from the other sample is reported if a peak overlaps the summit\n")
         xls2.write("# log2_fold_change is positive if t2 > t1\n")
         xls1.write("\t".join(("chr", "start", "end", "length", "summit",
@@ -3475,15 +3476,15 @@ cdef class DiffScoreTrackI:
                             score_value = this_dpvalue
                         elif self.diff_scoring_method == 'q':
                             score_value = this_dqvalue       
-                        log2_fold_change = log2(t1[i]) - log2(t2[i])
+                        #log2_fold_change = log2(t1[i]) - log2(t2[i])
                         log2_fold_change_w_pc = log2(t1[i] + pseudocount) - \
                                                 log2(t2[i] + pseudocount)
                         this_dlogLR = diff_logLR[i]
                         if flip_fc:
-                            write("\t%.5f" % -log2_fold_change)
+                            #write("\t%.5f" % -log2_fold_change)
                             write("\t%.5f" % -log2_fold_change_w_pc)
                         else:
-                            write("\t%.5f" % log2_fold_change)
+                            #write("\t%.5f" % log2_fold_change)
                             write("\t%.5f" % log2_fold_change_w_pc)
                         write("\t%.5f" % this_dpvalue)
                         write("\t%.5f" % this_dqvalue)
