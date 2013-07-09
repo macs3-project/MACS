@@ -1,4 +1,4 @@
-# Time-stamp: <2013-05-22 00:04:08 Tao Liu>
+# Time-stamp: <2013-07-09 01:21:33 Tao Liu>
 
 """Module for PeakIO IO classes.
 
@@ -58,9 +58,9 @@ cdef class PeakContent:
         float qscore
         str name
 
-    def __init__ ( self, int start, int end, int summit = 0, 
-                   float peak_score=0, float pileup=0, 
-                   float pscore=0, float fold_change=0, float qscore=0,
+    def __init__ ( self, int start, int end, int summit, 
+                   float peak_score, float pileup, 
+                   float pscore, float fold_change, float qscore,
                    str name="NA" ):
         self.start = start
         self.end = end
@@ -116,6 +116,9 @@ cdef class PeakContent:
             self.qscore = v
         elif a == "name":
             self.name = v
+
+    def __str__ (self):
+        return "start:%d;end:%d;score:%f" % ( self.start, self.end, self.score )
 
 cdef class PeakIO:
     """IO for peak information.
@@ -447,7 +450,7 @@ cdef class PeakIO:
         |           |      |qValue is assigned.                     |
         +-----------+------+----------------------------------------+
         |peak       |int   |Point-source called for this peak;      |
-l        |           |      |0-based offset from chromStart. Use -1  |
+        |           |      |0-based offset from chromStart. Use -1  |
         |           |      |if no point-source called.              |
         +-----------+------+----------------------------------------+
         
@@ -712,19 +715,27 @@ cdef class Region:
 
 cdef class BroadPeakContent:
     cdef:
-        long start,
+        long start
         long end
-        long score
+        long length
+        float score
         str thickStart
         str thickEnd
         long blockNum
         str  blockSizes
         str  blockStarts
+        float pileup
+        float pscore
+        float fc
+        float qscore
+        str name
 
-    def __init__ ( self, long start, long end, long score = 0,
-                   str thickStart=".", str thickEnd=".",
-                   long blockNum=0, str blockSizes=".", 
-                   str blockStarts="."):
+    def __init__ ( self, long start, long end, float score,
+                   str thickStart, str thickEnd,
+                   long blockNum, str blockSizes, 
+                   str blockStarts, float pileup, 
+                   float pscore, float fold_change, 
+                   float qscore, str name = "NA" ):
         self.start = start
         self.end = end
         self.score = score
@@ -734,11 +745,20 @@ cdef class BroadPeakContent:
         self.blockSizes = blockSizes
         self.blockStarts = blockStarts
 
+        self.length = end - start
+        self.pileup = pileup
+        self.pscore = pscore
+        self.fc = fold_change
+        self.qscore = qscore
+        self.name = name
+
     def __getitem__ ( self, a ):
         if a == "start":
             return self.start
         elif a == "end":
             return self.end
+        elif a == "length":
+            return self.length
         elif a == "score":
             return self.score
         elif a == "thickStart":
@@ -751,6 +771,20 @@ cdef class BroadPeakContent:
             return self.blockSizes
         elif a == "blockStarts":
             return self.blockStarts
+        elif a == "pileup":
+            return self.pileup
+        elif a == "pscore":
+            return self.pscore
+        elif a == "fc":
+            return self.fc
+        elif a == "qscore":
+            return self.qscore
+        elif a == "name":
+            return self.name
+
+    def __str__ (self):
+        return "start:%d;end:%d;score:%f" % ( self.start, self.end, self.score )
+
 
 cdef class BroadPeakIO:
     """IO for broad peak information.
@@ -765,7 +799,9 @@ cdef class BroadPeakIO:
     def add (self, char * chromosome, long start, long end, long score = 0,
              str thickStart=".", str thickEnd=".",
              long blockNum=0, str blockSizes=".", 
-             str blockStarts="." ):
+             str blockStarts=".", float pileup = 0,
+             float pscore = 0, float fold_change = 0,
+             float qscore = 0, str name = "NA" ):
         """items
         chromosome : chromosome name,
         start      : broad region start,
@@ -776,10 +812,17 @@ cdef class BroadPeakIO:
         blockNum   : number of blocks,                # could be 0
         blockSizes : sizes of blocks,                 # could be '.'
         blockStarts: starts of blocks                 # could be '.'
+        pileup     : median pileup in region          # could be 0
+        pscore     : median pvalue score in region    # could be 0
+        fold_change: median fold change in region     # could be 0
+        qscore     : median pvalue score in region    # could be 0
+        name       : peak name                        # could be 'NA'
         """
         if not self.peaks.has_key(chromosome):
-            self.peaks[chromosome]=[]
-        self.peaks[chromosome].append(BroadPeakContent(start, end, score, thickStart, thickEnd, blockNum, blockSizes, blockStarts))
+            self.peaks[chromosome] = []
+        self.peaks[chromosome].append( BroadPeakContent( start, end, score, thickStart, thickEnd, 
+                                                         blockNum, blockSizes, blockStarts, 
+                                                         pileup, pscore, fold_change, qscore, name ) )
 
     def total (self):
         cdef str chrom
@@ -865,11 +908,118 @@ cdef class BroadPeakIO:
                 if peak["thickStart"] == ".":
                     fhd.write( "%s\t%d\t%d\t%s%d\t%d\t.\n"
                                %
-                               (chrom,peak["start"],peak["end"],peakprefix,n_peak,int(peak["score"] ) ) )
+                               (chrom,peak["start"],peak["end"],peakprefix,n_peak,int(10*peak["qscore"]) ) )
                 else:
                     fhd.write( "%s\t%d\t%d\t%s%d\t%d\t.\t%s\t%s\t0\t%d\t%s\t%s\n"
                                %
-                               (chrom,peak["start"],peak["end"],peakprefix,n_peak,int(peak["score"]),
+                               (chrom,peak["start"],peak["end"],peakprefix,n_peak,int(10*peak["qscore"]),
                                 peak["thickStart"],peak["thickEnd"],
                                 peak["blockNum"],peak["blockSizes"],peak["blockStarts"] ) )
 
+
+    def write_to_broadPeak (self, fhd, name_prefix="peak_", name='peak', description="%s", trackline=True):
+        """Print out peaks in broadPeak format.
+
+        This format is designed for ENCODE project, and basically a
+        BED6+3 format.
+
+        +-----------+------+----------------------------------------+
+        |field      |type  |description                             |
+        +-----------+------+----------------------------------------+
+        |chrom      |string|Name of the chromosome                  |
+        +-----------+------+----------------------------------------+
+        |chromStart |int   |The starting position of the feature in |
+        |           |      |the chromosome. The first base in a     |
+        |           |      |chromosome is numbered 0.               |
+        +-----------+------+----------------------------------------+
+        |chromEnd   |int   |The ending position of the feature in   |
+        |           |      |the chromosome or scaffold. The chromEnd|
+        |           |      |base is not included in the display of  |
+        |           |      |the feature.  For example, the first 100|
+        |           |      |bases of a chromosome are defined as    |
+        |           |      |chromStart=0, chromEnd=100, and span the|
+        |           |      |bases numbered 0-99.                    |
+        +-----------+------+----------------------------------------+
+        |name       |string|Name given to a region (preferably      |
+        |           |      |unique). Use '.' if no name is assigned.|
+        +-----------+------+----------------------------------------+
+        |score      |int   |Indicates how dark the peak will be     |
+        |(-logqvalue|      |displayed in the browser (1-1000). If   |
+        |in MACS2 * |      |'0', the DCC will assign this based on  |
+        |10)        |      |signal value. Ideally average           |
+        |           |      |signalValue per base spread between     |
+        |           |      |100-1000.                               |
+        +-----------+------+----------------------------------------+
+        |strand     |char  |+/- to denote strand or orientation     |
+        |(always .) |      |(whenever applicable). Use '.' if no    |
+        |           |      |orientation is assigned.                |
+        +-----------+------+----------------------------------------+
+        |signalValue|float |Measurement of overall (usually,        |
+        |(fc)       |      |average) enrichment for the region.     |
+        +-----------+------+----------------------------------------+
+        |pValue     |float |Measurement of statistical signficance  |
+        |           |      |(-log10). Use -1 if no pValue is        |
+        |           |      |assigned.                               |
+        +-----------+------+----------------------------------------+
+        |qValue     |float |Measurement of statistical significance |
+        |           |      |using false discovery rate. Use -1 if no|
+        |           |      |qValue is assigned.                     |
+        +-----------+------+----------------------------------------+
+        
+        """
+        cdef int n_peak
+        cdef str chrom
+        cdef long s
+
+        chrs = self.peaks.keys()
+        chrs.sort()
+        n_peak = 0
+        write = fhd.write
+        try: peakprefix = name_prefix % name
+        except: peakprefix = name_prefix
+        if trackline:
+            write("track type=broadPeak name=\"%s\" description=\"%s\" nextItemButton=on\n" % (name, name))
+        for chrom in chrs:
+            for end, group in groupby(self.peaks[chrom], key=itemgetter("end")):
+                n_peak += 1
+                these_peaks = list(group)
+                peak = these_peaks[0]
+                peakname = "%s%d" % (peakprefix, n_peak)
+                fhd.write( "%s\t%d\t%d\t%s\t%d\t.\t%.5f\t%.5f\t%.5f\n" %
+                           (chrom,peak['start'],peak['end'],peakname,int(10*peak["qscore"]),
+                            peak['fc'],peak['pscore'],peak['qscore'] ) )
+        return
+
+
+    def write_to_xls (self, ofhd, name_prefix="%s_peak_", name="MACS"):
+        """Save the peak results in a tab-delimited plain text file
+        with suffix .xls.
+
+
+        wait... why I have two write_to_xls in this class?
+        
+        """
+        write = ofhd.write
+        write("\t".join(("chr","start", "end",  "length",  "pileup", "-log10(pvalue)", "fold_enrichment", "-log10(qvalue)", "name"))+"\n")
+        
+        try: peakprefix = name_prefix % name
+        except: peakprefix = name_prefix
+
+        peaks = self.peaks
+        chrs = peaks.keys()
+        chrs.sort()
+        n_peak = 0
+        for chrom in chrs:
+            for end, group in groupby(peaks[chrom], key=itemgetter("end")):
+                n_peak += 1
+                these_peaks = list(group)
+                peak = these_peaks[0]
+                peakname = "%s%d" % (peakprefix, n_peak)
+                write("%s\t%d\t%d\t%d" % (chrom,peak['start']+1,peak['end'],peak['length']))
+                write("\t%.2f" % (round(peak['pileup'],2))) # pileup height at summit
+                write("\t%.5f" % (peak['pscore'])) # -log10pvalue at summit
+                write("\t%.5f" % (peak['fc'])) # fold change at summit
+                write("\t%.5f" % (peak['qscore'])) # -log10qvalue at summit                    
+                write("\t%s" % peakname)
+                write("\n")
+        return

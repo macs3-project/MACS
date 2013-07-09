@@ -1,4 +1,4 @@
-# Time-stamp: <2013-04-15 18:05:14 Tao Liu>
+# Time-stamp: <2013-07-09 01:35:05 Tao Liu>
 
 """Description: MACS 2 main executable
 
@@ -291,30 +291,33 @@ def run( args ):
         score_column = "pscore"
     elif options.log_qvalue:
         score_column = "qscore"
-    info("#4 Write peak bed file... %s" % (options.peakbed))
-    ofhd_bed = open(options.peakbed,"w")
-    peakdetect.peaks.write_to_bed (ofhd_bed, name_prefix="%s_peak_", name = options.name, description="Peaks for %s (Made with MACS v2, " + strftime("%x") + ")", score_column=score_column, trackline=options.trackline)
-    ofhd_bed.close()
     #4.2 peaks in narrowPeak
-    info("#4 Write peak in narrowPeak format file... %s" % (options.peakNarrowPeak))
-    ofhd_bed = open(options.peakNarrowPeak,"w")
-    peakdetect.peaks.write_to_narrowPeak (ofhd_bed, name_prefix="%s_peak_", name=options.name, score_column=score_column, trackline=options.trackline )
-    ofhd_bed.close()
-    #4.2 broad peaks in bed12
-    if options.broad:
-        info("#4 Write broad peak in bed12 format file... %s" % (options.peakBroadPeak))
-        ofhd_bed = open(options.peakBroadPeak,"w")
-        peakdetect.broadpeaks.write_to_gappedPeak (ofhd_bed, name_prefix="%s_peak_", name=options.name, description=options.name, trackline=options.trackline)
+    if not options.broad:
+        #info("#4 Write peak bed file... %s" % (options.peakbed))
+        #ofhd_bed = open(options.peakbed,"w")
+        #peakdetect.peaks.write_to_bed (ofhd_bed, name_prefix="%s_peak_", name = options.name, description="Peaks for %s (Made with MACS v2, " + strftime("%x") + ")", score_column=score_column, trackline=options.trackline)
+        #ofhd_bed.close()
+        info("#4 Write peak in narrowPeak format file... %s" % (options.peakNarrowPeak))
+        ofhd_bed = open(options.peakNarrowPeak,"w")
+        peakdetect.peaks.write_to_narrowPeak (ofhd_bed, name_prefix="%s_peak_", name=options.name, score_column=score_column, trackline=options.trackline )
         ofhd_bed.close()
-    #4.2-2 summits in BED
-    info("#4 Write summits bed file... %s" % (options.summitbed))
-    ofhd_summits = open(options.summitbed,"w")
-    peakdetect.peaks.write_to_summit_bed (ofhd_summits, name_prefix="%s_peak_", name=options.name,
-                                          description="Summits for %s (Made with MACS v2, " + strftime("%x") + ")",
-                                          score_column=score_column, trackline=options.trackline )
-    ofhd_summits.close()
-
-
+        #4.2-2 summits in BED
+        info("#4 Write summits bed file... %s" % (options.summitbed))
+        ofhd_summits = open(options.summitbed,"w")
+        peakdetect.peaks.write_to_summit_bed (ofhd_summits, name_prefix="%s_peak_", name=options.name,
+                                              description="Summits for %s (Made with MACS v2, " + strftime("%x") + ")",
+                                              score_column=score_column, trackline=options.trackline )
+        ofhd_summits.close()
+    #4.2 broad peaks in bed12 or gappedPeak
+    else:
+        info("#4 Write broad peak in broadPeak format file... %s" % (options.peakBroadPeak))
+        ofhd_bed = open(options.peakBroadPeak,"w")
+        peakdetect.peaks.write_to_broadPeak (ofhd_bed, name_prefix="%s_peak_", name=options.name, description=options.name, trackline=options.trackline)
+        ofhd_bed.close()
+        info("#4 Write broad peak in bed12/gappedPeak format file... %s" % (options.peakGappedPeak))
+        ofhd_bed = open(options.peakGappedPeak,"w")
+        peakdetect.peaks.write_to_gappedPeak (ofhd_bed, name_prefix="%s_peak_", name=options.name, description=options.name, trackline=options.trackline)
+        ofhd_bed.close()
 
     info("Done!")
     

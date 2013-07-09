@@ -1,4 +1,4 @@
-# Time-stamp: <2013-05-22 13:16:55 Tao Liu>
+# Time-stamp: <2013-07-07 23:22:41 Tao Liu>
 
 """Module Description
 
@@ -132,7 +132,8 @@ def opt_validate ( options ):
     options.peakxls = options.name+"_peaks.xls"
     options.peakbed = options.name+"_peaks.bed"
     options.peakNarrowPeak = options.name+"_peaks.narrowPeak"
-    options.peakBroadPeak = options.name+"_broad_peaks.bed"
+    options.peakBroadPeak = options.name+"_peaks.broadPeak"
+    options.peakGappedPeak = options.name+"_peaks.gappedPeak"
     options.summitbed = options.name+"_summits.bed"
     options.zwig_tr = options.name+"_treat"
     options.zwig_ctl= options.name+"_control"

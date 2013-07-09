@@ -1,4 +1,4 @@
-# Time-stamp: <2013-05-28 00:20:44 Tao Liu>
+# Time-stamp: <2013-07-09 01:03:54 Tao Liu>
 
 """Module Description
 
@@ -105,15 +105,15 @@ class PeakDetect:
         self.final_peaks and self.final_negative_peaks.
         """
         if self.control:                # w/ control
-            if self.opt.broad:
-                (self.peaks,self.broadpeaks) = self.__call_peaks_w_control()
-            else:
-                self.peaks = self.__call_peaks_w_control ()
+            #if self.opt.broad:
+            #    (self.peaks,self.broadpeaks) = self.__call_peaks_w_control()
+            #else:
+            self.peaks = self.__call_peaks_w_control ()
         else:                           # w/o control
-            if self.opt.broad:
-                (self.peaks,self.broadpeaks) = self.__call_peaks_wo_control()
-            else:
-                self.peaks = self.__call_peaks_wo_control ()
+            #if self.opt.broad:
+            #    (self.peaks,self.broadpeaks) = self.__call_peaks_wo_control()
+            #else:
+            self.peaks = self.__call_peaks_wo_control ()
         return self.peaks
 
     def __call_peaks_w_control (self):

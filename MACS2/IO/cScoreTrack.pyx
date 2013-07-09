@@ -1,4 +1,4 @@
-# Time-stamp: <2013-05-28 10:43:51 Tao Liu>
+# Time-stamp: <2013-07-08 14:40:08 Tao Liu>
 
 """Module for Feature IO classes.
 
@@ -1336,6 +1336,7 @@ cdef class scoreTrackII:
             blockSizes = blockSizes+",1"
             blockStarts = blockStarts+","+str(end-start-1)
         
+        # add to BroadPeakIO object
         bpeaks.add(chrom, start, end, score=lvl2peak["score"], thickStart=thickStart, thickEnd=thickEnd,
                    blockNum = blockNum, blockSizes = blockSizes, blockStarts = blockStarts)
         return bpeaks
