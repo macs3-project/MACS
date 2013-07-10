@@ -1,4 +1,4 @@
-# Time-stamp: <2012-06-06 14:55:12 Tao Liu>
+# Time-stamp: <2013-07-10 14:28:07 Tao Liu>
 
 import sys
 import logging
@@ -57,31 +57,26 @@ def run( options ):
     
     #def make_scoreTrackII_for_macs (self, bdgTrack2, float depth1 = 1.0, float depth2 = 1.0 ):
     
-    method = options.method
-
-    info("Calculate scores comparing treatment and control by %s..." % method)
-    # build score track
-    if method == 'ppois':
-        sbtrack.change_score_method( ord('p') )
-    elif method == 'qpois':
-        sbtrack.change_score_method( ord('q') )        
-    elif method == 'subtract':
-        sbtrack.change_score_method( ord('d') )        
-    elif method == 'logFE':
-        sbtrack.change_score_method( ord('f') )
-    elif method == 'FE':
-        sbtrack.change_score_method( ord('F') )        
-    elif method == 'logLR':             # log likelihood
-        sbtrack.change_score_method( ord('l') )
-    else:
-        raise Exception("Can't reach here!")
-
-    info("Write bedGraph of scores...")
-    ofhd = io.open(options.ofile,"wb")
-
-    #r = sbtrack.get_data_by_chr("chr22")
-
-    #print r
-
-    sbtrack.write_bedGraph(ofhd,name="%s_Scores" % (method.upper()),description="Scores calculated by %s" % (method.upper()), column = 3)
-    info("Finished! Please check %s!" % (options.ofile))
+    for method in set(options.method):
+        info("Calculate scores comparing treatment and control by '%s'..." % method)
+        ofile = options.ofile + "_" + method + ".bdg"
+        # build score track
+        if method == 'ppois':
+            sbtrack.change_score_method( ord('p') )
+        elif method == 'qpois':
+            sbtrack.change_score_method( ord('q') )        
+        elif method == 'subtract':
+            sbtrack.change_score_method( ord('d') )        
+        elif method == 'logFE':
+            sbtrack.change_score_method( ord('f') )
+        elif method == 'FE':
+            sbtrack.change_score_method( ord('F') )        
+        elif method == 'logLR':             # log likelihood
+            sbtrack.change_score_method( ord('l') )
+        else:
+            raise Exception("Can't reach here!")
+        
+        info("Write bedGraph of scores...")
+        ofhd = io.open(ofile,"wb")
+        sbtrack.write_bedGraph(ofhd,name="%s_Scores" % (method.upper()),description="Scores calculated by %s" % (method.upper()), column = 3)
+        info("Finished '%s'! Please check '%s'!" % (method, ofile))
