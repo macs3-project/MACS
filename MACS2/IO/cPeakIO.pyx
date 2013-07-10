@@ -1,4 +1,4 @@
-# Time-stamp: <2013-07-09 01:21:33 Tao Liu>
+# Time-stamp: <2013-07-10 12:31:20 Tao Liu>
 
 """Module for PeakIO IO classes.
 
@@ -837,9 +837,98 @@ cdef class BroadPeakIO:
         return x
   
     def write_to_gappedPeak (self, fhd, name_prefix="peak_", name='peak', description="%s", trackline=True):
-        """Print out peaks in bed12 format.
+        """Print out peaks in gappedBed format.
 
-        This format is basically a BED12 format.
+        This format is basically a BED12+3 format.
+
+        +--------------+------+----------------------------------------+
+        |field         |type  |description                             |
+        +--------------+------+----------------------------------------+
+        |chrom         |string|Name of the chromosome                  |
+        +--------------+------+----------------------------------------+
+        |chromStart    |int   |The starting position of the feature in |
+        |              |      |the chromosome. The first base in a     |
+        |              |      |chromosome is numbered 0.               |
+        +--------------+------+----------------------------------------+
+        |chromEnd      |int   |The ending position of the feature in   |
+        |              |      |the chromosome or scaffold. The chromEnd|
+        |              |      |base is not included in the display of  |
+        |              |      |the feature.  For example, the first 100|
+        |              |      |bases of a chromosome are defined as    |
+        |              |      |chromStart=0, chromEnd=100, and span the|
+        |              |      |bases numbered 0-99.                    |
+        +--------------+------+----------------------------------------+
+        |name          |string|Name given to a region (preferably      |
+        |              |      |unique). Use '.' if no name is assigned.|
+        +--------------+------+----------------------------------------+
+        |score         |int   |Indicates how dark the peak will be     |
+        |(always use   |      |displayed in the browser (1-1000). If   |
+        |1000 for      |      |'0', the DCC will assign this based on  |
+        |the           |      |signal value. Ideally average           |
+        |thickest      |      |signalValue per base spread between     |
+        |color)        |      |100-1000.                               |
+        +--------------+------+----------------------------------------+
+        |strand        |char  |+/- to denote strand or orientation     |
+        |(always .)    |      |(whenever applicable). Use '.' if no    |
+        |              |      |orientation is assigned.                |
+        +--------------+------+----------------------------------------+
+        |thickStart    |int   | The starting position at which the     |
+        |              |      |feature is drawn thickly. Mark the start|
+        |              |      |of highly enriched regions.             |
+        |              |      |                                        |
+        +--------------+------+----------------------------------------+
+        |thickEnd      |int   | The ending position at which the       |
+        |              |      |feature is drawn thickly. Mark the end  |
+        |              |      |of highly enriched regions.             |
+        +--------------+------+----------------------------------------+
+        |itemRGB       |string| Not used. Set it as 0.                 |
+        +--------------+------+----------------------------------------+
+        |blockCounts   |int   | The number of blocks (exons) in the BED|
+        |              |      |line.                                   |
+        +--------------+------+----------------------------------------+
+        |blockSizes    |string| A comma-separated list of the block    |
+        |              |      |sizes.                                  |
+        +--------------+------+----------------------------------------+
+        |blockStarts   |string| A comma-separated list of block starts.|
+        +--------------+------+----------------------------------------+
+        |signalValue   |float |Measurement of overall (usually,        |
+        |(fc)          |      |average) enrichment for the region.     |
+        +--------------+------+----------------------------------------+
+        |pValue        |float |Measurement of statistical signficance  |
+        |              |      |(-log10). Use -1 if no pValue is        |
+        |              |      |assigned.                               |
+        +--------------+------+----------------------------------------+
+        |qValue        |float |Measurement of statistical significance |
+        |              |      |using false discovery rate. Use -1 if no|
+        |              |      |qValue is assigned.                     |
+        +--------------+------+----------------------------------------+
+       
+        """
+        chrs = self.peaks.keys()
+        chrs.sort()
+        n_peak = 0
+        try: peakprefix = name_prefix % name
+        except: peakprefix = name_prefix
+        try: desc = description % name
+        except: desc = description
+        if trackline:
+            fhd.write("track name=\"%s\" description=\"%s\" type=gappedPeak nextItemButton=on\n" % (name, desc) )
+        for chrom in chrs:
+            for peak in self.peaks[chrom]:
+                n_peak += 1
+                if peak["thickStart"] == ".":
+                    fhd.write( "%s\t%d\t%d\t%s%d\t%d\t.\n"
+                               %
+                               (chrom,peak["start"],peak["end"],peakprefix,n_peak,int(10*peak["qscore"]) ) )
+                else:
+                    fhd.write( "%s\t%d\t%d\t%s%d\t%d\t.\t%s\t%s\t0\t%d\t%s\t%s\t%.5f\t%.5f\t%.5f\n"
+                               %
+                               (chrom,peak["start"],peak["end"],peakprefix,n_peak,int(10*peak["qscore"]),
+                                peak["thickStart"],peak["thickEnd"],
+                                peak["blockNum"],peak["blockSizes"],peak["blockStarts"] ) )
+
+    def write_to_Bed12 (self, fhd, name_prefix="peak_", name='peak', description="%s", trackline=True):
+        """Print out peaks in Bed12 format.
 
         +--------------+------+----------------------------------------+
         |field         |type  |description                             |
@@ -912,9 +1001,10 @@ cdef class BroadPeakIO:
                 else:
                     fhd.write( "%s\t%d\t%d\t%s%d\t%d\t.\t%s\t%s\t0\t%d\t%s\t%s\n"
                                %
-                               (chrom,peak["start"],peak["end"],peakprefix,n_peak,int(10*peak["qscore"]),
-                                peak["thickStart"],peak["thickEnd"],
-                                peak["blockNum"],peak["blockSizes"],peak["blockStarts"] ) )
+                               (chrom, peak["start"], peak["end"], peakprefix, n_peak, int(10*peak["qscore"]),
+                                peak["thickStart"], peak["thickEnd"],
+                                peak["blockNum"], peak["blockSizes"], peak["blockStarts"],
+                                peak['fc'], peak['pscore'], peak['qscore'] ) )
 
 
     def write_to_broadPeak (self, fhd, name_prefix="peak_", name='peak', description="%s", trackline=True):
