@@ -1,3 +1,20 @@
+2013-07-10  Tao Liu  <vladimir.liu@gmail.com>
+	MACS version 2.0.10 20130710 (tag:alpha)
+
+	* fix BED style output format of callpeak module:
+
+	1) without --broad: narrowPeak (BED6+4) and BED for summit will be
+	the output. Old BED format file won't be saved.
+
+	2) with --broad: broadPeak (BED6+3) for broad region and
+	gappedPeak (BED12+3) for chained enriched regions will be the
+	output. Old BED format, narrowPeak format, summit file won't be
+	saved.
+
+	* bdgcmp now can accept list of methods to calculate scores. So
+	you can run it once to generate multiple types of scores. Thank
+	Jon Urban for this suggestion!
+
 2013-05-21  Tao Liu  <vladimir.liu@gmail.com>
 	MACS version 2.0.10 20130520 (tag:alpha)
 
