@@ -1,4 +1,4 @@
-# Time-stamp: <2013-07-10 12:31:20 Tao Liu>
+# Time-stamp: <2013-07-12 16:18:18 Tao Liu>
 
 """Module for PeakIO IO classes.
 
@@ -837,7 +837,7 @@ cdef class BroadPeakIO:
         return x
   
     def write_to_gappedPeak (self, fhd, name_prefix="peak_", name='peak', description="%s", trackline=True):
-        """Print out peaks in gappedBed format.
+        """Print out peaks in gappedBed format. Only those with stronger enrichment regions are saved.
 
         This format is basically a BED12+3 format.
 
@@ -916,16 +916,12 @@ cdef class BroadPeakIO:
         for chrom in chrs:
             for peak in self.peaks[chrom]:
                 n_peak += 1
-                if peak["thickStart"] == ".":
-                    fhd.write( "%s\t%d\t%d\t%s%d\t%d\t.\n"
-                               %
-                               (chrom,peak["start"],peak["end"],peakprefix,n_peak,int(10*peak["qscore"]) ) )
-                else:
+                if peak["thickStart"] != ".":
                     fhd.write( "%s\t%d\t%d\t%s%d\t%d\t.\t%s\t%s\t0\t%d\t%s\t%s\t%.5f\t%.5f\t%.5f\n"
                                %
                                (chrom,peak["start"],peak["end"],peakprefix,n_peak,int(10*peak["qscore"]),
                                 peak["thickStart"],peak["thickEnd"],
-                                peak["blockNum"],peak["blockSizes"],peak["blockStarts"] ) )
+                                peak["blockNum"],peak["blockSizes"],peak["blockStarts"], peak['fc'], peak['pscore'], peak['qscore'] ) )
 
     def write_to_Bed12 (self, fhd, name_prefix="peak_", name='peak', description="%s", trackline=True):
         """Print out peaks in Bed12 format.
@@ -1003,8 +999,7 @@ cdef class BroadPeakIO:
                                %
                                (chrom, peak["start"], peak["end"], peakprefix, n_peak, int(10*peak["qscore"]),
                                 peak["thickStart"], peak["thickEnd"],
-                                peak["blockNum"], peak["blockSizes"], peak["blockStarts"],
-                                peak['fc'], peak['pscore'], peak['qscore'] ) )
+                                peak["blockNum"], peak["blockSizes"], peak["blockStarts"] ))
 
 
     def write_to_broadPeak (self, fhd, name_prefix="peak_", name='peak', description="%s", trackline=True):

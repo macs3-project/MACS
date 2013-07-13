@@ -33,29 +33,24 @@ info    = logging.info
 # ------------------------------------
 
 def run( options ):
+    scaling_factor = options.sfactor
+    pseudo_depth = 1.0/scaling_factor   # not an actual depth, but its reciprocal, a trick to override SPMR while necessary.
+
     info("Read and build treatment bedGraph...")
     tbio = cBedGraphIO.bedGraphIO(options.tfile)
     tbtrack = tbio.build_bdgtrack()
-
-    treat_depth = options.tdepth
 
     info("Read and build control bedGraph...")
     cbio = cBedGraphIO.bedGraphIO(options.cfile)
     cbtrack = cbio.build_bdgtrack()
 
-    ctrl_depth = options.cdepth
-
     info("Build scoreTrackII...")
-    sbtrack = tbtrack.make_scoreTrackII_for_macs( cbtrack, depth1 = treat_depth, depth2 = ctrl_depth )
-    # normalize by depth
-    if abs(treat_depth-1) > 1e-6 or abs(ctrl_depth-1) > 1e-6:
-        # if depth of treat and control is 1.0 ( files are generated
-        # by MACS2 --SPMR ), no need for the following step.
-        info("Normalize by sequencing depth of million reads...")
-        sbtrack.change_normalization_method( ord('M') )
+    sbtrack = tbtrack.make_scoreTrackII_for_macs( cbtrack, depth1 = pseudo_depth, depth2 = pseudo_depth )
+    if abs(scaling_factor-1) > 1e-6:
+        # Only for the case while your input is SPMR from MACS2 callpeak; Let's override SPMR.
+        info("Values in your input bedGraph files will be multiplied by %f ..." % scaling_factor)
+        sbtrack.change_normalization_method( ord('M') ) # a hack to override SPMR
     sbtrack.set_pseudocount( options.pseudocount )
-    
-    #def make_scoreTrackII_for_macs (self, bdgTrack2, float depth1 = 1.0, float depth2 = 1.0 ):
     
     for method in set(options.method):
         info("Calculate scores comparing treatment and control by '%s'..." % method)
