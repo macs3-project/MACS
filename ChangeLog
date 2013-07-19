@@ -1,3 +1,20 @@
+2013-07-13  Tao Liu  <vladimir.liu@gmail.com>
+	MACS version 2.0.10 20130713 (tag:alpha)
+
+	* fix bugs while output broadPeak and gappedPeak.
+
+	Note. Those weak broad regions without any strong enrichment
+	regions inside won't be saved in gappedPeak file.
+
+	* bdgcmp -T and -C are merged into -S and description is updated.
+
+	Now, you can use it to override SPMR values in your input for
+	bdgcmp. To use SPMR (from 'callpeak --SPMR -B') while calculating
+	statistics will cause weird results ( in most cases, lower
+	significancy), and won't be consistent with MACS2 callpeak
+	behavior. So if you have SPMR bedGraphs, input the smaller/larger
+	sample size in MILLION according to 'callpeak --to-large' option.
+
 2013-07-10  Tao Liu  <vladimir.liu@gmail.com>
 	MACS version 2.0.10 20130710 (tag:alpha)
 

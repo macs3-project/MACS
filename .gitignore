@@ -27,3 +27,5 @@ MACS2/IO/numpy.pxd
 MACS2/mnumpy.pxd
 
 MACS2/numpy.pxd
+
+test/NOSPMR.ppois.bdg_ppois.bdg
