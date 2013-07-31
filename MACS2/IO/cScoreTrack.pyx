@@ -1,4 +1,4 @@
-# Time-stamp: <2013-07-31 15:03:59 Tao Liu>
+# Time-stamp: <2013-07-31 17:18:20 Tao Liu>
 
 """Module for Feature IO classes.
 
@@ -1715,7 +1715,7 @@ cdef class TwoConditionScores:
             # for cat3
             self.__add_a_peak ( cat3_peaks, chrom, cat3, cat3_startpos, cat3_endpos, abs(t1_vs_t2), max_gap, min_length )
 
-            return cat1_peaks, cat2_peaks, cat3_peaks
+        return cat1_peaks, cat2_peaks, cat3_peaks
     
     cdef object __add_a_peak ( self, object peaks, str chrom, np.ndarray indices, np.ndarray startpos, np.ndarray endpos,
                                np.ndarray score, int max_gap, int min_length ):
