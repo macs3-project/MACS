@@ -1,8 +1,8 @@
-# Time-stamp: <2013-07-08 14:40:08 Tao Liu>
+# Time-stamp: <2013-07-30 18:12:00 Tao Liu>
 
 """Module for Feature IO classes.
 
-Copyright (c) 2010,2011 Tao Liu <taoliu@jimmy.harvard.edu>
+Copyright (c) 2010,2011,2012,2013 Tao Liu <vladimir.liu@gmail.com>
 
 This code is free software; you can redistribute it and/or modify it
 under the terms of the Artistic License (see the file COPYING included
@@ -50,8 +50,8 @@ import logging
 # constants
 # ------------------------------------
 __version__ = "scoreTrackI $Revision$"
-__author__ = "Tao Liu <taoliu@jimmy.harvard.edu>"
-__doc__ = "scoreTrackI classes"
+__author__ = "Tao Liu <vladimir.liu@gmail.com>"
+__doc__ = "scoreTrack classes"
 
 # ------------------------------------
 # Misc functions
@@ -105,11 +105,13 @@ cdef double get_interpolated_pscore ( double observed, double expectation ):
              floor_pscore
     return pscore
     
-cdef inline double oldlogLR ( double x, double y ):
+cdef inline double logLR_asym ( double x, double y ):
     """Calculate log10 Likelihood between H1 ( enriched ) and H0 (
     chromatin bias ). Then store the values in integer form =
     100*logLR. Set minus sign for depletion.
     
+    *asymmetric version* 
+
     """
     cdef:
         double s
@@ -128,10 +130,12 @@ cdef inline double oldlogLR ( double x, double y ):
         logLR_khashtable.set_item(key_value, s)
         return s
 
-cdef inline double logLR_adjusted (int x, int y):
+cdef inline double logLR_4diff (double x, double y):
     """Calculate log10 Likelihood between H1 ( enriched ) and H0 (
     chromatin bias ). Then store the values in integer form =
-    100*logLR. Set minus sign for depletion.
+    100*logLR. 
+
+    * Always positive, used for evaluating difference only.*
     
     """
     cdef:
@@ -149,11 +153,13 @@ cdef inline double logLR_adjusted (int x, int y):
         logLR_khashtable.set_item(key_value, s)
         return s
     
-cdef inline double logLR ( double x, double y ):
+cdef inline double logLR_sym ( double x, double y ):
     """Calculate log10 Likelihood between H1 ( enriched ) and H0 (
     chromatin bias ). Then store the values in integer form =
     100*logLR. Set minus sign for depletion.
     
+    * symmetric version *
+
     """
     cdef:
         double s
@@ -163,12 +169,15 @@ cdef inline double logLR ( double x, double y ):
     try:
         return logLR_khashtable.get_item( key_value )
     except KeyError:
-        if y > x: y, x = x, y
-        if x==y: s = 0
-        
-        else: s = (x*(log(x)-log(y))+y-x)*LOG10_E
+        if x > y:
+            s = (x*(log(x)-log(y))+y-x)*LOG10_E
+        elif y > x:
+            s = (y*(log(x)-log(y))+y-x)*LOG10_E
+        else:
+            s = 0
         logLR_khashtable.set_item(key_value, s)
         return s
+
     
 cdef inline double get_logFE ( float x, float y ):
     """ return 100* log10 fold enrichment with +1 pseudocount.
@@ -854,7 +863,7 @@ cdef class scoreTrackII:
             for i in range(l):
                 v1 = p() 
                 v2 = c()
-                v[ i ] =  logLR( v1 + pseudocount, v2 + pseudocount )  #logLR( d[ i, 1]/100.0, d[ i, 2]/100.0 )
+                v[ i ] =  logLR_asym( v1 + pseudocount, v2 + pseudocount )  #logLR( d[ i, 1]/100.0, d[ i, 2]/100.0 )
         self.scoring_method = 'l'
         return 
 
@@ -1465,17 +1474,19 @@ cdef class TwoConditionScores:
                                  np.zeros( chrom_max_len, dtype="float32" ), # LLR t1 vs c1
                                  np.zeros( chrom_max_len, dtype="float32" ), # LLR t2 vs c2
                                  np.zeros( chrom_max_len, dtype="float32" )] # LLR t1 vs t2
-                                 #np.zeros( chrom_max_len, dtype="float32" )] # LLR t2 vs t1
             self.datalength[chrom] = 0
 
     cdef add (self, str chromosome, int endpos, float t1, float c1, float t2, float c2):
-        """Add a chr-endpos-sample-control block into data
-        dictionary.
+        """Take chr-endpos-sample1-control1-sample2-control2 and
+        compute logLR for t1 vs c1, t2 vs c2, and t1 vs t2, then save
+        values.
 
         chromosome: chromosome name in string
         endpos    : end position of each interval in integer
-        chip      : ChIP pileup value of each interval in float
-        control   : Control pileup value of each interval in float
+        t1        : Sample 1 ChIP pileup value of each interval in float
+        c1        : Sample 1 Control pileup value of each interval in float
+        t2        : Sample 2 ChIP pileup value of each interval in float
+        c2        : Sample 2 Control pileup value of each interval in float
 
         *Warning* Need to add regions continuously.
         """
@@ -1483,10 +1494,9 @@ cdef class TwoConditionScores:
         i = self.datalength[chromosome]
         c = self.data[chromosome]
         c[0][ i ] = endpos
-        c[1][ i ] = logLR( (t1+self.pseudocount)*self.cond1_depth, (c1+self.pseudocount)*self.cond1_depth )
-        c[2][ i ] = logLR( (t2+self.pseudocount)*self.cond2_depth, (c2+self.pseudocount)*self.cond2_depth )
-        c[3][ i ] = logLR( (t1+self.pseudocount)*self.cond1_depth, (t2+self.pseudocount)*self.cond2_depth )
-        #c[4][ i ] = logLR( t2+self.pseudocount, t1+self.pseudocount )
+        c[1][ i ] = logLR_asym( (t1+self.pseudocount)*self.cond1_depth, (c1+self.pseudocount)*self.cond1_depth )
+        c[2][ i ] = logLR_asym( (t2+self.pseudocount)*self.cond2_depth, (c2+self.pseudocount)*self.cond2_depth )
+        c[3][ i ] = logLR_sym( (t1+self.pseudocount)*self.cond1_depth, (t2+self.pseudocount)*self.cond2_depth )
         self.datalength[chromosome] += 1
 
     cpdef finalize ( self ):
@@ -1507,201 +1517,237 @@ cdef class TwoConditionScores:
             d[3].resize( l, refcheck = False )            
         return
     
-        
-    cpdef compute_all_pvalues( self ):
-        """Compute -log_{10}(pvalue)
-        """
-        cdef:
-            np.ndarray[np.float32_t] v1, v2, v3
-            np.ndarray[np.int32_t] pos
-            long l, i, prev_pos
-            str chrom
-        rv = chi2(1) # a chi-squared distribution with one degree of freedom
-        sf = rv.sf
-        log10 = np.log10
-        for chrom in self.data.keys():
-            prev_pos = 0
-            pos = self.data[chrom][0]
-            l = self.datalength[chrom]
-            self.data[chrom][1] = -log10(sf(2 * self.data[chrom][1] / LOG10_E)).astype('float32')
-            self.data[chrom][2] = -log10(sf(2 * self.data[chrom][2] / LOG10_E)).astype('float32')
-            self.data[chrom][3] = -log10(sf(2 * np.abs(self.data[chrom][3]) / LOG10_E)).astype('float32')
-            v1 = self.data[chrom][1]
-            v2 = self.data[chrom][2]
-            v3 = self.data[chrom][3]
-            for i in range(l):
-                try:
-                    self.pvalue_stat1[v1[ i ]] += pos[ i ] - prev_pos
-                except:
-                    self.pvalue_stat1[v1[ i ]] = pos[ i ] - prev_pos
-                try:
-                    self.pvalue_stat2[v2[ i ]] += pos[ i ] - prev_pos
-                except:
-                    self.pvalue_stat2[v2[ i ]] = pos[ i ] - prev_pos
-                prev_pos = pos[ i ]
-            
-    cpdef compute_track_qvalues ( self ):
-        """Compute -log_{10}(qvalue)
-        """
-        cdef:
-            dict pqtable
-            tuple pqtables
-            long i,l,j
-            double k
-            str chrom
-            np.ndarray p, c, v
-            
-        # make pqtables
-        # not sure if we should pool all the p-values or treat each comparison
-        # separately, but doing the latter for now
-        pqtables = self.make_pq_tables()
-        
-        # convert p to q
+    # cpdef compute_pvalue_stat( self ):
+    #     """Compute -log_{10}(pvalue)
 
-        # convert pvalue2qvalue to a simple dict based on khash
-        # khash has big advantage while checking keys for millions of times.
-        for table_index in range(2):
-            pqtable = pqtables[table_index]
-            s_p2q = Float64HashTable()
-            for k in pqtable.keys():
-                s_p2q.set_item(k,pqtable[k])
+    #     after this, logLR will be replaced with pvalue.
+    #     """
+    #     cdef:
+    #         np.ndarray[np.float32_t] v1, v2, v3
+    #         np.ndarray[np.int32_t] pos
+    #         long l, i, prev_pos
+    #         str chrom
+    #     rv = chi2(1) # a chi-squared distribution with one degree of freedom
+    #     sf = rv.sf
+    #     log10 = np.log10
+    #     for chrom in self.data.keys():
+    #         prev_pos = 0
+    #         pos = self.data[chrom][0]
+    #         l = self.datalength[chrom]
+    #         self.data[chrom][1] = -log10(sf(2 * self.data[chrom][1] / LOG10_E)).astype('float32') # convert logLR to p-value
+    #         self.data[chrom][2] = -log10(sf(2 * self.data[chrom][2] / LOG10_E)).astype('float32') # as above
+    #         self.data[chrom][3] = -log10(sf(2 * np.abs(self.data[chrom][3]) / LOG10_E)).astype('float32') # as above
+    #         v1 = self.data[chrom][1]
+    #         v2 = self.data[chrom][2]
+    #         v3 = self.data[chrom][3]
+    #         for i in range(l):
+    #             try:
+    #                 self.pvalue_stat1[v1[ i ]] += pos[ i ] - prev_pos
+    #             except:
+    #                 self.pvalue_stat1[v1[ i ]] = pos[ i ] - prev_pos
+    #             try:
+    #                 self.pvalue_stat2[v2[ i ]] += pos[ i ] - prev_pos
+    #             except:
+    #                 self.pvalue_stat2[v2[ i ]] = pos[ i ] - prev_pos
+    #             prev_pos = pos[ i ]
+
+        
+    # cpdef compute_all_pvalues_obsolete( self ):
+    #     """Compute -log_{10}(pvalue)
+
+    #     after this, logLR will be replaced with pvalue.
+    #     """
+    #     cdef:
+    #         np.ndarray[np.float32_t] v1, v2, v3
+    #         np.ndarray[np.int32_t] pos
+    #         long l, i, prev_pos
+    #         str chrom
+    #     rv = chi2(1) # a chi-squared distribution with one degree of freedom
+    #     sf = rv.sf
+    #     log10 = np.log10
+    #     for chrom in self.data.keys():
+    #         prev_pos = 0
+    #         pos = self.data[chrom][0]
+    #         l = self.datalength[chrom]
+    #         self.data[chrom][1] = -log10(sf(2 * self.data[chrom][1] / LOG10_E)).astype('float32') # convert logLR to p-value
+    #         self.data[chrom][2] = -log10(sf(2 * self.data[chrom][2] / LOG10_E)).astype('float32') # as above
+    #         self.data[chrom][3] = -log10(sf(2 * np.abs(self.data[chrom][3]) / LOG10_E)).astype('float32') # as above
+    #         v1 = self.data[chrom][1]
+    #         v2 = self.data[chrom][2]
+    #         v3 = self.data[chrom][3]
+    #         for i in range(l):
+    #             try:
+    #                 self.pvalue_stat1[v1[ i ]] += pos[ i ] - prev_pos
+    #             except:
+    #                 self.pvalue_stat1[v1[ i ]] = pos[ i ] - prev_pos
+    #             try:
+    #                 self.pvalue_stat2[v2[ i ]] += pos[ i ] - prev_pos
+    #             except:
+    #                 self.pvalue_stat2[v2[ i ]] = pos[ i ] - prev_pos
+    #             prev_pos = pos[ i ]
+            
+    # cpdef compute_track_qvalues ( self ):
+    #     """Compute -log_{10}(qvalue)
+    #     """
+    #     cdef:
+    #         dict pqtable
+    #         tuple pqtables
+    #         long i,l,j
+    #         double k
+    #         str chrom
+    #         np.ndarray p, c, v
+            
+    #     # make pqtables
+    #     # not sure if we should pool all the p-values or treat each comparison
+    #     # separately, but doing the latter for now
+    #     pqtables = self.make_pq_tables()
+        
+    #     # convert p to q
+
+    #     # convert pvalue2qvalue to a simple dict based on khash
+    #     # khash has big advantage while checking keys for millions of times.
+    #     for table_index in range(2):
+    #         pqtable = pqtables[table_index]
+    #         s_p2q = Float64HashTable()
+    #         for k in pqtable.keys():
+    #             s_p2q.set_item(k,pqtable[k])
     
-            g = s_p2q.get_item
+    #         g = s_p2q.get_item
             
-            for chrom in self.data.keys():
-                v = self.data[chrom][table_index + 1]
-                l = self.datalength[chrom]
-                for i in range(l):
-                    v[ i ] =  g( v[ i ])
+    #         for chrom in self.data.keys():
+    #             v = self.data[chrom][table_index + 1]
+    #             l = self.datalength[chrom]
+    #             for i in range(l):
+    #                 v[ i ] =  g( v[ i ])
         
-        return
+    #     return
 
-    cpdef compute_category_qvalues ( self, dict category ):
-        """Compute -log_{10}(qvalue)
-        """
-        cdef:
-            dict value_dict, pqtable
-            list unique_values
-            long i,l,j
-            np.ndarray p, c, v, data
-            long pre_l
-            double pre_v, unique_v, q, pre_q
-            long N, k
-            double f, pvalue
+    # cpdef compute_category_qvalues ( self, dict category ):
+    #     """Compute -log_{10}(qvalue)
+    #     """
+    #     cdef:
+    #         dict value_dict, pqtable
+    #         list unique_values
+    #         long i,l,j
+    #         np.ndarray p, c, v, data
+    #         long pre_l
+    #         double pre_v, unique_v, q, pre_q
+    #         long N, k
+    #         double f, pvalue
         
-        # make pqtable for category
-        value_dict = {}
-        for chrom in self.data.keys():
-            if category[chrom].size == 0: continue
+    #     # make pqtable for category
+    #     value_dict = {}
+    #     for chrom in self.data.keys():
+    #         if category[chrom].size == 0: continue
 
-            pos = self.data[chrom][0]
-            data = self.data[chrom][3]
-            for j in range(category[chrom].size):
-                i = category[chrom][j]
-                try:
-                    value_dict[data[i]] += pos[i + 1] - pos[i]
-                except IndexError:
-                    if not value_dict.has_key(data[i]):
-                        value_dict[data[i]] = 0
-                except KeyError:
-                    value_dict[data[i]] = pos[i + 1] - pos[i]
+    #         pos = self.data[chrom][0]
+    #         data = self.data[chrom][3]
+    #         for j in range(category[chrom].size):
+    #             i = category[chrom][j]
+    #             try:
+    #                 value_dict[data[i]] += pos[i + 1] - pos[i]
+    #             except IndexError:
+    #                 if not value_dict.has_key(data[i]):
+    #                     value_dict[data[i]] = 0
+    #             except KeyError:
+    #                 value_dict[data[i]] = pos[i + 1] - pos[i]
 
-        N = sum(value_dict.values())
-        k = 1                           # rank
-        f = -log10(N)
-        pre_v = -2147483647
-        pre_l = 0
-        pre_q = 2147483647              # save the previous q-value
-        pqtable = {}#Float64HashTable()
-        unique_values = sorted(value_dict.keys(), reverse=True) #sorted(unique_values,reverse=True)
-        for i in range(len(unique_values)):
-            unique_v = unique_values[i]
-            l = value_dict[unique_v]
-            q = unique_v + (log10(k) + f)
-            q = max(0,min(pre_q,q))           # make q-score monotonic
-            pqtable[ unique_v ] = q
-            pre_v = unique_v
-            pre_q = q
-            k+=l
+    #     N = sum(value_dict.values())
+    #     k = 1                           # rank
+    #     f = -log10(N)
+    #     pre_v = -2147483647
+    #     pre_l = 0
+    #     pre_q = 2147483647              # save the previous q-value
+    #     pqtable = {}#Float64HashTable()
+    #     unique_values = sorted(value_dict.keys(), reverse=True) #sorted(unique_values,reverse=True)
+    #     for i in range(len(unique_values)):
+    #         unique_v = unique_values[i]
+    #         l = value_dict[unique_v]
+    #         q = unique_v + (log10(k) + f)
+    #         q = max(0,min(pre_q,q))           # make q-score monotonic
+    #         pqtable[ unique_v ] = q
+    #         pre_v = unique_v
+    #         pre_q = q
+    #         k+=l
         
-        # convert p to q
+    #     # convert p to q
 
-        # convert pvalue2qvalue to a simple dict based on khash
-        # khash has big advantage while checking keys for millions of times.
-        s_p2q = Float64HashTable()
-        for pvalue in pqtable.keys():
-            s_p2q.set_item(pvalue,pqtable[pvalue])
+    #     # convert pvalue2qvalue to a simple dict based on khash
+    #     # khash has big advantage while checking keys for millions of times.
+    #     s_p2q = Float64HashTable()
+    #     for pvalue in pqtable.keys():
+    #         s_p2q.set_item(pvalue,pqtable[pvalue])
 
-        g = s_p2q.get_item
+    #     g = s_p2q.get_item
         
-        qvalues = {}
-        for chrom in self.data.keys():
-            v = self.data[chrom][3][category[chrom]]
-            qvalues[chrom] = v.copy()
-            for i in range(v.size):
-                qvalues[chrom][ i ] =  g( v[ i ])
+    #     qvalues = {}
+    #     for chrom in self.data.keys():
+    #         v = self.data[chrom][3][category[chrom]]
+    #         qvalues[chrom] = v.copy()
+    #         for i in range(v.size):
+    #             qvalues[chrom][ i ] =  g( v[ i ])
         
-        return qvalues
+    #     return qvalues
 
-    # borrowed from CombinedTwoTrack
-    cdef tuple make_pq_tables ( self ):
-        """Make pvalue-qvalue table.
+    # # borrowed from CombinedTwoTrack
+    # cdef tuple make_pq_tables ( self ):
+    #     """Make pvalue-qvalue table.
 
-        Step1: get all pvalue and length of block with this pvalue
-        Step2: Sort them
-        Step3: Apply AFDR method to adjust pvalue and get qvalue for each pvalue
+    #     Step1: get all pvalue and length of block with this pvalue
+    #     Step2: Sort them
+    #     Step3: Apply AFDR method to adjust pvalue and get qvalue for each pvalue
 
-        Return a dictionary of {-log10pvalue:(-log10qvalue,rank,basepairs)} relationships.
-        """
-        cdef:
-            long pre_l, l, i
-            double pre_v, v, q, pre_q
-            long N, k
-            double f
-            str chrom
-            dict pvalue2qvalue1, pvalue2qvalue2
-            dict value_dict
-            list unique_values
+    #     Return a dictionary of {-log10pvalue:(-log10qvalue,rank,basepairs)} relationships.
+    #     """
+    #     cdef:
+    #         long pre_l, l, i
+    #         double pre_v, v, q, pre_q
+    #         long N, k
+    #         double f
+    #         str chrom
+    #         dict pvalue2qvalue1, pvalue2qvalue2
+    #         dict value_dict
+    #         list unique_values
 
-        value_dict = self.pvalue_stat1
-        N = sum(value_dict.values())
-        k = 1                           # rank
-        f = -log10(N)
-        pre_v = -2147483647
-        pre_l = 0
-        pre_q = 2147483647              # save the previous q-value
-        pvalue2qvalue1 = {}#Float64HashTable()
-        unique_values = sorted(value_dict.keys(), reverse=True) #sorted(unique_values,reverse=True)
-        for i in range(len(unique_values)):
-            v = unique_values[i]
-            l = value_dict[v]
-            q = v + (log10(k) + f)
-            q = max(0,min(pre_q,q))           # make q-score monotonic
-            pvalue2qvalue1[ v ] = q
-            pre_v = v
-            pre_q = q
-            k+=l
+    #     value_dict = self.pvalue_stat1
+    #     N = sum(value_dict.values())
+    #     k = 1                           # rank
+    #     f = -log10(N)
+    #     pre_v = -2147483647
+    #     pre_l = 0
+    #     pre_q = 2147483647              # save the previous q-value
+    #     pvalue2qvalue1 = {}#Float64HashTable()
+    #     unique_values = sorted(value_dict.keys(), reverse=True) #sorted(unique_values,reverse=True)
+    #     for i in range(len(unique_values)):
+    #         v = unique_values[i]
+    #         l = value_dict[v]
+    #         q = v + (log10(k) + f)
+    #         q = max(0,min(pre_q,q))           # make q-score monotonic
+    #         pvalue2qvalue1[ v ] = q
+    #         pre_v = v
+    #         pre_q = q
+    #         k+=l
             
-        value_dict = self.pvalue_stat2
-        N = sum(value_dict.values())
-        k = 1                           # rank
-        f = -log10(N)
-        pre_v = -2147483647
-        pre_l = 0
-        pre_q = 2147483647              # save the previous q-value
-        pvalue2qvalue2 = {}#Float64HashTable()
-        unique_values = sorted(value_dict.keys(), reverse=True) #sorted(unique_values,reverse=True)
-        for i in range(len(unique_values)):
-            v = unique_values[i]
-            l = value_dict[v]
-            q = v + (log10(k) + f)
-            q = max(0,min(pre_q,q))           # make q-score monotonic
-            pvalue2qvalue2[ v ] = q
-            pre_v = v
-            pre_q = q
-            k+=l
+    #     value_dict = self.pvalue_stat2
+    #     N = sum(value_dict.values())
+    #     k = 1                           # rank
+    #     f = -log10(N)
+    #     pre_v = -2147483647
+    #     pre_l = 0
+    #     pre_q = 2147483647              # save the previous q-value
+    #     pvalue2qvalue2 = {}#Float64HashTable()
+    #     unique_values = sorted(value_dict.keys(), reverse=True) #sorted(unique_values,reverse=True)
+    #     for i in range(len(unique_values)):
+    #         v = unique_values[i]
+    #         l = value_dict[v]
+    #         q = v + (log10(k) + f)
+    #         q = max(0,min(pre_q,q))           # make q-score monotonic
+    #         pvalue2qvalue2[ v ] = q
+    #         pre_v = v
+    #         pre_q = q
+    #         k+=l
  
-        return (pvalue2qvalue1, pvalue2qvalue2) 
+    #     return (pvalue2qvalue1, pvalue2qvalue2) 
 
     # cpdef sort ( self, int column = 1 ):
     #     """ Sort data for each chromosome, by certain column.
@@ -1820,7 +1866,7 @@ cdef class TwoConditionScores:
             
         return True
 
-    cpdef call_peaks (self, float cutoff=0.05, int min_length=200,
+    cpdef call_peaks (self, float cutoff=3, int min_length=200,
                       bool call_summits=False):
         """This function try to find regions within which, scores
         are continuously higher than a given cutoff.
@@ -1842,7 +1888,7 @@ cdef class TwoConditionScores:
             np.ndarray pos, sample, control, value, above_cutoff, \
                        above_cutoff_v, above_cutoff_endpos, \
                        above_cutoff_startpos, above_cutoff_sv
-            np.ndarray[np.float32_t] cat1_qvalues, cat2_qvalues, cat3_qvalues
+            #np.ndarray[np.float32_t] cat1_qvalues, cat2_qvalues, cat3_qvalues
             list peak_content
             int max_gap
         max_gap = min_length / 4
@@ -1853,157 +1899,87 @@ cdef class TwoConditionScores:
         #cat4_peaks = PeakIO()       # dictionary to save peaks        
 
         self.cutoff = cutoff
-        logcutoff = -log10(cutoff)
-        cat1 = {}
-        cat2 = {}
-        cat3 = {}
-        cat1_qvalues_by_chrom = {}
-        cat2_qvalues_by_chrom = {}
-        cat3_qvalues_by_chrom = {}
-        for chrom in chrs:
-            tvsc1 = self.data[chrom][ 1 ]
-            tvsc2 = self.data[chrom][ 2 ]            
-            and_ = np.logical_and
-            not_ = np.logical_not
-            cond1_sig = tvsc1 >= logcutoff
-            cond2_sig = tvsc2 >= logcutoff
-            # indices where score is above cutoff
-            cat1[chrom] = np.where(and_(cond1_sig,       not_(cond2_sig)))[0]
-            cat2[chrom] = np.where(and_(not_(cond1_sig), cond2_sig))[0]
-            cat3[chrom] = np.where(and_(cond1_sig,       cond2_sig))[0]
-
-        # qvalue conversion for each category to improve statistical power
-        cat1_qvalues_by_chrom = self.compute_category_qvalues(cat1)
-        cat2_qvalues_by_chrom = self.compute_category_qvalues(cat2)
-        cat3_qvalues_by_chrom = self.compute_category_qvalues(cat3)
 
         for chrom in chrs:
-            peak_content = []           # to store points above cutoff
-
             pos = self.data[chrom][ 0 ]
-            t1vst2 = self.data[chrom][ 3 ]
+            t1_vs_c1 = self.data[chrom][ 1 ]
+            t2_vs_c2 = self.data[chrom][ 2 ]
+            t1_vs_t2 = self.data[chrom][ 3 ]
+            and_ = np.logical_and
+            #not_ = np.logical_not
+            cond1_over_cond2 = t1_vs_t2 >= cutoff # regions with stronger cond1 signals
+            cond2_over_cond1 = t1_vs_t2 <= -1*cutoff # regions with stronger cond2 signals
+            print np.where( cond2_over_cond1 )[0].size
+            cond1_equal_cond2= and_( t1_vs_t2 >= -1*cutoff, t1_vs_t2 <= cutoff )
+            cond1_sig = t1_vs_c1 >= cutoff # enriched regions in condition 1
+            cond2_sig = t2_vs_c2 >= cutoff # enriched regions in condition 2
+            # indices where score is above cutoff
+            cat1 = np.where( and_( cond1_sig, cond1_over_cond2 ) )[ 0 ] # cond1 stronger than cond2, the indices
+            cat2 = np.where( and_( cond2_over_cond1, cond2_sig ) )[ 0 ] # cond2 stronger than cond1, the indices
+            cat3 = np.where( and_( and_( cond1_sig, cond2_sig ), # cond1 and cond2 are equal, the indices
+                                   cond1_equal_cond2 ) ) [ 0 ]
 
-            cat1_qvalues = cat1_qvalues_by_chrom[chrom]
-            cat2_qvalues = cat2_qvalues_by_chrom[chrom]
-            cat3_qvalues = cat3_qvalues_by_chrom[chrom]
+            print "# cond1 stronger points: %d; # cond2 stronger points: %d" % (cat1.size, cat2.size)
 
+            cat1_endpos = pos[cat1] # end positions of regions where score is above cutoff
+            cat1_startpos = pos[cat1-1] # start positions of regions where score is above cutoff
+            cat2_endpos = pos[cat2] # end positions of regions where score is above cutoff
+            cat2_startpos = pos[cat2-1] # start positions of regions where score is above cutoff
+            cat3_endpos = pos[cat3] # end positions of regions where score is above cutoff
+            cat3_startpos = pos[cat3-1] # start positions of regions where score is above cutoff
 
-            where_cat1_above_cutoff = cat1_qvalues >= logcutoff
-            where_cat2_above_cutoff = cat2_qvalues >= logcutoff
-            where_cat3_above_cutoff = cat3_qvalues >= logcutoff
-            cat1_above_cutoff = cat1[chrom][where_cat1_above_cutoff]
-            cat2_above_cutoff = cat2[chrom][where_cat2_above_cutoff]
-            cat3_above_cutoff = cat3[chrom][where_cat2_above_cutoff]
-            cat1_above_cutoff_endpos = pos[cat1_above_cutoff] # end positions of regions where score is above cutoff
-            cat1_above_cutoff_startpos = pos[cat1_above_cutoff-1] # start positions of regions where score is above cutoff
-            cat2_above_cutoff_endpos = pos[cat2_above_cutoff] # end positions of regions where score is above cutoff
-            cat2_above_cutoff_startpos = pos[cat2_above_cutoff-1] # start positions of regions where score is above cutoff
-            cat3_above_cutoff_endpos = pos[cat3_above_cutoff] # end positions of regions where score is above cutoff
-            cat3_above_cutoff_startpos = pos[cat3_above_cutoff-1] # start positions of regions where score is above cutoff
-            #cat4_above_cutoff_endpos = pos[cat4_above_cutoff] # end positions of regions where score is above cutoff
-            #cat4_above_cutoff_startpos = pos[cat4_above_cutoff-1] # start positions of regions where score is above cutoff            
+            # for cat1
+            self.__add_a_peak ( cat1_peaks, chrom, cat1, cat1_startpos, cat1_endpos, t1_vs_t2, max_gap, min_length )
+            # for cat2
+            self.__add_a_peak ( cat2_peaks, chrom, cat2, cat2_startpos, cat2_endpos, -1 * t1_vs_t2, max_gap, min_length )
+            # for cat3
+            self.__add_a_peak ( cat3_peaks, chrom, cat3, cat3_startpos, cat3_endpos, abs(t1_vs_t2), max_gap, min_length )
 
-            # should we actually save these statistics???
+            return cat1_peaks, cat2_peaks, cat3_peaks
+    
+    cdef object __add_a_peak ( self, object peaks, str chrom, np.ndarray indices, np.ndarray startpos, np.ndarray endpos,
+                               np.ndarray score, int max_gap, int min_length ):
+         """
+         """
+         cdef:
+             list peak_content
+             double best_logLR
 
-            if cat1_above_cutoff_startpos.size > 0:
-                qscores = t1vst2[cat1_above_cutoff]
-                peak_content = []
-                # cat 1 is not empty
-                if cat1_above_cutoff[0] == 0:
-                    # first element > cutoff, fix the first point as 0. otherwise it would be the last item in data[chrom]['pos']
-                    cat1_above_cutoff_startpos[0] = 0
-                # first bit of region above cutoff
-                peak_content.append( (cat1_above_cutoff_startpos[0], cat1_above_cutoff_endpos[0], qscores[0]) )
-                for i in range( 1, cat1_above_cutoff_startpos.size ):
-                    if cat1_above_cutoff_startpos[i] - peak_content[-1][1] <= max_gap:
-                        # append
-                        peak_content.append( (cat1_above_cutoff_startpos[i], cat1_above_cutoff_endpos[i], qscores[i] ) )
-                    else:
-                        # close
-                        if peak_content[ -1 ][ 1 ] - peak_content[ 0 ][ 0 ] >= min_length:
-                            best_qscore = min(map(itemgetter(2), peak_content))
-                            cat1_peaks.add( chrom, peak_content[0][0], peak_content[-1][1],
-                                            summit = -1, peak_score  = 0, pileup = 0, pscore = 0, 
-                                            fold_change = 0, qscore = best_qscore,
-                                            )
-                        peak_content = [(cat1_above_cutoff_startpos[i], cat1_above_cutoff_endpos[i], qscores[i]),]
-                # save the last peak
-                if not peak_content:
-                    continue
-                else:
-                    if peak_content[ -1 ][ 1 ] - peak_content[ 0 ][ 0 ] >= min_length:                    
-                        best_qscore = min(map(itemgetter(2), peak_content))
-                        cat1_peaks.add( chrom, peak_content[0][0], peak_content[-1][1],
-                                        summit = -1, peak_score  = 0, pileup = 0, pscore = 0, 
-                                        fold_change = 0, qscore = best_qscore, 
-                                        )
-            if cat2_above_cutoff_startpos.size > 0:
-                qscores = t1vst2[cat2_above_cutoff]
-                peak_content = []
-                # cat 1 is not empty
-                if cat2_above_cutoff[0] == 0:
-                    # first element > cutoff, fix the first point as 0. otherwise it would be the last item in data[chrom]['pos']
-                    cat2_above_cutoff_startpos[0] = 0
-                # first bit of region above cutoff
-                peak_content.append( (cat2_above_cutoff_startpos[0], cat2_above_cutoff_endpos[0], qscores[0]) )
-                for i in range( 1, cat2_above_cutoff_startpos.size ):
-                    if cat2_above_cutoff_startpos[i] - peak_content[-1][1] <= max_gap:
-                        # append
-                        peak_content.append( (cat2_above_cutoff_startpos[i], cat2_above_cutoff_endpos[i], qscores[i] ) )
-                    else:
-                        # close
-                        if peak_content[ -1 ][ 1 ] - peak_content[ 0 ][ 0 ] >= min_length:                        
-                            best_qscore = min(map(itemgetter(2), peak_content))
-                            cat2_peaks.add( chrom, peak_content[0][0], peak_content[-1][1],
-                                            summit = -1, peak_score  = 0, pileup = 0, pscore = 0, 
-                                            fold_change = 0, qscore = best_qscore, 
-                                            )
-                        peak_content = [(cat2_above_cutoff_startpos[i], cat2_above_cutoff_endpos[i], qscores[i]),]
-                # save the last peak
-                if not peak_content:
-                    continue
-                else:
-                    if peak_content[ -1 ][ 1 ] - peak_content[ 0 ][ 0 ] >= min_length:                    
-                        best_qscore = min(map(itemgetter(2), peak_content))
-                        cat2_peaks.add( chrom, peak_content[0][0], peak_content[-1][1],
-                                        summit = -1, peak_score  = 0, pileup = 0, pscore = 0, 
-                                        fold_change = 0, qscore = best_qscore, 
-                                        )
+         if startpos.size > 0:
+             # if it is not empty
+             peak_content = []
+             if indices[0] == 0:
+                 # first element > cutoff, fix the first point as 0. otherwise it would be the last item in data[chrom]['pos']
+                 startpos[0] = 0
+             # first bit of region above cutoff
+             peak_content.append( (startpos[0], endpos[0], score[indices[ 0 ]]) )
+             for i in range( 1, startpos.size ):
+                 if startpos[i] - peak_content[-1][1] <= max_gap:
+                     # append
+                     peak_content.append( ( startpos[i], endpos[i], score[indices[ i ]] ) )
+                 else:
+                     # close
+                     if peak_content[ -1 ][ 1 ] - peak_content[ 0 ][ 0 ] >= min_length:
+                         best_logLR = max(map(itemgetter(2), peak_content))
+                         #print peak_content
+                         peaks.add( chrom, peak_content[0][0], peak_content[-1][1],
+                                    summit = -1, peak_score  = best_logLR, pileup = 0, pscore = 0, 
+                                    fold_change = 0, qscore = 0,
+                                    )
+                     peak_content = [(startpos[i], endpos[i], score[ indices[ i ] ]),]
 
-            if cat3_above_cutoff_startpos.size > 0:
-                qscores = t1vst2[cat3_above_cutoff]
-                peak_content = []
-                # cat 1 is not empty
-                if cat3_above_cutoff[0] == 0:
-                    # first element > cutoff, fix the first point as 0. otherwise it would be the last item in data[chrom]['pos']
-                    cat3_above_cutoff_startpos[0] = 0
-                # first bit of region above cutoff
-                peak_content.append( (cat3_above_cutoff_startpos[0], cat3_above_cutoff_endpos[0], qscores[0]) )
-                for i in range( 1, cat3_above_cutoff_startpos.size ):
-                    if cat3_above_cutoff_startpos[i] - peak_content[-1][1] <= max_gap:
-                        # append
-                        peak_content.append( (cat3_above_cutoff_startpos[i], cat3_above_cutoff_endpos[i], qscores[i] ) )
-                    else:
-                        # close
-                        if peak_content[ -1 ][ 1 ] - peak_content[ 0 ][ 0 ] >= min_length:                        
-                            best_qscore = min(map(itemgetter(2), peak_content))
-                            cat3_peaks.add( chrom, peak_content[0][0], peak_content[-1][1],
-                                            summit = -1, peak_score  = 0, pileup = 0, pscore = 0, 
-                                            fold_change = 0, qscore = best_qscore, 
-                                            )
-                        peak_content = [(cat3_above_cutoff_startpos[i], cat3_above_cutoff_endpos[i], qscores[i]),]
-                # save the last peak
-                if not peak_content:
-                    continue
-                else:
-                    if peak_content[ -1 ][ 1 ] - peak_content[ 0 ][ 0 ] >= min_length:
-                        best_qscore = min(map(itemgetter(2), peak_content))
-                        cat3_peaks.add( chrom, peak_content[0][0], peak_content[-1][1],
-                                        summit = -1, peak_score  = 0, pileup = 0, pscore = 0, 
-                                        fold_change = 0, qscore = best_qscore, 
-                                        )
-
-        return cat1_peaks, cat2_peaks, cat3_peaks
+             # save the last peak
+             if peak_content:
+                 if peak_content[ -1 ][ 1 ] - peak_content[ 0 ][ 0 ] >= min_length:                    
+                     best_logLR = min(map(itemgetter(2), peak_content))
+                     #print best_logLR
+                     #print peak_content                     
+                     peaks.add( chrom, peak_content[0][0], peak_content[-1][1],
+                                summit = -1, peak_score  = best_logLR, pileup = 0, pscore = 0, 
+                                fold_change = 0, qscore = 0, 
+                                )
+         
+         return
 
     cdef long total ( self ):
         """Return the number of regions in this object.
@@ -2648,8 +2624,8 @@ cdef class DiffScoreTrackI:
             v = self.tlogLR[chrom]
             with cython.boundscheck(False):
                 for i in range(self.pos[chrom].size): 
-                    v[i] = logLR_adjusted(<int>t1[i] + pseudocount,
-                                          <int>t2[i] + pseudocount)
+                    v[i] = logLR_4diff( t1[i] + pseudocount,
+                                        t2[i] + pseudocount )
                 self.t1vs2[chrom] = -log10(sf(2 * v / LOG10_E)).astype('float32')
     
     cpdef compute_diff_qvalues ( self ):

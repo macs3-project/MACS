@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# Time-stamp: <2013-07-10 14:17:17 Tao Liu>
+# Time-stamp: <2013-07-30 17:42:58 Tao Liu>
 
 """Description: MACS v2 main executable.
 
@@ -419,15 +419,13 @@ def add_bdgdiff_parser( subparsers ):
     argparser_bdgdiff.add_argument( "--c2", dest="c2bdg", type = str, required = True,
                                     help = "MACS control lambda bedGraph for condition 2. REQUIRED" )
     argparser_bdgdiff.add_argument( "-C", "--cutoff", dest = "cutoff", type = float,
-                                    help = "q-value cutoff. DEFAULT: 0.05 (log-likelihood ratio=3.33)", default = 0.05 )
+                                    help = "logLR cutoff. DEFAULT: 3 (likelihood ratio=1000)", default = 3 )
     argparser_bdgdiff.add_argument( "-m", "--min-len", dest = "minlen", type = int,
                                     help = "Minimum length of differential region. DEFAULT: 200", default = 200 )
     argparser_bdgdiff.add_argument( "-o", "--o-prefix", dest = "oprefix", default = "diffpeak", type = str,
                                     help = "output file prefix, DEFAULT: diffpeak" )
-    argparser_bdgdiff.add_argument( "--depth1", dest = "depth1", type = float, default = 1.0,
-                                    help = "Sequence depth of condition 1 in million reads. Default: 1 (if you use 'macs2 callpeak --SPMR' to generate bdg files." )
-    argparser_bdgdiff.add_argument( "--depth2", dest = "depth2", type = float, default = 1.0,
-                                    help = "Sequence depth of condition 2 in million reads. Default: 1 (if you use 'macs2 callpeak --SPMR' to generate bdg files." )
+    argparser_bdgdiff.add_argument( "-S", "--scaling-factor", dest = "sfactor", type = float, default = 1.0,
+                                    help = "Scaling factor for treatment and control track. Keep it as 1.0 or default in most cases. Set it ONLY while you have SPMR output from MACS2 callpeak, and plan to call differential regions based on real sequencing depth. If you have used 'callpeak' w/o '--to-large', calculate effective smaller sample size after filtering redudant reads in million (e.g., put 31.415926 if effective reads are 31,415,926) and input it for '-S'; for 'callpeak --to-large', calculate effective reads in larger sample. DEFAULT: 1.0") 
     return
 
 def add_refinepeak_parser( subparsers ):

@@ -1,4 +1,4 @@
-# Time-stamp: <2013-07-09 01:40:21 Tao Liu>
+# Time-stamp: <2013-07-30 15:43:28 Tao Liu>
 
 """Module for Calculate Scores.
 
@@ -127,11 +127,13 @@ cdef double get_interpolated_pscore ( double observed, double expectation ):
              floor_pscore
     return pscore
     
-cdef inline double oldlogLR ( double x, double y ):
+cdef inline double logLR_asym ( double x, double y ):
     """Calculate log10 Likelihood between H1 ( enriched ) and H0 (
     chromatin bias ). Then store the values in integer form =
     100*logLR. Set minus sign for depletion.
     
+    *asymmetric version* 
+
     """
     cdef:
         double s
@@ -150,10 +152,12 @@ cdef inline double oldlogLR ( double x, double y ):
         logLR_khashtable.set_item(key_value, s)
         return s
 
-cdef inline double logLR_adjusted (int x, int y):
+cdef inline double logLR_4diff (double x, double y):
     """Calculate log10 Likelihood between H1 ( enriched ) and H0 (
     chromatin bias ). Then store the values in integer form =
-    100*logLR. Set minus sign for depletion.
+    100*logLR. 
+
+    * Always positive, used for evaluating difference only.*
     
     """
     cdef:
@@ -171,11 +175,13 @@ cdef inline double logLR_adjusted (int x, int y):
         logLR_khashtable.set_item(key_value, s)
         return s
     
-cdef inline double logLR ( double x, double y ):
+cdef inline double logLR_sym ( double x, double y ):
     """Calculate log10 Likelihood between H1 ( enriched ) and H0 (
     chromatin bias ). Then store the values in integer form =
     100*logLR. Set minus sign for depletion.
     
+    * symmetric version *
+
     """
     cdef:
         double s
@@ -185,13 +191,15 @@ cdef inline double logLR ( double x, double y ):
     try:
         return logLR_khashtable.get_item( key_value )
     except KeyError:
-        if y > x: y, x = x, y
-        if x==y: s = 0
-        
-        else: s = (x*(log(x)-log(y))+y-x)*LOG10_E
+        if x > y:
+            s = (x*(log(x)-log(y))+y-x)*LOG10_E
+        elif y > x:
+            s = (y*(log(x)-log(y))+y-x)*LOG10_E
+        else:
+            s = 0
         logLR_khashtable.set_item(key_value, s)
         return s
-    
+
 cdef inline double get_logFE ( float x, float y ):
     """ return 100* log10 fold enrichment with +1 pseudocount.
     """
@@ -841,23 +849,25 @@ cdef class CallerFromAlignments:
         """
         cdef:
             int summit_pos, tstart, tend, tmpindex, summit_index, summit_offset
-            int start, end, i, j, start_boundary, m, n
+            int start, end, i, j, start_boundary, m, n, l
             double summit_value, tvalue, tsummitvalue
             np.ndarray[np.float32_t, ndim=1] peakdata
             np.ndarray[np.int32_t, ndim=1] peakindices, summit_offsets
             double ttreat_p, tctrl_p, tscore, summit_treat, summit_ctrl, summit_p_score, summit_q_score
             list tlist_scores_p
+
+        peak_length = peak_content[ -1 ][ 1 ] - peak_content[ 0 ][ 0 ]
             
+        if peak_length < min_length: return  # if the region is too small, reject it
+
         # Add 10 bp padding to peak region so that we can get true minima
         end = peak_content[ -1 ][ 1 ] + 10
         start = peak_content[ 0 ][ 0 ] - 10
         if start < 0:
-            start_boundary = 10 + start
+            start_boundary = 10 + start # this is the offset of original peak boundary in peakdata list.
             start = 0
         else:
-            start_boundary = 10
-        peak_length = end - start
-        if end - start < min_length: return # if the region is too small, reject it
+            start_boundary = 10 # this is the offset of original peak boundary in peakdata list.
 
         peakdata = np.zeros(end - start, dtype='float32') # save the scores (qscore) for each position in this region
         peakindices = np.zeros(end - start, dtype='int32') # save the indices for each position in this region
@@ -901,8 +911,8 @@ cdef class CallerFromAlignments:
                     return False # not passed, then disgard this summit.
 
             peaks.add( chrom,
-                       start,
-                       end,
+                       peak_content[ 0 ][ 0 ],
+                       peak_content[ -1 ][ 1 ],
                        summit      = start + summit_offset,
                        peak_score  = summit_q_score,
                        pileup      = summit_treat,
@@ -937,7 +947,7 @@ cdef class CallerFromAlignments:
         assert array1.shape[0] == array2.shape[0]
         s = np.zeros(array1.shape[0], dtype="float32")
         for i in range(array1.shape[0]):
-            s[i] = logLR( array1[i] + self.pseudocount, array2[i] + self.pseudocount ) 
+            s[i] = logLR_asym( array1[i] + self.pseudocount, array2[i] + self.pseudocount ) 
         return s
 
     cdef np.ndarray __cal_logFE ( self, array1, array2 ):

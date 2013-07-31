@@ -1,4 +1,4 @@
-# Time-stamp: <2012-09-14 02:27:53 Tao Liu>
+# Time-stamp: <2013-07-30 17:53:18 Tao Liu>
 
 """Description: Naive call differential peaks from 4 bedGraph tracks for scores.
 
@@ -59,8 +59,6 @@ def run( options ):
     c1bio = cBedGraphIO.bedGraphIO(options.c1bdg)
     c1btrack = c1bio.build_bdgtrack()
 
-    depth1 = options.depth1
-
     info("Read and build treatment 2 bedGraph...")
     t2bio = cBedGraphIO.bedGraphIO(options.t2bdg)
     t2btrack = t2bio.build_bdgtrack()
@@ -69,7 +67,8 @@ def run( options ):
     c2bio = cBedGraphIO.bedGraphIO(options.c2bdg)
     c2btrack = c2bio.build_bdgtrack()
 
-    depth2 = options.depth2
+    depth1 = options.sfactor
+    depth2 = options.sfactor
 
     twoconditionscore = cScoreTrack.TwoConditionScores( t1btrack,
                                                         c1btrack,
@@ -79,20 +78,15 @@ def run( options ):
                                                         depth2 )
     twoconditionscore.build()
     twoconditionscore.finalize()
-    twoconditionscore.compute_all_pvalues()
-    twoconditionscore.compute_track_qvalues()
-    #(cat1,cat2,cat3,cat4) = twoconditionscore.call_peaks(min_length=options.minlen, cutoff=options.cutoff)
     (cat1,cat2,cat3) = twoconditionscore.call_peaks(min_length=options.minlen, cutoff=options.cutoff)
 
     info("Write peaks...")
-    nf = open ("%s_c%.1f_cat1_peaks.encodePeak" % (options.oprefix,options.cutoff),"w")        
-    cat1.write_to_narrowPeak(nf, name_prefix=options.oprefix+"_encodePeak", score_column="score")
-    nf = open ("%s_c%.1f_cat2_peaks.encodePeak" % (options.oprefix,options.cutoff),"w")        
-    cat2.write_to_narrowPeak(nf, name_prefix=options.oprefix+"_encodePeak", score_column="score")
-    nf = open ("%s_c%.1f_cat3_peaks.encodePeak" % (options.oprefix,options.cutoff),"w")        
-    cat3.write_to_narrowPeak(nf, name_prefix=options.oprefix+"_encodePeak", score_column="score")
-    #nf = open ("%s_c%.1f_cat4_peaks.encodePeak" % (options.oprefix,options.cutoff),"w")        
-    #cat4.write_to_narrowPeak(nf, name_prefix=options.oprefix+"_encodePeak", score_column="score")    
+    nf = open ("%s_c%.1f_cond1.bed" % (options.oprefix,options.cutoff),"w")        
+    cat1.write_to_bed(nf, name_prefix=options.oprefix+"_cond1_", name="condition 1", description="unique regions in condition 1", score_column="score")
+    nf = open ("%s_c%.1f_cond2.bed" % (options.oprefix,options.cutoff),"w")        
+    cat2.write_to_bed(nf, name_prefix=options.oprefix+"_cond2_", name="condition 2", description="unique regions in condition 2", score_column="score")
+    nf = open ("%s_c%.1f_common.bed" % (options.oprefix,options.cutoff),"w")        
+    cat3.write_to_bed(nf, name_prefix=options.oprefix+"_common_",name="common", description="common regions in both conditions", score_column="score")
     info("Done")
 
     

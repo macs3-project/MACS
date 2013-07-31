@@ -1,3 +1,25 @@
+2013-07-31  Tao Liu  <vladimir.liu@gmail.com>
+	MACS version 2.0.10 20130731 (tag:alpha)
+
+	* callpeak --call-summits
+
+	Fix bugs causing callpeak --call-summits option generating extra
+	number of peaks and inconsistent peak boundaries comparing to
+	default option. Thank Ben Levinson!
+
+	* bdgcmp output
+
+	Fix bugs causing bdgcmp output logLR all in positive values. Now
+	'depletion' can be correctly represented as negative values.
+
+	* bdgdiff
+
+	Fix the behavior of bdgdiff module. Now it can take four
+	bedGraph files, then use logLR as cutoff to call differential
+	regions. A '--sfactor' option as that for bdgcmp module, is
+	introduced to specifically overcome the side-effect while SPMR
+	files are used as input.
+
 2013-07-13  Tao Liu  <vladimir.liu@gmail.com>
 	MACS version 2.0.10 20130713 (tag:alpha)
 
