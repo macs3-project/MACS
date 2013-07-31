@@ -1,4 +1,4 @@
-# Time-stamp: <2013-07-30 18:12:00 Tao Liu>
+# Time-stamp: <2013-07-31 13:12:47 Tao Liu>
 
 """Module for Feature IO classes.
 
@@ -37,6 +37,7 @@ from cython.parallel import parallel, prange
 cimport cython
 
 from libc.math cimport log10,log, floor, ceil
+from libc.stdint cimport uint32_t, uint64_t, int32_t, int64_t
 
 from MACS2.Constants import BYTE4, FBYTE4, array
 from MACS2.cProb cimport poisson_cdf
@@ -188,6 +189,40 @@ cdef inline float get_subtraction ( float x, float y):
     """ return subtraction.
     """
     return x - y
+
+
+cdef float median_from_value_length ( np.ndarray value, list length ):
+    """
+    """
+    cdef:
+        list tmp
+        int32_t l_half, c, tmp_l
+        float tmp_v
+    
+    tmp = sorted(zip( value, length ))
+    l = sum( length )/2
+    for (tmp_v, tmp_l) in tmp:
+        c += tmp_l
+        if c > l:
+            return tmp_v
+
+
+cdef float mean_from_value_length ( np.ndarray value, list length ):
+    """
+    """
+    cdef:
+        list tmp
+        int32_t tmp_l
+        float tmp_v, sum_v
+
+    tmp = zip( value, length )
+    l = sum( length )
+
+    for (tmp_v, tmp_l) in tmp:
+        sum_v += tmp_v * tmp_l
+
+    return sum_v / l
+
 
 # ------------------------------------
 # Classes
@@ -1866,7 +1901,7 @@ cdef class TwoConditionScores:
             
         return True
 
-    cpdef call_peaks (self, float cutoff=3, int min_length=200,
+    cpdef call_peaks (self, float cutoff=3, int min_length=200, int max_gap = 100,
                       bool call_summits=False):
         """This function try to find regions within which, scores
         are continuously higher than a given cutoff.
@@ -1879,7 +1914,7 @@ cdef class TwoConditionScores:
 
         cutoff:  cutoff of value, default 3. For log10 LR, it means 1000 or -1000.
         min_length :  minimum peak length, default 200.
-        gap   :  maximum gap to merge nearby peaks, default 50.
+        max_gap   :  maximum gap to merge nearby peaks, default 100.
         ptrack:  an optional track for pileup heights. If it's not None, use it to find summits. Otherwise, use self/scoreTrack.
         """
         cdef:
@@ -1888,15 +1923,12 @@ cdef class TwoConditionScores:
             np.ndarray pos, sample, control, value, above_cutoff, \
                        above_cutoff_v, above_cutoff_endpos, \
                        above_cutoff_startpos, above_cutoff_sv
-            #np.ndarray[np.float32_t] cat1_qvalues, cat2_qvalues, cat3_qvalues
             list peak_content
-            int max_gap
-        max_gap = min_length / 4
+
         chrs  = self.get_chr_names()
         cat1_peaks = PeakIO()       # dictionary to save peaks significant at condition 1
         cat2_peaks = PeakIO()       # dictionary to save peaks significant at condition 2
         cat3_peaks = PeakIO()       # dictionary to save peaks significant in both conditions
-        #cat4_peaks = PeakIO()       # dictionary to save peaks        
 
         self.cutoff = cutoff
 
@@ -1906,10 +1938,8 @@ cdef class TwoConditionScores:
             t2_vs_c2 = self.data[chrom][ 2 ]
             t1_vs_t2 = self.data[chrom][ 3 ]
             and_ = np.logical_and
-            #not_ = np.logical_not
             cond1_over_cond2 = t1_vs_t2 >= cutoff # regions with stronger cond1 signals
             cond2_over_cond1 = t1_vs_t2 <= -1*cutoff # regions with stronger cond2 signals
-            print np.where( cond2_over_cond1 )[0].size
             cond1_equal_cond2= and_( t1_vs_t2 >= -1*cutoff, t1_vs_t2 <= cutoff )
             cond1_sig = t1_vs_c1 >= cutoff # enriched regions in condition 1
             cond2_sig = t2_vs_c2 >= cutoff # enriched regions in condition 2
@@ -1918,8 +1948,6 @@ cdef class TwoConditionScores:
             cat2 = np.where( and_( cond2_over_cond1, cond2_sig ) )[ 0 ] # cond2 stronger than cond1, the indices
             cat3 = np.where( and_( and_( cond1_sig, cond2_sig ), # cond1 and cond2 are equal, the indices
                                    cond1_equal_cond2 ) ) [ 0 ]
-
-            print "# cond1 stronger points: %d; # cond2 stronger points: %d" % (cat1.size, cat2.size)
 
             cat1_endpos = pos[cat1] # end positions of regions where score is above cutoff
             cat1_startpos = pos[cat1-1] # start positions of regions where score is above cutoff
@@ -1939,11 +1967,14 @@ cdef class TwoConditionScores:
     
     cdef object __add_a_peak ( self, object peaks, str chrom, np.ndarray indices, np.ndarray startpos, np.ndarray endpos,
                                np.ndarray score, int max_gap, int min_length ):
-         """
+         """For a given chromosome, merge nearby significant regions,
+         filter out smaller regions, then add regions to PeakIO
+         object.
+
          """
          cdef:
              list peak_content
-             double best_logLR
+             float mean_logLR
 
          if startpos.size > 0:
              # if it is not empty
@@ -1960,10 +1991,9 @@ cdef class TwoConditionScores:
                  else:
                      # close
                      if peak_content[ -1 ][ 1 ] - peak_content[ 0 ][ 0 ] >= min_length:
-                         best_logLR = max(map(itemgetter(2), peak_content))
-                         #print peak_content
+                         mean_logLR = self.mean_from_peakcontent( peak_content )
                          peaks.add( chrom, peak_content[0][0], peak_content[-1][1],
-                                    summit = -1, peak_score  = best_logLR, pileup = 0, pscore = 0, 
+                                    summit = -1, peak_score  = mean_logLR, pileup = 0, pscore = 0, 
                                     fold_change = 0, qscore = 0,
                                     )
                      peak_content = [(startpos[i], endpos[i], score[ indices[ i ] ]),]
@@ -1971,15 +2001,29 @@ cdef class TwoConditionScores:
              # save the last peak
              if peak_content:
                  if peak_content[ -1 ][ 1 ] - peak_content[ 0 ][ 0 ] >= min_length:                    
-                     best_logLR = min(map(itemgetter(2), peak_content))
-                     #print best_logLR
-                     #print peak_content                     
+                     mean_logLR = self.mean_from_peakcontent( peak_content )
                      peaks.add( chrom, peak_content[0][0], peak_content[-1][1],
-                                summit = -1, peak_score  = best_logLR, pileup = 0, pscore = 0, 
+                                summit = -1, peak_score  = mean_logLR, pileup = 0, pscore = 0, 
                                 fold_change = 0, qscore = 0, 
                                 )
          
          return
+        
+    cdef float mean_from_peakcontent ( self, list peakcontent ):
+        """
+
+        """
+        cdef:
+            int32_t tmp_s, tmp_e
+            int32_t l = 0
+            float tmp_v, sum_v
+
+        for (tmp_s, tmp_e, tmp_v) in peakcontent:
+            sum_v += tmp_v * ( tmp_e - tmp_s )
+            l +=  tmp_e - tmp_s
+
+        return sum_v / l
+        
 
     cdef long total ( self ):
         """Return the number of regions in this object.

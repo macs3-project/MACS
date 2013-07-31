@@ -1,4 +1,4 @@
-# Time-stamp: <2013-07-30 17:53:18 Tao Liu>
+# Time-stamp: <2013-07-31 12:35:53 Tao Liu>
 
 """Description: Naive call differential peaks from 4 bedGraph tracks for scores.
 
@@ -48,6 +48,9 @@ info    = logging.info
 # Main function
 # ------------------------------------
 def run( options ):
+    if options.maxgap >= options.minlen:
+        error("MAXGAP should be smaller than MINLEN! Your input is MAXGAP = %d and MINLEN = %d" % (options.maxgap, options.minlen))
+
     LLR_cutoff = options.cutoff
     ofile_prefix = options.oprefix
 
@@ -78,7 +81,7 @@ def run( options ):
                                                         depth2 )
     twoconditionscore.build()
     twoconditionscore.finalize()
-    (cat1,cat2,cat3) = twoconditionscore.call_peaks(min_length=options.minlen, cutoff=options.cutoff)
+    (cat1,cat2,cat3) = twoconditionscore.call_peaks(min_length=options.minlen, max_gap=options.maxgap, cutoff=options.cutoff)
 
     info("Write peaks...")
     nf = open ("%s_c%.1f_cond1.bed" % (options.oprefix,options.cutoff),"w")        
