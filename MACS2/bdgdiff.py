@@ -1,4 +1,4 @@
-# Time-stamp: <2013-07-31 12:35:53 Tao Liu>
+# Time-stamp: <2013-07-31 15:23:17 Tao Liu>
 
 """Description: Naive call differential peaks from 4 bedGraph tracks for scores.
 
@@ -70,8 +70,18 @@ def run( options ):
     c2bio = cBedGraphIO.bedGraphIO(options.c2bdg)
     c2btrack = c2bio.build_bdgtrack()
 
-    depth1 = options.sfactor
-    depth2 = options.sfactor
+    depth1 = options.depth1
+    depth2 = options.depth2
+
+    if depth1 > depth2:         # scale down condition 1 to size of condition 2
+        depth1 = depth2 / depth1
+        depth2 = 1.0
+    elif depth1 < depth2:       # scale down condition 2 to size of condition 1
+        depth2 = depth1/ depth2
+        depth1 = 1.0
+    else:                       # no need to scale down any
+        depth1 = 1.0
+        depth2 = 1.0
 
     twoconditionscore = cScoreTrack.TwoConditionScores( t1btrack,
                                                         c1btrack,

@@ -1,4 +1,4 @@
-# Time-stamp: <2013-07-31 13:12:47 Tao Liu>
+# Time-stamp: <2013-07-31 15:03:59 Tao Liu>
 
 """Module for Feature IO classes.
 
@@ -1389,14 +1389,14 @@ cdef class TwoConditionScores:
     cdef:
         dict data                       # dictionary for data of each chromosome
         dict datalength                 # length of data array of each chromosome
-        float cond1_depth                 # seq depth in million of treatment
-        float cond2_depth                  # seq depth in million of control
-        float pseudocount                # the pseudocount used to calcuate LLR
+        float cond1_factor              # factor to apply to cond1 pileup values
+        float cond2_factor              # factor to apply to cond2 pileup values
+        float pseudocount               # the pseudocount used to calcuate LLR
         float cutoff
         object t1bdg, c1bdg, t2bdg, c2bdg
         dict pvalue_stat1, pvalue_stat2, pvalue_stat3
     
-    def __init__ (self, t1bdg, c1bdg, t2bdg, c2bdg, float cond1_depth = 1.0, float cond2_depth = 1.0, float pseudocount = 0.01 ):
+    def __init__ (self, t1bdg, c1bdg, t2bdg, c2bdg, float cond1_factor = 1.0, float cond2_factor = 1.0, float pseudocount = 0.01 ):
         self.data = {}           # for each chromosome, there is a l*4
                                  # matrix. First column: end position
                                  # of a region; Second: treatment
@@ -1406,8 +1406,8 @@ cdef class TwoConditionScores:
                                  # ratio/fold-enrichment/subtraction
                                  # depending on -c setting)
         self.datalength = {}
-        self.cond1_depth = cond1_depth
-        self.cond2_depth = cond2_depth
+        self.cond1_factor = cond1_factor
+        self.cond2_factor = cond2_factor
         self.pseudocount = pseudocount
         self.pvalue_stat1 = {}
         self.pvalue_stat2 = {}
@@ -1529,9 +1529,9 @@ cdef class TwoConditionScores:
         i = self.datalength[chromosome]
         c = self.data[chromosome]
         c[0][ i ] = endpos
-        c[1][ i ] = logLR_asym( (t1+self.pseudocount)*self.cond1_depth, (c1+self.pseudocount)*self.cond1_depth )
-        c[2][ i ] = logLR_asym( (t2+self.pseudocount)*self.cond2_depth, (c2+self.pseudocount)*self.cond2_depth )
-        c[3][ i ] = logLR_sym( (t1+self.pseudocount)*self.cond1_depth, (t2+self.pseudocount)*self.cond2_depth )
+        c[1][ i ] = logLR_asym( (t1+self.pseudocount)*self.cond1_factor, (c1+self.pseudocount)*self.cond1_factor )
+        c[2][ i ] = logLR_asym( (t2+self.pseudocount)*self.cond2_factor, (c2+self.pseudocount)*self.cond2_factor )
+        c[3][ i ] = logLR_sym( (t1+self.pseudocount)*self.cond1_factor, (t2+self.pseudocount)*self.cond2_factor )
         self.datalength[chromosome] += 1
 
     cpdef finalize ( self ):
@@ -1551,254 +1551,6 @@ cdef class TwoConditionScores:
             d[2].resize( l, refcheck = False )
             d[3].resize( l, refcheck = False )            
         return
-    
-    # cpdef compute_pvalue_stat( self ):
-    #     """Compute -log_{10}(pvalue)
-
-    #     after this, logLR will be replaced with pvalue.
-    #     """
-    #     cdef:
-    #         np.ndarray[np.float32_t] v1, v2, v3
-    #         np.ndarray[np.int32_t] pos
-    #         long l, i, prev_pos
-    #         str chrom
-    #     rv = chi2(1) # a chi-squared distribution with one degree of freedom
-    #     sf = rv.sf
-    #     log10 = np.log10
-    #     for chrom in self.data.keys():
-    #         prev_pos = 0
-    #         pos = self.data[chrom][0]
-    #         l = self.datalength[chrom]
-    #         self.data[chrom][1] = -log10(sf(2 * self.data[chrom][1] / LOG10_E)).astype('float32') # convert logLR to p-value
-    #         self.data[chrom][2] = -log10(sf(2 * self.data[chrom][2] / LOG10_E)).astype('float32') # as above
-    #         self.data[chrom][3] = -log10(sf(2 * np.abs(self.data[chrom][3]) / LOG10_E)).astype('float32') # as above
-    #         v1 = self.data[chrom][1]
-    #         v2 = self.data[chrom][2]
-    #         v3 = self.data[chrom][3]
-    #         for i in range(l):
-    #             try:
-    #                 self.pvalue_stat1[v1[ i ]] += pos[ i ] - prev_pos
-    #             except:
-    #                 self.pvalue_stat1[v1[ i ]] = pos[ i ] - prev_pos
-    #             try:
-    #                 self.pvalue_stat2[v2[ i ]] += pos[ i ] - prev_pos
-    #             except:
-    #                 self.pvalue_stat2[v2[ i ]] = pos[ i ] - prev_pos
-    #             prev_pos = pos[ i ]
-
-        
-    # cpdef compute_all_pvalues_obsolete( self ):
-    #     """Compute -log_{10}(pvalue)
-
-    #     after this, logLR will be replaced with pvalue.
-    #     """
-    #     cdef:
-    #         np.ndarray[np.float32_t] v1, v2, v3
-    #         np.ndarray[np.int32_t] pos
-    #         long l, i, prev_pos
-    #         str chrom
-    #     rv = chi2(1) # a chi-squared distribution with one degree of freedom
-    #     sf = rv.sf
-    #     log10 = np.log10
-    #     for chrom in self.data.keys():
-    #         prev_pos = 0
-    #         pos = self.data[chrom][0]
-    #         l = self.datalength[chrom]
-    #         self.data[chrom][1] = -log10(sf(2 * self.data[chrom][1] / LOG10_E)).astype('float32') # convert logLR to p-value
-    #         self.data[chrom][2] = -log10(sf(2 * self.data[chrom][2] / LOG10_E)).astype('float32') # as above
-    #         self.data[chrom][3] = -log10(sf(2 * np.abs(self.data[chrom][3]) / LOG10_E)).astype('float32') # as above
-    #         v1 = self.data[chrom][1]
-    #         v2 = self.data[chrom][2]
-    #         v3 = self.data[chrom][3]
-    #         for i in range(l):
-    #             try:
-    #                 self.pvalue_stat1[v1[ i ]] += pos[ i ] - prev_pos
-    #             except:
-    #                 self.pvalue_stat1[v1[ i ]] = pos[ i ] - prev_pos
-    #             try:
-    #                 self.pvalue_stat2[v2[ i ]] += pos[ i ] - prev_pos
-    #             except:
-    #                 self.pvalue_stat2[v2[ i ]] = pos[ i ] - prev_pos
-    #             prev_pos = pos[ i ]
-            
-    # cpdef compute_track_qvalues ( self ):
-    #     """Compute -log_{10}(qvalue)
-    #     """
-    #     cdef:
-    #         dict pqtable
-    #         tuple pqtables
-    #         long i,l,j
-    #         double k
-    #         str chrom
-    #         np.ndarray p, c, v
-            
-    #     # make pqtables
-    #     # not sure if we should pool all the p-values or treat each comparison
-    #     # separately, but doing the latter for now
-    #     pqtables = self.make_pq_tables()
-        
-    #     # convert p to q
-
-    #     # convert pvalue2qvalue to a simple dict based on khash
-    #     # khash has big advantage while checking keys for millions of times.
-    #     for table_index in range(2):
-    #         pqtable = pqtables[table_index]
-    #         s_p2q = Float64HashTable()
-    #         for k in pqtable.keys():
-    #             s_p2q.set_item(k,pqtable[k])
-    
-    #         g = s_p2q.get_item
-            
-    #         for chrom in self.data.keys():
-    #             v = self.data[chrom][table_index + 1]
-    #             l = self.datalength[chrom]
-    #             for i in range(l):
-    #                 v[ i ] =  g( v[ i ])
-        
-    #     return
-
-    # cpdef compute_category_qvalues ( self, dict category ):
-    #     """Compute -log_{10}(qvalue)
-    #     """
-    #     cdef:
-    #         dict value_dict, pqtable
-    #         list unique_values
-    #         long i,l,j
-    #         np.ndarray p, c, v, data
-    #         long pre_l
-    #         double pre_v, unique_v, q, pre_q
-    #         long N, k
-    #         double f, pvalue
-        
-    #     # make pqtable for category
-    #     value_dict = {}
-    #     for chrom in self.data.keys():
-    #         if category[chrom].size == 0: continue
-
-    #         pos = self.data[chrom][0]
-    #         data = self.data[chrom][3]
-    #         for j in range(category[chrom].size):
-    #             i = category[chrom][j]
-    #             try:
-    #                 value_dict[data[i]] += pos[i + 1] - pos[i]
-    #             except IndexError:
-    #                 if not value_dict.has_key(data[i]):
-    #                     value_dict[data[i]] = 0
-    #             except KeyError:
-    #                 value_dict[data[i]] = pos[i + 1] - pos[i]
-
-    #     N = sum(value_dict.values())
-    #     k = 1                           # rank
-    #     f = -log10(N)
-    #     pre_v = -2147483647
-    #     pre_l = 0
-    #     pre_q = 2147483647              # save the previous q-value
-    #     pqtable = {}#Float64HashTable()
-    #     unique_values = sorted(value_dict.keys(), reverse=True) #sorted(unique_values,reverse=True)
-    #     for i in range(len(unique_values)):
-    #         unique_v = unique_values[i]
-    #         l = value_dict[unique_v]
-    #         q = unique_v + (log10(k) + f)
-    #         q = max(0,min(pre_q,q))           # make q-score monotonic
-    #         pqtable[ unique_v ] = q
-    #         pre_v = unique_v
-    #         pre_q = q
-    #         k+=l
-        
-    #     # convert p to q
-
-    #     # convert pvalue2qvalue to a simple dict based on khash
-    #     # khash has big advantage while checking keys for millions of times.
-    #     s_p2q = Float64HashTable()
-    #     for pvalue in pqtable.keys():
-    #         s_p2q.set_item(pvalue,pqtable[pvalue])
-
-    #     g = s_p2q.get_item
-        
-    #     qvalues = {}
-    #     for chrom in self.data.keys():
-    #         v = self.data[chrom][3][category[chrom]]
-    #         qvalues[chrom] = v.copy()
-    #         for i in range(v.size):
-    #             qvalues[chrom][ i ] =  g( v[ i ])
-        
-    #     return qvalues
-
-    # # borrowed from CombinedTwoTrack
-    # cdef tuple make_pq_tables ( self ):
-    #     """Make pvalue-qvalue table.
-
-    #     Step1: get all pvalue and length of block with this pvalue
-    #     Step2: Sort them
-    #     Step3: Apply AFDR method to adjust pvalue and get qvalue for each pvalue
-
-    #     Return a dictionary of {-log10pvalue:(-log10qvalue,rank,basepairs)} relationships.
-    #     """
-    #     cdef:
-    #         long pre_l, l, i
-    #         double pre_v, v, q, pre_q
-    #         long N, k
-    #         double f
-    #         str chrom
-    #         dict pvalue2qvalue1, pvalue2qvalue2
-    #         dict value_dict
-    #         list unique_values
-
-    #     value_dict = self.pvalue_stat1
-    #     N = sum(value_dict.values())
-    #     k = 1                           # rank
-    #     f = -log10(N)
-    #     pre_v = -2147483647
-    #     pre_l = 0
-    #     pre_q = 2147483647              # save the previous q-value
-    #     pvalue2qvalue1 = {}#Float64HashTable()
-    #     unique_values = sorted(value_dict.keys(), reverse=True) #sorted(unique_values,reverse=True)
-    #     for i in range(len(unique_values)):
-    #         v = unique_values[i]
-    #         l = value_dict[v]
-    #         q = v + (log10(k) + f)
-    #         q = max(0,min(pre_q,q))           # make q-score monotonic
-    #         pvalue2qvalue1[ v ] = q
-    #         pre_v = v
-    #         pre_q = q
-    #         k+=l
-            
-    #     value_dict = self.pvalue_stat2
-    #     N = sum(value_dict.values())
-    #     k = 1                           # rank
-    #     f = -log10(N)
-    #     pre_v = -2147483647
-    #     pre_l = 0
-    #     pre_q = 2147483647              # save the previous q-value
-    #     pvalue2qvalue2 = {}#Float64HashTable()
-    #     unique_values = sorted(value_dict.keys(), reverse=True) #sorted(unique_values,reverse=True)
-    #     for i in range(len(unique_values)):
-    #         v = unique_values[i]
-    #         l = value_dict[v]
-    #         q = v + (log10(k) + f)
-    #         q = max(0,min(pre_q,q))           # make q-score monotonic
-    #         pvalue2qvalue2[ v ] = q
-    #         pre_v = v
-    #         pre_q = q
-    #         k+=l
- 
-    #     return (pvalue2qvalue1, pvalue2qvalue2) 
-
-    # cpdef sort ( self, int column = 1 ):
-    #     """ Sort data for each chromosome, by certain column.
-
-    #     column: 1: position, 2: sample, 3: control, 4: score
-
-    #     Default: sort by positions.
-    #     """
-    #     cdef:
-    #         str chrom
-            
-        
-    #     for chrom in self.data.keys():
-    #         d = self.data[chrom]
-    #         d.view('int32,int32,int32,int32').sort(axis=0,order=column-1)
-    #     return
 
     cpdef get_data_by_chr (self, str chromosome):
         """Return array of counts by chromosome.
@@ -2506,7 +2258,7 @@ cdef class DiffScoreTrackI:
                         in_peaks[above_cutoff[first_i]:above_cutoff[i]] = True
 
             self.where_peaks[chrom] = np.where(in_peaks)[0].astype('int32')
-#            print "Total peakage in bp", in_peaks.sum()
+            print "Total peakage in bp", in_peaks.sum()
         
         return
 
