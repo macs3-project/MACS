@@ -444,13 +444,7 @@ Output files
    summit. Coordinates in XLS is 1-based which is different with BED
    format.
 
-2. NAME_peaks.bed is BED format file which contains the peak
-   locations. You can load it to UCSC genome browser or Affymetrix
-   IGB software. The file can be loaded directly to UCSC genome
-   browser. Remove the beginning track line if you want to analyze it
-   by other tools.
-
-3. NAME_peaks.narrowPeak is BED6+4 format file which contains the
+2. NAME_peaks.narrowPeak is BED6+4 format file which contains the
    peak locations together with peak summit, pvalue and qvalue. You
    can load it to UCSC genome browser. Definition of some specific
    columns are: 5th: integer score for display, 7th: fold-change,
@@ -459,14 +453,14 @@ Output files
    genome browser. Remove the beginning track line if you want to
    analyze it by other tools.
 
-4. NAME_summits.bed is in BED format, which contains the peak summits
+3. NAME_summits.bed is in BED format, which contains the peak summits
    locations for every peaks. The 5th column in this file is
    -log10pvalue the same as NAME_peaks.bed. If you want to find the
    motifs at the binding sites, this file is recommended. The file
    can be loaded directly to UCSC genome browser. Remove the
    beginning track line if you want to analyze it by other tools.
 
-5. NAME_broad_peaks.bed is in BED12 format which contains both the
+4. NAME_broad_peaks.bed is in BED12 format which contains both the
    broad region and narrow peaks. The 5th column is 100*-log10pvalue,
    to be more compatible to UCSC standard. Tht 7th is the start of
    the first narrow peak in the region, and the 8th column is the
@@ -478,7 +472,7 @@ Output files
    loaded directly to UCSC genome browser. Remove the beginning track
    line if you want to analyze it by other tools.
 
-6. NAME_model.r is an R script which you can use to produce a PDF
+5. NAME_model.r is an R script which you can use to produce a PDF
    image about the model based on your data. Load it to R by:
 
    ```$ R --vanilla < NAME_model.r```
@@ -486,13 +480,10 @@ Output files
    Then a pdf file NAME_model.pdf will be generated in your current
    directory. Note, R is required to draw this figure.
 
-7. The .bdg files are in bedGraph format which can be imported to
+6. The .bdg files are in bedGraph format which can be imported to
    UCSC genome browser or be converted into even smaller bigWig
-   files. Four kinds of bdg files include treat_pileup,
-   control_lambda, treat_pvalue, and treat_qvalue.
-
-8. NAME_pqtable.txt store the -log10pvalue, -log10qvalue, rank of
-   this pvalue, and number of bp having this pvalue.
+   files. There are two kinds of bdg files: treat_pileup, and
+   control_lambda.
 
 Other useful links
 ==================
