@@ -68,6 +68,8 @@ def run( options ):
             sbtrack.change_score_method( ord('F') )        
         elif method == 'logLR':             # log likelihood
             sbtrack.change_score_method( ord('l') )
+        elif method == 'slogLR':             # log likelihood
+            sbtrack.change_score_method( ord('s') )
         else:
             raise Exception("Can't reach here!")
         

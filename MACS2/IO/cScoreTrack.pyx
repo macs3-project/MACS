@@ -63,6 +63,7 @@ def do_nothing(*args, **kwargs):
     pass
 
 LOG10_E = 0.43429448190325176
+
 pscore_khashtable = Int64HashTable()
 
 cdef inline double get_pscore ( int observed, double expectation ):
@@ -83,14 +84,6 @@ cdef inline double get_pscore ( int observed, double expectation ):
         score = -1*poisson_cdf(observed,expectation,False,True)
         pscore_khashtable.set_item(key_value, score)
         return score
-    #if pscore_dict.has_key(key_value):
-    #    return pscore_dict[key_value]
-    #else:
-    #    score = int(-100*poisson_cdf(observed,expectation,False,True))
-    #    pscore_dict[(observed,expectation)] = score
-    #return score
-
-logLR_khashtable = Int64HashTable()
 
 cdef double get_interpolated_pscore ( double observed, double expectation ):
     cdef:
@@ -105,11 +98,12 @@ cdef double get_interpolated_pscore ( double observed, double expectation ):
     pscore = (ceil_pscore - floor_pscore) * (observed - observed_floor) + \
              floor_pscore
     return pscore
-    
+
+asym_logLR_khashtable = Int64HashTable()
+
 cdef inline double logLR_asym ( double x, double y ):
     """Calculate log10 Likelihood between H1 ( enriched ) and H0 (
-    chromatin bias ). Then store the values in integer form =
-    100*logLR. Set minus sign for depletion.
+    chromatin bias ). Set minus sign for depletion.
     
     *asymmetric version* 
 
@@ -120,7 +114,7 @@ cdef inline double logLR_asym ( double x, double y ):
     
     key_value = hash( (x, y ) )
     try:
-        return logLR_khashtable.get_item( key_value )
+        return asym_logLR_khashtable.get_item( key_value )
     except KeyError:
         if x > y:
             s = (x*(log(x)-log(y))+y-x)*LOG10_E
@@ -128,14 +122,15 @@ cdef inline double logLR_asym ( double x, double y ):
             s = (x*(-log(x)+log(y))-y+x)*LOG10_E
         else:
             s = 0
-        logLR_khashtable.set_item(key_value, s)
+        asym_logLR_khashtable.set_item(key_value, s)
         return s
+
+diff_logLR_khashtable = Int64HashTable()
 
 cdef inline double logLR_4diff (double x, double y):
     """Calculate log10 Likelihood between H1 ( enriched ) and H0 (
-    chromatin bias ). Then store the values in integer form =
-    100*logLR. 
-
+    chromatin bias ).
+    
     * Always positive, used for evaluating difference only.*
     
     """
@@ -145,19 +140,20 @@ cdef inline double logLR_4diff (double x, double y):
     
     key_value = hash( (x, y) )
     try:
-        return logLR_khashtable.get_item( key_value )
+        return diff_logLR_khashtable.get_item( key_value )
     except KeyError:
         if y > x: y, x = x, y
         if x==y: s = 0
         
         else: s = (x*(log(x)-log(y))+y-x)*LOG10_E
-        logLR_khashtable.set_item(key_value, s)
+        diff_logLR_khashtable.set_item(key_value, s)
         return s
-    
+
+sym_logLR_khashtable = Int64HashTable()
+
 cdef inline double logLR_sym ( double x, double y ):
     """Calculate log10 Likelihood between H1 ( enriched ) and H0 (
-    chromatin bias ). Then store the values in integer form =
-    100*logLR. Set minus sign for depletion.
+    another enriched ). Set minus sign for H0>H1.
     
     * symmetric version *
 
@@ -168,7 +164,7 @@ cdef inline double logLR_sym ( double x, double y ):
     
     key_value = hash( (x, y ) )
     try:
-        return logLR_khashtable.get_item( key_value )
+        return sym_logLR_khashtable.get_item( key_value )
     except KeyError:
         if x > y:
             s = (x*(log(x)-log(y))+y-x)*LOG10_E
@@ -176,7 +172,7 @@ cdef inline double logLR_sym ( double x, double y ):
             s = (y*(log(x)-log(y))+y-x)*LOG10_E
         else:
             s = 0
-        logLR_khashtable.set_item(key_value, s)
+        sym_logLR_khashtable.set_item(key_value, s)
         return s
 
     
@@ -189,7 +185,6 @@ cdef inline float get_subtraction ( float x, float y):
     """ return subtraction.
     """
     return x - y
-
 
 cdef float median_from_value_length ( np.ndarray value, list length ):
     """
@@ -205,7 +200,6 @@ cdef float median_from_value_length ( np.ndarray value, list length ):
         c += tmp_l
         if c > l:
             return tmp_v
-
 
 cdef float mean_from_value_length ( np.ndarray value, list length ):
     """
@@ -736,6 +730,7 @@ cdef class scoreTrackII:
         scoring_method:  p: -log10 pvalue;
                          q: -log10 qvalue;
                          l: log10 likelihood ratio ( minus for depletion )
+			 s: symmetric log10 likelihood ratio ( for comparing two ChIPs )
                          f: log10 fold enrichment
                          F: linear fold enrichment
                          d: subtraction
@@ -750,6 +745,8 @@ cdef class scoreTrackII:
             self.compute_qvalue()
         elif scoring_method == 'l':
             self.compute_likelihood()
+        elif scoring_method == 's':
+            self.compute_sym_likelihood()
         elif scoring_method == 'f':
             self.compute_logFE()
         elif scoring_method == 'F':
@@ -900,6 +897,33 @@ cdef class scoreTrackII:
                 v2 = c()
                 v[ i ] =  logLR_asym( v1 + pseudocount, v2 + pseudocount )  #logLR( d[ i, 1]/100.0, d[ i, 2]/100.0 )
         self.scoring_method = 'l'
+        return 
+
+    cdef compute_sym_likelihood ( self ):
+        """Calculate symmetric log10 likelihood.
+        
+        """
+        cdef:
+            #np.ndarray v, p, c
+            long l, i
+            str chrom
+            float v1, v2
+            float pseudocount
+
+        pseudocount = self.pseudocount
+        
+        for chrom in self.data.keys():
+            p = self.data[chrom][ 1 ].flat.next
+            c = self.data[chrom][ 2 ].flat.next
+            v = self.data[chrom][ 3 ]
+            l = self.datalength[chrom]
+            v1 = 2
+            v2 = 1
+            for i in range(l):
+                v1 = p() 
+                v2 = c()
+                v[ i ] =  logLR_sym( v1 + pseudocount, v2 + pseudocount )  #logLR( d[ i, 1]/100.0, d[ i, 2]/100.0 )
+        self.scoring_method = 's'
         return 
 
     cdef compute_logFE ( self ):

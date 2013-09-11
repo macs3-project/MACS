@@ -1,4 +1,4 @@
-# Time-stamp: <2013-04-15 13:52:01 Tao Liu>
+# Time-stamp: <2013-09-11 00:32:45 Tao Liu>
 
 """Module for FWTrack classes.
 
@@ -78,7 +78,7 @@ cdef class FWTrackIII:
         public object dups
         public int fw
     
-    def __init__ (self, int32_t fw=0, char * anno=""):
+    def __init__ (self, int32_t fw=0, char * anno="", int32_t buffer_size = 100000 ):
         """fw is the fixed-width for all locations.
         
         """
@@ -94,6 +94,7 @@ cdef class FWTrackIII:
         self.dup_total = 0           # total tags
         self.annotation = anno   # need to be figured out
         self.rlengths = {}       # lengths of reference sequences, e.g. each chromosome in a genome
+        self.buffer_size = 100000
         self.__destroyed = False
 
     cpdef destroy ( self ):
@@ -106,16 +107,16 @@ cdef class FWTrackIII:
         chrs = set(self.get_chr_names())
         for chromosome in chrs:
             if self.__locations.has_key(chromosome):
-                self.__locations[chromosome][0].resize( 100000, refcheck=False )
+                self.__locations[chromosome][0].resize( self.buffer_size, refcheck=False )
                 self.__locations[chromosome][0].resize( 0, refcheck=False )
-                self.__locations[chromosome][1].resize( 100000, refcheck=False )
+                self.__locations[chromosome][1].resize( self.buffer_size, refcheck=False )
                 self.__locations[chromosome][1].resize( 0, refcheck=False )
                 self.__locations[chromosome] = [None, None]
                 self.__locations.pop(chromosome)
             if self.__dup_locations.has_key(chromosome):
-                self.__dup_locations[chromosome][0].resize( 100000, refcheck=False )
+                self.__dup_locations[chromosome][0].resize( self.buffer_size, refcheck=False )
                 self.__dup_locations[chromosome][0].resize( 0, refcheck=False )
-                self.__dup_locations[chromosome][1].resize( 100000, refcheck=False )
+                self.__dup_locations[chromosome][1].resize( self.buffer_size, refcheck=False )
                 self.__dup_locations[chromosome][1].resize( 0, refcheck=False )
                 self.__dup_locations[chromosome] = [None, None]
                 self.__dup_locations.pop(chromosome)
@@ -131,7 +132,7 @@ cdef class FWTrackIII:
         strand     -- 0: plus, 1: minus
         """
         if not self.__locations.has_key(chromosome):
-            self.__locations[chromosome] = [ np.zeros(BUFFER_SIZE, dtype='int32'), np.zeros(BUFFER_SIZE, dtype='int32') ] # [plus,minus strand]
+            self.__locations[chromosome] = [ np.zeros(self.buffer_size, dtype='int32'), np.zeros(self.buffer_size, dtype='int32') ] # [plus,minus strand]
             self.__pointer[chromosome] = [ 0, 0 ]
         try:
             self.__locations[chromosome][strand][self.__pointer[chromosome][strand]] = fiveendpos
@@ -143,7 +144,7 @@ cdef class FWTrackIII:
         #print chromosome
 
     cpdef __expand__ ( self, np.ndarray arr ):
-        arr.resize( arr.size + BUFFER_SIZE, refcheck = False )
+        arr.resize( arr.size + self.buffer_size, refcheck = False )
         return
 
     cpdef finalize ( self ):
@@ -305,7 +306,7 @@ cdef class FWTrackIII:
                 # I know I should shrink it to 0 size directly,
                 # however, on Mac OSX, it seems directly assigning 0
                 # doesn't do a thing.
-                plus.resize( 100000, refcheck=False )
+                plus.resize( self.buffer_size, refcheck=False )
                 plus.resize( 0, refcheck=False )
                 # hope there would be no mem leak...
 
@@ -351,7 +352,7 @@ cdef class FWTrackIII:
                 # I know I should shrink it to 0 size directly,
                 # however, on Mac OSX, it seems directly assigning 0
                 # doesn't do a thing.
-                minus.resize( 100000, refcheck=False )
+                minus.resize( self.buffer_size, refcheck=False )
                 minus.resize( 0, refcheck=False )
                 # hope there would be no mem leak...                
             
@@ -395,13 +396,13 @@ cdef class FWTrackIII:
             new_minus= np.concatenate((minus, dup_minus))
 
             # clean old data
-            plus.resize( 100000, refcheck=False )
+            plus.resize( self.buffer_size, refcheck=False )
             plus.resize( 0, refcheck=False )
-            dup_plus.resize( 100000, refcheck=False )
+            dup_plus.resize( self.buffer_size, refcheck=False )
             dup_plus.resize( 0, refcheck=False )
-            minus.resize( 100000, refcheck=False )
+            minus.resize( self.buffer_size, refcheck=False )
             minus.resize( 0, refcheck=False )
-            dup_minus.resize( 100000, refcheck=False )
+            dup_minus.resize( self.buffer_size, refcheck=False )
             dup_minus.resize( 0, refcheck=False )            
 
             # sort then assign
@@ -488,7 +489,7 @@ cdef class FWTrackIII:
                 # I know I should shrink it to 0 size directly,
                 # however, on Mac OSX, it seems directly assigning 0
                 # doesn't do a thing.
-                plus.resize( 100000, refcheck=False )
+                plus.resize( self.buffer_size, refcheck=False )
                 plus.resize( 0, refcheck=False )
                 # hope there would be no mem leak...
 
@@ -527,7 +528,7 @@ cdef class FWTrackIII:
                 # I know I should shrink it to 0 size directly,
                 # however, on Mac OSX, it seems directly assigning 0
                 # doesn't do a thing.
-                minus.resize( 100000, refcheck=False )
+                minus.resize( self.buffer_size, refcheck=False )
                 minus.resize( 0, refcheck=False )
                 # hope there would be no mem leak...                
             

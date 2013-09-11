@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# Time-stamp: <2013-07-31 15:21:14 Tao Liu>
+# Time-stamp: <2013-09-11 00:28:20 Tao Liu>
 
 """Description: MACS v2 main executable.
 
@@ -154,6 +154,8 @@ def add_callpeak_parser( subparsers ):
                               help = "Effective genome size. It can be 1.0e+9 or 1000000000, or shortcuts:'hs' for human (2.7e9), 'mm' for mouse (1.87e9), 'ce' for C. elegans (9e7) and 'dm' for fruitfly (1.2e8), Default:hs" )
     group_input.add_argument( "--keep-dup", dest = "keepduplicates", type = str, default = "1",
                               help = "It controls the MACS behavior towards duplicate tags at the exact same location -- the same coordination and the same strand. The 'auto' option makes MACS calculate the maximum tags at the exact same location based on binomal distribution using 1e-5 as pvalue cutoff; and the 'all' option keeps every tags. If an integer is given, at most this number of tags will be kept at the same location. The default is to keep one tag at the same location. Default: 1" )
+    group_input.add_argument( "--buffer-size", dest = "buffersize", type = int, default = "100000",
+                              help = "Buffer size for incrementally increasing internal array size to store reads alignment information. In most cases, you don't have to change this parameter. However, if there are large number of chromosomes/contigs/scaffolds in your alignment, it's recommended to specify a smaller buffer size in order to decrease memory usage (but it will take longer time to read alignment files). Minimum memory requested for reading an alignment file is about # of CHROMOSOME * BUFFER_SIZE * 2 Bytes. DEFAULT: 100000 " )
     
     # group for output files
     group_output = argparser_callpeak.add_argument_group( "Output arguments" )
@@ -378,8 +380,8 @@ def add_bdgcmp_parser( subparsers ):
     argparser_bdgcmp.add_argument( "-o", "--output", dest = "ofile", type = str, required = True,
                                    help = "The PREFIX of output bedGraph file to write scores. REQUIRED. If it is given as A, and method is 'ppois', output file will be A_ppois.bdg" )
     argparser_bdgcmp.add_argument( "-m", "--method", dest = "method", type = str, nargs = "+",
-                                   choices = ( "ppois", "qpois", "subtract", "logFE", "FE", "logLR" ),
-                                   help = "Method to use while calculating a score in any bin by comparing treatment value and control value. Available choices are: ppois, qpois, subtract, logFE, and logLR,. They represent Poisson Pvalue (-log10(pvalue) form) using control as lambda and treatment as observation, q-value through a BH process for poisson pvalues, subtraction from treatment, linear scale fold enrichment, log10 fold enrichment, log10 likelihood between ChIP-enriched model and open chromatin model (with or without pseudocount). Default option is ppois.",default="ppois")
+                                   choices = ( "ppois", "qpois", "subtract", "logFE", "FE", "logLR", "slogLR" ),
+                                   help = "Method to use while calculating a score in any bin by comparing treatment value and control value. Available choices are: ppois, qpois, subtract, logFE, logLR, and slogLR. They represent Poisson Pvalue (-log10(pvalue) form) using control as lambda and treatment as observation, q-value through a BH process for poisson pvalues, subtraction from treatment, linear scale fold enrichment, log10 fold enrichment(need to set pseudocount), log10 likelihood between ChIP-enriched model and open chromatin model(need to set pseudocount), and symmetric log10 likelihood between two ChIP-enrichment models. Default option is ppois.",default="ppois")
     return
     
 def add_randsample_parser( subparsers ):

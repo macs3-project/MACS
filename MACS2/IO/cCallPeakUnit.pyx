@@ -111,8 +111,6 @@ cdef inline double get_pscore ( int observed, double expectation ):
         pscore_khashtable.set_item(key_value, score)
         return score
 
-logLR_khashtable = Int64HashTable()
-
 cdef double get_interpolated_pscore ( double observed, double expectation ):
     cdef:
         double pscore
@@ -126,11 +124,12 @@ cdef double get_interpolated_pscore ( double observed, double expectation ):
     pscore = (ceil_pscore - floor_pscore) * (observed - observed_floor) + \
              floor_pscore
     return pscore
-    
+
+asym_logLR_khashtable = Int64HashTable()
+
 cdef inline double logLR_asym ( double x, double y ):
     """Calculate log10 Likelihood between H1 ( enriched ) and H0 (
-    chromatin bias ). Then store the values in integer form =
-    100*logLR. Set minus sign for depletion.
+    chromatin bias ). Set minus sign for depletion.
     
     *asymmetric version* 
 
@@ -141,7 +140,7 @@ cdef inline double logLR_asym ( double x, double y ):
     
     key_value = hash( (x, y ) )
     try:
-        return logLR_khashtable.get_item( key_value )
+        return asym_logLR_khashtable.get_item( key_value )
     except KeyError:
         if x > y:
             s = (x*(log(x)-log(y))+y-x)*LOG10_E
@@ -149,14 +148,15 @@ cdef inline double logLR_asym ( double x, double y ):
             s = (x*(-log(x)+log(y))-y+x)*LOG10_E
         else:
             s = 0
-        logLR_khashtable.set_item(key_value, s)
+        asym_logLR_khashtable.set_item(key_value, s)
         return s
+
+diff_logLR_khashtable = Int64HashTable()
 
 cdef inline double logLR_4diff (double x, double y):
     """Calculate log10 Likelihood between H1 ( enriched ) and H0 (
-    chromatin bias ). Then store the values in integer form =
-    100*logLR. 
-
+    chromatin bias ).
+    
     * Always positive, used for evaluating difference only.*
     
     """
@@ -166,19 +166,20 @@ cdef inline double logLR_4diff (double x, double y):
     
     key_value = hash( (x, y) )
     try:
-        return logLR_khashtable.get_item( key_value )
+        return diff_logLR_khashtable.get_item( key_value )
     except KeyError:
         if y > x: y, x = x, y
         if x==y: s = 0
         
         else: s = (x*(log(x)-log(y))+y-x)*LOG10_E
-        logLR_khashtable.set_item(key_value, s)
+        diff_logLR_khashtable.set_item(key_value, s)
         return s
-    
+
+sym_logLR_khashtable = Int64HashTable()
+
 cdef inline double logLR_sym ( double x, double y ):
     """Calculate log10 Likelihood between H1 ( enriched ) and H0 (
-    chromatin bias ). Then store the values in integer form =
-    100*logLR. Set minus sign for depletion.
+    another enriched ). Set minus sign for H0>H1.
     
     * symmetric version *
 
@@ -189,7 +190,7 @@ cdef inline double logLR_sym ( double x, double y ):
     
     key_value = hash( (x, y ) )
     try:
-        return logLR_khashtable.get_item( key_value )
+        return sym_logLR_khashtable.get_item( key_value )
     except KeyError:
         if x > y:
             s = (x*(log(x)-log(y))+y-x)*LOG10_E
@@ -197,7 +198,7 @@ cdef inline double logLR_sym ( double x, double y ):
             s = (y*(log(x)-log(y))+y-x)*LOG10_E
         else:
             s = 0
-        logLR_khashtable.set_item(key_value, s)
+        sym_logLR_khashtable.set_item(key_value, s)
         return s
 
 cdef inline double get_logFE ( float x, float y ):
