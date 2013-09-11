@@ -1,4 +1,4 @@
-# Time-stamp: <2013-09-11 17:41:18 Tao Liu>
+# Time-stamp: <2013-09-11 17:48:35 Tao Liu>
 
 """Module for all MACS Parser classes for input.
 
@@ -129,7 +129,7 @@ cdef class GenericParser:
     cdef object fhd
     cdef long buffer_size
     
-    def __init__ ( self, str filename, long buffer_size ):
+    def __init__ ( self, str filename, long buffer_size = 100000 ):
         """Open input file. Determine whether it's a gzipped file.
 
         'filename' must be a string object.
@@ -643,7 +643,7 @@ cdef class BAMParser( GenericParser ):
     512	does not pass quality check
     1024	PCR or optical duplicate
     """
-    def __init__ ( self, str filename, long buffer_size ):
+    def __init__ ( self, str filename, long buffer_size = 100000 ):
         """Open input file. Determine whether it's a gzipped file.
 
         'filename' must be a string object.
@@ -1374,7 +1374,7 @@ cdef class PySAMParser:
     cdef int tag_size
     cdef object fhd
     
-    def __init__ ( self, str filename, long buffer_size ):
+    def __init__ ( self, str filename, long buffer_size = 100000 ):
         """Open input file. Determine whether it's a gzipped file.
 
         'filename' must be a string object.
