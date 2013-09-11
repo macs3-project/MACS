@@ -1,4 +1,4 @@
-# Time-stamp: <2013-09-11 17:54:11 Tao Liu>
+# Time-stamp: <2013-09-11 17:56:14 Tao Liu>
 
 """Module for all MACS Parser classes for input.
 
@@ -64,7 +64,7 @@ __doc__ = "All Parser classes"
 # Misc functions
 # ------------------------------------
 
-cpdef guess_parser ( fhd, buffer_size = 100000 ):
+cpdef guess_parser ( fhd, long buffer_size = 100000 ):
     order_list = ("BAM",
                   "BED",
                   "ELAND",
