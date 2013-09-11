@@ -1,4 +1,4 @@
-# Time-stamp: <2013-09-11 17:48:35 Tao Liu>
+# Time-stamp: <2013-09-11 17:54:11 Tao Liu>
 
 """Module for all MACS Parser classes for input.
 
@@ -64,7 +64,7 @@ __doc__ = "All Parser classes"
 # Misc functions
 # ------------------------------------
 
-cpdef guess_parser ( fhd ):
+cpdef guess_parser ( fhd, buffer_size = 100000 ):
     order_list = ("BAM",
                   "BED",
                   "ELAND",
@@ -76,19 +76,19 @@ cpdef guess_parser ( fhd ):
 
     for f in order_list:
         if f == 'BED':
-            p = BEDParser( fhd )
+            p = BEDParser( fhd, buffer_size = buffer_size )
         elif f == "ELAND":
-            p = ELANDResultParser( fhd )
+            p = ELANDResultParser( fhd, buffer_size = buffer_size )
         elif f ==  "ELANDMULTI":
-            p = ELANDMultiParser( fhd )
+            p = ELANDMultiParser( fhd, buffer_size = buffer_size )
         elif f == "ELANDEXPORT":
-            p = ELANDExportParser( fhd )
+            p = ELANDExportParser( fhd, buffer_size = buffer_size )
         elif f == "SAM":
-            p = SAMParser( fhd )
+            p = SAMParser( fhd, buffer_size = buffer_size )
         elif f == "BAM":
-            p = BAMParser( fhd )
+            p = BAMParser( fhd, buffer_size = buffer_size )
         elif f == "BOWTIE":
-            p = BowtieParser( fhd )
+            p = BowtieParser( fhd, buffer_size = buffer_size )
         s = p.sniff()
         if s:
             logging.info( "Detected format is: %s" % ( f ) )
