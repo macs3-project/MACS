@@ -1,4 +1,4 @@
-# Time-stamp: <2013-07-09 01:35:05 Tao Liu>
+# Time-stamp: <2013-09-11 17:39:20 Tao Liu>
 
 """Description: MACS 2 main executable
 
@@ -336,27 +336,27 @@ def load_frag_files_options ( options ):
     """
     options.info("#1 read treatment fragments...")
 
-    tp = options.parser(options.tfile[0])
+    tp = options.parser(options.tfile[0], buffer_size=options.buffer_size)
     treat = tp.build_petrack()
     treat.sort()
     if len(options.tfile) > 1:
         # multiple input
         for tfile in options.tfile[1:]:
-            tp = options.parser(tfile)
+            tp = options.parser(tfile, buffer_size=options.buffer_size)
             treat = tp.append_petrack( treat )
             treat.sort()
 
     options.tsize = tp.d
     if options.cfile:
         options.info("#1.2 read input fragments...")
-        cp = options.parser(options.cfile[0])
+        cp = options.parser(options.cfile[0], buffer_size=options.buffer_size)
         control = cp.build_petrack()
         control_d = cp.d
         control.sort()
         if len(options.cfile) > 1:
             # multiple input
             for cfile in options.cfile[1:]:
-                cp = options.parser(cfile)
+                cp = options.parser(cfile, buffer_size=options.buffer_size)
                 control = cp.append_petrack( control )
                 control.sort()
     else:
@@ -372,7 +372,7 @@ def load_tag_files_options ( options ):
 
     """
     options.info("#1 read treatment tags...")
-    tp = options.parser(options.tfile[0])
+    tp = options.parser(options.tfile[0], buffer_size=options.buffer_size)
     if not options.tsize:           # override tsize if user specified --tsize
         ttsize = tp.tsize()
         options.tsize = ttsize
@@ -381,18 +381,18 @@ def load_tag_files_options ( options ):
     if len(options.tfile) > 1:
         # multiple input
         for tfile in options.tfile[1:]:
-            tp = options.parser(tfile)
+            tp = options.parser(tfile, buffer_size=options.buffer_size)
             treat = tp.append_fwtrack( treat )
             treat.sort()
     
     if options.cfile:
         options.info("#1.2 read input tags...")
-        control = options.parser(options.cfile[0]).build_fwtrack()
+        control = options.parser(options.cfile[0], buffer_size=options.buffer_size).build_fwtrack()
         control.sort()
         if len(options.cfile) > 1:
             # multiple input
             for cfile in options.cfile[1:]:
-                cp = options.parser(cfile)
+                cp = options.parser(cfile, buffer_size=options.buffer_size)
                 control = cp.append_fwtrack( control )
                 control.sort()
     else:

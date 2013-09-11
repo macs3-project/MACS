@@ -1,4 +1,4 @@
-# Time-stamp: <2013-05-27 21:28:58 Tao Liu>
+# Time-stamp: <2013-09-11 17:44:57 Tao Liu>
 
 """Module for filter duplicate tags from paired-end data
 
@@ -49,9 +49,10 @@ cdef class PETrackI:
     cdef public object annotation
     cdef public dict rlengths
     cdef public object dups
+    cdef public long buffer_size
     cdef bool   __destroyed
     
-    def __init__ (self, char * anno=""):
+    def __init__ (self, char * anno="", long buffer_size = 100000 ):
         """fw is the fixed-width for all locations.
         
         """
@@ -73,7 +74,7 @@ cdef class PETrackI:
         fiveendpos -- 5' end pos, left for plus strand, right for neg strand
         """
         if not self.__locations.has_key(chromosome):
-            self.__locations[chromosome] = np.zeros(shape=(BUFFER_SIZE, 2), dtype='int32') # note: [,0] is the leftmost end, [,1] is the rightmost end of fragment.
+            self.__locations[chromosome] = np.zeros(shape=(self.buffer_size, 2), dtype='int32') # note: [,0] is the leftmost end, [,1] is the rightmost end of fragment.
             self.__pointer[chromosome] = 0
         try:
             self.__locations[chromosome][self.__pointer[chromosome],0] = start
@@ -95,16 +96,16 @@ cdef class PETrackI:
         chrs = set(self.get_chr_names())
         for chromosome in chrs:
             if self.__locations.has_key(chromosome):
-                self.__locations[chromosome][0].resize( 100000, refcheck=False )
+                self.__locations[chromosome][0].resize( self.buffer_size, refcheck=False )
                 self.__locations[chromosome][0].resize( 0, refcheck=False )
-                self.__locations[chromosome][1].resize( 100000, refcheck=False )
+                self.__locations[chromosome][1].resize( self.buffer_size, refcheck=False )
                 self.__locations[chromosome][1].resize( 0, refcheck=False )
                 self.__locations[chromosome] = [None, None]
                 self.__locations.pop(chromosome)
             if self.__dup_locations.has_key(chromosome):
-                self.__dup_locations[chromosome][0].resize( 100000, refcheck=False )
+                self.__dup_locations[chromosome][0].resize( self.buffer_size, refcheck=False )
                 self.__dup_locations[chromosome][0].resize( 0, refcheck=False )
-                self.__dup_locations[chromosome][1].resize( 100000, refcheck=False )
+                self.__dup_locations[chromosome][1].resize( self.buffer_size, refcheck=False )
                 self.__dup_locations[chromosome][1].resize( 0, refcheck=False )
                 self.__dup_locations[chromosome] = [None, None]
                 self.__dup_locations.pop(chromosome)
@@ -113,7 +114,7 @@ cdef class PETrackI:
         return True
 
     cpdef __expand__ ( self, np.ndarray arr ):
-        arr.resize((arr.shape[0] + BUFFER_SIZE, 2), refcheck = False )
+        arr.resize((arr.shape[0] + self.buffer_size, 2), refcheck = False )
         return
 
     cpdef bint set_rlengths ( self, dict rlengths ):
@@ -231,7 +232,7 @@ cdef class PETrackI:
         fragment size, indices are the bin number (first bin is 0)
         """
         cdef:
-           np.ndarray[np.int64_t, ndim=1] counts = np.zeros(BUFFER_SIZE, dtype='int64')
+           np.ndarray[np.int64_t, ndim=1] counts = np.zeros(self.buffer_size, dtype='int64')
            np.ndarray[np.float64_t, ndim=1] pmf
            np.ndarray[np.int64_t, ndim=1] bins
            np.ndarray[np.int32_t, ndim=1] sizes, locs
@@ -330,7 +331,7 @@ cdef class PETrackI:
             # I know I should shrink it to 0 size directly,
             # however, on Mac OSX, it seems directly assigning 0
             # doesn't do a thing.
-            locs.resize( 100000, refcheck=False )
+            locs.resize( self.buffer_size, refcheck=False )
             locs.resize( 0, refcheck=False )
             # hope there would be no mem leak...
     
@@ -405,7 +406,7 @@ cdef class PETrackI:
             # I know I should shrink it to 0 size directly,
             # however, on Mac OSX, it seems directly assigning 0
             # doesn't do a thing.
-            locs.resize( 100000, refcheck=False )
+            locs.resize( self.buffer_size, refcheck=False )
             locs.resize( 0, refcheck=False )
             # hope there would be no mem leak...
     

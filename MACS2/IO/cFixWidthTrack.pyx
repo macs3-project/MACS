@@ -1,4 +1,4 @@
-# Time-stamp: <2013-09-11 00:32:45 Tao Liu>
+# Time-stamp: <2013-09-11 17:42:07 Tao Liu>
 
 """Module for FWTrack classes.
 
@@ -72,13 +72,14 @@ cdef class FWTrackIII:
         bool __destroyed
         bool __dup_separated
         dict rlengths
+        public long buffer_size
         public long total
         public unsigned long dup_total
         public object annotation
         public object dups
         public int fw
     
-    def __init__ (self, int32_t fw=0, char * anno="", int32_t buffer_size = 100000 ):
+    def __init__ (self, int32_t fw=0, char * anno="", long buffer_size = 100000 ):
         """fw is the fixed-width for all locations.
         
         """
@@ -94,7 +95,7 @@ cdef class FWTrackIII:
         self.dup_total = 0           # total tags
         self.annotation = anno   # need to be figured out
         self.rlengths = {}       # lengths of reference sequences, e.g. each chromosome in a genome
-        self.buffer_size = 100000
+        self.buffer_size = buffer_size
         self.__destroyed = False
 
     cpdef destroy ( self ):

@@ -1,3 +1,971 @@
+2013-09-11  Tao Liu  <vladimir.liu@gmail.com>
+	MACS version 2.0.10 20130911 (tag:alpha)
+
+	* callpeak Added a new option --buffer-size
+	
+	* fixed logLR bugs.
+
+2013-07-31  Tao Liu  <vladimir.liu@gmail.com>
+	MACS version 2.0.10 20130731 (tag:alpha)
+
+	* callpeak --call-summits
+
+	Fix bugs causing callpeak --call-summits option generating extra
+	number of peaks and inconsistent peak boundaries comparing to
+	default option. Thank Ben Levinson!
+
+	* bdgcmp output
+
+	Fix bugs causing bdgcmp output logLR all in positive values. Now
+	'depletion' can be correctly represented as negative values.
+
+	* bdgdiff
+
+	Fix the behavior of bdgdiff module. Now it can take four
+	bedGraph files, then use logLR as cutoff to call differential
+	regions. Check command line of bdgdiff for detail. 
+
+2013-07-13  Tao Liu  <vladimir.liu@gmail.com>
+	MACS version 2.0.10 20130713 (tag:alpha)
+
+	* fix bugs while output broadPeak and gappedPeak.
+
+	Note. Those weak broad regions without any strong enrichment
+	regions inside won't be saved in gappedPeak file.
+
+	* bdgcmp -T and -C are merged into -S and description is updated.
+
+	Now, you can use it to override SPMR values in your input for
+	bdgcmp. To use SPMR (from 'callpeak --SPMR -B') while calculating
+	statistics will cause weird results ( in most cases, lower
+	significancy), and won't be consistent with MACS2 callpeak
+	behavior. So if you have SPMR bedGraphs, input the smaller/larger
+	sample size in MILLION according to 'callpeak --to-large' option.
+
+2013-07-10  Tao Liu  <vladimir.liu@gmail.com>
+	MACS version 2.0.10 20130710 (tag:alpha)
+
+	* fix BED style output format of callpeak module:
+
+	1) without --broad: narrowPeak (BED6+4) and BED for summit will be
+	the output. Old BED format file won't be saved.
+
+	2) with --broad: broadPeak (BED6+3) for broad region and
+	gappedPeak (BED12+3) for chained enriched regions will be the
+	output. Old BED format, narrowPeak format, summit file won't be
+	saved.
+
+	* bdgcmp now can accept list of methods to calculate scores. So
+	you can run it once to generate multiple types of scores. Thank
+	Jon Urban for this suggestion!
+
+	* C codes are re-generated through Cython 0.19.1.
+
+2013-05-21  Tao Liu  <vladimir.liu@gmail.com>
+	MACS version 2.0.10 20130520 (tag:alpha)
+
+	* broad peak calling modules are modified in order to report all
+	relexed regions even there is no strong enrichment inside.
+
+2013-05-01  Tao Liu  <vladimir.liu@gmail.com>
+	MACS version 2.0.10 20130501 (tag:alpha)
+
+	* Memory usage is decreased to about 1/4-1/5 of previous usage
+	Now, the internal data structure and algorithm are both
+	re-organized, so that intermediate data wouldn't be saved in
+	memory. Intead they will be calculated on the fly. New MACS2 will
+	spend longer time (1.5 to 2 times) however it will use less memory
+	so can be more usable on small mem servers.
+
+	* --seed option is added to callpeak and randsample commands
+	Thank Mathieu Gineste for this suggestion!
+
+2013-03-05  Tao Liu  <vladimir.liu@gmail.com>
+	MACS version 2.0.10 20130306 (tag:alpha)
+
+	* diffpeak module New module to detect differential binding sites
+	with more statistics.
+
+	* Introduced --refine-peaks
+	Calculates reads balancing to refine peak summits
+
+	* Ouput file names prefix
+	Correct encodePeak to narrowPeak, broadPeak to bed12. 
+
+2012-09-13 Benjamin Schiller <benjamin.schiller@ucsf.edu>,  Tao Liu  <taoliu@jimmy.harvard.edu>
+	MACS version 2.0.10 (tag:alpha not released)
+
+	* Introduced BAMPEParser
+	Reads PE data directly, requires bedtools for now
+
+	* Introduced --call-summits
+	Uses signal processing methods to call overlapping peaks
+
+	* Added --no-trackline
+	By default, files have descriptive tracklines now
+
+	* new refinepeak command (experimental)
+	This new function will use a similar method in SPP (wtd), to
+	analyze raw tag distribution in peak region, then redefine the
+	peak summit where plus and minus tags are evenly distributed
+	around.
+
+	* Changes to output *
+	cPeakDetect.pyx has full support for new print/write methods and
+	--call-peaks, BAMPEParser, and use of paired-end data
+
+	* Parser optimization
+
+	cParser.pyx is rewritten to use io.BufferedReader to speed
+	up. Speed is doubled.
+
+	Code is reorganized -- most of functions are inherited from
+	GenericParser class.
+
+	* Use cross-correlation to calculate fragment size
+
+	First, all pairs will be used in prediction for fragment
+	size. Previously, only no more than 1000 pairs are used. Second,
+	cross-correlation is used to find the best phase difference
+	between + and - tag pileups.
+
+	* Speed up p-value and q-value calculation
+
+	This part is ten times faster now. I am using a dictionary to
+	cache p-value results from Poisson CDF function. A bit more memory
+	will be used to increase speed. I hope this dictionary would not
+	explode since the possible pairs of ChIP signal and control lambda
+	are hugely redundant. Also, I rewrited part of q-value
+	calculation.
+
+	* Speed up peak detection
+
+	This part is about hundred of times faster now.  Optimizations
+	include using Numpy functions as much as possible, and making loop
+	body as small as possible.
+
+	* Post-processing on differential calls
+
+	After macs2diff finds differential binding sites between two
+	conditions, it will try to annotate the peak calls from one of two
+	conditions, describe the changes ...
+
+	* Fragment size prediction in macs2diff
+
+	Now by default, macs2diff will try to use the average fragment
+	size from both condition 1 and condition 2 for tag extension and
+	peak calling. Previously, by default, it will use different sizes
+	unless --nomodel is specified.
+
+	Technically, I separate model building processes out. So macs2diff
+	will build fragment sizes for condition 1 and 2 in parallel (2
+	processes maximum), then perform 4-way comparisons in parallel (4
+	processes maximum).
+
+	* Diff score
+
+	Combine two p/qscore tracks together. At regions where condition 1
+	is higher than condition 2, score would be positive, otherwise,
+	negative.
+
+	* SAMParser and BAMParser
+
+	Bug fixed for paired-end sequencing data.
+
+	* BedGraph.pyx
+
+	Fixed a bug while calling peaks from BedGraph file. It previously
+	mistakenly output same peaks multiple times at the end of
+	chromosome.
+
+2011-11-2  Tao Liu  <taoliu@jimmy.harvard.edu>
+	MACS version 2.0.9 (tag:alpha)
+
+	* Auto fixation on predicted d is turned off by default!
+
+	Previous --off-auto is now default. MACS will not automatically
+	fix d less than 2 times of tag size according to
+	--shiftsize. While tag size is getting longer nowadays, it would
+	be easier to have d less than 2 times of tag size, however d may
+	still be meaningful and useful. Please judge it using your own
+	wisdom.
+
+	* Scaling issue
+
+	Now, the default scaling while treatment and input are unbalanced
+	has been adjusted. By default, larger sample will be scaled down
+	linearly to match the smaller sample. In this way, background
+	noise will be reduced more than real signals, so we expect to have
+	more specific results than the other way around (i.e. --to-large
+	is set).
+
+	Also, an alternative option to randomly sample larger data
+	(--down-sample) is provided to replace default linear
+	scaling. However, this option will cause results irresproducible,
+	so be careful. 
+
+	* randsample script
+
+	A new script 'randsample'  is added, which can randomly sample
+	certain percentage or number of tags.
+
+	* Peak summit
+
+	Now, MACS will decide peak summits according to pileup height
+	instead of qvalue scores. In this way, the summit may be more
+	accurate. 
+
+	* Diff score
+
+	MACS calculate qvalue scores as differential scores. When compare
+	two conditions (saying A and B), the maximum qscore for comparing
+	A to B -- maxqscore_a2b, and for comparing B to A --maxqscore_b2a
+	will be computed. If maxqscore_a2b is bigger, the diff score is
+	+maxqscore_a2b, otherwise, diff score is -1*maxqscore_b2a.
+
+2011-09-15  Tao Liu  <taoliu@jimmy.harvard.edu>
+	MACS version 2.0.8 (tag:alpha)
+
+	* bin/macs2, bin/bdgbroadcall, MACS2/IO/cScoreTrack.pyx, MACS2/IO/cBedGraph.pyx
+
+	New script bdgbroadcall and the extra option '--broad' for macs2
+	script, can be used to call broad regions with a loose cutoff to
+	link nearby significant regions. The output is represented as
+	BED12 format.
+
+	* MACS2/IO/cScoreTrack.pyx
+
+	Fix q-value calculation to generate forcefully monotonic values.
+
+	* bin/eland*2bed, bin/sam2bed and bin/filterdup
+
+	They are combined to one more powerful script called
+	"filterdup". The script filterdup can filter duplicated reads
+	according to sequencing depth and genome size. The script can also
+	convert any format supported by MACS to BED format.
+
+2011-08-21  Tao Liu  <taoliu@jimmy.harvard.edu>
+	MACS version 2.0.7 (tag:alpha)
+
+	* bin/macsdiff renamed to bin/bdgdiff
+
+	Now this script will work as a low-level finetuning tool as bdgcmp
+	and bdgpeakcall.
+
+	* bin/macs2diff
+
+	A new script to take treatment and control files from two
+	condition, calculate fragment size, use local poisson to get
+	pvalues and BH process to get qvalues, then combine 4-ways result
+	to call differential sites.
+
+	This script can use upto 4 cpus to speed up 4-ways calculation. (
+	I am trying multiprocessing in python. )
+
+	* MACS2/Constants.py, MACS2/IO/cBedGraph.pyx,
+	MACS2/IO/cScoreTrack.pyx, MACS2/OptValidator.py,
+	MACS2/PeakModel.py, MACS2/cPeakDetect.pyx
+
+	All above files are modified for the new macs2diff script.
+
+	* bin/macs2, bin/macs2diff, MACS2/OptValidator.py
+
+	Now q-value 0.01 is the default cutoff. If -p is specified,
+	p-value cutoff will be used instead.
+
+2011-07-25  Tao Liu  <vladimir.liu@gmail.com>
+	MACS version 2.0.6 (tag:alpha)
+
+	* bin/macsdiff
+
+	A script to call differential regions. A naive way is introduced
+	to find the regions where:
+
+	1. signal from condition 1 is larger than input 1 and condition 2 --
+	unique region in condition 1;
+	2. signal from condition 2 is larger than input 2 and condition 1
+	-- unique region in condition 2;
+	3. signal from condition 1 is larger than input 1, signal from
+	condition 2 is larger than input 2, however either signal from
+	condition 1 or 2 is not larger than the other.
+
+	Here 'larger' means the pvalue or qvalue from a Poisson test is
+	under certain cutoff.
+
+	(I will make another script to wrap up mulitple scripts for
+	differential calling)
+
+2011-07-07  Tao Liu  <vladimir.liu@gmail.com>
+	MACS version 2.0.5 (tag:alpha)
+
+	* bin/macs2, MACS2/cPeakDetect.py, MACS2/IO/cScoreTrack.pyx,
+	MACS2/IO/cPeakIO.pyx
+
+	Use hash to store peak information. Add back the feature to deal
+	with data without control.
+
+	Fix bug which incorrectly allows small peaks at the end of
+	chromosomes.
+
+	* bin/bdgpeakcall, bin/bdgcmp
+
+	Fix bugs. bdgpeakcall can output encodePeak format.
+
+2011-06-22  Tao Liu  <taoliu@jimmy.harvard.edu>
+	MACS version 2.0.4 (tag:alpha)
+
+	* cPeakDetect.py
+
+	Fix a bug, correctly assign lambda_bg while --to-small is
+	set. Thanks Junya Seo!
+
+	Add rank and num of bp columns to pvalue-qvalue table.
+
+	* cScoreTrack.py
+
+	Fix bugs to correctly deal with peakless chromosomes. Thanks
+	Vaibhav Jain!
+
+	Use AFDR for independent tests instead.
+
+	* encodePeak
+
+	Now MACS can output peak coordinates together with pvalue, qvalue,
+	summit positions in a single encodePeak format (designed for
+	ENCODE project) file. This file can be loaded to UCSC
+	browser. Definition of some specific columns are: 5th:
+	int(-log10pvalue*10), 7th: fold-change, 8th: -log10pvalue, 9th:
+	-log10qvalue, 10th: relative summit position to peak start.
+
+
+2011-06-19  Tao Liu  <taoliu@jimmy.harvard.edu>
+	MACS version 2.0.3 (tag:alpha)
+
+	* Rich output with qvalue, fold enrichment, and pileup height
+
+	Calculate q-values using a refined Benjamini–Hochberg–Yekutieli
+	procedure:
+
+	http://en.wikipedia.org/wiki/False_discovery_rate#Dependent_tests
+
+	Now we have a similiar xls output file as before. The differences
+	from previous file are:
+
+	1. Summit now is absolute summit, instead of relative summit
+	   position;
+	2. 'Pileup' is previous 'tag' column. It's the extended fragment
+	   pileup at the peak summit;
+	3. We now use '-log10(pvalue)' instead of '-10log10(pvalue)', so
+	   5.00 means 1e-5, simple and less confusing.
+	4. FDR column becomes '-log10(qvalue)' column.
+	5. The pileup, -log10pvalue, fold_enrichment and -log10qvalue are
+	   the values at the peak summit.
+
+	* Extra output files
+
+	NAME_pqtable.txt contains pvalue and qvalue relationships.
+
+	NAME_treat_pvalue.bdg and NAME_treat_qvalue.bdg store -log10pvalue
+	and -log10qvalue scores in BedGraph format. Nearby regions with
+	the same value are not merged.
+
+	* Separation of FeatIO.py
+
+	Its content has been divided into cPeakIO.pyx, cBedGraph.pyx, and
+	cFixWidthTrack.pyx. A modified bedGraphTrackI class was
+	implemented to store pileup, local lambda, pvalue, and qvalue
+	alltogether in cScoreTrack.pyx.
+
+	* Experimental option --half-ext
+
+	Suggested by NPS algorithm, I added an experimental option
+	--half-ext to let MACS only extends ChIP fragment around its
+	middle point for only 1/2 d.
+
+2011-06-12  Tao Liu  <taoliu@jimmy.harvard.edu>
+	MACS version 2.0.2 (tag:alpha)
+
+	* macs2
+
+	Add an error check to see if there is no common chromosome names
+	from treatment file and control file
+
+	* cPeakDetect.pyx, cFeatIO.pyx, cPileup.pyx
+
+	Reduce memory usage by removing deepcopy() calls.
+
+	* Modify README documents and others.
+
+2011-05-19  Tao Liu  <taoliu@jimmy.harvard.edu>
+	MACS Version 2.0.1 (tag:alpha)
+
+	* cPileup.pyx, cPeakDetect.pyx and peak calling process
+
+	Jie suggested me a brilliant simple method to pileup fragments
+	into bedGraph track. It works extremely faster than the previous
+	function, i.e, faster than MACS1.3 or MACS1.4. So I can include
+	large local lambda calculation in MACSv2 now. Now I generate three
+	bedGraphs for d-size local bias, slocal-size and llocal-size local
+	bias, and calculate the maximum local bias as local lambda
+	bedGraph track.
+
+	Minor: add_loc in bedGraphTrackI now can correctly merge the
+	region with its preceding region if their value are the same.
+
+	* macs2
+
+	Add an option to shift control tags before extension. By default,
+	control tags will be extended to both sides regardless of strand
+	information.
+
+2011-05-17  Tao Liu  <taoliu@jimmy.harvard.edu>
+	MACS Version 2.0.0 (tag:alpha)
+
+	* Use bedGraph type to store data internally and externally.
+
+	We can have theoretically one-basepair resolution profiles. 10
+	times smaller in filesize and even smaller after converting to
+	bigWig for visualization.
+
+	* Peak calling process modified. Better peak boundary detection.
+
+	Extend ChIP tag to d, and pileup to have a ChIP bedGraph. Extend
+	Control tag to d and 1,000bp, and pileup to two bedGraphs. (1000bp
+	one will be averaged to d size) Then calculate the maximum value
+	of these two tracks and a global background, to have a
+	local-lambda bedGraph.
+
+	Use -10log10poisson_pvalue as scores to generate a score track
+	before peak calling.
+
+	A general peak calling based on a score cutoff, min length of peak
+	and max gap between nearby peaks.
+
+	* Option changes.
+
+	Wiggle file output is removed. Now we only support bedGraph
+	output. The generation of bedGraph is highly recommended since it
+	will not cost extra time. In other words, bedGraph generation is
+	internally run even you don't want to save bedGraphs on disk, due
+	to the peak calling algorithm in MACS v2.
+
+	* cProb.pyx
+
+	We now can calculate poisson pvalue in log space so that the score
+	(-10*log10pvalue) will not have a upper limit of 3100 due to
+	precision of float number.
+
+	* Cython is adopted to speed up Python code.
+
+2011-02-28  Tao Liu  <taoliu@jimmy.harvard.edu>
+	Small fixes
+
+	* Replaced with a newest WigTrackI class and fixed the wignorm script.
+
+2011-02-21  Tao Liu  <taoliu@jimmy.harvard.edu>
+	Version 1.4.0rc2 (Valentine)
+
+	* --single-wig option is renamed to --single-profile
+
+	* BedGraph output with --bdg or -B option.
+
+	The BedGraph output provides 1bp resolution fragment pileup
+	profile. File size is smaller than wig file. This option can be
+	combined with --single-profile option to produce a bedgraph file
+	for the whole genome. This option can also make --space,
+	--call-subpeaks invalid.
+
+	* Fix the description of --shiftsize to correctly state that the
+	value is 1/2 d (fragment size).
+
+	* Fix a bug in the call to __filter_w_control_tags when control is
+	not available.
+
+	* Fix a bug on --to-small option. Now it works as expected.
+
+	* Fix a bug while counting the tags in candidate peak region, an
+	extra tag may be included. (Thanks to Jake Biesinger!)
+
+	* Fix the bug for the peaks extended outside of chromosome
+	start. If the minus strand tag goes outside of chromosome start
+	after extension of d, it will be thrown out.
+
+	* Post-process script for a combined wig file:
+
+	The "wignorm" command can be called after a full run of MACS14 as
+	a postprocess. wignorm can calculate the local background from the
+	control wig file from MACS14, then use either foldchange,
+	-10*log10(pvalue) from possion test, or difference after asinh
+	transformation as the score to build a single wig track to
+	represent the binding strength. This script will take a
+	significant long time to process.
+
+	* --wigextend has been obsoleted.
+
+2010-09-21  Tao Liu  <taoliu@jimmy.harvard.edu>
+	Version 1.4.0rc1 (Starry Sky)
+
+	* Duplicate reads option
+
+	--keep-dup behavior is changed. Now user can specify how many
+	reads he/she wants to keep at the same genomic location. 'auto' to
+	let MACS decide the number based on binomial distribution, 'all'
+	to let MACS keep all reads.
+
+	* pvalue and FDR fixes (Thanks to Prof. Zhiping Weng)
+
+	By default, MACS will now scale the smaller dataset to the bigger
+	dataset. For instance, if IP has 10 million reads, and Input has 5
+	million, MACS will double the lambda value calculated from Input
+	reads while calling BOTH the positive peaks and negative
+	peaks. This will address the issue caused by unbalanced numbers of
+	reads from IP and Input. If --to-small is turned on, MACS will
+	scale the larger dataset to the smaller one. So from now on, if d
+	is fixed, then the peaks from a MACS call for A vs B should be
+	identical to the negative peaks from a B vs A.
+
+2010-09-01  Tao Liu  <taoliu@jimmy.harvard.edu>
+	Version 1.4.0beta (summer wishes)
+
+	* New features
+
+	** Model building
+
+	The default behavior in the model building step is slightly
+	changed. When MACS can't find enough pairs to build model
+	(implemented in alpha version) or the modeled fragment length is
+	less than 2 times of tag length (implemented in beta version),
+	MACS will use 2 times of --shiftsize value as fragment length in
+	the later analysis. --off-auto can turn off this default behavior.
+
+	** Redundant tag filtering
+
+	The IO module is rewritten. The redundant tag filtering process
+	becomes simpler and works as promise. The maximum allowed number
+	of tags at the exact same location is calculated from the
+	sequencing depth and genome size using a binomial distribution,
+	for both TREAMENT and CONTROL separately. ( previously only
+	TREATMENT is considered ) The exact same location means the same
+	coordination and the same strand. Then MACS will only keep at most
+	this number of tags at the exact same location in the following
+	analysis. An option --keep-dup can let MACS skip the filtering and
+	keep all the tags. However this may bring in a lot of sequencing
+	bias, so you may get many false positive peaks.
+
+	** Single wiggle mode
+
+	First thing to mention, this is not the score track that I
+	described before. By default, MACS generates wiggle files for
+	fragment pileup for every chromosomes separately. When you use
+	--single-wig option, MACS will generate a single wiggle file for
+	all the chromosomes so you will get a wig.gz for TREATMENT and
+	another wig.gz for CONTROL if available.
+
+	** Sniff -- automatic format detection
+
+	Now, by default or "-f AUTO", MACS will decide the input file
+	format automatically. Technically, it will try to read at most
+	1000 records for the first 10 non-comment lines. If it succeeds,
+	the format is decided. I recommend not to use AUTO and specify the
+	right format for your input files, unless you combine different
+	formats in a single MACS run.
+
+	* Options changes
+
+	--single-wig and --keep-dup are added. Check previous section in
+	ChangeLog for detail.
+
+	-f (--format) AUTO is now the default option.
+
+	--slocal default: 1000
+	--llocal default: 10000
+
+	* Bug fixed
+
+	Setup script will stop the installation if python version is not
+	python2.6 or python2.7.
+
+	Local lambda calculation has been changed back. MACS will check
+	peak_region, slocal( default 1K) and llocal (default 10K) for the
+	local bias. The previous 200bps default will cause MACS misses
+	some peaks where the input bias is very sharp.
+
+	sam2bed.py script is corrected.
+
+	Relative pos in xls output is fixed.
+
+	Parser for ELAND_export is fixed to pass some of the no match
+	lines. And elandexport2bed.py is fixed too. ( however I can't
+	guarantee that it works on any eland_export files. )
+
+2010-06-04  Tao Liu  <taoliu@jimmy.harvard.edu>
+	Version 1.4.0alpha2 (be smarter)
+
+	* Options changes
+
+	--gsize now provides shortcuts for common genomes, including
+	human, mouse, C. elegans and fruitfly.
+
+	--llocal now will be 5000 bps if there is no input file, so that
+	local lambda doesn't overkill enriched binding sites.
+
+2010-06-02  Tao Liu  <taoliu@jimmy.harvard.edu>
+	Version 1.4alpha (be smarter)
+	
+	* Options changes
+
+	--tsize option is redesigned. MACS will use the first 10 lines of
+	the input to decide the tag size. If user specifies --tsize, it
+	will override the auto decided tsize.
+
+	--lambdaset is replaced by --slocal and --llocal which mean the
+	small local region and large local region. 
+
+	--bw has no effect on the scan-window size now. It only affects the
+	paired-peaks model process. 
+	
+	* Model building
+
+	During the model building, MACS will pick out the enriched regions
+	which are not too high and not too low to build the paired-peak
+	model. Default the region is from fold 10 to fold 30. If MACS
+	fails to build the model, by default it will use the nomodel
+	settings, like shiftsize=100bps, to shift and extend each
+	tags. This behavior can be turned off by '--off-auto'.
+
+	* Output files
+
+	An extra file including all the summit positions are saved in
+	*_summits.bed file. An option '--call-subpeaks' will invoke
+	PeakSplitter developed by Mali Salmon to split wide peaks into
+	smaller subpeaks.
+	
+	* Sniff ( will in beta )
+
+	Automatically recognize the input file format, so use can combine
+	different format in one MACS run.
+
+	Not implemented features/TODO:
+	
+	* Algorithms ( in near future? )
+
+	MACS will try to refine the peak boundaries by calculating the
+	scores for every point in the candidate peak regions. The score
+	will be the -10*log(10,pvalue) on a local poisson distribution. A
+	cutoff specified by users (--pvalue) will be applied to find the
+	precise sub-peaks in the original candidate peak region. Peak
+	boudaries and peak summits positions will be saved in separate BED
+	files.
+
+	* Single wiggle track ( in near future? )
+
+	A single wiggle track will be generated to save the scores within
+	candidate peak regions in the 10bps resolution. The wiggle file
+	is in fixedStep format.
+
+
+2009-10-16  Tao Liu  <taoliu@jimmy.harvard.edu>
+	Version 1.3.7.1 (Oktoberfest, bug fixed #1)
+	
+	* bin/Constants.py
+
+	Fixed typo. FCSTEP -> FESTEP
+
+	* lib/PeakDetect.py
+
+	The 'femax' attribute bug is fixed
+
+2009-10-02  Tao Liu  <taoliu@jimmy.harvard.edu>
+	Version 1.3.7 (Oktoberfest)
+	
+	* bin/macs, lib/PeakDetect.py, lib/IO/__init__.py, lib/OptValidator.py
+
+	Enhancements by Peter Chines:
+
+	1. gzip files are supported. 
+	2. when --diag is on, user can set the increment and endpoint for
+	fold enrichment analysis by setting --fe-step and --fe-max.
+
+	Enhancements by Davide Cittaro:
+
+	1. BAM and SAM formats are supported.
+	2. small changes in the header lines of wiggle output.
+
+	Enhancements by Me:
+	1. I added --fe-min option;
+	2. Bowtie ascii output with suffix ".map" is supported.
+	
+	Bug fixed:
+
+	1. --nolambda bug is fixed. ( reported by Martin in JHU )
+	2. --diag bug is fixed. ( reported by Bogdan Tanasa )
+	3. Function to remove suffix '.fa' is fixed. ( reported by Jeff Johnston )
+	4. Some "fold change" have been changed to "fold enrichment".
+
+2009-06-10  Tao Liu  <taoliu@jimmy.harvard.edu>
+	Version 1.3.6.1 (default parameter change)
+	
+	* bin/macs, lib/PeakDetect.py
+
+	"--oldfdr" is removed. The 'oldfdr' behaviour becomes
+	default. "--futurefdr" is added which can turn on the 'new' method
+	introduced in 1.3.6. By default it's off.
+
+	* lib/PeakDetect.py
+
+	Fixed a bug. p-value is corrected a little bit.
+	
+
+2009-05-11  Tao Liu  <taoliu@jimmy.harvard.edu>
+	Version 1.3.6 (Birthday cake)
+	
+	* bin/macs
+
+	"track name" is added to the header of BED output file.
+
+	Now the default peak detection method is to consider 5k and 10k
+	nearby regions in treatment data and peak location, 1k, 5k, and
+	10k regions in control data to calculate local bias. The old
+	method can be called through '--old' option.
+
+	Information about how many total/unique tags in treatment or
+	control will be saved in final .xls output.
+
+	* lib/IO/__init__.py
+
+	".fa" will be removed from input tag alignment so only the
+	chromosome names are kept.
+
+	WigTrackI class is added for Wiggle like data structure. (not used
+	now)
+
+	The parser for ELAND multi PET files has been fixed. Now the 5'
+	tag position for a pair will be kept, whereas in the previous
+	version, the middle points are kept.
+
+	* lib/IO/BinKeeper.py
+
+	BinKeeperI class is inspired by Jim Kent's library for UCSC genome
+	browser, which can quickly access certain region for values in a
+	large wiggle like data file. (not used now)
+
+	* lib/OptValidator.py
+
+	typo fixed.
+
+	* lib/PeakDetect.py
+
+	Now the default peak detection method is to consider 5k and 10k
+	nearby regions in treatment data and peak location, 1k, 5k, and
+	10k regions in control data to calculate local bias. The old
+	method can be called through '--old' option.
+
+	Two columns have beed added to BED output file. 4th column: peak
+	name; 5th column: peak score using -10log(10,pvalue) as score.
+
+	* setup.py
+
+	Add support to build a Mac App through 'setup.py py2app', or a
+	Windows executable through 'setup.py py2exe'. You need to install
+	py2app or py2exe package in order to use these functions.
+
+2009-02-12  Tao Liu  <taoliu@jimmy.harvard.edu>
+	Version 1.3.5 (local lambda fixed, typo fixed, model figure improved)
+	
+	* PeakDetect.py
+
+	Now, besides 1k, 5k, 10k, MACS will also consider peak size region
+	in control data to calculate local lambda for each peak. Peak
+	calling results will be slightly different with previous version,
+	beware!
+
+	* OptValidator.py
+
+	Typo fixed, ELANDParser -> ELANDResultParser
+
+	* OutputWriter.py
+
+	Now, modeled d value will be shown on the model figure.
+
+2009-01-06  Tao Liu  <taoliu@jimmy.harvard.edu>
+	Version 1.3.4 (Happy New Year Version, bug fixed, ELAND multi/PET support)
+	
+	* macs, IO/__init__.py, PeakDetect.py
+
+	Add support for ELAND multi format. Add support for Pair-End
+	experiment, in this case, 5'end and 3'end ELAND multi format files
+	are required for treatment or control data. See 00README file for
+	detail.
+
+	Add wigextend option.
+
+	Add petdist option for Pair-End Tag experiment, which is the best
+	distance between 5' and 3' tags.
+
+	* PeakDetect.py
+
+	Fixed a bug which cause the end positions of every peak region
+	incorrectly added by 1 bp. ( Thanks Mali Salmon!)
+
+	* OutputWriter.py
+	
+	Fix bugs while generating wiggle files. The start position of
+	wiggle file is set to 1 instead of 0.
+
+	Fix a bug that every 10M bps, signals in the first 'd' range are
+	lower than actual. ( Thanks Mali Salmon!)
+
+
+2008-12-03  Tao Liu  <taoliu@jimmy.harvard.edu>
+	Version 1.3.3 (wiggle bugs fixed)
+	
+	* OutputWriter.py
+
+	Fix bugs while generating wiggle files. 1. 'span=' is added to
+	'variableStep' line; 2. previously, every 10M bps, the coordinates
+	were wrongly shifted to the right for 'd' basepairs.
+
+	* macs, PeakDetect.py
+
+	Add an option to save wiggle files on different resolution.
+	
+2008-10-02  Tao Liu  <taoliu@jimmy.harvard.edu>
+	Version 1.3.2 (tiny bugs fixed)
+
+	* IO/__init__.py
+	
+	Fix 65536 -> 65535. ( Thank Joon) 
+	
+	* Prob.py
+	
+	Improved for binomial function with extra large number. Imported
+	from Cistrome project.
+	
+	* PeakDetect.py
+
+	If treatment channel misses reads in some chromosome included in
+	control channel, or vice versa, MACS will not exit. (Thank Shaun
+	Mahony)
+
+	Instead, MACS will fake a tag at position -1 when calling
+	treatment peaks vs control, but will ignore the chromosome while
+	calling negative peaks.
+
+2008-09-04  Tao Liu  <taoliu@jimmy.harvard.edu>
+	Version 1.3.1 (tiny bugs fixed version)
+
+	* Prob.py
+	
+	Hyunjin Gene Shin contributed some codes to Prob.py. Now the
+	binomial functions can tolerate large and small numbers.
+	
+	* IO/__init__.py
+
+	Parsers now split lines in BED/ELAND file using any
+	whitespaces. 'track' or 'browser' lines will be regarded as
+	comment lines. A bug fixed when throwing StrandFormatError. The
+	maximum redundant tag number at a single position can be no less
+	than 65536.
+
+	
+2008-07-15  Tao Liu  <taoliu@jimmy.harvard.edu>
+	Version 1.3 (naming clarification version)
+
+	* Naming clarification changes according to our manuscript:
+
+	'frag_len' is changed to 'd'.
+
+	'fold_change' is changed to 'fold_enrichment'.
+	
+	Suggest '--bw' parameter to be determined by users from the real
+	sonication size.
+
+	Maximum FDR is 100% in the output file.
+
+	And other clarifications in 00README file and the documents on the
+	website.
+	
+	* IO/__init__.py
+	If the redundant tag number at a single position is over 32767,
+	just remember 32767, instead of raising an overflow exception.
+	
+	* setup.py
+	fixed a typo.
+
+	* PeakDetect.py
+	Bug fixed for diagnosis report.
+	
+
+2008-07-10  Tao Liu  <taoliu@jimmy.harvard.edu>
+	Version 1.2.2gamma
+
+	* Serious bugs fix: 
+
+	Poisson distribution CDF and inverse CDF functions are
+	corrected. They can produce right results even for huge lambda
+	now. So that the p-value and FDR values in the final excel sheet
+	are corrected.
+
+	IO package now can tolerate some rare cases; ELANDParser in IO
+	package is fixed. (Thank Bogdan)
+
+	* Improvement:
+
+	Reverse paired peaks in model are rejected. So there will be no
+	negative 'frag_len'. (Thank Bogdan)
+
+	* Features added:
+	
+	Diagnosis function is completed. Which can output a table file for
+	users to estimate their sequencing depth.
+
+
+2008-06-30  Tao Liu  <taoliu@jimmy.harvard.edu>
+	Version 1.2
+	
+	* Probe.py is added!  
+
+	GSL is totally removed from MACS. Instead, I have implemented the
+	CDF and inverse CDF for poisson and binomial distribution purely
+	in python.
+
+	* Constants.py is added!
+
+	Organize constants used in MACS in the Constants.py file.
+
+	* All other files are modified!
+
+	Foldchange calculation is modified. Now the foldchange only be
+	calculated at the peak summit position instead of the whole peak
+	region. The values will be higher and more robust than before.
+
+	Features added:
+
+	1. MACS can save wiggle format files containing the tag number at
+	every 10 bp along the genome. Tags are shifted according to our
+	model before they are calculated.
+
+	2. Model building and local lambda calculation can be skipped with
+	certain options.
+
+	3. A diagnosis report can be generated through '--diag'
+	option. This report can help you get an assumption about the
+	sequencing saturation. This funtion is only in beta stage.
+
+	4. FDR calculation speed is highly improved.
+	
+2008-05-28  Tao Liu  <taoliu@jimmy.harvard.edu>
+	Version 1.1
+	
+	* TabIO, PeakModel.py ...
+	Bug fixed to let MACS tolerate some cases while there is no tag on
+	either plus strand or minus strand.
+
+	* setup.py
+	Check the version of python. If the version is lower than 2.4,
+	refuse to install with warning.
+
+
 2013-07-31  Tao Liu  <vladimir.liu@gmail.com>
 	MACS version 2.0.10 20130731 (tag:alpha)
 

@@ -1,4 +1,4 @@
-# Time-stamp: <2013-04-09 15:50:11 Tao Liu>
+# Time-stamp: <2013-09-11 17:41:18 Tao Liu>
 
 """Module for all MACS Parser classes for input.
 
@@ -127,8 +127,9 @@ cdef class GenericParser:
     cdef bool gzipped
     cdef int tag_size
     cdef object fhd
+    cdef long buffer_size
     
-    def __init__ ( self, str filename ):
+    def __init__ ( self, str filename, long buffer_size ):
         """Open input file. Determine whether it's a gzipped file.
 
         'filename' must be a string object.
@@ -142,6 +143,7 @@ cdef class GenericParser:
         self.filename = filename
         self.gzipped = True
         self.tag_size = -1
+        self.buffer_size = buffer_size
         # try gzip first
         f = gzip.open( filename )
         try:
@@ -204,7 +206,7 @@ cdef class GenericParser:
             long i, m, fpos, strand
             str chromosome
         
-        fwtrack = FWTrackIII()
+        fwtrack = FWTrackIII( buffer_size = self.buffer_size )
         i = 0
         m = 0
         for thisline in self.fhd:
@@ -641,7 +643,7 @@ cdef class BAMParser( GenericParser ):
     512	does not pass quality check
     1024	PCR or optical duplicate
     """
-    def __init__ ( self, str filename ):
+    def __init__ ( self, str filename, long buffer_size ):
         """Open input file. Determine whether it's a gzipped file.
 
         'filename' must be a string object.
@@ -655,6 +657,7 @@ cdef class BAMParser( GenericParser ):
         self.filename = filename
         self.gzipped = True
         self.tag_size = -1
+        self.buffer_size = buffer_size
         if HAS_PYSAM:
             self.fhd = pysam.Samfile(filename)
         else:
@@ -832,7 +835,7 @@ cdef class BAMParser( GenericParser ):
             list references
             dict rlengths
         
-        fwtrack = FWTrackIII()
+        fwtrack = FWTrackIII( buffer_size = self.buffer_size )
         self.fhd.reset()
         references, rlengths = self.get_references()
         while True:
@@ -874,7 +877,7 @@ cdef class BAMParser( GenericParser ):
             list references
             dict rlengths
         
-        fwtrack = FWTrackIII()
+        fwtrack = FWTrackIII( buffer_size = self.buffer_size )
         references, rlengths = self.get_references()
         fseek = self.fhd.seek
         fread = self.fhd.read
@@ -1127,7 +1130,7 @@ cdef class BAMPEParser(BAMParser):
 
 
     cdef __build_petrack_wo_pysam ( self ):
-        """Build FWTrackIII from all lines, return a FWTrackIII object.
+        """Build PETrackI from all lines, return a FWTrackIII object.
         """
         cdef:
             int i = 0
@@ -1140,7 +1143,7 @@ cdef class BAMPEParser(BAMParser):
             char *rawread, *rawentrylength
             _BAMPEParsed read
         
-        petrack = PETrackI()
+        petrack = PETrackI( buffer_size = self.buffer_size )
 
         references, rlengths = self.get_references()
         fseek = self.fhd.seek
@@ -1371,7 +1374,7 @@ cdef class PySAMParser:
     cdef int tag_size
     cdef object fhd
     
-    def __init__ ( self, str filename ):
+    def __init__ ( self, str filename, long buffer_size ):
         """Open input file. Determine whether it's a gzipped file.
 
         'filename' must be a string object.
@@ -1385,6 +1388,7 @@ cdef class PySAMParser:
         self.filename = filename
         self.gzipped = True
         self.tag_size = -1
+        self.buffer_size = buffer_size
         # try gzip first
         f = gzip.open( filename )
         try:
@@ -1447,7 +1451,7 @@ cdef class PySAMParser:
             long i, m, fpos, strand
             str chromosome
         
-        fwtrack = FWTrackIII()
+        fwtrack = FWTrackIII( buffer_size = self.buffer_size )
         i = 0
         m = 0
         for thisline in self.fhd:
