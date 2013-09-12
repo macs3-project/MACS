@@ -1,4 +1,4 @@
-# Time-stamp: <2013-05-28 10:56:36 Tao Liu>
+# Time-stamp: <2013-09-11 22:44:34 Tao Liu>
 
 """Description: MACS 2 main executable
 
@@ -27,8 +27,8 @@ from time import strftime
 # own python modules
 # ------------------------------------
 from MACS2.IO import cBedGraphIO
-from MACS2.IO import cScoreTrack
-from MACS2.IO import cPeakIO
+from MACS2.IO.cScoreTrack import DiffScoreTrackI
+from MACS2.IO.cPeakIO import PeakIO
 from MACS2.OptValidator import diff_opt_validate
 from MACS2.OutputWriter import *
 from MACS2.cProb import binomial_cdf_inv
@@ -74,13 +74,13 @@ def run( args ):
     
     if not options.peaks1 == '':
         info("Read peaks for condition 1...")
-        p1io = cPeakIO.PeakIO()
+        p1io = PeakIO()
         with open(options.peaks1, 'rU') as f:
             p1io.read_from_xls(f)
 
     if not options.peaks2 == '':
         info("Read peaks for condition 2...")
-        p2io = cPeakIO.PeakIO()
+        p2io = PeakIO()
         with open(options.peaks2, 'rU') as f:
             p2io.read_from_xls(f)
     
@@ -110,11 +110,11 @@ def run( args ):
     
     #3 Call Peaks
 
-    diffscore = cScoreTrack.DiffScoreTrackI( t1btrack,
-                                             c1btrack,
-                                             t2btrack,
-                                             c2btrack,
-                                             depth1, depth2 )
+    diffscore = DiffScoreTrackI( t1btrack,
+                                 c1btrack,
+                                 t2btrack,
+                                 c2btrack,
+                                 depth1, depth2 )
     diffscore.finalize()
     if options.call_peaks:
         diffscore.set_track_score_method(options.track_score_method)

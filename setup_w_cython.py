@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# Time-stamp: <2013-09-10 23:36:26 Tao Liu>
+# Time-stamp: <2013-09-11 22:55:08 Tao Liu>
 
 """Description: 
 
@@ -57,7 +57,8 @@ def main():
                        Extension("MACS2.IO.cFixWidthTrack", ["MACS2/IO/cFixWidthTrack.pyx"], include_dirs=numpy_include_dir),
                        Extension("MACS2.IO.cPairedEndTrack", ["MACS2/IO/cPairedEndTrack.pyx"], include_dirs=numpy_include_dir),
                        Extension("MACS2.IO.cBedGraph", ["MACS2/IO/cBedGraph.pyx"], libraries=["m"]),
-                       Extension("MACS2.IO.cScoreTrack", ["MACS2/IO/cScoreTrack.pyx"], include_dirs=numpy_include_dir ),
+                       Extension("MACS2.IO.cScoreTrack", ["MACS2/IO/cScoreTrack.pyx"], include_dirs=numpy_include_dir ), 
+                       Extension("MACS2.IO.cDiffScore", ["MACS2/IO/cDiffScore.pyx"], include_dirs=numpy_include_dir ),                      
                        Extension("MACS2.IO.cCallPeakUnit", ["MACS2/IO/cCallPeakUnit.pyx"], include_dirs=numpy_include_dir),
                        Extension("MACS2.hashtable", ["MACS2/hashtable.pyx"], include_dirs=["MACS2/",numpy_get_include()]),
                        ]
@@ -75,11 +76,12 @@ def main():
                        Extension("MACS2.IO.cPairedEndTrack", ["MACS2/IO/cPairedEndTrack.c"], include_dirs=numpy_include_dir),
                        Extension("MACS2.IO.cBedGraph", ["MACS2/IO/cBedGraph.c"], libraries=["m"]),
                        Extension("MACS2.IO.cScoreTrack", ["MACS2/IO/cScoreTrack.c"], include_dirs=numpy_include_dir),
+                       Extension("MACS2.IO.cDiffScore", ["MACS2/IO/cDiffScore.c"], include_dirs=numpy_include_dir ),                       
                        Extension("MACS2.IO.cCallPeakUnit", ["MACS2/IO/cCallPeakUnit.c"], include_dirs=numpy_include_dir),
                        Extension("MACS2.hashtable", ["MACS2/hashtable.c"], include_dirs=["MACS2/",numpy_get_include()]),                       
                        ]
 
-    setup(name="MACS",
+    setup(name="MACS2",
           version="2.0.10.20130911",
           description="Model Based Analysis for ChIP-Seq data",
           author='Tao Liu',
