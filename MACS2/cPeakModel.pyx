@@ -1,4 +1,4 @@
-# Time-stamp: <2013-04-09 15:51:09 Tao Liu>
+# Time-stamp: <2013-09-12 17:13:08 Tao Liu>
 
 """Module Description
 
@@ -19,6 +19,9 @@ import numpy as np
 cimport numpy as np
 from array import array
 from MACS2.Constants import *
+
+from cpython cimport bool
+
 
 cpdef median (nums):
     """Calculate Median.
@@ -41,58 +44,84 @@ class NotEnoughPairsException(Exception):
     def __str__ (self):
         return repr(self.value)
 
-class PeakModel:
+cdef class PeakModel:
     """Peak Model class.
     """
-    def __init__ (self, opt=None, treatment=None, max_pairnum=500, gz = 0, umfold=30, lmfold=10, bw=200, ts = 25, bg=0, quiet=False):
+    cdef:
+        object treatment
+        double gz
+        int max_pairnum
+        int umfold
+        int lmfold
+        int bw
+        int tsize
+        object info, debug, warn, error
+        str summary
+        public np.ndarray plus_line, minus_line, shifted_line
+        public int d
+        public int scan_window
+        public int min_tags
+        int max_tags
+        int peaksize
+        public list alternative_d
+        public np.ndarray xcorr, ycorr
+
+    def __init__ (self, opt=None, treatment=None, int max_pairnum=500, double gz = 0, int umfold=30, int lmfold=10, int bw=200, int ts = 25, int bg=0, bool quiet=False):
         self.treatment = treatment
-        if opt:
-            self.gz = opt.gsize
-            self.umfold = opt.umfold
-            self.lmfold = opt.lmfold
-            self.tsize = opt.tsize
-            self.bw = opt.bw
-            self.info  = opt.info
-            self.debug = opt.debug
-            self.warn  = opt.warn
-            self.error = opt.warn
-        else:
-            self.gz = gz
-            self.umfold = umfold
-            self.lmfold = lmfold            
-            self.tsize = ts
-            self.bg = bg
-            self.bw = bw
-            self.info  = lambda x: sys.stderr.write(x+"\n")
-            self.debug = lambda x: sys.stderr.write(x+"\n")
-            self.warn  = lambda x: sys.stderr.write(x+"\n")
-            self.error = lambda x: sys.stderr.write(x+"\n")
-        if quiet:
-            self.info = lambda x: None
-            self.debug = lambda x: None
-            self.warn = lambda x: None
-            self.error = lambda x: None
+        #if opt:
+        self.gz = opt.gsize
+        self.umfold = opt.umfold
+        self.lmfold = opt.lmfold
+        self.tsize = opt.tsize
+        self.bw = opt.bw
+        self.info  = opt.info
+        self.debug = opt.debug
+        self.warn  = opt.warn
+        self.error = opt.warn
+        #else:
+        #    self.gz = gz
+        #    self.umfold = umfold
+        #    self.lmfold = lmfold            
+        #    self.tsize = ts
+        #    self.bg = bg
+        #    self.bw = bw
+        #    self.info  = lambda x: sys.stderr.write(x+"\n")
+        #    self.debug = lambda x: sys.stderr.write(x+"\n")
+        #    self.warn  = lambda x: sys.stderr.write(x+"\n")
+        #    self.error = lambda x: sys.stderr.write(x+"\n")
+        #if quiet:
+        #    self.info = lambda x: None
+        #    self.debug = lambda x: None
+        #    self.warn = lambda x: None
+        #    self.error = lambda x: None
             
         self.max_pairnum = max_pairnum
-        self.summary = ""
-        self.plus_line = None
-        self.minus_line = None
-        self.shifted_line = None
-        self.d = None
-        self.scan_window = None
-        self.min_tags = None
-        self.peaksize = None
+        #self.summary = ""
+        #self.plus_line = None
+        #self.minus_line = None
+        #self.shifted_line = None
+        #self.d = None
+        #self.scan_window = None
+        #self.min_tags = None
+        #self.peaksize = None
         self.build()
     
-    def build (self):
+    cpdef build (self):
         """Build the model.
 
         prepare self.d, self.scan_window, self.plus_line,
         self.minus_line and self.shifted_line to use.
         """
+        cdef:
+            dict paired_peaks
+            long num_paired_peakpos, num_paired_peakpos_remained, num_paired_peakpos_picked
+            str c
+        
+
         self.peaksize = 2*self.bw
-        self.min_tags = float(self.treatment.total) * self.lmfold * self.peaksize / self.gz /2 # mininum unique hits on single strand
-        self.max_tags = float(self.treatment.total) * self.umfold * self.peaksize / self.gz /2 # maximum unique hits on single strand
+        self.min_tags = int(round(float(self.treatment.total) * self.lmfold * self.peaksize / self.gz /2)) # mininum unique hits on single strand
+        self.max_tags = int(round(float(self.treatment.total) * self.umfold * self.peaksize / self.gz /2)) # maximum unique hits on single strand
+        #print self.min_tags, self.max_tags
         #print self.min_tags
         #print self.max_tags
         # use treatment data to build model
@@ -130,36 +159,50 @@ Summary of Peak Model:
   Scan window size: %d
 """ % (self.min_tags,self.max_tags,self.d,self.scan_window)
 
-    def __paired_peak_model (self, paired_peakpos):
+    cdef __paired_peak_model (self, paired_peakpos):
         """Use paired peak positions and treatment tag positions to build the model.
 
         Modify self.(d, model_shift size and scan_window size. and extra, plus_line, minus_line and shifted_line for plotting).
         """
-        cdef int window_size, i
+        cdef:
+            int window_size, i
+            list chroms
+            np.ndarray tags_plus, tags_minus, plus_line, minus_line, ycorr, xcorr, i_l_max
+            object paired_peakpos_chrom
+            np.ndarray plus_start, plus_end, minus_start, minus_end
         
         window_size = 1+2*self.peaksize
-        #self.plus_line = np.zeros(window_size, dtype="int32")#[0]*window_size
-        #self.minus_line = np.zeros(window_size, dtype="int32")#[0]*window_size
-        self.plus_line = [0]*window_size
-        self.minus_line = [0]*window_size        
+        self.plus_line = np.zeros(window_size, dtype="int32")#[0]*window_size
+        self.minus_line = np.zeros(window_size, dtype="int32")#[0]*window_size
+        plus_start = np.zeros(window_size, dtype="int32")
+        plus_end = np.zeros(window_size, dtype="int32")
+        minus_start = np.zeros(window_size, dtype="int32")
+        minus_end = np.zeros(window_size, dtype="int32")
+        #self.plus_line = [0]*window_size
+        #self.minus_line = [0]*window_size        
         self.info("start model_add_line...")
-        for chrom in paired_peakpos.keys():
-            paired_peakpos_chrom = paired_peakpos[chrom]
-            tags = self.treatment.get_locations_by_chr(chrom)
-            tags_plus =  tags[0]
-            tags_minus = tags[1]
+        chroms = paired_peakpos.keys()
+        
+        for i in range(len(chroms)):
+            paired_peakpos_chrom = paired_peakpos[chroms[i]]
+            (tags_plus, tags_minus) = self.treatment.get_locations_by_chr(chroms[i])
             # every paired peak has plus line and minus line
             #  add plus_line
-            self.plus_line = self.__model_add_line (paired_peakpos_chrom, tags_plus, self.plus_line, plus_strand=1)
+            #self.plus_line = self.__model_add_line (paired_peakpos_chrom, tags_plus, self.plus_line) #, plus_strand=1)
+            self.__model_add_line (paired_peakpos_chrom, tags_plus, plus_start, plus_end) #, plus_strand=1)
+            self.__model_add_line (paired_peakpos_chrom, tags_minus, minus_start, minus_end) #, plus_strand=0)
             #  add minus_line
-            self.minus_line = self.__model_add_line (paired_peakpos_chrom, tags_minus, self.minus_line, plus_strand=0)
+            #self.minus_line = self.__model_add_line (paired_peakpos_chrom, tags_minus, self.minus_line) #, plus_strand=0)
+
+        self.__count ( plus_start, plus_end, self.plus_line )
+        self.__count ( minus_start, minus_end, self.minus_line )
 
         self.info("start X-correlation...")
         # Now I use cross-correlation to find the best d
-        plus_line = np.asarray(self.plus_line,dtype="int32")
-        minus_line = np.asarray(self.minus_line,dtype="int32")
-        #plus_line = self.plus_line
-        #minus_line = self.minus_line
+        #plus_line = np.asarray(self.plus_line,dtype="int32")
+        #minus_line = np.asarray(self.minus_line,dtype="int32")
+        plus_line = self.plus_line
+        minus_line = self.minus_line
         
         # normalize first
         minus_data = (minus_line - minus_line.mean())/(minus_line.std()*len(minus_line))
@@ -194,16 +237,16 @@ Summary of Peak Model:
         
         return True
 
-    def __model_add_line (self, pos1, pos2, line, int plus_strand=1):
+    cdef __model_add_line (self, object pos1, np.ndarray pos2, np.ndarray start, np.ndarray end): #, int plus_strand=1):
         """Project each pos in pos2 which is included in
         [pos1-self.peaksize,pos1+self.peaksize] to the line.
 
-        pos1: paired centers
+        pos1: paired centers -- array.array
         pos2: tags of certain strand -- a numpy.array object
         line: numpy array object where we pileup tags
 
         """
-        cdef int i1, i2, i2_prev, i1_max, i2_max, last_p2, psize_adjusted1, psize_adjusted2, p1, p2, length_l, s, e
+        cdef int i1, i2, i2_prev, i1_max, i2_max, last_p2, psize_adjusted1, psize_adjusted2, p1, p2, max_index, s, e
         
         i1 = 0                  # index for pos1
         i2 = 0                  # index for pos2
@@ -215,9 +258,9 @@ Summary of Peak Model:
         last_p2 = -1
         flag_find_overlap = False
 
-        length_l = len(line)
+        max_index = start.shape[0] - 1
 
-        psize_adjusted1 = self.peaksize + self.tsize
+        psize_adjusted1 = self.peaksize + self.tsize / 2
 
         while i1<i1_max and i2<i2_max:
             p1 = pos1[i1]
@@ -226,7 +269,7 @@ Summary of Peak Model:
             #else:
             #    p2 = pos2[i2] - self.tsize
 
-            p2 = pos2[i2] - self.tsize
+            p2 = pos2[i2] # - self.tsize
                 
             if p1-psize_adjusted1 > p2: # move pos2
                 i2 += 1
@@ -240,16 +283,30 @@ Summary of Peak Model:
                     i2_prev = i2 # only the first index is recorded
                 # project
                 #for i in range(p2-p1+self.peaksize,p2-p1+self.peaksize+self.tsize):
-                s = max(p2-p1+self.peaksize, 0)
-                e = min(p2-p1+self.peaksize+self.tsize, length_l)
+                s = max(p2-p1+self.peaksize-self.tsize/2, 0)
+                start[s] += 1
+                e = min(p2-p1+self.peaksize+self.tsize/2, max_index)
+                end[e] -= 1
                 #line[s:e] += 1
-                for i in range(s,e):
-                    #if i>=0 and i<length_l:
-                    line[i]+=1
+                #for i in range(s,e):
+                #    #if i>=0 and i<length_l:
+                #    line[i]+=1
                 i2+=1
-        return line
+        return
     
-    def __paired_peaks (self):
+    cdef __count ( self, np.ndarray start, np.ndarray end, np.ndarray line ):
+        """
+        """
+        cdef int i
+        cdef long pileup
+        pileup = 0
+        for i in range(line.shape[0]):
+            pileup += start[i] + end[i]
+            line[i] = pileup
+        return
+
+
+    cdef __paired_peaks (self):
         """Call paired peaks from fwtrackI object.
 
         Return paired peaks center positions.
@@ -274,7 +331,7 @@ Summary of Peak Model:
                 self.debug("Number of paired peaks: %d" %(len(paired_peaks_pos[chrom])))
         return paired_peaks_pos
 
-    def __find_pair_center (self, pluspeaks, minuspeaks):
+    cdef __find_pair_center (self, pluspeaks, minuspeaks):
         ip = 0                  # index for plus peaks
         im = 0                  # index for minus peaks
         im_prev = 0             # index for minus peaks in previous plus peak
@@ -302,7 +359,7 @@ Summary of Peak Model:
                 im += 1
         return pair_centers
             
-    def __naive_find_peaks (self, taglist, plus_strand=1 ):
+    cdef __naive_find_peaks (self, taglist, plus_strand=1 ):
         """Naively call peaks based on tags counting. 
 
         if plus_strand == 0, call peak on minus strand.
@@ -336,7 +393,7 @@ Summary of Peak Model:
                                            # 2. current_tag_list is []
         return peak_info
 
-    def __naive_peak_pos (self, pos_list, int plus_strand ):
+    cdef __naive_peak_pos (self, pos_list, int plus_strand ):
         """Naively calculate the position of peak.
 
         plus_strand: 1, plus; 0, minus
@@ -391,7 +448,7 @@ Summary of Peak Model:
         #print top_pos[int(len(top_pos)/2)]+start
         return (top_pos[int(len(top_pos)/2)]+start)
 
-    def __naive_peak_pos2 (self, pos_list, int plus_strand ):
+    cdef __naive_peak_pos2 (self, pos_list, int plus_strand ):
         """Naively calculate the position of peak.
 
         plus_strand: 1, plus; 0, minus
