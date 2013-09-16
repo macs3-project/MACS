@@ -1,8 +1,22 @@
-2013-09-11  Tao Liu  <vladimir.liu@gmail.com>
-	MACS version 2.0.10 20130911 (tag:alpha)
+2013-09-15  Tao Liu  <vladimir.liu@gmail.com>
+	MACS version 2.0.10 20130915 (tag:alpha)
 
 	* callpeak Added a new option --buffer-size
-	
+
+	This option is to tweak a previously hidden parameter that
+	controls the steps to increase array size for storing alignment
+	information. While in some rare cases, the number of
+	chromosomes/contigs/scaffolds is huge, the original default
+	setting will cause a huge memory waste. In these cases, we
+	recommend to decrease --buffer-size (e.g., 1000) to save memory,
+	although the decrease will slow process to read alignment files.
+
+	* an optimization to speed up pvalue-qvalue statistics
+
+	Previously, it took a hour to prepare p-q-table for 65M vs 65M
+	human TF library, and now it will take 10 minutes. It was due to a
+	single line of code to get a value from a numpy array ...
+
 	* fixed logLR bugs.
 
 2013-07-31  Tao Liu  <vladimir.liu@gmail.com>

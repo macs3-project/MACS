@@ -1,4 +1,4 @@
-# Time-stamp: <2013-09-15 22:39:22 Tao Liu>
+# Time-stamp: <2013-09-16 00:01:18 Tao Liu>
 
 """Module for Calculate Scores.
 
@@ -47,8 +47,7 @@ from MACS2.IO.cPeakIO import PeakIO, BroadPeakIO, parse_peakname
 from MACS2.IO.cFixWidthTrack import FWTrackIII
 from MACS2.IO.cPairedEndTrack import PETrackI
 
-#from MACS2.cPois import P_Score_Upper_Tail
-
+#from MACS2.Poisson import P_Score_Upper_Tail
 #pscore_table=P_Score_Upper_Tail()
 #get_pscore = pscore_table.get_pscore
 
