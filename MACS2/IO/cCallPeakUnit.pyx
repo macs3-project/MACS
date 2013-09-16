@@ -1,4 +1,4 @@
-# Time-stamp: <2013-07-31 13:05:28 Tao Liu>
+# Time-stamp: <2013-09-15 22:39:22 Tao Liu>
 
 """Module for Calculate Scores.
 
@@ -46,6 +46,11 @@ from MACS2.cProb cimport poisson_cdf
 from MACS2.IO.cPeakIO import PeakIO, BroadPeakIO, parse_peakname
 from MACS2.IO.cFixWidthTrack import FWTrackIII
 from MACS2.IO.cPairedEndTrack import PETrackI
+
+#from MACS2.cPois import P_Score_Upper_Tail
+
+#pscore_table=P_Score_Upper_Tail()
+#get_pscore = pscore_table.get_pscore
 
 from MACS2.hashtable import Int64HashTable, Float64HashTable
 
@@ -562,8 +567,8 @@ cdef class CallerFromAlignments:
             np.ndarray pos_array, treat_array, ctrl_array
             dict pvalue_stat = {}
             long n, pre_p, this_p, length, j, pre_l, l, i
-            double this_v, pre_v, v, q, pre_q
-            long N, k
+            double this_v, pre_v, v, q, pre_q, this_t, this_c
+            long N, k, this_l
             double f
             long nhcal = 0
             long npcal = 0
@@ -576,40 +581,38 @@ cdef class CallerFromAlignments:
         for chrom in self.chromosomes:
             pre_p = 0
 
-            #t0 = ttime()
 
             self.__pileup_treat_ctrl_a_chromosome( chrom )
             [pos_array, treat_array, ctrl_array] = self.chr_pos_treat_ctrl
 
+            pn = iter(pos_array).next
+            tn = iter(treat_array).next
+            cn = iter(ctrl_array).next
+
+            #t0 = ttime()
+
+            for i in range(pos_array.shape[0]):
+                this_p = pn()
+                this_t = tn()
+                this_c = cn()
+                this_v = get_pscore( int(this_t), this_c )
+
+                this_l = this_p - pre_p
+                if pvalue_stat.has_key( this_v ):
+                    pvalue_stat[ this_v ] += this_l
+                else:
+                    pvalue_stat[ this_v ] = this_l
+                pre_p = this_p #pos_array[ i ]
+
+            #npcal += pos_array.shape[0]
+            nhcal += pos_array.shape[0]            
             #t1 = ttime()
             #t += t1 - t0
             #t0 = t1
 
-            for i in range(pos_array.shape[0]):
-                #if ctrl_array[i] == 0:
-                #    print "cal c p:", chrom, i, pos_array[i], treat_array[i], ctrl_array[i] 
-                this_v = get_pscore( int(treat_array[i]), ctrl_array[i] )
-                npcal += 1
-                if pvalue_stat.has_key(this_v):
-                    #if this_v == 1.9496:
-                    #    print chrom, pvalue_stat[this_v], this_v, pos_array[i], pre_p
-                    pvalue_stat[ this_v ] += pos_array[ i ] - pre_p
-                    #if pvalue_stat[ this_v] <= 0:
-                    #    print chrom, this_v, pos_array[i], pre_p
-                    #    raise Exception("stop here")
-                
-                    nhcal += 1
-                else:
-                    pvalue_stat[ this_v ] = pos_array[ i ] - pre_p 
-                    nhcal += 1
-
-                #print pos_array[ i ], pre_p, pos_array[ i ] - pre_p
-                pre_p = pos_array[ i ]
-
-
         logging.debug ( "make pvalue_stat cost %.5f seconds" % t )
-        logging.debug ( "calculate pvalue for %d times" % npcal )
-        logging.debug ( "access hash for %d times" % nhcal )
+        logging.debug ( "calculate pvalue/access hash for %d times" % nhcal )
+        #logging.debug ( "access hash for %d times" % nhcal )
         nhval = 0
 
         #for v in sorted(pvalue_stat.keys()):

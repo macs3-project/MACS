@@ -1,4 +1,4 @@
-# Time-stamp: <2013-04-09 15:51:28 Tao Liu>
+# Time-stamp: <2013-09-15 21:55:17 Tao Liu>
 
 """Module Description
 
@@ -101,13 +101,19 @@ cdef inline double __poisson_cdf ( unsigned int k, double a ):
     k	: observation
     a	: lambda
     """
+    cdef:
+        double nextcdf
+        double cdf
+        unsigned int i
+        double lastcdf
+
     if k < 0:
         return 0.0                        # special cases
-    cdef double nextcdf = exp( -1 * a )
-    cdef double cdf = nextcdf
-    cdef unsigned int i
-    cdef double lastcdf
-    for i in xrange(1,k+1):
+
+    nextcdf = exp( -1 * a )
+    cdf = nextcdf
+    
+    for i in range( 1, k + 1 ):
         lastcdf = nextcdf
         nextcdf = lastcdf * a / i
         cdf = cdf + nextcdf
@@ -123,18 +129,25 @@ cdef inline double __poisson_cdf_large_lambda ( unsigned int k, double a ):
     k	: observation
     a	: lambda
     """
+    cdef:
+        int num_parts
+        double lastexp
+        double nextcdf
+        double cdf
+        unsigned int i
+        double lastcdf
+    
     assert a > 700
     if k < 0:
         return 0.0                        # special cases
-    cdef int num_parts = int(a/LSTEP)
-    cdef double lastexp = exp(-1 * (a % LSTEP) )
-    cdef double nextcdf = EXPSTEP
+
+    num_parts = int( a / LSTEP )
+    lastexp = exp( -1 * ( a % LSTEP ) )
+    nextcdf = EXPSTEP
 
     num_parts -= 1
-    cdef double cdf = nextcdf
-    cdef unsigned int i
-    cdef double lastcdf
-    for i in xrange(1,k+1):
+
+    for i in range( 1 , k + 1 ):
         lastcdf = nextcdf
         nextcdf = lastcdf * a / i
         cdf = cdf + nextcdf
@@ -147,7 +160,7 @@ cdef inline double __poisson_cdf_large_lambda ( unsigned int k, double a ):
                cdf *= lastexp
                lastexp = 1
 
-    for i in xrange(num_parts):
+    for i in range( num_parts ):
         cdf *= EXPSTEP
     cdf *= lastexp
     return cdf
@@ -310,7 +323,7 @@ cdef inline double log10_poisson_cdf_Q_large_lambda ( unsigned int k, double lbd
     return round((residue-lbd)/log(10),5)
 
 cdef inline double logspace_add ( double logx, double logy ):
-    return max (logx, logy) + log1p (exp (-fabs (logx - logy)));
+    return max (logx, logy) + log1p (exp (-fabs (logx - logy)))
 
 cpdef poisson_cdf_inv ( double cdf, double lam, int maximum=1000 ):
     """inverse poisson distribution.
