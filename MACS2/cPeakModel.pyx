@@ -1,4 +1,4 @@
-# Time-stamp: <2013-09-12 17:13:08 Tao Liu>
+# Time-stamp: <2013-09-18 15:47:57 Tao Liu>
 
 """Module Description
 
@@ -171,7 +171,7 @@ Summary of Peak Model:
             object paired_peakpos_chrom
             np.ndarray plus_start, plus_end, minus_start, minus_end
         
-        window_size = 1+2*self.peaksize
+        window_size = 1+2*self.peaksize+self.tsize
         self.plus_line = np.zeros(window_size, dtype="int32")#[0]*window_size
         self.minus_line = np.zeros(window_size, dtype="int32")#[0]*window_size
         plus_start = np.zeros(window_size, dtype="int32")
@@ -207,6 +207,8 @@ Summary of Peak Model:
         # normalize first
         minus_data = (minus_line - minus_line.mean())/(minus_line.std()*len(minus_line))
         plus_data = (plus_line - plus_line.mean())/(plus_line.std()*len(plus_line))
+        print "plus:",len(plus_data)
+        print "minus:",len(minus_data)
 
         # cross-correlation
         ycorr = np.correlate(minus_data,plus_data,mode="full")[window_size-self.peaksize:window_size+self.peaksize]
@@ -260,7 +262,7 @@ Summary of Peak Model:
 
         max_index = start.shape[0] - 1
 
-        psize_adjusted1 = self.peaksize + self.tsize / 2
+        psize_adjusted1 = self.peaksize + self.tsize / 2 # half window
 
         while i1<i1_max and i2<i2_max:
             p1 = pos1[i1]
@@ -269,7 +271,7 @@ Summary of Peak Model:
             #else:
             #    p2 = pos2[i2] - self.tsize
 
-            p2 = pos2[i2] # - self.tsize
+            p2 = pos2[i2] #- self.tsize/2
                 
             if p1-psize_adjusted1 > p2: # move pos2
                 i2 += 1
@@ -283,9 +285,9 @@ Summary of Peak Model:
                     i2_prev = i2 # only the first index is recorded
                 # project
                 #for i in range(p2-p1+self.peaksize,p2-p1+self.peaksize+self.tsize):
-                s = max(p2-p1+self.peaksize-self.tsize/2, 0)
+                s = max(p2-self.tsize/2-p1+psize_adjusted1, 0)
                 start[s] += 1
-                e = min(p2-p1+self.peaksize+self.tsize/2, max_index)
+                e = min(p2+self.tsize/2-p1+psize_adjusted1, max_index)
                 end[e] -= 1
                 #line[s:e] += 1
                 #for i in range(s,e):
@@ -405,12 +407,14 @@ Summary of Peak Model:
         #else:
         #    tpos = pos_list - self.tsize/2
         cdef int peak_length, start, pos, i, pp, top_p_num, s, e
-        
+
         peak_length = pos_list[-1]+1-pos_list[0]+self.tsize
-        if plus_strand:
-            start = pos_list[0] 
-        else:
-            start = pos_list[0] - self.tsize
+        #if plus_strand:
+        #    start = pos_list[0]
+        #else:
+        #    start = pos_list[0] - self.tsize
+
+        start = pos_list[0] - self.tsize/2
 
         #horizon_line = np.zeros(peak_length, dtype="int32") # the line for tags to be projected
         
@@ -418,17 +422,17 @@ Summary of Peak Model:
         #horizon_line = array('i',[0]*peak_length)
         #for pos in pos_list:
         for i in range(len(pos_list)):
-            pp = pos_list[i]
-            if plus_strand:
-                s = max(pos-start,0)
-                e = min(pos-start+self.tsize,peak_length)
-                for pp in range(s,e): # projected point
-                    horizon_line[pp] += 1
-            else:
-                s = max(pos-start-self.tsize,0)
-                e = min(pos-start,peak_length)
-                for pp in range(s,e): # projected point
-                    horizon_line[pp] += 1
+            pos = pos_list[i]
+            #if plus_strand:
+            s = max(pos-start-self.tsize/2,0)
+            e = min(pos-start+self.tsize/2,peak_length)
+            for pp in range(s,e): # projected point
+                horizon_line[pp] += 1
+            #else:
+            #    s = max(pos-start-self.tsize/2,0)
+            #    e = min(pos-start+self.tsize/2,peak_length)
+            #    for pp in range(s,e): # projected point
+            #        horizon_line[pp] += 1
 
         # # top indices
         # top_indices = np.where(horizon_line == horizon_line.max())[0]
@@ -445,6 +449,7 @@ Summary of Peak Model:
                top_pos = [pp]
            elif horizon_line[pp] == top_p_num:
                top_pos.append(pp)
+        
         #print top_pos[int(len(top_pos)/2)]+start
         return (top_pos[int(len(top_pos)/2)]+start)
 

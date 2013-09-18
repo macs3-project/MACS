@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# Time-stamp: <2013-09-16 00:02:10 Tao Liu>
+# Time-stamp: <2013-09-18 14:18:41 Tao Liu>
 
 """Description: 
 
@@ -61,7 +61,7 @@ def main():
                        Extension("MACS2.IO.cDiffScore", ["MACS2/IO/cDiffScore.pyx"], include_dirs=numpy_include_dir ),                      
                        Extension("MACS2.IO.cCallPeakUnit", ["MACS2/IO/cCallPeakUnit.pyx"], include_dirs=numpy_include_dir),
                        Extension("MACS2.hashtable", ["MACS2/hashtable.pyx"], include_dirs=["MACS2/",numpy_get_include()]),
-                       Extension("MACS2.Poisson", ["MACS2/Poisson.pyx", "MACS2/cPoisson.c"], libraries=["m"], include_dirs=["MACS2/",numpy_get_include()]),
+                       #Extension("MACS2.Poisson", ["MACS2/Poisson.pyx", "MACS2/cPoisson.c"], libraries=["m"], include_dirs=["MACS2/"]),
                        ]
     else:
         ext_modules = [Extension("MACS2.cProb", ["MACS2/cProb.c"], libraries=["m"], include_dirs=numpy_include_dir ),
