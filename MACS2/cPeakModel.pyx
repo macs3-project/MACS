@@ -1,4 +1,4 @@
-# Time-stamp: <2013-09-18 15:47:57 Tao Liu>
+# Time-stamp: <2013-09-18 17:10:21 Tao Liu>
 
 """Module Description
 
@@ -207,8 +207,8 @@ Summary of Peak Model:
         # normalize first
         minus_data = (minus_line - minus_line.mean())/(minus_line.std()*len(minus_line))
         plus_data = (plus_line - plus_line.mean())/(plus_line.std()*len(plus_line))
-        print "plus:",len(plus_data)
-        print "minus:",len(minus_data)
+        #print "plus:",len(plus_data)
+        #print "minus:",len(minus_data)
 
         # cross-correlation
         ycorr = np.correlate(minus_data,plus_data,mode="full")[window_size-self.peaksize:window_size+self.peaksize]
@@ -479,7 +479,7 @@ Summary of Peak Model:
 
         # top indices
         #print pos_list
-        print horizon_line
+        #print horizon_line
         top_indices = np.where(horizon_line == horizon_line.max())[0]
         #print top_indices+start
         return top_indices[ int(top_indices.shape[0]/2) ] + start
