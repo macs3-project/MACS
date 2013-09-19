@@ -1,4 +1,4 @@
-# Time-stamp: <2013-09-18 17:10:21 Tao Liu>
+# Time-stamp: <2013-09-19 15:59:35 Tao Liu>
 
 """Module Description
 
@@ -54,7 +54,7 @@ cdef class PeakModel:
         int umfold
         int lmfold
         int bw
-        int tsize
+        int tag_expansion_size
         object info, debug, warn, error
         str summary
         public np.ndarray plus_line, minus_line, shifted_line
@@ -66,13 +66,13 @@ cdef class PeakModel:
         public list alternative_d
         public np.ndarray xcorr, ycorr
 
-    def __init__ (self, opt=None, treatment=None, int max_pairnum=500, double gz = 0, int umfold=30, int lmfold=10, int bw=200, int ts = 25, int bg=0, bool quiet=False):
+    def __init__ ( self, opt , treatment, int max_pairnum=500 ): #, double gz = 0, int umfold=30, int lmfold=10, int bw=200, int ts = 25, int bg=0, bool quiet=False):
         self.treatment = treatment
         #if opt:
         self.gz = opt.gsize
         self.umfold = opt.umfold
         self.lmfold = opt.lmfold
-        self.tsize = opt.tsize
+        self.tag_expansion_size = 10         #opt.tsize| test 10bps. The reason is that we want the best 'lag' between left & right cutting sides. A tag will be expanded to 10bps centered at cutting point.
         self.bw = opt.bw
         self.info  = opt.info
         self.debug = opt.debug
@@ -82,7 +82,7 @@ cdef class PeakModel:
         #    self.gz = gz
         #    self.umfold = umfold
         #    self.lmfold = lmfold            
-        #    self.tsize = ts
+        #    self.tag_expansion_size = ts
         #    self.bg = bg
         #    self.bw = bw
         #    self.info  = lambda x: sys.stderr.write(x+"\n")
@@ -171,7 +171,7 @@ Summary of Peak Model:
             object paired_peakpos_chrom
             np.ndarray plus_start, plus_end, minus_start, minus_end
         
-        window_size = 1+2*self.peaksize+self.tsize
+        window_size = 1+2*self.peaksize+self.tag_expansion_size
         self.plus_line = np.zeros(window_size, dtype="int32")#[0]*window_size
         self.minus_line = np.zeros(window_size, dtype="int32")#[0]*window_size
         plus_start = np.zeros(window_size, dtype="int32")
@@ -218,7 +218,7 @@ Summary of Peak Model:
         ycorr = smooth(ycorr, window="flat") # window size is by default 11.
 
         # best cross-correlation point
-        self.d = xcorr[np.where(ycorr==max(ycorr))[0][0]] #+self.tsize
+        self.d = xcorr[np.where(ycorr==max(ycorr))[0][0]] #+self.tag_expansion_size
         # all local maximums could be alternative ds.
         i_l_max = np.r_[False, ycorr[1:] > ycorr[:-1]] & np.r_[ycorr[:-1] > ycorr[1:], False]
         self.alternative_d = map(int,xcorr[i_l_max])
@@ -231,7 +231,7 @@ Summary of Peak Model:
 
         #shift_size = self.d/2
         
-        self.scan_window = max(self.d,self.tsize)*2
+        self.scan_window = max(self.d,self.tag_expansion_size)*2
         # a shifted model
         #self.shifted_line = [0]*window_size
 
@@ -262,16 +262,16 @@ Summary of Peak Model:
 
         max_index = start.shape[0] - 1
 
-        psize_adjusted1 = self.peaksize + self.tsize / 2 # half window
+        psize_adjusted1 = self.peaksize + self.tag_expansion_size / 2 # half window
 
         while i1<i1_max and i2<i2_max:
             p1 = pos1[i1]
             #if plus_strand:
             #    p2 = pos2[i2]
             #else:
-            #    p2 = pos2[i2] - self.tsize
+            #    p2 = pos2[i2] - self.tag_expansion_size
 
-            p2 = pos2[i2] #- self.tsize/2
+            p2 = pos2[i2] #- self.tag_expansion_size/2
                 
             if p1-psize_adjusted1 > p2: # move pos2
                 i2 += 1
@@ -284,10 +284,10 @@ Summary of Peak Model:
                     flag_find_overlap = True
                     i2_prev = i2 # only the first index is recorded
                 # project
-                #for i in range(p2-p1+self.peaksize,p2-p1+self.peaksize+self.tsize):
-                s = max(p2-self.tsize/2-p1+psize_adjusted1, 0)
+                #for i in range(p2-p1+self.peaksize,p2-p1+self.peaksize+self.tag_expansion_size):
+                s = max(p2-self.tag_expansion_size/2-p1+psize_adjusted1, 0)
                 start[s] += 1
-                e = min(p2+self.tsize/2-p1+psize_adjusted1, max_index)
+                e = min(p2+self.tag_expansion_size/2-p1+psize_adjusted1, max_index)
                 end[e] -= 1
                 #line[s:e] += 1
                 #for i in range(s,e):
@@ -403,18 +403,18 @@ Summary of Peak Model:
         return the highest peak summit position.
         """
         #if plus_strand:
-        #    tpos = pos_list + self.tsize/2
+        #    tpos = pos_list + self.tag_expansion_size/2
         #else:
-        #    tpos = pos_list - self.tsize/2
+        #    tpos = pos_list - self.tag_expansion_size/2
         cdef int peak_length, start, pos, i, pp, top_p_num, s, e
 
-        peak_length = pos_list[-1]+1-pos_list[0]+self.tsize
+        peak_length = pos_list[-1]+1-pos_list[0]+self.tag_expansion_size
         #if plus_strand:
         #    start = pos_list[0]
         #else:
-        #    start = pos_list[0] - self.tsize
+        #    start = pos_list[0] - self.tag_expansion_size
 
-        start = pos_list[0] - self.tsize/2
+        start = pos_list[0] - self.tag_expansion_size/2
 
         #horizon_line = np.zeros(peak_length, dtype="int32") # the line for tags to be projected
         
@@ -424,13 +424,13 @@ Summary of Peak Model:
         for i in range(len(pos_list)):
             pos = pos_list[i]
             #if plus_strand:
-            s = max(pos-start-self.tsize/2,0)
-            e = min(pos-start+self.tsize/2,peak_length)
+            s = max(pos-start-self.tag_expansion_size/2,0)
+            e = min(pos-start+self.tag_expansion_size/2,peak_length)
             for pp in range(s,e): # projected point
                 horizon_line[pp] += 1
             #else:
-            #    s = max(pos-start-self.tsize/2,0)
-            #    e = min(pos-start+self.tsize/2,peak_length)
+            #    s = max(pos-start-self.tag_expansion_size/2,0)
+            #    e = min(pos-start+self.tag_expansion_size/2,peak_length)
             #    for pp in range(s,e): # projected point
             #        horizon_line[pp] += 1
 
@@ -462,19 +462,19 @@ Summary of Peak Model:
         """
         cdef int peak_length, start, pos, i, pp, top_p_num
         
-        peak_length = pos_list[-1]+1-pos_list[0]+self.tsize
+        peak_length = pos_list[-1]+1-pos_list[0]+self.tag_expansion_size
         if plus_strand:
             start = pos_list[0] 
         else:
-            start = pos_list[0] - self.tsize
+            start = pos_list[0] - self.tag_expansion_size
         horizon_line = np.zeros(peak_length, dtype="int32") # the line for tags to be projected
         for i in range(len(pos_list)):
             pos = pos_list[i]
             if plus_strand:
-                for pp in range(int(pos-start),int(pos-start+self.tsize)): # projected point
+                for pp in range(int(pos-start),int(pos-start+self.tag_expansion_size)): # projected point
                     horizon_line[pp] += 1
             else:
-                for pp in range(int(pos-start-self.tsize),int(pos-start)): # projected point
+                for pp in range(int(pos-start-self.tag_expansion_size),int(pos-start)): # projected point
                     horizon_line[pp] += 1
 
         # top indices
