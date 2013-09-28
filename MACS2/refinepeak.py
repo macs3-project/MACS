@@ -48,8 +48,11 @@ def run( o_options ):
     debug = options.debug
     error = options.error
 
+    if options.ofile:
+        outputfile = open(options.ofile, 'w')
+    else:
+        outputfile = open(options.oprefix+"_refinepeak.bed", "w")
 
-    outputfile = open(options.oprefix+"_refinepeak.bed", "w")
 
     peakio = file(options.bedfile)
     peaks = PeakIO()

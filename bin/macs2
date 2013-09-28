@@ -20,6 +20,7 @@ with the distribution).
 # python modules
 # ------------------------------------
 
+import os
 import sys
 import argparse as ap
 
@@ -39,7 +40,15 @@ def main():
     argparser = prepare_argparser()
     args = argparser.parse_args()
     subcommand  = args.subcommand_name
+    
     if subcommand == "callpeak":
+        if args.tmpdir:
+            # use a tmp directory to store MACS output
+            if not os.path.exists( args.tmpdir ):
+                try:
+                    os.makedirs( args.tmpdir )
+                except:
+                    sys.exit( "TMPDIR (%s) could not be created. Terminating program." % args.tmpdir )
         # General call peak
         from MACS2.callpeak import run
         run( args )
@@ -158,6 +167,8 @@ def add_callpeak_parser( subparsers ):
                               help = "Buffer size for incrementally increasing internal array size to store reads alignment information. In most cases, you don't have to change this parameter. However, if there are large number of chromosomes/contigs/scaffolds in your alignment, it's recommended to specify a smaller buffer size in order to decrease memory usage (but it will take longer time to read alignment files). Minimum memory requested for reading an alignment file is about # of CHROMOSOME * BUFFER_SIZE * 2 Bytes. DEFAULT: 100000 " )
     
     # group for output files
+    argparser.add_argument("--tmpdir", dest = "tmpdir", type = str, default = '',
+                                help = "If specified all output files will be written to that directory. Default: the current working directory")
     group_output = argparser_callpeak.add_argument_group( "Output arguments" )
     group_output.add_argument( "-n", "--name", dest = "name", type = str,
                                help = "Experiment name, which will be used to generate output file names. DEFAULT: \"NA\"", 
@@ -171,7 +182,7 @@ def add_callpeak_parser( subparsers ):
                                help = "Tells MACS to include trackline with bedGraph files. To include this trackline while displaying bedGraph at UCSC genome browser, can show name and description of the file as well. However my suggestion is to convert bedGraph to bigWig, then show the smaller and faster binary bigWig file at UCSC genome browser, as well as downstream analysis. Require -B to be set. Default: Not include trackline." )
     
     group_output.add_argument( "--SPMR", dest = "do_SPMR", action = "store_true", default = False,
-                               help = "If True, MACS will save signal per million reads for fragment pileup profiles. Require -B to be set. Default: False" )    
+                               help = "If True, MACS will save signal per million reads for fragment pileup profiles. Require -B to be set. Default: False" )
     # group for bimodal
     group_bimodal = argparser_callpeak.add_argument_group( "Shifting model arguments" )
     group_bimodal.add_argument( "-s", "--tsize",  dest = "tsize", type = int, default = None,
@@ -196,7 +207,7 @@ def add_callpeak_parser( subparsers ):
                                help = "(Legacy) The arbitrary shift size in bp. When nomodel is true, MACS will use this value as 1/2 of fragment size. Check --extsize for more information. DEFAULT: not set. --extsize and --shiftsize are mutually exclusive." )
     
     # General options.
-    group_callpeak = argparser_callpeak.add_argument_group( "Peak calling arguments" )    
+    group_callpeak = argparser_callpeak.add_argument_group( "Peak calling arguments" )
     p_or_q_group = group_callpeak.add_mutually_exclusive_group()
     p_or_q_group.add_argument( "-q", "--qvalue", dest = "qvalue", type = float, default = 0.05,
                                help = "Minimum FDR (q-value) cutoff for peak detection. DEFAULT: 0.05. -q, -p and -F are mutually exclusive." )
@@ -302,7 +313,7 @@ def add_filterdup_parser( subparsers ):
                                                  help = "Remove duplicate reads at the same position, then convert acceptable format to BED format." )
     argparser_filterdup.add_argument( "-i", dest = "ifile", type = str, required = True,
                                       help = "Sequencing alignment file. REQUIRED." )
-    argparser_filterdup.add_argument( "-o", dest = "outputfile", type = str,
+    argparser_filterdup.add_argument( "-o", "--ofile", dest = "outputfile", type = str,
                                       help = "Output BED file name. If not specified, will write to standard output. DEFAULT: stdout",
                                       default = "stdout" )
     argparser_filterdup.add_argument( "-f", "--format", dest = "format", type = str,
@@ -340,6 +351,8 @@ def add_bdgpeakcall_parser( subparsers ):
 #                         help="If set, MACS will use a more sophisticated approach to find all summits in each enriched peak region. DEFAULT: False",default=False)
     argparser_bdgpeakcall.add_argument("--no-trackline", dest="trackline", action="store_false", default=True,
                          help="Tells MACS not to include trackline with bedGraph files. The trackline is required by UCSC.")
+    argparser_bdgpeakcall.add_argument( "--ofile", dest = "ofile", default = "", type = str,
+                                        help = "output path, it set --o-prefix will be ignored" )
     return
 
 def add_bdgbroadcall_parser( subparsers ):
@@ -362,6 +375,8 @@ def add_bdgbroadcall_parser( subparsers ):
                                          help = "maximum linking between significant peaks, better to set it as 4 times of d value. DEFAULT: 800", default = 800)
     argparser_bdgbroadcall.add_argument( "-o", "--o-prefix", dest = "oprefix", default = "peak", type = str,
                                          help = "output file prefix, DEFAULT: peak" )
+    argparser_bdgbroadcall.add_argument( "--ofile", dest = "ofile", default = "", type = str,
+                                        help = "output file path, if set --o-prefix is ignored and the output is written to the specified file" )
     return
     
 def add_bdgcmp_parser( subparsers ):
@@ -377,8 +392,10 @@ def add_bdgcmp_parser( subparsers ):
                                    help = "Scaling factor for treatment and control track. Keep it as 1.0 or default in most cases. Set it ONLY while you have SPMR output from MACS2 callpeak, and plan to calculate scores as MACS2 callpeak module. If you want to simulate 'callpeak' w/o '--to-large', calculate effective smaller sample size after filtering redudant reads in million (e.g., put 31.415926 if effective reads are 31,415,926) and input it for '-S'; for 'callpeak --to-large', calculate effective reads in larger sample. DEFAULT: 1.0")                                 
     argparser_bdgcmp.add_argument( "-p", "--pseudocount", dest = "pseudocount", type = float, default = 0.0,
                                    help = "The pseudocount used for calculating logLR, logFE or FE. The count will be applied after normalization of sequencing depth. DEFAULT: 0.0, no pseudocount is applied.")     
-    argparser_bdgcmp.add_argument( "-o", "--output", dest = "ofile", type = str, required = True,
-                                   help = "The PREFIX of output bedGraph file to write scores. REQUIRED. If it is given as A, and method is 'ppois', output file will be A_ppois.bdg" )
+    argparser_bdgcmp.add_argument( "-o", "--o-prefix", dest = "oprefix", type = str,
+                                   help = "The PREFIX of output bedGraph file to write scores. If it is given as A, and method is 'ppois', output file will be A_ppois.bdg" )
+    argparser_bdgcmp.add_argument( "--ofile", dest = "ofile", type = str,
+                                   help = "output file path, if set --o-prefix is ignored and the output is written to the specified file" )
     argparser_bdgcmp.add_argument( "-m", "--method", dest = "method", type = str, nargs = "+",
                                    choices = ( "ppois", "qpois", "subtract", "logFE", "FE", "logLR", "slogLR" ),
                                    help = "Method to use while calculating a score in any bin by comparing treatment value and control value. Available choices are: ppois, qpois, subtract, logFE, logLR, and slogLR. They represent Poisson Pvalue (-log10(pvalue) form) using control as lambda and treatment as observation, q-value through a BH process for poisson pvalues, subtraction from treatment, linear scale fold enrichment, log10 fold enrichment(need to set pseudocount), log10 likelihood between ChIP-enriched model and open chromatin model(need to set pseudocount), and symmetric log10 likelihood between two ChIP-enrichment models. Default option is ppois.",default="ppois")
@@ -396,13 +413,13 @@ def add_randsample_parser( subparsers ):
                                help = "Number of tags you want to keep. Input 8000000 or 8e+6 for 8 million. This option can't be used at the same time with -p/--percent. Note that the number of tags in output is approximate as the number specified here. REQUIRED" )
     argparser_randsample.add_argument( "--seed", dest = "seed", type = int, default = -1, 
                                        help = "Set the random seed while down sampling data. Must be a non-negative integer in order to be effective. DEFAULT: not set" )
-    argparser_randsample.add_argument( "-o", dest = "outputfile", type = str,
+    argparser_randsample.add_argument( "-o", "--ofile", dest = "outputfile", type = str,
                                       help = "Output BED file name. If not specified, will write to standard output. DEFAULT: stdout",
                                       default = None)
     argparser_randsample.add_argument( "-s", "--tsize", dest = "tsize", type = int, default = None,
                                        help = "Tag size. This will overide the auto detected tag size. DEFAULT: Not set")
     argparser_randsample.add_argument( "-f", "--format", dest = "format", type = str,
-                                       choices=("AUTO","BAM","SAM","BED","ELAND","ELANDMULTI","ELANDEXPORT","BOWTIE"),                                       
+                                       choices=("AUTO","BAM","SAM","BED","ELAND","ELANDMULTI","ELANDEXPORT","BOWTIE"),
                                        help = "Format of tag file, \"AUTO\", \"BED\" or \"ELAND\" or \"ELANDMULTI\" or \"ELANDEXPORT\" or \"SAM\" or \"BAM\" or \"BOWTIE\". The default AUTO option will %(prog)s decide which format the file is. Please check the definition in README file if you choose ELAND/ELANDMULTI/ELANDEXPORT/SAM/BAM/BOWTIE. DEFAULT: \"AUTO\"",
                                        default = "AUTO" )
     argparser_randsample.add_argument( "--verbose", dest = "verbose", type = int, default = 2,
@@ -432,6 +449,13 @@ def add_bdgdiff_parser( subparsers ):
                                     help = "Sequencing depth (# of non-redundant reads in million) for condition 1. It will be used together with --d2. See description for --d2 below for how to assign them. Default: 1" )
     argparser_bdgdiff.add_argument( "--d2", "--depth2", dest = "depth2", type = float, default = 1.0,
                                     help = "Sequencing depth (# of non-redundant reads in million) for condition 2. It will be used together with --d1. DEPTH1 and DEPTH2 will be used to calculate scaling factor for each sample, to down-scale larger sample to the level of smaller one. For example, while comparing 10 million condition 1 and 20 million condition 2, use --d1 10 --d2 20, then pileup value in bedGraph for condition 2 will be divided by 2. Default: 1" )
+    argparser_bdgdiff.add_argument( "--ofile-cond1", dest = "ofile_cond1", type = str, default="",
+                                    help = "Output file of unique regions in condition 1." )
+    argparser_bdgdiff.add_argument( "--ofile-cond2", dest = "ofile_cond2", type = str, default="",
+                                    help = "Output file of unique regions in condition 2." )
+    argparser_bdgdiff.add_argument( "--ofile-both-conditions", dest = "ofile_both_conditions", type = str, default="",
+                                    help = "Output file of common regions in both conditions." )
+
     return
 
 def add_refinepeak_parser( subparsers ):
@@ -453,7 +477,8 @@ def add_refinepeak_parser( subparsers ):
                                         help = "Prefix for output file, DEFAULT: peak" )
     argparser_refinepeak.add_argument( "--verbose", dest = "verbose", type = int, default = 2,
                                        help = "Set verbose level. 0: only show critical message, 1: show additional warning message, 2: show process information, 3: show debug messages. If you want to know where are the duplicate reads, use 3. DEFAULT:2" )
-    
+    argparser_refinepeak.add_argument( "--ofile", dest = "ofile", type = str, default="",
+                                        help = "output file path, if set --o-prefix is ignored and the output is written to the specified file" )
     return
 
 def add_predictd_parser( subparsers ):
@@ -492,7 +517,7 @@ def add_pileup_parser( subparsers ):
                                               help = "Pileup aligned reads with a given extension size (fragment size or d in MACS language). Note there will be no step for duplicate reads filtering or sequencing depth scaling, so you may need to do certain pre/post-processing." )
     argparser_pileup.add_argument( "-i", "--ifile", dest = "ifile", type = str, required = True, nargs = "+",
                                    help = "ChIP-seq alignment file. If multiple files are given as '-t A B C', then they will all be read and combined. Note that pair-end data is not supposed to work with this command. REQUIRED." )
-    argparser_pileup.add_argument( "-o", dest = "outputfile", type = str,
+    argparser_pileup.add_argument( "-o", "--ofile", dest = "outputfile", type = str,
                                    help = "Output bedGraph file name. If not specified, will write to standard output. DEFAULT: stdout",
                                    default = "stdout" )
     argparser_pileup.add_argument( "-f", "--format", dest = "format", type = str,
