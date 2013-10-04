@@ -2,7 +2,6 @@
 
 import sys
 import logging
-import io
 
 from MACS2.IO import cBedGraphIO
 from MACS2.IO.cBedGraph import scoreTracktoBedGraph
@@ -77,6 +76,6 @@ def run( options ):
             raise Exception("Can't reach here!")
         
         info("Write bedGraph of scores...")
-        ofhd = io.open(ofile,"wb")
+        ofhd = open(ofile,"wb")
         sbtrack.write_bedGraph(ofhd,name="%s_Scores" % (method.upper()),description="Scores calculated by %s" % (method.upper()), column = 3)
         info("Finished '%s'! Please check '%s'!" % (method, ofile))

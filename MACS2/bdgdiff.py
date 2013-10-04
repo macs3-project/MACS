@@ -97,19 +97,19 @@ def run( options ):
     if options.ofile_cond1:
         nf = open( options.ofile_cond1, 'w' )
     else:
-        nf = open ("%s_c%.1f_cond1.bed" % (options.oprefix,options.cutoff),"w")
+        nf = open ( os.path.join( options.outdir, "%s_c%.1f_cond1.bed" % (options.oprefix,options.cutoff)), "w" )
     cat1.write_to_bed(nf, name_prefix=options.oprefix+"_cond1_", name="condition 1", description="unique regions in condition 1", score_column="score")
 
     if options.ofile_cond2:
         nf = open( options.ofile_cond2, 'w' )
     else:
-        nf = open ("%s_c%.1f_cond2.bed" % (options.oprefix,options.cutoff),"w")
+        nf = open ( os.path.join( options.outdir, "%s_c%.1f_cond2.bed" % (options.oprefix,options.cutoff)), "w" )
     cat2.write_to_bed(nf, name_prefix=options.oprefix+"_cond2_", name="condition 2", description="unique regions in condition 2", score_column="score")
 
     if options.ofile_both_conditions:
         nf = open( options.ofile_both_conditions, 'w' )
     else:
-        nf = open ("%s_c%.1f_common.bed" % (options.oprefix,options.cutoff),"w")
+        nf = open ( os.path.join( options.outdir, "%s_c%.1f_common.bed" % (options.oprefix,options.cutoff)), "w" )
     cat3.write_to_bed(nf, name_prefix=options.oprefix+"_common_",name="common", description="common regions in both conditions", score_column="score")
     info("Done")
 

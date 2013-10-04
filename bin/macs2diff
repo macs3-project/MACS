@@ -69,6 +69,8 @@ Example: %prog --t1 CTCF_GM12878.bam --c1 Control_GM12878.bam --t2 CTCF_K562.bam
     optparser.add_option("-n","--name",dest="name",type="string",
                          help="Analysis name, which will be used to generate output file names. DEFAULT: \"NA\"",
                          default="NA")
+    argparser.add_argument("--outdir", dest = "outdir", type = str, default = '',
+                         help = "If specified all output files will be written to that directory. Default: the current working directory")
     optparser.add_option("-f","--format",dest="format",type="string",
                          help="Format of tag file, \"AUTO\", \"BED\" or \"ELAND\" or \"ELANDMULTI\" or \"ELANDEXPORT\" or \"SAM\" or \"BAM\" or \"BOWTIE\". The default AUTO option will let MACS decide which format the file is. Please check the definition in 00README file if you choose ELAND/ELANDMULTI/ELANDEXPORT/SAM/BAM/BOWTIE. DEFAULT: \"AUTO\"",
                          default="AUTO")
@@ -138,7 +140,7 @@ def load_tag_files_options ( options ):
 
     options.info("#1 read treatment file for condition 1...")
     treat1 = tp1.build_fwtrack()
-    options.info("#1 read treatment file for condition 2...")    
+    options.info("#1 read treatment file for condition 2...")
     treat2 = tp2.build_fwtrack()    
 
     treat1.sort()
@@ -146,13 +148,13 @@ def load_tag_files_options ( options ):
     
     if options.cfile1:
         options.info("#1.2 read input control files...")
-        options.info("#1 read control file for condition 1...")        
+        options.info("#1 read control file for condition 1...")
         control1 = options.parser(open2(options.cfile1)).build_fwtrack()
         control1.sort()
         if options.cfile2 == options.cfile1:
             control2 = control1
         else:
-            options.info("#1 read control file for condition 2...")            
+            options.info("#1 read control file for condition 2...")
             control2 = options.parser(open2(options.cfile2)).build_fwtrack()
             control2.sort()
     else:
@@ -252,7 +254,15 @@ def macs2pqvalues ( task_options ):
 def main():
     # Parse options...
     options = opt_validate_diff( prepare_optparser() )
-    
+
+    if options.outdir:
+        # use a output directory to store MACS output
+        if not os.path.exists( options.outdir ):
+            try:
+                os.makedirs( options.outdir )
+            except:
+                sys.exit( "Output directory (%s) could not be created. Terminating program." % options.outdir )
+
     # end of parsing commandline options
     info = options.info
     warn = options.warn
@@ -265,7 +275,7 @@ def main():
         warn( "-a is larger than actual CPU counts, will cap it with %d" % CPUCOUNT )
         options.nprocesses = CPUCOUNT
     if options.nprocesses > 4:
-        warn( "Maximum 4 CPUs can be used!" )        
+        warn( "Maximum 4 CPUs can be used!" )
         options.nprocesses = 4
 
     #1 Read
@@ -349,36 +359,36 @@ def main():
         info("#3 save score to bedGraph files")
         if options.log_qvalue:
             info("#3 saving qvalues")
-            t1c1.write_bedGraph(open("%s_t1c1_qvalue.bdg" % options.name,"w"),
+            t1c1.write_bedGraph( open( os.path.join( options.outdir, "%s_t1c1_qvalue.bdg" % options.name), "w" ),
                                 name="%s t1c1 qvalue" % options.name,
                                 description="%s qvalues calculated by comparing treatment1 and control1" % options.name)
-            t2c2.write_bedGraph(open("%s_t2c2_qvalue.bdg" % options.name,"w"),
+            t2c2.write_bedGraph( open( os.path.join( options.outdir, "%s_t2c2_qvalue.bdg" % options.name), "w" ),
                                 name="%s t2c2 qvalue" % options.name,
                                 description="%s qvalues calculated by comparing treatment2 and control2" % options.name)
-            diff_track.write_bedGraph(open("%s_diff_qvalue.bdg" % options.name,"w"),
+            diff_track.write_bedGraph( open( os.path.join( options.outdir, "%s_diff_qvalue.bdg" % options.name), "w" ),
                                       name="%s diff score qvalue" % options.name,
-                                      description="%s qvalues calculated by comparing treatment1 and treatment2" % options.name)            
-            #t1t2.write_bedGraph(open("%s_t1t2_qvalue.bdg" % options.name,"w"),
+                                      description="%s qvalues calculated by comparing treatment1 and treatment2" % options.name)
+            #t1t2.write_bedGraph( open( os.path.join( options.outdir, "%s_t1t2_qvalue.bdg" % options.name), "w" ),
             #                    name="%s t1t2 qvalue" % options.name,
             #                    description="%s qvalues calculated by comparing treatment1 and treatment2" % options.name)
-            #t2t1.write_bedGraph(open("%s_t2t1_qvalue.bdg" % options.name,"w"),
+            #t2t1.write_bedGraph(open( os.path.join( options.outdir, "%s_t2t1_qvalue.bdg" % options.name), "w" ),
             #                    name="%s t2t1 qvalue" % options.name,
-            #                    description="%s qvalues calculated by comparing treatment2 and treatment1" % options.name)    
+            #                    description="%s qvalues calculated by comparing treatment2 and treatment1" % options.name)
         elif options.log_pvalue:
             info("#3 saving pvalues")
-            t1c1.write_bedGraph(open("%s_t1c1_pvalue.bdg" % options.name,"w"),
+            t1c1.write_bedGraph( open( os.path.join( options.outdir, "%s_t1c1_pvalue.bdg" % options.name), "w" ),
                                 name="%s t1c1 pvalue" % options.name,
                                 description="%s pvalues calculated by comparing treatment1 and control1" % options.name)
-            t2c2.write_bedGraph(open("%s_t2c2_pvalue.bdg" % options.name,"w"),
+            t2c2.write_bedGraph( open( os.path.join( options.outdir, "%s_t2c2_pvalue.bdg" % options.name), "w" ),
                                 name="%s t2c2 pvalue" % options.name,
                                 description="%s pvalues calculated by comparing treatment2 and control2" % options.name)
-            diff_track.write_bedGraph(open("%s_diff_pvalue.bdg" % options.name,"w"),
+            diff_track.write_bedGraph( open( os.path.join( options.outdir, "%s_diff_pvalue.bdg" % options.name), "w" ),
                                       name="%s diff score pvalue" % options.name,
-                                      description="%s pvalues calculated by comparing treatment1 and treatment2" % options.name)            
-            #t1t2.write_bedGraph(open("%s_t1t2_pvalue.bdg" % options.name,"w"),
+                                      description="%s pvalues calculated by comparing treatment1 and treatment2" % options.name)
+            #t1t2.write_bedGraph( open( os.path.join( options.outdir, "%s_t1t2_pvalue.bdg" % options.name), "w" ),
             #                    name="%s t1t2 pvalue" % options.name,
             #                    description="%s pvalues calculated by comparing treatment1 and treatment2" % options.name)
-            #t2t1.write_bedGraph(open("%s_t2t1_pvalue.bdg" % options.name,"w"),
+            #t2t1.write_bedGraph( open( os.path.join( options.outdir, "%s_t2t1_pvalue.bdg" % options.name), "w" ),
             #                    name="%s t2t1 pvalue" % options.name,
             #                    description="%s pvalues calculated by comparing treatment2 and treatment1" % options.name)
         else:
@@ -399,9 +409,9 @@ def main():
     ( consistent_peaks, condition1_peaks, condition2_peaks ) = comp_btrack.call_diff_regions(cutoff=cutoff,min_length=minlen,max_gap=options.tsize)
 
     info("#4 Write peaks...")
-    consistent_f = open ( options.consistent_peakbed, "w" )
-    condition1_f = open ( options.condition1_peakbed, "w" )
-    condition2_f = open ( options.condition2_peakbed, "w" )    
+    consistent_f = open ( os.path.join( options.outdir, options.consistent_peakbed), "w" )
+    condition1_f = open ( os.path.join( options.outdir, options.condition1_peakbed), "w" )
+    condition2_f = open ( os.path.join( options.outdir, options.condition2_peakbed), "w" )
     consistent_peaks.write_to_bed(consistent_f,name_prefix="consistent_site_", score_column="score")
     condition1_peaks.write_to_bed(condition1_f,name_prefix="condition1_unique_site_", score_column="score")
     condition2_peaks.write_to_bed(condition2_f,name_prefix="condition2_unique_site_", score_column="score")

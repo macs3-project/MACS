@@ -49,9 +49,9 @@ def run( o_options ):
     error = options.error
 
     if options.ofile:
-        outputfile = open(options.ofile, 'w')
+        outputfile = open( os.path.join( options.outdir, options.ofile ), 'w' )
     else:
-        outputfile = open(options.oprefix+"_refinepeak.bed", "w")
+        outputfile = open( os.path.join( options.outdir, "%s_refinepeak.bed" % options.oprefix), "w" )
 
 
     peakio = file(options.bedfile)

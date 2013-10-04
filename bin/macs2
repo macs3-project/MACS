@@ -39,16 +39,19 @@ def main():
     # Parse options...
     argparser = prepare_argparser()
     args = argparser.parse_args()
+    argparser.add_argument("--outdir", dest = "outdir", type = str, default = '',
+            help = "If specified all output files will be written to that directory. Default: the current working directory")
     subcommand  = args.subcommand_name
-    
+
+    if args.outdir:
+        # use a output directory to store MACS output
+        if not os.path.exists( args.outdir ):
+            try:
+                os.makedirs( args.outdir )
+            except:
+                sys.exit( "Output directory (%s) could not be created. Terminating program." % args.outdir )
+
     if subcommand == "callpeak":
-        if args.tmpdir:
-            # use a tmp directory to store MACS output
-            if not os.path.exists( args.tmpdir ):
-                try:
-                    os.makedirs( args.tmpdir )
-                except:
-                    sys.exit( "TMPDIR (%s) could not be created. Terminating program." % args.tmpdir )
         # General call peak
         from MACS2.callpeak import run
         run( args )
@@ -167,8 +170,6 @@ def add_callpeak_parser( subparsers ):
                               help = "Buffer size for incrementally increasing internal array size to store reads alignment information. In most cases, you don't have to change this parameter. However, if there are large number of chromosomes/contigs/scaffolds in your alignment, it's recommended to specify a smaller buffer size in order to decrease memory usage (but it will take longer time to read alignment files). Minimum memory requested for reading an alignment file is about # of CHROMOSOME * BUFFER_SIZE * 2 Bytes. DEFAULT: 100000 " )
     
     # group for output files
-    argparser.add_argument("--tmpdir", dest = "tmpdir", type = str, default = '',
-                                help = "If specified all output files will be written to that directory. Default: the current working directory")
     group_output = argparser_callpeak.add_argument_group( "Output arguments" )
     group_output.add_argument( "-n", "--name", dest = "name", type = str,
                                help = "Experiment name, which will be used to generate output file names. DEFAULT: \"NA\"", 
