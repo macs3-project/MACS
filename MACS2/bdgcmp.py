@@ -2,7 +2,6 @@
 
 import sys
 import logging
-import io
 
 from MACS2.IO import cBedGraphIO
 from MACS2.IO.cBedGraph import scoreTracktoBedGraph
@@ -54,18 +53,21 @@ def run( options ):
     
     for method in set(options.method):
         info("Calculate scores comparing treatment and control by '%s'..." % method)
-        ofile = options.ofile + "_" + method + ".bdg"
+        if options.ofile:
+            ofile = options.ofile
+        else:
+            ofile = options.oprefix + "_" + method + ".bdg"
         # build score track
         if method == 'ppois':
             sbtrack.change_score_method( ord('p') )
         elif method == 'qpois':
-            sbtrack.change_score_method( ord('q') )        
+            sbtrack.change_score_method( ord('q') )
         elif method == 'subtract':
-            sbtrack.change_score_method( ord('d') )        
+            sbtrack.change_score_method( ord('d') )
         elif method == 'logFE':
             sbtrack.change_score_method( ord('f') )
         elif method == 'FE':
-            sbtrack.change_score_method( ord('F') )        
+            sbtrack.change_score_method( ord('F') )
         elif method == 'logLR':             # log likelihood
             sbtrack.change_score_method( ord('l') )
         elif method == 'slogLR':             # log likelihood
@@ -74,6 +76,6 @@ def run( options ):
             raise Exception("Can't reach here!")
         
         info("Write bedGraph of scores...")
-        ofhd = io.open(ofile,"wb")
+        ofhd = open(ofile,"wb")
         sbtrack.write_bedGraph(ofhd,name="%s_Scores" % (method.upper()),description="Scores calculated by %s" % (method.upper()), column = 3)
         info("Finished '%s'! Please check '%s'!" % (method, ofile))
