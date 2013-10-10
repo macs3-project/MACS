@@ -1,4 +1,4 @@
-# Time-stamp: <2013-07-07 23:22:41 Tao Liu>
+# Time-stamp: <2013-10-10 00:53:20 Tao Liu>
 
 """Module Description
 
@@ -129,18 +129,18 @@ def opt_validate ( options ):
         sys.exit(1)
     
     # output filenames
-    options.peakxls = os.path.join( options.tmpdir, options.name+"_peaks.xls" )
-    options.peakbed = os.path.join( options.tmpdir, options.name+"_peaks.bed" )
-    options.peakNarrowPeak = os.path.join( options.tmpdir, options.name+"_peaks.narrowPeak" )
-    options.peakBroadPeak = os.path.join( options.tmpdir, options.name+"_peaks.broadPeak" )
-    options.peakGappedPeak = os.path.join( options.tmpdir, options.name+"_peaks.gappedPeak" )
-    options.summitbed = os.path.join( options.tmpdir, options.name+"_summits.bed" )
-    options.zwig_tr = os.path.join( options.tmpdir, options.name+"_treat" )
-    options.zwig_ctl= os.path.join( options.tmpdir, options.name+"_control" )
-    #options.negxls  = os.path.join( options.tmpdir, options.name+"_negative_peaks.xls" )
-    #options.diagxls = os.path.join( options.tmpdir, options.name+"_diag.xls" )
-    options.modelR  = os.path.join( options.tmpdir, options.name+"_model.r" )
-    options.pqtable  = os.path.join( options.tmpdir, options.name+"_pq_table.txt" )
+    options.peakxls = os.path.join( options.name+"_peaks.xls" )
+    options.peakbed = os.path.join( options.name+"_peaks.bed" )
+    options.peakNarrowPeak = os.path.join( options.name+"_peaks.narrowPeak" )
+    options.peakBroadPeak = os.path.join( options.name+"_peaks.broadPeak" )
+    options.peakGappedPeak = os.path.join( options.name+"_peaks.gappedPeak" )
+    options.summitbed = os.path.join( options.name+"_summits.bed" )
+    options.zwig_tr = os.path.join( options.name+"_treat" )
+    options.zwig_ctl= os.path.join( options.name+"_control" )
+    #options.negxls  = os.path.join( options.name+"_negative_peaks.xls" )
+    #options.diagxls = os.path.join( options.name+"_diag.xls" )
+    options.modelR  = os.path.join( options.name+"_model.r" )
+    options.pqtable  = os.path.join( options.name+"_pq_table.txt" )
 
     # logging object
     logging.basicConfig(level=(4-options.verbose)*10,

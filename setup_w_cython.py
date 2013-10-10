@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# Time-stamp: <2013-09-18 14:18:41 Tao Liu>
+# Time-stamp: <2013-10-10 00:25:53 Tao Liu>
 
 """Description: 
 
@@ -61,7 +61,7 @@ def main():
                        Extension("MACS2.IO.cDiffScore", ["MACS2/IO/cDiffScore.pyx"], include_dirs=numpy_include_dir ),                      
                        Extension("MACS2.IO.cCallPeakUnit", ["MACS2/IO/cCallPeakUnit.pyx"], include_dirs=numpy_include_dir),
                        Extension("MACS2.hashtable", ["MACS2/hashtable.pyx"], include_dirs=["MACS2/",numpy_get_include()]),
-                       #Extension("MACS2.Poisson", ["MACS2/Poisson.pyx", "MACS2/cPoisson.c"], libraries=["m"], include_dirs=["MACS2/"]),
+                       Extension("MACS2.Poisson", ["MACS2/Poisson.pyx", "MACS2/cPoisson.c"], libraries=["m"], include_dirs=["MACS2/",numpy_get_include()]),
                        ]
     else:
         ext_modules = [Extension("MACS2.cProb", ["MACS2/cProb.c"], libraries=["m"], include_dirs=numpy_include_dir ),
@@ -79,11 +79,12 @@ def main():
                        Extension("MACS2.IO.cScoreTrack", ["MACS2/IO/cScoreTrack.c"], include_dirs=numpy_include_dir),
                        Extension("MACS2.IO.cDiffScore", ["MACS2/IO/cDiffScore.c"], include_dirs=numpy_include_dir ),                       
                        Extension("MACS2.IO.cCallPeakUnit", ["MACS2/IO/cCallPeakUnit.c"], include_dirs=numpy_include_dir),
-                       Extension("MACS2.hashtable", ["MACS2/hashtable.c"], include_dirs=["MACS2/",numpy_get_include()]),                       
+                       Extension("MACS2.hashtable", ["MACS2/hashtable.c"], include_dirs=["MACS2/",numpy_get_include()]), 
+                       Extension("MACS2.Poisson", ["MACS2/Poisson.c", "MACS2/cPoisson.c"], libraries=["m"], include_dirs=["MACS2/",numpy_get_include()]),
                        ]
 
     setup(name="MACS2",
-          version="2.0.10.20130915",
+          version="2.0.10.20131010",
           description="Model Based Analysis for ChIP-Seq data",
           author='Tao Liu',
           author_email='vladimir.liu@gmail.com',

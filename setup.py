@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# Time-stamp: <2013-09-15 23:58:47 Tao Liu>
+# Time-stamp: <2013-10-10 00:26:05 Tao Liu>
 
 """Description
 
@@ -53,10 +53,11 @@ def main():
                    Extension("MACS2.IO.cDiffScore", ["MACS2/IO/cDiffScore.c"], include_dirs=numpy_include_dir ),                   
                    Extension("MACS2.IO.cCallPeakUnit", ["MACS2/IO/cCallPeakUnit.c"], include_dirs=numpy_include_dir),
                    Extension("MACS2.hashtable", ["MACS2/hashtable.c"], include_dirs=["MACS2/",numpy_get_include()]),
+                   Extension("MACS2.Poisson", ["MACS2/Poisson.c", "MACS2/cPoisson.c"], libraries=["m"], include_dirs=["MACS2/",numpy_get_include()]),
                    ]
     
     setup(name="MACS2",
-          version="2.0.10.20130915",
+          version="2.0.10.20131010",
           description="Model Based Analysis for ChIP-Seq data",
           author='Tao Liu',
           author_email='vladimir.liu@gmail.com',

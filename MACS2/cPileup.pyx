@@ -1,4 +1,4 @@
-# Time-stamp: <2013-04-09 15:32:25 Tao Liu>
+# Time-stamp: <2013-09-27 17:18:32 Tao Liu>
 
 """Module Description: For pileup functions.
 
@@ -464,6 +464,10 @@ cpdef se_all_in_one_pileup ( np.ndarray plus_tags, np.ndarray minus_tags, long f
     i_s = 0                         # index of start_poss
     i_e = 0                         # index of end_poss
 
+    s_next = iter(start_poss).next
+    e_next = iter(end_poss).next
+
+
     pileup = 0
     if start_poss.shape[0] == 0: return tmp
     pre_p = min(start_poss[0],end_poss[0])
@@ -474,6 +478,9 @@ cpdef se_all_in_one_pileup ( np.ndarray plus_tags, np.ndarray minus_tags, long f
         tmpvadd( float_max(0,baseline_value) )
         
     pre_v = pileup
+
+    #a = s_next()
+    #b = e_next()
 
     a = start_poss[i_s]
     b = end_poss[i_e]
@@ -488,7 +495,8 @@ cpdef se_all_in_one_pileup ( np.ndarray plus_tags, np.ndarray minus_tags, long f
                     pre_p = p
                 pileup += 1
                 i_s += 1
-                a = start_poss[i_s]            
+                a = start_poss[i_s]
+                #a = s_next() 
             elif a > b:
                 p = b
                 if p != pre_p:
@@ -497,18 +505,22 @@ cpdef se_all_in_one_pileup ( np.ndarray plus_tags, np.ndarray minus_tags, long f
                     pre_p = p
                 pileup -= 1
                 i_e += 1
+                #b = e_next() 
                 b = end_poss[i_e]
             else:
                 i_s += 1
                 i_e += 1
+                #a = s_next() 
                 a = start_poss[i_s]
+                #b = e_next() 
                 b = end_poss[i_e]
     except IndexError:
         pass
 
     if i_e < l:
         # add rest of end positions
-        for i in range(i_e, l):
+        for i in range(i_e+1, l):
+            #p = e_next()
             p = end_poss[i]
             if p != pre_p:
                 tmppadd( p )

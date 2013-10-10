@@ -1,4 +1,4 @@
-# Time-stamp: <2013-09-16 00:01:18 Tao Liu>
+# Time-stamp: <2013-10-10 00:24:46 Tao Liu>
 
 """Module for Calculate Scores.
 
@@ -47,11 +47,14 @@ from MACS2.IO.cPeakIO import PeakIO, BroadPeakIO, parse_peakname
 from MACS2.IO.cFixWidthTrack import FWTrackIII
 from MACS2.IO.cPairedEndTrack import PETrackI
 
-#from MACS2.Poisson import P_Score_Upper_Tail
-#pscore_table=P_Score_Upper_Tail()
-#get_pscore = pscore_table.get_pscore
+from MACS2.Poisson import P_Score_Upper_Tail, LogLR_Asym # pure C code for calculating p-value scores/logLR of Poisson
+pscore_table = P_Score_Upper_Tail() # this table will cache pscore being calculated.
+get_pscore = pscore_table.get_pscore
 
-from MACS2.hashtable import Int64HashTable, Float64HashTable
+logLR_table = LogLR_Asym() # this table will cache pscore being calculated.
+get_logLR_asym = logLR_table.get_logLR_asym
+
+from MACS2.hashtable import Float64HashTable
 
 import logging
 
@@ -73,7 +76,6 @@ def do_nothing(*args, **kwargs):
     pass
 
 LOG10_E = 0.43429448190325176
-pscore_khashtable = Int64HashTable()
 
 cdef inline np.ndarray apply_multiple_cutoffs ( list multiple_score_arrays, list multiple_cutoffs ):
     cdef:
@@ -96,114 +98,6 @@ cdef inline list get_from_multiple_scores ( list multiple_score_arrays, int inde
         ret.append(multiple_score_arrays[i][index])
     return ret
 
-
-cdef inline double get_pscore ( int observed, double expectation ):
-    """Get p-value score from Poisson test. First check existing
-    table, if failed, call poisson_cdf function, then store the result
-    in table.
-    
-    """
-    cdef:
-        double score
-        long key_value
-    
-    key_value = hash( (observed, expectation ) )
-    try:
-        return pscore_khashtable.get_item(key_value)
-    except KeyError:
-        score = -1*poisson_cdf(observed,expectation,False,True)
-        pscore_khashtable.set_item(key_value, score)
-        return score
-
-cdef double get_interpolated_pscore ( double observed, double expectation ):
-    cdef:
-        double pscore
-        double observed_floor, observed_ceil, step
-        double floor_pscore, ceil_pscore
-    observed_floor = floor(observed)
-    observed_ceil = ceil(observed)
-    step = observed - observed_floor
-    floor_pscore = get_pscore( int(observed_floor), expectation)
-    ceil_pscore = get_pscore( int(observed_ceil), expectation)
-    pscore = (ceil_pscore - floor_pscore) * (observed - observed_floor) + \
-             floor_pscore
-    return pscore
-
-asym_logLR_khashtable = Int64HashTable()
-
-cdef inline double logLR_asym ( double x, double y ):
-    """Calculate log10 Likelihood between H1 ( enriched ) and H0 (
-    chromatin bias ). Set minus sign for depletion.
-    
-    *asymmetric version* 
-
-    """
-    cdef:
-        double s
-        long key_value
-    
-    key_value = hash( (x, y ) )
-    try:
-        return asym_logLR_khashtable.get_item( key_value )
-    except KeyError:
-        if x > y:
-            s = (x*(log(x)-log(y))+y-x)*LOG10_E
-        elif x < y:
-            s = (x*(-log(x)+log(y))-y+x)*LOG10_E
-        else:
-            s = 0
-        asym_logLR_khashtable.set_item(key_value, s)
-        return s
-
-diff_logLR_khashtable = Int64HashTable()
-
-cdef inline double logLR_4diff (double x, double y):
-    """Calculate log10 Likelihood between H1 ( enriched ) and H0 (
-    chromatin bias ).
-    
-    * Always positive, used for evaluating difference only.*
-    
-    """
-    cdef:
-        double s
-        long key_value
-    
-    key_value = hash( (x, y) )
-    try:
-        return diff_logLR_khashtable.get_item( key_value )
-    except KeyError:
-        if y > x: y, x = x, y
-        if x==y: s = 0
-        
-        else: s = (x*(log(x)-log(y))+y-x)*LOG10_E
-        diff_logLR_khashtable.set_item(key_value, s)
-        return s
-
-sym_logLR_khashtable = Int64HashTable()
-
-cdef inline double logLR_sym ( double x, double y ):
-    """Calculate log10 Likelihood between H1 ( enriched ) and H0 (
-    another enriched ). Set minus sign for H0>H1.
-    
-    * symmetric version *
-
-    """
-    cdef:
-        double s
-        long key_value
-    
-    key_value = hash( (x, y ) )
-    try:
-        return sym_logLR_khashtable.get_item( key_value )
-    except KeyError:
-        if x > y:
-            s = (x*(log(x)-log(y))+y-x)*LOG10_E
-        elif y > x:
-            s = (y*(log(x)-log(y))+y-x)*LOG10_E
-        else:
-            s = 0
-        sym_logLR_khashtable.set_item(key_value, s)
-        return s
 
 cdef inline double get_logFE ( float x, float y ):
     """ return 100* log10 fold enrichment with +1 pseudocount.
@@ -343,6 +237,7 @@ cdef class CallerFromAlignments:
         object pqtable                   # remember pvalue->qvalue convertion
         bool pvalue_all_done             # whether the pvalue of whole genome is all calculated. If yes, it's OK to calculate q-value.
 
+        double test_time
 
 
     def __init__ (self, treat, ctrl,
@@ -423,6 +318,8 @@ cdef class CallerFromAlignments:
         chr2 = set(self.ctrl.get_chr_names())
         self.chromosomes = list(chr1.intersection(chr2))
 
+        self.test_time = 0
+
     cpdef set_pseudocount( self, float pseudocount ):
         self.pseudocount = pseudocount
         
@@ -440,6 +337,7 @@ cdef class CallerFromAlignments:
         cdef:
             list treat_pv, ctrl_pv
             long i
+            double t
 
         assert chrom in self.chromosomes, "chromosome %s is not valid." % chrom
 
@@ -451,6 +349,9 @@ cdef class CallerFromAlignments:
             self.chr_pos_treat_ctrl[0].resize(0,refcheck=False)
             self.chr_pos_treat_ctrl[1].resize(0,refcheck=False)
             self.chr_pos_treat_ctrl[2].resize(0,refcheck=False)            
+
+        #t = ttime()
+
         if self.PE_mode:
             treat_pv = self.treat.pileup_a_chromosome ( chrom, [self.treat_scaling_factor,], baseline_value = 0.0 )
         else:
@@ -469,6 +370,9 @@ cdef class CallerFromAlignments:
             ctrl_pv = [treat_pv[0][-1:], pyarray(FBYTE4,[self.lambda_bg,])] # set a global lambda
 
         self.chr_pos_treat_ctrl = self.__chrom_pair_treat_ctrl( treat_pv, ctrl_pv)
+
+        #self.test_time += ttime() - t
+
         # clean treat_pv and ctrl_pv
         treat_pv = []
         ctrl_pv  = []  
@@ -672,9 +576,11 @@ cdef class CallerFromAlignments:
 
             self.bedGraph_treat = open( self.bedGraph_filename_prefix + "_treat_pileup.bdg", "w" )
             self.bedGraph_ctrl = open( self.bedGraph_filename_prefix + "_control_lambda.bdg", "w" )
+
             logging.info ("#3 In the peak calling step, the following will be performed simultaneously:")
             logging.info ("#3   Write bedGraph files for treatment pileup (after scaling if necessary)... %s" % self.bedGraph_filename_prefix + "_treat_pileup.bdg")
             logging.info ("#3   Write bedGraph files for control lambda (after scaling if necessary)... %s" % self.bedGraph_filename_prefix + "_control_lambda.bdg")
+
             if self.save_SPMR:
                 logging.info ( "#3   --SPMR is requested, so pileup will be normalized by sequencing depth in million reads." )
             elif self.treat_scaling_factor == 1:
@@ -696,6 +602,8 @@ cdef class CallerFromAlignments:
             self.bedGraph_treat.close()
             self.bedGraph_ctrl.close()
             self.save_bedGraph = False
+
+        #print "test time: %f" % self.test_time
 
         return peaks
 
@@ -721,6 +629,7 @@ cdef class CallerFromAlignments:
         assert len(scoring_function_s) == len(score_cutoff_s), "number of functions and cutoffs should be the same!"
         
         peak_content = []           # to store points above cutoff
+
 
         # first, build pileup, self.chr_pos_treat_ctrl
         self.__pileup_treat_ctrl_a_chromosome( chrom )
@@ -766,6 +675,10 @@ cdef class CallerFromAlignments:
             else:
                 # close
                 if call_summits:
+                    #for x in peak_content:
+                    #    if x[2] >= 10:
+                    #        print peak_content
+                    #        break
                     self.__close_peak_with_subpeaks (peak_content, peaks, min_length, chrom, max_gap/2 )
                 else:
                     self.__close_peak_wo_subpeaks   (peak_content, peaks, min_length, chrom, max_gap/2 )
@@ -779,6 +692,7 @@ cdef class CallerFromAlignments:
                 self.__close_peak_with_subpeaks (peak_content, peaks, min_length, chrom, max_gap/2, score_cutoff_s ) # smooth length is 1/2 max-gap
             else:
                 self.__close_peak_wo_subpeaks   (peak_content, peaks, min_length, chrom, max_gap/2, score_cutoff_s ) # smooth length is 1/2 max-gap
+
 
         return peaks
 
@@ -950,7 +864,7 @@ cdef class CallerFromAlignments:
         assert array1.shape[0] == array2.shape[0]
         s = np.zeros(array1.shape[0], dtype="float32")
         for i in range(array1.shape[0]):
-            s[i] = logLR_asym( array1[i] + self.pseudocount, array2[i] + self.pseudocount ) 
+            s[i] = get_logLR_asym( array1[i] + self.pseudocount, array2[i] + self.pseudocount ) 
         return s
 
     cdef np.ndarray __cal_logFE ( self, array1, array2 ):
