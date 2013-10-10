@@ -73,7 +73,6 @@ def run( o_options ):
         info("# Generate R script for model : %s" % (options.modelR))
         model2r_script(peakmodel,options.modelR,options.rfile)
         options.d = peakmodel.d
-        
 
     except NotEnoughPairsException:
         warn("# Can't find enough pairs of symmetric peaks to build model!")

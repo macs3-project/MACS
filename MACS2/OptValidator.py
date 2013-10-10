@@ -129,18 +129,18 @@ def opt_validate ( options ):
         sys.exit(1)
     
     # output filenames
-    options.peakxls = options.name+"_peaks.xls"
-    options.peakbed = options.name+"_peaks.bed"
-    options.peakNarrowPeak = options.name+"_peaks.narrowPeak"
-    options.peakBroadPeak = options.name+"_peaks.broadPeak"
-    options.peakGappedPeak = options.name+"_peaks.gappedPeak"
-    options.summitbed = options.name+"_summits.bed"
-    options.zwig_tr = options.name+"_treat"
-    options.zwig_ctl= options.name+"_control"
-    #options.negxls  = options.name+"_negative_peaks.xls"
-    #options.diagxls = options.name+"_diag.xls"
-    options.modelR  = options.name+"_model.r"
-    options.pqtable  = options.name+"_pq_table.txt"    
+    options.peakxls = os.path.join( options.tmpdir, options.name+"_peaks.xls" )
+    options.peakbed = os.path.join( options.tmpdir, options.name+"_peaks.bed" )
+    options.peakNarrowPeak = os.path.join( options.tmpdir, options.name+"_peaks.narrowPeak" )
+    options.peakBroadPeak = os.path.join( options.tmpdir, options.name+"_peaks.broadPeak" )
+    options.peakGappedPeak = os.path.join( options.tmpdir, options.name+"_peaks.gappedPeak" )
+    options.summitbed = os.path.join( options.tmpdir, options.name+"_summits.bed" )
+    options.zwig_tr = os.path.join( options.tmpdir, options.name+"_treat" )
+    options.zwig_ctl= os.path.join( options.tmpdir, options.name+"_control" )
+    #options.negxls  = os.path.join( options.tmpdir, options.name+"_negative_peaks.xls" )
+    #options.diagxls = os.path.join( options.tmpdir, options.name+"_diag.xls" )
+    options.modelR  = os.path.join( options.tmpdir, options.name+"_model.r" )
+    options.pqtable  = os.path.join( options.tmpdir, options.name+"_pq_table.txt" )
 
     # logging object
     logging.basicConfig(level=(4-options.verbose)*10,

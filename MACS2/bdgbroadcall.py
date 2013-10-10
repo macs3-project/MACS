@@ -56,6 +56,9 @@ def run( options ):
 
     info("Write peaks...")
     #nf = open ("%s_c%.1f_l%d_g%d_peaks.encodePeak" % (options.oprefix,options.cutoffpeak,options.minlen,options.lvl1maxgap),"w")
-    bf = open ("%s_c%.1f_C%.2f_l%d_g%d_G%d_broad.bed12" % (options.oprefix,options.cutoffpeak,options.cutofflink,options.minlen,options.lvl1maxgap,options.lvl2maxgap),"w")        
-    bpeaks[1].write_to_gappedPeak(bf, name_prefix=options.oprefix+"_broadRegion")    
+    if options.ofile:
+        bf = open( options.ofile )
+    else:
+        bf = open ( os.path.join( options.outdir, "%s_c%.1f_C%.2f_l%d_g%d_G%d_broad.bed12" % (options.oprefix,options.cutoffpeak,options.cutofflink,options.minlen,options.lvl1maxgap,options.lvl2maxgap)), "w" )
+    bpeaks[1].write_to_gappedPeak(bf, name_prefix=options.oprefix+"_broadRegion")
     info("Done")
