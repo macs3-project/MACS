@@ -9,7 +9,7 @@ cpdef maxima(np.ndarray[np.float32_t, ndim=1] signal,
     """return the local maxima in a signal after applying a 2nd order
     Savitsky-Golay (polynomial) filter using window_size specified  
     """
-    cdef np.ndarray[np.int32_t, ndim=1] m = np.where(np.diff(np.sign(savitzky_golay_order2(signal, window_size, deriv=1))) >= 1)[0].astype('int32')
+    cdef np.ndarray[np.int32_t, ndim=1] m = np.where(np.diff(np.sign(savitzky_golay_order2(signal, window_size, deriv=1))) <= -1)[0].astype('int32')
     return m
 
 cdef np.ndarray[np.int32_t, ndim=1] internal_minima(np.ndarray[np.float32_t, ndim=1] signal,
@@ -236,6 +236,6 @@ cpdef savitzky_golay_order2(np.ndarray[np.float32_t, ndim=1] signal,
     firstvals = signal[0] - np.abs(signal[1:half_window+1][::-1] - signal[0])
     lastvals = signal[-1] + np.abs(signal[-half_window-1:-1][::-1] - signal[-1])
     signal = np.concatenate((firstvals, signal, lastvals))
-    ret = np.convolve( m, signal.astype('float64'), mode='valid').astype('float32')
+    ret = np.convolve( m[::-1], signal.astype('float64'), mode='valid').astype('float32')
     return ret
 
