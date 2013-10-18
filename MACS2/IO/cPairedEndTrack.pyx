@@ -1,4 +1,4 @@
-# Time-stamp: <2013-09-11 17:44:57 Tao Liu>
+# Time-stamp: <2013-10-18 13:10:39 Tao Liu>
 
 """Module for filter duplicate tags from paired-end data
 
@@ -66,6 +66,7 @@ cdef class PETrackI:
         self.dup_total = 0           # total fragments
         self.annotation = anno   # need to be figured out
         self.rlengths = {}
+        self.buffer_size = buffer_size
         
     cpdef add_loc ( self, str chromosome, int start, int end):
         """Add a location to the list according to the sequence name.
