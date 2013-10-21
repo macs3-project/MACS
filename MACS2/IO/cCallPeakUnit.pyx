@@ -1,4 +1,4 @@
-# Time-stamp: <2013-10-21 14:18:33 Tao Liu>
+# Time-stamp: <2013-10-21 14:23:36 Tao Liu>
 
 """Module for Calculate Scores.
 
@@ -28,7 +28,7 @@ from operator import itemgetter
 
 from cpython cimport bool
 #from scipy.signal import fftconvolve
-from MACS2.cSignal import maxima, enforce_valleys, enforce_peakyness, new_maxima
+from MACS2.cSignal import maxima, enforce_valleys, enforce_peakyness
 #np_convolve = np.convolve
 
 # Experimental
