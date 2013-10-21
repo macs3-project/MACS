@@ -1,4 +1,4 @@
-# Time-stamp: <2013-10-10 00:24:46 Tao Liu>
+# Time-stamp: <2013-10-21 14:18:33 Tao Liu>
 
 """Module for Calculate Scores.
 
@@ -28,7 +28,7 @@ from operator import itemgetter
 
 from cpython cimport bool
 #from scipy.signal import fftconvolve
-from MACS2.cSignal import maxima, enforce_valleys, enforce_peakyness
+from MACS2.cSignal import maxima, enforce_valleys, enforce_peakyness, new_maxima
 #np_convolve = np.convolve
 
 # Experimental
@@ -679,9 +679,9 @@ cdef class CallerFromAlignments:
                     #    if x[2] >= 10:
                     #        print peak_content
                     #        break
-                    self.__close_peak_with_subpeaks (peak_content, peaks, min_length, chrom, max_gap/2 )
+                    self.__close_peak_with_subpeaks (peak_content, peaks, min_length, chrom, smoothlen = min_length, score_cutoff_s = score_cutoff_s ) # smooth length is min_length, i.e. fragment size 'd'
                 else:
-                    self.__close_peak_wo_subpeaks   (peak_content, peaks, min_length, chrom, max_gap/2 )
+                    self.__close_peak_wo_subpeaks   (peak_content, peaks, min_length, chrom, smoothlen = min_length, score_cutoff_s = score_cutoff_s ) # smooth length is min_length, i.e. fragment size 'd'
                 peak_content = [ (above_cutoff_startpos[i], above_cutoff_endpos[i], treat_array[above_cutoff_index_array[i]], ctrl_array[above_cutoff_index_array[i]], get_from_multiple_scores( score_array_s, above_cutoff_index_array[i]) ), ]
             
         # save the last peak
@@ -689,9 +689,9 @@ cdef class CallerFromAlignments:
             return peaks
         else:
             if call_summits:
-                self.__close_peak_with_subpeaks (peak_content, peaks, min_length, chrom, max_gap/2, score_cutoff_s ) # smooth length is 1/2 max-gap
+                self.__close_peak_with_subpeaks (peak_content, peaks, min_length, chrom, smoothlen = min_length, score_cutoff_s = score_cutoff_s ) # smooth length is min_length, i.e. fragment size 'd'
             else:
-                self.__close_peak_wo_subpeaks   (peak_content, peaks, min_length, chrom, max_gap/2, score_cutoff_s ) # smooth length is 1/2 max-gap
+                self.__close_peak_wo_subpeaks   (peak_content, peaks, min_length, chrom, smoothlen = min_length, score_cutoff_s = score_cutoff_s ) # smooth length is min_length, i.e. fragment size 'd'
 
 
         return peaks
@@ -798,6 +798,7 @@ cdef class CallerFromAlignments:
             peakindices[m:n] = i
 
         summit_offsets = maxima(peakdata, smoothlen) # offsets are the indices for summits in peakdata/peakindices array.
+        #print "maxima:",summit_offsets
         if summit_offsets.shape[0] == 0:
             # **failsafe** if no summits, fall back on old approach #
             return self.__close_peak_wo_subpeaks(peak_content, peaks, min_length, chrom)
@@ -808,6 +809,7 @@ cdef class CallerFromAlignments:
             summit_offsets = summit_offsets[m:n]
         
         summit_offsets = enforce_peakyness(peakdata, summit_offsets)
+        #print "enforced:",summit_offsets
         if summit_offsets.shape[0] == 0:
             # **failsafe** if no summits, fall back on old approach #
             return self.__close_peak_wo_subpeaks(peak_content, peaks, min_length, chrom)
