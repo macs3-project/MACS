@@ -1,4 +1,4 @@
-# Time-stamp: <2013-09-11 17:42:07 Tao Liu>
+# Time-stamp: <2013-10-22 23:52:13 Tao Liu>
 
 """Module for FWTrack classes.
 
@@ -78,6 +78,7 @@ cdef class FWTrackIII:
         public object annotation
         public object dups
         public int fw
+        public long length
     
     def __init__ (self, int32_t fw=0, char * anno="", long buffer_size = 100000 ):
         """fw is the fixed-width for all locations.
@@ -96,6 +97,7 @@ cdef class FWTrackIII:
         self.annotation = anno   # need to be figured out
         self.rlengths = {}       # lengths of reference sequences, e.g. each chromosome in a genome
         self.buffer_size = buffer_size
+        self.length = 0
         self.__destroyed = False
 
     cpdef destroy ( self ):
@@ -142,7 +144,6 @@ cdef class FWTrackIII:
             self.__expand__ ( self.__locations[chromosome][strand] )
             self.__locations[chromosome][strand][self.__pointer[chromosome][strand]] = fiveendpos
             self.__pointer[chromosome][strand] += 1
-        #print chromosome
 
     cpdef __expand__ ( self, np.ndarray arr ):
         arr.resize( arr.size + self.buffer_size, refcheck = False )
@@ -168,6 +169,7 @@ cdef class FWTrackIII:
             self.total += self.__locations[c][0].size + self.__locations[c][1].size
 
         self.__sorted = True
+        self.length = self.fw * self.total
         return
 
     cpdef bint set_rlengths ( self, dict rlengths ):
@@ -217,10 +219,10 @@ cdef class FWTrackIII:
         l.sort()
         return l
 
-    cpdef length ( self ):
-        """Total sequenced length = total number of tags * width of tag		
-        """
-        return self.total*self.fw
+    # cpdef length ( self ):
+    #     """Total sequenced length = total number of tags * width of tag		
+    #     """
+    #     return self.total*self.fw
 
     cpdef sort ( self ):
         """Naive sorting for locations.
@@ -257,6 +259,7 @@ cdef class FWTrackIII:
         self.__dup_pointer = copy(self.__pointer)
         self.dup_total = 0
         self.total = 0
+        self.length = 0
 
         chrnames = self.get_chr_names()
         
@@ -361,7 +364,7 @@ cdef class FWTrackIII:
             self.__dup_locations[k]=[dup_plus, dup_minus]
 
         self.__dup_separated = True
-        
+        self.length = self.fw * self.total
         return
 
     @cython.boundscheck(False) # do not check that np indices are valid
@@ -380,6 +383,7 @@ cdef class FWTrackIII:
 
         assert self.__dup_separated == True, "need to run separate_dups first."
         self.total = 0
+        self.length = 0
 
         chrnames = self.get_chr_names()
         
@@ -422,6 +426,7 @@ cdef class FWTrackIII:
 
         self.dup_total =  0
         self.__dup_separated = False
+        self.length = self.fw * self.total
         return
 
     @cython.boundscheck(False) # do not check that np indices are valid
@@ -447,6 +452,7 @@ cdef class FWTrackIII:
             self.sort()
 
         self.total = 0
+        self.length = 0
 
         chrnames = self.get_chr_names()
         
@@ -534,6 +540,8 @@ cdef class FWTrackIII:
                 # hope there would be no mem leak...                
             
             self.__locations[k]=[new_plus,new_minus]
+
+        self.length = self.fw * self.total
         return self
 
     cpdef sample_percent (self, float percent, int seed = -1 ):
@@ -546,6 +554,7 @@ cdef class FWTrackIII:
             str key
         
         self.total = 0
+        self.length = 0
 
         chrnames = self.get_chr_names()
         
@@ -571,6 +580,8 @@ cdef class FWTrackIII:
             self.__pointer[key][1] = self.__locations[key][1].shape[0]            
             
             self.total += self.__pointer[key][0] + self.__pointer[key][1]
+
+        self.length = self.fw * self.total
         return
 
     cpdef sample_num (self, uint64_t samplesize, int seed = -1):

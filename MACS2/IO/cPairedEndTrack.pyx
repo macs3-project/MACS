@@ -1,4 +1,4 @@
-# Time-stamp: <2013-10-18 13:10:39 Tao Liu>
+# Time-stamp: <2013-10-22 23:40:51 Tao Liu>
 
 """Module for filter duplicate tags from paired-end data
 
@@ -38,19 +38,22 @@ cdef class PETrackI:
     Locations are stored and organized by sequence names (chr names) in a
     dict. They can be sorted by calling self.sort() function.
     """
-    cdef public dict __locations
-    cdef public dict __pointer
-    cdef public bool __sorted
-    cdef public unsigned long total
-    cdef public dict __dup_locations
-    cdef public dict __dup_pointer
-    cdef public bool __dup_sorted
-    cdef public unsigned long dup_total
-    cdef public object annotation
-    cdef public dict rlengths
-    cdef public object dups
-    cdef public long buffer_size
-    cdef bool   __destroyed
+    cdef:
+        public dict __locations
+        public dict __pointer
+        public bool __sorted
+        public unsigned long total
+        public dict __dup_locations
+        public dict __dup_pointer
+        public bool __dup_sorted
+        public unsigned long dup_total
+        public object annotation
+        public dict rlengths
+        public object dups
+        public long buffer_size
+        public long length
+        public float average_template_length
+        bool   __destroyed
     
     def __init__ (self, char * anno="", long buffer_size = 100000 ):
         """fw is the fixed-width for all locations.
@@ -67,6 +70,8 @@ cdef class PETrackI:
         self.annotation = anno   # need to be figured out
         self.rlengths = {}
         self.buffer_size = buffer_size
+        self.length = 0
+        self.average_template_length = 0.0
         
     cpdef add_loc ( self, str chromosome, int start, int end):
         """Add a location to the list according to the sequence name.
@@ -86,6 +91,7 @@ cdef class PETrackI:
             self.__locations[chromosome][self.__pointer[chromosome],0] = start
             self.__locations[chromosome][self.__pointer[chromosome],1] = end
             self.__pointer[chromosome] += 1
+        self.length += end - start
 
     cpdef destroy ( self ):
         """Destroy this object and release mem.
@@ -156,7 +162,7 @@ cdef class PETrackI:
         cdef int32_t i
         cdef str c
         
-        self.total = 0 #??
+        self.total = 0
 
         chrnames = self.get_chr_names()
 
@@ -167,6 +173,7 @@ cdef class PETrackI:
             self.total += self.__locations[c].shape[0]
 
         self.__sorted = True
+        self.average_template_length = float( self.length ) / self.total
         return
 
     def get_locations_by_chr ( self, str chromosome ):
@@ -185,15 +192,17 @@ cdef class PETrackI:
         l.sort()
         return l
 
-    cpdef length ( self ):
-        """Total sequenced length = sum(end-start+1) over chroms   
-        """
-        cdef:
-            long l = 0
-            np.ndarray[np.int32_t, ndim=2] v
-        for v in self.__locations.values():
-            l += (v[:,1] - v[:,0] + 1).sum() 
-        return l
+    # cpdef length ( self ):
+    #     """Total sequenced length = sum(end-start) over chroms 
+
+    #     TL: efficient?
+    #     """
+    #     cdef:
+    #         long l = 0
+    #         np.ndarray[np.int32_t, ndim=2] v
+    #     for v in self.__locations.values():
+    #         l += (v[:,1] - v[:,0]).sum() 
+    #     return l
 
     cpdef sort ( self ):
         """Naive sorting for locations.
@@ -278,6 +287,8 @@ cdef class PETrackI:
         self.__dup_pointer = copy(self.__pointer)
         self.dup_total = 0
         self.total = 0
+        self.length = 0
+        self.average_template_length = 0.0
 
         for i_chrom in range(len(chrnames)): # for each chromosome
             k = chrnames [ i_chrom ]
@@ -298,6 +309,7 @@ cdef class PETrackI:
                 current_loc_end = locs[0,1]
                 new_locs[i_new, 0] = current_loc_start
                 new_locs[i_new, 1] = current_loc_end
+                self.length += current_loc_end - current_loc_start
                 for i_old in range(1, size):
                     loc_start = locs[i_old, 0]
                     loc_end = locs[i_old, 1]
@@ -316,6 +328,7 @@ cdef class PETrackI:
                     else:
                         new_locs[i_new, 0] = loc_start
                         new_locs[i_new, 1] = loc_end
+                        self.length += loc_end - loc_start                        
                         i_new += 1
                 new_locs.resize( (i_new, 2) , refcheck = False)
                 dup_locs.resize( (i_dup, 2) , refcheck = False)
@@ -338,6 +351,7 @@ cdef class PETrackI:
     
             self.__locations[k] = new_locs
             self.__dup_locations[k] = dup_locs
+        self.average_template_length = float( self.length ) / self.total
         return
     
     @cython.boundscheck(False) # do not check that np indices are valid
@@ -360,6 +374,9 @@ cdef class PETrackI:
         if not self.__sorted: self.sort()
         
         self.total = 0
+        self.length = 0
+        self.average_template_length = 0.0
+        
         chrnames = self.get_chr_names()
         
         for i_chrom in range(len(chrnames)): # for each chromosome
@@ -378,6 +395,7 @@ cdef class PETrackI:
                 current_loc_end = locs[0,1]
                 new_locs[i_new, 0] = current_loc_start
                 new_locs[i_new, 1] = current_loc_end
+                self.length += current_loc_end - current_loc_start
                 for i_old in range(1, size):
                     loc_start = locs[i_old, 0]
                     loc_end = locs[i_old, 1]
@@ -388,15 +406,14 @@ cdef class PETrackI:
                         if n <= maxnum:
                             new_locs[i_new, 0] = loc_start
                             new_locs[i_new, 1] = loc_end
+                            self.length += loc_end - loc_start                            
                             i_new += 1
-#                        else:
-#                            start, end = loc
-#                            debug("Duplicate fragments found at %s:%d-%d" % (k, start, end) )
                     else:
                         current_loc_start = loc_start
                         current_loc_end = loc_end
                         new_locs[i_new, 0] = loc_start
                         new_locs[i_new, 1] = loc_end
+                        self.length += loc_end - loc_start                        
                         i_new += 1
                         n = 1
                 new_locs.resize( (i_new, 2) )
@@ -412,6 +429,7 @@ cdef class PETrackI:
             # hope there would be no mem leak...
     
             self.__locations[k] = new_locs
+        self.average_template_length = float( self.length ) / self.total
         return
 
     def sample_percent (self, float percent):
@@ -419,11 +437,14 @@ cdef class PETrackI:
 
         Warning: the current object is changed!
         """
-        cdef uint32_t num, i_chrom      # num: number of reads allowed on a certain chromosome
-        cdef str key
+        cdef:
+            uint32_t num, i_chrom      # num: number of reads allowed on a certain chromosome
+            str key
         
         self.total = 0
-
+        self.length = 0
+        self.average_template_length = 0.0
+        
         chrnames = self.get_chr_names()
         
         for i_chrom in range( len(chrnames) ):
@@ -437,8 +458,9 @@ cdef class PETrackI:
             self.__locations[key].resize( (num, 2) )
             self.__locations[key].sort(0)
             self.__pointer[key] = self.__locations[key].shape[0]
-            
+            self.length += ( self.__locations[key][:,1] - self.__locations[key][:,0] ).sum()
             self.total += self.__pointer[key]
+        self.average_template_length = float( self.length )/ self.total
         return
 
     def sample_num (self, uint64_t samplesize):

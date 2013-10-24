@@ -1,4 +1,4 @@
-# Time-stamp: <2013-07-09 01:03:54 Tao Liu>
+# Time-stamp: <2013-10-23 03:08:31 Tao Liu>
 
 """Module Description
 
@@ -139,34 +139,40 @@ class PeakDetect:
         Finally, a poisson CDF is applied to calculate one-side pvalue
         for enrichment.
         """
-        cdef int i
-        cdef float lambda_bg, effective_depth_in_million
-        cdef float treat_scale, d
-        cdef list ctrl_scale_s, ctrl_d_s
-
-        if self.PE_MODE: d = 0  # in PE_mode, d is not used
-        else: d = self.d
+        cdef:
+            int i
+            float lambda_bg, effective_depth_in_million
+            float treat_scale, d
+            list ctrl_scale_s, ctrl_d_s
+            long treat_total, control_total
+            long treat_sum              # approx sum of treatment pileup values
+            long control_sum            # approx sum of control pileup values
+            
         treat_total   = self.treat.total
-        control_total = self.control.total
-        treat_length = self.treat.length()
-        control_length = self.control.length()
-        self.ratio_treat2control = float(treat_total)/control_total
+        
+        if self.PE_MODE:
+            d = self.treat.average_template_length
+            control_total = self.control.total * 2 # in PE mode, entire fragment is counted as 1 
+                                                   # in treatment whereas both ends of fragment are counted in control/input.
+            treat_sum = self.treat.length
+            control_sum = control_total * self.treat.average_template_length
+            self.ratio_treat2control = float(treat_sum)/control_sum
+        else:
+            d = self.d
+            control_total = self.control.total
+            treat_sum = self.treat.total * self.d
+            control_sum = self.control.total * self.d
+            self.ratio_treat2control = float(treat_sum)/control_sum            
 
         if self.opt.tocontrol:
             # if MACS decides to scale treatment to control data because treatment is bigger
             effective_depth_in_million = control_total / 1000000.0
-            if self.PE_MODE:
-                lambda_bg = control_length / self.gsize
-            else:
-                lambda_bg = float(self.d) * control_total / self.gsize
+            lambda_bg = float( control_sum )/ self.gsize
             treat_scale = 1/self.ratio_treat2control
         else:
             # if MACS decides to scale control to treatment because control sample is bigger
             effective_depth_in_million = treat_total / 1000000.0
-            if self.PE_MODE:
-                lambda_bg = treat_length / self.gsize
-            else:
-                lambda_bg = float(self.d) * treat_total / self.gsize
+            lambda_bg = float( treat_sum )/ self.gsize
             treat_scale = 1.0
 
         # prepare d_s for control data
@@ -177,7 +183,7 @@ class PeakDetect:
             assert self.sregion <= self.lregion , "llocal can't be smaller than slocal!"
 
         # Now prepare a list of extension sizes
-        ctrl_d_s = [ d ]   # note, d doesn't make sense in PE mode.
+        ctrl_d_s = [ self.d ]   # note, d doesn't make sense in PE mode.
         # And a list of scaling factors for control
         ctrl_scale_s = []
 
@@ -208,11 +214,12 @@ class PeakDetect:
             else:
                 tmp_v = float(self.d)/self.lregion
             ctrl_scale_s.append( tmp_v )                            
-
-        if self.PE_MODE:        # first d/scale are useless.
-            ctrl_d_s = ctrl_d_s[1:]
-            ctrl_scale_s = ctrl_scale_s[1:]
-
+            
+        #if self.PE_MODE:        # first d/scale are useless in PE mode
+        #    ctrl_d_s = ctrl_d_s[1:]
+        #    ctrl_scale_s = ctrl_scale_s[1:]
+        #    print ctrl_d_s
+        #    print ctrl_scale_s
         if self.nolambda:
             ctrl_d_s = []
             ctrl_scale_s = []
