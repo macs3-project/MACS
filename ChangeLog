@@ -1,3 +1,38 @@
+2013-10-28  Tao Liu  <vladimir.liu@gmail.com>
+	MACS version 2.0.10 20131028 (tag:alpha)
+
+	* callpeak --call-summits improvement
+
+	The smoothing window length has been fixed as fragment length
+	instead of short read length. The larger smoothing window will
+	grant better smoothing results and better sub-peak summits
+	detection.
+
+	* --outdir and --ofile options for almost all commands
+
+	Thank Björn Grüning for initially implementing these options!
+	Now, MACS2 will save results into a specified
+	directory by '--outdir' option, and/or save result into a
+	specified file by '--ofile' option. Note, in case '--ofile' is
+	available for a subcommand, '-o' now has been adjusted to be the
+	same as '--ofile' instead of '--o-prefix'.
+
+	Here is the list of changes. For more detail, use 'macs2 xxx -h'
+	for each subcommand:
+
+	** callpeak: --outdir
+	** diffpeak: Not implemented
+	** bdgpeakcall: --outdir and --ofile
+	** bdgbroadcall: --outdir and --ofile
+	** bdgcmp: --outdir and --ofile. While --ofile is used, the number
+	and the order of arguments for --ofile must be the same as for -m.
+	** bdgdiff: --outdir and --ofile
+	** filterdup: --outdir
+	** pileup: --outdir
+	** randsample: --outdir
+	** refinepeak: --outdir and --ofile
+
+
 2013-09-15  Tao Liu  <vladimir.liu@gmail.com>
 	MACS version 2.0.10 20130915 (tag:alpha)
 

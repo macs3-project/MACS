@@ -1,4 +1,4 @@
-# Time-stamp: <2013-10-28 01:31:34 Tao Liu>
+# Time-stamp: <2013-10-28 12:21:24 Tao Liu>
 
 """Module Description
 
@@ -792,11 +792,12 @@ def opt_validate_bdgcmp ( options ):
             logging.error( "Invalid method: %s" % method )
             sys.exit( 1 )
 
-    # --ofile not compatible with multiple method
+    # # of --ofile must == # of -m
 
-    if len( options.method ) > 1 and options.ofile:
-        logging.error("--ofile is not compatible with multiple arguments by -m! Please specify only one method.")
-        sys.exit(1)        
+    if options.ofile:
+        if len(options.method) != len(options.ofile):
+            logging.error("The number and the order of arguments for --ofile must be the same as for -m.")
+            sys.exit(1)     
 
     return options
 

@@ -1,4 +1,4 @@
-# Time-stamp: <2013-10-27 22:39:45 Tao Liu>
+# Time-stamp: <2013-10-28 12:17:33 Tao Liu>
 
 import sys
 import os
@@ -51,10 +51,16 @@ def run( options ):
         sbtrack.change_normalization_method( ord('M') ) # a hack to override SPMR
     sbtrack.set_pseudocount( options.pseudocount )
 
-    for method in set(options.method):
+    already_processed_method_list = []
+    for (i, method) in enumerate(options.method):
+        if method in already_processed_method_list:
+            continue
+        else:
+            already_processed_method_list.append( method )
+
         info("Calculate scores comparing treatment and control by '%s'..." % method)
         if options.ofile:
-            ofile = os.path.join( options.outdir, options.ofile )
+            ofile = os.path.join( options.outdir, options.ofile[ i ] )
         else:
             ofile = os.path.join( options.outdir, options.oprefix + "_" + method + ".bdg" )
         # build score track

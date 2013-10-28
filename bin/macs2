@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# Time-stamp: <2013-10-28 02:00:22 Tao Liu>
+# Time-stamp: <2013-10-28 13:11:14 Tao Liu>
 
 """Description: MACS v2 main executable.
 
@@ -150,10 +150,10 @@ def add_outdir_option ( parser ):
 
 def add_output_group ( parser, required = True ):
     output_group = parser.add_mutually_exclusive_group( required = required )
-    output_group.add_argument( "--ofile", dest = "ofile", type = str,
-                               help = "output path, it set --o-prefix will be ignored. Mutually exclusive with -o/--o-prefix." )
-    output_group.add_argument( "-o", "--o-prefix", dest = "oprefix", type = str,
-                               help = "output file prefix. Mutually exclusive with --ofile." )
+    output_group.add_argument( "-o", "--ofile", dest = "ofile", type = str,
+                               help = "Output file name. Mutually exclusive with --o-prefix." )
+    output_group.add_argument( "--o-prefix", dest = "oprefix", type = str,
+                               help = "Output file prefix. Mutually exclusive with -o/--ofile." )
 
 def add_callpeak_parser( subparsers ):
     """Add main function 'peak calling' argument parsers.
@@ -287,8 +287,6 @@ def add_diffpeak_parser( subparsers ):
     
     # group for output files
     group_output = argparser_diffpeak.add_argument_group( "Output arguments" )
-#    argparser_diffpeak.add_argument( "-o", "--o-prefix", dest = "oprefix", default = "diffpeak", type = str,
-#                                help = "output file prefix, DEFAULT: diffpeak" )
     add_outdir_option( group_output )
     group_output.add_argument( "-n", "--name", dest = "name", type = str,
                                help = "Experiment name, which will be used to generate output file names. DEFAULT: \"diffpeak\"", 
@@ -413,10 +411,10 @@ def add_bdgcmp_parser( subparsers ):
 
     add_outdir_option( argparser_bdgcmp )   
     output_group = argparser_bdgcmp.add_mutually_exclusive_group( required = True )
-    output_group.add_argument( "-o", "--o-prefix", dest = "oprefix", type = str,
-                               help = "The PREFIX of output bedGraph file to write scores. If it is given as A, and method is 'ppois', output file will be A_ppois.bdg. Mutually exclusive with --ofile." )
-    output_group.add_argument( "--ofile", dest = "ofile", type = str,
-                               help = "output filename. Mutually exclusive with -o/--o-prefix. Note: --ofile is not compatible with multiple methods through -m!" )
+    output_group.add_argument( "--o-prefix", dest = "oprefix", type = str,
+                               help = "The PREFIX of output bedGraph file to write scores. If it is given as A, and method is 'ppois', output file will be A_ppois.bdg. Mutually exclusive with -o/--ofile." )
+    output_group.add_argument( "-o", "--ofile", dest = "ofile", type = str, nargs = "+",
+                               help = "Output filename. Mutually exclusive with --o-prefix. The number and the order of arguments for --ofile must be the same as for -m." )
     return
     
 def add_randsample_parser( subparsers ):
@@ -469,10 +467,10 @@ def add_bdgdiff_parser( subparsers ):
 
     add_outdir_option( argparser_bdgdiff )    
     output_group = argparser_bdgdiff.add_mutually_exclusive_group( required = True )
-    output_group.add_argument( "-o", "--o-prefix", dest = "oprefix", type = str,
-                               help = "Output file prefix. Actual files will be named as PREFIX_cond1.bed, PREFIX_cond2.bed and PREFIX_common.bed. Mutually exclusive with --ofile." )
-    output_group.add_argument( "--ofile", dest = "ofile", type = str, nargs = 3,
-                               help = "Output filenames. Must give three arguments in order: 1. file for unique regions in condition 1; 2. file for unique regions in condition 2; 3. file for common regions in both conditions. Note: mutually exclusive with -o/--o-prefix." )
+    output_group.add_argument( "--o-prefix", dest = "oprefix", type = str,
+                               help = "Output file prefix. Actual files will be named as PREFIX_cond1.bed, PREFIX_cond2.bed and PREFIX_common.bed. Mutually exclusive with -o/--ofile." )
+    output_group.add_argument( "-o", "--ofile", dest = "ofile", type = str, nargs = 3,
+                               help = "Output filenames. Must give three arguments in order: 1. file for unique regions in condition 1; 2. file for unique regions in condition 2; 3. file for common regions in both conditions. Note: mutually exclusive with --o-prefix." )
 
     return
 
