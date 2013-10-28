@@ -1,4 +1,4 @@
-# Time-stamp: <2013-03-19 12:00:28 Tao Liu>
+# Time-stamp: <2013-10-28 00:12:46 Tao Liu>
 
 """Description: Fine-tuning script to call broad peaks from a single bedGraph track for scores.
 
@@ -19,6 +19,7 @@ the distribution).
 # ------------------------------------
 
 import sys
+import os
 import logging
 from MACS2.IO import cBedGraphIO
 # ------------------------------------
@@ -57,7 +58,8 @@ def run( options ):
     info("Write peaks...")
     #nf = open ("%s_c%.1f_l%d_g%d_peaks.encodePeak" % (options.oprefix,options.cutoffpeak,options.minlen,options.lvl1maxgap),"w")
     if options.ofile:
-        bf = open( options.ofile )
+        bf = open( os.path.join( options.outdir, options.ofile ), "w" )
+        options.oprefix = options.ofile
     else:
         bf = open ( os.path.join( options.outdir, "%s_c%.1f_C%.2f_l%d_g%d_G%d_broad.bed12" % (options.oprefix,options.cutoffpeak,options.cutofflink,options.minlen,options.lvl1maxgap,options.lvl2maxgap)), "w" )
     bpeaks[1].write_to_gappedPeak(bf, name_prefix=options.oprefix+"_broadRegion")

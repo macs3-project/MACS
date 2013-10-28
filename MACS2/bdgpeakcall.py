@@ -1,4 +1,4 @@
-# Time-stamp: <2013-03-19 12:00:07 Tao Liu>
+# Time-stamp: <2013-10-27 23:55:20 Tao Liu>
 
 """Description: Naive call peaks from a single bedGraph track for scores.
 
@@ -18,6 +18,7 @@ the distribution).
 # python modules
 # ------------------------------------
 import sys
+import os
 import logging
 from MACS2.IO import cBedGraphIO
 # ------------------------------------
@@ -54,7 +55,8 @@ def run( options ):
 
     info("Write peaks...")
     if options.ofile:
-        nf = open( options.ofile, 'w' )
+        options.oprefix = options.ofile
+        nf = open( os.path.join( options.outdir, options.ofile ), 'w' )
     else:
         nf = open ( os.path.join( options.outdir, "%s_c%.1f_l%d_g%d_peaks.narrowPeak" % (options.oprefix,options.cutoff,options.minlen,options.maxgap)), "w" )
     peaks.write_to_narrowPeak(nf, name=options.oprefix, name_prefix=options.oprefix+"_narrowPeak", score_column="score", trackline=options.trackline)

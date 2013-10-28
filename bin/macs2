@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# Time-stamp: <2013-10-10 00:46:44 Tao Liu>
+# Time-stamp: <2013-10-28 02:00:22 Tao Liu>
 
 """Description: MACS v2 main executable.
 
@@ -47,8 +47,6 @@ def main():
                 os.makedirs( args.outdir )
             except:
                 sys.exit( "Output directory (%s) could not be created. Terminating program." % args.outdir )
-
-
 
     subcommand  = args.subcommand_name
 
@@ -149,6 +147,13 @@ def prepare_argparser ():
 def add_outdir_option ( parser ):
     parser.add_argument("--outdir", dest = "outdir", type = str, default = '',
                         help = "If specified all output files will be written to that directory. Default: the current working directory")
+
+def add_output_group ( parser, required = True ):
+    output_group = parser.add_mutually_exclusive_group( required = required )
+    output_group.add_argument( "--ofile", dest = "ofile", type = str,
+                               help = "output path, it set --o-prefix will be ignored. Mutually exclusive with -o/--o-prefix." )
+    output_group.add_argument( "-o", "--o-prefix", dest = "oprefix", type = str,
+                               help = "output file prefix. Mutually exclusive with --ofile." )
 
 def add_callpeak_parser( subparsers ):
     """Add main function 'peak calling' argument parsers.
@@ -321,10 +326,7 @@ def add_filterdup_parser( subparsers ):
                                                  help = "Remove duplicate reads at the same position, then convert acceptable format to BED format." )
     argparser_filterdup.add_argument( "-i", dest = "ifile", type = str, required = True,
                                       help = "Sequencing alignment file. REQUIRED." )
-    add_outdir_option( argparser_filterdup )    
-    argparser_filterdup.add_argument( "-o", "--ofile", dest = "outputfile", type = str,
-                                      help = "Output BED file name. If not specified, will write to standard output. DEFAULT: stdout",
-                                      default = "stdout" )
+
     argparser_filterdup.add_argument( "-f", "--format", dest = "format", type = str,
                                       choices=("AUTO","BAM","SAM","BED","ELAND","ELANDMULTI","ELANDEXPORT","BOWTIE"),
                                       help = "Format of tag file, \"AUTO\", \"BED\" or \"ELAND\" or \"ELANDMULTI\" or \"ELANDEXPORT\" or \"SAM\" or \"BAM\" or \"BOWTIE\". The default AUTO option will let '%(prog)s' decide which format the file is. Please check the definition in README file if you choose ELAND/ELANDMULTI/ELANDEXPORT/SAM/BAM/BOWTIE. DEFAULT: \"AUTO\"",
@@ -339,6 +341,10 @@ def add_filterdup_parser( subparsers ):
                                       help = "It controls the '%(prog)s' behavior towards duplicate tags at the exact same location -- the same coordination and the same strand. The default 'auto' option makes '%(prog)s' calculate the maximum tags at the exact same location based on binomal distribution using given -p as pvalue cutoff; and the 'all' option keeps every tags (useful if you only want to convert formats). If an integer is given, at most this number of tags will be kept at the same location. Default: auto" )
     argparser_filterdup.add_argument( "--verbose", dest = "verbose", type = int, default = 2,
                                       help = "Set verbose level. 0: only show critical message, 1: show additional warning message, 2: show process information, 3: show debug messages. If you want to know where are the duplicate reads, use 3. DEFAULT:2" )
+    add_outdir_option( argparser_filterdup )    
+    argparser_filterdup.add_argument( "-o", "--ofile", dest = "outputfile", type = str,
+                                      help = "Output BED file name. If not specified, will write to standard output. DEFAULT: stdout",
+                                      default = "stdout" )
     return
 
 def add_bdgpeakcall_parser( subparsers ):
@@ -354,15 +360,14 @@ def add_bdgpeakcall_parser( subparsers ):
                                        help = "minimum length of peak, better to set it as d value. DEFAULT: 200", default = 200 )
     argparser_bdgpeakcall.add_argument( "-g", "--max-gap", dest = "maxgap", type = int,
                                        help = "maximum gap between significant points in a peak, better to set it as tag size. DEFAULT: 30", default = 30 )
-    argparser_bdgpeakcall.add_argument( "-o", "--o-prefix", dest = "oprefix", default = "peak", type = str,
-                                        help = "output file prefix, DEFAULT: peak" )
-    add_outdir_option( argparser_bdgpeakcall )
     argparser_bdgpeakcall.add_argument( "--call-summits", dest="call_summits", action="store_true", help=ap.SUPPRESS, default=False)
 #                         help="If set, MACS will use a more sophisticated approach to find all summits in each enriched peak region. DEFAULT: False",default=False)
     argparser_bdgpeakcall.add_argument("--no-trackline", dest="trackline", action="store_false", default=True,
                          help="Tells MACS not to include trackline with bedGraph files. The trackline is required by UCSC.")
-    argparser_bdgpeakcall.add_argument( "--ofile", dest = "ofile", default = "", type = str,
-                                        help = "output path, it set --o-prefix will be ignored" )
+
+    add_outdir_option( argparser_bdgpeakcall )
+    add_output_group( argparser_bdgpeakcall )
+
     return
 
 def add_bdgbroadcall_parser( subparsers ):
@@ -383,11 +388,9 @@ def add_bdgbroadcall_parser( subparsers ):
                                          help = "maximum gap between significant peaks, better to set it as tag size. DEFAULT: 30", default = 30 )
     argparser_bdgbroadcall.add_argument( "-G", "--lvl2-max-gap", dest = "lvl2maxgap", type = int,
                                          help = "maximum linking between significant peaks, better to set it as 4 times of d value. DEFAULT: 800", default = 800)
-    argparser_bdgbroadcall.add_argument( "-o", "--o-prefix", dest = "oprefix", default = "peak", type = str,
-                                         help = "output file prefix, DEFAULT: peak" )
+
     add_outdir_option( argparser_bdgbroadcall )    
-    argparser_bdgbroadcall.add_argument( "--ofile", dest = "ofile", default = "", type = str,
-                                        help = "output file path, if set --o-prefix is ignored and the output is written to the specified file" )
+    add_output_group( argparser_bdgbroadcall )    
     return
     
 def add_bdgcmp_parser( subparsers ):
@@ -402,15 +405,18 @@ def add_bdgcmp_parser( subparsers ):
     argparser_bdgcmp.add_argument( "-S", "--scaling-factor", dest = "sfactor", type = float, default = 1.0,
                                    help = "Scaling factor for treatment and control track. Keep it as 1.0 or default in most cases. Set it ONLY while you have SPMR output from MACS2 callpeak, and plan to calculate scores as MACS2 callpeak module. If you want to simulate 'callpeak' w/o '--to-large', calculate effective smaller sample size after filtering redudant reads in million (e.g., put 31.415926 if effective reads are 31,415,926) and input it for '-S'; for 'callpeak --to-large', calculate effective reads in larger sample. DEFAULT: 1.0")                                 
     argparser_bdgcmp.add_argument( "-p", "--pseudocount", dest = "pseudocount", type = float, default = 0.0,
-                                   help = "The pseudocount used for calculating logLR, logFE or FE. The count will be applied after normalization of sequencing depth. DEFAULT: 0.0, no pseudocount is applied.")     
-    argparser_bdgcmp.add_argument( "-o", "--o-prefix", dest = "oprefix", type = str,
-                                   help = "The PREFIX of output bedGraph file to write scores. If it is given as A, and method is 'ppois', output file will be A_ppois.bdg" )
-    #argparser_bdgcmp.add_argument( "--ofile", dest = "ofile", type = str,
-    #                               help = "output file path, if set --o-prefix is ignored and the output is written to the specified file" )
-    add_outdir_option( argparser_bdgcmp )    
+                                   help = "The pseudocount used for calculating logLR, logFE or FE. The count will be applied after normalization of sequencing depth. DEFAULT: 0.0, no pseudocount is applied.")
+
     argparser_bdgcmp.add_argument( "-m", "--method", dest = "method", type = str, nargs = "+",
                                    choices = ( "ppois", "qpois", "subtract", "logFE", "FE", "logLR", "slogLR" ),
                                    help = "Method to use while calculating a score in any bin by comparing treatment value and control value. Available choices are: ppois, qpois, subtract, logFE, logLR, and slogLR. They represent Poisson Pvalue (-log10(pvalue) form) using control as lambda and treatment as observation, q-value through a BH process for poisson pvalues, subtraction from treatment, linear scale fold enrichment, log10 fold enrichment(need to set pseudocount), log10 likelihood between ChIP-enriched model and open chromatin model(need to set pseudocount), and symmetric log10 likelihood between two ChIP-enrichment models. Default option is ppois.",default="ppois")
+
+    add_outdir_option( argparser_bdgcmp )   
+    output_group = argparser_bdgcmp.add_mutually_exclusive_group( required = True )
+    output_group.add_argument( "-o", "--o-prefix", dest = "oprefix", type = str,
+                               help = "The PREFIX of output bedGraph file to write scores. If it is given as A, and method is 'ppois', output file will be A_ppois.bdg. Mutually exclusive with --ofile." )
+    output_group.add_argument( "--ofile", dest = "ofile", type = str,
+                               help = "output filename. Mutually exclusive with -o/--o-prefix. Note: --ofile is not compatible with multiple methods through -m!" )
     return
     
 def add_randsample_parser( subparsers ):
@@ -456,18 +462,17 @@ def add_bdgdiff_parser( subparsers ):
                                     help = "Minimum length of differential region. Try bigger value to remove small regions. DEFAULT: 200", default = 200 )
     argparser_bdgdiff.add_argument( "-g", "--max-gap", dest = "maxgap", type = int,
                                     help = "Maximum gap to merge nearby differential regions. Consider a wider gap for broad marks. Maximum gap should be smaller than minimum length (-g). DEFAULT: 100", default = 100 )
-    argparser_bdgdiff.add_argument( "-o", "--o-prefix", dest = "oprefix", default = "diffpeak", type = str,
-                                    help = "output file prefix, DEFAULT: diffpeak" )
     argparser_bdgdiff.add_argument( "--d1", "--depth1", dest = "depth1", type = float, default = 1.0,
                                     help = "Sequencing depth (# of non-redundant reads in million) for condition 1. It will be used together with --d2. See description for --d2 below for how to assign them. Default: 1" )
     argparser_bdgdiff.add_argument( "--d2", "--depth2", dest = "depth2", type = float, default = 1.0,
                                     help = "Sequencing depth (# of non-redundant reads in million) for condition 2. It will be used together with --d1. DEPTH1 and DEPTH2 will be used to calculate scaling factor for each sample, to down-scale larger sample to the level of smaller one. For example, while comparing 10 million condition 1 and 20 million condition 2, use --d1 10 --d2 20, then pileup value in bedGraph for condition 2 will be divided by 2. Default: 1" )
-    argparser_bdgdiff.add_argument( "--ofile-cond1", dest = "ofile_cond1", type = str, default="",
-                                    help = "Output file of unique regions in condition 1." )
-    argparser_bdgdiff.add_argument( "--ofile-cond2", dest = "ofile_cond2", type = str, default="",
-                                    help = "Output file of unique regions in condition 2." )
-    argparser_bdgdiff.add_argument( "--ofile-both-conditions", dest = "ofile_both_conditions", type = str, default="",
-                                    help = "Output file of common regions in both conditions." )
+
+    add_outdir_option( argparser_bdgdiff )    
+    output_group = argparser_bdgdiff.add_mutually_exclusive_group( required = True )
+    output_group.add_argument( "-o", "--o-prefix", dest = "oprefix", type = str,
+                               help = "Output file prefix. Actual files will be named as PREFIX_cond1.bed, PREFIX_cond2.bed and PREFIX_common.bed. Mutually exclusive with --ofile." )
+    output_group.add_argument( "--ofile", dest = "ofile", type = str, nargs = 3,
+                               help = "Output filenames. Must give three arguments in order: 1. file for unique regions in condition 1; 2. file for unique regions in condition 2; 3. file for common regions in both conditions. Note: mutually exclusive with -o/--o-prefix." )
 
     return
 
@@ -486,13 +491,12 @@ def add_refinepeak_parser( subparsers ):
                                         help = "Cutoff  DEFAULT: 5", default = 5 )
     argparser_refinepeak.add_argument( "-w", "--window-size", dest= "windowsize", help = 'Scan window size on both side of the summit (default: 100bp)',
                                         type = int, default = 200)
-    argparser_refinepeak.add_argument( "-o", "--o-prefix", dest = "oprefix", default = "peak", type = str,
-                                        help = "Prefix for output file, DEFAULT: peak" )
-    add_outdir_option( argparser_refinepeak )    
     argparser_refinepeak.add_argument( "--verbose", dest = "verbose", type = int, default = 2,
                                        help = "Set verbose level. 0: only show critical message, 1: show additional warning message, 2: show process information, 3: show debug messages. If you want to know where are the duplicate reads, use 3. DEFAULT:2" )
-    argparser_refinepeak.add_argument( "--ofile", dest = "ofile", type = str, default="",
-                                        help = "output file path, if set --o-prefix is ignored and the output is written to the specified file" )
+
+    add_outdir_option( argparser_refinepeak )
+    add_output_group( argparser_refinepeak )
+    
     return
 
 def add_predictd_parser( subparsers ):
@@ -511,17 +515,17 @@ def add_predictd_parser( subparsers ):
                                      default = "AUTO" )
     argparser_predictd.add_argument( "-g", "--gsize", dest = "gsize", type = str, default = "hs",
                                      help = "Effective genome size. It can be 1.0e+9 or 1000000000, or shortcuts:'hs' for human (2.7e9), 'mm' for mouse (1.87e9), 'ce' for C. elegans (9e7) and 'dm' for fruitfly (1.2e8), Default:hs" )
-    # group for bimodal
     argparser_predictd.add_argument( "-s", "--tsize",  dest = "tsize", type = int, default = None,
                                      help = "Tag size. This will overide the auto detected tag size. DEFAULT: Not set")
     argparser_predictd.add_argument( "--bw", dest = "bw", type = int, default = 300,
                                      help = "Band width for picking regions to compute fragment size. This value is only used while building the shifting model. DEFAULT: 300")
     argparser_predictd.add_argument( "-m", "--mfold", dest = "mfold", type = int, default = [5,50], nargs = 2,
                                      help = "Select the regions within MFOLD range of high-confidence enrichment ratio against background to build model. Fold-enrichment in regions must be lower than upper limit, and higher than the lower limit. Use as \"-m 10 30\". DEFAULT:5 50" )
-    # group for output files
+
+    add_outdir_option( argparser_predictd )    
     argparser_predictd.add_argument( "--rfile", dest = "rfile", type = str, default = "predictd",
                                      help = "PREFIX of filename of R script for drawing X-correlation figure. DEFAULT:'predictd' and R file will be predicted_model.R" )
-    add_outdir_option( argparser_predictd )    
+
     argparser_predictd.add_argument( "--verbose", dest = "verbose", type = int, default = 2,
                                      help = "Set verbose level of runtime message. 0: only show critical message, 1: show additional warning message, 2: show process information, 3: show debug messages. DEFAULT:2" )
     

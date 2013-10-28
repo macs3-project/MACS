@@ -1,4 +1,4 @@
-# Time-stamp: <2013-07-31 15:23:17 Tao Liu>
+# Time-stamp: <2013-10-28 01:08:06 Tao Liu>
 
 """Description: Naive call differential peaks from 4 bedGraph tracks for scores.
 
@@ -19,6 +19,7 @@ the distribution).
 # ------------------------------------
 
 import sys
+import os
 import logging
 from MACS2.IO import cBedGraphIO
 from MACS2.IO import cScoreTrack
@@ -94,23 +95,30 @@ def run( options ):
     (cat1,cat2,cat3) = twoconditionscore.call_peaks(min_length=options.minlen, max_gap=options.maxgap, cutoff=options.cutoff)
 
     info("Write peaks...")
-    if options.ofile_cond1:
-        nf = open( options.ofile_cond1, 'w' )
-    else:
-        nf = open ( os.path.join( options.outdir, "%s_c%.1f_cond1.bed" % (options.oprefix,options.cutoff)), "w" )
-    cat1.write_to_bed(nf, name_prefix=options.oprefix+"_cond1_", name="condition 1", description="unique regions in condition 1", score_column="score")
 
-    if options.ofile_cond2:
-        nf = open( options.ofile_cond2, 'w' )
+    ofiles = []
+    name_prefix = []
+    if options.ofile:
+        ofiles = map( lambda x: os.path.join( options.outdir, x ), options.ofile )
+        name_prefix = options.ofile
     else:
-        nf = open ( os.path.join( options.outdir, "%s_c%.1f_cond2.bed" % (options.oprefix,options.cutoff)), "w" )
-    cat2.write_to_bed(nf, name_prefix=options.oprefix+"_cond2_", name="condition 2", description="unique regions in condition 2", score_column="score")
+        ofiles = [ os.path.join( options.outdir, "%s_c%.1f_cond1.bed" % (options.oprefix,options.cutoff)),
+                   os.path.join( options.outdir, "%s_c%.1f_cond2.bed" % (options.oprefix,options.cutoff)),
+                   os.path.join( options.outdir, "%s_c%.1f_common.bed" % (options.oprefix,options.cutoff))
+                   ]
+        name_prefix = [ options.oprefix+"_cond1_",
+                        options.oprefix+"_cond2_",
+                        options.oprefix+"_common_",
+                        ]
+    
+    nf = open( ofiles[ 0 ], 'w' )
+    cat1.write_to_bed(nf, name_prefix=name_prefix[ 0 ], name="condition 1", description="unique regions in condition 1", score_column="score")
 
-    if options.ofile_both_conditions:
-        nf = open( options.ofile_both_conditions, 'w' )
-    else:
-        nf = open ( os.path.join( options.outdir, "%s_c%.1f_common.bed" % (options.oprefix,options.cutoff)), "w" )
-    cat3.write_to_bed(nf, name_prefix=options.oprefix+"_common_",name="common", description="common regions in both conditions", score_column="score")
+    nf = open( ofiles[ 1 ], 'w' )
+    cat2.write_to_bed(nf, name_prefix=name_prefix[ 1 ], name="condition 2", description="unique regions in condition 2", score_column="score")
+
+    nf = open( ofiles[ 2 ], 'w' )
+    cat3.write_to_bed(nf, name_prefix=name_prefix[ 2 ], name="common", description="common regions in both conditions", score_column="score")
     info("Done")
 
 

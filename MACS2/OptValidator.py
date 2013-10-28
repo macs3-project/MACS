@@ -1,4 +1,4 @@
-# Time-stamp: <2013-10-10 00:53:20 Tao Liu>
+# Time-stamp: <2013-10-28 01:31:34 Tao Liu>
 
 """Module Description
 
@@ -129,18 +129,18 @@ def opt_validate ( options ):
         sys.exit(1)
     
     # output filenames
-    options.peakxls = os.path.join( options.name+"_peaks.xls" )
-    options.peakbed = os.path.join( options.name+"_peaks.bed" )
-    options.peakNarrowPeak = os.path.join( options.name+"_peaks.narrowPeak" )
-    options.peakBroadPeak = os.path.join( options.name+"_peaks.broadPeak" )
-    options.peakGappedPeak = os.path.join( options.name+"_peaks.gappedPeak" )
-    options.summitbed = os.path.join( options.name+"_summits.bed" )
-    options.zwig_tr = os.path.join( options.name+"_treat" )
-    options.zwig_ctl= os.path.join( options.name+"_control" )
+    options.peakxls = os.path.join( options.outdir, options.name+"_peaks.xls" )
+    options.peakbed = os.path.join( options.outdir, options.name+"_peaks.bed" )
+    options.peakNarrowPeak = os.path.join( options.outdir, options.name+"_peaks.narrowPeak" )
+    options.peakBroadPeak = os.path.join( options.outdir, options.name+"_peaks.broadPeak" )
+    options.peakGappedPeak = os.path.join( options.outdir, options.name+"_peaks.gappedPeak" )
+    options.summitbed = os.path.join( options.outdir, options.name+"_summits.bed" )
+    options.bdg_treat = os.path.join( options.outdir, options.name+"_treat_pileup.bdg" )
+    options.bdg_control= os.path.join( options.outdir, options.name+"_control_lambda.bdg" )
     #options.negxls  = os.path.join( options.name+"_negative_peaks.xls" )
     #options.diagxls = os.path.join( options.name+"_diag.xls" )
-    options.modelR  = os.path.join( options.name+"_model.r" )
-    options.pqtable  = os.path.join( options.name+"_pq_table.txt" )
+    options.modelR  = os.path.join( options.outdir, options.name+"_model.r" )
+    #options.pqtable  = os.path.join( options.outdir, options.name+"_pq_table.txt" )
 
     # logging object
     logging.basicConfig(level=(4-options.verbose)*10,
@@ -695,7 +695,7 @@ def opt_validate_predictd ( options ):
         logging.error("Upper limit of mfold should be greater than lower limit!" % options.mfold)
         sys.exit(1)
     
-    options.modelR  = options.rfile+"_model.R"
+    options.modelR  = os.path.join( options.outdir, options.rfile )
 
     # logging object
     logging.basicConfig(level=(4-options.verbose)*10,
@@ -764,6 +764,39 @@ def opt_validate_pileup ( options ):
     if options.extsize <= 0 :
         logging.error("--extsize must > 0!")
         sys.exit(1)
+
+    return options
+
+def opt_validate_bdgcmp ( options ):
+    """Validate options from a OptParser object.
+
+    Ret: Validated options object.
+    """
+    # logging object
+    logging.basicConfig(level=20,
+                        format='%(levelname)-5s @ %(asctime)s: %(message)s ',
+                        datefmt='%a, %d %b %Y %H:%M:%S',
+                        stream=sys.stderr,
+                        filemode="w"
+                        )
+    
+    options.error   = logging.critical        # function alias
+    options.warn    = logging.warning
+    options.debug   = logging.debug
+    options.info    = logging.info
+
+    # methods should be valid:
+
+    for method in set(options.method):
+        if method not in [ 'ppois', 'qpois', 'subtract', 'logFE', 'FE', 'logLR', 'slogLR' ]:
+            logging.error( "Invalid method: %s" % method )
+            sys.exit( 1 )
+
+    # --ofile not compatible with multiple method
+
+    if len( options.method ) > 1 and options.ofile:
+        logging.error("--ofile is not compatible with multiple arguments by -m! Please specify only one method.")
+        sys.exit(1)        
 
     return options
 

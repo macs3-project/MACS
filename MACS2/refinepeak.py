@@ -1,4 +1,4 @@
-# Time-stamp: <2013-02-24 18:29:25 Tao Liu>
+# Time-stamp: <2013-10-28 01:48:32 Tao Liu>
 
 """Description: Filter duplicate reads depending on sequencing depth.
 
@@ -50,6 +50,7 @@ def run( o_options ):
 
     if options.ofile:
         outputfile = open( os.path.join( options.outdir, options.ofile ), 'w' )
+        options.oprefix = options.ofile
     else:
         outputfile = open( os.path.join( options.outdir, "%s_refinepeak.bed" % options.oprefix), "w" )
 

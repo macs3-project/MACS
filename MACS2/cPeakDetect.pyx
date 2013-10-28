@@ -1,4 +1,4 @@
-# Time-stamp: <2013-10-23 03:08:31 Tao Liu>
+# Time-stamp: <2013-10-28 01:55:57 Tao Liu>
 
 """Module Description
 
@@ -95,8 +95,8 @@ class PeakDetect:
             self.info("#3 !!!! DYNAMIC LAMBDA IS DISABLED !!!!")
         #self.diag = opt.diag
         #self.save_score = opt.store_score
-        self.zwig_tr = opt.zwig_tr
-        self.zwig_ctl= opt.zwig_ctl
+        #self.zwig_tr = opt.zwig_tr
+        #self.zwig_ctl= opt.zwig_ctl
 
     def call_peaks (self):
         """Call peaks function.
@@ -233,6 +233,8 @@ class PeakDetect:
                                                 shiftcontrol = self.shiftcontrol,
                                                 save_bedGraph = self.opt.store_bdg,
                                                 bedGraph_filename_prefix = self.opt.name,
+                                                bedGraph_treat_filename = self.opt.bdg_treat,
+                                                bedGraph_control_filename = self.opt.bdg_control,
                                                 save_SPMR = self.opt.do_SPMR)
 
         if self.opt.trackline: scorecalculator.enable_trackline()
@@ -294,7 +296,7 @@ class PeakDetect:
 
         if self.PE_MODE: d = 0
         else: d = self.d
-        treat_length = self.treat.length()
+        treat_length = self.treat.length
         treat_total = self.treat.total
         
         effective_depth_in_million = treat_total / 1000000.0
@@ -331,6 +333,8 @@ class PeakDetect:
                                                 shiftcontrol = self.shiftcontrol,
                                                 save_bedGraph = self.opt.store_bdg,
                                                 bedGraph_filename_prefix = self.opt.name,
+                                                bedGraph_treat_filename = self.opt.bdg_treat,
+                                                bedGraph_control_filename = self.opt.bdg_control,
                                                 save_SPMR = self.opt.do_SPMR )
 
         # calculate pvalue scores

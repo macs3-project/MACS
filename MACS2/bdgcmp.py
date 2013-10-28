@@ -1,11 +1,12 @@
-# Time-stamp: <2013-07-10 14:28:07 Tao Liu>
+# Time-stamp: <2013-10-27 22:39:45 Tao Liu>
 
 import sys
+import os
 import logging
 
 from MACS2.IO import cBedGraphIO
-from MACS2.IO.cBedGraph import scoreTracktoBedGraph
-from MACS2.cProb import poisson_cdf
+from MACS2.OptValidator import opt_validate_bdgcmp as opt_validate
+
 from math import log as mlog
 
 # ------------------------------------
@@ -17,8 +18,6 @@ logging.basicConfig(level=20,
                     stream=sys.stderr,
                     filemode="w"
                     )
-
-LOG10_E = 0.43429448190325176
 
 # ------------------------------------
 # Misc functions
@@ -32,6 +31,7 @@ info    = logging.info
 # ------------------------------------
 
 def run( options ):
+    options = opt_validate( options )
     scaling_factor = options.sfactor
     pseudo_depth = 1.0/scaling_factor   # not an actual depth, but its reciprocal, a trick to override SPMR while necessary.
 
@@ -50,13 +50,13 @@ def run( options ):
         info("Values in your input bedGraph files will be multiplied by %f ..." % scaling_factor)
         sbtrack.change_normalization_method( ord('M') ) # a hack to override SPMR
     sbtrack.set_pseudocount( options.pseudocount )
-    
+
     for method in set(options.method):
         info("Calculate scores comparing treatment and control by '%s'..." % method)
         if options.ofile:
-            ofile = options.ofile
+            ofile = os.path.join( options.outdir, options.ofile )
         else:
-            ofile = options.oprefix + "_" + method + ".bdg"
+            ofile = os.path.join( options.outdir, options.oprefix + "_" + method + ".bdg" )
         # build score track
         if method == 'ppois':
             sbtrack.change_score_method( ord('p') )

@@ -1,4 +1,4 @@
-# Time-stamp: <2013-04-15 14:08:12 Tao Liu>
+# Time-stamp: <2013-10-28 01:40:58 Tao Liu>
 
 """Description: Random sample certain number/percentage of tags.
 
@@ -40,8 +40,7 @@ def run( options0 ):
     error = options.error
     #0 check output file
     if options.outputfile:
-        assert not os.path.exists(options.outputfile), "%s already exists, please check!" % options.outputfile
-        outfhd = open(options.outputfile,"w")
+        outfhd = open( os.path.join( options.outdir, options.outputfile ), "w" )
     else:
         outfhd = sys.stdout
     

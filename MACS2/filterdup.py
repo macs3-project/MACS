@@ -1,4 +1,4 @@
-# Time-stamp: <2012-10-03 12:18:11 Tao Liu>
+# Time-stamp: <2013-10-28 01:19:30 Tao Liu>
 
 """Description: Filter duplicate reads depending on sequencing depth.
 
@@ -44,8 +44,7 @@ def run( o_options ):
     error = options.error
 
     if options.outputfile != "stdout":
-        assert not os.path.exists(options.outputfile), "%s already exists, please check!" % options.outputfile
-        outfhd = open(options.outputfile,"w")
+        outfhd = open( os.path.join( options.outdir, options.outputfile ) ,"w" )
     else:
         outfhd = sys.stdout
     

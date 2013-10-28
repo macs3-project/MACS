@@ -1,4 +1,4 @@
-# Time-stamp: <2013-10-23 02:36:21 Tao Liu>
+# Time-stamp: <2013-10-27 18:27:35 Tao Liu>
 
 """Module for Calculate Scores.
 
@@ -231,6 +231,8 @@ cdef class CallerFromAlignments:
         # temporary data buffer
         str chrom                        # name of current chromosome
         list chr_pos_treat_ctrl          # temporary [position, treat_pileup, ctrl_pileup] for a given chromosome
+        str bedGraph_treat_filename
+        str bedGraph_control_filename
         object bedGraph_treat            # file handler to write ChIP pileup
         object bedGraph_ctrl             # file handler to write Control pileup
         # data needed to be pre-computed before peak calling
@@ -250,6 +252,8 @@ cdef class CallerFromAlignments:
                   bool shiftcontrol = False,
                   bool save_bedGraph = False,
                   str  bedGraph_filename_prefix = "",
+                  str bedGraph_treat_filename = "",
+                  str bedGraph_control_filename = "",
                   bool save_SPMR = False):
         """Initialize.
 
@@ -306,6 +310,8 @@ cdef class CallerFromAlignments:
         self.save_bedGraph = save_bedGraph
         self.save_SPMR = save_SPMR
         self.bedGraph_filename_prefix =  bedGraph_filename_prefix
+        self.bedGraph_treat_filename = bedGraph_treat_filename
+        self.bedGraph_control_filename = bedGraph_control_filename
 
         if not self.ctrl_d_s or not self.ctrl_scaling_factor_s:
             self.no_lambda_flag = True
@@ -575,8 +581,8 @@ cdef class CallerFromAlignments:
         # prepare bedGraph file
         if self.save_bedGraph:
 
-            self.bedGraph_treat = open( self.bedGraph_filename_prefix + "_treat_pileup.bdg", "w" )
-            self.bedGraph_ctrl = open( self.bedGraph_filename_prefix + "_control_lambda.bdg", "w" )
+            self.bedGraph_treat = open( self.bedGraph_treat_filename, "w" )
+            self.bedGraph_ctrl = open( self.bedGraph_control_filename, "w" )
 
             logging.info ("#3 In the peak calling step, the following will be performed simultaneously:")
             logging.info ("#3   Write bedGraph files for treatment pileup (after scaling if necessary)... %s" % self.bedGraph_filename_prefix + "_treat_pileup.bdg")
@@ -995,8 +1001,8 @@ cdef class CallerFromAlignments:
         # prepare bedGraph file
         if self.save_bedGraph:
 
-            self.bedGraph_treat = open( self.bedGraph_filename_prefix + "_treat_pileup.bdg", "w" )
-            self.bedGraph_ctrl = open( self.bedGraph_filename_prefix + "_control_lambda.bdg", "w" )
+            self.bedGraph_treat = open( self.bedGraph_treat_filename, "w" )
+            self.bedGraph_ctrl = open( self.bedGraph_control_filename, "w" )
             logging.info ("#3 In the peak calling step, the following will be performed simultaneously:")
             logging.info ("#3   Write bedGraph files for treatment pileup (after scaling if necessary)... %s" % self.bedGraph_filename_prefix + "_treat_pileup.bdg")
             logging.info ("#3   Write bedGraph files for control lambda (after scaling if necessary)... %s" % self.bedGraph_filename_prefix + "_control_lambda.bdg")

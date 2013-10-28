@@ -1,4 +1,4 @@
-# Time-stamp: <2012-10-02 18:17:24 Tao Liu>
+# Time-stamp: <2013-10-28 01:31:46 Tao Liu>
 
 """Description: Filter duplicate reads depending on sequencing depth.
 
@@ -71,7 +71,7 @@ def run( o_options ):
         info("# predicted fragment length is %d bps" % peakmodel.d)
         info("# alternative fragment length(s) may be %s bps" % ','.join(map(str,peakmodel.alternative_d)))
         info("# Generate R script for model : %s" % (options.modelR))
-        model2r_script(peakmodel,options.modelR,options.rfile)
+        model2r_script(peakmodel,options.modelR, options.rfile )
         options.d = peakmodel.d
 
     except NotEnoughPairsException:
