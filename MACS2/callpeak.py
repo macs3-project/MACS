@@ -1,4 +1,4 @@
-# Time-stamp: <2013-10-27 18:06:47 Tao Liu>
+# Time-stamp: <2013-12-13 11:55:48 Tao Liu>
 
 """Description: MACS 2 main executable
 
@@ -206,7 +206,7 @@ def run( args ):
         info("# local lambda is disabled!")
 
     # decide options.tocontrol according to options.tolarge
-    if options.PE_MODE:
+    if control and options.PE_MODE:
         c1 = c1 * 2
     
     if control:
