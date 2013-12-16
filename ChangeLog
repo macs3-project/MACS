@@ -1,6 +1,9 @@
 2013-12-16  Tao Liu  <vladimir.liu@gmail.com>
 	Version 1.4.3
 
+	* --outdir/-O option to specify a user-defined directory to write
+	all output files.
+
 	* File/folder name changes
 
 	Executable script has been renamed as 'macs' to be consistent with

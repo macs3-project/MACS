@@ -1,4 +1,4 @@
-# Time-stamp: <2013-12-16 15:01:52 Tao Liu>
+# Time-stamp: <2013-12-16 15:58:42 Tao Liu>
 
 """Module Description
 
@@ -180,15 +180,20 @@ def opt_validate ( optparser ):
             logging.error("Install PeakSplitter so that you can access it through typing 'PeakSplitter' under the command line.")
             sys.exit(1)
 
+    # outdir
+    if not os.path.exists( options.outdir ):
+        os.mkdir( options.outdir )
+
+
     # output filenames
-    options.peakxls = options.name+"_peaks.xls"
-    options.peakbed = options.name+"_peaks.bed"
-    options.summitbed = options.name+"_summits.bed"
+    options.peakxls = os.path.join( options.outdir, options.name+"_peaks.xls" )
+    options.peakbed = os.path.join( options.outdir, options.name+"_peaks.bed" )
+    options.summitbed = os.path.join( options.outdir, options.name+"_summits.bed" )
     options.zwig_tr = options.name+"_treat_afterfiting"
     options.zwig_ctl= options.name+"_control_afterfiting"
-    options.negxls  = options.name+"_negative_peaks.xls"
-    options.diagxls = options.name+"_diag.xls"
-    options.modelR  = options.name+"_model.r"
+    options.negxls  = os.path.join( options.outdir, options.name+"_negative_peaks.xls" )
+    options.diagxls = os.path.join( options.outdir, options.name+"_diag.xls" )
+    options.modelR  = os.path.join( options.outdir, options.name+"_model.r" )
 
     # logging object
     logging.basicConfig(level=(4-options.verbose)*10,
@@ -239,9 +244,9 @@ def opt_validate ( optparser ):
     if options.store_wig or options.store_bdg:
         if options.store_bdg:
             # bdg has higher priority
-            subdir = options.name+"_MACS_bedGraph"
+            subdir = os.path.join( options.outdir, options.name+"_MACS_bedGraph" )
         elif options.store_wig:
-            subdir = options.name+"_MACS_wiggle"
+            subdir = os.path.join( options.outdir, options.name+"_MACS_wiggle" )
         # check subdir
         if os.path.exists(subdir):
             options.error("./%s exists! Unable to create directory to store profiles!!" % (subdir))

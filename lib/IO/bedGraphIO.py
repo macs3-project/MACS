@@ -1,4 +1,4 @@
-# Time-stamp: <2011-03-02 17:28:30 Tao Liu>
+# Time-stamp: <2013-12-16 15:14:33 Tao Liu>
 
 """Module Description
 
@@ -21,8 +21,8 @@ import os
 import sys
 import re
 import shutil
-from MACS14.IO.FeatIO import bedGraphTrackI
-from MACS14.IO.BinKeeper import BinKeeperII
+from MACS1.IO.FeatIO import bedGraphTrackI
+from MACS1.IO.BinKeeper import BinKeeperII
 
 import time
 # ------------------------------------

@@ -1,4 +1,4 @@
-# Time-stamp: <2011-03-02 17:28:15 Tao Liu>
+# Time-stamp: <2013-12-16 15:14:27 Tao Liu>
 
 """Module for Feature IO classes.
 
@@ -26,7 +26,7 @@ from random import sample as random_sample
 from operator import itemgetter
 from math import sqrt
 
-from MACS14.Constants import *
+from MACS1.Constants import *
 
 # ------------------------------------
 # constants
