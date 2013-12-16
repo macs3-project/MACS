@@ -1,4 +1,4 @@
-# Time-stamp: <2013-10-27 18:27:35 Tao Liu>
+# Time-stamp: <2013-12-16 13:27:43 Tao Liu>
 
 """Module for Calculate Scores.
 
@@ -1236,8 +1236,10 @@ cdef class CallerFromAlignments:
 
         if not lvl1peakset:
             #try:
-            bpeaks.add(chrom, start, end, score=lvl2peak["score"], thickStart=".", thickEnd=".",
-                       blockNum = 0, blockSizes = ".", blockStarts = ".", pileup = lvl2peak["pileup"],
+            # will complement by adding 1bps start and end to this region
+            # may change in the future if gappedPeak format was improved.
+            bpeaks.add(chrom, start, end, score=lvl2peak["score"], thickStart=str(start), thickEnd=str(end),
+                       blockNum = 2, blockSizes = "1,1", blockStarts = "0,"+str(end-start-1), pileup = lvl2peak["pileup"],
                        pscore = lvl2peak["pscore"], fold_change = lvl2peak["fc"],
                        qscore = lvl2peak["qscore"] )
             #except:
@@ -1253,6 +1255,20 @@ cdef class CallerFromAlignments:
         blockNum   = int(len(lvl1peakset))
         blockSizes = ",".join(map(str,map(itemgetter("length"),lvl1peakset))) #join( map(lambda x:str(x["length"]),lvl1peakset) )
         blockStarts = ",".join(getitem_then_subtract(lvl1peakset, start))     #join( map(lambda x:str(x["start"]-start),lvl1peakset) )
+
+        # add 1bp left and/or right block if necessary
+        if int(thickStart) != start:
+            # add 1bp left block
+            thickStart = str(start)
+            blockNum += 1
+            blockSizes = "1,"+blockSizes
+            blockStarts = "0,"+blockStarts
+        if int(thickEnd) != end:
+            # add 1bp right block
+            thickEnd = str(end)
+            blockNum += 1
+            blockSizes = blockSizes+",1"
+            blockStarts = blockStarts+","+str(end-start-1)
         
         bpeaks.add(chrom, start, end, score=lvl2peak["score"], thickStart=thickStart, thickEnd=thickEnd,
                    blockNum = blockNum, blockSizes = blockSizes, blockStarts = blockStarts, pileup = lvl2peak["pileup"],

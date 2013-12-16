@@ -1,4 +1,4 @@
-# Time-stamp: <2013-07-12 16:18:18 Tao Liu>
+# Time-stamp: <2013-12-16 11:53:58 Tao Liu>
 
 """Module for PeakIO IO classes.
 
@@ -991,6 +991,7 @@ cdef class BroadPeakIO:
             for peak in self.peaks[chrom]:
                 n_peak += 1
                 if peak["thickStart"] == ".":
+                    # this will violate gappedPeak format, since it's a complement like broadPeak line.
                     fhd.write( "%s\t%d\t%d\t%s%d\t%d\t.\n"
                                %
                                (chrom,peak["start"],peak["end"],peakprefix,n_peak,int(10*peak["qscore"]) ) )

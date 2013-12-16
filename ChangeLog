@@ -1,3 +1,20 @@
+2013-12-16  Tao Liu  <vladimir.liu@gmail.com>
+	MACS version 2.0.10 20131216 (tag:alpha)
+
+	bug fixes and tweaks
+
+	* Process paired-end data with "-f BAMPE" without control
+
+	* GappedPeak output for --broad option has been fixed again to be
+	consistent with official UCSC format. We add 1bp pseudo-block to
+	left and/or right of broad region when necessary, so that you can
+	virtualize the regions without strong enrichment inside
+	successfully. In downstream analysis except for virtualization,
+	you may need to remove all 1bps blocks from gappedPeak file.
+
+	* diffpeak subcommand is temporarily disabled. Till we
+	re-implement it.
+
 2013-10-28  Tao Liu  <vladimir.liu@gmail.com>
 	MACS version 2.0.10 20131028 (tag:alpha)
 
