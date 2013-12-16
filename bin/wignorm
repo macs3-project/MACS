@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# Time-stamp: <2011-03-15 12:32:34 Tao Liu>
+# Time-stamp: <2013-12-16 15:04:02 Tao Liu>
 
 """Description: Call peaks from two wiggle file, one for treatment and one for control.
 
@@ -27,10 +27,10 @@ from array import array
 from math import log as mathlog
 from math import asinh
 from optparse import OptionParser
-from MACS14.IO import WiggleIO
-from MACS14 import Prob
-from MACS14.Prob import *
-from MACS14.IO.FeatIO import *
+from MACS1.IO import WiggleIO
+from MACS1 import Prob
+from MACS1.Prob import *
+from MACS1.IO.FeatIO import *
 
 # ------------------------------------
 # constants

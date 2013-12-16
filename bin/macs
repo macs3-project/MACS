@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# Time-stamp: <2012-04-25 22:34:40 Tao Liu>
+# Time-stamp: <2013-12-16 15:03:24 Tao Liu>
 
 """Description: MACS 1.4 main executable
 
@@ -32,12 +32,12 @@ import gzip
 # ------------------------------------
 # own python modules
 # ------------------------------------
-from MACS14.OptValidator import opt_validate
-from MACS14.OutputWriter import *
-from MACS14.Prob import binomial_cdf_inv
-from MACS14.PeakModel import PeakModel,NotEnoughPairsException
-from MACS14.PeakDetect import PeakDetect
-from MACS14.Constants import *
+from MACS1.OptValidator import opt_validate
+from MACS1.OutputWriter import *
+from MACS1.Prob import binomial_cdf_inv
+from MACS1.PeakModel import PeakModel,NotEnoughPairsException
+from MACS1.PeakDetect import PeakDetect
+from MACS1.Constants import *
 # ------------------------------------
 # Main function
 # ------------------------------------

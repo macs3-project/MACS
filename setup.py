@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# Time-stamp: <2011-12-07 17:24:20 Tao Liu>
+# Time-stamp: <2013-12-16 14:23:02 Tao Liu>
 
 """Description
 
@@ -40,12 +40,12 @@ def main():
           author='Yong Zhang; Tao (Foo) Liu',
           author_email='zy@jimmy.harvard.edu; taoliu@jimmy.harvard.edu',
           url='http://liulab.dfci.harvard.edu/MACS/',
-          package_dir={'MACS14' : 'lib'},
-          packages=['MACS14', 'MACS14.IO'],
-          scripts=['bin/macs14','bin/elandmulti2bed','bin/elandresult2bed','bin/elandexport2bed',
+          package_dir={'MACS1' : 'lib'},
+          packages=['MACS1', 'MACS1.IO'],
+          scripts=['bin/macs','bin/elandmulti2bed','bin/elandresult2bed','bin/elandexport2bed',
                    'bin/sam2bed','bin/wignorm'],
-          console=['bin/macs14'],
-          app    =['bin/macs14'],
+          console=['bin/macs'],
+          app    =['bin/macs'],
           classifiers=[
               'Development Status :: 5 - productive',
               'Environment :: Console',

@@ -1,4 +1,4 @@
-include README COPYING ChangeLog INSTALL MANIFEST NEW_IN_MACS14 setup.py bin/macs14 bin/wignorm bin/elandmulti2bed bin/elandresult2bed bin/elandexport2bed bin/sam2bed
+include README COPYING ChangeLog INSTALL MANIFEST NEW_IN_MACS14 setup.py bin/macs bin/wignorm bin/elandmulti2bed bin/elandresult2bed bin/elandexport2bed bin/sam2bed
 recursive-include lib *.py
 prune test
 prune web

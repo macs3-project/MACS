@@ -1,3 +1,18 @@
+2013-12-16  Tao Liu  <vladimir.liu@gmail.com>
+	Version 1.4.3
+
+	* File/folder name changes
+
+	Executable script has been renamed as 'macs' to be consistent with
+	'macs2' in MACS2.
+
+	macs14 -> macs
+
+	MACS library path has been renamed as 'MACS1' to be consistent
+	with 'MACS2' in MACS2.
+
+	MACS14 -> MACS1
+
 2011-12-07  Tao Liu  <taoliu@jimmy.harvard.edu>
 	Version 1.4.2
 

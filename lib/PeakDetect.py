@@ -1,4 +1,4 @@
-# Time-stamp: <2011-06-21 10:59:08 Tao Liu>
+# Time-stamp: <2013-12-16 15:02:45 Tao Liu>
 
 """Module Description
 
@@ -18,16 +18,16 @@ import os
 from math import log as mathlog
 from array import array
 
-from MACS14.OutputWriter import zwig_write,zbdg_write
-from MACS14.IO.FeatIO import PeakIO,WigTrackI
-from MACS14.Prob import poisson_cdf,poisson_cdf_inv
-from MACS14.Constants import *
+from MACS1.OutputWriter import zwig_write,zbdg_write
+from MACS1.IO.FeatIO import PeakIO,WigTrackI
+from MACS1.Prob import poisson_cdf,poisson_cdf_inv
+from MACS1.Constants import *
 
 class PeakDetect:
     """Class to do the peak calling.
 
     e.g:
-    >>> from MACS14.PeakDetect import PeakDetect
+    >>> from MACS1.PeakDetect import PeakDetect
     >>> pd = PeakDetect(treat=treatdata, control=controldata, pvalue=pvalue_cutoff, d=100, scan_window=200, gsize=3000000000)
     >>> pd.call_peaks()
     >>> print pd.toxls()
