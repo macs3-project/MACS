@@ -6,7 +6,7 @@ Copyright (c) 2008,2009 Yong Zhang, Tao Liu <taoliu@jimmy.harvard.edu>
 Copyright (c) 2010,2011 Tao Liu <taoliu@jimmy.harvard.edu>
 
 This code is free software; you can redistribute it and/or modify it
-under the terms of the Artistic License (see the file COPYING included
+under the terms of the BSD License (see the file COPYING included
 with the distribution).
 
 @status:  experimental

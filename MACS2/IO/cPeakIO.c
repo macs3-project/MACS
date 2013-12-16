@@ -1177,7 +1177,7 @@ static char __pyx_k_68[] = "%s\t%d\t%d\t%s%d\t%d\t.\n";
 static char __pyx_k_69[] = "%s\t%d\t%d\t%s%d\t%d\t.\t%s\t%s\t0\t%d\t%s\t%s\n";
 static char __pyx_k_71[] = "track type=broadPeak name=\"%s\" description=\"%s\" nextItemButton=on\n";
 static char __pyx_k_73[] = "%s\t%d\t%d\t%s\t%d\t.\t%.5f\t%.5f\t%.5f\n";
-static char __pyx_k_78[] = "Module for PeakIO IO classes.\n\nCopyright (c) 2010,2011 Tao Liu <taoliu@jimmy.harvard.edu>\n\nThis code is free software; you can redistribute it and/or modify it\nunder the terms of the Artistic License (see the file COPYING included\nwith the distribution).\n\n@status:  experimental\n@version: $Revision$\n@author:  Tao Liu\n@contact: taoliu@jimmy.harvard.edu\n";
+static char __pyx_k_78[] = "Module for PeakIO IO classes.\n\nCopyright (c) 2010,2011 Tao Liu <taoliu@jimmy.harvard.edu>\n\nThis code is free software; you can redistribute it and/or modify it\nunder the terms of the BSD License (see the file COPYING included\nwith the distribution).\n\n@status:  experimental\n@version: $Revision$\n@author:  Tao Liu\n@contact: taoliu@jimmy.harvard.edu\n";
 static char __pyx_k_79[] = "MACS2.Constants";
 static char __pyx_k_80[] = "*";
 static char __pyx_k_81[] = "PeakIO $Revision$";

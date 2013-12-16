@@ -3,6 +3,10 @@
 
 	bug fixes and tweaks
 
+	* We changed license from Artistic License to 3-clauses BSD license.
+
+	Yes. Simpler the better.
+
 	* Process paired-end data with "-f BAMPE" without control
 
 	* GappedPeak output for --broad option has been fixed again to be

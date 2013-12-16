@@ -5,7 +5,7 @@
 Copyright (c) 2010,2011,2012,2013 Tao Liu <vladimir.liu@gmail.com>
 
 This code is free software; you can redistribute it and/or modify it
-under the terms of the Artistic License (see the file COPYING included
+under the terms of the BSD License (see the file COPYING included
 with the distribution).
 
 @status:  experimental

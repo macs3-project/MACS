@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# Time-stamp: <2013-12-16 13:36:23 Tao Liu>
+# Time-stamp: <2013-12-16 16:58:13 Tao Liu>
 
 """Description: 
 
@@ -10,8 +10,8 @@ Use this when you need Cython regenerate .c files.
 Copyright (c) 2008,2009,2010,2011 Tao Liu <taoliu@jimmy.harvard.edu>
 
 This code is free software; you can redistribute it and/or modify it
-under the terms of the Artistic License (see the file COPYING included
-with the distribution).
+under the terms of the BSD License (see the file COPYING included with
+the distribution).
 
 @status:  beta
 @version: $Revision$
@@ -99,7 +99,7 @@ def main():
               'Environment :: Console',
               'Intended Audience :: Developers',
               'Intended Audience :: Science/Research',              
-              'License :: OSI Approved :: Artistic License',
+              'License :: OSI Approved :: BSD License',
               'Operating System :: MacOS :: MacOS X',
               'Operating System :: POSIX',
               'Topic :: Scientific/Engineering :: Bio-Informatics',
