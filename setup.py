@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# Time-stamp: <2013-12-16 15:15:27 Tao Liu>
+# Time-stamp: <2013-12-16 16:12:03 Tao Liu>
 
 """Description
 
@@ -47,7 +47,7 @@ def main():
           console=['bin/macs'],
           app    =['bin/macs'],
           classifiers=[
-              'Development Status :: 5 - productive',
+              'Development Status :: 5 - Production/Stable',
               'Environment :: Console',
               'Intended Audience :: Developers',
               'License :: OSI Approved :: Artistic License',

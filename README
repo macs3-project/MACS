@@ -1,5 +1,5 @@
-README for MACS (1.4.2)
-Time-stamp: <2012-03-19 02:49:22 Tao Liu>
+README for MACS (1.4.3)
+Time-stamp: <2013-12-16 17:08:36 Tao Liu>
 
 * Introduction
 
@@ -21,12 +21,12 @@ Please check the file 'INSTALL' in the distribution.
 
 * Usage
 
-Usage: macs14 <-t tfile> [-n name] [-g genomesize] [options]
+Usage: macs <-t tfile> [-n name] [-g genomesize] [options]
 
-Example: macs14 -t ChIP.bam -c Control.bam -f BAM -g h -n test -w --call-subpeaks
+Example: macs -t ChIP.bam -c Control.bam -f BAM -g h -n test -w --call-subpeaks
 
 
-macs14 -- Model-based Analysis for ChIP-Sequencing
+macs -- Model-based Analysis for ChIP-Sequencing
 
 Options:
   --version             show program's version number and exit
@@ -42,6 +42,8 @@ Options:
                         s_2_1_eland_multi.txt,s_2_2_eland_multi.txt
   -n NAME, --name=NAME  Experiment name, which will be used to generate output
                         file names. DEFAULT: "NA"
+  -O OUTDIR, --outdir=OUTDIR
+                        Optional output directory name. DEFAULT: current
   -f FORMAT, --format=FORMAT
                         Format of tag file, "AUTO", "BED" or "ELAND" or
                         "ELANDMULTI" or "ELANDMULTIPET" or "ELANDEXPORT" or
@@ -221,7 +223,7 @@ then the --treat (and --control if needed) parameter must be two file
 names separated by comma. Each file must be in ELAND multiple-match
 format described above. e.g.
 
-macs14 --format ELANDMULTIPET -t s_1_1_eland_multi.txt,s_2_1_eland_multi.txt ...
+macs --format ELANDMULTIPET -t s_1_1_eland_multi.txt,s_2_1_eland_multi.txt ...
 
 If you use ELANDMULTIPET, you may need to modify --petdist parameter.
 
@@ -294,6 +296,11 @@ $ cat replicate1.bed replicate2.bed replicate3.bed > all_replicates.bed
 datasets, because people may mislabel the 11th and 12th column. MACS
 uses 11th column as the sequence name which should be the chromosome
 names.
+
+**  -O OUTDIR, --outdir=OUTDIR
+
+Optional output directory name. DEFAULT: current directory. By setting
+this, all output will be saved in given directory.
 
 ** --petdist=PETDIST     
 
