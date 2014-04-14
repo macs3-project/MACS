@@ -331,7 +331,7 @@ default 'auto' option makes MACS calculate the maximum tags at the
 exact same location based on binomal distribution using 1e-5 as
 pvalue cutoff; and the 'all' option keeps every tags.  If an integer
 is given, at most this number of tags will be kept at the same
-location. Default: auto
+location. The default is to keep one tag at the same location. Default: 1
 
 --broad
 ```````
