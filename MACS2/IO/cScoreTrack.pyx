@@ -1,4 +1,4 @@
-# Time-stamp: <2013-09-16 15:07:33 Tao Liu>
+# Time-stamp: <2014-03-10 17:55:48 Tao Liu>
 
 """Module for Feature IO classes.
 
@@ -23,6 +23,8 @@ cimport numpy as np
 from copy import copy
 
 from cpython cimport bool
+
+#from scipy.stats import chi2    # for 
 
 from MACS2.cSignal import maxima, enforce_valleys, enforce_peakyness
 
@@ -848,6 +850,7 @@ cdef class scoreTrackII:
                 v1 = p() 
                 v2 = c()
                 v[ i ] =  logLR_asym( v1 + pseudocount, v2 + pseudocount )  #logLR( d[ i, 1]/100.0, d[ i, 2]/100.0 )
+                print v1, v2, v[i]
         self.scoring_method = 'l'
         return 
 
@@ -1362,6 +1365,8 @@ cdef class scoreTrackII:
         return bpeaks
 
 cdef class TwoConditionScores:
+    """Class for saving two condition comparison scores.
+    """
     cdef:
         dict data                       # dictionary for data of each chromosome
         dict datalength                 # length of data array of each chromosome
@@ -1372,7 +1377,22 @@ cdef class TwoConditionScores:
         object t1bdg, c1bdg, t2bdg, c2bdg
         dict pvalue_stat1, pvalue_stat2, pvalue_stat3
     
-    def __init__ (self, t1bdg, c1bdg, t2bdg, c2bdg, float cond1_factor = 1.0, float cond2_factor = 1.0, float pseudocount = 0.01 ):
+    def __init__ (self, t1bdg, c1bdg, t2bdg, c2bdg, float cond1_factor = 1.0, float cond2_factor = 1.0, float pseudocount = 0.01, proportion_background_empirical_distribution = 0.99999 ):
+        """
+        t1bdg: a bedGraphTrackI object for treat 1
+        c1bdg: a bedGraphTrackI object for control 1
+        t2bdg: a bedGraphTrackI object for treat 2
+        c2bdg: a bedGraphTrackI object for control 2
+
+        cond1_factor: this will be multiplied to values in t1bdg and c1bdg
+        cond2_factor: this will be multiplied to values in t2bdg and c2bdg
+
+        pseudocount: pseudocount, by default 0.01.
+
+        proportion_background_empirical_distribution: proportion of genome as the background to build empirical distribution
+
+        """
+
         self.data = {}           # for each chromosome, there is a l*4
                                  # matrix. First column: end position
                                  # of a region; Second: treatment
@@ -1391,11 +1411,16 @@ cdef class TwoConditionScores:
         self.c1bdg = c1bdg
         self.t2bdg = t2bdg
         self.c2bdg = c2bdg
-
+        
+        self.empirical_distr_llr = [] # save all values in histogram
+        
     cpdef set_pseudocount( self, float pseudocount ):
         self.pseudocount = pseudocount
         
     cpdef build ( self ):
+        """Compute scores from 3 types of comparisons and store them in self.data.
+
+        """
         cdef:
             set common_chrs
             str chrname
@@ -1415,12 +1440,59 @@ cdef class TwoConditionScores:
                                    cond1_treat_vs, cond1_control_vs,
                                    cond2_treat_vs, cond2_control_vs )
 
+        ## now we will build an empirical distribution of all abs ( log likelihood ratios )
+        #self.build_empirical_distribution()
+
+    # cdef build_empirical_distribution ( self ):
+    #     cdef:
+    #         int p
+    #         int prev_p
+    #         float v
+
+    #     for chrom in self.get_common_chrs():
+    #         pre_p = 0
+
+    #         self.data[ chrom ]
+    #         [pos_array, treat_array, ctrl_array] = self.chr_pos_treat_ctrl
+
+    #         pn = iter(pos_array).next
+    #         tn = iter(treat_array).next
+    #         cn = iter(ctrl_array).next
+
+    #         #t0 = ttime()
+
+    #         for i in range(pos_array.shape[0]):
+    #             this_p = pn()
+    #             this_t = tn()
+    #             this_c = cn()
+    #             this_v = get_pscore( int(this_t), this_c )
+
+    #             this_l = this_p - pre_p
+    #             if pvalue_stat.has_key( this_v ):
+    #                 pvalue_stat[ this_v ] += this_l
+    #             else:
+    #                 pvalue_stat[ this_v ] = this_l
+    #             pre_p = this_p #pos_array[ i ]
+
+    #         #npcal += pos_array.shape[0]
+    #         nhcal += pos_array.shape[0]            
+    #         #t1 = ttime()
+    #         #t += t1 - t0
+    #         #t0 = t1
+
     cdef build_chromosome( self, chrname,
                            cond1_treat_ps, cond1_control_ps,
                            cond2_treat_ps, cond2_control_ps,
                            cond1_treat_vs, cond1_control_vs,
                            cond2_treat_vs, cond2_control_vs ):
-                                           
+        """Internal function to calculate scores for three types of comparisons.
+
+        cond1_treat_ps, cond1_control_ps: position of treat and control of condition 1
+        cond2_treat_ps, cond2_control_ps: position of treat and control of condition 2
+        cond1_treat_vs, cond1_control_vs: value of treat and control of condition 1
+        cond2_treat_vs, cond2_control_vs: value of treat and control of condition 2
+
+        """
 
         c1tpn = iter(cond1_treat_ps).next
         c1cpn = iter(cond1_control_ps).next
@@ -1684,11 +1756,11 @@ cdef class TwoConditionScores:
             cat3_endpos = pos[cat3] # end positions of regions where score is above cutoff
             cat3_startpos = pos[cat3-1] # start positions of regions where score is above cutoff
 
-            # for cat1
+            # for cat1: condition 1 stronger regions
             self.__add_a_peak ( cat1_peaks, chrom, cat1, cat1_startpos, cat1_endpos, t1_vs_t2, max_gap, min_length )
-            # for cat2
+            # for cat2: condition 2 stronger regions
             self.__add_a_peak ( cat2_peaks, chrom, cat2, cat2_startpos, cat2_endpos, -1 * t1_vs_t2, max_gap, min_length )
-            # for cat3
+            # for cat3: commonly strong regions
             self.__add_a_peak ( cat3_peaks, chrom, cat3, cat3_startpos, cat3_endpos, abs(t1_vs_t2), max_gap, min_length )
 
         return cat1_peaks, cat2_peaks, cat3_peaks

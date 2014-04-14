@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# Time-stamp: <2013-12-16 16:58:10 Tao Liu>
+# Time-stamp: <2014-04-14 12:51:53 Tao Liu>
 
 """Description
 
@@ -50,14 +50,14 @@ def main():
                    Extension("MACS2.IO.cPairedEndTrack", ["MACS2/IO/cPairedEndTrack.c"], include_dirs=numpy_include_dir),
                    Extension("MACS2.IO.cBedGraph", ["MACS2/IO/cBedGraph.c"], libraries=["m"]),
                    Extension("MACS2.IO.cScoreTrack", ["MACS2/IO/cScoreTrack.c"], include_dirs=numpy_include_dir ),
-                   Extension("MACS2.IO.cDiffScore", ["MACS2/IO/cDiffScore.c"], include_dirs=numpy_include_dir ),                   
+                   #Extension("MACS2.IO.cDiffScore", ["MACS2/IO/cDiffScore.c"], include_dirs=numpy_include_dir ),                   
                    Extension("MACS2.IO.cCallPeakUnit", ["MACS2/IO/cCallPeakUnit.c"], include_dirs=numpy_include_dir),
                    Extension("MACS2.hashtable", ["MACS2/hashtable.c"], include_dirs=["MACS2/",numpy_get_include()]),
                    Extension("MACS2.Poisson", ["MACS2/Poisson.c", "MACS2/cPoisson.c"], libraries=["m"], include_dirs=["MACS2/",numpy_get_include()]),
                    ]
     
     setup(name="MACS2",
-          version="2.0.10.20131216",
+          version="2.0.10.2014XXXX",
           description="Model Based Analysis for ChIP-Seq data",
           author='Tao Liu',
           author_email='vladimir.liu@gmail.com',
@@ -80,7 +80,7 @@ def main():
               ],
           install_requires=[
               'numpy>=1.6',
-              'scipy',
+              #'scipy',
               ],
           cmdclass = command_classes,
           ext_modules = ext_modules

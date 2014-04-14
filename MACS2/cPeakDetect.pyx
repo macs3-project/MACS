@@ -164,6 +164,9 @@ class PeakDetect:
             control_sum = self.control.total * self.d
             self.ratio_treat2control = float(treat_sum)/control_sum            
 
+        if self.opt.ratio != 1.0:
+            self.ratio_treat2control = self.opt.ratio
+
         if self.opt.tocontrol:
             # if MACS decides to scale treatment to control data because treatment is bigger
             effective_depth_in_million = control_total / 1000000.0

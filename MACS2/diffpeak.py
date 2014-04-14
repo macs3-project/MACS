@@ -1,4 +1,4 @@
-# Time-stamp: <2013-09-11 22:44:34 Tao Liu>
+# Time-stamp: <2014-02-24 11:35:25 Tao Liu>
 
 """Description: MACS 2 main executable
 
@@ -28,7 +28,7 @@ from time import strftime
 # own python modules
 # ------------------------------------
 from MACS2.IO import cBedGraphIO
-from MACS2.IO.cScoreTrack import DiffScoreTrackI
+from MACS2.IO.cDiffScore import DiffScoreTrackI
 from MACS2.IO.cPeakIO import PeakIO
 from MACS2.OptValidator import diff_opt_validate
 from MACS2.OutputWriter import *

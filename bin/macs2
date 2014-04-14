@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# Time-stamp: <2013-12-16 17:00:42 Tao Liu>
+# Time-stamp: <2014-02-24 11:42:37 Tao Liu>
 
 """Description: MACS v2 main executable.
 
@@ -54,10 +54,10 @@ def main():
         # General call peak
         from MACS2.callpeak import run
         run( args )
-    # elif subcommand == "diffpeak":
-    #     # differential peak calling w/ bedgraphs + optional peak regions
-    #     from MACS2.diffpeak import run
-    #     run( args )
+    elif subcommand == "diffpeak":
+        # differential peak calling w/ bedgraphs + optional peak regions
+        from MACS2.diffpeak import run
+        run( args )
     elif subcommand == "bdgpeakcall":
         # call peak from bedGraph
         from MACS2.bdgpeakcall import run
@@ -113,7 +113,7 @@ def prepare_argparser ():
     add_callpeak_parser( subparsers )
 
     # # command for 'diffpeak'
-    # add_diffpeak_parser( subparsers )
+    add_diffpeak_parser( subparsers )
     
     # command for 'bdgpeakcall'
     add_bdgpeakcall_parser( subparsers )
@@ -230,6 +230,8 @@ def add_callpeak_parser( subparsers ):
     # about scaling
     group_callpeak.add_argument( "--to-large", dest = "tolarge", action = "store_true", default = False,
                                 help = "When set, scale the small sample up to the bigger sample. By default, the bigger dataset will be scaled down towards the smaller dataset, which will lead to smaller p/qvalues and more specific results. Keep in mind that scaling down will bring down background noise more. DEFAULT: False" )
+    group_callpeak.add_argument( "--ratio", dest = "ratio", type = float, default = 1.0,
+                                help = "When set, use a custom scaling ratio of ChIP/control (e.g. calculated using NCIS) for linear scaling. DEFAULT: ingore" )
     group_callpeak.add_argument( "--down-sample", dest = "downsample", action = "store_true", default = False,
                                  help = "When set, random sampling method will scale down the bigger sample. By default, MACS uses linear scaling. Warning: This option will make your result unstable and irreproducible since each time, random reads would be selected. Consider to use 'randsample' script instead. <not implmented>If used together with --SPMR, 1 million unique reads will be randomly picked.</not implemented> Caution: due to the implementation, the final number of selected reads may not be as you expected! DEFAULT: False" )
     group_callpeak.add_argument( "--seed", dest = "seed", type = int, default = -1, 

@@ -1,8 +1,8 @@
-# Time-stamp: <2013-09-11 22:52:23 Tao Liu>
+# Time-stamp: <2014-03-03 14:47:15 Tao Liu>
 
 """Module for Feature IO classes.
 
-Copyright (c) 2013 Tao Liu <vladimir.liu@gmail.com>, Ben Schiller <>
+Copyright (c) 2013-2014 Tao Liu <vladimir.liu@gmail.com>, Ben Schiller <>
 
 This code is free software; you can redistribute it and/or modify it
 under the terms of the BSD License (see the file COPYING included
@@ -11,7 +11,7 @@ with the distribution).
 @status:  experimental
 @version: $Revision$
 @author:  Tao Liu
-@contact: taoliu@jimmy.harvard.edu
+@contact: tliu4@buffalo.edu
 """
 
 # ------------------------------------
@@ -1204,7 +1204,11 @@ cdef class DiffScoreTrackI:
             bool peak1_present, peak2_present
             float this_dpvalue, this_dqvalue, this_dlogLR
             float pseudocount
-        assert self.has_peakio(), "No information on peaks"
+        if not self.has_peakio():
+            # prompt "No information on peaks", then quit
+            print "No information on differential peaks"
+            return
+
         logging.captureWarnings(True) 
         pseudocount = float(self.pseudocount)
         if xls is not None:
