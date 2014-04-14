@@ -229,7 +229,10 @@ def opt_validate ( optparser ):
 
     options.tosmall = not options.tolarge
 
-    if options.tosmall:
+    # Check if ratio is set. The arbitrary default is -5000 which would signify "not set". If it is not set, use --to-small
+    if options.ratio!=-5000:
+        options.argtxt += "# Using a custom scaling factor.\n"
+    elif options.tosmall:
         options.argtxt += "# Large dataset will be scaled towards smaller dataset.\n"
     else:
         options.argtxt += "# Small dataset will be scaled towards larger dataset.\n"

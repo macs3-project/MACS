@@ -1,3 +1,8 @@
+2013-12-19  Colin D, Dietmar Rieder <dietmar.rieder@gmail.com> 
+	Version 1.4.4
+
+	* Added --ratio option for scaling with a custom ratio
+
 2013-12-16  Tao Liu  <vladimir.liu@gmail.com>
 	Version 1.4.3
 

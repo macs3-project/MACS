@@ -280,11 +280,11 @@ class PeakDetect:
         
         self.info("#3 use control data to filter peak candidates...")
         #self.final_peaks = self.__filter_w_control(peak_candidates,self.treat,self.control, self.ratio_treat2control,fake_when_missing=True)
-        self.final_peaks = self.__filter_w_control(peak_candidates,self.treat,self.control, fake_when_missing=True, to_small_sample=self.opt.tosmall)
+        self.final_peaks = self.__filter_w_control(peak_candidates,self.treat,self.control, fake_when_missing=True, to_small_sample=self.opt.tosmall, ratio=self.opt.ratio)
         self.info("#3 find negative peaks by swapping treat and control")
 
         #self.final_negative_peaks = self.__filter_w_control(negative_peak_candidates,self.control,self.treat, 1.0/self.ratio_treat2control,fake_when_missing=True)
-        self.final_negative_peaks = self.__filter_w_control(negative_peak_candidates,self.control,self.treat, fake_when_missing=True, to_small_sample=self.opt.tosmall)
+        self.final_negative_peaks = self.__filter_w_control(negative_peak_candidates,self.control,self.treat, fake_when_missing=True, to_small_sample=self.opt.tosmall, ratio=self.opt.ratio)
         return self.__add_fdr (self.final_peaks, self.final_negative_peaks)
 
     def __call_peaks_wo_control (self):
@@ -335,7 +335,7 @@ class PeakDetect:
             for peak in peak_list:
                 print ( chrom+"\t"+"\t".join(map(str,peak)) )
 
-    def __filter_w_control (self, peak_info, treatment, control, pass_sregion=False, write2wig= False, fake_when_missing=False, to_small_sample=False ):
+    def __filter_w_control (self, peak_info, treatment, control, pass_sregion=False, write2wig= False, fake_when_missing=False, to_small_sample=False, ratio=-5000 ):
         """Use control data to calculate several lambda values around
         1k, 5k and 10k region around peak summit. Choose the highest
         one as local lambda, then calculate p-value in poisson
@@ -369,13 +369,23 @@ class PeakDetect:
         else:
             t_ratio = float(control.total)/treatment.total
             c_ratio = 1.00
+            
+        if ratio!=-5000:
+            if treatment.total>control.total:
+               t_ratio = 1.00
+               c_ratio = ratio
+            else:
+               t_ratio = ratio
+               c_ratio = 1.00
+        elif to_small_sample:
+           tmp = t_ratio
+           t_ratio = 1/c_ratio
+           c_ratio = 1/tmp
+        else:
+           # use tolarge, unchanged
+           t_ratio=t_ratio
+           c_ratio=c_ratio
 
-        if to_small_sample:
-            tmp = t_ratio
-            t_ratio = 1/c_ratio
-            c_ratio = 1/tmp
-        
-        
         final_peak_info = {}
         chrs = peak_info.keys()
         chrs.sort()
