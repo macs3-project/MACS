@@ -1,4 +1,4 @@
-# Time-stamp: <2013-09-19 15:59:35 Tao Liu>
+# Time-stamp: <2014-05-02 15:10:06 Tao Liu>
 
 """Module Description
 
@@ -217,11 +217,17 @@ Summary of Peak Model:
         # smooth correlation values to get rid of local maximums from small fluctuations. 
         ycorr = smooth(ycorr, window="flat") # window size is by default 11.
 
-        # best cross-correlation point
-        self.d = xcorr[np.where(ycorr==max(ycorr))[0][0]] #+self.tag_expansion_size
         # all local maximums could be alternative ds.
         i_l_max = np.r_[False, ycorr[1:] > ycorr[:-1]] & np.r_[ycorr[:-1] > ycorr[1:], False]
-        self.alternative_d = map(int,xcorr[i_l_max])
+        tmp_cor_alternative_d = ycorr[ i_l_max ]
+        tmp_alternative_d = xcorr[ i_l_max ]
+        cor_alternative_d =  tmp_cor_alternative_d [ tmp_alternative_d > 0 ]
+        self.alternative_d = map( int, tmp_alternative_d[ tmp_alternative_d > 0 ] )
+        
+        # best cross-correlation point
+        self.d = xcorr[ np.where( ycorr== max( cor_alternative_d ) )[0][0] ]
+        #self.d = xcorr[np.where(ycorr==max(ycorr))[0][0]] #+self.tag_expansion_size
+
         # get rid of the last local maximum if it's at the right end of curve.
         
         assert len(self.alternative_d) > 0, "No proper d can be found! Tweak --mfold?"
