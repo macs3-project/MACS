@@ -42,9 +42,7 @@ added (toward top):
         run( args )
 
 
-> copied /usr/local/Cellar/python/2.7.6/Frameworks/Python.framework/Versions/2.7/lib/python2.7/site-packages/johnmacs2/filterdup.py
-to /usr/local/Cellar/python/2.7.6/Frameworks/Python.framework/Versions/2.7/lib/python2.7/site-packages/johnmacs2/calmaxtag.py
---- and edited/made changes therein -- as documented by the file itself
+> copied MACS2/filterdup.py to MACS2/calmaxtag.py and made changes therein -- as documented by the file itself
 
 > modifications to file: MACS2/OptValidator.py
 added "def opt_validate_calmaxtag ( options ):"
