@@ -1,0 +1,6 @@
+macs2 calmaxtag -g 43000 -n 500000 -q
+
+macs2 calmaxtag -g 1000000 -i inputFile
+
+
+
