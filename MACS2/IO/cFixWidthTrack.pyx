@@ -1,4 +1,4 @@
-# Time-stamp: <2013-10-22 23:52:13 Tao Liu>
+# Time-stamp: <2014-06-17 01:35:40 Tao Liu>
 
 """Module for FWTrack classes.
 
@@ -544,6 +544,82 @@ cdef class FWTrackIII:
         self.length = self.fw * self.total
         return self
 
+
+    @cython.boundscheck(False) # do not check that np indices are valid
+    cpdef filter_dup_dryrun ( self, int32_t maxnum = -1):
+        """Filter the duplicated reads. (dry run) only return number of remaining reads
+
+        Run it right after you add all data into this object.
+
+        Note, this function will *throw out* duplicates
+        permenantly. If you want to keep them, use separate_dups
+        instead.
+        """
+        cdef:
+            int p, m, n, current_loc, i_chrom, total
+            # index for old array, and index for new one
+            unsigned long i_old, size
+            str k
+            np.ndarray plus, minus
+
+        if maxnum < 0: return           # do nothing
+
+        if not self.__sorted:
+            self.sort()
+
+        total = 0
+        chrnames = self.get_chr_names()
+        
+        for i_chrom in range( len(chrnames) ):
+            # for each chromosome.
+            # This loop body is too big, I may need to split code later...
+            
+            k = chrnames[ i_chrom ]
+            # + strand
+            plus = self.__locations[k][0]
+            size = plus.shape[0]
+            if len(plus) < 1:
+                pass
+            else:
+                total += 1
+                n = 1                # the number of tags in the current location
+                current_loc = plus[0]
+                for i_old in range( 1, size ):
+                    p = plus[ i_old ]
+                    if p == current_loc:
+                        n += 1
+                        if n <= maxnum:
+                            total += 1
+                        else:
+                            logging.debug("Duplicate reads found at %s:%d at + strand" % (k,p) )
+                    else:
+                        current_loc = p
+                        total += 1                        
+                        n = 1
+
+            # - strand
+            minus = self.__locations[k][1]
+            size = minus.shape[0]
+            if len(minus) < 1:
+                pass
+            else:
+                total += 1
+                n = 1                # the number of tags in the current location
+                current_loc = minus[0]
+                for i_old in range( 1, size ):
+                    p = minus[ i_old ]
+                    if p == current_loc:
+                        n += 1
+                        if n <= maxnum:
+                            total += 1
+                        else:
+                            logging.debug("Duplicate reads found at %s:%d at + strand" % (k,p) )
+                    else:
+                        current_loc = p
+                        total += 1                        
+                        n = 1
+        return total
+
     cpdef sample_percent (self, float percent, int seed = -1 ):
         """Sample the tags for a given percentage.
 
@@ -854,7 +930,7 @@ cdef class FWTrackIII:
                 # end of a loop
         return ret_peaks
 
-    cpdef pileup_a_chromosome ( self, str chrom, list ds, list scale_factor_s, float baseline_value = 0.0, bint directional = True, bint halfextension = True ):
+    cpdef pileup_a_chromosome ( self, str chrom, list ds, list scale_factor_s, float baseline_value = 0.0, bint directional = True, int end_shift = 0 ):
         """pileup a certain chromosome, return [p,v] (end position and value) list.
         
         ds             : tag will be extended to this value to 3' direction,
@@ -863,7 +939,7 @@ cdef class FWTrackIII:
         scale_factor_s  : linearly scale the pileup value applied to each d in ds. The list should have the same length as ds.
         baseline_value : a value to be filled for missing values, and will be the minimum pileup.
         directional    : if False, the strand or direction of tag will be ignored, so that extenstion will be both sides with d/2.
-        halfextension  : only make a fragment of d/2 size centered at fragment center        
+        end_shift      : move cutting ends towards 5->3 direction if value is positive, or towards 3->5 direction if negative. Default is 0 -- no shift at all.
         """
         cdef:
             long d
@@ -881,20 +957,12 @@ cdef class FWTrackIII:
         for d in ds:
             if directional:
                 # only extend to 3' side
-                if halfextension:
-                    five_shift_s.append(d/-4)  # five shift is used to move cursor towards 5' direction to find the start of fragment
-                    three_shift_s.append(d*3/4) # three shift is used to move cursor towards 3' direction to find the end of fragment
-                else:
-                    five_shift_s.append(0)
-                    three_shift_s.append(d)
+                five_shift_s.append(  - end_shift )
+                three_shift_s.append( end_shift + d)
             else:
                 # both sides
-                if halfextension:
-                    five_shift_s.append(d/4)
-                    three_shift_s.append(d/4)
-                else:
-                    five_shift_s.append(d/2)
-                    three_shift_s.append(d - d/2)
+                five_shift_s.append( d/2 - end_shift )
+                three_shift_s.append( end_shift + d - d/2)
 
         prev_pileup = None
 

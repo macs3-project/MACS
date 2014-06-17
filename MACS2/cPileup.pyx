@@ -1,4 +1,4 @@
-# Time-stamp: <2013-09-27 17:18:32 Tao Liu>
+# Time-stamp: <2014-06-17 02:03:38 Tao Liu>
 
 """Module Description: For pileup functions.
 
@@ -485,6 +485,9 @@ cpdef se_all_in_one_pileup ( np.ndarray plus_tags, np.ndarray minus_tags, long f
     a = start_poss[i_s]
     b = end_poss[i_e]
 
+    assert start_poss.shape[0] == end_poss.shape[0]
+    lx = start_poss.shape[0]
+
     try:
         while 1:
             if a < b:
@@ -496,7 +499,6 @@ cpdef se_all_in_one_pileup ( np.ndarray plus_tags, np.ndarray minus_tags, long f
                 pileup += 1
                 i_s += 1
                 a = start_poss[i_s]
-                #a = s_next() 
             elif a > b:
                 p = b
                 if p != pre_p:
@@ -505,22 +507,18 @@ cpdef se_all_in_one_pileup ( np.ndarray plus_tags, np.ndarray minus_tags, long f
                     pre_p = p
                 pileup -= 1
                 i_e += 1
-                #b = e_next() 
                 b = end_poss[i_e]
             else:
                 i_s += 1
                 i_e += 1
-                #a = s_next() 
                 a = start_poss[i_s]
-                #b = e_next() 
                 b = end_poss[i_e]
     except IndexError:
         pass
 
-    if i_e < l:
+    if i_e < lx:
         # add rest of end positions
-        for i in range(i_e+1, l):
-            #p = e_next()
+        for i in range(i_e, lx):
             p = end_poss[i]
             if p != pre_p:
                 tmppadd( p )

@@ -1,4 +1,4 @@
-# Time-stamp: <2013-12-13 11:55:48 Tao Liu>
+# Time-stamp: <2014-06-16 13:15:59 Tao Liu>
 
 """Description: MACS 2 main executable
 
@@ -158,10 +158,14 @@ def run( args ):
     if options.nomodel:
         info("#2 Skipped...")
         if options.PE_MODE:
-            options.shiftsize = 0
+            #options.shiftsize = 0
             options.d = options.tsize
         else:
-            options.d=options.shiftsize*2
+            options.d=options.extsize
+        if options.shift > 0:
+            info("#2 Sequencing ends will be shifted towards 3' by %d bp(s)" % (options.shift))
+        elif options.shift < 0:
+            info("#2 Sequencing ends will be shifted towards 5' by %d bp(s)" % (options.shift * -1))
         info("#2 Use %d as fragment length" % (options.d))
         options.scanwindow=2*options.d  # remove the effect of --bw
     else:
@@ -184,21 +188,20 @@ def run( args ):
             if options.d <= 2*options.tsize:
                 warn("#2 Since the d (%.0f) calculated from paired-peaks are smaller than 2*tag length, it may be influenced by unknown sequencing problem!" % (options.d))
                 if options.onauto:
-                    options.d=options.shiftsize*2
+                    options.d=options.extsize
                     options.scanwindow=2*options.d 
-                    warn("#2 MACS will use %d as shiftsize, %d as fragment length. NOTE: if the d calculated is still acceptable, please do not use --fix-bimodal option!" % (options.shiftsize,options.d))
+                    warn("#2 MACS will use %d as EXTSIZE/fragment length d. NOTE: if the d calculated is still acceptable, please do not use --fix-bimodal option!" % (options.d))
                 else:
                     warn("#2 You may need to consider one of the other alternative d(s): %s" %  ','.join(map(str,peakmodel.alternative_d)))
-                    warn("#2 You can restart the process with --nomodel --shiftsize XXX with your choice or an arbitrary number. Nontheless, MACS will continute computing.")
+                    warn("#2 You can restart the process with --nomodel --extsize XXX with your choice or an arbitrary number. Nontheless, MACS will continute computing.")
                 
         except NotEnoughPairsException:
             if not options.onauto:
                 sys.exit(1)
             warn("#2 Skipped...")
-            options.d=options.shiftsize*2
+            options.d=options.extsize
             options.scanwindow=2*options.d 
-            warn("#2 Since --fix-bimodal is set, MACS will use %d as shiftsize, %d as fragment length" % (options.shiftsize,options.d))
-
+            warn("#2 Since --fix-bimodal is set, MACS will use %d as fragment length" % (options.d))
 
     #3 Call Peaks
     info("#3 Call peaks...")
@@ -278,6 +281,11 @@ def run( args ):
     ofhd_xls.write(options.argtxt+"\n")
 
     ofhd_xls.write(tagsinfo)
+
+    if options.shift > 0:
+        ofhd_xls.write("#2 Sequencing ends will be shifted towards 3' by %d bp(s)\n" % (options.shift))
+    elif options.shift < 0:
+        ofhd_xls.write("#2 Sequencing ends will be shifted towards 5' by %d bp(s)\n" % (options.shift * -1))
 
     ofhd_xls.write("# d = %d\n" % (options.d))
     try:

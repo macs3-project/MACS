@@ -1,9 +1,37 @@
-2014-04-14  Tao Liu  <vladimir.liu@gmail.com>
-	MACS version 2.0.10 2014XXXX
+2014-06-16  Tao Liu  <vladimir.liu@gmail.com>
+	MACS version 2.0.10 20140616
 
-	* --ratio added to callpeak module
+	* callpeak module
 
-	* ...
+	"--ratio" is added to manually assign the scaling factor of ChIP
+	vs control, e.g. from NCIS. Thank Colin D and Dietmar Rieder for
+	implementing the patch file!
+
+	"--shift" is added to move cutting ends (5' end of reads) around,
+	in order to process DNAse-Seq data, e.g., use "--shift -100
+	--extsize 200" to get 200bps fragments around 5' ends. For general
+	ChIP-Seq data analysis, this option should be always set as
+	0. Thank Xi Chen and Anshul Kundaje for the discussions in user
+	group!
+
+	** Do not output negative fragment size from cross-correlation
+	analysis. Thank Alvin Qin for the feedback!
+
+	** --half-ext and --control-shift are removed. For complex read
+	shifting and extending, combine '--shift' and '--extsize'
+	options. For comparing two conditions, use 'bdgdiff' module
+	instead.
+
+	** a bug is fixed to output the last pileup value in bdg file
+	correctly.
+
+	* filterdup
+
+	A 'dry-run' option is added to only output numbers, including the
+	number of allowed duplicates, the total number of reads before and
+	after filtering duplicates and the estimated duplication
+	rate. Thank John Urban for the suggestion!
+
 
 2013-12-16  Tao Liu  <vladimir.liu@gmail.com>
 	MACS version 2.0.10 20131216 (tag:alpha)

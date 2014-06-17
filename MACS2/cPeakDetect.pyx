@@ -1,4 +1,4 @@
-# Time-stamp: <2013-10-28 22:31:57 Tao Liu>
+# Time-stamp: <2014-06-17 01:39:56 Tao Liu>
 
 """Module Description
 
@@ -26,7 +26,6 @@ import gc                               # use garbage collectior
 from MACS2.IO.cPeakIO import PeakIO
 from MACS2.IO.cBedGraphIO import bedGraphIO
 from MACS2.Constants import *
-from MACS2.cPileup import unified_pileup_bdg   
 from MACS2.IO.cCallPeakUnit import CallerFromAlignments
 
 cdef str subpeak_letters(short i):
@@ -44,7 +43,7 @@ class PeakDetect:
     >>> pd.call_peaks()
     """
     def __init__ (self,opt = None,treat = None, control = None, d = None,
-                  slocal = None, llocal = None, shiftcontrol = None):
+                  slocal = None, llocal = None):
         """Initialize the PeakDetect object.
 
         """
@@ -71,7 +70,7 @@ class PeakDetect:
             self.d = d
         else:
             self.d = self.opt.d
-        self.shift_size = self.d/2
+        self.end_shift = self.opt.shift
         self.gsize = opt.gsize
         
         self.nolambda = opt.nolambda
@@ -85,11 +84,6 @@ class PeakDetect:
             self.lregion = llocal
         else:
             self.lregion = opt.largelocal
-
-        if shiftcontrol != None:
-            self.shiftcontrol = shiftcontrol
-        else:
-            self.shiftcontrol = opt.shiftcontrol
 
         if (self.nolambda):
             self.info("#3 !!!! DYNAMIC LAMBDA IS DISABLED !!!!")
@@ -231,9 +225,8 @@ class PeakDetect:
                                                 d = d, ctrl_d_s = ctrl_d_s, 
                                                 treat_scaling_factor = treat_scale, 
                                                 ctrl_scaling_factor_s = ctrl_scale_s,
-                                                halfextension = self.opt.halfext,
+                                                end_shift = self.end_shift,
                                                 lambda_bg = lambda_bg,
-                                                shiftcontrol = self.shiftcontrol,
                                                 save_bedGraph = self.opt.store_bdg,
                                                 bedGraph_filename_prefix = self.opt.name,
                                                 bedGraph_treat_filename = self.opt.bdg_treat,
@@ -306,8 +299,6 @@ class PeakDetect:
 
         # global lambda
         if self.PE_MODE:
-        #    # should we support halfext?
-        #    if self.opt.halfext: warn('halfextension not supported in PE mode')
         #    # this an estimator, we should maybe test it for accuracy?
             lambda_bg = treat_length / self.gsize
         else:
@@ -331,9 +322,8 @@ class PeakDetect:
                                                 d = d, ctrl_d_s = ctrl_d_s, 
                                                 treat_scaling_factor = treat_scale, 
                                                 ctrl_scaling_factor_s = ctrl_scale_s,
-                                                halfextension = self.opt.halfext,
+                                                end_shift = self.end_shift,
                                                 lambda_bg = lambda_bg,
-                                                shiftcontrol = self.shiftcontrol,
                                                 save_bedGraph = self.opt.store_bdg,
                                                 bedGraph_filename_prefix = self.opt.name,
                                                 bedGraph_treat_filename = self.opt.bdg_treat,

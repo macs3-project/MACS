@@ -1,4 +1,4 @@
-# Time-stamp: <2013-10-28 01:19:30 Tao Liu>
+# Time-stamp: <2014-06-17 00:42:04 Tao Liu>
 
 """Description: Filter duplicate reads depending on sequencing depth.
 
@@ -68,13 +68,22 @@ def run( o_options ):
             max_dup_tags = int(options.keepduplicates)
             info("filter out redundant tags at the same location and the same strand by allowing at most %d tag(s)" % (max_dup_tags))
 
-        fwtrack = fwtrack.filter_dup(max_dup_tags)
-        t1 = fwtrack.total
+        if not options.dryrun:
+            fwtrack = fwtrack.filter_dup(max_dup_tags)
+            t1 = fwtrack.total
+        else:
+            t1 = fwtrack.filter_dup_dryrun( max_dup_tags )
+
         info(" tags after filtering in alignment file: %d" % (t1))
         info(" Redundant rate of alignment file: %.2f" % (float(t0-t1)/t0))
-    info("Write to BED file")
-    fwtrack.print_to_bed(fhd=outfhd)
-    info("finished! Check %s." % options.outputfile)
+            
+            
+    if not options.dryrun:
+        info( "Write to BED file" )
+        fwtrack.print_to_bed( fhd=outfhd )
+        info( "finished! Check %s." % options.outputfile )
+    else:
+        info( "Dry-run is finished!" )
 
 def cal_max_dup_tags ( genome_size, tags_number, p=1e-5 ):
     """Calculate the maximum duplicated tag number based on genome

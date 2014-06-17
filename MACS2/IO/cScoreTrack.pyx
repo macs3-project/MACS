@@ -1,4 +1,4 @@
-# Time-stamp: <2014-03-10 17:55:48 Tao Liu>
+# Time-stamp: <2014-06-17 11:58:23 Tao Liu>
 
 """Module for Feature IO classes.
 
@@ -1412,7 +1412,7 @@ cdef class TwoConditionScores:
         self.t2bdg = t2bdg
         self.c2bdg = c2bdg
         
-        self.empirical_distr_llr = [] # save all values in histogram
+        #self.empirical_distr_llr = [] # save all values in histogram
         
     cpdef set_pseudocount( self, float pseudocount ):
         self.pseudocount = pseudocount

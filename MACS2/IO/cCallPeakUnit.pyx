@@ -1,4 +1,4 @@
-# Time-stamp: <2013-12-16 13:27:43 Tao Liu>
+# Time-stamp: <2014-06-17 00:57:31 Tao Liu>
 
 """Module for Calculate Scores.
 
@@ -211,7 +211,6 @@ cdef class CallerFromAlignments:
         object treat            # FWTrackIII or PETrackI object for ChIP
         object ctrl             # FWTrackIII or PETrackI object for Control
 
-
         int  d                           # extension size for ChIP
         list ctrl_d_s                    # extension sizes for Control. Can be multiple values
         float treat_scaling_factor       # scaling factor for ChIP
@@ -221,8 +220,8 @@ cdef class CallerFromAlignments:
         float pseudocount                # the pseudocount used to calcuate logLR, FE or logFE
         str bedGraph_filename_prefix     # prefix will be added to _pileup.bdg for treatment and _lambda.bdg for control
 
-        bool shiftcontrol                # whether consider strand of Control sequencing ends the same way as ChIP.
-        bool halfextension               # whether or not extend both sides at sequencing ends
+        #SHIFTCONTROL is obsolete
+        int  end_shift                   # shift of cutting ends before extension
         bool trackline                   # whether trackline should be saved in bedGraph
         bool save_bedGraph               # whether to save pileup and local bias in bedGraph files
         bool save_SPMR                   # whether to save pileup normalized by sequencing depth in million reads
@@ -247,9 +246,8 @@ cdef class CallerFromAlignments:
                   float treat_scaling_factor = 1.0, list ctrl_scaling_factor_s = [1.0, 0.2, 0.02], 
                   bool stderr_on = False, 
                   float pseudocount = 1.0, 
-                  bool halfextension = False, 
+                  int end_shift = 0, 
                   float lambda_bg = 0, 
-                  bool shiftcontrol = False,
                   bool save_bedGraph = False,
                   str  bedGraph_filename_prefix = "",
                   str bedGraph_treat_filename = "",
@@ -303,8 +301,7 @@ cdef class CallerFromAlignments:
         self.ctrl_d_s = ctrl_d_s# note, self.d doesn't make sense in PE mode
         self.treat_scaling_factor = treat_scaling_factor
         self.ctrl_scaling_factor_s= ctrl_scaling_factor_s
-        self.halfextension = halfextension
-        self.shiftcontrol = shiftcontrol
+        self.end_shift = end_shift
         self.lambda_bg = lambda_bg
         self.pqtable = None
         self.save_bedGraph = save_bedGraph
@@ -362,7 +359,8 @@ cdef class CallerFromAlignments:
             treat_pv = self.treat.pileup_a_chromosome ( chrom, [self.treat_scaling_factor,], baseline_value = 0.0 )
         else:
             treat_pv = self.treat.pileup_a_chromosome( chrom, [self.d,], [self.treat_scaling_factor,], baseline_value = 0.0,
-                                                       directional = True, halfextension = self.halfextension )
+                                                       directional = True, 
+                                                       end_shift = self.end_shift )
 
         if not self.no_lambda_flag:
             if self.PE_mode:
@@ -371,8 +369,7 @@ cdef class CallerFromAlignments:
             else:
                 ctrl_pv = self.ctrl.pileup_a_chromosome( chrom, self.ctrl_d_s, self.ctrl_scaling_factor_s,
                                                          baseline_value = self.lambda_bg,
-                                                         directional = self.shiftcontrol,
-                                                         halfextension = self.halfextension )
+                                                         directional = False )
         else:
             ctrl_pv = [treat_pv[0][-1:], pyarray(FBYTE4,[self.lambda_bg,])] # set a global lambda
 

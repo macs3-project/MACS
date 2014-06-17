@@ -1,4 +1,4 @@
-# Time-stamp: <2013-09-11 17:56:14 Tao Liu>
+# Time-stamp: <2014-06-06 10:24:14 Tao Liu>
 
 """Module for all MACS Parser classes for input.
 
@@ -822,10 +822,15 @@ cdef class BAMParser( GenericParser ):
         return (references, rlengths)
 
     cpdef build_fwtrack ( self ):
-        if HAS_PYSAM:
-            return self.__build_fwtrack_w_pysam()
-        else:
-            return self.__build_fwtrack_wo_pysam()
+        try:
+            if HAS_PYSAM:
+                return self.__build_fwtrack_w_pysam()
+            else:
+                return self.__build_fwtrack_wo_pysam()
+        except IOError:
+            logging.error( "BAM files might be corrupted!" )
+            sys.exit(0)
+            
 
     cdef __build_fwtrack_w_pysam ( self ):
         cdef:
