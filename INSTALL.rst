@@ -1,7 +1,7 @@
 ======================
 INSTALL Guide For MACS
 ======================
-Time-stamp: <2014-06-17 12:57:57 Tao Liu>
+Time-stamp: <2014-06-17 15:27:24 Tao Liu>
 
 Please check the following instructions to complete your installation.
 
@@ -49,24 +49,6 @@ install them. This will fail the whole installation. You can pass
 ```pip install -U --no-deps MACS2```.
 
 .. _pip: http://www.pip-installer.org/en/latest/installing.html
-
-
-Install under Debian or Ubuntu Linux system
-===========================================
-
-You can install MACS2 through Debian APT system, so that it can be
-perfectly integrated in the Python environment of your operation
-system. You can easily manage the package, and the uninstallation is
-much easier. Download the *deb* package from MACS download page, and
-type this in the commend line::
-
- $ dpkg -i macs_2.0.10.deb
-
-To uninstall, type::
-
- $ dpkg -r macs_2.0.10
-
-This is tested only in Ubuntu >= 10.04 LTS.
 
 Install from source
 ===================
@@ -145,12 +127,6 @@ variable::
 
  $ export PATH=/home/taoliu/bin:$PATH
 
-About PeakSplitter
-==================
-
-Please go to it's main site
-<http://www.ebi.ac.uk/bertone/software.html> to download.
-
 --
-Tao Liu <taoliu@jimmy.harvard.edu>
+Tao Liu <vladimir.liu@gmail.com>
 
