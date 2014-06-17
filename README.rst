@@ -501,12 +501,9 @@ Output files
 Other useful links
 ==================
 
-:Cistrome, a web server for ChIP-chip/seq analysis
-:http://cistrome.org/ap/
-:bedTools, a super useful toolkits for genome annotation files
-:http://code.google.com/p/bedtools/
-:UCSC toolkits
-:http://hgdownload.cse.ucsc.edu/admin/exe/
+:Cistrome: http://cistrome.org/ap/
+:bedTools: http://code.google.com/p/bedtools/
+:UCSC toolkits: http://hgdownload.cse.ucsc.edu/admin/exe/
 
 Tips of fine-tuning peak calling
 ================================
