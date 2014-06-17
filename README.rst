@@ -1,7 +1,7 @@
 ========================
 README for MACS (2.1.0)
 ========================
-Time-stamp: <2014-06-17 16:56:56 Tao Liu>
+Time-stamp: <2014-06-17 16:58:37 Tao Liu>
 
 Introduction
 ============
@@ -501,9 +501,12 @@ Output files
 Other useful links
 ==================
 
-:Cistrome, a web server for ChIP-chip/seq analysis: http://cistrome.org/ap/
-:bedTools, a super useful toolkits for genome annotation files: http://code.google.com/p/bedtools/
-:UCSC toolkits: http://hgdownload.cse.ucsc.edu/admin/exe/
+:Cistrome, a web server for ChIP-chip/seq analysis
+:http://cistrome.org/ap/
+:bedTools, a super useful toolkits for genome annotation files
+:http://code.google.com/p/bedtools/
+:UCSC toolkits
+:http://hgdownload.cse.ucsc.edu/admin/exe/
 
 Tips of fine-tuning peak calling
 ================================
