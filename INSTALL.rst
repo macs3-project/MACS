@@ -1,7 +1,7 @@
 ======================
 INSTALL Guide For MACS
 ======================
-Time-stamp: <2012-04-28 12:54:45 Tao Liu>
+Time-stamp: <2014-06-17 12:57:57 Tao Liu>
 
 Please check the following instructions to complete your installation.
 
@@ -11,28 +11,54 @@ Prerequisites
 Python version must be equal to *2.7* to run MACS. I recommend
 using the version *2.7.2*.
 
-Numpy_ (>=1.3.0) are required to run MACS v2. 
-
-.. _Numpy: http://www.scipy.org/Download
+Numpy_ (>=1.6) are required to run MACS v2. 
 
 GCC is required to compile ``.c`` codes in MACS v2 package, and python
 header files are needed. If you are using Mac OSX, I recommend you
 install Xcode; if you are using Linux, you need to make sure
 ``python-dev`` is installed.
 
-Cython_ (>=0.14.1) is required *only if* you want to regenerate ``.c``
+Cython_ (>=0.18) is required *only if* you want to regenerate ``.c``
 files from ``.pyx`` files using ``setup_w_cython.py`` script.
 
+.. _Numpy: http://www.scipy.org/Download
 .. _Cython: http://cython.org/
+
+Easy installation through PyPI
+==============================
+
+The easiest way to install MACS2 is through PyPI system. Get pip_ if
+it's not available in your system. *Note* if you have already
+installed numpy and scipy system-wide, you can use ```virtualenv
+--system-site-packages``` to let your virtual Python environment have
+access to system-wide numpy and scipy libraries so that you don't need
+to install them again.  
+
+Then under command line, type ```pip install MACS2```. PyPI will
+install Numpy and Scipy automatically if they are absent.  
+
+To upgrade MACS2, type ```pip install -U MACS2```. It will check
+currently installed MACS2, compare the version with the one on PyPI
+repository, download and install newer version while necessary.
+
+Note, if you do not want pip to fix dependencies. For example, you
+already have a workable Scipy and Numpy, and when 'pip install -U
+MACS2', pip downloads newest Scipy and Numpy but unable to compile and
+install them. This will fail the whole installation. You can pass
+'--no-deps' option to pip and let it skip all dependencies. Type
+```pip install -U --no-deps MACS2```.
+
+.. _pip: http://www.pip-installer.org/en/latest/installing.html
+
 
 Install under Debian or Ubuntu Linux system
 ===========================================
 
-The most convenient way to install MACS is through Debian APT system,
-so that it can be perfectly integrated in the Python environment of
-your operation system. You can easily manage the package, and the
-uninstallation is much easier. Download the *deb* package from MACS
-download page, and type this in the commend line::
+You can install MACS2 through Debian APT system, so that it can be
+perfectly integrated in the Python environment of your operation
+system. You can easily manage the package, and the uninstallation is
+much easier. Download the *deb* package from MACS download page, and
+type this in the commend line::
 
  $ dpkg -i macs_2.0.10.deb
 

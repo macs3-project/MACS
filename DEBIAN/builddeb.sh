@@ -21,5 +21,5 @@ python2.7 setup.py install --prefix=debian/usr/ --install-layout=deb
 #for f in `ls debian/usr/bin/*.py`;do mv ${f} ${f/.py/};done
 for f in `find debian/usr/lib/ -name '*.pyc'`;do rm -f ${f};done
 fakeroot dpkg-deb --build debian
-mv debian.deb macs2_2.0.10.deb
+mv debian.deb macs2_2.1.0.deb
 echo "finished!"
