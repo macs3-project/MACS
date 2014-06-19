@@ -184,6 +184,9 @@ def opt_validate ( options ):
         else:
             options.argtxt += "# Larger dataset will be scaled towards smaller dataset.\n"
 
+    if options.ratio != 1.0:
+       options.argtxt += "# Using a custom scaling factor: %.2e\n" % (options.ratio)
+
     if options.cfile:
         options.argtxt += "# Range for calculating regional lambda is: %d bps and %d bps\n" % (options.smalllocal,options.largelocal)
     else:
