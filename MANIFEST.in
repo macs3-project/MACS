@@ -1,4 +1,3 @@
-include README COPYING ChangeLog INSTALL.rst MANIFEST setup.py bin/macs2
+include README.rst COPYING ChangeLog INSTALL.rst MANIFEST setup.py bin/macs2
 recursive-include MACS2 *.py *.pyx *.pxd *.h *.c
 prune test
-prune web

@@ -1,4 +1,4 @@
-# Time-stamp: <2014-06-17 11:58:23 Tao Liu>
+# Time-stamp: <2014-06-24 17:53:54 Tao Liu>
 
 """Module for Feature IO classes.
 
@@ -850,7 +850,7 @@ cdef class scoreTrackII:
                 v1 = p() 
                 v2 = c()
                 v[ i ] =  logLR_asym( v1 + pseudocount, v2 + pseudocount )  #logLR( d[ i, 1]/100.0, d[ i, 2]/100.0 )
-                print v1, v2, v[i]
+                #print v1, v2, v[i]
         self.scoring_method = 'l'
         return 
 
