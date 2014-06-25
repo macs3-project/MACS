@@ -94,6 +94,10 @@ def main():
         # pileup alignment results with a given extension method
         from MACS2.pileup import run
         run( args )
+    elif subcommand == "calmaxtag":
+        # user only wants to calculate max tags given input paramters
+        from MACS2.calmaxtag import run
+        run( args )
 
 def prepare_argparser ():
     """Prepare optparser object. New options will be added in this
@@ -141,6 +145,9 @@ def prepare_argparser ():
     
     # command for 'refinepeak'
     add_refinepeak_parser( subparsers )
+
+    # command for 'calmaxtag'
+    add_calmaxtag_parser( subparsers )
     
     return argparser
 
@@ -553,7 +560,31 @@ def add_pileup_parser( subparsers ):
                                       help = "Set verbose level. 0: only show critical message, 1: show additional warning message, 2: show process information, 3: show debug messages. If you want to know where are the duplicate reads, use 3. DEFAULT:2" )
     return
 
-
+def add_calmaxtag_parser( subparsers ):
+    argparser_calmaxtag = subparsers.add_parser("calmaxtag",
+						help = "Simply calculate maximum duplicate tags allowed at a given site with given input paramters" )
+    input = argparser_calmaxtag.add_mutually_exclusive_group()
+    input.add_argument( "-i", dest = "ifile", type = str, required = False,
+                                      help = "Sequencing alignment file. Provide reads file or number of reads with -n." )
+    input.add_argument( "-n", dest = "numTags", type = int, required = False,
+                                      help = "Number of reads in input file (this allows macs2 to skip counting). Provide number of reads or reads file -i." )
+    argparser_calmaxtag.add_argument( "-f", "--format", dest = "format", type = str,
+                                      choices=("AUTO","BAM","SAM","BED","ELAND","ELANDMULTI","ELANDEXPORT","BOWTIE"),
+                                      help = "Format of tag file, \"AUTO\", \"BED\" or \"ELAND\" or \"ELANDMULTI\" or \"ELANDEXPORT\" or \"SAM\" or \"BAM\" or \"BOWTIE\". The default AUTO option will let '%(prog)s' decide which format the file is. Please check the definition in README file if you choose ELAND/ELANDMULTI/ELANDEXPORT/SAM/BAM/BOWTIE. DEFAULT: \"AUTO\"",
+                                      default = "AUTO" )
+    argparser_calmaxtag.add_argument( "-g", "--gsize", dest = "gsize", type = str, default = "hs", required=True,
+                                      help = "Effective genome size. It can be 1.0e+9 or 1000000000, or shortcuts:'hs' for human (2.7e9), 'mm' for mouse (1.87e9), 'ce' for C. elegans (9e7) and 'dm' for fruitfly (1.2e8), DEFAULT:hs" )
+    argparser_calmaxtag.add_argument( "-p", "--pvalue", dest = "pvalue", type = float,
+                                      help = "Pvalue cutoff for binomial distribution test. DEFAULT:1e-5" )
+    argparser_calmaxtag.add_argument( "-s", "--tsize", dest = "tsize", type = int,
+                                      help = "Tag size. This will overide the auto detected tag size. DEFAULT: Not set" )
+    argparser_calmaxtag.add_argument( "-q", "--quiet", dest = "quiet", action = "store_true", 
+                                      help = "When using -n, this flag will suppress all messages except answer. When using -i, it will suppress most messages except answer. DEFAULT: Not set" )
+    add_outdir_option( argparser_calmaxtag )
+    argparser_calmaxtag.add_argument( "-o", "--ofile", dest = "outputfile", type = str,
+                                      help = "Output BED file name. If not specified, will write to standard output. DEFAULT: stdout",
+                                      default = "stdout" )
+    return
 if __name__ == '__main__':
     try:
         main()

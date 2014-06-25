@@ -185,8 +185,8 @@ def opt_validate ( options ):
             options.argtxt += "# Larger dataset will be scaled towards smaller dataset.\n"
 
     if options.ratio != 1.0:
-	options.argtxt += "# Using a custom scaling factor: %.2e\n" % (options.ratio)
-	
+       options.argtxt += "# Using a custom scaling factor: %.2e\n" % (options.ratio)
+
     if options.cfile:
         options.argtxt += "# Range for calculating regional lambda is: %d bps and %d bps\n" % (options.smalllocal,options.largelocal)
     else:
@@ -650,3 +650,124 @@ def opt_validate_bdgcmp ( options ):
 
     return options
 
+
+
+def opt_validate_calmaxtag ( options ):
+    """Validate options from a OptParser object.
+
+    Ret: Validated options object.
+    """
+    # gsize
+    try:
+        options.gsize = efgsize[options.gsize]
+    except:
+        try:
+            options.gsize = float(options.gsize)
+        except:
+            logging.error("Error when interpreting --gsize option: %s" % options.gsize)
+            logging.error("Available shortcuts of effective genome sizes are %s" % ",".join(efgsize.keys()))
+            sys.exit(1)
+
+    # format
+
+    options.gzip_flag = False           # if the input is gzip file
+    
+    options.format = options.format.upper()
+    if options.format == "ELAND":
+        options.parser = ELANDResultParser
+    elif options.format == "BED":
+        options.parser = BEDParser
+    elif options.format == "ELANDMULTI":
+        options.parser = ELANDMultiParser
+    elif options.format == "ELANDEXPORT":
+        options.parser = ELANDExportParser
+    elif options.format == "SAM":
+        options.parser = SAMParser
+    elif options.format == "BAM":
+        options.parser = BAMParser
+        options.gzip_flag = True
+    elif options.format == "BOWTIE":
+        options.parser = BowtieParser
+    elif options.format == "AUTO":
+        options.parser = guess_parser
+    else:
+        logging.error("Format \"%s\" cannot be recognized!" % (options.format))
+        sys.exit(1)
+    
+    # uppercase the format string 
+    options.format = options.format.upper()
+
+    # logging object
+    logging.basicConfig(level=10,
+                        format='%(levelname)-5s @ %(asctime)s: %(message)s ',
+                        datefmt='%a, %d %b %Y %H:%M:%S',
+                        stream=sys.stderr,
+                        filemode="w"
+                        )
+    
+    options.error   = logging.critical        # function alias
+    options.warn    = logging.warning
+    options.debug   = logging.debug
+    options.info    = logging.info
+
+    return options
+
+def opt_validate_calmaxtag ( options ):
+    """Validate options from a OptParser object.
+
+    Ret: Validated options object.
+    """
+    # gsize
+    try:
+        options.gsize = efgsize[options.gsize]
+    except:
+        try:
+            options.gsize = float(options.gsize)
+        except:
+            logging.error("Error when interpreting --gsize option: %s" % options.gsize)
+            logging.error("Available shortcuts of effective genome sizes are %s" % ",".join(efgsize.keys()))
+            sys.exit(1)
+
+    # format
+
+    options.gzip_flag = False           # if the input is gzip file
+    
+    options.format = options.format.upper()
+    if options.format == "ELAND":
+        options.parser = ELANDResultParser
+    elif options.format == "BED":
+        options.parser = BEDParser
+    elif options.format == "ELANDMULTI":
+        options.parser = ELANDMultiParser
+    elif options.format == "ELANDEXPORT":
+        options.parser = ELANDExportParser
+    elif options.format == "SAM":
+        options.parser = SAMParser
+    elif options.format == "BAM":
+        options.parser = BAMParser
+        options.gzip_flag = True
+    elif options.format == "BOWTIE":
+        options.parser = BowtieParser
+    elif options.format == "AUTO":
+        options.parser = guess_parser
+    else:
+        logging.error("Format \"%s\" cannot be recognized!" % (options.format))
+        sys.exit(1)
+    
+    # uppercase the format string 
+    options.format = options.format.upper()
+
+    # logging object
+    logging.basicConfig(level=10,
+                        format='%(levelname)-5s @ %(asctime)s: %(message)s ',
+                        datefmt='%a, %d %b %Y %H:%M:%S',
+                        stream=sys.stderr,
+                        filemode="w"
+                        )
+    
+    options.error   = logging.critical        # function alias
+    options.warn    = logging.warning
+    options.debug   = logging.debug
+    options.info    = logging.info
+
+    return options
