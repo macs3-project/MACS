@@ -1,4 +1,4 @@
-# Time-stamp: <2014-06-17 01:39:03 Tao Liu>
+# Time-stamp: <2014-07-30 23:05:15 Tao Liu>
 
 """Module Description
 
@@ -647,6 +647,82 @@ def opt_validate_bdgcmp ( options ):
         if len(options.method) != len(options.ofile):
             logging.error("The number and the order of arguments for --ofile must be the same as for -m.")
             sys.exit(1)     
+
+    return options
+
+
+def opt_validate_cmbreps ( options ):
+    """Validate options from a OptParser object.
+
+    Ret: Validated options object.
+    """
+    # logging object
+    logging.basicConfig(level=20,
+                        format='%(levelname)-5s @ %(asctime)s: %(message)s ',
+                        datefmt='%a, %d %b %Y %H:%M:%S',
+                        stream=sys.stderr,
+                        filemode="w"
+                        )
+    
+    options.error   = logging.critical        # function alias
+    options.warn    = logging.warning
+    options.debug   = logging.debug
+    options.info    = logging.info
+
+    # methods should be valid:
+
+
+    if options.method not in [ 'fisher', 'max', 'mean']:
+        logging.error( "Invalid method: %s" % options.method )
+        sys.exit( 1 )
+
+    if len( options.ifile ) != 2:
+        logging.error("Only support two replicates!")
+        sys.exit( 1 )
+
+    # # of -i must == # of -w
+
+    # if not options.weights:
+    #     options.weights = [ 1.0 ] * len( options.ifile )
+
+    # if len( options.ifile ) != len( options.weights ):
+    #     logging.error("Must provide same number of weights as number of input files.")
+    #     sys.exit( 1 )
+
+    # if options.method == "fisher" and len( options.ifile ) > 3:
+    #     logging.error("NOT IMPLEMENTED! Can't combine more than 3 replicates using Fisher's method.")
+    #     sys.exit( 1 )
+
+    return options
+
+
+def opt_validate_bdgopt ( options ):
+    """Validate options from a OptParser object.
+
+    Ret: Validated options object.
+    """
+    # logging object
+    logging.basicConfig(level=20,
+                        format='%(levelname)-5s @ %(asctime)s: %(message)s ',
+                        datefmt='%a, %d %b %Y %H:%M:%S',
+                        stream=sys.stderr,
+                        filemode="w"
+                        )
+    
+    options.error   = logging.critical        # function alias
+    options.warn    = logging.warning
+    options.debug   = logging.debug
+    options.info    = logging.info
+
+    # methods should be valid:
+
+    if options.method.lower() not in [ 'multiply', 'add', 'p2q']:
+        logging.error( "Invalid method: %s" % options.method )
+        sys.exit( 1 )
+
+    if options.method.lower() in [ 'multiply', 'add' ] and not options.extparam:
+        logging.error( "Need EXTRAPARAM for method multiply or add!")
+        sys.exit( 1 )
 
     return options
 

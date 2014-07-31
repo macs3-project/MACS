@@ -1,13 +1,57 @@
-//Time-stamp: <2013-09-15 21:56:36 Tao Liu>
+//Time-stamp: <2014-07-29 17:01:45 Tao Liu>
 
 #include <math.h>
 
 double log10_poisson_cdf ( unsigned int n, double lam, short lower );
 double log10_poisson_cdf_P_large_lambda ( unsigned int k, double lbd );
 double log10_poisson_cdf_Q_large_lambda ( unsigned int k, double lbd );
+double chi2_k1_cdf ( double x );
+double chi2_k2_cdf ( double x );
+double chi2_k4_cdf ( double x );
+double log10_chi2_k1_cdf ( double x );
+double log10_chi2_k2_cdf ( double x );
+double log10_chi2_k4_cdf ( double x );
 
 #define max(x, y) ((x)>(y)?(x):(y))
 #define logspace_add(x, y) ((x)>(y)?(x):(y)) + log1p ( exp( -fabs(x - y) ) )
+#define LOG10_E 0.43429448190325176
+
+double chi2_k1_cdf ( double x )
+{
+  /*CDF for chi-square distribution with degree of freedom 1.*/
+  return erf( sqrt(x/2) );
+}
+
+double log10_chi2_k1_cdf ( double x )
+{
+  /*log10 CDF for chi-square distribution with degree of freedom 1.*/
+  return log10( erf( sqrt(x/2) ) );
+}
+
+double chi2_k2_cdf ( double x )
+{
+  /*CDF for chi-square distribution with degree of freedom 2.*/
+  return 1 - exp( -x/2 );
+}
+
+double log10_chi2_k2_cdf ( double x )
+{
+  /*log10 CDF for chi-square distribution with degree of freedom 2.*/
+  return log1p( - exp( -x/2 ) ) * LOG10_E;
+}
+
+double chi2_k4_cdf ( double x )
+{
+  /*CDF for chi-square distribution with degree of freedom 4.*/
+  return 1 - exp( -x/2 ) * ( 1 + x/2 );
+}
+
+double log10_chi2_k4_CDF ( double x )
+{
+  /*log10 CDF for chi-square distribution with degree of freedom 4.*/
+  return log1p( - exp( -x/2 ) * ( 1 + x/2 ) ) * LOG10_E;
+}
+
 
 double log10_poisson_cdf ( unsigned int n, double lam, short lower )
 {

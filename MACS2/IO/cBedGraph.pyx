@@ -1,4 +1,4 @@
-# Time-stamp: <2014-03-03 13:56:01 Tao Liu>
+# Time-stamp: <2014-07-30 23:10:44 Tao Liu>
 
 """Module for Feature IO classes.
 
@@ -42,6 +42,17 @@ __doc__ = "bedGraphTrackI class"
 # ------------------------------------
 # Misc functions
 # ------------------------------------
+LOG10_E = 0.43429448190325176
+
+from libc.math cimport log1p, exp, log10
+
+cpdef float fisher_method_combining_two_log10pvalues ( float p1, float p2 ):
+    #x = 2 * ( p1 + p2 ) / LOG10_E
+    #return -log10( exp( -x/2 ) * ( 1 + x/2 ) )
+    return ( p1 + p2 ) - log1p( ( p1 + p2 ) / LOG10_E ) * LOG10_E
+
+cpdef float mean ( float p1, float p2 ):
+    return ( p1 + p2 ) / 2
 
 # ------------------------------------
 # Classes
@@ -700,7 +711,7 @@ cdef class bedGraphTrackI:
             ret.add_loc(chrom,0,max_p,new_value)
         return ret
 
-    def overlie (self, bdgTrack2, func=max ):
+    def overlie (self, bdgTrack2, func="max" ):
         """Calculate two bedGraphTrackI objects by letting self
         overlying bdgTrack2, with user-defined functions.
 
@@ -738,6 +749,15 @@ cdef class bedGraphTrackI:
         
         assert isinstance(bdgTrack2,bedGraphTrackI), "bdgTrack2 is not a bedGraphTrackI object"
 
+        if func == "max":
+            f = max
+        elif func == "mean":
+            f = lambda x, y: ( x + y ) / 2
+        elif func == "fisher":
+            f = lambda p1, p2: ( p1 + p2 ) - log1p( ( p1 + p2 ) / LOG10_E ) * LOG10_E
+        else:
+            raise Exception("Invalid function")
+
         ret = bedGraphTrackI()
         retadd = ret.add_loc
         
@@ -766,21 +786,21 @@ cdef class bedGraphTrackI:
                 while True:
                     if p1 < p2:
                         # clip a region from pre_p to p1, then set pre_p as p1.
-                        retadd(chrom,pre_p,p1,func(v1,v2))
+                        retadd(chrom,pre_p,p1,f(v1,v2))
                         pre_p = p1
                         # call for the next p1 and v1
                         p1 = p1n()
                         v1 = v1n()
                     elif p2 < p1:
                         # clip a region from pre_p to p2, then set pre_p as p2.
-                        retadd(chrom,pre_p,p2,func(v1,v2))
+                        retadd(chrom,pre_p,p2,f(v1,v2))
                         pre_p = p2
                         # call for the next p2 and v2
                         p2 = p2n()
                         v2 = v2n()
                     elif p1 == p2:
                         # from pre_p to p1 or p2, then set pre_p as p1 or p2.
-                        retadd(chrom,pre_p,p1,func(v1,v2))
+                        retadd(chrom,pre_p,p1,f(v1,v2))
                         pre_p = p1
                         # call for the next p1, v1, p2, v2.
                         p1 = p1n()
@@ -806,6 +826,81 @@ cdef class bedGraphTrackI:
         self.maxvalue = func(self.maxvalue)
         self.minvalue = func(self.minvalue)
         return True
+
+    def p2q ( self ):
+        """Convert pvalue scores to qvalue scores.
+
+        *Assume scores in this bedGraph are pvalue scores! Not work
+         for other type of scores.
+        """
+        cdef:
+            str chrom
+            object pos_array, pscore_array
+            dict pvalue_stat = {}
+            dict pqtable = {}
+            long n, pre_p, this_p, length, j, pre_l, l, i
+            double this_v, pre_v, v, q, pre_q, this_t, this_c
+            long N, k, this_l
+            double f
+            long nhcal = 0
+            long npcal = 0
+            list unique_values
+            double t0, t1, t 
+
+        # calculate frequencies of each p-score
+        for chrom in self.__data.keys():
+            pre_p = 0
+
+            [pos_array, pscore_array] = self.__data[ chrom ]
+
+            pn = iter(pos_array).next
+            vn = iter(pscore_array).next
+
+            for i in range( len( pos_array ) ):
+                this_p = pn()
+                this_v = vn()
+                this_l = this_p - pre_p
+                if pvalue_stat.has_key( this_v ):
+                    pvalue_stat[ this_v ] += this_l
+                else:
+                    pvalue_stat[ this_v ] = this_l
+                pre_p = this_p
+
+            nhcal += len( pos_array )
+
+        nhval = 0
+
+        N = sum(pvalue_stat.values()) # total length
+        k = 1                           # rank
+        f = -log10(N)
+        pre_v = -2147483647
+        pre_l = 0
+        pre_q = 2147483647              # save the previous q-value
+
+        # calculate qscore for each pscore
+        pqtable = {}
+        unique_values = sorted(pvalue_stat.keys(), reverse=True)
+        for i in range(len(unique_values)):
+            v = unique_values[i]
+            l = pvalue_stat[v]
+            q = v + (log10(k) + f)
+            q = max(0,min(pre_q,q))           # make q-score monotonic
+            pqtable[ v ] = q
+            pre_v = v
+            pre_q = q
+            k+=l
+            nhcal += 1
+
+        # convert pscore to qscore
+        for chrom in self.__data.keys():
+            [pos_array, pscore_array] = self.__data[ chrom ]
+
+            for i in range( len( pos_array ) ):
+                pscore_array[ i ] = pqtable[ pscore_array[ i ] ]
+
+        self.merge_regions()
+        return
+        
 
     def extract_value ( self, bdgTrack2 ):
         """It's like overlie function. THe overlapped regions between

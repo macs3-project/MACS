@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# Time-stamp: <2014-06-17 11:50:19 Tao Liu>
+# Time-stamp: <2014-07-30 23:14:39 Tao Liu>
 
 """Description: MACS v2 main executable.
 
@@ -70,6 +70,14 @@ def main():
         # compare treatment and control to make enrichment scores
         from MACS2.bdgcmp import run
         run( args )
+    elif subcommand == "bdgopt":
+        # operations on the score column of bedGraph file
+        from MACS2.bdgopt import run
+        run( args )        
+    elif subcommand == "cmbreps":
+        # combine replicates
+        from MACS2.cmbreps import run
+        run( args )
     elif subcommand == "randsample":
         # randomly sample sequencing reads, and save as bed file
         from MACS2.randsample import run
@@ -123,6 +131,12 @@ def prepare_argparser ():
     
     # command for 'bdgcmp'
     add_bdgcmp_parser( subparsers )
+
+    # command for 'bdgopt'
+    add_bdgopt_parser( subparsers )
+    
+    # command for 'cmbreps'
+    add_cmbreps_parser( subparsers )    
     
     # command for 'bdgdiff'
     add_bdgdiff_parser( subparsers )
@@ -163,9 +177,9 @@ def add_callpeak_parser( subparsers ):
     # group for input files
     group_input = argparser_callpeak.add_argument_group( "Input files arguments" )
     group_input.add_argument( "-t", "--treatment", dest = "tfile", type = str, required = True, nargs = "+",
-                              help = "ChIP-seq treatment file. If multiple files are given as '-t A B C', then they will all be read and combined. REQUIRED." )
+                              help = "ChIP-seq treatment file. If multiple files are given as '-t A B C', then they will all be read and treated as replicates. MACS2 uses Liptak's method with weights as REQUIRED." )
     group_input.add_argument( "-c", "--control", dest = "cfile", type = str, nargs = "*",
-                                    help = "Control file. If multiple files are given as '-c A B C', then they will all be read and combined.")
+                                    help = "Control file. If multiple files are given as '-c A B C', they won't be regarded as replicates, instead they will be pooled to estimate ChIP-seq background noise.")
     group_input.add_argument( "-f", "--format", dest = "format", type = str,
                               choices = ("AUTO", "BAM", "SAM", "BED", "ELAND",
                                          "ELANDMULTI", "ELANDEXPORT", "BOWTIE",
@@ -418,7 +432,41 @@ def add_bdgcmp_parser( subparsers ):
     output_group.add_argument( "-o", "--ofile", dest = "ofile", type = str, nargs = "+",
                                help = "Output filename. Mutually exclusive with --o-prefix. The number and the order of arguments for --ofile must be the same as for -m." )
     return
-    
+
+def add_bdgopt_parser( subparsers ):
+    """Add function 'operations on score column of bedGraph' argument parsers.
+    """    
+    argparser_bdgopt = subparsers.add_parser( "bdgopt",
+                                              help = "Operations on score column of bedGraph file." )
+    argparser_bdgopt.add_argument( "-i", "--ifile", dest = "ifile", type = str, required = True,
+                                   help = "MACS score in bedGraph. Note: this must be a bedGraph file covering the ENTIRE genome. REQUIRED" )
+    argparser_bdgopt.add_argument( "-m", "--method", dest = "method", type = str,
+                                   choices = ( "multiply", "add", "p2q" ),
+                                   help = "Method to modify the score column of bedGraph file. Available choices are: multiply, add or p2q. 1) multiply, the EXTRAPARAM is required and will be multiplied to the score column. If you intend to divide the score column by X, use value of 1/X as EXTRAPARAM. 2) add, the EXTRAPARAM is required and will be added to the score column. If you intend to subtract the score column by X, use value of -X as EXTRAPARAM. 3) p2q, this will convert p-value scores to q-value scores using Benjamini-Hochberg process. The EXTRAPARAM is not required. This method assumes the scores are -log10 p-value from MACS2. Any other types of score will cause unexpected errors.", default="p2q")
+    argparser_bdgopt.add_argument( "-p", "--extra-param", dest = "extraparam", type = float,
+                                   help = "The extra parameter for METHOD. Check the detail of -m option.")
+    add_outdir_option( argparser_bdgopt )
+    argparser_bdgopt.add_argument( "-o", "--ofile", dest = "ofile", type = str,
+                                   help = "Output BEDGraph filename.", required = True )
+    return
+
+def add_cmbreps_parser( subparsers ):
+    """Add function 'combine replicates' argument parsers.
+    """
+    argparser_cmbreps = subparsers.add_parser( "cmbreps",
+                                               help = "Combine BEDGraphs of scores from replicates." )
+    argparser_cmbreps.add_argument( "-i", dest = "ifile", type = str, required = True, nargs = "+",
+                                    help = "MACS score in bedGraph for each replicate. Require exactly two files such as '-i A B'. REQUIRED" )
+    # argparser_cmbreps.add_argument( "-w", dest = "weights", type = float, nargs = "*",
+    #                                 help = "Weight for each replicate. Default is 1.0 for each. When given, require same number of parameters as IFILE." )    
+    argparser_cmbreps.add_argument( "-m", "--method", dest = "method", type = str,
+                                    choices = ( "fisher", "max", "mean" ),
+                                    help = "Method to use while combining scores from replicates. 1) fisher: Fisher's combined probability test. It requires scores in ppois form (-log10 pvalues) from bdgcmp. Other types of scores for this method may cause cmbreps unexpected errors. 2) max: take the maximum value from replicates for each genomic position. 3) mean: take the average value. Note, except for Fisher's method, max or mean will take scores AS IS which means they won't convert scores from log scale to linear scale or vice versa.", default="fisher")
+    add_outdir_option( argparser_cmbreps ) 
+    argparser_cmbreps.add_argument( "-o", "--ofile", dest = "ofile", type = str, required = True,
+                                    help = "Output BEDGraph filename for combined scores." )
+    return
+
 def add_randsample_parser( subparsers ):
     argparser_randsample = subparsers.add_parser( "randsample",
                                                   help = "Randomly sample number/percentage of total reads." )

@@ -1,4 +1,4 @@
-# Time-stamp: <2014-06-06 10:24:14 Tao Liu>
+# Time-stamp: <2014-07-29 23:55:08 Tao Liu>
 
 """Module for all MACS Parser classes for input.
 
@@ -158,7 +158,7 @@ cdef class GenericParser:
         else:
             self.fhd = io.open( filename, mode='rb' ) # binary mode! I don't expect unicode here!
 
-    def tsize( self ):
+    cpdef int tsize( self ):
         """General function to detect tag size.
 
         * Although it can be used by most parsers, it must be
@@ -189,13 +189,13 @@ cdef class GenericParser:
         self.tag_size = s/n
         return self.tag_size
 
-    def __tlen_parse_line ( self, str thisline ):
+    cdef __tlen_parse_line ( self, str thisline ):
         """Abstract function to detect tag length.
         
         """
         raise NotImplemented
     
-    def build_fwtrack ( self ):
+    cpdef build_fwtrack ( self ):
         """Generic function to build FWTrackIII object. Create a new
         FWTrackIII object. If you want to append new records to an
         existing FWTrackIII object, try append_fwtrack function.
@@ -228,7 +228,7 @@ cdef class GenericParser:
         self.close()
         return fwtrack
 
-    def append_fwtrack ( self, fwtrack ):
+    cpdef append_fwtrack ( self, fwtrack ):
         """Add more records to an existing FWTrackIII object. 
 
         """
@@ -252,9 +252,7 @@ cdef class GenericParser:
         self.close()
         return fwtrack
         
-
-
-    def __fw_parse_line ( self, str thisline ):
+    cdef __fw_parse_line ( self, str thisline ):
         """Abstract function to parse chromosome, 5' end position and
         strand.
         
@@ -264,7 +262,7 @@ cdef class GenericParser:
         cdef int strand = -1
         return ( chromosome, fpos, strand )
 
-    def sniff ( self ):
+    cpdef sniff ( self ):
         """Detect whether this parser is the correct parser for input
         file.
 
@@ -288,7 +286,7 @@ cdef class GenericParser:
                 self.fhd.seek( 0 )
                 return True
             
-    def close ( self ):
+    cpdef close ( self ):
         """Run this when this Parser will be never used.
 
         Close file I/O stream.
@@ -299,7 +297,7 @@ cdef class BEDParser( GenericParser ):
     """File Parser Class for tabular File.
 
     """
-    def __tlen_parse_line ( self, str thisline ):
+    cdef __tlen_parse_line ( self, str thisline ):
         """Parse 5' and 3' position, then calculate tag length.
 
         """
@@ -313,7 +311,7 @@ cdef class BEDParser( GenericParser ):
         thisfields = thisline.split( '\t' )
         return atoi( thisfields[ 2 ] )-atoi( thisfields[ 1 ] )
     
-    def __fw_parse_line ( self, str thisline ):
+    cdef __fw_parse_line ( self, str thisline ):
         #cdef list thisfields
         cdef char * chromname
         
@@ -349,12 +347,11 @@ cdef class BEDParser( GenericParser ):
                      atoi( thisfields[ 1 ] ),
                      0 )
             
-
 cdef class ELANDResultParser( GenericParser ):
     """File Parser Class for tabular File.
 
     """
-    def __tlen_parse_line ( self, str thisline ):
+    cdef __tlen_parse_line ( self, str thisline ):
         """Parse tag sequence, then tag length.
 
         """
@@ -366,7 +363,7 @@ cdef class ELANDResultParser( GenericParser ):
         else:
             return len( thisfields[ 1 ] )
 
-    def __fw_parse_line ( self, str thisline ):
+    cdef __fw_parse_line ( self, str thisline ):
         cdef:
             str chromname, strand
             int thistaglength
@@ -702,30 +699,6 @@ cdef class BAMParser( GenericParser ):
                 return False
 
     cpdef int tsize ( self ):
-        if HAS_PYSAM:
-            return self.__tsize_w_pysam()
-        else:
-            return self.__tsize_wo_pysam()
-
-    cdef int __tsize_w_pysam( self ):
-        cdef:
-            int n = 0                   # successful read of tag size
-            double s = 0                # sum of tag sizes
-
-        if self.tag_size != -1:
-            # if we have already calculated tag size (!= -1),  return it.
-            return self.tag_size
-
-        for n in range( 1, 11, 1 ):
-            try:
-                s += self.fhd.next().qlen
-            except:
-                break
-        self.tag_size = int( s/n )
-        self.fhd.reset()
-        return self.tag_size
-
-    cdef int __tsize_wo_pysam( self ):
         """Get tag size from BAM file -- read l_seq field.
 
         Refer to: http://samtools.sourceforge.net/SAM1.pdf
