@@ -1,4 +1,4 @@
-# Time-stamp: <2014-06-17 00:57:31 Tao Liu>
+# Time-stamp: <2014-07-30 02:26:34 Tao Liu>
 
 """Module for Calculate Scores.
 
@@ -17,6 +17,7 @@ with the distribution).
 # ------------------------------------
 # python modules
 # ------------------------------------
+
 import numpy as np
 cimport numpy as np
 
@@ -27,19 +28,19 @@ from copy import copy, deepcopy
 from operator import itemgetter
 
 from cpython cimport bool
-#from scipy.signal import fftconvolve
 from MACS2.cSignal import maxima, enforce_valleys, enforce_peakyness
-#np_convolve = np.convolve
 
 # Experimental
 #from scipy.stats import chi2
 
 from libc.stdint cimport uint32_t, uint64_t, int32_t, int64_t
 
+from libc.math cimport exp,log,log10, M_LN10, log1p, erf, sqrt
+
 #from cython.parallel import parallel, prange
 cimport cython
 
-from libc.math cimport log10,log, floor, ceil
+from libc.math cimport log10,log, floor, ceil, erf, sqrt, log1p, exp
 
 from MACS2.Constants import BYTE4, FBYTE4, array
 from MACS2.cProb cimport poisson_cdf
@@ -47,7 +48,8 @@ from MACS2.IO.cPeakIO import PeakIO, BroadPeakIO, parse_peakname
 from MACS2.IO.cFixWidthTrack import FWTrackIII
 from MACS2.IO.cPairedEndTrack import PETrackI
 
-from MACS2.Poisson import P_Score_Upper_Tail, LogLR_Asym # pure C code for calculating p-value scores/logLR of Poisson
+from MACS2.Statistics import P_Score_Upper_Tail, LogLR_Asym # pure C code for calculating p-value scores/logLR of Poisson
+
 pscore_table = P_Score_Upper_Tail() # this table will cache pscore being calculated.
 get_pscore = pscore_table.get_pscore
 
@@ -76,6 +78,25 @@ def do_nothing(*args, **kwargs):
     pass
 
 LOG10_E = 0.43429448190325176
+
+cdef inline float chi2_k1_cdf ( float x ):
+    return erf( sqrt(x/2) )
+
+cdef inline float log10_chi2_k1_cdf ( float x ):
+  return log10( erf( sqrt(x/2) ) )
+
+cdef inline float chi2_k2_cdf ( float x ):
+  return 1 - exp( -x/2 )
+
+cdef inline float log10_chi2_k2_cdf ( float x ):
+  return log1p( - exp( -x/2 ) ) * LOG10_E
+
+cdef inline float chi2_k4_cdf ( float x ):
+  return 1 - exp( -x/2 ) * ( 1 + x/2 )
+
+cdef inline float log10_chi2_k4_CDF ( float x ):
+  return log1p( - exp( -x/2 ) * ( 1 + x/2 ) ) * LOG10_E
+
 
 cdef inline np.ndarray apply_multiple_cutoffs ( list multiple_score_arrays, list multiple_cutoffs ):
     cdef:
@@ -355,6 +376,8 @@ cdef class CallerFromAlignments:
 
         #t = ttime()
 
+        #t0 = ttime()
+
         if self.PE_mode:
             treat_pv = self.treat.pileup_a_chromosome ( chrom, [self.treat_scaling_factor,], baseline_value = 0.0 )
         else:
@@ -362,10 +385,12 @@ cdef class CallerFromAlignments:
                                                        directional = True, 
                                                        end_shift = self.end_shift )
 
+        #print "pileup treatment took:",ttime()-t0
+        #t0 = ttime()
+        
         if not self.no_lambda_flag:
             if self.PE_mode:
                 ctrl_pv = self.ctrl.pileup_a_chromosome_c( chrom, self.ctrl_d_s, self.ctrl_scaling_factor_s, baseline_value = self.lambda_bg )
-                #ctrl_pv = self.ctrl.pileup_a_chromosome( chrom, self.ctrl_scaling_factor_s, baseline_value = self.lambda_bg )
             else:
                 ctrl_pv = self.ctrl.pileup_a_chromosome( chrom, self.ctrl_d_s, self.ctrl_scaling_factor_s,
                                                          baseline_value = self.lambda_bg,
@@ -373,7 +398,11 @@ cdef class CallerFromAlignments:
         else:
             ctrl_pv = [treat_pv[0][-1:], pyarray(FBYTE4,[self.lambda_bg,])] # set a global lambda
 
+
+
         self.chr_pos_treat_ctrl = self.__chrom_pair_treat_ctrl( treat_pv, ctrl_pv)
+
+        #print "pileup control took:",ttime()-t0
 
         #self.test_time += ttime() - t
 
@@ -599,7 +628,9 @@ cdef class CallerFromAlignments:
 
         logging.info("#3 Call peaks for each chromosome...")
         for chrom in self.chromosomes:
+            #t0 = ttime()
             self.__chrom_call_peak_using_certain_criteria ( peaks, chrom, scoring_function_symbols, score_cutoff_s, min_length, max_gap, call_summits, self.save_bedGraph )
+            #print chrom, ":", ttime() - t0
 
         # close bedGraph file
         if self.save_bedGraph:
@@ -622,6 +653,7 @@ cdef class CallerFromAlignments:
         save_bedGraph     : whether or not to save pileup and control into a bedGraph file
         """
         cdef:
+
             int i
             str s
             np.ndarray above_cutoff, above_cutoff_endpos, above_cutoff_startpos
@@ -634,16 +666,22 @@ cdef class CallerFromAlignments:
         
         peak_content = []           # to store points above cutoff
 
+        #tt = 0
+        #t0 = ttime()        
 
         # first, build pileup, self.chr_pos_treat_ctrl
         self.__pileup_treat_ctrl_a_chromosome( chrom )
         [pos_array, treat_array, ctrl_array] = self.chr_pos_treat_ctrl
+
+        #tt +=  ttime() - t0
+        #print "in function, calling peaks used ", tt
 
         # while save_bedGraph is true, invoke __write_bedGraph_for_a_chromosome
         if save_bedGraph:
             self.__write_bedGraph_for_a_chromosome ( chrom )
 
         # keep all types of scores needed
+
         score_array_s = []
         for i in range(len(scoring_function_s)):
             s = scoring_function_s[i]
@@ -678,16 +716,13 @@ cdef class CallerFromAlignments:
                 peak_content.append( (above_cutoff_startpos[i], above_cutoff_endpos[i], treat_array[above_cutoff_index_array[i]], ctrl_array[above_cutoff_index_array[i]], get_from_multiple_scores( score_array_s, above_cutoff_index_array[i]) ) )
             else:
                 # close
+
                 if call_summits:
-                    #for x in peak_content:
-                    #    if x[2] >= 10:
-                    #        print peak_content
-                    #        break
                     self.__close_peak_with_subpeaks (peak_content, peaks, min_length, chrom, smoothlen = min_length, score_cutoff_s = score_cutoff_s ) # smooth length is min_length, i.e. fragment size 'd'
                 else:
                     self.__close_peak_wo_subpeaks   (peak_content, peaks, min_length, chrom, smoothlen = min_length, score_cutoff_s = score_cutoff_s ) # smooth length is min_length, i.e. fragment size 'd'
                 peak_content = [ (above_cutoff_startpos[i], above_cutoff_endpos[i], treat_array[above_cutoff_index_array[i]], ctrl_array[above_cutoff_index_array[i]], get_from_multiple_scores( score_array_s, above_cutoff_index_array[i]) ), ]
-            
+
         # save the last peak
         if not peak_content:
             return peaks

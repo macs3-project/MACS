@@ -1,4 +1,4 @@
-# Time-stamp: <2014-06-17 02:03:38 Tao Liu>
+# Time-stamp: <2014-07-12 15:48:23 Tao Liu>
 
 """Module Description: For pileup functions.
 
@@ -17,7 +17,6 @@ the distribution).
 # ------------------------------------
 # python modules
 # ------------------------------------
-import sys
 from array import array
 
 from MACS2.IO.cFixWidthTrack import FWTrackIII
