@@ -1,4 +1,4 @@
-# Time-stamp: <2014-06-17 01:39:56 Tao Liu>
+# Time-stamp: <2014-08-11 17:36:40 Tao Liu>
 
 """Module Description
 
@@ -260,6 +260,7 @@ class PeakDetect:
                                                     min_length=self.d,
                                                     max_gap=self.opt.tsize,
                                                     call_summits=call_summits)
+        scorecalculator.destroy()
         return peaks
 
     def __call_peaks_wo_control (self):
@@ -358,6 +359,7 @@ class PeakDetect:
                                                     min_length=self.d,
                                                     max_gap=self.opt.tsize,
                                                     call_summits=call_summits)
+        scorecalculator.destroy()
         return peaks
 
     # def __diag_w_control (self):

@@ -1,4 +1,4 @@
-# Time-stamp: <2013-10-22 23:40:51 Tao Liu>
+# Time-stamp: <2014-08-05 16:56:44 Tao Liu>
 
 """Module for filter duplicate tags from paired-end data
 
@@ -475,8 +475,8 @@ cdef class PETrackI:
         return
 
     def print_to_bed (self, fhd=None):
-        """Output FWTrackIII to BED format files. If fhd is given,
-        write to a file, otherwise, output to standard output.
+        """Output to BED format files. If fhd is given, write to a
+        file, otherwise, output to standard output.
         
         """
         cdef int32_t i, i_chrom, s, e
@@ -485,7 +485,7 @@ cdef class PETrackI:
         if not fhd:
             fhd = sys.stdout
         assert isinstance(fhd, file)
-        assert self.fw > 0, "FWTrackIII object .fw should be set larger than 0!"
+        assert self.fw > 0, "width should be set larger than 0!"
 
         chrnames = self.get_chr_names()
         

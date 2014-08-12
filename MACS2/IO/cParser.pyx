@@ -1,4 +1,4 @@
-# Time-stamp: <2014-07-29 23:55:08 Tao Liu>
+# Time-stamp: <2014-08-05 16:54:20 Tao Liu>
 
 """Module for all MACS Parser classes for input.
 
@@ -23,7 +23,7 @@ from struct import unpack
 import gzip
 import io
 from MACS2.Constants import *
-from MACS2.IO.cFixWidthTrack import FWTrackIII
+from MACS2.IO.cFixWidthTrack import FWTrack
 from MACS2.IO.cPairedEndTrack import PETrackI
 
 cdef public bint HAS_PYSAM
@@ -89,6 +89,7 @@ cpdef guess_parser ( fhd, long buffer_size = 100000 ):
             p = BAMParser( fhd, buffer_size = buffer_size )
         elif f == "BOWTIE":
             p = BowtieParser( fhd, buffer_size = buffer_size )
+        logging.debug( "Testing format %s" % f )
         s = p.sniff()
         if s:
             logging.info( "Detected format is: %s" % ( f ) )
@@ -196,9 +197,9 @@ cdef class GenericParser:
         raise NotImplemented
     
     cpdef build_fwtrack ( self ):
-        """Generic function to build FWTrackIII object. Create a new
-        FWTrackIII object. If you want to append new records to an
-        existing FWTrackIII object, try append_fwtrack function.
+        """Generic function to build FWTrack object. Create a new
+        FWTrack object. If you want to append new records to an
+        existing FWTrack object, try append_fwtrack function.
 
         * BAMParser for binary BAM format should have a different one.
         """
@@ -206,7 +207,7 @@ cdef class GenericParser:
             long i, m, fpos, strand
             str chromosome
         
-        fwtrack = FWTrackIII( buffer_size = self.buffer_size )
+        fwtrack = FWTrack( buffer_size = self.buffer_size )
         i = 0
         m = 0
         for thisline in self.fhd:
@@ -229,7 +230,7 @@ cdef class GenericParser:
         return fwtrack
 
     cpdef append_fwtrack ( self, fwtrack ):
-        """Add more records to an existing FWTrackIII object. 
+        """Add more records to an existing FWTrack object. 
 
         """
         i = 0
@@ -416,7 +417,7 @@ cdef class ELANDMultiParser( GenericParser ):
     starting at position 160322 with one error, one in the forward direction starting at 
     position 170128 with two errors. There is also a single-error match to E_coli.fa.
     """
-    def __tlen_parse_line ( self, str thisline ):
+    cdef __tlen_parse_line ( self, str thisline ):
         """Parse tag sequence, then tag length.
 
         """
@@ -428,7 +429,7 @@ cdef class ELANDMultiParser( GenericParser ):
         else:
             return len( thisfields[ 1 ] )
 
-    def __fw_parse_line ( self, str thisline ):
+    cdef __fw_parse_line ( self, str thisline ):
         cdef:
             list thisfields
             str thistagname, pos, strand
@@ -476,7 +477,7 @@ cdef class ELANDExportParser( GenericParser ):
     """File Parser Class for ELAND Export File.
 
     """
-    def __tlen_parse_line ( self, str thisline ):
+    cdef __tlen_parse_line ( self, str thisline ):
         """Parse tag sequence, then tag length.
 
         """
@@ -489,7 +490,7 @@ cdef class ELANDExportParser( GenericParser ):
         else:
             return 0
         
-    def __fw_parse_line ( self, str thisline ):
+    cdef __fw_parse_line ( self, str thisline ):
         cdef:
             list thisfields
             str thisname, strand
@@ -547,7 +548,7 @@ cdef class SAMParser( GenericParser ):
     1024	PCR or optical duplicate
     """
 
-    def __tlen_parse_line ( self, str thisline ):
+    cdef __tlen_parse_line ( self, str thisline ):
         """Parse tag sequence, then tag length.
 
         """
@@ -575,7 +576,7 @@ cdef class SAMParser( GenericParser ):
                 return 0
         return len( thisfields[ 9 ] )
 
-    def __fw_parse_line ( self, thisline ):
+    cdef __fw_parse_line ( self, str thisline ):
         cdef:
             list thisfields
             str thistagname, thisref
@@ -672,7 +673,7 @@ cdef class BAMParser( GenericParser ):
             else:
                 self.fhd = io.open( filename, mode='rb' ) # binary mode! I don't expect unicode here!
 
-    def sniff( self ):
+    cpdef sniff( self ):
         """Check the first 3 bytes of BAM file. If it's 'BAM', check
         is success.
 
@@ -813,7 +814,7 @@ cdef class BAMParser( GenericParser ):
             list references
             dict rlengths
         
-        fwtrack = FWTrackIII( buffer_size = self.buffer_size )
+        fwtrack = FWTrack( buffer_size = self.buffer_size )
         self.fhd.reset()
         references, rlengths = self.get_references()
         while True:
@@ -844,7 +845,7 @@ cdef class BAMParser( GenericParser ):
         return fwtrack
 
     cdef __build_fwtrack_wo_pysam ( self ):
-        """Build FWTrackIII from all lines, return a FWTrackIII object.
+        """Build FWTrack from all lines, return a FWTrack object.
 
         Note only the unique match for a tag is kept.
         """
@@ -855,7 +856,7 @@ cdef class BAMParser( GenericParser ):
             list references
             dict rlengths
         
-        fwtrack = FWTrackIII( buffer_size = self.buffer_size )
+        fwtrack = FWTrack( buffer_size = self.buffer_size )
         references, rlengths = self.get_references()
         fseek = self.fhd.seek
         fread = self.fhd.read
@@ -866,7 +867,7 @@ cdef class BAMParser( GenericParser ):
                 entrylength = unpack( '<i', fread( 4 ) )[ 0 ]
             except struct.error:
                 break
-            ( chrid, fpos, strand ) = self.__fw_binary_parse( fread( entrylength ) )
+            ( chrid, fpos, strand ) = self.__fw_binary_parse_wo_pysam( fread( entrylength ) )
             i+=1
             if i == 1000000:
                 m += 1
@@ -924,7 +925,7 @@ cdef class BAMParser( GenericParser ):
         return fwtrack
 
     cdef __append_fwtrack_wo_pysam ( self, fwtrack ):
-        """Build FWTrackIII from all lines, return a FWTrackIII object.
+        """Build FWTrack from all lines, return a FWTrack object.
 
         Note only the unique match for a tag is kept.
         """
@@ -958,7 +959,7 @@ cdef class BAMParser( GenericParser ):
         fwtrack.set_rlengths( rlengths )
         return fwtrack
     
-    cpdef tuple __fw_binary_parse (self, data ):
+    cdef tuple __fw_binary_parse_wo_pysam (self, data ):
         cdef:
             int thisref, thisstart, thisstrand
             short cigar, bwflag
@@ -1108,7 +1109,7 @@ cdef class BAMPEParser(BAMParser):
 
 
     cdef __build_petrack_wo_pysam ( self ):
-        """Build PETrackI from all lines, return a FWTrackIII object.
+        """Build PETrackI from all lines, return a FWTrack object.
         """
         cdef:
             int i = 0
@@ -1264,7 +1265,7 @@ cdef class BowtieParser( GenericParser ):
     program.
 
     """
-    def __tlen_parse_line ( self, str thisline ):
+    cdef __tlen_parse_line ( self, str thisline ):
         """Parse tag sequence, then tag length.
 
         """
@@ -1276,7 +1277,7 @@ cdef class BowtieParser( GenericParser ):
         thisfields = thisline.split( '\t' ) # I hope it will never bring me more trouble
         return len( thisfields[ 4 ] )
 
-    def __fw_parse_line (self, str thisline ):
+    cdef __fw_parse_line (self, str thisline ):
         """
         The following definition comes from bowtie website:
         
@@ -1412,16 +1413,16 @@ cdef class PySAMParser:
         self.tag_size = s/n
         return self.tag_size
 
-    def __tlen_parse_line ( self, str thisline ):
+    cdef __tlen_parse_line ( self, str thisline ):
         """Abstract function to detect tag length.
         
         """
         raise NotImplemented
     
     def build_fwtrack ( self ):
-        """Generic function to build FWTrackIII object. Create a new
-        FWTrackIII object. If you want to append new records to an
-        existing FWTrackIII object, try append_fwtrack function.
+        """Generic function to build FWTrack object. Create a new
+        FWTrack object. If you want to append new records to an
+        existing FWTrack object, try append_fwtrack function.
 
         * BAMParser for binary BAM format should have a different one.
         """
@@ -1429,7 +1430,7 @@ cdef class PySAMParser:
             long i, m, fpos, strand
             str chromosome
         
-        fwtrack = FWTrackIII( buffer_size = self.buffer_size )
+        fwtrack = FWTrack( buffer_size = self.buffer_size )
         i = 0
         m = 0
         for thisline in self.fhd:
@@ -1452,7 +1453,7 @@ cdef class PySAMParser:
         return fwtrack
 
     def append_fwtrack ( self, fwtrack ):
-        """Add more records to an existing FWTrackIII object. 
+        """Add more records to an existing FWTrack object. 
 
         """
         i = 0
@@ -1477,7 +1478,7 @@ cdef class PySAMParser:
         
 
 
-    def __fw_parse_line ( self, str thisline ):
+    cdef __fw_parse_line ( self, str thisline ):
         """Abstract function to parse chromosome, 5' end position and
         strand.
         
@@ -1487,7 +1488,7 @@ cdef class PySAMParser:
         cdef int strand = -1
         return ( chromosome, fpos, strand )
 
-    def sniff ( self ):
+    cpdef sniff ( self ):
         """Detect whether this parser is the correct parser for input
         file.
 

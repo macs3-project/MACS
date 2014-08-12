@@ -1,4 +1,4 @@
-# Time-stamp: <2014-06-17 01:35:40 Tao Liu>
+# Time-stamp: <2014-08-05 16:53:19 Tao Liu>
 
 """Module for FWTrack classes.
 
@@ -54,8 +54,8 @@ cdef INT_MAX = <int>((<unsigned int>-1)>>1)
 # Classes
 # ------------------------------------
 
-cdef class FWTrackIII:
-    """Fixed Width Locations Track class III along the whole genome
+cdef class FWTrack:
+    """Fixed Width Locations Track class  along the whole genome
     (commonly with the same annotation type), which are stored in a
     dict.
 
@@ -145,7 +145,7 @@ cdef class FWTrackIII:
             self.__locations[chromosome][strand][self.__pointer[chromosome][strand]] = fiveendpos
             self.__pointer[chromosome][strand] += 1
 
-    cpdef __expand__ ( self, np.ndarray arr ):
+    cdef __expand__ ( self, np.ndarray arr ):
         arr.resize( arr.size + self.buffer_size, refcheck = False )
         return
 
@@ -673,7 +673,7 @@ cdef class FWTrackIII:
         return
 
     cpdef print_to_bed (self, fhd=None):
-        """Output FWTrackIII to BED format files. If fhd is given,
+        """Output FWTrack to BED format files. If fhd is given,
         write to a file, otherwise, output to standard output.
         
         """
@@ -684,7 +684,7 @@ cdef class FWTrackIII:
         if not fhd:
             fhd = sys.stdout
         assert isinstance(fhd, file)
-        assert self.fw > 0, "FWTrackIII object .fw should be set larger than 0!"
+        assert self.fw > 0, "FWTrack object .fw should be set larger than 0!"
 
         chrnames = self.get_chr_names()
         
@@ -716,7 +716,7 @@ cdef class FWTrackIII:
         if not self.__sorted: self.sort()
         
         chrnames = self.get_chr_names()
-        assert chromosome in chrnames, "chromosome %s can't be found in the FWTrackIII object." % chromosome
+        assert chromosome in chrnames, "chromosome %s can't be found in the FWTrack object." % chromosome
         
         (plus, minus) = self.__locations[chromosome]
 
@@ -777,7 +777,7 @@ cdef class FWTrackIII:
         chrnames = self.get_chr_names()
 
         for chrom in pchrnames:
-            assert chrom in chrnames, "chromosome %s can't be found in the FWTrackIII object." % chrom
+            assert chrom in chrnames, "chromosome %s can't be found in the FWTrack object." % chrom
             (plus, minus) = self.__locations[chrom]
             cpeaks = peaks.get_data_from_chrom(chrom)
             prev_i = 0
@@ -862,7 +862,7 @@ cdef class FWTrackIII:
         ret_peaks = PeakIO()
         
         for chrom in pchrnames:
-            assert chrom in chrnames, "chromosome %s can't be found in the FWTrackIII object. %s" % (chrom, str(chrnames))
+            assert chrom in chrnames, "chromosome %s can't be found in the FWTrack object. %s" % (chrom, str(chrnames))
             (plus, minus) = self.__locations[chrom]
             cpeaks = peaks.get_data_from_chrom(chrom)
             #ret_peaks.peaks[chrom] = []

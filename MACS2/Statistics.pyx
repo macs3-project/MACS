@@ -53,7 +53,6 @@ cdef class P_Score_Upper_Tail:
             self.pscore_table.keys[ k ] = key_value
             self.pscore_table.vals[ k ] = val
             return val
-        
 
 cdef class LogLR_Asym:
     """Unit to calculate asymmetric log likelihood, and cache

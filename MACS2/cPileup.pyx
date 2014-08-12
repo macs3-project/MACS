@@ -1,4 +1,4 @@
-# Time-stamp: <2014-07-12 15:48:23 Tao Liu>
+# Time-stamp: <2014-08-05 16:55:22 Tao Liu>
 
 """Module Description: For pileup functions.
 
@@ -19,7 +19,7 @@ the distribution).
 # ------------------------------------
 from array import array
 
-from MACS2.IO.cFixWidthTrack import FWTrackIII
+from MACS2.IO.cFixWidthTrack import FWTrack
 from MACS2.IO.cPairedEndTrack import PETrackI
 from MACS2.IO.cBedGraph import bedGraphTrackI
 from MACS2.Constants import *
@@ -46,7 +46,7 @@ cpdef unified_pileup_bdg(track,
                          float baseline_value = 0.0,
                          bint directional = True, 
                          bint halfextension = True):
-    """This function will call corresponding function for FWTrackIII
+    """This function will call corresponding function for FWTrack
     or PETrackI to pileup fragments.
 
     It will call pileup_w_multiple_d* functions for control input, then
@@ -58,7 +58,7 @@ cpdef unified_pileup_bdg(track,
     chrs = track.get_chr_names()
     if type(ds) is list:
         # multiple pileup (e.g. control with 1k, 10k and d extension)
-        if isinstance(track, FWTrackIII):
+        if isinstance(track, FWTrack):
             return pileup_w_multiple_d_bdg(track, ds, scale_factors,
                                            baseline_value,
                                            directional, halfextension)
@@ -66,10 +66,10 @@ cpdef unified_pileup_bdg(track,
             return pileup_w_multiple_d_bdg_pe(track, ds, scale_factors,
                                               baseline_value)
         else:
-            raise ValueError("track must be of type FWTrackIII or PETrackI")
+            raise ValueError("track must be of type FWTrack or PETrackI")
     else:
         # single extension (e.g. treatment data)
-        if isinstance(track, FWTrackIII):
+        if isinstance(track, FWTrack):
             return pileup_bdg_se(track, ds, scale_factors,
                                  baseline_value,
                                  directional, halfextension)
@@ -80,7 +80,7 @@ cpdef unified_pileup_bdg(track,
                 return pileup_bdg_pe_w_ext(track, ds, scale_factors,
                                            baseline_value)
         else:
-            raise ValueError("track must be of type FWTrackIII or PETrackI")
+            raise ValueError("track must be of type FWTrack or PETrackI")
 
 ## Fixed-width functions for single end library##
 cdef pileup_bdg_se(object trackI, int d,
@@ -94,7 +94,7 @@ cdef pileup_bdg_se(object trackI, int d,
 
     A tag is a single genomic location.
 
-    trackI  : A FWTrackIII object with raw plus and minus 5' end positions
+    trackI  : A FWTrack object with raw plus and minus 5' end positions
     d       : tag will be extended to this value to 3' direction, unless directional is False.
     baseline_value : a value to be filled for missing values.
     directional: if False, the strand or direction of tag will be ignored, so that extenstion will be both sides with d/2.
@@ -156,7 +156,7 @@ cdef pileup_w_multiple_d_bdg(object trackI, list d_s, list scale_factor_s = [],
 
     A tag is a single genomic location.
 
-    trackI  : A FWTrackIII object with raw plus and minus 5' end positions
+    trackI  : A FWTrack object with raw plus and minus 5' end positions
     d       : tag will be extended to this value to 3' direction, unless directional is False.
     baseline_value : a value to be filled for missing values.
     directional: if False, the strand or direction of tag will be ignored, so that extenstion will be both sides with d/2.
