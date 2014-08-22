@@ -1,4 +1,4 @@
-# Time-stamp: <2013-12-16 11:53:58 Tao Liu>
+# Time-stamp: <2014-08-22 15:41:27 Tao Liu>
 
 """Module for PeakIO IO classes.
 
@@ -823,6 +823,46 @@ cdef class BroadPeakIO:
         self.peaks[chromosome].append( BroadPeakContent( start, end, score, thickStart, thickEnd, 
                                                          blockNum, blockSizes, blockStarts, 
                                                          pileup, pscore, fold_change, qscore, name ) )
+
+    def filter_pscore (self, double pscore_cut ):
+        cdef str chrom
+        
+        peaks = self.peaks
+        new_peaks = {}
+        chrs = sorted(peaks.keys())
+        
+        for chrom in chrs:
+            new_peaks[chrom]=[p for p in peaks[chrom] if p['pscore'] >= pscore_cut]
+        self.peaks = new_peaks
+
+    def filter_qscore (self, double qscore_cut ):
+        cdef str chrom
+
+        peaks = self.peaks
+        new_peaks = {}
+        chrs = sorted(peaks.keys())
+        
+        for chrom in chrs:
+            new_peaks[chrom]=[p for p in peaks[chrom] if p['qscore'] >= qscore_cut]
+        self.peaks = new_peaks
+
+    def filter_fc (self, fc_low, fc_up=None ):
+        """Filter peaks in a given fc range.
+
+        If fc_low and fc_up is assigned, the peaks with fc in [fc_low,fc_up)
+        
+        """
+        peaks = self.peaks
+        new_peaks = {}
+        chrs = peaks.keys()
+        chrs.sort()
+        if fc_up:
+            for chrom in chrs:
+                new_peaks[chrom]=[p for p in peaks[chrom] if p['fc'] >= fc_low and p['fc']<fc_up]
+        else:
+            for chrom in chrs:
+                new_peaks[chrom]=[p for p in peaks[chrom] if p['fc'] >= fc_low]
+        self.peaks = new_peaks
 
     def total (self):
         cdef str chrom
