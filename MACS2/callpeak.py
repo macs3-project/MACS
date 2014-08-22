@@ -1,4 +1,4 @@
-# Time-stamp: <2014-06-16 13:15:59 Tao Liu>
+# Time-stamp: <2014-08-22 14:56:43 Tao Liu>
 
 """Description: MACS 2 main executable
 
@@ -259,6 +259,9 @@ def run( args ):
                             opt = options
                             )
     peakdetect.call_peaks()
+
+    # filter out low FE peaks
+    peakdetect.peaks.filter_fc( fc_low = options.fecutoff )
 
     #call refinepeak if needed.
     # if options.refine_peaks:

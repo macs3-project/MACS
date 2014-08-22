@@ -1,4 +1,4 @@
-# Time-stamp: <2014-08-21 16:28:47 Tao Liu>
+# Time-stamp: <2014-08-22 14:57:45 Tao Liu>
 
 """Module Description
 
@@ -200,6 +200,9 @@ def opt_validate ( options ):
         options.argtxt += "# Broad region calling is on\n"
     else:
         options.argtxt += "# Broad region calling is off\n"
+
+    if options.fecutoff != 1.0:
+        options.argtxt += "# Additional cutoff on fold-enrichment is: %.2f\n" % (options.fecutoff)
 
     if options.format == "BAMPE":
         # neutralize SHIFT

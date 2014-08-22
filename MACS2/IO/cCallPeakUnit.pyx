@@ -1,4 +1,4 @@
-# Time-stamp: <2014-08-21 17:18:38 Tao Liu>
+# Time-stamp: <2014-08-22 14:59:54 Tao Liu>
 
 """Module for Calculate Scores.
 
@@ -880,7 +880,7 @@ cdef class CallerFromAlignments:
             self.__write_bedGraph_for_a_chromosome ( chrom )
 
         # keep all types of scores needed
-        t0 = ttime()
+        #t0 = ttime()
         score_array_s = []
         for i in range(len(scoring_function_s)):
             s = scoring_function_s[i]
@@ -893,7 +893,7 @@ cdef class CallerFromAlignments:
             elif s == 's':
                 score_array_s.append( self.__cal_subtraction( treat_array, ctrl_array ) )
 
-        self.test_time += ttime() - t0
+        #self.test_time += ttime() - t0
 
         # get the regions with scores above cutoffs
         above_cutoff = np.nonzero( apply_multiple_cutoffs(score_array_s,score_cutoff_s) )[0] # this is not an optimized method. It would be better to store score array in a 2-D ndarray?
