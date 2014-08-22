@@ -1,4 +1,4 @@
-# Time-stamp: <2014-08-05 16:54:20 Tao Liu>
+# Time-stamp: <2014-08-22 16:59:13 Tao Liu>
 
 """Module for all MACS Parser classes for input.
 
@@ -946,7 +946,7 @@ cdef class BAMParser( GenericParser ):
                 entrylength = unpack( '<i', fread( 4 ) )[ 0 ]
             except struct.error:
                 break
-            ( chrid, fpos, strand ) = self.__fw_binary_parse( fread( entrylength ) )
+            ( chrid, fpos, strand ) = self.__fw_binary_parse_wo_pysam( fread( entrylength ) )
             i+=1
             if i == 1000000:
                 m += 1
