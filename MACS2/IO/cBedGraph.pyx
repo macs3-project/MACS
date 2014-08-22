@@ -1,4 +1,4 @@
-# Time-stamp: <2014-07-30 23:10:44 Tao Liu>
+# Time-stamp: <2014-08-21 17:48:02 Tao Liu>
 
 """Module for Feature IO classes.
 
@@ -144,6 +144,12 @@ cdef class bedGraphTrackI:
                 # otherwise, add a new region
                 c[0].append(endpos)
                 c[1].append(value)
+
+        if value > self.maxvalue:
+            self.maxvalue = value
+        if value < self.minvalue:
+            self.minvalue = value
+
 
     def destroy ( self ):
         """ destroy content, free memory.
@@ -1064,6 +1070,80 @@ cdef class bedGraphTrackI:
         #ret.merge_regions()
         return ret
 
+    cpdef str cutoff_analysis ( self, int max_gap, int min_length, int steps = 100 ):
+        cdef:
+            list chrs, tmplist, peak_content
+            str  chrom, ret
+            float cutoff
+            long total_l, total_p, i, n, ts, te, lastp, tl, peak_length
+            dict cutoff_npeaks, cutoff_lpeaks
+            float s, midvalue
+            
+        chrs = self.__data.keys()
+
+        midvalue = self.minvalue/2 + self.maxvalue/2
+        s = float(self.minvalue - midvalue)/steps
+        
+        tmplist = list( np.arange( midvalue, self.minvalue - s, s ) )
+
+        cutoff_npeaks = {}
+        cutoff_lpeaks = {}
+
+        for chrom in chrs:
+            ( pos_array, score_array ) = self.__data[ chrom ]
+            pos_array = np.array( self.__data[ chrom ][ 0 ] )
+            score_array = np.array( self.__data[ chrom ][ 1 ] )
+
+            for n in range( len( tmplist ) ):
+                cutoff = round( tmplist[ n ], 3 )
+                total_l = 0           # total length of peaks
+                total_p = 0           # total number of peaks
+                
+                # get the regions with scores above cutoffs
+                above_cutoff = np.nonzero( score_array > cutoff )[0]# this is not an optimized method. It would be better to store score array in a 2-D ndarray?
+                above_cutoff_endpos = pos_array[above_cutoff] # end positions of regions where score is above cutoff
+                above_cutoff_startpos = pos_array[above_cutoff-1] # start positions of regions where score is above cutoff
+
+                if above_cutoff_endpos.size == 0:
+                    continue
+
+                # first bit of region above cutoff
+                acs_next = iter(above_cutoff_startpos).next
+                ace_next = iter(above_cutoff_endpos).next
+
+                ts = acs_next()
+                te = ace_next()
+                peak_content = [( ts, te ), ]
+                lastp = te
+        
+                for i in range( 1, above_cutoff_startpos.size ):
+                    ts = acs_next()
+                    te = ace_next()
+                    tl = ts - lastp
+                    if tl <= max_gap:
+                        peak_content.append( ( ts, te ) )
+                    else:
+                        peak_length = peak_content[ -1 ][ 1 ] - peak_content[ 0 ][ 0 ]
+                        if peak_length >= min_length: # if the peak is too small, reject it
+                            total_l +=  peak_length
+                            total_p += 1
+                        peak_content = [ ( ts, te ), ]
+                    lastp = te
+
+                if peak_content:
+                    peak_length = peak_content[ -1 ][ 1 ] - peak_content[ 0 ][ 0 ]
+                    if peak_length >= min_length: # if the peak is too small, reject it
+                        total_l +=  peak_length
+                        total_p += 1
+                cutoff_lpeaks[ cutoff ] = cutoff_lpeaks.get( cutoff, 0 ) + total_l
+                cutoff_npeaks[ cutoff ] = cutoff_npeaks.get( cutoff, 0 ) + total_p
+            
+        # write pvalue and total length of predicted peaks
+        ret = "pscore\tnpeaks\tlpeaks\tavelpeak\n"
+        for cutoff in sorted(cutoff_lpeaks.keys(), reverse=True):
+            if cutoff_npeaks[ cutoff ] > 0:
+                ret += "%.2f\t%d\t%d\t%.2f\n" % ( cutoff, cutoff_npeaks[ cutoff ], cutoff_lpeaks[ cutoff ], cutoff_lpeaks[ cutoff ]/cutoff_npeaks[ cutoff ] )
+        return ret
 
     # def make_scoreTrack_for_macs2diff (self, bdgTrack2 ):
     #     """A modified overlie function for MACS v2 differential call.

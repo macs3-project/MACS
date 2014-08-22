@@ -1,4 +1,4 @@
-# Time-stamp: <2014-08-11 17:36:40 Tao Liu>
+# Time-stamp: <2014-08-21 17:12:48 Tao Liu>
 
 """Module Description
 
@@ -231,7 +231,8 @@ class PeakDetect:
                                                 bedGraph_filename_prefix = self.opt.name,
                                                 bedGraph_treat_filename = self.opt.bdg_treat,
                                                 bedGraph_control_filename = self.opt.bdg_control,
-                                                save_SPMR = self.opt.do_SPMR)
+                                                save_SPMR = self.opt.do_SPMR,
+                                                cutoff_analysis_filename = self.opt.cutoff_analysis_file )
 
         if self.opt.trackline: scorecalculator.enable_trackline()
 
@@ -249,7 +250,8 @@ class PeakDetect:
                 peaks = scorecalculator.call_peaks( ['p',], [self.log_pvalue,],
                                                     min_length=self.d,
                                                     max_gap=self.opt.tsize,
-                                                    call_summits=call_summits)
+                                                    call_summits=call_summits,
+                                                    auto_cutoff=self.opt.cutoff_analysis )
         elif self.log_qvalue:
             if self.opt.broad:
                 self.info("#3 Call broad peaks with given level1 -log10qvalue cutoff and level2: %f, %f..." % (self.log_qvalue,self.opt.log_broadcutoff) )
@@ -259,7 +261,8 @@ class PeakDetect:
                 peaks = scorecalculator.call_peaks( ['q',], [self.log_qvalue,],
                                                     min_length=self.d,
                                                     max_gap=self.opt.tsize,
-                                                    call_summits=call_summits)
+                                                    call_summits=call_summits,
+                                                    auto_cutoff=self.opt.cutoff_analysis )
         scorecalculator.destroy()
         return peaks
 
@@ -329,7 +332,8 @@ class PeakDetect:
                                                 bedGraph_filename_prefix = self.opt.name,
                                                 bedGraph_treat_filename = self.opt.bdg_treat,
                                                 bedGraph_control_filename = self.opt.bdg_control,
-                                                save_SPMR = self.opt.do_SPMR )
+                                                save_SPMR = self.opt.do_SPMR,
+                                                cutoff_analysis_filename = self.opt.cutoff_analysis_file )
 
         # calculate pvalue scores
         if self.opt.trackline: self.scoretrack.enable_trackline()
@@ -348,7 +352,8 @@ class PeakDetect:
                 peaks = scorecalculator.call_peaks( ['p',], [self.log_pvalue,],
                                                     min_length=self.d,
                                                     max_gap=self.opt.tsize,
-                                                    call_summits=call_summits)
+                                                    call_summits=call_summits,
+                                                    auto_cutoff=self.opt.cutoff_analysis )
         elif self.log_qvalue:
             if self.opt.broad:
                 self.info("#3 Call broad peaks with given level1 -log10qvalue cutoff and level2: %f, %f..." % (self.log_qvalue,self.opt.log_broadcutoff) )
@@ -358,7 +363,8 @@ class PeakDetect:
                 peaks = scorecalculator.call_peaks( ['q',], [self.log_qvalue,],
                                                     min_length=self.d,
                                                     max_gap=self.opt.tsize,
-                                                    call_summits=call_summits)
+                                                    call_summits=call_summits,
+                                                    auto_cutoff=self.opt.cutoff_analysis )
         scorecalculator.destroy()
         return peaks
 

@@ -1,7 +1,7 @@
 cdef extern from "cStatistics.h":
-    double log10_poisson_cdf ( unsigned int n, double lam, short lower )
-    double log10_poisson_cdf_P_large_lambda ( unsigned int k, double lbd )
-    double log10_poisson_cdf_Q_large_lambda ( unsigned int k, double lbd )
+    float log10_poisson_cdf ( unsigned int n, float lam, short lower )
+    float log10_poisson_cdf_P_large_lambda ( unsigned int k, float lbd )
+    float log10_poisson_cdf_Q_large_lambda ( unsigned int k, float lbd )
 
 from khash cimport *
 from libc.math cimport log10, log
@@ -23,7 +23,7 @@ cdef class P_Score_Upper_Tail:
     def __dealloc__( self ):
         kh_destroy_int64(self.pscore_table)
 
-    cpdef bint check_cache ( self, int x, double l ):
+    cpdef bint check_cache ( self, int x, float l ):
         """Check if the Poisson CDF(x|l) has been calculated and
         cached.
          
@@ -36,11 +36,11 @@ cdef class P_Score_Upper_Tail:
         k = kh_get_int64( self.pscore_table, key_value )
         return k != self.pscore_table.n_buckets
 
-    cpdef double get_pscore ( self, int x, double l ):
+    cpdef float get_pscore ( self, int x, float l ):
         cdef:
             khiter_t k                  # index got in the table; translated from hash key
             int ret = 0
-            double val
+            float val
             long key_value              # hash key
         key_value = hash( (x, l) )
         k = kh_get_int64(self.pscore_table, key_value) # translate hash key to index 
@@ -71,7 +71,7 @@ cdef class LogLR_Asym:
     def __dealloc__( self ):
         kh_destroy_int64(self.logLR_table)
 
-    cpdef bint check_cache ( self, double x, double y ):
+    cpdef bint check_cache ( self, float x, float y ):
         """Check if the logLR of enrich:x background:y; has been
         calculated and cached.
          
@@ -84,11 +84,11 @@ cdef class LogLR_Asym:
         k = kh_get_int64( self.logLR_table, key_value )
         return k != self.logLR_table.n_buckets
 
-    cpdef double get_logLR_asym ( self, double x, double y ):
+    cpdef float get_logLR_asym ( self, float x, float y ):
         cdef:
             khiter_t k                  # index got in the table; translated from hash key
             int ret = 0
-            double val
+            float val
             long key_value              # hash key
         key_value = hash( (x, y) )
         k = kh_get_int64(self.logLR_table, key_value) # translate hash key to index 
@@ -128,7 +128,7 @@ cdef class LogLR_Sym:
     def __dealloc__( self ):
         kh_destroy_int64(self.logLR_table)
 
-    cpdef bint check_cache ( self, double x, double y ):
+    cpdef bint check_cache ( self, float x, float y ):
         """Check if the logLR of enrich:x background:y; has been
         calculated and cached.
          
@@ -141,11 +141,11 @@ cdef class LogLR_Sym:
         k = kh_get_int64( self.logLR_table, key_value )
         return k != self.logLR_table.n_buckets
 
-    cpdef double get_logLR_sym ( self, double x, double y ):
+    cpdef float get_logLR_sym ( self, float x, float y ):
         cdef:
             khiter_t k                  # index got in the table; translated from hash key
             int ret = 0
-            double val
+            float val
             long key_value              # hash key
         key_value = hash( (x, y) )
         k = kh_get_int64(self.logLR_table, key_value) # translate hash key to index 
@@ -185,7 +185,7 @@ cdef class LogLR_Diff:
     def __dealloc__( self ):
         kh_destroy_int64(self.logLR_table)
 
-    cpdef bint check_cache ( self, double x, double y ):
+    cpdef bint check_cache ( self, float x, float y ):
         """Check if the logLR of enrich:x background:y; has been
         calculated and cached.
          
@@ -198,11 +198,11 @@ cdef class LogLR_Diff:
         k = kh_get_int64( self.logLR_table, key_value )
         return k != self.logLR_table.n_buckets
 
-    cpdef double get_logLR_diff ( self, double x, double y ):
+    cpdef float get_logLR_diff ( self, float x, float y ):
         cdef:
             khiter_t k                  # index got in the table; translated from hash key
             int ret = 0
-            double val
+            float val
             long key_value              # hash key
         key_value = hash( (x, y) )
         k = kh_get_int64(self.logLR_table, key_value) # translate hash key to index 

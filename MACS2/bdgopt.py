@@ -1,4 +1,4 @@
-# Time-stamp: <2014-07-30 23:06:58 Tao Liu>
+# Time-stamp: <2014-08-20 17:23:41 Tao Liu>
 
 """Description: Modify bedGraph file
 
@@ -60,6 +60,8 @@ def run( options ):
         btrack.apply_func( lambda x: x + options.extraparam)
     elif options.method.lower() == "p2q":
         btrack.p2q()
+    elif options.method.lower() == "analen":
+        btrack.analen()
         
     ofile = os.path.join( options.outdir, options.ofile )
     info("Write bedGraph of modified scores...")

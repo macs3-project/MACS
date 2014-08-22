@@ -1,4 +1,4 @@
-# Time-stamp: <2014-07-30 23:05:15 Tao Liu>
+# Time-stamp: <2014-08-21 16:28:47 Tao Liu>
 
 """Module Description
 
@@ -137,6 +137,10 @@ def opt_validate ( options ):
     options.summitbed = os.path.join( options.outdir, options.name+"_summits.bed" )
     options.bdg_treat = os.path.join( options.outdir, options.name+"_treat_pileup.bdg" )
     options.bdg_control= os.path.join( options.outdir, options.name+"_control_lambda.bdg" )
+    if options.cutoff_analysis:
+        options.cutoff_analysis_file = os.path.join( options.outdir, options.name+"_cutoff_analysis.txt" )
+    else:
+        options.cutoff_analysis_file = None
     #options.negxls  = os.path.join( options.name+"_negative_peaks.xls" )
     #options.diagxls = os.path.join( options.name+"_diag.xls" )
     options.modelR  = os.path.join( options.outdir, options.name+"_model.r" )

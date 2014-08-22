@@ -1,4 +1,4 @@
-# Time-stamp: <2014-08-12 16:45:23 Tao Liu>
+# Time-stamp: <2014-08-21 17:18:38 Tao Liu>
 
 """Module for Calculate Scores.
 
@@ -123,7 +123,7 @@ cdef inline list get_from_multiple_scores ( list multiple_score_arrays, int inde
     return ret
 
 
-cdef inline double get_logFE ( float x, float y ):
+cdef inline float get_logFE ( float x, float y ):
     """ return 100* log10 fold enrichment with +1 pseudocount.
     """
     return log10( x/y )
@@ -262,6 +262,12 @@ cdef class CallerFromAlignments:
         object pqtable                   # remember pvalue->qvalue convertion
         bool pvalue_all_done             # whether the pvalue of whole genome is all calculated. If yes, it's OK to calculate q-value.
 
+        dict pvalue_npeaks               # record for each pvalue cutoff, how many peaks can be called  
+        dict pvalue_length               # record for each pvalue cutoff, the total length of called peaks
+        float optimal_p_cutoff           # automatically decide the p-value cutoff ( can be translated into qvalue cutoff ) based 
+                                         # on p-value to total peak length analysis. 
+        str cutoff_analysis_filename     # file to save the pvalue-npeaks-totallength table
+
         double test_time
         dict pileup_data_files           # Record the names of temporary files for storing pileup values of each chromosome
 
@@ -274,10 +280,11 @@ cdef class CallerFromAlignments:
                   int end_shift = 0, 
                   float lambda_bg = 0, 
                   bool save_bedGraph = False,
-                  str  bedGraph_filename_prefix = "",
-                  str bedGraph_treat_filename = "",
-                  str bedGraph_control_filename = "",
-                  bool save_SPMR = False):
+                  str  bedGraph_filename_prefix = "PREFIX",
+                  str bedGraph_treat_filename = "TREAT.bdg",
+                  str bedGraph_control_filename = "CTRL.bdg",
+                  str cutoff_analysis_filename = "TMP.txt",
+                  bool save_SPMR = False ):
         """Initialize.
 
         A calculator is unique to each comparison of treat and
@@ -308,6 +315,7 @@ cdef class CallerFromAlignments:
         """
         cdef:
             set chr1, chr2
+            int i
 
         if isinstance(treat, FWTrack):
             self.PE_mode = False
@@ -348,6 +356,14 @@ cdef class CallerFromAlignments:
 
         self.test_time = 0
         self.pileup_data_files = {}
+        
+        self.pvalue_length = {}
+        self.pvalue_npeaks = {}
+        for i in np.arange( 0.3, 10, 0.3 ): # step for optimal cutoff is 0.3 in -log10pvalue, we try from pvalue 1E-10 (-10logp=10) to 0.5 (-10logp=0.3)
+            self.pvalue_length[ i ] = 0
+            self.pvalue_npeaks[ i ] = 0
+        self.optimal_p_cutoff = 0
+        self.cutoff_analysis_filename = cutoff_analysis_filename
 
     cpdef destroy ( self ):
         """Remove temparary files for pileup values of each chromosome.
@@ -381,7 +397,7 @@ cdef class CallerFromAlignments:
         cdef:
             list treat_pv, ctrl_pv
             long i
-            double t
+            float t
             object f
 
         assert chrom in self.chromosomes, "chromosome %s is not valid." % chrom
@@ -454,7 +470,7 @@ cdef class CallerFromAlignments:
 
     cdef list __chrom_pair_treat_ctrl ( self, treat_pv, ctrl_pv ):
         """*private* Pair treat and ctrl pileup for each region.
-
+        
         return [p, t, c] list
         """
         cdef:
@@ -541,12 +557,12 @@ cdef class CallerFromAlignments:
         """
         cdef:
             str chrom
-            np.ndarray pos_array, treat_array, ctrl_array
+            np.ndarray pos_array, treat_array, ctrl_array, score_array
             dict pvalue_stat = {}
             long n, pre_p, this_p, length, j, pre_l, l, i
-            double this_v, pre_v, v, q, pre_q, this_t, this_c
+            float this_v, pre_v, v, q, pre_q, this_t, this_c
             long N, k, this_l
-            double f
+            float f
             long nhcal = 0
             long npcal = 0
             list unique_values
@@ -557,7 +573,6 @@ cdef class CallerFromAlignments:
         t = 0
         for chrom in self.chromosomes:
             pre_p = 0
-
 
             self.__pileup_treat_ctrl_a_chromosome( chrom )
             [pos_array, treat_array, ctrl_array] = self.chr_pos_treat_ctrl
@@ -617,14 +632,148 @@ cdef class CallerFromAlignments:
             pre_v = v
             pre_q = q
             k+=l
-            
             nhcal += 1
+            
         logging.debug( "access pq hash for %d times" % nhcal )
         
         return self.pqtable
 
+
+    cdef object __pre_computes ( self, int max_gap = 50, int min_length = 200 ):
+        """After this function is called, self.pqtable and self.pvalue_length is built. All
+        chromosomes will be iterated. So it will take some time.
+        
+        """
+        cdef:
+            str chrom
+            np.ndarray pos_array, treat_array, ctrl_array, score_array
+            dict pvalue_stat = {}
+            long n, pre_p, this_p, length, j, pre_l, l, i
+            float this_v, pre_v, v, q, pre_q, this_t, this_c
+            long N, k, this_l
+            float f
+            long nhcal = 0
+            long npcal = 0
+            list unique_values
+            double t0, t1, t 
+
+            float cutoff
+            np.ndarray above_cutoff, above_cutoff_endpos, above_cutoff_startpos
+            list peak_content
+            long peak_length, total_l, total_p
+
+            list tmplist
+
+        logging.debug ( "Start to calculate pvalue stat..." )
+
+        tmplist = sorted( list(np.arange(0.3, 10.0, 0.3)), reverse = True )
+        
+        for chrom in self.chromosomes:
+            self.__pileup_treat_ctrl_a_chromosome( chrom )
+            [pos_array, treat_array, ctrl_array] = self.chr_pos_treat_ctrl
+
+            score_array = self.__cal_pscore( treat_array, ctrl_array )
+
+            for n in range( len( tmplist ) ):
+                cutoff = tmplist[ n ]
+                total_l = 0           # total length in potential peak
+                total_p = 0
+                
+                # get the regions with scores above cutoffs
+                above_cutoff = np.nonzero( score_array > cutoff )[0]# this is not an optimized method. It would be better to store score array in a 2-D ndarray?
+                above_cutoff_endpos = pos_array[above_cutoff] # end positions of regions where score is above cutoff
+                above_cutoff_startpos = pos_array[above_cutoff-1] # start positions of regions where score is above cutoff
+
+                if above_cutoff_endpos.size == 0:
+                    continue
+
+                # first bit of region above cutoff
+                acs_next = iter(above_cutoff_startpos).next
+                ace_next = iter(above_cutoff_endpos).next
+
+                ts = acs_next()
+                te = ace_next()
+                peak_content = [( ts, te ), ]
+                lastp = te
+        
+                for i in range( 1, above_cutoff_startpos.size ):
+                    ts = acs_next()
+                    te = ace_next()
+                    tl = ts - lastp
+                    if tl <= max_gap:
+                        peak_content.append( ( ts, te ) )
+                    else:
+                        peak_length = peak_content[ -1 ][ 1 ] - peak_content[ 0 ][ 0 ]
+                        if peak_length >= min_length: # if the peak is too small, reject it
+                            total_l +=  peak_length
+                            total_p += 1
+                        peak_content = [ ( ts, te ), ]
+                    lastp = te
+
+                if peak_content:
+                    peak_length = peak_content[ -1 ][ 1 ] - peak_content[ 0 ][ 0 ]
+                    if peak_length >= min_length: # if the peak is too small, reject it
+                        total_l +=  peak_length
+                        total_p += 1
+                self.pvalue_length[ cutoff ] = self.pvalue_length.get( cutoff, 0 ) + total_l
+                self.pvalue_npeaks[ cutoff ] = self.pvalue_npeaks.get( cutoff, 0 ) + total_p
+            
+            pn = iter(pos_array).next
+            sn = iter(score_array).next
+
+            pre_p = 0
+            for i in range(pos_array.shape[0]):
+                this_p = pn()
+                this_v = sn()
+                this_l = this_p - pre_p
+                if pvalue_stat.has_key( this_v ):
+                    pvalue_stat[ this_v ] += this_l
+                else:
+                    pvalue_stat[ this_v ] = this_l
+                pre_p = this_p #pos_array[ i ]
+
+            nhcal += pos_array.shape[0]            
+
+        # write pvalue and total length of predicted peaks
+        fhd = file( self.cutoff_analysis_filename, "w" )
+        fhd.write( "pscore\tnpeaks\tlpeaks\tavelpeak\n" )
+        for cutoff in tmplist:
+            fhd.write( "%.2f\t%d\t%d\t%.2f\n" % ( cutoff, self.pvalue_npeaks[ cutoff ], self.pvalue_length[ cutoff ], self.pvalue_length[ cutoff ]/self.pvalue_npeaks[ cutoff ] ) )
+        fhd.close()
+        logging.info( "#3 Analysis of -10log10pvalue vs num of peaks or total length has been saved in %s" % self.cutoff_analysis_filename )
+
+        logging.debug ( "make pvalue_stat cost %.5f seconds" % t )
+        logging.debug ( "calculate pvalue/access hash for %d times" % nhcal )
+
+        nhval = 0
+
+        N = sum(pvalue_stat.values()) # total length
+        k = 1                           # rank
+        f = -log10(N)
+        pre_v = -2147483647
+        pre_l = 0
+        pre_q = 2147483647              # save the previous q-value
+
+        self.pqtable = Float64HashTable()
+        unique_values = sorted(pvalue_stat.keys(), reverse=True) #sorted(unique_values,reverse=True)
+        for i in range(len(unique_values)):
+            v = unique_values[i]
+            l = pvalue_stat[v]
+            q = v + (log10(k) + f)
+            q = max(0,min(pre_q,q))           # make q-score monotonic
+            self.pqtable[ v ] = q
+            pre_v = v
+            pre_q = q
+            k+=l
+            nhcal += 1
+
+        logging.debug( "access pq hash for %d times" % nhcal )
+        
+        return self.pqtable
+
+
     cpdef call_peaks ( self, list scoring_function_symbols, list score_cutoff_s, int min_length = 200, 
-                       int max_gap = 50, bool call_summits = False ):
+                       int max_gap = 50, bool call_summits = False, bool auto_cutoff = False ):
         """Call peaks for all chromosomes. Return a PeakIO object.
         
         scoring_function_s: symbols of functions to calculate score. 'p' for pscore, 'q' for qscore, 'f' for fold change, 's' for subtraction. for example: ['p', 'q']
@@ -643,7 +792,12 @@ cdef class CallerFromAlignments:
         # prepare p-q table
         if not self.pqtable:
             logging.info("#3 Pre-compute pvalue-qvalue table...")
-            self.__cal_pvalue_qvalue_table()
+            if auto_cutoff:
+                logging.info("#3 Cutoff will be automatically decided!")
+                self.__pre_computes( max_gap = max_gap, min_length = min_length )
+            else:
+                self.__cal_pvalue_qvalue_table()
+
 
         # prepare bedGraph file
         if self.save_bedGraph:
@@ -679,7 +833,7 @@ cdef class CallerFromAlignments:
             self.bedGraph_ctrl.close()
             self.save_bedGraph = False
 
-        print "time to build peak regions: %f" % self.test_time
+        #print "time to build peak regions: %f" % self.test_time
 
         return peaks
 
@@ -694,7 +848,7 @@ cdef class CallerFromAlignments:
         save_bedGraph     : whether or not to save pileup and control into a bedGraph file
         """
         cdef:
-            double t0
+            float t0
             int i, n
             str s
             np.ndarray above_cutoff, above_cutoff_endpos, above_cutoff_startpos
@@ -726,7 +880,6 @@ cdef class CallerFromAlignments:
             self.__write_bedGraph_for_a_chromosome ( chrom )
 
         # keep all types of scores needed
-        # 80% time
         t0 = ttime()
         score_array_s = []
         for i in range(len(scoring_function_s)):
@@ -757,7 +910,6 @@ cdef class CallerFromAlignments:
             above_cutoff_startpos[0] = 0
 
         # start to build peak regions
-        # 20% time all together
         # t0 = ttime()
 
         # first bit of region above cutoff
@@ -784,34 +936,28 @@ cdef class CallerFromAlignments:
             tl = ts - lastp
             if tl <= max_gap:
                 # append. 
-                # %8 time  0.15s
                 #t0 = ttime()
                 #peak_content.append( (above_cutoff_startpos[i], above_cutoff_endpos[i], treat_array[above_cutoff_index_array[i]], ctrl_array[above_cutoff_index_array[i]], above_cutoff_index_array[i] ) )
                 peak_content.append( ( ts, te, tp, cp, ti ) )
                 lastp = te #above_cutoff_endpos[i]
                 #self.test_time += ttime() - t0
-                # 8% time
             else:
                 # close
-                # ~ 14% time 0.29s
                 #t0 = ttime()
                 if call_summits:
                     self.__close_peak_with_subpeaks (peak_content, peaks, min_length, chrom, min_length, score_array_s, score_cutoff_s = score_cutoff_s ) # smooth length is min_length, i.e. fragment size 'd'
                 else:
                     self.__close_peak_wo_subpeaks   (peak_content, peaks, min_length, chrom, min_length, score_array_s, score_cutoff_s = score_cutoff_s ) # smooth length is min_length, i.e. fragment size 'd'
                 #self.test_time += ttime() - t0
-                # ~ 14% time
-
-                # ~ 5% time 0.09s
                 #t0 = ttime()
                 #peak_content = [ (above_cutoff_startpos[i], above_cutoff_endpos[i], treat_array[above_cutoff_index_array[i]], ctrl_array[above_cutoff_index_array[i]], above_cutoff_index_array[i] ), ]
                 peak_content = [ ( ts, te, tp, cp, ti ), ]
                 lastp = te #above_cutoff_endpos[i]
                 #self.test_time += ttime() - t0
-                # ~5% time
                 
         # save the last peak
         #t0 = ttime()
+        
         if not peak_content:
             return peaks
         else:
@@ -835,7 +981,7 @@ cdef class CallerFromAlignments:
         """
         cdef:
             int summit_pos, tstart, tend, tmpindex, summit_index, i, midindex
-            double treat_v, ctrl_v, tsummitvalue, ttreat_p, tctrl_p, tscore, summit_treat, summit_ctrl, summit_p_score, summit_q_score
+            float treat_v, ctrl_v, tsummitvalue, ttreat_p, tctrl_p, tscore, summit_treat, summit_ctrl, summit_p_score, summit_q_score
             int tlist_scores_p
 
         peak_length = peak_content[ -1 ][ 1 ] - peak_content[ 0 ][ 0 ]
@@ -894,10 +1040,10 @@ cdef class CallerFromAlignments:
         cdef:
             int summit_pos, tstart, tend, tmpindex, summit_index, summit_offset
             int start, end, i, j, start_boundary, m, n, l
-            double summit_value, tvalue, tsummitvalue
+            float summit_value, tvalue, tsummitvalue
             np.ndarray[np.float32_t, ndim=1] peakdata
             np.ndarray[np.int32_t, ndim=1] peakindices, summit_offsets
-            double ttreat_p, tctrl_p, tscore, summit_treat, summit_ctrl, summit_p_score, summit_q_score
+            float ttreat_p, tctrl_p, tscore, summit_treat, summit_ctrl, summit_p_score, summit_q_score
             int tlist_scores_p
 
         peak_length = peak_content[ -1 ][ 1 ] - peak_content[ 0 ][ 0 ]
@@ -1084,7 +1230,7 @@ cdef class CallerFromAlignments:
             
         return True
 
-    cpdef call_broadpeaks (self, list scoring_function_symbols, list lvl1_cutoff_s, list lvl2_cutoff_s, int min_length=200, int lvl1_max_gap=50, int lvl2_max_gap=400):
+    cpdef call_broadpeaks (self, list scoring_function_symbols, list lvl1_cutoff_s, list lvl2_cutoff_s, int min_length=200, int lvl1_max_gap=50, int lvl2_max_gap=400, bool auto_cutoff = False):
         """This function try to find enriched regions within which,
         scores are continuously higher than a given cutoff for level
         1, and link them using the gap above level 2 cutoff with a
@@ -1116,7 +1262,11 @@ cdef class CallerFromAlignments:
         # prepare p-q table
         if not self.pqtable:
             logging.info("#3 Pre-compute pvalue-qvalue table...")
-            self.__cal_pvalue_qvalue_table()
+            if auto_cutoff:
+                logging.info("#3 Cutoff for broad region will be automatically decided!")
+                self.__pre_computes( max_gap = lvl2_max_gap, min_length = min_length )
+            else:
+                self.__cal_pvalue_qvalue_table()
 
         # prepare bedGraph file
         if self.save_bedGraph:
@@ -1347,7 +1497,7 @@ cdef class CallerFromAlignments:
         """
         cdef:
             int summit_pos, tstart, tend, tmpindex, summit_index, i, midindex
-            double treat_v, ctrl_v, tsummitvalue, ttreat_p, tctrl_p, tscore, summit_treat, summit_ctrl, summit_p_score, summit_q_score
+            float treat_v, ctrl_v, tsummitvalue, ttreat_p, tctrl_p, tscore, summit_treat, summit_ctrl, summit_p_score, summit_q_score
             list tlist_pileup, tlist_control, tlist_length
             int tlist_scores_p
             np.ndarray tarray_pileup, tarray_control, tarray_pscore, tarray_qscore, tarray_fc

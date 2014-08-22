@@ -2,58 +2,58 @@
 
 #include <math.h>
 
-double log10_poisson_cdf ( unsigned int n, double lam, short lower );
-double log10_poisson_cdf_P_large_lambda ( unsigned int k, double lbd );
-double log10_poisson_cdf_Q_large_lambda ( unsigned int k, double lbd );
-double chi2_k1_cdf ( double x );
-double chi2_k2_cdf ( double x );
-double chi2_k4_cdf ( double x );
-double log10_chi2_k1_cdf ( double x );
-double log10_chi2_k2_cdf ( double x );
-double log10_chi2_k4_cdf ( double x );
+float log10_poisson_cdf ( unsigned int n, float lam, short lower );
+float log10_poisson_cdf_P_large_lambda ( unsigned int k, float lbd );
+float log10_poisson_cdf_Q_large_lambda ( unsigned int k, float lbd );
+float chi2_k1_cdf ( float x );
+float chi2_k2_cdf ( float x );
+float chi2_k4_cdf ( float x );
+float log10_chi2_k1_cdf ( float x );
+float log10_chi2_k2_cdf ( float x );
+float log10_chi2_k4_cdf ( float x );
 
 #define max(x, y) ((x)>(y)?(x):(y))
 #define logspace_add(x, y) ((x)>(y)?(x):(y)) + log1p ( exp( -fabs(x - y) ) )
 #define LOG10_E 0.43429448190325176
 
-double chi2_k1_cdf ( double x )
+float chi2_k1_cdf ( float x )
 {
   /*CDF for chi-square distribution with degree of freedom 1.*/
   return erf( sqrt(x/2) );
 }
 
-double log10_chi2_k1_cdf ( double x )
+float log10_chi2_k1_cdf ( float x )
 {
   /*log10 CDF for chi-square distribution with degree of freedom 1.*/
   return log10( erf( sqrt(x/2) ) );
 }
 
-double chi2_k2_cdf ( double x )
+float chi2_k2_cdf ( float x )
 {
   /*CDF for chi-square distribution with degree of freedom 2.*/
   return 1 - exp( -x/2 );
 }
 
-double log10_chi2_k2_cdf ( double x )
+float log10_chi2_k2_cdf ( float x )
 {
   /*log10 CDF for chi-square distribution with degree of freedom 2.*/
   return log1p( - exp( -x/2 ) ) * LOG10_E;
 }
 
-double chi2_k4_cdf ( double x )
+float chi2_k4_cdf ( float x )
 {
   /*CDF for chi-square distribution with degree of freedom 4.*/
   return 1 - exp( -x/2 ) * ( 1 + x/2 );
 }
 
-double log10_chi2_k4_CDF ( double x )
+float log10_chi2_k4_CDF ( float x )
 {
   /*log10 CDF for chi-square distribution with degree of freedom 4.*/
   return log1p( - exp( -x/2 ) * ( 1 + x/2 ) ) * LOG10_E;
 }
 
 
-double log10_poisson_cdf ( unsigned int n, double lam, short lower )
+float log10_poisson_cdf ( unsigned int n, float lam, short lower )
 {
   /*Poisson CDF evaluater.
     
@@ -75,7 +75,7 @@ double log10_poisson_cdf ( unsigned int n, double lam, short lower )
     return log10_poisson_cdf_Q_large_lambda( n, lam );
 }
 
-double log10_poisson_cdf_P_large_lambda ( unsigned int k, double lbd )
+float log10_poisson_cdf_P_large_lambda ( unsigned int k, float lbd )
 {
   /*Slower Poisson CDF evaluater for lower tail which allow
     calculation in log space. Better for the pvalue < 10^-310.
@@ -90,14 +90,14 @@ double log10_poisson_cdf_P_large_lambda ( unsigned int k, double lbd )
 
     Return the log10(pvalue)
   */
-  double residue = 0;
-  double logx = 0;
-  double ln_lbd = log( lbd );
-  double logy, pre_residue;
+  float residue = 0;
+  float logx = 0;
+  float ln_lbd = log( lbd );
+  float logy, pre_residue;
 
   // first residue
   int m = k;
-  double sum_ln_m = 0;
+  float sum_ln_m = 0;
   int i = 0;
   for ( i = 1; i <= m; i++ )
     sum_ln_m += log( i );
@@ -116,7 +116,7 @@ double log10_poisson_cdf_P_large_lambda ( unsigned int k, double lbd )
   return ( residue-lbd ) / M_LN10 ;
 }
 
-double log10_poisson_cdf_Q_large_lambda ( unsigned int k, double lbd )
+float log10_poisson_cdf_Q_large_lambda ( unsigned int k, float lbd )
 {
   /*Slower Poisson CDF evaluater for upper tail which allow
     calculation in log space. Better for the pvalue < 10^-310.
@@ -131,14 +131,14 @@ double log10_poisson_cdf_Q_large_lambda ( unsigned int k, double lbd )
 
     Return the log10(pvalue)
   */
-  double residue = 0;		/* to save ln(\sum{ exp{N} }) */
-  double logx = 0;
-  double ln_lbd = log( lbd );
-  double logy, pre_residue;
+  float residue = 0;		/* to save ln(\sum{ exp{N} }) */
+  float logx = 0;
+  float ln_lbd = log( lbd );
+  float logy, pre_residue;
 
   // first residue
   int m = k + 1 ;
-  double sum_ln_m = 0;
+  float sum_ln_m = 0;
   int i;
 
   for ( i = 2; i <= m; i++ )	/* should start from 1, however log1 = 0 */
