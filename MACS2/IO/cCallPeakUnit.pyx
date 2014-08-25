@@ -1,4 +1,4 @@
-# Time-stamp: <2014-08-22 14:59:54 Tao Liu>
+# Time-stamp: <2014-08-25 16:36:09 Tao Liu>
 
 """Module for Calculate Scores.
 
@@ -734,16 +734,13 @@ cdef class CallerFromAlignments:
 
             nhcal += pos_array.shape[0]            
 
-        # write pvalue and total length of predicted peaks
-        fhd = file( self.cutoff_analysis_filename, "w" )
-        fhd.write( "pscore\tnpeaks\tlpeaks\tavelpeak\n" )
-        for cutoff in tmplist:
-            fhd.write( "%.2f\t%d\t%d\t%.2f\n" % ( cutoff, self.pvalue_npeaks[ cutoff ], self.pvalue_length[ cutoff ], self.pvalue_length[ cutoff ]/self.pvalue_npeaks[ cutoff ] ) )
-        fhd.close()
-        logging.info( "#3 Analysis of -10log10pvalue vs num of peaks or total length has been saved in %s" % self.cutoff_analysis_filename )
-
         logging.debug ( "make pvalue_stat cost %.5f seconds" % t )
         logging.debug ( "calculate pvalue/access hash for %d times" % nhcal )
+
+        # add all pvalue cutoffs from cutoff-analysis part. So that we
+        # can get the corresponding qvalues for them.
+        for cutoff in tmplist:
+            pvalue_stat[ cutoff ] = 0
 
         nhval = 0
 
@@ -768,6 +765,14 @@ cdef class CallerFromAlignments:
             nhcal += 1
 
         logging.debug( "access pq hash for %d times" % nhcal )
+
+        # write pvalue and total length of predicted peaks
+        fhd = file( self.cutoff_analysis_filename, "w" )
+        fhd.write( "pscore\tqscore\tnpeaks\tlpeaks\tavelpeak\n" )
+        for cutoff in tmplist:
+            fhd.write( "%.2f\t%.2f\t%d\t%d\t%.2f\n" % ( cutoff, self.pqtable[ cutoff ], self.pvalue_npeaks[ cutoff ], self.pvalue_length[ cutoff ], self.pvalue_length[ cutoff ]/self.pvalue_npeaks[ cutoff ] ) )
+        fhd.close()
+        logging.info( "#3 Analysis of cutoff vs num of peaks or total length has been saved in %s" % self.cutoff_analysis_filename )
         
         return self.pqtable
 
