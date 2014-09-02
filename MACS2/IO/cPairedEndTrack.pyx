@@ -1,4 +1,4 @@
-# Time-stamp: <2014-08-05 16:56:44 Tao Liu>
+# Time-stamp: <2014-09-02 14:13:56 Tao Liu>
 
 """Module for filter duplicate tags from paired-end data
 
@@ -432,7 +432,7 @@ cdef class PETrackI:
         self.average_template_length = float( self.length ) / self.total
         return
 
-    def sample_percent (self, float percent):
+    def sample_percent (self, float percent, int seed = -1):
         """Sample the tags for a given percentage.
 
         Warning: the current object is changed!
@@ -446,6 +446,9 @@ cdef class PETrackI:
         self.average_template_length = 0.0
         
         chrnames = self.get_chr_names()
+
+        if seed >= 0:
+            np.random.seed(seed)
         
         for i_chrom in range( len(chrnames) ):
             # for each chromosome.
@@ -463,7 +466,7 @@ cdef class PETrackI:
         self.average_template_length = float( self.length )/ self.total
         return
 
-    def sample_num (self, uint64_t samplesize):
+    def sample_num (self, uint64_t samplesize, int seed = -1):
         """Sample the tags for a given percentage.
 
         Warning: the current object is changed!
@@ -471,7 +474,7 @@ cdef class PETrackI:
         cdef float percent
 
         percent = float(samplesize)/self.total
-        self.sample_percent ( percent )
+        self.sample_percent ( percent, seed )
         return
 
     def print_to_bed (self, fhd=None):
