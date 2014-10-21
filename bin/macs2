@@ -614,5 +614,5 @@ if __name__ == '__main__':
     try:
         main()
     except KeyboardInterrupt:
-        sys.stderr.write("User interrupt me! ;-) Bye!\n")
+        sys.stderr.write("User interrupted me! ;-) Bye!\n")
         sys.exit(0)

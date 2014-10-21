@@ -1,4 +1,4 @@
-# Time-stamp: <2014-08-05 16:53:19 Tao Liu>
+# Time-stamp: <2014-10-21 12:42:25 Tao Liu>
 
 """Module for FWTrack classes.
 
@@ -180,9 +180,11 @@ cdef class FWTrack:
         If chromosome in this fwtrack is not covered by given
         rlengths, and it has no associated length, it will be set as
         maximum integer.
+
+        fixed to remove those chromosomes without any alignment. --TL 10-22-2014
         """
         cdef:
-            set valid_chroms, missed_chroms
+            set valid_chroms, missed_chroms, extra_chroms
             str chrom
 
         valid_chroms = set(self.__locations.keys()).intersection(rlengths.keys())
@@ -191,6 +193,10 @@ cdef class FWTrack:
         missed_chroms = set(self.__locations.keys()).difference(rlengths.keys())
         for chrom in missed_chroms:
             self.rlength[chrom] = INT_MAX
+        # these are chromosomes without alignments but with names in header
+        extra_chroms = set(rlenths.keys()).difference(self.__locations.keys())
+        for chrom in extra_chroms:
+            self.rlength.pop(chrom)
         return True
 
     cpdef dict get_rlengths ( self ):
@@ -282,6 +288,7 @@ cdef class FWTrack:
                 new_plus[ i_new ] = plus[ i_new ] # first item
                 i_new += 1
                 current_loc = plus[0]
+                n = 1
                 for i_old in range( 1, size ):
                     p = plus[ i_old ]
                     if p == current_loc:

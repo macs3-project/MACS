@@ -1,4 +1,4 @@
-# Time-stamp: <2014-08-25 16:36:09 Tao Liu>
+# Time-stamp: <2014-08-27 17:00:33 Tao Liu>
 
 """Module for Calculate Scores.
 
@@ -206,7 +206,8 @@ cdef float median_from_value_length ( np.ndarray value, list length ):
             return tmp_v
 
 cdef float mean_from_value_length ( np.ndarray value, list length ):
-    """
+    """take list of values and list of corresponding lengths, calculate the mean.
+    An important function for bedGraph type of data.
     """
     cdef:
         list tmp
@@ -220,6 +221,43 @@ cdef float mean_from_value_length ( np.ndarray value, list length ):
         sum_v += tmp_v * tmp_l
 
     return sum_v / l
+
+
+cdef tuple find_optimal_cutoff( list x, list y ):
+    """Return the best cutoff x and y. 
+
+    We assume that total peak length increase exponentially while
+    decreasing cutoff value. But while cutoff decreases to a point
+    that background noises are captured, total length increases much
+    faster. So we fit a linear model by taking the first 10 points,
+    then look for the largest cutoff that 
+
+    """
+    cdef:
+        np.ndarray npx, npy, npA
+        float optimal_x, optimal_y
+        long l, i
+        float m, c # slop and intercept
+        float sst # sum of squared total
+        float sse # sum of squared error
+        float rsq # R-squared
+
+    l = len(x)
+    assert l == len(y)
+    npx = np.array( x )
+    npy = np.log10( np.array( y ) )
+    npA = np.vstack( [npx, np.ones(len(npx))] ).T
+
+    for i in range( 10, l ):
+        # at least the largest 10 points
+        m, c = np.linalg.lstsq( npA[:i], npy[:i] )[ 0 ]
+        sst = sum( ( npy[:i] - np.mean( npy[:i] ) ) ** 2 )
+        sse = sum( ( npy[:i] - m*npx[:i] - c ) ** 2 )
+        rsq = 1 - sse/sst
+        print i, x[i], y[i], m, c, rsq
+    return ( 1.0, 1.0 )
+    
+
 
 # ------------------------------------
 # Classes
@@ -734,8 +772,8 @@ cdef class CallerFromAlignments:
 
             nhcal += pos_array.shape[0]            
 
-        logging.debug ( "make pvalue_stat cost %.5f seconds" % t )
-        logging.debug ( "calculate pvalue/access hash for %d times" % nhcal )
+        #logging.debug ( "make pvalue_stat cost %.5f seconds" % t )
+        #logging.debug ( "calculate pvalue/access hash for %d times" % nhcal )
 
         # add all pvalue cutoffs from cutoff-analysis part. So that we
         # can get the corresponding qvalues for them.
@@ -769,11 +807,17 @@ cdef class CallerFromAlignments:
         # write pvalue and total length of predicted peaks
         fhd = file( self.cutoff_analysis_filename, "w" )
         fhd.write( "pscore\tqscore\tnpeaks\tlpeaks\tavelpeak\n" )
+        x = []
+        y = []
         for cutoff in tmplist:
             fhd.write( "%.2f\t%.2f\t%d\t%d\t%.2f\n" % ( cutoff, self.pqtable[ cutoff ], self.pvalue_npeaks[ cutoff ], self.pvalue_length[ cutoff ], self.pvalue_length[ cutoff ]/self.pvalue_npeaks[ cutoff ] ) )
+            x.append( cutoff )
+            y.append( self.pvalue_length[ cutoff ] )
         fhd.close()
         logging.info( "#3 Analysis of cutoff vs num of peaks or total length has been saved in %s" % self.cutoff_analysis_filename )
-        
+        logging.info( "#3 Suggest a cutoff..." )
+        optimal_cutoff, optimal_length = find_optimal_cutoff( x, y )
+        logging.info( "#3 -10log10pvalue cutoff %.2f will call approximately %d bps regions as significant regions" % ( optimal_cutoff, optimal_length ) )
         return self.pqtable
 
 
