@@ -1,4 +1,4 @@
-# Time-stamp: <2014-10-21 14:10:08 Tao Liu>
+# Time-stamp: <2014-10-21 14:37:10 Tao Liu>
 
 """Module for FWTrack classes.
 
@@ -181,7 +181,6 @@ cdef class FWTrack:
         rlengths, and it has no associated length, it will be set as
         maximum integer.
 
-        fixed to remove those chromosomes without any alignment. --TL 10-22-2014
         """
         cdef:
             set valid_chroms, missed_chroms, extra_chroms
@@ -193,10 +192,6 @@ cdef class FWTrack:
         missed_chroms = set(self.__locations.keys()).difference(rlengths.keys())
         for chrom in missed_chroms:
             self.rlengths[chrom] = INT_MAX
-        # these are chromosomes without alignments but with names in header
-        extra_chroms = set(rlengths.keys()).difference(self.__locations.keys())
-        for chrom in extra_chroms:
-            self.rlengths.pop(chrom)
         return True
 
     cpdef dict get_rlengths ( self ):
