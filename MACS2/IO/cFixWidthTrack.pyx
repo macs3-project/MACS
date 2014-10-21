@@ -1,4 +1,4 @@
-# Time-stamp: <2014-10-21 12:42:25 Tao Liu>
+# Time-stamp: <2014-10-21 14:07:43 Tao Liu>
 
 """Module for FWTrack classes.
 
@@ -194,7 +194,7 @@ cdef class FWTrack:
         for chrom in missed_chroms:
             self.rlength[chrom] = INT_MAX
         # these are chromosomes without alignments but with names in header
-        extra_chroms = set(rlenths.keys()).difference(self.__locations.keys())
+        extra_chroms = set(rlengths.keys()).difference(self.__locations.keys())
         for chrom in extra_chroms:
             self.rlength.pop(chrom)
         return True
