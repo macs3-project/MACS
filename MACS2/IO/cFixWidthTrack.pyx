@@ -1,4 +1,4 @@
-# Time-stamp: <2014-10-21 14:07:43 Tao Liu>
+# Time-stamp: <2014-10-21 14:10:08 Tao Liu>
 
 """Module for FWTrack classes.
 
@@ -192,11 +192,11 @@ cdef class FWTrack:
             self.rlengths[chrom] = rlengths[chrom]
         missed_chroms = set(self.__locations.keys()).difference(rlengths.keys())
         for chrom in missed_chroms:
-            self.rlength[chrom] = INT_MAX
+            self.rlengths[chrom] = INT_MAX
         # these are chromosomes without alignments but with names in header
         extra_chroms = set(rlengths.keys()).difference(self.__locations.keys())
         for chrom in extra_chroms:
-            self.rlength.pop(chrom)
+            self.rlengths.pop(chrom)
         return True
 
     cpdef dict get_rlengths ( self ):
