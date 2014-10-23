@@ -1,4 +1,4 @@
-# Time-stamp: <2014-08-22 13:49:38 Tao Liu>
+# Time-stamp: <2014-10-23 15:18:38 Tao Liu>
 
 """Module Description
 
@@ -337,8 +337,7 @@ class PeakDetect:
                                                 save_SPMR = self.opt.do_SPMR,
                                                 cutoff_analysis_filename = self.opt.cutoff_analysis_file )
 
-        # calculate pvalue scores
-        if self.opt.trackline: self.scoretrack.enable_trackline()
+        if self.opt.trackline: scorecalculator.enable_trackline()
 
         # call peaks
         call_summits = self.opt.call_summits
