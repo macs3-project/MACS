@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# Time-stamp: <2014-08-22 14:45:32 Tao Liu>
+# Time-stamp: <2014-10-23 16:16:22 Tao Liu>
 
 """Description: MACS v2 main executable.
 
@@ -356,7 +356,7 @@ def add_filterdup_parser( subparsers ):
     argparser_filterdup.add_argument( "-p", "--pvalue", dest = "pvalue", type = float,
                                       help = "Pvalue cutoff for binomial distribution test. DEFAULT:1e-5" )
     argparser_filterdup.add_argument( "--keep-dup", dest = "keepduplicates", type = str, default = "auto",
-                                      help = "It controls the '%(prog)s' behavior towards duplicate tags at the exact same location -- the same coordination and the same strand. The default 'auto' option makes '%(prog)s' calculate the maximum tags at the exact same location based on binomal distribution using given -p as pvalue cutoff; and the 'all' option keeps every tags (useful if you only want to convert formats). If an integer is given, at most this number of tags will be kept at the same location. Note, MACS2 callpeak function uses KEEPDUPLICATES=1 as default. Default: auto" )
+                                      help = "It controls the '%(prog)s' behavior towards duplicate tags/pairs at the exact same location -- the same coordination and the same strand. The 'auto' option makes '%(prog)s' calculate the maximum tags at the exact same location based on binomal distribution using given -p as pvalue cutoff; and the 'all' option keeps every tags (useful if you only want to convert formats). If an integer is given, at most this number of tags will be kept at the same location. Note, MACS2 callpeak function uses KEEPDUPLICATES=1 as default. Note, if you've used samtools or picard to flag duplicates in bit 1024, MACS2 will discard them no matter how you set KEEPDUPLICATES.  Default: auto" )
     argparser_filterdup.add_argument( "--verbose", dest = "verbose", type = int, default = 2,
                                       help = "Set verbose level. 0: only show critical message, 1: show additional warning message, 2: show process information, 3: show debug messages. If you want to know where are the duplicate reads, use 3. DEFAULT:2" )
     add_outdir_option( argparser_filterdup )    
