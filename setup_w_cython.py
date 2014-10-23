@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# Time-stamp: <2014-07-29 17:03:44 Tao Liu>
+# Time-stamp: <2014-10-23 15:07:06 Tao Liu>
 
 """Description: 
 
@@ -21,7 +21,7 @@ the distribution).
 
 import os
 import sys
-from distutils.core import setup, Extension
+from setuptools import setup, Extension
 
 # Use build_ext from Cython if found
 command_classes = {}
