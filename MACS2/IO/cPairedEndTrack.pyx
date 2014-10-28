@@ -1,4 +1,4 @@
-# Time-stamp: <2014-09-02 14:13:56 Tao Liu>
+# Time-stamp: <2014-10-28 14:05:49 Tao Liu>
 
 """Module for filter duplicate tags from paired-end data
 
@@ -80,16 +80,14 @@ cdef class PETrackI:
         fiveendpos -- 5' end pos, left for plus strand, right for neg strand
         """
         if not self.__locations.has_key(chromosome):
-            self.__locations[chromosome] = np.zeros(shape=(self.buffer_size, 2), dtype='int32') # note: [,0] is the leftmost end, [,1] is the rightmost end of fragment.
+            self.__locations[chromosome] = np.zeros(shape=self.buffer_size, dtype=[('l','int32'),('r','int32')]) # note: ['l'] is the leftmost end, ['r'] is the rightmost end of fragment.
             self.__pointer[chromosome] = 0
         try:
-            self.__locations[chromosome][self.__pointer[chromosome],0] = start
-            self.__locations[chromosome][self.__pointer[chromosome],1] = end
+            self.__locations[chromosome][self.__pointer[chromosome]] = ( start, end )
             self.__pointer[chromosome] += 1
         except IndexError:
             self.__expand__ ( self.__locations[chromosome] )
-            self.__locations[chromosome][self.__pointer[chromosome],0] = start
-            self.__locations[chromosome][self.__pointer[chromosome],1] = end
+            self.__locations[chromosome][self.__pointer[chromosome]] = ( start, end )
             self.__pointer[chromosome] += 1
         self.length += end - start
 
@@ -103,25 +101,21 @@ cdef class PETrackI:
         chrs = set(self.get_chr_names())
         for chromosome in chrs:
             if self.__locations.has_key(chromosome):
-                self.__locations[chromosome][0].resize( self.buffer_size, refcheck=False )
-                self.__locations[chromosome][0].resize( 0, refcheck=False )
-                self.__locations[chromosome][1].resize( self.buffer_size, refcheck=False )
-                self.__locations[chromosome][1].resize( 0, refcheck=False )
-                self.__locations[chromosome] = [None, None]
+                self.__locations[chromosome].resize( self.buffer_size, refcheck=False )
+                self.__locations[chromosome].resize( 0, refcheck=False )
+                self.__locations[chromosome] = None
                 self.__locations.pop(chromosome)
             if self.__dup_locations.has_key(chromosome):
-                self.__dup_locations[chromosome][0].resize( self.buffer_size, refcheck=False )
-                self.__dup_locations[chromosome][0].resize( 0, refcheck=False )
-                self.__dup_locations[chromosome][1].resize( self.buffer_size, refcheck=False )
-                self.__dup_locations[chromosome][1].resize( 0, refcheck=False )
-                self.__dup_locations[chromosome] = [None, None]
+                self.__dup_locations[chromosome].resize( self.buffer_size, refcheck=False )
+                self.__dup_locations[chromosome].resize( 0, refcheck=False )
+                self.__dup_locations[chromosome] = None
                 self.__dup_locations.pop(chromosome)
         self.__destroyed = True
 
         return True
 
     cpdef __expand__ ( self, np.ndarray arr ):
-        arr.resize((arr.shape[0] + self.buffer_size, 2), refcheck = False )
+        arr.resize((arr.shape[0] + self.buffer_size), refcheck = False )
         return
 
     cpdef bint set_rlengths ( self, dict rlengths ):
@@ -168,7 +162,7 @@ cdef class PETrackI:
 
         for i in range(len(chrnames)):
             c = chrnames[i]
-            self.__locations[c].resize((self.__pointer[c], 2), refcheck=False)
+            self.__locations[c].resize((self.__pointer[c]), refcheck=False)
             self.__locations[c].sort(0)
             self.total += self.__locations[c].shape[0]
 
@@ -214,7 +208,7 @@ cdef class PETrackI:
 
         for i in range(len(chrnames)):
             c = chrnames[i]
-            self.__locations[c].sort(0)
+            self.__locations[c].sort(order='l') # sort by the leftmost location
 
         self.__sorted = True
 
@@ -254,7 +248,7 @@ cdef class PETrackI:
         for i in range(len(chrnames)):
             c = chrnames[i]
             locs = self.__locations[c]
-            sizes = locs[:, 1] - locs[:, 0] # +1 ?? irrelevant for use
+            sizes = locs['r'] - locs['l'] # +1 ?? irrelevant for use
             bins = np.bincount(sizes).astype('int64')
             bins_len = bins.shape[0]
             if bins_len > max_bins: max_bins = bins_len
@@ -300,19 +294,19 @@ cdef class PETrackI:
             if size < 1:
                 new_locs = locs
             else:
-                new_locs = np.zeros((self.__pointer[k], 2), dtype='int32')
-                dup_locs = np.zeros((self.__pointer[k], 2), dtype='int32')
+                new_locs = np.zeros(self.__pointer[k], dtype=[('l','int32'),('r','int32')]) # note: ['l'] is the leftmost end, ['r'] is the rightmost end of fragment.
+                dup_locs = np.zeros(self.__pointer[k], dtype=[('l','int32'),('r','int32')]) # note: ['l'] is the leftmost end, ['r'] is the rightmost end of fragment.
                 i_new += 1
                 n = 1
             
-                current_loc_start = locs[0,0]
-                current_loc_end = locs[0,1]
-                new_locs[i_new, 0] = current_loc_start
-                new_locs[i_new, 1] = current_loc_end
+                current_loc_start = locs[0][0] # same as locs[0]['l']
+                current_loc_end = locs[0][1]# same as locs[0]['r']
+                new_locs[i_new][0] = current_loc_start
+                new_locs[i_new][1] = current_loc_end
                 self.length += current_loc_end - current_loc_start
                 for i_old in range(1, size):
-                    loc_start = locs[i_old, 0]
-                    loc_end = locs[i_old, 1]
+                    loc_start = locs[i_old][0]
+                    loc_end = locs[i_old][1]
                     all_same = ((loc_start == current_loc_start) and
                                 (loc_end == current_loc_end)) 
                     if all_same:
@@ -322,16 +316,16 @@ cdef class PETrackI:
                         current_loc_end = loc_end
                         n = 1
                     if n > maxint:
-                        dup_locs[i_dup , 0] = loc_start
-                        dup_locs[i_dup , 1] = loc_end
+                        dup_locs[i_dup][0] = loc_start
+                        dup_locs[i_dup][1] = loc_end
                         i_dup += 1
                     else:
-                        new_locs[i_new, 0] = loc_start
-                        new_locs[i_new, 1] = loc_end
+                        new_locs[i_new][0] = loc_start
+                        new_locs[i_new][1] = loc_end
                         self.length += loc_end - loc_start                        
                         i_new += 1
-                new_locs.resize( (i_new, 2) , refcheck = False)
-                dup_locs.resize( (i_dup, 2) , refcheck = False)
+                new_locs.resize( i_new , refcheck = False)
+                dup_locs.resize( i_dup , refcheck = False)
                 self.total += i_new
                 self.dup_total += i_dup
                 self.__pointer[k] = i_new
@@ -387,36 +381,36 @@ cdef class PETrackI:
             if size < 1:
                 new_locs = locs
             else:
-                new_locs = np.zeros((self.__pointer[k], 2), dtype='int32')
+                new_locs = np.zeros( self.__pointer[k], dtype=[('l','int32'),('r','int32')]) # note: ['l'] is the leftmost end, ['r'] is the rightmost end of fragment.
                 i_new += 1
                 n = 1                # the number of tags in the current location
             
-                current_loc_start = locs[0,0]
-                current_loc_end = locs[0,1]
-                new_locs[i_new, 0] = current_loc_start
-                new_locs[i_new, 1] = current_loc_end
+                current_loc_start = locs[0][0]
+                current_loc_end = locs[0][1]
+                new_locs[i_new][0] = current_loc_start
+                new_locs[i_new][1] = current_loc_end
                 self.length += current_loc_end - current_loc_start
                 for i_old in range(1, size):
-                    loc_start = locs[i_old, 0]
-                    loc_end = locs[i_old, 1]
+                    loc_start = locs[i_old][0]
+                    loc_end = locs[i_old][1]
                     all_same = ((loc_start == current_loc_start) and
                                 (loc_end == current_loc_end))
                     if all_same:
                         n += 1
                         if n <= maxnum:
-                            new_locs[i_new, 0] = loc_start
-                            new_locs[i_new, 1] = loc_end
+                            new_locs[i_new][0] = loc_start
+                            new_locs[i_new][1] = loc_end
                             self.length += loc_end - loc_start                            
                             i_new += 1
                     else:
                         current_loc_start = loc_start
                         current_loc_end = loc_end
-                        new_locs[i_new, 0] = loc_start
-                        new_locs[i_new, 1] = loc_end
+                        new_locs[i_new][0] = loc_start
+                        new_locs[i_new][1] = loc_end
                         self.length += loc_end - loc_start                        
                         i_new += 1
                         n = 1
-                new_locs.resize( (i_new, 2) )
+                new_locs.resize( i_new, refcheck = False )
                 new_size = new_locs.shape[0]
                 self.__pointer[k] = new_size
                 self.total += new_size
@@ -458,10 +452,10 @@ cdef class PETrackI:
         
             num = <uint32_t>round(self.__locations[key].shape[0] * percent, 5 )
             np.random.shuffle( self.__locations[key] )
-            self.__locations[key].resize( (num, 2) )
-            self.__locations[key].sort(0)
+            self.__locations[key].resize( num, refcheck = False )
+            self.__locations[key].sort( order = 'l' ) # sort by leftmost positions
             self.__pointer[key] = self.__locations[key].shape[0]
-            self.length += ( self.__locations[key][:,1] - self.__locations[key][:,0] ).sum()
+            self.length += ( self.__locations[key]['r'] - self.__locations[key]['l'] ).sum()
             self.total += self.__pointer[key]
         self.average_template_length = float( self.length )/ self.total
         return
@@ -501,7 +495,7 @@ cdef class PETrackI:
             locs = self.__locations[k]
 
             for i in range(locs.shape[0]):
-                s, e = locs[i, :]
+                s, e = locs[ i ]
                 fhd.write("%s\t%d\t%d\t.\t.\t.\n" % (k, s, e))
 
         return
@@ -523,7 +517,7 @@ cdef class PETrackI:
         for i in range(len(scale_factor_s)):
             scale_factor = scale_factor_s[i]
 
-            tmp_pileup = quick_pileup ( self.__locations[chrom][:,0], self.__locations[chrom][:,1], scale_factor, baseline_value )
+            tmp_pileup = quick_pileup ( self.__locations[chrom]['l'], self.__locations[chrom]['r'], scale_factor, baseline_value )
 
             if prev_pileup:
                 prev_pileup = max_over_two_pv_array ( prev_pileup, tmp_pileup )
@@ -561,7 +555,7 @@ cdef class PETrackI:
             five_shift = d/2
             three_shift= d/2
 
-            tmp_pileup = se_all_in_one_pileup ( self.__locations[chrom][:,0], self.__locations[chrom][:,1], five_shift, three_shift, rlength, scale_factor, baseline_value )
+            tmp_pileup = se_all_in_one_pileup ( self.__locations[chrom]['l'], self.__locations[chrom]['r'], five_shift, three_shift, rlength, scale_factor, baseline_value )
 
             if prev_pileup:
                 prev_pileup = max_over_two_pv_array ( prev_pileup, tmp_pileup )

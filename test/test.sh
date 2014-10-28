@@ -1,7 +1,10 @@
 # test all sub-commands
 
-CHIP=ChIP_200K.bed.gz
-CTRL=Control_200K.bed.gz
+CHIP=CTCF_ChIP_200K.bed.gz
+CTRL=CTCF_Control_200K.bed.gz
+
+CHIPPE=CTCF_PE_ChIP_chr22.bam
+CTRLPE=CTCF_PE_Control_chr22.bam
 
 # callpeak
 echo "callpeak"
@@ -10,6 +13,11 @@ macs2 callpeak -t $CHIP -c $CTRL -n run_callpeak_narrow -B --outdir run_callpeak
 macs2 callpeak -t $CHIP -c $CTRL -n run_callpeak_narrow2 -B --outdir run_callpeak_narrow --nomodel --extsize 100 &> run_callpeak_narrow/run_callpeak_narrow2.log
 macs2 callpeak -t $CHIP -c $CTRL -n run_callpeak_narrow3 -B --outdir run_callpeak_narrow --nomodel --extsize 100 --shift -50 &> run_callpeak_narrow/run_callpeak_narrow3.log
 macs2 callpeak -t $CHIP -c $CTRL -n run_callpeak_broad -B --outdir run_callpeak_broad --broad &> run_callpeak_broad/run_callpeak_broad.log
+
+echo "callpeak on PE"
+
+macs2 callpeak -t $CHIPPE -c $CTRLPE -n run_callpeak_pe_narrow -B --outdir run_callpeak_pe_narrow --call-summits &> run_callpeak_pe_narrow/run_callpeak_pe_narrow.log
+macs2 callpeak -t $CHIPPE -c $CTRLPE -n run_callpeak_pe_broad -B --outdir run_callpeak_pe_broad --broad &> run_callpeak_pe_broad/run_callpeak_pe_broad.log
 
 # bdgcmp
 echo "bdgcmp"
