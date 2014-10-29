@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# Time-stamp: <2014-10-23 15:48:33 Tao Liu>
+# Time-stamp: <2014-10-29 02:00:22 Tao Liu>
 
 """Description: 
 
@@ -82,7 +82,7 @@ def main():
                        ]
 
     setup(name="MACS2",
-          version="2.1.0.20140616",
+          version="2.1.0.20141030",
           description="Model Based Analysis for ChIP-Seq data",
           author='Tao Liu',
           author_email='vladimir.liu@gmail.com',
