@@ -1,4 +1,4 @@
-# Time-stamp: <2014-10-28 17:00:19 Tao Liu>
+# Time-stamp: <2014-10-29 01:57:21 Tao Liu>
 
 """Module for all MACS Parser classes for input.
 
@@ -966,8 +966,9 @@ cdef class BAMParser( GenericParser ):
     
     cdef tuple __fw_binary_parse_wo_pysam (self, data ):
         cdef:
-            int thisref, thisstart, thisstrand, i, cigar_op_len
-            short bwflag, l_read_name, n_cigar_op, cigar_op
+            int thisref, thisstart, thisstrand, i
+            short bwflag, l_read_name, n_cigar_op
+            int cigar_code
         
         # we skip lot of the available information in data (i.e. tag name, quality etc etc)
         if not data: return ( -1, -1, -1 )
@@ -997,11 +998,9 @@ cdef class BAMParser( GenericParser ):
             # read mapped to minus strand
             l_read_name = unpack( '<B', data[ 8:9 ] )[ 0 ]
             # need to decipher CIGAR string
-            for i in range( n_cigar_op ):
-                cigar_op_len = unpack( '<I', data[ 32 + l_read_name + i*4 : 32 + l_read_name + i*4 + 4 ] )[ 0 ]
-                cigar_op = cigar_op_len & 15
-                if cigar_op in [ 0, 2, 3, 7, 8 ]:   # they are CIGAR op M/D/N/=/X
-                    thisstart += cigar_op_len >> 4
+            for cigar_code in unpack( '<%dI' % (n_cigar_op) , data[ 32 + l_read_name : 32 + l_read_name + n_cigar_op*4 ] ):
+                if cigar_code & 15 in [ 0, 2, 3, 7, 8 ]:   # they are CIGAR op M/D/N/=/X
+                    thisstart += cigar_code >> 4
             thisstrand = 1
         else:
             thisstrand = 0
@@ -1129,7 +1128,8 @@ cdef class BAMPEParser(BAMParser):
             list references
             dict rlengths
             float d = 0.0
-            char *rawread, *rawentrylength
+            char *rawread
+            char *rawentrylength
             _BAMPEParsed read
         
         petrack = PETrackI( buffer_size = self.buffer_size )
@@ -1178,7 +1178,8 @@ cdef class BAMPEParser(BAMParser):
             list references
             dict rlengths
             float d = 0.0
-            char *rawread, *rawentrylength
+            char *rawread
+            char *rawentrylength
             _BAMPEParsed read
         
         references, rlengths = self.get_references()
