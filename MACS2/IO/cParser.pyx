@@ -1,4 +1,4 @@
-# Time-stamp: <2014-08-22 16:59:13 Tao Liu>
+# Time-stamp: <2014-10-28 17:00:19 Tao Liu>
 
 """Module for all MACS Parser classes for input.
 
@@ -20,6 +20,7 @@ with the distribution).
 import logging
 import struct
 from struct import unpack
+from re import findall
 import gzip
 import io
 from MACS2.Constants import *
@@ -589,6 +590,7 @@ cdef class SAMParser( GenericParser ):
         thistagname = thisfields[ 0 ]         # name of tag
         thisref = thisfields[ 2 ]
         bwflag = atoi( thisfields[ 1 ] )
+        CIGAR = thisfields[ 5 ]
         if bwflag & 4 or bwflag & 512 or bwflag & 1024:
             return ( "", -1, -1 )       #unmapped sequence or bad sequence
         if bwflag & 1:
@@ -608,8 +610,10 @@ cdef class SAMParser( GenericParser ):
         # we can treat it as a single read, so just check the strand and calculate its
         # start position... hope I'm right!
         if bwflag & 16:
+            # minus strand, we have to decipher CIGAR string
+            
             thisstrand = 1
-            thisstart = atoi( thisfields[ 3 ] ) - 1 + strlen( thisfields[ 9 ] )	#reverse strand should be shifted len(query) bp 
+            thisstart = atoi( thisfields[ 3 ] ) - 1 + sum(map(int, findall("(\d+)[MDNX=]",CIGAR)))	#reverse strand should be shifted alen bp 
         else:
             thisstrand = 0
             thisstart = atoi( thisfields[ 3 ] ) - 1
@@ -618,6 +622,7 @@ cdef class SAMParser( GenericParser ):
             thisref = thisref[ :thisref.rindex( ".fa" ) ]
         except ValueError:
             pass
+
         return ( thisref, thisstart, thisstrand )
 
 cdef class BAMParser( GenericParser ):
@@ -828,7 +833,7 @@ cdef class BAMParser( GenericParser ):
             else:
                 if a.is_reverse:
                     strand = 1              # minus strand
-                    fpos = a.pos + a.rlen     # rightmost position
+                    fpos = a.aend     # rightmost position
                 else:
                     strand = 0              # plus strand
                     fpos = a.pos
@@ -907,7 +912,7 @@ cdef class BAMParser( GenericParser ):
             else:
                 if a.is_reverse:
                     strand = 1              # minus strand
-                    fpos = a.pos + a.rlen     # rightmost position
+                    fpos = a.aend           # rightmost position
                 else:
                     strand = 0              # plus strand
                     fpos = a.pos
@@ -961,15 +966,15 @@ cdef class BAMParser( GenericParser ):
     
     cdef tuple __fw_binary_parse_wo_pysam (self, data ):
         cdef:
-            int thisref, thisstart, thisstrand
-            short cigar, bwflag
+            int thisref, thisstart, thisstrand, i, cigar_op_len
+            short bwflag, l_read_name, n_cigar_op, cigar_op
         
         # we skip lot of the available information in data (i.e. tag name, quality etc etc)
         if not data: return ( -1, -1, -1 )
 
         thisref = unpack( '<i', data[ 0:4 ] )[ 0 ]
         thisstart = unpack( '<i', data[ 4:8 ] )[ 0 ]
-        ( cigar, bwflag ) = unpack( '<hh' , data[ 12:16 ] )
+        (n_cigar_op,  bwflag ) = unpack( '<HH' , data[ 12:16 ] )
         if bwflag & 4 or bwflag & 512 or bwflag & 1024:
             return ( -1, -1, -1 )       #unmapped sequence or bad sequence
         if bwflag & 1:
@@ -988,10 +993,16 @@ cdef class BAMParser( GenericParser ):
         # in case of proper pair we have skipped the rightmost one... if the leftmost pair comes
         # we can treat it as a single read, so just check the strand and calculate its
         # start position... hope I'm right!
-	# l = unpack( '<i', data[ 16:20 ] )[ 0 ]
         if bwflag & 16:
+            # read mapped to minus strand
+            l_read_name = unpack( '<B', data[ 8:9 ] )[ 0 ]
+            # need to decipher CIGAR string
+            for i in range( n_cigar_op ):
+                cigar_op_len = unpack( '<I', data[ 32 + l_read_name + i*4 : 32 + l_read_name + i*4 + 4 ] )[ 0 ]
+                cigar_op = cigar_op_len & 15
+                if cigar_op in [ 0, 2, 3, 7, 8 ]:   # they are CIGAR op M/D/N/=/X
+                    thisstart += cigar_op_len >> 4
             thisstrand = 1
-            thisstart = thisstart + unpack( '<i', data[ 16:20 ] )[ 0 ]	#reverse strand should be shifted len(query) bp 
         else:
             thisstrand = 0
 
@@ -1081,7 +1092,6 @@ cdef class BAMPEParser(BAMParser):
 #         # for convenience, only count valid pairs
 #         add_loc = petrack.add_loc
 #         info = logging.info
-#         unpack = struct.unpack
 #         err = struct.error
 #         while True:
 #             try: entrylength = unpack('<i', fread(4))[0]
@@ -1132,7 +1142,6 @@ cdef class BAMPEParser(BAMParser):
         # for convenience, only count valid pairs
         add_loc = petrack.add_loc
         info = logging.info
-        unpack = struct.unpack
         err = struct.error
         while True:
             try: entrylength = unpack('<i', fread(4))[0]
@@ -1180,7 +1189,6 @@ cdef class BAMPEParser(BAMParser):
         # for convenience, only count valid pairs
         add_loc = petrack.add_loc
         info = logging.info
-        unpack = struct.unpack
         err = struct.error
         while True:
             try: entrylength = unpack('<i', fread(4))[0]
@@ -1207,8 +1215,8 @@ cdef class BAMPEParser(BAMParser):
         
     cdef _BAMPEParsed __pe_binary_parse (self, char *data):
         cdef:
-            int nextpos, pos
-            short bwflag
+            int nextpos, pos, cigar_op_len, i
+            short bwflag, l_read_name, n_cigar_op, cigar_op
             _BAMPEParsed ret
 #            int *asint = <int*>data
 #            short *asshort = <short *>data
@@ -1224,9 +1232,7 @@ cdef class BAMPEParser(BAMParser):
         # we skip lot of the available information in data (i.e. tag name, quality etc etc)
         if not data: return ret
 
-        unpack = struct.unpack
-        bwflag = unpack('<hh', data[12:16])[1]
-        
+        (n_cigar_op,  bwflag ) = unpack( '<HH' , data[ 12:16 ] )
         if bwflag & 4 or bwflag & 512 or bwflag & 1024:
             return ret       #unmapped sequence or bad sequence
         if bwflag & 1:
@@ -1243,14 +1249,17 @@ cdef class BAMPEParser(BAMParser):
         ret.ref = unpack('<i', data[0:4])[0]
         pos = unpack('<i', data[4:8])[0]
         nextpos = unpack('<i', data[24:28])[0]
-        ret.start = min(pos, nextpos)
-        ret.tlen = abs(unpack('<i', data[28:32])[0])
-                
-        # In case of paired-end we have now skipped all possible "bad" pairs
-        # in case of proper pair we have skipped the rightmost one... if the leftmost pair comes
-        # we can treat it as a single read, so just check the strand and calculate its
-        # start position... hope I'm right!
-
+        ret.start = min(pos, nextpos) # we keep only the leftmost
+                                      # position which means this must
+                                      # be at + strand. So we don't
+                                      # need to decipher CIGAR string.
+        ret.tlen = abs(unpack('<i', data[28:32])[0]) # Actually, if
+                                                     # the value
+                                                     # unpacked is
+                                                     # negative, then
+                                                     # nextpos is the
+                                                     # leftmost
+                                                     # position.
         return ret
 
 cdef struct _BAMPEParsed:
