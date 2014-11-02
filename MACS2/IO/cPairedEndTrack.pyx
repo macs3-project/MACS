@@ -1,4 +1,4 @@
-# Time-stamp: <2014-10-29 15:01:48 Tao Liu>
+# Time-stamp: <2014-11-02 16:00:04 Tao Liu>
 
 """Module for filter duplicate tags from paired-end data
 
@@ -271,7 +271,7 @@ cdef class PETrackI:
 #            np.ndarray[np.int32_t, ndim=1] loc #= np.zeros([1,2], np.int32)
 #            np.ndarray[np.int32_t, ndim=1] current_loc #= np.zeros([1,2], np.int32)
             int loc_start, loc_end, current_loc_start, current_loc_end
-            np.array locs, new_locs, dup_locs
+            np.ndarray locs, new_locs, dup_locs
             unsigned long i_old, i_new, i_dup, new_size, dup_size
             list chrnames = self.get_chr_names()
             str k
@@ -517,7 +517,7 @@ cdef class PETrackI:
         for i in range(len(scale_factor_s)):
             scale_factor = scale_factor_s[i]
 
-            tmp_pileup = quick_pileup ( self.__locations[chrom]['l'], self.__locations[chrom]['r'], scale_factor, baseline_value )
+            tmp_pileup = quick_pileup ( self.__locations[chrom]['l'], np.sort(self.__locations[chrom]['r']), scale_factor, baseline_value )
 
             if prev_pileup:
                 prev_pileup = max_over_two_pv_array ( prev_pileup, tmp_pileup )
