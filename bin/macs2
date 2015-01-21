@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# Time-stamp: <2014-10-23 16:16:22 Tao Liu>
+# Time-stamp: <2014-11-02 16:34:17 Tao Liu>
 
 """Description: MACS v2 main executable.
 
@@ -54,10 +54,10 @@ def main():
         # General call peak
         from MACS2.callpeak import run
         run( args )
-    elif subcommand == "diffpeak":
-        # differential peak calling w/ bedgraphs + optional peak regions
-        from MACS2.diffpeak import run
-        run( args )
+    #elif subcommand == "diffpeak":
+    #    # differential peak calling w/ bedgraphs + optional peak regions
+    #    from MACS2.diffpeak import run
+    #    run( args )
     elif subcommand == "bdgpeakcall":
         # call peak from bedGraph
         from MACS2.bdgpeakcall import run
@@ -121,7 +121,7 @@ def prepare_argparser ():
     add_callpeak_parser( subparsers )
 
     # # command for 'diffpeak'
-    add_diffpeak_parser( subparsers )
+    # add_diffpeak_parser( subparsers )
     
     # command for 'bdgpeakcall'
     add_bdgpeakcall_parser( subparsers )
