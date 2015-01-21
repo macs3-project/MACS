@@ -95,7 +95,7 @@ def opt_validate ( options ):
     #    options.extsize = 2 * options.shiftsize
     #else:                               # if --shiftsize is not set
     #    options.shiftsize = options.extsize / 2
-    if options.extsize <= 1 :
+    if options.extsize < 1 :
         logging.error("--extsize must >= 1!")
         sys.exit(1)
 
