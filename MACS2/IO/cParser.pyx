@@ -1146,7 +1146,8 @@ cdef class BAMPEParser(BAMParser):
         while True:
             try: entrylength = unpack('<i', fread(4))[0]
             except err: break
-            rawread = <bytes>fread(32)
+            brawread = <bytes>fread(32)
+            rawread = <char *> brawread
 #            rawread = <bytes>fread(entrylength)
             read = self.__pe_binary_parse(rawread)
             fseek(entrylength - 32, 1)
@@ -1194,7 +1195,8 @@ cdef class BAMPEParser(BAMParser):
         while True:
             try: entrylength = unpack('<i', fread(4))[0]
             except err: break
-            rawread = <bytes>fread(32)
+            brawread = <bytes>fread(32)
+            rawread = <char *> brawread
 #            rawread = <bytes>fread(entrylength)
             read = self.__pe_binary_parse(rawread)
             fseek(entrylength - 32, 1)
