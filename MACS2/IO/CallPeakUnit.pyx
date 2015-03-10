@@ -1,4 +1,4 @@
-# Time-stamp: <2015-03-10 00:09:42 Tao Liu>
+# Time-stamp: <2015-03-10 13:33:32 Tao Liu>
 
 """Module for Calculate Scores.
 
@@ -40,7 +40,6 @@ from MACS2.Signal import maxima, enforce_valleys, enforce_peakyness
 #from scipy.stats import chi2
 
 from libc.stdint cimport uint32_t, uint64_t, int32_t, int64_t
-
 ctypedef np.float32_t float32_t
 
 from libc.math cimport exp,log,log10, M_LN10, log1p, erf, sqrt

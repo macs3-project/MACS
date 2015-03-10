@@ -1,4 +1,4 @@
-# Time-stamp: <2014-05-02 15:10:06 Tao Liu>
+# Time-stamp: <2015-03-10 15:38:17 Tao Liu>
 
 """Module Description
 
@@ -21,7 +21,8 @@ from array import array
 from MACS2.Constants import *
 
 from cpython cimport bool
-
+from libc.stdint cimport uint32_t, uint64_t, int32_t, int64_t
+ctypedef np.float32_t float32_t
 
 cpdef median (nums):
     """Calculate Median.
@@ -125,6 +126,7 @@ cdef class PeakModel:
         #print self.min_tags
         #print self.max_tags
         # use treatment data to build model
+        self.info("#2 looking for paired plus/minus strand peaks...")
         paired_peakpos = self.__paired_peaks ()
         # select up to 1000 pairs of peaks to build model
         num_paired_peakpos = 0
@@ -167,17 +169,17 @@ Summary of Peak Model:
         cdef:
             int window_size, i
             list chroms
-            np.ndarray tags_plus, tags_minus, plus_line, minus_line, ycorr, xcorr, i_l_max
             object paired_peakpos_chrom
-            np.ndarray plus_start, plus_end, minus_start, minus_end
+            np.ndarray[np.int32_t, ndim=1] tags_plus, tags_minus, plus_start, plus_end, minus_start, minus_end, plus_line, minus_line
+            np.ndarray plus_data, minus_data, xcorr, ycorr, i_l_max
         
         window_size = 1+2*self.peaksize+self.tag_expansion_size
-        self.plus_line = np.zeros(window_size, dtype="int32")#[0]*window_size
-        self.minus_line = np.zeros(window_size, dtype="int32")#[0]*window_size
-        plus_start = np.zeros(window_size, dtype="int32")
-        plus_end = np.zeros(window_size, dtype="int32")
-        minus_start = np.zeros(window_size, dtype="int32")
-        minus_end = np.zeros(window_size, dtype="int32")
+        self.plus_line = np.zeros(window_size, dtype="int32") # for plus strand pileup
+        self.minus_line = np.zeros(window_size, dtype="int32")# for minus strand pileup
+        plus_start = np.zeros(window_size, dtype="int32")     # for fast pileup
+        plus_end = np.zeros(window_size, dtype="int32")       # for fast pileup
+        minus_start = np.zeros(window_size, dtype="int32")    # for fast pileup
+        minus_end = np.zeros(window_size, dtype="int32")      # for fast pileup
         #self.plus_line = [0]*window_size
         #self.minus_line = [0]*window_size        
         self.info("start model_add_line...")
@@ -245,7 +247,7 @@ Summary of Peak Model:
         
         return True
 
-    cdef __model_add_line (self, object pos1, np.ndarray pos2, np.ndarray start, np.ndarray end): #, int plus_strand=1):
+    cdef __model_add_line (self, object pos1, np.ndarray[np.int32_t, ndim=1] pos2, np.ndarray[np.int32_t, ndim=1] start, np.ndarray[np.int32_t, ndim=1] end): #, int plus_strand=1):
         """Project each pos in pos2 which is included in
         [pos1-self.peaksize,pos1+self.peaksize] to the line.
 
@@ -254,7 +256,8 @@ Summary of Peak Model:
         line: numpy array object where we pileup tags
 
         """
-        cdef int i1, i2, i2_prev, i1_max, i2_max, last_p2, psize_adjusted1, psize_adjusted2, p1, p2, max_index, s, e
+        cdef:
+            int i1, i2, i2_prev, i1_max, i2_max, last_p2, psize_adjusted1, psize_adjusted2, p1, p2, max_index, s, e
         
         i1 = 0                  # index for pos1
         i2 = 0                  # index for pos2
@@ -302,11 +305,12 @@ Summary of Peak Model:
                 i2+=1
         return
     
-    cdef __count ( self, np.ndarray start, np.ndarray end, np.ndarray line ):
+    cdef __count ( self, np.ndarray[np.int32_t, ndim=1] start, np.ndarray[np.int32_t, ndim=1] end, np.ndarray[np.int32_t, ndim=1] line ):
         """
         """
-        cdef int i
-        cdef long pileup
+        cdef:
+            int i
+            long pileup
         pileup = 0
         for i in range(line.shape[0]):
             pileup += start[i] + end[i]
@@ -319,20 +323,28 @@ Summary of Peak Model:
 
         Return paired peaks center positions.
         """
+        cdef:
+           int i
+           list chrs
+           str chrom
+           dict paired_peaks_pos
+           np.ndarray[np.int32_t, ndim=1] plus_tags, minus_tags
+
         chrs = self.treatment.get_chr_names()
         chrs.sort()
         paired_peaks_pos = {}
-        for chrom in chrs:
-            self.debug("Chromosome: %s" % (chrom))
-            tags = self.treatment.get_locations_by_chr(chrom)
-            plus_peaksinfo = self.__naive_find_peaks (tags[0],1)
-            self.debug("Number of unique tags on + strand: %d" % (len(tags[0])))            
-            self.debug("Number of peaks in + strand: %d" % (len(plus_peaksinfo)))
-            minus_peaksinfo = self.__naive_find_peaks (tags[1],0)
-            self.debug("Number of unique tags on - strand: %d" % (len(tags[1])))            
-            self.debug("Number of peaks in - strand: %d" % (len(minus_peaksinfo)))
+        for i in range( len(chrs) ):
+            chrom = chrs[ i ]
+            self.debug("Chromosome: %s" % (chrom) )
+            [ plus_tags, minus_tags ] = self.treatment.get_locations_by_chr( chrom )
+            plus_peaksinfo = self.__naive_find_peaks ( plus_tags, 1 )
+            self.debug("Number of unique tags on + strand: %d" % ( plus_tags.shape[0] ) )
+            self.debug("Number of peaks in + strand: %d" % ( len(plus_peaksinfo) ) )
+            minus_peaksinfo = self.__naive_find_peaks ( minus_tags, 0 )
+            self.debug("Number of unique tags on - strand: %d" % ( minus_tags.shape[0] ) )
+            self.debug("Number of peaks in - strand: %d" % ( len( minus_peaksinfo ) ) )
             if not plus_peaksinfo or not minus_peaksinfo:
-                self.debug("Chrom %s is discarded!" % (chrom))
+                self.debug("Chrom %s is discarded!" % (chrom) )
                 continue
             else:
                 paired_peaks_pos[chrom] = self.__find_pair_center (plus_peaksinfo, minus_peaksinfo)
@@ -367,38 +379,44 @@ Summary of Peak Model:
                 im += 1
         return pair_centers
             
-    cdef __naive_find_peaks (self, taglist, plus_strand=1 ):
+    cdef __naive_find_peaks (self, np.ndarray[np.int32_t, ndim=1] taglist, int plus_strand=1 ):
         """Naively call peaks based on tags counting. 
 
         if plus_strand == 0, call peak on minus strand.
 
         Return peak positions and the tag number in peak region by a tuple list [(pos,num)].
         """
-        cdef long i
-        cdef int pos
+        cdef:
+            long i
+            int pos
+            list peak_info
+            int32_t * taglist_ptr
+            list current_tag_list
         
+        taglist_ptr = <int32_t *> taglist.data
+
         peak_info = []    # store peak pos in every peak region and
                           # unique tag number in every peak region
         if taglist.shape[0] < 2:
             return peak_info
         pos = taglist[0]
 
-        #current_tag_list = array(BYTE4, [pos])   # list to find peak pos
-        current_tag_list = [pos]
+        current_tag_list = [ pos ]
 
         for i in range( 1, taglist.shape[0] ):
-            pos = taglist[i]
+            pos = taglist_ptr[0]
+            taglist_ptr += 1
 
-            if ( pos - current_tag_list[0]+1 ) > self.peaksize: # call peak in current_tag_list when the region is long enough
+            if ( pos - current_tag_list[0] + 1 ) > self.peaksize: # call peak in current_tag_list when the region is long enough
                 # a peak will be called if tag number is ge min tags.
                 if len(current_tag_list) >= self.min_tags and len(current_tag_list) <= self.max_tags:
                     peak_info.append( ( self.__naive_peak_pos(current_tag_list,plus_strand), len(current_tag_list) ) )
                 #current_tag_list = array(BYTE4, []) # reset current_tag_list
                 current_tag_list = []
 
-            current_tag_list.append(pos)   # add pos while 1. no
-                                           # need to call peak;
-                                           # 2. current_tag_list is []
+            current_tag_list.append( pos )   # add pos while 1. no
+                                             # need to call peak;
+                                             # 2. current_tag_list is []
         return peak_info
 
     cdef __naive_peak_pos (self, pos_list, int plus_strand ):
@@ -412,7 +430,11 @@ Summary of Peak Model:
         #    tpos = pos_list + self.tag_expansion_size/2
         #else:
         #    tpos = pos_list - self.tag_expansion_size/2
-        cdef int peak_length, start, pos, i, pp, top_p_num, s, e
+        cdef:
+            int peak_length, start, pos, i, pp, top_p_num, s, e, pileup, j
+            np.ndarray[np.int32_t, ndim=1] horizon_line
+            list ss, es
+            int l_ss, l_es, i_s, i_e
 
         peak_length = pos_list[-1]+1-pos_list[0]+self.tag_expansion_size
         #if plus_strand:
@@ -420,25 +442,65 @@ Summary of Peak Model:
         #else:
         #    start = pos_list[0] - self.tag_expansion_size
 
-        start = pos_list[0] - self.tag_expansion_size/2
+        start = pos_list[0] - self.tag_expansion_size/2 # leftmost position of project line
+        ss = []
+        es = []
 
         #horizon_line = np.zeros(peak_length, dtype="int32") # the line for tags to be projected
         
-        horizon_line = [0]*peak_length # the line for tags to be projected
+        horizon_line = np.zeros( peak_length, dtype="int32") # the line for tags to be projected
         #horizon_line = array('i',[0]*peak_length)
         #for pos in pos_list:
         for i in range(len(pos_list)):
             pos = pos_list[i]
             #if plus_strand:
-            s = max(pos-start-self.tag_expansion_size/2,0)
-            e = min(pos-start+self.tag_expansion_size/2,peak_length)
-            for pp in range(s,e): # projected point
-                horizon_line[pp] += 1
-            #else:
-            #    s = max(pos-start-self.tag_expansion_size/2,0)
-            #    e = min(pos-start+self.tag_expansion_size/2,peak_length)
-            #    for pp in range(s,e): # projected point
-            #        horizon_line[pp] += 1
+            ss.append( max(pos-start-self.tag_expansion_size/2,0) )
+            es.append( min(pos-start+self.tag_expansion_size/2,peak_length) )
+
+        ss.sort()
+        es.sort()
+        
+        pileup = 0
+
+        ls = len( ss )
+        le = len( es )
+
+        i_s = 0
+        i_e = 0
+        
+        pre_p = min( ss[ 0 ], es[ 0 ] )
+        if pre_p != 0:
+            for i in range( pre_p ):
+                horizon_line[ i ] = 0
+
+        while i_s < ls and i_e < le:
+            if ss[ i_s ] < es[ i_e ]:
+                p = ss[ i_s ]
+                if p != pre_p:
+                    for i in range( pre_p, p ):
+                        horizon_line[ i ] = pileup
+                    pre_p = p
+                pileup += 1
+                i_s += 1
+            elif ss[ i_s ] > es[ i_e ]:
+                p = es[ i_e ]
+                if p != pre_p:
+                    for i in range( pre_p, p):
+                        horizon_line[ i ] = pileup
+                    pre_p = p
+                pileup -= 1
+                i_e += 1
+            else:
+                i_s += 1
+                i_e += 1
+        if ( i_e < ls ):
+            for j in range( i_e, ls ):
+                p = es[ i_e ]
+                if p != pre_p:
+                    for i in range( pre_p, p ):
+                        horizon_line[ i ] = pileup
+                    pre_p = p
+                pileup -= 1
 
         # # top indices
         # top_indices = np.where(horizon_line == horizon_line.max())[0]
