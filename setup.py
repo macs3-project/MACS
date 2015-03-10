@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# Time-stamp: <2015-03-10 15:45:16 Tao Liu>
+# Time-stamp: <2015-03-10 16:13:01 Tao Liu>
 
 """Description
 
@@ -39,7 +39,7 @@ def main():
 
     ext_modules = [Extension("MACS2.Prob", ["MACS2/Prob.c"], libraries=["m"], include_dirs=numpy_include_dir, extra_compile_args=["-w","-O3"] ),
                    Extension("MACS2.IO.Parser",["MACS2/IO/Parser.c"], include_dirs=numpy_include_dir, extra_compile_args=["-w","-O3"]),
-                   Extension("MACS2.Pileup", ["MACS2/Pileup.c","MACS2/cPosValCalculation.c", "MACS2/cPosValCalculation.h"], include_dirs=numpy_include_dir, extra_compile_args=["-w","-O3"] ),
+                   Extension("MACS2.Pileup", ["MACS2/Pileup.c","MACS2/cPosValCalculation.c"], include_dirs=numpy_include_dir, extra_compile_args=["-w","-O3"] ),
                    Extension("MACS2.PeakModel", ["MACS2/PeakModel.c"], include_dirs=numpy_include_dir, extra_compile_args=["-w","-O3"]),
                    Extension("MACS2.PeakDetect", ["MACS2/PeakDetect.c"], extra_compile_args=["-w","-O3"]),
                    Extension("MACS2.Signal", ["MACS2/Signal.c"], include_dirs=numpy_include_dir, extra_compile_args=["-w","-O3"]),
