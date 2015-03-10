@@ -1,4 +1,4 @@
-# Time-stamp: <2013-10-28 01:35:22 Tao Liu>
+# Time-stamp: <2015-03-05 13:48:43 Tao Liu>
 
 """Description: Filter duplicate reads depending on sequencing depth.
 
@@ -25,9 +25,10 @@ import logging
 # ------------------------------------
 # own python modules
 # ------------------------------------
-from MACS2.OptValidator import opt_validate_pileup as opt_validate
+from MACS2.OptValidator import opt_validate_predictd as opt_validate
 from MACS2.OutputWriter import *
-from MACS2.cPileup import unified_pileup_bdg   
+from MACS2.PeakModel import PeakModel,NotEnoughPairsException
+from MACS2.Prob import binomial_cdf_inv
 from MACS2.Constants import *
 # ------------------------------------
 # Main function
@@ -44,35 +45,37 @@ def run( o_options ):
     debug = options.debug
     error = options.error
     #0 output arguments
-    assert options.format != 'BAMPE', "Pair-end data with BAMPE option currently doesn't work with pileup command. You can pretend your data to be single-end with -f BAM. Please try again!"
-
-    #0 prepare output file
-    if options.outputfile != "stdout":
-        outfhd = open( os.path.join( options.outdir, options.outputfile ), "w" )
-    else:
-        outfhd = sys.stdout
+    assert options.format != 'BAMPE', "Pair-end data with BAMPE option doesn't work with predictd command. You can pretend your data to be single-end with -f BAM. Please try again!"
     
     #1 Read tag files
     info("# read alignment files...")
-    (tsize, treat) = load_tag_files_options  (options)
+    treat = load_tag_files_options  (options)
     
-    info("# tag size = %d", tsize)
+    info("# tag size = %d", options.tsize)
     
     t0 = treat.total
     info("# total tags in alignment file: %d", t0)
 
-    if options.bothdirection:
-        info("# Pileup alignment file, extend each read towards up/downstream direction with %d bps" % options.extsize)        
-        treat_btrack = unified_pileup_bdg(treat, options.extsize * 2, 1, directional=False, halfextension=False)
-        info("# save bedGraph to %s" % options.outputfile)
-        treat_btrack.write_bedGraph( outfhd, "Pileup", "Pileup track with extsize %d on both directions" % options.extsize, trackline=False )
-    else:
-        info("# Pileup alignment file, extend each read towards downstream direction with %d bps" % options.extsize)
-        treat_btrack = unified_pileup_bdg(treat, options.extsize, 1, directional=True, halfextension=False)
-        info("# save bedGraph to %s" % options.outputfile)
-        treat_btrack.write_bedGraph( outfhd, "Pileup", "Pileup track with extsize %d on 5' directions" % options.extsize, trackline=False )
+    #2 Build Model
+    info("# Build Peak Model...")
 
-    info("# Done! Check %s" % options.outputfile)
+    try:
+        peakmodel = PeakModel(treatment = treat,
+                              max_pairnum = MAX_PAIRNUM,
+                              opt = options
+                              )
+        info("# finished!")
+        debug("#  Summary Model:")
+        debug("#   min_tags: %d" % (peakmodel.min_tags))
+        debug("#   d: %d" % (peakmodel.d))
+        info("# predicted fragment length is %d bps" % peakmodel.d)
+        info("# alternative fragment length(s) may be %s bps" % ','.join(map(str,peakmodel.alternative_d)))
+        info("# Generate R script for model : %s" % (options.modelR))
+        model2r_script(peakmodel,options.modelR, options.rfile )
+        options.d = peakmodel.d
+
+    except NotEnoughPairsException:
+        warn("# Can't find enough pairs of symmetric peaks to build model!")
 
 def load_tag_files_options ( options ):
     """From the options, load alignment tags.
@@ -80,7 +83,9 @@ def load_tag_files_options ( options ):
     """
     options.info("# read treatment tags...")
     tp = options.parser(options.ifile[0])
-    tsize = tp.tsize()
+    if not options.tsize:           # override tsize if user specified --tsize
+        ttsize = tp.tsize()
+        options.tsize = ttsize
     treat = tp.build_fwtrack()
     treat.sort()
     if len(options.ifile) > 1:
@@ -90,6 +95,6 @@ def load_tag_files_options ( options ):
             treat = tp.append_fwtrack( treat )
             treat.sort()
 
-    options.info("tag size is determined as %d bps" % tsize)
-    return (tsize, treat)
+    options.info("tag size is determined as %d bps" % options.tsize)
+    return treat
 

@@ -1,4 +1,4 @@
-# Time-stamp: <2014-08-21 17:48:02 Tao Liu>
+# Time-stamp: <2015-03-05 14:18:00 Tao Liu>
 
 """Module for Feature IO classes.
 
@@ -29,8 +29,9 @@ from libc.math cimport log
 from cpython cimport bool
 
 from MACS2.Constants import *
-from MACS2.IO.cScoreTrack import scoreTrackII,CombinedTwoTrack
-from MACS2.IO.cPeakIO import PeakIO, BroadPeakIO
+from MACS2.IO.ScoreTrack import scoreTrackII,CombinedTwoTrack
+from MACS2.IO.PeakIO import PeakIO, BroadPeakIO
+
 
 # ------------------------------------
 # constants

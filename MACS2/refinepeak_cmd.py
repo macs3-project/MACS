@@ -1,4 +1,4 @@
-# Time-stamp: <2013-10-28 01:48:32 Tao Liu>
+# Time-stamp: <2015-03-05 13:48:25 Tao Liu>
 
 """Description: Filter duplicate reads depending on sequencing depth.
 
@@ -27,9 +27,9 @@ from collections import Counter
 # own python modules
 # ------------------------------------
 from MACS2.OptValidator import opt_validate_refinepeak as opt_validate
-from MACS2.cProb import binomial_cdf_inv
-from MACS2.IO.cBedGraphIO import bedGraphIO,genericBedIO
-from MACS2.IO.cPeakIO import PeakIO
+from MACS2.Prob import binomial_cdf_inv
+from MACS2.IO.BedGraphIO import bedGraphIO,genericBedIO
+from MACS2.IO.PeakIO import PeakIO
 from MACS2.Constants import *
 
 

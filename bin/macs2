@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# Time-stamp: <2014-11-02 16:34:17 Tao Liu>
+# Time-stamp: <2015-03-05 14:00:59 Tao Liu>
 
 """Description: MACS v2 main executable.
 
@@ -52,55 +52,55 @@ def main():
 
     if subcommand == "callpeak":
         # General call peak
-        from MACS2.callpeak import run
+        from MACS2.callpeak_cmd import run
         run( args )
     #elif subcommand == "diffpeak":
     #    # differential peak calling w/ bedgraphs + optional peak regions
-    #    from MACS2.diffpeak import run
+    #    from MACS2.diffpeak_cmd import run
     #    run( args )
     elif subcommand == "bdgpeakcall":
         # call peak from bedGraph
-        from MACS2.bdgpeakcall import run
+        from MACS2.bdgpeakcall_cmd import run
         run( args )
     elif subcommand == "bdgbroadcall":
         # call broad peak from bedGraph
-        from MACS2.bdgbroadcall import run
+        from MACS2.bdgbroadcall_cmd import run
         run( args )
     elif subcommand == "bdgcmp":
         # compare treatment and control to make enrichment scores
-        from MACS2.bdgcmp import run
+        from MACS2.bdgcmp_cmd import run
         run( args )
     elif subcommand == "bdgopt":
         # operations on the score column of bedGraph file
-        from MACS2.bdgopt import run
+        from MACS2.bdgopt_cmd import run
         run( args )        
     elif subcommand == "cmbreps":
         # combine replicates
-        from MACS2.cmbreps import run
+        from MACS2.cmbreps_cmd import run
         run( args )
     elif subcommand == "randsample":
         # randomly sample sequencing reads, and save as bed file
-        from MACS2.randsample import run
+        from MACS2.randsample_cmd import run
         run( args )
     elif subcommand == "filterdup":
         # filter out duplicate reads, and save as bed file
-        from MACS2.filterdup import run
+        from MACS2.filterdup_cmd import run
         run( args )
     elif subcommand == "bdgdiff":
         # differential calling
-        from MACS2.bdgdiff import run
+        from MACS2.bdgdiff_cmd import run
         run( args )
     elif subcommand == "refinepeak":
         # refine peak summits
-        from MACS2.refinepeak import run
+        from MACS2.refinepeak_cmd import run
         run( args )
     elif subcommand == "predictd":
         # predict d or fragment size
-        from MACS2.predictd import run
+        from MACS2.predictd_cmd import run
         run( args )
     elif subcommand == "pileup":
         # pileup alignment results with a given extension method
-        from MACS2.pileup import run
+        from MACS2.pileup_cmd import run
         run( args )
 
 def prepare_argparser ():
@@ -592,9 +592,8 @@ def add_pileup_parser( subparsers ):
                                               help = "Pileup aligned reads with a given extension size (fragment size or d in MACS language). Note there will be no step for duplicate reads filtering or sequencing depth scaling, so you may need to do certain pre/post-processing." )
     argparser_pileup.add_argument( "-i", "--ifile", dest = "ifile", type = str, required = True, nargs = "+",
                                    help = "ChIP-seq alignment file. If multiple files are given as '-t A B C', then they will all be read and combined. Note that pair-end data is not supposed to work with this command. REQUIRED." )
-    argparser_pileup.add_argument( "-o", "--ofile", dest = "outputfile", type = str,
-                                   help = "Output bedGraph file name. If not specified, will write to standard output. DEFAULT: stdout",
-                                   default = "stdout" )
+    argparser_pileup.add_argument( "-o", "--ofile", dest = "outputfile", type = str, required = True,
+                                   help = "Output bedGraph file name. If not specified, will write to standard output. REQUIRED." )
     add_outdir_option( argparser_pileup )    
     argparser_pileup.add_argument( "-f", "--format", dest = "format", type = str,
                                    choices=("AUTO","BAM","SAM","BED","ELAND","ELANDMULTI","ELANDEXPORT","BOWTIE"),

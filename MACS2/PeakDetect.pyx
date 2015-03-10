@@ -1,4 +1,4 @@
-# Time-stamp: <2014-10-23 15:18:38 Tao Liu>
+# Time-stamp: <2015-03-05 15:37:59 Tao Liu>
 
 """Module Description
 
@@ -23,10 +23,10 @@ import io
 #import subprocess
 import gc                               # use garbage collectior
 
-from MACS2.IO.cPeakIO import PeakIO
-from MACS2.IO.cBedGraphIO import bedGraphIO
+from MACS2.IO.PeakIO import PeakIO
+from MACS2.IO.BedGraphIO import bedGraphIO
 from MACS2.Constants import *
-from MACS2.IO.cCallPeakUnit import CallerFromAlignments
+from MACS2.IO.CallPeakUnit import CallerFromAlignments
 
 cdef str subpeak_letters(short i):
     if i < 26:

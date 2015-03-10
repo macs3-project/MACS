@@ -1,4 +1,4 @@
-# Time-stamp: <2014-08-05 16:55:22 Tao Liu>
+# Time-stamp: <2015-03-09 16:10:40 Tao Liu>
 
 """Module Description: For pileup functions.
 
@@ -17,19 +17,30 @@ the distribution).
 # ------------------------------------
 # python modules
 # ------------------------------------
-from array import array
+from libc.stdlib cimport malloc, free, qsort
 
-from MACS2.IO.cFixWidthTrack import FWTrack
-from MACS2.IO.cPairedEndTrack import PETrackI
-from MACS2.IO.cBedGraph import bedGraphTrackI
+from MACS2.IO.FixWidthTrack import FWTrack
+from MACS2.IO.PairedEndTrack import PETrackI
+from MACS2.IO.BedGraph import bedGraphTrackI
 from MACS2.Constants import *
 
 import numpy as np
 cimport numpy as np
 
 from numpy cimport int32_t
+ctypedef np.float32_t float32_t
 
 from cpython cimport bool
+from cpython cimport PyObject
+
+from cPosValCalculation cimport single_end_pileup as c_single_end_pileup
+from cPosValCalculation cimport write_pv_array_to_bedGraph as c_write_pv_array_to_bedGraph
+from cPosValCalculation cimport PosVal
+from cPosValCalculation cimport quick_pileup_simple
+
+from cython.parallel import *
+
+from time import time as ttime
 
 # ------------------------------------
 # functions
@@ -38,6 +49,73 @@ from cpython cimport bool
 cdef inline int int_max(int a, int b): return a if a >= b else b
 cdef inline long long_max(long a, long b): return a if a >= b else b
 cdef inline float float_max(float a, float b): return a if a >= b else b
+
+# This function uses pure C code for pileup
+cpdef pileup_and_write( trackI,
+                        output_filename,
+                        int d,
+                        float scale_factor,
+                        float baseline_value = 0.0,
+                        bint directional = True, 
+                        bint halfextension = True ):
+
+    cdef:
+        long five_shift, three_shift, l, i
+        list chroms
+        int n_chroms
+        str chrom
+        np.ndarray[np.int32_t, ndim=1] plus_tags, minus_tags
+        dict chrlengths = trackI.get_rlengths ()
+        int * plus_tags_pos
+        int * minus_tags_pos
+        long rlength
+        long fl
+        bytes py_bytes
+        char * chrom_char
+        PosVal ** _data
+        long * l_data
+
+    
+    # This block should be reused to determine the actual shift values
+    if directional:
+        # only extend to 3' side
+        if halfextension:
+            five_shift = d/-4  # five shift is used to move cursor towards 5' direction to find the start of fragment
+            three_shift = d*3/4 # three shift is used to move cursor towards 3' direction to find the end of fragment
+        else:
+            five_shift = 0
+            three_shift = d
+    else:
+        # both sides
+        if halfextension:
+            five_shift = d/4
+            three_shift = five_shift
+        else:
+            five_shift = d/2
+            three_shift = d - five_shift
+    # end of the block
+
+    chroms = chrlengths.keys()
+    n_chroms = len( chroms )
+    _data = < PosVal ** > malloc( n_chroms * sizeof( PosVal * ) )
+    l_data = < long * > malloc( n_chroms * sizeof( long ) )
+  
+    for i in range( n_chroms ):
+        chrom = chroms[ i ]
+        (plus_tags, minus_tags) = trackI.get_locations_by_chr(chrom)
+        rlength = <long> chrlengths[ chrom ]
+        plus_tags_pos = <int *> plus_tags.data
+        minus_tags_pos = <int *> minus_tags.data
+        _data[ i ] = c_single_end_pileup( plus_tags_pos, plus_tags.shape[0], minus_tags_pos, minus_tags.shape[0], five_shift, three_shift, 0, rlength, scale_factor, baseline_value, &l_data[ i ] )
+
+    for i in range( n_chroms ):
+        chrom = chroms[ i ]
+        py_bytes = chrom.encode()
+        chrom_char = py_bytes
+        c_write_pv_array_to_bedGraph( _data[ i ], l_data[ i ], chrom_char, output_filename, 1 )
+
+    free( l_data )
+    free( _data )
 
 # Unified pileup function #
 cpdef unified_pileup_bdg(track,
@@ -398,15 +476,36 @@ cdef start_and_end_poss ( np.ndarray plus_tags, np.ndarray minus_tags,
     return ends
 
 cdef np.ndarray[np.int32_t, ndim=1] fix_coordinates(np.ndarray[np.int32_t, ndim=1] poss, int rlength):
+    cdef:
+        long i
+        int32_t * ptr
+    
+    ptr = <int32_t *> poss.data
+
+    for i in range( poss.shape[0] ):
+        if ptr[i] < 0:
+            ptr[i] = 0
+        else:
+            break
+        
+    for i in range( poss.shape[0]-1, -1, -1 ):
+        if ptr[i] > rlength:
+            ptr[i] = rlength
+        else:
+            break
+    
+    return poss
+
+cdef int * fix_coordinates_2 ( int * poss, int l_of_poss, int rlength) nogil:
     cdef long i
     
-    for i in range( poss.shape[0] ):
+    for i in range( l_of_poss ):
         if poss[i] < 0:
             poss[i] = 0
         else:
             break
         
-    for i in range( poss.shape[0]-1, -1, -1 ):
+    for i in range( l_of_poss-1, -1, -1 ):
         if poss[i] > rlength:
             poss[i] = rlength
         else:
@@ -415,7 +514,7 @@ cdef np.ndarray[np.int32_t, ndim=1] fix_coordinates(np.ndarray[np.int32_t, ndim=
     return poss
 
 # general pileup function
-cpdef se_all_in_one_pileup ( np.ndarray plus_tags, np.ndarray minus_tags, long five_shift, long three_shift, int rlength, float scale_factor, float baseline_value ):
+cpdef se_all_in_one_pileup ( np.ndarray[np.int32_t, ndim=1] plus_tags, np.ndarray[np.int32_t, ndim=1] minus_tags, long five_shift, long three_shift, int rlength, float scale_factor, float baseline_value ):
     """Return pileup given 5' end of fragment at plus or minus strand
     separately, and given shift at both direction to recover a
     fragment. This function is for single end sequencing library
@@ -438,13 +537,20 @@ cpdef se_all_in_one_pileup ( np.ndarray plus_tags, np.ndarray minus_tags, long f
 
     """
     cdef:
-        long i_s, i_e, i
+        long i_s, i_e, i, I
         int a, b, p, pre_p, pileup
         list tmp
         long lp = plus_tags.shape[0]
         long lm = minus_tags.shape[0]
         long l = lp + lm
-        np.ndarray start_poss, end_poss
+        np.ndarray[np.int32_t, ndim=1] start_poss, end_poss, ret_p
+        np.ndarray[np.float32_t, ndim=1] ret_v
+        # pointers are used for numpy arrays
+        int32_t * start_poss_ptr
+        int32_t * end_poss_ptr
+        int32_t * ret_p_ptr     # pointer for position array 
+        float32_t * ret_v_ptr     # pointer for value array
+        
 
     start_poss = np.concatenate( ( plus_tags-five_shift, minus_tags-three_shift ) )
     end_poss   = np.concatenate( ( plus_tags+three_shift, minus_tags+five_shift ) )    
@@ -452,179 +558,108 @@ cpdef se_all_in_one_pileup ( np.ndarray plus_tags, np.ndarray minus_tags, long f
     # sort
     start_poss.sort()
     end_poss.sort()
-
+    
     # fix negative coordinations and those extends over end of chromosomes
     start_poss = fix_coordinates(start_poss, rlength)
     end_poss = fix_coordinates(end_poss, rlength)
 
-    tmp = [array(BYTE4,[]),array(FBYTE4,[])] # for (endpos,value)
-    tmppadd = tmp[0].append
-    tmpvadd = tmp[1].append
+    lx = start_poss.shape[0]
+
+    start_poss_ptr = <int32_t *> start_poss.data
+    end_poss_ptr = <int32_t *> end_poss.data
+
+    ret_p = np.zeros( 2 * lx, dtype="int32" )
+    ret_v = np.zeros( 2 * lx, dtype="float32" )
+
+    ret_p_ptr = <int32_t *> ret_p.data
+    ret_v_ptr = <float32_t *> ret_v.data
+
+    tmp = [ret_p, ret_v] # for (endpos,value)
+    # #tmppadd = tmp[0].append
+    # #tmpvadd = tmp[1].append
     i_s = 0                         # index of start_poss
     i_e = 0                         # index of end_poss
-
-    s_next = iter(start_poss).next
-    e_next = iter(end_poss).next
-
+    I = 0
 
     pileup = 0
     if start_poss.shape[0] == 0: return tmp
-    pre_p = min(start_poss[0],end_poss[0])
+    pre_p = min(start_poss_ptr[0],end_poss_ptr[0])
 
     if pre_p != 0:
         # the first chunk of 0
-        tmppadd( pre_p )
-        tmpvadd( float_max(0,baseline_value) )
+        ret_p_ptr[0] = pre_p
+        ret_v_ptr[0] = float_max(0,baseline_value) 
+        ret_p_ptr += 1
+        ret_v_ptr += 1
+        I += 1
         
     pre_v = pileup
-
-    #a = s_next()
-    #b = e_next()
-
-    a = start_poss[i_s]
-    b = end_poss[i_e]
 
     assert start_poss.shape[0] == end_poss.shape[0]
     lx = start_poss.shape[0]
 
-    try:
-        while 1:
-            if a < b:
-                p = a
-                if p != pre_p:
-                    tmppadd( p )
-                    tmpvadd( float_max(pileup * scale_factor, baseline_value) )
-                    pre_p = p
-                pileup += 1
-                i_s += 1
-                a = start_poss[i_s]
-            elif a > b:
-                p = b
-                if p != pre_p:
-                    tmppadd( p )
-                    tmpvadd( float_max(pileup * scale_factor, baseline_value) ) 
-                    pre_p = p
-                pileup -= 1
-                i_e += 1
-                b = end_poss[i_e]
-            else:
-                i_s += 1
-                i_e += 1
-                a = start_poss[i_s]
-                b = end_poss[i_e]
-    except IndexError:
-        pass
+    while i_s < lx and i_e < lx:
+        if start_poss_ptr[0] < end_poss_ptr[0]:
+            p = start_poss_ptr[0]
+            if p != pre_p:
+                ret_p_ptr[0] = p
+                ret_v_ptr[0] = float_max(pileup * scale_factor, baseline_value)
+                ret_p_ptr += 1
+                ret_v_ptr += 1
+                I += 1
+                pre_p = p
+            pileup += 1
+            i_s += 1
+            start_poss_ptr += 1
+        elif start_poss_ptr[0] > end_poss_ptr[0]:
+            p = end_poss_ptr[0]
+            if p != pre_p:
+                ret_p_ptr[0] = p
+                ret_v_ptr[0] = float_max(pileup * scale_factor, baseline_value)
+                ret_p_ptr += 1
+                ret_v_ptr += 1
+                I += 1
+                pre_p = p
+            pileup -= 1
+            i_e += 1
+            end_poss_ptr += 1
+        else:
+            i_s += 1
+            i_e += 1
+            start_poss_ptr += 1
+            end_poss_ptr += 1
 
     if i_e < lx:
         # add rest of end positions
         for i in range(i_e, lx):
-            p = end_poss[i]
+            p = end_poss_ptr[0]
             if p != pre_p:
-                tmppadd( p )
-                tmpvadd( float_max(pileup * scale_factor, baseline_value) )
+                ret_p_ptr[0] = p
+                ret_v_ptr[0] = float_max(pileup * scale_factor, baseline_value)
+                ret_p_ptr += 1
+                ret_v_ptr += 1
+                I += 1
                 pre_p = p
             pileup -= 1
+            end_poss_ptr += 1
 
     # clean mem
     start_poss.resize(100000, refcheck=False)
     start_poss.resize(0, refcheck=False)
     end_poss.resize(100000, refcheck=False)
-    end_poss.resize(0, refcheck=False)                            
-    
+    end_poss.resize(0, refcheck=False)   
+
+    # resize
+    ret_p.resize( I, refcheck=False )
+    ret_v.resize( I, refcheck=False )
+
     return tmp
 
+cdef int compare(const void * a, const void * b) nogil:
+    if a - b > 0: return 1
+    return 0
 
-cpdef se_all_in_one_pileup2 ( np.ndarray plus_tags, np.ndarray minus_tags, long five_shift, long three_shift, int rlength, float scale_factor, float baseline_value ):
-    """Return pileup given 5' end of fragment at plus or minus strand
-    separately, and given shift at both direction to recover a
-    fragment. This function is for single end sequencing library
-    only. Please directly use 'quick_pileup' function for Pair-end
-    library.
-    
-    It contains a super-fast and simple algorithm proposed by Jie
-    Wang. It will take sorted start positions and end positions, then
-    compute pileup values.
-
-    It will return a pileup result in similar structure as
-    bedGraph. There are two python arrays:
-    
-    [end positions, values] or '[p,v] array' in other description for
-    functions within MACS2.
-
-    Two arrays have the same length and can be matched by index. End
-    position at index x (p[x]) record continuous value of v[x] from
-    p[x-1] to p[x].
-
-    """
-    cdef:
-        long i_s, i_e, i, j
-        int a, b, p, pre_p, pileup
-        list tmp
-        long lp = plus_tags.shape[0]
-        long lm = minus_tags.shape[0]
-        np.ndarray start_poss, end_poss, alldata, parray, varray
-
-    alldata = np.zeros( 2*(lp+lm), dtype = [("pos", "int32"),("v","int8")] )
-    alldata["pos"][:lp] = plus_tags-five_shift
-    alldata["pos"][lp:lp+lm] = minus_tags-three_shift
-    alldata["v"][:lp+lm] = 1
-
-    alldata["pos"][lp+lm:lp+lp+lm] = plus_tags+three_shift
-    alldata["pos"][lp+lp+lm:] = minus_tags+five_shift
-    alldata["v"][lp+lm:] = -1
-
-    # sort
-    alldata.sort( order = "pos" )
-
-    #print alldata
-
-    # fix coordinates
-    for i in range( alldata.shape[0] ):
-        if alldata[i][0] < 0:
-            alldata[i][0] = 0
-        else:
-            break
-        
-    for i in range( alldata.shape[0]-1, -1, -1 ):
-        if alldata[i][0] > rlength:
-            alldata[i][0] = rlength
-        else:
-            break
-    
-    tmp = [array(BYTE4,[]),array(FBYTE4,[])] # for (endpos,value)
-    tmppadd = tmp[0].append
-    tmpvadd = tmp[1].append
-    i_s = 0                         # index of start_poss
-    i_e = 0                         # index of end_poss
-
-    parray = alldata["pos"]
-    varray = alldata["v"]
-
-    pileup = 0
-    if alldata.shape[0] == 0: return tmp
-
-    pre_p = parray[0]
-
-    if pre_p != 0:
-        # the first chunk of 0
-        tmppadd( pre_p )
-        tmpvadd( float_max(0,baseline_value) )
-
-    for i in range( alldata.shape[0] ):
-        p = parray[ i ]
-        if p != pre_p:
-            tmppadd( p )
-            tmpvadd( float_max(pileup * scale_factor, baseline_value) )
-            pre_p = p
-        pileup += varray[ i ]
-
-    alldata.resize(100000, refcheck=False)
-    alldata.resize(0, refcheck=False)
-    
-    return tmp
-
-
-cpdef quick_pileup ( np.ndarray plus_tags, np.ndarray minus_tags, float scale_factor, float baseline_value ):
+cpdef quick_pileup ( np.ndarray[np.int32_t, ndim=1] start_poss, np.ndarray[np.int32_t, ndim=1] end_poss, float scale_factor, float baseline_value ):
     """Return pileup given plus strand and minus strand positions of fragments.
     
     A super-fast and simple algorithm proposed by Jie Wang. It will
@@ -642,137 +677,189 @@ cpdef quick_pileup ( np.ndarray plus_tags, np.ndarray minus_tags, float scale_fa
 
     """
     cdef:
-        long i_s, i_e, i
+        long i_s, i_e, i, I
         int a, b, p, pre_p, pileup
         list tmp
-        long lp = plus_tags.shape[0]
-        long lm = minus_tags.shape[0]
-        long l = lp + lm
+        long ls = start_poss.shape[0]
+        long le = end_poss.shape[0]
+        long l = ls + le
+        np.ndarray[np.int32_t, ndim=1] ret_p
+        np.ndarray[np.float32_t, ndim=1] ret_v
+        # pointers are used for numpy arrays
+        int32_t * start_poss_ptr
+        int32_t * end_poss_ptr
+        int32_t * ret_p_ptr     # pointer for position array 
+        float32_t * ret_v_ptr     # pointer for value array
 
-    tmp = [array(BYTE4,[]),array(FBYTE4,[])] # for (endpos,value)
-    tmppadd = tmp[0].append
-    tmpvadd = tmp[1].append
+    start_poss_ptr = <int32_t *> start_poss.data
+    end_poss_ptr = <int32_t *> end_poss.data
+
+    ret_p = np.zeros( l, dtype="int32" )
+    ret_v = np.zeros( l, dtype="float32" )
+
+    ret_p_ptr = <int32_t *> ret_p.data
+    ret_v_ptr = <float32_t *> ret_v.data
+
+    tmp = [ret_p, ret_v] # for (endpos,value)
+
     i_s = 0                         # index of plus_tags
     i_e = 0                         # index of minus_tags
+    I = 0
 
     pileup = 0
-    if plus_tags.shape[0] == 0: return tmp
-    pre_p = min(plus_tags[0],minus_tags[0])
+    if ls == 0: return tmp
+    pre_p = min(start_poss_ptr[0], end_poss_ptr[0])
+
     #print pre_p
     if pre_p != 0:
         # the first chunk of 0
-        tmppadd( pre_p )
-        tmpvadd( float_max(0,baseline_value) )
+        ret_p_ptr[0] = pre_p
+        ret_v_ptr[0] = float_max(0,baseline_value) 
+        ret_p_ptr += 1
+        ret_v_ptr += 1
+        I += 1
         
     pre_v = pileup
     
-    while i_s < lp and i_e < lm:
-        a = plus_tags[i_s]
-        b = minus_tags[i_e]
-        if a < b:
-            p = a
+    while i_s < ls and i_e < le:
+        if start_poss_ptr[0] < end_poss_ptr[0]:
+            p = start_poss_ptr[0]
             if p != pre_p:
-                tmppadd( p )
-                tmpvadd( float_max(pileup * scale_factor, baseline_value) )
+                ret_p_ptr[0] = p
+                ret_v_ptr[0] = float_max(pileup * scale_factor, baseline_value)
+                ret_p_ptr += 1
+                ret_v_ptr += 1
+                I += 1
                 pre_p = p
             pileup += 1
             i_s += 1
-        elif a > b:
-            p = b
+            start_poss_ptr += 1
+        elif start_poss_ptr[0] > end_poss_ptr[0]:
+            p = end_poss_ptr[0]
             if p != pre_p:
-                tmppadd( p )
-                tmpvadd( float_max(pileup * scale_factor, baseline_value) ) 
+                ret_p_ptr[0] = p
+                ret_v_ptr[0] = float_max(pileup * scale_factor, baseline_value)
+                ret_p_ptr += 1
+                ret_v_ptr += 1
+                I += 1
                 pre_p = p
             pileup -= 1
             i_e += 1
+            end_poss_ptr += 1
         else:
             i_s += 1
             i_e += 1
-    if i_e < lm:
+            start_poss_ptr += 1
+            end_poss_ptr += 1
+
+    if i_e < le:
         # add rest of end positions
-        for i in range(i_e, lm):
-            p = minus_tags[i]
+        for i in range(i_e, le):
+            p = end_poss_ptr[0]
             #for p in minus_tags[i_e:]:
             if p != pre_p:
-                tmppadd( p )
-                tmpvadd( float_max(pileup * scale_factor, baseline_value) )
-                #ret.add_loc(chrom,pre_p,p,pileup)
+                ret_p_ptr[0] = p
+                ret_v_ptr[0] = float_max(pileup * scale_factor, baseline_value)
+                ret_p_ptr += 1
+                ret_v_ptr += 1
+                I += 1
                 pre_p = p
             pileup -= 1
-    #    if i_s < l:
-    #        # add rest of start positions ( I don't think this will happen )
-    #        raise Exception("start positions can't be the only things left!")
+            end_poss_ptr += 1
+
+    ret_p.resize( I, refcheck=False )
+    ret_v.resize( I, refcheck=False )
+
     return tmp
 
 # general function to calculate maximum between two arrays.
 
-cpdef max_over_two_pv_array ( tmparray1, tmparray2 ):
+cpdef list max_over_two_pv_array ( list tmparray1, list tmparray2 ):
     """Merge two position-value arrays. For intersection regions, take
     the maximum value within region.
 
     tmparray1 and tmparray2 are [p,v] type lists, same as the output
-    from quick_pileup function.
+    from quick_pileup function. 'p' and 'v' are numpy arrays of int32
+    and float32.
     """
     
     cdef:
         int pre_p, p1, p2
         float v1, v2
-        list tmp
-        long l1, l2, l
+        np.ndarray[np.int32_t, ndim=1] a1_pos, a2_pos, ret_pos
+        np.ndarray[np.float32_t, ndim=1] a1_v, a2_v, ret_v
+        int32_t * a1_pos_ptr
+        int32_t * a2_pos_ptr
+        int32_t * ret_pos_ptr
+        float32_t * a1_v_ptr
+        float32_t * a2_v_ptr
+        float32_t * ret_v_ptr
+        long l1, l2, l, i1, i2, I
 
-    tmp = [array(BYTE4,[]),array(FBYTE4,[])] # for (endpos,value)
-    tmppadd = tmp[0].append
-    tmpvadd = tmp[1].append    
+    [ a1_pos, a1_v ] = tmparray1
+    [ a2_pos, a2_v ] = tmparray2
+    ret_pos = np.zeros( a1_pos.shape[0] + a2_pos.shape[0], dtype="int32" )
+    ret_v   = np.zeros( a1_pos.shape[0] + a2_pos.shape[0], dtype="float32" )
 
-    (p1s,v1s) = tmparray1
-    p1n = iter(p1s).next         # assign the next function to a viable to speed up
-    v1n = iter(v1s).next
-    l1  = len(p1s)
+    a1_pos_ptr = <int32_t *> a1_pos.data
+    a1_v_ptr = <float32_t *> a1_v.data
+    a2_pos_ptr = <int32_t *> a2_pos.data
+    a2_v_ptr = <float32_t *> a2_v.data
+    ret_pos_ptr = <int32_t *> ret_pos.data
+    ret_v_ptr = <float32_t *> ret_v.data
 
-    (p2s,v2s) = tmparray2
-    p2n = iter(p2s).next         # assign the next function to a viable to speed up
-    v2n = iter(v2s).next
-    l2  = len(p2s)
-    
+    l1 = a1_pos.shape[0]
+    l2 = a2_pos.shape[0]
+
+    i1 = 0
+    i2 = 0
+    I = 0
+
     pre_p = 0                   # remember the previous position in the new bedGraphTrackI object ret
 
-    try:
-        p1 = p1n()
-        v1 = v1n()
+    while i1 < l1 and i2 < l2:
+        if a1_pos_ptr[0] < a2_pos_ptr[0]:
+            # clip a region from pre_p to p1, then set pre_p as p1.
+            ret_pos_ptr[0] = a1_pos_ptr[0]
+            ret_v_ptr[0] =  float_max( a1_v_ptr[0], a2_v_ptr[0] )
+            ret_pos_ptr += 1
+            ret_v_ptr += 1
+            I += 1
+            pre_p = a1_pos_ptr[0]
+            # call for the next p1 and v1
+            a1_pos_ptr += 1
+            a1_v_ptr += 1
+            i1 += 1
+        elif a1_pos_ptr[0] > a2_pos_ptr[0]:
+            # clip a region from pre_p to p2, then set pre_p as p2.
+            ret_pos_ptr[0] = a2_pos_ptr[0]
+            ret_v_ptr[0] =  float_max( a1_v_ptr[0], a2_v_ptr[0] )
+            ret_pos_ptr += 1
+            ret_v_ptr += 1
+            I += 1
+            pre_p = a2_pos_ptr[0]
+            # call for the next p1 and v1
+            a2_pos_ptr += 1
+            a2_v_ptr += 1
+            i2 += 1
+        else:
+            # from pre_p to p1 or p2, then set pre_p as p1 or p2.
+            ret_pos_ptr[0] = a1_pos_ptr[0]
+            ret_v_ptr[0] =  float_max( a1_v_ptr[0], a2_v_ptr[0] )
+            ret_pos_ptr += 1
+            ret_v_ptr += 1
+            I += 1
+            pre_p = a1_pos_ptr[0]
+            # call for the next p1, v1, p2, v2.
+            a1_pos_ptr += 1
+            a1_v_ptr += 1
+            i1 += 1
+            a2_pos_ptr += 1
+            a2_v_ptr += 1
+            i2 += 1
 
-        p2 = p2n()
-        v2 = v2n()
-
-        while True:
-            if p1 < p2:
-                # clip a region from pre_p to p1, then set pre_p as p1.
-                tmppadd( p1 )
-                tmpvadd( float_max(v1,v2) )
-                pre_p = p1
-                # call for the next p1 and v1
-                p1 = p1n()
-                v1 = v1n()
-            elif p2 < p1:
-                # clip a region from pre_p to p2, then set pre_p as p2.
-                tmppadd( p2 )
-                tmpvadd( float_max(v1,v2) )
-                pre_p = p2
-                # call for the next p2 and v2
-                p2 = p2n()
-                v2 = v2n()
-            elif p1 == p2:
-                # from pre_p to p1 or p2, then set pre_p as p1 or p2.
-                tmppadd( p1 )
-                tmpvadd( float_max(v1,v2) )
-                pre_p = p1
-                # call for the next p1, v1, p2, v2.
-                p1 = p1n()
-                v1 = v1n()
-                p2 = p2n()
-                v2 = v2n()
-    except StopIteration:
-        # meet the end of either bedGraphTrackI, simply exit
-        pass
-    return tmp
+    ret_pos.resize( I, refcheck=False )
+    ret_v.resize( I, refcheck=False )
+    return [ret_pos, ret_v]
 
 

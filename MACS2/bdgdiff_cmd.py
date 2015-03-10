@@ -1,4 +1,4 @@
-# Time-stamp: <2013-10-28 01:08:06 Tao Liu>
+# Time-stamp: <2015-03-05 13:46:31 Tao Liu>
 
 """Description: Naive call differential peaks from 4 bedGraph tracks for scores.
 
@@ -21,8 +21,8 @@ the distribution).
 import sys
 import os
 import logging
-from MACS2.IO import cBedGraphIO
-from MACS2.IO import cScoreTrack
+from MACS2.IO import BedGraphIO
+from MACS2.IO import ScoreTrack
 
 # ------------------------------------
 # constants
@@ -56,19 +56,19 @@ def run( options ):
     ofile_prefix = options.oprefix
 
     info("Read and build treatment 1 bedGraph...")
-    t1bio = cBedGraphIO.bedGraphIO(options.t1bdg)
+    t1bio = BedGraphIO.bedGraphIO(options.t1bdg)
     t1btrack = t1bio.build_bdgtrack()
 
     info("Read and build control 1 bedGraph...")
-    c1bio = cBedGraphIO.bedGraphIO(options.c1bdg)
+    c1bio = BedGraphIO.bedGraphIO(options.c1bdg)
     c1btrack = c1bio.build_bdgtrack()
 
     info("Read and build treatment 2 bedGraph...")
-    t2bio = cBedGraphIO.bedGraphIO(options.t2bdg)
+    t2bio = BedGraphIO.bedGraphIO(options.t2bdg)
     t2btrack = t2bio.build_bdgtrack()
 
     info("Read and build control 2 bedGraph...")
-    c2bio = cBedGraphIO.bedGraphIO(options.c2bdg)
+    c2bio = BedGraphIO.bedGraphIO(options.c2bdg)
     c2btrack = c2bio.build_bdgtrack()
 
     depth1 = options.depth1
@@ -84,7 +84,7 @@ def run( options ):
         depth1 = 1.0
         depth2 = 1.0
 
-    twoconditionscore = cScoreTrack.TwoConditionScores( t1btrack,
+    twoconditionscore = ScoreTrack.TwoConditionScores( t1btrack,
                                                         c1btrack,
                                                         t2btrack,
                                                         c2btrack,

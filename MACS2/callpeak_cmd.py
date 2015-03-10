@@ -1,4 +1,4 @@
-# Time-stamp: <2014-08-22 14:56:43 Tao Liu>
+# Time-stamp: <2015-03-05 13:40:06 Tao Liu>
 
 """Description: MACS 2 main executable
 
@@ -29,9 +29,9 @@ from time import strftime
 # ------------------------------------
 from MACS2.OptValidator import opt_validate
 from MACS2.OutputWriter import *
-from MACS2.cProb import binomial_cdf_inv
-from MACS2.cPeakModel import PeakModel,NotEnoughPairsException
-from MACS2.cPeakDetect import PeakDetect
+from MACS2.Prob import binomial_cdf_inv
+from MACS2.PeakModel import PeakModel,NotEnoughPairsException
+from MACS2.PeakDetect import PeakDetect
 from MACS2.Constants import *
 # ------------------------------------
 # Main function

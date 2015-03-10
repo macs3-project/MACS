@@ -1,4 +1,4 @@
-# Time-stamp: <2013-10-28 00:12:46 Tao Liu>
+# Time-stamp: <2015-03-05 13:45:50 Tao Liu>
 
 """Description: Fine-tuning script to call broad peaks from a single bedGraph track for scores.
 
@@ -21,7 +21,7 @@ the distribution).
 import sys
 import os
 import logging
-from MACS2.IO import cBedGraphIO
+from MACS2.IO import BedGraphIO
 # ------------------------------------
 # constants
 # ------------------------------------
@@ -48,7 +48,7 @@ info    = logging.info
 # ------------------------------------
 def run( options ):
     info("Read and build bedGraph...")
-    bio = cBedGraphIO.bedGraphIO(options.ifile)
+    bio = BedGraphIO.bedGraphIO(options.ifile)
     btrack = bio.build_bdgtrack(baseline_value=0)
 
     info("Call peaks from bedGraph...")

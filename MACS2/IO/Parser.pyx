@@ -1,4 +1,4 @@
-# Time-stamp: <2015-01-21 10:07:59 Tao Liu>
+# Time-stamp: <2015-03-05 14:10:18 Tao Liu>
 
 """Module for all MACS Parser classes for input.
 
@@ -24,8 +24,8 @@ from re import findall
 import gzip
 import io
 from MACS2.Constants import *
-from MACS2.IO.cFixWidthTrack import FWTrack
-from MACS2.IO.cPairedEndTrack import PETrackI
+from MACS2.IO.FixWidthTrack import FWTrack
+from MACS2.IO.PairedEndTrack import PETrackI
 
 cdef public bint HAS_PYSAM
 
@@ -1128,8 +1128,8 @@ cdef class BAMPEParser(BAMParser):
             list references
             dict rlengths
             float d = 0.0
-            char *rawread
-            char *rawentrylength
+            str rawread
+            str rawentrylength
             _BAMPEParsed read
         
         petrack = PETrackI( buffer_size = self.buffer_size )
@@ -1146,7 +1146,7 @@ cdef class BAMPEParser(BAMParser):
         while True:
             try: entrylength = unpack('<i', fread(4))[0]
             except err: break
-            rawread = <bytes>fread(32)
+            rawread = fread(32)
 #            rawread = <bytes>fread(entrylength)
             read = self.__pe_binary_parse(rawread)
             fseek(entrylength - 32, 1)
@@ -1178,8 +1178,8 @@ cdef class BAMPEParser(BAMParser):
             list references
             dict rlengths
             float d = 0.0
-            char *rawread
-            char *rawentrylength
+            str rawread
+            str rawentrylength
             _BAMPEParsed read
         
         references, rlengths = self.get_references()
@@ -1194,7 +1194,7 @@ cdef class BAMPEParser(BAMParser):
         while True:
             try: entrylength = unpack('<i', fread(4))[0]
             except err: break
-            rawread = <bytes>fread(32)
+            rawread = fread(32)
 #            rawread = <bytes>fread(entrylength)
             read = self.__pe_binary_parse(rawread)
             fseek(entrylength - 32, 1)
@@ -1214,7 +1214,7 @@ cdef class BAMPEParser(BAMParser):
         petrack.set_rlengths( rlengths )
         return petrack
         
-    cdef _BAMPEParsed __pe_binary_parse (self, char *data):
+    cdef _BAMPEParsed __pe_binary_parse (self, str data):
         cdef:
             int nextpos, pos, cigar_op_len, i
             short bwflag, l_read_name, n_cigar_op, cigar_op

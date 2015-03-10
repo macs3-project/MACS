@@ -1,4 +1,4 @@
-# Time-stamp: <2014-11-02 16:00:04 Tao Liu>
+# Time-stamp: <2015-03-05 14:10:07 Tao Liu>
 
 """Module for filter duplicate tags from paired-end data
 
@@ -22,7 +22,7 @@ from copy import copy
 from cpython cimport bool
 cimport cython
 
-from MACS2.cPileup import quick_pileup, max_over_two_pv_array, se_all_in_one_pileup
+from MACS2.Pileup import quick_pileup, max_over_two_pv_array, se_all_in_one_pileup
 import sys
 
 cdef INT_MAX = <int>((<unsigned int>-1)>>1)

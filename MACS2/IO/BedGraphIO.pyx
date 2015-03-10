@@ -1,4 +1,4 @@
-# Time-stamp: <2013-04-09 15:50:29 Tao Liu>
+# Time-stamp: <2015-03-05 14:05:59 Tao Liu>
 
 """Module Description:  IO Module for bedGraph file
 
@@ -19,7 +19,7 @@ the distribution).
 # ------------------------------------
 import io
 
-from MACS2.IO.cBedGraph import bedGraphTrackI,bedRegionTrackI
+from MACS2.IO.BedGraph import bedGraphTrackI,bedRegionTrackI
 
 # ------------------------------------
 # constants

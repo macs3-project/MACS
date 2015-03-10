@@ -1,4 +1,4 @@
-# Time-stamp: <2013-10-27 23:55:20 Tao Liu>
+# Time-stamp: <2015-03-05 13:45:37 Tao Liu>
 
 """Description: Naive call peaks from a single bedGraph track for scores.
 
@@ -20,7 +20,7 @@ the distribution).
 import sys
 import os
 import logging
-from MACS2.IO import cBedGraphIO
+from MACS2.IO import BedGraphIO
 # ------------------------------------
 # constants
 # ------------------------------------
@@ -47,7 +47,7 @@ info    = logging.info
 # ------------------------------------
 def run( options ):
     info("Read and build bedGraph...")
-    bio = cBedGraphIO.bedGraphIO(options.ifile)
+    bio = BedGraphIO.bedGraphIO(options.ifile)
     btrack = bio.build_bdgtrack(baseline_value=0)
 
     if options.cutoff_analysis:

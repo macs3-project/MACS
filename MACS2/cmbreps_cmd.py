@@ -1,10 +1,10 @@
-# Time-stamp: <2014-07-30 15:33:55 Tao Liu>
+# Time-stamp: <2015-03-05 13:47:22 Tao Liu>
 
 import sys
 import os
 import logging
 
-from MACS2.IO import cBedGraphIO
+from MACS2.IO import BedGraphIO
 from MACS2.OptValidator import opt_validate_cmbreps as opt_validate
 
 from math import log as mlog
@@ -39,7 +39,7 @@ def run( options ):
     i = 1
     for ifile in options.ifile:
         info("Read file #%d" % i)
-        reps.append( cBedGraphIO.bedGraphIO( ifile ).build_bdgtrack( ) )
+        reps.append( BedGraphIO.bedGraphIO( ifile ).build_bdgtrack( ) )
         i += 1
 
     # first two reps

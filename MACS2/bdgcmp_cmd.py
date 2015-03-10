@@ -1,10 +1,10 @@
-# Time-stamp: <2014-07-30 02:40:36 Tao Liu>
+# Time-stamp: <2015-03-05 13:40:31 Tao Liu>
 
 import sys
 import os
 import logging
 
-from MACS2.IO import cBedGraphIO
+from MACS2.IO import BedGraphIO
 from MACS2.OptValidator import opt_validate_bdgcmp as opt_validate
 
 from math import log as mlog
@@ -36,11 +36,11 @@ def run( options ):
     pseudo_depth = 1.0/scaling_factor   # not an actual depth, but its reciprocal, a trick to override SPMR while necessary.
 
     info("Read and build treatment bedGraph...")
-    tbio = cBedGraphIO.bedGraphIO(options.tfile)
+    tbio = BedGraphIO.bedGraphIO(options.tfile)
     tbtrack = tbio.build_bdgtrack()
 
     info("Read and build control bedGraph...")
-    cbio = cBedGraphIO.bedGraphIO(options.cfile)
+    cbio = BedGraphIO.bedGraphIO(options.cfile)
     cbtrack = cbio.build_bdgtrack()
 
     info("Build scoreTrackII...")

@@ -1,4 +1,4 @@
-# Time-stamp: <2014-10-07 10:49:59 Tao Liu>
+# Time-stamp: <2015-03-05 14:21:33 Tao Liu>
 
 """Module for Feature IO classes.
 
@@ -26,7 +26,7 @@ from cpython cimport bool
 
 #from scipy.stats import chi2    # for 
 
-from MACS2.cSignal import maxima, enforce_valleys, enforce_peakyness
+from MACS2.Signal import maxima, enforce_valleys, enforce_peakyness
 
 cimport cython
 
@@ -34,8 +34,8 @@ from libc.math cimport log10,log, floor, ceil
 from libc.stdint cimport uint32_t, uint64_t, int32_t, int64_t
 
 from MACS2.Constants import BYTE4, FBYTE4, array
-from MACS2.cProb cimport poisson_cdf
-from MACS2.IO.cPeakIO import PeakIO, BroadPeakIO, parse_peakname
+from MACS2.Prob import poisson_cdf
+from MACS2.IO.PeakIO import PeakIO, BroadPeakIO, parse_peakname
 
 from MACS2.hashtable import Int64HashTable, Float64HashTable
 
@@ -1006,64 +1006,64 @@ cdef class scoreTrackII:
             
         return True
 
-    @cython.boundscheck(False)
-    cpdef reassign_peaks ( self, peaks ):
-        """Re-assign values of score, pileup, pscore, qscore, fold
-        change to predefined peaks.
+    # @cython.boundscheck(False)
+    # cpdef reassign_peaks ( self, peaks ):
+    #     """Re-assign values of score, pileup, pscore, qscore, fold
+    #     change to predefined peaks.
 
-        peaks should be a PeakIO object.
+    #     peaks should be a PeakIO object.
 
-        *Note* assume positions in scoreTrackIII object are sorted
-         from small to large.
+    #     *Note* assume positions in scoreTrackIII object are sorted
+    #      from small to large.
 
-        """
-        cdef:
-            str chrom
-            set chrs
-            int i, j, t_index, tmp_summit, l
-            float cutoff
+    #     """
+    #     cdef:
+    #         str chrom
+    #         set chrs
+    #         int i, j, t_index, tmp_summit, l
+    #         float cutoff
 
-        assert isinstance( peaks, PeakIO ), "peaks must be a PeakIO object!"
+    #     assert isinstance( peaks, PeakIO ), "peaks must be a PeakIO object!"
         
-        ret_peaks = PeakIO()
+    #     ret_peaks = PeakIO()
 
-        peaks.sort()
+    #     peaks.sort()
         
-        chrs = self.get_chr_names()
-        for chrom in chrs:
-            cpeaks = peaks.peaks[chrom]
-            ret_peaks.peaks[chrom] = []
-            npeaks = ret_peaks.peaks[chrom]
+    #     chrs = self.get_chr_names()
+    #     for chrom in chrs:
+    #         cpeaks = peaks.peaks[chrom]
+    #         ret_peaks.peaks[chrom] = []
+    #         npeaks = ret_peaks.peaks[chrom]
 
-            pos = self.data[chrom][ 0 ]
-            sample = self.data[chrom][ 1 ]
-            control = self.data[chrom][ 2 ]            
-            value = self.data[chrom][ 3 ]
+    #         pos = self.data[chrom][ 0 ]
+    #         sample = self.data[chrom][ 1 ]
+    #         control = self.data[chrom][ 2 ]            
+    #         value = self.data[chrom][ 3 ]
 
-            l = pos.shape[0]
+    #         l = pos.shape[0]
 
-            t_index = 0
+    #         t_index = 0
 
-            for i in range(len(cpeaks)):
-                thispeak = cpeaks[i]
-                # we need to assign values for each peak -- actuall peak summit
-                tmp_summit = thispeak["summit"]
-                while t_index < l and pos[t_index] < tmp_summit:
-                    t_index += 1
-                # find the summit
-                if value[t_index] >= cutoff:
-                    tmppeak = copy(thispeak)
-                    tmppeak["score"] = value[t_index]
-                    tmppeak["pileup"]= sample[t_index]
-                    tmppeak["pscore"]= get_pscore(sample[ t_index ], control[ t_index ])
-                    if self.scoring_method == 'q':
-                        tmppeak["qscore"]= value[ t_index ]
-                    else:
-                        tmppeak["qscore"]= -1
-                    tmppeak["fc"] = float ( sample[ t_index ] + self.pseudocount ) / ( control[ t_index ] + self.pseudocount )
-                    npeaks.append(tmppeak)
+    #         for i in range(len(cpeaks)):
+    #             thispeak = cpeaks[i]
+    #             # we need to assign values for each peak -- actuall peak summit
+    #             tmp_summit = thispeak["summit"]
+    #             while t_index < l and pos[t_index] < tmp_summit:
+    #                 t_index += 1
+    #             # find the summit
+    #             if value[t_index] >= cutoff:
+    #                 tmppeak = copy(thispeak)
+    #                 tmppeak["score"] = value[t_index]
+    #                 tmppeak["pileup"]= sample[t_index]
+    #                 tmppeak["pscore"]= get_pscore(sample[ t_index ], control[ t_index ])
+    #                 if self.scoring_method == 'q':
+    #                     tmppeak["qscore"]= value[ t_index ]
+    #                 else:
+    #                     tmppeak["qscore"]= -1
+    #                 tmppeak["fc"] = float ( sample[ t_index ] + self.pseudocount ) / ( control[ t_index ] + self.pseudocount )
+    #                 npeaks.append(tmppeak)
 
-        return ret_peaks
+    #     return ret_peaks
 
     cpdef call_peaks (self, float cutoff=5.0, int min_length=200, int max_gap=50, bool call_summits=False):
         """This function try to find regions within which, scores

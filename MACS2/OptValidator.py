@@ -1,4 +1,4 @@
-# Time-stamp: <2014-08-22 14:57:45 Tao Liu>
+# Time-stamp: <2015-03-05 13:56:30 Tao Liu>
 
 """Module Description
 
@@ -24,9 +24,9 @@ import logging
 from argparse import ArgumentError
 from subprocess import Popen, PIPE
 from math import log
-from MACS2.IO.cParser import BEDParser, ELANDResultParser, ELANDMultiParser, \
-                             ELANDExportParser, SAMParser, BAMParser, \
-                             BAMPEParser, BowtieParser,  guess_parser
+from MACS2.IO.Parser import BEDParser, ELANDResultParser, ELANDMultiParser, \
+    ELANDExportParser, SAMParser, BAMParser, \
+    BAMPEParser, BowtieParser,  guess_parser
 # ------------------------------------
 # constants
 # ------------------------------------
