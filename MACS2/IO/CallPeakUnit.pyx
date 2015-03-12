@@ -467,9 +467,13 @@ cdef class CallerFromAlignments:
                 f.close()
                 return
             except IOError:
-                self.pileup_data_files[ chrom ] = mkstemp()[1]                
+                temp_fd, temp_filename = mkstemp()
+                os.close(temp_fd)
+                self.pileup_data_files[ chrom ] = temp_filename
         else:
-            self.pileup_data_files[ chrom ] = mkstemp()[1]
+            temp_fd, temp_filename = mkstemp()
+            os.close(temp_fd)
+            self.pileup_data_files[ chrom ] = temp_filename
 
         # reset or clean existing self.chr_pos_treat_ctrl
         if self.chr_pos_treat_ctrl:     # not a beautiful way to clean
