@@ -1,4 +1,4 @@
-# Time-stamp: <2015-03-05 14:10:07 Tao Liu>
+# Time-stamp: <2015-03-11 16:13:50 Tao Liu>
 
 """Module for filter duplicate tags from paired-end data
 
@@ -81,13 +81,13 @@ cdef class PETrackI:
         """
         if not self.__locations.has_key(chromosome):
             self.__locations[chromosome] = np.zeros(shape=self.buffer_size, dtype=[('l','int32'),('r','int32')]) # note: ['l'] is the leftmost end, ['r'] is the rightmost end of fragment.
-            self.__pointer[chromosome] = 0
-        try:
-            self.__locations[chromosome][self.__pointer[chromosome]] = ( start, end )
-            self.__pointer[chromosome] += 1
-        except IndexError:
-            self.__expand__ ( self.__locations[chromosome] )
-            self.__locations[chromosome][self.__pointer[chromosome]] = ( start, end )
+            self.__locations[chromosome][ 0 ] = ( start, end )
+            self.__pointer[chromosome] = 1
+        else:
+            i = self.__pointer[chromosome]
+            if i % self.buffer_size == 0:
+                self.__expand__ ( self.__locations[chromosome] )
+            self.__locations[chromosome][ i ] = ( start, end )
             self.__pointer[chromosome] += 1
         self.length += end - start
 

@@ -1,4 +1,4 @@
-# Time-stamp: <2015-03-05 14:09:11 Tao Liu>
+# Time-stamp: <2015-03-11 16:15:16 Tao Liu>
 
 """Module for FWTrack classes.
 
@@ -134,20 +134,24 @@ cdef class FWTrack:
         fiveendpos -- 5' end pos, left for plus strand, right for neg strand
         strand     -- 0: plus, 1: minus
         """
+        cdef:
+            long i
+
         if not self.__locations.has_key(chromosome):
             self.__locations[chromosome] = [ np.zeros(self.buffer_size, dtype='int32'), np.zeros(self.buffer_size, dtype='int32') ] # [plus,minus strand]
             self.__pointer[chromosome] = [ 0, 0 ]
-        try:
-            self.__locations[chromosome][strand][self.__pointer[chromosome][strand]] = fiveendpos
-            self.__pointer[chromosome][strand] += 1
-        except IndexError:
-            self.__expand__ ( self.__locations[chromosome][strand] )
-            self.__locations[chromosome][strand][self.__pointer[chromosome][strand]] = fiveendpos
+            self.__locations[chromosome][strand][0] = fiveendpos
+            self.__pointer[chromosome][strand] = 1
+        else:
+            i = self.__pointer[chromosome][strand]
+            if i % self.buffer_size == 0:
+                self.__expand__ ( self.__locations[chromosome][strand] )
+            self.__locations[chromosome][strand][i]= fiveendpos
             self.__pointer[chromosome][strand] += 1
 
-    cdef __expand__ ( self, np.ndarray arr ):
-        arr.resize( arr.size + self.buffer_size, refcheck = False )
-        return
+    cdef np.ndarray[np.int32_t, ndim=1] __expand__ ( self, np.ndarray[np.int32_t, ndim=1] arr ):
+        arr.resize( arr.shape[0] + self.buffer_size, refcheck = False )
+        return arr
 
     cpdef finalize ( self ):
         """ Resize np arrays for 5' positions and sort them in place """
@@ -252,7 +256,7 @@ cdef class FWTrack:
             unsigned long i_old, i_new          # index for old array, and index for new one
             unsigned long i_dup, size, new_size, dup_size
             str k
-            np.ndarray plus, new_plus, dup_plus, minus, new_minus, dup_minus
+            np.ndarray[np.int32_t, ndim=1] plus, new_plus, dup_plus, minus, new_minus, dup_minus
 
         if not self.__sorted:
             self.sort()
@@ -297,8 +301,8 @@ cdef class FWTrack:
                     else:
                         new_plus[ i_new ] = p
                         i_new += 1           
-                new_plus.resize( i_new )
-                dup_plus.resize( i_dup )
+                new_plus.resize( i_new, refcheck=False )
+                dup_plus.resize( i_dup, refcheck=False )
                 self.total += i_new
                 self.dup_total += i_dup
                 self.__pointer[k][0] = i_new
@@ -378,7 +382,7 @@ cdef class FWTrack:
             unsigned long i_old, i_new          # index for old array, and index for new one
             unsigned long i_dup, size, new_size, dup_size
             str k
-            np.ndarray plus, new_plus, dup_plus, minus, new_minus, dup_minus
+            np.ndarray[np.int32_t, ndim=1] plus, new_plus, dup_plus, minus, new_minus, dup_minus
 
         if not self.__sorted:
             self.sort()
@@ -429,7 +433,7 @@ cdef class FWTrack:
         self.dup_total =  0
         self.__dup_separated = False
         self.length = self.fw * self.total
-        return
+        return 0
 
     @cython.boundscheck(False) # do not check that np indices are valid
     cpdef filter_dup ( self, int32_t maxnum = -1):
@@ -446,7 +450,7 @@ cdef class FWTrack:
             # index for old array, and index for new one
             unsigned long i_old, i_new, size, new_size 
             str k
-            np.ndarray plus, new_plus, dup_plus, minus, new_minus, dup_minus
+            np.ndarray[np.int32_t, ndim=1] plus, new_plus, minus, new_minus
 
         if maxnum < 0: return           # do nothing
 
@@ -489,7 +493,7 @@ cdef class FWTrack:
                         new_plus[ i_new ] = p
                         i_new += 1                        
                         n = 1
-                new_plus.resize( i_new )
+                new_plus.resize( i_new, refcheck=False )
                 self.total +=  i_new
                 self.__pointer[k][0] = i_new
 #                self.total +=  new_plus.shape[0]
@@ -528,7 +532,7 @@ cdef class FWTrack:
                         new_minus[ i_new ] = p
                         i_new += 1                        
                         n = 1
-                new_minus.resize( i_new )
+                new_minus.resize( i_new, refcheck=False )
                 self.total +=  i_new
                 self.__pointer[k][1] = i_new                
 #                self.total +=  new_minus.shape[0]
@@ -544,7 +548,7 @@ cdef class FWTrack:
             self.__locations[k]=[new_plus,new_minus]
 
         self.length = self.fw * self.total
-        return self
+        return
 
 
     @cython.boundscheck(False) # do not check that np indices are valid
@@ -562,7 +566,7 @@ cdef class FWTrack:
             # index for old array, and index for new one
             unsigned long i_old, size
             str k
-            np.ndarray plus, minus
+            np.ndarray[np.int32_t, ndim=1] plus, minus
 
         if maxnum < 0: return           # do nothing
 
@@ -647,13 +651,13 @@ cdef class FWTrack:
         
             num = <int32_t>round(self.__locations[key][0].shape[0] * percent, 5 )
             np.random.shuffle( self.__locations[key][0] )
-            self.__locations[key][0].resize( num )
+            self.__locations[key][0].resize( num, refcheck=False )
             self.__locations[key][0].sort()
             self.__pointer[key][0] = self.__locations[key][0].shape[0]
 
             num = <int32_t>round(self.__locations[key][1].shape[0] * percent, 5 )
             np.random.shuffle( self.__locations[key][1] )
-            self.__locations[key][1].resize( num )
+            self.__locations[key][1].resize( num, refcheck=False )
             self.__locations[key][1].sort()
             self.__pointer[key][1] = self.__locations[key][1].shape[0]            
             
@@ -712,7 +716,7 @@ cdef class FWTrack:
     cpdef tuple extract_region_tags ( self, str chromosome, int32_t startpos, int32_t endpos ):
         cdef:
             int32_t i, pos
-            np.ndarray rt_plus, rt_minus
+            np.ndarray[np.int32_t, ndim=1] rt_plus, rt_minus
             list temp
 
         if not self.__sorted: self.sort()
@@ -764,7 +768,7 @@ cdef class FWTrack:
         
         cdef:
             int32_t m, i, j, pre_i, pre_j, pos, startpos, endpos
-            np.ndarray plus, minus, rt_plus, rt_minus
+            np.ndarray[np.int32_t, ndim=1] plus, minus, rt_plus, rt_minus
             str chrom, name
             list temp, retval, pchrnames
 
@@ -845,10 +849,10 @@ cdef class FWTrack:
         
         cdef:
             int32_t m, i, j, pre_i, pre_j, pos, startpos, endpos #, n_peaks
-            np.ndarray plus, minus, rt_plus, rt_minus
+            np.ndarray[np.int32_t, ndim=1] plus, minus, rt_plus, rt_minus
             str chrom #, peak_name
             list temp, retval, pchrnames, cpeaks
-            np.ndarray adjusted_summits, passflags
+            np.ndarray[np.int32_t, ndim=1] adjusted_summits, passflags
 
         pchrnames = sorted(peaks.get_chr_names())
         retval = []
@@ -997,7 +1001,7 @@ cdef inline int32_t left_forward ( data, int pos, int window_size ):
 cdef inline int32_t right_forward ( data, int pos, int window_size ):
     return data.get(pos + window_size, 0) - data.get(pos, 0)
 
-cdef wtd_find_summit(chrom, np.ndarray plus, np.ndarray minus, int32_t search_start, int32_t search_end, int32_t window_size, float cutoff):
+cdef wtd_find_summit(chrom, np.ndarray[np.int32_t, ndim=1] plus, np.ndarray[np.int32_t, ndim=1] minus, int32_t search_start, int32_t search_end, int32_t window_size, float cutoff):
     """internal function to be called by refine_peak_from_tags_distribution()
 
     """
