@@ -1,3 +1,59 @@
+2015-03-16  Tao Liu  <vladimir.liu@gmail.com>
+	MACS version 2.1.0 20150316 (tag:rc)
+
+	* New commands
+
+	1) bdgopt ...
+
+	2) cmbreps ...
+
+	* New features
+
+	1) callpeak and bdgpeakcall now can try to analyze the
+	relationship between p-values and number/length of peaks then
+	generate a summary to help users decide an appropriate cutoff.
+
+	2) callpeak now can accept fold-enrichment cutoff as a filter for
+	final peak calls.
+
+	* Performance
+
+	Now MACS2 runs about 3X as fast as previous version. Trade
+	clean python codes for speed... Now while processing 50M ChIP vs
+	50M control, it will take only 10 minutes.
+
+	* Bug fixes
+
+	1) Sampling function in BAMPE mode.
+
+	2) Callpeak while there are >= 2 input files for -t or -c.
+
+	3) While reading BAM/SAM, those secondary or supplementary
+	alignments will be correctly skipped.
+
+	4) Fixed issue #33: Explanation is added to callpeak --keep-dup
+	option that MACS2 will discard those SAM/BAM alignments with bit
+	1024 no matter how --keep-dup is set.
+
+	5) Fixed issue #49: setuptools is used intead of distutils
+
+	6) Fixed issue #51: fix the problem when using --trackline
+	argument when control file is absent.
+
+	7) Fixed issue #53: Use Use SAM/BAM CIGAR to find the 5' end of
+	read mapped to minus strand. Previous implementation will find
+	incorrect 5' end if there is indel in alignment.
+
+	8) Fixed issue #56: An incorrect sorting method used for BAMPE
+	mode which will cause incorrect filtering of duplicated reads. Now
+	fixed.
+
+	9) Issue #63: Merged from jayhesselberth@github, extsize now can
+	be 1.
+
+	10) Issue #71: Merged from aertslab@github, close file descriptor
+	after creating them with mkstemp().
+
 2014-06-16  Tao Liu  <vladimir.liu@gmail.com>
 	MACS version 2.1.0 20140616 (tag:rc)
 
