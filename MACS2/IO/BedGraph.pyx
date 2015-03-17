@@ -1,4 +1,4 @@
-# Time-stamp: <2015-03-05 14:18:00 Tao Liu>
+# Time-stamp: <2015-03-13 13:36:34 Tao Liu>
 
 """Module for Feature IO classes.
 
@@ -37,7 +37,7 @@ from MACS2.IO.PeakIO import PeakIO, BroadPeakIO
 # constants
 # ------------------------------------
 __version__ = "BedGraph $Revision$"
-__author__ = "Tao Liu <taoliu@jimmy.harvard.edu>"
+__author__ = "Tao Liu <vladimir.liu@gmail.com>"
 __doc__ = "bedGraphTrackI class"
 
 # ------------------------------------
@@ -47,12 +47,10 @@ LOG10_E = 0.43429448190325176
 
 from libc.math cimport log1p, exp, log10
 
-cpdef float fisher_method_combining_two_log10pvalues ( float p1, float p2 ):
-    #x = 2 * ( p1 + p2 ) / LOG10_E
-    #return -log10( exp( -x/2 ) * ( 1 + x/2 ) )
+cdef inline float fisher_method_combining_two_log10pvalues ( float p1, float p2 ):
     return ( p1 + p2 ) - log1p( ( p1 + p2 ) / LOG10_E ) * LOG10_E
 
-cpdef float mean ( float p1, float p2 ):
+cdef inline float mean ( float p1, float p2 ):
     return ( p1 + p2 ) / 2
 
 # ------------------------------------
@@ -260,7 +258,7 @@ cdef class bedGraphTrackI:
             vnext = iter(v).next
             pre = 0
 
-            for i in xrange(len(p)):
+            for i in range(len(p)):
                 pos = pnext()
                 value = vnext()
                 #if value != self.baseline_value:
@@ -917,7 +915,7 @@ cdef class bedGraphTrackI:
 
         """
         cdef:
-            int pre_p, p1, p2
+            int pre_p, p1, p2, i
             double v1, v2
             str chrom
         
@@ -934,7 +932,8 @@ cdef class bedGraphTrackI:
         chr1 = set(self.get_chr_names())
         chr2 = set(bdgTrack2.get_chr_names())
         common_chr = chr1.intersection(chr2)
-        for chrom in common_chr:
+        for i in range( len( common_chr ) ):
+            chrom = common_chr.pop()
             (p1s,v1s) = self.get_data_by_chr(chrom) # arrays for position and values
             p1n = iter(p1s).next         # assign the next function to a viable to speed up
             v1n = iter(v1s).next

@@ -1,4 +1,4 @@
-# Time-stamp: <2015-03-05 14:05:59 Tao Liu>
+# Time-stamp: <2015-03-13 12:50:14 Tao Liu>
 
 """Module Description:  IO Module for bedGraph file
 
@@ -24,17 +24,28 @@ from MACS2.IO.BedGraph import bedGraphTrackI,bedRegionTrackI
 # ------------------------------------
 # constants
 # ------------------------------------
-cdef extern from "stdlib.h":
-    ctypedef unsigned int size_t
-    size_t strlen(char *s)
-    void *malloc(size_t size)
-    void *calloc(size_t n, size_t size)
-    void free(void *ptr)
-    int strcmp(char *a, char *b)
-    char * strcpy(char *a, char *b)
-    long atol(char *str)
-    int atoi(char *str)
-    double atof(char *str)
+# cdef extern from "stdio.h":
+#     ctypedef struct FILE
+#     FILE *fopen   (const char *filename, const char  *opentype)
+#     int fclose   (FILE *stream)
+#     int fscanf   (FILE *stream, const char *template, ...)
+#     int fprintf  (FILE *stream, const char *template, ...)
+#     enum: EOF
+
+# cdef extern from "stdlib.h":
+#     ctypedef unsigned int size_t
+#     size_t strlen(char *s)
+#     void *malloc(size_t size)
+#     void *calloc(size_t n, size_t size)
+#     void free(void *ptr)
+#     int strcmp(char *a, char *b)
+#     char * strcpy(char *a, char *b)
+#     long atol(char *str)
+#     int atoi(char *str)
+#     double atof(char *str)
+
+from libc.stdio cimport *
+from libc.stdlib cimport *
     
 # ------------------------------------
 # Misc functions
@@ -44,7 +55,7 @@ cdef extern from "stdlib.h":
 # Classes
 # ------------------------------------
 
-class bedGraphIO:
+cdef class bedGraphIO:
     """File Parser Class for bedGraph File.
 
     There are two assumptions in my bedGraphTrackI object:
@@ -57,16 +68,14 @@ class bedGraphIO:
 
     If any of the above two criteria is violated, parsering will fail.
     """
-    def __init__ ( self, f ):
+    cdef:
+        char * bedGraph_filename
+
+    def __init__ ( self, bedGraph_filename ):
         """f must be a filename or a file handler.
         
         """
-        if type(f) == str:
-            self.fhd = io.open(f,"rb")
-        elif type(f) == file:
-            self.fhd = f
-        else:
-            raise Exception("f must be a filename or a file handler.")
+        self.bedGraph_filename = <bytes> bedGraph_filename
 
     def build_bdgtrack (self, double baseline_value=0):
         """Use this function to return a bedGraphTrackI object.
@@ -80,33 +89,14 @@ class bedGraphIO:
         Then the region chr1:200..250 should be filled with
         baseline_value. Default of baseline_value is 0.
         """
-        cdef:
-            str i
-            list fs
-        
+        cdef str i
+
         data = bedGraphTrackI(baseline_value=baseline_value)
         add_func = data.add_loc
-        chrom_itemcount = {}
-        # get a summary of how many data points for each chromosome
-        #for i in self.fhd:
-        #    if i.startswith("track"):
-        #        continue
-        #    elif i.startswith("#"):
-        #        continue
-        #    elif i.startswith("browse"):
-        #        continue
-        #    else:
-        #        (chrom,startpos,endpos,value)=i.split()
-        #        chrom_itemcount[chrom] = chrom_itemcount.get(chrom,0)+1
-
-        # initiate
-        #for chrom in chrom_itemcount.keys():
-        #    data.add_chromosome(chrom,chrom_itemcount[chrom])
-
-        self.fhd.seek(0)
+        # python open file
+        bedGraph_file = open( self.bedGraph_filename, "r" )
         
-        split = str.split
-        for i in self.fhd:
+        for i in bedGraph_file:
             if i.startswith("track"):
                 continue
             elif i.startswith("#"):
@@ -114,15 +104,46 @@ class bedGraphIO:
             elif i.startswith("browse"):
                 continue
             else:
-                fs = split(i)
+                fs = i.split()
                 add_func(fs[0],atoi(fs[1]),atoi(fs[2]),atof(fs[3]))
+
+        bedGraph_file.close()
+        return data
+
+    def build_bdgtrack_c (self, double baseline_value=0):
+        """Use this function to return a bedGraphTrackI object. This is a C version.
+
+        baseline_value is the value to fill in the regions not defined
+        in bedGraph. For example, if the bedGraph is like:
+
+        chr1  100 200  1
+        chr1  250 350  2
+
+        Then the region chr1:200..250 should be filled with
+        baseline_value. Default of baseline_value is 0.
+        """
+        cdef:
+            char[80] chrom      # will there be chromosome name longer than 80 characters?
+            int start, end
+            float value
+            FILE * bedGraph_file
+        
+        data = bedGraphTrackI(baseline_value=baseline_value)
+        add_func = data.add_loc
+        # C open file
+        bedGraph_file = fopen( self.bedGraph_filename, "r" )
+        if bedGraph_file == NULL:
+            raise Exception("File '%s' can not be opened!" % self.bedGraph_filename )
+        
+        while ( fscanf( bedGraph_file, "%s\t%d\t%d\t%f\n", chrom, &start, &end, &value ) != EOF ):
+            add_func( chrom, start, end, value )
+        fclose( bedGraph_file )
         #data.finalize()
-        self.fhd.seek(0)
         return data
 
 
 
-class genericBedIO:
+cdef class genericBedIO:
     """File Parser Class for generic bed File with at least column #1,#2,#3,and #5.
 
     There are two assumptions in my bedGraphTrackI object:

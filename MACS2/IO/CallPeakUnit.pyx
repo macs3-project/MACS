@@ -1,4 +1,4 @@
-# Time-stamp: <2015-03-11 23:46:16 Tao Liu>
+# Time-stamp: <2015-03-13 12:47:37 Tao Liu>
 
 """Module for Calculate Scores.
 
@@ -21,9 +21,8 @@ with the distribution).
 import numpy as np
 cimport numpy as np
 
-from array import array as pyarray
 from collections import Counter
-from copy import copy, deepcopy
+from copy import copy
 
 from operator import itemgetter
 import cPickle
@@ -31,10 +30,8 @@ from tempfile import mkstemp
 import os
 
 from cpython cimport bool
-from cpython cimport array as c_array
 
 from MACS2.Signal import maxima, enforce_valleys, enforce_peakyness
-#import multiprocessing as mp
 
 # Experimental
 #from scipy.stats import chi2
@@ -42,11 +39,8 @@ from MACS2.Signal import maxima, enforce_valleys, enforce_peakyness
 from libc.stdint cimport uint32_t, uint64_t, int32_t, int64_t
 ctypedef np.float32_t float32_t
 
-from libc.math cimport exp,log,log10, M_LN10, log1p, erf, sqrt
+from libc.math cimport exp,log,log10, M_LN10, log1p, erf, sqrt, floor, ceil
 
-from libc.math cimport floor, ceil
-
-from MACS2.Constants import BYTE4, FBYTE4, array
 from MACS2.IO.PeakIO import PeakIO, BroadPeakIO, parse_peakname
 from MACS2.IO.FixWidthTrack import FWTrack
 from MACS2.IO.PairedEndTrack import PETrackI
@@ -67,12 +61,12 @@ from time import time as ttime
 
 from libc.stdio cimport *
  
-cdef extern from "stdio.h":
-    ctypedef struct FILE
-    FILE *fopen   (const char *filename, const char  *opentype)
-    #FILE * fopen ( const char * filename, const char * mode )
-    int  fclose   (FILE *stream)
-    int fprintf  (FILE *stream, const char *template, ...)
+# cdef extern from "stdio.h":
+#     ctypedef struct FILE
+#     FILE *fopen   (const char *filename, const char  *opentype)
+#     #FILE * fopen ( const char * filename, const char * mode )
+#     int  fclose   (FILE *stream)
+#     int fprintf  (FILE *stream, const char *template, ...)
 
 # ------------------------------------
 # constants
@@ -467,9 +461,13 @@ cdef class CallerFromAlignments:
                 f.close()
                 return
             except IOError:
-                self.pileup_data_files[ chrom ] = mkstemp()[1]                
+                temp_fd, temp_filename = mkstemp()
+                os.close(temp_fd)
+                self.pileup_data_files[ chrom ] = temp_filename
         else:
-            self.pileup_data_files[ chrom ] = mkstemp()[1]
+            temp_fd, temp_filename = mkstemp()
+            os.close(temp_fd)
+            self.pileup_data_files[ chrom ] = temp_filename
 
         # reset or clean existing self.chr_pos_treat_ctrl
         if self.chr_pos_treat_ctrl:     # not a beautiful way to clean
@@ -495,7 +493,7 @@ cdef class CallerFromAlignments:
                                                          baseline_value = self.lambda_bg,
                                                          directional = False )
         else:
-            ctrl_pv = [treat_pv[0][-1:], pyarray(FBYTE4,[self.lambda_bg,])] # set a global lambda
+            ctrl_pv = [treat_pv[0][-1:], np.ndarray([self.lambda_bg,], dtype="float32")] # set a global lambda
 
 
 
@@ -910,7 +908,7 @@ cdef class CallerFromAlignments:
 
         logging.info("#3 Call peaks for each chromosome...")
         for chrom in self.chromosomes:
-            #t0 = ttime()
+            # treat/control bedGraph will be saved if requested by user.
             self.__chrom_call_peak_using_certain_criteria ( peaks, chrom, scoring_function_symbols, score_cutoff_s, min_length, max_gap, call_summits, self.save_bedGraph )
             #print chrom, ":", ttime() - t0
 

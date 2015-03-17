@@ -1,4 +1,4 @@
-# Time-stamp: <2015-03-11 16:15:16 Tao Liu>
+# Time-stamp: <2015-03-13 12:43:58 Tao Liu>
 
 """Module for FWTrack classes.
 
@@ -946,6 +946,9 @@ cdef class FWTrack:
         baseline_value : a value to be filled for missing values, and will be the minimum pileup.
         directional    : if False, the strand or direction of tag will be ignored, so that extenstion will be both sides with d/2.
         end_shift      : move cutting ends towards 5->3 direction if value is positive, or towards 3->5 direction if negative. Default is 0 -- no shift at all.
+
+
+        p and v are numpy.ndarray objects.
         """
         cdef:
             long d
