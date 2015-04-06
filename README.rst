@@ -33,7 +33,7 @@ Usage of MACS2
 
 :Example for regular peak calling: ``macs2 callpeak -t ChIP.bam -c Control.bam -f BAM -g hs -n test -B -q 0.01``
 
-:Example for broad peak calling: ``macs2 -t ChIP.bam -c Control.bam --broad -g hs``
+:Example for broad peak calling: ``macs2 callpeak -t ChIP.bam -c Control.bam --broad -g hs --broad-cutoff 0.1``
 
 There are seven major functions available in MACS serving as sub-commands.
 
