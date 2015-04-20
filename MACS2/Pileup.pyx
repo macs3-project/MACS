@@ -1,4 +1,4 @@
-# Time-stamp: <2015-03-09 16:10:40 Tao Liu>
+# Time-stamp: <2015-04-20 14:15:35 Tao Liu>
 
 """Module Description: For pileup functions.
 
@@ -432,7 +432,6 @@ cdef pileup_w_multiple_d_bdg_pe ( object trackI, list d_s = [],
             end_poss = midpoints + three_shift
             end_poss = fix_coordinates( end_poss, rlength) 
 
-            #print chrom, baseline_value
             tmp_pileup = quick_pileup(start_poss, end_poss, scale_factor,
                                       baseline_value)
 
@@ -690,6 +689,7 @@ cpdef quick_pileup ( np.ndarray[np.int32_t, ndim=1] start_poss, np.ndarray[np.in
         int32_t * end_poss_ptr
         int32_t * ret_p_ptr     # pointer for position array 
         float32_t * ret_v_ptr     # pointer for value array
+        int max_pileup = 0
 
     start_poss_ptr = <int32_t *> start_poss.data
     end_poss_ptr = <int32_t *> end_poss.data
@@ -710,7 +710,6 @@ cpdef quick_pileup ( np.ndarray[np.int32_t, ndim=1] start_poss, np.ndarray[np.in
     if ls == 0: return tmp
     pre_p = min(start_poss_ptr[0], end_poss_ptr[0])
 
-    #print pre_p
     if pre_p != 0:
         # the first chunk of 0
         ret_p_ptr[0] = pre_p
@@ -732,6 +731,8 @@ cpdef quick_pileup ( np.ndarray[np.int32_t, ndim=1] start_poss, np.ndarray[np.in
                 I += 1
                 pre_p = p
             pileup += 1
+            if pileup > max_pileup:
+                max_pileup = pileup
             i_s += 1
             start_poss_ptr += 1
         elif start_poss_ptr[0] > end_poss_ptr[0]:

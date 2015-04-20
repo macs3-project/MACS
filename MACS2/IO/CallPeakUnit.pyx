@@ -1,4 +1,4 @@
-# Time-stamp: <2015-03-13 12:47:37 Tao Liu>
+# Time-stamp: <2015-04-20 14:21:12 Tao Liu>
 
 """Module for Calculate Scores.
 
@@ -645,7 +645,7 @@ cdef class CallerFromAlignments:
             float32_t * ctrl_value_ptr
 
         logging.debug ( "Start to calculate pvalue stat..." )
-        
+
         for i in range( len( self.chromosomes ) ):
             chrom = self.chromosomes[ i ]
             pre_p = 0
@@ -657,7 +657,7 @@ cdef class CallerFromAlignments:
             treat_value_ptr = <float32_t *> treat_array.data
             ctrl_value_ptr = <float32_t *> ctrl_array.data
 
-            for i in range(pos_array.shape[0]):
+            for j in range(pos_array.shape[0]):
                 this_v = get_pscore( int(treat_value_ptr[0]), ctrl_value_ptr[0] )
                 this_l = pos_ptr[0] - pre_p
 

@@ -1,4 +1,4 @@
-# Time-stamp: <2015-03-11 16:13:50 Tao Liu>
+# Time-stamp: <2015-04-20 14:22:09 Tao Liu>
 
 """Module for filter duplicate tags from paired-end data
 
@@ -14,7 +14,7 @@ with the distribution).
 @contact: taoliu@jimmy.harvard.edu
 """
 from MACS2.Constants import *
-from logging import debug
+from logging import debug, info
 import numpy as np
 cimport numpy as np
 from libc.stdint cimport uint32_t, uint64_t, int32_t, int64_t
@@ -79,6 +79,9 @@ cdef class PETrackI:
         chromosome -- mostly the chromosome name
         fiveendpos -- 5' end pos, left for plus strand, right for neg strand
         """
+        cdef:
+            long i
+
         if not self.__locations.has_key(chromosome):
             self.__locations[chromosome] = np.zeros(shape=self.buffer_size, dtype=[('l','int32'),('r','int32')]) # note: ['l'] is the leftmost end, ['r'] is the rightmost end of fragment.
             self.__locations[chromosome][ 0 ] = ( start, end )
@@ -163,7 +166,7 @@ cdef class PETrackI:
         for i in range(len(chrnames)):
             c = chrnames[i]
             self.__locations[c].resize((self.__pointer[c]), refcheck=False)
-            self.__locations[c].sort(0)
+            self.__locations[c].sort(order='l')
             self.total += self.__locations[c].shape[0]
 
         self.__sorted = True
@@ -208,8 +211,9 @@ cdef class PETrackI:
 
         for i in range(len(chrnames)):
             c = chrnames[i]
+            #print "before", self.__locations[c][0:100]
             self.__locations[c].sort(order='l') # sort by the leftmost location
-
+            #print "before", self.__locations[c][0:100]
         self.__sorted = True
 
 #    def centered_fake_fragments(track, int d):
@@ -510,14 +514,15 @@ cdef class PETrackI:
             list tmp_pileup, prev_pileup
             float scale_factor
             
-        if not self.__sorted: self.sort()
+        #if not self.__sorted: 
+        #    self.sort()
 
         prev_pileup = None
 
         for i in range(len(scale_factor_s)):
             scale_factor = scale_factor_s[i]
 
-            tmp_pileup = quick_pileup ( self.__locations[chrom]['l'], np.sort(self.__locations[chrom]['r']), scale_factor, baseline_value )
+            tmp_pileup = quick_pileup ( np.sort(self.__locations[chrom]['l']), np.sort(self.__locations[chrom]['r']), scale_factor, baseline_value ) # Can't directly pass partial nparray there since that will mess up with pointer calculation.
 
             if prev_pileup:
                 prev_pileup = max_over_two_pv_array ( prev_pileup, tmp_pileup )
@@ -563,4 +568,5 @@ cdef class PETrackI:
                 prev_pileup = tmp_pileup
 
         return prev_pileup
+
 
