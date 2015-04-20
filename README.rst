@@ -1,7 +1,7 @@
 ========================
 README for MACS (2.1.0)
 ========================
-Time-stamp: <2014-06-17 16:58:37 Tao Liu>
+Time-stamp: <2015-04-20 15:37:09 Tao Liu>
 
 Introduction
 ============
@@ -42,7 +42,6 @@ There are seven major functions available in MACS serving as sub-commands.
 :bdgbroadcall:        Call broad peaks from bedGraph output.
 :bdgcmp:              Deduct noise by comparing two signal tracks in bedGraph.
 :bdgdiff:             Differential peak detection based on paired four bedgraph files.
-:diffpeak:            Another differential peak detection based on paired four bedgraph files, with more statistics.
 :filterdup:           Remove duplicate reads at the same position, then convert acceptable format to BED format.
 :predictd:            Predict d or fragment size from alignment results.
 :pileup:              Pileup aligned reads with a given extension
