@@ -1,4 +1,4 @@
-# Time-stamp: <2015-04-20 14:15:35 Tao Liu>
+# Time-stamp: <2015-04-20 14:26:53 Tao Liu>
 
 """Module Description: For pileup functions.
 
@@ -689,7 +689,7 @@ cpdef quick_pileup ( np.ndarray[np.int32_t, ndim=1] start_poss, np.ndarray[np.in
         int32_t * end_poss_ptr
         int32_t * ret_p_ptr     # pointer for position array 
         float32_t * ret_v_ptr     # pointer for value array
-        int max_pileup = 0
+        #int max_pileup = 0
 
     start_poss_ptr = <int32_t *> start_poss.data
     end_poss_ptr = <int32_t *> end_poss.data
@@ -731,8 +731,8 @@ cpdef quick_pileup ( np.ndarray[np.int32_t, ndim=1] start_poss, np.ndarray[np.in
                 I += 1
                 pre_p = p
             pileup += 1
-            if pileup > max_pileup:
-                max_pileup = pileup
+            #if pileup > max_pileup:
+            #    max_pileup = pileup
             i_s += 1
             start_poss_ptr += 1
         elif start_poss_ptr[0] > end_poss_ptr[0]:
