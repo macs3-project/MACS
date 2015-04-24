@@ -1,4 +1,4 @@
-# Time-stamp: <2015-03-05 13:56:30 Tao Liu>
+# Time-stamp: <2015-04-24 17:17:25 Tao Liu>
 
 """Module Description
 
@@ -173,10 +173,19 @@ def opt_validate ( options ):
         ))
 
     if options.pvalue:
-        options.argtxt +=  "# pvalue cutoff = %.2e\n" % (options.pvalue)
-        options.argtxt +=  "# qvalue will not be calculated and reported as -1 in the final output.\n"
+        if options.broad:
+            options.argtxt +=  "# pvalue cutoff for narrow/strong regions = %.2e\n" % (options.pvalue)
+            options.argtxt +=  "# pvalue cutoff for broad/weak regions = %.2e\n" % (options.broadcutoff)
+            options.argtxt +=  "# qvalue will not be calculated and reported as -1 in the final output.\n"
+        else:
+            options.argtxt +=  "# pvalue cutoff = %.2e\n" % (options.pvalue)
+            options.argtxt +=  "# qvalue will not be calculated and reported as -1 in the final output.\n"
     else:
-        options.argtxt +=  "# qvalue cutoff = %.2e\n" % (options.qvalue)
+        if options.broad:
+            options.argtxt +=  "# qvalue cutoff for narrow/strong regions = %.2e\n" % (options.qvalue)
+            options.argtxt +=  "# qvalue cutoff for broad/weak regions = %.2e\n" % (options.broadcutoff)
+        else:
+            options.argtxt +=  "# qvalue cutoff = %.2e\n" % (options.qvalue)
 
     if options.downsample:
         options.argtxt += "# Larger dataset will be randomly sampled towards smaller dataset.\n"

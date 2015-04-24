@@ -1,4 +1,4 @@
-# Time-stamp: <2015-04-20 14:21:12 Tao Liu>
+# Time-stamp: <2015-04-24 10:05:31 Tao Liu>
 
 """Module for Calculate Scores.
 
@@ -216,6 +216,7 @@ cdef float mean_from_value_length ( np.ndarray value, list length ):
         int32_t tmp_l
         float tmp_v, sum_v
 
+    sum_v = 0
     tmp = zip( value, length )
     l = sum( length )
 
@@ -256,7 +257,7 @@ cdef tuple find_optimal_cutoff( list x, list y ):
         sst = sum( ( npy[:i] - np.mean( npy[:i] ) ) ** 2 )
         sse = sum( ( npy[:i] - m*npx[:i] - c ) ** 2 )
         rsq = 1 - sse/sst
-        print i, x[i], y[i], m, c, rsq
+        #print i, x[i], y[i], m, c, rsq
     return ( 1.0, 1.0 )
     
 
