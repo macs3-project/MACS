@@ -1,4 +1,4 @@
-# Time-stamp: <2015-04-24 17:17:25 Tao Liu>
+# Time-stamp: <2015-05-19 13:42:30 Tao Liu>
 
 """Module Description
 
@@ -736,7 +736,7 @@ def opt_validate_bdgopt ( options ):
         logging.error( "Invalid method: %s" % options.method )
         sys.exit( 1 )
 
-    if options.method.lower() in [ 'multiply', 'add' ] and not options.extparam:
+    if options.method.lower() in [ 'multiply', 'add' ] and not options.extraparam:
         logging.error( "Need EXTRAPARAM for method multiply or add!")
         sys.exit( 1 )
 

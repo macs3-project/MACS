@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# Time-stamp: <2015-04-20 14:32:39 Tao Liu>
+# Time-stamp: <2015-04-24 17:34:14 Tao Liu>
 
 """Description
 
@@ -36,6 +36,8 @@ def main():
     if float(sys.version[:3])<2.7 or float(sys.version[:3])>=2.8:
         sys.stderr.write("CRITICAL: Python version must be 2.7!\n")
         sys.exit(1)
+
+    # User must check GCC, if >= 4.6, use -Ofast, otherwise -O3.
 
     ext_modules = [Extension("MACS2.Prob", ["MACS2/Prob.c"], libraries=["m"], include_dirs=numpy_include_dir, extra_compile_args=["-w","-Ofast"] ),
                    Extension("MACS2.IO.Parser",["MACS2/IO/Parser.c"], include_dirs=numpy_include_dir, extra_compile_args=["-w","-Ofast"]),
