@@ -1,4 +1,4 @@
-# Time-stamp: <2014-06-17 00:42:04 Tao Liu>
+# Time-stamp: <2015-06-03 00:23:34 Tao Liu>
 
 """Description: Filter duplicate reads depending on sequencing depth.
 
@@ -69,7 +69,7 @@ def run( o_options ):
             info("filter out redundant tags at the same location and the same strand by allowing at most %d tag(s)" % (max_dup_tags))
 
         if not options.dryrun:
-            fwtrack = fwtrack.filter_dup(max_dup_tags)
+            fwtrack.filter_dup(max_dup_tags)
             t1 = fwtrack.total
         else:
             t1 = fwtrack.filter_dup_dryrun( max_dup_tags )
@@ -98,16 +98,20 @@ def load_tag_files_options ( options ):
     """From the options, load alignment tags.
 
     """
-    options.info("read alignment tags...")
-    tp = options.parser(options.ifile)
-
+    options.info("# read treatment tags...")
+    tp = options.parser(options.ifile[0])
     if not options.tsize:           # override tsize if user specified --tsize
         ttsize = tp.tsize()
         options.tsize = ttsize
 
     treat = tp.build_fwtrack()
-    treat.sort()
+    #treat.sort()
+    if len(options.ifile) > 1:
+        # multiple input
+        for tfile in options.ifile[1:]:
+            tp = options.parser(tfile)
+            treat = tp.append_fwtrack( treat )
+            #treat.sort()
+    treat.finalize()
 
-    options.info("tag size is determined as %d bps" % options.tsize)
     return treat
-

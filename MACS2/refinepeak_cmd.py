@@ -1,4 +1,4 @@
-# Time-stamp: <2015-03-05 13:48:25 Tao Liu>
+# Time-stamp: <2015-06-03 00:50:50 Tao Liu>
 
 """Description: Filter duplicate reads depending on sequencing depth.
 
@@ -70,7 +70,6 @@ def run( o_options ):
     retval = fwtrack.compute_region_tags_from_peaks( peaks, find_summit, window_size = options.windowsize, cutoff = options.cutoff )
     outputfile.write( "\n".join( map(lambda x: "%s\t%d\t%d\t%s\t%.2f" % x , retval) ) )
     info("Done!")
-    info("Check output file: %s" % options.oprefix+"_refinepeak.bed")
 
 def find_summit(chrom, plus, minus, peak_start, peak_end, name = "peak", window_size=100, cutoff = 5):
     
@@ -163,20 +162,20 @@ def find_summit(chrom, plus, minus, peak_start, peak_end, name = "peak", window_
 
 
 
-
 def load_tag_files_options ( options ):
     """From the options, load alignment tags.
 
     """
-    options.info("read alignment tags...")
-    tp = options.parser(options.ifile)
-
-    ttsize = tp.tsize()
-    options.tsize = ttsize
-
+    options.info("# read treatment tags...")
+    tp = options.parser(options.ifile[0])
     treat = tp.build_fwtrack()
-    treat.sort()
-
-    options.info("tag size is determined as %d bps" % options.tsize)
+    #treat.sort()
+    if len(options.ifile) > 1:
+        # multiple input
+        for tfile in options.ifile[1:]:
+            tp = options.parser(tfile)
+            treat = tp.append_fwtrack( treat )
+            #treat.sort()
+    treat.finalize()
     return treat
 

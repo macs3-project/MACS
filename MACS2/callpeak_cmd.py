@@ -1,4 +1,4 @@
-# Time-stamp: <2015-03-11 16:04:34 Tao Liu>
+# Time-stamp: <2015-06-02 23:30:13 Tao Liu>
 
 """Description: MACS 2 main executable
 
@@ -360,6 +360,7 @@ def load_frag_files_options ( options ):
             tp = options.parser(tfile, buffer_size=options.buffer_size)
             treat = tp.append_petrack( treat )
             treat.sort()
+    tp.finalize()
 
     options.tsize = tp.d
     if options.cfile:
@@ -374,6 +375,7 @@ def load_frag_files_options ( options ):
                 cp = options.parser(cfile, buffer_size=options.buffer_size)
                 control = cp.append_petrack( control )
                 control.sort()
+        cp.finalize()
     else:
         control = None
     options.info("#1 mean fragment size is determined as %d bp from treatment" % options.tsize)
@@ -392,24 +394,26 @@ def load_tag_files_options ( options ):
         ttsize = tp.tsize()
         options.tsize = ttsize
     treat = tp.build_fwtrack()
-    treat.sort()
+    #treat.sort()
     if len(options.tfile) > 1:
         # multiple input
         for tfile in options.tfile[1:]:
             tp = options.parser(tfile, buffer_size=options.buffer_size)
             treat = tp.append_fwtrack( treat )
-            treat.sort()
+            #treat.sort()
+    treat.finalize()
     
     if options.cfile:
         options.info("#1.2 read input tags...")
         control = options.parser(options.cfile[0], buffer_size=options.buffer_size).build_fwtrack()
-        control.sort()
+        #control.sort()
         if len(options.cfile) > 1:
             # multiple input
             for cfile in options.cfile[1:]:
                 cp = options.parser(cfile, buffer_size=options.buffer_size)
                 control = cp.append_fwtrack( control )
-                control.sort()
+                #control.sort()
+        control.finalize()
     else:
         control = None
     options.info("#1 tag size is determined as %d bps" % options.tsize)

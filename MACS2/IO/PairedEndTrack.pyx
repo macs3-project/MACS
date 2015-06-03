@@ -1,4 +1,4 @@
-# Time-stamp: <2015-04-20 14:22:09 Tao Liu>
+# Time-stamp: <2015-06-02 23:23:09 Tao Liu>
 
 """Module for filter duplicate tags from paired-end data
 
@@ -154,7 +154,10 @@ cdef class PETrackI:
     
 
     def finalize ( self ):
-        """ Resize np arrays for 5' positions and sort them in place """
+        """ Resize np arrays for 5' positions and sort them in place
+
+        Note: If this function is called, it's impossible to append more files to this FWTrack object. So remember to call it after all the files are read!        
+        """
         
         cdef int32_t i
         cdef str c

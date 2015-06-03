@@ -1,4 +1,4 @@
-# Time-stamp: <2015-03-05 13:40:58 Tao Liu>
+# Time-stamp: <2015-06-02 23:36:21 Tao Liu>
 
 """Description: Filter duplicate reads depending on sequencing depth.
 
@@ -78,13 +78,14 @@ def load_tag_files_options ( options ):
     tp = options.parser(options.ifile[0])
     tsize = tp.tsize()
     treat = tp.build_fwtrack()
-    treat.sort()
+    #treat.sort()
     if len(options.ifile) > 1:
         # multiple input
         for tfile in options.ifile[1:]:
             tp = options.parser(tfile)
             treat = tp.append_fwtrack( treat )
-            treat.sort()
+            #treat.sort()
+    treat.finalize()
 
     options.info("tag size is determined as %d bps" % tsize)
     return (tsize, treat)

@@ -1,4 +1,4 @@
-# Time-stamp: <2015-03-13 12:43:58 Tao Liu>
+# Time-stamp: <2015-06-03 00:49:19 Tao Liu>
 
 """Module for FWTrack classes.
 
@@ -143,18 +143,28 @@ cdef class FWTrack:
             self.__locations[chromosome][strand][0] = fiveendpos
             self.__pointer[chromosome][strand] = 1
         else:
-            i = self.__pointer[chromosome][strand]
-            if i % self.buffer_size == 0:
-                self.__expand__ ( self.__locations[chromosome][strand] )
-            self.__locations[chromosome][strand][i]= fiveendpos
-            self.__pointer[chromosome][strand] += 1
+            try:
+                i = self.__pointer[chromosome][strand]
+                if i % self.buffer_size == 0:
+                    self.__expand__ ( self.__locations[chromosome][strand] )
+                self.__locations[chromosome][strand][i]= fiveendpos
+                self.__pointer[chromosome][strand] += 1
+            except:
+                print "i:",i
+                print "self.buffer_size:", self.buffer_size
+                print "strand:", strand
+                print "loc len:", len( self.__locations[chromosome][strand] )
+                raise Exception("!!")
 
     cdef np.ndarray[np.int32_t, ndim=1] __expand__ ( self, np.ndarray[np.int32_t, ndim=1] arr ):
         arr.resize( arr.shape[0] + self.buffer_size, refcheck = False )
         return arr
 
     cpdef finalize ( self ):
-        """ Resize np arrays for 5' positions and sort them in place """
+        """ Resize np arrays for 5' positions and sort them in place
+
+        Note: If this function is called, it's impossible to append more files to this FWTrack object. So remember to call it after all the files are read!
+        """
         
         cdef:
             int32_t i
@@ -803,7 +813,7 @@ cdef class FWTrack:
                         break
                     else:
                         temp.append(pos)
-                rt_plus = np.array(temp)
+                rt_plus = np.array(temp, dtype=np.int32)
                 
                 temp = []
                 for j in range(prev_j,minus.shape[0]):
@@ -815,7 +825,7 @@ cdef class FWTrack:
                         break
                     else:
                         temp.append(pos)
-                rt_minus = np.array(temp)
+                rt_minus = np.array(temp, dtype=np.int32)
 
                 retval.append( func(chrom, rt_plus, rt_minus, startpos, endpos, name = name, window_size = window_size, cutoff = cutoff) )
                 # rewind window_size

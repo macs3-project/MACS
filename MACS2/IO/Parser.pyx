@@ -1,4 +1,4 @@
-# Time-stamp: <2015-03-11 15:04:10 Tao Liu>
+# Time-stamp: <2015-06-02 23:21:25 Tao Liu>
 
 """Module for all MACS Parser classes for input.
 
@@ -225,7 +225,8 @@ cdef class GenericParser:
             fwtrack.add_loc( chromosome, fpos, strand )
 
         # close fwtrack and sort
-        fwtrack.finalize()
+        # fwtrack.finalize()
+        # this is the problematic part. If fwtrack is finalized, then it's impossible to increase the length of it in a step of buffer_size for multiple input files.
         # close file stream.
         self.close()
         return fwtrack
@@ -250,7 +251,8 @@ cdef class GenericParser:
             fwtrack.add_loc( chromosome, fpos, strand )
 
         # close fwtrack and sort
-        fwtrack.finalize()
+        #fwtrack.finalize()
+        # this is the problematic part. If fwtrack is finalized, then it's impossible to increase the length of it in a step of buffer_size for multiple input files.
         self.close()
         return fwtrack
         
@@ -811,7 +813,7 @@ cdef class BAMParser( GenericParser ):
             sys.exit(0)
             
 
-    cdef __build_fwtrack_w_pysam ( self ):
+    cdef __build_fwtrack_w_pysam ( self ): # obsolete function
         cdef:
             int i = 0
             int m = 0
@@ -881,7 +883,8 @@ cdef class BAMParser( GenericParser ):
             if fpos >= 0:
                 fwtrack.add_loc( references[ chrid ], fpos, strand )
         self.fhd.close()
-        fwtrack.finalize()
+        # this is the problematic part. If fwtrack is finalized, then it's impossible to increase the length of it in a step of buffer_size for multiple input files.
+        # fwtrack.finalize()
         fwtrack.set_rlengths( rlengths )
         return fwtrack
 
@@ -891,7 +894,7 @@ cdef class BAMParser( GenericParser ):
         else:
             return self.__append_fwtrack_wo_pysam( fwtrack )
 
-    cdef __append_fwtrack_w_pysam ( self, fwtrack ):
+    cdef __append_fwtrack_w_pysam ( self, fwtrack ): # obsolete function
         cdef:
             int i = 0
             int m = 0
@@ -960,7 +963,8 @@ cdef class BAMParser( GenericParser ):
             if fpos >= 0:
                 fwtrack.add_loc( references[ chrid ], fpos, strand )
         self.fhd.close()
-        fwtrack.finalize()
+        #fwtrack.finalize()
+        # this is the problematic part. If fwtrack is finalized, then it's impossible to increase the length of it in a step of buffer_size for multiple input files.
         fwtrack.set_rlengths( rlengths )
         return fwtrack
     
@@ -1163,7 +1167,8 @@ cdef class BAMPEParser(BAMParser):
         self.d = int(d)
         assert d >= 0, "Something went wrong (mean fragment size was negative)"
         self.fhd.close()
-        petrack.finalize()
+        # this is the problematic part. If fwtrack is finalized, then it's impossible to increase the length of it in a step of buffer_size for multiple input files.
+        # petrack.finalize()
         petrack.set_rlengths( rlengths )
         return petrack
 
@@ -1210,7 +1215,8 @@ cdef class BAMPEParser(BAMParser):
         self.d = int(d)
         assert d >= 0, "Something went wrong (mean fragment size was negative)"
         self.fhd.close()
-        petrack.finalize()
+        # this is the problematic part. If fwtrack is finalized, then it's impossible to increase the length of it in a step of buffer_size for multiple input files.
+        # petrack.finalize()
         petrack.set_rlengths( rlengths )
         return petrack
         
@@ -1459,7 +1465,8 @@ cdef class PySAMParser:
             fwtrack.add_loc( chromosome, fpos, strand )
 
         # close fwtrack and sort
-        fwtrack.finalize()
+        # fwtrack.finalize()
+        # this is the problematic part. If fwtrack is finalized, then it's impossible to increase the length of it in a step of buffer_size for multiple input files.
         # close file stream.
         self.close()
         return fwtrack
@@ -1484,7 +1491,8 @@ cdef class PySAMParser:
             fwtrack.add_loc( chromosome, fpos, strand )
 
         # close fwtrack and sort
-        fwtrack.finalize()
+        # fwtrack.finalize()
+        # this is the problematic part. If fwtrack is finalized, then it's impossible to increase the length of it in a step of buffer_size for multiple input files.
         self.close()
         return fwtrack
         

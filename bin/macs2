@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# Time-stamp: <2015-05-19 13:41:57 Tao Liu>
+# Time-stamp: <2015-06-03 00:07:13 Tao Liu>
 
 """Description: MACS v2 main executable.
 
@@ -342,9 +342,8 @@ def add_diffpeak_parser( subparsers ):
 def add_filterdup_parser( subparsers ):
     argparser_filterdup = subparsers.add_parser( "filterdup",
                                                  help = "Remove duplicate reads at the same position, then convert acceptable format to BED format." )
-    argparser_filterdup.add_argument( "-i", dest = "ifile", type = str, required = True,
-                                      help = "Sequencing alignment file. REQUIRED." )
-
+    argparser_filterdup.add_argument( "-i", "--ifile", dest = "ifile", type = str, required = True, nargs = "+",
+                                      help = "ChIP-seq alignment file. If multiple files are given as '-t A B C', then they will all be read and combined. Note that pair-end data is not supposed to work with this command. REQUIRED." )
     argparser_filterdup.add_argument( "-f", "--format", dest = "format", type = str,
                                       choices=("AUTO","BAM","SAM","BED","ELAND","ELANDMULTI","ELANDEXPORT","BOWTIE"),
                                       help = "Format of tag file, \"AUTO\", \"BED\" or \"ELAND\" or \"ELANDMULTI\" or \"ELANDEXPORT\" or \"SAM\" or \"BAM\" or \"BOWTIE\". The default AUTO option will let '%(prog)s' decide which format the file is. Please check the definition in README file if you choose ELAND/ELANDMULTI/ELANDEXPORT/SAM/BAM/BOWTIE. DEFAULT: \"AUTO\"",
@@ -478,8 +477,9 @@ def add_cmbreps_parser( subparsers ):
 def add_randsample_parser( subparsers ):
     argparser_randsample = subparsers.add_parser( "randsample",
                                                   help = "Randomly sample number/percentage of total reads." )
-    argparser_randsample.add_argument( "-t", dest = "tfile", type = str, required = True,
-                                       help = "Sequencing alignment file. REQUIRED." )
+    argparser_randsample.add_argument( "-t", "--tfile", dest = "tfile", type = str, required = True, nargs = "+",
+                                      help = "ChIP-seq alignment file. If multiple files are given as '-t A B C', then they will all be read and combined. Note that pair-end data is not supposed to work with this command. REQUIRED." )
+
     p_or_n_group = argparser_randsample.add_mutually_exclusive_group( required = True )
     p_or_n_group.add_argument( "-p", "--percentage", dest = "percentage", type = float,
                                help = "Percentage of tags you want to keep. Input 80.0 for 80%%. This option can't be used at the same time with -n/--num. REQUIRED")
@@ -537,8 +537,8 @@ def add_refinepeak_parser( subparsers ):
                                                  help = "(Experimental) Take raw reads alignment, refine peak summits and give scores measuring balance of waston/crick tags. Inspired by SPP." )
     argparser_refinepeak.add_argument( "-b", dest = "bedfile", type = str, required = True,
                                       help = "Candidate peak file in BED format. REQUIRED." )
-    argparser_refinepeak.add_argument( "-i", dest = "ifile", type = str, required = True,
-                                      help = "Sequencing alignment file of treatment/ChIP. REQUIRED." )
+    argparser_refinepeak.add_argument( "-i", "--ifile", dest = "ifile", type = str, required = True, nargs = "+",
+                                      help = "ChIP-seq alignment file. If multiple files are given as '-t A B C', then they will all be read and combined. Note that pair-end data is not supposed to work with this command. REQUIRED." )
     argparser_refinepeak.add_argument( "-f", "--format", dest = "format", type = str,
                                       choices=("AUTO","BAM","SAM","BED","ELAND","ELANDMULTI","ELANDEXPORT","BOWTIE"),
                                       help = "Format of tag file, \"AUTO\", \"BED\" or \"ELAND\" or \"ELANDMULTI\" or \"ELANDEXPORT\" or \"SAM\" or \"BAM\" or \"BOWTIE\". The default AUTO option will let '%(prog)s' decide which format the file is. Please check the definition in README file if you choose ELAND/ELANDMULTI/ELANDEXPORT/SAM/BAM/BOWTIE. DEFAULT: \"AUTO\"",

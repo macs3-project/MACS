@@ -1,4 +1,4 @@
-# Time-stamp: <2013-10-28 01:40:58 Tao Liu>
+# Time-stamp: <2015-06-02 23:55:02 Tao Liu>
 
 """Description: Random sample certain number/percentage of tags.
 
@@ -77,15 +77,20 @@ def load_tag_files_options ( options ):
     """From the options, load alignment tags.
 
     """
-    options.info("read alignment tags...")
-    tp = options.parser(options.tfile)
-
+    options.info("# read treatment tags...")
+    tp = options.parser(options.tfile[0])
     if not options.tsize:           # override tsize if user specified --tsize
         ttsize = tp.tsize()
         options.tsize = ttsize
-
     treat = tp.build_fwtrack()
-    treat.sort()
+    #treat.sort()
+    if len(options.tfile) > 1:
+        # multiple input
+        for tfile in options.tfile[1:]:
+            tp = options.parser(tfile)
+            treat = tp.append_fwtrack( treat )
+            #treat.sort()
+    treat.finalize()
 
     options.info("tag size is determined as %d bps" % options.tsize)
     return treat
