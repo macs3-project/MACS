@@ -443,22 +443,30 @@ Output files
 
 1. NAME_peaks.xls is a tabular file which contains information about
    called peaks. You can open it in excel and sort/filter using excel
-   functions. Information include: chromosome name, start position of
-   peak, end position of peak, length of peak region, absolute peak
-   summit position, pileup height at peak summit, -log10(pvalue) for
-   the peak summit (e.g. pvalue =1e-10, then this value should be
-   10), fold enrichment for this peak summit against random Poisson
-   distribution with local lambda, -log10(qvalue) at peak
-   summit. Coordinates in XLS is 1-based which is different with BED
-   format.
+   functions. Information include:
+   
+    - chromosome name
+    - start position of peak
+    - end position of peak
+    - length of peak region
+    - absolute peak summit position
+    - pileup height at peak summit, -log10(pvalue) for the peak summit (e.g. pvalue =1e-10, then this value should be 10)
+    - fold enrichment for this peak summit against random Poisson distribution with local lambda, -log10(qvalue) at peak summit
+   
+   Coordinates in XLS is 1-based which is different with BED format.
 
 2. NAME_peaks.narrowPeak is BED6+4 format file which contains the
    peak locations together with peak summit, pvalue and qvalue. You
    can load it to UCSC genome browser. Definition of some specific
-   columns are: 5th: integer score for display, 7th: fold-change,
-   8th: -log10pvalue, 9th: -log10qvalue, 10th: relative summit
-   position to peak start. The file can be loaded directly to UCSC
-   genome browser. Remove the beginning track line if you want to
+   columns are: 
+   
+   - 5th: integer score for display
+   - 7th: fold-change
+   - 8th: -log10pvalue
+   - 9th: -log10qvalue
+   - 10th: relative summit position to peak start
+   
+   The file can be loaded directly to UCSC genome browser. Remove the beginning track line if you want to
    analyze it by other tools.
 
 3. NAME_summits.bed is in BED format, which contains the peak summits
@@ -472,7 +480,7 @@ Output files
    narrowPeak file, except for missing the 10th column for annotating
    peak summits.
 
-4. NAME_peaks.gappedPeak is in BED12+3 format which contains both the
+5. NAME_peaks.gappedPeak is in BED12+3 format which contains both the
    broad region and narrow peaks. The 5th column is 10*-log10qvalue,
    to be more compatible to show grey levels on UCSC browser. Tht 7th
    is the start of the first narrow peak in the region, and the 8th
@@ -484,7 +492,7 @@ Output files
    fold-change, 14th: -log10pvalue, 15th: -log10qvalue. The file can be
    loaded directly to UCSC genome browser. 
 
-5. NAME_model.r is an R script which you can use to produce a PDF
+6. NAME_model.r is an R script which you can use to produce a PDF
    image about the model based on your data. Load it to R by:
 
    ```$ Rscript NAME_model.r```
@@ -492,7 +500,7 @@ Output files
    Then a pdf file NAME_model.pdf will be generated in your current
    directory. Note, R is required to draw this figure.
 
-6. The .bdg files are in bedGraph format which can be imported to
+7. The .bdg files are in bedGraph format which can be imported to
    UCSC genome browser or be converted into even smaller bigWig
    files. There are two kinds of bdg files: treat_pileup, and
    control_lambda.
