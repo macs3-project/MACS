@@ -1,4 +1,4 @@
-# Time-stamp: <2015-07-27 12:32:19 Tao Liu>
+# Time-stamp: <2015-07-27 12:37:26 Tao Liu>
 
 """Module for filter duplicate tags from paired-end data
 
@@ -283,7 +283,6 @@ cdef class PETrackI:
             list chrnames = self.get_chr_names()
             str k
            
-        print "sorted?",self.__sorted
         if not self.__sorted: self.sort()
         
         self.__dup_pointer = copy(self.__pointer)
