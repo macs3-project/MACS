@@ -393,8 +393,8 @@ qvalue cutoff.  DEFAULT: 0.1
 ``````````
 
 When set, linearly scale the smaller dataset to the same depth as
-larger dataset, by default, the smaller dataset will be scaled
-towards the larger dataset. Beware, to scale up small data would
+larger dataset, by default, the larger dataset will be scaled
+towards the smaller dataset. Beware, to scale up small data would
 cause more false positives.
 
 --down-sample
