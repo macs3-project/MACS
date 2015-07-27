@@ -1,4 +1,4 @@
-# Time-stamp: <2015-06-02 23:30:13 Tao Liu>
+# Time-stamp: <2015-07-27 11:34:00 Tao Liu>
 
 """Description: MACS 2 main executable
 
@@ -360,7 +360,7 @@ def load_frag_files_options ( options ):
             tp = options.parser(tfile, buffer_size=options.buffer_size)
             treat = tp.append_petrack( treat )
             treat.sort()
-    tp.finalize()
+    treat.finalize()
 
     options.tsize = tp.d
     if options.cfile:
@@ -375,7 +375,7 @@ def load_frag_files_options ( options ):
                 cp = options.parser(cfile, buffer_size=options.buffer_size)
                 control = cp.append_petrack( control )
                 control.sort()
-        cp.finalize()
+        control.finalize()
     else:
         control = None
     options.info("#1 mean fragment size is determined as %d bp from treatment" % options.tsize)
