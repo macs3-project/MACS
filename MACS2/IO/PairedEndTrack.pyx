@@ -1,4 +1,4 @@
-# Time-stamp: <2015-06-02 23:23:09 Tao Liu>
+# Time-stamp: <2015-07-27 12:32:19 Tao Liu>
 
 """Module for filter duplicate tags from paired-end data
 
@@ -169,7 +169,7 @@ cdef class PETrackI:
         for i in range(len(chrnames)):
             c = chrnames[i]
             self.__locations[c].resize((self.__pointer[c]), refcheck=False)
-            self.__locations[c].sort(order='l')
+            self.__locations[c].sort( order=['l', 'r'] )
             self.total += self.__locations[c].shape[0]
 
         self.__sorted = True
@@ -215,7 +215,7 @@ cdef class PETrackI:
         for i in range(len(chrnames)):
             c = chrnames[i]
             #print "before", self.__locations[c][0:100]
-            self.__locations[c].sort(order='l') # sort by the leftmost location
+            self.__locations[c].sort( order=['l', 'r'] ) # sort by the leftmost location
             #print "before", self.__locations[c][0:100]
         self.__sorted = True
 
@@ -282,7 +282,8 @@ cdef class PETrackI:
             unsigned long i_old, i_new, i_dup, new_size, dup_size
             list chrnames = self.get_chr_names()
             str k
-                        
+           
+        print "sorted?",self.__sorted
         if not self.__sorted: self.sort()
         
         self.__dup_pointer = copy(self.__pointer)
@@ -460,7 +461,7 @@ cdef class PETrackI:
             num = <uint32_t>round(self.__locations[key].shape[0] * percent, 5 )
             np.random.shuffle( self.__locations[key] )
             self.__locations[key].resize( num, refcheck = False )
-            self.__locations[key].sort( order = 'l' ) # sort by leftmost positions
+            self.__locations[key].sort( order = ['l', 'r'] ) # sort by leftmost positions
             self.__pointer[key] = self.__locations[key].shape[0]
             self.length += ( self.__locations[key]['r'] - self.__locations[key]['l'] ).sum()
             self.total += self.__pointer[key]

@@ -1,4 +1,4 @@
-# Time-stamp: <2015-07-27 11:34:00 Tao Liu>
+# Time-stamp: <2015-07-27 12:31:14 Tao Liu>
 
 """Description: MACS 2 main executable
 
@@ -353,13 +353,13 @@ def load_frag_files_options ( options ):
 
     tp = options.parser(options.tfile[0], buffer_size=options.buffer_size)
     treat = tp.build_petrack()
-    treat.sort()
+    #treat.sort()
     if len(options.tfile) > 1:
         # multiple input
         for tfile in options.tfile[1:]:
             tp = options.parser(tfile, buffer_size=options.buffer_size)
             treat = tp.append_petrack( treat )
-            treat.sort()
+            #treat.sort()
     treat.finalize()
 
     options.tsize = tp.d
@@ -368,13 +368,13 @@ def load_frag_files_options ( options ):
         cp = options.parser(options.cfile[0], buffer_size=options.buffer_size)
         control = cp.build_petrack()
         control_d = cp.d
-        control.sort()
+        #control.sort()
         if len(options.cfile) > 1:
             # multiple input
             for cfile in options.cfile[1:]:
                 cp = options.parser(cfile, buffer_size=options.buffer_size)
                 control = cp.append_petrack( control )
-                control.sort()
+                #control.sort()
         control.finalize()
     else:
         control = None
