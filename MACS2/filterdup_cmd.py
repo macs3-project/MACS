@@ -1,4 +1,4 @@
-# Time-stamp: <2015-06-03 00:23:34 Tao Liu>
+# Time-stamp: <2015-07-27 13:51:19 Tao Liu>
 
 """Description: Filter duplicate reads depending on sequencing depth.
 
@@ -26,7 +26,7 @@ import logging
 # own python modules
 # ------------------------------------
 from MACS2.OptValidator import opt_validate_filterdup as opt_validate
-from MACS2.cProb import binomial_cdf_inv
+from MACS2.Prob import binomial_cdf_inv
 from MACS2.Constants import *
 # ------------------------------------
 # Main function

@@ -1,4 +1,4 @@
-# Time-stamp: <2014-02-24 11:35:25 Tao Liu>
+# Time-stamp: <2015-07-27 13:52:39 Tao Liu>
 
 """Description: MACS 2 main executable
 
@@ -32,9 +32,9 @@ from MACS2.IO.cDiffScore import DiffScoreTrackI
 from MACS2.IO.cPeakIO import PeakIO
 from MACS2.OptValidator import diff_opt_validate
 from MACS2.OutputWriter import *
-from MACS2.cProb import binomial_cdf_inv
-from MACS2.cPeakModel import PeakModel,NotEnoughPairsException
-from MACS2.cPeakDetect import PeakDetect
+from MACS2.Prob import binomial_cdf_inv
+from MACS2.PeakModel import PeakModel,NotEnoughPairsException
+from MACS2.PeakDetect import PeakDetect
 from MACS2.Constants import *
 # ------------------------------------
 # constants
