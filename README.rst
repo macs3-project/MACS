@@ -285,8 +285,8 @@ of qvalue.
 This parameter is used to select the regions within MFOLD range of
 high-confidence enrichment ratio against background to build
 model. The regions must be lower than upper limit, and higher than
-the lower limit of fold enrichment. DEFAULT:10,30 means using all
-regions not too low (>10) and not too high (<30) to build
+the lower limit of fold enrichment. DEFAULT:5,50 means using all
+regions not too low (>5) and not too high (<50) to build
 paired-peaks model. If MACS can not find more than 100 regions to
 build model, it will use the --extsize parameter to continue the
 peak detection ONLY if --fix-bimodal is set.
