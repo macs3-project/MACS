@@ -1,3 +1,25 @@
+2015-07-28  Tao Liu  <vladimir.liu@gmail.com>
+	MACS version 2.1.0 20150727 (tag:rc)
+
+	* Bug fixes
+
+	1) Fixed issue #76: information about broad/narrow cutoff will be
+	correctly displayed.
+
+	2) Fixed issue #79: bdgopt extparam option is fixed.
+
+	3) Fixed issue #87: reference to cProb has been fixed as 'Prob'
+	for filterdup command.
+
+	3) Fixed issue #78, #88 and similar issue reported in MACS google
+	group: MACS2 now can correctly deal with multiple alignment files
+	for -t or -c. The 'finalize' function will be correctly
+	called. Multiple files option is enabled for filterdup,
+	randsample, predictd, pileup and refinepeak commands.
+
+	4) A related issue to #88, when BAMPE mode is used, PE pairs will
+	be sorted by leftmost then rightmost ends. 
+
 2015-04-20  Tao Liu  <vladimir.liu@gmail.com>
 	MACS version 2.1.0 20150420 (tag:rc)
 
