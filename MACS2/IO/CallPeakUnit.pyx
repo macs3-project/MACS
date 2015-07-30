@@ -1,4 +1,4 @@
-# Time-stamp: <2015-04-24 10:05:31 Tao Liu>
+# Time-stamp: <2015-07-30 15:55:55 Tao Liu>
 
 """Module for Calculate Scores.
 
@@ -494,9 +494,7 @@ cdef class CallerFromAlignments:
                                                          baseline_value = self.lambda_bg,
                                                          directional = False )
         else:
-            ctrl_pv = [treat_pv[0][-1:], np.ndarray([self.lambda_bg,], dtype="float32")] # set a global lambda
-
-
+            ctrl_pv = [treat_pv[0][-1:], np.array([self.lambda_bg,], dtype="float32")] # set a global lambda
 
         self.chr_pos_treat_ctrl = self.__chrom_pair_treat_ctrl( treat_pv, ctrl_pv)
 
