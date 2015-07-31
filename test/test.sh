@@ -12,6 +12,7 @@ echo "callpeak"
 macs2 callpeak -t $CHIP -c $CTRL -n run_callpeak_narrow -B --outdir run_callpeak_narrow --call-summits &> run_callpeak_narrow/run_callpeak_narrow.log
 macs2 callpeak -t $CHIP -c $CTRL -n run_callpeak_narrow2 -B --outdir run_callpeak_narrow --nomodel --extsize 100 &> run_callpeak_narrow/run_callpeak_narrow2.log
 macs2 callpeak -t $CHIP -c $CTRL -n run_callpeak_narrow3 -B --outdir run_callpeak_narrow --nomodel --extsize 100 --shift -50 &> run_callpeak_narrow/run_callpeak_narrow3.log
+macs2 callpeak -t $CHIP -c $CTRL -n run_callpeak_narrow4 -B --outdir run_callpeak_narrow --nomodel --nolambda --extsize 100 --shift -50 &> run_callpeak_narrow/run_callpeak_narrow4.log
 macs2 callpeak -t $CHIP -c $CTRL -n run_callpeak_broad -B --outdir run_callpeak_broad --broad &> run_callpeak_broad/run_callpeak_broad.log
 
 echo "callpeak on PE"
