@@ -23,6 +23,7 @@ import os
 import sys
 import logging
 from time import strftime
+import tempfile
 
 # ------------------------------------
 # own python modules
@@ -63,7 +64,9 @@ def run( args ):
     options.PE_MODE = options.format in ('BAMPE',)
     if options.PE_MODE: tag = 'fragment' # call things fragments not tags
     else: tag = 'tag'
-    
+
+    tempfile.tempdir = options.tempdir
+
     #1 Read tag files
     info("#1 read %s files...", tag)
     if options.PE_MODE: (treat, control) = load_frag_files_options (options)
