@@ -298,11 +298,11 @@ cdef class PETrackI:
             i_dup = 0
             locs = self.__locations[k]
             size = locs.shape[0]
-            if size < 1:
+            if size <= 1:
                 new_locs = locs
             else:
-                new_locs = np.zeros(self.__pointer[k], dtype=[('l','int32'),('r','int32')]) # note: ['l'] is the leftmost end, ['r'] is the rightmost end of fragment.
-                dup_locs = np.zeros(self.__pointer[k], dtype=[('l','int32'),('r','int32')]) # note: ['l'] is the leftmost end, ['r'] is the rightmost end of fragment.
+                new_locs = np.zeros(self.__pointer[k] + 1, dtype=[('l','int32'),('r','int32')]) # note: ['l'] is the leftmost end, ['r'] is the rightmost end of fragment.
+                dup_locs = np.zeros(self.__pointer[k] + 1, dtype=[('l','int32'),('r','int32')]) # note: ['l'] is the leftmost end, ['r'] is the rightmost end of fragment.
                 i_new += 1
                 n = 1
             
@@ -385,10 +385,10 @@ cdef class PETrackI:
             i_new = 0
             locs = self.__locations[k]
             size = locs.shape[0]
-            if size < 1:
+            if size <= 1:
                 new_locs = locs
             else:
-                new_locs = np.zeros( self.__pointer[k], dtype=[('l','int32'),('r','int32')]) # note: ['l'] is the leftmost end, ['r'] is the rightmost end of fragment.
+                new_locs = np.zeros( self.__pointer[k] + 1, dtype=[('l','int32'),('r','int32')]) # note: ['l'] is the leftmost end, ['r'] is the rightmost end of fragment.
                 i_new += 1
                 n = 1                # the number of tags in the current location
             
