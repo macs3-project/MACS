@@ -289,11 +289,11 @@ cdef class FWTrack:
             i_dup = 0
             plus = self.__locations[k][0]
             size = plus.shape[0]
-            dup_plus = np.zeros( self.__pointer[k][0],dtype='int32' )
-            if len(plus) < 1:
+            dup_plus = np.zeros( self.__pointer[k][0] + 1,dtype='int32' )
+            if len(plus) <= 1:
                 new_plus = plus         # do nothing
             else:
-                new_plus = np.zeros( self.__pointer[k][0],dtype='int32' )
+                new_plus = np.zeros( self.__pointer[k][0] + 1,dtype='int32' )
                 new_plus[ i_new ] = plus[ i_new ] # first item
                 i_new += 1
                 current_loc = plus[0]
@@ -335,11 +335,11 @@ cdef class FWTrack:
             i_dup = 0
             minus = self.__locations[k][1]
             size = minus.shape[0]
-            dup_minus = np.zeros( self.__pointer[k][1],dtype='int32' )
-            if len(minus) < 1:
+            dup_minus = np.zeros( self.__pointer[k][1] + 1,dtype='int32' )
+            if len(minus) <= 1:
                 new_minus = minus         # do nothing
             else:
-                new_minus = np.zeros( self.__pointer[k][1],dtype='int32' )
+                new_minus = np.zeros( self.__pointer[k][1] + 1,dtype='int32' )
                 new_minus[ i_new ] = minus[ i_new ] # first item
                 i_new += 1
                 current_loc = minus[0]
@@ -481,10 +481,10 @@ cdef class FWTrack:
             i_new = 0
             plus = self.__locations[k][0]
             size = plus.shape[0]
-            if len(plus) < 1:
+            if len(plus) <= 1:
                 new_plus = plus         # do nothing
             else:
-                new_plus = np.zeros( self.__pointer[k][0],dtype='int32' )
+                new_plus = np.zeros( self.__pointer[k][0] + 1,dtype='int32' )
                 new_plus[ i_new ] = plus[ i_new ] # first item
                 i_new += 1
                 n = 1                # the number of tags in the current location
@@ -520,10 +520,10 @@ cdef class FWTrack:
             i_new = 0
             minus = self.__locations[k][1]
             size = minus.shape[0]
-            if len(minus) < 1:
+            if len(minus) <= 1:
                 new_minus = minus         # do nothing
             else:
-                new_minus = np.zeros( self.__pointer[k][1],dtype='int32' )
+                new_minus = np.zeros( self.__pointer[k][1] + 1,dtype='int32' )
                 new_minus[ i_new ] = minus[ i_new ] # first item
                 i_new += 1
                 n = 1                # the number of tags in the current location
