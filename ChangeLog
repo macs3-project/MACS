@@ -12,7 +12,8 @@
 	broad calls may be reported, and sometimes you would see peaks
 	with lower than cutoff values in the output files.
 
-	3) "Potentially" Fixed issue #105, need further followup.
+	3) "Potentially" Fixed issue #105 on temporary cache files, need
+	further followup.
 
 
 2015-07-31  Tao Liu  <vladimir.liu@gmail.com>
