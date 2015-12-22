@@ -1,4 +1,4 @@
-# Time-stamp: <2015-07-30 15:55:55 Tao Liu>
+# Time-stamp: <2015-12-22 16:06:56 Tao Liu>
 
 """Module for Calculate Scores.
 
@@ -461,7 +461,7 @@ cdef class CallerFromAlignments:
                 self.chr_pos_treat_ctrl = cPickle.load( f )
                 f.close()
                 return
-            except IOError:
+            except:
                 temp_fd, temp_filename = mkstemp()
                 os.close(temp_fd)
                 self.pileup_data_files[ chrom ] = temp_filename
@@ -507,8 +507,9 @@ cdef class CallerFromAlignments:
             f = file(self.pileup_data_files[ chrom ],"wb")
             cPickle.dump( self.chr_pos_treat_ctrl, f , protocol=2 )
             f.close()
-        except IOError:
-            pass
+        except:
+            # fail to write then remove the key in pileup_data_files
+            self.pileup_data_files.pop(chrom)
         return
 
     cdef list __chrom_pair_treat_ctrl ( self, treat_pv, ctrl_pv ):
@@ -1585,7 +1586,7 @@ cdef class CallerFromAlignments:
 
         # get the regions with scores above cutoffs
         above_cutoff = np.nonzero( apply_multiple_cutoffs(score_array_s,lvl1_cutoff_s) )[0] # this is not an optimized method. It would be better to store score array in a 2-D ndarray?
-        above_cutoff_index_array = np.arange(pos_array.shape[0])[above_cutoff] # indices
+        above_cutoff_index_array = np.arange(pos_array.shape[0],dtype="int32")[above_cutoff] # indices
         above_cutoff_endpos = pos_array[above_cutoff] # end positions of regions where score is above cutoff
         above_cutoff_startpos = pos_array[above_cutoff-1] # start positions of regions where score is above cutoff
 
@@ -1611,6 +1612,9 @@ cdef class CallerFromAlignments:
         cp = ctrl_array_ptr[ ti ]        
 
         peak_content.append( ( ts, te, tp, cp, ti ) )
+        acs_ptr += 1 # move ptr
+        ace_ptr += 1
+        acia_ptr+= 1
         lastp = te
 
         #peak_content.append( (above_cutoff_startpos[0], above_cutoff_endpos[0], treat_array[above_cutoff_index_array[0]], ctrl_array[above_cutoff_index_array[0]], score_array_s, above_cutoff_index_array[0] ) )
@@ -1645,7 +1649,7 @@ cdef class CallerFromAlignments:
 
         # get the regions with scores above cutoffs
         above_cutoff = np.nonzero( apply_multiple_cutoffs(score_array_s,lvl2_cutoff_s) )[0] # this is not an optimized method. It would be better to store score array in a 2-D ndarray?
-        above_cutoff_index_array = np.arange(pos_array.shape[0])[above_cutoff] # indices
+        above_cutoff_index_array = np.arange(pos_array.shape[0],dtype="int32")[above_cutoff] # indices
         above_cutoff_endpos = pos_array[above_cutoff] # end positions of regions where score is above cutoff
         above_cutoff_startpos = pos_array[above_cutoff-1] # start positions of regions where score is above cutoff
 
@@ -1669,19 +1673,25 @@ cdef class CallerFromAlignments:
         ti = acia_ptr[ 0 ]
         tp = treat_array_ptr[ ti ]
         cp = ctrl_array_ptr[ ti ]        
-
         peak_content.append( ( ts, te, tp, cp, ti ) )
+        acs_ptr += 1 # move ptr
+        ace_ptr += 1
+        acia_ptr+= 1
+
         lastp = te
         for i in range( 1, above_cutoff_startpos.size ):
-            ts = acs_ptr[ 0 ]
-            te = ace_ptr[ 0 ]
-            ti = acia_ptr[ 0 ]
-            acs_ptr += 1
+            # for everything above cutoff
+            ts = acs_ptr[ 0 ] # get the start
+            te = ace_ptr[ 0 ] # get the end
+            ti = acia_ptr[ 0 ]# get the index
+
+            acs_ptr += 1 # move ptr
             ace_ptr += 1
             acia_ptr+= 1
-            tp = treat_array_ptr[ ti ]
-            cp = ctrl_array_ptr[ ti ]        
-            tl = ts - lastp
+            tp = treat_array_ptr[ ti ] # get the treatment pileup
+            cp = ctrl_array_ptr[ ti ]  # get the control pileup
+            tl = ts - lastp # get the distance from the current point to last position of existing peak_content
+
             if tl <= lvl2_max_gap:
                 # append
                 peak_content.append( ( ts, te, tp, cp, ti ) )
@@ -1689,6 +1699,7 @@ cdef class CallerFromAlignments:
             else:
                 # close
                 self.__close_peak_for_broad_region (peak_content, lvl2peaks, min_length, chrom, lvl2_max_gap/2, score_array_s )
+                
                 peak_content = [ ( ts, te, tp, cp, ti ), ]
                 lastp = te
 
@@ -1743,6 +1754,8 @@ cdef class CallerFromAlignments:
                        fold_change = mean_from_value_length( tarray_fc, tlist_length ),
                        qscore      = mean_from_value_length( tarray_qscore, tlist_length ),
                        )
+            #if chrom == "chr1" and  peak_content[0][0] == 237643 and peak_content[-1][1] == 237935:
+            #    print tarray_qscore, tlist_length
             # start a new peak
             return True
 

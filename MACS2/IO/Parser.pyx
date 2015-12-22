@@ -1,4 +1,4 @@
-# Time-stamp: <2015-06-02 23:21:25 Tao Liu>
+# Time-stamp: <2015-08-14 14:29:30 Tao Liu>
 
 """Module for all MACS Parser classes for input.
 
@@ -1242,8 +1242,8 @@ cdef class BAMPEParser(BAMParser):
         (n_cigar_op,  bwflag ) = unpack( '<HH' , data[ 12:16 ] )
         if bwflag & 4 or bwflag & 512 or bwflag & 1024 or bwflag & 256 or bwflag & 2048:
             return ret       #unmapped sequence or bad sequence or 2nd or sup alignment
-        if bwflag & 256 or bwflag & 2048:
-            return ret          # secondary or supplementary alignment
+        #if bwflag & 256 or bwflag & 2048:
+        #    return ret          # secondary or supplementary alignment
         if bwflag & 1:
             # paired read. We should only keep sequence if the mate is mapped
             # and if this is the left mate, all is within  the flag! 

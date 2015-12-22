@@ -1,4 +1,4 @@
-# Time-stamp: <2015-07-27 12:31:14 Tao Liu>
+# Time-stamp: <2015-12-22 11:55:15 Tao Liu>
 
 """Description: MACS 2 main executable
 
@@ -286,9 +286,9 @@ def run( args ):
     ofhd_xls.write(tagsinfo)
 
     if options.shift > 0:
-        ofhd_xls.write("#2 Sequencing ends will be shifted towards 3' by %d bp(s)\n" % (options.shift))
+        ofhd_xls.write("# Sequencing ends will be shifted towards 3' by %d bp(s)\n" % (options.shift))
     elif options.shift < 0:
-        ofhd_xls.write("#2 Sequencing ends will be shifted towards 5' by %d bp(s)\n" % (options.shift * -1))
+        ofhd_xls.write("# Sequencing ends will be shifted towards 5' by %d bp(s)\n" % (options.shift * -1))
 
     ofhd_xls.write("# d = %d\n" % (options.d))
     try:
