@@ -23,6 +23,7 @@ the distribution).
 import os
 import sys
 import argparse as ap
+import tempfile
 
 # ------------------------------------
 # own python modules
@@ -252,6 +253,8 @@ def add_callpeak_parser( subparsers ):
                                  help = "When set, random sampling method will scale down the bigger sample. By default, MACS uses linear scaling. Warning: This option will make your result unstable and irreproducible since each time, random reads would be selected. Consider to use 'randsample' script instead. <not implmented>If used together with --SPMR, 1 million unique reads will be randomly picked.</not implemented> Caution: due to the implementation, the final number of selected reads may not be as you expected! DEFAULT: False" )
     group_callpeak.add_argument( "--seed", dest = "seed", type = int, default = -1, 
                                  help = "Set the random seed while down sampling data. Must be a non-negative integer in order to be effective. DEFAULT: not set" )
+    group_callpeak.add_argument( "--tempdir", dest="tempdir", default=tempfile.gettempdir(),
+                                help = "Optional directory to store temp files. DEFAULT: %(default)s")
     group_callpeak.add_argument( "--nolambda", dest = "nolambda", action = "store_true",
                                  help = "If True, MACS will use fixed background lambda as local lambda for every peak region. Normally, MACS calculates a dynamic local lambda to reflect the local bias due to potential chromatin structure. ",
                                  default = False )
