@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# Time-stamp: <2015-12-22 16:21:04 Tao Liu>
+# Time-stamp: <2016-01-30 14:18:53 Tao Liu>
 
 """Description
 
@@ -37,23 +37,24 @@ def main():
         sys.stderr.write("CRITICAL: Python version must be 2.7!\n")
         sys.exit(1)
 
-    # User must check GCC, if >= 4.6, use -Ofast, otherwise -O3.
+    # I intend to use -Ofast, however if gcc version < 4.6, this option is unavailable so...
+    extra_c_args = ["-w","-O3","-ffast-math"] # for C, -Ofast implies -O3 and -ffast-math
 
-    ext_modules = [Extension("MACS2.Prob", ["MACS2/Prob.c"], libraries=["m"], include_dirs=numpy_include_dir, extra_compile_args=["-w","-Ofast"] ),
-                   Extension("MACS2.IO.Parser",["MACS2/IO/Parser.c"], include_dirs=numpy_include_dir, extra_compile_args=["-w","-Ofast"]),
-                   Extension("MACS2.Pileup", ["MACS2/Pileup.c","MACS2/cPosValCalculation.c"], include_dirs=numpy_include_dir, extra_compile_args=["-w","-Ofast"] ),
-                   Extension("MACS2.PeakModel", ["MACS2/PeakModel.c"], include_dirs=numpy_include_dir, extra_compile_args=["-w","-Ofast"]),
-                   Extension("MACS2.PeakDetect", ["MACS2/PeakDetect.c"], extra_compile_args=["-w","-Ofast"]),
-                   Extension("MACS2.Signal", ["MACS2/Signal.c"], include_dirs=numpy_include_dir, extra_compile_args=["-w","-Ofast"]),
-                   Extension("MACS2.IO.PeakIO", ["MACS2/IO/PeakIO.c"], extra_compile_args=["-w","-Ofast"]),
-                   Extension("MACS2.IO.BedGraphIO", ["MACS2/IO/BedGraphIO.c"], extra_compile_args=["-w","-Ofast"]),                   
-                   Extension("MACS2.IO.FixWidthTrack", ["MACS2/IO/FixWidthTrack.c"], include_dirs=numpy_include_dir, extra_compile_args=["-w","-Ofast"]),
-                   Extension("MACS2.IO.PairedEndTrack", ["MACS2/IO/PairedEndTrack.c"], include_dirs=numpy_include_dir, extra_compile_args=["-w","-Ofast"]),
-                   Extension("MACS2.IO.BedGraph", ["MACS2/IO/BedGraph.c"], libraries=["m"], extra_compile_args=["-w","-Ofast"]),
-                   Extension("MACS2.IO.ScoreTrack", ["MACS2/IO/ScoreTrack.c"], include_dirs=numpy_include_dir, extra_compile_args=["-w","-Ofast"] ),
-                   Extension("MACS2.IO.CallPeakUnit", ["MACS2/IO/CallPeakUnit.c"], include_dirs=numpy_include_dir, extra_compile_args=["-w","-Ofast"]),
-                   Extension("MACS2.hashtable", ["MACS2/hashtable.c"], include_dirs=["MACS2/",numpy_get_include()], extra_compile_args=["-w","-Ofast"]),
-                   Extension("MACS2.Statistics", ["MACS2/Statistics.c", "MACS2/cStatistics.c"], libraries=["m"], include_dirs=["MACS2/",numpy_get_include()], extra_compile_args=["-w","-Ofast"]),
+    ext_modules = [Extension("MACS2.Prob", ["MACS2/Prob.c"], libraries=["m"], include_dirs=numpy_include_dir, extra_compile_args=extra_c_args ),
+                   Extension("MACS2.IO.Parser",["MACS2/IO/Parser.c"], include_dirs=numpy_include_dir, extra_compile_args=extra_c_args),
+                   Extension("MACS2.Pileup", ["MACS2/Pileup.c","MACS2/cPosValCalculation.c"], include_dirs=numpy_include_dir, extra_compile_args=extra_c_args ),
+                   Extension("MACS2.PeakModel", ["MACS2/PeakModel.c"], include_dirs=numpy_include_dir, extra_compile_args=extra_c_args),
+                   Extension("MACS2.PeakDetect", ["MACS2/PeakDetect.c"], extra_compile_args=extra_c_args),
+                   Extension("MACS2.Signal", ["MACS2/Signal.c"], include_dirs=numpy_include_dir, extra_compile_args=extra_c_args),
+                   Extension("MACS2.IO.PeakIO", ["MACS2/IO/PeakIO.c"], extra_compile_args=extra_c_args),
+                   Extension("MACS2.IO.BedGraphIO", ["MACS2/IO/BedGraphIO.c"], extra_compile_args=extra_c_args),                   
+                   Extension("MACS2.IO.FixWidthTrack", ["MACS2/IO/FixWidthTrack.c"], include_dirs=numpy_include_dir, extra_compile_args=extra_c_args),
+                   Extension("MACS2.IO.PairedEndTrack", ["MACS2/IO/PairedEndTrack.c"], include_dirs=numpy_include_dir, extra_compile_args=extra_c_args),
+                   Extension("MACS2.IO.BedGraph", ["MACS2/IO/BedGraph.c"], libraries=["m"], extra_compile_args=extra_c_args),
+                   Extension("MACS2.IO.ScoreTrack", ["MACS2/IO/ScoreTrack.c"], include_dirs=numpy_include_dir, extra_compile_args=extra_c_args ),
+                   Extension("MACS2.IO.CallPeakUnit", ["MACS2/IO/CallPeakUnit.c"], include_dirs=numpy_include_dir, extra_compile_args=extra_c_args),
+                   Extension("MACS2.hashtable", ["MACS2/hashtable.c"], include_dirs=["MACS2/",numpy_get_include()], extra_compile_args=extra_c_args),
+                   Extension("MACS2.Statistics", ["MACS2/Statistics.c", "MACS2/cStatistics.c"], libraries=["m"], include_dirs=["MACS2/",numpy_get_include()], extra_compile_args=extra_c_args),
                    ]
     
     setup(name="MACS2",
