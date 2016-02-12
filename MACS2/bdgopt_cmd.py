@@ -1,4 +1,4 @@
-# Time-stamp: <2015-03-05 13:41:20 Tao Liu>
+# Time-stamp: <2016-02-12 00:43:42 Tao Liu>
 
 """Description: Modify bedGraph file
 
@@ -54,14 +54,20 @@ def run( options ):
     btrack = bio.build_bdgtrack(baseline_value=0)
 
     info("Modify bedGraph...")
-    if options.method.lower() == "multiply":
-        btrack.apply_func( lambda x: x * options.extraparam)
-    elif options.method.lower() == "add":
-        btrack.apply_func( lambda x: x + options.extraparam)
-    elif options.method.lower() == "p2q":
+    if options.method.lower() == "p2q":
         btrack.p2q()
     elif options.method.lower() == "analen":
         btrack.analen()
+    else:
+        extraparam = float(options.extraparam[0])
+        if options.method.lower() == "multiply":
+            btrack.apply_func( lambda x: x * extraparam)
+        elif options.method.lower() == "add":
+            btrack.apply_func( lambda x: x + extraparam)
+        elif options.method.lower() == "max":
+            btrack.apply_func( lambda x: x if x> extraparam else extraparam )
+        elif options.method.lower() == "min":
+            btrack.apply_func( lambda x: x if x< extraparam else extraparam )
         
     ofile = os.path.join( options.outdir, options.ofile )
     info("Write bedGraph of modified scores...")

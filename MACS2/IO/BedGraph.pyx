@@ -1,4 +1,4 @@
-# Time-stamp: <2015-05-19 13:46:49 Tao Liu>
+# Time-stamp: <2016-02-12 00:39:32 Tao Liu>
 
 """Module for Feature IO classes.
 
@@ -827,7 +827,7 @@ cdef class bedGraphTrackI:
         
         for (p,s) in self.__data.values():
             for i in xrange(len(s)):
-                s[i][1] = func(s[i][1])
+                s[i] = func(s[i])
         self.maxvalue = func(self.maxvalue)
         self.minvalue = func(self.minvalue)
         return True

@@ -1,4 +1,4 @@
-# Time-stamp: <2015-03-05 14:21:33 Tao Liu>
+# Time-stamp: <2016-02-12 00:12:45 Tao Liu>
 
 """Module for Feature IO classes.
 
@@ -688,6 +688,7 @@ cdef class scoreTrackII:
                          f: log10 fold enrichment
                          F: linear fold enrichment
                          d: subtraction
+                         M: maximum
                          m: fragment pileup per million reads
         """
         if scoring_method == 'p':
@@ -709,6 +710,8 @@ cdef class scoreTrackII:
             self.compute_subtraction()
         elif scoring_method == 'm':
             self.compute_SPMR()
+        elif scoring_method == 'M':
+            self.compute_max()            
         else:
             raise NotImplemented
             
@@ -957,6 +960,21 @@ cdef class scoreTrackII:
             for i in range(l):
                 v[ i ] =  p[ i ] / scale # two digit precision may not be enough...
         self.scoring_method = 'm'
+        return
+
+    cdef compute_max ( self ):
+        cdef:
+            np.ndarray p, c, v
+            long l, i
+        
+        for chrom in self.data.keys():
+            p = self.data[chrom][1]
+            c = self.data[chrom][2]
+            v = self.data[chrom][3]
+            l = self.datalength[chrom]
+            for i in range(l):
+                v[ i ] = max(p[ i ],c[ i ])
+        self.scoring_method = 'M'
         return
 
     cpdef write_bedGraph ( self, fhd, str name, str description, short column = 3):

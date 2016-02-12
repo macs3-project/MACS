@@ -1,4 +1,4 @@
-# Time-stamp: <2015-05-19 13:42:30 Tao Liu>
+# Time-stamp: <2016-02-12 00:28:17 Tao Liu>
 
 """Module Description
 
@@ -653,7 +653,7 @@ def opt_validate_bdgcmp ( options ):
     # methods should be valid:
 
     for method in set(options.method):
-        if method not in [ 'ppois', 'qpois', 'subtract', 'logFE', 'FE', 'logLR', 'slogLR' ]:
+        if method not in [ 'ppois', 'qpois', 'subtract', 'logFE', 'FE', 'logLR', 'slogLR', 'max' ]:
             logging.error( "Invalid method: %s" % method )
             sys.exit( 1 )
 
@@ -732,7 +732,7 @@ def opt_validate_bdgopt ( options ):
 
     # methods should be valid:
 
-    if options.method.lower() not in [ 'multiply', 'add', 'p2q']:
+    if options.method.lower() not in [ 'multiply', 'add', 'p2q', 'max', 'min']:
         logging.error( "Invalid method: %s" % options.method )
         sys.exit( 1 )
 

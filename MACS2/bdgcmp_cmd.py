@@ -1,4 +1,4 @@
-# Time-stamp: <2015-03-05 13:40:31 Tao Liu>
+# Time-stamp: <2016-02-12 00:11:11 Tao Liu>
 
 import sys
 import os
@@ -78,6 +78,8 @@ def run( options ):
             sbtrack.change_score_method( ord('l') )
         elif method == 'slogLR':             # log likelihood
             sbtrack.change_score_method( ord('s') )
+        elif method == 'max':             
+            sbtrack.change_score_method( ord('M') )            
         else:
             raise Exception("Can't reach here!")
         
