@@ -1,4 +1,4 @@
-# Time-stamp: <2016-02-12 00:28:17 Tao Liu>
+# Time-stamp: <2016-02-15 14:57:27 Tao Liu>
 
 """Module Description
 
@@ -25,8 +25,8 @@ from argparse import ArgumentError
 from subprocess import Popen, PIPE
 from math import log
 from MACS2.IO.Parser import BEDParser, ELANDResultParser, ELANDMultiParser, \
-    ELANDExportParser, SAMParser, BAMParser, \
-    BAMPEParser, BowtieParser,  guess_parser
+    ELANDExportParser, SAMParser, BAMParser, BAMPEParser,\
+    BEDPEParser, BowtieParser,  guess_parser
 # ------------------------------------
 # constants
 # ------------------------------------
@@ -75,6 +75,9 @@ def opt_validate ( options ):
     elif options.format == "BAMPE":
         options.parser = BAMPEParser
         options.gzip_flag = True
+        options.nomodel = True
+    elif options.format == "BEDPE":
+        options.parser = BEDPEParser
         options.nomodel = True
     elif options.format == "BOWTIE":
         options.parser = BowtieParser
@@ -213,9 +216,12 @@ def opt_validate ( options ):
     if options.fecutoff != 1.0:
         options.argtxt += "# Additional cutoff on fold-enrichment is: %.2f\n" % (options.fecutoff)
 
-    if options.format == "BAMPE":
+    if options.format in ["BAMPE", "BEDPE"]:
         # neutralize SHIFT
         options.shift = 0
+        options.argtxt += "# Paired-End mode is on\n"
+    else:
+        options.argtxt += "# Paired-End mode is off\n"
 
     #if options.refine_peaks:
     #    options.argtxt += "# Refining peak for read balance is on\n"
@@ -541,6 +547,9 @@ def opt_validate_predictd ( options ):
     elif options.format == "BAMPE":
         options.parser = BAMPEParser
         options.gzip_flag = True
+        options.nomodel = True
+    elif options.format == "BEDPE":
+        options.parser = BEDPEParser
         options.nomodel = True
     elif options.format == "BOWTIE":
         options.parser = BowtieParser

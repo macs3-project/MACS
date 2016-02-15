@@ -1,4 +1,4 @@
-# Time-stamp: <2015-07-27 12:37:26 Tao Liu>
+# Time-stamp: <2016-02-15 15:25:06 Tao Liu>
 
 """Module for filter duplicate tags from paired-end data
 
@@ -139,13 +139,13 @@ cdef class PETrackI:
             self.rlengths[chrom] = rlengths[chrom]
         missed_chroms = set(self.__locations.keys()).difference(rlengths.keys())
         for chrom in missed_chroms:
-            self.rlength[chrom] = INT_MAX
+            self.rlengths[chrom] = INT_MAX
         return True
 
     cpdef dict get_rlengths ( self ):
         """Get reference chromosome lengths dictionary.
 
-        If self.rlength is empty, create a new dict where the length of
+        If self.rlengths is empty, create a new dict where the length of
         chromosome will be set as the maximum integer.
         """
         if not self.rlengths:
@@ -537,7 +537,10 @@ cdef class PETrackI:
     cpdef pileup_a_chromosome_c ( self, str chrom, list ds, list scale_factor_s, float baseline_value = 0.0 ):
         """pileup a certain chromosome, return [p,v] (end position and value) list.
 
-        This function is for control track. Basically, here is a simplified function from FixWidthTrack.
+        This function is for control track. Basically, here is a
+        simplified function from FixWidthTrack. We pretend the PE is
+        SE data and left read is on plus strand and right read is on
+        minus strand.
         
         ds             : tag will be extended to this value to 3' direction,
                          unless directional is False. Can contain multiple extension

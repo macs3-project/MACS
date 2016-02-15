@@ -1,4 +1,4 @@
-# Time-stamp: <2015-08-14 14:29:30 Tao Liu>
+# Time-stamp: <2016-02-15 15:17:11 Tao Liu>
 
 """Module for all MACS Parser classes for input.
 
@@ -26,16 +26,6 @@ import io
 from MACS2.Constants import *
 from MACS2.IO.FixWidthTrack import FWTrack
 from MACS2.IO.PairedEndTrack import PETrackI
-
-cdef public bint HAS_PYSAM
-
-try:
-    import pysam
-    HAS_PYSAM = True
-except:
-    HAS_PYSAM = False
-
-HAS_PYSAM=False
 
 from cpython cimport bool
 
@@ -66,6 +56,7 @@ __doc__ = "All Parser classes"
 # ------------------------------------
 
 cpdef guess_parser ( fhd, long buffer_size = 100000 ):
+    # Note: BAMPE and BEDPE can't be automatically detected.
     order_list = ("BAM",
                   "BED",
                   "ELAND",
@@ -298,11 +289,11 @@ cdef class GenericParser:
         self.fhd.close()
 
 cdef class BEDParser( GenericParser ):
-    """File Parser Class for tabular File.
+    """File Parser Class for BED File.
 
     """
     cdef __tlen_parse_line ( self, str thisline ):
-        """Parse 5' and 3' position, then calculate tag length.
+        """Parse 5' and 3' position, then calculate frag length.
 
         """
         thisline = thisline.rstrip()
@@ -350,6 +341,123 @@ cdef class BEDParser( GenericParser ):
             return ( chromname,
                      atoi( thisfields[ 1 ] ),
                      0 )
+
+cdef class BEDPEParser(GenericParser):
+    """Parser for BED format file containing PE information, and also
+    can be used for the cases when users predefine the fragment
+    locations by shifting/extending by themselves.
+
+    Format:
+
+    chromosome_name	frag_leftend	frag_rightend
+
+
+    Note: Only the first columns are used!
+    """
+
+    cdef public int n
+    cdef public int d
+
+    cdef __pe_parse_line ( self, str thisline ):
+        """ Parse each line, and return chromosome, left and right positions
+
+        """
+        thisline = thisline.rstrip()
+
+        # skip track/browser/comment lines
+        if not thisline or thisline[ :5 ] == "track" \
+            or thisline[ :7 ] == "browser" \
+            or thisline[ 0 ] == "#":
+             return ( "", -1, -1 )
+
+        # still only support tabular as delimiter.
+        thisfields = thisline.split( '\t' )
+        try:
+            return ( thisfields[ 0 ],
+                     atoi( thisfields[ 1 ] ),
+                     atoi( thisfields[ 2 ] ) )
+        except IndexError:
+            raise Exception("Less than 3 columns found at this line: %s\n" % thisline)
+
+    cpdef build_petrack ( self ):
+        """Build PETrackI from all lines.
+
+        """
+        cdef:
+            str chromname
+            int left_pos
+            int right_pos
+            long i = 0
+            long m = 0
+            float d = 0         # the average fragment size
+
+        petrack = PETrackI( buffer_size = self.buffer_size )
+        add_loc = petrack.add_loc
+
+        for thisline in self.fhd:
+            ( chromosome, left_pos, right_pos ) = self.__pe_parse_line( thisline )
+
+            if left_pos < 0 or not chromosome:
+                continue
+
+            assert right_pos > left_pos, "Right position must be larger than left position, check your BED file at line: %s" % thisline
+            d = ( d * i + right_pos-left_pos ) / ( i + 1 ) # keep track of avg fragment size
+            i += 1
+
+            if i % 1000000 == 0:
+                m += 1
+                logging.info( " %d" % ( m*1000000 ) )
+
+            add_loc( chromosome, left_pos, right_pos )
+
+        self.n = i
+        self.d = int( d )
+
+        assert d >= 0, "Something went wrong (mean fragment size was negative)"
+
+        self.close()
+        petrack.set_rlengths( {"DUMMYCHROM":0} )
+
+        print i, self.n, self.d
+        return petrack
+
+    cpdef append_petrack (self, petrack):
+        """Build PETrackI from all lines, return a PETrackI object.
+        """
+        cdef:
+            str chromname
+            int left_pos
+            int right_pos
+            long i = 0
+            long m = 0
+            float d = 0         # the average fragment size        
+
+        add_loc = petrack.add_loc
+
+        for thisline in self.fhd:
+            ( chromosome, left_pos, right_pos ) = self.__pe_parse_line( thisline )
+
+            if left_pos < 0 or not chromosome:
+                continue
+
+            assert right_pos > left_pos, "Right position must be larger than left position, check your BED file at line: %s" % thisline
+            d = ( d * i + right_pos-left_pos ) / ( i + 1 ) # keep track of avg fragment size
+            i += 1
+
+            if i % 1000000 == 0:
+                m += 1
+                logging.info( " %d" % ( m*1000000 ) )
+
+            add_loc( chromosome, left_pos, righ_pos )
+
+        self.d = int( self.d * self.n + d * i )/( self.n + i )
+        self.n += i
+
+        assert d >= 0, "Something went wrong (mean fragment size was negative)"
+
+        self.close()
+        petrack.set_rlengths( {"DUMMYCHROM":0} )
+        return petrack
             
 cdef class ELANDResultParser( GenericParser ):
     """File Parser Class for tabular File.
@@ -663,48 +771,37 @@ cdef class BAMParser( GenericParser ):
         self.gzipped = True
         self.tag_size = -1
         self.buffer_size = buffer_size
-        if HAS_PYSAM:
-            self.fhd = pysam.Samfile(filename)
+        # try gzip first
+        f = gzip.open( filename )
+        try:
+            f.read( 10 )
+        except IOError:
+            # not a gzipped file
+            self.gzipped = False
+        f.close()
+        if self.gzipped:
+            # open with gzip.open, then wrap it with BufferedReader!
+            self.fhd = io.BufferedReader( gzip.open( filename, mode='rb' ) )
         else:
-            # try gzip first
-            f = gzip.open( filename )
-            try:
-                f.read( 10 )
-            except IOError:
-                # not a gzipped file
-                self.gzipped = False
-            f.close()
-            if self.gzipped:
-                # open with gzip.open, then wrap it with BufferedReader!
-                self.fhd = io.BufferedReader( gzip.open( filename, mode='rb' ) )
-            else:
-                self.fhd = io.open( filename, mode='rb' ) # binary mode! I don't expect unicode here!
+            self.fhd = io.open( filename, mode='rb' ) # binary mode! I don't expect unicode here!
 
     cpdef sniff( self ):
         """Check the first 3 bytes of BAM file. If it's 'BAM', check
         is success.
 
         """
-        if HAS_PYSAM:
-            try:
-                self.fhd.tell()
-            except:
-                return False
-            else:
+        magic_header = self.fhd.read( 3 )
+        if magic_header == "BAM":
+            tsize  = self.tsize()
+            if tsize > 0:
+                self.fhd.seek( 0 )
                 return True
-        else:
-            magic_header = self.fhd.read( 3 )
-            if magic_header == "BAM":
-                tsize  = self.tsize()
-                if tsize > 0:
-                    self.fhd.seek( 0 )
-                    return True
-                else:
-                    self.fhd.seek( 0 )
-                    raise Exception( "File is not of a valid BAM format! %d" % tsize )
             else:
                 self.fhd.seek( 0 )
-                return False
+                raise Exception( "File is not of a valid BAM format! %d" % tsize )
+        else:
+            self.fhd.seek( 0 )
+            return False
 
     cpdef int tsize ( self ):
         """Get tag size from BAM file -- read l_seq field.
@@ -750,27 +847,6 @@ cdef class BAMParser( GenericParser ):
         return self.tag_size
 
     cpdef tuple get_references( self ):
-        if HAS_PYSAM:
-            return self.__get_references_w_pysam()
-        else:
-            return self.__get_references_wo_pysam()
-
-    cdef tuple __get_references_w_pysam( self ):
-        """
-        read in references from BAM header
-        
-        return a tuple (references (list of names),
-                        rlengths (dict of lengths)
-        """
-        cdef:
-            list references = []
-            dict rlengths = {}
-
-        references = list(self.fhd.references)
-        rlengths = dict( zip( references, self.fhd.lengths ) )
-        return (references, rlengths)
-        
-    cdef tuple __get_references_wo_pysam( self ):
         """
         read in references from BAM header
         
@@ -803,55 +879,6 @@ cdef class BAMParser( GenericParser ):
         return (references, rlengths)
 
     cpdef build_fwtrack ( self ):
-        try:
-            if HAS_PYSAM:
-                return self.__build_fwtrack_w_pysam()
-            else:
-                return self.__build_fwtrack_wo_pysam()
-        except IOError:
-            logging.error( "BAM files might be corrupted!" )
-            sys.exit(0)
-            
-
-    cdef __build_fwtrack_w_pysam ( self ): # obsolete function
-        cdef:
-            int i = 0
-            int m = 0
-            int fpos, strand, chrid
-            list references
-            dict rlengths
-        
-        fwtrack = FWTrack( buffer_size = self.buffer_size )
-        self.fhd.reset()
-        references, rlengths = self.get_references()
-        while True:
-            try:
-                a  =  self.fhd.next()
-            except StopIteration:
-                break
-            chrid = a.tid
-            if a.is_unmapped or (a.is_paired and (not a.is_proper_pair or a.is_read2)):
-                fpos = -1
-            else:
-                if a.is_reverse:
-                    strand = 1              # minus strand
-                    fpos = a.aend     # rightmost position
-                else:
-                    strand = 0              # plus strand
-                    fpos = a.pos
-            i+=1
-            if i == 1000000:
-                m += 1
-                logging.info( " %d" % ( m*1000000 ) )
-                i = 0
-            if fpos >= 0:
-                fwtrack.add_loc( references[ chrid ], fpos, strand )
-        self.fhd.close()
-        fwtrack.finalize()
-        fwtrack.set_rlengths( rlengths )
-        return fwtrack
-
-    cdef __build_fwtrack_wo_pysam ( self ):
         """Build FWTrack from all lines, return a FWTrack object.
 
         Note only the unique match for a tag is kept.
@@ -874,7 +901,7 @@ cdef class BAMParser( GenericParser ):
                 entrylength = unpack( '<i', fread( 4 ) )[ 0 ]
             except struct.error:
                 break
-            ( chrid, fpos, strand ) = self.__fw_binary_parse_wo_pysam( fread( entrylength ) )
+            ( chrid, fpos, strand ) = self.__fw_binary_parse( fread( entrylength ) )
             i+=1
             if i == 1000000:
                 m += 1
@@ -889,50 +916,6 @@ cdef class BAMParser( GenericParser ):
         return fwtrack
 
     cpdef append_fwtrack ( self, fwtrack ):
-        if HAS_PYSAM:
-            return self.__append_fwtrack_w_pysam( fwtrack )
-        else:
-            return self.__append_fwtrack_wo_pysam( fwtrack )
-
-    cdef __append_fwtrack_w_pysam ( self, fwtrack ): # obsolete function
-        cdef:
-            int i = 0
-            int m = 0
-            int fpos, strand, chrid
-            list references
-            dict rlengths
-        
-        self.fhd.reset()
-        references, rlengths = self.get_references()
-        while True:
-            try:
-                a  =  self.fhd.next()
-            except StopIteration:
-                break
-            chrid = a.tid
-            if a.is_unmapped or (a.is_paired and (not a.is_proper_pair or a.is_read2)):
-                fpos = -1
-            else:
-                if a.is_reverse:
-                    strand = 1              # minus strand
-                    fpos = a.aend           # rightmost position
-                else:
-                    strand = 0              # plus strand
-                    fpos = a.pos
-            i+=1
-            if i == 1000000:
-                m += 1
-                logging.info( " %d" % ( m*1000000 ) )
-                i = 0
-            if fpos >= 0:
-                fwtrack.add_loc( references[ chrid ], fpos, strand )
-        self.fhd.close()
-        fwtrack.finalize()
-        if isinstance( fwtrack.rlengths, dict ):
-            fwtrack.set_rlengths(rlengths)
-        return fwtrack
-
-    cdef __append_fwtrack_wo_pysam ( self, fwtrack ):
         """Build FWTrack from all lines, return a FWTrack object.
 
         Note only the unique match for a tag is kept.
@@ -954,7 +937,7 @@ cdef class BAMParser( GenericParser ):
                 entrylength = unpack( '<i', fread( 4 ) )[ 0 ]
             except struct.error:
                 break
-            ( chrid, fpos, strand ) = self.__fw_binary_parse_wo_pysam( fread( entrylength ) )
+            ( chrid, fpos, strand ) = self.__fw_binary_parse( fread( entrylength ) )
             i+=1
             if i == 1000000:
                 m += 1
@@ -968,7 +951,7 @@ cdef class BAMParser( GenericParser ):
         fwtrack.set_rlengths( rlengths )
         return fwtrack
     
-    cdef tuple __fw_binary_parse_wo_pysam (self, data ):
+    cdef tuple __fw_binary_parse (self, data ):
         cdef:
             int thisref, thisstart, thisstrand, i
             short bwflag, l_read_name, n_cigar_op
@@ -1035,97 +1018,14 @@ cdef class BAMPEParser(BAMParser):
     512    does not pass quality check
     1024    PCR or optical duplicate
     """
-    cdef public int n
-    cdef public int d
+    cdef public int n           # total number of fragments
+    cdef public int d           # the average length of fragments in integar
 
     cpdef build_petrack ( self ):
-        if HAS_PYSAM:
-            return self.__build_petrack_w_pysam()
-        else:
-            return self.__build_petrack_wo_pysam()
-
-    cdef __build_petrack_w_pysam ( self ):
-        return
-#         cdef:
-#             int i = 0
-#             int m = 0
-#             int entrylength, fpos, chrid, tlen
-#             int *asint
-#             list references
-#             dict rlengths
-#             float d = 0.0
-#             char *rawread, *rawentrylength
-#             _BAMPEParsed read
-        
-#         petrack = PETrackI()
-#         self.fhd.reset()
-
-#         references, rlengths = self.get_references()
-#         while True:
-#             try:
-#                 a = self.fhd.next()
-#             except StopIteration:
-#                 break
-#             chrid = a.tid
-#             if a.is_paired:
-#                 # not from paired-end sequencing? Pass
-                
-#             if a.is_unmapped or (a.is_paired and (not a.is_proper_pair or a.is_read2)):
-#                 fpos = -1
-#             else:
-#                 if a.is_reverse:
-#                     strand = 1              # minus strand
-#                     fpos = a.pos + a.rlen     # rightmost position
-#                 else:
-#                     strand = 0              # plus strand
-#                     fpos = a.pos
-#             i+=1
-#             if i == 1000000:
-#                 m += 1
-#                 logging.info( " %d" % ( m*1000000 ) )
-#                 i = 0
-#             if fpos >= 0:
-#                 fwtrack.add_loc( references[ chrid ], fpos, strand )
-#         self.fhd.close()
-#         fwtrack.finalize()
-#         fwtrack.set_rlengths( rlengths )
-#         return fwtrack
-            
-            
-#         # for convenience, only count valid pairs
-#         add_loc = petrack.add_loc
-#         info = logging.info
-#         err = struct.error
-#         while True:
-#             try: entrylength = unpack('<i', fread(4))[0]
-#             except err: break
-#             rawread = <bytes>fread(32)
-# #            rawread = <bytes>fread(entrylength)
-#             read = self.__pe_binary_parse(rawread)
-#             fseek(entrylength - 32, 1)
-#             if read.ref == -1: continue
-#             d = (d * i + abs(read.tlen)) / (i + 1) # keep track of avg fragment size
-#             i+=1
-            
-#             if i == 1000000:
-#                 m += 1
-#                 info(" %d" % (m*1000000))
-#                 i=0
-#             petrack.add_loc(references[read.ref], read.start, read.start + read.tlen)
-#         self.n = m * 1000000 + i
-#         self.d = int(d)
-#         assert d >= 0, "Something went wrong (mean fragment size was negative)"
-#         self.fhd.close()
-#         petrack.finalize()
-#         petrack.set_rlengths( rlengths )
-#         return petrack
-
-
-    cdef __build_petrack_wo_pysam ( self ):
         """Build PETrackI from all lines, return a FWTrack object.
         """
         cdef:
-            int i = 0
+            long i = 0
             int m = 0
             int entrylength, fpos, chrid, tlen
             int *asint
@@ -1156,19 +1056,16 @@ cdef class BAMPEParser(BAMParser):
             fseek(entrylength - 32, 1)
             if read.ref == -1: continue
             d = (d * i + abs(read.tlen)) / (i + 1) # keep track of avg fragment size
-            i+=1
+            i += 1
             
-            if i == 1000000:
+            if i % 1000000 == 0:
                 m += 1
                 info(" %d" % (m*1000000))
-                i=0
             add_loc(references[read.ref], read.start, read.start + read.tlen)
-        self.n = m * 1000000 + i
+        self.n = i
         self.d = int(d)
         assert d >= 0, "Something went wrong (mean fragment size was negative)"
         self.fhd.close()
-        # this is the problematic part. If fwtrack is finalized, then it's impossible to increase the length of it in a step of buffer_size for multiple input files.
-        # petrack.finalize()
         petrack.set_rlengths( rlengths )
         return petrack
 
@@ -1176,7 +1073,7 @@ cdef class BAMPEParser(BAMParser):
         """Build PETrackI from all lines, return a PETrackI object.
         """
         cdef:
-            int i = 0
+            long i = 0
             int m = 0
             int entrylength, fpos, chrid, tlen
             int *asint
@@ -1211,8 +1108,8 @@ cdef class BAMPEParser(BAMParser):
                 info(" %d" % (m*1000000))
                 i=0
             add_loc(references[read.ref], read.start, read.start + read.tlen)
-        self.n = m * 1000000 + i
-        self.d = int(d)
+        self.d = int( self.d * self.n + d * i )/( self.n + i )
+        self.n += i
         assert d >= 0, "Something went wrong (mean fragment size was negative)"
         self.fhd.close()
         # this is the problematic part. If fwtrack is finalized, then it's impossible to increase the length of it in a step of buffer_size for multiple input files.
@@ -1362,179 +1259,3 @@ cdef class BowtieParser( GenericParser ):
             else:
                 raise StrandFormatError( thisline, thisfields[ 1 ] )
 
-cdef class PySAMParser:
-    """Parser using PySAM to parse SAM or BAM
-
-    """
-    cdef str filename
-    cdef bool gzipped
-    cdef int tag_size
-    cdef object fhd
-    
-    def __init__ ( self, str filename, long buffer_size = 100000 ):
-        """Open input file. Determine whether it's a gzipped file.
-
-        'filename' must be a string object.
-
-        This function initialize the following attributes:
-
-        1. self.filename: the filename for input file.
-        2. self.gzipped: a boolean indicating whether input file is gzipped.
-        3. self.fhd: buffered I/O stream of input file
-        """
-        self.filename = filename
-        self.gzipped = True
-        self.tag_size = -1
-        self.buffer_size = buffer_size
-        # try gzip first
-        f = gzip.open( filename )
-        try:
-            f.read( 10 )
-        except IOError:
-            # not a gzipped file
-            self.gzipped = False
-        f.close()
-        if self.gzipped:
-            # open with gzip.open, then wrap it with BufferedReader!
-            self.fhd = io.BufferedReader( gzip.open( filename, mode='rb' ) )
-        else:
-            self.fhd = io.open( filename, mode='rb' ) # binary mode! I don't expect unicode here!
-
-    def tsize( self ):
-        """General function to detect tag size.
-
-        * Although it can be used by most parsers, it must be
-          rewritten by BAMParser!
-        """
-        cdef:
-            int s = 0
-            int n = 0     # number of successful/valid read alignments
-            int m = 0     # number of trials
-            int this_taglength
-        
-        if self.tag_size != -1:
-            # if we have already calculated tag size (!= -1),  return it.
-            return self.tag_size
-        
-        # try 10k times or retrieve 10 successfule alignments
-        while n < 10 and m < 10000:
-            m += 1
-            thisline = self.fhd.readline()
-            this_taglength = self.__tlen_parse_line( thisline )
-            if this_taglength > 0:
-                # this_taglength == 0 means this line doesn't contain
-                # successful alignment.
-                s += this_taglength
-                n += 1
-        # done
-        self.fhd.seek( 0 )
-        self.tag_size = s/n
-        return self.tag_size
-
-    cdef __tlen_parse_line ( self, str thisline ):
-        """Abstract function to detect tag length.
-        
-        """
-        raise NotImplemented
-    
-    def build_fwtrack ( self ):
-        """Generic function to build FWTrack object. Create a new
-        FWTrack object. If you want to append new records to an
-        existing FWTrack object, try append_fwtrack function.
-
-        * BAMParser for binary BAM format should have a different one.
-        """
-        cdef:
-            long i, m, fpos, strand
-            str chromosome
-        
-        fwtrack = FWTrack( buffer_size = self.buffer_size )
-        i = 0
-        m = 0
-        for thisline in self.fhd:
-            ( chromosome, fpos, strand ) = self.__fw_parse_line( thisline )
-            i+=1
-            if fpos < 0 or not chromosome:
-                # normally __fw_parse_line will return -1 if the line
-                # contains no successful alignment.
-                continue
-            if i == 1000000:
-                m += 1
-                logging.info( " %d" % ( m*1000000 ) )
-                i=0
-            fwtrack.add_loc( chromosome, fpos, strand )
-
-        # close fwtrack and sort
-        # fwtrack.finalize()
-        # this is the problematic part. If fwtrack is finalized, then it's impossible to increase the length of it in a step of buffer_size for multiple input files.
-        # close file stream.
-        self.close()
-        return fwtrack
-
-    def append_fwtrack ( self, fwtrack ):
-        """Add more records to an existing FWTrack object. 
-
-        """
-        i = 0
-        m = 0
-        for thisline in self.fhd:
-            ( chromosome, fpos, strand ) = self.__fw_parse_line( thisline )
-            i+=1
-            if fpos < 0 or not chromosome:
-                # normally __fw_parse_line will return -1 if the line
-                # contains no successful alignment.
-                continue
-            if i == 1000000:
-                m += 1
-                logging.info( " %d" % ( m*1000000 ) )
-                i=0
-            fwtrack.add_loc( chromosome, fpos, strand )
-
-        # close fwtrack and sort
-        # fwtrack.finalize()
-        # this is the problematic part. If fwtrack is finalized, then it's impossible to increase the length of it in a step of buffer_size for multiple input files.
-        self.close()
-        return fwtrack
-        
-
-
-    cdef __fw_parse_line ( self, str thisline ):
-        """Abstract function to parse chromosome, 5' end position and
-        strand.
-        
-        """
-        cdef str chromosome = ""
-        cdef int fpos = -1
-        cdef int strand = -1
-        return ( chromosome, fpos, strand )
-
-    cpdef sniff ( self ):
-        """Detect whether this parser is the correct parser for input
-        file.
-
-        Rule: try to find the tag size using this parser, if error
-        occurs or tag size is too small or too big, check is failed.
-
-        * BAMParser has a different sniff function.
-        """
-        cdef int t
-        
-        try:
-            t = self.tsize()
-        except:
-            self.fhd.seek( 0 )
-            return False
-        else:
-            if t <= 10 or t >= 10000:
-                self.fhd.seek( 0 )
-                return False
-            else:
-                self.fhd.seek( 0 )
-                return True
-            
-    def close ( self ):
-        """Run this when this Parser will be never used.
-
-        Close file I/O stream.
-        """
-        self.fhd.close()

@@ -1,4 +1,4 @@
-# Time-stamp: <2015-12-22 16:06:56 Tao Liu>
+# Time-stamp: <2016-02-15 15:23:38 Tao Liu>
 
 """Module for Calculate Scores.
 
@@ -488,6 +488,9 @@ cdef class CallerFromAlignments:
         
         if not self.no_lambda_flag:
             if self.PE_mode:
+                # note, we pileup up PE control as SE control because
+                # we assume the bias only can be captured at the
+                # surrounding regions of cutting sites from control experiments.
                 ctrl_pv = self.ctrl.pileup_a_chromosome_c( chrom, self.ctrl_d_s, self.ctrl_scaling_factor_s, baseline_value = self.lambda_bg )
             else:
                 ctrl_pv = self.ctrl.pileup_a_chromosome( chrom, self.ctrl_d_s, self.ctrl_scaling_factor_s,
@@ -862,7 +865,7 @@ cdef class CallerFromAlignments:
         scoring_function_s: symbols of functions to calculate score. 'p' for pscore, 'q' for qscore, 'f' for fold change, 's' for subtraction. for example: ['p', 'q']
         score_cutoff_s    : cutoff values corresponding to scoring functions
         min_length        : minimum length of peak
-        max_gap           : maximum gap of 'insignificant' regions within a peak
+        max_gap           : maximum gap of 'insignificant' regions within a peak. Note, for PE_mode, max_gap and max_length are both set as fragment length.
         call_summits      : boolean. Whether or not call sub-peaks.
         save_bedGraph     : whether or not to save pileup and control into a bedGraph file
         """
@@ -1435,7 +1438,7 @@ cdef class CallerFromAlignments:
 
         lvl1_cutoff_s:  list of cutoffs at highly enriched regions, corresponding to scoring functions.
         lvl2_cutoff_s:  list of cutoffs at less enriched regions, corresponding to scoring functions.
-        min_length :  minimum peak length, default 200.
+        min_length :    minimum peak length, default 200.
         lvl1_max_gap   :  maximum gap to merge nearby enriched peaks, default 50.
         lvl2_max_gap   :  maximum length of linkage regions, default 400.        
 

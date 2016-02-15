@@ -1,3 +1,34 @@
+2016-02-15  Tao Liu  <vladimir.liu@gmail.com>
+	MACS version 2.1.0 20160215 (tag:rc Zhengyue)
+
+	* Bug fixes
+
+	1) Now "-Ofast" has been replaced by "-O3 --ffast-math", because
+	the former option is not supported by older GCC. Related to issues
+	#91, #109.
+
+	* New features
+
+	1) callpeak
+	A more flexible format, BEDPE, is supported. Now users can define
+	the left and right position of the ChIPed fragment, and MACS2 will
+	skip model building and directly pileup the fragments. Related to
+	issue #112.
+
+	The 'tempdir' can be specified now, to save cached pileup
+	tracks. Originially, the temporary files were stored in
+	/tmp. Thank @daler! Related to issues #97 and #105.
+
+	2) bdgopt
+
+	New operations are added, to calculate the maximum or minimum value between
+	values in BEDGRAPH and given value.
+
+	3) bdgcmp
+
+	New method is added, to calculate the maximum value between values
+	defined in two BEDGRAPH files.
+
 2015-12-22  Tao Liu  <vladimir.liu@gmail.com>
 	MACS version 2.1.0 20151222 (tag:rc Dongzhi)
 

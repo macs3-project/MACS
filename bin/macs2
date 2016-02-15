@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# Time-stamp: <2016-02-12 00:31:09 Tao Liu>
+# Time-stamp: <2016-02-15 14:56:39 Tao Liu>
 
 """Description: MACS v2 main executable.
 
@@ -184,8 +184,8 @@ def add_callpeak_parser( subparsers ):
     group_input.add_argument( "-f", "--format", dest = "format", type = str,
                               choices = ("AUTO", "BAM", "SAM", "BED", "ELAND",
                                          "ELANDMULTI", "ELANDEXPORT", "BOWTIE",
-                                          "BAMPE"),
-                              help = "Format of tag file, \"AUTO\", \"BED\" or \"ELAND\" or \"ELANDMULTI\" or \"ELANDEXPORT\" or \"SAM\" or \"BAM\" or \"BOWTIE\" or \"BAMPE\". The default AUTO option will let MACS decide which format the file is. Please check the definition in README file if you choose ELAND/ELANDMULTI/ELANDEXPORT/SAM/BAM/BOWTIE. DEFAULT: \"AUTO\"",
+                                          "BAMPE", "BEDPE"),
+                              help = "Format of tag file, \"AUTO\", \"BED\" or \"ELAND\" or \"ELANDMULTI\" or \"ELANDEXPORT\" or \"SAM\" or \"BAM\" or \"BOWTIE\" or \"BAMPE\" or \"BEDPE\". The default AUTO option will let MACS decide which format (except for BAMPE and BEDPE which should be implicitly set) the file is. Please check the definition in README. Please note that if the format is set as BAMPE or BEDPE, MACS2 will call its special Paired-end mode to call peaks by piling up the actual ChIPed fragments defined by both aligned ends, instead of predicting the fragment size first and extending reads. Also please note that the BEDPE only contains three columns, and is NOT the same BEDPE format used by BEDTOOLS. DEFAULT: \"AUTO\"",
                               default = "AUTO" )
     group_input.add_argument( "-g", "--gsize", dest = "gsize", type = str, default = "hs",
                               help = "Effective genome size. It can be 1.0e+9 or 1000000000, or shortcuts:'hs' for human (2.7e9), 'mm' for mouse (1.87e9), 'ce' for C. elegans (9e7) and 'dm' for fruitfly (1.2e8), Default:hs" )
@@ -226,7 +226,7 @@ def add_callpeak_parser( subparsers ):
                                 help = "Whether or not to build the shifting model. If True, MACS will not build model. by default it means shifting size = 100, try to set extsize to change it. DEFAULT: False",
                                 default = False )
     group_bimodal.add_argument( "--shift", dest = "shift", type = int, default = 0,
-                               help = "(NOT the legacy --shiftsize option!) The arbitrary shift in bp. Use discretion while setting it other than default value. When NOMODEL is set, MACS will use this value to move cutting ends (5') towards 5'->3' direction then apply EXTSIZE to extend them to fragments. When this value is negative, ends will be moved toward 3'->5' direction. Recommended to keep it as default 0 for ChIP-Seq datasets, or -1 * half of EXTSIZE together with EXTSIZE option for detecting enriched cutting loci such as certain DNAseI-Seq datasets. Note, you can't set values other than 0 if format is BAMPE for paired-end data. DEFAULT: 0. " )
+                               help = "(NOT the legacy --shiftsize option!) The arbitrary shift in bp. Use discretion while setting it other than default value. When NOMODEL is set, MACS will use this value to move cutting ends (5') towards 5'->3' direction then apply EXTSIZE to extend them to fragments. When this value is negative, ends will be moved toward 3'->5' direction. Recommended to keep it as default 0 for ChIP-Seq datasets, or -1 * half of EXTSIZE together with EXTSIZE option for detecting enriched cutting loci such as certain DNAseI-Seq datasets. Note, you can't set values other than 0 if format is BAMPE or BEDPE for paired-end data. DEFAULT: 0. " )
     group_bimodal.add_argument( "--extsize", dest = "extsize", type = int, default = 200,
                                 help = "The arbitrary extension size in bp. When nomodel is true, MACS will use this value as fragment size to extend each read towards 3' end, then pile them up. It's exactly twice the number of obsolete SHIFTSIZE. In previous language, each read is moved 5'->3' direction to middle of fragment by 1/2 d, then extended to both direction with 1/2 d. This is equivalent to say each read is extended towards 5'->3' into a d size fragment. DEFAULT: 200. EXTSIZE and SHIFT can be combined when necessary. Check SHIFT option." )    
     # The next two options are obsolete. To compare two conditions, using bdgcmp.
@@ -569,8 +569,8 @@ def add_predictd_parser( subparsers ):
     argparser_predictd.add_argument( "-f", "--format", dest = "format", type = str,
                                      choices = ("AUTO", "BAM", "SAM", "BED", "ELAND",
                                                 "ELANDMULTI", "ELANDEXPORT", "BOWTIE",
-                                                "BAMPE"),
-                                     help = "Format of tag file, \"AUTO\", \"BED\" or \"ELAND\" or \"ELANDMULTI\" or \"ELANDEXPORT\" or \"SAM\" or \"BAM\" or \"BOWTIE\". The default AUTO option will let MACS decide which format the file is. Please check the definition in README file if you choose ELAND/ELANDMULTI/ELANDEXPORT/SAM/BAM/BOWTIE. DEFAULT: \"AUTO\"",
+                                                "BAMPE", "BEDPE"),
+                                     help = "Format of tag file, \"AUTO\", \"BED\" or \"ELAND\" or \"ELANDMULTI\" or \"ELANDEXPORT\" or \"SAM\" or \"BAM\" or \"BOWTIE\" or \"BAMPE\" or \"BEDPE\". The default AUTO option will let MACS decide which format the file is. Please check the definition in README file if you choose ELAND/ELANDMULTI/ELANDEXPORT/SAM/BAM/BOWTIE. DEFAULT: \"AUTO\"",
                                      default = "AUTO" )
     argparser_predictd.add_argument( "-g", "--gsize", dest = "gsize", type = str, default = "hs",
                                      help = "Effective genome size. It can be 1.0e+9 or 1000000000, or shortcuts:'hs' for human (2.7e9), 'mm' for mouse (1.87e9), 'ce' for C. elegans (9e7) and 'dm' for fruitfly (1.2e8), Default:hs" )

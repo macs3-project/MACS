@@ -1,4 +1,4 @@
-# Time-stamp: <2015-12-22 11:55:15 Tao Liu>
+# Time-stamp: <2016-02-15 14:11:21 Tao Liu>
 
 """Description: MACS 2 main executable
 
@@ -61,7 +61,7 @@ def run( args ):
     error = options.error
     #0 output arguments
     info("\n"+options.argtxt)
-    options.PE_MODE = options.format in ('BAMPE',)
+    options.PE_MODE = options.format in ('BAMPE','BEDPE')
     if options.PE_MODE: tag = 'fragment' # call things fragments not tags
     else: tag = 'tag'
 

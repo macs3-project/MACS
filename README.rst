@@ -1,7 +1,7 @@
 ========================
 README for MACS (2.1.0)
 ========================
-Time-stamp: <2015-04-20 15:37:09 Tao Liu>
+Time-stamp: <2016-02-15 15:31:42 Tao Liu>
 
 Introduction
 ============
@@ -103,9 +103,11 @@ option.
 
 Format of tag file, can be "ELAND", "BED", "ELANDMULTI",
 "ELANDEXPORT", "ELANDMULTIPET" (for pair-end tags), "SAM", "BAM",
-"BOWTIE" or "BAMPE". Default is "AUTO" which will allow MACS to decide
-the format automatically. "AUTO" is also usefule when you combine
-different formats of files.
+"BOWTIE", "BAMPE" or "BEDPE". Default is "AUTO" which will allow MACS
+to decide the format automatically. "AUTO" is also usefule when you
+combine different formats of files. Note that MACS can't detect
+"BAMPE" or "BEDPE" format with "AUTO", and you have to implicitly
+specify the format for "BAMPE" and "BEDPE".
 
 The BED format can be found at `UCSC genome browser website <http://genome.ucsc.edu/FAQ/FAQformat#format1>`_.
 
@@ -142,6 +144,12 @@ each line MUST represents only ONE tag, with fields of:
     was A, not whatever is was in read).
 12. Position and type of first substitution error, as above. 
 
+The BEDPE format is a simplified and more flexible BED format, which
+only contains the first three columns defining the chromosome name,
+left and right position of the fragment from Paired-end
+sequencing. Note, this is NOT the same format used by BEDTOOLS, and
+BEDTOOLS version of BEDPE is actually not in a standard BED format.
+
 If the format is ELANDMULTI, the file must be ELAND output file from
 multiple-match mode, each line MUST represents only ONE tag, with
 fields of:
@@ -161,8 +169,8 @@ If the format is BAM/SAM, please check the definition in
 (http://samtools.sourceforge.net/samtools.shtml).  Pair-end mapping
 results can be saved in a single BAM file, if so, MACS will
 automatically keep the left mate(5' end) tag. However, when format
-BAMPE is specified, MACS will use the real fragments inferred from
-alignment results for reads pileup.
+BAMPE is specified, MACS will use the real fragments inferred
+from alignment results for reads pileup.
 
 If the format is BOWTIE, you need to provide the ASCII bowtie output
 file with the suffix '.map'. Please note that, you need to make sure
@@ -225,10 +233,10 @@ uses 11th column as the sequence name which should be the chromosome
 names.
 
 5) A special mode will be triggered while format is specified as
-'BAMPE'. In this way, MACS2 will process the BAM files as paired-end
-data. Instead of building bimodal distribution of plus and minus
-strand reads to predict fragment size, MACS2 now will use actual
-insert sizes of pairs of reads to build fragment pileup. 
+'BAMPE' or 'BEDPE'. In this way, MACS2 will process the BAM or BED
+files as paired-end data. Instead of building bimodal distribution of
+plus and minus strand reads to predict fragment size, MACS2 now will
+use actual insert sizes of pairs of reads to build fragment pileup.
 
 
 -g/--gsize
@@ -347,7 +355,7 @@ fragments. When this value is negative, ends will be moved toward
 as default 0 for ChIP-Seq datasets, or -1 * half of EXTSIZE together
 with --extsize option for detecting enriched cutting loci such as
 certain DNAseI-Seq datasets. Note, you can't set values other than 0
-if format is BAMPE for paired-end data. Default is 0.
+if format is BAMPE or BEDPE for paired-end data. Default is 0.
 
 Here are some examples for combining --shift and --extsize:
 
