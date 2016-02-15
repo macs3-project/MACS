@@ -1,4 +1,4 @@
-# Time-stamp: <2016-02-15 15:17:11 Tao Liu>
+# Time-stamp: <2016-02-15 16:02:11 Tao Liu>
 
 """Module for all MACS Parser classes for input.
 
@@ -396,7 +396,6 @@ cdef class BEDPEParser(GenericParser):
 
         for thisline in self.fhd:
             ( chromosome, left_pos, right_pos ) = self.__pe_parse_line( thisline )
-
             if left_pos < 0 or not chromosome:
                 continue
 
@@ -417,8 +416,6 @@ cdef class BEDPEParser(GenericParser):
 
         self.close()
         petrack.set_rlengths( {"DUMMYCHROM":0} )
-
-        print i, self.n, self.d
         return petrack
 
     cpdef append_petrack (self, petrack):

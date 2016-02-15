@@ -1,4 +1,4 @@
-# Time-stamp: <2016-02-15 14:11:21 Tao Liu>
+# Time-stamp: <2016-02-15 16:12:30 Tao Liu>
 
 """Description: MACS 2 main executable
 
@@ -72,7 +72,7 @@ def run( args ):
     if options.PE_MODE: (treat, control) = load_frag_files_options (options)
     else:       (treat, control) = load_tag_files_options  (options)
     if control is not None: check_names(treat, control, error)
-    
+
     info("#1 %s size = %d", tag, options.tsize)
     tagsinfo  = "# %s size is determined as %d bps\n" % (tag, options.tsize)
     

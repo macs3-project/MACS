@@ -1,4 +1,4 @@
-# Time-stamp: <2016-02-15 15:25:06 Tao Liu>
+# Time-stamp: <2016-02-15 16:12:19 Tao Liu>
 
 """Module for filter duplicate tags from paired-end data
 
@@ -303,13 +303,13 @@ cdef class PETrackI:
             else:
                 new_locs = np.zeros(self.__pointer[k] + 1, dtype=[('l','int32'),('r','int32')]) # note: ['l'] is the leftmost end, ['r'] is the rightmost end of fragment.
                 dup_locs = np.zeros(self.__pointer[k] + 1, dtype=[('l','int32'),('r','int32')]) # note: ['l'] is the leftmost end, ['r'] is the rightmost end of fragment.
-                i_new += 1
                 n = 1
             
                 current_loc_start = locs[0][0] # same as locs[0]['l']
                 current_loc_end = locs[0][1]# same as locs[0]['r']
                 new_locs[i_new][0] = current_loc_start
                 new_locs[i_new][1] = current_loc_end
+                i_new += 1
                 self.length += current_loc_end - current_loc_start
                 for i_old in range(1, size):
                     loc_start = locs[i_old][0]
@@ -389,13 +389,13 @@ cdef class PETrackI:
                 new_locs = locs
             else:
                 new_locs = np.zeros( self.__pointer[k] + 1, dtype=[('l','int32'),('r','int32')]) # note: ['l'] is the leftmost end, ['r'] is the rightmost end of fragment.
-                i_new += 1
                 n = 1                # the number of tags in the current location
             
                 current_loc_start = locs[0][0]
                 current_loc_end = locs[0][1]
                 new_locs[i_new][0] = current_loc_start
                 new_locs[i_new][1] = current_loc_end
+                i_new += 1
                 self.length += current_loc_end - current_loc_start
                 for i_old in range(1, size):
                     loc_start = locs[i_old][0]
