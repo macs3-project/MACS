@@ -1,4 +1,4 @@
-# Time-stamp: <2014-08-22 15:41:27 Tao Liu>
+# Time-stamp: <2016-02-26 10:12:50 Tao Liu>
 
 """Module for PeakIO IO classes.
 
@@ -155,6 +155,8 @@ cdef class PeakIO:
         self.peaks[chromosome].append(peakcontent)
 
     def get_data_from_chrom (self, str chrom):
+        if not self.peaks.has_key( chrom ):
+            self.peaks[chrom]= []
         return self.peaks[chrom]
 
     def get_chr_names (self):
