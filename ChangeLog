@@ -1,5 +1,5 @@
-2016-02-15  Tao Liu  <vladimir.liu@gmail.com>
-	MACS version 2.1.0 20160215 (tag:rc Zhengyue)
+2016-02-26  Tao Liu  <vladimir.liu@gmail.com>
+	MACS version 2.1.1 20160226 (tag:rc Zhengyue)
 
 	* Bug fixes
 
@@ -7,15 +7,19 @@
 	the former option is not supported by older GCC. Related to issues
 	#91, #109.
 
+	2) Issue #108 is fixed. If no peak can be found in a chromosome,
+	the PeakIO won't throw an error.
+
 	* New features
 
 	1) callpeak
-	A more flexible format, BEDPE, is supported. Now users can define
-	the left and right position of the ChIPed fragment, and MACS2 will
-	skip model building and directly pileup the fragments. Related to
-	issue #112.
 
-	The 'tempdir' can be specified now, to save cached pileup
+	a) A more flexible format, BEDPE, is supported. Now users can
+	define the left and right position of the ChIPed fragment, and
+	MACS2 will skip model building and directly pileup the
+	fragments. Related to issue #112.
+
+	b) The 'tempdir' can be specified, to save cached pileup
 	tracks. Originially, the temporary files were stored in
 	/tmp. Thank @daler! Related to issues #97 and #105.
 
