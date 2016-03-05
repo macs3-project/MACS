@@ -213,7 +213,7 @@ def add_callpeak_parser( subparsers ):
     # group for bimodal
     group_bimodal = argparser_callpeak.add_argument_group( "Shifting model arguments" )
     group_bimodal.add_argument( "-s", "--tsize",  dest = "tsize", type = int, default = None,
-                                help = "Tag size. This will overide the auto detected tag size. DEFAULT: Not set")
+                                help = "Tag size. This will override the auto detected tag size. DEFAULT: Not set")
     group_bimodal.add_argument( "--bw", dest = "bw", type = int, default = 300,
                                 help = "Band width for picking regions to compute fragment size. This value is only used while building the shifting model. DEFAULT: 300")
     group_bimodal.add_argument( "-m", "--mfold", dest = "mfold", type = int, default = [5,50], nargs = 2,
@@ -354,7 +354,7 @@ def add_filterdup_parser( subparsers ):
     argparser_filterdup.add_argument( "-g", "--gsize", dest = "gsize", type = str, default = "hs",
                                       help = "Effective genome size. It can be 1.0e+9 or 1000000000, or shortcuts:'hs' for human (2.7e9), 'mm' for mouse (1.87e9), 'ce' for C. elegans (9e7) and 'dm' for fruitfly (1.2e8), DEFAULT:hs" )
     argparser_filterdup.add_argument( "-s", "--tsize", dest = "tsize", type = int,
-                                      help = "Tag size. This will overide the auto detected tag size. DEFAULT: Not set" )
+                                      help = "Tag size. This will override the auto detected tag size. DEFAULT: Not set" )
     argparser_filterdup.add_argument( "-p", "--pvalue", dest = "pvalue", type = float,
                                       help = "Pvalue cutoff for binomial distribution test. DEFAULT:1e-5" )
     argparser_filterdup.add_argument( "--keep-dup", dest = "keepduplicates", type = str, default = "auto",
@@ -373,7 +373,7 @@ def add_bdgpeakcall_parser( subparsers ):
     """Add function 'peak calling on bedGraph' argument parsers.
     """    
     argparser_bdgpeakcall = subparsers.add_parser( "bdgpeakcall",
-                                                   help = "Call peaks from bedGraph output. Note: All regions on the same chromosome in the bedGraph file should be continous so only bedGraph files from MACS2 are accpetable." )
+                                                   help = "Call peaks from bedGraph output. Note: All regions on the same chromosome in the bedGraph file should be continuous so only bedGraph files from MACS2 are accpetable." )
     argparser_bdgpeakcall.add_argument( "-i", "--ifile", dest = "ifile", type = str, required = True,
                                         help = "MACS score in bedGraph. REQUIRED" )
     argparser_bdgpeakcall.add_argument( "-c", "--cutoff" , dest = "cutoff", type = float,
@@ -398,7 +398,7 @@ def add_bdgbroadcall_parser( subparsers ):
     """Add function 'broad peak calling on bedGraph' argument parsers.
     """
     argparser_bdgbroadcall = subparsers.add_parser( "bdgbroadcall",
-                                                    help = "Call broad peaks from bedGraph output. Note: All regions on the same chromosome in the bedGraph file should be continous so only bedGraph files from MACS2 are accpetable." )
+                                                    help = "Call broad peaks from bedGraph output. Note: All regions on the same chromosome in the bedGraph file should be continuous so only bedGraph files from MACS2 are accpetable." )
     argparser_bdgbroadcall.add_argument( "-i", "--ifile", dest = "ifile" , type = str, required = True,
                                          help = "MACS score in bedGraph. REQUIRED" )
     argparser_bdgbroadcall.add_argument( "-c", "--cutoff-peak", dest = "cutoffpeak", type = float,
@@ -421,7 +421,7 @@ def add_bdgcmp_parser( subparsers ):
     """Add function 'peak calling on bedGraph' argument parsers.
     """
     argparser_bdgcmp = subparsers.add_parser( "bdgcmp",
-                                              help = "Deduct noise by comparing two signal tracks in bedGraph. Note: All regions on the same chromosome in the bedGraph file should be continous so only bedGraph files from MACS2 are accpetable." )
+                                              help = "Deduct noise by comparing two signal tracks in bedGraph. Note: All regions on the same chromosome in the bedGraph file should be continuous so only bedGraph files from MACS2 are accpetable." )
     argparser_bdgcmp.add_argument( "-t", "--tfile", dest = "tfile", type = str, required = True,
                                    help = "Treatment bedGraph file, e.g. *_treat_pileup.bdg from MACSv2. REQUIRED")
     argparser_bdgcmp.add_argument( "-c", "--cfile", dest = "cfile", type = str, required = True,
@@ -447,7 +447,7 @@ def add_bdgopt_parser( subparsers ):
     """Add function 'operations on score column of bedGraph' argument parsers.
     """    
     argparser_bdgopt = subparsers.add_parser( "bdgopt",
-                                              help = "Operations on score column of bedGraph file. Note: All regions on the same chromosome in the bedGraph file should be continous so only bedGraph files from MACS2 are accpetable." )
+                                              help = "Operations on score column of bedGraph file. Note: All regions on the same chromosome in the bedGraph file should be continuous so only bedGraph files from MACS2 are accpetable." )
     argparser_bdgopt.add_argument( "-i", "--ifile", dest = "ifile", type = str, required = True,
                                    help = "MACS score in bedGraph. Note: this must be a bedGraph file covering the ENTIRE genome. REQUIRED" )
     argparser_bdgopt.add_argument( "-m", "--method", dest = "method", type = str,
@@ -464,7 +464,7 @@ def add_cmbreps_parser( subparsers ):
     """Add function 'combine replicates' argument parsers.
     """
     argparser_cmbreps = subparsers.add_parser( "cmbreps",
-                                               help = "Combine BEDGraphs of scores from replicates. Note: All regions on the same chromosome in the bedGraph file should be continous so only bedGraph files from MACS2 are accpetable." )
+                                               help = "Combine BEDGraphs of scores from replicates. Note: All regions on the same chromosome in the bedGraph file should be continuous so only bedGraph files from MACS2 are accpetable." )
     argparser_cmbreps.add_argument( "-i", dest = "ifile", type = str, required = True, nargs = "+",
                                     help = "MACS score in bedGraph for each replicate. Require exactly two files such as '-i A B'. REQUIRED" )
     # argparser_cmbreps.add_argument( "-w", dest = "weights", type = float, nargs = "*",
@@ -495,7 +495,7 @@ def add_randsample_parser( subparsers ):
                                       default = None)
     add_outdir_option( argparser_randsample )    
     argparser_randsample.add_argument( "-s", "--tsize", dest = "tsize", type = int, default = None,
-                                       help = "Tag size. This will overide the auto detected tag size. DEFAULT: Not set")
+                                       help = "Tag size. This will override the auto detected tag size. DEFAULT: Not set")
     argparser_randsample.add_argument( "-f", "--format", dest = "format", type = str,
                                        choices=("AUTO","BAM","SAM","BED","ELAND","ELANDMULTI","ELANDEXPORT","BOWTIE"),
                                        help = "Format of tag file, \"AUTO\", \"BED\" or \"ELAND\" or \"ELANDMULTI\" or \"ELANDEXPORT\" or \"SAM\" or \"BAM\" or \"BOWTIE\". The default AUTO option will %(prog)s decide which format the file is. Please check the definition in README file if you choose ELAND/ELANDMULTI/ELANDEXPORT/SAM/BAM/BOWTIE. DEFAULT: \"AUTO\"",
@@ -506,7 +506,7 @@ def add_randsample_parser( subparsers ):
     
 def add_bdgdiff_parser( subparsers ):
     argparser_bdgdiff = subparsers.add_parser( "bdgdiff",
-                                               help = "Differential peak detection based on paired four bedgraph files. Note: All regions on the same chromosome in the bedGraph file should be continous so only bedGraph files from MACS2 are accpetable." )
+                                               help = "Differential peak detection based on paired four bedgraph files. Note: All regions on the same chromosome in the bedGraph file should be continuous so only bedGraph files from MACS2 are accpetable." )
     argparser_bdgdiff.add_argument( "--t1", dest = "t1bdg", type = str, required = True,
                                     help = "MACS pileup bedGraph for condition 1. Incompatible with callpeak --SPMR output. REQUIRED" )
     argparser_bdgdiff.add_argument( "--t2", dest="t2bdg", type = str, required = True,
@@ -575,7 +575,7 @@ def add_predictd_parser( subparsers ):
     argparser_predictd.add_argument( "-g", "--gsize", dest = "gsize", type = str, default = "hs",
                                      help = "Effective genome size. It can be 1.0e+9 or 1000000000, or shortcuts:'hs' for human (2.7e9), 'mm' for mouse (1.87e9), 'ce' for C. elegans (9e7) and 'dm' for fruitfly (1.2e8), Default:hs" )
     argparser_predictd.add_argument( "-s", "--tsize",  dest = "tsize", type = int, default = None,
-                                     help = "Tag size. This will overide the auto detected tag size. DEFAULT: Not set")
+                                     help = "Tag size. This will override the auto detected tag size. DEFAULT: Not set")
     argparser_predictd.add_argument( "--bw", dest = "bw", type = int, default = 300,
                                      help = "Band width for picking regions to compute fragment size. This value is only used while building the shifting model. DEFAULT: 300")
     argparser_predictd.add_argument( "-m", "--mfold", dest = "mfold", type = int, default = [5,50], nargs = 2,

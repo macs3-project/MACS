@@ -954,7 +954,7 @@ cdef class FWTrack:
                          values. Final pileup will the maximum.
         scale_factor_s  : linearly scale the pileup value applied to each d in ds. The list should have the same length as ds.
         baseline_value : a value to be filled for missing values, and will be the minimum pileup.
-        directional    : if False, the strand or direction of tag will be ignored, so that extenstion will be both sides with d/2.
+        directional    : if False, the strand or direction of tag will be ignored, so that extension will be both sides with d/2.
         end_shift      : move cutting ends towards 5->3 direction if value is positive, or towards 3->5 direction if negative. Default is 0 -- no shift at all.
 
 
