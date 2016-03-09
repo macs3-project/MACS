@@ -1,3 +1,18 @@
+2016-03-09  Tao Liu  <vladimir.liu@gmail.com>
+	MACS version 2.1.1 20160309
+
+	* Retire the tag:rc. 
+
+	* Fixed spelling. Merged pull request #120. Thank @mr-c!
+
+	* Change filtering criteria for reading BAM/SAM files
+
+	Related to callpeak and filterdup commands. Now the
+	reads/alignments flagged with 1028 or 'PCR/Optical duplicate' will
+	still be read although MACS2 may decide them as duplicates
+	later. Related to old issue #33. Sorry I forgot to address it for
+	years!
+
 2016-02-26  Tao Liu  <vladimir.liu@gmail.com>
 	MACS version 2.1.1 20160226 (tag:rc Zhengyue)
 

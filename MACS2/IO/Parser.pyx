@@ -1,4 +1,4 @@
-# Time-stamp: <2016-02-15 16:02:11 Tao Liu>
+# Time-stamp: <2016-03-09 14:18:20 Tao Liu>
 
 """Module for all MACS Parser classes for input.
 
@@ -654,6 +654,7 @@ cdef class SAMParser( GenericParser ):
     256	alignment is not primary
     512	does not pass quality check
     1024	PCR or optical duplicate
+    2048	supplementary alignment
     """
 
     cdef __tlen_parse_line ( self, str thisline ):
@@ -669,7 +670,7 @@ cdef class SAMParser( GenericParser ):
         if thisline[ 0 ] == "@": return 0 # header line started with '@' is skipped
         thisfields = thisline.split( '\t' )
         bwflag = atoi( thisfields[ 1 ] )
-        if bwflag & 4 or bwflag & 512 or bwflag & 1024 or bwflag & 256 or bwflag & 2048:
+        if bwflag & 4 or bwflag & 512 or bwflag & 256 or bwflag & 2048:
             return 0       #unmapped sequence or bad sequence or 2nd or sup alignment
         if bwflag & 1:
             # paired read. We should only keep sequence if the mate is mapped
@@ -698,7 +699,7 @@ cdef class SAMParser( GenericParser ):
         thisref = thisfields[ 2 ]
         bwflag = atoi( thisfields[ 1 ] )
         CIGAR = thisfields[ 5 ]
-        if bwflag & 4 or bwflag & 512 or bwflag & 1024 or bwflag & 256 or bwflag & 2048:
+        if bwflag & 4 or bwflag & 512 or bwflag & 256 or bwflag & 2048:
             return ( "", -1, -1 )       #unmapped sequence or bad sequence or 2nd or sup alignment
         if bwflag & 1:
             # paired read. We should only keep sequence if the mate is mapped
@@ -752,6 +753,7 @@ cdef class BAMParser( GenericParser ):
     256	alignment is not primary
     512	does not pass quality check
     1024	PCR or optical duplicate
+    2048	supplementary alignment
     """
     def __init__ ( self, str filename, long buffer_size = 100000 ):
         """Open input file. Determine whether it's a gzipped file.
@@ -960,7 +962,7 @@ cdef class BAMParser( GenericParser ):
         thisref = unpack( '<i', data[ 0:4 ] )[ 0 ]
         thisstart = unpack( '<i', data[ 4:8 ] )[ 0 ]
         (n_cigar_op,  bwflag ) = unpack( '<HH' , data[ 12:16 ] )
-        if bwflag & 4 or bwflag & 512 or bwflag & 1024 or bwflag & 256 or bwflag & 2048:
+        if bwflag & 4 or bwflag & 512 or bwflag & 256 or bwflag & 2048:
             return ( -1, -1, -1 )       #unmapped sequence or bad sequence or  secondary or supplementary alignment 
         if bwflag & 1:
             # paired read. We should only keep sequence if the mate is mapped
@@ -1014,6 +1016,7 @@ cdef class BAMPEParser(BAMParser):
     256    alignment is not primary
     512    does not pass quality check
     1024    PCR or optical duplicate
+    2048    supplementary alignment
     """
     cdef public int n           # total number of fragments
     cdef public int d           # the average length of fragments in integar
@@ -1134,7 +1137,7 @@ cdef class BAMPEParser(BAMParser):
         if not data: return ret
 
         (n_cigar_op,  bwflag ) = unpack( '<HH' , data[ 12:16 ] )
-        if bwflag & 4 or bwflag & 512 or bwflag & 1024 or bwflag & 256 or bwflag & 2048:
+        if bwflag & 4 or bwflag & 512 or bwflag & 256 or bwflag & 2048:
             return ret       #unmapped sequence or bad sequence or 2nd or sup alignment
         #if bwflag & 256 or bwflag & 2048:
         #    return ret          # secondary or supplementary alignment

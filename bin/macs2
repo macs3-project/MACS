@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# Time-stamp: <2016-02-15 14:56:39 Tao Liu>
+# Time-stamp: <2016-03-09 14:34:14 Tao Liu>
 
 """Description: MACS v2 main executable.
 
@@ -190,7 +190,7 @@ def add_callpeak_parser( subparsers ):
     group_input.add_argument( "-g", "--gsize", dest = "gsize", type = str, default = "hs",
                               help = "Effective genome size. It can be 1.0e+9 or 1000000000, or shortcuts:'hs' for human (2.7e9), 'mm' for mouse (1.87e9), 'ce' for C. elegans (9e7) and 'dm' for fruitfly (1.2e8), Default:hs" )
     group_input.add_argument( "--keep-dup", dest = "keepduplicates", type = str, default = "1",
-                              help = "It controls the MACS behavior towards duplicate tags at the exact same location -- the same coordination and the same strand. The 'auto' option makes MACS calculate the maximum tags at the exact same location based on binomal distribution using 1e-5 as pvalue cutoff; and the 'all' option keeps every tags. If an integer is given, at most this number of tags will be kept at the same location. The default is to keep one tag at the same location. Default: 1" )
+                              help = "It controls the MACS behavior towards duplicate tags at the exact same location -- the same coordination and the same strand. The 'auto' option makes MACS calculate the maximum tags at the exact same location based on binomal distribution using 1e-5 as pvalue cutoff; and the 'all' option keeps every tags. If an integer is given, at most this number of tags will be kept at the same location. Note, if you've used samtools or picard to flag reads as 'PCR/Optical duplicate' in bit 1024, MACS2 will still read them although the reads may be decided by MACS2 as duplicate later. The default is to keep one tag at the same location. Default: 1" )
     group_input.add_argument( "--buffer-size", dest = "buffer_size", type = int, default = "100000",
                               help = "Buffer size for incrementally increasing internal array size to store reads alignment information. In most cases, you don't have to change this parameter. However, if there are large number of chromosomes/contigs/scaffolds in your alignment, it's recommended to specify a smaller buffer size in order to decrease memory usage (but it will take longer time to read alignment files). Minimum memory requested for reading an alignment file is about # of CHROMOSOME * BUFFER_SIZE * 2 Bytes. DEFAULT: 100000 " )
     
@@ -358,7 +358,7 @@ def add_filterdup_parser( subparsers ):
     argparser_filterdup.add_argument( "-p", "--pvalue", dest = "pvalue", type = float,
                                       help = "Pvalue cutoff for binomial distribution test. DEFAULT:1e-5" )
     argparser_filterdup.add_argument( "--keep-dup", dest = "keepduplicates", type = str, default = "auto",
-                                      help = "It controls the '%(prog)s' behavior towards duplicate tags/pairs at the exact same location -- the same coordination and the same strand. The 'auto' option makes '%(prog)s' calculate the maximum tags at the exact same location based on binomal distribution using given -p as pvalue cutoff; and the 'all' option keeps every tags (useful if you only want to convert formats). If an integer is given, at most this number of tags will be kept at the same location. Note, MACS2 callpeak function uses KEEPDUPLICATES=1 as default. Note, if you've used samtools or picard to flag duplicates in bit 1024, MACS2 will discard them no matter how you set KEEPDUPLICATES.  Default: auto" )
+                                      help = "It controls the '%(prog)s' behavior towards duplicate tags/pairs at the exact same location -- the same coordination and the same strand. The 'auto' option makes '%(prog)s' calculate the maximum tags at the exact same location based on binomal distribution using given -p as pvalue cutoff; and the 'all' option keeps every tags (useful if you only want to convert formats). If an integer is given, at most this number of tags will be kept at the same location. Note, MACS2 callpeak function uses KEEPDUPLICATES=1 as default. Note, if you've used samtools or picard to flag reads as 'PCR/Optical duplicate' in bit 1024, MACS2 will still read them although the reads may be decided by MACS2 as duplicate later. Default: auto" )
     argparser_filterdup.add_argument( "--verbose", dest = "verbose", type = int, default = 2,
                                       help = "Set verbose level. 0: only show critical message, 1: show additional warning message, 2: show process information, 3: show debug messages. If you want to know where are the duplicate reads, use 3. DEFAULT:2" )
     add_outdir_option( argparser_filterdup )    
