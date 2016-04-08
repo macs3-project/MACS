@@ -362,6 +362,8 @@ def opt_validate_filterdup ( options ):
         options.parser = ELANDResultParser
     elif options.format == "BED":
         options.parser = BEDParser
+    elif options.format == "BEDPE":
+        options.parser = BEDPEParser
     elif options.format == "ELANDMULTI":
         options.parser = ELANDMultiParser
     elif options.format == "ELANDEXPORT":
