@@ -175,7 +175,7 @@ cdef pileup_bdg_se(object trackI, int d,
     trackI  : A FWTrack object with raw plus and minus 5' end positions
     d       : tag will be extended to this value to 3' direction, unless directional is False.
     baseline_value : a value to be filled for missing values.
-    directional: if False, the strand or direction of tag will be ignored, so that extenstion will be both sides with d/2.
+    directional: if False, the strand or direction of tag will be ignored, so that extension will be both sides with d/2.
     halfextension: only make a fragment of d/2 size centered at fragment center
 
     Return a bedGraphTrackI object.
@@ -237,7 +237,7 @@ cdef pileup_w_multiple_d_bdg(object trackI, list d_s, list scale_factor_s = [],
     trackI  : A FWTrack object with raw plus and minus 5' end positions
     d       : tag will be extended to this value to 3' direction, unless directional is False.
     baseline_value : a value to be filled for missing values.
-    directional: if False, the strand or direction of tag will be ignored, so that extenstion will be both sides with d/2.
+    directional: if False, the strand or direction of tag will be ignored, so that extension will be both sides with d/2.
     halfextension: only make a fragment of d/2 size centered at fragment center
 
     Return a bedGraphTrackI object.
