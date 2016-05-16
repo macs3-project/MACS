@@ -548,7 +548,7 @@ cdef class PeakIO:
 
     def overlap_with_other_peaks (self, peaks2, double cover=0):
         """Peaks2 is a PeakIO object or dictionary with can be
-        initialzed as a PeakIO. check __init__ for PeakIO for detail.
+        initialized as a PeakIO. check __init__ for PeakIO for detail.
 
         return how many peaks are intersected by peaks2 by percentage
         coverage on peaks2(if 50%, cover = 0.5).
