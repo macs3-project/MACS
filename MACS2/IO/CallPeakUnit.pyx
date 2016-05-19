@@ -1,4 +1,4 @@
-# Time-stamp: <2016-02-15 15:23:38 Tao Liu>
+# Time-stamp: <2016-05-19 10:22:22 Tao Liu>
 
 """Module for Calculate Scores.
 
@@ -84,6 +84,15 @@ def do_nothing(*args, **kwargs):
     pass
 
 LOG10_E = 0.43429448190325176
+
+cdef void clean_up_ndarray ( np.ndarray x ):
+    # clean numpy ndarray in two steps
+    cdef:
+        long i
+    i = x.shape[0] / 2
+    x.resize( 100000 if i > 100000 else i, refcheck=False)
+    x.resize( 0, refcheck=False)
+    return
 
 cdef inline float chi2_k1_cdf ( float x ):
     return erf( sqrt(x/2) )
@@ -472,12 +481,15 @@ cdef class CallerFromAlignments:
 
         # reset or clean existing self.chr_pos_treat_ctrl
         if self.chr_pos_treat_ctrl:     # not a beautiful way to clean
-            self.chr_pos_treat_ctrl[0].resize(10000,refcheck=False)
-            self.chr_pos_treat_ctrl[1].resize(10000,refcheck=False)
-            self.chr_pos_treat_ctrl[2].resize(10000,refcheck=False)
-            self.chr_pos_treat_ctrl[0].resize(0,refcheck=False)
-            self.chr_pos_treat_ctrl[1].resize(0,refcheck=False)
-            self.chr_pos_treat_ctrl[2].resize(0,refcheck=False)            
+            clean_up_ndarray( self.chr_pos_treat_ctrl[0] )
+            clean_up_ndarray( self.chr_pos_treat_ctrl[1] )
+            clean_up_ndarray( self.chr_pos_treat_ctrl[2] )
+            #self.chr_pos_treat_ctrl[0].resize(10000,refcheck=False)
+            #self.chr_pos_treat_ctrl[1].resize(10000,refcheck=False)
+            #self.chr_pos_treat_ctrl[2].resize(10000,refcheck=False)
+            #self.chr_pos_treat_ctrl[0].resize(0,refcheck=False)
+            #self.chr_pos_treat_ctrl[1].resize(0,refcheck=False)
+            #self.chr_pos_treat_ctrl[2].resize(0,refcheck=False)            
 
         if self.PE_mode:
             treat_pv = self.treat.pileup_a_chromosome ( chrom, [self.treat_scaling_factor,], baseline_value = 0.0 )

@@ -1,4 +1,4 @@
-# Time-stamp: <2016-02-15 16:18:10 Tao Liu>
+# Time-stamp: <2016-05-19 10:26:24 Tao Liu>
 
 """Module Description: For pileup functions.
 
@@ -49,6 +49,15 @@ from time import time as ttime
 cdef inline int int_max(int a, int b): return a if a >= b else b
 cdef inline long long_max(long a, long b): return a if a >= b else b
 cdef inline float float_max(float a, float b): return a if a >= b else b
+
+cdef void clean_up_ndarray ( np.ndarray x ):
+    # clean numpy ndarray in two steps
+    cdef:
+        long i
+    i = x.shape[0] / 2
+    x.resize( 100000 if i > 100000 else i, refcheck=False)
+    x.resize( 0, refcheck=False)
+    return
 
 # This function uses pure C code for pileup
 cpdef pileup_and_write( trackI,
@@ -217,10 +226,12 @@ cdef pileup_bdg_se(object trackI, int d,
         ret.add_a_chromosome( chrom, quick_pileup ( ends.startposs, ends.endposs, scale_factor, baseline_value ) )
 
         # free mem
-        ends.startposs.resize(100000, refcheck=False)
-        ends.startposs.resize(0, refcheck=False)
-        ends.endposs.resize(100000, refcheck=False)
-        ends.endposs.resize(0, refcheck=False)                
+        clean_up_ndarray( ends.startposs )
+        clean_up_ndarray( ends.endposs )
+        #ends.startposs.resize(100000, refcheck=False)
+        #ends.startposs.resize(0, refcheck=False)
+        #ends.endposs.resize(100000, refcheck=False)
+        #ends.endposs.resize(0, refcheck=False)                
 
     return ret
 
@@ -292,10 +303,12 @@ cdef pileup_w_multiple_d_bdg(object trackI, list d_s, list scale_factor_s = [],
             tmp_pileup = quick_pileup ( ends.startposs, ends.endposs, scale_factor, baseline_value )
 
             # free mem
-            ends.startposs.resize(100000, refcheck=False)
-            ends.startposs.resize(0, refcheck=False)
-            ends.endposs.resize(100000, refcheck=False)
-            ends.endposs.resize(0, refcheck=False)                            
+            clean_up_ndarray( ends.startposs )
+            clean_up_ndarray( ends.endposs )
+            #ends.startposs.resize(100000, refcheck=False)
+            #ends.startposs.resize(0, refcheck=False)
+            #ends.endposs.resize(100000, refcheck=False)
+            #ends.endposs.resize(0, refcheck=False)                            
             
             if prev_pileup:
                 prev_pileup = max_over_two_pv_array ( prev_pileup, tmp_pileup )
@@ -377,10 +390,12 @@ cdef pileup_bdg_pe_w_ext (object trackI, int d, float scale_factor = 1.0,
         ret.add_a_chromosome( chrom, pileup )
 
         # free mem
-        start_poss.resize(100000, refcheck=False)
-        start_poss.resize(0, refcheck=False)
-        end_poss.resize(100000, refcheck=False)
-        end_poss.resize(0, refcheck=False)                
+        clean_up_ndarray( start_poss )
+        clean_up_ndarray( end_poss) 
+        #start_poss.resize(100000, refcheck=False)
+        #start_poss.resize(0, refcheck=False)
+        #end_poss.resize(100000, refcheck=False)
+        #end_poss.resize(0, refcheck=False)                
 
     return ret
 
@@ -436,10 +451,12 @@ cdef pileup_w_multiple_d_bdg_pe ( object trackI, list d_s = [],
                                       baseline_value)
 
             # free mem
-            start_poss.resize(100000, refcheck=False)
-            start_poss.resize(0, refcheck=False)
-            end_poss.resize(100000, refcheck=False)
-            end_poss.resize(0, refcheck=False)                            
+            clean_up_ndarray( start_poss )
+            clean_up_ndarray( end_poss )
+            #start_poss.resize(100000, refcheck=False)
+            #start_poss.resize(0, refcheck=False)
+            #end_poss.resize(100000, refcheck=False)
+            #end_poss.resize(0, refcheck=False)                            
             
             prev_pileup = max_over_two_pv_array ( prev_pileup, tmp_pileup )
             
@@ -643,10 +660,12 @@ cpdef se_all_in_one_pileup ( np.ndarray[np.int32_t, ndim=1] plus_tags, np.ndarra
             end_poss_ptr += 1
 
     # clean mem
-    start_poss.resize(100000, refcheck=False)
-    start_poss.resize(0, refcheck=False)
-    end_poss.resize(100000, refcheck=False)
-    end_poss.resize(0, refcheck=False)   
+    clean_up_ndarray( start_poss )
+    clean_up_ndarray( end_poss )
+    #start_poss.resize(100000, refcheck=False)
+    #start_poss.resize(0, refcheck=False)
+    #end_poss.resize(100000, refcheck=False)
+    #end_poss.resize(0, refcheck=False)   
 
     # resize
     ret_p.resize( I, refcheck=False )
