@@ -445,7 +445,7 @@ cdef class BEDPEParser(GenericParser):
                 m += 1
                 logging.info( " %d" % ( m*1000000 ) )
 
-            add_loc( chromosome, left_pos, righ_pos )
+            add_loc( chromosome, left_pos, right_pos )
 
         self.d = int( self.d * self.n + d * i )/( self.n + i )
         self.n += i
