@@ -175,8 +175,8 @@ def opt_validate ( optparser ):
         except OSError as (errno,detail):
             logging.error("PeakSplitter can not be accessed through the command line!")
             logging.error("OS gave me this error message: [Errno %d]: %s" % (errno,detail))
-            logging.error("Please download PeakSplitter from <http://www.ebi.ac.uk/bertone/software/PeakSplitter_Cpp.tar.gz>.")
-            logging.error("After you download and unzip it, read the instruction at <http://www.ebi.ac.uk/bertone/software/PeakSplitter_Cpp_usage.txt>")
+            logging.error("Please download PeakSplitter from <http://www.ebi.ac.uk/sites/ebi.ac.uk/files/groups/bertone/software/PeakSplitter_Cpp_1.0.tar.gz>.")
+            logging.error("After you download and unzip it, read the instruction at <http://www.ebi.ac.uk/sites/ebi.ac.uk/files/groups/bertone/software/PeakSplitter_Cpp_README>")
             logging.error("Install PeakSplitter so that you can access it through typing 'PeakSplitter' under the command line.")
             sys.exit(1)
 
