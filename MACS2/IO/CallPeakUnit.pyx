@@ -1,4 +1,4 @@
-# Time-stamp: <2016-05-19 10:22:22 Tao Liu>
+# Time-stamp: <2017-03-21 15:54:26 Tao Liu>
 
 """Module for Calculate Scores.
 
@@ -145,12 +145,14 @@ cdef inline float get_subtraction ( float x, float y):
     return x - y
 
 cdef inline list getitem_then_subtract ( list peakset, int start ):
+    """Return list of bytes
+    """
     cdef:
         list a
     
-    a = map(itemgetter("start"), peakset)
+    a = list(map(itemgetter("start"), peakset))
     for i in range(len(a)):
-        a[i] = str(a[i] - start).encode()
+        a[i] = b"%d" % (a[i] - start)
     return a
 
 cdef inline int32_t left_sum ( data, int pos, int width ):
@@ -226,7 +228,7 @@ cdef float mean_from_value_length ( np.ndarray value, list length ):
         float tmp_v, sum_v
 
     sum_v = 0
-    tmp = zip( value, length )
+    tmp = list(zip( value, length ))
     l = sum( length )
 
     for (tmp_v, tmp_l) in tmp:
@@ -1514,7 +1516,7 @@ cdef class CallerFromAlignments:
             tmp_n = 0
             lvl1peakschrom = lvl1peaks.get_data_from_chrom(chrom)
             lvl2peakschrom = lvl2peaks.get_data_from_chrom(chrom)
-            lvl1peakschrom_next = iter(lvl1peakschrom).next
+            lvl1peakschrom_next = iter(lvl1peakschrom).__next__
             tmppeakset = []             # to temporarily store lvl1 region inside a lvl2 region
             # our assumption is lvl1 regions should be included in lvl2 regions
             try:
@@ -1804,11 +1806,11 @@ cdef class CallerFromAlignments:
             #    raise Exception("quit")
             return bpeaks
 
-        thickStart = lvl1peakset[0]["start"].encode()
-        thickEnd   = lvl1peakset[-1]["end"].encode()
+        thickStart = b"%d" % lvl1peakset[0]["start"]
+        thickEnd   = b"%d" % lvl1peakset[-1]["end"]
         blockNum   = int(len(lvl1peakset))
         blockSizes = ",".join(map(str,map(itemgetter("length"),lvl1peakset))).encode() #join( map(lambda x:str(x["length"]),lvl1peakset) )
-        blockStarts = ",".join(getitem_then_subtract(lvl1peakset, start)).encode()     #join( map(lambda x:str(x["start"]-start),lvl1peakset) )
+        blockStarts = b",".join(getitem_then_subtract(lvl1peakset, start))     #join( map(lambda x:str(x["start"]-start),lvl1peakset) )
 
         # add 1bp left and/or right block if necessary
         if int(thickStart) != start:

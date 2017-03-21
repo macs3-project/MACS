@@ -1,4 +1,4 @@
-# Time-stamp: <2016-03-09 14:18:20 Tao Liu>
+# Time-stamp: <2017-03-21 16:09:49 Tao Liu>
 
 """Module for all MACS Parser classes for input.
 
@@ -57,29 +57,29 @@ __doc__ = "All Parser classes"
 
 cpdef guess_parser ( fhd, long buffer_size = 100000 ):
     # Note: BAMPE and BEDPE can't be automatically detected.
-    order_list = (b"BAM",
-                  b"BED",
-                  b"ELAND",
-                  b"ELANDMULTI",
-                  b"ELANDEXPORT",
-                  b"SAM",
-                  b"BOWTIE",
+    order_list = ("BAM",
+                  "BED",
+                  "ELAND",
+                  "ELANDMULTI",
+                  "ELANDEXPORT",
+                  "SAM",
+                  "BOWTIE",
                   )
 
     for f in order_list:
-        if f == b'BED':
+        if f == 'BED':
             p = BEDParser( fhd, buffer_size = buffer_size )
-        elif f == b"ELAND":
+        elif f == "ELAND":
             p = ELANDResultParser( fhd, buffer_size = buffer_size )
-        elif f ==  b"ELANDMULTI":
+        elif f == "ELANDMULTI":
             p = ELANDMultiParser( fhd, buffer_size = buffer_size )
-        elif f == b"ELANDEXPORT":
+        elif f == "ELANDEXPORT":
             p = ELANDExportParser( fhd, buffer_size = buffer_size )
-        elif f == b"SAM":
+        elif f == "SAM":
             p = SAMParser( fhd, buffer_size = buffer_size )
-        elif f == b"BAM":
+        elif f == "BAM":
             p = BAMParser( fhd, buffer_size = buffer_size )
-        elif f == b"BOWTIE":
+        elif f == "BOWTIE":
             p = BowtieParser( fhd, buffer_size = buffer_size )
         logging.debug( "Testing format %s" % f )
         s = p.sniff()

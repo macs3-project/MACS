@@ -1,4 +1,4 @@
-# Time-stamp: <2016-02-15 16:12:30 Tao Liu>
+# Time-stamp: <2017-03-21 16:24:21 Tao Liu>
 
 """Description: MACS 2 main executable
 
@@ -302,9 +302,7 @@ def run( args ):
     if options.nolambda:
         ofhd_xls.write(("# local lambda is disabled!\n").encode())
     # pass write method so we can print too, and include name
-    print("++++++")
     peakdetect.peaks.write_to_xls(ofhd_xls, name = options.name.encode())
-    print("------")
     ofhd_xls.close()
     #4.2 peaks in BED
     if options.log_pvalue:
@@ -319,12 +317,12 @@ def run( args ):
         #ofhd_bed.close()
         info("#4 Write peak in narrowPeak format file... %s" % (options.peakNarrowPeak))
         ofhd_bed = open( options.peakNarrowPeak, "wb" )
-        peakdetect.peaks.write_to_narrowPeak (ofhd_bed, name_prefix="%s_peak_", name=options.name.encode(), score_column=score_column, trackline=options.trackline )
+        peakdetect.peaks.write_to_narrowPeak (ofhd_bed, name_prefix=b"_peak_", name=options.name.encode(), score_column=score_column, trackline=options.trackline )
         ofhd_bed.close()
         #4.2-2 summits in BED
         info("#4 Write summits bed file... %s" % (options.summitbed))
         ofhd_summits = open( options.summitbed, "wb" )
-        peakdetect.peaks.write_to_summit_bed (ofhd_summits, name_prefix=b"%s_peak_", name=options.name.encode(),
+        peakdetect.peaks.write_to_summit_bed (ofhd_summits, name_prefix=b"_peak_", name=options.name.encode(),
                                               description=("Summits for %s (Made with MACS v2, " + strftime("%x") + ")").encode(),
                                               score_column=score_column, trackline=options.trackline )
         ofhd_summits.close()
@@ -332,11 +330,11 @@ def run( args ):
     else:
         info("#4 Write broad peak in broadPeak format file... %s" % (options.peakBroadPeak))
         ofhd_bed = open( options.peakBroadPeak, "wb" )
-        peakdetect.peaks.write_to_broadPeak (ofhd_bed, name_prefix="%s_peak_", name=options.name.encode(), description=options.name.encode(), trackline=options.trackline)
+        peakdetect.peaks.write_to_broadPeak (ofhd_bed, name_prefix=b"_peak_", name=options.name.encode(), description=options.name.encode(), trackline=options.trackline)
         ofhd_bed.close()
         info("#4 Write broad peak in bed12/gappedPeak format file... %s" % (options.peakGappedPeak))
         ofhd_bed = open( options.peakGappedPeak, "wb" )
-        peakdetect.peaks.write_to_gappedPeak (ofhd_bed, name_prefix="%s_peak_", name=options.name.encode(), description=options.name.encode(), trackline=options.trackline)
+        peakdetect.peaks.write_to_gappedPeak (ofhd_bed, name_prefix=b"_peak_", name=options.name.encode(), description=options.name.encode(), trackline=options.trackline)
         ofhd_bed.close()
 
     info("Done!")

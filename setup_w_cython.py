@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# Time-stamp: <2016-03-09 13:36:00 Tao Liu>
+# Time-stamp: <2017-03-21 16:32:22 Tao Liu>
 
 """Description: 
 
@@ -40,9 +40,9 @@ except:
 
 
 def main():
-    #if float(sys.version[:3])<2.7 or float(sys.version[:3])>=2.8:
-    #    sys.stderr.write("CRITICAL: Python version must be 2.7!\n")
-    #    sys.exit(1)
+    if float(sys.version[:3])<3.6 or float(sys.version[:3])>=3.7:
+        sys.stderr.write("CRITICAL: Python version must be 3.6!\n")
+        sys.exit(1)
 
     # I intend to use -Ofast, however if gcc version < 4.6, this option is unavailable so...
     extra_c_args = ["-w","-O3","-ffast-math"] # for C, -Ofast implies -O3 and -ffast-math
@@ -83,7 +83,7 @@ def main():
                        ]
 
     setup(name="MACS2",
-          version="2.1.1.20160309",
+          version="2.1.2.20170320",
           description="Model Based Analysis for ChIP-Seq data",
           author='Tao Liu',
           author_email='vladimir.liu@gmail.com',
@@ -105,8 +105,8 @@ def main():
               'Programming Language :: Python',
               ],
           install_requires=[
-              'numpy>=1.6',
-              'cython>=0.18',
+              'numpy>=1.12',
+              'cython>=0.25',
               #'scipy',
               ],
           cmdclass = command_classes,
