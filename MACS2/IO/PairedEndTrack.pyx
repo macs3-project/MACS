@@ -24,6 +24,7 @@ cimport cython
 
 from MACS2.Pileup import quick_pileup, max_over_two_pv_array, se_all_in_one_pileup
 import sys
+import os
 
 cdef INT_MAX = <int>((<unsigned int>-1)>>1)
 
@@ -55,7 +56,7 @@ cdef class PETrackI:
         public float average_template_length
         bool   __destroyed
     
-    def __init__ (self, char * anno="", long buffer_size = 100000 ):
+    def __init__ (self, char * anno=b"", long buffer_size = 100000 ):
         """fw is the fixed-width for all locations.
         
         """
@@ -73,7 +74,7 @@ cdef class PETrackI:
         self.length = 0
         self.average_template_length = 0.0
         
-    cpdef add_loc ( self, str chromosome, int start, int end):
+    cpdef add_loc ( self, bytes chromosome, int start, int end):
         """Add a location to the list according to the sequence name.
         
         chromosome -- mostly the chromosome name
@@ -99,7 +100,7 @@ cdef class PETrackI:
         """
         cdef:
             set chrs
-            str chromosome
+            bytes chromosome
             
         chrs = set(self.get_chr_names())
         for chromosome in chrs:
@@ -132,7 +133,7 @@ cdef class PETrackI:
         """
         cdef:
             set valid_chroms, missed_chroms
-            str chrom
+            bytes chrom
 
         valid_chroms = set(self.__locations.keys()).intersection(rlengths.keys())
         for chrom in valid_chroms:
@@ -160,7 +161,7 @@ cdef class PETrackI:
         """
         
         cdef int32_t i
-        cdef str c
+        cdef bytes c
         
         self.total = 0
 
@@ -176,7 +177,7 @@ cdef class PETrackI:
         self.average_template_length = float( self.length ) / self.total
         return
 
-    def get_locations_by_chr ( self, str chromosome ):
+    def get_locations_by_chr ( self, bytes chromosome ):
         """Return a tuple of two lists of locations for certain chromosome.
 
         """
@@ -209,7 +210,7 @@ cdef class PETrackI:
         
         """
         cdef uint32_t i
-        cdef str c
+        cdef bytes c
         cdef list chrnames = self.get_chr_names()
 
         for i in range(len(chrnames)):
@@ -247,7 +248,7 @@ cdef class PETrackI:
            np.ndarray[np.float64_t, ndim=1] pmf
            np.ndarray[np.int64_t, ndim=1] bins
            np.ndarray[np.int32_t, ndim=1] sizes, locs
-           str c
+           bytes c
            int i, bins_len
            int max_bins = 0
            list chrnames = self.get_chr_names()
@@ -281,7 +282,7 @@ cdef class PETrackI:
             np.ndarray locs, new_locs, dup_locs
             unsigned long i_old, i_new, i_dup, new_size, dup_size
             list chrnames = self.get_chr_names()
-            str k
+            bytes k
            
         if not self.__sorted: self.sort()
         
@@ -367,7 +368,7 @@ cdef class PETrackI:
 #            np.ndarray[np.int32_t, ndim=1] current_loc #= np.zeros([1,2], np.int32)
             int loc_start, loc_end, current_loc_start, current_loc_end
             unsigned long i_old, i_new, size, new_size
-            str k
+            bytes k
             np.ndarray locs, new_locs
                 
         if maxnum < 0: return # condition to return if not filtering
@@ -440,7 +441,7 @@ cdef class PETrackI:
         """
         cdef:
             uint32_t num, i_chrom      # num: number of reads allowed on a certain chromosome
-            str key
+            bytes key
         
         self.total = 0
         self.length = 0
@@ -484,11 +485,11 @@ cdef class PETrackI:
         
         """
         cdef int32_t i, i_chrom, s, e
-        cdef str k
+        cdef bytes k
         
         if not fhd:
             fhd = sys.stdout
-        assert isinstance(fhd, file)
+        assert isinstance(fhd, io.IOBase)
         assert self.fw > 0, "width should be set larger than 0!"
 
         chrnames = self.get_chr_names()
@@ -503,11 +504,11 @@ cdef class PETrackI:
 
             for i in range(locs.shape[0]):
                 s, e = locs[ i ]
-                fhd.write("%s\t%d\t%d\t.\t.\t.\n" % (k, s, e))
+                fhd.write( ("%s\t%d\t%d\t.\t.\t.\n" % (k, s, e)).encode() )
 
         return
     
-    cpdef pileup_a_chromosome ( self, str chrom, list scale_factor_s, float baseline_value = 0.0 ):
+    cpdef pileup_a_chromosome ( self, bytes chrom, list scale_factor_s, float baseline_value = 0.0 ):
         """pileup a certain chromosome, return [p,v] (end position and value) list.
         
         scale_factor_s  : linearly scale the pileup value applied to each d in ds. The list should have the same length as ds.
@@ -534,7 +535,7 @@ cdef class PETrackI:
 
         return prev_pileup
 
-    cpdef pileup_a_chromosome_c ( self, str chrom, list ds, list scale_factor_s, float baseline_value = 0.0 ):
+    cpdef pileup_a_chromosome_c ( self, bytes chrom, list ds, list scale_factor_s, float baseline_value = 0.0 ):
         """pileup a certain chromosome, return [p,v] (end position and value) list.
 
         This function is for control track. Basically, here is a

@@ -99,7 +99,7 @@ def run( options ):
     ofiles = []
     name_prefix = []
     if options.ofile:
-        ofiles = map( lambda x: os.path.join( options.outdir, x ), options.ofile )
+        ofiles = [os.path.join( options.outdir, x ) for x in options.ofile]
         name_prefix = options.ofile
     else:
         ofiles = [ os.path.join( options.outdir, "%s_c%.1f_cond1.bed" % (options.oprefix,options.cutoff)),

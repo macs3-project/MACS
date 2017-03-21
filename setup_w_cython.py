@@ -40,9 +40,9 @@ except:
 
 
 def main():
-    if float(sys.version[:3])<2.7 or float(sys.version[:3])>=2.8:
-        sys.stderr.write("CRITICAL: Python version must be 2.7!\n")
-        sys.exit(1)
+    #if float(sys.version[:3])<2.7 or float(sys.version[:3])>=2.8:
+    #    sys.stderr.write("CRITICAL: Python version must be 2.7!\n")
+    #    sys.exit(1)
 
     # I intend to use -Ofast, however if gcc version < 4.6, this option is unavailable so...
     extra_c_args = ["-w","-O3","-ffast-math"] # for C, -Ofast implies -O3 and -ffast-math

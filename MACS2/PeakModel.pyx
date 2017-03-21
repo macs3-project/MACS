@@ -116,7 +116,7 @@ cdef class PeakModel:
         cdef:
             dict paired_peaks
             long num_paired_peakpos, num_paired_peakpos_remained, num_paired_peakpos_picked
-            str c
+            bytes c
         
 
         self.peaksize = 2*self.bw
@@ -183,7 +183,7 @@ Summary of Peak Model:
         #self.plus_line = [0]*window_size
         #self.minus_line = [0]*window_size        
         self.info("start model_add_line...")
-        chroms = paired_peakpos.keys()
+        chroms = sorted(paired_peakpos.keys())
         
         for i in range(len(chroms)):
             paired_peakpos_chrom = paired_peakpos[chroms[i]]
@@ -224,7 +224,7 @@ Summary of Peak Model:
         tmp_cor_alternative_d = ycorr[ i_l_max ]
         tmp_alternative_d = xcorr[ i_l_max ]
         cor_alternative_d =  tmp_cor_alternative_d [ tmp_alternative_d > 0 ]
-        self.alternative_d = map( int, tmp_alternative_d[ tmp_alternative_d > 0 ] )
+        self.alternative_d = list(map( int, tmp_alternative_d[ tmp_alternative_d > 0 ] ))
         
         # best cross-correlation point
         self.d = xcorr[ np.where( ycorr== max( cor_alternative_d ) )[0][0] ]
@@ -326,7 +326,7 @@ Summary of Peak Model:
         cdef:
            int i
            list chrs
-           str chrom
+           bytes chrom
            dict paired_peaks_pos
            np.ndarray[np.int32_t, ndim=1] plus_tags, minus_tags
 
@@ -352,6 +352,12 @@ Summary of Peak Model:
         return paired_peaks_pos
 
     cdef __find_pair_center (self, pluspeaks, minuspeaks):
+        cdef:
+            long ip, im, im_prev
+            long ip_max, im_max
+            bool flag_find_overlap
+            long pp, pn, mp, mn
+            
         ip = 0                  # index for plus peaks
         im = 0                  # index for minus peaks
         im_prev = 0             # index for minus peaks in previous plus peak

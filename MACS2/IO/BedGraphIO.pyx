@@ -164,7 +164,7 @@ cdef class genericBedIO:
         """
         if type(f) == str:
             self.fhd = open(f,"r")
-        elif type(f) == file:
+        elif isinstance(f,io.IOBase):
             self.fhd = f
         else:
             raise Exception("f must be a filename or a file handler.")

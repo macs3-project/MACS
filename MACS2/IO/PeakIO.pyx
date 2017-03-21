@@ -56,12 +56,12 @@ cdef class PeakContent:
         float pscore
         float fc
         float qscore
-        str name
+        bytes name
 
     def __init__ ( self, int start, int end, int summit, 
                    float peak_score, float pileup, 
                    float pscore, float fold_change, float qscore,
-                   str name="NA" ):
+                   bytes name=b"NA" ):
         self.start = start
         self.end = end
         self.length = end - start
@@ -130,10 +130,10 @@ cdef class PeakIO:
     def __init__ (self):
         self.peaks = {}
     
-    cpdef add (self, str chromosome, int start, int end, int summit = 0, 
+    cpdef add (self, bytes chromosome, int start, int end, int summit = 0, 
                float peak_score=0, float pileup=0, 
                float pscore=0, float fold_change=0, float qscore=0,
-               str name="NA"):
+               bytes name=b"NA"):
         """items:
         start:start
         end:end,
@@ -149,18 +149,18 @@ cdef class PeakIO:
             self.peaks[chromosome]=[]
         self.peaks[chromosome].append(PeakContent( start, end, summit, peak_score, pileup, pscore, fold_change, qscore, name))
 
-    cpdef add_PeakContent ( self, str chromosome, object peakcontent ):
+    cpdef add_PeakContent ( self, bytes chromosome, object peakcontent ):
         if not self.peaks.has_key(chromosome):
             self.peaks[chromosome]=[]
         self.peaks[chromosome].append(peakcontent)
 
-    def get_data_from_chrom (self, str chrom):
+    def get_data_from_chrom (self, bytes chrom):
         if not self.peaks.has_key( chrom ):
             self.peaks[chrom]= []
         return self.peaks[chrom]
 
     def get_chr_names (self):
-        return self.peaks.keys()
+        return sorted(self.peaks.keys())
 
     def sort ( self ):
         # sort by position
@@ -171,7 +171,7 @@ cdef class PeakIO:
         
 
     def filter_pscore (self, double pscore_cut ):
-        cdef str chrom
+        cdef bytes chrom
         
         peaks = self.peaks
         new_peaks = {}
@@ -182,7 +182,7 @@ cdef class PeakIO:
         self.peaks = new_peaks
 
     def filter_qscore (self, double qscore_cut ):
-        cdef str chrom
+        cdef bytes chrom
 
         peaks = self.peaks
         new_peaks = {}
@@ -200,8 +200,7 @@ cdef class PeakIO:
         """
         peaks = self.peaks
         new_peaks = {}
-        chrs = peaks.keys()
-        chrs.sort()
+        chrs = sorted(peaks.keys())
         if fc_up:
             for chrom in chrs:
                 new_peaks[chrom]=[p for p in peaks[chrom] if p['fc'] >= fc_low and p['fc']<fc_up]
@@ -212,31 +211,28 @@ cdef class PeakIO:
 
     def total (self):
         peaks = self.peaks
-        chrs = peaks.keys()
-        chrs.sort()
+        chrs = sorted(peaks.keys())
         x = 0
         for chrom in chrs:
             x += len(peaks[chrom])
         return x
   
     # these methods are very fast, specifying types is unnecessary
-    def write_to_xls (self, fhd, str name_prefix="%s_peak_", str name="MACS"):
+    def write_to_xls (self, fhd, bytes name_prefix=b"", bytes name=b"MACS"):
         return self._to_xls(name_prefix=name_prefix, name=name,
                             print_func=fhd.write)
 
-    def _to_xls (self, name_prefix="%s_peak_", name="MACS", print_func=print):
+    def _to_xls (self, name_prefix=b"_peak_", name=b"MACS", print_func=print):
 
         if self.peaks:
-            print_func("\t".join(("chr","start", "end",  "length",  "abs_summit", "pileup", "-log10(pvalue)", "fold_enrichment", "-log10(qvalue)", "name"))+"\n")
+            print_func("\t".join(("chr","start", "end",  "length",  "abs_summit", "pileup", "-log10(pvalue)", "fold_enrichment", "-log10(qvalue)", "name"))+"\n" )
         else:
             return
         
-        try: peakprefix = name_prefix % name
-        except: peakprefix = name_prefix
-
+        peakprefix = name + name_prefix 
+        
         peaks = self.peaks
-        chrs = peaks.keys()
-        chrs.sort()
+        chrs = sorted(peaks.keys())
         n_peak = 0
         for chrom in chrs:
             for end, group in groupby(peaks[chrom], key=itemgetter("end")):
@@ -244,38 +240,39 @@ cdef class PeakIO:
                 these_peaks = list(group)
                 if len(these_peaks) > 1:
                     for i, peak in enumerate(these_peaks):
-                        peakname = "%s%d%s" % (peakprefix, n_peak, subpeak_letters(i))
+                        peakname = peakprefix + n_peak + subpeak_letters(i)
                         #[start,end,end-start,summit,peak_height,number_tags,pvalue,fold_change,qvalue]
-                        print_func("%s\t%d\t%d\t%d" % (chrom,peak['start']+1,peak['end'],peak['length']))
+                        print_func(chrom.decode())
+                        print_func("\t%d\t%d\t%d" % (peak['start']+1,peak['end'],peak['length']))
                         print_func("\t%d" % (peak['summit']+1)) # summit position
                         print_func("\t%.2f" % (round(peak['pileup'],2))) # pileup height at summit
                         print_func("\t%.5f" % (peak['pscore'])) # -log10pvalue at summit
                         print_func("\t%.5f" % (peak['fc'])) # fold change at summit                
-                        print_func("\t%.5f" % (peak['qscore'])) # -log10qvalue at summit
-                        print_func("\t%s" % peakname)
+                        print_func("\t%.5f\t" % (peak['qscore'])) # -log10qvalue at summit
+                        print_func(peakname)
                         print_func("\n")
                 else:
                     peak = these_peaks[0]
                     peakname = "%s%d" % (peakprefix, n_peak)
                     #[start,end,end-start,summit,peak_height,number_tags,pvalue,fold_change,qvalue]
-                    print_func("%s\t%d\t%d\t%d" % (chrom,peak['start']+1,peak['end'],peak['length']))
+                    print_func(chrom.decode())
+                    print_func("\t%d\t%d\t%d" % (peak['start']+1,peak['end'],peak['length']))
                     print_func("\t%d" % (peak['summit']+1)) # summit position
                     print_func("\t%.2f" % (round(peak['pileup'],2))) # pileup height at summit
                     print_func("\t%.5f" % (peak['pscore'])) # -log10pvalue at summit
                     print_func("\t%.5f" % (peak['fc'])) # fold change at summit                
-                    print_func("\t%.5f" % (peak['qscore'])) # -log10qvalue at summit
-                    print_func("\t%s" % peakname)
+                    print_func("\t%.5f\t" % (peak['qscore'])) # -log10qvalue at summit
+                    print_func(peakname)
                     print_func("\n")
         return
 
-    def _to_bed(self, name_prefix="%s_peak_", name="MACS",
-                description="%s", score_column="score",
+    def _to_bed(self, name_prefix=b"", name=b"MACS",
+                description=b"", score_column="score",
                 print_func=print, trackline=False):
         """
         generalization of tobed and write_to_bed
         """
-        chrs = self.peaks.keys()
-        chrs.sort()
+        chrs = sorted(self.peaks.keys())
         n_peak = 0
         try: peakprefix = name_prefix % name
         except: peakprefix = name_prefix
@@ -296,20 +293,19 @@ cdef class PeakIO:
                     peak = peaks[0]
                     print_func("%s\t%d\t%d\t%s%d\t%.5f\n" % (chrom,peak['start'],peak['end'],peakprefix,n_peak,peak[score_column])) 
 
-    def _to_summits_bed(self, name_prefix="%s_peak_", name="MACS",
-                        description = "%s", score_column="score",
+    def _to_summits_bed(self, name_prefix=b"", name=b"MACS",
+                        description = b"", score_column="score",
                         print_func=print, trackline=False):
         """ 
         generalization of to_summits_bed and write_to_summit_bed
         """
-        chrs = self.peaks.keys()
-        chrs.sort()
+        chrs = sorted(self.peaks.keys())
         n_peak = 0
         try: peakprefix = name_prefix % name
         except: peakprefix = name_prefix
         try: desc = description % name
         except: desc = description
-        trackcontents = (name.replace("\"", "\\\""), desc.replace("\"", "\\\""))
+        trackcontents = (name.replace(b"\"", b"\\\""), desc.replace(b"\"", b"\\\""))
         if trackline:
             try: print_func('track name="%s (summits)" description="%s" visibility=1\n' % trackcontents)
             except: print_func('track name=MACS description=Unknown') 
@@ -324,7 +320,7 @@ cdef class PeakIO:
                 else:
                     peak = peaks[0]
                     summit_p = peak['summit']
-                    print_func("%s\t%d\t%d\t%s%d\t%.5f\n" % (chrom,summit_p,summit_p+1,peakprefix,n_peak,peak[score_column]))
+                    print_func("%s\t%d\t%d\t%s%d\t%.5f\n" % (chrom,summit_p,summit_p+1,peakprefix,n_peak,float(peak[score_column])))
 
     def tobed (self):
         """Print out peaks in BED5 format.
@@ -341,7 +337,7 @@ cdef class PeakIO:
         fc:fold_change,
         qscore:qvalue
         """
-        return self._to_bed(name_prefix="peak_", score_column="score")
+        return self._to_bed(name_prefix=b"peak_", score_column="score")
 
     def to_summits_bed (self):
         """Print out peak summits in BED5 format.
@@ -349,11 +345,11 @@ cdef class PeakIO:
         Five columns are chromosome, summit start, summit end, peak name, and peak height.
 
         """
-        return self._to_summits_bed(name_prefix="peak_", score_column="score")
+        return self._to_summits_bed(name_prefix=b"peak_", score_column="score")
 
     # these methods are very fast, specifying types is unnecessary
-    def write_to_bed (self, fhd, str name_prefix="peak_", str name="MACS",
-                        str description = "%s", str score_column="score", trackline=True):
+    def write_to_bed (self, fhd, bytes name_prefix=b"peak_", bytes name=b"MACS",
+                        bytes description = b"", str score_column="score", trackline=True):
         """Write peaks in BED5 format in a file handler. Score (5th
         column) is decided by score_column setting. Check the
         following list. Name column ( 4th column) is made by putting
@@ -376,10 +372,10 @@ cdef class PeakIO:
         """
         return self._to_bed(name_prefix=name_prefix, name=name,
                             description=description, score_column=score_column,
-                            print_func=fhd.write, trackline=trackline)
+                            print_func=lambda x:fhd.write(x.encode()), trackline=trackline)
 
-    def write_to_summit_bed (self, fhd, name_prefix="peak_", name="MACS",
-                             description = "%s", score_column="score", trackline=True):
+    def write_to_summit_bed (self, fhd, name_prefix=b"peak_", name=b"MACS",
+                             description = b"", score_column="score", trackline=True):
         """Write peak summits in BED5 format in a file handler. Score
         (5th column) is decided by score_column setting. Check the
         following list. Name column ( 4th column) is made by putting
@@ -401,9 +397,9 @@ cdef class PeakIO:
         """
         return self._to_summits_bed(name_prefix=name_prefix, name=name,
                                     description=description, score_column=score_column,
-                                    print_func=fhd.write, trackline=trackline)
+                                    print_func=lambda x:fhd.write(x.encode()), trackline=trackline)
 
-    def write_to_narrowPeak (self, fhd, name_prefix="peak_", name="peak", score_column="score", trackline=True):
+    def write_to_narrowPeak (self, fhd, name_prefix=b"peak_", name=b"peak", score_column="score", trackline=True):
         """Print out peaks in narrowPeak format.
 
         This format is designed for ENCODE project, and basically a
@@ -458,13 +454,12 @@ cdef class PeakIO:
         
         """
         cdef int n_peak
-        cdef str chrom
+        cdef bytes chrom
         cdef long s
 
-        chrs = self.peaks.keys()
-        chrs.sort()
+        chrs = sorted(self.peaks.keys())
         n_peak = 0
-        write = fhd.write
+        write =  lambda x:fhd.write(x.encode())
         try: peakprefix = name_prefix % name
         except: peakprefix = name_prefix
         if trackline:
@@ -497,7 +492,7 @@ cdef class PeakIO:
                                 peak['fc'],peak['pscore'],peak['qscore'],s) )
         return
 
-    def write_to_xls (self, ofhd, name_prefix="%s_peak_", name="MACS"):
+    def write_to_xls (self, ofhd, name_prefix="%s_peak_", name=b"MACS"):
         """Save the peak results in a tab-delimited plain text file
         with suffix .xls.
 
@@ -505,15 +500,15 @@ cdef class PeakIO:
         wait... why I have two write_to_xls in this class?
         
         """
-        write = ofhd.write
+        print(">>>>>>")
+        write = lambda x:ofhd.write(x.encode())
         write("\t".join(("chr","start", "end",  "length",  "abs_summit", "pileup", "-log10(pvalue)", "fold_enrichment", "-log10(qvalue)", "name"))+"\n")
         
         try: peakprefix = name_prefix % name
         except: peakprefix = name_prefix
 
         peaks = self.peaks
-        chrs = peaks.keys()
-        chrs.sort()
+        chrs = sorted(peaks.keys())
         n_peak = 0
         for chrom in chrs:
             for end, group in groupby(peaks[chrom], key=itemgetter("end")):
@@ -523,26 +518,28 @@ cdef class PeakIO:
                     for i, peak in enumerate(these_peaks):
                         peakname = "%s%d%s" % (peakprefix, n_peak, subpeak_letters(i))
                         #[start,end,end-start,summit,peak_height,number_tags,pvalue,fold_change,qvalue]
-                        write("%s\t%d\t%d\t%d" % (chrom,peak['start']+1,peak['end'],peak['length']))
+                        ofhd.write(chrom)
+                        write("\t%d\t%d\t%d" % (peak['start']+1,peak['end'],peak['length']))
                         write("\t%d" % (peak['summit']+1)) # summit position
                         write("\t%.2f" % (round(peak['pileup'],2))) # pileup height at summit
                         write("\t%.5f" % (peak['pscore'])) # -log10pvalue at summit
                         write("\t%.5f" % (peak['fc'])) # fold change at summit
-                        write("\t%.5f" % (peak['qscore'])) # -log10qvalue at summit
-                        write("\t%s" % peakname)
-                        write("\n")
+                        write("\t%.5f\t" % (peak['qscore'])) # -log10qvalue at summit
+                        ofhd.write(peakname.encode())
+                        write("+++\n")
                 else:
                     peak = these_peaks[0]
                     peakname = "%s%d" % (peakprefix, n_peak)
                     #[start,end,end-start,summit,peak_height,number_tags,pvalue,fold_change,qvalue]
-                    write("%s\t%d\t%d\t%d" % (chrom,peak['start']+1,peak['end'],peak['length']))
+                    ofhd.write(chrom)
+                    write("\t%d\t%d\t%d" % (peak['start']+1,peak['end'],peak['length']))
                     write("\t%d" % (peak['summit']+1)) # summit position
                     write("\t%.2f" % (round(peak['pileup'],2))) # pileup height at summit
                     write("\t%.5f" % (peak['pscore'])) # -log10pvalue at summit
                     write("\t%.5f" % (peak['fc'])) # fold change at summit
-                    write("\t%.5f" % (peak['qscore'])) # -log10qvalue at summit                    
-                    write("\t%s" % peakname)
-                    write("\n")
+                    write("\t%.5f\t" % (peak['qscore'])) # -log10qvalue at summit                    
+                    ofhd.write(peakname.encode())
+                    write("+++\n")
         return
 
 
@@ -555,14 +552,14 @@ cdef class PeakIO:
         """
         cdef int total_num
         cdef list chrs1, chrs2, a
-        cdef str k
+        cdef bytes k
         
         peaks1 = self.peaks
         if isinstance(peaks2,PeakIO):
             peaks2 = peaks2.peaks
         total_num = 0
-        chrs1 = peaks1.keys()
-        chrs2 = peaks2.keys()
+        chrs1 = sorted(peaks1.keys())
+        chrs2 = sorted(peaks2.keys())
         for k in chrs1:
             if not chrs2.count(k):
                 continue
@@ -594,8 +591,8 @@ cdef class PeakIO:
         
         """
         cdef:
-            str line = ''
-            str chrom = ''
+            bytes line = b''
+            bytes chrom = b''
             int n_peak = 0
             int start, end, length, summit
             float pileup, pscore, fc, qscore
@@ -636,14 +633,14 @@ cpdef parse_peakname(peakname):
     """returns peaknumber, subpeak  
     """
     cdef:
-        str peak_id, peaknumber, subpeak
+        bytes peak_id, peaknumber, subpeak
     peak_id = peakname.split('_')[-1]
     x = re.split('(\D.*)', peak_id)
     peaknumber = int(x[0])
     try:
         subpeak = x[1]
     except IndexError:
-        subpeak = ''
+        subpeak = b''
     return (peaknumber, subpeak)
 
 cdef class Region:
@@ -653,7 +650,7 @@ cdef class Region:
         self.regions= {}
         self.__flag_sorted = False
 
-    def add_loc ( self, str chrom, int start, int end ):
+    def add_loc ( self, bytes chrom, int start, int end ):
         if self.regions.has_key(chrom):
             self.regions[chrom].append( (start,end) )
         else:
@@ -662,22 +659,21 @@ cdef class Region:
         return
 
     def sort (self):
-        cdef str chrom
+        cdef bytes chrom
 
         for chrom in self.regions.keys():
             self.regions[chrom].sort()
         self.__flag_sorted = True
     
     def merge_overlap ( self ):
-        cdef str chrom
+        cdef bytes chrom
         cdef int s_new_region, e_new_region, i, j
         
         if not self.__flag_sorted:
             self.sort()
         regions = self.regions
         new_regions = {}
-        chrs = regions.keys()
-        chrs.sort()
+        chrs = sorted(regions.keys())
         for i in range(len(chrs)):
             chrom = chrs[i]
         #for chrom in chrs:
@@ -705,14 +701,13 @@ cdef class Region:
 
     def write_to_bed (self, fhd ):
         cdef int i
-        cdef str chrom
+        cdef bytes chrom
         
-        chrs = self.regions.keys()
-        chrs.sort()
+        chrs = sorted(self.regions.keys())
         for i in range( len(chrs) ):
             chrom = chrs[i]
             for region in self.regions[chrom]:
-                fhd.write( "%s\t%d\t%d\n" % (chrom,region[0],region[1] ) )
+                fhd.write( ("%s\t%d\t%d\n" % (chrom,region[0],region[1] ) ).encode())
 
 
 cdef class BroadPeakContent:
@@ -721,23 +716,23 @@ cdef class BroadPeakContent:
         long end
         long length
         float score
-        str thickStart
-        str thickEnd
+        bytes thickStart
+        bytes thickEnd
         long blockNum
-        str  blockSizes
-        str  blockStarts
+        bytes  blockSizes
+        bytes  blockStarts
         float pileup
         float pscore
         float fc
         float qscore
-        str name
+        bytes name
 
     def __init__ ( self, long start, long end, float score,
-                   str thickStart, str thickEnd,
-                   long blockNum, str blockSizes, 
-                   str blockStarts, float pileup, 
+                   bytes thickStart, bytes thickEnd,
+                   long blockNum, bytes blockSizes, 
+                   bytes blockStarts, float pileup, 
                    float pscore, float fold_change, 
-                   float qscore, str name = "NA" ):
+                   float qscore, bytes name = b"NA" ):
         self.start = start
         self.end = end
         self.score = score
@@ -799,11 +794,11 @@ cdef class BroadPeakIO:
         self.peaks = {}
     
     def add (self, char * chromosome, long start, long end, long score = 0,
-             str thickStart=".", str thickEnd=".",
-             long blockNum=0, str blockSizes=".", 
-             str blockStarts=".", float pileup = 0,
+             bytes thickStart=b".", bytes thickEnd=b".",
+             long blockNum=0, bytes blockSizes=b".", 
+             bytes blockStarts=b".", float pileup = 0,
              float pscore = 0, float fold_change = 0,
-             float qscore = 0, str name = "NA" ):
+             float qscore = 0, bytes name = b"NA" ):
         """items
         chromosome : chromosome name,
         start      : broad region start,
@@ -827,7 +822,7 @@ cdef class BroadPeakIO:
                                                          pileup, pscore, fold_change, qscore, name ) )
 
     def filter_pscore (self, double pscore_cut ):
-        cdef str chrom
+        cdef bytes chrom
         
         peaks = self.peaks
         new_peaks = {}
@@ -838,7 +833,7 @@ cdef class BroadPeakIO:
         self.peaks = new_peaks
 
     def filter_qscore (self, double qscore_cut ):
-        cdef str chrom
+        cdef bytes chrom
 
         peaks = self.peaks
         new_peaks = {}
@@ -856,7 +851,7 @@ cdef class BroadPeakIO:
         """
         peaks = self.peaks
         new_peaks = {}
-        chrs = peaks.keys()
+        chrs = sorted(peaks.keys())
         chrs.sort()
         if fc_up:
             for chrom in chrs:
@@ -867,18 +862,18 @@ cdef class BroadPeakIO:
         self.peaks = new_peaks
 
     def total (self):
-        cdef str chrom
+        cdef bytes chrom
         cdef long x
         
         peaks = self.peaks
-        chrs = peaks.keys()
+        chrs = sorted(peaks.keys())
         chrs.sort()
         x = 0
         for chrom in chrs:
             x += len(peaks[chrom])
         return x
   
-    def write_to_gappedPeak (self, fhd, name_prefix="peak_", name='peak', description="%s", trackline=True):
+    def write_to_gappedPeak (self, fhd, name_prefix=b"peak_", name=b'peak', description=b"", trackline=True):
         """Print out peaks in gappedBed format. Only those with stronger enrichment regions are saved.
 
         This format is basically a BED12+3 format.
@@ -946,26 +941,26 @@ cdef class BroadPeakIO:
         +--------------+------+----------------------------------------+
        
         """
-        chrs = self.peaks.keys()
-        chrs.sort()
+        write=lambda x:fhd.write(x.encode())
+        chrs = sorted(self.peaks.keys())
         n_peak = 0
         try: peakprefix = name_prefix % name
         except: peakprefix = name_prefix
         try: desc = description % name
         except: desc = description
         if trackline:
-            fhd.write("track name=\"%s\" description=\"%s\" type=gappedPeak nextItemButton=on\n" % (name, desc) )
+            write("track name=\"%s\" description=\"%s\" type=gappedPeak nextItemButton=on\n" % (name, desc) )
         for chrom in chrs:
             for peak in self.peaks[chrom]:
                 n_peak += 1
                 if peak["thickStart"] != ".":
-                    fhd.write( "%s\t%d\t%d\t%s%d\t%d\t.\t%s\t%s\t0\t%d\t%s\t%s\t%.5f\t%.5f\t%.5f\n"
-                               %
-                               (chrom,peak["start"],peak["end"],peakprefix,n_peak,int(10*peak["qscore"]),
-                                peak["thickStart"],peak["thickEnd"],
-                                peak["blockNum"],peak["blockSizes"],peak["blockStarts"], peak['fc'], peak['pscore'], peak['qscore'] ) )
+                    write( "%s\t%d\t%d\t%s%d\t%d\t.\t%s\t%s\t0\t%d\t%s\t%s\t%.5f\t%.5f\t%.5f\n"
+                           %
+                           (chrom,peak["start"],peak["end"],peakprefix,n_peak,int(10*peak["qscore"]),
+                            peak["thickStart"],peak["thickEnd"],
+                            peak["blockNum"],peak["blockSizes"],peak["blockStarts"], peak['fc'], peak['pscore'], peak['qscore'] ) )
 
-    def write_to_Bed12 (self, fhd, name_prefix="peak_", name='peak', description="%s", trackline=True):
+    def write_to_Bed12 (self, fhd, name_prefix=b"peak_", name=b'peak', description=b"", trackline=True):
         """Print out peaks in Bed12 format.
 
         +--------------+------+----------------------------------------+
@@ -1020,32 +1015,32 @@ cdef class BroadPeakIO:
         +--------------+------+----------------------------------------+
        
         """
-        chrs = self.peaks.keys()
-        chrs.sort()
+        chrs = sorted(self.peaks.keys())
+        write=lambda x:fhd.write(x.encode())
         n_peak = 0
         try: peakprefix = name_prefix % name
         except: peakprefix = name_prefix
         try: desc = description % name
         except: desc = description
         if trackline:
-            fhd.write("track name=\"%s\" description=\"%s\" type=bed nextItemButton=on\n" % (name, desc) )
+            write("track name=\"%s\" description=\"%s\" type=bed nextItemButton=on\n" % (name, desc) )
         for chrom in chrs:
             for peak in self.peaks[chrom]:
                 n_peak += 1
                 if peak["thickStart"] == ".":
                     # this will violate gappedPeak format, since it's a complement like broadPeak line.
-                    fhd.write( "%s\t%d\t%d\t%s%d\t%d\t.\n"
-                               %
-                               (chrom,peak["start"],peak["end"],peakprefix,n_peak,int(10*peak["qscore"]) ) )
+                    write( "%s\t%d\t%d\t%s%d\t%d\t.\n"
+                           %
+                           (chrom,peak["start"],peak["end"],peakprefix,n_peak,int(10*peak["qscore"]) ) )
                 else:
-                    fhd.write( "%s\t%d\t%d\t%s%d\t%d\t.\t%s\t%s\t0\t%d\t%s\t%s\n"
-                               %
-                               (chrom, peak["start"], peak["end"], peakprefix, n_peak, int(10*peak["qscore"]),
-                                peak["thickStart"], peak["thickEnd"],
-                                peak["blockNum"], peak["blockSizes"], peak["blockStarts"] ))
+                    write( "%s\t%d\t%d\t%s%d\t%d\t.\t%s\t%s\t0\t%d\t%s\t%s\n"
+                           %
+                           (chrom, peak["start"], peak["end"], peakprefix, n_peak, int(10*peak["qscore"]),
+                            peak["thickStart"], peak["thickEnd"],
+                            peak["blockNum"], peak["blockSizes"], peak["blockStarts"] ))
 
 
-    def write_to_broadPeak (self, fhd, name_prefix="peak_", name='peak', description="%s", trackline=True):
+    def write_to_broadPeak (self, fhd, name_prefix=b"peak_", name=b'peak', description=b"", trackline=True):
         """Print out peaks in broadPeak format.
 
         This format is designed for ENCODE project, and basically a
@@ -1096,13 +1091,12 @@ cdef class BroadPeakIO:
         
         """
         cdef int n_peak
-        cdef str chrom
+        cdef bytes chrom
         cdef long s
 
-        chrs = self.peaks.keys()
-        chrs.sort()
+        chrs = sorted(self.peaks.keys())
         n_peak = 0
-        write = fhd.write
+        write = lambda x:fhd.write(x.encode())
         try: peakprefix = name_prefix % name
         except: peakprefix = name_prefix
         if trackline:
@@ -1119,7 +1113,7 @@ cdef class BroadPeakIO:
         return
 
 
-    def write_to_xls (self, ofhd, name_prefix="%s_peak_", name="MACS"):
+    def write_to_xls (self, ofhd, name_prefix=b"", name=b"MACS"):
         """Save the peak results in a tab-delimited plain text file
         with suffix .xls.
 
@@ -1127,15 +1121,15 @@ cdef class BroadPeakIO:
         wait... why I have two write_to_xls in this class?
         
         """
-        write = ofhd.write
+        print("MMMMMMMMM")
+        write = lambda x:ofhd.write(x.encode())
         write("\t".join(("chr","start", "end",  "length",  "pileup", "-log10(pvalue)", "fold_enrichment", "-log10(qvalue)", "name"))+"\n")
         
         try: peakprefix = name_prefix % name
         except: peakprefix = name_prefix
 
         peaks = self.peaks
-        chrs = peaks.keys()
-        chrs.sort()
+        chrs = sorted(peaks.keys())
         n_peak = 0
         for chrom in chrs:
             for end, group in groupby(peaks[chrom], key=itemgetter("end")):

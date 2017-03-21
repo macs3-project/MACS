@@ -19,6 +19,7 @@ with the distribution).
 # ------------------------------------
 import numpy as np
 cimport numpy as np
+from functools import reduce
 
 from copy import copy
 

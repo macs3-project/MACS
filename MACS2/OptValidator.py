@@ -52,7 +52,7 @@ def opt_validate ( options ):
             options.gsize = float(options.gsize)
         except:
             logging.error("Error when interpreting --gsize option: %s" % options.gsize)
-            logging.error("Available shortcuts of effective genome sizes are %s" % ",".join(efgsize.keys()))
+            logging.error("Available shortcuts of effective genome sizes are %s" % ",".join(list(efgsize.keys())))
             sys.exit(1)
 
     # format
@@ -201,7 +201,7 @@ def opt_validate ( options ):
             options.argtxt += "# Larger dataset will be scaled towards smaller dataset.\n"
 
     if options.ratio != 1.0:
-	options.argtxt += "# Using a custom scaling factor: %.2e\n" % (options.ratio)
+        options.argtxt += "# Using a custom scaling factor: %.2e\n" % (options.ratio)
 	
     if options.cfile:
         options.argtxt += "# Range for calculating regional lambda is: %d bps and %d bps\n" % (options.smalllocal,options.largelocal)
@@ -350,7 +350,7 @@ def opt_validate_filterdup ( options ):
             options.gsize = float(options.gsize)
         except:
             logging.error("Error when interpreting --gsize option: %s" % options.gsize)
-            logging.error("Available shortcuts of effective genome sizes are %s" % ",".join(efgsize.keys()))
+            logging.error("Available shortcuts of effective genome sizes are %s" % ",".join(list(efgsize.keys())))
             sys.exit(1)
 
     # format
@@ -524,7 +524,7 @@ def opt_validate_predictd ( options ):
             options.gsize = float(options.gsize)
         except:
             logging.error("Error when interpreting --gsize option: %s" % options.gsize)
-            logging.error("Available shortcuts of effective genome sizes are %s" % ",".join(efgsize.keys()))
+            logging.error("Available shortcuts of effective genome sizes are %s" % ",".join(list(efgsize.keys())))
             sys.exit(1)
 
     # format

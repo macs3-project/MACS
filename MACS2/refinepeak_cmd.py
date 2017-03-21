@@ -68,7 +68,7 @@ def run( o_options ):
     fwtrack = load_tag_files_options (options)
     
     retval = fwtrack.compute_region_tags_from_peaks( peaks, find_summit, window_size = options.windowsize, cutoff = options.cutoff )
-    outputfile.write( "\n".join( map(lambda x: "%s\t%d\t%d\t%s\t%.2f" % x , retval) ) )
+    outputfile.write( "\n".join( ["%s\t%d\t%d\t%s\t%.2f" % x for x in retval] ) )
     info("Done!")
 
 def find_summit(chrom, plus, minus, peak_start, peak_end, name = "peak", window_size=100, cutoff = 5):

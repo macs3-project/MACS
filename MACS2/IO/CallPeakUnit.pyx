@@ -25,7 +25,7 @@ from collections import Counter
 from copy import copy
 
 from operator import itemgetter
-import cPickle
+import _pickle as cPickle
 from tempfile import mkstemp
 import os
 
@@ -150,7 +150,7 @@ cdef inline list getitem_then_subtract ( list peakset, int start ):
     
     a = map(itemgetter("start"), peakset)
     for i in range(len(a)):
-        a[i] = str(a[i] - start)
+        a[i] = str(a[i] - start).encode()
     return a
 
 cdef inline int32_t left_sum ( data, int pos, int width ):
@@ -302,10 +302,10 @@ cdef class CallerFromAlignments:
         bool no_lambda_flag              # whether ignore local bias, and to use global bias instead
         bool PE_mode                     # whether it's in PE mode, will be detected during initiation
         # temporary data buffer
-        str chrom                        # name of current chromosome
+        bytes chrom                        # name of current chromosome
         list chr_pos_treat_ctrl          # temporary [position, treat_pileup, ctrl_pileup] for a given chromosome
-        char * bedGraph_treat_filename
-        char * bedGraph_control_filename
+        str bedGraph_treat_filename
+        str bedGraph_control_filename
         FILE * bedGraph_treat_f
         FILE * bedGraph_ctrl_f
         #object bedGraph_treat            # file handler to write ChIP pileup
@@ -332,7 +332,7 @@ cdef class CallerFromAlignments:
                   int end_shift = 0, 
                   float lambda_bg = 0, 
                   bool save_bedGraph = False,
-                  str  bedGraph_filename_prefix = "PREFIX",
+                  str bedGraph_filename_prefix = "PREFIX",
                   str bedGraph_treat_filename = "TREAT.bdg",
                   str bedGraph_control_filename = "CTRL.bdg",
                   str cutoff_analysis_filename = "TMP.txt",
@@ -397,10 +397,10 @@ cdef class CallerFromAlignments:
         self.bedGraph_filename_prefix =  bedGraph_filename_prefix
         #tmp_bytes = bedGraph_treat_filename.encode('UTF-8')
         #print bedGraph_treat_filename, tmp_bytes
-        self.bedGraph_treat_filename = <bytes>bedGraph_treat_filename
+        self.bedGraph_treat_filename = bedGraph_treat_filename
         #tmp_bytes = bedGraph_control_filename.encode('UTF-8')
         #print bedGraph_control_filename, tmp_bytes
-        self.bedGraph_control_filename = <bytes>bedGraph_control_filename
+        self.bedGraph_control_filename = bedGraph_control_filename
 
         if not self.ctrl_d_s or not self.ctrl_scaling_factor_s:
             self.no_lambda_flag = True
@@ -447,7 +447,7 @@ cdef class CallerFromAlignments:
         """
         self.trackline = True
 
-    cdef __pileup_treat_ctrl_a_chromosome ( self, str chrom ):
+    cdef __pileup_treat_ctrl_a_chromosome ( self, bytes chrom ):
         """After this function is called, self.chr_pos_treat_ctrl will
         be reset and assigned to the pileup values of the given
         chromosome.
@@ -466,7 +466,7 @@ cdef class CallerFromAlignments:
         # values.
         if self.pileup_data_files.has_key( chrom ):
             try:
-                f = file( self.pileup_data_files[ chrom ],"rb" )
+                f = open( self.pileup_data_files[ chrom ],"rb" )
                 self.chr_pos_treat_ctrl = cPickle.load( f )
                 f.close()
                 return
@@ -519,7 +519,7 @@ cdef class CallerFromAlignments:
 
         # save data to temporary file
         try:
-            f = file(self.pileup_data_files[ chrom ],"wb")
+            f = open(self.pileup_data_files[ chrom ],"wb")
             cPickle.dump( self.chr_pos_treat_ctrl, f , protocol=2 )
             f.close()
         except:
@@ -644,7 +644,7 @@ cdef class CallerFromAlignments:
         
         """
         cdef:
-            str chrom
+            bytes chrom
             np.ndarray pos_array, treat_array, ctrl_array, score_array
             dict pvalue_stat = {}
             long n, pre_p, length, j, pre_l, l, i
@@ -724,7 +724,7 @@ cdef class CallerFromAlignments:
         
         """
         cdef:
-            str chrom
+            bytes chrom
             np.ndarray pos_array, treat_array, ctrl_array, score_array
             dict pvalue_stat = {}
             long n, pre_p, this_p, length, j, pre_l, l, i
@@ -854,12 +854,12 @@ cdef class CallerFromAlignments:
         logging.debug( "access pq hash for %d times" % nhcal )
 
         # write pvalue and total length of predicted peaks
-        fhd = file( self.cutoff_analysis_filename, "w" )
-        fhd.write( "pscore\tqscore\tnpeaks\tlpeaks\tavelpeak\n" )
+        fhd = open( self.cutoff_analysis_filename, "wb" )
+        fhd.write( b"pscore\tqscore\tnpeaks\tlpeaks\tavelpeak\n" )
         x = []
         y = []
         for cutoff in tmplist:
-            fhd.write( "%.2f\t%.2f\t%d\t%d\t%.2f\n" % ( cutoff, self.pqtable[ cutoff ], self.pvalue_npeaks[ cutoff ], self.pvalue_length[ cutoff ], self.pvalue_length[ cutoff ]/self.pvalue_npeaks[ cutoff ] ) )
+            fhd.write( ("%.2f\t%.2f\t%d\t%d\t%.2f\n" % ( cutoff, self.pqtable[ cutoff ], self.pvalue_npeaks[ cutoff ], self.pvalue_length[ cutoff ], self.pvalue_length[ cutoff ]/self.pvalue_npeaks[ cutoff ] )).encode() )
             x.append( cutoff )
             y.append( self.pvalue_length[ cutoff ] )
         fhd.close()
@@ -882,8 +882,8 @@ cdef class CallerFromAlignments:
         save_bedGraph     : whether or not to save pileup and control into a bedGraph file
         """
         cdef:
-            str chrom
-            str s
+            bytes chrom
+            bytes s
             bytes tmp_bytes
 
         peaks = PeakIO()
@@ -900,12 +900,12 @@ cdef class CallerFromAlignments:
 
         # prepare bedGraph file
         if self.save_bedGraph:
-            self.bedGraph_treat_f = fopen( self.bedGraph_treat_filename, "w" )
-            self.bedGraph_ctrl_f = fopen( self.bedGraph_control_filename, "w" )
+            self.bedGraph_treat_f = fopen( self.bedGraph_treat_filename.encode(), "wb" )
+            self.bedGraph_ctrl_f = fopen( self.bedGraph_control_filename.encode(), "wb" )
 
             logging.info ("#3 In the peak calling step, the following will be performed simultaneously:")
-            logging.info ("#3   Write bedGraph files for treatment pileup (after scaling if necessary)... %s" % self.bedGraph_filename_prefix + "_treat_pileup.bdg")
-            logging.info ("#3   Write bedGraph files for control lambda (after scaling if necessary)... %s" % self.bedGraph_filename_prefix + "_control_lambda.bdg")
+            logging.info ("#3   Write bedGraph files for treatment pileup (after scaling if necessary)... %s" % self.bedGraph_filename_prefix + b"_treat_pileup.bdg")
+            logging.info ("#3   Write bedGraph files for control lambda (after scaling if necessary)... %s" % self.bedGraph_filename_prefix + b"_control_lambda.bdg")
 
             if self.save_SPMR:
                 logging.info ( "#3   --SPMR is requested, so pileup will be normalized by sequencing depth in million reads." )
@@ -937,7 +937,7 @@ cdef class CallerFromAlignments:
 
         return peaks
 
-    cdef __chrom_call_peak_using_certain_criteria ( self, peaks, str chrom, list scoring_function_s, list score_cutoff_s, int min_length, 
+    cdef __chrom_call_peak_using_certain_criteria ( self, peaks, bytes chrom, list scoring_function_s, list score_cutoff_s, int min_length, 
                                                    int max_gap, bool call_summits, bool save_bedGraph ):
         """ Call peaks for a chromosome.
 
@@ -950,7 +950,7 @@ cdef class CallerFromAlignments:
         cdef:
             double t0
             int i, n
-            str s
+            bytes s
             np.ndarray above_cutoff
             np.ndarray[np.int32_t, ndim=1] above_cutoff_endpos, above_cutoff_startpos, pos_array, above_cutoff_index_array
 
@@ -991,13 +991,13 @@ cdef class CallerFromAlignments:
         score_array_s = []
         for i in range(len(scoring_function_s)):
             s = scoring_function_s[i]
-            if s == 'p':
+            if s == b'p':
                 score_array_s.append( self.__cal_pscore( treat_array, ctrl_array ) )
-            elif s == 'q':
+            elif s == b'q':
                 score_array_s.append( self.__cal_qscore( treat_array, ctrl_array ) )
-            elif s == 'f':
+            elif s == b'f':
                 score_array_s.append( self.__cal_FE( treat_array, ctrl_array ) )
-            elif s == 's':
+            elif s == b's':
                 score_array_s.append( self.__cal_subtraction( treat_array, ctrl_array ) )
 
         #self.test_time += ttime() - t0
@@ -1076,7 +1076,7 @@ cdef class CallerFromAlignments:
         return peaks
 
     cdef bool __close_peak_wo_subpeaks (self, list peak_content, peaks, int min_length,
-                                          str chrom, int smoothlen, list score_array_s, list score_cutoff_s=[]):
+                                          bytes chrom, int smoothlen, list score_array_s, list score_cutoff_s=[]):
         """Close the peak region, output peak boundaries, peak summit
         and scores, then add the peak to peakIO object.
 
@@ -1136,7 +1136,7 @@ cdef class CallerFromAlignments:
             return True
 
     cdef bool __close_peak_with_subpeaks (self, list peak_content, peaks, int min_length,
-                                         str chrom, int smoothlen, list score_array_s, list score_cutoff_s=[],
+                                         bytes chrom, int smoothlen, list score_array_s, list score_cutoff_s=[],
                                          float min_valley = 0.9 ):
         """Algorithm implemented by Ben, to profile the pileup signals
         within a peak region then find subpeak summits. This method is
@@ -1184,7 +1184,7 @@ cdef class CallerFromAlignments:
         else:
             # remove maxima that occurred in padding
             m = np.searchsorted(summit_offsets, start_boundary)
-            n = np.searchsorted(summit_offsets, peak_length + start_boundary, 'right')
+            n = np.searchsorted(summit_offsets, peak_length + start_boundary, side='right')
             summit_offsets = summit_offsets[m:n]
         
         summit_offsets = enforce_peakyness(peakdata, summit_offsets)
@@ -1356,7 +1356,7 @@ cdef class CallerFromAlignments:
         return s
 
 
-    cdef bool __write_bedGraph_for_a_chromosome ( self, str chrom ):
+    cdef bool __write_bedGraph_for_a_chromosome ( self, bytes chrom ):
         """Write treat/control values for a certain chromosome into a
         specified file handler.
 
@@ -1459,7 +1459,7 @@ cdef class CallerFromAlignments:
         """
         cdef:
             int i, j
-            str chrom
+            bytes chrom
             object lvl1peaks, lvl1peakschrom, lvl1
             object lvl2peaks, lvl2peakschrom, lvl2
             object broadpeaks
@@ -1481,11 +1481,11 @@ cdef class CallerFromAlignments:
         # prepare bedGraph file
         if self.save_bedGraph:
 
-            self.bedGraph_treat_f = fopen( self.bedGraph_treat_filename, "w" )
-            self.bedGraph_ctrl_f = fopen( self.bedGraph_control_filename, "w" )
+            self.bedGraph_treat_f = fopen( self.bedGraph_treat_filename.encode(), "wb" )
+            self.bedGraph_ctrl_f = fopen( self.bedGraph_control_filename.encode(), "wb" )
             logging.info ("#3 In the peak calling step, the following will be performed simultaneously:")
-            logging.info ("#3   Write bedGraph files for treatment pileup (after scaling if necessary)... %s" % self.bedGraph_filename_prefix + "_treat_pileup.bdg")
-            logging.info ("#3   Write bedGraph files for control lambda (after scaling if necessary)... %s" % self.bedGraph_filename_prefix + "_control_lambda.bdg")
+            logging.info ("#3   Write bedGraph files for treatment pileup (after scaling if necessary)... %s" % self.bedGraph_filename_prefix + b"_treat_pileup.bdg")
+            logging.info ("#3   Write bedGraph files for control lambda (after scaling if necessary)... %s" % self.bedGraph_filename_prefix + b"_control_lambda.bdg")
 
             if self.trackline:
                 # this line is REQUIRED by the wiggle format for UCSC browser
@@ -1548,7 +1548,7 @@ cdef class CallerFromAlignments:
 
         return broadpeaks
 
-    cdef __chrom_call_broadpeak_using_certain_criteria ( self, lvl1peaks, lvl2peaks, str chrom, list scoring_function_s, list lvl1_cutoff_s, list lvl2_cutoff_s,
+    cdef __chrom_call_broadpeak_using_certain_criteria ( self, lvl1peaks, lvl2peaks, bytes chrom, list scoring_function_s, list lvl1_cutoff_s, list lvl2_cutoff_s,
                                                          int min_length, int lvl1_max_gap, int lvl2_max_gap, bool save_bedGraph):
         """ Call peaks for a chromosome.
 
@@ -1560,7 +1560,7 @@ cdef class CallerFromAlignments:
         """
         cdef:
             int i
-            str s
+            bytes s
             np.ndarray above_cutoff, above_cutoff_endpos, above_cutoff_startpos
             np.ndarray pos_array, treat_array, ctrl_array
             np.ndarray above_cutoff_index_array
@@ -1587,13 +1587,13 @@ cdef class CallerFromAlignments:
         score_array_s = []
         for i in range(len(scoring_function_s)):
             s = scoring_function_s[i]
-            if s == 'p':
+            if s == b'p':
                 score_array_s.append( self.__cal_pscore( treat_array, ctrl_array ) )
-            elif s == 'q':
+            elif s == b'q':
                 score_array_s.append( self.__cal_qscore( treat_array, ctrl_array ) )
-            elif s == 'f':
+            elif s == b'f':
                 score_array_s.append( self.__cal_FE( treat_array, ctrl_array ) )
-            elif s == 's':
+            elif s == b's':
                 score_array_s.append( self.__cal_subtraction( treat_array, ctrl_array ) )
 
         # lvl1 : strong peaks
@@ -1725,7 +1725,7 @@ cdef class CallerFromAlignments:
         return
 
     cdef bool __close_peak_for_broad_region (self, list peak_content, peaks, int min_length,
-                                             str chrom, int smoothlen, list score_array_s, list score_cutoff_s=[]):
+                                             bytes chrom, int smoothlen, list score_array_s, list score_cutoff_s=[]):
         """Close the broad peak region, output peak boundaries, peak summit
         and scores, then add the peak to peakIO object.
 
@@ -1774,7 +1774,7 @@ cdef class CallerFromAlignments:
             # start a new peak
             return True
 
-    cdef __add_broadpeak (self, bpeaks, str chrom, object lvl2peak, list lvl1peakset):
+    cdef __add_broadpeak (self, bpeaks, bytes chrom, object lvl2peak, list lvl1peakset):
         """Internal function to create broad peak.
 
         *Note* lvl1peakset/strong_regions might be empty
@@ -1782,7 +1782,7 @@ cdef class CallerFromAlignments:
         
         cdef:
             int blockNum, start, end
-            str blockSizes, blockStarts, thickStart, thickEnd, 
+            bytes blockSizes, blockStarts, thickStart, thickEnd, 
 
         #print lvl2peak["start"], lvl2peak["end"], lvl2peak["score"]
         start      = lvl2peak["start"]
@@ -1792,8 +1792,8 @@ cdef class CallerFromAlignments:
             #try:
             # will complement by adding 1bps start and end to this region
             # may change in the future if gappedPeak format was improved.
-            bpeaks.add(chrom, start, end, score=lvl2peak["score"], thickStart=str(start), thickEnd=str(end),
-                       blockNum = 2, blockSizes = "1,1", blockStarts = "0,"+str(end-start-1), pileup = lvl2peak["pileup"],
+            bpeaks.add(chrom, start, end, score=lvl2peak["score"], thickStart=str(start).encode(), thickEnd=str(end).encode(),
+                       blockNum = 2, blockSizes = b"1,1", blockStarts = b"0,"+str(end-start-1).encode(), pileup = lvl2peak["pileup"],
                        pscore = lvl2peak["pscore"], fold_change = lvl2peak["fc"],
                        qscore = lvl2peak["qscore"] )
             #except:
@@ -1804,25 +1804,25 @@ cdef class CallerFromAlignments:
             #    raise Exception("quit")
             return bpeaks
 
-        thickStart = str(lvl1peakset[0]["start"])
-        thickEnd   = str(lvl1peakset[-1]["end"])
+        thickStart = lvl1peakset[0]["start"].encode()
+        thickEnd   = lvl1peakset[-1]["end"].encode()
         blockNum   = int(len(lvl1peakset))
-        blockSizes = ",".join(map(str,map(itemgetter("length"),lvl1peakset))) #join( map(lambda x:str(x["length"]),lvl1peakset) )
-        blockStarts = ",".join(getitem_then_subtract(lvl1peakset, start))     #join( map(lambda x:str(x["start"]-start),lvl1peakset) )
+        blockSizes = ",".join(map(str,map(itemgetter("length"),lvl1peakset))).encode() #join( map(lambda x:str(x["length"]),lvl1peakset) )
+        blockStarts = ",".join(getitem_then_subtract(lvl1peakset, start)).encode()     #join( map(lambda x:str(x["start"]-start),lvl1peakset) )
 
         # add 1bp left and/or right block if necessary
         if int(thickStart) != start:
             # add 1bp left block
-            thickStart = str(start)
+            thickStart = str(start).encode()
             blockNum += 1
-            blockSizes = "1,"+blockSizes
-            blockStarts = "0,"+blockStarts
+            blockSizes = b"1,"+blockSizes
+            blockStarts = b"0,"+blockStarts
         if int(thickEnd) != end:
             # add 1bp right block
-            thickEnd = str(end)
+            thickEnd = str(end).encode()
             blockNum += 1
-            blockSizes = blockSizes+",1"
-            blockStarts = blockStarts+","+str(end-start-1)
+            blockSizes = blockSizes+b",1"
+            blockStarts = blockStarts+b","+str(end-start-1).encode()
         
         bpeaks.add(chrom, start, end, score=lvl2peak["score"], thickStart=thickStart, thickEnd=thickEnd,
                    blockNum = blockNum, blockSizes = blockSizes, blockStarts = blockStarts, pileup = lvl2peak["pileup"],
@@ -1848,7 +1848,7 @@ cdef class CallerFromAlignments:
         cdef:
             int32_t c, m, i, j, pre_i, pre_j, pos, startpos, endpos
             np.ndarray plus, minus, rt_plus, rt_minus
-            str chrom
+            bytes chrom
             list temp, retval, pchrnames, cpeaks
             np.ndarray adjusted_summits, passflags
 
