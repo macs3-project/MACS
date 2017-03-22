@@ -1,4 +1,4 @@
-# Time-stamp: <2017-03-21 15:54:26 Tao Liu>
+# Time-stamp: <2017-03-22 09:58:45 Tao Liu>
 
 """Module for Calculate Scores.
 
@@ -906,8 +906,8 @@ cdef class CallerFromAlignments:
             self.bedGraph_ctrl_f = fopen( self.bedGraph_control_filename.encode(), "wb" )
 
             logging.info ("#3 In the peak calling step, the following will be performed simultaneously:")
-            logging.info ("#3   Write bedGraph files for treatment pileup (after scaling if necessary)... %s" % self.bedGraph_filename_prefix + b"_treat_pileup.bdg")
-            logging.info ("#3   Write bedGraph files for control lambda (after scaling if necessary)... %s" % self.bedGraph_filename_prefix + b"_control_lambda.bdg")
+            logging.info ("#3   Write bedGraph files for treatment pileup (after scaling if necessary)... %s" % self.bedGraph_filename_prefix + "_treat_pileup.bdg")
+            logging.info ("#3   Write bedGraph files for control lambda (after scaling if necessary)... %s" % self.bedGraph_filename_prefix + "_control_lambda.bdg")
 
             if self.save_SPMR:
                 logging.info ( "#3   --SPMR is requested, so pileup will be normalized by sequencing depth in million reads." )
@@ -1375,7 +1375,7 @@ cdef class CallerFromAlignments:
             float denominator # 1 if save_SPMR is false, or depth in million if save_SPMR is true. Note, while piling up and calling peaks, treatment and control have been scaled to the same depth, so we need to find what this 'depth' is.
             FILE * ft
             FILE * fc
-            bytes tmp_bytes
+            bytes tmp_bytes,ttttt
 
         [pos_array, treat_array, ctrl_array] = self.chr_pos_treat_ctrl
         pos_array_ptr = <int32_t *> pos_array.data
@@ -1418,27 +1418,19 @@ cdef class CallerFromAlignments:
             ctrl_array_ptr += 1
 
             if abs(pre_v_t - v_t) > 1e-5: # precision is 5 digits
-                tmp_bytes = ("%s\t%d\t%d\t%.5f\n" % ( chrom, pre_p_t, p, pre_v_t )).encode()
-                #t_write_func( "%s\t%d\t%d\t%.5f\n" % ( chrom, pre_p_t, p, pre_v_t ) )
-                fprintf( ft, tmp_bytes )
+                fprintf( ft, b"%s\t%d\t%d\t%.5f\n" % ( chrom, pre_p_t, p, pre_v_t ) )
                 pre_v_t = v_t
                 pre_p_t = p
 
             if abs(pre_v_c - v_c) > 1e-5: # precision is 5 digits
-                tmp_bytes = ("%s\t%d\t%d\t%.5f\n" % ( chrom, pre_p_c, p, pre_v_c )).encode()
-                fprintf( fc, tmp_bytes )
-                #c_write_func( "%s\t%d\t%d\t%.5f\n" % ( chrom, pre_p_c, p, pre_v_c ) )
+                fprintf( fc, b"%s\t%d\t%d\t%.5f\n" % ( chrom, pre_p_c, p, pre_v_c ) )
                 pre_v_c = v_c
                 pre_p_c = p
 
         p = pos_array_ptr[ 0 ]
         # last one
-        tmp_bytes = ("%s\t%d\t%d\t%.5f\n" % ( chrom, pre_p_t, p, pre_v_t )).encode()
-        fprintf( ft, tmp_bytes )
-        tmp_bytes = ("%s\t%d\t%d\t%.5f\n" % ( chrom, pre_p_c, p, pre_v_c )).encode()
-        fprintf( fc, tmp_bytes )
-        #t_write_func( "%s\t%d\t%d\t%.5f\n" % ( chrom, pre_p_t, p, pre_v_t ) )
-        #c_write_func( "%s\t%d\t%d\t%.5f\n" % ( chrom, pre_p_c, p, pre_v_c ) )
+        fprintf( ft, b"%s\t%d\t%d\t%.5f\n" % ( chrom, pre_p_t, p, pre_v_t ) )
+        fprintf( fc, b"%s\t%d\t%d\t%.5f\n" % ( chrom, pre_p_c, p, pre_v_c ) )
             
         return True
 
