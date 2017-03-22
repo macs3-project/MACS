@@ -343,7 +343,7 @@ class PeakDetect:
         call_summits = self.opt.call_summits
         if call_summits: self.info("#3 Going to call summits inside each peak ...")
 
-        if self.log_pvalue:
+        if self.log_pvalue != None:
             if self.opt.broad:
                 self.info("#3 Call broad peaks with given level1 -log10pvalue cutoff and level2: %.5f, %.5f..." % (self.log_pvalue,self.opt.log_broadcutoff) )
                 peaks = scorecalculator.call_broadpeaks(['p',], lvl1_cutoff_s=[self.log_pvalue,],lvl2_cutoff_s=[self.opt.log_broadcutoff,],min_length=self.d,
@@ -355,7 +355,7 @@ class PeakDetect:
                                                     max_gap=self.opt.tsize,
                                                     call_summits=call_summits,
                                                     auto_cutoff=self.opt.cutoff_analysis )
-        elif self.log_qvalue:
+        elif self.log_qvalue != None:
             if self.opt.broad:
                 self.info("#3 Call broad peaks with given level1 -log10qvalue cutoff and level2: %f, %f..." % (self.log_qvalue,self.opt.log_broadcutoff) )
                 peaks = scorecalculator.call_broadpeaks(['q',], lvl1_cutoff_s=[self.log_qvalue,],lvl2_cutoff_s=[self.opt.log_broadcutoff,],min_length=self.d,
