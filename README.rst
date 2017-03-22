@@ -1,7 +1,7 @@
 ========================
-README for MACS (2.1.0)
+README for MACS (2.1.2)
 ========================
-Time-stamp: <2016-02-15 15:31:42 Tao Liu>
+Time-stamp: <2017-03-22 10:03:42 Tao Liu>
 
 Introduction
 ============

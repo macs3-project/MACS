@@ -1,3 +1,8 @@
+2017-03-22  Tao Liu  <vladimir.liu@gmail.com>
+	MACS version 2.1.2 20170320 (Python3)
+
+	* MACS2 is ported to Python3.
+
 2016-03-09  Tao Liu  <vladimir.liu@gmail.com>
 	MACS version 2.1.1 20160309
 

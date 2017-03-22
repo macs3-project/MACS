@@ -1,31 +1,31 @@
 ======================
 INSTALL Guide For MACS
 ======================
-Time-stamp: <2014-06-17 15:27:24 Tao Liu>
+Time-stamp: <2017-03-22 10:51:38 Tao Liu>
 
 Please check the following instructions to complete your installation.
 
 Prerequisites
 =============
 
-Python version must be equal to *2.7* to run MACS. I recommend
-using the version *2.7.2*.
+Python version must be equal to *3.6* to run this version of MACS2. I recommend
+using the version *3.6.0*.
 
-Numpy_ (>=1.6) are required to run MACS v2. 
+Numpy_ (>=1.12) is required to run MACS v2. 
 
 GCC is required to compile ``.c`` codes in MACS v2 package, and python
 header files are needed. If you are using Mac OSX, I recommend you
 install Xcode; if you are using Linux, you need to make sure
 ``python-dev`` is installed.
 
-Cython_ (>=0.18) is required *only if* you want to regenerate ``.c``
+Cython_ (>=0.25) is required *only if* you want to regenerate ``.c``
 files from ``.pyx`` files using ``setup_w_cython.py`` script.
 
 .. _Numpy: http://www.scipy.org/Download
 .. _Cython: http://cython.org/
 
-Easy installation through PyPI
-==============================
+Easy installation through PyPI (NOT READY YET)
+==============================================
 
 The easiest way to install MACS2 is through PyPI system. Get pip_ if
 it's not available in your system. *Note* if you have already
