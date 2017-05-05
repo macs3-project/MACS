@@ -351,7 +351,8 @@ cdef class PETrackI:
             # hope there would be no mem leak...
     
             self.__locations[k] = new_locs
-            self.__dup_locations[k] = dup_locs
+            if size > 1:
+                self.__dup_locations[k] = dup_locs
         self.average_template_length = float( self.length ) / self.total
         return
     
