@@ -278,7 +278,7 @@ model building.
 ```````````
 
 The qvalue (minimum FDR) cutoff to call significant regions. Default
-is 0.01. For broad marks, you can try 0.05 as cutoff. Q-values are
+is 0.05. For broad marks, you can try 0.05 as cutoff. Q-values are
 calculated from p-values using Benjamini-Hochberg procedure.
 
 -p/--pvalue
