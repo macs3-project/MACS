@@ -305,9 +305,9 @@ def run( args ):
     peakdetect.peaks.write_to_xls(ofhd_xls, name = options.name)
     ofhd_xls.close()
     #4.2 peaks in BED
-    if options.log_pvalue:
+    if options.log_pvalue != None:
         score_column = "pscore"
-    elif options.log_qvalue:
+    elif options.log_qvalue != None:
         score_column = "qscore"
     #4.2 peaks in narrowPeak
     if not options.broad:
