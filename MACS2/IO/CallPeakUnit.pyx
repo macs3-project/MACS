@@ -1,4 +1,4 @@
-# Time-stamp: <2017-03-22 09:58:45 Tao Liu>
+# Time-stamp: <2017-07-14 14:58:00 Tao Liu>
 
 """Module for Calculate Scores.
 
@@ -1783,6 +1783,8 @@ cdef class CallerFromAlignments:
         end        = lvl2peak["end"]
 
         if not lvl1peakset:
+            #7/15/2017: I need to reconsider this
+
             #try:
             # will complement by adding 1bps start and end to this region
             # may change in the future if gappedPeak format was improved.
