@@ -199,7 +199,7 @@ def run( args ):
                     warn("#2 You can restart the process with --nomodel --extsize XXX with your choice or an arbitrary number. Nontheless, MACS will continute computing.")
                 
         except NotEnoughPairsException:
-            logging.error("If the model can't be built with greater MFOLD, we suggest to use --nomodel and --extsize 147 or other fixed number instead.")
+            warn("If the model can't be built with greater MFOLD, we suggest to use --nomodel and --extsize 147 or other fixed number instead.")
             if not options.onauto:
                 sys.exit(1)
             warn("#2 Skipped...")
