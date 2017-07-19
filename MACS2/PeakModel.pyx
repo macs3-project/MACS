@@ -141,9 +141,8 @@ cdef class PeakModel:
 
         self.info("#2 number of paired peaks: %d" % (num_paired_peakpos))
         if num_paired_peakpos < 100:
-            self.error("Too few paired peaks (%d) so I can not build the model! Broader your MFOLD range parameter may erase this error. If it still can't build the model, we suggest to use --nomodel and --extsize 147 or other fixed number instead." % (num_paired_peakpos))
-            self.error("Process for pairing-model is terminated!")
-            raise NotEnoughPairsException("No enough pairs to build model")
+            self.error("Too few paired peaks (%d) so I can not build the model, terminating process for pairing-model. A greater MFOLD range parameter may erase this error." % (num_paired_peakpos))
+            raise NotEnoughPairsException("Not enough pairs to build model")
         elif num_paired_peakpos < self.max_pairnum:
             self.warn("Fewer paired peaks (%d) than %d! Model may not be build well! Lower your MFOLD parameter may erase this warning. Now I will use %d pairs to build model!" % (num_paired_peakpos,self.max_pairnum,num_paired_peakpos_picked))
         self.debug("Use %d pairs to build the model." % (num_paired_peakpos_picked))
