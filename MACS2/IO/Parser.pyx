@@ -1063,7 +1063,7 @@ cdef class BAMPEParser(BAMParser):
                 info(" %d" % (m*1000000))
             add_loc(references[read.ref], read.start, read.start + read.tlen)
         self.n = i
-        self.d = int(d)
+        self.d = int(round(d))
         assert d >= 0, "Something went wrong (mean fragment size was negative)"
         self.fhd.close()
         petrack.set_rlengths( rlengths )
