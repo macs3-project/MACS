@@ -1031,7 +1031,7 @@ cdef class BAMPEParser(BAMParser):
             int *asint
             list references
             dict rlengths
-            float d = 0.0
+            double d = 0.0
             str rawread
             str rawentrylength
             _BAMPEParsed read
