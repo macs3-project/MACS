@@ -53,6 +53,17 @@ def main():
 
     if subcommand == "callpeak":
         # General call peak
+        # Check if the base directory of the --name argument exits.  This
+        # prevents MACS peak calling and then failing to write the output when
+        # the --name argument is used.
+        if args.name:
+            name_dir = os.path.dirname(args.name)
+            if not os.path.exists(name_dir):
+                try:
+                    os.makedirs(name_dir)
+                except:
+                    sys.exit("Base directory %s of --name argument could not be created. Terminating program." % name_dir)
+
         from MACS2.callpeak_cmd import run
         run( args )
     #elif subcommand == "diffpeak":
