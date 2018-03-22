@@ -73,7 +73,7 @@ def run( args ):
     else:       (treat, control) = load_tag_files_options  (options)
     if control is not None: check_names(treat, control, error)
 
-    info("#1 %s size = %d", tag, options.tsize)
+    info("#1 %s size = %.1f", tag, options.tsize)
     tagsinfo  = "# %s size is determined as %d bps\n" % (tag, options.tsize)
     
     t0 = treat.total
@@ -156,22 +156,21 @@ def run( args ):
     info("#1 finished!")
 
     #2 Build Model
-    info("#2 Build Peak Model...")
-
     if options.nomodel:
-        info("#2 Skipped...")
+        #info("#2 Skipped...")
         if options.PE_MODE:
             #options.shiftsize = 0
             options.d = options.tsize
         else:
             options.d=options.extsize
+            info("#2 Use %d as fragment length" % (options.d))
         if options.shift > 0:
             info("#2 Sequencing ends will be shifted towards 3' by %d bp(s)" % (options.shift))
         elif options.shift < 0:
             info("#2 Sequencing ends will be shifted towards 5' by %d bp(s)" % (options.shift * -1))
-        info("#2 Use %d as fragment length" % (options.d))
         options.scanwindow=2*options.d  # remove the effect of --bw
     else:
+        info("#2 Build Peak Model...")
         try:
             peakmodel = PeakModel(treatment = treat,
                                   max_pairnum = MAX_PAIRNUM,
@@ -381,10 +380,10 @@ def load_frag_files_options ( options ):
         control.finalize()
     else:
         control = None
-    options.info("#1 mean fragment size is determined as %d bp from treatment" % options.tsize)
+    options.info("#1 mean fragment size is determined as %.1f bp from treatment" % options.tsize)
 #    options.info("#1 fragment size variance is determined as %d bp from treatment" % tp.variance)
     if control is not None:
-        options.info("#1 note: mean fragment size in control is %d bp -- value ignored" % control_d)
+        options.info("#1 note: mean fragment size in control is %.1f bp -- value ignored" % control_d)
     return (treat, control)
 
 def load_tag_files_options ( options ):
