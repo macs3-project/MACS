@@ -156,8 +156,10 @@ def run( args ):
     info("#1 finished!")
 
     #2 Build Model
+    info("#2 Build Peak Model...")
+
     if options.nomodel:
-        #info("#2 Skipped...")
+        info("#2 Skipped...")
         if options.PE_MODE:
             #options.shiftsize = 0
             options.d = options.tsize
@@ -170,7 +172,6 @@ def run( args ):
             info("#2 Sequencing ends will be shifted towards 5' by %d bp(s)" % (options.shift * -1))
         options.scanwindow=2*options.d  # remove the effect of --bw
     else:
-        info("#2 Build Peak Model...")
         try:
             peakmodel = PeakModel(treatment = treat,
                                   max_pairnum = MAX_PAIRNUM,
