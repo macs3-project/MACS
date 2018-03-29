@@ -1,10 +1,6 @@
-cdef extern from "cStatistics.h":
-    float log10_poisson_cdf ( unsigned int n, float lam, short lower )
-    float log10_poisson_cdf_P_large_lambda ( unsigned int k, float lbd )
-    float log10_poisson_cdf_Q_large_lambda ( unsigned int k, float lbd )
-
 from khash cimport *
 from libc.math cimport log10, log
+from MACS2.Prob import poisson_cdf
 
 cdef class P_Score_Upper_Tail:
     """Unit to calculate -log10 poisson_CDF of upper tail and cache
@@ -46,7 +42,7 @@ cdef class P_Score_Upper_Tail:
             return self.pscore_dict[(x, l)]
         else:
             # calculate and cache
-            val = -1 * log10_poisson_cdf ( x, l, 0 )
+            val = -1 * poisson_cdf ( x, l, False, True )
             self.pscore_dict[(x, l)] = val
             return val
 
