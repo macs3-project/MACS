@@ -468,7 +468,7 @@ Output files
    can load it to UCSC genome browser. Definition of some specific
    columns are: 
    
-   - 5th: integer score for display
+   - 5th: integer score for display calculated as ``int(-10*log10qvalue)``. Please note that currently this value might be out of the [0-1000] range defined in UCSC Encode narrowPeak format<https://genome.ucsc.edu/FAQ/FAQformat.html#format12>
    - 7th: fold-change
    - 8th: -log10pvalue
    - 9th: -log10qvalue
