@@ -190,6 +190,9 @@ def opt_validate ( options ):
         else:
             options.argtxt +=  "# qvalue cutoff = %.2e\n" % (options.qvalue)
 
+    options.argtxt += "# max. gap between significant sites = %d\n" % options.maxgap
+    options.argtxt += "# min. length of peaks = %d\n" % options.minlen
+
     if options.downsample:
         options.argtxt += "# Larger dataset will be randomly sampled towards smaller dataset.\n"
         if options.seed >= 0:

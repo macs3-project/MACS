@@ -57,6 +57,7 @@ cdef inline int int_min(int a, int b): return a if a <= b else b
 LOG10_E = 0.43429448190325176
 
 pscore_khashtable = Int64HashTable()
+pscore_dict = dict()
 
 cdef inline double get_pscore ( int observed, double expectation ):
     """Get p-value score from Poisson test. First check existing
@@ -66,15 +67,12 @@ cdef inline double get_pscore ( int observed, double expectation ):
     """
     cdef:
         double score
-        long key_value
-    
-    #key_value = ( observed, expectation )
-    key_value = hash( (observed, expectation ) )
+
     try:
-        return pscore_khashtable.get_item(key_value)
+        return pscore_dict[(observed, expectation)]
     except KeyError:
         score = -1*poisson_cdf(observed,expectation,False,True)
-        pscore_khashtable.set_item(key_value, score)
+        pscore_dict[(observed, expectation)] = score
         return score
 
 asym_logLR_khashtable = Int64HashTable()

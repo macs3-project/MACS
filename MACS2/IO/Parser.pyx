@@ -356,7 +356,7 @@ cdef class BEDPEParser(GenericParser):
     """
 
     cdef public int n
-    cdef public int d
+    cdef public float d
 
     cdef __pe_parse_line ( self, str thisline ):
         """ Parse each line, and return chromosome, left and right positions
@@ -387,9 +387,8 @@ cdef class BEDPEParser(GenericParser):
             str chromname
             int left_pos
             int right_pos
-            long i = 0
-            long m = 0
-            float d = 0         # the average fragment size
+            long i = 0          # number of fragments
+            long m = 0          # sum of fragment lengths
 
         petrack = PETrackI( buffer_size = self.buffer_size )
         add_loc = petrack.add_loc
@@ -400,19 +399,18 @@ cdef class BEDPEParser(GenericParser):
                 continue
 
             assert right_pos > left_pos, "Right position must be larger than left position, check your BED file at line: %s" % thisline
-            d = ( d * i + right_pos-left_pos ) / ( i + 1 ) # keep track of avg fragment size
+            m += right_pos - left_pos
             i += 1
 
             if i % 1000000 == 0:
-                m += 1
-                logging.info( " %d" % ( m*1000000 ) )
+                logging.info( " %d" % i )
 
             add_loc( chromosome, left_pos, right_pos )
 
+        self.d = float( m ) / i
         self.n = i
-        self.d = int( d )
 
-        assert d >= 0, "Something went wrong (mean fragment size was negative)"
+        assert self.d >= 0, "Something went wrong (mean fragment size was negative)"
 
         self.close()
         petrack.set_rlengths( {"DUMMYCHROM":0} )
@@ -425,9 +423,8 @@ cdef class BEDPEParser(GenericParser):
             str chromname
             int left_pos
             int right_pos
-            long i = 0
-            long m = 0
-            float d = 0         # the average fragment size        
+            long i = 0          # number of fragments
+            long m = 0          # sum of fragment lengths
 
         add_loc = petrack.add_loc
 
@@ -438,19 +435,18 @@ cdef class BEDPEParser(GenericParser):
                 continue
 
             assert right_pos > left_pos, "Right position must be larger than left position, check your BED file at line: %s" % thisline
-            d = ( d * i + right_pos-left_pos ) / ( i + 1 ) # keep track of avg fragment size
+            m += right_pos - left_pos
             i += 1
 
             if i % 1000000 == 0:
-                m += 1
-                logging.info( " %d" % ( m*1000000 ) )
+                logging.info( " %d" % i )
 
             add_loc( chromosome, left_pos, right_pos )
 
-        self.d = int( self.d * self.n + d * i )/( self.n + i )
+        self.d = ( self.d * self.n + m ) / ( self.n + i )
         self.n += i
 
-        assert d >= 0, "Something went wrong (mean fragment size was negative)"
+        assert self.d >= 0, "Something went wrong (mean fragment size was negative)"
 
         self.close()
         petrack.set_rlengths( {"DUMMYCHROM":0} )
@@ -1019,19 +1015,18 @@ cdef class BAMPEParser(BAMParser):
     2048    supplementary alignment
     """
     cdef public int n           # total number of fragments
-    cdef public int d           # the average length of fragments in integar
+    cdef public float d         # the average length of fragments
 
     cpdef build_petrack ( self ):
         """Build PETrackI from all lines, return a FWTrack object.
         """
         cdef:
-            long i = 0
-            int m = 0
+            long i = 0          # number of fragments
+            long m = 0          # sum of fragment lengths
             int entrylength, fpos, chrid, tlen
             int *asint
             list references
             dict rlengths
-            float d = 0.0
             str rawread
             str rawentrylength
             _BAMPEParsed read
@@ -1055,16 +1050,16 @@ cdef class BAMPEParser(BAMParser):
             read = self.__pe_binary_parse(rawread)
             fseek(entrylength - 32, 1)
             if read.ref == -1: continue
-            d = (d * i + abs(read.tlen)) / (i + 1) # keep track of avg fragment size
+            tlen = abs(read.tlen)
+            m += tlen
             i += 1
-            
             if i % 1000000 == 0:
-                m += 1
-                info(" %d" % (m*1000000))
-            add_loc(references[read.ref], read.start, read.start + read.tlen)
+                info(" %d" % i)
+            add_loc(references[read.ref], read.start, read.start + tlen)
+
+        self.d = float( m ) / i
         self.n = i
-        self.d = int(d)
-        assert d >= 0, "Something went wrong (mean fragment size was negative)"
+        assert self.d >= 0, "Something went wrong (mean fragment size was negative)"
         self.fhd.close()
         petrack.set_rlengths( rlengths )
         return petrack
@@ -1073,13 +1068,12 @@ cdef class BAMPEParser(BAMParser):
         """Build PETrackI from all lines, return a PETrackI object.
         """
         cdef:
-            long i = 0
-            int m = 0
+            long i = 0          # number of fragments
+            long m = 0          # sum of fragment lengths
             int entrylength, fpos, chrid, tlen
             int *asint
             list references
             dict rlengths
-            float d = 0.0
             str rawread
             str rawentrylength
             _BAMPEParsed read
@@ -1101,16 +1095,16 @@ cdef class BAMPEParser(BAMParser):
             read = self.__pe_binary_parse(rawread)
             fseek(entrylength - 32, 1)
             if read.ref == -1: continue
-            d = (d * i + abs(read.tlen)) / (i + 1) # keep track of avg fragment size
-            i+=1
+            tlen = abs(read.tlen)
+            m += tlen
+            i += 1
             if i == 1000000:
-                m += 1
-                info(" %d" % (m*1000000))
-                i=0
-            add_loc(references[read.ref], read.start, read.start + read.tlen)
-        self.d = int( self.d * self.n + d * i )/( self.n + i )
+                info(" %d" % i)
+            add_loc(references[read.ref], read.start, read.start + tlen)
+
+        self.d = ( self.d * self.n + m ) / ( self.n + i )
         self.n += i
-        assert d >= 0, "Something went wrong (mean fragment size was negative)"
+        assert self.d >= 0, "Something went wrong (mean fragment size was negative)"
         self.fhd.close()
         # this is the problematic part. If fwtrack is finalized, then it's impossible to increase the length of it in a step of buffer_size for multiple input files.
         # petrack.finalize()

@@ -29,3 +29,7 @@ MACS2/mnumpy.pxd
 MACS2/numpy.pxd
 
 test/NOSPMR.ppois.bdg_ppois.bdg
+
+MACS2.egg-info
+MACS2/IO/*.c
+MACS2/*.c
