@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# Time-stamp: <2016-03-09 14:34:14 Tao Liu>
+# Time-stamp: <2018-10-02 17:00:16 Tao Liu>
 
 """Description: MACS v2 main executable.
 
@@ -262,16 +262,16 @@ def add_callpeak_parser( subparsers ):
                                  help = "The small nearby region in basepairs to calculate dynamic lambda. This is used to capture the bias near the peak summit region. Invalid if there is no control data. If you set this to 0, MACS will skip slocal lambda calculation. *Note* that MACS will always perform a d-size local lambda calculation. The final local bias should be the maximum of the lambda value from d, slocal, and llocal size windows. DEFAULT: 1000 " )
     group_callpeak.add_argument( "--llocal", dest = "largelocal", type = int, default = 10000,
                                  help = "The large nearby region in basepairs to calculate dynamic lambda. This is used to capture the surround bias. If you set this to 0, MACS will skip llocal lambda calculation. *Note* that MACS will always perform a d-size local lambda calculation. The final local bias should be the maximum of the lambda value from d, slocal, and llocal size windows. DEFAULT: 10000." )
-    group_callpeak.add_argument( "--max-gap", dest = "maxgap", type = int, default = 50,
-                                 help = "Maximum gap between significant sites to cluster them together. DEFAULT: 50" )
-    group_callpeak.add_argument( "--min-length", dest = "minlen", type = int, default = 100,
-                                 help = "Minimum length of a peak. DEFAULT: 100" )
+    group_callpeak.add_argument( "--max-gap", dest = "maxgap", type = int,
+                                 help = "Maximum gap between significant sites to cluster them together. The DEFAULT value is the detected read length/tag size." )
+    group_callpeak.add_argument( "--min-length", dest = "minlen", type = int, 
+                                 help = "Minimum length of a peak. The DEFAULT value is the predicted fragment size d. Note, if you set a value smaller than the fragment size, it may have NO effect on the result. For BROAD peak calling, try to set a large value such as 500bps. You can also use '--cutoff-analysis' option with default setting, and  check the column 'avelpeak' under different cutoff values to decide a reasonable minlen value." )
     group_callpeak.add_argument( "--broad", dest = "broad", action = "store_true",
-                                 help = "If set, MACS will try to call broad peaks by linking nearby highly enriched regions. The linking region is controlled by another cutoff through --broad-cutoff. The maximum gap is 4 * MAXGAP (--max-gap parameter). DEFAULT: False", default = False )
+                                 help = "If set, MACS will try to call broad peaks using the --broad-cutoff setting. Please tweak '--broad-cutoff' setting to control the peak calling behavior. At the meantime, either -q or -p cutoff will be used to define regions with 'stronger enrichment' inside of broad peaks. The maximum gap is expanded to 4 * MAXGAP (--max-gap parameter). As a result, MACS will output a 'gappedPeak' and a 'broadPeak' file instead of 'narrowPeak' file. Note, a broad peak will be reported even if there is no 'stronger enrichment' inside. DEFAULT: False", default = False )
     group_callpeak.add_argument( "--broad-cutoff", dest = "broadcutoff", type = float, default = 0.1,
                                  help = "Cutoff for broad region. This option is not available unless --broad is set. If -p is set, this is a pvalue cutoff, otherwise, it's a qvalue cutoff. DEFAULT: 0.1 " )
     group_callpeak.add_argument( "--cutoff-analysis", dest="cutoff_analysis", action="store_true",
-                                 help = "While set, MACS2 will analyze number or total length of peaks that can be called by different p-value cutoff then output a summary table to help user decide a better cutoff. The table will be saved in NAME_cutoff_analysis.txt file. Note, minlen and maxgap may affect the results. WARNING: May take  ~30 folds longer time to finish. DEFAULT: False", default = False )
+                                 help = "While set, MACS2 will analyze number or total length of peaks that can be called by different p-value cutoff then output a summary table to help user decide a better cutoff. The table will be saved in NAME_cutoff_analysis.txt file. Note, minlen and maxgap may affect the results. WARNING: May take  ~30 folds longer time to finish. The result can be useful for users to decide a reasonable cutoff value. DEFAULT: False", default = False )
 
     group_postprocessing = argparser_callpeak.add_argument_group( "Post-processing options" )
     postprocess_group = group_postprocessing.add_mutually_exclusive_group()

@@ -1,4 +1,4 @@
-# Time-stamp: <2015-03-05 15:37:59 Tao Liu>
+# Time-stamp: <2018-10-02 16:23:24 Tao Liu>
 
 """Module Description
 
@@ -70,8 +70,17 @@ class PeakDetect:
             self.d = d
         else:
             self.d = self.opt.d
-        self.maxgap = opt.maxgap
-        self.minlen = opt.minlen
+
+        if opt.maxgap:
+            self.maxgap = opt.maxgap
+        else:
+            self.maxgap = opt.tsize
+            
+        if opt.minlen:
+            self.minlen = opt.minlen
+        else:
+            self.minlen = self.d
+
         self.end_shift = self.opt.shift
         self.gsize = opt.gsize
         

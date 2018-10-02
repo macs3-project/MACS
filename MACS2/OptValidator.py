@@ -1,4 +1,4 @@
-# Time-stamp: <2016-02-15 14:57:27 Tao Liu>
+# Time-stamp: <2018-10-02 16:17:35 Tao Liu>
 
 """Module Description
 
@@ -190,9 +190,15 @@ def opt_validate ( options ):
         else:
             options.argtxt +=  "# qvalue cutoff = %.2e\n" % (options.qvalue)
 
-    options.argtxt += "# max. gap between significant sites = %d\n" % options.maxgap
-    options.argtxt += "# min. length of peaks = %d\n" % options.minlen
-
+    if options.maxgap:
+        options.argtxt += "# The maximum gap between significant sites = %d\n" % options.maxgap
+    else:
+        options.argtxt += "# The maximum gap between significant sites is assigned as the read length/tag size.\n" 
+    if options.minlen:
+        options.argtxt += "# The minimum length of peaks = %d\n" % options.minlen
+    else:
+        options.argtxt += "# The minimum length of peaks is assigned as the predicted fragment length \"d\".\n"
+        
     if options.downsample:
         options.argtxt += "# Larger dataset will be randomly sampled towards smaller dataset.\n"
         if options.seed >= 0:
