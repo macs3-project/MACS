@@ -1,4 +1,4 @@
-# Time-stamp: <2018-10-02 16:17:35 Tao Liu>
+# Time-stamp: <2018-10-15 16:54:40 Tao Liu>
 
 """Module Description
 
@@ -204,7 +204,7 @@ def opt_validate ( options ):
         if options.seed >= 0:
             options.argtxt += "# Random seed has been set as: %d\n" % options.seed
     else:
-        if options.tolarge:
+        if options.scaleto == "large":
             options.argtxt += "# Smaller dataset will be scaled towards larger dataset.\n"
         else:
             options.argtxt += "# Larger dataset will be scaled towards smaller dataset.\n"
@@ -439,6 +439,11 @@ def opt_validate_randsample ( options ):
         options.gzip_flag = True
     elif options.format == "BOWTIE":
         options.parser = BowtieParser
+    elif options.format == "BAMPE":
+        options.parser = BAMPEParser
+        options.gzip_flag = True
+    elif options.format == "BEDPE":
+        options.parser = BEDPEParser
     elif options.format == "AUTO":
         options.parser = guess_parser
     else:
@@ -623,8 +628,11 @@ def opt_validate_pileup ( options ):
         options.gzip_flag = True
     elif options.format == "BOWTIE":
         options.parser = BowtieParser
-    elif options.format == "AUTO":
-        options.parser = guess_parser
+    elif options.format == "BAMPE":
+        options.parser = BAMPEParser
+        options.gzip_flag = True
+    elif options.format == "BEDPE":
+        options.parser = BEDPEParser
     else:
         logging.error("Format \"%s\" cannot be recognized!" % (options.format))
         sys.exit(1)

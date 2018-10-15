@@ -1,3 +1,38 @@
+2018-10-15  Tao Liu  <vladimir.liu@gmail.com>
+	MACS version 2.1.2 20181015
+
+	* New features
+
+	1) Added missing BEDPE support. And enable the support for BAMPE
+	and BEDPE formats in 'pileup' subcommand. When format is BAMPE or
+	BEDPE, The 'pileup' command will pile up the whole fragment
+	defined by mapping locations of the left end and right end of each
+	read pair. Thank @purcaro
+
+	2) Added options to callpeak command for tweaking max-gap and
+	min-len during peak calling. Thank @jsh58!
+
+	3) The callpeak option "--to-large" option is replaced with
+	"--scale-to large".
+
+	* Bug fixes
+
+	1) Fixed memory issue related to #122 and #146
+
+	2) Fixed a bug caused by a typo. Related to #249, Thank @shengqh
+
+	3) Fixed a bug while setting commandline qvalue cutoff.
+
+	4) Better describe the 5th column of narrowPeak. Thank @alexbarrera
+
+	5) Fixed the calculation of average fragment length for paired-end
+	data. Thank @jsh58
+
+	6) Fixed bugs caused by khash while computing p/q-value and log
+	likelihood ratios. Thank @jsh58
+
+	7) More spelling tweaks in source code. Thank @mr-c
+
 2016-03-09  Tao Liu  <vladimir.liu@gmail.com>
 	MACS version 2.1.1 20160309
 

@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# Time-stamp: <2018-10-02 17:00:16 Tao Liu>
+# Time-stamp: <2018-10-15 15:09:25 Tao Liu>
 
 """Description: MACS v2 main executable.
 
@@ -189,10 +189,10 @@ def add_callpeak_parser( subparsers ):
                               default = "AUTO" )
     group_input.add_argument( "-g", "--gsize", dest = "gsize", type = str, default = "hs",
                               help = "Effective genome size. It can be 1.0e+9 or 1000000000, or shortcuts:'hs' for human (2.7e9), 'mm' for mouse (1.87e9), 'ce' for C. elegans (9e7) and 'dm' for fruitfly (1.2e8), Default:hs" )
+    group_input.add_argument( "-s", "--tsize",  dest = "tsize", type = int, default = None,
+                                    help = "Tag size/read length. This will override the auto detected tag size. DEFAULT: Not set")
     group_input.add_argument( "--keep-dup", dest = "keepduplicates", type = str, default = "1",
-                              help = "It controls the MACS behavior towards duplicate tags at the exact same location -- the same coordination and the same strand. The 'auto' option makes MACS calculate the maximum tags at the exact same location based on binomal distribution using 1e-5 as pvalue cutoff; and the 'all' option keeps every tags. If an integer is given, at most this number of tags will be kept at the same location. Note, if you've used samtools or picard to flag reads as 'PCR/Optical duplicate' in bit 1024, MACS2 will still read them although the reads may be decided by MACS2 as duplicate later. The default is to keep one tag at the same location. Default: 1" )
-    group_input.add_argument( "--buffer-size", dest = "buffer_size", type = int, default = "100000",
-                              help = "Buffer size for incrementally increasing internal array size to store reads alignment information. In most cases, you don't have to change this parameter. However, if there are large number of chromosomes/contigs/scaffolds in your alignment, it's recommended to specify a smaller buffer size in order to decrease memory usage (but it will take longer time to read alignment files). Minimum memory requested for reading an alignment file is about # of CHROMOSOME * BUFFER_SIZE * 2 Bytes. DEFAULT: 100000 " )
+                              help = "It controls the  behavior towards duplicate tags at the exact same location -- the same coordination and the same strand. The 'auto' option makes MACS calculate the maximum tags at the exact same location based on binomal distribution using 1e-5 as pvalue cutoff; and the 'all' option keeps every tags. If an integer is given, at most this number of tags will be kept at the same location. Note, if you've used samtools or picard to flag reads as 'PCR/Optical duplicate' in bit 1024, MACS2 will still read them although the reads may be decided by MACS2 as duplicate later. If you plan to rely on samtools/picard/any other tool to filter duplicates, please remove those duplicate reads and save a new alignment file then ask MACS2 to keep all by '--keep-dup all'. The default is to keep one tag at the same location. Default: 1" )
     
     # group for output files
     group_output = argparser_callpeak.add_argument_group( "Output arguments" )
@@ -209,32 +209,24 @@ def add_callpeak_parser( subparsers ):
                                help = "Tells MACS to include trackline with bedGraph files. To include this trackline while displaying bedGraph at UCSC genome browser, can show name and description of the file as well. However my suggestion is to convert bedGraph to bigWig, then show the smaller and faster binary bigWig file at UCSC genome browser, as well as downstream analysis. Require -B to be set. Default: Not include trackline." )
     
     group_output.add_argument( "--SPMR", dest = "do_SPMR", action = "store_true", default = False,
-                               help = "If True, MACS will save signal per million reads for fragment pileup profiles. Require -B to be set. Default: False" )
+                               help = "If True, MACS will SAVE signal per million reads for fragment pileup profiles. It won't interfere with computing pvalue/qvalue during peak calling, since internally MACS2 keeps using the raw pileup and scaling factors between larger and smaller dataset to calculate statistics measurements. If you plan to use the signal output in bedGraph to call peaks using bdgcmp and bdgpeakcall, you shouldn't use this option because you will end up with different results. However, this option is recommended for displaying normalized pileup tracks across many datasets. Require -B to be set. Default: False" )
     # group for bimodal
     group_bimodal = argparser_callpeak.add_argument_group( "Shifting model arguments" )
-    group_bimodal.add_argument( "-s", "--tsize",  dest = "tsize", type = int, default = None,
-                                help = "Tag size. This will override the auto detected tag size. DEFAULT: Not set")
+    group_bimodal.add_argument( "--nomodel", dest = "nomodel", action = "store_true", default = False,
+                                help = "Whether or not to build the shifting model. If True, MACS will not build model. by default it means shifting size = 100, try to set extsize to change it. It's highly recommended that while you have many datasets to process and you plan to compare different conditions, aka differential calling, use both 'nomodel' and 'extsize' to make signal files from different datasets comparable. DEFAULT: False" )
+    group_bimodal.add_argument( "--shift", dest = "shift", type = int, default = 0,
+                                help = "(NOT the legacy --shiftsize option!) The arbitrary shift in bp. Use discretion while setting it other than default value. When NOMODEL is set, MACS will use this value to move cutting ends (5') towards 5'->3' direction then apply EXTSIZE to extend them to fragments. When this value is negative, ends will be moved toward 3'->5' direction. Recommended to keep it as default 0 for ChIP-Seq datasets, or -1 * half of EXTSIZE together with EXTSIZE option for detecting enriched cutting loci such as certain DNAseI-Seq datasets. Note, you can't set values other than 0 if format is BAMPE or BEDPE for paired-end data. DEFAULT: 0. " )
+    group_bimodal.add_argument( "--extsize", dest = "extsize", type = int, default = 200,
+                                help = "The arbitrary extension size in bp. When nomodel is true, MACS will use this value as fragment size to extend each read towards 3' end, then pile them up. It's exactly twice the number of obsolete SHIFTSIZE. In previous language, each read is moved 5'->3' direction to middle of fragment by 1/2 d, then extended to both direction with 1/2 d. This is equivalent to say each read is extended towards 5'->3' into a d size fragment. DEFAULT: 200. EXTSIZE and SHIFT can be combined when necessary. Check SHIFT option." )   
     group_bimodal.add_argument( "--bw", dest = "bw", type = int, default = 300,
-                                help = "Band width for picking regions to compute fragment size. This value is only used while building the shifting model. DEFAULT: 300")
+                                help = "Band width for picking regions to compute fragment size. This value is only used while building the shifting model. Tweaking this is not recommended. DEFAULT: 300")
     group_bimodal.add_argument( "-m", "--mfold", dest = "mfold", type = int, default = [5,50], nargs = 2,
-                                help = "Select the regions within MFOLD range of high-confidence enrichment ratio against background to build model. Fold-enrichment in regions must be lower than upper limit, and higher than the lower limit. Use as \"-m 10 30\". DEFAULT:5 50" )
+                                help = "Select the regions within MFOLD range of high-confidence enrichment ratio against background to build model. Fold-enrichment in regions must be lower than upper limit, and higher than the lower limit. Use as \"-m 10 30\". This setting is only used while building the shifting model. Tweaking it is not recommended. DEFAULT:5 50" )
     
     group_bimodal.add_argument( "--fix-bimodal", dest = "onauto", action = "store_true",
                                 help = "Whether turn on the auto pair model process. If set, when MACS failed to build paired model, it will use the nomodel settings, the --exsize parameter to extend each tags towards 3' direction. Not to use this automate fixation is a default behavior now. DEFAULT: False",
                                 default = False )
-    group_bimodal.add_argument( "--nomodel", dest = "nomodel", action = "store_true",
-                                help = "Whether or not to build the shifting model. If True, MACS will not build model. by default it means shifting size = 100, try to set extsize to change it. DEFAULT: False",
-                                default = False )
-    group_bimodal.add_argument( "--shift", dest = "shift", type = int, default = 0,
-                               help = "(NOT the legacy --shiftsize option!) The arbitrary shift in bp. Use discretion while setting it other than default value. When NOMODEL is set, MACS will use this value to move cutting ends (5') towards 5'->3' direction then apply EXTSIZE to extend them to fragments. When this value is negative, ends will be moved toward 3'->5' direction. Recommended to keep it as default 0 for ChIP-Seq datasets, or -1 * half of EXTSIZE together with EXTSIZE option for detecting enriched cutting loci such as certain DNAseI-Seq datasets. Note, you can't set values other than 0 if format is BAMPE or BEDPE for paired-end data. DEFAULT: 0. " )
-    group_bimodal.add_argument( "--extsize", dest = "extsize", type = int, default = 200,
-                                help = "The arbitrary extension size in bp. When nomodel is true, MACS will use this value as fragment size to extend each read towards 3' end, then pile them up. It's exactly twice the number of obsolete SHIFTSIZE. In previous language, each read is moved 5'->3' direction to middle of fragment by 1/2 d, then extended to both direction with 1/2 d. This is equivalent to say each read is extended towards 5'->3' into a d size fragment. DEFAULT: 200. EXTSIZE and SHIFT can be combined when necessary. Check SHIFT option." )    
-    # The next two options are obsolete. To compare two conditions, using bdgcmp.
-    #group_bimodal.add_argument( "--control-as-ChIP", dest = "controlasChIP", action = "store_true", default = False,
-    #                             help = "When set, control tags will be shifted and extended using SHIFT and EXTSIZE options just as ChIP tags according to their strand before the extension of d, slocal and llocal. By default, control tags are extended centered at their current positions regardless of strand. You may consider to turn this option on while comparing two ChIP datasets of different condition but the same factor. DEFAULT: False" )
-    #group_bimodal.add_argument( "--half-ext", dest = "halfext", action = "store_true", default = False,
-    #                             help = "When set, MACS extends 1/2 d size for each fragment centered at its middle point. DEFAULT: False" )
-    
+ 
     # General options.
     group_callpeak = argparser_callpeak.add_argument_group( "Peak calling arguments" )
     p_or_q_group = group_callpeak.add_mutually_exclusive_group()
@@ -242,11 +234,10 @@ def add_callpeak_parser( subparsers ):
                                help = "Minimum FDR (q-value) cutoff for peak detection. DEFAULT: 0.05. -q, and -p are mutually exclusive." )
     p_or_q_group.add_argument( "-p", "--pvalue", dest = "pvalue", type = float,
                                help = "Pvalue cutoff for peak detection. DEFAULT: not set. -q, and -p are mutually exclusive. If pvalue cutoff is set, qvalue will not be calculated and reported as -1 in the final .xls file." )
-    #p_or_q_group.add_argument( "-F", "--foldenrichment", dest = "foldenrichment", type = float,
-    #                           help = "Foldenrichment cutoff for peak detection. DEFAULT: not set. -q, -p and -F are mutually exclusive. If pvalue cutoff is set, qvalue will not be calculated and reported as -1 in the final .xls file." )    
+
     # about scaling
-    group_callpeak.add_argument( "--to-large", dest = "tolarge", action = "store_true", default = False,
-                                help = "When set, scale the small sample up to the bigger sample. By default, the bigger dataset will be scaled down towards the smaller dataset, which will lead to smaller p/qvalues and more specific results. Keep in mind that scaling down will bring down background noise more. DEFAULT: False" )
+    group_callpeak.add_argument( "--scale-to", dest = "scaleto", type = str, choices = ("large", "small"),
+                                help = "When set to 'small', scale the larger sample up to the smaller sample. When set to 'larger', scale the smaller sample up to the bigger sample. By default, scale to 'small'. This option replaces the obsolete '--to-large' option. The default behavior is recommended since it will lead to less significant p/q-values in general but more specific results. Keep in mind that scaling down will influence control/input sample more. DEFAULT: 'small', the choice is either 'small' or 'large'." )
     group_callpeak.add_argument( "--ratio", dest = "ratio", type = float, default = 1.0,
                                 help = "When set, use a custom scaling ratio of ChIP/control (e.g. calculated using NCIS) for linear scaling. DEFAULT: ingore" )
     group_callpeak.add_argument( "--down-sample", dest = "downsample", action = "store_true", default = False,
@@ -256,12 +247,12 @@ def add_callpeak_parser( subparsers ):
     group_callpeak.add_argument( "--tempdir", dest="tempdir", default=tempfile.gettempdir(),
                                 help = "Optional directory to store temp files. DEFAULT: %(default)s")
     group_callpeak.add_argument( "--nolambda", dest = "nolambda", action = "store_true",
-                                 help = "If True, MACS will use fixed background lambda as local lambda for every peak region. Normally, MACS calculates a dynamic local lambda to reflect the local bias due to potential chromatin structure. ",
+                                 help = "If True, MACS will use fixed background lambda as local lambda for every peak region. Normally, MACS calculates a dynamic local lambda to reflect the local bias due to the potential chromatin accessibility. ",
                                  default = False )
     group_callpeak.add_argument( "--slocal", dest = "smalllocal", type = int, default = 1000,
-                                 help = "The small nearby region in basepairs to calculate dynamic lambda. This is used to capture the bias near the peak summit region. Invalid if there is no control data. If you set this to 0, MACS will skip slocal lambda calculation. *Note* that MACS will always perform a d-size local lambda calculation. The final local bias should be the maximum of the lambda value from d, slocal, and llocal size windows. DEFAULT: 1000 " )
+                                 help = "The small nearby region in basepairs to calculate dynamic lambda. This is used to capture the bias near the peak summit region. Invalid if there is no control data. If you set this to 0, MACS will skip slocal lambda calculation. *Note* that MACS will always perform a d-size local lambda calculation while the control data is available. The final local bias would be the maximum of the lambda value from d, slocal, and llocal size windows. While control is not available, d and slocal lambda won't be considered. DEFAULT: 1000 " )
     group_callpeak.add_argument( "--llocal", dest = "largelocal", type = int, default = 10000,
-                                 help = "The large nearby region in basepairs to calculate dynamic lambda. This is used to capture the surround bias. If you set this to 0, MACS will skip llocal lambda calculation. *Note* that MACS will always perform a d-size local lambda calculation. The final local bias should be the maximum of the lambda value from d, slocal, and llocal size windows. DEFAULT: 10000." )
+                                 help = "The large nearby region in basepairs to calculate dynamic lambda. This is used to capture the surround bias. If you set this to 0, MACS will skip llocal lambda calculation. *Note* that MACS will always perform a d-size local lambda calculation while the control data is available. The final local bias would be the maximum of the lambda value from d, slocal, and llocal size windows. While control is not available, d and slocal lambda won't be considered. DEFAULT: 10000." )
     group_callpeak.add_argument( "--max-gap", dest = "maxgap", type = int,
                                  help = "Maximum gap between significant sites to cluster them together. The DEFAULT value is the detected read length/tag size." )
     group_callpeak.add_argument( "--min-length", dest = "minlen", type = int, 
@@ -269,10 +260,11 @@ def add_callpeak_parser( subparsers ):
     group_callpeak.add_argument( "--broad", dest = "broad", action = "store_true",
                                  help = "If set, MACS will try to call broad peaks using the --broad-cutoff setting. Please tweak '--broad-cutoff' setting to control the peak calling behavior. At the meantime, either -q or -p cutoff will be used to define regions with 'stronger enrichment' inside of broad peaks. The maximum gap is expanded to 4 * MAXGAP (--max-gap parameter). As a result, MACS will output a 'gappedPeak' and a 'broadPeak' file instead of 'narrowPeak' file. Note, a broad peak will be reported even if there is no 'stronger enrichment' inside. DEFAULT: False", default = False )
     group_callpeak.add_argument( "--broad-cutoff", dest = "broadcutoff", type = float, default = 0.1,
-                                 help = "Cutoff for broad region. This option is not available unless --broad is set. If -p is set, this is a pvalue cutoff, otherwise, it's a qvalue cutoff. DEFAULT: 0.1 " )
+                                 help = "Cutoff for broad region. This option is not available unless --broad is set. If -p is set, this is a pvalue cutoff, otherwise, it's a qvalue cutoff. Please note that in broad peakcalling mode, MACS2 uses this setting to control the overall peak calling behavior, then uses -q or -p setting to define regions inside broad region as 'stronger' enrichment. DEFAULT: 0.1 " )
     group_callpeak.add_argument( "--cutoff-analysis", dest="cutoff_analysis", action="store_true",
                                  help = "While set, MACS2 will analyze number or total length of peaks that can be called by different p-value cutoff then output a summary table to help user decide a better cutoff. The table will be saved in NAME_cutoff_analysis.txt file. Note, minlen and maxgap may affect the results. WARNING: May take  ~30 folds longer time to finish. The result can be useful for users to decide a reasonable cutoff value. DEFAULT: False", default = False )
 
+    # post-processing options
     group_postprocessing = argparser_callpeak.add_argument_group( "Post-processing options" )
     postprocess_group = group_postprocessing.add_mutually_exclusive_group()
     
@@ -282,7 +274,16 @@ def add_callpeak_parser( subparsers ):
     #                                 help="If set, MACS will refine peak summits by measuring balance of waston/crick tags. Those peaks without balancing tags will be disgarded. Peak summits will be redefined and reassgined with scores. Note, duplicate reads will be put back while calculating read balance. And more memory will be used. Default: False", default=False )
     group_postprocessing.add_argument( "--fe-cutoff", dest="fecutoff", type=float, default = 1.0,
                                        help = "When set, the value will be used to filter out peaks with low fold-enrichment. Note, MACS2 use 1.0 as pseudocount while calculating fold-enrichment. DEFAULT: 1.0")
+
+    # other options
+    group_other = argparser_callpeak.add_argument_group( "Other options" )
+    group_other.add_argument( "--buffer-size", dest = "buffer_size", type = int, default = "100000",
+                                  help = "Buffer size for incrementally increasing internal array size to store reads alignment information. In most cases, you don't have to change this parameter. However, if there are large number of chromosomes/contigs/scaffolds in your alignment, it's recommended to specify a smaller buffer size in order to decrease memory usage (but it will take longer time to read alignment files). Minimum memory requested for reading an alignment file is about # of CHROMOSOME * BUFFER_SIZE * 2 Bytes. DEFAULT: 100000 " )
     
+    # obsolete options
+    group_obsolete = argparser_callpeak.add_argument_group( "Obsolete options" )
+    group_obsolete.add_argument( "--to-large", dest = "tolarge", action = "store_true", default = False,
+                                     help = "Obsolete option. Please use '--scale-to large' instead." )
     return
 
 def add_diffpeak_parser( subparsers ):
@@ -352,8 +353,8 @@ def add_filterdup_parser( subparsers ):
     argparser_filterdup.add_argument( "-i", "--ifile", dest = "ifile", type = str, required = True, nargs = "+",
                                       help = "ChIP-seq alignment file. If multiple files are given as '-t A B C', then they will all be read and combined. Note that pair-end data is not supposed to work with this command. REQUIRED." )
     argparser_filterdup.add_argument( "-f", "--format", dest = "format", type = str,
-                                      choices=("AUTO","BAM","SAM","BED","ELAND","ELANDMULTI","ELANDEXPORT","BOWTIE"),
-                                      help = "Format of tag file, \"AUTO\", \"BED\" or \"ELAND\" or \"ELANDMULTI\" or \"ELANDEXPORT\" or \"SAM\" or \"BAM\" or \"BOWTIE\". The default AUTO option will let '%(prog)s' decide which format the file is. Please check the definition in README file if you choose ELAND/ELANDMULTI/ELANDEXPORT/SAM/BAM/BOWTIE. DEFAULT: \"AUTO\"",
+                                      choices=("AUTO","BAM","SAM","BED","ELAND","ELANDMULTI","ELANDEXPORT","BOWTIE","BAMPE","BEDPE"),
+                                      help = "Format of tag file, \"AUTO\", \"BED\" or \"ELAND\" or \"ELANDMULTI\" or \"ELANDEXPORT\" or \"SAM\" or \"BAM\" or \"BOWTIE\" or \"BAMPE\" or \"BEDPE\". The default AUTO option will let '%(prog)s' decide which format the file is. Please check the definition in README file if you choose ELAND/ELANDMULTI/ELANDEXPORT/SAM/BAM/BOWTIE or BAMPE/BEDPE. DEFAULT: \"AUTO\"",
                                       default = "AUTO" )
     argparser_filterdup.add_argument( "-g", "--gsize", dest = "gsize", type = str, default = "hs",
                                       help = "Effective genome size. It can be 1.0e+9 or 1000000000, or shortcuts:'hs' for human (2.7e9), 'mm' for mouse (1.87e9), 'ce' for C. elegans (9e7) and 'dm' for fruitfly (1.2e8), DEFAULT:hs" )
@@ -367,7 +368,7 @@ def add_filterdup_parser( subparsers ):
                                       help = "Set verbose level. 0: only show critical message, 1: show additional warning message, 2: show process information, 3: show debug messages. If you want to know where are the duplicate reads, use 3. DEFAULT:2" )
     add_outdir_option( argparser_filterdup )    
     argparser_filterdup.add_argument( "-o", "--ofile", dest = "outputfile", type = str,
-                                      help = "Output BED file name. If not specified, will write to standard output. DEFAULT: stdout",
+                                      help = "Output BED file name. If not specified, will write to standard output. Note, if the input format is BAMPE or BEDPE, the output will be in BEDPE format. DEFAULT: stdout",
                                       default = "stdout" )
     argparser_filterdup.add_argument( "-d", "--dry-run", dest="dryrun", action="store_true", default=False,
                                       help = "When set, filterdup will only output numbers instead of writing output files, including maximum allowable duplicates, total number of reads before filtering, total number of reads after filtering, and redundant rate. Default: not set" )
@@ -495,14 +496,14 @@ def add_randsample_parser( subparsers ):
     argparser_randsample.add_argument( "--seed", dest = "seed", type = int, default = -1, 
                                        help = "Set the random seed while down sampling data. Must be a non-negative integer in order to be effective. DEFAULT: not set" )
     argparser_randsample.add_argument( "-o", "--ofile", dest = "outputfile", type = str,
-                                      help = "Output BED file name. If not specified, will write to standard output. DEFAULT: stdout",
+                                      help = "Output BED file name. If not specified, will write to standard output. Note, if the input format is BAMPE or BEDPE, the output will be in BEDPE format. DEFAULT: stdout",
                                       default = None)
     add_outdir_option( argparser_randsample )    
     argparser_randsample.add_argument( "-s", "--tsize", dest = "tsize", type = int, default = None,
                                        help = "Tag size. This will override the auto detected tag size. DEFAULT: Not set")
     argparser_randsample.add_argument( "-f", "--format", dest = "format", type = str,
-                                       choices=("AUTO","BAM","SAM","BED","ELAND","ELANDMULTI","ELANDEXPORT","BOWTIE"),
-                                       help = "Format of tag file, \"AUTO\", \"BED\" or \"ELAND\" or \"ELANDMULTI\" or \"ELANDEXPORT\" or \"SAM\" or \"BAM\" or \"BOWTIE\". The default AUTO option will %(prog)s decide which format the file is. Please check the definition in README file if you choose ELAND/ELANDMULTI/ELANDEXPORT/SAM/BAM/BOWTIE. DEFAULT: \"AUTO\"",
+                                       choices=("AUTO","BAM","SAM","BED","ELAND","ELANDMULTI","ELANDEXPORT","BOWTIE","BAMPE","BEDPE"),
+                                       help = "Format of tag file, \"AUTO\", \"BED\" or \"ELAND\" or \"ELANDMULTI\" or \"ELANDEXPORT\" or \"SAM\" or \"BAM\" or \"BOWTIE\" or \"BAMPE\" or \"BEDPE\". The default AUTO option will %(prog)s decide which format the file is. Please check the definition in README file if you choose ELAND/ELANDMULTI/ELANDEXPORT/SAM/BAM/BOWTIE or BAMPE/BEDPE. DEFAULT: \"AUTO\"",
                                        default = "AUTO" )
     argparser_randsample.add_argument( "--verbose", dest = "verbose", type = int, default = 2,
                                        help = "Set verbose level. 0: only show critical message, 1: show additional warning message, 2: show process information, 3: show debug messages. If you want to know where are the duplicate reads, use 3. DEFAULT:2" )
@@ -603,14 +604,14 @@ def add_pileup_parser( subparsers ):
                                    help = "Output bedGraph file name. If not specified, will write to standard output. REQUIRED." )
     add_outdir_option( argparser_pileup )    
     argparser_pileup.add_argument( "-f", "--format", dest = "format", type = str,
-                                   choices=("AUTO","BAM","SAM","BED","ELAND","ELANDMULTI","ELANDEXPORT","BOWTIE"),
-                                   help = "Format of tag file, \"AUTO\", \"BED\" or \"ELAND\" or \"ELANDMULTI\" or \"ELANDEXPORT\" or \"SAM\" or \"BAM\" or \"BOWTIE\". The default AUTO option will let '%(prog)s' decide which format the file is. Please check the definition in README file if you choose ELAND/ELANDMULTI/ELANDEXPORT/SAM/BAM/BOWTIE. DEFAULT: \"AUTO\"",
+                                   choices=("AUTO","BAM","SAM","BED","ELAND","ELANDMULTI","ELANDEXPORT","BOWTIE","BAMPE","BEDPE"),
+                                   help = "Format of tag file, \"AUTO\", \"BED\", \"ELAND\", \"ELANDMULTI\", \"ELANDEXPORT\", \"SAM\", \"BAM\", \"BOWTIE\", \"BAMPE\", or \"BEDPE\". The default AUTO option will let '%(prog)s' decide which format the file is. DEFAULT: \"AUTO\", MACS2 will pick a format from \"AUTO\", \"BED\", \"ELAND\", \"ELANDMULTI\", \"ELANDEXPORT\", \"SAM\", \"BAM\" and \"BOWTIE\". If the format is BAMPE or BEDPE, please specify it explicitly. Please note that when the format is BAMPE or BEDPE, the -B and --extsize options would be ignored.",
                                    default = "AUTO" )
     argparser_pileup.add_argument( "-B", "--both-direction", dest = "bothdirection", action = "store_true", default = False,
-                                   help = "By default, any read will be extended towards downstream direction by extension size. So it's [0,size-1] (1-based index system) for plus strand read and [-size+1,0] for minus strand read where position 0 is 5' end of the aligned read. Default behavior can simulate MACS2 way of piling up ChIP sample reads where extension size is set as fragment size/d. If this option is set as on, aligned reads will be extended in both upstream and downstream directions by extension size. It means [-size,size] where 0 is the 5' end of a aligned read. It can partially simulate MACS2 way of piling up control reads. However MACS2 local bias is calculated by maximizing the expected pileup over a ChIP fragment size/d estimated from 10kb, 1kb, d and whole genome background. DEFAULT: False" )
+                                   help = "By default, any read will be extended towards downstream direction by extension size. So it's [0,size-1] (1-based index system) for plus strand read and [-size+1,0] for minus strand read where position 0 is 5' end of the aligned read. Default behavior can simulate MACS2 way of piling up ChIP sample reads where extension size is set as fragment size/d. If this option is set as on, aligned reads will be extended in both upstream and downstream directions by extension size. It means [-size,size] where 0 is the 5' end of a aligned read. It can partially simulate MACS2 way of piling up control reads. However MACS2 local bias is calculated by maximizing the expected pileup over a ChIP fragment size/d estimated from 10kb, 1kb, d and whole genome background. This option will be ignored when the format is set as BAMPE or BEDPE. DEFAULT: False" )
     
     argparser_pileup.add_argument( "--extsize", dest = "extsize", type = int, default = 200,
-                                   help = "The extension size in bps. Each alignment read will become a EXTSIZE of fragment, then be piled up. Check description for -B for detail. It's twice the `shiftsize` in old MACSv1 language. DEFAULT: 200 " )
+                                   help = "The extension size in bps. Each alignment read will become a EXTSIZE of fragment, then be piled up. Check description for -B for detail. It's twice the `shiftsize` in old MACSv1 language. This option will be ignored when the format is set as BAMPE or BEDPE. DEFAULT: 200 " )
     argparser_pileup.add_argument( "--verbose", dest = "verbose", type = int, default = 2,
                                       help = "Set verbose level. 0: only show critical message, 1: show additional warning message, 2: show process information, 3: show debug messages. If you want to know where are the duplicate reads, use 3. DEFAULT:2" )
     return

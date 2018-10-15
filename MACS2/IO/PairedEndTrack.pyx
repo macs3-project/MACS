@@ -1,4 +1,4 @@
-# Time-stamp: <2016-02-15 16:12:19 Tao Liu>
+# Time-stamp: <2018-10-15 16:57:07 Tao Liu>
 
 """Module for filter duplicate tags from paired-end data
 
@@ -480,7 +480,7 @@ cdef class PETrackI:
         return
 
     def print_to_bed (self, fhd=None):
-        """Output to BED format files. If fhd is given, write to a
+        """Output to BEDPE format files. If fhd is given, write to a
         file, otherwise, output to standard output.
         
         """
@@ -490,7 +490,6 @@ cdef class PETrackI:
         if not fhd:
             fhd = sys.stdout
         assert isinstance(fhd, file)
-        assert self.fw > 0, "width should be set larger than 0!"
 
         chrnames = self.get_chr_names()
         

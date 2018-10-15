@@ -1,4 +1,4 @@
-# Time-stamp: <2015-06-02 23:36:21 Tao Liu>
+# Time-stamp: <2018-10-15 15:12:45 Tao Liu>
 
 """Description: Filter duplicate reads depending on sequencing depth.
 
@@ -27,7 +27,7 @@ import logging
 # ------------------------------------
 from MACS2.OptValidator import opt_validate_pileup as opt_validate
 from MACS2.OutputWriter import *
-from MACS2.Pileup import pileup_and_write
+from MACS2.Pileup import pileup_and_write, pileup_and_write_pe
 from MACS2.Constants import *
 # ------------------------------------
 # Main function
@@ -44,29 +44,40 @@ def run( o_options ):
     debug = options.debug
     error = options.error
     #0 output arguments
-    assert options.format != 'BAMPE', "Pair-end data with BAMPE option currently doesn't work with pileup command. You can pretend your data to be single-end with -f BAM. Please try again!"
+    options.PE_MODE = options.format in ('BAMPE','BEDPE')
+    #assert options.format != 'BAMPE', "Pair-end data with BAMPE option currently doesn't work with pileup command. You can pretend your data to be single-end with -f BAM. Please try again!"
+    if options.PE_MODE:
+        info("# Will read input file in Paired-end mode.")
 
     #0 prepare output file
     outfile = os.path.join( options.outdir, options.outputfile )
     if os.path.isfile( outfile ):
         info("# Existing file %s will be replaced!" % outfile )
         os.unlink( outfile )
-
+        
     #1 Read tag files
     info("# read alignment files...")
-    (tsize, treat) = load_tag_files_options  (options)
-    
-    info("# tag size = %d", tsize)
-    
-    t0 = treat.total
-    info("# total tags in alignment file: %d", t0)
-
-    if options.bothdirection:
-        info("# Pileup alignment file, extend each read towards up/downstream direction with %d bps" % options.extsize)
-        pileup_and_write(treat, outfile, options.extsize * 2, 1, directional=False, halfextension=False)
+    if options.PE_MODE:
+        treat = load_frag_files_options ( options ) # return PETrackI object
+        t0 = treat.total # total fragments
+        info("# total fragments/pairs in alignment file: %d" % (t0) )
+        info("# Pileup paired-end alignment file.")
+        pileup_and_write_pe(treat, outfile )
+        
     else:
-        info("# Pileup alignment file, extend each read towards downstream direction with %d bps" % options.extsize)
-        pileup_and_write(treat, outfile, options.extsize, 1, directional=True, halfextension=False)
+        (tsize, treat) = load_tag_files_options  (options)
+    
+        info("# tag size = %d", tsize)
+    
+        t0 = treat.total
+        info("# total tags in alignment file: %d", t0)
+
+        if options.bothdirection:
+            info("# Pileup alignment file, extend each read towards up/downstream direction with %d bps" % options.extsize)
+            pileup_and_write(treat, outfile, options.extsize * 2, 1, directional=False, halfextension=False)
+        else:
+            info("# Pileup alignment file, extend each read towards downstream direction with %d bps" % options.extsize)
+            pileup_and_write(treat, outfile, options.extsize, 1, directional=True, halfextension=False)
 
     info("# Done! Check %s" % options.outputfile)
 
@@ -90,3 +101,20 @@ def load_tag_files_options ( options ):
     options.info("tag size is determined as %d bps" % tsize)
     return (tsize, treat)
 
+def load_frag_files_options ( options ):
+    """From the options, load treatment fragments and control fragments (if available).
+
+    """
+    options.info("# read treatment fragments...")
+
+    tp = options.parser(options.ifile[0])
+    treat = tp.build_petrack()
+    #treat.sort()
+    if len(options.ifile) > 1:
+        # multiple input
+        for tfile in options.ifile[1:]:
+            tp = options.parser(tfile)
+            treat = tp.append_petrack( treat )
+            #treat.sort()
+    treat.finalize()
+    return treat

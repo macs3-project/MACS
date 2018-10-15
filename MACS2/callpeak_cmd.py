@@ -1,4 +1,4 @@
-# Time-stamp: <2016-02-15 16:12:30 Tao Liu>
+# Time-stamp: <2018-10-15 12:34:16 Tao Liu>
 
 """Description: MACS 2 main executable
 
@@ -238,7 +238,7 @@ def run( args ):
             # set options.tocontrol although it would;t matter now
             options.tocontrol = False
         else:
-            if options.tolarge:
+            if options.scaleto == "large":
                 if t1 > c1:
                     # treatment has more tags than control, since tolarge is
                     # true, we will scale control to treatment.
