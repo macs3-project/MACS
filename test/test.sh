@@ -81,20 +81,20 @@ echo "randsample"
 
 mkdir ${TAG}_run_randsample
 
-macs2 randsample -t $CHIP -n 100000 --seed 31415926 --outdir ${TAG}_run_randsample -o run_randsample.bed &> ${TAG}_run_randsample/run_randsample.log
+macs2 randsample -i $CHIP -n 100000 --seed 31415926 --outdir ${TAG}_run_randsample -o run_randsample.bed &> ${TAG}_run_randsample/run_randsample.log
 
-macs2 randsample -t $CHIPPE -n 100000 --seed 31415926 --outdir ${TAG}_run_randsample -o run_randsample_bampe.bedpe &> ${TAG}_run_randsample/run_randsample_bampe.log
+macs2 randsample -f BAMPE -i $CHIPPE -n 100000 --seed 31415926 --outdir ${TAG}_run_randsample -o run_randsample_bampe.bedpe &> ${TAG}_run_randsample/run_randsample_bampe.log
 
-macs2 randsample -t $CHIPBEDPE -n 100000 --seed 31415926 --outdir ${TAG}_run_randsample -o run_randsample_bedpe.bedpe &> ${TAG}_run_randsample/run_randsample_bedpe.log
+macs2 randsample -f BEDPE -i $CHIPBEDPE -n 100000 --seed 31415926 --outdir ${TAG}_run_randsample -o run_randsample_bedpe.bedpe &> ${TAG}_run_randsample/run_randsample_bedpe.log
 
 # refinepeak
 echo "refinepeak"
 
 mkdir ${TAG}_run_refinepeak
 
-macs2 refinepeak -b run_callpeak_narrow/run_callpeak_narrow_peaks.narrowPeak -i $CHIP --outdir ${TAG}_run_refinepeak --o-prefix run_refinepeak_w_prefix &> ${TAG}_run_refinepeak/run_refinepeak_w_prefix.log
+macs2 refinepeak -b ${TAG}_run_callpeak_narrow/run_callpeak_narrow0_peaks.narrowPeak -i $CHIP --outdir ${TAG}_run_refinepeak --o-prefix run_refinepeak_w_prefix &> ${TAG}_run_refinepeak/run_refinepeak_w_prefix.log
 
-macs2 refinepeak -b run_callpeak_narrow/run_callpeak_narrow_peaks.narrowPeak -i $CHIP --outdir ${TAG}_run_refinepeak -o run_refinepeak_w_ofile.bed &> ${TAG}_run_refinepeak/run_refinepeak_w_ofile.log
+macs2 refinepeak -b ${TAG}_run_callpeak_narrow/run_callpeak_narrow0_peaks.narrowPeak -i $CHIP --outdir ${TAG}_run_refinepeak -o run_refinepeak_w_ofile.bed &> ${TAG}_run_refinepeak/run_refinepeak_w_ofile.log
 
 # bdgcmp
 echo "bdgcmp"
@@ -125,7 +125,7 @@ mkdir ${TAG}_run_bdgdiff
 
 macs2 callpeak -c $CHIP -t $CTRL -n run_callpeak_narrow_revert -B --outdir ${TAG}_run_callpeak_narrow_revert &> ${TAG}_run_callpeak_narrow_revert/run_callpeak_narrow_revert.log
 
-macs2 bdgdiff --t1 ${TAG}_run_callpeak_narrow/run_callpeak_narrow_treat_pileup.bdg --c1 ${TAG}_run_callpeak_narrow/run_callpeak_narrow_control_lambda.bdg --t2 ${TAG}_run_callpeak_narrow_revert/run_callpeak_narrow_revert_treat_pileup.bdg --c2 ${TAG}_run_callpeak_narrow_revert/run_callpeak_narrow_revert_control_lambda.bdg --o-prefix run_bdgdiff_prefix --outdir ${TAG}_run_bdgdiff &> ${TAG}_run_bdgdiff/run_bdgdiff_w_prefix.log
+macs2 bdgdiff --t1 ${TAG}_run_callpeak_narrow/run_callpeak_narrow0_treat_pileup.bdg --c1 ${TAG}_run_callpeak_narrow/run_callpeak_narrow0_control_lambda.bdg --t2 ${TAG}_run_callpeak_narrow_revert/run_callpeak_narrow_revert_treat_pileup.bdg --c2 ${TAG}_run_callpeak_narrow_revert/run_callpeak_narrow_revert_control_lambda.bdg --o-prefix run_bdgdiff_prefix --outdir ${TAG}_run_bdgdiff &> ${TAG}_run_bdgdiff/run_bdgdiff_w_prefix.log
 
-macs2 bdgdiff --t1 ${TAG}_run_callpeak_narrow/run_callpeak_narrow_treat_pileup.bdg --c1 ${TAG}_run_callpeak_narrow/run_callpeak_narrow_control_lambda.bdg --t2 ${TAG}_run_callpeak_narrow_revert/run_callpeak_narrow_revert_treat_pileup.bdg --c2 ${TAG}_run_callpeak_narrow_revert/run_callpeak_narrow_revert_control_lambda.bdg -o cond1.bed cond2.bed common.bed --outdir ${TAG}_run_bdgdiff &> ${TAG}_run_bdgdiff/run_bdgdiff_w_o_file.log
+macs2 bdgdiff --t1 ${TAG}_run_callpeak_narrow/run_callpeak_narrow0_treat_pileup.bdg --c1 ${TAG}_run_callpeak_narrow/run_callpeak_narrow0_control_lambda.bdg --t2 ${TAG}_run_callpeak_narrow_revert/run_callpeak_narrow_revert_treat_pileup.bdg --c2 ${TAG}_run_callpeak_narrow_revert/run_callpeak_narrow_revert_control_lambda.bdg -o cond1.bed cond2.bed common.bed --outdir ${TAG}_run_bdgdiff &> ${TAG}_run_bdgdiff/run_bdgdiff_w_o_file.log
 
