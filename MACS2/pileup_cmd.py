@@ -1,4 +1,4 @@
-# Time-stamp: <2018-10-15 15:12:45 Tao Liu>
+# Time-stamp: <2018-10-16 11:48:16 Tao Liu>
 
 """Description: Filter duplicate reads depending on sequencing depth.
 
@@ -46,8 +46,7 @@ def run( o_options ):
     #0 output arguments
     options.PE_MODE = options.format in ('BAMPE','BEDPE')
     #assert options.format != 'BAMPE', "Pair-end data with BAMPE option currently doesn't work with pileup command. You can pretend your data to be single-end with -f BAM. Please try again!"
-    if options.PE_MODE:
-        info("# Will read input file in Paired-end mode.")
+
 
     #0 prepare output file
     outfile = os.path.join( options.outdir, options.outputfile )
@@ -58,6 +57,7 @@ def run( o_options ):
     #1 Read tag files
     info("# read alignment files...")
     if options.PE_MODE:
+        info("# read input file in Paired-end mode.")
         treat = load_frag_files_options ( options ) # return PETrackI object
         t0 = treat.total # total fragments
         info("# total fragments/pairs in alignment file: %d" % (t0) )

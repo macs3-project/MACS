@@ -1,4 +1,4 @@
-# Time-stamp: <2018-10-15 16:55:59 Tao Liu>
+# Time-stamp: <2018-10-16 12:06:22 Tao Liu>
 
 """Description: Random sample certain number/percentage of tags.
 
@@ -49,7 +49,7 @@ def run( options0 ):
     
     #1 Read tag files
     if options.PE_MODE:
-        info("# Will read input file in Paired-end mode.")
+        info("# read input file in Paired-end mode.")
         treat = load_frag_files_options ( options ) # return PETrackI object
         t0 = treat.total # total fragments
         info("# total fragments/pairs in alignment file: %d" % (t0) )
@@ -88,16 +88,16 @@ def load_tag_files_options ( options ):
 
     """
     options.info("# read treatment tags...")
-    tp = options.parser(options.tfile[0])
+    tp = options.parser(options.ifile[0])
     if not options.tsize:           # override tsize if user specified --tsize
         ttsize = tp.tsize()
         options.tsize = ttsize
     treat = tp.build_fwtrack()
     #treat.sort()
-    if len(options.tfile) > 1:
+    if len(options.ifile) > 1:
         # multiple input
-        for tfile in options.tfile[1:]:
-            tp = options.parser(tfile)
+        for ifile in options.ifile[1:]:
+            tp = options.parser(ifile)
             treat = tp.append_fwtrack( treat )
             #treat.sort()
     treat.finalize()
@@ -111,13 +111,13 @@ def load_frag_files_options ( options ):
     """
     options.info("# read treatment fragments...")
 
-    tp = options.parser(options.tfile[0])
+    tp = options.parser(options.ifile[0])
     treat = tp.build_petrack()
     #treat.sort()
-    if len(options.tfile) > 1:
+    if len(options.ifile) > 1:
         # multiple input
-        for tfile in options.tfile[1:]:
-            tp = options.parser(tfile)
+        for ifile in options.ifile[1:]:
+            tp = options.parser(ifile)
             treat = tp.append_petrack( treat )
             #treat.sort()
     treat.finalize()

@@ -1,4 +1,4 @@
-# Time-stamp: <2018-10-15 16:57:07 Tao Liu>
+# Time-stamp: <2018-10-16 12:15:12 Tao Liu>
 
 """Module for filter duplicate tags from paired-end data
 
@@ -503,7 +503,7 @@ cdef class PETrackI:
 
             for i in range(locs.shape[0]):
                 s, e = locs[ i ]
-                fhd.write("%s\t%d\t%d\t.\t.\t.\n" % (k, s, e))
+                fhd.write("%s\t%d\t%d\n" % (k, s, e))
 
         return
     

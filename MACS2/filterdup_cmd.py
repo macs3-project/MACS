@@ -1,4 +1,4 @@
-# Time-stamp: <2015-07-27 13:51:19 Tao Liu>
+# Time-stamp: <2018-10-16 11:47:20 Tao Liu>
 
 """Description: Filter duplicate reads depending on sequencing depth.
 
@@ -43,20 +43,29 @@ def run( o_options ):
     debug = options.debug
     error = options.error
 
+    options.PE_MODE = options.format in ('BAMPE','BEDPE')
+    
     if options.outputfile != "stdout":
         outfhd = open( os.path.join( options.outdir, options.outputfile ) ,"w" )
     else:
         outfhd = sys.stdout
     
     #1 Read tag files
-    info("read tag files...")
-    fwtrack = load_tag_files_options (options)
+    if options.PE_MODE:
+        info("# read input file in Paired-end mode.")
+        inputtrack = load_frag_files_options ( options ) # return PETrackI object
+        t0 = inputtrack.total # total fragments
+        info("# total fragments/pairs in alignment file: %d" % (t0) )
+    else:
+        info("read tag files...")
+        inputtrack = load_tag_files_options (options)
     
-    info("tag size = %d" % options.tsize)
-    fwtrack.fw = options.tsize
+        info("tag size = %d" % options.tsize)
+        inputtrack.fw = options.tsize
 
-    t0 = fwtrack.total
-    info(" total tags in alignment file: %d" % (t0))
+        t0 = inputtrack.total
+        info(" total tags in alignment file: %d" % (t0))
+
     if options.keepduplicates != "all":
         if options.keepduplicates == "auto":
             info("calculate max duplicate tags in single position based on binomal distribution...")
@@ -69,10 +78,10 @@ def run( o_options ):
             info("filter out redundant tags at the same location and the same strand by allowing at most %d tag(s)" % (max_dup_tags))
 
         if not options.dryrun:
-            fwtrack.filter_dup(max_dup_tags)
-            t1 = fwtrack.total
+            inputtrack.filter_dup(max_dup_tags)
+            t1 = inputtrack.total
         else:
-            t1 = fwtrack.filter_dup_dryrun( max_dup_tags )
+            t1 = inputtrack.filter_dup_dryrun( max_dup_tags )
 
         info(" tags after filtering in alignment file: %d" % (t1))
         info(" Redundant rate of alignment file: %.2f" % (float(t0-t1)/t0))
@@ -80,7 +89,7 @@ def run( o_options ):
             
     if not options.dryrun:
         info( "Write to BED file" )
-        fwtrack.print_to_bed( fhd=outfhd )
+        inputtrack.print_to_bed( fhd=outfhd )
         info( "finished! Check %s." % options.outputfile )
     else:
         info( "Dry-run is finished!" )
@@ -105,7 +114,6 @@ def load_tag_files_options ( options ):
         options.tsize = ttsize
 
     treat = tp.build_fwtrack()
-    #treat.sort()
     if len(options.ifile) > 1:
         # multiple input
         for tfile in options.ifile[1:]:
@@ -113,5 +121,20 @@ def load_tag_files_options ( options ):
             treat = tp.append_fwtrack( treat )
             #treat.sort()
     treat.finalize()
+    return treat
 
+def load_frag_files_options ( options ):
+    """From the options, load treatment fragments and control fragments (if available).
+
+    """
+    options.info("# read treatment fragments...")
+
+    tp = options.parser(options.ifile[0])
+    treat = tp.build_petrack()
+    if len(options.ifile) > 1:
+        # multiple input
+        for tfile in options.ifile[1:]:
+            tp = options.parser(ifile)
+            treat = tp.append_petrack( treat )
+    treat.finalize()
     return treat

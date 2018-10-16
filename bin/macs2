@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# Time-stamp: <2018-10-15 15:09:25 Tao Liu>
+# Time-stamp: <2018-10-16 12:08:55 Tao Liu>
 
 """Description: MACS v2 main executable.
 
@@ -349,9 +349,9 @@ def add_diffpeak_parser( subparsers ):
 
 def add_filterdup_parser( subparsers ):
     argparser_filterdup = subparsers.add_parser( "filterdup",
-                                                 help = "Remove duplicate reads at the same position, then convert acceptable format to BED format." )
+                                                 help = "Remove duplicate reads at the same position, then save the rest alignments to BED or BEDPE file. If you use '--keep-dup all option', this script can be utilized to convert any acceptable format into BED or BEDPE format." )
     argparser_filterdup.add_argument( "-i", "--ifile", dest = "ifile", type = str, required = True, nargs = "+",
-                                      help = "ChIP-seq alignment file. If multiple files are given as '-t A B C', then they will all be read and combined. Note that pair-end data is not supposed to work with this command. REQUIRED." )
+                                      help = "Alignment file. If multiple files are given as '-t A B C', then they will all be read and combined. Note that pair-end data is not supposed to work with this command. REQUIRED." )
     argparser_filterdup.add_argument( "-f", "--format", dest = "format", type = str,
                                       choices=("AUTO","BAM","SAM","BED","ELAND","ELANDMULTI","ELANDEXPORT","BOWTIE","BAMPE","BEDPE"),
                                       help = "Format of tag file, \"AUTO\", \"BED\" or \"ELAND\" or \"ELANDMULTI\" or \"ELANDEXPORT\" or \"SAM\" or \"BAM\" or \"BOWTIE\" or \"BAMPE\" or \"BEDPE\". The default AUTO option will let '%(prog)s' decide which format the file is. Please check the definition in README file if you choose ELAND/ELANDMULTI/ELANDEXPORT/SAM/BAM/BOWTIE or BAMPE/BEDPE. DEFAULT: \"AUTO\"",
@@ -485,8 +485,8 @@ def add_cmbreps_parser( subparsers ):
 def add_randsample_parser( subparsers ):
     argparser_randsample = subparsers.add_parser( "randsample",
                                                   help = "Randomly sample number/percentage of total reads." )
-    argparser_randsample.add_argument( "-t", "--tfile", dest = "tfile", type = str, required = True, nargs = "+",
-                                      help = "ChIP-seq alignment file. If multiple files are given as '-t A B C', then they will all be read and combined. Note that pair-end data is not supposed to work with this command. REQUIRED." )
+    argparser_randsample.add_argument( "-i", "--ifile", dest = "ifile", type = str, required = True, nargs = "+",
+                                      help = "Alignment file. If multiple files are given as '-t A B C', then they will all be read and combined. Note that pair-end data is not supposed to work with this command. REQUIRED." )
 
     p_or_n_group = argparser_randsample.add_mutually_exclusive_group( required = True )
     p_or_n_group.add_argument( "-p", "--percentage", dest = "percentage", type = float,
@@ -599,7 +599,7 @@ def add_pileup_parser( subparsers ):
     argparser_pileup = subparsers.add_parser( "pileup",
                                               help = "Pileup aligned reads with a given extension size (fragment size or d in MACS language). Note there will be no step for duplicate reads filtering or sequencing depth scaling, so you may need to do certain pre/post-processing." )
     argparser_pileup.add_argument( "-i", "--ifile", dest = "ifile", type = str, required = True, nargs = "+",
-                                   help = "ChIP-seq alignment file. If multiple files are given as '-t A B C', then they will all be read and combined. Note that pair-end data is not supposed to work with this command. REQUIRED." )
+                                   help = "Alignment file. If multiple files are given as '-t A B C', then they will all be read and combined. Note that pair-end data is not supposed to work with this command. REQUIRED." )
     argparser_pileup.add_argument( "-o", "--ofile", dest = "outputfile", type = str, required = True,
                                    help = "Output bedGraph file name. If not specified, will write to standard output. REQUIRED." )
     add_outdir_option( argparser_pileup )    

@@ -4,16 +4,18 @@
 	* New features
 
 	1) Added missing BEDPE support. And enable the support for BAMPE
-	and BEDPE formats in 'pileup' subcommand. When format is BAMPE or
-	BEDPE, The 'pileup' command will pile up the whole fragment
-	defined by mapping locations of the left end and right end of each
-	read pair. Thank @purcaro
+	and BEDPE formats in 'pileup', 'filterdup' and 'randsample'
+	subcommands. When format is BAMPE or BEDPE, The 'pileup' command
+	will pile up the whole fragment defined by mapping locations of
+	the left end and right end of each read pair. Thank @purcaro
 
 	2) Added options to callpeak command for tweaking max-gap and
 	min-len during peak calling. Thank @jsh58!
 
 	3) The callpeak option "--to-large" option is replaced with
 	"--scale-to large".
+
+	4) The randsample option "-t" has been replaced with "-i".
 
 	* Bug fixes
 

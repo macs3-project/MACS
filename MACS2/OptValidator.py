@@ -1,4 +1,4 @@
-# Time-stamp: <2018-10-15 16:54:40 Tao Liu>
+# Time-stamp: <2018-10-16 12:02:29 Tao Liu>
 
 """Module Description
 
@@ -384,6 +384,11 @@ def opt_validate_filterdup ( options ):
         options.gzip_flag = True
     elif options.format == "BOWTIE":
         options.parser = BowtieParser
+    elif options.format == "BAMPE":
+        options.parser = BAMPEParser
+        options.gzip_flag = True
+    elif options.format == "BEDPE":
+        options.parser = BEDPEParser        
     elif options.format == "AUTO":
         options.parser = guess_parser
     else:
