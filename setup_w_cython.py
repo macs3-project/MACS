@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# Time-stamp: <2018-10-17 14:58:49 Tao Liu>
+# Time-stamp: <2018-10-17 15:44:04 Tao Liu>
 
 """Description: 
 
@@ -99,7 +99,7 @@ def main():
           scripts=['bin/macs2',
                    ],
           classifiers=[
-              'Development Status :: 5 - Production',
+              'Development Status :: 5 - Production/Stable',
               'Environment :: Console',
               'Intended Audience :: Developers',
               'Intended Audience :: Science/Research',              

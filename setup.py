@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# Time-stamp: <2018-10-17 14:58:34 Tao Liu>
+# Time-stamp: <2018-10-17 15:48:44 Tao Liu>
 
 """Description
 
@@ -65,7 +65,7 @@ def main():
           description="Model Based Analysis for ChIP-Seq data",
           long_description = long_description,
           long_description_content_type="text/markdown",
-          author='Tao Liu',
+`          author='Tao Liu',
           author_email='vladimir.liu@gmail.com',
           url='http://github.com/taoliu/MACS/',
           package_dir={'MACS2' : 'MACS2'},
@@ -74,7 +74,7 @@ def main():
           scripts=['bin/macs2',
                    ],
           classifiers=[
-              'Development Status :: 5 - Production',
+              'Development Status :: 5 - Production/Stable',
               'Environment :: Console',
               'Intended Audience :: Developers',
               'Intended Audience :: Science/Research',              
