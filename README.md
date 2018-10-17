@@ -1,6 +1,8 @@
 # Recent Changes for MACS (2.1.2)
 
+###
 
+###
 
 # README for MACS (2.1.2)
 
@@ -24,7 +26,7 @@ Please check the file 'INSTALL' in the distribution.
 
 ## Usage
 
-    macs2 [-h] [--version]  {callpeak,filterdup,bdgpeakcall,bdgcmp,randsample,bdgdiff,bdgbroadcall}
+    `macs2 [-h] [--version]  {callpeak,filterdup,bdgpeakcall,bdgcmp,randsample,bdgdiff,bdgbroadcall}`
 
 Example for regular peak calling: `macs2 callpeak -t ChIP.bam -c Control.bam -f BAM -g hs -n test -B -q 0.01`
 
@@ -34,7 +36,7 @@ There are seven major functions available in MACS serving as sub-commands.
 
 Subcommand | Description
 -----------|----------
-callpeak |  Main MACS2 Function to [call peaks](#Call Peaks) from alignment results.
+callpeak |  Main MACS2 Function to call peaksfrom alignment results.
 bdgpeakcall | Call peaks from bedGraph output. 
 bdgbroadcall | Call broad peaks from bedGraph output.
 bdgcmp | Comparing two signal tracks in bedGraph format.
@@ -95,68 +97,43 @@ combine different formats of files. Note that MACS can't detect
 "BAMPE" or "BEDPE" format with "AUTO", and you have to implicitly
 specify the format for "BAMPE" and "BEDPE".
 
-The BED format can be found at `UCSC genome browser website <http://genome.ucsc.edu/FAQ/FAQformat#format1>`_.
+Nowadays, the most common formats are BED or BAM/SAM. 
 
-If the format is ELAND, the file must be ELAND result output file,
-each line MUST represents only ONE tag, with fields of:
+###### BED
+The BED format can be found at [UCSC genome browser website](http://genome.ucsc.edu/FAQ/FAQformat#format1).
 
-1. Sequence name (derived from file name and line number if format is not Fasta)
-2. Sequence
-3. Type of match:
+The essential columns in BED format input are the 1st column
+"chromosome name", the 2nd "start position", the 3rd "end position",
+and the 6th, "strand".
 
-:NM: no match found.
-:QC: no matching done: QC failure (too many Ns basically).
-:RM: no matching done: repeat masked (may be seen if repeatFile.txt was specified).
-:U0: Best match found was a unique exact match.
-:U1: Best match found was a unique 1-error match. 
-:U2: Best match found was a unique 2-error match. 
-:R0: Multiple exact matches found.
-:R1: Multiple 1-error matches found, no exact matches.
-:R2: Multiple 2-error matches found, no exact or 1-error matches.
+###### BAM/SAM
 
-4. Number of exact matches found.
-5. Number of 1-error matches found.
-6. Number of 2-error matches found.  
-   Rest of fields are only seen if a unique best match was found
-   (i.e. the match code in field 3 begins with "U").
-7. Genome file in which match was found.
-8. Position of match (bases in file are numbered starting at 1).
-9. Direction of match (F=forward strand, R=reverse).
-10. How N characters in read were interpreted: ("."=not applicable,
-    "D"=deletion, "I"=insertion). Rest of fields are only seen in
-    the case of a unique inexact match (i.e. the match code was U1 or
-    U2).
-11. Position and type of first substitution error (e.g. 12A: base 12
-    was A, not whatever is was in read).
-12. Position and type of first substitution error, as above. 
+If the format is BAM/SAM, please check the definition in
+(http://samtools.sourceforge.net/samtools.shtml).  If the BAM file is
+generated for paired-end data, MACS will only keep the left mate(5'
+end) tag. However, when format BAMPE is specified, MACS will use the
+real fragments inferred from alignment results for reads pileup.
+
+###### BEDPE or BAMPE
+
+A special mode will be triggered while format is specified as
+'BAMPE' or 'BEDPE'. In this way, MACS2 will process the BAM or BED
+files as paired-end data. Instead of building bimodal distribution of
+plus and minus strand reads to predict fragment size, MACS2  will
+use actual insert sizes of pairs of reads to build fragment
+pileup.
+
+The BAMPE format is just BAM format containing paired-end alignment
+information, such as those from BWA or BOWTIE. 
 
 The BEDPE format is a simplified and more flexible BED format, which
 only contains the first three columns defining the chromosome name,
 left and right position of the fragment from Paired-end
-sequencing. Note, this is NOT the same format used by BEDTOOLS, and
-BEDTOOLS version of BEDPE is actually not in a standard BED format.
+sequencing. Please note, this is NOT the same format used by BEDTOOLS,
+and BEDTOOLS version of BEDPE is actually not in a standard BED
+format.
 
-If the format is ELANDMULTI, the file must be ELAND output file from
-multiple-match mode, each line MUST represents only ONE tag, with
-fields of:
-
-1. Sequence name 
-2. Sequence 
-3. Either NM, QC, RM (as described above) or the following: 
-4. x:y:z where x, y, and z are the number of exact, single-error, and 2-error matches found
-5. Blank, if no matches found or if too many matches found, or the following:
-   BAC_plus_vector.fa:163022R1,170128F2,E_coli.fa:3909847R1 This says
-   there are two matches to BAC_plus_vector.fa: one in the reverse
-   direction starting at position 160322 with one error, one in the
-   forward direction starting at position 170128 with two
-   errors. There is also a single-error match to E_coli.fa.
-
-If the format is BAM/SAM, please check the definition in
-(http://samtools.sourceforge.net/samtools.shtml).  Pair-end mapping
-results can be saved in a single BAM file, if so, MACS will
-automatically keep the left mate(5' end) tag. However, when format
-BAMPE is specified, MACS will use the real fragments inferred
-from alignment results for reads pileup.
+###### BOWTIE
 
 If the format is BOWTIE, you need to provide the ASCII bowtie output
 file with the suffix '.map'. Please note that, you need to make sure
@@ -192,6 +169,57 @@ from the above webpage:
    offset is expressed as a 0-based offset from the high-quality (5')
    end of the read.
 
+###### ELAND
+If the format is ELAND, the file must be ELAND result output file,
+each line MUST represents only ONE tag, with fields of:
+
+1. Sequence name (derived from file name and line number if format is not Fasta)
+2. Sequence
+3. Type of match:
+
+ * NM: no match found.
+ * QC: no matching done: QC failure (too many Ns basically).
+ * RM: no matching done: repeat masked (may be seen if repeatFile.txt was specified).
+ * U0: Best match found was a unique exact match.
+ * U1: Best match found was a unique 1-error match. 
+ * U2: Best match found was a unique 2-error match. 
+ * R0: Multiple exact matches found.
+ * R1: Multiple 1-error matches found, no exact matches.
+ * R2: Multiple 2-error matches found, no exact or 1-error matches.
+
+4. Number of exact matches found.
+5. Number of 1-error matches found.
+6. Number of 2-error matches found.  
+   Rest of fields are only seen if a unique best match was found
+   (i.e. the match code in field 3 begins with "U").
+7. Genome file in which match was found.
+8. Position of match (bases in file are numbered starting at 1).
+9. Direction of match (F=forward strand, R=reverse).
+10. How N characters in read were interpreted: ("."=not applicable,
+    "D"=deletion, "I"=insertion). Rest of fields are only seen in
+    the case of a unique inexact match (i.e. the match code was U1 or
+    U2).
+11. Position and type of first substitution error (e.g. 12A: base 12
+    was A, not whatever is was in read).
+12. Position and type of first substitution error, as above. 
+
+###### ELANDMULTI
+
+If the format is ELANDMULTI, the file must be ELAND output file from
+multiple-match mode, each line MUST represents only ONE tag, with
+fields of:
+
+1. Sequence name 
+2. Sequence 
+3. Either NM, QC, RM (as described above) or the following: 
+4. x:y:z where x, y, and z are the number of exact, single-error, and 2-error matches found
+5. Blank, if no matches found or if too many matches found, or the following:
+   `BAC_plus_vector.fa:163022R1,170128F2,E_coli.fa:3909847R1 This says
+   there are two matches to BAC_plus_vector.fa: one in the reverse
+   direction starting at position 160322 with one error, one in the
+   forward direction starting at position 170128 with two
+   errors. There is also a single-error match to E_coli.fa.`
+   
 Notes:
 
 1) For BED format, the 6th column of strand information is required by
@@ -205,24 +233,10 @@ less than 3 errors is involed in calculation. If multiple hits of a
 single tag are included in your raw ELAND file, please remove the
 redundancy to keep the best hit for that sequencing tag.
 
-3) For the experiment with several replicates, it is recommended to
-concatenate several ChIP-seq treatment files into a single file. To
-do this, under Unix/Mac or Cygwin (for windows OS), type:
-
-```$ cat replicate1.bed replicate2.bed replicate3.bed > all_replicates.bed```
-
-For BAM or SAM files, samtools can be used to combine replicates.
-
-4) ELAND export format support sometimes may not work on your
+3) ELAND export format support sometimes may not work on your
 datasets, because people may mislabel the 11th and 12th column. MACS
 uses 11th column as the sequence name which should be the chromosome
 names.
-
-5) A special mode will be triggered while format is specified as
-'BAMPE' or 'BEDPE'. In this way, MACS2 will process the BAM or BED
-files as paired-end data. Instead of building bimodal distribution of
-plus and minus strand reads to predict fragment size, MACS2 now will
-use actual insert sizes of pairs of reads to build fragment pileup.
 
 ##### -g/--gsize
 
@@ -236,10 +250,10 @@ size. The default hs -- 2.7e9 is recommended for UCSC human hg18
 assembly. Here are all precompiled parameters for effective genome
 size:
 
-:hs: 2.7e9
-:mm: 1.87e9
-:ce: 9e7
-:dm: 1.2e8
+ * hs: 2.7e9
+ * mm: 1.87e9
+ * ce: 9e7
+ * dm: 1.2e8
 
 ##### -s/--tsize
 
@@ -313,7 +327,7 @@ is 200bps, then use '--nomodel --shift -100 --extsize 200'.
 2. For certain nucleosome-seq data, we need to pileup the centers of
 nucleosomes using a half-nucleosome size for wavelet analysis
 (e.g. NPS algorithm). Since the DNA wrapped on nucleosome is about
-147bps, this option can be used: '--nomodel --shift 37 --extsize 73'.
+147bps, this option can be used: `--nomodel --shift 37 --extsize 73`.
 
 ##### --keep-dup
 
@@ -352,12 +366,11 @@ scale up small data would cause more false positives.
 If this flag is on, MACS will store the fragment pileup, control
 lambda, -log10pvalue and -log10qvalue scores in bedGraph files. The
 bedGraph files will be stored in current directory named
-NAME+'_treat_pileup.bdg' for treatment data,
-NAME+'_control_lambda.bdg' for local lambda values from control,
-NAME+'_treat_pvalue.bdg' for Poisson pvalue scores (in -log10(pvalue)
-form), and NAME+'_treat_qvalue.bdg' for q-value scores from
-Benjamini–Hochberg–Yekutieli procedure
-<http://en.wikipedia.org/wiki/False_discovery_rate#Dependent_tests>
+`NAME_treat_pileup.bdg` for treatment data, `NAME_control_lambda.bdg`
+for local lambda values from control, `NAME_treat_pvalue.bdg` for
+Poisson pvalue scores (in -log10(pvalue) form), and
+`NAME_treat_qvalue.bdg` for q-value scores from
+[Benjamini–Hochberg–Yekutieli procedure](http://en.wikipedia.org/wiki/False_discovery_rate#Dependent_tests).
 
 ##### --call-summits
 
@@ -370,7 +383,7 @@ and peak summit positions.
 
 #### Output files
 
-1. NAME_peaks.xls is a tabular file which contains information about
+1. `NAME_peaks.xls` is a tabular file which contains information about
    called peaks. You can open it in excel and sort/filter using excel
    functions. Information include:
    
@@ -384,12 +397,12 @@ and peak summit positions.
    
    Coordinates in XLS is 1-based which is different with BED format.
 
-2. NAME_peaks.narrowPeak is BED6+4 format file which contains the
+2. `NAME_peaks.narrowPeak` is BED6+4 format file which contains the
    peak locations together with peak summit, pvalue and qvalue. You
    can load it to UCSC genome browser. Definition of some specific
    columns are: 
    
-   - 5th: integer score for display calculated as ``int(-10*log10qvalue)``. Please note that currently this value might be out of the [0-1000] range defined in UCSC Encode narrowPeak format<https://genome.ucsc.edu/FAQ/FAQformat.html#format12>
+   - 5th: integer score for display calculated as `int(-10*log10qvalue)`. Please note that currently this value might be out of the [0-1000] range defined in [UCSC Encode narrowPeak format](https://genome.ucsc.edu/FAQ/FAQformat.html#format12)
    - 7th: fold-change
    - 8th: -log10pvalue
    - 9th: -log10qvalue
@@ -398,18 +411,18 @@ and peak summit positions.
    The file can be loaded directly to UCSC genome browser. Remove the beginning track line if you want to
    analyze it by other tools.
 
-3. NAME_summits.bed is in BED format, which contains the peak summits
+3. `NAME_summits.bed` is in BED format, which contains the peak summits
    locations for every peaks. The 5th column in this file is
    -log10pvalue the same as NAME_peaks.bed. If you want to find the
    motifs at the binding sites, this file is recommended. The file
    can be loaded directly to UCSC genome browser. Remove the
    beginning track line if you want to analyze it by other tools.
 
-4. NAME_peaks.broadPeak is in BED6+3 format which is similar to
+4. `NAME_peaks.broadPeak` is in BED6+3 format which is similar to
    narrowPeak file, except for missing the 10th column for annotating
    peak summits.
 
-5. NAME_peaks.gappedPeak is in BED12+3 format which contains both the
+5. `NAME_peaks.gappedPeak` is in BED12+3 format which contains both the
    broad region and narrow peaks. The 5th column is 10*-log10qvalue,
    to be more compatible to show grey levels on UCSC browser. Tht 7th
    is the start of the first narrow peak in the region, and the 8th
@@ -421,38 +434,38 @@ and peak summit positions.
    fold-change, 14th: -log10pvalue, 15th: -log10qvalue. The file can be
    loaded directly to UCSC genome browser. 
 
-6. NAME_model.r is an R script which you can use to produce a PDF
+6. `NAME_model.r` is an R script which you can use to produce a PDF
    image about the model based on your data. Load it to R by:
 
-   ```$ Rscript NAME_model.r```
+   `$ Rscript NAME_model.r`
 
-   Then a pdf file NAME_model.pdf will be generated in your current
+   Then a pdf file `NAME_model.pdf` will be generated in your current
    directory. Note, R is required to draw this figure.
 
-7. The .bdg files are in bedGraph format which can be imported to
-   UCSC genome browser or be converted into even smaller bigWig
-   files. There are two kinds of bdg files: treat_pileup, and
-   control_lambda.
+7. The .bdg files are in bedGraph format which can be imported to UCSC
+   genome browser or be converted into even smaller bigWig
+   files. There are two kinds of bdg files, one for treatment and the
+   other one for control.
 
 ## Other useful links
 
-:Cistrome: http://cistrome.org/ap/
-:bedTools: http://code.google.com/p/bedtools/
-:UCSC toolkits: http://hgdownload.cse.ucsc.edu/admin/exe/
+ * [Cistrome](http://cistrome.org/ap/)
+ * [bedTools](http://code.google.com/p/bedtools/)
+ * [UCSC toolkits](http://hgdownload.cse.ucsc.edu/admin/exe/)
 
 ## Tips of fine-tuning peak calling
 
 Check the three scripts within MACSv2 package:
 
-1. bdgcmp can be used on ```*_treat_pileup.bdg``` and
-   ```*_control_lambda.bdg``` or bedGraph files from other resources
+1. bdgcmp can be used on `*_treat_pileup.bdg` and
+   `*_control_lambda.bdg` or bedGraph files from other resources
    to calculate score track.
 
-2. bdgpeakcall can be used on ```*_treat_pvalue.bdg``` or the file
+2. bdgpeakcall can be used on `*_treat_pvalue.bdg` or the file
    generated from bdgcmp or bedGraph file from other resources to
    call peaks with given cutoff, maximum-gap between nearby mergable
    peaks and minimum length of peak. bdgbroadcall works similarly to
-   bdgpeakcall, however it will output _broad_peaks.bed in BED12
+   bdgpeakcall, however it will output `_broad_peaks.bed` in BED12
    format.
 
 3. Differential calling tool -- bdgdiff, can be used on 4 bedgraph
