@@ -1,9 +1,55 @@
 # Recent Changes for MACS (2.1.2)
 
-###
+### 2.1.2
 
-###
+	* New features
 
+	1) Added missing BEDPE support. And enable the support for BAMPE
+	and BEDPE formats in 'pileup', 'filterdup' and 'randsample'
+	subcommands. When format is BAMPE or BEDPE, The 'pileup' command
+	will pile up the whole fragment defined by mapping locations of
+	the left end and right end of each read pair. Thank @purcaro
+
+	2) Added options to callpeak command for tweaking max-gap and
+	min-len during peak calling. Thank @jsh58!
+
+	3) The callpeak option "--to-large" option is replaced with
+	"--scale-to large".
+
+	4) The randsample option "-t" has been replaced with "-i".
+
+	* Bug fixes
+
+	1) Fixed memory issue related to #122 and #146
+
+	2) Fixed a bug caused by a typo. Related to #249, Thank @shengqh
+
+	3) Fixed a bug while setting commandline qvalue cutoff.
+
+	4) Better describe the 5th column of narrowPeak. Thank @alexbarrera
+
+	5) Fixed the calculation of average fragment length for paired-end
+	data. Thank @jsh58
+
+	6) Fixed bugs caused by khash while computing p/q-value and log
+	likelihood ratios. Thank @jsh58
+
+    7) More spelling tweaks in source code. Thank @mr-c
+
+### 2.1.1
+
+	* Retire the tag:rc. 
+
+	* Fixed spelling. Merged pull request #120. Thank @mr-c!
+
+	* Change filtering criteria for reading BAM/SAM files
+
+	Related to callpeak and filterdup commands. Now the
+	reads/alignments flagged with 1028 or 'PCR/Optical duplicate' will
+	still be read although MACS2 may decide them as duplicates
+	later. Related to old issue #33. Sorry I forgot to address it for
+	years!
+	
 # README for MACS (2.1.2)
 
 ## Introduction
@@ -220,7 +266,7 @@ fields of:
    forward direction starting at position 170128 with two
    errors. There is also a single-error match to E_coli.fa.`
    
-Notes:
+###### Notes
 
 1) For BED format, the 6th column of strand information is required by
 MACS. And please pay attention that the coordinates in BED format is
