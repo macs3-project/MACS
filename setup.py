@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# Time-stamp: <2018-10-16 16:30:08 Tao Liu>
+# Time-stamp: <2018-10-17 14:58:34 Tao Liu>
 
 """Description
 
@@ -56,10 +56,15 @@ def main():
                    Extension("MACS2.hashtable", ["MACS2/hashtable.c"], include_dirs=["MACS2/",numpy_get_include()], extra_compile_args=extra_c_args),
                    Extension("MACS2.Statistics", ["MACS2/Statistics.c"], libraries=["m"], include_dirs=["MACS2/",numpy_get_include()], extra_compile_args=extra_c_args),
                    ]
-    
+
+    with open("README.md", "r") as fh:
+        long_description = fh.read()
+        
     setup(name="MACS2",
-          version="2.1.2.20181016",
+          version="2.1.2.20181017",
           description="Model Based Analysis for ChIP-Seq data",
+          long_description = long_description,
+          long_description_content_type="text/markdown",
           author='Tao Liu',
           author_email='vladimir.liu@gmail.com',
           url='http://github.com/taoliu/MACS/',
@@ -69,7 +74,7 @@ def main():
           scripts=['bin/macs2',
                    ],
           classifiers=[
-              'Development Status :: 4 - Beta',
+              'Development Status :: 5 - Production',
               'Environment :: Console',
               'Intended Audience :: Developers',
               'Intended Audience :: Science/Research',              
@@ -77,7 +82,8 @@ def main():
               'Operating System :: MacOS :: MacOS X',
               'Operating System :: POSIX',
               'Topic :: Scientific/Engineering :: Bio-Informatics',
-              'Programming Language :: Python',
+              'Programming Language :: Python :: 2 :: Only',
+              'Programming Language :: Cython',
               ],
           install_requires=[
               'numpy>=1.6',

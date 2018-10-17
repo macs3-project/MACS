@@ -1,10 +1,10 @@
-========================
-README for MACS (2.1.0)
-========================
-Time-stamp: <2016-02-15 15:31:42 Tao Liu>
+# Recent Changes for MACS (2.1.2)
 
-Introduction
-============
+
+
+# README for MACS (2.1.2)
+
+## Introduction
 
 With the improvement of sequencing techniques, chromatin
 immunoprecipitation followed by high throughput sequencing (ChIP-Seq)
@@ -18,88 +18,74 @@ binding sites through combining the information of both sequencing tag
 position and orientation. MACS can be easily used for ChIP-Seq data
 alone, or with control sample with the increase of specificity.
 
-Install
-=======
+## Install
 
 Please check the file 'INSTALL' in the distribution.
 
-Usage of MACS2
-==============
+## Usage
 
-::
+    macs2 [-h] [--version]  {callpeak,filterdup,bdgpeakcall,bdgcmp,randsample,bdgdiff,bdgbroadcall}
 
-  macs2 [-h] [--version]
-             {callpeak,filterdup,bdgpeakcall,bdgcmp,randsample,bdgdiff,bdgbroadcall}
+Example for regular peak calling: `macs2 callpeak -t ChIP.bam -c Control.bam -f BAM -g hs -n test -B -q 0.01`
 
-:Example for regular peak calling: ``macs2 callpeak -t ChIP.bam -c Control.bam -f BAM -g hs -n test -B -q 0.01``
-
-:Example for broad peak calling: ``macs2 callpeak -t ChIP.bam -c Control.bam --broad -g hs --broad-cutoff 0.1``
+Example for broad peak calling: `macs2 callpeak -t ChIP.bam -c Control.bam --broad -g hs --broad-cutoff 0.1`
 
 There are seven major functions available in MACS serving as sub-commands.
 
-:callpeak:            Main MACS2 Function to `Call peaks`_ from alignment results.
-:bdgpeakcall:         Call peaks from bedGraph output.
-:bdgbroadcall:        Call broad peaks from bedGraph output.
-:bdgcmp:              Deduct noise by comparing two signal tracks in bedGraph.
-:bdgdiff:             Differential peak detection based on paired four bedgraph files.
-:filterdup:           Remove duplicate reads at the same position, then convert acceptable format to BED format.
-:predictd:            Predict d or fragment size from alignment results.
-:pileup:              Pileup aligned reads with a given extension
-                      size (fragment size or d in MACS language). Note there will be no
-                      step for duplicate reads filtering or sequencing depth scaling, so you may need to do certain post-
-                      processing.
-:randsample:          Randomly sample number/percentage of total reads.
-:refinepeak:          (Experimental) Take raw reads alignment, refine peak
-                          summits and give scores measuring balance of forward-
-                          backward tags. Inspired by SPP.
-
+Subcommand | Description
+-----------|----------
+callpeak |  Main MACS2 Function to [call peaks](#Call Peaks) from alignment results.
+bdgpeakcall | Call peaks from bedGraph output. 
+bdgbroadcall | Call broad peaks from bedGraph output.
+bdgcmp | Comparing two signal tracks in bedGraph format.
+bdgopt | Operate the score column of bedGraph file. 
+cmbreps | Combine BEDGraphs of scores from replicates. 
+bdgdiff | Differential peak detection based on paired four bedgraph files. 
+filterdup | Remove duplicate reads, then save in BED/BEDPE format.
+predictd | Predict d or fragment size from alignment results.
+pileup | Pileup aligned reads (single end) or fragments (paired-end)
+randsample | Randomly choose a number/percentage of total reads.
+refinepeak | Take raw reads alignment, refine peak summits.
 
 We only cover 'callpeak' module in this document. Please use 'macs2
 COMMAND -h' to see the detail description for each option of each
 module.
 
-Call peaks
-~~~~~~~~~~
+### Call peaks
 
 This is the main function in MACS2. It can be invoked by 'macs2
 callpeak' command. If you type this command without parameters, you
 will see a full description of commandline options. Here we only list
-commonly used ones.
+the essential options.
 
-Options
---------------
+#### Essential Options
 
--t/--treatment FILENAME
-```````````````````````
+##### -t/--treatment FILENAME
 
 This is the only REQUIRED parameter for MACS. File can be in any
 supported format specified by --format option. Check --format for
 detail. If you have more than one alignment files, you can specify
-them as ```-t A B C```. MACS will pool up all these files together.
+them as `-t A B C`. MACS will pool up all these files together.
 
--c/--control
-````````````
+##### -c/--control
 
 The control or mock data file. Please follow the same direction as for
 -t/--treatment.
 
--n/--name
-`````````
+##### -n/--name
 
 The name string of the experiment. MACS will use this string NAME to
-create output files like 'NAME_peaks.xls', 'NAME_negative_peaks.xls',
-'NAME_peaks.bed' , 'NAME_summits.bed', 'NAME_model.r' and so on. So
+create output files like `NAME_peaks.xls`, `NAME_negative_peaks.xls`,
+`NAME_peaks.bed` , `NAME_summits.bed`, `NAME_model.r` and so on. So
 please avoid any confliction between these filenames and your
 existing files.
 
---outdir
-````````
+##### --outdir
 
 MACS2 will save all output files into speficied folder for this
 option.
 
--f/--format FORMAT
-``````````````````
+##### -f/--format FORMAT
 
 Format of tag file, can be "ELAND", "BED", "ELANDMULTI",
 "ELANDEXPORT", "ELANDMULTIPET" (for pair-end tags), "SAM", "BAM",
@@ -238,9 +224,7 @@ files as paired-end data. Instead of building bimodal distribution of
 plus and minus strand reads to predict fragment size, MACS2 now will
 use actual insert sizes of pairs of reads to build fragment pileup.
 
-
--g/--gsize
-``````````
+##### -g/--gsize
 
 PLEASE assign this parameter to fit your needs!
 
@@ -257,58 +241,31 @@ size:
 :ce: 9e7
 :dm: 1.2e8
 
--s/--tsize
-``````````
+##### -s/--tsize
 
 The size of sequencing tags. If you don't specify it, MACS will try to
 use the first 10 sequences from your input treatment file to determine
 the tag size. Specifying it will override the automatically determined
 tag size.
 
---bw
-````
-
-The band width which is used to scan the genome ONLY for model
-building. You can set this parameter as the sonication fragment size
-expected from wet experiment. The previous side effect on the peak
-detection process has been removed. So this parameter only affects the
-model building.
-
--q/--qvalue
-```````````
+##### -q/--qvalue
 
 The qvalue (minimum FDR) cutoff to call significant regions. Default
 is 0.05. For broad marks, you can try 0.05 as cutoff. Q-values are
 calculated from p-values using Benjamini-Hochberg procedure.
 
--p/--pvalue
-```````````
+##### -p/--pvalue
 
 The pvalue cutoff. If -p is specified, MACS2 will use pvalue instead
 of qvalue.
 
--m/--mfold
-``````````
-
-This parameter is used to select the regions within MFOLD range of
-high-confidence enrichment ratio against background to build
-model. The regions must be lower than upper limit, and higher than
-the lower limit of fold enrichment. DEFAULT:5,50 means using all
-regions not too low (>5) and not too high (<50) to build
-paired-peaks model. If MACS can not find more than 100 regions to
-build model, it will use the --extsize parameter to continue the
-peak detection ONLY if --fix-bimodal is set.
-
-
---nolambda
-``````````
+##### --nolambda
 
 With this flag on, MACS will use the background lambda as local
 lambda. This means MACS will not consider the local bias at peak
 candidate regions.
 
---slocal, --llocal
-``````````````````
+##### --slocal, --llocal
 
 These two parameters control which two levels of regions will be
 checked around the peak regions to calculate the maximum lambda as
@@ -319,21 +276,11 @@ domain. You can tweak these according to your project. Remember that
 if the region is set too small, a sharp spike in the input data may
 kill the significant peak.
 
---fix-bimodal
-`````````````
-
-Whether turn on the auto paired-peak model process. If it's set, when
-MACS failed to build paired model, it will use the nomodel settings,
-the '--extsize' parameter to extend each tags. If set, MACS will be
-terminated if paried-peak model is failed.
-
---nomodel
-`````````
+##### --nomodel
 
 While on, MACS will bypass building the shifting model.
 
---extsize
-`````````
+##### --extsize
 
 While '--nomodel' is set, MACS uses this parameter to extend reads in
 5'->3' direction to fix-sized fragments. For example, if the size of
@@ -342,8 +289,7 @@ to bypass the model building by MACS, this parameter can be set
 as 200. This option is only valid when --nomodel is set or when MACS
 fails to build model and --fix-bimodal is on.
 
---shift
-```````
+##### --shift
 
 Note, this is NOT the legacy --shiftsize option which is replaced by
 --extsize! You can set an arbitrary shift in bp here. Please Use
@@ -369,8 +315,7 @@ nucleosomes using a half-nucleosome size for wavelet analysis
 (e.g. NPS algorithm). Since the DNA wrapped on nucleosome is about
 147bps, this option can be used: '--nomodel --shift 37 --extsize 73'.
 
---keep-dup
-``````````
+##### --keep-dup
 
 It controls the MACS behavior towards duplicate tags at the exact same
 location -- the same coordination and the same strand. The default
@@ -380,8 +325,7 @@ and the 'all' option keeps every tags.  If an integer is given, at
 most this number of tags will be kept at the same location. The
 default is to keep one tag at the same location. Default: 1
 
---broad
-```````
+##### --broad
 
 When this flag is on, MACS will try to composite broad regions in
 BED12 ( a gene-model-like format ) by putting nearby highly enriched
@@ -390,33 +334,20 @@ controlled by another cutoff through --broad-cutoff. The maximum
 length of broad region length is 4 times of d from MACS. DEFAULT:
 False
 
---broad-cutoff
-``````````````
+##### --broad-cutoff
 
 Cutoff for broad region. This option is not available unless --broad
 is set. If -p is set, this is a pvalue cutoff, otherwise, it's a
 qvalue cutoff.  DEFAULT: 0.1
 
---to-large
-``````````
+##### --scale-to <large|small>
 
-When set, linearly scale the smaller dataset to the same depth as
-larger dataset, by default, the larger dataset will be scaled
-towards the smaller dataset. Beware, to scale up small data would
-cause more false positives.
+When set to "large", linearly scale the smaller dataset to the same
+depth as larger dataset. By default or being set as "small", the
+larger dataset will be scaled towards the smaller dataset. Beware, to
+scale up small data would cause more false positives.
 
---down-sample
-`````````````
-
-When set, random sampling method will scale down the bigger
-sample. By default, MACS uses linear scaling. This option will make
-the results unstable and irreproducible since each time, random reads
-would be selected, especially the numbers (pileup, pvalue, qvalue)
-would change. Consider to use 'randsample' script before MACS2 runs
-instead.
-
--B/--bdg
-````````
+##### -B/--bdg
 
 If this flag is on, MACS will store the fragment pileup, control
 lambda, -log10pvalue and -log10qvalue scores in bedGraph files. The
@@ -428,8 +359,7 @@ form), and NAME+'_treat_qvalue.bdg' for q-value scores from
 Benjamini–Hochberg–Yekutieli procedure
 <http://en.wikipedia.org/wiki/False_discovery_rate#Dependent_tests>
 
---call-summits
-``````````````
+##### --call-summits
 
 MACS will now reanalyze the shape of signal profile (p or q-score
 depending on cutoff setting) to deconvolve subpeaks within each peak
@@ -438,16 +368,7 @@ adjacent binding events. While used, the output subpeaks of a big
 peak region will have the same peak boundaries, and different scores
 and peak summit positions.
 
---verbose
-`````````
-
-If you don't want to see any message during the running of MACS, set
-it to 0. But the CRITICAL messages will never be hidden. If you want
-to see rich information like how many peaks are called for every
-chromosome, you can set it to 3 or larger than 3.
-
-Output files
-~~~~~~~~~~~~
+#### Output files
 
 1. NAME_peaks.xls is a tabular file which contains information about
    called peaks. You can open it in excel and sort/filter using excel
@@ -513,15 +434,13 @@ Output files
    files. There are two kinds of bdg files: treat_pileup, and
    control_lambda.
 
-Other useful links
-==================
+## Other useful links
 
 :Cistrome: http://cistrome.org/ap/
 :bedTools: http://code.google.com/p/bedtools/
 :UCSC toolkits: http://hgdownload.cse.ucsc.edu/admin/exe/
 
-Tips of fine-tuning peak calling
-================================
+## Tips of fine-tuning peak calling
 
 Check the three scripts within MACSv2 package:
 
@@ -542,3 +461,6 @@ Check the three scripts within MACSv2 package:
    2 and treatment 1. It will output the consistent and unique sites
    according to parameter settings for minimum length, maximum gap
    and cutoff.
+
+4. You can combine subcommands to do a step-by-step peak
+   calling. Read detail at [MACS2 wikipage](https://github.com/taoliu/MACS/wiki/Advanced%3A-Call-peaks-using-MACS2-subcommands)
