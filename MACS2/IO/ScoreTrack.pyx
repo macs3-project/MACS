@@ -722,7 +722,7 @@ cdef class scoreTrackII:
             v = self.data[chrom][3]
             l = self.datalength[chrom]
             for i in range(l):
-                v[ i ] =  get_pscore( int(p[ i ]) , c[ i ] )
+                v[ i ] =  get_pscore( int(p[ i ])  + self.pseudocount , c[ i ]  + self.pseudocount )
                 try:
                     self.pvalue_stat[v[ i ]] += pos[ i ] - prev_pos
                 except:
