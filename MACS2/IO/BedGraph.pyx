@@ -1,4 +1,4 @@
-# Time-stamp: <2016-02-12 00:39:32 Tao Liu>
+# Time-stamp: <2018-10-23 17:05:26 Tao Liu>
 
 """Module for Feature IO classes.
 
@@ -662,25 +662,36 @@ cdef class bedGraphTrackI:
         
         start      = lvl2peak["start"]
         end        = lvl2peak["end"]
+
         if not lvl1peakset:
-            bpeaks.add(chrom, start, end, score=lvl2peak["score"], thickStart=".", thickEnd=".",
-                       blockNum = 0, blockSizes = ".", blockStarts = ".")
-            return bpeaks            
+            #try:
+            # will complement by adding 1bps start and end to this region
+            # may change in the future if gappedPeak format was improved.
+            bpeaks.add(chrom, start, end, score=lvl2peak["score"], thickStart=str(start), thickEnd=str(end),
+                       blockNum = 2, blockSizes = "1,1", blockStarts = "0,"+str(end-start-1), pileup = lvl2peak["pileup"],
+                       pscore = lvl2peak["pscore"], fold_change = lvl2peak["fc"],
+                       qscore = lvl2peak["qscore"] )
+            return bpeaks
+
         thickStart = str(lvl1peakset[0]["start"])
         thickEnd   = str(lvl1peakset[-1]["end"])
         blockNum   = len(lvl1peakset)
         blockSizes = ",".join( map(lambda x:str(x["length"]),lvl1peakset) )
         blockStarts = ",".join( map(lambda x:str(x["start"]-start),lvl1peakset) )
-        #if lvl2peak["start"] != thickStart:
-        #    # add 1bp mark for the start of lvl2 peak
-        #    blockNum += 1
-        #    blockSizes = "1,"+blockSizes
-        #    blockStarts = "0,"+blockStarts
-        #if lvl2peak["end"] != thickEnd:
-        #    # add 1bp mark for the end of lvl2 peak            
-        #    blockNum += 1
-        #    blockSizes = blockSizes+",1"
-        #    blockStarts = blockStarts+","+str(end-start-1)
+
+        # add 1bp left and/or right block if necessary
+        if int(thickStart) != start:
+            # add 1bp left block
+            thickStart = str(start)
+            blockNum += 1
+            blockSizes = "1,"+blockSizes
+            blockStarts = "0,"+blockStarts
+        if int(thickEnd) != end:
+            # add 1bp right block
+            thickEnd = str(end)
+            blockNum += 1
+            blockSizes = blockSizes+",1"
+            blockStarts = blockStarts+","+str(end-start-1)
         
         bpeaks.add(chrom, start, end, score=lvl2peak["score"], thickStart=thickStart, thickEnd=thickEnd,
                    blockNum = blockNum, blockSizes = blockSizes, blockStarts = blockStarts)
