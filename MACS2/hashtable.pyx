@@ -2,7 +2,7 @@
 Modified from Pandas: https://github.com/pydata/pandas/blob/master/pandas/src/hashtable.pyx
 """
 
-from khash cimport *
+from MACS2.khash cimport *
 from numpy cimport *
 import numpy as np
 cimport numpy as np

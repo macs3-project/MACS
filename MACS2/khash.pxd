@@ -64,13 +64,13 @@ cdef extern from "khash.h":
         int64_t *keys
         float64_t *vals                 # values in hashtable are in float64 type
 
-    inline kh_int64_t* kh_init_int64()
-    inline void kh_destroy_int64(kh_int64_t*)
-    inline void kh_clear_int64(kh_int64_t*)
-    inline khint_t kh_get_int64(kh_int64_t*, int64_t)
-    inline void kh_resize_int64(kh_int64_t*, khint_t)
-    inline khint_t kh_put_int64(kh_int64_t*, int64_t, int*)
-    inline void kh_del_int64(kh_int64_t*, khint_t)
+    kh_int64_t* kh_init_int64()
+    void kh_destroy_int64(kh_int64_t*)
+    void kh_clear_int64(kh_int64_t*)
+    khint_t kh_get_int64(kh_int64_t*, int64_t)
+    void kh_resize_int64(kh_int64_t*, khint_t)
+    khint_t kh_put_int64(kh_int64_t*, int64_t, int*)
+    void kh_del_int64(kh_int64_t*, khint_t)
 
     bint kh_exist_int64(kh_int64_t*, khiter_t)
 
@@ -80,12 +80,12 @@ cdef extern from "khash.h":
         float64_t *keys
         float64_t *vals
         
-    inline kh_float64_t* kh_init_float64()
-    inline void kh_destroy_float64(kh_float64_t*)
-    inline void kh_clear_float64(kh_float64_t*)
-    inline khint_t kh_get_float64(kh_float64_t*, float64_t)
-    inline void kh_resize_float64(kh_float64_t*, khint_t)
-    inline khint_t kh_put_float64(kh_float64_t*, float64_t, int*)
-    inline void kh_del_float64(kh_float64_t*, khint_t)
+    kh_float64_t* kh_init_float64()
+    void kh_destroy_float64(kh_float64_t*)
+    void kh_clear_float64(kh_float64_t*)
+    khint_t kh_get_float64(kh_float64_t*, float64_t)
+    void kh_resize_float64(kh_float64_t*, khint_t)
+    khint_t kh_put_float64(kh_float64_t*, float64_t, int*)
+    void kh_del_float64(kh_float64_t*, khint_t)
 
     bint kh_exist_float64(kh_float64_t*, khiter_t)

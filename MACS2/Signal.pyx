@@ -22,7 +22,7 @@ cpdef np.ndarray[np.int32_t, ndim=1] maxima(np.ndarray[np.float32_t, ndim=1] sig
     """
     cdef np.ndarray[np.int32_t, ndim=1] m 
 
-    window_size = window_size/2*2+1 # to make a even number
+    window_size = window_size//2*2+1 # to make a even number
 
     #m = np.where(np.diff(np.sign(savitzky_golay(signal, window_size, order=2, deriv=1))) <= -1)[0].astype('int32')
     m = np.where(np.diff(np.sign(savitzky_golay_order2(signal, window_size, deriv=1))) <= -1)[0].astype('int32')
@@ -243,7 +243,7 @@ cpdef savitzky_golay_order2(np.ndarray[np.float32_t, ndim=1] signal,
         np.ndarray[np.float32_t, ndim=1] firstvals, lastvals, ret
         np.ndarray[np.float64_t, ndim=1] m
     if window_size % 2 != 1: window_size += 1
-    half_window = (window_size - 1) / 2
+    half_window = (window_size - 1) // 2
     # precompute coefficients
     b = np.mat([[1, k, k**2] for k in range(-half_window, half_window+1)],
                dtype='int64')

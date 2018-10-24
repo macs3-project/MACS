@@ -1,4 +1,4 @@
-# Time-stamp: <2019-09-25 10:14:53 taoliu>
+# Time-stamp: <2019-09-25 10:25:41 taoliu>
 
 """Module Description: Build shifting model
 
@@ -285,7 +285,7 @@ Summary of Peak Model:
 
         max_index = start.shape[0] - 1
 
-        psize_adjusted1 = self.peaksize + self.tag_expansion_size / 2 # half window
+        psize_adjusted1 = self.peaksize + self.tag_expansion_size // 2 # half window
 
         while i1<i1_max and i2<i2_max:
             p1 = pos1[i1]
@@ -308,9 +308,9 @@ Summary of Peak Model:
                     i2_prev = i2 # only the first index is recorded
                 # project
                 #for i in range(p2-p1+self.peaksize,p2-p1+self.peaksize+self.tag_expansion_size):
-                s = max(p2-self.tag_expansion_size/2-p1+psize_adjusted1, 0)
+                s = max(int(p2-self.tag_expansion_size/2-p1+psize_adjusted1), 0)
                 start[s] += 1
-                e = min(p2+self.tag_expansion_size/2-p1+psize_adjusted1, max_index)
+                e = min(int(p2+self.tag_expansion_size/2-p1+psize_adjusted1), max_index)
                 end[e] -= 1
                 #line[s:e] += 1
                 #for i in range(s,e):

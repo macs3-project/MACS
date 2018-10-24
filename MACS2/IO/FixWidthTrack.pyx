@@ -1,4 +1,4 @@
-# Time-stamp: <2019-09-25 10:18:17 taoliu>
+# Time-stamp: <2019-09-25 10:26:50 taoliu>
 
 """Module for FWTrack classes.
 
@@ -144,10 +144,10 @@ cdef class FWTrack:
                 self.__locations[chromosome][strand][i]= fiveendpos
                 self.__pointer[chromosome][strand] += 1
             except:
-                print "i:",i
-                print "self.buffer_size:", self.buffer_size
-                print "strand:", strand
-                print "loc len:", len( self.__locations[chromosome][strand] )
+                print ("i:",i)
+                print ("self.buffer_size:", self.buffer_size)
+                print ("strand:", strand)
+                print ("loc len:", len( self.__locations[chromosome][strand] ))
                 raise Exception("!!")
 
     cdef np.ndarray[np.int32_t, ndim=1] __expand__ ( self, np.ndarray[np.int32_t, ndim=1] arr ):
@@ -799,7 +799,7 @@ cdef class FWTrack:
                 name     = cpeaks[m]["name"]
 
                 temp = []
-                for i in range(prev_i,plus.shape[0]):
+                for i in range(ev_i,plus.shape[0]):
                     pos = plus[i]
                     if pos < startpos:
                         continue

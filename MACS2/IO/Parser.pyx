@@ -1,4 +1,4 @@
-# Time-stamp: <2019-09-25 10:16:49 taoliu>
+# Time-stamp: <2019-09-25 10:26:34 taoliu>
 
 """Module for all MACS Parser classes for input.
 
@@ -173,7 +173,7 @@ cdef class GenericParser:
                 n += 1
         # done
         self.fhd.seek( 0 )
-        self.tag_size = s/n
+        self.tag_size = int(s/n)
         return self.tag_size
 
     cdef __tlen_parse_line ( self, bytes thisline ):
@@ -835,7 +835,7 @@ cdef class BAMParser( GenericParser ):
             s += a
             n += 1
         fseek( 0 )
-        self.tag_size = int( s/n )
+        self.tag_size = int(s/n)
         return self.tag_size
 
     cpdef tuple get_references( self ):

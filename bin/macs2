@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# Time-stamp: <2019-09-20 11:20:49 taoliu>
+# Time-stamp: <2019-09-25 10:24:38 taoliu>
 
 """Description: MACS v2 main executable.
 
@@ -33,6 +33,8 @@ def main():
     argparser = prepare_argparser()
     args = argparser.parse_args()
 
+    subcommand  = args.subcommand
+
     if args.outdir:
         # use a output directory to store MACS output
         if not os.path.exists( args.outdir ):
@@ -41,7 +43,6 @@ def main():
             except:
                 sys.exit( "Output directory (%s) could not be created. Terminating program." % args.outdir )
 
-    subcommand  = args.subcommand_name
 
     if subcommand == "callpeak":
         # General call peak
@@ -126,8 +127,9 @@ def prepare_argparser ():
     # top-level parser
     argparser = ap.ArgumentParser( description = description, epilog = epilog ) #, usage = usage )
     argparser.add_argument("--version", action="version", version="%(prog)s "+MACS_VERSION)
-    subparsers = argparser.add_subparsers( dest = 'subcommand_name' ) #help="sub-command help")
-    
+    subparsers = argparser.add_subparsers( dest = 'subcommand' ) #help="sub-command help")
+    subparsers.required = True
+
     # command for 'callpeak'
     add_callpeak_parser( subparsers )
 

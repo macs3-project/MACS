@@ -1,4 +1,4 @@
-# Time-stamp: <2019-09-25 10:18:32 taoliu>
+# Time-stamp: <2019-09-25 10:27:30 taoliu>
 
 """Module for Calculate Scores.
 
@@ -81,7 +81,7 @@ cdef void clean_up_ndarray ( np.ndarray x ):
     # clean numpy ndarray in two steps
     cdef:
         long i
-    i = x.shape[0] / 2
+    i = x.shape[0] // 2
     x.resize( 100000 if i > 100000 else i, refcheck=False)
     x.resize( 0, refcheck=False)
     return
@@ -198,16 +198,16 @@ cdef float median_from_value_length ( np.ndarray value, list length ):
     """
     cdef:
         list tmp
-        int32_t l_half, c, tmp_l
+        int32_t c, tmp_l
         float tmp_v
+        float mid_l
 
     c = 0
     tmp = sorted(list(zip( value, length )))
-    l_half = sum( length )/2
-
+    mid_l = sum( length )/2
     for (tmp_v, tmp_l) in tmp:
         c += tmp_l
-        if c > l_half:
+        if c > mid_l:
             return tmp_v
 
 cdef float mean_from_value_length ( np.ndarray value, list length ):
@@ -1639,14 +1639,14 @@ cdef class CallerFromAlignments:
                 lastp = te
             else:
                 # close
-                self.__close_peak_for_broad_region (peak_content, lvl1peaks, min_length, chrom, lvl1_max_gap/2, score_array_s )
+                self.__close_peak_for_broad_region (peak_content, lvl1peaks, min_length, chrom, lvl1_max_gap//2, score_array_s )
                 #peak_content = [ (above_cutoff_startpos[i], above_cutoff_endpos[i], treat_array[above_cutoff_index_array[i]], ctrl_array[above_cutoff_index_array[i]], score_array_s, above_cutoff_index_array[i]) , ]
                 peak_content = [ ( ts, te, tp, cp, ti ), ]
                 lastp = te #above_cutoff_endpos[i]
             
         # save the last peak
         if peak_content:
-            self.__close_peak_for_broad_region (peak_content, lvl1peaks, min_length, chrom, lvl1_max_gap/2, score_array_s )
+            self.__close_peak_for_broad_region (peak_content, lvl1peaks, min_length, chrom, lvl1_max_gap//2, score_array_s )
 
         # lvl2 : weak peaks
         peak_content = []           # to store points above cutoff
@@ -1702,14 +1702,14 @@ cdef class CallerFromAlignments:
                 lastp = te
             else:
                 # close
-                self.__close_peak_for_broad_region (peak_content, lvl2peaks, min_length, chrom, lvl2_max_gap/2, score_array_s )
+                self.__close_peak_for_broad_region (peak_content, lvl2peaks, min_length, chrom, lvl2_max_gap//2, score_array_s )
                 
                 peak_content = [ ( ts, te, tp, cp, ti ), ]
                 lastp = te
 
         # save the last peak
         if peak_content:
-            self.__close_peak_for_broad_region (peak_content, lvl2peaks, min_length, chrom, lvl2_max_gap/2, score_array_s )  
+            self.__close_peak_for_broad_region (peak_content, lvl2peaks, min_length, chrom, lvl2_max_gap//2, score_array_s )  
 
         return
 

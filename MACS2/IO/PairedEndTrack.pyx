@@ -1,4 +1,4 @@
-# Time-stamp: <2019-09-25 10:17:26 taoliu>
+# Time-stamp: <2019-09-25 10:26:44 taoliu>
 
 """Module for filter duplicate tags from paired-end data
 
@@ -562,8 +562,8 @@ cdef class PETrackI:
         for i in range(len(scale_factor_s)):
             d = ds[i]
             scale_factor = scale_factor_s[i]
-            five_shift = d/2
-            three_shift= d/2
+            five_shift = d//2
+            three_shift= d//2
 
             tmp_pileup = se_all_in_one_pileup ( self.__locations[chrom]['l'], self.__locations[chrom]['r'], five_shift, three_shift, rlength, scale_factor, baseline_value )
 

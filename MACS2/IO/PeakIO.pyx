@@ -1,4 +1,4 @@
-# Time-stamp: <2019-09-25 10:16:35 taoliu>
+# Time-stamp: <2019-09-25 10:26:25 taoliu>
 
 """Module for PeakIO IO classes.
 
@@ -33,7 +33,7 @@ cdef str subpeak_letters( int i):
     if i < 26:
         return chr(97+i)
     else:
-        return subpeak_letters(i / 26) + chr(97 + (i % 26))
+        return subpeak_letters(i // 26) + chr(97 + (i % 26))
     
 # ------------------------------------
 # Classes
