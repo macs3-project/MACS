@@ -1,4 +1,4 @@
-# Time-stamp: <2019-09-20 11:30:00 taoliu>
+# Time-stamp: <2019-09-25 10:04:37 taoliu>
 
 """Description: compare bdg files
 
@@ -91,6 +91,6 @@ def run( options ):
             raise Exception("Can't reach here!")
         
         info("Write bedGraph of scores...")
-        ofhd = open(ofile,"wb")
+        ofhd = open(ofile,"w")
         sbtrack.write_bedGraph(ofhd,name="%s_Scores" % (method.upper()),description="Scores calculated by %s" % (method.upper()), column = 3)
         info("Finished '%s'! Please check '%s'!" % (method, ofile))

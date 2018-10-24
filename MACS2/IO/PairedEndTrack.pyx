@@ -1,4 +1,4 @@
-# Time-stamp: <2019-09-20 11:39:05 taoliu>
+# Time-stamp: <2019-09-25 10:17:26 taoliu>
 
 """Module for filter duplicate tags from paired-end data
 
@@ -8,16 +8,19 @@ the distribution).
 """
 
 from MACS2.Constants import *
+import io
+import sys
 from logging import debug, info
 import numpy as np
 cimport numpy as np
-from libc.stdint cimport uint32_t, uint64_t, int32_t, int64_t
 from copy import copy
+
 from cpython cimport bool
 cimport cython
+from libc.stdint cimport uint32_t, uint64_t, int32_t, int64_t
 
+from MACS2.Constants import *
 from MACS2.Pileup import quick_pileup, max_over_two_pv_array, se_all_in_one_pileup
-import sys
 
 cdef INT_MAX = <int>((<unsigned int>-1)>>1)
 
@@ -67,7 +70,7 @@ cdef class PETrackI:
         self.length = 0
         self.average_template_length = 0.0
         
-    cpdef add_loc ( self, str chromosome, int start, int end):
+    cpdef add_loc ( self, bytes chromosome, int start, int end):
         """Add a location to the list according to the sequence name.
         
         chromosome -- mostly the chromosome name
@@ -76,7 +79,7 @@ cdef class PETrackI:
         cdef:
             long i
 
-        if not self.__locations.has_key(chromosome):
+        if chromosome not in self.__locations:
             self.__locations[chromosome] = np.zeros(shape=self.buffer_size, dtype=[('l','int32'),('r','int32')]) # note: ['l'] is the leftmost end, ['r'] is the rightmost end of fragment.
             self.__locations[chromosome][ 0 ] = ( start, end )
             self.__pointer[chromosome] = 1
@@ -93,16 +96,16 @@ cdef class PETrackI:
         """
         cdef:
             set chrs
-            str chromosome
+            bytes chromosome
             
         chrs = set(self.get_chr_names())
         for chromosome in chrs:
-            if self.__locations.has_key(chromosome):
+            if chromosome in self.__locations:
                 self.__locations[chromosome].resize( self.buffer_size, refcheck=False )
                 self.__locations[chromosome].resize( 0, refcheck=False )
                 self.__locations[chromosome] = None
                 self.__locations.pop(chromosome)
-            if self.__dup_locations.has_key(chromosome):
+            if chromosome in self.__dup_locations:
                 self.__dup_locations[chromosome].resize( self.buffer_size, refcheck=False )
                 self.__dup_locations[chromosome].resize( 0, refcheck=False )
                 self.__dup_locations[chromosome] = None
@@ -126,7 +129,7 @@ cdef class PETrackI:
         """
         cdef:
             set valid_chroms, missed_chroms
-            str chrom
+            bytes chrom
 
         valid_chroms = set(self.__locations.keys()).intersection(rlengths.keys())
         for chrom in valid_chroms:
@@ -154,7 +157,7 @@ cdef class PETrackI:
         """
         
         cdef int32_t i
-        cdef str c
+        cdef bytes c
         
         self.total = 0
 
@@ -170,11 +173,11 @@ cdef class PETrackI:
         self.average_template_length = float( self.length ) / self.total
         return
 
-    def get_locations_by_chr ( self, str chromosome ):
+    def get_locations_by_chr ( self, bytes chromosome ):
         """Return a tuple of two lists of locations for certain chromosome.
 
         """
-        if self.__locations.has_key(chromosome):
+        if chromosome in self.__locations:
             return self.__locations[chromosome]
         else:
             raise Exception("No such chromosome name (%s) in TrackI object!\n" % (chromosome))
@@ -182,7 +185,9 @@ cdef class PETrackI:
     cpdef list get_chr_names ( self ):
         """Return all the chromosome names stored in this track object.
         """
-        l = self.__locations.keys()
+        cdef list l
+        
+        l = list(self.__locations.keys())
         l.sort()
         return l
 
@@ -203,7 +208,7 @@ cdef class PETrackI:
         
         """
         cdef uint32_t i
-        cdef str c
+        cdef bytes c
         cdef list chrnames = self.get_chr_names()
 
         for i in range(len(chrnames)):
@@ -241,7 +246,7 @@ cdef class PETrackI:
            np.ndarray[np.float64_t, ndim=1] pmf
            np.ndarray[np.int64_t, ndim=1] bins
            np.ndarray[np.int32_t, ndim=1] sizes, locs
-           str c
+           bytes c
            int i, bins_len
            int max_bins = 0
            list chrnames = self.get_chr_names()
@@ -275,7 +280,7 @@ cdef class PETrackI:
             np.ndarray locs, new_locs, dup_locs
             unsigned long i_old, i_new, i_dup, new_size, dup_size
             list chrnames = self.get_chr_names()
-            str k
+            bytes k
            
         if not self.__sorted: self.sort()
         
@@ -362,7 +367,7 @@ cdef class PETrackI:
 #            np.ndarray[np.int32_t, ndim=1] current_loc #= np.zeros([1,2], np.int32)
             int loc_start, loc_end, current_loc_start, current_loc_end
             unsigned long i_old, i_new, size, new_size
-            str k
+            bytes k
             np.ndarray locs, new_locs
                 
         if maxnum < 0: return self.total # condition to return if not filtering
@@ -435,7 +440,7 @@ cdef class PETrackI:
         """
         cdef:
             uint32_t num, i_chrom      # num: number of reads allowed on a certain chromosome
-            str key
+            bytes key
         
         self.total = 0
         self.length = 0
@@ -479,11 +484,11 @@ cdef class PETrackI:
         
         """
         cdef int32_t i, i_chrom, s, e
-        cdef str k
+        cdef bytes k
         
         if not fhd:
             fhd = sys.stdout
-        assert isinstance(fhd, file)
+        assert isinstance(fhd, io.IOBase)
 
         chrnames = self.get_chr_names()
         
@@ -497,11 +502,11 @@ cdef class PETrackI:
 
             for i in range(locs.shape[0]):
                 s, e = locs[ i ]
-                fhd.write("%s\t%d\t%d\n" % (k, s, e))
+                fhd.write("%s\t%d\t%d\n" % (k.decode(), s, e))
 
         return
     
-    cpdef pileup_a_chromosome ( self, str chrom, list scale_factor_s, float baseline_value = 0.0 ):
+    cpdef pileup_a_chromosome ( self, bytes chrom, list scale_factor_s, float baseline_value = 0.0 ):
         """pileup a certain chromosome, return [p,v] (end position and value) list.
         
         scale_factor_s  : linearly scale the pileup value applied to each d in ds. The list should have the same length as ds.
@@ -528,7 +533,7 @@ cdef class PETrackI:
 
         return prev_pileup
 
-    cpdef pileup_a_chromosome_c ( self, str chrom, list ds, list scale_factor_s, float baseline_value = 0.0 ):
+    cpdef pileup_a_chromosome_c ( self, bytes chrom, list ds, list scale_factor_s, float baseline_value = 0.0 ):
         """pileup a certain chromosome, return [p,v] (end position and value) list.
 
         This function is for control track. Basically, here is a

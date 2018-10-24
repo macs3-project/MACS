@@ -1,4 +1,4 @@
-# Time-stamp: <2019-09-20 11:37:21 taoliu>
+# Time-stamp: <2019-09-25 10:21:04 taoliu>
 
 """Module for BedGraph data class.
 
@@ -91,12 +91,12 @@ cdef class bedGraphTrackI:
         self.minvalue = 10000000  # initial minimum value is large since I want safe_add_loc to update it
         self.baseline_value = baseline_value
 
-    def add_a_chromosome ( self, chrom, d ):
+    def add_a_chromosome ( self, bytes chrom, d ):
         """Unsafe method. Only to be used by cPileup.pyx.
         """
         self.__data[chrom] = d
 
-    cpdef add_loc ( self, str chromosome, int startpos, int endpos, float value ):
+    cpdef add_loc ( self, bytes chromosome, int startpos, int endpos, float value ):
         """Add a chr-start-end-value block into __data dictionary.
 
         Difference between safe_add_loc: no check, but faster. Save
@@ -112,7 +112,7 @@ cdef class bedGraphTrackI:
         if startpos < 0:
             startpos = 0
         
-        if not self.__data.has_key(chromosome):
+        if chromosome not in self.__data:
             self.__data[chromosome] = [array(BYTE4,[]),array(FBYTE4,[])] # for (endpos,value)
             c = self.__data[chromosome]
             if startpos:
@@ -147,16 +147,16 @@ cdef class bedGraphTrackI:
         """
         cdef:
             set chrs
-            str chromosome
+            bytes chromosome
             
         chrs = self.get_chr_names()
         for chromosome in chrs:
-            if self.__data.has_key(chromosome):
+            if chromosome in self.__data:
                 self.__data[chromosome] = [None, None]
                 self.__data.pop(chromosome)
         return True
 
-    def safe_add_loc ( self, str chromosome, int startpos, int endpos, double value):
+    def safe_add_loc ( self, bytes chromosome, int startpos, int endpos, double value):
         """Add a chr-start-end-value block into __data dictionary.
 
         """
@@ -168,7 +168,7 @@ cdef class bedGraphTrackI:
         if startpos < 0:
             startpos = 0
         
-        if not self.__data.has_key(chromosome):
+        if chromosome not in self.__data:
             self.__data[chromosome] = [array(BYTE4,[]),array(FBYTE4,[])] # for (endpos,value)
             c = self.__data[chromosome]
             if startpos:
@@ -209,13 +209,13 @@ cdef class bedGraphTrackI:
         if value < self.minvalue:
             self.minvalue = value
 
-    def get_data_by_chr (self, str chromosome):
+    def get_data_by_chr (self, bytes chromosome):
         """Return array of counts by chromosome.
 
         The return value is a tuple:
         ([end pos],[value])
         """
-        if self.__data.has_key(chromosome):
+        if chromosome in self.__data:
             return self.__data[chromosome]
         else:
             return None
@@ -227,7 +227,7 @@ cdef class bedGraphTrackI:
         l = set(self.__data.keys())
         return l
 
-    def write_bedGraph (self, fhd, str name, str description, bool trackline=True):
+    def write_bedGraph (self, fhd, bytes name, bytes description, bool trackline=True):
         """Write all data to fhd in Wiggle Format.
 
         fhd: a filehandler to save bedGraph.
@@ -238,16 +238,16 @@ cdef class bedGraphTrackI:
         cdef:
             int pre, pos, i
             double value
-            str chrom
+            bytes chrom
         
         if trackline:
-            trackcontents = (name.replace("\"", "\\\""), description.replace("\"", "\\\""))
-            fhd.write("track type=bedGraph name=\"%s\" description=\"%s\" visibility=2 alwaysZero=on\n" % trackcontents)
+            trackcontents = (name.replace(b"\"", b"\\\""), description.replace(b"\"", b"\\\""))
+            fhd.write("track type=bedGraph name=\"%s\" description=\"%s\" visibility=2 alwaysZero=on\n" % trackcontents.decode())
         chrs = self.get_chr_names()
         for chrom in chrs:
             (p,v) = self.__data[chrom]
-            pnext = iter(p).next
-            vnext = iter(v).next
+            pnext = iter(p).__next__
+            vnext = iter(v).__next__
             pre = 0
 
             for i in range(len(p)):
@@ -255,7 +255,7 @@ cdef class bedGraphTrackI:
                 value = vnext()
                 #if value != self.baseline_value:
                 # never write baseline_value
-                fhd.write("%s\t%d\t%d\t%.5f\n" % (chrom,pre,pos,value))
+                fhd.write("%s\t%d\t%d\t%.5f\n" % (chrom.decode(),pre,pos,value))
                 pre = pos
 
     def reset_baseline (self, double baseline_value):
@@ -276,13 +276,13 @@ cdef class bedGraphTrackI:
         cdef:
             int new_pre_pos, pos, i
             double new_pre_value, value
-            str chrom
+            bytes chrom
         
         chrs = set(self.__data.keys())
         for chrom in chrs:
             (p,v) = self.__data[chrom]
-            pnext = iter(p).next
-            vnext = iter(v).next
+            pnext = iter(p).__next__
+            vnext = iter(v).__next__
 
             # new arrays
             new_pos = array(BYTE4,[pnext(),])
@@ -317,13 +317,13 @@ cdef class bedGraphTrackI:
         cdef:
             int new_pre_pos, pos, i
             double new_pre_value, value
-            str chrom
+            bytes chrom
         
         chrs = set(self.__data.keys())
         for chrom in chrs:
             (p,v) = self.__data[chrom]
-            pnext = iter(p).next
-            vnext = iter(v).next
+            pnext = iter(p).__next__
+            vnext = iter(v).__next__
 
             # new arrays
             new_pos = array(BYTE4,[])
@@ -412,7 +412,7 @@ cdef class bedGraphTrackI:
         cdef:
             int peak_length, x, pre_p, p, i, summit, tstart, tend
             double v, summit_value, tvalue
-            str chrom
+            bytes chrom
         
         #if call_summits: close_peak = self.__close_peak2
         #else: close_peak = self.__close_peak
@@ -423,8 +423,8 @@ cdef class bedGraphTrackI:
             peak_content = None
             peak_length = 0
             (ps,vs) = self.get_data_by_chr(chrom) # arrays for position and values
-            psn = iter(ps).next         # assign the next function to a viable to speed up
-            vsn = iter(vs).next
+            psn = iter(ps).__next__         # assign the next function to a viable to speed up
+            vsn = iter(vs).__next__
             x = 0
             pre_p = 0                   # remember previous position
             while True:
@@ -466,7 +466,7 @@ cdef class bedGraphTrackI:
             close_peak(peak_content, peaks, min_length, chrom) #, smoothlen=max_gap / 2 )
         return peaks
 
-    def __close_peak( self, peak_content, peaks, int min_length, str chrom ):
+    def __close_peak( self, peak_content, peaks, int min_length, bytes chrom ):
         
         peak_length = peak_content[-1][1]-peak_content[0][0]
         if peak_length >= min_length: # if the peak is too small, reject it
@@ -509,7 +509,7 @@ cdef class bedGraphTrackI:
         Return both general PeakIO object for highly enriched regions
         and gapped broad regions in BroadPeakIO.
         """
-        cdef str chrom
+        cdef bytes chrom
         cdef int i, j
         #cdef int tmp_n
         
@@ -524,7 +524,7 @@ cdef class bedGraphTrackI:
             #tmp_n = 0
             lvl1peakschrom = lvl1_peaks.get_data_from_chrom(chrom)
             lvl2peakschrom = lvl2_peaks.get_data_from_chrom(chrom)
-            lvl1peakschrom_next = iter(lvl1peakschrom).next
+            lvl1peakschrom_next = iter(lvl1peakschrom).__next__
             tmppeakset = []             # to temporarily store lvl1 region inside a lvl2 region
             # our assumption is lvl1 regions should be included in lvl2 regions
             try:
@@ -551,7 +551,7 @@ cdef class bedGraphTrackI:
             
             #print len(lvl1peakschrom), len(lvl2peakschrom), tmp_n
 
-        return lvl1_peaks, broadpeaks
+        return broadpeaks
 
     def __add_broadpeak (self, bpeaks, chrom, lvl2peak, lvl1peakset):
         """Internal function to create broad peak.
@@ -559,40 +559,39 @@ cdef class bedGraphTrackI:
         """
         cdef:
             long start, end, blockNum
-            str blockSizes, blockStarts, thickStart, thickEnd
+            bytes blockSizes, blockStarts, thickStart, thickEnd
         
         start      = lvl2peak["start"]
         end        = lvl2peak["end"]
 
+        # the following code will add those broad/lvl2 peaks with no strong/lvl1 peaks inside
         if not lvl1peakset:
-            #try:
             # will complement by adding 1bps start and end to this region
             # may change in the future if gappedPeak format was improved.
-            bpeaks.add(chrom, start, end, score=lvl2peak["score"], thickStart=str(start), thickEnd=str(end),
-                       blockNum = 2, blockSizes = "1,1", blockStarts = "0,"+str(end-start-1), pileup = lvl2peak["pileup"],
+            bpeaks.add(chrom, start, end, score=lvl2peak["score"], thickStart=(b"%d" % start), thickEnd=(b"%d" % end),
+                       blockNum = 2, blockSizes = b"1,1", blockStarts = (b"0,%d" % (end-start-1)), pileup = lvl2peak["pileup"],
                        pscore = lvl2peak["pscore"], fold_change = lvl2peak["fc"],
                        qscore = lvl2peak["qscore"] )
             return bpeaks
-
-        thickStart = str(lvl1peakset[0]["start"])
-        thickEnd   = str(lvl1peakset[-1]["end"])
+        
+        thickStart = b"%d" % lvl1peakset[0]["start"]
+        thickEnd   = b"%d" % lvl1peakset[-1]["end"]
         blockNum   = len(lvl1peakset)
-        blockSizes = ",".join( map(lambda x:str(x["length"]),lvl1peakset) )
-        blockStarts = ",".join( map(lambda x:str(x["start"]-start),lvl1peakset) )
+        blockSizes = b",".join( [b"%d" % x["length"] for x in lvl1peakset] )
+        blockStarts = b",".join( [b"%d" % (x["start"]-start) for x in lvl1peakset] )
 
-        # add 1bp left and/or right block if necessary
-        if int(thickStart) != start:
-            # add 1bp left block
-            thickStart = str(start)
+        if lvl2peak["start"] != thickStart:
+            # add 1bp mark for the start of lvl2 peak
+            thickStart = b"%d" % start
             blockNum += 1
-            blockSizes = "1,"+blockSizes
-            blockStarts = "0,"+blockStarts
-        if int(thickEnd) != end:
-            # add 1bp right block
-            thickEnd = str(end)
+            blockSizes = b"1,"+blockSizes
+            blockStarts = b"0,"+blockStarts
+        if lvl2peak["end"] != thickEnd:
+            # add 1bp mark for the end of lvl2 peak
+            thickEnd = b"%d" % end
             blockNum += 1
-            blockSizes = blockSizes+",1"
-            blockStarts = blockStarts+","+str(end-start-1)
+            blockSizes = blockSizes+b",1"
+            blockStarts = blockStarts + b"," + (b"%d" % (end-start-1))
         
         bpeaks.add(chrom, start, end, score=lvl2peak["score"], thickStart=thickStart, thickEnd=thickEnd,
                    blockNum = blockNum, blockSizes = blockSizes, blockStarts = blockStarts)
@@ -615,7 +614,7 @@ cdef class bedGraphTrackI:
         
         """
         cdef:
-            str chrom
+            bytes chrom
             int max_p
         
         ret = bedGraphTrackI()
@@ -663,7 +662,7 @@ cdef class bedGraphTrackI:
         cdef:
             int pre_p, p1, p2
             double v1, v2
-            str chrom
+            bytes chrom
 
         nr_tracks = len(bdgTracks) + 1  # +1 for self
         assert nr_tracks >= 2, "Specify at least two replicates"
@@ -698,9 +697,9 @@ cdef class bedGraphTrackI:
             ps, vs, pn, vn = [], [], [], []
             for data in datas:
                 ps.append(data[0])
-                pn.append(iter(ps[-1]).next)
+                pn.append(iter(ps[-1]).__next__)
                 vs.append(data[1])
-                vn.append(iter(vs[-1]).next)
+                vn.append(iter(vs[-1]).__next__)
 
             pre_p = 0                   # remember the previous position in the new bedGraphTrackI object ret
             try:
@@ -748,7 +747,7 @@ cdef class bedGraphTrackI:
          for other type of scores.
         """
         cdef:
-            str chrom
+            bytes chrom
             object pos_array, pscore_array
             dict pvalue_stat = {}
             dict pqtable = {}
@@ -767,14 +766,14 @@ cdef class bedGraphTrackI:
 
             [pos_array, pscore_array] = self.__data[ chrom ]
 
-            pn = iter(pos_array).next
-            vn = iter(pscore_array).next
+            pn = iter(pos_array).__next__
+            vn = iter(pscore_array).__next__
 
             for i in range( len( pos_array ) ):
                 this_p = pn()
                 this_v = vn()
                 this_l = this_p - pre_p
-                if pvalue_stat.has_key( this_v ):
+                if this_v in pvalue_stat:
                     pvalue_stat[ this_v ] += this_l
                 else:
                     pvalue_stat[ this_v ] = this_l
@@ -826,7 +825,7 @@ cdef class bedGraphTrackI:
         cdef:
             int pre_p, p1, p2, i
             double v1, v2
-            str chrom
+            bytes chrom
         
         assert isinstance(bdgTrack2,bedGraphTrackI), "bdgTrack2 is not a bedGraphTrackI object"
 
@@ -844,12 +843,12 @@ cdef class bedGraphTrackI:
         for i in range( len( common_chr ) ):
             chrom = common_chr.pop()
             (p1s,v1s) = self.get_data_by_chr(chrom) # arrays for position and values
-            p1n = iter(p1s).next         # assign the next function to a viable to speed up
-            v1n = iter(v1s).next
+            p1n = iter(p1s).__next__         # assign the next function to a viable to speed up
+            v1n = iter(v1s).__next__
 
             (p2s,v2s) = bdgTrack2.get_data_by_chr(chrom) # arrays for position and values
-            p2n = iter(p2s).next         # assign the next function to a viable to speed up
-            v2n = iter(v2s).next
+            p2n = iter(p2s).__next__         # assign the next function to a viable to speed up
+            v2n = iter(v2s).__next__
 
             pre_p = 0                   # remember the previous position in the new bedGraphTrackI object ret
             
@@ -914,7 +913,7 @@ cdef class bedGraphTrackI:
         cdef:
             int pre_p, p1, p2
             double v1, v2
-            str chrom
+            bytes chrom
         
         assert isinstance(bdgTrack2,bedGraphTrackI), "bdgTrack2 is not a bedGraphTrackI object"
 
@@ -927,12 +926,12 @@ cdef class bedGraphTrackI:
         for chrom in common_chr:
             
             (p1s,v1s) = self.get_data_by_chr(chrom) # arrays for position and values
-            p1n = iter(p1s).next         # assign the next function to a viable to speed up
-            v1n = iter(v1s).next
+            p1n = iter(p1s).__next__         # assign the next function to a viable to speed up
+            v1n = iter(v1s).__next__
 
             (p2s,v2s) = bdgTrack2.get_data_by_chr(chrom) # arrays for position and values
-            p2n = iter(p2s).next         # assign the next function to a viable to speed up
-            v2n = iter(v2s).next
+            p2n = iter(p2s).__next__         # assign the next function to a viable to speed up
+            v2n = iter(v2s).__next__
 
             chrom_max_len = len(p1s)+len(p2s) # this is the maximum number of locations needed to be recorded in scoreTrackI for this chromosome.
             
@@ -982,7 +981,8 @@ cdef class bedGraphTrackI:
     cpdef str cutoff_analysis ( self, int max_gap, int min_length, int steps = 100 ):
         cdef:
             list chrs, tmplist, peak_content
-            str  chrom, ret
+            bytes  chrom
+            str ret
             float cutoff
             long total_l, total_p, i, n, ts, te, lastp, tl, peak_length
             dict cutoff_npeaks, cutoff_lpeaks
@@ -1017,8 +1017,8 @@ cdef class bedGraphTrackI:
                     continue
 
                 # first bit of region above cutoff
-                acs_next = iter(above_cutoff_startpos).next
-                ace_next = iter(above_cutoff_endpos).next
+                acs_next = iter(above_cutoff_startpos).__next__
+                ace_next = iter(above_cutoff_endpos).__next__
 
                 ts = acs_next()
                 te = ace_next()
@@ -1062,7 +1062,7 @@ def scoreTracktoBedGraph (scoretrack, str colname):
     """
     cdef:
         int pre, i
-        str chrom
+        bytes chrom
     
     bdgtrack = bedGraphTrackI( baseline_value = 0 )
     if colname not in ['sample','control','-100logp','-100logq']:
@@ -1098,7 +1098,7 @@ class bedRegionTrackI (bedGraphTrackI):
         self.minvalue = 0
         self.baseline_value = 0
 
-    def safe_add_loc (self, str chromosome, int startpos, int endpos):
+    def safe_add_loc (self, bytes chromosome, int startpos, int endpos):
         """Add a chr-start-end-value block into __data dictionary.
 
         """
@@ -1114,7 +1114,7 @@ class bedRegionTrackI (bedGraphTrackI):
         if startpos < 0:
             startpos = 0
         
-        if not self.__data.has_key(chromosome):
+        if chromosome not in self.__data:
             self.__data[chromosome] = [array(BYTE4,[]),array(FBYTE4,[])] # for (endpos,value)
             c = self.__data[chromosome]
             if startpos:

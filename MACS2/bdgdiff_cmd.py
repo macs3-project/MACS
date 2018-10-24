@@ -90,26 +90,23 @@ def run( options ):
     info("Write peaks...")
 
     if options.ofile:
-        ofiles = map( lambda x: os.path.join( options.outdir, x ), options.ofile )
+        ofiles = [os.path.join( options.outdir, x ) for x in options.ofile]
         name_prefix = options.ofile
     else:
         ofiles = [ os.path.join( options.outdir, "%s_c%.1f_cond1.bed" % (options.oprefix,options.cutoff)),
                    os.path.join( options.outdir, "%s_c%.1f_cond2.bed" % (options.oprefix,options.cutoff)),
                    os.path.join( options.outdir, "%s_c%.1f_common.bed" % (options.oprefix,options.cutoff))
                    ]
-        name_prefix = [ options.oprefix+"_cond1_",
-                        options.oprefix+"_cond2_",
-                        options.oprefix+"_common_",
-                        ]
+        name_prefix = [ x.encode() for x in [ options.oprefix+"_cond1_", options.oprefix+"_cond2_", options.oprefix+"_common_",]]
     
     nf = open( ofiles[ 0 ], 'w' )
-    cat1.write_to_bed(nf, name_prefix=name_prefix[ 0 ], name="condition 1", description="unique regions in condition 1", score_column="score")
+    cat1.write_to_bed(nf, name_prefix=name_prefix[ 0 ], name=b"condition 1", description=b"unique regions in condition 1", score_column="score")
 
     nf = open( ofiles[ 1 ], 'w' )
-    cat2.write_to_bed(nf, name_prefix=name_prefix[ 1 ], name="condition 2", description="unique regions in condition 2", score_column="score")
+    cat2.write_to_bed(nf, name_prefix=name_prefix[ 1 ], name=b"condition 2", description=b"unique regions in condition 2", score_column="score")
 
     nf = open( ofiles[ 2 ], 'w' )
-    cat3.write_to_bed(nf, name_prefix=name_prefix[ 2 ], name="common", description="common regions in both conditions", score_column="score")
+    cat3.write_to_bed(nf, name_prefix=name_prefix[ 2 ], name=b"common", description=b"common regions in both conditions", score_column="score")
     info("Done")
 
 

@@ -1,4 +1,4 @@
-# Time-stamp: <2019-09-20 11:39:20 taoliu>
+# Time-stamp: <2019-09-25 10:16:49 taoliu>
 
 """Module for all MACS Parser classes for input.
 
@@ -155,6 +155,7 @@ cdef class GenericParser:
             int n = 0     # number of successful/valid read alignments
             int m = 0     # number of trials
             int this_taglength
+            bytes thisline
         
         if self.tag_size != -1:
             # if we have already calculated tag size (!= -1),  return it.
@@ -175,7 +176,7 @@ cdef class GenericParser:
         self.tag_size = s/n
         return self.tag_size
 
-    cdef __tlen_parse_line ( self, str thisline ):
+    cdef __tlen_parse_line ( self, bytes thisline ):
         """Abstract function to detect tag length.
         
         """
@@ -190,7 +191,7 @@ cdef class GenericParser:
         """
         cdef:
             long i, m, fpos, strand
-            str chromosome
+            bytes chromosome
         
         fwtrack = FWTrack( buffer_size = self.buffer_size )
         i = 0
@@ -240,12 +241,12 @@ cdef class GenericParser:
         self.close()
         return fwtrack
         
-    cdef __fw_parse_line ( self, str thisline ):
+    cdef __fw_parse_line ( self, bytes thisline ):
         """Abstract function to parse chromosome, 5' end position and
         strand.
         
         """
-        cdef str chromosome = ""
+        cdef bytes chromosome = b""
         cdef int fpos = -1
         cdef int strand = -1
         return ( chromosome, fpos, strand )
@@ -285,32 +286,32 @@ cdef class BEDParser( GenericParser ):
     """File Parser Class for BED File.
 
     """
-    cdef __tlen_parse_line ( self, str thisline ):
+    cdef __tlen_parse_line ( self, bytes thisline ):
         """Parse 5' and 3' position, then calculate frag length.
 
         """
         thisline = thisline.rstrip()
         if not thisline \
-           or thisline[ :5 ] == "track" \
-           or thisline[ :7 ] == "browser"\
-           or thisline[ 0 ] == "#":
+           or thisline[ :5 ] == b"track" \
+           or thisline[ :7 ] == b"browser"\
+           or thisline[ 0 ] == b"#":
             return 0
 
-        thisfields = thisline.split( '\t' )
+        thisfields = thisline.split( b'\t' )
         return atoi( thisfields[ 2 ] )-atoi( thisfields[ 1 ] )
     
-    cdef __fw_parse_line ( self, str thisline ):
+    cdef __fw_parse_line ( self, bytes thisline ):
         #cdef list thisfields
         cdef char * chromname
-        
+
         thisline = thisline.rstrip()
 
-        if not thisline or thisline[ :5 ] == "track" \
-            or thisline[ :7 ] == "browser" \
-            or thisline[ 0 ] == "#":
-             return ( "", -1, -1 )
+        if not thisline or thisline[ :5 ] == b"track" \
+            or thisline[ :7 ] == b"browser" \
+            or thisline[ 0 ] == b"#":
+             return ( b"", -1, -1 )
 
-        thisfields = thisline.split( '\t' )
+        thisfields = thisline.split( b'\t' )
         chromname = thisfields[ 0 ]
         #try:
         ##    chromname = chromname[ :chromname.rindex( ".fa" ) ]
@@ -318,11 +319,11 @@ cdef class BEDParser( GenericParser ):
         #    pass
 
         try:
-            if not strcmp(thisfields[ 5 ],"+"):
+            if not strcmp(thisfields[ 5 ],b"+"):
                 return ( chromname,
                          atoi( thisfields[ 1 ] ),
                          0 )
-            elif not strcmp(thisfields[ 5 ], "-"):
+            elif not strcmp(thisfields[ 5 ], b"-"):
                 return ( chromname,
                          atoi( thisfields[ 2 ] ),
                          1 )
@@ -351,20 +352,23 @@ cdef class BEDPEParser(GenericParser):
     cdef public int n
     cdef public float d
 
-    cdef __pe_parse_line ( self, str thisline ):
+    cdef __pe_parse_line ( self, bytes thisline ):
         """ Parse each line, and return chromosome, left and right positions
 
         """
+        cdef:
+            list thisfields
+            
         thisline = thisline.rstrip()
 
         # skip track/browser/comment lines
-        if not thisline or thisline[ :5 ] == "track" \
-            or thisline[ :7 ] == "browser" \
-            or thisline[ 0 ] == "#":
-             return ( "", -1, -1 )
+        if not thisline or thisline[ :5 ] == b"track" \
+            or thisline[ :7 ] == b"browser" \
+            or thisline[ 0 ] == b"#":
+             return ( b"", -1, -1 )
 
         # still only support tabular as delimiter.
-        thisfields = thisline.split( '\t' )
+        thisfields = thisline.split( b'\t' )
         try:
             return ( thisfields[ 0 ],
                      atoi( thisfields[ 1 ] ),
@@ -377,7 +381,7 @@ cdef class BEDPEParser(GenericParser):
 
         """
         cdef:
-            str chromname
+            bytes chromname
             int left_pos
             int right_pos
             long i = 0          # number of fragments
@@ -413,7 +417,7 @@ cdef class BEDPEParser(GenericParser):
         """Build PETrackI from all lines, return a PETrackI object.
         """
         cdef:
-            str chromname
+            bytes chromname
             int left_pos
             int right_pos
             long i = 0          # number of fragments
@@ -449,7 +453,7 @@ cdef class ELANDResultParser( GenericParser ):
     """File Parser Class for tabular File.
 
     """
-    cdef __tlen_parse_line ( self, str thisline ):
+    cdef __tlen_parse_line ( self, bytes thisline ):
         """Parse tag sequence, then tag length.
 
         """
@@ -461,41 +465,41 @@ cdef class ELANDResultParser( GenericParser ):
         else:
             return len( thisfields[ 1 ] )
 
-    cdef __fw_parse_line ( self, str thisline ):
+    cdef __fw_parse_line ( self, bytes thisline ):
         cdef:
-            str chromname, strand
+            bytes chromname, strand
             int thistaglength
         #if thisline.startswith("#") or thisline.startswith("track") or thisline.startswith("browser"): return ("comment line",None,None) # comment line is skipped
         thisline = thisline.rstrip()
-        if not thisline: return ( "", -1, -1 )
+        if not thisline: return ( b"", -1, -1 )
 
-        thisfields = thisline.split( '\t' )
+        thisfields = thisline.split( b'\t' )
         thistaglength = strlen( thisfields[ 1 ] )
 
         if len( thisfields ) <= 6:
-            return ( "", -1, -1 )
+            return ( b"", -1, -1 )
 
         try:
             chromname = thisfields[ 6 ]
-            chromname = chromname[ :chromname.rindex( ".fa" ) ]
+            chromname = chromname[ :chromname.rindex( b".fa" ) ]
         except ValueError:
             pass
 
-        if thisfields[ 2 ] == "U0" or thisfields[ 2 ] == "U1" or thisfields[ 2 ] == "U2":
+        if thisfields[ 2 ] == b"U0" or thisfields[ 2 ] == b"U1" or thisfields[ 2 ] == b"U2":
             # allow up to 2 mismatches...
             strand = thisfields[ 8 ]
-            if strand == "F":
+            if strand == b"F":
                 return ( chromname,
                          atoi( thisfields[ 7 ] ) - 1,
                          0 )
-            elif strand == "R":
+            elif strand == b"R":
                 return ( chromname,
                          atoi( thisfields[ 7 ] ) + thistaglength - 1,
                          1 )
             else:
                 raise StrandFormatError( thisline, strand )
         else:
-            return ( "", -1, -1 )
+            return ( b"", -1, -1 )
 
 cdef class ELANDMultiParser( GenericParser ):
     """File Parser Class for ELAND multi File.
@@ -514,55 +518,55 @@ cdef class ELANDMultiParser( GenericParser ):
     starting at position 160322 with one error, one in the forward direction starting at 
     position 170128 with two errors. There is also a single-error match to E_coli.fa.
     """
-    cdef __tlen_parse_line ( self, str thisline ):
+    cdef __tlen_parse_line ( self, bytes thisline ):
         """Parse tag sequence, then tag length.
 
         """
         thisline = thisline.rstrip()
         if not thisline: return 0
-        thisfields = thisline.split( '\t' )
+        thisfields = thisline.split( b'\t' )
         if thisfields[1].isdigit():
             return 0
         else:
             return len( thisfields[ 1 ] )
 
-    cdef __fw_parse_line ( self, str thisline ):
+    cdef __fw_parse_line ( self, bytes thisline ):
         cdef:
             list thisfields
-            str thistagname, pos, strand
+            bytes thistagname, pos, strand
             int thistaglength, thistaghits
         
-        if not thisline: return ( "", -1, -1 )
+        if not thisline: return ( b"", -1, -1 )
         thisline = thisline.rstrip()
-        if not thisline: return ( "", -1, -1 )
+        if not thisline: return ( b"", -1, -1 )
 
         #if thisline[ 0 ] == "#": return ( "", -1, -1 ) # comment line is skipped
         
-        thisfields = thisline.split( '\t' )
+        thisfields = thisline.split( b'\t' )
         thistagname = thisfields[ 0 ]        # name of tag
         thistaglength = len( thisfields[ 1 ] ) # length of tag
 
         if len( thisfields ) < 4:
-            return ( "", -1, -1 )
+            return ( b"", -1, -1 )
         else:
-            thistaghits = sum( map( int, thisfields[ 2 ].split( ':' ) ) )
+            thistaghits = sum( [int(x) for x in thisfields[ 2 ].split( b':' ) ] )
             if thistaghits > 1:
                 # multiple hits
-                return ( "", -1, -1 )
+                return ( b"", -1, -1 )
             else:
-                ( chromname, pos ) = thisfields[ 3 ].split( ':' )
+                ( chromname, pos ) = thisfields[ 3 ].split( b':' )
 
                 try:
-                    chromname = chromname[ :chromname.rindex( ".fa" ) ]
+                    chromname = chromname[ :chromname.rindex( b".fa" ) ]
                 except ValueError:
                     pass
                 
                 strand  = pos[ -2 ]
-                if strand == "F":
+                if strand == b"F":
                     return ( chromname,
                              int( pos[ :-2 ] )-1,
                              0 )
-                elif strand == "R":
+                elif strand == b"R":
                     return ( chromname,
                              int( pos[ :-2 ] ) + thistaglength - 1,
                              1 )
@@ -574,43 +578,43 @@ cdef class ELANDExportParser( GenericParser ):
     """File Parser Class for ELAND Export File.
 
     """
-    cdef __tlen_parse_line ( self, str thisline ):
+    cdef __tlen_parse_line ( self, bytes thisline ):
         """Parse tag sequence, then tag length.
 
         """
         thisline = thisline.rstrip()
         if not thisline: return 0
-        thisfields = thisline.split( '\t' )
+        thisfields = thisline.split( b'\t' )
         if len( thisfields ) > 12 and thisfields[ 12 ]:
             # a successful alignment has over 12 columns
             return len( thisfields[ 8 ] )
         else:
             return 0
         
-    cdef __fw_parse_line ( self, str thisline ):
+    cdef __fw_parse_line ( self, bytes thisline ):
         cdef:
             list thisfields
-            str thisname, strand
+            bytes thisname, strand
             int thistaglength
         
         #if thisline.startswith("#") : return ("comment line",None,None) # comment line is skipped
         thisline = thisline.rstrip()
-        if not thisline: return ( "", -1, -1 )
+        if not thisline: return ( b"", -1, -1 )
     
-        thisfields = thisline.split( "\t" )
+        thisfields = thisline.split( b"\t" )
 
         if len(thisfields) > 12 and thisfields[ 12 ]:
-            thisname = ":".join( thisfields[ 0:6 ] )
+            thisname = b":".join( thisfields[ 0:6 ] )
             thistaglength = len( thisfields[ 8 ] )
             strand = thisfields[ 13 ]
-            if strand == "F":
+            if strand == b"F":
                 return ( thisfields[ 10 ], atoi( thisfields[ 12 ] ) - 1, 0 )
-            elif strand == "R":
+            elif strand == b"R":
                 return ( thisfields[ 10 ], atoi( thisfields[ 12 ] ) + thistaglength - 1, 1 )
             else:
                 raise StrandFormatError( thisline, strand )
         else:
-            return ( -1, -1, -1 )
+            return ( b"", -1, -1 )
 
 ### Contributed by Davide, modified by Tao
 cdef class SAMParser( GenericParser ):
@@ -646,7 +650,7 @@ cdef class SAMParser( GenericParser ):
     2048	supplementary alignment
     """
 
-    cdef __tlen_parse_line ( self, str thisline ):
+    cdef __tlen_parse_line ( self, bytes thisline ):
         """Parse tag sequence, then tag length.
 
         """
@@ -656,8 +660,8 @@ cdef class SAMParser( GenericParser ):
         
         thisline = thisline.rstrip()
         if not thisline: return 0
-        if thisline[ 0 ] == "@": return 0 # header line started with '@' is skipped
-        thisfields = thisline.split( '\t' )
+        if thisline[ 0 ] == b"@": return 0 # header line started with '@' is skipped
+        thisfields = thisline.split( b'\t' )
         bwflag = atoi( thisfields[ 1 ] )
         if bwflag & 4 or bwflag & 512 or bwflag & 256 or bwflag & 2048:
             return 0       #unmapped sequence or bad sequence or 2nd or sup alignment
@@ -674,33 +678,33 @@ cdef class SAMParser( GenericParser ):
                 return 0
         return len( thisfields[ 9 ] )
 
-    cdef __fw_parse_line ( self, str thisline ):
+    cdef __fw_parse_line ( self, bytes thisline ):
         cdef:
             list thisfields
-            str thistagname, thisref
+            bytes thistagname, thisref
             int bwflag, thisstrand, thisstart
 
         thisline = thisline.rstrip()
-        if not thisline: return ( "", -1, -1 )
-        if thisline[ 0 ] == "@": return ( "", -1, -1 ) # header line started with '@' is skipped
-        thisfields = thisline.split( '\t' )
+        if not thisline: return ( b"", -1, -1 )
+        if thisline[ 0 ] == b"@": return ( b"", -1, -1 ) # header line started with '@' is skipped
+        thisfields = thisline.split( b'\t' )
         thistagname = thisfields[ 0 ]         # name of tag
         thisref = thisfields[ 2 ]
         bwflag = atoi( thisfields[ 1 ] )
         CIGAR = thisfields[ 5 ]
         if bwflag & 4 or bwflag & 512 or bwflag & 256 or bwflag & 2048:
-            return ( "", -1, -1 )       #unmapped sequence or bad sequence or 2nd or sup alignment
+            return ( b"", -1, -1 )       #unmapped sequence or bad sequence or 2nd or sup alignment
         if bwflag & 1:
             # paired read. We should only keep sequence if the mate is mapped
             # and if this is the left mate, all is within  the flag! 
             if not bwflag & 2:
-                return ( "", -1, -1 )   # not a proper pair
+                return ( b"", -1, -1 )   # not a proper pair
             if bwflag & 8:
-                return ( "", -1, -1 )   # the mate is unmapped
+                return ( b"", -1, -1 )   # the mate is unmapped
             # From Benjamin Schiller https://github.com/benjschiller
             if bwflag & 128:
                 # this is not the first read in a pair
-                return ( "", -1, -1 )
+                return ( b"", -1, -1 )
             # end of the patch
         # In case of paired-end we have now skipped all possible "bad" pairs
         # in case of proper pair we have skipped the rightmost one... if the leftmost pair comes
@@ -710,13 +714,13 @@ cdef class SAMParser( GenericParser ):
             # minus strand, we have to decipher CIGAR string
             
             thisstrand = 1
-            thisstart = atoi( thisfields[ 3 ] ) - 1 + sum(map(int, findall("(\d+)[MDNX=]",CIGAR)))	#reverse strand should be shifted alen bp 
+            thisstart = atoi( thisfields[ 3 ] ) - 1 + sum( [ int(x) for x in findall("(\d+)[MDNX=]",CIGAR) ] )	#reverse strand should be shifted alen bp 
         else:
             thisstrand = 0
             thisstart = atoi( thisfields[ 3 ] ) - 1
 
         try:
-            thisref = thisref[ :thisref.rindex( ".fa" ) ]
+            thisref = thisref[ :thisref.rindex( b".fa" ) ]
         except ValueError:
             pass
 
@@ -779,7 +783,7 @@ cdef class BAMParser( GenericParser ):
 
         """
         magic_header = self.fhd.read( 3 )
-        if magic_header == "BAM":
+        if magic_header == b"BAM":
             tsize  = self.tsize()
             if tsize > 0:
                 self.fhd.seek( 0 )
@@ -843,7 +847,7 @@ cdef class BAMParser( GenericParser ):
         """
         cdef:
             int header_len, x, nc, nlength
-            str refname
+            bytes refname
             list references = []
             dict rlengths = {}
             
@@ -864,6 +868,7 @@ cdef class BAMParser( GenericParser ):
             # don't jump over chromosome size
             # we can use it to avoid falling of chrom ends during peak calling
             rlengths[refname] = unpack( '<i', fread( 4 ) )[ 0 ]
+        #print references
         return (references, rlengths)
 
     cpdef build_fwtrack ( self ):
@@ -1020,8 +1025,8 @@ cdef class BAMPEParser(BAMParser):
             int *asint
             list references
             dict rlengths
-            str rawread
-            str rawentrylength
+            bytes rawread
+            bytes rawentrylength
             _BAMPEParsed read
         
         petrack = PETrackI( buffer_size = self.buffer_size )
@@ -1067,8 +1072,8 @@ cdef class BAMPEParser(BAMParser):
             int *asint
             list references
             dict rlengths
-            str rawread
-            str rawentrylength
+            bytes rawread
+            bytes rawentrylength
             _BAMPEParsed read
         
         references, rlengths = self.get_references()
@@ -1104,7 +1109,7 @@ cdef class BAMPEParser(BAMParser):
         petrack.set_rlengths( rlengths )
         return petrack
         
-    cdef _BAMPEParsed __pe_binary_parse (self, str data):
+    cdef _BAMPEParsed __pe_binary_parse (self, bytes data):
         cdef:
             int nextpos, pos, cigar_op_len, i
             short bwflag, l_read_name, n_cigar_op, cigar_op
@@ -1167,19 +1172,19 @@ cdef class BowtieParser( GenericParser ):
     program.
 
     """
-    cdef __tlen_parse_line ( self, str thisline ):
+    cdef __tlen_parse_line ( self, bytes thisline ):
         """Parse tag sequence, then tag length.
 
         """
         cdef list thisfields
         
         thisline = thisline.rstrip()
-        if not thisline: return ( "", -1, -1 )
-        if thisline[ 0 ]=="#": return ( "", -1 , -1 ) # comment line is skipped
-        thisfields = thisline.split( '\t' ) # I hope it will never bring me more trouble
+        if not thisline: return ( b"", -1, -1 )
+        if thisline[ 0 ] == b"#": return ( b"", -1 , -1 ) # comment line is skipped
+        thisfields = thisline.split( b'\t' ) # I hope it will never bring me more trouble
         return len( thisfields[ 4 ] )
 
-    cdef __fw_parse_line (self, str thisline ):
+    cdef __fw_parse_line (self, bytes thisline ):
         """
         The following definition comes from bowtie website:
         
@@ -1222,24 +1227,24 @@ cdef class BowtieParser( GenericParser ):
         """
         cdef:
             list thisfields
-            str chromname
+            bytes chromname
         
         thisline = thisline.rstrip()
-        if not thisline: return ( "", -1, -1 )
-        if thisline[ 0 ]=="#": return ( "", -1, -1 ) # comment line is skipped
-        thisfields = thisline.split( '\t' ) # I hope it will never bring me more trouble
+        if not thisline: return ( b"", -1, -1 )
+        if thisline[ 0 ] == b"#": return ( b"", -1, -1 ) # comment line is skipped
+        thisfields = thisline.split( b'\t' ) # I hope it will never bring me more trouble
 
         chromname = thisfields[ 2 ]
         try:
-            chromname = chromname[ :chromname.rindex( ".fa" ) ]
+            chromname = chromname[ :chromname.rindex( b".fa" ) ]
         except ValueError:
             pass
 
-            if thisfields[ 1 ] == "+":
+            if thisfields[ 1 ] == b"+":
                 return ( chromname,
                          atoi( thisfields[ 3 ] ),
                          0 )
-            elif thisfields[ 1 ] == "-":
+            elif thisfields[ 1 ] == b"-":
                 return ( chromname,
                          atoi( thisfields[ 3 ] ) + strlen( thisfields[ 4 ] ),
                          1 )

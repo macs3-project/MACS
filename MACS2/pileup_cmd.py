@@ -1,4 +1,4 @@
-# Time-stamp: <2019-09-20 11:36:03 taoliu>
+# Time-stamp: <2019-09-25 10:03:31 taoliu>
 
 """Description: Pileup alignment files
 
@@ -41,7 +41,7 @@ def run( o_options ):
 
 
     #0 prepare output file
-    outfile = os.path.join( options.outdir, options.outputfile )
+    outfile = os.path.join( options.outdir, options.outputfile ).encode()
     if os.path.isfile( outfile ):
         info("# Existing file %s will be replaced!" % outfile )
         os.unlink( outfile )

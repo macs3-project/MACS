@@ -1,4 +1,4 @@
-# Time-stamp: <2019-09-20 11:26:17 taoliu>
+# Time-stamp: <2019-09-25 10:04:57 taoliu>
 
 """Module Description: For pileup functions.
 
@@ -54,7 +54,7 @@ cdef void clean_up_ndarray ( np.ndarray x ):
 
 # This function uses pure C code for pileup
 cpdef pileup_and_write( trackI,
-                        output_filename,
+                        bytes output_filename,
                         int d,
                         float scale_factor,
                         float baseline_value = 0.0,
@@ -65,7 +65,7 @@ cpdef pileup_and_write( trackI,
         long five_shift, three_shift, l, i
         list chroms
         int n_chroms
-        str chrom
+        bytes chrom
         np.ndarray[np.int32_t, ndim=1] plus_tags, minus_tags
         dict chrlengths = trackI.get_rlengths ()
         int * plus_tags_pos
@@ -96,10 +96,10 @@ cpdef pileup_and_write( trackI,
             three_shift = d - five_shift
     # end of the block
 
-    chroms = chrlengths.keys()
+    chroms = list(chrlengths.keys())
     n_chroms = len( chroms )
 
-    fh = file(output_filename, "w")
+    fh = open(output_filename, "w")
     fh.write("")
     fh.close()
     
@@ -113,7 +113,7 @@ cpdef pileup_and_write( trackI,
         _data = c_single_end_pileup( plus_tags_pos, plus_tags.shape[0], minus_tags_pos, minus_tags.shape[0], five_shift, three_shift, 0, rlength, scale_factor, baseline_value, &l_data )
 
         # write
-        py_bytes = chrom.encode()
+        py_bytes = chrom
         chrom_char = py_bytes
         c_write_pv_array_to_bedGraph( _data, l_data, chrom_char, output_filename, 1 )
 
@@ -123,7 +123,7 @@ cpdef pileup_and_write( trackI,
 
 # function to pileup BAMPE/BEDPE stored in PETrackI object and write to a BEDGraph file
 cpdef pileup_and_write_pe( petrackI,
-                           output_filename,
+                           bytes output_filename,
                            float scale_factor = 1,
                            float baseline_value = 0.0):
 
@@ -132,7 +132,7 @@ cpdef pileup_and_write_pe( petrackI,
         list chroms
         int n_chroms
         int i
-        str chrom
+        bytes chrom
 
         np.ndarray locs
         np.ndarray[np.int32_t, ndim=1] locs0
@@ -146,10 +146,10 @@ cpdef pileup_and_write_pe( petrackI,
         PosVal * _data
         long l_data
         
-    chroms = chrlengths.keys()
+    chroms = list(chrlengths.keys())
     n_chroms = len( chroms )
 
-    fh = file(output_filename, "w")
+    fh = open(output_filename, "w")
     fh.write("")
     fh.close()    
 
@@ -164,7 +164,7 @@ cpdef pileup_and_write_pe( petrackI,
         
         _data = c_quick_pileup ( start_pos, end_pos, locs0.shape[0], scale_factor, baseline_value, &l_data )
 
-        py_bytes = chrom.encode()
+        py_bytes = chrom
         chrom_char = py_bytes
         c_write_pv_array_to_bedGraph( _data, l_data, chrom_char, output_filename, 1 )
 
@@ -235,7 +235,7 @@ cdef pileup_bdg_se(object trackI, int d,
     cdef:
         long five_shift, three_shift, l
         int rlength
-        str chrom
+        bytes chrom
         Ends ends
         np.ndarray[np.int32_t, ndim=1] plus_tags, minus_tags
         dict chrlengths = trackI.get_rlengths ()
@@ -260,7 +260,7 @@ cdef pileup_bdg_se(object trackI, int d,
             five_shift = d/2
             three_shift = d - five_shift
 
-    for chrom in sorted(chrlengths.keys()):
+    for chrom in sorted(list(chrlengths.keys())):
         rlength = chrlengths[chrom]
         (plus_tags, minus_tags) = trackI.get_locations_by_chr(chrom)
 
@@ -329,7 +329,7 @@ cdef pileup_w_multiple_d_bdg(object trackI, list d_s, list scale_factor_s = [],
                 five_shift_s.append(d/2)
                 three_shift_s.append(d - d/2)
 
-    for chrom in sorted(chrlengths.keys()):
+    for chrom in sorted(list(chrlengths.keys())):
         rlength = chrlengths[chrom]
         (plus_tags,minus_tags) = trackI.get_locations_by_chr(chrom)
 
@@ -377,12 +377,12 @@ cdef pileup_bdg_pe(object trackI, float scale_factor, float baseline_value):
     """
     cdef:
         int rlength
-        str chrom
+        bytes chrom
         np.ndarray[np.int32_t, ndim=2] locs
         dict chrlengths = trackI.get_rlengths ()
         
     ret = bedGraphTrackI(baseline_value=baseline_value) # bedGraphTrackI object to be returned.
-    for chrom in sorted(chrlengths.keys()):
+    for chrom in sorted(list(chrlengths.keys())):
         rlength = chrlengths[chrom]
         locs = trackI.get_locations_by_chr(chrom) # we have to sort before doing quick_pileup!
         ret.add_a_chromosome(chrom, quick_pileup(np.sort(locs[:,0]), np.sort(locs[:,1]),
@@ -407,7 +407,7 @@ cdef pileup_bdg_pe_w_ext (object trackI, int d, float scale_factor = 1.0,
     cdef:
         int five_shift, three_shift
         int rlength
-        str chrom
+        bytes chrom
         np.ndarray[np.int32_t, ndim=2] locs
         np.ndarray[np.int32_t, ndim=1] start_poss, end_poss
         dict chrlengths = trackI.get_rlengths ()
@@ -417,7 +417,7 @@ cdef pileup_bdg_pe_w_ext (object trackI, int d, float scale_factor = 1.0,
     five_shift = d/2
     three_shift = d - five_shift
 
-    for chrom in sorted(chrlengths.keys()):
+    for chrom in sorted(list(chrlengths.keys())):
         rlength = chrlengths[chrom]
         locs = trackI.get_locations_by_chr(chrom)
         midpoints = locs[:,0] + (locs[:,1] - locs[:,0]) / 2
@@ -471,7 +471,7 @@ cdef pileup_w_multiple_d_bdg_pe ( object trackI, list d_s = [],
     five_shift_s = [d / 2 for d in d_s[1:]]
     three_shift_s = [d - d / 2 for d in d_s[1:]]
 
-    for chrom in sorted(chrlengths.keys()):
+    for chrom in sorted(list(chrlengths.keys())):
         rlength = chrlengths[chrom]
         locs = trackI.get_locations_by_chr(chrom)
         midpoints = locs[:,0] + (locs[:,1] - locs[:,0]) / 2

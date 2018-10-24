@@ -1,4 +1,4 @@
-# Time-stamp: <2019-09-20 11:36:55 taoliu>
+# Time-stamp: <2019-09-25 10:03:13 taoliu>
 
 """Description: refine peak summits
 
@@ -48,23 +48,25 @@ def run( o_options ):
         outputfile = open( os.path.join( options.outdir, "%s_refinepeak.bed" % options.oprefix), "w" )
 
 
-    peakio = file(options.bedfile)
+    peakio = open(options.bedfile,"rb")
     peaks = PeakIO()
     for l in peakio:
         fs = l.rstrip().split()
         peaks.add( fs[0], int(fs[1]), int(fs[2]), name=fs[3] )
 
     peaks.sort()
+    peakio.close()
     
     #1 Read tag files
     info("read tag files...")
     fwtrack = load_tag_files_options (options)
     
     retval = fwtrack.compute_region_tags_from_peaks( peaks, find_summit, window_size = options.windowsize, cutoff = options.cutoff )
-    outputfile.write( "\n".join( map(lambda x: "%s\t%d\t%d\t%s\t%.2f" % x , retval) ) )
+    outputfile.write( (b"\n".join( [b"%s\t%d\t%d\t%s\t%.2f" % x for x in retval] )).decode() )
+    outputfile.close()
     info("Done!")
 
-def find_summit(chrom, plus, minus, peak_start, peak_end, name = "peak", window_size=100, cutoff = 5):
+def find_summit(chrom, plus, minus, peak_start, peak_end, name = b"peak", window_size=100, cutoff = 5):
     
     left_sum = lambda strand, pos, width = window_size: sum([strand[x] for x in strand if x <= pos and x >= pos - width])
     right_sum = lambda strand, pos, width = window_size: sum([strand[x] for x in strand if x >= pos and x <= pos + width])
@@ -91,9 +93,9 @@ def find_summit(chrom, plus, minus, peak_start, peak_end, name = "peak", window_
     #return (chrom, wtd_max_pos, wtd_max_pos+1, wtd_max_val)
 
     if wtd_max_val > cutoff:
-        return (chrom, wtd_max_pos, wtd_max_pos+1, name+"_R" , wtd_max_val) # 'R'efined
+        return (chrom, wtd_max_pos, wtd_max_pos+1, name+b"_R" , wtd_max_val) # 'R'efined
     else:
-        return (chrom, wtd_max_pos, wtd_max_pos+1, name+"_F" , wtd_max_val) # 'F'ailed
+        return (chrom, wtd_max_pos, wtd_max_pos+1, name+b"_F" , wtd_max_val) # 'F'ailed
 
     #return "{}\t{}\t{}\tRefinePeak_summit\t{:.2f}\n".format(chrom,
     #                                                        wtd_max_pos,
