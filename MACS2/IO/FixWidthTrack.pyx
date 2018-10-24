@@ -1,4 +1,4 @@
-# Time-stamp: <2018-10-24 16:54:27 Tao Liu>
+# Time-stamp: <2018-10-24 17:14:57 Tao Liu>
 
 """Module for FWTrack classes.
 
@@ -462,7 +462,7 @@ cdef class FWTrack:
             str k
             np.ndarray[np.int32_t, ndim=1] plus, new_plus, minus, new_minus
 
-        if maxnum < 0: return           # do nothing
+        if maxnum < 0: return self.total           # do nothing
 
         if not self.__sorted:
             self.sort()

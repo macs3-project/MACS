@@ -1,4 +1,4 @@
-# Time-stamp: <2018-10-24 16:53:38 Tao Liu>
+# Time-stamp: <2018-10-24 17:17:36 Tao Liu>
 
 """Module for filter duplicate tags from paired-end data
 
@@ -371,7 +371,7 @@ cdef class PETrackI:
             str k
             np.ndarray locs, new_locs
                 
-        if maxnum < 0: return # condition to return if not filtering
+        if maxnum < 0: return self.total # condition to return if not filtering
         
         if not self.__sorted: self.sort()
         
