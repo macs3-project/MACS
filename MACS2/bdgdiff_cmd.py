@@ -1,4 +1,4 @@
-# Time-stamp: <2019-09-25 14:40:58 taoliu>
+# Time-stamp: <2019-09-25 10:28:53 taoliu>
 
 """Description: Naive call differential peaks from 4 bedGraph tracks for scores.
 
@@ -91,7 +91,7 @@ def run( options ):
 
     if options.ofile:
         ofiles = [os.path.join( options.outdir, x ) for x in options.ofile]
-        name_prefix = options.ofile
+        name_prefix = [ x.encode() for x in options.ofile ]
     else:
         ofiles = [ os.path.join( options.outdir, "%s_c%.1f_cond1.bed" % (options.oprefix,options.cutoff)),
                    os.path.join( options.outdir, "%s_c%.1f_cond2.bed" % (options.oprefix,options.cutoff)),

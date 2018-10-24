@@ -1,4 +1,4 @@
-# Time-stamp: <2019-09-25 10:27:30 taoliu>
+# Time-stamp: <2019-09-25 10:29:47 taoliu>
 
 """Module for Calculate Scores.
 
@@ -1096,15 +1096,15 @@ cdef class CallerFromAlignments:
                 (tstart, tend, ttreat_p, tctrl_p, tlist_scores_p) = peak_content[i]
                 tscore = ttreat_p #self.pqtable[ get_pscore(int(ttreat_p), tctrl_p) ] # use qscore as general score to find summit
                 if not summit_value or summit_value < tscore:
-                    tsummit = [(tend + tstart) / 2, ]
+                    tsummit = [(tend + tstart) // 2, ]
                     tsummit_index = [ i, ]
                     summit_value = tscore
                 elif summit_value == tscore:
                     # remember continuous summit values
-                    tsummit.append(int((tend + tstart) / 2))
+                    tsummit.append((tend + tstart) // 2)
                     tsummit_index.append( i )
             # the middle of all highest points in peak region is defined as summit
-            midindex = int((len(tsummit) + 1) / 2) - 1
+            midindex = (len(tsummit) + 1) // 2 - 1
             summit_pos    = tsummit[ midindex ]
             summit_index  = tsummit_index[ midindex ]
 

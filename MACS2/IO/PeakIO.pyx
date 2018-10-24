@@ -1,4 +1,4 @@
-# Time-stamp: <2019-09-25 10:26:25 taoliu>
+# Time-stamp: <2019-09-25 10:29:18 taoliu>
 
 """Module for PeakIO IO classes.
 
@@ -246,7 +246,7 @@ cdef class PeakIO:
                         print_func("\t%.5f" % (peak['pscore'])) # -log10pvalue at summit
                         print_func("\t%.5f" % (peak['fc'])) # fold change at summit                
                         print_func("\t%.5f" % (peak['qscore'])) # -log10qvalue at summit
-                        print_func("\t%s" % peakname.decode())
+                        print_func("\t%s" % peakname)
                         print_func("\n")
                 else:
                     peak = these_peaks[0]
@@ -258,7 +258,7 @@ cdef class PeakIO:
                     print_func("\t%.5f" % (peak['pscore'])) # -log10pvalue at summit
                     print_func("\t%.5f" % (peak['fc'])) # fold change at summit                
                     print_func("\t%.5f" % (peak['qscore'])) # -log10qvalue at summit
-                    print_func("\t%s" % peakname.decode())
+                    print_func("\t%s" % peakname)
                     print_func("\n")
         return
 

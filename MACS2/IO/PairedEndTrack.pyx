@@ -1,4 +1,4 @@
-# Time-stamp: <2019-09-25 10:26:44 taoliu>
+# Time-stamp: <2019-09-25 10:29:28 taoliu>
 
 """Module for filter duplicate tags from paired-end data
 
@@ -371,6 +371,84 @@ cdef class PETrackI:
             np.ndarray locs, new_locs
                 
         if maxnum < 0: return self.total # condition to return if not filtering
+        
+        if not self.__sorted: self.sort()
+        
+        self.total = 0
+        self.length = 0
+        self.average_template_length = 0.0
+        
+        chrnames = self.get_chr_names()
+        
+        for i_chrom in range(len(chrnames)): # for each chromosome
+            k = chrnames [ i_chrom ]
+            i_new = 0
+            locs = self.__locations[k]
+            size = locs.shape[0]
+            if size <= 1:
+                new_locs = locs
+            else:
+                new_locs = np.zeros( self.__pointer[k] + 1, dtype=[('l','int32'),('r','int32')]) # note: ['l'] is the leftmost end, ['r'] is the rightmost end of fragment.
+                n = 1                # the number of tags in the current location
+            
+                current_loc_start = locs[0][0]
+                current_loc_end = locs[0][1]
+                new_locs[i_new][0] = current_loc_start
+                new_locs[i_new][1] = current_loc_end
+                i_new += 1
+                self.length += current_loc_end - current_loc_start
+                for i_old in range(1, size):
+                    loc_start = locs[i_old][0]
+                    loc_end = locs[i_old][1]
+                    all_same = ((loc_start == current_loc_start) and
+                                (loc_end == current_loc_end))
+                    if all_same:
+                        n += 1
+                        if n <= maxnum:
+                            new_locs[i_new][0] = loc_start
+                            new_locs[i_new][1] = loc_end
+                            self.length += loc_end - loc_start                            
+                            i_new += 1
+                    else:
+                        current_loc_start = loc_start
+                        current_loc_end = loc_end
+                        new_locs[i_new][0] = loc_start
+                        new_locs[i_new][1] = loc_end
+                        self.length += loc_end - loc_start                        
+                        i_new += 1
+                        n = 1
+                new_locs.resize( i_new, refcheck = False )
+                new_size = new_locs.shape[0]
+                self.__pointer[k] = new_size
+                self.total += new_size
+           # free memory?
+            # I know I should shrink it to 0 size directly,
+            # however, on Mac OSX, it seems directly assigning 0
+            # doesn't do a thing.
+            locs.resize( self.buffer_size, refcheck=False )
+            locs.resize( 0, refcheck=False )
+            # hope there would be no mem leak...
+    
+            self.__locations[k] = new_locs
+        self.average_template_length = float( self.length ) / self.total
+        return self.total
+
+    @cython.boundscheck(False) # do not check that np indices are valid
+    def filter_dup_dryrun ( self, int maxnum=-1):
+        """Filter the duplicated reads.
+    
+        Run it right after you add all data into this object.
+        """
+        cdef:
+            int i_chrom, n, start, end
+#            np.ndarray[np.int32_t, ndim=1] loc #= np.zeros([1,2], np.int32)
+#            np.ndarray[np.int32_t, ndim=1] current_loc #= np.zeros([1,2], np.int32)
+            int loc_start, loc_end, current_loc_start, current_loc_end
+            unsigned long i_old, i_new, size, new_size
+            bytes k
+            np.ndarray locs, new_locs
+                
+        if maxnum < 0: return # condition to return if not filtering
         
         if not self.__sorted: self.sort()
         

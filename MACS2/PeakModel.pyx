@@ -1,4 +1,4 @@
-# Time-stamp: <2019-09-25 10:25:41 taoliu>
+# Time-stamp: <2019-09-25 10:29:08 taoliu>
 
 """Module Description: Build shifting model
 
@@ -28,9 +28,9 @@ cpdef median (nums):
     p = sorted(nums)
     l = len(p)
     if l%2 == 0:
-        return (p[l/2]+p[l/2-1])/2
+        return (p[l//2]+p[l//2-1])/2
     else:
-        return p[l/2]
+        return p[l//2]
 
 class NotEnoughPairsException(Exception):
     def __init__ (self,value):
@@ -115,7 +115,7 @@ cdef class PeakModel:
         
 
         self.peaksize = 2*self.bw
-        self.min_tags = int(round(float(self.treatment.total) * self.lmfold * self.peaksize / self.gz /2)) # mininum unique hits on single strand
+        self.min_tags = int(round(float(self.treatment.total) * self.lmfold * self.peaksize / self.gz / 2)) # mininum unique hits on single strand
         self.max_tags = int(round(float(self.treatment.total) * self.umfold * self.peaksize / self.gz /2)) # maximum unique hits on single strand
         #print self.min_tags, self.max_tags
         #print self.min_tags
@@ -396,7 +396,7 @@ Summary of Peak Model:
                     im_prev = im # only the first index is recorded
                 if float(pn)/mn < 2 and float(pn)/mn > 0.5: # number tags in plus and minus peak region are comparable...
                     if pp < mp:
-                        pair_centers.append((pp+mp)/2)
+                        pair_centers.append((pp+mp)//2)
                         #self.debug ( "distance: %d, minus: %d, plus: %d" % (mp-pp,mp,pp))
                 im += 1
         return pair_centers
@@ -465,7 +465,7 @@ Summary of Peak Model:
         #else:
         #    start = pos_list[0] - self.tag_expansion_size
 
-        start = pos_list[0] - self.tag_expansion_size/2 # leftmost position of project line
+        start = pos_list[0] - self.tag_expansion_size//2 # leftmost position of project line
         ss = []
         es = []
 
@@ -477,8 +477,8 @@ Summary of Peak Model:
         for i in range(len(pos_list)):
             pos = pos_list[i]
             #if plus_strand:
-            ss.append( max(pos-start-self.tag_expansion_size/2,0) )
-            es.append( min(pos-start+self.tag_expansion_size/2,peak_length) )
+            ss.append( max(pos-start-self.tag_expansion_size//2,0) )
+            es.append( min(pos-start+self.tag_expansion_size//2,peak_length) )
 
         ss.sort()
         es.sort()
@@ -542,7 +542,7 @@ Summary of Peak Model:
                top_pos.append(pp)
         
         #print top_pos[int(len(top_pos)/2)]+start
-        return (top_pos[int(len(top_pos)/2)]+start)
+        return (top_pos[len(top_pos)//2]+start)
 
     cdef __naive_peak_pos2 (self, pos_list, int plus_strand ):
         """Naively calculate the position of peak.
@@ -573,7 +573,7 @@ Summary of Peak Model:
         #print horizon_line
         top_indices = np.where(horizon_line == horizon_line.max())[0]
         #print top_indices+start
-        return top_indices[ int(top_indices.shape[0]/2) ] + start
+        return top_indices[ top_indices.shape[0]//2 ] + start
 
 # smooth function from SciPy cookbook: http://www.scipy.org/Cookbook/SignalSmooth
 cpdef smooth(x, int window_len=11, str window='hanning'):
@@ -631,4 +631,4 @@ cpdef smooth(x, int window_len=11, str window='hanning'):
         w=eval('np.'+window+'(window_len)')
 
     y=np.convolve(w/w.sum(),s,mode='valid')
-    return y[(window_len/2):-(window_len/2)]
+    return y[(window_len//2):-(window_len//2)]
