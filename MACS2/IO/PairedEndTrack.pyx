@@ -1,4 +1,4 @@
-# Time-stamp: <2018-10-16 12:15:12 Tao Liu>
+# Time-stamp: <2018-10-24 16:53:38 Tao Liu>
 
 """Module for filter duplicate tags from paired-end data
 
@@ -357,7 +357,7 @@ cdef class PETrackI:
         return
     
     @cython.boundscheck(False) # do not check that np indices are valid
-    def filter_dup ( self, int maxnum=-1):
+    cpdef unsigned long filter_dup ( self, int maxnum=-1):
         """Filter the duplicated reads.
     
         Run it right after you add all data into this object.
@@ -432,7 +432,7 @@ cdef class PETrackI:
     
             self.__locations[k] = new_locs
         self.average_template_length = float( self.length ) / self.total
-        return
+        return self.total
 
     def sample_percent (self, float percent, int seed = -1):
         """Sample the tags for a given percentage.

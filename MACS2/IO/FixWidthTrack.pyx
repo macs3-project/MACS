@@ -1,4 +1,4 @@
-# Time-stamp: <2015-06-03 00:49:19 Tao Liu>
+# Time-stamp: <2018-10-24 16:54:27 Tao Liu>
 
 """Module for FWTrack classes.
 
@@ -446,7 +446,7 @@ cdef class FWTrack:
         return 0
 
     @cython.boundscheck(False) # do not check that np indices are valid
-    cpdef filter_dup ( self, int32_t maxnum = -1):
+    cpdef unsigned long filter_dup ( self, int32_t maxnum = -1):
         """Filter the duplicated reads.
 
         Run it right after you add all data into this object.
@@ -558,83 +558,7 @@ cdef class FWTrack:
             self.__locations[k]=[new_plus,new_minus]
 
         self.length = self.fw * self.total
-        return
-
-
-    @cython.boundscheck(False) # do not check that np indices are valid
-    cpdef filter_dup_dryrun ( self, int32_t maxnum = -1):
-        """Filter the duplicated reads. (dry run) only return number of remaining reads
-
-        Run it right after you add all data into this object.
-
-        Note, this function will *throw out* duplicates
-        permenantly. If you want to keep them, use separate_dups
-        instead.
-        """
-        cdef:
-            int p, m, n, current_loc, i_chrom, total
-            # index for old array, and index for new one
-            unsigned long i_old, size
-            str k
-            np.ndarray[np.int32_t, ndim=1] plus, minus
-
-        if maxnum < 0: return           # do nothing
-
-        if not self.__sorted:
-            self.sort()
-
-        total = 0
-        chrnames = self.get_chr_names()
-        
-        for i_chrom in range( len(chrnames) ):
-            # for each chromosome.
-            # This loop body is too big, I may need to split code later...
-            
-            k = chrnames[ i_chrom ]
-            # + strand
-            plus = self.__locations[k][0]
-            size = plus.shape[0]
-            if len(plus) < 1:
-                pass
-            else:
-                total += 1
-                n = 1                # the number of tags in the current location
-                current_loc = plus[0]
-                for i_old in range( 1, size ):
-                    p = plus[ i_old ]
-                    if p == current_loc:
-                        n += 1
-                        if n <= maxnum:
-                            total += 1
-                        else:
-                            logging.debug("Duplicate reads found at %s:%d at + strand" % (k,p) )
-                    else:
-                        current_loc = p
-                        total += 1                        
-                        n = 1
-
-            # - strand
-            minus = self.__locations[k][1]
-            size = minus.shape[0]
-            if len(minus) < 1:
-                pass
-            else:
-                total += 1
-                n = 1                # the number of tags in the current location
-                current_loc = minus[0]
-                for i_old in range( 1, size ):
-                    p = minus[ i_old ]
-                    if p == current_loc:
-                        n += 1
-                        if n <= maxnum:
-                            total += 1
-                        else:
-                            logging.debug("Duplicate reads found at %s:%d at + strand" % (k,p) )
-                    else:
-                        current_loc = p
-                        total += 1                        
-                        n = 1
-        return total
+        return self.total
 
     cpdef sample_percent (self, float percent, int seed = -1 ):
         """Sample the tags for a given percentage.
