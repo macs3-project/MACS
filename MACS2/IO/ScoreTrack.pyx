@@ -1,4 +1,4 @@
-# Time-stamp: <2019-09-25 10:26:03 taoliu>
+# Time-stamp: <2019-09-25 10:49:34 taoliu>
 
 """Module for Feature IO classes.
 
@@ -1350,7 +1350,7 @@ cdef class scoreTrackII:
 
         start      = lvl2peak["start"]
         end        = lvl2peak["end"]
-
+        
         # the following code will add those broad/lvl2 peaks with no strong/lvl1 peaks inside
         if not lvl1peakset:
             # will complement by adding 1bps start and end to this region
@@ -1397,7 +1397,7 @@ cdef class TwoConditionScores:
         float cutoff
         object t1bdg, c1bdg, t2bdg, c2bdg
         dict pvalue_stat1, pvalue_stat2, pvalue_stat3
-    
+
     def __init__ (self, t1bdg, c1bdg, t2bdg, c2bdg, float cond1_factor = 1.0, float cond2_factor = 1.0, float pseudocount = 0.01, proportion_background_empirical_distribution = 0.99999 ):
         """
         t1bdg: a bedGraphTrackI object for treat 1
@@ -1461,45 +1461,6 @@ cdef class TwoConditionScores:
                                    cond1_treat_vs, cond1_control_vs,
                                    cond2_treat_vs, cond2_control_vs )
 
-        ## now we will build an empirical distribution of all abs ( log likelihood ratios )
-        #self.build_empirical_distribution()
-
-    # cdef build_empirical_distribution ( self ):
-    #     cdef:
-    #         int p
-    #         int prev_p
-    #         float v
-
-    #     for chrom in self.get_common_chrs():
-    #         pre_p = 0
-
-    #         self.data[ chrom ]
-    #         [pos_array, treat_array, ctrl_array] = self.chr_pos_treat_ctrl
-
-    #         pn = iter(pos_array).next
-    #         tn = iter(treat_array).next
-    #         cn = iter(ctrl_array).next
-
-    #         #t0 = ttime()
-
-    #         for i in range(pos_array.shape[0]):
-    #             this_p = pn()
-    #             this_t = tn()
-    #             this_c = cn()
-    #             this_v = get_pscore( int(this_t), this_c )
-
-    #             this_l = this_p - pre_p
-    #             if pvalue_stat.has_key( this_v ):
-    #                 pvalue_stat[ this_v ] += this_l
-    #             else:
-    #                 pvalue_stat[ this_v ] = this_l
-    #             pre_p = this_p #pos_array[ i ]
-
-    #         #npcal += pos_array.shape[0]
-    #         nhcal += pos_array.shape[0]            
-    #         #t1 = ttime()
-    #         #t += t1 - t0
-    #         #t0 = t1
 
     cdef build_chromosome( self, chrname,
                            cond1_treat_ps, cond1_control_ps,
@@ -1646,7 +1607,7 @@ cdef class TwoConditionScores:
 
         name/description: the name and description in track line.
 
-        colname: can be 1: chip, 2: control, 3: score
+        colname: can be 1: cond1 chip vs cond1 ctrl, 2: cond2 chip vs cond2 ctrl, 3: cond1 chip vs cond2 chip
 
         """
         cdef:
@@ -1659,9 +1620,9 @@ cdef class TwoConditionScores:
         
         write = fhd.write
 
-        if self.trackline:
-            # this line is REQUIRED by the wiggle format for UCSC browser
-            write( "track type=bedGraph name=\"%s\" description=\"%s\"\n" % ( name.decode(), description ) )
+        #if self.trackline:
+        #    # this line is REQUIRED by the wiggle format for UCSC browser
+        #    write( "track type=bedGraph name=\"%s\" description=\"%s\"\n" % ( name.decode(), description ) )
         
         chrs = self.get_chr_names()
         for chrom in chrs:
@@ -1691,7 +1652,6 @@ cdef class TwoConditionScores:
         col2: t1 vs c1
         col3: t2 vs c2
         col4: t1 vs t2
-        col5: t2 vs t1
 
         fhd: a filehandler to save the matrix.
 
@@ -1720,7 +1680,7 @@ cdef class TwoConditionScores:
             
         return True
 
-    cpdef call_peaks (self, float cutoff=3, int min_length=200, int max_gap = 100,
+    cpdef tuple call_peaks (self, float cutoff=3, int min_length=200, int max_gap = 100,
                       bool call_summits=False):
         """This function try to find regions within which, scores
         are continuously higher than a given cutoff.
@@ -1784,7 +1744,7 @@ cdef class TwoConditionScores:
             # for cat3: commonly strong regions
             self.__add_a_peak ( cat3_peaks, chrom, cat3, cat3_startpos, cat3_endpos, abs(t1_vs_t2), max_gap, min_length )
 
-        return cat1_peaks, cat2_peaks, cat3_peaks
+        return (cat1_peaks, cat2_peaks, cat3_peaks)
     
     cdef object __add_a_peak ( self, object peaks, bytes chrom, np.ndarray indices, np.ndarray startpos, np.ndarray endpos,
                                np.ndarray score, int max_gap, int min_length ):

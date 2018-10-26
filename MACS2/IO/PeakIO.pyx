@@ -1,4 +1,4 @@
-# Time-stamp: <2019-09-25 10:29:18 taoliu>
+# Time-stamp: <2019-09-25 10:49:46 taoliu>
 
 """Module for PeakIO IO classes.
 
@@ -218,7 +218,7 @@ cdef class PeakIO:
         return self._to_xls(name_prefix=name_prefix, name=name,
                             print_func=fhd.write)
 
-    def _to_xls (self, bytes name_prefix=b"%s_peak_", bytes name=b"MACS", print_func=sys.stdout.write):
+    cdef _to_xls (self, bytes name_prefix=b"%s_peak_", bytes name=b"MACS", print_func=sys.stdout.write):
 
         if self.peaks:
             print_func("\t".join(("chr","start", "end",  "length",  "abs_summit", "pileup", "-log10(pvalue)", "fold_enrichment", "-log10(qvalue)", "name"))+"\n")
@@ -262,12 +262,13 @@ cdef class PeakIO:
                     print_func("\n")
         return
 
-    def _to_bed(self, bytes name_prefix=b"%s_peak_", bytes name=b"MACS",
+    cdef _to_bed(self, bytes name_prefix=b"%s_peak_", bytes name=b"MACS",
                 bytes description=b"%s", str score_column="score",
                 trackline=False, print_func=sys.stdout.write):
         """
         generalization of tobed and write_to_bed
         """
+        #print(description)        
         chrs = list(self.peaks.keys())
         chrs.sort()
         n_peak = 0
@@ -275,10 +276,10 @@ cdef class PeakIO:
         except: peakprefix = name_prefix
         try: desc = description % name
         except: desc = description
-        trackcontents = (name.replace(b"\"", b"\\\""), desc.replace(b"\"", b"\\\""))
         if trackline:
-            try: print_func('track name="%s (peaks)" description="%s" visibility=1\n' % trackcontents.decode())
-            except: print_func('track name=MACS description=Unknown') 
+            try: print_func('track name="%s (peaks)" description="%s" visibility=1\n' % ( name.replace(b"\"", b"\\\"").decode(),\
+                                                                                          desc.replace(b"\"", b"\\\"").decode() ) )
+            except: print_func('track name=MACS description=Unknown\n') 
         for chrom in chrs:
             for end, group in groupby(self.peaks[chrom], key=itemgetter("end")):
                 n_peak += 1
@@ -290,7 +291,7 @@ cdef class PeakIO:
                     peak = peaks[0]
                     print_func("%s\t%d\t%d\t%s%d\t%.5f\n" % (chrom.decode(),peak['start'],peak['end'],peakprefix.decode(),n_peak,peak[score_column])) 
 
-    def _to_summits_bed(self, bytes name_prefix=b"%s_peak_", bytes name=b"MACS",
+    cdef _to_summits_bed(self, bytes name_prefix=b"%s_peak_", bytes name=b"MACS",
                         bytes description = b"%s", str score_column="score",
                         bool trackline=False, print_func=sys.stdout.write):
         """ 
@@ -303,9 +304,9 @@ cdef class PeakIO:
         except: peakprefix = name_prefix
         try: desc = description % name
         except: desc = description
-        trackcontents = (name.replace(b"\"", b"\\\""), desc.replace(b"\"", b"\\\""))
         if trackline:
-            try: print_func('track name="%s (summits)" description="%s" visibility=1\n' % trackcontents.decode())
+            try: print_func('track name="%s (summits)" description="%s" visibility=1\n' % ( name.replace(b"\"", b"\\\"").decode(),\
+                                                                                            desc.replace(b"\"", b"\\\"").decode() ) )
             except: print_func('track name=MACS description=Unknown') 
         for chrom in chrs:
             for end, group in groupby(self.peaks[chrom], key=itemgetter("end")):
@@ -335,7 +336,7 @@ cdef class PeakIO:
         fc:fold_change,
         qscore:qvalue
         """
-        return self._to_bed(name_prefix=b"peak_", score_column="score")
+        return self._to_bed(name_prefix=b"peak_", score_column="score", name=b"", description=b"")
 
     def to_summits_bed (self):
         """Print out peak summits in BED5 format.
@@ -343,7 +344,7 @@ cdef class PeakIO:
         Five columns are chromosome, summit start, summit end, peak name, and peak height.
 
         """
-        return self._to_summits_bed(name_prefix=b"peak_", score_column="score")
+        return self._to_summits_bed(name_prefix=b"peak_", score_column="score", name=b"", description=b"")
 
     # these methods are very fast, specifying types is unnecessary
     def write_to_bed (self, fhd, bytes name_prefix=b"peak_", bytes name=b"MACS",
@@ -368,6 +369,7 @@ cdef class PeakIO:
         fc:fold_change,
         qscore:qvalue        
         """
+        #print(description)
         return self._to_bed(name_prefix=name_prefix, name=name,
                             description=description, score_column=score_column,
                             print_func=fhd.write, trackline=trackline)

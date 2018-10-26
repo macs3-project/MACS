@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-# Time-stamp: <2018-10-24 16:06:35 Tao Liu>
+# Time-stamp: <2018-10-25 13:31:28 Tao Liu>
 
 """Description: 
 
@@ -113,7 +113,7 @@ def main():
               ],
           install_requires=[
               'numpy>=1.15',
-              'cython>=0.29',
+              'cython>=0.25',
               #'scipy',
               ],
           cmdclass = command_classes,
