@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# Time-stamp: <2018-10-17 16:21:40 Tao Liu>
+# Time-stamp: <2018-10-26 14:17:19 Tao Liu>
 
 """Description
 
@@ -38,7 +38,7 @@ def main():
         sys.exit(1)
 
     # I intend to use -Ofast, however if gcc version < 4.6, this option is unavailable so...
-    extra_c_args = ["-w","-O3","-ffast-math"] # for C, -Ofast implies -O3 and -ffast-math
+    extra_c_args = ["-w","-O3","-ffast-math","-g0"] # for C, -Ofast implies -O3 and -ffast-math
 
     ext_modules = [Extension("MACS2.Prob", ["MACS2/Prob.c"], libraries=["m"], include_dirs=numpy_include_dir, extra_compile_args=extra_c_args ),
                    Extension("MACS2.IO.Parser",["MACS2/IO/Parser.c"], include_dirs=numpy_include_dir, extra_compile_args=extra_c_args),
@@ -61,7 +61,7 @@ def main():
         long_description = fh.read()
         
     setup(name="MACS2",
-          version="2.1.2",
+          version="2.1.3",
           description="Model Based Analysis for ChIP-Seq data",
           long_description = long_description,
           long_description_content_type="text/markdown",
@@ -86,7 +86,7 @@ def main():
               'Programming Language :: Cython',
               ],
           install_requires=[
-              'numpy>=1.6',
+              'numpy>=1.15',
               #'scipy',
               ],
           cmdclass = command_classes,

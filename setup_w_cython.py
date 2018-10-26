@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# Time-stamp: <2018-10-17 16:21:49 Tao Liu>
+# Time-stamp: <2018-10-26 14:18:45 Tao Liu>
 
 """Description: 
 
@@ -28,6 +28,7 @@ command_classes = {}
 try:
     import Cython.Distutils
     command_classes['build_ext'] = Cython.Distutils.build_ext
+    from Cython.Build import cythonize
     has_cython = True
 except:
     has_cython = False
@@ -86,7 +87,7 @@ def main():
         long_description = fh.read()
         
     setup(name="MACS2",
-          version="2.1.2",
+          version="2.1.3",
           description="Model Based Analysis for ChIP-Seq data",
           long_description = long_description,
           long_description_content_type="text/markdown",
@@ -111,12 +112,12 @@ def main():
               'Programming Language :: Cython',
               ],
           install_requires=[
-              'numpy>=1.6',
-              'cython>=0.18',
+              'numpy>=1.15',
+              'cython>=0.25',
               #'scipy',
               ],
           cmdclass = command_classes,
-          ext_modules = ext_modules
+          ext_modules = cythonize(ext_modules, language_level="2")
           )
 
 if __name__ == '__main__':

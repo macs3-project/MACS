@@ -1,4 +1,4 @@
-# Time-stamp: <2018-10-02 15:12:17 Tao Liu>
+# Time-stamp: <2018-10-26 14:20:19 Tao Liu>
 
 """Module for Feature IO classes.
 
@@ -1672,7 +1672,7 @@ cdef class TwoConditionScores:
             
         return True
 
-    cpdef write_matrix ( self, fhd, str name, str description, short column = 3 ):
+    cpdef write_matrix ( self, fhd, str name, str description ):
         """Write all data to fhd into five columns Format:
 
         col1: chr_start_end
@@ -1687,25 +1687,23 @@ cdef class TwoConditionScores:
         cdef:
             str chrom
             int l, pre, i, p 
-            float v1, v2, v3, v4
-            np.ndarray pos, value
+            float v1, v2, v3
+            np.ndarray pos, value1, value2, value3
 
         write = fhd.write
 
         chrs = self.get_chr_names()
         for chrom in chrs:
-            pos = self.data[ chrom ][ 0 ]
-            value = self.data[ chrom ][ column ]
+            [ pos, value1, value2, value3 ] = self.data[ chrom ]
             l = self.datalength[ chrom ]
             pre = 0
             if pos.shape[ 0 ] == 0: continue # skip if there's no data
             for i in range( 0, l ):
-                v1 = self.data[ i ][ 1 ]
-                v2 = self.data[ i ][ 2 ]
-                v3 = self.data[ i ][ 3 ]
-                v4 = self.data[ i ][ 4 ]                
+                v1 = value1[ i ]
+                v2 = value2[ i ]
+                v3 = value3[ i ]
                 p = pos[ i ]
-                write( "%s:%d_%d\t%.5f\t%.5f\t%.5f\t%.5f\n" % ( chrom, pre, p, v1, v2, v3, v4 ) )
+                write( "%s:%d_%d\t%.5f\t%.5f\t%.5f\n" % ( chrom, pre, p, v1, v2, v3 ) )
                 pre = p
             
         return True
