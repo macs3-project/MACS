@@ -1,23 +1,33 @@
+2019-10-01  Tao Liu  <vladimir.liu@gmail.com>
+	MACS version 2.2.4 (Python3)
+
+	* New features
+
+	1) First Python3 version MACS2 released.
+
+	2) Version number 2.2.X will be used for MACS2 in Python3, in
+	parallel to 2.1.X.
+
 2019-09-30  Tao Liu  <vladimir.liu@gmail.com>
-	MACS version 2.1.4
+	MACS version 2.1.4 
 
-	* Features added
+	* Features added 
 
-	Github Actions is used together with Travis CI for testing and
-	deployment.
+	Github Actions is used together with Travis CI for testing and 
+	deployment. 
 
-	* Bugs fixed
+	* Bugs fixed 
 
-	PR #322:
+	PR #322: 
 
-	1) #318 Random score in bdgdiff output. It turns out the sum_v is
-	not initialized as 0 before adding. Potential bugs are fixed in
-	other functions in ScoreTrack and CallPeakUnit codes.
+	1) #318 Random score in bdgdiff output. It turns out the sum_v is 
+	not initialized as 0 before adding. Potential bugs are fixed in 
+	other functions in ScoreTrack and CallPeakUnit codes. 
 
-	2) #321 Cython dependency in setup.py script is removed. And place
-	'cythonzie' call to the correct position.
+	2) #321 Cython dependency in setup.py script is removed. And place 
+	'cythonzie' call to the correct position. 
 
-	3) A typo is fixed in Github Actions script.
+	3) A typo is fixed in Github Actions script. 
 
 2019-09-19  Tao Liu  <vladimir.liu@gmail.com>
 	MACS version 2.1.3.3
@@ -96,7 +106,7 @@
 2016-03-09  Tao Liu  <vladimir.liu@gmail.com>
 	MACS version 2.1.1 20160309
 
-	* Retire the tag:rc. 
+	* Retire the tag:rc.
 
 	* Fixed spelling. Merged pull request #120. Thank @mr-c!
 
