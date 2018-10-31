@@ -55,6 +55,7 @@ cdef class PeakModel:
         int umfold
         int lmfold
         int bw
+        int d_min
         int tag_expansion_size
         object info, debug, warn, error
         str summary
@@ -74,6 +75,7 @@ cdef class PeakModel:
         self.umfold = opt.umfold
         self.lmfold = opt.lmfold
         self.tag_expansion_size = 10         #opt.tsize| test 10bps. The reason is that we want the best 'lag' between left & right cutting sides. A tag will be expanded to 10bps centered at cutting point.
+        self.d_min = 20 ### discard any fragment size < d_min
         self.bw = opt.bw
         self.info  = opt.info
         self.debug = opt.debug
@@ -161,7 +163,7 @@ Summary of Peak Model:
   Scan window size: %d
 """ % (self.min_tags,self.max_tags,self.d,self.scan_window)
 
-    cdef __paired_peak_model (self, paired_peakpos):
+    cdef __paired_peak_model (self, paired_peakpos,):
         """Use paired peak positions and treatment tag positions to build the model.
 
         Modify self.(d, model_shift size and scan_window size. and extra, plus_line, minus_line and shifted_line for plotting).
@@ -221,18 +223,38 @@ Summary of Peak Model:
 
         # all local maximums could be alternative ds.
         i_l_max = np.r_[False, ycorr[1:] > ycorr[:-1]] & np.r_[ycorr[:-1] > ycorr[1:], False]
-        tmp_cor_alternative_d = ycorr[ i_l_max ]
-        tmp_alternative_d = xcorr[ i_l_max ]
-        cor_alternative_d =  tmp_cor_alternative_d [ tmp_alternative_d > 0 ]
-        self.alternative_d = map( int, tmp_alternative_d[ tmp_alternative_d > 0 ] )
+        i_l_max = np.where(i_l_max)[0]
+        i_l_max = i_l_max[ xcorr[i_l_max] > self.d_min ]
+        i_l_max = i_l_max[ np.argsort(ycorr[i_l_max])[::-1]]
+#         filter(lambda i: xcorr[i]>self.d_min, i_l_max )
+#         i_l_max = sorted(i_l_max,
+#                          key=ycorr.__getitem__, 
+#                          reverse=True)
+        self.alternative_d = sorted(map(int, xcorr[i_l_max]))
+        assert len(self.alternative_d) > 0, "No proper d can be found! Tweak --mfold?"
+        
+        self.d = xcorr[i_l_max[0]]
+#         i_l_max = filter(lambda: ycorr)
+#         tmp_cor_alternative_d = ycorr[ i_l_max ]
+#         tmp_alternative_d = xcorr[ i_l_max ]
+#         cor_alternative_d =  tmp_cor_alternative_d [ tmp_alternative_d > 0 ]
+#         self.alternative_d = map( int, tmp_alternative_d[ tmp_alternative_d > 0 ] )
+        
         
         # best cross-correlation point
-        self.d = xcorr[ np.where( ycorr== max( cor_alternative_d ) )[0][0] ]
+        
+#         d_cand = xcorr[ np.where( ycorr == sorted( cor_alternative_d [::-1] ) ) ]
+#         print (cor_alternative_d)
+#         print (d_cand)
+#         d_cand = xcorr[ np.where( ycorr== max( cor_alternative_d ) )[0] ]
+        
+        #### make sure fragment size is not zero
+        
+#         self.d = [ x for x in d_cand if x > self.d_min ] [0] 
         #self.d = xcorr[np.where(ycorr==max(ycorr))[0][0]] #+self.tag_expansion_size
 
         # get rid of the last local maximum if it's at the right end of curve.
         
-        assert len(self.alternative_d) > 0, "No proper d can be found! Tweak --mfold?"
         
         self.ycorr = ycorr
         self.xcorr = xcorr
@@ -417,6 +439,7 @@ Summary of Peak Model:
             current_tag_list.append( pos )   # add pos while 1. no
                                              # need to call peak;
                                              # 2. current_tag_list is []
+            
         return peak_info
 
     cdef __naive_peak_pos (self, pos_list, int plus_strand ):
