@@ -1,13 +1,10 @@
 # Use an official Python runtime as a parent image
-FROM python:2.7
+FROM python:2.7.15
 
-# Set the working directory to /app
-WORKDIR /
-
+# install numpy and MACS2
+COPY requirements.txt /
 RUN pip install --trusted-host pypi.python.org numpy
 RUN pip install --trusted-host pypi.python.org MACS2
 
 # Define environment variable
-ENV NAME MACS2
-
-CMD ["macs2", "-h"]
+ENTRYPOINT ["macs2"]
