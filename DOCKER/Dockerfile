@@ -2,7 +2,6 @@
 FROM python:2.7.15
 
 # install numpy and MACS2
-COPY requirements.txt /
 RUN pip install --trusted-host pypi.python.org numpy
 RUN pip install --trusted-host pypi.python.org MACS2
 
