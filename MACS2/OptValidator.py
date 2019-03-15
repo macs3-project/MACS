@@ -50,7 +50,7 @@ def opt_validate ( options ):
 
     # format
     options.gzip_flag = False           # if the input is gzip file
-    
+
     options.format = options.format.upper()
     if options.format == "ELAND":
         options.parser = ELANDResultParser
@@ -79,7 +79,7 @@ def opt_validate ( options ):
     else:
         logging.error("Format \"%s\" cannot be recognized!" % (options.format))
         sys.exit(1)
-    
+
     # duplicate reads
     if options.keepduplicates != "auto" and options.keepduplicates != "all":
         if not options.keepduplicates.isdigit():
@@ -113,8 +113,8 @@ def opt_validate ( options ):
         options.log_pvalue = None
     if options.broad:
         options.log_broadcutoff = log(options.broadcutoff,10)*-1
-    
-    # uppercase the format string 
+
+    # uppercase the format string
     options.format = options.format.upper()
 
     # d_min is non-negative
@@ -128,7 +128,7 @@ def opt_validate ( options ):
     if options.lmfold > options.umfold:
         logging.error("Upper limit of mfold should be greater than lower limit!" % options.mfold)
         sys.exit(1)
-    
+
     # output filenames
     options.peakxls = os.path.join( options.outdir, options.name+"_peaks.xls" )
     options.peakbed = os.path.join( options.outdir, options.name+"_peaks.bed" )
@@ -154,7 +154,7 @@ def opt_validate ( options ):
                         stream=sys.stderr,
                         filemode="w"
                         )
-    
+
     options.error   = logging.critical        # function alias
     options.warn    = logging.warning
     options.debug   = logging.debug
@@ -191,12 +191,12 @@ def opt_validate ( options ):
     if options.maxgap:
         options.argtxt += "# The maximum gap between significant sites = %d\n" % options.maxgap
     else:
-        options.argtxt += "# The maximum gap between significant sites is assigned as the read length/tag size.\n" 
+        options.argtxt += "# The maximum gap between significant sites is assigned as the read length/tag size.\n"
     if options.minlen:
         options.argtxt += "# The minimum length of peaks = %d\n" % options.minlen
     else:
         options.argtxt += "# The minimum length of peaks is assigned as the predicted fragment length \"d\".\n"
-        
+
     if options.downsample:
         options.argtxt += "# Larger dataset will be randomly sampled towards smaller dataset.\n"
         if options.seed >= 0:
@@ -209,7 +209,7 @@ def opt_validate ( options ):
 
     if options.ratio != 1.0:
 	options.argtxt += "# Using a custom scaling factor: %.2e\n" % (options.ratio)
-	
+
     if options.cfile:
         options.argtxt += "# Range for calculating regional lambda is: %d bps and %d bps\n" % (options.smalllocal,options.largelocal)
     else:
@@ -236,7 +236,218 @@ def opt_validate ( options ):
         options.argtxt += "# Searching for subpeak summits is on\n"
 
     if options.do_SPMR and options.store_bdg:
-        options.argtxt += "# MACS will save fragment pileup signal per million reads\n"        
+        options.argtxt += "# MACS will save fragment pileup signal per million reads\n"
+
+    #wacs -- added
+    options.controlweights = 0.0
+    options.multiple = False
+
+    return options
+
+def opt_validate_wacs ( options ):
+    """Validate options from a OptParser object.
+
+    Ret: Validated options object.
+    """
+    # gsize
+    try:
+        options.gsize = efgsize[options.gsize]
+    except:
+        try:
+            options.gsize = float(options.gsize)
+        except:
+            logging.error("Error when interpreting --gsize option: %s" % options.gsize)
+            logging.error("Available shortcuts of effective genome sizes are %s" % ",".join(efgsize.keys()))
+            sys.exit(1)
+
+    # format
+    options.gzip_flag = False           # if the input is gzip file
+
+    options.format = options.format.upper()
+    if options.format == "ELAND":
+        options.parser = ELANDResultParser
+    elif options.format == "BED":
+        options.parser = BEDParser
+    elif options.format == "ELANDMULTI":
+        options.parser = ELANDMultiParser
+    elif options.format == "ELANDEXPORT":
+        options.parser = ELANDExportParser
+    elif options.format == "SAM":
+        options.parser = SAMParser
+    elif options.format == "BAM":
+        options.parser = BAMParser
+        options.gzip_flag = True
+    elif options.format == "BAMPE":
+        options.parser = BAMPEParser
+        options.gzip_flag = True
+        options.nomodel = True
+    elif options.format == "BEDPE":
+        options.parser = BEDPEParser
+        options.nomodel = True
+    elif options.format == "BOWTIE":
+        options.parser = BowtieParser
+    elif options.format == "AUTO":
+        options.parser = guess_parser
+    else:
+        logging.error("Format \"%s\" cannot be recognized!" % (options.format))
+        sys.exit(1)
+
+    # duplicate reads
+    if options.keepduplicates != "auto" and options.keepduplicates != "all":
+        if not options.keepduplicates.isdigit():
+            logging.error("--keep-dup should be 'auto', 'all' or an integer!")
+            sys.exit(1)
+
+    if options.extsize < 1 :
+        logging.error("--extsize must >= 1!")
+        sys.exit(1)
+
+    if options.broad and options.call_summits:
+        logging.error("--broad can't be combined with --call-summits!")
+        sys.exit(1)
+
+    if options.pvalue:
+        # if set, ignore qvalue cutoff
+        options.log_qvalue = None
+        options.log_pvalue = log(options.pvalue,10)*-1
+    else:
+        options.log_qvalue = log(options.qvalue,10)*-1
+        options.log_pvalue = None
+    if options.broad:
+        options.log_broadcutoff = log(options.broadcutoff,10)*-1
+
+    # uppercase the format string
+    options.format = options.format.upper()
+
+    # upper and lower mfold
+    options.lmfold = options.mfold[0]
+    options.umfold = options.mfold[1]
+    if options.lmfold > options.umfold:
+        logging.error("Upper limit of mfold should be greater than lower limit!" % options.mfold)
+        sys.exit(1)
+
+    # output filenames
+    options.peakxls = os.path.join( options.outdir, options.name+"_peaks.xls" )
+    options.peakbed = os.path.join( options.outdir, options.name+"_peaks.bed" )
+    options.peakNarrowPeak = os.path.join( options.outdir, options.name+"_peaks.narrowPeak" )
+    options.peakBroadPeak = os.path.join( options.outdir, options.name+"_peaks.broadPeak" )
+    options.peakGappedPeak = os.path.join( options.outdir, options.name+"_peaks.gappedPeak" )
+    options.summitbed = os.path.join( options.outdir, options.name+"_summits.bed" )
+    options.bdg_treat = os.path.join( options.outdir, options.name+"_treat_pileup.bdg" )
+    options.bdg_control= os.path.join( options.outdir, options.name+"_control_lambda.bdg" )
+    if options.cutoff_analysis:
+        options.cutoff_analysis_file = os.path.join( options.outdir, options.name+"_cutoff_analysis.txt" )
+    else:
+        options.cutoff_analysis_file = None
+    #options.negxls  = os.path.join( options.name+"_negative_peaks.xls" )
+    #options.diagxls = os.path.join( options.name+"_diag.xls" )
+    options.modelR  = os.path.join( options.outdir, options.name+"_model.r" )
+    #options.pqtable  = os.path.join( options.outdir, options.name+"_pq_table.txt" )
+
+    # logging object
+    logging.basicConfig(level=(4-options.verbose)*10,
+                        format='%(levelname)-5s @ %(asctime)s: %(message)s ',
+                        datefmt='%a, %d %b %Y %H:%M:%S',
+                        stream=sys.stderr,
+                        filemode="w"
+                        )
+
+    options.error   = logging.critical        # function alias
+    options.warn    = logging.warning
+    options.debug   = logging.debug
+    options.info    = logging.info
+
+    #wacs
+    if options.controlweights != 0.0:
+        options.argtxt = "\n".join((
+            "# Command line: %s" % " ".join(sys.argv[1:]),\
+            "# ARGUMENTS LIST:",\
+            "# name = %s" % (options.name),\
+            "# format = %s" % (options.format),\
+            "# ChIP-seq file = %s" % (options.tfile),\
+            "# control file = %s" % (options.cfile),\
+            "# control weights = %s" % (options.controlweights), \
+            "# effective genome size = %.2e" % (options.gsize),\
+            "# band width = %d" % (options.bw),\
+            "# model fold = %s\n" % (options.mfold),\
+            ))
+    else:
+        options.argtxt = "\n".join((
+            "# Command line: %s" % " ".join(sys.argv[1:]),\
+            "# ARGUMENTS LIST:",\
+            "# name = %s" % (options.name),\
+            "# format = %s" % (options.format),\
+            "# ChIP-seq file = %s" % (options.tfile),\
+            "# control file = %s" % (options.cfile),\
+            "# effective genome size = %.2e" % (options.gsize),\
+            "# band width = %d" % (options.bw),\
+            "# model fold = %s\n" % (options.mfold),\
+            ))
+
+    if options.pvalue:
+        if options.broad:
+            options.argtxt +=  "# pvalue cutoff for narrow/strong regions = %.2e\n" % (options.pvalue)
+            options.argtxt +=  "# pvalue cutoff for broad/weak regions = %.2e\n" % (options.broadcutoff)
+            options.argtxt +=  "# qvalue will not be calculated and reported as -1 in the final output.\n"
+        else:
+            options.argtxt +=  "# pvalue cutoff = %.2e\n" % (options.pvalue)
+            options.argtxt +=  "# qvalue will not be calculated and reported as -1 in the final output.\n"
+    else:
+        if options.broad:
+            options.argtxt +=  "# qvalue cutoff for narrow/strong regions = %.2e\n" % (options.qvalue)
+            options.argtxt +=  "# qvalue cutoff for broad/weak regions = %.2e\n" % (options.broadcutoff)
+        else:
+            options.argtxt +=  "# qvalue cutoff = %.2e\n" % (options.qvalue)
+
+    if options.maxgap:
+        options.argtxt += "# The maximum gap between significant sites = %d\n" % options.maxgap
+    else:
+        options.argtxt += "# The maximum gap between significant sites is assigned as the read length/tag size.\n"
+    if options.minlen:
+        options.argtxt += "# The minimum length of peaks = %d\n" % options.minlen
+    else:
+        options.argtxt += "# The minimum length of peaks is assigned as the predicted fragment length \"d\".\n"
+
+    if options.downsample:
+        options.argtxt += "# Larger dataset will be randomly sampled towards smaller dataset.\n"
+        if options.seed >= 0:
+            options.argtxt += "# Random seed has been set as: %d\n" % options.seed
+    else:
+        if options.scaleto == "large":
+            options.argtxt += "# Smaller dataset will be scaled towards larger dataset.\n"
+        else:
+            options.argtxt += "# Larger dataset will be scaled towards smaller dataset.\n"
+
+    if options.ratio != 1.0:
+	options.argtxt += "# Using a custom scaling factor: %.2e\n" % (options.ratio)
+
+    if options.cfile:
+        options.argtxt += "# Range for calculating regional lambda is: %d bps and %d bps\n" % (options.smalllocal,options.largelocal)
+    else:
+        options.argtxt += "# Range for calculating regional lambda is: %d bps\n" % (options.largelocal)
+
+    if options.broad:
+        options.argtxt += "# Broad region calling is on\n"
+    else:
+        options.argtxt += "# Broad region calling is off\n"
+
+    if options.fecutoff != 1.0:
+        options.argtxt += "# Additional cutoff on fold-enrichment is: %.2f\n" % (options.fecutoff)
+
+    if options.format in ["BAMPE", "BEDPE"]:
+        # neutralize SHIFT
+        options.shift = 0
+        options.argtxt += "# Paired-End mode is on\n"
+    else:
+        options.argtxt += "# Paired-End mode is off\n"
+
+    #if options.refine_peaks:
+    #    options.argtxt += "# Refining peak for read balance is on\n"
+    if options.call_summits:
+        options.argtxt += "# Searching for subpeak summits is on\n"
+
+    if options.do_SPMR and options.store_bdg:
+        options.argtxt += "# MACS will save fragment pileup signal per million reads\n"
 
     return options
 
@@ -247,7 +458,7 @@ def diff_opt_validate ( options ):
     """
     # format
     options.gzip_flag = False           # if the input is gzip file
-    
+
 #    options.format = options.format.upper()
     # fox this stuff
 #    if True: pass
@@ -256,7 +467,7 @@ def diff_opt_validate ( options ):
 #    else:
 #        logging.error("Format \"%s\" cannot be recognized!" % (options.format))
 #        sys.exit(1)
-    
+
     if options.peaks_pvalue:
         # if set, ignore qvalue cutoff
         options.peaks_log_qvalue = None
@@ -276,7 +487,7 @@ def diff_opt_validate ( options ):
         options.log_qvalue = log(options.diff_qvalue,10)*-1
         options.log_pvalue = None
         options.score_method = 'q'
-    
+
     # output filenames
     options.peakxls = options.name+"_diffpeaks.xls"
     options.peakbed = options.name+"_diffpeaks.bed"
@@ -285,7 +496,7 @@ def diff_opt_validate ( options ):
     options.bdglogLR = options.name+"_logLR.bdg"
     options.bdgpvalue = options.name+"_logLR.bdg"
     options.bdglogFC = options.name+"_logLR.bdg"
-    
+
     options.call_peaks = True
     if not (options.peaks1 == '' or options.peaks2 == ''):
         if options.peaks1 == '':
@@ -316,13 +527,13 @@ def diff_opt_validate ( options ):
             "# control file 2 = %s" % (options.c2bdg),\
             ""
             ))
-         
+
         if options.peaks_pvalue:
             options.argtxt +=  "# treat/control -log10(pvalue) cutoff = %.2e\n" % (options.peaks_log_pvalue)
             options.argtxt +=  "# treat/control -log10(qvalue) will not be calculated and reported as -1 in the final output.\n"
         else:
             options.argtxt +=  "# treat/control -log10(qvalue) cutoff = %.2e\n" % (options.peaks_log_qvalue)
-        
+
     if options.diff_pvalue:
         options.argtxt +=  "# differential pvalue cutoff = %.2e\n" % (options.log_pvalue)
         options.argtxt +=  "# differential qvalue will not be calculated and reported as -1 in the final output.\n"
@@ -336,7 +547,7 @@ def diff_opt_validate ( options ):
                         stream=sys.stderr,
                         filemode="w"
                         )
-    
+
     options.error   = logging.critical        # function alias
     options.warn    = logging.warning
     options.debug   = logging.debug
@@ -363,7 +574,7 @@ def opt_validate_filterdup ( options ):
     # format
 
     options.gzip_flag = False           # if the input is gzip file
-    
+
     options.format = options.format.upper()
     if options.format == "ELAND":
         options.parser = ELANDResultParser
@@ -386,20 +597,20 @@ def opt_validate_filterdup ( options ):
         options.parser = BAMPEParser
         options.gzip_flag = True
     elif options.format == "BEDPE":
-        options.parser = BEDPEParser        
+        options.parser = BEDPEParser
     elif options.format == "AUTO":
         options.parser = guess_parser
     else:
         logging.error("Format \"%s\" cannot be recognized!" % (options.format))
         sys.exit(1)
-    
+
     # duplicate reads
     if options.keepduplicates != "auto" and options.keepduplicates != "all":
         if not options.keepduplicates.isdigit():
             logging.error("--keep-dup should be 'auto', 'all' or an integer!")
             sys.exit(1)
 
-    # uppercase the format string 
+    # uppercase the format string
     options.format = options.format.upper()
 
     # logging object
@@ -409,7 +620,7 @@ def opt_validate_filterdup ( options ):
                         stream=sys.stderr,
                         filemode="w"
                         )
-    
+
     options.error   = logging.critical        # function alias
     options.warn    = logging.warning
     options.debug   = logging.debug
@@ -425,7 +636,7 @@ def opt_validate_randsample ( options ):
     # format
 
     options.gzip_flag = False           # if the input is gzip file
-    
+
     options.format = options.format.upper()
     if options.format == "ELAND":
         options.parser = ELANDResultParser
@@ -452,8 +663,8 @@ def opt_validate_randsample ( options ):
     else:
         logging.error("Format \"%s\" cannot be recognized!" % (options.format))
         sys.exit(1)
-    
-    # uppercase the format string 
+
+    # uppercase the format string
     options.format = options.format.upper()
 
     # percentage or number
@@ -473,7 +684,7 @@ def opt_validate_randsample ( options ):
                         stream=sys.stderr,
                         filemode="w"
                         )
-    
+
     options.error   = logging.critical        # function alias
     options.warn    = logging.warning
     options.debug   = logging.debug
@@ -489,7 +700,7 @@ def opt_validate_refinepeak ( options ):
     # format
 
     options.gzip_flag = False           # if the input is gzip file
-    
+
     options.format = options.format.upper()
     if options.format == "ELAND":
         options.parser = ELANDResultParser
@@ -511,8 +722,8 @@ def opt_validate_refinepeak ( options ):
     else:
         logging.error("Format \"%s\" cannot be recognized!" % (options.format))
         sys.exit(1)
-    
-    # uppercase the format string 
+
+    # uppercase the format string
     options.format = options.format.upper()
 
     # logging object
@@ -522,7 +733,7 @@ def opt_validate_refinepeak ( options ):
                         stream=sys.stderr,
                         filemode="w"
                         )
-    
+
     options.error   = logging.critical        # function alias
     options.warn    = logging.warning
     options.debug   = logging.debug
@@ -548,7 +759,7 @@ def opt_validate_predictd ( options ):
 
     # format
     options.gzip_flag = False           # if the input is gzip file
-    
+
     options.format = options.format.upper()
     if options.format == "ELAND":
         options.parser = ELANDResultParser
@@ -577,8 +788,8 @@ def opt_validate_predictd ( options ):
     else:
         logging.error("Format \"%s\" cannot be recognized!" % (options.format))
         sys.exit(1)
-    
-    # uppercase the format string 
+
+    # uppercase the format string
     options.format = options.format.upper()
 
     # d_min is non-negative
@@ -592,7 +803,7 @@ def opt_validate_predictd ( options ):
     if options.lmfold > options.umfold:
         logging.error("Upper limit of mfold should be greater than lower limit!" % options.mfold)
         sys.exit(1)
-    
+
     options.modelR  = os.path.join( options.outdir, options.rfile )
 
     # logging object
@@ -602,7 +813,7 @@ def opt_validate_predictd ( options ):
                         stream=sys.stderr,
                         filemode="w"
                         )
-    
+
     options.error   = logging.critical        # function alias
     options.warn    = logging.warning
     options.debug   = logging.debug
@@ -619,7 +830,7 @@ def opt_validate_pileup ( options ):
     # format
 
     options.gzip_flag = False           # if the input is gzip file
-    
+
     options.format = options.format.upper()
     if options.format == "ELAND":
         options.parser = ELANDResultParser
@@ -644,8 +855,8 @@ def opt_validate_pileup ( options ):
     else:
         logging.error("Format \"%s\" cannot be recognized!" % (options.format))
         sys.exit(1)
-    
-    # uppercase the format string 
+
+    # uppercase the format string
     options.format = options.format.upper()
 
     # logging object
@@ -655,7 +866,7 @@ def opt_validate_pileup ( options ):
                         stream=sys.stderr,
                         filemode="w"
                         )
-    
+
     options.error   = logging.critical        # function alias
     options.warn    = logging.warning
     options.debug   = logging.debug
@@ -680,7 +891,7 @@ def opt_validate_bdgcmp ( options ):
                         stream=sys.stderr,
                         filemode="w"
                         )
-    
+
     options.error   = logging.critical        # function alias
     options.warn    = logging.warning
     options.debug   = logging.debug
@@ -698,7 +909,7 @@ def opt_validate_bdgcmp ( options ):
     if options.ofile:
         if len(options.method) != len(options.ofile):
             logging.error("The number and the order of arguments for --ofile must be the same as for -m.")
-            sys.exit(1)     
+            sys.exit(1)
 
     return options
 
@@ -715,7 +926,7 @@ def opt_validate_cmbreps ( options ):
                         stream=sys.stderr,
                         filemode="w"
                         )
-    
+
     options.error   = logging.critical        # function alias
     options.warn    = logging.warning
     options.debug   = logging.debug
@@ -760,7 +971,7 @@ def opt_validate_bdgopt ( options ):
                         stream=sys.stderr,
                         filemode="w"
                         )
-    
+
     options.error   = logging.critical        # function alias
     options.warn    = logging.warning
     options.debug   = logging.debug
@@ -777,4 +988,3 @@ def opt_validate_bdgopt ( options ):
         sys.exit( 1 )
 
     return options
-
