@@ -1,9 +1,9 @@
-# Time-stamp: <2019-02-05 16:12:30 Aseel Awdeh>
-
 """Description: MACS 2 main executable
 
 Copyright (c) 2008,2009 Yong Zhang, Tao Liu <taoliu@jimmy.harvard.edu>
 Copyright (c) 2010,2011 Tao Liu <taoliu@jimmy.harvard.edu>
+Copyright (c) 2013, Tao Liu lab at UB and Xiaole Shirley Liu lab at DFCI
+All rights reserved.
 
 This code is free software; you can redistribute it and/or modify it
 under the terms of the BSD License (see the file COPYING included
@@ -15,9 +15,7 @@ with the distribution).
 @contact: taoliu@jimmy.harvard.edu
 """
 
-"""Added: WACS main executable
-
-Copyright (c) 2018,2019 Aseel Awdeh <araed104@uottawa.ca>
+"""Added: WACS main executable by Aseel Awdeh <araed104@uottawa.ca>
 """
 
 # ------------------------------------
