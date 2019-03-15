@@ -1,8 +1,8 @@
-# Time-stamp: <2018-01-30 10:22:22 Tao Liu>
-
 """Module for Calculate Scores.
 
 Copyright (c) 2013 Tao Liu <vladimir.liu@gmail.com>
+Copyright (c) 2013, Tao Liu lab at UB and Xiaole Shirley Liu lab at DFCI
+All rights reserved.
 
 This code is free software; you can redistribute it and/or modify it
 under the terms of the BSD License (see the file COPYING included
@@ -14,8 +14,7 @@ with the distribution).
 @contact: vladimir.liu@gmail.com
 """
 
-"""Added for WACS
-Copyright (c) 2018,2019 Aseel Awdeh <araed104@uottawa.ca>
+"""Added for WACS by Aseel Awdeh <araed104@uottawa.ca>
 
 CallPeakUnitPrecompiled allows the user to detect peaks from previously computed pileups
 
