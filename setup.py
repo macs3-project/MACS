@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# Time-stamp: <2019-09-20 15:08:11 taoliu>
+# Time-stamp: <2019-09-24 14:09:43 taoliu>
 
 """Description: 
 
@@ -25,12 +25,13 @@ try:
 except:
     has_cython = False
 
-try: 
-    from numpy import get_include as numpy_get_include 
-    numpy_include_dir = [numpy_get_include()] 
-except: 
-    numpy_include_dir = [] 
-
+try:
+    from numpy import get_include as numpy_get_include
+    numpy_include_dir = [numpy_get_include()]
+except:
+    numpy_include_dir = []
+    sys.stderr.write("CRITICAL:Numpy must be installed!\n")
+    sys.exit(1)
 
 def main():
     if float(sys.version[:3])<2.7 or float(sys.version[:3])>=2.8:
@@ -77,7 +78,7 @@ def main():
 
     with open("README.md", "r") as fh:
         long_description = fh.read()
-        
+
     setup(name="MACS2",
           version="2.1.3.3",
           description="Model Based Analysis for ChIP-Seq data",
@@ -88,14 +89,12 @@ def main():
           url='http://github.com/taoliu/MACS/',
           package_dir={'MACS2' : 'MACS2'},
           packages=['MACS2', 'MACS2.IO'],
-          #package_data={'MACS2': ['data/*.dat']},          
-          scripts=['bin/macs2',
-                   ],
+          scripts=['bin/macs2'],
           classifiers=[
               'Development Status :: 5 - Production/Stable',
               'Environment :: Console',
               'Intended Audience :: Developers',
-              'Intended Audience :: Science/Research',              
+              'Intended Audience :: Science/Research',
               'License :: OSI Approved :: BSD License',
               'Operating System :: MacOS :: MacOS X',
               'Operating System :: POSIX',
