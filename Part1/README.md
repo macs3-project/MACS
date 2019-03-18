@@ -1,4 +1,4 @@
-# WACS for weighted peak calling approach. 
+# WACS: Improving Peak Calling by Optimally Weighting Controls
 
 ## Introduction 
 Chromatin immunoprecipitation followed by high throughput sequencing (ChIP-seq) allows biologists to identify protein/DNA binding
@@ -9,8 +9,8 @@ remainder of the ChIP-seq signal captures true binding or histone modification. 
 in different ChIP-seq experiments. Depending on which controls are used, different aspects of ChIP-seq bias are better or worse accounted for, 
 and peak calling can produce different results for the same ChIP-seq experiment. We introduce WACS (Weighted Analysis of ChIP-seq) 
 which is an extension of the well-known peak caller, MACS2. It allows the use of “smart” controls to model the non-signal effect for 
-a specific ChIP-seq experiment. WACS first generates the weights per control to model the background distribution per ChIP-seq experiment 
-(weights are generated in Part 1). This is then followed by peak calling. .
+a specific ChIP-seq experiment. WACS first generates the weights per control to model the background distribution per ChIP-seq experiment. 
+This is then followed by peak calling. .
 
 
 ## Install
