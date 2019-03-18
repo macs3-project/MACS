@@ -27,7 +27,7 @@ a specific ChIP-seq experiment. WACS first generates the weights per control to 
 **Your environment should also be set with Python, BEDtools and SAMtools.**
 	
 ## Usage
-####Step 1. Generate the weights per control sample.
+#### Step 1. Generate the weights per control sample.
 
 *./Part.sh controlDir treatmentFile chromSize*
 
@@ -44,7 +44,7 @@ If no chromosome size is provided, by default chromosome sizes corresponding to 
 
 **The BAM files could either be (1) unsorted or unindexed bam files, or (2) sorted and indexed bam files.**
 
-####Step 2. Call peaks.
+#### Step 2. Call peaks.
 
 For each chip, get control names and their corresponding weights and pass them to macs2 callpeak_wacs. 
 
