@@ -27,11 +27,12 @@ a specific ChIP-seq experiment. WACS first generates the weights per control to 
 **Your environment should also be set with Python, BEDtools and SAMtools.**
 	
 ## Usage
-**Step 1. Generate the weights per control sample.**
+####Step 1. Generate the weights per control sample.
 
-./Part.sh controlDir treatmentFile chromSize
+*./Part.sh controlDir treatmentFile chromSize*
 
 Inputs:
+
 (a) a path to a directory holding all the control BAM files -- required.
 
 (b) full path to the treatment BAM file -- required.
@@ -43,17 +44,24 @@ If no chromosome size is provided, by default chromosome sizes corresponding to 
 
 **The BAM files could either be (1) unsorted or unindexed bam files, or (2) sorted and indexed bam files.**
 
-**Step 2. Call peaks.**
-For each chip, get control names and their corresponding weights and pass them to macs2 callpeak_wacs.
+####Step 2. Call peaks.
+
+For each chip, get control names and their corresponding weights and pass them to macs2 callpeak_wacs. 
 
 FILENAME=`basename name.bam`
+
 BASE=`echo $FILENAME | cut -d. -f1`
-coefFile=Coefficients/$BASE.coefficients.csv 
+
+coefFile=Coefficients/$BASE.coefficients.csv
+
 ControlBamDir=BAM/Control
 
 if [ -e $coefFile ]
+
 then
+	
 	controlNames="`cut -d, -f1 $coefFile`"
+	
 	controlWeights="`cut -d, -f2 $coefFile`"
 
 	for i in $controlNames; do controlNames_full+="$ControlBamDir$i.bam "; done
