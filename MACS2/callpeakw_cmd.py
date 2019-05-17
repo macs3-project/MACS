@@ -389,5 +389,6 @@ def load_frag_treat_files_options ( options ):
             treat = tp.append_petrack( treat )
             #treat.sort()
     treat.finalize()
+    options.tsize = tp.d
     options.info("#1 mean fragment size is determined as %d bp from treatment" % options.tsize)
     return treat
