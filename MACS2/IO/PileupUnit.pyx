@@ -269,7 +269,13 @@ cdef class PileupUnitFromAlignments:
                 continue
 
             #print("ctrl_d_s_index: " + str(ctrl_d_s_index) + ", Scale factor: " + str(sf_ctrl) + ", Weight: " + str(self.ctrl_weight))
-            pileup_ctrl = self.ctrl.pileup_a_chromosome( chrom, [ctrl_d_s_index,],
+            if self.PE_mode:
+                pileup_ctrl = self.ctrl.pileup_a_chromosome_c( chrom, [ctrl_d_s_index,],
+                                                                    [sf_ctrl,],
+                                                                    self.ctrl_weight,
+                                                                    directional = False )                
+            else:
+                pileup_ctrl = self.ctrl.pileup_a_chromosome( chrom, [ctrl_d_s_index,],
                                                                     [sf_ctrl,],
                                                                     self.ctrl_weight,
                                                                     directional = False )
