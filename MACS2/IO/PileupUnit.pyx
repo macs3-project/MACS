@@ -272,8 +272,7 @@ cdef class PileupUnitFromAlignments:
             if self.PE_mode:
                 pileup_ctrl = self.ctrl.pileup_a_chromosome_c( chrom, [ctrl_d_s_index,],
                                                                     [sf_ctrl,],
-                                                                    self.ctrl_weight,
-                                                                    directional = False )                
+                                                                    self.ctrl_weight )                
             else:
                 pileup_ctrl = self.ctrl.pileup_a_chromosome( chrom, [ctrl_d_s_index,],
                                                                     [sf_ctrl,],
