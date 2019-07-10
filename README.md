@@ -11,7 +11,7 @@ and peak calling can produce different results for the same ChIP-seq experiment.
 
 We introduce WACS (Weighted Analysis of ChIP-seq). WACS is an extension of the well-known peak caller -- MACS2. It allows the use of “smart” controls to model the non-signal effect for 
 a specific ChIP-seq experiment. WACS first generates the weights per control to model the background distribution per ChIP-seq experiment. 
-This is then followed by peak calling. .
+This is then followed by peak calling.
 
 
 ## Install
