@@ -35,8 +35,8 @@ class ManipulateData:
 
         Step 1: Retrive matrix of controls (nwindows, ncontrols) and chipseq dataset.
         Step 2: Normalize each control to chipseq, by finding total count in control and total count in chipseq and finding ratio
-        Step 3: Find weights associated with each control by finding variance of each control. -- W=1/V
-        Step 4: Use non negative weighed least squares to find value of coefficients for each control to model background signal for each chipseq.
+        Step 3: Find weights associated with each control. 
+        Step 4: Use non negative least squares to find value of coefficients for each control to model background signal for each chipseq.
 
         chipseq and control files are converted to read counts per 200bp window with 50 bp increments across genome.
         control is a (window, control) matrix
@@ -56,7 +56,6 @@ class ManipulateData:
         self.control_names = control_names
 
         if sample and not self.control_names:
-            #https://nikolaygrozev.wordpress.com/2015/06/16/fast-and-simple-sampling-in-pandas-when-loading-data-from-files/
             #Take every N-th row
             #print("Sample from control read count matrix.")
             n = 3
