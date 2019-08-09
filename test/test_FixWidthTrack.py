@@ -1,11 +1,9 @@
 #!/usr/bin/env python
-# Time-stamp: <2012-05-01 22:09:55 Tao Liu>
+# Time-stamp: <2019-08-09 12:48:06 taoliu>
 
-import os
-import sys
 import unittest
 
-from MACS2.IO.cFixWidthTrack import *
+from MACS2.IO.FixWidthTrack import *
 
 class Test_FWTrackIII(unittest.TestCase):
 

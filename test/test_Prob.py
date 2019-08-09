@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# Time-stamp: <2012-03-09 09:50:12 Tao Liu>
+# Time-stamp: <2019-08-09 12:46:17 taoliu>
 
 """Module Description: Test functions to calculate probabilities.
 
@@ -16,12 +16,10 @@ the distribution).
 """
 
 
-import os
-import sys
 import unittest
 
 from math import log10
-from MACS2.cProb import *
+from MACS2.Prob import *
 
 # ------------------------------------
 # Main function

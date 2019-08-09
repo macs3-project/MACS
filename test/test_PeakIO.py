@@ -1,11 +1,9 @@
 #!/usr/bin/env python
-# Time-stamp: <2012-04-29 17:27:36 Tao Liu>
+# Time-stamp: <2019-08-09 12:48:33 taoliu>
 
-import os
-import sys
 import unittest
 
-from MACS2.IO.cPeakIO import *
+from MACS2.IO.PeakIO import *
 
 class Test_Region(unittest.TestCase):
 

@@ -1,9 +1,9 @@
 #!/usr/bin/env python
-# Time-stamp: <2012-04-29 18:25:30 Tao Liu>
+# Time-stamp: <2019-08-09 12:48:45 taoliu>
 
 """Module Description: Test functions for pileup functions.
 
-Copyright (c) 2011 Tao Liu <taoliu@jimmy.harvard.edu>
+Copyright (c) 2019 Tao Liu <tao.liu@roswellpark.org>
 
 This code is free software; you can redistribute it and/or modify it
 under the terms of the BSD License (see the file COPYING included with
@@ -12,17 +12,14 @@ the distribution).
 @status:  experimental
 @version: $Revision$
 @author:  Tao Liu
-@contact: taoliu@jimmy.harvard.edu
+@contact: tao.liu@roswellpark.org
 """
 
-
-import os
-import sys
 import unittest
 
 from math import log10
-from MACS2.cPileup import *
-from MACS2.IO.cFixWidthTrack import FWTrackIII
+from MACS2.Pileup import *
+from MACS2.IO.FixWidthTrack import FWTrack
 
 # ------------------------------------
 # Main function
@@ -60,7 +57,7 @@ class Test_pileup(unittest.TestCase):
 
     def test_pileup(self):
         # build FWTrackII
-        self.fwtrack2 = FWTrackIII()
+        self.fwtrack2 = FWTrack()
         for i in self.plus_pos:
             self.fwtrack2.add_loc(self.chrom, i, 0)
         for i in self.minus_pos:
@@ -85,7 +82,7 @@ class Test_pileup(unittest.TestCase):
 
     def test_pileup_w_multiple_d_bdg ( self ):
         # build FWTrackII
-        self.fwtrack2 = FWTrackIII(fw=5)
+        self.fwtrack2 = FWTrack(fw=5)
         for i in self.plus_pos:
             self.fwtrack2.add_loc(self.chrom, i, 0)
         for i in self.minus_pos:

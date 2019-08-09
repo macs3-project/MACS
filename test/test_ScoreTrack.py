@@ -1,13 +1,11 @@
 #!/usr/bin/env python
-# Time-stamp: <2012-06-09 16:44:48 Tao Liu>
+# Time-stamp: <2019-08-09 12:28:24 taoliu>
 
-import os
-import sys
 import unittest
 import StringIO
 from numpy.testing import assert_equal,  assert_almost_equal, assert_array_equal
 
-from MACS2.IO.cScoreTrack import *
+from MACS2.IO.ScoreTrack import *
 
 class Test_ScoreTrackII(unittest.TestCase):
 
