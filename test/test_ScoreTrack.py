@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# Time-stamp: <2019-08-09 12:28:24 taoliu>
+# Time-stamp: <2019-08-09 15:18:11 taoliu>
 
 import unittest
 import StringIO
@@ -18,8 +18,8 @@ class Test_ScoreTrackII(unittest.TestCase):
                               ("chrY",210,20,5)]
         self.treat_edm = 10
         self.ctrl_edm = 5
-        # for scoring
-        self.p_result = [63.27, 0.38, 0.07, 0.00, 7.09]
+        # for different scoring method
+        self.p_result = [60.49, 0.38, 0.08, 0.0, 6.41] # pseudo count 1 added
         self.q_result = [60.95, 0, 0, 0 ,5.81]
         self.l_result = [57.21, 0.00, -0.40, -3.79, 4.37]
         self.f_result = [0.96, 0.00, -0.12, -0.54, 0.54] # note, pseudo count 1 would be introduced.

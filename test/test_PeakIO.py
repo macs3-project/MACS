@@ -1,7 +1,8 @@
 #!/usr/bin/env python
-# Time-stamp: <2019-08-09 12:48:33 taoliu>
+# Time-stamp: <2019-08-09 14:43:31 taoliu>
 
 import unittest
+import sys
 
 from MACS2.IO.PeakIO import *
 

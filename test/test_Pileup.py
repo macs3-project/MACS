@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# Time-stamp: <2019-08-09 12:48:45 taoliu>
+# Time-stamp: <2019-08-09 14:59:54 taoliu>
 
 """Module Description: Test functions for pileup functions.
 
@@ -26,7 +26,7 @@ from MACS2.IO.FixWidthTrack import FWTrack
 # ------------------------------------
 
 class Test_pileup(unittest.TestCase):
-    """Unittest for pileup_bdg() in cPileup.pyx.
+    """Unittest for pileup_bdg() in Pileup.pyx.
 
     """
     def setUp(self):
@@ -64,7 +64,7 @@ class Test_pileup(unittest.TestCase):
             self.fwtrack2.add_loc(self.chrom, i, 1)            
         self.fwtrack2.finalize()
         
-        self.pileup = pileup_bdg(self.fwtrack2, self.d, halfextension=False, scale_factor = self.scale_factor)
+        self.pileup = unified_pileup_bdg(self.fwtrack2, self.d, self.scale_factor, halfextension=False)
         self.result = []
         chrs = self.pileup.get_chr_names()
         for chrom in chrs:
@@ -89,7 +89,7 @@ class Test_pileup(unittest.TestCase):
             self.fwtrack2.add_loc(self.chrom, i, 1)            
         self.fwtrack2.finalize()
         # pileup test
-        self.pileup = pileup_w_multiple_d_bdg(self.fwtrack2, self.d_s, baseline_value=13, halfextension=False, scale_factor_s = self.scale_factor_s)
+        self.pileup = unified_pileup_bdg(self.fwtrack2, self.d_s, self.scale_factor_s, baseline_value=13, halfextension=False)
         self.result = []
         chrs = self.pileup.get_chr_names()
         for chrom in chrs:

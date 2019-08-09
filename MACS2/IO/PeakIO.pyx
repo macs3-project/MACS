@@ -1,4 +1,4 @@
-# Time-stamp: <2016-02-26 10:12:50 Tao Liu>
+# Time-stamp: <2019-08-09 14:40:31 taoliu>
 
 """Module for PeakIO IO classes.
 
@@ -23,6 +23,7 @@ from __future__ import print_function # this line must be first
 from MACS2.Constants import *
 from itertools import groupby
 from operator import itemgetter
+from cpython cimport bool
 import re
 
 # ------------------------------------
@@ -649,6 +650,10 @@ cpdef parse_peakname(peakname):
 cdef class Region:
     """For plain region of chrom, start and end
     """
+    cdef:
+        dict regions
+        bool __flag_sorted
+    
     def __init__ (self):
         self.regions= {}
         self.__flag_sorted = False
