@@ -1,9 +1,9 @@
 #!/usr/bin/env python
-# Time-stamp: <2012-04-29 18:25:30 Tao Liu>
+# Time-stamp: <2019-08-09 14:59:54 taoliu>
 
 """Module Description: Test functions for pileup functions.
 
-Copyright (c) 2011 Tao Liu <taoliu@jimmy.harvard.edu>
+Copyright (c) 2019 Tao Liu <tao.liu@roswellpark.org>
 
 This code is free software; you can redistribute it and/or modify it
 under the terms of the BSD License (see the file COPYING included with
@@ -12,24 +12,21 @@ the distribution).
 @status:  experimental
 @version: $Revision$
 @author:  Tao Liu
-@contact: taoliu@jimmy.harvard.edu
+@contact: tao.liu@roswellpark.org
 """
 
-
-import os
-import sys
 import unittest
 
 from math import log10
-from MACS2.cPileup import *
-from MACS2.IO.cFixWidthTrack import FWTrackIII
+from MACS2.Pileup import *
+from MACS2.IO.FixWidthTrack import FWTrack
 
 # ------------------------------------
 # Main function
 # ------------------------------------
 
 class Test_pileup(unittest.TestCase):
-    """Unittest for pileup_bdg() in cPileup.pyx.
+    """Unittest for pileup_bdg() in Pileup.pyx.
 
     """
     def setUp(self):
@@ -60,14 +57,14 @@ class Test_pileup(unittest.TestCase):
 
     def test_pileup(self):
         # build FWTrackII
-        self.fwtrack2 = FWTrackIII()
+        self.fwtrack2 = FWTrack()
         for i in self.plus_pos:
             self.fwtrack2.add_loc(self.chrom, i, 0)
         for i in self.minus_pos:
             self.fwtrack2.add_loc(self.chrom, i, 1)            
         self.fwtrack2.finalize()
         
-        self.pileup = pileup_bdg(self.fwtrack2, self.d, halfextension=False, scale_factor = self.scale_factor)
+        self.pileup = unified_pileup_bdg(self.fwtrack2, self.d, self.scale_factor, halfextension=False)
         self.result = []
         chrs = self.pileup.get_chr_names()
         for chrom in chrs:
@@ -85,14 +82,14 @@ class Test_pileup(unittest.TestCase):
 
     def test_pileup_w_multiple_d_bdg ( self ):
         # build FWTrackII
-        self.fwtrack2 = FWTrackIII(fw=5)
+        self.fwtrack2 = FWTrack(fw=5)
         for i in self.plus_pos:
             self.fwtrack2.add_loc(self.chrom, i, 0)
         for i in self.minus_pos:
             self.fwtrack2.add_loc(self.chrom, i, 1)            
         self.fwtrack2.finalize()
         # pileup test
-        self.pileup = pileup_w_multiple_d_bdg(self.fwtrack2, self.d_s, baseline_value=13, halfextension=False, scale_factor_s = self.scale_factor_s)
+        self.pileup = unified_pileup_bdg(self.fwtrack2, self.d_s, self.scale_factor_s, baseline_value=13, halfextension=False)
         self.result = []
         chrs = self.pileup.get_chr_names()
         for chrom in chrs:
