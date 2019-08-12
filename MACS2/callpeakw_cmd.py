@@ -152,6 +152,10 @@ def run( args ):
     #-------------------------------------------------------------------------------------------------------------------
     #Then, load controls one a time.
     if options.cfile:
+        if(len(options.cfile) != len(options.controlweights)):
+            info("Number of controls should be equal to number of weights provided.")
+            sys.exit(1)
+
         prev_pileup_ctrl = None
         treat_pileup = True
         index_ctrl = 0
@@ -168,8 +172,8 @@ def run( args ):
                 #self.__chrom_pair_treat_ctrl( treat_pv, ctrl_pv) for each chromosome
                 #Construct p-value q-value table for each chromsome
                 #self.__chrom_pair_treat_ctrl( treat_pv, ctrl_pv) for each chromosome
-                #Peak calling for each chromosome
-
+                #Peak calling for each chromosome      
+                
         for cfile in options.cfile:
             if options.controlweights[index_ctrl] == 0: #dont read controls with weights 0
                 index_ctrl = index_ctrl + 1
