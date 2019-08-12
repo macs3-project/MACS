@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# Time-stamp: <2019-08-09 15:18:11 taoliu>
+# Time-stamp: <2019-08-12 10:44:22 taoliu>
 
 import unittest
 import StringIO
@@ -19,9 +19,9 @@ class Test_ScoreTrackII(unittest.TestCase):
         self.treat_edm = 10
         self.ctrl_edm = 5
         # for different scoring method
-        self.p_result = [60.49, 0.38, 0.08, 0.0, 6.41] # pseudo count 1 added
-        self.q_result = [60.95, 0, 0, 0 ,5.81]
-        self.l_result = [57.21, 0.00, -0.40, -3.79, 4.37]
+        self.p_result = [60.49, 0.38, 0.08, 0.0, 6.41] # -log10(p-value), pseudo count 1 added
+        self.q_result = [58.17, 0.0, 0.0, 0.0, 5.13] # -log10(q-value) from BH, pseudo count 1 added
+        self.l_result = [58.17, 0.0, -0.28, -3.25, 4.91] # log10 likelihood ratio, pseudo count 1 added
         self.f_result = [0.96, 0.00, -0.12, -0.54, 0.54] # note, pseudo count 1 would be introduced.
         self.d_result = [90.00, 0, -5.00, -15.00, 15.00]
         self.m_result = [10.00, 1.00, 1.50, 0.50, 2.00]
@@ -48,32 +48,32 @@ class Test_ScoreTrackII(unittest.TestCase):
                                 [210,  20,   5,   0]]).transpose()
 
         # for write_bedGraph
-        self.bdg1 = """chrY	0	10	100.00
-chrY	10	60	10.00
-chrY	60	110	15.00
-chrY	110	160	5.00
-chrY	160	210	20.00
+        self.bdg1 = """chrY	0	10	100.00000
+chrY	10	60	10.00000
+chrY	60	110	15.00000
+chrY	110	160	5.00000
+chrY	160	210	20.00000
 """
-        self.bdg2 = """chrY	0	60	10.00
-chrY	60	160	20.00
-chrY	160	210	5.00
+        self.bdg2 = """chrY	0	60	10.00000
+chrY	60	160	20.00000
+chrY	160	210	5.00000
 """
-        self.bdg3 = """chrY	0	10	63.27
-chrY	10	60	0.38
-chrY	60	110	0.07
-chrY	110	160	0.00
-chrY	160	210	7.09
+        self.bdg3 = """chrY	0	10	60.48912
+chrY	10	60	0.37599
+chrY	60	110	0.07723
+chrY	110	160	0.00006
+chrY	160	210	6.40804
 """
         # for peak calls
-        self.peak1 = """chrY	0	60	peak_1	63.27
-chrY	160	210	peak_2	7.09
+        self.peak1 = """chrY	0	60	peak_1	60.48912
+chrY	160	210	peak_2	6.40804
 """
-        self.summit1 = """chrY	5	6	peak_1	63.27
-chrY	185	186	peak_2	7.09
+        self.summit1 = """chrY	5	6	peak_1	60.48912
+chrY	185	186	peak_2	6.40804
 """
         self.xls1    ="""chr	start	end	length	abs_summit	pileup	-log10(pvalue)	fold_enrichment	-log10(qvalue)	name
-chrY	1	60	60	6	100.00	63.27	9.18	-1.00	MACS_peak_1
-chrY	161	210	50	186	20.00	7.09	3.50	-1.00	MACS_peak_2
+chrY	1	60	60	6	100.00	63.27251	9.18182	-1.00000	MACS_peak_1
+chrY	161	210	50	186	20.00	7.09102	3.50000	-1.00000	MACS_peak_2
 """
         
     def assertEqual_float ( self, a, b, roundn = 5 ):
