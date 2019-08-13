@@ -6,3 +6,5 @@ install:
   - python setup_w_cython.py install
 script:
   - pytest
+  - cd test; ./test.sh subcommandstest; egrep -i "error|warning" subcommandstest_run_*/*.log
+ 
