@@ -1,4 +1,4 @@
-# Time-stamp: <2019-09-25 10:49:34 taoliu>
+# Time-stamp: <2019-09-25 10:57:55 taoliu>
 
 """Module for Feature IO classes.
 
@@ -600,54 +600,54 @@ cdef class scoreTrackII:
                               M: scale to depth of 1 million;
                               N: not set/ raw pileup        
         """
-        if normalization_method == 'T':
-            if self.normalization_method == 'T': # do nothing
+        if normalization_method == ord('T'):
+            if self.normalization_method == ord('T'): # do nothing
                 pass
-            elif self.normalization_method == 'C':
+            elif self.normalization_method == ord('C'):
                 self.normalize( self.treat_edm/self.ctrl_edm, self.treat_edm/self.ctrl_edm )
-            elif  self.normalization_method == 'M':
+            elif  self.normalization_method == ord('M'):
                 self.normalize( self.treat_edm, self.treat_edm )
-            elif self.normalization_method == 'N':
+            elif self.normalization_method == ord('N'):
                 self.normalize( 1, self.treat_edm/self.ctrl_edm )
             else:
                 raise NotImplemented
-            self.normalization_method = 'T'
-        elif normalization_method == 'C':
-            if self.normalization_method == 'T':
+            self.normalization_method = ord('T')
+        elif normalization_method == ord('C'):
+            if self.normalization_method == ord('T'):
                 self.normalize( self.ctrl_edm/self.treat_edm, self.ctrl_edm/self.treat_edm )
-            elif self.normalization_method == 'C': # do nothing
+            elif self.normalization_method == ord('C'): # do nothing
                 pass
-            elif  self.normalization_method == 'M':
+            elif  self.normalization_method == ord('M'):
                 self.normalize( self.ctrl_edm, self.ctrl_edm )
-            elif self.normalization_method == 'N':
+            elif self.normalization_method == ord('N'):
                 self.normalize( self.ctrl_edm/self.treat_edm, 1 )
             else:
                 raise NotImplemented
-            self.normalization_method = 'C'                
-        elif normalization_method == 'M':
-            if self.normalization_method == 'T':
+            self.normalization_method = ord('C')                
+        elif normalization_method == ord('M'):
+            if self.normalization_method == ord('T'):
                 self.normalize( 1/self.treat_edm, 1/self.treat_edm )
-            elif self.normalization_method == 'C':
+            elif self.normalization_method == ord('C'):
                 self.normalize( 1/self.ctrl_edm, 1/self.ctrl_edm )
-            elif  self.normalization_method == 'M': # do nothing
+            elif  self.normalization_method == ord('M'): # do nothing
                 pass
-            elif self.normalization_method == 'N':
+            elif self.normalization_method == ord('N'):
                 self.normalize( 1/self.treat_edm, 1/self.ctrl_edm )
             else:
                 raise NotImplemented
-            self.normalization_method = 'M'                
-        elif normalization_method == 'N':
-            if self.normalization_method == 'T':
+            self.normalization_method = ord('M')                
+        elif normalization_method == ord('N'):
+            if self.normalization_method == ord('T'):
                 self.normalize( self.treat_edm, self.treat_edm )
-            elif self.normalization_method == 'C':
+            elif self.normalization_method == ord('C'):
                 self.normalize( self.ctrl_edm, self.ctrl_edm )
-            elif  self.normalization_method == 'M':
+            elif  self.normalization_method == ord('M'):
                 self.normalize( self.treat_edm, self.ctrl_edm )
-            elif self.normalization_method == 'N': # do nothing
+            elif self.normalization_method == ord('N'): # do nothing
                 pass
             else:
                 raise NotImplemented
-            self.normalization_method = 'N'            
+            self.normalization_method = ord('N')            
 
     cdef normalize ( self, double treat_scale, double control_scale ):
         cdef:
@@ -675,26 +675,26 @@ cdef class scoreTrackII:
                          M: maximum
                          m: fragment pileup per million reads
         """
-        if scoring_method == 'p':
+        if scoring_method == ord('p'):
             self.compute_pvalue()
-        elif scoring_method == 'q':
+        elif scoring_method == ord('q'):
             #if not already calculated p, compute pvalue first
-            if self.scoring_method != 'p':
+            if self.scoring_method != ord('p'):
                 self.compute_pvalue()
             self.compute_qvalue()
-        elif scoring_method == 'l':
+        elif scoring_method == ord('l'):
             self.compute_likelihood()
-        elif scoring_method == 's':
+        elif scoring_method == ord('s'):
             self.compute_sym_likelihood()
-        elif scoring_method == 'f':
+        elif scoring_method == ord('f'):
             self.compute_logFE()
-        elif scoring_method == 'F':
+        elif scoring_method == ord('F'):
             self.compute_foldenrichment()
-        elif scoring_method == 'd':
+        elif scoring_method == ord('d'):
             self.compute_subtraction()
-        elif scoring_method == 'm':
+        elif scoring_method == ord('m'):
             self.compute_SPMR()
-        elif scoring_method == 'M':
+        elif scoring_method == ord('M'):
             self.compute_max()            
         else:
             raise NotImplemented
@@ -723,7 +723,7 @@ cdef class scoreTrackII:
                     self.pvalue_stat[v[ i ]] = pos[ i ] - prev_pos
                 prev_pos = pos[ i ]
                     
-        self.scoring_method = 'p'
+        self.scoring_method = ord('p')
         return 
 
     cdef compute_qvalue ( self ):
@@ -737,7 +737,7 @@ cdef class scoreTrackII:
             np.ndarray p, c, v
             
         # pvalue should be computed first!
-        assert self.scoring_method == 'p'
+        assert self.scoring_method == ord('p')
         # make pqtable
         pqtable = self.make_pq_table()
         
@@ -758,7 +758,7 @@ cdef class scoreTrackII:
                 v[ i ] = pqtable[ v[ i ] ]
                 #v [ i ] =  g( v[ i ])
         
-        self.scoring_method = 'q'
+        self.scoring_method = ord('q')
         return
 
     cpdef dict make_pq_table ( self ):
@@ -781,7 +781,7 @@ cdef class scoreTrackII:
             dict value_dict
             list unique_values
 
-        assert self.scoring_method == 'p'
+        assert self.scoring_method == ord('p')
 
         value_dict = self.pvalue_stat
 
@@ -839,7 +839,7 @@ cdef class scoreTrackII:
                 v2 = c()
                 v[ i ] =  logLR_asym( v1 + pseudocount, v2 + pseudocount )  #logLR( d[ i, 1]/100.0, d[ i, 2]/100.0 )
                 #print v1, v2, v[i]
-        self.scoring_method = 'l'
+        self.scoring_method = ord('l')
         return 
 
     cdef compute_sym_likelihood ( self ):
@@ -866,7 +866,7 @@ cdef class scoreTrackII:
                 v1 = p() 
                 v2 = c()
                 v[ i ] =  logLR_sym( v1 + pseudocount, v2 + pseudocount )  #logLR( d[ i, 1]/100.0, d[ i, 2]/100.0 )
-        self.scoring_method = 's'
+        self.scoring_method = ord('s')
         return 
 
     cdef compute_logFE ( self ):
@@ -887,7 +887,7 @@ cdef class scoreTrackII:
             l = self.datalength[chrom]
             for i in range(l):
                 v[ i ] = get_logFE ( p[ i ] + pseudocount, c[ i ] + pseudocount)
-        self.scoring_method = 'f'
+        self.scoring_method = ord('f')
         return
 
     cdef compute_foldenrichment ( self ):
@@ -908,7 +908,7 @@ cdef class scoreTrackII:
             l = self.datalength[chrom]
             for i in range(l):
                 v[ i ] =  ( p[ i ] + pseudocount )/( c[ i ] + pseudocount )
-        self.scoring_method = 'F'
+        self.scoring_method = ord('F')
         return
 
     cdef compute_subtraction ( self ):
@@ -923,7 +923,7 @@ cdef class scoreTrackII:
             l = self.datalength[chrom]
             for i in range(l):
                 v[ i ] = p[ i ] - c[ i ]
-        self.scoring_method = 'd'
+        self.scoring_method = ord('d')
         return
 
     cdef compute_SPMR ( self ):
@@ -931,11 +931,11 @@ cdef class scoreTrackII:
             np.ndarray p, v
             long l, i
             float scale
-        if self.normalization_method == 'T' or self.normalization_method == 'N':
+        if self.normalization_method == ord('T') or self.normalization_method == ord('N'):
             scale = self.treat_edm
-        elif self.normalization_method == 'C':
+        elif self.normalization_method == ord('C'):
             scale = self.ctrl_edm
-        elif self.normalization_method == 'M':
+        elif self.normalization_method == ord('M'):
             scale = 1
         
         for chrom in self.data.keys():
@@ -944,7 +944,7 @@ cdef class scoreTrackII:
             l = self.datalength[chrom]
             for i in range(l):
                 v[ i ] =  p[ i ] / scale # two digit precision may not be enough...
-        self.scoring_method = 'm'
+        self.scoring_method = ord('m')
         return
 
     cdef compute_max ( self ):
@@ -959,7 +959,7 @@ cdef class scoreTrackII:
             l = self.datalength[chrom]
             for i in range(l):
                 v[ i ] = max(p[ i ],c[ i ])
-        self.scoring_method = 'M'
+        self.scoring_method = ord('M')
         return
 
     cpdef write_bedGraph ( self, fhd, str name, str description, short column = 3):
@@ -1059,7 +1059,7 @@ cdef class scoreTrackII:
     #                 tmppeak["score"] = value[t_index]
     #                 tmppeak["pileup"]= sample[t_index]
     #                 tmppeak["pscore"]= get_pscore(sample[ t_index ], control[ t_index ])
-    #                 if self.scoring_method == 'q':
+    #                 if self.scoring_method == ord('q'):
     #                     tmppeak["qscore"]= value[ t_index ]
     #                 else:
     #                     tmppeak["qscore"]= -1
@@ -1173,7 +1173,7 @@ cdef class scoreTrackII:
             midindex = int((len(tsummit) + 1) / 2) - 1
             summit_pos    = tsummit[ midindex ]
             summit_index  = tsummit_index[ midindex ]
-            if self.scoring_method == 'q':
+            if self.scoring_method == ord('q'):
                 qscore = self.data[chrom][3][ summit_index ]
             else:
                 # if q value is not computed, use -1
@@ -1250,7 +1250,7 @@ cdef class scoreTrackII:
         if not (peak_scores > self.cutoff).all():
             return self.__close_peak(peak_content, peaks, min_length, chrom)
         for summit_offset, summit_index in zip(summit_offsets, summit_indices):
-            if self.scoring_method == 'q':
+            if self.scoring_method == ord('q'):
                 qscore = self.data[chrom][3][ summit_index ]
             else:
                 # if q value is not computed, use -1
