@@ -319,6 +319,11 @@ calculated from p-values using Benjamini-Hochberg procedure.
 The pvalue cutoff. If -p is specified, MACS2 will use pvalue instead
 of qvalue.
 
+##### --min-length, --max-gap
+
+These two options can be used to fine-tune the peak calling behavior by specifying the minimum length of a called peak and the maximum allowed gap between two nearby regions to be merged. In another word, a called peak has to be longer than "min-length", and if the distance between two nearby peaks is smaller than "max-gap" then they will be merged as one. If they are not set, MACS2 will set the DEFAULT value for "min-length" as the predicted fragment size d, and the DEFAULT value for "max-gap" as the detected read length. Note, if you set a "min-length" value smaller than the fragment size, it may have NO effect on the result. For BROAD peak calling, try to set a
+large value such as 500bps. You can also use '--cutoff-analysis' option with default setting, and check the column 'avelpeak' under different cutoff values to decide a reasonable "min-length" value.
+
 ##### --nolambda
 
 With this flag on, MACS will use the background lambda as local
