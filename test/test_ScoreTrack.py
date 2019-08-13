@@ -1,8 +1,8 @@
 #!/usr/bin/env python
 # Time-stamp: <2019-09-25 14:44:07 taoliu>
 
+import io
 import unittest
-import StringIO
 from numpy.testing import assert_equal,  assert_almost_equal, assert_array_equal
 
 from MACS2.IO.ScoreTrack import *
@@ -173,13 +173,13 @@ chrY	161	210	50	186	20.00	7.09102	3.50000	-1.00000	MACS_peak_2
 
         s1.change_score_method( ord('p') )
 
-        strio = StringIO.StringIO()
+        strio = io.StringIO()
         s1.write_bedGraph( strio, "NAME", "DESC", 1 )
         self.assertEqual( strio.getvalue(), self.bdg1 )
-        strio = StringIO.StringIO()        
+        strio = io.StringIO()        
         s1.write_bedGraph( strio, "NAME", "DESC", 2 )
         self.assertEqual( strio.getvalue(), self.bdg2 )
-        strio = StringIO.StringIO()        
+        strio = io.StringIO()        
         s1.write_bedGraph( strio, "NAME", "DESC", 3 )
         self.assertEqual( strio.getvalue(), self.bdg3 )
 
@@ -191,15 +191,15 @@ chrY	161	210	50	186	20.00	7.09102	3.50000	-1.00000	MACS_peak_2
 
         s1.change_score_method( ord('p') )
         p = s1.call_peaks( cutoff = 0.10, min_length=10, max_gap=10 )
-        strio = StringIO.StringIO()
+        strio = io.StringIO()
         p.write_to_bed( strio, trackline = False )
         self.assertEqual( strio.getvalue(), self.peak1 )
 
-        strio = StringIO.StringIO()
+        strio = io.StringIO()
         p.write_to_summit_bed( strio, trackline = False )
         self.assertEqual( strio.getvalue(), self.summit1 )
 
-        strio = StringIO.StringIO()
+        strio = io.StringIO()
         p.write_to_xls( strio )
         self.assertEqual( strio.getvalue(), self.xls1 )        
 
