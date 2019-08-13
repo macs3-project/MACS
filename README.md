@@ -319,6 +319,11 @@ calculated from p-values using Benjamini-Hochberg procedure.
 The pvalue cutoff. If -p is specified, MACS2 will use pvalue instead
 of qvalue.
 
+##### --min-length, --max-gap
+
+These two options can be used to fine-tune the peak calling behavior by specifying the minimum length of a called peak and the maximum allowed gap between two nearby regions to be merged. In another word, a called peak has to be longer than "min-length", and if the distance between two nearby peaks is smaller than "max-gap" then they will be merged as one. If they are not set, MACS2 will set the DEFAULT value for "min-length" as the predicted fragment size d, and the DEFAULT value for "max-gap" as the detected read length. Note, if you set a "min-length" value smaller than the fragment size, it may have NO effect on the result. For BROAD peak calling, try to set a
+large value such as 500bps. You can also use '--cutoff-analysis' option with default setting, and check the column 'avelpeak' under different cutoff values to decide a reasonable "min-length" value.
+
 ##### --nolambda
 
 With this flag on, MACS will use the background lambda as local
@@ -448,7 +453,7 @@ and peak summit positions.
    can load it to UCSC genome browser. Definition of some specific
    columns are: 
    
-   - 5th: integer score for display calculated as `int(-10*log10qvalue)`. Please note that currently this value might be out of the [0-1000] range defined in [UCSC Encode narrowPeak format](https://genome.ucsc.edu/FAQ/FAQformat.html#format12)
+   - 5th: integer score for display. It's calculated as `int(-10*log10pvalue)` or `int(-10*log10qvalue)` depending on whether `-p` (pvalue) or `-q` (qvalue) is used as score cutoff. Please note that currently this value might be out of the [0-1000] range defined in [UCSC Encode narrowPeak format](https://genome.ucsc.edu/FAQ/FAQformat.html#format12). You can let the value saturated at 1000 (i.e. p/q-value = 10^-100) by using the following 1-liner awk: `awk -v OFS="\t" '{$5=$5>1000?1000:$5} {print}' NAME_peaks.narrowPeak`
    - 7th: fold-change
    - 8th: -log10pvalue
    - 9th: -log10qvalue
@@ -457,12 +462,12 @@ and peak summit positions.
    The file can be loaded directly to UCSC genome browser. Remove the beginning track line if you want to
    analyze it by other tools.
 
-3. `NAME_summits.bed` is in BED format, which contains the peak summits
-   locations for every peaks. The 5th column in this file is
-   -log10pvalue the same as NAME_peaks.bed. If you want to find the
-   motifs at the binding sites, this file is recommended. The file
-   can be loaded directly to UCSC genome browser. Remove the
-   beginning track line if you want to analyze it by other tools.
+3. `NAME_summits.bed` is in BED format, which contains the peak
+   summits locations for every peaks. The 5th column in this file is
+   the same as NAME_peaks.narrowPeak. If you want to find the motifs
+   at the binding sites, this file is recommended. The file can be
+   loaded directly to UCSC genome browser. Remove the beginning track
+   line if you want to analyze it by other tools.
 
 4. `NAME_peaks.broadPeak` is in BED6+3 format which is similar to
    narrowPeak file, except for missing the 10th column for annotating
