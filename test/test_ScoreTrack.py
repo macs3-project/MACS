@@ -43,11 +43,11 @@ class Test_ScoreTrackII(unittest.TestCase):
 
     def setUp(self):
         # for initiate scoretrack
-        self.test_regions1 = [("chrY",10,100,10),
-                              ("chrY",60,10,10),
-                              ("chrY",110,15,20),
-                              ("chrY",160,5,20),
-                              ("chrY",210,20,5)]
+        self.test_regions1 = [(b"chrY",10,100,10),
+                              (b"chrY",60,10,10),
+                              (b"chrY",110,15,20),
+                              (b"chrY",160,5,20),
+                              (b"chrY",210,20,5)]
         self.treat_edm = 10
         self.ctrl_edm = 5
         # for different scoring method
@@ -111,63 +111,66 @@ chrY	161	210	50	186	20.00	7.09102	3.50000	-1.00000	MACS_peak_2
     def assertEqual_float ( self, a, b, roundn = 5 ):
         self.assertEqual( round( a, roundn ), round( b, roundn ) )
 
+    def assertListAlmostEqual ( self, a, b, places =2 ):
+        return all( [self.assertAlmostEqual(x, y, places=places) for (x, y) in zip( a, b)] )
+
     def test_compute_scores(self):
         s1 = scoreTrackII( self.treat_edm, self.ctrl_edm )
-        s1.add_chromosome( "chrY", 5 )
+        s1.add_chromosome( b"chrY", 5 )
         for a in self.test_regions1:
             s1.add( a[0],a[1],a[2],a[3] )
 
         s1.set_pseudocount ( 1.0 )
 
         s1.change_score_method( ord('p') )
-        r = s1.get_data_by_chr("chrY")
-        self.assertListEqual( map(lambda x:round(x,2),list(r[3])), self.p_result )
+        r = s1.get_data_by_chr(b"chrY")
+        self.assertListAlmostEqual( [round(x,2) for x in r[3]], self.p_result )
 
         s1.change_score_method( ord('q') )
-        r = s1.get_data_by_chr("chrY")
-        self.assertListEqual( map(lambda x:round(x,2),list(r[3])), self.q_result )
+        r = s1.get_data_by_chr(b"chrY")
+        self.assertListAlmostEqual( [round(x,2) for x in list(r[3])], self.q_result )
         
         s1.change_score_method( ord('l') )
-        r = s1.get_data_by_chr("chrY")
-        self.assertListEqual( map(lambda x:round(x,2),list(r[3])), self.l_result )
+        r = s1.get_data_by_chr(b"chrY")
+        self.assertListAlmostEqual( [round(x,2) for x in list(r[3])], self.l_result )
 
         s1.change_score_method( ord('f') )
-        r = s1.get_data_by_chr("chrY")
-        self.assertListEqual( map(lambda x:round(x,2),list(r[3])), self.f_result )
+        r = s1.get_data_by_chr(b"chrY")
+        self.assertListAlmostEqual( [round(x,2) for x in list(r[3])], self.f_result )
 
         s1.change_score_method( ord('d') )
-        r = s1.get_data_by_chr("chrY")
-        self.assertListEqual( map(lambda x:round(x,2),list(r[3])), self.d_result )
+        r = s1.get_data_by_chr(b"chrY")
+        self.assertListAlmostEqual( [round(x,2) for x in list(r[3])], self.d_result )
 
         s1.change_score_method( ord('m') )
-        r = s1.get_data_by_chr("chrY")
-        self.assertListEqual( map(lambda x:round(x,2),list(r[3])), self.m_result )
+        r = s1.get_data_by_chr(b"chrY")
+        self.assertListAlmostEqual( [round(x,2) for x in list(r[3])], self.m_result )
 
     def test_normalize(self):
         s1 = scoreTrackII( self.treat_edm, self.ctrl_edm )
-        s1.add_chromosome( "chrY", 5 )
+        s1.add_chromosome( b"chrY", 5 )
         for a in self.test_regions1:
             s1.add( a[0],a[1],a[2],a[3] )
 
         s1.change_normalization_method( ord('T') )
-        r = s1.get_data_by_chr("chrY")
+        r = s1.get_data_by_chr(b"chrY")
         assert_array_equal( r, self.norm_T )
 
         s1.change_normalization_method( ord('C') )
-        r = s1.get_data_by_chr("chrY")
+        r = s1.get_data_by_chr(b"chrY")
         assert_array_equal( r, self.norm_C )
 
         s1.change_normalization_method( ord('M') )
-        r = s1.get_data_by_chr("chrY")
+        r = s1.get_data_by_chr(b"chrY")
         assert_array_equal( r, self.norm_M )
 
         s1.change_normalization_method( ord('N') )
-        r = s1.get_data_by_chr("chrY")
+        r = s1.get_data_by_chr(b"chrY")
         assert_array_equal( r, self.norm_N )
 
     def test_writebedgraph ( self ):
         s1 = scoreTrackII( self.treat_edm, self.ctrl_edm )
-        s1.add_chromosome( "chrY", 5 )
+        s1.add_chromosome( b"chrY", 5 )
         for a in self.test_regions1:
             s1.add( a[0],a[1],a[2],a[3] )
 
@@ -185,7 +188,7 @@ chrY	161	210	50	186	20.00	7.09102	3.50000	-1.00000	MACS_peak_2
 
     def test_callpeak ( self ):
         s1 = scoreTrackII( self.treat_edm, self.ctrl_edm )
-        s1.add_chromosome( "chrY", 5 )
+        s1.add_chromosome( b"chrY", 5 )
         for a in self.test_regions1:
             s1.add( a[0],a[1],a[2],a[3] )
 

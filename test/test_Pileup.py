@@ -24,7 +24,7 @@ class Test_pileup(unittest.TestCase):
     """
     def setUp(self):
         self.maxDiff = None
-        self.chrom = "chr1"
+        self.chrom = b"chr1"
         self.plus_pos = ( 0, 1, 3, 4, 5 )
         self.minus_pos = ( 5, 6, 8, 9, 10 )
         self.d = 5
@@ -62,10 +62,10 @@ class Test_pileup(unittest.TestCase):
         chrs = self.pileup.get_chr_names()
         for chrom in chrs:
             (p,v) = self.pileup.get_data_by_chr(chrom)
-            pnext = iter(p).next
-            vnext = iter(v).next
+            pnext = iter(p).__next__
+            vnext = iter(v).__next__
             pre = 0
-            for i in xrange(len(p)):
+            for i in range(len(p)):
                 pos = pnext()
                 value = vnext()
                 self.result.append( (pre,pos,value) )
@@ -87,10 +87,10 @@ class Test_pileup(unittest.TestCase):
         chrs = self.pileup.get_chr_names()
         for chrom in chrs:
             (p,v) = self.pileup.get_data_by_chr(chrom)
-            pnext = iter(p).next
-            vnext = iter(v).next
+            pnext = iter(p).__next__
+            vnext = iter(v).__next__
             pre = 0
-            for i in xrange(len(p)):
+            for i in range(len(p)):
                 pos = pnext()
                 value = vnext()
                 self.result.append( (pre,pos,value) )

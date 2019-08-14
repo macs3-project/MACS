@@ -8,8 +8,8 @@ from MACS2.IO.BedGraph import *
 class Test_bedGraphTrackI_add_loc(unittest.TestCase):
 
     def setUp(self):
-        self.test_regions1 = [("chrY",0,10593155,0.0),
-                              ("chrY",10593155,10597655,0.0066254580149)]
+        self.test_regions1 = [(b"chrY",0,10593155,0.0),
+                              (b"chrY",10593155,10597655,0.0066254580149)]
 
     def test_add_loc1(self):
         # make sure the shuffled sequence does not lose any elements
@@ -87,10 +87,10 @@ class Test_bedGraphTrackI_overlie(unittest.TestCase):
     def test_overlie_mean(self):
         bdgb = self.bdg1.overlie([self.bdg2,self.bdg3], func="mean")
 
-        chrom = "chrY"
+        chrom = b"chrY"
         (p,v) = bdgb.get_data_by_chr(chrom)
         pre = 0
-        for i in xrange(len(p)):
+        for i in range(len(p)):
             pos = p[i]
             value = v[i]
             self.assertEqual_float( self.test_overlie_mean[i][1], pre )

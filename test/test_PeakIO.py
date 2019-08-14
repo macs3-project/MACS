@@ -9,20 +9,20 @@ from MACS2.IO.PeakIO import *
 class Test_Region(unittest.TestCase):
 
     def setUp(self):
-        self.test_regions1 = [("chrY",0,100),
-                              ("chrY",300,500),
-                              ("chrY",700,900),
-                              ("chrY",1000,1200),
+        self.test_regions1 = [(b"chrY",0,100),
+                              (b"chrY",300,500),
+                              (b"chrY",700,900),
+                              (b"chrY",1000,1200),
                               ]
-        self.test_regions2 = [("chrY",100,200),
-                              ("chrY",300,400),
-                              ("chrY",600,800),
-                              ("chrY",1200,1300),
+        self.test_regions2 = [(b"chrY",100,200),
+                              (b"chrY",300,400),
+                              (b"chrY",600,800),
+                              (b"chrY",1200,1300),
                               ]
-        self.merge_result_regions = [ ("chrY",0,200),
-                                      ("chrY",300,500),
-                                      ("chrY",600,900),
-                                      ("chrY",1000,1300),
+        self.merge_result_regions = [ (b"chrY",0,200),
+                                      (b"chrY",300,500),
+                                      (b"chrY",600,900),
+                                      (b"chrY",1000,1300),
                                       ]
         self.subpeak_n = [1,10,100,1000]
 
