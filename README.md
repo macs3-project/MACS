@@ -493,10 +493,16 @@ and peak summit positions.
    Then a pdf file `NAME_model.pdf` will be generated in your current
    directory. Note, R is required to draw this figure.
 
-7. The .bdg files are in bedGraph format which can be imported to UCSC
-   genome browser or be converted into even smaller bigWig
-   files. There are two kinds of bdg files, one for treatment and the
-   other one for control.
+7. The `NAME_treat_pileup.bdg` and `NAME_control_lambda.bdg` files are
+   in bedGraph format which can be imported to UCSC genome browser or
+   be converted into even smaller bigWig files. The
+   `NAME_treat_pielup.bdg` contains the pileup signals (normalized
+   according to `--scale-to` option) from ChIP/treatment sample. The
+   `NAME_control_lambda.bdg` contains local biases estimated for each
+   genomic locations from control sample, or from treatment sample
+   when control sample is absent. The subcommand `bdgcmp` can be used
+   to compare these two files and make bedGraph file of scores such as
+   p-value, q-value, log likelihood, and log fold changes.
 
 ## Other useful links
 
@@ -506,20 +512,20 @@ and peak summit positions.
 
 ## Tips of fine-tuning peak calling
 
-Check the three scripts within MACSv2 package:
+There are several subcommands within MACSv2 package to fine-tune or customize your analysis:
 
-1. bdgcmp can be used on `*_treat_pileup.bdg` and
+1. `bdgcmp` can be used on `*_treat_pileup.bdg` and
    `*_control_lambda.bdg` or bedGraph files from other resources
    to calculate score track.
 
-2. bdgpeakcall can be used on `*_treat_pvalue.bdg` or the file
+2. `bdgpeakcall` can be used on `*_treat_pvalue.bdg` or the file
    generated from bdgcmp or bedGraph file from other resources to
    call peaks with given cutoff, maximum-gap between nearby mergable
    peaks and minimum length of peak. bdgbroadcall works similarly to
    bdgpeakcall, however it will output `_broad_peaks.bed` in BED12
    format.
 
-3. Differential calling tool -- bdgdiff, can be used on 4 bedgraph
+3. Differential calling tool -- `bdgdiff`, can be used on 4 bedgraph
    files which are scores between treatment 1 and control 1,
    treatment 2 and control 2, treatment 1 and treatment 2, treatment
    2 and treatment 1. It will output the consistent and unique sites
