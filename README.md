@@ -443,10 +443,12 @@ and peak summit positions.
     - end position of peak
     - length of peak region
     - absolute peak summit position
-    - pileup height at peak summit, -log10(pvalue) for the peak summit (e.g. pvalue =1e-10, then this value should be 10)
-    - fold enrichment for this peak summit against random Poisson distribution with local lambda, -log10(qvalue) at peak summit
+    - pileup height at peak summit
+    - -log10(pvalue) for the peak summit (e.g. pvalue =1e-10, then this value should be 10)
+    - fold enrichment for this peak summit against random Poisson distribution with local lambda, 
+    - -log10(qvalue) at peak summit
    
-   Coordinates in XLS is 1-based which is different with BED format.
+   Coordinates in XLS is 1-based which is different with BED format. When `--broad` is enabled for broad peak calling, the pileup, pvalue, qvalue, and fold change in the XLS file will be the mean value across the entire peak region, since peak summit won't be called in broad peak calling mode. 
 
 2. `NAME_peaks.narrowPeak` is BED6+4 format file which contains the
    peak locations together with peak summit, pvalue and qvalue. You
@@ -454,9 +456,9 @@ and peak summit positions.
    columns are: 
    
    - 5th: integer score for display. It's calculated as `int(-10*log10pvalue)` or `int(-10*log10qvalue)` depending on whether `-p` (pvalue) or `-q` (qvalue) is used as score cutoff. Please note that currently this value might be out of the [0-1000] range defined in [UCSC Encode narrowPeak format](https://genome.ucsc.edu/FAQ/FAQformat.html#format12). You can let the value saturated at 1000 (i.e. p/q-value = 10^-100) by using the following 1-liner awk: `awk -v OFS="\t" '{$5=$5>1000?1000:$5} {print}' NAME_peaks.narrowPeak`
-   - 7th: fold-change
-   - 8th: -log10pvalue
-   - 9th: -log10qvalue
+   - 7th: fold-change at peak summit
+   - 8th: -log10pvalue at peak summit
+   - 9th: -log10qvalue at peak summit
    - 10th: relative summit position to peak start
    
    The file can be loaded directly to UCSC genome browser. Remove the beginning track line if you want to
@@ -471,7 +473,10 @@ and peak summit positions.
 
 4. `NAME_peaks.broadPeak` is in BED6+3 format which is similar to
    narrowPeak file, except for missing the 10th column for annotating
-   peak summits.
+   peak summits. This file and the `gappedPeak` file will only be 
+   available when `--broad` is enabled. Since in the broad peak calling
+   mode, the peak summit won't be called, the values in the 5th, and 
+   7-9th columns are the mean value over all positions in the peak region. 
 
 5. `NAME_peaks.gappedPeak` is in BED12+3 format which contains both the
    broad region and narrow peaks. The 5th column is 10*-log10qvalue,
