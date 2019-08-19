@@ -44,8 +44,8 @@ def run( options ):
 
     # first two reps
 
-    info("combining #1 and #2 with method '%s'" % options.method)
-    cmbtrack = reps[ 0 ].overlie( reps[ 1 ], func=options.method )
+    info("combining tracks 1-%i with method '%s'" % (i - 1, options.method))
+    cmbtrack = reps[ 0 ].overlie( [reps[ j ] for j in range(1, i - 1)], func=options.method )
     ofile = os.path.join( options.outdir, options.ofile )
     info("Write bedGraph of combined scores...")
     ofhd = open(ofile,"wb")

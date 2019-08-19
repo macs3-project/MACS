@@ -24,6 +24,8 @@ from array import array
 import numpy as np
 np_convolve = np.convolve
 
+from scipy.stats import combine_pvalues
+
 from libc.math cimport sqrt
 from libc.math cimport log
 from cpython cimport bool
@@ -727,7 +729,7 @@ cdef class bedGraphTrackI:
             ret.add_loc(chrom,0,max_p,new_value)
         return ret
 
-    def overlie (self, bdgTrack2, func="max" ):
+    def overlie (self, bdgTracks, func="max" ):
         """Calculate two bedGraphTrackI objects by letting self
         overlying bdgTrack2, with user-defined functions.
 
@@ -762,67 +764,60 @@ cdef class bedGraphTrackI:
             int pre_p, p1, p2
             double v1, v2
             str chrom
-        
-        assert isinstance(bdgTrack2,bedGraphTrackI), "bdgTrack2 is not a bedGraphTrackI object"
+
+        nr_tracks = len(bdgTracks) + 1  # +1 for self
+        assert nr_tracks >= 2, "Specify at least two replicates"
+        for i, bdgTrack in enumerate(bdgTracks):
+            assert isinstance(bdgTrack, bedGraphTrackI), "bdgTrack{} is not a bedGraphTrackI object".format(i + 1)
 
         if func == "max":
             f = max
         elif func == "mean":
-            f = lambda x, y: ( x + y ) / 2
+            def f(*args):
+                return sum([*args]) / nr_tracks
         elif func == "fisher":
-            f = lambda p1, p2: ( p1 + p2 ) - log1p( ( p1 + p2 ) / LOG10_E ) * LOG10_E
+            def f(*args):
+                return combine_pvalues([*args])[1]
         else:
             raise Exception("Invalid function")
 
         ret = bedGraphTrackI()
         retadd = ret.add_loc
-        
-        chr1 = set(self.get_chr_names())
-        chr2 = set(bdgTrack2.get_chr_names())
-        common_chr = chr1.intersection(chr2)
+
+        common_chr = set(self.get_chr_names())
+        for track in bdgTracks:
+            common_chr = common_chr.intersection(set(track.get_chr_names()))
 
         for chrom in common_chr:
-            (p1s,v1s) = self.get_data_by_chr(chrom) # arrays for position and values
-            p1n = iter(p1s).next         # assign the next function to a viable to speed up
-            v1n = iter(v1s).next
+            datas = [self.get_data_by_chr(chrom)]
+            datas.extend([bdgTracks[i].get_data_by_chr(chrom) for i in range(len(bdgTracks))])
 
-            (p2s,v2s) = bdgTrack2.get_data_by_chr(chrom) # arrays for position and values
-            p2n = iter(p2s).next         # assign the next function to a viable to speed up
-            v2n = iter(v2s).next
+            ps, vs, pn, vn = [], [], [], []
+            for data in datas:
+                ps.append(data[0])
+                pn.append(iter(ps[-1]).next)
+                vs.append(data[1])
+                vn.append(iter(vs[-1]).next)
 
             pre_p = 0                   # remember the previous position in the new bedGraphTrackI object ret
-            
             try:
-                p1 = p1n()
-                v1 = v1n()
-
-                p2 = p2n()
-                v2 = v2n()
+                ps_cur = [pn[i]() for i in range(len(pn))]
+                vs_cur = [vn[i]() for i in range(len(pn))]
 
                 while True:
-                    if p1 < p2:
-                        # clip a region from pre_p to p1, then set pre_p as p1.
-                        retadd(chrom,pre_p,p1,f(v1,v2))
-                        pre_p = p1
-                        # call for the next p1 and v1
-                        p1 = p1n()
-                        v1 = v1n()
-                    elif p2 < p1:
-                        # clip a region from pre_p to p2, then set pre_p as p2.
-                        retadd(chrom,pre_p,p2,f(v1,v2))
-                        pre_p = p2
-                        # call for the next p2 and v2
-                        p2 = p2n()
-                        v2 = v2n()
-                    elif p1 == p2:
-                        # from pre_p to p1 or p2, then set pre_p as p1 or p2.
-                        retadd(chrom,pre_p,p1,f(v1,v2))
-                        pre_p = p1
-                        # call for the next p1, v1, p2, v2.
-                        p1 = p1n()
-                        v1 = v1n()
-                        p2 = p2n()
-                        v2 = v2n()
+                    # get the lowest position
+                    lowest_p = min(ps_cur)
+
+                    # at least one lowest position, could be multiple
+                    locations = [i for i in range(len(ps_cur)) if ps_cur[i] == lowest_p]
+
+                    # add the data until the interval
+                    ret.add_loc(chrom, pre_p, ps_cur[locations[0]], f(*vs_cur))
+
+                    pre_p = ps_cur[locations[0]]
+                    for index in locations:
+                        ps_cur[index] = pn[index]()
+                        vs_cur[index] = vn[index]()
             except StopIteration:
                 # meet the end of either bedGraphTrackI, simply exit
                 pass
