@@ -57,7 +57,7 @@ class Test_bedGraphTrackI_overlie(unittest.TestCase):
         for a in self.test_cdregions2:
             bdg2.safe_add_loc(a[0],a[1],a[2],a[3])
 
-        bdgb = bdg1.overlie(bdg2)
+        bdgb = bdg1.overlie([bdg2])
 
         chrom = "chrY"
         (p,v) = bdgb.get_data_by_chr(chrom)
