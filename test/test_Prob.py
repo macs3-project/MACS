@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# Time-stamp: <2012-03-09 09:50:12 Tao Liu>
+# Time-stamp: <2019-08-09 15:33:31 taoliu>
 
 """Module Description: Test functions to calculate probabilities.
 
@@ -16,12 +16,10 @@ the distribution).
 """
 
 
-import os
-import sys
 import unittest
 
 from math import log10
-from MACS2.cProb import *
+from MACS2.Prob import *
 
 # ------------------------------------
 # Main function
@@ -72,10 +70,10 @@ class Test_poisson_cdf(unittest.TestCase):
         self.assertEqual( result, expect )
 
     def test_poisson_cdf_n3(self):
-        expect = (round(log10(1),4),
-                  round(log10(6.042525e-293),4))
-        result = (round(log10(poisson_cdf(self.n3[0],self.n3[1],False)),4),
-                  round(log10(poisson_cdf(self.n3[0],self.n3[1],True)),4))
+        expect = (round(log10(1),2),
+                  round(log10(6.042525e-293),2))
+        result = (round(poisson_cdf(self.n3[0],self.n3[1],False,True),2),
+                  round(poisson_cdf(self.n3[0],self.n3[1],True,True),2))
         self.assertEqual( result, expect )
 
     def test_poisson_cdf_n4(self):

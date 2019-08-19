@@ -1,4 +1,4 @@
-# Time-stamp: <2013-09-15 21:55:17 Tao Liu>
+# Time-stamp: <2019-08-09 15:34:02 taoliu>
 
 """Module Description
 
@@ -82,13 +82,13 @@ cpdef double poisson_cdf ( unsigned int n, double lam, bool lower=False, bool lo
             return log10_poisson_cdf_Q_large_lambda(n, lam)
         
     if lower:
-        if lam > 700:
+        if lam > 700: # may be problematic
             return __poisson_cdf_large_lambda (n, lam)
         else:
             return __poisson_cdf(n,lam)
     else:
         # upper tail
-        if lam > 700:
+        if lam > 700: # may be problematic
             return __poisson_cdf_Q_large_lambda (n, lam)
         else:
             return __poisson_cdf_Q(n,lam)
