@@ -725,8 +725,8 @@ def opt_validate_cmbreps ( options ):
         logging.error( "Invalid method: %s" % options.method )
         sys.exit( 1 )
 
-    if len( options.ifile ) != 2:
-        logging.error("Only support two replicates!")
+    if len( options.ifile ) < 2:
+        logging.error("Combining replicates needs at least two replicates!")
         sys.exit( 1 )
 
     # # of -i must == # of -w
