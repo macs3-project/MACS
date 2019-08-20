@@ -1,20 +1,19 @@
 #!/usr/bin/env python
-# Time-stamp: <2018-10-26 14:17:19 Tao Liu>
+# Time-stamp: <2019-08-20 16:35:36 taoliu>
 
 """Description
 
 Setup script for MACS -- Model Based Analysis for ChIP-Seq data
 
-Copyright (c) 2008,2009,2010,2011 Tao Liu <taoliu@jimmy.harvard.edu>
+Copyright (c) 2008-2019 Tao Liu <vladimir.liu@gmail.com>
 
 This code is free software; you can redistribute it and/or modify it
 under the terms of the BSD License (see the file COPYING included with
 the distribution).
 
-@status:  beta
 @version: $Revision$
 @author:  Tao Liu
-@contact: taoliu@jimmy.harvard.edu
+@contact: vladimir.liu@gmail.com
 """
 
 import os
@@ -87,7 +86,7 @@ def main():
               ],
           install_requires=[
               'numpy>=1.15',
-              #'scipy',
+              'scipy>=1.1.0',
               ],
           cmdclass = command_classes,
           ext_modules = ext_modules
