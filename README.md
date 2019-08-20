@@ -443,10 +443,12 @@ and peak summit positions.
     - end position of peak
     - length of peak region
     - absolute peak summit position
-    - pileup height at peak summit, -log10(pvalue) for the peak summit (e.g. pvalue =1e-10, then this value should be 10)
-    - fold enrichment for this peak summit against random Poisson distribution with local lambda, -log10(qvalue) at peak summit
+    - pileup height at peak summit
+    - -log10(pvalue) for the peak summit (e.g. pvalue =1e-10, then this value should be 10)
+    - fold enrichment for this peak summit against random Poisson distribution with local lambda, 
+    - -log10(qvalue) at peak summit
    
-   Coordinates in XLS is 1-based which is different with BED format.
+   Coordinates in XLS is 1-based which is different with BED format. When `--broad` is enabled for broad peak calling, the pileup, pvalue, qvalue, and fold change in the XLS file will be the mean value across the entire peak region, since peak summit won't be called in broad peak calling mode. 
 
 2. `NAME_peaks.narrowPeak` is BED6+4 format file which contains the
    peak locations together with peak summit, pvalue and qvalue. You
@@ -454,9 +456,9 @@ and peak summit positions.
    columns are: 
    
    - 5th: integer score for display. It's calculated as `int(-10*log10pvalue)` or `int(-10*log10qvalue)` depending on whether `-p` (pvalue) or `-q` (qvalue) is used as score cutoff. Please note that currently this value might be out of the [0-1000] range defined in [UCSC Encode narrowPeak format](https://genome.ucsc.edu/FAQ/FAQformat.html#format12). You can let the value saturated at 1000 (i.e. p/q-value = 10^-100) by using the following 1-liner awk: `awk -v OFS="\t" '{$5=$5>1000?1000:$5} {print}' NAME_peaks.narrowPeak`
-   - 7th: fold-change
-   - 8th: -log10pvalue
-   - 9th: -log10qvalue
+   - 7th: fold-change at peak summit
+   - 8th: -log10pvalue at peak summit
+   - 9th: -log10qvalue at peak summit
    - 10th: relative summit position to peak start
    
    The file can be loaded directly to UCSC genome browser. Remove the beginning track line if you want to
@@ -471,7 +473,10 @@ and peak summit positions.
 
 4. `NAME_peaks.broadPeak` is in BED6+3 format which is similar to
    narrowPeak file, except for missing the 10th column for annotating
-   peak summits.
+   peak summits. This file and the `gappedPeak` file will only be 
+   available when `--broad` is enabled. Since in the broad peak calling
+   mode, the peak summit won't be called, the values in the 5th, and 
+   7-9th columns are the mean value over all positions in the peak region. 
 
 5. `NAME_peaks.gappedPeak` is in BED12+3 format which contains both the
    broad region and narrow peaks. The 5th column is 10*-log10qvalue,
@@ -493,10 +498,16 @@ and peak summit positions.
    Then a pdf file `NAME_model.pdf` will be generated in your current
    directory. Note, R is required to draw this figure.
 
-7. The .bdg files are in bedGraph format which can be imported to UCSC
-   genome browser or be converted into even smaller bigWig
-   files. There are two kinds of bdg files, one for treatment and the
-   other one for control.
+7. The `NAME_treat_pileup.bdg` and `NAME_control_lambda.bdg` files are
+   in bedGraph format which can be imported to UCSC genome browser or
+   be converted into even smaller bigWig files. The
+   `NAME_treat_pielup.bdg` contains the pileup signals (normalized
+   according to `--scale-to` option) from ChIP/treatment sample. The
+   `NAME_control_lambda.bdg` contains local biases estimated for each
+   genomic locations from control sample, or from treatment sample
+   when control sample is absent. The subcommand `bdgcmp` can be used
+   to compare these two files and make bedGraph file of scores such as
+   p-value, q-value, log likelihood, and log fold changes.
 
 ## Other useful links
 
@@ -506,20 +517,20 @@ and peak summit positions.
 
 ## Tips of fine-tuning peak calling
 
-Check the three scripts within MACSv2 package:
+There are several subcommands within MACSv2 package to fine-tune or customize your analysis:
 
-1. bdgcmp can be used on `*_treat_pileup.bdg` and
+1. `bdgcmp` can be used on `*_treat_pileup.bdg` and
    `*_control_lambda.bdg` or bedGraph files from other resources
    to calculate score track.
 
-2. bdgpeakcall can be used on `*_treat_pvalue.bdg` or the file
+2. `bdgpeakcall` can be used on `*_treat_pvalue.bdg` or the file
    generated from bdgcmp or bedGraph file from other resources to
    call peaks with given cutoff, maximum-gap between nearby mergable
    peaks and minimum length of peak. bdgbroadcall works similarly to
    bdgpeakcall, however it will output `_broad_peaks.bed` in BED12
    format.
 
-3. Differential calling tool -- bdgdiff, can be used on 4 bedgraph
+3. Differential calling tool -- `bdgdiff`, can be used on 4 bedgraph
    files which are scores between treatment 1 and control 1,
    treatment 2 and control 2, treatment 1 and treatment 2, treatment
    2 and treatment 1. It will output the consistent and unique sites
