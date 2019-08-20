@@ -777,7 +777,7 @@ cdef class bedGraphTrackI:
                 return sum([*args]) / nr_tracks
         elif func == "fisher":
             def f(*args):
-                return combine_pvalues([*args])[1]
+                return -np.log10(combine_pvalues([10 ** -arg for arg in args])[1])
         else:
             raise Exception("Invalid function")
 
