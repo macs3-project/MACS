@@ -9,14 +9,8 @@ test/*.wig
 test/*.bed
 
 test/log
-
-test/NA_peaks.encodePeak
-
-test/CTCF_1M.bed.gz
-
-test/NA_model.r
-
-test/NA_peaks.xls
+test/test*_run_*
+test/__pycache__
 
 .DS_Store
 
@@ -33,3 +27,6 @@ test/NOSPMR.ppois.bdg_ppois.bdg
 MACS2.egg-info
 MACS2/IO/*.c
 MACS2/*.c
+
+.pytest_cache
+.cache

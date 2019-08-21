@@ -1,4 +1,4 @@
-# Time-stamp: <2018-10-23 17:05:26 Tao Liu>
+# Time-stamp: <2019-08-21 16:29:49 taoliu>
 
 """Module for Feature IO classes.
 
@@ -23,8 +23,9 @@ from array import array
 
 import numpy as np
 np_convolve = np.convolve
+np_mean = np.mean
 
-from scipy.stats import combine_pvalues
+#from scipy.stats import combine_pvalues
 
 from libc.math cimport sqrt
 from libc.math cimport log
@@ -33,7 +34,7 @@ from cpython cimport bool
 from MACS2.Constants import *
 from MACS2.IO.ScoreTrack import scoreTrackII,CombinedTwoTrack
 from MACS2.IO.PeakIO import PeakIO, BroadPeakIO
-
+from MACS2.Prob import chisq_logp_e
 
 # ------------------------------------
 # constants
@@ -757,6 +758,7 @@ cdef class bedGraphTrackI:
 
         Then the given 'func' will be applied on each 2-tuple as func(#1,#2)
 
+        Supported 'func' are "max", "mean" and "fisher".
 
         Return value is a bedGraphTrackI object.
         """
@@ -773,11 +775,14 @@ cdef class bedGraphTrackI:
         if func == "max":
             f = max
         elif func == "mean":
+            #f = np_mean
             def f(*args):
-                return sum([*args]) / nr_tracks
+                return np_mean(args)
         elif func == "fisher":
+            # combine -log10pvalues
             def f(*args):
-                return -np.log10(combine_pvalues([10 ** -arg for arg in args])[1])
+                # chisq statistics = sum(-log10p)/log10(e)*2, chisq df = 2*number_of_reps
+                return chisq_logp_e(2*sum(args)/LOG10_E, 2*len(args), log10=True)
         else:
             raise Exception("Invalid function")
 

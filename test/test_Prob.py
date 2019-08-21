@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# Time-stamp: <2019-08-09 15:33:31 taoliu>
+# Time-stamp: <2019-08-21 15:36:54 taoliu>
 
 """Module Description: Test functions to calculate probabilities.
 
@@ -83,6 +83,40 @@ class Test_poisson_cdf(unittest.TestCase):
                   round(log10(poisson_cdf(self.n4[0],self.n4[1],True)),4))
         self.assertEqual( result, expect )
 
+class Test_chisq_p_e(unittest.TestCase):
+    """Test chisq pvalue calculation -- assuming df is an even number. We
+    only implemented even number pchisq for upper tail. Because this
+    is the function we need to combine p-values using fisher's method
+
+    """
+    def setUp(self):
+        # x, k, p(upper), -log p upper, -log10 p upper
+        self.c = ((10, 2, 0.006737947, 5, 2.171472),
+                  (100, 2, 1.92875e-22, 50, 21.71472),
+                  (1000, 22, 1.956374e-197, 452.9382, 196.7085),
+                  (10, 4, 0.04042768, 3.208241, 1.393321),
+                  (100, 8, 4.269159e-18, 39.99511, 17.36966),
+                  (1000, 80, 6.889598e-159, 364.181, 158.1618),
+                  (54, 6, 7.377151e-10, 21.02746, 9.132111),
+                  (565, 10, 5.518772e-115, 263.0891, 114.2582 ),
+                  (7765, 12, 0, 3845.965, 1670.2814),
+                 )
+
+    def test_chisq_p(self):
+        expect = map(lambda x:round(x[2],4),self.c)
+        result = map(lambda x:round(chisq_pvalue_e(x[0],x[1]),4),self.c)
+        self.assertEqual( result, expect )
+
+    def test_chisq_logp(self):
+        expect = map(lambda x:round(x[3],4),self.c)
+        result = map(lambda x:round(chisq_logp_e(x[0],x[1]),4),self.c)
+        self.assertEqual( result, expect )
+
+    def test_chisq_log10p(self):
+        expect = map(lambda x:round(x[4],4),self.c)
+        result = map(lambda x:round(chisq_logp_e(x[0],x[1],log10=True),4),self.c)
+        self.assertEqual( result, expect )
+        
 class Test_binomial_cdf(unittest.TestCase):
 
     def setUp(self):
