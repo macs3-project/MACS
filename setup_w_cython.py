@@ -113,7 +113,6 @@ def main():
           install_requires=[
               'numpy>=1.15',
               'cython>=0.25',
-              'scipy>=1.1.0',
               ],
           cmdclass = command_classes,
           ext_modules = cythonize(ext_modules, language_level="2")
