@@ -1,4 +1,4 @@
-# Time-stamp: <2019-08-09 15:34:02 taoliu>
+# Time-stamp: <2019-08-21 15:39:44 taoliu>
 
 """Module Description
 
@@ -32,6 +32,7 @@ from cpython cimport bool
 cdef int LSTEP = 200
 cdef double EXPTHRES = exp(LSTEP)
 cdef double EXPSTEP  = exp(-1*LSTEP)
+cdef double bigx = 20
 
 # ------------------------------------
 # Normal distribution functions
@@ -58,6 +59,138 @@ cpdef factorial ( unsigned int n ):
         fact = fact * i
     return fact
 
+cdef double poz(double z):
+    """ probability of normal z value
+    """
+    cdef:
+        double y, x, w
+        double Z_MAX = 6.0 # Maximum meaningful z value 
+    if z == 0.0:
+        x = 0.0;
+    else:
+        y = 0.5 * fabs(z)
+        if y >= (Z_MAX * 0.5):
+            x = 1.0
+        elif y < 1.0:
+            w = y * y
+            x = ((((((((0.000124818987 * w
+                        - 0.001075204047) * w + 0.005198775019) * w
+                        - 0.019198292004) * w + 0.059054035642) * w
+                        - 0.151968751364) * w + 0.319152932694) * w
+                        - 0.531923007300) * w + 0.797884560593) * y * 2.0
+        else:
+            y -= 2.0
+            x = (((((((((((((-0.000045255659 * y
+                             + 0.000152529290) * y - 0.000019538132) * y
+                             - 0.000676904986) * y + 0.001390604284) * y
+                             - 0.000794620820) * y - 0.002034254874) * y
+                             + 0.006549791214) * y - 0.010557625006) * y
+                             + 0.011630447319) * y - 0.009279453341) * y
+                             + 0.005353579108) * y - 0.002141268741) * y
+                             + 0.000535310849) * y + 0.999936657524
+    if z > 0.0:
+        return ((x + 1.0) * 0.5)
+    else:
+        return ((1.0 - x) * 0.5)
+
+cdef double ex20 ( double x ):
+    """Wrapper on exp function. It will return 0 if x is smaller than -20.
+    """
+    if x < -20.0:
+        return 0.0
+    else:
+        return exp(x)
+
+cpdef double chisq_pvalue_e ( double x, unsigned int df ):
+    """Chisq CDF function for upper tail and even degree of freedom.
+    Good for p-value calculation and designed for combining pvalues.
+
+    Note: we assume df to be an even number larger than 1! Do not
+    violate this assumption and there is no checking.
+
+    df has to be even number! if df is odd, result will be wrong!
+
+    """
+    cdef:
+        double  a, y, s
+        double  e, c, z
+
+    if x <= 0.0:
+        return 1.0
+       
+    a = 0.5 * x
+    even = ((2*(df/2)) == df)
+    y = ex20(-a)
+    s = y
+    if df > 2:
+        x = 0.5 * (df - 1.0)
+        z = 1.0
+        if a > bigx:            # approximation for big number
+            e = 0.0
+            c = log (a)
+            while z <= x:
+                e = log (z) + e
+                s += ex20(c*z-a-e)
+                z += 1.0
+            return s
+        else:
+            e = 1.0
+            c = 0.0
+            while z <= x:
+                e = e * (a / z)
+                c = c + e
+                z += 1.0
+            return c * y + s
+    else:
+        return s
+
+cpdef double chisq_logp_e ( double x, unsigned int df, bool log10 = False ):
+    """Chisq CDF function in log space for upper tail and even degree of freedom
+    Good for p-value calculation and designed for combining pvalues.
+
+    Note: we assume df to be an even number larger than 1! Do not
+    violate this assumption and there is no checking.
+
+    Return value is -logp. If log10 is set as True, return -log10p
+    instead.
+
+    """
+    cdef:
+        double a, y
+        double s                # s is the return value
+        double e, c, z
+
+    if x <= 0.0:
+        return 0.0
+       
+    a = 0.5 * x
+    y = exp(-a)             # y is for small number calculation
+    # initialize s
+    s = -a
+    if df > 2:
+        x = 0.5 * (df - 1.0)    # control number of iterations
+        z = 1.0             # variable for iteration
+        if a > bigx:            # approximation for big number
+            e = 0.0         # constant
+            c = log (a)         # constant
+            while z <= x:       # iterations
+                e += log(z)
+                s = logspace_add(s, c*z-a-e)
+                z += 1.0
+        else:                   # for small number
+            e = 1.0             # not a constant
+            c = 0.0             # not a constant
+            while z <= x:
+                e = e * (a / z)
+                c = c + e
+                z += 1.0
+            s = log(y+c*y) #logspace_add( s, log(c) ) - a
+    # return
+    if log10:
+        return -s/log(10)
+    else:
+        return -s
+    
 cpdef double poisson_cdf ( unsigned int n, double lam, bool lower=False, bool log10=False ):
     """Poisson CDF evaluater.
 
@@ -323,6 +456,12 @@ cdef inline double log10_poisson_cdf_Q_large_lambda ( unsigned int k, double lbd
     return round((residue-lbd)/log(10),5)
 
 cdef inline double logspace_add ( double logx, double logy ):
+    """addition in log space. 
+
+    Given two log values, such as logx and logy, return
+    log(exp(logx)+exp(logy)).
+
+    """
     return max (logx, logy) + log1p (exp (-fabs (logx - logy)))
 
 cpdef poisson_cdf_inv ( double cdf, double lam, int maximum=1000 ):

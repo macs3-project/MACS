@@ -86,7 +86,6 @@ def main():
               ],
           install_requires=[
               'numpy>=1.15',
-              'scipy>=1.1.0',
               ],
           cmdclass = command_classes,
           ext_modules = ext_modules
