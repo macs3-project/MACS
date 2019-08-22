@@ -25,7 +25,7 @@ echo "callpeak"
 mkdir ${TAG}_run_callpeak_narrow
 
 macs2 callpeak -t $CHIP -c $CTRL -n run_callpeak_narrow0 -B --outdir ${TAG}_run_callpeak_narrow  &> ${TAG}_run_callpeak_narrow/run_callpeak_narrow0.log
-macs2 callpeak -t $CHIP -c $CTRL -n run_callpeak_narrow1 -B --outdir ${TAG}_run_callpeak_narrow --call-summits &> ${TAG}_run_callpeak_narrow/run_callpeak_narrow1.log
+macs2 callpeak -t $CHIP -c $CTRL -n run_callpeak_narrow1 -B --outdir ${TAG}_run_callpeak_narrow --d-min 15 --call-summits &> ${TAG}_run_callpeak_narrow/run_callpeak_narrow1.log
 macs2 callpeak -t $CHIP -c $CTRL -n run_callpeak_narrow2 -B --outdir ${TAG}_run_callpeak_narrow --nomodel --extsize 100 &> ${TAG}_run_callpeak_narrow/run_callpeak_narrow2.log
 macs2 callpeak -t $CHIP -c $CTRL -n run_callpeak_narrow3 -B --outdir ${TAG}_run_callpeak_narrow --nomodel --extsize 100 --shift -50 &> ${TAG}_run_callpeak_narrow/run_callpeak_narrow3.log
 macs2 callpeak -t $CHIP -c $CTRL -n run_callpeak_narrow4 -B --outdir ${TAG}_run_callpeak_narrow --nomodel --nolambda --extsize 100 --shift -50 &> ${TAG}_run_callpeak_narrow/run_callpeak_narrow4.log
@@ -76,7 +76,7 @@ echo "predictd"
 
 mkdir ${TAG}_run_predictd
 
-macs2 predictd -i $CHIP --outdir ${TAG}_run_predictd --rfile run_predictd.R &> ${TAG}_run_predictd/run_predictd.log
+macs2 predictd -i $CHIP --d-min 10 --outdir ${TAG}_run_predictd --rfile run_predictd.R &> ${TAG}_run_predictd/run_predictd.log
 
 # randsample
 echo "randsample"
