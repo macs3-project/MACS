@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# Time-stamp: <2018-10-16 12:08:55 Tao Liu>
+# Time-stamp: <2019-08-22 12:07:29 taoliu>
 
 """Description: MACS v2 main executable.
 
@@ -220,6 +220,8 @@ def add_callpeak_parser( subparsers ):
                                 help = "The arbitrary extension size in bp. When nomodel is true, MACS will use this value as fragment size to extend each read towards 3' end, then pile them up. It's exactly twice the number of obsolete SHIFTSIZE. In previous language, each read is moved 5'->3' direction to middle of fragment by 1/2 d, then extended to both direction with 1/2 d. This is equivalent to say each read is extended towards 5'->3' into a d size fragment. DEFAULT: 200. EXTSIZE and SHIFT can be combined when necessary. Check SHIFT option." )   
     group_bimodal.add_argument( "--bw", dest = "bw", type = int, default = 300,
                                 help = "Band width for picking regions to compute fragment size. This value is only used while building the shifting model. Tweaking this is not recommended. DEFAULT: 300")
+    group_bimodal.add_argument( "--d-min", dest = "d_min", type = int, default = 20,
+                                help = "Minimum fragment size in basepair. Any predicted fragment size less than this will be excluded. DEFAULT: 20")
     group_bimodal.add_argument( "-m", "--mfold", dest = "mfold", type = int, default = [5,50], nargs = 2,
                                 help = "Select the regions within MFOLD range of high-confidence enrichment ratio against background to build model. Fold-enrichment in regions must be lower than upper limit, and higher than the lower limit. Use as \"-m 10 30\". This setting is only used while building the shifting model. Tweaking it is not recommended. DEFAULT:5 50" )
     
@@ -583,6 +585,8 @@ def add_predictd_parser( subparsers ):
                                      help = "Tag size. This will override the auto detected tag size. DEFAULT: Not set")
     argparser_predictd.add_argument( "--bw", dest = "bw", type = int, default = 300,
                                      help = "Band width for picking regions to compute fragment size. This value is only used while building the shifting model. DEFAULT: 300")
+    argparser_predictd.add_argument( "--d-min", dest = "d_min", type = int, default = 20,
+                                     help = "Minimum fragment size in basepair. Any predicted fragment size less than this will be excluded. DEFAULT: 20")
     argparser_predictd.add_argument( "-m", "--mfold", dest = "mfold", type = int, default = [5,50], nargs = 2,
                                      help = "Select the regions within MFOLD range of high-confidence enrichment ratio against background to build model. Fold-enrichment in regions must be lower than upper limit, and higher than the lower limit. Use as \"-m 10 30\". DEFAULT:5 50" )
 
