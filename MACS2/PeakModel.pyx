@@ -1,18 +1,17 @@
-# Time-stamp: <2015-03-10 15:38:17 Tao Liu>
+# Time-stamp: <2019-08-22 12:03:17 taoliu>
 
 """Module Description
 
 Copyright (c) 2008,2009 Yong Zhang, Tao Liu <taoliu@jimmy.harvard.edu>
-Copyright (c) 2010,2011 Tao Liu <taoliu@jimmy.harvard.edu>
+Copyright (c) 2010-2019 Tao Liu <vladimir.liu@gmail.com>
 
 This code is free software; you can redistribute it and/or modify it
 under the terms of the BSD License (see the file COPYING included
 with the distribution).
 
-@status:  experimental
 @version: $Revision$
 @author:  Yong Zhang, Tao Liu
-@contact: taoliu@jimmy.harvard.edu
+@contact: vladimir.liu@gmail.com
 """
 import sys, time, random
 import numpy as np
@@ -75,7 +74,7 @@ cdef class PeakModel:
         self.umfold = opt.umfold
         self.lmfold = opt.lmfold
         self.tag_expansion_size = 10         #opt.tsize| test 10bps. The reason is that we want the best 'lag' between left & right cutting sides. A tag will be expanded to 10bps centered at cutting point.
-        self.d_min = 20 ### discard any fragment size < d_min
+        self.d_min = opt.d_min ### discard any fragment size < d_min
         self.bw = opt.bw
         self.info  = opt.info
         self.debug = opt.debug

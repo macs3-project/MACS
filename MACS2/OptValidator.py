@@ -1,4 +1,4 @@
-# Time-stamp: <2018-10-16 12:02:29 Tao Liu>
+# Time-stamp: <2019-08-22 12:09:56 taoliu>
 
 """Module Description
 
@@ -124,6 +124,11 @@ def opt_validate ( options ):
     # uppercase the format string 
     options.format = options.format.upper()
 
+    # d_min is non-negative
+    if options.d_min < 0:
+        logging.error("Minimum fragment size shouldn't be negative!" % options.d_min)
+        sys.exit(1)
+    
     # upper and lower mfold
     options.lmfold = options.mfold[0]
     options.umfold = options.mfold[1]
@@ -582,6 +587,11 @@ def opt_validate_predictd ( options ):
     
     # uppercase the format string 
     options.format = options.format.upper()
+
+    # d_min is non-negative
+    if options.d_min < 0:
+        logging.error("Minimum fragment size shouldn't be negative!" % options.d_min)
+        sys.exit(1)
 
     # upper and lower mfold
     options.lmfold = options.mfold[0]
