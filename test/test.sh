@@ -20,7 +20,8 @@ CHIPBEDPE=CTCF_PE_ChIP_chr22.bedpe
 CTRLBEDPE=CTCF_PE_CTRL_chr22.bedpe
 
 # callpeak
-echo "callpeak"
+echo "1. callpeak"
+echo "1.1 callpeak narrow"
 
 mkdir ${TAG}_run_callpeak_narrow
 
@@ -31,11 +32,12 @@ macs2 callpeak -t $CHIP -c $CTRL -n run_callpeak_narrow3 -B --outdir ${TAG}_run_
 macs2 callpeak -t $CHIP -c $CTRL -n run_callpeak_narrow4 -B --outdir ${TAG}_run_callpeak_narrow --nomodel --nolambda --extsize 100 --shift -50 &> ${TAG}_run_callpeak_narrow/run_callpeak_narrow4.log
 macs2 callpeak -t $CHIP -c $CTRL -n run_callpeak_narrow5 -B --outdir ${TAG}_run_callpeak_narrow --scale-to large &> ${TAG}_run_callpeak_narrow/run_callpeak_narrow5.log
 
+echo "1.1 callpeak broad"
 mkdir ${TAG}_run_callpeak_broad 
 
 macs2 callpeak -t $CHIP -c $CTRL -n run_callpeak_broad -B --outdir ${TAG}_run_callpeak_broad --broad &> ${TAG}_run_callpeak_broad/run_callpeak_broad.log
 
-echo "callpeak on PE"
+echo "1.3 callpeak on PE narrow/broad"
 
 mkdir  ${TAG}_run_callpeak_pe_narrow
 mkdir  ${TAG}_run_callpeak_pe_broad
@@ -47,7 +49,7 @@ macs2 callpeak -f BEDPE -t $CHIPBEDPE -c $CTRLBEDPE -n run_callpeak_bedpe_broad 
 macs2 callpeak -f BEDPE -t $CHIPBEDPE -n run_callpeak_pe_narrow_onlychip -B --outdir ${TAG}_run_callpeak_pe_narrow &> ${TAG}_run_callpeak_pe_narrow/run_callpeak_pe_narrow_onlychip.log
 
 # pileup
-echo "pileup"
+echo "2. pileup"
 
 mkdir ${TAG}_run_pileup
 
@@ -61,7 +63,7 @@ macs2 pileup -f BEDPE -i $CHIPBEDPE --outdir ${TAG}_run_pileup -o run_pileup_ChI
 macs2 pileup -f BEDPE -i $CTRLBEDPE --outdir ${TAG}_run_pileup -o run_pileup_CTRLPE.bedpe.bdg &> ${TAG}_run_pileup/run_pileup_CTRLPE.bedpe.log
 
 # filterdup
-echo "filterdup"
+echo "3. filterdup"
 
 mkdir ${TAG}_run_filterdup 
 
@@ -72,14 +74,14 @@ macs2 filterdup -i $CHIPPE -f BAMPE --outdir ${TAG}_run_filterdup -o run_filterd
 macs2 filterdup -i $CHIPPE -f BAMPE --outdir ${TAG}_run_filterdup -o run_filterdup_result_pe.bedpe &> ${TAG}_run_filterdup/run_filterdup_pe.log
 
 # predictd
-echo "predictd"
+echo "4. predictd"
 
 mkdir ${TAG}_run_predictd
 
 macs2 predictd -i $CHIP --d-min 10 --outdir ${TAG}_run_predictd --rfile run_predictd.R &> ${TAG}_run_predictd/run_predictd.log
 
 # randsample
-echo "randsample"
+echo "5. randsample"
 
 mkdir ${TAG}_run_randsample
 
@@ -90,7 +92,7 @@ macs2 randsample -f BAMPE -i $CHIPPE -n 100000 --seed 31415926 --outdir ${TAG}_r
 macs2 randsample -f BEDPE -i $CHIPBEDPE -n 100000 --seed 31415926 --outdir ${TAG}_run_randsample -o run_randsample_bedpe.bedpe &> ${TAG}_run_randsample/run_randsample_bedpe.log
 
 # refinepeak
-echo "refinepeak"
+echo "6. refinepeak"
 
 mkdir ${TAG}_run_refinepeak
 
@@ -99,28 +101,28 @@ macs2 refinepeak -b ${TAG}_run_callpeak_narrow/run_callpeak_narrow0_peaks.narrow
 macs2 refinepeak -b ${TAG}_run_callpeak_narrow/run_callpeak_narrow0_peaks.narrowPeak -i $CHIP --outdir ${TAG}_run_refinepeak -o run_refinepeak_w_ofile.bed &> ${TAG}_run_refinepeak/run_refinepeak_w_ofile.log
 
 # bdgcmp
-echo "bdgcmp"
+echo "7. bdgcmp"
 
 mkdir ${TAG}_run_bdgcmp
 
 macs2 bdgcmp -t ${TAG}_run_pileup/run_pileup_ChIP.bed.bdg -c ${TAG}_run_pileup/run_pileup_CTRL.bed.bdg  -m ppois FE -p 1 --outdir ${TAG}_run_bdgcmp --o-prefix run_bdgcmp &> ${TAG}_run_bdgcmp/run_bdgcmp.log
 
 # bdgpeakcall
-echo "bdgpeakcall"
+echo "8. bdgpeakcall"
 
 mkdir ${TAG}_run_bdgpeakcall
 
 macs2 bdgpeakcall -i ${TAG}_run_bdgcmp/run_bdgcmp_FE.bdg -c 2 --outdir ${TAG}_run_bdgpeakcall --o-prefix run_bdgpeakcall_w_prefix &> ${TAG}_run_bdgpeakcall/run_bdgpeakcall_w_prefix.log
 
 # bdgbroadcall
-echo "bdgbroadcall"
+echo "9. bdgbroadcall"
 
 mkdir ${TAG}_run_bdgbroadcall
 
 macs2 bdgbroadcall -i ${TAG}_run_bdgcmp/run_bdgcmp_FE.bdg -c 2 -C 1.5 --outdir ${TAG}_run_bdgbroadcall --o-prefix run_bdgbroadcall_w_prefix &> ${TAG}_run_bdgbroadcall/run_bdgbroadcall_w_prefix.log
 
 # bdgdiff
-echo "bdgdiff"
+echo "10. bdgdiff"
 
 mkdir ${TAG}_run_callpeak_narrow_revert
 mkdir ${TAG}_run_bdgdiff
@@ -132,7 +134,7 @@ macs2 bdgdiff --t1 ${TAG}_run_callpeak_narrow/run_callpeak_narrow0_treat_pileup.
 macs2 bdgdiff --t1 ${TAG}_run_callpeak_narrow/run_callpeak_narrow0_treat_pileup.bdg --c1 ${TAG}_run_callpeak_narrow/run_callpeak_narrow0_control_lambda.bdg --t2 ${TAG}_run_callpeak_narrow_revert/run_callpeak_narrow_revert_treat_pileup.bdg --c2 ${TAG}_run_callpeak_narrow_revert/run_callpeak_narrow_revert_control_lambda.bdg -o cond1.bed cond2.bed common.bed --outdir ${TAG}_run_bdgdiff &> ${TAG}_run_bdgdiff/run_bdgdiff_w_o_file.log
 
 # cmbreps
-echo "cmbreps"
+echo "11. cmbreps"
 
 mkdir ${TAG}_run_cmbreps
 
