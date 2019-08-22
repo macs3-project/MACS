@@ -30,7 +30,7 @@ The first part ```-v $PWD:/data/``` will mount the CURRENT directory ```$PWD``` 
 
 * Python2.7 docker image 2.7.15
 * pip install numpy version 1.15.4
-* pip install MACS2 version 2.1.2
+* git clone MACS codes from github master branch then run ```setup_w_cython.py```
 
 # Author
 
