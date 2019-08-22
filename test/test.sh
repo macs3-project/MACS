@@ -1,7 +1,9 @@
 #!/bin/bash
 
+# integrative subcmds testing
+
 if [ $# -lt 1 ];then
-    echo "Run all tests for MACS2. Need 1 parameter for a tag name! A unique string combining date, time and MACS2 version is recommended. ./test.sh <TAG>"
+    echo "Run all tests for subcommands of MACS2. Need 1 parameter for a tag name! A unique string combining date, time and MACS2 version is recommended. ./test.sh <TAG>"
     exit
 fi
 
@@ -129,3 +131,11 @@ macs2 bdgdiff --t1 ${TAG}_run_callpeak_narrow/run_callpeak_narrow0_treat_pileup.
 
 macs2 bdgdiff --t1 ${TAG}_run_callpeak_narrow/run_callpeak_narrow0_treat_pileup.bdg --c1 ${TAG}_run_callpeak_narrow/run_callpeak_narrow0_control_lambda.bdg --t2 ${TAG}_run_callpeak_narrow_revert/run_callpeak_narrow_revert_treat_pileup.bdg --c2 ${TAG}_run_callpeak_narrow_revert/run_callpeak_narrow_revert_control_lambda.bdg -o cond1.bed cond2.bed common.bed --outdir ${TAG}_run_bdgdiff &> ${TAG}_run_bdgdiff/run_bdgdiff_w_o_file.log
 
+# cmbreps
+echo "cmbreps"
+
+mkdir ${TAG}_run_cmbreps
+
+macs2 cmbreps -i ${TAG}_run_callpeak_narrow/run_callpeak_narrow0_treat_pileup.bdg ${TAG}_run_callpeak_narrow/run_callpeak_narrow0_control_lambda.bdg ${TAG}_run_bdgcmp/run_bdgcmp_ppois.bdg -m max -o ${TAG}_cmbreps_max.bdg --outdir ${TAG}_run_cmbreps &> ${TAG}_run_cmbreps/run_cmbreps_max.log
+macs2 cmbreps -i ${TAG}_run_callpeak_narrow/run_callpeak_narrow0_treat_pileup.bdg ${TAG}_run_callpeak_narrow/run_callpeak_narrow0_control_lambda.bdg ${TAG}_run_bdgcmp/run_bdgcmp_ppois.bdg -m mean -o ${TAG}_cmbreps_mean.bdg --outdir ${TAG}_run_cmbreps &> ${TAG}_run_cmbreps/run_cmbreps_mean.log
+macs2 cmbreps -i ${TAG}_run_callpeak_narrow/run_callpeak_narrow0_treat_pileup.bdg ${TAG}_run_callpeak_narrow/run_callpeak_narrow0_control_lambda.bdg ${TAG}_run_bdgcmp/run_bdgcmp_ppois.bdg -m fisher -o ${TAG}_cmbreps_fisher.bdg --outdir ${TAG}_run_cmbreps &> ${TAG}_run_cmbreps/run_cmbreps_fisher.log

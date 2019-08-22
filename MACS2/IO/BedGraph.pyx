@@ -1,17 +1,16 @@
 # Time-stamp: <2019-08-21 16:29:49 taoliu>
 
-"""Module for Feature IO classes.
+"""Module for BedGraph data class.
 
-Copyright (c) 2010,2011 Tao Liu <taoliu@jimmy.harvard.edu>
+Copyright (c) 2010-2019 Tao Liu <vladimir.liu@gmail.com>
 
 This code is free software; you can redistribute it and/or modify it
 under the terms of the BSD License (see the file COPYING included
 with the distribution).
 
-@status:  experimental
 @version: $Revision$
 @author:  Tao Liu
-@contact: taoliu@jimmy.harvard.edu
+@contact: vladimir.liu@gmail.com
 """
 
 # ------------------------------------
@@ -22,10 +21,6 @@ import logging
 from array import array
 
 import numpy as np
-np_convolve = np.convolve
-np_mean = np.mean
-
-#from scipy.stats import combine_pvalues
 
 from libc.math cimport sqrt
 from libc.math cimport log
@@ -503,97 +498,6 @@ cdef class bedGraphTrackI:
                        )
             return True
                     
-   
-    # def __close_peak2 (self, peak_content, peaks, int min_length, str chrom, int smoothlen=50):
-    #     # this is where the summits are called, need to fix this
-    #     end, start = peak_content[ -1 ][ 1 ], peak_content[ 0 ][ 0 ]
-    #     if end - start < min_length: return # if the peak is too small, reject it
-    #     #for (start,end,value,summitvalue,index) in peak_content:
-    #     peakdata = np.zeros(end - start, dtype='float32')
-    #     peakindices = np.zeros(end - start, dtype='int32')
-    #     for (tmpstart,tmpend,tmpvalue,tmpsummitvalue, tmpindex) in peak_content:
-    #         i, j = tmpstart-start, tmpend-start
-    #         peakdata[i:j] = self.data[chrom]['sample'][tmpindex]
-    #         peakindices[i:j] = tmpindex
-    #     # apply smoothing window of tsize / 2
-    #     w = np.ones(smoothlen, dtype='float32')
-    #     smoothdata = np_convolve(w/w.sum(), peakdata, mode='same')
-    #     # find maxima and minima
-    #     local_extrema = np.where(np.diff(np.sign(np.diff(smoothdata))))[0]+1
-    #     # get only maxima by requiring it be greater than the mean
-    #     # might be better to take another derivative instead
-    #     plateau_offsets = np.intersect1d(local_extrema,
-    #                                      np.where(peakdata>peakdata.mean())[0])
-    #     # sometimes peak summits are plateaus, so check for adjacent coordinates
-    #     # and take the middle ones if needed
-    #     if len(plateau_offsets)==0:
-    #     #####################################################################
-    #     # ***failsafe if no summits so far***                               #
-    #         summit_offset_groups = [[(end - start) / 2]]                    #
-    #     ##################################################################### 
-    #     elif len(plateau_offsets) == 1:
-    #         summit_offset_groups = [[plateau_offsets[0]]]
-    #     else:
-    #         previous_offset = plateau_offsets[0]
-    #         summit_offset_groups = [[previous_offset]]
-    #         for offset in plateau_offsets:
-    #             if offset == previous_offset + 1:
-    #                 summit_offset_groups[-1].append(offset)
-    #             else:
-    #                 summit_offset_groups.append([offset])
-    #     summit_offsets = []
-    #     for offset_group in summit_offset_groups:
-    #         summit_offsets.append(offset_group[len(offset_group) / 2])
-    #     summit_indices = peakindices[summit_offsets]
-    #     # also purge offsets that have the same summit_index
-    #     unique_offsets = []
-    #     summit_offsets = np.fromiter(summit_offsets, dtype='int32')
-    #     for index in np.unique(summit_indices):
-    #         those_index_indices = np.where(summit_indices == index)[0]
-    #         those_offsets = summit_offsets[those_index_indices]
-    #         unique_offsets.append(int(those_offsets.mean()))
-    #     # also require a valley of at least 0.6 * taller peak
-    #     # in every adjacent two peaks or discard the lesser one
-    #     # this behavior is like PeakSplitter
-    #     better_offsets = []
-    #     previous_offset = unique_offsets.pop()
-    #     while True:
-    #         if len(unique_offsets) == 0:
-    #             better_offsets.append(previous_offset)
-    #             break
-    #         else:
-    #             this_offset = unique_offsets.pop()
-    #             this_h, prev_h = peakdata[[this_offset, previous_offset]]
-    #             if this_h > prev_h:
-    #                 prev_is_taller = False
-    #                 min_valley = 0.6 * this_h
-    #             else:
-    #                 prev_is_taller = True
-    #                 min_valley = 0.6 * prev_h
-    #             s = slice(this_offset, previous_offset)
-    #             valley = np.where(peakdata[s] < min_valley)[0]
-    #             if len(valley) > 0: better_offsets.append(previous_offset)
-    #             else:
-    #                 if prev_is_taller: continue # discard this peak
-    #                 # else: discard previous peak by ignoring it
-    #             previous_offset = this_offset
-    #     better_offsets.reverse()
-    #     better_indices = peakindices[better_offsets]
-    #     assert len(better_offsets) > 0, "Lost peak summit(s) near %s %d" % (chrom, start) 
-    #     for summit_offset, summit_index in zip(better_offsets, better_indices):
-    #         peaks.add( chrom,
-    #                    start,
-    #                    end,
-    #                    summit      = start + summit_offset,
-    #                    peak_score  = peakdata[summit_offset],
-    #                    pileup      = 0,
-    #                    pscore      = 0,
-    #                    fold_change = 0,
-    #                    qscore      = 0,
-    #                    )
-    #     # start a new peak
-    #     return True
-    
     def call_broadpeaks (self, double lvl1_cutoff=500, double lvl2_cutoff=100, int min_length=200,
                          int lvl1_max_gap=50, int lvl2_max_gap=400):
         """This function try to find enriched regions within which,
@@ -777,12 +681,12 @@ cdef class bedGraphTrackI:
         elif func == "mean":
             #f = np_mean
             def f(*args):
-                return np_mean(args)
+                return sum(args)/nr_tracks
         elif func == "fisher":
             # combine -log10pvalues
             def f(*args):
                 # chisq statistics = sum(-log10p)/log10(e)*2, chisq df = 2*number_of_reps
-                return chisq_logp_e(2*sum(args)/LOG10_E, 2*len(args), log10=True)
+                return chisq_logp_e(2*sum(args)/LOG10_E, 2*nr_tracks, log10=True)
         else:
             raise Exception("Invalid function")
 
@@ -1155,80 +1059,6 @@ cdef class bedGraphTrackI:
             if cutoff_npeaks[ cutoff ] > 0:
                 ret += "%.2f\t%d\t%d\t%.2f\n" % ( cutoff, cutoff_npeaks[ cutoff ], cutoff_lpeaks[ cutoff ], cutoff_lpeaks[ cutoff ]/cutoff_npeaks[ cutoff ] )
         return ret
-
-    # def make_scoreTrack_for_macs2diff (self, bdgTrack2 ):
-    #     """A modified overlie function for MACS v2 differential call.
-
-    #     Return value is a bedGraphTrackI object.
-    #     """
-    #     cdef:
-    #         int pre_p, p1, p2
-    #         double v1, v2
-    #         str chrom
-        
-    #     assert isinstance(bdgTrack2,bedGraphTrackI), "bdgTrack2 is not a bedGraphTrackI object"
-
-    #     ret = CombinedTwoTrack()
-    #     retadd = ret.add
-        
-    #     chr1 = set(self.get_chr_names())
-    #     chr2 = set(bdgTrack2.get_chr_names())
-    #     common_chr = chr1.intersection(chr2)
-    #     for chrom in common_chr:
-            
-    #         (p1s,v1s) = self.get_data_by_chr(chrom) # arrays for position and values
-    #         p1n = iter(p1s).next         # assign the next function to a viable to speed up
-    #         v1n = iter(v1s).next
-
-    #         (p2s,v2s) = bdgTrack2.get_data_by_chr(chrom) # arrays for position and values
-    #         p2n = iter(p2s).next         # assign the next function to a viable to speed up
-    #         v2n = iter(v2s).next
-
-    #         chrom_max_len = len(p1s)+len(p2s) # this is the maximum number of locations needed to be recorded in scoreTrackI for this chromosome.
-            
-    #         ret.add_chromosome(chrom,chrom_max_len)
-
-    #         pre_p = 0                   # remember the previous position in the new bedGraphTrackI object ret
-            
-    #         try:
-    #             p1 = p1n()
-    #             v1 = v1n()
-
-    #             p2 = p2n()
-    #             v2 = v2n()
-
-    #             while True:
-    #                 if p1 < p2:
-    #                     # clip a region from pre_p to p1, then set pre_p as p1.
-    #                     retadd( chrom, p1, v1, v2 )
-    #                     pre_p = p1
-    #                     # call for the next p1 and v1
-    #                     p1 = p1n()
-    #                     v1 = v1n()
-    #                 elif p2 < p1:
-    #                     # clip a region from pre_p to p2, then set pre_p as p2.
-    #                     retadd( chrom, p2, v1, v2 )
-    #                     pre_p = p2
-    #                     # call for the next p2 and v2
-    #                     p2 = p2n()
-    #                     v2 = v2n()
-    #                 elif p1 == p2:
-    #                     # from pre_p to p1 or p2, then set pre_p as p1 or p2.
-    #                     retadd( chrom, p1, v1, v2 )
-    #                     pre_p = p1
-    #                     # call for the next p1, v1, p2, v2.
-    #                     p1 = p1n()
-    #                     v1 = v1n()
-    #                     p2 = p2n()
-    #                     v2 = v2n()
-    #         except StopIteration:
-    #             # meet the end of either bedGraphTrackI, simply exit
-    #             pass
-
-    #     ret.finalize()
-    #     #ret.merge_regions()
-    #     return ret
-
 
 def scoreTracktoBedGraph (scoretrack, str colname):
     """Produce a bedGraphTrackI object with certain column as scores.

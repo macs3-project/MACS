@@ -471,7 +471,7 @@ def add_cmbreps_parser( subparsers ):
     argparser_cmbreps = subparsers.add_parser( "cmbreps",
                                                help = "Combine BEDGraphs of scores from replicates. Note: All regions on the same chromosome in the bedGraph file should be continuous so only bedGraph files from MACS2 are accpetable." )
     argparser_cmbreps.add_argument( "-i", dest = "ifile", type = str, required = True, nargs = "+",
-                                    help = "MACS score in bedGraph for each replicate. Require exactly two files such as '-i A B'. REQUIRED" )
+                                    help = "MACS score in bedGraph for each replicate. Require at least 2 files such as '-i A B C D'. REQUIRED" )
     # argparser_cmbreps.add_argument( "-w", dest = "weights", type = float, nargs = "*",
     #                                 help = "Weight for each replicate. Default is 1.0 for each. When given, require same number of parameters as IFILE." )    
     argparser_cmbreps.add_argument( "-m", "--method", dest = "method", type = str,
