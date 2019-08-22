@@ -2,8 +2,9 @@
 FROM python:2.7 AS build
 
 # install numpy and MACS2
-RUN pip install --trusted-host pypi.python.org numpy
-RUN pip install --trusted-host pypi.python.org MACS2
+RUN git clone https://github.com/taoliu/MACS.git /MACS && cd /MACS
+RUN pip install --trusted-host pypi.python.org -r requirements.txt
+RUN python setup_w_cython.py install
 
 FROM python:2.7-slim
 
