@@ -228,10 +228,10 @@ def run( args ):
                     #if chromosome is empty -- no peaks for that chr -- continue
                     if temp_pileup_ctrl_chr == "None" or prev_pileup_ctrl == "None":
                         continue
-                    
-                    for sf in range(len(pileups)): #loop through each SF
-                        pileup_chrom_sf.append( sum_over_two_pv_array(prev_pileup_ctrl_chr[sf], temp_pileup_ctrl_chr[sf]) )
-                    prev_pileup_ctrl[chr] = pileup_chrom_sf
+                    else:
+                        for sf in range(len(pileups)): #loop through each SF
+                            pileup_chrom_sf.append( sum_over_two_pv_array(prev_pileup_ctrl_chr[sf], temp_pileup_ctrl_chr[sf]) )
+                        prev_pileup_ctrl[chr] = pileup_chrom_sf
 
             else:
                 prev_pileup_ctrl = temp_pileup_ctrl
