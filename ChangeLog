@@ -1,3 +1,33 @@
+2019-09-18  Tao Liu  <vladimir.liu@gmail.com>
+	MACS version 2.1.3
+
+	* Features added
+
+	1) Support Docker auto-deploy. PR #309
+
+	2) Support Travis CI auto-testing, update unit-testing
+	scripts, and enable subcommand testing on small datasets.
+
+	3) Update README documents. #297 PR #306
+
+	4) `cmbreps` supports more than 2 replicates. Merged from PR #304
+	@Maarten-vd-Sande and PR #307 (our own chi-sq test code)
+
+	5) `--d-min` option is added in `callpeak` and `predictd`, to
+	exclude predictions of fragment size smaller than the given
+	value. Merged from PR #267 @shouldsee.
+
+	* Bugs fixed
+
+	1) #265 Fixed a bug where the pseudocount hasn't been applied
+	while calculating p-value score in ScoreTrack object.
+
+	2) Fixed bdgbroadcall so that it will report those broad peaks
+	without strong peak inside, a consistent behavior as `callpeak
+	--broad`.
+
+	3) Rename COPYING to LICENSE.
+
 2018-10-17  Tao Liu  <vladimir.liu@gmail.com>
 	MACS version 2.1.2
 
