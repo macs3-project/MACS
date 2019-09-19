@@ -1,4 +1,4 @@
-# Time-stamp: <2018-10-16 11:48:16 Tao Liu>
+# Time-stamp: <2019-09-19 16:03:21 taoliu>
 
 """Description: Filter duplicate reads depending on sequencing depth.
 
@@ -86,14 +86,14 @@ def load_tag_files_options ( options ):
 
     """
     options.info("# read treatment tags...")
-    tp = options.parser(options.ifile[0])
+    tp = options.parser(options.ifile[0], buffer_size=options.buffer_size)
     tsize = tp.tsize()
     treat = tp.build_fwtrack()
     #treat.sort()
     if len(options.ifile) > 1:
         # multiple input
         for tfile in options.ifile[1:]:
-            tp = options.parser(tfile)
+            tp = options.parser(tfile, buffer_size=options.buffer_size)
             treat = tp.append_fwtrack( treat )
             #treat.sort()
     treat.finalize()
@@ -107,13 +107,13 @@ def load_frag_files_options ( options ):
     """
     options.info("# read treatment fragments...")
 
-    tp = options.parser(options.ifile[0])
+    tp = options.parser(options.ifile[0], buffer_size=options.buffer_size)
     treat = tp.build_petrack()
     #treat.sort()
     if len(options.ifile) > 1:
         # multiple input
         for tfile in options.ifile[1:]:
-            tp = options.parser(tfile)
+            tp = options.parser(tfile, buffer_size=options.buffer_size)
             treat = tp.append_petrack( treat )
             #treat.sort()
     treat.finalize()

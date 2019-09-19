@@ -19,6 +19,8 @@ CTRLPE=CTCF_PE_CTRL_chr22.bam
 CHIPBEDPE=CTCF_PE_ChIP_chr22.bedpe
 CTRLBEDPE=CTCF_PE_CTRL_chr22.bedpe
 
+CHIPCONTIGS50K=contigs50k.bed.gz
+
 # callpeak
 echo "1. callpeak"
 echo "1.1 callpeak narrow"
@@ -141,3 +143,24 @@ mkdir ${TAG}_run_cmbreps
 macs2 cmbreps -i ${TAG}_run_callpeak_narrow/run_callpeak_narrow0_treat_pileup.bdg ${TAG}_run_callpeak_narrow/run_callpeak_narrow0_control_lambda.bdg ${TAG}_run_bdgcmp/run_bdgcmp_ppois.bdg -m max -o ${TAG}_cmbreps_max.bdg --outdir ${TAG}_run_cmbreps &> ${TAG}_run_cmbreps/run_cmbreps_max.log
 macs2 cmbreps -i ${TAG}_run_callpeak_narrow/run_callpeak_narrow0_treat_pileup.bdg ${TAG}_run_callpeak_narrow/run_callpeak_narrow0_control_lambda.bdg ${TAG}_run_bdgcmp/run_bdgcmp_ppois.bdg -m mean -o ${TAG}_cmbreps_mean.bdg --outdir ${TAG}_run_cmbreps &> ${TAG}_run_cmbreps/run_cmbreps_mean.log
 macs2 cmbreps -i ${TAG}_run_callpeak_narrow/run_callpeak_narrow0_treat_pileup.bdg ${TAG}_run_callpeak_narrow/run_callpeak_narrow0_control_lambda.bdg ${TAG}_run_bdgcmp/run_bdgcmp_ppois.bdg -m fisher -o ${TAG}_cmbreps_fisher.bdg --outdir ${TAG}_run_cmbreps &> ${TAG}_run_cmbreps/run_cmbreps_fisher.log
+
+# test large amount of contigs
+echo "12. 50k contigs with buffersize"
+
+mkdir ${TAG}_run_50kcontigs
+
+echo "12.1 callpeak"
+macs2 callpeak -t $CHIPCONTIGS50K -n run_callpeak_50kcontigs -B --outdir ${TAG}_run_50kcontigs --buffer-size 1000 --nomodel --extsize 200 &> ${TAG}_run_50kcontigs/run_callpeak_50kcontigs.log
+
+echo "12.2 filterdup"
+macs2 callpeak -t $CHIPCONTIGS50K -n run_callpeak_50kcontigs -B --outdir ${TAG}_run_50kcontigs --buffer-size 1000 &> ${TAG}_run_50kcontigs/run_callpeak_50kcontigs.log
+
+echo "12.3 pileup"
+macs2 pileup -f BED -i $CHIPCONTIGS50K --extsize 200 --outdir ${TAG}_run_50kcontigs -o run_pileup_ChIP.bed.bdg --buffer-size 1000 &> ${TAG}_run_50kcontigs/run_pileup_ChIP.bed.log
+
+echo "12.4 predictd"
+macs2 predictd -i $CHIPCONTIGS50K --d-min 10 --outdir ${TAG}_run_50kcontigs --rfile run_predictd.R --buffer-size 1000 &> ${TAG}_run_50kcontigs/run_predictd.log
+
+echo "12.5 randsample"
+macs2 randsample -i $CHIPCONTIGS50K -n 100000 --seed 31415926 --outdir ${TAG}_run_50kcontigs -o run_randsample.bed --buffer-size 1000 &> ${TAG}_run_50kcontigs/run_randsample.log
+
