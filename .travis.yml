@@ -20,5 +20,5 @@ deploy:
   on:
     tags: true
   skip_existing: true
-  distributions: "sdist bwheel"
+  distributions: "sdist bdist_wheel"
   
