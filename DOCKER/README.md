@@ -1,4 +1,4 @@
-# Official MACS2 v2.1.3.1 docker
+# Official MACS2 v2.1.3.3 docker
 
 MACS2 is a bioinformatics algorithm to analyze ChIP-seq datasets. 
 

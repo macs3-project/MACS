@@ -1,21 +1,13 @@
 #!/usr/bin/env python
-# Time-stamp: <2019-09-20 14:04:51 taoliu>
+# Time-stamp: <2019-09-20 15:08:11 taoliu>
 
 """Description: 
 
 Setup script for MACS -- Model Based Analysis for ChIP-Seq data
 
-Use this when you need Cython regenerate .c files.
-
-Copyright (c) 2008-2019 Tao Liu <vladimir.liu@gmail.com>
-
 This code is free software; you can redistribute it and/or modify it
-under the terms of the BSD License (see the file COPYING included with
+under the terms of the BSD License (see the file LICENSE included with
 the distribution).
-
-@version: $Revision$
-@author:  Tao Liu
-@contact: vladimir.liu@gmail.com
 """
 
 import os
@@ -87,7 +79,7 @@ def main():
         long_description = fh.read()
         
     setup(name="MACS2",
-          version="2.1.3.2",
+          version="2.1.3.3",
           description="Model Based Analysis for ChIP-Seq data",
           long_description = long_description,
           long_description_content_type="text/markdown",
@@ -95,7 +87,7 @@ def main():
           author_email='vladimir.liu@gmail.com',
           url='http://github.com/taoliu/MACS/',
           package_dir={'MACS2' : 'MACS2'},
-          packages=['MACS2', 'MACS2.IO', 'MACS2.data'],
+          packages=['MACS2', 'MACS2.IO'],
           #package_data={'MACS2': ['data/*.dat']},          
           scripts=['bin/macs2',
                    ],

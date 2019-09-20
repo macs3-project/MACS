@@ -1,5 +1,5 @@
 # INSTALL Guide For MACS
-Time-stamp: <2019-09-20 14:08:02 taoliu>
+Time-stamp: <2019-09-20 15:08:35 taoliu>
 
 Please check the following instructions to complete your installation.
 

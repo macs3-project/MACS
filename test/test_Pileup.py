@@ -1,18 +1,11 @@
 #!/usr/bin/env python
-# Time-stamp: <2019-08-09 14:59:54 taoliu>
+# Time-stamp: <2019-09-20 15:06:44 taoliu>
 
 """Module Description: Test functions for pileup functions.
 
-Copyright (c) 2019 Tao Liu <tao.liu@roswellpark.org>
-
 This code is free software; you can redistribute it and/or modify it
-under the terms of the BSD License (see the file COPYING included with
+under the terms of the BSD License (see the file LICENSE included with
 the distribution).
-
-@status:  experimental
-@version: $Revision$
-@author:  Tao Liu
-@contact: tao.liu@roswellpark.org
 """
 
 import unittest
