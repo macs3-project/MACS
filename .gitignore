@@ -10,6 +10,7 @@ test/*.bed
 
 test/log
 test/test*_run_*
+test/subcommandstest_run_*
 test/__pycache__
 
 .DS_Store

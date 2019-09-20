@@ -1,4 +1,4 @@
-# Time-stamp: <2019-09-20 11:33:53 taoliu>
+# Time-stamp: <2019-09-20 11:59:10 taoliu>
 
 """Description: MACS 2 main executable
 
@@ -24,6 +24,7 @@ from MACS2.OptValidator import opt_validate
 from MACS2.Prob import binomial_cdf_inv
 from MACS2.PeakModel import PeakModel,NotEnoughPairsException
 from MACS2.PeakDetect import PeakDetect
+from MACS2.OutputWriter import model2r_script
 from MACS2.Constants import *
 # ------------------------------------
 # Main function

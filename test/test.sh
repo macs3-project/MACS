@@ -153,14 +153,11 @@ echo "12.1 callpeak"
 macs2 callpeak -t $CHIPCONTIGS50K -n run_callpeak_50kcontigs -B --outdir ${TAG}_run_50kcontigs --buffer-size 1000 --nomodel --extsize 200 &> ${TAG}_run_50kcontigs/run_callpeak_50kcontigs.log
 
 echo "12.2 filterdup"
-macs2 callpeak -t $CHIPCONTIGS50K -n run_callpeak_50kcontigs -B --outdir ${TAG}_run_50kcontigs --buffer-size 1000 &> ${TAG}_run_50kcontigs/run_callpeak_50kcontigs.log
+macs2 filterdup -i $CHIPCONTIGS50K --outdir ${TAG}_run_50kcontigs -o run_filterdup_result.bed --buffer-size 1000 &> ${TAG}_run_50kcontigs/run_filterdup_50kcontigs.log
 
 echo "12.3 pileup"
 macs2 pileup -f BED -i $CHIPCONTIGS50K --extsize 200 --outdir ${TAG}_run_50kcontigs -o run_pileup_ChIP.bed.bdg --buffer-size 1000 &> ${TAG}_run_50kcontigs/run_pileup_ChIP.bed.log
 
-echo "12.4 predictd"
-macs2 predictd -i $CHIPCONTIGS50K --d-min 10 --outdir ${TAG}_run_50kcontigs --rfile run_predictd.R --buffer-size 1000 &> ${TAG}_run_50kcontigs/run_predictd.log
-
-echo "12.5 randsample"
+echo "12.4 randsample"
 macs2 randsample -i $CHIPCONTIGS50K -n 100000 --seed 31415926 --outdir ${TAG}_run_50kcontigs -o run_randsample.bed --buffer-size 1000 &> ${TAG}_run_50kcontigs/run_randsample.log
 

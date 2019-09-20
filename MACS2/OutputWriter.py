@@ -1,6 +1,6 @@
-# Time-stamp: <2019-09-20 11:23:41 taoliu>
+# Time-stamp: <2019-09-20 11:59:32 taoliu>
 
-"""Module Description: Functions to write file (obsolete)
+"""Module Description: Functions to write file
 
 This code is free software; you can redistribute it and/or modify it
 under the terms of the BSD License (see the file LICENSE included with
