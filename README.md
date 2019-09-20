@@ -1,6 +1,6 @@
-# Recent Changes for MACS (2.1.3.1)
+# Recent Changes for MACS (2.1.3.2)
 
-### 2.1.3.1
+### 2.1.3.2
 	* Features added
 
 	1) Support Docker auto-deploy. PR #309
@@ -72,7 +72,7 @@
 
     7) More spelling tweaks in source code. Thank @mr-c
 
-# README for MACS2 (2.1.3.1)
+# README for MACS2 (2.1.3.2)
 
 ## Introduction
 
