@@ -72,7 +72,7 @@
 
     7) More spelling tweaks in source code. Thank @mr-c
 
-# README for MACS2 (2.1.3)
+# README for MACS2 (2.1.3.1)
 
 ## Introduction
 
