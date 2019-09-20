@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# Time-stamp: <2019-09-20 13:49:13 taoliu>
+# Time-stamp: <2019-09-20 14:04:51 taoliu>
 
 """Description: 
 
@@ -29,6 +29,7 @@ try:
     command_classes['build_ext'] = Cython.Distutils.build_ext
     from Cython.Build import cythonize
     has_cython = True
+    # Note: if this script is run under pip, cython should be installed already due to requirements.txt setting.
 except:
     has_cython = False
 

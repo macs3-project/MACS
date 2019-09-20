@@ -1,22 +1,22 @@
 # INSTALL Guide For MACS
-Time-stamp: <2018-10-17 16:18:48 Tao Liu>
+Time-stamp: <2019-09-20 14:08:02 taoliu>
 
 Please check the following instructions to complete your installation.
 
 ## Prerequisites
 
 Python version must be equal to *2.7* to run MACS. I recommend
-using the version *2.7.9*.
+using the version *2.7.15*.
 
-[Numpy](http://www.scipy.org/Download) (>=1.6) are required to run MACS v2. 
+[Numpy](http://www.scipy.org/Download) (>=1.15) are required to run MACS v2. 
 
 GCC is required to compile `.c` codes in MACS v2 package, and python
 header files are needed. If you are using Mac OSX, I recommend you
 install Xcode; if you are using Linux, you need to make sure
 `python-dev` is installed.
 
-[Cython](http://cython.org/) (>=0.18) is required *only if* you want to regenerate `.c`
-files from `.pyx` files using `setup_w_cython.py` script.
+[Cython](http://cython.org/) (>=0.25) is required to generate `.c`
+files from `.pyx` files using `setup.py` script.
 
 ## Easy installation through PyPI
 
@@ -28,18 +28,11 @@ access to system-wide numpy and scipy libraries so that you don't need
 to install them again.  
 
 Then under command line, type `pip install MACS2`. PyPI will
-install Numpy and Scipy automatically if they are absent. 
+install Numpy and Cython automatically if they are absent. 
 
 To upgrade MACS2, type `pip install -U MACS2`. It will check
 currently installed MACS2, compare the version with the one on PyPI
 repository, download and install newer version while necessary.
-
-Note, if you do not want pip to fix dependencies. For example, you
-already have a workable Scipy and Numpy, and when 'pip install -U
-MACS2', pip downloads newest Scipy and Numpy but unable to compile and
-install them. This will fail the whole installation. You can pass
-'--no-deps' option to pip and let it skip all dependencies. Type
-`pip install -U --no-deps MACS2`.
 
 ## Install from source
 
@@ -65,15 +58,6 @@ directory, use this command:
 
  `$ python setup.py install --prefix /home/taoliu/`
 
-If you want to re-generate `.c` files from `.pyx` files, you need
-to install Cython first, then use `setup_w_cython.py` script to
-replace `setup.py` script in the previous commands, such as::
-
- `$ python setup_w_cython.py install`
-
-or:
-
-  `$ python setup_w_cython.py install --prefix /home/taoliu/`
 
 ## Configure enviroment variables
 
