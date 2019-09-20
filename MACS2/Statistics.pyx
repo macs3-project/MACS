@@ -1,3 +1,12 @@
+# Time-stamp: <2019-09-20 11:28:16 taoliu>
+
+"""Module Description: Statistics function wrappers.
+
+This code is free software; you can redistribute it and/or modify it
+under the terms of the BSD License (see the file LICENSE included with
+the distribution).
+"""
+
 from khash cimport *
 from libc.math cimport log10, log
 from MACS2.Prob import poisson_cdf

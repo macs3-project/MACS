@@ -1,4 +1,11 @@
-# Time-stamp: <2016-02-12 00:11:11 Tao Liu>
+# Time-stamp: <2019-09-20 11:30:00 taoliu>
+
+"""Description: compare bdg files
+
+This code is free software; you can redistribute it and/or modify it
+under the terms of the BSD License (see the file LICENSE included with
+the distribution).
+"""
 
 import sys
 import os

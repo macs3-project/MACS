@@ -1,17 +1,10 @@
-# Time-stamp: <2019-09-19 16:02:59 taoliu>
+# Time-stamp: <2019-09-20 11:59:26 taoliu>
 
-"""Description: Filter duplicate reads depending on sequencing depth.
-
-Copyright (c) 2011 Tao Liu <taoliu@jimmy.harvard.edu>
+"""Description: predict fragment size.
 
 This code is free software; you can redistribute it and/or modify it
-under the terms of the BSD License (see the file COPYING included
-with the distribution).
-
-@status: release candidate
-@version: $Id$
-@author:  Yong Zhang, Tao Liu
-@contact: taoliu@jimmy.harvard.edu
+under the terms of the BSD License (see the file LICENSE included with
+the distribution).
 """
 
 # ------------------------------------
@@ -26,9 +19,9 @@ import logging
 # own python modules
 # ------------------------------------
 from MACS2.OptValidator import opt_validate_predictd as opt_validate
-from MACS2.OutputWriter import *
 from MACS2.PeakModel import PeakModel,NotEnoughPairsException
 from MACS2.Prob import binomial_cdf_inv
+from MACS2.OutputWriter import model2r_script
 from MACS2.Constants import *
 # ------------------------------------
 # Main function
@@ -98,4 +91,3 @@ def load_tag_files_options ( options ):
 
     options.info("tag size is determined as %d bps" % options.tsize)
     return treat
-

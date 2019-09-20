@@ -1,17 +1,10 @@
-# Time-stamp: <2018-10-26 14:20:19 Tao Liu>
+# Time-stamp: <2019-09-20 11:40:07 taoliu>
 
 """Module for Feature IO classes.
 
-Copyright (c) 2010,2011,2012,2013 Tao Liu <vladimir.liu@gmail.com>
-
 This code is free software; you can redistribute it and/or modify it
-under the terms of the BSD License (see the file COPYING included
-with the distribution).
-
-@status:  experimental
-@version: $Revision$
-@author:  Tao Liu
-@contact: taoliu@jimmy.harvard.edu
+under the terms of the BSD License (see the file LICENSE included with
+the distribution).
 """
 
 # ------------------------------------

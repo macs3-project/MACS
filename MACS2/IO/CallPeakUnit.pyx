@@ -1,17 +1,10 @@
-# Time-stamp: <2016-05-19 10:22:22 Tao Liu>
+# Time-stamp: <2019-09-20 11:38:30 taoliu>
 
 """Module for Calculate Scores.
 
-Copyright (c) 2013 Tao Liu <vladimir.liu@gmail.com>
-
 This code is free software; you can redistribute it and/or modify it
-under the terms of the BSD License (see the file COPYING included
-with the distribution).
-
-@status:  experimental
-@version: $Revision$
-@author:  Tao Liu
-@contact: vladimir.liu@gmail.com
+under the terms of the BSD License (see the file LICENSE included with
+the distribution).
 """
 
 # ------------------------------------

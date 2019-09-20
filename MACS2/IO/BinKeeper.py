@@ -1,17 +1,10 @@
-# Time-stamp: <2011-03-14 17:52:00 Tao Liu>
+# Time-stamp: <2019-09-20 11:38:14 taoliu>
 
-"""Module Description: BinKeeper for Wiggle-like tracks.
-
-Copyright (c) 2008 Tao Liu <taoliu@jimmy.harvard.edu>
+"""Module Description: BinKeeper for Wiggle-like tracks. (obsolete)
 
 This code is free software; you can redistribute it and/or modify it
-under the terms of the BSD License (see the file COPYING included with
+under the terms of the BSD License (see the file LICENSE included with
 the distribution).
-
-@status:  experimental
-@version: $Revision$
-@author:  Tao Liu
-@contact: taoliu@jimmy.harvard.edu
 """
 
 # ------------------------------------

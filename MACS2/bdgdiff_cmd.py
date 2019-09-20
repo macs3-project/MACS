@@ -1,17 +1,10 @@
-# Time-stamp: <2015-03-05 13:46:31 Tao Liu>
+# Time-stamp: <2019-09-20 11:30:12 taoliu>
 
 """Description: Naive call differential peaks from 4 bedGraph tracks for scores.
 
-Copyright (c) 2011 Tao Liu <taoliu@jimmy.harvard.edu>
-
 This code is free software; you can redistribute it and/or modify it
-under the terms of the BSD License (see the file COPYING included with
+under the terms of the BSD License (see the file LICENSE included with
 the distribution).
-
-@status:  experimental
-@version: $Revision$
-@author:  Tao Liu
-@contact: taoliu@jimmy.harvard.edu
 """
 
 # ------------------------------------

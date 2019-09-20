@@ -1,17 +1,10 @@
-# Time-stamp: <2019-08-21 15:39:44 taoliu>
+# Time-stamp: <2019-09-20 11:28:51 taoliu>
 
-"""Module Description
-
-Copyright (c) 2008,2009,2010,2011 Hyunjin Shin, Tao Liu <taoliu@jimmy.harvard.edu>
+"""Module Description: statistics functions to calculate p-values
 
 This code is free software; you can redistribute it and/or modify it
-under the terms of the BSD License (see the file COPYING included with
+under the terms of the BSD License (see the file LICENSE included with
 the distribution).
-
-@status:  experimental
-@version: $Revision$
-@author:  Hyunjin Gene Shin, Tao Liu
-@contact: taoliu@jimmy.harvard.edu
 """
 
 # ------------------------------------

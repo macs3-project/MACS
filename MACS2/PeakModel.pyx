@@ -1,17 +1,10 @@
-# Time-stamp: <2019-08-22 12:03:17 taoliu>
+# Time-stamp: <2019-09-20 11:25:18 taoliu>
 
-"""Module Description
-
-Copyright (c) 2008,2009 Yong Zhang, Tao Liu <taoliu@jimmy.harvard.edu>
-Copyright (c) 2010-2019 Tao Liu <vladimir.liu@gmail.com>
+"""Module Description: Build shifting model
 
 This code is free software; you can redistribute it and/or modify it
-under the terms of the BSD License (see the file COPYING included
-with the distribution).
-
-@version: $Revision$
-@author:  Yong Zhang, Tao Liu
-@contact: vladimir.liu@gmail.com
+under the terms of the BSD License (see the file LICENSE included with
+the distribution).
 """
 import sys, time, random
 import numpy as np

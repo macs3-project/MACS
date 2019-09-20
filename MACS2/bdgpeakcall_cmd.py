@@ -1,17 +1,11 @@
-# Time-stamp: <2015-03-05 13:45:37 Tao Liu>
+# Time-stamp: <2019-09-20 11:30:45 taoliu>
 
-"""Description: Naive call peaks from a single bedGraph track for scores.
-
-Copyright (c) 2011 Tao Liu <taoliu@jimmy.harvard.edu>
+"""Description: Naive call peaks from a single bedGraph track for
+scores.
 
 This code is free software; you can redistribute it and/or modify it
-under the terms of the BSD License (see the file COPYING included with
+under the terms of the BSD License (see the file LICENSE included with
 the distribution).
-
-@status:  experimental
-@version: $Revision$
-@author:  Tao Liu
-@contact: taoliu@jimmy.harvard.edu
 """
 
 # ------------------------------------

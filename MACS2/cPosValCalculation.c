@@ -1,4 +1,9 @@
-//Time-stamp:
+/* Time-stamp: <2019-09-20 11:32:53 taoliu>
+
+ This code is free software; you can redistribute it and/or modify it
+ under the terms of the BSD License (see the file LICENSE included
+ with the distribution).
+*/
 
 #include <stdio.h>
 #include <stdlib.h>

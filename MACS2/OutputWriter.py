@@ -1,17 +1,10 @@
-# Time-stamp: <2012-10-02 17:14:25 Tao Liu>
+# Time-stamp: <2019-09-20 11:59:32 taoliu>
 
-"""Module Description
-
-Copyright (c) 2008,2009,2010,2011 Tao Liu <taoliu@jimmy.harvard.edu>
+"""Module Description: Functions to write file
 
 This code is free software; you can redistribute it and/or modify it
-under the terms of the BSD License (see the file COPYING included with
+under the terms of the BSD License (see the file LICENSE included with
 the distribution).
-
-@status:  experimental
-@version: $Revision$
-@author:  Tao Liu
-@contact: taoliu@jimmy.harvard.edu
 """
 
 # ------------------------------------

@@ -1,17 +1,10 @@
-# Time-stamp: <2019-09-19 15:58:02 taoliu>
+# Time-stamp: <2019-09-20 11:34:59 taoliu>
 
 """Description: Filter duplicate reads depending on sequencing depth.
 
-Copyright (c) 2011 Tao Liu <taoliu@jimmy.harvard.edu>
-
 This code is free software; you can redistribute it and/or modify it
-under the terms of the BSD License (see the file COPYING included
-with the distribution).
-
-@status: release candidate
-@version: $Id$
-@author:  Yong Zhang, Tao Liu
-@contact: taoliu@jimmy.harvard.edu
+under the terms of the BSD License (see the file LICENSE included with
+the distribution).
 """
 
 # ------------------------------------

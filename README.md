@@ -1,4 +1,41 @@
-# Recent Changes for MACS (2.1.2)
+# Recent Changes for MACS (2.1.3)
+
+### 2.1.3
+
+	* Features added
+
+	1) Support Docker auto-deploy. PR #309
+
+	2) Support Travis CI auto-testing, update unit-testing
+	scripts, and enable subcommand testing on small datasets.
+
+	3) Update README documents. #297 PR #306
+
+	4) `cmbreps` supports more than 2 replicates. Merged from PR #304
+	@Maarten-vd-Sande and PR #307 (our own chi-sq test code)
+
+	5) `--d-min` option is added in `callpeak` and `predictd`, to
+	exclude predictions of fragment size smaller than the given
+	value. Merged from PR #267 @shouldsee.
+
+	6) `--buffer-size` option is added in `predictd`, `filterdup`,
+	`pileup` and `refinepeak` subcommands. Users can use this option
+	to decrease memory usage while there are a large number of contigs
+	in the data. Also, now `callpeak`, `predictd`, `filterdup`,
+	`pileup` and `refinepeak` will suggest users to tweak
+	`--buffer-size` while catching a MemoryError. #313 PR #314
+
+	* Bugs fixed
+
+	1) #265 Fixed a bug where the pseudocount hasn't been applied
+	while calculating p-value score in ScoreTrack object.
+
+	2) Fixed bdgbroadcall so that it will report those broad peaks
+	without strong peak inside, a consistent behavior as `callpeak
+	--broad`.
+
+	3) Rename COPYING to LICENSE.
+
 
 ### 2.1.2
 
@@ -36,28 +73,14 @@
 
     7) More spelling tweaks in source code. Thank @mr-c
 
-### 2.1.1
-
-	* Retire the tag:rc. 
-
-	* Fixed spelling. Merged pull request #120. Thank @mr-c!
-
-	* Change filtering criteria for reading BAM/SAM files
-
-	Related to callpeak and filterdup commands. Now the
-	reads/alignments flagged with 1028 or 'PCR/Optical duplicate' will
-	still be read although MACS2 may decide them as duplicates
-	later. Related to old issue #33. Sorry I forgot to address it for
-	years!
-	
-# README for MACS (2.1.2)
+# README for MACS2 (2.1.3)
 
 ## Introduction
 
 With the improvement of sequencing techniques, chromatin
 immunoprecipitation followed by high throughput sequencing (ChIP-Seq)
 is getting popular to study genome-wide protein-DNA interactions. To
-address the lack of powerful ChIP-Seq analysis method, we present a
+address the lack of powerful ChIP-Seq analysis method, we presented a
 novel algorithm, named Model-based Analysis of ChIP-Seq (MACS), for
 identifying transcript factor binding sites. MACS captures the
 influence of genome complexity to evaluate the significance of
@@ -72,13 +95,16 @@ Please check the file 'INSTALL' in the distribution.
 
 ## Usage
 
-    `macs2 [-h] [--version]  {callpeak,filterdup,bdgpeakcall,bdgcmp,randsample,bdgdiff,bdgbroadcall}`
+```
+macs2 [-h] [--version]
+    {callpeak,bdgpeakcall,bdgbroadcall,bdgcmp,bdgopt,cmbreps,bdgdiff,filterdup,predictd,pileup,randsample,refinepeak}
+```
 
 Example for regular peak calling: `macs2 callpeak -t ChIP.bam -c Control.bam -f BAM -g hs -n test -B -q 0.01`
 
 Example for broad peak calling: `macs2 callpeak -t ChIP.bam -c Control.bam --broad -g hs --broad-cutoff 0.1`
 
-There are seven major functions available in MACS serving as sub-commands.
+There are twelve functions available in MAC2S serving as sub-commands.
 
 Subcommand | Description
 -----------|----------
@@ -152,6 +178,11 @@ The essential columns in BED format input are the 1st column
 `chromosome name`, the 2nd `start position`, the 3rd `end position`,
 and the 6th, `strand`.
 
+Note that, for BED format, the 6th column of strand information is
+required by MACS. And please pay attention that the coordinates in BED
+format is zero-based and half-open
+(http://genome.ucsc.edu/FAQ/FAQtracks#tracks1).
+
 ###### BAM/SAM
 
 If the format is BAM/SAM, please check the definition in
@@ -177,50 +208,12 @@ only contains the first three columns defining the chromosome name,
 left and right position of the fragment from Paired-end
 sequencing. Please note, this is NOT the same format used by BEDTOOLS,
 and BEDTOOLS version of BEDPE is actually not in a standard BED
-format.
+format. You can use MACS2 subcommand `randsample` to convert a BAM
+file containing paired-end information to a BEDPE format file:
 
-###### BOWTIE
-
-If the format is BOWTIE, you need to provide the ASCII bowtie output
-file with the suffix '.map'. Please note that, you need to make sure
-that in the bowtie output, you only keep one location for one
-read. Check the bowtie manual for detail if you want at
-(http://bowtie-bio.sourceforge.net/manual.shtml)
-
-Here is the definition for Bowtie output in ASCII characters I copied
-from the above webpage:
-
-1. Name of read that aligned
-2. Orientation of read in the alignment, '-' for reverse complement, '+'
-   otherwise
-3. Name of reference sequence where alignment occurs, or ordinal ID
-   if no name was provided
-4. 0-based offset into the forward reference strand where leftmost
-   character of the alignment occurs
-5. Read sequence (reverse-complemented if orientation is -)
-6. ASCII-encoded read qualities (reversed if orientation is -). The
-   encoded quality values are on the Phred scale and the encoding is
-   ASCII-offset by 33 (ASCII char !).
-7. Number of other instances where the same read aligns against the
-   same reference characters as were aligned against in this
-   alignment. This is not the number of other places the read aligns
-   with the same number of mismatches. The number in this column is
-   generally not a good proxy for that number (e.g., the number in
-   this column may be '0' while the number of other alignments with
-   the same number of mismatches might be large). This column was
-   previously described as "Reserved".
-8. Comma-separated list of mismatch descriptors. If there are no
-   mismatches in the alignment, this field is empty. A single
-   descriptor has the format offset:reference-base>read-base. The
-   offset is expressed as a 0-based offset from the high-quality (5')
-   end of the read.
-
-###### Notes
-
-For BED format, the 6th column of strand information is required by
-MACS. And please pay attention that the coordinates in BED format is
-zero-based and half-open
-(http://genome.ucsc.edu/FAQ/FAQtracks#tracks1).
+```
+macs2 randsample -i the_BAMPE_file.bam -f BAMPE -p 100 -o the_BEDPE_file.bed
+```
 
 ##### `-g/--gsize`
 
@@ -374,6 +367,20 @@ called from general procedure. It's highly recommended to detect
 adjacent binding events. While used, the output subpeaks of a big
 peak region will have the same peak boundaries, and different scores
 and peak summit positions.
+
+##### `--buffer-size`
+
+MACS uses a buffer size for incrementally increasing internal array
+size to store reads alignment information for each chromosome or
+contig. To increase the buffer size, MACS can run faster but will
+waste more memory if certain chromosome/contig only has very few
+reads. In most cases, the default value 100000 works fine. However, if
+there are large number of chromosomes/contigs in your alignment and
+reads per chromosome/contigs are few, it's recommended to specify a
+smaller buffer size in order to decrease memory usage (but it will
+take longer time to read alignment files). Minimum memory requested
+for reading an alignment file is about # of CHROMOSOME * BUFFER_SIZE *
+8 Bytes. DEFAULT: 100000
 
 #### Output files
 

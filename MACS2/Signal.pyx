@@ -1,3 +1,13 @@
+# Time-stamp: <2019-09-20 11:27:27 taoliu>
+
+"""Module Description: functions to find maxima minima or smooth the
+signal tracks.
+
+This code is free software; you can redistribute it and/or modify it
+under the terms of the BSD License (see the file LICENSE included with
+the distribution).
+"""
+
 # smoothing function 
 import numpy as np
 cimport numpy as np

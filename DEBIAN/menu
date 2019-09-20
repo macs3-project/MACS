@@ -1,2 +1,0 @@
-?package(macs2): section="Apps/Science" needs="text"\
-  title="Model-based Analysis for ChIP-Seq" command="/usr/bin/macs2"
