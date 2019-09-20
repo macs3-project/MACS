@@ -1,7 +1,6 @@
-# Recent Changes for MACS (2.1.3)
+# Recent Changes for MACS (2.1.3.1)
 
-### 2.1.3
-
+### 2.1.3.1
 	* Features added
 
 	1) Support Docker auto-deploy. PR #309
