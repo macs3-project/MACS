@@ -1,17 +1,10 @@
-# Time-stamp: <2019-09-19 16:03:21 taoliu>
+# Time-stamp: <2019-09-20 11:36:03 taoliu>
 
-"""Description: Filter duplicate reads depending on sequencing depth.
-
-Copyright (c) 2011 Tao Liu <taoliu@jimmy.harvard.edu>
+"""Description: Pileup alignment files
 
 This code is free software; you can redistribute it and/or modify it
-under the terms of the BSD License (see the file COPYING included
-with the distribution).
-
-@status: release candidate
-@version: $Id$
-@author:  Yong Zhang, Tao Liu
-@contact: taoliu@jimmy.harvard.edu
+under the terms of the BSD License (see the file LICENSE included with
+the distribution).
 """
 
 # ------------------------------------
@@ -26,7 +19,6 @@ import logging
 # own python modules
 # ------------------------------------
 from MACS2.OptValidator import opt_validate_pileup as opt_validate
-from MACS2.OutputWriter import *
 from MACS2.Pileup import pileup_and_write, pileup_and_write_pe
 from MACS2.Constants import *
 # ------------------------------------

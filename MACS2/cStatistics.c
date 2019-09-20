@@ -1,4 +1,9 @@
-//Time-stamp: <2014-07-29 17:01:45 Tao Liu>
+/* Time-stamp: <2019-09-20 11:33:14 taoliu>
+
+ This code is free software; you can redistribute it and/or modify it
+ under the terms of the BSD License (see the file LICENSE included
+ with the distribution).
+*/
 
 #include <math.h>
 

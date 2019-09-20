@@ -1,26 +1,15 @@
-# Time-stamp: <2018-10-02 16:23:24 Tao Liu>
+# Time-stamp: <2019-09-20 11:24:38 taoliu>
 
-"""Module Description
-
-Copyright (c) 2008,2009 Yong Zhang, Tao Liu <taoliu@jimmy.harvard.edu>
-Copyright (c) 2010,2011 Tao Liu <taoliu@jimmy.harvard.edu>
+"""Module Description: Detect peaks, main module
 
 This code is free software; you can redistribute it and/or modify it
-under the terms of the BSD License (see the file COPYING included
-with the distribution).
-
-@status:  experimental
-@version: $Revision$
-@author:  Yong Zhang, Tao Liu
-@contact: taoliu@jimmy.harvard.edu
+under the terms of the BSD License (see the file LICENSE included with
+the distribution).
 """
-#import os
-#from array import array
-#from copy import deepcopy
+
 from itertools import groupby
 from operator import itemgetter
 import io
-#import subprocess
 import gc                               # use garbage collectior
 
 from MACS2.IO.PeakIO import PeakIO

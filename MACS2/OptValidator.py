@@ -1,17 +1,10 @@
-# Time-stamp: <2019-08-22 12:09:56 taoliu>
+# Time-stamp: <2019-09-20 11:15:34 taoliu>
 
 """Module Description
 
-Copyright (c) 2010,2011 Tao Liu <taoliu@jimmy.harvard.edu>
-
 This code is free software; you can redistribute it and/or modify it
-under the terms of the BSD License (see the file COPYING included with
+under the terms of the BSD License (see the file LICENSE included with
 the distribution).
-
-@status:  experimental
-@version: $Revision$
-@author:  Tao Liu
-@contact: taoliu@jimmy.harvard.edu
 """
 
 # ------------------------------------

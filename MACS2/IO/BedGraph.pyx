@@ -1,16 +1,10 @@
-# Time-stamp: <2019-08-21 16:29:49 taoliu>
+# Time-stamp: <2019-09-20 11:37:21 taoliu>
 
 """Module for BedGraph data class.
 
-Copyright (c) 2010-2019 Tao Liu <vladimir.liu@gmail.com>
-
 This code is free software; you can redistribute it and/or modify it
-under the terms of the BSD License (see the file COPYING included
-with the distribution).
-
-@version: $Revision$
-@author:  Tao Liu
-@contact: vladimir.liu@gmail.com
+under the terms of the BSD License (see the file LICENSE included with
+the distribution).
 """
 
 # ------------------------------------

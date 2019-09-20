@@ -1,17 +1,10 @@
-# Time-stamp: <2019-09-19 16:02:20 taoliu>
+# Time-stamp: <2019-09-20 11:36:55 taoliu>
 
-"""Description: Filter duplicate reads depending on sequencing depth.
-
-Copyright (c) 2011 Tao Liu <taoliu@jimmy.harvard.edu>
+"""Description: refine peak summits
 
 This code is free software; you can redistribute it and/or modify it
-under the terms of the BSD License (see the file COPYING included
-with the distribution).
-
-@status: release candidate
-@version: $Id$
-@author:  Yong Zhang, Tao Liu
-@contact: taoliu@jimmy.harvard.edu
+under the terms of the BSD License (see the file LICENSE included with
+the distribution).
 """
 
 # ------------------------------------

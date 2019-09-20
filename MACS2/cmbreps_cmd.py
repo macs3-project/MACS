@@ -1,4 +1,11 @@
-# Time-stamp: <2015-03-05 13:47:22 Tao Liu>
+# Time-stamp: <2019-09-20 11:34:13 taoliu>
+
+"""Description: combine replicates
+
+This code is free software; you can redistribute it and/or modify it
+under the terms of the BSD License (see the file LICENSE included with
+the distribution).
+"""
 
 import sys
 import os

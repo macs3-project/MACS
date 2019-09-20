@@ -1,17 +1,10 @@
-# Time-stamp: <2018-10-24 17:14:57 Tao Liu>
+# Time-stamp: <2019-09-20 11:38:45 taoliu>
 
 """Module for FWTrack classes.
 
-Copyright (c) 2010,2011 Tao Liu <taoliu@jimmy.harvard.edu>
-
 This code is free software; you can redistribute it and/or modify it
-under the terms of the BSD License (see the file COPYING included
-with the distribution).
-
-@status:  experimental
-@version: $Revision$
-@author:  Tao Liu
-@contact: taoliu@jimmy.harvard.edu
+under the terms of the BSD License (see the file LICENSE included with
+the distribution).
 """
 
 # ------------------------------------

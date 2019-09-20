@@ -1,17 +1,10 @@
-# Time-stamp: <2015-03-13 12:50:14 Tao Liu>
+# Time-stamp: <2019-09-20 11:37:42 taoliu>
 
 """Module Description:  IO Module for bedGraph file
 
-Copyright (c) 2011 Tao Liu <taoliu@jimmy.harvard.edu>
-
 This code is free software; you can redistribute it and/or modify it
-under the terms of the BSD License (see the file COPYING included with
+under the terms of the BSD License (see the file LICENSE included with
 the distribution).
-
-@status:  experimental
-@version: $Revision$
-@author:  Tao Liu
-@contact: taoliu@jimmy.harvard.edu
 """
 
 # ------------------------------------

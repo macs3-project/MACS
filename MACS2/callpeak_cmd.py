@@ -1,18 +1,10 @@
-# Time-stamp: <2018-10-15 12:34:16 Tao Liu>
+# Time-stamp: <2019-09-20 11:33:53 taoliu>
 
 """Description: MACS 2 main executable
 
-Copyright (c) 2008,2009 Yong Zhang, Tao Liu <taoliu@jimmy.harvard.edu>
-Copyright (c) 2010,2011 Tao Liu <taoliu@jimmy.harvard.edu>
-
 This code is free software; you can redistribute it and/or modify it
-under the terms of the BSD License (see the file COPYING included
-with the distribution).
-
-@status: release candidate
-@version: $Id$
-@author:  Yong Zhang, Tao Liu
-@contact: taoliu@jimmy.harvard.edu
+under the terms of the BSD License (see the file LICENSE included with
+the distribution).
 """
 
 # ------------------------------------
@@ -29,7 +21,6 @@ import tempfile
 # own python modules
 # ------------------------------------
 from MACS2.OptValidator import opt_validate
-from MACS2.OutputWriter import *
 from MACS2.Prob import binomial_cdf_inv
 from MACS2.PeakModel import PeakModel,NotEnoughPairsException
 from MACS2.PeakDetect import PeakDetect

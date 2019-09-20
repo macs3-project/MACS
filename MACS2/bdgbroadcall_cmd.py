@@ -1,17 +1,12 @@
-# Time-stamp: <2015-03-05 13:45:50 Tao Liu>
+# Time-stamp: <2019-09-20 11:29:19 taoliu>
 
-"""Description: Fine-tuning script to call broad peaks from a single bedGraph track for scores.
-
-Copyright (c) 2011 Tao Liu <taoliu@jimmy.harvard.edu>
+"""Description: Fine-tuning script to call broad peaks from a single
+bedGraph track for scores.
 
 This code is free software; you can redistribute it and/or modify it
-under the terms of the BSD License (see the file COPYING included with
+under the terms of the BSD License (see the file LICENSE included with
 the distribution).
 
-@status:  experimental
-@version: $Revision$
-@author:  Tao Liu
-@contact: taoliu@jimmy.harvard.edu
 """
 
 # ------------------------------------

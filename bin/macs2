@@ -1,19 +1,11 @@
 #!/usr/bin/env python
-# Time-stamp: <2019-09-19 16:50:13 taoliu>
+# Time-stamp: <2019-09-20 11:20:49 taoliu>
 
 """Description: MACS v2 main executable.
 
-Copyright (c) 2008,2009 Yong Zhang, Tao Liu <taoliu@jimmy.harvard.edu>
-Copyright (c) 2010,2011,2012,2013,2014,2015 Tao Liu <taoliu@jimmy.harvard.edu>
-
 This code is free software; you can redistribute it and/or modify it
-under the terms of the BSD License (see the file COPYING included with
+under the terms of the BSD License (see the file LICENSE included with
 the distribution).
-
-@status: release candidate
-@version: $Id$
-@author:  Yong Zhang, Tao Liu
-@contact: taoliu@jimmy.harvard.edu
 """
 
 # ------------------------------------
@@ -298,7 +290,7 @@ def add_callpeak_parser( subparsers ):
     # other options
     group_other = argparser_callpeak.add_argument_group( "Other options" )
     group_other.add_argument( "--buffer-size", dest = "buffer_size", type = int, default = "100000",
-                                  help = "Buffer size for incrementally increasing internal array size to store reads alignment information. In most cases, you don't have to change this parameter. However, if there are large number of chromosomes/contigs/scaffolds in your alignment, it's recommended to specify a smaller buffer size in order to decrease memory usage (but it will take longer time to read alignment files). Minimum memory requested for reading an alignment file is about # of CHROMOSOME * BUFFER_SIZE * 2 Bytes. DEFAULT: 100000 " )
+                                  help = "Buffer size for incrementally increasing internal array size to store reads alignment information. In most cases, you don't have to change this parameter. However, if there are large number of chromosomes/contigs/scaffolds in your alignment, it's recommended to specify a smaller buffer size in order to decrease memory usage (but it will take longer time to read alignment files). Minimum memory requested for reading an alignment file is about # of CHROMOSOME * BUFFER_SIZE * 8 Bytes. DEFAULT: 100000 " )
     
     # obsolete options
     group_obsolete = argparser_callpeak.add_argument_group( "Obsolete options" )
@@ -385,7 +377,7 @@ def add_filterdup_parser( subparsers ):
     argparser_filterdup.add_argument( "--keep-dup", dest = "keepduplicates", type = str, default = "auto",
                                       help = "It controls the '%(prog)s' behavior towards duplicate tags/pairs at the exact same location -- the same coordination and the same strand. The 'auto' option makes '%(prog)s' calculate the maximum tags at the exact same location based on binomal distribution using given -p as pvalue cutoff; and the 'all' option keeps every tags (useful if you only want to convert formats). If an integer is given, at most this number of tags will be kept at the same location. Note, MACS2 callpeak function uses KEEPDUPLICATES=1 as default. Note, if you've used samtools or picard to flag reads as 'PCR/Optical duplicate' in bit 1024, MACS2 will still read them although the reads may be decided by MACS2 as duplicate later. Default: auto" )
     argparser_filterdup.add_argument( "--buffer-size", dest = "buffer_size", type = int, default = "100000",
-                                      help = "Buffer size for incrementally increasing internal array size to store reads alignment information. In most cases, you don't have to change this parameter. However, if there are large number of chromosomes/contigs/scaffolds in your alignment, it's recommended to specify a smaller buffer size in order to decrease memory usage (but it will take longer time to read alignment files). Minimum memory requested for reading an alignment file is about # of CHROMOSOME * BUFFER_SIZE * 2 Bytes. DEFAULT: 100000 " )
+                                      help = "Buffer size for incrementally increasing internal array size to store reads alignment information. In most cases, you don't have to change this parameter. However, if there are large number of chromosomes/contigs/scaffolds in your alignment, it's recommended to specify a smaller buffer size in order to decrease memory usage (but it will take longer time to read alignment files). Minimum memory requested for reading an alignment file is about # of CHROMOSOME * BUFFER_SIZE * 8 Bytes. DEFAULT: 100000 " )
     
     argparser_filterdup.add_argument( "--verbose", dest = "verbose", type = int, default = 2,
                                       help = "Set verbose level. 0: only show critical message, 1: show additional warning message, 2: show process information, 3: show debug messages. If you want to know where are the duplicate reads, use 3. DEFAULT:2" )
@@ -529,7 +521,7 @@ def add_randsample_parser( subparsers ):
                                        help = "Format of tag file, \"AUTO\", \"BED\" or \"ELAND\" or \"ELANDMULTI\" or \"ELANDEXPORT\" or \"SAM\" or \"BAM\" or \"BOWTIE\" or \"BAMPE\" or \"BEDPE\". The default AUTO option will %(prog)s decide which format the file is. Please check the definition in README file if you choose ELAND/ELANDMULTI/ELANDEXPORT/SAM/BAM/BOWTIE or BAMPE/BEDPE. DEFAULT: \"AUTO\"",
                                        default = "AUTO" )
     argparser_randsample.add_argument( "--buffer-size", dest = "buffer_size", type = int, default = "100000",
-                                       help = "Buffer size for incrementally increasing internal array size to store reads alignment information. In most cases, you don't have to change this parameter. However, if there are large number of chromosomes/contigs/scaffolds in your alignment, it's recommended to specify a smaller buffer size in order to decrease memory usage (but it will take longer time to read alignment files). Minimum memory requested for reading an alignment file is about # of CHROMOSOME * BUFFER_SIZE * 2 Bytes. DEFAULT: 100000 " )
+                                       help = "Buffer size for incrementally increasing internal array size to store reads alignment information. In most cases, you don't have to change this parameter. However, if there are large number of chromosomes/contigs/scaffolds in your alignment, it's recommended to specify a smaller buffer size in order to decrease memory usage (but it will take longer time to read alignment files). Minimum memory requested for reading an alignment file is about # of CHROMOSOME * BUFFER_SIZE * 8 Bytes. DEFAULT: 100000 " )
     
     argparser_randsample.add_argument( "--verbose", dest = "verbose", type = int, default = 2,
                                        help = "Set verbose level. 0: only show critical message, 1: show additional warning message, 2: show process information, 3: show debug messages. If you want to know where are the duplicate reads, use 3. DEFAULT:2" )
@@ -582,7 +574,7 @@ def add_refinepeak_parser( subparsers ):
     argparser_refinepeak.add_argument( "-w", "--window-size", dest= "windowsize", help = 'Scan window size on both side of the summit (default: 100bp)',
                                         type = int, default = 200)
     argparser_refinepeak.add_argument( "--buffer-size", dest = "buffer_size", type = int, default = "100000",
-                                       help = "Buffer size for incrementally increasing internal array size to store reads alignment information. In most cases, you don't have to change this parameter. However, if there are large number of chromosomes/contigs/scaffolds in your alignment, it's recommended to specify a smaller buffer size in order to decrease memory usage (but it will take longer time to read alignment files). Minimum memory requested for reading an alignment file is about # of CHROMOSOME * BUFFER_SIZE * 2 Bytes. DEFAULT: 100000 " )
+                                       help = "Buffer size for incrementally increasing internal array size to store reads alignment information. In most cases, you don't have to change this parameter. However, if there are large number of chromosomes/contigs/scaffolds in your alignment, it's recommended to specify a smaller buffer size in order to decrease memory usage (but it will take longer time to read alignment files). Minimum memory requested for reading an alignment file is about # of CHROMOSOME * BUFFER_SIZE * 8 Bytes. DEFAULT: 100000 " )
     
     argparser_refinepeak.add_argument( "--verbose", dest = "verbose", type = int, default = 2,
                                        help = "Set verbose level. 0: only show critical message, 1: show additional warning message, 2: show process information, 3: show debug messages. If you want to know where are the duplicate reads, use 3. DEFAULT:2" )
@@ -621,7 +613,7 @@ def add_predictd_parser( subparsers ):
     argparser_predictd.add_argument( "--rfile", dest = "rfile", type = str, default = "predictd",
                                      help = "PREFIX of filename of R script for drawing X-correlation figure. DEFAULT:'predictd' and R file will be predicted_model.R" )
     argparser_predictd.add_argument( "--buffer-size", dest = "buffer_size", type = int, default = "100000",
-                                     help = "Buffer size for incrementally increasing internal array size to store reads alignment information. In most cases, you don't have to change this parameter. However, if there are large number of chromosomes/contigs/scaffolds in your alignment, it's recommended to specify a smaller buffer size in order to decrease memory usage (but it will take longer time to read alignment files). Minimum memory requested for reading an alignment file is about # of CHROMOSOME * BUFFER_SIZE * 2 Bytes. DEFAULT: 100000 " )    
+                                     help = "Buffer size for incrementally increasing internal array size to store reads alignment information. In most cases, you don't have to change this parameter. However, if there are large number of chromosomes/contigs/scaffolds in your alignment, it's recommended to specify a smaller buffer size in order to decrease memory usage (but it will take longer time to read alignment files). Minimum memory requested for reading an alignment file is about # of CHROMOSOME * BUFFER_SIZE * 8 Bytes. DEFAULT: 100000 " )    
 
     argparser_predictd.add_argument( "--verbose", dest = "verbose", type = int, default = 2,
                                      help = "Set verbose level of runtime message. 0: only show critical message, 1: show additional warning message, 2: show process information, 3: show debug messages. DEFAULT:2" )
@@ -646,7 +638,7 @@ def add_pileup_parser( subparsers ):
     argparser_pileup.add_argument( "--extsize", dest = "extsize", type = int, default = 200,
                                    help = "The extension size in bps. Each alignment read will become a EXTSIZE of fragment, then be piled up. Check description for -B for detail. It's twice the `shiftsize` in old MACSv1 language. This option will be ignored when the format is set as BAMPE or BEDPE. DEFAULT: 200 " )
     argparser_pileup.add_argument( "--buffer-size", dest = "buffer_size", type = int, default = "100000",
-                                   help = "Buffer size for incrementally increasing internal array size to store reads alignment information. In most cases, you don't have to change this parameter. However, if there are large number of chromosomes/contigs/scaffolds in your alignment, it's recommended to specify a smaller buffer size in order to decrease memory usage (but it will take longer time to read alignment files). Minimum memory requested for reading an alignment file is about # of CHROMOSOME * BUFFER_SIZE * 2 Bytes. DEFAULT: 100000 " )
+                                   help = "Buffer size for incrementally increasing internal array size to store reads alignment information. In most cases, you don't have to change this parameter. However, if there are large number of chromosomes/contigs/scaffolds in your alignment, it's recommended to specify a smaller buffer size in order to decrease memory usage (but it will take longer time to read alignment files). Minimum memory requested for reading an alignment file is about # of CHROMOSOME * BUFFER_SIZE * 8 Bytes. DEFAULT: 100000 " )
     
     argparser_pileup.add_argument( "--verbose", dest = "verbose", type = int, default = 2,
                                       help = "Set verbose level. 0: only show critical message, 1: show additional warning message, 2: show process information, 3: show debug messages. If you want to know where are the duplicate reads, use 3. DEFAULT:2" )

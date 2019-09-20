@@ -1,17 +1,10 @@
-# Time-stamp: <2018-10-15 11:59:09 Tao Liu>
+# Time-stamp: <2019-09-20 11:26:17 taoliu>
 
 """Module Description: For pileup functions.
 
-Copyright (c) 2011 Tao Liu <taoliu@jimmy.harvard.edu>
-
 This code is free software; you can redistribute it and/or modify it
-under the terms of the BSD License (see the file COPYING included with
+under the terms of the BSD License (see the file LICENSE included with
 the distribution).
-
-@status:  experimental
-@version: $Revision$
-@author:  Tao Liu
-@contact: taoliu@jimmy.harvard.edu
 """
 
 # ------------------------------------
