@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# Time-stamp: <2019-09-24 14:40:36 taoliu>
+# Time-stamp: <2019-09-24 14:42:18 taoliu>
 
 """Description: 
 
@@ -30,8 +30,7 @@ try:
     numpy_include_dir = [numpy_get_include()]
 except:
     numpy_include_dir = []
-    sys.stderr.write("CRITICAL:Numpy must be installed!\n")
-    sys.exit(1)
+
 
 def main():
     if float(sys.version[:3])<2.7 or float(sys.version[:3])>=2.8:
@@ -57,6 +56,9 @@ def main():
                        Extension("MACS2.IO.CallPeakUnit", ["MACS2/IO/CallPeakUnit.pyx"], include_dirs=numpy_include_dir, extra_compile_args=extra_c_args),
                        Extension("MACS2.hashtable", ["MACS2/hashtable.pyx"], include_dirs=["MACS2/",numpy_get_include()], extra_compile_args=extra_c_args),
                        Extension("MACS2.Statistics", ["MACS2/Statistics.pyx"], libraries=["m"], include_dirs=["MACS2/",numpy_get_include()], extra_compile_args=extra_c_args),
+                       Extension("MACS2.ComputePileups", ["MACS2/ComputePileups.pyx"], extra_compile_args=extra_c_args),#added
+                       Extension("MACS2.IO.PileupUnit", ["MACS2/IO/PileupUnit.pyx"], include_dirs=numpy_include_dir, extra_compile_args=extra_c_args), #added
+                       Extension("MACS2.IO.CallPeakUnitPrecompiled", ["MACS2/IO/CallPeakUnitPrecompiled.pyx"], include_dirs=numpy_include_dir, extra_compile_args=extra_c_args),#added
                        ]
     else:
         ext_modules = [Extension("MACS2.Prob", ["MACS2/Prob.c"], libraries=["m"], include_dirs=numpy_include_dir, extra_compile_args=extra_c_args ),
@@ -66,7 +68,7 @@ def main():
                        Extension("MACS2.PeakDetect", ["MACS2/PeakDetect.c"], extra_compile_args=extra_c_args),
                        Extension("MACS2.Signal", ["MACS2/Signal.c"], include_dirs=numpy_include_dir, extra_compile_args=extra_c_args),
                        Extension("MACS2.IO.PeakIO", ["MACS2/IO/PeakIO.c"], extra_compile_args=extra_c_args),
-                       Extension("MACS2.IO.BedGraphIO", ["MACS2/IO/BedGraphIO.c"], extra_compile_args=extra_c_args),                   
+                       Extension("MACS2.IO.BedGraphIO", ["MACS2/IO/BedGraphIO.c"], extra_compile_args=extra_c_args),
                        Extension("MACS2.IO.FixWidthTrack", ["MACS2/IO/FixWidthTrack.c"], include_dirs=numpy_include_dir, extra_compile_args=extra_c_args),
                        Extension("MACS2.IO.PairedEndTrack", ["MACS2/IO/PairedEndTrack.c"], include_dirs=numpy_include_dir, extra_compile_args=extra_c_args),
                        Extension("MACS2.IO.BedGraph", ["MACS2/IO/BedGraph.c"], libraries=["m"], extra_compile_args=extra_c_args),
@@ -74,6 +76,9 @@ def main():
                        Extension("MACS2.IO.CallPeakUnit", ["MACS2/IO/CallPeakUnit.c"], include_dirs=numpy_include_dir, extra_compile_args=extra_c_args),
                        Extension("MACS2.hashtable", ["MACS2/hashtable.c"], include_dirs=["MACS2/",numpy_get_include()], extra_compile_args=extra_c_args),
                        Extension("MACS2.Statistics", ["MACS2/Statistics.c", "MACS2/cStatistics.c"], libraries=["m"], include_dirs=["MACS2/",numpy_get_include()], extra_compile_args=extra_c_args),
+                       Extension("MACS2.ComputePileups", ["MACS2/ComputePileups.c"], extra_compile_args=extra_c_args),#added
+                       Extension("MACS2.IO.PileupUnit", ["MACS2/IO/PileupUnit.c"], include_dirs=numpy_include_dir, extra_compile_args=extra_c_args), #added
+                       Extension("MACS2.IO.CallPeakUnitPrecompiled", ["MACS2/IO/CallPeakUnitPrecompiled.c"], include_dirs=numpy_include_dir, extra_compile_args=extra_c_args), #added           
                        ]
 
     with open("README.md", "r") as fh:
