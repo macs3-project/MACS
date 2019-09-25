@@ -1,4 +1,4 @@
-# Time-stamp: <2019-09-25 10:49:06 taoliu>
+# Time-stamp: <2019-09-25 12:27:01 taoliu>
 
 """Description: Naive call differential peaks from 4 bedGraph tracks for scores.
 
@@ -97,8 +97,8 @@ def run( options ):
                    os.path.join( options.outdir, "%s_c%.1f_cond2.bed" % (options.oprefix,options.cutoff)),
                    os.path.join( options.outdir, "%s_c%.1f_common.bed" % (options.oprefix,options.cutoff))
                    ]
-        name_prefix = [ x.encode() for x in [ options.oprefix+"_cond1_", options.oprefix+"_cond2_", options.oprefix+"_common_",]]
-    
+        name_prefix = [ x.encode() for x in [ options.oprefix+"_cond1_", options.oprefix+"_cond2_", options.oprefix+"_common_" ]]
+
     nf = open( ofiles[ 0 ], 'w' )
     cat1.write_to_bed(nf, name_prefix=name_prefix[ 0 ], name=b"condition 1", description=b"unique regions in condition 1", score_column="score")
     nf.close()
@@ -111,5 +111,4 @@ def run( options ):
     cat3.write_to_bed(nf, name_prefix=name_prefix[ 2 ], name=b"common", description=b"common regions in both conditions", score_column="score")
     nf.close()
     info("Done")
-
 

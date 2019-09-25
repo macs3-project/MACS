@@ -1,4 +1,4 @@
-# Time-stamp: <2019-09-25 10:21:04 taoliu>
+# Time-stamp: <2019-09-25 12:42:53 taoliu>
 
 """Module for BedGraph data class.
 
@@ -227,7 +227,7 @@ cdef class bedGraphTrackI:
         l = set(self.__data.keys())
         return l
 
-    def write_bedGraph (self, fhd, bytes name, bytes description, bool trackline=True):
+    def write_bedGraph (self, fhd, str name, str description, bool trackline=True):
         """Write all data to fhd in Wiggle Format.
 
         fhd: a filehandler to save bedGraph.
@@ -241,8 +241,8 @@ cdef class bedGraphTrackI:
             bytes chrom
         
         if trackline:
-            trackcontents = (name.replace(b"\"", b"\\\""), description.replace(b"\"", b"\\\""))
-            fhd.write("track type=bedGraph name=\"%s\" description=\"%s\" visibility=2 alwaysZero=on\n" % trackcontents.decode())
+            trackcontents = (name.replace("\"", "\\\""), description.replace("\"", "\\\""))
+            fhd.write("track type=bedGraph name=\"%s\" description=\"%s\" visibility=2 alwaysZero=on\n" % trackcontents)
         chrs = self.get_chr_names()
         for chrom in chrs:
             (p,v) = self.__data[chrom]
