@@ -13,19 +13,11 @@ TAG=$1
 CHIP=CTCF_SE_ChIP_chr22_50k.bed.gz
 CTRL=CTCF_SE_CTRL_chr22_50k.bed.gz
 
-<<<<<<< HEAD
 CHIPPE=CTCF_PE_ChIP_chr22_50k.bam
 CTRLPE=CTCF_PE_CTRL_chr22_50k.bam
 
 CHIPBEDPE=CTCF_PE_ChIP_chr22_50k.bedpe.gz
 CTRLBEDPE=CTCF_PE_CTRL_chr22_50k.bedpe.gz
-=======
-CHIPPE=CTCF_PE_ChIP_chr22.bam
-CTRLPE=CTCF_PE_CTRL_chr22.bam
-
-CHIPBEDPE=CTCF_PE_ChIP_chr22.bedpe
-CTRLBEDPE=CTCF_PE_CTRL_chr22.bedpe
->>>>>>> fix strange issue in bdgdiff when o-prefix is used score column will show weird large values. fix cmbreps and BedGraph for py3
 
 CHIPCONTIGS50K=contigs50k.bed.gz
 
