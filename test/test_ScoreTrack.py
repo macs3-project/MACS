@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# Time-stamp: <2019-08-12 10:44:22 taoliu>
+# Time-stamp: <2019-09-25 14:44:07 taoliu>
 
 import unittest
 import StringIO
@@ -7,6 +7,38 @@ from numpy.testing import assert_equal,  assert_almost_equal, assert_array_equal
 
 from MACS2.IO.ScoreTrack import *
 
+class Test_TwoConditionScores(unittest.TestCase):
+
+    def setUp(self):
+        self.t1bdg = bedGraphTrackI()
+        self.t2bdg = bedGraphTrackI()
+        self.c1bdg = bedGraphTrackI()
+        self.c2bdg = bedGraphTrackI()
+        self.test_regions1 = [("chrY",0,70,0.00,0.01),
+                              ("chrY",70,80,7.00,0.5),
+                              ("chrY",80,150,0.00,0.02)]
+        self.test_regions2 = [("chrY",0,75,20.0,4.00),
+                              ("chrY",75,90,35.0,6.00),
+                              ("chrY",90,150,10.0,15.00)]
+        for a in self.test_regions1:
+            self.t1bdg.safe_add_loc(a[0],a[1],a[2],a[3])
+            self.c1bdg.safe_add_loc(a[0],a[1],a[2],a[4])
+
+        for a in self.test_regions2:
+            self.t2bdg.safe_add_loc(a[0],a[1],a[2],a[3])
+            self.c2bdg.safe_add_loc(a[0],a[1],a[2],a[4])
+
+        self.twoconditionscore = ScoreTrack.TwoConditionScores( self.t1bdg,
+                                                                self.c1bdg,
+                                                                self.t2bdg,
+                                                                self.c2bdg,
+                                                                1.0,
+                                                                1.0 )
+        self.twoconditionscore.build()
+        self.twoconditionscore.finalize()
+        (self.cat1,self.cat2,self.cat3) = twoconditionscore.call_peaks(min_length=10, max_gap=10, cutoff=3)
+
+            
 class Test_ScoreTrackII(unittest.TestCase):
 
     def setUp(self):

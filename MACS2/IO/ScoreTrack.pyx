@@ -1,4 +1,4 @@
-# Time-stamp: <2019-09-20 11:40:07 taoliu>
+# Time-stamp: <2019-09-25 16:45:58 taoliu>
 
 """Module for Feature IO classes.
 
@@ -1705,6 +1705,8 @@ cdef class TwoConditionScores:
                       bool call_summits=False):
         """This function try to find regions within which, scores
         are continuously higher than a given cutoff.
+
+        For bdgdiff.
 
         This function is NOT using sliding-windows. Instead, any
         regions in bedGraph above certain cutoff will be detected,

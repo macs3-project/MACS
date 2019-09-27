@@ -31,14 +31,29 @@ jobs:
         flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics
         # exit-zero treats all errors as warnings. The GitHub editor is 127 chars wide
         flake8 . --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
+    - name: Install MACS2
+      run: |
+        python setup.py install
     - name: Test with pytest
       run: |
         pip install pytest
         pytest
-    - name: Test with test.sh
+    - name: Test with small data files
       run: |
         cd test
         ./test.sh subcommandtest
         flag=1;for i in `ls subcommandstest_run_*/*.log`;do echo $i;egrep -i "error|warning" $i;let "flag&=$?";done;if [[ $flag == 0 ]];then false;fi
         cd ..
-        
+    - name: Build sdist
+      run: |
+        python setup sdist
+    - name: Publish distribution to Test PyPI
+      uses: pypa/gh-action-pypi-publish@master
+      with:
+        password: ${{ secrets.test_pypi_password }}
+        repository_url: https://test.pypi.org/legacy/
+    - name: Publish distribution to PyPI
+      if: startsWith(github.event.ref, 'refs/tags')
+      uses: pypa/gh-action-pypi-publish@master
+      with:
+        password: ${{ secrets.pypi_password }}
