@@ -1,4 +1,4 @@
-# Time-stamp: <2019-09-20 11:38:30 taoliu>
+# Time-stamp: <2019-09-30 13:05:38 taoliu>
 
 """Module for Calculate Scores.
 
@@ -201,12 +201,13 @@ cdef float median_from_value_length ( np.ndarray value, list length ):
         list tmp
         int32_t l_half, c, tmp_l
         float tmp_v
-    
+
+    c = 0
     tmp = sorted(zip( value, length ))
-    l = sum( length )/2
+    l_half = sum( length )/2
     for (tmp_v, tmp_l) in tmp:
         c += tmp_l
-        if c > l:
+        if c > l_half:
             return tmp_v
 
 cdef float mean_from_value_length ( np.ndarray value, list length ):
@@ -215,7 +216,7 @@ cdef float mean_from_value_length ( np.ndarray value, list length ):
     """
     cdef:
         list tmp
-        int32_t tmp_l
+        int32_t tmp_l, l
         float tmp_v, sum_v
 
     sum_v = 0
