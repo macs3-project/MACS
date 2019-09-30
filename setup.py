@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# Time-stamp: <2019-09-20 15:08:11 taoliu>
+# Time-stamp: <2019-09-30 13:38:06 taoliu>
 
 """Description: 
 
@@ -57,6 +57,7 @@ def main():
                        Extension("MACS2.hashtable", ["MACS2/hashtable.pyx"], include_dirs=["MACS2/",numpy_get_include()], extra_compile_args=extra_c_args),
                        Extension("MACS2.Statistics", ["MACS2/Statistics.pyx"], libraries=["m"], include_dirs=["MACS2/",numpy_get_include()], extra_compile_args=extra_c_args),
                        ]
+        ext_modules = cythonize(ext_modules, language_level=2)
     else:
         ext_modules = [Extension("MACS2.Prob", ["MACS2/Prob.c"], libraries=["m"], include_dirs=numpy_include_dir, extra_compile_args=extra_c_args ),
                        Extension("MACS2.IO.Parser",["MACS2/IO/Parser.c"], include_dirs=numpy_include_dir, extra_compile_args=extra_c_args),
@@ -79,7 +80,7 @@ def main():
         long_description = fh.read()
         
     setup(name="MACS2",
-          version="2.1.3.3",
+          version="2.1.4",
           description="Model Based Analysis for ChIP-Seq data",
           long_description = long_description,
           long_description_content_type="text/markdown",
@@ -88,7 +89,6 @@ def main():
           url='http://github.com/taoliu/MACS/',
           package_dir={'MACS2' : 'MACS2'},
           packages=['MACS2', 'MACS2.IO'],
-          #package_data={'MACS2': ['data/*.dat']},          
           scripts=['bin/macs2',
                    ],
           classifiers=[
@@ -105,10 +105,9 @@ def main():
               ],
           install_requires=[
               'numpy>=1.15',
-              'cython>=0.25',
               ],
           cmdclass = command_classes,
-          ext_modules = cythonize(ext_modules, language_level="2")
+          ext_modules = ext_modules
           )
 
 if __name__ == '__main__':

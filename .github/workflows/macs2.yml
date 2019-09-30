@@ -46,7 +46,7 @@ jobs:
         cd ..
     - name: Build sdist
       run: |
-        python setup sdist
+        python setup.py sdist
     - name: Publish distribution to Test PyPI
       uses: pypa/gh-action-pypi-publish@master
       with:
