@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# Time-stamp: <2019-09-30 14:48:10 taoliu>
+# Time-stamp: <2019-09-30 16:57:18 taoliu>
 
 """Description: 
 
@@ -10,7 +10,6 @@ under the terms of the BSD License (see the file LICENSE included with
 the distribution).
 """
 
-import os
 import sys
 from setuptools import setup, Extension
 
@@ -22,14 +21,14 @@ try:
     from Cython.Build import cythonize
     has_cython = True
     # Note: if this script is run under pip, cython should be installed already due to requirements.txt setting.
-except:
+except ImportError:
     has_cython = False
 
 try: 
-    from numpy import get_include as numpy_get_include 
-    numpy_include_dir = [numpy_get_include()] 
-except: 
-    numpy_include_dir = [] 
+    from numpy import get_include as numpy_get_include
+    numpy_include_dir = [numpy_get_include()]
+except ImportError:
+    numpy_include_dir = []
 
 
 def main():
@@ -48,7 +47,7 @@ def main():
                        Extension("MACS2.PeakDetect", ["MACS2/PeakDetect.pyx"], extra_compile_args=extra_c_args),
                        Extension("MACS2.Signal", ["MACS2/Signal.pyx"], include_dirs=numpy_include_dir, extra_compile_args=extra_c_args),
                        Extension("MACS2.IO.PeakIO", ["MACS2/IO/PeakIO.pyx"], extra_compile_args=extra_c_args),
-                       Extension("MACS2.IO.BedGraphIO", ["MACS2/IO/BedGraphIO.pyx"], extra_compile_args=extra_c_args),                   
+                       Extension("MACS2.IO.BedGraphIO", ["MACS2/IO/BedGraphIO.pyx"], extra_compile_args=extra_c_args),
                        Extension("MACS2.IO.FixWidthTrack", ["MACS2/IO/FixWidthTrack.pyx"], include_dirs=numpy_include_dir, extra_compile_args=extra_c_args),
                        Extension("MACS2.IO.PairedEndTrack", ["MACS2/IO/PairedEndTrack.pyx"], include_dirs=numpy_include_dir, extra_compile_args=extra_c_args),
                        Extension("MACS2.IO.BedGraph", ["MACS2/IO/BedGraph.pyx"], libraries=["m"], extra_compile_args=extra_c_args),
@@ -66,7 +65,7 @@ def main():
                        Extension("MACS2.PeakDetect", ["MACS2/PeakDetect.c"], extra_compile_args=extra_c_args),
                        Extension("MACS2.Signal", ["MACS2/Signal.c"], include_dirs=numpy_include_dir, extra_compile_args=extra_c_args),
                        Extension("MACS2.IO.PeakIO", ["MACS2/IO/PeakIO.c"], extra_compile_args=extra_c_args),
-                       Extension("MACS2.IO.BedGraphIO", ["MACS2/IO/BedGraphIO.c"], extra_compile_args=extra_c_args),                   
+                       Extension("MACS2.IO.BedGraphIO", ["MACS2/IO/BedGraphIO.c"], extra_compile_args=extra_c_args),
                        Extension("MACS2.IO.FixWidthTrack", ["MACS2/IO/FixWidthTrack.c"], include_dirs=numpy_include_dir, extra_compile_args=extra_c_args),
                        Extension("MACS2.IO.PairedEndTrack", ["MACS2/IO/PairedEndTrack.c"], include_dirs=numpy_include_dir, extra_compile_args=extra_c_args),
                        Extension("MACS2.IO.BedGraph", ["MACS2/IO/BedGraph.c"], libraries=["m"], extra_compile_args=extra_c_args),
