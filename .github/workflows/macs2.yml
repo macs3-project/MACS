@@ -34,18 +34,15 @@ jobs:
     - name: Install MACS2
       run: 
         python setup.py install
-    - name: Test with pytest
+    - name: Run pytest
       run: |
         pip install pytest
         pytest
-    - name: Run tests with small data files
+    - name: Run small data files
       run: |
         cd test
         ./test.sh subcommandtest
         cd ..
-    - name: Check warn/error from previous test
-      run:
-        flag=1;for i in `ls test/subcommandtest_run_*/*.log`;do echo $i;egrep -i "error|warning" $i;let "flag&=$?";done;if [[ $flag == 0 ]];then false;fi
     - name: Build sdist
       run:
         python setup.py sdist

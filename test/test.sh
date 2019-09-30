@@ -150,7 +150,7 @@ echo "12. 50k contigs with buffersize"
 mkdir ${TAG}_run_50kcontigs
 
 echo "12.1 callpeak"
-macs2 callpeak -g 10000000 -t $CHIPCONTIGS50K -n run_callpeak_50kcontigs -B --outdir ${TAG}_run_50kcontigs --buffer-size 1000 --nomodel --extsize 200 &> ${TAG}_run_50kcontigs/run_callpeak_50kcontigs.log
+macs2 callpeak -g 10000000 -t $CHIPCONTIGS50K -n run_callpeak_50kcontigs --outdir ${TAG}_run_50kcontigs --buffer-size 1000 --nomodel --extsize 200 &> ${TAG}_run_50kcontigs/run_callpeak_50kcontigs.log
 
 echo "12.2 filterdup"
 macs2 filterdup -g 10000000 -i $CHIPCONTIGS50K --outdir ${TAG}_run_50kcontigs -o run_filterdup_result.bed --buffer-size 1000 &> ${TAG}_run_50kcontigs/run_filterdup_50kcontigs.log
@@ -161,3 +161,17 @@ macs2 pileup -f BED -i $CHIPCONTIGS50K --extsize 200 --outdir ${TAG}_run_50kcont
 echo "12.4 randsample"
 macs2 randsample -i $CHIPCONTIGS50K -n 100000 --seed 31415926 --outdir ${TAG}_run_50kcontigs -o run_randsample.bed --buffer-size 1000 &> ${TAG}_run_50kcontigs/run_randsample.log
 
+echo ""
+echo "Last step: search for errors or warnings in log files"
+flag=1
+for i in `ls ${TAG}_run_*/*.log`;do
+    echo $i;
+    egrep -i "error|warning" $i;
+    let "flag&=$?";
+done;
+
+if [[ $flag == 0 ]]; then
+    exit 1;
+fi
+
+exit 0;
