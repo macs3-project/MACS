@@ -42,7 +42,7 @@ jobs:
       run: |
         cd test
         ./test.sh subcommandtest
-	cd ..
+        cd ..
     - name: Check warn/error from previous test
         flag=1;for i in `ls test/subcommandtest_run_*/*.log`;do echo $i;egrep -i "error|warning" $i;let "flag&=$?";done;if [[ $flag == 0 ]];then false;fi
     - name: Build sdist
