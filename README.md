@@ -1,6 +1,24 @@
-# Recent Changes for MACS (2.1.3.3)
+# Recent Changes for MACS (2.1.4)
 
-### 2.1.3.3
+### 2.1.4
+	* Features added
+	
+	Github Actions is used together with Travis CI for testing and
+	deployment.
+	
+	* Bugs fixed (PR #322)
+	
+	1) #318 Random score in `bdgdiff` output. It turns out the sum_v
+	is not initialized as 0 before adding. Potential bugs are fixed in
+	other functions in ScoreTrack and CallPeakUnit codes.
+	
+	2) #321 Cython dependency in `setup.py` script is removed. And
+	place 'cythonzie' call to the correct position.
+	
+	3) A typo is fixed in Github Actions script.	
+
+
+### 2.1.3
 	* Features added
 
 	1) Support Docker auto-deploy. PR #309
@@ -35,44 +53,7 @@
 
 	3) Rename COPYING to LICENSE.
 
-
-### 2.1.2
-
-	* New features
-
-	1) Added missing BEDPE support. And enable the support for BAMPE
-	and BEDPE formats in 'pileup', 'filterdup' and 'randsample'
-	subcommands. When format is BAMPE or BEDPE, The 'pileup' command
-	will pile up the whole fragment defined by mapping locations of
-	the left end and right end of each read pair. Thank @purcaro
-
-	2) Added options to callpeak command for tweaking max-gap and
-	min-len during peak calling. Thank @jsh58!
-
-	3) The callpeak option "--to-large" option is replaced with
-	"--scale-to large".
-
-	4) The randsample option "-t" has been replaced with "-i".
-
-	* Bug fixes
-
-	1) Fixed memory issue related to #122 and #146
-
-	2) Fixed a bug caused by a typo. Related to #249, Thank @shengqh
-
-	3) Fixed a bug while setting commandline qvalue cutoff.
-
-	4) Better describe the 5th column of narrowPeak. Thank @alexbarrera
-
-	5) Fixed the calculation of average fragment length for paired-end
-	data. Thank @jsh58
-
-	6) Fixed bugs caused by khash while computing p/q-value and log
-	likelihood ratios. Thank @jsh58
-
-    7) More spelling tweaks in source code. Thank @mr-c
-
-# README for MACS2 (2.1.3.3)
+# README for MACS2 (2.1.4)
 
 ## Introduction
 
@@ -260,8 +241,19 @@ of qvalue.
 
 ##### `--min-length`, `--max-gap`
 
-These two options can be used to fine-tune the peak calling behavior by specifying the minimum length of a called peak and the maximum allowed gap between two nearby regions to be merged. In another word, a called peak has to be longer than *min-length*, and if the distance between two nearby peaks is smaller than *max-gap* then they will be merged as one. If they are not set, MACS2 will set the DEFAULT value for *min-length* as the predicted fragment size d, and the DEFAULT value for *max-gap* as the detected read length. Note, if you set a *min-length* value smaller than the fragment size, it may have NO effect on the result. For BROAD peak calling, try to set a
-large value such as 500bps. You can also use '--cutoff-analysis' option with default setting, and check the column 'avelpeak' under different cutoff values to decide a reasonable *min-length* value.
+These two options can be used to fine-tune the peak calling behavior
+by specifying the minimum length of a called peak and the maximum
+allowed gap between two nearby regions to be merged. In another word,
+a called peak has to be longer than *min-length*, and if the distance
+between two nearby peaks is smaller than *max-gap* then they will be
+merged as one. If they are not set, MACS2 will set the DEFAULT value
+for *min-length* as the predicted fragment size d, and the DEFAULT
+value for *max-gap* as the detected read length. Note, if you set a
+*min-length* value smaller than the fragment size, it may have NO
+effect on the result. For BROAD peak calling, try to set a large value
+such as 500bps. You can also use '--cutoff-analysis' option with
+default setting, and check the column 'avelpeak' under different
+cutoff values to decide a reasonable *min-length* value.
 
 ##### `--nolambda`
 
@@ -397,21 +389,33 @@ for reading an alignment file is about # of CHROMOSOME * BUFFER_SIZE *
     - fold enrichment for this peak summit against random Poisson distribution with local lambda, 
     - -log10(qvalue) at peak summit
    
-   Coordinates in XLS is 1-based which is different with BED format. When `--broad` is enabled for broad peak calling, the pileup, pvalue, qvalue, and fold change in the XLS file will be the mean value across the entire peak region, since peak summit won't be called in broad peak calling mode. 
+   Coordinates in XLS is 1-based which is different with BED
+   format. When `--broad` is enabled for broad peak calling, the
+   pileup, pvalue, qvalue, and fold change in the XLS file will be the
+   mean value across the entire peak region, since peak summit won't
+   be called in broad peak calling mode.
 
 2. `NAME_peaks.narrowPeak` is BED6+4 format file which contains the
    peak locations together with peak summit, pvalue and qvalue. You
    can load it to UCSC genome browser. Definition of some specific
    columns are: 
    
-   - 5th: integer score for display. It's calculated as `int(-10*log10pvalue)` or `int(-10*log10qvalue)` depending on whether `-p` (pvalue) or `-q` (qvalue) is used as score cutoff. Please note that currently this value might be out of the [0-1000] range defined in [UCSC Encode narrowPeak format](https://genome.ucsc.edu/FAQ/FAQformat.html#format12). You can let the value saturated at 1000 (i.e. p/q-value = 10^-100) by using the following 1-liner awk: `awk -v OFS="\t" '{$5=$5>1000?1000:$5} {print}' NAME_peaks.narrowPeak`
+   - 5th: integer score for display. It's calculated as
+     `int(-10*log10pvalue)` or `int(-10*log10qvalue)` depending on
+     whether `-p` (pvalue) or `-q` (qvalue) is used as score
+     cutoff. Please note that currently this value might be out of the
+     [0-1000] range defined in [UCSC Encode narrowPeak
+     format](https://genome.ucsc.edu/FAQ/FAQformat.html#format12). You
+     can let the value saturated at 1000 (i.e. p/q-value = 10^-100) by
+     using the following 1-liner awk: `awk -v OFS="\t"
+     '{$5=$5>1000?1000:$5} {print}' NAME_peaks.narrowPeak`
    - 7th: fold-change at peak summit
    - 8th: -log10pvalue at peak summit
    - 9th: -log10qvalue at peak summit
    - 10th: relative summit position to peak start
    
-   The file can be loaded directly to UCSC genome browser. Remove the beginning track line if you want to
-   analyze it by other tools.
+   The file can be loaded directly to UCSC genome browser. Remove the
+   beginning track line if you want to analyze it by other tools.
 
 3. `NAME_summits.bed` is in BED format, which contains the peak
    summits locations for every peaks. The 5th column in this file is
@@ -466,7 +470,8 @@ for reading an alignment file is about # of CHROMOSOME * BUFFER_SIZE *
 
 ## Tips of fine-tuning peak calling
 
-There are several subcommands within MACSv2 package to fine-tune or customize your analysis:
+There are several subcommands within MACSv2 package to fine-tune or
+customize your analysis:
 
 1. `bdgcmp` can be used on `*_treat_pileup.bdg` and
    `*_control_lambda.bdg` or bedGraph files from other resources
@@ -486,5 +491,6 @@ There are several subcommands within MACSv2 package to fine-tune or customize yo
    according to parameter settings for minimum length, maximum gap
    and cutoff.
 
-4. You can combine subcommands to do a step-by-step peak
-   calling. Read detail at [MACS2 wikipage](https://github.com/taoliu/MACS/wiki/Advanced%3A-Call-peaks-using-MACS2-subcommands)
+4. You can combine subcommands to do a step-by-step peak calling. Read
+   detail at [MACS2
+   wikipage](https://github.com/taoliu/MACS/wiki/Advanced%3A-Call-peaks-using-MACS2-subcommands)

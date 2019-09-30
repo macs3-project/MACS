@@ -1,21 +1,20 @@
 # INSTALL Guide For MACS
-Time-stamp: <2019-09-20 15:08:35 taoliu>
+Time-stamp: <2019-09-30 14:47:45 taoliu>
 
 Please check the following instructions to complete your installation.
 
 ## Prerequisites
 
-Python version must be equal to *2.7* to run MACS. I recommend
-using the version *2.7.15*.
+Python version must be equal to *2.7* to run MACS.
 
-[Numpy](http://www.scipy.org/Download) (>=1.15) are required to run MACS v2. 
+[Numpy](http://www.scipy.org/Download) (>=1.16) are required to run MACS v2. 
 
 GCC is required to compile `.c` codes in MACS v2 package, and python
 header files are needed. If you are using Mac OSX, I recommend you
 install Xcode; if you are using Linux, you need to make sure
 `python-dev` is installed.
 
-[Cython](http://cython.org/) (>=0.25) is required to generate `.c`
+[Cython](http://cython.org/) (>=0.29) is required to generate `.c`
 files from `.pyx` files using `setup.py` script.
 
 ## Easy installation through PyPI
@@ -25,12 +24,12 @@ it's not available in your system. *Note* if you have already
 installed numpy and scipy system-wide, you can use `virtualenv
 --system-site-packages` to let your virtual Python environment have
 access to system-wide numpy and scipy libraries so that you don't need
-to install them again.  
+to install them again.
 
 Then under command line, type `pip install MACS2`. PyPI will
 install Numpy and Cython automatically if they are absent. 
 
-To upgrade MACS2, type `pip install -U MACS2`. It will check
+To upgrade MACS2, type `pip install --upgrade MACS2`. It will check
 currently installed MACS2, compare the version with the one on PyPI
 repository, download and install newer version while necessary.
 

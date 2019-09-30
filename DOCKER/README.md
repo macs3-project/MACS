@@ -1,4 +1,4 @@
-# Official MACS2 v2.1.3.3 docker
+# Official MACS2 v2.1.4 docker
 
 MACS2 is a bioinformatics algorithm to analyze ChIP-seq datasets. 
 
@@ -29,7 +29,7 @@ The first part ```-v $PWD:/data/``` will mount the CURRENT directory ```$PWD``` 
 # Built with
 
 * Python2.7 docker image 2.7.15
-* pip install numpy version 1.15, cython 0.25, and pytest 4.6 
+* pip install numpy version 1.16, cython 0.29, and pytest 4.6 
 * git clone MACS codes from github master branch then run ```setup.py```
 
 # Author
