@@ -47,7 +47,8 @@ jobs:
       run:
         python setup.py sdist
     - name: Publish distribution to PyPI
-      if: startsWith(github.event.ref, 'refs/tags')
+      if: github.event_name == 'push' && startsWith(github.event.ref, 'refs/tags')
       uses: pypa/gh-action-pypi-publish@master
       with:
+        user: __token__
         password: ${{ secrets.pypi_password }}
