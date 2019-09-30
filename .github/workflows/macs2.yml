@@ -32,20 +32,20 @@ jobs:
         # exit-zero treats all errors as warnings. The GitHub editor is 127 chars wide
         flake8 . --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
     - name: Install MACS2
-      run: |
+      run: 
         python setup.py install
     - name: Test with pytest
       run: |
         pip install pytest
         pytest
     - name: Test with small data files
-      run: |
+      run: 
         cd test
         ./test.sh subcommandtest
         flag=1;for i in `ls subcommandtest_run_*/*.log`;do echo $i;egrep -i "error|warning" $i;let "flag&=$?";done;if [[ $flag == 0 ]];then false;fi
         cd ..
     - name: Build sdist
-      run: |
+      run:
         python setup.py sdist
     - name: Publish distribution to PyPI
       if: startsWith(github.event.ref, 'refs/tags')
