@@ -1,4 +1,4 @@
-# Time-stamp: <2019-09-25 16:45:58 taoliu>
+# Time-stamp: <2019-09-30 13:02:11 taoliu>
 
 """Module for Feature IO classes.
 
@@ -16,8 +16,6 @@ cimport numpy as np
 from copy import copy
 
 from cpython cimport bool
-
-#from scipy.stats import chi2 
 
 from MACS2.Signal import maxima, enforce_valleys, enforce_peakyness
 
@@ -49,7 +47,7 @@ LOG10_E = 0.43429448190325176
 
 pscore_dict = dict()
 
-cdef inline double get_pscore ( int observed, double expectation ):
+cdef double get_pscore ( int observed, double expectation ):
     """Get p-value score from Poisson test. First check existing
     table, if failed, call poisson_cdf function, then store the result
     in table.
@@ -67,7 +65,7 @@ cdef inline double get_pscore ( int observed, double expectation ):
 
 asym_logLR_dict = dict()
 
-cdef inline double logLR_asym ( double x, double y ):
+cdef double logLR_asym ( double x, double y ):
     """Calculate log10 Likelihood between H1 ( enriched ) and H0 (
     chromatin bias ). Set minus sign for depletion.
     
@@ -91,7 +89,7 @@ cdef inline double logLR_asym ( double x, double y ):
 
 sym_logLR_dict = dict()
 
-cdef inline double logLR_sym ( double x, double y ):
+cdef double logLR_sym ( double x, double y ):
     """Calculate log10 Likelihood between H1 ( enriched ) and H0 (
     another enriched ). Set minus sign for H0>H1.
     
@@ -113,12 +111,12 @@ cdef inline double logLR_sym ( double x, double y ):
         sym_logLR_dict[ ( x, y ) ] = s
         return s
     
-cdef inline double get_logFE ( float x, float y ):
+cdef double get_logFE ( float x, float y ):
     """ return 100* log10 fold enrichment with +1 pseudocount.
     """
     return log10( x/y )
 
-cdef inline float get_subtraction ( float x, float y):
+cdef float get_subtraction ( float x, float y):
     """ return subtraction.
     """
     return x - y
@@ -130,12 +128,13 @@ cdef float median_from_value_length ( np.ndarray value, list length ):
         list tmp
         int32_t l_half, c, tmp_l
         float tmp_v
-    
+
+    c = 0
     tmp = sorted(zip( value, length ))
-    l = sum( length )/2
+    l_half = sum( length )/2
     for (tmp_v, tmp_l) in tmp:
         c += tmp_l
-        if c > l:
+        if c > l_half:
             return tmp_v
 
 cdef float mean_from_value_length ( np.ndarray value, list length ):
@@ -143,9 +142,10 @@ cdef float mean_from_value_length ( np.ndarray value, list length ):
     """
     cdef:
         list tmp
-        int32_t tmp_l
+        int32_t tmp_l, l
         float tmp_v, sum_v
 
+    sum_v = 0
     tmp = zip( value, length )
     l = sum( length )
 
@@ -153,7 +153,6 @@ cdef float mean_from_value_length ( np.ndarray value, list length ):
         sum_v += tmp_v * tmp_l
 
     return sum_v / l
-
 
 # ------------------------------------
 # Classes
@@ -1817,9 +1816,11 @@ cdef class TwoConditionScores:
         """
         cdef:
             int32_t tmp_s, tmp_e
-            int32_t l = 0
+            int32_t l
             float tmp_v, sum_v
 
+        sum_v = 0
+        l = 0
         for (tmp_s, tmp_e, tmp_v) in peakcontent:
             sum_v += tmp_v * ( tmp_e - tmp_s )
             l +=  tmp_e - tmp_s

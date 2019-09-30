@@ -46,12 +46,7 @@ jobs:
         cd ..
     - name: Build sdist
       run: |
-        python setup sdist
-    - name: Publish distribution to Test PyPI
-      uses: pypa/gh-action-pypi-publish@master
-      with:
-        password: ${{ secrets.test_pypi_password }}
-        repository_url: https://test.pypi.org/legacy/
+        python setup.py sdist
     - name: Publish distribution to PyPI
       if: startsWith(github.event.ref, 'refs/tags')
       uses: pypa/gh-action-pypi-publish@master
