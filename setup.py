@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# Time-stamp: <2019-09-30 16:57:18 taoliu>
+# Time-stamp: <2019-09-30 17:27:35 taoliu>
 
 """Description: 
 
@@ -88,8 +88,7 @@ def main():
           url='http://github.com/taoliu/MACS/',
           package_dir={'MACS2' : 'MACS2'},
           packages=['MACS2', 'MACS2.IO'],
-          scripts=['bin/macs2',
-                   ],
+          scripts=['bin/macs2', ],
           classifiers=[
               'Development Status :: 5 - Production/Stable',
               'Environment :: Console',
