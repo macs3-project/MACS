@@ -44,16 +44,13 @@ echo "1.3 callpeak on PE narrow/broad"
 mkdir  ${TAG}_run_callpeak_pe_narrow
 
 macs2 callpeak -g 52000000 -f BAMPE -t $CHIPPE -c $CTRLPE -n run_callpeak_bampe_narrow -B --outdir ${TAG}_run_callpeak_pe_narrow --call-summits &> ${TAG}_run_callpeak_pe_narrow/run_callpeak_bampe_narrow.log
-macs2 callpeak -g 52000000 -f BAMPE -t $CHIPPE -c $CTRLPE -n run_callpeak_bampe_broad -B --outdir ${TAG}_run_callpeak_pe_broad --broad &> ${TAG}_run_callpeak_pe_broad/run_callpeak_bampe_broad.log
 macs2 callpeak -g 52000000 -f BEDPE -t $CHIPBEDPE -c $CTRLBEDPE -n run_callpeak_bedpe_narrow -B --outdir ${TAG}_run_callpeak_pe_narrow --call-summits &> ${TAG}_run_callpeak_pe_narrow/run_callpeak_bedpe_narrow.log
-macs2 callpeak -g 52000000 -f BEDPE -t $CHIPBEDPE -c $CTRLBEDPE -n run_callpeak_bedpe_broad -B --outdir ${TAG}_run_callpeak_pe_broad --broad &> ${TAG}_run_callpeak_pe_broad/run_callpeak_bedpe_broad.log
 macs2 callpeak -g 52000000 -f BEDPE -t $CHIPBEDPE -n run_callpeak_pe_narrow_onlychip -B --outdir ${TAG}_run_callpeak_pe_narrow &> ${TAG}_run_callpeak_pe_narrow/run_callpeak_pe_narrow_onlychip.log
 
 mkdir  ${TAG}_run_callpeak_pe_broad
 
-macs2 callpeak -f BAMPE -t $CHIPPE -c $CTRLPE -n run_callpeak_bampe_broad -B --outdir ${TAG}_run_callpeak_pe_broad --broad &> ${TAG}_run_callpeak_pe_broad/run_callpeak_bampe_broad.log
-macs2 callpeak -f BEDPE -t $CHIPBEDPE -c $CTRLBEDPE -n run_callpeak_bedpe_broad -B --outdir ${TAG}_run_callpeak_pe_broad --broad &> ${TAG}_run_callpeak_pe_broad/run_callpeak_bedpe_broad.log
-
+macs2 callpeak -g 52000000 -f BAMPE -t $CHIPPE -c $CTRLPE -n run_callpeak_bampe_broad -B --outdir ${TAG}_run_callpeak_pe_broad --broad &> ${TAG}_run_callpeak_pe_broad/run_callpeak_bampe_broad.log
+macs2 callpeak -g 52000000 -f BEDPE -t $CHIPBEDPE -c $CTRLBEDPE -n run_callpeak_bedpe_broad -B --outdir ${TAG}_run_callpeak_pe_broad --broad &> ${TAG}_run_callpeak_pe_broad/run_callpeak_bedpe_broad.log
 
 # pileup
 echo "2. pileup"
