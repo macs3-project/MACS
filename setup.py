@@ -79,7 +79,7 @@ def main():
         long_description = fh.read()
         
     setup(name="MACS2",
-          version="2.2.4p3",
+          version="2.2.4",
           description="Model Based Analysis for ChIP-Seq data",
           long_description = long_description,
           long_description_content_type="text/markdown",
@@ -98,7 +98,7 @@ def main():
               'Operating System :: MacOS :: MacOS X',
               'Operating System :: POSIX',
               'Topic :: Scientific/Engineering :: Bio-Informatics',
-              'Programming Language :: Python :: 2 :: Only',
+              'Programming Language :: Python :: 3 :: Only',
               'Programming Language :: Cython',
               ],
           install_requires=[
