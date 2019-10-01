@@ -1,4 +1,4 @@
-# Time-stamp: <2019-09-25 12:42:53 taoliu>
+# Time-stamp: <2019-10-01 13:19:21 taoliu>
 
 """Module for BedGraph data class.
 
@@ -566,6 +566,7 @@ cdef class bedGraphTrackI:
 
         # the following code will add those broad/lvl2 peaks with no strong/lvl1 peaks inside
         if not lvl1peakset:
+            # try:
             # will complement by adding 1bps start and end to this region
             # may change in the future if gappedPeak format was improved.
             bpeaks.add(chrom, start, end, score=lvl2peak["score"], thickStart=(b"%d" % start), thickEnd=(b"%d" % end),
@@ -580,14 +581,14 @@ cdef class bedGraphTrackI:
         blockSizes = b",".join( [b"%d" % x["length"] for x in lvl1peakset] )
         blockStarts = b",".join( [b"%d" % (x["start"]-start) for x in lvl1peakset] )
 
-        if lvl2peak["start"] != thickStart:
-            # add 1bp mark for the start of lvl2 peak
+        if int(thickStart) != start:
+            # add 1bp left block
             thickStart = b"%d" % start
             blockNum += 1
             blockSizes = b"1,"+blockSizes
             blockStarts = b"0,"+blockStarts
-        if lvl2peak["end"] != thickEnd:
-            # add 1bp mark for the end of lvl2 peak
+        if int(thickEnd) != end:
+            # add 1bp right block
             thickEnd = b"%d" % end
             blockNum += 1
             blockSizes = blockSizes+b",1"
