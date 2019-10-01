@@ -163,41 +163,52 @@ macs2 pileup -f BED -i $CHIPCONTIGS50K --extsize 200 --outdir ${TAG}_run_50kcont
 echo "12.4 randsample"
 macs2 randsample -i $CHIPCONTIGS50K -n 100000 --seed 31415926 --outdir ${TAG}_run_50kcontigs -o run_randsample.bed --buffer-size 1000 &> ${TAG}_run_50kcontigs/run_randsample.log
 
-echo "13 search for errors or warnings in log files"
-flag=1
+echo "13. search for errors or warnings in log files"
+flag=0
 for i in `ls ${TAG}_run_*/*.log`;do
-    echo $i;
+    echo " checking $i..."
     egrep -i "error|warning" $i;
-    let "flag&=$?";
+    if [[ $? == 0 ]];then
+	echo " ... error/warning found!"
+	let "flag=1";
+    else
+	echo " ... clear!"
+    fi
 done;
 
-if [[ $flag == 0 ]]; then
-    echo "Error or Warning can be found!"
+if [[ $flag == 1 ]]; then
+    echo " Error or Warning can be found! Quit the test!"
     exit 1;
 fi
 
-echo "14 compare with standard outputs"
+echo "14. compare with standard outputs"
 
 flag=0
 subfolders=(50kcontigs bdgbroadcall bdgcmp bdgdiff bdgpeakcall callpeak_broad callpeak_narrow callpeak_narrow_revert callpeak_pe_broad callpeak_pe_narrow cmbreps filterdup pileup randsample refinepeak)
 
+m=0
+n=0
 for i in ${subfolders[@]};do
+    let "m+=1"
+    let "n=0"
     for j in `ls standard_results_${i}/*`; do
 	k=`basename $j`
-	echo "checking $i $k"
+	let "n+=1"
+	echo "14.${m}.${n} checking $i $k ..."
 	fq=${TAG}_run_${i}/${k}
 	fs=standard_results_${i}/${k}
 	sort $fq > tmp_fq.txt
 	sort $fs > tmp_fs.txt
 	d=`diff tmp_fq.txt tmp_fs.txt`
 	if [ -z "$d" ]; then
-	    echo "... success!"
+	    echo " ... success!"
 	else
-	    echo "... failed! Difference:"
+	    echo " ... failed! Difference:"
 	    echo $d
 	    let "flag=1";
 	fi
     done
 done
+rm -f tmp_fq.txt tmp_fs.txt
 exit $flag;
 

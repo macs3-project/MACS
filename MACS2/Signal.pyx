@@ -1,4 +1,4 @@
-# Time-stamp: <2019-09-20 11:27:27 taoliu>
+# Time-stamp: <2019-10-01 16:22:18 taoliu>
 
 """Module Description: functions to find maxima minima or smooth the
 signal tracks.
@@ -245,9 +245,9 @@ cpdef savitzky_golay_order2(np.ndarray[np.float32_t, ndim=1] signal,
     if window_size % 2 != 1: window_size += 1
     half_window = (window_size - 1) // 2
     # precompute coefficients
-    b = np.mat([[1, k, k**2] for k in range(-half_window, half_window+1)],
-               dtype='int64')
-    m = np.linalg.pinv(b).A[deriv]
+    b = np.array([[1, k, k**2] for k in range(-half_window, half_window+1)],
+                 dtype='int64')
+    m = np.linalg.pinv(b)[deriv]
     # pad the signal at the extremes with
     # values taken from the signal itself
     firstvals = signal[0] - np.abs(signal[1:half_window+1][::-1] - signal[0])
@@ -326,8 +326,8 @@ cpdef np.ndarray[np.float32_t, ndim=1] savitzky_golay( np.ndarray[np.float32_t, 
         raise TypeError("window_size is too small for the polynomials order")
     half_window = ( window_size -1 ) // 2
     # precompute coefficients
-    b = np.mat( [ [ k**i for i in range( order + 1 ) ] for k in range( -half_window, half_window+1 ) ] )
-    m = np.linalg.pinv( b ).A[ deriv ] * rate**deriv * mathfactorial( deriv )
+    b = np.array( [ [ k**i for i in range( order + 1 ) ] for k in range( -half_window, half_window+1 ) ] )
+    m = np.linalg.pinv( b )[ deriv ] * rate**deriv * mathfactorial( deriv )
     # pad the signal at the extremes with
     # values taken from the signal itself
     firstvals = y[ 0 ] - np.abs( y[ 1:half_window + 1 ][ ::-1 ] - y[ 0 ] )

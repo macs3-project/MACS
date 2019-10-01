@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-# Time-stamp: <2019-09-25 10:48:47 taoliu>
+# Time-stamp: <2019-10-01 16:22:33 taoliu>
 
 """Description: 
 
@@ -102,7 +102,7 @@ def main():
               'Programming Language :: Cython',
               ],
           install_requires=[
-              'numpy>=1.16',
+              'numpy>=1.17',
               ],
           cmdclass = command_classes,
           ext_modules = ext_modules

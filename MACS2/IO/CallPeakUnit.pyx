@@ -1,4 +1,4 @@
-# Time-stamp: <2019-10-01 14:51:41 taoliu>
+# Time-stamp: <2019-10-01 16:30:34 taoliu>
 
 """Module for Calculate Scores.
 
@@ -25,9 +25,6 @@ from cpython cimport bool
 
 from MACS2.Signal import maxima, enforce_valleys, enforce_peakyness
 
-# Experimental
-#from scipy.stats import chi2
-
 from libc.stdint cimport uint32_t, uint64_t, int32_t, int64_t
 ctypedef np.float32_t float32_t
 
@@ -53,13 +50,6 @@ from time import time as ttime
 
 from libc.stdio cimport *
  
-# cdef extern from "stdio.h":
-#     ctypedef struct FILE
-#     FILE *fopen   (const char *filename, const char  *opentype)
-#     #FILE * fopen ( const char * filename, const char * mode )
-#     int  fclose   (FILE *stream)
-#     int fprintf  (FILE *stream, const char *template, ...)
-
 # ------------------------------------
 # constants
 # ------------------------------------
@@ -1174,7 +1164,7 @@ cdef class CallerFromAlignments:
             peakindices[m:n] = i
 
         summit_offsets = maxima(peakdata, smoothlen) # offsets are the indices for summits in peakdata/peakindices array.
-        #print "maxima:",summit_offsets
+
         if summit_offsets.shape[0] == 0:
             # **failsafe** if no summits, fall back on old approach #
             return self.__close_peak_wo_subpeaks(peak_content, peaks, min_length, chrom, smoothlen, score_array_s, score_cutoff_s)
@@ -1185,6 +1175,7 @@ cdef class CallerFromAlignments:
             summit_offsets = summit_offsets[m:n]
         
         summit_offsets = enforce_peakyness(peakdata, summit_offsets)
+
         #print "enforced:",summit_offsets
         if summit_offsets.shape[0] == 0:
             # **failsafe** if no summits, fall back on old approach #
