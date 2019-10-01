@@ -9,7 +9,7 @@ install:
 script:
   - pytest
   - cd test
-  - ./test.sh subcommandstest
+  - ./test.sh smalldatatest
   - cd ..
 deploy:
   provider: pypi

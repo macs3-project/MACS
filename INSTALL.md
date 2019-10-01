@@ -1,13 +1,14 @@
 # INSTALL Guide For MACS
-Time-stamp: <2019-09-30 14:47:45 taoliu>
+Time-stamp: <2019-10-01 16:45:58 taoliu>
 
 Please check the following instructions to complete your installation.
 
 ## Prerequisites
 
-Python3
+Python3. We tested MACS2 in Python3.5, 3.6 and 3.7. MACS2 runs slower
+under Python3.5.
 
-[Numpy](http://www.scipy.org/Download) (>=1.15)
+[Numpy](http://www.scipy.org/Download) (>=1.17). 
 
 GCC is required to compile `.c` codes in MACS v2 package, and python
 header files are needed. If you are using Mac OSX, I recommend you
@@ -87,7 +88,7 @@ concept is the same across platforms.
 To set up your `PYTHONPATH` environment variable, you'll need to add the
 value `PREFIX/lib/pythonX.Y/site-packages` to your existing
 `PYTHONPATH`. In this value, X.Y stands for the major–minor version of
-Python you are using (such as 2.7 ; you can find this with
+Python you are using (such as 3.7 ; you can find this with
 `sys.version[:3]` from a Python command line). `PREFIX` is the install
 prefix where you installed MACS. If you did not specify a prefix on
 the command line, MACS will be installed using Python's sys.prefix
@@ -96,7 +97,7 @@ value.
 On Linux, using bash, I include the new value in my `PYTHONPATH` by
 adding this line to my `~/.bashrc`::
 
- `$ export PYTHONPATH=/home/taoliu/lib/python2.7/site-packages:$PYTHONPATH`
+ `$ export PYTHONPATH=/home/taoliu/lib/python3.7/site-packages:$PYTHONPATH`
 
 Using Windows, you need to open up the system properties dialog, and
 locate the tab labeled Environment. Add your value to the `PYTHONPATH`

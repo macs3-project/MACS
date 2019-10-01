@@ -1,13 +1,17 @@
 # Recent Changes for MACS (2.2.4)
 
 ## 2.2.4
+	* Features added
+	
+	1) First Python3 version MACS2 released.
 
-    * New features
+	2) Version number 2.2.X will be used for MACS2 in Python3, in
+	parallel to 2.1.X.
 
-    1) First Python3 version MACS2 released.
+	3) More comprehensive test.sh script to check consistency of
+	results from Python2 version and Python3 version.
 
-    2) Version number 2.2.X will be used for MACS2 in Python3, in
-    parallel to 2.1.X.
+	4) Fix Signal.pyx to use np.array instead of np.mat.
 
 ### 2.1.4 
 	* Features added 

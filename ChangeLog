@@ -1,12 +1,17 @@
 2019-10-01  Tao Liu  <vladimir.liu@gmail.com>
 	MACS version 2.2.4 (Python3)
 
-	* New features
+	* Features added
 
 	1) First Python3 version MACS2 released.
 
 	2) Version number 2.2.X will be used for MACS2 in Python3, in
 	parallel to 2.1.X.
+
+	3) More comprehensive test.sh script to check consistency of
+	results from Python2 version and Python3 version.
+
+	4) Fix Signal.pyx to use np.array instead of np.mat.
 
 2019-09-30  Tao Liu  <vladimir.liu@gmail.com>
 	MACS version 2.1.4
