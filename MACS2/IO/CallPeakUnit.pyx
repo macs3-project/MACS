@@ -1,4 +1,4 @@
-# Time-stamp: <2019-09-25 10:29:47 taoliu>
+# Time-stamp: <2019-10-01 14:51:41 taoliu>
 
 """Module for Calculate Scores.
 
@@ -408,7 +408,7 @@ cdef class CallerFromAlignments:
 
         chr1 = set(self.treat.get_chr_names())
         chr2 = set(self.ctrl.get_chr_names())
-        self.chromosomes = list(chr1.intersection(chr2))
+        self.chromosomes = sorted(list(chr1.intersection(chr2)))
 
         self.test_time = 0
         self.pileup_data_files = {}

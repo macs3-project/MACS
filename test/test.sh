@@ -142,9 +142,9 @@ echo "11. cmbreps"
 
 mkdir ${TAG}_run_cmbreps
 
-macs2 cmbreps -i ${TAG}_run_callpeak_narrow/run_callpeak_narrow0_treat_pileup.bdg ${TAG}_run_callpeak_narrow/run_callpeak_narrow0_control_lambda.bdg ${TAG}_run_bdgcmp/run_bdgcmp_ppois.bdg -m max -o ${TAG}_cmbreps_max.bdg --outdir ${TAG}_run_cmbreps &> ${TAG}_run_cmbreps/run_cmbreps_max.log
-macs2 cmbreps -i ${TAG}_run_callpeak_narrow/run_callpeak_narrow0_treat_pileup.bdg ${TAG}_run_callpeak_narrow/run_callpeak_narrow0_control_lambda.bdg ${TAG}_run_bdgcmp/run_bdgcmp_ppois.bdg -m mean -o ${TAG}_cmbreps_mean.bdg --outdir ${TAG}_run_cmbreps &> ${TAG}_run_cmbreps/run_cmbreps_mean.log
-macs2 cmbreps -i ${TAG}_run_callpeak_narrow/run_callpeak_narrow0_treat_pileup.bdg ${TAG}_run_callpeak_narrow/run_callpeak_narrow0_control_lambda.bdg ${TAG}_run_bdgcmp/run_bdgcmp_ppois.bdg -m fisher -o ${TAG}_cmbreps_fisher.bdg --outdir ${TAG}_run_cmbreps &> ${TAG}_run_cmbreps/run_cmbreps_fisher.log
+macs2 cmbreps -i ${TAG}_run_callpeak_narrow/run_callpeak_narrow0_treat_pileup.bdg ${TAG}_run_callpeak_narrow/run_callpeak_narrow0_control_lambda.bdg ${TAG}_run_bdgcmp/run_bdgcmp_ppois.bdg -m max -o run_cmbreps_max.bdg --outdir ${TAG}_run_cmbreps &> ${TAG}_run_cmbreps/run_cmbreps_max.log
+macs2 cmbreps -i ${TAG}_run_callpeak_narrow/run_callpeak_narrow0_treat_pileup.bdg ${TAG}_run_callpeak_narrow/run_callpeak_narrow0_control_lambda.bdg ${TAG}_run_bdgcmp/run_bdgcmp_ppois.bdg -m mean -o run_cmbreps_mean.bdg --outdir ${TAG}_run_cmbreps &> ${TAG}_run_cmbreps/run_cmbreps_mean.log
+macs2 cmbreps -i ${TAG}_run_callpeak_narrow/run_callpeak_narrow0_treat_pileup.bdg ${TAG}_run_callpeak_narrow/run_callpeak_narrow0_control_lambda.bdg ${TAG}_run_bdgcmp/run_bdgcmp_ppois.bdg -m fisher -o run_cmbreps_fisher.bdg --outdir ${TAG}_run_cmbreps &> ${TAG}_run_cmbreps/run_cmbreps_fisher.log
 
 # test large amount of contigs
 echo "12. 50k contigs with buffersize"
@@ -163,8 +163,7 @@ macs2 pileup -f BED -i $CHIPCONTIGS50K --extsize 200 --outdir ${TAG}_run_50kcont
 echo "12.4 randsample"
 macs2 randsample -i $CHIPCONTIGS50K -n 100000 --seed 31415926 --outdir ${TAG}_run_50kcontigs -o run_randsample.bed --buffer-size 1000 &> ${TAG}_run_50kcontigs/run_randsample.log
 
-echo ""
-echo "Last step: search for errors or warnings in log files"
+echo "13 search for errors or warnings in log files"
 flag=1
 for i in `ls ${TAG}_run_*/*.log`;do
     echo $i;
@@ -173,7 +172,32 @@ for i in `ls ${TAG}_run_*/*.log`;do
 done;
 
 if [[ $flag == 0 ]]; then
+    echo "Error or Warning can be found!"
     exit 1;
 fi
 
-exit 0;
+echo "14 compare with standard outputs"
+
+flag=0
+subfolders=(50kcontigs bdgbroadcall bdgcmp bdgdiff bdgpeakcall callpeak_broad callpeak_narrow callpeak_narrow_revert callpeak_pe_broad callpeak_pe_narrow cmbreps filterdup pileup randsample refinepeak)
+
+for i in ${subfolders[@]};do
+    for j in `ls standard_results_${i}/*`; do
+	k=`basename $j`
+	echo "checking $i $k"
+	fq=${TAG}_run_${i}/${k}
+	fs=standard_results_${i}/${k}
+	sort $fq > tmp_fq.txt
+	sort $fs > tmp_fs.txt
+	d=`diff tmp_fq.txt tmp_fs.txt`
+	if [ -z "$d" ]; then
+	    echo "... success!"
+	else
+	    echo "... failed! Difference:"
+	    echo $d
+	    let "flag=1";
+	fi
+    done
+done
+exit $flag;
+

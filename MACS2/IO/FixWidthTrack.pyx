@@ -1,4 +1,4 @@
-# Time-stamp: <2019-09-25 10:32:01 taoliu>
+# Time-stamp: <2019-10-01 14:03:56 taoliu>
 
 """Module for FWTrack classes.
 
@@ -898,8 +898,8 @@ cdef class FWTrack:
                 three_shift_s.append( end_shift + d)
             else:
                 # both sides
-                five_shift_s.append( d/2 - end_shift )
-                three_shift_s.append( end_shift + d - d/2)
+                five_shift_s.append( d//2 - end_shift )
+                three_shift_s.append( end_shift + d - d//2)
 
         prev_pileup = None
 
@@ -907,13 +907,13 @@ cdef class FWTrack:
             five_shift = five_shift_s[i]
             three_shift = three_shift_s[i]
             scale_factor = scale_factor_s[i]
-            
             tmp_pileup = se_all_in_one_pileup ( self.__locations[chrom][0], self.__locations[chrom][1], five_shift, three_shift, rlength, scale_factor, baseline_value )
 
             if prev_pileup:
                 prev_pileup = max_over_two_pv_array ( prev_pileup, tmp_pileup )
             else:
                 prev_pileup = tmp_pileup
+
         return prev_pileup
 
 cdef inline int32_t left_sum ( data, int pos, int width ):
