@@ -1,3 +1,5 @@
+# cython: language_level=3
+
 """
 Modified from Pandas: https://github.com/pydata/pandas/blob/master/pandas/src/hashtable.pyx
 """

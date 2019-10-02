@@ -1,4 +1,5 @@
-# Time-stamp: <2019-09-25 10:49:46 taoliu>
+# cython: language_level=3
+# Time-stamp: <2019-10-02 11:06:36 taoliu>
 
 """Module for PeakIO IO classes.
 

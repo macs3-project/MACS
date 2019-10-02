@@ -1,4 +1,5 @@
-# Time-stamp: <2019-10-01 16:22:18 taoliu>
+# cython: language_level=3
+# Time-stamp: <2019-10-02 11:04:34 taoliu>
 
 """Module Description: functions to find maxima minima or smooth the
 signal tracks.

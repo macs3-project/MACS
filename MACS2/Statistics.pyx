@@ -1,4 +1,5 @@
-# Time-stamp: <2019-09-25 10:25:19 taoliu>
+# cython: language_level=3
+# Time-stamp: <2019-10-02 11:04:48 taoliu>
 
 """Module Description: Statistics function wrappers.
 

@@ -1,3 +1,5 @@
+# cython: language_level=3
+
 import numpy as np
 cimport numpy as np
 from numpy cimport int32_t

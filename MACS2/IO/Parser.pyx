@@ -1,4 +1,5 @@
-# Time-stamp: <2019-09-25 10:26:34 taoliu>
+# cython: language_level=3
+# Time-stamp: <2019-10-02 11:06:11 taoliu>
 
 """Module for all MACS Parser classes for input.
 

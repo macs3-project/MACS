@@ -16,20 +16,10 @@ test/__pycache__
 .DS_Store
 .cache
 
-MACS2/IO/cParser.h
-
-MACS2/IO/numpy.pxd
-
-MACS2/mnumpy.pxd
-
-MACS2/numpy.pxd
-
 test/NOSPMR.ppois.bdg_ppois.bdg
 test/*_run_*
 
 MACS2.egg-info
-MACS2/IO/*.c
-MACS2/*.c
 
 .pytest_cache
 .cache

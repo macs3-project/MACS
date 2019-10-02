@@ -1,4 +1,5 @@
-# Time-stamp: <2019-09-25 10:18:47 taoliu>
+# cython: language_level=3
+# Time-stamp: <2019-10-02 11:05:42 taoliu>
 
 """Module Description:  IO Module for bedGraph file
 

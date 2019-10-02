@@ -10,8 +10,12 @@
 
 	3) More comprehensive test.sh script to check consistency of
 	results from Python2 version and Python3 version.
-
-	4) Fix Signal.pyx to use np.array instead of np.mat.
+	
+	4) Simplify setup.py script since the newest version transparently
+	supports cython. And when cython is not installed by user,
+	setup.py can still compile using only C codes.
+	
+	5) Fix Signal.pyx to use np.array instead of np.mat.
 
 ### 2.1.4 
 	* Features added 
@@ -48,7 +52,7 @@ alone, or with control sample with the increase of specificity.
 
 ## Install
 
-Please check the file 'INSTALL' in the distribution.
+Please check the file 'INSTALL.md' in the distribution.
 
 ## Usage
 

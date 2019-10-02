@@ -1,3 +1,5 @@
+# cython: language_level=3
+
 """
 Copied from Pandas: https://github.com/pydata/pandas/blob/master/pandas/src/khash.pxd
 """

@@ -1,4 +1,5 @@
-# Time-stamp: <2019-09-25 10:25:52 taoliu>
+# cython: language_level=3
+# Time-stamp: <2019-10-02 11:03:50 taoliu>
 
 """Module Description: Detect peaks, main module
 

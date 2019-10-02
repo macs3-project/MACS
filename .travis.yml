@@ -4,7 +4,8 @@ python:
   - "3.6"
   - "3.5"
 install:
-  - pip install -r requirements.txt
+  - pip install --upgrade pip
+  - pip install ---upgrade r requirements.txt
   - python setup.py install
 script:
   - pytest
