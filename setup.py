@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-# Time-stamp: <2019-10-02 11:19:33 taoliu>
+# Time-stamp: <2019-10-02 15:11:14 taoliu>
 
 """Description: 
 
@@ -17,8 +17,8 @@ from numpy import get_include as numpy_get_include
 numpy_include_dir = [numpy_get_include()]
 
 def main():
-    if float(sys.version[:3])<3.0:
-        sys.stderr.write("CRITICAL: Python version must be 3!\n")
+    if float(sys.version[:3])<3.5:
+        sys.stderr.write("CRITICAL: Python version must >= 3.5!\n")
         sys.exit(1)
 
     # I intend to use -Ofast, however if gcc version < 4.6, this option is unavailable so...
@@ -65,7 +65,9 @@ def main():
               'Operating System :: MacOS :: MacOS X',
               'Operating System :: POSIX',
               'Topic :: Scientific/Engineering :: Bio-Informatics',
-              'Programming Language :: Python :: 3 :: Only',
+              'Programming Language :: Python :: 3.5',
+              'Programming Language :: Python :: 3.6',
+              'Programming Language :: Python :: 3.7',
               'Programming Language :: Cython',
               ],
           install_requires=['numpy>=1.17'],          

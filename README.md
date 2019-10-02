@@ -1,3 +1,81 @@
+# MACS: Model-based Analysis for ChIP-Seq
+<table>
+<tr>
+  <td>
+    <img src="https://img.shields.io/github/languages/top/taoliu/MACS" alt="python version" />
+    <img src="https://img.shields.io/github/commit-activity/m/taoliu/MACS" alt="python version" />
+  </td>
+<tr>
+</table>
+
+<table>
+  <td>Latest Release</td>
+  <td>
+    <a href="https://github.com/taoliu/MACS/releases">
+    <img src="https://img.shields.io/github/v/release/taoliu/MACS" alt="latest release" />
+    </a>
+</td>
+</tr>
+<tr>
+  <td></td>
+  <td>
+    <a href="https://pypi.org/project/macs2/">
+    <img src="https://img.shields.io/pypi/v/macs2.svg" alt="latest release" />
+    <img src="https://img.shields.io/pypi/pyversions/MACS2" alt="python version" />
+    <img src="https://img.shields.io/pypi/format/macs2" alt="format" />
+    </a>
+  </td>
+</tr>
+<tr>
+  <td></td>
+  <td>
+    <a href="https://anaconda.org/bioconda/macs2">
+    <img src="https://img.shields.io/conda/v/bioconda/macs2" alt="latest release" />
+    <img src="https://img.shields.io/conda/pn/bioconda/macs2" alt="platform" />
+    </a>
+</td>
+</tr>
+<tr>
+  <td>Package Status</td>
+  <td>
+		<a href="https://pypi.org/project/macs2/">
+		<img src="https://img.shields.io/pypi/status/macs2.svg" alt="status" />
+		</a>
+  </td>
+</tr>
+<tr>
+  <td>License</td>
+  <td>
+    <a href="https://github.com/pandas-dev/pandas/blob/master/LICENSE">
+    <img src="https://img.shields.io/github/license/taoliu/MACS" alt="license" />
+    </a>
+</td>
+</tr>
+<tr>
+  <td>Build Status</td>
+  <td>
+    <a href="https://travis-ci.org/taoliu/MACS">
+    <img src="https://img.shields.io/travis/com/taoliu/MACS/master" alt="travis build status" />
+    </a>
+  </td>
+</tr>
+<tr>
+  <td>Downloads (PyPI)</td>
+  <td>
+    <a href="https://pypistats.org/packages/macs2">
+    <img src="https://img.shields.io/pypi/dm/macs2" alt="pypi downloads" />
+    </a>
+  </td>
+</tr>
+<tr>
+  <td>Downloads (Conda)</td>
+  <td>
+    <a href="https://anaconda.org/bioconda/macs2">
+    <img src="https://img.shields.io/conda/dn/bioconda/macs2" alt="conda downloads" />
+    </a>
+  </td>
+</tr>
+
 # Recent Changes for MACS (2.2.4)
 
 ## 2.2.4
