@@ -5,7 +5,7 @@
     <img src="https://img.shields.io/github/languages/top/taoliu/MACS" alt="python version" />
     <img src="https://img.shields.io/github/commit-activity/m/taoliu/MACS" alt="python version" />
   </td>
-<tr>
+</tr>
 </table>
 
 <table>
@@ -15,7 +15,7 @@
     <a href="https://github.com/taoliu/MACS/releases">
     <img src="https://img.shields.io/github/v/release/taoliu/MACS" alt="latest release" />
     </a>
-</td>
+  </td>
 </tr>
 <tr>
   <td></td>
