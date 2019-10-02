@@ -9,6 +9,7 @@
 </table>
 
 <table>
+<tr>
   <td>Latest Release</td>
   <td>
     <a href="https://github.com/taoliu/MACS/releases">
