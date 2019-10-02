@@ -78,9 +78,27 @@
 </tr>
 </table>
 
-# Recent Changes for MACS (2.2.4)
+## Introduction
 
-## 2.2.4
+With the improvement of sequencing techniques, chromatin
+immunoprecipitation followed by high throughput sequencing (ChIP-Seq)
+is getting popular to study genome-wide protein-DNA interactions. To
+address the lack of powerful ChIP-Seq analysis method, we presented
+the **M**odel-based **A**nalysis of **C**hIP-**S**eq (MACS), for
+identifying transcript factor binding sites. MACS captures the
+influence of genome complexity to evaluate the significance of
+enriched ChIP regions, and MACS improves the spatial resolution of
+binding sites through combining the information of both sequencing tag
+position and orientation. MACS can be easily used for ChIP-Seq data
+alone, or with control sample with the increase of
+specificity. Moreover, as a general peak-caller, MACS can also be
+applied to analyze any "DNA enrichment assays" if the question to be
+asked is simply "where in the genome we can find significant reads
+coverage than the random background".
+
+## Recent Changes for MACS (2.2.4)
+
+### 2.2.4
 	* Features added
 	
 	1) First Python3 version MACS2 released.
@@ -97,7 +115,7 @@
 	
 	5) Fix Signal.pyx to use np.array instead of np.mat.
 
-### 2.1.4 
+#### 2.1.4 
 	* Features added 
 	
 	Github Actions is used together with Travis CI for testing and 
@@ -113,22 +131,6 @@
 	place 'cythonzie' call to the correct position. 
 	
 	3) A typo is fixed in Github Actions script.	
-
-# README for MACS (2.2.4)
-
-## Introduction
-
-With the improvement of sequencing techniques, chromatin
-immunoprecipitation followed by high throughput sequencing (ChIP-Seq)
-is getting popular to study genome-wide protein-DNA interactions. To
-address the lack of powerful ChIP-Seq analysis method, we presented a
-novel algorithm, named Model-based Analysis of ChIP-Seq (MACS), for
-identifying transcript factor binding sites. MACS captures the
-influence of genome complexity to evaluate the significance of
-enriched ChIP regions, and MACS improves the spatial resolution of
-binding sites through combining the information of both sequencing tag
-position and orientation. MACS can be easily used for ChIP-Seq data
-alone, or with control sample with the increase of specificity.
 
 ## Install
 
