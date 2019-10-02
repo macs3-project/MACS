@@ -34,7 +34,7 @@
     <img src="https://img.shields.io/conda/v/bioconda/macs2" alt="latest release" />
     <img src="https://img.shields.io/conda/pn/bioconda/macs2" alt="platform" />
     </a>
-</td>
+  </td>
 </tr>
 <tr>
   <td>Package Status</td>
@@ -76,6 +76,7 @@
     </a>
   </td>
 </tr>
+</table>
 
 # Recent Changes for MACS (2.2.4)
 
