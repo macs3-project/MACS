@@ -55,7 +55,7 @@
 <tr>
   <td>Build Status</td>
   <td>
-    <a href="https://travis-ci.org/taoliu/MACS">
+    <a href="https://travis-ci.com/taoliu/MACS">
     <img src="https://img.shields.io/travis/com/taoliu/MACS/master" alt="travis build status" />
     </a>
   </td>
