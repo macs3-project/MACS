@@ -1,4 +1,4 @@
-# Time-stamp: <2019-09-20 11:34:13 taoliu>
+# Time-stamp: <2019-09-25 12:43:53 taoliu>
 
 """Description: combine replicates
 
@@ -55,7 +55,7 @@ def run( options ):
     cmbtrack = reps[ 0 ].overlie( [reps[ j ] for j in range(1, i - 1)], func=options.method )
     ofile = os.path.join( options.outdir, options.ofile )
     info("Write bedGraph of combined scores...")
-    ofhd = open(ofile,"wb")
+    ofhd = open(ofile,"w")
     cmbtrack.write_bedGraph(ofhd,name="%s_combined_scores" % (options.method.upper()),description="Scores calculated by %s" % (options.method.upper()))
     info("Finished '%s'! Please check '%s'!" % (options.method, ofile))
     

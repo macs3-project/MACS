@@ -1,4 +1,5 @@
-# Time-stamp: <2019-09-20 11:38:45 taoliu>
+# cython: language_level=3
+# Time-stamp: <2019-10-02 11:06:00 taoliu>
 
 """Module for FWTrack classes.
 
@@ -15,6 +16,7 @@ import logging
 #from array import array
 #from random import sample as random_sample
 import sys
+import io
 from copy import copy
 from collections import Counter
 
@@ -98,18 +100,18 @@ cdef class FWTrack:
         """
         cdef:
             set chrs
-            str chromosome
+            bytes chromosome
             
         chrs = set(self.get_chr_names())
         for chromosome in chrs:
-            if self.__locations.has_key(chromosome):
+            if chromosome in self.__locations:
                 self.__locations[chromosome][0].resize( self.buffer_size, refcheck=False )
                 self.__locations[chromosome][0].resize( 0, refcheck=False )
                 self.__locations[chromosome][1].resize( self.buffer_size, refcheck=False )
                 self.__locations[chromosome][1].resize( 0, refcheck=False )
                 self.__locations[chromosome] = [None, None]
                 self.__locations.pop(chromosome)
-            if self.__dup_locations.has_key(chromosome):
+            if chromosome in self.__dup_locations:
                 self.__dup_locations[chromosome][0].resize( self.buffer_size, refcheck=False )
                 self.__dup_locations[chromosome][0].resize( 0, refcheck=False )
                 self.__dup_locations[chromosome][1].resize( self.buffer_size, refcheck=False )
@@ -120,7 +122,7 @@ cdef class FWTrack:
         return True
 
 
-    cpdef add_loc ( self, str chromosome, int32_t fiveendpos, int strand ):
+    cpdef add_loc ( self, bytes chromosome, int32_t fiveendpos, int strand ):
         """Add a location to the list according to the sequence name.
         
         chromosome -- mostly the chromosome name
@@ -130,7 +132,7 @@ cdef class FWTrack:
         cdef:
             long i
 
-        if not self.__locations.has_key(chromosome):
+        if chromosome not in self.__locations:
             self.__locations[chromosome] = [ np.zeros(self.buffer_size, dtype='int32'), np.zeros(self.buffer_size, dtype='int32') ] # [plus,minus strand]
             self.__pointer[chromosome] = [ 0, 0 ]
             self.__locations[chromosome][strand][0] = fiveendpos
@@ -143,10 +145,10 @@ cdef class FWTrack:
                 self.__locations[chromosome][strand][i]= fiveendpos
                 self.__pointer[chromosome][strand] += 1
             except:
-                print "i:",i
-                print "self.buffer_size:", self.buffer_size
-                print "strand:", strand
-                print "loc len:", len( self.__locations[chromosome][strand] )
+                print ("i:",i)
+                print ("self.buffer_size:", self.buffer_size)
+                print ("strand:", strand)
+                print ("loc len:", len( self.__locations[chromosome][strand] ))
                 raise Exception("!!")
 
     cdef np.ndarray[np.int32_t, ndim=1] __expand__ ( self, np.ndarray[np.int32_t, ndim=1] arr ):
@@ -161,7 +163,7 @@ cdef class FWTrack:
         
         cdef:
             int32_t i
-            str c
+            bytes c
         
         self.total = 0
 
@@ -191,7 +193,7 @@ cdef class FWTrack:
         """
         cdef:
             set valid_chroms, missed_chroms, extra_chroms
-            str chrom
+            bytes chrom
 
         valid_chroms = set(self.__locations.keys()).intersection(rlengths.keys())
         for chrom in valid_chroms:
@@ -211,11 +213,11 @@ cdef class FWTrack:
             self.rlengths = dict([(k, INT_MAX) for k in self.__locations.keys()])
         return self.rlengths
 
-    cpdef get_locations_by_chr ( self, str chromosome ):
+    cpdef get_locations_by_chr ( self, bytes chromosome ):
         """Return a tuple of two lists of locations for certain chromosome.
 
         """
-        if self.__locations.has_key(chromosome):
+        if chromosome in self.__locations:
             return self.__locations[chromosome]
         else:
             raise Exception("No such chromosome name (%s) in TrackI object!\n" % (chromosome))
@@ -223,7 +225,7 @@ cdef class FWTrack:
     cpdef list get_chr_names ( self ):
         """Return all the chromosome names stored in this track object.
         """
-        l = self.__locations.keys()
+        l = list(self.__locations.keys())
         l.sort()
         return l
 
@@ -238,7 +240,7 @@ cdef class FWTrack:
         """
         cdef:
             int32_t i
-            str c
+            bytes c
 
         chrnames = self.get_chr_names()
 
@@ -258,7 +260,7 @@ cdef class FWTrack:
             int p, m, n, current_loc, i_chrom
             unsigned long i_old, i_new          # index for old array, and index for new one
             unsigned long i_dup, size, new_size, dup_size
-            str k
+            bytes k
             np.ndarray[np.int32_t, ndim=1] plus, new_plus, dup_plus, minus, new_minus, dup_minus
 
         if not self.__sorted:
@@ -384,7 +386,7 @@ cdef class FWTrack:
             int p, m, n, current_loc, i_chrom
             unsigned long i_old, i_new          # index for old array, and index for new one
             unsigned long i_dup, size, new_size, dup_size
-            str k
+            bytes k
             np.ndarray[np.int32_t, ndim=1] plus, new_plus, dup_plus, minus, new_minus, dup_minus
 
         if not self.__sorted:
@@ -452,10 +454,10 @@ cdef class FWTrack:
             int p, m, n, current_loc, i_chrom
             # index for old array, and index for new one
             unsigned long i_old, i_new, size, new_size 
-            str k
+            bytes k
             np.ndarray[np.int32_t, ndim=1] plus, new_plus, minus, new_minus
 
-        if maxnum < 0: return self.total           # do nothing
+        if maxnum < 0: return self.total         # do nothing
 
         if not self.__sorted:
             self.sort()
@@ -560,7 +562,7 @@ cdef class FWTrack:
         """
         cdef:
             int32_t num, i_chrom      # num: number of reads allowed on a certain chromosome
-            str key
+            bytes key
         
         self.total = 0
         self.length = 0
@@ -612,11 +614,11 @@ cdef class FWTrack:
         """
         cdef:
             int32_t i, i_chrom, p
-            str k
+            bytes k
         
         if not fhd:
             fhd = sys.stdout
-        assert isinstance(fhd, file)
+        assert isinstance(fhd,io.IOBase)
         assert self.fw > 0, "FWTrack object .fw should be set larger than 0!"
 
         chrnames = self.get_chr_names()
@@ -631,16 +633,16 @@ cdef class FWTrack:
 
             for i in range(plus.shape[0]):
                 p = plus[i]
-                fhd.write("%s\t%d\t%d\t.\t.\t%s\n" % (k,p,p+self.fw,"+") )
+                fhd.write("%s\t%d\t%d\t.\t.\t%s\n" % (k.decode(),p,p+self.fw,"+") )
 
             minus = self.__locations[k][1]
             
             for i in range(minus.shape[0]):
                 p = minus[i]
-                fhd.write("%s\t%d\t%d\t.\t.\t%s\n" % (k,p-self.fw,p,"-") )
+                fhd.write("%s\t%d\t%d\t.\t.\t%s\n" % (k.decode(),p-self.fw,p,"-") )
         return
     
-    cpdef tuple extract_region_tags ( self, str chromosome, int32_t startpos, int32_t endpos ):
+    cpdef tuple extract_region_tags ( self, bytes chromosome, int32_t startpos, int32_t endpos ):
         cdef:
             int32_t i, pos
             np.ndarray[np.int32_t, ndim=1] rt_plus, rt_minus
@@ -696,7 +698,7 @@ cdef class FWTrack:
         cdef:
             int32_t m, i, j, pre_i, pre_j, pos, startpos, endpos
             np.ndarray[np.int32_t, ndim=1] plus, minus, rt_plus, rt_minus
-            str chrom, name
+            bytes chrom, name
             list temp, retval, pchrnames
 
         pchrnames = peaks.get_chr_names()
@@ -777,7 +779,7 @@ cdef class FWTrack:
         cdef:
             int32_t m, i, j, pre_i, pre_j, pos, startpos, endpos #, n_peaks
             np.ndarray[np.int32_t, ndim=1] plus, minus, rt_plus, rt_minus
-            str chrom #, peak_name
+            bytes chrom #, peak_name
             list temp, retval, pchrnames, cpeaks
             np.ndarray[np.int32_t, ndim=1] adjusted_summits, passflags
 
@@ -863,7 +865,7 @@ cdef class FWTrack:
                 # end of a loop
         return ret_peaks
 
-    cpdef pileup_a_chromosome ( self, str chrom, list ds, list scale_factor_s, float baseline_value = 0.0, bint directional = True, int end_shift = 0 ):
+    cpdef pileup_a_chromosome ( self, bytes chrom, list ds, list scale_factor_s, float baseline_value = 0.0, bint directional = True, int end_shift = 0 ):
         """pileup a certain chromosome, return [p,v] (end position and value) list.
         
         ds             : tag will be extended to this value to 3' direction,
@@ -897,8 +899,8 @@ cdef class FWTrack:
                 three_shift_s.append( end_shift + d)
             else:
                 # both sides
-                five_shift_s.append( d/2 - end_shift )
-                three_shift_s.append( end_shift + d - d/2)
+                five_shift_s.append( d//2 - end_shift )
+                three_shift_s.append( end_shift + d - d//2)
 
         prev_pileup = None
 
@@ -906,13 +908,13 @@ cdef class FWTrack:
             five_shift = five_shift_s[i]
             three_shift = three_shift_s[i]
             scale_factor = scale_factor_s[i]
-            
             tmp_pileup = se_all_in_one_pileup ( self.__locations[chrom][0], self.__locations[chrom][1], five_shift, three_shift, rlength, scale_factor, baseline_value )
 
             if prev_pileup:
                 prev_pileup = max_over_two_pv_array ( prev_pileup, tmp_pileup )
             else:
                 prev_pileup = tmp_pileup
+
         return prev_pileup
 
 cdef inline int32_t left_sum ( data, int pos, int width ):

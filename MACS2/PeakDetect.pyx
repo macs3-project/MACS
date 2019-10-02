@@ -1,4 +1,5 @@
-# Time-stamp: <2019-09-20 11:24:38 taoliu>
+# cython: language_level=3
+# Time-stamp: <2019-10-02 11:03:50 taoliu>
 
 """Module Description: Detect peaks, main module
 
@@ -17,11 +18,11 @@ from MACS2.IO.BedGraphIO import bedGraphIO
 from MACS2.Constants import *
 from MACS2.IO.CallPeakUnit import CallerFromAlignments
 
-cdef str subpeak_letters(short i):
+cdef bytes subpeak_letters(short i):
     if i < 26:
-        return chr(97+i)
+        return chr(97+i).encode()
     else:
-        return subpeak_letters(i / 26) + chr(97 + (i % 26))
+        return subpeak_letters(i // 26) + chr(97 + (i % 26)).encode()
 
 class PeakDetect:
     """Class to do the peak calling.

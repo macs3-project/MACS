@@ -89,13 +89,13 @@ def zwig_write (trackI, subdir, fileprefix, d, log=None,space=10, single=False):
                 # project tag to window_counts line
                 ps = s-startp # projection start
                 pe = ps+d     # projection end
-                for i in xrange(ps,pe):
+                for i in range(ps,pe):
                     window_counts[i] += 1
                 index_tag += 1
             else:
                 # write it to zwig file then reset parameters
                 # keep this tag for next window
-                for i in xrange(d,step-d,space):
+                for i in range(d,step-d,space):
                     if window_counts[i] == 0:
                         pass
                     else:
@@ -103,13 +103,13 @@ def zwig_write (trackI, subdir, fileprefix, d, log=None,space=10, single=False):
                 # reset
                 window_counts_next = array(BYTE4,[0]*step)
                 # copy d values from the tail of previous window to next window
-                for n,i in enumerate(xrange(step-2*d,step)): # debug
+                for n,i in enumerate(range(step-2*d,step)): # debug
                     window_counts_next[n] = window_counts[i]
                 window_counts = window_counts_next
                 startp = endp - 2*d
                 endp = startp+step
         # last window
-        for i in xrange(d,step-d,space):
+        for i in range(d,step-d,space):
             if window_counts[i] == 0:
                 pass
             else:
@@ -171,7 +171,7 @@ def zbdg_write (trackI, subdir, fileprefix, d, log=None, single=False):
                 # project tag to window_counts line
                 ps = s-startp # projection start
                 pe = ps+d     # projection end
-                for i in xrange(ps,pe):
+                for i in range(ps,pe):
                     window_counts[i] += 1
                 index_tag += 1
             else:
@@ -180,7 +180,7 @@ def zbdg_write (trackI, subdir, fileprefix, d, log=None, single=False):
                 prev = window_counts[d]
                 left = startp+d
                 right = left+1
-                for i in xrange(d+1,step-d):
+                for i in range(d+1,step-d):
                     if window_counts[i] == prev:
                         # same value, extend
                         right += 1
@@ -198,7 +198,7 @@ def zbdg_write (trackI, subdir, fileprefix, d, log=None, single=False):
                 # reset
                 window_counts_next = array(BYTE4,[0]*step)
                 # copy d values from the tail of previous window to next window
-                for n,i in enumerate(xrange(step-2*d,step)): # debug
+                for n,i in enumerate(range(step-2*d,step)): # debug
                     window_counts_next[n] = window_counts[i]
                 window_counts = window_counts_next
                 startp = endp - 2*d
@@ -207,7 +207,7 @@ def zbdg_write (trackI, subdir, fileprefix, d, log=None, single=False):
         prev = window_counts[d]
         left = startp+d
         right = left+1
-        for i in xrange(d+1,step-d):
+        for i in range(d+1,step-d):
             if window_counts[i] == prev:
                 # same value, exrend
                 right += 1

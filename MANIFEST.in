@@ -1,3 +1,6 @@
 include README.md LICENSE ChangeLog INSTALL.md MANIFEST.in setup.py bin/macs2 MACS2/cPosValCalculation.c MACS2/cStatistics.c
-recursive-include MACS2 *.py *.pyx *.pxd *.h
+recursive-include MACS2 *.py *.pyx *.pxd *.c *.h
+exclude .gitignore .travis.yml
 prune test
+prune .github
+prune DOCKER

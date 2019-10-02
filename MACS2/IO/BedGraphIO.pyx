@@ -1,4 +1,5 @@
-# Time-stamp: <2019-09-20 11:37:42 taoliu>
+# cython: language_level=3
+# Time-stamp: <2019-10-02 11:05:42 taoliu>
 
 """Module Description:  IO Module for bedGraph file
 
@@ -62,13 +63,13 @@ cdef class bedGraphIO:
     If any of the above two criteria is violated, parsering will fail.
     """
     cdef:
-        char * bedGraph_filename
+        str bedGraph_filename
 
-    def __init__ ( self, bedGraph_filename ):
+    def __init__ ( self, str bedGraph_filename ):
         """f must be a filename or a file handler.
         
         """
-        self.bedGraph_filename = <bytes> bedGraph_filename
+        self.bedGraph_filename = bedGraph_filename
 
     def build_bdgtrack (self, double baseline_value=0):
         """Use this function to return a bedGraphTrackI object.
@@ -82,19 +83,19 @@ cdef class bedGraphIO:
         Then the region chr1:200..250 should be filled with
         baseline_value. Default of baseline_value is 0.
         """
-        cdef str i
+        cdef bytes i
 
         data = bedGraphTrackI(baseline_value=baseline_value)
         add_func = data.add_loc
         # python open file
-        bedGraph_file = open( self.bedGraph_filename, "r" )
+        bedGraph_file = open( self.bedGraph_filename, "rb" )
         
         for i in bedGraph_file:
-            if i.startswith("track"):
+            if i.startswith(b"track"):
                 continue
-            elif i.startswith("#"):
+            elif i.startswith(b"#"):
                 continue
-            elif i.startswith("browse"):
+            elif i.startswith(b"browse"):
                 continue
             else:
                 fs = i.split()
@@ -102,39 +103,6 @@ cdef class bedGraphIO:
 
         bedGraph_file.close()
         return data
-
-    def build_bdgtrack_c (self, double baseline_value=0):
-        """Use this function to return a bedGraphTrackI object. This is a C version.
-
-        baseline_value is the value to fill in the regions not defined
-        in bedGraph. For example, if the bedGraph is like:
-
-        chr1  100 200  1
-        chr1  250 350  2
-
-        Then the region chr1:200..250 should be filled with
-        baseline_value. Default of baseline_value is 0.
-        """
-        cdef:
-            char[80] chrom      # will there be chromosome name longer than 80 characters?
-            int start, end
-            float value
-            FILE * bedGraph_file
-        
-        data = bedGraphTrackI(baseline_value=baseline_value)
-        add_func = data.add_loc
-        # C open file
-        bedGraph_file = fopen( self.bedGraph_filename, "r" )
-        if bedGraph_file == NULL:
-            raise Exception("File '%s' can not be opened!" % self.bedGraph_filename )
-        
-        while ( fscanf( bedGraph_file, "%s\t%d\t%d\t%f\n", chrom, &start, &end, &value ) != EOF ):
-            add_func( chrom, start, end, value )
-        fclose( bedGraph_file )
-        #data.finalize()
-        return data
-
-
 
 cdef class genericBedIO:
     """File Parser Class for generic bed File with at least column #1,#2,#3,and #5.
@@ -156,8 +124,8 @@ cdef class genericBedIO:
         
         """
         if type(f) == str:
-            self.fhd = open(f,"r")
-        elif type(f) == file:
+            self.fhd = open(f,"rb")
+        elif type(f) == io.IOBase:
             self.fhd = f
         else:
             raise Exception("f must be a filename or a file handler.")

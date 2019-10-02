@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# Time-stamp: <2019-09-20 15:06:27 taoliu>
+# Time-stamp: <2019-09-25 11:35:54 taoliu>
 
 """Module Description: Test functions to calculate probabilities.
 
@@ -95,18 +95,18 @@ class Test_chisq_p_e(unittest.TestCase):
                  )
 
     def test_chisq_p(self):
-        expect = map(lambda x:round(x[2],4),self.c)
-        result = map(lambda x:round(chisq_pvalue_e(x[0],x[1]),4),self.c)
+        expect = [round(x[2],4) for x in self.c]
+        result = [round(chisq_pvalue_e(x[0],x[1]),4) for x in self.c]
         self.assertEqual( result, expect )
 
     def test_chisq_logp(self):
-        expect = map(lambda x:round(x[3],4),self.c)
-        result = map(lambda x:round(chisq_logp_e(x[0],x[1]),4),self.c)
+        expect = [round(x[3],4) for x in self.c]
+        result = [round(chisq_logp_e(x[0],x[1]),4) for x in self.c]
         self.assertEqual( result, expect )
 
     def test_chisq_log10p(self):
-        expect = map(lambda x:round(x[4],4),self.c)
-        result = map(lambda x:round(chisq_logp_e(x[0],x[1],log10=True),4),self.c)
+        expect = [round(x[4],4) for x in self.c]
+        result = [round(chisq_logp_e(x[0],x[1],log10=True),4) for x in self.c]
         self.assertEqual( result, expect )
         
 class Test_binomial_cdf(unittest.TestCase):

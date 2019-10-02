@@ -1,54 +1,86 @@
 # INSTALL Guide For MACS
-Time-stamp: <2019-09-30 14:47:45 taoliu>
+Time-stamp: <2019-10-02 12:06:33 taoliu>
 
 Please check the following instructions to complete your installation.
 
 ## Prerequisites
 
-Python version must be equal to *2.7* to run MACS.
+MACS v2.2.x requires Python3. We have tested MACS in Python3.5, 3.6
+and 3.7. MACS runs slower under Python3.5, so Python3.6 or Python3.7
+is recommanded.
 
-[Numpy](http://www.scipy.org/Download) (>=1.16) are required to run MACS v2. 
+MACS also requires [Numpy](http://www.scipy.org/Download) (>=1.17).
 
 GCC is required to compile `.c` codes in MACS v2 package, and python
 header files are needed. If you are using Mac OSX, I recommend you
 install Xcode; if you are using Linux, you need to make sure
-`python-dev` is installed.
+`python-dev` package is installed -- the actual package name depends
+on the Linux OS distribution you are using.
 
-[Cython](http://cython.org/) (>=0.29) is required to generate `.c`
-files from `.pyx` files using `setup.py` script.
+[Cython](http://cython.org/) is **NOT** required although most of
+MACS codes are written in Cython. But if you plan to generate `.c`
+files from `.pyx` by your own, you can install Cython (>=0.29), then
+use `setup.py` script.
 
-## Easy installation through PyPI
+## Prepare a virtual Python environment 
 
-The easiest way to install MACS2 is through PyPI system. Get pip_ if
-it's not available in your system. *Note* if you have already
-installed numpy and scipy system-wide, you can use `virtualenv
---system-site-packages` to let your virtual Python environment have
-access to system-wide numpy and scipy libraries so that you don't need
-to install them again.
+I strongly recommend to install your MACS program in a virtual
+environment, so that you have full control of your installation and
+won't mess up with your system libraries. To learn about virtual
+environment, read
+[this article](https://docs.python.org/3/library/venv.html). A simple
+way to create a virtual environment of Python3 is
 
-Then under command line, type `pip install MACS2`. PyPI will
-install Numpy and Cython automatically if they are absent. 
+`$ python3 -m venv MyPythonEnv/`
 
-To upgrade MACS2, type `pip install --upgrade MACS2`. It will check
+Then active it by
+
+`$ source MyPythonEnv/bin/active`
+
+## Install through PyPI
+
+The easiest way to install MACS is through PyPI system. Get `pip` if
+it's not available in your system. If you create a virtual environment
+as described before, your `pip` command will install everything under
+the folder you specified previously through `python3 -m env` command.
+
+Then under the command line, type `pip install macs2`. PyPI will
+install Numpy automatically if it is absent. 
+
+To upgrade MACS2, type `pip install --upgrade macs2`. It will check
 currently installed MACS2, compare the version with the one on PyPI
 repository, download and install newer version while necessary.
 
+## Install through Conda
+
+Please check [MACS2 page on
+bioconda](https://anaconda.org/bioconda/macs2) for instructions.
+
+## Install through Debian APT
+
+MACS is included in Debian Stretch/Buster/Unstable blessed by some
+kind of Supper Cow Powers.
+
 ## Install from source
 
-MACS uses Python's distutils tools for source installations. To
-install a source distribution of MACS, unpack the distribution tarball
-and open up a command terminal. Go to the directory where you unpacked
-MACS, and simply run the install script:
+MACS uses Python's [setuptools](https://setuptools.readthedocs.io) for
+source code installations. To install a source distribution of MACS,
+unpack the distribution tarball, or clone Git repository with `git
+clone git@github.com:taoliu/MACS.git`. Go to the directory where you
+unpacked MACS, and simply run the install script:
 
  `$ python setup.py install`
 
 By default, the script will install python library and executable
-codes globally, which means you need to be root or administrator of
-the machine so as to complete the installation. Please contact the
-administrator of that machine if you want their help. If you need to
-provide a nonstandard install prefix, or any other nonstandard
-options, you can provide many command line options to the install
-script. Use the –help option to see a brief list of available options:
+codes according to the environment. When you run the command under
+virtualenv, the script will install to the virtual environment
+instead. When you run it without virtual environment, you may need to
+be root or administrator of the machine so as to complete the
+installation. Please contact the system administrator if you want
+their help. If you need to provide a nonstandard install prefix, or
+any other nonstandard options, you can provide many command line
+options to the install script. Use the `--help` option to see a brief
+list of available options:
 
  `$ python setup.py --help`
 
@@ -57,8 +89,17 @@ directory, use this command:
 
  `$ python setup.py install --prefix /home/taoliu/`
 
+As mentioned in *Prerequisites*, you don't need to install Cython in
+order to install MACS. When Cython is available, this setup script
+will regenerate C codes from Pyx codes when necessary. When Cython is
+not available, this setup script will just use the C codes included in
+release package (or your Github clone) for installation.
 
 ## Configure enviroment variables
+
+*Note*, if you are using virtual environment, you should skip this
+section since all the corresponding environment variables have been
+correctly set while you `activate` the environment.
 
 After running the setup script, you might need to add the install
 location to your `PYTHONPATH` and `PATH` environment variables. The
@@ -70,7 +111,7 @@ concept is the same across platforms.
 To set up your `PYTHONPATH` environment variable, you'll need to add the
 value `PREFIX/lib/pythonX.Y/site-packages` to your existing
 `PYTHONPATH`. In this value, X.Y stands for the major–minor version of
-Python you are using (such as 2.7 ; you can find this with
+Python you are using (such as 3.7 ; you can find this with
 `sys.version[:3]` from a Python command line). `PREFIX` is the install
 prefix where you installed MACS. If you did not specify a prefix on
 the command line, MACS will be installed using Python's sys.prefix
@@ -79,7 +120,7 @@ value.
 On Linux, using bash, I include the new value in my `PYTHONPATH` by
 adding this line to my `~/.bashrc`::
 
- `$ export PYTHONPATH=/home/taoliu/lib/python2.7/site-packages:$PYTHONPATH`
+ `$ export PYTHONPATH=/home/taoliu/lib/python3.7/site-packages:$PYTHONPATH`
 
 Using Windows, you need to open up the system properties dialog, and
 locate the tab labeled Environment. Add your value to the `PYTHONPATH`

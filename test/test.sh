@@ -42,13 +42,15 @@ macs2 callpeak -g 52000000 -t $CHIP -c $CTRL -n run_callpeak_broad -B --outdir $
 echo "1.3 callpeak on PE narrow/broad"
 
 mkdir  ${TAG}_run_callpeak_pe_narrow
-mkdir  ${TAG}_run_callpeak_pe_broad
 
 macs2 callpeak -g 52000000 -f BAMPE -t $CHIPPE -c $CTRLPE -n run_callpeak_bampe_narrow -B --outdir ${TAG}_run_callpeak_pe_narrow --call-summits &> ${TAG}_run_callpeak_pe_narrow/run_callpeak_bampe_narrow.log
-macs2 callpeak -g 52000000 -f BAMPE -t $CHIPPE -c $CTRLPE -n run_callpeak_bampe_broad -B --outdir ${TAG}_run_callpeak_pe_broad --broad &> ${TAG}_run_callpeak_pe_broad/run_callpeak_bampe_broad.log
 macs2 callpeak -g 52000000 -f BEDPE -t $CHIPBEDPE -c $CTRLBEDPE -n run_callpeak_bedpe_narrow -B --outdir ${TAG}_run_callpeak_pe_narrow --call-summits &> ${TAG}_run_callpeak_pe_narrow/run_callpeak_bedpe_narrow.log
-macs2 callpeak -g 52000000 -f BEDPE -t $CHIPBEDPE -c $CTRLBEDPE -n run_callpeak_bedpe_broad -B --outdir ${TAG}_run_callpeak_pe_broad --broad &> ${TAG}_run_callpeak_pe_broad/run_callpeak_bedpe_broad.log
 macs2 callpeak -g 52000000 -f BEDPE -t $CHIPBEDPE -n run_callpeak_pe_narrow_onlychip -B --outdir ${TAG}_run_callpeak_pe_narrow &> ${TAG}_run_callpeak_pe_narrow/run_callpeak_pe_narrow_onlychip.log
+
+mkdir  ${TAG}_run_callpeak_pe_broad
+
+macs2 callpeak -g 52000000 -f BAMPE -t $CHIPPE -c $CTRLPE -n run_callpeak_bampe_broad -B --outdir ${TAG}_run_callpeak_pe_broad --broad &> ${TAG}_run_callpeak_pe_broad/run_callpeak_bampe_broad.log
+macs2 callpeak -g 52000000 -f BEDPE -t $CHIPBEDPE -c $CTRLBEDPE -n run_callpeak_bedpe_broad -B --outdir ${TAG}_run_callpeak_pe_broad --broad &> ${TAG}_run_callpeak_pe_broad/run_callpeak_bedpe_broad.log
 
 # pileup
 echo "2. pileup"
@@ -140,9 +142,9 @@ echo "11. cmbreps"
 
 mkdir ${TAG}_run_cmbreps
 
-macs2 cmbreps -i ${TAG}_run_callpeak_narrow/run_callpeak_narrow0_treat_pileup.bdg ${TAG}_run_callpeak_narrow/run_callpeak_narrow0_control_lambda.bdg ${TAG}_run_bdgcmp/run_bdgcmp_ppois.bdg -m max -o ${TAG}_cmbreps_max.bdg --outdir ${TAG}_run_cmbreps &> ${TAG}_run_cmbreps/run_cmbreps_max.log
-macs2 cmbreps -i ${TAG}_run_callpeak_narrow/run_callpeak_narrow0_treat_pileup.bdg ${TAG}_run_callpeak_narrow/run_callpeak_narrow0_control_lambda.bdg ${TAG}_run_bdgcmp/run_bdgcmp_ppois.bdg -m mean -o ${TAG}_cmbreps_mean.bdg --outdir ${TAG}_run_cmbreps &> ${TAG}_run_cmbreps/run_cmbreps_mean.log
-macs2 cmbreps -i ${TAG}_run_callpeak_narrow/run_callpeak_narrow0_treat_pileup.bdg ${TAG}_run_callpeak_narrow/run_callpeak_narrow0_control_lambda.bdg ${TAG}_run_bdgcmp/run_bdgcmp_ppois.bdg -m fisher -o ${TAG}_cmbreps_fisher.bdg --outdir ${TAG}_run_cmbreps &> ${TAG}_run_cmbreps/run_cmbreps_fisher.log
+macs2 cmbreps -i ${TAG}_run_callpeak_narrow/run_callpeak_narrow0_treat_pileup.bdg ${TAG}_run_callpeak_narrow/run_callpeak_narrow0_control_lambda.bdg ${TAG}_run_bdgcmp/run_bdgcmp_ppois.bdg -m max -o run_cmbreps_max.bdg --outdir ${TAG}_run_cmbreps &> ${TAG}_run_cmbreps/run_cmbreps_max.log
+macs2 cmbreps -i ${TAG}_run_callpeak_narrow/run_callpeak_narrow0_treat_pileup.bdg ${TAG}_run_callpeak_narrow/run_callpeak_narrow0_control_lambda.bdg ${TAG}_run_bdgcmp/run_bdgcmp_ppois.bdg -m mean -o run_cmbreps_mean.bdg --outdir ${TAG}_run_cmbreps &> ${TAG}_run_cmbreps/run_cmbreps_mean.log
+macs2 cmbreps -i ${TAG}_run_callpeak_narrow/run_callpeak_narrow0_treat_pileup.bdg ${TAG}_run_callpeak_narrow/run_callpeak_narrow0_control_lambda.bdg ${TAG}_run_bdgcmp/run_bdgcmp_ppois.bdg -m fisher -o run_cmbreps_fisher.bdg --outdir ${TAG}_run_cmbreps &> ${TAG}_run_cmbreps/run_cmbreps_fisher.log
 
 # test large amount of contigs
 echo "12. 50k contigs with buffersize"
@@ -161,17 +163,52 @@ macs2 pileup -f BED -i $CHIPCONTIGS50K --extsize 200 --outdir ${TAG}_run_50kcont
 echo "12.4 randsample"
 macs2 randsample -i $CHIPCONTIGS50K -n 100000 --seed 31415926 --outdir ${TAG}_run_50kcontigs -o run_randsample.bed --buffer-size 1000 &> ${TAG}_run_50kcontigs/run_randsample.log
 
-echo ""
-echo "Last step: search for errors or warnings in log files"
-flag=1
+echo "13. search for errors or warnings in log files"
+flag=0
 for i in `ls ${TAG}_run_*/*.log`;do
-    echo $i;
+    echo " checking $i..."
     egrep -i "error|warning" $i;
-    let "flag&=$?";
+    if [[ $? == 0 ]];then
+	echo " ... error/warning found!"
+	let "flag=1";
+    else
+	echo " ... clear!"
+    fi
 done;
 
-if [[ $flag == 0 ]]; then
+if [[ $flag == 1 ]]; then
+    echo " Error or Warning can be found! Quit the test!"
     exit 1;
 fi
 
-exit 0;
+echo "14. compare with standard outputs"
+
+flag=0
+subfolders=(50kcontigs bdgbroadcall bdgcmp bdgdiff bdgpeakcall callpeak_broad callpeak_narrow callpeak_narrow_revert callpeak_pe_broad callpeak_pe_narrow cmbreps filterdup pileup randsample refinepeak)
+
+m=0
+n=0
+for i in ${subfolders[@]};do
+    let "m+=1"
+    let "n=0"
+    for j in `ls standard_results_${i}/*`; do
+	k=`basename $j`
+	let "n+=1"
+	echo "14.${m}.${n} checking $i $k ..."
+	fq=${TAG}_run_${i}/${k}
+	fs=standard_results_${i}/${k}
+	sort $fq > tmp_fq.txt
+	sort $fs > tmp_fs.txt
+	d=`diff tmp_fq.txt tmp_fs.txt`
+	if [ -z "$d" ]; then
+	    echo " ... success!"
+	else
+	    echo " ... failed! Difference:"
+	    echo $d
+	    let "flag=1";
+	fi
+    done
+done
+rm -f tmp_fq.txt tmp_fs.txt
+exit $flag;
+

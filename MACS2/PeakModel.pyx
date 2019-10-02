@@ -1,4 +1,5 @@
-# Time-stamp: <2019-09-20 11:25:18 taoliu>
+# cython: language_level=3
+# Time-stamp: <2019-10-02 11:03:47 taoliu>
 
 """Module Description: Build shifting model
 
@@ -9,7 +10,8 @@ the distribution).
 import sys, time, random
 import numpy as np
 cimport numpy as np
-from array import array
+from cpython cimport array
+import array
 from MACS2.Constants import *
 
 from cpython cimport bool
@@ -27,9 +29,9 @@ cpdef median (nums):
     p = sorted(nums)
     l = len(p)
     if l%2 == 0:
-        return (p[l/2]+p[l/2-1])/2
+        return (p[l//2]+p[l//2-1])/2
     else:
-        return p[l/2]
+        return p[l//2]
 
 class NotEnoughPairsException(Exception):
     def __init__ (self,value):
@@ -110,11 +112,11 @@ cdef class PeakModel:
         cdef:
             dict paired_peaks
             long num_paired_peakpos, num_paired_peakpos_remained, num_paired_peakpos_picked
-            str c
+            bytes c                       #chromosome
         
 
         self.peaksize = 2*self.bw
-        self.min_tags = int(round(float(self.treatment.total) * self.lmfold * self.peaksize / self.gz /2)) # mininum unique hits on single strand
+        self.min_tags = int(round(float(self.treatment.total) * self.lmfold * self.peaksize / self.gz / 2)) # mininum unique hits on single strand
         self.max_tags = int(round(float(self.treatment.total) * self.umfold * self.peaksize / self.gz /2)) # maximum unique hits on single strand
         #print self.min_tags, self.max_tags
         #print self.min_tags
@@ -127,7 +129,7 @@ cdef class PeakModel:
         num_paired_peakpos_remained = self.max_pairnum
         num_paired_peakpos_picked = 0
         # select only num_paired_peakpos_remained pairs.
-        for c in paired_peakpos.keys():
+        for c in list(paired_peakpos.keys()):
             num_paired_peakpos +=len(paired_peakpos[c])
         # TL: Now I want to use everything
 
@@ -177,7 +179,7 @@ Summary of Peak Model:
         #self.plus_line = [0]*window_size
         #self.minus_line = [0]*window_size        
         self.info("start model_add_line...")
-        chroms = paired_peakpos.keys()
+        chroms = list(paired_peakpos.keys())
         
         for i in range(len(chroms)):
             paired_peakpos_chrom = paired_peakpos[chroms[i]]
@@ -222,7 +224,7 @@ Summary of Peak Model:
 #         i_l_max = sorted(i_l_max,
 #                          key=ycorr.__getitem__, 
 #                          reverse=True)
-        self.alternative_d = sorted(map(int, xcorr[i_l_max]))
+        self.alternative_d = sorted([int(x) for x in xcorr[i_l_max]])
         assert len(self.alternative_d) > 0, "No proper d can be found! Tweak --mfold?"
         
         self.d = xcorr[i_l_max[0]]
@@ -231,7 +233,6 @@ Summary of Peak Model:
 #         tmp_alternative_d = xcorr[ i_l_max ]
 #         cor_alternative_d =  tmp_cor_alternative_d [ tmp_alternative_d > 0 ]
 #         self.alternative_d = map( int, tmp_alternative_d[ tmp_alternative_d > 0 ] )
-        
         
         # best cross-correlation point
         
@@ -285,7 +286,7 @@ Summary of Peak Model:
 
         max_index = start.shape[0] - 1
 
-        psize_adjusted1 = self.peaksize + self.tag_expansion_size / 2 # half window
+        psize_adjusted1 = self.peaksize + self.tag_expansion_size // 2 # half window
 
         while i1<i1_max and i2<i2_max:
             p1 = pos1[i1]
@@ -308,9 +309,9 @@ Summary of Peak Model:
                     i2_prev = i2 # only the first index is recorded
                 # project
                 #for i in range(p2-p1+self.peaksize,p2-p1+self.peaksize+self.tag_expansion_size):
-                s = max(p2-self.tag_expansion_size/2-p1+psize_adjusted1, 0)
+                s = max(int(p2-self.tag_expansion_size/2-p1+psize_adjusted1), 0)
                 start[s] += 1
-                e = min(p2+self.tag_expansion_size/2-p1+psize_adjusted1, max_index)
+                e = min(int(p2+self.tag_expansion_size/2-p1+psize_adjusted1), max_index)
                 end[e] -= 1
                 #line[s:e] += 1
                 #for i in range(s,e):
@@ -340,7 +341,7 @@ Summary of Peak Model:
         cdef:
            int i
            list chrs
-           str chrom
+           bytes chrom
            dict paired_peaks_pos
            np.ndarray[np.int32_t, ndim=1] plus_tags, minus_tags
 
@@ -365,11 +366,19 @@ Summary of Peak Model:
                 self.debug("Number of paired peaks: %d" %(len(paired_peaks_pos[chrom])))
         return paired_peaks_pos
 
-    cdef __find_pair_center (self, pluspeaks, minuspeaks):
-        ip = 0                  # index for plus peaks
-        im = 0                  # index for minus peaks
-        im_prev = 0             # index for minus peaks in previous plus peak
-        pair_centers = array(BYTE4,[])
+    cdef __find_pair_center (self, list pluspeaks, list minuspeaks):
+        cdef:
+            long ip = 0                  # index for plus peaks
+            long im = 0                  # index for minus peaks
+            long im_prev = 0             # index for minus peaks in previous plus peak
+            array.array pair_centers
+            long ip_max
+            long im_max
+            bool flag_find_overlap
+            long pp, pn
+            long mp, mn
+            
+        pair_centers = array.array(BYTE4,[])
         ip_max = len(pluspeaks)
         im_max = len(minuspeaks)
         flag_find_overlap = False
@@ -388,7 +397,7 @@ Summary of Peak Model:
                     im_prev = im # only the first index is recorded
                 if float(pn)/mn < 2 and float(pn)/mn > 0.5: # number tags in plus and minus peak region are comparable...
                     if pp < mp:
-                        pair_centers.append((pp+mp)/2)
+                        pair_centers.append((pp+mp)//2)
                         #self.debug ( "distance: %d, minus: %d, plus: %d" % (mp-pp,mp,pp))
                 im += 1
         return pair_centers
@@ -457,7 +466,7 @@ Summary of Peak Model:
         #else:
         #    start = pos_list[0] - self.tag_expansion_size
 
-        start = pos_list[0] - self.tag_expansion_size/2 # leftmost position of project line
+        start = pos_list[0] - self.tag_expansion_size//2 # leftmost position of project line
         ss = []
         es = []
 
@@ -469,8 +478,8 @@ Summary of Peak Model:
         for i in range(len(pos_list)):
             pos = pos_list[i]
             #if plus_strand:
-            ss.append( max(pos-start-self.tag_expansion_size/2,0) )
-            es.append( min(pos-start+self.tag_expansion_size/2,peak_length) )
+            ss.append( max(pos-start-self.tag_expansion_size//2,0) )
+            es.append( min(pos-start+self.tag_expansion_size//2,peak_length) )
 
         ss.sort()
         es.sort()
@@ -534,7 +543,7 @@ Summary of Peak Model:
                top_pos.append(pp)
         
         #print top_pos[int(len(top_pos)/2)]+start
-        return (top_pos[int(len(top_pos)/2)]+start)
+        return (top_pos[len(top_pos)//2]+start)
 
     cdef __naive_peak_pos2 (self, pos_list, int plus_strand ):
         """Naively calculate the position of peak.
@@ -565,7 +574,7 @@ Summary of Peak Model:
         #print horizon_line
         top_indices = np.where(horizon_line == horizon_line.max())[0]
         #print top_indices+start
-        return top_indices[ int(top_indices.shape[0]/2) ] + start
+        return top_indices[ top_indices.shape[0]//2 ] + start
 
 # smooth function from SciPy cookbook: http://www.scipy.org/Cookbook/SignalSmooth
 cpdef smooth(x, int window_len=11, str window='hanning'):
@@ -623,4 +632,4 @@ cpdef smooth(x, int window_len=11, str window='hanning'):
         w=eval('np.'+window+'(window_len)')
 
     y=np.convolve(w/w.sum(),s,mode='valid')
-    return y[(window_len/2):-(window_len/2)]
+    return y[(window_len//2):-(window_len//2)]

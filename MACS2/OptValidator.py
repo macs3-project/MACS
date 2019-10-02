@@ -1,4 +1,4 @@
-# Time-stamp: <2019-09-20 11:15:34 taoliu>
+# Time-stamp: <2019-09-25 10:15:20 taoliu>
 
 """Module Description
 
@@ -45,7 +45,7 @@ def opt_validate ( options ):
             options.gsize = float(options.gsize)
         except:
             logging.error("Error when interpreting --gsize option: %s" % options.gsize)
-            logging.error("Available shortcuts of effective genome sizes are %s" % ",".join(efgsize.keys()))
+            logging.error("Available shortcuts of effective genome sizes are %s" % ",".join(list(efgsize.keys())))
             sys.exit(1)
 
     # format
@@ -141,7 +141,7 @@ def opt_validate ( options ):
     if options.cutoff_analysis:
         options.cutoff_analysis_file = os.path.join( options.outdir, options.name+"_cutoff_analysis.txt" )
     else:
-        options.cutoff_analysis_file = None
+        options.cutoff_analysis_file = "None"
     #options.negxls  = os.path.join( options.name+"_negative_peaks.xls" )
     #options.diagxls = os.path.join( options.name+"_diag.xls" )
     options.modelR  = os.path.join( options.outdir, options.name+"_model.r" )
@@ -208,7 +208,7 @@ def opt_validate ( options ):
             options.argtxt += "# Larger dataset will be scaled towards smaller dataset.\n"
 
     if options.ratio != 1.0:
-	options.argtxt += "# Using a custom scaling factor: %.2e\n" % (options.ratio)
+        options.argtxt += "# Using a custom scaling factor: %.2e\n" % (options.ratio)
 	
     if options.cfile:
         options.argtxt += "# Range for calculating regional lambda is: %d bps and %d bps\n" % (options.smalllocal,options.largelocal)
@@ -357,7 +357,7 @@ def opt_validate_filterdup ( options ):
             options.gsize = float(options.gsize)
         except:
             logging.error("Error when interpreting --gsize option: %s" % options.gsize)
-            logging.error("Available shortcuts of effective genome sizes are %s" % ",".join(efgsize.keys()))
+            logging.error("Available shortcuts of effective genome sizes are %s" % ",".join(list(efgsize.keys())))
             sys.exit(1)
 
     # format
@@ -543,7 +543,7 @@ def opt_validate_predictd ( options ):
             options.gsize = float(options.gsize)
         except:
             logging.error("Error when interpreting --gsize option: %s" % options.gsize)
-            logging.error("Available shortcuts of effective genome sizes are %s" % ",".join(efgsize.keys()))
+            logging.error("Available shortcuts of effective genome sizes are %s" % ",".join(list(efgsize.keys())))
             sys.exit(1)
 
     # format

@@ -1,59 +1,40 @@
-# Recent Changes for MACS (2.1.4)
+# Recent Changes for MACS (2.2.4)
 
-### 2.1.4
+## 2.2.4
 	* Features added
 	
-	Github Actions is used together with Travis CI for testing and
-	deployment.
+	1) First Python3 version MACS2 released.
+
+	2) Version number 2.2.X will be used for MACS2 in Python3, in
+	parallel to 2.1.X.
+
+	3) More comprehensive test.sh script to check consistency of
+	results from Python2 version and Python3 version.
 	
-	* Bugs fixed (PR #322)
+	4) Simplify setup.py script since the newest version transparently
+	supports cython. And when cython is not installed by user,
+	setup.py can still compile using only C codes.
 	
-	1) #318 Random score in `bdgdiff` output. It turns out the sum_v
-	is not initialized as 0 before adding. Potential bugs are fixed in
-	other functions in ScoreTrack and CallPeakUnit codes.
+	5) Fix Signal.pyx to use np.array instead of np.mat.
+
+### 2.1.4 
+	* Features added 
 	
-	2) #321 Cython dependency in `setup.py` script is removed. And
-	place 'cythonzie' call to the correct position.
+	Github Actions is used together with Travis CI for testing and 
+	deployment. 
+	
+	* Bugs fixed (PR #322) 
+	
+	1) #318 Random score in `bdgdiff` output. It turns out the sum_v 
+	is not initialized as 0 before adding. Potential bugs are fixed in 
+	other functions in ScoreTrack and CallPeakUnit codes. 
+	
+	2) #321 Cython dependency in `setup.py` script is removed. And 
+	place 'cythonzie' call to the correct position. 
 	
 	3) A typo is fixed in Github Actions script.	
 
-
-### 2.1.3
-	* Features added
-
-	1) Support Docker auto-deploy. PR #309
-
-	2) Support Travis CI auto-testing, update unit-testing
-	scripts, and enable subcommand testing on small datasets.
-
-	3) Update README documents. #297 PR #306
-
-	4) `cmbreps` supports more than 2 replicates. Merged from PR #304
-	@Maarten-vd-Sande and PR #307 (our own chi-sq test code)
-
-	5) `--d-min` option is added in `callpeak` and `predictd`, to
-	exclude predictions of fragment size smaller than the given
-	value. Merged from PR #267 @shouldsee.
-
-	6) `--buffer-size` option is added in `predictd`, `filterdup`,
-	`pileup` and `refinepeak` subcommands. Users can use this option
-	to decrease memory usage while there are a large number of contigs
-	in the data. Also, now `callpeak`, `predictd`, `filterdup`,
-	`pileup` and `refinepeak` will suggest users to tweak
-	`--buffer-size` while catching a MemoryError. #313 PR #314
-
-	* Bugs fixed
-
-	1) #265 Fixed a bug where the pseudocount hasn't been applied
-	while calculating p-value score in ScoreTrack object.
-
-	2) Fixed bdgbroadcall so that it will report those broad peaks
-	without strong peak inside, a consistent behavior as `callpeak
-	--broad`.
-
-	3) Rename COPYING to LICENSE.
-
-# README for MACS2 (2.1.4)
+# README for MACS (2.2.4)
 
 ## Introduction
 
@@ -71,7 +52,7 @@ alone, or with control sample with the increase of specificity.
 
 ## Install
 
-Please check the file 'INSTALL' in the distribution.
+Please check the file 'INSTALL.md' in the distribution.
 
 ## Usage
 
