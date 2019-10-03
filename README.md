@@ -151,19 +151,20 @@ Control.bam --broad -g hs --broad-cutoff 0.1`
 
 There are twelve functions available in MAC2S serving as sub-commands.
 
-Subcommand | Description -----------|---------- `callpeak` | Main
-MACS2 Function to call peaks from alignment results.  `bdgpeakcall` |
-Call peaks from bedGraph output.  `bdgbroadcall` | Call broad peaks
-from bedGraph output.  `bdgcmp` | Comparing two signal tracks in
-bedGraph format.  `bdgopt` | Operate the score column of bedGraph
-file.  `cmbreps` | Combine BEDGraphs of scores from replicates.
-`bdgdiff` | Differential peak detection based on paired four bedGraph
-files.  `filterdup` | Remove duplicate reads, then save in BED/BEDPE
-format.  `predictd` | Predict d or fragment size from alignment
-results.  `pileup` | Pileup aligned reads (single-end) or fragments
-(paired-end) `randsample` | Randomly choose a number/percentage of
-total reads.  `refinepeak` | Take raw reads alignment, refine peak
-summits.
+Subcommand | Description
+-----------|----------
+`callpeak` | Main MACS2 Function to call peaks from alignment results.
+`bdgpeakcall` | Call peaks from bedGraph output.
+`bdgbroadcall` | Call broad peaks from bedGraph output.
+`bdgcmp` | Comparing two signal tracks in bedGraph format.
+`bdgopt` | Operate the score column of bedGraph file.
+`cmbreps` | Combine BEDGraphs of scores from replicates.
+`bdgdiff` | Differential peak detection based on paired four bedGraph files.
+`filterdup` | Remove duplicate reads, then save in BED/BEDPE format.
+`predictd` | Predict d or fragment size from alignment results.
+`pileup` | Pileup aligned reads (single-end) or fragments (paired-end)
+`randsample` | Randomly choose a number/percentage of total reads.
+`refinepeak` | Take raw reads alignment, refine peak summits.
 
 We only cover `callpeak` module in this document. Please use `macs2
 COMMAND -h` to see the detail description for each option of each
