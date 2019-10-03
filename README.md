@@ -182,14 +182,14 @@ the essential options.
 ##### `-t/--treatment FILENAME`
 
 This is the only REQUIRED parameter for MACS. The file can be in any
-supported format specified by --format option. Check --format for
+supported format specified by `--format` option. Check `--format` for
 detail. If you have more than one alignment file, you can specify them
 as `-t A B C`. MACS will pool up all these files together.
 
 ##### `-c/--control`
 
 The control or mock data file. Please follow the same direction as for
--t/--treatment.
+`-t`/`--treatment`.
 
 ##### `-n/--name`
 
@@ -268,9 +268,8 @@ It's the mappable genome size or effective genome size which is
 defined as the genome size which can be sequenced. Because of the
 repetitive features on the chromosomes, the actual mappable genome
 size will be smaller than the original size, about 90% or 70% of the
-genome size. The default hs -- 2.7e9 is recommended for UCSC human
-hg18 assembly. Here are all precompiled parameters for effective
-genome size:
+genome size. The default *hs* -- 2.7e9 is recommended for human
+genome. Here are all precompiled parameters for effective genome size:
 
  * hs: 2.7e9
  * mm: 1.87e9
@@ -301,7 +300,7 @@ calculated from p-values using the Benjamini-Hochberg procedure.
 
 ##### `-p/--pvalue`
 
-The p-value cutoff. If -p is specified, MACS2 will use p-value instead
+The p-value cutoff. If `-p` is specified, MACS2 will use p-value instead
 of q-value.
 
 ##### `--min-length`, `--max-gap`
@@ -398,7 +397,7 @@ False
 ##### `--broad-cutoff`
 
 Cutoff for the broad region. This option is not available unless
---broad is set. If -p is set, this is a p-value cutoff, otherwise,
+`--broad` is set. If `-p` is set, this is a p-value cutoff, otherwise,
 it's a q-value cutoff.  DEFAULT: 0.1
 
 ##### `--scale-to <large|small>`
@@ -486,31 +485,32 @@ for reading an alignment file is about # of CHROMOSOME * BUFFER_SIZE *
 
 3. `NAME_summits.bed` is in BED format, which contains the peak
    summits locations for every peak. The 5th column in this file is
-   the same as NAME_peaks.narrowPeak. If you want to find the motifs
-   at the binding sites, this file is recommended. The file can be
-   loaded directly to the UCSC genome browser. Remove the beginning
-   track line if you want to analyze it by other tools.
+   the same as what is in the `narrowPeak` file. If you want to find
+   the motifs at the binding sites, this file is recommended. The file
+   can be loaded directly to the UCSC genome browser. Remove the
+   beginning track line if you want to analyze it by other tools.
 
 4. `NAME_peaks.broadPeak` is in BED6+3 format which is similar to
-   narrowPeak file, except for missing the 10th column for annotating
-   peak summits. This file and the `gappedPeak` file will only be
-   available when `--broad` is enabled. Since in the broad peak
-   calling mode, the peak summit won't be called, the values in the
-   5th, and 7-9th columns are the mean value across all positions in
-   the peak region.
+   `narrowPeak` file, except for missing the 10th column for
+   annotating peak summits. This file and the `gappedPeak` file will
+   only be available when `--broad` is enabled. Since in the broad
+   peak calling mode, the peak summit won't be called, the values in
+   the 5th, and 7-9th columns are the mean value across all positions
+   in the peak region. Refer to `narrowPeak` if you want to fix the
+   value issue in the 5th column.
 
 5. `NAME_peaks.gappedPeak` is in BED12+3 format which contains both
-   the broad region and narrow peaks. The 5th column is
-   10*-log10qvalue, to be more compatible to show grey levels on the
-   UCSC browser. The 7th is the start of the first narrow peak in the
-   region, and the 8th column is the end. The 9th column should be RGB
-   color key, however, we keep 0 here to use the default color, so
-   change it if you want. The 10th column tells how many blocks
-   including the starting 1bp and ending 1bp of broad regions. The
-   11th column shows the length of each block and 12th for the start
-   of each block. 13th: fold-change, 14th: -log10pvalue, 15th:
-   -log10qvalue. The file can be loaded directly to the UCSC genome
-   browser.
+   the broad region and narrow peaks. The 5th column is the score for
+   showing grey levels on the UCSC browser as in `narrowPeak`. The 7th
+   is the start of the first narrow peak in the region, and the 8th
+   column is the end. The 9th column should be RGB color key, however,
+   we keep 0 here to use the default color, so change it if you
+   want. The 10th column tells how many blocks including the starting
+   1bp and ending 1bp of broad regions. The 11th column shows the
+   length of each block and 12th for the start of each block. 13th:
+   fold-change, 14th: *-log10pvalue*, 15th: *-log10qvalue*. The file can
+   be loaded directly to the UCSC genome browser. Refer to
+   `narrowPeak` if you want to fix the value issue in the 5th column.
 
 6. `NAME_model.r` is an R script which you can use to produce a PDF
    image of the model based on your data. Load it to R by:
