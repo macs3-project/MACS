@@ -471,7 +471,7 @@ for reading an alignment file is about # of CHROMOSOME * BUFFER_SIZE *
      `int(-10*log10pvalue)` or `int(-10*log10qvalue)` depending on
      whether `-p` (pvalue) or `-q` (qvalue) is used as score
      cutoff. Please note that currently this value might be out of the
-     [0-1000] range defined in [UCSC Encode narrowPeak
+     [0-1000] range defined in [UCSC ENCODE narrowPeak
      format](https://genome.ucsc.edu/FAQ/FAQformat.html#format12). You
      can let the value saturated at 1000 (i.e. p/q-value = 10^-100) by
      using the following 1-liner awk: `awk -v OFS="\t"
