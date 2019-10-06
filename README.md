@@ -58,7 +58,7 @@
 <tr>
   <td>License</td>
   <td>
-    <a href="https://github.com/pandas-dev/pandas/blob/master/LICENSE">
+    <a href="https://github.com/taoliu/MACS/blob/master/LICENSE">
     <img src="https://img.shields.io/github/license/taoliu/MACS" alt="license" />
     </a>
 </td>
