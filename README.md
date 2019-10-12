@@ -32,22 +32,33 @@
   <td>
     <a href="https://anaconda.org/bioconda/macs2">
     <img src="https://img.shields.io/conda/v/bioconda/macs2" alt="latest release" />
+    </a>	
     <img src="https://img.shields.io/conda/pn/bioconda/macs2" alt="platform" />
+  </td>
+</tr>
+<tr>
+  <td></td>
+  <td>
+    <a href="https://packages.debian.org/buster/macs">
+    <img src="https://img.shields.io/debian/v/macs/stable?label=debian%20%28stable%29" alt="lastest release stable" />
+    </a>
+    <a href="https://packages.debian.org/sid/macs">
+    <img src="https://img.shields.io/debian/v/macs/sid?label=debian%20%28sid%29" alt="latest release unstable" />
     </a>
   </td>
 </tr>
 <tr>
   <td>Package Status</td>
   <td>
-		<a href="https://pypi.org/project/macs2/">
-		<img src="https://img.shields.io/pypi/status/macs2.svg" alt="status" />
-		</a>
+    <a href="https://pypi.org/project/macs2/">
+    <img src="https://img.shields.io/pypi/status/macs2.svg" alt="status" />
+    </a>
   </td>
 </tr>
 <tr>
   <td>License</td>
   <td>
-    <a href="https://github.com/pandas-dev/pandas/blob/master/LICENSE">
+    <a href="https://github.com/taoliu/MACS/blob/master/LICENSE">
     <img src="https://img.shields.io/github/license/taoliu/MACS" alt="license" />
     </a>
 </td>
