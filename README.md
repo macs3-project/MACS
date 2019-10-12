@@ -1,12 +1,6 @@
 # MACS: Model-based Analysis for ChIP-Seq
-<table>
-<tr>
-  <td>
-    <img src="https://img.shields.io/github/languages/top/taoliu/MACS" alt="python version" />
-    <img src="https://img.shields.io/github/commit-activity/m/taoliu/MACS" alt="python version" />
-  </td>
-</tr>
-</table>
+
+![Programming languages](https://img.shields.io/github/languages/top/taoliu/MACS) ![Commit activity](https://img.shields.io/github/commit-activity/m/taoliu/MACS) [![Codecov](https://img.shields.io/codecov/c/github/taoliu/MACS)](https://codecov.io/gh/taoliu/MACS) [![TravisCI Build Status](https://img.shields.io/travis/com/taoliu/MACS/master)](https://travis-ci.com/taoliu/MACS)
 
 <table>
 <tr>
@@ -62,14 +56,6 @@
     <img src="https://img.shields.io/github/license/taoliu/MACS" alt="license" />
     </a>
 </td>
-</tr>
-<tr>
-  <td>Build Status</td>
-  <td>
-    <a href="https://travis-ci.com/taoliu/MACS">
-    <img src="https://img.shields.io/travis/com/taoliu/MACS/master" alt="travis build status" />
-    </a>
-  </td>
 </tr>
 <tr>
   <td>Downloads (PyPI)</td>
