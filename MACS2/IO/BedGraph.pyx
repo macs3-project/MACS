@@ -1,5 +1,5 @@
 # cython: language_level=3
-# Time-stamp: <2019-10-02 11:05:35 taoliu>
+# Time-stamp: <2019-10-23 16:42:25 taoliu>
 
 """Module for BedGraph data class.
 
@@ -221,11 +221,11 @@ cdef class bedGraphTrackI:
         else:
             return None
 
-    def get_chr_names (self):
+    def list get_chr_names (self):
         """Return all the chromosome names stored.
         
         """
-        l = set(self.__data.keys())
+        l = sorted(self.__data.keys())
         return l
 
     def write_bedGraph (self, fhd, str name, str description, bool trackline=True):
@@ -320,7 +320,7 @@ cdef class bedGraphTrackI:
             double new_pre_value, value
             bytes chrom
         
-        chrs = set(self.__data.keys())
+        chrs = self.get_chr_names()
         for chrom in chrs:
             (p,v) = self.__data[chrom]
             pnext = iter(p).__next__
@@ -763,7 +763,7 @@ cdef class bedGraphTrackI:
             double t0, t1, t 
 
         # calculate frequencies of each p-score
-        for chrom in self.__data.keys():
+        for chrom in self.get_chr_names():
             pre_p = 0
 
             [pos_array, pscore_array] = self.__data[ chrom ]
@@ -807,7 +807,7 @@ cdef class bedGraphTrackI:
             nhcal += 1
 
         # convert pscore to qscore
-        for chrom in self.__data.keys():
+        for chrom in self.get_chr_names():
             [pos_array, pscore_array] = self.__data[ chrom ]
 
             for i in range( len( pos_array ) ):
@@ -990,7 +990,7 @@ cdef class bedGraphTrackI:
             dict cutoff_npeaks, cutoff_lpeaks
             float s, midvalue
             
-        chrs = self.__data.keys()
+        chrs = self.get_chr_names()
 
         midvalue = self.minvalue/2 + self.maxvalue/2
         s = float(self.minvalue - midvalue)/steps
