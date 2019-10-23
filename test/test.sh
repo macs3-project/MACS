@@ -118,7 +118,7 @@ mkdir ${TAG}_run_bdgpeakcall
 
 macs2 bdgpeakcall -i ${TAG}_run_bdgcmp/run_bdgcmp_FE.bdg -c 2 --outdir ${TAG}_run_bdgpeakcall --o-prefix run_bdgpeakcall_w_prefix &> ${TAG}_run_bdgpeakcall/run_bdgpeakcall_w_prefix.log
 
-macs2 bdgpeakcall -i ${TAG}_run_bdgcmp/run_bdgcmp_FE.bdg -c 2 --outdir ${TAG}_run_bdgpeakcall --o run_bdgpeakcall_cutoff.txt --cutoff-analysis &> ${TAG}_run_bdgpeakcall/run_bdgpeakcall_cutoff.log
+macs2 bdgpeakcall -i ${TAG}_run_bdgcmp/run_bdgcmp_FE.bdg -c 2 --outdir ${TAG}_run_bdgpeakcall -o run_bdgpeakcall_cutoff.txt --cutoff-analysis &> ${TAG}_run_bdgpeakcall/run_bdgpeakcall_cutoff.log
 
 # bdgbroadcall
 echo "9. bdgbroadcall"
