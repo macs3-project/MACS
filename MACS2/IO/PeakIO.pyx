@@ -1,5 +1,6 @@
 # cython: language_level=3
-# Time-stamp: <2019-10-30 12:12:25 taoliu>
+# cython: profile=True
+# Time-stamp: <2019-10-30 16:33:14 taoliu>
 
 """Module for PeakIO IO classes.
 
