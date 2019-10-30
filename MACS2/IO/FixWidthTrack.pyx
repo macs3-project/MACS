@@ -1,5 +1,5 @@
 # cython: language_level=3
-# Time-stamp: <2019-10-02 11:06:00 taoliu>
+# Time-stamp: <2019-10-30 12:11:43 taoliu>
 
 """Module for FWTrack classes.
 
@@ -102,7 +102,7 @@ cdef class FWTrack:
             set chrs
             bytes chromosome
             
-        chrs = set(self.get_chr_names())
+        chrs = self.get_chr_names()
         for chromosome in chrs:
             if chromosome in self.__locations:
                 self.__locations[chromosome][0].resize( self.buffer_size, refcheck=False )
@@ -164,13 +164,13 @@ cdef class FWTrack:
         cdef:
             int32_t i
             bytes c
+            set chrnames
         
         self.total = 0
 
         chrnames = self.get_chr_names()
 
-        for i in range(len(chrnames)):
-            c = chrnames[i]
+        for c in chrnames:
             self.__locations[c][0].resize( self.__pointer[c][0], refcheck=False )
             self.__locations[c][0].sort()
             self.__locations[c][1].resize( self.__pointer[c][1], refcheck=False )
@@ -222,12 +222,10 @@ cdef class FWTrack:
         else:
             raise Exception("No such chromosome name (%s) in TrackI object!\n" % (chromosome))
 
-    cpdef list get_chr_names ( self ):
+    cpdef set get_chr_names ( self ):
         """Return all the chromosome names stored in this track object.
         """
-        l = list(self.__locations.keys())
-        l.sort()
-        return l
+        return set(sorted(self.__locations.keys()))
 
     # cpdef length ( self ):
     #     """Total sequenced length = total number of tags * width of tag		
@@ -241,11 +239,11 @@ cdef class FWTrack:
         cdef:
             int32_t i
             bytes c
+            set chrnames
 
         chrnames = self.get_chr_names()
 
-        for i in range(len(chrnames)):
-            c = chrnames[i]
+        for c in chrnames:
             self.__locations[c][0].sort()
             self.__locations[c][1].sort()
 
@@ -257,11 +255,12 @@ cdef class FWTrack:
         stored at self.dup
         """
         cdef:
-            int p, m, n, current_loc, i_chrom
+            int p, m, n, current_loc
             unsigned long i_old, i_new          # index for old array, and index for new one
             unsigned long i_dup, size, new_size, dup_size
             bytes k
             np.ndarray[np.int32_t, ndim=1] plus, new_plus, dup_plus, minus, new_minus, dup_minus
+            set chrnames
 
         if not self.__sorted:
             self.sort()
@@ -273,12 +272,10 @@ cdef class FWTrack:
 
         chrnames = self.get_chr_names()
         
-        for i_chrom in range( len(chrnames) ):
+        for k in chrnames:
             # for each chromosome.
             # This loop body is too big, I may need to split code later...
             
-            k = chrnames[ i_chrom ]
-#            dups.__locations[k] = self.__locations[k].copy()
             # + strand
             i_new = 0
             i_dup = 0
@@ -383,11 +380,12 @@ cdef class FWTrack:
         """Add back the duplicate reads stored in self.__dup_locations to self.__locations
         """
         cdef:
-            int p, m, n, current_loc, i_chrom
+            int p, m, n, current_loc
             unsigned long i_old, i_new          # index for old array, and index for new one
             unsigned long i_dup, size, new_size, dup_size
             bytes k
             np.ndarray[np.int32_t, ndim=1] plus, new_plus, dup_plus, minus, new_minus, dup_minus
+            set chrnames
 
         if not self.__sorted:
             self.sort()
@@ -398,10 +396,9 @@ cdef class FWTrack:
 
         chrnames = self.get_chr_names()
         
-        for i_chrom in range( len(chrnames) ):
+        for k in chrnames:
             # for each chromosome.
             # This loop body is too big, I may need to split code later...
-            k = chrnames[ i_chrom ]
             plus = self.__locations[k][0]
             dup_plus = self.__dup_locations[k][0]
             minus = self.__locations[k][1]
@@ -451,11 +448,12 @@ cdef class FWTrack:
         instead.
         """
         cdef:
-            int p, m, n, current_loc, i_chrom
+            int p, m, n, current_loc
             # index for old array, and index for new one
             unsigned long i_old, i_new, size, new_size 
             bytes k
             np.ndarray[np.int32_t, ndim=1] plus, new_plus, minus, new_minus
+            set chrnames
 
         if maxnum < 0: return self.total         # do nothing
 
@@ -467,11 +465,10 @@ cdef class FWTrack:
 
         chrnames = self.get_chr_names()
         
-        for i_chrom in range( len(chrnames) ):
+        for k in chrnames:
             # for each chromosome.
             # This loop body is too big, I may need to split code later...
             
-            k = chrnames[ i_chrom ]
             # + strand
             i_new = 0
             plus = self.__locations[k][0]
@@ -562,7 +559,8 @@ cdef class FWTrack:
         """
         cdef:
             int32_t num, i_chrom      # num: number of reads allowed on a certain chromosome
-            bytes key
+            bytes k
+            set chrnames
         
         self.total = 0
         self.length = 0
@@ -572,25 +570,23 @@ cdef class FWTrack:
         if seed >= 0:
             np.random.seed(seed)
 
-        for i_chrom in range( len(chrnames) ):
+        for k in chrnames:
             # for each chromosome.
             # This loop body is too big, I may need to split code later...
             
-            key = chrnames[ i_chrom ]
-        
-            num = <int32_t>round(self.__locations[key][0].shape[0] * percent, 5 )
-            np.random.shuffle( self.__locations[key][0] )
-            self.__locations[key][0].resize( num, refcheck=False )
-            self.__locations[key][0].sort()
-            self.__pointer[key][0] = self.__locations[key][0].shape[0]
+            num = <int32_t>round(self.__locations[k][0].shape[0] * percent, 5 )
+            np.random.shuffle( self.__locations[k][0] )
+            self.__locations[k][0].resize( num, refcheck=False )
+            self.__locations[k][0].sort()
+            self.__pointer[k][0] = self.__locations[k][0].shape[0]
 
-            num = <int32_t>round(self.__locations[key][1].shape[0] * percent, 5 )
-            np.random.shuffle( self.__locations[key][1] )
-            self.__locations[key][1].resize( num, refcheck=False )
-            self.__locations[key][1].sort()
-            self.__pointer[key][1] = self.__locations[key][1].shape[0]            
+            num = <int32_t>round(self.__locations[k][1].shape[0] * percent, 5 )
+            np.random.shuffle( self.__locations[k][1] )
+            self.__locations[k][1].resize( num, refcheck=False )
+            self.__locations[k][1].sort()
+            self.__pointer[k][1] = self.__locations[k][1].shape[0]            
             
-            self.total += self.__pointer[key][0] + self.__pointer[key][1]
+            self.total += self.__pointer[k][0] + self.__pointer[k][1]
 
         self.length = self.fw * self.total
         return
@@ -615,6 +611,7 @@ cdef class FWTrack:
         cdef:
             int32_t i, i_chrom, p
             bytes k
+            set chrnames
         
         if not fhd:
             fhd = sys.stdout
@@ -623,12 +620,10 @@ cdef class FWTrack:
 
         chrnames = self.get_chr_names()
         
-        for i_chrom in range( len(chrnames) ):
+        for k in chrnames:
             # for each chromosome.
             # This loop body is too big, I may need to split code later...
             
-            k = chrnames[ i_chrom ]
-
             plus = self.__locations[k][0]
 
             for i in range(plus.shape[0]):
@@ -647,6 +642,7 @@ cdef class FWTrack:
             int32_t i, pos
             np.ndarray[np.int32_t, ndim=1] rt_plus, rt_minus
             list temp
+            set chrnames
 
         if not self.__sorted: self.sort()
         
@@ -699,7 +695,8 @@ cdef class FWTrack:
             int32_t m, i, j, pre_i, pre_j, pos, startpos, endpos
             np.ndarray[np.int32_t, ndim=1] plus, minus, rt_plus, rt_minus
             bytes chrom, name
-            list temp, retval, pchrnames
+            list temp, retval
+            set pchrnames, chrnames
 
         pchrnames = peaks.get_chr_names()
         retval = []
@@ -780,10 +777,11 @@ cdef class FWTrack:
             int32_t m, i, j, pre_i, pre_j, pos, startpos, endpos #, n_peaks
             np.ndarray[np.int32_t, ndim=1] plus, minus, rt_plus, rt_minus
             bytes chrom #, peak_name
-            list temp, retval, pchrnames, cpeaks
+            set pchrnames, chrnames
+            list temp, retval, cpeaks
             np.ndarray[np.int32_t, ndim=1] adjusted_summits, passflags
 
-        pchrnames = sorted(peaks.get_chr_names())
+        pchrnames = peaks.get_chr_names()
         retval = []
 
         # this object should be sorted

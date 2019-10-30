@@ -1,5 +1,5 @@
 # cython: language_level=3
-# Time-stamp: <2019-10-02 11:06:06 taoliu>
+# Time-stamp: <2019-10-30 12:12:08 taoliu>
 
 """Module for filter duplicate tags from paired-end data
 
@@ -99,7 +99,7 @@ cdef class PETrackI:
             set chrs
             bytes chromosome
             
-        chrs = set(self.get_chr_names())
+        chrs = self.get_chr_names()
         for chromosome in chrs:
             if chromosome in self.__locations:
                 self.__locations[chromosome].resize( self.buffer_size, refcheck=False )
@@ -157,15 +157,17 @@ cdef class PETrackI:
         Note: If this function is called, it's impossible to append more files to this FWTrack object. So remember to call it after all the files are read!        
         """
         
-        cdef int32_t i
-        cdef bytes c
+        cdef:
+            int32_t i
+            bytes c
+            set chrnames
+        
         
         self.total = 0
 
         chrnames = self.get_chr_names()
 
-        for i in range(len(chrnames)):
-            c = chrnames[i]
+        for c in chrnames:
             self.__locations[c].resize((self.__pointer[c]), refcheck=False)
             self.__locations[c].sort( order=['l', 'r'] )
             self.total += self.__locations[c].shape[0]
@@ -183,14 +185,10 @@ cdef class PETrackI:
         else:
             raise Exception("No such chromosome name (%s) in TrackI object!\n" % (chromosome))
 
-    cpdef list get_chr_names ( self ):
+    cpdef set get_chr_names ( self ):
         """Return all the chromosome names stored in this track object.
         """
-        cdef list l
-        
-        l = list(self.__locations.keys())
-        l.sort()
-        return l
+        return set(sorted(self.__locations.keys()))
 
     # cpdef length ( self ):
     #     """Total sequenced length = sum(end-start) over chroms 
@@ -208,12 +206,14 @@ cdef class PETrackI:
         """Naive sorting for locations.
         
         """
-        cdef uint32_t i
-        cdef bytes c
-        cdef list chrnames = self.get_chr_names()
+        cdef:
+            uint32_t i
+            bytes c
+            set chrnames
 
-        for i in range(len(chrnames)):
-            c = chrnames[i]
+        chrnames = self.get_chr_names()
+
+        for c in chrnames:
             #print "before", self.__locations[c][0:100]
             self.__locations[c].sort( order=['l', 'r'] ) # sort by the leftmost location
             #print "before", self.__locations[c][0:100]
@@ -250,10 +250,11 @@ cdef class PETrackI:
            bytes c
            int i, bins_len
            int max_bins = 0
-           list chrnames = self.get_chr_names()
+           set chrnames
+           
+        chrnames = self.get_chr_names()
 
-        for i in range(len(chrnames)):
-            c = chrnames[i]
+        for c in chrnames:
             locs = self.__locations[c]
             sizes = locs['r'] - locs['l'] # +1 ?? irrelevant for use
             bins = np.bincount(sizes).astype('int64')
@@ -280,9 +281,11 @@ cdef class PETrackI:
             int loc_start, loc_end, current_loc_start, current_loc_end
             np.ndarray locs, new_locs, dup_locs
             unsigned long i_old, i_new, i_dup, new_size, dup_size
-            list chrnames = self.get_chr_names()
+            set chrnames
             bytes k
-           
+
+        chrnames = self.get_chr_names()
+         
         if not self.__sorted: self.sort()
         
         self.__dup_pointer = copy(self.__pointer)
@@ -291,8 +294,7 @@ cdef class PETrackI:
         self.length = 0
         self.average_template_length = 0.0
 
-        for i_chrom in range(len(chrnames)): # for each chromosome
-            k = chrnames [ i_chrom ]
+        for k in chrnames: # for each chromosome
 #            dups.__locations[k] = self.__locations[k].copy()
             i_new = 0
             i_dup = 0
@@ -370,6 +372,7 @@ cdef class PETrackI:
             unsigned long i_old, i_new, size, new_size
             bytes k
             np.ndarray locs, new_locs
+            set chrnames
                 
         if maxnum < 0: return self.total # condition to return if not filtering
         
@@ -381,8 +384,7 @@ cdef class PETrackI:
         
         chrnames = self.get_chr_names()
         
-        for i_chrom in range(len(chrnames)): # for each chromosome
-            k = chrnames [ i_chrom ]
+        for k in chrnames: # for each chromosome
             i_new = 0
             locs = self.__locations[k]
             size = locs.shape[0]
@@ -441,7 +443,8 @@ cdef class PETrackI:
         """
         cdef:
             uint32_t num, i_chrom      # num: number of reads allowed on a certain chromosome
-            bytes key
+            bytes k
+            set chrnames
         
         self.total = 0
         self.length = 0
@@ -452,19 +455,17 @@ cdef class PETrackI:
         if seed >= 0:
             np.random.seed(seed)
         
-        for i_chrom in range( len(chrnames) ):
+        for k in chrnames:
             # for each chromosome.
             # This loop body is too big, I may need to split code later...
             
-            key = chrnames[ i_chrom ]
-        
-            num = <uint32_t>round(self.__locations[key].shape[0] * percent, 5 )
-            np.random.shuffle( self.__locations[key] )
-            self.__locations[key].resize( num, refcheck = False )
-            self.__locations[key].sort( order = ['l', 'r'] ) # sort by leftmost positions
-            self.__pointer[key] = self.__locations[key].shape[0]
-            self.length += ( self.__locations[key]['r'] - self.__locations[key]['l'] ).sum()
-            self.total += self.__pointer[key]
+            num = <uint32_t>round(self.__locations[k].shape[0] * percent, 5 )
+            np.random.shuffle( self.__locations[k] )
+            self.__locations[k].resize( num, refcheck = False )
+            self.__locations[k].sort( order = ['l', 'r'] ) # sort by leftmost positions
+            self.__pointer[k] = self.__locations[k].shape[0]
+            self.length += ( self.__locations[k]['r'] - self.__locations[k]['l'] ).sum()
+            self.total += self.__pointer[k]
         self.average_template_length = float( self.length )/ self.total
         return
 
@@ -484,8 +485,11 @@ cdef class PETrackI:
         file, otherwise, output to standard output.
         
         """
-        cdef int32_t i, i_chrom, s, e
-        cdef bytes k
+        cdef:
+            int32_t i, i_chrom, s, e
+            bytes k
+            set chrnames
+        
         
         if not fhd:
             fhd = sys.stdout
@@ -493,11 +497,9 @@ cdef class PETrackI:
 
         chrnames = self.get_chr_names()
         
-        for i_chrom in range( len(chrnames) ):
+        for k in chrnames:
             # for each chromosome.
             # This loop body is too big, I may need to split code later...
-            
-            k = chrnames[ i_chrom ]
 
             locs = self.__locations[k]
 

@@ -89,11 +89,11 @@ echo "5. randsample"
 
 mkdir ${TAG}_run_randsample
 
-macs2 randsample -i $CHIP -n 100000 --seed 31415926 --outdir ${TAG}_run_randsample -o run_randsample.bed &> ${TAG}_run_randsample/run_randsample.log
+macs2 randsample -i $CHIP -n 10000 --seed 31415926 --outdir ${TAG}_run_randsample -o run_randsample.bed &> ${TAG}_run_randsample/run_randsample.log
 
-macs2 randsample -f BAMPE -i $CHIPPE -n 100000 --seed 31415926 --outdir ${TAG}_run_randsample -o run_randsample_bampe.bedpe &> ${TAG}_run_randsample/run_randsample_bampe.log
+macs2 randsample -f BAMPE -i $CHIPPE -n 10000 --seed 31415926 --outdir ${TAG}_run_randsample -o run_randsample_bampe.bedpe &> ${TAG}_run_randsample/run_randsample_bampe.log
 
-macs2 randsample -f BEDPE -i $CHIPBEDPE -n 100000 --seed 31415926 --outdir ${TAG}_run_randsample -o run_randsample_bedpe.bedpe &> ${TAG}_run_randsample/run_randsample_bedpe.log
+macs2 randsample -f BEDPE -i $CHIPBEDPE -n 10000 --seed 31415926 --outdir ${TAG}_run_randsample -o run_randsample_bedpe.bedpe &> ${TAG}_run_randsample/run_randsample_bedpe.log
 
 # refinepeak
 echo "6. refinepeak"

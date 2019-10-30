@@ -1,5 +1,5 @@
 # cython: language_level=3
-# Time-stamp: <2019-10-30 10:46:50 taoliu>
+# Time-stamp: <2019-10-30 12:12:53 taoliu>
 
 """Module for BedGraph data class.
 
@@ -221,12 +221,11 @@ cdef class bedGraphTrackI:
         else:
             return None
 
-    cpdef list get_chr_names (self):
+    cpdef set get_chr_names (self):
         """Return all the chromosome names stored.
         
         """
-        l = sorted(self.__data.keys())
-        return l
+        return set(sorted(self.__data.keys()))
 
     def write_bedGraph (self, fhd, str name, str description, bool trackline=True):
         """Write all data to fhd in Wiggle Format.
@@ -240,6 +239,7 @@ cdef class bedGraphTrackI:
             int pre, pos, i
             double value
             bytes chrom
+            set chrs
         
         if trackline:
             trackcontents = (name.replace("\"", "\\\""), description.replace("\"", "\\\""))
@@ -278,8 +278,9 @@ cdef class bedGraphTrackI:
             int new_pre_pos, pos, i
             double new_pre_value, value
             bytes chrom
+            set chrs
         
-        chrs = set(self.__data.keys())
+        chrs = self.get_chr_names()
         for chrom in chrs:
             (p,v) = self.__data[chrom]
             pnext = iter(p).__next__
@@ -319,6 +320,7 @@ cdef class bedGraphTrackI:
             int new_pre_pos, pos, i
             double new_pre_value, value
             bytes chrom
+            set chrs
         
         chrs = self.get_chr_names()
         for chrom in chrs:
@@ -414,6 +416,7 @@ cdef class bedGraphTrackI:
             int peak_length, x, pre_p, p, i, summit, tstart, tend
             double v, summit_value, tvalue
             bytes chrom
+            set chrs
         
         #if call_summits: close_peak = self.__close_peak2
         #else: close_peak = self.__close_peak
@@ -512,6 +515,7 @@ cdef class bedGraphTrackI:
         """
         cdef bytes chrom
         cdef int i, j
+        cdef set chrs
         #cdef int tmp_n
         
         assert lvl1_cutoff > lvl2_cutoff, "level 1 cutoff should be larger than level 2."
@@ -982,7 +986,8 @@ cdef class bedGraphTrackI:
 
     cpdef str cutoff_analysis ( self, int max_gap, int min_length, int steps = 100 ):
         cdef:
-            list chrs, tmplist, peak_content
+            set chrs
+            list tmplist, peak_content
             bytes  chrom
             str ret
             float cutoff
@@ -1065,6 +1070,7 @@ def scoreTracktoBedGraph (scoretrack, str colname):
     cdef:
         int pre, i
         bytes chrom
+        set chrs
     
     bdgtrack = bedGraphTrackI( baseline_value = 0 )
     if colname not in ['sample','control','-100logp','-100logq']:
