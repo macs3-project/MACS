@@ -1,5 +1,5 @@
 # cython: language_level=3
-# Time-stamp: <2019-10-23 16:42:25 taoliu>
+# Time-stamp: <2019-10-30 10:46:50 taoliu>
 
 """Module for BedGraph data class.
 
@@ -221,7 +221,7 @@ cdef class bedGraphTrackI:
         else:
             return None
 
-    def list get_chr_names (self):
+    cpdef list get_chr_names (self):
         """Return all the chromosome names stored.
         
         """
@@ -989,7 +989,7 @@ cdef class bedGraphTrackI:
             long total_l, total_p, i, n, ts, te, lastp, tl, peak_length
             dict cutoff_npeaks, cutoff_lpeaks
             float s, midvalue
-            
+
         chrs = self.get_chr_names()
 
         midvalue = self.minvalue/2 + self.maxvalue/2
