@@ -1,5 +1,6 @@
 # cython: language_level=3
-# Time-stamp: <2019-10-02 11:04:48 taoliu>
+# cython: profile=True
+# Time-stamp: <2019-10-30 17:27:50 taoliu>
 
 """Module Description: Statistics function wrappers.
 
