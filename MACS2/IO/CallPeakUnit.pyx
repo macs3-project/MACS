@@ -1,5 +1,5 @@
 # cython: language_level=3
-# Time-stamp: <2019-10-02 11:05:53 taoliu>
+# Time-stamp: <2019-10-30 11:09:25 taoliu>
 
 """Module for Calculate Scores.
 
@@ -1450,7 +1450,8 @@ cdef class CallerFromAlignments:
             object lvl1peaks, lvl1peakschrom, lvl1
             object lvl2peaks, lvl2peakschrom, lvl2
             object broadpeaks
-            list chrs, tmppeakset
+            set chrs
+            list tmppeakset
 
         lvl1peaks = PeakIO()
         lvl2peaks = PeakIO()
@@ -1822,7 +1823,8 @@ cdef class CallerFromAlignments:
             int32_t c, m, i, j, pre_i, pre_j, pos, startpos, endpos
             np.ndarray plus, minus, rt_plus, rt_minus
             bytes chrom
-            list temp, retval, pchrnames, cpeaks
+            set pchrnames, chrnames
+            list temp, retval, cpeaks
             np.ndarray adjusted_summits, passflags
 
         if self.PE_mode:

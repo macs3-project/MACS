@@ -1,5 +1,5 @@
 # cython: language_level=3
-# Time-stamp: <2019-10-02 11:06:36 taoliu>
+# Time-stamp: <2019-10-30 12:12:25 taoliu>
 
 """Module for PeakIO IO classes.
 
@@ -154,8 +154,8 @@ cdef class PeakIO:
             self.peaks[chrom]= []
         return self.peaks[chrom]
 
-    def get_chr_names (self):
-        return list(self.peaks.keys())
+    cpdef set get_chr_names (self):
+        return set(sorted(self.peaks.keys()))
 
     def sort ( self ):
         # sort by position

@@ -1,5 +1,5 @@
 # cython: language_level=3
-# Time-stamp: <2019-10-02 11:03:47 taoliu>
+# Time-stamp: <2019-10-30 11:27:50 taoliu>
 
 """Module Description: Build shifting model
 
@@ -345,7 +345,7 @@ Summary of Peak Model:
            dict paired_peaks_pos
            np.ndarray[np.int32_t, ndim=1] plus_tags, minus_tags
 
-        chrs = self.treatment.get_chr_names()
+        chrs = list(self.treatment.get_chr_names())
         chrs.sort()
         paired_peaks_pos = {}
         for i in range( len(chrs) ):
