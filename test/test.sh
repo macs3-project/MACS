@@ -21,6 +21,9 @@ CTRLBEDPE=CTCF_PE_CTRL_chr22_50k.bedpe.gz
 
 CHIPCONTIGS50K=contigs50k.bed.gz
 
+CHIPBIGSPEEDTEST=CTCF_12878_5M.bed.gz
+CTRLBIGSPEEDTEST=input_12878_5M.bed.gz
+
 # callpeak
 echo "1. callpeak"
 echo "1.1 callpeak narrow"
@@ -212,5 +215,17 @@ for i in ${subfolders[@]};do
     done
 done
 rm -f tmp_fq.txt tmp_fs.txt
-exit $flag;
 
+# exit with 1 if test fails
+if [ $flag -eq 1 ];then
+    exit $flag;
+fi
+
+echo "15. brief speed test"
+
+macs2 callpeak -t CTCF_12878_5M.bed.gz -c Input_12878_5M.bed.gz -n speedtest.py37 -B &> speedtest.py37.log &
+# monitor the macs2 callpeak run and output CPU and mem usage
+./prockreport 2 $!
+wait;
+
+# END of test

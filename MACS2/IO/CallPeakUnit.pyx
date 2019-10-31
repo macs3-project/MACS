@@ -40,8 +40,7 @@ from MACS2.IO.PeakIO import PeakIO, BroadPeakIO, parse_peakname
 from MACS2.IO.FixWidthTrack import FWTrack
 from MACS2.IO.PairedEndTrack import PETrackI
 from MACS2.Statistics import P_Score_Upper_Tail, LogLR_Asym # pure C code for calculating p-value scores/logLR of Poisson
-from MACS2.hashtable import Float64HashTable
-
+#
 pscore_table = P_Score_Upper_Tail() # this table will cache pscore being calculated.
 get_pscore = pscore_table.get_pscore
 
@@ -685,8 +684,8 @@ cdef class CallerFromAlignments:
         pre_l = 0
         pre_q = 2147483647              # save the previous q-value
 
-        #self.pqtable = {}
-        self.pqtable = Float64HashTable()
+        self.pqtable = {}
+        #self.pqtable = Float64HashTable()
         unique_values = sorted(list(pvalue_stat.keys()), reverse=True) #sorted(unique_values,reverse=True)
         for i in range(len(unique_values)):
             v = unique_values[i]
@@ -824,7 +823,8 @@ cdef class CallerFromAlignments:
         pre_l = 0
         pre_q = 2147483647              # save the previous q-value
 
-        self.pqtable = Float64HashTable()
+        self.pqtable = {}
+        #self.pqtable = Float64HashTable()
         unique_values = sorted(list(pvalue_stat.keys()), reverse=True) #sorted(unique_values,reverse=True)
         for i in range(len(unique_values)):
             v = unique_values[i]

@@ -20,11 +20,12 @@ MAIN=`basename $2`
 CMD=( $@ )
 CMD=${CMD[@]: 1}
 
-echo $PROF
-echo $MAIN
-echo $CMD
-
+# run CMD with cProfile
 python -m cProfile -o $PROF $CMD
+
+# brief the profile
 ./pyprofile_stat.py $PROF tottime > ${PROF/.prof/}.tottime
 ./pyprofile_stat.py $PROF calls > ${PROF/.prof/}.calls
 ./pyprofile_stat.py $PROF cumulative > ${PROF/.prof/}.cumulative
+
+echo "check ${PROF/.prof/}.tottime, ${PROF/.prof/}.calls, and ${PROF/.prof/}.cumulative"
