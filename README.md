@@ -31,32 +31,34 @@ background*.
 ## Recent Changes for MACS (2.2.5)
 
 ### 2.2.5
-    * Features added/Bugs fixed
+	* Features added
 
 	1) *Github code only and Not included in MACS2 release* New
 	testing data for performance test. An subsampled ENCODE2 CTCF
 	ChIP-seq dataset, including 5million ChIP reads and 5 million
 	control reads, has been included in the test folder for testing
-	CPU and memory usage. Several related scripts (prockreport for
-	output cpu memory usage, pyprofile and pyprofile_stat for debuging
-	and profiling MACS2 codes) have been included.
+	CPU and memory usage (i.e. 5M test). Several related scripts ,
+	including `prockreport` for output cpu memory usage, `pyprofile`
+	and `pyprofile_stat` for debuging and profiling MACS2 codes, have
+	been included.
 
 	2) Speed up pvalue-qvalue checkup (pqtable checkup) #335 #338.
 	The old hashtable.pyx implementation copied from Pandas (very old
 	version) doesn't work well in Python3+Cython. It slows down the
-	pqtable checkup using the identical Cython codes. While running 5M
-	test, the `__getitem__` function in the hashtable.pyx took 3.5s
-	with 37,382,037 calls in MACS2 v2.1.4, but 148.6s with the same
-	number of calls in MACS2 v2.2.4. Therefore, the standard python
-	dictionary implementation has replaced hashtable.pyx for pqtable
-	checkup. Now MACS2 runs a bit faster than py2 version, but uses a
-	bit more memory. As an example, v2.2.5 can finish 5M reads test in
-	20% less time than MACS2 v2.1.4, but use 15% more memory.
+	pqtable checkup using the identical Cython codes as in
+	v2.1.4. While running 5M test, the `__getitem__` function in the
+	hashtable.pyx took 3.5s with 37,382,037 calls in MACS2 v2.1.4, but
+	148.6s with the same number of calls in MACS2 v2.2.4. As a
+	consequence, the standard python dictionary implementation has
+	replaced hashtable.pyx for pqtable checkup. Now MACS2 runs a bit
+	faster than py2 version, but uses a bit more memory. In general,
+	v2.2.5 can finish 5M reads test in 20% less time than MACS2
+	v2.1.4, but use 15% more memory.
 
 	* Bug fixed
 
-	1) More Python3 related fixes, e.g. the return value of keys from py3
-	dict. #333 #337
+	1) More Python3 related fixes, e.g. the return value of keys from
+	py3 dict. #333 #337
 
 ### 2.2.4
 	* Features added
