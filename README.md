@@ -1,79 +1,14 @@
 # MACS: Model-based Analysis for ChIP-Seq
 
-![Programming languages](https://img.shields.io/github/languages/top/taoliu/MACS) ![Commit activity](https://img.shields.io/github/commit-activity/m/taoliu/MACS) [![Codecov](https://img.shields.io/codecov/c/github/taoliu/MACS)](https://codecov.io/gh/taoliu/MACS) [![TravisCI Build Status](https://img.shields.io/travis/com/taoliu/MACS/master)](https://travis-ci.com/taoliu/MACS)
+![Status](https://img.shields.io/pypi/status/macs2.svg) [![License](https://img.shields.io/github/license/taoliu/MACS)](https://github.com/taoliu/MACS/blob/master/LICENSE) ![Programming languages](https://img.shields.io/github/languages/top/taoliu/MACS) ![Commit activity](https://img.shields.io/github/commit-activity/m/taoliu/MACS) [![Codecov](https://img.shields.io/codecov/c/github/taoliu/MACS)](https://codecov.io/gh/taoliu/MACS) [![TravisCI Build Status](https://img.shields.io/travis/com/taoliu/MACS/master)](https://travis-ci.com/taoliu/MACS)
 
-<table>
-<tr>
-  <td>Latest Release</td>
-  <td>
-    <a href="https://github.com/taoliu/MACS/releases">
-    <img src="https://img.shields.io/github/v/release/taoliu/MACS" alt="latest release" />
-    </a>
-  </td>
-</tr>
-<tr>
-  <td></td>
-  <td>
-    <a href="https://pypi.org/project/macs2/">
-    <img src="https://img.shields.io/pypi/v/macs2.svg" alt="latest release" />
-    <img src="https://img.shields.io/pypi/pyversions/MACS2" alt="python version" />
-    <img src="https://img.shields.io/pypi/format/macs2" alt="format" />
-    </a>
-  </td>
-</tr>
-<tr>
-  <td></td>
-  <td>
-    <a href="https://anaconda.org/bioconda/macs2">
-    <img src="https://img.shields.io/conda/v/bioconda/macs2" alt="latest release" />
-    </a>	
-    <img src="https://img.shields.io/conda/pn/bioconda/macs2" alt="platform" />
-  </td>
-</tr>
-<tr>
-  <td></td>
-  <td>
-    <a href="https://packages.debian.org/buster/macs">
-    <img src="https://img.shields.io/debian/v/macs/stable?label=debian%20%28stable%29" alt="lastest release stable" />
-    </a>
-    <a href="https://packages.debian.org/sid/macs">
-    <img src="https://img.shields.io/debian/v/macs/sid?label=debian%20%28sid%29" alt="latest release unstable" />
-    </a>
-  </td>
-</tr>
-<tr>
-  <td>Package Status</td>
-  <td>
-    <a href="https://pypi.org/project/macs2/">
-    <img src="https://img.shields.io/pypi/status/macs2.svg" alt="status" />
-    </a>
-  </td>
-</tr>
-<tr>
-  <td>License</td>
-  <td>
-    <a href="https://github.com/taoliu/MACS/blob/master/LICENSE">
-    <img src="https://img.shields.io/github/license/taoliu/MACS" alt="license" />
-    </a>
-</td>
-</tr>
-<tr>
-  <td>Downloads (PyPI)</td>
-  <td>
-    <a href="https://pypistats.org/packages/macs2">
-    <img src="https://img.shields.io/pypi/dm/macs2" alt="pypi downloads" />
-    </a>
-  </td>
-</tr>
-<tr>
-  <td>Downloads (Conda)</td>
-  <td>
-    <a href="https://anaconda.org/bioconda/macs2">
-    <img src="https://img.shields.io/conda/dn/bioconda/macs2" alt="conda downloads" />
-    </a>
-  </td>
-</tr>
-</table>
+[![PyPI download](https://img.shields.io/pypi/dm/macs2?label=pypi%20downloads)](https://pypistats.org/packages/macs2) [![Bioconda download](https://img.shields.io/conda/dn/bioconda/macs2?label=bioconda%20downloads)](https://anaconda.org/bioconda/macs2)
+
+Latest Release:
+* Github: [![Github Release](https://img.shields.io/github/v/release/taoliu/MACS)](https://github.com/taoliu/MACS/releases)
+* PyPI: [![PyPI Release](https://img.shields.io/pypi/v/macs2.svg) ![PyPI Python Version](https://img.shields.io/pypi/pyversions/MACS2) ![PyPI Format](https://img.shields.io/pypi/format/macs2)](https://pypi.org/project/macs2/)
+* Bioconda: [![Bioconda Release](https://img.shields.io/conda/v/bioconda/macs2) ![Bioconda Platform](https://img.shields.io/conda/pn/bioconda/macs2)](https://anaconda.org/bioconda/macs2)
+* Debian Med: [![Debian Stable](https://img.shields.io/debian/v/macs/stable?label=debian%20stable)](https://packages.debian.org/stable/macs) [![Debian Unstable](https://img.shields.io/debian/v/macs/sid?label=debian%20sid)](https://packages.debian.org/sid/macs)
 
 ## Introduction
 
@@ -93,7 +28,35 @@ applied to any "DNA enrichment assays" if the question to be asked is
 simply: *where we can find significant reads coverage than the random
 background*.
 
-## Recent Changes for MACS (2.2.4)
+## Recent Changes for MACS (2.2.5)
+
+### 2.2.5
+    * Features added/Bugs fixed
+
+	1) *Github code only and Not included in MACS2 release* New
+	testing data for performance test. An subsampled ENCODE2 CTCF
+	ChIP-seq dataset, including 5million ChIP reads and 5 million
+	control reads, has been included in the test folder for testing
+	CPU and memory usage. Several related scripts (prockreport for
+	output cpu memory usage, pyprofile and pyprofile_stat for debuging
+	and profiling MACS2 codes) have been included.
+
+	2) Speed up pvalue-qvalue checkup (pqtable checkup) #335 #338.
+	The old hashtable.pyx implementation copied from Pandas (very old
+	version) doesn't work well in Python3+Cython. It slows down the
+	pqtable checkup using the identical Cython codes. While running 5M
+	test, the `__getitem__` function in the hashtable.pyx took 3.5s
+	with 37,382,037 calls in MACS2 v2.1.4, but 148.6s with the same
+	number of calls in MACS2 v2.2.4. Therefore, the standard python
+	dictionary implementation has replaced hashtable.pyx for pqtable
+	checkup. Now MACS2 runs a bit faster than py2 version, but uses a
+	bit more memory. As an example, v2.2.5 can finish 5M reads test in
+	20% less time than MACS2 v2.1.4, but use 15% more memory.
+
+	* Bug fixed
+
+	1) More Python3 related fixes, e.g. the return value of keys from py3
+	dict. #333 #337
 
 ### 2.2.4
 	* Features added
@@ -111,23 +74,6 @@ background*.
 	setup.py can still compile using only C codes.
 	
 	5) Fix Signal.pyx to use np.array instead of np.mat.
-
-#### 2.1.4 
-	* Features added
-	
-	Github Actions is used together with Travis CI for testing and
-	deployment.
-	
-	* Bugs fixed (PR #322)
-	
-	1) #318 Random score in `bdgdiff` output. It turns out the sum_v
-	is not initialized as 0 before adding. Potential bugs are fixed in
-	other functions in ScoreTrack and CallPeakUnit codes.
-	
-	2) #321 Cython dependency in `setup.py` script is removed. And
-	place 'cythonzie' call to the correct position.
-	
-	3) A typo is fixed in the Github Actions script.
 
 ## Install
 

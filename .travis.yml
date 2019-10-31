@@ -10,7 +10,7 @@ install:
 script:
   - pytest --cov-report term --cov=test/
   - cd test
-  - ./test.sh smalldatatest
+  - ./test.sh cmdlinetest
   - cd ..
 deploy:
   provider: pypi
