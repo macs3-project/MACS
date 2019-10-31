@@ -1,0 +1,34 @@
+#!/bin/bash
+# modified from prockmon
+
+unset LD_LIBRARY_PATH
+
+if [[ $# < 2 ]];then
+    echo 'Check total CPU time and maximum memory usage of a process.'
+    echo 'need two parameters: $0 <interval> <pid>'
+    exit 1;
+fi
+ 
+INTERVAL=$1
+PID=$2
+ 
+MAXMEM=0
+NLINE=0
+
+while [ $(ps -p $PID|wc -l) -gt 1 ];do
+    REPORT=`ps -o time,rss -p $PID | tail -1`
+    NLINE=`ps -o time,rss -p $PID | wc -l`
+    ARR=(${REPORT//\ +/ })
+    TEMP=${ARR[0]}
+    if [[ ${NLINE} -gt 1 ]];then 
+	TIME=$TEMP
+	MEM=${ARR[1]}
+	if [ $MEM -gt $MAXMEM ];then
+	    MAXMEM=$MEM
+	fi
+    fi
+    sleep $1
+done
+ 
+echo 'CPU time (mm:ss):' $TIME
+echo 'Max mem (KB):' $MAXMEM

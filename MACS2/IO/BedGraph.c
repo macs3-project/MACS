@@ -817,7 +817,7 @@ struct __pyx_obj_5MACS2_2IO_8BedGraph_bedGraphTrackI;
 struct __pyx_obj_5MACS2_2IO_8BedGraph___pyx_scope_struct__overlie;
 struct __pyx_opt_args_5MACS2_2IO_8BedGraph_14bedGraphTrackI_cutoff_analysis;
 
-/* "MACS2/IO/BedGraph.pyx":987
+/* "MACS2/IO/BedGraph.pyx":988
  *         return ret
  * 
  *     cpdef str cutoff_analysis ( self, int max_gap, int min_length, int steps = 100 ):             # <<<<<<<<<<<<<<
@@ -829,7 +829,7 @@ struct __pyx_opt_args_5MACS2_2IO_8BedGraph_14bedGraphTrackI_cutoff_analysis {
   int steps;
 };
 
-/* "MACS2/IO/BedGraph.pyx":52
+/* "MACS2/IO/BedGraph.pyx":53
  * # Classes
  * # ------------------------------------
  * cdef class bedGraphTrackI:             # <<<<<<<<<<<<<<
@@ -846,7 +846,7 @@ struct __pyx_obj_5MACS2_2IO_8BedGraph_bedGraphTrackI {
 };
 
 
-/* "MACS2/IO/BedGraph.pyx":636
+/* "MACS2/IO/BedGraph.pyx":637
  *         return ret
  * 
  *     def overlie (self, bdgTracks, func="max" ):             # <<<<<<<<<<<<<<
@@ -860,7 +860,7 @@ struct __pyx_obj_5MACS2_2IO_8BedGraph___pyx_scope_struct__overlie {
 
 
 
-/* "MACS2/IO/BedGraph.pyx":52
+/* "MACS2/IO/BedGraph.pyx":53
  * # Classes
  * # ------------------------------------
  * cdef class bedGraphTrackI:             # <<<<<<<<<<<<<<
@@ -949,6 +949,244 @@ static CYTHON_INLINE PyObject* __Pyx_PyObject_GetAttrStr(PyObject* obj, PyObject
 /* GetBuiltinName.proto */
 static PyObject *__Pyx_GetBuiltinName(PyObject *name);
 
+/* PyThreadStateGet.proto */
+#if CYTHON_FAST_THREAD_STATE
+#define __Pyx_PyThreadState_declare  PyThreadState *__pyx_tstate;
+#define __Pyx_PyThreadState_assign  __pyx_tstate = __Pyx_PyThreadState_Current;
+#define __Pyx_PyErr_Occurred()  __pyx_tstate->curexc_type
+#else
+#define __Pyx_PyThreadState_declare
+#define __Pyx_PyThreadState_assign
+#define __Pyx_PyErr_Occurred()  PyErr_Occurred()
+#endif
+
+/* PyErrFetchRestore.proto */
+#if CYTHON_FAST_THREAD_STATE
+#define __Pyx_PyErr_Clear() __Pyx_ErrRestore(NULL, NULL, NULL)
+#define __Pyx_ErrRestoreWithState(type, value, tb)  __Pyx_ErrRestoreInState(PyThreadState_GET(), type, value, tb)
+#define __Pyx_ErrFetchWithState(type, value, tb)    __Pyx_ErrFetchInState(PyThreadState_GET(), type, value, tb)
+#define __Pyx_ErrRestore(type, value, tb)  __Pyx_ErrRestoreInState(__pyx_tstate, type, value, tb)
+#define __Pyx_ErrFetch(type, value, tb)    __Pyx_ErrFetchInState(__pyx_tstate, type, value, tb)
+static CYTHON_INLINE void __Pyx_ErrRestoreInState(PyThreadState *tstate, PyObject *type, PyObject *value, PyObject *tb);
+static CYTHON_INLINE void __Pyx_ErrFetchInState(PyThreadState *tstate, PyObject **type, PyObject **value, PyObject **tb);
+#if CYTHON_COMPILING_IN_CPYTHON
+#define __Pyx_PyErr_SetNone(exc) (Py_INCREF(exc), __Pyx_ErrRestore((exc), NULL, NULL))
+#else
+#define __Pyx_PyErr_SetNone(exc) PyErr_SetNone(exc)
+#endif
+#else
+#define __Pyx_PyErr_Clear() PyErr_Clear()
+#define __Pyx_PyErr_SetNone(exc) PyErr_SetNone(exc)
+#define __Pyx_ErrRestoreWithState(type, value, tb)  PyErr_Restore(type, value, tb)
+#define __Pyx_ErrFetchWithState(type, value, tb)  PyErr_Fetch(type, value, tb)
+#define __Pyx_ErrRestoreInState(tstate, type, value, tb)  PyErr_Restore(type, value, tb)
+#define __Pyx_ErrFetchInState(tstate, type, value, tb)  PyErr_Fetch(type, value, tb)
+#define __Pyx_ErrRestore(type, value, tb)  PyErr_Restore(type, value, tb)
+#define __Pyx_ErrFetch(type, value, tb)  PyErr_Fetch(type, value, tb)
+#endif
+
+/* Profile.proto */
+#ifndef CYTHON_PROFILE
+#if CYTHON_COMPILING_IN_PYPY || CYTHON_COMPILING_IN_PYSTON
+  #define CYTHON_PROFILE 0
+#else
+  #define CYTHON_PROFILE 1
+#endif
+#endif
+#ifndef CYTHON_TRACE_NOGIL
+  #define CYTHON_TRACE_NOGIL 0
+#else
+  #if CYTHON_TRACE_NOGIL && !defined(CYTHON_TRACE)
+    #define CYTHON_TRACE 1
+  #endif
+#endif
+#ifndef CYTHON_TRACE
+  #define CYTHON_TRACE 0
+#endif
+#if CYTHON_TRACE
+  #undef CYTHON_PROFILE_REUSE_FRAME
+#endif
+#ifndef CYTHON_PROFILE_REUSE_FRAME
+  #define CYTHON_PROFILE_REUSE_FRAME 0
+#endif
+#if CYTHON_PROFILE || CYTHON_TRACE
+  #include "compile.h"
+  #include "frameobject.h"
+  #include "traceback.h"
+  #if CYTHON_PROFILE_REUSE_FRAME
+    #define CYTHON_FRAME_MODIFIER static
+    #define CYTHON_FRAME_DEL(frame)
+  #else
+    #define CYTHON_FRAME_MODIFIER
+    #define CYTHON_FRAME_DEL(frame) Py_CLEAR(frame)
+  #endif
+  #define __Pyx_TraceDeclarations\
+  static PyCodeObject *__pyx_frame_code = NULL;\
+  CYTHON_FRAME_MODIFIER PyFrameObject *__pyx_frame = NULL;\
+  int __Pyx_use_tracing = 0;
+  #define __Pyx_TraceFrameInit(codeobj)\
+  if (codeobj) __pyx_frame_code = (PyCodeObject*) codeobj;
+  #ifdef WITH_THREAD
+  #define __Pyx_TraceCall(funcname, srcfile, firstlineno, nogil, goto_error)\
+  if (nogil) {\
+      if (CYTHON_TRACE_NOGIL) {\
+          PyThreadState *tstate;\
+          PyGILState_STATE state = PyGILState_Ensure();\
+          tstate = __Pyx_PyThreadState_Current;\
+          if (unlikely(tstate->use_tracing) && !tstate->tracing &&\
+                  (tstate->c_profilefunc || (CYTHON_TRACE && tstate->c_tracefunc))) {\
+              __Pyx_use_tracing = __Pyx_TraceSetupAndCall(&__pyx_frame_code, &__pyx_frame, tstate, funcname, srcfile, firstlineno);\
+          }\
+          PyGILState_Release(state);\
+          if (unlikely(__Pyx_use_tracing < 0)) goto_error;\
+      }\
+  } else {\
+      PyThreadState* tstate = PyThreadState_GET();\
+      if (unlikely(tstate->use_tracing) && !tstate->tracing &&\
+              (tstate->c_profilefunc || (CYTHON_TRACE && tstate->c_tracefunc))) {\
+          __Pyx_use_tracing = __Pyx_TraceSetupAndCall(&__pyx_frame_code, &__pyx_frame, tstate, funcname, srcfile, firstlineno);\
+          if (unlikely(__Pyx_use_tracing < 0)) goto_error;\
+      }\
+  }
+  #else
+  #define __Pyx_TraceCall(funcname, srcfile, firstlineno, nogil, goto_error)\
+  {   PyThreadState* tstate = PyThreadState_GET();\
+      if (unlikely(tstate->use_tracing) && !tstate->tracing &&\
+              (tstate->c_profilefunc || (CYTHON_TRACE && tstate->c_tracefunc))) {\
+          __Pyx_use_tracing = __Pyx_TraceSetupAndCall(&__pyx_frame_code, &__pyx_frame, tstate, funcname, srcfile, firstlineno);\
+          if (unlikely(__Pyx_use_tracing < 0)) goto_error;\
+      }\
+  }
+  #endif
+  #define __Pyx_TraceException()\
+  if (likely(!__Pyx_use_tracing)); else {\
+      PyThreadState* tstate = __Pyx_PyThreadState_Current;\
+      if (tstate->use_tracing &&\
+              (tstate->c_profilefunc || (CYTHON_TRACE && tstate->c_tracefunc))) {\
+          tstate->tracing++;\
+          tstate->use_tracing = 0;\
+          PyObject *exc_info = __Pyx_GetExceptionTuple(tstate);\
+          if (exc_info) {\
+              if (CYTHON_TRACE && tstate->c_tracefunc)\
+                  tstate->c_tracefunc(\
+                      tstate->c_traceobj, __pyx_frame, PyTrace_EXCEPTION, exc_info);\
+              tstate->c_profilefunc(\
+                  tstate->c_profileobj, __pyx_frame, PyTrace_EXCEPTION, exc_info);\
+              Py_DECREF(exc_info);\
+          }\
+          tstate->use_tracing = 1;\
+          tstate->tracing--;\
+      }\
+  }
+  static void __Pyx_call_return_trace_func(PyThreadState *tstate, PyFrameObject *frame, PyObject *result) {
+      PyObject *type, *value, *traceback;
+      __Pyx_ErrFetchInState(tstate, &type, &value, &traceback);
+      tstate->tracing++;
+      tstate->use_tracing = 0;
+      if (CYTHON_TRACE && tstate->c_tracefunc)
+          tstate->c_tracefunc(tstate->c_traceobj, frame, PyTrace_RETURN, result);
+      if (tstate->c_profilefunc)
+          tstate->c_profilefunc(tstate->c_profileobj, frame, PyTrace_RETURN, result);
+      CYTHON_FRAME_DEL(frame);
+      tstate->use_tracing = 1;
+      tstate->tracing--;
+      __Pyx_ErrRestoreInState(tstate, type, value, traceback);
+  }
+  #ifdef WITH_THREAD
+  #define __Pyx_TraceReturn(result, nogil)\
+  if (likely(!__Pyx_use_tracing)); else {\
+      if (nogil) {\
+          if (CYTHON_TRACE_NOGIL) {\
+              PyThreadState *tstate;\
+              PyGILState_STATE state = PyGILState_Ensure();\
+              tstate = __Pyx_PyThreadState_Current;\
+              if (tstate->use_tracing) {\
+                  __Pyx_call_return_trace_func(tstate, __pyx_frame, (PyObject*)result);\
+              }\
+              PyGILState_Release(state);\
+          }\
+      } else {\
+          PyThreadState* tstate = __Pyx_PyThreadState_Current;\
+          if (tstate->use_tracing) {\
+              __Pyx_call_return_trace_func(tstate, __pyx_frame, (PyObject*)result);\
+          }\
+      }\
+  }
+  #else
+  #define __Pyx_TraceReturn(result, nogil)\
+  if (likely(!__Pyx_use_tracing)); else {\
+      PyThreadState* tstate = __Pyx_PyThreadState_Current;\
+      if (tstate->use_tracing) {\
+          __Pyx_call_return_trace_func(tstate, __pyx_frame, (PyObject*)result);\
+      }\
+  }
+  #endif
+  static PyCodeObject *__Pyx_createFrameCodeObject(const char *funcname, const char *srcfile, int firstlineno);
+  static int __Pyx_TraceSetupAndCall(PyCodeObject** code, PyFrameObject** frame, PyThreadState* tstate, const char *funcname, const char *srcfile, int firstlineno);
+#else
+  #define __Pyx_TraceDeclarations
+  #define __Pyx_TraceFrameInit(codeobj)
+  #define __Pyx_TraceCall(funcname, srcfile, firstlineno, nogil, goto_error)   if ((1)); else goto_error;
+  #define __Pyx_TraceException()
+  #define __Pyx_TraceReturn(result, nogil)
+#endif
+#if CYTHON_TRACE
+  static int __Pyx_call_line_trace_func(PyThreadState *tstate, PyFrameObject *frame, int lineno) {
+      int ret;
+      PyObject *type, *value, *traceback;
+      __Pyx_ErrFetchInState(tstate, &type, &value, &traceback);
+      __Pyx_PyFrame_SetLineNumber(frame, lineno);
+      tstate->tracing++;
+      tstate->use_tracing = 0;
+      ret = tstate->c_tracefunc(tstate->c_traceobj, frame, PyTrace_LINE, NULL);
+      tstate->use_tracing = 1;
+      tstate->tracing--;
+      if (likely(!ret)) {
+          __Pyx_ErrRestoreInState(tstate, type, value, traceback);
+      } else {
+          Py_XDECREF(type);
+          Py_XDECREF(value);
+          Py_XDECREF(traceback);
+      }
+      return ret;
+  }
+  #ifdef WITH_THREAD
+  #define __Pyx_TraceLine(lineno, nogil, goto_error)\
+  if (likely(!__Pyx_use_tracing)); else {\
+      if (nogil) {\
+          if (CYTHON_TRACE_NOGIL) {\
+              int ret = 0;\
+              PyThreadState *tstate;\
+              PyGILState_STATE state = PyGILState_Ensure();\
+              tstate = __Pyx_PyThreadState_Current;\
+              if (unlikely(tstate->use_tracing && tstate->c_tracefunc && __pyx_frame->f_trace)) {\
+                  ret = __Pyx_call_line_trace_func(tstate, __pyx_frame, lineno);\
+              }\
+              PyGILState_Release(state);\
+              if (unlikely(ret)) goto_error;\
+          }\
+      } else {\
+          PyThreadState* tstate = __Pyx_PyThreadState_Current;\
+          if (unlikely(tstate->use_tracing && tstate->c_tracefunc && __pyx_frame->f_trace)) {\
+              int ret = __Pyx_call_line_trace_func(tstate, __pyx_frame, lineno);\
+              if (unlikely(ret)) goto_error;\
+          }\
+      }\
+  }
+  #else
+  #define __Pyx_TraceLine(lineno, nogil, goto_error)\
+  if (likely(!__Pyx_use_tracing)); else {\
+      PyThreadState* tstate = __Pyx_PyThreadState_Current;\
+      if (unlikely(tstate->use_tracing && tstate->c_tracefunc && __pyx_frame->f_trace)) {\
+          int ret = __Pyx_call_line_trace_func(tstate, __pyx_frame, lineno);\
+          if (unlikely(ret)) goto_error;\
+      }\
+  }
+  #endif
+#else
+  #define __Pyx_TraceLine(lineno, nogil, goto_error)   if ((1)); else goto_error;
+#endif
+
 /* PyDictVersioning.proto */
 #if CYTHON_USE_DICT_VERSIONS && CYTHON_USE_TYPE_SLOTS
 #define __PYX_DICT_VERSION_INIT  ((PY_UINT64_T) -1)
@@ -994,42 +1232,6 @@ static PyObject *__Pyx__GetModuleGlobalName(PyObject *name, PY_UINT64_T *dict_ve
 #define __Pyx_GetModuleGlobalName(var, name)  (var) = __Pyx__GetModuleGlobalName(name)
 #define __Pyx_GetModuleGlobalNameUncached(var, name)  (var) = __Pyx__GetModuleGlobalName(name)
 static CYTHON_INLINE PyObject *__Pyx__GetModuleGlobalName(PyObject *name);
-#endif
-
-/* PyThreadStateGet.proto */
-#if CYTHON_FAST_THREAD_STATE
-#define __Pyx_PyThreadState_declare  PyThreadState *__pyx_tstate;
-#define __Pyx_PyThreadState_assign  __pyx_tstate = __Pyx_PyThreadState_Current;
-#define __Pyx_PyErr_Occurred()  __pyx_tstate->curexc_type
-#else
-#define __Pyx_PyThreadState_declare
-#define __Pyx_PyThreadState_assign
-#define __Pyx_PyErr_Occurred()  PyErr_Occurred()
-#endif
-
-/* PyErrFetchRestore.proto */
-#if CYTHON_FAST_THREAD_STATE
-#define __Pyx_PyErr_Clear() __Pyx_ErrRestore(NULL, NULL, NULL)
-#define __Pyx_ErrRestoreWithState(type, value, tb)  __Pyx_ErrRestoreInState(PyThreadState_GET(), type, value, tb)
-#define __Pyx_ErrFetchWithState(type, value, tb)    __Pyx_ErrFetchInState(PyThreadState_GET(), type, value, tb)
-#define __Pyx_ErrRestore(type, value, tb)  __Pyx_ErrRestoreInState(__pyx_tstate, type, value, tb)
-#define __Pyx_ErrFetch(type, value, tb)    __Pyx_ErrFetchInState(__pyx_tstate, type, value, tb)
-static CYTHON_INLINE void __Pyx_ErrRestoreInState(PyThreadState *tstate, PyObject *type, PyObject *value, PyObject *tb);
-static CYTHON_INLINE void __Pyx_ErrFetchInState(PyThreadState *tstate, PyObject **type, PyObject **value, PyObject **tb);
-#if CYTHON_COMPILING_IN_CPYTHON
-#define __Pyx_PyErr_SetNone(exc) (Py_INCREF(exc), __Pyx_ErrRestore((exc), NULL, NULL))
-#else
-#define __Pyx_PyErr_SetNone(exc) PyErr_SetNone(exc)
-#endif
-#else
-#define __Pyx_PyErr_Clear() PyErr_Clear()
-#define __Pyx_PyErr_SetNone(exc) PyErr_SetNone(exc)
-#define __Pyx_ErrRestoreWithState(type, value, tb)  PyErr_Restore(type, value, tb)
-#define __Pyx_ErrFetchWithState(type, value, tb)  PyErr_Fetch(type, value, tb)
-#define __Pyx_ErrRestoreInState(tstate, type, value, tb)  PyErr_Restore(type, value, tb)
-#define __Pyx_ErrFetchInState(tstate, type, value, tb)  PyErr_Fetch(type, value, tb)
-#define __Pyx_ErrRestore(type, value, tb)  PyErr_Restore(type, value, tb)
-#define __Pyx_ErrFetch(type, value, tb)  PyErr_Fetch(type, value, tb)
 #endif
 
 /* WriteUnraisableException.proto */
@@ -1820,7 +2022,7 @@ static const char __pyx_k_0_d[] = "0,%d";
 static const char __pyx_k_1_1[] = "1,1";
 static const char __pyx_k_1_2[] = ",1";
 static const char __pyx_k__11[] = ".";
-static const char __pyx_k__12[] = "*";
+static const char __pyx_k__16[] = "*";
 static const char __pyx_k_add[] = "add";
 static const char __pyx_k_d_2[] = "%d";
 static const char __pyx_k_doc[] = "__doc__";
@@ -2034,7 +2236,7 @@ static PyObject *__pyx_kp_u_Specify_at_least_two_replicates;
 static PyObject *__pyx_n_s_StopIteration;
 static PyObject *__pyx_kp_u_Tao_Liu_vladimir_liu_gmail_com;
 static PyObject *__pyx_kp_u__11;
-static PyObject *__pyx_n_s__12;
+static PyObject *__pyx_n_s__16;
 static PyObject *__pyx_kp_u__2;
 static PyObject *__pyx_kp_u__3;
 static PyObject *__pyx_kp_u__4;
@@ -2262,19 +2464,19 @@ static PyObject *__pyx_int_240202735;
 static PyObject *__pyx_tuple__6;
 static PyObject *__pyx_tuple__8;
 static PyObject *__pyx_tuple__10;
-static PyObject *__pyx_tuple__13;
-static PyObject *__pyx_tuple__15;
 static PyObject *__pyx_tuple__17;
+static PyObject *__pyx_tuple__18;
 static PyObject *__pyx_tuple__19;
+static PyObject *__pyx_tuple__20;
 static PyObject *__pyx_codeobj__7;
 static PyObject *__pyx_codeobj__9;
+static PyObject *__pyx_codeobj__12;
+static PyObject *__pyx_codeobj__13;
 static PyObject *__pyx_codeobj__14;
-static PyObject *__pyx_codeobj__16;
-static PyObject *__pyx_codeobj__18;
-static PyObject *__pyx_codeobj__20;
+static PyObject *__pyx_codeobj__15;
 /* Late includes */
 
-/* "MACS2/IO/BedGraph.pyx":43
+/* "MACS2/IO/BedGraph.pyx":44
  * from libc.math cimport log1p, exp, log10
  * 
  * cdef inline float fisher_method_combining_two_log10pvalues ( float p1, float p2 ):             # <<<<<<<<<<<<<<
@@ -2284,6 +2486,7 @@ static PyObject *__pyx_codeobj__20;
 
 static CYTHON_INLINE float __pyx_f_5MACS2_2IO_8BedGraph_fisher_method_combining_two_log10pvalues(float __pyx_v_p1, float __pyx_v_p2) {
   float __pyx_r;
+  __Pyx_TraceDeclarations
   __Pyx_RefNannyDeclarations
   PyObject *__pyx_t_1 = NULL;
   PyObject *__pyx_t_2 = NULL;
@@ -2292,44 +2495,45 @@ static CYTHON_INLINE float __pyx_f_5MACS2_2IO_8BedGraph_fisher_method_combining_
   double __pyx_t_5;
   float __pyx_t_6;
   __Pyx_RefNannySetupContext("fisher_method_combining_two_log10pvalues", 0);
+  __Pyx_TraceCall("fisher_method_combining_two_log10pvalues", __pyx_f[0], 44, 0, __PYX_ERR(0, 44, __pyx_L1_error));
 
-  /* "MACS2/IO/BedGraph.pyx":44
+  /* "MACS2/IO/BedGraph.pyx":45
  * 
  * cdef inline float fisher_method_combining_two_log10pvalues ( float p1, float p2 ):
  *     return ( p1 + p2 ) - log1p( ( p1 + p2 ) / LOG10_E ) * LOG10_E             # <<<<<<<<<<<<<<
  * 
  * cdef inline float mean ( float p1, float p2 ):
  */
-  __pyx_t_1 = PyFloat_FromDouble((__pyx_v_p1 + __pyx_v_p2)); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 44, __pyx_L1_error)
+  __pyx_t_1 = PyFloat_FromDouble((__pyx_v_p1 + __pyx_v_p2)); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 45, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_2 = PyFloat_FromDouble((__pyx_v_p1 + __pyx_v_p2)); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 44, __pyx_L1_error)
+  __pyx_t_2 = PyFloat_FromDouble((__pyx_v_p1 + __pyx_v_p2)); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 45, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
-  __Pyx_GetModuleGlobalName(__pyx_t_3, __pyx_n_s_LOG10_E); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 44, __pyx_L1_error)
+  __Pyx_GetModuleGlobalName(__pyx_t_3, __pyx_n_s_LOG10_E); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 45, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
-  __pyx_t_4 = __Pyx_PyNumber_Divide(__pyx_t_2, __pyx_t_3); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 44, __pyx_L1_error)
+  __pyx_t_4 = __Pyx_PyNumber_Divide(__pyx_t_2, __pyx_t_3); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 45, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_4);
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-  __pyx_t_5 = __pyx_PyFloat_AsDouble(__pyx_t_4); if (unlikely((__pyx_t_5 == (double)-1) && PyErr_Occurred())) __PYX_ERR(0, 44, __pyx_L1_error)
+  __pyx_t_5 = __pyx_PyFloat_AsDouble(__pyx_t_4); if (unlikely((__pyx_t_5 == (double)-1) && PyErr_Occurred())) __PYX_ERR(0, 45, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-  __pyx_t_4 = PyFloat_FromDouble(log1p(__pyx_t_5)); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 44, __pyx_L1_error)
+  __pyx_t_4 = PyFloat_FromDouble(log1p(__pyx_t_5)); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 45, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_4);
-  __Pyx_GetModuleGlobalName(__pyx_t_3, __pyx_n_s_LOG10_E); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 44, __pyx_L1_error)
+  __Pyx_GetModuleGlobalName(__pyx_t_3, __pyx_n_s_LOG10_E); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 45, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
-  __pyx_t_2 = PyNumber_Multiply(__pyx_t_4, __pyx_t_3); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 44, __pyx_L1_error)
+  __pyx_t_2 = PyNumber_Multiply(__pyx_t_4, __pyx_t_3); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 45, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-  __pyx_t_3 = PyNumber_Subtract(__pyx_t_1, __pyx_t_2); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 44, __pyx_L1_error)
+  __pyx_t_3 = PyNumber_Subtract(__pyx_t_1, __pyx_t_2); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 45, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-  __pyx_t_6 = __pyx_PyFloat_AsFloat(__pyx_t_3); if (unlikely((__pyx_t_6 == (float)-1) && PyErr_Occurred())) __PYX_ERR(0, 44, __pyx_L1_error)
+  __pyx_t_6 = __pyx_PyFloat_AsFloat(__pyx_t_3); if (unlikely((__pyx_t_6 == (float)-1) && PyErr_Occurred())) __PYX_ERR(0, 45, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
   __pyx_r = __pyx_t_6;
   goto __pyx_L0;
 
-  /* "MACS2/IO/BedGraph.pyx":43
+  /* "MACS2/IO/BedGraph.pyx":44
  * from libc.math cimport log1p, exp, log10
  * 
  * cdef inline float fisher_method_combining_two_log10pvalues ( float p1, float p2 ):             # <<<<<<<<<<<<<<
@@ -2346,11 +2550,12 @@ static CYTHON_INLINE float __pyx_f_5MACS2_2IO_8BedGraph_fisher_method_combining_
   __Pyx_WriteUnraisable("MACS2.IO.BedGraph.fisher_method_combining_two_log10pvalues", __pyx_clineno, __pyx_lineno, __pyx_filename, 1, 0);
   __pyx_r = 0;
   __pyx_L0:;
+  __Pyx_TraceReturn(Py_None, 0);
   __Pyx_RefNannyFinishContext();
   return __pyx_r;
 }
 
-/* "MACS2/IO/BedGraph.pyx":46
+/* "MACS2/IO/BedGraph.pyx":47
  *     return ( p1 + p2 ) - log1p( ( p1 + p2 ) / LOG10_E ) * LOG10_E
  * 
  * cdef inline float mean ( float p1, float p2 ):             # <<<<<<<<<<<<<<
@@ -2360,10 +2565,12 @@ static CYTHON_INLINE float __pyx_f_5MACS2_2IO_8BedGraph_fisher_method_combining_
 
 static CYTHON_INLINE float __pyx_f_5MACS2_2IO_8BedGraph_mean(float __pyx_v_p1, float __pyx_v_p2) {
   float __pyx_r;
+  __Pyx_TraceDeclarations
   __Pyx_RefNannyDeclarations
   __Pyx_RefNannySetupContext("mean", 0);
+  __Pyx_TraceCall("mean", __pyx_f[0], 47, 0, __PYX_ERR(0, 47, __pyx_L1_error));
 
-  /* "MACS2/IO/BedGraph.pyx":47
+  /* "MACS2/IO/BedGraph.pyx":48
  * 
  * cdef inline float mean ( float p1, float p2 ):
  *     return ( p1 + p2 ) / 2             # <<<<<<<<<<<<<<
@@ -2373,7 +2580,7 @@ static CYTHON_INLINE float __pyx_f_5MACS2_2IO_8BedGraph_mean(float __pyx_v_p1, f
   __pyx_r = ((__pyx_v_p1 + __pyx_v_p2) / 2.0);
   goto __pyx_L0;
 
-  /* "MACS2/IO/BedGraph.pyx":46
+  /* "MACS2/IO/BedGraph.pyx":47
  *     return ( p1 + p2 ) - log1p( ( p1 + p2 ) / LOG10_E ) * LOG10_E
  * 
  * cdef inline float mean ( float p1, float p2 ):             # <<<<<<<<<<<<<<
@@ -2382,12 +2589,16 @@ static CYTHON_INLINE float __pyx_f_5MACS2_2IO_8BedGraph_mean(float __pyx_v_p1, f
  */
 
   /* function exit code */
+  __pyx_L1_error:;
+  __Pyx_WriteUnraisable("MACS2.IO.BedGraph.mean", __pyx_clineno, __pyx_lineno, __pyx_filename, 1, 0);
+  __pyx_r = 0;
   __pyx_L0:;
+  __Pyx_TraceReturn(Py_None, 0);
   __Pyx_RefNannyFinishContext();
   return __pyx_r;
 }
 
-/* "MACS2/IO/BedGraph.pyx":79
+/* "MACS2/IO/BedGraph.pyx":80
  *         double baseline_value
  * 
  *     def __init__ (self, double baseline_value=0):             # <<<<<<<<<<<<<<
@@ -2427,7 +2638,7 @@ static int __pyx_pw_5MACS2_2IO_8BedGraph_14bedGraphTrackI_1__init__(PyObject *__
         }
       }
       if (unlikely(kw_args > 0)) {
-        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "__init__") < 0)) __PYX_ERR(0, 79, __pyx_L3_error)
+        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "__init__") < 0)) __PYX_ERR(0, 80, __pyx_L3_error)
       }
     } else {
       switch (PyTuple_GET_SIZE(__pyx_args)) {
@@ -2438,14 +2649,14 @@ static int __pyx_pw_5MACS2_2IO_8BedGraph_14bedGraphTrackI_1__init__(PyObject *__
       }
     }
     if (values[0]) {
-      __pyx_v_baseline_value = __pyx_PyFloat_AsDouble(values[0]); if (unlikely((__pyx_v_baseline_value == (double)-1) && PyErr_Occurred())) __PYX_ERR(0, 79, __pyx_L3_error)
+      __pyx_v_baseline_value = __pyx_PyFloat_AsDouble(values[0]); if (unlikely((__pyx_v_baseline_value == (double)-1) && PyErr_Occurred())) __PYX_ERR(0, 80, __pyx_L3_error)
     } else {
       __pyx_v_baseline_value = ((double)0.0);
     }
   }
   goto __pyx_L4_argument_unpacking_done;
   __pyx_L5_argtuple_error:;
-  __Pyx_RaiseArgtupleInvalid("__init__", 0, 0, 1, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 79, __pyx_L3_error)
+  __Pyx_RaiseArgtupleInvalid("__init__", 0, 0, 1, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 80, __pyx_L3_error)
   __pyx_L3_error:;
   __Pyx_AddTraceback("MACS2.IO.BedGraph.bedGraphTrackI.__init__", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __Pyx_RefNannyFinishContext();
@@ -2460,18 +2671,20 @@ static int __pyx_pw_5MACS2_2IO_8BedGraph_14bedGraphTrackI_1__init__(PyObject *__
 
 static int __pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI___init__(struct __pyx_obj_5MACS2_2IO_8BedGraph_bedGraphTrackI *__pyx_v_self, double __pyx_v_baseline_value) {
   int __pyx_r;
+  __Pyx_TraceDeclarations
   __Pyx_RefNannyDeclarations
   PyObject *__pyx_t_1 = NULL;
   __Pyx_RefNannySetupContext("__init__", 0);
+  __Pyx_TraceCall("__init__", __pyx_f[0], 80, 0, __PYX_ERR(0, 80, __pyx_L1_error));
 
-  /* "MACS2/IO/BedGraph.pyx":90
+  /* "MACS2/IO/BedGraph.pyx":91
  * 
  *         """
  *         self.__data = {}             # <<<<<<<<<<<<<<
  *         self.maxvalue = -10000000 # initial maximum value is tiny since I want safe_add_loc to update it
  *         self.minvalue = 10000000  # initial minimum value is large since I want safe_add_loc to update it
  */
-  __pyx_t_1 = __Pyx_PyDict_NewPresized(0); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 90, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyDict_NewPresized(0); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 91, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __Pyx_GIVEREF(__pyx_t_1);
   __Pyx_GOTREF(__pyx_v_self->__pyx___data);
@@ -2479,7 +2692,7 @@ static int __pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI___init__(struct __pyx_
   __pyx_v_self->__pyx___data = ((PyObject*)__pyx_t_1);
   __pyx_t_1 = 0;
 
-  /* "MACS2/IO/BedGraph.pyx":91
+  /* "MACS2/IO/BedGraph.pyx":92
  *         """
  *         self.__data = {}
  *         self.maxvalue = -10000000 # initial maximum value is tiny since I want safe_add_loc to update it             # <<<<<<<<<<<<<<
@@ -2488,7 +2701,7 @@ static int __pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI___init__(struct __pyx_
  */
   __pyx_v_self->maxvalue = -10000000.0;
 
-  /* "MACS2/IO/BedGraph.pyx":92
+  /* "MACS2/IO/BedGraph.pyx":93
  *         self.__data = {}
  *         self.maxvalue = -10000000 # initial maximum value is tiny since I want safe_add_loc to update it
  *         self.minvalue = 10000000  # initial minimum value is large since I want safe_add_loc to update it             # <<<<<<<<<<<<<<
@@ -2497,7 +2710,7 @@ static int __pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI___init__(struct __pyx_
  */
   __pyx_v_self->minvalue = 10000000.0;
 
-  /* "MACS2/IO/BedGraph.pyx":93
+  /* "MACS2/IO/BedGraph.pyx":94
  *         self.maxvalue = -10000000 # initial maximum value is tiny since I want safe_add_loc to update it
  *         self.minvalue = 10000000  # initial minimum value is large since I want safe_add_loc to update it
  *         self.baseline_value = baseline_value             # <<<<<<<<<<<<<<
@@ -2506,7 +2719,7 @@ static int __pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI___init__(struct __pyx_
  */
   __pyx_v_self->baseline_value = __pyx_v_baseline_value;
 
-  /* "MACS2/IO/BedGraph.pyx":79
+  /* "MACS2/IO/BedGraph.pyx":80
  *         double baseline_value
  * 
  *     def __init__ (self, double baseline_value=0):             # <<<<<<<<<<<<<<
@@ -2522,11 +2735,12 @@ static int __pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI___init__(struct __pyx_
   __Pyx_AddTraceback("MACS2.IO.BedGraph.bedGraphTrackI.__init__", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __pyx_r = -1;
   __pyx_L0:;
+  __Pyx_TraceReturn(Py_None, 0);
   __Pyx_RefNannyFinishContext();
   return __pyx_r;
 }
 
-/* "MACS2/IO/BedGraph.pyx":95
+/* "MACS2/IO/BedGraph.pyx":96
  *         self.baseline_value = baseline_value
  * 
  *     def add_a_chromosome ( self, bytes chrom, d ):             # <<<<<<<<<<<<<<
@@ -2566,11 +2780,11 @@ static PyObject *__pyx_pw_5MACS2_2IO_8BedGraph_14bedGraphTrackI_3add_a_chromosom
         case  1:
         if (likely((values[1] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_d)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("add_a_chromosome", 1, 2, 2, 1); __PYX_ERR(0, 95, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("add_a_chromosome", 1, 2, 2, 1); __PYX_ERR(0, 96, __pyx_L3_error)
         }
       }
       if (unlikely(kw_args > 0)) {
-        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "add_a_chromosome") < 0)) __PYX_ERR(0, 95, __pyx_L3_error)
+        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "add_a_chromosome") < 0)) __PYX_ERR(0, 96, __pyx_L3_error)
       }
     } else if (PyTuple_GET_SIZE(__pyx_args) != 2) {
       goto __pyx_L5_argtuple_error;
@@ -2583,13 +2797,13 @@ static PyObject *__pyx_pw_5MACS2_2IO_8BedGraph_14bedGraphTrackI_3add_a_chromosom
   }
   goto __pyx_L4_argument_unpacking_done;
   __pyx_L5_argtuple_error:;
-  __Pyx_RaiseArgtupleInvalid("add_a_chromosome", 1, 2, 2, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 95, __pyx_L3_error)
+  __Pyx_RaiseArgtupleInvalid("add_a_chromosome", 1, 2, 2, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 96, __pyx_L3_error)
   __pyx_L3_error:;
   __Pyx_AddTraceback("MACS2.IO.BedGraph.bedGraphTrackI.add_a_chromosome", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __Pyx_RefNannyFinishContext();
   return NULL;
   __pyx_L4_argument_unpacking_done:;
-  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_chrom), (&PyBytes_Type), 1, "chrom", 1))) __PYX_ERR(0, 95, __pyx_L1_error)
+  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_chrom), (&PyBytes_Type), 1, "chrom", 1))) __PYX_ERR(0, 96, __pyx_L1_error)
   __pyx_r = __pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_2add_a_chromosome(((struct __pyx_obj_5MACS2_2IO_8BedGraph_bedGraphTrackI *)__pyx_v_self), __pyx_v_chrom, __pyx_v_d);
 
   /* function exit code */
@@ -2603,10 +2817,12 @@ static PyObject *__pyx_pw_5MACS2_2IO_8BedGraph_14bedGraphTrackI_3add_a_chromosom
 
 static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_2add_a_chromosome(struct __pyx_obj_5MACS2_2IO_8BedGraph_bedGraphTrackI *__pyx_v_self, PyObject *__pyx_v_chrom, PyObject *__pyx_v_d) {
   PyObject *__pyx_r = NULL;
+  __Pyx_TraceDeclarations
   __Pyx_RefNannyDeclarations
   __Pyx_RefNannySetupContext("add_a_chromosome", 0);
+  __Pyx_TraceCall("add_a_chromosome", __pyx_f[0], 96, 0, __PYX_ERR(0, 96, __pyx_L1_error));
 
-  /* "MACS2/IO/BedGraph.pyx":98
+  /* "MACS2/IO/BedGraph.pyx":99
  *         """Unsafe method. Only to be used by cPileup.pyx.
  *         """
  *         self.__data[chrom] = d             # <<<<<<<<<<<<<<
@@ -2615,11 +2831,11 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_2add_a_chromosom
  */
   if (unlikely(__pyx_v_self->__pyx___data == Py_None)) {
     PyErr_SetString(PyExc_TypeError, "'NoneType' object is not subscriptable");
-    __PYX_ERR(0, 98, __pyx_L1_error)
+    __PYX_ERR(0, 99, __pyx_L1_error)
   }
-  if (unlikely(PyDict_SetItem(__pyx_v_self->__pyx___data, __pyx_v_chrom, __pyx_v_d) < 0)) __PYX_ERR(0, 98, __pyx_L1_error)
+  if (unlikely(PyDict_SetItem(__pyx_v_self->__pyx___data, __pyx_v_chrom, __pyx_v_d) < 0)) __PYX_ERR(0, 99, __pyx_L1_error)
 
-  /* "MACS2/IO/BedGraph.pyx":95
+  /* "MACS2/IO/BedGraph.pyx":96
  *         self.baseline_value = baseline_value
  * 
  *     def add_a_chromosome ( self, bytes chrom, d ):             # <<<<<<<<<<<<<<
@@ -2635,11 +2851,12 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_2add_a_chromosom
   __pyx_r = NULL;
   __pyx_L0:;
   __Pyx_XGIVEREF(__pyx_r);
+  __Pyx_TraceReturn(__pyx_r, 0);
   __Pyx_RefNannyFinishContext();
   return __pyx_r;
 }
 
-/* "MACS2/IO/BedGraph.pyx":100
+/* "MACS2/IO/BedGraph.pyx":101
  *         self.__data[chrom] = d
  * 
  *     cpdef add_loc ( self, bytes chromosome, int startpos, int endpos, float value ):             # <<<<<<<<<<<<<<
@@ -2652,6 +2869,7 @@ static PyObject *__pyx_f_5MACS2_2IO_8BedGraph_14bedGraphTrackI_add_loc(struct __
   float __pyx_v_pre_v;
   PyObject *__pyx_v_c = NULL;
   PyObject *__pyx_r = NULL;
+  __Pyx_TraceDeclarations
   __Pyx_RefNannyDeclarations
   PyObject *__pyx_t_1 = NULL;
   PyObject *__pyx_t_2 = NULL;
@@ -2667,6 +2885,7 @@ static PyObject *__pyx_f_5MACS2_2IO_8BedGraph_14bedGraphTrackI_add_loc(struct __
   int __pyx_t_12;
   float __pyx_t_13;
   __Pyx_RefNannySetupContext("add_loc", 0);
+  __Pyx_TraceCall("add_loc", __pyx_f[0], 101, 0, __PYX_ERR(0, 101, __pyx_L1_error));
   /* Check if called by wrapper */
   if (unlikely(__pyx_skip_dispatch)) ;
   /* Check if overridden in Python */
@@ -2676,15 +2895,15 @@ static PyObject *__pyx_f_5MACS2_2IO_8BedGraph_14bedGraphTrackI_add_loc(struct __
     if (unlikely(!__Pyx_object_dict_version_matches(((PyObject *)__pyx_v_self), __pyx_tp_dict_version, __pyx_obj_dict_version))) {
       PY_UINT64_T __pyx_type_dict_guard = __Pyx_get_tp_dict_version(((PyObject *)__pyx_v_self));
       #endif
-      __pyx_t_1 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_v_self), __pyx_n_s_add_loc); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 100, __pyx_L1_error)
+      __pyx_t_1 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_v_self), __pyx_n_s_add_loc); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 101, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_1);
       if (!PyCFunction_Check(__pyx_t_1) || (PyCFunction_GET_FUNCTION(__pyx_t_1) != (PyCFunction)(void*)__pyx_pw_5MACS2_2IO_8BedGraph_14bedGraphTrackI_5add_loc)) {
         __Pyx_XDECREF(__pyx_r);
-        __pyx_t_3 = __Pyx_PyInt_From_int(__pyx_v_startpos); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 100, __pyx_L1_error)
+        __pyx_t_3 = __Pyx_PyInt_From_int(__pyx_v_startpos); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 101, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_3);
-        __pyx_t_4 = __Pyx_PyInt_From_int(__pyx_v_endpos); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 100, __pyx_L1_error)
+        __pyx_t_4 = __Pyx_PyInt_From_int(__pyx_v_endpos); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 101, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_4);
-        __pyx_t_5 = PyFloat_FromDouble(__pyx_v_value); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 100, __pyx_L1_error)
+        __pyx_t_5 = PyFloat_FromDouble(__pyx_v_value); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 101, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_5);
         __Pyx_INCREF(__pyx_t_1);
         __pyx_t_6 = __pyx_t_1; __pyx_t_7 = NULL;
@@ -2702,7 +2921,7 @@ static PyObject *__pyx_f_5MACS2_2IO_8BedGraph_14bedGraphTrackI_add_loc(struct __
         #if CYTHON_FAST_PYCALL
         if (PyFunction_Check(__pyx_t_6)) {
           PyObject *__pyx_temp[5] = {__pyx_t_7, __pyx_v_chromosome, __pyx_t_3, __pyx_t_4, __pyx_t_5};
-          __pyx_t_2 = __Pyx_PyFunction_FastCall(__pyx_t_6, __pyx_temp+1-__pyx_t_8, 4+__pyx_t_8); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 100, __pyx_L1_error)
+          __pyx_t_2 = __Pyx_PyFunction_FastCall(__pyx_t_6, __pyx_temp+1-__pyx_t_8, 4+__pyx_t_8); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 101, __pyx_L1_error)
           __Pyx_XDECREF(__pyx_t_7); __pyx_t_7 = 0;
           __Pyx_GOTREF(__pyx_t_2);
           __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
@@ -2713,7 +2932,7 @@ static PyObject *__pyx_f_5MACS2_2IO_8BedGraph_14bedGraphTrackI_add_loc(struct __
         #if CYTHON_FAST_PYCCALL
         if (__Pyx_PyFastCFunction_Check(__pyx_t_6)) {
           PyObject *__pyx_temp[5] = {__pyx_t_7, __pyx_v_chromosome, __pyx_t_3, __pyx_t_4, __pyx_t_5};
-          __pyx_t_2 = __Pyx_PyCFunction_FastCall(__pyx_t_6, __pyx_temp+1-__pyx_t_8, 4+__pyx_t_8); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 100, __pyx_L1_error)
+          __pyx_t_2 = __Pyx_PyCFunction_FastCall(__pyx_t_6, __pyx_temp+1-__pyx_t_8, 4+__pyx_t_8); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 101, __pyx_L1_error)
           __Pyx_XDECREF(__pyx_t_7); __pyx_t_7 = 0;
           __Pyx_GOTREF(__pyx_t_2);
           __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
@@ -2722,7 +2941,7 @@ static PyObject *__pyx_f_5MACS2_2IO_8BedGraph_14bedGraphTrackI_add_loc(struct __
         } else
         #endif
         {
-          __pyx_t_9 = PyTuple_New(4+__pyx_t_8); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 100, __pyx_L1_error)
+          __pyx_t_9 = PyTuple_New(4+__pyx_t_8); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 101, __pyx_L1_error)
           __Pyx_GOTREF(__pyx_t_9);
           if (__pyx_t_7) {
             __Pyx_GIVEREF(__pyx_t_7); PyTuple_SET_ITEM(__pyx_t_9, 0, __pyx_t_7); __pyx_t_7 = NULL;
@@ -2739,7 +2958,7 @@ static PyObject *__pyx_f_5MACS2_2IO_8BedGraph_14bedGraphTrackI_add_loc(struct __
           __pyx_t_3 = 0;
           __pyx_t_4 = 0;
           __pyx_t_5 = 0;
-          __pyx_t_2 = __Pyx_PyObject_Call(__pyx_t_6, __pyx_t_9, NULL); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 100, __pyx_L1_error)
+          __pyx_t_2 = __Pyx_PyObject_Call(__pyx_t_6, __pyx_t_9, NULL); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 101, __pyx_L1_error)
           __Pyx_GOTREF(__pyx_t_2);
           __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
         }
@@ -2762,7 +2981,7 @@ static PyObject *__pyx_f_5MACS2_2IO_8BedGraph_14bedGraphTrackI_add_loc(struct __
     #endif
   }
 
-  /* "MACS2/IO/BedGraph.pyx":111
+  /* "MACS2/IO/BedGraph.pyx":112
  *         # basic assumption, end pos should > start pos
  * 
  *         if endpos <= 0:             # <<<<<<<<<<<<<<
@@ -2772,7 +2991,7 @@ static PyObject *__pyx_f_5MACS2_2IO_8BedGraph_14bedGraphTrackI_add_loc(struct __
   __pyx_t_10 = ((__pyx_v_endpos <= 0) != 0);
   if (__pyx_t_10) {
 
-    /* "MACS2/IO/BedGraph.pyx":112
+    /* "MACS2/IO/BedGraph.pyx":113
  * 
  *         if endpos <= 0:
  *             return             # <<<<<<<<<<<<<<
@@ -2783,7 +3002,7 @@ static PyObject *__pyx_f_5MACS2_2IO_8BedGraph_14bedGraphTrackI_add_loc(struct __
     __pyx_r = Py_None; __Pyx_INCREF(Py_None);
     goto __pyx_L0;
 
-    /* "MACS2/IO/BedGraph.pyx":111
+    /* "MACS2/IO/BedGraph.pyx":112
  *         # basic assumption, end pos should > start pos
  * 
  *         if endpos <= 0:             # <<<<<<<<<<<<<<
@@ -2792,7 +3011,7 @@ static PyObject *__pyx_f_5MACS2_2IO_8BedGraph_14bedGraphTrackI_add_loc(struct __
  */
   }
 
-  /* "MACS2/IO/BedGraph.pyx":113
+  /* "MACS2/IO/BedGraph.pyx":114
  *         if endpos <= 0:
  *             return
  *         if startpos < 0:             # <<<<<<<<<<<<<<
@@ -2802,7 +3021,7 @@ static PyObject *__pyx_f_5MACS2_2IO_8BedGraph_14bedGraphTrackI_add_loc(struct __
   __pyx_t_10 = ((__pyx_v_startpos < 0) != 0);
   if (__pyx_t_10) {
 
-    /* "MACS2/IO/BedGraph.pyx":114
+    /* "MACS2/IO/BedGraph.pyx":115
  *             return
  *         if startpos < 0:
  *             startpos = 0             # <<<<<<<<<<<<<<
@@ -2811,7 +3030,7 @@ static PyObject *__pyx_f_5MACS2_2IO_8BedGraph_14bedGraphTrackI_add_loc(struct __
  */
     __pyx_v_startpos = 0;
 
-    /* "MACS2/IO/BedGraph.pyx":113
+    /* "MACS2/IO/BedGraph.pyx":114
  *         if endpos <= 0:
  *             return
  *         if startpos < 0:             # <<<<<<<<<<<<<<
@@ -2820,7 +3039,7 @@ static PyObject *__pyx_f_5MACS2_2IO_8BedGraph_14bedGraphTrackI_add_loc(struct __
  */
   }
 
-  /* "MACS2/IO/BedGraph.pyx":116
+  /* "MACS2/IO/BedGraph.pyx":117
  *             startpos = 0
  * 
  *         if chromosome not in self.__data:             # <<<<<<<<<<<<<<
@@ -2829,24 +3048,24 @@ static PyObject *__pyx_f_5MACS2_2IO_8BedGraph_14bedGraphTrackI_add_loc(struct __
  */
   if (unlikely(__pyx_v_self->__pyx___data == Py_None)) {
     PyErr_SetString(PyExc_TypeError, "'NoneType' object is not iterable");
-    __PYX_ERR(0, 116, __pyx_L1_error)
+    __PYX_ERR(0, 117, __pyx_L1_error)
   }
-  __pyx_t_10 = (__Pyx_PyDict_ContainsTF(__pyx_v_chromosome, __pyx_v_self->__pyx___data, Py_NE)); if (unlikely(__pyx_t_10 < 0)) __PYX_ERR(0, 116, __pyx_L1_error)
+  __pyx_t_10 = (__Pyx_PyDict_ContainsTF(__pyx_v_chromosome, __pyx_v_self->__pyx___data, Py_NE)); if (unlikely(__pyx_t_10 < 0)) __PYX_ERR(0, 117, __pyx_L1_error)
   __pyx_t_11 = (__pyx_t_10 != 0);
   if (__pyx_t_11) {
 
-    /* "MACS2/IO/BedGraph.pyx":117
+    /* "MACS2/IO/BedGraph.pyx":118
  * 
  *         if chromosome not in self.__data:
  *             self.__data[chromosome] = [array(BYTE4,[]),array(FBYTE4,[])] # for (endpos,value)             # <<<<<<<<<<<<<<
  *             c = self.__data[chromosome]
  *             if startpos:
  */
-    __Pyx_GetModuleGlobalName(__pyx_t_2, __pyx_n_s_array); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 117, __pyx_L1_error)
+    __Pyx_GetModuleGlobalName(__pyx_t_2, __pyx_n_s_array); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 118, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
-    __Pyx_GetModuleGlobalName(__pyx_t_6, __pyx_n_s_BYTE4); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 117, __pyx_L1_error)
+    __Pyx_GetModuleGlobalName(__pyx_t_6, __pyx_n_s_BYTE4); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 118, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_6);
-    __pyx_t_9 = PyList_New(0); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 117, __pyx_L1_error)
+    __pyx_t_9 = PyList_New(0); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 118, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_9);
     __pyx_t_5 = NULL;
     __pyx_t_8 = 0;
@@ -2863,7 +3082,7 @@ static PyObject *__pyx_f_5MACS2_2IO_8BedGraph_14bedGraphTrackI_add_loc(struct __
     #if CYTHON_FAST_PYCALL
     if (PyFunction_Check(__pyx_t_2)) {
       PyObject *__pyx_temp[3] = {__pyx_t_5, __pyx_t_6, __pyx_t_9};
-      __pyx_t_1 = __Pyx_PyFunction_FastCall(__pyx_t_2, __pyx_temp+1-__pyx_t_8, 2+__pyx_t_8); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 117, __pyx_L1_error)
+      __pyx_t_1 = __Pyx_PyFunction_FastCall(__pyx_t_2, __pyx_temp+1-__pyx_t_8, 2+__pyx_t_8); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 118, __pyx_L1_error)
       __Pyx_XDECREF(__pyx_t_5); __pyx_t_5 = 0;
       __Pyx_GOTREF(__pyx_t_1);
       __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
@@ -2873,7 +3092,7 @@ static PyObject *__pyx_f_5MACS2_2IO_8BedGraph_14bedGraphTrackI_add_loc(struct __
     #if CYTHON_FAST_PYCCALL
     if (__Pyx_PyFastCFunction_Check(__pyx_t_2)) {
       PyObject *__pyx_temp[3] = {__pyx_t_5, __pyx_t_6, __pyx_t_9};
-      __pyx_t_1 = __Pyx_PyCFunction_FastCall(__pyx_t_2, __pyx_temp+1-__pyx_t_8, 2+__pyx_t_8); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 117, __pyx_L1_error)
+      __pyx_t_1 = __Pyx_PyCFunction_FastCall(__pyx_t_2, __pyx_temp+1-__pyx_t_8, 2+__pyx_t_8); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 118, __pyx_L1_error)
       __Pyx_XDECREF(__pyx_t_5); __pyx_t_5 = 0;
       __Pyx_GOTREF(__pyx_t_1);
       __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
@@ -2881,7 +3100,7 @@ static PyObject *__pyx_f_5MACS2_2IO_8BedGraph_14bedGraphTrackI_add_loc(struct __
     } else
     #endif
     {
-      __pyx_t_4 = PyTuple_New(2+__pyx_t_8); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 117, __pyx_L1_error)
+      __pyx_t_4 = PyTuple_New(2+__pyx_t_8); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 118, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_4);
       if (__pyx_t_5) {
         __Pyx_GIVEREF(__pyx_t_5); PyTuple_SET_ITEM(__pyx_t_4, 0, __pyx_t_5); __pyx_t_5 = NULL;
@@ -2892,16 +3111,16 @@ static PyObject *__pyx_f_5MACS2_2IO_8BedGraph_14bedGraphTrackI_add_loc(struct __
       PyTuple_SET_ITEM(__pyx_t_4, 1+__pyx_t_8, __pyx_t_9);
       __pyx_t_6 = 0;
       __pyx_t_9 = 0;
-      __pyx_t_1 = __Pyx_PyObject_Call(__pyx_t_2, __pyx_t_4, NULL); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 117, __pyx_L1_error)
+      __pyx_t_1 = __Pyx_PyObject_Call(__pyx_t_2, __pyx_t_4, NULL); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 118, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_1);
       __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
     }
     __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-    __Pyx_GetModuleGlobalName(__pyx_t_4, __pyx_n_s_array); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 117, __pyx_L1_error)
+    __Pyx_GetModuleGlobalName(__pyx_t_4, __pyx_n_s_array); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 118, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_4);
-    __Pyx_GetModuleGlobalName(__pyx_t_9, __pyx_n_s_FBYTE4); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 117, __pyx_L1_error)
+    __Pyx_GetModuleGlobalName(__pyx_t_9, __pyx_n_s_FBYTE4); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 118, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_9);
-    __pyx_t_6 = PyList_New(0); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 117, __pyx_L1_error)
+    __pyx_t_6 = PyList_New(0); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 118, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_6);
     __pyx_t_5 = NULL;
     __pyx_t_8 = 0;
@@ -2918,7 +3137,7 @@ static PyObject *__pyx_f_5MACS2_2IO_8BedGraph_14bedGraphTrackI_add_loc(struct __
     #if CYTHON_FAST_PYCALL
     if (PyFunction_Check(__pyx_t_4)) {
       PyObject *__pyx_temp[3] = {__pyx_t_5, __pyx_t_9, __pyx_t_6};
-      __pyx_t_2 = __Pyx_PyFunction_FastCall(__pyx_t_4, __pyx_temp+1-__pyx_t_8, 2+__pyx_t_8); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 117, __pyx_L1_error)
+      __pyx_t_2 = __Pyx_PyFunction_FastCall(__pyx_t_4, __pyx_temp+1-__pyx_t_8, 2+__pyx_t_8); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 118, __pyx_L1_error)
       __Pyx_XDECREF(__pyx_t_5); __pyx_t_5 = 0;
       __Pyx_GOTREF(__pyx_t_2);
       __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
@@ -2928,7 +3147,7 @@ static PyObject *__pyx_f_5MACS2_2IO_8BedGraph_14bedGraphTrackI_add_loc(struct __
     #if CYTHON_FAST_PYCCALL
     if (__Pyx_PyFastCFunction_Check(__pyx_t_4)) {
       PyObject *__pyx_temp[3] = {__pyx_t_5, __pyx_t_9, __pyx_t_6};
-      __pyx_t_2 = __Pyx_PyCFunction_FastCall(__pyx_t_4, __pyx_temp+1-__pyx_t_8, 2+__pyx_t_8); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 117, __pyx_L1_error)
+      __pyx_t_2 = __Pyx_PyCFunction_FastCall(__pyx_t_4, __pyx_temp+1-__pyx_t_8, 2+__pyx_t_8); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 118, __pyx_L1_error)
       __Pyx_XDECREF(__pyx_t_5); __pyx_t_5 = 0;
       __Pyx_GOTREF(__pyx_t_2);
       __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
@@ -2936,7 +3155,7 @@ static PyObject *__pyx_f_5MACS2_2IO_8BedGraph_14bedGraphTrackI_add_loc(struct __
     } else
     #endif
     {
-      __pyx_t_3 = PyTuple_New(2+__pyx_t_8); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 117, __pyx_L1_error)
+      __pyx_t_3 = PyTuple_New(2+__pyx_t_8); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 118, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_3);
       if (__pyx_t_5) {
         __Pyx_GIVEREF(__pyx_t_5); PyTuple_SET_ITEM(__pyx_t_3, 0, __pyx_t_5); __pyx_t_5 = NULL;
@@ -2947,12 +3166,12 @@ static PyObject *__pyx_f_5MACS2_2IO_8BedGraph_14bedGraphTrackI_add_loc(struct __
       PyTuple_SET_ITEM(__pyx_t_3, 1+__pyx_t_8, __pyx_t_6);
       __pyx_t_9 = 0;
       __pyx_t_6 = 0;
-      __pyx_t_2 = __Pyx_PyObject_Call(__pyx_t_4, __pyx_t_3, NULL); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 117, __pyx_L1_error)
+      __pyx_t_2 = __Pyx_PyObject_Call(__pyx_t_4, __pyx_t_3, NULL); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 118, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_2);
       __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
     }
     __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-    __pyx_t_4 = PyList_New(2); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 117, __pyx_L1_error)
+    __pyx_t_4 = PyList_New(2); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 118, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_4);
     __Pyx_GIVEREF(__pyx_t_1);
     PyList_SET_ITEM(__pyx_t_4, 0, __pyx_t_1);
@@ -2962,12 +3181,12 @@ static PyObject *__pyx_f_5MACS2_2IO_8BedGraph_14bedGraphTrackI_add_loc(struct __
     __pyx_t_2 = 0;
     if (unlikely(__pyx_v_self->__pyx___data == Py_None)) {
       PyErr_SetString(PyExc_TypeError, "'NoneType' object is not subscriptable");
-      __PYX_ERR(0, 117, __pyx_L1_error)
+      __PYX_ERR(0, 118, __pyx_L1_error)
     }
-    if (unlikely(PyDict_SetItem(__pyx_v_self->__pyx___data, __pyx_v_chromosome, __pyx_t_4) < 0)) __PYX_ERR(0, 117, __pyx_L1_error)
+    if (unlikely(PyDict_SetItem(__pyx_v_self->__pyx___data, __pyx_v_chromosome, __pyx_t_4) < 0)) __PYX_ERR(0, 118, __pyx_L1_error)
     __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
 
-    /* "MACS2/IO/BedGraph.pyx":118
+    /* "MACS2/IO/BedGraph.pyx":119
  *         if chromosome not in self.__data:
  *             self.__data[chromosome] = [array(BYTE4,[]),array(FBYTE4,[])] # for (endpos,value)
  *             c = self.__data[chromosome]             # <<<<<<<<<<<<<<
@@ -2976,14 +3195,14 @@ static PyObject *__pyx_f_5MACS2_2IO_8BedGraph_14bedGraphTrackI_add_loc(struct __
  */
     if (unlikely(__pyx_v_self->__pyx___data == Py_None)) {
       PyErr_SetString(PyExc_TypeError, "'NoneType' object is not subscriptable");
-      __PYX_ERR(0, 118, __pyx_L1_error)
+      __PYX_ERR(0, 119, __pyx_L1_error)
     }
-    __pyx_t_4 = __Pyx_PyDict_GetItem(__pyx_v_self->__pyx___data, __pyx_v_chromosome); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 118, __pyx_L1_error)
+    __pyx_t_4 = __Pyx_PyDict_GetItem(__pyx_v_self->__pyx___data, __pyx_v_chromosome); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 119, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_4);
     __pyx_v_c = __pyx_t_4;
     __pyx_t_4 = 0;
 
-    /* "MACS2/IO/BedGraph.pyx":119
+    /* "MACS2/IO/BedGraph.pyx":120
  *             self.__data[chromosome] = [array(BYTE4,[]),array(FBYTE4,[])] # for (endpos,value)
  *             c = self.__data[chromosome]
  *             if startpos:             # <<<<<<<<<<<<<<
@@ -2993,37 +3212,37 @@ static PyObject *__pyx_f_5MACS2_2IO_8BedGraph_14bedGraphTrackI_add_loc(struct __
     __pyx_t_11 = (__pyx_v_startpos != 0);
     if (__pyx_t_11) {
 
-      /* "MACS2/IO/BedGraph.pyx":122
+      /* "MACS2/IO/BedGraph.pyx":123
  *                 # start pos is not 0, then add two blocks, the first
  *                 # with "baseline_value"; the second with "value"
  *                 c[0].append(startpos)             # <<<<<<<<<<<<<<
  *                 c[1].append(self.baseline_value)
  *             c[0].append(endpos)
  */
-      __pyx_t_4 = __Pyx_GetItemInt(__pyx_v_c, 0, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 122, __pyx_L1_error)
+      __pyx_t_4 = __Pyx_GetItemInt(__pyx_v_c, 0, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 123, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_4);
-      __pyx_t_2 = __Pyx_PyInt_From_int(__pyx_v_startpos); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 122, __pyx_L1_error)
+      __pyx_t_2 = __Pyx_PyInt_From_int(__pyx_v_startpos); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 123, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_2);
-      __pyx_t_12 = __Pyx_PyObject_Append(__pyx_t_4, __pyx_t_2); if (unlikely(__pyx_t_12 == ((int)-1))) __PYX_ERR(0, 122, __pyx_L1_error)
+      __pyx_t_12 = __Pyx_PyObject_Append(__pyx_t_4, __pyx_t_2); if (unlikely(__pyx_t_12 == ((int)-1))) __PYX_ERR(0, 123, __pyx_L1_error)
       __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
       __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
-      /* "MACS2/IO/BedGraph.pyx":123
+      /* "MACS2/IO/BedGraph.pyx":124
  *                 # with "baseline_value"; the second with "value"
  *                 c[0].append(startpos)
  *                 c[1].append(self.baseline_value)             # <<<<<<<<<<<<<<
  *             c[0].append(endpos)
  *             c[1].append(value)
  */
-      __pyx_t_2 = __Pyx_GetItemInt(__pyx_v_c, 1, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 123, __pyx_L1_error)
+      __pyx_t_2 = __Pyx_GetItemInt(__pyx_v_c, 1, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 124, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_2);
-      __pyx_t_4 = PyFloat_FromDouble(__pyx_v_self->baseline_value); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 123, __pyx_L1_error)
+      __pyx_t_4 = PyFloat_FromDouble(__pyx_v_self->baseline_value); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 124, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_4);
-      __pyx_t_12 = __Pyx_PyObject_Append(__pyx_t_2, __pyx_t_4); if (unlikely(__pyx_t_12 == ((int)-1))) __PYX_ERR(0, 123, __pyx_L1_error)
+      __pyx_t_12 = __Pyx_PyObject_Append(__pyx_t_2, __pyx_t_4); if (unlikely(__pyx_t_12 == ((int)-1))) __PYX_ERR(0, 124, __pyx_L1_error)
       __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
       __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
 
-      /* "MACS2/IO/BedGraph.pyx":119
+      /* "MACS2/IO/BedGraph.pyx":120
  *             self.__data[chromosome] = [array(BYTE4,[]),array(FBYTE4,[])] # for (endpos,value)
  *             c = self.__data[chromosome]
  *             if startpos:             # <<<<<<<<<<<<<<
@@ -3032,37 +3251,37 @@ static PyObject *__pyx_f_5MACS2_2IO_8BedGraph_14bedGraphTrackI_add_loc(struct __
  */
     }
 
-    /* "MACS2/IO/BedGraph.pyx":124
+    /* "MACS2/IO/BedGraph.pyx":125
  *                 c[0].append(startpos)
  *                 c[1].append(self.baseline_value)
  *             c[0].append(endpos)             # <<<<<<<<<<<<<<
  *             c[1].append(value)
  *         else:
  */
-    __pyx_t_4 = __Pyx_GetItemInt(__pyx_v_c, 0, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 124, __pyx_L1_error)
+    __pyx_t_4 = __Pyx_GetItemInt(__pyx_v_c, 0, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 125, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_4);
-    __pyx_t_2 = __Pyx_PyInt_From_int(__pyx_v_endpos); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 124, __pyx_L1_error)
+    __pyx_t_2 = __Pyx_PyInt_From_int(__pyx_v_endpos); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 125, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
-    __pyx_t_12 = __Pyx_PyObject_Append(__pyx_t_4, __pyx_t_2); if (unlikely(__pyx_t_12 == ((int)-1))) __PYX_ERR(0, 124, __pyx_L1_error)
+    __pyx_t_12 = __Pyx_PyObject_Append(__pyx_t_4, __pyx_t_2); if (unlikely(__pyx_t_12 == ((int)-1))) __PYX_ERR(0, 125, __pyx_L1_error)
     __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
     __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
-    /* "MACS2/IO/BedGraph.pyx":125
+    /* "MACS2/IO/BedGraph.pyx":126
  *                 c[1].append(self.baseline_value)
  *             c[0].append(endpos)
  *             c[1].append(value)             # <<<<<<<<<<<<<<
  *         else:
  *             c = self.__data[chromosome]
  */
-    __pyx_t_2 = __Pyx_GetItemInt(__pyx_v_c, 1, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 125, __pyx_L1_error)
+    __pyx_t_2 = __Pyx_GetItemInt(__pyx_v_c, 1, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 126, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
-    __pyx_t_4 = PyFloat_FromDouble(__pyx_v_value); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 125, __pyx_L1_error)
+    __pyx_t_4 = PyFloat_FromDouble(__pyx_v_value); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 126, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_4);
-    __pyx_t_12 = __Pyx_PyObject_Append(__pyx_t_2, __pyx_t_4); if (unlikely(__pyx_t_12 == ((int)-1))) __PYX_ERR(0, 125, __pyx_L1_error)
+    __pyx_t_12 = __Pyx_PyObject_Append(__pyx_t_2, __pyx_t_4); if (unlikely(__pyx_t_12 == ((int)-1))) __PYX_ERR(0, 126, __pyx_L1_error)
     __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
     __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
 
-    /* "MACS2/IO/BedGraph.pyx":116
+    /* "MACS2/IO/BedGraph.pyx":117
  *             startpos = 0
  * 
  *         if chromosome not in self.__data:             # <<<<<<<<<<<<<<
@@ -3072,7 +3291,7 @@ static PyObject *__pyx_f_5MACS2_2IO_8BedGraph_14bedGraphTrackI_add_loc(struct __
     goto __pyx_L5;
   }
 
-  /* "MACS2/IO/BedGraph.pyx":127
+  /* "MACS2/IO/BedGraph.pyx":128
  *             c[1].append(value)
  *         else:
  *             c = self.__data[chromosome]             # <<<<<<<<<<<<<<
@@ -3082,30 +3301,30 @@ static PyObject *__pyx_f_5MACS2_2IO_8BedGraph_14bedGraphTrackI_add_loc(struct __
   /*else*/ {
     if (unlikely(__pyx_v_self->__pyx___data == Py_None)) {
       PyErr_SetString(PyExc_TypeError, "'NoneType' object is not subscriptable");
-      __PYX_ERR(0, 127, __pyx_L1_error)
+      __PYX_ERR(0, 128, __pyx_L1_error)
     }
-    __pyx_t_4 = __Pyx_PyDict_GetItem(__pyx_v_self->__pyx___data, __pyx_v_chromosome); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 127, __pyx_L1_error)
+    __pyx_t_4 = __Pyx_PyDict_GetItem(__pyx_v_self->__pyx___data, __pyx_v_chromosome); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 128, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_4);
     __pyx_v_c = __pyx_t_4;
     __pyx_t_4 = 0;
 
-    /* "MACS2/IO/BedGraph.pyx":129
+    /* "MACS2/IO/BedGraph.pyx":130
  *             c = self.__data[chromosome]
  *             # get the preceding region
  *             pre_v   = c[1][-1]             # <<<<<<<<<<<<<<
  * 
  *             # if this region is next to the previous one.
  */
-    __pyx_t_4 = __Pyx_GetItemInt(__pyx_v_c, 1, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 129, __pyx_L1_error)
+    __pyx_t_4 = __Pyx_GetItemInt(__pyx_v_c, 1, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 130, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_4);
-    __pyx_t_2 = __Pyx_GetItemInt(__pyx_t_4, -1L, long, 1, __Pyx_PyInt_From_long, 0, 1, 1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 129, __pyx_L1_error)
+    __pyx_t_2 = __Pyx_GetItemInt(__pyx_t_4, -1L, long, 1, __Pyx_PyInt_From_long, 0, 1, 1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 130, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
     __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-    __pyx_t_13 = __pyx_PyFloat_AsFloat(__pyx_t_2); if (unlikely((__pyx_t_13 == (float)-1) && PyErr_Occurred())) __PYX_ERR(0, 129, __pyx_L1_error)
+    __pyx_t_13 = __pyx_PyFloat_AsFloat(__pyx_t_2); if (unlikely((__pyx_t_13 == (float)-1) && PyErr_Occurred())) __PYX_ERR(0, 130, __pyx_L1_error)
     __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
     __pyx_v_pre_v = __pyx_t_13;
 
-    /* "MACS2/IO/BedGraph.pyx":132
+    /* "MACS2/IO/BedGraph.pyx":133
  * 
  *             # if this region is next to the previous one.
  *             if pre_v == value:             # <<<<<<<<<<<<<<
@@ -3115,22 +3334,22 @@ static PyObject *__pyx_f_5MACS2_2IO_8BedGraph_14bedGraphTrackI_add_loc(struct __
     __pyx_t_11 = ((__pyx_v_pre_v == __pyx_v_value) != 0);
     if (__pyx_t_11) {
 
-      /* "MACS2/IO/BedGraph.pyx":134
+      /* "MACS2/IO/BedGraph.pyx":135
  *             if pre_v == value:
  *                 # if value is the same, simply extend it.
  *                 c[0][-1] = endpos             # <<<<<<<<<<<<<<
  *             else:
  *                 # otherwise, add a new region
  */
-      __pyx_t_2 = __Pyx_PyInt_From_int(__pyx_v_endpos); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 134, __pyx_L1_error)
+      __pyx_t_2 = __Pyx_PyInt_From_int(__pyx_v_endpos); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 135, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_2);
-      __pyx_t_4 = __Pyx_GetItemInt(__pyx_v_c, 0, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 134, __pyx_L1_error)
+      __pyx_t_4 = __Pyx_GetItemInt(__pyx_v_c, 0, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 135, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_4);
-      if (unlikely(__Pyx_SetItemInt(__pyx_t_4, -1L, __pyx_t_2, long, 1, __Pyx_PyInt_From_long, 0, 1, 1) < 0)) __PYX_ERR(0, 134, __pyx_L1_error)
+      if (unlikely(__Pyx_SetItemInt(__pyx_t_4, -1L, __pyx_t_2, long, 1, __Pyx_PyInt_From_long, 0, 1, 1) < 0)) __PYX_ERR(0, 135, __pyx_L1_error)
       __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
       __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
-      /* "MACS2/IO/BedGraph.pyx":132
+      /* "MACS2/IO/BedGraph.pyx":133
  * 
  *             # if this region is next to the previous one.
  *             if pre_v == value:             # <<<<<<<<<<<<<<
@@ -3140,7 +3359,7 @@ static PyObject *__pyx_f_5MACS2_2IO_8BedGraph_14bedGraphTrackI_add_loc(struct __
       goto __pyx_L7;
     }
 
-    /* "MACS2/IO/BedGraph.pyx":137
+    /* "MACS2/IO/BedGraph.pyx":138
  *             else:
  *                 # otherwise, add a new region
  *                 c[0].append(endpos)             # <<<<<<<<<<<<<<
@@ -3148,26 +3367,26 @@ static PyObject *__pyx_f_5MACS2_2IO_8BedGraph_14bedGraphTrackI_add_loc(struct __
  * 
  */
     /*else*/ {
-      __pyx_t_2 = __Pyx_GetItemInt(__pyx_v_c, 0, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 137, __pyx_L1_error)
+      __pyx_t_2 = __Pyx_GetItemInt(__pyx_v_c, 0, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 138, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_2);
-      __pyx_t_4 = __Pyx_PyInt_From_int(__pyx_v_endpos); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 137, __pyx_L1_error)
+      __pyx_t_4 = __Pyx_PyInt_From_int(__pyx_v_endpos); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 138, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_4);
-      __pyx_t_12 = __Pyx_PyObject_Append(__pyx_t_2, __pyx_t_4); if (unlikely(__pyx_t_12 == ((int)-1))) __PYX_ERR(0, 137, __pyx_L1_error)
+      __pyx_t_12 = __Pyx_PyObject_Append(__pyx_t_2, __pyx_t_4); if (unlikely(__pyx_t_12 == ((int)-1))) __PYX_ERR(0, 138, __pyx_L1_error)
       __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
       __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
 
-      /* "MACS2/IO/BedGraph.pyx":138
+      /* "MACS2/IO/BedGraph.pyx":139
  *                 # otherwise, add a new region
  *                 c[0].append(endpos)
  *                 c[1].append(value)             # <<<<<<<<<<<<<<
  * 
  *         if value > self.maxvalue:
  */
-      __pyx_t_4 = __Pyx_GetItemInt(__pyx_v_c, 1, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 138, __pyx_L1_error)
+      __pyx_t_4 = __Pyx_GetItemInt(__pyx_v_c, 1, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 139, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_4);
-      __pyx_t_2 = PyFloat_FromDouble(__pyx_v_value); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 138, __pyx_L1_error)
+      __pyx_t_2 = PyFloat_FromDouble(__pyx_v_value); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 139, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_2);
-      __pyx_t_12 = __Pyx_PyObject_Append(__pyx_t_4, __pyx_t_2); if (unlikely(__pyx_t_12 == ((int)-1))) __PYX_ERR(0, 138, __pyx_L1_error)
+      __pyx_t_12 = __Pyx_PyObject_Append(__pyx_t_4, __pyx_t_2); if (unlikely(__pyx_t_12 == ((int)-1))) __PYX_ERR(0, 139, __pyx_L1_error)
       __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
       __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
     }
@@ -3175,7 +3394,7 @@ static PyObject *__pyx_f_5MACS2_2IO_8BedGraph_14bedGraphTrackI_add_loc(struct __
   }
   __pyx_L5:;
 
-  /* "MACS2/IO/BedGraph.pyx":140
+  /* "MACS2/IO/BedGraph.pyx":141
  *                 c[1].append(value)
  * 
  *         if value > self.maxvalue:             # <<<<<<<<<<<<<<
@@ -3185,7 +3404,7 @@ static PyObject *__pyx_f_5MACS2_2IO_8BedGraph_14bedGraphTrackI_add_loc(struct __
   __pyx_t_11 = ((__pyx_v_value > __pyx_v_self->maxvalue) != 0);
   if (__pyx_t_11) {
 
-    /* "MACS2/IO/BedGraph.pyx":141
+    /* "MACS2/IO/BedGraph.pyx":142
  * 
  *         if value > self.maxvalue:
  *             self.maxvalue = value             # <<<<<<<<<<<<<<
@@ -3194,7 +3413,7 @@ static PyObject *__pyx_f_5MACS2_2IO_8BedGraph_14bedGraphTrackI_add_loc(struct __
  */
     __pyx_v_self->maxvalue = __pyx_v_value;
 
-    /* "MACS2/IO/BedGraph.pyx":140
+    /* "MACS2/IO/BedGraph.pyx":141
  *                 c[1].append(value)
  * 
  *         if value > self.maxvalue:             # <<<<<<<<<<<<<<
@@ -3203,7 +3422,7 @@ static PyObject *__pyx_f_5MACS2_2IO_8BedGraph_14bedGraphTrackI_add_loc(struct __
  */
   }
 
-  /* "MACS2/IO/BedGraph.pyx":142
+  /* "MACS2/IO/BedGraph.pyx":143
  *         if value > self.maxvalue:
  *             self.maxvalue = value
  *         if value < self.minvalue:             # <<<<<<<<<<<<<<
@@ -3213,7 +3432,7 @@ static PyObject *__pyx_f_5MACS2_2IO_8BedGraph_14bedGraphTrackI_add_loc(struct __
   __pyx_t_11 = ((__pyx_v_value < __pyx_v_self->minvalue) != 0);
   if (__pyx_t_11) {
 
-    /* "MACS2/IO/BedGraph.pyx":143
+    /* "MACS2/IO/BedGraph.pyx":144
  *             self.maxvalue = value
  *         if value < self.minvalue:
  *             self.minvalue = value             # <<<<<<<<<<<<<<
@@ -3222,7 +3441,7 @@ static PyObject *__pyx_f_5MACS2_2IO_8BedGraph_14bedGraphTrackI_add_loc(struct __
  */
     __pyx_v_self->minvalue = __pyx_v_value;
 
-    /* "MACS2/IO/BedGraph.pyx":142
+    /* "MACS2/IO/BedGraph.pyx":143
  *         if value > self.maxvalue:
  *             self.maxvalue = value
  *         if value < self.minvalue:             # <<<<<<<<<<<<<<
@@ -3231,7 +3450,7 @@ static PyObject *__pyx_f_5MACS2_2IO_8BedGraph_14bedGraphTrackI_add_loc(struct __
  */
   }
 
-  /* "MACS2/IO/BedGraph.pyx":100
+  /* "MACS2/IO/BedGraph.pyx":101
  *         self.__data[chrom] = d
  * 
  *     cpdef add_loc ( self, bytes chromosome, int startpos, int endpos, float value ):             # <<<<<<<<<<<<<<
@@ -3256,6 +3475,7 @@ static PyObject *__pyx_f_5MACS2_2IO_8BedGraph_14bedGraphTrackI_add_loc(struct __
   __pyx_L0:;
   __Pyx_XDECREF(__pyx_v_c);
   __Pyx_XGIVEREF(__pyx_r);
+  __Pyx_TraceReturn(__pyx_r, 0);
   __Pyx_RefNannyFinishContext();
   return __pyx_r;
 }
@@ -3298,23 +3518,23 @@ static PyObject *__pyx_pw_5MACS2_2IO_8BedGraph_14bedGraphTrackI_5add_loc(PyObjec
         case  1:
         if (likely((values[1] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_startpos)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("add_loc", 1, 4, 4, 1); __PYX_ERR(0, 100, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("add_loc", 1, 4, 4, 1); __PYX_ERR(0, 101, __pyx_L3_error)
         }
         CYTHON_FALLTHROUGH;
         case  2:
         if (likely((values[2] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_endpos)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("add_loc", 1, 4, 4, 2); __PYX_ERR(0, 100, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("add_loc", 1, 4, 4, 2); __PYX_ERR(0, 101, __pyx_L3_error)
         }
         CYTHON_FALLTHROUGH;
         case  3:
         if (likely((values[3] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_value)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("add_loc", 1, 4, 4, 3); __PYX_ERR(0, 100, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("add_loc", 1, 4, 4, 3); __PYX_ERR(0, 101, __pyx_L3_error)
         }
       }
       if (unlikely(kw_args > 0)) {
-        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "add_loc") < 0)) __PYX_ERR(0, 100, __pyx_L3_error)
+        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "add_loc") < 0)) __PYX_ERR(0, 101, __pyx_L3_error)
       }
     } else if (PyTuple_GET_SIZE(__pyx_args) != 4) {
       goto __pyx_L5_argtuple_error;
@@ -3325,19 +3545,19 @@ static PyObject *__pyx_pw_5MACS2_2IO_8BedGraph_14bedGraphTrackI_5add_loc(PyObjec
       values[3] = PyTuple_GET_ITEM(__pyx_args, 3);
     }
     __pyx_v_chromosome = ((PyObject*)values[0]);
-    __pyx_v_startpos = __Pyx_PyInt_As_int(values[1]); if (unlikely((__pyx_v_startpos == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 100, __pyx_L3_error)
-    __pyx_v_endpos = __Pyx_PyInt_As_int(values[2]); if (unlikely((__pyx_v_endpos == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 100, __pyx_L3_error)
-    __pyx_v_value = __pyx_PyFloat_AsFloat(values[3]); if (unlikely((__pyx_v_value == (float)-1) && PyErr_Occurred())) __PYX_ERR(0, 100, __pyx_L3_error)
+    __pyx_v_startpos = __Pyx_PyInt_As_int(values[1]); if (unlikely((__pyx_v_startpos == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 101, __pyx_L3_error)
+    __pyx_v_endpos = __Pyx_PyInt_As_int(values[2]); if (unlikely((__pyx_v_endpos == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 101, __pyx_L3_error)
+    __pyx_v_value = __pyx_PyFloat_AsFloat(values[3]); if (unlikely((__pyx_v_value == (float)-1) && PyErr_Occurred())) __PYX_ERR(0, 101, __pyx_L3_error)
   }
   goto __pyx_L4_argument_unpacking_done;
   __pyx_L5_argtuple_error:;
-  __Pyx_RaiseArgtupleInvalid("add_loc", 1, 4, 4, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 100, __pyx_L3_error)
+  __Pyx_RaiseArgtupleInvalid("add_loc", 1, 4, 4, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 101, __pyx_L3_error)
   __pyx_L3_error:;
   __Pyx_AddTraceback("MACS2.IO.BedGraph.bedGraphTrackI.add_loc", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __Pyx_RefNannyFinishContext();
   return NULL;
   __pyx_L4_argument_unpacking_done:;
-  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_chromosome), (&PyBytes_Type), 1, "chromosome", 1))) __PYX_ERR(0, 100, __pyx_L1_error)
+  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_chromosome), (&PyBytes_Type), 1, "chromosome", 1))) __PYX_ERR(0, 101, __pyx_L1_error)
   __pyx_r = __pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_4add_loc(((struct __pyx_obj_5MACS2_2IO_8BedGraph_bedGraphTrackI *)__pyx_v_self), __pyx_v_chromosome, __pyx_v_startpos, __pyx_v_endpos, __pyx_v_value);
 
   /* function exit code */
@@ -3351,11 +3571,13 @@ static PyObject *__pyx_pw_5MACS2_2IO_8BedGraph_14bedGraphTrackI_5add_loc(PyObjec
 
 static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_4add_loc(struct __pyx_obj_5MACS2_2IO_8BedGraph_bedGraphTrackI *__pyx_v_self, PyObject *__pyx_v_chromosome, int __pyx_v_startpos, int __pyx_v_endpos, float __pyx_v_value) {
   PyObject *__pyx_r = NULL;
+  __Pyx_TraceDeclarations
   __Pyx_RefNannyDeclarations
   PyObject *__pyx_t_1 = NULL;
   __Pyx_RefNannySetupContext("add_loc", 0);
+  __Pyx_TraceCall("add_loc (wrapper)", __pyx_f[0], 101, 0, __PYX_ERR(0, 101, __pyx_L1_error));
   __Pyx_XDECREF(__pyx_r);
-  __pyx_t_1 = __pyx_f_5MACS2_2IO_8BedGraph_14bedGraphTrackI_add_loc(__pyx_v_self, __pyx_v_chromosome, __pyx_v_startpos, __pyx_v_endpos, __pyx_v_value, 1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 100, __pyx_L1_error)
+  __pyx_t_1 = __pyx_f_5MACS2_2IO_8BedGraph_14bedGraphTrackI_add_loc(__pyx_v_self, __pyx_v_chromosome, __pyx_v_startpos, __pyx_v_endpos, __pyx_v_value, 1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 101, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __pyx_r = __pyx_t_1;
   __pyx_t_1 = 0;
@@ -3368,11 +3590,12 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_4add_loc(struct 
   __pyx_r = NULL;
   __pyx_L0:;
   __Pyx_XGIVEREF(__pyx_r);
+  __Pyx_TraceReturn(__pyx_r, 0);
   __Pyx_RefNannyFinishContext();
   return __pyx_r;
 }
 
-/* "MACS2/IO/BedGraph.pyx":146
+/* "MACS2/IO/BedGraph.pyx":147
  * 
  * 
  *     def destroy ( self ):             # <<<<<<<<<<<<<<
@@ -3398,6 +3621,7 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_6destroy(struct 
   PyObject *__pyx_v_chrs = 0;
   PyObject *__pyx_v_chromosome = 0;
   PyObject *__pyx_r = NULL;
+  __Pyx_TraceDeclarations
   __Pyx_RefNannyDeclarations
   PyObject *__pyx_t_1 = NULL;
   Py_ssize_t __pyx_t_2;
@@ -3408,20 +3632,21 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_6destroy(struct 
   int __pyx_t_7;
   int __pyx_t_8;
   __Pyx_RefNannySetupContext("destroy", 0);
+  __Pyx_TraceCall("destroy", __pyx_f[0], 147, 0, __PYX_ERR(0, 147, __pyx_L1_error));
 
-  /* "MACS2/IO/BedGraph.pyx":153
+  /* "MACS2/IO/BedGraph.pyx":154
  *             bytes chromosome
  * 
  *         chrs = self.get_chr_names()             # <<<<<<<<<<<<<<
  *         for chromosome in chrs:
  *             if chromosome in self.__data:
  */
-  __pyx_t_1 = ((struct __pyx_vtabstruct_5MACS2_2IO_8BedGraph_bedGraphTrackI *)__pyx_v_self->__pyx_vtab)->get_chr_names(__pyx_v_self, 0); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 153, __pyx_L1_error)
+  __pyx_t_1 = ((struct __pyx_vtabstruct_5MACS2_2IO_8BedGraph_bedGraphTrackI *)__pyx_v_self->__pyx_vtab)->get_chr_names(__pyx_v_self, 0); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 154, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __pyx_v_chrs = ((PyObject*)__pyx_t_1);
   __pyx_t_1 = 0;
 
-  /* "MACS2/IO/BedGraph.pyx":154
+  /* "MACS2/IO/BedGraph.pyx":155
  * 
  *         chrs = self.get_chr_names()
  *         for chromosome in chrs:             # <<<<<<<<<<<<<<
@@ -3429,7 +3654,7 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_6destroy(struct 
  *                 self.__data[chromosome] = [None, None]
  */
   __pyx_t_2 = 0;
-  __pyx_t_5 = __Pyx_set_iterator(__pyx_v_chrs, 1, (&__pyx_t_3), (&__pyx_t_4)); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 154, __pyx_L1_error)
+  __pyx_t_5 = __Pyx_set_iterator(__pyx_v_chrs, 1, (&__pyx_t_3), (&__pyx_t_4)); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 155, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_5);
   __Pyx_XDECREF(__pyx_t_1);
   __pyx_t_1 = __pyx_t_5;
@@ -3437,13 +3662,13 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_6destroy(struct 
   while (1) {
     __pyx_t_6 = __Pyx_set_iter_next(__pyx_t_1, __pyx_t_3, &__pyx_t_2, &__pyx_t_5, __pyx_t_4);
     if (unlikely(__pyx_t_6 == 0)) break;
-    if (unlikely(__pyx_t_6 == -1)) __PYX_ERR(0, 154, __pyx_L1_error)
+    if (unlikely(__pyx_t_6 == -1)) __PYX_ERR(0, 155, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_5);
-    if (!(likely(PyBytes_CheckExact(__pyx_t_5))||((__pyx_t_5) == Py_None)||(PyErr_Format(PyExc_TypeError, "Expected %.16s, got %.200s", "bytes", Py_TYPE(__pyx_t_5)->tp_name), 0))) __PYX_ERR(0, 154, __pyx_L1_error)
+    if (!(likely(PyBytes_CheckExact(__pyx_t_5))||((__pyx_t_5) == Py_None)||(PyErr_Format(PyExc_TypeError, "Expected %.16s, got %.200s", "bytes", Py_TYPE(__pyx_t_5)->tp_name), 0))) __PYX_ERR(0, 155, __pyx_L1_error)
     __Pyx_XDECREF_SET(__pyx_v_chromosome, ((PyObject*)__pyx_t_5));
     __pyx_t_5 = 0;
 
-    /* "MACS2/IO/BedGraph.pyx":155
+    /* "MACS2/IO/BedGraph.pyx":156
  *         chrs = self.get_chr_names()
  *         for chromosome in chrs:
  *             if chromosome in self.__data:             # <<<<<<<<<<<<<<
@@ -3452,20 +3677,20 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_6destroy(struct 
  */
     if (unlikely(__pyx_v_self->__pyx___data == Py_None)) {
       PyErr_SetString(PyExc_TypeError, "'NoneType' object is not iterable");
-      __PYX_ERR(0, 155, __pyx_L1_error)
+      __PYX_ERR(0, 156, __pyx_L1_error)
     }
-    __pyx_t_7 = (__Pyx_PyDict_ContainsTF(__pyx_v_chromosome, __pyx_v_self->__pyx___data, Py_EQ)); if (unlikely(__pyx_t_7 < 0)) __PYX_ERR(0, 155, __pyx_L1_error)
+    __pyx_t_7 = (__Pyx_PyDict_ContainsTF(__pyx_v_chromosome, __pyx_v_self->__pyx___data, Py_EQ)); if (unlikely(__pyx_t_7 < 0)) __PYX_ERR(0, 156, __pyx_L1_error)
     __pyx_t_8 = (__pyx_t_7 != 0);
     if (__pyx_t_8) {
 
-      /* "MACS2/IO/BedGraph.pyx":156
+      /* "MACS2/IO/BedGraph.pyx":157
  *         for chromosome in chrs:
  *             if chromosome in self.__data:
  *                 self.__data[chromosome] = [None, None]             # <<<<<<<<<<<<<<
  *                 self.__data.pop(chromosome)
  *         return True
  */
-      __pyx_t_5 = PyList_New(2); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 156, __pyx_L1_error)
+      __pyx_t_5 = PyList_New(2); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 157, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_5);
       __Pyx_INCREF(Py_None);
       __Pyx_GIVEREF(Py_None);
@@ -3475,12 +3700,12 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_6destroy(struct 
       PyList_SET_ITEM(__pyx_t_5, 1, Py_None);
       if (unlikely(__pyx_v_self->__pyx___data == Py_None)) {
         PyErr_SetString(PyExc_TypeError, "'NoneType' object is not subscriptable");
-        __PYX_ERR(0, 156, __pyx_L1_error)
+        __PYX_ERR(0, 157, __pyx_L1_error)
       }
-      if (unlikely(PyDict_SetItem(__pyx_v_self->__pyx___data, __pyx_v_chromosome, __pyx_t_5) < 0)) __PYX_ERR(0, 156, __pyx_L1_error)
+      if (unlikely(PyDict_SetItem(__pyx_v_self->__pyx___data, __pyx_v_chromosome, __pyx_t_5) < 0)) __PYX_ERR(0, 157, __pyx_L1_error)
       __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
 
-      /* "MACS2/IO/BedGraph.pyx":157
+      /* "MACS2/IO/BedGraph.pyx":158
  *             if chromosome in self.__data:
  *                 self.__data[chromosome] = [None, None]
  *                 self.__data.pop(chromosome)             # <<<<<<<<<<<<<<
@@ -3489,13 +3714,13 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_6destroy(struct 
  */
       if (unlikely(__pyx_v_self->__pyx___data == Py_None)) {
         PyErr_Format(PyExc_AttributeError, "'NoneType' object has no attribute '%.30s'", "pop");
-        __PYX_ERR(0, 157, __pyx_L1_error)
+        __PYX_ERR(0, 158, __pyx_L1_error)
       }
-      __pyx_t_5 = __Pyx_PyDict_Pop(__pyx_v_self->__pyx___data, __pyx_v_chromosome, ((PyObject *)NULL)); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 157, __pyx_L1_error)
+      __pyx_t_5 = __Pyx_PyDict_Pop(__pyx_v_self->__pyx___data, __pyx_v_chromosome, ((PyObject *)NULL)); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 158, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_5);
       __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
 
-      /* "MACS2/IO/BedGraph.pyx":155
+      /* "MACS2/IO/BedGraph.pyx":156
  *         chrs = self.get_chr_names()
  *         for chromosome in chrs:
  *             if chromosome in self.__data:             # <<<<<<<<<<<<<<
@@ -3506,7 +3731,7 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_6destroy(struct 
   }
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-  /* "MACS2/IO/BedGraph.pyx":158
+  /* "MACS2/IO/BedGraph.pyx":159
  *                 self.__data[chromosome] = [None, None]
  *                 self.__data.pop(chromosome)
  *         return True             # <<<<<<<<<<<<<<
@@ -3518,7 +3743,7 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_6destroy(struct 
   __pyx_r = Py_True;
   goto __pyx_L0;
 
-  /* "MACS2/IO/BedGraph.pyx":146
+  /* "MACS2/IO/BedGraph.pyx":147
  * 
  * 
  *     def destroy ( self ):             # <<<<<<<<<<<<<<
@@ -3536,11 +3761,12 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_6destroy(struct 
   __Pyx_XDECREF(__pyx_v_chrs);
   __Pyx_XDECREF(__pyx_v_chromosome);
   __Pyx_XGIVEREF(__pyx_r);
+  __Pyx_TraceReturn(__pyx_r, 0);
   __Pyx_RefNannyFinishContext();
   return __pyx_r;
 }
 
-/* "MACS2/IO/BedGraph.pyx":160
+/* "MACS2/IO/BedGraph.pyx":161
  *         return True
  * 
  *     def safe_add_loc ( self, bytes chromosome, int startpos, int endpos, double value):             # <<<<<<<<<<<<<<
@@ -3586,23 +3812,23 @@ static PyObject *__pyx_pw_5MACS2_2IO_8BedGraph_14bedGraphTrackI_9safe_add_loc(Py
         case  1:
         if (likely((values[1] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_startpos)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("safe_add_loc", 1, 4, 4, 1); __PYX_ERR(0, 160, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("safe_add_loc", 1, 4, 4, 1); __PYX_ERR(0, 161, __pyx_L3_error)
         }
         CYTHON_FALLTHROUGH;
         case  2:
         if (likely((values[2] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_endpos)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("safe_add_loc", 1, 4, 4, 2); __PYX_ERR(0, 160, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("safe_add_loc", 1, 4, 4, 2); __PYX_ERR(0, 161, __pyx_L3_error)
         }
         CYTHON_FALLTHROUGH;
         case  3:
         if (likely((values[3] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_value)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("safe_add_loc", 1, 4, 4, 3); __PYX_ERR(0, 160, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("safe_add_loc", 1, 4, 4, 3); __PYX_ERR(0, 161, __pyx_L3_error)
         }
       }
       if (unlikely(kw_args > 0)) {
-        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "safe_add_loc") < 0)) __PYX_ERR(0, 160, __pyx_L3_error)
+        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "safe_add_loc") < 0)) __PYX_ERR(0, 161, __pyx_L3_error)
       }
     } else if (PyTuple_GET_SIZE(__pyx_args) != 4) {
       goto __pyx_L5_argtuple_error;
@@ -3613,19 +3839,19 @@ static PyObject *__pyx_pw_5MACS2_2IO_8BedGraph_14bedGraphTrackI_9safe_add_loc(Py
       values[3] = PyTuple_GET_ITEM(__pyx_args, 3);
     }
     __pyx_v_chromosome = ((PyObject*)values[0]);
-    __pyx_v_startpos = __Pyx_PyInt_As_int(values[1]); if (unlikely((__pyx_v_startpos == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 160, __pyx_L3_error)
-    __pyx_v_endpos = __Pyx_PyInt_As_int(values[2]); if (unlikely((__pyx_v_endpos == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 160, __pyx_L3_error)
-    __pyx_v_value = __pyx_PyFloat_AsDouble(values[3]); if (unlikely((__pyx_v_value == (double)-1) && PyErr_Occurred())) __PYX_ERR(0, 160, __pyx_L3_error)
+    __pyx_v_startpos = __Pyx_PyInt_As_int(values[1]); if (unlikely((__pyx_v_startpos == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 161, __pyx_L3_error)
+    __pyx_v_endpos = __Pyx_PyInt_As_int(values[2]); if (unlikely((__pyx_v_endpos == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 161, __pyx_L3_error)
+    __pyx_v_value = __pyx_PyFloat_AsDouble(values[3]); if (unlikely((__pyx_v_value == (double)-1) && PyErr_Occurred())) __PYX_ERR(0, 161, __pyx_L3_error)
   }
   goto __pyx_L4_argument_unpacking_done;
   __pyx_L5_argtuple_error:;
-  __Pyx_RaiseArgtupleInvalid("safe_add_loc", 1, 4, 4, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 160, __pyx_L3_error)
+  __Pyx_RaiseArgtupleInvalid("safe_add_loc", 1, 4, 4, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 161, __pyx_L3_error)
   __pyx_L3_error:;
   __Pyx_AddTraceback("MACS2.IO.BedGraph.bedGraphTrackI.safe_add_loc", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __Pyx_RefNannyFinishContext();
   return NULL;
   __pyx_L4_argument_unpacking_done:;
-  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_chromosome), (&PyBytes_Type), 1, "chromosome", 1))) __PYX_ERR(0, 160, __pyx_L1_error)
+  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_chromosome), (&PyBytes_Type), 1, "chromosome", 1))) __PYX_ERR(0, 161, __pyx_L1_error)
   __pyx_r = __pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_8safe_add_loc(((struct __pyx_obj_5MACS2_2IO_8BedGraph_bedGraphTrackI *)__pyx_v_self), __pyx_v_chromosome, __pyx_v_startpos, __pyx_v_endpos, __pyx_v_value);
 
   /* function exit code */
@@ -3642,6 +3868,7 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_8safe_add_loc(st
   PyObject *__pyx_v_pre_pos = NULL;
   PyObject *__pyx_v_pre_v = NULL;
   PyObject *__pyx_r = NULL;
+  __Pyx_TraceDeclarations
   __Pyx_RefNannyDeclarations
   PyObject *__pyx_t_1 = NULL;
   Py_ssize_t __pyx_t_2;
@@ -3657,8 +3884,9 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_8safe_add_loc(st
   PyObject *__pyx_t_12 = NULL;
   int __pyx_t_13;
   __Pyx_RefNannySetupContext("safe_add_loc", 0);
+  __Pyx_TraceCall("safe_add_loc", __pyx_f[0], 161, 0, __PYX_ERR(0, 161, __pyx_L1_error));
 
-  /* "MACS2/IO/BedGraph.pyx":165
+  /* "MACS2/IO/BedGraph.pyx":166
  *         """
  *         # basic assumption, end pos should > start pos
  *         assert endpos > startpos, "endpos %d can't be smaller than start pos %d" % (endpos,startpos)             # <<<<<<<<<<<<<<
@@ -3668,7 +3896,7 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_8safe_add_loc(st
   #ifndef CYTHON_WITHOUT_ASSERTIONS
   if (unlikely(!Py_OptimizeFlag)) {
     if (unlikely(!((__pyx_v_endpos > __pyx_v_startpos) != 0))) {
-      __pyx_t_1 = PyTuple_New(4); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 165, __pyx_L1_error)
+      __pyx_t_1 = PyTuple_New(4); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 166, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_1);
       __pyx_t_2 = 0;
       __pyx_t_3 = 127;
@@ -3676,7 +3904,7 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_8safe_add_loc(st
       __pyx_t_2 += 7;
       __Pyx_GIVEREF(__pyx_kp_u_endpos_2);
       PyTuple_SET_ITEM(__pyx_t_1, 0, __pyx_kp_u_endpos_2);
-      __pyx_t_4 = __Pyx_PyUnicode_From_int(__pyx_v_endpos, 0, ' ', 'd'); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 165, __pyx_L1_error)
+      __pyx_t_4 = __Pyx_PyUnicode_From_int(__pyx_v_endpos, 0, ' ', 'd'); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 166, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_4);
       __pyx_t_2 += __Pyx_PyUnicode_GET_LENGTH(__pyx_t_4);
       __Pyx_GIVEREF(__pyx_t_4);
@@ -3686,23 +3914,23 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_8safe_add_loc(st
       __pyx_t_2 += 33;
       __Pyx_GIVEREF(__pyx_kp_u_can_t_be_smaller_than_start_pos);
       PyTuple_SET_ITEM(__pyx_t_1, 2, __pyx_kp_u_can_t_be_smaller_than_start_pos);
-      __pyx_t_4 = __Pyx_PyUnicode_From_int(__pyx_v_startpos, 0, ' ', 'd'); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 165, __pyx_L1_error)
+      __pyx_t_4 = __Pyx_PyUnicode_From_int(__pyx_v_startpos, 0, ' ', 'd'); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 166, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_4);
       __pyx_t_2 += __Pyx_PyUnicode_GET_LENGTH(__pyx_t_4);
       __Pyx_GIVEREF(__pyx_t_4);
       PyTuple_SET_ITEM(__pyx_t_1, 3, __pyx_t_4);
       __pyx_t_4 = 0;
-      __pyx_t_4 = __Pyx_PyUnicode_Join(__pyx_t_1, 4, __pyx_t_2, __pyx_t_3); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 165, __pyx_L1_error)
+      __pyx_t_4 = __Pyx_PyUnicode_Join(__pyx_t_1, 4, __pyx_t_2, __pyx_t_3); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 166, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_4);
       __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
       PyErr_SetObject(PyExc_AssertionError, __pyx_t_4);
       __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-      __PYX_ERR(0, 165, __pyx_L1_error)
+      __PYX_ERR(0, 166, __pyx_L1_error)
     }
   }
   #endif
 
-  /* "MACS2/IO/BedGraph.pyx":167
+  /* "MACS2/IO/BedGraph.pyx":168
  *         assert endpos > startpos, "endpos %d can't be smaller than start pos %d" % (endpos,startpos)
  * 
  *         if endpos <= 0:             # <<<<<<<<<<<<<<
@@ -3712,7 +3940,7 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_8safe_add_loc(st
   __pyx_t_5 = ((__pyx_v_endpos <= 0) != 0);
   if (__pyx_t_5) {
 
-    /* "MACS2/IO/BedGraph.pyx":168
+    /* "MACS2/IO/BedGraph.pyx":169
  * 
  *         if endpos <= 0:
  *             return             # <<<<<<<<<<<<<<
@@ -3723,7 +3951,7 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_8safe_add_loc(st
     __pyx_r = Py_None; __Pyx_INCREF(Py_None);
     goto __pyx_L0;
 
-    /* "MACS2/IO/BedGraph.pyx":167
+    /* "MACS2/IO/BedGraph.pyx":168
  *         assert endpos > startpos, "endpos %d can't be smaller than start pos %d" % (endpos,startpos)
  * 
  *         if endpos <= 0:             # <<<<<<<<<<<<<<
@@ -3732,7 +3960,7 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_8safe_add_loc(st
  */
   }
 
-  /* "MACS2/IO/BedGraph.pyx":169
+  /* "MACS2/IO/BedGraph.pyx":170
  *         if endpos <= 0:
  *             return
  *         if startpos < 0:             # <<<<<<<<<<<<<<
@@ -3742,7 +3970,7 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_8safe_add_loc(st
   __pyx_t_5 = ((__pyx_v_startpos < 0) != 0);
   if (__pyx_t_5) {
 
-    /* "MACS2/IO/BedGraph.pyx":170
+    /* "MACS2/IO/BedGraph.pyx":171
  *             return
  *         if startpos < 0:
  *             startpos = 0             # <<<<<<<<<<<<<<
@@ -3751,7 +3979,7 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_8safe_add_loc(st
  */
     __pyx_v_startpos = 0;
 
-    /* "MACS2/IO/BedGraph.pyx":169
+    /* "MACS2/IO/BedGraph.pyx":170
  *         if endpos <= 0:
  *             return
  *         if startpos < 0:             # <<<<<<<<<<<<<<
@@ -3760,7 +3988,7 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_8safe_add_loc(st
  */
   }
 
-  /* "MACS2/IO/BedGraph.pyx":172
+  /* "MACS2/IO/BedGraph.pyx":173
  *             startpos = 0
  * 
  *         if chromosome not in self.__data:             # <<<<<<<<<<<<<<
@@ -3769,24 +3997,24 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_8safe_add_loc(st
  */
   if (unlikely(__pyx_v_self->__pyx___data == Py_None)) {
     PyErr_SetString(PyExc_TypeError, "'NoneType' object is not iterable");
-    __PYX_ERR(0, 172, __pyx_L1_error)
+    __PYX_ERR(0, 173, __pyx_L1_error)
   }
-  __pyx_t_5 = (__Pyx_PyDict_ContainsTF(__pyx_v_chromosome, __pyx_v_self->__pyx___data, Py_NE)); if (unlikely(__pyx_t_5 < 0)) __PYX_ERR(0, 172, __pyx_L1_error)
+  __pyx_t_5 = (__Pyx_PyDict_ContainsTF(__pyx_v_chromosome, __pyx_v_self->__pyx___data, Py_NE)); if (unlikely(__pyx_t_5 < 0)) __PYX_ERR(0, 173, __pyx_L1_error)
   __pyx_t_6 = (__pyx_t_5 != 0);
   if (__pyx_t_6) {
 
-    /* "MACS2/IO/BedGraph.pyx":173
+    /* "MACS2/IO/BedGraph.pyx":174
  * 
  *         if chromosome not in self.__data:
  *             self.__data[chromosome] = [array(BYTE4,[]),array(FBYTE4,[])] # for (endpos,value)             # <<<<<<<<<<<<<<
  *             c = self.__data[chromosome]
  *             if startpos:
  */
-    __Pyx_GetModuleGlobalName(__pyx_t_1, __pyx_n_s_array); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 173, __pyx_L1_error)
+    __Pyx_GetModuleGlobalName(__pyx_t_1, __pyx_n_s_array); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 174, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
-    __Pyx_GetModuleGlobalName(__pyx_t_7, __pyx_n_s_BYTE4); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 173, __pyx_L1_error)
+    __Pyx_GetModuleGlobalName(__pyx_t_7, __pyx_n_s_BYTE4); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 174, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_7);
-    __pyx_t_8 = PyList_New(0); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 173, __pyx_L1_error)
+    __pyx_t_8 = PyList_New(0); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 174, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_8);
     __pyx_t_9 = NULL;
     __pyx_t_10 = 0;
@@ -3803,7 +4031,7 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_8safe_add_loc(st
     #if CYTHON_FAST_PYCALL
     if (PyFunction_Check(__pyx_t_1)) {
       PyObject *__pyx_temp[3] = {__pyx_t_9, __pyx_t_7, __pyx_t_8};
-      __pyx_t_4 = __Pyx_PyFunction_FastCall(__pyx_t_1, __pyx_temp+1-__pyx_t_10, 2+__pyx_t_10); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 173, __pyx_L1_error)
+      __pyx_t_4 = __Pyx_PyFunction_FastCall(__pyx_t_1, __pyx_temp+1-__pyx_t_10, 2+__pyx_t_10); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 174, __pyx_L1_error)
       __Pyx_XDECREF(__pyx_t_9); __pyx_t_9 = 0;
       __Pyx_GOTREF(__pyx_t_4);
       __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
@@ -3813,7 +4041,7 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_8safe_add_loc(st
     #if CYTHON_FAST_PYCCALL
     if (__Pyx_PyFastCFunction_Check(__pyx_t_1)) {
       PyObject *__pyx_temp[3] = {__pyx_t_9, __pyx_t_7, __pyx_t_8};
-      __pyx_t_4 = __Pyx_PyCFunction_FastCall(__pyx_t_1, __pyx_temp+1-__pyx_t_10, 2+__pyx_t_10); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 173, __pyx_L1_error)
+      __pyx_t_4 = __Pyx_PyCFunction_FastCall(__pyx_t_1, __pyx_temp+1-__pyx_t_10, 2+__pyx_t_10); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 174, __pyx_L1_error)
       __Pyx_XDECREF(__pyx_t_9); __pyx_t_9 = 0;
       __Pyx_GOTREF(__pyx_t_4);
       __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
@@ -3821,7 +4049,7 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_8safe_add_loc(st
     } else
     #endif
     {
-      __pyx_t_11 = PyTuple_New(2+__pyx_t_10); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 173, __pyx_L1_error)
+      __pyx_t_11 = PyTuple_New(2+__pyx_t_10); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 174, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_11);
       if (__pyx_t_9) {
         __Pyx_GIVEREF(__pyx_t_9); PyTuple_SET_ITEM(__pyx_t_11, 0, __pyx_t_9); __pyx_t_9 = NULL;
@@ -3832,16 +4060,16 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_8safe_add_loc(st
       PyTuple_SET_ITEM(__pyx_t_11, 1+__pyx_t_10, __pyx_t_8);
       __pyx_t_7 = 0;
       __pyx_t_8 = 0;
-      __pyx_t_4 = __Pyx_PyObject_Call(__pyx_t_1, __pyx_t_11, NULL); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 173, __pyx_L1_error)
+      __pyx_t_4 = __Pyx_PyObject_Call(__pyx_t_1, __pyx_t_11, NULL); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 174, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_4);
       __Pyx_DECREF(__pyx_t_11); __pyx_t_11 = 0;
     }
     __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-    __Pyx_GetModuleGlobalName(__pyx_t_11, __pyx_n_s_array); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 173, __pyx_L1_error)
+    __Pyx_GetModuleGlobalName(__pyx_t_11, __pyx_n_s_array); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 174, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_11);
-    __Pyx_GetModuleGlobalName(__pyx_t_8, __pyx_n_s_FBYTE4); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 173, __pyx_L1_error)
+    __Pyx_GetModuleGlobalName(__pyx_t_8, __pyx_n_s_FBYTE4); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 174, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_8);
-    __pyx_t_7 = PyList_New(0); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 173, __pyx_L1_error)
+    __pyx_t_7 = PyList_New(0); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 174, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_7);
     __pyx_t_9 = NULL;
     __pyx_t_10 = 0;
@@ -3858,7 +4086,7 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_8safe_add_loc(st
     #if CYTHON_FAST_PYCALL
     if (PyFunction_Check(__pyx_t_11)) {
       PyObject *__pyx_temp[3] = {__pyx_t_9, __pyx_t_8, __pyx_t_7};
-      __pyx_t_1 = __Pyx_PyFunction_FastCall(__pyx_t_11, __pyx_temp+1-__pyx_t_10, 2+__pyx_t_10); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 173, __pyx_L1_error)
+      __pyx_t_1 = __Pyx_PyFunction_FastCall(__pyx_t_11, __pyx_temp+1-__pyx_t_10, 2+__pyx_t_10); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 174, __pyx_L1_error)
       __Pyx_XDECREF(__pyx_t_9); __pyx_t_9 = 0;
       __Pyx_GOTREF(__pyx_t_1);
       __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
@@ -3868,7 +4096,7 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_8safe_add_loc(st
     #if CYTHON_FAST_PYCCALL
     if (__Pyx_PyFastCFunction_Check(__pyx_t_11)) {
       PyObject *__pyx_temp[3] = {__pyx_t_9, __pyx_t_8, __pyx_t_7};
-      __pyx_t_1 = __Pyx_PyCFunction_FastCall(__pyx_t_11, __pyx_temp+1-__pyx_t_10, 2+__pyx_t_10); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 173, __pyx_L1_error)
+      __pyx_t_1 = __Pyx_PyCFunction_FastCall(__pyx_t_11, __pyx_temp+1-__pyx_t_10, 2+__pyx_t_10); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 174, __pyx_L1_error)
       __Pyx_XDECREF(__pyx_t_9); __pyx_t_9 = 0;
       __Pyx_GOTREF(__pyx_t_1);
       __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
@@ -3876,7 +4104,7 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_8safe_add_loc(st
     } else
     #endif
     {
-      __pyx_t_12 = PyTuple_New(2+__pyx_t_10); if (unlikely(!__pyx_t_12)) __PYX_ERR(0, 173, __pyx_L1_error)
+      __pyx_t_12 = PyTuple_New(2+__pyx_t_10); if (unlikely(!__pyx_t_12)) __PYX_ERR(0, 174, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_12);
       if (__pyx_t_9) {
         __Pyx_GIVEREF(__pyx_t_9); PyTuple_SET_ITEM(__pyx_t_12, 0, __pyx_t_9); __pyx_t_9 = NULL;
@@ -3887,12 +4115,12 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_8safe_add_loc(st
       PyTuple_SET_ITEM(__pyx_t_12, 1+__pyx_t_10, __pyx_t_7);
       __pyx_t_8 = 0;
       __pyx_t_7 = 0;
-      __pyx_t_1 = __Pyx_PyObject_Call(__pyx_t_11, __pyx_t_12, NULL); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 173, __pyx_L1_error)
+      __pyx_t_1 = __Pyx_PyObject_Call(__pyx_t_11, __pyx_t_12, NULL); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 174, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_1);
       __Pyx_DECREF(__pyx_t_12); __pyx_t_12 = 0;
     }
     __Pyx_DECREF(__pyx_t_11); __pyx_t_11 = 0;
-    __pyx_t_11 = PyList_New(2); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 173, __pyx_L1_error)
+    __pyx_t_11 = PyList_New(2); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 174, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_11);
     __Pyx_GIVEREF(__pyx_t_4);
     PyList_SET_ITEM(__pyx_t_11, 0, __pyx_t_4);
@@ -3902,12 +4130,12 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_8safe_add_loc(st
     __pyx_t_1 = 0;
     if (unlikely(__pyx_v_self->__pyx___data == Py_None)) {
       PyErr_SetString(PyExc_TypeError, "'NoneType' object is not subscriptable");
-      __PYX_ERR(0, 173, __pyx_L1_error)
+      __PYX_ERR(0, 174, __pyx_L1_error)
     }
-    if (unlikely(PyDict_SetItem(__pyx_v_self->__pyx___data, __pyx_v_chromosome, __pyx_t_11) < 0)) __PYX_ERR(0, 173, __pyx_L1_error)
+    if (unlikely(PyDict_SetItem(__pyx_v_self->__pyx___data, __pyx_v_chromosome, __pyx_t_11) < 0)) __PYX_ERR(0, 174, __pyx_L1_error)
     __Pyx_DECREF(__pyx_t_11); __pyx_t_11 = 0;
 
-    /* "MACS2/IO/BedGraph.pyx":174
+    /* "MACS2/IO/BedGraph.pyx":175
  *         if chromosome not in self.__data:
  *             self.__data[chromosome] = [array(BYTE4,[]),array(FBYTE4,[])] # for (endpos,value)
  *             c = self.__data[chromosome]             # <<<<<<<<<<<<<<
@@ -3916,14 +4144,14 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_8safe_add_loc(st
  */
     if (unlikely(__pyx_v_self->__pyx___data == Py_None)) {
       PyErr_SetString(PyExc_TypeError, "'NoneType' object is not subscriptable");
-      __PYX_ERR(0, 174, __pyx_L1_error)
+      __PYX_ERR(0, 175, __pyx_L1_error)
     }
-    __pyx_t_11 = __Pyx_PyDict_GetItem(__pyx_v_self->__pyx___data, __pyx_v_chromosome); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 174, __pyx_L1_error)
+    __pyx_t_11 = __Pyx_PyDict_GetItem(__pyx_v_self->__pyx___data, __pyx_v_chromosome); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 175, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_11);
     __pyx_v_c = __pyx_t_11;
     __pyx_t_11 = 0;
 
-    /* "MACS2/IO/BedGraph.pyx":175
+    /* "MACS2/IO/BedGraph.pyx":176
  *             self.__data[chromosome] = [array(BYTE4,[]),array(FBYTE4,[])] # for (endpos,value)
  *             c = self.__data[chromosome]
  *             if startpos:             # <<<<<<<<<<<<<<
@@ -3933,37 +4161,37 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_8safe_add_loc(st
     __pyx_t_6 = (__pyx_v_startpos != 0);
     if (__pyx_t_6) {
 
-      /* "MACS2/IO/BedGraph.pyx":178
+      /* "MACS2/IO/BedGraph.pyx":179
  *                 # start pos is not 0, then add two blocks, the first
  *                 # with "baseline_value"; the second with "value"
  *                 c[0].append(startpos)             # <<<<<<<<<<<<<<
  *                 c[1].append(self.baseline_value)
  *             c[0].append(endpos)
  */
-      __pyx_t_11 = __Pyx_GetItemInt(__pyx_v_c, 0, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 178, __pyx_L1_error)
+      __pyx_t_11 = __Pyx_GetItemInt(__pyx_v_c, 0, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 179, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_11);
-      __pyx_t_1 = __Pyx_PyInt_From_int(__pyx_v_startpos); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 178, __pyx_L1_error)
+      __pyx_t_1 = __Pyx_PyInt_From_int(__pyx_v_startpos); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 179, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_1);
-      __pyx_t_13 = __Pyx_PyObject_Append(__pyx_t_11, __pyx_t_1); if (unlikely(__pyx_t_13 == ((int)-1))) __PYX_ERR(0, 178, __pyx_L1_error)
+      __pyx_t_13 = __Pyx_PyObject_Append(__pyx_t_11, __pyx_t_1); if (unlikely(__pyx_t_13 == ((int)-1))) __PYX_ERR(0, 179, __pyx_L1_error)
       __Pyx_DECREF(__pyx_t_11); __pyx_t_11 = 0;
       __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-      /* "MACS2/IO/BedGraph.pyx":179
+      /* "MACS2/IO/BedGraph.pyx":180
  *                 # with "baseline_value"; the second with "value"
  *                 c[0].append(startpos)
  *                 c[1].append(self.baseline_value)             # <<<<<<<<<<<<<<
  *             c[0].append(endpos)
  *             c[1].append(value)
  */
-      __pyx_t_1 = __Pyx_GetItemInt(__pyx_v_c, 1, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 179, __pyx_L1_error)
+      __pyx_t_1 = __Pyx_GetItemInt(__pyx_v_c, 1, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 180, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_1);
-      __pyx_t_11 = PyFloat_FromDouble(__pyx_v_self->baseline_value); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 179, __pyx_L1_error)
+      __pyx_t_11 = PyFloat_FromDouble(__pyx_v_self->baseline_value); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 180, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_11);
-      __pyx_t_13 = __Pyx_PyObject_Append(__pyx_t_1, __pyx_t_11); if (unlikely(__pyx_t_13 == ((int)-1))) __PYX_ERR(0, 179, __pyx_L1_error)
+      __pyx_t_13 = __Pyx_PyObject_Append(__pyx_t_1, __pyx_t_11); if (unlikely(__pyx_t_13 == ((int)-1))) __PYX_ERR(0, 180, __pyx_L1_error)
       __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
       __Pyx_DECREF(__pyx_t_11); __pyx_t_11 = 0;
 
-      /* "MACS2/IO/BedGraph.pyx":175
+      /* "MACS2/IO/BedGraph.pyx":176
  *             self.__data[chromosome] = [array(BYTE4,[]),array(FBYTE4,[])] # for (endpos,value)
  *             c = self.__data[chromosome]
  *             if startpos:             # <<<<<<<<<<<<<<
@@ -3972,37 +4200,37 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_8safe_add_loc(st
  */
     }
 
-    /* "MACS2/IO/BedGraph.pyx":180
+    /* "MACS2/IO/BedGraph.pyx":181
  *                 c[0].append(startpos)
  *                 c[1].append(self.baseline_value)
  *             c[0].append(endpos)             # <<<<<<<<<<<<<<
  *             c[1].append(value)
  *         else:
  */
-    __pyx_t_11 = __Pyx_GetItemInt(__pyx_v_c, 0, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 180, __pyx_L1_error)
+    __pyx_t_11 = __Pyx_GetItemInt(__pyx_v_c, 0, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 181, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_11);
-    __pyx_t_1 = __Pyx_PyInt_From_int(__pyx_v_endpos); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 180, __pyx_L1_error)
+    __pyx_t_1 = __Pyx_PyInt_From_int(__pyx_v_endpos); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 181, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
-    __pyx_t_13 = __Pyx_PyObject_Append(__pyx_t_11, __pyx_t_1); if (unlikely(__pyx_t_13 == ((int)-1))) __PYX_ERR(0, 180, __pyx_L1_error)
+    __pyx_t_13 = __Pyx_PyObject_Append(__pyx_t_11, __pyx_t_1); if (unlikely(__pyx_t_13 == ((int)-1))) __PYX_ERR(0, 181, __pyx_L1_error)
     __Pyx_DECREF(__pyx_t_11); __pyx_t_11 = 0;
     __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-    /* "MACS2/IO/BedGraph.pyx":181
+    /* "MACS2/IO/BedGraph.pyx":182
  *                 c[1].append(self.baseline_value)
  *             c[0].append(endpos)
  *             c[1].append(value)             # <<<<<<<<<<<<<<
  *         else:
  *             c = self.__data[chromosome]
  */
-    __pyx_t_1 = __Pyx_GetItemInt(__pyx_v_c, 1, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 181, __pyx_L1_error)
+    __pyx_t_1 = __Pyx_GetItemInt(__pyx_v_c, 1, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 182, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
-    __pyx_t_11 = PyFloat_FromDouble(__pyx_v_value); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 181, __pyx_L1_error)
+    __pyx_t_11 = PyFloat_FromDouble(__pyx_v_value); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 182, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_11);
-    __pyx_t_13 = __Pyx_PyObject_Append(__pyx_t_1, __pyx_t_11); if (unlikely(__pyx_t_13 == ((int)-1))) __PYX_ERR(0, 181, __pyx_L1_error)
+    __pyx_t_13 = __Pyx_PyObject_Append(__pyx_t_1, __pyx_t_11); if (unlikely(__pyx_t_13 == ((int)-1))) __PYX_ERR(0, 182, __pyx_L1_error)
     __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
     __Pyx_DECREF(__pyx_t_11); __pyx_t_11 = 0;
 
-    /* "MACS2/IO/BedGraph.pyx":172
+    /* "MACS2/IO/BedGraph.pyx":173
  *             startpos = 0
  * 
  *         if chromosome not in self.__data:             # <<<<<<<<<<<<<<
@@ -4012,7 +4240,7 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_8safe_add_loc(st
     goto __pyx_L5;
   }
 
-  /* "MACS2/IO/BedGraph.pyx":183
+  /* "MACS2/IO/BedGraph.pyx":184
  *             c[1].append(value)
  *         else:
  *             c = self.__data[chromosome]             # <<<<<<<<<<<<<<
@@ -4022,44 +4250,44 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_8safe_add_loc(st
   /*else*/ {
     if (unlikely(__pyx_v_self->__pyx___data == Py_None)) {
       PyErr_SetString(PyExc_TypeError, "'NoneType' object is not subscriptable");
-      __PYX_ERR(0, 183, __pyx_L1_error)
+      __PYX_ERR(0, 184, __pyx_L1_error)
     }
-    __pyx_t_11 = __Pyx_PyDict_GetItem(__pyx_v_self->__pyx___data, __pyx_v_chromosome); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 183, __pyx_L1_error)
+    __pyx_t_11 = __Pyx_PyDict_GetItem(__pyx_v_self->__pyx___data, __pyx_v_chromosome); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 184, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_11);
     __pyx_v_c = __pyx_t_11;
     __pyx_t_11 = 0;
 
-    /* "MACS2/IO/BedGraph.pyx":185
+    /* "MACS2/IO/BedGraph.pyx":186
  *             c = self.__data[chromosome]
  *             # get the preceding region
  *             pre_pos = c[0][-1]             # <<<<<<<<<<<<<<
  *             pre_v   = c[1][-1]
  *             # to check 1. continuity; 2. non-overlapping
  */
-    __pyx_t_11 = __Pyx_GetItemInt(__pyx_v_c, 0, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 185, __pyx_L1_error)
+    __pyx_t_11 = __Pyx_GetItemInt(__pyx_v_c, 0, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 186, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_11);
-    __pyx_t_1 = __Pyx_GetItemInt(__pyx_t_11, -1L, long, 1, __Pyx_PyInt_From_long, 0, 1, 1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 185, __pyx_L1_error)
+    __pyx_t_1 = __Pyx_GetItemInt(__pyx_t_11, -1L, long, 1, __Pyx_PyInt_From_long, 0, 1, 1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 186, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
     __Pyx_DECREF(__pyx_t_11); __pyx_t_11 = 0;
     __pyx_v_pre_pos = __pyx_t_1;
     __pyx_t_1 = 0;
 
-    /* "MACS2/IO/BedGraph.pyx":186
+    /* "MACS2/IO/BedGraph.pyx":187
  *             # get the preceding region
  *             pre_pos = c[0][-1]
  *             pre_v   = c[1][-1]             # <<<<<<<<<<<<<<
  *             # to check 1. continuity; 2. non-overlapping
  *             assert pre_pos < endpos , "bedGraph regions are not continuous."
  */
-    __pyx_t_1 = __Pyx_GetItemInt(__pyx_v_c, 1, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 186, __pyx_L1_error)
+    __pyx_t_1 = __Pyx_GetItemInt(__pyx_v_c, 1, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 187, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
-    __pyx_t_11 = __Pyx_GetItemInt(__pyx_t_1, -1L, long, 1, __Pyx_PyInt_From_long, 0, 1, 1); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 186, __pyx_L1_error)
+    __pyx_t_11 = __Pyx_GetItemInt(__pyx_t_1, -1L, long, 1, __Pyx_PyInt_From_long, 0, 1, 1); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 187, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_11);
     __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
     __pyx_v_pre_v = __pyx_t_11;
     __pyx_t_11 = 0;
 
-    /* "MACS2/IO/BedGraph.pyx":188
+    /* "MACS2/IO/BedGraph.pyx":189
  *             pre_v   = c[1][-1]
  *             # to check 1. continuity; 2. non-overlapping
  *             assert pre_pos < endpos , "bedGraph regions are not continuous."             # <<<<<<<<<<<<<<
@@ -4068,20 +4296,20 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_8safe_add_loc(st
  */
     #ifndef CYTHON_WITHOUT_ASSERTIONS
     if (unlikely(!Py_OptimizeFlag)) {
-      __pyx_t_11 = __Pyx_PyInt_From_int(__pyx_v_endpos); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 188, __pyx_L1_error)
+      __pyx_t_11 = __Pyx_PyInt_From_int(__pyx_v_endpos); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 189, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_11);
-      __pyx_t_1 = PyObject_RichCompare(__pyx_v_pre_pos, __pyx_t_11, Py_LT); __Pyx_XGOTREF(__pyx_t_1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 188, __pyx_L1_error)
+      __pyx_t_1 = PyObject_RichCompare(__pyx_v_pre_pos, __pyx_t_11, Py_LT); __Pyx_XGOTREF(__pyx_t_1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 189, __pyx_L1_error)
       __Pyx_DECREF(__pyx_t_11); __pyx_t_11 = 0;
-      __pyx_t_6 = __Pyx_PyObject_IsTrue(__pyx_t_1); if (unlikely(__pyx_t_6 < 0)) __PYX_ERR(0, 188, __pyx_L1_error)
+      __pyx_t_6 = __Pyx_PyObject_IsTrue(__pyx_t_1); if (unlikely(__pyx_t_6 < 0)) __PYX_ERR(0, 189, __pyx_L1_error)
       __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
       if (unlikely(!__pyx_t_6)) {
         PyErr_SetObject(PyExc_AssertionError, __pyx_kp_u_bedGraph_regions_are_not_continu);
-        __PYX_ERR(0, 188, __pyx_L1_error)
+        __PYX_ERR(0, 189, __pyx_L1_error)
       }
     }
     #endif
 
-    /* "MACS2/IO/BedGraph.pyx":189
+    /* "MACS2/IO/BedGraph.pyx":190
  *             # to check 1. continuity; 2. non-overlapping
  *             assert pre_pos < endpos , "bedGraph regions are not continuous."
  *             assert pre_pos <= startpos , "bedGraph regions have overlappings."             # <<<<<<<<<<<<<<
@@ -4090,95 +4318,95 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_8safe_add_loc(st
  */
     #ifndef CYTHON_WITHOUT_ASSERTIONS
     if (unlikely(!Py_OptimizeFlag)) {
-      __pyx_t_1 = __Pyx_PyInt_From_int(__pyx_v_startpos); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 189, __pyx_L1_error)
+      __pyx_t_1 = __Pyx_PyInt_From_int(__pyx_v_startpos); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 190, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_1);
-      __pyx_t_11 = PyObject_RichCompare(__pyx_v_pre_pos, __pyx_t_1, Py_LE); __Pyx_XGOTREF(__pyx_t_11); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 189, __pyx_L1_error)
+      __pyx_t_11 = PyObject_RichCompare(__pyx_v_pre_pos, __pyx_t_1, Py_LE); __Pyx_XGOTREF(__pyx_t_11); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 190, __pyx_L1_error)
       __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-      __pyx_t_6 = __Pyx_PyObject_IsTrue(__pyx_t_11); if (unlikely(__pyx_t_6 < 0)) __PYX_ERR(0, 189, __pyx_L1_error)
+      __pyx_t_6 = __Pyx_PyObject_IsTrue(__pyx_t_11); if (unlikely(__pyx_t_6 < 0)) __PYX_ERR(0, 190, __pyx_L1_error)
       __Pyx_DECREF(__pyx_t_11); __pyx_t_11 = 0;
       if (unlikely(!__pyx_t_6)) {
         PyErr_SetObject(PyExc_AssertionError, __pyx_kp_u_bedGraph_regions_have_overlappin);
-        __PYX_ERR(0, 189, __pyx_L1_error)
+        __PYX_ERR(0, 190, __pyx_L1_error)
       }
     }
     #endif
 
-    /* "MACS2/IO/BedGraph.pyx":191
+    /* "MACS2/IO/BedGraph.pyx":192
  *             assert pre_pos <= startpos , "bedGraph regions have overlappings."
  * 
  *             if startpos != pre_pos:             # <<<<<<<<<<<<<<
  *                 # there is a gap, so fill it with baseline_value
  *                 c[0].append(startpos)
  */
-    __pyx_t_11 = __Pyx_PyInt_From_int(__pyx_v_startpos); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 191, __pyx_L1_error)
+    __pyx_t_11 = __Pyx_PyInt_From_int(__pyx_v_startpos); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 192, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_11);
-    __pyx_t_1 = PyObject_RichCompare(__pyx_t_11, __pyx_v_pre_pos, Py_NE); __Pyx_XGOTREF(__pyx_t_1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 191, __pyx_L1_error)
+    __pyx_t_1 = PyObject_RichCompare(__pyx_t_11, __pyx_v_pre_pos, Py_NE); __Pyx_XGOTREF(__pyx_t_1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 192, __pyx_L1_error)
     __Pyx_DECREF(__pyx_t_11); __pyx_t_11 = 0;
-    __pyx_t_6 = __Pyx_PyObject_IsTrue(__pyx_t_1); if (unlikely(__pyx_t_6 < 0)) __PYX_ERR(0, 191, __pyx_L1_error)
+    __pyx_t_6 = __Pyx_PyObject_IsTrue(__pyx_t_1); if (unlikely(__pyx_t_6 < 0)) __PYX_ERR(0, 192, __pyx_L1_error)
     __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
     if (__pyx_t_6) {
 
-      /* "MACS2/IO/BedGraph.pyx":193
+      /* "MACS2/IO/BedGraph.pyx":194
  *             if startpos != pre_pos:
  *                 # there is a gap, so fill it with baseline_value
  *                 c[0].append(startpos)             # <<<<<<<<<<<<<<
  *                 c[1].append(self.baseline_value)
  *                 # then add this region
  */
-      __pyx_t_1 = __Pyx_GetItemInt(__pyx_v_c, 0, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 193, __pyx_L1_error)
+      __pyx_t_1 = __Pyx_GetItemInt(__pyx_v_c, 0, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 194, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_1);
-      __pyx_t_11 = __Pyx_PyInt_From_int(__pyx_v_startpos); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 193, __pyx_L1_error)
+      __pyx_t_11 = __Pyx_PyInt_From_int(__pyx_v_startpos); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 194, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_11);
-      __pyx_t_13 = __Pyx_PyObject_Append(__pyx_t_1, __pyx_t_11); if (unlikely(__pyx_t_13 == ((int)-1))) __PYX_ERR(0, 193, __pyx_L1_error)
+      __pyx_t_13 = __Pyx_PyObject_Append(__pyx_t_1, __pyx_t_11); if (unlikely(__pyx_t_13 == ((int)-1))) __PYX_ERR(0, 194, __pyx_L1_error)
       __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
       __Pyx_DECREF(__pyx_t_11); __pyx_t_11 = 0;
 
-      /* "MACS2/IO/BedGraph.pyx":194
+      /* "MACS2/IO/BedGraph.pyx":195
  *                 # there is a gap, so fill it with baseline_value
  *                 c[0].append(startpos)
  *                 c[1].append(self.baseline_value)             # <<<<<<<<<<<<<<
  *                 # then add this region
  *                 c[0].append(endpos)
  */
-      __pyx_t_11 = __Pyx_GetItemInt(__pyx_v_c, 1, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 194, __pyx_L1_error)
+      __pyx_t_11 = __Pyx_GetItemInt(__pyx_v_c, 1, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 195, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_11);
-      __pyx_t_1 = PyFloat_FromDouble(__pyx_v_self->baseline_value); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 194, __pyx_L1_error)
+      __pyx_t_1 = PyFloat_FromDouble(__pyx_v_self->baseline_value); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 195, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_1);
-      __pyx_t_13 = __Pyx_PyObject_Append(__pyx_t_11, __pyx_t_1); if (unlikely(__pyx_t_13 == ((int)-1))) __PYX_ERR(0, 194, __pyx_L1_error)
+      __pyx_t_13 = __Pyx_PyObject_Append(__pyx_t_11, __pyx_t_1); if (unlikely(__pyx_t_13 == ((int)-1))) __PYX_ERR(0, 195, __pyx_L1_error)
       __Pyx_DECREF(__pyx_t_11); __pyx_t_11 = 0;
       __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-      /* "MACS2/IO/BedGraph.pyx":196
+      /* "MACS2/IO/BedGraph.pyx":197
  *                 c[1].append(self.baseline_value)
  *                 # then add this region
  *                 c[0].append(endpos)             # <<<<<<<<<<<<<<
  *                 c[1].append(value)
  *             else:
  */
-      __pyx_t_1 = __Pyx_GetItemInt(__pyx_v_c, 0, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 196, __pyx_L1_error)
+      __pyx_t_1 = __Pyx_GetItemInt(__pyx_v_c, 0, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 197, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_1);
-      __pyx_t_11 = __Pyx_PyInt_From_int(__pyx_v_endpos); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 196, __pyx_L1_error)
+      __pyx_t_11 = __Pyx_PyInt_From_int(__pyx_v_endpos); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 197, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_11);
-      __pyx_t_13 = __Pyx_PyObject_Append(__pyx_t_1, __pyx_t_11); if (unlikely(__pyx_t_13 == ((int)-1))) __PYX_ERR(0, 196, __pyx_L1_error)
+      __pyx_t_13 = __Pyx_PyObject_Append(__pyx_t_1, __pyx_t_11); if (unlikely(__pyx_t_13 == ((int)-1))) __PYX_ERR(0, 197, __pyx_L1_error)
       __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
       __Pyx_DECREF(__pyx_t_11); __pyx_t_11 = 0;
 
-      /* "MACS2/IO/BedGraph.pyx":197
+      /* "MACS2/IO/BedGraph.pyx":198
  *                 # then add this region
  *                 c[0].append(endpos)
  *                 c[1].append(value)             # <<<<<<<<<<<<<<
  *             else:
  *                 # if this region is next to the previous one.
  */
-      __pyx_t_11 = __Pyx_GetItemInt(__pyx_v_c, 1, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 197, __pyx_L1_error)
+      __pyx_t_11 = __Pyx_GetItemInt(__pyx_v_c, 1, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 198, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_11);
-      __pyx_t_1 = PyFloat_FromDouble(__pyx_v_value); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 197, __pyx_L1_error)
+      __pyx_t_1 = PyFloat_FromDouble(__pyx_v_value); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 198, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_1);
-      __pyx_t_13 = __Pyx_PyObject_Append(__pyx_t_11, __pyx_t_1); if (unlikely(__pyx_t_13 == ((int)-1))) __PYX_ERR(0, 197, __pyx_L1_error)
+      __pyx_t_13 = __Pyx_PyObject_Append(__pyx_t_11, __pyx_t_1); if (unlikely(__pyx_t_13 == ((int)-1))) __PYX_ERR(0, 198, __pyx_L1_error)
       __Pyx_DECREF(__pyx_t_11); __pyx_t_11 = 0;
       __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-      /* "MACS2/IO/BedGraph.pyx":191
+      /* "MACS2/IO/BedGraph.pyx":192
  *             assert pre_pos <= startpos , "bedGraph regions have overlappings."
  * 
  *             if startpos != pre_pos:             # <<<<<<<<<<<<<<
@@ -4188,7 +4416,7 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_8safe_add_loc(st
       goto __pyx_L7;
     }
 
-    /* "MACS2/IO/BedGraph.pyx":200
+    /* "MACS2/IO/BedGraph.pyx":201
  *             else:
  *                 # if this region is next to the previous one.
  *                 if pre_v == value:             # <<<<<<<<<<<<<<
@@ -4196,30 +4424,30 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_8safe_add_loc(st
  *                     c[0][-1] = endpos
  */
     /*else*/ {
-      __pyx_t_1 = PyFloat_FromDouble(__pyx_v_value); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 200, __pyx_L1_error)
+      __pyx_t_1 = PyFloat_FromDouble(__pyx_v_value); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 201, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_1);
-      __pyx_t_11 = PyObject_RichCompare(__pyx_v_pre_v, __pyx_t_1, Py_EQ); __Pyx_XGOTREF(__pyx_t_11); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 200, __pyx_L1_error)
+      __pyx_t_11 = PyObject_RichCompare(__pyx_v_pre_v, __pyx_t_1, Py_EQ); __Pyx_XGOTREF(__pyx_t_11); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 201, __pyx_L1_error)
       __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-      __pyx_t_6 = __Pyx_PyObject_IsTrue(__pyx_t_11); if (unlikely(__pyx_t_6 < 0)) __PYX_ERR(0, 200, __pyx_L1_error)
+      __pyx_t_6 = __Pyx_PyObject_IsTrue(__pyx_t_11); if (unlikely(__pyx_t_6 < 0)) __PYX_ERR(0, 201, __pyx_L1_error)
       __Pyx_DECREF(__pyx_t_11); __pyx_t_11 = 0;
       if (__pyx_t_6) {
 
-        /* "MACS2/IO/BedGraph.pyx":202
+        /* "MACS2/IO/BedGraph.pyx":203
  *                 if pre_v == value:
  *                     # if value is the same, simply extend it.
  *                     c[0][-1] = endpos             # <<<<<<<<<<<<<<
  *                 else:
  *                     # otherwise, add a new region
  */
-        __pyx_t_11 = __Pyx_PyInt_From_int(__pyx_v_endpos); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 202, __pyx_L1_error)
+        __pyx_t_11 = __Pyx_PyInt_From_int(__pyx_v_endpos); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 203, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_11);
-        __pyx_t_1 = __Pyx_GetItemInt(__pyx_v_c, 0, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 202, __pyx_L1_error)
+        __pyx_t_1 = __Pyx_GetItemInt(__pyx_v_c, 0, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 203, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_1);
-        if (unlikely(__Pyx_SetItemInt(__pyx_t_1, -1L, __pyx_t_11, long, 1, __Pyx_PyInt_From_long, 0, 1, 1) < 0)) __PYX_ERR(0, 202, __pyx_L1_error)
+        if (unlikely(__Pyx_SetItemInt(__pyx_t_1, -1L, __pyx_t_11, long, 1, __Pyx_PyInt_From_long, 0, 1, 1) < 0)) __PYX_ERR(0, 203, __pyx_L1_error)
         __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
         __Pyx_DECREF(__pyx_t_11); __pyx_t_11 = 0;
 
-        /* "MACS2/IO/BedGraph.pyx":200
+        /* "MACS2/IO/BedGraph.pyx":201
  *             else:
  *                 # if this region is next to the previous one.
  *                 if pre_v == value:             # <<<<<<<<<<<<<<
@@ -4229,7 +4457,7 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_8safe_add_loc(st
         goto __pyx_L8;
       }
 
-      /* "MACS2/IO/BedGraph.pyx":205
+      /* "MACS2/IO/BedGraph.pyx":206
  *                 else:
  *                     # otherwise, add a new region
  *                     c[0].append(endpos)             # <<<<<<<<<<<<<<
@@ -4237,26 +4465,26 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_8safe_add_loc(st
  * 
  */
       /*else*/ {
-        __pyx_t_11 = __Pyx_GetItemInt(__pyx_v_c, 0, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 205, __pyx_L1_error)
+        __pyx_t_11 = __Pyx_GetItemInt(__pyx_v_c, 0, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 206, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_11);
-        __pyx_t_1 = __Pyx_PyInt_From_int(__pyx_v_endpos); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 205, __pyx_L1_error)
+        __pyx_t_1 = __Pyx_PyInt_From_int(__pyx_v_endpos); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 206, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_1);
-        __pyx_t_13 = __Pyx_PyObject_Append(__pyx_t_11, __pyx_t_1); if (unlikely(__pyx_t_13 == ((int)-1))) __PYX_ERR(0, 205, __pyx_L1_error)
+        __pyx_t_13 = __Pyx_PyObject_Append(__pyx_t_11, __pyx_t_1); if (unlikely(__pyx_t_13 == ((int)-1))) __PYX_ERR(0, 206, __pyx_L1_error)
         __Pyx_DECREF(__pyx_t_11); __pyx_t_11 = 0;
         __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-        /* "MACS2/IO/BedGraph.pyx":206
+        /* "MACS2/IO/BedGraph.pyx":207
  *                     # otherwise, add a new region
  *                     c[0].append(endpos)
  *                     c[1].append(value)             # <<<<<<<<<<<<<<
  * 
  *         if value > self.maxvalue:
  */
-        __pyx_t_1 = __Pyx_GetItemInt(__pyx_v_c, 1, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 206, __pyx_L1_error)
+        __pyx_t_1 = __Pyx_GetItemInt(__pyx_v_c, 1, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 207, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_1);
-        __pyx_t_11 = PyFloat_FromDouble(__pyx_v_value); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 206, __pyx_L1_error)
+        __pyx_t_11 = PyFloat_FromDouble(__pyx_v_value); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 207, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_11);
-        __pyx_t_13 = __Pyx_PyObject_Append(__pyx_t_1, __pyx_t_11); if (unlikely(__pyx_t_13 == ((int)-1))) __PYX_ERR(0, 206, __pyx_L1_error)
+        __pyx_t_13 = __Pyx_PyObject_Append(__pyx_t_1, __pyx_t_11); if (unlikely(__pyx_t_13 == ((int)-1))) __PYX_ERR(0, 207, __pyx_L1_error)
         __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
         __Pyx_DECREF(__pyx_t_11); __pyx_t_11 = 0;
       }
@@ -4266,7 +4494,7 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_8safe_add_loc(st
   }
   __pyx_L5:;
 
-  /* "MACS2/IO/BedGraph.pyx":208
+  /* "MACS2/IO/BedGraph.pyx":209
  *                     c[1].append(value)
  * 
  *         if value > self.maxvalue:             # <<<<<<<<<<<<<<
@@ -4276,7 +4504,7 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_8safe_add_loc(st
   __pyx_t_6 = ((__pyx_v_value > __pyx_v_self->maxvalue) != 0);
   if (__pyx_t_6) {
 
-    /* "MACS2/IO/BedGraph.pyx":209
+    /* "MACS2/IO/BedGraph.pyx":210
  * 
  *         if value > self.maxvalue:
  *             self.maxvalue = value             # <<<<<<<<<<<<<<
@@ -4285,7 +4513,7 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_8safe_add_loc(st
  */
     __pyx_v_self->maxvalue = __pyx_v_value;
 
-    /* "MACS2/IO/BedGraph.pyx":208
+    /* "MACS2/IO/BedGraph.pyx":209
  *                     c[1].append(value)
  * 
  *         if value > self.maxvalue:             # <<<<<<<<<<<<<<
@@ -4294,7 +4522,7 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_8safe_add_loc(st
  */
   }
 
-  /* "MACS2/IO/BedGraph.pyx":210
+  /* "MACS2/IO/BedGraph.pyx":211
  *         if value > self.maxvalue:
  *             self.maxvalue = value
  *         if value < self.minvalue:             # <<<<<<<<<<<<<<
@@ -4304,7 +4532,7 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_8safe_add_loc(st
   __pyx_t_6 = ((__pyx_v_value < __pyx_v_self->minvalue) != 0);
   if (__pyx_t_6) {
 
-    /* "MACS2/IO/BedGraph.pyx":211
+    /* "MACS2/IO/BedGraph.pyx":212
  *             self.maxvalue = value
  *         if value < self.minvalue:
  *             self.minvalue = value             # <<<<<<<<<<<<<<
@@ -4313,7 +4541,7 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_8safe_add_loc(st
  */
     __pyx_v_self->minvalue = __pyx_v_value;
 
-    /* "MACS2/IO/BedGraph.pyx":210
+    /* "MACS2/IO/BedGraph.pyx":211
  *         if value > self.maxvalue:
  *             self.maxvalue = value
  *         if value < self.minvalue:             # <<<<<<<<<<<<<<
@@ -4322,7 +4550,7 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_8safe_add_loc(st
  */
   }
 
-  /* "MACS2/IO/BedGraph.pyx":160
+  /* "MACS2/IO/BedGraph.pyx":161
  *         return True
  * 
  *     def safe_add_loc ( self, bytes chromosome, int startpos, int endpos, double value):             # <<<<<<<<<<<<<<
@@ -4348,11 +4576,12 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_8safe_add_loc(st
   __Pyx_XDECREF(__pyx_v_pre_pos);
   __Pyx_XDECREF(__pyx_v_pre_v);
   __Pyx_XGIVEREF(__pyx_r);
+  __Pyx_TraceReturn(__pyx_r, 0);
   __Pyx_RefNannyFinishContext();
   return __pyx_r;
 }
 
-/* "MACS2/IO/BedGraph.pyx":213
+/* "MACS2/IO/BedGraph.pyx":214
  *             self.minvalue = value
  * 
  *     def get_data_by_chr (self, bytes chromosome):             # <<<<<<<<<<<<<<
@@ -4367,7 +4596,7 @@ static PyObject *__pyx_pw_5MACS2_2IO_8BedGraph_14bedGraphTrackI_11get_data_by_ch
   PyObject *__pyx_r = 0;
   __Pyx_RefNannyDeclarations
   __Pyx_RefNannySetupContext("get_data_by_chr (wrapper)", 0);
-  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_chromosome), (&PyBytes_Type), 1, "chromosome", 1))) __PYX_ERR(0, 213, __pyx_L1_error)
+  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_chromosome), (&PyBytes_Type), 1, "chromosome", 1))) __PYX_ERR(0, 214, __pyx_L1_error)
   __pyx_r = __pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_10get_data_by_chr(((struct __pyx_obj_5MACS2_2IO_8BedGraph_bedGraphTrackI *)__pyx_v_self), ((PyObject*)__pyx_v_chromosome));
 
   /* function exit code */
@@ -4381,13 +4610,15 @@ static PyObject *__pyx_pw_5MACS2_2IO_8BedGraph_14bedGraphTrackI_11get_data_by_ch
 
 static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_10get_data_by_chr(struct __pyx_obj_5MACS2_2IO_8BedGraph_bedGraphTrackI *__pyx_v_self, PyObject *__pyx_v_chromosome) {
   PyObject *__pyx_r = NULL;
+  __Pyx_TraceDeclarations
   __Pyx_RefNannyDeclarations
   int __pyx_t_1;
   int __pyx_t_2;
   PyObject *__pyx_t_3 = NULL;
   __Pyx_RefNannySetupContext("get_data_by_chr", 0);
+  __Pyx_TraceCall("get_data_by_chr", __pyx_f[0], 214, 0, __PYX_ERR(0, 214, __pyx_L1_error));
 
-  /* "MACS2/IO/BedGraph.pyx":219
+  /* "MACS2/IO/BedGraph.pyx":220
  *         ([end pos],[value])
  *         """
  *         if chromosome in self.__data:             # <<<<<<<<<<<<<<
@@ -4396,13 +4627,13 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_10get_data_by_ch
  */
   if (unlikely(__pyx_v_self->__pyx___data == Py_None)) {
     PyErr_SetString(PyExc_TypeError, "'NoneType' object is not iterable");
-    __PYX_ERR(0, 219, __pyx_L1_error)
+    __PYX_ERR(0, 220, __pyx_L1_error)
   }
-  __pyx_t_1 = (__Pyx_PyDict_ContainsTF(__pyx_v_chromosome, __pyx_v_self->__pyx___data, Py_EQ)); if (unlikely(__pyx_t_1 < 0)) __PYX_ERR(0, 219, __pyx_L1_error)
+  __pyx_t_1 = (__Pyx_PyDict_ContainsTF(__pyx_v_chromosome, __pyx_v_self->__pyx___data, Py_EQ)); if (unlikely(__pyx_t_1 < 0)) __PYX_ERR(0, 220, __pyx_L1_error)
   __pyx_t_2 = (__pyx_t_1 != 0);
   if (__pyx_t_2) {
 
-    /* "MACS2/IO/BedGraph.pyx":220
+    /* "MACS2/IO/BedGraph.pyx":221
  *         """
  *         if chromosome in self.__data:
  *             return self.__data[chromosome]             # <<<<<<<<<<<<<<
@@ -4412,15 +4643,15 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_10get_data_by_ch
     __Pyx_XDECREF(__pyx_r);
     if (unlikely(__pyx_v_self->__pyx___data == Py_None)) {
       PyErr_SetString(PyExc_TypeError, "'NoneType' object is not subscriptable");
-      __PYX_ERR(0, 220, __pyx_L1_error)
+      __PYX_ERR(0, 221, __pyx_L1_error)
     }
-    __pyx_t_3 = __Pyx_PyDict_GetItem(__pyx_v_self->__pyx___data, __pyx_v_chromosome); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 220, __pyx_L1_error)
+    __pyx_t_3 = __Pyx_PyDict_GetItem(__pyx_v_self->__pyx___data, __pyx_v_chromosome); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 221, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_3);
     __pyx_r = __pyx_t_3;
     __pyx_t_3 = 0;
     goto __pyx_L0;
 
-    /* "MACS2/IO/BedGraph.pyx":219
+    /* "MACS2/IO/BedGraph.pyx":220
  *         ([end pos],[value])
  *         """
  *         if chromosome in self.__data:             # <<<<<<<<<<<<<<
@@ -4429,7 +4660,7 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_10get_data_by_ch
  */
   }
 
-  /* "MACS2/IO/BedGraph.pyx":222
+  /* "MACS2/IO/BedGraph.pyx":223
  *             return self.__data[chromosome]
  *         else:
  *             return None             # <<<<<<<<<<<<<<
@@ -4442,7 +4673,7 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_10get_data_by_ch
     goto __pyx_L0;
   }
 
-  /* "MACS2/IO/BedGraph.pyx":213
+  /* "MACS2/IO/BedGraph.pyx":214
  *             self.minvalue = value
  * 
  *     def get_data_by_chr (self, bytes chromosome):             # <<<<<<<<<<<<<<
@@ -4457,11 +4688,12 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_10get_data_by_ch
   __pyx_r = NULL;
   __pyx_L0:;
   __Pyx_XGIVEREF(__pyx_r);
+  __Pyx_TraceReturn(__pyx_r, 0);
   __Pyx_RefNannyFinishContext();
   return __pyx_r;
 }
 
-/* "MACS2/IO/BedGraph.pyx":224
+/* "MACS2/IO/BedGraph.pyx":225
  *             return None
  * 
  *     cpdef set get_chr_names (self):             # <<<<<<<<<<<<<<
@@ -4472,6 +4704,7 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_10get_data_by_ch
 static PyObject *__pyx_pw_5MACS2_2IO_8BedGraph_14bedGraphTrackI_13get_chr_names(PyObject *__pyx_v_self, CYTHON_UNUSED PyObject *unused); /*proto*/
 static PyObject *__pyx_f_5MACS2_2IO_8BedGraph_14bedGraphTrackI_get_chr_names(struct __pyx_obj_5MACS2_2IO_8BedGraph_bedGraphTrackI *__pyx_v_self, int __pyx_skip_dispatch) {
   PyObject *__pyx_r = NULL;
+  __Pyx_TraceDeclarations
   __Pyx_RefNannyDeclarations
   PyObject *__pyx_t_1 = NULL;
   PyObject *__pyx_t_2 = NULL;
@@ -4479,6 +4712,7 @@ static PyObject *__pyx_f_5MACS2_2IO_8BedGraph_14bedGraphTrackI_get_chr_names(str
   PyObject *__pyx_t_4 = NULL;
   int __pyx_t_5;
   __Pyx_RefNannySetupContext("get_chr_names", 0);
+  __Pyx_TraceCall("get_chr_names", __pyx_f[0], 225, 0, __PYX_ERR(0, 225, __pyx_L1_error));
   /* Check if called by wrapper */
   if (unlikely(__pyx_skip_dispatch)) ;
   /* Check if overridden in Python */
@@ -4488,7 +4722,7 @@ static PyObject *__pyx_f_5MACS2_2IO_8BedGraph_14bedGraphTrackI_get_chr_names(str
     if (unlikely(!__Pyx_object_dict_version_matches(((PyObject *)__pyx_v_self), __pyx_tp_dict_version, __pyx_obj_dict_version))) {
       PY_UINT64_T __pyx_type_dict_guard = __Pyx_get_tp_dict_version(((PyObject *)__pyx_v_self));
       #endif
-      __pyx_t_1 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_v_self), __pyx_n_s_get_chr_names); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 224, __pyx_L1_error)
+      __pyx_t_1 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_v_self), __pyx_n_s_get_chr_names); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 225, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_1);
       if (!PyCFunction_Check(__pyx_t_1) || (PyCFunction_GET_FUNCTION(__pyx_t_1) != (PyCFunction)(void*)__pyx_pw_5MACS2_2IO_8BedGraph_14bedGraphTrackI_13get_chr_names)) {
         __Pyx_XDECREF(__pyx_r);
@@ -4505,10 +4739,10 @@ static PyObject *__pyx_f_5MACS2_2IO_8BedGraph_14bedGraphTrackI_get_chr_names(str
         }
         __pyx_t_2 = (__pyx_t_4) ? __Pyx_PyObject_CallOneArg(__pyx_t_3, __pyx_t_4) : __Pyx_PyObject_CallNoArg(__pyx_t_3);
         __Pyx_XDECREF(__pyx_t_4); __pyx_t_4 = 0;
-        if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 224, __pyx_L1_error)
+        if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 225, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_2);
         __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-        if (!(likely(PySet_CheckExact(__pyx_t_2))||((__pyx_t_2) == Py_None)||(PyErr_Format(PyExc_TypeError, "Expected %.16s, got %.200s", "set", Py_TYPE(__pyx_t_2)->tp_name), 0))) __PYX_ERR(0, 224, __pyx_L1_error)
+        if (!(likely(PySet_CheckExact(__pyx_t_2))||((__pyx_t_2) == Py_None)||(PyErr_Format(PyExc_TypeError, "Expected %.16s, got %.200s", "set", Py_TYPE(__pyx_t_2)->tp_name), 0))) __PYX_ERR(0, 225, __pyx_L1_error)
         __pyx_r = ((PyObject*)__pyx_t_2);
         __pyx_t_2 = 0;
         __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
@@ -4527,7 +4761,7 @@ static PyObject *__pyx_f_5MACS2_2IO_8BedGraph_14bedGraphTrackI_get_chr_names(str
     #endif
   }
 
-  /* "MACS2/IO/BedGraph.pyx":228
+  /* "MACS2/IO/BedGraph.pyx":229
  * 
  *         """
  *         return set(sorted(self.__data.keys()))             # <<<<<<<<<<<<<<
@@ -4537,24 +4771,24 @@ static PyObject *__pyx_f_5MACS2_2IO_8BedGraph_14bedGraphTrackI_get_chr_names(str
   __Pyx_XDECREF(__pyx_r);
   if (unlikely(__pyx_v_self->__pyx___data == Py_None)) {
     PyErr_Format(PyExc_AttributeError, "'NoneType' object has no attribute '%.30s'", "keys");
-    __PYX_ERR(0, 228, __pyx_L1_error)
+    __PYX_ERR(0, 229, __pyx_L1_error)
   }
-  __pyx_t_2 = __Pyx_PyDict_Keys(__pyx_v_self->__pyx___data); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 228, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyDict_Keys(__pyx_v_self->__pyx___data); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 229, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
-  __pyx_t_3 = PySequence_List(__pyx_t_2); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 228, __pyx_L1_error)
+  __pyx_t_3 = PySequence_List(__pyx_t_2); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 229, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
   __pyx_t_1 = ((PyObject*)__pyx_t_3);
   __pyx_t_3 = 0;
-  __pyx_t_5 = PyList_Sort(__pyx_t_1); if (unlikely(__pyx_t_5 == ((int)-1))) __PYX_ERR(0, 228, __pyx_L1_error)
-  __pyx_t_3 = PySet_New(__pyx_t_1); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 228, __pyx_L1_error)
+  __pyx_t_5 = PyList_Sort(__pyx_t_1); if (unlikely(__pyx_t_5 == ((int)-1))) __PYX_ERR(0, 229, __pyx_L1_error)
+  __pyx_t_3 = PySet_New(__pyx_t_1); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 229, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   __pyx_r = ((PyObject*)__pyx_t_3);
   __pyx_t_3 = 0;
   goto __pyx_L0;
 
-  /* "MACS2/IO/BedGraph.pyx":224
+  /* "MACS2/IO/BedGraph.pyx":225
  *             return None
  * 
  *     cpdef set get_chr_names (self):             # <<<<<<<<<<<<<<
@@ -4572,6 +4806,7 @@ static PyObject *__pyx_f_5MACS2_2IO_8BedGraph_14bedGraphTrackI_get_chr_names(str
   __pyx_r = 0;
   __pyx_L0:;
   __Pyx_XGIVEREF(__pyx_r);
+  __Pyx_TraceReturn(__pyx_r, 0);
   __Pyx_RefNannyFinishContext();
   return __pyx_r;
 }
@@ -4592,11 +4827,13 @@ static PyObject *__pyx_pw_5MACS2_2IO_8BedGraph_14bedGraphTrackI_13get_chr_names(
 
 static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_12get_chr_names(struct __pyx_obj_5MACS2_2IO_8BedGraph_bedGraphTrackI *__pyx_v_self) {
   PyObject *__pyx_r = NULL;
+  __Pyx_TraceDeclarations
   __Pyx_RefNannyDeclarations
   PyObject *__pyx_t_1 = NULL;
   __Pyx_RefNannySetupContext("get_chr_names", 0);
+  __Pyx_TraceCall("get_chr_names (wrapper)", __pyx_f[0], 225, 0, __PYX_ERR(0, 225, __pyx_L1_error));
   __Pyx_XDECREF(__pyx_r);
-  __pyx_t_1 = __pyx_f_5MACS2_2IO_8BedGraph_14bedGraphTrackI_get_chr_names(__pyx_v_self, 1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 224, __pyx_L1_error)
+  __pyx_t_1 = __pyx_f_5MACS2_2IO_8BedGraph_14bedGraphTrackI_get_chr_names(__pyx_v_self, 1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 225, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __pyx_r = __pyx_t_1;
   __pyx_t_1 = 0;
@@ -4609,11 +4846,12 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_12get_chr_names(
   __pyx_r = NULL;
   __pyx_L0:;
   __Pyx_XGIVEREF(__pyx_r);
+  __Pyx_TraceReturn(__pyx_r, 0);
   __Pyx_RefNannyFinishContext();
   return __pyx_r;
 }
 
-/* "MACS2/IO/BedGraph.pyx":230
+/* "MACS2/IO/BedGraph.pyx":231
  *         return set(sorted(self.__data.keys()))
  * 
  *     def write_bedGraph (self, fhd, str name, str description, bool trackline=True):             # <<<<<<<<<<<<<<
@@ -4660,13 +4898,13 @@ static PyObject *__pyx_pw_5MACS2_2IO_8BedGraph_14bedGraphTrackI_15write_bedGraph
         case  1:
         if (likely((values[1] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_name)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("write_bedGraph", 0, 3, 4, 1); __PYX_ERR(0, 230, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("write_bedGraph", 0, 3, 4, 1); __PYX_ERR(0, 231, __pyx_L3_error)
         }
         CYTHON_FALLTHROUGH;
         case  2:
         if (likely((values[2] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_description)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("write_bedGraph", 0, 3, 4, 2); __PYX_ERR(0, 230, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("write_bedGraph", 0, 3, 4, 2); __PYX_ERR(0, 231, __pyx_L3_error)
         }
         CYTHON_FALLTHROUGH;
         case  3:
@@ -4676,7 +4914,7 @@ static PyObject *__pyx_pw_5MACS2_2IO_8BedGraph_14bedGraphTrackI_15write_bedGraph
         }
       }
       if (unlikely(kw_args > 0)) {
-        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "write_bedGraph") < 0)) __PYX_ERR(0, 230, __pyx_L3_error)
+        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "write_bedGraph") < 0)) __PYX_ERR(0, 231, __pyx_L3_error)
       }
     } else {
       switch (PyTuple_GET_SIZE(__pyx_args)) {
@@ -4696,15 +4934,15 @@ static PyObject *__pyx_pw_5MACS2_2IO_8BedGraph_14bedGraphTrackI_15write_bedGraph
   }
   goto __pyx_L4_argument_unpacking_done;
   __pyx_L5_argtuple_error:;
-  __Pyx_RaiseArgtupleInvalid("write_bedGraph", 0, 3, 4, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 230, __pyx_L3_error)
+  __Pyx_RaiseArgtupleInvalid("write_bedGraph", 0, 3, 4, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 231, __pyx_L3_error)
   __pyx_L3_error:;
   __Pyx_AddTraceback("MACS2.IO.BedGraph.bedGraphTrackI.write_bedGraph", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __Pyx_RefNannyFinishContext();
   return NULL;
   __pyx_L4_argument_unpacking_done:;
-  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_name), (&PyUnicode_Type), 1, "name", 1))) __PYX_ERR(0, 230, __pyx_L1_error)
-  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_description), (&PyUnicode_Type), 1, "description", 1))) __PYX_ERR(0, 230, __pyx_L1_error)
-  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_trackline), __pyx_ptype_7cpython_4bool_bool, 1, "trackline", 0))) __PYX_ERR(0, 230, __pyx_L1_error)
+  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_name), (&PyUnicode_Type), 1, "name", 1))) __PYX_ERR(0, 231, __pyx_L1_error)
+  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_description), (&PyUnicode_Type), 1, "description", 1))) __PYX_ERR(0, 231, __pyx_L1_error)
+  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_trackline), __pyx_ptype_7cpython_4bool_bool, 1, "trackline", 0))) __PYX_ERR(0, 231, __pyx_L1_error)
   __pyx_r = __pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_14write_bedGraph(((struct __pyx_obj_5MACS2_2IO_8BedGraph_bedGraphTrackI *)__pyx_v_self), __pyx_v_fhd, __pyx_v_name, __pyx_v_description, __pyx_v_trackline);
 
   /* function exit code */
@@ -4729,6 +4967,7 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_14write_bedGraph
   PyObject *__pyx_v_pnext = NULL;
   PyObject *__pyx_v_vnext = NULL;
   PyObject *__pyx_r = NULL;
+  __Pyx_TraceDeclarations
   __Pyx_RefNannyDeclarations
   int __pyx_t_1;
   PyObject *__pyx_t_2 = NULL;
@@ -4749,18 +4988,19 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_14write_bedGraph
   Py_UCS4 __pyx_t_17;
   PyObject *__pyx_t_18 = NULL;
   __Pyx_RefNannySetupContext("write_bedGraph", 0);
+  __Pyx_TraceCall("write_bedGraph", __pyx_f[0], 231, 0, __PYX_ERR(0, 231, __pyx_L1_error));
 
-  /* "MACS2/IO/BedGraph.pyx":244
+  /* "MACS2/IO/BedGraph.pyx":245
  *             set chrs
  * 
  *         if trackline:             # <<<<<<<<<<<<<<
  *             trackcontents = (name.replace("\"", "\\\""), description.replace("\"", "\\\""))
  *             fhd.write("track type=bedGraph name=\"%s\" description=\"%s\" visibility=2 alwaysZero=on\n" % trackcontents)
  */
-  __pyx_t_1 = __Pyx_PyObject_IsTrue(((PyObject *)__pyx_v_trackline)); if (unlikely(__pyx_t_1 < 0)) __PYX_ERR(0, 244, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyObject_IsTrue(((PyObject *)__pyx_v_trackline)); if (unlikely(__pyx_t_1 < 0)) __PYX_ERR(0, 245, __pyx_L1_error)
   if (__pyx_t_1) {
 
-    /* "MACS2/IO/BedGraph.pyx":245
+    /* "MACS2/IO/BedGraph.pyx":246
  * 
  *         if trackline:
  *             trackcontents = (name.replace("\"", "\\\""), description.replace("\"", "\\\""))             # <<<<<<<<<<<<<<
@@ -4769,17 +5009,17 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_14write_bedGraph
  */
     if (unlikely(__pyx_v_name == Py_None)) {
       PyErr_Format(PyExc_AttributeError, "'NoneType' object has no attribute '%.30s'", "replace");
-      __PYX_ERR(0, 245, __pyx_L1_error)
+      __PYX_ERR(0, 246, __pyx_L1_error)
     }
-    __pyx_t_2 = PyUnicode_Replace(__pyx_v_name, __pyx_kp_u_, __pyx_kp_u__2, -1L); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 245, __pyx_L1_error)
+    __pyx_t_2 = PyUnicode_Replace(__pyx_v_name, __pyx_kp_u_, __pyx_kp_u__2, -1L); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 246, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
     if (unlikely(__pyx_v_description == Py_None)) {
       PyErr_Format(PyExc_AttributeError, "'NoneType' object has no attribute '%.30s'", "replace");
-      __PYX_ERR(0, 245, __pyx_L1_error)
+      __PYX_ERR(0, 246, __pyx_L1_error)
     }
-    __pyx_t_3 = PyUnicode_Replace(__pyx_v_description, __pyx_kp_u_, __pyx_kp_u__2, -1L); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 245, __pyx_L1_error)
+    __pyx_t_3 = PyUnicode_Replace(__pyx_v_description, __pyx_kp_u_, __pyx_kp_u__2, -1L); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 246, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_3);
-    __pyx_t_4 = PyTuple_New(2); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 245, __pyx_L1_error)
+    __pyx_t_4 = PyTuple_New(2); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 246, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_4);
     __Pyx_GIVEREF(__pyx_t_2);
     PyTuple_SET_ITEM(__pyx_t_4, 0, __pyx_t_2);
@@ -4790,16 +5030,16 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_14write_bedGraph
     __pyx_v_trackcontents = ((PyObject*)__pyx_t_4);
     __pyx_t_4 = 0;
 
-    /* "MACS2/IO/BedGraph.pyx":246
+    /* "MACS2/IO/BedGraph.pyx":247
  *         if trackline:
  *             trackcontents = (name.replace("\"", "\\\""), description.replace("\"", "\\\""))
  *             fhd.write("track type=bedGraph name=\"%s\" description=\"%s\" visibility=2 alwaysZero=on\n" % trackcontents)             # <<<<<<<<<<<<<<
  *         chrs = self.get_chr_names()
  *         for chrom in chrs:
  */
-    __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_v_fhd, __pyx_n_s_write); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 246, __pyx_L1_error)
+    __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_v_fhd, __pyx_n_s_write); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 247, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_3);
-    __pyx_t_2 = PyUnicode_Format(__pyx_kp_u_track_type_bedGraph_name_s_descr, __pyx_v_trackcontents); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 246, __pyx_L1_error)
+    __pyx_t_2 = PyUnicode_Format(__pyx_kp_u_track_type_bedGraph_name_s_descr, __pyx_v_trackcontents); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 247, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
     __pyx_t_5 = NULL;
     if (CYTHON_UNPACK_METHODS && likely(PyMethod_Check(__pyx_t_3))) {
@@ -4814,12 +5054,12 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_14write_bedGraph
     __pyx_t_4 = (__pyx_t_5) ? __Pyx_PyObject_Call2Args(__pyx_t_3, __pyx_t_5, __pyx_t_2) : __Pyx_PyObject_CallOneArg(__pyx_t_3, __pyx_t_2);
     __Pyx_XDECREF(__pyx_t_5); __pyx_t_5 = 0;
     __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-    if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 246, __pyx_L1_error)
+    if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 247, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_4);
     __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
     __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
 
-    /* "MACS2/IO/BedGraph.pyx":244
+    /* "MACS2/IO/BedGraph.pyx":245
  *             set chrs
  * 
  *         if trackline:             # <<<<<<<<<<<<<<
@@ -4828,19 +5068,19 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_14write_bedGraph
  */
   }
 
-  /* "MACS2/IO/BedGraph.pyx":247
+  /* "MACS2/IO/BedGraph.pyx":248
  *             trackcontents = (name.replace("\"", "\\\""), description.replace("\"", "\\\""))
  *             fhd.write("track type=bedGraph name=\"%s\" description=\"%s\" visibility=2 alwaysZero=on\n" % trackcontents)
  *         chrs = self.get_chr_names()             # <<<<<<<<<<<<<<
  *         for chrom in chrs:
  *             (p,v) = self.__data[chrom]
  */
-  __pyx_t_4 = ((struct __pyx_vtabstruct_5MACS2_2IO_8BedGraph_bedGraphTrackI *)__pyx_v_self->__pyx_vtab)->get_chr_names(__pyx_v_self, 0); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 247, __pyx_L1_error)
+  __pyx_t_4 = ((struct __pyx_vtabstruct_5MACS2_2IO_8BedGraph_bedGraphTrackI *)__pyx_v_self->__pyx_vtab)->get_chr_names(__pyx_v_self, 0); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 248, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_4);
   __pyx_v_chrs = ((PyObject*)__pyx_t_4);
   __pyx_t_4 = 0;
 
-  /* "MACS2/IO/BedGraph.pyx":248
+  /* "MACS2/IO/BedGraph.pyx":249
  *             fhd.write("track type=bedGraph name=\"%s\" description=\"%s\" visibility=2 alwaysZero=on\n" % trackcontents)
  *         chrs = self.get_chr_names()
  *         for chrom in chrs:             # <<<<<<<<<<<<<<
@@ -4848,7 +5088,7 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_14write_bedGraph
  *             pnext = iter(p).__next__
  */
   __pyx_t_6 = 0;
-  __pyx_t_3 = __Pyx_set_iterator(__pyx_v_chrs, 1, (&__pyx_t_7), (&__pyx_t_8)); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 248, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_set_iterator(__pyx_v_chrs, 1, (&__pyx_t_7), (&__pyx_t_8)); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 249, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
   __Pyx_XDECREF(__pyx_t_4);
   __pyx_t_4 = __pyx_t_3;
@@ -4856,13 +5096,13 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_14write_bedGraph
   while (1) {
     __pyx_t_9 = __Pyx_set_iter_next(__pyx_t_4, __pyx_t_7, &__pyx_t_6, &__pyx_t_3, __pyx_t_8);
     if (unlikely(__pyx_t_9 == 0)) break;
-    if (unlikely(__pyx_t_9 == -1)) __PYX_ERR(0, 248, __pyx_L1_error)
+    if (unlikely(__pyx_t_9 == -1)) __PYX_ERR(0, 249, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_3);
-    if (!(likely(PyBytes_CheckExact(__pyx_t_3))||((__pyx_t_3) == Py_None)||(PyErr_Format(PyExc_TypeError, "Expected %.16s, got %.200s", "bytes", Py_TYPE(__pyx_t_3)->tp_name), 0))) __PYX_ERR(0, 248, __pyx_L1_error)
+    if (!(likely(PyBytes_CheckExact(__pyx_t_3))||((__pyx_t_3) == Py_None)||(PyErr_Format(PyExc_TypeError, "Expected %.16s, got %.200s", "bytes", Py_TYPE(__pyx_t_3)->tp_name), 0))) __PYX_ERR(0, 249, __pyx_L1_error)
     __Pyx_XDECREF_SET(__pyx_v_chrom, ((PyObject*)__pyx_t_3));
     __pyx_t_3 = 0;
 
-    /* "MACS2/IO/BedGraph.pyx":249
+    /* "MACS2/IO/BedGraph.pyx":250
  *         chrs = self.get_chr_names()
  *         for chrom in chrs:
  *             (p,v) = self.__data[chrom]             # <<<<<<<<<<<<<<
@@ -4871,9 +5111,9 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_14write_bedGraph
  */
     if (unlikely(__pyx_v_self->__pyx___data == Py_None)) {
       PyErr_SetString(PyExc_TypeError, "'NoneType' object is not subscriptable");
-      __PYX_ERR(0, 249, __pyx_L1_error)
+      __PYX_ERR(0, 250, __pyx_L1_error)
     }
-    __pyx_t_3 = __Pyx_PyDict_GetItem(__pyx_v_self->__pyx___data, __pyx_v_chrom); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 249, __pyx_L1_error)
+    __pyx_t_3 = __Pyx_PyDict_GetItem(__pyx_v_self->__pyx___data, __pyx_v_chrom); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 250, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_3);
     if ((likely(PyTuple_CheckExact(__pyx_t_3))) || (PyList_CheckExact(__pyx_t_3))) {
       PyObject* sequence = __pyx_t_3;
@@ -4881,7 +5121,7 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_14write_bedGraph
       if (unlikely(size != 2)) {
         if (size > 2) __Pyx_RaiseTooManyValuesError(2);
         else if (size >= 0) __Pyx_RaiseNeedMoreValuesError(size);
-        __PYX_ERR(0, 249, __pyx_L1_error)
+        __PYX_ERR(0, 250, __pyx_L1_error)
       }
       #if CYTHON_ASSUME_SAFE_MACROS && !CYTHON_AVOID_BORROWED_REFS
       if (likely(PyTuple_CheckExact(sequence))) {
@@ -4894,15 +5134,15 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_14write_bedGraph
       __Pyx_INCREF(__pyx_t_2);
       __Pyx_INCREF(__pyx_t_5);
       #else
-      __pyx_t_2 = PySequence_ITEM(sequence, 0); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 249, __pyx_L1_error)
+      __pyx_t_2 = PySequence_ITEM(sequence, 0); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 250, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_2);
-      __pyx_t_5 = PySequence_ITEM(sequence, 1); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 249, __pyx_L1_error)
+      __pyx_t_5 = PySequence_ITEM(sequence, 1); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 250, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_5);
       #endif
       __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
     } else {
       Py_ssize_t index = -1;
-      __pyx_t_10 = PyObject_GetIter(__pyx_t_3); if (unlikely(!__pyx_t_10)) __PYX_ERR(0, 249, __pyx_L1_error)
+      __pyx_t_10 = PyObject_GetIter(__pyx_t_3); if (unlikely(!__pyx_t_10)) __PYX_ERR(0, 250, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_10);
       __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
       __pyx_t_11 = Py_TYPE(__pyx_t_10)->tp_iternext;
@@ -4910,7 +5150,7 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_14write_bedGraph
       __Pyx_GOTREF(__pyx_t_2);
       index = 1; __pyx_t_5 = __pyx_t_11(__pyx_t_10); if (unlikely(!__pyx_t_5)) goto __pyx_L6_unpacking_failed;
       __Pyx_GOTREF(__pyx_t_5);
-      if (__Pyx_IternextUnpackEndCheck(__pyx_t_11(__pyx_t_10), 2) < 0) __PYX_ERR(0, 249, __pyx_L1_error)
+      if (__Pyx_IternextUnpackEndCheck(__pyx_t_11(__pyx_t_10), 2) < 0) __PYX_ERR(0, 250, __pyx_L1_error)
       __pyx_t_11 = NULL;
       __Pyx_DECREF(__pyx_t_10); __pyx_t_10 = 0;
       goto __pyx_L7_unpacking_done;
@@ -4918,7 +5158,7 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_14write_bedGraph
       __Pyx_DECREF(__pyx_t_10); __pyx_t_10 = 0;
       __pyx_t_11 = NULL;
       if (__Pyx_IterFinish() == 0) __Pyx_RaiseNeedMoreValuesError(index);
-      __PYX_ERR(0, 249, __pyx_L1_error)
+      __PYX_ERR(0, 250, __pyx_L1_error)
       __pyx_L7_unpacking_done:;
     }
     __Pyx_XDECREF_SET(__pyx_v_p, __pyx_t_2);
@@ -4926,37 +5166,37 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_14write_bedGraph
     __Pyx_XDECREF_SET(__pyx_v_v, __pyx_t_5);
     __pyx_t_5 = 0;
 
-    /* "MACS2/IO/BedGraph.pyx":250
+    /* "MACS2/IO/BedGraph.pyx":251
  *         for chrom in chrs:
  *             (p,v) = self.__data[chrom]
  *             pnext = iter(p).__next__             # <<<<<<<<<<<<<<
  *             vnext = iter(v).__next__
  *             pre = 0
  */
-    __pyx_t_3 = PyObject_GetIter(__pyx_v_p); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 250, __pyx_L1_error)
+    __pyx_t_3 = PyObject_GetIter(__pyx_v_p); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 251, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_3);
-    __pyx_t_5 = __Pyx_PyObject_GetAttrStr(__pyx_t_3, __pyx_n_s_next); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 250, __pyx_L1_error)
+    __pyx_t_5 = __Pyx_PyObject_GetAttrStr(__pyx_t_3, __pyx_n_s_next); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 251, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_5);
     __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
     __Pyx_XDECREF_SET(__pyx_v_pnext, __pyx_t_5);
     __pyx_t_5 = 0;
 
-    /* "MACS2/IO/BedGraph.pyx":251
+    /* "MACS2/IO/BedGraph.pyx":252
  *             (p,v) = self.__data[chrom]
  *             pnext = iter(p).__next__
  *             vnext = iter(v).__next__             # <<<<<<<<<<<<<<
  *             pre = 0
  * 
  */
-    __pyx_t_5 = PyObject_GetIter(__pyx_v_v); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 251, __pyx_L1_error)
+    __pyx_t_5 = PyObject_GetIter(__pyx_v_v); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 252, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_5);
-    __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_t_5, __pyx_n_s_next); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 251, __pyx_L1_error)
+    __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_t_5, __pyx_n_s_next); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 252, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_3);
     __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
     __Pyx_XDECREF_SET(__pyx_v_vnext, __pyx_t_3);
     __pyx_t_3 = 0;
 
-    /* "MACS2/IO/BedGraph.pyx":252
+    /* "MACS2/IO/BedGraph.pyx":253
  *             pnext = iter(p).__next__
  *             vnext = iter(v).__next__
  *             pre = 0             # <<<<<<<<<<<<<<
@@ -4965,19 +5205,19 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_14write_bedGraph
  */
     __pyx_v_pre = 0;
 
-    /* "MACS2/IO/BedGraph.pyx":254
+    /* "MACS2/IO/BedGraph.pyx":255
  *             pre = 0
  * 
  *             for i in range(len(p)):             # <<<<<<<<<<<<<<
  *                 pos = pnext()
  *                 value = vnext()
  */
-    __pyx_t_12 = PyObject_Length(__pyx_v_p); if (unlikely(__pyx_t_12 == ((Py_ssize_t)-1))) __PYX_ERR(0, 254, __pyx_L1_error)
+    __pyx_t_12 = PyObject_Length(__pyx_v_p); if (unlikely(__pyx_t_12 == ((Py_ssize_t)-1))) __PYX_ERR(0, 255, __pyx_L1_error)
     __pyx_t_13 = __pyx_t_12;
     for (__pyx_t_9 = 0; __pyx_t_9 < __pyx_t_13; __pyx_t_9+=1) {
       __pyx_v_i = __pyx_t_9;
 
-      /* "MACS2/IO/BedGraph.pyx":255
+      /* "MACS2/IO/BedGraph.pyx":256
  * 
  *             for i in range(len(p)):
  *                 pos = pnext()             # <<<<<<<<<<<<<<
@@ -4997,14 +5237,14 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_14write_bedGraph
       }
       __pyx_t_3 = (__pyx_t_2) ? __Pyx_PyObject_CallOneArg(__pyx_t_5, __pyx_t_2) : __Pyx_PyObject_CallNoArg(__pyx_t_5);
       __Pyx_XDECREF(__pyx_t_2); __pyx_t_2 = 0;
-      if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 255, __pyx_L1_error)
+      if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 256, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_3);
       __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
-      __pyx_t_14 = __Pyx_PyInt_As_int(__pyx_t_3); if (unlikely((__pyx_t_14 == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 255, __pyx_L1_error)
+      __pyx_t_14 = __Pyx_PyInt_As_int(__pyx_t_3); if (unlikely((__pyx_t_14 == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 256, __pyx_L1_error)
       __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
       __pyx_v_pos = __pyx_t_14;
 
-      /* "MACS2/IO/BedGraph.pyx":256
+      /* "MACS2/IO/BedGraph.pyx":257
  *             for i in range(len(p)):
  *                 pos = pnext()
  *                 value = vnext()             # <<<<<<<<<<<<<<
@@ -5024,31 +5264,31 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_14write_bedGraph
       }
       __pyx_t_3 = (__pyx_t_2) ? __Pyx_PyObject_CallOneArg(__pyx_t_5, __pyx_t_2) : __Pyx_PyObject_CallNoArg(__pyx_t_5);
       __Pyx_XDECREF(__pyx_t_2); __pyx_t_2 = 0;
-      if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 256, __pyx_L1_error)
+      if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 257, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_3);
       __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
-      __pyx_t_15 = __pyx_PyFloat_AsDouble(__pyx_t_3); if (unlikely((__pyx_t_15 == (double)-1) && PyErr_Occurred())) __PYX_ERR(0, 256, __pyx_L1_error)
+      __pyx_t_15 = __pyx_PyFloat_AsDouble(__pyx_t_3); if (unlikely((__pyx_t_15 == (double)-1) && PyErr_Occurred())) __PYX_ERR(0, 257, __pyx_L1_error)
       __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
       __pyx_v_value = __pyx_t_15;
 
-      /* "MACS2/IO/BedGraph.pyx":259
+      /* "MACS2/IO/BedGraph.pyx":260
  *                 #if value != self.baseline_value:
  *                 # never write baseline_value
  *                 fhd.write("%s\t%d\t%d\t%.5f\n" % (chrom.decode(),pre,pos,value))             # <<<<<<<<<<<<<<
  *                 pre = pos
  * 
  */
-      __pyx_t_5 = __Pyx_PyObject_GetAttrStr(__pyx_v_fhd, __pyx_n_s_write); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 259, __pyx_L1_error)
+      __pyx_t_5 = __Pyx_PyObject_GetAttrStr(__pyx_v_fhd, __pyx_n_s_write); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 260, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_5);
-      __pyx_t_2 = PyTuple_New(8); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 259, __pyx_L1_error)
+      __pyx_t_2 = PyTuple_New(8); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 260, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_2);
       __pyx_t_16 = 0;
       __pyx_t_17 = 127;
       if (unlikely(__pyx_v_chrom == Py_None)) {
         PyErr_Format(PyExc_AttributeError, "'NoneType' object has no attribute '%.30s'", "decode");
-        __PYX_ERR(0, 259, __pyx_L1_error)
+        __PYX_ERR(0, 260, __pyx_L1_error)
       }
-      __pyx_t_10 = __Pyx_decode_bytes(__pyx_v_chrom, 0, PY_SSIZE_T_MAX, NULL, NULL, NULL); if (unlikely(!__pyx_t_10)) __PYX_ERR(0, 259, __pyx_L1_error)
+      __pyx_t_10 = __Pyx_decode_bytes(__pyx_v_chrom, 0, PY_SSIZE_T_MAX, NULL, NULL, NULL); if (unlikely(!__pyx_t_10)) __PYX_ERR(0, 260, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_10);
       __pyx_t_17 = (__Pyx_PyUnicode_MAX_CHAR_VALUE(__pyx_t_10) > __pyx_t_17) ? __Pyx_PyUnicode_MAX_CHAR_VALUE(__pyx_t_10) : __pyx_t_17;
       __pyx_t_16 += __Pyx_PyUnicode_GET_LENGTH(__pyx_t_10);
@@ -5059,7 +5299,7 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_14write_bedGraph
       __pyx_t_16 += 1;
       __Pyx_GIVEREF(__pyx_kp_u__3);
       PyTuple_SET_ITEM(__pyx_t_2, 1, __pyx_kp_u__3);
-      __pyx_t_10 = __Pyx_PyUnicode_From_int(__pyx_v_pre, 0, ' ', 'd'); if (unlikely(!__pyx_t_10)) __PYX_ERR(0, 259, __pyx_L1_error)
+      __pyx_t_10 = __Pyx_PyUnicode_From_int(__pyx_v_pre, 0, ' ', 'd'); if (unlikely(!__pyx_t_10)) __PYX_ERR(0, 260, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_10);
       __pyx_t_16 += __Pyx_PyUnicode_GET_LENGTH(__pyx_t_10);
       __Pyx_GIVEREF(__pyx_t_10);
@@ -5069,7 +5309,7 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_14write_bedGraph
       __pyx_t_16 += 1;
       __Pyx_GIVEREF(__pyx_kp_u__3);
       PyTuple_SET_ITEM(__pyx_t_2, 3, __pyx_kp_u__3);
-      __pyx_t_10 = __Pyx_PyUnicode_From_int(__pyx_v_pos, 0, ' ', 'd'); if (unlikely(!__pyx_t_10)) __PYX_ERR(0, 259, __pyx_L1_error)
+      __pyx_t_10 = __Pyx_PyUnicode_From_int(__pyx_v_pos, 0, ' ', 'd'); if (unlikely(!__pyx_t_10)) __PYX_ERR(0, 260, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_10);
       __pyx_t_16 += __Pyx_PyUnicode_GET_LENGTH(__pyx_t_10);
       __Pyx_GIVEREF(__pyx_t_10);
@@ -5079,9 +5319,9 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_14write_bedGraph
       __pyx_t_16 += 1;
       __Pyx_GIVEREF(__pyx_kp_u__3);
       PyTuple_SET_ITEM(__pyx_t_2, 5, __pyx_kp_u__3);
-      __pyx_t_10 = PyFloat_FromDouble(__pyx_v_value); if (unlikely(!__pyx_t_10)) __PYX_ERR(0, 259, __pyx_L1_error)
+      __pyx_t_10 = PyFloat_FromDouble(__pyx_v_value); if (unlikely(!__pyx_t_10)) __PYX_ERR(0, 260, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_10);
-      __pyx_t_18 = __Pyx_PyObject_Format(__pyx_t_10, __pyx_kp_u_5f); if (unlikely(!__pyx_t_18)) __PYX_ERR(0, 259, __pyx_L1_error)
+      __pyx_t_18 = __Pyx_PyObject_Format(__pyx_t_10, __pyx_kp_u_5f); if (unlikely(!__pyx_t_18)) __PYX_ERR(0, 260, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_18);
       __Pyx_DECREF(__pyx_t_10); __pyx_t_10 = 0;
       __pyx_t_17 = (__Pyx_PyUnicode_MAX_CHAR_VALUE(__pyx_t_18) > __pyx_t_17) ? __Pyx_PyUnicode_MAX_CHAR_VALUE(__pyx_t_18) : __pyx_t_17;
@@ -5093,7 +5333,7 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_14write_bedGraph
       __pyx_t_16 += 1;
       __Pyx_GIVEREF(__pyx_kp_u__4);
       PyTuple_SET_ITEM(__pyx_t_2, 7, __pyx_kp_u__4);
-      __pyx_t_18 = __Pyx_PyUnicode_Join(__pyx_t_2, 8, __pyx_t_16, __pyx_t_17); if (unlikely(!__pyx_t_18)) __PYX_ERR(0, 259, __pyx_L1_error)
+      __pyx_t_18 = __Pyx_PyUnicode_Join(__pyx_t_2, 8, __pyx_t_16, __pyx_t_17); if (unlikely(!__pyx_t_18)) __PYX_ERR(0, 260, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_18);
       __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
       __pyx_t_2 = NULL;
@@ -5109,12 +5349,12 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_14write_bedGraph
       __pyx_t_3 = (__pyx_t_2) ? __Pyx_PyObject_Call2Args(__pyx_t_5, __pyx_t_2, __pyx_t_18) : __Pyx_PyObject_CallOneArg(__pyx_t_5, __pyx_t_18);
       __Pyx_XDECREF(__pyx_t_2); __pyx_t_2 = 0;
       __Pyx_DECREF(__pyx_t_18); __pyx_t_18 = 0;
-      if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 259, __pyx_L1_error)
+      if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 260, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_3);
       __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
       __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
 
-      /* "MACS2/IO/BedGraph.pyx":260
+      /* "MACS2/IO/BedGraph.pyx":261
  *                 # never write baseline_value
  *                 fhd.write("%s\t%d\t%d\t%.5f\n" % (chrom.decode(),pre,pos,value))
  *                 pre = pos             # <<<<<<<<<<<<<<
@@ -5126,7 +5366,7 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_14write_bedGraph
   }
   __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
 
-  /* "MACS2/IO/BedGraph.pyx":230
+  /* "MACS2/IO/BedGraph.pyx":231
  *         return set(sorted(self.__data.keys()))
  * 
  *     def write_bedGraph (self, fhd, str name, str description, bool trackline=True):             # <<<<<<<<<<<<<<
@@ -5155,11 +5395,12 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_14write_bedGraph
   __Pyx_XDECREF(__pyx_v_pnext);
   __Pyx_XDECREF(__pyx_v_vnext);
   __Pyx_XGIVEREF(__pyx_r);
+  __Pyx_TraceReturn(__pyx_r, 0);
   __Pyx_RefNannyFinishContext();
   return __pyx_r;
 }
 
-/* "MACS2/IO/BedGraph.pyx":262
+/* "MACS2/IO/BedGraph.pyx":263
  *                 pre = pos
  * 
  *     def reset_baseline (self, double baseline_value):             # <<<<<<<<<<<<<<
@@ -5176,7 +5417,7 @@ static PyObject *__pyx_pw_5MACS2_2IO_8BedGraph_14bedGraphTrackI_17reset_baseline
   __Pyx_RefNannyDeclarations
   __Pyx_RefNannySetupContext("reset_baseline (wrapper)", 0);
   assert(__pyx_arg_baseline_value); {
-    __pyx_v_baseline_value = __pyx_PyFloat_AsDouble(__pyx_arg_baseline_value); if (unlikely((__pyx_v_baseline_value == (double)-1) && PyErr_Occurred())) __PYX_ERR(0, 262, __pyx_L3_error)
+    __pyx_v_baseline_value = __pyx_PyFloat_AsDouble(__pyx_arg_baseline_value); if (unlikely((__pyx_v_baseline_value == (double)-1) && PyErr_Occurred())) __PYX_ERR(0, 263, __pyx_L3_error)
   }
   goto __pyx_L4_argument_unpacking_done;
   __pyx_L3_error:;
@@ -5193,13 +5434,15 @@ static PyObject *__pyx_pw_5MACS2_2IO_8BedGraph_14bedGraphTrackI_17reset_baseline
 
 static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_16reset_baseline(struct __pyx_obj_5MACS2_2IO_8BedGraph_bedGraphTrackI *__pyx_v_self, double __pyx_v_baseline_value) {
   PyObject *__pyx_r = NULL;
+  __Pyx_TraceDeclarations
   __Pyx_RefNannyDeclarations
   PyObject *__pyx_t_1 = NULL;
   PyObject *__pyx_t_2 = NULL;
   PyObject *__pyx_t_3 = NULL;
   __Pyx_RefNannySetupContext("reset_baseline", 0);
+  __Pyx_TraceCall("reset_baseline", __pyx_f[0], 263, 0, __PYX_ERR(0, 263, __pyx_L1_error));
 
-  /* "MACS2/IO/BedGraph.pyx":269
+  /* "MACS2/IO/BedGraph.pyx":270
  * 
  *         """
  *         self.baseline_value = baseline_value             # <<<<<<<<<<<<<<
@@ -5208,35 +5451,35 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_16reset_baseline
  */
   __pyx_v_self->baseline_value = __pyx_v_baseline_value;
 
-  /* "MACS2/IO/BedGraph.pyx":270
+  /* "MACS2/IO/BedGraph.pyx":271
  *         """
  *         self.baseline_value = baseline_value
  *         self.filter_score(cutoff=baseline_value)             # <<<<<<<<<<<<<<
  *         self.merge_regions()
  * 
  */
-  __pyx_t_1 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_v_self), __pyx_n_s_filter_score); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 270, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_v_self), __pyx_n_s_filter_score); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 271, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_2 = __Pyx_PyDict_NewPresized(1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 270, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyDict_NewPresized(1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 271, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
-  __pyx_t_3 = PyFloat_FromDouble(__pyx_v_baseline_value); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 270, __pyx_L1_error)
+  __pyx_t_3 = PyFloat_FromDouble(__pyx_v_baseline_value); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 271, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
-  if (PyDict_SetItem(__pyx_t_2, __pyx_n_s_cutoff, __pyx_t_3) < 0) __PYX_ERR(0, 270, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_t_2, __pyx_n_s_cutoff, __pyx_t_3) < 0) __PYX_ERR(0, 271, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-  __pyx_t_3 = __Pyx_PyObject_Call(__pyx_t_1, __pyx_empty_tuple, __pyx_t_2); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 270, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_PyObject_Call(__pyx_t_1, __pyx_empty_tuple, __pyx_t_2); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 271, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
 
-  /* "MACS2/IO/BedGraph.pyx":271
+  /* "MACS2/IO/BedGraph.pyx":272
  *         self.baseline_value = baseline_value
  *         self.filter_score(cutoff=baseline_value)
  *         self.merge_regions()             # <<<<<<<<<<<<<<
  * 
  *     def merge_regions (self):
  */
-  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_v_self), __pyx_n_s_merge_regions); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 271, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_v_self), __pyx_n_s_merge_regions); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 272, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __pyx_t_1 = NULL;
   if (CYTHON_UNPACK_METHODS && likely(PyMethod_Check(__pyx_t_2))) {
@@ -5250,12 +5493,12 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_16reset_baseline
   }
   __pyx_t_3 = (__pyx_t_1) ? __Pyx_PyObject_CallOneArg(__pyx_t_2, __pyx_t_1) : __Pyx_PyObject_CallNoArg(__pyx_t_2);
   __Pyx_XDECREF(__pyx_t_1); __pyx_t_1 = 0;
-  if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 271, __pyx_L1_error)
+  if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 272, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
 
-  /* "MACS2/IO/BedGraph.pyx":262
+  /* "MACS2/IO/BedGraph.pyx":263
  *                 pre = pos
  * 
  *     def reset_baseline (self, double baseline_value):             # <<<<<<<<<<<<<<
@@ -5274,11 +5517,12 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_16reset_baseline
   __pyx_r = NULL;
   __pyx_L0:;
   __Pyx_XGIVEREF(__pyx_r);
+  __Pyx_TraceReturn(__pyx_r, 0);
   __Pyx_RefNannyFinishContext();
   return __pyx_r;
 }
 
-/* "MACS2/IO/BedGraph.pyx":273
+/* "MACS2/IO/BedGraph.pyx":274
  *         self.merge_regions()
  * 
  *     def merge_regions (self):             # <<<<<<<<<<<<<<
@@ -5317,6 +5561,7 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_18merge_regions(
   PyObject *__pyx_v_newpa = NULL;
   PyObject *__pyx_v_newva = NULL;
   PyObject *__pyx_r = NULL;
+  __Pyx_TraceDeclarations
   __Pyx_RefNannyDeclarations
   PyObject *__pyx_t_1 = NULL;
   Py_ssize_t __pyx_t_2;
@@ -5337,20 +5582,21 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_18merge_regions(
   int __pyx_t_17;
   int __pyx_t_18;
   __Pyx_RefNannySetupContext("merge_regions", 0);
+  __Pyx_TraceCall("merge_regions", __pyx_f[0], 274, 0, __PYX_ERR(0, 274, __pyx_L1_error));
 
-  /* "MACS2/IO/BedGraph.pyx":283
+  /* "MACS2/IO/BedGraph.pyx":284
  *             set chrs
  * 
  *         chrs = self.get_chr_names()             # <<<<<<<<<<<<<<
  *         for chrom in chrs:
  *             (p,v) = self.__data[chrom]
  */
-  __pyx_t_1 = ((struct __pyx_vtabstruct_5MACS2_2IO_8BedGraph_bedGraphTrackI *)__pyx_v_self->__pyx_vtab)->get_chr_names(__pyx_v_self, 0); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 283, __pyx_L1_error)
+  __pyx_t_1 = ((struct __pyx_vtabstruct_5MACS2_2IO_8BedGraph_bedGraphTrackI *)__pyx_v_self->__pyx_vtab)->get_chr_names(__pyx_v_self, 0); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 284, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __pyx_v_chrs = ((PyObject*)__pyx_t_1);
   __pyx_t_1 = 0;
 
-  /* "MACS2/IO/BedGraph.pyx":284
+  /* "MACS2/IO/BedGraph.pyx":285
  * 
  *         chrs = self.get_chr_names()
  *         for chrom in chrs:             # <<<<<<<<<<<<<<
@@ -5358,7 +5604,7 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_18merge_regions(
  *             pnext = iter(p).__next__
  */
   __pyx_t_2 = 0;
-  __pyx_t_5 = __Pyx_set_iterator(__pyx_v_chrs, 1, (&__pyx_t_3), (&__pyx_t_4)); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 284, __pyx_L1_error)
+  __pyx_t_5 = __Pyx_set_iterator(__pyx_v_chrs, 1, (&__pyx_t_3), (&__pyx_t_4)); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 285, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_5);
   __Pyx_XDECREF(__pyx_t_1);
   __pyx_t_1 = __pyx_t_5;
@@ -5366,13 +5612,13 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_18merge_regions(
   while (1) {
     __pyx_t_6 = __Pyx_set_iter_next(__pyx_t_1, __pyx_t_3, &__pyx_t_2, &__pyx_t_5, __pyx_t_4);
     if (unlikely(__pyx_t_6 == 0)) break;
-    if (unlikely(__pyx_t_6 == -1)) __PYX_ERR(0, 284, __pyx_L1_error)
+    if (unlikely(__pyx_t_6 == -1)) __PYX_ERR(0, 285, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_5);
-    if (!(likely(PyBytes_CheckExact(__pyx_t_5))||((__pyx_t_5) == Py_None)||(PyErr_Format(PyExc_TypeError, "Expected %.16s, got %.200s", "bytes", Py_TYPE(__pyx_t_5)->tp_name), 0))) __PYX_ERR(0, 284, __pyx_L1_error)
+    if (!(likely(PyBytes_CheckExact(__pyx_t_5))||((__pyx_t_5) == Py_None)||(PyErr_Format(PyExc_TypeError, "Expected %.16s, got %.200s", "bytes", Py_TYPE(__pyx_t_5)->tp_name), 0))) __PYX_ERR(0, 285, __pyx_L1_error)
     __Pyx_XDECREF_SET(__pyx_v_chrom, ((PyObject*)__pyx_t_5));
     __pyx_t_5 = 0;
 
-    /* "MACS2/IO/BedGraph.pyx":285
+    /* "MACS2/IO/BedGraph.pyx":286
  *         chrs = self.get_chr_names()
  *         for chrom in chrs:
  *             (p,v) = self.__data[chrom]             # <<<<<<<<<<<<<<
@@ -5381,9 +5627,9 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_18merge_regions(
  */
     if (unlikely(__pyx_v_self->__pyx___data == Py_None)) {
       PyErr_SetString(PyExc_TypeError, "'NoneType' object is not subscriptable");
-      __PYX_ERR(0, 285, __pyx_L1_error)
+      __PYX_ERR(0, 286, __pyx_L1_error)
     }
-    __pyx_t_5 = __Pyx_PyDict_GetItem(__pyx_v_self->__pyx___data, __pyx_v_chrom); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 285, __pyx_L1_error)
+    __pyx_t_5 = __Pyx_PyDict_GetItem(__pyx_v_self->__pyx___data, __pyx_v_chrom); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 286, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_5);
     if ((likely(PyTuple_CheckExact(__pyx_t_5))) || (PyList_CheckExact(__pyx_t_5))) {
       PyObject* sequence = __pyx_t_5;
@@ -5391,7 +5637,7 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_18merge_regions(
       if (unlikely(size != 2)) {
         if (size > 2) __Pyx_RaiseTooManyValuesError(2);
         else if (size >= 0) __Pyx_RaiseNeedMoreValuesError(size);
-        __PYX_ERR(0, 285, __pyx_L1_error)
+        __PYX_ERR(0, 286, __pyx_L1_error)
       }
       #if CYTHON_ASSUME_SAFE_MACROS && !CYTHON_AVOID_BORROWED_REFS
       if (likely(PyTuple_CheckExact(sequence))) {
@@ -5404,15 +5650,15 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_18merge_regions(
       __Pyx_INCREF(__pyx_t_7);
       __Pyx_INCREF(__pyx_t_8);
       #else
-      __pyx_t_7 = PySequence_ITEM(sequence, 0); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 285, __pyx_L1_error)
+      __pyx_t_7 = PySequence_ITEM(sequence, 0); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 286, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_7);
-      __pyx_t_8 = PySequence_ITEM(sequence, 1); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 285, __pyx_L1_error)
+      __pyx_t_8 = PySequence_ITEM(sequence, 1); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 286, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_8);
       #endif
       __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
     } else {
       Py_ssize_t index = -1;
-      __pyx_t_9 = PyObject_GetIter(__pyx_t_5); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 285, __pyx_L1_error)
+      __pyx_t_9 = PyObject_GetIter(__pyx_t_5); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 286, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_9);
       __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
       __pyx_t_10 = Py_TYPE(__pyx_t_9)->tp_iternext;
@@ -5420,7 +5666,7 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_18merge_regions(
       __Pyx_GOTREF(__pyx_t_7);
       index = 1; __pyx_t_8 = __pyx_t_10(__pyx_t_9); if (unlikely(!__pyx_t_8)) goto __pyx_L5_unpacking_failed;
       __Pyx_GOTREF(__pyx_t_8);
-      if (__Pyx_IternextUnpackEndCheck(__pyx_t_10(__pyx_t_9), 2) < 0) __PYX_ERR(0, 285, __pyx_L1_error)
+      if (__Pyx_IternextUnpackEndCheck(__pyx_t_10(__pyx_t_9), 2) < 0) __PYX_ERR(0, 286, __pyx_L1_error)
       __pyx_t_10 = NULL;
       __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
       goto __pyx_L6_unpacking_done;
@@ -5428,7 +5674,7 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_18merge_regions(
       __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
       __pyx_t_10 = NULL;
       if (__Pyx_IterFinish() == 0) __Pyx_RaiseNeedMoreValuesError(index);
-      __PYX_ERR(0, 285, __pyx_L1_error)
+      __PYX_ERR(0, 286, __pyx_L1_error)
       __pyx_L6_unpacking_done:;
     }
     __Pyx_XDECREF_SET(__pyx_v_p, __pyx_t_7);
@@ -5436,46 +5682,46 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_18merge_regions(
     __Pyx_XDECREF_SET(__pyx_v_v, __pyx_t_8);
     __pyx_t_8 = 0;
 
-    /* "MACS2/IO/BedGraph.pyx":286
+    /* "MACS2/IO/BedGraph.pyx":287
  *         for chrom in chrs:
  *             (p,v) = self.__data[chrom]
  *             pnext = iter(p).__next__             # <<<<<<<<<<<<<<
  *             vnext = iter(v).__next__
  * 
  */
-    __pyx_t_5 = PyObject_GetIter(__pyx_v_p); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 286, __pyx_L1_error)
+    __pyx_t_5 = PyObject_GetIter(__pyx_v_p); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 287, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_5);
-    __pyx_t_8 = __Pyx_PyObject_GetAttrStr(__pyx_t_5, __pyx_n_s_next); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 286, __pyx_L1_error)
+    __pyx_t_8 = __Pyx_PyObject_GetAttrStr(__pyx_t_5, __pyx_n_s_next); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 287, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_8);
     __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
     __Pyx_XDECREF_SET(__pyx_v_pnext, __pyx_t_8);
     __pyx_t_8 = 0;
 
-    /* "MACS2/IO/BedGraph.pyx":287
+    /* "MACS2/IO/BedGraph.pyx":288
  *             (p,v) = self.__data[chrom]
  *             pnext = iter(p).__next__
  *             vnext = iter(v).__next__             # <<<<<<<<<<<<<<
  * 
  *             # new arrays
  */
-    __pyx_t_8 = PyObject_GetIter(__pyx_v_v); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 287, __pyx_L1_error)
+    __pyx_t_8 = PyObject_GetIter(__pyx_v_v); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 288, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_8);
-    __pyx_t_5 = __Pyx_PyObject_GetAttrStr(__pyx_t_8, __pyx_n_s_next); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 287, __pyx_L1_error)
+    __pyx_t_5 = __Pyx_PyObject_GetAttrStr(__pyx_t_8, __pyx_n_s_next); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 288, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_5);
     __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
     __Pyx_XDECREF_SET(__pyx_v_vnext, __pyx_t_5);
     __pyx_t_5 = 0;
 
-    /* "MACS2/IO/BedGraph.pyx":290
+    /* "MACS2/IO/BedGraph.pyx":291
  * 
  *             # new arrays
  *             new_pos = array(BYTE4,[pnext(),])             # <<<<<<<<<<<<<<
  *             new_value = array(FBYTE4,[vnext(),])
  * 
  */
-    __Pyx_GetModuleGlobalName(__pyx_t_8, __pyx_n_s_array); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 290, __pyx_L1_error)
+    __Pyx_GetModuleGlobalName(__pyx_t_8, __pyx_n_s_array); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 291, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_8);
-    __Pyx_GetModuleGlobalName(__pyx_t_7, __pyx_n_s_BYTE4); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 290, __pyx_L1_error)
+    __Pyx_GetModuleGlobalName(__pyx_t_7, __pyx_n_s_BYTE4); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 291, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_7);
     __Pyx_INCREF(__pyx_v_pnext);
     __pyx_t_11 = __pyx_v_pnext; __pyx_t_12 = NULL;
@@ -5490,10 +5736,10 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_18merge_regions(
     }
     __pyx_t_9 = (__pyx_t_12) ? __Pyx_PyObject_CallOneArg(__pyx_t_11, __pyx_t_12) : __Pyx_PyObject_CallNoArg(__pyx_t_11);
     __Pyx_XDECREF(__pyx_t_12); __pyx_t_12 = 0;
-    if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 290, __pyx_L1_error)
+    if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 291, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_9);
     __Pyx_DECREF(__pyx_t_11); __pyx_t_11 = 0;
-    __pyx_t_11 = PyList_New(1); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 290, __pyx_L1_error)
+    __pyx_t_11 = PyList_New(1); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 291, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_11);
     __Pyx_GIVEREF(__pyx_t_9);
     PyList_SET_ITEM(__pyx_t_11, 0, __pyx_t_9);
@@ -5513,7 +5759,7 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_18merge_regions(
     #if CYTHON_FAST_PYCALL
     if (PyFunction_Check(__pyx_t_8)) {
       PyObject *__pyx_temp[3] = {__pyx_t_9, __pyx_t_7, __pyx_t_11};
-      __pyx_t_5 = __Pyx_PyFunction_FastCall(__pyx_t_8, __pyx_temp+1-__pyx_t_6, 2+__pyx_t_6); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 290, __pyx_L1_error)
+      __pyx_t_5 = __Pyx_PyFunction_FastCall(__pyx_t_8, __pyx_temp+1-__pyx_t_6, 2+__pyx_t_6); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 291, __pyx_L1_error)
       __Pyx_XDECREF(__pyx_t_9); __pyx_t_9 = 0;
       __Pyx_GOTREF(__pyx_t_5);
       __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
@@ -5523,7 +5769,7 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_18merge_regions(
     #if CYTHON_FAST_PYCCALL
     if (__Pyx_PyFastCFunction_Check(__pyx_t_8)) {
       PyObject *__pyx_temp[3] = {__pyx_t_9, __pyx_t_7, __pyx_t_11};
-      __pyx_t_5 = __Pyx_PyCFunction_FastCall(__pyx_t_8, __pyx_temp+1-__pyx_t_6, 2+__pyx_t_6); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 290, __pyx_L1_error)
+      __pyx_t_5 = __Pyx_PyCFunction_FastCall(__pyx_t_8, __pyx_temp+1-__pyx_t_6, 2+__pyx_t_6); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 291, __pyx_L1_error)
       __Pyx_XDECREF(__pyx_t_9); __pyx_t_9 = 0;
       __Pyx_GOTREF(__pyx_t_5);
       __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
@@ -5531,7 +5777,7 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_18merge_regions(
     } else
     #endif
     {
-      __pyx_t_12 = PyTuple_New(2+__pyx_t_6); if (unlikely(!__pyx_t_12)) __PYX_ERR(0, 290, __pyx_L1_error)
+      __pyx_t_12 = PyTuple_New(2+__pyx_t_6); if (unlikely(!__pyx_t_12)) __PYX_ERR(0, 291, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_12);
       if (__pyx_t_9) {
         __Pyx_GIVEREF(__pyx_t_9); PyTuple_SET_ITEM(__pyx_t_12, 0, __pyx_t_9); __pyx_t_9 = NULL;
@@ -5542,7 +5788,7 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_18merge_regions(
       PyTuple_SET_ITEM(__pyx_t_12, 1+__pyx_t_6, __pyx_t_11);
       __pyx_t_7 = 0;
       __pyx_t_11 = 0;
-      __pyx_t_5 = __Pyx_PyObject_Call(__pyx_t_8, __pyx_t_12, NULL); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 290, __pyx_L1_error)
+      __pyx_t_5 = __Pyx_PyObject_Call(__pyx_t_8, __pyx_t_12, NULL); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 291, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_5);
       __Pyx_DECREF(__pyx_t_12); __pyx_t_12 = 0;
     }
@@ -5550,16 +5796,16 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_18merge_regions(
     __Pyx_XDECREF_SET(__pyx_v_new_pos, __pyx_t_5);
     __pyx_t_5 = 0;
 
-    /* "MACS2/IO/BedGraph.pyx":291
+    /* "MACS2/IO/BedGraph.pyx":292
  *             # new arrays
  *             new_pos = array(BYTE4,[pnext(),])
  *             new_value = array(FBYTE4,[vnext(),])             # <<<<<<<<<<<<<<
  * 
  *             newpa = new_pos.append
  */
-    __Pyx_GetModuleGlobalName(__pyx_t_8, __pyx_n_s_array); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 291, __pyx_L1_error)
+    __Pyx_GetModuleGlobalName(__pyx_t_8, __pyx_n_s_array); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 292, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_8);
-    __Pyx_GetModuleGlobalName(__pyx_t_12, __pyx_n_s_FBYTE4); if (unlikely(!__pyx_t_12)) __PYX_ERR(0, 291, __pyx_L1_error)
+    __Pyx_GetModuleGlobalName(__pyx_t_12, __pyx_n_s_FBYTE4); if (unlikely(!__pyx_t_12)) __PYX_ERR(0, 292, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_12);
     __Pyx_INCREF(__pyx_v_vnext);
     __pyx_t_7 = __pyx_v_vnext; __pyx_t_9 = NULL;
@@ -5574,10 +5820,10 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_18merge_regions(
     }
     __pyx_t_11 = (__pyx_t_9) ? __Pyx_PyObject_CallOneArg(__pyx_t_7, __pyx_t_9) : __Pyx_PyObject_CallNoArg(__pyx_t_7);
     __Pyx_XDECREF(__pyx_t_9); __pyx_t_9 = 0;
-    if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 291, __pyx_L1_error)
+    if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 292, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_11);
     __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
-    __pyx_t_7 = PyList_New(1); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 291, __pyx_L1_error)
+    __pyx_t_7 = PyList_New(1); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 292, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_7);
     __Pyx_GIVEREF(__pyx_t_11);
     PyList_SET_ITEM(__pyx_t_7, 0, __pyx_t_11);
@@ -5597,7 +5843,7 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_18merge_regions(
     #if CYTHON_FAST_PYCALL
     if (PyFunction_Check(__pyx_t_8)) {
       PyObject *__pyx_temp[3] = {__pyx_t_11, __pyx_t_12, __pyx_t_7};
-      __pyx_t_5 = __Pyx_PyFunction_FastCall(__pyx_t_8, __pyx_temp+1-__pyx_t_6, 2+__pyx_t_6); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 291, __pyx_L1_error)
+      __pyx_t_5 = __Pyx_PyFunction_FastCall(__pyx_t_8, __pyx_temp+1-__pyx_t_6, 2+__pyx_t_6); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 292, __pyx_L1_error)
       __Pyx_XDECREF(__pyx_t_11); __pyx_t_11 = 0;
       __Pyx_GOTREF(__pyx_t_5);
       __Pyx_DECREF(__pyx_t_12); __pyx_t_12 = 0;
@@ -5607,7 +5853,7 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_18merge_regions(
     #if CYTHON_FAST_PYCCALL
     if (__Pyx_PyFastCFunction_Check(__pyx_t_8)) {
       PyObject *__pyx_temp[3] = {__pyx_t_11, __pyx_t_12, __pyx_t_7};
-      __pyx_t_5 = __Pyx_PyCFunction_FastCall(__pyx_t_8, __pyx_temp+1-__pyx_t_6, 2+__pyx_t_6); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 291, __pyx_L1_error)
+      __pyx_t_5 = __Pyx_PyCFunction_FastCall(__pyx_t_8, __pyx_temp+1-__pyx_t_6, 2+__pyx_t_6); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 292, __pyx_L1_error)
       __Pyx_XDECREF(__pyx_t_11); __pyx_t_11 = 0;
       __Pyx_GOTREF(__pyx_t_5);
       __Pyx_DECREF(__pyx_t_12); __pyx_t_12 = 0;
@@ -5615,7 +5861,7 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_18merge_regions(
     } else
     #endif
     {
-      __pyx_t_9 = PyTuple_New(2+__pyx_t_6); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 291, __pyx_L1_error)
+      __pyx_t_9 = PyTuple_New(2+__pyx_t_6); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 292, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_9);
       if (__pyx_t_11) {
         __Pyx_GIVEREF(__pyx_t_11); PyTuple_SET_ITEM(__pyx_t_9, 0, __pyx_t_11); __pyx_t_11 = NULL;
@@ -5626,7 +5872,7 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_18merge_regions(
       PyTuple_SET_ITEM(__pyx_t_9, 1+__pyx_t_6, __pyx_t_7);
       __pyx_t_12 = 0;
       __pyx_t_7 = 0;
-      __pyx_t_5 = __Pyx_PyObject_Call(__pyx_t_8, __pyx_t_9, NULL); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 291, __pyx_L1_error)
+      __pyx_t_5 = __Pyx_PyObject_Call(__pyx_t_8, __pyx_t_9, NULL); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 292, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_5);
       __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
     }
@@ -5634,69 +5880,69 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_18merge_regions(
     __Pyx_XDECREF_SET(__pyx_v_new_value, __pyx_t_5);
     __pyx_t_5 = 0;
 
-    /* "MACS2/IO/BedGraph.pyx":293
+    /* "MACS2/IO/BedGraph.pyx":294
  *             new_value = array(FBYTE4,[vnext(),])
  * 
  *             newpa = new_pos.append             # <<<<<<<<<<<<<<
  *             newva = new_value.append
  * 
  */
-    __pyx_t_5 = __Pyx_PyObject_GetAttrStr(__pyx_v_new_pos, __pyx_n_s_append); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 293, __pyx_L1_error)
+    __pyx_t_5 = __Pyx_PyObject_GetAttrStr(__pyx_v_new_pos, __pyx_n_s_append); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 294, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_5);
     __Pyx_XDECREF_SET(__pyx_v_newpa, __pyx_t_5);
     __pyx_t_5 = 0;
 
-    /* "MACS2/IO/BedGraph.pyx":294
+    /* "MACS2/IO/BedGraph.pyx":295
  * 
  *             newpa = new_pos.append
  *             newva = new_value.append             # <<<<<<<<<<<<<<
  * 
  *             new_pre_pos = new_pos[0]
  */
-    __pyx_t_5 = __Pyx_PyObject_GetAttrStr(__pyx_v_new_value, __pyx_n_s_append); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 294, __pyx_L1_error)
+    __pyx_t_5 = __Pyx_PyObject_GetAttrStr(__pyx_v_new_value, __pyx_n_s_append); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 295, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_5);
     __Pyx_XDECREF_SET(__pyx_v_newva, __pyx_t_5);
     __pyx_t_5 = 0;
 
-    /* "MACS2/IO/BedGraph.pyx":296
+    /* "MACS2/IO/BedGraph.pyx":297
  *             newva = new_value.append
  * 
  *             new_pre_pos = new_pos[0]             # <<<<<<<<<<<<<<
  *             new_pre_value = new_value[0]
  * 
  */
-    __pyx_t_5 = __Pyx_GetItemInt(__pyx_v_new_pos, 0, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 296, __pyx_L1_error)
+    __pyx_t_5 = __Pyx_GetItemInt(__pyx_v_new_pos, 0, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 297, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_5);
-    __pyx_t_6 = __Pyx_PyInt_As_int(__pyx_t_5); if (unlikely((__pyx_t_6 == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 296, __pyx_L1_error)
+    __pyx_t_6 = __Pyx_PyInt_As_int(__pyx_t_5); if (unlikely((__pyx_t_6 == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 297, __pyx_L1_error)
     __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
     __pyx_v_new_pre_pos = __pyx_t_6;
 
-    /* "MACS2/IO/BedGraph.pyx":297
+    /* "MACS2/IO/BedGraph.pyx":298
  * 
  *             new_pre_pos = new_pos[0]
  *             new_pre_value = new_value[0]             # <<<<<<<<<<<<<<
  * 
  *             for i in xrange(1,len(p)):
  */
-    __pyx_t_5 = __Pyx_GetItemInt(__pyx_v_new_value, 0, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 297, __pyx_L1_error)
+    __pyx_t_5 = __Pyx_GetItemInt(__pyx_v_new_value, 0, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 298, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_5);
-    __pyx_t_13 = __pyx_PyFloat_AsDouble(__pyx_t_5); if (unlikely((__pyx_t_13 == (double)-1) && PyErr_Occurred())) __PYX_ERR(0, 297, __pyx_L1_error)
+    __pyx_t_13 = __pyx_PyFloat_AsDouble(__pyx_t_5); if (unlikely((__pyx_t_13 == (double)-1) && PyErr_Occurred())) __PYX_ERR(0, 298, __pyx_L1_error)
     __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
     __pyx_v_new_pre_value = __pyx_t_13;
 
-    /* "MACS2/IO/BedGraph.pyx":299
+    /* "MACS2/IO/BedGraph.pyx":300
  *             new_pre_value = new_value[0]
  * 
  *             for i in xrange(1,len(p)):             # <<<<<<<<<<<<<<
  *                 pos = pnext()
  *                 value = vnext()
  */
-    __pyx_t_14 = PyObject_Length(__pyx_v_p); if (unlikely(__pyx_t_14 == ((Py_ssize_t)-1))) __PYX_ERR(0, 299, __pyx_L1_error)
+    __pyx_t_14 = PyObject_Length(__pyx_v_p); if (unlikely(__pyx_t_14 == ((Py_ssize_t)-1))) __PYX_ERR(0, 300, __pyx_L1_error)
     __pyx_t_15 = __pyx_t_14;
     for (__pyx_t_6 = 1; __pyx_t_6 < __pyx_t_15; __pyx_t_6+=1) {
       __pyx_v_i = __pyx_t_6;
 
-      /* "MACS2/IO/BedGraph.pyx":300
+      /* "MACS2/IO/BedGraph.pyx":301
  * 
  *             for i in xrange(1,len(p)):
  *                 pos = pnext()             # <<<<<<<<<<<<<<
@@ -5716,14 +5962,14 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_18merge_regions(
       }
       __pyx_t_5 = (__pyx_t_9) ? __Pyx_PyObject_CallOneArg(__pyx_t_8, __pyx_t_9) : __Pyx_PyObject_CallNoArg(__pyx_t_8);
       __Pyx_XDECREF(__pyx_t_9); __pyx_t_9 = 0;
-      if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 300, __pyx_L1_error)
+      if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 301, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_5);
       __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
-      __pyx_t_16 = __Pyx_PyInt_As_int(__pyx_t_5); if (unlikely((__pyx_t_16 == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 300, __pyx_L1_error)
+      __pyx_t_16 = __Pyx_PyInt_As_int(__pyx_t_5); if (unlikely((__pyx_t_16 == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 301, __pyx_L1_error)
       __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
       __pyx_v_pos = __pyx_t_16;
 
-      /* "MACS2/IO/BedGraph.pyx":301
+      /* "MACS2/IO/BedGraph.pyx":302
  *             for i in xrange(1,len(p)):
  *                 pos = pnext()
  *                 value = vnext()             # <<<<<<<<<<<<<<
@@ -5743,14 +5989,14 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_18merge_regions(
       }
       __pyx_t_5 = (__pyx_t_9) ? __Pyx_PyObject_CallOneArg(__pyx_t_8, __pyx_t_9) : __Pyx_PyObject_CallNoArg(__pyx_t_8);
       __Pyx_XDECREF(__pyx_t_9); __pyx_t_9 = 0;
-      if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 301, __pyx_L1_error)
+      if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 302, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_5);
       __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
-      __pyx_t_13 = __pyx_PyFloat_AsDouble(__pyx_t_5); if (unlikely((__pyx_t_13 == (double)-1) && PyErr_Occurred())) __PYX_ERR(0, 301, __pyx_L1_error)
+      __pyx_t_13 = __pyx_PyFloat_AsDouble(__pyx_t_5); if (unlikely((__pyx_t_13 == (double)-1) && PyErr_Occurred())) __PYX_ERR(0, 302, __pyx_L1_error)
       __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
       __pyx_v_value = __pyx_t_13;
 
-      /* "MACS2/IO/BedGraph.pyx":302
+      /* "MACS2/IO/BedGraph.pyx":303
  *                 pos = pnext()
  *                 value = vnext()
  *                 if value == new_pre_value:             # <<<<<<<<<<<<<<
@@ -5760,19 +6006,19 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_18merge_regions(
       __pyx_t_17 = ((__pyx_v_value == __pyx_v_new_pre_value) != 0);
       if (__pyx_t_17) {
 
-        /* "MACS2/IO/BedGraph.pyx":303
+        /* "MACS2/IO/BedGraph.pyx":304
  *                 value = vnext()
  *                 if value == new_pre_value:
  *                     new_pos[-1] = pos             # <<<<<<<<<<<<<<
  *                 else:
  *                     # add new region
  */
-        __pyx_t_5 = __Pyx_PyInt_From_int(__pyx_v_pos); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 303, __pyx_L1_error)
+        __pyx_t_5 = __Pyx_PyInt_From_int(__pyx_v_pos); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 304, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_5);
-        if (unlikely(__Pyx_SetItemInt(__pyx_v_new_pos, -1L, __pyx_t_5, long, 1, __Pyx_PyInt_From_long, 0, 1, 1) < 0)) __PYX_ERR(0, 303, __pyx_L1_error)
+        if (unlikely(__Pyx_SetItemInt(__pyx_v_new_pos, -1L, __pyx_t_5, long, 1, __Pyx_PyInt_From_long, 0, 1, 1) < 0)) __PYX_ERR(0, 304, __pyx_L1_error)
         __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
 
-        /* "MACS2/IO/BedGraph.pyx":302
+        /* "MACS2/IO/BedGraph.pyx":303
  *                 pos = pnext()
  *                 value = vnext()
  *                 if value == new_pre_value:             # <<<<<<<<<<<<<<
@@ -5782,7 +6028,7 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_18merge_regions(
         goto __pyx_L9;
       }
 
-      /* "MACS2/IO/BedGraph.pyx":306
+      /* "MACS2/IO/BedGraph.pyx":307
  *                 else:
  *                     # add new region
  *                     newpa(pos)             # <<<<<<<<<<<<<<
@@ -5791,39 +6037,39 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_18merge_regions(
  */
       /*else*/ {
 
-        /* "MACS2/IO/BedGraph.pyx":293
+        /* "MACS2/IO/BedGraph.pyx":294
  *             new_value = array(FBYTE4,[vnext(),])
  * 
  *             newpa = new_pos.append             # <<<<<<<<<<<<<<
  *             newva = new_value.append
  * 
  */
-        __pyx_t_5 = __Pyx_PyInt_From_int(__pyx_v_pos); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 306, __pyx_L1_error)
+        __pyx_t_5 = __Pyx_PyInt_From_int(__pyx_v_pos); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 307, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_5);
 
-        /* "MACS2/IO/BedGraph.pyx":306
+        /* "MACS2/IO/BedGraph.pyx":307
  *                 else:
  *                     # add new region
  *                     newpa(pos)             # <<<<<<<<<<<<<<
  *                     newva(value)
  *                     new_pre_pos = pos
  */
-        __pyx_t_18 = __Pyx_PyObject_Append(__pyx_v_new_pos, __pyx_t_5); if (unlikely(__pyx_t_18 == ((int)-1))) __PYX_ERR(0, 306, __pyx_L1_error)
+        __pyx_t_18 = __Pyx_PyObject_Append(__pyx_v_new_pos, __pyx_t_5); if (unlikely(__pyx_t_18 == ((int)-1))) __PYX_ERR(0, 307, __pyx_L1_error)
         __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
 
-        /* "MACS2/IO/BedGraph.pyx":307
+        /* "MACS2/IO/BedGraph.pyx":308
  *                     # add new region
  *                     newpa(pos)
  *                     newva(value)             # <<<<<<<<<<<<<<
  *                     new_pre_pos = pos
  *                     new_pre_value = value
  */
-        __pyx_t_5 = PyFloat_FromDouble(__pyx_v_value); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 307, __pyx_L1_error)
+        __pyx_t_5 = PyFloat_FromDouble(__pyx_v_value); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 308, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_5);
-        __pyx_t_18 = __Pyx_PyObject_Append(__pyx_v_new_value, __pyx_t_5); if (unlikely(__pyx_t_18 == ((int)-1))) __PYX_ERR(0, 307, __pyx_L1_error)
+        __pyx_t_18 = __Pyx_PyObject_Append(__pyx_v_new_value, __pyx_t_5); if (unlikely(__pyx_t_18 == ((int)-1))) __PYX_ERR(0, 308, __pyx_L1_error)
         __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
 
-        /* "MACS2/IO/BedGraph.pyx":308
+        /* "MACS2/IO/BedGraph.pyx":309
  *                     newpa(pos)
  *                     newva(value)
  *                     new_pre_pos = pos             # <<<<<<<<<<<<<<
@@ -5832,7 +6078,7 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_18merge_regions(
  */
         __pyx_v_new_pre_pos = __pyx_v_pos;
 
-        /* "MACS2/IO/BedGraph.pyx":309
+        /* "MACS2/IO/BedGraph.pyx":310
  *                     newva(value)
  *                     new_pre_pos = pos
  *                     new_pre_value = value             # <<<<<<<<<<<<<<
@@ -5844,14 +6090,14 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_18merge_regions(
       __pyx_L9:;
     }
 
-    /* "MACS2/IO/BedGraph.pyx":310
+    /* "MACS2/IO/BedGraph.pyx":311
  *                     new_pre_pos = pos
  *                     new_pre_value = value
  *             self.__data[chrom] = [new_pos,new_value]             # <<<<<<<<<<<<<<
  *         return True
  * 
  */
-    __pyx_t_5 = PyList_New(2); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 310, __pyx_L1_error)
+    __pyx_t_5 = PyList_New(2); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 311, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_5);
     __Pyx_INCREF(__pyx_v_new_pos);
     __Pyx_GIVEREF(__pyx_v_new_pos);
@@ -5861,14 +6107,14 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_18merge_regions(
     PyList_SET_ITEM(__pyx_t_5, 1, __pyx_v_new_value);
     if (unlikely(__pyx_v_self->__pyx___data == Py_None)) {
       PyErr_SetString(PyExc_TypeError, "'NoneType' object is not subscriptable");
-      __PYX_ERR(0, 310, __pyx_L1_error)
+      __PYX_ERR(0, 311, __pyx_L1_error)
     }
-    if (unlikely(PyDict_SetItem(__pyx_v_self->__pyx___data, __pyx_v_chrom, __pyx_t_5) < 0)) __PYX_ERR(0, 310, __pyx_L1_error)
+    if (unlikely(PyDict_SetItem(__pyx_v_self->__pyx___data, __pyx_v_chrom, __pyx_t_5) < 0)) __PYX_ERR(0, 311, __pyx_L1_error)
     __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
   }
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-  /* "MACS2/IO/BedGraph.pyx":311
+  /* "MACS2/IO/BedGraph.pyx":312
  *                     new_pre_value = value
  *             self.__data[chrom] = [new_pos,new_value]
  *         return True             # <<<<<<<<<<<<<<
@@ -5880,7 +6126,7 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_18merge_regions(
   __pyx_r = Py_True;
   goto __pyx_L0;
 
-  /* "MACS2/IO/BedGraph.pyx":273
+  /* "MACS2/IO/BedGraph.pyx":274
  *         self.merge_regions()
  * 
  *     def merge_regions (self):             # <<<<<<<<<<<<<<
@@ -5911,11 +6157,12 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_18merge_regions(
   __Pyx_XDECREF(__pyx_v_newpa);
   __Pyx_XDECREF(__pyx_v_newva);
   __Pyx_XGIVEREF(__pyx_r);
+  __Pyx_TraceReturn(__pyx_r, 0);
   __Pyx_RefNannyFinishContext();
   return __pyx_r;
 }
 
-/* "MACS2/IO/BedGraph.pyx":313
+/* "MACS2/IO/BedGraph.pyx":314
  *         return True
  * 
  *     def filter_score (self, double cutoff=0):             # <<<<<<<<<<<<<<
@@ -5952,7 +6199,7 @@ static PyObject *__pyx_pw_5MACS2_2IO_8BedGraph_14bedGraphTrackI_21filter_score(P
         }
       }
       if (unlikely(kw_args > 0)) {
-        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "filter_score") < 0)) __PYX_ERR(0, 313, __pyx_L3_error)
+        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "filter_score") < 0)) __PYX_ERR(0, 314, __pyx_L3_error)
       }
     } else {
       switch (PyTuple_GET_SIZE(__pyx_args)) {
@@ -5963,14 +6210,14 @@ static PyObject *__pyx_pw_5MACS2_2IO_8BedGraph_14bedGraphTrackI_21filter_score(P
       }
     }
     if (values[0]) {
-      __pyx_v_cutoff = __pyx_PyFloat_AsDouble(values[0]); if (unlikely((__pyx_v_cutoff == (double)-1) && PyErr_Occurred())) __PYX_ERR(0, 313, __pyx_L3_error)
+      __pyx_v_cutoff = __pyx_PyFloat_AsDouble(values[0]); if (unlikely((__pyx_v_cutoff == (double)-1) && PyErr_Occurred())) __PYX_ERR(0, 314, __pyx_L3_error)
     } else {
       __pyx_v_cutoff = ((double)0.0);
     }
   }
   goto __pyx_L4_argument_unpacking_done;
   __pyx_L5_argtuple_error:;
-  __Pyx_RaiseArgtupleInvalid("filter_score", 0, 0, 1, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 313, __pyx_L3_error)
+  __Pyx_RaiseArgtupleInvalid("filter_score", 0, 0, 1, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 314, __pyx_L3_error)
   __pyx_L3_error:;
   __Pyx_AddTraceback("MACS2.IO.BedGraph.bedGraphTrackI.filter_score", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __Pyx_RefNannyFinishContext();
@@ -5998,6 +6245,7 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_20filter_score(s
   PyObject *__pyx_v_new_pos = NULL;
   PyObject *__pyx_v_new_value = NULL;
   PyObject *__pyx_r = NULL;
+  __Pyx_TraceDeclarations
   __Pyx_RefNannyDeclarations
   PyObject *__pyx_t_1 = NULL;
   Py_ssize_t __pyx_t_2;
@@ -6018,20 +6266,21 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_20filter_score(s
   int __pyx_t_17;
   int __pyx_t_18;
   __Pyx_RefNannySetupContext("filter_score", 0);
+  __Pyx_TraceCall("filter_score", __pyx_f[0], 314, 0, __PYX_ERR(0, 314, __pyx_L1_error));
 
-  /* "MACS2/IO/BedGraph.pyx":325
+  /* "MACS2/IO/BedGraph.pyx":326
  *             set chrs
  * 
  *         chrs = self.get_chr_names()             # <<<<<<<<<<<<<<
  *         for chrom in chrs:
  *             (p,v) = self.__data[chrom]
  */
-  __pyx_t_1 = ((struct __pyx_vtabstruct_5MACS2_2IO_8BedGraph_bedGraphTrackI *)__pyx_v_self->__pyx_vtab)->get_chr_names(__pyx_v_self, 0); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 325, __pyx_L1_error)
+  __pyx_t_1 = ((struct __pyx_vtabstruct_5MACS2_2IO_8BedGraph_bedGraphTrackI *)__pyx_v_self->__pyx_vtab)->get_chr_names(__pyx_v_self, 0); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 326, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __pyx_v_chrs = ((PyObject*)__pyx_t_1);
   __pyx_t_1 = 0;
 
-  /* "MACS2/IO/BedGraph.pyx":326
+  /* "MACS2/IO/BedGraph.pyx":327
  * 
  *         chrs = self.get_chr_names()
  *         for chrom in chrs:             # <<<<<<<<<<<<<<
@@ -6039,7 +6288,7 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_20filter_score(s
  *             pnext = iter(p).__next__
  */
   __pyx_t_2 = 0;
-  __pyx_t_5 = __Pyx_set_iterator(__pyx_v_chrs, 1, (&__pyx_t_3), (&__pyx_t_4)); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 326, __pyx_L1_error)
+  __pyx_t_5 = __Pyx_set_iterator(__pyx_v_chrs, 1, (&__pyx_t_3), (&__pyx_t_4)); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 327, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_5);
   __Pyx_XDECREF(__pyx_t_1);
   __pyx_t_1 = __pyx_t_5;
@@ -6047,13 +6296,13 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_20filter_score(s
   while (1) {
     __pyx_t_6 = __Pyx_set_iter_next(__pyx_t_1, __pyx_t_3, &__pyx_t_2, &__pyx_t_5, __pyx_t_4);
     if (unlikely(__pyx_t_6 == 0)) break;
-    if (unlikely(__pyx_t_6 == -1)) __PYX_ERR(0, 326, __pyx_L1_error)
+    if (unlikely(__pyx_t_6 == -1)) __PYX_ERR(0, 327, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_5);
-    if (!(likely(PyBytes_CheckExact(__pyx_t_5))||((__pyx_t_5) == Py_None)||(PyErr_Format(PyExc_TypeError, "Expected %.16s, got %.200s", "bytes", Py_TYPE(__pyx_t_5)->tp_name), 0))) __PYX_ERR(0, 326, __pyx_L1_error)
+    if (!(likely(PyBytes_CheckExact(__pyx_t_5))||((__pyx_t_5) == Py_None)||(PyErr_Format(PyExc_TypeError, "Expected %.16s, got %.200s", "bytes", Py_TYPE(__pyx_t_5)->tp_name), 0))) __PYX_ERR(0, 327, __pyx_L1_error)
     __Pyx_XDECREF_SET(__pyx_v_chrom, ((PyObject*)__pyx_t_5));
     __pyx_t_5 = 0;
 
-    /* "MACS2/IO/BedGraph.pyx":327
+    /* "MACS2/IO/BedGraph.pyx":328
  *         chrs = self.get_chr_names()
  *         for chrom in chrs:
  *             (p,v) = self.__data[chrom]             # <<<<<<<<<<<<<<
@@ -6062,9 +6311,9 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_20filter_score(s
  */
     if (unlikely(__pyx_v_self->__pyx___data == Py_None)) {
       PyErr_SetString(PyExc_TypeError, "'NoneType' object is not subscriptable");
-      __PYX_ERR(0, 327, __pyx_L1_error)
+      __PYX_ERR(0, 328, __pyx_L1_error)
     }
-    __pyx_t_5 = __Pyx_PyDict_GetItem(__pyx_v_self->__pyx___data, __pyx_v_chrom); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 327, __pyx_L1_error)
+    __pyx_t_5 = __Pyx_PyDict_GetItem(__pyx_v_self->__pyx___data, __pyx_v_chrom); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 328, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_5);
     if ((likely(PyTuple_CheckExact(__pyx_t_5))) || (PyList_CheckExact(__pyx_t_5))) {
       PyObject* sequence = __pyx_t_5;
@@ -6072,7 +6321,7 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_20filter_score(s
       if (unlikely(size != 2)) {
         if (size > 2) __Pyx_RaiseTooManyValuesError(2);
         else if (size >= 0) __Pyx_RaiseNeedMoreValuesError(size);
-        __PYX_ERR(0, 327, __pyx_L1_error)
+        __PYX_ERR(0, 328, __pyx_L1_error)
       }
       #if CYTHON_ASSUME_SAFE_MACROS && !CYTHON_AVOID_BORROWED_REFS
       if (likely(PyTuple_CheckExact(sequence))) {
@@ -6085,15 +6334,15 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_20filter_score(s
       __Pyx_INCREF(__pyx_t_7);
       __Pyx_INCREF(__pyx_t_8);
       #else
-      __pyx_t_7 = PySequence_ITEM(sequence, 0); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 327, __pyx_L1_error)
+      __pyx_t_7 = PySequence_ITEM(sequence, 0); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 328, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_7);
-      __pyx_t_8 = PySequence_ITEM(sequence, 1); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 327, __pyx_L1_error)
+      __pyx_t_8 = PySequence_ITEM(sequence, 1); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 328, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_8);
       #endif
       __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
     } else {
       Py_ssize_t index = -1;
-      __pyx_t_9 = PyObject_GetIter(__pyx_t_5); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 327, __pyx_L1_error)
+      __pyx_t_9 = PyObject_GetIter(__pyx_t_5); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 328, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_9);
       __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
       __pyx_t_10 = Py_TYPE(__pyx_t_9)->tp_iternext;
@@ -6101,7 +6350,7 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_20filter_score(s
       __Pyx_GOTREF(__pyx_t_7);
       index = 1; __pyx_t_8 = __pyx_t_10(__pyx_t_9); if (unlikely(!__pyx_t_8)) goto __pyx_L5_unpacking_failed;
       __Pyx_GOTREF(__pyx_t_8);
-      if (__Pyx_IternextUnpackEndCheck(__pyx_t_10(__pyx_t_9), 2) < 0) __PYX_ERR(0, 327, __pyx_L1_error)
+      if (__Pyx_IternextUnpackEndCheck(__pyx_t_10(__pyx_t_9), 2) < 0) __PYX_ERR(0, 328, __pyx_L1_error)
       __pyx_t_10 = NULL;
       __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
       goto __pyx_L6_unpacking_done;
@@ -6109,7 +6358,7 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_20filter_score(s
       __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
       __pyx_t_10 = NULL;
       if (__Pyx_IterFinish() == 0) __Pyx_RaiseNeedMoreValuesError(index);
-      __PYX_ERR(0, 327, __pyx_L1_error)
+      __PYX_ERR(0, 328, __pyx_L1_error)
       __pyx_L6_unpacking_done:;
     }
     __Pyx_XDECREF_SET(__pyx_v_p, __pyx_t_7);
@@ -6117,48 +6366,48 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_20filter_score(s
     __Pyx_XDECREF_SET(__pyx_v_v, __pyx_t_8);
     __pyx_t_8 = 0;
 
-    /* "MACS2/IO/BedGraph.pyx":328
+    /* "MACS2/IO/BedGraph.pyx":329
  *         for chrom in chrs:
  *             (p,v) = self.__data[chrom]
  *             pnext = iter(p).__next__             # <<<<<<<<<<<<<<
  *             vnext = iter(v).__next__
  * 
  */
-    __pyx_t_5 = PyObject_GetIter(__pyx_v_p); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 328, __pyx_L1_error)
+    __pyx_t_5 = PyObject_GetIter(__pyx_v_p); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 329, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_5);
-    __pyx_t_8 = __Pyx_PyObject_GetAttrStr(__pyx_t_5, __pyx_n_s_next); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 328, __pyx_L1_error)
+    __pyx_t_8 = __Pyx_PyObject_GetAttrStr(__pyx_t_5, __pyx_n_s_next); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 329, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_8);
     __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
     __Pyx_XDECREF_SET(__pyx_v_pnext, __pyx_t_8);
     __pyx_t_8 = 0;
 
-    /* "MACS2/IO/BedGraph.pyx":329
+    /* "MACS2/IO/BedGraph.pyx":330
  *             (p,v) = self.__data[chrom]
  *             pnext = iter(p).__next__
  *             vnext = iter(v).__next__             # <<<<<<<<<<<<<<
  * 
  *             # new arrays
  */
-    __pyx_t_8 = PyObject_GetIter(__pyx_v_v); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 329, __pyx_L1_error)
+    __pyx_t_8 = PyObject_GetIter(__pyx_v_v); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 330, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_8);
-    __pyx_t_5 = __Pyx_PyObject_GetAttrStr(__pyx_t_8, __pyx_n_s_next); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 329, __pyx_L1_error)
+    __pyx_t_5 = __Pyx_PyObject_GetAttrStr(__pyx_t_8, __pyx_n_s_next); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 330, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_5);
     __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
     __Pyx_XDECREF_SET(__pyx_v_vnext, __pyx_t_5);
     __pyx_t_5 = 0;
 
-    /* "MACS2/IO/BedGraph.pyx":332
+    /* "MACS2/IO/BedGraph.pyx":333
  * 
  *             # new arrays
  *             new_pos = array(BYTE4,[])             # <<<<<<<<<<<<<<
  *             new_value = array(FBYTE4,[])
  *             new_pre_pos = 0
  */
-    __Pyx_GetModuleGlobalName(__pyx_t_8, __pyx_n_s_array); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 332, __pyx_L1_error)
+    __Pyx_GetModuleGlobalName(__pyx_t_8, __pyx_n_s_array); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 333, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_8);
-    __Pyx_GetModuleGlobalName(__pyx_t_7, __pyx_n_s_BYTE4); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 332, __pyx_L1_error)
+    __Pyx_GetModuleGlobalName(__pyx_t_7, __pyx_n_s_BYTE4); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 333, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_7);
-    __pyx_t_9 = PyList_New(0); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 332, __pyx_L1_error)
+    __pyx_t_9 = PyList_New(0); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 333, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_9);
     __pyx_t_11 = NULL;
     __pyx_t_6 = 0;
@@ -6175,7 +6424,7 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_20filter_score(s
     #if CYTHON_FAST_PYCALL
     if (PyFunction_Check(__pyx_t_8)) {
       PyObject *__pyx_temp[3] = {__pyx_t_11, __pyx_t_7, __pyx_t_9};
-      __pyx_t_5 = __Pyx_PyFunction_FastCall(__pyx_t_8, __pyx_temp+1-__pyx_t_6, 2+__pyx_t_6); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 332, __pyx_L1_error)
+      __pyx_t_5 = __Pyx_PyFunction_FastCall(__pyx_t_8, __pyx_temp+1-__pyx_t_6, 2+__pyx_t_6); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 333, __pyx_L1_error)
       __Pyx_XDECREF(__pyx_t_11); __pyx_t_11 = 0;
       __Pyx_GOTREF(__pyx_t_5);
       __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
@@ -6185,7 +6434,7 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_20filter_score(s
     #if CYTHON_FAST_PYCCALL
     if (__Pyx_PyFastCFunction_Check(__pyx_t_8)) {
       PyObject *__pyx_temp[3] = {__pyx_t_11, __pyx_t_7, __pyx_t_9};
-      __pyx_t_5 = __Pyx_PyCFunction_FastCall(__pyx_t_8, __pyx_temp+1-__pyx_t_6, 2+__pyx_t_6); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 332, __pyx_L1_error)
+      __pyx_t_5 = __Pyx_PyCFunction_FastCall(__pyx_t_8, __pyx_temp+1-__pyx_t_6, 2+__pyx_t_6); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 333, __pyx_L1_error)
       __Pyx_XDECREF(__pyx_t_11); __pyx_t_11 = 0;
       __Pyx_GOTREF(__pyx_t_5);
       __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
@@ -6193,7 +6442,7 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_20filter_score(s
     } else
     #endif
     {
-      __pyx_t_12 = PyTuple_New(2+__pyx_t_6); if (unlikely(!__pyx_t_12)) __PYX_ERR(0, 332, __pyx_L1_error)
+      __pyx_t_12 = PyTuple_New(2+__pyx_t_6); if (unlikely(!__pyx_t_12)) __PYX_ERR(0, 333, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_12);
       if (__pyx_t_11) {
         __Pyx_GIVEREF(__pyx_t_11); PyTuple_SET_ITEM(__pyx_t_12, 0, __pyx_t_11); __pyx_t_11 = NULL;
@@ -6204,7 +6453,7 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_20filter_score(s
       PyTuple_SET_ITEM(__pyx_t_12, 1+__pyx_t_6, __pyx_t_9);
       __pyx_t_7 = 0;
       __pyx_t_9 = 0;
-      __pyx_t_5 = __Pyx_PyObject_Call(__pyx_t_8, __pyx_t_12, NULL); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 332, __pyx_L1_error)
+      __pyx_t_5 = __Pyx_PyObject_Call(__pyx_t_8, __pyx_t_12, NULL); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 333, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_5);
       __Pyx_DECREF(__pyx_t_12); __pyx_t_12 = 0;
     }
@@ -6212,18 +6461,18 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_20filter_score(s
     __Pyx_XDECREF_SET(__pyx_v_new_pos, __pyx_t_5);
     __pyx_t_5 = 0;
 
-    /* "MACS2/IO/BedGraph.pyx":333
+    /* "MACS2/IO/BedGraph.pyx":334
  *             # new arrays
  *             new_pos = array(BYTE4,[])
  *             new_value = array(FBYTE4,[])             # <<<<<<<<<<<<<<
  *             new_pre_pos = 0
  *             new_pre_value = 0
  */
-    __Pyx_GetModuleGlobalName(__pyx_t_8, __pyx_n_s_array); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 333, __pyx_L1_error)
+    __Pyx_GetModuleGlobalName(__pyx_t_8, __pyx_n_s_array); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 334, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_8);
-    __Pyx_GetModuleGlobalName(__pyx_t_12, __pyx_n_s_FBYTE4); if (unlikely(!__pyx_t_12)) __PYX_ERR(0, 333, __pyx_L1_error)
+    __Pyx_GetModuleGlobalName(__pyx_t_12, __pyx_n_s_FBYTE4); if (unlikely(!__pyx_t_12)) __PYX_ERR(0, 334, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_12);
-    __pyx_t_9 = PyList_New(0); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 333, __pyx_L1_error)
+    __pyx_t_9 = PyList_New(0); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 334, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_9);
     __pyx_t_7 = NULL;
     __pyx_t_6 = 0;
@@ -6240,7 +6489,7 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_20filter_score(s
     #if CYTHON_FAST_PYCALL
     if (PyFunction_Check(__pyx_t_8)) {
       PyObject *__pyx_temp[3] = {__pyx_t_7, __pyx_t_12, __pyx_t_9};
-      __pyx_t_5 = __Pyx_PyFunction_FastCall(__pyx_t_8, __pyx_temp+1-__pyx_t_6, 2+__pyx_t_6); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 333, __pyx_L1_error)
+      __pyx_t_5 = __Pyx_PyFunction_FastCall(__pyx_t_8, __pyx_temp+1-__pyx_t_6, 2+__pyx_t_6); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 334, __pyx_L1_error)
       __Pyx_XDECREF(__pyx_t_7); __pyx_t_7 = 0;
       __Pyx_GOTREF(__pyx_t_5);
       __Pyx_DECREF(__pyx_t_12); __pyx_t_12 = 0;
@@ -6250,7 +6499,7 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_20filter_score(s
     #if CYTHON_FAST_PYCCALL
     if (__Pyx_PyFastCFunction_Check(__pyx_t_8)) {
       PyObject *__pyx_temp[3] = {__pyx_t_7, __pyx_t_12, __pyx_t_9};
-      __pyx_t_5 = __Pyx_PyCFunction_FastCall(__pyx_t_8, __pyx_temp+1-__pyx_t_6, 2+__pyx_t_6); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 333, __pyx_L1_error)
+      __pyx_t_5 = __Pyx_PyCFunction_FastCall(__pyx_t_8, __pyx_temp+1-__pyx_t_6, 2+__pyx_t_6); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 334, __pyx_L1_error)
       __Pyx_XDECREF(__pyx_t_7); __pyx_t_7 = 0;
       __Pyx_GOTREF(__pyx_t_5);
       __Pyx_DECREF(__pyx_t_12); __pyx_t_12 = 0;
@@ -6258,7 +6507,7 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_20filter_score(s
     } else
     #endif
     {
-      __pyx_t_11 = PyTuple_New(2+__pyx_t_6); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 333, __pyx_L1_error)
+      __pyx_t_11 = PyTuple_New(2+__pyx_t_6); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 334, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_11);
       if (__pyx_t_7) {
         __Pyx_GIVEREF(__pyx_t_7); PyTuple_SET_ITEM(__pyx_t_11, 0, __pyx_t_7); __pyx_t_7 = NULL;
@@ -6269,7 +6518,7 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_20filter_score(s
       PyTuple_SET_ITEM(__pyx_t_11, 1+__pyx_t_6, __pyx_t_9);
       __pyx_t_12 = 0;
       __pyx_t_9 = 0;
-      __pyx_t_5 = __Pyx_PyObject_Call(__pyx_t_8, __pyx_t_11, NULL); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 333, __pyx_L1_error)
+      __pyx_t_5 = __Pyx_PyObject_Call(__pyx_t_8, __pyx_t_11, NULL); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 334, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_5);
       __Pyx_DECREF(__pyx_t_11); __pyx_t_11 = 0;
     }
@@ -6277,7 +6526,7 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_20filter_score(s
     __Pyx_XDECREF_SET(__pyx_v_new_value, __pyx_t_5);
     __pyx_t_5 = 0;
 
-    /* "MACS2/IO/BedGraph.pyx":334
+    /* "MACS2/IO/BedGraph.pyx":335
  *             new_pos = array(BYTE4,[])
  *             new_value = array(FBYTE4,[])
  *             new_pre_pos = 0             # <<<<<<<<<<<<<<
@@ -6286,7 +6535,7 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_20filter_score(s
  */
     __pyx_v_new_pre_pos = 0;
 
-    /* "MACS2/IO/BedGraph.pyx":335
+    /* "MACS2/IO/BedGraph.pyx":336
  *             new_value = array(FBYTE4,[])
  *             new_pre_pos = 0
  *             new_pre_value = 0             # <<<<<<<<<<<<<<
@@ -6295,19 +6544,19 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_20filter_score(s
  */
     __pyx_v_new_pre_value = 0.0;
 
-    /* "MACS2/IO/BedGraph.pyx":337
+    /* "MACS2/IO/BedGraph.pyx":338
  *             new_pre_value = 0
  * 
  *             for i in xrange(len(p)):             # <<<<<<<<<<<<<<
  *                 pos = pnext()
  *                 value = vnext()
  */
-    __pyx_t_13 = PyObject_Length(__pyx_v_p); if (unlikely(__pyx_t_13 == ((Py_ssize_t)-1))) __PYX_ERR(0, 337, __pyx_L1_error)
+    __pyx_t_13 = PyObject_Length(__pyx_v_p); if (unlikely(__pyx_t_13 == ((Py_ssize_t)-1))) __PYX_ERR(0, 338, __pyx_L1_error)
     __pyx_t_14 = __pyx_t_13;
     for (__pyx_t_6 = 0; __pyx_t_6 < __pyx_t_14; __pyx_t_6+=1) {
       __pyx_v_i = __pyx_t_6;
 
-      /* "MACS2/IO/BedGraph.pyx":338
+      /* "MACS2/IO/BedGraph.pyx":339
  * 
  *             for i in xrange(len(p)):
  *                 pos = pnext()             # <<<<<<<<<<<<<<
@@ -6327,14 +6576,14 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_20filter_score(s
       }
       __pyx_t_5 = (__pyx_t_11) ? __Pyx_PyObject_CallOneArg(__pyx_t_8, __pyx_t_11) : __Pyx_PyObject_CallNoArg(__pyx_t_8);
       __Pyx_XDECREF(__pyx_t_11); __pyx_t_11 = 0;
-      if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 338, __pyx_L1_error)
+      if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 339, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_5);
       __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
-      __pyx_t_15 = __Pyx_PyInt_As_int(__pyx_t_5); if (unlikely((__pyx_t_15 == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 338, __pyx_L1_error)
+      __pyx_t_15 = __Pyx_PyInt_As_int(__pyx_t_5); if (unlikely((__pyx_t_15 == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 339, __pyx_L1_error)
       __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
       __pyx_v_pos = __pyx_t_15;
 
-      /* "MACS2/IO/BedGraph.pyx":339
+      /* "MACS2/IO/BedGraph.pyx":340
  *             for i in xrange(len(p)):
  *                 pos = pnext()
  *                 value = vnext()             # <<<<<<<<<<<<<<
@@ -6354,14 +6603,14 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_20filter_score(s
       }
       __pyx_t_5 = (__pyx_t_11) ? __Pyx_PyObject_CallOneArg(__pyx_t_8, __pyx_t_11) : __Pyx_PyObject_CallNoArg(__pyx_t_8);
       __Pyx_XDECREF(__pyx_t_11); __pyx_t_11 = 0;
-      if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 339, __pyx_L1_error)
+      if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 340, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_5);
       __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
-      __pyx_t_16 = __pyx_PyFloat_AsDouble(__pyx_t_5); if (unlikely((__pyx_t_16 == (double)-1) && PyErr_Occurred())) __PYX_ERR(0, 339, __pyx_L1_error)
+      __pyx_t_16 = __pyx_PyFloat_AsDouble(__pyx_t_5); if (unlikely((__pyx_t_16 == (double)-1) && PyErr_Occurred())) __PYX_ERR(0, 340, __pyx_L1_error)
       __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
       __pyx_v_value = __pyx_t_16;
 
-      /* "MACS2/IO/BedGraph.pyx":341
+      /* "MACS2/IO/BedGraph.pyx":342
  *                 value = vnext()
  * 
  *                 if value < cutoff:             # <<<<<<<<<<<<<<
@@ -6371,7 +6620,7 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_20filter_score(s
       __pyx_t_17 = ((__pyx_v_value < __pyx_v_cutoff) != 0);
       if (__pyx_t_17) {
 
-        /* "MACS2/IO/BedGraph.pyx":343
+        /* "MACS2/IO/BedGraph.pyx":344
  *                 if value < cutoff:
  *                     # this region will be set to baseline_value
  *                     if new_pre_value == self.baseline_value:             # <<<<<<<<<<<<<<
@@ -6381,19 +6630,19 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_20filter_score(s
         __pyx_t_17 = ((__pyx_v_new_pre_value == __pyx_v_self->baseline_value) != 0);
         if (__pyx_t_17) {
 
-          /* "MACS2/IO/BedGraph.pyx":345
+          /* "MACS2/IO/BedGraph.pyx":346
  *                     if new_pre_value == self.baseline_value:
  *                         # if preceding region is at baseline, extend it
  *                         new_pos[-1] = pos             # <<<<<<<<<<<<<<
  *                     else:
  *                         # else add a new baseline region
  */
-          __pyx_t_5 = __Pyx_PyInt_From_int(__pyx_v_pos); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 345, __pyx_L1_error)
+          __pyx_t_5 = __Pyx_PyInt_From_int(__pyx_v_pos); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 346, __pyx_L1_error)
           __Pyx_GOTREF(__pyx_t_5);
-          if (unlikely(__Pyx_SetItemInt(__pyx_v_new_pos, -1L, __pyx_t_5, long, 1, __Pyx_PyInt_From_long, 0, 1, 1) < 0)) __PYX_ERR(0, 345, __pyx_L1_error)
+          if (unlikely(__Pyx_SetItemInt(__pyx_v_new_pos, -1L, __pyx_t_5, long, 1, __Pyx_PyInt_From_long, 0, 1, 1) < 0)) __PYX_ERR(0, 346, __pyx_L1_error)
           __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
 
-          /* "MACS2/IO/BedGraph.pyx":343
+          /* "MACS2/IO/BedGraph.pyx":344
  *                 if value < cutoff:
  *                     # this region will be set to baseline_value
  *                     if new_pre_value == self.baseline_value:             # <<<<<<<<<<<<<<
@@ -6403,7 +6652,7 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_20filter_score(s
           goto __pyx_L10;
         }
 
-        /* "MACS2/IO/BedGraph.pyx":348
+        /* "MACS2/IO/BedGraph.pyx":349
  *                     else:
  *                         # else add a new baseline region
  *                         new_pos.append(pos)             # <<<<<<<<<<<<<<
@@ -6411,26 +6660,26 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_20filter_score(s
  *                 else:
  */
         /*else*/ {
-          __pyx_t_5 = __Pyx_PyInt_From_int(__pyx_v_pos); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 348, __pyx_L1_error)
+          __pyx_t_5 = __Pyx_PyInt_From_int(__pyx_v_pos); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 349, __pyx_L1_error)
           __Pyx_GOTREF(__pyx_t_5);
-          __pyx_t_18 = __Pyx_PyObject_Append(__pyx_v_new_pos, __pyx_t_5); if (unlikely(__pyx_t_18 == ((int)-1))) __PYX_ERR(0, 348, __pyx_L1_error)
+          __pyx_t_18 = __Pyx_PyObject_Append(__pyx_v_new_pos, __pyx_t_5); if (unlikely(__pyx_t_18 == ((int)-1))) __PYX_ERR(0, 349, __pyx_L1_error)
           __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
 
-          /* "MACS2/IO/BedGraph.pyx":349
+          /* "MACS2/IO/BedGraph.pyx":350
  *                         # else add a new baseline region
  *                         new_pos.append(pos)
  *                         new_value.append(self.baseline_value)             # <<<<<<<<<<<<<<
  *                 else:
  *                     # put it into new arrays
  */
-          __pyx_t_5 = PyFloat_FromDouble(__pyx_v_self->baseline_value); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 349, __pyx_L1_error)
+          __pyx_t_5 = PyFloat_FromDouble(__pyx_v_self->baseline_value); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 350, __pyx_L1_error)
           __Pyx_GOTREF(__pyx_t_5);
-          __pyx_t_18 = __Pyx_PyObject_Append(__pyx_v_new_value, __pyx_t_5); if (unlikely(__pyx_t_18 == ((int)-1))) __PYX_ERR(0, 349, __pyx_L1_error)
+          __pyx_t_18 = __Pyx_PyObject_Append(__pyx_v_new_value, __pyx_t_5); if (unlikely(__pyx_t_18 == ((int)-1))) __PYX_ERR(0, 350, __pyx_L1_error)
           __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
         }
         __pyx_L10:;
 
-        /* "MACS2/IO/BedGraph.pyx":341
+        /* "MACS2/IO/BedGraph.pyx":342
  *                 value = vnext()
  * 
  *                 if value < cutoff:             # <<<<<<<<<<<<<<
@@ -6440,7 +6689,7 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_20filter_score(s
         goto __pyx_L9;
       }
 
-      /* "MACS2/IO/BedGraph.pyx":352
+      /* "MACS2/IO/BedGraph.pyx":353
  *                 else:
  *                     # put it into new arrays
  *                     new_pos.append(pos)             # <<<<<<<<<<<<<<
@@ -6448,60 +6697,60 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_20filter_score(s
  *                 new_pre_pos = new_pos[-1]
  */
       /*else*/ {
-        __pyx_t_5 = __Pyx_PyInt_From_int(__pyx_v_pos); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 352, __pyx_L1_error)
+        __pyx_t_5 = __Pyx_PyInt_From_int(__pyx_v_pos); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 353, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_5);
-        __pyx_t_18 = __Pyx_PyObject_Append(__pyx_v_new_pos, __pyx_t_5); if (unlikely(__pyx_t_18 == ((int)-1))) __PYX_ERR(0, 352, __pyx_L1_error)
+        __pyx_t_18 = __Pyx_PyObject_Append(__pyx_v_new_pos, __pyx_t_5); if (unlikely(__pyx_t_18 == ((int)-1))) __PYX_ERR(0, 353, __pyx_L1_error)
         __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
 
-        /* "MACS2/IO/BedGraph.pyx":353
+        /* "MACS2/IO/BedGraph.pyx":354
  *                     # put it into new arrays
  *                     new_pos.append(pos)
  *                     new_value.append(value)             # <<<<<<<<<<<<<<
  *                 new_pre_pos = new_pos[-1]
  *                 new_pre_value = new_value[-1]
  */
-        __pyx_t_5 = PyFloat_FromDouble(__pyx_v_value); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 353, __pyx_L1_error)
+        __pyx_t_5 = PyFloat_FromDouble(__pyx_v_value); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 354, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_5);
-        __pyx_t_18 = __Pyx_PyObject_Append(__pyx_v_new_value, __pyx_t_5); if (unlikely(__pyx_t_18 == ((int)-1))) __PYX_ERR(0, 353, __pyx_L1_error)
+        __pyx_t_18 = __Pyx_PyObject_Append(__pyx_v_new_value, __pyx_t_5); if (unlikely(__pyx_t_18 == ((int)-1))) __PYX_ERR(0, 354, __pyx_L1_error)
         __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
       }
       __pyx_L9:;
 
-      /* "MACS2/IO/BedGraph.pyx":354
+      /* "MACS2/IO/BedGraph.pyx":355
  *                     new_pos.append(pos)
  *                     new_value.append(value)
  *                 new_pre_pos = new_pos[-1]             # <<<<<<<<<<<<<<
  *                 new_pre_value = new_value[-1]
  *             self.__data[chrom]=[new_pos,new_value]
  */
-      __pyx_t_5 = __Pyx_GetItemInt(__pyx_v_new_pos, -1L, long, 1, __Pyx_PyInt_From_long, 0, 1, 1); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 354, __pyx_L1_error)
+      __pyx_t_5 = __Pyx_GetItemInt(__pyx_v_new_pos, -1L, long, 1, __Pyx_PyInt_From_long, 0, 1, 1); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 355, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_5);
-      __pyx_t_15 = __Pyx_PyInt_As_int(__pyx_t_5); if (unlikely((__pyx_t_15 == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 354, __pyx_L1_error)
+      __pyx_t_15 = __Pyx_PyInt_As_int(__pyx_t_5); if (unlikely((__pyx_t_15 == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 355, __pyx_L1_error)
       __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
       __pyx_v_new_pre_pos = __pyx_t_15;
 
-      /* "MACS2/IO/BedGraph.pyx":355
+      /* "MACS2/IO/BedGraph.pyx":356
  *                     new_value.append(value)
  *                 new_pre_pos = new_pos[-1]
  *                 new_pre_value = new_value[-1]             # <<<<<<<<<<<<<<
  *             self.__data[chrom]=[new_pos,new_value]
  *         return True
  */
-      __pyx_t_5 = __Pyx_GetItemInt(__pyx_v_new_value, -1L, long, 1, __Pyx_PyInt_From_long, 0, 1, 1); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 355, __pyx_L1_error)
+      __pyx_t_5 = __Pyx_GetItemInt(__pyx_v_new_value, -1L, long, 1, __Pyx_PyInt_From_long, 0, 1, 1); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 356, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_5);
-      __pyx_t_16 = __pyx_PyFloat_AsDouble(__pyx_t_5); if (unlikely((__pyx_t_16 == (double)-1) && PyErr_Occurred())) __PYX_ERR(0, 355, __pyx_L1_error)
+      __pyx_t_16 = __pyx_PyFloat_AsDouble(__pyx_t_5); if (unlikely((__pyx_t_16 == (double)-1) && PyErr_Occurred())) __PYX_ERR(0, 356, __pyx_L1_error)
       __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
       __pyx_v_new_pre_value = __pyx_t_16;
     }
 
-    /* "MACS2/IO/BedGraph.pyx":356
+    /* "MACS2/IO/BedGraph.pyx":357
  *                 new_pre_pos = new_pos[-1]
  *                 new_pre_value = new_value[-1]
  *             self.__data[chrom]=[new_pos,new_value]             # <<<<<<<<<<<<<<
  *         return True
  * 
  */
-    __pyx_t_5 = PyList_New(2); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 356, __pyx_L1_error)
+    __pyx_t_5 = PyList_New(2); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 357, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_5);
     __Pyx_INCREF(__pyx_v_new_pos);
     __Pyx_GIVEREF(__pyx_v_new_pos);
@@ -6511,14 +6760,14 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_20filter_score(s
     PyList_SET_ITEM(__pyx_t_5, 1, __pyx_v_new_value);
     if (unlikely(__pyx_v_self->__pyx___data == Py_None)) {
       PyErr_SetString(PyExc_TypeError, "'NoneType' object is not subscriptable");
-      __PYX_ERR(0, 356, __pyx_L1_error)
+      __PYX_ERR(0, 357, __pyx_L1_error)
     }
-    if (unlikely(PyDict_SetItem(__pyx_v_self->__pyx___data, __pyx_v_chrom, __pyx_t_5) < 0)) __PYX_ERR(0, 356, __pyx_L1_error)
+    if (unlikely(PyDict_SetItem(__pyx_v_self->__pyx___data, __pyx_v_chrom, __pyx_t_5) < 0)) __PYX_ERR(0, 357, __pyx_L1_error)
     __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
   }
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-  /* "MACS2/IO/BedGraph.pyx":357
+  /* "MACS2/IO/BedGraph.pyx":358
  *                 new_pre_value = new_value[-1]
  *             self.__data[chrom]=[new_pos,new_value]
  *         return True             # <<<<<<<<<<<<<<
@@ -6530,7 +6779,7 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_20filter_score(s
   __pyx_r = Py_True;
   goto __pyx_L0;
 
-  /* "MACS2/IO/BedGraph.pyx":313
+  /* "MACS2/IO/BedGraph.pyx":314
  *         return True
  * 
  *     def filter_score (self, double cutoff=0):             # <<<<<<<<<<<<<<
@@ -6559,11 +6808,12 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_20filter_score(s
   __Pyx_XDECREF(__pyx_v_new_pos);
   __Pyx_XDECREF(__pyx_v_new_value);
   __Pyx_XGIVEREF(__pyx_r);
+  __Pyx_TraceReturn(__pyx_r, 0);
   __Pyx_RefNannyFinishContext();
   return __pyx_r;
 }
 
-/* "MACS2/IO/BedGraph.pyx":359
+/* "MACS2/IO/BedGraph.pyx":360
  *         return True
  * 
  *     def summary (self):             # <<<<<<<<<<<<<<
@@ -6600,6 +6850,7 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_22summary(struct
   PyObject *__pyx_v_p = NULL;
   PyObject *__pyx_v_v = NULL;
   PyObject *__pyx_r = NULL;
+  __Pyx_TraceDeclarations
   __Pyx_RefNannyDeclarations
   PyObject *__pyx_t_1 = NULL;
   Py_ssize_t __pyx_t_2;
@@ -6619,8 +6870,9 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_22summary(struct
   PyObject *__pyx_t_16 = NULL;
   PyObject *__pyx_t_17 = NULL;
   __Pyx_RefNannySetupContext("summary", 0);
+  __Pyx_TraceCall("summary", __pyx_f[0], 360, 0, __PYX_ERR(0, 360, __pyx_L1_error));
 
-  /* "MACS2/IO/BedGraph.pyx":368
+  /* "MACS2/IO/BedGraph.pyx":369
  *             int pre_p, l, i
  * 
  *         pre_p = 0             # <<<<<<<<<<<<<<
@@ -6629,7 +6881,7 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_22summary(struct
  */
   __pyx_v_pre_p = 0;
 
-  /* "MACS2/IO/BedGraph.pyx":369
+  /* "MACS2/IO/BedGraph.pyx":370
  * 
  *         pre_p = 0
  *         n_v = 0             # <<<<<<<<<<<<<<
@@ -6638,7 +6890,7 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_22summary(struct
  */
   __pyx_v_n_v = 0;
 
-  /* "MACS2/IO/BedGraph.pyx":370
+  /* "MACS2/IO/BedGraph.pyx":371
  *         pre_p = 0
  *         n_v = 0
  *         sum_v = 0             # <<<<<<<<<<<<<<
@@ -6647,7 +6899,7 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_22summary(struct
  */
   __pyx_v_sum_v = 0.0;
 
-  /* "MACS2/IO/BedGraph.pyx":371
+  /* "MACS2/IO/BedGraph.pyx":372
  *         n_v = 0
  *         sum_v = 0
  *         max_v = -100000             # <<<<<<<<<<<<<<
@@ -6656,7 +6908,7 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_22summary(struct
  */
   __pyx_v_max_v = -100000.0;
 
-  /* "MACS2/IO/BedGraph.pyx":372
+  /* "MACS2/IO/BedGraph.pyx":373
  *         sum_v = 0
  *         max_v = -100000
  *         min_v = 100000             # <<<<<<<<<<<<<<
@@ -6665,7 +6917,7 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_22summary(struct
  */
   __pyx_v_min_v = 100000.0;
 
-  /* "MACS2/IO/BedGraph.pyx":373
+  /* "MACS2/IO/BedGraph.pyx":374
  *         max_v = -100000
  *         min_v = 100000
  *         for (p,v) in self.__data.values():             # <<<<<<<<<<<<<<
@@ -6675,9 +6927,9 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_22summary(struct
   __pyx_t_2 = 0;
   if (unlikely(__pyx_v_self->__pyx___data == Py_None)) {
     PyErr_Format(PyExc_AttributeError, "'NoneType' object has no attribute '%.30s'", "values");
-    __PYX_ERR(0, 373, __pyx_L1_error)
+    __PYX_ERR(0, 374, __pyx_L1_error)
   }
-  __pyx_t_5 = __Pyx_dict_iterator(__pyx_v_self->__pyx___data, 1, __pyx_n_s_values, (&__pyx_t_3), (&__pyx_t_4)); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 373, __pyx_L1_error)
+  __pyx_t_5 = __Pyx_dict_iterator(__pyx_v_self->__pyx___data, 1, __pyx_n_s_values, (&__pyx_t_3), (&__pyx_t_4)); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 374, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_5);
   __Pyx_XDECREF(__pyx_t_1);
   __pyx_t_1 = __pyx_t_5;
@@ -6685,7 +6937,7 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_22summary(struct
   while (1) {
     __pyx_t_6 = __Pyx_dict_iter_next(__pyx_t_1, __pyx_t_3, &__pyx_t_2, NULL, &__pyx_t_5, NULL, __pyx_t_4);
     if (unlikely(__pyx_t_6 == 0)) break;
-    if (unlikely(__pyx_t_6 == -1)) __PYX_ERR(0, 373, __pyx_L1_error)
+    if (unlikely(__pyx_t_6 == -1)) __PYX_ERR(0, 374, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_5);
     if ((likely(PyTuple_CheckExact(__pyx_t_5))) || (PyList_CheckExact(__pyx_t_5))) {
       PyObject* sequence = __pyx_t_5;
@@ -6693,7 +6945,7 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_22summary(struct
       if (unlikely(size != 2)) {
         if (size > 2) __Pyx_RaiseTooManyValuesError(2);
         else if (size >= 0) __Pyx_RaiseNeedMoreValuesError(size);
-        __PYX_ERR(0, 373, __pyx_L1_error)
+        __PYX_ERR(0, 374, __pyx_L1_error)
       }
       #if CYTHON_ASSUME_SAFE_MACROS && !CYTHON_AVOID_BORROWED_REFS
       if (likely(PyTuple_CheckExact(sequence))) {
@@ -6706,15 +6958,15 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_22summary(struct
       __Pyx_INCREF(__pyx_t_7);
       __Pyx_INCREF(__pyx_t_8);
       #else
-      __pyx_t_7 = PySequence_ITEM(sequence, 0); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 373, __pyx_L1_error)
+      __pyx_t_7 = PySequence_ITEM(sequence, 0); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 374, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_7);
-      __pyx_t_8 = PySequence_ITEM(sequence, 1); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 373, __pyx_L1_error)
+      __pyx_t_8 = PySequence_ITEM(sequence, 1); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 374, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_8);
       #endif
       __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
     } else {
       Py_ssize_t index = -1;
-      __pyx_t_9 = PyObject_GetIter(__pyx_t_5); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 373, __pyx_L1_error)
+      __pyx_t_9 = PyObject_GetIter(__pyx_t_5); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 374, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_9);
       __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
       __pyx_t_10 = Py_TYPE(__pyx_t_9)->tp_iternext;
@@ -6722,7 +6974,7 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_22summary(struct
       __Pyx_GOTREF(__pyx_t_7);
       index = 1; __pyx_t_8 = __pyx_t_10(__pyx_t_9); if (unlikely(!__pyx_t_8)) goto __pyx_L5_unpacking_failed;
       __Pyx_GOTREF(__pyx_t_8);
-      if (__Pyx_IternextUnpackEndCheck(__pyx_t_10(__pyx_t_9), 2) < 0) __PYX_ERR(0, 373, __pyx_L1_error)
+      if (__Pyx_IternextUnpackEndCheck(__pyx_t_10(__pyx_t_9), 2) < 0) __PYX_ERR(0, 374, __pyx_L1_error)
       __pyx_t_10 = NULL;
       __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
       goto __pyx_L6_unpacking_done;
@@ -6730,7 +6982,7 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_22summary(struct
       __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
       __pyx_t_10 = NULL;
       if (__Pyx_IterFinish() == 0) __Pyx_RaiseNeedMoreValuesError(index);
-      __PYX_ERR(0, 373, __pyx_L1_error)
+      __PYX_ERR(0, 374, __pyx_L1_error)
       __pyx_L6_unpacking_done:;
     }
     __Pyx_XDECREF_SET(__pyx_v_p, __pyx_t_7);
@@ -6738,7 +6990,7 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_22summary(struct
     __Pyx_XDECREF_SET(__pyx_v_v, __pyx_t_8);
     __pyx_t_8 = 0;
 
-    /* "MACS2/IO/BedGraph.pyx":375
+    /* "MACS2/IO/BedGraph.pyx":376
  *         for (p,v) in self.__data.values():
  *             # for each chromosome
  *             pre_p = 0             # <<<<<<<<<<<<<<
@@ -6747,63 +6999,63 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_22summary(struct
  */
     __pyx_v_pre_p = 0;
 
-    /* "MACS2/IO/BedGraph.pyx":376
+    /* "MACS2/IO/BedGraph.pyx":377
  *             # for each chromosome
  *             pre_p = 0
  *             for i in range(len(p)):             # <<<<<<<<<<<<<<
  *                 # for each region
  *                 l = p[i]-pre_p
  */
-    __pyx_t_11 = PyObject_Length(__pyx_v_p); if (unlikely(__pyx_t_11 == ((Py_ssize_t)-1))) __PYX_ERR(0, 376, __pyx_L1_error)
+    __pyx_t_11 = PyObject_Length(__pyx_v_p); if (unlikely(__pyx_t_11 == ((Py_ssize_t)-1))) __PYX_ERR(0, 377, __pyx_L1_error)
     __pyx_t_12 = __pyx_t_11;
     for (__pyx_t_6 = 0; __pyx_t_6 < __pyx_t_12; __pyx_t_6+=1) {
       __pyx_v_i = __pyx_t_6;
 
-      /* "MACS2/IO/BedGraph.pyx":378
+      /* "MACS2/IO/BedGraph.pyx":379
  *             for i in range(len(p)):
  *                 # for each region
  *                 l = p[i]-pre_p             # <<<<<<<<<<<<<<
  *                 sum_v += v[i]*l
  *                 n_v += l
  */
-      __pyx_t_5 = __Pyx_GetItemInt(__pyx_v_p, __pyx_v_i, int, 1, __Pyx_PyInt_From_int, 0, 1, 1); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 378, __pyx_L1_error)
+      __pyx_t_5 = __Pyx_GetItemInt(__pyx_v_p, __pyx_v_i, int, 1, __Pyx_PyInt_From_int, 0, 1, 1); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 379, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_5);
-      __pyx_t_8 = __Pyx_PyInt_From_int(__pyx_v_pre_p); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 378, __pyx_L1_error)
+      __pyx_t_8 = __Pyx_PyInt_From_int(__pyx_v_pre_p); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 379, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_8);
-      __pyx_t_7 = PyNumber_Subtract(__pyx_t_5, __pyx_t_8); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 378, __pyx_L1_error)
+      __pyx_t_7 = PyNumber_Subtract(__pyx_t_5, __pyx_t_8); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 379, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_7);
       __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
       __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
-      __pyx_t_13 = __Pyx_PyInt_As_int(__pyx_t_7); if (unlikely((__pyx_t_13 == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 378, __pyx_L1_error)
+      __pyx_t_13 = __Pyx_PyInt_As_int(__pyx_t_7); if (unlikely((__pyx_t_13 == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 379, __pyx_L1_error)
       __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
       __pyx_v_l = __pyx_t_13;
 
-      /* "MACS2/IO/BedGraph.pyx":379
+      /* "MACS2/IO/BedGraph.pyx":380
  *                 # for each region
  *                 l = p[i]-pre_p
  *                 sum_v += v[i]*l             # <<<<<<<<<<<<<<
  *                 n_v += l
  *                 pre_p = p[i]
  */
-      __pyx_t_7 = PyFloat_FromDouble(__pyx_v_sum_v); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 379, __pyx_L1_error)
+      __pyx_t_7 = PyFloat_FromDouble(__pyx_v_sum_v); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 380, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_7);
-      __pyx_t_8 = __Pyx_GetItemInt(__pyx_v_v, __pyx_v_i, int, 1, __Pyx_PyInt_From_int, 0, 1, 1); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 379, __pyx_L1_error)
+      __pyx_t_8 = __Pyx_GetItemInt(__pyx_v_v, __pyx_v_i, int, 1, __Pyx_PyInt_From_int, 0, 1, 1); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 380, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_8);
-      __pyx_t_5 = __Pyx_PyInt_From_int(__pyx_v_l); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 379, __pyx_L1_error)
+      __pyx_t_5 = __Pyx_PyInt_From_int(__pyx_v_l); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 380, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_5);
-      __pyx_t_9 = PyNumber_Multiply(__pyx_t_8, __pyx_t_5); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 379, __pyx_L1_error)
+      __pyx_t_9 = PyNumber_Multiply(__pyx_t_8, __pyx_t_5); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 380, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_9);
       __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
       __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
-      __pyx_t_5 = PyNumber_InPlaceAdd(__pyx_t_7, __pyx_t_9); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 379, __pyx_L1_error)
+      __pyx_t_5 = PyNumber_InPlaceAdd(__pyx_t_7, __pyx_t_9); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 380, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_5);
       __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
       __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
-      __pyx_t_14 = __pyx_PyFloat_AsDouble(__pyx_t_5); if (unlikely((__pyx_t_14 == (double)-1) && PyErr_Occurred())) __PYX_ERR(0, 379, __pyx_L1_error)
+      __pyx_t_14 = __pyx_PyFloat_AsDouble(__pyx_t_5); if (unlikely((__pyx_t_14 == (double)-1) && PyErr_Occurred())) __PYX_ERR(0, 380, __pyx_L1_error)
       __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
       __pyx_v_sum_v = __pyx_t_14;
 
-      /* "MACS2/IO/BedGraph.pyx":380
+      /* "MACS2/IO/BedGraph.pyx":381
  *                 l = p[i]-pre_p
  *                 sum_v += v[i]*l
  *                 n_v += l             # <<<<<<<<<<<<<<
@@ -6812,21 +7064,21 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_22summary(struct
  */
       __pyx_v_n_v = (__pyx_v_n_v + __pyx_v_l);
 
-      /* "MACS2/IO/BedGraph.pyx":381
+      /* "MACS2/IO/BedGraph.pyx":382
  *                 sum_v += v[i]*l
  *                 n_v += l
  *                 pre_p = p[i]             # <<<<<<<<<<<<<<
  *             max_v = max(max(v),max_v)
  *             min_v = min(min(v),min_v)
  */
-      __pyx_t_5 = __Pyx_GetItemInt(__pyx_v_p, __pyx_v_i, int, 1, __Pyx_PyInt_From_int, 0, 1, 1); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 381, __pyx_L1_error)
+      __pyx_t_5 = __Pyx_GetItemInt(__pyx_v_p, __pyx_v_i, int, 1, __Pyx_PyInt_From_int, 0, 1, 1); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 382, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_5);
-      __pyx_t_13 = __Pyx_PyInt_As_int(__pyx_t_5); if (unlikely((__pyx_t_13 == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 381, __pyx_L1_error)
+      __pyx_t_13 = __Pyx_PyInt_As_int(__pyx_t_5); if (unlikely((__pyx_t_13 == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 382, __pyx_L1_error)
       __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
       __pyx_v_pre_p = __pyx_t_13;
     }
 
-    /* "MACS2/IO/BedGraph.pyx":382
+    /* "MACS2/IO/BedGraph.pyx":383
  *                 n_v += l
  *                 pre_p = p[i]
  *             max_v = max(max(v),max_v)             # <<<<<<<<<<<<<<
@@ -6834,16 +7086,16 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_22summary(struct
  *         mean_v = sum_v/n_v
  */
     __pyx_t_14 = __pyx_v_max_v;
-    __pyx_t_5 = __Pyx_PyObject_CallOneArg(__pyx_builtin_max, __pyx_v_v); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 382, __pyx_L1_error)
+    __pyx_t_5 = __Pyx_PyObject_CallOneArg(__pyx_builtin_max, __pyx_v_v); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 383, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_5);
-    __pyx_t_7 = PyFloat_FromDouble(__pyx_t_14); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 382, __pyx_L1_error)
+    __pyx_t_7 = PyFloat_FromDouble(__pyx_t_14); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 383, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_7);
-    __pyx_t_8 = PyObject_RichCompare(__pyx_t_7, __pyx_t_5, Py_GT); __Pyx_XGOTREF(__pyx_t_8); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 382, __pyx_L1_error)
+    __pyx_t_8 = PyObject_RichCompare(__pyx_t_7, __pyx_t_5, Py_GT); __Pyx_XGOTREF(__pyx_t_8); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 383, __pyx_L1_error)
     __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
-    __pyx_t_15 = __Pyx_PyObject_IsTrue(__pyx_t_8); if (unlikely(__pyx_t_15 < 0)) __PYX_ERR(0, 382, __pyx_L1_error)
+    __pyx_t_15 = __Pyx_PyObject_IsTrue(__pyx_t_8); if (unlikely(__pyx_t_15 < 0)) __PYX_ERR(0, 383, __pyx_L1_error)
     __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
     if (__pyx_t_15) {
-      __pyx_t_8 = PyFloat_FromDouble(__pyx_t_14); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 382, __pyx_L1_error)
+      __pyx_t_8 = PyFloat_FromDouble(__pyx_t_14); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 383, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_8);
       __pyx_t_9 = __pyx_t_8;
       __pyx_t_8 = 0;
@@ -6852,11 +7104,11 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_22summary(struct
       __pyx_t_9 = __pyx_t_5;
     }
     __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
-    __pyx_t_14 = __pyx_PyFloat_AsDouble(__pyx_t_9); if (unlikely((__pyx_t_14 == (double)-1) && PyErr_Occurred())) __PYX_ERR(0, 382, __pyx_L1_error)
+    __pyx_t_14 = __pyx_PyFloat_AsDouble(__pyx_t_9); if (unlikely((__pyx_t_14 == (double)-1) && PyErr_Occurred())) __PYX_ERR(0, 383, __pyx_L1_error)
     __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
     __pyx_v_max_v = __pyx_t_14;
 
-    /* "MACS2/IO/BedGraph.pyx":383
+    /* "MACS2/IO/BedGraph.pyx":384
  *                 pre_p = p[i]
  *             max_v = max(max(v),max_v)
  *             min_v = min(min(v),min_v)             # <<<<<<<<<<<<<<
@@ -6864,16 +7116,16 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_22summary(struct
  *         variance = 0.0
  */
     __pyx_t_14 = __pyx_v_min_v;
-    __pyx_t_9 = __Pyx_PyObject_CallOneArg(__pyx_builtin_min, __pyx_v_v); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 383, __pyx_L1_error)
+    __pyx_t_9 = __Pyx_PyObject_CallOneArg(__pyx_builtin_min, __pyx_v_v); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 384, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_9);
-    __pyx_t_8 = PyFloat_FromDouble(__pyx_t_14); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 383, __pyx_L1_error)
+    __pyx_t_8 = PyFloat_FromDouble(__pyx_t_14); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 384, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_8);
-    __pyx_t_7 = PyObject_RichCompare(__pyx_t_8, __pyx_t_9, Py_LT); __Pyx_XGOTREF(__pyx_t_7); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 383, __pyx_L1_error)
+    __pyx_t_7 = PyObject_RichCompare(__pyx_t_8, __pyx_t_9, Py_LT); __Pyx_XGOTREF(__pyx_t_7); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 384, __pyx_L1_error)
     __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
-    __pyx_t_15 = __Pyx_PyObject_IsTrue(__pyx_t_7); if (unlikely(__pyx_t_15 < 0)) __PYX_ERR(0, 383, __pyx_L1_error)
+    __pyx_t_15 = __Pyx_PyObject_IsTrue(__pyx_t_7); if (unlikely(__pyx_t_15 < 0)) __PYX_ERR(0, 384, __pyx_L1_error)
     __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
     if (__pyx_t_15) {
-      __pyx_t_7 = PyFloat_FromDouble(__pyx_t_14); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 383, __pyx_L1_error)
+      __pyx_t_7 = PyFloat_FromDouble(__pyx_t_14); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 384, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_7);
       __pyx_t_5 = __pyx_t_7;
       __pyx_t_7 = 0;
@@ -6882,13 +7134,13 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_22summary(struct
       __pyx_t_5 = __pyx_t_9;
     }
     __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
-    __pyx_t_14 = __pyx_PyFloat_AsDouble(__pyx_t_5); if (unlikely((__pyx_t_14 == (double)-1) && PyErr_Occurred())) __PYX_ERR(0, 383, __pyx_L1_error)
+    __pyx_t_14 = __pyx_PyFloat_AsDouble(__pyx_t_5); if (unlikely((__pyx_t_14 == (double)-1) && PyErr_Occurred())) __PYX_ERR(0, 384, __pyx_L1_error)
     __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
     __pyx_v_min_v = __pyx_t_14;
   }
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-  /* "MACS2/IO/BedGraph.pyx":384
+  /* "MACS2/IO/BedGraph.pyx":385
  *             max_v = max(max(v),max_v)
  *             min_v = min(min(v),min_v)
  *         mean_v = sum_v/n_v             # <<<<<<<<<<<<<<
@@ -6897,11 +7149,11 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_22summary(struct
  */
   if (unlikely(__pyx_v_n_v == 0)) {
     PyErr_SetString(PyExc_ZeroDivisionError, "float division");
-    __PYX_ERR(0, 384, __pyx_L1_error)
+    __PYX_ERR(0, 385, __pyx_L1_error)
   }
   __pyx_v_mean_v = (__pyx_v_sum_v / ((double)__pyx_v_n_v));
 
-  /* "MACS2/IO/BedGraph.pyx":385
+  /* "MACS2/IO/BedGraph.pyx":386
  *             min_v = min(min(v),min_v)
  *         mean_v = sum_v/n_v
  *         variance = 0.0             # <<<<<<<<<<<<<<
@@ -6910,7 +7162,7 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_22summary(struct
  */
   __pyx_v_variance = 0.0;
 
-  /* "MACS2/IO/BedGraph.pyx":386
+  /* "MACS2/IO/BedGraph.pyx":387
  *         mean_v = sum_v/n_v
  *         variance = 0.0
  *         for (p,v) in self.__data.values():             # <<<<<<<<<<<<<<
@@ -6920,9 +7172,9 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_22summary(struct
   __pyx_t_3 = 0;
   if (unlikely(__pyx_v_self->__pyx___data == Py_None)) {
     PyErr_Format(PyExc_AttributeError, "'NoneType' object has no attribute '%.30s'", "values");
-    __PYX_ERR(0, 386, __pyx_L1_error)
+    __PYX_ERR(0, 387, __pyx_L1_error)
   }
-  __pyx_t_5 = __Pyx_dict_iterator(__pyx_v_self->__pyx___data, 1, __pyx_n_s_values, (&__pyx_t_2), (&__pyx_t_4)); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 386, __pyx_L1_error)
+  __pyx_t_5 = __Pyx_dict_iterator(__pyx_v_self->__pyx___data, 1, __pyx_n_s_values, (&__pyx_t_2), (&__pyx_t_4)); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 387, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_5);
   __Pyx_XDECREF(__pyx_t_1);
   __pyx_t_1 = __pyx_t_5;
@@ -6930,7 +7182,7 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_22summary(struct
   while (1) {
     __pyx_t_6 = __Pyx_dict_iter_next(__pyx_t_1, __pyx_t_2, &__pyx_t_3, NULL, &__pyx_t_5, NULL, __pyx_t_4);
     if (unlikely(__pyx_t_6 == 0)) break;
-    if (unlikely(__pyx_t_6 == -1)) __PYX_ERR(0, 386, __pyx_L1_error)
+    if (unlikely(__pyx_t_6 == -1)) __PYX_ERR(0, 387, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_5);
     if ((likely(PyTuple_CheckExact(__pyx_t_5))) || (PyList_CheckExact(__pyx_t_5))) {
       PyObject* sequence = __pyx_t_5;
@@ -6938,7 +7190,7 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_22summary(struct
       if (unlikely(size != 2)) {
         if (size > 2) __Pyx_RaiseTooManyValuesError(2);
         else if (size >= 0) __Pyx_RaiseNeedMoreValuesError(size);
-        __PYX_ERR(0, 386, __pyx_L1_error)
+        __PYX_ERR(0, 387, __pyx_L1_error)
       }
       #if CYTHON_ASSUME_SAFE_MACROS && !CYTHON_AVOID_BORROWED_REFS
       if (likely(PyTuple_CheckExact(sequence))) {
@@ -6951,15 +7203,15 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_22summary(struct
       __Pyx_INCREF(__pyx_t_9);
       __Pyx_INCREF(__pyx_t_7);
       #else
-      __pyx_t_9 = PySequence_ITEM(sequence, 0); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 386, __pyx_L1_error)
+      __pyx_t_9 = PySequence_ITEM(sequence, 0); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 387, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_9);
-      __pyx_t_7 = PySequence_ITEM(sequence, 1); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 386, __pyx_L1_error)
+      __pyx_t_7 = PySequence_ITEM(sequence, 1); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 387, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_7);
       #endif
       __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
     } else {
       Py_ssize_t index = -1;
-      __pyx_t_8 = PyObject_GetIter(__pyx_t_5); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 386, __pyx_L1_error)
+      __pyx_t_8 = PyObject_GetIter(__pyx_t_5); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 387, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_8);
       __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
       __pyx_t_10 = Py_TYPE(__pyx_t_8)->tp_iternext;
@@ -6967,7 +7219,7 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_22summary(struct
       __Pyx_GOTREF(__pyx_t_9);
       index = 1; __pyx_t_7 = __pyx_t_10(__pyx_t_8); if (unlikely(!__pyx_t_7)) goto __pyx_L11_unpacking_failed;
       __Pyx_GOTREF(__pyx_t_7);
-      if (__Pyx_IternextUnpackEndCheck(__pyx_t_10(__pyx_t_8), 2) < 0) __PYX_ERR(0, 386, __pyx_L1_error)
+      if (__Pyx_IternextUnpackEndCheck(__pyx_t_10(__pyx_t_8), 2) < 0) __PYX_ERR(0, 387, __pyx_L1_error)
       __pyx_t_10 = NULL;
       __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
       goto __pyx_L12_unpacking_done;
@@ -6975,7 +7227,7 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_22summary(struct
       __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
       __pyx_t_10 = NULL;
       if (__Pyx_IterFinish() == 0) __Pyx_RaiseNeedMoreValuesError(index);
-      __PYX_ERR(0, 386, __pyx_L1_error)
+      __PYX_ERR(0, 387, __pyx_L1_error)
       __pyx_L12_unpacking_done:;
     }
     __Pyx_XDECREF_SET(__pyx_v_p, __pyx_t_9);
@@ -6983,57 +7235,57 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_22summary(struct
     __Pyx_XDECREF_SET(__pyx_v_v, __pyx_t_7);
     __pyx_t_7 = 0;
 
-    /* "MACS2/IO/BedGraph.pyx":387
+    /* "MACS2/IO/BedGraph.pyx":388
  *         variance = 0.0
  *         for (p,v) in self.__data.values():
  *             for i in range(len(p)):             # <<<<<<<<<<<<<<
  *                 # for each region
  *                 tmp = v[i]-mean_v
  */
-    __pyx_t_11 = PyObject_Length(__pyx_v_p); if (unlikely(__pyx_t_11 == ((Py_ssize_t)-1))) __PYX_ERR(0, 387, __pyx_L1_error)
+    __pyx_t_11 = PyObject_Length(__pyx_v_p); if (unlikely(__pyx_t_11 == ((Py_ssize_t)-1))) __PYX_ERR(0, 388, __pyx_L1_error)
     __pyx_t_12 = __pyx_t_11;
     for (__pyx_t_6 = 0; __pyx_t_6 < __pyx_t_12; __pyx_t_6+=1) {
       __pyx_v_i = __pyx_t_6;
 
-      /* "MACS2/IO/BedGraph.pyx":389
+      /* "MACS2/IO/BedGraph.pyx":390
  *             for i in range(len(p)):
  *                 # for each region
  *                 tmp = v[i]-mean_v             # <<<<<<<<<<<<<<
  *                 l = p[i]-pre_p
  *                 variance += tmp*tmp*l
  */
-      __pyx_t_5 = __Pyx_GetItemInt(__pyx_v_v, __pyx_v_i, int, 1, __Pyx_PyInt_From_int, 0, 1, 1); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 389, __pyx_L1_error)
+      __pyx_t_5 = __Pyx_GetItemInt(__pyx_v_v, __pyx_v_i, int, 1, __Pyx_PyInt_From_int, 0, 1, 1); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 390, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_5);
-      __pyx_t_7 = PyFloat_FromDouble(__pyx_v_mean_v); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 389, __pyx_L1_error)
+      __pyx_t_7 = PyFloat_FromDouble(__pyx_v_mean_v); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 390, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_7);
-      __pyx_t_9 = PyNumber_Subtract(__pyx_t_5, __pyx_t_7); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 389, __pyx_L1_error)
+      __pyx_t_9 = PyNumber_Subtract(__pyx_t_5, __pyx_t_7); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 390, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_9);
       __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
       __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
-      __pyx_t_14 = __pyx_PyFloat_AsDouble(__pyx_t_9); if (unlikely((__pyx_t_14 == (double)-1) && PyErr_Occurred())) __PYX_ERR(0, 389, __pyx_L1_error)
+      __pyx_t_14 = __pyx_PyFloat_AsDouble(__pyx_t_9); if (unlikely((__pyx_t_14 == (double)-1) && PyErr_Occurred())) __PYX_ERR(0, 390, __pyx_L1_error)
       __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
       __pyx_v_tmp = __pyx_t_14;
 
-      /* "MACS2/IO/BedGraph.pyx":390
+      /* "MACS2/IO/BedGraph.pyx":391
  *                 # for each region
  *                 tmp = v[i]-mean_v
  *                 l = p[i]-pre_p             # <<<<<<<<<<<<<<
  *                 variance += tmp*tmp*l
  *                 pre_p = p[i]
  */
-      __pyx_t_9 = __Pyx_GetItemInt(__pyx_v_p, __pyx_v_i, int, 1, __Pyx_PyInt_From_int, 0, 1, 1); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 390, __pyx_L1_error)
+      __pyx_t_9 = __Pyx_GetItemInt(__pyx_v_p, __pyx_v_i, int, 1, __Pyx_PyInt_From_int, 0, 1, 1); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 391, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_9);
-      __pyx_t_7 = __Pyx_PyInt_From_int(__pyx_v_pre_p); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 390, __pyx_L1_error)
+      __pyx_t_7 = __Pyx_PyInt_From_int(__pyx_v_pre_p); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 391, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_7);
-      __pyx_t_5 = PyNumber_Subtract(__pyx_t_9, __pyx_t_7); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 390, __pyx_L1_error)
+      __pyx_t_5 = PyNumber_Subtract(__pyx_t_9, __pyx_t_7); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 391, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_5);
       __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
       __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
-      __pyx_t_13 = __Pyx_PyInt_As_int(__pyx_t_5); if (unlikely((__pyx_t_13 == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 390, __pyx_L1_error)
+      __pyx_t_13 = __Pyx_PyInt_As_int(__pyx_t_5); if (unlikely((__pyx_t_13 == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 391, __pyx_L1_error)
       __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
       __pyx_v_l = __pyx_t_13;
 
-      /* "MACS2/IO/BedGraph.pyx":391
+      /* "MACS2/IO/BedGraph.pyx":392
  *                 tmp = v[i]-mean_v
  *                 l = p[i]-pre_p
  *                 variance += tmp*tmp*l             # <<<<<<<<<<<<<<
@@ -7042,23 +7294,23 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_22summary(struct
  */
       __pyx_v_variance = (__pyx_v_variance + ((__pyx_v_tmp * __pyx_v_tmp) * __pyx_v_l));
 
-      /* "MACS2/IO/BedGraph.pyx":392
+      /* "MACS2/IO/BedGraph.pyx":393
  *                 l = p[i]-pre_p
  *                 variance += tmp*tmp*l
  *                 pre_p = p[i]             # <<<<<<<<<<<<<<
  * 
  *         variance /= float(n_v-1)
  */
-      __pyx_t_5 = __Pyx_GetItemInt(__pyx_v_p, __pyx_v_i, int, 1, __Pyx_PyInt_From_int, 0, 1, 1); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 392, __pyx_L1_error)
+      __pyx_t_5 = __Pyx_GetItemInt(__pyx_v_p, __pyx_v_i, int, 1, __Pyx_PyInt_From_int, 0, 1, 1); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 393, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_5);
-      __pyx_t_13 = __Pyx_PyInt_As_int(__pyx_t_5); if (unlikely((__pyx_t_13 == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 392, __pyx_L1_error)
+      __pyx_t_13 = __Pyx_PyInt_As_int(__pyx_t_5); if (unlikely((__pyx_t_13 == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 393, __pyx_L1_error)
       __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
       __pyx_v_pre_p = __pyx_t_13;
     }
   }
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-  /* "MACS2/IO/BedGraph.pyx":394
+  /* "MACS2/IO/BedGraph.pyx":395
  *                 pre_p = p[i]
  * 
  *         variance /= float(n_v-1)             # <<<<<<<<<<<<<<
@@ -7067,11 +7319,11 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_22summary(struct
  */
   if (unlikely(((double)(__pyx_v_n_v - 1)) == 0)) {
     PyErr_SetString(PyExc_ZeroDivisionError, "float division");
-    __PYX_ERR(0, 394, __pyx_L1_error)
+    __PYX_ERR(0, 395, __pyx_L1_error)
   }
   __pyx_v_variance = (__pyx_v_variance / ((double)(__pyx_v_n_v - 1)));
 
-  /* "MACS2/IO/BedGraph.pyx":395
+  /* "MACS2/IO/BedGraph.pyx":396
  * 
  *         variance /= float(n_v-1)
  *         std_v = sqrt(variance)             # <<<<<<<<<<<<<<
@@ -7080,7 +7332,7 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_22summary(struct
  */
   __pyx_v_std_v = sqrt(__pyx_v_variance);
 
-  /* "MACS2/IO/BedGraph.pyx":396
+  /* "MACS2/IO/BedGraph.pyx":397
  *         variance /= float(n_v-1)
  *         std_v = sqrt(variance)
  *         return (sum_v, n_v, max_v, min_v, mean_v, std_v)             # <<<<<<<<<<<<<<
@@ -7088,19 +7340,19 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_22summary(struct
  *     def call_peaks (self, double cutoff=1, double up_limit=1e310, int min_length=200, int max_gap=50,
  */
   __Pyx_XDECREF(__pyx_r);
-  __pyx_t_1 = PyFloat_FromDouble(__pyx_v_sum_v); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 396, __pyx_L1_error)
+  __pyx_t_1 = PyFloat_FromDouble(__pyx_v_sum_v); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 397, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_5 = __Pyx_PyInt_From_long(__pyx_v_n_v); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 396, __pyx_L1_error)
+  __pyx_t_5 = __Pyx_PyInt_From_long(__pyx_v_n_v); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 397, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_5);
-  __pyx_t_7 = PyFloat_FromDouble(__pyx_v_max_v); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 396, __pyx_L1_error)
+  __pyx_t_7 = PyFloat_FromDouble(__pyx_v_max_v); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 397, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_7);
-  __pyx_t_9 = PyFloat_FromDouble(__pyx_v_min_v); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 396, __pyx_L1_error)
+  __pyx_t_9 = PyFloat_FromDouble(__pyx_v_min_v); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 397, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_9);
-  __pyx_t_8 = PyFloat_FromDouble(__pyx_v_mean_v); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 396, __pyx_L1_error)
+  __pyx_t_8 = PyFloat_FromDouble(__pyx_v_mean_v); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 397, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_8);
-  __pyx_t_16 = PyFloat_FromDouble(__pyx_v_std_v); if (unlikely(!__pyx_t_16)) __PYX_ERR(0, 396, __pyx_L1_error)
+  __pyx_t_16 = PyFloat_FromDouble(__pyx_v_std_v); if (unlikely(!__pyx_t_16)) __PYX_ERR(0, 397, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_16);
-  __pyx_t_17 = PyTuple_New(6); if (unlikely(!__pyx_t_17)) __PYX_ERR(0, 396, __pyx_L1_error)
+  __pyx_t_17 = PyTuple_New(6); if (unlikely(!__pyx_t_17)) __PYX_ERR(0, 397, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_17);
   __Pyx_GIVEREF(__pyx_t_1);
   PyTuple_SET_ITEM(__pyx_t_17, 0, __pyx_t_1);
@@ -7124,7 +7376,7 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_22summary(struct
   __pyx_t_17 = 0;
   goto __pyx_L0;
 
-  /* "MACS2/IO/BedGraph.pyx":359
+  /* "MACS2/IO/BedGraph.pyx":360
  *         return True
  * 
  *     def summary (self):             # <<<<<<<<<<<<<<
@@ -7147,11 +7399,12 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_22summary(struct
   __Pyx_XDECREF(__pyx_v_p);
   __Pyx_XDECREF(__pyx_v_v);
   __Pyx_XGIVEREF(__pyx_r);
+  __Pyx_TraceReturn(__pyx_r, 0);
   __Pyx_RefNannyFinishContext();
   return __pyx_r;
 }
 
-/* "MACS2/IO/BedGraph.pyx":398
+/* "MACS2/IO/BedGraph.pyx":399
  *         return (sum_v, n_v, max_v, min_v, mean_v, std_v)
  * 
  *     def call_peaks (self, double cutoff=1, double up_limit=1e310, int min_length=200, int max_gap=50,             # <<<<<<<<<<<<<<
@@ -7175,7 +7428,7 @@ static PyObject *__pyx_pw_5MACS2_2IO_8BedGraph_14bedGraphTrackI_25call_peaks(PyO
     static PyObject **__pyx_pyargnames[] = {&__pyx_n_s_cutoff,&__pyx_n_s_up_limit,&__pyx_n_s_min_length,&__pyx_n_s_max_gap,&__pyx_n_s_call_summits,0};
     PyObject* values[5] = {0,0,0,0,0};
 
-    /* "MACS2/IO/BedGraph.pyx":399
+    /* "MACS2/IO/BedGraph.pyx":400
  * 
  *     def call_peaks (self, double cutoff=1, double up_limit=1e310, int min_length=200, int max_gap=50,
  *                     bool call_summits=False):             # <<<<<<<<<<<<<<
@@ -7233,7 +7486,7 @@ static PyObject *__pyx_pw_5MACS2_2IO_8BedGraph_14bedGraphTrackI_25call_peaks(PyO
         }
       }
       if (unlikely(kw_args > 0)) {
-        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "call_peaks") < 0)) __PYX_ERR(0, 398, __pyx_L3_error)
+        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "call_peaks") < 0)) __PYX_ERR(0, 399, __pyx_L3_error)
       }
     } else {
       switch (PyTuple_GET_SIZE(__pyx_args)) {
@@ -7252,22 +7505,22 @@ static PyObject *__pyx_pw_5MACS2_2IO_8BedGraph_14bedGraphTrackI_25call_peaks(PyO
       }
     }
     if (values[0]) {
-      __pyx_v_cutoff = __pyx_PyFloat_AsDouble(values[0]); if (unlikely((__pyx_v_cutoff == (double)-1) && PyErr_Occurred())) __PYX_ERR(0, 398, __pyx_L3_error)
+      __pyx_v_cutoff = __pyx_PyFloat_AsDouble(values[0]); if (unlikely((__pyx_v_cutoff == (double)-1) && PyErr_Occurred())) __PYX_ERR(0, 399, __pyx_L3_error)
     } else {
       __pyx_v_cutoff = ((double)1.0);
     }
     if (values[1]) {
-      __pyx_v_up_limit = __pyx_PyFloat_AsDouble(values[1]); if (unlikely((__pyx_v_up_limit == (double)-1) && PyErr_Occurred())) __PYX_ERR(0, 398, __pyx_L3_error)
+      __pyx_v_up_limit = __pyx_PyFloat_AsDouble(values[1]); if (unlikely((__pyx_v_up_limit == (double)-1) && PyErr_Occurred())) __PYX_ERR(0, 399, __pyx_L3_error)
     } else {
       __pyx_v_up_limit = ((double)Py_HUGE_VAL);
     }
     if (values[2]) {
-      __pyx_v_min_length = __Pyx_PyInt_As_int(values[2]); if (unlikely((__pyx_v_min_length == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 398, __pyx_L3_error)
+      __pyx_v_min_length = __Pyx_PyInt_As_int(values[2]); if (unlikely((__pyx_v_min_length == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 399, __pyx_L3_error)
     } else {
       __pyx_v_min_length = ((int)0xC8);
     }
     if (values[3]) {
-      __pyx_v_max_gap = __Pyx_PyInt_As_int(values[3]); if (unlikely((__pyx_v_max_gap == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 398, __pyx_L3_error)
+      __pyx_v_max_gap = __Pyx_PyInt_As_int(values[3]); if (unlikely((__pyx_v_max_gap == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 399, __pyx_L3_error)
     } else {
       __pyx_v_max_gap = ((int)50);
     }
@@ -7275,16 +7528,16 @@ static PyObject *__pyx_pw_5MACS2_2IO_8BedGraph_14bedGraphTrackI_25call_peaks(PyO
   }
   goto __pyx_L4_argument_unpacking_done;
   __pyx_L5_argtuple_error:;
-  __Pyx_RaiseArgtupleInvalid("call_peaks", 0, 0, 5, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 398, __pyx_L3_error)
+  __Pyx_RaiseArgtupleInvalid("call_peaks", 0, 0, 5, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 399, __pyx_L3_error)
   __pyx_L3_error:;
   __Pyx_AddTraceback("MACS2.IO.BedGraph.bedGraphTrackI.call_peaks", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __Pyx_RefNannyFinishContext();
   return NULL;
   __pyx_L4_argument_unpacking_done:;
-  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_call_summits), __pyx_ptype_7cpython_4bool_bool, 1, "call_summits", 0))) __PYX_ERR(0, 399, __pyx_L1_error)
+  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_call_summits), __pyx_ptype_7cpython_4bool_bool, 1, "call_summits", 0))) __PYX_ERR(0, 400, __pyx_L1_error)
   __pyx_r = __pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_24call_peaks(((struct __pyx_obj_5MACS2_2IO_8BedGraph_bedGraphTrackI *)__pyx_v_self), __pyx_v_cutoff, __pyx_v_up_limit, __pyx_v_min_length, __pyx_v_max_gap, __pyx_v_call_summits);
 
-  /* "MACS2/IO/BedGraph.pyx":398
+  /* "MACS2/IO/BedGraph.pyx":399
  *         return (sum_v, n_v, max_v, min_v, mean_v, std_v)
  * 
  *     def call_peaks (self, double cutoff=1, double up_limit=1e310, int min_length=200, int max_gap=50,             # <<<<<<<<<<<<<<
@@ -7318,6 +7571,7 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_24call_peaks(str
   PyObject *__pyx_v_psn = NULL;
   PyObject *__pyx_v_vsn = NULL;
   PyObject *__pyx_r = NULL;
+  __Pyx_TraceDeclarations
   __Pyx_RefNannyDeclarations
   PyObject *__pyx_t_1 = NULL;
   PyObject *__pyx_t_2 = NULL;
@@ -7341,39 +7595,40 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_24call_peaks(str
   int __pyx_t_20;
   PyObject *__pyx_t_21 = NULL;
   __Pyx_RefNannySetupContext("call_peaks", 0);
+  __Pyx_TraceCall("call_peaks", __pyx_f[0], 399, 0, __PYX_ERR(0, 399, __pyx_L1_error));
 
-  /* "MACS2/IO/BedGraph.pyx":423
+  /* "MACS2/IO/BedGraph.pyx":424
  *         #if call_summits: close_peak = self.__close_peak2
  *         #else: close_peak = self.__close_peak
  *         close_peak = self.__close_peak             # <<<<<<<<<<<<<<
  *         chrs = self.get_chr_names()
  *         peaks = PeakIO()                      # dictionary to save peaks
  */
-  __pyx_t_1 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_v_self), __pyx_n_s_close_peak); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 423, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_v_self), __pyx_n_s_close_peak); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 424, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __pyx_v_close_peak = __pyx_t_1;
   __pyx_t_1 = 0;
 
-  /* "MACS2/IO/BedGraph.pyx":424
+  /* "MACS2/IO/BedGraph.pyx":425
  *         #else: close_peak = self.__close_peak
  *         close_peak = self.__close_peak
  *         chrs = self.get_chr_names()             # <<<<<<<<<<<<<<
  *         peaks = PeakIO()                      # dictionary to save peaks
  *         for chrom in chrs:
  */
-  __pyx_t_1 = ((struct __pyx_vtabstruct_5MACS2_2IO_8BedGraph_bedGraphTrackI *)__pyx_v_self->__pyx_vtab)->get_chr_names(__pyx_v_self, 0); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 424, __pyx_L1_error)
+  __pyx_t_1 = ((struct __pyx_vtabstruct_5MACS2_2IO_8BedGraph_bedGraphTrackI *)__pyx_v_self->__pyx_vtab)->get_chr_names(__pyx_v_self, 0); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 425, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __pyx_v_chrs = ((PyObject*)__pyx_t_1);
   __pyx_t_1 = 0;
 
-  /* "MACS2/IO/BedGraph.pyx":425
+  /* "MACS2/IO/BedGraph.pyx":426
  *         close_peak = self.__close_peak
  *         chrs = self.get_chr_names()
  *         peaks = PeakIO()                      # dictionary to save peaks             # <<<<<<<<<<<<<<
  *         for chrom in chrs:
  *             peak_content = None
  */
-  __Pyx_GetModuleGlobalName(__pyx_t_2, __pyx_n_s_PeakIO); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 425, __pyx_L1_error)
+  __Pyx_GetModuleGlobalName(__pyx_t_2, __pyx_n_s_PeakIO); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 426, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __pyx_t_3 = NULL;
   if (CYTHON_UNPACK_METHODS && unlikely(PyMethod_Check(__pyx_t_2))) {
@@ -7387,13 +7642,13 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_24call_peaks(str
   }
   __pyx_t_1 = (__pyx_t_3) ? __Pyx_PyObject_CallOneArg(__pyx_t_2, __pyx_t_3) : __Pyx_PyObject_CallNoArg(__pyx_t_2);
   __Pyx_XDECREF(__pyx_t_3); __pyx_t_3 = 0;
-  if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 425, __pyx_L1_error)
+  if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 426, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
   __pyx_v_peaks = __pyx_t_1;
   __pyx_t_1 = 0;
 
-  /* "MACS2/IO/BedGraph.pyx":426
+  /* "MACS2/IO/BedGraph.pyx":427
  *         chrs = self.get_chr_names()
  *         peaks = PeakIO()                      # dictionary to save peaks
  *         for chrom in chrs:             # <<<<<<<<<<<<<<
@@ -7401,7 +7656,7 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_24call_peaks(str
  *             peak_length = 0
  */
   __pyx_t_4 = 0;
-  __pyx_t_2 = __Pyx_set_iterator(__pyx_v_chrs, 1, (&__pyx_t_5), (&__pyx_t_6)); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 426, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_set_iterator(__pyx_v_chrs, 1, (&__pyx_t_5), (&__pyx_t_6)); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 427, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __Pyx_XDECREF(__pyx_t_1);
   __pyx_t_1 = __pyx_t_2;
@@ -7409,13 +7664,13 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_24call_peaks(str
   while (1) {
     __pyx_t_7 = __Pyx_set_iter_next(__pyx_t_1, __pyx_t_5, &__pyx_t_4, &__pyx_t_2, __pyx_t_6);
     if (unlikely(__pyx_t_7 == 0)) break;
-    if (unlikely(__pyx_t_7 == -1)) __PYX_ERR(0, 426, __pyx_L1_error)
+    if (unlikely(__pyx_t_7 == -1)) __PYX_ERR(0, 427, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
-    if (!(likely(PyBytes_CheckExact(__pyx_t_2))||((__pyx_t_2) == Py_None)||(PyErr_Format(PyExc_TypeError, "Expected %.16s, got %.200s", "bytes", Py_TYPE(__pyx_t_2)->tp_name), 0))) __PYX_ERR(0, 426, __pyx_L1_error)
+    if (!(likely(PyBytes_CheckExact(__pyx_t_2))||((__pyx_t_2) == Py_None)||(PyErr_Format(PyExc_TypeError, "Expected %.16s, got %.200s", "bytes", Py_TYPE(__pyx_t_2)->tp_name), 0))) __PYX_ERR(0, 427, __pyx_L1_error)
     __Pyx_XDECREF_SET(__pyx_v_chrom, ((PyObject*)__pyx_t_2));
     __pyx_t_2 = 0;
 
-    /* "MACS2/IO/BedGraph.pyx":427
+    /* "MACS2/IO/BedGraph.pyx":428
  *         peaks = PeakIO()                      # dictionary to save peaks
  *         for chrom in chrs:
  *             peak_content = None             # <<<<<<<<<<<<<<
@@ -7425,7 +7680,7 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_24call_peaks(str
     __Pyx_INCREF(Py_None);
     __Pyx_XDECREF_SET(__pyx_v_peak_content, ((PyObject*)Py_None));
 
-    /* "MACS2/IO/BedGraph.pyx":428
+    /* "MACS2/IO/BedGraph.pyx":429
  *         for chrom in chrs:
  *             peak_content = None
  *             peak_length = 0             # <<<<<<<<<<<<<<
@@ -7434,14 +7689,14 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_24call_peaks(str
  */
     __pyx_v_peak_length = 0;
 
-    /* "MACS2/IO/BedGraph.pyx":429
+    /* "MACS2/IO/BedGraph.pyx":430
  *             peak_content = None
  *             peak_length = 0
  *             (ps,vs) = self.get_data_by_chr(chrom) # arrays for position and values             # <<<<<<<<<<<<<<
  *             psn = iter(ps).__next__         # assign the next function to a viable to speed up
  *             vsn = iter(vs).__next__
  */
-    __pyx_t_3 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_v_self), __pyx_n_s_get_data_by_chr); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 429, __pyx_L1_error)
+    __pyx_t_3 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_v_self), __pyx_n_s_get_data_by_chr); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 430, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_3);
     __pyx_t_8 = NULL;
     if (CYTHON_UNPACK_METHODS && likely(PyMethod_Check(__pyx_t_3))) {
@@ -7455,7 +7710,7 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_24call_peaks(str
     }
     __pyx_t_2 = (__pyx_t_8) ? __Pyx_PyObject_Call2Args(__pyx_t_3, __pyx_t_8, __pyx_v_chrom) : __Pyx_PyObject_CallOneArg(__pyx_t_3, __pyx_v_chrom);
     __Pyx_XDECREF(__pyx_t_8); __pyx_t_8 = 0;
-    if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 429, __pyx_L1_error)
+    if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 430, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
     __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
     if ((likely(PyTuple_CheckExact(__pyx_t_2))) || (PyList_CheckExact(__pyx_t_2))) {
@@ -7464,7 +7719,7 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_24call_peaks(str
       if (unlikely(size != 2)) {
         if (size > 2) __Pyx_RaiseTooManyValuesError(2);
         else if (size >= 0) __Pyx_RaiseNeedMoreValuesError(size);
-        __PYX_ERR(0, 429, __pyx_L1_error)
+        __PYX_ERR(0, 430, __pyx_L1_error)
       }
       #if CYTHON_ASSUME_SAFE_MACROS && !CYTHON_AVOID_BORROWED_REFS
       if (likely(PyTuple_CheckExact(sequence))) {
@@ -7477,15 +7732,15 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_24call_peaks(str
       __Pyx_INCREF(__pyx_t_3);
       __Pyx_INCREF(__pyx_t_8);
       #else
-      __pyx_t_3 = PySequence_ITEM(sequence, 0); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 429, __pyx_L1_error)
+      __pyx_t_3 = PySequence_ITEM(sequence, 0); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 430, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_3);
-      __pyx_t_8 = PySequence_ITEM(sequence, 1); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 429, __pyx_L1_error)
+      __pyx_t_8 = PySequence_ITEM(sequence, 1); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 430, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_8);
       #endif
       __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
     } else {
       Py_ssize_t index = -1;
-      __pyx_t_9 = PyObject_GetIter(__pyx_t_2); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 429, __pyx_L1_error)
+      __pyx_t_9 = PyObject_GetIter(__pyx_t_2); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 430, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_9);
       __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
       __pyx_t_10 = Py_TYPE(__pyx_t_9)->tp_iternext;
@@ -7493,7 +7748,7 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_24call_peaks(str
       __Pyx_GOTREF(__pyx_t_3);
       index = 1; __pyx_t_8 = __pyx_t_10(__pyx_t_9); if (unlikely(!__pyx_t_8)) goto __pyx_L5_unpacking_failed;
       __Pyx_GOTREF(__pyx_t_8);
-      if (__Pyx_IternextUnpackEndCheck(__pyx_t_10(__pyx_t_9), 2) < 0) __PYX_ERR(0, 429, __pyx_L1_error)
+      if (__Pyx_IternextUnpackEndCheck(__pyx_t_10(__pyx_t_9), 2) < 0) __PYX_ERR(0, 430, __pyx_L1_error)
       __pyx_t_10 = NULL;
       __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
       goto __pyx_L6_unpacking_done;
@@ -7501,7 +7756,7 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_24call_peaks(str
       __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
       __pyx_t_10 = NULL;
       if (__Pyx_IterFinish() == 0) __Pyx_RaiseNeedMoreValuesError(index);
-      __PYX_ERR(0, 429, __pyx_L1_error)
+      __PYX_ERR(0, 430, __pyx_L1_error)
       __pyx_L6_unpacking_done:;
     }
     __Pyx_XDECREF_SET(__pyx_v_ps, __pyx_t_3);
@@ -7509,37 +7764,37 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_24call_peaks(str
     __Pyx_XDECREF_SET(__pyx_v_vs, __pyx_t_8);
     __pyx_t_8 = 0;
 
-    /* "MACS2/IO/BedGraph.pyx":430
+    /* "MACS2/IO/BedGraph.pyx":431
  *             peak_length = 0
  *             (ps,vs) = self.get_data_by_chr(chrom) # arrays for position and values
  *             psn = iter(ps).__next__         # assign the next function to a viable to speed up             # <<<<<<<<<<<<<<
  *             vsn = iter(vs).__next__
  *             x = 0
  */
-    __pyx_t_2 = PyObject_GetIter(__pyx_v_ps); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 430, __pyx_L1_error)
+    __pyx_t_2 = PyObject_GetIter(__pyx_v_ps); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 431, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
-    __pyx_t_8 = __Pyx_PyObject_GetAttrStr(__pyx_t_2, __pyx_n_s_next); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 430, __pyx_L1_error)
+    __pyx_t_8 = __Pyx_PyObject_GetAttrStr(__pyx_t_2, __pyx_n_s_next); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 431, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_8);
     __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
     __Pyx_XDECREF_SET(__pyx_v_psn, __pyx_t_8);
     __pyx_t_8 = 0;
 
-    /* "MACS2/IO/BedGraph.pyx":431
+    /* "MACS2/IO/BedGraph.pyx":432
  *             (ps,vs) = self.get_data_by_chr(chrom) # arrays for position and values
  *             psn = iter(ps).__next__         # assign the next function to a viable to speed up
  *             vsn = iter(vs).__next__             # <<<<<<<<<<<<<<
  *             x = 0
  *             pre_p = 0                   # remember previous position
  */
-    __pyx_t_8 = PyObject_GetIter(__pyx_v_vs); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 431, __pyx_L1_error)
+    __pyx_t_8 = PyObject_GetIter(__pyx_v_vs); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 432, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_8);
-    __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_t_8, __pyx_n_s_next); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 431, __pyx_L1_error)
+    __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_t_8, __pyx_n_s_next); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 432, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
     __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
     __Pyx_XDECREF_SET(__pyx_v_vsn, __pyx_t_2);
     __pyx_t_2 = 0;
 
-    /* "MACS2/IO/BedGraph.pyx":432
+    /* "MACS2/IO/BedGraph.pyx":433
  *             psn = iter(ps).__next__         # assign the next function to a viable to speed up
  *             vsn = iter(vs).__next__
  *             x = 0             # <<<<<<<<<<<<<<
@@ -7548,7 +7803,7 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_24call_peaks(str
  */
     __pyx_v_x = 0;
 
-    /* "MACS2/IO/BedGraph.pyx":433
+    /* "MACS2/IO/BedGraph.pyx":434
  *             vsn = iter(vs).__next__
  *             x = 0
  *             pre_p = 0                   # remember previous position             # <<<<<<<<<<<<<<
@@ -7557,7 +7812,7 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_24call_peaks(str
  */
     __pyx_v_pre_p = 0;
 
-    /* "MACS2/IO/BedGraph.pyx":434
+    /* "MACS2/IO/BedGraph.pyx":435
  *             x = 0
  *             pre_p = 0                   # remember previous position
  *             while True:             # <<<<<<<<<<<<<<
@@ -7566,7 +7821,7 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_24call_peaks(str
  */
     while (1) {
 
-      /* "MACS2/IO/BedGraph.pyx":436
+      /* "MACS2/IO/BedGraph.pyx":437
  *             while True:
  *                 # find the first region above cutoff
  *                 try:                    # try to read the first data range for this chrom             # <<<<<<<<<<<<<<
@@ -7582,7 +7837,7 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_24call_peaks(str
         __Pyx_XGOTREF(__pyx_t_13);
         /*try:*/ {
 
-          /* "MACS2/IO/BedGraph.pyx":437
+          /* "MACS2/IO/BedGraph.pyx":438
  *                 # find the first region above cutoff
  *                 try:                    # try to read the first data range for this chrom
  *                     p = psn()             # <<<<<<<<<<<<<<
@@ -7602,14 +7857,14 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_24call_peaks(str
           }
           __pyx_t_2 = (__pyx_t_3) ? __Pyx_PyObject_CallOneArg(__pyx_t_8, __pyx_t_3) : __Pyx_PyObject_CallNoArg(__pyx_t_8);
           __Pyx_XDECREF(__pyx_t_3); __pyx_t_3 = 0;
-          if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 437, __pyx_L9_error)
+          if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 438, __pyx_L9_error)
           __Pyx_GOTREF(__pyx_t_2);
           __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
-          __pyx_t_7 = __Pyx_PyInt_As_int(__pyx_t_2); if (unlikely((__pyx_t_7 == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 437, __pyx_L9_error)
+          __pyx_t_7 = __Pyx_PyInt_As_int(__pyx_t_2); if (unlikely((__pyx_t_7 == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 438, __pyx_L9_error)
           __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
           __pyx_v_p = __pyx_t_7;
 
-          /* "MACS2/IO/BedGraph.pyx":438
+          /* "MACS2/IO/BedGraph.pyx":439
  *                 try:                    # try to read the first data range for this chrom
  *                     p = psn()
  *                     v = vsn()             # <<<<<<<<<<<<<<
@@ -7629,14 +7884,14 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_24call_peaks(str
           }
           __pyx_t_2 = (__pyx_t_3) ? __Pyx_PyObject_CallOneArg(__pyx_t_8, __pyx_t_3) : __Pyx_PyObject_CallNoArg(__pyx_t_8);
           __Pyx_XDECREF(__pyx_t_3); __pyx_t_3 = 0;
-          if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 438, __pyx_L9_error)
+          if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 439, __pyx_L9_error)
           __Pyx_GOTREF(__pyx_t_2);
           __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
-          __pyx_t_14 = __pyx_PyFloat_AsDouble(__pyx_t_2); if (unlikely((__pyx_t_14 == (double)-1) && PyErr_Occurred())) __PYX_ERR(0, 438, __pyx_L9_error)
+          __pyx_t_14 = __pyx_PyFloat_AsDouble(__pyx_t_2); if (unlikely((__pyx_t_14 == (double)-1) && PyErr_Occurred())) __PYX_ERR(0, 439, __pyx_L9_error)
           __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
           __pyx_v_v = __pyx_t_14;
 
-          /* "MACS2/IO/BedGraph.pyx":436
+          /* "MACS2/IO/BedGraph.pyx":437
  *             while True:
  *                 # find the first region above cutoff
  *                 try:                    # try to read the first data range for this chrom             # <<<<<<<<<<<<<<
@@ -7654,7 +7909,7 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_24call_peaks(str
         __Pyx_XDECREF(__pyx_t_8); __pyx_t_8 = 0;
         __Pyx_XDECREF(__pyx_t_9); __pyx_t_9 = 0;
 
-        /* "MACS2/IO/BedGraph.pyx":439
+        /* "MACS2/IO/BedGraph.pyx":440
  *                     p = psn()
  *                     v = vsn()
  *                 except:             # <<<<<<<<<<<<<<
@@ -7663,12 +7918,12 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_24call_peaks(str
  */
         /*except:*/ {
           __Pyx_AddTraceback("MACS2.IO.BedGraph.bedGraphTrackI.call_peaks", __pyx_clineno, __pyx_lineno, __pyx_filename);
-          if (__Pyx_GetException(&__pyx_t_2, &__pyx_t_8, &__pyx_t_3) < 0) __PYX_ERR(0, 439, __pyx_L11_except_error)
+          if (__Pyx_GetException(&__pyx_t_2, &__pyx_t_8, &__pyx_t_3) < 0) __PYX_ERR(0, 440, __pyx_L11_except_error)
           __Pyx_GOTREF(__pyx_t_2);
           __Pyx_GOTREF(__pyx_t_8);
           __Pyx_GOTREF(__pyx_t_3);
 
-          /* "MACS2/IO/BedGraph.pyx":440
+          /* "MACS2/IO/BedGraph.pyx":441
  *                     v = vsn()
  *                 except:
  *                     break             # <<<<<<<<<<<<<<
@@ -7684,7 +7939,7 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_24call_peaks(str
         }
         __pyx_L11_except_error:;
 
-        /* "MACS2/IO/BedGraph.pyx":436
+        /* "MACS2/IO/BedGraph.pyx":437
  *             while True:
  *                 # find the first region above cutoff
  *                 try:                    # try to read the first data range for this chrom             # <<<<<<<<<<<<<<
@@ -7705,7 +7960,7 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_24call_peaks(str
         __pyx_L16_try_end:;
       }
 
-      /* "MACS2/IO/BedGraph.pyx":441
+      /* "MACS2/IO/BedGraph.pyx":442
  *                 except:
  *                     break
  *                 x += 1                  # index for the next point             # <<<<<<<<<<<<<<
@@ -7714,7 +7969,7 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_24call_peaks(str
  */
       __pyx_v_x = (__pyx_v_x + 1);
 
-      /* "MACS2/IO/BedGraph.pyx":442
+      /* "MACS2/IO/BedGraph.pyx":443
  *                     break
  *                 x += 1                  # index for the next point
  *                 if v >= cutoff and v <= up_limit:             # <<<<<<<<<<<<<<
@@ -7732,20 +7987,20 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_24call_peaks(str
       __pyx_L20_bool_binop_done:;
       if (__pyx_t_15) {
 
-        /* "MACS2/IO/BedGraph.pyx":443
+        /* "MACS2/IO/BedGraph.pyx":444
  *                 x += 1                  # index for the next point
  *                 if v >= cutoff and v <= up_limit:
  *                     peak_content = [(pre_p,p,v),]             # <<<<<<<<<<<<<<
  *                     pre_p = p
  *                     break               # found the first range above cutoff
  */
-        __pyx_t_3 = __Pyx_PyInt_From_int(__pyx_v_pre_p); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 443, __pyx_L1_error)
+        __pyx_t_3 = __Pyx_PyInt_From_int(__pyx_v_pre_p); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 444, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_3);
-        __pyx_t_8 = __Pyx_PyInt_From_int(__pyx_v_p); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 443, __pyx_L1_error)
+        __pyx_t_8 = __Pyx_PyInt_From_int(__pyx_v_p); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 444, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_8);
-        __pyx_t_2 = PyFloat_FromDouble(__pyx_v_v); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 443, __pyx_L1_error)
+        __pyx_t_2 = PyFloat_FromDouble(__pyx_v_v); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 444, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_2);
-        __pyx_t_9 = PyTuple_New(3); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 443, __pyx_L1_error)
+        __pyx_t_9 = PyTuple_New(3); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 444, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_9);
         __Pyx_GIVEREF(__pyx_t_3);
         PyTuple_SET_ITEM(__pyx_t_9, 0, __pyx_t_3);
@@ -7756,7 +8011,7 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_24call_peaks(str
         __pyx_t_3 = 0;
         __pyx_t_8 = 0;
         __pyx_t_2 = 0;
-        __pyx_t_2 = PyList_New(1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 443, __pyx_L1_error)
+        __pyx_t_2 = PyList_New(1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 444, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_2);
         __Pyx_GIVEREF(__pyx_t_9);
         PyList_SET_ITEM(__pyx_t_2, 0, __pyx_t_9);
@@ -7764,7 +8019,7 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_24call_peaks(str
         __Pyx_DECREF_SET(__pyx_v_peak_content, ((PyObject*)__pyx_t_2));
         __pyx_t_2 = 0;
 
-        /* "MACS2/IO/BedGraph.pyx":444
+        /* "MACS2/IO/BedGraph.pyx":445
  *                 if v >= cutoff and v <= up_limit:
  *                     peak_content = [(pre_p,p,v),]
  *                     pre_p = p             # <<<<<<<<<<<<<<
@@ -7773,7 +8028,7 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_24call_peaks(str
  */
         __pyx_v_pre_p = __pyx_v_p;
 
-        /* "MACS2/IO/BedGraph.pyx":445
+        /* "MACS2/IO/BedGraph.pyx":446
  *                     peak_content = [(pre_p,p,v),]
  *                     pre_p = p
  *                     break               # found the first range above cutoff             # <<<<<<<<<<<<<<
@@ -7782,7 +8037,7 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_24call_peaks(str
  */
         goto __pyx_L8_break;
 
-        /* "MACS2/IO/BedGraph.pyx":442
+        /* "MACS2/IO/BedGraph.pyx":443
  *                     break
  *                 x += 1                  # index for the next point
  *                 if v >= cutoff and v <= up_limit:             # <<<<<<<<<<<<<<
@@ -7791,7 +8046,7 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_24call_peaks(str
  */
       }
 
-      /* "MACS2/IO/BedGraph.pyx":447
+      /* "MACS2/IO/BedGraph.pyx":448
  *                     break               # found the first range above cutoff
  *                 else:
  *                     pre_p = p             # <<<<<<<<<<<<<<
@@ -7804,19 +8059,19 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_24call_peaks(str
     }
     __pyx_L8_break:;
 
-    /* "MACS2/IO/BedGraph.pyx":449
+    /* "MACS2/IO/BedGraph.pyx":450
  *                     pre_p = p
  * 
  *             for i in range(x,len(ps)):             # <<<<<<<<<<<<<<
  *                 # continue scan the rest regions
  *                 p = psn()
  */
-    __pyx_t_17 = PyObject_Length(__pyx_v_ps); if (unlikely(__pyx_t_17 == ((Py_ssize_t)-1))) __PYX_ERR(0, 449, __pyx_L1_error)
+    __pyx_t_17 = PyObject_Length(__pyx_v_ps); if (unlikely(__pyx_t_17 == ((Py_ssize_t)-1))) __PYX_ERR(0, 450, __pyx_L1_error)
     __pyx_t_18 = __pyx_t_17;
     for (__pyx_t_7 = __pyx_v_x; __pyx_t_7 < __pyx_t_18; __pyx_t_7+=1) {
       __pyx_v_i = __pyx_t_7;
 
-      /* "MACS2/IO/BedGraph.pyx":451
+      /* "MACS2/IO/BedGraph.pyx":452
  *             for i in range(x,len(ps)):
  *                 # continue scan the rest regions
  *                 p = psn()             # <<<<<<<<<<<<<<
@@ -7836,14 +8091,14 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_24call_peaks(str
       }
       __pyx_t_2 = (__pyx_t_8) ? __Pyx_PyObject_CallOneArg(__pyx_t_9, __pyx_t_8) : __Pyx_PyObject_CallNoArg(__pyx_t_9);
       __Pyx_XDECREF(__pyx_t_8); __pyx_t_8 = 0;
-      if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 451, __pyx_L1_error)
+      if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 452, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_2);
       __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
-      __pyx_t_19 = __Pyx_PyInt_As_int(__pyx_t_2); if (unlikely((__pyx_t_19 == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 451, __pyx_L1_error)
+      __pyx_t_19 = __Pyx_PyInt_As_int(__pyx_t_2); if (unlikely((__pyx_t_19 == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 452, __pyx_L1_error)
       __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
       __pyx_v_p = __pyx_t_19;
 
-      /* "MACS2/IO/BedGraph.pyx":452
+      /* "MACS2/IO/BedGraph.pyx":453
  *                 # continue scan the rest regions
  *                 p = psn()
  *                 v = vsn()             # <<<<<<<<<<<<<<
@@ -7863,14 +8118,14 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_24call_peaks(str
       }
       __pyx_t_2 = (__pyx_t_8) ? __Pyx_PyObject_CallOneArg(__pyx_t_9, __pyx_t_8) : __Pyx_PyObject_CallNoArg(__pyx_t_9);
       __Pyx_XDECREF(__pyx_t_8); __pyx_t_8 = 0;
-      if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 452, __pyx_L1_error)
+      if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 453, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_2);
       __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
-      __pyx_t_14 = __pyx_PyFloat_AsDouble(__pyx_t_2); if (unlikely((__pyx_t_14 == (double)-1) && PyErr_Occurred())) __PYX_ERR(0, 452, __pyx_L1_error)
+      __pyx_t_14 = __pyx_PyFloat_AsDouble(__pyx_t_2); if (unlikely((__pyx_t_14 == (double)-1) && PyErr_Occurred())) __PYX_ERR(0, 453, __pyx_L1_error)
       __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
       __pyx_v_v = __pyx_t_14;
 
-      /* "MACS2/IO/BedGraph.pyx":453
+      /* "MACS2/IO/BedGraph.pyx":454
  *                 p = psn()
  *                 v = vsn()
  *                 if v < cutoff or v > up_limit: # not be detected as 'peak'             # <<<<<<<<<<<<<<
@@ -7888,7 +8143,7 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_24call_peaks(str
       __pyx_L25_bool_binop_done:;
       if (__pyx_t_15) {
 
-        /* "MACS2/IO/BedGraph.pyx":454
+        /* "MACS2/IO/BedGraph.pyx":455
  *                 v = vsn()
  *                 if v < cutoff or v > up_limit: # not be detected as 'peak'
  *                     pre_p = p             # <<<<<<<<<<<<<<
@@ -7897,7 +8152,7 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_24call_peaks(str
  */
         __pyx_v_pre_p = __pyx_v_p;
 
-        /* "MACS2/IO/BedGraph.pyx":455
+        /* "MACS2/IO/BedGraph.pyx":456
  *                 if v < cutoff or v > up_limit: # not be detected as 'peak'
  *                     pre_p = p
  *                     continue             # <<<<<<<<<<<<<<
@@ -7906,7 +8161,7 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_24call_peaks(str
  */
         goto __pyx_L22_continue;
 
-        /* "MACS2/IO/BedGraph.pyx":453
+        /* "MACS2/IO/BedGraph.pyx":454
  *                 p = psn()
  *                 v = vsn()
  *                 if v < cutoff or v > up_limit: # not be detected as 'peak'             # <<<<<<<<<<<<<<
@@ -7915,38 +8170,38 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_24call_peaks(str
  */
       }
 
-      /* "MACS2/IO/BedGraph.pyx":458
+      /* "MACS2/IO/BedGraph.pyx":459
  *                 # for points above cutoff
  *                 # if the gap is allowed
  *                 if pre_p - peak_content[-1][1] <= max_gap:             # <<<<<<<<<<<<<<
  *                     peak_content.append((pre_p,p,v))
  *                 else:
  */
-      __pyx_t_2 = __Pyx_PyInt_From_int(__pyx_v_pre_p); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 458, __pyx_L1_error)
+      __pyx_t_2 = __Pyx_PyInt_From_int(__pyx_v_pre_p); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 459, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_2);
       if (unlikely(__pyx_v_peak_content == Py_None)) {
         PyErr_SetString(PyExc_TypeError, "'NoneType' object is not subscriptable");
-        __PYX_ERR(0, 458, __pyx_L1_error)
+        __PYX_ERR(0, 459, __pyx_L1_error)
       }
-      __pyx_t_9 = __Pyx_GetItemInt_List(__pyx_v_peak_content, -1L, long, 1, __Pyx_PyInt_From_long, 1, 1, 1); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 458, __pyx_L1_error)
+      __pyx_t_9 = __Pyx_GetItemInt_List(__pyx_v_peak_content, -1L, long, 1, __Pyx_PyInt_From_long, 1, 1, 1); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 459, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_9);
-      __pyx_t_8 = __Pyx_GetItemInt(__pyx_t_9, 1, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 458, __pyx_L1_error)
+      __pyx_t_8 = __Pyx_GetItemInt(__pyx_t_9, 1, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 459, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_8);
       __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
-      __pyx_t_9 = PyNumber_Subtract(__pyx_t_2, __pyx_t_8); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 458, __pyx_L1_error)
+      __pyx_t_9 = PyNumber_Subtract(__pyx_t_2, __pyx_t_8); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 459, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_9);
       __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
       __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
-      __pyx_t_8 = __Pyx_PyInt_From_int(__pyx_v_max_gap); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 458, __pyx_L1_error)
+      __pyx_t_8 = __Pyx_PyInt_From_int(__pyx_v_max_gap); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 459, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_8);
-      __pyx_t_2 = PyObject_RichCompare(__pyx_t_9, __pyx_t_8, Py_LE); __Pyx_XGOTREF(__pyx_t_2); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 458, __pyx_L1_error)
+      __pyx_t_2 = PyObject_RichCompare(__pyx_t_9, __pyx_t_8, Py_LE); __Pyx_XGOTREF(__pyx_t_2); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 459, __pyx_L1_error)
       __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
       __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
-      __pyx_t_15 = __Pyx_PyObject_IsTrue(__pyx_t_2); if (unlikely(__pyx_t_15 < 0)) __PYX_ERR(0, 458, __pyx_L1_error)
+      __pyx_t_15 = __Pyx_PyObject_IsTrue(__pyx_t_2); if (unlikely(__pyx_t_15 < 0)) __PYX_ERR(0, 459, __pyx_L1_error)
       __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
       if (__pyx_t_15) {
 
-        /* "MACS2/IO/BedGraph.pyx":459
+        /* "MACS2/IO/BedGraph.pyx":460
  *                 # if the gap is allowed
  *                 if pre_p - peak_content[-1][1] <= max_gap:
  *                     peak_content.append((pre_p,p,v))             # <<<<<<<<<<<<<<
@@ -7955,15 +8210,15 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_24call_peaks(str
  */
         if (unlikely(__pyx_v_peak_content == Py_None)) {
           PyErr_Format(PyExc_AttributeError, "'NoneType' object has no attribute '%.30s'", "append");
-          __PYX_ERR(0, 459, __pyx_L1_error)
+          __PYX_ERR(0, 460, __pyx_L1_error)
         }
-        __pyx_t_2 = __Pyx_PyInt_From_int(__pyx_v_pre_p); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 459, __pyx_L1_error)
+        __pyx_t_2 = __Pyx_PyInt_From_int(__pyx_v_pre_p); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 460, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_2);
-        __pyx_t_8 = __Pyx_PyInt_From_int(__pyx_v_p); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 459, __pyx_L1_error)
+        __pyx_t_8 = __Pyx_PyInt_From_int(__pyx_v_p); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 460, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_8);
-        __pyx_t_9 = PyFloat_FromDouble(__pyx_v_v); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 459, __pyx_L1_error)
+        __pyx_t_9 = PyFloat_FromDouble(__pyx_v_v); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 460, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_9);
-        __pyx_t_3 = PyTuple_New(3); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 459, __pyx_L1_error)
+        __pyx_t_3 = PyTuple_New(3); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 460, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_3);
         __Pyx_GIVEREF(__pyx_t_2);
         PyTuple_SET_ITEM(__pyx_t_3, 0, __pyx_t_2);
@@ -7974,10 +8229,10 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_24call_peaks(str
         __pyx_t_2 = 0;
         __pyx_t_8 = 0;
         __pyx_t_9 = 0;
-        __pyx_t_20 = __Pyx_PyList_Append(__pyx_v_peak_content, __pyx_t_3); if (unlikely(__pyx_t_20 == ((int)-1))) __PYX_ERR(0, 459, __pyx_L1_error)
+        __pyx_t_20 = __Pyx_PyList_Append(__pyx_v_peak_content, __pyx_t_3); if (unlikely(__pyx_t_20 == ((int)-1))) __PYX_ERR(0, 460, __pyx_L1_error)
         __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
 
-        /* "MACS2/IO/BedGraph.pyx":458
+        /* "MACS2/IO/BedGraph.pyx":459
  *                 # for points above cutoff
  *                 # if the gap is allowed
  *                 if pre_p - peak_content[-1][1] <= max_gap:             # <<<<<<<<<<<<<<
@@ -7987,7 +8242,7 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_24call_peaks(str
         goto __pyx_L27;
       }
 
-      /* "MACS2/IO/BedGraph.pyx":462
+      /* "MACS2/IO/BedGraph.pyx":463
  *                 else:
  *                     # when the gap is not allowed, close this peak
  *                     close_peak(peak_content, peaks, min_length, chrom) #, smoothlen=max_gap / 2 )             # <<<<<<<<<<<<<<
@@ -7995,7 +8250,7 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_24call_peaks(str
  *                     peak_content = [(pre_p,p,v),]
  */
       /*else*/ {
-        __pyx_t_9 = __Pyx_PyInt_From_int(__pyx_v_min_length); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 462, __pyx_L1_error)
+        __pyx_t_9 = __Pyx_PyInt_From_int(__pyx_v_min_length); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 463, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_9);
         __Pyx_INCREF(__pyx_v_close_peak);
         __pyx_t_8 = __pyx_v_close_peak; __pyx_t_2 = NULL;
@@ -8013,7 +8268,7 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_24call_peaks(str
         #if CYTHON_FAST_PYCALL
         if (PyFunction_Check(__pyx_t_8)) {
           PyObject *__pyx_temp[5] = {__pyx_t_2, __pyx_v_peak_content, __pyx_v_peaks, __pyx_t_9, __pyx_v_chrom};
-          __pyx_t_3 = __Pyx_PyFunction_FastCall(__pyx_t_8, __pyx_temp+1-__pyx_t_19, 4+__pyx_t_19); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 462, __pyx_L1_error)
+          __pyx_t_3 = __Pyx_PyFunction_FastCall(__pyx_t_8, __pyx_temp+1-__pyx_t_19, 4+__pyx_t_19); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 463, __pyx_L1_error)
           __Pyx_XDECREF(__pyx_t_2); __pyx_t_2 = 0;
           __Pyx_GOTREF(__pyx_t_3);
           __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
@@ -8022,14 +8277,14 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_24call_peaks(str
         #if CYTHON_FAST_PYCCALL
         if (__Pyx_PyFastCFunction_Check(__pyx_t_8)) {
           PyObject *__pyx_temp[5] = {__pyx_t_2, __pyx_v_peak_content, __pyx_v_peaks, __pyx_t_9, __pyx_v_chrom};
-          __pyx_t_3 = __Pyx_PyCFunction_FastCall(__pyx_t_8, __pyx_temp+1-__pyx_t_19, 4+__pyx_t_19); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 462, __pyx_L1_error)
+          __pyx_t_3 = __Pyx_PyCFunction_FastCall(__pyx_t_8, __pyx_temp+1-__pyx_t_19, 4+__pyx_t_19); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 463, __pyx_L1_error)
           __Pyx_XDECREF(__pyx_t_2); __pyx_t_2 = 0;
           __Pyx_GOTREF(__pyx_t_3);
           __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
         } else
         #endif
         {
-          __pyx_t_21 = PyTuple_New(4+__pyx_t_19); if (unlikely(!__pyx_t_21)) __PYX_ERR(0, 462, __pyx_L1_error)
+          __pyx_t_21 = PyTuple_New(4+__pyx_t_19); if (unlikely(!__pyx_t_21)) __PYX_ERR(0, 463, __pyx_L1_error)
           __Pyx_GOTREF(__pyx_t_21);
           if (__pyx_t_2) {
             __Pyx_GIVEREF(__pyx_t_2); PyTuple_SET_ITEM(__pyx_t_21, 0, __pyx_t_2); __pyx_t_2 = NULL;
@@ -8046,27 +8301,27 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_24call_peaks(str
           __Pyx_GIVEREF(__pyx_v_chrom);
           PyTuple_SET_ITEM(__pyx_t_21, 3+__pyx_t_19, __pyx_v_chrom);
           __pyx_t_9 = 0;
-          __pyx_t_3 = __Pyx_PyObject_Call(__pyx_t_8, __pyx_t_21, NULL); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 462, __pyx_L1_error)
+          __pyx_t_3 = __Pyx_PyObject_Call(__pyx_t_8, __pyx_t_21, NULL); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 463, __pyx_L1_error)
           __Pyx_GOTREF(__pyx_t_3);
           __Pyx_DECREF(__pyx_t_21); __pyx_t_21 = 0;
         }
         __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
         __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
 
-        /* "MACS2/IO/BedGraph.pyx":464
+        /* "MACS2/IO/BedGraph.pyx":465
  *                     close_peak(peak_content, peaks, min_length, chrom) #, smoothlen=max_gap / 2 )
  *                     # start a new peak
  *                     peak_content = [(pre_p,p,v),]             # <<<<<<<<<<<<<<
  *                 pre_p = p
  * 
  */
-        __pyx_t_3 = __Pyx_PyInt_From_int(__pyx_v_pre_p); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 464, __pyx_L1_error)
+        __pyx_t_3 = __Pyx_PyInt_From_int(__pyx_v_pre_p); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 465, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_3);
-        __pyx_t_8 = __Pyx_PyInt_From_int(__pyx_v_p); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 464, __pyx_L1_error)
+        __pyx_t_8 = __Pyx_PyInt_From_int(__pyx_v_p); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 465, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_8);
-        __pyx_t_21 = PyFloat_FromDouble(__pyx_v_v); if (unlikely(!__pyx_t_21)) __PYX_ERR(0, 464, __pyx_L1_error)
+        __pyx_t_21 = PyFloat_FromDouble(__pyx_v_v); if (unlikely(!__pyx_t_21)) __PYX_ERR(0, 465, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_21);
-        __pyx_t_9 = PyTuple_New(3); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 464, __pyx_L1_error)
+        __pyx_t_9 = PyTuple_New(3); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 465, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_9);
         __Pyx_GIVEREF(__pyx_t_3);
         PyTuple_SET_ITEM(__pyx_t_9, 0, __pyx_t_3);
@@ -8077,7 +8332,7 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_24call_peaks(str
         __pyx_t_3 = 0;
         __pyx_t_8 = 0;
         __pyx_t_21 = 0;
-        __pyx_t_21 = PyList_New(1); if (unlikely(!__pyx_t_21)) __PYX_ERR(0, 464, __pyx_L1_error)
+        __pyx_t_21 = PyList_New(1); if (unlikely(!__pyx_t_21)) __PYX_ERR(0, 465, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_21);
         __Pyx_GIVEREF(__pyx_t_9);
         PyList_SET_ITEM(__pyx_t_21, 0, __pyx_t_9);
@@ -8087,7 +8342,7 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_24call_peaks(str
       }
       __pyx_L27:;
 
-      /* "MACS2/IO/BedGraph.pyx":465
+      /* "MACS2/IO/BedGraph.pyx":466
  *                     # start a new peak
  *                     peak_content = [(pre_p,p,v),]
  *                 pre_p = p             # <<<<<<<<<<<<<<
@@ -8098,7 +8353,7 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_24call_peaks(str
       __pyx_L22_continue:;
     }
 
-    /* "MACS2/IO/BedGraph.pyx":468
+    /* "MACS2/IO/BedGraph.pyx":469
  * 
  *             # save the last peak
  *             if not peak_content:             # <<<<<<<<<<<<<<
@@ -8109,7 +8364,7 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_24call_peaks(str
     __pyx_t_16 = ((!__pyx_t_15) != 0);
     if (__pyx_t_16) {
 
-      /* "MACS2/IO/BedGraph.pyx":469
+      /* "MACS2/IO/BedGraph.pyx":470
  *             # save the last peak
  *             if not peak_content:
  *                 continue             # <<<<<<<<<<<<<<
@@ -8118,7 +8373,7 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_24call_peaks(str
  */
       goto __pyx_L3_continue;
 
-      /* "MACS2/IO/BedGraph.pyx":468
+      /* "MACS2/IO/BedGraph.pyx":469
  * 
  *             # save the last peak
  *             if not peak_content:             # <<<<<<<<<<<<<<
@@ -8127,14 +8382,14 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_24call_peaks(str
  */
     }
 
-    /* "MACS2/IO/BedGraph.pyx":470
+    /* "MACS2/IO/BedGraph.pyx":471
  *             if not peak_content:
  *                 continue
  *             close_peak(peak_content, peaks, min_length, chrom) #, smoothlen=max_gap / 2 )             # <<<<<<<<<<<<<<
  *         return peaks
  * 
  */
-    __pyx_t_9 = __Pyx_PyInt_From_int(__pyx_v_min_length); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 470, __pyx_L1_error)
+    __pyx_t_9 = __Pyx_PyInt_From_int(__pyx_v_min_length); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 471, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_9);
     __Pyx_INCREF(__pyx_v_close_peak);
     __pyx_t_8 = __pyx_v_close_peak; __pyx_t_3 = NULL;
@@ -8152,7 +8407,7 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_24call_peaks(str
     #if CYTHON_FAST_PYCALL
     if (PyFunction_Check(__pyx_t_8)) {
       PyObject *__pyx_temp[5] = {__pyx_t_3, __pyx_v_peak_content, __pyx_v_peaks, __pyx_t_9, __pyx_v_chrom};
-      __pyx_t_21 = __Pyx_PyFunction_FastCall(__pyx_t_8, __pyx_temp+1-__pyx_t_7, 4+__pyx_t_7); if (unlikely(!__pyx_t_21)) __PYX_ERR(0, 470, __pyx_L1_error)
+      __pyx_t_21 = __Pyx_PyFunction_FastCall(__pyx_t_8, __pyx_temp+1-__pyx_t_7, 4+__pyx_t_7); if (unlikely(!__pyx_t_21)) __PYX_ERR(0, 471, __pyx_L1_error)
       __Pyx_XDECREF(__pyx_t_3); __pyx_t_3 = 0;
       __Pyx_GOTREF(__pyx_t_21);
       __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
@@ -8161,14 +8416,14 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_24call_peaks(str
     #if CYTHON_FAST_PYCCALL
     if (__Pyx_PyFastCFunction_Check(__pyx_t_8)) {
       PyObject *__pyx_temp[5] = {__pyx_t_3, __pyx_v_peak_content, __pyx_v_peaks, __pyx_t_9, __pyx_v_chrom};
-      __pyx_t_21 = __Pyx_PyCFunction_FastCall(__pyx_t_8, __pyx_temp+1-__pyx_t_7, 4+__pyx_t_7); if (unlikely(!__pyx_t_21)) __PYX_ERR(0, 470, __pyx_L1_error)
+      __pyx_t_21 = __Pyx_PyCFunction_FastCall(__pyx_t_8, __pyx_temp+1-__pyx_t_7, 4+__pyx_t_7); if (unlikely(!__pyx_t_21)) __PYX_ERR(0, 471, __pyx_L1_error)
       __Pyx_XDECREF(__pyx_t_3); __pyx_t_3 = 0;
       __Pyx_GOTREF(__pyx_t_21);
       __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
     } else
     #endif
     {
-      __pyx_t_2 = PyTuple_New(4+__pyx_t_7); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 470, __pyx_L1_error)
+      __pyx_t_2 = PyTuple_New(4+__pyx_t_7); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 471, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_2);
       if (__pyx_t_3) {
         __Pyx_GIVEREF(__pyx_t_3); PyTuple_SET_ITEM(__pyx_t_2, 0, __pyx_t_3); __pyx_t_3 = NULL;
@@ -8185,7 +8440,7 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_24call_peaks(str
       __Pyx_GIVEREF(__pyx_v_chrom);
       PyTuple_SET_ITEM(__pyx_t_2, 3+__pyx_t_7, __pyx_v_chrom);
       __pyx_t_9 = 0;
-      __pyx_t_21 = __Pyx_PyObject_Call(__pyx_t_8, __pyx_t_2, NULL); if (unlikely(!__pyx_t_21)) __PYX_ERR(0, 470, __pyx_L1_error)
+      __pyx_t_21 = __Pyx_PyObject_Call(__pyx_t_8, __pyx_t_2, NULL); if (unlikely(!__pyx_t_21)) __PYX_ERR(0, 471, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_21);
       __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
     }
@@ -8195,7 +8450,7 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_24call_peaks(str
   }
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-  /* "MACS2/IO/BedGraph.pyx":471
+  /* "MACS2/IO/BedGraph.pyx":472
  *                 continue
  *             close_peak(peak_content, peaks, min_length, chrom) #, smoothlen=max_gap / 2 )
  *         return peaks             # <<<<<<<<<<<<<<
@@ -8207,7 +8462,7 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_24call_peaks(str
   __pyx_r = __pyx_v_peaks;
   goto __pyx_L0;
 
-  /* "MACS2/IO/BedGraph.pyx":398
+  /* "MACS2/IO/BedGraph.pyx":399
  *         return (sum_v, n_v, max_v, min_v, mean_v, std_v)
  * 
  *     def call_peaks (self, double cutoff=1, double up_limit=1e310, int min_length=200, int max_gap=50,             # <<<<<<<<<<<<<<
@@ -8236,11 +8491,12 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_24call_peaks(str
   __Pyx_XDECREF(__pyx_v_psn);
   __Pyx_XDECREF(__pyx_v_vsn);
   __Pyx_XGIVEREF(__pyx_r);
+  __Pyx_TraceReturn(__pyx_r, 0);
   __Pyx_RefNannyFinishContext();
   return __pyx_r;
 }
 
-/* "MACS2/IO/BedGraph.pyx":473
+/* "MACS2/IO/BedGraph.pyx":474
  *         return peaks
  * 
  *     def __close_peak( self, peak_content, peaks, int min_length, bytes chrom ):             # <<<<<<<<<<<<<<
@@ -8285,23 +8541,23 @@ static PyObject *__pyx_pw_5MACS2_2IO_8BedGraph_14bedGraphTrackI_27__close_peak(P
         case  1:
         if (likely((values[1] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_peaks)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("__close_peak", 1, 4, 4, 1); __PYX_ERR(0, 473, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("__close_peak", 1, 4, 4, 1); __PYX_ERR(0, 474, __pyx_L3_error)
         }
         CYTHON_FALLTHROUGH;
         case  2:
         if (likely((values[2] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_min_length)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("__close_peak", 1, 4, 4, 2); __PYX_ERR(0, 473, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("__close_peak", 1, 4, 4, 2); __PYX_ERR(0, 474, __pyx_L3_error)
         }
         CYTHON_FALLTHROUGH;
         case  3:
         if (likely((values[3] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_chrom)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("__close_peak", 1, 4, 4, 3); __PYX_ERR(0, 473, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("__close_peak", 1, 4, 4, 3); __PYX_ERR(0, 474, __pyx_L3_error)
         }
       }
       if (unlikely(kw_args > 0)) {
-        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "__close_peak") < 0)) __PYX_ERR(0, 473, __pyx_L3_error)
+        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "__close_peak") < 0)) __PYX_ERR(0, 474, __pyx_L3_error)
       }
     } else if (PyTuple_GET_SIZE(__pyx_args) != 4) {
       goto __pyx_L5_argtuple_error;
@@ -8313,18 +8569,18 @@ static PyObject *__pyx_pw_5MACS2_2IO_8BedGraph_14bedGraphTrackI_27__close_peak(P
     }
     __pyx_v_peak_content = values[0];
     __pyx_v_peaks = values[1];
-    __pyx_v_min_length = __Pyx_PyInt_As_int(values[2]); if (unlikely((__pyx_v_min_length == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 473, __pyx_L3_error)
+    __pyx_v_min_length = __Pyx_PyInt_As_int(values[2]); if (unlikely((__pyx_v_min_length == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 474, __pyx_L3_error)
     __pyx_v_chrom = ((PyObject*)values[3]);
   }
   goto __pyx_L4_argument_unpacking_done;
   __pyx_L5_argtuple_error:;
-  __Pyx_RaiseArgtupleInvalid("__close_peak", 1, 4, 4, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 473, __pyx_L3_error)
+  __Pyx_RaiseArgtupleInvalid("__close_peak", 1, 4, 4, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 474, __pyx_L3_error)
   __pyx_L3_error:;
   __Pyx_AddTraceback("MACS2.IO.BedGraph.bedGraphTrackI.__close_peak", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __Pyx_RefNannyFinishContext();
   return NULL;
   __pyx_L4_argument_unpacking_done:;
-  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_chrom), (&PyBytes_Type), 1, "chrom", 1))) __PYX_ERR(0, 473, __pyx_L1_error)
+  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_chrom), (&PyBytes_Type), 1, "chrom", 1))) __PYX_ERR(0, 474, __pyx_L1_error)
   __pyx_r = __pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_26__close_peak(((struct __pyx_obj_5MACS2_2IO_8BedGraph_bedGraphTrackI *)__pyx_v_self), __pyx_v_peak_content, __pyx_v_peaks, __pyx_v_min_length, __pyx_v_chrom);
 
   /* function exit code */
@@ -8345,6 +8601,7 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_26__close_peak(C
   PyObject *__pyx_v_tend = NULL;
   PyObject *__pyx_v_tvalue = NULL;
   PyObject *__pyx_r = NULL;
+  __Pyx_TraceDeclarations
   __Pyx_RefNannyDeclarations
   PyObject *__pyx_t_1 = NULL;
   PyObject *__pyx_t_2 = NULL;
@@ -8360,59 +8617,60 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_26__close_peak(C
   int __pyx_t_12;
   int __pyx_t_13;
   __Pyx_RefNannySetupContext("__close_peak", 0);
+  __Pyx_TraceCall("__close_peak", __pyx_f[0], 474, 0, __PYX_ERR(0, 474, __pyx_L1_error));
 
-  /* "MACS2/IO/BedGraph.pyx":475
+  /* "MACS2/IO/BedGraph.pyx":476
  *     def __close_peak( self, peak_content, peaks, int min_length, bytes chrom ):
  * 
  *         peak_length = peak_content[-1][1]-peak_content[0][0]             # <<<<<<<<<<<<<<
  *         if peak_length >= min_length: # if the peak is too small, reject it
  *             tsummit = []
  */
-  __pyx_t_1 = __Pyx_GetItemInt(__pyx_v_peak_content, -1L, long, 1, __Pyx_PyInt_From_long, 0, 1, 1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 475, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_GetItemInt(__pyx_v_peak_content, -1L, long, 1, __Pyx_PyInt_From_long, 0, 1, 1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 476, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_2 = __Pyx_GetItemInt(__pyx_t_1, 1, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 475, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_GetItemInt(__pyx_t_1, 1, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 476, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-  __pyx_t_1 = __Pyx_GetItemInt(__pyx_v_peak_content, 0, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 475, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_GetItemInt(__pyx_v_peak_content, 0, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 476, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_3 = __Pyx_GetItemInt(__pyx_t_1, 0, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 475, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_GetItemInt(__pyx_t_1, 0, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 476, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-  __pyx_t_1 = PyNumber_Subtract(__pyx_t_2, __pyx_t_3); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 475, __pyx_L1_error)
+  __pyx_t_1 = PyNumber_Subtract(__pyx_t_2, __pyx_t_3); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 476, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
   __pyx_v_peak_length = __pyx_t_1;
   __pyx_t_1 = 0;
 
-  /* "MACS2/IO/BedGraph.pyx":476
+  /* "MACS2/IO/BedGraph.pyx":477
  * 
  *         peak_length = peak_content[-1][1]-peak_content[0][0]
  *         if peak_length >= min_length: # if the peak is too small, reject it             # <<<<<<<<<<<<<<
  *             tsummit = []
  *             summit = 0
  */
-  __pyx_t_1 = __Pyx_PyInt_From_int(__pyx_v_min_length); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 476, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyInt_From_int(__pyx_v_min_length); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 477, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_3 = PyObject_RichCompare(__pyx_v_peak_length, __pyx_t_1, Py_GE); __Pyx_XGOTREF(__pyx_t_3); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 476, __pyx_L1_error)
+  __pyx_t_3 = PyObject_RichCompare(__pyx_v_peak_length, __pyx_t_1, Py_GE); __Pyx_XGOTREF(__pyx_t_3); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 477, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-  __pyx_t_4 = __Pyx_PyObject_IsTrue(__pyx_t_3); if (unlikely(__pyx_t_4 < 0)) __PYX_ERR(0, 476, __pyx_L1_error)
+  __pyx_t_4 = __Pyx_PyObject_IsTrue(__pyx_t_3); if (unlikely(__pyx_t_4 < 0)) __PYX_ERR(0, 477, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
   if (__pyx_t_4) {
 
-    /* "MACS2/IO/BedGraph.pyx":477
+    /* "MACS2/IO/BedGraph.pyx":478
  *         peak_length = peak_content[-1][1]-peak_content[0][0]
  *         if peak_length >= min_length: # if the peak is too small, reject it
  *             tsummit = []             # <<<<<<<<<<<<<<
  *             summit = 0
  *             summit_value = 0
  */
-    __pyx_t_3 = PyList_New(0); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 477, __pyx_L1_error)
+    __pyx_t_3 = PyList_New(0); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 478, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_3);
     __pyx_v_tsummit = ((PyObject*)__pyx_t_3);
     __pyx_t_3 = 0;
 
-    /* "MACS2/IO/BedGraph.pyx":478
+    /* "MACS2/IO/BedGraph.pyx":479
  *         if peak_length >= min_length: # if the peak is too small, reject it
  *             tsummit = []
  *             summit = 0             # <<<<<<<<<<<<<<
@@ -8422,7 +8680,7 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_26__close_peak(C
     __Pyx_INCREF(__pyx_int_0);
     __pyx_v_summit = __pyx_int_0;
 
-    /* "MACS2/IO/BedGraph.pyx":479
+    /* "MACS2/IO/BedGraph.pyx":480
  *             tsummit = []
  *             summit = 0
  *             summit_value = 0             # <<<<<<<<<<<<<<
@@ -8432,7 +8690,7 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_26__close_peak(C
     __Pyx_INCREF(__pyx_int_0);
     __pyx_v_summit_value = __pyx_int_0;
 
-    /* "MACS2/IO/BedGraph.pyx":480
+    /* "MACS2/IO/BedGraph.pyx":481
  *             summit = 0
  *             summit_value = 0
  *             for (tstart,tend,tvalue) in peak_content:             # <<<<<<<<<<<<<<
@@ -8443,26 +8701,26 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_26__close_peak(C
       __pyx_t_3 = __pyx_v_peak_content; __Pyx_INCREF(__pyx_t_3); __pyx_t_5 = 0;
       __pyx_t_6 = NULL;
     } else {
-      __pyx_t_5 = -1; __pyx_t_3 = PyObject_GetIter(__pyx_v_peak_content); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 480, __pyx_L1_error)
+      __pyx_t_5 = -1; __pyx_t_3 = PyObject_GetIter(__pyx_v_peak_content); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 481, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_3);
-      __pyx_t_6 = Py_TYPE(__pyx_t_3)->tp_iternext; if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 480, __pyx_L1_error)
+      __pyx_t_6 = Py_TYPE(__pyx_t_3)->tp_iternext; if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 481, __pyx_L1_error)
     }
     for (;;) {
       if (likely(!__pyx_t_6)) {
         if (likely(PyList_CheckExact(__pyx_t_3))) {
           if (__pyx_t_5 >= PyList_GET_SIZE(__pyx_t_3)) break;
           #if CYTHON_ASSUME_SAFE_MACROS && !CYTHON_AVOID_BORROWED_REFS
-          __pyx_t_1 = PyList_GET_ITEM(__pyx_t_3, __pyx_t_5); __Pyx_INCREF(__pyx_t_1); __pyx_t_5++; if (unlikely(0 < 0)) __PYX_ERR(0, 480, __pyx_L1_error)
+          __pyx_t_1 = PyList_GET_ITEM(__pyx_t_3, __pyx_t_5); __Pyx_INCREF(__pyx_t_1); __pyx_t_5++; if (unlikely(0 < 0)) __PYX_ERR(0, 481, __pyx_L1_error)
           #else
-          __pyx_t_1 = PySequence_ITEM(__pyx_t_3, __pyx_t_5); __pyx_t_5++; if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 480, __pyx_L1_error)
+          __pyx_t_1 = PySequence_ITEM(__pyx_t_3, __pyx_t_5); __pyx_t_5++; if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 481, __pyx_L1_error)
           __Pyx_GOTREF(__pyx_t_1);
           #endif
         } else {
           if (__pyx_t_5 >= PyTuple_GET_SIZE(__pyx_t_3)) break;
           #if CYTHON_ASSUME_SAFE_MACROS && !CYTHON_AVOID_BORROWED_REFS
-          __pyx_t_1 = PyTuple_GET_ITEM(__pyx_t_3, __pyx_t_5); __Pyx_INCREF(__pyx_t_1); __pyx_t_5++; if (unlikely(0 < 0)) __PYX_ERR(0, 480, __pyx_L1_error)
+          __pyx_t_1 = PyTuple_GET_ITEM(__pyx_t_3, __pyx_t_5); __Pyx_INCREF(__pyx_t_1); __pyx_t_5++; if (unlikely(0 < 0)) __PYX_ERR(0, 481, __pyx_L1_error)
           #else
-          __pyx_t_1 = PySequence_ITEM(__pyx_t_3, __pyx_t_5); __pyx_t_5++; if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 480, __pyx_L1_error)
+          __pyx_t_1 = PySequence_ITEM(__pyx_t_3, __pyx_t_5); __pyx_t_5++; if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 481, __pyx_L1_error)
           __Pyx_GOTREF(__pyx_t_1);
           #endif
         }
@@ -8472,7 +8730,7 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_26__close_peak(C
           PyObject* exc_type = PyErr_Occurred();
           if (exc_type) {
             if (likely(__Pyx_PyErr_GivenExceptionMatches(exc_type, PyExc_StopIteration))) PyErr_Clear();
-            else __PYX_ERR(0, 480, __pyx_L1_error)
+            else __PYX_ERR(0, 481, __pyx_L1_error)
           }
           break;
         }
@@ -8484,7 +8742,7 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_26__close_peak(C
         if (unlikely(size != 3)) {
           if (size > 3) __Pyx_RaiseTooManyValuesError(3);
           else if (size >= 0) __Pyx_RaiseNeedMoreValuesError(size);
-          __PYX_ERR(0, 480, __pyx_L1_error)
+          __PYX_ERR(0, 481, __pyx_L1_error)
         }
         #if CYTHON_ASSUME_SAFE_MACROS && !CYTHON_AVOID_BORROWED_REFS
         if (likely(PyTuple_CheckExact(sequence))) {
@@ -8500,17 +8758,17 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_26__close_peak(C
         __Pyx_INCREF(__pyx_t_7);
         __Pyx_INCREF(__pyx_t_8);
         #else
-        __pyx_t_2 = PySequence_ITEM(sequence, 0); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 480, __pyx_L1_error)
+        __pyx_t_2 = PySequence_ITEM(sequence, 0); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 481, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_2);
-        __pyx_t_7 = PySequence_ITEM(sequence, 1); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 480, __pyx_L1_error)
+        __pyx_t_7 = PySequence_ITEM(sequence, 1); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 481, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_7);
-        __pyx_t_8 = PySequence_ITEM(sequence, 2); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 480, __pyx_L1_error)
+        __pyx_t_8 = PySequence_ITEM(sequence, 2); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 481, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_8);
         #endif
         __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
       } else {
         Py_ssize_t index = -1;
-        __pyx_t_9 = PyObject_GetIter(__pyx_t_1); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 480, __pyx_L1_error)
+        __pyx_t_9 = PyObject_GetIter(__pyx_t_1); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 481, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_9);
         __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
         __pyx_t_10 = Py_TYPE(__pyx_t_9)->tp_iternext;
@@ -8520,7 +8778,7 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_26__close_peak(C
         __Pyx_GOTREF(__pyx_t_7);
         index = 2; __pyx_t_8 = __pyx_t_10(__pyx_t_9); if (unlikely(!__pyx_t_8)) goto __pyx_L6_unpacking_failed;
         __Pyx_GOTREF(__pyx_t_8);
-        if (__Pyx_IternextUnpackEndCheck(__pyx_t_10(__pyx_t_9), 3) < 0) __PYX_ERR(0, 480, __pyx_L1_error)
+        if (__Pyx_IternextUnpackEndCheck(__pyx_t_10(__pyx_t_9), 3) < 0) __PYX_ERR(0, 481, __pyx_L1_error)
         __pyx_t_10 = NULL;
         __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
         goto __pyx_L7_unpacking_done;
@@ -8528,7 +8786,7 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_26__close_peak(C
         __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
         __pyx_t_10 = NULL;
         if (__Pyx_IterFinish() == 0) __Pyx_RaiseNeedMoreValuesError(index);
-        __PYX_ERR(0, 480, __pyx_L1_error)
+        __PYX_ERR(0, 481, __pyx_L1_error)
         __pyx_L7_unpacking_done:;
       }
       __Pyx_XDECREF_SET(__pyx_v_tstart, __pyx_t_2);
@@ -8538,43 +8796,43 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_26__close_peak(C
       __Pyx_XDECREF_SET(__pyx_v_tvalue, __pyx_t_8);
       __pyx_t_8 = 0;
 
-      /* "MACS2/IO/BedGraph.pyx":481
+      /* "MACS2/IO/BedGraph.pyx":482
  *             summit_value = 0
  *             for (tstart,tend,tvalue) in peak_content:
  *                 if not summit_value or summit_value < tvalue:             # <<<<<<<<<<<<<<
  *                     tsummit = [int((tend+tstart)/2),]
  *                     summit_value = tvalue
  */
-      __pyx_t_11 = __Pyx_PyObject_IsTrue(__pyx_v_summit_value); if (unlikely(__pyx_t_11 < 0)) __PYX_ERR(0, 481, __pyx_L1_error)
+      __pyx_t_11 = __Pyx_PyObject_IsTrue(__pyx_v_summit_value); if (unlikely(__pyx_t_11 < 0)) __PYX_ERR(0, 482, __pyx_L1_error)
       __pyx_t_12 = ((!__pyx_t_11) != 0);
       if (!__pyx_t_12) {
       } else {
         __pyx_t_4 = __pyx_t_12;
         goto __pyx_L9_bool_binop_done;
       }
-      __pyx_t_1 = PyObject_RichCompare(__pyx_v_summit_value, __pyx_v_tvalue, Py_LT); __Pyx_XGOTREF(__pyx_t_1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 481, __pyx_L1_error)
-      __pyx_t_12 = __Pyx_PyObject_IsTrue(__pyx_t_1); if (unlikely(__pyx_t_12 < 0)) __PYX_ERR(0, 481, __pyx_L1_error)
+      __pyx_t_1 = PyObject_RichCompare(__pyx_v_summit_value, __pyx_v_tvalue, Py_LT); __Pyx_XGOTREF(__pyx_t_1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 482, __pyx_L1_error)
+      __pyx_t_12 = __Pyx_PyObject_IsTrue(__pyx_t_1); if (unlikely(__pyx_t_12 < 0)) __PYX_ERR(0, 482, __pyx_L1_error)
       __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
       __pyx_t_4 = __pyx_t_12;
       __pyx_L9_bool_binop_done:;
       if (__pyx_t_4) {
 
-        /* "MACS2/IO/BedGraph.pyx":482
+        /* "MACS2/IO/BedGraph.pyx":483
  *             for (tstart,tend,tvalue) in peak_content:
  *                 if not summit_value or summit_value < tvalue:
  *                     tsummit = [int((tend+tstart)/2),]             # <<<<<<<<<<<<<<
  *                     summit_value = tvalue
  *                 elif summit_value == tvalue:
  */
-        __pyx_t_1 = PyNumber_Add(__pyx_v_tend, __pyx_v_tstart); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 482, __pyx_L1_error)
+        __pyx_t_1 = PyNumber_Add(__pyx_v_tend, __pyx_v_tstart); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 483, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_1);
-        __pyx_t_8 = __Pyx_PyInt_TrueDivideObjC(__pyx_t_1, __pyx_int_2, 2, 0, 0); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 482, __pyx_L1_error)
+        __pyx_t_8 = __Pyx_PyInt_TrueDivideObjC(__pyx_t_1, __pyx_int_2, 2, 0, 0); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 483, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_8);
         __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-        __pyx_t_1 = __Pyx_PyNumber_Int(__pyx_t_8); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 482, __pyx_L1_error)
+        __pyx_t_1 = __Pyx_PyNumber_Int(__pyx_t_8); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 483, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_1);
         __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
-        __pyx_t_8 = PyList_New(1); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 482, __pyx_L1_error)
+        __pyx_t_8 = PyList_New(1); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 483, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_8);
         __Pyx_GIVEREF(__pyx_t_1);
         PyList_SET_ITEM(__pyx_t_8, 0, __pyx_t_1);
@@ -8582,7 +8840,7 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_26__close_peak(C
         __Pyx_DECREF_SET(__pyx_v_tsummit, ((PyObject*)__pyx_t_8));
         __pyx_t_8 = 0;
 
-        /* "MACS2/IO/BedGraph.pyx":483
+        /* "MACS2/IO/BedGraph.pyx":484
  *                 if not summit_value or summit_value < tvalue:
  *                     tsummit = [int((tend+tstart)/2),]
  *                     summit_value = tvalue             # <<<<<<<<<<<<<<
@@ -8592,7 +8850,7 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_26__close_peak(C
         __Pyx_INCREF(__pyx_v_tvalue);
         __Pyx_DECREF_SET(__pyx_v_summit_value, __pyx_v_tvalue);
 
-        /* "MACS2/IO/BedGraph.pyx":481
+        /* "MACS2/IO/BedGraph.pyx":482
  *             summit_value = 0
  *             for (tstart,tend,tvalue) in peak_content:
  *                 if not summit_value or summit_value < tvalue:             # <<<<<<<<<<<<<<
@@ -8602,37 +8860,37 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_26__close_peak(C
         goto __pyx_L8;
       }
 
-      /* "MACS2/IO/BedGraph.pyx":484
+      /* "MACS2/IO/BedGraph.pyx":485
  *                     tsummit = [int((tend+tstart)/2),]
  *                     summit_value = tvalue
  *                 elif summit_value == tvalue:             # <<<<<<<<<<<<<<
  *                     tsummit.append( int((tend+tstart)/2) )
  *             summit = tsummit[int((len(tsummit)+1)/2)-1 ]
  */
-      __pyx_t_8 = PyObject_RichCompare(__pyx_v_summit_value, __pyx_v_tvalue, Py_EQ); __Pyx_XGOTREF(__pyx_t_8); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 484, __pyx_L1_error)
-      __pyx_t_4 = __Pyx_PyObject_IsTrue(__pyx_t_8); if (unlikely(__pyx_t_4 < 0)) __PYX_ERR(0, 484, __pyx_L1_error)
+      __pyx_t_8 = PyObject_RichCompare(__pyx_v_summit_value, __pyx_v_tvalue, Py_EQ); __Pyx_XGOTREF(__pyx_t_8); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 485, __pyx_L1_error)
+      __pyx_t_4 = __Pyx_PyObject_IsTrue(__pyx_t_8); if (unlikely(__pyx_t_4 < 0)) __PYX_ERR(0, 485, __pyx_L1_error)
       __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
       if (__pyx_t_4) {
 
-        /* "MACS2/IO/BedGraph.pyx":485
+        /* "MACS2/IO/BedGraph.pyx":486
  *                     summit_value = tvalue
  *                 elif summit_value == tvalue:
  *                     tsummit.append( int((tend+tstart)/2) )             # <<<<<<<<<<<<<<
  *             summit = tsummit[int((len(tsummit)+1)/2)-1 ]
  *             peaks.add( chrom,
  */
-        __pyx_t_8 = PyNumber_Add(__pyx_v_tend, __pyx_v_tstart); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 485, __pyx_L1_error)
+        __pyx_t_8 = PyNumber_Add(__pyx_v_tend, __pyx_v_tstart); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 486, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_8);
-        __pyx_t_1 = __Pyx_PyInt_TrueDivideObjC(__pyx_t_8, __pyx_int_2, 2, 0, 0); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 485, __pyx_L1_error)
+        __pyx_t_1 = __Pyx_PyInt_TrueDivideObjC(__pyx_t_8, __pyx_int_2, 2, 0, 0); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 486, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_1);
         __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
-        __pyx_t_8 = __Pyx_PyNumber_Int(__pyx_t_1); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 485, __pyx_L1_error)
+        __pyx_t_8 = __Pyx_PyNumber_Int(__pyx_t_1); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 486, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_8);
         __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-        __pyx_t_13 = __Pyx_PyList_Append(__pyx_v_tsummit, __pyx_t_8); if (unlikely(__pyx_t_13 == ((int)-1))) __PYX_ERR(0, 485, __pyx_L1_error)
+        __pyx_t_13 = __Pyx_PyList_Append(__pyx_v_tsummit, __pyx_t_8); if (unlikely(__pyx_t_13 == ((int)-1))) __PYX_ERR(0, 486, __pyx_L1_error)
         __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
 
-        /* "MACS2/IO/BedGraph.pyx":484
+        /* "MACS2/IO/BedGraph.pyx":485
  *                     tsummit = [int((tend+tstart)/2),]
  *                     summit_value = tvalue
  *                 elif summit_value == tvalue:             # <<<<<<<<<<<<<<
@@ -8642,7 +8900,7 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_26__close_peak(C
       }
       __pyx_L8:;
 
-      /* "MACS2/IO/BedGraph.pyx":480
+      /* "MACS2/IO/BedGraph.pyx":481
  *             summit = 0
  *             summit_value = 0
  *             for (tstart,tend,tvalue) in peak_content:             # <<<<<<<<<<<<<<
@@ -8652,69 +8910,69 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_26__close_peak(C
     }
     __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
 
-    /* "MACS2/IO/BedGraph.pyx":486
+    /* "MACS2/IO/BedGraph.pyx":487
  *                 elif summit_value == tvalue:
  *                     tsummit.append( int((tend+tstart)/2) )
  *             summit = tsummit[int((len(tsummit)+1)/2)-1 ]             # <<<<<<<<<<<<<<
  *             peaks.add( chrom,
  *                        peak_content[0][0],
  */
-    __pyx_t_5 = PyList_GET_SIZE(__pyx_v_tsummit); if (unlikely(__pyx_t_5 == ((Py_ssize_t)-1))) __PYX_ERR(0, 486, __pyx_L1_error)
-    __pyx_t_3 = __Pyx_PyInt_FromDouble((((double)(__pyx_t_5 + 1)) / 2.0)); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 486, __pyx_L1_error)
+    __pyx_t_5 = PyList_GET_SIZE(__pyx_v_tsummit); if (unlikely(__pyx_t_5 == ((Py_ssize_t)-1))) __PYX_ERR(0, 487, __pyx_L1_error)
+    __pyx_t_3 = __Pyx_PyInt_FromDouble((((double)(__pyx_t_5 + 1)) / 2.0)); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 487, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_3);
-    __pyx_t_8 = __Pyx_PyInt_SubtractObjC(__pyx_t_3, __pyx_int_1, 1, 0, 0); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 486, __pyx_L1_error)
+    __pyx_t_8 = __Pyx_PyInt_SubtractObjC(__pyx_t_3, __pyx_int_1, 1, 0, 0); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 487, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_8);
     __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-    __pyx_t_3 = __Pyx_PyObject_GetItem(__pyx_v_tsummit, __pyx_t_8); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 486, __pyx_L1_error)
+    __pyx_t_3 = __Pyx_PyObject_GetItem(__pyx_v_tsummit, __pyx_t_8); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 487, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_3);
     __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
     __Pyx_DECREF_SET(__pyx_v_summit, __pyx_t_3);
     __pyx_t_3 = 0;
 
-    /* "MACS2/IO/BedGraph.pyx":487
+    /* "MACS2/IO/BedGraph.pyx":488
  *                     tsummit.append( int((tend+tstart)/2) )
  *             summit = tsummit[int((len(tsummit)+1)/2)-1 ]
  *             peaks.add( chrom,             # <<<<<<<<<<<<<<
  *                        peak_content[0][0],
  *                        peak_content[-1][1],
  */
-    __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_v_peaks, __pyx_n_s_add); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 487, __pyx_L1_error)
+    __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_v_peaks, __pyx_n_s_add); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 488, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_3);
 
-    /* "MACS2/IO/BedGraph.pyx":488
+    /* "MACS2/IO/BedGraph.pyx":489
  *             summit = tsummit[int((len(tsummit)+1)/2)-1 ]
  *             peaks.add( chrom,
  *                        peak_content[0][0],             # <<<<<<<<<<<<<<
  *                        peak_content[-1][1],
  *                        summit      = summit,
  */
-    __pyx_t_8 = __Pyx_GetItemInt(__pyx_v_peak_content, 0, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 488, __pyx_L1_error)
+    __pyx_t_8 = __Pyx_GetItemInt(__pyx_v_peak_content, 0, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 489, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_8);
-    __pyx_t_1 = __Pyx_GetItemInt(__pyx_t_8, 0, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 488, __pyx_L1_error)
+    __pyx_t_1 = __Pyx_GetItemInt(__pyx_t_8, 0, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 489, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
     __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
 
-    /* "MACS2/IO/BedGraph.pyx":489
+    /* "MACS2/IO/BedGraph.pyx":490
  *             peaks.add( chrom,
  *                        peak_content[0][0],
  *                        peak_content[-1][1],             # <<<<<<<<<<<<<<
  *                        summit      = summit,
  *                        peak_score  = summit_value,
  */
-    __pyx_t_8 = __Pyx_GetItemInt(__pyx_v_peak_content, -1L, long, 1, __Pyx_PyInt_From_long, 0, 1, 1); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 489, __pyx_L1_error)
+    __pyx_t_8 = __Pyx_GetItemInt(__pyx_v_peak_content, -1L, long, 1, __Pyx_PyInt_From_long, 0, 1, 1); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 490, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_8);
-    __pyx_t_7 = __Pyx_GetItemInt(__pyx_t_8, 1, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 489, __pyx_L1_error)
+    __pyx_t_7 = __Pyx_GetItemInt(__pyx_t_8, 1, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 490, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_7);
     __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
 
-    /* "MACS2/IO/BedGraph.pyx":487
+    /* "MACS2/IO/BedGraph.pyx":488
  *                     tsummit.append( int((tend+tstart)/2) )
  *             summit = tsummit[int((len(tsummit)+1)/2)-1 ]
  *             peaks.add( chrom,             # <<<<<<<<<<<<<<
  *                        peak_content[0][0],
  *                        peak_content[-1][1],
  */
-    __pyx_t_8 = PyTuple_New(3); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 487, __pyx_L1_error)
+    __pyx_t_8 = PyTuple_New(3); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 488, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_8);
     __Pyx_INCREF(__pyx_v_chrom);
     __Pyx_GIVEREF(__pyx_v_chrom);
@@ -8726,45 +8984,45 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_26__close_peak(C
     __pyx_t_1 = 0;
     __pyx_t_7 = 0;
 
-    /* "MACS2/IO/BedGraph.pyx":490
+    /* "MACS2/IO/BedGraph.pyx":491
  *                        peak_content[0][0],
  *                        peak_content[-1][1],
  *                        summit      = summit,             # <<<<<<<<<<<<<<
  *                        peak_score  = summit_value,
  *                        pileup      = 0,
  */
-    __pyx_t_7 = __Pyx_PyDict_NewPresized(6); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 490, __pyx_L1_error)
+    __pyx_t_7 = __Pyx_PyDict_NewPresized(6); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 491, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_7);
-    if (PyDict_SetItem(__pyx_t_7, __pyx_n_s_summit, __pyx_v_summit) < 0) __PYX_ERR(0, 490, __pyx_L1_error)
+    if (PyDict_SetItem(__pyx_t_7, __pyx_n_s_summit, __pyx_v_summit) < 0) __PYX_ERR(0, 491, __pyx_L1_error)
 
-    /* "MACS2/IO/BedGraph.pyx":491
+    /* "MACS2/IO/BedGraph.pyx":492
  *                        peak_content[-1][1],
  *                        summit      = summit,
  *                        peak_score  = summit_value,             # <<<<<<<<<<<<<<
  *                        pileup      = 0,
  *                        pscore      = 0,
  */
-    if (PyDict_SetItem(__pyx_t_7, __pyx_n_s_peak_score, __pyx_v_summit_value) < 0) __PYX_ERR(0, 490, __pyx_L1_error)
-    if (PyDict_SetItem(__pyx_t_7, __pyx_n_s_pileup, __pyx_int_0) < 0) __PYX_ERR(0, 490, __pyx_L1_error)
-    if (PyDict_SetItem(__pyx_t_7, __pyx_n_s_pscore, __pyx_int_0) < 0) __PYX_ERR(0, 490, __pyx_L1_error)
-    if (PyDict_SetItem(__pyx_t_7, __pyx_n_s_fold_change, __pyx_int_0) < 0) __PYX_ERR(0, 490, __pyx_L1_error)
-    if (PyDict_SetItem(__pyx_t_7, __pyx_n_s_qscore, __pyx_int_0) < 0) __PYX_ERR(0, 490, __pyx_L1_error)
+    if (PyDict_SetItem(__pyx_t_7, __pyx_n_s_peak_score, __pyx_v_summit_value) < 0) __PYX_ERR(0, 491, __pyx_L1_error)
+    if (PyDict_SetItem(__pyx_t_7, __pyx_n_s_pileup, __pyx_int_0) < 0) __PYX_ERR(0, 491, __pyx_L1_error)
+    if (PyDict_SetItem(__pyx_t_7, __pyx_n_s_pscore, __pyx_int_0) < 0) __PYX_ERR(0, 491, __pyx_L1_error)
+    if (PyDict_SetItem(__pyx_t_7, __pyx_n_s_fold_change, __pyx_int_0) < 0) __PYX_ERR(0, 491, __pyx_L1_error)
+    if (PyDict_SetItem(__pyx_t_7, __pyx_n_s_qscore, __pyx_int_0) < 0) __PYX_ERR(0, 491, __pyx_L1_error)
 
-    /* "MACS2/IO/BedGraph.pyx":487
+    /* "MACS2/IO/BedGraph.pyx":488
  *                     tsummit.append( int((tend+tstart)/2) )
  *             summit = tsummit[int((len(tsummit)+1)/2)-1 ]
  *             peaks.add( chrom,             # <<<<<<<<<<<<<<
  *                        peak_content[0][0],
  *                        peak_content[-1][1],
  */
-    __pyx_t_1 = __Pyx_PyObject_Call(__pyx_t_3, __pyx_t_8, __pyx_t_7); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 487, __pyx_L1_error)
+    __pyx_t_1 = __Pyx_PyObject_Call(__pyx_t_3, __pyx_t_8, __pyx_t_7); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 488, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
     __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
     __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
     __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
     __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-    /* "MACS2/IO/BedGraph.pyx":497
+    /* "MACS2/IO/BedGraph.pyx":498
  *                        qscore      = 0
  *                        )
  *             return True             # <<<<<<<<<<<<<<
@@ -8776,7 +9034,7 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_26__close_peak(C
     __pyx_r = Py_True;
     goto __pyx_L0;
 
-    /* "MACS2/IO/BedGraph.pyx":476
+    /* "MACS2/IO/BedGraph.pyx":477
  * 
  *         peak_length = peak_content[-1][1]-peak_content[0][0]
  *         if peak_length >= min_length: # if the peak is too small, reject it             # <<<<<<<<<<<<<<
@@ -8785,7 +9043,7 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_26__close_peak(C
  */
   }
 
-  /* "MACS2/IO/BedGraph.pyx":473
+  /* "MACS2/IO/BedGraph.pyx":474
  *         return peaks
  * 
  *     def __close_peak( self, peak_content, peaks, int min_length, bytes chrom ):             # <<<<<<<<<<<<<<
@@ -8814,11 +9072,12 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_26__close_peak(C
   __Pyx_XDECREF(__pyx_v_tend);
   __Pyx_XDECREF(__pyx_v_tvalue);
   __Pyx_XGIVEREF(__pyx_r);
+  __Pyx_TraceReturn(__pyx_r, 0);
   __Pyx_RefNannyFinishContext();
   return __pyx_r;
 }
 
-/* "MACS2/IO/BedGraph.pyx":499
+/* "MACS2/IO/BedGraph.pyx":500
  *             return True
  * 
  *     def call_broadpeaks (self, double lvl1_cutoff=500, double lvl2_cutoff=100, int min_length=200,             # <<<<<<<<<<<<<<
@@ -8891,7 +9150,7 @@ static PyObject *__pyx_pw_5MACS2_2IO_8BedGraph_14bedGraphTrackI_29call_broadpeak
         }
       }
       if (unlikely(kw_args > 0)) {
-        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "call_broadpeaks") < 0)) __PYX_ERR(0, 499, __pyx_L3_error)
+        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "call_broadpeaks") < 0)) __PYX_ERR(0, 500, __pyx_L3_error)
       }
     } else {
       switch (PyTuple_GET_SIZE(__pyx_args)) {
@@ -8910,34 +9169,34 @@ static PyObject *__pyx_pw_5MACS2_2IO_8BedGraph_14bedGraphTrackI_29call_broadpeak
       }
     }
     if (values[0]) {
-      __pyx_v_lvl1_cutoff = __pyx_PyFloat_AsDouble(values[0]); if (unlikely((__pyx_v_lvl1_cutoff == (double)-1) && PyErr_Occurred())) __PYX_ERR(0, 499, __pyx_L3_error)
+      __pyx_v_lvl1_cutoff = __pyx_PyFloat_AsDouble(values[0]); if (unlikely((__pyx_v_lvl1_cutoff == (double)-1) && PyErr_Occurred())) __PYX_ERR(0, 500, __pyx_L3_error)
     } else {
       __pyx_v_lvl1_cutoff = ((double)500.0);
     }
     if (values[1]) {
-      __pyx_v_lvl2_cutoff = __pyx_PyFloat_AsDouble(values[1]); if (unlikely((__pyx_v_lvl2_cutoff == (double)-1) && PyErr_Occurred())) __PYX_ERR(0, 499, __pyx_L3_error)
+      __pyx_v_lvl2_cutoff = __pyx_PyFloat_AsDouble(values[1]); if (unlikely((__pyx_v_lvl2_cutoff == (double)-1) && PyErr_Occurred())) __PYX_ERR(0, 500, __pyx_L3_error)
     } else {
       __pyx_v_lvl2_cutoff = ((double)100.0);
     }
     if (values[2]) {
-      __pyx_v_min_length = __Pyx_PyInt_As_int(values[2]); if (unlikely((__pyx_v_min_length == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 499, __pyx_L3_error)
+      __pyx_v_min_length = __Pyx_PyInt_As_int(values[2]); if (unlikely((__pyx_v_min_length == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 500, __pyx_L3_error)
     } else {
       __pyx_v_min_length = ((int)0xC8);
     }
     if (values[3]) {
-      __pyx_v_lvl1_max_gap = __Pyx_PyInt_As_int(values[3]); if (unlikely((__pyx_v_lvl1_max_gap == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 500, __pyx_L3_error)
+      __pyx_v_lvl1_max_gap = __Pyx_PyInt_As_int(values[3]); if (unlikely((__pyx_v_lvl1_max_gap == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 501, __pyx_L3_error)
     } else {
       __pyx_v_lvl1_max_gap = ((int)50);
     }
     if (values[4]) {
-      __pyx_v_lvl2_max_gap = __Pyx_PyInt_As_int(values[4]); if (unlikely((__pyx_v_lvl2_max_gap == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 500, __pyx_L3_error)
+      __pyx_v_lvl2_max_gap = __Pyx_PyInt_As_int(values[4]); if (unlikely((__pyx_v_lvl2_max_gap == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 501, __pyx_L3_error)
     } else {
       __pyx_v_lvl2_max_gap = ((int)0x190);
     }
   }
   goto __pyx_L4_argument_unpacking_done;
   __pyx_L5_argtuple_error:;
-  __Pyx_RaiseArgtupleInvalid("call_broadpeaks", 0, 0, 5, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 499, __pyx_L3_error)
+  __Pyx_RaiseArgtupleInvalid("call_broadpeaks", 0, 0, 5, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 500, __pyx_L3_error)
   __pyx_L3_error:;
   __Pyx_AddTraceback("MACS2.IO.BedGraph.bedGraphTrackI.call_broadpeaks", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __Pyx_RefNannyFinishContext();
@@ -8965,6 +9224,7 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_28call_broadpeak
   PyObject *__pyx_v_lvl1 = NULL;
   PyObject *__pyx_v_lvl2 = NULL;
   PyObject *__pyx_r = NULL;
+  __Pyx_TraceDeclarations
   __Pyx_RefNannyDeclarations
   PyObject *__pyx_t_1 = NULL;
   PyObject *__pyx_t_2 = NULL;
@@ -8989,8 +9249,9 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_28call_broadpeak
   PyObject *__pyx_t_21 = NULL;
   PyObject *__pyx_t_22 = NULL;
   __Pyx_RefNannySetupContext("call_broadpeaks", 0);
+  __Pyx_TraceCall("call_broadpeaks", __pyx_f[0], 500, 0, __PYX_ERR(0, 500, __pyx_L1_error));
 
-  /* "MACS2/IO/BedGraph.pyx":521
+  /* "MACS2/IO/BedGraph.pyx":522
  *         #cdef int tmp_n
  * 
  *         assert lvl1_cutoff > lvl2_cutoff, "level 1 cutoff should be larger than level 2."             # <<<<<<<<<<<<<<
@@ -9001,12 +9262,12 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_28call_broadpeak
   if (unlikely(!Py_OptimizeFlag)) {
     if (unlikely(!((__pyx_v_lvl1_cutoff > __pyx_v_lvl2_cutoff) != 0))) {
       PyErr_SetObject(PyExc_AssertionError, __pyx_kp_u_level_1_cutoff_should_be_larger);
-      __PYX_ERR(0, 521, __pyx_L1_error)
+      __PYX_ERR(0, 522, __pyx_L1_error)
     }
   }
   #endif
 
-  /* "MACS2/IO/BedGraph.pyx":522
+  /* "MACS2/IO/BedGraph.pyx":523
  * 
  *         assert lvl1_cutoff > lvl2_cutoff, "level 1 cutoff should be larger than level 2."
  *         assert lvl1_max_gap < lvl2_max_gap, "level 2 maximum gap should be larger than level 1."             # <<<<<<<<<<<<<<
@@ -9017,79 +9278,79 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_28call_broadpeak
   if (unlikely(!Py_OptimizeFlag)) {
     if (unlikely(!((__pyx_v_lvl1_max_gap < __pyx_v_lvl2_max_gap) != 0))) {
       PyErr_SetObject(PyExc_AssertionError, __pyx_kp_u_level_2_maximum_gap_should_be_la);
-      __PYX_ERR(0, 522, __pyx_L1_error)
+      __PYX_ERR(0, 523, __pyx_L1_error)
     }
   }
   #endif
 
-  /* "MACS2/IO/BedGraph.pyx":523
+  /* "MACS2/IO/BedGraph.pyx":524
  *         assert lvl1_cutoff > lvl2_cutoff, "level 1 cutoff should be larger than level 2."
  *         assert lvl1_max_gap < lvl2_max_gap, "level 2 maximum gap should be larger than level 1."
  *         lvl1_peaks = self.call_peaks(cutoff=lvl1_cutoff, min_length=min_length, max_gap=lvl1_max_gap)             # <<<<<<<<<<<<<<
  *         lvl2_peaks = self.call_peaks(cutoff=lvl2_cutoff, min_length=min_length, max_gap=lvl2_max_gap)
  *         chrs = lvl1_peaks.get_chr_names()
  */
-  __pyx_t_1 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_v_self), __pyx_n_s_call_peaks); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 523, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_v_self), __pyx_n_s_call_peaks); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 524, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_2 = __Pyx_PyDict_NewPresized(3); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 523, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyDict_NewPresized(3); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 524, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
-  __pyx_t_3 = PyFloat_FromDouble(__pyx_v_lvl1_cutoff); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 523, __pyx_L1_error)
+  __pyx_t_3 = PyFloat_FromDouble(__pyx_v_lvl1_cutoff); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 524, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
-  if (PyDict_SetItem(__pyx_t_2, __pyx_n_s_cutoff, __pyx_t_3) < 0) __PYX_ERR(0, 523, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_t_2, __pyx_n_s_cutoff, __pyx_t_3) < 0) __PYX_ERR(0, 524, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-  __pyx_t_3 = __Pyx_PyInt_From_int(__pyx_v_min_length); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 523, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_PyInt_From_int(__pyx_v_min_length); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 524, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
-  if (PyDict_SetItem(__pyx_t_2, __pyx_n_s_min_length, __pyx_t_3) < 0) __PYX_ERR(0, 523, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_t_2, __pyx_n_s_min_length, __pyx_t_3) < 0) __PYX_ERR(0, 524, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-  __pyx_t_3 = __Pyx_PyInt_From_int(__pyx_v_lvl1_max_gap); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 523, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_PyInt_From_int(__pyx_v_lvl1_max_gap); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 524, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
-  if (PyDict_SetItem(__pyx_t_2, __pyx_n_s_max_gap, __pyx_t_3) < 0) __PYX_ERR(0, 523, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_t_2, __pyx_n_s_max_gap, __pyx_t_3) < 0) __PYX_ERR(0, 524, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-  __pyx_t_3 = __Pyx_PyObject_Call(__pyx_t_1, __pyx_empty_tuple, __pyx_t_2); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 523, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_PyObject_Call(__pyx_t_1, __pyx_empty_tuple, __pyx_t_2); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 524, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
   __pyx_v_lvl1_peaks = __pyx_t_3;
   __pyx_t_3 = 0;
 
-  /* "MACS2/IO/BedGraph.pyx":524
+  /* "MACS2/IO/BedGraph.pyx":525
  *         assert lvl1_max_gap < lvl2_max_gap, "level 2 maximum gap should be larger than level 1."
  *         lvl1_peaks = self.call_peaks(cutoff=lvl1_cutoff, min_length=min_length, max_gap=lvl1_max_gap)
  *         lvl2_peaks = self.call_peaks(cutoff=lvl2_cutoff, min_length=min_length, max_gap=lvl2_max_gap)             # <<<<<<<<<<<<<<
  *         chrs = lvl1_peaks.get_chr_names()
  *         broadpeaks = BroadPeakIO()
  */
-  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_v_self), __pyx_n_s_call_peaks); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 524, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_v_self), __pyx_n_s_call_peaks); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 525, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
-  __pyx_t_2 = __Pyx_PyDict_NewPresized(3); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 524, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyDict_NewPresized(3); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 525, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
-  __pyx_t_1 = PyFloat_FromDouble(__pyx_v_lvl2_cutoff); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 524, __pyx_L1_error)
+  __pyx_t_1 = PyFloat_FromDouble(__pyx_v_lvl2_cutoff); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 525, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  if (PyDict_SetItem(__pyx_t_2, __pyx_n_s_cutoff, __pyx_t_1) < 0) __PYX_ERR(0, 524, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_t_2, __pyx_n_s_cutoff, __pyx_t_1) < 0) __PYX_ERR(0, 525, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-  __pyx_t_1 = __Pyx_PyInt_From_int(__pyx_v_min_length); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 524, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyInt_From_int(__pyx_v_min_length); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 525, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  if (PyDict_SetItem(__pyx_t_2, __pyx_n_s_min_length, __pyx_t_1) < 0) __PYX_ERR(0, 524, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_t_2, __pyx_n_s_min_length, __pyx_t_1) < 0) __PYX_ERR(0, 525, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-  __pyx_t_1 = __Pyx_PyInt_From_int(__pyx_v_lvl2_max_gap); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 524, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyInt_From_int(__pyx_v_lvl2_max_gap); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 525, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  if (PyDict_SetItem(__pyx_t_2, __pyx_n_s_max_gap, __pyx_t_1) < 0) __PYX_ERR(0, 524, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_t_2, __pyx_n_s_max_gap, __pyx_t_1) < 0) __PYX_ERR(0, 525, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-  __pyx_t_1 = __Pyx_PyObject_Call(__pyx_t_3, __pyx_empty_tuple, __pyx_t_2); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 524, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyObject_Call(__pyx_t_3, __pyx_empty_tuple, __pyx_t_2); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 525, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
   __pyx_v_lvl2_peaks = __pyx_t_1;
   __pyx_t_1 = 0;
 
-  /* "MACS2/IO/BedGraph.pyx":525
+  /* "MACS2/IO/BedGraph.pyx":526
  *         lvl1_peaks = self.call_peaks(cutoff=lvl1_cutoff, min_length=min_length, max_gap=lvl1_max_gap)
  *         lvl2_peaks = self.call_peaks(cutoff=lvl2_cutoff, min_length=min_length, max_gap=lvl2_max_gap)
  *         chrs = lvl1_peaks.get_chr_names()             # <<<<<<<<<<<<<<
  *         broadpeaks = BroadPeakIO()
  *         # use lvl2_peaks as linking regions between lvl1_peaks
  */
-  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_lvl1_peaks, __pyx_n_s_get_chr_names); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 525, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_lvl1_peaks, __pyx_n_s_get_chr_names); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 526, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __pyx_t_3 = NULL;
   if (CYTHON_UNPACK_METHODS && likely(PyMethod_Check(__pyx_t_2))) {
@@ -9103,21 +9364,21 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_28call_broadpeak
   }
   __pyx_t_1 = (__pyx_t_3) ? __Pyx_PyObject_CallOneArg(__pyx_t_2, __pyx_t_3) : __Pyx_PyObject_CallNoArg(__pyx_t_2);
   __Pyx_XDECREF(__pyx_t_3); __pyx_t_3 = 0;
-  if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 525, __pyx_L1_error)
+  if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 526, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-  if (!(likely(PySet_CheckExact(__pyx_t_1))||((__pyx_t_1) == Py_None)||(PyErr_Format(PyExc_TypeError, "Expected %.16s, got %.200s", "set", Py_TYPE(__pyx_t_1)->tp_name), 0))) __PYX_ERR(0, 525, __pyx_L1_error)
+  if (!(likely(PySet_CheckExact(__pyx_t_1))||((__pyx_t_1) == Py_None)||(PyErr_Format(PyExc_TypeError, "Expected %.16s, got %.200s", "set", Py_TYPE(__pyx_t_1)->tp_name), 0))) __PYX_ERR(0, 526, __pyx_L1_error)
   __pyx_v_chrs = ((PyObject*)__pyx_t_1);
   __pyx_t_1 = 0;
 
-  /* "MACS2/IO/BedGraph.pyx":526
+  /* "MACS2/IO/BedGraph.pyx":527
  *         lvl2_peaks = self.call_peaks(cutoff=lvl2_cutoff, min_length=min_length, max_gap=lvl2_max_gap)
  *         chrs = lvl1_peaks.get_chr_names()
  *         broadpeaks = BroadPeakIO()             # <<<<<<<<<<<<<<
  *         # use lvl2_peaks as linking regions between lvl1_peaks
  *         for chrom in chrs:
  */
-  __Pyx_GetModuleGlobalName(__pyx_t_2, __pyx_n_s_BroadPeakIO); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 526, __pyx_L1_error)
+  __Pyx_GetModuleGlobalName(__pyx_t_2, __pyx_n_s_BroadPeakIO); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 527, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __pyx_t_3 = NULL;
   if (CYTHON_UNPACK_METHODS && unlikely(PyMethod_Check(__pyx_t_2))) {
@@ -9131,13 +9392,13 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_28call_broadpeak
   }
   __pyx_t_1 = (__pyx_t_3) ? __Pyx_PyObject_CallOneArg(__pyx_t_2, __pyx_t_3) : __Pyx_PyObject_CallNoArg(__pyx_t_2);
   __Pyx_XDECREF(__pyx_t_3); __pyx_t_3 = 0;
-  if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 526, __pyx_L1_error)
+  if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 527, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
   __pyx_v_broadpeaks = __pyx_t_1;
   __pyx_t_1 = 0;
 
-  /* "MACS2/IO/BedGraph.pyx":528
+  /* "MACS2/IO/BedGraph.pyx":529
  *         broadpeaks = BroadPeakIO()
  *         # use lvl2_peaks as linking regions between lvl1_peaks
  *         for chrom in chrs:             # <<<<<<<<<<<<<<
@@ -9145,7 +9406,7 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_28call_broadpeak
  *             lvl1peakschrom = lvl1_peaks.get_data_from_chrom(chrom)
  */
   __pyx_t_4 = 0;
-  __pyx_t_2 = __Pyx_set_iterator(__pyx_v_chrs, 1, (&__pyx_t_5), (&__pyx_t_6)); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 528, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_set_iterator(__pyx_v_chrs, 1, (&__pyx_t_5), (&__pyx_t_6)); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 529, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __Pyx_XDECREF(__pyx_t_1);
   __pyx_t_1 = __pyx_t_2;
@@ -9153,47 +9414,20 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_28call_broadpeak
   while (1) {
     __pyx_t_7 = __Pyx_set_iter_next(__pyx_t_1, __pyx_t_5, &__pyx_t_4, &__pyx_t_2, __pyx_t_6);
     if (unlikely(__pyx_t_7 == 0)) break;
-    if (unlikely(__pyx_t_7 == -1)) __PYX_ERR(0, 528, __pyx_L1_error)
+    if (unlikely(__pyx_t_7 == -1)) __PYX_ERR(0, 529, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
-    if (!(likely(PyBytes_CheckExact(__pyx_t_2))||((__pyx_t_2) == Py_None)||(PyErr_Format(PyExc_TypeError, "Expected %.16s, got %.200s", "bytes", Py_TYPE(__pyx_t_2)->tp_name), 0))) __PYX_ERR(0, 528, __pyx_L1_error)
+    if (!(likely(PyBytes_CheckExact(__pyx_t_2))||((__pyx_t_2) == Py_None)||(PyErr_Format(PyExc_TypeError, "Expected %.16s, got %.200s", "bytes", Py_TYPE(__pyx_t_2)->tp_name), 0))) __PYX_ERR(0, 529, __pyx_L1_error)
     __Pyx_XDECREF_SET(__pyx_v_chrom, ((PyObject*)__pyx_t_2));
     __pyx_t_2 = 0;
 
-    /* "MACS2/IO/BedGraph.pyx":530
+    /* "MACS2/IO/BedGraph.pyx":531
  *         for chrom in chrs:
  *             #tmp_n = 0
  *             lvl1peakschrom = lvl1_peaks.get_data_from_chrom(chrom)             # <<<<<<<<<<<<<<
  *             lvl2peakschrom = lvl2_peaks.get_data_from_chrom(chrom)
  *             lvl1peakschrom_next = iter(lvl1peakschrom).__next__
  */
-    __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_v_lvl1_peaks, __pyx_n_s_get_data_from_chrom); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 530, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_3);
-    __pyx_t_8 = NULL;
-    if (CYTHON_UNPACK_METHODS && likely(PyMethod_Check(__pyx_t_3))) {
-      __pyx_t_8 = PyMethod_GET_SELF(__pyx_t_3);
-      if (likely(__pyx_t_8)) {
-        PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_3);
-        __Pyx_INCREF(__pyx_t_8);
-        __Pyx_INCREF(function);
-        __Pyx_DECREF_SET(__pyx_t_3, function);
-      }
-    }
-    __pyx_t_2 = (__pyx_t_8) ? __Pyx_PyObject_Call2Args(__pyx_t_3, __pyx_t_8, __pyx_v_chrom) : __Pyx_PyObject_CallOneArg(__pyx_t_3, __pyx_v_chrom);
-    __Pyx_XDECREF(__pyx_t_8); __pyx_t_8 = 0;
-    if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 530, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_2);
-    __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-    __Pyx_XDECREF_SET(__pyx_v_lvl1peakschrom, __pyx_t_2);
-    __pyx_t_2 = 0;
-
-    /* "MACS2/IO/BedGraph.pyx":531
- *             #tmp_n = 0
- *             lvl1peakschrom = lvl1_peaks.get_data_from_chrom(chrom)
- *             lvl2peakschrom = lvl2_peaks.get_data_from_chrom(chrom)             # <<<<<<<<<<<<<<
- *             lvl1peakschrom_next = iter(lvl1peakschrom).__next__
- *             tmppeakset = []             # to temporarily store lvl1 region inside a lvl2 region
- */
-    __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_v_lvl2_peaks, __pyx_n_s_get_data_from_chrom); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 531, __pyx_L1_error)
+    __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_v_lvl1_peaks, __pyx_n_s_get_data_from_chrom); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 531, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_3);
     __pyx_t_8 = NULL;
     if (CYTHON_UNPACK_METHODS && likely(PyMethod_Check(__pyx_t_3))) {
@@ -9210,37 +9444,64 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_28call_broadpeak
     if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 531, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
     __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-    __Pyx_XDECREF_SET(__pyx_v_lvl2peakschrom, __pyx_t_2);
+    __Pyx_XDECREF_SET(__pyx_v_lvl1peakschrom, __pyx_t_2);
     __pyx_t_2 = 0;
 
     /* "MACS2/IO/BedGraph.pyx":532
+ *             #tmp_n = 0
+ *             lvl1peakschrom = lvl1_peaks.get_data_from_chrom(chrom)
+ *             lvl2peakschrom = lvl2_peaks.get_data_from_chrom(chrom)             # <<<<<<<<<<<<<<
+ *             lvl1peakschrom_next = iter(lvl1peakschrom).__next__
+ *             tmppeakset = []             # to temporarily store lvl1 region inside a lvl2 region
+ */
+    __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_v_lvl2_peaks, __pyx_n_s_get_data_from_chrom); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 532, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_3);
+    __pyx_t_8 = NULL;
+    if (CYTHON_UNPACK_METHODS && likely(PyMethod_Check(__pyx_t_3))) {
+      __pyx_t_8 = PyMethod_GET_SELF(__pyx_t_3);
+      if (likely(__pyx_t_8)) {
+        PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_3);
+        __Pyx_INCREF(__pyx_t_8);
+        __Pyx_INCREF(function);
+        __Pyx_DECREF_SET(__pyx_t_3, function);
+      }
+    }
+    __pyx_t_2 = (__pyx_t_8) ? __Pyx_PyObject_Call2Args(__pyx_t_3, __pyx_t_8, __pyx_v_chrom) : __Pyx_PyObject_CallOneArg(__pyx_t_3, __pyx_v_chrom);
+    __Pyx_XDECREF(__pyx_t_8); __pyx_t_8 = 0;
+    if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 532, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_2);
+    __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
+    __Pyx_XDECREF_SET(__pyx_v_lvl2peakschrom, __pyx_t_2);
+    __pyx_t_2 = 0;
+
+    /* "MACS2/IO/BedGraph.pyx":533
  *             lvl1peakschrom = lvl1_peaks.get_data_from_chrom(chrom)
  *             lvl2peakschrom = lvl2_peaks.get_data_from_chrom(chrom)
  *             lvl1peakschrom_next = iter(lvl1peakschrom).__next__             # <<<<<<<<<<<<<<
  *             tmppeakset = []             # to temporarily store lvl1 region inside a lvl2 region
  *             # our assumption is lvl1 regions should be included in lvl2 regions
  */
-    __pyx_t_2 = PyObject_GetIter(__pyx_v_lvl1peakschrom); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 532, __pyx_L1_error)
+    __pyx_t_2 = PyObject_GetIter(__pyx_v_lvl1peakschrom); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 533, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
-    __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_t_2, __pyx_n_s_next); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 532, __pyx_L1_error)
+    __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_t_2, __pyx_n_s_next); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 533, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_3);
     __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
     __Pyx_XDECREF_SET(__pyx_v_lvl1peakschrom_next, __pyx_t_3);
     __pyx_t_3 = 0;
 
-    /* "MACS2/IO/BedGraph.pyx":533
+    /* "MACS2/IO/BedGraph.pyx":534
  *             lvl2peakschrom = lvl2_peaks.get_data_from_chrom(chrom)
  *             lvl1peakschrom_next = iter(lvl1peakschrom).__next__
  *             tmppeakset = []             # to temporarily store lvl1 region inside a lvl2 region             # <<<<<<<<<<<<<<
  *             # our assumption is lvl1 regions should be included in lvl2 regions
  *             try:
  */
-    __pyx_t_3 = PyList_New(0); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 533, __pyx_L1_error)
+    __pyx_t_3 = PyList_New(0); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 534, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_3);
     __Pyx_XDECREF_SET(__pyx_v_tmppeakset, ((PyObject*)__pyx_t_3));
     __pyx_t_3 = 0;
 
-    /* "MACS2/IO/BedGraph.pyx":535
+    /* "MACS2/IO/BedGraph.pyx":536
  *             tmppeakset = []             # to temporarily store lvl1 region inside a lvl2 region
  *             # our assumption is lvl1 regions should be included in lvl2 regions
  *             try:             # <<<<<<<<<<<<<<
@@ -9256,7 +9517,7 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_28call_broadpeak
       __Pyx_XGOTREF(__pyx_t_11);
       /*try:*/ {
 
-        /* "MACS2/IO/BedGraph.pyx":536
+        /* "MACS2/IO/BedGraph.pyx":537
  *             # our assumption is lvl1 regions should be included in lvl2 regions
  *             try:
  *                 lvl1 = lvl1peakschrom_next()             # <<<<<<<<<<<<<<
@@ -9276,37 +9537,37 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_28call_broadpeak
         }
         __pyx_t_3 = (__pyx_t_8) ? __Pyx_PyObject_CallOneArg(__pyx_t_2, __pyx_t_8) : __Pyx_PyObject_CallNoArg(__pyx_t_2);
         __Pyx_XDECREF(__pyx_t_8); __pyx_t_8 = 0;
-        if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 536, __pyx_L5_error)
+        if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 537, __pyx_L5_error)
         __Pyx_GOTREF(__pyx_t_3);
         __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
         __Pyx_XDECREF_SET(__pyx_v_lvl1, __pyx_t_3);
         __pyx_t_3 = 0;
 
-        /* "MACS2/IO/BedGraph.pyx":537
+        /* "MACS2/IO/BedGraph.pyx":538
  *             try:
  *                 lvl1 = lvl1peakschrom_next()
  *                 for i in range( len(lvl2peakschrom) ):             # <<<<<<<<<<<<<<
  *                     # for each lvl2 peak, find all lvl1 peaks inside
  *                     lvl2 = lvl2peakschrom[i]
  */
-        __pyx_t_12 = PyObject_Length(__pyx_v_lvl2peakschrom); if (unlikely(__pyx_t_12 == ((Py_ssize_t)-1))) __PYX_ERR(0, 537, __pyx_L5_error)
+        __pyx_t_12 = PyObject_Length(__pyx_v_lvl2peakschrom); if (unlikely(__pyx_t_12 == ((Py_ssize_t)-1))) __PYX_ERR(0, 538, __pyx_L5_error)
         __pyx_t_13 = __pyx_t_12;
         for (__pyx_t_7 = 0; __pyx_t_7 < __pyx_t_13; __pyx_t_7+=1) {
           __pyx_v_i = __pyx_t_7;
 
-          /* "MACS2/IO/BedGraph.pyx":539
+          /* "MACS2/IO/BedGraph.pyx":540
  *                 for i in range( len(lvl2peakschrom) ):
  *                     # for each lvl2 peak, find all lvl1 peaks inside
  *                     lvl2 = lvl2peakschrom[i]             # <<<<<<<<<<<<<<
  *                     while True:
  *                         if lvl2["start"] <= lvl1["start"]  and lvl1["end"] <= lvl2["end"]:
  */
-          __pyx_t_3 = __Pyx_GetItemInt(__pyx_v_lvl2peakschrom, __pyx_v_i, int, 1, __Pyx_PyInt_From_int, 0, 1, 1); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 539, __pyx_L5_error)
+          __pyx_t_3 = __Pyx_GetItemInt(__pyx_v_lvl2peakschrom, __pyx_v_i, int, 1, __Pyx_PyInt_From_int, 0, 1, 1); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 540, __pyx_L5_error)
           __Pyx_GOTREF(__pyx_t_3);
           __Pyx_XDECREF_SET(__pyx_v_lvl2, __pyx_t_3);
           __pyx_t_3 = 0;
 
-          /* "MACS2/IO/BedGraph.pyx":540
+          /* "MACS2/IO/BedGraph.pyx":541
  *                     # for each lvl2 peak, find all lvl1 peaks inside
  *                     lvl2 = lvl2peakschrom[i]
  *                     while True:             # <<<<<<<<<<<<<<
@@ -9315,50 +9576,50 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_28call_broadpeak
  */
           while (1) {
 
-            /* "MACS2/IO/BedGraph.pyx":541
+            /* "MACS2/IO/BedGraph.pyx":542
  *                     lvl2 = lvl2peakschrom[i]
  *                     while True:
  *                         if lvl2["start"] <= lvl1["start"]  and lvl1["end"] <= lvl2["end"]:             # <<<<<<<<<<<<<<
  *                             tmppeakset.append(lvl1)
  *                             lvl1 = lvl1peakschrom_next()
  */
-            __pyx_t_3 = __Pyx_PyObject_Dict_GetItem(__pyx_v_lvl2, __pyx_n_u_start); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 541, __pyx_L5_error)
+            __pyx_t_3 = __Pyx_PyObject_Dict_GetItem(__pyx_v_lvl2, __pyx_n_u_start); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 542, __pyx_L5_error)
             __Pyx_GOTREF(__pyx_t_3);
-            __pyx_t_2 = __Pyx_PyObject_Dict_GetItem(__pyx_v_lvl1, __pyx_n_u_start); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 541, __pyx_L5_error)
+            __pyx_t_2 = __Pyx_PyObject_Dict_GetItem(__pyx_v_lvl1, __pyx_n_u_start); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 542, __pyx_L5_error)
             __Pyx_GOTREF(__pyx_t_2);
-            __pyx_t_8 = PyObject_RichCompare(__pyx_t_3, __pyx_t_2, Py_LE); __Pyx_XGOTREF(__pyx_t_8); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 541, __pyx_L5_error)
+            __pyx_t_8 = PyObject_RichCompare(__pyx_t_3, __pyx_t_2, Py_LE); __Pyx_XGOTREF(__pyx_t_8); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 542, __pyx_L5_error)
             __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
             __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-            __pyx_t_15 = __Pyx_PyObject_IsTrue(__pyx_t_8); if (unlikely(__pyx_t_15 < 0)) __PYX_ERR(0, 541, __pyx_L5_error)
+            __pyx_t_15 = __Pyx_PyObject_IsTrue(__pyx_t_8); if (unlikely(__pyx_t_15 < 0)) __PYX_ERR(0, 542, __pyx_L5_error)
             __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
             if (__pyx_t_15) {
             } else {
               __pyx_t_14 = __pyx_t_15;
               goto __pyx_L18_bool_binop_done;
             }
-            __pyx_t_8 = __Pyx_PyObject_Dict_GetItem(__pyx_v_lvl1, __pyx_n_u_end); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 541, __pyx_L5_error)
+            __pyx_t_8 = __Pyx_PyObject_Dict_GetItem(__pyx_v_lvl1, __pyx_n_u_end); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 542, __pyx_L5_error)
             __Pyx_GOTREF(__pyx_t_8);
-            __pyx_t_2 = __Pyx_PyObject_Dict_GetItem(__pyx_v_lvl2, __pyx_n_u_end); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 541, __pyx_L5_error)
+            __pyx_t_2 = __Pyx_PyObject_Dict_GetItem(__pyx_v_lvl2, __pyx_n_u_end); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 542, __pyx_L5_error)
             __Pyx_GOTREF(__pyx_t_2);
-            __pyx_t_3 = PyObject_RichCompare(__pyx_t_8, __pyx_t_2, Py_LE); __Pyx_XGOTREF(__pyx_t_3); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 541, __pyx_L5_error)
+            __pyx_t_3 = PyObject_RichCompare(__pyx_t_8, __pyx_t_2, Py_LE); __Pyx_XGOTREF(__pyx_t_3); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 542, __pyx_L5_error)
             __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
             __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-            __pyx_t_15 = __Pyx_PyObject_IsTrue(__pyx_t_3); if (unlikely(__pyx_t_15 < 0)) __PYX_ERR(0, 541, __pyx_L5_error)
+            __pyx_t_15 = __Pyx_PyObject_IsTrue(__pyx_t_3); if (unlikely(__pyx_t_15 < 0)) __PYX_ERR(0, 542, __pyx_L5_error)
             __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
             __pyx_t_14 = __pyx_t_15;
             __pyx_L18_bool_binop_done:;
             if (__pyx_t_14) {
 
-              /* "MACS2/IO/BedGraph.pyx":542
+              /* "MACS2/IO/BedGraph.pyx":543
  *                     while True:
  *                         if lvl2["start"] <= lvl1["start"]  and lvl1["end"] <= lvl2["end"]:
  *                             tmppeakset.append(lvl1)             # <<<<<<<<<<<<<<
  *                             lvl1 = lvl1peakschrom_next()
  *                         else:
  */
-              __pyx_t_16 = __Pyx_PyList_Append(__pyx_v_tmppeakset, __pyx_v_lvl1); if (unlikely(__pyx_t_16 == ((int)-1))) __PYX_ERR(0, 542, __pyx_L5_error)
+              __pyx_t_16 = __Pyx_PyList_Append(__pyx_v_tmppeakset, __pyx_v_lvl1); if (unlikely(__pyx_t_16 == ((int)-1))) __PYX_ERR(0, 543, __pyx_L5_error)
 
-              /* "MACS2/IO/BedGraph.pyx":543
+              /* "MACS2/IO/BedGraph.pyx":544
  *                         if lvl2["start"] <= lvl1["start"]  and lvl1["end"] <= lvl2["end"]:
  *                             tmppeakset.append(lvl1)
  *                             lvl1 = lvl1peakschrom_next()             # <<<<<<<<<<<<<<
@@ -9378,13 +9639,13 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_28call_broadpeak
               }
               __pyx_t_3 = (__pyx_t_8) ? __Pyx_PyObject_CallOneArg(__pyx_t_2, __pyx_t_8) : __Pyx_PyObject_CallNoArg(__pyx_t_2);
               __Pyx_XDECREF(__pyx_t_8); __pyx_t_8 = 0;
-              if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 543, __pyx_L5_error)
+              if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 544, __pyx_L5_error)
               __Pyx_GOTREF(__pyx_t_3);
               __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
               __Pyx_DECREF_SET(__pyx_v_lvl1, __pyx_t_3);
               __pyx_t_3 = 0;
 
-              /* "MACS2/IO/BedGraph.pyx":541
+              /* "MACS2/IO/BedGraph.pyx":542
  *                     lvl2 = lvl2peakschrom[i]
  *                     while True:
  *                         if lvl2["start"] <= lvl1["start"]  and lvl1["end"] <= lvl2["end"]:             # <<<<<<<<<<<<<<
@@ -9394,7 +9655,7 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_28call_broadpeak
               goto __pyx_L17;
             }
 
-            /* "MACS2/IO/BedGraph.pyx":545
+            /* "MACS2/IO/BedGraph.pyx":546
  *                             lvl1 = lvl1peakschrom_next()
  *                         else:
  *                             self.__add_broadpeak ( broadpeaks, chrom, lvl2, tmppeakset)             # <<<<<<<<<<<<<<
@@ -9402,7 +9663,7 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_28call_broadpeak
  *                             tmppeakset = []
  */
             /*else*/ {
-              __pyx_t_2 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_v_self), __pyx_n_s_add_broadpeak); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 545, __pyx_L5_error)
+              __pyx_t_2 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_v_self), __pyx_n_s_add_broadpeak); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 546, __pyx_L5_error)
               __Pyx_GOTREF(__pyx_t_2);
               __pyx_t_8 = NULL;
               __pyx_t_17 = 0;
@@ -9419,7 +9680,7 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_28call_broadpeak
               #if CYTHON_FAST_PYCALL
               if (PyFunction_Check(__pyx_t_2)) {
                 PyObject *__pyx_temp[5] = {__pyx_t_8, __pyx_v_broadpeaks, __pyx_v_chrom, __pyx_v_lvl2, __pyx_v_tmppeakset};
-                __pyx_t_3 = __Pyx_PyFunction_FastCall(__pyx_t_2, __pyx_temp+1-__pyx_t_17, 4+__pyx_t_17); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 545, __pyx_L5_error)
+                __pyx_t_3 = __Pyx_PyFunction_FastCall(__pyx_t_2, __pyx_temp+1-__pyx_t_17, 4+__pyx_t_17); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 546, __pyx_L5_error)
                 __Pyx_XDECREF(__pyx_t_8); __pyx_t_8 = 0;
                 __Pyx_GOTREF(__pyx_t_3);
               } else
@@ -9427,13 +9688,13 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_28call_broadpeak
               #if CYTHON_FAST_PYCCALL
               if (__Pyx_PyFastCFunction_Check(__pyx_t_2)) {
                 PyObject *__pyx_temp[5] = {__pyx_t_8, __pyx_v_broadpeaks, __pyx_v_chrom, __pyx_v_lvl2, __pyx_v_tmppeakset};
-                __pyx_t_3 = __Pyx_PyCFunction_FastCall(__pyx_t_2, __pyx_temp+1-__pyx_t_17, 4+__pyx_t_17); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 545, __pyx_L5_error)
+                __pyx_t_3 = __Pyx_PyCFunction_FastCall(__pyx_t_2, __pyx_temp+1-__pyx_t_17, 4+__pyx_t_17); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 546, __pyx_L5_error)
                 __Pyx_XDECREF(__pyx_t_8); __pyx_t_8 = 0;
                 __Pyx_GOTREF(__pyx_t_3);
               } else
               #endif
               {
-                __pyx_t_18 = PyTuple_New(4+__pyx_t_17); if (unlikely(!__pyx_t_18)) __PYX_ERR(0, 545, __pyx_L5_error)
+                __pyx_t_18 = PyTuple_New(4+__pyx_t_17); if (unlikely(!__pyx_t_18)) __PYX_ERR(0, 546, __pyx_L5_error)
                 __Pyx_GOTREF(__pyx_t_18);
                 if (__pyx_t_8) {
                   __Pyx_GIVEREF(__pyx_t_8); PyTuple_SET_ITEM(__pyx_t_18, 0, __pyx_t_8); __pyx_t_8 = NULL;
@@ -9450,26 +9711,26 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_28call_broadpeak
                 __Pyx_INCREF(__pyx_v_tmppeakset);
                 __Pyx_GIVEREF(__pyx_v_tmppeakset);
                 PyTuple_SET_ITEM(__pyx_t_18, 3+__pyx_t_17, __pyx_v_tmppeakset);
-                __pyx_t_3 = __Pyx_PyObject_Call(__pyx_t_2, __pyx_t_18, NULL); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 545, __pyx_L5_error)
+                __pyx_t_3 = __Pyx_PyObject_Call(__pyx_t_2, __pyx_t_18, NULL); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 546, __pyx_L5_error)
                 __Pyx_GOTREF(__pyx_t_3);
                 __Pyx_DECREF(__pyx_t_18); __pyx_t_18 = 0;
               }
               __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
               __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
 
-              /* "MACS2/IO/BedGraph.pyx":547
+              /* "MACS2/IO/BedGraph.pyx":548
  *                             self.__add_broadpeak ( broadpeaks, chrom, lvl2, tmppeakset)
  *                             #tmp_n += 1
  *                             tmppeakset = []             # <<<<<<<<<<<<<<
  *                             break
  *             except StopIteration:
  */
-              __pyx_t_3 = PyList_New(0); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 547, __pyx_L5_error)
+              __pyx_t_3 = PyList_New(0); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 548, __pyx_L5_error)
               __Pyx_GOTREF(__pyx_t_3);
               __Pyx_DECREF_SET(__pyx_v_tmppeakset, ((PyObject*)__pyx_t_3));
               __pyx_t_3 = 0;
 
-              /* "MACS2/IO/BedGraph.pyx":548
+              /* "MACS2/IO/BedGraph.pyx":549
  *                             #tmp_n += 1
  *                             tmppeakset = []
  *                             break             # <<<<<<<<<<<<<<
@@ -9483,7 +9744,7 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_28call_broadpeak
           __pyx_L16_break:;
         }
 
-        /* "MACS2/IO/BedGraph.pyx":535
+        /* "MACS2/IO/BedGraph.pyx":536
  *             tmppeakset = []             # to temporarily store lvl1 region inside a lvl2 region
  *             # our assumption is lvl1 regions should be included in lvl2 regions
  *             try:             # <<<<<<<<<<<<<<
@@ -9501,7 +9762,7 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_28call_broadpeak
       __Pyx_XDECREF(__pyx_t_3); __pyx_t_3 = 0;
       __Pyx_XDECREF(__pyx_t_8); __pyx_t_8 = 0;
 
-      /* "MACS2/IO/BedGraph.pyx":549
+      /* "MACS2/IO/BedGraph.pyx":550
  *                             tmppeakset = []
  *                             break
  *             except StopIteration:             # <<<<<<<<<<<<<<
@@ -9511,21 +9772,21 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_28call_broadpeak
       __pyx_t_7 = __Pyx_PyErr_ExceptionMatches(__pyx_builtin_StopIteration);
       if (__pyx_t_7) {
         __Pyx_AddTraceback("MACS2.IO.BedGraph.bedGraphTrackI.call_broadpeaks", __pyx_clineno, __pyx_lineno, __pyx_filename);
-        if (__Pyx_GetException(&__pyx_t_3, &__pyx_t_2, &__pyx_t_18) < 0) __PYX_ERR(0, 549, __pyx_L7_except_error)
+        if (__Pyx_GetException(&__pyx_t_3, &__pyx_t_2, &__pyx_t_18) < 0) __PYX_ERR(0, 550, __pyx_L7_except_error)
         __Pyx_GOTREF(__pyx_t_3);
         __Pyx_GOTREF(__pyx_t_2);
         __Pyx_GOTREF(__pyx_t_18);
 
-        /* "MACS2/IO/BedGraph.pyx":550
+        /* "MACS2/IO/BedGraph.pyx":551
  *                             break
  *             except StopIteration:
  *                 self.__add_broadpeak ( broadpeaks, chrom, lvl2, tmppeakset)             # <<<<<<<<<<<<<<
  *                 #tmp_n += 1
  *                 tmppeakset = []
  */
-        __pyx_t_19 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_v_self), __pyx_n_s_add_broadpeak); if (unlikely(!__pyx_t_19)) __PYX_ERR(0, 550, __pyx_L7_except_error)
+        __pyx_t_19 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_v_self), __pyx_n_s_add_broadpeak); if (unlikely(!__pyx_t_19)) __PYX_ERR(0, 551, __pyx_L7_except_error)
         __Pyx_GOTREF(__pyx_t_19);
-        if (unlikely(!__pyx_v_lvl2)) { __Pyx_RaiseUnboundLocalError("lvl2"); __PYX_ERR(0, 550, __pyx_L7_except_error) }
+        if (unlikely(!__pyx_v_lvl2)) { __Pyx_RaiseUnboundLocalError("lvl2"); __PYX_ERR(0, 551, __pyx_L7_except_error) }
         __pyx_t_20 = NULL;
         __pyx_t_7 = 0;
         if (CYTHON_UNPACK_METHODS && likely(PyMethod_Check(__pyx_t_19))) {
@@ -9541,7 +9802,7 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_28call_broadpeak
         #if CYTHON_FAST_PYCALL
         if (PyFunction_Check(__pyx_t_19)) {
           PyObject *__pyx_temp[5] = {__pyx_t_20, __pyx_v_broadpeaks, __pyx_v_chrom, __pyx_v_lvl2, __pyx_v_tmppeakset};
-          __pyx_t_8 = __Pyx_PyFunction_FastCall(__pyx_t_19, __pyx_temp+1-__pyx_t_7, 4+__pyx_t_7); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 550, __pyx_L7_except_error)
+          __pyx_t_8 = __Pyx_PyFunction_FastCall(__pyx_t_19, __pyx_temp+1-__pyx_t_7, 4+__pyx_t_7); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 551, __pyx_L7_except_error)
           __Pyx_XDECREF(__pyx_t_20); __pyx_t_20 = 0;
           __Pyx_GOTREF(__pyx_t_8);
         } else
@@ -9549,13 +9810,13 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_28call_broadpeak
         #if CYTHON_FAST_PYCCALL
         if (__Pyx_PyFastCFunction_Check(__pyx_t_19)) {
           PyObject *__pyx_temp[5] = {__pyx_t_20, __pyx_v_broadpeaks, __pyx_v_chrom, __pyx_v_lvl2, __pyx_v_tmppeakset};
-          __pyx_t_8 = __Pyx_PyCFunction_FastCall(__pyx_t_19, __pyx_temp+1-__pyx_t_7, 4+__pyx_t_7); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 550, __pyx_L7_except_error)
+          __pyx_t_8 = __Pyx_PyCFunction_FastCall(__pyx_t_19, __pyx_temp+1-__pyx_t_7, 4+__pyx_t_7); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 551, __pyx_L7_except_error)
           __Pyx_XDECREF(__pyx_t_20); __pyx_t_20 = 0;
           __Pyx_GOTREF(__pyx_t_8);
         } else
         #endif
         {
-          __pyx_t_21 = PyTuple_New(4+__pyx_t_7); if (unlikely(!__pyx_t_21)) __PYX_ERR(0, 550, __pyx_L7_except_error)
+          __pyx_t_21 = PyTuple_New(4+__pyx_t_7); if (unlikely(!__pyx_t_21)) __PYX_ERR(0, 551, __pyx_L7_except_error)
           __Pyx_GOTREF(__pyx_t_21);
           if (__pyx_t_20) {
             __Pyx_GIVEREF(__pyx_t_20); PyTuple_SET_ITEM(__pyx_t_21, 0, __pyx_t_20); __pyx_t_20 = NULL;
@@ -9572,47 +9833,47 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_28call_broadpeak
           __Pyx_INCREF(__pyx_v_tmppeakset);
           __Pyx_GIVEREF(__pyx_v_tmppeakset);
           PyTuple_SET_ITEM(__pyx_t_21, 3+__pyx_t_7, __pyx_v_tmppeakset);
-          __pyx_t_8 = __Pyx_PyObject_Call(__pyx_t_19, __pyx_t_21, NULL); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 550, __pyx_L7_except_error)
+          __pyx_t_8 = __Pyx_PyObject_Call(__pyx_t_19, __pyx_t_21, NULL); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 551, __pyx_L7_except_error)
           __Pyx_GOTREF(__pyx_t_8);
           __Pyx_DECREF(__pyx_t_21); __pyx_t_21 = 0;
         }
         __Pyx_DECREF(__pyx_t_19); __pyx_t_19 = 0;
         __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
 
-        /* "MACS2/IO/BedGraph.pyx":552
+        /* "MACS2/IO/BedGraph.pyx":553
  *                 self.__add_broadpeak ( broadpeaks, chrom, lvl2, tmppeakset)
  *                 #tmp_n += 1
  *                 tmppeakset = []             # <<<<<<<<<<<<<<
  *                 for j in range( i+1, len(lvl2peakschrom) ):
  *                     self.__add_broadpeak ( broadpeaks, chrom, lvl2peakschrom[j], tmppeakset)
  */
-        __pyx_t_8 = PyList_New(0); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 552, __pyx_L7_except_error)
+        __pyx_t_8 = PyList_New(0); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 553, __pyx_L7_except_error)
         __Pyx_GOTREF(__pyx_t_8);
         __Pyx_DECREF_SET(__pyx_v_tmppeakset, ((PyObject*)__pyx_t_8));
         __pyx_t_8 = 0;
 
-        /* "MACS2/IO/BedGraph.pyx":553
+        /* "MACS2/IO/BedGraph.pyx":554
  *                 #tmp_n += 1
  *                 tmppeakset = []
  *                 for j in range( i+1, len(lvl2peakschrom) ):             # <<<<<<<<<<<<<<
  *                     self.__add_broadpeak ( broadpeaks, chrom, lvl2peakschrom[j], tmppeakset)
  *                     #tmp_n += 1
  */
-        __pyx_t_12 = PyObject_Length(__pyx_v_lvl2peakschrom); if (unlikely(__pyx_t_12 == ((Py_ssize_t)-1))) __PYX_ERR(0, 553, __pyx_L7_except_error)
+        __pyx_t_12 = PyObject_Length(__pyx_v_lvl2peakschrom); if (unlikely(__pyx_t_12 == ((Py_ssize_t)-1))) __PYX_ERR(0, 554, __pyx_L7_except_error)
         __pyx_t_13 = __pyx_t_12;
         for (__pyx_t_7 = (__pyx_v_i + 1); __pyx_t_7 < __pyx_t_13; __pyx_t_7+=1) {
           __pyx_v_j = __pyx_t_7;
 
-          /* "MACS2/IO/BedGraph.pyx":554
+          /* "MACS2/IO/BedGraph.pyx":555
  *                 tmppeakset = []
  *                 for j in range( i+1, len(lvl2peakschrom) ):
  *                     self.__add_broadpeak ( broadpeaks, chrom, lvl2peakschrom[j], tmppeakset)             # <<<<<<<<<<<<<<
  *                     #tmp_n += 1
  * 
  */
-          __pyx_t_19 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_v_self), __pyx_n_s_add_broadpeak); if (unlikely(!__pyx_t_19)) __PYX_ERR(0, 554, __pyx_L7_except_error)
+          __pyx_t_19 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_v_self), __pyx_n_s_add_broadpeak); if (unlikely(!__pyx_t_19)) __PYX_ERR(0, 555, __pyx_L7_except_error)
           __Pyx_GOTREF(__pyx_t_19);
-          __pyx_t_21 = __Pyx_GetItemInt(__pyx_v_lvl2peakschrom, __pyx_v_j, int, 1, __Pyx_PyInt_From_int, 0, 1, 1); if (unlikely(!__pyx_t_21)) __PYX_ERR(0, 554, __pyx_L7_except_error)
+          __pyx_t_21 = __Pyx_GetItemInt(__pyx_v_lvl2peakschrom, __pyx_v_j, int, 1, __Pyx_PyInt_From_int, 0, 1, 1); if (unlikely(!__pyx_t_21)) __PYX_ERR(0, 555, __pyx_L7_except_error)
           __Pyx_GOTREF(__pyx_t_21);
           __pyx_t_20 = NULL;
           __pyx_t_17 = 0;
@@ -9629,7 +9890,7 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_28call_broadpeak
           #if CYTHON_FAST_PYCALL
           if (PyFunction_Check(__pyx_t_19)) {
             PyObject *__pyx_temp[5] = {__pyx_t_20, __pyx_v_broadpeaks, __pyx_v_chrom, __pyx_t_21, __pyx_v_tmppeakset};
-            __pyx_t_8 = __Pyx_PyFunction_FastCall(__pyx_t_19, __pyx_temp+1-__pyx_t_17, 4+__pyx_t_17); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 554, __pyx_L7_except_error)
+            __pyx_t_8 = __Pyx_PyFunction_FastCall(__pyx_t_19, __pyx_temp+1-__pyx_t_17, 4+__pyx_t_17); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 555, __pyx_L7_except_error)
             __Pyx_XDECREF(__pyx_t_20); __pyx_t_20 = 0;
             __Pyx_GOTREF(__pyx_t_8);
             __Pyx_DECREF(__pyx_t_21); __pyx_t_21 = 0;
@@ -9638,14 +9899,14 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_28call_broadpeak
           #if CYTHON_FAST_PYCCALL
           if (__Pyx_PyFastCFunction_Check(__pyx_t_19)) {
             PyObject *__pyx_temp[5] = {__pyx_t_20, __pyx_v_broadpeaks, __pyx_v_chrom, __pyx_t_21, __pyx_v_tmppeakset};
-            __pyx_t_8 = __Pyx_PyCFunction_FastCall(__pyx_t_19, __pyx_temp+1-__pyx_t_17, 4+__pyx_t_17); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 554, __pyx_L7_except_error)
+            __pyx_t_8 = __Pyx_PyCFunction_FastCall(__pyx_t_19, __pyx_temp+1-__pyx_t_17, 4+__pyx_t_17); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 555, __pyx_L7_except_error)
             __Pyx_XDECREF(__pyx_t_20); __pyx_t_20 = 0;
             __Pyx_GOTREF(__pyx_t_8);
             __Pyx_DECREF(__pyx_t_21); __pyx_t_21 = 0;
           } else
           #endif
           {
-            __pyx_t_22 = PyTuple_New(4+__pyx_t_17); if (unlikely(!__pyx_t_22)) __PYX_ERR(0, 554, __pyx_L7_except_error)
+            __pyx_t_22 = PyTuple_New(4+__pyx_t_17); if (unlikely(!__pyx_t_22)) __PYX_ERR(0, 555, __pyx_L7_except_error)
             __Pyx_GOTREF(__pyx_t_22);
             if (__pyx_t_20) {
               __Pyx_GIVEREF(__pyx_t_20); PyTuple_SET_ITEM(__pyx_t_22, 0, __pyx_t_20); __pyx_t_20 = NULL;
@@ -9662,7 +9923,7 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_28call_broadpeak
             __Pyx_GIVEREF(__pyx_v_tmppeakset);
             PyTuple_SET_ITEM(__pyx_t_22, 3+__pyx_t_17, __pyx_v_tmppeakset);
             __pyx_t_21 = 0;
-            __pyx_t_8 = __Pyx_PyObject_Call(__pyx_t_19, __pyx_t_22, NULL); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 554, __pyx_L7_except_error)
+            __pyx_t_8 = __Pyx_PyObject_Call(__pyx_t_19, __pyx_t_22, NULL); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 555, __pyx_L7_except_error)
             __Pyx_GOTREF(__pyx_t_8);
             __Pyx_DECREF(__pyx_t_22); __pyx_t_22 = 0;
           }
@@ -9677,7 +9938,7 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_28call_broadpeak
       goto __pyx_L7_except_error;
       __pyx_L7_except_error:;
 
-      /* "MACS2/IO/BedGraph.pyx":535
+      /* "MACS2/IO/BedGraph.pyx":536
  *             tmppeakset = []             # to temporarily store lvl1 region inside a lvl2 region
  *             # our assumption is lvl1 regions should be included in lvl2 regions
  *             try:             # <<<<<<<<<<<<<<
@@ -9699,7 +9960,7 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_28call_broadpeak
   }
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-  /* "MACS2/IO/BedGraph.pyx":559
+  /* "MACS2/IO/BedGraph.pyx":560
  *             #print len(lvl1peakschrom), len(lvl2peakschrom), tmp_n
  * 
  *         return broadpeaks             # <<<<<<<<<<<<<<
@@ -9711,7 +9972,7 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_28call_broadpeak
   __pyx_r = __pyx_v_broadpeaks;
   goto __pyx_L0;
 
-  /* "MACS2/IO/BedGraph.pyx":499
+  /* "MACS2/IO/BedGraph.pyx":500
  *             return True
  * 
  *     def call_broadpeaks (self, double lvl1_cutoff=500, double lvl2_cutoff=100, int min_length=200,             # <<<<<<<<<<<<<<
@@ -9745,11 +10006,12 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_28call_broadpeak
   __Pyx_XDECREF(__pyx_v_lvl1);
   __Pyx_XDECREF(__pyx_v_lvl2);
   __Pyx_XGIVEREF(__pyx_r);
+  __Pyx_TraceReturn(__pyx_r, 0);
   __Pyx_RefNannyFinishContext();
   return __pyx_r;
 }
 
-/* "MACS2/IO/BedGraph.pyx":561
+/* "MACS2/IO/BedGraph.pyx":562
  *         return broadpeaks
  * 
  *     def __add_broadpeak (self, bpeaks, chrom, lvl2peak, lvl1peakset):             # <<<<<<<<<<<<<<
@@ -9795,23 +10057,23 @@ static PyObject *__pyx_pw_5MACS2_2IO_8BedGraph_14bedGraphTrackI_31__add_broadpea
         case  1:
         if (likely((values[1] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_chrom)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("__add_broadpeak", 1, 4, 4, 1); __PYX_ERR(0, 561, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("__add_broadpeak", 1, 4, 4, 1); __PYX_ERR(0, 562, __pyx_L3_error)
         }
         CYTHON_FALLTHROUGH;
         case  2:
         if (likely((values[2] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_lvl2peak)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("__add_broadpeak", 1, 4, 4, 2); __PYX_ERR(0, 561, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("__add_broadpeak", 1, 4, 4, 2); __PYX_ERR(0, 562, __pyx_L3_error)
         }
         CYTHON_FALLTHROUGH;
         case  3:
         if (likely((values[3] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_lvl1peakset)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("__add_broadpeak", 1, 4, 4, 3); __PYX_ERR(0, 561, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("__add_broadpeak", 1, 4, 4, 3); __PYX_ERR(0, 562, __pyx_L3_error)
         }
       }
       if (unlikely(kw_args > 0)) {
-        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "__add_broadpeak") < 0)) __PYX_ERR(0, 561, __pyx_L3_error)
+        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "__add_broadpeak") < 0)) __PYX_ERR(0, 562, __pyx_L3_error)
       }
     } else if (PyTuple_GET_SIZE(__pyx_args) != 4) {
       goto __pyx_L5_argtuple_error;
@@ -9828,7 +10090,7 @@ static PyObject *__pyx_pw_5MACS2_2IO_8BedGraph_14bedGraphTrackI_31__add_broadpea
   }
   goto __pyx_L4_argument_unpacking_done;
   __pyx_L5_argtuple_error:;
-  __Pyx_RaiseArgtupleInvalid("__add_broadpeak", 1, 4, 4, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 561, __pyx_L3_error)
+  __Pyx_RaiseArgtupleInvalid("__add_broadpeak", 1, 4, 4, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 562, __pyx_L3_error)
   __pyx_L3_error:;
   __Pyx_AddTraceback("MACS2.IO.BedGraph.bedGraphTrackI.__add_broadpeak", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __Pyx_RefNannyFinishContext();
@@ -9852,6 +10114,7 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_30__add_broadpea
   PyObject *__pyx_7genexpr__pyx_v_x = NULL;
   PyObject *__pyx_8genexpr1__pyx_v_x = NULL;
   PyObject *__pyx_r = NULL;
+  __Pyx_TraceDeclarations
   __Pyx_RefNannyDeclarations
   PyObject *__pyx_t_1 = NULL;
   long __pyx_t_2;
@@ -9864,58 +10127,59 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_30__add_broadpea
   Py_ssize_t __pyx_t_9;
   PyObject *(*__pyx_t_10)(PyObject *);
   __Pyx_RefNannySetupContext("__add_broadpeak", 0);
+  __Pyx_TraceCall("__add_broadpeak", __pyx_f[0], 562, 0, __PYX_ERR(0, 562, __pyx_L1_error));
 
-  /* "MACS2/IO/BedGraph.pyx":569
+  /* "MACS2/IO/BedGraph.pyx":570
  *             bytes blockSizes, blockStarts, thickStart, thickEnd
  * 
  *         start      = lvl2peak["start"]             # <<<<<<<<<<<<<<
  *         end        = lvl2peak["end"]
  * 
  */
-  __pyx_t_1 = __Pyx_PyObject_Dict_GetItem(__pyx_v_lvl2peak, __pyx_n_u_start); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 569, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyObject_Dict_GetItem(__pyx_v_lvl2peak, __pyx_n_u_start); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 570, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_2 = __Pyx_PyInt_As_long(__pyx_t_1); if (unlikely((__pyx_t_2 == (long)-1) && PyErr_Occurred())) __PYX_ERR(0, 569, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyInt_As_long(__pyx_t_1); if (unlikely((__pyx_t_2 == (long)-1) && PyErr_Occurred())) __PYX_ERR(0, 570, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   __pyx_v_start = __pyx_t_2;
 
-  /* "MACS2/IO/BedGraph.pyx":570
+  /* "MACS2/IO/BedGraph.pyx":571
  * 
  *         start      = lvl2peak["start"]
  *         end        = lvl2peak["end"]             # <<<<<<<<<<<<<<
  * 
  *         # the following code will add those broad/lvl2 peaks with no strong/lvl1 peaks inside
  */
-  __pyx_t_1 = __Pyx_PyObject_Dict_GetItem(__pyx_v_lvl2peak, __pyx_n_u_end); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 570, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyObject_Dict_GetItem(__pyx_v_lvl2peak, __pyx_n_u_end); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 571, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_2 = __Pyx_PyInt_As_long(__pyx_t_1); if (unlikely((__pyx_t_2 == (long)-1) && PyErr_Occurred())) __PYX_ERR(0, 570, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyInt_As_long(__pyx_t_1); if (unlikely((__pyx_t_2 == (long)-1) && PyErr_Occurred())) __PYX_ERR(0, 571, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   __pyx_v_end = __pyx_t_2;
 
-  /* "MACS2/IO/BedGraph.pyx":573
+  /* "MACS2/IO/BedGraph.pyx":574
  * 
  *         # the following code will add those broad/lvl2 peaks with no strong/lvl1 peaks inside
  *         if not lvl1peakset:             # <<<<<<<<<<<<<<
  *             # try:
  *             # will complement by adding 1bps start and end to this region
  */
-  __pyx_t_3 = __Pyx_PyObject_IsTrue(__pyx_v_lvl1peakset); if (unlikely(__pyx_t_3 < 0)) __PYX_ERR(0, 573, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_PyObject_IsTrue(__pyx_v_lvl1peakset); if (unlikely(__pyx_t_3 < 0)) __PYX_ERR(0, 574, __pyx_L1_error)
   __pyx_t_4 = ((!__pyx_t_3) != 0);
   if (__pyx_t_4) {
 
-    /* "MACS2/IO/BedGraph.pyx":577
+    /* "MACS2/IO/BedGraph.pyx":578
  *             # will complement by adding 1bps start and end to this region
  *             # may change in the future if gappedPeak format was improved.
  *             bpeaks.add(chrom, start, end, score=lvl2peak["score"], thickStart=(b"%d" % start), thickEnd=(b"%d" % end),             # <<<<<<<<<<<<<<
  *                        blockNum = 2, blockSizes = b"1,1", blockStarts = (b"0,%d" % (end-start-1)), pileup = lvl2peak["pileup"],
  *                        pscore = lvl2peak["pscore"], fold_change = lvl2peak["fc"],
  */
-    __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_v_bpeaks, __pyx_n_s_add); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 577, __pyx_L1_error)
+    __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_v_bpeaks, __pyx_n_s_add); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 578, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
-    __pyx_t_5 = __Pyx_PyInt_From_long(__pyx_v_start); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 577, __pyx_L1_error)
+    __pyx_t_5 = __Pyx_PyInt_From_long(__pyx_v_start); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 578, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_5);
-    __pyx_t_6 = __Pyx_PyInt_From_long(__pyx_v_end); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 577, __pyx_L1_error)
+    __pyx_t_6 = __Pyx_PyInt_From_long(__pyx_v_end); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 578, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_6);
-    __pyx_t_7 = PyTuple_New(3); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 577, __pyx_L1_error)
+    __pyx_t_7 = PyTuple_New(3); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 578, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_7);
     __Pyx_INCREF(__pyx_v_chrom);
     __Pyx_GIVEREF(__pyx_v_chrom);
@@ -9926,91 +10190,91 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_30__add_broadpea
     PyTuple_SET_ITEM(__pyx_t_7, 2, __pyx_t_6);
     __pyx_t_5 = 0;
     __pyx_t_6 = 0;
-    __pyx_t_6 = __Pyx_PyDict_NewPresized(10); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 577, __pyx_L1_error)
+    __pyx_t_6 = __Pyx_PyDict_NewPresized(10); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 578, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_6);
-    __pyx_t_5 = __Pyx_PyObject_Dict_GetItem(__pyx_v_lvl2peak, __pyx_n_u_score); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 577, __pyx_L1_error)
+    __pyx_t_5 = __Pyx_PyObject_Dict_GetItem(__pyx_v_lvl2peak, __pyx_n_u_score); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 578, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_5);
-    if (PyDict_SetItem(__pyx_t_6, __pyx_n_s_score, __pyx_t_5) < 0) __PYX_ERR(0, 577, __pyx_L1_error)
+    if (PyDict_SetItem(__pyx_t_6, __pyx_n_s_score, __pyx_t_5) < 0) __PYX_ERR(0, 578, __pyx_L1_error)
     __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
-    __pyx_t_5 = __Pyx_PyInt_From_long(__pyx_v_start); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 577, __pyx_L1_error)
+    __pyx_t_5 = __Pyx_PyInt_From_long(__pyx_v_start); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 578, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_5);
-    __pyx_t_8 = PyNumber_Remainder(__pyx_kp_b_d_2, __pyx_t_5); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 577, __pyx_L1_error)
+    __pyx_t_8 = PyNumber_Remainder(__pyx_kp_b_d_2, __pyx_t_5); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 578, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_8);
     __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
-    if (PyDict_SetItem(__pyx_t_6, __pyx_n_s_thickStart, __pyx_t_8) < 0) __PYX_ERR(0, 577, __pyx_L1_error)
+    if (PyDict_SetItem(__pyx_t_6, __pyx_n_s_thickStart, __pyx_t_8) < 0) __PYX_ERR(0, 578, __pyx_L1_error)
     __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
-    __pyx_t_8 = __Pyx_PyInt_From_long(__pyx_v_end); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 577, __pyx_L1_error)
+    __pyx_t_8 = __Pyx_PyInt_From_long(__pyx_v_end); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 578, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_8);
-    __pyx_t_5 = PyNumber_Remainder(__pyx_kp_b_d_2, __pyx_t_8); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 577, __pyx_L1_error)
+    __pyx_t_5 = PyNumber_Remainder(__pyx_kp_b_d_2, __pyx_t_8); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 578, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_5);
     __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
-    if (PyDict_SetItem(__pyx_t_6, __pyx_n_s_thickEnd, __pyx_t_5) < 0) __PYX_ERR(0, 577, __pyx_L1_error)
+    if (PyDict_SetItem(__pyx_t_6, __pyx_n_s_thickEnd, __pyx_t_5) < 0) __PYX_ERR(0, 578, __pyx_L1_error)
     __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
-    if (PyDict_SetItem(__pyx_t_6, __pyx_n_s_blockNum, __pyx_int_2) < 0) __PYX_ERR(0, 577, __pyx_L1_error)
-    if (PyDict_SetItem(__pyx_t_6, __pyx_n_s_blockSizes, __pyx_kp_b_1_1) < 0) __PYX_ERR(0, 577, __pyx_L1_error)
+    if (PyDict_SetItem(__pyx_t_6, __pyx_n_s_blockNum, __pyx_int_2) < 0) __PYX_ERR(0, 578, __pyx_L1_error)
+    if (PyDict_SetItem(__pyx_t_6, __pyx_n_s_blockSizes, __pyx_kp_b_1_1) < 0) __PYX_ERR(0, 578, __pyx_L1_error)
 
-    /* "MACS2/IO/BedGraph.pyx":578
+    /* "MACS2/IO/BedGraph.pyx":579
  *             # may change in the future if gappedPeak format was improved.
  *             bpeaks.add(chrom, start, end, score=lvl2peak["score"], thickStart=(b"%d" % start), thickEnd=(b"%d" % end),
  *                        blockNum = 2, blockSizes = b"1,1", blockStarts = (b"0,%d" % (end-start-1)), pileup = lvl2peak["pileup"],             # <<<<<<<<<<<<<<
  *                        pscore = lvl2peak["pscore"], fold_change = lvl2peak["fc"],
  *                        qscore = lvl2peak["qscore"] )
  */
-    __pyx_t_5 = __Pyx_PyInt_From_long(((__pyx_v_end - __pyx_v_start) - 1)); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 578, __pyx_L1_error)
+    __pyx_t_5 = __Pyx_PyInt_From_long(((__pyx_v_end - __pyx_v_start) - 1)); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 579, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_5);
-    __pyx_t_8 = PyNumber_Remainder(__pyx_kp_b_0_d, __pyx_t_5); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 578, __pyx_L1_error)
+    __pyx_t_8 = PyNumber_Remainder(__pyx_kp_b_0_d, __pyx_t_5); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 579, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_8);
     __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
-    if (PyDict_SetItem(__pyx_t_6, __pyx_n_s_blockStarts, __pyx_t_8) < 0) __PYX_ERR(0, 577, __pyx_L1_error)
+    if (PyDict_SetItem(__pyx_t_6, __pyx_n_s_blockStarts, __pyx_t_8) < 0) __PYX_ERR(0, 578, __pyx_L1_error)
     __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
-    __pyx_t_8 = __Pyx_PyObject_Dict_GetItem(__pyx_v_lvl2peak, __pyx_n_u_pileup); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 578, __pyx_L1_error)
+    __pyx_t_8 = __Pyx_PyObject_Dict_GetItem(__pyx_v_lvl2peak, __pyx_n_u_pileup); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 579, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_8);
-    if (PyDict_SetItem(__pyx_t_6, __pyx_n_s_pileup, __pyx_t_8) < 0) __PYX_ERR(0, 577, __pyx_L1_error)
+    if (PyDict_SetItem(__pyx_t_6, __pyx_n_s_pileup, __pyx_t_8) < 0) __PYX_ERR(0, 578, __pyx_L1_error)
     __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
 
-    /* "MACS2/IO/BedGraph.pyx":579
+    /* "MACS2/IO/BedGraph.pyx":580
  *             bpeaks.add(chrom, start, end, score=lvl2peak["score"], thickStart=(b"%d" % start), thickEnd=(b"%d" % end),
  *                        blockNum = 2, blockSizes = b"1,1", blockStarts = (b"0,%d" % (end-start-1)), pileup = lvl2peak["pileup"],
  *                        pscore = lvl2peak["pscore"], fold_change = lvl2peak["fc"],             # <<<<<<<<<<<<<<
  *                        qscore = lvl2peak["qscore"] )
  *             return bpeaks
  */
-    __pyx_t_8 = __Pyx_PyObject_Dict_GetItem(__pyx_v_lvl2peak, __pyx_n_u_pscore); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 579, __pyx_L1_error)
+    __pyx_t_8 = __Pyx_PyObject_Dict_GetItem(__pyx_v_lvl2peak, __pyx_n_u_pscore); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 580, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_8);
-    if (PyDict_SetItem(__pyx_t_6, __pyx_n_s_pscore, __pyx_t_8) < 0) __PYX_ERR(0, 577, __pyx_L1_error)
+    if (PyDict_SetItem(__pyx_t_6, __pyx_n_s_pscore, __pyx_t_8) < 0) __PYX_ERR(0, 578, __pyx_L1_error)
     __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
-    __pyx_t_8 = __Pyx_PyObject_Dict_GetItem(__pyx_v_lvl2peak, __pyx_n_u_fc); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 579, __pyx_L1_error)
+    __pyx_t_8 = __Pyx_PyObject_Dict_GetItem(__pyx_v_lvl2peak, __pyx_n_u_fc); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 580, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_8);
-    if (PyDict_SetItem(__pyx_t_6, __pyx_n_s_fold_change, __pyx_t_8) < 0) __PYX_ERR(0, 577, __pyx_L1_error)
+    if (PyDict_SetItem(__pyx_t_6, __pyx_n_s_fold_change, __pyx_t_8) < 0) __PYX_ERR(0, 578, __pyx_L1_error)
     __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
 
-    /* "MACS2/IO/BedGraph.pyx":580
+    /* "MACS2/IO/BedGraph.pyx":581
  *                        blockNum = 2, blockSizes = b"1,1", blockStarts = (b"0,%d" % (end-start-1)), pileup = lvl2peak["pileup"],
  *                        pscore = lvl2peak["pscore"], fold_change = lvl2peak["fc"],
  *                        qscore = lvl2peak["qscore"] )             # <<<<<<<<<<<<<<
  *             return bpeaks
  * 
  */
-    __pyx_t_8 = __Pyx_PyObject_Dict_GetItem(__pyx_v_lvl2peak, __pyx_n_u_qscore); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 580, __pyx_L1_error)
+    __pyx_t_8 = __Pyx_PyObject_Dict_GetItem(__pyx_v_lvl2peak, __pyx_n_u_qscore); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 581, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_8);
-    if (PyDict_SetItem(__pyx_t_6, __pyx_n_s_qscore, __pyx_t_8) < 0) __PYX_ERR(0, 577, __pyx_L1_error)
+    if (PyDict_SetItem(__pyx_t_6, __pyx_n_s_qscore, __pyx_t_8) < 0) __PYX_ERR(0, 578, __pyx_L1_error)
     __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
 
-    /* "MACS2/IO/BedGraph.pyx":577
+    /* "MACS2/IO/BedGraph.pyx":578
  *             # will complement by adding 1bps start and end to this region
  *             # may change in the future if gappedPeak format was improved.
  *             bpeaks.add(chrom, start, end, score=lvl2peak["score"], thickStart=(b"%d" % start), thickEnd=(b"%d" % end),             # <<<<<<<<<<<<<<
  *                        blockNum = 2, blockSizes = b"1,1", blockStarts = (b"0,%d" % (end-start-1)), pileup = lvl2peak["pileup"],
  *                        pscore = lvl2peak["pscore"], fold_change = lvl2peak["fc"],
  */
-    __pyx_t_8 = __Pyx_PyObject_Call(__pyx_t_1, __pyx_t_7, __pyx_t_6); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 577, __pyx_L1_error)
+    __pyx_t_8 = __Pyx_PyObject_Call(__pyx_t_1, __pyx_t_7, __pyx_t_6); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 578, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_8);
     __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
     __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
     __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
     __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
 
-    /* "MACS2/IO/BedGraph.pyx":581
+    /* "MACS2/IO/BedGraph.pyx":582
  *                        pscore = lvl2peak["pscore"], fold_change = lvl2peak["fc"],
  *                        qscore = lvl2peak["qscore"] )
  *             return bpeaks             # <<<<<<<<<<<<<<
@@ -10022,7 +10286,7 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_30__add_broadpea
     __pyx_r = __pyx_v_bpeaks;
     goto __pyx_L0;
 
-    /* "MACS2/IO/BedGraph.pyx":573
+    /* "MACS2/IO/BedGraph.pyx":574
  * 
  *         # the following code will add those broad/lvl2 peaks with no strong/lvl1 peaks inside
  *         if not lvl1peakset:             # <<<<<<<<<<<<<<
@@ -10031,53 +10295,53 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_30__add_broadpea
  */
   }
 
-  /* "MACS2/IO/BedGraph.pyx":583
+  /* "MACS2/IO/BedGraph.pyx":584
  *             return bpeaks
  * 
  *         thickStart = b"%d" % lvl1peakset[0]["start"]             # <<<<<<<<<<<<<<
  *         thickEnd   = b"%d" % lvl1peakset[-1]["end"]
  *         blockNum   = len(lvl1peakset)
  */
-  __pyx_t_8 = __Pyx_GetItemInt(__pyx_v_lvl1peakset, 0, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 583, __pyx_L1_error)
+  __pyx_t_8 = __Pyx_GetItemInt(__pyx_v_lvl1peakset, 0, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 584, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_8);
-  __pyx_t_6 = __Pyx_PyObject_Dict_GetItem(__pyx_t_8, __pyx_n_u_start); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 583, __pyx_L1_error)
+  __pyx_t_6 = __Pyx_PyObject_Dict_GetItem(__pyx_t_8, __pyx_n_u_start); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 584, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_6);
   __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
-  __pyx_t_8 = PyNumber_Remainder(__pyx_kp_b_d_2, __pyx_t_6); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 583, __pyx_L1_error)
+  __pyx_t_8 = PyNumber_Remainder(__pyx_kp_b_d_2, __pyx_t_6); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 584, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_8);
   __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
   __pyx_v_thickStart = ((PyObject*)__pyx_t_8);
   __pyx_t_8 = 0;
 
-  /* "MACS2/IO/BedGraph.pyx":584
+  /* "MACS2/IO/BedGraph.pyx":585
  * 
  *         thickStart = b"%d" % lvl1peakset[0]["start"]
  *         thickEnd   = b"%d" % lvl1peakset[-1]["end"]             # <<<<<<<<<<<<<<
  *         blockNum   = len(lvl1peakset)
  *         blockSizes = b",".join( [b"%d" % x["length"] for x in lvl1peakset] )
  */
-  __pyx_t_8 = __Pyx_GetItemInt(__pyx_v_lvl1peakset, -1L, long, 1, __Pyx_PyInt_From_long, 0, 1, 1); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 584, __pyx_L1_error)
+  __pyx_t_8 = __Pyx_GetItemInt(__pyx_v_lvl1peakset, -1L, long, 1, __Pyx_PyInt_From_long, 0, 1, 1); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 585, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_8);
-  __pyx_t_6 = __Pyx_PyObject_Dict_GetItem(__pyx_t_8, __pyx_n_u_end); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 584, __pyx_L1_error)
+  __pyx_t_6 = __Pyx_PyObject_Dict_GetItem(__pyx_t_8, __pyx_n_u_end); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 585, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_6);
   __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
-  __pyx_t_8 = PyNumber_Remainder(__pyx_kp_b_d_2, __pyx_t_6); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 584, __pyx_L1_error)
+  __pyx_t_8 = PyNumber_Remainder(__pyx_kp_b_d_2, __pyx_t_6); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 585, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_8);
   __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
   __pyx_v_thickEnd = ((PyObject*)__pyx_t_8);
   __pyx_t_8 = 0;
 
-  /* "MACS2/IO/BedGraph.pyx":585
+  /* "MACS2/IO/BedGraph.pyx":586
  *         thickStart = b"%d" % lvl1peakset[0]["start"]
  *         thickEnd   = b"%d" % lvl1peakset[-1]["end"]
  *         blockNum   = len(lvl1peakset)             # <<<<<<<<<<<<<<
  *         blockSizes = b",".join( [b"%d" % x["length"] for x in lvl1peakset] )
  *         blockStarts = b",".join( [b"%d" % (x["start"]-start) for x in lvl1peakset] )
  */
-  __pyx_t_9 = PyObject_Length(__pyx_v_lvl1peakset); if (unlikely(__pyx_t_9 == ((Py_ssize_t)-1))) __PYX_ERR(0, 585, __pyx_L1_error)
+  __pyx_t_9 = PyObject_Length(__pyx_v_lvl1peakset); if (unlikely(__pyx_t_9 == ((Py_ssize_t)-1))) __PYX_ERR(0, 586, __pyx_L1_error)
   __pyx_v_blockNum = __pyx_t_9;
 
-  /* "MACS2/IO/BedGraph.pyx":586
+  /* "MACS2/IO/BedGraph.pyx":587
  *         thickEnd   = b"%d" % lvl1peakset[-1]["end"]
  *         blockNum   = len(lvl1peakset)
  *         blockSizes = b",".join( [b"%d" % x["length"] for x in lvl1peakset] )             # <<<<<<<<<<<<<<
@@ -10085,32 +10349,32 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_30__add_broadpea
  * 
  */
   { /* enter inner scope */
-    __pyx_t_8 = PyList_New(0); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 586, __pyx_L6_error)
+    __pyx_t_8 = PyList_New(0); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 587, __pyx_L6_error)
     __Pyx_GOTREF(__pyx_t_8);
     if (likely(PyList_CheckExact(__pyx_v_lvl1peakset)) || PyTuple_CheckExact(__pyx_v_lvl1peakset)) {
       __pyx_t_6 = __pyx_v_lvl1peakset; __Pyx_INCREF(__pyx_t_6); __pyx_t_9 = 0;
       __pyx_t_10 = NULL;
     } else {
-      __pyx_t_9 = -1; __pyx_t_6 = PyObject_GetIter(__pyx_v_lvl1peakset); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 586, __pyx_L6_error)
+      __pyx_t_9 = -1; __pyx_t_6 = PyObject_GetIter(__pyx_v_lvl1peakset); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 587, __pyx_L6_error)
       __Pyx_GOTREF(__pyx_t_6);
-      __pyx_t_10 = Py_TYPE(__pyx_t_6)->tp_iternext; if (unlikely(!__pyx_t_10)) __PYX_ERR(0, 586, __pyx_L6_error)
+      __pyx_t_10 = Py_TYPE(__pyx_t_6)->tp_iternext; if (unlikely(!__pyx_t_10)) __PYX_ERR(0, 587, __pyx_L6_error)
     }
     for (;;) {
       if (likely(!__pyx_t_10)) {
         if (likely(PyList_CheckExact(__pyx_t_6))) {
           if (__pyx_t_9 >= PyList_GET_SIZE(__pyx_t_6)) break;
           #if CYTHON_ASSUME_SAFE_MACROS && !CYTHON_AVOID_BORROWED_REFS
-          __pyx_t_7 = PyList_GET_ITEM(__pyx_t_6, __pyx_t_9); __Pyx_INCREF(__pyx_t_7); __pyx_t_9++; if (unlikely(0 < 0)) __PYX_ERR(0, 586, __pyx_L6_error)
+          __pyx_t_7 = PyList_GET_ITEM(__pyx_t_6, __pyx_t_9); __Pyx_INCREF(__pyx_t_7); __pyx_t_9++; if (unlikely(0 < 0)) __PYX_ERR(0, 587, __pyx_L6_error)
           #else
-          __pyx_t_7 = PySequence_ITEM(__pyx_t_6, __pyx_t_9); __pyx_t_9++; if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 586, __pyx_L6_error)
+          __pyx_t_7 = PySequence_ITEM(__pyx_t_6, __pyx_t_9); __pyx_t_9++; if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 587, __pyx_L6_error)
           __Pyx_GOTREF(__pyx_t_7);
           #endif
         } else {
           if (__pyx_t_9 >= PyTuple_GET_SIZE(__pyx_t_6)) break;
           #if CYTHON_ASSUME_SAFE_MACROS && !CYTHON_AVOID_BORROWED_REFS
-          __pyx_t_7 = PyTuple_GET_ITEM(__pyx_t_6, __pyx_t_9); __Pyx_INCREF(__pyx_t_7); __pyx_t_9++; if (unlikely(0 < 0)) __PYX_ERR(0, 586, __pyx_L6_error)
+          __pyx_t_7 = PyTuple_GET_ITEM(__pyx_t_6, __pyx_t_9); __Pyx_INCREF(__pyx_t_7); __pyx_t_9++; if (unlikely(0 < 0)) __PYX_ERR(0, 587, __pyx_L6_error)
           #else
-          __pyx_t_7 = PySequence_ITEM(__pyx_t_6, __pyx_t_9); __pyx_t_9++; if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 586, __pyx_L6_error)
+          __pyx_t_7 = PySequence_ITEM(__pyx_t_6, __pyx_t_9); __pyx_t_9++; if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 587, __pyx_L6_error)
           __Pyx_GOTREF(__pyx_t_7);
           #endif
         }
@@ -10120,7 +10384,7 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_30__add_broadpea
           PyObject* exc_type = PyErr_Occurred();
           if (exc_type) {
             if (likely(__Pyx_PyErr_GivenExceptionMatches(exc_type, PyExc_StopIteration))) PyErr_Clear();
-            else __PYX_ERR(0, 586, __pyx_L6_error)
+            else __PYX_ERR(0, 587, __pyx_L6_error)
           }
           break;
         }
@@ -10128,12 +10392,12 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_30__add_broadpea
       }
       __Pyx_XDECREF_SET(__pyx_7genexpr__pyx_v_x, __pyx_t_7);
       __pyx_t_7 = 0;
-      __pyx_t_7 = __Pyx_PyObject_Dict_GetItem(__pyx_7genexpr__pyx_v_x, __pyx_n_u_length); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 586, __pyx_L6_error)
+      __pyx_t_7 = __Pyx_PyObject_Dict_GetItem(__pyx_7genexpr__pyx_v_x, __pyx_n_u_length); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 587, __pyx_L6_error)
       __Pyx_GOTREF(__pyx_t_7);
-      __pyx_t_1 = PyNumber_Remainder(__pyx_kp_b_d_2, __pyx_t_7); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 586, __pyx_L6_error)
+      __pyx_t_1 = PyNumber_Remainder(__pyx_kp_b_d_2, __pyx_t_7); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 587, __pyx_L6_error)
       __Pyx_GOTREF(__pyx_t_1);
       __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
-      if (unlikely(__Pyx_ListComp_Append(__pyx_t_8, (PyObject*)__pyx_t_1))) __PYX_ERR(0, 586, __pyx_L6_error)
+      if (unlikely(__Pyx_ListComp_Append(__pyx_t_8, (PyObject*)__pyx_t_1))) __PYX_ERR(0, 587, __pyx_L6_error)
       __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
     }
     __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
@@ -10144,14 +10408,14 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_30__add_broadpea
     goto __pyx_L1_error;
     __pyx_L9_exit_scope:;
   } /* exit inner scope */
-  __pyx_t_6 = __Pyx_PyBytes_Join(__pyx_kp_b__5, __pyx_t_8); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 586, __pyx_L1_error)
+  __pyx_t_6 = __Pyx_PyBytes_Join(__pyx_kp_b__5, __pyx_t_8); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 587, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_6);
   __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
-  if (!(likely(PyBytes_CheckExact(__pyx_t_6))||((__pyx_t_6) == Py_None)||(PyErr_Format(PyExc_TypeError, "Expected %.16s, got %.200s", "bytes", Py_TYPE(__pyx_t_6)->tp_name), 0))) __PYX_ERR(0, 586, __pyx_L1_error)
+  if (!(likely(PyBytes_CheckExact(__pyx_t_6))||((__pyx_t_6) == Py_None)||(PyErr_Format(PyExc_TypeError, "Expected %.16s, got %.200s", "bytes", Py_TYPE(__pyx_t_6)->tp_name), 0))) __PYX_ERR(0, 587, __pyx_L1_error)
   __pyx_v_blockSizes = ((PyObject*)__pyx_t_6);
   __pyx_t_6 = 0;
 
-  /* "MACS2/IO/BedGraph.pyx":587
+  /* "MACS2/IO/BedGraph.pyx":588
  *         blockNum   = len(lvl1peakset)
  *         blockSizes = b",".join( [b"%d" % x["length"] for x in lvl1peakset] )
  *         blockStarts = b",".join( [b"%d" % (x["start"]-start) for x in lvl1peakset] )             # <<<<<<<<<<<<<<
@@ -10159,32 +10423,32 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_30__add_broadpea
  *         if int(thickStart) != start:
  */
   { /* enter inner scope */
-    __pyx_t_6 = PyList_New(0); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 587, __pyx_L12_error)
+    __pyx_t_6 = PyList_New(0); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 588, __pyx_L12_error)
     __Pyx_GOTREF(__pyx_t_6);
     if (likely(PyList_CheckExact(__pyx_v_lvl1peakset)) || PyTuple_CheckExact(__pyx_v_lvl1peakset)) {
       __pyx_t_8 = __pyx_v_lvl1peakset; __Pyx_INCREF(__pyx_t_8); __pyx_t_9 = 0;
       __pyx_t_10 = NULL;
     } else {
-      __pyx_t_9 = -1; __pyx_t_8 = PyObject_GetIter(__pyx_v_lvl1peakset); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 587, __pyx_L12_error)
+      __pyx_t_9 = -1; __pyx_t_8 = PyObject_GetIter(__pyx_v_lvl1peakset); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 588, __pyx_L12_error)
       __Pyx_GOTREF(__pyx_t_8);
-      __pyx_t_10 = Py_TYPE(__pyx_t_8)->tp_iternext; if (unlikely(!__pyx_t_10)) __PYX_ERR(0, 587, __pyx_L12_error)
+      __pyx_t_10 = Py_TYPE(__pyx_t_8)->tp_iternext; if (unlikely(!__pyx_t_10)) __PYX_ERR(0, 588, __pyx_L12_error)
     }
     for (;;) {
       if (likely(!__pyx_t_10)) {
         if (likely(PyList_CheckExact(__pyx_t_8))) {
           if (__pyx_t_9 >= PyList_GET_SIZE(__pyx_t_8)) break;
           #if CYTHON_ASSUME_SAFE_MACROS && !CYTHON_AVOID_BORROWED_REFS
-          __pyx_t_1 = PyList_GET_ITEM(__pyx_t_8, __pyx_t_9); __Pyx_INCREF(__pyx_t_1); __pyx_t_9++; if (unlikely(0 < 0)) __PYX_ERR(0, 587, __pyx_L12_error)
+          __pyx_t_1 = PyList_GET_ITEM(__pyx_t_8, __pyx_t_9); __Pyx_INCREF(__pyx_t_1); __pyx_t_9++; if (unlikely(0 < 0)) __PYX_ERR(0, 588, __pyx_L12_error)
           #else
-          __pyx_t_1 = PySequence_ITEM(__pyx_t_8, __pyx_t_9); __pyx_t_9++; if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 587, __pyx_L12_error)
+          __pyx_t_1 = PySequence_ITEM(__pyx_t_8, __pyx_t_9); __pyx_t_9++; if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 588, __pyx_L12_error)
           __Pyx_GOTREF(__pyx_t_1);
           #endif
         } else {
           if (__pyx_t_9 >= PyTuple_GET_SIZE(__pyx_t_8)) break;
           #if CYTHON_ASSUME_SAFE_MACROS && !CYTHON_AVOID_BORROWED_REFS
-          __pyx_t_1 = PyTuple_GET_ITEM(__pyx_t_8, __pyx_t_9); __Pyx_INCREF(__pyx_t_1); __pyx_t_9++; if (unlikely(0 < 0)) __PYX_ERR(0, 587, __pyx_L12_error)
+          __pyx_t_1 = PyTuple_GET_ITEM(__pyx_t_8, __pyx_t_9); __Pyx_INCREF(__pyx_t_1); __pyx_t_9++; if (unlikely(0 < 0)) __PYX_ERR(0, 588, __pyx_L12_error)
           #else
-          __pyx_t_1 = PySequence_ITEM(__pyx_t_8, __pyx_t_9); __pyx_t_9++; if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 587, __pyx_L12_error)
+          __pyx_t_1 = PySequence_ITEM(__pyx_t_8, __pyx_t_9); __pyx_t_9++; if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 588, __pyx_L12_error)
           __Pyx_GOTREF(__pyx_t_1);
           #endif
         }
@@ -10194,7 +10458,7 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_30__add_broadpea
           PyObject* exc_type = PyErr_Occurred();
           if (exc_type) {
             if (likely(__Pyx_PyErr_GivenExceptionMatches(exc_type, PyExc_StopIteration))) PyErr_Clear();
-            else __PYX_ERR(0, 587, __pyx_L12_error)
+            else __PYX_ERR(0, 588, __pyx_L12_error)
           }
           break;
         }
@@ -10202,18 +10466,18 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_30__add_broadpea
       }
       __Pyx_XDECREF_SET(__pyx_8genexpr1__pyx_v_x, __pyx_t_1);
       __pyx_t_1 = 0;
-      __pyx_t_1 = __Pyx_PyObject_Dict_GetItem(__pyx_8genexpr1__pyx_v_x, __pyx_n_u_start); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 587, __pyx_L12_error)
+      __pyx_t_1 = __Pyx_PyObject_Dict_GetItem(__pyx_8genexpr1__pyx_v_x, __pyx_n_u_start); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 588, __pyx_L12_error)
       __Pyx_GOTREF(__pyx_t_1);
-      __pyx_t_7 = __Pyx_PyInt_From_long(__pyx_v_start); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 587, __pyx_L12_error)
+      __pyx_t_7 = __Pyx_PyInt_From_long(__pyx_v_start); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 588, __pyx_L12_error)
       __Pyx_GOTREF(__pyx_t_7);
-      __pyx_t_5 = PyNumber_Subtract(__pyx_t_1, __pyx_t_7); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 587, __pyx_L12_error)
+      __pyx_t_5 = PyNumber_Subtract(__pyx_t_1, __pyx_t_7); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 588, __pyx_L12_error)
       __Pyx_GOTREF(__pyx_t_5);
       __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
       __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
-      __pyx_t_7 = PyNumber_Remainder(__pyx_kp_b_d_2, __pyx_t_5); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 587, __pyx_L12_error)
+      __pyx_t_7 = PyNumber_Remainder(__pyx_kp_b_d_2, __pyx_t_5); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 588, __pyx_L12_error)
       __Pyx_GOTREF(__pyx_t_7);
       __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
-      if (unlikely(__Pyx_ListComp_Append(__pyx_t_6, (PyObject*)__pyx_t_7))) __PYX_ERR(0, 587, __pyx_L12_error)
+      if (unlikely(__Pyx_ListComp_Append(__pyx_t_6, (PyObject*)__pyx_t_7))) __PYX_ERR(0, 588, __pyx_L12_error)
       __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
     }
     __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
@@ -10224,47 +10488,47 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_30__add_broadpea
     goto __pyx_L1_error;
     __pyx_L15_exit_scope:;
   } /* exit inner scope */
-  __pyx_t_8 = __Pyx_PyBytes_Join(__pyx_kp_b__5, __pyx_t_6); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 587, __pyx_L1_error)
+  __pyx_t_8 = __Pyx_PyBytes_Join(__pyx_kp_b__5, __pyx_t_6); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 588, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_8);
   __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
-  if (!(likely(PyBytes_CheckExact(__pyx_t_8))||((__pyx_t_8) == Py_None)||(PyErr_Format(PyExc_TypeError, "Expected %.16s, got %.200s", "bytes", Py_TYPE(__pyx_t_8)->tp_name), 0))) __PYX_ERR(0, 587, __pyx_L1_error)
+  if (!(likely(PyBytes_CheckExact(__pyx_t_8))||((__pyx_t_8) == Py_None)||(PyErr_Format(PyExc_TypeError, "Expected %.16s, got %.200s", "bytes", Py_TYPE(__pyx_t_8)->tp_name), 0))) __PYX_ERR(0, 588, __pyx_L1_error)
   __pyx_v_blockStarts = ((PyObject*)__pyx_t_8);
   __pyx_t_8 = 0;
 
-  /* "MACS2/IO/BedGraph.pyx":589
+  /* "MACS2/IO/BedGraph.pyx":590
  *         blockStarts = b",".join( [b"%d" % (x["start"]-start) for x in lvl1peakset] )
  * 
  *         if int(thickStart) != start:             # <<<<<<<<<<<<<<
  *             # add 1bp left block
  *             thickStart = b"%d" % start
  */
-  __pyx_t_8 = __Pyx_PyNumber_Int(__pyx_v_thickStart); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 589, __pyx_L1_error)
+  __pyx_t_8 = __Pyx_PyNumber_Int(__pyx_v_thickStart); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 590, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_8);
-  __pyx_t_6 = __Pyx_PyInt_From_long(__pyx_v_start); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 589, __pyx_L1_error)
+  __pyx_t_6 = __Pyx_PyInt_From_long(__pyx_v_start); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 590, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_6);
-  __pyx_t_7 = PyObject_RichCompare(__pyx_t_8, __pyx_t_6, Py_NE); __Pyx_XGOTREF(__pyx_t_7); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 589, __pyx_L1_error)
+  __pyx_t_7 = PyObject_RichCompare(__pyx_t_8, __pyx_t_6, Py_NE); __Pyx_XGOTREF(__pyx_t_7); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 590, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
   __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
-  __pyx_t_4 = __Pyx_PyObject_IsTrue(__pyx_t_7); if (unlikely(__pyx_t_4 < 0)) __PYX_ERR(0, 589, __pyx_L1_error)
+  __pyx_t_4 = __Pyx_PyObject_IsTrue(__pyx_t_7); if (unlikely(__pyx_t_4 < 0)) __PYX_ERR(0, 590, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
   if (__pyx_t_4) {
 
-    /* "MACS2/IO/BedGraph.pyx":591
+    /* "MACS2/IO/BedGraph.pyx":592
  *         if int(thickStart) != start:
  *             # add 1bp left block
  *             thickStart = b"%d" % start             # <<<<<<<<<<<<<<
  *             blockNum += 1
  *             blockSizes = b"1,"+blockSizes
  */
-    __pyx_t_7 = __Pyx_PyInt_From_long(__pyx_v_start); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 591, __pyx_L1_error)
+    __pyx_t_7 = __Pyx_PyInt_From_long(__pyx_v_start); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 592, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_7);
-    __pyx_t_6 = PyNumber_Remainder(__pyx_kp_b_d_2, __pyx_t_7); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 591, __pyx_L1_error)
+    __pyx_t_6 = PyNumber_Remainder(__pyx_kp_b_d_2, __pyx_t_7); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 592, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_6);
     __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
     __Pyx_DECREF_SET(__pyx_v_thickStart, ((PyObject*)__pyx_t_6));
     __pyx_t_6 = 0;
 
-    /* "MACS2/IO/BedGraph.pyx":592
+    /* "MACS2/IO/BedGraph.pyx":593
  *             # add 1bp left block
  *             thickStart = b"%d" % start
  *             blockNum += 1             # <<<<<<<<<<<<<<
@@ -10273,31 +10537,31 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_30__add_broadpea
  */
     __pyx_v_blockNum = (__pyx_v_blockNum + 1);
 
-    /* "MACS2/IO/BedGraph.pyx":593
+    /* "MACS2/IO/BedGraph.pyx":594
  *             thickStart = b"%d" % start
  *             blockNum += 1
  *             blockSizes = b"1,"+blockSizes             # <<<<<<<<<<<<<<
  *             blockStarts = b"0,"+blockStarts
  *         if int(thickEnd) != end:
  */
-    __pyx_t_6 = PyNumber_Add(__pyx_kp_b_1, __pyx_v_blockSizes); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 593, __pyx_L1_error)
+    __pyx_t_6 = PyNumber_Add(__pyx_kp_b_1, __pyx_v_blockSizes); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 594, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_6);
     __Pyx_DECREF_SET(__pyx_v_blockSizes, ((PyObject*)__pyx_t_6));
     __pyx_t_6 = 0;
 
-    /* "MACS2/IO/BedGraph.pyx":594
+    /* "MACS2/IO/BedGraph.pyx":595
  *             blockNum += 1
  *             blockSizes = b"1,"+blockSizes
  *             blockStarts = b"0,"+blockStarts             # <<<<<<<<<<<<<<
  *         if int(thickEnd) != end:
  *             # add 1bp right block
  */
-    __pyx_t_6 = PyNumber_Add(__pyx_kp_b_0, __pyx_v_blockStarts); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 594, __pyx_L1_error)
+    __pyx_t_6 = PyNumber_Add(__pyx_kp_b_0, __pyx_v_blockStarts); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 595, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_6);
     __Pyx_DECREF_SET(__pyx_v_blockStarts, ((PyObject*)__pyx_t_6));
     __pyx_t_6 = 0;
 
-    /* "MACS2/IO/BedGraph.pyx":589
+    /* "MACS2/IO/BedGraph.pyx":590
  *         blockStarts = b",".join( [b"%d" % (x["start"]-start) for x in lvl1peakset] )
  * 
  *         if int(thickStart) != start:             # <<<<<<<<<<<<<<
@@ -10306,40 +10570,40 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_30__add_broadpea
  */
   }
 
-  /* "MACS2/IO/BedGraph.pyx":595
+  /* "MACS2/IO/BedGraph.pyx":596
  *             blockSizes = b"1,"+blockSizes
  *             blockStarts = b"0,"+blockStarts
  *         if int(thickEnd) != end:             # <<<<<<<<<<<<<<
  *             # add 1bp right block
  *             thickEnd = b"%d" % end
  */
-  __pyx_t_6 = __Pyx_PyNumber_Int(__pyx_v_thickEnd); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 595, __pyx_L1_error)
+  __pyx_t_6 = __Pyx_PyNumber_Int(__pyx_v_thickEnd); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 596, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_6);
-  __pyx_t_7 = __Pyx_PyInt_From_long(__pyx_v_end); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 595, __pyx_L1_error)
+  __pyx_t_7 = __Pyx_PyInt_From_long(__pyx_v_end); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 596, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_7);
-  __pyx_t_8 = PyObject_RichCompare(__pyx_t_6, __pyx_t_7, Py_NE); __Pyx_XGOTREF(__pyx_t_8); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 595, __pyx_L1_error)
+  __pyx_t_8 = PyObject_RichCompare(__pyx_t_6, __pyx_t_7, Py_NE); __Pyx_XGOTREF(__pyx_t_8); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 596, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
   __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
-  __pyx_t_4 = __Pyx_PyObject_IsTrue(__pyx_t_8); if (unlikely(__pyx_t_4 < 0)) __PYX_ERR(0, 595, __pyx_L1_error)
+  __pyx_t_4 = __Pyx_PyObject_IsTrue(__pyx_t_8); if (unlikely(__pyx_t_4 < 0)) __PYX_ERR(0, 596, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
   if (__pyx_t_4) {
 
-    /* "MACS2/IO/BedGraph.pyx":597
+    /* "MACS2/IO/BedGraph.pyx":598
  *         if int(thickEnd) != end:
  *             # add 1bp right block
  *             thickEnd = b"%d" % end             # <<<<<<<<<<<<<<
  *             blockNum += 1
  *             blockSizes = blockSizes+b",1"
  */
-    __pyx_t_8 = __Pyx_PyInt_From_long(__pyx_v_end); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 597, __pyx_L1_error)
+    __pyx_t_8 = __Pyx_PyInt_From_long(__pyx_v_end); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 598, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_8);
-    __pyx_t_7 = PyNumber_Remainder(__pyx_kp_b_d_2, __pyx_t_8); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 597, __pyx_L1_error)
+    __pyx_t_7 = PyNumber_Remainder(__pyx_kp_b_d_2, __pyx_t_8); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 598, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_7);
     __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
     __Pyx_DECREF_SET(__pyx_v_thickEnd, ((PyObject*)__pyx_t_7));
     __pyx_t_7 = 0;
 
-    /* "MACS2/IO/BedGraph.pyx":598
+    /* "MACS2/IO/BedGraph.pyx":599
  *             # add 1bp right block
  *             thickEnd = b"%d" % end
  *             blockNum += 1             # <<<<<<<<<<<<<<
@@ -10348,40 +10612,40 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_30__add_broadpea
  */
     __pyx_v_blockNum = (__pyx_v_blockNum + 1);
 
-    /* "MACS2/IO/BedGraph.pyx":599
+    /* "MACS2/IO/BedGraph.pyx":600
  *             thickEnd = b"%d" % end
  *             blockNum += 1
  *             blockSizes = blockSizes+b",1"             # <<<<<<<<<<<<<<
  *             blockStarts = blockStarts + b"," + (b"%d" % (end-start-1))
  * 
  */
-    __pyx_t_7 = PyNumber_Add(__pyx_v_blockSizes, __pyx_kp_b_1_2); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 599, __pyx_L1_error)
+    __pyx_t_7 = PyNumber_Add(__pyx_v_blockSizes, __pyx_kp_b_1_2); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 600, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_7);
     __Pyx_DECREF_SET(__pyx_v_blockSizes, ((PyObject*)__pyx_t_7));
     __pyx_t_7 = 0;
 
-    /* "MACS2/IO/BedGraph.pyx":600
+    /* "MACS2/IO/BedGraph.pyx":601
  *             blockNum += 1
  *             blockSizes = blockSizes+b",1"
  *             blockStarts = blockStarts + b"," + (b"%d" % (end-start-1))             # <<<<<<<<<<<<<<
  * 
  *         bpeaks.add(chrom, start, end, score=lvl2peak["score"], thickStart=thickStart, thickEnd=thickEnd,
  */
-    __pyx_t_7 = PyNumber_Add(__pyx_v_blockStarts, __pyx_kp_b__5); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 600, __pyx_L1_error)
+    __pyx_t_7 = PyNumber_Add(__pyx_v_blockStarts, __pyx_kp_b__5); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 601, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_7);
-    __pyx_t_8 = __Pyx_PyInt_From_long(((__pyx_v_end - __pyx_v_start) - 1)); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 600, __pyx_L1_error)
+    __pyx_t_8 = __Pyx_PyInt_From_long(((__pyx_v_end - __pyx_v_start) - 1)); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 601, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_8);
-    __pyx_t_6 = PyNumber_Remainder(__pyx_kp_b_d_2, __pyx_t_8); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 600, __pyx_L1_error)
+    __pyx_t_6 = PyNumber_Remainder(__pyx_kp_b_d_2, __pyx_t_8); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 601, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_6);
     __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
-    __pyx_t_8 = PyNumber_Add(__pyx_t_7, __pyx_t_6); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 600, __pyx_L1_error)
+    __pyx_t_8 = PyNumber_Add(__pyx_t_7, __pyx_t_6); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 601, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_8);
     __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
     __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
     __Pyx_DECREF_SET(__pyx_v_blockStarts, ((PyObject*)__pyx_t_8));
     __pyx_t_8 = 0;
 
-    /* "MACS2/IO/BedGraph.pyx":595
+    /* "MACS2/IO/BedGraph.pyx":596
  *             blockSizes = b"1,"+blockSizes
  *             blockStarts = b"0,"+blockStarts
  *         if int(thickEnd) != end:             # <<<<<<<<<<<<<<
@@ -10390,20 +10654,20 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_30__add_broadpea
  */
   }
 
-  /* "MACS2/IO/BedGraph.pyx":602
+  /* "MACS2/IO/BedGraph.pyx":603
  *             blockStarts = blockStarts + b"," + (b"%d" % (end-start-1))
  * 
  *         bpeaks.add(chrom, start, end, score=lvl2peak["score"], thickStart=thickStart, thickEnd=thickEnd,             # <<<<<<<<<<<<<<
  *                    blockNum = blockNum, blockSizes = blockSizes, blockStarts = blockStarts)
  *         return bpeaks
  */
-  __pyx_t_8 = __Pyx_PyObject_GetAttrStr(__pyx_v_bpeaks, __pyx_n_s_add); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 602, __pyx_L1_error)
+  __pyx_t_8 = __Pyx_PyObject_GetAttrStr(__pyx_v_bpeaks, __pyx_n_s_add); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 603, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_8);
-  __pyx_t_6 = __Pyx_PyInt_From_long(__pyx_v_start); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 602, __pyx_L1_error)
+  __pyx_t_6 = __Pyx_PyInt_From_long(__pyx_v_start); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 603, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_6);
-  __pyx_t_7 = __Pyx_PyInt_From_long(__pyx_v_end); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 602, __pyx_L1_error)
+  __pyx_t_7 = __Pyx_PyInt_From_long(__pyx_v_end); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 603, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_7);
-  __pyx_t_5 = PyTuple_New(3); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 602, __pyx_L1_error)
+  __pyx_t_5 = PyTuple_New(3); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 603, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_5);
   __Pyx_INCREF(__pyx_v_chrom);
   __Pyx_GIVEREF(__pyx_v_chrom);
@@ -10414,44 +10678,44 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_30__add_broadpea
   PyTuple_SET_ITEM(__pyx_t_5, 2, __pyx_t_7);
   __pyx_t_6 = 0;
   __pyx_t_7 = 0;
-  __pyx_t_7 = __Pyx_PyDict_NewPresized(6); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 602, __pyx_L1_error)
+  __pyx_t_7 = __Pyx_PyDict_NewPresized(6); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 603, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_7);
-  __pyx_t_6 = __Pyx_PyObject_Dict_GetItem(__pyx_v_lvl2peak, __pyx_n_u_score); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 602, __pyx_L1_error)
+  __pyx_t_6 = __Pyx_PyObject_Dict_GetItem(__pyx_v_lvl2peak, __pyx_n_u_score); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 603, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_6);
-  if (PyDict_SetItem(__pyx_t_7, __pyx_n_s_score, __pyx_t_6) < 0) __PYX_ERR(0, 602, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_t_7, __pyx_n_s_score, __pyx_t_6) < 0) __PYX_ERR(0, 603, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
-  if (PyDict_SetItem(__pyx_t_7, __pyx_n_s_thickStart, __pyx_v_thickStart) < 0) __PYX_ERR(0, 602, __pyx_L1_error)
-  if (PyDict_SetItem(__pyx_t_7, __pyx_n_s_thickEnd, __pyx_v_thickEnd) < 0) __PYX_ERR(0, 602, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_t_7, __pyx_n_s_thickStart, __pyx_v_thickStart) < 0) __PYX_ERR(0, 603, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_t_7, __pyx_n_s_thickEnd, __pyx_v_thickEnd) < 0) __PYX_ERR(0, 603, __pyx_L1_error)
 
-  /* "MACS2/IO/BedGraph.pyx":603
+  /* "MACS2/IO/BedGraph.pyx":604
  * 
  *         bpeaks.add(chrom, start, end, score=lvl2peak["score"], thickStart=thickStart, thickEnd=thickEnd,
  *                    blockNum = blockNum, blockSizes = blockSizes, blockStarts = blockStarts)             # <<<<<<<<<<<<<<
  *         return bpeaks
  * 
  */
-  __pyx_t_6 = __Pyx_PyInt_From_long(__pyx_v_blockNum); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 603, __pyx_L1_error)
+  __pyx_t_6 = __Pyx_PyInt_From_long(__pyx_v_blockNum); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 604, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_6);
-  if (PyDict_SetItem(__pyx_t_7, __pyx_n_s_blockNum, __pyx_t_6) < 0) __PYX_ERR(0, 602, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_t_7, __pyx_n_s_blockNum, __pyx_t_6) < 0) __PYX_ERR(0, 603, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
-  if (PyDict_SetItem(__pyx_t_7, __pyx_n_s_blockSizes, __pyx_v_blockSizes) < 0) __PYX_ERR(0, 602, __pyx_L1_error)
-  if (PyDict_SetItem(__pyx_t_7, __pyx_n_s_blockStarts, __pyx_v_blockStarts) < 0) __PYX_ERR(0, 602, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_t_7, __pyx_n_s_blockSizes, __pyx_v_blockSizes) < 0) __PYX_ERR(0, 603, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_t_7, __pyx_n_s_blockStarts, __pyx_v_blockStarts) < 0) __PYX_ERR(0, 603, __pyx_L1_error)
 
-  /* "MACS2/IO/BedGraph.pyx":602
+  /* "MACS2/IO/BedGraph.pyx":603
  *             blockStarts = blockStarts + b"," + (b"%d" % (end-start-1))
  * 
  *         bpeaks.add(chrom, start, end, score=lvl2peak["score"], thickStart=thickStart, thickEnd=thickEnd,             # <<<<<<<<<<<<<<
  *                    blockNum = blockNum, blockSizes = blockSizes, blockStarts = blockStarts)
  *         return bpeaks
  */
-  __pyx_t_6 = __Pyx_PyObject_Call(__pyx_t_8, __pyx_t_5, __pyx_t_7); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 602, __pyx_L1_error)
+  __pyx_t_6 = __Pyx_PyObject_Call(__pyx_t_8, __pyx_t_5, __pyx_t_7); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 603, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_6);
   __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
   __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
   __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
   __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
 
-  /* "MACS2/IO/BedGraph.pyx":604
+  /* "MACS2/IO/BedGraph.pyx":605
  *         bpeaks.add(chrom, start, end, score=lvl2peak["score"], thickStart=thickStart, thickEnd=thickEnd,
  *                    blockNum = blockNum, blockSizes = blockSizes, blockStarts = blockStarts)
  *         return bpeaks             # <<<<<<<<<<<<<<
@@ -10463,7 +10727,7 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_30__add_broadpea
   __pyx_r = __pyx_v_bpeaks;
   goto __pyx_L0;
 
-  /* "MACS2/IO/BedGraph.pyx":561
+  /* "MACS2/IO/BedGraph.pyx":562
  *         return broadpeaks
  * 
  *     def __add_broadpeak (self, bpeaks, chrom, lvl2peak, lvl1peakset):             # <<<<<<<<<<<<<<
@@ -10488,11 +10752,12 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_30__add_broadpea
   __Pyx_XDECREF(__pyx_7genexpr__pyx_v_x);
   __Pyx_XDECREF(__pyx_8genexpr1__pyx_v_x);
   __Pyx_XGIVEREF(__pyx_r);
+  __Pyx_TraceReturn(__pyx_r, 0);
   __Pyx_RefNannyFinishContext();
   return __pyx_r;
 }
 
-/* "MACS2/IO/BedGraph.pyx":607
+/* "MACS2/IO/BedGraph.pyx":608
  * 
  * 
  *     def total (self):             # <<<<<<<<<<<<<<
@@ -10519,6 +10784,7 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_32total(struct _
   PyObject *__pyx_v_p = NULL;
   CYTHON_UNUSED PyObject *__pyx_v_s = NULL;
   PyObject *__pyx_r = NULL;
+  __Pyx_TraceDeclarations
   __Pyx_RefNannyDeclarations
   PyObject *__pyx_t_1 = NULL;
   Py_ssize_t __pyx_t_2;
@@ -10532,8 +10798,9 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_32total(struct _
   PyObject *(*__pyx_t_10)(PyObject *);
   Py_ssize_t __pyx_t_11;
   __Pyx_RefNannySetupContext("total", 0);
+  __Pyx_TraceCall("total", __pyx_f[0], 608, 0, __PYX_ERR(0, 608, __pyx_L1_error));
 
-  /* "MACS2/IO/BedGraph.pyx":612
+  /* "MACS2/IO/BedGraph.pyx":613
  *         """
  *         cdef long t
  *         t = 0             # <<<<<<<<<<<<<<
@@ -10542,7 +10809,7 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_32total(struct _
  */
   __pyx_v_t = 0;
 
-  /* "MACS2/IO/BedGraph.pyx":613
+  /* "MACS2/IO/BedGraph.pyx":614
  *         cdef long t
  *         t = 0
  *         for (p,s) in self.__data.values():             # <<<<<<<<<<<<<<
@@ -10552,9 +10819,9 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_32total(struct _
   __pyx_t_2 = 0;
   if (unlikely(__pyx_v_self->__pyx___data == Py_None)) {
     PyErr_Format(PyExc_AttributeError, "'NoneType' object has no attribute '%.30s'", "values");
-    __PYX_ERR(0, 613, __pyx_L1_error)
+    __PYX_ERR(0, 614, __pyx_L1_error)
   }
-  __pyx_t_5 = __Pyx_dict_iterator(__pyx_v_self->__pyx___data, 1, __pyx_n_s_values, (&__pyx_t_3), (&__pyx_t_4)); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 613, __pyx_L1_error)
+  __pyx_t_5 = __Pyx_dict_iterator(__pyx_v_self->__pyx___data, 1, __pyx_n_s_values, (&__pyx_t_3), (&__pyx_t_4)); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 614, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_5);
   __Pyx_XDECREF(__pyx_t_1);
   __pyx_t_1 = __pyx_t_5;
@@ -10562,7 +10829,7 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_32total(struct _
   while (1) {
     __pyx_t_6 = __Pyx_dict_iter_next(__pyx_t_1, __pyx_t_3, &__pyx_t_2, NULL, &__pyx_t_5, NULL, __pyx_t_4);
     if (unlikely(__pyx_t_6 == 0)) break;
-    if (unlikely(__pyx_t_6 == -1)) __PYX_ERR(0, 613, __pyx_L1_error)
+    if (unlikely(__pyx_t_6 == -1)) __PYX_ERR(0, 614, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_5);
     if ((likely(PyTuple_CheckExact(__pyx_t_5))) || (PyList_CheckExact(__pyx_t_5))) {
       PyObject* sequence = __pyx_t_5;
@@ -10570,7 +10837,7 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_32total(struct _
       if (unlikely(size != 2)) {
         if (size > 2) __Pyx_RaiseTooManyValuesError(2);
         else if (size >= 0) __Pyx_RaiseNeedMoreValuesError(size);
-        __PYX_ERR(0, 613, __pyx_L1_error)
+        __PYX_ERR(0, 614, __pyx_L1_error)
       }
       #if CYTHON_ASSUME_SAFE_MACROS && !CYTHON_AVOID_BORROWED_REFS
       if (likely(PyTuple_CheckExact(sequence))) {
@@ -10583,15 +10850,15 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_32total(struct _
       __Pyx_INCREF(__pyx_t_7);
       __Pyx_INCREF(__pyx_t_8);
       #else
-      __pyx_t_7 = PySequence_ITEM(sequence, 0); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 613, __pyx_L1_error)
+      __pyx_t_7 = PySequence_ITEM(sequence, 0); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 614, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_7);
-      __pyx_t_8 = PySequence_ITEM(sequence, 1); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 613, __pyx_L1_error)
+      __pyx_t_8 = PySequence_ITEM(sequence, 1); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 614, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_8);
       #endif
       __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
     } else {
       Py_ssize_t index = -1;
-      __pyx_t_9 = PyObject_GetIter(__pyx_t_5); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 613, __pyx_L1_error)
+      __pyx_t_9 = PyObject_GetIter(__pyx_t_5); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 614, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_9);
       __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
       __pyx_t_10 = Py_TYPE(__pyx_t_9)->tp_iternext;
@@ -10599,7 +10866,7 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_32total(struct _
       __Pyx_GOTREF(__pyx_t_7);
       index = 1; __pyx_t_8 = __pyx_t_10(__pyx_t_9); if (unlikely(!__pyx_t_8)) goto __pyx_L5_unpacking_failed;
       __Pyx_GOTREF(__pyx_t_8);
-      if (__Pyx_IternextUnpackEndCheck(__pyx_t_10(__pyx_t_9), 2) < 0) __PYX_ERR(0, 613, __pyx_L1_error)
+      if (__Pyx_IternextUnpackEndCheck(__pyx_t_10(__pyx_t_9), 2) < 0) __PYX_ERR(0, 614, __pyx_L1_error)
       __pyx_t_10 = NULL;
       __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
       goto __pyx_L6_unpacking_done;
@@ -10607,7 +10874,7 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_32total(struct _
       __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
       __pyx_t_10 = NULL;
       if (__Pyx_IterFinish() == 0) __Pyx_RaiseNeedMoreValuesError(index);
-      __PYX_ERR(0, 613, __pyx_L1_error)
+      __PYX_ERR(0, 614, __pyx_L1_error)
       __pyx_L6_unpacking_done:;
     }
     __Pyx_XDECREF_SET(__pyx_v_p, __pyx_t_7);
@@ -10615,19 +10882,19 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_32total(struct _
     __Pyx_XDECREF_SET(__pyx_v_s, __pyx_t_8);
     __pyx_t_8 = 0;
 
-    /* "MACS2/IO/BedGraph.pyx":614
+    /* "MACS2/IO/BedGraph.pyx":615
  *         t = 0
  *         for (p,s) in self.__data.values():
  *             t += len(p)             # <<<<<<<<<<<<<<
  *         return t
  * 
  */
-    __pyx_t_11 = PyObject_Length(__pyx_v_p); if (unlikely(__pyx_t_11 == ((Py_ssize_t)-1))) __PYX_ERR(0, 614, __pyx_L1_error)
+    __pyx_t_11 = PyObject_Length(__pyx_v_p); if (unlikely(__pyx_t_11 == ((Py_ssize_t)-1))) __PYX_ERR(0, 615, __pyx_L1_error)
     __pyx_v_t = (__pyx_v_t + __pyx_t_11);
   }
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-  /* "MACS2/IO/BedGraph.pyx":615
+  /* "MACS2/IO/BedGraph.pyx":616
  *         for (p,s) in self.__data.values():
  *             t += len(p)
  *         return t             # <<<<<<<<<<<<<<
@@ -10635,13 +10902,13 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_32total(struct _
  *     def set_single_value (self, double new_value):
  */
   __Pyx_XDECREF(__pyx_r);
-  __pyx_t_1 = __Pyx_PyInt_From_long(__pyx_v_t); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 615, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyInt_From_long(__pyx_v_t); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 616, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __pyx_r = __pyx_t_1;
   __pyx_t_1 = 0;
   goto __pyx_L0;
 
-  /* "MACS2/IO/BedGraph.pyx":607
+  /* "MACS2/IO/BedGraph.pyx":608
  * 
  * 
  *     def total (self):             # <<<<<<<<<<<<<<
@@ -10662,11 +10929,12 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_32total(struct _
   __Pyx_XDECREF(__pyx_v_p);
   __Pyx_XDECREF(__pyx_v_s);
   __Pyx_XGIVEREF(__pyx_r);
+  __Pyx_TraceReturn(__pyx_r, 0);
   __Pyx_RefNannyFinishContext();
   return __pyx_r;
 }
 
-/* "MACS2/IO/BedGraph.pyx":617
+/* "MACS2/IO/BedGraph.pyx":618
  *         return t
  * 
  *     def set_single_value (self, double new_value):             # <<<<<<<<<<<<<<
@@ -10683,7 +10951,7 @@ static PyObject *__pyx_pw_5MACS2_2IO_8BedGraph_14bedGraphTrackI_35set_single_val
   __Pyx_RefNannyDeclarations
   __Pyx_RefNannySetupContext("set_single_value (wrapper)", 0);
   assert(__pyx_arg_new_value); {
-    __pyx_v_new_value = __pyx_PyFloat_AsDouble(__pyx_arg_new_value); if (unlikely((__pyx_v_new_value == (double)-1) && PyErr_Occurred())) __PYX_ERR(0, 617, __pyx_L3_error)
+    __pyx_v_new_value = __pyx_PyFloat_AsDouble(__pyx_arg_new_value); if (unlikely((__pyx_v_new_value == (double)-1) && PyErr_Occurred())) __PYX_ERR(0, 618, __pyx_L3_error)
   }
   goto __pyx_L4_argument_unpacking_done;
   __pyx_L3_error:;
@@ -10706,6 +10974,7 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_34set_single_val
   PyObject *__pyx_v_p1 = NULL;
   CYTHON_UNUSED PyObject *__pyx_v_v1 = NULL;
   PyObject *__pyx_r = NULL;
+  __Pyx_TraceDeclarations
   __Pyx_RefNannyDeclarations
   PyObject *__pyx_t_1 = NULL;
   PyObject *__pyx_t_2 = NULL;
@@ -10718,35 +10987,36 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_34set_single_val
   PyObject *__pyx_t_9 = NULL;
   PyObject *(*__pyx_t_10)(PyObject *);
   __Pyx_RefNannySetupContext("set_single_value", 0);
+  __Pyx_TraceCall("set_single_value", __pyx_f[0], 618, 0, __PYX_ERR(0, 618, __pyx_L1_error));
 
-  /* "MACS2/IO/BedGraph.pyx":626
+  /* "MACS2/IO/BedGraph.pyx":627
  *             int max_p
  * 
  *         ret = bedGraphTrackI()             # <<<<<<<<<<<<<<
  *         chroms = set(self.get_chr_names())
  *         for chrom in chroms:
  */
-  __pyx_t_1 = __Pyx_PyObject_CallNoArg(((PyObject *)__pyx_ptype_5MACS2_2IO_8BedGraph_bedGraphTrackI)); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 626, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyObject_CallNoArg(((PyObject *)__pyx_ptype_5MACS2_2IO_8BedGraph_bedGraphTrackI)); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 627, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __pyx_v_ret = ((struct __pyx_obj_5MACS2_2IO_8BedGraph_bedGraphTrackI *)__pyx_t_1);
   __pyx_t_1 = 0;
 
-  /* "MACS2/IO/BedGraph.pyx":627
+  /* "MACS2/IO/BedGraph.pyx":628
  * 
  *         ret = bedGraphTrackI()
  *         chroms = set(self.get_chr_names())             # <<<<<<<<<<<<<<
  *         for chrom in chroms:
  *             (p1,v1) = self.get_data_by_chr(chrom) # arrays for position and values
  */
-  __pyx_t_1 = ((struct __pyx_vtabstruct_5MACS2_2IO_8BedGraph_bedGraphTrackI *)__pyx_v_self->__pyx_vtab)->get_chr_names(__pyx_v_self, 0); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 627, __pyx_L1_error)
+  __pyx_t_1 = ((struct __pyx_vtabstruct_5MACS2_2IO_8BedGraph_bedGraphTrackI *)__pyx_v_self->__pyx_vtab)->get_chr_names(__pyx_v_self, 0); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 628, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_2 = PySet_New(__pyx_t_1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 627, __pyx_L1_error)
+  __pyx_t_2 = PySet_New(__pyx_t_1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 628, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   __pyx_v_chroms = ((PyObject*)__pyx_t_2);
   __pyx_t_2 = 0;
 
-  /* "MACS2/IO/BedGraph.pyx":628
+  /* "MACS2/IO/BedGraph.pyx":629
  *         ret = bedGraphTrackI()
  *         chroms = set(self.get_chr_names())
  *         for chrom in chroms:             # <<<<<<<<<<<<<<
@@ -10754,7 +11024,7 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_34set_single_val
  *             # maximum p
  */
   __pyx_t_3 = 0;
-  __pyx_t_1 = __Pyx_set_iterator(__pyx_v_chroms, 1, (&__pyx_t_4), (&__pyx_t_5)); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 628, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_set_iterator(__pyx_v_chroms, 1, (&__pyx_t_4), (&__pyx_t_5)); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 629, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __Pyx_XDECREF(__pyx_t_2);
   __pyx_t_2 = __pyx_t_1;
@@ -10762,20 +11032,20 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_34set_single_val
   while (1) {
     __pyx_t_6 = __Pyx_set_iter_next(__pyx_t_2, __pyx_t_4, &__pyx_t_3, &__pyx_t_1, __pyx_t_5);
     if (unlikely(__pyx_t_6 == 0)) break;
-    if (unlikely(__pyx_t_6 == -1)) __PYX_ERR(0, 628, __pyx_L1_error)
+    if (unlikely(__pyx_t_6 == -1)) __PYX_ERR(0, 629, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
-    if (!(likely(PyBytes_CheckExact(__pyx_t_1))||((__pyx_t_1) == Py_None)||(PyErr_Format(PyExc_TypeError, "Expected %.16s, got %.200s", "bytes", Py_TYPE(__pyx_t_1)->tp_name), 0))) __PYX_ERR(0, 628, __pyx_L1_error)
+    if (!(likely(PyBytes_CheckExact(__pyx_t_1))||((__pyx_t_1) == Py_None)||(PyErr_Format(PyExc_TypeError, "Expected %.16s, got %.200s", "bytes", Py_TYPE(__pyx_t_1)->tp_name), 0))) __PYX_ERR(0, 629, __pyx_L1_error)
     __Pyx_XDECREF_SET(__pyx_v_chrom, ((PyObject*)__pyx_t_1));
     __pyx_t_1 = 0;
 
-    /* "MACS2/IO/BedGraph.pyx":629
+    /* "MACS2/IO/BedGraph.pyx":630
  *         chroms = set(self.get_chr_names())
  *         for chrom in chroms:
  *             (p1,v1) = self.get_data_by_chr(chrom) # arrays for position and values             # <<<<<<<<<<<<<<
  *             # maximum p
  *             max_p = max(p1)
  */
-    __pyx_t_7 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_v_self), __pyx_n_s_get_data_by_chr); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 629, __pyx_L1_error)
+    __pyx_t_7 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_v_self), __pyx_n_s_get_data_by_chr); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 630, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_7);
     __pyx_t_8 = NULL;
     if (CYTHON_UNPACK_METHODS && likely(PyMethod_Check(__pyx_t_7))) {
@@ -10789,7 +11059,7 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_34set_single_val
     }
     __pyx_t_1 = (__pyx_t_8) ? __Pyx_PyObject_Call2Args(__pyx_t_7, __pyx_t_8, __pyx_v_chrom) : __Pyx_PyObject_CallOneArg(__pyx_t_7, __pyx_v_chrom);
     __Pyx_XDECREF(__pyx_t_8); __pyx_t_8 = 0;
-    if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 629, __pyx_L1_error)
+    if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 630, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
     __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
     if ((likely(PyTuple_CheckExact(__pyx_t_1))) || (PyList_CheckExact(__pyx_t_1))) {
@@ -10798,7 +11068,7 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_34set_single_val
       if (unlikely(size != 2)) {
         if (size > 2) __Pyx_RaiseTooManyValuesError(2);
         else if (size >= 0) __Pyx_RaiseNeedMoreValuesError(size);
-        __PYX_ERR(0, 629, __pyx_L1_error)
+        __PYX_ERR(0, 630, __pyx_L1_error)
       }
       #if CYTHON_ASSUME_SAFE_MACROS && !CYTHON_AVOID_BORROWED_REFS
       if (likely(PyTuple_CheckExact(sequence))) {
@@ -10811,15 +11081,15 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_34set_single_val
       __Pyx_INCREF(__pyx_t_7);
       __Pyx_INCREF(__pyx_t_8);
       #else
-      __pyx_t_7 = PySequence_ITEM(sequence, 0); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 629, __pyx_L1_error)
+      __pyx_t_7 = PySequence_ITEM(sequence, 0); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 630, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_7);
-      __pyx_t_8 = PySequence_ITEM(sequence, 1); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 629, __pyx_L1_error)
+      __pyx_t_8 = PySequence_ITEM(sequence, 1); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 630, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_8);
       #endif
       __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
     } else {
       Py_ssize_t index = -1;
-      __pyx_t_9 = PyObject_GetIter(__pyx_t_1); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 629, __pyx_L1_error)
+      __pyx_t_9 = PyObject_GetIter(__pyx_t_1); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 630, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_9);
       __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
       __pyx_t_10 = Py_TYPE(__pyx_t_9)->tp_iternext;
@@ -10827,7 +11097,7 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_34set_single_val
       __Pyx_GOTREF(__pyx_t_7);
       index = 1; __pyx_t_8 = __pyx_t_10(__pyx_t_9); if (unlikely(!__pyx_t_8)) goto __pyx_L5_unpacking_failed;
       __Pyx_GOTREF(__pyx_t_8);
-      if (__Pyx_IternextUnpackEndCheck(__pyx_t_10(__pyx_t_9), 2) < 0) __PYX_ERR(0, 629, __pyx_L1_error)
+      if (__Pyx_IternextUnpackEndCheck(__pyx_t_10(__pyx_t_9), 2) < 0) __PYX_ERR(0, 630, __pyx_L1_error)
       __pyx_t_10 = NULL;
       __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
       goto __pyx_L6_unpacking_done;
@@ -10835,7 +11105,7 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_34set_single_val
       __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
       __pyx_t_10 = NULL;
       if (__Pyx_IterFinish() == 0) __Pyx_RaiseNeedMoreValuesError(index);
-      __PYX_ERR(0, 629, __pyx_L1_error)
+      __PYX_ERR(0, 630, __pyx_L1_error)
       __pyx_L6_unpacking_done:;
     }
     __Pyx_XDECREF_SET(__pyx_v_p1, __pyx_t_7);
@@ -10843,33 +11113,33 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_34set_single_val
     __Pyx_XDECREF_SET(__pyx_v_v1, __pyx_t_8);
     __pyx_t_8 = 0;
 
-    /* "MACS2/IO/BedGraph.pyx":631
+    /* "MACS2/IO/BedGraph.pyx":632
  *             (p1,v1) = self.get_data_by_chr(chrom) # arrays for position and values
  *             # maximum p
  *             max_p = max(p1)             # <<<<<<<<<<<<<<
  *             # add a region from 0 to max_p
  *             ret.add_loc(chrom,0,max_p,new_value)
  */
-    __pyx_t_1 = __Pyx_PyObject_CallOneArg(__pyx_builtin_max, __pyx_v_p1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 631, __pyx_L1_error)
+    __pyx_t_1 = __Pyx_PyObject_CallOneArg(__pyx_builtin_max, __pyx_v_p1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 632, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
-    __pyx_t_6 = __Pyx_PyInt_As_int(__pyx_t_1); if (unlikely((__pyx_t_6 == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 631, __pyx_L1_error)
+    __pyx_t_6 = __Pyx_PyInt_As_int(__pyx_t_1); if (unlikely((__pyx_t_6 == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 632, __pyx_L1_error)
     __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
     __pyx_v_max_p = __pyx_t_6;
 
-    /* "MACS2/IO/BedGraph.pyx":633
+    /* "MACS2/IO/BedGraph.pyx":634
  *             max_p = max(p1)
  *             # add a region from 0 to max_p
  *             ret.add_loc(chrom,0,max_p,new_value)             # <<<<<<<<<<<<<<
  *         return ret
  * 
  */
-    __pyx_t_1 = ((struct __pyx_vtabstruct_5MACS2_2IO_8BedGraph_bedGraphTrackI *)__pyx_v_ret->__pyx_vtab)->add_loc(__pyx_v_ret, __pyx_v_chrom, 0, __pyx_v_max_p, __pyx_v_new_value, 0); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 633, __pyx_L1_error)
+    __pyx_t_1 = ((struct __pyx_vtabstruct_5MACS2_2IO_8BedGraph_bedGraphTrackI *)__pyx_v_ret->__pyx_vtab)->add_loc(__pyx_v_ret, __pyx_v_chrom, 0, __pyx_v_max_p, __pyx_v_new_value, 0); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 634, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
     __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   }
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
-  /* "MACS2/IO/BedGraph.pyx":634
+  /* "MACS2/IO/BedGraph.pyx":635
  *             # add a region from 0 to max_p
  *             ret.add_loc(chrom,0,max_p,new_value)
  *         return ret             # <<<<<<<<<<<<<<
@@ -10881,7 +11151,7 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_34set_single_val
   __pyx_r = ((PyObject *)__pyx_v_ret);
   goto __pyx_L0;
 
-  /* "MACS2/IO/BedGraph.pyx":617
+  /* "MACS2/IO/BedGraph.pyx":618
  *         return t
  * 
  *     def set_single_value (self, double new_value):             # <<<<<<<<<<<<<<
@@ -10905,11 +11175,12 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_34set_single_val
   __Pyx_XDECREF(__pyx_v_p1);
   __Pyx_XDECREF(__pyx_v_v1);
   __Pyx_XGIVEREF(__pyx_r);
+  __Pyx_TraceReturn(__pyx_r, 0);
   __Pyx_RefNannyFinishContext();
   return __pyx_r;
 }
 
-/* "MACS2/IO/BedGraph.pyx":636
+/* "MACS2/IO/BedGraph.pyx":637
  *         return ret
  * 
  *     def overlie (self, bdgTracks, func="max" ):             # <<<<<<<<<<<<<<
@@ -10954,7 +11225,7 @@ static PyObject *__pyx_pw_5MACS2_2IO_8BedGraph_14bedGraphTrackI_37overlie(PyObje
         }
       }
       if (unlikely(kw_args > 0)) {
-        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "overlie") < 0)) __PYX_ERR(0, 636, __pyx_L3_error)
+        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "overlie") < 0)) __PYX_ERR(0, 637, __pyx_L3_error)
       }
     } else {
       switch (PyTuple_GET_SIZE(__pyx_args)) {
@@ -10970,7 +11241,7 @@ static PyObject *__pyx_pw_5MACS2_2IO_8BedGraph_14bedGraphTrackI_37overlie(PyObje
   }
   goto __pyx_L4_argument_unpacking_done;
   __pyx_L5_argtuple_error:;
-  __Pyx_RaiseArgtupleInvalid("overlie", 0, 1, 2, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 636, __pyx_L3_error)
+  __Pyx_RaiseArgtupleInvalid("overlie", 0, 1, 2, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 637, __pyx_L3_error)
   __pyx_L3_error:;
   __Pyx_AddTraceback("MACS2.IO.BedGraph.bedGraphTrackI.overlie", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __Pyx_RefNannyFinishContext();
@@ -10983,7 +11254,7 @@ static PyObject *__pyx_pw_5MACS2_2IO_8BedGraph_14bedGraphTrackI_37overlie(PyObje
   return __pyx_r;
 }
 
-/* "MACS2/IO/BedGraph.pyx":682
+/* "MACS2/IO/BedGraph.pyx":683
  *         elif func == "mean":
  *             #f = np_mean
  *             def f(*args):             # <<<<<<<<<<<<<<
@@ -11014,6 +11285,7 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_7overlie_f(PyObj
   struct __pyx_obj_5MACS2_2IO_8BedGraph___pyx_scope_struct__overlie *__pyx_cur_scope;
   struct __pyx_obj_5MACS2_2IO_8BedGraph___pyx_scope_struct__overlie *__pyx_outer_scope;
   PyObject *__pyx_r = NULL;
+  __Pyx_TraceDeclarations
   __Pyx_RefNannyDeclarations
   PyObject *__pyx_t_1 = NULL;
   PyObject *__pyx_t_2 = NULL;
@@ -11021,8 +11293,9 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_7overlie_f(PyObj
   __Pyx_RefNannySetupContext("f", 0);
   __pyx_outer_scope = (struct __pyx_obj_5MACS2_2IO_8BedGraph___pyx_scope_struct__overlie *) __Pyx_CyFunction_GetClosure(__pyx_self);
   __pyx_cur_scope = __pyx_outer_scope;
+  __Pyx_TraceCall("f", __pyx_f[0], 683, 0, __PYX_ERR(0, 683, __pyx_L1_error));
 
-  /* "MACS2/IO/BedGraph.pyx":683
+  /* "MACS2/IO/BedGraph.pyx":684
  *             #f = np_mean
  *             def f(*args):
  *                 return sum(args)/nr_tracks             # <<<<<<<<<<<<<<
@@ -11030,11 +11303,11 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_7overlie_f(PyObj
  *             # combine -log10pvalues
  */
   __Pyx_XDECREF(__pyx_r);
-  __pyx_t_1 = __Pyx_PyObject_CallOneArg(__pyx_builtin_sum, __pyx_v_args); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 683, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyObject_CallOneArg(__pyx_builtin_sum, __pyx_v_args); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 684, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_2 = PyInt_FromSsize_t(__pyx_cur_scope->__pyx_v_nr_tracks); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 683, __pyx_L1_error)
+  __pyx_t_2 = PyInt_FromSsize_t(__pyx_cur_scope->__pyx_v_nr_tracks); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 684, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
-  __pyx_t_3 = __Pyx_PyNumber_Divide(__pyx_t_1, __pyx_t_2); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 683, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_PyNumber_Divide(__pyx_t_1, __pyx_t_2); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 684, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
@@ -11042,7 +11315,7 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_7overlie_f(PyObj
   __pyx_t_3 = 0;
   goto __pyx_L0;
 
-  /* "MACS2/IO/BedGraph.pyx":682
+  /* "MACS2/IO/BedGraph.pyx":683
  *         elif func == "mean":
  *             #f = np_mean
  *             def f(*args):             # <<<<<<<<<<<<<<
@@ -11059,11 +11332,12 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_7overlie_f(PyObj
   __pyx_r = NULL;
   __pyx_L0:;
   __Pyx_XGIVEREF(__pyx_r);
+  __Pyx_TraceReturn(__pyx_r, 0);
   __Pyx_RefNannyFinishContext();
   return __pyx_r;
 }
 
-/* "MACS2/IO/BedGraph.pyx":686
+/* "MACS2/IO/BedGraph.pyx":687
  *         elif func == "fisher":
  *             # combine -log10pvalues
  *             def f(*args):             # <<<<<<<<<<<<<<
@@ -11094,6 +11368,7 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_7overlie_2f(PyOb
   struct __pyx_obj_5MACS2_2IO_8BedGraph___pyx_scope_struct__overlie *__pyx_cur_scope;
   struct __pyx_obj_5MACS2_2IO_8BedGraph___pyx_scope_struct__overlie *__pyx_outer_scope;
   PyObject *__pyx_r = NULL;
+  __Pyx_TraceDeclarations
   __Pyx_RefNannyDeclarations
   PyObject *__pyx_t_1 = NULL;
   PyObject *__pyx_t_2 = NULL;
@@ -11102,8 +11377,9 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_7overlie_2f(PyOb
   __Pyx_RefNannySetupContext("f", 0);
   __pyx_outer_scope = (struct __pyx_obj_5MACS2_2IO_8BedGraph___pyx_scope_struct__overlie *) __Pyx_CyFunction_GetClosure(__pyx_self);
   __pyx_cur_scope = __pyx_outer_scope;
+  __Pyx_TraceCall("f", __pyx_f[0], 687, 0, __PYX_ERR(0, 687, __pyx_L1_error));
 
-  /* "MACS2/IO/BedGraph.pyx":688
+  /* "MACS2/IO/BedGraph.pyx":689
  *             def f(*args):
  *                 # chisq statistics = sum(-log10p)/log10(e)*2, chisq df = 2*number_of_reps
  *                 return chisq_logp_e(2*sum(args)/LOG10_E, 2*nr_tracks, log10=True)             # <<<<<<<<<<<<<<
@@ -11111,22 +11387,22 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_7overlie_2f(PyOb
  *             raise Exception("Invalid function")
  */
   __Pyx_XDECREF(__pyx_r);
-  __Pyx_GetModuleGlobalName(__pyx_t_1, __pyx_n_s_chisq_logp_e); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 688, __pyx_L1_error)
+  __Pyx_GetModuleGlobalName(__pyx_t_1, __pyx_n_s_chisq_logp_e); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 689, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_2 = __Pyx_PyObject_CallOneArg(__pyx_builtin_sum, __pyx_v_args); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 688, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyObject_CallOneArg(__pyx_builtin_sum, __pyx_v_args); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 689, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
-  __pyx_t_3 = PyNumber_Multiply(__pyx_int_2, __pyx_t_2); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 688, __pyx_L1_error)
+  __pyx_t_3 = PyNumber_Multiply(__pyx_int_2, __pyx_t_2); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 689, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-  __Pyx_GetModuleGlobalName(__pyx_t_2, __pyx_n_s_LOG10_E); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 688, __pyx_L1_error)
+  __Pyx_GetModuleGlobalName(__pyx_t_2, __pyx_n_s_LOG10_E); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 689, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
-  __pyx_t_4 = __Pyx_PyNumber_Divide(__pyx_t_3, __pyx_t_2); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 688, __pyx_L1_error)
+  __pyx_t_4 = __Pyx_PyNumber_Divide(__pyx_t_3, __pyx_t_2); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 689, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_4);
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-  __pyx_t_2 = PyInt_FromSsize_t((2 * __pyx_cur_scope->__pyx_v_nr_tracks)); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 688, __pyx_L1_error)
+  __pyx_t_2 = PyInt_FromSsize_t((2 * __pyx_cur_scope->__pyx_v_nr_tracks)); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 689, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
-  __pyx_t_3 = PyTuple_New(2); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 688, __pyx_L1_error)
+  __pyx_t_3 = PyTuple_New(2); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 689, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
   __Pyx_GIVEREF(__pyx_t_4);
   PyTuple_SET_ITEM(__pyx_t_3, 0, __pyx_t_4);
@@ -11134,10 +11410,10 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_7overlie_2f(PyOb
   PyTuple_SET_ITEM(__pyx_t_3, 1, __pyx_t_2);
   __pyx_t_4 = 0;
   __pyx_t_2 = 0;
-  __pyx_t_2 = __Pyx_PyDict_NewPresized(1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 688, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyDict_NewPresized(1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 689, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
-  if (PyDict_SetItem(__pyx_t_2, __pyx_n_s_log10, Py_True) < 0) __PYX_ERR(0, 688, __pyx_L1_error)
-  __pyx_t_4 = __Pyx_PyObject_Call(__pyx_t_1, __pyx_t_3, __pyx_t_2); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 688, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_t_2, __pyx_n_s_log10, Py_True) < 0) __PYX_ERR(0, 689, __pyx_L1_error)
+  __pyx_t_4 = __Pyx_PyObject_Call(__pyx_t_1, __pyx_t_3, __pyx_t_2); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 689, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_4);
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
@@ -11146,7 +11422,7 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_7overlie_2f(PyOb
   __pyx_t_4 = 0;
   goto __pyx_L0;
 
-  /* "MACS2/IO/BedGraph.pyx":686
+  /* "MACS2/IO/BedGraph.pyx":687
  *         elif func == "fisher":
  *             # combine -log10pvalues
  *             def f(*args):             # <<<<<<<<<<<<<<
@@ -11164,11 +11440,12 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_7overlie_2f(PyOb
   __pyx_r = NULL;
   __pyx_L0:;
   __Pyx_XGIVEREF(__pyx_r);
+  __Pyx_TraceReturn(__pyx_r, 0);
   __Pyx_RefNannyFinishContext();
   return __pyx_r;
 }
 
-/* "MACS2/IO/BedGraph.pyx":636
+/* "MACS2/IO/BedGraph.pyx":637
  *         return ret
  * 
  *     def overlie (self, bdgTracks, func="max" ):             # <<<<<<<<<<<<<<
@@ -11203,6 +11480,7 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_36overlie(struct
   Py_ssize_t __pyx_8genexpr4__pyx_v_i;
   Py_ssize_t __pyx_8genexpr5__pyx_v_i;
   PyObject *__pyx_r = NULL;
+  __Pyx_TraceDeclarations
   __Pyx_RefNannyDeclarations
   Py_ssize_t __pyx_t_1;
   PyObject *__pyx_t_2 = NULL;
@@ -11227,22 +11505,23 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_36overlie(struct
   if (unlikely(!__pyx_cur_scope)) {
     __pyx_cur_scope = ((struct __pyx_obj_5MACS2_2IO_8BedGraph___pyx_scope_struct__overlie *)Py_None);
     __Pyx_INCREF(Py_None);
-    __PYX_ERR(0, 636, __pyx_L1_error)
+    __PYX_ERR(0, 637, __pyx_L1_error)
   } else {
     __Pyx_GOTREF(__pyx_cur_scope);
   }
+  __Pyx_TraceCall("overlie", __pyx_f[0], 637, 0, __PYX_ERR(0, 637, __pyx_L1_error));
 
-  /* "MACS2/IO/BedGraph.pyx":673
+  /* "MACS2/IO/BedGraph.pyx":674
  *             bytes chrom
  * 
  *         nr_tracks = len(bdgTracks) + 1  # +1 for self             # <<<<<<<<<<<<<<
  *         assert nr_tracks >= 2, "Specify at least two replicates"
  *         for i, bdgTrack in enumerate(bdgTracks):
  */
-  __pyx_t_1 = PyObject_Length(__pyx_v_bdgTracks); if (unlikely(__pyx_t_1 == ((Py_ssize_t)-1))) __PYX_ERR(0, 673, __pyx_L1_error)
+  __pyx_t_1 = PyObject_Length(__pyx_v_bdgTracks); if (unlikely(__pyx_t_1 == ((Py_ssize_t)-1))) __PYX_ERR(0, 674, __pyx_L1_error)
   __pyx_cur_scope->__pyx_v_nr_tracks = (__pyx_t_1 + 1);
 
-  /* "MACS2/IO/BedGraph.pyx":674
+  /* "MACS2/IO/BedGraph.pyx":675
  * 
  *         nr_tracks = len(bdgTracks) + 1  # +1 for self
  *         assert nr_tracks >= 2, "Specify at least two replicates"             # <<<<<<<<<<<<<<
@@ -11253,12 +11532,12 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_36overlie(struct
   if (unlikely(!Py_OptimizeFlag)) {
     if (unlikely(!((__pyx_cur_scope->__pyx_v_nr_tracks >= 2) != 0))) {
       PyErr_SetObject(PyExc_AssertionError, __pyx_kp_u_Specify_at_least_two_replicates);
-      __PYX_ERR(0, 674, __pyx_L1_error)
+      __PYX_ERR(0, 675, __pyx_L1_error)
     }
   }
   #endif
 
-  /* "MACS2/IO/BedGraph.pyx":675
+  /* "MACS2/IO/BedGraph.pyx":676
  *         nr_tracks = len(bdgTracks) + 1  # +1 for self
  *         assert nr_tracks >= 2, "Specify at least two replicates"
  *         for i, bdgTrack in enumerate(bdgTracks):             # <<<<<<<<<<<<<<
@@ -11271,26 +11550,26 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_36overlie(struct
     __pyx_t_3 = __pyx_v_bdgTracks; __Pyx_INCREF(__pyx_t_3); __pyx_t_1 = 0;
     __pyx_t_4 = NULL;
   } else {
-    __pyx_t_1 = -1; __pyx_t_3 = PyObject_GetIter(__pyx_v_bdgTracks); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 675, __pyx_L1_error)
+    __pyx_t_1 = -1; __pyx_t_3 = PyObject_GetIter(__pyx_v_bdgTracks); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 676, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_3);
-    __pyx_t_4 = Py_TYPE(__pyx_t_3)->tp_iternext; if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 675, __pyx_L1_error)
+    __pyx_t_4 = Py_TYPE(__pyx_t_3)->tp_iternext; if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 676, __pyx_L1_error)
   }
   for (;;) {
     if (likely(!__pyx_t_4)) {
       if (likely(PyList_CheckExact(__pyx_t_3))) {
         if (__pyx_t_1 >= PyList_GET_SIZE(__pyx_t_3)) break;
         #if CYTHON_ASSUME_SAFE_MACROS && !CYTHON_AVOID_BORROWED_REFS
-        __pyx_t_5 = PyList_GET_ITEM(__pyx_t_3, __pyx_t_1); __Pyx_INCREF(__pyx_t_5); __pyx_t_1++; if (unlikely(0 < 0)) __PYX_ERR(0, 675, __pyx_L1_error)
+        __pyx_t_5 = PyList_GET_ITEM(__pyx_t_3, __pyx_t_1); __Pyx_INCREF(__pyx_t_5); __pyx_t_1++; if (unlikely(0 < 0)) __PYX_ERR(0, 676, __pyx_L1_error)
         #else
-        __pyx_t_5 = PySequence_ITEM(__pyx_t_3, __pyx_t_1); __pyx_t_1++; if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 675, __pyx_L1_error)
+        __pyx_t_5 = PySequence_ITEM(__pyx_t_3, __pyx_t_1); __pyx_t_1++; if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 676, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_5);
         #endif
       } else {
         if (__pyx_t_1 >= PyTuple_GET_SIZE(__pyx_t_3)) break;
         #if CYTHON_ASSUME_SAFE_MACROS && !CYTHON_AVOID_BORROWED_REFS
-        __pyx_t_5 = PyTuple_GET_ITEM(__pyx_t_3, __pyx_t_1); __Pyx_INCREF(__pyx_t_5); __pyx_t_1++; if (unlikely(0 < 0)) __PYX_ERR(0, 675, __pyx_L1_error)
+        __pyx_t_5 = PyTuple_GET_ITEM(__pyx_t_3, __pyx_t_1); __Pyx_INCREF(__pyx_t_5); __pyx_t_1++; if (unlikely(0 < 0)) __PYX_ERR(0, 676, __pyx_L1_error)
         #else
-        __pyx_t_5 = PySequence_ITEM(__pyx_t_3, __pyx_t_1); __pyx_t_1++; if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 675, __pyx_L1_error)
+        __pyx_t_5 = PySequence_ITEM(__pyx_t_3, __pyx_t_1); __pyx_t_1++; if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 676, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_5);
         #endif
       }
@@ -11300,7 +11579,7 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_36overlie(struct
         PyObject* exc_type = PyErr_Occurred();
         if (exc_type) {
           if (likely(__Pyx_PyErr_GivenExceptionMatches(exc_type, PyExc_StopIteration))) PyErr_Clear();
-          else __PYX_ERR(0, 675, __pyx_L1_error)
+          else __PYX_ERR(0, 676, __pyx_L1_error)
         }
         break;
       }
@@ -11310,13 +11589,13 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_36overlie(struct
     __pyx_t_5 = 0;
     __Pyx_INCREF(__pyx_t_2);
     __Pyx_XDECREF_SET(__pyx_v_i, __pyx_t_2);
-    __pyx_t_5 = __Pyx_PyInt_AddObjC(__pyx_t_2, __pyx_int_1, 1, 0, 0); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 675, __pyx_L1_error)
+    __pyx_t_5 = __Pyx_PyInt_AddObjC(__pyx_t_2, __pyx_int_1, 1, 0, 0); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 676, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_5);
     __Pyx_DECREF(__pyx_t_2);
     __pyx_t_2 = __pyx_t_5;
     __pyx_t_5 = 0;
 
-    /* "MACS2/IO/BedGraph.pyx":676
+    /* "MACS2/IO/BedGraph.pyx":677
  *         assert nr_tracks >= 2, "Specify at least two replicates"
  *         for i, bdgTrack in enumerate(bdgTracks):
  *             assert isinstance(bdgTrack, bedGraphTrackI), "bdgTrack{} is not a bedGraphTrackI object".format(i + 1)             # <<<<<<<<<<<<<<
@@ -11327,9 +11606,9 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_36overlie(struct
     if (unlikely(!Py_OptimizeFlag)) {
       __pyx_t_6 = __Pyx_TypeCheck(__pyx_v_bdgTrack, __pyx_ptype_5MACS2_2IO_8BedGraph_bedGraphTrackI); 
       if (unlikely(!(__pyx_t_6 != 0))) {
-        __pyx_t_7 = __Pyx_PyObject_GetAttrStr(__pyx_kp_u_bdgTrack_is_not_a_bedGraphTrackI, __pyx_n_s_format); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 676, __pyx_L1_error)
+        __pyx_t_7 = __Pyx_PyObject_GetAttrStr(__pyx_kp_u_bdgTrack_is_not_a_bedGraphTrackI, __pyx_n_s_format); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 677, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_7);
-        __pyx_t_8 = __Pyx_PyInt_AddObjC(__pyx_v_i, __pyx_int_1, 1, 0, 0); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 676, __pyx_L1_error)
+        __pyx_t_8 = __Pyx_PyInt_AddObjC(__pyx_v_i, __pyx_int_1, 1, 0, 0); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 677, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_8);
         __pyx_t_9 = NULL;
         if (CYTHON_UNPACK_METHODS && likely(PyMethod_Check(__pyx_t_7))) {
@@ -11344,20 +11623,20 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_36overlie(struct
         __pyx_t_5 = (__pyx_t_9) ? __Pyx_PyObject_Call2Args(__pyx_t_7, __pyx_t_9, __pyx_t_8) : __Pyx_PyObject_CallOneArg(__pyx_t_7, __pyx_t_8);
         __Pyx_XDECREF(__pyx_t_9); __pyx_t_9 = 0;
         __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
-        if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 676, __pyx_L1_error)
+        if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 677, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_5);
         __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
-        __pyx_t_7 = PyTuple_Pack(1, __pyx_t_5); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 676, __pyx_L1_error)
+        __pyx_t_7 = PyTuple_Pack(1, __pyx_t_5); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 677, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_7);
         __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
         PyErr_SetObject(PyExc_AssertionError, __pyx_t_7);
         __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
-        __PYX_ERR(0, 676, __pyx_L1_error)
+        __PYX_ERR(0, 677, __pyx_L1_error)
       }
     }
     #endif
 
-    /* "MACS2/IO/BedGraph.pyx":675
+    /* "MACS2/IO/BedGraph.pyx":676
  *         nr_tracks = len(bdgTracks) + 1  # +1 for self
  *         assert nr_tracks >= 2, "Specify at least two replicates"
  *         for i, bdgTrack in enumerate(bdgTracks):             # <<<<<<<<<<<<<<
@@ -11368,17 +11647,17 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_36overlie(struct
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
-  /* "MACS2/IO/BedGraph.pyx":678
+  /* "MACS2/IO/BedGraph.pyx":679
  *             assert isinstance(bdgTrack, bedGraphTrackI), "bdgTrack{} is not a bedGraphTrackI object".format(i + 1)
  * 
  *         if func == "max":             # <<<<<<<<<<<<<<
  *             f = max
  *         elif func == "mean":
  */
-  __pyx_t_6 = (__Pyx_PyUnicode_Equals(__pyx_v_func, __pyx_n_u_max, Py_EQ)); if (unlikely(__pyx_t_6 < 0)) __PYX_ERR(0, 678, __pyx_L1_error)
+  __pyx_t_6 = (__Pyx_PyUnicode_Equals(__pyx_v_func, __pyx_n_u_max, Py_EQ)); if (unlikely(__pyx_t_6 < 0)) __PYX_ERR(0, 679, __pyx_L1_error)
   if (__pyx_t_6) {
 
-    /* "MACS2/IO/BedGraph.pyx":679
+    /* "MACS2/IO/BedGraph.pyx":680
  * 
  *         if func == "max":
  *             f = max             # <<<<<<<<<<<<<<
@@ -11388,7 +11667,7 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_36overlie(struct
     __Pyx_INCREF(__pyx_builtin_max);
     __pyx_v_f = __pyx_builtin_max;
 
-    /* "MACS2/IO/BedGraph.pyx":678
+    /* "MACS2/IO/BedGraph.pyx":679
  *             assert isinstance(bdgTrack, bedGraphTrackI), "bdgTrack{} is not a bedGraphTrackI object".format(i + 1)
  * 
  *         if func == "max":             # <<<<<<<<<<<<<<
@@ -11398,29 +11677,29 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_36overlie(struct
     goto __pyx_L5;
   }
 
-  /* "MACS2/IO/BedGraph.pyx":680
+  /* "MACS2/IO/BedGraph.pyx":681
  *         if func == "max":
  *             f = max
  *         elif func == "mean":             # <<<<<<<<<<<<<<
  *             #f = np_mean
  *             def f(*args):
  */
-  __pyx_t_6 = (__Pyx_PyUnicode_Equals(__pyx_v_func, __pyx_n_u_mean, Py_EQ)); if (unlikely(__pyx_t_6 < 0)) __PYX_ERR(0, 680, __pyx_L1_error)
+  __pyx_t_6 = (__Pyx_PyUnicode_Equals(__pyx_v_func, __pyx_n_u_mean, Py_EQ)); if (unlikely(__pyx_t_6 < 0)) __PYX_ERR(0, 681, __pyx_L1_error)
   if (__pyx_t_6) {
 
-    /* "MACS2/IO/BedGraph.pyx":682
+    /* "MACS2/IO/BedGraph.pyx":683
  *         elif func == "mean":
  *             #f = np_mean
  *             def f(*args):             # <<<<<<<<<<<<<<
  *                 return sum(args)/nr_tracks
  *         elif func == "fisher":
  */
-    __pyx_t_2 = __Pyx_CyFunction_NewEx(&__pyx_mdef_5MACS2_2IO_8BedGraph_14bedGraphTrackI_7overlie_1f, 0, __pyx_n_s_overlie_locals_f, ((PyObject*)__pyx_cur_scope), __pyx_n_s_MACS2_IO_BedGraph, __pyx_d, ((PyObject *)__pyx_codeobj__7)); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 682, __pyx_L1_error)
+    __pyx_t_2 = __Pyx_CyFunction_NewEx(&__pyx_mdef_5MACS2_2IO_8BedGraph_14bedGraphTrackI_7overlie_1f, 0, __pyx_n_s_overlie_locals_f, ((PyObject*)__pyx_cur_scope), __pyx_n_s_MACS2_IO_BedGraph, __pyx_d, ((PyObject *)__pyx_codeobj__7)); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 683, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
     __pyx_v_f = __pyx_t_2;
     __pyx_t_2 = 0;
 
-    /* "MACS2/IO/BedGraph.pyx":680
+    /* "MACS2/IO/BedGraph.pyx":681
  *         if func == "max":
  *             f = max
  *         elif func == "mean":             # <<<<<<<<<<<<<<
@@ -11430,29 +11709,29 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_36overlie(struct
     goto __pyx_L5;
   }
 
-  /* "MACS2/IO/BedGraph.pyx":684
+  /* "MACS2/IO/BedGraph.pyx":685
  *             def f(*args):
  *                 return sum(args)/nr_tracks
  *         elif func == "fisher":             # <<<<<<<<<<<<<<
  *             # combine -log10pvalues
  *             def f(*args):
  */
-  __pyx_t_6 = (__Pyx_PyUnicode_Equals(__pyx_v_func, __pyx_n_u_fisher, Py_EQ)); if (unlikely(__pyx_t_6 < 0)) __PYX_ERR(0, 684, __pyx_L1_error)
+  __pyx_t_6 = (__Pyx_PyUnicode_Equals(__pyx_v_func, __pyx_n_u_fisher, Py_EQ)); if (unlikely(__pyx_t_6 < 0)) __PYX_ERR(0, 685, __pyx_L1_error)
   if (likely(__pyx_t_6)) {
 
-    /* "MACS2/IO/BedGraph.pyx":686
+    /* "MACS2/IO/BedGraph.pyx":687
  *         elif func == "fisher":
  *             # combine -log10pvalues
  *             def f(*args):             # <<<<<<<<<<<<<<
  *                 # chisq statistics = sum(-log10p)/log10(e)*2, chisq df = 2*number_of_reps
  *                 return chisq_logp_e(2*sum(args)/LOG10_E, 2*nr_tracks, log10=True)
  */
-    __pyx_t_2 = __Pyx_CyFunction_NewEx(&__pyx_mdef_5MACS2_2IO_8BedGraph_14bedGraphTrackI_7overlie_3f, 0, __pyx_n_s_overlie_locals_f, ((PyObject*)__pyx_cur_scope), __pyx_n_s_MACS2_IO_BedGraph, __pyx_d, ((PyObject *)__pyx_codeobj__9)); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 686, __pyx_L1_error)
+    __pyx_t_2 = __Pyx_CyFunction_NewEx(&__pyx_mdef_5MACS2_2IO_8BedGraph_14bedGraphTrackI_7overlie_3f, 0, __pyx_n_s_overlie_locals_f, ((PyObject*)__pyx_cur_scope), __pyx_n_s_MACS2_IO_BedGraph, __pyx_d, ((PyObject *)__pyx_codeobj__9)); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 687, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
     __pyx_v_f = __pyx_t_2;
     __pyx_t_2 = 0;
 
-    /* "MACS2/IO/BedGraph.pyx":684
+    /* "MACS2/IO/BedGraph.pyx":685
  *             def f(*args):
  *                 return sum(args)/nr_tracks
  *         elif func == "fisher":             # <<<<<<<<<<<<<<
@@ -11462,7 +11741,7 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_36overlie(struct
     goto __pyx_L5;
   }
 
-  /* "MACS2/IO/BedGraph.pyx":690
+  /* "MACS2/IO/BedGraph.pyx":691
  *                 return chisq_logp_e(2*sum(args)/LOG10_E, 2*nr_tracks, log10=True)
  *         else:
  *             raise Exception("Invalid function")             # <<<<<<<<<<<<<<
@@ -11470,54 +11749,54 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_36overlie(struct
  *         ret = bedGraphTrackI()
  */
   /*else*/ {
-    __pyx_t_2 = __Pyx_PyObject_Call(((PyObject *)(&((PyTypeObject*)PyExc_Exception)[0])), __pyx_tuple__10, NULL); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 690, __pyx_L1_error)
+    __pyx_t_2 = __Pyx_PyObject_Call(((PyObject *)(&((PyTypeObject*)PyExc_Exception)[0])), __pyx_tuple__10, NULL); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 691, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
     __Pyx_Raise(__pyx_t_2, 0, 0, 0);
     __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-    __PYX_ERR(0, 690, __pyx_L1_error)
+    __PYX_ERR(0, 691, __pyx_L1_error)
   }
   __pyx_L5:;
 
-  /* "MACS2/IO/BedGraph.pyx":692
+  /* "MACS2/IO/BedGraph.pyx":693
  *             raise Exception("Invalid function")
  * 
  *         ret = bedGraphTrackI()             # <<<<<<<<<<<<<<
  *         retadd = ret.add_loc
  * 
  */
-  __pyx_t_2 = __Pyx_PyObject_CallNoArg(((PyObject *)__pyx_ptype_5MACS2_2IO_8BedGraph_bedGraphTrackI)); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 692, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyObject_CallNoArg(((PyObject *)__pyx_ptype_5MACS2_2IO_8BedGraph_bedGraphTrackI)); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 693, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __pyx_v_ret = ((struct __pyx_obj_5MACS2_2IO_8BedGraph_bedGraphTrackI *)__pyx_t_2);
   __pyx_t_2 = 0;
 
-  /* "MACS2/IO/BedGraph.pyx":693
+  /* "MACS2/IO/BedGraph.pyx":694
  * 
  *         ret = bedGraphTrackI()
  *         retadd = ret.add_loc             # <<<<<<<<<<<<<<
  * 
  *         common_chr = set(self.get_chr_names())
  */
-  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_v_ret), __pyx_n_s_add_loc); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 693, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_v_ret), __pyx_n_s_add_loc); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 694, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __pyx_v_retadd = __pyx_t_2;
   __pyx_t_2 = 0;
 
-  /* "MACS2/IO/BedGraph.pyx":695
+  /* "MACS2/IO/BedGraph.pyx":696
  *         retadd = ret.add_loc
  * 
  *         common_chr = set(self.get_chr_names())             # <<<<<<<<<<<<<<
  *         for track in bdgTracks:
  *             common_chr = common_chr.intersection(set(track.get_chr_names()))
  */
-  __pyx_t_2 = ((struct __pyx_vtabstruct_5MACS2_2IO_8BedGraph_bedGraphTrackI *)__pyx_v_self->__pyx_vtab)->get_chr_names(__pyx_v_self, 0); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 695, __pyx_L1_error)
+  __pyx_t_2 = ((struct __pyx_vtabstruct_5MACS2_2IO_8BedGraph_bedGraphTrackI *)__pyx_v_self->__pyx_vtab)->get_chr_names(__pyx_v_self, 0); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 696, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
-  __pyx_t_3 = PySet_New(__pyx_t_2); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 695, __pyx_L1_error)
+  __pyx_t_3 = PySet_New(__pyx_t_2); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 696, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
   __pyx_v_common_chr = __pyx_t_3;
   __pyx_t_3 = 0;
 
-  /* "MACS2/IO/BedGraph.pyx":696
+  /* "MACS2/IO/BedGraph.pyx":697
  * 
  *         common_chr = set(self.get_chr_names())
  *         for track in bdgTracks:             # <<<<<<<<<<<<<<
@@ -11528,26 +11807,26 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_36overlie(struct
     __pyx_t_3 = __pyx_v_bdgTracks; __Pyx_INCREF(__pyx_t_3); __pyx_t_1 = 0;
     __pyx_t_4 = NULL;
   } else {
-    __pyx_t_1 = -1; __pyx_t_3 = PyObject_GetIter(__pyx_v_bdgTracks); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 696, __pyx_L1_error)
+    __pyx_t_1 = -1; __pyx_t_3 = PyObject_GetIter(__pyx_v_bdgTracks); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 697, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_3);
-    __pyx_t_4 = Py_TYPE(__pyx_t_3)->tp_iternext; if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 696, __pyx_L1_error)
+    __pyx_t_4 = Py_TYPE(__pyx_t_3)->tp_iternext; if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 697, __pyx_L1_error)
   }
   for (;;) {
     if (likely(!__pyx_t_4)) {
       if (likely(PyList_CheckExact(__pyx_t_3))) {
         if (__pyx_t_1 >= PyList_GET_SIZE(__pyx_t_3)) break;
         #if CYTHON_ASSUME_SAFE_MACROS && !CYTHON_AVOID_BORROWED_REFS
-        __pyx_t_2 = PyList_GET_ITEM(__pyx_t_3, __pyx_t_1); __Pyx_INCREF(__pyx_t_2); __pyx_t_1++; if (unlikely(0 < 0)) __PYX_ERR(0, 696, __pyx_L1_error)
+        __pyx_t_2 = PyList_GET_ITEM(__pyx_t_3, __pyx_t_1); __Pyx_INCREF(__pyx_t_2); __pyx_t_1++; if (unlikely(0 < 0)) __PYX_ERR(0, 697, __pyx_L1_error)
         #else
-        __pyx_t_2 = PySequence_ITEM(__pyx_t_3, __pyx_t_1); __pyx_t_1++; if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 696, __pyx_L1_error)
+        __pyx_t_2 = PySequence_ITEM(__pyx_t_3, __pyx_t_1); __pyx_t_1++; if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 697, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_2);
         #endif
       } else {
         if (__pyx_t_1 >= PyTuple_GET_SIZE(__pyx_t_3)) break;
         #if CYTHON_ASSUME_SAFE_MACROS && !CYTHON_AVOID_BORROWED_REFS
-        __pyx_t_2 = PyTuple_GET_ITEM(__pyx_t_3, __pyx_t_1); __Pyx_INCREF(__pyx_t_2); __pyx_t_1++; if (unlikely(0 < 0)) __PYX_ERR(0, 696, __pyx_L1_error)
+        __pyx_t_2 = PyTuple_GET_ITEM(__pyx_t_3, __pyx_t_1); __Pyx_INCREF(__pyx_t_2); __pyx_t_1++; if (unlikely(0 < 0)) __PYX_ERR(0, 697, __pyx_L1_error)
         #else
-        __pyx_t_2 = PySequence_ITEM(__pyx_t_3, __pyx_t_1); __pyx_t_1++; if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 696, __pyx_L1_error)
+        __pyx_t_2 = PySequence_ITEM(__pyx_t_3, __pyx_t_1); __pyx_t_1++; if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 697, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_2);
         #endif
       }
@@ -11557,7 +11836,7 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_36overlie(struct
         PyObject* exc_type = PyErr_Occurred();
         if (exc_type) {
           if (likely(__Pyx_PyErr_GivenExceptionMatches(exc_type, PyExc_StopIteration))) PyErr_Clear();
-          else __PYX_ERR(0, 696, __pyx_L1_error)
+          else __PYX_ERR(0, 697, __pyx_L1_error)
         }
         break;
       }
@@ -11566,16 +11845,16 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_36overlie(struct
     __Pyx_XDECREF_SET(__pyx_v_track, __pyx_t_2);
     __pyx_t_2 = 0;
 
-    /* "MACS2/IO/BedGraph.pyx":697
+    /* "MACS2/IO/BedGraph.pyx":698
  *         common_chr = set(self.get_chr_names())
  *         for track in bdgTracks:
  *             common_chr = common_chr.intersection(set(track.get_chr_names()))             # <<<<<<<<<<<<<<
  * 
  *         for chrom in common_chr:
  */
-    __pyx_t_7 = __Pyx_PyObject_GetAttrStr(__pyx_v_common_chr, __pyx_n_s_intersection); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 697, __pyx_L1_error)
+    __pyx_t_7 = __Pyx_PyObject_GetAttrStr(__pyx_v_common_chr, __pyx_n_s_intersection); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 698, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_7);
-    __pyx_t_8 = __Pyx_PyObject_GetAttrStr(__pyx_v_track, __pyx_n_s_get_chr_names); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 697, __pyx_L1_error)
+    __pyx_t_8 = __Pyx_PyObject_GetAttrStr(__pyx_v_track, __pyx_n_s_get_chr_names); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 698, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_8);
     __pyx_t_9 = NULL;
     if (CYTHON_UNPACK_METHODS && likely(PyMethod_Check(__pyx_t_8))) {
@@ -11589,10 +11868,10 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_36overlie(struct
     }
     __pyx_t_5 = (__pyx_t_9) ? __Pyx_PyObject_CallOneArg(__pyx_t_8, __pyx_t_9) : __Pyx_PyObject_CallNoArg(__pyx_t_8);
     __Pyx_XDECREF(__pyx_t_9); __pyx_t_9 = 0;
-    if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 697, __pyx_L1_error)
+    if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 698, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_5);
     __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
-    __pyx_t_8 = PySet_New(__pyx_t_5); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 697, __pyx_L1_error)
+    __pyx_t_8 = PySet_New(__pyx_t_5); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 698, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_8);
     __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
     __pyx_t_5 = NULL;
@@ -11608,13 +11887,13 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_36overlie(struct
     __pyx_t_2 = (__pyx_t_5) ? __Pyx_PyObject_Call2Args(__pyx_t_7, __pyx_t_5, __pyx_t_8) : __Pyx_PyObject_CallOneArg(__pyx_t_7, __pyx_t_8);
     __Pyx_XDECREF(__pyx_t_5); __pyx_t_5 = 0;
     __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
-    if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 697, __pyx_L1_error)
+    if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 698, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
     __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
     __Pyx_DECREF_SET(__pyx_v_common_chr, __pyx_t_2);
     __pyx_t_2 = 0;
 
-    /* "MACS2/IO/BedGraph.pyx":696
+    /* "MACS2/IO/BedGraph.pyx":697
  * 
  *         common_chr = set(self.get_chr_names())
  *         for track in bdgTracks:             # <<<<<<<<<<<<<<
@@ -11624,7 +11903,7 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_36overlie(struct
   }
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
 
-  /* "MACS2/IO/BedGraph.pyx":699
+  /* "MACS2/IO/BedGraph.pyx":700
  *             common_chr = common_chr.intersection(set(track.get_chr_names()))
  * 
  *         for chrom in common_chr:             # <<<<<<<<<<<<<<
@@ -11635,26 +11914,26 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_36overlie(struct
     __pyx_t_3 = __pyx_v_common_chr; __Pyx_INCREF(__pyx_t_3); __pyx_t_1 = 0;
     __pyx_t_4 = NULL;
   } else {
-    __pyx_t_1 = -1; __pyx_t_3 = PyObject_GetIter(__pyx_v_common_chr); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 699, __pyx_L1_error)
+    __pyx_t_1 = -1; __pyx_t_3 = PyObject_GetIter(__pyx_v_common_chr); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 700, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_3);
-    __pyx_t_4 = Py_TYPE(__pyx_t_3)->tp_iternext; if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 699, __pyx_L1_error)
+    __pyx_t_4 = Py_TYPE(__pyx_t_3)->tp_iternext; if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 700, __pyx_L1_error)
   }
   for (;;) {
     if (likely(!__pyx_t_4)) {
       if (likely(PyList_CheckExact(__pyx_t_3))) {
         if (__pyx_t_1 >= PyList_GET_SIZE(__pyx_t_3)) break;
         #if CYTHON_ASSUME_SAFE_MACROS && !CYTHON_AVOID_BORROWED_REFS
-        __pyx_t_2 = PyList_GET_ITEM(__pyx_t_3, __pyx_t_1); __Pyx_INCREF(__pyx_t_2); __pyx_t_1++; if (unlikely(0 < 0)) __PYX_ERR(0, 699, __pyx_L1_error)
+        __pyx_t_2 = PyList_GET_ITEM(__pyx_t_3, __pyx_t_1); __Pyx_INCREF(__pyx_t_2); __pyx_t_1++; if (unlikely(0 < 0)) __PYX_ERR(0, 700, __pyx_L1_error)
         #else
-        __pyx_t_2 = PySequence_ITEM(__pyx_t_3, __pyx_t_1); __pyx_t_1++; if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 699, __pyx_L1_error)
+        __pyx_t_2 = PySequence_ITEM(__pyx_t_3, __pyx_t_1); __pyx_t_1++; if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 700, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_2);
         #endif
       } else {
         if (__pyx_t_1 >= PyTuple_GET_SIZE(__pyx_t_3)) break;
         #if CYTHON_ASSUME_SAFE_MACROS && !CYTHON_AVOID_BORROWED_REFS
-        __pyx_t_2 = PyTuple_GET_ITEM(__pyx_t_3, __pyx_t_1); __Pyx_INCREF(__pyx_t_2); __pyx_t_1++; if (unlikely(0 < 0)) __PYX_ERR(0, 699, __pyx_L1_error)
+        __pyx_t_2 = PyTuple_GET_ITEM(__pyx_t_3, __pyx_t_1); __Pyx_INCREF(__pyx_t_2); __pyx_t_1++; if (unlikely(0 < 0)) __PYX_ERR(0, 700, __pyx_L1_error)
         #else
-        __pyx_t_2 = PySequence_ITEM(__pyx_t_3, __pyx_t_1); __pyx_t_1++; if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 699, __pyx_L1_error)
+        __pyx_t_2 = PySequence_ITEM(__pyx_t_3, __pyx_t_1); __pyx_t_1++; if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 700, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_2);
         #endif
       }
@@ -11664,24 +11943,24 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_36overlie(struct
         PyObject* exc_type = PyErr_Occurred();
         if (exc_type) {
           if (likely(__Pyx_PyErr_GivenExceptionMatches(exc_type, PyExc_StopIteration))) PyErr_Clear();
-          else __PYX_ERR(0, 699, __pyx_L1_error)
+          else __PYX_ERR(0, 700, __pyx_L1_error)
         }
         break;
       }
       __Pyx_GOTREF(__pyx_t_2);
     }
-    if (!(likely(PyBytes_CheckExact(__pyx_t_2))||((__pyx_t_2) == Py_None)||(PyErr_Format(PyExc_TypeError, "Expected %.16s, got %.200s", "bytes", Py_TYPE(__pyx_t_2)->tp_name), 0))) __PYX_ERR(0, 699, __pyx_L1_error)
+    if (!(likely(PyBytes_CheckExact(__pyx_t_2))||((__pyx_t_2) == Py_None)||(PyErr_Format(PyExc_TypeError, "Expected %.16s, got %.200s", "bytes", Py_TYPE(__pyx_t_2)->tp_name), 0))) __PYX_ERR(0, 700, __pyx_L1_error)
     __Pyx_XDECREF_SET(__pyx_v_chrom, ((PyObject*)__pyx_t_2));
     __pyx_t_2 = 0;
 
-    /* "MACS2/IO/BedGraph.pyx":700
+    /* "MACS2/IO/BedGraph.pyx":701
  * 
  *         for chrom in common_chr:
  *             datas = [self.get_data_by_chr(chrom)]             # <<<<<<<<<<<<<<
  *             datas.extend([bdgTracks[i].get_data_by_chr(chrom) for i in range(len(bdgTracks))])
  * 
  */
-    __pyx_t_7 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_v_self), __pyx_n_s_get_data_by_chr); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 700, __pyx_L1_error)
+    __pyx_t_7 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_v_self), __pyx_n_s_get_data_by_chr); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 701, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_7);
     __pyx_t_8 = NULL;
     if (CYTHON_UNPACK_METHODS && likely(PyMethod_Check(__pyx_t_7))) {
@@ -11695,10 +11974,10 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_36overlie(struct
     }
     __pyx_t_2 = (__pyx_t_8) ? __Pyx_PyObject_Call2Args(__pyx_t_7, __pyx_t_8, __pyx_v_chrom) : __Pyx_PyObject_CallOneArg(__pyx_t_7, __pyx_v_chrom);
     __Pyx_XDECREF(__pyx_t_8); __pyx_t_8 = 0;
-    if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 700, __pyx_L1_error)
+    if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 701, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
     __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
-    __pyx_t_7 = PyList_New(1); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 700, __pyx_L1_error)
+    __pyx_t_7 = PyList_New(1); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 701, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_7);
     __Pyx_GIVEREF(__pyx_t_2);
     PyList_SET_ITEM(__pyx_t_7, 0, __pyx_t_2);
@@ -11706,7 +11985,7 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_36overlie(struct
     __Pyx_XDECREF_SET(__pyx_v_datas, ((PyObject*)__pyx_t_7));
     __pyx_t_7 = 0;
 
-    /* "MACS2/IO/BedGraph.pyx":701
+    /* "MACS2/IO/BedGraph.pyx":702
  *         for chrom in common_chr:
  *             datas = [self.get_data_by_chr(chrom)]
  *             datas.extend([bdgTracks[i].get_data_by_chr(chrom) for i in range(len(bdgTracks))])             # <<<<<<<<<<<<<<
@@ -11714,15 +11993,15 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_36overlie(struct
  *             ps, vs, pn, vn = [], [], [], []
  */
     { /* enter inner scope */
-      __pyx_t_7 = PyList_New(0); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 701, __pyx_L1_error)
+      __pyx_t_7 = PyList_New(0); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 702, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_7);
-      __pyx_t_10 = PyObject_Length(__pyx_v_bdgTracks); if (unlikely(__pyx_t_10 == ((Py_ssize_t)-1))) __PYX_ERR(0, 701, __pyx_L1_error)
+      __pyx_t_10 = PyObject_Length(__pyx_v_bdgTracks); if (unlikely(__pyx_t_10 == ((Py_ssize_t)-1))) __PYX_ERR(0, 702, __pyx_L1_error)
       __pyx_t_11 = __pyx_t_10;
       for (__pyx_t_12 = 0; __pyx_t_12 < __pyx_t_11; __pyx_t_12+=1) {
         __pyx_8genexpr2__pyx_v_i = __pyx_t_12;
-        __pyx_t_8 = __Pyx_GetItemInt(__pyx_v_bdgTracks, __pyx_8genexpr2__pyx_v_i, Py_ssize_t, 1, PyInt_FromSsize_t, 0, 1, 1); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 701, __pyx_L1_error)
+        __pyx_t_8 = __Pyx_GetItemInt(__pyx_v_bdgTracks, __pyx_8genexpr2__pyx_v_i, Py_ssize_t, 1, PyInt_FromSsize_t, 0, 1, 1); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 702, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_8);
-        __pyx_t_5 = __Pyx_PyObject_GetAttrStr(__pyx_t_8, __pyx_n_s_get_data_by_chr); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 701, __pyx_L1_error)
+        __pyx_t_5 = __Pyx_PyObject_GetAttrStr(__pyx_t_8, __pyx_n_s_get_data_by_chr); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 702, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_5);
         __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
         __pyx_t_8 = NULL;
@@ -11737,30 +12016,30 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_36overlie(struct
         }
         __pyx_t_2 = (__pyx_t_8) ? __Pyx_PyObject_Call2Args(__pyx_t_5, __pyx_t_8, __pyx_v_chrom) : __Pyx_PyObject_CallOneArg(__pyx_t_5, __pyx_v_chrom);
         __Pyx_XDECREF(__pyx_t_8); __pyx_t_8 = 0;
-        if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 701, __pyx_L1_error)
+        if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 702, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_2);
         __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
-        if (unlikely(__Pyx_ListComp_Append(__pyx_t_7, (PyObject*)__pyx_t_2))) __PYX_ERR(0, 701, __pyx_L1_error)
+        if (unlikely(__Pyx_ListComp_Append(__pyx_t_7, (PyObject*)__pyx_t_2))) __PYX_ERR(0, 702, __pyx_L1_error)
         __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
       }
     } /* exit inner scope */
-    __pyx_t_13 = __Pyx_PyList_Extend(__pyx_v_datas, __pyx_t_7); if (unlikely(__pyx_t_13 == ((int)-1))) __PYX_ERR(0, 701, __pyx_L1_error)
+    __pyx_t_13 = __Pyx_PyList_Extend(__pyx_v_datas, __pyx_t_7); if (unlikely(__pyx_t_13 == ((int)-1))) __PYX_ERR(0, 702, __pyx_L1_error)
     __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
 
-    /* "MACS2/IO/BedGraph.pyx":703
+    /* "MACS2/IO/BedGraph.pyx":704
  *             datas.extend([bdgTracks[i].get_data_by_chr(chrom) for i in range(len(bdgTracks))])
  * 
  *             ps, vs, pn, vn = [], [], [], []             # <<<<<<<<<<<<<<
  *             for data in datas:
  *                 ps.append(data[0])
  */
-    __pyx_t_7 = PyList_New(0); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 703, __pyx_L1_error)
+    __pyx_t_7 = PyList_New(0); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 704, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_7);
-    __pyx_t_2 = PyList_New(0); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 703, __pyx_L1_error)
+    __pyx_t_2 = PyList_New(0); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 704, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
-    __pyx_t_5 = PyList_New(0); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 703, __pyx_L1_error)
+    __pyx_t_5 = PyList_New(0); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 704, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_5);
-    __pyx_t_8 = PyList_New(0); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 703, __pyx_L1_error)
+    __pyx_t_8 = PyList_New(0); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 704, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_8);
     __Pyx_XDECREF_SET(__pyx_v_ps, ((PyObject*)__pyx_t_7));
     __pyx_t_7 = 0;
@@ -11771,7 +12050,7 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_36overlie(struct
     __Pyx_XDECREF_SET(__pyx_v_vn, ((PyObject*)__pyx_t_8));
     __pyx_t_8 = 0;
 
-    /* "MACS2/IO/BedGraph.pyx":704
+    /* "MACS2/IO/BedGraph.pyx":705
  * 
  *             ps, vs, pn, vn = [], [], [], []
  *             for data in datas:             # <<<<<<<<<<<<<<
@@ -11782,75 +12061,75 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_36overlie(struct
     for (;;) {
       if (__pyx_t_10 >= PyList_GET_SIZE(__pyx_t_8)) break;
       #if CYTHON_ASSUME_SAFE_MACROS && !CYTHON_AVOID_BORROWED_REFS
-      __pyx_t_5 = PyList_GET_ITEM(__pyx_t_8, __pyx_t_10); __Pyx_INCREF(__pyx_t_5); __pyx_t_10++; if (unlikely(0 < 0)) __PYX_ERR(0, 704, __pyx_L1_error)
+      __pyx_t_5 = PyList_GET_ITEM(__pyx_t_8, __pyx_t_10); __Pyx_INCREF(__pyx_t_5); __pyx_t_10++; if (unlikely(0 < 0)) __PYX_ERR(0, 705, __pyx_L1_error)
       #else
-      __pyx_t_5 = PySequence_ITEM(__pyx_t_8, __pyx_t_10); __pyx_t_10++; if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 704, __pyx_L1_error)
+      __pyx_t_5 = PySequence_ITEM(__pyx_t_8, __pyx_t_10); __pyx_t_10++; if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 705, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_5);
       #endif
       __Pyx_XDECREF_SET(__pyx_v_data, __pyx_t_5);
       __pyx_t_5 = 0;
 
-      /* "MACS2/IO/BedGraph.pyx":705
+      /* "MACS2/IO/BedGraph.pyx":706
  *             ps, vs, pn, vn = [], [], [], []
  *             for data in datas:
  *                 ps.append(data[0])             # <<<<<<<<<<<<<<
  *                 pn.append(iter(ps[-1]).__next__)
  *                 vs.append(data[1])
  */
-      __pyx_t_5 = __Pyx_GetItemInt(__pyx_v_data, 0, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 705, __pyx_L1_error)
+      __pyx_t_5 = __Pyx_GetItemInt(__pyx_v_data, 0, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 706, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_5);
-      __pyx_t_13 = __Pyx_PyList_Append(__pyx_v_ps, __pyx_t_5); if (unlikely(__pyx_t_13 == ((int)-1))) __PYX_ERR(0, 705, __pyx_L1_error)
+      __pyx_t_13 = __Pyx_PyList_Append(__pyx_v_ps, __pyx_t_5); if (unlikely(__pyx_t_13 == ((int)-1))) __PYX_ERR(0, 706, __pyx_L1_error)
       __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
 
-      /* "MACS2/IO/BedGraph.pyx":706
+      /* "MACS2/IO/BedGraph.pyx":707
  *             for data in datas:
  *                 ps.append(data[0])
  *                 pn.append(iter(ps[-1]).__next__)             # <<<<<<<<<<<<<<
  *                 vs.append(data[1])
  *                 vn.append(iter(vs[-1]).__next__)
  */
-      __pyx_t_5 = __Pyx_GetItemInt_List(__pyx_v_ps, -1L, long, 1, __Pyx_PyInt_From_long, 1, 1, 1); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 706, __pyx_L1_error)
+      __pyx_t_5 = __Pyx_GetItemInt_List(__pyx_v_ps, -1L, long, 1, __Pyx_PyInt_From_long, 1, 1, 1); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 707, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_5);
-      __pyx_t_2 = PyObject_GetIter(__pyx_t_5); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 706, __pyx_L1_error)
+      __pyx_t_2 = PyObject_GetIter(__pyx_t_5); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 707, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_2);
       __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
-      __pyx_t_5 = __Pyx_PyObject_GetAttrStr(__pyx_t_2, __pyx_n_s_next); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 706, __pyx_L1_error)
+      __pyx_t_5 = __Pyx_PyObject_GetAttrStr(__pyx_t_2, __pyx_n_s_next); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 707, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_5);
       __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-      __pyx_t_13 = __Pyx_PyList_Append(__pyx_v_pn, __pyx_t_5); if (unlikely(__pyx_t_13 == ((int)-1))) __PYX_ERR(0, 706, __pyx_L1_error)
+      __pyx_t_13 = __Pyx_PyList_Append(__pyx_v_pn, __pyx_t_5); if (unlikely(__pyx_t_13 == ((int)-1))) __PYX_ERR(0, 707, __pyx_L1_error)
       __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
 
-      /* "MACS2/IO/BedGraph.pyx":707
+      /* "MACS2/IO/BedGraph.pyx":708
  *                 ps.append(data[0])
  *                 pn.append(iter(ps[-1]).__next__)
  *                 vs.append(data[1])             # <<<<<<<<<<<<<<
  *                 vn.append(iter(vs[-1]).__next__)
  * 
  */
-      __pyx_t_5 = __Pyx_GetItemInt(__pyx_v_data, 1, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 707, __pyx_L1_error)
+      __pyx_t_5 = __Pyx_GetItemInt(__pyx_v_data, 1, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 708, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_5);
-      __pyx_t_13 = __Pyx_PyList_Append(__pyx_v_vs, __pyx_t_5); if (unlikely(__pyx_t_13 == ((int)-1))) __PYX_ERR(0, 707, __pyx_L1_error)
+      __pyx_t_13 = __Pyx_PyList_Append(__pyx_v_vs, __pyx_t_5); if (unlikely(__pyx_t_13 == ((int)-1))) __PYX_ERR(0, 708, __pyx_L1_error)
       __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
 
-      /* "MACS2/IO/BedGraph.pyx":708
+      /* "MACS2/IO/BedGraph.pyx":709
  *                 pn.append(iter(ps[-1]).__next__)
  *                 vs.append(data[1])
  *                 vn.append(iter(vs[-1]).__next__)             # <<<<<<<<<<<<<<
  * 
  *             pre_p = 0                   # remember the previous position in the new bedGraphTrackI object ret
  */
-      __pyx_t_5 = __Pyx_GetItemInt_List(__pyx_v_vs, -1L, long, 1, __Pyx_PyInt_From_long, 1, 1, 1); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 708, __pyx_L1_error)
+      __pyx_t_5 = __Pyx_GetItemInt_List(__pyx_v_vs, -1L, long, 1, __Pyx_PyInt_From_long, 1, 1, 1); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 709, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_5);
-      __pyx_t_2 = PyObject_GetIter(__pyx_t_5); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 708, __pyx_L1_error)
+      __pyx_t_2 = PyObject_GetIter(__pyx_t_5); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 709, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_2);
       __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
-      __pyx_t_5 = __Pyx_PyObject_GetAttrStr(__pyx_t_2, __pyx_n_s_next); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 708, __pyx_L1_error)
+      __pyx_t_5 = __Pyx_PyObject_GetAttrStr(__pyx_t_2, __pyx_n_s_next); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 709, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_5);
       __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-      __pyx_t_13 = __Pyx_PyList_Append(__pyx_v_vn, __pyx_t_5); if (unlikely(__pyx_t_13 == ((int)-1))) __PYX_ERR(0, 708, __pyx_L1_error)
+      __pyx_t_13 = __Pyx_PyList_Append(__pyx_v_vn, __pyx_t_5); if (unlikely(__pyx_t_13 == ((int)-1))) __PYX_ERR(0, 709, __pyx_L1_error)
       __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
 
-      /* "MACS2/IO/BedGraph.pyx":704
+      /* "MACS2/IO/BedGraph.pyx":705
  * 
  *             ps, vs, pn, vn = [], [], [], []
  *             for data in datas:             # <<<<<<<<<<<<<<
@@ -11860,7 +12139,7 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_36overlie(struct
     }
     __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
 
-    /* "MACS2/IO/BedGraph.pyx":710
+    /* "MACS2/IO/BedGraph.pyx":711
  *                 vn.append(iter(vs[-1]).__next__)
  * 
  *             pre_p = 0                   # remember the previous position in the new bedGraphTrackI object ret             # <<<<<<<<<<<<<<
@@ -11869,7 +12148,7 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_36overlie(struct
  */
     __pyx_v_pre_p = 0;
 
-    /* "MACS2/IO/BedGraph.pyx":711
+    /* "MACS2/IO/BedGraph.pyx":712
  * 
  *             pre_p = 0                   # remember the previous position in the new bedGraphTrackI object ret
  *             try:             # <<<<<<<<<<<<<<
@@ -11885,7 +12164,7 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_36overlie(struct
       __Pyx_XGOTREF(__pyx_t_16);
       /*try:*/ {
 
-        /* "MACS2/IO/BedGraph.pyx":712
+        /* "MACS2/IO/BedGraph.pyx":713
  *             pre_p = 0                   # remember the previous position in the new bedGraphTrackI object ret
  *             try:
  *                 ps_cur = [pn[i]() for i in range(len(pn))]             # <<<<<<<<<<<<<<
@@ -11893,51 +12172,13 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_36overlie(struct
  * 
  */
         { /* enter inner scope */
-          __pyx_t_8 = PyList_New(0); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 712, __pyx_L14_error)
-          __Pyx_GOTREF(__pyx_t_8);
-          __pyx_t_10 = PyList_GET_SIZE(__pyx_v_pn); if (unlikely(__pyx_t_10 == ((Py_ssize_t)-1))) __PYX_ERR(0, 712, __pyx_L14_error)
-          __pyx_t_11 = __pyx_t_10;
-          for (__pyx_t_12 = 0; __pyx_t_12 < __pyx_t_11; __pyx_t_12+=1) {
-            __pyx_8genexpr3__pyx_v_i = __pyx_t_12;
-            __pyx_t_2 = __Pyx_GetItemInt_List(__pyx_v_pn, __pyx_8genexpr3__pyx_v_i, Py_ssize_t, 1, PyInt_FromSsize_t, 1, 1, 1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 712, __pyx_L14_error)
-            __Pyx_GOTREF(__pyx_t_2);
-            __pyx_t_7 = NULL;
-            if (CYTHON_UNPACK_METHODS && unlikely(PyMethod_Check(__pyx_t_2))) {
-              __pyx_t_7 = PyMethod_GET_SELF(__pyx_t_2);
-              if (likely(__pyx_t_7)) {
-                PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_2);
-                __Pyx_INCREF(__pyx_t_7);
-                __Pyx_INCREF(function);
-                __Pyx_DECREF_SET(__pyx_t_2, function);
-              }
-            }
-            __pyx_t_5 = (__pyx_t_7) ? __Pyx_PyObject_CallOneArg(__pyx_t_2, __pyx_t_7) : __Pyx_PyObject_CallNoArg(__pyx_t_2);
-            __Pyx_XDECREF(__pyx_t_7); __pyx_t_7 = 0;
-            if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 712, __pyx_L14_error)
-            __Pyx_GOTREF(__pyx_t_5);
-            __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-            if (unlikely(__Pyx_ListComp_Append(__pyx_t_8, (PyObject*)__pyx_t_5))) __PYX_ERR(0, 712, __pyx_L14_error)
-            __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
-          }
-        } /* exit inner scope */
-        __Pyx_XDECREF_SET(__pyx_v_ps_cur, ((PyObject*)__pyx_t_8));
-        __pyx_t_8 = 0;
-
-        /* "MACS2/IO/BedGraph.pyx":713
- *             try:
- *                 ps_cur = [pn[i]() for i in range(len(pn))]
- *                 vs_cur = [vn[i]() for i in range(len(pn))]             # <<<<<<<<<<<<<<
- * 
- *                 while True:
- */
-        { /* enter inner scope */
           __pyx_t_8 = PyList_New(0); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 713, __pyx_L14_error)
           __Pyx_GOTREF(__pyx_t_8);
           __pyx_t_10 = PyList_GET_SIZE(__pyx_v_pn); if (unlikely(__pyx_t_10 == ((Py_ssize_t)-1))) __PYX_ERR(0, 713, __pyx_L14_error)
           __pyx_t_11 = __pyx_t_10;
           for (__pyx_t_12 = 0; __pyx_t_12 < __pyx_t_11; __pyx_t_12+=1) {
-            __pyx_8genexpr4__pyx_v_i = __pyx_t_12;
-            __pyx_t_2 = __Pyx_GetItemInt_List(__pyx_v_vn, __pyx_8genexpr4__pyx_v_i, Py_ssize_t, 1, PyInt_FromSsize_t, 1, 1, 1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 713, __pyx_L14_error)
+            __pyx_8genexpr3__pyx_v_i = __pyx_t_12;
+            __pyx_t_2 = __Pyx_GetItemInt_List(__pyx_v_pn, __pyx_8genexpr3__pyx_v_i, Py_ssize_t, 1, PyInt_FromSsize_t, 1, 1, 1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 713, __pyx_L14_error)
             __Pyx_GOTREF(__pyx_t_2);
             __pyx_t_7 = NULL;
             if (CYTHON_UNPACK_METHODS && unlikely(PyMethod_Check(__pyx_t_2))) {
@@ -11958,10 +12199,48 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_36overlie(struct
             __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
           }
         } /* exit inner scope */
+        __Pyx_XDECREF_SET(__pyx_v_ps_cur, ((PyObject*)__pyx_t_8));
+        __pyx_t_8 = 0;
+
+        /* "MACS2/IO/BedGraph.pyx":714
+ *             try:
+ *                 ps_cur = [pn[i]() for i in range(len(pn))]
+ *                 vs_cur = [vn[i]() for i in range(len(pn))]             # <<<<<<<<<<<<<<
+ * 
+ *                 while True:
+ */
+        { /* enter inner scope */
+          __pyx_t_8 = PyList_New(0); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 714, __pyx_L14_error)
+          __Pyx_GOTREF(__pyx_t_8);
+          __pyx_t_10 = PyList_GET_SIZE(__pyx_v_pn); if (unlikely(__pyx_t_10 == ((Py_ssize_t)-1))) __PYX_ERR(0, 714, __pyx_L14_error)
+          __pyx_t_11 = __pyx_t_10;
+          for (__pyx_t_12 = 0; __pyx_t_12 < __pyx_t_11; __pyx_t_12+=1) {
+            __pyx_8genexpr4__pyx_v_i = __pyx_t_12;
+            __pyx_t_2 = __Pyx_GetItemInt_List(__pyx_v_vn, __pyx_8genexpr4__pyx_v_i, Py_ssize_t, 1, PyInt_FromSsize_t, 1, 1, 1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 714, __pyx_L14_error)
+            __Pyx_GOTREF(__pyx_t_2);
+            __pyx_t_7 = NULL;
+            if (CYTHON_UNPACK_METHODS && unlikely(PyMethod_Check(__pyx_t_2))) {
+              __pyx_t_7 = PyMethod_GET_SELF(__pyx_t_2);
+              if (likely(__pyx_t_7)) {
+                PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_2);
+                __Pyx_INCREF(__pyx_t_7);
+                __Pyx_INCREF(function);
+                __Pyx_DECREF_SET(__pyx_t_2, function);
+              }
+            }
+            __pyx_t_5 = (__pyx_t_7) ? __Pyx_PyObject_CallOneArg(__pyx_t_2, __pyx_t_7) : __Pyx_PyObject_CallNoArg(__pyx_t_2);
+            __Pyx_XDECREF(__pyx_t_7); __pyx_t_7 = 0;
+            if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 714, __pyx_L14_error)
+            __Pyx_GOTREF(__pyx_t_5);
+            __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
+            if (unlikely(__Pyx_ListComp_Append(__pyx_t_8, (PyObject*)__pyx_t_5))) __PYX_ERR(0, 714, __pyx_L14_error)
+            __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
+          }
+        } /* exit inner scope */
         __Pyx_XDECREF_SET(__pyx_v_vs_cur, ((PyObject*)__pyx_t_8));
         __pyx_t_8 = 0;
 
-        /* "MACS2/IO/BedGraph.pyx":715
+        /* "MACS2/IO/BedGraph.pyx":716
  *                 vs_cur = [vn[i]() for i in range(len(pn))]
  * 
  *                 while True:             # <<<<<<<<<<<<<<
@@ -11970,19 +12249,19 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_36overlie(struct
  */
         while (1) {
 
-          /* "MACS2/IO/BedGraph.pyx":717
+          /* "MACS2/IO/BedGraph.pyx":718
  *                 while True:
  *                     # get the lowest position
  *                     lowest_p = min(ps_cur)             # <<<<<<<<<<<<<<
  * 
  *                     # at least one lowest position, could be multiple
  */
-          __pyx_t_8 = __Pyx_PyObject_CallOneArg(__pyx_builtin_min, __pyx_v_ps_cur); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 717, __pyx_L14_error)
+          __pyx_t_8 = __Pyx_PyObject_CallOneArg(__pyx_builtin_min, __pyx_v_ps_cur); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 718, __pyx_L14_error)
           __Pyx_GOTREF(__pyx_t_8);
           __Pyx_XDECREF_SET(__pyx_v_lowest_p, __pyx_t_8);
           __pyx_t_8 = 0;
 
-          /* "MACS2/IO/BedGraph.pyx":720
+          /* "MACS2/IO/BedGraph.pyx":721
  * 
  *                     # at least one lowest position, could be multiple
  *                     locations = [i for i in range(len(ps_cur)) if ps_cur[i] == lowest_p]             # <<<<<<<<<<<<<<
@@ -11990,22 +12269,22 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_36overlie(struct
  *                     # add the data until the interval
  */
           { /* enter inner scope */
-            __pyx_t_8 = PyList_New(0); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 720, __pyx_L14_error)
+            __pyx_t_8 = PyList_New(0); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 721, __pyx_L14_error)
             __Pyx_GOTREF(__pyx_t_8);
-            __pyx_t_10 = PyList_GET_SIZE(__pyx_v_ps_cur); if (unlikely(__pyx_t_10 == ((Py_ssize_t)-1))) __PYX_ERR(0, 720, __pyx_L14_error)
+            __pyx_t_10 = PyList_GET_SIZE(__pyx_v_ps_cur); if (unlikely(__pyx_t_10 == ((Py_ssize_t)-1))) __PYX_ERR(0, 721, __pyx_L14_error)
             __pyx_t_11 = __pyx_t_10;
             for (__pyx_t_12 = 0; __pyx_t_12 < __pyx_t_11; __pyx_t_12+=1) {
               __pyx_8genexpr5__pyx_v_i = __pyx_t_12;
-              __pyx_t_5 = __Pyx_GetItemInt_List(__pyx_v_ps_cur, __pyx_8genexpr5__pyx_v_i, Py_ssize_t, 1, PyInt_FromSsize_t, 1, 1, 1); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 720, __pyx_L14_error)
+              __pyx_t_5 = __Pyx_GetItemInt_List(__pyx_v_ps_cur, __pyx_8genexpr5__pyx_v_i, Py_ssize_t, 1, PyInt_FromSsize_t, 1, 1, 1); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 721, __pyx_L14_error)
               __Pyx_GOTREF(__pyx_t_5);
-              __pyx_t_2 = PyObject_RichCompare(__pyx_t_5, __pyx_v_lowest_p, Py_EQ); __Pyx_XGOTREF(__pyx_t_2); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 720, __pyx_L14_error)
+              __pyx_t_2 = PyObject_RichCompare(__pyx_t_5, __pyx_v_lowest_p, Py_EQ); __Pyx_XGOTREF(__pyx_t_2); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 721, __pyx_L14_error)
               __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
-              __pyx_t_6 = __Pyx_PyObject_IsTrue(__pyx_t_2); if (unlikely(__pyx_t_6 < 0)) __PYX_ERR(0, 720, __pyx_L14_error)
+              __pyx_t_6 = __Pyx_PyObject_IsTrue(__pyx_t_2); if (unlikely(__pyx_t_6 < 0)) __PYX_ERR(0, 721, __pyx_L14_error)
               __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
               if (__pyx_t_6) {
-                __pyx_t_2 = PyInt_FromSsize_t(__pyx_8genexpr5__pyx_v_i); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 720, __pyx_L14_error)
+                __pyx_t_2 = PyInt_FromSsize_t(__pyx_8genexpr5__pyx_v_i); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 721, __pyx_L14_error)
                 __Pyx_GOTREF(__pyx_t_2);
-                if (unlikely(__Pyx_ListComp_Append(__pyx_t_8, (PyObject*)__pyx_t_2))) __PYX_ERR(0, 720, __pyx_L14_error)
+                if (unlikely(__Pyx_ListComp_Append(__pyx_t_8, (PyObject*)__pyx_t_2))) __PYX_ERR(0, 721, __pyx_L14_error)
                 __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
               }
             }
@@ -12013,48 +12292,48 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_36overlie(struct
           __Pyx_XDECREF_SET(__pyx_v_locations, ((PyObject*)__pyx_t_8));
           __pyx_t_8 = 0;
 
-          /* "MACS2/IO/BedGraph.pyx":723
+          /* "MACS2/IO/BedGraph.pyx":724
  * 
  *                     # add the data until the interval
  *                     ret.add_loc(chrom, pre_p, ps_cur[locations[0]], f(*vs_cur))             # <<<<<<<<<<<<<<
  * 
  *                     pre_p = ps_cur[locations[0]]
  */
-          __pyx_t_8 = __Pyx_GetItemInt_List(__pyx_v_locations, 0, long, 1, __Pyx_PyInt_From_long, 1, 0, 1); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 723, __pyx_L14_error)
+          __pyx_t_8 = __Pyx_GetItemInt_List(__pyx_v_locations, 0, long, 1, __Pyx_PyInt_From_long, 1, 0, 1); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 724, __pyx_L14_error)
           __Pyx_GOTREF(__pyx_t_8);
-          __pyx_t_2 = __Pyx_PyObject_GetItem(__pyx_v_ps_cur, __pyx_t_8); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 723, __pyx_L14_error)
+          __pyx_t_2 = __Pyx_PyObject_GetItem(__pyx_v_ps_cur, __pyx_t_8); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 724, __pyx_L14_error)
           __Pyx_GOTREF(__pyx_t_2);
           __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
-          __pyx_t_17 = __Pyx_PyInt_As_int(__pyx_t_2); if (unlikely((__pyx_t_17 == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 723, __pyx_L14_error)
+          __pyx_t_17 = __Pyx_PyInt_As_int(__pyx_t_2); if (unlikely((__pyx_t_17 == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 724, __pyx_L14_error)
           __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-          __pyx_t_2 = PySequence_Tuple(__pyx_v_vs_cur); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 723, __pyx_L14_error)
+          __pyx_t_2 = PySequence_Tuple(__pyx_v_vs_cur); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 724, __pyx_L14_error)
           __Pyx_GOTREF(__pyx_t_2);
-          __pyx_t_8 = __Pyx_PyObject_Call(__pyx_v_f, __pyx_t_2, NULL); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 723, __pyx_L14_error)
+          __pyx_t_8 = __Pyx_PyObject_Call(__pyx_v_f, __pyx_t_2, NULL); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 724, __pyx_L14_error)
           __Pyx_GOTREF(__pyx_t_8);
           __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-          __pyx_t_18 = __pyx_PyFloat_AsFloat(__pyx_t_8); if (unlikely((__pyx_t_18 == (float)-1) && PyErr_Occurred())) __PYX_ERR(0, 723, __pyx_L14_error)
+          __pyx_t_18 = __pyx_PyFloat_AsFloat(__pyx_t_8); if (unlikely((__pyx_t_18 == (float)-1) && PyErr_Occurred())) __PYX_ERR(0, 724, __pyx_L14_error)
           __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
-          __pyx_t_8 = ((struct __pyx_vtabstruct_5MACS2_2IO_8BedGraph_bedGraphTrackI *)__pyx_v_ret->__pyx_vtab)->add_loc(__pyx_v_ret, __pyx_v_chrom, __pyx_v_pre_p, __pyx_t_17, __pyx_t_18, 0); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 723, __pyx_L14_error)
+          __pyx_t_8 = ((struct __pyx_vtabstruct_5MACS2_2IO_8BedGraph_bedGraphTrackI *)__pyx_v_ret->__pyx_vtab)->add_loc(__pyx_v_ret, __pyx_v_chrom, __pyx_v_pre_p, __pyx_t_17, __pyx_t_18, 0); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 724, __pyx_L14_error)
           __Pyx_GOTREF(__pyx_t_8);
           __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
 
-          /* "MACS2/IO/BedGraph.pyx":725
+          /* "MACS2/IO/BedGraph.pyx":726
  *                     ret.add_loc(chrom, pre_p, ps_cur[locations[0]], f(*vs_cur))
  * 
  *                     pre_p = ps_cur[locations[0]]             # <<<<<<<<<<<<<<
  *                     for index in locations:
  *                         ps_cur[index] = pn[index]()
  */
-          __pyx_t_8 = __Pyx_GetItemInt_List(__pyx_v_locations, 0, long, 1, __Pyx_PyInt_From_long, 1, 0, 1); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 725, __pyx_L14_error)
+          __pyx_t_8 = __Pyx_GetItemInt_List(__pyx_v_locations, 0, long, 1, __Pyx_PyInt_From_long, 1, 0, 1); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 726, __pyx_L14_error)
           __Pyx_GOTREF(__pyx_t_8);
-          __pyx_t_2 = __Pyx_PyObject_GetItem(__pyx_v_ps_cur, __pyx_t_8); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 725, __pyx_L14_error)
+          __pyx_t_2 = __Pyx_PyObject_GetItem(__pyx_v_ps_cur, __pyx_t_8); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 726, __pyx_L14_error)
           __Pyx_GOTREF(__pyx_t_2);
           __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
-          __pyx_t_17 = __Pyx_PyInt_As_int(__pyx_t_2); if (unlikely((__pyx_t_17 == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 725, __pyx_L14_error)
+          __pyx_t_17 = __Pyx_PyInt_As_int(__pyx_t_2); if (unlikely((__pyx_t_17 == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 726, __pyx_L14_error)
           __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
           __pyx_v_pre_p = __pyx_t_17;
 
-          /* "MACS2/IO/BedGraph.pyx":726
+          /* "MACS2/IO/BedGraph.pyx":727
  * 
  *                     pre_p = ps_cur[locations[0]]
  *                     for index in locations:             # <<<<<<<<<<<<<<
@@ -12065,49 +12344,22 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_36overlie(struct
           for (;;) {
             if (__pyx_t_10 >= PyList_GET_SIZE(__pyx_t_2)) break;
             #if CYTHON_ASSUME_SAFE_MACROS && !CYTHON_AVOID_BORROWED_REFS
-            __pyx_t_8 = PyList_GET_ITEM(__pyx_t_2, __pyx_t_10); __Pyx_INCREF(__pyx_t_8); __pyx_t_10++; if (unlikely(0 < 0)) __PYX_ERR(0, 726, __pyx_L14_error)
+            __pyx_t_8 = PyList_GET_ITEM(__pyx_t_2, __pyx_t_10); __Pyx_INCREF(__pyx_t_8); __pyx_t_10++; if (unlikely(0 < 0)) __PYX_ERR(0, 727, __pyx_L14_error)
             #else
-            __pyx_t_8 = PySequence_ITEM(__pyx_t_2, __pyx_t_10); __pyx_t_10++; if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 726, __pyx_L14_error)
+            __pyx_t_8 = PySequence_ITEM(__pyx_t_2, __pyx_t_10); __pyx_t_10++; if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 727, __pyx_L14_error)
             __Pyx_GOTREF(__pyx_t_8);
             #endif
             __Pyx_XDECREF_SET(__pyx_v_index, __pyx_t_8);
             __pyx_t_8 = 0;
 
-            /* "MACS2/IO/BedGraph.pyx":727
+            /* "MACS2/IO/BedGraph.pyx":728
  *                     pre_p = ps_cur[locations[0]]
  *                     for index in locations:
  *                         ps_cur[index] = pn[index]()             # <<<<<<<<<<<<<<
  *                         vs_cur[index] = vn[index]()
  *             except StopIteration:
  */
-            __pyx_t_5 = __Pyx_PyObject_GetItem(__pyx_v_pn, __pyx_v_index); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 727, __pyx_L14_error)
-            __Pyx_GOTREF(__pyx_t_5);
-            __pyx_t_7 = NULL;
-            if (CYTHON_UNPACK_METHODS && unlikely(PyMethod_Check(__pyx_t_5))) {
-              __pyx_t_7 = PyMethod_GET_SELF(__pyx_t_5);
-              if (likely(__pyx_t_7)) {
-                PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_5);
-                __Pyx_INCREF(__pyx_t_7);
-                __Pyx_INCREF(function);
-                __Pyx_DECREF_SET(__pyx_t_5, function);
-              }
-            }
-            __pyx_t_8 = (__pyx_t_7) ? __Pyx_PyObject_CallOneArg(__pyx_t_5, __pyx_t_7) : __Pyx_PyObject_CallNoArg(__pyx_t_5);
-            __Pyx_XDECREF(__pyx_t_7); __pyx_t_7 = 0;
-            if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 727, __pyx_L14_error)
-            __Pyx_GOTREF(__pyx_t_8);
-            __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
-            if (unlikely(PyObject_SetItem(__pyx_v_ps_cur, __pyx_v_index, __pyx_t_8) < 0)) __PYX_ERR(0, 727, __pyx_L14_error)
-            __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
-
-            /* "MACS2/IO/BedGraph.pyx":728
- *                     for index in locations:
- *                         ps_cur[index] = pn[index]()
- *                         vs_cur[index] = vn[index]()             # <<<<<<<<<<<<<<
- *             except StopIteration:
- *                 # meet the end of either bedGraphTrackI, simply exit
- */
-            __pyx_t_5 = __Pyx_PyObject_GetItem(__pyx_v_vn, __pyx_v_index); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 728, __pyx_L14_error)
+            __pyx_t_5 = __Pyx_PyObject_GetItem(__pyx_v_pn, __pyx_v_index); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 728, __pyx_L14_error)
             __Pyx_GOTREF(__pyx_t_5);
             __pyx_t_7 = NULL;
             if (CYTHON_UNPACK_METHODS && unlikely(PyMethod_Check(__pyx_t_5))) {
@@ -12124,10 +12376,37 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_36overlie(struct
             if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 728, __pyx_L14_error)
             __Pyx_GOTREF(__pyx_t_8);
             __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
-            if (unlikely(PyObject_SetItem(__pyx_v_vs_cur, __pyx_v_index, __pyx_t_8) < 0)) __PYX_ERR(0, 728, __pyx_L14_error)
+            if (unlikely(PyObject_SetItem(__pyx_v_ps_cur, __pyx_v_index, __pyx_t_8) < 0)) __PYX_ERR(0, 728, __pyx_L14_error)
             __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
 
-            /* "MACS2/IO/BedGraph.pyx":726
+            /* "MACS2/IO/BedGraph.pyx":729
+ *                     for index in locations:
+ *                         ps_cur[index] = pn[index]()
+ *                         vs_cur[index] = vn[index]()             # <<<<<<<<<<<<<<
+ *             except StopIteration:
+ *                 # meet the end of either bedGraphTrackI, simply exit
+ */
+            __pyx_t_5 = __Pyx_PyObject_GetItem(__pyx_v_vn, __pyx_v_index); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 729, __pyx_L14_error)
+            __Pyx_GOTREF(__pyx_t_5);
+            __pyx_t_7 = NULL;
+            if (CYTHON_UNPACK_METHODS && unlikely(PyMethod_Check(__pyx_t_5))) {
+              __pyx_t_7 = PyMethod_GET_SELF(__pyx_t_5);
+              if (likely(__pyx_t_7)) {
+                PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_5);
+                __Pyx_INCREF(__pyx_t_7);
+                __Pyx_INCREF(function);
+                __Pyx_DECREF_SET(__pyx_t_5, function);
+              }
+            }
+            __pyx_t_8 = (__pyx_t_7) ? __Pyx_PyObject_CallOneArg(__pyx_t_5, __pyx_t_7) : __Pyx_PyObject_CallNoArg(__pyx_t_5);
+            __Pyx_XDECREF(__pyx_t_7); __pyx_t_7 = 0;
+            if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 729, __pyx_L14_error)
+            __Pyx_GOTREF(__pyx_t_8);
+            __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
+            if (unlikely(PyObject_SetItem(__pyx_v_vs_cur, __pyx_v_index, __pyx_t_8) < 0)) __PYX_ERR(0, 729, __pyx_L14_error)
+            __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
+
+            /* "MACS2/IO/BedGraph.pyx":727
  * 
  *                     pre_p = ps_cur[locations[0]]
  *                     for index in locations:             # <<<<<<<<<<<<<<
@@ -12138,7 +12417,7 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_36overlie(struct
           __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
         }
 
-        /* "MACS2/IO/BedGraph.pyx":711
+        /* "MACS2/IO/BedGraph.pyx":712
  * 
  *             pre_p = 0                   # remember the previous position in the new bedGraphTrackI object ret
  *             try:             # <<<<<<<<<<<<<<
@@ -12157,7 +12436,7 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_36overlie(struct
       __Pyx_XDECREF(__pyx_t_8); __pyx_t_8 = 0;
       __Pyx_XDECREF(__pyx_t_9); __pyx_t_9 = 0;
 
-      /* "MACS2/IO/BedGraph.pyx":729
+      /* "MACS2/IO/BedGraph.pyx":730
  *                         ps_cur[index] = pn[index]()
  *                         vs_cur[index] = vn[index]()
  *             except StopIteration:             # <<<<<<<<<<<<<<
@@ -12172,7 +12451,7 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_36overlie(struct
       goto __pyx_L16_except_error;
       __pyx_L16_except_error:;
 
-      /* "MACS2/IO/BedGraph.pyx":711
+      /* "MACS2/IO/BedGraph.pyx":712
  * 
  *             pre_p = 0                   # remember the previous position in the new bedGraphTrackI object ret
  *             try:             # <<<<<<<<<<<<<<
@@ -12192,7 +12471,7 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_36overlie(struct
       __pyx_L21_try_end:;
     }
 
-    /* "MACS2/IO/BedGraph.pyx":699
+    /* "MACS2/IO/BedGraph.pyx":700
  *             common_chr = common_chr.intersection(set(track.get_chr_names()))
  * 
  *         for chrom in common_chr:             # <<<<<<<<<<<<<<
@@ -12202,7 +12481,7 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_36overlie(struct
   }
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
 
-  /* "MACS2/IO/BedGraph.pyx":732
+  /* "MACS2/IO/BedGraph.pyx":733
  *                 # meet the end of either bedGraphTrackI, simply exit
  *                 pass
  *         return ret             # <<<<<<<<<<<<<<
@@ -12214,7 +12493,7 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_36overlie(struct
   __pyx_r = ((PyObject *)__pyx_v_ret);
   goto __pyx_L0;
 
-  /* "MACS2/IO/BedGraph.pyx":636
+  /* "MACS2/IO/BedGraph.pyx":637
  *         return ret
  * 
  *     def overlie (self, bdgTracks, func="max" ):             # <<<<<<<<<<<<<<
@@ -12254,11 +12533,12 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_36overlie(struct
   __Pyx_XDECREF(__pyx_v_index);
   __Pyx_DECREF(((PyObject *)__pyx_cur_scope));
   __Pyx_XGIVEREF(__pyx_r);
+  __Pyx_TraceReturn(__pyx_r, 0);
   __Pyx_RefNannyFinishContext();
   return __pyx_r;
 }
 
-/* "MACS2/IO/BedGraph.pyx":734
+/* "MACS2/IO/BedGraph.pyx":735
  *         return ret
  * 
  *     def apply_func ( self, func ):             # <<<<<<<<<<<<<<
@@ -12285,6 +12565,7 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_38apply_func(str
   CYTHON_UNUSED PyObject *__pyx_v_p = NULL;
   PyObject *__pyx_v_s = NULL;
   PyObject *__pyx_r = NULL;
+  __Pyx_TraceDeclarations
   __Pyx_RefNannyDeclarations
   PyObject *__pyx_t_1 = NULL;
   Py_ssize_t __pyx_t_2;
@@ -12300,8 +12581,9 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_38apply_func(str
   Py_ssize_t __pyx_t_12;
   double __pyx_t_13;
   __Pyx_RefNannySetupContext("apply_func", 0);
+  __Pyx_TraceCall("apply_func", __pyx_f[0], 735, 0, __PYX_ERR(0, 735, __pyx_L1_error));
 
-  /* "MACS2/IO/BedGraph.pyx":742
+  /* "MACS2/IO/BedGraph.pyx":743
  *         cdef int i
  * 
  *         for (p,s) in self.__data.values():             # <<<<<<<<<<<<<<
@@ -12311,9 +12593,9 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_38apply_func(str
   __pyx_t_2 = 0;
   if (unlikely(__pyx_v_self->__pyx___data == Py_None)) {
     PyErr_Format(PyExc_AttributeError, "'NoneType' object has no attribute '%.30s'", "values");
-    __PYX_ERR(0, 742, __pyx_L1_error)
+    __PYX_ERR(0, 743, __pyx_L1_error)
   }
-  __pyx_t_5 = __Pyx_dict_iterator(__pyx_v_self->__pyx___data, 1, __pyx_n_s_values, (&__pyx_t_3), (&__pyx_t_4)); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 742, __pyx_L1_error)
+  __pyx_t_5 = __Pyx_dict_iterator(__pyx_v_self->__pyx___data, 1, __pyx_n_s_values, (&__pyx_t_3), (&__pyx_t_4)); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 743, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_5);
   __Pyx_XDECREF(__pyx_t_1);
   __pyx_t_1 = __pyx_t_5;
@@ -12321,7 +12603,7 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_38apply_func(str
   while (1) {
     __pyx_t_6 = __Pyx_dict_iter_next(__pyx_t_1, __pyx_t_3, &__pyx_t_2, NULL, &__pyx_t_5, NULL, __pyx_t_4);
     if (unlikely(__pyx_t_6 == 0)) break;
-    if (unlikely(__pyx_t_6 == -1)) __PYX_ERR(0, 742, __pyx_L1_error)
+    if (unlikely(__pyx_t_6 == -1)) __PYX_ERR(0, 743, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_5);
     if ((likely(PyTuple_CheckExact(__pyx_t_5))) || (PyList_CheckExact(__pyx_t_5))) {
       PyObject* sequence = __pyx_t_5;
@@ -12329,7 +12611,7 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_38apply_func(str
       if (unlikely(size != 2)) {
         if (size > 2) __Pyx_RaiseTooManyValuesError(2);
         else if (size >= 0) __Pyx_RaiseNeedMoreValuesError(size);
-        __PYX_ERR(0, 742, __pyx_L1_error)
+        __PYX_ERR(0, 743, __pyx_L1_error)
       }
       #if CYTHON_ASSUME_SAFE_MACROS && !CYTHON_AVOID_BORROWED_REFS
       if (likely(PyTuple_CheckExact(sequence))) {
@@ -12342,15 +12624,15 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_38apply_func(str
       __Pyx_INCREF(__pyx_t_7);
       __Pyx_INCREF(__pyx_t_8);
       #else
-      __pyx_t_7 = PySequence_ITEM(sequence, 0); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 742, __pyx_L1_error)
+      __pyx_t_7 = PySequence_ITEM(sequence, 0); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 743, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_7);
-      __pyx_t_8 = PySequence_ITEM(sequence, 1); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 742, __pyx_L1_error)
+      __pyx_t_8 = PySequence_ITEM(sequence, 1); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 743, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_8);
       #endif
       __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
     } else {
       Py_ssize_t index = -1;
-      __pyx_t_9 = PyObject_GetIter(__pyx_t_5); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 742, __pyx_L1_error)
+      __pyx_t_9 = PyObject_GetIter(__pyx_t_5); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 743, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_9);
       __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
       __pyx_t_10 = Py_TYPE(__pyx_t_9)->tp_iternext;
@@ -12358,7 +12640,7 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_38apply_func(str
       __Pyx_GOTREF(__pyx_t_7);
       index = 1; __pyx_t_8 = __pyx_t_10(__pyx_t_9); if (unlikely(!__pyx_t_8)) goto __pyx_L5_unpacking_failed;
       __Pyx_GOTREF(__pyx_t_8);
-      if (__Pyx_IternextUnpackEndCheck(__pyx_t_10(__pyx_t_9), 2) < 0) __PYX_ERR(0, 742, __pyx_L1_error)
+      if (__Pyx_IternextUnpackEndCheck(__pyx_t_10(__pyx_t_9), 2) < 0) __PYX_ERR(0, 743, __pyx_L1_error)
       __pyx_t_10 = NULL;
       __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
       goto __pyx_L6_unpacking_done;
@@ -12366,7 +12648,7 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_38apply_func(str
       __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
       __pyx_t_10 = NULL;
       if (__Pyx_IterFinish() == 0) __Pyx_RaiseNeedMoreValuesError(index);
-      __PYX_ERR(0, 742, __pyx_L1_error)
+      __PYX_ERR(0, 743, __pyx_L1_error)
       __pyx_L6_unpacking_done:;
     }
     __Pyx_XDECREF_SET(__pyx_v_p, __pyx_t_7);
@@ -12374,26 +12656,26 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_38apply_func(str
     __Pyx_XDECREF_SET(__pyx_v_s, __pyx_t_8);
     __pyx_t_8 = 0;
 
-    /* "MACS2/IO/BedGraph.pyx":743
+    /* "MACS2/IO/BedGraph.pyx":744
  * 
  *         for (p,s) in self.__data.values():
  *             for i in xrange(len(s)):             # <<<<<<<<<<<<<<
  *                 s[i] = func(s[i])
  *         self.maxvalue = func(self.maxvalue)
  */
-    __pyx_t_11 = PyObject_Length(__pyx_v_s); if (unlikely(__pyx_t_11 == ((Py_ssize_t)-1))) __PYX_ERR(0, 743, __pyx_L1_error)
+    __pyx_t_11 = PyObject_Length(__pyx_v_s); if (unlikely(__pyx_t_11 == ((Py_ssize_t)-1))) __PYX_ERR(0, 744, __pyx_L1_error)
     __pyx_t_12 = __pyx_t_11;
     for (__pyx_t_6 = 0; __pyx_t_6 < __pyx_t_12; __pyx_t_6+=1) {
       __pyx_v_i = __pyx_t_6;
 
-      /* "MACS2/IO/BedGraph.pyx":744
+      /* "MACS2/IO/BedGraph.pyx":745
  *         for (p,s) in self.__data.values():
  *             for i in xrange(len(s)):
  *                 s[i] = func(s[i])             # <<<<<<<<<<<<<<
  *         self.maxvalue = func(self.maxvalue)
  *         self.minvalue = func(self.minvalue)
  */
-      __pyx_t_8 = __Pyx_GetItemInt(__pyx_v_s, __pyx_v_i, int, 1, __Pyx_PyInt_From_int, 0, 1, 1); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 744, __pyx_L1_error)
+      __pyx_t_8 = __Pyx_GetItemInt(__pyx_v_s, __pyx_v_i, int, 1, __Pyx_PyInt_From_int, 0, 1, 1); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 745, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_8);
       __Pyx_INCREF(__pyx_v_func);
       __pyx_t_7 = __pyx_v_func; __pyx_t_9 = NULL;
@@ -12409,23 +12691,23 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_38apply_func(str
       __pyx_t_5 = (__pyx_t_9) ? __Pyx_PyObject_Call2Args(__pyx_t_7, __pyx_t_9, __pyx_t_8) : __Pyx_PyObject_CallOneArg(__pyx_t_7, __pyx_t_8);
       __Pyx_XDECREF(__pyx_t_9); __pyx_t_9 = 0;
       __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
-      if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 744, __pyx_L1_error)
+      if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 745, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_5);
       __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
-      if (unlikely(__Pyx_SetItemInt(__pyx_v_s, __pyx_v_i, __pyx_t_5, int, 1, __Pyx_PyInt_From_int, 0, 1, 1) < 0)) __PYX_ERR(0, 744, __pyx_L1_error)
+      if (unlikely(__Pyx_SetItemInt(__pyx_v_s, __pyx_v_i, __pyx_t_5, int, 1, __Pyx_PyInt_From_int, 0, 1, 1) < 0)) __PYX_ERR(0, 745, __pyx_L1_error)
       __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
     }
   }
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-  /* "MACS2/IO/BedGraph.pyx":745
+  /* "MACS2/IO/BedGraph.pyx":746
  *             for i in xrange(len(s)):
  *                 s[i] = func(s[i])
  *         self.maxvalue = func(self.maxvalue)             # <<<<<<<<<<<<<<
  *         self.minvalue = func(self.minvalue)
  *         return True
  */
-  __pyx_t_5 = PyFloat_FromDouble(__pyx_v_self->maxvalue); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 745, __pyx_L1_error)
+  __pyx_t_5 = PyFloat_FromDouble(__pyx_v_self->maxvalue); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 746, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_5);
   __Pyx_INCREF(__pyx_v_func);
   __pyx_t_7 = __pyx_v_func; __pyx_t_8 = NULL;
@@ -12441,21 +12723,21 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_38apply_func(str
   __pyx_t_1 = (__pyx_t_8) ? __Pyx_PyObject_Call2Args(__pyx_t_7, __pyx_t_8, __pyx_t_5) : __Pyx_PyObject_CallOneArg(__pyx_t_7, __pyx_t_5);
   __Pyx_XDECREF(__pyx_t_8); __pyx_t_8 = 0;
   __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
-  if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 745, __pyx_L1_error)
+  if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 746, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
-  __pyx_t_13 = __pyx_PyFloat_AsDouble(__pyx_t_1); if (unlikely((__pyx_t_13 == (double)-1) && PyErr_Occurred())) __PYX_ERR(0, 745, __pyx_L1_error)
+  __pyx_t_13 = __pyx_PyFloat_AsDouble(__pyx_t_1); if (unlikely((__pyx_t_13 == (double)-1) && PyErr_Occurred())) __PYX_ERR(0, 746, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   __pyx_v_self->maxvalue = __pyx_t_13;
 
-  /* "MACS2/IO/BedGraph.pyx":746
+  /* "MACS2/IO/BedGraph.pyx":747
  *                 s[i] = func(s[i])
  *         self.maxvalue = func(self.maxvalue)
  *         self.minvalue = func(self.minvalue)             # <<<<<<<<<<<<<<
  *         return True
  * 
  */
-  __pyx_t_7 = PyFloat_FromDouble(__pyx_v_self->minvalue); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 746, __pyx_L1_error)
+  __pyx_t_7 = PyFloat_FromDouble(__pyx_v_self->minvalue); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 747, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_7);
   __Pyx_INCREF(__pyx_v_func);
   __pyx_t_5 = __pyx_v_func; __pyx_t_8 = NULL;
@@ -12471,14 +12753,14 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_38apply_func(str
   __pyx_t_1 = (__pyx_t_8) ? __Pyx_PyObject_Call2Args(__pyx_t_5, __pyx_t_8, __pyx_t_7) : __Pyx_PyObject_CallOneArg(__pyx_t_5, __pyx_t_7);
   __Pyx_XDECREF(__pyx_t_8); __pyx_t_8 = 0;
   __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
-  if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 746, __pyx_L1_error)
+  if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 747, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
-  __pyx_t_13 = __pyx_PyFloat_AsDouble(__pyx_t_1); if (unlikely((__pyx_t_13 == (double)-1) && PyErr_Occurred())) __PYX_ERR(0, 746, __pyx_L1_error)
+  __pyx_t_13 = __pyx_PyFloat_AsDouble(__pyx_t_1); if (unlikely((__pyx_t_13 == (double)-1) && PyErr_Occurred())) __PYX_ERR(0, 747, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   __pyx_v_self->minvalue = __pyx_t_13;
 
-  /* "MACS2/IO/BedGraph.pyx":747
+  /* "MACS2/IO/BedGraph.pyx":748
  *         self.maxvalue = func(self.maxvalue)
  *         self.minvalue = func(self.minvalue)
  *         return True             # <<<<<<<<<<<<<<
@@ -12490,7 +12772,7 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_38apply_func(str
   __pyx_r = Py_True;
   goto __pyx_L0;
 
-  /* "MACS2/IO/BedGraph.pyx":734
+  /* "MACS2/IO/BedGraph.pyx":735
  *         return ret
  * 
  *     def apply_func ( self, func ):             # <<<<<<<<<<<<<<
@@ -12511,11 +12793,12 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_38apply_func(str
   __Pyx_XDECREF(__pyx_v_p);
   __Pyx_XDECREF(__pyx_v_s);
   __Pyx_XGIVEREF(__pyx_r);
+  __Pyx_TraceReturn(__pyx_r, 0);
   __Pyx_RefNannyFinishContext();
   return __pyx_r;
 }
 
-/* "MACS2/IO/BedGraph.pyx":749
+/* "MACS2/IO/BedGraph.pyx":750
  *         return True
  * 
  *     def p2q ( self ):             # <<<<<<<<<<<<<<
@@ -12564,6 +12847,7 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_40p2q(struct __p
   PyObject *__pyx_v_vn = NULL;
   CYTHON_UNUSED long __pyx_v_nhval;
   PyObject *__pyx_r = NULL;
+  __Pyx_TraceDeclarations
   __Pyx_RefNannyDeclarations
   PyObject *__pyx_t_1 = NULL;
   Py_ssize_t __pyx_t_2;
@@ -12585,32 +12869,33 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_40p2q(struct __p
   double __pyx_t_18;
   double __pyx_t_19;
   __Pyx_RefNannySetupContext("p2q", 0);
+  __Pyx_TraceCall("p2q", __pyx_f[0], 750, 0, __PYX_ERR(0, 750, __pyx_L1_error));
 
-  /* "MACS2/IO/BedGraph.pyx":758
+  /* "MACS2/IO/BedGraph.pyx":759
  *             bytes chrom
  *             object pos_array, pscore_array
  *             dict pvalue_stat = {}             # <<<<<<<<<<<<<<
  *             dict pqtable = {}
  *             long n, pre_p, this_p, length, j, pre_l, l, i
  */
-  __pyx_t_1 = __Pyx_PyDict_NewPresized(0); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 758, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyDict_NewPresized(0); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 759, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __pyx_v_pvalue_stat = ((PyObject*)__pyx_t_1);
   __pyx_t_1 = 0;
 
-  /* "MACS2/IO/BedGraph.pyx":759
+  /* "MACS2/IO/BedGraph.pyx":760
  *             object pos_array, pscore_array
  *             dict pvalue_stat = {}
  *             dict pqtable = {}             # <<<<<<<<<<<<<<
  *             long n, pre_p, this_p, length, j, pre_l, l, i
  *             double this_v, pre_v, v, q, pre_q, this_t, this_c
  */
-  __pyx_t_1 = __Pyx_PyDict_NewPresized(0); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 759, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyDict_NewPresized(0); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 760, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __pyx_v_pqtable = ((PyObject*)__pyx_t_1);
   __pyx_t_1 = 0;
 
-  /* "MACS2/IO/BedGraph.pyx":764
+  /* "MACS2/IO/BedGraph.pyx":765
  *             long N, k, this_l
  *             double f
  *             long nhcal = 0             # <<<<<<<<<<<<<<
@@ -12619,7 +12904,7 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_40p2q(struct __p
  */
   __pyx_v_nhcal = 0;
 
-  /* "MACS2/IO/BedGraph.pyx":765
+  /* "MACS2/IO/BedGraph.pyx":766
  *             double f
  *             long nhcal = 0
  *             long npcal = 0             # <<<<<<<<<<<<<<
@@ -12628,7 +12913,7 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_40p2q(struct __p
  */
   __pyx_v_npcal = 0;
 
-  /* "MACS2/IO/BedGraph.pyx":770
+  /* "MACS2/IO/BedGraph.pyx":771
  * 
  *         # calculate frequencies of each p-score
  *         for chrom in self.get_chr_names():             # <<<<<<<<<<<<<<
@@ -12636,9 +12921,9 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_40p2q(struct __p
  * 
  */
   __pyx_t_2 = 0;
-  __pyx_t_5 = ((struct __pyx_vtabstruct_5MACS2_2IO_8BedGraph_bedGraphTrackI *)__pyx_v_self->__pyx_vtab)->get_chr_names(__pyx_v_self, 0); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 770, __pyx_L1_error)
+  __pyx_t_5 = ((struct __pyx_vtabstruct_5MACS2_2IO_8BedGraph_bedGraphTrackI *)__pyx_v_self->__pyx_vtab)->get_chr_names(__pyx_v_self, 0); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 771, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_5);
-  __pyx_t_6 = __Pyx_set_iterator(__pyx_t_5, 1, (&__pyx_t_3), (&__pyx_t_4)); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 770, __pyx_L1_error)
+  __pyx_t_6 = __Pyx_set_iterator(__pyx_t_5, 1, (&__pyx_t_3), (&__pyx_t_4)); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 771, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_6);
   __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
   __Pyx_XDECREF(__pyx_t_1);
@@ -12647,13 +12932,13 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_40p2q(struct __p
   while (1) {
     __pyx_t_7 = __Pyx_set_iter_next(__pyx_t_1, __pyx_t_3, &__pyx_t_2, &__pyx_t_6, __pyx_t_4);
     if (unlikely(__pyx_t_7 == 0)) break;
-    if (unlikely(__pyx_t_7 == -1)) __PYX_ERR(0, 770, __pyx_L1_error)
+    if (unlikely(__pyx_t_7 == -1)) __PYX_ERR(0, 771, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_6);
-    if (!(likely(PyBytes_CheckExact(__pyx_t_6))||((__pyx_t_6) == Py_None)||(PyErr_Format(PyExc_TypeError, "Expected %.16s, got %.200s", "bytes", Py_TYPE(__pyx_t_6)->tp_name), 0))) __PYX_ERR(0, 770, __pyx_L1_error)
+    if (!(likely(PyBytes_CheckExact(__pyx_t_6))||((__pyx_t_6) == Py_None)||(PyErr_Format(PyExc_TypeError, "Expected %.16s, got %.200s", "bytes", Py_TYPE(__pyx_t_6)->tp_name), 0))) __PYX_ERR(0, 771, __pyx_L1_error)
     __Pyx_XDECREF_SET(__pyx_v_chrom, ((PyObject*)__pyx_t_6));
     __pyx_t_6 = 0;
 
-    /* "MACS2/IO/BedGraph.pyx":771
+    /* "MACS2/IO/BedGraph.pyx":772
  *         # calculate frequencies of each p-score
  *         for chrom in self.get_chr_names():
  *             pre_p = 0             # <<<<<<<<<<<<<<
@@ -12662,7 +12947,7 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_40p2q(struct __p
  */
     __pyx_v_pre_p = 0;
 
-    /* "MACS2/IO/BedGraph.pyx":773
+    /* "MACS2/IO/BedGraph.pyx":774
  *             pre_p = 0
  * 
  *             [pos_array, pscore_array] = self.__data[ chrom ]             # <<<<<<<<<<<<<<
@@ -12671,9 +12956,9 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_40p2q(struct __p
  */
     if (unlikely(__pyx_v_self->__pyx___data == Py_None)) {
       PyErr_SetString(PyExc_TypeError, "'NoneType' object is not subscriptable");
-      __PYX_ERR(0, 773, __pyx_L1_error)
+      __PYX_ERR(0, 774, __pyx_L1_error)
     }
-    __pyx_t_6 = __Pyx_PyDict_GetItem(__pyx_v_self->__pyx___data, __pyx_v_chrom); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 773, __pyx_L1_error)
+    __pyx_t_6 = __Pyx_PyDict_GetItem(__pyx_v_self->__pyx___data, __pyx_v_chrom); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 774, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_6);
     if ((likely(PyTuple_CheckExact(__pyx_t_6))) || (PyList_CheckExact(__pyx_t_6))) {
       PyObject* sequence = __pyx_t_6;
@@ -12681,7 +12966,7 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_40p2q(struct __p
       if (unlikely(size != 2)) {
         if (size > 2) __Pyx_RaiseTooManyValuesError(2);
         else if (size >= 0) __Pyx_RaiseNeedMoreValuesError(size);
-        __PYX_ERR(0, 773, __pyx_L1_error)
+        __PYX_ERR(0, 774, __pyx_L1_error)
       }
       #if CYTHON_ASSUME_SAFE_MACROS && !CYTHON_AVOID_BORROWED_REFS
       if (likely(PyTuple_CheckExact(sequence))) {
@@ -12694,15 +12979,15 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_40p2q(struct __p
       __Pyx_INCREF(__pyx_t_5);
       __Pyx_INCREF(__pyx_t_8);
       #else
-      __pyx_t_5 = PySequence_ITEM(sequence, 0); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 773, __pyx_L1_error)
+      __pyx_t_5 = PySequence_ITEM(sequence, 0); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 774, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_5);
-      __pyx_t_8 = PySequence_ITEM(sequence, 1); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 773, __pyx_L1_error)
+      __pyx_t_8 = PySequence_ITEM(sequence, 1); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 774, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_8);
       #endif
       __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
     } else {
       Py_ssize_t index = -1;
-      __pyx_t_9 = PyObject_GetIter(__pyx_t_6); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 773, __pyx_L1_error)
+      __pyx_t_9 = PyObject_GetIter(__pyx_t_6); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 774, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_9);
       __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
       __pyx_t_10 = Py_TYPE(__pyx_t_9)->tp_iternext;
@@ -12710,7 +12995,7 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_40p2q(struct __p
       __Pyx_GOTREF(__pyx_t_5);
       index = 1; __pyx_t_8 = __pyx_t_10(__pyx_t_9); if (unlikely(!__pyx_t_8)) goto __pyx_L5_unpacking_failed;
       __Pyx_GOTREF(__pyx_t_8);
-      if (__Pyx_IternextUnpackEndCheck(__pyx_t_10(__pyx_t_9), 2) < 0) __PYX_ERR(0, 773, __pyx_L1_error)
+      if (__Pyx_IternextUnpackEndCheck(__pyx_t_10(__pyx_t_9), 2) < 0) __PYX_ERR(0, 774, __pyx_L1_error)
       __pyx_t_10 = NULL;
       __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
       goto __pyx_L6_unpacking_done;
@@ -12718,7 +13003,7 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_40p2q(struct __p
       __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
       __pyx_t_10 = NULL;
       if (__Pyx_IterFinish() == 0) __Pyx_RaiseNeedMoreValuesError(index);
-      __PYX_ERR(0, 773, __pyx_L1_error)
+      __PYX_ERR(0, 774, __pyx_L1_error)
       __pyx_L6_unpacking_done:;
     }
     __Pyx_XDECREF_SET(__pyx_v_pos_array, __pyx_t_5);
@@ -12726,49 +13011,49 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_40p2q(struct __p
     __Pyx_XDECREF_SET(__pyx_v_pscore_array, __pyx_t_8);
     __pyx_t_8 = 0;
 
-    /* "MACS2/IO/BedGraph.pyx":775
+    /* "MACS2/IO/BedGraph.pyx":776
  *             [pos_array, pscore_array] = self.__data[ chrom ]
  * 
  *             pn = iter(pos_array).__next__             # <<<<<<<<<<<<<<
  *             vn = iter(pscore_array).__next__
  * 
  */
-    __pyx_t_6 = PyObject_GetIter(__pyx_v_pos_array); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 775, __pyx_L1_error)
+    __pyx_t_6 = PyObject_GetIter(__pyx_v_pos_array); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 776, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_6);
-    __pyx_t_8 = __Pyx_PyObject_GetAttrStr(__pyx_t_6, __pyx_n_s_next); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 775, __pyx_L1_error)
+    __pyx_t_8 = __Pyx_PyObject_GetAttrStr(__pyx_t_6, __pyx_n_s_next); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 776, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_8);
     __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
     __Pyx_XDECREF_SET(__pyx_v_pn, __pyx_t_8);
     __pyx_t_8 = 0;
 
-    /* "MACS2/IO/BedGraph.pyx":776
+    /* "MACS2/IO/BedGraph.pyx":777
  * 
  *             pn = iter(pos_array).__next__
  *             vn = iter(pscore_array).__next__             # <<<<<<<<<<<<<<
  * 
  *             for i in range( len( pos_array ) ):
  */
-    __pyx_t_8 = PyObject_GetIter(__pyx_v_pscore_array); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 776, __pyx_L1_error)
+    __pyx_t_8 = PyObject_GetIter(__pyx_v_pscore_array); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 777, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_8);
-    __pyx_t_6 = __Pyx_PyObject_GetAttrStr(__pyx_t_8, __pyx_n_s_next); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 776, __pyx_L1_error)
+    __pyx_t_6 = __Pyx_PyObject_GetAttrStr(__pyx_t_8, __pyx_n_s_next); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 777, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_6);
     __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
     __Pyx_XDECREF_SET(__pyx_v_vn, __pyx_t_6);
     __pyx_t_6 = 0;
 
-    /* "MACS2/IO/BedGraph.pyx":778
+    /* "MACS2/IO/BedGraph.pyx":779
  *             vn = iter(pscore_array).__next__
  * 
  *             for i in range( len( pos_array ) ):             # <<<<<<<<<<<<<<
  *                 this_p = pn()
  *                 this_v = vn()
  */
-    __pyx_t_11 = PyObject_Length(__pyx_v_pos_array); if (unlikely(__pyx_t_11 == ((Py_ssize_t)-1))) __PYX_ERR(0, 778, __pyx_L1_error)
+    __pyx_t_11 = PyObject_Length(__pyx_v_pos_array); if (unlikely(__pyx_t_11 == ((Py_ssize_t)-1))) __PYX_ERR(0, 779, __pyx_L1_error)
     __pyx_t_12 = __pyx_t_11;
     for (__pyx_t_13 = 0; __pyx_t_13 < __pyx_t_12; __pyx_t_13+=1) {
       __pyx_v_i = __pyx_t_13;
 
-      /* "MACS2/IO/BedGraph.pyx":779
+      /* "MACS2/IO/BedGraph.pyx":780
  * 
  *             for i in range( len( pos_array ) ):
  *                 this_p = pn()             # <<<<<<<<<<<<<<
@@ -12788,14 +13073,14 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_40p2q(struct __p
       }
       __pyx_t_6 = (__pyx_t_5) ? __Pyx_PyObject_CallOneArg(__pyx_t_8, __pyx_t_5) : __Pyx_PyObject_CallNoArg(__pyx_t_8);
       __Pyx_XDECREF(__pyx_t_5); __pyx_t_5 = 0;
-      if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 779, __pyx_L1_error)
+      if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 780, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_6);
       __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
-      __pyx_t_14 = __Pyx_PyInt_As_long(__pyx_t_6); if (unlikely((__pyx_t_14 == (long)-1) && PyErr_Occurred())) __PYX_ERR(0, 779, __pyx_L1_error)
+      __pyx_t_14 = __Pyx_PyInt_As_long(__pyx_t_6); if (unlikely((__pyx_t_14 == (long)-1) && PyErr_Occurred())) __PYX_ERR(0, 780, __pyx_L1_error)
       __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
       __pyx_v_this_p = __pyx_t_14;
 
-      /* "MACS2/IO/BedGraph.pyx":780
+      /* "MACS2/IO/BedGraph.pyx":781
  *             for i in range( len( pos_array ) ):
  *                 this_p = pn()
  *                 this_v = vn()             # <<<<<<<<<<<<<<
@@ -12815,14 +13100,14 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_40p2q(struct __p
       }
       __pyx_t_6 = (__pyx_t_5) ? __Pyx_PyObject_CallOneArg(__pyx_t_8, __pyx_t_5) : __Pyx_PyObject_CallNoArg(__pyx_t_8);
       __Pyx_XDECREF(__pyx_t_5); __pyx_t_5 = 0;
-      if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 780, __pyx_L1_error)
+      if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 781, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_6);
       __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
-      __pyx_t_15 = __pyx_PyFloat_AsDouble(__pyx_t_6); if (unlikely((__pyx_t_15 == (double)-1) && PyErr_Occurred())) __PYX_ERR(0, 780, __pyx_L1_error)
+      __pyx_t_15 = __pyx_PyFloat_AsDouble(__pyx_t_6); if (unlikely((__pyx_t_15 == (double)-1) && PyErr_Occurred())) __PYX_ERR(0, 781, __pyx_L1_error)
       __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
       __pyx_v_this_v = __pyx_t_15;
 
-      /* "MACS2/IO/BedGraph.pyx":781
+      /* "MACS2/IO/BedGraph.pyx":782
  *                 this_p = pn()
  *                 this_v = vn()
  *                 this_l = this_p - pre_p             # <<<<<<<<<<<<<<
@@ -12831,42 +13116,42 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_40p2q(struct __p
  */
       __pyx_v_this_l = (__pyx_v_this_p - __pyx_v_pre_p);
 
-      /* "MACS2/IO/BedGraph.pyx":782
+      /* "MACS2/IO/BedGraph.pyx":783
  *                 this_v = vn()
  *                 this_l = this_p - pre_p
  *                 if this_v in pvalue_stat:             # <<<<<<<<<<<<<<
  *                     pvalue_stat[ this_v ] += this_l
  *                 else:
  */
-      __pyx_t_6 = PyFloat_FromDouble(__pyx_v_this_v); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 782, __pyx_L1_error)
+      __pyx_t_6 = PyFloat_FromDouble(__pyx_v_this_v); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 783, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_6);
-      __pyx_t_16 = (__Pyx_PyDict_ContainsTF(__pyx_t_6, __pyx_v_pvalue_stat, Py_EQ)); if (unlikely(__pyx_t_16 < 0)) __PYX_ERR(0, 782, __pyx_L1_error)
+      __pyx_t_16 = (__Pyx_PyDict_ContainsTF(__pyx_t_6, __pyx_v_pvalue_stat, Py_EQ)); if (unlikely(__pyx_t_16 < 0)) __PYX_ERR(0, 783, __pyx_L1_error)
       __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
       __pyx_t_17 = (__pyx_t_16 != 0);
       if (__pyx_t_17) {
 
-        /* "MACS2/IO/BedGraph.pyx":783
+        /* "MACS2/IO/BedGraph.pyx":784
  *                 this_l = this_p - pre_p
  *                 if this_v in pvalue_stat:
  *                     pvalue_stat[ this_v ] += this_l             # <<<<<<<<<<<<<<
  *                 else:
  *                     pvalue_stat[ this_v ] = this_l
  */
-        __pyx_t_6 = PyFloat_FromDouble(__pyx_v_this_v); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 783, __pyx_L1_error)
+        __pyx_t_6 = PyFloat_FromDouble(__pyx_v_this_v); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 784, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_6);
-        __pyx_t_8 = __Pyx_PyDict_GetItem(__pyx_v_pvalue_stat, __pyx_t_6); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 783, __pyx_L1_error)
+        __pyx_t_8 = __Pyx_PyDict_GetItem(__pyx_v_pvalue_stat, __pyx_t_6); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 784, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_8);
-        __pyx_t_5 = __Pyx_PyInt_From_long(__pyx_v_this_l); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 783, __pyx_L1_error)
+        __pyx_t_5 = __Pyx_PyInt_From_long(__pyx_v_this_l); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 784, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_5);
-        __pyx_t_9 = PyNumber_InPlaceAdd(__pyx_t_8, __pyx_t_5); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 783, __pyx_L1_error)
+        __pyx_t_9 = PyNumber_InPlaceAdd(__pyx_t_8, __pyx_t_5); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 784, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_9);
         __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
         __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
-        if (unlikely(PyDict_SetItem(__pyx_v_pvalue_stat, __pyx_t_6, __pyx_t_9) < 0)) __PYX_ERR(0, 783, __pyx_L1_error)
+        if (unlikely(PyDict_SetItem(__pyx_v_pvalue_stat, __pyx_t_6, __pyx_t_9) < 0)) __PYX_ERR(0, 784, __pyx_L1_error)
         __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
         __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
 
-        /* "MACS2/IO/BedGraph.pyx":782
+        /* "MACS2/IO/BedGraph.pyx":783
  *                 this_v = vn()
  *                 this_l = this_p - pre_p
  *                 if this_v in pvalue_stat:             # <<<<<<<<<<<<<<
@@ -12876,7 +13161,7 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_40p2q(struct __p
         goto __pyx_L9;
       }
 
-      /* "MACS2/IO/BedGraph.pyx":785
+      /* "MACS2/IO/BedGraph.pyx":786
  *                     pvalue_stat[ this_v ] += this_l
  *                 else:
  *                     pvalue_stat[ this_v ] = this_l             # <<<<<<<<<<<<<<
@@ -12884,17 +13169,17 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_40p2q(struct __p
  * 
  */
       /*else*/ {
-        __pyx_t_6 = __Pyx_PyInt_From_long(__pyx_v_this_l); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 785, __pyx_L1_error)
+        __pyx_t_6 = __Pyx_PyInt_From_long(__pyx_v_this_l); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 786, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_6);
-        __pyx_t_9 = PyFloat_FromDouble(__pyx_v_this_v); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 785, __pyx_L1_error)
+        __pyx_t_9 = PyFloat_FromDouble(__pyx_v_this_v); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 786, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_9);
-        if (unlikely(PyDict_SetItem(__pyx_v_pvalue_stat, __pyx_t_9, __pyx_t_6) < 0)) __PYX_ERR(0, 785, __pyx_L1_error)
+        if (unlikely(PyDict_SetItem(__pyx_v_pvalue_stat, __pyx_t_9, __pyx_t_6) < 0)) __PYX_ERR(0, 786, __pyx_L1_error)
         __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
         __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
       }
       __pyx_L9:;
 
-      /* "MACS2/IO/BedGraph.pyx":786
+      /* "MACS2/IO/BedGraph.pyx":787
  *                 else:
  *                     pvalue_stat[ this_v ] = this_l
  *                 pre_p = this_p             # <<<<<<<<<<<<<<
@@ -12904,19 +13189,19 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_40p2q(struct __p
       __pyx_v_pre_p = __pyx_v_this_p;
     }
 
-    /* "MACS2/IO/BedGraph.pyx":788
+    /* "MACS2/IO/BedGraph.pyx":789
  *                 pre_p = this_p
  * 
  *             nhcal += len( pos_array )             # <<<<<<<<<<<<<<
  * 
  *         nhval = 0
  */
-    __pyx_t_11 = PyObject_Length(__pyx_v_pos_array); if (unlikely(__pyx_t_11 == ((Py_ssize_t)-1))) __PYX_ERR(0, 788, __pyx_L1_error)
+    __pyx_t_11 = PyObject_Length(__pyx_v_pos_array); if (unlikely(__pyx_t_11 == ((Py_ssize_t)-1))) __PYX_ERR(0, 789, __pyx_L1_error)
     __pyx_v_nhcal = (__pyx_v_nhcal + __pyx_t_11);
   }
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-  /* "MACS2/IO/BedGraph.pyx":790
+  /* "MACS2/IO/BedGraph.pyx":791
  *             nhcal += len( pos_array )
  * 
  *         nhval = 0             # <<<<<<<<<<<<<<
@@ -12925,23 +13210,23 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_40p2q(struct __p
  */
   __pyx_v_nhval = 0;
 
-  /* "MACS2/IO/BedGraph.pyx":792
+  /* "MACS2/IO/BedGraph.pyx":793
  *         nhval = 0
  * 
  *         N = sum(pvalue_stat.values()) # total length             # <<<<<<<<<<<<<<
  *         k = 1                           # rank
  *         f = -log10(N)
  */
-  __pyx_t_1 = __Pyx_PyDict_Values(__pyx_v_pvalue_stat); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 792, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyDict_Values(__pyx_v_pvalue_stat); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 793, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_6 = __Pyx_PyObject_CallOneArg(__pyx_builtin_sum, __pyx_t_1); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 792, __pyx_L1_error)
+  __pyx_t_6 = __Pyx_PyObject_CallOneArg(__pyx_builtin_sum, __pyx_t_1); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 793, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_6);
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-  __pyx_t_13 = __Pyx_PyInt_As_long(__pyx_t_6); if (unlikely((__pyx_t_13 == (long)-1) && PyErr_Occurred())) __PYX_ERR(0, 792, __pyx_L1_error)
+  __pyx_t_13 = __Pyx_PyInt_As_long(__pyx_t_6); if (unlikely((__pyx_t_13 == (long)-1) && PyErr_Occurred())) __PYX_ERR(0, 793, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
   __pyx_v_N = __pyx_t_13;
 
-  /* "MACS2/IO/BedGraph.pyx":793
+  /* "MACS2/IO/BedGraph.pyx":794
  * 
  *         N = sum(pvalue_stat.values()) # total length
  *         k = 1                           # rank             # <<<<<<<<<<<<<<
@@ -12950,7 +13235,7 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_40p2q(struct __p
  */
   __pyx_v_k = 1;
 
-  /* "MACS2/IO/BedGraph.pyx":794
+  /* "MACS2/IO/BedGraph.pyx":795
  *         N = sum(pvalue_stat.values()) # total length
  *         k = 1                           # rank
  *         f = -log10(N)             # <<<<<<<<<<<<<<
@@ -12959,7 +13244,7 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_40p2q(struct __p
  */
   __pyx_v_f = (-log10(__pyx_v_N));
 
-  /* "MACS2/IO/BedGraph.pyx":795
+  /* "MACS2/IO/BedGraph.pyx":796
  *         k = 1                           # rank
  *         f = -log10(N)
  *         pre_v = -2147483647             # <<<<<<<<<<<<<<
@@ -12968,7 +13253,7 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_40p2q(struct __p
  */
   __pyx_v_pre_v = -2147483647.0;
 
-  /* "MACS2/IO/BedGraph.pyx":796
+  /* "MACS2/IO/BedGraph.pyx":797
  *         f = -log10(N)
  *         pre_v = -2147483647
  *         pre_l = 0             # <<<<<<<<<<<<<<
@@ -12977,7 +13262,7 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_40p2q(struct __p
  */
   __pyx_v_pre_l = 0;
 
-  /* "MACS2/IO/BedGraph.pyx":797
+  /* "MACS2/IO/BedGraph.pyx":798
  *         pre_v = -2147483647
  *         pre_l = 0
  *         pre_q = 2147483647              # save the previous q-value             # <<<<<<<<<<<<<<
@@ -12986,44 +13271,44 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_40p2q(struct __p
  */
   __pyx_v_pre_q = 2147483647.0;
 
-  /* "MACS2/IO/BedGraph.pyx":800
+  /* "MACS2/IO/BedGraph.pyx":801
  * 
  *         # calculate qscore for each pscore
  *         pqtable = {}             # <<<<<<<<<<<<<<
  *         unique_values = sorted(pvalue_stat.keys(), reverse=True)
  *         for i in range(len(unique_values)):
  */
-  __pyx_t_6 = __Pyx_PyDict_NewPresized(0); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 800, __pyx_L1_error)
+  __pyx_t_6 = __Pyx_PyDict_NewPresized(0); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 801, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_6);
   __Pyx_DECREF_SET(__pyx_v_pqtable, ((PyObject*)__pyx_t_6));
   __pyx_t_6 = 0;
 
-  /* "MACS2/IO/BedGraph.pyx":801
+  /* "MACS2/IO/BedGraph.pyx":802
  *         # calculate qscore for each pscore
  *         pqtable = {}
  *         unique_values = sorted(pvalue_stat.keys(), reverse=True)             # <<<<<<<<<<<<<<
  *         for i in range(len(unique_values)):
  *             v = unique_values[i]
  */
-  __pyx_t_6 = __Pyx_PyDict_Keys(__pyx_v_pvalue_stat); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 801, __pyx_L1_error)
+  __pyx_t_6 = __Pyx_PyDict_Keys(__pyx_v_pvalue_stat); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 802, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_6);
-  __pyx_t_1 = PyTuple_New(1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 801, __pyx_L1_error)
+  __pyx_t_1 = PyTuple_New(1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 802, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __Pyx_GIVEREF(__pyx_t_6);
   PyTuple_SET_ITEM(__pyx_t_1, 0, __pyx_t_6);
   __pyx_t_6 = 0;
-  __pyx_t_6 = __Pyx_PyDict_NewPresized(1); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 801, __pyx_L1_error)
+  __pyx_t_6 = __Pyx_PyDict_NewPresized(1); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 802, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_6);
-  if (PyDict_SetItem(__pyx_t_6, __pyx_n_s_reverse, Py_True) < 0) __PYX_ERR(0, 801, __pyx_L1_error)
-  __pyx_t_9 = __Pyx_PyObject_Call(__pyx_builtin_sorted, __pyx_t_1, __pyx_t_6); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 801, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_t_6, __pyx_n_s_reverse, Py_True) < 0) __PYX_ERR(0, 802, __pyx_L1_error)
+  __pyx_t_9 = __Pyx_PyObject_Call(__pyx_builtin_sorted, __pyx_t_1, __pyx_t_6); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 802, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_9);
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
-  if (!(likely(PyList_CheckExact(__pyx_t_9))||((__pyx_t_9) == Py_None)||(PyErr_Format(PyExc_TypeError, "Expected %.16s, got %.200s", "list", Py_TYPE(__pyx_t_9)->tp_name), 0))) __PYX_ERR(0, 801, __pyx_L1_error)
+  if (!(likely(PyList_CheckExact(__pyx_t_9))||((__pyx_t_9) == Py_None)||(PyErr_Format(PyExc_TypeError, "Expected %.16s, got %.200s", "list", Py_TYPE(__pyx_t_9)->tp_name), 0))) __PYX_ERR(0, 802, __pyx_L1_error)
   __pyx_v_unique_values = ((PyObject*)__pyx_t_9);
   __pyx_t_9 = 0;
 
-  /* "MACS2/IO/BedGraph.pyx":802
+  /* "MACS2/IO/BedGraph.pyx":803
  *         pqtable = {}
  *         unique_values = sorted(pvalue_stat.keys(), reverse=True)
  *         for i in range(len(unique_values)):             # <<<<<<<<<<<<<<
@@ -13032,14 +13317,14 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_40p2q(struct __p
  */
   if (unlikely(__pyx_v_unique_values == Py_None)) {
     PyErr_SetString(PyExc_TypeError, "object of type 'NoneType' has no len()");
-    __PYX_ERR(0, 802, __pyx_L1_error)
+    __PYX_ERR(0, 803, __pyx_L1_error)
   }
-  __pyx_t_3 = PyList_GET_SIZE(__pyx_v_unique_values); if (unlikely(__pyx_t_3 == ((Py_ssize_t)-1))) __PYX_ERR(0, 802, __pyx_L1_error)
+  __pyx_t_3 = PyList_GET_SIZE(__pyx_v_unique_values); if (unlikely(__pyx_t_3 == ((Py_ssize_t)-1))) __PYX_ERR(0, 803, __pyx_L1_error)
   __pyx_t_2 = __pyx_t_3;
   for (__pyx_t_13 = 0; __pyx_t_13 < __pyx_t_2; __pyx_t_13+=1) {
     __pyx_v_i = __pyx_t_13;
 
-    /* "MACS2/IO/BedGraph.pyx":803
+    /* "MACS2/IO/BedGraph.pyx":804
  *         unique_values = sorted(pvalue_stat.keys(), reverse=True)
  *         for i in range(len(unique_values)):
  *             v = unique_values[i]             # <<<<<<<<<<<<<<
@@ -13048,31 +13333,31 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_40p2q(struct __p
  */
     if (unlikely(__pyx_v_unique_values == Py_None)) {
       PyErr_SetString(PyExc_TypeError, "'NoneType' object is not subscriptable");
-      __PYX_ERR(0, 803, __pyx_L1_error)
+      __PYX_ERR(0, 804, __pyx_L1_error)
     }
-    __pyx_t_9 = __Pyx_GetItemInt_List(__pyx_v_unique_values, __pyx_v_i, long, 1, __Pyx_PyInt_From_long, 1, 1, 1); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 803, __pyx_L1_error)
+    __pyx_t_9 = __Pyx_GetItemInt_List(__pyx_v_unique_values, __pyx_v_i, long, 1, __Pyx_PyInt_From_long, 1, 1, 1); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 804, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_9);
-    __pyx_t_15 = __pyx_PyFloat_AsDouble(__pyx_t_9); if (unlikely((__pyx_t_15 == (double)-1) && PyErr_Occurred())) __PYX_ERR(0, 803, __pyx_L1_error)
+    __pyx_t_15 = __pyx_PyFloat_AsDouble(__pyx_t_9); if (unlikely((__pyx_t_15 == (double)-1) && PyErr_Occurred())) __PYX_ERR(0, 804, __pyx_L1_error)
     __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
     __pyx_v_v = __pyx_t_15;
 
-    /* "MACS2/IO/BedGraph.pyx":804
+    /* "MACS2/IO/BedGraph.pyx":805
  *         for i in range(len(unique_values)):
  *             v = unique_values[i]
  *             l = pvalue_stat[v]             # <<<<<<<<<<<<<<
  *             q = v + (log10(k) + f)
  *             q = max(0,min(pre_q,q))           # make q-score monotonic
  */
-    __pyx_t_9 = PyFloat_FromDouble(__pyx_v_v); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 804, __pyx_L1_error)
+    __pyx_t_9 = PyFloat_FromDouble(__pyx_v_v); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 805, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_9);
-    __pyx_t_6 = __Pyx_PyDict_GetItem(__pyx_v_pvalue_stat, __pyx_t_9); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 804, __pyx_L1_error)
+    __pyx_t_6 = __Pyx_PyDict_GetItem(__pyx_v_pvalue_stat, __pyx_t_9); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 805, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_6);
     __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
-    __pyx_t_14 = __Pyx_PyInt_As_long(__pyx_t_6); if (unlikely((__pyx_t_14 == (long)-1) && PyErr_Occurred())) __PYX_ERR(0, 804, __pyx_L1_error)
+    __pyx_t_14 = __Pyx_PyInt_As_long(__pyx_t_6); if (unlikely((__pyx_t_14 == (long)-1) && PyErr_Occurred())) __PYX_ERR(0, 805, __pyx_L1_error)
     __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
     __pyx_v_l = __pyx_t_14;
 
-    /* "MACS2/IO/BedGraph.pyx":805
+    /* "MACS2/IO/BedGraph.pyx":806
  *             v = unique_values[i]
  *             l = pvalue_stat[v]
  *             q = v + (log10(k) + f)             # <<<<<<<<<<<<<<
@@ -13081,7 +13366,7 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_40p2q(struct __p
  */
     __pyx_v_q = (__pyx_v_v + (log10(__pyx_v_k) + __pyx_v_f));
 
-    /* "MACS2/IO/BedGraph.pyx":806
+    /* "MACS2/IO/BedGraph.pyx":807
  *             l = pvalue_stat[v]
  *             q = v + (log10(k) + f)
  *             q = max(0,min(pre_q,q))           # make q-score monotonic             # <<<<<<<<<<<<<<
@@ -13104,22 +13389,22 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_40p2q(struct __p
     }
     __pyx_v_q = __pyx_t_19;
 
-    /* "MACS2/IO/BedGraph.pyx":807
+    /* "MACS2/IO/BedGraph.pyx":808
  *             q = v + (log10(k) + f)
  *             q = max(0,min(pre_q,q))           # make q-score monotonic
  *             pqtable[ v ] = q             # <<<<<<<<<<<<<<
  *             pre_v = v
  *             pre_q = q
  */
-    __pyx_t_6 = PyFloat_FromDouble(__pyx_v_q); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 807, __pyx_L1_error)
+    __pyx_t_6 = PyFloat_FromDouble(__pyx_v_q); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 808, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_6);
-    __pyx_t_9 = PyFloat_FromDouble(__pyx_v_v); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 807, __pyx_L1_error)
+    __pyx_t_9 = PyFloat_FromDouble(__pyx_v_v); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 808, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_9);
-    if (unlikely(PyDict_SetItem(__pyx_v_pqtable, __pyx_t_9, __pyx_t_6) < 0)) __PYX_ERR(0, 807, __pyx_L1_error)
+    if (unlikely(PyDict_SetItem(__pyx_v_pqtable, __pyx_t_9, __pyx_t_6) < 0)) __PYX_ERR(0, 808, __pyx_L1_error)
     __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
     __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
 
-    /* "MACS2/IO/BedGraph.pyx":808
+    /* "MACS2/IO/BedGraph.pyx":809
  *             q = max(0,min(pre_q,q))           # make q-score monotonic
  *             pqtable[ v ] = q
  *             pre_v = v             # <<<<<<<<<<<<<<
@@ -13128,7 +13413,7 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_40p2q(struct __p
  */
     __pyx_v_pre_v = __pyx_v_v;
 
-    /* "MACS2/IO/BedGraph.pyx":809
+    /* "MACS2/IO/BedGraph.pyx":810
  *             pqtable[ v ] = q
  *             pre_v = v
  *             pre_q = q             # <<<<<<<<<<<<<<
@@ -13137,7 +13422,7 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_40p2q(struct __p
  */
     __pyx_v_pre_q = __pyx_v_q;
 
-    /* "MACS2/IO/BedGraph.pyx":810
+    /* "MACS2/IO/BedGraph.pyx":811
  *             pre_v = v
  *             pre_q = q
  *             k+=l             # <<<<<<<<<<<<<<
@@ -13146,7 +13431,7 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_40p2q(struct __p
  */
     __pyx_v_k = (__pyx_v_k + __pyx_v_l);
 
-    /* "MACS2/IO/BedGraph.pyx":811
+    /* "MACS2/IO/BedGraph.pyx":812
  *             pre_q = q
  *             k+=l
  *             nhcal += 1             # <<<<<<<<<<<<<<
@@ -13156,7 +13441,7 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_40p2q(struct __p
     __pyx_v_nhcal = (__pyx_v_nhcal + 1);
   }
 
-  /* "MACS2/IO/BedGraph.pyx":814
+  /* "MACS2/IO/BedGraph.pyx":815
  * 
  *         # convert pscore to qscore
  *         for chrom in self.get_chr_names():             # <<<<<<<<<<<<<<
@@ -13164,9 +13449,9 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_40p2q(struct __p
  * 
  */
   __pyx_t_3 = 0;
-  __pyx_t_9 = ((struct __pyx_vtabstruct_5MACS2_2IO_8BedGraph_bedGraphTrackI *)__pyx_v_self->__pyx_vtab)->get_chr_names(__pyx_v_self, 0); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 814, __pyx_L1_error)
+  __pyx_t_9 = ((struct __pyx_vtabstruct_5MACS2_2IO_8BedGraph_bedGraphTrackI *)__pyx_v_self->__pyx_vtab)->get_chr_names(__pyx_v_self, 0); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 815, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_9);
-  __pyx_t_1 = __Pyx_set_iterator(__pyx_t_9, 1, (&__pyx_t_2), (&__pyx_t_4)); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 814, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_set_iterator(__pyx_t_9, 1, (&__pyx_t_2), (&__pyx_t_4)); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 815, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
   __Pyx_XDECREF(__pyx_t_6);
@@ -13175,13 +13460,13 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_40p2q(struct __p
   while (1) {
     __pyx_t_7 = __Pyx_set_iter_next(__pyx_t_6, __pyx_t_2, &__pyx_t_3, &__pyx_t_1, __pyx_t_4);
     if (unlikely(__pyx_t_7 == 0)) break;
-    if (unlikely(__pyx_t_7 == -1)) __PYX_ERR(0, 814, __pyx_L1_error)
+    if (unlikely(__pyx_t_7 == -1)) __PYX_ERR(0, 815, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
-    if (!(likely(PyBytes_CheckExact(__pyx_t_1))||((__pyx_t_1) == Py_None)||(PyErr_Format(PyExc_TypeError, "Expected %.16s, got %.200s", "bytes", Py_TYPE(__pyx_t_1)->tp_name), 0))) __PYX_ERR(0, 814, __pyx_L1_error)
+    if (!(likely(PyBytes_CheckExact(__pyx_t_1))||((__pyx_t_1) == Py_None)||(PyErr_Format(PyExc_TypeError, "Expected %.16s, got %.200s", "bytes", Py_TYPE(__pyx_t_1)->tp_name), 0))) __PYX_ERR(0, 815, __pyx_L1_error)
     __Pyx_XDECREF_SET(__pyx_v_chrom, ((PyObject*)__pyx_t_1));
     __pyx_t_1 = 0;
 
-    /* "MACS2/IO/BedGraph.pyx":815
+    /* "MACS2/IO/BedGraph.pyx":816
  *         # convert pscore to qscore
  *         for chrom in self.get_chr_names():
  *             [pos_array, pscore_array] = self.__data[ chrom ]             # <<<<<<<<<<<<<<
@@ -13190,9 +13475,9 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_40p2q(struct __p
  */
     if (unlikely(__pyx_v_self->__pyx___data == Py_None)) {
       PyErr_SetString(PyExc_TypeError, "'NoneType' object is not subscriptable");
-      __PYX_ERR(0, 815, __pyx_L1_error)
+      __PYX_ERR(0, 816, __pyx_L1_error)
     }
-    __pyx_t_1 = __Pyx_PyDict_GetItem(__pyx_v_self->__pyx___data, __pyx_v_chrom); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 815, __pyx_L1_error)
+    __pyx_t_1 = __Pyx_PyDict_GetItem(__pyx_v_self->__pyx___data, __pyx_v_chrom); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 816, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
     if ((likely(PyTuple_CheckExact(__pyx_t_1))) || (PyList_CheckExact(__pyx_t_1))) {
       PyObject* sequence = __pyx_t_1;
@@ -13200,7 +13485,7 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_40p2q(struct __p
       if (unlikely(size != 2)) {
         if (size > 2) __Pyx_RaiseTooManyValuesError(2);
         else if (size >= 0) __Pyx_RaiseNeedMoreValuesError(size);
-        __PYX_ERR(0, 815, __pyx_L1_error)
+        __PYX_ERR(0, 816, __pyx_L1_error)
       }
       #if CYTHON_ASSUME_SAFE_MACROS && !CYTHON_AVOID_BORROWED_REFS
       if (likely(PyTuple_CheckExact(sequence))) {
@@ -13213,15 +13498,15 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_40p2q(struct __p
       __Pyx_INCREF(__pyx_t_9);
       __Pyx_INCREF(__pyx_t_5);
       #else
-      __pyx_t_9 = PySequence_ITEM(sequence, 0); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 815, __pyx_L1_error)
+      __pyx_t_9 = PySequence_ITEM(sequence, 0); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 816, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_9);
-      __pyx_t_5 = PySequence_ITEM(sequence, 1); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 815, __pyx_L1_error)
+      __pyx_t_5 = PySequence_ITEM(sequence, 1); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 816, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_5);
       #endif
       __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
     } else {
       Py_ssize_t index = -1;
-      __pyx_t_8 = PyObject_GetIter(__pyx_t_1); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 815, __pyx_L1_error)
+      __pyx_t_8 = PyObject_GetIter(__pyx_t_1); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 816, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_8);
       __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
       __pyx_t_10 = Py_TYPE(__pyx_t_8)->tp_iternext;
@@ -13229,7 +13514,7 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_40p2q(struct __p
       __Pyx_GOTREF(__pyx_t_9);
       index = 1; __pyx_t_5 = __pyx_t_10(__pyx_t_8); if (unlikely(!__pyx_t_5)) goto __pyx_L14_unpacking_failed;
       __Pyx_GOTREF(__pyx_t_5);
-      if (__Pyx_IternextUnpackEndCheck(__pyx_t_10(__pyx_t_8), 2) < 0) __PYX_ERR(0, 815, __pyx_L1_error)
+      if (__Pyx_IternextUnpackEndCheck(__pyx_t_10(__pyx_t_8), 2) < 0) __PYX_ERR(0, 816, __pyx_L1_error)
       __pyx_t_10 = NULL;
       __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
       goto __pyx_L15_unpacking_done;
@@ -13237,7 +13522,7 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_40p2q(struct __p
       __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
       __pyx_t_10 = NULL;
       if (__Pyx_IterFinish() == 0) __Pyx_RaiseNeedMoreValuesError(index);
-      __PYX_ERR(0, 815, __pyx_L1_error)
+      __PYX_ERR(0, 816, __pyx_L1_error)
       __pyx_L15_unpacking_done:;
     }
     __Pyx_XDECREF_SET(__pyx_v_pos_array, __pyx_t_9);
@@ -13245,44 +13530,44 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_40p2q(struct __p
     __Pyx_XDECREF_SET(__pyx_v_pscore_array, __pyx_t_5);
     __pyx_t_5 = 0;
 
-    /* "MACS2/IO/BedGraph.pyx":817
+    /* "MACS2/IO/BedGraph.pyx":818
  *             [pos_array, pscore_array] = self.__data[ chrom ]
  * 
  *             for i in range( len( pos_array ) ):             # <<<<<<<<<<<<<<
  *                 pscore_array[ i ] = pqtable[ pscore_array[ i ] ]
  * 
  */
-    __pyx_t_11 = PyObject_Length(__pyx_v_pos_array); if (unlikely(__pyx_t_11 == ((Py_ssize_t)-1))) __PYX_ERR(0, 817, __pyx_L1_error)
+    __pyx_t_11 = PyObject_Length(__pyx_v_pos_array); if (unlikely(__pyx_t_11 == ((Py_ssize_t)-1))) __PYX_ERR(0, 818, __pyx_L1_error)
     __pyx_t_12 = __pyx_t_11;
     for (__pyx_t_13 = 0; __pyx_t_13 < __pyx_t_12; __pyx_t_13+=1) {
       __pyx_v_i = __pyx_t_13;
 
-      /* "MACS2/IO/BedGraph.pyx":818
+      /* "MACS2/IO/BedGraph.pyx":819
  * 
  *             for i in range( len( pos_array ) ):
  *                 pscore_array[ i ] = pqtable[ pscore_array[ i ] ]             # <<<<<<<<<<<<<<
  * 
  *         self.merge_regions()
  */
-      __pyx_t_1 = __Pyx_GetItemInt(__pyx_v_pscore_array, __pyx_v_i, long, 1, __Pyx_PyInt_From_long, 0, 1, 1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 818, __pyx_L1_error)
+      __pyx_t_1 = __Pyx_GetItemInt(__pyx_v_pscore_array, __pyx_v_i, long, 1, __Pyx_PyInt_From_long, 0, 1, 1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 819, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_1);
-      __pyx_t_5 = __Pyx_PyDict_GetItem(__pyx_v_pqtable, __pyx_t_1); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 818, __pyx_L1_error)
+      __pyx_t_5 = __Pyx_PyDict_GetItem(__pyx_v_pqtable, __pyx_t_1); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 819, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_5);
       __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-      if (unlikely(__Pyx_SetItemInt(__pyx_v_pscore_array, __pyx_v_i, __pyx_t_5, long, 1, __Pyx_PyInt_From_long, 0, 1, 1) < 0)) __PYX_ERR(0, 818, __pyx_L1_error)
+      if (unlikely(__Pyx_SetItemInt(__pyx_v_pscore_array, __pyx_v_i, __pyx_t_5, long, 1, __Pyx_PyInt_From_long, 0, 1, 1) < 0)) __PYX_ERR(0, 819, __pyx_L1_error)
       __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
     }
   }
   __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
 
-  /* "MACS2/IO/BedGraph.pyx":820
+  /* "MACS2/IO/BedGraph.pyx":821
  *                 pscore_array[ i ] = pqtable[ pscore_array[ i ] ]
  * 
  *         self.merge_regions()             # <<<<<<<<<<<<<<
  *         return
  * 
  */
-  __pyx_t_5 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_v_self), __pyx_n_s_merge_regions); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 820, __pyx_L1_error)
+  __pyx_t_5 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_v_self), __pyx_n_s_merge_regions); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 821, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_5);
   __pyx_t_1 = NULL;
   if (CYTHON_UNPACK_METHODS && likely(PyMethod_Check(__pyx_t_5))) {
@@ -13296,12 +13581,12 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_40p2q(struct __p
   }
   __pyx_t_6 = (__pyx_t_1) ? __Pyx_PyObject_CallOneArg(__pyx_t_5, __pyx_t_1) : __Pyx_PyObject_CallNoArg(__pyx_t_5);
   __Pyx_XDECREF(__pyx_t_1); __pyx_t_1 = 0;
-  if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 820, __pyx_L1_error)
+  if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 821, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_6);
   __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
   __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
 
-  /* "MACS2/IO/BedGraph.pyx":821
+  /* "MACS2/IO/BedGraph.pyx":822
  * 
  *         self.merge_regions()
  *         return             # <<<<<<<<<<<<<<
@@ -13312,7 +13597,7 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_40p2q(struct __p
   __pyx_r = Py_None; __Pyx_INCREF(Py_None);
   goto __pyx_L0;
 
-  /* "MACS2/IO/BedGraph.pyx":749
+  /* "MACS2/IO/BedGraph.pyx":750
  *         return True
  * 
  *     def p2q ( self ):             # <<<<<<<<<<<<<<
@@ -13339,11 +13624,12 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_40p2q(struct __p
   __Pyx_XDECREF(__pyx_v_pn);
   __Pyx_XDECREF(__pyx_v_vn);
   __Pyx_XGIVEREF(__pyx_r);
+  __Pyx_TraceReturn(__pyx_r, 0);
   __Pyx_RefNannyFinishContext();
   return __pyx_r;
 }
 
-/* "MACS2/IO/BedGraph.pyx":824
+/* "MACS2/IO/BedGraph.pyx":825
  * 
  * 
  *     def extract_value ( self, bdgTrack2 ):             # <<<<<<<<<<<<<<
@@ -13389,6 +13675,7 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_42extract_value(
   PyObject *__pyx_v_p2n = NULL;
   PyObject *__pyx_v_v2n = NULL;
   PyObject *__pyx_r = NULL;
+  __Pyx_TraceDeclarations
   __Pyx_RefNannyDeclarations
   int __pyx_t_1;
   PyObject *__pyx_t_2 = NULL;
@@ -13409,8 +13696,9 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_42extract_value(
   int __pyx_t_17;
   double __pyx_t_18;
   __Pyx_RefNannySetupContext("extract_value", 0);
+  __Pyx_TraceCall("extract_value", __pyx_f[0], 825, 0, __PYX_ERR(0, 825, __pyx_L1_error));
 
-  /* "MACS2/IO/BedGraph.pyx":836
+  /* "MACS2/IO/BedGraph.pyx":837
  *             bytes chrom
  * 
  *         assert isinstance(bdgTrack2,bedGraphTrackI), "bdgTrack2 is not a bedGraphTrackI object"             # <<<<<<<<<<<<<<
@@ -13422,25 +13710,25 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_42extract_value(
     __pyx_t_1 = __Pyx_TypeCheck(__pyx_v_bdgTrack2, __pyx_ptype_5MACS2_2IO_8BedGraph_bedGraphTrackI); 
     if (unlikely(!(__pyx_t_1 != 0))) {
       PyErr_SetObject(PyExc_AssertionError, __pyx_kp_u_bdgTrack2_is_not_a_bedGraphTrack);
-      __PYX_ERR(0, 836, __pyx_L1_error)
+      __PYX_ERR(0, 837, __pyx_L1_error)
     }
   }
   #endif
 
-  /* "MACS2/IO/BedGraph.pyx":838
+  /* "MACS2/IO/BedGraph.pyx":839
  *         assert isinstance(bdgTrack2,bedGraphTrackI), "bdgTrack2 is not a bedGraphTrackI object"
  * 
  *         ret = [[],array(FBYTE4,[]),array(BYTE4,[])] # 1: region in             # <<<<<<<<<<<<<<
  *                                                     # bdgTrack2; 2:
  *                                                     # value; 3: length
  */
-  __pyx_t_2 = PyList_New(0); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 838, __pyx_L1_error)
+  __pyx_t_2 = PyList_New(0); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 839, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
-  __Pyx_GetModuleGlobalName(__pyx_t_4, __pyx_n_s_array); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 838, __pyx_L1_error)
+  __Pyx_GetModuleGlobalName(__pyx_t_4, __pyx_n_s_array); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 839, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_4);
-  __Pyx_GetModuleGlobalName(__pyx_t_5, __pyx_n_s_FBYTE4); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 838, __pyx_L1_error)
+  __Pyx_GetModuleGlobalName(__pyx_t_5, __pyx_n_s_FBYTE4); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 839, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_5);
-  __pyx_t_6 = PyList_New(0); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 838, __pyx_L1_error)
+  __pyx_t_6 = PyList_New(0); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 839, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_6);
   __pyx_t_7 = NULL;
   __pyx_t_8 = 0;
@@ -13457,7 +13745,7 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_42extract_value(
   #if CYTHON_FAST_PYCALL
   if (PyFunction_Check(__pyx_t_4)) {
     PyObject *__pyx_temp[3] = {__pyx_t_7, __pyx_t_5, __pyx_t_6};
-    __pyx_t_3 = __Pyx_PyFunction_FastCall(__pyx_t_4, __pyx_temp+1-__pyx_t_8, 2+__pyx_t_8); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 838, __pyx_L1_error)
+    __pyx_t_3 = __Pyx_PyFunction_FastCall(__pyx_t_4, __pyx_temp+1-__pyx_t_8, 2+__pyx_t_8); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 839, __pyx_L1_error)
     __Pyx_XDECREF(__pyx_t_7); __pyx_t_7 = 0;
     __Pyx_GOTREF(__pyx_t_3);
     __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
@@ -13467,7 +13755,7 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_42extract_value(
   #if CYTHON_FAST_PYCCALL
   if (__Pyx_PyFastCFunction_Check(__pyx_t_4)) {
     PyObject *__pyx_temp[3] = {__pyx_t_7, __pyx_t_5, __pyx_t_6};
-    __pyx_t_3 = __Pyx_PyCFunction_FastCall(__pyx_t_4, __pyx_temp+1-__pyx_t_8, 2+__pyx_t_8); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 838, __pyx_L1_error)
+    __pyx_t_3 = __Pyx_PyCFunction_FastCall(__pyx_t_4, __pyx_temp+1-__pyx_t_8, 2+__pyx_t_8); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 839, __pyx_L1_error)
     __Pyx_XDECREF(__pyx_t_7); __pyx_t_7 = 0;
     __Pyx_GOTREF(__pyx_t_3);
     __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
@@ -13475,7 +13763,7 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_42extract_value(
   } else
   #endif
   {
-    __pyx_t_9 = PyTuple_New(2+__pyx_t_8); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 838, __pyx_L1_error)
+    __pyx_t_9 = PyTuple_New(2+__pyx_t_8); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 839, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_9);
     if (__pyx_t_7) {
       __Pyx_GIVEREF(__pyx_t_7); PyTuple_SET_ITEM(__pyx_t_9, 0, __pyx_t_7); __pyx_t_7 = NULL;
@@ -13486,16 +13774,16 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_42extract_value(
     PyTuple_SET_ITEM(__pyx_t_9, 1+__pyx_t_8, __pyx_t_6);
     __pyx_t_5 = 0;
     __pyx_t_6 = 0;
-    __pyx_t_3 = __Pyx_PyObject_Call(__pyx_t_4, __pyx_t_9, NULL); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 838, __pyx_L1_error)
+    __pyx_t_3 = __Pyx_PyObject_Call(__pyx_t_4, __pyx_t_9, NULL); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 839, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_3);
     __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
   }
   __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-  __Pyx_GetModuleGlobalName(__pyx_t_9, __pyx_n_s_array); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 838, __pyx_L1_error)
+  __Pyx_GetModuleGlobalName(__pyx_t_9, __pyx_n_s_array); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 839, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_9);
-  __Pyx_GetModuleGlobalName(__pyx_t_6, __pyx_n_s_BYTE4); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 838, __pyx_L1_error)
+  __Pyx_GetModuleGlobalName(__pyx_t_6, __pyx_n_s_BYTE4); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 839, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_6);
-  __pyx_t_5 = PyList_New(0); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 838, __pyx_L1_error)
+  __pyx_t_5 = PyList_New(0); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 839, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_5);
   __pyx_t_7 = NULL;
   __pyx_t_8 = 0;
@@ -13512,7 +13800,7 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_42extract_value(
   #if CYTHON_FAST_PYCALL
   if (PyFunction_Check(__pyx_t_9)) {
     PyObject *__pyx_temp[3] = {__pyx_t_7, __pyx_t_6, __pyx_t_5};
-    __pyx_t_4 = __Pyx_PyFunction_FastCall(__pyx_t_9, __pyx_temp+1-__pyx_t_8, 2+__pyx_t_8); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 838, __pyx_L1_error)
+    __pyx_t_4 = __Pyx_PyFunction_FastCall(__pyx_t_9, __pyx_temp+1-__pyx_t_8, 2+__pyx_t_8); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 839, __pyx_L1_error)
     __Pyx_XDECREF(__pyx_t_7); __pyx_t_7 = 0;
     __Pyx_GOTREF(__pyx_t_4);
     __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
@@ -13522,7 +13810,7 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_42extract_value(
   #if CYTHON_FAST_PYCCALL
   if (__Pyx_PyFastCFunction_Check(__pyx_t_9)) {
     PyObject *__pyx_temp[3] = {__pyx_t_7, __pyx_t_6, __pyx_t_5};
-    __pyx_t_4 = __Pyx_PyCFunction_FastCall(__pyx_t_9, __pyx_temp+1-__pyx_t_8, 2+__pyx_t_8); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 838, __pyx_L1_error)
+    __pyx_t_4 = __Pyx_PyCFunction_FastCall(__pyx_t_9, __pyx_temp+1-__pyx_t_8, 2+__pyx_t_8); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 839, __pyx_L1_error)
     __Pyx_XDECREF(__pyx_t_7); __pyx_t_7 = 0;
     __Pyx_GOTREF(__pyx_t_4);
     __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
@@ -13530,7 +13818,7 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_42extract_value(
   } else
   #endif
   {
-    __pyx_t_10 = PyTuple_New(2+__pyx_t_8); if (unlikely(!__pyx_t_10)) __PYX_ERR(0, 838, __pyx_L1_error)
+    __pyx_t_10 = PyTuple_New(2+__pyx_t_8); if (unlikely(!__pyx_t_10)) __PYX_ERR(0, 839, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_10);
     if (__pyx_t_7) {
       __Pyx_GIVEREF(__pyx_t_7); PyTuple_SET_ITEM(__pyx_t_10, 0, __pyx_t_7); __pyx_t_7 = NULL;
@@ -13541,12 +13829,12 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_42extract_value(
     PyTuple_SET_ITEM(__pyx_t_10, 1+__pyx_t_8, __pyx_t_5);
     __pyx_t_6 = 0;
     __pyx_t_5 = 0;
-    __pyx_t_4 = __Pyx_PyObject_Call(__pyx_t_9, __pyx_t_10, NULL); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 838, __pyx_L1_error)
+    __pyx_t_4 = __Pyx_PyObject_Call(__pyx_t_9, __pyx_t_10, NULL); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 839, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_4);
     __Pyx_DECREF(__pyx_t_10); __pyx_t_10 = 0;
   }
   __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
-  __pyx_t_9 = PyList_New(3); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 838, __pyx_L1_error)
+  __pyx_t_9 = PyList_New(3); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 839, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_9);
   __Pyx_GIVEREF(__pyx_t_2);
   PyList_SET_ITEM(__pyx_t_9, 0, __pyx_t_2);
@@ -13560,74 +13848,74 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_42extract_value(
   __pyx_v_ret = ((PyObject*)__pyx_t_9);
   __pyx_t_9 = 0;
 
-  /* "MACS2/IO/BedGraph.pyx":842
+  /* "MACS2/IO/BedGraph.pyx":843
  *                                                     # value; 3: length
  *                                                     # with the value
  *         radd = ret[0].append             # <<<<<<<<<<<<<<
  *         vadd = ret[1].append
  *         ladd = ret[2].append
  */
-  __pyx_t_9 = __Pyx_GetItemInt_List(__pyx_v_ret, 0, long, 1, __Pyx_PyInt_From_long, 1, 0, 1); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 842, __pyx_L1_error)
+  __pyx_t_9 = __Pyx_GetItemInt_List(__pyx_v_ret, 0, long, 1, __Pyx_PyInt_From_long, 1, 0, 1); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 843, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_9);
-  __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_t_9, __pyx_n_s_append); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 842, __pyx_L1_error)
+  __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_t_9, __pyx_n_s_append); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 843, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_4);
   __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
   __pyx_v_radd = __pyx_t_4;
   __pyx_t_4 = 0;
 
-  /* "MACS2/IO/BedGraph.pyx":843
+  /* "MACS2/IO/BedGraph.pyx":844
  *                                                     # with the value
  *         radd = ret[0].append
  *         vadd = ret[1].append             # <<<<<<<<<<<<<<
  *         ladd = ret[2].append
  * 
  */
-  __pyx_t_4 = __Pyx_GetItemInt_List(__pyx_v_ret, 1, long, 1, __Pyx_PyInt_From_long, 1, 0, 1); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 843, __pyx_L1_error)
+  __pyx_t_4 = __Pyx_GetItemInt_List(__pyx_v_ret, 1, long, 1, __Pyx_PyInt_From_long, 1, 0, 1); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 844, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_4);
-  __pyx_t_9 = __Pyx_PyObject_GetAttrStr(__pyx_t_4, __pyx_n_s_append); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 843, __pyx_L1_error)
+  __pyx_t_9 = __Pyx_PyObject_GetAttrStr(__pyx_t_4, __pyx_n_s_append); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 844, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_9);
   __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
   __pyx_v_vadd = __pyx_t_9;
   __pyx_t_9 = 0;
 
-  /* "MACS2/IO/BedGraph.pyx":844
+  /* "MACS2/IO/BedGraph.pyx":845
  *         radd = ret[0].append
  *         vadd = ret[1].append
  *         ladd = ret[2].append             # <<<<<<<<<<<<<<
  * 
  *         chr1 = set(self.get_chr_names())
  */
-  __pyx_t_9 = __Pyx_GetItemInt_List(__pyx_v_ret, 2, long, 1, __Pyx_PyInt_From_long, 1, 0, 1); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 844, __pyx_L1_error)
+  __pyx_t_9 = __Pyx_GetItemInt_List(__pyx_v_ret, 2, long, 1, __Pyx_PyInt_From_long, 1, 0, 1); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 845, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_9);
-  __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_t_9, __pyx_n_s_append); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 844, __pyx_L1_error)
+  __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_t_9, __pyx_n_s_append); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 845, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_4);
   __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
   __pyx_v_ladd = __pyx_t_4;
   __pyx_t_4 = 0;
 
-  /* "MACS2/IO/BedGraph.pyx":846
+  /* "MACS2/IO/BedGraph.pyx":847
  *         ladd = ret[2].append
  * 
  *         chr1 = set(self.get_chr_names())             # <<<<<<<<<<<<<<
  *         chr2 = set(bdgTrack2.get_chr_names())
  *         common_chr = chr1.intersection(chr2)
  */
-  __pyx_t_4 = ((struct __pyx_vtabstruct_5MACS2_2IO_8BedGraph_bedGraphTrackI *)__pyx_v_self->__pyx_vtab)->get_chr_names(__pyx_v_self, 0); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 846, __pyx_L1_error)
+  __pyx_t_4 = ((struct __pyx_vtabstruct_5MACS2_2IO_8BedGraph_bedGraphTrackI *)__pyx_v_self->__pyx_vtab)->get_chr_names(__pyx_v_self, 0); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 847, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_4);
-  __pyx_t_9 = PySet_New(__pyx_t_4); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 846, __pyx_L1_error)
+  __pyx_t_9 = PySet_New(__pyx_t_4); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 847, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_9);
   __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
   __pyx_v_chr1 = ((PyObject*)__pyx_t_9);
   __pyx_t_9 = 0;
 
-  /* "MACS2/IO/BedGraph.pyx":847
+  /* "MACS2/IO/BedGraph.pyx":848
  * 
  *         chr1 = set(self.get_chr_names())
  *         chr2 = set(bdgTrack2.get_chr_names())             # <<<<<<<<<<<<<<
  *         common_chr = chr1.intersection(chr2)
  *         for i in range( len( common_chr ) ):
  */
-  __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_v_bdgTrack2, __pyx_n_s_get_chr_names); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 847, __pyx_L1_error)
+  __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_v_bdgTrack2, __pyx_n_s_get_chr_names); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 848, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_4);
   __pyx_t_3 = NULL;
   if (CYTHON_UNPACK_METHODS && likely(PyMethod_Check(__pyx_t_4))) {
@@ -13641,60 +13929,60 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_42extract_value(
   }
   __pyx_t_9 = (__pyx_t_3) ? __Pyx_PyObject_CallOneArg(__pyx_t_4, __pyx_t_3) : __Pyx_PyObject_CallNoArg(__pyx_t_4);
   __Pyx_XDECREF(__pyx_t_3); __pyx_t_3 = 0;
-  if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 847, __pyx_L1_error)
+  if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 848, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_9);
   __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-  __pyx_t_4 = PySet_New(__pyx_t_9); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 847, __pyx_L1_error)
+  __pyx_t_4 = PySet_New(__pyx_t_9); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 848, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_4);
   __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
   __pyx_v_chr2 = ((PyObject*)__pyx_t_4);
   __pyx_t_4 = 0;
 
-  /* "MACS2/IO/BedGraph.pyx":848
+  /* "MACS2/IO/BedGraph.pyx":849
  *         chr1 = set(self.get_chr_names())
  *         chr2 = set(bdgTrack2.get_chr_names())
  *         common_chr = chr1.intersection(chr2)             # <<<<<<<<<<<<<<
  *         for i in range( len( common_chr ) ):
  *             chrom = common_chr.pop()
  */
-  __pyx_t_4 = __Pyx_CallUnboundCMethod1(&__pyx_umethod_PySet_Type_intersection, __pyx_v_chr1, __pyx_v_chr2); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 848, __pyx_L1_error)
+  __pyx_t_4 = __Pyx_CallUnboundCMethod1(&__pyx_umethod_PySet_Type_intersection, __pyx_v_chr1, __pyx_v_chr2); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 849, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_4);
   __pyx_v_common_chr = __pyx_t_4;
   __pyx_t_4 = 0;
 
-  /* "MACS2/IO/BedGraph.pyx":849
+  /* "MACS2/IO/BedGraph.pyx":850
  *         chr2 = set(bdgTrack2.get_chr_names())
  *         common_chr = chr1.intersection(chr2)
  *         for i in range( len( common_chr ) ):             # <<<<<<<<<<<<<<
  *             chrom = common_chr.pop()
  *             (p1s,v1s) = self.get_data_by_chr(chrom) # arrays for position and values
  */
-  __pyx_t_11 = PyObject_Length(__pyx_v_common_chr); if (unlikely(__pyx_t_11 == ((Py_ssize_t)-1))) __PYX_ERR(0, 849, __pyx_L1_error)
+  __pyx_t_11 = PyObject_Length(__pyx_v_common_chr); if (unlikely(__pyx_t_11 == ((Py_ssize_t)-1))) __PYX_ERR(0, 850, __pyx_L1_error)
   __pyx_t_12 = __pyx_t_11;
   for (__pyx_t_8 = 0; __pyx_t_8 < __pyx_t_12; __pyx_t_8+=1) {
     __pyx_v_i = __pyx_t_8;
 
-    /* "MACS2/IO/BedGraph.pyx":850
+    /* "MACS2/IO/BedGraph.pyx":851
  *         common_chr = chr1.intersection(chr2)
  *         for i in range( len( common_chr ) ):
  *             chrom = common_chr.pop()             # <<<<<<<<<<<<<<
  *             (p1s,v1s) = self.get_data_by_chr(chrom) # arrays for position and values
  *             p1n = iter(p1s).__next__         # assign the next function to a viable to speed up
  */
-    __pyx_t_4 = __Pyx_PyObject_Pop(__pyx_v_common_chr); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 850, __pyx_L1_error)
+    __pyx_t_4 = __Pyx_PyObject_Pop(__pyx_v_common_chr); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 851, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_4);
-    if (!(likely(PyBytes_CheckExact(__pyx_t_4))||((__pyx_t_4) == Py_None)||(PyErr_Format(PyExc_TypeError, "Expected %.16s, got %.200s", "bytes", Py_TYPE(__pyx_t_4)->tp_name), 0))) __PYX_ERR(0, 850, __pyx_L1_error)
+    if (!(likely(PyBytes_CheckExact(__pyx_t_4))||((__pyx_t_4) == Py_None)||(PyErr_Format(PyExc_TypeError, "Expected %.16s, got %.200s", "bytes", Py_TYPE(__pyx_t_4)->tp_name), 0))) __PYX_ERR(0, 851, __pyx_L1_error)
     __Pyx_XDECREF_SET(__pyx_v_chrom, ((PyObject*)__pyx_t_4));
     __pyx_t_4 = 0;
 
-    /* "MACS2/IO/BedGraph.pyx":851
+    /* "MACS2/IO/BedGraph.pyx":852
  *         for i in range( len( common_chr ) ):
  *             chrom = common_chr.pop()
  *             (p1s,v1s) = self.get_data_by_chr(chrom) # arrays for position and values             # <<<<<<<<<<<<<<
  *             p1n = iter(p1s).__next__         # assign the next function to a viable to speed up
  *             v1n = iter(v1s).__next__
  */
-    __pyx_t_9 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_v_self), __pyx_n_s_get_data_by_chr); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 851, __pyx_L1_error)
+    __pyx_t_9 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_v_self), __pyx_n_s_get_data_by_chr); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 852, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_9);
     __pyx_t_3 = NULL;
     if (CYTHON_UNPACK_METHODS && likely(PyMethod_Check(__pyx_t_9))) {
@@ -13708,7 +13996,7 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_42extract_value(
     }
     __pyx_t_4 = (__pyx_t_3) ? __Pyx_PyObject_Call2Args(__pyx_t_9, __pyx_t_3, __pyx_v_chrom) : __Pyx_PyObject_CallOneArg(__pyx_t_9, __pyx_v_chrom);
     __Pyx_XDECREF(__pyx_t_3); __pyx_t_3 = 0;
-    if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 851, __pyx_L1_error)
+    if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 852, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_4);
     __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
     if ((likely(PyTuple_CheckExact(__pyx_t_4))) || (PyList_CheckExact(__pyx_t_4))) {
@@ -13717,7 +14005,7 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_42extract_value(
       if (unlikely(size != 2)) {
         if (size > 2) __Pyx_RaiseTooManyValuesError(2);
         else if (size >= 0) __Pyx_RaiseNeedMoreValuesError(size);
-        __PYX_ERR(0, 851, __pyx_L1_error)
+        __PYX_ERR(0, 852, __pyx_L1_error)
       }
       #if CYTHON_ASSUME_SAFE_MACROS && !CYTHON_AVOID_BORROWED_REFS
       if (likely(PyTuple_CheckExact(sequence))) {
@@ -13730,15 +14018,15 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_42extract_value(
       __Pyx_INCREF(__pyx_t_9);
       __Pyx_INCREF(__pyx_t_3);
       #else
-      __pyx_t_9 = PySequence_ITEM(sequence, 0); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 851, __pyx_L1_error)
+      __pyx_t_9 = PySequence_ITEM(sequence, 0); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 852, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_9);
-      __pyx_t_3 = PySequence_ITEM(sequence, 1); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 851, __pyx_L1_error)
+      __pyx_t_3 = PySequence_ITEM(sequence, 1); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 852, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_3);
       #endif
       __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
     } else {
       Py_ssize_t index = -1;
-      __pyx_t_2 = PyObject_GetIter(__pyx_t_4); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 851, __pyx_L1_error)
+      __pyx_t_2 = PyObject_GetIter(__pyx_t_4); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 852, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_2);
       __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
       __pyx_t_13 = Py_TYPE(__pyx_t_2)->tp_iternext;
@@ -13746,7 +14034,7 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_42extract_value(
       __Pyx_GOTREF(__pyx_t_9);
       index = 1; __pyx_t_3 = __pyx_t_13(__pyx_t_2); if (unlikely(!__pyx_t_3)) goto __pyx_L5_unpacking_failed;
       __Pyx_GOTREF(__pyx_t_3);
-      if (__Pyx_IternextUnpackEndCheck(__pyx_t_13(__pyx_t_2), 2) < 0) __PYX_ERR(0, 851, __pyx_L1_error)
+      if (__Pyx_IternextUnpackEndCheck(__pyx_t_13(__pyx_t_2), 2) < 0) __PYX_ERR(0, 852, __pyx_L1_error)
       __pyx_t_13 = NULL;
       __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
       goto __pyx_L6_unpacking_done;
@@ -13754,7 +14042,7 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_42extract_value(
       __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
       __pyx_t_13 = NULL;
       if (__Pyx_IterFinish() == 0) __Pyx_RaiseNeedMoreValuesError(index);
-      __PYX_ERR(0, 851, __pyx_L1_error)
+      __PYX_ERR(0, 852, __pyx_L1_error)
       __pyx_L6_unpacking_done:;
     }
     __Pyx_XDECREF_SET(__pyx_v_p1s, __pyx_t_9);
@@ -13762,44 +14050,44 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_42extract_value(
     __Pyx_XDECREF_SET(__pyx_v_v1s, __pyx_t_3);
     __pyx_t_3 = 0;
 
-    /* "MACS2/IO/BedGraph.pyx":852
+    /* "MACS2/IO/BedGraph.pyx":853
  *             chrom = common_chr.pop()
  *             (p1s,v1s) = self.get_data_by_chr(chrom) # arrays for position and values
  *             p1n = iter(p1s).__next__         # assign the next function to a viable to speed up             # <<<<<<<<<<<<<<
  *             v1n = iter(v1s).__next__
  * 
  */
-    __pyx_t_4 = PyObject_GetIter(__pyx_v_p1s); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 852, __pyx_L1_error)
+    __pyx_t_4 = PyObject_GetIter(__pyx_v_p1s); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 853, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_4);
-    __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_t_4, __pyx_n_s_next); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 852, __pyx_L1_error)
+    __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_t_4, __pyx_n_s_next); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 853, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_3);
     __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
     __Pyx_XDECREF_SET(__pyx_v_p1n, __pyx_t_3);
     __pyx_t_3 = 0;
 
-    /* "MACS2/IO/BedGraph.pyx":853
+    /* "MACS2/IO/BedGraph.pyx":854
  *             (p1s,v1s) = self.get_data_by_chr(chrom) # arrays for position and values
  *             p1n = iter(p1s).__next__         # assign the next function to a viable to speed up
  *             v1n = iter(v1s).__next__             # <<<<<<<<<<<<<<
  * 
  *             (p2s,v2s) = bdgTrack2.get_data_by_chr(chrom) # arrays for position and values
  */
-    __pyx_t_3 = PyObject_GetIter(__pyx_v_v1s); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 853, __pyx_L1_error)
+    __pyx_t_3 = PyObject_GetIter(__pyx_v_v1s); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 854, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_3);
-    __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_t_3, __pyx_n_s_next); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 853, __pyx_L1_error)
+    __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_t_3, __pyx_n_s_next); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 854, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_4);
     __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
     __Pyx_XDECREF_SET(__pyx_v_v1n, __pyx_t_4);
     __pyx_t_4 = 0;
 
-    /* "MACS2/IO/BedGraph.pyx":855
+    /* "MACS2/IO/BedGraph.pyx":856
  *             v1n = iter(v1s).__next__
  * 
  *             (p2s,v2s) = bdgTrack2.get_data_by_chr(chrom) # arrays for position and values             # <<<<<<<<<<<<<<
  *             p2n = iter(p2s).__next__         # assign the next function to a viable to speed up
  *             v2n = iter(v2s).__next__
  */
-    __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_v_bdgTrack2, __pyx_n_s_get_data_by_chr); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 855, __pyx_L1_error)
+    __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_v_bdgTrack2, __pyx_n_s_get_data_by_chr); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 856, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_3);
     __pyx_t_9 = NULL;
     if (CYTHON_UNPACK_METHODS && likely(PyMethod_Check(__pyx_t_3))) {
@@ -13813,7 +14101,7 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_42extract_value(
     }
     __pyx_t_4 = (__pyx_t_9) ? __Pyx_PyObject_Call2Args(__pyx_t_3, __pyx_t_9, __pyx_v_chrom) : __Pyx_PyObject_CallOneArg(__pyx_t_3, __pyx_v_chrom);
     __Pyx_XDECREF(__pyx_t_9); __pyx_t_9 = 0;
-    if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 855, __pyx_L1_error)
+    if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 856, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_4);
     __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
     if ((likely(PyTuple_CheckExact(__pyx_t_4))) || (PyList_CheckExact(__pyx_t_4))) {
@@ -13822,7 +14110,7 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_42extract_value(
       if (unlikely(size != 2)) {
         if (size > 2) __Pyx_RaiseTooManyValuesError(2);
         else if (size >= 0) __Pyx_RaiseNeedMoreValuesError(size);
-        __PYX_ERR(0, 855, __pyx_L1_error)
+        __PYX_ERR(0, 856, __pyx_L1_error)
       }
       #if CYTHON_ASSUME_SAFE_MACROS && !CYTHON_AVOID_BORROWED_REFS
       if (likely(PyTuple_CheckExact(sequence))) {
@@ -13835,15 +14123,15 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_42extract_value(
       __Pyx_INCREF(__pyx_t_3);
       __Pyx_INCREF(__pyx_t_9);
       #else
-      __pyx_t_3 = PySequence_ITEM(sequence, 0); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 855, __pyx_L1_error)
+      __pyx_t_3 = PySequence_ITEM(sequence, 0); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 856, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_3);
-      __pyx_t_9 = PySequence_ITEM(sequence, 1); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 855, __pyx_L1_error)
+      __pyx_t_9 = PySequence_ITEM(sequence, 1); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 856, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_9);
       #endif
       __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
     } else {
       Py_ssize_t index = -1;
-      __pyx_t_2 = PyObject_GetIter(__pyx_t_4); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 855, __pyx_L1_error)
+      __pyx_t_2 = PyObject_GetIter(__pyx_t_4); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 856, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_2);
       __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
       __pyx_t_13 = Py_TYPE(__pyx_t_2)->tp_iternext;
@@ -13851,7 +14139,7 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_42extract_value(
       __Pyx_GOTREF(__pyx_t_3);
       index = 1; __pyx_t_9 = __pyx_t_13(__pyx_t_2); if (unlikely(!__pyx_t_9)) goto __pyx_L7_unpacking_failed;
       __Pyx_GOTREF(__pyx_t_9);
-      if (__Pyx_IternextUnpackEndCheck(__pyx_t_13(__pyx_t_2), 2) < 0) __PYX_ERR(0, 855, __pyx_L1_error)
+      if (__Pyx_IternextUnpackEndCheck(__pyx_t_13(__pyx_t_2), 2) < 0) __PYX_ERR(0, 856, __pyx_L1_error)
       __pyx_t_13 = NULL;
       __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
       goto __pyx_L8_unpacking_done;
@@ -13859,7 +14147,7 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_42extract_value(
       __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
       __pyx_t_13 = NULL;
       if (__Pyx_IterFinish() == 0) __Pyx_RaiseNeedMoreValuesError(index);
-      __PYX_ERR(0, 855, __pyx_L1_error)
+      __PYX_ERR(0, 856, __pyx_L1_error)
       __pyx_L8_unpacking_done:;
     }
     __Pyx_XDECREF_SET(__pyx_v_p2s, __pyx_t_3);
@@ -13867,37 +14155,37 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_42extract_value(
     __Pyx_XDECREF_SET(__pyx_v_v2s, __pyx_t_9);
     __pyx_t_9 = 0;
 
-    /* "MACS2/IO/BedGraph.pyx":856
+    /* "MACS2/IO/BedGraph.pyx":857
  * 
  *             (p2s,v2s) = bdgTrack2.get_data_by_chr(chrom) # arrays for position and values
  *             p2n = iter(p2s).__next__         # assign the next function to a viable to speed up             # <<<<<<<<<<<<<<
  *             v2n = iter(v2s).__next__
  * 
  */
-    __pyx_t_4 = PyObject_GetIter(__pyx_v_p2s); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 856, __pyx_L1_error)
+    __pyx_t_4 = PyObject_GetIter(__pyx_v_p2s); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 857, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_4);
-    __pyx_t_9 = __Pyx_PyObject_GetAttrStr(__pyx_t_4, __pyx_n_s_next); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 856, __pyx_L1_error)
+    __pyx_t_9 = __Pyx_PyObject_GetAttrStr(__pyx_t_4, __pyx_n_s_next); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 857, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_9);
     __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
     __Pyx_XDECREF_SET(__pyx_v_p2n, __pyx_t_9);
     __pyx_t_9 = 0;
 
-    /* "MACS2/IO/BedGraph.pyx":857
+    /* "MACS2/IO/BedGraph.pyx":858
  *             (p2s,v2s) = bdgTrack2.get_data_by_chr(chrom) # arrays for position and values
  *             p2n = iter(p2s).__next__         # assign the next function to a viable to speed up
  *             v2n = iter(v2s).__next__             # <<<<<<<<<<<<<<
  * 
  *             pre_p = 0                   # remember the previous position in the new bedGraphTrackI object ret
  */
-    __pyx_t_9 = PyObject_GetIter(__pyx_v_v2s); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 857, __pyx_L1_error)
+    __pyx_t_9 = PyObject_GetIter(__pyx_v_v2s); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 858, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_9);
-    __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_t_9, __pyx_n_s_next); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 857, __pyx_L1_error)
+    __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_t_9, __pyx_n_s_next); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 858, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_4);
     __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
     __Pyx_XDECREF_SET(__pyx_v_v2n, __pyx_t_4);
     __pyx_t_4 = 0;
 
-    /* "MACS2/IO/BedGraph.pyx":859
+    /* "MACS2/IO/BedGraph.pyx":860
  *             v2n = iter(v2s).__next__
  * 
  *             pre_p = 0                   # remember the previous position in the new bedGraphTrackI object ret             # <<<<<<<<<<<<<<
@@ -13906,7 +14194,7 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_42extract_value(
  */
     __pyx_v_pre_p = 0;
 
-    /* "MACS2/IO/BedGraph.pyx":861
+    /* "MACS2/IO/BedGraph.pyx":862
  *             pre_p = 0                   # remember the previous position in the new bedGraphTrackI object ret
  * 
  *             try:             # <<<<<<<<<<<<<<
@@ -13922,7 +14210,7 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_42extract_value(
       __Pyx_XGOTREF(__pyx_t_16);
       /*try:*/ {
 
-        /* "MACS2/IO/BedGraph.pyx":862
+        /* "MACS2/IO/BedGraph.pyx":863
  * 
  *             try:
  *                 p1 = p1n()             # <<<<<<<<<<<<<<
@@ -13942,14 +14230,14 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_42extract_value(
         }
         __pyx_t_4 = (__pyx_t_3) ? __Pyx_PyObject_CallOneArg(__pyx_t_9, __pyx_t_3) : __Pyx_PyObject_CallNoArg(__pyx_t_9);
         __Pyx_XDECREF(__pyx_t_3); __pyx_t_3 = 0;
-        if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 862, __pyx_L9_error)
+        if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 863, __pyx_L9_error)
         __Pyx_GOTREF(__pyx_t_4);
         __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
-        __pyx_t_17 = __Pyx_PyInt_As_int(__pyx_t_4); if (unlikely((__pyx_t_17 == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 862, __pyx_L9_error)
+        __pyx_t_17 = __Pyx_PyInt_As_int(__pyx_t_4); if (unlikely((__pyx_t_17 == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 863, __pyx_L9_error)
         __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
         __pyx_v_p1 = __pyx_t_17;
 
-        /* "MACS2/IO/BedGraph.pyx":863
+        /* "MACS2/IO/BedGraph.pyx":864
  *             try:
  *                 p1 = p1n()
  *                 v1 = v1n()             # <<<<<<<<<<<<<<
@@ -13969,14 +14257,14 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_42extract_value(
         }
         __pyx_t_4 = (__pyx_t_3) ? __Pyx_PyObject_CallOneArg(__pyx_t_9, __pyx_t_3) : __Pyx_PyObject_CallNoArg(__pyx_t_9);
         __Pyx_XDECREF(__pyx_t_3); __pyx_t_3 = 0;
-        if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 863, __pyx_L9_error)
+        if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 864, __pyx_L9_error)
         __Pyx_GOTREF(__pyx_t_4);
         __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
-        __pyx_t_18 = __pyx_PyFloat_AsDouble(__pyx_t_4); if (unlikely((__pyx_t_18 == (double)-1) && PyErr_Occurred())) __PYX_ERR(0, 863, __pyx_L9_error)
+        __pyx_t_18 = __pyx_PyFloat_AsDouble(__pyx_t_4); if (unlikely((__pyx_t_18 == (double)-1) && PyErr_Occurred())) __PYX_ERR(0, 864, __pyx_L9_error)
         __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
         __pyx_v_v1 = __pyx_t_18;
 
-        /* "MACS2/IO/BedGraph.pyx":865
+        /* "MACS2/IO/BedGraph.pyx":866
  *                 v1 = v1n()
  * 
  *                 p2 = p2n()             # <<<<<<<<<<<<<<
@@ -13996,14 +14284,14 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_42extract_value(
         }
         __pyx_t_4 = (__pyx_t_3) ? __Pyx_PyObject_CallOneArg(__pyx_t_9, __pyx_t_3) : __Pyx_PyObject_CallNoArg(__pyx_t_9);
         __Pyx_XDECREF(__pyx_t_3); __pyx_t_3 = 0;
-        if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 865, __pyx_L9_error)
+        if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 866, __pyx_L9_error)
         __Pyx_GOTREF(__pyx_t_4);
         __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
-        __pyx_t_17 = __Pyx_PyInt_As_int(__pyx_t_4); if (unlikely((__pyx_t_17 == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 865, __pyx_L9_error)
+        __pyx_t_17 = __Pyx_PyInt_As_int(__pyx_t_4); if (unlikely((__pyx_t_17 == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 866, __pyx_L9_error)
         __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
         __pyx_v_p2 = __pyx_t_17;
 
-        /* "MACS2/IO/BedGraph.pyx":866
+        /* "MACS2/IO/BedGraph.pyx":867
  * 
  *                 p2 = p2n()
  *                 v2 = v2n()             # <<<<<<<<<<<<<<
@@ -14023,14 +14311,14 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_42extract_value(
         }
         __pyx_t_4 = (__pyx_t_3) ? __Pyx_PyObject_CallOneArg(__pyx_t_9, __pyx_t_3) : __Pyx_PyObject_CallNoArg(__pyx_t_9);
         __Pyx_XDECREF(__pyx_t_3); __pyx_t_3 = 0;
-        if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 866, __pyx_L9_error)
+        if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 867, __pyx_L9_error)
         __Pyx_GOTREF(__pyx_t_4);
         __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
-        __pyx_t_18 = __pyx_PyFloat_AsDouble(__pyx_t_4); if (unlikely((__pyx_t_18 == (double)-1) && PyErr_Occurred())) __PYX_ERR(0, 866, __pyx_L9_error)
+        __pyx_t_18 = __pyx_PyFloat_AsDouble(__pyx_t_4); if (unlikely((__pyx_t_18 == (double)-1) && PyErr_Occurred())) __PYX_ERR(0, 867, __pyx_L9_error)
         __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
         __pyx_v_v2 = __pyx_t_18;
 
-        /* "MACS2/IO/BedGraph.pyx":868
+        /* "MACS2/IO/BedGraph.pyx":869
  *                 v2 = v2n()
  * 
  *                 while True:             # <<<<<<<<<<<<<<
@@ -14039,7 +14327,7 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_42extract_value(
  */
         while (1) {
 
-          /* "MACS2/IO/BedGraph.pyx":869
+          /* "MACS2/IO/BedGraph.pyx":870
  * 
  *                 while True:
  *                     if p1 < p2:             # <<<<<<<<<<<<<<
@@ -14049,7 +14337,7 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_42extract_value(
           __pyx_t_1 = ((__pyx_v_p1 < __pyx_v_p2) != 0);
           if (__pyx_t_1) {
 
-            /* "MACS2/IO/BedGraph.pyx":871
+            /* "MACS2/IO/BedGraph.pyx":872
  *                     if p1 < p2:
  *                         # clip a region from pre_p to p1, then set pre_p as p1.
  *                         if v2>0:             # <<<<<<<<<<<<<<
@@ -14059,33 +14347,33 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_42extract_value(
             __pyx_t_1 = ((__pyx_v_v2 > 0.0) != 0);
             if (__pyx_t_1) {
 
-              /* "MACS2/IO/BedGraph.pyx":872
+              /* "MACS2/IO/BedGraph.pyx":873
  *                         # clip a region from pre_p to p1, then set pre_p as p1.
  *                         if v2>0:
  *                             radd(chrom+"."+str(pre_p)+"."+str(p1))             # <<<<<<<<<<<<<<
  *                             vadd(v1)
  *                             ladd(p1-pre_p)
  */
-              __pyx_t_9 = __Pyx_PyUnicode_ConcatSafe(__pyx_v_chrom, __pyx_kp_u__11); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 872, __pyx_L9_error)
+              __pyx_t_9 = __Pyx_PyUnicode_ConcatSafe(__pyx_v_chrom, __pyx_kp_u__11); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 873, __pyx_L9_error)
               __Pyx_GOTREF(__pyx_t_9);
-              __pyx_t_3 = __Pyx_PyInt_From_int(__pyx_v_pre_p); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 872, __pyx_L9_error)
+              __pyx_t_3 = __Pyx_PyInt_From_int(__pyx_v_pre_p); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 873, __pyx_L9_error)
               __Pyx_GOTREF(__pyx_t_3);
-              __pyx_t_2 = __Pyx_PyObject_CallOneArg(((PyObject *)(&PyUnicode_Type)), __pyx_t_3); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 872, __pyx_L9_error)
+              __pyx_t_2 = __Pyx_PyObject_CallOneArg(((PyObject *)(&PyUnicode_Type)), __pyx_t_3); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 873, __pyx_L9_error)
               __Pyx_GOTREF(__pyx_t_2);
               __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-              __pyx_t_3 = __Pyx_PyUnicode_Concat(__pyx_t_9, __pyx_t_2); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 872, __pyx_L9_error)
+              __pyx_t_3 = __Pyx_PyUnicode_Concat(__pyx_t_9, __pyx_t_2); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 873, __pyx_L9_error)
               __Pyx_GOTREF(__pyx_t_3);
               __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
               __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-              __pyx_t_2 = __Pyx_PyUnicode_Concat(__pyx_t_3, __pyx_kp_u__11); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 872, __pyx_L9_error)
+              __pyx_t_2 = __Pyx_PyUnicode_Concat(__pyx_t_3, __pyx_kp_u__11); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 873, __pyx_L9_error)
               __Pyx_GOTREF(__pyx_t_2);
               __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-              __pyx_t_3 = __Pyx_PyInt_From_int(__pyx_v_p1); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 872, __pyx_L9_error)
+              __pyx_t_3 = __Pyx_PyInt_From_int(__pyx_v_p1); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 873, __pyx_L9_error)
               __Pyx_GOTREF(__pyx_t_3);
-              __pyx_t_9 = __Pyx_PyObject_CallOneArg(((PyObject *)(&PyUnicode_Type)), __pyx_t_3); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 872, __pyx_L9_error)
+              __pyx_t_9 = __Pyx_PyObject_CallOneArg(((PyObject *)(&PyUnicode_Type)), __pyx_t_3); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 873, __pyx_L9_error)
               __Pyx_GOTREF(__pyx_t_9);
               __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-              __pyx_t_3 = __Pyx_PyUnicode_Concat(__pyx_t_2, __pyx_t_9); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 872, __pyx_L9_error)
+              __pyx_t_3 = __Pyx_PyUnicode_Concat(__pyx_t_2, __pyx_t_9); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 873, __pyx_L9_error)
               __Pyx_GOTREF(__pyx_t_3);
               __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
               __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
@@ -14103,19 +14391,19 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_42extract_value(
               __pyx_t_4 = (__pyx_t_2) ? __Pyx_PyObject_Call2Args(__pyx_t_9, __pyx_t_2, __pyx_t_3) : __Pyx_PyObject_CallOneArg(__pyx_t_9, __pyx_t_3);
               __Pyx_XDECREF(__pyx_t_2); __pyx_t_2 = 0;
               __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-              if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 872, __pyx_L9_error)
+              if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 873, __pyx_L9_error)
               __Pyx_GOTREF(__pyx_t_4);
               __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
               __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
 
-              /* "MACS2/IO/BedGraph.pyx":873
+              /* "MACS2/IO/BedGraph.pyx":874
  *                         if v2>0:
  *                             radd(chrom+"."+str(pre_p)+"."+str(p1))
  *                             vadd(v1)             # <<<<<<<<<<<<<<
  *                             ladd(p1-pre_p)
  *                         pre_p = p1
  */
-              __pyx_t_9 = PyFloat_FromDouble(__pyx_v_v1); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 873, __pyx_L9_error)
+              __pyx_t_9 = PyFloat_FromDouble(__pyx_v_v1); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 874, __pyx_L9_error)
               __Pyx_GOTREF(__pyx_t_9);
               __Pyx_INCREF(__pyx_v_vadd);
               __pyx_t_3 = __pyx_v_vadd; __pyx_t_2 = NULL;
@@ -14131,19 +14419,19 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_42extract_value(
               __pyx_t_4 = (__pyx_t_2) ? __Pyx_PyObject_Call2Args(__pyx_t_3, __pyx_t_2, __pyx_t_9) : __Pyx_PyObject_CallOneArg(__pyx_t_3, __pyx_t_9);
               __Pyx_XDECREF(__pyx_t_2); __pyx_t_2 = 0;
               __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
-              if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 873, __pyx_L9_error)
+              if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 874, __pyx_L9_error)
               __Pyx_GOTREF(__pyx_t_4);
               __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
               __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
 
-              /* "MACS2/IO/BedGraph.pyx":874
+              /* "MACS2/IO/BedGraph.pyx":875
  *                             radd(chrom+"."+str(pre_p)+"."+str(p1))
  *                             vadd(v1)
  *                             ladd(p1-pre_p)             # <<<<<<<<<<<<<<
  *                         pre_p = p1
  *                         # call for the next p1 and v1
  */
-              __pyx_t_3 = __Pyx_PyInt_From_int((__pyx_v_p1 - __pyx_v_pre_p)); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 874, __pyx_L9_error)
+              __pyx_t_3 = __Pyx_PyInt_From_int((__pyx_v_p1 - __pyx_v_pre_p)); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 875, __pyx_L9_error)
               __Pyx_GOTREF(__pyx_t_3);
               __Pyx_INCREF(__pyx_v_ladd);
               __pyx_t_9 = __pyx_v_ladd; __pyx_t_2 = NULL;
@@ -14159,12 +14447,12 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_42extract_value(
               __pyx_t_4 = (__pyx_t_2) ? __Pyx_PyObject_Call2Args(__pyx_t_9, __pyx_t_2, __pyx_t_3) : __Pyx_PyObject_CallOneArg(__pyx_t_9, __pyx_t_3);
               __Pyx_XDECREF(__pyx_t_2); __pyx_t_2 = 0;
               __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-              if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 874, __pyx_L9_error)
+              if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 875, __pyx_L9_error)
               __Pyx_GOTREF(__pyx_t_4);
               __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
               __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
 
-              /* "MACS2/IO/BedGraph.pyx":871
+              /* "MACS2/IO/BedGraph.pyx":872
  *                     if p1 < p2:
  *                         # clip a region from pre_p to p1, then set pre_p as p1.
  *                         if v2>0:             # <<<<<<<<<<<<<<
@@ -14173,7 +14461,7 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_42extract_value(
  */
             }
 
-            /* "MACS2/IO/BedGraph.pyx":875
+            /* "MACS2/IO/BedGraph.pyx":876
  *                             vadd(v1)
  *                             ladd(p1-pre_p)
  *                         pre_p = p1             # <<<<<<<<<<<<<<
@@ -14182,7 +14470,7 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_42extract_value(
  */
             __pyx_v_pre_p = __pyx_v_p1;
 
-            /* "MACS2/IO/BedGraph.pyx":877
+            /* "MACS2/IO/BedGraph.pyx":878
  *                         pre_p = p1
  *                         # call for the next p1 and v1
  *                         p1 = p1n()             # <<<<<<<<<<<<<<
@@ -14202,14 +14490,14 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_42extract_value(
             }
             __pyx_t_4 = (__pyx_t_3) ? __Pyx_PyObject_CallOneArg(__pyx_t_9, __pyx_t_3) : __Pyx_PyObject_CallNoArg(__pyx_t_9);
             __Pyx_XDECREF(__pyx_t_3); __pyx_t_3 = 0;
-            if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 877, __pyx_L9_error)
+            if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 878, __pyx_L9_error)
             __Pyx_GOTREF(__pyx_t_4);
             __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
-            __pyx_t_17 = __Pyx_PyInt_As_int(__pyx_t_4); if (unlikely((__pyx_t_17 == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 877, __pyx_L9_error)
+            __pyx_t_17 = __Pyx_PyInt_As_int(__pyx_t_4); if (unlikely((__pyx_t_17 == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 878, __pyx_L9_error)
             __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
             __pyx_v_p1 = __pyx_t_17;
 
-            /* "MACS2/IO/BedGraph.pyx":878
+            /* "MACS2/IO/BedGraph.pyx":879
  *                         # call for the next p1 and v1
  *                         p1 = p1n()
  *                         v1 = v1n()             # <<<<<<<<<<<<<<
@@ -14229,14 +14517,14 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_42extract_value(
             }
             __pyx_t_4 = (__pyx_t_3) ? __Pyx_PyObject_CallOneArg(__pyx_t_9, __pyx_t_3) : __Pyx_PyObject_CallNoArg(__pyx_t_9);
             __Pyx_XDECREF(__pyx_t_3); __pyx_t_3 = 0;
-            if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 878, __pyx_L9_error)
+            if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 879, __pyx_L9_error)
             __Pyx_GOTREF(__pyx_t_4);
             __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
-            __pyx_t_18 = __pyx_PyFloat_AsDouble(__pyx_t_4); if (unlikely((__pyx_t_18 == (double)-1) && PyErr_Occurred())) __PYX_ERR(0, 878, __pyx_L9_error)
+            __pyx_t_18 = __pyx_PyFloat_AsDouble(__pyx_t_4); if (unlikely((__pyx_t_18 == (double)-1) && PyErr_Occurred())) __PYX_ERR(0, 879, __pyx_L9_error)
             __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
             __pyx_v_v1 = __pyx_t_18;
 
-            /* "MACS2/IO/BedGraph.pyx":869
+            /* "MACS2/IO/BedGraph.pyx":870
  * 
  *                 while True:
  *                     if p1 < p2:             # <<<<<<<<<<<<<<
@@ -14246,7 +14534,7 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_42extract_value(
             goto __pyx_L19;
           }
 
-          /* "MACS2/IO/BedGraph.pyx":879
+          /* "MACS2/IO/BedGraph.pyx":880
  *                         p1 = p1n()
  *                         v1 = v1n()
  *                     elif p2 < p1:             # <<<<<<<<<<<<<<
@@ -14256,7 +14544,7 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_42extract_value(
           __pyx_t_1 = ((__pyx_v_p2 < __pyx_v_p1) != 0);
           if (__pyx_t_1) {
 
-            /* "MACS2/IO/BedGraph.pyx":881
+            /* "MACS2/IO/BedGraph.pyx":882
  *                     elif p2 < p1:
  *                         # clip a region from pre_p to p2, then set pre_p as p2.
  *                         if v2>0:             # <<<<<<<<<<<<<<
@@ -14266,33 +14554,33 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_42extract_value(
             __pyx_t_1 = ((__pyx_v_v2 > 0.0) != 0);
             if (__pyx_t_1) {
 
-              /* "MACS2/IO/BedGraph.pyx":882
+              /* "MACS2/IO/BedGraph.pyx":883
  *                         # clip a region from pre_p to p2, then set pre_p as p2.
  *                         if v2>0:
  *                             radd(chrom+"."+str(pre_p)+"."+str(p2))             # <<<<<<<<<<<<<<
  *                             vadd(v1)
  *                             ladd(p2-pre_p)
  */
-              __pyx_t_9 = __Pyx_PyUnicode_ConcatSafe(__pyx_v_chrom, __pyx_kp_u__11); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 882, __pyx_L9_error)
+              __pyx_t_9 = __Pyx_PyUnicode_ConcatSafe(__pyx_v_chrom, __pyx_kp_u__11); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 883, __pyx_L9_error)
               __Pyx_GOTREF(__pyx_t_9);
-              __pyx_t_3 = __Pyx_PyInt_From_int(__pyx_v_pre_p); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 882, __pyx_L9_error)
+              __pyx_t_3 = __Pyx_PyInt_From_int(__pyx_v_pre_p); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 883, __pyx_L9_error)
               __Pyx_GOTREF(__pyx_t_3);
-              __pyx_t_2 = __Pyx_PyObject_CallOneArg(((PyObject *)(&PyUnicode_Type)), __pyx_t_3); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 882, __pyx_L9_error)
+              __pyx_t_2 = __Pyx_PyObject_CallOneArg(((PyObject *)(&PyUnicode_Type)), __pyx_t_3); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 883, __pyx_L9_error)
               __Pyx_GOTREF(__pyx_t_2);
               __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-              __pyx_t_3 = __Pyx_PyUnicode_Concat(__pyx_t_9, __pyx_t_2); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 882, __pyx_L9_error)
+              __pyx_t_3 = __Pyx_PyUnicode_Concat(__pyx_t_9, __pyx_t_2); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 883, __pyx_L9_error)
               __Pyx_GOTREF(__pyx_t_3);
               __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
               __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-              __pyx_t_2 = __Pyx_PyUnicode_Concat(__pyx_t_3, __pyx_kp_u__11); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 882, __pyx_L9_error)
+              __pyx_t_2 = __Pyx_PyUnicode_Concat(__pyx_t_3, __pyx_kp_u__11); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 883, __pyx_L9_error)
               __Pyx_GOTREF(__pyx_t_2);
               __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-              __pyx_t_3 = __Pyx_PyInt_From_int(__pyx_v_p2); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 882, __pyx_L9_error)
+              __pyx_t_3 = __Pyx_PyInt_From_int(__pyx_v_p2); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 883, __pyx_L9_error)
               __Pyx_GOTREF(__pyx_t_3);
-              __pyx_t_9 = __Pyx_PyObject_CallOneArg(((PyObject *)(&PyUnicode_Type)), __pyx_t_3); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 882, __pyx_L9_error)
+              __pyx_t_9 = __Pyx_PyObject_CallOneArg(((PyObject *)(&PyUnicode_Type)), __pyx_t_3); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 883, __pyx_L9_error)
               __Pyx_GOTREF(__pyx_t_9);
               __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-              __pyx_t_3 = __Pyx_PyUnicode_Concat(__pyx_t_2, __pyx_t_9); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 882, __pyx_L9_error)
+              __pyx_t_3 = __Pyx_PyUnicode_Concat(__pyx_t_2, __pyx_t_9); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 883, __pyx_L9_error)
               __Pyx_GOTREF(__pyx_t_3);
               __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
               __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
@@ -14310,19 +14598,19 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_42extract_value(
               __pyx_t_4 = (__pyx_t_2) ? __Pyx_PyObject_Call2Args(__pyx_t_9, __pyx_t_2, __pyx_t_3) : __Pyx_PyObject_CallOneArg(__pyx_t_9, __pyx_t_3);
               __Pyx_XDECREF(__pyx_t_2); __pyx_t_2 = 0;
               __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-              if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 882, __pyx_L9_error)
+              if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 883, __pyx_L9_error)
               __Pyx_GOTREF(__pyx_t_4);
               __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
               __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
 
-              /* "MACS2/IO/BedGraph.pyx":883
+              /* "MACS2/IO/BedGraph.pyx":884
  *                         if v2>0:
  *                             radd(chrom+"."+str(pre_p)+"."+str(p2))
  *                             vadd(v1)             # <<<<<<<<<<<<<<
  *                             ladd(p2-pre_p)
  *                         pre_p = p2
  */
-              __pyx_t_9 = PyFloat_FromDouble(__pyx_v_v1); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 883, __pyx_L9_error)
+              __pyx_t_9 = PyFloat_FromDouble(__pyx_v_v1); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 884, __pyx_L9_error)
               __Pyx_GOTREF(__pyx_t_9);
               __Pyx_INCREF(__pyx_v_vadd);
               __pyx_t_3 = __pyx_v_vadd; __pyx_t_2 = NULL;
@@ -14338,19 +14626,19 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_42extract_value(
               __pyx_t_4 = (__pyx_t_2) ? __Pyx_PyObject_Call2Args(__pyx_t_3, __pyx_t_2, __pyx_t_9) : __Pyx_PyObject_CallOneArg(__pyx_t_3, __pyx_t_9);
               __Pyx_XDECREF(__pyx_t_2); __pyx_t_2 = 0;
               __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
-              if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 883, __pyx_L9_error)
+              if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 884, __pyx_L9_error)
               __Pyx_GOTREF(__pyx_t_4);
               __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
               __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
 
-              /* "MACS2/IO/BedGraph.pyx":884
+              /* "MACS2/IO/BedGraph.pyx":885
  *                             radd(chrom+"."+str(pre_p)+"."+str(p2))
  *                             vadd(v1)
  *                             ladd(p2-pre_p)             # <<<<<<<<<<<<<<
  *                         pre_p = p2
  *                         # call for the next p2 and v2
  */
-              __pyx_t_3 = __Pyx_PyInt_From_int((__pyx_v_p2 - __pyx_v_pre_p)); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 884, __pyx_L9_error)
+              __pyx_t_3 = __Pyx_PyInt_From_int((__pyx_v_p2 - __pyx_v_pre_p)); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 885, __pyx_L9_error)
               __Pyx_GOTREF(__pyx_t_3);
               __Pyx_INCREF(__pyx_v_ladd);
               __pyx_t_9 = __pyx_v_ladd; __pyx_t_2 = NULL;
@@ -14366,12 +14654,12 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_42extract_value(
               __pyx_t_4 = (__pyx_t_2) ? __Pyx_PyObject_Call2Args(__pyx_t_9, __pyx_t_2, __pyx_t_3) : __Pyx_PyObject_CallOneArg(__pyx_t_9, __pyx_t_3);
               __Pyx_XDECREF(__pyx_t_2); __pyx_t_2 = 0;
               __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-              if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 884, __pyx_L9_error)
+              if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 885, __pyx_L9_error)
               __Pyx_GOTREF(__pyx_t_4);
               __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
               __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
 
-              /* "MACS2/IO/BedGraph.pyx":881
+              /* "MACS2/IO/BedGraph.pyx":882
  *                     elif p2 < p1:
  *                         # clip a region from pre_p to p2, then set pre_p as p2.
  *                         if v2>0:             # <<<<<<<<<<<<<<
@@ -14380,7 +14668,7 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_42extract_value(
  */
             }
 
-            /* "MACS2/IO/BedGraph.pyx":885
+            /* "MACS2/IO/BedGraph.pyx":886
  *                             vadd(v1)
  *                             ladd(p2-pre_p)
  *                         pre_p = p2             # <<<<<<<<<<<<<<
@@ -14389,7 +14677,7 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_42extract_value(
  */
             __pyx_v_pre_p = __pyx_v_p2;
 
-            /* "MACS2/IO/BedGraph.pyx":887
+            /* "MACS2/IO/BedGraph.pyx":888
  *                         pre_p = p2
  *                         # call for the next p2 and v2
  *                         p2 = p2n()             # <<<<<<<<<<<<<<
@@ -14409,14 +14697,14 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_42extract_value(
             }
             __pyx_t_4 = (__pyx_t_3) ? __Pyx_PyObject_CallOneArg(__pyx_t_9, __pyx_t_3) : __Pyx_PyObject_CallNoArg(__pyx_t_9);
             __Pyx_XDECREF(__pyx_t_3); __pyx_t_3 = 0;
-            if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 887, __pyx_L9_error)
+            if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 888, __pyx_L9_error)
             __Pyx_GOTREF(__pyx_t_4);
             __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
-            __pyx_t_17 = __Pyx_PyInt_As_int(__pyx_t_4); if (unlikely((__pyx_t_17 == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 887, __pyx_L9_error)
+            __pyx_t_17 = __Pyx_PyInt_As_int(__pyx_t_4); if (unlikely((__pyx_t_17 == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 888, __pyx_L9_error)
             __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
             __pyx_v_p2 = __pyx_t_17;
 
-            /* "MACS2/IO/BedGraph.pyx":888
+            /* "MACS2/IO/BedGraph.pyx":889
  *                         # call for the next p2 and v2
  *                         p2 = p2n()
  *                         v2 = v2n()             # <<<<<<<<<<<<<<
@@ -14436,14 +14724,14 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_42extract_value(
             }
             __pyx_t_4 = (__pyx_t_3) ? __Pyx_PyObject_CallOneArg(__pyx_t_9, __pyx_t_3) : __Pyx_PyObject_CallNoArg(__pyx_t_9);
             __Pyx_XDECREF(__pyx_t_3); __pyx_t_3 = 0;
-            if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 888, __pyx_L9_error)
+            if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 889, __pyx_L9_error)
             __Pyx_GOTREF(__pyx_t_4);
             __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
-            __pyx_t_18 = __pyx_PyFloat_AsDouble(__pyx_t_4); if (unlikely((__pyx_t_18 == (double)-1) && PyErr_Occurred())) __PYX_ERR(0, 888, __pyx_L9_error)
+            __pyx_t_18 = __pyx_PyFloat_AsDouble(__pyx_t_4); if (unlikely((__pyx_t_18 == (double)-1) && PyErr_Occurred())) __PYX_ERR(0, 889, __pyx_L9_error)
             __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
             __pyx_v_v2 = __pyx_t_18;
 
-            /* "MACS2/IO/BedGraph.pyx":879
+            /* "MACS2/IO/BedGraph.pyx":880
  *                         p1 = p1n()
  *                         v1 = v1n()
  *                     elif p2 < p1:             # <<<<<<<<<<<<<<
@@ -14453,7 +14741,7 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_42extract_value(
             goto __pyx_L19;
           }
 
-          /* "MACS2/IO/BedGraph.pyx":889
+          /* "MACS2/IO/BedGraph.pyx":890
  *                         p2 = p2n()
  *                         v2 = v2n()
  *                     elif p1 == p2:             # <<<<<<<<<<<<<<
@@ -14463,7 +14751,7 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_42extract_value(
           __pyx_t_1 = ((__pyx_v_p1 == __pyx_v_p2) != 0);
           if (__pyx_t_1) {
 
-            /* "MACS2/IO/BedGraph.pyx":891
+            /* "MACS2/IO/BedGraph.pyx":892
  *                     elif p1 == p2:
  *                         # from pre_p to p1 or p2, then set pre_p as p1 or p2.
  *                         if v2>0:             # <<<<<<<<<<<<<<
@@ -14473,33 +14761,33 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_42extract_value(
             __pyx_t_1 = ((__pyx_v_v2 > 0.0) != 0);
             if (__pyx_t_1) {
 
-              /* "MACS2/IO/BedGraph.pyx":892
+              /* "MACS2/IO/BedGraph.pyx":893
  *                         # from pre_p to p1 or p2, then set pre_p as p1 or p2.
  *                         if v2>0:
  *                             radd(chrom+"."+str(pre_p)+"."+str(p1))             # <<<<<<<<<<<<<<
  *                             vadd(v1)
  *                             ladd(p1-pre_p)
  */
-              __pyx_t_9 = __Pyx_PyUnicode_ConcatSafe(__pyx_v_chrom, __pyx_kp_u__11); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 892, __pyx_L9_error)
+              __pyx_t_9 = __Pyx_PyUnicode_ConcatSafe(__pyx_v_chrom, __pyx_kp_u__11); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 893, __pyx_L9_error)
               __Pyx_GOTREF(__pyx_t_9);
-              __pyx_t_3 = __Pyx_PyInt_From_int(__pyx_v_pre_p); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 892, __pyx_L9_error)
+              __pyx_t_3 = __Pyx_PyInt_From_int(__pyx_v_pre_p); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 893, __pyx_L9_error)
               __Pyx_GOTREF(__pyx_t_3);
-              __pyx_t_2 = __Pyx_PyObject_CallOneArg(((PyObject *)(&PyUnicode_Type)), __pyx_t_3); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 892, __pyx_L9_error)
+              __pyx_t_2 = __Pyx_PyObject_CallOneArg(((PyObject *)(&PyUnicode_Type)), __pyx_t_3); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 893, __pyx_L9_error)
               __Pyx_GOTREF(__pyx_t_2);
               __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-              __pyx_t_3 = __Pyx_PyUnicode_Concat(__pyx_t_9, __pyx_t_2); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 892, __pyx_L9_error)
+              __pyx_t_3 = __Pyx_PyUnicode_Concat(__pyx_t_9, __pyx_t_2); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 893, __pyx_L9_error)
               __Pyx_GOTREF(__pyx_t_3);
               __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
               __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-              __pyx_t_2 = __Pyx_PyUnicode_Concat(__pyx_t_3, __pyx_kp_u__11); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 892, __pyx_L9_error)
+              __pyx_t_2 = __Pyx_PyUnicode_Concat(__pyx_t_3, __pyx_kp_u__11); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 893, __pyx_L9_error)
               __Pyx_GOTREF(__pyx_t_2);
               __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-              __pyx_t_3 = __Pyx_PyInt_From_int(__pyx_v_p1); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 892, __pyx_L9_error)
+              __pyx_t_3 = __Pyx_PyInt_From_int(__pyx_v_p1); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 893, __pyx_L9_error)
               __Pyx_GOTREF(__pyx_t_3);
-              __pyx_t_9 = __Pyx_PyObject_CallOneArg(((PyObject *)(&PyUnicode_Type)), __pyx_t_3); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 892, __pyx_L9_error)
+              __pyx_t_9 = __Pyx_PyObject_CallOneArg(((PyObject *)(&PyUnicode_Type)), __pyx_t_3); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 893, __pyx_L9_error)
               __Pyx_GOTREF(__pyx_t_9);
               __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-              __pyx_t_3 = __Pyx_PyUnicode_Concat(__pyx_t_2, __pyx_t_9); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 892, __pyx_L9_error)
+              __pyx_t_3 = __Pyx_PyUnicode_Concat(__pyx_t_2, __pyx_t_9); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 893, __pyx_L9_error)
               __Pyx_GOTREF(__pyx_t_3);
               __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
               __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
@@ -14517,19 +14805,19 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_42extract_value(
               __pyx_t_4 = (__pyx_t_2) ? __Pyx_PyObject_Call2Args(__pyx_t_9, __pyx_t_2, __pyx_t_3) : __Pyx_PyObject_CallOneArg(__pyx_t_9, __pyx_t_3);
               __Pyx_XDECREF(__pyx_t_2); __pyx_t_2 = 0;
               __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-              if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 892, __pyx_L9_error)
+              if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 893, __pyx_L9_error)
               __Pyx_GOTREF(__pyx_t_4);
               __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
               __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
 
-              /* "MACS2/IO/BedGraph.pyx":893
+              /* "MACS2/IO/BedGraph.pyx":894
  *                         if v2>0:
  *                             radd(chrom+"."+str(pre_p)+"."+str(p1))
  *                             vadd(v1)             # <<<<<<<<<<<<<<
  *                             ladd(p1-pre_p)
  *                         pre_p = p1
  */
-              __pyx_t_9 = PyFloat_FromDouble(__pyx_v_v1); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 893, __pyx_L9_error)
+              __pyx_t_9 = PyFloat_FromDouble(__pyx_v_v1); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 894, __pyx_L9_error)
               __Pyx_GOTREF(__pyx_t_9);
               __Pyx_INCREF(__pyx_v_vadd);
               __pyx_t_3 = __pyx_v_vadd; __pyx_t_2 = NULL;
@@ -14545,19 +14833,19 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_42extract_value(
               __pyx_t_4 = (__pyx_t_2) ? __Pyx_PyObject_Call2Args(__pyx_t_3, __pyx_t_2, __pyx_t_9) : __Pyx_PyObject_CallOneArg(__pyx_t_3, __pyx_t_9);
               __Pyx_XDECREF(__pyx_t_2); __pyx_t_2 = 0;
               __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
-              if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 893, __pyx_L9_error)
+              if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 894, __pyx_L9_error)
               __Pyx_GOTREF(__pyx_t_4);
               __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
               __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
 
-              /* "MACS2/IO/BedGraph.pyx":894
+              /* "MACS2/IO/BedGraph.pyx":895
  *                             radd(chrom+"."+str(pre_p)+"."+str(p1))
  *                             vadd(v1)
  *                             ladd(p1-pre_p)             # <<<<<<<<<<<<<<
  *                         pre_p = p1
  *                         # call for the next p1, v1, p2, v2.
  */
-              __pyx_t_3 = __Pyx_PyInt_From_int((__pyx_v_p1 - __pyx_v_pre_p)); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 894, __pyx_L9_error)
+              __pyx_t_3 = __Pyx_PyInt_From_int((__pyx_v_p1 - __pyx_v_pre_p)); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 895, __pyx_L9_error)
               __Pyx_GOTREF(__pyx_t_3);
               __Pyx_INCREF(__pyx_v_ladd);
               __pyx_t_9 = __pyx_v_ladd; __pyx_t_2 = NULL;
@@ -14573,12 +14861,12 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_42extract_value(
               __pyx_t_4 = (__pyx_t_2) ? __Pyx_PyObject_Call2Args(__pyx_t_9, __pyx_t_2, __pyx_t_3) : __Pyx_PyObject_CallOneArg(__pyx_t_9, __pyx_t_3);
               __Pyx_XDECREF(__pyx_t_2); __pyx_t_2 = 0;
               __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-              if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 894, __pyx_L9_error)
+              if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 895, __pyx_L9_error)
               __Pyx_GOTREF(__pyx_t_4);
               __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
               __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
 
-              /* "MACS2/IO/BedGraph.pyx":891
+              /* "MACS2/IO/BedGraph.pyx":892
  *                     elif p1 == p2:
  *                         # from pre_p to p1 or p2, then set pre_p as p1 or p2.
  *                         if v2>0:             # <<<<<<<<<<<<<<
@@ -14587,7 +14875,7 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_42extract_value(
  */
             }
 
-            /* "MACS2/IO/BedGraph.pyx":895
+            /* "MACS2/IO/BedGraph.pyx":896
  *                             vadd(v1)
  *                             ladd(p1-pre_p)
  *                         pre_p = p1             # <<<<<<<<<<<<<<
@@ -14596,7 +14884,7 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_42extract_value(
  */
             __pyx_v_pre_p = __pyx_v_p1;
 
-            /* "MACS2/IO/BedGraph.pyx":897
+            /* "MACS2/IO/BedGraph.pyx":898
  *                         pre_p = p1
  *                         # call for the next p1, v1, p2, v2.
  *                         p1 = p1n()             # <<<<<<<<<<<<<<
@@ -14616,14 +14904,14 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_42extract_value(
             }
             __pyx_t_4 = (__pyx_t_3) ? __Pyx_PyObject_CallOneArg(__pyx_t_9, __pyx_t_3) : __Pyx_PyObject_CallNoArg(__pyx_t_9);
             __Pyx_XDECREF(__pyx_t_3); __pyx_t_3 = 0;
-            if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 897, __pyx_L9_error)
+            if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 898, __pyx_L9_error)
             __Pyx_GOTREF(__pyx_t_4);
             __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
-            __pyx_t_17 = __Pyx_PyInt_As_int(__pyx_t_4); if (unlikely((__pyx_t_17 == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 897, __pyx_L9_error)
+            __pyx_t_17 = __Pyx_PyInt_As_int(__pyx_t_4); if (unlikely((__pyx_t_17 == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 898, __pyx_L9_error)
             __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
             __pyx_v_p1 = __pyx_t_17;
 
-            /* "MACS2/IO/BedGraph.pyx":898
+            /* "MACS2/IO/BedGraph.pyx":899
  *                         # call for the next p1, v1, p2, v2.
  *                         p1 = p1n()
  *                         v1 = v1n()             # <<<<<<<<<<<<<<
@@ -14643,14 +14931,14 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_42extract_value(
             }
             __pyx_t_4 = (__pyx_t_3) ? __Pyx_PyObject_CallOneArg(__pyx_t_9, __pyx_t_3) : __Pyx_PyObject_CallNoArg(__pyx_t_9);
             __Pyx_XDECREF(__pyx_t_3); __pyx_t_3 = 0;
-            if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 898, __pyx_L9_error)
+            if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 899, __pyx_L9_error)
             __Pyx_GOTREF(__pyx_t_4);
             __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
-            __pyx_t_18 = __pyx_PyFloat_AsDouble(__pyx_t_4); if (unlikely((__pyx_t_18 == (double)-1) && PyErr_Occurred())) __PYX_ERR(0, 898, __pyx_L9_error)
+            __pyx_t_18 = __pyx_PyFloat_AsDouble(__pyx_t_4); if (unlikely((__pyx_t_18 == (double)-1) && PyErr_Occurred())) __PYX_ERR(0, 899, __pyx_L9_error)
             __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
             __pyx_v_v1 = __pyx_t_18;
 
-            /* "MACS2/IO/BedGraph.pyx":899
+            /* "MACS2/IO/BedGraph.pyx":900
  *                         p1 = p1n()
  *                         v1 = v1n()
  *                         p2 = p2n()             # <<<<<<<<<<<<<<
@@ -14670,14 +14958,14 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_42extract_value(
             }
             __pyx_t_4 = (__pyx_t_3) ? __Pyx_PyObject_CallOneArg(__pyx_t_9, __pyx_t_3) : __Pyx_PyObject_CallNoArg(__pyx_t_9);
             __Pyx_XDECREF(__pyx_t_3); __pyx_t_3 = 0;
-            if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 899, __pyx_L9_error)
+            if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 900, __pyx_L9_error)
             __Pyx_GOTREF(__pyx_t_4);
             __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
-            __pyx_t_17 = __Pyx_PyInt_As_int(__pyx_t_4); if (unlikely((__pyx_t_17 == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 899, __pyx_L9_error)
+            __pyx_t_17 = __Pyx_PyInt_As_int(__pyx_t_4); if (unlikely((__pyx_t_17 == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 900, __pyx_L9_error)
             __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
             __pyx_v_p2 = __pyx_t_17;
 
-            /* "MACS2/IO/BedGraph.pyx":900
+            /* "MACS2/IO/BedGraph.pyx":901
  *                         v1 = v1n()
  *                         p2 = p2n()
  *                         v2 = v2n()             # <<<<<<<<<<<<<<
@@ -14697,14 +14985,14 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_42extract_value(
             }
             __pyx_t_4 = (__pyx_t_3) ? __Pyx_PyObject_CallOneArg(__pyx_t_9, __pyx_t_3) : __Pyx_PyObject_CallNoArg(__pyx_t_9);
             __Pyx_XDECREF(__pyx_t_3); __pyx_t_3 = 0;
-            if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 900, __pyx_L9_error)
+            if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 901, __pyx_L9_error)
             __Pyx_GOTREF(__pyx_t_4);
             __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
-            __pyx_t_18 = __pyx_PyFloat_AsDouble(__pyx_t_4); if (unlikely((__pyx_t_18 == (double)-1) && PyErr_Occurred())) __PYX_ERR(0, 900, __pyx_L9_error)
+            __pyx_t_18 = __pyx_PyFloat_AsDouble(__pyx_t_4); if (unlikely((__pyx_t_18 == (double)-1) && PyErr_Occurred())) __PYX_ERR(0, 901, __pyx_L9_error)
             __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
             __pyx_v_v2 = __pyx_t_18;
 
-            /* "MACS2/IO/BedGraph.pyx":889
+            /* "MACS2/IO/BedGraph.pyx":890
  *                         p2 = p2n()
  *                         v2 = v2n()
  *                     elif p1 == p2:             # <<<<<<<<<<<<<<
@@ -14715,7 +15003,7 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_42extract_value(
           __pyx_L19:;
         }
 
-        /* "MACS2/IO/BedGraph.pyx":861
+        /* "MACS2/IO/BedGraph.pyx":862
  *             pre_p = 0                   # remember the previous position in the new bedGraphTrackI object ret
  * 
  *             try:             # <<<<<<<<<<<<<<
@@ -14737,7 +15025,7 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_42extract_value(
       __Pyx_XDECREF(__pyx_t_7); __pyx_t_7 = 0;
       __Pyx_XDECREF(__pyx_t_9); __pyx_t_9 = 0;
 
-      /* "MACS2/IO/BedGraph.pyx":901
+      /* "MACS2/IO/BedGraph.pyx":902
  *                         p2 = p2n()
  *                         v2 = v2n()
  *             except StopIteration:             # <<<<<<<<<<<<<<
@@ -14752,7 +15040,7 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_42extract_value(
       goto __pyx_L11_except_error;
       __pyx_L11_except_error:;
 
-      /* "MACS2/IO/BedGraph.pyx":861
+      /* "MACS2/IO/BedGraph.pyx":862
  *             pre_p = 0                   # remember the previous position in the new bedGraphTrackI object ret
  * 
  *             try:             # <<<<<<<<<<<<<<
@@ -14773,7 +15061,7 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_42extract_value(
     }
   }
 
-  /* "MACS2/IO/BedGraph.pyx":905
+  /* "MACS2/IO/BedGraph.pyx":906
  *                 pass
  * 
  *         return ret             # <<<<<<<<<<<<<<
@@ -14785,7 +15073,7 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_42extract_value(
   __pyx_r = __pyx_v_ret;
   goto __pyx_L0;
 
-  /* "MACS2/IO/BedGraph.pyx":824
+  /* "MACS2/IO/BedGraph.pyx":825
  * 
  * 
  *     def extract_value ( self, bdgTrack2 ):             # <<<<<<<<<<<<<<
@@ -14823,11 +15111,12 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_42extract_value(
   __Pyx_XDECREF(__pyx_v_p2n);
   __Pyx_XDECREF(__pyx_v_v2n);
   __Pyx_XGIVEREF(__pyx_r);
+  __Pyx_TraceReturn(__pyx_r, 0);
   __Pyx_RefNannyFinishContext();
   return __pyx_r;
 }
 
-/* "MACS2/IO/BedGraph.pyx":907
+/* "MACS2/IO/BedGraph.pyx":908
  *         return ret
  * 
  *     def make_scoreTrackII_for_macs (self, bdgTrack2, float depth1 = 1.0, float depth2 = 1.0 ):             # <<<<<<<<<<<<<<
@@ -14880,7 +15169,7 @@ static PyObject *__pyx_pw_5MACS2_2IO_8BedGraph_14bedGraphTrackI_45make_scoreTrac
         }
       }
       if (unlikely(kw_args > 0)) {
-        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "make_scoreTrackII_for_macs") < 0)) __PYX_ERR(0, 907, __pyx_L3_error)
+        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "make_scoreTrackII_for_macs") < 0)) __PYX_ERR(0, 908, __pyx_L3_error)
       }
     } else {
       switch (PyTuple_GET_SIZE(__pyx_args)) {
@@ -14895,19 +15184,19 @@ static PyObject *__pyx_pw_5MACS2_2IO_8BedGraph_14bedGraphTrackI_45make_scoreTrac
     }
     __pyx_v_bdgTrack2 = values[0];
     if (values[1]) {
-      __pyx_v_depth1 = __pyx_PyFloat_AsFloat(values[1]); if (unlikely((__pyx_v_depth1 == (float)-1) && PyErr_Occurred())) __PYX_ERR(0, 907, __pyx_L3_error)
+      __pyx_v_depth1 = __pyx_PyFloat_AsFloat(values[1]); if (unlikely((__pyx_v_depth1 == (float)-1) && PyErr_Occurred())) __PYX_ERR(0, 908, __pyx_L3_error)
     } else {
       __pyx_v_depth1 = ((float)1.0);
     }
     if (values[2]) {
-      __pyx_v_depth2 = __pyx_PyFloat_AsFloat(values[2]); if (unlikely((__pyx_v_depth2 == (float)-1) && PyErr_Occurred())) __PYX_ERR(0, 907, __pyx_L3_error)
+      __pyx_v_depth2 = __pyx_PyFloat_AsFloat(values[2]); if (unlikely((__pyx_v_depth2 == (float)-1) && PyErr_Occurred())) __PYX_ERR(0, 908, __pyx_L3_error)
     } else {
       __pyx_v_depth2 = ((float)1.0);
     }
   }
   goto __pyx_L4_argument_unpacking_done;
   __pyx_L5_argtuple_error:;
-  __Pyx_RaiseArgtupleInvalid("make_scoreTrackII_for_macs", 0, 1, 3, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 907, __pyx_L3_error)
+  __Pyx_RaiseArgtupleInvalid("make_scoreTrackII_for_macs", 0, 1, 3, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 908, __pyx_L3_error)
   __pyx_L3_error:;
   __Pyx_AddTraceback("MACS2.IO.BedGraph.bedGraphTrackI.make_scoreTrackII_for_macs", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __Pyx_RefNannyFinishContext();
@@ -14942,6 +15231,7 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_44make_scoreTrac
   PyObject *__pyx_v_v2n = NULL;
   Py_ssize_t __pyx_v_chrom_max_len;
   PyObject *__pyx_r = NULL;
+  __Pyx_TraceDeclarations
   __Pyx_RefNannyDeclarations
   int __pyx_t_1;
   PyObject *__pyx_t_2 = NULL;
@@ -14963,8 +15253,9 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_44make_scoreTrac
   PyObject *__pyx_t_18 = NULL;
   PyObject *__pyx_t_19 = NULL;
   __Pyx_RefNannySetupContext("make_scoreTrackII_for_macs", 0);
+  __Pyx_TraceCall("make_scoreTrackII_for_macs", __pyx_f[0], 908, 0, __PYX_ERR(0, 908, __pyx_L1_error));
 
-  /* "MACS2/IO/BedGraph.pyx":924
+  /* "MACS2/IO/BedGraph.pyx":925
  *             bytes chrom
  * 
  *         assert isinstance(bdgTrack2,bedGraphTrackI), "bdgTrack2 is not a bedGraphTrackI object"             # <<<<<<<<<<<<<<
@@ -14976,72 +15267,72 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_44make_scoreTrac
     __pyx_t_1 = __Pyx_TypeCheck(__pyx_v_bdgTrack2, __pyx_ptype_5MACS2_2IO_8BedGraph_bedGraphTrackI); 
     if (unlikely(!(__pyx_t_1 != 0))) {
       PyErr_SetObject(PyExc_AssertionError, __pyx_kp_u_bdgTrack2_is_not_a_bedGraphTrack);
-      __PYX_ERR(0, 924, __pyx_L1_error)
+      __PYX_ERR(0, 925, __pyx_L1_error)
     }
   }
   #endif
 
-  /* "MACS2/IO/BedGraph.pyx":926
+  /* "MACS2/IO/BedGraph.pyx":927
  *         assert isinstance(bdgTrack2,bedGraphTrackI), "bdgTrack2 is not a bedGraphTrackI object"
  * 
  *         ret = scoreTrackII( treat_depth = depth1, ctrl_depth = depth2 )             # <<<<<<<<<<<<<<
  *         retadd = ret.add
  * 
  */
-  __Pyx_GetModuleGlobalName(__pyx_t_2, __pyx_n_s_scoreTrackII); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 926, __pyx_L1_error)
+  __Pyx_GetModuleGlobalName(__pyx_t_2, __pyx_n_s_scoreTrackII); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 927, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
-  __pyx_t_3 = __Pyx_PyDict_NewPresized(2); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 926, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_PyDict_NewPresized(2); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 927, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
-  __pyx_t_4 = PyFloat_FromDouble(__pyx_v_depth1); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 926, __pyx_L1_error)
+  __pyx_t_4 = PyFloat_FromDouble(__pyx_v_depth1); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 927, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_4);
-  if (PyDict_SetItem(__pyx_t_3, __pyx_n_s_treat_depth, __pyx_t_4) < 0) __PYX_ERR(0, 926, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_t_3, __pyx_n_s_treat_depth, __pyx_t_4) < 0) __PYX_ERR(0, 927, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-  __pyx_t_4 = PyFloat_FromDouble(__pyx_v_depth2); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 926, __pyx_L1_error)
+  __pyx_t_4 = PyFloat_FromDouble(__pyx_v_depth2); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 927, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_4);
-  if (PyDict_SetItem(__pyx_t_3, __pyx_n_s_ctrl_depth, __pyx_t_4) < 0) __PYX_ERR(0, 926, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_t_3, __pyx_n_s_ctrl_depth, __pyx_t_4) < 0) __PYX_ERR(0, 927, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-  __pyx_t_4 = __Pyx_PyObject_Call(__pyx_t_2, __pyx_empty_tuple, __pyx_t_3); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 926, __pyx_L1_error)
+  __pyx_t_4 = __Pyx_PyObject_Call(__pyx_t_2, __pyx_empty_tuple, __pyx_t_3); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 927, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_4);
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
   __pyx_v_ret = __pyx_t_4;
   __pyx_t_4 = 0;
 
-  /* "MACS2/IO/BedGraph.pyx":927
+  /* "MACS2/IO/BedGraph.pyx":928
  * 
  *         ret = scoreTrackII( treat_depth = depth1, ctrl_depth = depth2 )
  *         retadd = ret.add             # <<<<<<<<<<<<<<
  * 
  *         chr1 = set(self.get_chr_names())
  */
-  __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_v_ret, __pyx_n_s_add); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 927, __pyx_L1_error)
+  __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_v_ret, __pyx_n_s_add); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 928, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_4);
   __pyx_v_retadd = __pyx_t_4;
   __pyx_t_4 = 0;
 
-  /* "MACS2/IO/BedGraph.pyx":929
+  /* "MACS2/IO/BedGraph.pyx":930
  *         retadd = ret.add
  * 
  *         chr1 = set(self.get_chr_names())             # <<<<<<<<<<<<<<
  *         chr2 = set(bdgTrack2.get_chr_names())
  *         common_chr = chr1.intersection(chr2)
  */
-  __pyx_t_4 = ((struct __pyx_vtabstruct_5MACS2_2IO_8BedGraph_bedGraphTrackI *)__pyx_v_self->__pyx_vtab)->get_chr_names(__pyx_v_self, 0); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 929, __pyx_L1_error)
+  __pyx_t_4 = ((struct __pyx_vtabstruct_5MACS2_2IO_8BedGraph_bedGraphTrackI *)__pyx_v_self->__pyx_vtab)->get_chr_names(__pyx_v_self, 0); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 930, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_4);
-  __pyx_t_3 = PySet_New(__pyx_t_4); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 929, __pyx_L1_error)
+  __pyx_t_3 = PySet_New(__pyx_t_4); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 930, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
   __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
   __pyx_v_chr1 = ((PyObject*)__pyx_t_3);
   __pyx_t_3 = 0;
 
-  /* "MACS2/IO/BedGraph.pyx":930
+  /* "MACS2/IO/BedGraph.pyx":931
  * 
  *         chr1 = set(self.get_chr_names())
  *         chr2 = set(bdgTrack2.get_chr_names())             # <<<<<<<<<<<<<<
  *         common_chr = chr1.intersection(chr2)
  *         for chrom in common_chr:
  */
-  __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_v_bdgTrack2, __pyx_n_s_get_chr_names); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 930, __pyx_L1_error)
+  __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_v_bdgTrack2, __pyx_n_s_get_chr_names); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 931, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_4);
   __pyx_t_2 = NULL;
   if (CYTHON_UNPACK_METHODS && likely(PyMethod_Check(__pyx_t_4))) {
@@ -15055,28 +15346,28 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_44make_scoreTrac
   }
   __pyx_t_3 = (__pyx_t_2) ? __Pyx_PyObject_CallOneArg(__pyx_t_4, __pyx_t_2) : __Pyx_PyObject_CallNoArg(__pyx_t_4);
   __Pyx_XDECREF(__pyx_t_2); __pyx_t_2 = 0;
-  if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 930, __pyx_L1_error)
+  if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 931, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
   __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-  __pyx_t_4 = PySet_New(__pyx_t_3); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 930, __pyx_L1_error)
+  __pyx_t_4 = PySet_New(__pyx_t_3); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 931, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_4);
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
   __pyx_v_chr2 = ((PyObject*)__pyx_t_4);
   __pyx_t_4 = 0;
 
-  /* "MACS2/IO/BedGraph.pyx":931
+  /* "MACS2/IO/BedGraph.pyx":932
  *         chr1 = set(self.get_chr_names())
  *         chr2 = set(bdgTrack2.get_chr_names())
  *         common_chr = chr1.intersection(chr2)             # <<<<<<<<<<<<<<
  *         for chrom in common_chr:
  * 
  */
-  __pyx_t_4 = __Pyx_CallUnboundCMethod1(&__pyx_umethod_PySet_Type_intersection, __pyx_v_chr1, __pyx_v_chr2); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 931, __pyx_L1_error)
+  __pyx_t_4 = __Pyx_CallUnboundCMethod1(&__pyx_umethod_PySet_Type_intersection, __pyx_v_chr1, __pyx_v_chr2); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 932, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_4);
   __pyx_v_common_chr = __pyx_t_4;
   __pyx_t_4 = 0;
 
-  /* "MACS2/IO/BedGraph.pyx":932
+  /* "MACS2/IO/BedGraph.pyx":933
  *         chr2 = set(bdgTrack2.get_chr_names())
  *         common_chr = chr1.intersection(chr2)
  *         for chrom in common_chr:             # <<<<<<<<<<<<<<
@@ -15087,26 +15378,26 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_44make_scoreTrac
     __pyx_t_4 = __pyx_v_common_chr; __Pyx_INCREF(__pyx_t_4); __pyx_t_5 = 0;
     __pyx_t_6 = NULL;
   } else {
-    __pyx_t_5 = -1; __pyx_t_4 = PyObject_GetIter(__pyx_v_common_chr); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 932, __pyx_L1_error)
+    __pyx_t_5 = -1; __pyx_t_4 = PyObject_GetIter(__pyx_v_common_chr); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 933, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_4);
-    __pyx_t_6 = Py_TYPE(__pyx_t_4)->tp_iternext; if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 932, __pyx_L1_error)
+    __pyx_t_6 = Py_TYPE(__pyx_t_4)->tp_iternext; if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 933, __pyx_L1_error)
   }
   for (;;) {
     if (likely(!__pyx_t_6)) {
       if (likely(PyList_CheckExact(__pyx_t_4))) {
         if (__pyx_t_5 >= PyList_GET_SIZE(__pyx_t_4)) break;
         #if CYTHON_ASSUME_SAFE_MACROS && !CYTHON_AVOID_BORROWED_REFS
-        __pyx_t_3 = PyList_GET_ITEM(__pyx_t_4, __pyx_t_5); __Pyx_INCREF(__pyx_t_3); __pyx_t_5++; if (unlikely(0 < 0)) __PYX_ERR(0, 932, __pyx_L1_error)
+        __pyx_t_3 = PyList_GET_ITEM(__pyx_t_4, __pyx_t_5); __Pyx_INCREF(__pyx_t_3); __pyx_t_5++; if (unlikely(0 < 0)) __PYX_ERR(0, 933, __pyx_L1_error)
         #else
-        __pyx_t_3 = PySequence_ITEM(__pyx_t_4, __pyx_t_5); __pyx_t_5++; if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 932, __pyx_L1_error)
+        __pyx_t_3 = PySequence_ITEM(__pyx_t_4, __pyx_t_5); __pyx_t_5++; if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 933, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_3);
         #endif
       } else {
         if (__pyx_t_5 >= PyTuple_GET_SIZE(__pyx_t_4)) break;
         #if CYTHON_ASSUME_SAFE_MACROS && !CYTHON_AVOID_BORROWED_REFS
-        __pyx_t_3 = PyTuple_GET_ITEM(__pyx_t_4, __pyx_t_5); __Pyx_INCREF(__pyx_t_3); __pyx_t_5++; if (unlikely(0 < 0)) __PYX_ERR(0, 932, __pyx_L1_error)
+        __pyx_t_3 = PyTuple_GET_ITEM(__pyx_t_4, __pyx_t_5); __Pyx_INCREF(__pyx_t_3); __pyx_t_5++; if (unlikely(0 < 0)) __PYX_ERR(0, 933, __pyx_L1_error)
         #else
-        __pyx_t_3 = PySequence_ITEM(__pyx_t_4, __pyx_t_5); __pyx_t_5++; if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 932, __pyx_L1_error)
+        __pyx_t_3 = PySequence_ITEM(__pyx_t_4, __pyx_t_5); __pyx_t_5++; if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 933, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_3);
         #endif
       }
@@ -15116,24 +15407,24 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_44make_scoreTrac
         PyObject* exc_type = PyErr_Occurred();
         if (exc_type) {
           if (likely(__Pyx_PyErr_GivenExceptionMatches(exc_type, PyExc_StopIteration))) PyErr_Clear();
-          else __PYX_ERR(0, 932, __pyx_L1_error)
+          else __PYX_ERR(0, 933, __pyx_L1_error)
         }
         break;
       }
       __Pyx_GOTREF(__pyx_t_3);
     }
-    if (!(likely(PyBytes_CheckExact(__pyx_t_3))||((__pyx_t_3) == Py_None)||(PyErr_Format(PyExc_TypeError, "Expected %.16s, got %.200s", "bytes", Py_TYPE(__pyx_t_3)->tp_name), 0))) __PYX_ERR(0, 932, __pyx_L1_error)
+    if (!(likely(PyBytes_CheckExact(__pyx_t_3))||((__pyx_t_3) == Py_None)||(PyErr_Format(PyExc_TypeError, "Expected %.16s, got %.200s", "bytes", Py_TYPE(__pyx_t_3)->tp_name), 0))) __PYX_ERR(0, 933, __pyx_L1_error)
     __Pyx_XDECREF_SET(__pyx_v_chrom, ((PyObject*)__pyx_t_3));
     __pyx_t_3 = 0;
 
-    /* "MACS2/IO/BedGraph.pyx":934
+    /* "MACS2/IO/BedGraph.pyx":935
  *         for chrom in common_chr:
  * 
  *             (p1s,v1s) = self.get_data_by_chr(chrom) # arrays for position and values             # <<<<<<<<<<<<<<
  *             p1n = iter(p1s).__next__         # assign the next function to a viable to speed up
  *             v1n = iter(v1s).__next__
  */
-    __pyx_t_2 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_v_self), __pyx_n_s_get_data_by_chr); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 934, __pyx_L1_error)
+    __pyx_t_2 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_v_self), __pyx_n_s_get_data_by_chr); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 935, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
     __pyx_t_7 = NULL;
     if (CYTHON_UNPACK_METHODS && likely(PyMethod_Check(__pyx_t_2))) {
@@ -15147,7 +15438,7 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_44make_scoreTrac
     }
     __pyx_t_3 = (__pyx_t_7) ? __Pyx_PyObject_Call2Args(__pyx_t_2, __pyx_t_7, __pyx_v_chrom) : __Pyx_PyObject_CallOneArg(__pyx_t_2, __pyx_v_chrom);
     __Pyx_XDECREF(__pyx_t_7); __pyx_t_7 = 0;
-    if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 934, __pyx_L1_error)
+    if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 935, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_3);
     __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
     if ((likely(PyTuple_CheckExact(__pyx_t_3))) || (PyList_CheckExact(__pyx_t_3))) {
@@ -15156,7 +15447,7 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_44make_scoreTrac
       if (unlikely(size != 2)) {
         if (size > 2) __Pyx_RaiseTooManyValuesError(2);
         else if (size >= 0) __Pyx_RaiseNeedMoreValuesError(size);
-        __PYX_ERR(0, 934, __pyx_L1_error)
+        __PYX_ERR(0, 935, __pyx_L1_error)
       }
       #if CYTHON_ASSUME_SAFE_MACROS && !CYTHON_AVOID_BORROWED_REFS
       if (likely(PyTuple_CheckExact(sequence))) {
@@ -15169,15 +15460,15 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_44make_scoreTrac
       __Pyx_INCREF(__pyx_t_2);
       __Pyx_INCREF(__pyx_t_7);
       #else
-      __pyx_t_2 = PySequence_ITEM(sequence, 0); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 934, __pyx_L1_error)
+      __pyx_t_2 = PySequence_ITEM(sequence, 0); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 935, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_2);
-      __pyx_t_7 = PySequence_ITEM(sequence, 1); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 934, __pyx_L1_error)
+      __pyx_t_7 = PySequence_ITEM(sequence, 1); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 935, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_7);
       #endif
       __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
     } else {
       Py_ssize_t index = -1;
-      __pyx_t_8 = PyObject_GetIter(__pyx_t_3); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 934, __pyx_L1_error)
+      __pyx_t_8 = PyObject_GetIter(__pyx_t_3); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 935, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_8);
       __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
       __pyx_t_9 = Py_TYPE(__pyx_t_8)->tp_iternext;
@@ -15185,7 +15476,7 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_44make_scoreTrac
       __Pyx_GOTREF(__pyx_t_2);
       index = 1; __pyx_t_7 = __pyx_t_9(__pyx_t_8); if (unlikely(!__pyx_t_7)) goto __pyx_L5_unpacking_failed;
       __Pyx_GOTREF(__pyx_t_7);
-      if (__Pyx_IternextUnpackEndCheck(__pyx_t_9(__pyx_t_8), 2) < 0) __PYX_ERR(0, 934, __pyx_L1_error)
+      if (__Pyx_IternextUnpackEndCheck(__pyx_t_9(__pyx_t_8), 2) < 0) __PYX_ERR(0, 935, __pyx_L1_error)
       __pyx_t_9 = NULL;
       __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
       goto __pyx_L6_unpacking_done;
@@ -15193,7 +15484,7 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_44make_scoreTrac
       __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
       __pyx_t_9 = NULL;
       if (__Pyx_IterFinish() == 0) __Pyx_RaiseNeedMoreValuesError(index);
-      __PYX_ERR(0, 934, __pyx_L1_error)
+      __PYX_ERR(0, 935, __pyx_L1_error)
       __pyx_L6_unpacking_done:;
     }
     __Pyx_XDECREF_SET(__pyx_v_p1s, __pyx_t_2);
@@ -15201,44 +15492,44 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_44make_scoreTrac
     __Pyx_XDECREF_SET(__pyx_v_v1s, __pyx_t_7);
     __pyx_t_7 = 0;
 
-    /* "MACS2/IO/BedGraph.pyx":935
+    /* "MACS2/IO/BedGraph.pyx":936
  * 
  *             (p1s,v1s) = self.get_data_by_chr(chrom) # arrays for position and values
  *             p1n = iter(p1s).__next__         # assign the next function to a viable to speed up             # <<<<<<<<<<<<<<
  *             v1n = iter(v1s).__next__
  * 
  */
-    __pyx_t_3 = PyObject_GetIter(__pyx_v_p1s); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 935, __pyx_L1_error)
+    __pyx_t_3 = PyObject_GetIter(__pyx_v_p1s); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 936, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_3);
-    __pyx_t_7 = __Pyx_PyObject_GetAttrStr(__pyx_t_3, __pyx_n_s_next); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 935, __pyx_L1_error)
+    __pyx_t_7 = __Pyx_PyObject_GetAttrStr(__pyx_t_3, __pyx_n_s_next); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 936, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_7);
     __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
     __Pyx_XDECREF_SET(__pyx_v_p1n, __pyx_t_7);
     __pyx_t_7 = 0;
 
-    /* "MACS2/IO/BedGraph.pyx":936
+    /* "MACS2/IO/BedGraph.pyx":937
  *             (p1s,v1s) = self.get_data_by_chr(chrom) # arrays for position and values
  *             p1n = iter(p1s).__next__         # assign the next function to a viable to speed up
  *             v1n = iter(v1s).__next__             # <<<<<<<<<<<<<<
  * 
  *             (p2s,v2s) = bdgTrack2.get_data_by_chr(chrom) # arrays for position and values
  */
-    __pyx_t_7 = PyObject_GetIter(__pyx_v_v1s); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 936, __pyx_L1_error)
+    __pyx_t_7 = PyObject_GetIter(__pyx_v_v1s); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 937, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_7);
-    __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_t_7, __pyx_n_s_next); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 936, __pyx_L1_error)
+    __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_t_7, __pyx_n_s_next); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 937, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_3);
     __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
     __Pyx_XDECREF_SET(__pyx_v_v1n, __pyx_t_3);
     __pyx_t_3 = 0;
 
-    /* "MACS2/IO/BedGraph.pyx":938
+    /* "MACS2/IO/BedGraph.pyx":939
  *             v1n = iter(v1s).__next__
  * 
  *             (p2s,v2s) = bdgTrack2.get_data_by_chr(chrom) # arrays for position and values             # <<<<<<<<<<<<<<
  *             p2n = iter(p2s).__next__         # assign the next function to a viable to speed up
  *             v2n = iter(v2s).__next__
  */
-    __pyx_t_7 = __Pyx_PyObject_GetAttrStr(__pyx_v_bdgTrack2, __pyx_n_s_get_data_by_chr); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 938, __pyx_L1_error)
+    __pyx_t_7 = __Pyx_PyObject_GetAttrStr(__pyx_v_bdgTrack2, __pyx_n_s_get_data_by_chr); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 939, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_7);
     __pyx_t_2 = NULL;
     if (CYTHON_UNPACK_METHODS && likely(PyMethod_Check(__pyx_t_7))) {
@@ -15252,7 +15543,7 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_44make_scoreTrac
     }
     __pyx_t_3 = (__pyx_t_2) ? __Pyx_PyObject_Call2Args(__pyx_t_7, __pyx_t_2, __pyx_v_chrom) : __Pyx_PyObject_CallOneArg(__pyx_t_7, __pyx_v_chrom);
     __Pyx_XDECREF(__pyx_t_2); __pyx_t_2 = 0;
-    if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 938, __pyx_L1_error)
+    if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 939, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_3);
     __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
     if ((likely(PyTuple_CheckExact(__pyx_t_3))) || (PyList_CheckExact(__pyx_t_3))) {
@@ -15261,7 +15552,7 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_44make_scoreTrac
       if (unlikely(size != 2)) {
         if (size > 2) __Pyx_RaiseTooManyValuesError(2);
         else if (size >= 0) __Pyx_RaiseNeedMoreValuesError(size);
-        __PYX_ERR(0, 938, __pyx_L1_error)
+        __PYX_ERR(0, 939, __pyx_L1_error)
       }
       #if CYTHON_ASSUME_SAFE_MACROS && !CYTHON_AVOID_BORROWED_REFS
       if (likely(PyTuple_CheckExact(sequence))) {
@@ -15274,15 +15565,15 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_44make_scoreTrac
       __Pyx_INCREF(__pyx_t_7);
       __Pyx_INCREF(__pyx_t_2);
       #else
-      __pyx_t_7 = PySequence_ITEM(sequence, 0); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 938, __pyx_L1_error)
+      __pyx_t_7 = PySequence_ITEM(sequence, 0); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 939, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_7);
-      __pyx_t_2 = PySequence_ITEM(sequence, 1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 938, __pyx_L1_error)
+      __pyx_t_2 = PySequence_ITEM(sequence, 1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 939, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_2);
       #endif
       __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
     } else {
       Py_ssize_t index = -1;
-      __pyx_t_8 = PyObject_GetIter(__pyx_t_3); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 938, __pyx_L1_error)
+      __pyx_t_8 = PyObject_GetIter(__pyx_t_3); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 939, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_8);
       __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
       __pyx_t_9 = Py_TYPE(__pyx_t_8)->tp_iternext;
@@ -15290,7 +15581,7 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_44make_scoreTrac
       __Pyx_GOTREF(__pyx_t_7);
       index = 1; __pyx_t_2 = __pyx_t_9(__pyx_t_8); if (unlikely(!__pyx_t_2)) goto __pyx_L7_unpacking_failed;
       __Pyx_GOTREF(__pyx_t_2);
-      if (__Pyx_IternextUnpackEndCheck(__pyx_t_9(__pyx_t_8), 2) < 0) __PYX_ERR(0, 938, __pyx_L1_error)
+      if (__Pyx_IternextUnpackEndCheck(__pyx_t_9(__pyx_t_8), 2) < 0) __PYX_ERR(0, 939, __pyx_L1_error)
       __pyx_t_9 = NULL;
       __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
       goto __pyx_L8_unpacking_done;
@@ -15298,7 +15589,7 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_44make_scoreTrac
       __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
       __pyx_t_9 = NULL;
       if (__Pyx_IterFinish() == 0) __Pyx_RaiseNeedMoreValuesError(index);
-      __PYX_ERR(0, 938, __pyx_L1_error)
+      __PYX_ERR(0, 939, __pyx_L1_error)
       __pyx_L8_unpacking_done:;
     }
     __Pyx_XDECREF_SET(__pyx_v_p2s, __pyx_t_7);
@@ -15306,57 +15597,57 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_44make_scoreTrac
     __Pyx_XDECREF_SET(__pyx_v_v2s, __pyx_t_2);
     __pyx_t_2 = 0;
 
-    /* "MACS2/IO/BedGraph.pyx":939
+    /* "MACS2/IO/BedGraph.pyx":940
  * 
  *             (p2s,v2s) = bdgTrack2.get_data_by_chr(chrom) # arrays for position and values
  *             p2n = iter(p2s).__next__         # assign the next function to a viable to speed up             # <<<<<<<<<<<<<<
  *             v2n = iter(v2s).__next__
  * 
  */
-    __pyx_t_3 = PyObject_GetIter(__pyx_v_p2s); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 939, __pyx_L1_error)
+    __pyx_t_3 = PyObject_GetIter(__pyx_v_p2s); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 940, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_3);
-    __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_t_3, __pyx_n_s_next); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 939, __pyx_L1_error)
+    __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_t_3, __pyx_n_s_next); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 940, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
     __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
     __Pyx_XDECREF_SET(__pyx_v_p2n, __pyx_t_2);
     __pyx_t_2 = 0;
 
-    /* "MACS2/IO/BedGraph.pyx":940
+    /* "MACS2/IO/BedGraph.pyx":941
  *             (p2s,v2s) = bdgTrack2.get_data_by_chr(chrom) # arrays for position and values
  *             p2n = iter(p2s).__next__         # assign the next function to a viable to speed up
  *             v2n = iter(v2s).__next__             # <<<<<<<<<<<<<<
  * 
  *             chrom_max_len = len(p1s)+len(p2s) # this is the maximum number of locations needed to be recorded in scoreTrackI for this chromosome.
  */
-    __pyx_t_2 = PyObject_GetIter(__pyx_v_v2s); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 940, __pyx_L1_error)
+    __pyx_t_2 = PyObject_GetIter(__pyx_v_v2s); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 941, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
-    __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_t_2, __pyx_n_s_next); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 940, __pyx_L1_error)
+    __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_t_2, __pyx_n_s_next); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 941, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_3);
     __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
     __Pyx_XDECREF_SET(__pyx_v_v2n, __pyx_t_3);
     __pyx_t_3 = 0;
 
-    /* "MACS2/IO/BedGraph.pyx":942
+    /* "MACS2/IO/BedGraph.pyx":943
  *             v2n = iter(v2s).__next__
  * 
  *             chrom_max_len = len(p1s)+len(p2s) # this is the maximum number of locations needed to be recorded in scoreTrackI for this chromosome.             # <<<<<<<<<<<<<<
  * 
  *             ret.add_chromosome(chrom,chrom_max_len)
  */
-    __pyx_t_10 = PyObject_Length(__pyx_v_p1s); if (unlikely(__pyx_t_10 == ((Py_ssize_t)-1))) __PYX_ERR(0, 942, __pyx_L1_error)
-    __pyx_t_11 = PyObject_Length(__pyx_v_p2s); if (unlikely(__pyx_t_11 == ((Py_ssize_t)-1))) __PYX_ERR(0, 942, __pyx_L1_error)
+    __pyx_t_10 = PyObject_Length(__pyx_v_p1s); if (unlikely(__pyx_t_10 == ((Py_ssize_t)-1))) __PYX_ERR(0, 943, __pyx_L1_error)
+    __pyx_t_11 = PyObject_Length(__pyx_v_p2s); if (unlikely(__pyx_t_11 == ((Py_ssize_t)-1))) __PYX_ERR(0, 943, __pyx_L1_error)
     __pyx_v_chrom_max_len = (__pyx_t_10 + __pyx_t_11);
 
-    /* "MACS2/IO/BedGraph.pyx":944
+    /* "MACS2/IO/BedGraph.pyx":945
  *             chrom_max_len = len(p1s)+len(p2s) # this is the maximum number of locations needed to be recorded in scoreTrackI for this chromosome.
  * 
  *             ret.add_chromosome(chrom,chrom_max_len)             # <<<<<<<<<<<<<<
  * 
  *             pre_p = 0                   # remember the previous position in the new bedGraphTrackI object ret
  */
-    __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_ret, __pyx_n_s_add_chromosome); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 944, __pyx_L1_error)
+    __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_ret, __pyx_n_s_add_chromosome); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 945, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
-    __pyx_t_7 = PyInt_FromSsize_t(__pyx_v_chrom_max_len); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 944, __pyx_L1_error)
+    __pyx_t_7 = PyInt_FromSsize_t(__pyx_v_chrom_max_len); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 945, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_7);
     __pyx_t_8 = NULL;
     __pyx_t_12 = 0;
@@ -15373,7 +15664,7 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_44make_scoreTrac
     #if CYTHON_FAST_PYCALL
     if (PyFunction_Check(__pyx_t_2)) {
       PyObject *__pyx_temp[3] = {__pyx_t_8, __pyx_v_chrom, __pyx_t_7};
-      __pyx_t_3 = __Pyx_PyFunction_FastCall(__pyx_t_2, __pyx_temp+1-__pyx_t_12, 2+__pyx_t_12); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 944, __pyx_L1_error)
+      __pyx_t_3 = __Pyx_PyFunction_FastCall(__pyx_t_2, __pyx_temp+1-__pyx_t_12, 2+__pyx_t_12); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 945, __pyx_L1_error)
       __Pyx_XDECREF(__pyx_t_8); __pyx_t_8 = 0;
       __Pyx_GOTREF(__pyx_t_3);
       __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
@@ -15382,14 +15673,14 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_44make_scoreTrac
     #if CYTHON_FAST_PYCCALL
     if (__Pyx_PyFastCFunction_Check(__pyx_t_2)) {
       PyObject *__pyx_temp[3] = {__pyx_t_8, __pyx_v_chrom, __pyx_t_7};
-      __pyx_t_3 = __Pyx_PyCFunction_FastCall(__pyx_t_2, __pyx_temp+1-__pyx_t_12, 2+__pyx_t_12); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 944, __pyx_L1_error)
+      __pyx_t_3 = __Pyx_PyCFunction_FastCall(__pyx_t_2, __pyx_temp+1-__pyx_t_12, 2+__pyx_t_12); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 945, __pyx_L1_error)
       __Pyx_XDECREF(__pyx_t_8); __pyx_t_8 = 0;
       __Pyx_GOTREF(__pyx_t_3);
       __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
     } else
     #endif
     {
-      __pyx_t_13 = PyTuple_New(2+__pyx_t_12); if (unlikely(!__pyx_t_13)) __PYX_ERR(0, 944, __pyx_L1_error)
+      __pyx_t_13 = PyTuple_New(2+__pyx_t_12); if (unlikely(!__pyx_t_13)) __PYX_ERR(0, 945, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_13);
       if (__pyx_t_8) {
         __Pyx_GIVEREF(__pyx_t_8); PyTuple_SET_ITEM(__pyx_t_13, 0, __pyx_t_8); __pyx_t_8 = NULL;
@@ -15400,14 +15691,14 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_44make_scoreTrac
       __Pyx_GIVEREF(__pyx_t_7);
       PyTuple_SET_ITEM(__pyx_t_13, 1+__pyx_t_12, __pyx_t_7);
       __pyx_t_7 = 0;
-      __pyx_t_3 = __Pyx_PyObject_Call(__pyx_t_2, __pyx_t_13, NULL); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 944, __pyx_L1_error)
+      __pyx_t_3 = __Pyx_PyObject_Call(__pyx_t_2, __pyx_t_13, NULL); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 945, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_3);
       __Pyx_DECREF(__pyx_t_13); __pyx_t_13 = 0;
     }
     __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
     __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
 
-    /* "MACS2/IO/BedGraph.pyx":946
+    /* "MACS2/IO/BedGraph.pyx":947
  *             ret.add_chromosome(chrom,chrom_max_len)
  * 
  *             pre_p = 0                   # remember the previous position in the new bedGraphTrackI object ret             # <<<<<<<<<<<<<<
@@ -15416,7 +15707,7 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_44make_scoreTrac
  */
     __pyx_v_pre_p = 0;
 
-    /* "MACS2/IO/BedGraph.pyx":948
+    /* "MACS2/IO/BedGraph.pyx":949
  *             pre_p = 0                   # remember the previous position in the new bedGraphTrackI object ret
  * 
  *             try:             # <<<<<<<<<<<<<<
@@ -15432,7 +15723,7 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_44make_scoreTrac
       __Pyx_XGOTREF(__pyx_t_16);
       /*try:*/ {
 
-        /* "MACS2/IO/BedGraph.pyx":949
+        /* "MACS2/IO/BedGraph.pyx":950
  * 
  *             try:
  *                 p1 = p1n()             # <<<<<<<<<<<<<<
@@ -15452,14 +15743,14 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_44make_scoreTrac
         }
         __pyx_t_3 = (__pyx_t_13) ? __Pyx_PyObject_CallOneArg(__pyx_t_2, __pyx_t_13) : __Pyx_PyObject_CallNoArg(__pyx_t_2);
         __Pyx_XDECREF(__pyx_t_13); __pyx_t_13 = 0;
-        if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 949, __pyx_L9_error)
+        if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 950, __pyx_L9_error)
         __Pyx_GOTREF(__pyx_t_3);
         __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-        __pyx_t_12 = __Pyx_PyInt_As_int(__pyx_t_3); if (unlikely((__pyx_t_12 == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 949, __pyx_L9_error)
+        __pyx_t_12 = __Pyx_PyInt_As_int(__pyx_t_3); if (unlikely((__pyx_t_12 == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 950, __pyx_L9_error)
         __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
         __pyx_v_p1 = __pyx_t_12;
 
-        /* "MACS2/IO/BedGraph.pyx":950
+        /* "MACS2/IO/BedGraph.pyx":951
  *             try:
  *                 p1 = p1n()
  *                 v1 = v1n()             # <<<<<<<<<<<<<<
@@ -15479,14 +15770,14 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_44make_scoreTrac
         }
         __pyx_t_3 = (__pyx_t_13) ? __Pyx_PyObject_CallOneArg(__pyx_t_2, __pyx_t_13) : __Pyx_PyObject_CallNoArg(__pyx_t_2);
         __Pyx_XDECREF(__pyx_t_13); __pyx_t_13 = 0;
-        if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 950, __pyx_L9_error)
+        if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 951, __pyx_L9_error)
         __Pyx_GOTREF(__pyx_t_3);
         __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-        __pyx_t_17 = __pyx_PyFloat_AsDouble(__pyx_t_3); if (unlikely((__pyx_t_17 == (double)-1) && PyErr_Occurred())) __PYX_ERR(0, 950, __pyx_L9_error)
+        __pyx_t_17 = __pyx_PyFloat_AsDouble(__pyx_t_3); if (unlikely((__pyx_t_17 == (double)-1) && PyErr_Occurred())) __PYX_ERR(0, 951, __pyx_L9_error)
         __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
         __pyx_v_v1 = __pyx_t_17;
 
-        /* "MACS2/IO/BedGraph.pyx":952
+        /* "MACS2/IO/BedGraph.pyx":953
  *                 v1 = v1n()
  * 
  *                 p2 = p2n()             # <<<<<<<<<<<<<<
@@ -15506,14 +15797,14 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_44make_scoreTrac
         }
         __pyx_t_3 = (__pyx_t_13) ? __Pyx_PyObject_CallOneArg(__pyx_t_2, __pyx_t_13) : __Pyx_PyObject_CallNoArg(__pyx_t_2);
         __Pyx_XDECREF(__pyx_t_13); __pyx_t_13 = 0;
-        if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 952, __pyx_L9_error)
+        if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 953, __pyx_L9_error)
         __Pyx_GOTREF(__pyx_t_3);
         __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-        __pyx_t_12 = __Pyx_PyInt_As_int(__pyx_t_3); if (unlikely((__pyx_t_12 == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 952, __pyx_L9_error)
+        __pyx_t_12 = __Pyx_PyInt_As_int(__pyx_t_3); if (unlikely((__pyx_t_12 == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 953, __pyx_L9_error)
         __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
         __pyx_v_p2 = __pyx_t_12;
 
-        /* "MACS2/IO/BedGraph.pyx":953
+        /* "MACS2/IO/BedGraph.pyx":954
  * 
  *                 p2 = p2n()
  *                 v2 = v2n()             # <<<<<<<<<<<<<<
@@ -15533,14 +15824,14 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_44make_scoreTrac
         }
         __pyx_t_3 = (__pyx_t_13) ? __Pyx_PyObject_CallOneArg(__pyx_t_2, __pyx_t_13) : __Pyx_PyObject_CallNoArg(__pyx_t_2);
         __Pyx_XDECREF(__pyx_t_13); __pyx_t_13 = 0;
-        if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 953, __pyx_L9_error)
+        if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 954, __pyx_L9_error)
         __Pyx_GOTREF(__pyx_t_3);
         __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-        __pyx_t_17 = __pyx_PyFloat_AsDouble(__pyx_t_3); if (unlikely((__pyx_t_17 == (double)-1) && PyErr_Occurred())) __PYX_ERR(0, 953, __pyx_L9_error)
+        __pyx_t_17 = __pyx_PyFloat_AsDouble(__pyx_t_3); if (unlikely((__pyx_t_17 == (double)-1) && PyErr_Occurred())) __PYX_ERR(0, 954, __pyx_L9_error)
         __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
         __pyx_v_v2 = __pyx_t_17;
 
-        /* "MACS2/IO/BedGraph.pyx":955
+        /* "MACS2/IO/BedGraph.pyx":956
  *                 v2 = v2n()
  * 
  *                 while True:             # <<<<<<<<<<<<<<
@@ -15549,7 +15840,7 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_44make_scoreTrac
  */
         while (1) {
 
-          /* "MACS2/IO/BedGraph.pyx":956
+          /* "MACS2/IO/BedGraph.pyx":957
  * 
  *                 while True:
  *                     if p1 < p2:             # <<<<<<<<<<<<<<
@@ -15559,18 +15850,18 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_44make_scoreTrac
           __pyx_t_1 = ((__pyx_v_p1 < __pyx_v_p2) != 0);
           if (__pyx_t_1) {
 
-            /* "MACS2/IO/BedGraph.pyx":958
+            /* "MACS2/IO/BedGraph.pyx":959
  *                     if p1 < p2:
  *                         # clip a region from pre_p to p1, then set pre_p as p1.
  *                         retadd( chrom, p1, v1, v2 )             # <<<<<<<<<<<<<<
  *                         pre_p = p1
  *                         # call for the next p1 and v1
  */
-            __pyx_t_2 = __Pyx_PyInt_From_int(__pyx_v_p1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 958, __pyx_L9_error)
+            __pyx_t_2 = __Pyx_PyInt_From_int(__pyx_v_p1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 959, __pyx_L9_error)
             __Pyx_GOTREF(__pyx_t_2);
-            __pyx_t_13 = PyFloat_FromDouble(__pyx_v_v1); if (unlikely(!__pyx_t_13)) __PYX_ERR(0, 958, __pyx_L9_error)
+            __pyx_t_13 = PyFloat_FromDouble(__pyx_v_v1); if (unlikely(!__pyx_t_13)) __PYX_ERR(0, 959, __pyx_L9_error)
             __Pyx_GOTREF(__pyx_t_13);
-            __pyx_t_7 = PyFloat_FromDouble(__pyx_v_v2); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 958, __pyx_L9_error)
+            __pyx_t_7 = PyFloat_FromDouble(__pyx_v_v2); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 959, __pyx_L9_error)
             __Pyx_GOTREF(__pyx_t_7);
             __Pyx_INCREF(__pyx_v_retadd);
             __pyx_t_8 = __pyx_v_retadd; __pyx_t_18 = NULL;
@@ -15588,7 +15879,7 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_44make_scoreTrac
             #if CYTHON_FAST_PYCALL
             if (PyFunction_Check(__pyx_t_8)) {
               PyObject *__pyx_temp[5] = {__pyx_t_18, __pyx_v_chrom, __pyx_t_2, __pyx_t_13, __pyx_t_7};
-              __pyx_t_3 = __Pyx_PyFunction_FastCall(__pyx_t_8, __pyx_temp+1-__pyx_t_12, 4+__pyx_t_12); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 958, __pyx_L9_error)
+              __pyx_t_3 = __Pyx_PyFunction_FastCall(__pyx_t_8, __pyx_temp+1-__pyx_t_12, 4+__pyx_t_12); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 959, __pyx_L9_error)
               __Pyx_XDECREF(__pyx_t_18); __pyx_t_18 = 0;
               __Pyx_GOTREF(__pyx_t_3);
               __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
@@ -15599,7 +15890,7 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_44make_scoreTrac
             #if CYTHON_FAST_PYCCALL
             if (__Pyx_PyFastCFunction_Check(__pyx_t_8)) {
               PyObject *__pyx_temp[5] = {__pyx_t_18, __pyx_v_chrom, __pyx_t_2, __pyx_t_13, __pyx_t_7};
-              __pyx_t_3 = __Pyx_PyCFunction_FastCall(__pyx_t_8, __pyx_temp+1-__pyx_t_12, 4+__pyx_t_12); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 958, __pyx_L9_error)
+              __pyx_t_3 = __Pyx_PyCFunction_FastCall(__pyx_t_8, __pyx_temp+1-__pyx_t_12, 4+__pyx_t_12); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 959, __pyx_L9_error)
               __Pyx_XDECREF(__pyx_t_18); __pyx_t_18 = 0;
               __Pyx_GOTREF(__pyx_t_3);
               __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
@@ -15608,7 +15899,7 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_44make_scoreTrac
             } else
             #endif
             {
-              __pyx_t_19 = PyTuple_New(4+__pyx_t_12); if (unlikely(!__pyx_t_19)) __PYX_ERR(0, 958, __pyx_L9_error)
+              __pyx_t_19 = PyTuple_New(4+__pyx_t_12); if (unlikely(!__pyx_t_19)) __PYX_ERR(0, 959, __pyx_L9_error)
               __Pyx_GOTREF(__pyx_t_19);
               if (__pyx_t_18) {
                 __Pyx_GIVEREF(__pyx_t_18); PyTuple_SET_ITEM(__pyx_t_19, 0, __pyx_t_18); __pyx_t_18 = NULL;
@@ -15625,14 +15916,14 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_44make_scoreTrac
               __pyx_t_2 = 0;
               __pyx_t_13 = 0;
               __pyx_t_7 = 0;
-              __pyx_t_3 = __Pyx_PyObject_Call(__pyx_t_8, __pyx_t_19, NULL); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 958, __pyx_L9_error)
+              __pyx_t_3 = __Pyx_PyObject_Call(__pyx_t_8, __pyx_t_19, NULL); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 959, __pyx_L9_error)
               __Pyx_GOTREF(__pyx_t_3);
               __Pyx_DECREF(__pyx_t_19); __pyx_t_19 = 0;
             }
             __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
             __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
 
-            /* "MACS2/IO/BedGraph.pyx":959
+            /* "MACS2/IO/BedGraph.pyx":960
  *                         # clip a region from pre_p to p1, then set pre_p as p1.
  *                         retadd( chrom, p1, v1, v2 )
  *                         pre_p = p1             # <<<<<<<<<<<<<<
@@ -15641,7 +15932,7 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_44make_scoreTrac
  */
             __pyx_v_pre_p = __pyx_v_p1;
 
-            /* "MACS2/IO/BedGraph.pyx":961
+            /* "MACS2/IO/BedGraph.pyx":962
  *                         pre_p = p1
  *                         # call for the next p1 and v1
  *                         p1 = p1n()             # <<<<<<<<<<<<<<
@@ -15661,14 +15952,14 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_44make_scoreTrac
             }
             __pyx_t_3 = (__pyx_t_19) ? __Pyx_PyObject_CallOneArg(__pyx_t_8, __pyx_t_19) : __Pyx_PyObject_CallNoArg(__pyx_t_8);
             __Pyx_XDECREF(__pyx_t_19); __pyx_t_19 = 0;
-            if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 961, __pyx_L9_error)
+            if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 962, __pyx_L9_error)
             __Pyx_GOTREF(__pyx_t_3);
             __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
-            __pyx_t_12 = __Pyx_PyInt_As_int(__pyx_t_3); if (unlikely((__pyx_t_12 == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 961, __pyx_L9_error)
+            __pyx_t_12 = __Pyx_PyInt_As_int(__pyx_t_3); if (unlikely((__pyx_t_12 == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 962, __pyx_L9_error)
             __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
             __pyx_v_p1 = __pyx_t_12;
 
-            /* "MACS2/IO/BedGraph.pyx":962
+            /* "MACS2/IO/BedGraph.pyx":963
  *                         # call for the next p1 and v1
  *                         p1 = p1n()
  *                         v1 = v1n()             # <<<<<<<<<<<<<<
@@ -15688,14 +15979,14 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_44make_scoreTrac
             }
             __pyx_t_3 = (__pyx_t_19) ? __Pyx_PyObject_CallOneArg(__pyx_t_8, __pyx_t_19) : __Pyx_PyObject_CallNoArg(__pyx_t_8);
             __Pyx_XDECREF(__pyx_t_19); __pyx_t_19 = 0;
-            if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 962, __pyx_L9_error)
+            if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 963, __pyx_L9_error)
             __Pyx_GOTREF(__pyx_t_3);
             __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
-            __pyx_t_17 = __pyx_PyFloat_AsDouble(__pyx_t_3); if (unlikely((__pyx_t_17 == (double)-1) && PyErr_Occurred())) __PYX_ERR(0, 962, __pyx_L9_error)
+            __pyx_t_17 = __pyx_PyFloat_AsDouble(__pyx_t_3); if (unlikely((__pyx_t_17 == (double)-1) && PyErr_Occurred())) __PYX_ERR(0, 963, __pyx_L9_error)
             __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
             __pyx_v_v1 = __pyx_t_17;
 
-            /* "MACS2/IO/BedGraph.pyx":956
+            /* "MACS2/IO/BedGraph.pyx":957
  * 
  *                 while True:
  *                     if p1 < p2:             # <<<<<<<<<<<<<<
@@ -15705,7 +15996,7 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_44make_scoreTrac
             goto __pyx_L19;
           }
 
-          /* "MACS2/IO/BedGraph.pyx":963
+          /* "MACS2/IO/BedGraph.pyx":964
  *                         p1 = p1n()
  *                         v1 = v1n()
  *                     elif p2 < p1:             # <<<<<<<<<<<<<<
@@ -15715,18 +16006,18 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_44make_scoreTrac
           __pyx_t_1 = ((__pyx_v_p2 < __pyx_v_p1) != 0);
           if (__pyx_t_1) {
 
-            /* "MACS2/IO/BedGraph.pyx":965
+            /* "MACS2/IO/BedGraph.pyx":966
  *                     elif p2 < p1:
  *                         # clip a region from pre_p to p2, then set pre_p as p2.
  *                         retadd( chrom, p2, v1, v2 )             # <<<<<<<<<<<<<<
  *                         pre_p = p2
  *                         # call for the next p2 and v2
  */
-            __pyx_t_8 = __Pyx_PyInt_From_int(__pyx_v_p2); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 965, __pyx_L9_error)
+            __pyx_t_8 = __Pyx_PyInt_From_int(__pyx_v_p2); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 966, __pyx_L9_error)
             __Pyx_GOTREF(__pyx_t_8);
-            __pyx_t_19 = PyFloat_FromDouble(__pyx_v_v1); if (unlikely(!__pyx_t_19)) __PYX_ERR(0, 965, __pyx_L9_error)
+            __pyx_t_19 = PyFloat_FromDouble(__pyx_v_v1); if (unlikely(!__pyx_t_19)) __PYX_ERR(0, 966, __pyx_L9_error)
             __Pyx_GOTREF(__pyx_t_19);
-            __pyx_t_7 = PyFloat_FromDouble(__pyx_v_v2); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 965, __pyx_L9_error)
+            __pyx_t_7 = PyFloat_FromDouble(__pyx_v_v2); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 966, __pyx_L9_error)
             __Pyx_GOTREF(__pyx_t_7);
             __Pyx_INCREF(__pyx_v_retadd);
             __pyx_t_13 = __pyx_v_retadd; __pyx_t_2 = NULL;
@@ -15744,7 +16035,7 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_44make_scoreTrac
             #if CYTHON_FAST_PYCALL
             if (PyFunction_Check(__pyx_t_13)) {
               PyObject *__pyx_temp[5] = {__pyx_t_2, __pyx_v_chrom, __pyx_t_8, __pyx_t_19, __pyx_t_7};
-              __pyx_t_3 = __Pyx_PyFunction_FastCall(__pyx_t_13, __pyx_temp+1-__pyx_t_12, 4+__pyx_t_12); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 965, __pyx_L9_error)
+              __pyx_t_3 = __Pyx_PyFunction_FastCall(__pyx_t_13, __pyx_temp+1-__pyx_t_12, 4+__pyx_t_12); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 966, __pyx_L9_error)
               __Pyx_XDECREF(__pyx_t_2); __pyx_t_2 = 0;
               __Pyx_GOTREF(__pyx_t_3);
               __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
@@ -15755,7 +16046,7 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_44make_scoreTrac
             #if CYTHON_FAST_PYCCALL
             if (__Pyx_PyFastCFunction_Check(__pyx_t_13)) {
               PyObject *__pyx_temp[5] = {__pyx_t_2, __pyx_v_chrom, __pyx_t_8, __pyx_t_19, __pyx_t_7};
-              __pyx_t_3 = __Pyx_PyCFunction_FastCall(__pyx_t_13, __pyx_temp+1-__pyx_t_12, 4+__pyx_t_12); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 965, __pyx_L9_error)
+              __pyx_t_3 = __Pyx_PyCFunction_FastCall(__pyx_t_13, __pyx_temp+1-__pyx_t_12, 4+__pyx_t_12); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 966, __pyx_L9_error)
               __Pyx_XDECREF(__pyx_t_2); __pyx_t_2 = 0;
               __Pyx_GOTREF(__pyx_t_3);
               __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
@@ -15764,7 +16055,7 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_44make_scoreTrac
             } else
             #endif
             {
-              __pyx_t_18 = PyTuple_New(4+__pyx_t_12); if (unlikely(!__pyx_t_18)) __PYX_ERR(0, 965, __pyx_L9_error)
+              __pyx_t_18 = PyTuple_New(4+__pyx_t_12); if (unlikely(!__pyx_t_18)) __PYX_ERR(0, 966, __pyx_L9_error)
               __Pyx_GOTREF(__pyx_t_18);
               if (__pyx_t_2) {
                 __Pyx_GIVEREF(__pyx_t_2); PyTuple_SET_ITEM(__pyx_t_18, 0, __pyx_t_2); __pyx_t_2 = NULL;
@@ -15781,14 +16072,14 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_44make_scoreTrac
               __pyx_t_8 = 0;
               __pyx_t_19 = 0;
               __pyx_t_7 = 0;
-              __pyx_t_3 = __Pyx_PyObject_Call(__pyx_t_13, __pyx_t_18, NULL); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 965, __pyx_L9_error)
+              __pyx_t_3 = __Pyx_PyObject_Call(__pyx_t_13, __pyx_t_18, NULL); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 966, __pyx_L9_error)
               __Pyx_GOTREF(__pyx_t_3);
               __Pyx_DECREF(__pyx_t_18); __pyx_t_18 = 0;
             }
             __Pyx_DECREF(__pyx_t_13); __pyx_t_13 = 0;
             __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
 
-            /* "MACS2/IO/BedGraph.pyx":966
+            /* "MACS2/IO/BedGraph.pyx":967
  *                         # clip a region from pre_p to p2, then set pre_p as p2.
  *                         retadd( chrom, p2, v1, v2 )
  *                         pre_p = p2             # <<<<<<<<<<<<<<
@@ -15797,7 +16088,7 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_44make_scoreTrac
  */
             __pyx_v_pre_p = __pyx_v_p2;
 
-            /* "MACS2/IO/BedGraph.pyx":968
+            /* "MACS2/IO/BedGraph.pyx":969
  *                         pre_p = p2
  *                         # call for the next p2 and v2
  *                         p2 = p2n()             # <<<<<<<<<<<<<<
@@ -15817,14 +16108,14 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_44make_scoreTrac
             }
             __pyx_t_3 = (__pyx_t_18) ? __Pyx_PyObject_CallOneArg(__pyx_t_13, __pyx_t_18) : __Pyx_PyObject_CallNoArg(__pyx_t_13);
             __Pyx_XDECREF(__pyx_t_18); __pyx_t_18 = 0;
-            if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 968, __pyx_L9_error)
+            if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 969, __pyx_L9_error)
             __Pyx_GOTREF(__pyx_t_3);
             __Pyx_DECREF(__pyx_t_13); __pyx_t_13 = 0;
-            __pyx_t_12 = __Pyx_PyInt_As_int(__pyx_t_3); if (unlikely((__pyx_t_12 == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 968, __pyx_L9_error)
+            __pyx_t_12 = __Pyx_PyInt_As_int(__pyx_t_3); if (unlikely((__pyx_t_12 == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 969, __pyx_L9_error)
             __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
             __pyx_v_p2 = __pyx_t_12;
 
-            /* "MACS2/IO/BedGraph.pyx":969
+            /* "MACS2/IO/BedGraph.pyx":970
  *                         # call for the next p2 and v2
  *                         p2 = p2n()
  *                         v2 = v2n()             # <<<<<<<<<<<<<<
@@ -15844,14 +16135,14 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_44make_scoreTrac
             }
             __pyx_t_3 = (__pyx_t_18) ? __Pyx_PyObject_CallOneArg(__pyx_t_13, __pyx_t_18) : __Pyx_PyObject_CallNoArg(__pyx_t_13);
             __Pyx_XDECREF(__pyx_t_18); __pyx_t_18 = 0;
-            if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 969, __pyx_L9_error)
+            if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 970, __pyx_L9_error)
             __Pyx_GOTREF(__pyx_t_3);
             __Pyx_DECREF(__pyx_t_13); __pyx_t_13 = 0;
-            __pyx_t_17 = __pyx_PyFloat_AsDouble(__pyx_t_3); if (unlikely((__pyx_t_17 == (double)-1) && PyErr_Occurred())) __PYX_ERR(0, 969, __pyx_L9_error)
+            __pyx_t_17 = __pyx_PyFloat_AsDouble(__pyx_t_3); if (unlikely((__pyx_t_17 == (double)-1) && PyErr_Occurred())) __PYX_ERR(0, 970, __pyx_L9_error)
             __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
             __pyx_v_v2 = __pyx_t_17;
 
-            /* "MACS2/IO/BedGraph.pyx":963
+            /* "MACS2/IO/BedGraph.pyx":964
  *                         p1 = p1n()
  *                         v1 = v1n()
  *                     elif p2 < p1:             # <<<<<<<<<<<<<<
@@ -15861,7 +16152,7 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_44make_scoreTrac
             goto __pyx_L19;
           }
 
-          /* "MACS2/IO/BedGraph.pyx":970
+          /* "MACS2/IO/BedGraph.pyx":971
  *                         p2 = p2n()
  *                         v2 = v2n()
  *                     elif p1 == p2:             # <<<<<<<<<<<<<<
@@ -15871,18 +16162,18 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_44make_scoreTrac
           __pyx_t_1 = ((__pyx_v_p1 == __pyx_v_p2) != 0);
           if (__pyx_t_1) {
 
-            /* "MACS2/IO/BedGraph.pyx":972
+            /* "MACS2/IO/BedGraph.pyx":973
  *                     elif p1 == p2:
  *                         # from pre_p to p1 or p2, then set pre_p as p1 or p2.
  *                         retadd( chrom, p1, v1, v2 )             # <<<<<<<<<<<<<<
  *                         pre_p = p1
  *                         # call for the next p1, v1, p2, v2.
  */
-            __pyx_t_13 = __Pyx_PyInt_From_int(__pyx_v_p1); if (unlikely(!__pyx_t_13)) __PYX_ERR(0, 972, __pyx_L9_error)
+            __pyx_t_13 = __Pyx_PyInt_From_int(__pyx_v_p1); if (unlikely(!__pyx_t_13)) __PYX_ERR(0, 973, __pyx_L9_error)
             __Pyx_GOTREF(__pyx_t_13);
-            __pyx_t_18 = PyFloat_FromDouble(__pyx_v_v1); if (unlikely(!__pyx_t_18)) __PYX_ERR(0, 972, __pyx_L9_error)
+            __pyx_t_18 = PyFloat_FromDouble(__pyx_v_v1); if (unlikely(!__pyx_t_18)) __PYX_ERR(0, 973, __pyx_L9_error)
             __Pyx_GOTREF(__pyx_t_18);
-            __pyx_t_7 = PyFloat_FromDouble(__pyx_v_v2); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 972, __pyx_L9_error)
+            __pyx_t_7 = PyFloat_FromDouble(__pyx_v_v2); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 973, __pyx_L9_error)
             __Pyx_GOTREF(__pyx_t_7);
             __Pyx_INCREF(__pyx_v_retadd);
             __pyx_t_19 = __pyx_v_retadd; __pyx_t_8 = NULL;
@@ -15900,7 +16191,7 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_44make_scoreTrac
             #if CYTHON_FAST_PYCALL
             if (PyFunction_Check(__pyx_t_19)) {
               PyObject *__pyx_temp[5] = {__pyx_t_8, __pyx_v_chrom, __pyx_t_13, __pyx_t_18, __pyx_t_7};
-              __pyx_t_3 = __Pyx_PyFunction_FastCall(__pyx_t_19, __pyx_temp+1-__pyx_t_12, 4+__pyx_t_12); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 972, __pyx_L9_error)
+              __pyx_t_3 = __Pyx_PyFunction_FastCall(__pyx_t_19, __pyx_temp+1-__pyx_t_12, 4+__pyx_t_12); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 973, __pyx_L9_error)
               __Pyx_XDECREF(__pyx_t_8); __pyx_t_8 = 0;
               __Pyx_GOTREF(__pyx_t_3);
               __Pyx_DECREF(__pyx_t_13); __pyx_t_13 = 0;
@@ -15911,7 +16202,7 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_44make_scoreTrac
             #if CYTHON_FAST_PYCCALL
             if (__Pyx_PyFastCFunction_Check(__pyx_t_19)) {
               PyObject *__pyx_temp[5] = {__pyx_t_8, __pyx_v_chrom, __pyx_t_13, __pyx_t_18, __pyx_t_7};
-              __pyx_t_3 = __Pyx_PyCFunction_FastCall(__pyx_t_19, __pyx_temp+1-__pyx_t_12, 4+__pyx_t_12); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 972, __pyx_L9_error)
+              __pyx_t_3 = __Pyx_PyCFunction_FastCall(__pyx_t_19, __pyx_temp+1-__pyx_t_12, 4+__pyx_t_12); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 973, __pyx_L9_error)
               __Pyx_XDECREF(__pyx_t_8); __pyx_t_8 = 0;
               __Pyx_GOTREF(__pyx_t_3);
               __Pyx_DECREF(__pyx_t_13); __pyx_t_13 = 0;
@@ -15920,7 +16211,7 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_44make_scoreTrac
             } else
             #endif
             {
-              __pyx_t_2 = PyTuple_New(4+__pyx_t_12); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 972, __pyx_L9_error)
+              __pyx_t_2 = PyTuple_New(4+__pyx_t_12); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 973, __pyx_L9_error)
               __Pyx_GOTREF(__pyx_t_2);
               if (__pyx_t_8) {
                 __Pyx_GIVEREF(__pyx_t_8); PyTuple_SET_ITEM(__pyx_t_2, 0, __pyx_t_8); __pyx_t_8 = NULL;
@@ -15937,14 +16228,14 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_44make_scoreTrac
               __pyx_t_13 = 0;
               __pyx_t_18 = 0;
               __pyx_t_7 = 0;
-              __pyx_t_3 = __Pyx_PyObject_Call(__pyx_t_19, __pyx_t_2, NULL); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 972, __pyx_L9_error)
+              __pyx_t_3 = __Pyx_PyObject_Call(__pyx_t_19, __pyx_t_2, NULL); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 973, __pyx_L9_error)
               __Pyx_GOTREF(__pyx_t_3);
               __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
             }
             __Pyx_DECREF(__pyx_t_19); __pyx_t_19 = 0;
             __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
 
-            /* "MACS2/IO/BedGraph.pyx":973
+            /* "MACS2/IO/BedGraph.pyx":974
  *                         # from pre_p to p1 or p2, then set pre_p as p1 or p2.
  *                         retadd( chrom, p1, v1, v2 )
  *                         pre_p = p1             # <<<<<<<<<<<<<<
@@ -15953,7 +16244,7 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_44make_scoreTrac
  */
             __pyx_v_pre_p = __pyx_v_p1;
 
-            /* "MACS2/IO/BedGraph.pyx":975
+            /* "MACS2/IO/BedGraph.pyx":976
  *                         pre_p = p1
  *                         # call for the next p1, v1, p2, v2.
  *                         p1 = p1n()             # <<<<<<<<<<<<<<
@@ -15973,14 +16264,14 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_44make_scoreTrac
             }
             __pyx_t_3 = (__pyx_t_2) ? __Pyx_PyObject_CallOneArg(__pyx_t_19, __pyx_t_2) : __Pyx_PyObject_CallNoArg(__pyx_t_19);
             __Pyx_XDECREF(__pyx_t_2); __pyx_t_2 = 0;
-            if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 975, __pyx_L9_error)
+            if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 976, __pyx_L9_error)
             __Pyx_GOTREF(__pyx_t_3);
             __Pyx_DECREF(__pyx_t_19); __pyx_t_19 = 0;
-            __pyx_t_12 = __Pyx_PyInt_As_int(__pyx_t_3); if (unlikely((__pyx_t_12 == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 975, __pyx_L9_error)
+            __pyx_t_12 = __Pyx_PyInt_As_int(__pyx_t_3); if (unlikely((__pyx_t_12 == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 976, __pyx_L9_error)
             __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
             __pyx_v_p1 = __pyx_t_12;
 
-            /* "MACS2/IO/BedGraph.pyx":976
+            /* "MACS2/IO/BedGraph.pyx":977
  *                         # call for the next p1, v1, p2, v2.
  *                         p1 = p1n()
  *                         v1 = v1n()             # <<<<<<<<<<<<<<
@@ -16000,14 +16291,14 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_44make_scoreTrac
             }
             __pyx_t_3 = (__pyx_t_2) ? __Pyx_PyObject_CallOneArg(__pyx_t_19, __pyx_t_2) : __Pyx_PyObject_CallNoArg(__pyx_t_19);
             __Pyx_XDECREF(__pyx_t_2); __pyx_t_2 = 0;
-            if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 976, __pyx_L9_error)
+            if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 977, __pyx_L9_error)
             __Pyx_GOTREF(__pyx_t_3);
             __Pyx_DECREF(__pyx_t_19); __pyx_t_19 = 0;
-            __pyx_t_17 = __pyx_PyFloat_AsDouble(__pyx_t_3); if (unlikely((__pyx_t_17 == (double)-1) && PyErr_Occurred())) __PYX_ERR(0, 976, __pyx_L9_error)
+            __pyx_t_17 = __pyx_PyFloat_AsDouble(__pyx_t_3); if (unlikely((__pyx_t_17 == (double)-1) && PyErr_Occurred())) __PYX_ERR(0, 977, __pyx_L9_error)
             __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
             __pyx_v_v1 = __pyx_t_17;
 
-            /* "MACS2/IO/BedGraph.pyx":977
+            /* "MACS2/IO/BedGraph.pyx":978
  *                         p1 = p1n()
  *                         v1 = v1n()
  *                         p2 = p2n()             # <<<<<<<<<<<<<<
@@ -16027,14 +16318,14 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_44make_scoreTrac
             }
             __pyx_t_3 = (__pyx_t_2) ? __Pyx_PyObject_CallOneArg(__pyx_t_19, __pyx_t_2) : __Pyx_PyObject_CallNoArg(__pyx_t_19);
             __Pyx_XDECREF(__pyx_t_2); __pyx_t_2 = 0;
-            if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 977, __pyx_L9_error)
+            if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 978, __pyx_L9_error)
             __Pyx_GOTREF(__pyx_t_3);
             __Pyx_DECREF(__pyx_t_19); __pyx_t_19 = 0;
-            __pyx_t_12 = __Pyx_PyInt_As_int(__pyx_t_3); if (unlikely((__pyx_t_12 == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 977, __pyx_L9_error)
+            __pyx_t_12 = __Pyx_PyInt_As_int(__pyx_t_3); if (unlikely((__pyx_t_12 == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 978, __pyx_L9_error)
             __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
             __pyx_v_p2 = __pyx_t_12;
 
-            /* "MACS2/IO/BedGraph.pyx":978
+            /* "MACS2/IO/BedGraph.pyx":979
  *                         v1 = v1n()
  *                         p2 = p2n()
  *                         v2 = v2n()             # <<<<<<<<<<<<<<
@@ -16054,14 +16345,14 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_44make_scoreTrac
             }
             __pyx_t_3 = (__pyx_t_2) ? __Pyx_PyObject_CallOneArg(__pyx_t_19, __pyx_t_2) : __Pyx_PyObject_CallNoArg(__pyx_t_19);
             __Pyx_XDECREF(__pyx_t_2); __pyx_t_2 = 0;
-            if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 978, __pyx_L9_error)
+            if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 979, __pyx_L9_error)
             __Pyx_GOTREF(__pyx_t_3);
             __Pyx_DECREF(__pyx_t_19); __pyx_t_19 = 0;
-            __pyx_t_17 = __pyx_PyFloat_AsDouble(__pyx_t_3); if (unlikely((__pyx_t_17 == (double)-1) && PyErr_Occurred())) __PYX_ERR(0, 978, __pyx_L9_error)
+            __pyx_t_17 = __pyx_PyFloat_AsDouble(__pyx_t_3); if (unlikely((__pyx_t_17 == (double)-1) && PyErr_Occurred())) __PYX_ERR(0, 979, __pyx_L9_error)
             __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
             __pyx_v_v2 = __pyx_t_17;
 
-            /* "MACS2/IO/BedGraph.pyx":970
+            /* "MACS2/IO/BedGraph.pyx":971
  *                         p2 = p2n()
  *                         v2 = v2n()
  *                     elif p1 == p2:             # <<<<<<<<<<<<<<
@@ -16072,7 +16363,7 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_44make_scoreTrac
           __pyx_L19:;
         }
 
-        /* "MACS2/IO/BedGraph.pyx":948
+        /* "MACS2/IO/BedGraph.pyx":949
  *             pre_p = 0                   # remember the previous position in the new bedGraphTrackI object ret
  * 
  *             try:             # <<<<<<<<<<<<<<
@@ -16093,7 +16384,7 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_44make_scoreTrac
       __Pyx_XDECREF(__pyx_t_7); __pyx_t_7 = 0;
       __Pyx_XDECREF(__pyx_t_8); __pyx_t_8 = 0;
 
-      /* "MACS2/IO/BedGraph.pyx":979
+      /* "MACS2/IO/BedGraph.pyx":980
  *                         p2 = p2n()
  *                         v2 = v2n()
  *             except StopIteration:             # <<<<<<<<<<<<<<
@@ -16108,7 +16399,7 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_44make_scoreTrac
       goto __pyx_L11_except_error;
       __pyx_L11_except_error:;
 
-      /* "MACS2/IO/BedGraph.pyx":948
+      /* "MACS2/IO/BedGraph.pyx":949
  *             pre_p = 0                   # remember the previous position in the new bedGraphTrackI object ret
  * 
  *             try:             # <<<<<<<<<<<<<<
@@ -16128,7 +16419,7 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_44make_scoreTrac
       __pyx_L16_try_end:;
     }
 
-    /* "MACS2/IO/BedGraph.pyx":932
+    /* "MACS2/IO/BedGraph.pyx":933
  *         chr2 = set(bdgTrack2.get_chr_names())
  *         common_chr = chr1.intersection(chr2)
  *         for chrom in common_chr:             # <<<<<<<<<<<<<<
@@ -16138,14 +16429,14 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_44make_scoreTrac
   }
   __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
 
-  /* "MACS2/IO/BedGraph.pyx":983
+  /* "MACS2/IO/BedGraph.pyx":984
  *                 pass
  * 
  *         ret.finalize()             # <<<<<<<<<<<<<<
  *         #ret.merge_regions()
  *         return ret
  */
-  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_v_ret, __pyx_n_s_finalize); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 983, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_v_ret, __pyx_n_s_finalize); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 984, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
   __pyx_t_19 = NULL;
   if (CYTHON_UNPACK_METHODS && likely(PyMethod_Check(__pyx_t_3))) {
@@ -16159,12 +16450,12 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_44make_scoreTrac
   }
   __pyx_t_4 = (__pyx_t_19) ? __Pyx_PyObject_CallOneArg(__pyx_t_3, __pyx_t_19) : __Pyx_PyObject_CallNoArg(__pyx_t_3);
   __Pyx_XDECREF(__pyx_t_19); __pyx_t_19 = 0;
-  if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 983, __pyx_L1_error)
+  if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 984, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_4);
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
   __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
 
-  /* "MACS2/IO/BedGraph.pyx":985
+  /* "MACS2/IO/BedGraph.pyx":986
  *         ret.finalize()
  *         #ret.merge_regions()
  *         return ret             # <<<<<<<<<<<<<<
@@ -16176,7 +16467,7 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_44make_scoreTrac
   __pyx_r = __pyx_v_ret;
   goto __pyx_L0;
 
-  /* "MACS2/IO/BedGraph.pyx":907
+  /* "MACS2/IO/BedGraph.pyx":908
  *         return ret
  * 
  *     def make_scoreTrackII_for_macs (self, bdgTrack2, float depth1 = 1.0, float depth2 = 1.0 ):             # <<<<<<<<<<<<<<
@@ -16212,11 +16503,12 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_44make_scoreTrac
   __Pyx_XDECREF(__pyx_v_p2n);
   __Pyx_XDECREF(__pyx_v_v2n);
   __Pyx_XGIVEREF(__pyx_r);
+  __Pyx_TraceReturn(__pyx_r, 0);
   __Pyx_RefNannyFinishContext();
   return __pyx_r;
 }
 
-/* "MACS2/IO/BedGraph.pyx":987
+/* "MACS2/IO/BedGraph.pyx":988
  *         return ret
  * 
  *     cpdef str cutoff_analysis ( self, int max_gap, int min_length, int steps = 100 ):             # <<<<<<<<<<<<<<
@@ -16254,6 +16546,7 @@ static PyObject *__pyx_f_5MACS2_2IO_8BedGraph_14bedGraphTrackI_cutoff_analysis(s
   PyObject *__pyx_v_acs_next = NULL;
   PyObject *__pyx_v_ace_next = NULL;
   PyObject *__pyx_r = NULL;
+  __Pyx_TraceDeclarations
   __Pyx_RefNannyDeclarations
   PyObject *__pyx_t_1 = NULL;
   PyObject *__pyx_t_2 = NULL;
@@ -16281,6 +16574,7 @@ static PyObject *__pyx_f_5MACS2_2IO_8BedGraph_14bedGraphTrackI_cutoff_analysis(s
   PyObject *(*__pyx_t_24)(PyObject *);
   Py_UCS4 __pyx_t_25;
   __Pyx_RefNannySetupContext("cutoff_analysis", 0);
+  __Pyx_TraceCall("cutoff_analysis", __pyx_f[0], 988, 0, __PYX_ERR(0, 988, __pyx_L1_error));
   if (__pyx_optional_args) {
     if (__pyx_optional_args->__pyx_n > 0) {
       __pyx_v_steps = __pyx_optional_args->steps;
@@ -16295,15 +16589,15 @@ static PyObject *__pyx_f_5MACS2_2IO_8BedGraph_14bedGraphTrackI_cutoff_analysis(s
     if (unlikely(!__Pyx_object_dict_version_matches(((PyObject *)__pyx_v_self), __pyx_tp_dict_version, __pyx_obj_dict_version))) {
       PY_UINT64_T __pyx_type_dict_guard = __Pyx_get_tp_dict_version(((PyObject *)__pyx_v_self));
       #endif
-      __pyx_t_1 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_v_self), __pyx_n_s_cutoff_analysis); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 987, __pyx_L1_error)
+      __pyx_t_1 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_v_self), __pyx_n_s_cutoff_analysis); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 988, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_1);
       if (!PyCFunction_Check(__pyx_t_1) || (PyCFunction_GET_FUNCTION(__pyx_t_1) != (PyCFunction)(void*)__pyx_pw_5MACS2_2IO_8BedGraph_14bedGraphTrackI_47cutoff_analysis)) {
         __Pyx_XDECREF(__pyx_r);
-        __pyx_t_3 = __Pyx_PyInt_From_int(__pyx_v_max_gap); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 987, __pyx_L1_error)
+        __pyx_t_3 = __Pyx_PyInt_From_int(__pyx_v_max_gap); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 988, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_3);
-        __pyx_t_4 = __Pyx_PyInt_From_int(__pyx_v_min_length); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 987, __pyx_L1_error)
+        __pyx_t_4 = __Pyx_PyInt_From_int(__pyx_v_min_length); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 988, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_4);
-        __pyx_t_5 = __Pyx_PyInt_From_int(__pyx_v_steps); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 987, __pyx_L1_error)
+        __pyx_t_5 = __Pyx_PyInt_From_int(__pyx_v_steps); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 988, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_5);
         __Pyx_INCREF(__pyx_t_1);
         __pyx_t_6 = __pyx_t_1; __pyx_t_7 = NULL;
@@ -16321,7 +16615,7 @@ static PyObject *__pyx_f_5MACS2_2IO_8BedGraph_14bedGraphTrackI_cutoff_analysis(s
         #if CYTHON_FAST_PYCALL
         if (PyFunction_Check(__pyx_t_6)) {
           PyObject *__pyx_temp[4] = {__pyx_t_7, __pyx_t_3, __pyx_t_4, __pyx_t_5};
-          __pyx_t_2 = __Pyx_PyFunction_FastCall(__pyx_t_6, __pyx_temp+1-__pyx_t_8, 3+__pyx_t_8); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 987, __pyx_L1_error)
+          __pyx_t_2 = __Pyx_PyFunction_FastCall(__pyx_t_6, __pyx_temp+1-__pyx_t_8, 3+__pyx_t_8); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 988, __pyx_L1_error)
           __Pyx_XDECREF(__pyx_t_7); __pyx_t_7 = 0;
           __Pyx_GOTREF(__pyx_t_2);
           __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
@@ -16332,7 +16626,7 @@ static PyObject *__pyx_f_5MACS2_2IO_8BedGraph_14bedGraphTrackI_cutoff_analysis(s
         #if CYTHON_FAST_PYCCALL
         if (__Pyx_PyFastCFunction_Check(__pyx_t_6)) {
           PyObject *__pyx_temp[4] = {__pyx_t_7, __pyx_t_3, __pyx_t_4, __pyx_t_5};
-          __pyx_t_2 = __Pyx_PyCFunction_FastCall(__pyx_t_6, __pyx_temp+1-__pyx_t_8, 3+__pyx_t_8); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 987, __pyx_L1_error)
+          __pyx_t_2 = __Pyx_PyCFunction_FastCall(__pyx_t_6, __pyx_temp+1-__pyx_t_8, 3+__pyx_t_8); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 988, __pyx_L1_error)
           __Pyx_XDECREF(__pyx_t_7); __pyx_t_7 = 0;
           __Pyx_GOTREF(__pyx_t_2);
           __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
@@ -16341,7 +16635,7 @@ static PyObject *__pyx_f_5MACS2_2IO_8BedGraph_14bedGraphTrackI_cutoff_analysis(s
         } else
         #endif
         {
-          __pyx_t_9 = PyTuple_New(3+__pyx_t_8); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 987, __pyx_L1_error)
+          __pyx_t_9 = PyTuple_New(3+__pyx_t_8); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 988, __pyx_L1_error)
           __Pyx_GOTREF(__pyx_t_9);
           if (__pyx_t_7) {
             __Pyx_GIVEREF(__pyx_t_7); PyTuple_SET_ITEM(__pyx_t_9, 0, __pyx_t_7); __pyx_t_7 = NULL;
@@ -16355,12 +16649,12 @@ static PyObject *__pyx_f_5MACS2_2IO_8BedGraph_14bedGraphTrackI_cutoff_analysis(s
           __pyx_t_3 = 0;
           __pyx_t_4 = 0;
           __pyx_t_5 = 0;
-          __pyx_t_2 = __Pyx_PyObject_Call(__pyx_t_6, __pyx_t_9, NULL); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 987, __pyx_L1_error)
+          __pyx_t_2 = __Pyx_PyObject_Call(__pyx_t_6, __pyx_t_9, NULL); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 988, __pyx_L1_error)
           __Pyx_GOTREF(__pyx_t_2);
           __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
         }
         __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
-        if (!(likely(PyUnicode_CheckExact(__pyx_t_2))||((__pyx_t_2) == Py_None)||(PyErr_Format(PyExc_TypeError, "Expected %.16s, got %.200s", "unicode", Py_TYPE(__pyx_t_2)->tp_name), 0))) __PYX_ERR(0, 987, __pyx_L1_error)
+        if (!(likely(PyUnicode_CheckExact(__pyx_t_2))||((__pyx_t_2) == Py_None)||(PyErr_Format(PyExc_TypeError, "Expected %.16s, got %.200s", "unicode", Py_TYPE(__pyx_t_2)->tp_name), 0))) __PYX_ERR(0, 988, __pyx_L1_error)
         __pyx_r = ((PyObject*)__pyx_t_2);
         __pyx_t_2 = 0;
         __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
@@ -16379,19 +16673,19 @@ static PyObject *__pyx_f_5MACS2_2IO_8BedGraph_14bedGraphTrackI_cutoff_analysis(s
     #endif
   }
 
-  /* "MACS2/IO/BedGraph.pyx":998
+  /* "MACS2/IO/BedGraph.pyx":999
  *             float s, midvalue
  * 
  *         chrs = self.get_chr_names()             # <<<<<<<<<<<<<<
  * 
  *         midvalue = self.minvalue/2 + self.maxvalue/2
  */
-  __pyx_t_1 = ((struct __pyx_vtabstruct_5MACS2_2IO_8BedGraph_bedGraphTrackI *)__pyx_v_self->__pyx_vtab)->get_chr_names(__pyx_v_self, 0); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 998, __pyx_L1_error)
+  __pyx_t_1 = ((struct __pyx_vtabstruct_5MACS2_2IO_8BedGraph_bedGraphTrackI *)__pyx_v_self->__pyx_vtab)->get_chr_names(__pyx_v_self, 0); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 999, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __pyx_v_chrs = ((PyObject*)__pyx_t_1);
   __pyx_t_1 = 0;
 
-  /* "MACS2/IO/BedGraph.pyx":1000
+  /* "MACS2/IO/BedGraph.pyx":1001
  *         chrs = self.get_chr_names()
  * 
  *         midvalue = self.minvalue/2 + self.maxvalue/2             # <<<<<<<<<<<<<<
@@ -16400,7 +16694,7 @@ static PyObject *__pyx_f_5MACS2_2IO_8BedGraph_14bedGraphTrackI_cutoff_analysis(s
  */
   __pyx_v_midvalue = ((__pyx_v_self->minvalue / 2.0) + (__pyx_v_self->maxvalue / 2.0));
 
-  /* "MACS2/IO/BedGraph.pyx":1001
+  /* "MACS2/IO/BedGraph.pyx":1002
  * 
  *         midvalue = self.minvalue/2 + self.maxvalue/2
  *         s = float(self.minvalue - midvalue)/steps             # <<<<<<<<<<<<<<
@@ -16409,27 +16703,27 @@ static PyObject *__pyx_f_5MACS2_2IO_8BedGraph_14bedGraphTrackI_cutoff_analysis(s
  */
   if (unlikely(__pyx_v_steps == 0)) {
     PyErr_SetString(PyExc_ZeroDivisionError, "float division");
-    __PYX_ERR(0, 1001, __pyx_L1_error)
+    __PYX_ERR(0, 1002, __pyx_L1_error)
   }
   __pyx_v_s = ((__pyx_v_self->minvalue - __pyx_v_midvalue) / ((double)__pyx_v_steps));
 
-  /* "MACS2/IO/BedGraph.pyx":1003
+  /* "MACS2/IO/BedGraph.pyx":1004
  *         s = float(self.minvalue - midvalue)/steps
  * 
  *         tmplist = list( np.arange( midvalue, self.minvalue - s, s ) )             # <<<<<<<<<<<<<<
  * 
  *         cutoff_npeaks = {}
  */
-  __Pyx_GetModuleGlobalName(__pyx_t_2, __pyx_n_s_np); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1003, __pyx_L1_error)
+  __Pyx_GetModuleGlobalName(__pyx_t_2, __pyx_n_s_np); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1004, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
-  __pyx_t_6 = __Pyx_PyObject_GetAttrStr(__pyx_t_2, __pyx_n_s_arange); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 1003, __pyx_L1_error)
+  __pyx_t_6 = __Pyx_PyObject_GetAttrStr(__pyx_t_2, __pyx_n_s_arange); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 1004, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_6);
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-  __pyx_t_2 = PyFloat_FromDouble(__pyx_v_midvalue); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1003, __pyx_L1_error)
+  __pyx_t_2 = PyFloat_FromDouble(__pyx_v_midvalue); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1004, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
-  __pyx_t_9 = PyFloat_FromDouble((__pyx_v_self->minvalue - __pyx_v_s)); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 1003, __pyx_L1_error)
+  __pyx_t_9 = PyFloat_FromDouble((__pyx_v_self->minvalue - __pyx_v_s)); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 1004, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_9);
-  __pyx_t_5 = PyFloat_FromDouble(__pyx_v_s); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 1003, __pyx_L1_error)
+  __pyx_t_5 = PyFloat_FromDouble(__pyx_v_s); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 1004, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_5);
   __pyx_t_4 = NULL;
   __pyx_t_8 = 0;
@@ -16446,7 +16740,7 @@ static PyObject *__pyx_f_5MACS2_2IO_8BedGraph_14bedGraphTrackI_cutoff_analysis(s
   #if CYTHON_FAST_PYCALL
   if (PyFunction_Check(__pyx_t_6)) {
     PyObject *__pyx_temp[4] = {__pyx_t_4, __pyx_t_2, __pyx_t_9, __pyx_t_5};
-    __pyx_t_1 = __Pyx_PyFunction_FastCall(__pyx_t_6, __pyx_temp+1-__pyx_t_8, 3+__pyx_t_8); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1003, __pyx_L1_error)
+    __pyx_t_1 = __Pyx_PyFunction_FastCall(__pyx_t_6, __pyx_temp+1-__pyx_t_8, 3+__pyx_t_8); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1004, __pyx_L1_error)
     __Pyx_XDECREF(__pyx_t_4); __pyx_t_4 = 0;
     __Pyx_GOTREF(__pyx_t_1);
     __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
@@ -16457,7 +16751,7 @@ static PyObject *__pyx_f_5MACS2_2IO_8BedGraph_14bedGraphTrackI_cutoff_analysis(s
   #if CYTHON_FAST_PYCCALL
   if (__Pyx_PyFastCFunction_Check(__pyx_t_6)) {
     PyObject *__pyx_temp[4] = {__pyx_t_4, __pyx_t_2, __pyx_t_9, __pyx_t_5};
-    __pyx_t_1 = __Pyx_PyCFunction_FastCall(__pyx_t_6, __pyx_temp+1-__pyx_t_8, 3+__pyx_t_8); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1003, __pyx_L1_error)
+    __pyx_t_1 = __Pyx_PyCFunction_FastCall(__pyx_t_6, __pyx_temp+1-__pyx_t_8, 3+__pyx_t_8); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1004, __pyx_L1_error)
     __Pyx_XDECREF(__pyx_t_4); __pyx_t_4 = 0;
     __Pyx_GOTREF(__pyx_t_1);
     __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
@@ -16466,7 +16760,7 @@ static PyObject *__pyx_f_5MACS2_2IO_8BedGraph_14bedGraphTrackI_cutoff_analysis(s
   } else
   #endif
   {
-    __pyx_t_3 = PyTuple_New(3+__pyx_t_8); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 1003, __pyx_L1_error)
+    __pyx_t_3 = PyTuple_New(3+__pyx_t_8); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 1004, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_3);
     if (__pyx_t_4) {
       __Pyx_GIVEREF(__pyx_t_4); PyTuple_SET_ITEM(__pyx_t_3, 0, __pyx_t_4); __pyx_t_4 = NULL;
@@ -16480,42 +16774,42 @@ static PyObject *__pyx_f_5MACS2_2IO_8BedGraph_14bedGraphTrackI_cutoff_analysis(s
     __pyx_t_2 = 0;
     __pyx_t_9 = 0;
     __pyx_t_5 = 0;
-    __pyx_t_1 = __Pyx_PyObject_Call(__pyx_t_6, __pyx_t_3, NULL); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1003, __pyx_L1_error)
+    __pyx_t_1 = __Pyx_PyObject_Call(__pyx_t_6, __pyx_t_3, NULL); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1004, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
     __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
   }
   __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
-  __pyx_t_6 = PySequence_List(__pyx_t_1); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 1003, __pyx_L1_error)
+  __pyx_t_6 = PySequence_List(__pyx_t_1); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 1004, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_6);
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   __pyx_v_tmplist = ((PyObject*)__pyx_t_6);
   __pyx_t_6 = 0;
 
-  /* "MACS2/IO/BedGraph.pyx":1005
+  /* "MACS2/IO/BedGraph.pyx":1006
  *         tmplist = list( np.arange( midvalue, self.minvalue - s, s ) )
  * 
  *         cutoff_npeaks = {}             # <<<<<<<<<<<<<<
  *         cutoff_lpeaks = {}
  * 
  */
-  __pyx_t_6 = __Pyx_PyDict_NewPresized(0); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 1005, __pyx_L1_error)
+  __pyx_t_6 = __Pyx_PyDict_NewPresized(0); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 1006, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_6);
   __pyx_v_cutoff_npeaks = ((PyObject*)__pyx_t_6);
   __pyx_t_6 = 0;
 
-  /* "MACS2/IO/BedGraph.pyx":1006
+  /* "MACS2/IO/BedGraph.pyx":1007
  * 
  *         cutoff_npeaks = {}
  *         cutoff_lpeaks = {}             # <<<<<<<<<<<<<<
  * 
  *         for chrom in chrs:
  */
-  __pyx_t_6 = __Pyx_PyDict_NewPresized(0); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 1006, __pyx_L1_error)
+  __pyx_t_6 = __Pyx_PyDict_NewPresized(0); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 1007, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_6);
   __pyx_v_cutoff_lpeaks = ((PyObject*)__pyx_t_6);
   __pyx_t_6 = 0;
 
-  /* "MACS2/IO/BedGraph.pyx":1008
+  /* "MACS2/IO/BedGraph.pyx":1009
  *         cutoff_lpeaks = {}
  * 
  *         for chrom in chrs:             # <<<<<<<<<<<<<<
@@ -16523,7 +16817,7 @@ static PyObject *__pyx_f_5MACS2_2IO_8BedGraph_14bedGraphTrackI_cutoff_analysis(s
  *             pos_array = np.array( self.__data[ chrom ][ 0 ] )
  */
   __pyx_t_10 = 0;
-  __pyx_t_1 = __Pyx_set_iterator(__pyx_v_chrs, 1, (&__pyx_t_11), (&__pyx_t_8)); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1008, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_set_iterator(__pyx_v_chrs, 1, (&__pyx_t_11), (&__pyx_t_8)); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1009, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __Pyx_XDECREF(__pyx_t_6);
   __pyx_t_6 = __pyx_t_1;
@@ -16531,13 +16825,13 @@ static PyObject *__pyx_f_5MACS2_2IO_8BedGraph_14bedGraphTrackI_cutoff_analysis(s
   while (1) {
     __pyx_t_12 = __Pyx_set_iter_next(__pyx_t_6, __pyx_t_11, &__pyx_t_10, &__pyx_t_1, __pyx_t_8);
     if (unlikely(__pyx_t_12 == 0)) break;
-    if (unlikely(__pyx_t_12 == -1)) __PYX_ERR(0, 1008, __pyx_L1_error)
+    if (unlikely(__pyx_t_12 == -1)) __PYX_ERR(0, 1009, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
-    if (!(likely(PyBytes_CheckExact(__pyx_t_1))||((__pyx_t_1) == Py_None)||(PyErr_Format(PyExc_TypeError, "Expected %.16s, got %.200s", "bytes", Py_TYPE(__pyx_t_1)->tp_name), 0))) __PYX_ERR(0, 1008, __pyx_L1_error)
+    if (!(likely(PyBytes_CheckExact(__pyx_t_1))||((__pyx_t_1) == Py_None)||(PyErr_Format(PyExc_TypeError, "Expected %.16s, got %.200s", "bytes", Py_TYPE(__pyx_t_1)->tp_name), 0))) __PYX_ERR(0, 1009, __pyx_L1_error)
     __Pyx_XDECREF_SET(__pyx_v_chrom, ((PyObject*)__pyx_t_1));
     __pyx_t_1 = 0;
 
-    /* "MACS2/IO/BedGraph.pyx":1009
+    /* "MACS2/IO/BedGraph.pyx":1010
  * 
  *         for chrom in chrs:
  *             ( pos_array, score_array ) = self.__data[ chrom ]             # <<<<<<<<<<<<<<
@@ -16546,9 +16840,9 @@ static PyObject *__pyx_f_5MACS2_2IO_8BedGraph_14bedGraphTrackI_cutoff_analysis(s
  */
     if (unlikely(__pyx_v_self->__pyx___data == Py_None)) {
       PyErr_SetString(PyExc_TypeError, "'NoneType' object is not subscriptable");
-      __PYX_ERR(0, 1009, __pyx_L1_error)
+      __PYX_ERR(0, 1010, __pyx_L1_error)
     }
-    __pyx_t_1 = __Pyx_PyDict_GetItem(__pyx_v_self->__pyx___data, __pyx_v_chrom); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1009, __pyx_L1_error)
+    __pyx_t_1 = __Pyx_PyDict_GetItem(__pyx_v_self->__pyx___data, __pyx_v_chrom); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1010, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
     if ((likely(PyTuple_CheckExact(__pyx_t_1))) || (PyList_CheckExact(__pyx_t_1))) {
       PyObject* sequence = __pyx_t_1;
@@ -16556,7 +16850,7 @@ static PyObject *__pyx_f_5MACS2_2IO_8BedGraph_14bedGraphTrackI_cutoff_analysis(s
       if (unlikely(size != 2)) {
         if (size > 2) __Pyx_RaiseTooManyValuesError(2);
         else if (size >= 0) __Pyx_RaiseNeedMoreValuesError(size);
-        __PYX_ERR(0, 1009, __pyx_L1_error)
+        __PYX_ERR(0, 1010, __pyx_L1_error)
       }
       #if CYTHON_ASSUME_SAFE_MACROS && !CYTHON_AVOID_BORROWED_REFS
       if (likely(PyTuple_CheckExact(sequence))) {
@@ -16569,15 +16863,15 @@ static PyObject *__pyx_f_5MACS2_2IO_8BedGraph_14bedGraphTrackI_cutoff_analysis(s
       __Pyx_INCREF(__pyx_t_3);
       __Pyx_INCREF(__pyx_t_5);
       #else
-      __pyx_t_3 = PySequence_ITEM(sequence, 0); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 1009, __pyx_L1_error)
+      __pyx_t_3 = PySequence_ITEM(sequence, 0); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 1010, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_3);
-      __pyx_t_5 = PySequence_ITEM(sequence, 1); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 1009, __pyx_L1_error)
+      __pyx_t_5 = PySequence_ITEM(sequence, 1); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 1010, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_5);
       #endif
       __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
     } else {
       Py_ssize_t index = -1;
-      __pyx_t_9 = PyObject_GetIter(__pyx_t_1); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 1009, __pyx_L1_error)
+      __pyx_t_9 = PyObject_GetIter(__pyx_t_1); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 1010, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_9);
       __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
       __pyx_t_13 = Py_TYPE(__pyx_t_9)->tp_iternext;
@@ -16585,7 +16879,7 @@ static PyObject *__pyx_f_5MACS2_2IO_8BedGraph_14bedGraphTrackI_cutoff_analysis(s
       __Pyx_GOTREF(__pyx_t_3);
       index = 1; __pyx_t_5 = __pyx_t_13(__pyx_t_9); if (unlikely(!__pyx_t_5)) goto __pyx_L5_unpacking_failed;
       __Pyx_GOTREF(__pyx_t_5);
-      if (__Pyx_IternextUnpackEndCheck(__pyx_t_13(__pyx_t_9), 2) < 0) __PYX_ERR(0, 1009, __pyx_L1_error)
+      if (__Pyx_IternextUnpackEndCheck(__pyx_t_13(__pyx_t_9), 2) < 0) __PYX_ERR(0, 1010, __pyx_L1_error)
       __pyx_t_13 = NULL;
       __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
       goto __pyx_L6_unpacking_done;
@@ -16593,7 +16887,7 @@ static PyObject *__pyx_f_5MACS2_2IO_8BedGraph_14bedGraphTrackI_cutoff_analysis(s
       __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
       __pyx_t_13 = NULL;
       if (__Pyx_IterFinish() == 0) __Pyx_RaiseNeedMoreValuesError(index);
-      __PYX_ERR(0, 1009, __pyx_L1_error)
+      __PYX_ERR(0, 1010, __pyx_L1_error)
       __pyx_L6_unpacking_done:;
     }
     __Pyx_XDECREF_SET(__pyx_v_pos_array, __pyx_t_3);
@@ -16601,25 +16895,25 @@ static PyObject *__pyx_f_5MACS2_2IO_8BedGraph_14bedGraphTrackI_cutoff_analysis(s
     __Pyx_XDECREF_SET(__pyx_v_score_array, __pyx_t_5);
     __pyx_t_5 = 0;
 
-    /* "MACS2/IO/BedGraph.pyx":1010
+    /* "MACS2/IO/BedGraph.pyx":1011
  *         for chrom in chrs:
  *             ( pos_array, score_array ) = self.__data[ chrom ]
  *             pos_array = np.array( self.__data[ chrom ][ 0 ] )             # <<<<<<<<<<<<<<
  *             score_array = np.array( self.__data[ chrom ][ 1 ] )
  * 
  */
-    __Pyx_GetModuleGlobalName(__pyx_t_5, __pyx_n_s_np); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 1010, __pyx_L1_error)
+    __Pyx_GetModuleGlobalName(__pyx_t_5, __pyx_n_s_np); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 1011, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_5);
-    __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_t_5, __pyx_n_s_array); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 1010, __pyx_L1_error)
+    __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_t_5, __pyx_n_s_array); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 1011, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_3);
     __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
     if (unlikely(__pyx_v_self->__pyx___data == Py_None)) {
       PyErr_SetString(PyExc_TypeError, "'NoneType' object is not subscriptable");
-      __PYX_ERR(0, 1010, __pyx_L1_error)
+      __PYX_ERR(0, 1011, __pyx_L1_error)
     }
-    __pyx_t_5 = __Pyx_PyDict_GetItem(__pyx_v_self->__pyx___data, __pyx_v_chrom); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 1010, __pyx_L1_error)
+    __pyx_t_5 = __Pyx_PyDict_GetItem(__pyx_v_self->__pyx___data, __pyx_v_chrom); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 1011, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_5);
-    __pyx_t_9 = __Pyx_GetItemInt(__pyx_t_5, 0, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 1010, __pyx_L1_error)
+    __pyx_t_9 = __Pyx_GetItemInt(__pyx_t_5, 0, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 1011, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_9);
     __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
     __pyx_t_5 = NULL;
@@ -16635,31 +16929,31 @@ static PyObject *__pyx_f_5MACS2_2IO_8BedGraph_14bedGraphTrackI_cutoff_analysis(s
     __pyx_t_1 = (__pyx_t_5) ? __Pyx_PyObject_Call2Args(__pyx_t_3, __pyx_t_5, __pyx_t_9) : __Pyx_PyObject_CallOneArg(__pyx_t_3, __pyx_t_9);
     __Pyx_XDECREF(__pyx_t_5); __pyx_t_5 = 0;
     __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
-    if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1010, __pyx_L1_error)
+    if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1011, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
     __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
     __Pyx_DECREF_SET(__pyx_v_pos_array, __pyx_t_1);
     __pyx_t_1 = 0;
 
-    /* "MACS2/IO/BedGraph.pyx":1011
+    /* "MACS2/IO/BedGraph.pyx":1012
  *             ( pos_array, score_array ) = self.__data[ chrom ]
  *             pos_array = np.array( self.__data[ chrom ][ 0 ] )
  *             score_array = np.array( self.__data[ chrom ][ 1 ] )             # <<<<<<<<<<<<<<
  * 
  *             for n in range( len( tmplist ) ):
  */
-    __Pyx_GetModuleGlobalName(__pyx_t_3, __pyx_n_s_np); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 1011, __pyx_L1_error)
+    __Pyx_GetModuleGlobalName(__pyx_t_3, __pyx_n_s_np); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 1012, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_3);
-    __pyx_t_9 = __Pyx_PyObject_GetAttrStr(__pyx_t_3, __pyx_n_s_array); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 1011, __pyx_L1_error)
+    __pyx_t_9 = __Pyx_PyObject_GetAttrStr(__pyx_t_3, __pyx_n_s_array); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 1012, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_9);
     __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
     if (unlikely(__pyx_v_self->__pyx___data == Py_None)) {
       PyErr_SetString(PyExc_TypeError, "'NoneType' object is not subscriptable");
-      __PYX_ERR(0, 1011, __pyx_L1_error)
+      __PYX_ERR(0, 1012, __pyx_L1_error)
     }
-    __pyx_t_3 = __Pyx_PyDict_GetItem(__pyx_v_self->__pyx___data, __pyx_v_chrom); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 1011, __pyx_L1_error)
+    __pyx_t_3 = __Pyx_PyDict_GetItem(__pyx_v_self->__pyx___data, __pyx_v_chrom); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 1012, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_3);
-    __pyx_t_5 = __Pyx_GetItemInt(__pyx_t_3, 1, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 1011, __pyx_L1_error)
+    __pyx_t_5 = __Pyx_GetItemInt(__pyx_t_3, 1, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 1012, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_5);
     __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
     __pyx_t_3 = NULL;
@@ -16675,34 +16969,34 @@ static PyObject *__pyx_f_5MACS2_2IO_8BedGraph_14bedGraphTrackI_cutoff_analysis(s
     __pyx_t_1 = (__pyx_t_3) ? __Pyx_PyObject_Call2Args(__pyx_t_9, __pyx_t_3, __pyx_t_5) : __Pyx_PyObject_CallOneArg(__pyx_t_9, __pyx_t_5);
     __Pyx_XDECREF(__pyx_t_3); __pyx_t_3 = 0;
     __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
-    if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1011, __pyx_L1_error)
+    if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1012, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
     __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
     __Pyx_DECREF_SET(__pyx_v_score_array, __pyx_t_1);
     __pyx_t_1 = 0;
 
-    /* "MACS2/IO/BedGraph.pyx":1013
+    /* "MACS2/IO/BedGraph.pyx":1014
  *             score_array = np.array( self.__data[ chrom ][ 1 ] )
  * 
  *             for n in range( len( tmplist ) ):             # <<<<<<<<<<<<<<
  *                 cutoff = round( tmplist[ n ], 3 )
  *                 total_l = 0           # total length of peaks
  */
-    __pyx_t_14 = PyList_GET_SIZE(__pyx_v_tmplist); if (unlikely(__pyx_t_14 == ((Py_ssize_t)-1))) __PYX_ERR(0, 1013, __pyx_L1_error)
+    __pyx_t_14 = PyList_GET_SIZE(__pyx_v_tmplist); if (unlikely(__pyx_t_14 == ((Py_ssize_t)-1))) __PYX_ERR(0, 1014, __pyx_L1_error)
     __pyx_t_15 = __pyx_t_14;
     for (__pyx_t_16 = 0; __pyx_t_16 < __pyx_t_15; __pyx_t_16+=1) {
       __pyx_v_n = __pyx_t_16;
 
-      /* "MACS2/IO/BedGraph.pyx":1014
+      /* "MACS2/IO/BedGraph.pyx":1015
  * 
  *             for n in range( len( tmplist ) ):
  *                 cutoff = round( tmplist[ n ], 3 )             # <<<<<<<<<<<<<<
  *                 total_l = 0           # total length of peaks
  *                 total_p = 0           # total number of peaks
  */
-      __pyx_t_1 = __Pyx_GetItemInt_List(__pyx_v_tmplist, __pyx_v_n, long, 1, __Pyx_PyInt_From_long, 1, 1, 1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1014, __pyx_L1_error)
+      __pyx_t_1 = __Pyx_GetItemInt_List(__pyx_v_tmplist, __pyx_v_n, long, 1, __Pyx_PyInt_From_long, 1, 1, 1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1015, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_1);
-      __pyx_t_9 = PyTuple_New(2); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 1014, __pyx_L1_error)
+      __pyx_t_9 = PyTuple_New(2); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 1015, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_9);
       __Pyx_GIVEREF(__pyx_t_1);
       PyTuple_SET_ITEM(__pyx_t_9, 0, __pyx_t_1);
@@ -16710,14 +17004,14 @@ static PyObject *__pyx_f_5MACS2_2IO_8BedGraph_14bedGraphTrackI_cutoff_analysis(s
       __Pyx_GIVEREF(__pyx_int_3);
       PyTuple_SET_ITEM(__pyx_t_9, 1, __pyx_int_3);
       __pyx_t_1 = 0;
-      __pyx_t_1 = __Pyx_PyObject_Call(__pyx_builtin_round, __pyx_t_9, NULL); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1014, __pyx_L1_error)
+      __pyx_t_1 = __Pyx_PyObject_Call(__pyx_builtin_round, __pyx_t_9, NULL); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1015, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_1);
       __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
-      __pyx_t_17 = __pyx_PyFloat_AsFloat(__pyx_t_1); if (unlikely((__pyx_t_17 == (float)-1) && PyErr_Occurred())) __PYX_ERR(0, 1014, __pyx_L1_error)
+      __pyx_t_17 = __pyx_PyFloat_AsFloat(__pyx_t_1); if (unlikely((__pyx_t_17 == (float)-1) && PyErr_Occurred())) __PYX_ERR(0, 1015, __pyx_L1_error)
       __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
       __pyx_v_cutoff = __pyx_t_17;
 
-      /* "MACS2/IO/BedGraph.pyx":1015
+      /* "MACS2/IO/BedGraph.pyx":1016
  *             for n in range( len( tmplist ) ):
  *                 cutoff = round( tmplist[ n ], 3 )
  *                 total_l = 0           # total length of peaks             # <<<<<<<<<<<<<<
@@ -16726,7 +17020,7 @@ static PyObject *__pyx_f_5MACS2_2IO_8BedGraph_14bedGraphTrackI_cutoff_analysis(s
  */
       __pyx_v_total_l = 0;
 
-      /* "MACS2/IO/BedGraph.pyx":1016
+      /* "MACS2/IO/BedGraph.pyx":1017
  *                 cutoff = round( tmplist[ n ], 3 )
  *                 total_l = 0           # total length of peaks
  *                 total_p = 0           # total number of peaks             # <<<<<<<<<<<<<<
@@ -16735,21 +17029,21 @@ static PyObject *__pyx_f_5MACS2_2IO_8BedGraph_14bedGraphTrackI_cutoff_analysis(s
  */
       __pyx_v_total_p = 0;
 
-      /* "MACS2/IO/BedGraph.pyx":1019
+      /* "MACS2/IO/BedGraph.pyx":1020
  * 
  *                 # get the regions with scores above cutoffs
  *                 above_cutoff = np.nonzero( score_array > cutoff )[0]# this is not an optimized method. It would be better to store score array in a 2-D ndarray?             # <<<<<<<<<<<<<<
  *                 above_cutoff_endpos = pos_array[above_cutoff] # end positions of regions where score is above cutoff
  *                 above_cutoff_startpos = pos_array[above_cutoff-1] # start positions of regions where score is above cutoff
  */
-      __Pyx_GetModuleGlobalName(__pyx_t_9, __pyx_n_s_np); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 1019, __pyx_L1_error)
+      __Pyx_GetModuleGlobalName(__pyx_t_9, __pyx_n_s_np); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 1020, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_9);
-      __pyx_t_5 = __Pyx_PyObject_GetAttrStr(__pyx_t_9, __pyx_n_s_nonzero); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 1019, __pyx_L1_error)
+      __pyx_t_5 = __Pyx_PyObject_GetAttrStr(__pyx_t_9, __pyx_n_s_nonzero); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 1020, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_5);
       __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
-      __pyx_t_9 = PyFloat_FromDouble(__pyx_v_cutoff); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 1019, __pyx_L1_error)
+      __pyx_t_9 = PyFloat_FromDouble(__pyx_v_cutoff); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 1020, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_9);
-      __pyx_t_3 = PyObject_RichCompare(__pyx_v_score_array, __pyx_t_9, Py_GT); __Pyx_XGOTREF(__pyx_t_3); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 1019, __pyx_L1_error)
+      __pyx_t_3 = PyObject_RichCompare(__pyx_v_score_array, __pyx_t_9, Py_GT); __Pyx_XGOTREF(__pyx_t_3); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 1020, __pyx_L1_error)
       __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
       __pyx_t_9 = NULL;
       if (CYTHON_UNPACK_METHODS && unlikely(PyMethod_Check(__pyx_t_5))) {
@@ -16764,59 +17058,59 @@ static PyObject *__pyx_f_5MACS2_2IO_8BedGraph_14bedGraphTrackI_cutoff_analysis(s
       __pyx_t_1 = (__pyx_t_9) ? __Pyx_PyObject_Call2Args(__pyx_t_5, __pyx_t_9, __pyx_t_3) : __Pyx_PyObject_CallOneArg(__pyx_t_5, __pyx_t_3);
       __Pyx_XDECREF(__pyx_t_9); __pyx_t_9 = 0;
       __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-      if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1019, __pyx_L1_error)
+      if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1020, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_1);
       __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
-      __pyx_t_5 = __Pyx_GetItemInt(__pyx_t_1, 0, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 1019, __pyx_L1_error)
+      __pyx_t_5 = __Pyx_GetItemInt(__pyx_t_1, 0, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 1020, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_5);
       __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
       __Pyx_XDECREF_SET(__pyx_v_above_cutoff, __pyx_t_5);
       __pyx_t_5 = 0;
 
-      /* "MACS2/IO/BedGraph.pyx":1020
+      /* "MACS2/IO/BedGraph.pyx":1021
  *                 # get the regions with scores above cutoffs
  *                 above_cutoff = np.nonzero( score_array > cutoff )[0]# this is not an optimized method. It would be better to store score array in a 2-D ndarray?
  *                 above_cutoff_endpos = pos_array[above_cutoff] # end positions of regions where score is above cutoff             # <<<<<<<<<<<<<<
  *                 above_cutoff_startpos = pos_array[above_cutoff-1] # start positions of regions where score is above cutoff
  * 
  */
-      __pyx_t_5 = __Pyx_PyObject_GetItem(__pyx_v_pos_array, __pyx_v_above_cutoff); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 1020, __pyx_L1_error)
+      __pyx_t_5 = __Pyx_PyObject_GetItem(__pyx_v_pos_array, __pyx_v_above_cutoff); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 1021, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_5);
       __Pyx_XDECREF_SET(__pyx_v_above_cutoff_endpos, __pyx_t_5);
       __pyx_t_5 = 0;
 
-      /* "MACS2/IO/BedGraph.pyx":1021
+      /* "MACS2/IO/BedGraph.pyx":1022
  *                 above_cutoff = np.nonzero( score_array > cutoff )[0]# this is not an optimized method. It would be better to store score array in a 2-D ndarray?
  *                 above_cutoff_endpos = pos_array[above_cutoff] # end positions of regions where score is above cutoff
  *                 above_cutoff_startpos = pos_array[above_cutoff-1] # start positions of regions where score is above cutoff             # <<<<<<<<<<<<<<
  * 
  *                 if above_cutoff_endpos.size == 0:
  */
-      __pyx_t_5 = __Pyx_PyInt_SubtractObjC(__pyx_v_above_cutoff, __pyx_int_1, 1, 0, 0); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 1021, __pyx_L1_error)
+      __pyx_t_5 = __Pyx_PyInt_SubtractObjC(__pyx_v_above_cutoff, __pyx_int_1, 1, 0, 0); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 1022, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_5);
-      __pyx_t_1 = __Pyx_PyObject_GetItem(__pyx_v_pos_array, __pyx_t_5); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1021, __pyx_L1_error)
+      __pyx_t_1 = __Pyx_PyObject_GetItem(__pyx_v_pos_array, __pyx_t_5); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1022, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_1);
       __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
       __Pyx_XDECREF_SET(__pyx_v_above_cutoff_startpos, __pyx_t_1);
       __pyx_t_1 = 0;
 
-      /* "MACS2/IO/BedGraph.pyx":1023
+      /* "MACS2/IO/BedGraph.pyx":1024
  *                 above_cutoff_startpos = pos_array[above_cutoff-1] # start positions of regions where score is above cutoff
  * 
  *                 if above_cutoff_endpos.size == 0:             # <<<<<<<<<<<<<<
  *                     continue
  * 
  */
-      __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_v_above_cutoff_endpos, __pyx_n_s_size); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1023, __pyx_L1_error)
+      __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_v_above_cutoff_endpos, __pyx_n_s_size); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1024, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_1);
-      __pyx_t_5 = __Pyx_PyInt_EqObjC(__pyx_t_1, __pyx_int_0, 0, 0); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 1023, __pyx_L1_error)
+      __pyx_t_5 = __Pyx_PyInt_EqObjC(__pyx_t_1, __pyx_int_0, 0, 0); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 1024, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_5);
       __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-      __pyx_t_18 = __Pyx_PyObject_IsTrue(__pyx_t_5); if (unlikely(__pyx_t_18 < 0)) __PYX_ERR(0, 1023, __pyx_L1_error)
+      __pyx_t_18 = __Pyx_PyObject_IsTrue(__pyx_t_5); if (unlikely(__pyx_t_18 < 0)) __PYX_ERR(0, 1024, __pyx_L1_error)
       __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
       if (__pyx_t_18) {
 
-        /* "MACS2/IO/BedGraph.pyx":1024
+        /* "MACS2/IO/BedGraph.pyx":1025
  * 
  *                 if above_cutoff_endpos.size == 0:
  *                     continue             # <<<<<<<<<<<<<<
@@ -16825,7 +17119,7 @@ static PyObject *__pyx_f_5MACS2_2IO_8BedGraph_14bedGraphTrackI_cutoff_analysis(s
  */
         goto __pyx_L7_continue;
 
-        /* "MACS2/IO/BedGraph.pyx":1023
+        /* "MACS2/IO/BedGraph.pyx":1024
  *                 above_cutoff_startpos = pos_array[above_cutoff-1] # start positions of regions where score is above cutoff
  * 
  *                 if above_cutoff_endpos.size == 0:             # <<<<<<<<<<<<<<
@@ -16834,37 +17128,37 @@ static PyObject *__pyx_f_5MACS2_2IO_8BedGraph_14bedGraphTrackI_cutoff_analysis(s
  */
       }
 
-      /* "MACS2/IO/BedGraph.pyx":1027
+      /* "MACS2/IO/BedGraph.pyx":1028
  * 
  *                 # first bit of region above cutoff
  *                 acs_next = iter(above_cutoff_startpos).__next__             # <<<<<<<<<<<<<<
  *                 ace_next = iter(above_cutoff_endpos).__next__
  * 
  */
-      __pyx_t_5 = PyObject_GetIter(__pyx_v_above_cutoff_startpos); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 1027, __pyx_L1_error)
+      __pyx_t_5 = PyObject_GetIter(__pyx_v_above_cutoff_startpos); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 1028, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_5);
-      __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_t_5, __pyx_n_s_next); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1027, __pyx_L1_error)
+      __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_t_5, __pyx_n_s_next); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1028, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_1);
       __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
       __Pyx_XDECREF_SET(__pyx_v_acs_next, __pyx_t_1);
       __pyx_t_1 = 0;
 
-      /* "MACS2/IO/BedGraph.pyx":1028
+      /* "MACS2/IO/BedGraph.pyx":1029
  *                 # first bit of region above cutoff
  *                 acs_next = iter(above_cutoff_startpos).__next__
  *                 ace_next = iter(above_cutoff_endpos).__next__             # <<<<<<<<<<<<<<
  * 
  *                 ts = acs_next()
  */
-      __pyx_t_1 = PyObject_GetIter(__pyx_v_above_cutoff_endpos); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1028, __pyx_L1_error)
+      __pyx_t_1 = PyObject_GetIter(__pyx_v_above_cutoff_endpos); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1029, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_1);
-      __pyx_t_5 = __Pyx_PyObject_GetAttrStr(__pyx_t_1, __pyx_n_s_next); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 1028, __pyx_L1_error)
+      __pyx_t_5 = __Pyx_PyObject_GetAttrStr(__pyx_t_1, __pyx_n_s_next); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 1029, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_5);
       __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
       __Pyx_XDECREF_SET(__pyx_v_ace_next, __pyx_t_5);
       __pyx_t_5 = 0;
 
-      /* "MACS2/IO/BedGraph.pyx":1030
+      /* "MACS2/IO/BedGraph.pyx":1031
  *                 ace_next = iter(above_cutoff_endpos).__next__
  * 
  *                 ts = acs_next()             # <<<<<<<<<<<<<<
@@ -16884,14 +17178,14 @@ static PyObject *__pyx_f_5MACS2_2IO_8BedGraph_14bedGraphTrackI_cutoff_analysis(s
       }
       __pyx_t_5 = (__pyx_t_3) ? __Pyx_PyObject_CallOneArg(__pyx_t_1, __pyx_t_3) : __Pyx_PyObject_CallNoArg(__pyx_t_1);
       __Pyx_XDECREF(__pyx_t_3); __pyx_t_3 = 0;
-      if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 1030, __pyx_L1_error)
+      if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 1031, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_5);
       __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-      __pyx_t_19 = __Pyx_PyInt_As_long(__pyx_t_5); if (unlikely((__pyx_t_19 == (long)-1) && PyErr_Occurred())) __PYX_ERR(0, 1030, __pyx_L1_error)
+      __pyx_t_19 = __Pyx_PyInt_As_long(__pyx_t_5); if (unlikely((__pyx_t_19 == (long)-1) && PyErr_Occurred())) __PYX_ERR(0, 1031, __pyx_L1_error)
       __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
       __pyx_v_ts = __pyx_t_19;
 
-      /* "MACS2/IO/BedGraph.pyx":1031
+      /* "MACS2/IO/BedGraph.pyx":1032
  * 
  *                 ts = acs_next()
  *                 te = ace_next()             # <<<<<<<<<<<<<<
@@ -16911,25 +17205,25 @@ static PyObject *__pyx_f_5MACS2_2IO_8BedGraph_14bedGraphTrackI_cutoff_analysis(s
       }
       __pyx_t_5 = (__pyx_t_3) ? __Pyx_PyObject_CallOneArg(__pyx_t_1, __pyx_t_3) : __Pyx_PyObject_CallNoArg(__pyx_t_1);
       __Pyx_XDECREF(__pyx_t_3); __pyx_t_3 = 0;
-      if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 1031, __pyx_L1_error)
+      if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 1032, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_5);
       __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-      __pyx_t_19 = __Pyx_PyInt_As_long(__pyx_t_5); if (unlikely((__pyx_t_19 == (long)-1) && PyErr_Occurred())) __PYX_ERR(0, 1031, __pyx_L1_error)
+      __pyx_t_19 = __Pyx_PyInt_As_long(__pyx_t_5); if (unlikely((__pyx_t_19 == (long)-1) && PyErr_Occurred())) __PYX_ERR(0, 1032, __pyx_L1_error)
       __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
       __pyx_v_te = __pyx_t_19;
 
-      /* "MACS2/IO/BedGraph.pyx":1032
+      /* "MACS2/IO/BedGraph.pyx":1033
  *                 ts = acs_next()
  *                 te = ace_next()
  *                 peak_content = [( ts, te ), ]             # <<<<<<<<<<<<<<
  *                 lastp = te
  * 
  */
-      __pyx_t_5 = __Pyx_PyInt_From_long(__pyx_v_ts); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 1032, __pyx_L1_error)
+      __pyx_t_5 = __Pyx_PyInt_From_long(__pyx_v_ts); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 1033, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_5);
-      __pyx_t_1 = __Pyx_PyInt_From_long(__pyx_v_te); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1032, __pyx_L1_error)
+      __pyx_t_1 = __Pyx_PyInt_From_long(__pyx_v_te); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1033, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_1);
-      __pyx_t_3 = PyTuple_New(2); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 1032, __pyx_L1_error)
+      __pyx_t_3 = PyTuple_New(2); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 1033, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_3);
       __Pyx_GIVEREF(__pyx_t_5);
       PyTuple_SET_ITEM(__pyx_t_3, 0, __pyx_t_5);
@@ -16937,7 +17231,7 @@ static PyObject *__pyx_f_5MACS2_2IO_8BedGraph_14bedGraphTrackI_cutoff_analysis(s
       PyTuple_SET_ITEM(__pyx_t_3, 1, __pyx_t_1);
       __pyx_t_5 = 0;
       __pyx_t_1 = 0;
-      __pyx_t_1 = PyList_New(1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1032, __pyx_L1_error)
+      __pyx_t_1 = PyList_New(1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1033, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_1);
       __Pyx_GIVEREF(__pyx_t_3);
       PyList_SET_ITEM(__pyx_t_1, 0, __pyx_t_3);
@@ -16945,7 +17239,7 @@ static PyObject *__pyx_f_5MACS2_2IO_8BedGraph_14bedGraphTrackI_cutoff_analysis(s
       __Pyx_XDECREF_SET(__pyx_v_peak_content, ((PyObject*)__pyx_t_1));
       __pyx_t_1 = 0;
 
-      /* "MACS2/IO/BedGraph.pyx":1033
+      /* "MACS2/IO/BedGraph.pyx":1034
  *                 te = ace_next()
  *                 peak_content = [( ts, te ), ]
  *                 lastp = te             # <<<<<<<<<<<<<<
@@ -16954,22 +17248,22 @@ static PyObject *__pyx_f_5MACS2_2IO_8BedGraph_14bedGraphTrackI_cutoff_analysis(s
  */
       __pyx_v_lastp = __pyx_v_te;
 
-      /* "MACS2/IO/BedGraph.pyx":1035
+      /* "MACS2/IO/BedGraph.pyx":1036
  *                 lastp = te
  * 
  *                 for i in range( 1, above_cutoff_startpos.size ):             # <<<<<<<<<<<<<<
  *                     ts = acs_next()
  *                     te = ace_next()
  */
-      __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_v_above_cutoff_startpos, __pyx_n_s_size); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1035, __pyx_L1_error)
+      __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_v_above_cutoff_startpos, __pyx_n_s_size); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1036, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_1);
-      __pyx_t_19 = __Pyx_PyInt_As_long(__pyx_t_1); if (unlikely((__pyx_t_19 == (long)-1) && PyErr_Occurred())) __PYX_ERR(0, 1035, __pyx_L1_error)
+      __pyx_t_19 = __Pyx_PyInt_As_long(__pyx_t_1); if (unlikely((__pyx_t_19 == (long)-1) && PyErr_Occurred())) __PYX_ERR(0, 1036, __pyx_L1_error)
       __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
       __pyx_t_20 = __pyx_t_19;
       for (__pyx_t_21 = 1; __pyx_t_21 < __pyx_t_20; __pyx_t_21+=1) {
         __pyx_v_i = __pyx_t_21;
 
-        /* "MACS2/IO/BedGraph.pyx":1036
+        /* "MACS2/IO/BedGraph.pyx":1037
  * 
  *                 for i in range( 1, above_cutoff_startpos.size ):
  *                     ts = acs_next()             # <<<<<<<<<<<<<<
@@ -16989,14 +17283,14 @@ static PyObject *__pyx_f_5MACS2_2IO_8BedGraph_14bedGraphTrackI_cutoff_analysis(s
         }
         __pyx_t_1 = (__pyx_t_5) ? __Pyx_PyObject_CallOneArg(__pyx_t_3, __pyx_t_5) : __Pyx_PyObject_CallNoArg(__pyx_t_3);
         __Pyx_XDECREF(__pyx_t_5); __pyx_t_5 = 0;
-        if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1036, __pyx_L1_error)
+        if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1037, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_1);
         __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-        __pyx_t_22 = __Pyx_PyInt_As_long(__pyx_t_1); if (unlikely((__pyx_t_22 == (long)-1) && PyErr_Occurred())) __PYX_ERR(0, 1036, __pyx_L1_error)
+        __pyx_t_22 = __Pyx_PyInt_As_long(__pyx_t_1); if (unlikely((__pyx_t_22 == (long)-1) && PyErr_Occurred())) __PYX_ERR(0, 1037, __pyx_L1_error)
         __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
         __pyx_v_ts = __pyx_t_22;
 
-        /* "MACS2/IO/BedGraph.pyx":1037
+        /* "MACS2/IO/BedGraph.pyx":1038
  *                 for i in range( 1, above_cutoff_startpos.size ):
  *                     ts = acs_next()
  *                     te = ace_next()             # <<<<<<<<<<<<<<
@@ -17016,14 +17310,14 @@ static PyObject *__pyx_f_5MACS2_2IO_8BedGraph_14bedGraphTrackI_cutoff_analysis(s
         }
         __pyx_t_1 = (__pyx_t_5) ? __Pyx_PyObject_CallOneArg(__pyx_t_3, __pyx_t_5) : __Pyx_PyObject_CallNoArg(__pyx_t_3);
         __Pyx_XDECREF(__pyx_t_5); __pyx_t_5 = 0;
-        if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1037, __pyx_L1_error)
+        if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1038, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_1);
         __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-        __pyx_t_22 = __Pyx_PyInt_As_long(__pyx_t_1); if (unlikely((__pyx_t_22 == (long)-1) && PyErr_Occurred())) __PYX_ERR(0, 1037, __pyx_L1_error)
+        __pyx_t_22 = __Pyx_PyInt_As_long(__pyx_t_1); if (unlikely((__pyx_t_22 == (long)-1) && PyErr_Occurred())) __PYX_ERR(0, 1038, __pyx_L1_error)
         __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
         __pyx_v_te = __pyx_t_22;
 
-        /* "MACS2/IO/BedGraph.pyx":1038
+        /* "MACS2/IO/BedGraph.pyx":1039
  *                     ts = acs_next()
  *                     te = ace_next()
  *                     tl = ts - lastp             # <<<<<<<<<<<<<<
@@ -17032,7 +17326,7 @@ static PyObject *__pyx_f_5MACS2_2IO_8BedGraph_14bedGraphTrackI_cutoff_analysis(s
  */
         __pyx_v_tl = (__pyx_v_ts - __pyx_v_lastp);
 
-        /* "MACS2/IO/BedGraph.pyx":1039
+        /* "MACS2/IO/BedGraph.pyx":1040
  *                     te = ace_next()
  *                     tl = ts - lastp
  *                     if tl <= max_gap:             # <<<<<<<<<<<<<<
@@ -17042,18 +17336,18 @@ static PyObject *__pyx_f_5MACS2_2IO_8BedGraph_14bedGraphTrackI_cutoff_analysis(s
         __pyx_t_18 = ((__pyx_v_tl <= __pyx_v_max_gap) != 0);
         if (__pyx_t_18) {
 
-          /* "MACS2/IO/BedGraph.pyx":1040
+          /* "MACS2/IO/BedGraph.pyx":1041
  *                     tl = ts - lastp
  *                     if tl <= max_gap:
  *                         peak_content.append( ( ts, te ) )             # <<<<<<<<<<<<<<
  *                     else:
  *                         peak_length = peak_content[ -1 ][ 1 ] - peak_content[ 0 ][ 0 ]
  */
-          __pyx_t_1 = __Pyx_PyInt_From_long(__pyx_v_ts); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1040, __pyx_L1_error)
+          __pyx_t_1 = __Pyx_PyInt_From_long(__pyx_v_ts); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1041, __pyx_L1_error)
           __Pyx_GOTREF(__pyx_t_1);
-          __pyx_t_3 = __Pyx_PyInt_From_long(__pyx_v_te); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 1040, __pyx_L1_error)
+          __pyx_t_3 = __Pyx_PyInt_From_long(__pyx_v_te); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 1041, __pyx_L1_error)
           __Pyx_GOTREF(__pyx_t_3);
-          __pyx_t_5 = PyTuple_New(2); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 1040, __pyx_L1_error)
+          __pyx_t_5 = PyTuple_New(2); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 1041, __pyx_L1_error)
           __Pyx_GOTREF(__pyx_t_5);
           __Pyx_GIVEREF(__pyx_t_1);
           PyTuple_SET_ITEM(__pyx_t_5, 0, __pyx_t_1);
@@ -17061,10 +17355,10 @@ static PyObject *__pyx_f_5MACS2_2IO_8BedGraph_14bedGraphTrackI_cutoff_analysis(s
           PyTuple_SET_ITEM(__pyx_t_5, 1, __pyx_t_3);
           __pyx_t_1 = 0;
           __pyx_t_3 = 0;
-          __pyx_t_23 = __Pyx_PyList_Append(__pyx_v_peak_content, __pyx_t_5); if (unlikely(__pyx_t_23 == ((int)-1))) __PYX_ERR(0, 1040, __pyx_L1_error)
+          __pyx_t_23 = __Pyx_PyList_Append(__pyx_v_peak_content, __pyx_t_5); if (unlikely(__pyx_t_23 == ((int)-1))) __PYX_ERR(0, 1041, __pyx_L1_error)
           __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
 
-          /* "MACS2/IO/BedGraph.pyx":1039
+          /* "MACS2/IO/BedGraph.pyx":1040
  *                     te = ace_next()
  *                     tl = ts - lastp
  *                     if tl <= max_gap:             # <<<<<<<<<<<<<<
@@ -17074,7 +17368,7 @@ static PyObject *__pyx_f_5MACS2_2IO_8BedGraph_14bedGraphTrackI_cutoff_analysis(s
           goto __pyx_L12;
         }
 
-        /* "MACS2/IO/BedGraph.pyx":1042
+        /* "MACS2/IO/BedGraph.pyx":1043
  *                         peak_content.append( ( ts, te ) )
  *                     else:
  *                         peak_length = peak_content[ -1 ][ 1 ] - peak_content[ 0 ][ 0 ]             # <<<<<<<<<<<<<<
@@ -17082,25 +17376,25 @@ static PyObject *__pyx_f_5MACS2_2IO_8BedGraph_14bedGraphTrackI_cutoff_analysis(s
  *                             total_l +=  peak_length
  */
         /*else*/ {
-          __pyx_t_5 = __Pyx_GetItemInt_List(__pyx_v_peak_content, -1L, long, 1, __Pyx_PyInt_From_long, 1, 1, 1); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 1042, __pyx_L1_error)
+          __pyx_t_5 = __Pyx_GetItemInt_List(__pyx_v_peak_content, -1L, long, 1, __Pyx_PyInt_From_long, 1, 1, 1); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 1043, __pyx_L1_error)
           __Pyx_GOTREF(__pyx_t_5);
-          __pyx_t_3 = __Pyx_GetItemInt(__pyx_t_5, 1, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 1042, __pyx_L1_error)
+          __pyx_t_3 = __Pyx_GetItemInt(__pyx_t_5, 1, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 1043, __pyx_L1_error)
           __Pyx_GOTREF(__pyx_t_3);
           __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
-          __pyx_t_5 = __Pyx_GetItemInt_List(__pyx_v_peak_content, 0, long, 1, __Pyx_PyInt_From_long, 1, 0, 1); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 1042, __pyx_L1_error)
+          __pyx_t_5 = __Pyx_GetItemInt_List(__pyx_v_peak_content, 0, long, 1, __Pyx_PyInt_From_long, 1, 0, 1); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 1043, __pyx_L1_error)
           __Pyx_GOTREF(__pyx_t_5);
-          __pyx_t_1 = __Pyx_GetItemInt(__pyx_t_5, 0, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1042, __pyx_L1_error)
+          __pyx_t_1 = __Pyx_GetItemInt(__pyx_t_5, 0, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1043, __pyx_L1_error)
           __Pyx_GOTREF(__pyx_t_1);
           __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
-          __pyx_t_5 = PyNumber_Subtract(__pyx_t_3, __pyx_t_1); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 1042, __pyx_L1_error)
+          __pyx_t_5 = PyNumber_Subtract(__pyx_t_3, __pyx_t_1); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 1043, __pyx_L1_error)
           __Pyx_GOTREF(__pyx_t_5);
           __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
           __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-          __pyx_t_22 = __Pyx_PyInt_As_long(__pyx_t_5); if (unlikely((__pyx_t_22 == (long)-1) && PyErr_Occurred())) __PYX_ERR(0, 1042, __pyx_L1_error)
+          __pyx_t_22 = __Pyx_PyInt_As_long(__pyx_t_5); if (unlikely((__pyx_t_22 == (long)-1) && PyErr_Occurred())) __PYX_ERR(0, 1043, __pyx_L1_error)
           __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
           __pyx_v_peak_length = __pyx_t_22;
 
-          /* "MACS2/IO/BedGraph.pyx":1043
+          /* "MACS2/IO/BedGraph.pyx":1044
  *                     else:
  *                         peak_length = peak_content[ -1 ][ 1 ] - peak_content[ 0 ][ 0 ]
  *                         if peak_length >= min_length: # if the peak is too small, reject it             # <<<<<<<<<<<<<<
@@ -17110,7 +17404,7 @@ static PyObject *__pyx_f_5MACS2_2IO_8BedGraph_14bedGraphTrackI_cutoff_analysis(s
           __pyx_t_18 = ((__pyx_v_peak_length >= __pyx_v_min_length) != 0);
           if (__pyx_t_18) {
 
-            /* "MACS2/IO/BedGraph.pyx":1044
+            /* "MACS2/IO/BedGraph.pyx":1045
  *                         peak_length = peak_content[ -1 ][ 1 ] - peak_content[ 0 ][ 0 ]
  *                         if peak_length >= min_length: # if the peak is too small, reject it
  *                             total_l +=  peak_length             # <<<<<<<<<<<<<<
@@ -17119,7 +17413,7 @@ static PyObject *__pyx_f_5MACS2_2IO_8BedGraph_14bedGraphTrackI_cutoff_analysis(s
  */
             __pyx_v_total_l = (__pyx_v_total_l + __pyx_v_peak_length);
 
-            /* "MACS2/IO/BedGraph.pyx":1045
+            /* "MACS2/IO/BedGraph.pyx":1046
  *                         if peak_length >= min_length: # if the peak is too small, reject it
  *                             total_l +=  peak_length
  *                             total_p += 1             # <<<<<<<<<<<<<<
@@ -17128,7 +17422,7 @@ static PyObject *__pyx_f_5MACS2_2IO_8BedGraph_14bedGraphTrackI_cutoff_analysis(s
  */
             __pyx_v_total_p = (__pyx_v_total_p + 1);
 
-            /* "MACS2/IO/BedGraph.pyx":1043
+            /* "MACS2/IO/BedGraph.pyx":1044
  *                     else:
  *                         peak_length = peak_content[ -1 ][ 1 ] - peak_content[ 0 ][ 0 ]
  *                         if peak_length >= min_length: # if the peak is too small, reject it             # <<<<<<<<<<<<<<
@@ -17137,18 +17431,18 @@ static PyObject *__pyx_f_5MACS2_2IO_8BedGraph_14bedGraphTrackI_cutoff_analysis(s
  */
           }
 
-          /* "MACS2/IO/BedGraph.pyx":1046
+          /* "MACS2/IO/BedGraph.pyx":1047
  *                             total_l +=  peak_length
  *                             total_p += 1
  *                         peak_content = [ ( ts, te ), ]             # <<<<<<<<<<<<<<
  *                     lastp = te
  * 
  */
-          __pyx_t_5 = __Pyx_PyInt_From_long(__pyx_v_ts); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 1046, __pyx_L1_error)
+          __pyx_t_5 = __Pyx_PyInt_From_long(__pyx_v_ts); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 1047, __pyx_L1_error)
           __Pyx_GOTREF(__pyx_t_5);
-          __pyx_t_1 = __Pyx_PyInt_From_long(__pyx_v_te); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1046, __pyx_L1_error)
+          __pyx_t_1 = __Pyx_PyInt_From_long(__pyx_v_te); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1047, __pyx_L1_error)
           __Pyx_GOTREF(__pyx_t_1);
-          __pyx_t_3 = PyTuple_New(2); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 1046, __pyx_L1_error)
+          __pyx_t_3 = PyTuple_New(2); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 1047, __pyx_L1_error)
           __Pyx_GOTREF(__pyx_t_3);
           __Pyx_GIVEREF(__pyx_t_5);
           PyTuple_SET_ITEM(__pyx_t_3, 0, __pyx_t_5);
@@ -17156,7 +17450,7 @@ static PyObject *__pyx_f_5MACS2_2IO_8BedGraph_14bedGraphTrackI_cutoff_analysis(s
           PyTuple_SET_ITEM(__pyx_t_3, 1, __pyx_t_1);
           __pyx_t_5 = 0;
           __pyx_t_1 = 0;
-          __pyx_t_1 = PyList_New(1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1046, __pyx_L1_error)
+          __pyx_t_1 = PyList_New(1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1047, __pyx_L1_error)
           __Pyx_GOTREF(__pyx_t_1);
           __Pyx_GIVEREF(__pyx_t_3);
           PyList_SET_ITEM(__pyx_t_1, 0, __pyx_t_3);
@@ -17166,7 +17460,7 @@ static PyObject *__pyx_f_5MACS2_2IO_8BedGraph_14bedGraphTrackI_cutoff_analysis(s
         }
         __pyx_L12:;
 
-        /* "MACS2/IO/BedGraph.pyx":1047
+        /* "MACS2/IO/BedGraph.pyx":1048
  *                             total_p += 1
  *                         peak_content = [ ( ts, te ), ]
  *                     lastp = te             # <<<<<<<<<<<<<<
@@ -17176,7 +17470,7 @@ static PyObject *__pyx_f_5MACS2_2IO_8BedGraph_14bedGraphTrackI_cutoff_analysis(s
         __pyx_v_lastp = __pyx_v_te;
       }
 
-      /* "MACS2/IO/BedGraph.pyx":1049
+      /* "MACS2/IO/BedGraph.pyx":1050
  *                     lastp = te
  * 
  *                 if peak_content:             # <<<<<<<<<<<<<<
@@ -17186,32 +17480,32 @@ static PyObject *__pyx_f_5MACS2_2IO_8BedGraph_14bedGraphTrackI_cutoff_analysis(s
       __pyx_t_18 = (PyList_GET_SIZE(__pyx_v_peak_content) != 0);
       if (__pyx_t_18) {
 
-        /* "MACS2/IO/BedGraph.pyx":1050
+        /* "MACS2/IO/BedGraph.pyx":1051
  * 
  *                 if peak_content:
  *                     peak_length = peak_content[ -1 ][ 1 ] - peak_content[ 0 ][ 0 ]             # <<<<<<<<<<<<<<
  *                     if peak_length >= min_length: # if the peak is too small, reject it
  *                         total_l +=  peak_length
  */
-        __pyx_t_1 = __Pyx_GetItemInt_List(__pyx_v_peak_content, -1L, long, 1, __Pyx_PyInt_From_long, 1, 1, 1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1050, __pyx_L1_error)
+        __pyx_t_1 = __Pyx_GetItemInt_List(__pyx_v_peak_content, -1L, long, 1, __Pyx_PyInt_From_long, 1, 1, 1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1051, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_1);
-        __pyx_t_3 = __Pyx_GetItemInt(__pyx_t_1, 1, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 1050, __pyx_L1_error)
+        __pyx_t_3 = __Pyx_GetItemInt(__pyx_t_1, 1, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 1051, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_3);
         __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-        __pyx_t_1 = __Pyx_GetItemInt_List(__pyx_v_peak_content, 0, long, 1, __Pyx_PyInt_From_long, 1, 0, 1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1050, __pyx_L1_error)
+        __pyx_t_1 = __Pyx_GetItemInt_List(__pyx_v_peak_content, 0, long, 1, __Pyx_PyInt_From_long, 1, 0, 1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1051, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_1);
-        __pyx_t_5 = __Pyx_GetItemInt(__pyx_t_1, 0, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 1050, __pyx_L1_error)
+        __pyx_t_5 = __Pyx_GetItemInt(__pyx_t_1, 0, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 1051, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_5);
         __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-        __pyx_t_1 = PyNumber_Subtract(__pyx_t_3, __pyx_t_5); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1050, __pyx_L1_error)
+        __pyx_t_1 = PyNumber_Subtract(__pyx_t_3, __pyx_t_5); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1051, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_1);
         __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
         __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
-        __pyx_t_19 = __Pyx_PyInt_As_long(__pyx_t_1); if (unlikely((__pyx_t_19 == (long)-1) && PyErr_Occurred())) __PYX_ERR(0, 1050, __pyx_L1_error)
+        __pyx_t_19 = __Pyx_PyInt_As_long(__pyx_t_1); if (unlikely((__pyx_t_19 == (long)-1) && PyErr_Occurred())) __PYX_ERR(0, 1051, __pyx_L1_error)
         __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
         __pyx_v_peak_length = __pyx_t_19;
 
-        /* "MACS2/IO/BedGraph.pyx":1051
+        /* "MACS2/IO/BedGraph.pyx":1052
  *                 if peak_content:
  *                     peak_length = peak_content[ -1 ][ 1 ] - peak_content[ 0 ][ 0 ]
  *                     if peak_length >= min_length: # if the peak is too small, reject it             # <<<<<<<<<<<<<<
@@ -17221,7 +17515,7 @@ static PyObject *__pyx_f_5MACS2_2IO_8BedGraph_14bedGraphTrackI_cutoff_analysis(s
         __pyx_t_18 = ((__pyx_v_peak_length >= __pyx_v_min_length) != 0);
         if (__pyx_t_18) {
 
-          /* "MACS2/IO/BedGraph.pyx":1052
+          /* "MACS2/IO/BedGraph.pyx":1053
  *                     peak_length = peak_content[ -1 ][ 1 ] - peak_content[ 0 ][ 0 ]
  *                     if peak_length >= min_length: # if the peak is too small, reject it
  *                         total_l +=  peak_length             # <<<<<<<<<<<<<<
@@ -17230,7 +17524,7 @@ static PyObject *__pyx_f_5MACS2_2IO_8BedGraph_14bedGraphTrackI_cutoff_analysis(s
  */
           __pyx_v_total_l = (__pyx_v_total_l + __pyx_v_peak_length);
 
-          /* "MACS2/IO/BedGraph.pyx":1053
+          /* "MACS2/IO/BedGraph.pyx":1054
  *                     if peak_length >= min_length: # if the peak is too small, reject it
  *                         total_l +=  peak_length
  *                         total_p += 1             # <<<<<<<<<<<<<<
@@ -17239,7 +17533,7 @@ static PyObject *__pyx_f_5MACS2_2IO_8BedGraph_14bedGraphTrackI_cutoff_analysis(s
  */
           __pyx_v_total_p = (__pyx_v_total_p + 1);
 
-          /* "MACS2/IO/BedGraph.pyx":1051
+          /* "MACS2/IO/BedGraph.pyx":1052
  *                 if peak_content:
  *                     peak_length = peak_content[ -1 ][ 1 ] - peak_content[ 0 ][ 0 ]
  *                     if peak_length >= min_length: # if the peak is too small, reject it             # <<<<<<<<<<<<<<
@@ -17248,7 +17542,7 @@ static PyObject *__pyx_f_5MACS2_2IO_8BedGraph_14bedGraphTrackI_cutoff_analysis(s
  */
         }
 
-        /* "MACS2/IO/BedGraph.pyx":1049
+        /* "MACS2/IO/BedGraph.pyx":1050
  *                     lastp = te
  * 
  *                 if peak_content:             # <<<<<<<<<<<<<<
@@ -17257,51 +17551,51 @@ static PyObject *__pyx_f_5MACS2_2IO_8BedGraph_14bedGraphTrackI_cutoff_analysis(s
  */
       }
 
-      /* "MACS2/IO/BedGraph.pyx":1054
+      /* "MACS2/IO/BedGraph.pyx":1055
  *                         total_l +=  peak_length
  *                         total_p += 1
  *                 cutoff_lpeaks[ cutoff ] = cutoff_lpeaks.get( cutoff, 0 ) + total_l             # <<<<<<<<<<<<<<
  *                 cutoff_npeaks[ cutoff ] = cutoff_npeaks.get( cutoff, 0 ) + total_p
  * 
  */
-      __pyx_t_1 = PyFloat_FromDouble(__pyx_v_cutoff); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1054, __pyx_L1_error)
+      __pyx_t_1 = PyFloat_FromDouble(__pyx_v_cutoff); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1055, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_1);
-      __pyx_t_5 = __Pyx_PyDict_GetItemDefault(__pyx_v_cutoff_lpeaks, __pyx_t_1, __pyx_int_0); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 1054, __pyx_L1_error)
+      __pyx_t_5 = __Pyx_PyDict_GetItemDefault(__pyx_v_cutoff_lpeaks, __pyx_t_1, __pyx_int_0); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 1055, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_5);
       __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-      __pyx_t_1 = __Pyx_PyInt_From_long(__pyx_v_total_l); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1054, __pyx_L1_error)
+      __pyx_t_1 = __Pyx_PyInt_From_long(__pyx_v_total_l); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1055, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_1);
-      __pyx_t_3 = PyNumber_Add(__pyx_t_5, __pyx_t_1); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 1054, __pyx_L1_error)
+      __pyx_t_3 = PyNumber_Add(__pyx_t_5, __pyx_t_1); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 1055, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_3);
       __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
       __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-      __pyx_t_1 = PyFloat_FromDouble(__pyx_v_cutoff); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1054, __pyx_L1_error)
+      __pyx_t_1 = PyFloat_FromDouble(__pyx_v_cutoff); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1055, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_1);
-      if (unlikely(PyDict_SetItem(__pyx_v_cutoff_lpeaks, __pyx_t_1, __pyx_t_3) < 0)) __PYX_ERR(0, 1054, __pyx_L1_error)
+      if (unlikely(PyDict_SetItem(__pyx_v_cutoff_lpeaks, __pyx_t_1, __pyx_t_3) < 0)) __PYX_ERR(0, 1055, __pyx_L1_error)
       __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
       __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
 
-      /* "MACS2/IO/BedGraph.pyx":1055
+      /* "MACS2/IO/BedGraph.pyx":1056
  *                         total_p += 1
  *                 cutoff_lpeaks[ cutoff ] = cutoff_lpeaks.get( cutoff, 0 ) + total_l
  *                 cutoff_npeaks[ cutoff ] = cutoff_npeaks.get( cutoff, 0 ) + total_p             # <<<<<<<<<<<<<<
  * 
  *         # write pvalue and total length of predicted peaks
  */
-      __pyx_t_3 = PyFloat_FromDouble(__pyx_v_cutoff); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 1055, __pyx_L1_error)
+      __pyx_t_3 = PyFloat_FromDouble(__pyx_v_cutoff); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 1056, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_3);
-      __pyx_t_1 = __Pyx_PyDict_GetItemDefault(__pyx_v_cutoff_npeaks, __pyx_t_3, __pyx_int_0); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1055, __pyx_L1_error)
+      __pyx_t_1 = __Pyx_PyDict_GetItemDefault(__pyx_v_cutoff_npeaks, __pyx_t_3, __pyx_int_0); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1056, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_1);
       __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-      __pyx_t_3 = __Pyx_PyInt_From_long(__pyx_v_total_p); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 1055, __pyx_L1_error)
+      __pyx_t_3 = __Pyx_PyInt_From_long(__pyx_v_total_p); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 1056, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_3);
-      __pyx_t_5 = PyNumber_Add(__pyx_t_1, __pyx_t_3); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 1055, __pyx_L1_error)
+      __pyx_t_5 = PyNumber_Add(__pyx_t_1, __pyx_t_3); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 1056, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_5);
       __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
       __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-      __pyx_t_3 = PyFloat_FromDouble(__pyx_v_cutoff); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 1055, __pyx_L1_error)
+      __pyx_t_3 = PyFloat_FromDouble(__pyx_v_cutoff); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 1056, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_3);
-      if (unlikely(PyDict_SetItem(__pyx_v_cutoff_npeaks, __pyx_t_3, __pyx_t_5) < 0)) __PYX_ERR(0, 1055, __pyx_L1_error)
+      if (unlikely(PyDict_SetItem(__pyx_v_cutoff_npeaks, __pyx_t_3, __pyx_t_5) < 0)) __PYX_ERR(0, 1056, __pyx_L1_error)
       __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
       __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
       __pyx_L7_continue:;
@@ -17309,7 +17603,7 @@ static PyObject *__pyx_f_5MACS2_2IO_8BedGraph_14bedGraphTrackI_cutoff_analysis(s
   }
   __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
 
-  /* "MACS2/IO/BedGraph.pyx":1058
+  /* "MACS2/IO/BedGraph.pyx":1059
  * 
  *         # write pvalue and total length of predicted peaks
  *         ret = "pscore\tnpeaks\tlpeaks\tavelpeak\n"             # <<<<<<<<<<<<<<
@@ -17319,24 +17613,24 @@ static PyObject *__pyx_f_5MACS2_2IO_8BedGraph_14bedGraphTrackI_cutoff_analysis(s
   __Pyx_INCREF(__pyx_kp_u_pscore_npeaks_lpeaks_avelpeak);
   __pyx_v_ret = __pyx_kp_u_pscore_npeaks_lpeaks_avelpeak;
 
-  /* "MACS2/IO/BedGraph.pyx":1059
+  /* "MACS2/IO/BedGraph.pyx":1060
  *         # write pvalue and total length of predicted peaks
  *         ret = "pscore\tnpeaks\tlpeaks\tavelpeak\n"
  *         for cutoff in sorted(cutoff_lpeaks.keys(), reverse=True):             # <<<<<<<<<<<<<<
  *             if cutoff_npeaks[ cutoff ] > 0:
  *                 ret += "%.2f\t%d\t%d\t%.2f\n" % ( cutoff, cutoff_npeaks[ cutoff ], cutoff_lpeaks[ cutoff ], cutoff_lpeaks[ cutoff ]/cutoff_npeaks[ cutoff ] )
  */
-  __pyx_t_6 = __Pyx_PyDict_Keys(__pyx_v_cutoff_lpeaks); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 1059, __pyx_L1_error)
+  __pyx_t_6 = __Pyx_PyDict_Keys(__pyx_v_cutoff_lpeaks); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 1060, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_6);
-  __pyx_t_5 = PyTuple_New(1); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 1059, __pyx_L1_error)
+  __pyx_t_5 = PyTuple_New(1); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 1060, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_5);
   __Pyx_GIVEREF(__pyx_t_6);
   PyTuple_SET_ITEM(__pyx_t_5, 0, __pyx_t_6);
   __pyx_t_6 = 0;
-  __pyx_t_6 = __Pyx_PyDict_NewPresized(1); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 1059, __pyx_L1_error)
+  __pyx_t_6 = __Pyx_PyDict_NewPresized(1); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 1060, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_6);
-  if (PyDict_SetItem(__pyx_t_6, __pyx_n_s_reverse, Py_True) < 0) __PYX_ERR(0, 1059, __pyx_L1_error)
-  __pyx_t_3 = __Pyx_PyObject_Call(__pyx_builtin_sorted, __pyx_t_5, __pyx_t_6); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 1059, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_t_6, __pyx_n_s_reverse, Py_True) < 0) __PYX_ERR(0, 1060, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_PyObject_Call(__pyx_builtin_sorted, __pyx_t_5, __pyx_t_6); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 1060, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
   __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
   __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
@@ -17344,9 +17638,9 @@ static PyObject *__pyx_f_5MACS2_2IO_8BedGraph_14bedGraphTrackI_cutoff_analysis(s
     __pyx_t_6 = __pyx_t_3; __Pyx_INCREF(__pyx_t_6); __pyx_t_11 = 0;
     __pyx_t_24 = NULL;
   } else {
-    __pyx_t_11 = -1; __pyx_t_6 = PyObject_GetIter(__pyx_t_3); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 1059, __pyx_L1_error)
+    __pyx_t_11 = -1; __pyx_t_6 = PyObject_GetIter(__pyx_t_3); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 1060, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_6);
-    __pyx_t_24 = Py_TYPE(__pyx_t_6)->tp_iternext; if (unlikely(!__pyx_t_24)) __PYX_ERR(0, 1059, __pyx_L1_error)
+    __pyx_t_24 = Py_TYPE(__pyx_t_6)->tp_iternext; if (unlikely(!__pyx_t_24)) __PYX_ERR(0, 1060, __pyx_L1_error)
   }
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
   for (;;) {
@@ -17354,17 +17648,17 @@ static PyObject *__pyx_f_5MACS2_2IO_8BedGraph_14bedGraphTrackI_cutoff_analysis(s
       if (likely(PyList_CheckExact(__pyx_t_6))) {
         if (__pyx_t_11 >= PyList_GET_SIZE(__pyx_t_6)) break;
         #if CYTHON_ASSUME_SAFE_MACROS && !CYTHON_AVOID_BORROWED_REFS
-        __pyx_t_3 = PyList_GET_ITEM(__pyx_t_6, __pyx_t_11); __Pyx_INCREF(__pyx_t_3); __pyx_t_11++; if (unlikely(0 < 0)) __PYX_ERR(0, 1059, __pyx_L1_error)
+        __pyx_t_3 = PyList_GET_ITEM(__pyx_t_6, __pyx_t_11); __Pyx_INCREF(__pyx_t_3); __pyx_t_11++; if (unlikely(0 < 0)) __PYX_ERR(0, 1060, __pyx_L1_error)
         #else
-        __pyx_t_3 = PySequence_ITEM(__pyx_t_6, __pyx_t_11); __pyx_t_11++; if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 1059, __pyx_L1_error)
+        __pyx_t_3 = PySequence_ITEM(__pyx_t_6, __pyx_t_11); __pyx_t_11++; if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 1060, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_3);
         #endif
       } else {
         if (__pyx_t_11 >= PyTuple_GET_SIZE(__pyx_t_6)) break;
         #if CYTHON_ASSUME_SAFE_MACROS && !CYTHON_AVOID_BORROWED_REFS
-        __pyx_t_3 = PyTuple_GET_ITEM(__pyx_t_6, __pyx_t_11); __Pyx_INCREF(__pyx_t_3); __pyx_t_11++; if (unlikely(0 < 0)) __PYX_ERR(0, 1059, __pyx_L1_error)
+        __pyx_t_3 = PyTuple_GET_ITEM(__pyx_t_6, __pyx_t_11); __Pyx_INCREF(__pyx_t_3); __pyx_t_11++; if (unlikely(0 < 0)) __PYX_ERR(0, 1060, __pyx_L1_error)
         #else
-        __pyx_t_3 = PySequence_ITEM(__pyx_t_6, __pyx_t_11); __pyx_t_11++; if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 1059, __pyx_L1_error)
+        __pyx_t_3 = PySequence_ITEM(__pyx_t_6, __pyx_t_11); __pyx_t_11++; if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 1060, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_3);
         #endif
       }
@@ -17374,48 +17668,48 @@ static PyObject *__pyx_f_5MACS2_2IO_8BedGraph_14bedGraphTrackI_cutoff_analysis(s
         PyObject* exc_type = PyErr_Occurred();
         if (exc_type) {
           if (likely(__Pyx_PyErr_GivenExceptionMatches(exc_type, PyExc_StopIteration))) PyErr_Clear();
-          else __PYX_ERR(0, 1059, __pyx_L1_error)
+          else __PYX_ERR(0, 1060, __pyx_L1_error)
         }
         break;
       }
       __Pyx_GOTREF(__pyx_t_3);
     }
-    __pyx_t_17 = __pyx_PyFloat_AsFloat(__pyx_t_3); if (unlikely((__pyx_t_17 == (float)-1) && PyErr_Occurred())) __PYX_ERR(0, 1059, __pyx_L1_error)
+    __pyx_t_17 = __pyx_PyFloat_AsFloat(__pyx_t_3); if (unlikely((__pyx_t_17 == (float)-1) && PyErr_Occurred())) __PYX_ERR(0, 1060, __pyx_L1_error)
     __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
     __pyx_v_cutoff = __pyx_t_17;
 
-    /* "MACS2/IO/BedGraph.pyx":1060
+    /* "MACS2/IO/BedGraph.pyx":1061
  *         ret = "pscore\tnpeaks\tlpeaks\tavelpeak\n"
  *         for cutoff in sorted(cutoff_lpeaks.keys(), reverse=True):
  *             if cutoff_npeaks[ cutoff ] > 0:             # <<<<<<<<<<<<<<
  *                 ret += "%.2f\t%d\t%d\t%.2f\n" % ( cutoff, cutoff_npeaks[ cutoff ], cutoff_lpeaks[ cutoff ], cutoff_lpeaks[ cutoff ]/cutoff_npeaks[ cutoff ] )
  *         return ret
  */
-    __pyx_t_3 = PyFloat_FromDouble(__pyx_v_cutoff); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 1060, __pyx_L1_error)
+    __pyx_t_3 = PyFloat_FromDouble(__pyx_v_cutoff); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 1061, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_3);
-    __pyx_t_5 = __Pyx_PyDict_GetItem(__pyx_v_cutoff_npeaks, __pyx_t_3); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 1060, __pyx_L1_error)
+    __pyx_t_5 = __Pyx_PyDict_GetItem(__pyx_v_cutoff_npeaks, __pyx_t_3); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 1061, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_5);
     __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-    __pyx_t_3 = PyObject_RichCompare(__pyx_t_5, __pyx_int_0, Py_GT); __Pyx_XGOTREF(__pyx_t_3); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 1060, __pyx_L1_error)
+    __pyx_t_3 = PyObject_RichCompare(__pyx_t_5, __pyx_int_0, Py_GT); __Pyx_XGOTREF(__pyx_t_3); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 1061, __pyx_L1_error)
     __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
-    __pyx_t_18 = __Pyx_PyObject_IsTrue(__pyx_t_3); if (unlikely(__pyx_t_18 < 0)) __PYX_ERR(0, 1060, __pyx_L1_error)
+    __pyx_t_18 = __Pyx_PyObject_IsTrue(__pyx_t_3); if (unlikely(__pyx_t_18 < 0)) __PYX_ERR(0, 1061, __pyx_L1_error)
     __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
     if (__pyx_t_18) {
 
-      /* "MACS2/IO/BedGraph.pyx":1061
+      /* "MACS2/IO/BedGraph.pyx":1062
  *         for cutoff in sorted(cutoff_lpeaks.keys(), reverse=True):
  *             if cutoff_npeaks[ cutoff ] > 0:
  *                 ret += "%.2f\t%d\t%d\t%.2f\n" % ( cutoff, cutoff_npeaks[ cutoff ], cutoff_lpeaks[ cutoff ], cutoff_lpeaks[ cutoff ]/cutoff_npeaks[ cutoff ] )             # <<<<<<<<<<<<<<
  *         return ret
  * 
  */
-      __pyx_t_3 = PyTuple_New(8); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 1061, __pyx_L1_error)
+      __pyx_t_3 = PyTuple_New(8); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 1062, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_3);
       __pyx_t_10 = 0;
       __pyx_t_25 = 127;
-      __pyx_t_5 = PyFloat_FromDouble(__pyx_v_cutoff); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 1061, __pyx_L1_error)
+      __pyx_t_5 = PyFloat_FromDouble(__pyx_v_cutoff); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 1062, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_5);
-      __pyx_t_1 = __Pyx_PyObject_Format(__pyx_t_5, __pyx_kp_u_2f); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1061, __pyx_L1_error)
+      __pyx_t_1 = __Pyx_PyObject_Format(__pyx_t_5, __pyx_kp_u_2f); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1062, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_1);
       __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
       __pyx_t_25 = (__Pyx_PyUnicode_MAX_CHAR_VALUE(__pyx_t_1) > __pyx_t_25) ? __Pyx_PyUnicode_MAX_CHAR_VALUE(__pyx_t_1) : __pyx_t_25;
@@ -17427,12 +17721,12 @@ static PyObject *__pyx_f_5MACS2_2IO_8BedGraph_14bedGraphTrackI_cutoff_analysis(s
       __pyx_t_10 += 1;
       __Pyx_GIVEREF(__pyx_kp_u__3);
       PyTuple_SET_ITEM(__pyx_t_3, 1, __pyx_kp_u__3);
-      __pyx_t_1 = PyFloat_FromDouble(__pyx_v_cutoff); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1061, __pyx_L1_error)
+      __pyx_t_1 = PyFloat_FromDouble(__pyx_v_cutoff); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1062, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_1);
-      __pyx_t_5 = __Pyx_PyDict_GetItem(__pyx_v_cutoff_npeaks, __pyx_t_1); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 1061, __pyx_L1_error)
+      __pyx_t_5 = __Pyx_PyDict_GetItem(__pyx_v_cutoff_npeaks, __pyx_t_1); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 1062, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_5);
       __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-      __pyx_t_1 = __Pyx_PyObject_Format(__pyx_t_5, __pyx_n_u_d); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1061, __pyx_L1_error)
+      __pyx_t_1 = __Pyx_PyObject_Format(__pyx_t_5, __pyx_n_u_d); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1062, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_1);
       __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
       __pyx_t_25 = (__Pyx_PyUnicode_MAX_CHAR_VALUE(__pyx_t_1) > __pyx_t_25) ? __Pyx_PyUnicode_MAX_CHAR_VALUE(__pyx_t_1) : __pyx_t_25;
@@ -17444,12 +17738,12 @@ static PyObject *__pyx_f_5MACS2_2IO_8BedGraph_14bedGraphTrackI_cutoff_analysis(s
       __pyx_t_10 += 1;
       __Pyx_GIVEREF(__pyx_kp_u__3);
       PyTuple_SET_ITEM(__pyx_t_3, 3, __pyx_kp_u__3);
-      __pyx_t_1 = PyFloat_FromDouble(__pyx_v_cutoff); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1061, __pyx_L1_error)
+      __pyx_t_1 = PyFloat_FromDouble(__pyx_v_cutoff); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1062, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_1);
-      __pyx_t_5 = __Pyx_PyDict_GetItem(__pyx_v_cutoff_lpeaks, __pyx_t_1); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 1061, __pyx_L1_error)
+      __pyx_t_5 = __Pyx_PyDict_GetItem(__pyx_v_cutoff_lpeaks, __pyx_t_1); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 1062, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_5);
       __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-      __pyx_t_1 = __Pyx_PyObject_Format(__pyx_t_5, __pyx_n_u_d); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1061, __pyx_L1_error)
+      __pyx_t_1 = __Pyx_PyObject_Format(__pyx_t_5, __pyx_n_u_d); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1062, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_1);
       __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
       __pyx_t_25 = (__Pyx_PyUnicode_MAX_CHAR_VALUE(__pyx_t_1) > __pyx_t_25) ? __Pyx_PyUnicode_MAX_CHAR_VALUE(__pyx_t_1) : __pyx_t_25;
@@ -17461,21 +17755,21 @@ static PyObject *__pyx_f_5MACS2_2IO_8BedGraph_14bedGraphTrackI_cutoff_analysis(s
       __pyx_t_10 += 1;
       __Pyx_GIVEREF(__pyx_kp_u__3);
       PyTuple_SET_ITEM(__pyx_t_3, 5, __pyx_kp_u__3);
-      __pyx_t_1 = PyFloat_FromDouble(__pyx_v_cutoff); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1061, __pyx_L1_error)
+      __pyx_t_1 = PyFloat_FromDouble(__pyx_v_cutoff); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1062, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_1);
-      __pyx_t_5 = __Pyx_PyDict_GetItem(__pyx_v_cutoff_lpeaks, __pyx_t_1); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 1061, __pyx_L1_error)
+      __pyx_t_5 = __Pyx_PyDict_GetItem(__pyx_v_cutoff_lpeaks, __pyx_t_1); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 1062, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_5);
       __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-      __pyx_t_1 = PyFloat_FromDouble(__pyx_v_cutoff); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1061, __pyx_L1_error)
+      __pyx_t_1 = PyFloat_FromDouble(__pyx_v_cutoff); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1062, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_1);
-      __pyx_t_9 = __Pyx_PyDict_GetItem(__pyx_v_cutoff_npeaks, __pyx_t_1); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 1061, __pyx_L1_error)
+      __pyx_t_9 = __Pyx_PyDict_GetItem(__pyx_v_cutoff_npeaks, __pyx_t_1); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 1062, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_9);
       __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-      __pyx_t_1 = __Pyx_PyNumber_Divide(__pyx_t_5, __pyx_t_9); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1061, __pyx_L1_error)
+      __pyx_t_1 = __Pyx_PyNumber_Divide(__pyx_t_5, __pyx_t_9); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1062, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_1);
       __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
       __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
-      __pyx_t_9 = __Pyx_PyObject_Format(__pyx_t_1, __pyx_kp_u_2f); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 1061, __pyx_L1_error)
+      __pyx_t_9 = __Pyx_PyObject_Format(__pyx_t_1, __pyx_kp_u_2f); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 1062, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_9);
       __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
       __pyx_t_25 = (__Pyx_PyUnicode_MAX_CHAR_VALUE(__pyx_t_9) > __pyx_t_25) ? __Pyx_PyUnicode_MAX_CHAR_VALUE(__pyx_t_9) : __pyx_t_25;
@@ -17487,16 +17781,16 @@ static PyObject *__pyx_f_5MACS2_2IO_8BedGraph_14bedGraphTrackI_cutoff_analysis(s
       __pyx_t_10 += 1;
       __Pyx_GIVEREF(__pyx_kp_u__4);
       PyTuple_SET_ITEM(__pyx_t_3, 7, __pyx_kp_u__4);
-      __pyx_t_9 = __Pyx_PyUnicode_Join(__pyx_t_3, 8, __pyx_t_10, __pyx_t_25); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 1061, __pyx_L1_error)
+      __pyx_t_9 = __Pyx_PyUnicode_Join(__pyx_t_3, 8, __pyx_t_10, __pyx_t_25); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 1062, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_9);
       __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-      __pyx_t_3 = __Pyx_PyUnicode_Concat(__pyx_v_ret, __pyx_t_9); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 1061, __pyx_L1_error)
+      __pyx_t_3 = __Pyx_PyUnicode_Concat(__pyx_v_ret, __pyx_t_9); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 1062, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_3);
       __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
       __Pyx_DECREF_SET(__pyx_v_ret, ((PyObject*)__pyx_t_3));
       __pyx_t_3 = 0;
 
-      /* "MACS2/IO/BedGraph.pyx":1060
+      /* "MACS2/IO/BedGraph.pyx":1061
  *         ret = "pscore\tnpeaks\tlpeaks\tavelpeak\n"
  *         for cutoff in sorted(cutoff_lpeaks.keys(), reverse=True):
  *             if cutoff_npeaks[ cutoff ] > 0:             # <<<<<<<<<<<<<<
@@ -17505,7 +17799,7 @@ static PyObject *__pyx_f_5MACS2_2IO_8BedGraph_14bedGraphTrackI_cutoff_analysis(s
  */
     }
 
-    /* "MACS2/IO/BedGraph.pyx":1059
+    /* "MACS2/IO/BedGraph.pyx":1060
  *         # write pvalue and total length of predicted peaks
  *         ret = "pscore\tnpeaks\tlpeaks\tavelpeak\n"
  *         for cutoff in sorted(cutoff_lpeaks.keys(), reverse=True):             # <<<<<<<<<<<<<<
@@ -17515,7 +17809,7 @@ static PyObject *__pyx_f_5MACS2_2IO_8BedGraph_14bedGraphTrackI_cutoff_analysis(s
   }
   __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
 
-  /* "MACS2/IO/BedGraph.pyx":1062
+  /* "MACS2/IO/BedGraph.pyx":1063
  *             if cutoff_npeaks[ cutoff ] > 0:
  *                 ret += "%.2f\t%d\t%d\t%.2f\n" % ( cutoff, cutoff_npeaks[ cutoff ], cutoff_lpeaks[ cutoff ], cutoff_lpeaks[ cutoff ]/cutoff_npeaks[ cutoff ] )
  *         return ret             # <<<<<<<<<<<<<<
@@ -17527,7 +17821,7 @@ static PyObject *__pyx_f_5MACS2_2IO_8BedGraph_14bedGraphTrackI_cutoff_analysis(s
   __pyx_r = __pyx_v_ret;
   goto __pyx_L0;
 
-  /* "MACS2/IO/BedGraph.pyx":987
+  /* "MACS2/IO/BedGraph.pyx":988
  *         return ret
  * 
  *     cpdef str cutoff_analysis ( self, int max_gap, int min_length, int steps = 100 ):             # <<<<<<<<<<<<<<
@@ -17563,6 +17857,7 @@ static PyObject *__pyx_f_5MACS2_2IO_8BedGraph_14bedGraphTrackI_cutoff_analysis(s
   __Pyx_XDECREF(__pyx_v_acs_next);
   __Pyx_XDECREF(__pyx_v_ace_next);
   __Pyx_XGIVEREF(__pyx_r);
+  __Pyx_TraceReturn(__pyx_r, 0);
   __Pyx_RefNannyFinishContext();
   return __pyx_r;
 }
@@ -17601,7 +17896,7 @@ static PyObject *__pyx_pw_5MACS2_2IO_8BedGraph_14bedGraphTrackI_47cutoff_analysi
         case  1:
         if (likely((values[1] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_min_length)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("cutoff_analysis", 0, 2, 3, 1); __PYX_ERR(0, 987, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("cutoff_analysis", 0, 2, 3, 1); __PYX_ERR(0, 988, __pyx_L3_error)
         }
         CYTHON_FALLTHROUGH;
         case  2:
@@ -17611,7 +17906,7 @@ static PyObject *__pyx_pw_5MACS2_2IO_8BedGraph_14bedGraphTrackI_47cutoff_analysi
         }
       }
       if (unlikely(kw_args > 0)) {
-        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "cutoff_analysis") < 0)) __PYX_ERR(0, 987, __pyx_L3_error)
+        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "cutoff_analysis") < 0)) __PYX_ERR(0, 988, __pyx_L3_error)
       }
     } else {
       switch (PyTuple_GET_SIZE(__pyx_args)) {
@@ -17623,17 +17918,17 @@ static PyObject *__pyx_pw_5MACS2_2IO_8BedGraph_14bedGraphTrackI_47cutoff_analysi
         default: goto __pyx_L5_argtuple_error;
       }
     }
-    __pyx_v_max_gap = __Pyx_PyInt_As_int(values[0]); if (unlikely((__pyx_v_max_gap == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 987, __pyx_L3_error)
-    __pyx_v_min_length = __Pyx_PyInt_As_int(values[1]); if (unlikely((__pyx_v_min_length == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 987, __pyx_L3_error)
+    __pyx_v_max_gap = __Pyx_PyInt_As_int(values[0]); if (unlikely((__pyx_v_max_gap == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 988, __pyx_L3_error)
+    __pyx_v_min_length = __Pyx_PyInt_As_int(values[1]); if (unlikely((__pyx_v_min_length == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 988, __pyx_L3_error)
     if (values[2]) {
-      __pyx_v_steps = __Pyx_PyInt_As_int(values[2]); if (unlikely((__pyx_v_steps == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 987, __pyx_L3_error)
+      __pyx_v_steps = __Pyx_PyInt_As_int(values[2]); if (unlikely((__pyx_v_steps == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 988, __pyx_L3_error)
     } else {
       __pyx_v_steps = ((int)0x64);
     }
   }
   goto __pyx_L4_argument_unpacking_done;
   __pyx_L5_argtuple_error:;
-  __Pyx_RaiseArgtupleInvalid("cutoff_analysis", 0, 2, 3, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 987, __pyx_L3_error)
+  __Pyx_RaiseArgtupleInvalid("cutoff_analysis", 0, 2, 3, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 988, __pyx_L3_error)
   __pyx_L3_error:;
   __Pyx_AddTraceback("MACS2.IO.BedGraph.bedGraphTrackI.cutoff_analysis", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __Pyx_RefNannyFinishContext();
@@ -17648,14 +17943,16 @@ static PyObject *__pyx_pw_5MACS2_2IO_8BedGraph_14bedGraphTrackI_47cutoff_analysi
 
 static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_46cutoff_analysis(struct __pyx_obj_5MACS2_2IO_8BedGraph_bedGraphTrackI *__pyx_v_self, int __pyx_v_max_gap, int __pyx_v_min_length, int __pyx_v_steps) {
   PyObject *__pyx_r = NULL;
+  __Pyx_TraceDeclarations
   __Pyx_RefNannyDeclarations
   PyObject *__pyx_t_1 = NULL;
   struct __pyx_opt_args_5MACS2_2IO_8BedGraph_14bedGraphTrackI_cutoff_analysis __pyx_t_2;
   __Pyx_RefNannySetupContext("cutoff_analysis", 0);
+  __Pyx_TraceCall("cutoff_analysis (wrapper)", __pyx_f[0], 988, 0, __PYX_ERR(0, 988, __pyx_L1_error));
   __Pyx_XDECREF(__pyx_r);
   __pyx_t_2.__pyx_n = 1;
   __pyx_t_2.steps = __pyx_v_steps;
-  __pyx_t_1 = __pyx_vtabptr_5MACS2_2IO_8BedGraph_bedGraphTrackI->cutoff_analysis(__pyx_v_self, __pyx_v_max_gap, __pyx_v_min_length, 1, &__pyx_t_2); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 987, __pyx_L1_error)
+  __pyx_t_1 = __pyx_vtabptr_5MACS2_2IO_8BedGraph_bedGraphTrackI->cutoff_analysis(__pyx_v_self, __pyx_v_max_gap, __pyx_v_min_length, 1, &__pyx_t_2); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 988, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __pyx_r = __pyx_t_1;
   __pyx_t_1 = 0;
@@ -17668,6 +17965,7 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_46cutoff_analysi
   __pyx_r = NULL;
   __pyx_L0:;
   __Pyx_XGIVEREF(__pyx_r);
+  __Pyx_TraceReturn(__pyx_r, 0);
   __Pyx_RefNannyFinishContext();
   return __pyx_r;
 }
@@ -17696,6 +17994,7 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_48__reduce_cytho
   PyObject *__pyx_v__dict = 0;
   int __pyx_v_use_setstate;
   PyObject *__pyx_r = NULL;
+  __Pyx_TraceDeclarations
   __Pyx_RefNannyDeclarations
   PyObject *__pyx_t_1 = NULL;
   PyObject *__pyx_t_2 = NULL;
@@ -17704,6 +18003,7 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_48__reduce_cytho
   int __pyx_t_5;
   int __pyx_t_6;
   __Pyx_RefNannySetupContext("__reduce_cython__", 0);
+  __Pyx_TraceCall("__reduce_cython__", __pyx_f[1], 1, 0, __PYX_ERR(1, 1, __pyx_L1_error));
 
   /* "(tree fragment)":5
  *     cdef object _dict
@@ -17916,6 +18216,7 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_48__reduce_cytho
   __Pyx_XDECREF(__pyx_v_state);
   __Pyx_XDECREF(__pyx_v__dict);
   __Pyx_XGIVEREF(__pyx_r);
+  __Pyx_TraceReturn(__pyx_r, 0);
   __Pyx_RefNannyFinishContext();
   return __pyx_r;
 }
@@ -17942,9 +18243,11 @@ static PyObject *__pyx_pw_5MACS2_2IO_8BedGraph_14bedGraphTrackI_51__setstate_cyt
 
 static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_50__setstate_cython__(struct __pyx_obj_5MACS2_2IO_8BedGraph_bedGraphTrackI *__pyx_v_self, PyObject *__pyx_v___pyx_state) {
   PyObject *__pyx_r = NULL;
+  __Pyx_TraceDeclarations
   __Pyx_RefNannyDeclarations
   PyObject *__pyx_t_1 = NULL;
   __Pyx_RefNannySetupContext("__setstate_cython__", 0);
+  __Pyx_TraceCall("__setstate_cython__", __pyx_f[1], 16, 0, __PYX_ERR(1, 16, __pyx_L1_error));
 
   /* "(tree fragment)":17
  *         return __pyx_unpickle_bedGraphTrackI, (type(self), 0xe5133ef, state)
@@ -17972,11 +18275,12 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_14bedGraphTrackI_50__setstate_cyt
   __pyx_r = NULL;
   __pyx_L0:;
   __Pyx_XGIVEREF(__pyx_r);
+  __Pyx_TraceReturn(__pyx_r, 0);
   __Pyx_RefNannyFinishContext();
   return __pyx_r;
 }
 
-/* "MACS2/IO/BedGraph.pyx":1064
+/* "MACS2/IO/BedGraph.pyx":1065
  *         return ret
  * 
  * def scoreTracktoBedGraph (scoretrack, str colname):             # <<<<<<<<<<<<<<
@@ -18017,11 +18321,11 @@ static PyObject *__pyx_pw_5MACS2_2IO_8BedGraph_1scoreTracktoBedGraph(PyObject *_
         case  1:
         if (likely((values[1] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_colname)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("scoreTracktoBedGraph", 1, 2, 2, 1); __PYX_ERR(0, 1064, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("scoreTracktoBedGraph", 1, 2, 2, 1); __PYX_ERR(0, 1065, __pyx_L3_error)
         }
       }
       if (unlikely(kw_args > 0)) {
-        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "scoreTracktoBedGraph") < 0)) __PYX_ERR(0, 1064, __pyx_L3_error)
+        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "scoreTracktoBedGraph") < 0)) __PYX_ERR(0, 1065, __pyx_L3_error)
       }
     } else if (PyTuple_GET_SIZE(__pyx_args) != 2) {
       goto __pyx_L5_argtuple_error;
@@ -18034,13 +18338,13 @@ static PyObject *__pyx_pw_5MACS2_2IO_8BedGraph_1scoreTracktoBedGraph(PyObject *_
   }
   goto __pyx_L4_argument_unpacking_done;
   __pyx_L5_argtuple_error:;
-  __Pyx_RaiseArgtupleInvalid("scoreTracktoBedGraph", 1, 2, 2, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 1064, __pyx_L3_error)
+  __Pyx_RaiseArgtupleInvalid("scoreTracktoBedGraph", 1, 2, 2, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 1065, __pyx_L3_error)
   __pyx_L3_error:;
   __Pyx_AddTraceback("MACS2.IO.BedGraph.scoreTracktoBedGraph", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __Pyx_RefNannyFinishContext();
   return NULL;
   __pyx_L4_argument_unpacking_done:;
-  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_colname), (&PyUnicode_Type), 1, "colname", 1))) __PYX_ERR(0, 1064, __pyx_L1_error)
+  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_colname), (&PyUnicode_Type), 1, "colname", 1))) __PYX_ERR(0, 1065, __pyx_L1_error)
   __pyx_r = __pyx_pf_5MACS2_2IO_8BedGraph_scoreTracktoBedGraph(__pyx_self, __pyx_v_scoretrack, __pyx_v_colname);
 
   /* function exit code */
@@ -18064,6 +18368,7 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_scoreTracktoBedGraph(CYTHON_UNUSE
   PyObject *__pyx_v_pos = NULL;
   PyObject *__pyx_v_value = NULL;
   PyObject *__pyx_r = NULL;
+  __Pyx_TraceDeclarations
   __Pyx_RefNannyDeclarations
   PyObject *__pyx_t_1 = NULL;
   PyObject *__pyx_t_2 = NULL;
@@ -18080,25 +18385,27 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_scoreTracktoBedGraph(CYTHON_UNUSE
   long __pyx_t_13;
   int __pyx_t_14;
   float __pyx_t_15;
+  __Pyx_TraceFrameInit(__pyx_codeobj__12)
   __Pyx_RefNannySetupContext("scoreTracktoBedGraph", 0);
+  __Pyx_TraceCall("scoreTracktoBedGraph", __pyx_f[0], 1065, 0, __PYX_ERR(0, 1065, __pyx_L1_error));
 
-  /* "MACS2/IO/BedGraph.pyx":1075
+  /* "MACS2/IO/BedGraph.pyx":1076
  *         set chrs
  * 
  *     bdgtrack = bedGraphTrackI( baseline_value = 0 )             # <<<<<<<<<<<<<<
  *     if colname not in ['sample','control','-100logp','-100logq']:
  *         raise Exception("%s not supported!" % colname)
  */
-  __pyx_t_1 = __Pyx_PyDict_NewPresized(1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1075, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyDict_NewPresized(1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1076, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  if (PyDict_SetItem(__pyx_t_1, __pyx_n_s_baseline_value, __pyx_int_0) < 0) __PYX_ERR(0, 1075, __pyx_L1_error)
-  __pyx_t_2 = __Pyx_PyObject_Call(((PyObject *)__pyx_ptype_5MACS2_2IO_8BedGraph_bedGraphTrackI), __pyx_empty_tuple, __pyx_t_1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1075, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_t_1, __pyx_n_s_baseline_value, __pyx_int_0) < 0) __PYX_ERR(0, 1076, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyObject_Call(((PyObject *)__pyx_ptype_5MACS2_2IO_8BedGraph_bedGraphTrackI), __pyx_empty_tuple, __pyx_t_1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1076, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   __pyx_v_bdgtrack = ((struct __pyx_obj_5MACS2_2IO_8BedGraph_bedGraphTrackI *)__pyx_t_2);
   __pyx_t_2 = 0;
 
-  /* "MACS2/IO/BedGraph.pyx":1076
+  /* "MACS2/IO/BedGraph.pyx":1077
  * 
  *     bdgtrack = bedGraphTrackI( baseline_value = 0 )
  *     if colname not in ['sample','control','-100logp','-100logq']:             # <<<<<<<<<<<<<<
@@ -18107,28 +18414,28 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_scoreTracktoBedGraph(CYTHON_UNUSE
  */
   __Pyx_INCREF(__pyx_v_colname);
   __pyx_t_3 = __pyx_v_colname;
-  __pyx_t_5 = (__Pyx_PyUnicode_Equals(__pyx_t_3, __pyx_n_u_sample, Py_NE)); if (unlikely(__pyx_t_5 < 0)) __PYX_ERR(0, 1076, __pyx_L1_error)
+  __pyx_t_5 = (__Pyx_PyUnicode_Equals(__pyx_t_3, __pyx_n_u_sample, Py_NE)); if (unlikely(__pyx_t_5 < 0)) __PYX_ERR(0, 1077, __pyx_L1_error)
   __pyx_t_6 = (__pyx_t_5 != 0);
   if (__pyx_t_6) {
   } else {
     __pyx_t_4 = __pyx_t_6;
     goto __pyx_L4_bool_binop_done;
   }
-  __pyx_t_6 = (__Pyx_PyUnicode_Equals(__pyx_t_3, __pyx_n_u_control, Py_NE)); if (unlikely(__pyx_t_6 < 0)) __PYX_ERR(0, 1076, __pyx_L1_error)
+  __pyx_t_6 = (__Pyx_PyUnicode_Equals(__pyx_t_3, __pyx_n_u_control, Py_NE)); if (unlikely(__pyx_t_6 < 0)) __PYX_ERR(0, 1077, __pyx_L1_error)
   __pyx_t_5 = (__pyx_t_6 != 0);
   if (__pyx_t_5) {
   } else {
     __pyx_t_4 = __pyx_t_5;
     goto __pyx_L4_bool_binop_done;
   }
-  __pyx_t_5 = (__Pyx_PyUnicode_Equals(__pyx_t_3, __pyx_kp_u_100logp, Py_NE)); if (unlikely(__pyx_t_5 < 0)) __PYX_ERR(0, 1076, __pyx_L1_error)
+  __pyx_t_5 = (__Pyx_PyUnicode_Equals(__pyx_t_3, __pyx_kp_u_100logp, Py_NE)); if (unlikely(__pyx_t_5 < 0)) __PYX_ERR(0, 1077, __pyx_L1_error)
   __pyx_t_6 = (__pyx_t_5 != 0);
   if (__pyx_t_6) {
   } else {
     __pyx_t_4 = __pyx_t_6;
     goto __pyx_L4_bool_binop_done;
   }
-  __pyx_t_6 = (__Pyx_PyUnicode_Equals(__pyx_t_3, __pyx_kp_u_100logq, Py_NE)); if (unlikely(__pyx_t_6 < 0)) __PYX_ERR(0, 1076, __pyx_L1_error)
+  __pyx_t_6 = (__Pyx_PyUnicode_Equals(__pyx_t_3, __pyx_kp_u_100logq, Py_NE)); if (unlikely(__pyx_t_6 < 0)) __PYX_ERR(0, 1077, __pyx_L1_error)
   __pyx_t_5 = (__pyx_t_6 != 0);
   __pyx_t_4 = __pyx_t_5;
   __pyx_L4_bool_binop_done:;
@@ -18136,23 +18443,23 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_scoreTracktoBedGraph(CYTHON_UNUSE
   __pyx_t_5 = (__pyx_t_4 != 0);
   if (unlikely(__pyx_t_5)) {
 
-    /* "MACS2/IO/BedGraph.pyx":1077
+    /* "MACS2/IO/BedGraph.pyx":1078
  *     bdgtrack = bedGraphTrackI( baseline_value = 0 )
  *     if colname not in ['sample','control','-100logp','-100logq']:
  *         raise Exception("%s not supported!" % colname)             # <<<<<<<<<<<<<<
  *     if colname in ['-100logp', '-100logq']:
  *         flag100 = True              # for pvalue or qvalue, divide them by 100 while writing to bedGraph file
  */
-    __pyx_t_2 = PyUnicode_Format(__pyx_kp_u_s_not_supported, __pyx_v_colname); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1077, __pyx_L1_error)
+    __pyx_t_2 = PyUnicode_Format(__pyx_kp_u_s_not_supported, __pyx_v_colname); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1078, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
-    __pyx_t_1 = __Pyx_PyObject_CallOneArg(((PyObject *)(&((PyTypeObject*)PyExc_Exception)[0])), __pyx_t_2); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1077, __pyx_L1_error)
+    __pyx_t_1 = __Pyx_PyObject_CallOneArg(((PyObject *)(&((PyTypeObject*)PyExc_Exception)[0])), __pyx_t_2); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1078, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
     __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
     __Pyx_Raise(__pyx_t_1, 0, 0, 0);
     __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-    __PYX_ERR(0, 1077, __pyx_L1_error)
+    __PYX_ERR(0, 1078, __pyx_L1_error)
 
-    /* "MACS2/IO/BedGraph.pyx":1076
+    /* "MACS2/IO/BedGraph.pyx":1077
  * 
  *     bdgtrack = bedGraphTrackI( baseline_value = 0 )
  *     if colname not in ['sample','control','-100logp','-100logq']:             # <<<<<<<<<<<<<<
@@ -18161,7 +18468,7 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_scoreTracktoBedGraph(CYTHON_UNUSE
  */
   }
 
-  /* "MACS2/IO/BedGraph.pyx":1078
+  /* "MACS2/IO/BedGraph.pyx":1079
  *     if colname not in ['sample','control','-100logp','-100logq']:
  *         raise Exception("%s not supported!" % colname)
  *     if colname in ['-100logp', '-100logq']:             # <<<<<<<<<<<<<<
@@ -18170,14 +18477,14 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_scoreTracktoBedGraph(CYTHON_UNUSE
  */
   __Pyx_INCREF(__pyx_v_colname);
   __pyx_t_3 = __pyx_v_colname;
-  __pyx_t_4 = (__Pyx_PyUnicode_Equals(__pyx_t_3, __pyx_kp_u_100logp, Py_EQ)); if (unlikely(__pyx_t_4 < 0)) __PYX_ERR(0, 1078, __pyx_L1_error)
+  __pyx_t_4 = (__Pyx_PyUnicode_Equals(__pyx_t_3, __pyx_kp_u_100logp, Py_EQ)); if (unlikely(__pyx_t_4 < 0)) __PYX_ERR(0, 1079, __pyx_L1_error)
   __pyx_t_6 = (__pyx_t_4 != 0);
   if (!__pyx_t_6) {
   } else {
     __pyx_t_5 = __pyx_t_6;
     goto __pyx_L9_bool_binop_done;
   }
-  __pyx_t_6 = (__Pyx_PyUnicode_Equals(__pyx_t_3, __pyx_kp_u_100logq, Py_EQ)); if (unlikely(__pyx_t_6 < 0)) __PYX_ERR(0, 1078, __pyx_L1_error)
+  __pyx_t_6 = (__Pyx_PyUnicode_Equals(__pyx_t_3, __pyx_kp_u_100logq, Py_EQ)); if (unlikely(__pyx_t_6 < 0)) __PYX_ERR(0, 1079, __pyx_L1_error)
   __pyx_t_4 = (__pyx_t_6 != 0);
   __pyx_t_5 = __pyx_t_4;
   __pyx_L9_bool_binop_done:;
@@ -18185,7 +18492,7 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_scoreTracktoBedGraph(CYTHON_UNUSE
   __pyx_t_4 = (__pyx_t_5 != 0);
   if (__pyx_t_4) {
 
-    /* "MACS2/IO/BedGraph.pyx":1079
+    /* "MACS2/IO/BedGraph.pyx":1080
  *         raise Exception("%s not supported!" % colname)
  *     if colname in ['-100logp', '-100logq']:
  *         flag100 = True              # for pvalue or qvalue, divide them by 100 while writing to bedGraph file             # <<<<<<<<<<<<<<
@@ -18194,7 +18501,7 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_scoreTracktoBedGraph(CYTHON_UNUSE
  */
     __pyx_v_flag100 = 1;
 
-    /* "MACS2/IO/BedGraph.pyx":1078
+    /* "MACS2/IO/BedGraph.pyx":1079
  *     if colname not in ['sample','control','-100logp','-100logq']:
  *         raise Exception("%s not supported!" % colname)
  *     if colname in ['-100logp', '-100logq']:             # <<<<<<<<<<<<<<
@@ -18204,7 +18511,7 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_scoreTracktoBedGraph(CYTHON_UNUSE
     goto __pyx_L8;
   }
 
-  /* "MACS2/IO/BedGraph.pyx":1081
+  /* "MACS2/IO/BedGraph.pyx":1082
  *         flag100 = True              # for pvalue or qvalue, divide them by 100 while writing to bedGraph file
  *     else:
  *         flag100 = False             # <<<<<<<<<<<<<<
@@ -18216,14 +18523,14 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_scoreTracktoBedGraph(CYTHON_UNUSE
   }
   __pyx_L8:;
 
-  /* "MACS2/IO/BedGraph.pyx":1082
+  /* "MACS2/IO/BedGraph.pyx":1083
  *     else:
  *         flag100 = False
  *     chrs = scoretrack.get_chr_names()             # <<<<<<<<<<<<<<
  *     for chrom in chrs:
  *         d = scoretrack.data[chrom]
  */
-  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_scoretrack, __pyx_n_s_get_chr_names); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1082, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_scoretrack, __pyx_n_s_get_chr_names); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1083, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __pyx_t_7 = NULL;
   if (CYTHON_UNPACK_METHODS && likely(PyMethod_Check(__pyx_t_2))) {
@@ -18237,14 +18544,14 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_scoreTracktoBedGraph(CYTHON_UNUSE
   }
   __pyx_t_1 = (__pyx_t_7) ? __Pyx_PyObject_CallOneArg(__pyx_t_2, __pyx_t_7) : __Pyx_PyObject_CallNoArg(__pyx_t_2);
   __Pyx_XDECREF(__pyx_t_7); __pyx_t_7 = 0;
-  if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1082, __pyx_L1_error)
+  if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1083, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-  if (!(likely(PySet_CheckExact(__pyx_t_1))||((__pyx_t_1) == Py_None)||(PyErr_Format(PyExc_TypeError, "Expected %.16s, got %.200s", "set", Py_TYPE(__pyx_t_1)->tp_name), 0))) __PYX_ERR(0, 1082, __pyx_L1_error)
+  if (!(likely(PySet_CheckExact(__pyx_t_1))||((__pyx_t_1) == Py_None)||(PyErr_Format(PyExc_TypeError, "Expected %.16s, got %.200s", "set", Py_TYPE(__pyx_t_1)->tp_name), 0))) __PYX_ERR(0, 1083, __pyx_L1_error)
   __pyx_v_chrs = ((PyObject*)__pyx_t_1);
   __pyx_t_1 = 0;
 
-  /* "MACS2/IO/BedGraph.pyx":1083
+  /* "MACS2/IO/BedGraph.pyx":1084
  *         flag100 = False
  *     chrs = scoretrack.get_chr_names()
  *     for chrom in chrs:             # <<<<<<<<<<<<<<
@@ -18252,7 +18559,7 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_scoreTracktoBedGraph(CYTHON_UNUSE
  *         l = scoretrack.pointer[chrom]
  */
   __pyx_t_8 = 0;
-  __pyx_t_2 = __Pyx_set_iterator(__pyx_v_chrs, 1, (&__pyx_t_9), (&__pyx_t_10)); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1083, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_set_iterator(__pyx_v_chrs, 1, (&__pyx_t_9), (&__pyx_t_10)); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1084, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __Pyx_XDECREF(__pyx_t_1);
   __pyx_t_1 = __pyx_t_2;
@@ -18260,43 +18567,43 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_scoreTracktoBedGraph(CYTHON_UNUSE
   while (1) {
     __pyx_t_11 = __Pyx_set_iter_next(__pyx_t_1, __pyx_t_9, &__pyx_t_8, &__pyx_t_2, __pyx_t_10);
     if (unlikely(__pyx_t_11 == 0)) break;
-    if (unlikely(__pyx_t_11 == -1)) __PYX_ERR(0, 1083, __pyx_L1_error)
+    if (unlikely(__pyx_t_11 == -1)) __PYX_ERR(0, 1084, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
-    if (!(likely(PyBytes_CheckExact(__pyx_t_2))||((__pyx_t_2) == Py_None)||(PyErr_Format(PyExc_TypeError, "Expected %.16s, got %.200s", "bytes", Py_TYPE(__pyx_t_2)->tp_name), 0))) __PYX_ERR(0, 1083, __pyx_L1_error)
+    if (!(likely(PyBytes_CheckExact(__pyx_t_2))||((__pyx_t_2) == Py_None)||(PyErr_Format(PyExc_TypeError, "Expected %.16s, got %.200s", "bytes", Py_TYPE(__pyx_t_2)->tp_name), 0))) __PYX_ERR(0, 1084, __pyx_L1_error)
     __Pyx_XDECREF_SET(__pyx_v_chrom, ((PyObject*)__pyx_t_2));
     __pyx_t_2 = 0;
 
-    /* "MACS2/IO/BedGraph.pyx":1084
+    /* "MACS2/IO/BedGraph.pyx":1085
  *     chrs = scoretrack.get_chr_names()
  *     for chrom in chrs:
  *         d = scoretrack.data[chrom]             # <<<<<<<<<<<<<<
  *         l = scoretrack.pointer[chrom]
  *         pre = 0
  */
-    __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_scoretrack, __pyx_n_s_data); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1084, __pyx_L1_error)
+    __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_scoretrack, __pyx_n_s_data); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1085, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
-    __pyx_t_7 = __Pyx_PyObject_GetItem(__pyx_t_2, __pyx_v_chrom); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 1084, __pyx_L1_error)
+    __pyx_t_7 = __Pyx_PyObject_GetItem(__pyx_t_2, __pyx_v_chrom); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 1085, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_7);
     __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
     __Pyx_XDECREF_SET(__pyx_v_d, __pyx_t_7);
     __pyx_t_7 = 0;
 
-    /* "MACS2/IO/BedGraph.pyx":1085
+    /* "MACS2/IO/BedGraph.pyx":1086
  *     for chrom in chrs:
  *         d = scoretrack.data[chrom]
  *         l = scoretrack.pointer[chrom]             # <<<<<<<<<<<<<<
  *         pre = 0
  *         pos   = d['pos']
  */
-    __pyx_t_7 = __Pyx_PyObject_GetAttrStr(__pyx_v_scoretrack, __pyx_n_s_pointer); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 1085, __pyx_L1_error)
+    __pyx_t_7 = __Pyx_PyObject_GetAttrStr(__pyx_v_scoretrack, __pyx_n_s_pointer); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 1086, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_7);
-    __pyx_t_2 = __Pyx_PyObject_GetItem(__pyx_t_7, __pyx_v_chrom); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1085, __pyx_L1_error)
+    __pyx_t_2 = __Pyx_PyObject_GetItem(__pyx_t_7, __pyx_v_chrom); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1086, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
     __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
     __Pyx_XDECREF_SET(__pyx_v_l, __pyx_t_2);
     __pyx_t_2 = 0;
 
-    /* "MACS2/IO/BedGraph.pyx":1086
+    /* "MACS2/IO/BedGraph.pyx":1087
  *         d = scoretrack.data[chrom]
  *         l = scoretrack.pointer[chrom]
  *         pre = 0             # <<<<<<<<<<<<<<
@@ -18305,19 +18612,19 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_scoreTracktoBedGraph(CYTHON_UNUSE
  */
     __pyx_v_pre = 0;
 
-    /* "MACS2/IO/BedGraph.pyx":1087
+    /* "MACS2/IO/BedGraph.pyx":1088
  *         l = scoretrack.pointer[chrom]
  *         pre = 0
  *         pos   = d['pos']             # <<<<<<<<<<<<<<
  *         if flag100:
  *             value = d[colname]/100.0
  */
-    __pyx_t_2 = __Pyx_PyObject_Dict_GetItem(__pyx_v_d, __pyx_n_u_pos); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1087, __pyx_L1_error)
+    __pyx_t_2 = __Pyx_PyObject_Dict_GetItem(__pyx_v_d, __pyx_n_u_pos); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1088, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
     __Pyx_XDECREF_SET(__pyx_v_pos, __pyx_t_2);
     __pyx_t_2 = 0;
 
-    /* "MACS2/IO/BedGraph.pyx":1088
+    /* "MACS2/IO/BedGraph.pyx":1089
  *         pre = 0
  *         pos   = d['pos']
  *         if flag100:             # <<<<<<<<<<<<<<
@@ -18327,22 +18634,22 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_scoreTracktoBedGraph(CYTHON_UNUSE
     __pyx_t_4 = (__pyx_v_flag100 != 0);
     if (__pyx_t_4) {
 
-      /* "MACS2/IO/BedGraph.pyx":1089
+      /* "MACS2/IO/BedGraph.pyx":1090
  *         pos   = d['pos']
  *         if flag100:
  *             value = d[colname]/100.0             # <<<<<<<<<<<<<<
  *         else:
  *             value = d[colname]
  */
-      __pyx_t_2 = __Pyx_PyObject_Dict_GetItem(__pyx_v_d, __pyx_v_colname); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1089, __pyx_L1_error)
+      __pyx_t_2 = __Pyx_PyObject_Dict_GetItem(__pyx_v_d, __pyx_v_colname); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1090, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_2);
-      __pyx_t_7 = __Pyx_PyFloat_TrueDivideObjC(__pyx_t_2, __pyx_float_100_0, 100.0, 0, 0); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 1089, __pyx_L1_error)
+      __pyx_t_7 = __Pyx_PyFloat_TrueDivideObjC(__pyx_t_2, __pyx_float_100_0, 100.0, 0, 0); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 1090, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_7);
       __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
       __Pyx_XDECREF_SET(__pyx_v_value, __pyx_t_7);
       __pyx_t_7 = 0;
 
-      /* "MACS2/IO/BedGraph.pyx":1088
+      /* "MACS2/IO/BedGraph.pyx":1089
  *         pre = 0
  *         pos   = d['pos']
  *         if flag100:             # <<<<<<<<<<<<<<
@@ -18352,7 +18659,7 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_scoreTracktoBedGraph(CYTHON_UNUSE
       goto __pyx_L13;
     }
 
-    /* "MACS2/IO/BedGraph.pyx":1091
+    /* "MACS2/IO/BedGraph.pyx":1092
  *             value = d[colname]/100.0
  *         else:
  *             value = d[colname]             # <<<<<<<<<<<<<<
@@ -18360,61 +18667,61 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_scoreTracktoBedGraph(CYTHON_UNUSE
  *             bdgtrack.add_loc( chrom, pre, pos[i] ,value[i] )
  */
     /*else*/ {
-      __pyx_t_7 = __Pyx_PyObject_Dict_GetItem(__pyx_v_d, __pyx_v_colname); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 1091, __pyx_L1_error)
+      __pyx_t_7 = __Pyx_PyObject_Dict_GetItem(__pyx_v_d, __pyx_v_colname); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 1092, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_7);
       __Pyx_XDECREF_SET(__pyx_v_value, __pyx_t_7);
       __pyx_t_7 = 0;
     }
     __pyx_L13:;
 
-    /* "MACS2/IO/BedGraph.pyx":1092
+    /* "MACS2/IO/BedGraph.pyx":1093
  *         else:
  *             value = d[colname]
  *         for i in xrange( l ):             # <<<<<<<<<<<<<<
  *             bdgtrack.add_loc( chrom, pre, pos[i] ,value[i] )
  *             pre = pos[i]
  */
-    __pyx_t_12 = __Pyx_PyInt_As_long(__pyx_v_l); if (unlikely((__pyx_t_12 == (long)-1) && PyErr_Occurred())) __PYX_ERR(0, 1092, __pyx_L1_error)
+    __pyx_t_12 = __Pyx_PyInt_As_long(__pyx_v_l); if (unlikely((__pyx_t_12 == (long)-1) && PyErr_Occurred())) __PYX_ERR(0, 1093, __pyx_L1_error)
     __pyx_t_13 = __pyx_t_12;
     for (__pyx_t_11 = 0; __pyx_t_11 < __pyx_t_13; __pyx_t_11+=1) {
       __pyx_v_i = __pyx_t_11;
 
-      /* "MACS2/IO/BedGraph.pyx":1093
+      /* "MACS2/IO/BedGraph.pyx":1094
  *             value = d[colname]
  *         for i in xrange( l ):
  *             bdgtrack.add_loc( chrom, pre, pos[i] ,value[i] )             # <<<<<<<<<<<<<<
  *             pre = pos[i]
  * 
  */
-      __pyx_t_7 = __Pyx_GetItemInt(__pyx_v_pos, __pyx_v_i, int, 1, __Pyx_PyInt_From_int, 0, 1, 1); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 1093, __pyx_L1_error)
+      __pyx_t_7 = __Pyx_GetItemInt(__pyx_v_pos, __pyx_v_i, int, 1, __Pyx_PyInt_From_int, 0, 1, 1); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 1094, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_7);
-      __pyx_t_14 = __Pyx_PyInt_As_int(__pyx_t_7); if (unlikely((__pyx_t_14 == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 1093, __pyx_L1_error)
+      __pyx_t_14 = __Pyx_PyInt_As_int(__pyx_t_7); if (unlikely((__pyx_t_14 == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 1094, __pyx_L1_error)
       __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
-      __pyx_t_7 = __Pyx_GetItemInt(__pyx_v_value, __pyx_v_i, int, 1, __Pyx_PyInt_From_int, 0, 1, 1); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 1093, __pyx_L1_error)
+      __pyx_t_7 = __Pyx_GetItemInt(__pyx_v_value, __pyx_v_i, int, 1, __Pyx_PyInt_From_int, 0, 1, 1); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 1094, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_7);
-      __pyx_t_15 = __pyx_PyFloat_AsFloat(__pyx_t_7); if (unlikely((__pyx_t_15 == (float)-1) && PyErr_Occurred())) __PYX_ERR(0, 1093, __pyx_L1_error)
+      __pyx_t_15 = __pyx_PyFloat_AsFloat(__pyx_t_7); if (unlikely((__pyx_t_15 == (float)-1) && PyErr_Occurred())) __PYX_ERR(0, 1094, __pyx_L1_error)
       __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
-      __pyx_t_7 = ((struct __pyx_vtabstruct_5MACS2_2IO_8BedGraph_bedGraphTrackI *)__pyx_v_bdgtrack->__pyx_vtab)->add_loc(__pyx_v_bdgtrack, __pyx_v_chrom, __pyx_v_pre, __pyx_t_14, __pyx_t_15, 0); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 1093, __pyx_L1_error)
+      __pyx_t_7 = ((struct __pyx_vtabstruct_5MACS2_2IO_8BedGraph_bedGraphTrackI *)__pyx_v_bdgtrack->__pyx_vtab)->add_loc(__pyx_v_bdgtrack, __pyx_v_chrom, __pyx_v_pre, __pyx_t_14, __pyx_t_15, 0); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 1094, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_7);
       __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
 
-      /* "MACS2/IO/BedGraph.pyx":1094
+      /* "MACS2/IO/BedGraph.pyx":1095
  *         for i in xrange( l ):
  *             bdgtrack.add_loc( chrom, pre, pos[i] ,value[i] )
  *             pre = pos[i]             # <<<<<<<<<<<<<<
  * 
  *     return bdgtrack
  */
-      __pyx_t_7 = __Pyx_GetItemInt(__pyx_v_pos, __pyx_v_i, int, 1, __Pyx_PyInt_From_int, 0, 1, 1); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 1094, __pyx_L1_error)
+      __pyx_t_7 = __Pyx_GetItemInt(__pyx_v_pos, __pyx_v_i, int, 1, __Pyx_PyInt_From_int, 0, 1, 1); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 1095, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_7);
-      __pyx_t_14 = __Pyx_PyInt_As_int(__pyx_t_7); if (unlikely((__pyx_t_14 == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 1094, __pyx_L1_error)
+      __pyx_t_14 = __Pyx_PyInt_As_int(__pyx_t_7); if (unlikely((__pyx_t_14 == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 1095, __pyx_L1_error)
       __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
       __pyx_v_pre = __pyx_t_14;
     }
   }
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-  /* "MACS2/IO/BedGraph.pyx":1096
+  /* "MACS2/IO/BedGraph.pyx":1097
  *             pre = pos[i]
  * 
  *     return bdgtrack             # <<<<<<<<<<<<<<
@@ -18426,7 +18733,7 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_scoreTracktoBedGraph(CYTHON_UNUSE
   __pyx_r = ((PyObject *)__pyx_v_bdgtrack);
   goto __pyx_L0;
 
-  /* "MACS2/IO/BedGraph.pyx":1064
+  /* "MACS2/IO/BedGraph.pyx":1065
  *         return ret
  * 
  * def scoreTracktoBedGraph (scoretrack, str colname):             # <<<<<<<<<<<<<<
@@ -18451,11 +18758,12 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_scoreTracktoBedGraph(CYTHON_UNUSE
   __Pyx_XDECREF(__pyx_v_pos);
   __Pyx_XDECREF(__pyx_v_value);
   __Pyx_XGIVEREF(__pyx_r);
+  __Pyx_TraceReturn(__pyx_r, 0);
   __Pyx_RefNannyFinishContext();
   return __pyx_r;
 }
 
-/* "MACS2/IO/BedGraph.pyx":1103
+/* "MACS2/IO/BedGraph.pyx":1104
  * 
  *     """
  *     def __init__ (self):             # <<<<<<<<<<<<<<
@@ -18479,50 +18787,53 @@ static PyObject *__pyx_pw_5MACS2_2IO_8BedGraph_15bedRegionTrackI_1__init__(PyObj
 
 static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_15bedRegionTrackI___init__(CYTHON_UNUSED PyObject *__pyx_self, PyObject *__pyx_v_self) {
   PyObject *__pyx_r = NULL;
+  __Pyx_TraceDeclarations
   __Pyx_RefNannyDeclarations
   PyObject *__pyx_t_1 = NULL;
+  __Pyx_TraceFrameInit(__pyx_codeobj__13)
   __Pyx_RefNannySetupContext("__init__", 0);
+  __Pyx_TraceCall("__init__", __pyx_f[0], 1104, 0, __PYX_ERR(0, 1104, __pyx_L1_error));
 
-  /* "MACS2/IO/BedGraph.pyx":1104
+  /* "MACS2/IO/BedGraph.pyx":1105
  *     """
  *     def __init__ (self):
  *         self.__data = {}             # <<<<<<<<<<<<<<
  *         self.maxvalue = 1
  *         self.minvalue = 0
  */
-  __pyx_t_1 = __Pyx_PyDict_NewPresized(0); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1104, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyDict_NewPresized(0); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1105, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  if (__Pyx_PyObject_SetAttrStr(__pyx_v_self, __pyx_n_s_bedRegionTrackI__data, __pyx_t_1) < 0) __PYX_ERR(0, 1104, __pyx_L1_error)
+  if (__Pyx_PyObject_SetAttrStr(__pyx_v_self, __pyx_n_s_bedRegionTrackI__data, __pyx_t_1) < 0) __PYX_ERR(0, 1105, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-  /* "MACS2/IO/BedGraph.pyx":1105
+  /* "MACS2/IO/BedGraph.pyx":1106
  *     def __init__ (self):
  *         self.__data = {}
  *         self.maxvalue = 1             # <<<<<<<<<<<<<<
  *         self.minvalue = 0
  *         self.baseline_value = 0
  */
-  if (__Pyx_PyObject_SetAttrStr(__pyx_v_self, __pyx_n_s_maxvalue, __pyx_int_1) < 0) __PYX_ERR(0, 1105, __pyx_L1_error)
+  if (__Pyx_PyObject_SetAttrStr(__pyx_v_self, __pyx_n_s_maxvalue, __pyx_int_1) < 0) __PYX_ERR(0, 1106, __pyx_L1_error)
 
-  /* "MACS2/IO/BedGraph.pyx":1106
+  /* "MACS2/IO/BedGraph.pyx":1107
  *         self.__data = {}
  *         self.maxvalue = 1
  *         self.minvalue = 0             # <<<<<<<<<<<<<<
  *         self.baseline_value = 0
  * 
  */
-  if (__Pyx_PyObject_SetAttrStr(__pyx_v_self, __pyx_n_s_minvalue, __pyx_int_0) < 0) __PYX_ERR(0, 1106, __pyx_L1_error)
+  if (__Pyx_PyObject_SetAttrStr(__pyx_v_self, __pyx_n_s_minvalue, __pyx_int_0) < 0) __PYX_ERR(0, 1107, __pyx_L1_error)
 
-  /* "MACS2/IO/BedGraph.pyx":1107
+  /* "MACS2/IO/BedGraph.pyx":1108
  *         self.maxvalue = 1
  *         self.minvalue = 0
  *         self.baseline_value = 0             # <<<<<<<<<<<<<<
  * 
  *     def safe_add_loc (self, bytes chromosome, int startpos, int endpos):
  */
-  if (__Pyx_PyObject_SetAttrStr(__pyx_v_self, __pyx_n_s_baseline_value, __pyx_int_0) < 0) __PYX_ERR(0, 1107, __pyx_L1_error)
+  if (__Pyx_PyObject_SetAttrStr(__pyx_v_self, __pyx_n_s_baseline_value, __pyx_int_0) < 0) __PYX_ERR(0, 1108, __pyx_L1_error)
 
-  /* "MACS2/IO/BedGraph.pyx":1103
+  /* "MACS2/IO/BedGraph.pyx":1104
  * 
  *     """
  *     def __init__ (self):             # <<<<<<<<<<<<<<
@@ -18539,11 +18850,12 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_15bedRegionTrackI___init__(CYTHON
   __pyx_r = NULL;
   __pyx_L0:;
   __Pyx_XGIVEREF(__pyx_r);
+  __Pyx_TraceReturn(__pyx_r, 0);
   __Pyx_RefNannyFinishContext();
   return __pyx_r;
 }
 
-/* "MACS2/IO/BedGraph.pyx":1109
+/* "MACS2/IO/BedGraph.pyx":1110
  *         self.baseline_value = 0
  * 
  *     def safe_add_loc (self, bytes chromosome, int startpos, int endpos):             # <<<<<<<<<<<<<<
@@ -18590,23 +18902,23 @@ static PyObject *__pyx_pw_5MACS2_2IO_8BedGraph_15bedRegionTrackI_3safe_add_loc(P
         case  1:
         if (likely((values[1] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_chromosome)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("safe_add_loc", 1, 4, 4, 1); __PYX_ERR(0, 1109, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("safe_add_loc", 1, 4, 4, 1); __PYX_ERR(0, 1110, __pyx_L3_error)
         }
         CYTHON_FALLTHROUGH;
         case  2:
         if (likely((values[2] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_startpos)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("safe_add_loc", 1, 4, 4, 2); __PYX_ERR(0, 1109, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("safe_add_loc", 1, 4, 4, 2); __PYX_ERR(0, 1110, __pyx_L3_error)
         }
         CYTHON_FALLTHROUGH;
         case  3:
         if (likely((values[3] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_endpos)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("safe_add_loc", 1, 4, 4, 3); __PYX_ERR(0, 1109, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("safe_add_loc", 1, 4, 4, 3); __PYX_ERR(0, 1110, __pyx_L3_error)
         }
       }
       if (unlikely(kw_args > 0)) {
-        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "safe_add_loc") < 0)) __PYX_ERR(0, 1109, __pyx_L3_error)
+        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "safe_add_loc") < 0)) __PYX_ERR(0, 1110, __pyx_L3_error)
       }
     } else if (PyTuple_GET_SIZE(__pyx_args) != 4) {
       goto __pyx_L5_argtuple_error;
@@ -18618,18 +18930,18 @@ static PyObject *__pyx_pw_5MACS2_2IO_8BedGraph_15bedRegionTrackI_3safe_add_loc(P
     }
     __pyx_v_self = values[0];
     __pyx_v_chromosome = ((PyObject*)values[1]);
-    __pyx_v_startpos = __Pyx_PyInt_As_int(values[2]); if (unlikely((__pyx_v_startpos == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 1109, __pyx_L3_error)
-    __pyx_v_endpos = __Pyx_PyInt_As_int(values[3]); if (unlikely((__pyx_v_endpos == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 1109, __pyx_L3_error)
+    __pyx_v_startpos = __Pyx_PyInt_As_int(values[2]); if (unlikely((__pyx_v_startpos == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 1110, __pyx_L3_error)
+    __pyx_v_endpos = __Pyx_PyInt_As_int(values[3]); if (unlikely((__pyx_v_endpos == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 1110, __pyx_L3_error)
   }
   goto __pyx_L4_argument_unpacking_done;
   __pyx_L5_argtuple_error:;
-  __Pyx_RaiseArgtupleInvalid("safe_add_loc", 1, 4, 4, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 1109, __pyx_L3_error)
+  __Pyx_RaiseArgtupleInvalid("safe_add_loc", 1, 4, 4, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 1110, __pyx_L3_error)
   __pyx_L3_error:;
   __Pyx_AddTraceback("MACS2.IO.BedGraph.bedRegionTrackI.safe_add_loc", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __Pyx_RefNannyFinishContext();
   return NULL;
   __pyx_L4_argument_unpacking_done:;
-  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_chromosome), (&PyBytes_Type), 1, "chromosome", 1))) __PYX_ERR(0, 1109, __pyx_L1_error)
+  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_chromosome), (&PyBytes_Type), 1, "chromosome", 1))) __PYX_ERR(0, 1110, __pyx_L1_error)
   __pyx_r = __pyx_pf_5MACS2_2IO_8BedGraph_15bedRegionTrackI_2safe_add_loc(__pyx_self, __pyx_v_self, __pyx_v_chromosome, __pyx_v_startpos, __pyx_v_endpos);
 
   /* function exit code */
@@ -18646,6 +18958,7 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_15bedRegionTrackI_2safe_add_loc(C
   double __pyx_v_pre_v;
   PyObject *__pyx_v_c = NULL;
   PyObject *__pyx_r = NULL;
+  __Pyx_TraceDeclarations
   __Pyx_RefNannyDeclarations
   PyObject *__pyx_t_1 = NULL;
   Py_ssize_t __pyx_t_2;
@@ -18661,9 +18974,11 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_15bedRegionTrackI_2safe_add_loc(C
   PyObject *__pyx_t_12 = NULL;
   int __pyx_t_13;
   double __pyx_t_14;
+  __Pyx_TraceFrameInit(__pyx_codeobj__14)
   __Pyx_RefNannySetupContext("safe_add_loc", 0);
+  __Pyx_TraceCall("safe_add_loc", __pyx_f[0], 1110, 0, __PYX_ERR(0, 1110, __pyx_L1_error));
 
-  /* "MACS2/IO/BedGraph.pyx":1118
+  /* "MACS2/IO/BedGraph.pyx":1119
  * 
  *         # basic assumption, end pos should > start pos
  *         assert endpos > startpos, "endpos %d can't be smaller than start pos %d" % (endpos,startpos)             # <<<<<<<<<<<<<<
@@ -18673,7 +18988,7 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_15bedRegionTrackI_2safe_add_loc(C
   #ifndef CYTHON_WITHOUT_ASSERTIONS
   if (unlikely(!Py_OptimizeFlag)) {
     if (unlikely(!((__pyx_v_endpos > __pyx_v_startpos) != 0))) {
-      __pyx_t_1 = PyTuple_New(4); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1118, __pyx_L1_error)
+      __pyx_t_1 = PyTuple_New(4); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1119, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_1);
       __pyx_t_2 = 0;
       __pyx_t_3 = 127;
@@ -18681,7 +18996,7 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_15bedRegionTrackI_2safe_add_loc(C
       __pyx_t_2 += 7;
       __Pyx_GIVEREF(__pyx_kp_u_endpos_2);
       PyTuple_SET_ITEM(__pyx_t_1, 0, __pyx_kp_u_endpos_2);
-      __pyx_t_4 = __Pyx_PyUnicode_From_int(__pyx_v_endpos, 0, ' ', 'd'); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 1118, __pyx_L1_error)
+      __pyx_t_4 = __Pyx_PyUnicode_From_int(__pyx_v_endpos, 0, ' ', 'd'); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 1119, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_4);
       __pyx_t_2 += __Pyx_PyUnicode_GET_LENGTH(__pyx_t_4);
       __Pyx_GIVEREF(__pyx_t_4);
@@ -18691,23 +19006,23 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_15bedRegionTrackI_2safe_add_loc(C
       __pyx_t_2 += 33;
       __Pyx_GIVEREF(__pyx_kp_u_can_t_be_smaller_than_start_pos);
       PyTuple_SET_ITEM(__pyx_t_1, 2, __pyx_kp_u_can_t_be_smaller_than_start_pos);
-      __pyx_t_4 = __Pyx_PyUnicode_From_int(__pyx_v_startpos, 0, ' ', 'd'); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 1118, __pyx_L1_error)
+      __pyx_t_4 = __Pyx_PyUnicode_From_int(__pyx_v_startpos, 0, ' ', 'd'); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 1119, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_4);
       __pyx_t_2 += __Pyx_PyUnicode_GET_LENGTH(__pyx_t_4);
       __Pyx_GIVEREF(__pyx_t_4);
       PyTuple_SET_ITEM(__pyx_t_1, 3, __pyx_t_4);
       __pyx_t_4 = 0;
-      __pyx_t_4 = __Pyx_PyUnicode_Join(__pyx_t_1, 4, __pyx_t_2, __pyx_t_3); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 1118, __pyx_L1_error)
+      __pyx_t_4 = __Pyx_PyUnicode_Join(__pyx_t_1, 4, __pyx_t_2, __pyx_t_3); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 1119, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_4);
       __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
       PyErr_SetObject(PyExc_AssertionError, __pyx_t_4);
       __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-      __PYX_ERR(0, 1118, __pyx_L1_error)
+      __PYX_ERR(0, 1119, __pyx_L1_error)
     }
   }
   #endif
 
-  /* "MACS2/IO/BedGraph.pyx":1120
+  /* "MACS2/IO/BedGraph.pyx":1121
  *         assert endpos > startpos, "endpos %d can't be smaller than start pos %d" % (endpos,startpos)
  * 
  *         if endpos <= 0:             # <<<<<<<<<<<<<<
@@ -18717,7 +19032,7 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_15bedRegionTrackI_2safe_add_loc(C
   __pyx_t_5 = ((__pyx_v_endpos <= 0) != 0);
   if (__pyx_t_5) {
 
-    /* "MACS2/IO/BedGraph.pyx":1121
+    /* "MACS2/IO/BedGraph.pyx":1122
  * 
  *         if endpos <= 0:
  *             return             # <<<<<<<<<<<<<<
@@ -18728,7 +19043,7 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_15bedRegionTrackI_2safe_add_loc(C
     __pyx_r = Py_None; __Pyx_INCREF(Py_None);
     goto __pyx_L0;
 
-    /* "MACS2/IO/BedGraph.pyx":1120
+    /* "MACS2/IO/BedGraph.pyx":1121
  *         assert endpos > startpos, "endpos %d can't be smaller than start pos %d" % (endpos,startpos)
  * 
  *         if endpos <= 0:             # <<<<<<<<<<<<<<
@@ -18737,7 +19052,7 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_15bedRegionTrackI_2safe_add_loc(C
  */
   }
 
-  /* "MACS2/IO/BedGraph.pyx":1122
+  /* "MACS2/IO/BedGraph.pyx":1123
  *         if endpos <= 0:
  *             return
  *         if startpos < 0:             # <<<<<<<<<<<<<<
@@ -18747,7 +19062,7 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_15bedRegionTrackI_2safe_add_loc(C
   __pyx_t_5 = ((__pyx_v_startpos < 0) != 0);
   if (__pyx_t_5) {
 
-    /* "MACS2/IO/BedGraph.pyx":1123
+    /* "MACS2/IO/BedGraph.pyx":1124
  *             return
  *         if startpos < 0:
  *             startpos = 0             # <<<<<<<<<<<<<<
@@ -18756,7 +19071,7 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_15bedRegionTrackI_2safe_add_loc(C
  */
     __pyx_v_startpos = 0;
 
-    /* "MACS2/IO/BedGraph.pyx":1122
+    /* "MACS2/IO/BedGraph.pyx":1123
  *         if endpos <= 0:
  *             return
  *         if startpos < 0:             # <<<<<<<<<<<<<<
@@ -18765,32 +19080,32 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_15bedRegionTrackI_2safe_add_loc(C
  */
   }
 
-  /* "MACS2/IO/BedGraph.pyx":1125
+  /* "MACS2/IO/BedGraph.pyx":1126
  *             startpos = 0
  * 
  *         if chromosome not in self.__data:             # <<<<<<<<<<<<<<
  *             self.__data[chromosome] = [array(BYTE4,[]),array(FBYTE4,[])] # for (endpos,value)
  *             c = self.__data[chromosome]
  */
-  __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_bedRegionTrackI__data); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 1125, __pyx_L1_error)
+  __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_bedRegionTrackI__data); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 1126, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_4);
-  __pyx_t_5 = (__Pyx_PySequence_ContainsTF(__pyx_v_chromosome, __pyx_t_4, Py_NE)); if (unlikely(__pyx_t_5 < 0)) __PYX_ERR(0, 1125, __pyx_L1_error)
+  __pyx_t_5 = (__Pyx_PySequence_ContainsTF(__pyx_v_chromosome, __pyx_t_4, Py_NE)); if (unlikely(__pyx_t_5 < 0)) __PYX_ERR(0, 1126, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
   __pyx_t_6 = (__pyx_t_5 != 0);
   if (__pyx_t_6) {
 
-    /* "MACS2/IO/BedGraph.pyx":1126
+    /* "MACS2/IO/BedGraph.pyx":1127
  * 
  *         if chromosome not in self.__data:
  *             self.__data[chromosome] = [array(BYTE4,[]),array(FBYTE4,[])] # for (endpos,value)             # <<<<<<<<<<<<<<
  *             c = self.__data[chromosome]
  *             if startpos:
  */
-    __Pyx_GetModuleGlobalName(__pyx_t_1, __pyx_n_s_array); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1126, __pyx_L1_error)
+    __Pyx_GetModuleGlobalName(__pyx_t_1, __pyx_n_s_array); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1127, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
-    __Pyx_GetModuleGlobalName(__pyx_t_7, __pyx_n_s_BYTE4); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 1126, __pyx_L1_error)
+    __Pyx_GetModuleGlobalName(__pyx_t_7, __pyx_n_s_BYTE4); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 1127, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_7);
-    __pyx_t_8 = PyList_New(0); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 1126, __pyx_L1_error)
+    __pyx_t_8 = PyList_New(0); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 1127, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_8);
     __pyx_t_9 = NULL;
     __pyx_t_10 = 0;
@@ -18807,7 +19122,7 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_15bedRegionTrackI_2safe_add_loc(C
     #if CYTHON_FAST_PYCALL
     if (PyFunction_Check(__pyx_t_1)) {
       PyObject *__pyx_temp[3] = {__pyx_t_9, __pyx_t_7, __pyx_t_8};
-      __pyx_t_4 = __Pyx_PyFunction_FastCall(__pyx_t_1, __pyx_temp+1-__pyx_t_10, 2+__pyx_t_10); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 1126, __pyx_L1_error)
+      __pyx_t_4 = __Pyx_PyFunction_FastCall(__pyx_t_1, __pyx_temp+1-__pyx_t_10, 2+__pyx_t_10); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 1127, __pyx_L1_error)
       __Pyx_XDECREF(__pyx_t_9); __pyx_t_9 = 0;
       __Pyx_GOTREF(__pyx_t_4);
       __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
@@ -18817,7 +19132,7 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_15bedRegionTrackI_2safe_add_loc(C
     #if CYTHON_FAST_PYCCALL
     if (__Pyx_PyFastCFunction_Check(__pyx_t_1)) {
       PyObject *__pyx_temp[3] = {__pyx_t_9, __pyx_t_7, __pyx_t_8};
-      __pyx_t_4 = __Pyx_PyCFunction_FastCall(__pyx_t_1, __pyx_temp+1-__pyx_t_10, 2+__pyx_t_10); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 1126, __pyx_L1_error)
+      __pyx_t_4 = __Pyx_PyCFunction_FastCall(__pyx_t_1, __pyx_temp+1-__pyx_t_10, 2+__pyx_t_10); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 1127, __pyx_L1_error)
       __Pyx_XDECREF(__pyx_t_9); __pyx_t_9 = 0;
       __Pyx_GOTREF(__pyx_t_4);
       __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
@@ -18825,7 +19140,7 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_15bedRegionTrackI_2safe_add_loc(C
     } else
     #endif
     {
-      __pyx_t_11 = PyTuple_New(2+__pyx_t_10); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 1126, __pyx_L1_error)
+      __pyx_t_11 = PyTuple_New(2+__pyx_t_10); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 1127, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_11);
       if (__pyx_t_9) {
         __Pyx_GIVEREF(__pyx_t_9); PyTuple_SET_ITEM(__pyx_t_11, 0, __pyx_t_9); __pyx_t_9 = NULL;
@@ -18836,16 +19151,16 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_15bedRegionTrackI_2safe_add_loc(C
       PyTuple_SET_ITEM(__pyx_t_11, 1+__pyx_t_10, __pyx_t_8);
       __pyx_t_7 = 0;
       __pyx_t_8 = 0;
-      __pyx_t_4 = __Pyx_PyObject_Call(__pyx_t_1, __pyx_t_11, NULL); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 1126, __pyx_L1_error)
+      __pyx_t_4 = __Pyx_PyObject_Call(__pyx_t_1, __pyx_t_11, NULL); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 1127, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_4);
       __Pyx_DECREF(__pyx_t_11); __pyx_t_11 = 0;
     }
     __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-    __Pyx_GetModuleGlobalName(__pyx_t_11, __pyx_n_s_array); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 1126, __pyx_L1_error)
+    __Pyx_GetModuleGlobalName(__pyx_t_11, __pyx_n_s_array); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 1127, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_11);
-    __Pyx_GetModuleGlobalName(__pyx_t_8, __pyx_n_s_FBYTE4); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 1126, __pyx_L1_error)
+    __Pyx_GetModuleGlobalName(__pyx_t_8, __pyx_n_s_FBYTE4); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 1127, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_8);
-    __pyx_t_7 = PyList_New(0); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 1126, __pyx_L1_error)
+    __pyx_t_7 = PyList_New(0); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 1127, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_7);
     __pyx_t_9 = NULL;
     __pyx_t_10 = 0;
@@ -18862,7 +19177,7 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_15bedRegionTrackI_2safe_add_loc(C
     #if CYTHON_FAST_PYCALL
     if (PyFunction_Check(__pyx_t_11)) {
       PyObject *__pyx_temp[3] = {__pyx_t_9, __pyx_t_8, __pyx_t_7};
-      __pyx_t_1 = __Pyx_PyFunction_FastCall(__pyx_t_11, __pyx_temp+1-__pyx_t_10, 2+__pyx_t_10); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1126, __pyx_L1_error)
+      __pyx_t_1 = __Pyx_PyFunction_FastCall(__pyx_t_11, __pyx_temp+1-__pyx_t_10, 2+__pyx_t_10); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1127, __pyx_L1_error)
       __Pyx_XDECREF(__pyx_t_9); __pyx_t_9 = 0;
       __Pyx_GOTREF(__pyx_t_1);
       __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
@@ -18872,7 +19187,7 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_15bedRegionTrackI_2safe_add_loc(C
     #if CYTHON_FAST_PYCCALL
     if (__Pyx_PyFastCFunction_Check(__pyx_t_11)) {
       PyObject *__pyx_temp[3] = {__pyx_t_9, __pyx_t_8, __pyx_t_7};
-      __pyx_t_1 = __Pyx_PyCFunction_FastCall(__pyx_t_11, __pyx_temp+1-__pyx_t_10, 2+__pyx_t_10); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1126, __pyx_L1_error)
+      __pyx_t_1 = __Pyx_PyCFunction_FastCall(__pyx_t_11, __pyx_temp+1-__pyx_t_10, 2+__pyx_t_10); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1127, __pyx_L1_error)
       __Pyx_XDECREF(__pyx_t_9); __pyx_t_9 = 0;
       __Pyx_GOTREF(__pyx_t_1);
       __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
@@ -18880,7 +19195,7 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_15bedRegionTrackI_2safe_add_loc(C
     } else
     #endif
     {
-      __pyx_t_12 = PyTuple_New(2+__pyx_t_10); if (unlikely(!__pyx_t_12)) __PYX_ERR(0, 1126, __pyx_L1_error)
+      __pyx_t_12 = PyTuple_New(2+__pyx_t_10); if (unlikely(!__pyx_t_12)) __PYX_ERR(0, 1127, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_12);
       if (__pyx_t_9) {
         __Pyx_GIVEREF(__pyx_t_9); PyTuple_SET_ITEM(__pyx_t_12, 0, __pyx_t_9); __pyx_t_9 = NULL;
@@ -18891,12 +19206,12 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_15bedRegionTrackI_2safe_add_loc(C
       PyTuple_SET_ITEM(__pyx_t_12, 1+__pyx_t_10, __pyx_t_7);
       __pyx_t_8 = 0;
       __pyx_t_7 = 0;
-      __pyx_t_1 = __Pyx_PyObject_Call(__pyx_t_11, __pyx_t_12, NULL); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1126, __pyx_L1_error)
+      __pyx_t_1 = __Pyx_PyObject_Call(__pyx_t_11, __pyx_t_12, NULL); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1127, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_1);
       __Pyx_DECREF(__pyx_t_12); __pyx_t_12 = 0;
     }
     __Pyx_DECREF(__pyx_t_11); __pyx_t_11 = 0;
-    __pyx_t_11 = PyList_New(2); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 1126, __pyx_L1_error)
+    __pyx_t_11 = PyList_New(2); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 1127, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_11);
     __Pyx_GIVEREF(__pyx_t_4);
     PyList_SET_ITEM(__pyx_t_11, 0, __pyx_t_4);
@@ -18904,28 +19219,28 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_15bedRegionTrackI_2safe_add_loc(C
     PyList_SET_ITEM(__pyx_t_11, 1, __pyx_t_1);
     __pyx_t_4 = 0;
     __pyx_t_1 = 0;
-    __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_bedRegionTrackI__data); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1126, __pyx_L1_error)
+    __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_bedRegionTrackI__data); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1127, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
-    if (unlikely(PyObject_SetItem(__pyx_t_1, __pyx_v_chromosome, __pyx_t_11) < 0)) __PYX_ERR(0, 1126, __pyx_L1_error)
+    if (unlikely(PyObject_SetItem(__pyx_t_1, __pyx_v_chromosome, __pyx_t_11) < 0)) __PYX_ERR(0, 1127, __pyx_L1_error)
     __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
     __Pyx_DECREF(__pyx_t_11); __pyx_t_11 = 0;
 
-    /* "MACS2/IO/BedGraph.pyx":1127
+    /* "MACS2/IO/BedGraph.pyx":1128
  *         if chromosome not in self.__data:
  *             self.__data[chromosome] = [array(BYTE4,[]),array(FBYTE4,[])] # for (endpos,value)
  *             c = self.__data[chromosome]             # <<<<<<<<<<<<<<
  *             if startpos:
  *                 # start pos is not 0, then add two blocks, the first
  */
-    __pyx_t_11 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_bedRegionTrackI__data); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 1127, __pyx_L1_error)
+    __pyx_t_11 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_bedRegionTrackI__data); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 1128, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_11);
-    __pyx_t_1 = __Pyx_PyObject_GetItem(__pyx_t_11, __pyx_v_chromosome); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1127, __pyx_L1_error)
+    __pyx_t_1 = __Pyx_PyObject_GetItem(__pyx_t_11, __pyx_v_chromosome); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1128, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
     __Pyx_DECREF(__pyx_t_11); __pyx_t_11 = 0;
     __pyx_v_c = __pyx_t_1;
     __pyx_t_1 = 0;
 
-    /* "MACS2/IO/BedGraph.pyx":1128
+    /* "MACS2/IO/BedGraph.pyx":1129
  *             self.__data[chromosome] = [array(BYTE4,[]),array(FBYTE4,[])] # for (endpos,value)
  *             c = self.__data[chromosome]
  *             if startpos:             # <<<<<<<<<<<<<<
@@ -18935,37 +19250,37 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_15bedRegionTrackI_2safe_add_loc(C
     __pyx_t_6 = (__pyx_v_startpos != 0);
     if (__pyx_t_6) {
 
-      /* "MACS2/IO/BedGraph.pyx":1131
+      /* "MACS2/IO/BedGraph.pyx":1132
  *                 # start pos is not 0, then add two blocks, the first
  *                 # with "baseline_value"; the second with "value"
  *                 c[0].append(startpos)             # <<<<<<<<<<<<<<
  *                 c[1].append(self.baseline_value)
  *             c[0].append(endpos)
  */
-      __pyx_t_1 = __Pyx_GetItemInt(__pyx_v_c, 0, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1131, __pyx_L1_error)
+      __pyx_t_1 = __Pyx_GetItemInt(__pyx_v_c, 0, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1132, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_1);
-      __pyx_t_11 = __Pyx_PyInt_From_int(__pyx_v_startpos); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 1131, __pyx_L1_error)
+      __pyx_t_11 = __Pyx_PyInt_From_int(__pyx_v_startpos); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 1132, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_11);
-      __pyx_t_13 = __Pyx_PyObject_Append(__pyx_t_1, __pyx_t_11); if (unlikely(__pyx_t_13 == ((int)-1))) __PYX_ERR(0, 1131, __pyx_L1_error)
+      __pyx_t_13 = __Pyx_PyObject_Append(__pyx_t_1, __pyx_t_11); if (unlikely(__pyx_t_13 == ((int)-1))) __PYX_ERR(0, 1132, __pyx_L1_error)
       __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
       __Pyx_DECREF(__pyx_t_11); __pyx_t_11 = 0;
 
-      /* "MACS2/IO/BedGraph.pyx":1132
+      /* "MACS2/IO/BedGraph.pyx":1133
  *                 # with "baseline_value"; the second with "value"
  *                 c[0].append(startpos)
  *                 c[1].append(self.baseline_value)             # <<<<<<<<<<<<<<
  *             c[0].append(endpos)
  *             c[1].append(1)
  */
-      __pyx_t_11 = __Pyx_GetItemInt(__pyx_v_c, 1, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 1132, __pyx_L1_error)
+      __pyx_t_11 = __Pyx_GetItemInt(__pyx_v_c, 1, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 1133, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_11);
-      __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_baseline_value); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1132, __pyx_L1_error)
+      __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_baseline_value); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1133, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_1);
-      __pyx_t_13 = __Pyx_PyObject_Append(__pyx_t_11, __pyx_t_1); if (unlikely(__pyx_t_13 == ((int)-1))) __PYX_ERR(0, 1132, __pyx_L1_error)
+      __pyx_t_13 = __Pyx_PyObject_Append(__pyx_t_11, __pyx_t_1); if (unlikely(__pyx_t_13 == ((int)-1))) __PYX_ERR(0, 1133, __pyx_L1_error)
       __Pyx_DECREF(__pyx_t_11); __pyx_t_11 = 0;
       __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-      /* "MACS2/IO/BedGraph.pyx":1128
+      /* "MACS2/IO/BedGraph.pyx":1129
  *             self.__data[chromosome] = [array(BYTE4,[]),array(FBYTE4,[])] # for (endpos,value)
  *             c = self.__data[chromosome]
  *             if startpos:             # <<<<<<<<<<<<<<
@@ -18974,34 +19289,34 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_15bedRegionTrackI_2safe_add_loc(C
  */
     }
 
-    /* "MACS2/IO/BedGraph.pyx":1133
+    /* "MACS2/IO/BedGraph.pyx":1134
  *                 c[0].append(startpos)
  *                 c[1].append(self.baseline_value)
  *             c[0].append(endpos)             # <<<<<<<<<<<<<<
  *             c[1].append(1)
  *         else:
  */
-    __pyx_t_1 = __Pyx_GetItemInt(__pyx_v_c, 0, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1133, __pyx_L1_error)
+    __pyx_t_1 = __Pyx_GetItemInt(__pyx_v_c, 0, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1134, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
-    __pyx_t_11 = __Pyx_PyInt_From_int(__pyx_v_endpos); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 1133, __pyx_L1_error)
+    __pyx_t_11 = __Pyx_PyInt_From_int(__pyx_v_endpos); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 1134, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_11);
-    __pyx_t_13 = __Pyx_PyObject_Append(__pyx_t_1, __pyx_t_11); if (unlikely(__pyx_t_13 == ((int)-1))) __PYX_ERR(0, 1133, __pyx_L1_error)
+    __pyx_t_13 = __Pyx_PyObject_Append(__pyx_t_1, __pyx_t_11); if (unlikely(__pyx_t_13 == ((int)-1))) __PYX_ERR(0, 1134, __pyx_L1_error)
     __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
     __Pyx_DECREF(__pyx_t_11); __pyx_t_11 = 0;
 
-    /* "MACS2/IO/BedGraph.pyx":1134
+    /* "MACS2/IO/BedGraph.pyx":1135
  *                 c[1].append(self.baseline_value)
  *             c[0].append(endpos)
  *             c[1].append(1)             # <<<<<<<<<<<<<<
  *         else:
  *             c = self.__data[chromosome]
  */
-    __pyx_t_11 = __Pyx_GetItemInt(__pyx_v_c, 1, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 1134, __pyx_L1_error)
+    __pyx_t_11 = __Pyx_GetItemInt(__pyx_v_c, 1, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 1135, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_11);
-    __pyx_t_13 = __Pyx_PyObject_Append(__pyx_t_11, __pyx_int_1); if (unlikely(__pyx_t_13 == ((int)-1))) __PYX_ERR(0, 1134, __pyx_L1_error)
+    __pyx_t_13 = __Pyx_PyObject_Append(__pyx_t_11, __pyx_int_1); if (unlikely(__pyx_t_13 == ((int)-1))) __PYX_ERR(0, 1135, __pyx_L1_error)
     __Pyx_DECREF(__pyx_t_11); __pyx_t_11 = 0;
 
-    /* "MACS2/IO/BedGraph.pyx":1125
+    /* "MACS2/IO/BedGraph.pyx":1126
  *             startpos = 0
  * 
  *         if chromosome not in self.__data:             # <<<<<<<<<<<<<<
@@ -19011,7 +19326,7 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_15bedRegionTrackI_2safe_add_loc(C
     goto __pyx_L5;
   }
 
-  /* "MACS2/IO/BedGraph.pyx":1136
+  /* "MACS2/IO/BedGraph.pyx":1137
  *             c[1].append(1)
  *         else:
  *             c = self.__data[chromosome]             # <<<<<<<<<<<<<<
@@ -19019,47 +19334,47 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_15bedRegionTrackI_2safe_add_loc(C
  *             pre_pos = c[0][-1]
  */
   /*else*/ {
-    __pyx_t_11 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_bedRegionTrackI__data); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 1136, __pyx_L1_error)
+    __pyx_t_11 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_bedRegionTrackI__data); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 1137, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_11);
-    __pyx_t_1 = __Pyx_PyObject_GetItem(__pyx_t_11, __pyx_v_chromosome); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1136, __pyx_L1_error)
+    __pyx_t_1 = __Pyx_PyObject_GetItem(__pyx_t_11, __pyx_v_chromosome); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1137, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
     __Pyx_DECREF(__pyx_t_11); __pyx_t_11 = 0;
     __pyx_v_c = __pyx_t_1;
     __pyx_t_1 = 0;
 
-    /* "MACS2/IO/BedGraph.pyx":1138
+    /* "MACS2/IO/BedGraph.pyx":1139
  *             c = self.__data[chromosome]
  *             # get the preceding region
  *             pre_pos = c[0][-1]             # <<<<<<<<<<<<<<
  *             pre_v   = c[1][-1]
  *             # to check 1. continuity; 2. non-overlapping
  */
-    __pyx_t_1 = __Pyx_GetItemInt(__pyx_v_c, 0, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1138, __pyx_L1_error)
+    __pyx_t_1 = __Pyx_GetItemInt(__pyx_v_c, 0, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1139, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
-    __pyx_t_11 = __Pyx_GetItemInt(__pyx_t_1, -1L, long, 1, __Pyx_PyInt_From_long, 0, 1, 1); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 1138, __pyx_L1_error)
+    __pyx_t_11 = __Pyx_GetItemInt(__pyx_t_1, -1L, long, 1, __Pyx_PyInt_From_long, 0, 1, 1); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 1139, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_11);
     __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-    __pyx_t_10 = __Pyx_PyInt_As_int(__pyx_t_11); if (unlikely((__pyx_t_10 == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 1138, __pyx_L1_error)
+    __pyx_t_10 = __Pyx_PyInt_As_int(__pyx_t_11); if (unlikely((__pyx_t_10 == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 1139, __pyx_L1_error)
     __Pyx_DECREF(__pyx_t_11); __pyx_t_11 = 0;
     __pyx_v_pre_pos = __pyx_t_10;
 
-    /* "MACS2/IO/BedGraph.pyx":1139
+    /* "MACS2/IO/BedGraph.pyx":1140
  *             # get the preceding region
  *             pre_pos = c[0][-1]
  *             pre_v   = c[1][-1]             # <<<<<<<<<<<<<<
  *             # to check 1. continuity; 2. non-overlapping
  *             assert pre_pos < endpos , "bedGraph regions are not continuous."
  */
-    __pyx_t_11 = __Pyx_GetItemInt(__pyx_v_c, 1, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 1139, __pyx_L1_error)
+    __pyx_t_11 = __Pyx_GetItemInt(__pyx_v_c, 1, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 1140, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_11);
-    __pyx_t_1 = __Pyx_GetItemInt(__pyx_t_11, -1L, long, 1, __Pyx_PyInt_From_long, 0, 1, 1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1139, __pyx_L1_error)
+    __pyx_t_1 = __Pyx_GetItemInt(__pyx_t_11, -1L, long, 1, __Pyx_PyInt_From_long, 0, 1, 1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1140, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
     __Pyx_DECREF(__pyx_t_11); __pyx_t_11 = 0;
-    __pyx_t_14 = __pyx_PyFloat_AsDouble(__pyx_t_1); if (unlikely((__pyx_t_14 == (double)-1) && PyErr_Occurred())) __PYX_ERR(0, 1139, __pyx_L1_error)
+    __pyx_t_14 = __pyx_PyFloat_AsDouble(__pyx_t_1); if (unlikely((__pyx_t_14 == (double)-1) && PyErr_Occurred())) __PYX_ERR(0, 1140, __pyx_L1_error)
     __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
     __pyx_v_pre_v = __pyx_t_14;
 
-    /* "MACS2/IO/BedGraph.pyx":1141
+    /* "MACS2/IO/BedGraph.pyx":1142
  *             pre_v   = c[1][-1]
  *             # to check 1. continuity; 2. non-overlapping
  *             assert pre_pos < endpos , "bedGraph regions are not continuous."             # <<<<<<<<<<<<<<
@@ -19070,12 +19385,12 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_15bedRegionTrackI_2safe_add_loc(C
     if (unlikely(!Py_OptimizeFlag)) {
       if (unlikely(!((__pyx_v_pre_pos < __pyx_v_endpos) != 0))) {
         PyErr_SetObject(PyExc_AssertionError, __pyx_kp_u_bedGraph_regions_are_not_continu);
-        __PYX_ERR(0, 1141, __pyx_L1_error)
+        __PYX_ERR(0, 1142, __pyx_L1_error)
       }
     }
     #endif
 
-    /* "MACS2/IO/BedGraph.pyx":1142
+    /* "MACS2/IO/BedGraph.pyx":1143
  *             # to check 1. continuity; 2. non-overlapping
  *             assert pre_pos < endpos , "bedGraph regions are not continuous."
  *             assert pre_pos <= startpos , "bedGraph regions have overlappings."             # <<<<<<<<<<<<<<
@@ -19086,12 +19401,12 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_15bedRegionTrackI_2safe_add_loc(C
     if (unlikely(!Py_OptimizeFlag)) {
       if (unlikely(!((__pyx_v_pre_pos <= __pyx_v_startpos) != 0))) {
         PyErr_SetObject(PyExc_AssertionError, __pyx_kp_u_bedGraph_regions_have_overlappin);
-        __PYX_ERR(0, 1142, __pyx_L1_error)
+        __PYX_ERR(0, 1143, __pyx_L1_error)
       }
     }
     #endif
 
-    /* "MACS2/IO/BedGraph.pyx":1144
+    /* "MACS2/IO/BedGraph.pyx":1145
  *             assert pre_pos <= startpos , "bedGraph regions have overlappings."
  * 
  *             if startpos != pre_pos:             # <<<<<<<<<<<<<<
@@ -19101,64 +19416,64 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_15bedRegionTrackI_2safe_add_loc(C
     __pyx_t_6 = ((__pyx_v_startpos != __pyx_v_pre_pos) != 0);
     if (__pyx_t_6) {
 
-      /* "MACS2/IO/BedGraph.pyx":1146
+      /* "MACS2/IO/BedGraph.pyx":1147
  *             if startpos != pre_pos:
  *                 # there is a gap, so fill it with baseline_value
  *                 c[0].append(startpos)             # <<<<<<<<<<<<<<
  *                 c[1].append(self.baseline_value)
  *                 # then add this region
  */
-      __pyx_t_1 = __Pyx_GetItemInt(__pyx_v_c, 0, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1146, __pyx_L1_error)
+      __pyx_t_1 = __Pyx_GetItemInt(__pyx_v_c, 0, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1147, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_1);
-      __pyx_t_11 = __Pyx_PyInt_From_int(__pyx_v_startpos); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 1146, __pyx_L1_error)
+      __pyx_t_11 = __Pyx_PyInt_From_int(__pyx_v_startpos); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 1147, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_11);
-      __pyx_t_13 = __Pyx_PyObject_Append(__pyx_t_1, __pyx_t_11); if (unlikely(__pyx_t_13 == ((int)-1))) __PYX_ERR(0, 1146, __pyx_L1_error)
+      __pyx_t_13 = __Pyx_PyObject_Append(__pyx_t_1, __pyx_t_11); if (unlikely(__pyx_t_13 == ((int)-1))) __PYX_ERR(0, 1147, __pyx_L1_error)
       __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
       __Pyx_DECREF(__pyx_t_11); __pyx_t_11 = 0;
 
-      /* "MACS2/IO/BedGraph.pyx":1147
+      /* "MACS2/IO/BedGraph.pyx":1148
  *                 # there is a gap, so fill it with baseline_value
  *                 c[0].append(startpos)
  *                 c[1].append(self.baseline_value)             # <<<<<<<<<<<<<<
  *                 # then add this region
  *                 c[0].append(endpos)
  */
-      __pyx_t_11 = __Pyx_GetItemInt(__pyx_v_c, 1, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 1147, __pyx_L1_error)
+      __pyx_t_11 = __Pyx_GetItemInt(__pyx_v_c, 1, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 1148, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_11);
-      __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_baseline_value); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1147, __pyx_L1_error)
+      __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_baseline_value); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1148, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_1);
-      __pyx_t_13 = __Pyx_PyObject_Append(__pyx_t_11, __pyx_t_1); if (unlikely(__pyx_t_13 == ((int)-1))) __PYX_ERR(0, 1147, __pyx_L1_error)
+      __pyx_t_13 = __Pyx_PyObject_Append(__pyx_t_11, __pyx_t_1); if (unlikely(__pyx_t_13 == ((int)-1))) __PYX_ERR(0, 1148, __pyx_L1_error)
       __Pyx_DECREF(__pyx_t_11); __pyx_t_11 = 0;
       __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-      /* "MACS2/IO/BedGraph.pyx":1149
+      /* "MACS2/IO/BedGraph.pyx":1150
  *                 c[1].append(self.baseline_value)
  *                 # then add this region
  *                 c[0].append(endpos)             # <<<<<<<<<<<<<<
  *                 c[1].append(1)
  *             else:
  */
-      __pyx_t_1 = __Pyx_GetItemInt(__pyx_v_c, 0, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1149, __pyx_L1_error)
+      __pyx_t_1 = __Pyx_GetItemInt(__pyx_v_c, 0, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1150, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_1);
-      __pyx_t_11 = __Pyx_PyInt_From_int(__pyx_v_endpos); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 1149, __pyx_L1_error)
+      __pyx_t_11 = __Pyx_PyInt_From_int(__pyx_v_endpos); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 1150, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_11);
-      __pyx_t_13 = __Pyx_PyObject_Append(__pyx_t_1, __pyx_t_11); if (unlikely(__pyx_t_13 == ((int)-1))) __PYX_ERR(0, 1149, __pyx_L1_error)
+      __pyx_t_13 = __Pyx_PyObject_Append(__pyx_t_1, __pyx_t_11); if (unlikely(__pyx_t_13 == ((int)-1))) __PYX_ERR(0, 1150, __pyx_L1_error)
       __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
       __Pyx_DECREF(__pyx_t_11); __pyx_t_11 = 0;
 
-      /* "MACS2/IO/BedGraph.pyx":1150
+      /* "MACS2/IO/BedGraph.pyx":1151
  *                 # then add this region
  *                 c[0].append(endpos)
  *                 c[1].append(1)             # <<<<<<<<<<<<<<
  *             else:
  *                 # if this region is next to the previous one.
  */
-      __pyx_t_11 = __Pyx_GetItemInt(__pyx_v_c, 1, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 1150, __pyx_L1_error)
+      __pyx_t_11 = __Pyx_GetItemInt(__pyx_v_c, 1, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 1151, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_11);
-      __pyx_t_13 = __Pyx_PyObject_Append(__pyx_t_11, __pyx_int_1); if (unlikely(__pyx_t_13 == ((int)-1))) __PYX_ERR(0, 1150, __pyx_L1_error)
+      __pyx_t_13 = __Pyx_PyObject_Append(__pyx_t_11, __pyx_int_1); if (unlikely(__pyx_t_13 == ((int)-1))) __PYX_ERR(0, 1151, __pyx_L1_error)
       __Pyx_DECREF(__pyx_t_11); __pyx_t_11 = 0;
 
-      /* "MACS2/IO/BedGraph.pyx":1144
+      /* "MACS2/IO/BedGraph.pyx":1145
  *             assert pre_pos <= startpos , "bedGraph regions have overlappings."
  * 
  *             if startpos != pre_pos:             # <<<<<<<<<<<<<<
@@ -19168,7 +19483,7 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_15bedRegionTrackI_2safe_add_loc(C
       goto __pyx_L7;
     }
 
-    /* "MACS2/IO/BedGraph.pyx":1153
+    /* "MACS2/IO/BedGraph.pyx":1154
  *             else:
  *                 # if this region is next to the previous one.
  *                 if pre_v == 1:             # <<<<<<<<<<<<<<
@@ -19179,22 +19494,22 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_15bedRegionTrackI_2safe_add_loc(C
       __pyx_t_6 = ((__pyx_v_pre_v == 1.0) != 0);
       if (__pyx_t_6) {
 
-        /* "MACS2/IO/BedGraph.pyx":1155
+        /* "MACS2/IO/BedGraph.pyx":1156
  *                 if pre_v == 1:
  *                     # if value is the same, simply extend it.
  *                     c[0][-1] = endpos             # <<<<<<<<<<<<<<
  *                 else:
  *                     # otherwise, add a new region
  */
-        __pyx_t_11 = __Pyx_PyInt_From_int(__pyx_v_endpos); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 1155, __pyx_L1_error)
+        __pyx_t_11 = __Pyx_PyInt_From_int(__pyx_v_endpos); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 1156, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_11);
-        __pyx_t_1 = __Pyx_GetItemInt(__pyx_v_c, 0, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1155, __pyx_L1_error)
+        __pyx_t_1 = __Pyx_GetItemInt(__pyx_v_c, 0, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1156, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_1);
-        if (unlikely(__Pyx_SetItemInt(__pyx_t_1, -1L, __pyx_t_11, long, 1, __Pyx_PyInt_From_long, 0, 1, 1) < 0)) __PYX_ERR(0, 1155, __pyx_L1_error)
+        if (unlikely(__Pyx_SetItemInt(__pyx_t_1, -1L, __pyx_t_11, long, 1, __Pyx_PyInt_From_long, 0, 1, 1) < 0)) __PYX_ERR(0, 1156, __pyx_L1_error)
         __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
         __Pyx_DECREF(__pyx_t_11); __pyx_t_11 = 0;
 
-        /* "MACS2/IO/BedGraph.pyx":1153
+        /* "MACS2/IO/BedGraph.pyx":1154
  *             else:
  *                 # if this region is next to the previous one.
  *                 if pre_v == 1:             # <<<<<<<<<<<<<<
@@ -19204,7 +19519,7 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_15bedRegionTrackI_2safe_add_loc(C
         goto __pyx_L8;
       }
 
-      /* "MACS2/IO/BedGraph.pyx":1158
+      /* "MACS2/IO/BedGraph.pyx":1159
  *                 else:
  *                     # otherwise, add a new region
  *                     c[0].append(endpos)             # <<<<<<<<<<<<<<
@@ -19212,24 +19527,24 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_15bedRegionTrackI_2safe_add_loc(C
  * 
  */
       /*else*/ {
-        __pyx_t_11 = __Pyx_GetItemInt(__pyx_v_c, 0, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 1158, __pyx_L1_error)
+        __pyx_t_11 = __Pyx_GetItemInt(__pyx_v_c, 0, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 1159, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_11);
-        __pyx_t_1 = __Pyx_PyInt_From_int(__pyx_v_endpos); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1158, __pyx_L1_error)
+        __pyx_t_1 = __Pyx_PyInt_From_int(__pyx_v_endpos); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1159, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_1);
-        __pyx_t_13 = __Pyx_PyObject_Append(__pyx_t_11, __pyx_t_1); if (unlikely(__pyx_t_13 == ((int)-1))) __PYX_ERR(0, 1158, __pyx_L1_error)
+        __pyx_t_13 = __Pyx_PyObject_Append(__pyx_t_11, __pyx_t_1); if (unlikely(__pyx_t_13 == ((int)-1))) __PYX_ERR(0, 1159, __pyx_L1_error)
         __Pyx_DECREF(__pyx_t_11); __pyx_t_11 = 0;
         __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-        /* "MACS2/IO/BedGraph.pyx":1159
+        /* "MACS2/IO/BedGraph.pyx":1160
  *                     # otherwise, add a new region
  *                     c[0].append(endpos)
  *                     c[1].append(1)             # <<<<<<<<<<<<<<
  * 
  * 
  */
-        __pyx_t_1 = __Pyx_GetItemInt(__pyx_v_c, 1, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1159, __pyx_L1_error)
+        __pyx_t_1 = __Pyx_GetItemInt(__pyx_v_c, 1, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1160, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_1);
-        __pyx_t_13 = __Pyx_PyObject_Append(__pyx_t_1, __pyx_int_1); if (unlikely(__pyx_t_13 == ((int)-1))) __PYX_ERR(0, 1159, __pyx_L1_error)
+        __pyx_t_13 = __Pyx_PyObject_Append(__pyx_t_1, __pyx_int_1); if (unlikely(__pyx_t_13 == ((int)-1))) __PYX_ERR(0, 1160, __pyx_L1_error)
         __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
       }
       __pyx_L8:;
@@ -19238,7 +19553,7 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_15bedRegionTrackI_2safe_add_loc(C
   }
   __pyx_L5:;
 
-  /* "MACS2/IO/BedGraph.pyx":1109
+  /* "MACS2/IO/BedGraph.pyx":1110
  *         self.baseline_value = 0
  * 
  *     def safe_add_loc (self, bytes chromosome, int startpos, int endpos):             # <<<<<<<<<<<<<<
@@ -19262,6 +19577,7 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_15bedRegionTrackI_2safe_add_loc(C
   __pyx_L0:;
   __Pyx_XDECREF(__pyx_v_c);
   __Pyx_XGIVEREF(__pyx_r);
+  __Pyx_TraceReturn(__pyx_r, 0);
   __Pyx_RefNannyFinishContext();
   return __pyx_r;
 }
@@ -19349,6 +19665,7 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_2__pyx_unpickle_bedGraphTrackI(CY
   PyObject *__pyx_v___pyx_PickleError = 0;
   PyObject *__pyx_v___pyx_result = 0;
   PyObject *__pyx_r = NULL;
+  __Pyx_TraceDeclarations
   __Pyx_RefNannyDeclarations
   int __pyx_t_1;
   PyObject *__pyx_t_2 = NULL;
@@ -19356,7 +19673,9 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_2__pyx_unpickle_bedGraphTrackI(CY
   PyObject *__pyx_t_4 = NULL;
   PyObject *__pyx_t_5 = NULL;
   int __pyx_t_6;
+  __Pyx_TraceFrameInit(__pyx_codeobj__15)
   __Pyx_RefNannySetupContext("__pyx_unpickle_bedGraphTrackI", 0);
+  __Pyx_TraceCall("__pyx_unpickle_bedGraphTrackI", __pyx_f[1], 1, 0, __PYX_ERR(1, 1, __pyx_L1_error));
 
   /* "(tree fragment)":4
  *     cdef object __pyx_PickleError
@@ -19521,6 +19840,7 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_2__pyx_unpickle_bedGraphTrackI(CY
   __Pyx_XDECREF(__pyx_v___pyx_PickleError);
   __Pyx_XDECREF(__pyx_v___pyx_result);
   __Pyx_XGIVEREF(__pyx_r);
+  __Pyx_TraceReturn(__pyx_r, 0);
   __Pyx_RefNannyFinishContext();
   return __pyx_r;
 }
@@ -19535,6 +19855,7 @@ static PyObject *__pyx_pf_5MACS2_2IO_8BedGraph_2__pyx_unpickle_bedGraphTrackI(CY
 
 static PyObject *__pyx_f_5MACS2_2IO_8BedGraph___pyx_unpickle_bedGraphTrackI__set_state(struct __pyx_obj_5MACS2_2IO_8BedGraph_bedGraphTrackI *__pyx_v___pyx_result, PyObject *__pyx_v___pyx_state) {
   PyObject *__pyx_r = NULL;
+  __Pyx_TraceDeclarations
   __Pyx_RefNannyDeclarations
   PyObject *__pyx_t_1 = NULL;
   double __pyx_t_2;
@@ -19546,6 +19867,7 @@ static PyObject *__pyx_f_5MACS2_2IO_8BedGraph___pyx_unpickle_bedGraphTrackI__set
   PyObject *__pyx_t_8 = NULL;
   PyObject *__pyx_t_9 = NULL;
   __Pyx_RefNannySetupContext("__pyx_unpickle_bedGraphTrackI__set_state", 0);
+  __Pyx_TraceCall("__pyx_unpickle_bedGraphTrackI__set_state", __pyx_f[1], 11, 0, __PYX_ERR(1, 11, __pyx_L1_error));
 
   /* "(tree fragment)":12
  *     return __pyx_result
@@ -19679,6 +20001,7 @@ static PyObject *__pyx_f_5MACS2_2IO_8BedGraph___pyx_unpickle_bedGraphTrackI__set
   __pyx_r = 0;
   __pyx_L0:;
   __Pyx_XGIVEREF(__pyx_r);
+  __Pyx_TraceReturn(__pyx_r, 0);
   __Pyx_RefNannyFinishContext();
   return __pyx_r;
 }
@@ -19912,8 +20235,8 @@ static int __pyx_import_star_set(PyObject *o, PyObject* py_name, char *name) {
   static const char* internal_type_names[] = {
     "__pyx_ctuple_Py_ssize_t",
     "__pyx_ctuple_Py_ssize_t_struct",
-    "__pyx_ctuple_d79f5__double__and_long__and_double__and_double__and_double__and_double__etc",
-    "__pyx_ctuple_d79f5__double__and_long__and_double__and_double__and_double__and_double__etc_struct",
+    "__pyx_ctuple_daaec__double__and_long__and_double__and_double__and_double__and_double__etc",
+    "__pyx_ctuple_daaec__double__and_long__and_double__and_double__and_double__and_double__etc_struct",
     "__pyx_ctuple_double",
     "__pyx_ctuple_double_struct",
     "__pyx_ctuple_float",
@@ -20138,7 +20461,7 @@ static __Pyx_StringTabEntry __pyx_string_tab[] = {
   {&__pyx_n_s_StopIteration, __pyx_k_StopIteration, sizeof(__pyx_k_StopIteration), 0, 0, 1, 1},
   {&__pyx_kp_u_Tao_Liu_vladimir_liu_gmail_com, __pyx_k_Tao_Liu_vladimir_liu_gmail_com, sizeof(__pyx_k_Tao_Liu_vladimir_liu_gmail_com), 0, 1, 0, 0},
   {&__pyx_kp_u__11, __pyx_k__11, sizeof(__pyx_k__11), 0, 1, 0, 0},
-  {&__pyx_n_s__12, __pyx_k__12, sizeof(__pyx_k__12), 0, 0, 1, 1},
+  {&__pyx_n_s__16, __pyx_k__16, sizeof(__pyx_k__16), 0, 0, 1, 1},
   {&__pyx_kp_u__2, __pyx_k__2, sizeof(__pyx_k__2), 0, 1, 0, 0},
   {&__pyx_kp_u__3, __pyx_k__3, sizeof(__pyx_k__3), 0, 1, 0, 0},
   {&__pyx_kp_u__4, __pyx_k__4, sizeof(__pyx_k__4), 0, 1, 0, 0},
@@ -20319,19 +20642,19 @@ static __Pyx_StringTabEntry __pyx_string_tab[] = {
   {0, 0, 0, 0, 0, 0, 0}
 };
 static CYTHON_SMALL_CODE int __Pyx_InitCachedBuiltins(void) {
-  __pyx_builtin_range = __Pyx_GetBuiltinName(__pyx_n_s_range); if (!__pyx_builtin_range) __PYX_ERR(0, 254, __pyx_L1_error)
+  __pyx_builtin_range = __Pyx_GetBuiltinName(__pyx_n_s_range); if (!__pyx_builtin_range) __PYX_ERR(0, 255, __pyx_L1_error)
   #if PY_MAJOR_VERSION >= 3
-  __pyx_builtin_xrange = __Pyx_GetBuiltinName(__pyx_n_s_range); if (!__pyx_builtin_xrange) __PYX_ERR(0, 299, __pyx_L1_error)
+  __pyx_builtin_xrange = __Pyx_GetBuiltinName(__pyx_n_s_range); if (!__pyx_builtin_xrange) __PYX_ERR(0, 300, __pyx_L1_error)
   #else
-  __pyx_builtin_xrange = __Pyx_GetBuiltinName(__pyx_n_s_xrange); if (!__pyx_builtin_xrange) __PYX_ERR(0, 299, __pyx_L1_error)
+  __pyx_builtin_xrange = __Pyx_GetBuiltinName(__pyx_n_s_xrange); if (!__pyx_builtin_xrange) __PYX_ERR(0, 300, __pyx_L1_error)
   #endif
-  __pyx_builtin_max = __Pyx_GetBuiltinName(__pyx_n_s_max); if (!__pyx_builtin_max) __PYX_ERR(0, 382, __pyx_L1_error)
-  __pyx_builtin_min = __Pyx_GetBuiltinName(__pyx_n_s_min); if (!__pyx_builtin_min) __PYX_ERR(0, 383, __pyx_L1_error)
-  __pyx_builtin_StopIteration = __Pyx_GetBuiltinName(__pyx_n_s_StopIteration); if (!__pyx_builtin_StopIteration) __PYX_ERR(0, 549, __pyx_L1_error)
-  __pyx_builtin_enumerate = __Pyx_GetBuiltinName(__pyx_n_s_enumerate); if (!__pyx_builtin_enumerate) __PYX_ERR(0, 675, __pyx_L1_error)
-  __pyx_builtin_sum = __Pyx_GetBuiltinName(__pyx_n_s_sum); if (!__pyx_builtin_sum) __PYX_ERR(0, 683, __pyx_L1_error)
-  __pyx_builtin_sorted = __Pyx_GetBuiltinName(__pyx_n_s_sorted); if (!__pyx_builtin_sorted) __PYX_ERR(0, 801, __pyx_L1_error)
-  __pyx_builtin_round = __Pyx_GetBuiltinName(__pyx_n_s_round); if (!__pyx_builtin_round) __PYX_ERR(0, 1014, __pyx_L1_error)
+  __pyx_builtin_max = __Pyx_GetBuiltinName(__pyx_n_s_max); if (!__pyx_builtin_max) __PYX_ERR(0, 383, __pyx_L1_error)
+  __pyx_builtin_min = __Pyx_GetBuiltinName(__pyx_n_s_min); if (!__pyx_builtin_min) __PYX_ERR(0, 384, __pyx_L1_error)
+  __pyx_builtin_StopIteration = __Pyx_GetBuiltinName(__pyx_n_s_StopIteration); if (!__pyx_builtin_StopIteration) __PYX_ERR(0, 550, __pyx_L1_error)
+  __pyx_builtin_enumerate = __Pyx_GetBuiltinName(__pyx_n_s_enumerate); if (!__pyx_builtin_enumerate) __PYX_ERR(0, 676, __pyx_L1_error)
+  __pyx_builtin_sum = __Pyx_GetBuiltinName(__pyx_n_s_sum); if (!__pyx_builtin_sum) __PYX_ERR(0, 684, __pyx_L1_error)
+  __pyx_builtin_sorted = __Pyx_GetBuiltinName(__pyx_n_s_sorted); if (!__pyx_builtin_sorted) __PYX_ERR(0, 802, __pyx_L1_error)
+  __pyx_builtin_round = __Pyx_GetBuiltinName(__pyx_n_s_round); if (!__pyx_builtin_round) __PYX_ERR(0, 1015, __pyx_L1_error)
   return 0;
   __pyx_L1_error:;
   return -1;
@@ -20341,86 +20664,86 @@ static CYTHON_SMALL_CODE int __Pyx_InitCachedConstants(void) {
   __Pyx_RefNannyDeclarations
   __Pyx_RefNannySetupContext("__Pyx_InitCachedConstants", 0);
 
-  /* "MACS2/IO/BedGraph.pyx":682
+  /* "MACS2/IO/BedGraph.pyx":683
  *         elif func == "mean":
  *             #f = np_mean
  *             def f(*args):             # <<<<<<<<<<<<<<
  *                 return sum(args)/nr_tracks
  *         elif func == "fisher":
  */
-  __pyx_tuple__6 = PyTuple_Pack(1, __pyx_n_s_args); if (unlikely(!__pyx_tuple__6)) __PYX_ERR(0, 682, __pyx_L1_error)
+  __pyx_tuple__6 = PyTuple_Pack(1, __pyx_n_s_args); if (unlikely(!__pyx_tuple__6)) __PYX_ERR(0, 683, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_tuple__6);
   __Pyx_GIVEREF(__pyx_tuple__6);
-  __pyx_codeobj__7 = (PyObject*)__Pyx_PyCode_New(0, 0, 1, 0, CO_OPTIMIZED|CO_NEWLOCALS|CO_VARARGS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__6, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_MACS2_IO_BedGraph_pyx, __pyx_n_s_f, 682, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__7)) __PYX_ERR(0, 682, __pyx_L1_error)
+  __pyx_codeobj__7 = (PyObject*)__Pyx_PyCode_New(0, 0, 1, 0, CO_OPTIMIZED|CO_NEWLOCALS|CO_VARARGS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__6, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_MACS2_IO_BedGraph_pyx, __pyx_n_s_f, 683, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__7)) __PYX_ERR(0, 683, __pyx_L1_error)
 
-  /* "MACS2/IO/BedGraph.pyx":686
+  /* "MACS2/IO/BedGraph.pyx":687
  *         elif func == "fisher":
  *             # combine -log10pvalues
  *             def f(*args):             # <<<<<<<<<<<<<<
  *                 # chisq statistics = sum(-log10p)/log10(e)*2, chisq df = 2*number_of_reps
  *                 return chisq_logp_e(2*sum(args)/LOG10_E, 2*nr_tracks, log10=True)
  */
-  __pyx_tuple__8 = PyTuple_Pack(1, __pyx_n_s_args); if (unlikely(!__pyx_tuple__8)) __PYX_ERR(0, 686, __pyx_L1_error)
+  __pyx_tuple__8 = PyTuple_Pack(1, __pyx_n_s_args); if (unlikely(!__pyx_tuple__8)) __PYX_ERR(0, 687, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_tuple__8);
   __Pyx_GIVEREF(__pyx_tuple__8);
-  __pyx_codeobj__9 = (PyObject*)__Pyx_PyCode_New(0, 0, 1, 0, CO_OPTIMIZED|CO_NEWLOCALS|CO_VARARGS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__8, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_MACS2_IO_BedGraph_pyx, __pyx_n_s_f, 686, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__9)) __PYX_ERR(0, 686, __pyx_L1_error)
+  __pyx_codeobj__9 = (PyObject*)__Pyx_PyCode_New(0, 0, 1, 0, CO_OPTIMIZED|CO_NEWLOCALS|CO_VARARGS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__8, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_MACS2_IO_BedGraph_pyx, __pyx_n_s_f, 687, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__9)) __PYX_ERR(0, 687, __pyx_L1_error)
 
-  /* "MACS2/IO/BedGraph.pyx":690
+  /* "MACS2/IO/BedGraph.pyx":691
  *                 return chisq_logp_e(2*sum(args)/LOG10_E, 2*nr_tracks, log10=True)
  *         else:
  *             raise Exception("Invalid function")             # <<<<<<<<<<<<<<
  * 
  *         ret = bedGraphTrackI()
  */
-  __pyx_tuple__10 = PyTuple_Pack(1, __pyx_kp_u_Invalid_function); if (unlikely(!__pyx_tuple__10)) __PYX_ERR(0, 690, __pyx_L1_error)
+  __pyx_tuple__10 = PyTuple_Pack(1, __pyx_kp_u_Invalid_function); if (unlikely(!__pyx_tuple__10)) __PYX_ERR(0, 691, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_tuple__10);
   __Pyx_GIVEREF(__pyx_tuple__10);
 
-  /* "MACS2/IO/BedGraph.pyx":1064
+  /* "MACS2/IO/BedGraph.pyx":1065
  *         return ret
  * 
  * def scoreTracktoBedGraph (scoretrack, str colname):             # <<<<<<<<<<<<<<
  *     """Produce a bedGraphTrackI object with certain column as scores.
  * 
  */
-  __pyx_tuple__13 = PyTuple_Pack(12, __pyx_n_s_scoretrack, __pyx_n_s_colname, __pyx_n_s_pre, __pyx_n_s_i, __pyx_n_s_chrom, __pyx_n_s_chrs, __pyx_n_s_bdgtrack, __pyx_n_s_flag100, __pyx_n_s_d, __pyx_n_s_l, __pyx_n_s_pos, __pyx_n_s_value); if (unlikely(!__pyx_tuple__13)) __PYX_ERR(0, 1064, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_tuple__13);
-  __Pyx_GIVEREF(__pyx_tuple__13);
-  __pyx_codeobj__14 = (PyObject*)__Pyx_PyCode_New(2, 0, 12, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__13, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_MACS2_IO_BedGraph_pyx, __pyx_n_s_scoreTracktoBedGraph, 1064, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__14)) __PYX_ERR(0, 1064, __pyx_L1_error)
+  __pyx_tuple__17 = PyTuple_Pack(12, __pyx_n_s_scoretrack, __pyx_n_s_colname, __pyx_n_s_pre, __pyx_n_s_i, __pyx_n_s_chrom, __pyx_n_s_chrs, __pyx_n_s_bdgtrack, __pyx_n_s_flag100, __pyx_n_s_d, __pyx_n_s_l, __pyx_n_s_pos, __pyx_n_s_value); if (unlikely(!__pyx_tuple__17)) __PYX_ERR(0, 1065, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_tuple__17);
+  __Pyx_GIVEREF(__pyx_tuple__17);
+  __pyx_codeobj__12 = (PyObject*)__Pyx_PyCode_New(2, 0, 12, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__17, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_MACS2_IO_BedGraph_pyx, __pyx_n_s_scoreTracktoBedGraph, 1065, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__12)) __PYX_ERR(0, 1065, __pyx_L1_error)
 
-  /* "MACS2/IO/BedGraph.pyx":1103
+  /* "MACS2/IO/BedGraph.pyx":1104
  * 
  *     """
  *     def __init__ (self):             # <<<<<<<<<<<<<<
  *         self.__data = {}
  *         self.maxvalue = 1
  */
-  __pyx_tuple__15 = PyTuple_Pack(1, __pyx_n_s_self); if (unlikely(!__pyx_tuple__15)) __PYX_ERR(0, 1103, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_tuple__15);
-  __Pyx_GIVEREF(__pyx_tuple__15);
-  __pyx_codeobj__16 = (PyObject*)__Pyx_PyCode_New(1, 0, 1, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__15, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_MACS2_IO_BedGraph_pyx, __pyx_n_s_init, 1103, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__16)) __PYX_ERR(0, 1103, __pyx_L1_error)
+  __pyx_tuple__18 = PyTuple_Pack(1, __pyx_n_s_self); if (unlikely(!__pyx_tuple__18)) __PYX_ERR(0, 1104, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_tuple__18);
+  __Pyx_GIVEREF(__pyx_tuple__18);
+  __pyx_codeobj__13 = (PyObject*)__Pyx_PyCode_New(1, 0, 1, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__18, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_MACS2_IO_BedGraph_pyx, __pyx_n_s_init, 1104, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__13)) __PYX_ERR(0, 1104, __pyx_L1_error)
 
-  /* "MACS2/IO/BedGraph.pyx":1109
+  /* "MACS2/IO/BedGraph.pyx":1110
  *         self.baseline_value = 0
  * 
  *     def safe_add_loc (self, bytes chromosome, int startpos, int endpos):             # <<<<<<<<<<<<<<
  *         """Add a chr-start-end-value block into __data dictionary.
  * 
  */
-  __pyx_tuple__17 = PyTuple_Pack(7, __pyx_n_s_self, __pyx_n_s_chromosome, __pyx_n_s_startpos, __pyx_n_s_endpos, __pyx_n_s_pre_pos, __pyx_n_s_pre_v, __pyx_n_s_c); if (unlikely(!__pyx_tuple__17)) __PYX_ERR(0, 1109, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_tuple__17);
-  __Pyx_GIVEREF(__pyx_tuple__17);
-  __pyx_codeobj__18 = (PyObject*)__Pyx_PyCode_New(4, 0, 7, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__17, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_MACS2_IO_BedGraph_pyx, __pyx_n_s_safe_add_loc, 1109, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__18)) __PYX_ERR(0, 1109, __pyx_L1_error)
+  __pyx_tuple__19 = PyTuple_Pack(7, __pyx_n_s_self, __pyx_n_s_chromosome, __pyx_n_s_startpos, __pyx_n_s_endpos, __pyx_n_s_pre_pos, __pyx_n_s_pre_v, __pyx_n_s_c); if (unlikely(!__pyx_tuple__19)) __PYX_ERR(0, 1110, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_tuple__19);
+  __Pyx_GIVEREF(__pyx_tuple__19);
+  __pyx_codeobj__14 = (PyObject*)__Pyx_PyCode_New(4, 0, 7, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__19, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_MACS2_IO_BedGraph_pyx, __pyx_n_s_safe_add_loc, 1110, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__14)) __PYX_ERR(0, 1110, __pyx_L1_error)
 
   /* "(tree fragment)":1
  * def __pyx_unpickle_bedGraphTrackI(__pyx_type, long __pyx_checksum, __pyx_state):             # <<<<<<<<<<<<<<
  *     cdef object __pyx_PickleError
  *     cdef object __pyx_result
  */
-  __pyx_tuple__19 = PyTuple_Pack(5, __pyx_n_s_pyx_type, __pyx_n_s_pyx_checksum, __pyx_n_s_pyx_state, __pyx_n_s_pyx_PickleError, __pyx_n_s_pyx_result); if (unlikely(!__pyx_tuple__19)) __PYX_ERR(1, 1, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_tuple__19);
-  __Pyx_GIVEREF(__pyx_tuple__19);
-  __pyx_codeobj__20 = (PyObject*)__Pyx_PyCode_New(3, 0, 5, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__19, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_stringsource, __pyx_n_s_pyx_unpickle_bedGraphTrackI, 1, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__20)) __PYX_ERR(1, 1, __pyx_L1_error)
+  __pyx_tuple__20 = PyTuple_Pack(5, __pyx_n_s_pyx_type, __pyx_n_s_pyx_checksum, __pyx_n_s_pyx_state, __pyx_n_s_pyx_PickleError, __pyx_n_s_pyx_result); if (unlikely(!__pyx_tuple__20)) __PYX_ERR(1, 1, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_tuple__20);
+  __Pyx_GIVEREF(__pyx_tuple__20);
+  __pyx_codeobj__15 = (PyObject*)__Pyx_PyCode_New(3, 0, 5, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__20, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_stringsource, __pyx_n_s_pyx_unpickle_bedGraphTrackI, 1, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__15)) __PYX_ERR(1, 1, __pyx_L1_error)
   __Pyx_RefNannyFinishContext();
   return 0;
   __pyx_L1_error:;
@@ -20488,7 +20811,7 @@ static int __Pyx_modinit_type_init_code(void) {
   __pyx_vtable_5MACS2_2IO_8BedGraph_bedGraphTrackI.add_loc = (PyObject *(*)(struct __pyx_obj_5MACS2_2IO_8BedGraph_bedGraphTrackI *, PyObject *, int, int, float, int __pyx_skip_dispatch))__pyx_f_5MACS2_2IO_8BedGraph_14bedGraphTrackI_add_loc;
   __pyx_vtable_5MACS2_2IO_8BedGraph_bedGraphTrackI.get_chr_names = (PyObject *(*)(struct __pyx_obj_5MACS2_2IO_8BedGraph_bedGraphTrackI *, int __pyx_skip_dispatch))__pyx_f_5MACS2_2IO_8BedGraph_14bedGraphTrackI_get_chr_names;
   __pyx_vtable_5MACS2_2IO_8BedGraph_bedGraphTrackI.cutoff_analysis = (PyObject *(*)(struct __pyx_obj_5MACS2_2IO_8BedGraph_bedGraphTrackI *, int, int, int __pyx_skip_dispatch, struct __pyx_opt_args_5MACS2_2IO_8BedGraph_14bedGraphTrackI_cutoff_analysis *__pyx_optional_args))__pyx_f_5MACS2_2IO_8BedGraph_14bedGraphTrackI_cutoff_analysis;
-  if (PyType_Ready(&__pyx_type_5MACS2_2IO_8BedGraph_bedGraphTrackI) < 0) __PYX_ERR(0, 52, __pyx_L1_error)
+  if (PyType_Ready(&__pyx_type_5MACS2_2IO_8BedGraph_bedGraphTrackI) < 0) __PYX_ERR(0, 53, __pyx_L1_error)
   #if PY_VERSION_HEX < 0x030800B1
   __pyx_type_5MACS2_2IO_8BedGraph_bedGraphTrackI.tp_print = 0;
   #endif
@@ -20497,7 +20820,7 @@ static int __Pyx_modinit_type_init_code(void) {
   }
   #if CYTHON_COMPILING_IN_CPYTHON
   {
-    PyObject *wrapper = PyObject_GetAttrString((PyObject *)&__pyx_type_5MACS2_2IO_8BedGraph_bedGraphTrackI, "__init__"); if (unlikely(!wrapper)) __PYX_ERR(0, 52, __pyx_L1_error)
+    PyObject *wrapper = PyObject_GetAttrString((PyObject *)&__pyx_type_5MACS2_2IO_8BedGraph_bedGraphTrackI, "__init__"); if (unlikely(!wrapper)) __PYX_ERR(0, 53, __pyx_L1_error)
     if (Py_TYPE(wrapper) == &PyWrapperDescr_Type) {
       __pyx_wrapperbase_5MACS2_2IO_8BedGraph_14bedGraphTrackI___init__ = *((PyWrapperDescrObject *)wrapper)->d_base;
       __pyx_wrapperbase_5MACS2_2IO_8BedGraph_14bedGraphTrackI___init__.doc = __pyx_doc_5MACS2_2IO_8BedGraph_14bedGraphTrackI___init__;
@@ -20505,11 +20828,11 @@ static int __Pyx_modinit_type_init_code(void) {
     }
   }
   #endif
-  if (__Pyx_SetVtable(__pyx_type_5MACS2_2IO_8BedGraph_bedGraphTrackI.tp_dict, __pyx_vtabptr_5MACS2_2IO_8BedGraph_bedGraphTrackI) < 0) __PYX_ERR(0, 52, __pyx_L1_error)
-  if (PyObject_SetAttr(__pyx_m, __pyx_n_s_bedGraphTrackI, (PyObject *)&__pyx_type_5MACS2_2IO_8BedGraph_bedGraphTrackI) < 0) __PYX_ERR(0, 52, __pyx_L1_error)
-  if (__Pyx_setup_reduce((PyObject*)&__pyx_type_5MACS2_2IO_8BedGraph_bedGraphTrackI) < 0) __PYX_ERR(0, 52, __pyx_L1_error)
+  if (__Pyx_SetVtable(__pyx_type_5MACS2_2IO_8BedGraph_bedGraphTrackI.tp_dict, __pyx_vtabptr_5MACS2_2IO_8BedGraph_bedGraphTrackI) < 0) __PYX_ERR(0, 53, __pyx_L1_error)
+  if (PyObject_SetAttr(__pyx_m, __pyx_n_s_bedGraphTrackI, (PyObject *)&__pyx_type_5MACS2_2IO_8BedGraph_bedGraphTrackI) < 0) __PYX_ERR(0, 53, __pyx_L1_error)
+  if (__Pyx_setup_reduce((PyObject*)&__pyx_type_5MACS2_2IO_8BedGraph_bedGraphTrackI) < 0) __PYX_ERR(0, 53, __pyx_L1_error)
   __pyx_ptype_5MACS2_2IO_8BedGraph_bedGraphTrackI = &__pyx_type_5MACS2_2IO_8BedGraph_bedGraphTrackI;
-  if (PyType_Ready(&__pyx_type_5MACS2_2IO_8BedGraph___pyx_scope_struct__overlie) < 0) __PYX_ERR(0, 636, __pyx_L1_error)
+  if (PyType_Ready(&__pyx_type_5MACS2_2IO_8BedGraph___pyx_scope_struct__overlie) < 0) __PYX_ERR(0, 637, __pyx_L1_error)
   #if PY_VERSION_HEX < 0x030800B1
   __pyx_type_5MACS2_2IO_8BedGraph___pyx_scope_struct__overlie.tp_print = 0;
   #endif
@@ -20666,6 +20989,7 @@ static CYTHON_SMALL_CODE int __pyx_pymod_exec_BedGraph(PyObject *__pyx_pyinit_mo
 #endif
 #endif
 {
+  __Pyx_TraceDeclarations
   PyObject *__pyx_t_1 = NULL;
   PyObject *__pyx_t_2 = NULL;
   PyObject *__pyx_t_3 = NULL;
@@ -20773,78 +21097,79 @@ if (!__Pyx_RefNanny) {
   #if defined(__Pyx_Generator_USED) || defined(__Pyx_Coroutine_USED)
   if (__Pyx_patch_abc() < 0) __PYX_ERR(0, 1, __pyx_L1_error)
   #endif
+  __Pyx_TraceCall("__Pyx_PyMODINIT_FUNC PyInit_BedGraph(void)", __pyx_f[0], 1, 0, __PYX_ERR(0, 1, __pyx_L1_error));
 
-  /* "MACS2/IO/BedGraph.pyx":14
+  /* "MACS2/IO/BedGraph.pyx":15
  * # python modules
  * # ------------------------------------
  * import logging             # <<<<<<<<<<<<<<
  * 
  * from array import array
  */
-  __pyx_t_1 = __Pyx_Import(__pyx_n_s_logging, 0, 0); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 14, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_Import(__pyx_n_s_logging, 0, 0); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 15, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  if (PyDict_SetItem(__pyx_d, __pyx_n_s_logging, __pyx_t_1) < 0) __PYX_ERR(0, 14, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_d, __pyx_n_s_logging, __pyx_t_1) < 0) __PYX_ERR(0, 15, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-  /* "MACS2/IO/BedGraph.pyx":16
+  /* "MACS2/IO/BedGraph.pyx":17
  * import logging
  * 
  * from array import array             # <<<<<<<<<<<<<<
  * 
  * import numpy as np
  */
-  __pyx_t_1 = PyList_New(1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 16, __pyx_L1_error)
+  __pyx_t_1 = PyList_New(1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 17, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __Pyx_INCREF(__pyx_n_s_array);
   __Pyx_GIVEREF(__pyx_n_s_array);
   PyList_SET_ITEM(__pyx_t_1, 0, __pyx_n_s_array);
-  __pyx_t_2 = __Pyx_Import(__pyx_n_s_array, __pyx_t_1, 0); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 16, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_Import(__pyx_n_s_array, __pyx_t_1, 0); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 17, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-  __pyx_t_1 = __Pyx_ImportFrom(__pyx_t_2, __pyx_n_s_array); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 16, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_ImportFrom(__pyx_t_2, __pyx_n_s_array); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 17, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  if (PyDict_SetItem(__pyx_d, __pyx_n_s_array, __pyx_t_1) < 0) __PYX_ERR(0, 16, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_d, __pyx_n_s_array, __pyx_t_1) < 0) __PYX_ERR(0, 17, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
-  /* "MACS2/IO/BedGraph.pyx":18
+  /* "MACS2/IO/BedGraph.pyx":19
  * from array import array
  * 
  * import numpy as np             # <<<<<<<<<<<<<<
  * 
  * from libc.math cimport sqrt
  */
-  __pyx_t_2 = __Pyx_Import(__pyx_n_s_numpy, 0, 0); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 18, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_Import(__pyx_n_s_numpy, 0, 0); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 19, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
-  if (PyDict_SetItem(__pyx_d, __pyx_n_s_np, __pyx_t_2) < 0) __PYX_ERR(0, 18, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_d, __pyx_n_s_np, __pyx_t_2) < 0) __PYX_ERR(0, 19, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
-  /* "MACS2/IO/BedGraph.pyx":24
+  /* "MACS2/IO/BedGraph.pyx":25
  * from cpython cimport bool
  * 
  * from MACS2.Constants import *             # <<<<<<<<<<<<<<
  * from MACS2.IO.ScoreTrack import scoreTrackII,CombinedTwoTrack
  * from MACS2.IO.PeakIO import PeakIO, BroadPeakIO
  */
-  __pyx_t_2 = PyList_New(1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 24, __pyx_L1_error)
+  __pyx_t_2 = PyList_New(1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 25, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
-  __Pyx_INCREF(__pyx_n_s__12);
-  __Pyx_GIVEREF(__pyx_n_s__12);
-  PyList_SET_ITEM(__pyx_t_2, 0, __pyx_n_s__12);
-  __pyx_t_1 = __Pyx_Import(__pyx_n_s_MACS2_Constants, __pyx_t_2, 0); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 24, __pyx_L1_error)
+  __Pyx_INCREF(__pyx_n_s__16);
+  __Pyx_GIVEREF(__pyx_n_s__16);
+  PyList_SET_ITEM(__pyx_t_2, 0, __pyx_n_s__16);
+  __pyx_t_1 = __Pyx_Import(__pyx_n_s_MACS2_Constants, __pyx_t_2, 0); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 25, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-  if (__pyx_import_star(__pyx_t_1) < 0) __PYX_ERR(0, 24, __pyx_L1_error);
+  if (__pyx_import_star(__pyx_t_1) < 0) __PYX_ERR(0, 25, __pyx_L1_error);
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-  /* "MACS2/IO/BedGraph.pyx":25
+  /* "MACS2/IO/BedGraph.pyx":26
  * 
  * from MACS2.Constants import *
  * from MACS2.IO.ScoreTrack import scoreTrackII,CombinedTwoTrack             # <<<<<<<<<<<<<<
  * from MACS2.IO.PeakIO import PeakIO, BroadPeakIO
  * from MACS2.Prob import chisq_logp_e
  */
-  __pyx_t_1 = PyList_New(2); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 25, __pyx_L1_error)
+  __pyx_t_1 = PyList_New(2); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 26, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __Pyx_INCREF(__pyx_n_s_scoreTrackII);
   __Pyx_GIVEREF(__pyx_n_s_scoreTrackII);
@@ -20852,27 +21177,27 @@ if (!__Pyx_RefNanny) {
   __Pyx_INCREF(__pyx_n_s_CombinedTwoTrack);
   __Pyx_GIVEREF(__pyx_n_s_CombinedTwoTrack);
   PyList_SET_ITEM(__pyx_t_1, 1, __pyx_n_s_CombinedTwoTrack);
-  __pyx_t_2 = __Pyx_Import(__pyx_n_s_MACS2_IO_ScoreTrack, __pyx_t_1, 0); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 25, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_Import(__pyx_n_s_MACS2_IO_ScoreTrack, __pyx_t_1, 0); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 26, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-  __pyx_t_1 = __Pyx_ImportFrom(__pyx_t_2, __pyx_n_s_scoreTrackII); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 25, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_ImportFrom(__pyx_t_2, __pyx_n_s_scoreTrackII); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 26, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  if (PyDict_SetItem(__pyx_d, __pyx_n_s_scoreTrackII, __pyx_t_1) < 0) __PYX_ERR(0, 25, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_d, __pyx_n_s_scoreTrackII, __pyx_t_1) < 0) __PYX_ERR(0, 26, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-  __pyx_t_1 = __Pyx_ImportFrom(__pyx_t_2, __pyx_n_s_CombinedTwoTrack); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 25, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_ImportFrom(__pyx_t_2, __pyx_n_s_CombinedTwoTrack); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 26, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  if (PyDict_SetItem(__pyx_d, __pyx_n_s_CombinedTwoTrack, __pyx_t_1) < 0) __PYX_ERR(0, 25, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_d, __pyx_n_s_CombinedTwoTrack, __pyx_t_1) < 0) __PYX_ERR(0, 26, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
-  /* "MACS2/IO/BedGraph.pyx":26
+  /* "MACS2/IO/BedGraph.pyx":27
  * from MACS2.Constants import *
  * from MACS2.IO.ScoreTrack import scoreTrackII,CombinedTwoTrack
  * from MACS2.IO.PeakIO import PeakIO, BroadPeakIO             # <<<<<<<<<<<<<<
  * from MACS2.Prob import chisq_logp_e
  * 
  */
-  __pyx_t_2 = PyList_New(2); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 26, __pyx_L1_error)
+  __pyx_t_2 = PyList_New(2); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 27, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __Pyx_INCREF(__pyx_n_s_PeakIO);
   __Pyx_GIVEREF(__pyx_n_s_PeakIO);
@@ -20880,139 +21205,139 @@ if (!__Pyx_RefNanny) {
   __Pyx_INCREF(__pyx_n_s_BroadPeakIO);
   __Pyx_GIVEREF(__pyx_n_s_BroadPeakIO);
   PyList_SET_ITEM(__pyx_t_2, 1, __pyx_n_s_BroadPeakIO);
-  __pyx_t_1 = __Pyx_Import(__pyx_n_s_MACS2_IO_PeakIO, __pyx_t_2, 0); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 26, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_Import(__pyx_n_s_MACS2_IO_PeakIO, __pyx_t_2, 0); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 27, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-  __pyx_t_2 = __Pyx_ImportFrom(__pyx_t_1, __pyx_n_s_PeakIO); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 26, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_ImportFrom(__pyx_t_1, __pyx_n_s_PeakIO); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 27, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
-  if (PyDict_SetItem(__pyx_d, __pyx_n_s_PeakIO, __pyx_t_2) < 0) __PYX_ERR(0, 26, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_d, __pyx_n_s_PeakIO, __pyx_t_2) < 0) __PYX_ERR(0, 27, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-  __pyx_t_2 = __Pyx_ImportFrom(__pyx_t_1, __pyx_n_s_BroadPeakIO); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 26, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_ImportFrom(__pyx_t_1, __pyx_n_s_BroadPeakIO); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 27, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
-  if (PyDict_SetItem(__pyx_d, __pyx_n_s_BroadPeakIO, __pyx_t_2) < 0) __PYX_ERR(0, 26, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_d, __pyx_n_s_BroadPeakIO, __pyx_t_2) < 0) __PYX_ERR(0, 27, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-  /* "MACS2/IO/BedGraph.pyx":27
+  /* "MACS2/IO/BedGraph.pyx":28
  * from MACS2.IO.ScoreTrack import scoreTrackII,CombinedTwoTrack
  * from MACS2.IO.PeakIO import PeakIO, BroadPeakIO
  * from MACS2.Prob import chisq_logp_e             # <<<<<<<<<<<<<<
  * 
  * # ------------------------------------
  */
-  __pyx_t_1 = PyList_New(1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 27, __pyx_L1_error)
+  __pyx_t_1 = PyList_New(1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 28, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __Pyx_INCREF(__pyx_n_s_chisq_logp_e);
   __Pyx_GIVEREF(__pyx_n_s_chisq_logp_e);
   PyList_SET_ITEM(__pyx_t_1, 0, __pyx_n_s_chisq_logp_e);
-  __pyx_t_2 = __Pyx_Import(__pyx_n_s_MACS2_Prob, __pyx_t_1, 0); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 27, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_Import(__pyx_n_s_MACS2_Prob, __pyx_t_1, 0); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 28, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-  __pyx_t_1 = __Pyx_ImportFrom(__pyx_t_2, __pyx_n_s_chisq_logp_e); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 27, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_ImportFrom(__pyx_t_2, __pyx_n_s_chisq_logp_e); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 28, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  if (PyDict_SetItem(__pyx_d, __pyx_n_s_chisq_logp_e, __pyx_t_1) < 0) __PYX_ERR(0, 27, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_d, __pyx_n_s_chisq_logp_e, __pyx_t_1) < 0) __PYX_ERR(0, 28, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
-  /* "MACS2/IO/BedGraph.pyx":32
+  /* "MACS2/IO/BedGraph.pyx":33
  * # constants
  * # ------------------------------------
  * __version__ = "BedGraph $Revision$"             # <<<<<<<<<<<<<<
  * __author__ = "Tao Liu <vladimir.liu@gmail.com>"
  * __doc__ = "bedGraphTrackI class"
  */
-  if (PyDict_SetItem(__pyx_d, __pyx_n_s_version, __pyx_kp_u_BedGraph_Revision) < 0) __PYX_ERR(0, 32, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_d, __pyx_n_s_version, __pyx_kp_u_BedGraph_Revision) < 0) __PYX_ERR(0, 33, __pyx_L1_error)
 
-  /* "MACS2/IO/BedGraph.pyx":33
+  /* "MACS2/IO/BedGraph.pyx":34
  * # ------------------------------------
  * __version__ = "BedGraph $Revision$"
  * __author__ = "Tao Liu <vladimir.liu@gmail.com>"             # <<<<<<<<<<<<<<
  * __doc__ = "bedGraphTrackI class"
  * 
  */
-  if (PyDict_SetItem(__pyx_d, __pyx_n_s_author, __pyx_kp_u_Tao_Liu_vladimir_liu_gmail_com) < 0) __PYX_ERR(0, 33, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_d, __pyx_n_s_author, __pyx_kp_u_Tao_Liu_vladimir_liu_gmail_com) < 0) __PYX_ERR(0, 34, __pyx_L1_error)
 
-  /* "MACS2/IO/BedGraph.pyx":34
+  /* "MACS2/IO/BedGraph.pyx":35
  * __version__ = "BedGraph $Revision$"
  * __author__ = "Tao Liu <vladimir.liu@gmail.com>"
  * __doc__ = "bedGraphTrackI class"             # <<<<<<<<<<<<<<
  * 
  * # ------------------------------------
  */
-  if (PyDict_SetItem(__pyx_d, __pyx_n_s_doc, __pyx_kp_u_bedGraphTrackI_class) < 0) __PYX_ERR(0, 34, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_d, __pyx_n_s_doc, __pyx_kp_u_bedGraphTrackI_class) < 0) __PYX_ERR(0, 35, __pyx_L1_error)
 
-  /* "MACS2/IO/BedGraph.pyx":39
+  /* "MACS2/IO/BedGraph.pyx":40
  * # Misc functions
  * # ------------------------------------
  * LOG10_E = 0.43429448190325176             # <<<<<<<<<<<<<<
  * 
  * from libc.math cimport log1p, exp, log10
  */
-  if (PyDict_SetItem(__pyx_d, __pyx_n_s_LOG10_E, __pyx_float_0_43429448190325176) < 0) __PYX_ERR(0, 39, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_d, __pyx_n_s_LOG10_E, __pyx_float_0_43429448190325176) < 0) __PYX_ERR(0, 40, __pyx_L1_error)
 
-  /* "MACS2/IO/BedGraph.pyx":1064
+  /* "MACS2/IO/BedGraph.pyx":1065
  *         return ret
  * 
  * def scoreTracktoBedGraph (scoretrack, str colname):             # <<<<<<<<<<<<<<
  *     """Produce a bedGraphTrackI object with certain column as scores.
  * 
  */
-  __pyx_t_2 = PyCFunction_NewEx(&__pyx_mdef_5MACS2_2IO_8BedGraph_1scoreTracktoBedGraph, NULL, __pyx_n_s_MACS2_IO_BedGraph); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1064, __pyx_L1_error)
+  __pyx_t_2 = PyCFunction_NewEx(&__pyx_mdef_5MACS2_2IO_8BedGraph_1scoreTracktoBedGraph, NULL, __pyx_n_s_MACS2_IO_BedGraph); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1065, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
-  if (PyDict_SetItem(__pyx_d, __pyx_n_s_scoreTracktoBedGraph, __pyx_t_2) < 0) __PYX_ERR(0, 1064, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_d, __pyx_n_s_scoreTracktoBedGraph, __pyx_t_2) < 0) __PYX_ERR(0, 1065, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
-  /* "MACS2/IO/BedGraph.pyx":1098
+  /* "MACS2/IO/BedGraph.pyx":1099
  *     return bdgtrack
  * 
  * class bedRegionTrackI (bedGraphTrackI):             # <<<<<<<<<<<<<<
  *     """A similar class to bedGraphTrackI, but is designed to save
  *     traditional 3-fields BED format data.
  */
-  __pyx_t_2 = PyTuple_New(1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1098, __pyx_L1_error)
+  __pyx_t_2 = PyTuple_New(1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1099, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __Pyx_INCREF(((PyObject *)__pyx_ptype_5MACS2_2IO_8BedGraph_bedGraphTrackI));
   __Pyx_GIVEREF(((PyObject *)__pyx_ptype_5MACS2_2IO_8BedGraph_bedGraphTrackI));
   PyTuple_SET_ITEM(__pyx_t_2, 0, ((PyObject *)__pyx_ptype_5MACS2_2IO_8BedGraph_bedGraphTrackI));
-  __pyx_t_1 = __Pyx_CalculateMetaclass(NULL, __pyx_t_2); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1098, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_CalculateMetaclass(NULL, __pyx_t_2); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1099, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_3 = __Pyx_Py3MetaclassPrepare(__pyx_t_1, __pyx_t_2, __pyx_n_s_bedRegionTrackI, __pyx_n_s_bedRegionTrackI, (PyObject *) NULL, __pyx_n_s_MACS2_IO_BedGraph, __pyx_kp_s_A_similar_class_to_bedGraphTrack); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 1098, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_Py3MetaclassPrepare(__pyx_t_1, __pyx_t_2, __pyx_n_s_bedRegionTrackI, __pyx_n_s_bedRegionTrackI, (PyObject *) NULL, __pyx_n_s_MACS2_IO_BedGraph, __pyx_kp_s_A_similar_class_to_bedGraphTrack); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 1099, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
 
-  /* "MACS2/IO/BedGraph.pyx":1103
+  /* "MACS2/IO/BedGraph.pyx":1104
  * 
  *     """
  *     def __init__ (self):             # <<<<<<<<<<<<<<
  *         self.__data = {}
  *         self.maxvalue = 1
  */
-  __pyx_t_4 = __Pyx_CyFunction_NewEx(&__pyx_mdef_5MACS2_2IO_8BedGraph_15bedRegionTrackI_1__init__, 0, __pyx_n_s_bedRegionTrackI___init, NULL, __pyx_n_s_MACS2_IO_BedGraph, __pyx_d, ((PyObject *)__pyx_codeobj__16)); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 1103, __pyx_L1_error)
+  __pyx_t_4 = __Pyx_CyFunction_NewEx(&__pyx_mdef_5MACS2_2IO_8BedGraph_15bedRegionTrackI_1__init__, 0, __pyx_n_s_bedRegionTrackI___init, NULL, __pyx_n_s_MACS2_IO_BedGraph, __pyx_d, ((PyObject *)__pyx_codeobj__13)); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 1104, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_4);
-  if (__Pyx_SetNameInClass(__pyx_t_3, __pyx_n_s_init, __pyx_t_4) < 0) __PYX_ERR(0, 1103, __pyx_L1_error)
+  if (__Pyx_SetNameInClass(__pyx_t_3, __pyx_n_s_init, __pyx_t_4) < 0) __PYX_ERR(0, 1104, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
 
-  /* "MACS2/IO/BedGraph.pyx":1109
+  /* "MACS2/IO/BedGraph.pyx":1110
  *         self.baseline_value = 0
  * 
  *     def safe_add_loc (self, bytes chromosome, int startpos, int endpos):             # <<<<<<<<<<<<<<
  *         """Add a chr-start-end-value block into __data dictionary.
  * 
  */
-  __pyx_t_4 = __Pyx_CyFunction_NewEx(&__pyx_mdef_5MACS2_2IO_8BedGraph_15bedRegionTrackI_3safe_add_loc, 0, __pyx_n_s_bedRegionTrackI_safe_add_loc, NULL, __pyx_n_s_MACS2_IO_BedGraph, __pyx_d, ((PyObject *)__pyx_codeobj__18)); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 1109, __pyx_L1_error)
+  __pyx_t_4 = __Pyx_CyFunction_NewEx(&__pyx_mdef_5MACS2_2IO_8BedGraph_15bedRegionTrackI_3safe_add_loc, 0, __pyx_n_s_bedRegionTrackI_safe_add_loc, NULL, __pyx_n_s_MACS2_IO_BedGraph, __pyx_d, ((PyObject *)__pyx_codeobj__14)); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 1110, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_4);
-  if (__Pyx_SetNameInClass(__pyx_t_3, __pyx_n_s_safe_add_loc, __pyx_t_4) < 0) __PYX_ERR(0, 1109, __pyx_L1_error)
+  if (__Pyx_SetNameInClass(__pyx_t_3, __pyx_n_s_safe_add_loc, __pyx_t_4) < 0) __PYX_ERR(0, 1110, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
 
-  /* "MACS2/IO/BedGraph.pyx":1098
+  /* "MACS2/IO/BedGraph.pyx":1099
  *     return bdgtrack
  * 
  * class bedRegionTrackI (bedGraphTrackI):             # <<<<<<<<<<<<<<
  *     """A similar class to bedGraphTrackI, but is designed to save
  *     traditional 3-fields BED format data.
  */
-  __pyx_t_4 = __Pyx_Py3ClassCreate(__pyx_t_1, __pyx_n_s_bedRegionTrackI, __pyx_t_2, __pyx_t_3, NULL, 0, 0); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 1098, __pyx_L1_error)
+  __pyx_t_4 = __Pyx_Py3ClassCreate(__pyx_t_1, __pyx_n_s_bedRegionTrackI, __pyx_t_2, __pyx_t_3, NULL, 0, 0); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 1099, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_4);
-  if (PyDict_SetItem(__pyx_d, __pyx_n_s_bedRegionTrackI, __pyx_t_4) < 0) __PYX_ERR(0, 1098, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_d, __pyx_n_s_bedRegionTrackI, __pyx_t_4) < 0) __PYX_ERR(0, 1099, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
@@ -21030,13 +21355,14 @@ if (!__Pyx_RefNanny) {
 
   /* "MACS2/IO/BedGraph.pyx":1
  * # cython: language_level=3             # <<<<<<<<<<<<<<
- * # Time-stamp: <2019-10-30 12:12:53 taoliu>
- * 
+ * # cython: profile=True
+ * # Time-stamp: <2019-10-30 17:48:55 taoliu>
  */
   __pyx_t_2 = __Pyx_PyDict_NewPresized(0); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   if (PyDict_SetItem(__pyx_d, __pyx_n_s_test, __pyx_t_2) < 0) __PYX_ERR(0, 1, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
+  __Pyx_TraceReturn(Py_None, 0);
 
   /*--- Wrapped vars code ---*/
 
@@ -21111,6 +21437,123 @@ static PyObject *__Pyx_GetBuiltinName(PyObject *name) {
     return result;
 }
 
+/* PyErrFetchRestore */
+#if CYTHON_FAST_THREAD_STATE
+static CYTHON_INLINE void __Pyx_ErrRestoreInState(PyThreadState *tstate, PyObject *type, PyObject *value, PyObject *tb) {
+    PyObject *tmp_type, *tmp_value, *tmp_tb;
+    tmp_type = tstate->curexc_type;
+    tmp_value = tstate->curexc_value;
+    tmp_tb = tstate->curexc_traceback;
+    tstate->curexc_type = type;
+    tstate->curexc_value = value;
+    tstate->curexc_traceback = tb;
+    Py_XDECREF(tmp_type);
+    Py_XDECREF(tmp_value);
+    Py_XDECREF(tmp_tb);
+}
+static CYTHON_INLINE void __Pyx_ErrFetchInState(PyThreadState *tstate, PyObject **type, PyObject **value, PyObject **tb) {
+    *type = tstate->curexc_type;
+    *value = tstate->curexc_value;
+    *tb = tstate->curexc_traceback;
+    tstate->curexc_type = 0;
+    tstate->curexc_value = 0;
+    tstate->curexc_traceback = 0;
+}
+#endif
+
+/* Profile */
+#if CYTHON_PROFILE
+static int __Pyx_TraceSetupAndCall(PyCodeObject** code,
+                                   PyFrameObject** frame,
+                                   PyThreadState* tstate,
+                                   const char *funcname,
+                                   const char *srcfile,
+                                   int firstlineno) {
+    PyObject *type, *value, *traceback;
+    int retval;
+    if (*frame == NULL || !CYTHON_PROFILE_REUSE_FRAME) {
+        if (*code == NULL) {
+            *code = __Pyx_createFrameCodeObject(funcname, srcfile, firstlineno);
+            if (*code == NULL) return 0;
+        }
+        *frame = PyFrame_New(
+            tstate,                          /*PyThreadState *tstate*/
+            *code,                           /*PyCodeObject *code*/
+            __pyx_d,                  /*PyObject *globals*/
+            0                                /*PyObject *locals*/
+        );
+        if (*frame == NULL) return 0;
+        if (CYTHON_TRACE && (*frame)->f_trace == NULL) {
+            Py_INCREF(Py_None);
+            (*frame)->f_trace = Py_None;
+        }
+#if PY_VERSION_HEX < 0x030400B1
+    } else {
+        (*frame)->f_tstate = tstate;
+#endif
+    }
+      __Pyx_PyFrame_SetLineNumber(*frame, firstlineno);
+    retval = 1;
+    tstate->tracing++;
+    tstate->use_tracing = 0;
+    __Pyx_ErrFetchInState(tstate, &type, &value, &traceback);
+    #if CYTHON_TRACE
+    if (tstate->c_tracefunc)
+        retval = tstate->c_tracefunc(tstate->c_traceobj, *frame, PyTrace_CALL, NULL) == 0;
+    if (retval && tstate->c_profilefunc)
+    #endif
+        retval = tstate->c_profilefunc(tstate->c_profileobj, *frame, PyTrace_CALL, NULL) == 0;
+    tstate->use_tracing = (tstate->c_profilefunc ||
+                           (CYTHON_TRACE && tstate->c_tracefunc));
+    tstate->tracing--;
+    if (retval) {
+        __Pyx_ErrRestoreInState(tstate, type, value, traceback);
+        return tstate->use_tracing && retval;
+    } else {
+        Py_XDECREF(type);
+        Py_XDECREF(value);
+        Py_XDECREF(traceback);
+        return -1;
+    }
+}
+static PyCodeObject *__Pyx_createFrameCodeObject(const char *funcname, const char *srcfile, int firstlineno) {
+    PyCodeObject *py_code = 0;
+#if PY_MAJOR_VERSION >= 3
+    py_code = PyCode_NewEmpty(srcfile, funcname, firstlineno);
+    if (likely(py_code)) {
+        py_code->co_flags |= CO_OPTIMIZED | CO_NEWLOCALS;
+    }
+#else
+    PyObject *py_srcfile = 0;
+    PyObject *py_funcname = 0;
+    py_funcname = PyString_FromString(funcname);
+    if (unlikely(!py_funcname)) goto bad;
+    py_srcfile = PyString_FromString(srcfile);
+    if (unlikely(!py_srcfile)) goto bad;
+    py_code = PyCode_New(
+        0,
+        0,
+        0,
+        CO_OPTIMIZED | CO_NEWLOCALS,
+        __pyx_empty_bytes,     /*PyObject *code,*/
+        __pyx_empty_tuple,     /*PyObject *consts,*/
+        __pyx_empty_tuple,     /*PyObject *names,*/
+        __pyx_empty_tuple,     /*PyObject *varnames,*/
+        __pyx_empty_tuple,     /*PyObject *freevars,*/
+        __pyx_empty_tuple,     /*PyObject *cellvars,*/
+        py_srcfile,       /*PyObject *filename,*/
+        py_funcname,      /*PyObject *name,*/
+        firstlineno,
+        __pyx_empty_bytes      /*PyObject *lnotab*/
+    );
+bad:
+    Py_XDECREF(py_srcfile);
+    Py_XDECREF(py_funcname);
+#endif
+    return py_code;
+}
+#endif
+
 /* PyDictVersioning */
 #if CYTHON_USE_DICT_VERSIONS && CYTHON_USE_TYPE_SLOTS
 static CYTHON_INLINE PY_UINT64_T __Pyx_get_tp_dict_version(PyObject *obj) {
@@ -21171,30 +21614,6 @@ static CYTHON_INLINE PyObject *__Pyx__GetModuleGlobalName(PyObject *name)
 #endif
     return __Pyx_GetBuiltinName(name);
 }
-
-/* PyErrFetchRestore */
-#if CYTHON_FAST_THREAD_STATE
-static CYTHON_INLINE void __Pyx_ErrRestoreInState(PyThreadState *tstate, PyObject *type, PyObject *value, PyObject *tb) {
-    PyObject *tmp_type, *tmp_value, *tmp_tb;
-    tmp_type = tstate->curexc_type;
-    tmp_value = tstate->curexc_value;
-    tmp_tb = tstate->curexc_traceback;
-    tstate->curexc_type = type;
-    tstate->curexc_value = value;
-    tstate->curexc_traceback = tb;
-    Py_XDECREF(tmp_type);
-    Py_XDECREF(tmp_value);
-    Py_XDECREF(tmp_tb);
-}
-static CYTHON_INLINE void __Pyx_ErrFetchInState(PyThreadState *tstate, PyObject **type, PyObject **value, PyObject **tb) {
-    *type = tstate->curexc_type;
-    *value = tstate->curexc_value;
-    *tb = tstate->curexc_traceback;
-    tstate->curexc_type = 0;
-    tstate->curexc_value = 0;
-    tstate->curexc_traceback = 0;
-}
-#endif
 
 /* WriteUnraisableException */
 static void __Pyx_WriteUnraisable(const char *name, CYTHON_UNUSED int clineno,

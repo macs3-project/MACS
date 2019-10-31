@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-# Time-stamp: <2019-10-02 15:11:14 taoliu>
+# Time-stamp: <2019-10-30 16:00:40 taoliu>
 
 """Description: 
 
@@ -37,7 +37,6 @@ def main():
                    Extension("MACS2.IO.BedGraph", ["MACS2/IO/BedGraph.pyx"], libraries=["m"], extra_compile_args=extra_c_args),
                    Extension("MACS2.IO.ScoreTrack", ["MACS2/IO/ScoreTrack.pyx"], include_dirs=numpy_include_dir, extra_compile_args=extra_c_args ),
                    Extension("MACS2.IO.CallPeakUnit", ["MACS2/IO/CallPeakUnit.pyx"], include_dirs=numpy_include_dir, extra_compile_args=extra_c_args),
-                   Extension("MACS2.hashtable", ["MACS2/hashtable.pyx"], include_dirs=["MACS2/",numpy_get_include()], extra_compile_args=extra_c_args),
                    Extension("MACS2.Statistics", ["MACS2/Statistics.pyx"], libraries=["m"], include_dirs=["MACS2/",numpy_get_include()], extra_compile_args=extra_c_args),
     ]
 
@@ -70,7 +69,8 @@ def main():
               'Programming Language :: Python :: 3.7',
               'Programming Language :: Cython',
               ],
-          install_requires=['numpy>=1.17'],          
+          install_requires=['numpy>=1.17',
+                            'cython>=0.29'],          
           ext_modules = ext_modules
           )
 

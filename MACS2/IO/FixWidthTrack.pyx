@@ -1,5 +1,6 @@
 # cython: language_level=3
-# Time-stamp: <2019-10-30 12:11:43 taoliu>
+# cython: profile=True
+# Time-stamp: <2019-10-30 16:32:50 taoliu>
 
 """Module for FWTrack classes.
 

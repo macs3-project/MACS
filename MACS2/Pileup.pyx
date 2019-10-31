@@ -1,5 +1,6 @@
 # cython: language_level=3
-# Time-stamp: <2019-10-02 11:04:05 taoliu>
+# cython: profile=True
+# Time-stamp: <2019-10-30 17:27:47 taoliu>
 
 """Module Description: For pileup functions.
 
@@ -31,8 +32,6 @@ from MACS2.cPosValCalculation cimport single_end_pileup as c_single_end_pileup
 from MACS2.cPosValCalculation cimport write_pv_array_to_bedGraph as c_write_pv_array_to_bedGraph
 from MACS2.cPosValCalculation cimport PosVal
 from MACS2.cPosValCalculation cimport quick_pileup as c_quick_pileup
-
-from cython.parallel import *
 
 from time import time as ttime
 

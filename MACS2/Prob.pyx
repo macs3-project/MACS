@@ -1,5 +1,6 @@
 # cython: language_level=3
-# Time-stamp: <2019-10-02 11:04:23 taoliu>
+# cython: profile=True
+# Time-stamp: <2019-10-30 17:28:00 taoliu>
 
 """Module Description: statistics functions to calculate p-values
 

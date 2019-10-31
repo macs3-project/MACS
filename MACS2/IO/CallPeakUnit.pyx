@@ -1,5 +1,6 @@
 # cython: language_level=3
-# Time-stamp: <2019-10-30 11:09:25 taoliu>
+# cython: profile=True
+# Time-stamp: <2019-10-30 16:33:01 taoliu>
 
 """Module for Calculate Scores.
 
@@ -12,45 +13,40 @@ the distribution).
 # python modules
 # ------------------------------------
 
-import numpy as np
-cimport numpy as np
-
 from collections import Counter
 from copy import copy
-
+import logging
+from time import time as ttime
 import _pickle as cPickle
 from tempfile import mkstemp
 import os
 
-from cpython cimport bool
-
-from MACS2.Signal import maxima, enforce_valleys, enforce_peakyness
-
-from libc.stdint cimport uint32_t, uint64_t, int32_t, int64_t
+# numpy
+import numpy as np
+cimport numpy as np
 ctypedef np.float32_t float32_t
 
+# cython
+from cpython cimport bool
+
+# C lib
+from libc.stdio cimport *
+from libc.stdint cimport uint32_t, uint64_t, int32_t, int64_t
 from libc.math cimport exp,log,log10, M_LN10, log1p, erf, sqrt, floor, ceil
 
+# MACS2
+from MACS2.Signal import maxima, enforce_valleys, enforce_peakyness
 from MACS2.IO.PeakIO import PeakIO, BroadPeakIO, parse_peakname
 from MACS2.IO.FixWidthTrack import FWTrack
 from MACS2.IO.PairedEndTrack import PETrackI
-
 from MACS2.Statistics import P_Score_Upper_Tail, LogLR_Asym # pure C code for calculating p-value scores/logLR of Poisson
-
+#
 pscore_table = P_Score_Upper_Tail() # this table will cache pscore being calculated.
 get_pscore = pscore_table.get_pscore
 
 logLR_table = LogLR_Asym() # this table will cache pscore being calculated.
 get_logLR_asym = logLR_table.get_logLR_asym
 
-from MACS2.hashtable import Float64HashTable
-
-import logging
-
-from time import time as ttime
-
-from libc.stdio cimport *
- 
 # ------------------------------------
 # constants
 # ------------------------------------
@@ -688,8 +684,8 @@ cdef class CallerFromAlignments:
         pre_l = 0
         pre_q = 2147483647              # save the previous q-value
 
-        #self.pqtable = {}
-        self.pqtable = Float64HashTable()
+        self.pqtable = {}
+        #self.pqtable = Float64HashTable()
         unique_values = sorted(list(pvalue_stat.keys()), reverse=True) #sorted(unique_values,reverse=True)
         for i in range(len(unique_values)):
             v = unique_values[i]
@@ -827,7 +823,8 @@ cdef class CallerFromAlignments:
         pre_l = 0
         pre_q = 2147483647              # save the previous q-value
 
-        self.pqtable = Float64HashTable()
+        self.pqtable = {}
+        #self.pqtable = Float64HashTable()
         unique_values = sorted(list(pvalue_stat.keys()), reverse=True) #sorted(unique_values,reverse=True)
         for i in range(len(unique_values)):
             v = unique_values[i]
