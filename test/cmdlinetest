@@ -189,7 +189,8 @@ fi
 echo "14. compare with standard outputs"
 
 flag=0
-subfolders=(50kcontigs bdgbroadcall bdgcmp bdgdiff bdgpeakcall callpeak_broad callpeak_narrow callpeak_narrow_revert callpeak_pe_broad callpeak_pe_narrow cmbreps filterdup pileup randsample refinepeak)
+# we do not check the consistency of random subsampling results
+subfolders=(50kcontigs bdgbroadcall bdgcmp bdgdiff bdgpeakcall callpeak_broad callpeak_narrow callpeak_narrow_revert callpeak_pe_broad callpeak_pe_narrow cmbreps filterdup pileup refinepeak)
 
 m=0
 n=0
