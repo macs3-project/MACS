@@ -5,13 +5,21 @@ dist/*
 .pydevproject
 .project
 *~
+*.log
+.coverage
+coverage.xml
+\#*\#
+
 test/*.wig
 test/*.bed
-
 test/log
 test/test*_run_*
 test/subcommandstest_run_*
 test/__pycache__
+test/*.prof
+test/*.tottime
+test/*.calls
+test/*.cumulative
 
 .DS_Store
 .cache

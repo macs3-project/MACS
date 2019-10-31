@@ -1,4 +1,4 @@
-# Official MACS2 v2.1.4 docker
+# Official MACS2 v2.2.5 docker
 
 MACS2 is a bioinformatics algorithm to analyze ChIP-seq datasets. 
 
@@ -14,7 +14,7 @@ To pull the regular MACS2 image:
 
 To pull the MACS2 image based on Python3.7-slim
 
-```docker pull fooliu/macs2:py27-slim```
+```docker pull fooliu/macs2:py37-slim```
 
 ## Analyze your data
 
