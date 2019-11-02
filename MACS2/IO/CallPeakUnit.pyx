@@ -243,7 +243,7 @@ cdef tuple find_optimal_cutoff( list x, list y ):
 
     for i in range( 10, l ):
         # at least the largest 10 points
-        m, c = np.linalg.lstsq( npA[:i], npy[:i] )[ 0 ]
+        m, c = np.linalg.lstsq( npA[:i], npy[:i], rcond=None )[ 0 ]
         sst = sum( ( npy[:i] - np.mean( npy[:i] ) ) ** 2 )
         sse = sum( ( npy[:i] - m*npx[:i] - c ) ** 2 )
         rsq = 1 - sse/sst
@@ -850,9 +850,9 @@ cdef class CallerFromAlignments:
             y.append( self.pvalue_length[ cutoff ] )
         fhd.close()
         logging.info( "#3 Analysis of cutoff vs num of peaks or total length has been saved in %s" % self.cutoff_analysis_filename )
-        logging.info( "#3 Suggest a cutoff..." )
-        optimal_cutoff, optimal_length = find_optimal_cutoff( x, y )
-        logging.info( "#3 -10log10pvalue cutoff %.2f will call approximately %d bps regions as significant regions" % ( optimal_cutoff, optimal_length ) )
+        #logging.info( "#3 Suggest a cutoff..." )
+        #optimal_cutoff, optimal_length = find_optimal_cutoff( x, y )
+        #logging.info( "#3 -10log10pvalue cutoff %.2f will call approximately %.0f bps regions as significant regions" % ( optimal_cutoff, optimal_length ) )
         return self.pqtable
 
 
