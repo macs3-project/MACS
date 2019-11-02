@@ -111,11 +111,12 @@ cdef class GenericParser:
     1. __tlen_parse_line which returns tag length of a line
     2.  __fw_parse_line which returns tuple of ( chromosome, 5'position, strand )
     """
-    cdef str filename
-    cdef bool gzipped
-    cdef int tag_size
-    cdef object fhd
-    cdef long buffer_size
+    cdef:
+        str filename
+        bool gzipped
+        int tag_size
+        object fhd
+        long buffer_size
     
     def __init__ ( self, str filename, long buffer_size = 100000 ):
         """Open input file. Determine whether it's a gzipped file.
@@ -178,7 +179,7 @@ cdef class GenericParser:
         self.tag_size = int(s/n)
         return self.tag_size
 
-    cdef __tlen_parse_line ( self, bytes thisline ):
+    cdef int __tlen_parse_line ( self, bytes thisline ):
         """Abstract function to detect tag length.
         
         """
@@ -243,7 +244,7 @@ cdef class GenericParser:
         self.close()
         return fwtrack
         
-    cdef __fw_parse_line ( self, bytes thisline ):
+    cdef tuple __fw_parse_line ( self, bytes thisline ):
         """Abstract function to parse chromosome, 5' end position and
         strand.
         
@@ -288,44 +289,44 @@ cdef class BEDParser( GenericParser ):
     """File Parser Class for BED File.
 
     """
-    cdef __tlen_parse_line ( self, bytes thisline ):
+    cdef int __tlen_parse_line ( self, bytes thisline ):
         """Parse 5' and 3' position, then calculate frag length.
 
         """
         thisline = thisline.rstrip()
-        if not thisline \
-           or thisline[ :5 ] == b"track" \
-           or thisline[ :7 ] == b"browser"\
-           or thisline[ 0 ] == b"#":
+        #if not thisline \
+        #   or thisline[ :5 ] == b"track" \
+        #   or thisline[ :7 ] == b"browser"\
+        #   or thisline[ 0 ] == b"#":
+        if not thisline:
             return 0
 
         thisfields = thisline.split( b'\t' )
         return atoi( thisfields[ 2 ] )-atoi( thisfields[ 1 ] )
     
-    cdef __fw_parse_line ( self, bytes thisline ):
+    cdef tuple __fw_parse_line ( self, bytes thisline ):
         #cdef list thisfields
-        cdef char * chromname
+        cdef:
+            bytes chromname
+            list thisfields
 
         thisline = thisline.rstrip()
 
-        if not thisline or thisline[ :5 ] == b"track" \
-            or thisline[ :7 ] == b"browser" \
-            or thisline[ 0 ] == b"#":
-             return ( b"", -1, -1 )
-
+        #if not thisline or thisline[ :5 ] == b"track" \
+        #    or thisline[ :7 ] == b"browser" \
+        #    or thisline[ 0 ] == b"#":
+        if not thisline:
+            return ( b"", -1, -1 )
         thisfields = thisline.split( b'\t' )
         chromname = thisfields[ 0 ]
-        #try:
-        ##    chromname = chromname[ :chromname.rindex( ".fa" ) ]
-        #except ValueError:
-        #    pass
-
         try:
-            if not strcmp(thisfields[ 5 ],b"+"):
+            #if not strcmp(thisfields[ 5 ],b"+"):
+            if thisfields[5] == b"+":
                 return ( chromname,
                          atoi( thisfields[ 1 ] ),
                          0 )
-            elif not strcmp(thisfields[ 5 ], b"-"):
+            #elif not strcmp(thisfields[ 5 ], b"-"):
+            elif thisfields[5] == b"-":
                 return ( chromname,
                          atoi( thisfields[ 2 ] ),
                          1 )
@@ -455,7 +456,7 @@ cdef class ELANDResultParser( GenericParser ):
     """File Parser Class for tabular File.
 
     """
-    cdef __tlen_parse_line ( self, bytes thisline ):
+    cdef int __tlen_parse_line ( self, bytes thisline ):
         """Parse tag sequence, then tag length.
 
         """
@@ -467,7 +468,7 @@ cdef class ELANDResultParser( GenericParser ):
         else:
             return len( thisfields[ 1 ] )
 
-    cdef __fw_parse_line ( self, bytes thisline ):
+    cdef tuple __fw_parse_line ( self, bytes thisline ):
         cdef:
             bytes chromname, strand
             int thistaglength
@@ -520,7 +521,7 @@ cdef class ELANDMultiParser( GenericParser ):
     starting at position 160322 with one error, one in the forward direction starting at 
     position 170128 with two errors. There is also a single-error match to E_coli.fa.
     """
-    cdef __tlen_parse_line ( self, bytes thisline ):
+    cdef int __tlen_parse_line ( self, bytes thisline ):
         """Parse tag sequence, then tag length.
 
         """
@@ -532,7 +533,7 @@ cdef class ELANDMultiParser( GenericParser ):
         else:
             return len( thisfields[ 1 ] )
 
-    cdef __fw_parse_line ( self, bytes thisline ):
+    cdef tuple __fw_parse_line ( self, bytes thisline ):
         cdef:
             list thisfields
             bytes thistagname, pos, strand
@@ -580,7 +581,7 @@ cdef class ELANDExportParser( GenericParser ):
     """File Parser Class for ELAND Export File.
 
     """
-    cdef __tlen_parse_line ( self, bytes thisline ):
+    cdef int __tlen_parse_line ( self, bytes thisline ):
         """Parse tag sequence, then tag length.
 
         """
@@ -593,7 +594,7 @@ cdef class ELANDExportParser( GenericParser ):
         else:
             return 0
         
-    cdef __fw_parse_line ( self, bytes thisline ):
+    cdef tuple __fw_parse_line ( self, bytes thisline ):
         cdef:
             list thisfields
             bytes thisname, strand
@@ -652,7 +653,7 @@ cdef class SAMParser( GenericParser ):
     2048	supplementary alignment
     """
 
-    cdef __tlen_parse_line ( self, bytes thisline ):
+    cdef int __tlen_parse_line ( self, bytes thisline ):
         """Parse tag sequence, then tag length.
 
         """
@@ -680,7 +681,7 @@ cdef class SAMParser( GenericParser ):
                 return 0
         return len( thisfields[ 9 ] )
 
-    cdef __fw_parse_line ( self, bytes thisline ):
+    cdef tuple __fw_parse_line ( self, bytes thisline ):
         cdef:
             list thisfields
             bytes thistagname, thisref
@@ -958,20 +959,24 @@ cdef class BAMParser( GenericParser ):
         thisref = unpack( '<i', data[ 0:4 ] )[ 0 ]
         thisstart = unpack( '<i', data[ 4:8 ] )[ 0 ]
         (n_cigar_op,  bwflag ) = unpack( '<HH' , data[ 12:16 ] )
-        if bwflag & 4 or bwflag & 512 or bwflag & 256 or bwflag & 2048:
-            return ( -1, -1, -1 )       #unmapped sequence or bad sequence or  secondary or supplementary alignment 
-        if bwflag & 1:
-            # paired read. We should only keep sequence if the mate is mapped
-            # and if this is the left mate, all is within  the flag! 
-            if not bwflag & 2:
-                return ( -1, -1, -1 )   # not a proper pair
-            if bwflag & 8:
-                return ( -1, -1, -1 )   # the mate is unmapped
-            # From Benjamin Schiller https://github.com/benjschiller
-            if bwflag & 128:
-                # this is not the first read in a pair
-                return ( -1, -1, -1 )
+        if (bwflag & 2820) or (bwflag & 1 and (bwflag & 136 or not bwflag & 2)):
+        #simple form of the expression below 
+        #if bwflag & 4 or bwflag & 512 or bwflag & 256 or bwflag & 2048:
+            #unmapped sequence or bad sequence or  secondary or supplementary alignment             
+        #if bwflag & 1:
+        #    # paired read. We should only keep sequence if the mate is mapped
+        #    # and if this is the left mate, all is within  the flag! 
+        #    if not bwflag & 2:
+        #        return ( -1, -1, -1 )   # not a proper pair
+        #    if bwflag & 8:
+        #        return ( -1, -1, -1 )   # the mate is unmapped
+        #    # From Benjamin Schiller https://github.com/benjschiller
+        #    if bwflag & 128:
+        #        # this is not the first read in a pair
+        #        return ( -1, -1, -1 )
             # end of the patch
+            return ( -1, -1, -1 )
+
         # In case of paired-end we have now skipped all possible "bad" pairs
         # in case of proper pair we have skipped the rightmost one... if the leftmost pair comes
         # we can treat it as a single read, so just check the strand and calculate its
@@ -1174,7 +1179,7 @@ cdef class BowtieParser( GenericParser ):
     program.
 
     """
-    cdef __tlen_parse_line ( self, bytes thisline ):
+    cdef int __tlen_parse_line ( self, bytes thisline ):
         """Parse tag sequence, then tag length.
 
         """
@@ -1186,7 +1191,7 @@ cdef class BowtieParser( GenericParser ):
         thisfields = thisline.split( b'\t' ) # I hope it will never bring me more trouble
         return len( thisfields[ 4 ] )
 
-    cdef __fw_parse_line (self, bytes thisline ):
+    cdef tuple __fw_parse_line (self, bytes thisline ):
         """
         The following definition comes from bowtie website:
         

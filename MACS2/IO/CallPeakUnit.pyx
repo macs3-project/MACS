@@ -1,6 +1,7 @@
 # cython: language_level=3
 # cython: profile=True
-# Time-stamp: <2019-10-30 16:33:01 taoliu>
+# cython: linetrace=True
+# Time-stamp: <2019-10-31 12:18:02 taoliu>
 
 """Module for Calculate Scores.
 
@@ -292,7 +293,7 @@ cdef class CallerFromAlignments:
         #object bedGraph_treat            # file handler to write ChIP pileup
         #object bedGraph_ctrl             # file handler to write Control pileup
         # data needed to be pre-computed before peak calling
-        object pqtable                   # remember pvalue->qvalue convertion
+        dict pqtable                   # remember pvalue->qvalue convertion
         bool pvalue_all_done             # whether the pvalue of whole genome is all calculated. If yes, it's OK to calculate q-value.
 
         dict pvalue_npeaks               # record for each pvalue cutoff, how many peaks can be called  
@@ -469,12 +470,6 @@ cdef class CallerFromAlignments:
             clean_up_ndarray( self.chr_pos_treat_ctrl[0] )
             clean_up_ndarray( self.chr_pos_treat_ctrl[1] )
             clean_up_ndarray( self.chr_pos_treat_ctrl[2] )
-            #self.chr_pos_treat_ctrl[0].resize(10000,refcheck=False)
-            #self.chr_pos_treat_ctrl[1].resize(10000,refcheck=False)
-            #self.chr_pos_treat_ctrl[2].resize(10000,refcheck=False)
-            #self.chr_pos_treat_ctrl[0].resize(0,refcheck=False)
-            #self.chr_pos_treat_ctrl[1].resize(0,refcheck=False)
-            #self.chr_pos_treat_ctrl[2].resize(0,refcheck=False)            
 
         if self.PE_mode:
             treat_pv = self.treat.pileup_a_chromosome ( chrom, [self.treat_scaling_factor,], baseline_value = 0.0 )
@@ -623,7 +618,7 @@ cdef class CallerFromAlignments:
             #ptr += 1
         return s
 
-    cdef object __cal_pvalue_qvalue_table ( self ):
+    cdef void __cal_pvalue_qvalue_table ( self ):
         """After this function is called, self.pqtable is built. All
         chromosomes will be iterated. So it will take some time.
         
@@ -685,7 +680,6 @@ cdef class CallerFromAlignments:
         pre_q = 2147483647              # save the previous q-value
 
         self.pqtable = {}
-        #self.pqtable = Float64HashTable()
         unique_values = sorted(list(pvalue_stat.keys()), reverse=True) #sorted(unique_values,reverse=True)
         for i in range(len(unique_values)):
             v = unique_values[i]
@@ -700,10 +694,10 @@ cdef class CallerFromAlignments:
             
         logging.debug( "access pq hash for %d times" % nhcal )
 
-        return self.pqtable
+        return
 
 
-    cdef object __pre_computes ( self, int max_gap = 50, int min_length = 200 ):
+    cdef void __pre_computes ( self, int max_gap = 50, int min_length = 200 ):
         """After this function is called, self.pqtable and self.pvalue_length is built. All
         chromosomes will be iterated. So it will take some time.
         
@@ -824,7 +818,6 @@ cdef class CallerFromAlignments:
         pre_q = 2147483647              # save the previous q-value
 
         self.pqtable = {}
-        #self.pqtable = Float64HashTable()
         unique_values = sorted(list(pvalue_stat.keys()), reverse=True) #sorted(unique_values,reverse=True)
         for i in range(len(unique_values)):
             v = unique_values[i]
@@ -853,8 +846,7 @@ cdef class CallerFromAlignments:
         #logging.info( "#3 Suggest a cutoff..." )
         #optimal_cutoff, optimal_length = find_optimal_cutoff( x, y )
         #logging.info( "#3 -10log10pvalue cutoff %.2f will call approximately %.0f bps regions as significant regions" % ( optimal_cutoff, optimal_length ) )
-        return self.pqtable
-
+        return
 
     cpdef call_peaks ( self, list scoring_function_symbols, list score_cutoff_s, int min_length = 200, 
                        int max_gap = 50, bool call_summits = False, bool auto_cutoff = False ):
@@ -922,7 +914,7 @@ cdef class CallerFromAlignments:
 
         return peaks
 
-    cdef __chrom_call_peak_using_certain_criteria ( self, peaks, bytes chrom, list scoring_function_s, list score_cutoff_s, int min_length, 
+    cdef void __chrom_call_peak_using_certain_criteria ( self, peaks, bytes chrom, list scoring_function_s, list score_cutoff_s, int min_length, 
                                                    int max_gap, bool call_summits, bool save_bedGraph ):
         """ Call peaks for a chromosome.
 
@@ -997,7 +989,7 @@ cdef class CallerFromAlignments:
 
         if above_cutoff.size == 0:
             # nothing above cutoff
-            return peaks
+            return
 
         if above_cutoff[0] == 0:
             # first element > cutoff, fix the first point as 0. otherwise it would be the last item in data[chrom]['pos']
@@ -1050,7 +1042,7 @@ cdef class CallerFromAlignments:
                 lastp = te #above_cutoff_endpos[i]
         # save the last peak
         if not peak_content:
-            return peaks
+            return
         else:
             if call_summits:
                 self.__close_peak_with_subpeaks (peak_content, peaks, min_length, chrom, min_length, score_array_s, score_cutoff_s = score_cutoff_s ) # smooth length is min_length, i.e. fragment size 'd'
@@ -1058,7 +1050,7 @@ cdef class CallerFromAlignments:
                 self.__close_peak_wo_subpeaks   (peak_content, peaks, min_length, chrom, min_length, score_array_s, score_cutoff_s = score_cutoff_s ) # smooth length is min_length, i.e. fragment size 'd'
 
         #print "close peaks -- chrom:",chrom,"  time:", ttime() - t0
-        return peaks
+        return
 
     cdef bool __close_peak_wo_subpeaks (self, list peak_content, peaks, int min_length,
                                           bytes chrom, int smoothlen, list score_array_s, list score_cutoff_s=[]):
@@ -1527,7 +1519,7 @@ cdef class CallerFromAlignments:
 
         return broadpeaks
 
-    cdef __chrom_call_broadpeak_using_certain_criteria ( self, lvl1peaks, lvl2peaks, bytes chrom, list scoring_function_s, list lvl1_cutoff_s, list lvl2_cutoff_s,
+    cdef void  __chrom_call_broadpeak_using_certain_criteria ( self, lvl1peaks, lvl2peaks, bytes chrom, list scoring_function_s, list lvl1_cutoff_s, list lvl2_cutoff_s,
                                                          int min_length, int lvl1_max_gap, int lvl2_max_gap, bool save_bedGraph):
         """ Call peaks for a chromosome.
 

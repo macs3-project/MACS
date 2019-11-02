@@ -39,9 +39,10 @@ from time import time as ttime
 # functions
 # ------------------------------------
 
-cdef inline int int_max(int a, int b): return a if a >= b else b
-cdef inline long long_max(long a, long b): return a if a >= b else b
-cdef inline float float_max(float a, float b): return a if a >= b else b
+# use python3 max function instead
+#cdef inline int int_max(int a, int b): return a if a > b else b
+#cdef inline long long_max(long a, long b): return a if a > b else b
+#cdef inline float float_max(float a, float b): return a if a > b else b
 
 cdef void clean_up_ndarray ( np.ndarray x ):
     # clean numpy ndarray in two steps
@@ -647,7 +648,7 @@ cpdef se_all_in_one_pileup ( np.ndarray[np.int32_t, ndim=1] plus_tags, np.ndarra
     if pre_p != 0:
         # the first chunk of 0
         ret_p_ptr[0] = pre_p
-        ret_v_ptr[0] = float_max(0,baseline_value) 
+        ret_v_ptr[0] = max(0,baseline_value) 
         ret_p_ptr += 1
         ret_v_ptr += 1
         I += 1
@@ -662,7 +663,7 @@ cpdef se_all_in_one_pileup ( np.ndarray[np.int32_t, ndim=1] plus_tags, np.ndarra
             p = start_poss_ptr[0]
             if p != pre_p:
                 ret_p_ptr[0] = p
-                ret_v_ptr[0] = float_max(pileup * scale_factor, baseline_value)
+                ret_v_ptr[0] = max(pileup * scale_factor, baseline_value)
                 ret_p_ptr += 1
                 ret_v_ptr += 1
                 I += 1
@@ -674,7 +675,7 @@ cpdef se_all_in_one_pileup ( np.ndarray[np.int32_t, ndim=1] plus_tags, np.ndarra
             p = end_poss_ptr[0]
             if p != pre_p:
                 ret_p_ptr[0] = p
-                ret_v_ptr[0] = float_max(pileup * scale_factor, baseline_value)
+                ret_v_ptr[0] = max(pileup * scale_factor, baseline_value)
                 ret_p_ptr += 1
                 ret_v_ptr += 1
                 I += 1
@@ -694,7 +695,7 @@ cpdef se_all_in_one_pileup ( np.ndarray[np.int32_t, ndim=1] plus_tags, np.ndarra
             p = end_poss_ptr[0]
             if p != pre_p:
                 ret_p_ptr[0] = p
-                ret_v_ptr[0] = float_max(pileup * scale_factor, baseline_value)
+                ret_v_ptr[0] = max(pileup * scale_factor, baseline_value)
                 ret_p_ptr += 1
                 ret_v_ptr += 1
                 I += 1
@@ -775,7 +776,7 @@ cpdef quick_pileup ( np.ndarray[np.int32_t, ndim=1] start_poss, np.ndarray[np.in
     if pre_p != 0:
         # the first chunk of 0
         ret_p_ptr[0] = pre_p
-        ret_v_ptr[0] = float_max(0,baseline_value) 
+        ret_v_ptr[0] = max(0,baseline_value) 
         ret_p_ptr += 1
         ret_v_ptr += 1
         I += 1
@@ -787,7 +788,7 @@ cpdef quick_pileup ( np.ndarray[np.int32_t, ndim=1] start_poss, np.ndarray[np.in
             p = start_poss_ptr[0]
             if p != pre_p:
                 ret_p_ptr[0] = p
-                ret_v_ptr[0] = float_max(pileup * scale_factor, baseline_value)
+                ret_v_ptr[0] = max(pileup * scale_factor, baseline_value)
                 ret_p_ptr += 1
                 ret_v_ptr += 1
                 I += 1
@@ -801,7 +802,7 @@ cpdef quick_pileup ( np.ndarray[np.int32_t, ndim=1] start_poss, np.ndarray[np.in
             p = end_poss_ptr[0]
             if p != pre_p:
                 ret_p_ptr[0] = p
-                ret_v_ptr[0] = float_max(pileup * scale_factor, baseline_value)
+                ret_v_ptr[0] = max(pileup * scale_factor, baseline_value)
                 ret_p_ptr += 1
                 ret_v_ptr += 1
                 I += 1
@@ -822,7 +823,7 @@ cpdef quick_pileup ( np.ndarray[np.int32_t, ndim=1] start_poss, np.ndarray[np.in
             #for p in minus_tags[i_e:]:
             if p != pre_p:
                 ret_p_ptr[0] = p
-                ret_v_ptr[0] = float_max(pileup * scale_factor, baseline_value)
+                ret_v_ptr[0] = max(pileup * scale_factor, baseline_value)
                 ret_p_ptr += 1
                 ret_v_ptr += 1
                 I += 1
@@ -884,7 +885,7 @@ cpdef list max_over_two_pv_array ( list tmparray1, list tmparray2 ):
         if a1_pos_ptr[0] < a2_pos_ptr[0]:
             # clip a region from pre_p to p1, then set pre_p as p1.
             ret_pos_ptr[0] = a1_pos_ptr[0]
-            ret_v_ptr[0] =  float_max( a1_v_ptr[0], a2_v_ptr[0] )
+            ret_v_ptr[0] =  max( a1_v_ptr[0], a2_v_ptr[0] )
             ret_pos_ptr += 1
             ret_v_ptr += 1
             I += 1
@@ -896,7 +897,7 @@ cpdef list max_over_two_pv_array ( list tmparray1, list tmparray2 ):
         elif a1_pos_ptr[0] > a2_pos_ptr[0]:
             # clip a region from pre_p to p2, then set pre_p as p2.
             ret_pos_ptr[0] = a2_pos_ptr[0]
-            ret_v_ptr[0] =  float_max( a1_v_ptr[0], a2_v_ptr[0] )
+            ret_v_ptr[0] =  max( a1_v_ptr[0], a2_v_ptr[0] )
             ret_pos_ptr += 1
             ret_v_ptr += 1
             I += 1
@@ -908,7 +909,7 @@ cpdef list max_over_two_pv_array ( list tmparray1, list tmparray2 ):
         else:
             # from pre_p to p1 or p2, then set pre_p as p1 or p2.
             ret_pos_ptr[0] = a1_pos_ptr[0]
-            ret_v_ptr[0] =  float_max( a1_v_ptr[0], a2_v_ptr[0] )
+            ret_v_ptr[0] =  max( a1_v_ptr[0], a2_v_ptr[0] )
             ret_pos_ptr += 1
             ret_v_ptr += 1
             I += 1
