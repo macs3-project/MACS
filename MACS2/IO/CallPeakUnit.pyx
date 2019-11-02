@@ -41,19 +41,48 @@ from MACS2.IO.PeakIO import PeakIO, BroadPeakIO, parse_peakname
 from MACS2.IO.FixWidthTrack import FWTrack
 from MACS2.IO.PairedEndTrack import PETrackI
 from MACS2.Statistics import P_Score_Upper_Tail, LogLR_Asym # pure C code for calculating p-value scores/logLR of Poisson
-#
-pscore_table = P_Score_Upper_Tail() # this table will cache pscore being calculated.
-get_pscore = pscore_table.get_pscore
 
-logLR_table = LogLR_Asym() # this table will cache pscore being calculated.
-get_logLR_asym = logLR_table.get_logLR_asym
+# --------------------------------------------
+# cached pscore function and LR_asym functions
+# --------------------------------------------
+from MACS2.Prob import poisson_cdf
+pscore_dict = dict()
+logLR_dict = dict()
+
+cdef float get_pscore ( int x, float l ):
+    cdef:
+        float val
+    if ( x, l ) in pscore_dict:
+        return pscore_dict [ (x, l ) ]
+    else:
+        # calculate and cache
+        val = -1 * poisson_cdf ( x, l, False, True )
+        pscore_dict[ ( x, l ) ] = val
+        return val
+
+cdef float get_logLR_asym ( float x, float y ):
+    cdef:
+        float val
+
+    if ( x, y ) in logLR_dict:
+        return logLR_dict[ ( x, y ) ]
+    else:
+        # calculate and cache
+        if x > y:
+            val = (x*(log10(x)-log10(y))+y-x)
+        elif x < y:
+            val = (x*(-log10(x)+log10(y))-y+x)
+        else:
+            val = 0
+        logLR_dict[ ( x, y ) ] = val
+        return val
 
 # ------------------------------------
 # constants
 # ------------------------------------
-__version__ = "scoreCalculate $Revision$"
+__version__ = "CallPeakUnit $Revision$"
 __author__ = "Tao Liu <vladimir.liu@gmail.com>"
-__doc__ = "scoreTrackI classes"
+__doc__ = "CallPeakUnit"
 
 # ------------------------------------
 # Misc functions
@@ -284,7 +313,7 @@ cdef class CallerFromAlignments:
         bool no_lambda_flag              # whether ignore local bias, and to use global bias instead
         bool PE_mode                     # whether it's in PE mode, will be detected during initiation
         # temporary data buffer
-        bytes chrom                        # name of current chromosome
+        #bytes chrom                        # name of current chromosome
         list chr_pos_treat_ctrl          # temporary [position, treat_pileup, ctrl_pileup] for a given chromosome
         bytes bedGraph_treat_filename
         bytes bedGraph_control_filename
@@ -664,7 +693,7 @@ cdef class CallerFromAlignments:
                 pos_ptr += 1
                 treat_value_ptr += 1
                 ctrl_value_ptr += 1
-
+   
             nhcal += pos_array.shape[0]            
 
         #logging.debug ( "make pvalue_stat cost %.5f seconds" % t )
@@ -849,7 +878,7 @@ cdef class CallerFromAlignments:
         return
 
     cpdef call_peaks ( self, list scoring_function_symbols, list score_cutoff_s, int min_length = 200, 
-                       int max_gap = 50, bool call_summits = False, bool auto_cutoff = False ):
+                       int max_gap = 50, bool call_summits = False, bool cutoff_analysis = False ):
         """Call peaks for all chromosomes. Return a PeakIO object.
         
         scoring_function_s: symbols of functions to calculate score. 'p' for pscore, 'q' for qscore, 'f' for fold change, 's' for subtraction. for example: ['p', 'q']
@@ -868,8 +897,8 @@ cdef class CallerFromAlignments:
         # prepare p-q table
         if not self.pqtable:
             logging.info("#3 Pre-compute pvalue-qvalue table...")
-            if auto_cutoff:
-                logging.info("#3 Cutoff will be automatically decided!")
+            if cutoff_analysis:
+                logging.info("#3 Cutoff vs peaks called will be analyzed!")
                 self.__pre_computes( max_gap = max_gap, min_length = min_length )
             else:
                 self.__cal_pvalue_qvalue_table()
@@ -1416,7 +1445,7 @@ cdef class CallerFromAlignments:
 
         return True
 
-    cpdef call_broadpeaks (self, list scoring_function_symbols, list lvl1_cutoff_s, list lvl2_cutoff_s, int min_length=200, int lvl1_max_gap=50, int lvl2_max_gap=400, bool auto_cutoff = False):
+    cpdef call_broadpeaks (self, list scoring_function_symbols, list lvl1_cutoff_s, list lvl2_cutoff_s, int min_length=200, int lvl1_max_gap=50, int lvl2_max_gap=400, bool cutoff_analysis = False):
         """This function try to find enriched regions within which,
         scores are continuously higher than a given cutoff for level
         1, and link them using the gap above level 2 cutoff with a
@@ -1448,8 +1477,8 @@ cdef class CallerFromAlignments:
         # prepare p-q table
         if not self.pqtable:
             logging.info("#3 Pre-compute pvalue-qvalue table...")
-            if auto_cutoff:
-                logging.info("#3 Cutoff for broad region will be automatically decided!")
+            if cutoff_analysis:
+                logging.info("#3 Cutoff value vs broad region calls will be analyzed!")
                 self.__pre_computes( max_gap = lvl2_max_gap, min_length = min_length )
             else:
                 self.__cal_pvalue_qvalue_table()

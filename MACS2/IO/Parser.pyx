@@ -1,5 +1,6 @@
 # cython: language_level=3
 # cython: profile=True
+# cython: linetrace=True
 # Time-stamp: <2019-10-30 16:32:44 taoliu>
 
 """Module for all MACS Parser classes for input.

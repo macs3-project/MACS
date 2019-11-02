@@ -744,15 +744,6 @@ cdef class scoreTrackII:
         pqtable = self.make_pq_table()
         
         # convert p to q
-
-        # convert pvalue2qvalue to a simple dict based on khash
-        # khash has big advantage while checking keys for millions of times.
-        #s_p2q = Float64HashTable()
-        #for k in pqtable.keys():
-        #    s_p2q.set_item(k,pqtable[k])
-
-        #g = s_p2q.get_item
-        
         for chrom in self.data.keys():
             v = self.data[chrom][3]
             l = self.datalength[chrom]

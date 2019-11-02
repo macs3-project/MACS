@@ -14,7 +14,7 @@ def main():
     p = pstats.Stats(sys.argv[1])
     sort_term = sys.argv[2]
 
-    p.strip_dirs().sort_stats(sort_term).print_stats(20)
+    p.strip_dirs().sort_stats(sort_term).print_stats(30)
 
 
 if __name__ == '__main__':

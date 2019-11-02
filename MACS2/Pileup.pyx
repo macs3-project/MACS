@@ -123,6 +123,7 @@ cpdef pileup_and_write( trackI,
 
 
 # function to pileup BAMPE/BEDPE stored in PETrackI object and write to a BEDGraph file
+# this function uses c function
 cpdef pileup_and_write_pe( petrackI,
                            bytes output_filename,
                            float scale_factor = 1,
@@ -573,7 +574,7 @@ cdef int * fix_coordinates_2 ( int * poss, int l_of_poss, int rlength) nogil:
     
     return poss
 
-# general pileup function
+# general pileup function implemented in cython
 cpdef se_all_in_one_pileup ( np.ndarray[np.int32_t, ndim=1] plus_tags, np.ndarray[np.int32_t, ndim=1] minus_tags, long five_shift, long three_shift, int rlength, float scale_factor, float baseline_value ):
     """Return pileup given 5' end of fragment at plus or minus strand
     separately, and given shift at both direction to recover a
@@ -721,6 +722,7 @@ cdef int compare(const void * a, const void * b) nogil:
     if a - b > 0: return 1
     return 0
 
+# quick pileup implemented in cython
 cpdef quick_pileup ( np.ndarray[np.int32_t, ndim=1] start_poss, np.ndarray[np.int32_t, ndim=1] end_poss, float scale_factor, float baseline_value ):
     """Return pileup given plus strand and minus strand positions of fragments.
     
@@ -836,8 +838,7 @@ cpdef quick_pileup ( np.ndarray[np.int32_t, ndim=1] start_poss, np.ndarray[np.in
 
     return tmp
 
-# general function to calculate maximum between two arrays.
-
+# general function to calculate maximum between two arrays in cython.
 cpdef list max_over_two_pv_array ( list tmparray1, list tmparray2 ):
     """Merge two position-value arrays. For intersection regions, take
     the maximum value within region.
