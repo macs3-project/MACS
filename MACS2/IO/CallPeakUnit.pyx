@@ -655,7 +655,7 @@ cdef class CallerFromAlignments:
         cdef:
             bytes chrom
             np.ndarray pos_array, treat_array, ctrl_array, score_array
-            dict pvalue_stat = {}
+            dict pvalue_stat
             long n, pre_p, length, j, pre_l, l, i
             float this_v, pre_v, v, q, pre_q
             long N, k, this_l
@@ -670,6 +670,7 @@ cdef class CallerFromAlignments:
 
         logging.debug ( "Start to calculate pvalue stat..." )
 
+        pvalue_stat = dict()
         for i in range( len( self.chromosomes ) ):
             chrom = self.chromosomes[ i ]
             pre_p = 0
@@ -718,7 +719,7 @@ cdef class CallerFromAlignments:
             self.pqtable[ v ] = q
             pre_v = v
             pre_q = q
-            k+=l
+            k += l
             nhcal += 1
             
         logging.debug( "access pq hash for %d times" % nhcal )
@@ -734,7 +735,7 @@ cdef class CallerFromAlignments:
         cdef:
             bytes chrom
             np.ndarray pos_array, treat_array, ctrl_array, score_array
-            dict pvalue_stat = {}
+            dict pvalue_stat
             long n, pre_p, this_p, length, j, pre_l, l, i
             float this_v, pre_v, v, q, pre_q, this_t, this_c
             long N, k, this_l
@@ -759,7 +760,8 @@ cdef class CallerFromAlignments:
         logging.debug ( "Start to calculate pvalue stat..." )
 
         tmplist = sorted( list(np.arange(0.3, 10.0, 0.3)), reverse = True )
-        
+
+        pvalue_stat = dict()
         for i in range( len( self.chromosomes ) ):
             chrom = self.chromosomes[ i ]
             self.__pileup_treat_ctrl_a_chromosome( chrom )

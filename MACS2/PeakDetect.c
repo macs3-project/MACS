@@ -1520,7 +1520,6 @@ static const char __pyx_k_log_qvalue[] = "log_qvalue";
 static const char __pyx_k_min_length[] = "min_length";
 static const char __pyx_k_scoretrack[] = "scoretrack";
 static const char __pyx_k_smalllocal[] = "smalllocal";
-static const char __pyx_k_auto_cutoff[] = "auto_cutoff";
 static const char __pyx_k_bdg_control[] = "bdg_control";
 static const char __pyx_k_control_sum[] = "control_sum";
 static const char __pyx_k_final_peaks[] = "final_peaks";
@@ -1602,7 +1601,6 @@ static PyObject *__pyx_n_s_PeakIO;
 static PyObject *__pyx_kp_u__4;
 static PyObject *__pyx_kp_u__5;
 static PyObject *__pyx_n_s__7;
-static PyObject *__pyx_n_s_auto_cutoff;
 static PyObject *__pyx_n_s_average_template_length;
 static PyObject *__pyx_n_s_bdg_control;
 static PyObject *__pyx_n_s_bdg_treat;
@@ -4084,7 +4082,7 @@ static PyObject *__pyx_pf_5MACS2_10PeakDetect_10PeakDetect_4__call_peaks_w_contr
  *                                                     min_length=self.minlen,
  *                                                     lvl1_max_gap=self.maxgap,             # <<<<<<<<<<<<<<
  *                                                     lvl2_max_gap=self.maxgap*4,
- *                                                     auto_cutoff=self.opt.cutoff_analysis )
+ *                                                     cutoff_analysis=self.opt.cutoff_analysis )
  */
       __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_maxgap); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 252, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_1);
@@ -4095,7 +4093,7 @@ static PyObject *__pyx_pf_5MACS2_10PeakDetect_10PeakDetect_4__call_peaks_w_contr
  *                                                     min_length=self.minlen,
  *                                                     lvl1_max_gap=self.maxgap,
  *                                                     lvl2_max_gap=self.maxgap*4,             # <<<<<<<<<<<<<<
- *                                                     auto_cutoff=self.opt.cutoff_analysis )
+ *                                                     cutoff_analysis=self.opt.cutoff_analysis )
  *             else:
  */
       __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_maxgap); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 253, __pyx_L1_error)
@@ -4109,7 +4107,7 @@ static PyObject *__pyx_pf_5MACS2_10PeakDetect_10PeakDetect_4__call_peaks_w_contr
       /* "MACS2/PeakDetect.pyx":254
  *                                                     lvl1_max_gap=self.maxgap,
  *                                                     lvl2_max_gap=self.maxgap*4,
- *                                                     auto_cutoff=self.opt.cutoff_analysis )             # <<<<<<<<<<<<<<
+ *                                                     cutoff_analysis=self.opt.cutoff_analysis )             # <<<<<<<<<<<<<<
  *             else:
  *                 self.info("#3 Call peaks with given -log10pvalue cutoff: %.5f ..." % self.log_pvalue)
  */
@@ -4118,7 +4116,7 @@ static PyObject *__pyx_pf_5MACS2_10PeakDetect_10PeakDetect_4__call_peaks_w_contr
       __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_t_9, __pyx_n_s_cutoff_analysis); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 254, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_1);
       __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
-      if (PyDict_SetItem(__pyx_t_2, __pyx_n_s_auto_cutoff, __pyx_t_1) < 0) __PYX_ERR(0, 249, __pyx_L1_error)
+      if (PyDict_SetItem(__pyx_t_2, __pyx_n_s_cutoff_analysis, __pyx_t_1) < 0) __PYX_ERR(0, 249, __pyx_L1_error)
       __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
       /* "MACS2/PeakDetect.pyx":248
@@ -4147,7 +4145,7 @@ static PyObject *__pyx_pf_5MACS2_10PeakDetect_10PeakDetect_4__call_peaks_w_contr
     }
 
     /* "MACS2/PeakDetect.pyx":256
- *                                                     auto_cutoff=self.opt.cutoff_analysis )
+ *                                                     cutoff_analysis=self.opt.cutoff_analysis )
  *             else:
  *                 self.info("#3 Call peaks with given -log10pvalue cutoff: %.5f ..." % self.log_pvalue)             # <<<<<<<<<<<<<<
  *                 peaks = scorecalculator.call_peaks( ['p',], [self.log_pvalue,],
@@ -4228,7 +4226,7 @@ static PyObject *__pyx_pf_5MACS2_10PeakDetect_10PeakDetect_4__call_peaks_w_contr
  *                                                     min_length=self.minlen,
  *                                                     max_gap=self.maxgap,             # <<<<<<<<<<<<<<
  *                                                     call_summits=call_summits,
- *                                                     auto_cutoff=self.opt.cutoff_analysis )
+ *                                                     cutoff_analysis=self.opt.cutoff_analysis )
  */
       __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_maxgap); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 259, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_2);
@@ -4239,7 +4237,7 @@ static PyObject *__pyx_pf_5MACS2_10PeakDetect_10PeakDetect_4__call_peaks_w_contr
  *                                                     min_length=self.minlen,
  *                                                     max_gap=self.maxgap,
  *                                                     call_summits=call_summits,             # <<<<<<<<<<<<<<
- *                                                     auto_cutoff=self.opt.cutoff_analysis )
+ *                                                     cutoff_analysis=self.opt.cutoff_analysis )
  *         elif self.log_qvalue != None:
  */
       if (PyDict_SetItem(__pyx_t_10, __pyx_n_s_call_summits, __pyx_v_call_summits) < 0) __PYX_ERR(0, 258, __pyx_L1_error)
@@ -4247,7 +4245,7 @@ static PyObject *__pyx_pf_5MACS2_10PeakDetect_10PeakDetect_4__call_peaks_w_contr
       /* "MACS2/PeakDetect.pyx":261
  *                                                     max_gap=self.maxgap,
  *                                                     call_summits=call_summits,
- *                                                     auto_cutoff=self.opt.cutoff_analysis )             # <<<<<<<<<<<<<<
+ *                                                     cutoff_analysis=self.opt.cutoff_analysis )             # <<<<<<<<<<<<<<
  *         elif self.log_qvalue != None:
  *             if self.opt.broad:
  */
@@ -4256,7 +4254,7 @@ static PyObject *__pyx_pf_5MACS2_10PeakDetect_10PeakDetect_4__call_peaks_w_contr
       __pyx_t_9 = __Pyx_PyObject_GetAttrStr(__pyx_t_2, __pyx_n_s_cutoff_analysis); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 261, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_9);
       __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-      if (PyDict_SetItem(__pyx_t_10, __pyx_n_s_auto_cutoff, __pyx_t_9) < 0) __PYX_ERR(0, 258, __pyx_L1_error)
+      if (PyDict_SetItem(__pyx_t_10, __pyx_n_s_cutoff_analysis, __pyx_t_9) < 0) __PYX_ERR(0, 258, __pyx_L1_error)
       __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
 
       /* "MACS2/PeakDetect.pyx":257
@@ -4288,7 +4286,7 @@ static PyObject *__pyx_pf_5MACS2_10PeakDetect_10PeakDetect_4__call_peaks_w_contr
 
   /* "MACS2/PeakDetect.pyx":262
  *                                                     call_summits=call_summits,
- *                                                     auto_cutoff=self.opt.cutoff_analysis )
+ *                                                     cutoff_analysis=self.opt.cutoff_analysis )
  *         elif self.log_qvalue != None:             # <<<<<<<<<<<<<<
  *             if self.opt.broad:
  *                 self.info("#3 Call broad peaks with given level1 -log10qvalue cutoff and level2: %f, %f..." % (self.log_qvalue,self.opt.log_broadcutoff) )
@@ -4302,7 +4300,7 @@ static PyObject *__pyx_pf_5MACS2_10PeakDetect_10PeakDetect_4__call_peaks_w_contr
   if (__pyx_t_7) {
 
     /* "MACS2/PeakDetect.pyx":263
- *                                                     auto_cutoff=self.opt.cutoff_analysis )
+ *                                                     cutoff_analysis=self.opt.cutoff_analysis )
  *         elif self.log_qvalue != None:
  *             if self.opt.broad:             # <<<<<<<<<<<<<<
  *                 self.info("#3 Call broad peaks with given level1 -log10qvalue cutoff and level2: %f, %f..." % (self.log_qvalue,self.opt.log_broadcutoff) )
@@ -4462,7 +4460,7 @@ static PyObject *__pyx_pf_5MACS2_10PeakDetect_10PeakDetect_4__call_peaks_w_contr
  *                                                     min_length=self.minlen,
  *                                                     lvl1_max_gap=self.maxgap,             # <<<<<<<<<<<<<<
  *                                                     lvl2_max_gap=self.maxgap*4,
- *                                                     auto_cutoff=self.opt.cutoff_analysis )
+ *                                                     cutoff_analysis=self.opt.cutoff_analysis )
  */
       __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_maxgap); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 269, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_1);
@@ -4473,7 +4471,7 @@ static PyObject *__pyx_pf_5MACS2_10PeakDetect_10PeakDetect_4__call_peaks_w_contr
  *                                                     min_length=self.minlen,
  *                                                     lvl1_max_gap=self.maxgap,
  *                                                     lvl2_max_gap=self.maxgap*4,             # <<<<<<<<<<<<<<
- *                                                     auto_cutoff=self.opt.cutoff_analysis )
+ *                                                     cutoff_analysis=self.opt.cutoff_analysis )
  *             else:
  */
       __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_maxgap); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 270, __pyx_L1_error)
@@ -4487,7 +4485,7 @@ static PyObject *__pyx_pf_5MACS2_10PeakDetect_10PeakDetect_4__call_peaks_w_contr
       /* "MACS2/PeakDetect.pyx":271
  *                                                     lvl1_max_gap=self.maxgap,
  *                                                     lvl2_max_gap=self.maxgap*4,
- *                                                     auto_cutoff=self.opt.cutoff_analysis )             # <<<<<<<<<<<<<<
+ *                                                     cutoff_analysis=self.opt.cutoff_analysis )             # <<<<<<<<<<<<<<
  *             else:
  *                 peaks = scorecalculator.call_peaks( ['q',], [self.log_qvalue,],
  */
@@ -4496,7 +4494,7 @@ static PyObject *__pyx_pf_5MACS2_10PeakDetect_10PeakDetect_4__call_peaks_w_contr
       __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_t_6, __pyx_n_s_cutoff_analysis); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 271, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_1);
       __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
-      if (PyDict_SetItem(__pyx_t_10, __pyx_n_s_auto_cutoff, __pyx_t_1) < 0) __PYX_ERR(0, 266, __pyx_L1_error)
+      if (PyDict_SetItem(__pyx_t_10, __pyx_n_s_cutoff_analysis, __pyx_t_1) < 0) __PYX_ERR(0, 266, __pyx_L1_error)
       __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
       /* "MACS2/PeakDetect.pyx":265
@@ -4515,7 +4513,7 @@ static PyObject *__pyx_pf_5MACS2_10PeakDetect_10PeakDetect_4__call_peaks_w_contr
       __pyx_t_1 = 0;
 
       /* "MACS2/PeakDetect.pyx":263
- *                                                     auto_cutoff=self.opt.cutoff_analysis )
+ *                                                     cutoff_analysis=self.opt.cutoff_analysis )
  *         elif self.log_qvalue != None:
  *             if self.opt.broad:             # <<<<<<<<<<<<<<
  *                 self.info("#3 Call broad peaks with given level1 -log10qvalue cutoff and level2: %f, %f..." % (self.log_qvalue,self.opt.log_broadcutoff) )
@@ -4525,7 +4523,7 @@ static PyObject *__pyx_pf_5MACS2_10PeakDetect_10PeakDetect_4__call_peaks_w_contr
     }
 
     /* "MACS2/PeakDetect.pyx":273
- *                                                     auto_cutoff=self.opt.cutoff_analysis )
+ *                                                     cutoff_analysis=self.opt.cutoff_analysis )
  *             else:
  *                 peaks = scorecalculator.call_peaks( ['q',], [self.log_qvalue,],             # <<<<<<<<<<<<<<
  *                                                     min_length=self.minlen,
@@ -4574,7 +4572,7 @@ static PyObject *__pyx_pf_5MACS2_10PeakDetect_10PeakDetect_4__call_peaks_w_contr
  *                                                     min_length=self.minlen,
  *                                                     max_gap=self.maxgap,             # <<<<<<<<<<<<<<
  *                                                     call_summits=call_summits,
- *                                                     auto_cutoff=self.opt.cutoff_analysis )
+ *                                                     cutoff_analysis=self.opt.cutoff_analysis )
  */
       __pyx_t_10 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_maxgap); if (unlikely(!__pyx_t_10)) __PYX_ERR(0, 275, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_10);
@@ -4585,7 +4583,7 @@ static PyObject *__pyx_pf_5MACS2_10PeakDetect_10PeakDetect_4__call_peaks_w_contr
  *                                                     min_length=self.minlen,
  *                                                     max_gap=self.maxgap,
  *                                                     call_summits=call_summits,             # <<<<<<<<<<<<<<
- *                                                     auto_cutoff=self.opt.cutoff_analysis )
+ *                                                     cutoff_analysis=self.opt.cutoff_analysis )
  *         scorecalculator.destroy()
  */
       if (PyDict_SetItem(__pyx_t_9, __pyx_n_s_call_summits, __pyx_v_call_summits) < 0) __PYX_ERR(0, 274, __pyx_L1_error)
@@ -4593,7 +4591,7 @@ static PyObject *__pyx_pf_5MACS2_10PeakDetect_10PeakDetect_4__call_peaks_w_contr
       /* "MACS2/PeakDetect.pyx":277
  *                                                     max_gap=self.maxgap,
  *                                                     call_summits=call_summits,
- *                                                     auto_cutoff=self.opt.cutoff_analysis )             # <<<<<<<<<<<<<<
+ *                                                     cutoff_analysis=self.opt.cutoff_analysis )             # <<<<<<<<<<<<<<
  *         scorecalculator.destroy()
  *         return peaks
  */
@@ -4602,11 +4600,11 @@ static PyObject *__pyx_pf_5MACS2_10PeakDetect_10PeakDetect_4__call_peaks_w_contr
       __pyx_t_6 = __Pyx_PyObject_GetAttrStr(__pyx_t_10, __pyx_n_s_cutoff_analysis); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 277, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_6);
       __Pyx_DECREF(__pyx_t_10); __pyx_t_10 = 0;
-      if (PyDict_SetItem(__pyx_t_9, __pyx_n_s_auto_cutoff, __pyx_t_6) < 0) __PYX_ERR(0, 274, __pyx_L1_error)
+      if (PyDict_SetItem(__pyx_t_9, __pyx_n_s_cutoff_analysis, __pyx_t_6) < 0) __PYX_ERR(0, 274, __pyx_L1_error)
       __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
 
       /* "MACS2/PeakDetect.pyx":273
- *                                                     auto_cutoff=self.opt.cutoff_analysis )
+ *                                                     cutoff_analysis=self.opt.cutoff_analysis )
  *             else:
  *                 peaks = scorecalculator.call_peaks( ['q',], [self.log_qvalue,],             # <<<<<<<<<<<<<<
  *                                                     min_length=self.minlen,
@@ -4624,7 +4622,7 @@ static PyObject *__pyx_pf_5MACS2_10PeakDetect_10PeakDetect_4__call_peaks_w_contr
 
     /* "MACS2/PeakDetect.pyx":262
  *                                                     call_summits=call_summits,
- *                                                     auto_cutoff=self.opt.cutoff_analysis )
+ *                                                     cutoff_analysis=self.opt.cutoff_analysis )
  *         elif self.log_qvalue != None:             # <<<<<<<<<<<<<<
  *             if self.opt.broad:
  *                 self.info("#3 Call broad peaks with given level1 -log10qvalue cutoff and level2: %f, %f..." % (self.log_qvalue,self.opt.log_broadcutoff) )
@@ -4634,7 +4632,7 @@ static PyObject *__pyx_pf_5MACS2_10PeakDetect_10PeakDetect_4__call_peaks_w_contr
 
   /* "MACS2/PeakDetect.pyx":278
  *                                                     call_summits=call_summits,
- *                                                     auto_cutoff=self.opt.cutoff_analysis )
+ *                                                     cutoff_analysis=self.opt.cutoff_analysis )
  *         scorecalculator.destroy()             # <<<<<<<<<<<<<<
  *         return peaks
  * 
@@ -4659,7 +4657,7 @@ static PyObject *__pyx_pf_5MACS2_10PeakDetect_10PeakDetect_4__call_peaks_w_contr
   __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
 
   /* "MACS2/PeakDetect.pyx":279
- *                                                     auto_cutoff=self.opt.cutoff_analysis )
+ *                                                     cutoff_analysis=self.opt.cutoff_analysis )
  *         scorecalculator.destroy()
  *         return peaks             # <<<<<<<<<<<<<<
  * 
@@ -5499,7 +5497,7 @@ static PyObject *__pyx_pf_5MACS2_10PeakDetect_10PeakDetect_6__call_peaks_wo_cont
  *                                                     min_length=self.minlen,
  *                                                     lvl1_max_gap=self.maxgap,             # <<<<<<<<<<<<<<
  *                                                     lvl2_max_gap=self.maxgap*4,
- *                                                     auto_cutoff=self.opt.cutoff_analysis )
+ *                                                     cutoff_analysis=self.opt.cutoff_analysis )
  */
       __pyx_t_5 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_maxgap); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 363, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_5);
@@ -5510,7 +5508,7 @@ static PyObject *__pyx_pf_5MACS2_10PeakDetect_10PeakDetect_6__call_peaks_wo_cont
  *                                                     min_length=self.minlen,
  *                                                     lvl1_max_gap=self.maxgap,
  *                                                     lvl2_max_gap=self.maxgap*4,             # <<<<<<<<<<<<<<
- *                                                     auto_cutoff=self.opt.cutoff_analysis )
+ *                                                     cutoff_analysis=self.opt.cutoff_analysis )
  *             else:
  */
       __pyx_t_5 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_maxgap); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 364, __pyx_L1_error)
@@ -5524,7 +5522,7 @@ static PyObject *__pyx_pf_5MACS2_10PeakDetect_10PeakDetect_6__call_peaks_wo_cont
       /* "MACS2/PeakDetect.pyx":365
  *                                                     lvl1_max_gap=self.maxgap,
  *                                                     lvl2_max_gap=self.maxgap*4,
- *                                                     auto_cutoff=self.opt.cutoff_analysis )             # <<<<<<<<<<<<<<
+ *                                                     cutoff_analysis=self.opt.cutoff_analysis )             # <<<<<<<<<<<<<<
  *             else:
  *                 self.info("#3 Call peaks with given -log10pvalue cutoff: %.5f ..." % self.log_pvalue)
  */
@@ -5533,7 +5531,7 @@ static PyObject *__pyx_pf_5MACS2_10PeakDetect_10PeakDetect_6__call_peaks_wo_cont
       __pyx_t_5 = __Pyx_PyObject_GetAttrStr(__pyx_t_1, __pyx_n_s_cutoff_analysis); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 365, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_5);
       __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-      if (PyDict_SetItem(__pyx_t_4, __pyx_n_s_auto_cutoff, __pyx_t_5) < 0) __PYX_ERR(0, 360, __pyx_L1_error)
+      if (PyDict_SetItem(__pyx_t_4, __pyx_n_s_cutoff_analysis, __pyx_t_5) < 0) __PYX_ERR(0, 360, __pyx_L1_error)
       __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
 
       /* "MACS2/PeakDetect.pyx":359
@@ -5562,7 +5560,7 @@ static PyObject *__pyx_pf_5MACS2_10PeakDetect_10PeakDetect_6__call_peaks_wo_cont
     }
 
     /* "MACS2/PeakDetect.pyx":367
- *                                                     auto_cutoff=self.opt.cutoff_analysis )
+ *                                                     cutoff_analysis=self.opt.cutoff_analysis )
  *             else:
  *                 self.info("#3 Call peaks with given -log10pvalue cutoff: %.5f ..." % self.log_pvalue)             # <<<<<<<<<<<<<<
  *                 peaks = scorecalculator.call_peaks( ['p',], [self.log_pvalue,],
@@ -5643,7 +5641,7 @@ static PyObject *__pyx_pf_5MACS2_10PeakDetect_10PeakDetect_6__call_peaks_wo_cont
  *                                                     min_length=self.minlen,
  *                                                     max_gap=self.maxgap,             # <<<<<<<<<<<<<<
  *                                                     call_summits=call_summits,
- *                                                     auto_cutoff=self.opt.cutoff_analysis )
+ *                                                     cutoff_analysis=self.opt.cutoff_analysis )
  */
       __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_maxgap); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 370, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_4);
@@ -5654,7 +5652,7 @@ static PyObject *__pyx_pf_5MACS2_10PeakDetect_10PeakDetect_6__call_peaks_wo_cont
  *                                                     min_length=self.minlen,
  *                                                     max_gap=self.maxgap,
  *                                                     call_summits=call_summits,             # <<<<<<<<<<<<<<
- *                                                     auto_cutoff=self.opt.cutoff_analysis )
+ *                                                     cutoff_analysis=self.opt.cutoff_analysis )
  *         elif self.log_qvalue != None:
  */
       if (PyDict_SetItem(__pyx_t_8, __pyx_n_s_call_summits, __pyx_v_call_summits) < 0) __PYX_ERR(0, 369, __pyx_L1_error)
@@ -5662,7 +5660,7 @@ static PyObject *__pyx_pf_5MACS2_10PeakDetect_10PeakDetect_6__call_peaks_wo_cont
       /* "MACS2/PeakDetect.pyx":372
  *                                                     max_gap=self.maxgap,
  *                                                     call_summits=call_summits,
- *                                                     auto_cutoff=self.opt.cutoff_analysis )             # <<<<<<<<<<<<<<
+ *                                                     cutoff_analysis=self.opt.cutoff_analysis )             # <<<<<<<<<<<<<<
  *         elif self.log_qvalue != None:
  *             if self.opt.broad:
  */
@@ -5671,7 +5669,7 @@ static PyObject *__pyx_pf_5MACS2_10PeakDetect_10PeakDetect_6__call_peaks_wo_cont
       __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_t_4, __pyx_n_s_cutoff_analysis); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 372, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_1);
       __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-      if (PyDict_SetItem(__pyx_t_8, __pyx_n_s_auto_cutoff, __pyx_t_1) < 0) __PYX_ERR(0, 369, __pyx_L1_error)
+      if (PyDict_SetItem(__pyx_t_8, __pyx_n_s_cutoff_analysis, __pyx_t_1) < 0) __PYX_ERR(0, 369, __pyx_L1_error)
       __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
       /* "MACS2/PeakDetect.pyx":368
@@ -5703,7 +5701,7 @@ static PyObject *__pyx_pf_5MACS2_10PeakDetect_10PeakDetect_6__call_peaks_wo_cont
 
   /* "MACS2/PeakDetect.pyx":373
  *                                                     call_summits=call_summits,
- *                                                     auto_cutoff=self.opt.cutoff_analysis )
+ *                                                     cutoff_analysis=self.opt.cutoff_analysis )
  *         elif self.log_qvalue != None:             # <<<<<<<<<<<<<<
  *             if self.opt.broad:
  *                 self.info("#3 Call broad peaks with given level1 -log10qvalue cutoff and level2: %f, %f..." % (self.log_qvalue,self.opt.log_broadcutoff) )
@@ -5717,7 +5715,7 @@ static PyObject *__pyx_pf_5MACS2_10PeakDetect_10PeakDetect_6__call_peaks_wo_cont
   if (__pyx_t_6) {
 
     /* "MACS2/PeakDetect.pyx":374
- *                                                     auto_cutoff=self.opt.cutoff_analysis )
+ *                                                     cutoff_analysis=self.opt.cutoff_analysis )
  *         elif self.log_qvalue != None:
  *             if self.opt.broad:             # <<<<<<<<<<<<<<
  *                 self.info("#3 Call broad peaks with given level1 -log10qvalue cutoff and level2: %f, %f..." % (self.log_qvalue,self.opt.log_broadcutoff) )
@@ -5877,7 +5875,7 @@ static PyObject *__pyx_pf_5MACS2_10PeakDetect_10PeakDetect_6__call_peaks_wo_cont
  *                                                     min_length=self.minlen,
  *                                                     lvl1_max_gap=self.maxgap,             # <<<<<<<<<<<<<<
  *                                                     lvl2_max_gap=self.maxgap*4,
- *                                                     auto_cutoff=self.opt.cutoff_analysis )
+ *                                                     cutoff_analysis=self.opt.cutoff_analysis )
  */
       __pyx_t_5 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_maxgap); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 380, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_5);
@@ -5888,7 +5886,7 @@ static PyObject *__pyx_pf_5MACS2_10PeakDetect_10PeakDetect_6__call_peaks_wo_cont
  *                                                     min_length=self.minlen,
  *                                                     lvl1_max_gap=self.maxgap,
  *                                                     lvl2_max_gap=self.maxgap*4,             # <<<<<<<<<<<<<<
- *                                                     auto_cutoff=self.opt.cutoff_analysis )
+ *                                                     cutoff_analysis=self.opt.cutoff_analysis )
  *             else:
  */
       __pyx_t_5 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_maxgap); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 381, __pyx_L1_error)
@@ -5902,7 +5900,7 @@ static PyObject *__pyx_pf_5MACS2_10PeakDetect_10PeakDetect_6__call_peaks_wo_cont
       /* "MACS2/PeakDetect.pyx":382
  *                                                     lvl1_max_gap=self.maxgap,
  *                                                     lvl2_max_gap=self.maxgap*4,
- *                                                     auto_cutoff=self.opt.cutoff_analysis )             # <<<<<<<<<<<<<<
+ *                                                     cutoff_analysis=self.opt.cutoff_analysis )             # <<<<<<<<<<<<<<
  *             else:
  *                 peaks = scorecalculator.call_peaks( ['q',], [self.log_qvalue,],
  */
@@ -5911,7 +5909,7 @@ static PyObject *__pyx_pf_5MACS2_10PeakDetect_10PeakDetect_6__call_peaks_wo_cont
       __pyx_t_5 = __Pyx_PyObject_GetAttrStr(__pyx_t_7, __pyx_n_s_cutoff_analysis); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 382, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_5);
       __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
-      if (PyDict_SetItem(__pyx_t_8, __pyx_n_s_auto_cutoff, __pyx_t_5) < 0) __PYX_ERR(0, 377, __pyx_L1_error)
+      if (PyDict_SetItem(__pyx_t_8, __pyx_n_s_cutoff_analysis, __pyx_t_5) < 0) __PYX_ERR(0, 377, __pyx_L1_error)
       __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
 
       /* "MACS2/PeakDetect.pyx":376
@@ -5930,7 +5928,7 @@ static PyObject *__pyx_pf_5MACS2_10PeakDetect_10PeakDetect_6__call_peaks_wo_cont
       __pyx_t_5 = 0;
 
       /* "MACS2/PeakDetect.pyx":374
- *                                                     auto_cutoff=self.opt.cutoff_analysis )
+ *                                                     cutoff_analysis=self.opt.cutoff_analysis )
  *         elif self.log_qvalue != None:
  *             if self.opt.broad:             # <<<<<<<<<<<<<<
  *                 self.info("#3 Call broad peaks with given level1 -log10qvalue cutoff and level2: %f, %f..." % (self.log_qvalue,self.opt.log_broadcutoff) )
@@ -5940,7 +5938,7 @@ static PyObject *__pyx_pf_5MACS2_10PeakDetect_10PeakDetect_6__call_peaks_wo_cont
     }
 
     /* "MACS2/PeakDetect.pyx":384
- *                                                     auto_cutoff=self.opt.cutoff_analysis )
+ *                                                     cutoff_analysis=self.opt.cutoff_analysis )
  *             else:
  *                 peaks = scorecalculator.call_peaks( ['q',], [self.log_qvalue,],             # <<<<<<<<<<<<<<
  *                                                     min_length=self.minlen,
@@ -5989,7 +5987,7 @@ static PyObject *__pyx_pf_5MACS2_10PeakDetect_10PeakDetect_6__call_peaks_wo_cont
  *                                                     min_length=self.minlen,
  *                                                     max_gap=self.maxgap,             # <<<<<<<<<<<<<<
  *                                                     call_summits=call_summits,
- *                                                     auto_cutoff=self.opt.cutoff_analysis )
+ *                                                     cutoff_analysis=self.opt.cutoff_analysis )
  */
       __pyx_t_8 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_maxgap); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 386, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_8);
@@ -6000,7 +5998,7 @@ static PyObject *__pyx_pf_5MACS2_10PeakDetect_10PeakDetect_6__call_peaks_wo_cont
  *                                                     min_length=self.minlen,
  *                                                     max_gap=self.maxgap,
  *                                                     call_summits=call_summits,             # <<<<<<<<<<<<<<
- *                                                     auto_cutoff=self.opt.cutoff_analysis )
+ *                                                     cutoff_analysis=self.opt.cutoff_analysis )
  *         scorecalculator.destroy()
  */
       if (PyDict_SetItem(__pyx_t_1, __pyx_n_s_call_summits, __pyx_v_call_summits) < 0) __PYX_ERR(0, 385, __pyx_L1_error)
@@ -6008,7 +6006,7 @@ static PyObject *__pyx_pf_5MACS2_10PeakDetect_10PeakDetect_6__call_peaks_wo_cont
       /* "MACS2/PeakDetect.pyx":388
  *                                                     max_gap=self.maxgap,
  *                                                     call_summits=call_summits,
- *                                                     auto_cutoff=self.opt.cutoff_analysis )             # <<<<<<<<<<<<<<
+ *                                                     cutoff_analysis=self.opt.cutoff_analysis )             # <<<<<<<<<<<<<<
  *         scorecalculator.destroy()
  *         return peaks
  */
@@ -6017,11 +6015,11 @@ static PyObject *__pyx_pf_5MACS2_10PeakDetect_10PeakDetect_6__call_peaks_wo_cont
       __pyx_t_7 = __Pyx_PyObject_GetAttrStr(__pyx_t_8, __pyx_n_s_cutoff_analysis); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 388, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_7);
       __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
-      if (PyDict_SetItem(__pyx_t_1, __pyx_n_s_auto_cutoff, __pyx_t_7) < 0) __PYX_ERR(0, 385, __pyx_L1_error)
+      if (PyDict_SetItem(__pyx_t_1, __pyx_n_s_cutoff_analysis, __pyx_t_7) < 0) __PYX_ERR(0, 385, __pyx_L1_error)
       __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
 
       /* "MACS2/PeakDetect.pyx":384
- *                                                     auto_cutoff=self.opt.cutoff_analysis )
+ *                                                     cutoff_analysis=self.opt.cutoff_analysis )
  *             else:
  *                 peaks = scorecalculator.call_peaks( ['q',], [self.log_qvalue,],             # <<<<<<<<<<<<<<
  *                                                     min_length=self.minlen,
@@ -6039,7 +6037,7 @@ static PyObject *__pyx_pf_5MACS2_10PeakDetect_10PeakDetect_6__call_peaks_wo_cont
 
     /* "MACS2/PeakDetect.pyx":373
  *                                                     call_summits=call_summits,
- *                                                     auto_cutoff=self.opt.cutoff_analysis )
+ *                                                     cutoff_analysis=self.opt.cutoff_analysis )
  *         elif self.log_qvalue != None:             # <<<<<<<<<<<<<<
  *             if self.opt.broad:
  *                 self.info("#3 Call broad peaks with given level1 -log10qvalue cutoff and level2: %f, %f..." % (self.log_qvalue,self.opt.log_broadcutoff) )
@@ -6049,7 +6047,7 @@ static PyObject *__pyx_pf_5MACS2_10PeakDetect_10PeakDetect_6__call_peaks_wo_cont
 
   /* "MACS2/PeakDetect.pyx":389
  *                                                     call_summits=call_summits,
- *                                                     auto_cutoff=self.opt.cutoff_analysis )
+ *                                                     cutoff_analysis=self.opt.cutoff_analysis )
  *         scorecalculator.destroy()             # <<<<<<<<<<<<<<
  *         return peaks
  * 
@@ -6074,7 +6072,7 @@ static PyObject *__pyx_pf_5MACS2_10PeakDetect_10PeakDetect_6__call_peaks_wo_cont
   __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
 
   /* "MACS2/PeakDetect.pyx":390
- *                                                     auto_cutoff=self.opt.cutoff_analysis )
+ *                                                     cutoff_analysis=self.opt.cutoff_analysis )
  *         scorecalculator.destroy()
  *         return peaks             # <<<<<<<<<<<<<<
  * 
@@ -6320,7 +6318,6 @@ static __Pyx_StringTabEntry __pyx_string_tab[] = {
   {&__pyx_kp_u__4, __pyx_k__4, sizeof(__pyx_k__4), 0, 1, 0, 0},
   {&__pyx_kp_u__5, __pyx_k__5, sizeof(__pyx_k__5), 0, 1, 0, 0},
   {&__pyx_n_s__7, __pyx_k__7, sizeof(__pyx_k__7), 0, 0, 1, 1},
-  {&__pyx_n_s_auto_cutoff, __pyx_k_auto_cutoff, sizeof(__pyx_k_auto_cutoff), 0, 0, 1, 1},
   {&__pyx_n_s_average_template_length, __pyx_k_average_template_length, sizeof(__pyx_k_average_template_length), 0, 0, 1, 1},
   {&__pyx_n_s_bdg_control, __pyx_k_bdg_control, sizeof(__pyx_k_bdg_control), 0, 0, 1, 1},
   {&__pyx_n_s_bdg_treat, __pyx_k_bdg_treat, sizeof(__pyx_k_bdg_treat), 0, 0, 1, 1},
