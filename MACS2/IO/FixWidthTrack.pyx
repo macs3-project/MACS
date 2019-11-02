@@ -123,7 +123,7 @@ cdef class FWTrack:
         return True
 
 
-    cpdef add_loc ( self, bytes chromosome, int32_t fiveendpos, int strand ):
+    cpdef void add_loc ( self, bytes chromosome, int32_t fiveendpos, int strand ):
         """Add a location to the list according to the sequence name.
         
         chromosome -- mostly the chromosome name
@@ -139,18 +139,12 @@ cdef class FWTrack:
             self.__locations[chromosome][strand][0] = fiveendpos
             self.__pointer[chromosome][strand] = 1
         else:
-            try:
-                i = self.__pointer[chromosome][strand]
-                if i % self.buffer_size == 0:
-                    self.__expand__ ( self.__locations[chromosome][strand] )
-                self.__locations[chromosome][strand][i]= fiveendpos
-                self.__pointer[chromosome][strand] += 1
-            except:
-                print ("i:",i)
-                print ("self.buffer_size:", self.buffer_size)
-                print ("strand:", strand)
-                print ("loc len:", len( self.__locations[chromosome][strand] ))
-                raise Exception("!!")
+            i = self.__pointer[chromosome][strand]
+            if i % self.buffer_size == 0:
+                self.__expand__ ( self.__locations[chromosome][strand] )
+            self.__locations[chromosome][strand][i]= fiveendpos
+            self.__pointer[chromosome][strand] += 1
+        return
 
     cdef np.ndarray[np.int32_t, ndim=1] __expand__ ( self, np.ndarray[np.int32_t, ndim=1] arr ):
         arr.resize( arr.shape[0] + self.buffer_size, refcheck = False )

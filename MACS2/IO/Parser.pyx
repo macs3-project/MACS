@@ -899,16 +899,14 @@ cdef class BAMParser( GenericParser ):
             except struct.error:
                 break
             ( chrid, fpos, strand ) = self.__fw_binary_parse( fread( entrylength ) )
-            i+=1
+            i += 1
             if i == 1000000:
                 m += 1
-                logging.info( " %d" % ( m*1000000 ) )
+                logging.info( " %d million" % m )
                 i = 0
             if fpos >= 0:
                 fwtrack.add_loc( references[ chrid ], fpos, strand )
         self.fhd.close()
-        # this is the problematic part. If fwtrack is finalized, then it's impossible to increase the length of it in a step of buffer_size for multiple input files.
-        # fwtrack.finalize()
         fwtrack.set_rlengths( rlengths )
         return fwtrack
 

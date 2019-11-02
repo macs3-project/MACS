@@ -53,7 +53,7 @@ cdef float get_pscore ( int x, float l ):
     cdef:
         float val
     if ( x, l ) in pscore_dict:
-        return pscore_dict [ (x, l ) ]
+        return pscore_dict [ ( x, l ) ]
     else:
         # calculate and cache
         val = -1 * poisson_cdf ( x, l, False, True )
@@ -87,11 +87,6 @@ __doc__ = "CallPeakUnit"
 # ------------------------------------
 # Misc functions
 # ------------------------------------
-cdef inline int int_max(int a, int b): return a if a >= b else b
-cdef inline int int_min(int a, int b): return a if a <= b else b
-def do_nothing(*args, **kwargs):
-    pass
-
 LOG10_E = 0.43429448190325176
 
 cdef void clean_up_ndarray ( np.ndarray x ):
