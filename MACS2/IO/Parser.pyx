@@ -879,8 +879,7 @@ cdef class BAMParser( GenericParser ):
         Note only the unique match for a tag is kept.
         """
         cdef:
-            long i = 0                     #number of reads read
-            long j = 0                     #number of reads kept
+            long i = 0                           #number of reads kept
             int entrylength, fpos, strand, chrid
             list references
             dict rlengths
@@ -897,13 +896,12 @@ cdef class BAMParser( GenericParser ):
             except struct.error:
                 break
             ( chrid, fpos, strand ) = self.__fw_binary_parse( fread( entrylength ) )
+            if chrid == -1: continue
+            fwtrack.add_loc( references[ chrid ], fpos, strand )
             i += 1
-            if chrid != -1:
-                fwtrack.add_loc( references[ chrid ], fpos, strand )
-                j += 1
-            #if i % 1000000 == 0:
-            #    info( " %d" % i )
-        info( "%d/%d reads have been read." % ( j, i ) ) 
+            if i % 1000000 == 0:
+                info( " %d" % i )
+        info( "%d reads have been read." % i ) 
         self.fhd.close()
         fwtrack.set_rlengths( rlengths )
         return fwtrack
@@ -914,8 +912,7 @@ cdef class BAMParser( GenericParser ):
         Note only the unique match for a tag is kept.
         """
         cdef:
-            long i = 0                     #number of reads read
-            long j = 0                     #number of reads kept
+            long i = 0                     #number of reads kept
             int entrylength, fpos, strand, chrid
             list references
             dict rlengths
@@ -931,14 +928,13 @@ cdef class BAMParser( GenericParser ):
             except struct.error:
                 break
             ( chrid, fpos, strand ) = self.__fw_binary_parse( fread( entrylength ) )
-            i+=1
-            #if i % 1000000 == 0:
-            #    info( " %d" % i )
-            if chrid != -1:
-                fwtrack.add_loc( references[ chrid ], fpos, strand )
-                j += 1
+            if chrid == -1: continue
+            fwtrack.add_loc( references[ chrid ], fpos, strand )
+            i += 1
+            if i % 1000000 == 0:
+                info( " %d" % i )
 
-        info( "%d/%d reads have been read." % ( j, i ) ) 
+        info( "%d reads have been read." % i ) 
         self.fhd.close()
         #fwtrack.finalize()
         # this is the problematic part. If fwtrack is finalized, then it's impossible to increase the length of it in a step of buffer_size for multiple input files.
@@ -1036,13 +1032,11 @@ cdef class BAMPEParser(BAMParser):
         """Build PETrackI from all lines, return a FWTrack object.
         """
         cdef:
-            long i = 0          # number of fragments read
-            long j = 0          # number of fragments kept
+            long i = 0          # number of fragments kept
             long m = 0          # sum of fragment lengths
             int entrylength, fpos, chrid, tlen
             list references
             dict rlengths
-            #bytes rawread
         
         petrack = PETrackI( buffer_size = self.buffer_size )
 
@@ -1057,22 +1051,18 @@ cdef class BAMPEParser(BAMParser):
         while True:
             try: entrylength = unpack('<i', fread(4))[0]
             except err: break
-            #rawread = fread(32)
-            #rawread = <bytes>fread(entrylength)
             ( chrid, fpos, tlen ) = self.__pe_binary_parse( fread(entrylength) )
+            if chrid == -1: continue
+            add_loc(references[ chrid ], fpos, fpos + tlen)
+            m += tlen
             i += 1
-            #fseek(entrylength - 32, 1)
-            if chrid != -1:
-                m += tlen
-                add_loc(references[ chrid ], fpos, fpos + tlen)
-                j += 1
-            #if i % 1000000 == 0:
-            #    info(" %d" % i)
+            if i % 1000000 == 0:
+                info(" %d" % i)
 
-        self.d = m / j
-        self.n = j
+        self.d = m / i
+        self.n = i
         assert self.d >= 0, "Something went wrong (mean fragment size was negative)"
-        info( "%d/%d reads have been read." % ( j, i ) )         
+        info( "%d fragments have been read." % i )
         self.fhd.close()
         petrack.set_rlengths( rlengths )
         return petrack
@@ -1081,13 +1071,11 @@ cdef class BAMPEParser(BAMParser):
         """Build PETrackI from all lines, return a PETrackI object.
         """
         cdef:
-            long i = 0          # number of fragments read
-            long j = 0          # number of fragments kept
+            long i = 0          # number of fragments kept
             long m = 0          # sum of fragment lengths
             int entrylength, fpos, chrid, tlen
             list references
             dict rlengths
-            #bytes rawread
         
         references, rlengths = self.get_references()
         fseek = self.fhd.seek
@@ -1100,22 +1088,18 @@ cdef class BAMPEParser(BAMParser):
         while True:
             try: entrylength = unpack('<i', fread(4))[0]
             except err: break
-            #rawread = fread(32)           #only need 32bytes
-            #rawread = <bytes>fread(entrylength)
             ( chrid, fpos, tlen ) = self.__pe_binary_parse( fread(entrylength) )
+            if chrid == -1: continue
+            add_loc(references[ chrid ], fpos, fpos + tlen)
+            m += tlen
             i += 1
-            #fseek(entrylength - 32, 1)    #skip the rest bytes
-            if chrid != -1:
-                m += tlen
-                add_loc(references[ chrid ], fpos, fpos + tlen)
-                j += 1
-            #if i % 1000000 == 0:
-            #    info(" %d" % i)
+            if i % 1000000 == 0:
+                info(" %d" % i)
 
-        self.d = ( self.d * self.n + m ) / ( self.n + j )
-        self.n += j
+        self.d = ( self.d * self.n + m ) / ( self.n + i )
+        self.n += i
         assert self.d >= 0, "Something went wrong (mean fragment size was negative)"
-        info( "%d/%d reads have been read." % ( j, i ) )         
+        info( "%d fragments have been read." % i )         
         self.fhd.close()
         # this is the problematic part. If fwtrack is finalized, then it's impossible to increase the length of it in a step of buffer_size for multiple input files.
         # petrack.finalize()

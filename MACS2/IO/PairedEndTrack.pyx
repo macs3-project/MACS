@@ -284,7 +284,6 @@ cdef class PETrackI:
             np.ndarray locs, new_locs, dup_locs
             unsigned long i_old, i_new, i_dup, new_size, dup_size
             set chrnames
-            list loc_2
             bytes k
 
         chrnames = self.get_chr_names()
@@ -303,6 +302,8 @@ cdef class PETrackI:
             i_dup = 0
             locs = self.__locations[k]
             size = locs.shape[0]
+            #print(f"size={size}")
+            #print(locs[0], locs[1], locs[2])
             if size <= 1:
                 new_locs = locs
             else:
@@ -317,9 +318,8 @@ cdef class PETrackI:
                 i_new += 1
                 self.length += current_loc_end - current_loc_start
                 for i_old in range(1, size):
-                    loc_2 = locs[i_old]
-                    loc_start = loc_2[0]
-                    loc_end = loc_2[1]
+                    loc_start = locs[i_old][0]
+                    loc_end = locs[i_old][1]
                     
                     if (loc_start == current_loc_start) and (loc_end == current_loc_end) :
                         n += 1
