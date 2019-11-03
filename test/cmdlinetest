@@ -210,7 +210,7 @@ for i in ${subfolders[@]};do
 	    echo " ... success!"
 	else
 	    echo " ... failed! Difference:"
-	    echo $d
+	    diff tmp_fq.txt tmp_fs.txt | head -10
 	    let "flag=1";
 	fi
     done
