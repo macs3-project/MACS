@@ -284,6 +284,7 @@ cdef class PETrackI:
             np.ndarray locs, new_locs, dup_locs
             unsigned long i_old, i_new, i_dup, new_size, dup_size
             set chrnames
+            list loc_2
             bytes k
 
         chrnames = self.get_chr_names()
@@ -316,21 +317,20 @@ cdef class PETrackI:
                 i_new += 1
                 self.length += current_loc_end - current_loc_start
                 for i_old in range(1, size):
-                    loc_start = locs[i_old][0]
-                    loc_end = locs[i_old][1]
-                    all_same = ((loc_start == current_loc_start) and
-                                (loc_end == current_loc_end)) 
-                    if all_same:
+                    loc_2 = locs[i_old]
+                    loc_start = loc_2[0]
+                    loc_end = loc_2[1]
+                    
+                    if (loc_start == current_loc_start) and (loc_end == current_loc_end) :
                         n += 1
+                        if n > maxint:
+                            dup_locs[i_dup][0] = loc_start
+                            dup_locs[i_dup][1] = loc_end
+                            i_dup += 1
                     else:
                         current_loc_start = loc_start
                         current_loc_end = loc_end
                         n = 1
-                    if n > maxint:
-                        dup_locs[i_dup][0] = loc_start
-                        dup_locs[i_dup][1] = loc_end
-                        i_dup += 1
-                    else:
                         new_locs[i_new][0] = loc_start
                         new_locs[i_new][1] = loc_end
                         self.length += loc_end - loc_start                        
@@ -357,7 +357,7 @@ cdef class PETrackI:
             self.__locations[k] = new_locs
             if size > 1:
                 self.__dup_locations[k] = dup_locs
-        self.average_template_length = float( self.length ) / self.total
+        self.average_template_length = self.length / self.total
         return
     
     @cython.boundscheck(False) # do not check that np indices are valid

@@ -897,12 +897,12 @@ cdef class BAMParser( GenericParser ):
             except struct.error:
                 break
             ( chrid, fpos, strand ) = self.__fw_binary_parse( fread( entrylength ) )
-            if fpos >= 0:
+            i += 1
+            if chrid != -1:
                 fwtrack.add_loc( references[ chrid ], fpos, strand )
                 j += 1
-            i += 1
-            if i % 1000000 == 0:
-                info( " %d" % i )
+            #if i % 1000000 == 0:
+            #    info( " %d" % i )
         info( "%d/%d reads have been read." % ( j, i ) ) 
         self.fhd.close()
         fwtrack.set_rlengths( rlengths )
@@ -932,9 +932,9 @@ cdef class BAMParser( GenericParser ):
                 break
             ( chrid, fpos, strand ) = self.__fw_binary_parse( fread( entrylength ) )
             i+=1
-            if i % 1000000 == 0:
-                info( " %d" % i )
-            if fpos >= 0:
+            #if i % 1000000 == 0:
+            #    info( " %d" % i )
+            if chrid != -1:
                 fwtrack.add_loc( references[ chrid ], fpos, strand )
                 j += 1
 
@@ -947,17 +947,19 @@ cdef class BAMParser( GenericParser ):
     
     cdef tuple __fw_binary_parse (self, data ):
         cdef:
-            int thisref, thisstart, thisstrand, i
+            int thisref, thisstart, thisstrand
             short bwflag, l_read_name, n_cigar_op
             int cigar_code
-            short unused1, unused2, unused3
+            tuple readout
 
         # we skip lot of the available information in data (i.e. tag name, quality etc etc)        
 
         # no data, return, does it really happen without raising struct.error?
         if not data: return ( -1, -1, -1 )
 
-        (thisref, thisstart, l_read_name, unused1, unused2, unused3, n_cigar_op, bwflag) = unpack( '<iiBBBBHH', data [ : 16 ])
+        #(thisref, thisstart, l_read_name, unused1, unused2, unused3, n_cigar_op, bwflag) = unpack( '<iiBBBBHH', data [ : 16 ])
+        readout = unpack( '<iiBBBBHH', data [ : 16 ])
+        bwflag = readout[7]
         if (bwflag & 2820) or (bwflag & 1 and (bwflag & 136 or not bwflag & 2)): return ( -1, -1, -1 )
         #simple form of the expression below 
         #if bwflag & 4 or bwflag & 512 or bwflag & 256 or bwflag & 2048: return (-1, -1, -1)
@@ -975,7 +977,10 @@ cdef class BAMParser( GenericParser ):
         #        return ( -1, -1, -1 )
         
         #(ret.ref, ret.start, l_read_name, unused1, unused2, unused3, n_cigar_op) = unpack( '<iiBBBBH', data [ : 14 ])
-        
+        thisref = readout[0]
+        thisstart = readout[1]
+        l_read_name = readout[2]
+        n_cigar_op = readout[6]
         #thisref = unpack( '<i', data[ 0:4 ] )[ 0 ]
         #thisstart = unpack( '<i', data[ 4:8 ] )[ 0 ]
         # In case of paired-end we have now skipped all possible "bad" pairs
@@ -1055,14 +1060,14 @@ cdef class BAMPEParser(BAMParser):
             #rawread = fread(32)
             #rawread = <bytes>fread(entrylength)
             ( chrid, fpos, tlen ) = self.__pe_binary_parse( fread(entrylength) )
+            i += 1
             #fseek(entrylength - 32, 1)
             if chrid != -1:
                 m += tlen
                 add_loc(references[ chrid ], fpos, fpos + tlen)
                 j += 1
-            i += 1
-            if i % 1000000 == 0:
-                info(" %d" % i)
+            #if i % 1000000 == 0:
+            #    info(" %d" % i)
 
         self.d = m / j
         self.n = j
@@ -1098,14 +1103,14 @@ cdef class BAMPEParser(BAMParser):
             #rawread = fread(32)           #only need 32bytes
             #rawread = <bytes>fread(entrylength)
             ( chrid, fpos, tlen ) = self.__pe_binary_parse( fread(entrylength) )
+            i += 1
             #fseek(entrylength - 32, 1)    #skip the rest bytes
             if chrid != -1:
                 m += tlen
                 add_loc(references[ chrid ], fpos, fpos + tlen)
                 j += 1
-            i += 1
-            if i == 1000000:
-                info(" %d" % i)
+            #if i % 1000000 == 0:
+            #    info(" %d" % i)
 
         self.d = ( self.d * self.n + m ) / ( self.n + j )
         self.n += j
@@ -1120,16 +1125,17 @@ cdef class BAMPEParser(BAMParser):
     cdef tuple __pe_binary_parse (self, bytes data):
         cdef:
             int thisref, thisstart, thistlen
-            int nextpos, pos, cigar_op_len, i
-            short bwflag, l_read_name, n_cigar_op, cigar_op
-            int unused1, unused2, unused3, unused4
+            int nextpos, pos
+            short bwflag
+            tuple readout
         
         # we skip lot of the available information in data (i.e. tag name, quality etc etc)
         if not data: return ( -1, -1, -1 )
 
-        ( thisref, pos, unused1, n_cigar_op, bwflag, unused2, unused3, nextpos, thistlen ) = \
-          unpack( '<iiiHHiiii', data[:32] )
+        #( thisref, pos, unused1, n_cigar_op, bwflag, unused2, unused3, nextpos, thistlen ) = \
+        readout = unpack( '<iiiHHiiii', data[:32] )
 
+        bwflag = readout[4]
         if (bwflag & 2820) or (bwflag & 1 and (bwflag & 136 or not bwflag & 2)): return (-1, -1, -1)
         #simple form of the expression below 
         # if bwflag & 4 or bwflag & 512 or bwflag & 256 or bwflag & 2048:
@@ -1144,7 +1150,10 @@ cdef class BAMPEParser(BAMParser):
         #     if bwflag & 128:
         #         # this is not the first read in a pair
         #         return ret
-
+        thisref = readout[0]
+        pos = readout[1]
+        nextpos = readout[7]
+        thistlen = readout[8]
         thisstart = min(pos, nextpos) # we keep only the leftmost
                                       # position which means this must
                                       # be at + strand. So we don't
