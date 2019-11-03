@@ -72,7 +72,7 @@ cdef class PETrackI:
         self.length = 0
         self.average_template_length = 0.0
         
-    cpdef add_loc ( self, bytes chromosome, int start, int end):
+    cpdef void add_loc ( self, bytes chromosome, int start, int end):
         """Add a location to the list according to the sequence name.
         
         chromosome -- mostly the chromosome name
@@ -92,6 +92,7 @@ cdef class PETrackI:
             self.__locations[chromosome][ i ] = ( start, end )
             self.__pointer[chromosome] += 1
         self.length += end - start
+        return
 
     cpdef destroy ( self ):
         """Destroy this object and release mem.

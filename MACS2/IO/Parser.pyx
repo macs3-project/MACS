@@ -896,11 +896,11 @@ cdef class BAMParser( GenericParser ):
             except struct.error:
                 break
             ( chrid, fpos, strand ) = self.__fw_binary_parse( fread( entrylength ) )
+            if fpos >= 0:
+                fwtrack.add_loc( references[ chrid ], fpos, strand )
             i += 1
             if i % 1000000 == 0:
                 info( " %d" % i )
-            if fpos >= 0:
-                fwtrack.add_loc( references[ chrid ], fpos, strand )
         self.fhd.close()
         fwtrack.set_rlengths( rlengths )
         return fwtrack
@@ -1049,13 +1049,12 @@ cdef class BAMPEParser(BAMParser):
             #rawread = <bytes>fread(entrylength)
             ( chrid, fpos, tlen ) = self.__pe_binary_parse( fread(entrylength) )
             #fseek(entrylength - 32, 1)
-            if chrid == -1: continue
-            m += tlen
+            if chrid != -1:
+                m += tlen
+                add_loc(references[ chrid ], fpos, fpos + tlen)
             i += 1
             if i % 1000000 == 0:
                 info(" %d" % i)
-
-            add_loc(references[ chrid ], fpos, fpos + tlen)
 
         self.d = float( m ) / i
         self.n = i
@@ -1090,15 +1089,12 @@ cdef class BAMPEParser(BAMParser):
             #rawread = <bytes>fread(entrylength)
             ( chrid, fpos, tlen ) = self.__pe_binary_parse( fread(entrylength) )
             #fseek(entrylength - 32, 1)    #skip the rest bytes
-
-            if thisref == -1: continue
-
-            m += tlen
+            if chrid != -1:
+                m += tlen
+                add_loc(references[ chrid ], fpos, fpos + tlen)
             i += 1
             if i == 1000000:
                 info(" %d" % i)
-
-            add_loc(references[ chrid ], fpos, fpos + tlen)
 
         self.d = ( self.d * self.n + m ) / ( self.n + i )
         self.n += i
@@ -1117,7 +1113,7 @@ cdef class BAMPEParser(BAMParser):
             int unused1, unused2, unused3, unused4
         
         # we skip lot of the available information in data (i.e. tag name, quality etc etc)
-        if not data: return ret
+        if not data: return ( -1, -1, -1 )
 
         ( thisref, pos, unused1, n_cigar_op, bwflag, unused2, unused3, nextpos, thistlen ) = \
           unpack( '<iiiHHiiii', data[:32] )
