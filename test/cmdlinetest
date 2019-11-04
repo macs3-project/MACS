@@ -172,7 +172,7 @@ echo "13. search for errors or warnings in log files"
 flag=0
 for i in `ls ${TAG}_run_*/*.log`;do
     echo " checking $i..."
-    egrep -i "error|warning" $i;
+    egrep -A 2 -B 2 -i "error|warning" $i;
     if [[ $? == 0 ]];then
 	echo " ... error/warning found!"
 	let "flag=1";

@@ -313,8 +313,8 @@ cdef class PETrackI:
             dup_locs = np.zeros(self.__pointer[k] + 1, dtype=[('l','int32'),('r','int32')]) # note: ['l'] is the leftmost end, ['r'] is the rightmost end of fragment.
             current_loc_start = locs[0][0] # same as locs[0]['l']
             current_loc_end = locs[0][1]# same as locs[0]['r']
-            new_locs[i_new][0] = current_loc_start
-            new_locs[i_new][1] = current_loc_end
+            new_locs[0][0] = current_loc_start
+            new_locs[0][1] = current_loc_end
             self.length += current_loc_end - current_loc_start
             i_new = 1           # index of new_locs
             i_dup = 0           # index of dup_locs
@@ -397,8 +397,8 @@ cdef class PETrackI:
             # get the first loc
             current_loc_start = locs[0][0]
             current_loc_end = locs[0][1]
-            new_locs[i_new][0] = current_loc_start
-            new_locs[i_new][1] = current_loc_end
+            new_locs[0][0] = current_loc_start
+            new_locs[0][1] = current_loc_end
             self.length += current_loc_end - current_loc_start
             i_new = 1           # index of new_locs
             n = 1               # the number of tags in the current genomic location
