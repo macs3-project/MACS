@@ -1,6 +1,6 @@
 # cython: language_level=3
 # cython: profile=True
-# Time-stamp: <2019-10-30 16:32:50 taoliu>
+# Time-stamp: <2019-11-04 11:47:48 taoliu>
 
 """Module for FWTrack classes.
 
@@ -96,7 +96,7 @@ cdef class FWTrack:
         self.length = 0
         self.__destroyed = False
 
-    cpdef destroy ( self ):
+    cpdef void destroy ( self ):
         """Destroy this object and release mem.
         """
         cdef:
@@ -120,7 +120,7 @@ cdef class FWTrack:
                 self.__dup_locations[chromosome] = [None, None]
                 self.__dup_locations.pop(chromosome)
         self.__destroyed = True
-        return True
+        return
 
 
     cpdef void add_loc ( self, bytes chromosome, int32_t fiveendpos, int strand ):
@@ -146,11 +146,11 @@ cdef class FWTrack:
             self.__pointer[chromosome][strand] += 1
         return
 
-    cdef np.ndarray[np.int32_t, ndim=1] __expand__ ( self, np.ndarray[np.int32_t, ndim=1] arr ):
+    cdef void __expand__ ( self, np.ndarray[np.int32_t, ndim=1] arr ):
         arr.resize( arr.shape[0] + self.buffer_size, refcheck = False )
-        return arr
+        return
 
-    cpdef finalize ( self ):
+    cpdef void finalize ( self ):
         """ Resize np arrays for 5' positions and sort them in place
 
         Note: If this function is called, it's impossible to append more files to this FWTrack object. So remember to call it after all the files are read!
@@ -227,7 +227,7 @@ cdef class FWTrack:
     #     """
     #     return self.total*self.fw
 
-    cpdef sort ( self ):
+    cpdef void sort ( self ):
         """Naive sorting for locations.
         
         """
@@ -243,9 +243,10 @@ cdef class FWTrack:
             self.__locations[c][1].sort()
 
         self.__sorted = True
+        return
 
     @cython.boundscheck(False)
-    cpdef separate_dups( self, maxint = 1 ):
+    cpdef void separate_dups( self, int maxnum = 1 ):
         """Separate the duplicated reads into a different track
         stored at self.dup
         """
@@ -292,7 +293,7 @@ cdef class FWTrack:
                     else:
                         current_loc = p
                         n = 1
-                    if n > maxint:
+                    if n > maxnum:
                         dup_plus [ i_dup ] = p
                         i_dup += 1
                     else:
@@ -338,7 +339,7 @@ cdef class FWTrack:
                     else:
                         current_loc = p
                         n = 1
-                    if n > maxint:
+                    if n > maxnum:
                         dup_minus [ i_dup ] = p
                         i_dup += 1
                     else:
@@ -433,7 +434,7 @@ cdef class FWTrack:
         return 0
 
     @cython.boundscheck(False) # do not check that np indices are valid
-    cpdef unsigned long filter_dup ( self, int32_t maxnum = -1):
+    cpdef unsigned long filter_dup ( self, int maxnum = -1):
         """Filter the duplicated reads.
 
         Run it right after you add all data into this object.
@@ -480,16 +481,12 @@ cdef class FWTrack:
                     p = plus[ i_old ]
                     if p == current_loc:
                         n += 1
-                        if n <= maxnum:
-                            new_plus[ i_new ] = p
-                            i_new += 1
-                        else:
-                            logging.debug("Duplicate reads found at %s:%d at + strand" % (k,p) )
                     else:
                         current_loc = p
-                        new_plus[ i_new ] = p
-                        i_new += 1                        
                         n = 1
+                    if n <= maxnum:
+                        new_plus[ i_new ] = p
+                        i_new += 1
                 new_plus.resize( i_new, refcheck=False )
                 self.total +=  i_new
                 self.__pointer[k][0] = i_new
@@ -519,16 +516,12 @@ cdef class FWTrack:
                     p = minus[ i_old ]
                     if p == current_loc:
                         n += 1
-                        if n <= maxnum:
-                            new_minus[ i_new ] = p
-                            i_new += 1
-                        else:
-                            logging.debug("Duplicate reads found at %s:%d at + strand" % (k,p) )
                     else:
                         current_loc = p
-                        new_minus[ i_new ] = p
-                        i_new += 1                        
                         n = 1
+                    if n <= maxnum:
+                        new_minus[ i_new ] = p
+                        i_new += 1
                 new_minus.resize( i_new, refcheck=False )
                 self.total +=  i_new
                 self.__pointer[k][1] = i_new                
@@ -547,7 +540,7 @@ cdef class FWTrack:
         self.length = self.fw * self.total
         return self.total
 
-    cpdef sample_percent (self, float percent, int seed = -1 ):
+    cpdef void sample_percent (self, float percent, int seed = -1 ):
         """Sample the tags for a given percentage.
 
         Warning: the current object is changed!
@@ -586,7 +579,7 @@ cdef class FWTrack:
         self.length = self.fw * self.total
         return
 
-    cpdef sample_num (self, uint64_t samplesize, int seed = -1):
+    cpdef void sample_num (self, uint64_t samplesize, int seed = -1):
         """Sample the tags for a given percentage.
 
         Warning: the current object is changed!
@@ -598,7 +591,7 @@ cdef class FWTrack:
         self.sample_percent ( percent, seed )
         return
 
-    cpdef print_to_bed (self, fhd=None):
+    cpdef void print_to_bed (self, fhd=None):
         """Output FWTrack to BED format files. If fhd is given,
         write to a file, otherwise, output to standard output.
         
@@ -669,7 +662,7 @@ cdef class FWTrack:
         rt_minus = np.array(temp)
         return (rt_plus, rt_minus)
 
-    cpdef compute_region_tags_from_peaks ( self, peaks, func, int window_size = 100, float cutoff = 5 ):
+    cpdef list compute_region_tags_from_peaks ( self, peaks, func, int window_size = 100, float cutoff = 5 ):
         """Extract tags in peak, then apply func on extracted tags.
         
         peaks: redefined regions to extract raw tags in PeakIO type: check cPeakIO.pyx.
@@ -753,7 +746,7 @@ cdef class FWTrack:
                 
         return retval
 
-    cpdef refine_peak_from_tags_distribution ( self, peaks, int window_size = 100, float cutoff = 5 ):
+    cpdef object refine_peak_from_tags_distribution ( self, peaks, int window_size = 100, float cutoff = 5 ):
         """Extract tags in peak, then apply func on extracted tags.
         
         peaks: redefined regions to extract raw tags in PeakIO type: check cPeakIO.pyx.
@@ -775,6 +768,7 @@ cdef class FWTrack:
             set pchrnames, chrnames
             list temp, retval, cpeaks
             np.ndarray[np.int32_t, ndim=1] adjusted_summits, passflags
+            object ret_peaks
 
         pchrnames = peaks.get_chr_names()
         retval = []
@@ -858,7 +852,7 @@ cdef class FWTrack:
                 # end of a loop
         return ret_peaks
 
-    cpdef pileup_a_chromosome ( self, bytes chrom, list ds, list scale_factor_s, float baseline_value = 0.0, bint directional = True, int end_shift = 0 ):
+    cpdef list pileup_a_chromosome ( self, bytes chrom, list ds, list scale_factor_s, float baseline_value = 0.0, bint directional = True, int end_shift = 0 ):
         """pileup a certain chromosome, return [p,v] (end position and value) list.
         
         ds             : tag will be extended to this value to 3' direction,
@@ -926,7 +920,7 @@ cdef inline int32_t left_forward ( data, int pos, int window_size ):
 cdef inline int32_t right_forward ( data, int pos, int window_size ):
     return data.get(pos + window_size, 0) - data.get(pos, 0)
 
-cdef wtd_find_summit(chrom, np.ndarray[np.int32_t, ndim=1] plus, np.ndarray[np.int32_t, ndim=1] minus, int32_t search_start, int32_t search_end, int32_t window_size, float cutoff):
+cdef tuple wtd_find_summit(chrom, np.ndarray[np.int32_t, ndim=1] plus, np.ndarray[np.int32_t, ndim=1] minus, int32_t search_start, int32_t search_end, int32_t window_size, float cutoff):
     """internal function to be called by refine_peak_from_tags_distribution()
 
     """
