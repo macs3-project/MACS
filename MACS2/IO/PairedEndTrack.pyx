@@ -26,7 +26,10 @@ from MACS2.Pileup import quick_pileup, max_over_two_pv_array, se_all_in_one_pile
 
 cdef INT_MAX = <int>((<unsigned int>-1)>>1)
 
-
+cdef packed struct peLoc:
+    np.int32_t l
+    np.int32_t r
+  
 # Let numpy enforce PE-ness using ndarray, gives bonus speedup when sorting
 # PE data doesn't have strandedness
 cdef class PETrackI:
@@ -372,6 +375,7 @@ cdef class PETrackI:
             bytes k
             np.ndarray locs, new_locs
             set chrnames
+            #peLoc current_range, this_range
                 
         if maxnum < 0: return self.total # condition to return if not filtering
         
@@ -395,6 +399,7 @@ cdef class PETrackI:
             # discard duplicate reads and make a new __locations[k]
             new_locs = np.zeros( self.__pointer[k] + 1, dtype=[('l','int32'),('r','int32')]) # note: ['l'] is the leftmost end, ['r'] is the rightmost end of fragment.
             # get the first loc
+            #current_range = locs[0]
             current_loc_start = locs[0][0]
             current_loc_end = locs[0][1]
             new_locs[0][0] = current_loc_start
@@ -405,8 +410,7 @@ cdef class PETrackI:
             for i_old in range(1, size):
                 loc_start = locs[i_old][0]
                 loc_end = locs[i_old][1]
-                if ((loc_start == current_loc_start) and
-                    (loc_end == current_loc_end)):
+                if loc_start == current_loc_start and loc_end == current_loc_end:
                     # both ends are the same, add 1 to duplicate number n
                     n += 1
                 else:
@@ -418,8 +422,8 @@ cdef class PETrackI:
                     # smaller than maxnum, then add to new_locs,
                     # otherwise, discard
                     new_locs[i_new][0] = loc_start
-                    new_locs[i_new][1] = loc_end
-                    self.length += loc_end - loc_start                            
+                    new_locs[i_new][1] = loc_end                    
+                    self.length += loc_end - loc_start
                     i_new += 1
             new_locs.resize( i_new, refcheck = False )
             new_size = new_locs.shape[0]
@@ -433,7 +437,7 @@ cdef class PETrackI:
             locs.resize( 0, refcheck=False )
             # hope there would be no mem leak...
             self.__locations[k] = new_locs
-        self.average_template_length = float( self.length ) / self.total
+        self.average_template_length = self.length / self.total
         return self.total
 
     cpdef void sample_percent (self, float percent, int seed = -1):

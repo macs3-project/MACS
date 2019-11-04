@@ -1,7 +1,7 @@
 # cython: language_level=3
 # cython: profile=True
 # cython: linetrace=True
-# Time-stamp: <2019-10-30 16:32:44 taoliu>
+# Time-stamp: <2019-11-04 15:06:29 taoliu>
 
 """Module for all MACS Parser classes for input.
 
@@ -145,7 +145,7 @@ cdef class GenericParser:
         f.close()
         if self.gzipped:
             # open with gzip.open, then wrap it with BufferedReader!
-            self.fhd = io.BufferedReader( gzip.open( filename, mode='rb' ) )
+            self.fhd = io.BufferedReader( gzip.open( filename, mode='rb' ), buffer_size = 1048576 ) # buffersize set to 1M
         else:
             self.fhd = io.open( filename, mode='rb' ) # binary mode! I don't expect unicode here!
 
@@ -776,7 +776,7 @@ cdef class BAMParser( GenericParser ):
         f.close()
         if self.gzipped:
             # open with gzip.open, then wrap it with BufferedReader!
-            self.fhd = io.BufferedReader( gzip.open( filename, mode='rb' ) )
+            self.fhd = io.BufferedReader( gzip.open( filename, mode='rb' ), buffer_size = 1048576) # buffersize set to 1M
         else:
             self.fhd = io.open( filename, mode='rb' ) # binary mode! I don't expect unicode here!
 
