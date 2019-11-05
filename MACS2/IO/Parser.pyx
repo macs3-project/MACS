@@ -28,7 +28,7 @@ from cpython cimport bool
 
 import numpy as np
 cimport numpy as np
-from numpy cimport uint32_t, uint64_t, int32_t
+from numpy cimport uint32_t, uint64_t, int32_t, int64_t
 
 cdef extern from "stdlib.h":
     ctypedef unsigned int size_t
@@ -1028,12 +1028,12 @@ cdef class BAMPEParser(BAMParser):
     cdef public int n           # total number of fragments
     cdef public float d         # the average length of fragments
 
-    cpdef build_petrack ( self ):
+    cpdef object build_petrack ( self ):
         """Build PETrackI from all lines, return a FWTrack object.
         """
         cdef:
-            long i = 0          # number of fragments kept
-            long m = 0          # sum of fragment lengths
+            int i = 0          # number of fragments kept
+            int m = 0          # sum of fragment lengths
             int entrylength, fpos, chrid, tlen
             list references
             dict rlengths

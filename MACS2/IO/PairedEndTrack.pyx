@@ -82,7 +82,7 @@ cdef class PETrackI:
         fiveendpos -- 5' end pos, left for plus strand, right for neg strand
         """
         cdef:
-            long i
+            int i
 
         if chromosome not in self.__locations:
             self.__locations[chromosome] = np.zeros(shape=self.buffer_size, dtype=[('l','int32'),('r','int32')]) # note: ['l'] is the leftmost end, ['r'] is the rightmost end of fragment.
@@ -93,7 +93,7 @@ cdef class PETrackI:
             if i % self.buffer_size == 0:
                 self.__expand__ ( self.__locations[chromosome] )
             self.__locations[chromosome][ i ] = ( start, end )
-            self.__pointer[chromosome] += 1
+            self.__pointer[chromosome] = i + 1
         self.length += end - start
         return
 
@@ -363,7 +363,7 @@ cdef class PETrackI:
         return
     
     @cython.boundscheck(False) # do not check that np indices are valid
-    cpdef unsigned long filter_dup ( self, int maxnum=-1):
+    cpdef void filter_dup ( self, int maxnum=-1):
         """Filter the duplicated reads.
     
         Run it right after you add all data into this object.
@@ -377,7 +377,7 @@ cdef class PETrackI:
             set chrnames
             #peLoc current_range, this_range
                 
-        if maxnum < 0: return self.total # condition to return if not filtering
+        if maxnum < 0: return # condition to return if not filtering
         
         if not self.__sorted: self.sort()
         
@@ -389,7 +389,7 @@ cdef class PETrackI:
         
         for k in chrnames: # for each chromosome
             locs = self.__locations[k]
-            size = locs.shape[0]
+            size = locs.shape[0]            
             if size == 1:
                 # do nothing and continue
                 self.total += size
@@ -399,17 +399,19 @@ cdef class PETrackI:
             # discard duplicate reads and make a new __locations[k]
             new_locs = np.zeros( self.__pointer[k] + 1, dtype=[('l','int32'),('r','int32')]) # note: ['l'] is the leftmost end, ['r'] is the rightmost end of fragment.
             # get the first loc
-            #current_range = locs[0]
-            current_loc_start = locs[0][0]
-            current_loc_end = locs[0][1]
-            new_locs[0][0] = current_loc_start
-            new_locs[0][1] = current_loc_end
+            #current_loc_start = locs[0][0]
+            #current_loc_end = locs[0][1]
+            ( current_loc_start, current_loc_end ) = locs[0]
+            #new_locs[0][0] = current_loc_start
+            #new_locs[0][1] = current_loc_end
+            new_locs[0] = ( current_loc_start, current_loc_end )
             self.length += current_loc_end - current_loc_start
             i_new = 1           # index of new_locs
             n = 1               # the number of tags in the current genomic location
             for i_old in range(1, size):
-                loc_start = locs[i_old][0]
-                loc_end = locs[i_old][1]
+                #loc_start = locs[i_old][0]
+                #loc_end = locs[i_old][1]
+                ( loc_start, loc_end ) = locs[i_old]
                 if loc_start == current_loc_start and loc_end == current_loc_end:
                     # both ends are the same, add 1 to duplicate number n
                     n += 1
@@ -421,8 +423,9 @@ cdef class PETrackI:
                 if n <= maxnum:
                     # smaller than maxnum, then add to new_locs,
                     # otherwise, discard
-                    new_locs[i_new][0] = loc_start
-                    new_locs[i_new][1] = loc_end                    
+                    #new_locs[i_new][0] = loc_start
+                    #new_locs[i_new][1] = loc_end
+                    new_locs[i_new] = (loc_start, loc_end)
                     self.length += loc_end - loc_start
                     i_new += 1
             new_locs.resize( i_new, refcheck = False )
@@ -438,7 +441,7 @@ cdef class PETrackI:
             # hope there would be no mem leak...
             self.__locations[k] = new_locs
         self.average_template_length = self.length / self.total
-        return self.total
+        return
 
     cpdef void sample_percent (self, float percent, int seed = -1):
         """Sample the tags for a given percentage.

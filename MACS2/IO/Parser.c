@@ -19031,15 +19031,15 @@ static PyObject *__pyx_pf_5MACS2_2IO_6Parser_9BAMParser_14__setstate_cython__(st
 /* "MACS2/IO/Parser.pyx":1031
  *     cdef public float d         # the average length of fragments
  * 
- *     cpdef build_petrack ( self ):             # <<<<<<<<<<<<<<
+ *     cpdef object build_petrack ( self ):             # <<<<<<<<<<<<<<
  *         """Build PETrackI from all lines, return a FWTrack object.
  *         """
  */
 
 static PyObject *__pyx_pw_5MACS2_2IO_6Parser_11BAMPEParser_1build_petrack(PyObject *__pyx_v_self, CYTHON_UNUSED PyObject *unused); /*proto*/
 static PyObject *__pyx_f_5MACS2_2IO_6Parser_11BAMPEParser_build_petrack(struct __pyx_obj_5MACS2_2IO_6Parser_BAMPEParser *__pyx_v_self, int __pyx_skip_dispatch) {
-  long __pyx_v_i;
-  long __pyx_v_m;
+  int __pyx_v_i;
+  int __pyx_v_m;
   int __pyx_v_entrylength;
   int __pyx_v_fpos;
   int __pyx_v_chrid;
@@ -19121,8 +19121,8 @@ static PyObject *__pyx_f_5MACS2_2IO_6Parser_11BAMPEParser_build_petrack(struct _
   /* "MACS2/IO/Parser.pyx":1035
  *         """
  *         cdef:
- *             long i = 0          # number of fragments kept             # <<<<<<<<<<<<<<
- *             long m = 0          # sum of fragment lengths
+ *             int i = 0          # number of fragments kept             # <<<<<<<<<<<<<<
+ *             int m = 0          # sum of fragment lengths
  *             int entrylength, fpos, chrid, tlen
  */
   __Pyx_TraceLine(1035,0,__PYX_ERR(0, 1035, __pyx_L1_error))
@@ -19130,8 +19130,8 @@ static PyObject *__pyx_f_5MACS2_2IO_6Parser_11BAMPEParser_build_petrack(struct _
 
   /* "MACS2/IO/Parser.pyx":1036
  *         cdef:
- *             long i = 0          # number of fragments kept
- *             long m = 0          # sum of fragment lengths             # <<<<<<<<<<<<<<
+ *             int i = 0          # number of fragments kept
+ *             int m = 0          # sum of fragment lengths             # <<<<<<<<<<<<<<
  *             int entrylength, fpos, chrid, tlen
  *             list references
  */
@@ -19621,7 +19621,7 @@ static PyObject *__pyx_f_5MACS2_2IO_6Parser_11BAMPEParser_build_petrack(struct _
       __Pyx_TraceLine(1060,0,__PYX_ERR(0, 1060, __pyx_L1_error))
       __Pyx_GetModuleGlobalName(__pyx_t_4, __pyx_n_s_info); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 1060, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_4);
-      __pyx_t_14 = __Pyx_PyInt_From_long(__pyx_v_i); if (unlikely(!__pyx_t_14)) __PYX_ERR(0, 1060, __pyx_L1_error)
+      __pyx_t_14 = __Pyx_PyInt_From_int(__pyx_v_i); if (unlikely(!__pyx_t_14)) __PYX_ERR(0, 1060, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_14);
       __pyx_t_8 = PyUnicode_Format(__pyx_kp_u_d, __pyx_t_14); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 1060, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_8);
@@ -19707,7 +19707,7 @@ static PyObject *__pyx_f_5MACS2_2IO_6Parser_11BAMPEParser_build_petrack(struct _
   __Pyx_TraceLine(1065,0,__PYX_ERR(0, 1065, __pyx_L1_error))
   __Pyx_GetModuleGlobalName(__pyx_t_4, __pyx_n_s_info); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 1065, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_4);
-  __pyx_t_8 = __Pyx_PyInt_From_long(__pyx_v_i); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 1065, __pyx_L1_error)
+  __pyx_t_8 = __Pyx_PyInt_From_int(__pyx_v_i); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 1065, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_8);
   __pyx_t_14 = PyUnicode_Format(__pyx_kp_u_d_fragments_have_been_read, __pyx_t_8); if (unlikely(!__pyx_t_14)) __PYX_ERR(0, 1065, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_14);
@@ -19800,7 +19800,7 @@ static PyObject *__pyx_f_5MACS2_2IO_6Parser_11BAMPEParser_build_petrack(struct _
   /* "MACS2/IO/Parser.pyx":1031
  *     cdef public float d         # the average length of fragments
  * 
- *     cpdef build_petrack ( self ):             # <<<<<<<<<<<<<<
+ *     cpdef object build_petrack ( self ):             # <<<<<<<<<<<<<<
  *         """Build PETrackI from all lines, return a FWTrack object.
  *         """
  */
@@ -21106,7 +21106,7 @@ static int __pyx_pf_5MACS2_2IO_6Parser_11BAMPEParser_1n_2__set__(struct __pyx_ob
  *     cdef public int n           # total number of fragments
  *     cdef public float d         # the average length of fragments             # <<<<<<<<<<<<<<
  * 
- *     cpdef build_petrack ( self ):
+ *     cpdef object build_petrack ( self ):
  */
 
 /* Python wrapper */
@@ -30656,6 +30656,7 @@ static int __pyx_import_star_set(PyObject *o, PyObject* py_name, char *name) {
     "__pyx_opt_args_5MACS2_2IO_6Parser_guess_parser",
     "bool",
     "int32_t",
+    "int64_t",
     "size_t",
     "uint32_t",
     "uint64_t",
@@ -31958,7 +31959,7 @@ if (!__Pyx_RefNanny) {
  * 
  * import numpy as np             # <<<<<<<<<<<<<<
  * cimport numpy as np
- * from numpy cimport uint32_t, uint64_t, int32_t
+ * from numpy cimport uint32_t, uint64_t, int32_t, int64_t
  */
   __Pyx_TraceLine(29,0,__PYX_ERR(0, 29, __pyx_L1_error))
   __pyx_t_1 = __Pyx_Import(__pyx_n_s_numpy, 0, 0); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 29, __pyx_L1_error)
@@ -32329,7 +32330,7 @@ if (!__Pyx_RefNanny) {
   /* "MACS2/IO/Parser.pyx":1031
  *     cdef public float d         # the average length of fragments
  * 
- *     cpdef build_petrack ( self ):             # <<<<<<<<<<<<<<
+ *     cpdef object build_petrack ( self ):             # <<<<<<<<<<<<<<
  *         """Build PETrackI from all lines, return a FWTrack object.
  *         """
  */

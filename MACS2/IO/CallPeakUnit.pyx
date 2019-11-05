@@ -49,15 +49,16 @@ from MACS2.Prob import poisson_cdf
 pscore_dict = dict()
 logLR_dict = dict()
 
-cdef float get_pscore ( int x, float l ):
+#cdef float get_pscore ( int x, float l ):
+cdef float get_pscore ( tuple x ):
     cdef:
         float val
-    if ( x, l ) in pscore_dict:
-        return pscore_dict [ ( x, l ) ]
+    if x in pscore_dict:
+        return pscore_dict [ x ]
     else:
         # calculate and cache
-        val = -1 * poisson_cdf ( x, l, False, True )
-        pscore_dict[ ( x, l ) ] = val
+        val = -1 * poisson_cdf ( x[0], x[1], False, True )
+        pscore_dict[ x ] = val
         return val
 
 cdef float get_logLR_asym ( float x, float y ):
@@ -678,7 +679,8 @@ cdef class CallerFromAlignments:
             ctrl_value_ptr = <float32_t *> ctrl_array.data
 
             for j in range(pos_array.shape[0]):
-                this_v = get_pscore( int(treat_value_ptr[0]), ctrl_value_ptr[0] )
+                #this_v = get_pscore( int(treat_value_ptr[0]), ctrl_value_ptr[0] )
+                this_v = get_pscore( (int(treat_value_ptr[0]), ctrl_value_ptr[0] ) )
                 this_l = pos_ptr[0] - pre_p
 
                 if this_v in pvalue_stat:
@@ -1122,7 +1124,8 @@ cdef class CallerFromAlignments:
                 if score_cutoff_s[i] > score_array_s[ i ][ peak_content[ summit_index ][ 4 ] ]:
                     return False # not passed, then disgard this peak.
 
-            summit_p_score = get_pscore( int(summit_treat), summit_ctrl )
+            #summit_p_score = get_pscore( int(summit_treat), summit_ctrl )
+            summit_p_score = get_pscore(( int(summit_treat), summit_ctrl ) )
             summit_q_score = self.pqtable[ summit_p_score ]
 
             peaks.add( chrom,           # chromosome
@@ -1205,7 +1208,8 @@ cdef class CallerFromAlignments:
             summit_treat = peak_content[ summit_index ][ 2 ]
             summit_ctrl = peak_content[ summit_index ][ 3 ]            
 
-            summit_p_score = get_pscore( int(summit_treat), summit_ctrl )
+            #summit_p_score = get_pscore( int(summit_treat), summit_ctrl )
+            summit_p_score = get_pscore(( int(summit_treat), summit_ctrl ) )
             summit_q_score = self.pqtable[ summit_p_score ]
 
             for i in range(len(score_cutoff_s)):
@@ -1243,7 +1247,8 @@ cdef class CallerFromAlignments:
         array1_size = array1.shape[0]
         
         for i in range(array1_size):
-            s_ptr[0] = get_pscore( int(a1_ptr[0]), a2_ptr[0] )
+            #s_ptr[0] = get_pscore( int(a1_ptr[0]), a2_ptr[0] )
+            s_ptr[0] = get_pscore(( int(a1_ptr[0]), a2_ptr[0] ))
             s_ptr += 1
             a1_ptr += 1
             a2_ptr += 1
@@ -1265,7 +1270,8 @@ cdef class CallerFromAlignments:
         s_ptr = <float32_t *> s.data
 
         for i in range(array1.shape[0]):
-            s_ptr[0] = self.pqtable[ get_pscore( int(a1_ptr[0]), a2_ptr[0] ) ]
+            #s_ptr[0] = self.pqtable[ get_pscore( int(a1_ptr[0]), a2_ptr[0] ) ]
+            s_ptr[0] = self.pqtable[ get_pscore(( int(a1_ptr[0]), a2_ptr[0] )) ]
             s_ptr += 1
             a1_ptr += 1
             a2_ptr += 1

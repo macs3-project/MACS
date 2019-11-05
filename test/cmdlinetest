@@ -226,7 +226,7 @@ echo "15. brief speed test"
 
 macs2 callpeak -t CTCF_12878_5M.bed.gz -c Input_12878_5M.bed.gz -n speedtest.py37 -B &> speedtest.py37.log &
 # monitor the macs2 callpeak run and output CPU and mem usage
-./prockreport 2 $!
+./prockreport 1 $!
 wait;
 
 # END of test
