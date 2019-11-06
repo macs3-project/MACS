@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-# Time-stamp: <2019-10-30 16:00:40 taoliu>
+# Time-stamp: <2019-11-06 15:48:46 taoliu>
 
 """Description: 
 
@@ -44,7 +44,7 @@ def main():
         long_description = fh.read()
         
     setup(name="MACS2",
-          version="2.2.6a1",
+          version="2.2.6a2",
           description="Model Based Analysis for ChIP-Seq data",
           long_description = long_description,
           long_description_content_type="text/markdown",
