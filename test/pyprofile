@@ -24,8 +24,8 @@ CMD=${CMD[@]: 1}
 python -m cProfile -o $PROF $CMD
 
 # brief the profile
-./pyprofile_stat.py $PROF tottime > ${PROF/.prof/}.tottime
-./pyprofile_stat.py $PROF calls > ${PROF/.prof/}.calls
-./pyprofile_stat.py $PROF cumulative > ${PROF/.prof/}.cumulative
+./pyprofile_stat $PROF tottime > ${PROF/.prof/}.tottime
+./pyprofile_stat $PROF calls > ${PROF/.prof/}.calls
+./pyprofile_stat $PROF cumulative > ${PROF/.prof/}.cumulative
 
 echo "check ${PROF/.prof/}.tottime, ${PROF/.prof/}.calls, and ${PROF/.prof/}.cumulative"

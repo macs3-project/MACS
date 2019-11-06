@@ -874,7 +874,7 @@ typedef struct {
 } __Pyx_BufFmt_Context;
 
 
-/* "../../../DataAnalysis/Codes/TLPython37/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":776
+/* "../../../Codes/TLPython3/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":776
  * # in Cython to enable them only on the right systems.
  * 
  * ctypedef npy_int8       int8_t             # <<<<<<<<<<<<<<
@@ -883,7 +883,7 @@ typedef struct {
  */
 typedef npy_int8 __pyx_t_5numpy_int8_t;
 
-/* "../../../DataAnalysis/Codes/TLPython37/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":777
+/* "../../../Codes/TLPython3/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":777
  * 
  * ctypedef npy_int8       int8_t
  * ctypedef npy_int16      int16_t             # <<<<<<<<<<<<<<
@@ -892,7 +892,7 @@ typedef npy_int8 __pyx_t_5numpy_int8_t;
  */
 typedef npy_int16 __pyx_t_5numpy_int16_t;
 
-/* "../../../DataAnalysis/Codes/TLPython37/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":778
+/* "../../../Codes/TLPython3/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":778
  * ctypedef npy_int8       int8_t
  * ctypedef npy_int16      int16_t
  * ctypedef npy_int32      int32_t             # <<<<<<<<<<<<<<
@@ -901,7 +901,7 @@ typedef npy_int16 __pyx_t_5numpy_int16_t;
  */
 typedef npy_int32 __pyx_t_5numpy_int32_t;
 
-/* "../../../DataAnalysis/Codes/TLPython37/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":779
+/* "../../../Codes/TLPython3/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":779
  * ctypedef npy_int16      int16_t
  * ctypedef npy_int32      int32_t
  * ctypedef npy_int64      int64_t             # <<<<<<<<<<<<<<
@@ -910,7 +910,7 @@ typedef npy_int32 __pyx_t_5numpy_int32_t;
  */
 typedef npy_int64 __pyx_t_5numpy_int64_t;
 
-/* "../../../DataAnalysis/Codes/TLPython37/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":783
+/* "../../../Codes/TLPython3/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":783
  * #ctypedef npy_int128     int128_t
  * 
  * ctypedef npy_uint8      uint8_t             # <<<<<<<<<<<<<<
@@ -919,7 +919,7 @@ typedef npy_int64 __pyx_t_5numpy_int64_t;
  */
 typedef npy_uint8 __pyx_t_5numpy_uint8_t;
 
-/* "../../../DataAnalysis/Codes/TLPython37/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":784
+/* "../../../Codes/TLPython3/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":784
  * 
  * ctypedef npy_uint8      uint8_t
  * ctypedef npy_uint16     uint16_t             # <<<<<<<<<<<<<<
@@ -928,7 +928,7 @@ typedef npy_uint8 __pyx_t_5numpy_uint8_t;
  */
 typedef npy_uint16 __pyx_t_5numpy_uint16_t;
 
-/* "../../../DataAnalysis/Codes/TLPython37/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":785
+/* "../../../Codes/TLPython3/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":785
  * ctypedef npy_uint8      uint8_t
  * ctypedef npy_uint16     uint16_t
  * ctypedef npy_uint32     uint32_t             # <<<<<<<<<<<<<<
@@ -937,7 +937,7 @@ typedef npy_uint16 __pyx_t_5numpy_uint16_t;
  */
 typedef npy_uint32 __pyx_t_5numpy_uint32_t;
 
-/* "../../../DataAnalysis/Codes/TLPython37/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":786
+/* "../../../Codes/TLPython3/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":786
  * ctypedef npy_uint16     uint16_t
  * ctypedef npy_uint32     uint32_t
  * ctypedef npy_uint64     uint64_t             # <<<<<<<<<<<<<<
@@ -946,7 +946,7 @@ typedef npy_uint32 __pyx_t_5numpy_uint32_t;
  */
 typedef npy_uint64 __pyx_t_5numpy_uint64_t;
 
-/* "../../../DataAnalysis/Codes/TLPython37/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":790
+/* "../../../Codes/TLPython3/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":790
  * #ctypedef npy_uint128    uint128_t
  * 
  * ctypedef npy_float32    float32_t             # <<<<<<<<<<<<<<
@@ -955,7 +955,7 @@ typedef npy_uint64 __pyx_t_5numpy_uint64_t;
  */
 typedef npy_float32 __pyx_t_5numpy_float32_t;
 
-/* "../../../DataAnalysis/Codes/TLPython37/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":791
+/* "../../../Codes/TLPython3/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":791
  * 
  * ctypedef npy_float32    float32_t
  * ctypedef npy_float64    float64_t             # <<<<<<<<<<<<<<
@@ -964,7 +964,7 @@ typedef npy_float32 __pyx_t_5numpy_float32_t;
  */
 typedef npy_float64 __pyx_t_5numpy_float64_t;
 
-/* "../../../DataAnalysis/Codes/TLPython37/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":800
+/* "../../../Codes/TLPython3/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":800
  * # The int types are mapped a bit surprising --
  * # numpy.int corresponds to 'l' and numpy.long to 'q'
  * ctypedef npy_long       int_t             # <<<<<<<<<<<<<<
@@ -973,7 +973,7 @@ typedef npy_float64 __pyx_t_5numpy_float64_t;
  */
 typedef npy_long __pyx_t_5numpy_int_t;
 
-/* "../../../DataAnalysis/Codes/TLPython37/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":801
+/* "../../../Codes/TLPython3/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":801
  * # numpy.int corresponds to 'l' and numpy.long to 'q'
  * ctypedef npy_long       int_t
  * ctypedef npy_longlong   long_t             # <<<<<<<<<<<<<<
@@ -982,7 +982,7 @@ typedef npy_long __pyx_t_5numpy_int_t;
  */
 typedef npy_longlong __pyx_t_5numpy_long_t;
 
-/* "../../../DataAnalysis/Codes/TLPython37/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":802
+/* "../../../Codes/TLPython3/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":802
  * ctypedef npy_long       int_t
  * ctypedef npy_longlong   long_t
  * ctypedef npy_longlong   longlong_t             # <<<<<<<<<<<<<<
@@ -991,7 +991,7 @@ typedef npy_longlong __pyx_t_5numpy_long_t;
  */
 typedef npy_longlong __pyx_t_5numpy_longlong_t;
 
-/* "../../../DataAnalysis/Codes/TLPython37/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":804
+/* "../../../Codes/TLPython3/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":804
  * ctypedef npy_longlong   longlong_t
  * 
  * ctypedef npy_ulong      uint_t             # <<<<<<<<<<<<<<
@@ -1000,7 +1000,7 @@ typedef npy_longlong __pyx_t_5numpy_longlong_t;
  */
 typedef npy_ulong __pyx_t_5numpy_uint_t;
 
-/* "../../../DataAnalysis/Codes/TLPython37/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":805
+/* "../../../Codes/TLPython3/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":805
  * 
  * ctypedef npy_ulong      uint_t
  * ctypedef npy_ulonglong  ulong_t             # <<<<<<<<<<<<<<
@@ -1009,7 +1009,7 @@ typedef npy_ulong __pyx_t_5numpy_uint_t;
  */
 typedef npy_ulonglong __pyx_t_5numpy_ulong_t;
 
-/* "../../../DataAnalysis/Codes/TLPython37/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":806
+/* "../../../Codes/TLPython3/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":806
  * ctypedef npy_ulong      uint_t
  * ctypedef npy_ulonglong  ulong_t
  * ctypedef npy_ulonglong  ulonglong_t             # <<<<<<<<<<<<<<
@@ -1018,7 +1018,7 @@ typedef npy_ulonglong __pyx_t_5numpy_ulong_t;
  */
 typedef npy_ulonglong __pyx_t_5numpy_ulonglong_t;
 
-/* "../../../DataAnalysis/Codes/TLPython37/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":808
+/* "../../../Codes/TLPython3/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":808
  * ctypedef npy_ulonglong  ulonglong_t
  * 
  * ctypedef npy_intp       intp_t             # <<<<<<<<<<<<<<
@@ -1027,7 +1027,7 @@ typedef npy_ulonglong __pyx_t_5numpy_ulonglong_t;
  */
 typedef npy_intp __pyx_t_5numpy_intp_t;
 
-/* "../../../DataAnalysis/Codes/TLPython37/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":809
+/* "../../../Codes/TLPython3/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":809
  * 
  * ctypedef npy_intp       intp_t
  * ctypedef npy_uintp      uintp_t             # <<<<<<<<<<<<<<
@@ -1036,7 +1036,7 @@ typedef npy_intp __pyx_t_5numpy_intp_t;
  */
 typedef npy_uintp __pyx_t_5numpy_uintp_t;
 
-/* "../../../DataAnalysis/Codes/TLPython37/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":811
+/* "../../../Codes/TLPython3/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":811
  * ctypedef npy_uintp      uintp_t
  * 
  * ctypedef npy_double     float_t             # <<<<<<<<<<<<<<
@@ -1045,7 +1045,7 @@ typedef npy_uintp __pyx_t_5numpy_uintp_t;
  */
 typedef npy_double __pyx_t_5numpy_float_t;
 
-/* "../../../DataAnalysis/Codes/TLPython37/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":812
+/* "../../../Codes/TLPython3/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":812
  * 
  * ctypedef npy_double     float_t
  * ctypedef npy_double     double_t             # <<<<<<<<<<<<<<
@@ -1054,7 +1054,7 @@ typedef npy_double __pyx_t_5numpy_float_t;
  */
 typedef npy_double __pyx_t_5numpy_double_t;
 
-/* "../../../DataAnalysis/Codes/TLPython37/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":813
+/* "../../../Codes/TLPython3/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":813
  * ctypedef npy_double     float_t
  * ctypedef npy_double     double_t
  * ctypedef npy_longdouble longdouble_t             # <<<<<<<<<<<<<<
@@ -1091,7 +1091,7 @@ static CYTHON_INLINE __pyx_t_double_complex __pyx_t_double_complex_from_parts(do
 struct __pyx_obj_5MACS2_2IO_10ScoreTrack_scoreTrackII;
 struct __pyx_obj_5MACS2_2IO_10ScoreTrack_TwoConditionScores;
 
-/* "../../../DataAnalysis/Codes/TLPython37/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":815
+/* "../../../Codes/TLPython3/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":815
  * ctypedef npy_longdouble longdouble_t
  * 
  * ctypedef npy_cfloat      cfloat_t             # <<<<<<<<<<<<<<
@@ -1100,7 +1100,7 @@ struct __pyx_obj_5MACS2_2IO_10ScoreTrack_TwoConditionScores;
  */
 typedef npy_cfloat __pyx_t_5numpy_cfloat_t;
 
-/* "../../../DataAnalysis/Codes/TLPython37/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":816
+/* "../../../Codes/TLPython3/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":816
  * 
  * ctypedef npy_cfloat      cfloat_t
  * ctypedef npy_cdouble     cdouble_t             # <<<<<<<<<<<<<<
@@ -1109,7 +1109,7 @@ typedef npy_cfloat __pyx_t_5numpy_cfloat_t;
  */
 typedef npy_cdouble __pyx_t_5numpy_cdouble_t;
 
-/* "../../../DataAnalysis/Codes/TLPython37/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":817
+/* "../../../Codes/TLPython3/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":817
  * ctypedef npy_cfloat      cfloat_t
  * ctypedef npy_cdouble     cdouble_t
  * ctypedef npy_clongdouble clongdouble_t             # <<<<<<<<<<<<<<
@@ -1118,7 +1118,7 @@ typedef npy_cdouble __pyx_t_5numpy_cdouble_t;
  */
 typedef npy_clongdouble __pyx_t_5numpy_clongdouble_t;
 
-/* "../../../DataAnalysis/Codes/TLPython37/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":819
+/* "../../../Codes/TLPython3/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":819
  * ctypedef npy_clongdouble clongdouble_t
  * 
  * ctypedef npy_cdouble     complex_t             # <<<<<<<<<<<<<<
@@ -1134,7 +1134,7 @@ struct __pyx_opt_args_5MACS2_2IO_10ScoreTrack_12scoreTrackII_call_broadpeaks;
 struct __pyx_opt_args_5MACS2_2IO_10ScoreTrack_18TwoConditionScores_write_bedGraph;
 struct __pyx_opt_args_5MACS2_2IO_10ScoreTrack_18TwoConditionScores_call_peaks;
 
-/* "MACS2/IO/ScoreTrack.pyx":967
+/* "MACS2/IO/ScoreTrack.pyx":958
  *         return
  * 
  *     cpdef write_bedGraph ( self, fhd, str name, str description, short column = 3):             # <<<<<<<<<<<<<<
@@ -1146,7 +1146,7 @@ struct __pyx_opt_args_5MACS2_2IO_10ScoreTrack_12scoreTrackII_write_bedGraph {
   short column;
 };
 
-/* "MACS2/IO/ScoreTrack.pyx":1073
+/* "MACS2/IO/ScoreTrack.pyx":1064
  *     #     return ret_peaks
  * 
  *     cpdef call_peaks (self, float cutoff=5.0, int min_length=200, int max_gap=50, bool call_summits=False):             # <<<<<<<<<<<<<<
@@ -1161,7 +1161,7 @@ struct __pyx_opt_args_5MACS2_2IO_10ScoreTrack_12scoreTrackII_call_peaks {
   PyBoolObject *call_summits;
 };
 
-/* "MACS2/IO/ScoreTrack.pyx":1146
+/* "MACS2/IO/ScoreTrack.pyx":1137
  *         return peaks
  * 
  *     cdef bool __close_peak (self, list peak_content, peaks, int min_length,             # <<<<<<<<<<<<<<
@@ -1173,7 +1173,7 @@ struct __pyx_opt_args_5MACS2_2IO_10ScoreTrack_12scoreTrackII___close_peak {
   int smoothlen;
 };
 
-/* "MACS2/IO/ScoreTrack.pyx":1197
+/* "MACS2/IO/ScoreTrack.pyx":1188
  *             return True
  * 
  *     cdef bool __close_peak2 (self, list peak_content, peaks, int min_length,             # <<<<<<<<<<<<<<
@@ -1186,7 +1186,7 @@ struct __pyx_opt_args_5MACS2_2IO_10ScoreTrack_12scoreTrackII___close_peak2 {
   float min_valley;
 };
 
-/* "MACS2/IO/ScoreTrack.pyx":1286
+/* "MACS2/IO/ScoreTrack.pyx":1277
  *         return t
  * 
  *     cpdef call_broadpeaks (self, float lvl1_cutoff=5.0, float lvl2_cutoff=1.0, int min_length=200, int lvl1_max_gap=50, int lvl2_max_gap=400):             # <<<<<<<<<<<<<<
@@ -1202,7 +1202,7 @@ struct __pyx_opt_args_5MACS2_2IO_10ScoreTrack_12scoreTrackII_call_broadpeaks {
   int lvl2_max_gap;
 };
 
-/* "MACS2/IO/ScoreTrack.pyx":1605
+/* "MACS2/IO/ScoreTrack.pyx":1596
  *         return l
  * 
  *     cpdef write_bedGraph ( self, fhd, str name, str description, short column = 3):             # <<<<<<<<<<<<<<
@@ -1214,7 +1214,7 @@ struct __pyx_opt_args_5MACS2_2IO_10ScoreTrack_18TwoConditionScores_write_bedGrap
   short column;
 };
 
-/* "MACS2/IO/ScoreTrack.pyx":1685
+/* "MACS2/IO/ScoreTrack.pyx":1676
  *         return True
  * 
  *     cpdef tuple call_peaks (self, float cutoff=3, int min_length=200, int max_gap = 100,             # <<<<<<<<<<<<<<
@@ -1254,7 +1254,7 @@ struct __pyx_obj_5MACS2_2IO_10ScoreTrack_scoreTrackII {
 };
 
 
-/* "MACS2/IO/ScoreTrack.pyx":1390
+/* "MACS2/IO/ScoreTrack.pyx":1381
  *         return bpeaks
  * 
  * cdef class TwoConditionScores:             # <<<<<<<<<<<<<<
@@ -1320,7 +1320,7 @@ struct __pyx_vtabstruct_5MACS2_2IO_10ScoreTrack_scoreTrackII {
 static struct __pyx_vtabstruct_5MACS2_2IO_10ScoreTrack_scoreTrackII *__pyx_vtabptr_5MACS2_2IO_10ScoreTrack_scoreTrackII;
 
 
-/* "MACS2/IO/ScoreTrack.pyx":1390
+/* "MACS2/IO/ScoreTrack.pyx":1381
  *         return bpeaks
  * 
  * cdef class TwoConditionScores:             # <<<<<<<<<<<<<<
@@ -13869,9 +13869,9 @@ static PyObject *__pyx_f_5MACS2_2IO_10ScoreTrack_12scoreTrackII_compute_qvalue(s
   __pyx_v_pqtable = ((PyObject*)__pyx_t_1);
   __pyx_t_1 = 0;
 
-  /* "MACS2/IO/ScoreTrack.pyx":756
- *         #g = s_p2q.get_item
+  /* "MACS2/IO/ScoreTrack.pyx":747
  * 
+ *         # convert p to q
  *         for chrom in self.data.keys():             # <<<<<<<<<<<<<<
  *             v = self.data[chrom][3]
  *             l = self.datalength[chrom]
@@ -13879,9 +13879,9 @@ static PyObject *__pyx_f_5MACS2_2IO_10ScoreTrack_12scoreTrackII_compute_qvalue(s
   __pyx_t_2 = 0;
   if (unlikely(__pyx_v_self->data == Py_None)) {
     PyErr_Format(PyExc_AttributeError, "'NoneType' object has no attribute '%.30s'", "keys");
-    __PYX_ERR(0, 756, __pyx_L1_error)
+    __PYX_ERR(0, 747, __pyx_L1_error)
   }
-  __pyx_t_5 = __Pyx_dict_iterator(__pyx_v_self->data, 1, __pyx_n_s_keys, (&__pyx_t_3), (&__pyx_t_4)); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 756, __pyx_L1_error)
+  __pyx_t_5 = __Pyx_dict_iterator(__pyx_v_self->data, 1, __pyx_n_s_keys, (&__pyx_t_3), (&__pyx_t_4)); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 747, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_5);
   __Pyx_XDECREF(__pyx_t_1);
   __pyx_t_1 = __pyx_t_5;
@@ -13889,14 +13889,14 @@ static PyObject *__pyx_f_5MACS2_2IO_10ScoreTrack_12scoreTrackII_compute_qvalue(s
   while (1) {
     __pyx_t_6 = __Pyx_dict_iter_next(__pyx_t_1, __pyx_t_3, &__pyx_t_2, &__pyx_t_5, NULL, NULL, __pyx_t_4);
     if (unlikely(__pyx_t_6 == 0)) break;
-    if (unlikely(__pyx_t_6 == -1)) __PYX_ERR(0, 756, __pyx_L1_error)
+    if (unlikely(__pyx_t_6 == -1)) __PYX_ERR(0, 747, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_5);
-    if (!(likely(PyBytes_CheckExact(__pyx_t_5))||((__pyx_t_5) == Py_None)||(PyErr_Format(PyExc_TypeError, "Expected %.16s, got %.200s", "bytes", Py_TYPE(__pyx_t_5)->tp_name), 0))) __PYX_ERR(0, 756, __pyx_L1_error)
+    if (!(likely(PyBytes_CheckExact(__pyx_t_5))||((__pyx_t_5) == Py_None)||(PyErr_Format(PyExc_TypeError, "Expected %.16s, got %.200s", "bytes", Py_TYPE(__pyx_t_5)->tp_name), 0))) __PYX_ERR(0, 747, __pyx_L1_error)
     __Pyx_XDECREF_SET(__pyx_v_chrom, ((PyObject*)__pyx_t_5));
     __pyx_t_5 = 0;
 
-    /* "MACS2/IO/ScoreTrack.pyx":757
- * 
+    /* "MACS2/IO/ScoreTrack.pyx":748
+ *         # convert p to q
  *         for chrom in self.data.keys():
  *             v = self.data[chrom][3]             # <<<<<<<<<<<<<<
  *             l = self.datalength[chrom]
@@ -13904,18 +13904,18 @@ static PyObject *__pyx_f_5MACS2_2IO_10ScoreTrack_12scoreTrackII_compute_qvalue(s
  */
     if (unlikely(__pyx_v_self->data == Py_None)) {
       PyErr_SetString(PyExc_TypeError, "'NoneType' object is not subscriptable");
-      __PYX_ERR(0, 757, __pyx_L1_error)
+      __PYX_ERR(0, 748, __pyx_L1_error)
     }
-    __pyx_t_5 = __Pyx_PyDict_GetItem(__pyx_v_self->data, __pyx_v_chrom); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 757, __pyx_L1_error)
+    __pyx_t_5 = __Pyx_PyDict_GetItem(__pyx_v_self->data, __pyx_v_chrom); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 748, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_5);
-    __pyx_t_7 = __Pyx_GetItemInt(__pyx_t_5, 3, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 757, __pyx_L1_error)
+    __pyx_t_7 = __Pyx_GetItemInt(__pyx_t_5, 3, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 748, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_7);
     __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
-    if (!(likely(((__pyx_t_7) == Py_None) || likely(__Pyx_TypeTest(__pyx_t_7, __pyx_ptype_5numpy_ndarray))))) __PYX_ERR(0, 757, __pyx_L1_error)
+    if (!(likely(((__pyx_t_7) == Py_None) || likely(__Pyx_TypeTest(__pyx_t_7, __pyx_ptype_5numpy_ndarray))))) __PYX_ERR(0, 748, __pyx_L1_error)
     __Pyx_XDECREF_SET(__pyx_v_v, ((PyArrayObject *)__pyx_t_7));
     __pyx_t_7 = 0;
 
-    /* "MACS2/IO/ScoreTrack.pyx":758
+    /* "MACS2/IO/ScoreTrack.pyx":749
  *         for chrom in self.data.keys():
  *             v = self.data[chrom][3]
  *             l = self.datalength[chrom]             # <<<<<<<<<<<<<<
@@ -13924,15 +13924,15 @@ static PyObject *__pyx_f_5MACS2_2IO_10ScoreTrack_12scoreTrackII_compute_qvalue(s
  */
     if (unlikely(__pyx_v_self->datalength == Py_None)) {
       PyErr_SetString(PyExc_TypeError, "'NoneType' object is not subscriptable");
-      __PYX_ERR(0, 758, __pyx_L1_error)
+      __PYX_ERR(0, 749, __pyx_L1_error)
     }
-    __pyx_t_7 = __Pyx_PyDict_GetItem(__pyx_v_self->datalength, __pyx_v_chrom); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 758, __pyx_L1_error)
+    __pyx_t_7 = __Pyx_PyDict_GetItem(__pyx_v_self->datalength, __pyx_v_chrom); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 749, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_7);
-    __pyx_t_8 = __Pyx_PyInt_As_long(__pyx_t_7); if (unlikely((__pyx_t_8 == (long)-1) && PyErr_Occurred())) __PYX_ERR(0, 758, __pyx_L1_error)
+    __pyx_t_8 = __Pyx_PyInt_As_long(__pyx_t_7); if (unlikely((__pyx_t_8 == (long)-1) && PyErr_Occurred())) __PYX_ERR(0, 749, __pyx_L1_error)
     __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
     __pyx_v_l = __pyx_t_8;
 
-    /* "MACS2/IO/ScoreTrack.pyx":759
+    /* "MACS2/IO/ScoreTrack.pyx":750
  *             v = self.data[chrom][3]
  *             l = self.datalength[chrom]
  *             for i in range(l):             # <<<<<<<<<<<<<<
@@ -13944,7 +13944,7 @@ static PyObject *__pyx_f_5MACS2_2IO_10ScoreTrack_12scoreTrackII_compute_qvalue(s
     for (__pyx_t_10 = 0; __pyx_t_10 < __pyx_t_9; __pyx_t_10+=1) {
       __pyx_v_i = __pyx_t_10;
 
-      /* "MACS2/IO/ScoreTrack.pyx":760
+      /* "MACS2/IO/ScoreTrack.pyx":751
  *             l = self.datalength[chrom]
  *             for i in range(l):
  *                 v[ i ] = pqtable[ v[ i ] ]             # <<<<<<<<<<<<<<
@@ -13953,20 +13953,20 @@ static PyObject *__pyx_f_5MACS2_2IO_10ScoreTrack_12scoreTrackII_compute_qvalue(s
  */
       if (unlikely(__pyx_v_pqtable == Py_None)) {
         PyErr_SetString(PyExc_TypeError, "'NoneType' object is not subscriptable");
-        __PYX_ERR(0, 760, __pyx_L1_error)
+        __PYX_ERR(0, 751, __pyx_L1_error)
       }
-      __pyx_t_7 = __Pyx_GetItemInt(((PyObject *)__pyx_v_v), __pyx_v_i, long, 1, __Pyx_PyInt_From_long, 0, 1, 1); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 760, __pyx_L1_error)
+      __pyx_t_7 = __Pyx_GetItemInt(((PyObject *)__pyx_v_v), __pyx_v_i, long, 1, __Pyx_PyInt_From_long, 0, 1, 1); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 751, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_7);
-      __pyx_t_5 = __Pyx_PyDict_GetItem(__pyx_v_pqtable, __pyx_t_7); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 760, __pyx_L1_error)
+      __pyx_t_5 = __Pyx_PyDict_GetItem(__pyx_v_pqtable, __pyx_t_7); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 751, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_5);
       __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
-      if (unlikely(__Pyx_SetItemInt(((PyObject *)__pyx_v_v), __pyx_v_i, __pyx_t_5, long, 1, __Pyx_PyInt_From_long, 0, 1, 1) < 0)) __PYX_ERR(0, 760, __pyx_L1_error)
+      if (unlikely(__Pyx_SetItemInt(((PyObject *)__pyx_v_v), __pyx_v_i, __pyx_t_5, long, 1, __Pyx_PyInt_From_long, 0, 1, 1) < 0)) __PYX_ERR(0, 751, __pyx_L1_error)
       __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
     }
   }
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-  /* "MACS2/IO/ScoreTrack.pyx":763
+  /* "MACS2/IO/ScoreTrack.pyx":754
  *                 #v [ i ] =  g( v[ i ])
  * 
  *         self.scoring_method = ord('q')             # <<<<<<<<<<<<<<
@@ -13975,7 +13975,7 @@ static PyObject *__pyx_f_5MACS2_2IO_10ScoreTrack_12scoreTrackII_compute_qvalue(s
  */
   __pyx_v_self->scoring_method = 0x71;
 
-  /* "MACS2/IO/ScoreTrack.pyx":764
+  /* "MACS2/IO/ScoreTrack.pyx":755
  * 
  *         self.scoring_method = ord('q')
  *         return             # <<<<<<<<<<<<<<
@@ -14011,7 +14011,7 @@ static PyObject *__pyx_f_5MACS2_2IO_10ScoreTrack_12scoreTrackII_compute_qvalue(s
   return __pyx_r;
 }
 
-/* "MACS2/IO/ScoreTrack.pyx":766
+/* "MACS2/IO/ScoreTrack.pyx":757
  *         return
  * 
  *     cpdef dict make_pq_table ( self ):             # <<<<<<<<<<<<<<
@@ -14049,7 +14049,7 @@ static PyObject *__pyx_f_5MACS2_2IO_10ScoreTrack_12scoreTrackII_make_pq_table(st
   double __pyx_t_10;
   double __pyx_t_11;
   __Pyx_RefNannySetupContext("make_pq_table", 0);
-  __Pyx_TraceCall("make_pq_table", __pyx_f[0], 766, 0, __PYX_ERR(0, 766, __pyx_L1_error));
+  __Pyx_TraceCall("make_pq_table", __pyx_f[0], 757, 0, __PYX_ERR(0, 757, __pyx_L1_error));
   /* Check if called by wrapper */
   if (unlikely(__pyx_skip_dispatch)) ;
   /* Check if overridden in Python */
@@ -14059,7 +14059,7 @@ static PyObject *__pyx_f_5MACS2_2IO_10ScoreTrack_12scoreTrackII_make_pq_table(st
     if (unlikely(!__Pyx_object_dict_version_matches(((PyObject *)__pyx_v_self), __pyx_tp_dict_version, __pyx_obj_dict_version))) {
       PY_UINT64_T __pyx_type_dict_guard = __Pyx_get_tp_dict_version(((PyObject *)__pyx_v_self));
       #endif
-      __pyx_t_1 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_v_self), __pyx_n_s_make_pq_table); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 766, __pyx_L1_error)
+      __pyx_t_1 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_v_self), __pyx_n_s_make_pq_table); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 757, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_1);
       if (!PyCFunction_Check(__pyx_t_1) || (PyCFunction_GET_FUNCTION(__pyx_t_1) != (PyCFunction)(void*)__pyx_pw_5MACS2_2IO_10ScoreTrack_12scoreTrackII_21make_pq_table)) {
         __Pyx_XDECREF(__pyx_r);
@@ -14076,10 +14076,10 @@ static PyObject *__pyx_f_5MACS2_2IO_10ScoreTrack_12scoreTrackII_make_pq_table(st
         }
         __pyx_t_2 = (__pyx_t_4) ? __Pyx_PyObject_CallOneArg(__pyx_t_3, __pyx_t_4) : __Pyx_PyObject_CallNoArg(__pyx_t_3);
         __Pyx_XDECREF(__pyx_t_4); __pyx_t_4 = 0;
-        if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 766, __pyx_L1_error)
+        if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 757, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_2);
         __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-        if (!(likely(PyDict_CheckExact(__pyx_t_2))||((__pyx_t_2) == Py_None)||(PyErr_Format(PyExc_TypeError, "Expected %.16s, got %.200s", "dict", Py_TYPE(__pyx_t_2)->tp_name), 0))) __PYX_ERR(0, 766, __pyx_L1_error)
+        if (!(likely(PyDict_CheckExact(__pyx_t_2))||((__pyx_t_2) == Py_None)||(PyErr_Format(PyExc_TypeError, "Expected %.16s, got %.200s", "dict", Py_TYPE(__pyx_t_2)->tp_name), 0))) __PYX_ERR(0, 757, __pyx_L1_error)
         __pyx_r = ((PyObject*)__pyx_t_2);
         __pyx_t_2 = 0;
         __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
@@ -14098,7 +14098,7 @@ static PyObject *__pyx_f_5MACS2_2IO_10ScoreTrack_12scoreTrackII_make_pq_table(st
     #endif
   }
 
-  /* "MACS2/IO/ScoreTrack.pyx":786
+  /* "MACS2/IO/ScoreTrack.pyx":777
  *             list unique_values
  * 
  *         assert self.scoring_method == ord('p')             # <<<<<<<<<<<<<<
@@ -14109,12 +14109,12 @@ static PyObject *__pyx_f_5MACS2_2IO_10ScoreTrack_12scoreTrackII_make_pq_table(st
   if (unlikely(!Py_OptimizeFlag)) {
     if (unlikely(!((__pyx_v_self->scoring_method == 0x70) != 0))) {
       PyErr_SetNone(PyExc_AssertionError);
-      __PYX_ERR(0, 786, __pyx_L1_error)
+      __PYX_ERR(0, 777, __pyx_L1_error)
     }
   }
   #endif
 
-  /* "MACS2/IO/ScoreTrack.pyx":788
+  /* "MACS2/IO/ScoreTrack.pyx":779
  *         assert self.scoring_method == ord('p')
  * 
  *         value_dict = self.pvalue_stat             # <<<<<<<<<<<<<<
@@ -14126,7 +14126,7 @@ static PyObject *__pyx_f_5MACS2_2IO_10ScoreTrack_12scoreTrackII_make_pq_table(st
   __pyx_v_value_dict = ((PyObject*)__pyx_t_1);
   __pyx_t_1 = 0;
 
-  /* "MACS2/IO/ScoreTrack.pyx":794
+  /* "MACS2/IO/ScoreTrack.pyx":785
  * 
  *         #logging.info("####test#### 2")
  *         N = sum(value_dict.values())             # <<<<<<<<<<<<<<
@@ -14135,18 +14135,18 @@ static PyObject *__pyx_f_5MACS2_2IO_10ScoreTrack_12scoreTrackII_make_pq_table(st
  */
   if (unlikely(__pyx_v_value_dict == Py_None)) {
     PyErr_Format(PyExc_AttributeError, "'NoneType' object has no attribute '%.30s'", "values");
-    __PYX_ERR(0, 794, __pyx_L1_error)
+    __PYX_ERR(0, 785, __pyx_L1_error)
   }
-  __pyx_t_1 = __Pyx_PyDict_Values(__pyx_v_value_dict); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 794, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyDict_Values(__pyx_v_value_dict); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 785, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_2 = __Pyx_PyObject_CallOneArg(__pyx_builtin_sum, __pyx_t_1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 794, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyObject_CallOneArg(__pyx_builtin_sum, __pyx_t_1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 785, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-  __pyx_t_5 = __Pyx_PyInt_As_long(__pyx_t_2); if (unlikely((__pyx_t_5 == (long)-1) && PyErr_Occurred())) __PYX_ERR(0, 794, __pyx_L1_error)
+  __pyx_t_5 = __Pyx_PyInt_As_long(__pyx_t_2); if (unlikely((__pyx_t_5 == (long)-1) && PyErr_Occurred())) __PYX_ERR(0, 785, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
   __pyx_v_N = __pyx_t_5;
 
-  /* "MACS2/IO/ScoreTrack.pyx":797
+  /* "MACS2/IO/ScoreTrack.pyx":788
  *         #for i in range(len(unique_values)):
  *             #N += value_dict.get_item(unique_values[i])
  *         k = 1                           # rank             # <<<<<<<<<<<<<<
@@ -14155,7 +14155,7 @@ static PyObject *__pyx_f_5MACS2_2IO_10ScoreTrack_12scoreTrackII_make_pq_table(st
  */
   __pyx_v_k = 1;
 
-  /* "MACS2/IO/ScoreTrack.pyx":798
+  /* "MACS2/IO/ScoreTrack.pyx":789
  *             #N += value_dict.get_item(unique_values[i])
  *         k = 1                           # rank
  *         f = -log10(N)             # <<<<<<<<<<<<<<
@@ -14164,7 +14164,7 @@ static PyObject *__pyx_f_5MACS2_2IO_10ScoreTrack_12scoreTrackII_make_pq_table(st
  */
   __pyx_v_f = (-log10(__pyx_v_N));
 
-  /* "MACS2/IO/ScoreTrack.pyx":799
+  /* "MACS2/IO/ScoreTrack.pyx":790
  *         k = 1                           # rank
  *         f = -log10(N)
  *         pre_v = -2147483647             # <<<<<<<<<<<<<<
@@ -14173,7 +14173,7 @@ static PyObject *__pyx_f_5MACS2_2IO_10ScoreTrack_12scoreTrackII_make_pq_table(st
  */
   __pyx_v_pre_v = -2147483647.0;
 
-  /* "MACS2/IO/ScoreTrack.pyx":800
+  /* "MACS2/IO/ScoreTrack.pyx":791
  *         f = -log10(N)
  *         pre_v = -2147483647
  *         pre_l = 0             # <<<<<<<<<<<<<<
@@ -14182,7 +14182,7 @@ static PyObject *__pyx_f_5MACS2_2IO_10ScoreTrack_12scoreTrackII_make_pq_table(st
  */
   __pyx_v_pre_l = 0;
 
-  /* "MACS2/IO/ScoreTrack.pyx":801
+  /* "MACS2/IO/ScoreTrack.pyx":792
  *         pre_v = -2147483647
  *         pre_l = 0
  *         pre_q = 2147483647              # save the previous q-value             # <<<<<<<<<<<<<<
@@ -14191,19 +14191,19 @@ static PyObject *__pyx_f_5MACS2_2IO_10ScoreTrack_12scoreTrackII_make_pq_table(st
  */
   __pyx_v_pre_q = 2147483647.0;
 
-  /* "MACS2/IO/ScoreTrack.pyx":803
+  /* "MACS2/IO/ScoreTrack.pyx":794
  *         pre_q = 2147483647              # save the previous q-value
  * 
  *         pvalue2qvalue = {}#Float64HashTable()             # <<<<<<<<<<<<<<
  *         unique_values = sorted(value_dict.keys(), reverse=True) #sorted(unique_values,reverse=True)
  *         for i in range(len(unique_values)):
  */
-  __pyx_t_2 = __Pyx_PyDict_NewPresized(0); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 803, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyDict_NewPresized(0); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 794, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __pyx_v_pvalue2qvalue = ((PyObject*)__pyx_t_2);
   __pyx_t_2 = 0;
 
-  /* "MACS2/IO/ScoreTrack.pyx":804
+  /* "MACS2/IO/ScoreTrack.pyx":795
  * 
  *         pvalue2qvalue = {}#Float64HashTable()
  *         unique_values = sorted(value_dict.keys(), reverse=True) #sorted(unique_values,reverse=True)             # <<<<<<<<<<<<<<
@@ -14212,27 +14212,27 @@ static PyObject *__pyx_f_5MACS2_2IO_10ScoreTrack_12scoreTrackII_make_pq_table(st
  */
   if (unlikely(__pyx_v_value_dict == Py_None)) {
     PyErr_Format(PyExc_AttributeError, "'NoneType' object has no attribute '%.30s'", "keys");
-    __PYX_ERR(0, 804, __pyx_L1_error)
+    __PYX_ERR(0, 795, __pyx_L1_error)
   }
-  __pyx_t_2 = __Pyx_PyDict_Keys(__pyx_v_value_dict); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 804, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyDict_Keys(__pyx_v_value_dict); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 795, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
-  __pyx_t_1 = PyTuple_New(1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 804, __pyx_L1_error)
+  __pyx_t_1 = PyTuple_New(1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 795, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __Pyx_GIVEREF(__pyx_t_2);
   PyTuple_SET_ITEM(__pyx_t_1, 0, __pyx_t_2);
   __pyx_t_2 = 0;
-  __pyx_t_2 = __Pyx_PyDict_NewPresized(1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 804, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyDict_NewPresized(1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 795, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
-  if (PyDict_SetItem(__pyx_t_2, __pyx_n_s_reverse, Py_True) < 0) __PYX_ERR(0, 804, __pyx_L1_error)
-  __pyx_t_3 = __Pyx_PyObject_Call(__pyx_builtin_sorted, __pyx_t_1, __pyx_t_2); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 804, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_t_2, __pyx_n_s_reverse, Py_True) < 0) __PYX_ERR(0, 795, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_PyObject_Call(__pyx_builtin_sorted, __pyx_t_1, __pyx_t_2); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 795, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-  if (!(likely(PyList_CheckExact(__pyx_t_3))||((__pyx_t_3) == Py_None)||(PyErr_Format(PyExc_TypeError, "Expected %.16s, got %.200s", "list", Py_TYPE(__pyx_t_3)->tp_name), 0))) __PYX_ERR(0, 804, __pyx_L1_error)
+  if (!(likely(PyList_CheckExact(__pyx_t_3))||((__pyx_t_3) == Py_None)||(PyErr_Format(PyExc_TypeError, "Expected %.16s, got %.200s", "list", Py_TYPE(__pyx_t_3)->tp_name), 0))) __PYX_ERR(0, 795, __pyx_L1_error)
   __pyx_v_unique_values = ((PyObject*)__pyx_t_3);
   __pyx_t_3 = 0;
 
-  /* "MACS2/IO/ScoreTrack.pyx":805
+  /* "MACS2/IO/ScoreTrack.pyx":796
  *         pvalue2qvalue = {}#Float64HashTable()
  *         unique_values = sorted(value_dict.keys(), reverse=True) #sorted(unique_values,reverse=True)
  *         for i in range(len(unique_values)):             # <<<<<<<<<<<<<<
@@ -14241,14 +14241,14 @@ static PyObject *__pyx_f_5MACS2_2IO_10ScoreTrack_12scoreTrackII_make_pq_table(st
  */
   if (unlikely(__pyx_v_unique_values == Py_None)) {
     PyErr_SetString(PyExc_TypeError, "object of type 'NoneType' has no len()");
-    __PYX_ERR(0, 805, __pyx_L1_error)
+    __PYX_ERR(0, 796, __pyx_L1_error)
   }
-  __pyx_t_6 = PyList_GET_SIZE(__pyx_v_unique_values); if (unlikely(__pyx_t_6 == ((Py_ssize_t)-1))) __PYX_ERR(0, 805, __pyx_L1_error)
+  __pyx_t_6 = PyList_GET_SIZE(__pyx_v_unique_values); if (unlikely(__pyx_t_6 == ((Py_ssize_t)-1))) __PYX_ERR(0, 796, __pyx_L1_error)
   __pyx_t_7 = __pyx_t_6;
   for (__pyx_t_5 = 0; __pyx_t_5 < __pyx_t_7; __pyx_t_5+=1) {
     __pyx_v_i = __pyx_t_5;
 
-    /* "MACS2/IO/ScoreTrack.pyx":806
+    /* "MACS2/IO/ScoreTrack.pyx":797
  *         unique_values = sorted(value_dict.keys(), reverse=True) #sorted(unique_values,reverse=True)
  *         for i in range(len(unique_values)):
  *             v = unique_values[i]             # <<<<<<<<<<<<<<
@@ -14257,15 +14257,15 @@ static PyObject *__pyx_f_5MACS2_2IO_10ScoreTrack_12scoreTrackII_make_pq_table(st
  */
     if (unlikely(__pyx_v_unique_values == Py_None)) {
       PyErr_SetString(PyExc_TypeError, "'NoneType' object is not subscriptable");
-      __PYX_ERR(0, 806, __pyx_L1_error)
+      __PYX_ERR(0, 797, __pyx_L1_error)
     }
-    __pyx_t_3 = __Pyx_GetItemInt_List(__pyx_v_unique_values, __pyx_v_i, long, 1, __Pyx_PyInt_From_long, 1, 1, 1); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 806, __pyx_L1_error)
+    __pyx_t_3 = __Pyx_GetItemInt_List(__pyx_v_unique_values, __pyx_v_i, long, 1, __Pyx_PyInt_From_long, 1, 1, 1); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 797, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_3);
-    __pyx_t_8 = __pyx_PyFloat_AsDouble(__pyx_t_3); if (unlikely((__pyx_t_8 == (double)-1) && PyErr_Occurred())) __PYX_ERR(0, 806, __pyx_L1_error)
+    __pyx_t_8 = __pyx_PyFloat_AsDouble(__pyx_t_3); if (unlikely((__pyx_t_8 == (double)-1) && PyErr_Occurred())) __PYX_ERR(0, 797, __pyx_L1_error)
     __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
     __pyx_v_v = __pyx_t_8;
 
-    /* "MACS2/IO/ScoreTrack.pyx":808
+    /* "MACS2/IO/ScoreTrack.pyx":799
  *             v = unique_values[i]
  * 
  *             l = value_dict[v]             # <<<<<<<<<<<<<<
@@ -14274,18 +14274,18 @@ static PyObject *__pyx_f_5MACS2_2IO_10ScoreTrack_12scoreTrackII_make_pq_table(st
  */
     if (unlikely(__pyx_v_value_dict == Py_None)) {
       PyErr_SetString(PyExc_TypeError, "'NoneType' object is not subscriptable");
-      __PYX_ERR(0, 808, __pyx_L1_error)
+      __PYX_ERR(0, 799, __pyx_L1_error)
     }
-    __pyx_t_3 = PyFloat_FromDouble(__pyx_v_v); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 808, __pyx_L1_error)
+    __pyx_t_3 = PyFloat_FromDouble(__pyx_v_v); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 799, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_3);
-    __pyx_t_2 = __Pyx_PyDict_GetItem(__pyx_v_value_dict, __pyx_t_3); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 808, __pyx_L1_error)
+    __pyx_t_2 = __Pyx_PyDict_GetItem(__pyx_v_value_dict, __pyx_t_3); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 799, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
     __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-    __pyx_t_9 = __Pyx_PyInt_As_long(__pyx_t_2); if (unlikely((__pyx_t_9 == (long)-1) && PyErr_Occurred())) __PYX_ERR(0, 808, __pyx_L1_error)
+    __pyx_t_9 = __Pyx_PyInt_As_long(__pyx_t_2); if (unlikely((__pyx_t_9 == (long)-1) && PyErr_Occurred())) __PYX_ERR(0, 799, __pyx_L1_error)
     __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
     __pyx_v_l = __pyx_t_9;
 
-    /* "MACS2/IO/ScoreTrack.pyx":809
+    /* "MACS2/IO/ScoreTrack.pyx":800
  * 
  *             l = value_dict[v]
  *             q = v + (log10(k) + f)             # <<<<<<<<<<<<<<
@@ -14294,7 +14294,7 @@ static PyObject *__pyx_f_5MACS2_2IO_10ScoreTrack_12scoreTrackII_make_pq_table(st
  */
     __pyx_v_q = (__pyx_v_v + (log10(__pyx_v_k) + __pyx_v_f));
 
-    /* "MACS2/IO/ScoreTrack.pyx":810
+    /* "MACS2/IO/ScoreTrack.pyx":801
  *             l = value_dict[v]
  *             q = v + (log10(k) + f)
  *             q = max(0,min(pre_q,q))           # make q-score monotonic             # <<<<<<<<<<<<<<
@@ -14317,22 +14317,22 @@ static PyObject *__pyx_f_5MACS2_2IO_10ScoreTrack_12scoreTrackII_make_pq_table(st
     }
     __pyx_v_q = __pyx_t_11;
 
-    /* "MACS2/IO/ScoreTrack.pyx":812
+    /* "MACS2/IO/ScoreTrack.pyx":803
  *             q = max(0,min(pre_q,q))           # make q-score monotonic
  * 
  *             pvalue2qvalue[ v ] = q             # <<<<<<<<<<<<<<
  * 
  *             pre_v = v
  */
-    __pyx_t_2 = PyFloat_FromDouble(__pyx_v_q); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 812, __pyx_L1_error)
+    __pyx_t_2 = PyFloat_FromDouble(__pyx_v_q); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 803, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
-    __pyx_t_3 = PyFloat_FromDouble(__pyx_v_v); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 812, __pyx_L1_error)
+    __pyx_t_3 = PyFloat_FromDouble(__pyx_v_v); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 803, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_3);
-    if (unlikely(PyDict_SetItem(__pyx_v_pvalue2qvalue, __pyx_t_3, __pyx_t_2) < 0)) __PYX_ERR(0, 812, __pyx_L1_error)
+    if (unlikely(PyDict_SetItem(__pyx_v_pvalue2qvalue, __pyx_t_3, __pyx_t_2) < 0)) __PYX_ERR(0, 803, __pyx_L1_error)
     __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
     __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
-    /* "MACS2/IO/ScoreTrack.pyx":814
+    /* "MACS2/IO/ScoreTrack.pyx":805
  *             pvalue2qvalue[ v ] = q
  * 
  *             pre_v = v             # <<<<<<<<<<<<<<
@@ -14341,7 +14341,7 @@ static PyObject *__pyx_f_5MACS2_2IO_10ScoreTrack_12scoreTrackII_make_pq_table(st
  */
     __pyx_v_pre_v = __pyx_v_v;
 
-    /* "MACS2/IO/ScoreTrack.pyx":815
+    /* "MACS2/IO/ScoreTrack.pyx":806
  * 
  *             pre_v = v
  *             pre_q = q             # <<<<<<<<<<<<<<
@@ -14350,7 +14350,7 @@ static PyObject *__pyx_f_5MACS2_2IO_10ScoreTrack_12scoreTrackII_make_pq_table(st
  */
     __pyx_v_pre_q = __pyx_v_q;
 
-    /* "MACS2/IO/ScoreTrack.pyx":816
+    /* "MACS2/IO/ScoreTrack.pyx":807
  *             pre_v = v
  *             pre_q = q
  *             k+=l             # <<<<<<<<<<<<<<
@@ -14360,7 +14360,7 @@ static PyObject *__pyx_f_5MACS2_2IO_10ScoreTrack_12scoreTrackII_make_pq_table(st
     __pyx_v_k = (__pyx_v_k + __pyx_v_l);
   }
 
-  /* "MACS2/IO/ScoreTrack.pyx":817
+  /* "MACS2/IO/ScoreTrack.pyx":808
  *             pre_q = q
  *             k+=l
  *         return pvalue2qvalue             # <<<<<<<<<<<<<<
@@ -14372,7 +14372,7 @@ static PyObject *__pyx_f_5MACS2_2IO_10ScoreTrack_12scoreTrackII_make_pq_table(st
   __pyx_r = __pyx_v_pvalue2qvalue;
   goto __pyx_L0;
 
-  /* "MACS2/IO/ScoreTrack.pyx":766
+  /* "MACS2/IO/ScoreTrack.pyx":757
  *         return
  * 
  *     cpdef dict make_pq_table ( self ):             # <<<<<<<<<<<<<<
@@ -14418,9 +14418,9 @@ static PyObject *__pyx_pf_5MACS2_2IO_10ScoreTrack_12scoreTrackII_20make_pq_table
   __Pyx_RefNannyDeclarations
   PyObject *__pyx_t_1 = NULL;
   __Pyx_RefNannySetupContext("make_pq_table", 0);
-  __Pyx_TraceCall("make_pq_table (wrapper)", __pyx_f[0], 766, 0, __PYX_ERR(0, 766, __pyx_L1_error));
+  __Pyx_TraceCall("make_pq_table (wrapper)", __pyx_f[0], 757, 0, __PYX_ERR(0, 757, __pyx_L1_error));
   __Pyx_XDECREF(__pyx_r);
-  __pyx_t_1 = __pyx_f_5MACS2_2IO_10ScoreTrack_12scoreTrackII_make_pq_table(__pyx_v_self, 1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 766, __pyx_L1_error)
+  __pyx_t_1 = __pyx_f_5MACS2_2IO_10ScoreTrack_12scoreTrackII_make_pq_table(__pyx_v_self, 1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 757, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __pyx_r = __pyx_t_1;
   __pyx_t_1 = 0;
@@ -14438,7 +14438,7 @@ static PyObject *__pyx_pf_5MACS2_2IO_10ScoreTrack_12scoreTrackII_20make_pq_table
   return __pyx_r;
 }
 
-/* "MACS2/IO/ScoreTrack.pyx":819
+/* "MACS2/IO/ScoreTrack.pyx":810
  *         return pvalue2qvalue
  * 
  *     cdef compute_likelihood ( self ):             # <<<<<<<<<<<<<<
@@ -14472,9 +14472,9 @@ static PyObject *__pyx_f_5MACS2_2IO_10ScoreTrack_12scoreTrackII_compute_likeliho
   long __pyx_t_11;
   PyObject *__pyx_t_12 = NULL;
   __Pyx_RefNannySetupContext("compute_likelihood", 0);
-  __Pyx_TraceCall("compute_likelihood", __pyx_f[0], 819, 0, __PYX_ERR(0, 819, __pyx_L1_error));
+  __Pyx_TraceCall("compute_likelihood", __pyx_f[0], 810, 0, __PYX_ERR(0, 810, __pyx_L1_error));
 
-  /* "MACS2/IO/ScoreTrack.pyx":830
+  /* "MACS2/IO/ScoreTrack.pyx":821
  *             float pseudocount
  * 
  *         pseudocount = self.pseudocount             # <<<<<<<<<<<<<<
@@ -14484,7 +14484,7 @@ static PyObject *__pyx_f_5MACS2_2IO_10ScoreTrack_12scoreTrackII_compute_likeliho
   __pyx_t_1 = __pyx_v_self->pseudocount;
   __pyx_v_pseudocount = __pyx_t_1;
 
-  /* "MACS2/IO/ScoreTrack.pyx":832
+  /* "MACS2/IO/ScoreTrack.pyx":823
  *         pseudocount = self.pseudocount
  * 
  *         for chrom in self.data.keys():             # <<<<<<<<<<<<<<
@@ -14494,9 +14494,9 @@ static PyObject *__pyx_f_5MACS2_2IO_10ScoreTrack_12scoreTrackII_compute_likeliho
   __pyx_t_3 = 0;
   if (unlikely(__pyx_v_self->data == Py_None)) {
     PyErr_Format(PyExc_AttributeError, "'NoneType' object has no attribute '%.30s'", "keys");
-    __PYX_ERR(0, 832, __pyx_L1_error)
+    __PYX_ERR(0, 823, __pyx_L1_error)
   }
-  __pyx_t_6 = __Pyx_dict_iterator(__pyx_v_self->data, 1, __pyx_n_s_keys, (&__pyx_t_4), (&__pyx_t_5)); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 832, __pyx_L1_error)
+  __pyx_t_6 = __Pyx_dict_iterator(__pyx_v_self->data, 1, __pyx_n_s_keys, (&__pyx_t_4), (&__pyx_t_5)); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 823, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_6);
   __Pyx_XDECREF(__pyx_t_2);
   __pyx_t_2 = __pyx_t_6;
@@ -14504,13 +14504,13 @@ static PyObject *__pyx_f_5MACS2_2IO_10ScoreTrack_12scoreTrackII_compute_likeliho
   while (1) {
     __pyx_t_7 = __Pyx_dict_iter_next(__pyx_t_2, __pyx_t_4, &__pyx_t_3, &__pyx_t_6, NULL, NULL, __pyx_t_5);
     if (unlikely(__pyx_t_7 == 0)) break;
-    if (unlikely(__pyx_t_7 == -1)) __PYX_ERR(0, 832, __pyx_L1_error)
+    if (unlikely(__pyx_t_7 == -1)) __PYX_ERR(0, 823, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_6);
-    if (!(likely(PyBytes_CheckExact(__pyx_t_6))||((__pyx_t_6) == Py_None)||(PyErr_Format(PyExc_TypeError, "Expected %.16s, got %.200s", "bytes", Py_TYPE(__pyx_t_6)->tp_name), 0))) __PYX_ERR(0, 832, __pyx_L1_error)
+    if (!(likely(PyBytes_CheckExact(__pyx_t_6))||((__pyx_t_6) == Py_None)||(PyErr_Format(PyExc_TypeError, "Expected %.16s, got %.200s", "bytes", Py_TYPE(__pyx_t_6)->tp_name), 0))) __PYX_ERR(0, 823, __pyx_L1_error)
     __Pyx_XDECREF_SET(__pyx_v_chrom, ((PyObject*)__pyx_t_6));
     __pyx_t_6 = 0;
 
-    /* "MACS2/IO/ScoreTrack.pyx":833
+    /* "MACS2/IO/ScoreTrack.pyx":824
  * 
  *         for chrom in self.data.keys():
  *             p = self.data[chrom][ 1 ].flat.__next__             # <<<<<<<<<<<<<<
@@ -14519,23 +14519,23 @@ static PyObject *__pyx_f_5MACS2_2IO_10ScoreTrack_12scoreTrackII_compute_likeliho
  */
     if (unlikely(__pyx_v_self->data == Py_None)) {
       PyErr_SetString(PyExc_TypeError, "'NoneType' object is not subscriptable");
-      __PYX_ERR(0, 833, __pyx_L1_error)
+      __PYX_ERR(0, 824, __pyx_L1_error)
     }
-    __pyx_t_6 = __Pyx_PyDict_GetItem(__pyx_v_self->data, __pyx_v_chrom); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 833, __pyx_L1_error)
+    __pyx_t_6 = __Pyx_PyDict_GetItem(__pyx_v_self->data, __pyx_v_chrom); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 824, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_6);
-    __pyx_t_8 = __Pyx_GetItemInt(__pyx_t_6, 1, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 833, __pyx_L1_error)
+    __pyx_t_8 = __Pyx_GetItemInt(__pyx_t_6, 1, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 824, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_8);
     __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
-    __pyx_t_6 = __Pyx_PyObject_GetAttrStr(__pyx_t_8, __pyx_n_s_flat); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 833, __pyx_L1_error)
+    __pyx_t_6 = __Pyx_PyObject_GetAttrStr(__pyx_t_8, __pyx_n_s_flat); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 824, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_6);
     __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
-    __pyx_t_8 = __Pyx_PyObject_GetAttrStr(__pyx_t_6, __pyx_n_s_next); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 833, __pyx_L1_error)
+    __pyx_t_8 = __Pyx_PyObject_GetAttrStr(__pyx_t_6, __pyx_n_s_next); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 824, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_8);
     __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
     __Pyx_XDECREF_SET(__pyx_v_p, __pyx_t_8);
     __pyx_t_8 = 0;
 
-    /* "MACS2/IO/ScoreTrack.pyx":834
+    /* "MACS2/IO/ScoreTrack.pyx":825
  *         for chrom in self.data.keys():
  *             p = self.data[chrom][ 1 ].flat.__next__
  *             c = self.data[chrom][ 2 ].flat.__next__             # <<<<<<<<<<<<<<
@@ -14544,23 +14544,23 @@ static PyObject *__pyx_f_5MACS2_2IO_10ScoreTrack_12scoreTrackII_compute_likeliho
  */
     if (unlikely(__pyx_v_self->data == Py_None)) {
       PyErr_SetString(PyExc_TypeError, "'NoneType' object is not subscriptable");
-      __PYX_ERR(0, 834, __pyx_L1_error)
+      __PYX_ERR(0, 825, __pyx_L1_error)
     }
-    __pyx_t_8 = __Pyx_PyDict_GetItem(__pyx_v_self->data, __pyx_v_chrom); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 834, __pyx_L1_error)
+    __pyx_t_8 = __Pyx_PyDict_GetItem(__pyx_v_self->data, __pyx_v_chrom); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 825, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_8);
-    __pyx_t_6 = __Pyx_GetItemInt(__pyx_t_8, 2, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 834, __pyx_L1_error)
+    __pyx_t_6 = __Pyx_GetItemInt(__pyx_t_8, 2, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 825, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_6);
     __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
-    __pyx_t_8 = __Pyx_PyObject_GetAttrStr(__pyx_t_6, __pyx_n_s_flat); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 834, __pyx_L1_error)
+    __pyx_t_8 = __Pyx_PyObject_GetAttrStr(__pyx_t_6, __pyx_n_s_flat); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 825, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_8);
     __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
-    __pyx_t_6 = __Pyx_PyObject_GetAttrStr(__pyx_t_8, __pyx_n_s_next); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 834, __pyx_L1_error)
+    __pyx_t_6 = __Pyx_PyObject_GetAttrStr(__pyx_t_8, __pyx_n_s_next); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 825, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_6);
     __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
     __Pyx_XDECREF_SET(__pyx_v_c, __pyx_t_6);
     __pyx_t_6 = 0;
 
-    /* "MACS2/IO/ScoreTrack.pyx":835
+    /* "MACS2/IO/ScoreTrack.pyx":826
  *             p = self.data[chrom][ 1 ].flat.__next__
  *             c = self.data[chrom][ 2 ].flat.__next__
  *             v = self.data[chrom][ 3 ]             # <<<<<<<<<<<<<<
@@ -14569,17 +14569,17 @@ static PyObject *__pyx_f_5MACS2_2IO_10ScoreTrack_12scoreTrackII_compute_likeliho
  */
     if (unlikely(__pyx_v_self->data == Py_None)) {
       PyErr_SetString(PyExc_TypeError, "'NoneType' object is not subscriptable");
-      __PYX_ERR(0, 835, __pyx_L1_error)
+      __PYX_ERR(0, 826, __pyx_L1_error)
     }
-    __pyx_t_6 = __Pyx_PyDict_GetItem(__pyx_v_self->data, __pyx_v_chrom); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 835, __pyx_L1_error)
+    __pyx_t_6 = __Pyx_PyDict_GetItem(__pyx_v_self->data, __pyx_v_chrom); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 826, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_6);
-    __pyx_t_8 = __Pyx_GetItemInt(__pyx_t_6, 3, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 835, __pyx_L1_error)
+    __pyx_t_8 = __Pyx_GetItemInt(__pyx_t_6, 3, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 826, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_8);
     __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
     __Pyx_XDECREF_SET(__pyx_v_v, __pyx_t_8);
     __pyx_t_8 = 0;
 
-    /* "MACS2/IO/ScoreTrack.pyx":836
+    /* "MACS2/IO/ScoreTrack.pyx":827
  *             c = self.data[chrom][ 2 ].flat.__next__
  *             v = self.data[chrom][ 3 ]
  *             l = self.datalength[chrom]             # <<<<<<<<<<<<<<
@@ -14588,15 +14588,15 @@ static PyObject *__pyx_f_5MACS2_2IO_10ScoreTrack_12scoreTrackII_compute_likeliho
  */
     if (unlikely(__pyx_v_self->datalength == Py_None)) {
       PyErr_SetString(PyExc_TypeError, "'NoneType' object is not subscriptable");
-      __PYX_ERR(0, 836, __pyx_L1_error)
+      __PYX_ERR(0, 827, __pyx_L1_error)
     }
-    __pyx_t_8 = __Pyx_PyDict_GetItem(__pyx_v_self->datalength, __pyx_v_chrom); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 836, __pyx_L1_error)
+    __pyx_t_8 = __Pyx_PyDict_GetItem(__pyx_v_self->datalength, __pyx_v_chrom); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 827, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_8);
-    __pyx_t_9 = __Pyx_PyInt_As_long(__pyx_t_8); if (unlikely((__pyx_t_9 == (long)-1) && PyErr_Occurred())) __PYX_ERR(0, 836, __pyx_L1_error)
+    __pyx_t_9 = __Pyx_PyInt_As_long(__pyx_t_8); if (unlikely((__pyx_t_9 == (long)-1) && PyErr_Occurred())) __PYX_ERR(0, 827, __pyx_L1_error)
     __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
     __pyx_v_l = __pyx_t_9;
 
-    /* "MACS2/IO/ScoreTrack.pyx":837
+    /* "MACS2/IO/ScoreTrack.pyx":828
  *             v = self.data[chrom][ 3 ]
  *             l = self.datalength[chrom]
  *             v1 = 2             # <<<<<<<<<<<<<<
@@ -14605,7 +14605,7 @@ static PyObject *__pyx_f_5MACS2_2IO_10ScoreTrack_12scoreTrackII_compute_likeliho
  */
     __pyx_v_v1 = 2.0;
 
-    /* "MACS2/IO/ScoreTrack.pyx":838
+    /* "MACS2/IO/ScoreTrack.pyx":829
  *             l = self.datalength[chrom]
  *             v1 = 2
  *             v2 = 1             # <<<<<<<<<<<<<<
@@ -14614,7 +14614,7 @@ static PyObject *__pyx_f_5MACS2_2IO_10ScoreTrack_12scoreTrackII_compute_likeliho
  */
     __pyx_v_v2 = 1.0;
 
-    /* "MACS2/IO/ScoreTrack.pyx":839
+    /* "MACS2/IO/ScoreTrack.pyx":830
  *             v1 = 2
  *             v2 = 1
  *             for i in range(l):             # <<<<<<<<<<<<<<
@@ -14626,7 +14626,7 @@ static PyObject *__pyx_f_5MACS2_2IO_10ScoreTrack_12scoreTrackII_compute_likeliho
     for (__pyx_t_11 = 0; __pyx_t_11 < __pyx_t_10; __pyx_t_11+=1) {
       __pyx_v_i = __pyx_t_11;
 
-      /* "MACS2/IO/ScoreTrack.pyx":840
+      /* "MACS2/IO/ScoreTrack.pyx":831
  *             v2 = 1
  *             for i in range(l):
  *                 v1 = p()             # <<<<<<<<<<<<<<
@@ -14646,14 +14646,14 @@ static PyObject *__pyx_f_5MACS2_2IO_10ScoreTrack_12scoreTrackII_compute_likeliho
       }
       __pyx_t_8 = (__pyx_t_12) ? __Pyx_PyObject_CallOneArg(__pyx_t_6, __pyx_t_12) : __Pyx_PyObject_CallNoArg(__pyx_t_6);
       __Pyx_XDECREF(__pyx_t_12); __pyx_t_12 = 0;
-      if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 840, __pyx_L1_error)
+      if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 831, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_8);
       __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
-      __pyx_t_1 = __pyx_PyFloat_AsFloat(__pyx_t_8); if (unlikely((__pyx_t_1 == (float)-1) && PyErr_Occurred())) __PYX_ERR(0, 840, __pyx_L1_error)
+      __pyx_t_1 = __pyx_PyFloat_AsFloat(__pyx_t_8); if (unlikely((__pyx_t_1 == (float)-1) && PyErr_Occurred())) __PYX_ERR(0, 831, __pyx_L1_error)
       __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
       __pyx_v_v1 = __pyx_t_1;
 
-      /* "MACS2/IO/ScoreTrack.pyx":841
+      /* "MACS2/IO/ScoreTrack.pyx":832
  *             for i in range(l):
  *                 v1 = p()
  *                 v2 = c()             # <<<<<<<<<<<<<<
@@ -14673,29 +14673,29 @@ static PyObject *__pyx_f_5MACS2_2IO_10ScoreTrack_12scoreTrackII_compute_likeliho
       }
       __pyx_t_8 = (__pyx_t_12) ? __Pyx_PyObject_CallOneArg(__pyx_t_6, __pyx_t_12) : __Pyx_PyObject_CallNoArg(__pyx_t_6);
       __Pyx_XDECREF(__pyx_t_12); __pyx_t_12 = 0;
-      if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 841, __pyx_L1_error)
+      if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 832, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_8);
       __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
-      __pyx_t_1 = __pyx_PyFloat_AsFloat(__pyx_t_8); if (unlikely((__pyx_t_1 == (float)-1) && PyErr_Occurred())) __PYX_ERR(0, 841, __pyx_L1_error)
+      __pyx_t_1 = __pyx_PyFloat_AsFloat(__pyx_t_8); if (unlikely((__pyx_t_1 == (float)-1) && PyErr_Occurred())) __PYX_ERR(0, 832, __pyx_L1_error)
       __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
       __pyx_v_v2 = __pyx_t_1;
 
-      /* "MACS2/IO/ScoreTrack.pyx":842
+      /* "MACS2/IO/ScoreTrack.pyx":833
  *                 v1 = p()
  *                 v2 = c()
  *                 v[ i ] =  logLR_asym( v1 + pseudocount, v2 + pseudocount )  #logLR( d[ i, 1]/100.0, d[ i, 2]/100.0 )             # <<<<<<<<<<<<<<
  *                 #print v1, v2, v[i]
  *         self.scoring_method = ord('l')
  */
-      __pyx_t_8 = PyFloat_FromDouble(__pyx_f_5MACS2_2IO_10ScoreTrack_logLR_asym((__pyx_v_v1 + __pyx_v_pseudocount), (__pyx_v_v2 + __pyx_v_pseudocount))); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 842, __pyx_L1_error)
+      __pyx_t_8 = PyFloat_FromDouble(__pyx_f_5MACS2_2IO_10ScoreTrack_logLR_asym((__pyx_v_v1 + __pyx_v_pseudocount), (__pyx_v_v2 + __pyx_v_pseudocount))); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 833, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_8);
-      if (unlikely(__Pyx_SetItemInt(__pyx_v_v, __pyx_v_i, __pyx_t_8, long, 1, __Pyx_PyInt_From_long, 0, 1, 1) < 0)) __PYX_ERR(0, 842, __pyx_L1_error)
+      if (unlikely(__Pyx_SetItemInt(__pyx_v_v, __pyx_v_i, __pyx_t_8, long, 1, __Pyx_PyInt_From_long, 0, 1, 1) < 0)) __PYX_ERR(0, 833, __pyx_L1_error)
       __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
     }
   }
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
-  /* "MACS2/IO/ScoreTrack.pyx":844
+  /* "MACS2/IO/ScoreTrack.pyx":835
  *                 v[ i ] =  logLR_asym( v1 + pseudocount, v2 + pseudocount )  #logLR( d[ i, 1]/100.0, d[ i, 2]/100.0 )
  *                 #print v1, v2, v[i]
  *         self.scoring_method = ord('l')             # <<<<<<<<<<<<<<
@@ -14704,7 +14704,7 @@ static PyObject *__pyx_f_5MACS2_2IO_10ScoreTrack_12scoreTrackII_compute_likeliho
  */
   __pyx_v_self->scoring_method = 0x6C;
 
-  /* "MACS2/IO/ScoreTrack.pyx":845
+  /* "MACS2/IO/ScoreTrack.pyx":836
  *                 #print v1, v2, v[i]
  *         self.scoring_method = ord('l')
  *         return             # <<<<<<<<<<<<<<
@@ -14715,7 +14715,7 @@ static PyObject *__pyx_f_5MACS2_2IO_10ScoreTrack_12scoreTrackII_compute_likeliho
   __pyx_r = Py_None; __Pyx_INCREF(Py_None);
   goto __pyx_L0;
 
-  /* "MACS2/IO/ScoreTrack.pyx":819
+  /* "MACS2/IO/ScoreTrack.pyx":810
  *         return pvalue2qvalue
  * 
  *     cdef compute_likelihood ( self ):             # <<<<<<<<<<<<<<
@@ -14742,7 +14742,7 @@ static PyObject *__pyx_f_5MACS2_2IO_10ScoreTrack_12scoreTrackII_compute_likeliho
   return __pyx_r;
 }
 
-/* "MACS2/IO/ScoreTrack.pyx":847
+/* "MACS2/IO/ScoreTrack.pyx":838
  *         return
  * 
  *     cdef compute_sym_likelihood ( self ):             # <<<<<<<<<<<<<<
@@ -14776,9 +14776,9 @@ static PyObject *__pyx_f_5MACS2_2IO_10ScoreTrack_12scoreTrackII_compute_sym_like
   long __pyx_t_11;
   PyObject *__pyx_t_12 = NULL;
   __Pyx_RefNannySetupContext("compute_sym_likelihood", 0);
-  __Pyx_TraceCall("compute_sym_likelihood", __pyx_f[0], 847, 0, __PYX_ERR(0, 847, __pyx_L1_error));
+  __Pyx_TraceCall("compute_sym_likelihood", __pyx_f[0], 838, 0, __PYX_ERR(0, 838, __pyx_L1_error));
 
-  /* "MACS2/IO/ScoreTrack.pyx":858
+  /* "MACS2/IO/ScoreTrack.pyx":849
  *             float pseudocount
  * 
  *         pseudocount = self.pseudocount             # <<<<<<<<<<<<<<
@@ -14788,7 +14788,7 @@ static PyObject *__pyx_f_5MACS2_2IO_10ScoreTrack_12scoreTrackII_compute_sym_like
   __pyx_t_1 = __pyx_v_self->pseudocount;
   __pyx_v_pseudocount = __pyx_t_1;
 
-  /* "MACS2/IO/ScoreTrack.pyx":860
+  /* "MACS2/IO/ScoreTrack.pyx":851
  *         pseudocount = self.pseudocount
  * 
  *         for chrom in self.data.keys():             # <<<<<<<<<<<<<<
@@ -14798,9 +14798,9 @@ static PyObject *__pyx_f_5MACS2_2IO_10ScoreTrack_12scoreTrackII_compute_sym_like
   __pyx_t_3 = 0;
   if (unlikely(__pyx_v_self->data == Py_None)) {
     PyErr_Format(PyExc_AttributeError, "'NoneType' object has no attribute '%.30s'", "keys");
-    __PYX_ERR(0, 860, __pyx_L1_error)
+    __PYX_ERR(0, 851, __pyx_L1_error)
   }
-  __pyx_t_6 = __Pyx_dict_iterator(__pyx_v_self->data, 1, __pyx_n_s_keys, (&__pyx_t_4), (&__pyx_t_5)); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 860, __pyx_L1_error)
+  __pyx_t_6 = __Pyx_dict_iterator(__pyx_v_self->data, 1, __pyx_n_s_keys, (&__pyx_t_4), (&__pyx_t_5)); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 851, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_6);
   __Pyx_XDECREF(__pyx_t_2);
   __pyx_t_2 = __pyx_t_6;
@@ -14808,13 +14808,13 @@ static PyObject *__pyx_f_5MACS2_2IO_10ScoreTrack_12scoreTrackII_compute_sym_like
   while (1) {
     __pyx_t_7 = __Pyx_dict_iter_next(__pyx_t_2, __pyx_t_4, &__pyx_t_3, &__pyx_t_6, NULL, NULL, __pyx_t_5);
     if (unlikely(__pyx_t_7 == 0)) break;
-    if (unlikely(__pyx_t_7 == -1)) __PYX_ERR(0, 860, __pyx_L1_error)
+    if (unlikely(__pyx_t_7 == -1)) __PYX_ERR(0, 851, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_6);
-    if (!(likely(PyBytes_CheckExact(__pyx_t_6))||((__pyx_t_6) == Py_None)||(PyErr_Format(PyExc_TypeError, "Expected %.16s, got %.200s", "bytes", Py_TYPE(__pyx_t_6)->tp_name), 0))) __PYX_ERR(0, 860, __pyx_L1_error)
+    if (!(likely(PyBytes_CheckExact(__pyx_t_6))||((__pyx_t_6) == Py_None)||(PyErr_Format(PyExc_TypeError, "Expected %.16s, got %.200s", "bytes", Py_TYPE(__pyx_t_6)->tp_name), 0))) __PYX_ERR(0, 851, __pyx_L1_error)
     __Pyx_XDECREF_SET(__pyx_v_chrom, ((PyObject*)__pyx_t_6));
     __pyx_t_6 = 0;
 
-    /* "MACS2/IO/ScoreTrack.pyx":861
+    /* "MACS2/IO/ScoreTrack.pyx":852
  * 
  *         for chrom in self.data.keys():
  *             p = self.data[chrom][ 1 ].flat.__next__             # <<<<<<<<<<<<<<
@@ -14823,23 +14823,23 @@ static PyObject *__pyx_f_5MACS2_2IO_10ScoreTrack_12scoreTrackII_compute_sym_like
  */
     if (unlikely(__pyx_v_self->data == Py_None)) {
       PyErr_SetString(PyExc_TypeError, "'NoneType' object is not subscriptable");
-      __PYX_ERR(0, 861, __pyx_L1_error)
+      __PYX_ERR(0, 852, __pyx_L1_error)
     }
-    __pyx_t_6 = __Pyx_PyDict_GetItem(__pyx_v_self->data, __pyx_v_chrom); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 861, __pyx_L1_error)
+    __pyx_t_6 = __Pyx_PyDict_GetItem(__pyx_v_self->data, __pyx_v_chrom); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 852, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_6);
-    __pyx_t_8 = __Pyx_GetItemInt(__pyx_t_6, 1, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 861, __pyx_L1_error)
+    __pyx_t_8 = __Pyx_GetItemInt(__pyx_t_6, 1, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 852, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_8);
     __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
-    __pyx_t_6 = __Pyx_PyObject_GetAttrStr(__pyx_t_8, __pyx_n_s_flat); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 861, __pyx_L1_error)
+    __pyx_t_6 = __Pyx_PyObject_GetAttrStr(__pyx_t_8, __pyx_n_s_flat); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 852, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_6);
     __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
-    __pyx_t_8 = __Pyx_PyObject_GetAttrStr(__pyx_t_6, __pyx_n_s_next); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 861, __pyx_L1_error)
+    __pyx_t_8 = __Pyx_PyObject_GetAttrStr(__pyx_t_6, __pyx_n_s_next); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 852, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_8);
     __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
     __Pyx_XDECREF_SET(__pyx_v_p, __pyx_t_8);
     __pyx_t_8 = 0;
 
-    /* "MACS2/IO/ScoreTrack.pyx":862
+    /* "MACS2/IO/ScoreTrack.pyx":853
  *         for chrom in self.data.keys():
  *             p = self.data[chrom][ 1 ].flat.__next__
  *             c = self.data[chrom][ 2 ].flat.__next__             # <<<<<<<<<<<<<<
@@ -14848,23 +14848,23 @@ static PyObject *__pyx_f_5MACS2_2IO_10ScoreTrack_12scoreTrackII_compute_sym_like
  */
     if (unlikely(__pyx_v_self->data == Py_None)) {
       PyErr_SetString(PyExc_TypeError, "'NoneType' object is not subscriptable");
-      __PYX_ERR(0, 862, __pyx_L1_error)
+      __PYX_ERR(0, 853, __pyx_L1_error)
     }
-    __pyx_t_8 = __Pyx_PyDict_GetItem(__pyx_v_self->data, __pyx_v_chrom); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 862, __pyx_L1_error)
+    __pyx_t_8 = __Pyx_PyDict_GetItem(__pyx_v_self->data, __pyx_v_chrom); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 853, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_8);
-    __pyx_t_6 = __Pyx_GetItemInt(__pyx_t_8, 2, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 862, __pyx_L1_error)
+    __pyx_t_6 = __Pyx_GetItemInt(__pyx_t_8, 2, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 853, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_6);
     __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
-    __pyx_t_8 = __Pyx_PyObject_GetAttrStr(__pyx_t_6, __pyx_n_s_flat); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 862, __pyx_L1_error)
+    __pyx_t_8 = __Pyx_PyObject_GetAttrStr(__pyx_t_6, __pyx_n_s_flat); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 853, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_8);
     __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
-    __pyx_t_6 = __Pyx_PyObject_GetAttrStr(__pyx_t_8, __pyx_n_s_next); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 862, __pyx_L1_error)
+    __pyx_t_6 = __Pyx_PyObject_GetAttrStr(__pyx_t_8, __pyx_n_s_next); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 853, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_6);
     __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
     __Pyx_XDECREF_SET(__pyx_v_c, __pyx_t_6);
     __pyx_t_6 = 0;
 
-    /* "MACS2/IO/ScoreTrack.pyx":863
+    /* "MACS2/IO/ScoreTrack.pyx":854
  *             p = self.data[chrom][ 1 ].flat.__next__
  *             c = self.data[chrom][ 2 ].flat.__next__
  *             v = self.data[chrom][ 3 ]             # <<<<<<<<<<<<<<
@@ -14873,17 +14873,17 @@ static PyObject *__pyx_f_5MACS2_2IO_10ScoreTrack_12scoreTrackII_compute_sym_like
  */
     if (unlikely(__pyx_v_self->data == Py_None)) {
       PyErr_SetString(PyExc_TypeError, "'NoneType' object is not subscriptable");
-      __PYX_ERR(0, 863, __pyx_L1_error)
+      __PYX_ERR(0, 854, __pyx_L1_error)
     }
-    __pyx_t_6 = __Pyx_PyDict_GetItem(__pyx_v_self->data, __pyx_v_chrom); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 863, __pyx_L1_error)
+    __pyx_t_6 = __Pyx_PyDict_GetItem(__pyx_v_self->data, __pyx_v_chrom); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 854, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_6);
-    __pyx_t_8 = __Pyx_GetItemInt(__pyx_t_6, 3, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 863, __pyx_L1_error)
+    __pyx_t_8 = __Pyx_GetItemInt(__pyx_t_6, 3, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 854, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_8);
     __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
     __Pyx_XDECREF_SET(__pyx_v_v, __pyx_t_8);
     __pyx_t_8 = 0;
 
-    /* "MACS2/IO/ScoreTrack.pyx":864
+    /* "MACS2/IO/ScoreTrack.pyx":855
  *             c = self.data[chrom][ 2 ].flat.__next__
  *             v = self.data[chrom][ 3 ]
  *             l = self.datalength[chrom]             # <<<<<<<<<<<<<<
@@ -14892,15 +14892,15 @@ static PyObject *__pyx_f_5MACS2_2IO_10ScoreTrack_12scoreTrackII_compute_sym_like
  */
     if (unlikely(__pyx_v_self->datalength == Py_None)) {
       PyErr_SetString(PyExc_TypeError, "'NoneType' object is not subscriptable");
-      __PYX_ERR(0, 864, __pyx_L1_error)
+      __PYX_ERR(0, 855, __pyx_L1_error)
     }
-    __pyx_t_8 = __Pyx_PyDict_GetItem(__pyx_v_self->datalength, __pyx_v_chrom); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 864, __pyx_L1_error)
+    __pyx_t_8 = __Pyx_PyDict_GetItem(__pyx_v_self->datalength, __pyx_v_chrom); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 855, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_8);
-    __pyx_t_9 = __Pyx_PyInt_As_long(__pyx_t_8); if (unlikely((__pyx_t_9 == (long)-1) && PyErr_Occurred())) __PYX_ERR(0, 864, __pyx_L1_error)
+    __pyx_t_9 = __Pyx_PyInt_As_long(__pyx_t_8); if (unlikely((__pyx_t_9 == (long)-1) && PyErr_Occurred())) __PYX_ERR(0, 855, __pyx_L1_error)
     __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
     __pyx_v_l = __pyx_t_9;
 
-    /* "MACS2/IO/ScoreTrack.pyx":865
+    /* "MACS2/IO/ScoreTrack.pyx":856
  *             v = self.data[chrom][ 3 ]
  *             l = self.datalength[chrom]
  *             v1 = 2             # <<<<<<<<<<<<<<
@@ -14909,7 +14909,7 @@ static PyObject *__pyx_f_5MACS2_2IO_10ScoreTrack_12scoreTrackII_compute_sym_like
  */
     __pyx_v_v1 = 2.0;
 
-    /* "MACS2/IO/ScoreTrack.pyx":866
+    /* "MACS2/IO/ScoreTrack.pyx":857
  *             l = self.datalength[chrom]
  *             v1 = 2
  *             v2 = 1             # <<<<<<<<<<<<<<
@@ -14918,7 +14918,7 @@ static PyObject *__pyx_f_5MACS2_2IO_10ScoreTrack_12scoreTrackII_compute_sym_like
  */
     __pyx_v_v2 = 1.0;
 
-    /* "MACS2/IO/ScoreTrack.pyx":867
+    /* "MACS2/IO/ScoreTrack.pyx":858
  *             v1 = 2
  *             v2 = 1
  *             for i in range(l):             # <<<<<<<<<<<<<<
@@ -14930,7 +14930,7 @@ static PyObject *__pyx_f_5MACS2_2IO_10ScoreTrack_12scoreTrackII_compute_sym_like
     for (__pyx_t_11 = 0; __pyx_t_11 < __pyx_t_10; __pyx_t_11+=1) {
       __pyx_v_i = __pyx_t_11;
 
-      /* "MACS2/IO/ScoreTrack.pyx":868
+      /* "MACS2/IO/ScoreTrack.pyx":859
  *             v2 = 1
  *             for i in range(l):
  *                 v1 = p()             # <<<<<<<<<<<<<<
@@ -14950,14 +14950,14 @@ static PyObject *__pyx_f_5MACS2_2IO_10ScoreTrack_12scoreTrackII_compute_sym_like
       }
       __pyx_t_8 = (__pyx_t_12) ? __Pyx_PyObject_CallOneArg(__pyx_t_6, __pyx_t_12) : __Pyx_PyObject_CallNoArg(__pyx_t_6);
       __Pyx_XDECREF(__pyx_t_12); __pyx_t_12 = 0;
-      if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 868, __pyx_L1_error)
+      if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 859, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_8);
       __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
-      __pyx_t_1 = __pyx_PyFloat_AsFloat(__pyx_t_8); if (unlikely((__pyx_t_1 == (float)-1) && PyErr_Occurred())) __PYX_ERR(0, 868, __pyx_L1_error)
+      __pyx_t_1 = __pyx_PyFloat_AsFloat(__pyx_t_8); if (unlikely((__pyx_t_1 == (float)-1) && PyErr_Occurred())) __PYX_ERR(0, 859, __pyx_L1_error)
       __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
       __pyx_v_v1 = __pyx_t_1;
 
-      /* "MACS2/IO/ScoreTrack.pyx":869
+      /* "MACS2/IO/ScoreTrack.pyx":860
  *             for i in range(l):
  *                 v1 = p()
  *                 v2 = c()             # <<<<<<<<<<<<<<
@@ -14977,29 +14977,29 @@ static PyObject *__pyx_f_5MACS2_2IO_10ScoreTrack_12scoreTrackII_compute_sym_like
       }
       __pyx_t_8 = (__pyx_t_12) ? __Pyx_PyObject_CallOneArg(__pyx_t_6, __pyx_t_12) : __Pyx_PyObject_CallNoArg(__pyx_t_6);
       __Pyx_XDECREF(__pyx_t_12); __pyx_t_12 = 0;
-      if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 869, __pyx_L1_error)
+      if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 860, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_8);
       __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
-      __pyx_t_1 = __pyx_PyFloat_AsFloat(__pyx_t_8); if (unlikely((__pyx_t_1 == (float)-1) && PyErr_Occurred())) __PYX_ERR(0, 869, __pyx_L1_error)
+      __pyx_t_1 = __pyx_PyFloat_AsFloat(__pyx_t_8); if (unlikely((__pyx_t_1 == (float)-1) && PyErr_Occurred())) __PYX_ERR(0, 860, __pyx_L1_error)
       __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
       __pyx_v_v2 = __pyx_t_1;
 
-      /* "MACS2/IO/ScoreTrack.pyx":870
+      /* "MACS2/IO/ScoreTrack.pyx":861
  *                 v1 = p()
  *                 v2 = c()
  *                 v[ i ] =  logLR_sym( v1 + pseudocount, v2 + pseudocount )  #logLR( d[ i, 1]/100.0, d[ i, 2]/100.0 )             # <<<<<<<<<<<<<<
  *         self.scoring_method = ord('s')
  *         return
  */
-      __pyx_t_8 = PyFloat_FromDouble(__pyx_f_5MACS2_2IO_10ScoreTrack_logLR_sym((__pyx_v_v1 + __pyx_v_pseudocount), (__pyx_v_v2 + __pyx_v_pseudocount))); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 870, __pyx_L1_error)
+      __pyx_t_8 = PyFloat_FromDouble(__pyx_f_5MACS2_2IO_10ScoreTrack_logLR_sym((__pyx_v_v1 + __pyx_v_pseudocount), (__pyx_v_v2 + __pyx_v_pseudocount))); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 861, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_8);
-      if (unlikely(__Pyx_SetItemInt(__pyx_v_v, __pyx_v_i, __pyx_t_8, long, 1, __Pyx_PyInt_From_long, 0, 1, 1) < 0)) __PYX_ERR(0, 870, __pyx_L1_error)
+      if (unlikely(__Pyx_SetItemInt(__pyx_v_v, __pyx_v_i, __pyx_t_8, long, 1, __Pyx_PyInt_From_long, 0, 1, 1) < 0)) __PYX_ERR(0, 861, __pyx_L1_error)
       __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
     }
   }
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
-  /* "MACS2/IO/ScoreTrack.pyx":871
+  /* "MACS2/IO/ScoreTrack.pyx":862
  *                 v2 = c()
  *                 v[ i ] =  logLR_sym( v1 + pseudocount, v2 + pseudocount )  #logLR( d[ i, 1]/100.0, d[ i, 2]/100.0 )
  *         self.scoring_method = ord('s')             # <<<<<<<<<<<<<<
@@ -15008,7 +15008,7 @@ static PyObject *__pyx_f_5MACS2_2IO_10ScoreTrack_12scoreTrackII_compute_sym_like
  */
   __pyx_v_self->scoring_method = 0x73;
 
-  /* "MACS2/IO/ScoreTrack.pyx":872
+  /* "MACS2/IO/ScoreTrack.pyx":863
  *                 v[ i ] =  logLR_sym( v1 + pseudocount, v2 + pseudocount )  #logLR( d[ i, 1]/100.0, d[ i, 2]/100.0 )
  *         self.scoring_method = ord('s')
  *         return             # <<<<<<<<<<<<<<
@@ -15019,7 +15019,7 @@ static PyObject *__pyx_f_5MACS2_2IO_10ScoreTrack_12scoreTrackII_compute_sym_like
   __pyx_r = Py_None; __Pyx_INCREF(Py_None);
   goto __pyx_L0;
 
-  /* "MACS2/IO/ScoreTrack.pyx":847
+  /* "MACS2/IO/ScoreTrack.pyx":838
  *         return
  * 
  *     cdef compute_sym_likelihood ( self ):             # <<<<<<<<<<<<<<
@@ -15046,7 +15046,7 @@ static PyObject *__pyx_f_5MACS2_2IO_10ScoreTrack_12scoreTrackII_compute_sym_like
   return __pyx_r;
 }
 
-/* "MACS2/IO/ScoreTrack.pyx":874
+/* "MACS2/IO/ScoreTrack.pyx":865
  *         return
  * 
  *     cdef compute_logFE ( self ):             # <<<<<<<<<<<<<<
@@ -15079,9 +15079,9 @@ static PyObject *__pyx_f_5MACS2_2IO_10ScoreTrack_12scoreTrackII_compute_logFE(st
   PyObject *__pyx_t_12 = NULL;
   float __pyx_t_13;
   __Pyx_RefNannySetupContext("compute_logFE", 0);
-  __Pyx_TraceCall("compute_logFE", __pyx_f[0], 874, 0, __PYX_ERR(0, 874, __pyx_L1_error));
+  __Pyx_TraceCall("compute_logFE", __pyx_f[0], 865, 0, __PYX_ERR(0, 865, __pyx_L1_error));
 
-  /* "MACS2/IO/ScoreTrack.pyx":883
+  /* "MACS2/IO/ScoreTrack.pyx":874
  *             float pseudocount
  * 
  *         pseudocount = self.pseudocount             # <<<<<<<<<<<<<<
@@ -15091,7 +15091,7 @@ static PyObject *__pyx_f_5MACS2_2IO_10ScoreTrack_12scoreTrackII_compute_logFE(st
   __pyx_t_1 = __pyx_v_self->pseudocount;
   __pyx_v_pseudocount = __pyx_t_1;
 
-  /* "MACS2/IO/ScoreTrack.pyx":885
+  /* "MACS2/IO/ScoreTrack.pyx":876
  *         pseudocount = self.pseudocount
  * 
  *         for chrom in self.data.keys():             # <<<<<<<<<<<<<<
@@ -15101,9 +15101,9 @@ static PyObject *__pyx_f_5MACS2_2IO_10ScoreTrack_12scoreTrackII_compute_logFE(st
   __pyx_t_3 = 0;
   if (unlikely(__pyx_v_self->data == Py_None)) {
     PyErr_Format(PyExc_AttributeError, "'NoneType' object has no attribute '%.30s'", "keys");
-    __PYX_ERR(0, 885, __pyx_L1_error)
+    __PYX_ERR(0, 876, __pyx_L1_error)
   }
-  __pyx_t_6 = __Pyx_dict_iterator(__pyx_v_self->data, 1, __pyx_n_s_keys, (&__pyx_t_4), (&__pyx_t_5)); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 885, __pyx_L1_error)
+  __pyx_t_6 = __Pyx_dict_iterator(__pyx_v_self->data, 1, __pyx_n_s_keys, (&__pyx_t_4), (&__pyx_t_5)); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 876, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_6);
   __Pyx_XDECREF(__pyx_t_2);
   __pyx_t_2 = __pyx_t_6;
@@ -15111,12 +15111,12 @@ static PyObject *__pyx_f_5MACS2_2IO_10ScoreTrack_12scoreTrackII_compute_logFE(st
   while (1) {
     __pyx_t_7 = __Pyx_dict_iter_next(__pyx_t_2, __pyx_t_4, &__pyx_t_3, &__pyx_t_6, NULL, NULL, __pyx_t_5);
     if (unlikely(__pyx_t_7 == 0)) break;
-    if (unlikely(__pyx_t_7 == -1)) __PYX_ERR(0, 885, __pyx_L1_error)
+    if (unlikely(__pyx_t_7 == -1)) __PYX_ERR(0, 876, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_6);
     __Pyx_XDECREF_SET(__pyx_v_chrom, __pyx_t_6);
     __pyx_t_6 = 0;
 
-    /* "MACS2/IO/ScoreTrack.pyx":886
+    /* "MACS2/IO/ScoreTrack.pyx":877
  * 
  *         for chrom in self.data.keys():
  *             p = self.data[chrom][1]             # <<<<<<<<<<<<<<
@@ -15125,18 +15125,18 @@ static PyObject *__pyx_f_5MACS2_2IO_10ScoreTrack_12scoreTrackII_compute_logFE(st
  */
     if (unlikely(__pyx_v_self->data == Py_None)) {
       PyErr_SetString(PyExc_TypeError, "'NoneType' object is not subscriptable");
-      __PYX_ERR(0, 886, __pyx_L1_error)
+      __PYX_ERR(0, 877, __pyx_L1_error)
     }
-    __pyx_t_6 = __Pyx_PyDict_GetItem(__pyx_v_self->data, __pyx_v_chrom); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 886, __pyx_L1_error)
+    __pyx_t_6 = __Pyx_PyDict_GetItem(__pyx_v_self->data, __pyx_v_chrom); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 877, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_6);
-    __pyx_t_8 = __Pyx_GetItemInt(__pyx_t_6, 1, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 886, __pyx_L1_error)
+    __pyx_t_8 = __Pyx_GetItemInt(__pyx_t_6, 1, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 877, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_8);
     __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
-    if (!(likely(((__pyx_t_8) == Py_None) || likely(__Pyx_TypeTest(__pyx_t_8, __pyx_ptype_5numpy_ndarray))))) __PYX_ERR(0, 886, __pyx_L1_error)
+    if (!(likely(((__pyx_t_8) == Py_None) || likely(__Pyx_TypeTest(__pyx_t_8, __pyx_ptype_5numpy_ndarray))))) __PYX_ERR(0, 877, __pyx_L1_error)
     __Pyx_XDECREF_SET(__pyx_v_p, ((PyArrayObject *)__pyx_t_8));
     __pyx_t_8 = 0;
 
-    /* "MACS2/IO/ScoreTrack.pyx":887
+    /* "MACS2/IO/ScoreTrack.pyx":878
  *         for chrom in self.data.keys():
  *             p = self.data[chrom][1]
  *             c = self.data[chrom][2]             # <<<<<<<<<<<<<<
@@ -15145,18 +15145,18 @@ static PyObject *__pyx_f_5MACS2_2IO_10ScoreTrack_12scoreTrackII_compute_logFE(st
  */
     if (unlikely(__pyx_v_self->data == Py_None)) {
       PyErr_SetString(PyExc_TypeError, "'NoneType' object is not subscriptable");
-      __PYX_ERR(0, 887, __pyx_L1_error)
+      __PYX_ERR(0, 878, __pyx_L1_error)
     }
-    __pyx_t_8 = __Pyx_PyDict_GetItem(__pyx_v_self->data, __pyx_v_chrom); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 887, __pyx_L1_error)
+    __pyx_t_8 = __Pyx_PyDict_GetItem(__pyx_v_self->data, __pyx_v_chrom); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 878, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_8);
-    __pyx_t_6 = __Pyx_GetItemInt(__pyx_t_8, 2, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 887, __pyx_L1_error)
+    __pyx_t_6 = __Pyx_GetItemInt(__pyx_t_8, 2, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 878, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_6);
     __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
-    if (!(likely(((__pyx_t_6) == Py_None) || likely(__Pyx_TypeTest(__pyx_t_6, __pyx_ptype_5numpy_ndarray))))) __PYX_ERR(0, 887, __pyx_L1_error)
+    if (!(likely(((__pyx_t_6) == Py_None) || likely(__Pyx_TypeTest(__pyx_t_6, __pyx_ptype_5numpy_ndarray))))) __PYX_ERR(0, 878, __pyx_L1_error)
     __Pyx_XDECREF_SET(__pyx_v_c, ((PyArrayObject *)__pyx_t_6));
     __pyx_t_6 = 0;
 
-    /* "MACS2/IO/ScoreTrack.pyx":888
+    /* "MACS2/IO/ScoreTrack.pyx":879
  *             p = self.data[chrom][1]
  *             c = self.data[chrom][2]
  *             v = self.data[chrom][3]             # <<<<<<<<<<<<<<
@@ -15165,18 +15165,18 @@ static PyObject *__pyx_f_5MACS2_2IO_10ScoreTrack_12scoreTrackII_compute_logFE(st
  */
     if (unlikely(__pyx_v_self->data == Py_None)) {
       PyErr_SetString(PyExc_TypeError, "'NoneType' object is not subscriptable");
-      __PYX_ERR(0, 888, __pyx_L1_error)
+      __PYX_ERR(0, 879, __pyx_L1_error)
     }
-    __pyx_t_6 = __Pyx_PyDict_GetItem(__pyx_v_self->data, __pyx_v_chrom); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 888, __pyx_L1_error)
+    __pyx_t_6 = __Pyx_PyDict_GetItem(__pyx_v_self->data, __pyx_v_chrom); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 879, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_6);
-    __pyx_t_8 = __Pyx_GetItemInt(__pyx_t_6, 3, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 888, __pyx_L1_error)
+    __pyx_t_8 = __Pyx_GetItemInt(__pyx_t_6, 3, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 879, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_8);
     __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
-    if (!(likely(((__pyx_t_8) == Py_None) || likely(__Pyx_TypeTest(__pyx_t_8, __pyx_ptype_5numpy_ndarray))))) __PYX_ERR(0, 888, __pyx_L1_error)
+    if (!(likely(((__pyx_t_8) == Py_None) || likely(__Pyx_TypeTest(__pyx_t_8, __pyx_ptype_5numpy_ndarray))))) __PYX_ERR(0, 879, __pyx_L1_error)
     __Pyx_XDECREF_SET(__pyx_v_v, ((PyArrayObject *)__pyx_t_8));
     __pyx_t_8 = 0;
 
-    /* "MACS2/IO/ScoreTrack.pyx":889
+    /* "MACS2/IO/ScoreTrack.pyx":880
  *             c = self.data[chrom][2]
  *             v = self.data[chrom][3]
  *             l = self.datalength[chrom]             # <<<<<<<<<<<<<<
@@ -15185,15 +15185,15 @@ static PyObject *__pyx_f_5MACS2_2IO_10ScoreTrack_12scoreTrackII_compute_logFE(st
  */
     if (unlikely(__pyx_v_self->datalength == Py_None)) {
       PyErr_SetString(PyExc_TypeError, "'NoneType' object is not subscriptable");
-      __PYX_ERR(0, 889, __pyx_L1_error)
+      __PYX_ERR(0, 880, __pyx_L1_error)
     }
-    __pyx_t_8 = __Pyx_PyDict_GetItem(__pyx_v_self->datalength, __pyx_v_chrom); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 889, __pyx_L1_error)
+    __pyx_t_8 = __Pyx_PyDict_GetItem(__pyx_v_self->datalength, __pyx_v_chrom); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 880, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_8);
-    __pyx_t_9 = __Pyx_PyInt_As_long(__pyx_t_8); if (unlikely((__pyx_t_9 == (long)-1) && PyErr_Occurred())) __PYX_ERR(0, 889, __pyx_L1_error)
+    __pyx_t_9 = __Pyx_PyInt_As_long(__pyx_t_8); if (unlikely((__pyx_t_9 == (long)-1) && PyErr_Occurred())) __PYX_ERR(0, 880, __pyx_L1_error)
     __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
     __pyx_v_l = __pyx_t_9;
 
-    /* "MACS2/IO/ScoreTrack.pyx":890
+    /* "MACS2/IO/ScoreTrack.pyx":881
  *             v = self.data[chrom][3]
  *             l = self.datalength[chrom]
  *             for i in range(l):             # <<<<<<<<<<<<<<
@@ -15205,42 +15205,42 @@ static PyObject *__pyx_f_5MACS2_2IO_10ScoreTrack_12scoreTrackII_compute_logFE(st
     for (__pyx_t_11 = 0; __pyx_t_11 < __pyx_t_10; __pyx_t_11+=1) {
       __pyx_v_i = __pyx_t_11;
 
-      /* "MACS2/IO/ScoreTrack.pyx":891
+      /* "MACS2/IO/ScoreTrack.pyx":882
  *             l = self.datalength[chrom]
  *             for i in range(l):
  *                 v[ i ] = get_logFE ( p[ i ] + pseudocount, c[ i ] + pseudocount)             # <<<<<<<<<<<<<<
  *         self.scoring_method = ord('f')
  *         return
  */
-      __pyx_t_8 = __Pyx_GetItemInt(((PyObject *)__pyx_v_p), __pyx_v_i, long, 1, __Pyx_PyInt_From_long, 0, 1, 1); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 891, __pyx_L1_error)
+      __pyx_t_8 = __Pyx_GetItemInt(((PyObject *)__pyx_v_p), __pyx_v_i, long, 1, __Pyx_PyInt_From_long, 0, 1, 1); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 882, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_8);
-      __pyx_t_6 = PyFloat_FromDouble(__pyx_v_pseudocount); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 891, __pyx_L1_error)
+      __pyx_t_6 = PyFloat_FromDouble(__pyx_v_pseudocount); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 882, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_6);
-      __pyx_t_12 = PyNumber_Add(__pyx_t_8, __pyx_t_6); if (unlikely(!__pyx_t_12)) __PYX_ERR(0, 891, __pyx_L1_error)
+      __pyx_t_12 = PyNumber_Add(__pyx_t_8, __pyx_t_6); if (unlikely(!__pyx_t_12)) __PYX_ERR(0, 882, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_12);
       __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
       __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
-      __pyx_t_1 = __pyx_PyFloat_AsFloat(__pyx_t_12); if (unlikely((__pyx_t_1 == (float)-1) && PyErr_Occurred())) __PYX_ERR(0, 891, __pyx_L1_error)
+      __pyx_t_1 = __pyx_PyFloat_AsFloat(__pyx_t_12); if (unlikely((__pyx_t_1 == (float)-1) && PyErr_Occurred())) __PYX_ERR(0, 882, __pyx_L1_error)
       __Pyx_DECREF(__pyx_t_12); __pyx_t_12 = 0;
-      __pyx_t_12 = __Pyx_GetItemInt(((PyObject *)__pyx_v_c), __pyx_v_i, long, 1, __Pyx_PyInt_From_long, 0, 1, 1); if (unlikely(!__pyx_t_12)) __PYX_ERR(0, 891, __pyx_L1_error)
+      __pyx_t_12 = __Pyx_GetItemInt(((PyObject *)__pyx_v_c), __pyx_v_i, long, 1, __Pyx_PyInt_From_long, 0, 1, 1); if (unlikely(!__pyx_t_12)) __PYX_ERR(0, 882, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_12);
-      __pyx_t_6 = PyFloat_FromDouble(__pyx_v_pseudocount); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 891, __pyx_L1_error)
+      __pyx_t_6 = PyFloat_FromDouble(__pyx_v_pseudocount); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 882, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_6);
-      __pyx_t_8 = PyNumber_Add(__pyx_t_12, __pyx_t_6); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 891, __pyx_L1_error)
+      __pyx_t_8 = PyNumber_Add(__pyx_t_12, __pyx_t_6); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 882, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_8);
       __Pyx_DECREF(__pyx_t_12); __pyx_t_12 = 0;
       __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
-      __pyx_t_13 = __pyx_PyFloat_AsFloat(__pyx_t_8); if (unlikely((__pyx_t_13 == (float)-1) && PyErr_Occurred())) __PYX_ERR(0, 891, __pyx_L1_error)
+      __pyx_t_13 = __pyx_PyFloat_AsFloat(__pyx_t_8); if (unlikely((__pyx_t_13 == (float)-1) && PyErr_Occurred())) __PYX_ERR(0, 882, __pyx_L1_error)
       __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
-      __pyx_t_8 = PyFloat_FromDouble(__pyx_f_5MACS2_2IO_10ScoreTrack_get_logFE(__pyx_t_1, __pyx_t_13)); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 891, __pyx_L1_error)
+      __pyx_t_8 = PyFloat_FromDouble(__pyx_f_5MACS2_2IO_10ScoreTrack_get_logFE(__pyx_t_1, __pyx_t_13)); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 882, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_8);
-      if (unlikely(__Pyx_SetItemInt(((PyObject *)__pyx_v_v), __pyx_v_i, __pyx_t_8, long, 1, __Pyx_PyInt_From_long, 0, 1, 1) < 0)) __PYX_ERR(0, 891, __pyx_L1_error)
+      if (unlikely(__Pyx_SetItemInt(((PyObject *)__pyx_v_v), __pyx_v_i, __pyx_t_8, long, 1, __Pyx_PyInt_From_long, 0, 1, 1) < 0)) __PYX_ERR(0, 882, __pyx_L1_error)
       __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
     }
   }
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
-  /* "MACS2/IO/ScoreTrack.pyx":892
+  /* "MACS2/IO/ScoreTrack.pyx":883
  *             for i in range(l):
  *                 v[ i ] = get_logFE ( p[ i ] + pseudocount, c[ i ] + pseudocount)
  *         self.scoring_method = ord('f')             # <<<<<<<<<<<<<<
@@ -15249,7 +15249,7 @@ static PyObject *__pyx_f_5MACS2_2IO_10ScoreTrack_12scoreTrackII_compute_logFE(st
  */
   __pyx_v_self->scoring_method = 0x66;
 
-  /* "MACS2/IO/ScoreTrack.pyx":893
+  /* "MACS2/IO/ScoreTrack.pyx":884
  *                 v[ i ] = get_logFE ( p[ i ] + pseudocount, c[ i ] + pseudocount)
  *         self.scoring_method = ord('f')
  *         return             # <<<<<<<<<<<<<<
@@ -15260,7 +15260,7 @@ static PyObject *__pyx_f_5MACS2_2IO_10ScoreTrack_12scoreTrackII_compute_logFE(st
   __pyx_r = Py_None; __Pyx_INCREF(Py_None);
   goto __pyx_L0;
 
-  /* "MACS2/IO/ScoreTrack.pyx":874
+  /* "MACS2/IO/ScoreTrack.pyx":865
  *         return
  * 
  *     cdef compute_logFE ( self ):             # <<<<<<<<<<<<<<
@@ -15287,7 +15287,7 @@ static PyObject *__pyx_f_5MACS2_2IO_10ScoreTrack_12scoreTrackII_compute_logFE(st
   return __pyx_r;
 }
 
-/* "MACS2/IO/ScoreTrack.pyx":895
+/* "MACS2/IO/ScoreTrack.pyx":886
  *         return
  * 
  *     cdef compute_foldenrichment ( self ):             # <<<<<<<<<<<<<<
@@ -15320,9 +15320,9 @@ static PyObject *__pyx_f_5MACS2_2IO_10ScoreTrack_12scoreTrackII_compute_foldenri
   PyObject *__pyx_t_12 = NULL;
   PyObject *__pyx_t_13 = NULL;
   __Pyx_RefNannySetupContext("compute_foldenrichment", 0);
-  __Pyx_TraceCall("compute_foldenrichment", __pyx_f[0], 895, 0, __PYX_ERR(0, 895, __pyx_L1_error));
+  __Pyx_TraceCall("compute_foldenrichment", __pyx_f[0], 886, 0, __PYX_ERR(0, 886, __pyx_L1_error));
 
-  /* "MACS2/IO/ScoreTrack.pyx":904
+  /* "MACS2/IO/ScoreTrack.pyx":895
  *             float pseudocount
  * 
  *         pseudocount = self.pseudocount             # <<<<<<<<<<<<<<
@@ -15332,7 +15332,7 @@ static PyObject *__pyx_f_5MACS2_2IO_10ScoreTrack_12scoreTrackII_compute_foldenri
   __pyx_t_1 = __pyx_v_self->pseudocount;
   __pyx_v_pseudocount = __pyx_t_1;
 
-  /* "MACS2/IO/ScoreTrack.pyx":906
+  /* "MACS2/IO/ScoreTrack.pyx":897
  *         pseudocount = self.pseudocount
  * 
  *         for chrom in self.data.keys():             # <<<<<<<<<<<<<<
@@ -15342,9 +15342,9 @@ static PyObject *__pyx_f_5MACS2_2IO_10ScoreTrack_12scoreTrackII_compute_foldenri
   __pyx_t_3 = 0;
   if (unlikely(__pyx_v_self->data == Py_None)) {
     PyErr_Format(PyExc_AttributeError, "'NoneType' object has no attribute '%.30s'", "keys");
-    __PYX_ERR(0, 906, __pyx_L1_error)
+    __PYX_ERR(0, 897, __pyx_L1_error)
   }
-  __pyx_t_6 = __Pyx_dict_iterator(__pyx_v_self->data, 1, __pyx_n_s_keys, (&__pyx_t_4), (&__pyx_t_5)); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 906, __pyx_L1_error)
+  __pyx_t_6 = __Pyx_dict_iterator(__pyx_v_self->data, 1, __pyx_n_s_keys, (&__pyx_t_4), (&__pyx_t_5)); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 897, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_6);
   __Pyx_XDECREF(__pyx_t_2);
   __pyx_t_2 = __pyx_t_6;
@@ -15352,12 +15352,12 @@ static PyObject *__pyx_f_5MACS2_2IO_10ScoreTrack_12scoreTrackII_compute_foldenri
   while (1) {
     __pyx_t_7 = __Pyx_dict_iter_next(__pyx_t_2, __pyx_t_4, &__pyx_t_3, &__pyx_t_6, NULL, NULL, __pyx_t_5);
     if (unlikely(__pyx_t_7 == 0)) break;
-    if (unlikely(__pyx_t_7 == -1)) __PYX_ERR(0, 906, __pyx_L1_error)
+    if (unlikely(__pyx_t_7 == -1)) __PYX_ERR(0, 897, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_6);
     __Pyx_XDECREF_SET(__pyx_v_chrom, __pyx_t_6);
     __pyx_t_6 = 0;
 
-    /* "MACS2/IO/ScoreTrack.pyx":907
+    /* "MACS2/IO/ScoreTrack.pyx":898
  * 
  *         for chrom in self.data.keys():
  *             p = self.data[chrom][1]             # <<<<<<<<<<<<<<
@@ -15366,18 +15366,18 @@ static PyObject *__pyx_f_5MACS2_2IO_10ScoreTrack_12scoreTrackII_compute_foldenri
  */
     if (unlikely(__pyx_v_self->data == Py_None)) {
       PyErr_SetString(PyExc_TypeError, "'NoneType' object is not subscriptable");
-      __PYX_ERR(0, 907, __pyx_L1_error)
+      __PYX_ERR(0, 898, __pyx_L1_error)
     }
-    __pyx_t_6 = __Pyx_PyDict_GetItem(__pyx_v_self->data, __pyx_v_chrom); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 907, __pyx_L1_error)
+    __pyx_t_6 = __Pyx_PyDict_GetItem(__pyx_v_self->data, __pyx_v_chrom); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 898, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_6);
-    __pyx_t_8 = __Pyx_GetItemInt(__pyx_t_6, 1, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 907, __pyx_L1_error)
+    __pyx_t_8 = __Pyx_GetItemInt(__pyx_t_6, 1, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 898, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_8);
     __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
-    if (!(likely(((__pyx_t_8) == Py_None) || likely(__Pyx_TypeTest(__pyx_t_8, __pyx_ptype_5numpy_ndarray))))) __PYX_ERR(0, 907, __pyx_L1_error)
+    if (!(likely(((__pyx_t_8) == Py_None) || likely(__Pyx_TypeTest(__pyx_t_8, __pyx_ptype_5numpy_ndarray))))) __PYX_ERR(0, 898, __pyx_L1_error)
     __Pyx_XDECREF_SET(__pyx_v_p, ((PyArrayObject *)__pyx_t_8));
     __pyx_t_8 = 0;
 
-    /* "MACS2/IO/ScoreTrack.pyx":908
+    /* "MACS2/IO/ScoreTrack.pyx":899
  *         for chrom in self.data.keys():
  *             p = self.data[chrom][1]
  *             c = self.data[chrom][2]             # <<<<<<<<<<<<<<
@@ -15386,18 +15386,18 @@ static PyObject *__pyx_f_5MACS2_2IO_10ScoreTrack_12scoreTrackII_compute_foldenri
  */
     if (unlikely(__pyx_v_self->data == Py_None)) {
       PyErr_SetString(PyExc_TypeError, "'NoneType' object is not subscriptable");
-      __PYX_ERR(0, 908, __pyx_L1_error)
+      __PYX_ERR(0, 899, __pyx_L1_error)
     }
-    __pyx_t_8 = __Pyx_PyDict_GetItem(__pyx_v_self->data, __pyx_v_chrom); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 908, __pyx_L1_error)
+    __pyx_t_8 = __Pyx_PyDict_GetItem(__pyx_v_self->data, __pyx_v_chrom); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 899, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_8);
-    __pyx_t_6 = __Pyx_GetItemInt(__pyx_t_8, 2, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 908, __pyx_L1_error)
+    __pyx_t_6 = __Pyx_GetItemInt(__pyx_t_8, 2, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 899, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_6);
     __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
-    if (!(likely(((__pyx_t_6) == Py_None) || likely(__Pyx_TypeTest(__pyx_t_6, __pyx_ptype_5numpy_ndarray))))) __PYX_ERR(0, 908, __pyx_L1_error)
+    if (!(likely(((__pyx_t_6) == Py_None) || likely(__Pyx_TypeTest(__pyx_t_6, __pyx_ptype_5numpy_ndarray))))) __PYX_ERR(0, 899, __pyx_L1_error)
     __Pyx_XDECREF_SET(__pyx_v_c, ((PyArrayObject *)__pyx_t_6));
     __pyx_t_6 = 0;
 
-    /* "MACS2/IO/ScoreTrack.pyx":909
+    /* "MACS2/IO/ScoreTrack.pyx":900
  *             p = self.data[chrom][1]
  *             c = self.data[chrom][2]
  *             v = self.data[chrom][3]             # <<<<<<<<<<<<<<
@@ -15406,18 +15406,18 @@ static PyObject *__pyx_f_5MACS2_2IO_10ScoreTrack_12scoreTrackII_compute_foldenri
  */
     if (unlikely(__pyx_v_self->data == Py_None)) {
       PyErr_SetString(PyExc_TypeError, "'NoneType' object is not subscriptable");
-      __PYX_ERR(0, 909, __pyx_L1_error)
+      __PYX_ERR(0, 900, __pyx_L1_error)
     }
-    __pyx_t_6 = __Pyx_PyDict_GetItem(__pyx_v_self->data, __pyx_v_chrom); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 909, __pyx_L1_error)
+    __pyx_t_6 = __Pyx_PyDict_GetItem(__pyx_v_self->data, __pyx_v_chrom); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 900, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_6);
-    __pyx_t_8 = __Pyx_GetItemInt(__pyx_t_6, 3, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 909, __pyx_L1_error)
+    __pyx_t_8 = __Pyx_GetItemInt(__pyx_t_6, 3, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 900, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_8);
     __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
-    if (!(likely(((__pyx_t_8) == Py_None) || likely(__Pyx_TypeTest(__pyx_t_8, __pyx_ptype_5numpy_ndarray))))) __PYX_ERR(0, 909, __pyx_L1_error)
+    if (!(likely(((__pyx_t_8) == Py_None) || likely(__Pyx_TypeTest(__pyx_t_8, __pyx_ptype_5numpy_ndarray))))) __PYX_ERR(0, 900, __pyx_L1_error)
     __Pyx_XDECREF_SET(__pyx_v_v, ((PyArrayObject *)__pyx_t_8));
     __pyx_t_8 = 0;
 
-    /* "MACS2/IO/ScoreTrack.pyx":910
+    /* "MACS2/IO/ScoreTrack.pyx":901
  *             c = self.data[chrom][2]
  *             v = self.data[chrom][3]
  *             l = self.datalength[chrom]             # <<<<<<<<<<<<<<
@@ -15426,15 +15426,15 @@ static PyObject *__pyx_f_5MACS2_2IO_10ScoreTrack_12scoreTrackII_compute_foldenri
  */
     if (unlikely(__pyx_v_self->datalength == Py_None)) {
       PyErr_SetString(PyExc_TypeError, "'NoneType' object is not subscriptable");
-      __PYX_ERR(0, 910, __pyx_L1_error)
+      __PYX_ERR(0, 901, __pyx_L1_error)
     }
-    __pyx_t_8 = __Pyx_PyDict_GetItem(__pyx_v_self->datalength, __pyx_v_chrom); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 910, __pyx_L1_error)
+    __pyx_t_8 = __Pyx_PyDict_GetItem(__pyx_v_self->datalength, __pyx_v_chrom); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 901, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_8);
-    __pyx_t_9 = __Pyx_PyInt_As_long(__pyx_t_8); if (unlikely((__pyx_t_9 == (long)-1) && PyErr_Occurred())) __PYX_ERR(0, 910, __pyx_L1_error)
+    __pyx_t_9 = __Pyx_PyInt_As_long(__pyx_t_8); if (unlikely((__pyx_t_9 == (long)-1) && PyErr_Occurred())) __PYX_ERR(0, 901, __pyx_L1_error)
     __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
     __pyx_v_l = __pyx_t_9;
 
-    /* "MACS2/IO/ScoreTrack.pyx":911
+    /* "MACS2/IO/ScoreTrack.pyx":902
  *             v = self.data[chrom][3]
  *             l = self.datalength[chrom]
  *             for i in range(l):             # <<<<<<<<<<<<<<
@@ -15446,40 +15446,40 @@ static PyObject *__pyx_f_5MACS2_2IO_10ScoreTrack_12scoreTrackII_compute_foldenri
     for (__pyx_t_11 = 0; __pyx_t_11 < __pyx_t_10; __pyx_t_11+=1) {
       __pyx_v_i = __pyx_t_11;
 
-      /* "MACS2/IO/ScoreTrack.pyx":912
+      /* "MACS2/IO/ScoreTrack.pyx":903
  *             l = self.datalength[chrom]
  *             for i in range(l):
  *                 v[ i ] =  ( p[ i ] + pseudocount )/( c[ i ] + pseudocount )             # <<<<<<<<<<<<<<
  *         self.scoring_method = ord('F')
  *         return
  */
-      __pyx_t_8 = __Pyx_GetItemInt(((PyObject *)__pyx_v_p), __pyx_v_i, long, 1, __Pyx_PyInt_From_long, 0, 1, 1); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 912, __pyx_L1_error)
+      __pyx_t_8 = __Pyx_GetItemInt(((PyObject *)__pyx_v_p), __pyx_v_i, long, 1, __Pyx_PyInt_From_long, 0, 1, 1); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 903, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_8);
-      __pyx_t_6 = PyFloat_FromDouble(__pyx_v_pseudocount); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 912, __pyx_L1_error)
+      __pyx_t_6 = PyFloat_FromDouble(__pyx_v_pseudocount); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 903, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_6);
-      __pyx_t_12 = PyNumber_Add(__pyx_t_8, __pyx_t_6); if (unlikely(!__pyx_t_12)) __PYX_ERR(0, 912, __pyx_L1_error)
+      __pyx_t_12 = PyNumber_Add(__pyx_t_8, __pyx_t_6); if (unlikely(!__pyx_t_12)) __PYX_ERR(0, 903, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_12);
       __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
       __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
-      __pyx_t_6 = __Pyx_GetItemInt(((PyObject *)__pyx_v_c), __pyx_v_i, long, 1, __Pyx_PyInt_From_long, 0, 1, 1); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 912, __pyx_L1_error)
+      __pyx_t_6 = __Pyx_GetItemInt(((PyObject *)__pyx_v_c), __pyx_v_i, long, 1, __Pyx_PyInt_From_long, 0, 1, 1); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 903, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_6);
-      __pyx_t_8 = PyFloat_FromDouble(__pyx_v_pseudocount); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 912, __pyx_L1_error)
+      __pyx_t_8 = PyFloat_FromDouble(__pyx_v_pseudocount); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 903, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_8);
-      __pyx_t_13 = PyNumber_Add(__pyx_t_6, __pyx_t_8); if (unlikely(!__pyx_t_13)) __PYX_ERR(0, 912, __pyx_L1_error)
+      __pyx_t_13 = PyNumber_Add(__pyx_t_6, __pyx_t_8); if (unlikely(!__pyx_t_13)) __PYX_ERR(0, 903, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_13);
       __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
       __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
-      __pyx_t_8 = __Pyx_PyNumber_Divide(__pyx_t_12, __pyx_t_13); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 912, __pyx_L1_error)
+      __pyx_t_8 = __Pyx_PyNumber_Divide(__pyx_t_12, __pyx_t_13); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 903, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_8);
       __Pyx_DECREF(__pyx_t_12); __pyx_t_12 = 0;
       __Pyx_DECREF(__pyx_t_13); __pyx_t_13 = 0;
-      if (unlikely(__Pyx_SetItemInt(((PyObject *)__pyx_v_v), __pyx_v_i, __pyx_t_8, long, 1, __Pyx_PyInt_From_long, 0, 1, 1) < 0)) __PYX_ERR(0, 912, __pyx_L1_error)
+      if (unlikely(__Pyx_SetItemInt(((PyObject *)__pyx_v_v), __pyx_v_i, __pyx_t_8, long, 1, __Pyx_PyInt_From_long, 0, 1, 1) < 0)) __PYX_ERR(0, 903, __pyx_L1_error)
       __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
     }
   }
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
-  /* "MACS2/IO/ScoreTrack.pyx":913
+  /* "MACS2/IO/ScoreTrack.pyx":904
  *             for i in range(l):
  *                 v[ i ] =  ( p[ i ] + pseudocount )/( c[ i ] + pseudocount )
  *         self.scoring_method = ord('F')             # <<<<<<<<<<<<<<
@@ -15488,7 +15488,7 @@ static PyObject *__pyx_f_5MACS2_2IO_10ScoreTrack_12scoreTrackII_compute_foldenri
  */
   __pyx_v_self->scoring_method = 70;
 
-  /* "MACS2/IO/ScoreTrack.pyx":914
+  /* "MACS2/IO/ScoreTrack.pyx":905
  *                 v[ i ] =  ( p[ i ] + pseudocount )/( c[ i ] + pseudocount )
  *         self.scoring_method = ord('F')
  *         return             # <<<<<<<<<<<<<<
@@ -15499,7 +15499,7 @@ static PyObject *__pyx_f_5MACS2_2IO_10ScoreTrack_12scoreTrackII_compute_foldenri
   __pyx_r = Py_None; __Pyx_INCREF(Py_None);
   goto __pyx_L0;
 
-  /* "MACS2/IO/ScoreTrack.pyx":895
+  /* "MACS2/IO/ScoreTrack.pyx":886
  *         return
  * 
  *     cdef compute_foldenrichment ( self ):             # <<<<<<<<<<<<<<
@@ -15527,7 +15527,7 @@ static PyObject *__pyx_f_5MACS2_2IO_10ScoreTrack_12scoreTrackII_compute_foldenri
   return __pyx_r;
 }
 
-/* "MACS2/IO/ScoreTrack.pyx":916
+/* "MACS2/IO/ScoreTrack.pyx":907
  *         return
  * 
  *     cdef compute_subtraction ( self ):             # <<<<<<<<<<<<<<
@@ -15557,9 +15557,9 @@ static PyObject *__pyx_f_5MACS2_2IO_10ScoreTrack_12scoreTrackII_compute_subtract
   long __pyx_t_10;
   PyObject *__pyx_t_11 = NULL;
   __Pyx_RefNannySetupContext("compute_subtraction", 0);
-  __Pyx_TraceCall("compute_subtraction", __pyx_f[0], 916, 0, __PYX_ERR(0, 916, __pyx_L1_error));
+  __Pyx_TraceCall("compute_subtraction", __pyx_f[0], 907, 0, __PYX_ERR(0, 907, __pyx_L1_error));
 
-  /* "MACS2/IO/ScoreTrack.pyx":921
+  /* "MACS2/IO/ScoreTrack.pyx":912
  *             long l, i
  * 
  *         for chrom in self.data.keys():             # <<<<<<<<<<<<<<
@@ -15569,9 +15569,9 @@ static PyObject *__pyx_f_5MACS2_2IO_10ScoreTrack_12scoreTrackII_compute_subtract
   __pyx_t_2 = 0;
   if (unlikely(__pyx_v_self->data == Py_None)) {
     PyErr_Format(PyExc_AttributeError, "'NoneType' object has no attribute '%.30s'", "keys");
-    __PYX_ERR(0, 921, __pyx_L1_error)
+    __PYX_ERR(0, 912, __pyx_L1_error)
   }
-  __pyx_t_5 = __Pyx_dict_iterator(__pyx_v_self->data, 1, __pyx_n_s_keys, (&__pyx_t_3), (&__pyx_t_4)); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 921, __pyx_L1_error)
+  __pyx_t_5 = __Pyx_dict_iterator(__pyx_v_self->data, 1, __pyx_n_s_keys, (&__pyx_t_3), (&__pyx_t_4)); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 912, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_5);
   __Pyx_XDECREF(__pyx_t_1);
   __pyx_t_1 = __pyx_t_5;
@@ -15579,12 +15579,12 @@ static PyObject *__pyx_f_5MACS2_2IO_10ScoreTrack_12scoreTrackII_compute_subtract
   while (1) {
     __pyx_t_6 = __Pyx_dict_iter_next(__pyx_t_1, __pyx_t_3, &__pyx_t_2, &__pyx_t_5, NULL, NULL, __pyx_t_4);
     if (unlikely(__pyx_t_6 == 0)) break;
-    if (unlikely(__pyx_t_6 == -1)) __PYX_ERR(0, 921, __pyx_L1_error)
+    if (unlikely(__pyx_t_6 == -1)) __PYX_ERR(0, 912, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_5);
     __Pyx_XDECREF_SET(__pyx_v_chrom, __pyx_t_5);
     __pyx_t_5 = 0;
 
-    /* "MACS2/IO/ScoreTrack.pyx":922
+    /* "MACS2/IO/ScoreTrack.pyx":913
  * 
  *         for chrom in self.data.keys():
  *             p = self.data[chrom][1]             # <<<<<<<<<<<<<<
@@ -15593,18 +15593,18 @@ static PyObject *__pyx_f_5MACS2_2IO_10ScoreTrack_12scoreTrackII_compute_subtract
  */
     if (unlikely(__pyx_v_self->data == Py_None)) {
       PyErr_SetString(PyExc_TypeError, "'NoneType' object is not subscriptable");
-      __PYX_ERR(0, 922, __pyx_L1_error)
+      __PYX_ERR(0, 913, __pyx_L1_error)
     }
-    __pyx_t_5 = __Pyx_PyDict_GetItem(__pyx_v_self->data, __pyx_v_chrom); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 922, __pyx_L1_error)
+    __pyx_t_5 = __Pyx_PyDict_GetItem(__pyx_v_self->data, __pyx_v_chrom); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 913, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_5);
-    __pyx_t_7 = __Pyx_GetItemInt(__pyx_t_5, 1, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 922, __pyx_L1_error)
+    __pyx_t_7 = __Pyx_GetItemInt(__pyx_t_5, 1, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 913, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_7);
     __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
-    if (!(likely(((__pyx_t_7) == Py_None) || likely(__Pyx_TypeTest(__pyx_t_7, __pyx_ptype_5numpy_ndarray))))) __PYX_ERR(0, 922, __pyx_L1_error)
+    if (!(likely(((__pyx_t_7) == Py_None) || likely(__Pyx_TypeTest(__pyx_t_7, __pyx_ptype_5numpy_ndarray))))) __PYX_ERR(0, 913, __pyx_L1_error)
     __Pyx_XDECREF_SET(__pyx_v_p, ((PyArrayObject *)__pyx_t_7));
     __pyx_t_7 = 0;
 
-    /* "MACS2/IO/ScoreTrack.pyx":923
+    /* "MACS2/IO/ScoreTrack.pyx":914
  *         for chrom in self.data.keys():
  *             p = self.data[chrom][1]
  *             c = self.data[chrom][2]             # <<<<<<<<<<<<<<
@@ -15613,18 +15613,18 @@ static PyObject *__pyx_f_5MACS2_2IO_10ScoreTrack_12scoreTrackII_compute_subtract
  */
     if (unlikely(__pyx_v_self->data == Py_None)) {
       PyErr_SetString(PyExc_TypeError, "'NoneType' object is not subscriptable");
-      __PYX_ERR(0, 923, __pyx_L1_error)
+      __PYX_ERR(0, 914, __pyx_L1_error)
     }
-    __pyx_t_7 = __Pyx_PyDict_GetItem(__pyx_v_self->data, __pyx_v_chrom); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 923, __pyx_L1_error)
+    __pyx_t_7 = __Pyx_PyDict_GetItem(__pyx_v_self->data, __pyx_v_chrom); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 914, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_7);
-    __pyx_t_5 = __Pyx_GetItemInt(__pyx_t_7, 2, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 923, __pyx_L1_error)
+    __pyx_t_5 = __Pyx_GetItemInt(__pyx_t_7, 2, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 914, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_5);
     __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
-    if (!(likely(((__pyx_t_5) == Py_None) || likely(__Pyx_TypeTest(__pyx_t_5, __pyx_ptype_5numpy_ndarray))))) __PYX_ERR(0, 923, __pyx_L1_error)
+    if (!(likely(((__pyx_t_5) == Py_None) || likely(__Pyx_TypeTest(__pyx_t_5, __pyx_ptype_5numpy_ndarray))))) __PYX_ERR(0, 914, __pyx_L1_error)
     __Pyx_XDECREF_SET(__pyx_v_c, ((PyArrayObject *)__pyx_t_5));
     __pyx_t_5 = 0;
 
-    /* "MACS2/IO/ScoreTrack.pyx":924
+    /* "MACS2/IO/ScoreTrack.pyx":915
  *             p = self.data[chrom][1]
  *             c = self.data[chrom][2]
  *             v = self.data[chrom][3]             # <<<<<<<<<<<<<<
@@ -15633,18 +15633,18 @@ static PyObject *__pyx_f_5MACS2_2IO_10ScoreTrack_12scoreTrackII_compute_subtract
  */
     if (unlikely(__pyx_v_self->data == Py_None)) {
       PyErr_SetString(PyExc_TypeError, "'NoneType' object is not subscriptable");
-      __PYX_ERR(0, 924, __pyx_L1_error)
+      __PYX_ERR(0, 915, __pyx_L1_error)
     }
-    __pyx_t_5 = __Pyx_PyDict_GetItem(__pyx_v_self->data, __pyx_v_chrom); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 924, __pyx_L1_error)
+    __pyx_t_5 = __Pyx_PyDict_GetItem(__pyx_v_self->data, __pyx_v_chrom); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 915, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_5);
-    __pyx_t_7 = __Pyx_GetItemInt(__pyx_t_5, 3, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 924, __pyx_L1_error)
+    __pyx_t_7 = __Pyx_GetItemInt(__pyx_t_5, 3, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 915, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_7);
     __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
-    if (!(likely(((__pyx_t_7) == Py_None) || likely(__Pyx_TypeTest(__pyx_t_7, __pyx_ptype_5numpy_ndarray))))) __PYX_ERR(0, 924, __pyx_L1_error)
+    if (!(likely(((__pyx_t_7) == Py_None) || likely(__Pyx_TypeTest(__pyx_t_7, __pyx_ptype_5numpy_ndarray))))) __PYX_ERR(0, 915, __pyx_L1_error)
     __Pyx_XDECREF_SET(__pyx_v_v, ((PyArrayObject *)__pyx_t_7));
     __pyx_t_7 = 0;
 
-    /* "MACS2/IO/ScoreTrack.pyx":925
+    /* "MACS2/IO/ScoreTrack.pyx":916
  *             c = self.data[chrom][2]
  *             v = self.data[chrom][3]
  *             l = self.datalength[chrom]             # <<<<<<<<<<<<<<
@@ -15653,15 +15653,15 @@ static PyObject *__pyx_f_5MACS2_2IO_10ScoreTrack_12scoreTrackII_compute_subtract
  */
     if (unlikely(__pyx_v_self->datalength == Py_None)) {
       PyErr_SetString(PyExc_TypeError, "'NoneType' object is not subscriptable");
-      __PYX_ERR(0, 925, __pyx_L1_error)
+      __PYX_ERR(0, 916, __pyx_L1_error)
     }
-    __pyx_t_7 = __Pyx_PyDict_GetItem(__pyx_v_self->datalength, __pyx_v_chrom); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 925, __pyx_L1_error)
+    __pyx_t_7 = __Pyx_PyDict_GetItem(__pyx_v_self->datalength, __pyx_v_chrom); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 916, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_7);
-    __pyx_t_8 = __Pyx_PyInt_As_long(__pyx_t_7); if (unlikely((__pyx_t_8 == (long)-1) && PyErr_Occurred())) __PYX_ERR(0, 925, __pyx_L1_error)
+    __pyx_t_8 = __Pyx_PyInt_As_long(__pyx_t_7); if (unlikely((__pyx_t_8 == (long)-1) && PyErr_Occurred())) __PYX_ERR(0, 916, __pyx_L1_error)
     __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
     __pyx_v_l = __pyx_t_8;
 
-    /* "MACS2/IO/ScoreTrack.pyx":926
+    /* "MACS2/IO/ScoreTrack.pyx":917
  *             v = self.data[chrom][3]
  *             l = self.datalength[chrom]
  *             for i in range(l):             # <<<<<<<<<<<<<<
@@ -15673,28 +15673,28 @@ static PyObject *__pyx_f_5MACS2_2IO_10ScoreTrack_12scoreTrackII_compute_subtract
     for (__pyx_t_10 = 0; __pyx_t_10 < __pyx_t_9; __pyx_t_10+=1) {
       __pyx_v_i = __pyx_t_10;
 
-      /* "MACS2/IO/ScoreTrack.pyx":927
+      /* "MACS2/IO/ScoreTrack.pyx":918
  *             l = self.datalength[chrom]
  *             for i in range(l):
  *                 v[ i ] = p[ i ] - c[ i ]             # <<<<<<<<<<<<<<
  *         self.scoring_method = ord('d')
  *         return
  */
-      __pyx_t_7 = __Pyx_GetItemInt(((PyObject *)__pyx_v_p), __pyx_v_i, long, 1, __Pyx_PyInt_From_long, 0, 1, 1); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 927, __pyx_L1_error)
+      __pyx_t_7 = __Pyx_GetItemInt(((PyObject *)__pyx_v_p), __pyx_v_i, long, 1, __Pyx_PyInt_From_long, 0, 1, 1); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 918, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_7);
-      __pyx_t_5 = __Pyx_GetItemInt(((PyObject *)__pyx_v_c), __pyx_v_i, long, 1, __Pyx_PyInt_From_long, 0, 1, 1); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 927, __pyx_L1_error)
+      __pyx_t_5 = __Pyx_GetItemInt(((PyObject *)__pyx_v_c), __pyx_v_i, long, 1, __Pyx_PyInt_From_long, 0, 1, 1); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 918, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_5);
-      __pyx_t_11 = PyNumber_Subtract(__pyx_t_7, __pyx_t_5); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 927, __pyx_L1_error)
+      __pyx_t_11 = PyNumber_Subtract(__pyx_t_7, __pyx_t_5); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 918, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_11);
       __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
       __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
-      if (unlikely(__Pyx_SetItemInt(((PyObject *)__pyx_v_v), __pyx_v_i, __pyx_t_11, long, 1, __Pyx_PyInt_From_long, 0, 1, 1) < 0)) __PYX_ERR(0, 927, __pyx_L1_error)
+      if (unlikely(__Pyx_SetItemInt(((PyObject *)__pyx_v_v), __pyx_v_i, __pyx_t_11, long, 1, __Pyx_PyInt_From_long, 0, 1, 1) < 0)) __PYX_ERR(0, 918, __pyx_L1_error)
       __Pyx_DECREF(__pyx_t_11); __pyx_t_11 = 0;
     }
   }
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-  /* "MACS2/IO/ScoreTrack.pyx":928
+  /* "MACS2/IO/ScoreTrack.pyx":919
  *             for i in range(l):
  *                 v[ i ] = p[ i ] - c[ i ]
  *         self.scoring_method = ord('d')             # <<<<<<<<<<<<<<
@@ -15703,7 +15703,7 @@ static PyObject *__pyx_f_5MACS2_2IO_10ScoreTrack_12scoreTrackII_compute_subtract
  */
   __pyx_v_self->scoring_method = 0x64;
 
-  /* "MACS2/IO/ScoreTrack.pyx":929
+  /* "MACS2/IO/ScoreTrack.pyx":920
  *                 v[ i ] = p[ i ] - c[ i ]
  *         self.scoring_method = ord('d')
  *         return             # <<<<<<<<<<<<<<
@@ -15714,7 +15714,7 @@ static PyObject *__pyx_f_5MACS2_2IO_10ScoreTrack_12scoreTrackII_compute_subtract
   __pyx_r = Py_None; __Pyx_INCREF(Py_None);
   goto __pyx_L0;
 
-  /* "MACS2/IO/ScoreTrack.pyx":916
+  /* "MACS2/IO/ScoreTrack.pyx":907
  *         return
  * 
  *     cdef compute_subtraction ( self ):             # <<<<<<<<<<<<<<
@@ -15741,7 +15741,7 @@ static PyObject *__pyx_f_5MACS2_2IO_10ScoreTrack_12scoreTrackII_compute_subtract
   return __pyx_r;
 }
 
-/* "MACS2/IO/ScoreTrack.pyx":931
+/* "MACS2/IO/ScoreTrack.pyx":922
  *         return
  * 
  *     cdef compute_SPMR ( self ):             # <<<<<<<<<<<<<<
@@ -15772,9 +15772,9 @@ static PyObject *__pyx_f_5MACS2_2IO_10ScoreTrack_12scoreTrackII_compute_SPMR(str
   long __pyx_t_11;
   PyObject *__pyx_t_12 = NULL;
   __Pyx_RefNannySetupContext("compute_SPMR", 0);
-  __Pyx_TraceCall("compute_SPMR", __pyx_f[0], 931, 0, __PYX_ERR(0, 931, __pyx_L1_error));
+  __Pyx_TraceCall("compute_SPMR", __pyx_f[0], 922, 0, __PYX_ERR(0, 922, __pyx_L1_error));
 
-  /* "MACS2/IO/ScoreTrack.pyx":936
+  /* "MACS2/IO/ScoreTrack.pyx":927
  *             long l, i
  *             float scale
  *         if self.normalization_method == ord('T') or self.normalization_method == ord('N'):             # <<<<<<<<<<<<<<
@@ -15785,7 +15785,7 @@ static PyObject *__pyx_f_5MACS2_2IO_10ScoreTrack_12scoreTrackII_compute_SPMR(str
     case 84:
     case 78:
 
-    /* "MACS2/IO/ScoreTrack.pyx":937
+    /* "MACS2/IO/ScoreTrack.pyx":928
  *             float scale
  *         if self.normalization_method == ord('T') or self.normalization_method == ord('N'):
  *             scale = self.treat_edm             # <<<<<<<<<<<<<<
@@ -15795,7 +15795,7 @@ static PyObject *__pyx_f_5MACS2_2IO_10ScoreTrack_12scoreTrackII_compute_SPMR(str
     __pyx_t_1 = __pyx_v_self->treat_edm;
     __pyx_v_scale = __pyx_t_1;
 
-    /* "MACS2/IO/ScoreTrack.pyx":936
+    /* "MACS2/IO/ScoreTrack.pyx":927
  *             long l, i
  *             float scale
  *         if self.normalization_method == ord('T') or self.normalization_method == ord('N'):             # <<<<<<<<<<<<<<
@@ -15805,7 +15805,7 @@ static PyObject *__pyx_f_5MACS2_2IO_10ScoreTrack_12scoreTrackII_compute_SPMR(str
     break;
     case 67:
 
-    /* "MACS2/IO/ScoreTrack.pyx":939
+    /* "MACS2/IO/ScoreTrack.pyx":930
  *             scale = self.treat_edm
  *         elif self.normalization_method == ord('C'):
  *             scale = self.ctrl_edm             # <<<<<<<<<<<<<<
@@ -15815,7 +15815,7 @@ static PyObject *__pyx_f_5MACS2_2IO_10ScoreTrack_12scoreTrackII_compute_SPMR(str
     __pyx_t_1 = __pyx_v_self->ctrl_edm;
     __pyx_v_scale = __pyx_t_1;
 
-    /* "MACS2/IO/ScoreTrack.pyx":938
+    /* "MACS2/IO/ScoreTrack.pyx":929
  *         if self.normalization_method == ord('T') or self.normalization_method == ord('N'):
  *             scale = self.treat_edm
  *         elif self.normalization_method == ord('C'):             # <<<<<<<<<<<<<<
@@ -15825,7 +15825,7 @@ static PyObject *__pyx_f_5MACS2_2IO_10ScoreTrack_12scoreTrackII_compute_SPMR(str
     break;
     case 77:
 
-    /* "MACS2/IO/ScoreTrack.pyx":941
+    /* "MACS2/IO/ScoreTrack.pyx":932
  *             scale = self.ctrl_edm
  *         elif self.normalization_method == ord('M'):
  *             scale = 1             # <<<<<<<<<<<<<<
@@ -15834,7 +15834,7 @@ static PyObject *__pyx_f_5MACS2_2IO_10ScoreTrack_12scoreTrackII_compute_SPMR(str
  */
     __pyx_v_scale = 1.0;
 
-    /* "MACS2/IO/ScoreTrack.pyx":940
+    /* "MACS2/IO/ScoreTrack.pyx":931
  *         elif self.normalization_method == ord('C'):
  *             scale = self.ctrl_edm
  *         elif self.normalization_method == ord('M'):             # <<<<<<<<<<<<<<
@@ -15845,7 +15845,7 @@ static PyObject *__pyx_f_5MACS2_2IO_10ScoreTrack_12scoreTrackII_compute_SPMR(str
     default: break;
   }
 
-  /* "MACS2/IO/ScoreTrack.pyx":943
+  /* "MACS2/IO/ScoreTrack.pyx":934
  *             scale = 1
  * 
  *         for chrom in self.data.keys():             # <<<<<<<<<<<<<<
@@ -15855,9 +15855,9 @@ static PyObject *__pyx_f_5MACS2_2IO_10ScoreTrack_12scoreTrackII_compute_SPMR(str
   __pyx_t_3 = 0;
   if (unlikely(__pyx_v_self->data == Py_None)) {
     PyErr_Format(PyExc_AttributeError, "'NoneType' object has no attribute '%.30s'", "keys");
-    __PYX_ERR(0, 943, __pyx_L1_error)
+    __PYX_ERR(0, 934, __pyx_L1_error)
   }
-  __pyx_t_6 = __Pyx_dict_iterator(__pyx_v_self->data, 1, __pyx_n_s_keys, (&__pyx_t_4), (&__pyx_t_5)); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 943, __pyx_L1_error)
+  __pyx_t_6 = __Pyx_dict_iterator(__pyx_v_self->data, 1, __pyx_n_s_keys, (&__pyx_t_4), (&__pyx_t_5)); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 934, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_6);
   __Pyx_XDECREF(__pyx_t_2);
   __pyx_t_2 = __pyx_t_6;
@@ -15865,12 +15865,12 @@ static PyObject *__pyx_f_5MACS2_2IO_10ScoreTrack_12scoreTrackII_compute_SPMR(str
   while (1) {
     __pyx_t_7 = __Pyx_dict_iter_next(__pyx_t_2, __pyx_t_4, &__pyx_t_3, &__pyx_t_6, NULL, NULL, __pyx_t_5);
     if (unlikely(__pyx_t_7 == 0)) break;
-    if (unlikely(__pyx_t_7 == -1)) __PYX_ERR(0, 943, __pyx_L1_error)
+    if (unlikely(__pyx_t_7 == -1)) __PYX_ERR(0, 934, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_6);
     __Pyx_XDECREF_SET(__pyx_v_chrom, __pyx_t_6);
     __pyx_t_6 = 0;
 
-    /* "MACS2/IO/ScoreTrack.pyx":944
+    /* "MACS2/IO/ScoreTrack.pyx":935
  * 
  *         for chrom in self.data.keys():
  *             p = self.data[chrom][1]             # <<<<<<<<<<<<<<
@@ -15879,18 +15879,18 @@ static PyObject *__pyx_f_5MACS2_2IO_10ScoreTrack_12scoreTrackII_compute_SPMR(str
  */
     if (unlikely(__pyx_v_self->data == Py_None)) {
       PyErr_SetString(PyExc_TypeError, "'NoneType' object is not subscriptable");
-      __PYX_ERR(0, 944, __pyx_L1_error)
+      __PYX_ERR(0, 935, __pyx_L1_error)
     }
-    __pyx_t_6 = __Pyx_PyDict_GetItem(__pyx_v_self->data, __pyx_v_chrom); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 944, __pyx_L1_error)
+    __pyx_t_6 = __Pyx_PyDict_GetItem(__pyx_v_self->data, __pyx_v_chrom); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 935, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_6);
-    __pyx_t_8 = __Pyx_GetItemInt(__pyx_t_6, 1, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 944, __pyx_L1_error)
+    __pyx_t_8 = __Pyx_GetItemInt(__pyx_t_6, 1, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 935, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_8);
     __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
-    if (!(likely(((__pyx_t_8) == Py_None) || likely(__Pyx_TypeTest(__pyx_t_8, __pyx_ptype_5numpy_ndarray))))) __PYX_ERR(0, 944, __pyx_L1_error)
+    if (!(likely(((__pyx_t_8) == Py_None) || likely(__Pyx_TypeTest(__pyx_t_8, __pyx_ptype_5numpy_ndarray))))) __PYX_ERR(0, 935, __pyx_L1_error)
     __Pyx_XDECREF_SET(__pyx_v_p, ((PyArrayObject *)__pyx_t_8));
     __pyx_t_8 = 0;
 
-    /* "MACS2/IO/ScoreTrack.pyx":945
+    /* "MACS2/IO/ScoreTrack.pyx":936
  *         for chrom in self.data.keys():
  *             p = self.data[chrom][1]
  *             v = self.data[chrom][3]             # <<<<<<<<<<<<<<
@@ -15899,18 +15899,18 @@ static PyObject *__pyx_f_5MACS2_2IO_10ScoreTrack_12scoreTrackII_compute_SPMR(str
  */
     if (unlikely(__pyx_v_self->data == Py_None)) {
       PyErr_SetString(PyExc_TypeError, "'NoneType' object is not subscriptable");
-      __PYX_ERR(0, 945, __pyx_L1_error)
+      __PYX_ERR(0, 936, __pyx_L1_error)
     }
-    __pyx_t_8 = __Pyx_PyDict_GetItem(__pyx_v_self->data, __pyx_v_chrom); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 945, __pyx_L1_error)
+    __pyx_t_8 = __Pyx_PyDict_GetItem(__pyx_v_self->data, __pyx_v_chrom); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 936, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_8);
-    __pyx_t_6 = __Pyx_GetItemInt(__pyx_t_8, 3, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 945, __pyx_L1_error)
+    __pyx_t_6 = __Pyx_GetItemInt(__pyx_t_8, 3, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 936, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_6);
     __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
-    if (!(likely(((__pyx_t_6) == Py_None) || likely(__Pyx_TypeTest(__pyx_t_6, __pyx_ptype_5numpy_ndarray))))) __PYX_ERR(0, 945, __pyx_L1_error)
+    if (!(likely(((__pyx_t_6) == Py_None) || likely(__Pyx_TypeTest(__pyx_t_6, __pyx_ptype_5numpy_ndarray))))) __PYX_ERR(0, 936, __pyx_L1_error)
     __Pyx_XDECREF_SET(__pyx_v_v, ((PyArrayObject *)__pyx_t_6));
     __pyx_t_6 = 0;
 
-    /* "MACS2/IO/ScoreTrack.pyx":946
+    /* "MACS2/IO/ScoreTrack.pyx":937
  *             p = self.data[chrom][1]
  *             v = self.data[chrom][3]
  *             l = self.datalength[chrom]             # <<<<<<<<<<<<<<
@@ -15919,15 +15919,15 @@ static PyObject *__pyx_f_5MACS2_2IO_10ScoreTrack_12scoreTrackII_compute_SPMR(str
  */
     if (unlikely(__pyx_v_self->datalength == Py_None)) {
       PyErr_SetString(PyExc_TypeError, "'NoneType' object is not subscriptable");
-      __PYX_ERR(0, 946, __pyx_L1_error)
+      __PYX_ERR(0, 937, __pyx_L1_error)
     }
-    __pyx_t_6 = __Pyx_PyDict_GetItem(__pyx_v_self->datalength, __pyx_v_chrom); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 946, __pyx_L1_error)
+    __pyx_t_6 = __Pyx_PyDict_GetItem(__pyx_v_self->datalength, __pyx_v_chrom); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 937, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_6);
-    __pyx_t_9 = __Pyx_PyInt_As_long(__pyx_t_6); if (unlikely((__pyx_t_9 == (long)-1) && PyErr_Occurred())) __PYX_ERR(0, 946, __pyx_L1_error)
+    __pyx_t_9 = __Pyx_PyInt_As_long(__pyx_t_6); if (unlikely((__pyx_t_9 == (long)-1) && PyErr_Occurred())) __PYX_ERR(0, 937, __pyx_L1_error)
     __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
     __pyx_v_l = __pyx_t_9;
 
-    /* "MACS2/IO/ScoreTrack.pyx":947
+    /* "MACS2/IO/ScoreTrack.pyx":938
  *             v = self.data[chrom][3]
  *             l = self.datalength[chrom]
  *             for i in range(l):             # <<<<<<<<<<<<<<
@@ -15939,28 +15939,28 @@ static PyObject *__pyx_f_5MACS2_2IO_10ScoreTrack_12scoreTrackII_compute_SPMR(str
     for (__pyx_t_11 = 0; __pyx_t_11 < __pyx_t_10; __pyx_t_11+=1) {
       __pyx_v_i = __pyx_t_11;
 
-      /* "MACS2/IO/ScoreTrack.pyx":948
+      /* "MACS2/IO/ScoreTrack.pyx":939
  *             l = self.datalength[chrom]
  *             for i in range(l):
  *                 v[ i ] =  p[ i ] / scale # two digit precision may not be enough...             # <<<<<<<<<<<<<<
  *         self.scoring_method = ord('m')
  *         return
  */
-      __pyx_t_6 = __Pyx_GetItemInt(((PyObject *)__pyx_v_p), __pyx_v_i, long, 1, __Pyx_PyInt_From_long, 0, 1, 1); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 948, __pyx_L1_error)
+      __pyx_t_6 = __Pyx_GetItemInt(((PyObject *)__pyx_v_p), __pyx_v_i, long, 1, __Pyx_PyInt_From_long, 0, 1, 1); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 939, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_6);
-      __pyx_t_8 = PyFloat_FromDouble(__pyx_v_scale); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 948, __pyx_L1_error)
+      __pyx_t_8 = PyFloat_FromDouble(__pyx_v_scale); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 939, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_8);
-      __pyx_t_12 = __Pyx_PyNumber_Divide(__pyx_t_6, __pyx_t_8); if (unlikely(!__pyx_t_12)) __PYX_ERR(0, 948, __pyx_L1_error)
+      __pyx_t_12 = __Pyx_PyNumber_Divide(__pyx_t_6, __pyx_t_8); if (unlikely(!__pyx_t_12)) __PYX_ERR(0, 939, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_12);
       __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
       __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
-      if (unlikely(__Pyx_SetItemInt(((PyObject *)__pyx_v_v), __pyx_v_i, __pyx_t_12, long, 1, __Pyx_PyInt_From_long, 0, 1, 1) < 0)) __PYX_ERR(0, 948, __pyx_L1_error)
+      if (unlikely(__Pyx_SetItemInt(((PyObject *)__pyx_v_v), __pyx_v_i, __pyx_t_12, long, 1, __Pyx_PyInt_From_long, 0, 1, 1) < 0)) __PYX_ERR(0, 939, __pyx_L1_error)
       __Pyx_DECREF(__pyx_t_12); __pyx_t_12 = 0;
     }
   }
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
-  /* "MACS2/IO/ScoreTrack.pyx":949
+  /* "MACS2/IO/ScoreTrack.pyx":940
  *             for i in range(l):
  *                 v[ i ] =  p[ i ] / scale # two digit precision may not be enough...
  *         self.scoring_method = ord('m')             # <<<<<<<<<<<<<<
@@ -15969,7 +15969,7 @@ static PyObject *__pyx_f_5MACS2_2IO_10ScoreTrack_12scoreTrackII_compute_SPMR(str
  */
   __pyx_v_self->scoring_method = 0x6D;
 
-  /* "MACS2/IO/ScoreTrack.pyx":950
+  /* "MACS2/IO/ScoreTrack.pyx":941
  *                 v[ i ] =  p[ i ] / scale # two digit precision may not be enough...
  *         self.scoring_method = ord('m')
  *         return             # <<<<<<<<<<<<<<
@@ -15980,7 +15980,7 @@ static PyObject *__pyx_f_5MACS2_2IO_10ScoreTrack_12scoreTrackII_compute_SPMR(str
   __pyx_r = Py_None; __Pyx_INCREF(Py_None);
   goto __pyx_L0;
 
-  /* "MACS2/IO/ScoreTrack.pyx":931
+  /* "MACS2/IO/ScoreTrack.pyx":922
  *         return
  * 
  *     cdef compute_SPMR ( self ):             # <<<<<<<<<<<<<<
@@ -16006,7 +16006,7 @@ static PyObject *__pyx_f_5MACS2_2IO_10ScoreTrack_12scoreTrackII_compute_SPMR(str
   return __pyx_r;
 }
 
-/* "MACS2/IO/ScoreTrack.pyx":952
+/* "MACS2/IO/ScoreTrack.pyx":943
  *         return
  * 
  *     cdef compute_max ( self ):             # <<<<<<<<<<<<<<
@@ -16038,9 +16038,9 @@ static PyObject *__pyx_f_5MACS2_2IO_10ScoreTrack_12scoreTrackII_compute_max(stru
   PyObject *__pyx_t_12 = NULL;
   int __pyx_t_13;
   __Pyx_RefNannySetupContext("compute_max", 0);
-  __Pyx_TraceCall("compute_max", __pyx_f[0], 952, 0, __PYX_ERR(0, 952, __pyx_L1_error));
+  __Pyx_TraceCall("compute_max", __pyx_f[0], 943, 0, __PYX_ERR(0, 943, __pyx_L1_error));
 
-  /* "MACS2/IO/ScoreTrack.pyx":957
+  /* "MACS2/IO/ScoreTrack.pyx":948
  *             long l, i
  * 
  *         for chrom in self.data.keys():             # <<<<<<<<<<<<<<
@@ -16050,9 +16050,9 @@ static PyObject *__pyx_f_5MACS2_2IO_10ScoreTrack_12scoreTrackII_compute_max(stru
   __pyx_t_2 = 0;
   if (unlikely(__pyx_v_self->data == Py_None)) {
     PyErr_Format(PyExc_AttributeError, "'NoneType' object has no attribute '%.30s'", "keys");
-    __PYX_ERR(0, 957, __pyx_L1_error)
+    __PYX_ERR(0, 948, __pyx_L1_error)
   }
-  __pyx_t_5 = __Pyx_dict_iterator(__pyx_v_self->data, 1, __pyx_n_s_keys, (&__pyx_t_3), (&__pyx_t_4)); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 957, __pyx_L1_error)
+  __pyx_t_5 = __Pyx_dict_iterator(__pyx_v_self->data, 1, __pyx_n_s_keys, (&__pyx_t_3), (&__pyx_t_4)); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 948, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_5);
   __Pyx_XDECREF(__pyx_t_1);
   __pyx_t_1 = __pyx_t_5;
@@ -16060,12 +16060,12 @@ static PyObject *__pyx_f_5MACS2_2IO_10ScoreTrack_12scoreTrackII_compute_max(stru
   while (1) {
     __pyx_t_6 = __Pyx_dict_iter_next(__pyx_t_1, __pyx_t_3, &__pyx_t_2, &__pyx_t_5, NULL, NULL, __pyx_t_4);
     if (unlikely(__pyx_t_6 == 0)) break;
-    if (unlikely(__pyx_t_6 == -1)) __PYX_ERR(0, 957, __pyx_L1_error)
+    if (unlikely(__pyx_t_6 == -1)) __PYX_ERR(0, 948, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_5);
     __Pyx_XDECREF_SET(__pyx_v_chrom, __pyx_t_5);
     __pyx_t_5 = 0;
 
-    /* "MACS2/IO/ScoreTrack.pyx":958
+    /* "MACS2/IO/ScoreTrack.pyx":949
  * 
  *         for chrom in self.data.keys():
  *             p = self.data[chrom][1]             # <<<<<<<<<<<<<<
@@ -16074,18 +16074,18 @@ static PyObject *__pyx_f_5MACS2_2IO_10ScoreTrack_12scoreTrackII_compute_max(stru
  */
     if (unlikely(__pyx_v_self->data == Py_None)) {
       PyErr_SetString(PyExc_TypeError, "'NoneType' object is not subscriptable");
-      __PYX_ERR(0, 958, __pyx_L1_error)
+      __PYX_ERR(0, 949, __pyx_L1_error)
     }
-    __pyx_t_5 = __Pyx_PyDict_GetItem(__pyx_v_self->data, __pyx_v_chrom); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 958, __pyx_L1_error)
+    __pyx_t_5 = __Pyx_PyDict_GetItem(__pyx_v_self->data, __pyx_v_chrom); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 949, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_5);
-    __pyx_t_7 = __Pyx_GetItemInt(__pyx_t_5, 1, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 958, __pyx_L1_error)
+    __pyx_t_7 = __Pyx_GetItemInt(__pyx_t_5, 1, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 949, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_7);
     __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
-    if (!(likely(((__pyx_t_7) == Py_None) || likely(__Pyx_TypeTest(__pyx_t_7, __pyx_ptype_5numpy_ndarray))))) __PYX_ERR(0, 958, __pyx_L1_error)
+    if (!(likely(((__pyx_t_7) == Py_None) || likely(__Pyx_TypeTest(__pyx_t_7, __pyx_ptype_5numpy_ndarray))))) __PYX_ERR(0, 949, __pyx_L1_error)
     __Pyx_XDECREF_SET(__pyx_v_p, ((PyArrayObject *)__pyx_t_7));
     __pyx_t_7 = 0;
 
-    /* "MACS2/IO/ScoreTrack.pyx":959
+    /* "MACS2/IO/ScoreTrack.pyx":950
  *         for chrom in self.data.keys():
  *             p = self.data[chrom][1]
  *             c = self.data[chrom][2]             # <<<<<<<<<<<<<<
@@ -16094,18 +16094,18 @@ static PyObject *__pyx_f_5MACS2_2IO_10ScoreTrack_12scoreTrackII_compute_max(stru
  */
     if (unlikely(__pyx_v_self->data == Py_None)) {
       PyErr_SetString(PyExc_TypeError, "'NoneType' object is not subscriptable");
-      __PYX_ERR(0, 959, __pyx_L1_error)
+      __PYX_ERR(0, 950, __pyx_L1_error)
     }
-    __pyx_t_7 = __Pyx_PyDict_GetItem(__pyx_v_self->data, __pyx_v_chrom); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 959, __pyx_L1_error)
+    __pyx_t_7 = __Pyx_PyDict_GetItem(__pyx_v_self->data, __pyx_v_chrom); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 950, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_7);
-    __pyx_t_5 = __Pyx_GetItemInt(__pyx_t_7, 2, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 959, __pyx_L1_error)
+    __pyx_t_5 = __Pyx_GetItemInt(__pyx_t_7, 2, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 950, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_5);
     __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
-    if (!(likely(((__pyx_t_5) == Py_None) || likely(__Pyx_TypeTest(__pyx_t_5, __pyx_ptype_5numpy_ndarray))))) __PYX_ERR(0, 959, __pyx_L1_error)
+    if (!(likely(((__pyx_t_5) == Py_None) || likely(__Pyx_TypeTest(__pyx_t_5, __pyx_ptype_5numpy_ndarray))))) __PYX_ERR(0, 950, __pyx_L1_error)
     __Pyx_XDECREF_SET(__pyx_v_c, ((PyArrayObject *)__pyx_t_5));
     __pyx_t_5 = 0;
 
-    /* "MACS2/IO/ScoreTrack.pyx":960
+    /* "MACS2/IO/ScoreTrack.pyx":951
  *             p = self.data[chrom][1]
  *             c = self.data[chrom][2]
  *             v = self.data[chrom][3]             # <<<<<<<<<<<<<<
@@ -16114,18 +16114,18 @@ static PyObject *__pyx_f_5MACS2_2IO_10ScoreTrack_12scoreTrackII_compute_max(stru
  */
     if (unlikely(__pyx_v_self->data == Py_None)) {
       PyErr_SetString(PyExc_TypeError, "'NoneType' object is not subscriptable");
-      __PYX_ERR(0, 960, __pyx_L1_error)
+      __PYX_ERR(0, 951, __pyx_L1_error)
     }
-    __pyx_t_5 = __Pyx_PyDict_GetItem(__pyx_v_self->data, __pyx_v_chrom); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 960, __pyx_L1_error)
+    __pyx_t_5 = __Pyx_PyDict_GetItem(__pyx_v_self->data, __pyx_v_chrom); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 951, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_5);
-    __pyx_t_7 = __Pyx_GetItemInt(__pyx_t_5, 3, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 960, __pyx_L1_error)
+    __pyx_t_7 = __Pyx_GetItemInt(__pyx_t_5, 3, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 951, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_7);
     __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
-    if (!(likely(((__pyx_t_7) == Py_None) || likely(__Pyx_TypeTest(__pyx_t_7, __pyx_ptype_5numpy_ndarray))))) __PYX_ERR(0, 960, __pyx_L1_error)
+    if (!(likely(((__pyx_t_7) == Py_None) || likely(__Pyx_TypeTest(__pyx_t_7, __pyx_ptype_5numpy_ndarray))))) __PYX_ERR(0, 951, __pyx_L1_error)
     __Pyx_XDECREF_SET(__pyx_v_v, ((PyArrayObject *)__pyx_t_7));
     __pyx_t_7 = 0;
 
-    /* "MACS2/IO/ScoreTrack.pyx":961
+    /* "MACS2/IO/ScoreTrack.pyx":952
  *             c = self.data[chrom][2]
  *             v = self.data[chrom][3]
  *             l = self.datalength[chrom]             # <<<<<<<<<<<<<<
@@ -16134,15 +16134,15 @@ static PyObject *__pyx_f_5MACS2_2IO_10ScoreTrack_12scoreTrackII_compute_max(stru
  */
     if (unlikely(__pyx_v_self->datalength == Py_None)) {
       PyErr_SetString(PyExc_TypeError, "'NoneType' object is not subscriptable");
-      __PYX_ERR(0, 961, __pyx_L1_error)
+      __PYX_ERR(0, 952, __pyx_L1_error)
     }
-    __pyx_t_7 = __Pyx_PyDict_GetItem(__pyx_v_self->datalength, __pyx_v_chrom); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 961, __pyx_L1_error)
+    __pyx_t_7 = __Pyx_PyDict_GetItem(__pyx_v_self->datalength, __pyx_v_chrom); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 952, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_7);
-    __pyx_t_8 = __Pyx_PyInt_As_long(__pyx_t_7); if (unlikely((__pyx_t_8 == (long)-1) && PyErr_Occurred())) __PYX_ERR(0, 961, __pyx_L1_error)
+    __pyx_t_8 = __Pyx_PyInt_As_long(__pyx_t_7); if (unlikely((__pyx_t_8 == (long)-1) && PyErr_Occurred())) __PYX_ERR(0, 952, __pyx_L1_error)
     __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
     __pyx_v_l = __pyx_t_8;
 
-    /* "MACS2/IO/ScoreTrack.pyx":962
+    /* "MACS2/IO/ScoreTrack.pyx":953
  *             v = self.data[chrom][3]
  *             l = self.datalength[chrom]
  *             for i in range(l):             # <<<<<<<<<<<<<<
@@ -16154,19 +16154,19 @@ static PyObject *__pyx_f_5MACS2_2IO_10ScoreTrack_12scoreTrackII_compute_max(stru
     for (__pyx_t_10 = 0; __pyx_t_10 < __pyx_t_9; __pyx_t_10+=1) {
       __pyx_v_i = __pyx_t_10;
 
-      /* "MACS2/IO/ScoreTrack.pyx":963
+      /* "MACS2/IO/ScoreTrack.pyx":954
  *             l = self.datalength[chrom]
  *             for i in range(l):
  *                 v[ i ] = max(p[ i ],c[ i ])             # <<<<<<<<<<<<<<
  *         self.scoring_method = ord('M')
  *         return
  */
-      __pyx_t_7 = __Pyx_GetItemInt(((PyObject *)__pyx_v_c), __pyx_v_i, long, 1, __Pyx_PyInt_From_long, 0, 1, 1); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 963, __pyx_L1_error)
+      __pyx_t_7 = __Pyx_GetItemInt(((PyObject *)__pyx_v_c), __pyx_v_i, long, 1, __Pyx_PyInt_From_long, 0, 1, 1); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 954, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_7);
-      __pyx_t_5 = __Pyx_GetItemInt(((PyObject *)__pyx_v_p), __pyx_v_i, long, 1, __Pyx_PyInt_From_long, 0, 1, 1); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 963, __pyx_L1_error)
+      __pyx_t_5 = __Pyx_GetItemInt(((PyObject *)__pyx_v_p), __pyx_v_i, long, 1, __Pyx_PyInt_From_long, 0, 1, 1); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 954, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_5);
-      __pyx_t_12 = PyObject_RichCompare(__pyx_t_7, __pyx_t_5, Py_GT); __Pyx_XGOTREF(__pyx_t_12); if (unlikely(!__pyx_t_12)) __PYX_ERR(0, 963, __pyx_L1_error)
-      __pyx_t_13 = __Pyx_PyObject_IsTrue(__pyx_t_12); if (unlikely(__pyx_t_13 < 0)) __PYX_ERR(0, 963, __pyx_L1_error)
+      __pyx_t_12 = PyObject_RichCompare(__pyx_t_7, __pyx_t_5, Py_GT); __Pyx_XGOTREF(__pyx_t_12); if (unlikely(!__pyx_t_12)) __PYX_ERR(0, 954, __pyx_L1_error)
+      __pyx_t_13 = __Pyx_PyObject_IsTrue(__pyx_t_12); if (unlikely(__pyx_t_13 < 0)) __PYX_ERR(0, 954, __pyx_L1_error)
       __Pyx_DECREF(__pyx_t_12); __pyx_t_12 = 0;
       if (__pyx_t_13) {
         __Pyx_INCREF(__pyx_t_7);
@@ -16180,13 +16180,13 @@ static PyObject *__pyx_f_5MACS2_2IO_10ScoreTrack_12scoreTrackII_compute_max(stru
       __pyx_t_7 = __pyx_t_11;
       __Pyx_INCREF(__pyx_t_7);
       __Pyx_DECREF(__pyx_t_11); __pyx_t_11 = 0;
-      if (unlikely(__Pyx_SetItemInt(((PyObject *)__pyx_v_v), __pyx_v_i, __pyx_t_7, long, 1, __Pyx_PyInt_From_long, 0, 1, 1) < 0)) __PYX_ERR(0, 963, __pyx_L1_error)
+      if (unlikely(__Pyx_SetItemInt(((PyObject *)__pyx_v_v), __pyx_v_i, __pyx_t_7, long, 1, __Pyx_PyInt_From_long, 0, 1, 1) < 0)) __PYX_ERR(0, 954, __pyx_L1_error)
       __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
     }
   }
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-  /* "MACS2/IO/ScoreTrack.pyx":964
+  /* "MACS2/IO/ScoreTrack.pyx":955
  *             for i in range(l):
  *                 v[ i ] = max(p[ i ],c[ i ])
  *         self.scoring_method = ord('M')             # <<<<<<<<<<<<<<
@@ -16195,7 +16195,7 @@ static PyObject *__pyx_f_5MACS2_2IO_10ScoreTrack_12scoreTrackII_compute_max(stru
  */
   __pyx_v_self->scoring_method = 77;
 
-  /* "MACS2/IO/ScoreTrack.pyx":965
+  /* "MACS2/IO/ScoreTrack.pyx":956
  *                 v[ i ] = max(p[ i ],c[ i ])
  *         self.scoring_method = ord('M')
  *         return             # <<<<<<<<<<<<<<
@@ -16206,7 +16206,7 @@ static PyObject *__pyx_f_5MACS2_2IO_10ScoreTrack_12scoreTrackII_compute_max(stru
   __pyx_r = Py_None; __Pyx_INCREF(Py_None);
   goto __pyx_L0;
 
-  /* "MACS2/IO/ScoreTrack.pyx":952
+  /* "MACS2/IO/ScoreTrack.pyx":943
  *         return
  * 
  *     cdef compute_max ( self ):             # <<<<<<<<<<<<<<
@@ -16234,7 +16234,7 @@ static PyObject *__pyx_f_5MACS2_2IO_10ScoreTrack_12scoreTrackII_compute_max(stru
   return __pyx_r;
 }
 
-/* "MACS2/IO/ScoreTrack.pyx":967
+/* "MACS2/IO/ScoreTrack.pyx":958
  *         return
  * 
  *     cpdef write_bedGraph ( self, fhd, str name, str description, short column = 3):             # <<<<<<<<<<<<<<
@@ -16278,7 +16278,7 @@ static PyObject *__pyx_f_5MACS2_2IO_10ScoreTrack_12scoreTrackII_write_bedGraph(s
   int __pyx_t_17;
   Py_ssize_t __pyx_t_18;
   __Pyx_RefNannySetupContext("write_bedGraph", 0);
-  __Pyx_TraceCall("write_bedGraph", __pyx_f[0], 967, 0, __PYX_ERR(0, 967, __pyx_L1_error));
+  __Pyx_TraceCall("write_bedGraph", __pyx_f[0], 958, 0, __PYX_ERR(0, 958, __pyx_L1_error));
   if (__pyx_optional_args) {
     if (__pyx_optional_args->__pyx_n > 0) {
       __pyx_v_column = __pyx_optional_args->column;
@@ -16293,11 +16293,11 @@ static PyObject *__pyx_f_5MACS2_2IO_10ScoreTrack_12scoreTrackII_write_bedGraph(s
     if (unlikely(!__Pyx_object_dict_version_matches(((PyObject *)__pyx_v_self), __pyx_tp_dict_version, __pyx_obj_dict_version))) {
       PY_UINT64_T __pyx_type_dict_guard = __Pyx_get_tp_dict_version(((PyObject *)__pyx_v_self));
       #endif
-      __pyx_t_1 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_v_self), __pyx_n_s_write_bedGraph); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 967, __pyx_L1_error)
+      __pyx_t_1 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_v_self), __pyx_n_s_write_bedGraph); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 958, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_1);
       if (!PyCFunction_Check(__pyx_t_1) || (PyCFunction_GET_FUNCTION(__pyx_t_1) != (PyCFunction)(void*)__pyx_pw_5MACS2_2IO_10ScoreTrack_12scoreTrackII_23write_bedGraph)) {
         __Pyx_XDECREF(__pyx_r);
-        __pyx_t_3 = __Pyx_PyInt_From_short(__pyx_v_column); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 967, __pyx_L1_error)
+        __pyx_t_3 = __Pyx_PyInt_From_short(__pyx_v_column); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 958, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_3);
         __Pyx_INCREF(__pyx_t_1);
         __pyx_t_4 = __pyx_t_1; __pyx_t_5 = NULL;
@@ -16315,7 +16315,7 @@ static PyObject *__pyx_f_5MACS2_2IO_10ScoreTrack_12scoreTrackII_write_bedGraph(s
         #if CYTHON_FAST_PYCALL
         if (PyFunction_Check(__pyx_t_4)) {
           PyObject *__pyx_temp[5] = {__pyx_t_5, __pyx_v_fhd, __pyx_v_name, __pyx_v_description, __pyx_t_3};
-          __pyx_t_2 = __Pyx_PyFunction_FastCall(__pyx_t_4, __pyx_temp+1-__pyx_t_6, 4+__pyx_t_6); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 967, __pyx_L1_error)
+          __pyx_t_2 = __Pyx_PyFunction_FastCall(__pyx_t_4, __pyx_temp+1-__pyx_t_6, 4+__pyx_t_6); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 958, __pyx_L1_error)
           __Pyx_XDECREF(__pyx_t_5); __pyx_t_5 = 0;
           __Pyx_GOTREF(__pyx_t_2);
           __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
@@ -16324,14 +16324,14 @@ static PyObject *__pyx_f_5MACS2_2IO_10ScoreTrack_12scoreTrackII_write_bedGraph(s
         #if CYTHON_FAST_PYCCALL
         if (__Pyx_PyFastCFunction_Check(__pyx_t_4)) {
           PyObject *__pyx_temp[5] = {__pyx_t_5, __pyx_v_fhd, __pyx_v_name, __pyx_v_description, __pyx_t_3};
-          __pyx_t_2 = __Pyx_PyCFunction_FastCall(__pyx_t_4, __pyx_temp+1-__pyx_t_6, 4+__pyx_t_6); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 967, __pyx_L1_error)
+          __pyx_t_2 = __Pyx_PyCFunction_FastCall(__pyx_t_4, __pyx_temp+1-__pyx_t_6, 4+__pyx_t_6); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 958, __pyx_L1_error)
           __Pyx_XDECREF(__pyx_t_5); __pyx_t_5 = 0;
           __Pyx_GOTREF(__pyx_t_2);
           __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
         } else
         #endif
         {
-          __pyx_t_7 = PyTuple_New(4+__pyx_t_6); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 967, __pyx_L1_error)
+          __pyx_t_7 = PyTuple_New(4+__pyx_t_6); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 958, __pyx_L1_error)
           __Pyx_GOTREF(__pyx_t_7);
           if (__pyx_t_5) {
             __Pyx_GIVEREF(__pyx_t_5); PyTuple_SET_ITEM(__pyx_t_7, 0, __pyx_t_5); __pyx_t_5 = NULL;
@@ -16348,7 +16348,7 @@ static PyObject *__pyx_f_5MACS2_2IO_10ScoreTrack_12scoreTrackII_write_bedGraph(s
           __Pyx_GIVEREF(__pyx_t_3);
           PyTuple_SET_ITEM(__pyx_t_7, 3+__pyx_t_6, __pyx_t_3);
           __pyx_t_3 = 0;
-          __pyx_t_2 = __Pyx_PyObject_Call(__pyx_t_4, __pyx_t_7, NULL); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 967, __pyx_L1_error)
+          __pyx_t_2 = __Pyx_PyObject_Call(__pyx_t_4, __pyx_t_7, NULL); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 958, __pyx_L1_error)
           __Pyx_GOTREF(__pyx_t_2);
           __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
         }
@@ -16371,7 +16371,7 @@ static PyObject *__pyx_f_5MACS2_2IO_10ScoreTrack_12scoreTrackII_write_bedGraph(s
     #endif
   }
 
-  /* "MACS2/IO/ScoreTrack.pyx":984
+  /* "MACS2/IO/ScoreTrack.pyx":975
  *             np.ndarray pos, value
  * 
  *         assert column in range( 1, 4 ), "column should be between 1, 2 or 3."             # <<<<<<<<<<<<<<
@@ -16380,50 +16380,50 @@ static PyObject *__pyx_f_5MACS2_2IO_10ScoreTrack_12scoreTrackII_write_bedGraph(s
  */
   #ifndef CYTHON_WITHOUT_ASSERTIONS
   if (unlikely(!Py_OptimizeFlag)) {
-    __pyx_t_1 = __Pyx_PyInt_From_short(__pyx_v_column); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 984, __pyx_L1_error)
+    __pyx_t_1 = __Pyx_PyInt_From_short(__pyx_v_column); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 975, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
-    __pyx_t_2 = __Pyx_PyObject_Call(__pyx_builtin_range, __pyx_tuple__18, NULL); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 984, __pyx_L1_error)
+    __pyx_t_2 = __Pyx_PyObject_Call(__pyx_builtin_range, __pyx_tuple__18, NULL); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 975, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
-    __pyx_t_8 = (__Pyx_PySequence_ContainsTF(__pyx_t_1, __pyx_t_2, Py_EQ)); if (unlikely(__pyx_t_8 < 0)) __PYX_ERR(0, 984, __pyx_L1_error)
+    __pyx_t_8 = (__Pyx_PySequence_ContainsTF(__pyx_t_1, __pyx_t_2, Py_EQ)); if (unlikely(__pyx_t_8 < 0)) __PYX_ERR(0, 975, __pyx_L1_error)
     __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
     __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
     if (unlikely(!(__pyx_t_8 != 0))) {
       PyErr_SetObject(PyExc_AssertionError, __pyx_kp_u_column_should_be_between_1_2_or);
-      __PYX_ERR(0, 984, __pyx_L1_error)
+      __PYX_ERR(0, 975, __pyx_L1_error)
     }
   }
   #endif
 
-  /* "MACS2/IO/ScoreTrack.pyx":986
+  /* "MACS2/IO/ScoreTrack.pyx":977
  *         assert column in range( 1, 4 ), "column should be between 1, 2 or 3."
  * 
  *         write = fhd.write             # <<<<<<<<<<<<<<
  * 
  *         if self.trackline:
  */
-  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_fhd, __pyx_n_s_write); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 986, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_fhd, __pyx_n_s_write); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 977, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __pyx_v_write = __pyx_t_2;
   __pyx_t_2 = 0;
 
-  /* "MACS2/IO/ScoreTrack.pyx":988
+  /* "MACS2/IO/ScoreTrack.pyx":979
  *         write = fhd.write
  * 
  *         if self.trackline:             # <<<<<<<<<<<<<<
  *             # this line is REQUIRED by the wiggle format for UCSC browser
  *             write( "track type=bedGraph name=\"%s\" description=\"%s\"\n" % ( name.decode(), description ) )
  */
-  __pyx_t_8 = __Pyx_PyObject_IsTrue(((PyObject *)__pyx_v_self->trackline)); if (unlikely(__pyx_t_8 < 0)) __PYX_ERR(0, 988, __pyx_L1_error)
+  __pyx_t_8 = __Pyx_PyObject_IsTrue(((PyObject *)__pyx_v_self->trackline)); if (unlikely(__pyx_t_8 < 0)) __PYX_ERR(0, 979, __pyx_L1_error)
   if (__pyx_t_8) {
 
-    /* "MACS2/IO/ScoreTrack.pyx":990
+    /* "MACS2/IO/ScoreTrack.pyx":981
  *         if self.trackline:
  *             # this line is REQUIRED by the wiggle format for UCSC browser
  *             write( "track type=bedGraph name=\"%s\" description=\"%s\"\n" % ( name.decode(), description ) )             # <<<<<<<<<<<<<<
  * 
  *         chrs = self.get_chr_names()
  */
-    __pyx_t_1 = PyTuple_New(5); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 990, __pyx_L1_error)
+    __pyx_t_1 = PyTuple_New(5); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 981, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
     __pyx_t_9 = 0;
     __pyx_t_10 = 127;
@@ -16431,9 +16431,9 @@ static PyObject *__pyx_f_5MACS2_2IO_10ScoreTrack_12scoreTrackII_write_bedGraph(s
     __pyx_t_9 += 26;
     __Pyx_GIVEREF(__pyx_kp_u_track_type_bedGraph_name);
     PyTuple_SET_ITEM(__pyx_t_1, 0, __pyx_kp_u_track_type_bedGraph_name);
-    __pyx_t_4 = __Pyx_CallUnboundCMethod0(&__pyx_umethod_PyUnicode_Type_decode, __pyx_v_name); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 990, __pyx_L1_error)
+    __pyx_t_4 = __Pyx_CallUnboundCMethod0(&__pyx_umethod_PyUnicode_Type_decode, __pyx_v_name); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 981, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_4);
-    __pyx_t_7 = __Pyx_PyObject_FormatSimpleAndDecref(PyObject_Unicode(__pyx_t_4), __pyx_empty_unicode); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 990, __pyx_L1_error)
+    __pyx_t_7 = __Pyx_PyObject_FormatSimpleAndDecref(PyObject_Unicode(__pyx_t_4), __pyx_empty_unicode); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 981, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_7);
     __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
     __pyx_t_10 = (__Pyx_PyUnicode_MAX_CHAR_VALUE(__pyx_t_7) > __pyx_t_10) ? __Pyx_PyUnicode_MAX_CHAR_VALUE(__pyx_t_7) : __pyx_t_10;
@@ -16445,7 +16445,7 @@ static PyObject *__pyx_f_5MACS2_2IO_10ScoreTrack_12scoreTrackII_write_bedGraph(s
     __pyx_t_9 += 15;
     __Pyx_GIVEREF(__pyx_kp_u_description_2);
     PyTuple_SET_ITEM(__pyx_t_1, 2, __pyx_kp_u_description_2);
-    __pyx_t_7 = __Pyx_PyUnicode_Unicode(__pyx_v_description); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 990, __pyx_L1_error)
+    __pyx_t_7 = __Pyx_PyUnicode_Unicode(__pyx_v_description); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 981, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_7);
     __pyx_t_10 = (__Pyx_PyUnicode_MAX_CHAR_VALUE(__pyx_t_7) > __pyx_t_10) ? __Pyx_PyUnicode_MAX_CHAR_VALUE(__pyx_t_7) : __pyx_t_10;
     __pyx_t_9 += __Pyx_PyUnicode_GET_LENGTH(__pyx_t_7);
@@ -16456,7 +16456,7 @@ static PyObject *__pyx_f_5MACS2_2IO_10ScoreTrack_12scoreTrackII_write_bedGraph(s
     __pyx_t_9 += 2;
     __Pyx_GIVEREF(__pyx_kp_u__19);
     PyTuple_SET_ITEM(__pyx_t_1, 4, __pyx_kp_u__19);
-    __pyx_t_7 = __Pyx_PyUnicode_Join(__pyx_t_1, 5, __pyx_t_9, __pyx_t_10); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 990, __pyx_L1_error)
+    __pyx_t_7 = __Pyx_PyUnicode_Join(__pyx_t_1, 5, __pyx_t_9, __pyx_t_10); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 981, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_7);
     __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
     __Pyx_INCREF(__pyx_v_write);
@@ -16473,12 +16473,12 @@ static PyObject *__pyx_f_5MACS2_2IO_10ScoreTrack_12scoreTrackII_write_bedGraph(s
     __pyx_t_2 = (__pyx_t_4) ? __Pyx_PyObject_Call2Args(__pyx_t_1, __pyx_t_4, __pyx_t_7) : __Pyx_PyObject_CallOneArg(__pyx_t_1, __pyx_t_7);
     __Pyx_XDECREF(__pyx_t_4); __pyx_t_4 = 0;
     __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
-    if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 990, __pyx_L1_error)
+    if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 981, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
     __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
     __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
-    /* "MACS2/IO/ScoreTrack.pyx":988
+    /* "MACS2/IO/ScoreTrack.pyx":979
  *         write = fhd.write
  * 
  *         if self.trackline:             # <<<<<<<<<<<<<<
@@ -16487,20 +16487,20 @@ static PyObject *__pyx_f_5MACS2_2IO_10ScoreTrack_12scoreTrackII_write_bedGraph(s
  */
   }
 
-  /* "MACS2/IO/ScoreTrack.pyx":992
+  /* "MACS2/IO/ScoreTrack.pyx":983
  *             write( "track type=bedGraph name=\"%s\" description=\"%s\"\n" % ( name.decode(), description ) )
  * 
  *         chrs = self.get_chr_names()             # <<<<<<<<<<<<<<
  *         for chrom in chrs:
  *             pos = self.data[ chrom ][ 0 ]
  */
-  __pyx_t_2 = ((struct __pyx_vtabstruct_5MACS2_2IO_10ScoreTrack_scoreTrackII *)__pyx_v_self->__pyx_vtab)->get_chr_names(__pyx_v_self, 0); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 992, __pyx_L1_error)
+  __pyx_t_2 = ((struct __pyx_vtabstruct_5MACS2_2IO_10ScoreTrack_scoreTrackII *)__pyx_v_self->__pyx_vtab)->get_chr_names(__pyx_v_self, 0); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 983, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
-  if (!(likely(PySet_CheckExact(__pyx_t_2))||((__pyx_t_2) == Py_None)||(PyErr_Format(PyExc_TypeError, "Expected %.16s, got %.200s", "set", Py_TYPE(__pyx_t_2)->tp_name), 0))) __PYX_ERR(0, 992, __pyx_L1_error)
+  if (!(likely(PySet_CheckExact(__pyx_t_2))||((__pyx_t_2) == Py_None)||(PyErr_Format(PyExc_TypeError, "Expected %.16s, got %.200s", "set", Py_TYPE(__pyx_t_2)->tp_name), 0))) __PYX_ERR(0, 983, __pyx_L1_error)
   __pyx_v_chrs = ((PyObject*)__pyx_t_2);
   __pyx_t_2 = 0;
 
-  /* "MACS2/IO/ScoreTrack.pyx":993
+  /* "MACS2/IO/ScoreTrack.pyx":984
  * 
  *         chrs = self.get_chr_names()
  *         for chrom in chrs:             # <<<<<<<<<<<<<<
@@ -16508,7 +16508,7 @@ static PyObject *__pyx_f_5MACS2_2IO_10ScoreTrack_12scoreTrackII_write_bedGraph(s
  *             value = self.data[ chrom ][ column ]
  */
   __pyx_t_9 = 0;
-  __pyx_t_1 = __Pyx_set_iterator(__pyx_v_chrs, 1, (&__pyx_t_11), (&__pyx_t_6)); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 993, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_set_iterator(__pyx_v_chrs, 1, (&__pyx_t_11), (&__pyx_t_6)); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 984, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __Pyx_XDECREF(__pyx_t_2);
   __pyx_t_2 = __pyx_t_1;
@@ -16516,13 +16516,13 @@ static PyObject *__pyx_f_5MACS2_2IO_10ScoreTrack_12scoreTrackII_write_bedGraph(s
   while (1) {
     __pyx_t_12 = __Pyx_set_iter_next(__pyx_t_2, __pyx_t_11, &__pyx_t_9, &__pyx_t_1, __pyx_t_6);
     if (unlikely(__pyx_t_12 == 0)) break;
-    if (unlikely(__pyx_t_12 == -1)) __PYX_ERR(0, 993, __pyx_L1_error)
+    if (unlikely(__pyx_t_12 == -1)) __PYX_ERR(0, 984, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
-    if (!(likely(PyBytes_CheckExact(__pyx_t_1))||((__pyx_t_1) == Py_None)||(PyErr_Format(PyExc_TypeError, "Expected %.16s, got %.200s", "bytes", Py_TYPE(__pyx_t_1)->tp_name), 0))) __PYX_ERR(0, 993, __pyx_L1_error)
+    if (!(likely(PyBytes_CheckExact(__pyx_t_1))||((__pyx_t_1) == Py_None)||(PyErr_Format(PyExc_TypeError, "Expected %.16s, got %.200s", "bytes", Py_TYPE(__pyx_t_1)->tp_name), 0))) __PYX_ERR(0, 984, __pyx_L1_error)
     __Pyx_XDECREF_SET(__pyx_v_chrom, ((PyObject*)__pyx_t_1));
     __pyx_t_1 = 0;
 
-    /* "MACS2/IO/ScoreTrack.pyx":994
+    /* "MACS2/IO/ScoreTrack.pyx":985
  *         chrs = self.get_chr_names()
  *         for chrom in chrs:
  *             pos = self.data[ chrom ][ 0 ]             # <<<<<<<<<<<<<<
@@ -16531,18 +16531,18 @@ static PyObject *__pyx_f_5MACS2_2IO_10ScoreTrack_12scoreTrackII_write_bedGraph(s
  */
     if (unlikely(__pyx_v_self->data == Py_None)) {
       PyErr_SetString(PyExc_TypeError, "'NoneType' object is not subscriptable");
-      __PYX_ERR(0, 994, __pyx_L1_error)
+      __PYX_ERR(0, 985, __pyx_L1_error)
     }
-    __pyx_t_1 = __Pyx_PyDict_GetItem(__pyx_v_self->data, __pyx_v_chrom); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 994, __pyx_L1_error)
+    __pyx_t_1 = __Pyx_PyDict_GetItem(__pyx_v_self->data, __pyx_v_chrom); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 985, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
-    __pyx_t_7 = __Pyx_GetItemInt(__pyx_t_1, 0, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 994, __pyx_L1_error)
+    __pyx_t_7 = __Pyx_GetItemInt(__pyx_t_1, 0, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 985, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_7);
     __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-    if (!(likely(((__pyx_t_7) == Py_None) || likely(__Pyx_TypeTest(__pyx_t_7, __pyx_ptype_5numpy_ndarray))))) __PYX_ERR(0, 994, __pyx_L1_error)
+    if (!(likely(((__pyx_t_7) == Py_None) || likely(__Pyx_TypeTest(__pyx_t_7, __pyx_ptype_5numpy_ndarray))))) __PYX_ERR(0, 985, __pyx_L1_error)
     __Pyx_XDECREF_SET(__pyx_v_pos, ((PyArrayObject *)__pyx_t_7));
     __pyx_t_7 = 0;
 
-    /* "MACS2/IO/ScoreTrack.pyx":995
+    /* "MACS2/IO/ScoreTrack.pyx":986
  *         for chrom in chrs:
  *             pos = self.data[ chrom ][ 0 ]
  *             value = self.data[ chrom ][ column ]             # <<<<<<<<<<<<<<
@@ -16551,18 +16551,18 @@ static PyObject *__pyx_f_5MACS2_2IO_10ScoreTrack_12scoreTrackII_write_bedGraph(s
  */
     if (unlikely(__pyx_v_self->data == Py_None)) {
       PyErr_SetString(PyExc_TypeError, "'NoneType' object is not subscriptable");
-      __PYX_ERR(0, 995, __pyx_L1_error)
+      __PYX_ERR(0, 986, __pyx_L1_error)
     }
-    __pyx_t_7 = __Pyx_PyDict_GetItem(__pyx_v_self->data, __pyx_v_chrom); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 995, __pyx_L1_error)
+    __pyx_t_7 = __Pyx_PyDict_GetItem(__pyx_v_self->data, __pyx_v_chrom); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 986, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_7);
-    __pyx_t_1 = __Pyx_GetItemInt(__pyx_t_7, __pyx_v_column, short, 1, __Pyx_PyInt_From_short, 0, 1, 1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 995, __pyx_L1_error)
+    __pyx_t_1 = __Pyx_GetItemInt(__pyx_t_7, __pyx_v_column, short, 1, __Pyx_PyInt_From_short, 0, 1, 1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 986, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
     __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
-    if (!(likely(((__pyx_t_1) == Py_None) || likely(__Pyx_TypeTest(__pyx_t_1, __pyx_ptype_5numpy_ndarray))))) __PYX_ERR(0, 995, __pyx_L1_error)
+    if (!(likely(((__pyx_t_1) == Py_None) || likely(__Pyx_TypeTest(__pyx_t_1, __pyx_ptype_5numpy_ndarray))))) __PYX_ERR(0, 986, __pyx_L1_error)
     __Pyx_XDECREF_SET(__pyx_v_value, ((PyArrayObject *)__pyx_t_1));
     __pyx_t_1 = 0;
 
-    /* "MACS2/IO/ScoreTrack.pyx":996
+    /* "MACS2/IO/ScoreTrack.pyx":987
  *             pos = self.data[ chrom ][ 0 ]
  *             value = self.data[ chrom ][ column ]
  *             l = self.datalength[ chrom ]             # <<<<<<<<<<<<<<
@@ -16571,15 +16571,15 @@ static PyObject *__pyx_f_5MACS2_2IO_10ScoreTrack_12scoreTrackII_write_bedGraph(s
  */
     if (unlikely(__pyx_v_self->datalength == Py_None)) {
       PyErr_SetString(PyExc_TypeError, "'NoneType' object is not subscriptable");
-      __PYX_ERR(0, 996, __pyx_L1_error)
+      __PYX_ERR(0, 987, __pyx_L1_error)
     }
-    __pyx_t_1 = __Pyx_PyDict_GetItem(__pyx_v_self->datalength, __pyx_v_chrom); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 996, __pyx_L1_error)
+    __pyx_t_1 = __Pyx_PyDict_GetItem(__pyx_v_self->datalength, __pyx_v_chrom); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 987, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
-    __pyx_t_12 = __Pyx_PyInt_As_int(__pyx_t_1); if (unlikely((__pyx_t_12 == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 996, __pyx_L1_error)
+    __pyx_t_12 = __Pyx_PyInt_As_int(__pyx_t_1); if (unlikely((__pyx_t_12 == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 987, __pyx_L1_error)
     __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
     __pyx_v_l = __pyx_t_12;
 
-    /* "MACS2/IO/ScoreTrack.pyx":997
+    /* "MACS2/IO/ScoreTrack.pyx":988
  *             value = self.data[ chrom ][ column ]
  *             l = self.datalength[ chrom ]
  *             pre = 0             # <<<<<<<<<<<<<<
@@ -16588,7 +16588,7 @@ static PyObject *__pyx_f_5MACS2_2IO_10ScoreTrack_12scoreTrackII_write_bedGraph(s
  */
     __pyx_v_pre = 0;
 
-    /* "MACS2/IO/ScoreTrack.pyx":998
+    /* "MACS2/IO/ScoreTrack.pyx":989
  *             l = self.datalength[ chrom ]
  *             pre = 0
  *             if pos.shape[ 0 ] == 0: continue # skip if there's no data             # <<<<<<<<<<<<<<
@@ -16600,20 +16600,20 @@ static PyObject *__pyx_f_5MACS2_2IO_10ScoreTrack_12scoreTrackII_write_bedGraph(s
       goto __pyx_L4_continue;
     }
 
-    /* "MACS2/IO/ScoreTrack.pyx":999
+    /* "MACS2/IO/ScoreTrack.pyx":990
  *             pre = 0
  *             if pos.shape[ 0 ] == 0: continue # skip if there's no data
  *             pre_v = value[ 0 ]             # <<<<<<<<<<<<<<
  *             for i in range( 1, l ):
  *                 v = value[ i ]
  */
-    __pyx_t_1 = __Pyx_GetItemInt(((PyObject *)__pyx_v_value), 0, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 999, __pyx_L1_error)
+    __pyx_t_1 = __Pyx_GetItemInt(((PyObject *)__pyx_v_value), 0, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 990, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
-    __pyx_t_13 = __pyx_PyFloat_AsFloat(__pyx_t_1); if (unlikely((__pyx_t_13 == (float)-1) && PyErr_Occurred())) __PYX_ERR(0, 999, __pyx_L1_error)
+    __pyx_t_13 = __pyx_PyFloat_AsFloat(__pyx_t_1); if (unlikely((__pyx_t_13 == (float)-1) && PyErr_Occurred())) __PYX_ERR(0, 990, __pyx_L1_error)
     __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
     __pyx_v_pre_v = __pyx_t_13;
 
-    /* "MACS2/IO/ScoreTrack.pyx":1000
+    /* "MACS2/IO/ScoreTrack.pyx":991
  *             if pos.shape[ 0 ] == 0: continue # skip if there's no data
  *             pre_v = value[ 0 ]
  *             for i in range( 1, l ):             # <<<<<<<<<<<<<<
@@ -16625,20 +16625,20 @@ static PyObject *__pyx_f_5MACS2_2IO_10ScoreTrack_12scoreTrackII_write_bedGraph(s
     for (__pyx_t_15 = 1; __pyx_t_15 < __pyx_t_14; __pyx_t_15+=1) {
       __pyx_v_i = __pyx_t_15;
 
-      /* "MACS2/IO/ScoreTrack.pyx":1001
+      /* "MACS2/IO/ScoreTrack.pyx":992
  *             pre_v = value[ 0 ]
  *             for i in range( 1, l ):
  *                 v = value[ i ]             # <<<<<<<<<<<<<<
  *                 p = pos[ i-1 ]
  *                 #if ('%.5f' % pre_v) != ('%.5f' % v):
  */
-      __pyx_t_1 = __Pyx_GetItemInt(((PyObject *)__pyx_v_value), __pyx_v_i, int, 1, __Pyx_PyInt_From_int, 0, 1, 1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1001, __pyx_L1_error)
+      __pyx_t_1 = __Pyx_GetItemInt(((PyObject *)__pyx_v_value), __pyx_v_i, int, 1, __Pyx_PyInt_From_int, 0, 1, 1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 992, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_1);
-      __pyx_t_13 = __pyx_PyFloat_AsFloat(__pyx_t_1); if (unlikely((__pyx_t_13 == (float)-1) && PyErr_Occurred())) __PYX_ERR(0, 1001, __pyx_L1_error)
+      __pyx_t_13 = __pyx_PyFloat_AsFloat(__pyx_t_1); if (unlikely((__pyx_t_13 == (float)-1) && PyErr_Occurred())) __PYX_ERR(0, 992, __pyx_L1_error)
       __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
       __pyx_v_v = __pyx_t_13;
 
-      /* "MACS2/IO/ScoreTrack.pyx":1002
+      /* "MACS2/IO/ScoreTrack.pyx":993
  *             for i in range( 1, l ):
  *                 v = value[ i ]
  *                 p = pos[ i-1 ]             # <<<<<<<<<<<<<<
@@ -16646,13 +16646,13 @@ static PyObject *__pyx_f_5MACS2_2IO_10ScoreTrack_12scoreTrackII_write_bedGraph(s
  *                 if abs(pre_v - v) > 1e-5: # precision is 5 digits
  */
       __pyx_t_16 = (__pyx_v_i - 1);
-      __pyx_t_1 = __Pyx_GetItemInt(((PyObject *)__pyx_v_pos), __pyx_t_16, long, 1, __Pyx_PyInt_From_long, 0, 1, 1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1002, __pyx_L1_error)
+      __pyx_t_1 = __Pyx_GetItemInt(((PyObject *)__pyx_v_pos), __pyx_t_16, long, 1, __Pyx_PyInt_From_long, 0, 1, 1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 993, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_1);
-      __pyx_t_17 = __Pyx_PyInt_As_int(__pyx_t_1); if (unlikely((__pyx_t_17 == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 1002, __pyx_L1_error)
+      __pyx_t_17 = __Pyx_PyInt_As_int(__pyx_t_1); if (unlikely((__pyx_t_17 == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 993, __pyx_L1_error)
       __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
       __pyx_v_p = __pyx_t_17;
 
-      /* "MACS2/IO/ScoreTrack.pyx":1004
+      /* "MACS2/IO/ScoreTrack.pyx":995
  *                 p = pos[ i-1 ]
  *                 #if ('%.5f' % pre_v) != ('%.5f' % v):
  *                 if abs(pre_v - v) > 1e-5: # precision is 5 digits             # <<<<<<<<<<<<<<
@@ -16662,22 +16662,22 @@ static PyObject *__pyx_f_5MACS2_2IO_10ScoreTrack_12scoreTrackII_write_bedGraph(s
       __pyx_t_8 = ((fabsf((__pyx_v_pre_v - __pyx_v_v)) > 1e-5) != 0);
       if (__pyx_t_8) {
 
-        /* "MACS2/IO/ScoreTrack.pyx":1005
+        /* "MACS2/IO/ScoreTrack.pyx":996
  *                 #if ('%.5f' % pre_v) != ('%.5f' % v):
  *                 if abs(pre_v - v) > 1e-5: # precision is 5 digits
  *                     write( "%s\t%d\t%d\t%.5f\n" % ( chrom.decode(), pre, p, pre_v ) )             # <<<<<<<<<<<<<<
  *                     pre_v = v
  *                     pre = p
  */
-        __pyx_t_7 = PyTuple_New(8); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 1005, __pyx_L1_error)
+        __pyx_t_7 = PyTuple_New(8); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 996, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_7);
         __pyx_t_18 = 0;
         __pyx_t_10 = 127;
         if (unlikely(__pyx_v_chrom == Py_None)) {
           PyErr_Format(PyExc_AttributeError, "'NoneType' object has no attribute '%.30s'", "decode");
-          __PYX_ERR(0, 1005, __pyx_L1_error)
+          __PYX_ERR(0, 996, __pyx_L1_error)
         }
-        __pyx_t_4 = __Pyx_decode_bytes(__pyx_v_chrom, 0, PY_SSIZE_T_MAX, NULL, NULL, NULL); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 1005, __pyx_L1_error)
+        __pyx_t_4 = __Pyx_decode_bytes(__pyx_v_chrom, 0, PY_SSIZE_T_MAX, NULL, NULL, NULL); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 996, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_4);
         __pyx_t_10 = (__Pyx_PyUnicode_MAX_CHAR_VALUE(__pyx_t_4) > __pyx_t_10) ? __Pyx_PyUnicode_MAX_CHAR_VALUE(__pyx_t_4) : __pyx_t_10;
         __pyx_t_18 += __Pyx_PyUnicode_GET_LENGTH(__pyx_t_4);
@@ -16688,7 +16688,7 @@ static PyObject *__pyx_f_5MACS2_2IO_10ScoreTrack_12scoreTrackII_write_bedGraph(s
         __pyx_t_18 += 1;
         __Pyx_GIVEREF(__pyx_kp_u__11);
         PyTuple_SET_ITEM(__pyx_t_7, 1, __pyx_kp_u__11);
-        __pyx_t_4 = __Pyx_PyUnicode_From_int(__pyx_v_pre, 0, ' ', 'd'); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 1005, __pyx_L1_error)
+        __pyx_t_4 = __Pyx_PyUnicode_From_int(__pyx_v_pre, 0, ' ', 'd'); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 996, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_4);
         __pyx_t_18 += __Pyx_PyUnicode_GET_LENGTH(__pyx_t_4);
         __Pyx_GIVEREF(__pyx_t_4);
@@ -16698,7 +16698,7 @@ static PyObject *__pyx_f_5MACS2_2IO_10ScoreTrack_12scoreTrackII_write_bedGraph(s
         __pyx_t_18 += 1;
         __Pyx_GIVEREF(__pyx_kp_u__11);
         PyTuple_SET_ITEM(__pyx_t_7, 3, __pyx_kp_u__11);
-        __pyx_t_4 = __Pyx_PyUnicode_From_int(__pyx_v_p, 0, ' ', 'd'); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 1005, __pyx_L1_error)
+        __pyx_t_4 = __Pyx_PyUnicode_From_int(__pyx_v_p, 0, ' ', 'd'); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 996, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_4);
         __pyx_t_18 += __Pyx_PyUnicode_GET_LENGTH(__pyx_t_4);
         __Pyx_GIVEREF(__pyx_t_4);
@@ -16708,9 +16708,9 @@ static PyObject *__pyx_f_5MACS2_2IO_10ScoreTrack_12scoreTrackII_write_bedGraph(s
         __pyx_t_18 += 1;
         __Pyx_GIVEREF(__pyx_kp_u__11);
         PyTuple_SET_ITEM(__pyx_t_7, 5, __pyx_kp_u__11);
-        __pyx_t_4 = PyFloat_FromDouble(__pyx_v_pre_v); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 1005, __pyx_L1_error)
+        __pyx_t_4 = PyFloat_FromDouble(__pyx_v_pre_v); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 996, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_4);
-        __pyx_t_3 = __Pyx_PyObject_Format(__pyx_t_4, __pyx_kp_u_5f); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 1005, __pyx_L1_error)
+        __pyx_t_3 = __Pyx_PyObject_Format(__pyx_t_4, __pyx_kp_u_5f); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 996, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_3);
         __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
         __pyx_t_10 = (__Pyx_PyUnicode_MAX_CHAR_VALUE(__pyx_t_3) > __pyx_t_10) ? __Pyx_PyUnicode_MAX_CHAR_VALUE(__pyx_t_3) : __pyx_t_10;
@@ -16722,7 +16722,7 @@ static PyObject *__pyx_f_5MACS2_2IO_10ScoreTrack_12scoreTrackII_write_bedGraph(s
         __pyx_t_18 += 1;
         __Pyx_GIVEREF(__pyx_kp_u__12);
         PyTuple_SET_ITEM(__pyx_t_7, 7, __pyx_kp_u__12);
-        __pyx_t_3 = __Pyx_PyUnicode_Join(__pyx_t_7, 8, __pyx_t_18, __pyx_t_10); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 1005, __pyx_L1_error)
+        __pyx_t_3 = __Pyx_PyUnicode_Join(__pyx_t_7, 8, __pyx_t_18, __pyx_t_10); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 996, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_3);
         __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
         __Pyx_INCREF(__pyx_v_write);
@@ -16739,12 +16739,12 @@ static PyObject *__pyx_f_5MACS2_2IO_10ScoreTrack_12scoreTrackII_write_bedGraph(s
         __pyx_t_1 = (__pyx_t_4) ? __Pyx_PyObject_Call2Args(__pyx_t_7, __pyx_t_4, __pyx_t_3) : __Pyx_PyObject_CallOneArg(__pyx_t_7, __pyx_t_3);
         __Pyx_XDECREF(__pyx_t_4); __pyx_t_4 = 0;
         __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-        if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1005, __pyx_L1_error)
+        if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 996, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_1);
         __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
         __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-        /* "MACS2/IO/ScoreTrack.pyx":1006
+        /* "MACS2/IO/ScoreTrack.pyx":997
  *                 if abs(pre_v - v) > 1e-5: # precision is 5 digits
  *                     write( "%s\t%d\t%d\t%.5f\n" % ( chrom.decode(), pre, p, pre_v ) )
  *                     pre_v = v             # <<<<<<<<<<<<<<
@@ -16753,7 +16753,7 @@ static PyObject *__pyx_f_5MACS2_2IO_10ScoreTrack_12scoreTrackII_write_bedGraph(s
  */
         __pyx_v_pre_v = __pyx_v_v;
 
-        /* "MACS2/IO/ScoreTrack.pyx":1007
+        /* "MACS2/IO/ScoreTrack.pyx":998
  *                     write( "%s\t%d\t%d\t%.5f\n" % ( chrom.decode(), pre, p, pre_v ) )
  *                     pre_v = v
  *                     pre = p             # <<<<<<<<<<<<<<
@@ -16762,7 +16762,7 @@ static PyObject *__pyx_f_5MACS2_2IO_10ScoreTrack_12scoreTrackII_write_bedGraph(s
  */
         __pyx_v_pre = __pyx_v_p;
 
-        /* "MACS2/IO/ScoreTrack.pyx":1004
+        /* "MACS2/IO/ScoreTrack.pyx":995
  *                 p = pos[ i-1 ]
  *                 #if ('%.5f' % pre_v) != ('%.5f' % v):
  *                 if abs(pre_v - v) > 1e-5: # precision is 5 digits             # <<<<<<<<<<<<<<
@@ -16772,35 +16772,35 @@ static PyObject *__pyx_f_5MACS2_2IO_10ScoreTrack_12scoreTrackII_write_bedGraph(s
       }
     }
 
-    /* "MACS2/IO/ScoreTrack.pyx":1008
+    /* "MACS2/IO/ScoreTrack.pyx":999
  *                     pre_v = v
  *                     pre = p
  *             p = pos[ -1 ]             # <<<<<<<<<<<<<<
  *             # last one
  *             write( "%s\t%d\t%d\t%.5f\n" % ( chrom.decode(), pre, p, pre_v ) )
  */
-    __pyx_t_1 = __Pyx_GetItemInt(((PyObject *)__pyx_v_pos), -1L, long, 1, __Pyx_PyInt_From_long, 0, 1, 1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1008, __pyx_L1_error)
+    __pyx_t_1 = __Pyx_GetItemInt(((PyObject *)__pyx_v_pos), -1L, long, 1, __Pyx_PyInt_From_long, 0, 1, 1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 999, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
-    __pyx_t_12 = __Pyx_PyInt_As_int(__pyx_t_1); if (unlikely((__pyx_t_12 == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 1008, __pyx_L1_error)
+    __pyx_t_12 = __Pyx_PyInt_As_int(__pyx_t_1); if (unlikely((__pyx_t_12 == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 999, __pyx_L1_error)
     __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
     __pyx_v_p = __pyx_t_12;
 
-    /* "MACS2/IO/ScoreTrack.pyx":1010
+    /* "MACS2/IO/ScoreTrack.pyx":1001
  *             p = pos[ -1 ]
  *             # last one
  *             write( "%s\t%d\t%d\t%.5f\n" % ( chrom.decode(), pre, p, pre_v ) )             # <<<<<<<<<<<<<<
  * 
  *         return True
  */
-    __pyx_t_7 = PyTuple_New(8); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 1010, __pyx_L1_error)
+    __pyx_t_7 = PyTuple_New(8); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 1001, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_7);
     __pyx_t_18 = 0;
     __pyx_t_10 = 127;
     if (unlikely(__pyx_v_chrom == Py_None)) {
       PyErr_Format(PyExc_AttributeError, "'NoneType' object has no attribute '%.30s'", "decode");
-      __PYX_ERR(0, 1010, __pyx_L1_error)
+      __PYX_ERR(0, 1001, __pyx_L1_error)
     }
-    __pyx_t_3 = __Pyx_decode_bytes(__pyx_v_chrom, 0, PY_SSIZE_T_MAX, NULL, NULL, NULL); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 1010, __pyx_L1_error)
+    __pyx_t_3 = __Pyx_decode_bytes(__pyx_v_chrom, 0, PY_SSIZE_T_MAX, NULL, NULL, NULL); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 1001, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_3);
     __pyx_t_10 = (__Pyx_PyUnicode_MAX_CHAR_VALUE(__pyx_t_3) > __pyx_t_10) ? __Pyx_PyUnicode_MAX_CHAR_VALUE(__pyx_t_3) : __pyx_t_10;
     __pyx_t_18 += __Pyx_PyUnicode_GET_LENGTH(__pyx_t_3);
@@ -16811,7 +16811,7 @@ static PyObject *__pyx_f_5MACS2_2IO_10ScoreTrack_12scoreTrackII_write_bedGraph(s
     __pyx_t_18 += 1;
     __Pyx_GIVEREF(__pyx_kp_u__11);
     PyTuple_SET_ITEM(__pyx_t_7, 1, __pyx_kp_u__11);
-    __pyx_t_3 = __Pyx_PyUnicode_From_int(__pyx_v_pre, 0, ' ', 'd'); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 1010, __pyx_L1_error)
+    __pyx_t_3 = __Pyx_PyUnicode_From_int(__pyx_v_pre, 0, ' ', 'd'); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 1001, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_3);
     __pyx_t_18 += __Pyx_PyUnicode_GET_LENGTH(__pyx_t_3);
     __Pyx_GIVEREF(__pyx_t_3);
@@ -16821,7 +16821,7 @@ static PyObject *__pyx_f_5MACS2_2IO_10ScoreTrack_12scoreTrackII_write_bedGraph(s
     __pyx_t_18 += 1;
     __Pyx_GIVEREF(__pyx_kp_u__11);
     PyTuple_SET_ITEM(__pyx_t_7, 3, __pyx_kp_u__11);
-    __pyx_t_3 = __Pyx_PyUnicode_From_int(__pyx_v_p, 0, ' ', 'd'); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 1010, __pyx_L1_error)
+    __pyx_t_3 = __Pyx_PyUnicode_From_int(__pyx_v_p, 0, ' ', 'd'); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 1001, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_3);
     __pyx_t_18 += __Pyx_PyUnicode_GET_LENGTH(__pyx_t_3);
     __Pyx_GIVEREF(__pyx_t_3);
@@ -16831,9 +16831,9 @@ static PyObject *__pyx_f_5MACS2_2IO_10ScoreTrack_12scoreTrackII_write_bedGraph(s
     __pyx_t_18 += 1;
     __Pyx_GIVEREF(__pyx_kp_u__11);
     PyTuple_SET_ITEM(__pyx_t_7, 5, __pyx_kp_u__11);
-    __pyx_t_3 = PyFloat_FromDouble(__pyx_v_pre_v); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 1010, __pyx_L1_error)
+    __pyx_t_3 = PyFloat_FromDouble(__pyx_v_pre_v); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 1001, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_3);
-    __pyx_t_4 = __Pyx_PyObject_Format(__pyx_t_3, __pyx_kp_u_5f); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 1010, __pyx_L1_error)
+    __pyx_t_4 = __Pyx_PyObject_Format(__pyx_t_3, __pyx_kp_u_5f); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 1001, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_4);
     __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
     __pyx_t_10 = (__Pyx_PyUnicode_MAX_CHAR_VALUE(__pyx_t_4) > __pyx_t_10) ? __Pyx_PyUnicode_MAX_CHAR_VALUE(__pyx_t_4) : __pyx_t_10;
@@ -16845,7 +16845,7 @@ static PyObject *__pyx_f_5MACS2_2IO_10ScoreTrack_12scoreTrackII_write_bedGraph(s
     __pyx_t_18 += 1;
     __Pyx_GIVEREF(__pyx_kp_u__12);
     PyTuple_SET_ITEM(__pyx_t_7, 7, __pyx_kp_u__12);
-    __pyx_t_4 = __Pyx_PyUnicode_Join(__pyx_t_7, 8, __pyx_t_18, __pyx_t_10); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 1010, __pyx_L1_error)
+    __pyx_t_4 = __Pyx_PyUnicode_Join(__pyx_t_7, 8, __pyx_t_18, __pyx_t_10); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 1001, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_4);
     __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
     __Pyx_INCREF(__pyx_v_write);
@@ -16862,7 +16862,7 @@ static PyObject *__pyx_f_5MACS2_2IO_10ScoreTrack_12scoreTrackII_write_bedGraph(s
     __pyx_t_1 = (__pyx_t_3) ? __Pyx_PyObject_Call2Args(__pyx_t_7, __pyx_t_3, __pyx_t_4) : __Pyx_PyObject_CallOneArg(__pyx_t_7, __pyx_t_4);
     __Pyx_XDECREF(__pyx_t_3); __pyx_t_3 = 0;
     __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-    if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1010, __pyx_L1_error)
+    if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1001, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
     __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
     __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
@@ -16870,7 +16870,7 @@ static PyObject *__pyx_f_5MACS2_2IO_10ScoreTrack_12scoreTrackII_write_bedGraph(s
   }
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
-  /* "MACS2/IO/ScoreTrack.pyx":1012
+  /* "MACS2/IO/ScoreTrack.pyx":1003
  *             write( "%s\t%d\t%d\t%.5f\n" % ( chrom.decode(), pre, p, pre_v ) )
  * 
  *         return True             # <<<<<<<<<<<<<<
@@ -16882,7 +16882,7 @@ static PyObject *__pyx_f_5MACS2_2IO_10ScoreTrack_12scoreTrackII_write_bedGraph(s
   __pyx_r = Py_True;
   goto __pyx_L0;
 
-  /* "MACS2/IO/ScoreTrack.pyx":967
+  /* "MACS2/IO/ScoreTrack.pyx":958
  *         return
  * 
  *     cpdef write_bedGraph ( self, fhd, str name, str description, short column = 3):             # <<<<<<<<<<<<<<
@@ -16950,13 +16950,13 @@ static PyObject *__pyx_pw_5MACS2_2IO_10ScoreTrack_12scoreTrackII_23write_bedGrap
         case  1:
         if (likely((values[1] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_name)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("write_bedGraph", 0, 3, 4, 1); __PYX_ERR(0, 967, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("write_bedGraph", 0, 3, 4, 1); __PYX_ERR(0, 958, __pyx_L3_error)
         }
         CYTHON_FALLTHROUGH;
         case  2:
         if (likely((values[2] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_description)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("write_bedGraph", 0, 3, 4, 2); __PYX_ERR(0, 967, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("write_bedGraph", 0, 3, 4, 2); __PYX_ERR(0, 958, __pyx_L3_error)
         }
         CYTHON_FALLTHROUGH;
         case  3:
@@ -16966,7 +16966,7 @@ static PyObject *__pyx_pw_5MACS2_2IO_10ScoreTrack_12scoreTrackII_23write_bedGrap
         }
       }
       if (unlikely(kw_args > 0)) {
-        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "write_bedGraph") < 0)) __PYX_ERR(0, 967, __pyx_L3_error)
+        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "write_bedGraph") < 0)) __PYX_ERR(0, 958, __pyx_L3_error)
       }
     } else {
       switch (PyTuple_GET_SIZE(__pyx_args)) {
@@ -16983,21 +16983,21 @@ static PyObject *__pyx_pw_5MACS2_2IO_10ScoreTrack_12scoreTrackII_23write_bedGrap
     __pyx_v_name = ((PyObject*)values[1]);
     __pyx_v_description = ((PyObject*)values[2]);
     if (values[3]) {
-      __pyx_v_column = __Pyx_PyInt_As_short(values[3]); if (unlikely((__pyx_v_column == (short)-1) && PyErr_Occurred())) __PYX_ERR(0, 967, __pyx_L3_error)
+      __pyx_v_column = __Pyx_PyInt_As_short(values[3]); if (unlikely((__pyx_v_column == (short)-1) && PyErr_Occurred())) __PYX_ERR(0, 958, __pyx_L3_error)
     } else {
       __pyx_v_column = ((short)3);
     }
   }
   goto __pyx_L4_argument_unpacking_done;
   __pyx_L5_argtuple_error:;
-  __Pyx_RaiseArgtupleInvalid("write_bedGraph", 0, 3, 4, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 967, __pyx_L3_error)
+  __Pyx_RaiseArgtupleInvalid("write_bedGraph", 0, 3, 4, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 958, __pyx_L3_error)
   __pyx_L3_error:;
   __Pyx_AddTraceback("MACS2.IO.ScoreTrack.scoreTrackII.write_bedGraph", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __Pyx_RefNannyFinishContext();
   return NULL;
   __pyx_L4_argument_unpacking_done:;
-  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_name), (&PyUnicode_Type), 1, "name", 1))) __PYX_ERR(0, 967, __pyx_L1_error)
-  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_description), (&PyUnicode_Type), 1, "description", 1))) __PYX_ERR(0, 967, __pyx_L1_error)
+  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_name), (&PyUnicode_Type), 1, "name", 1))) __PYX_ERR(0, 958, __pyx_L1_error)
+  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_description), (&PyUnicode_Type), 1, "description", 1))) __PYX_ERR(0, 958, __pyx_L1_error)
   __pyx_r = __pyx_pf_5MACS2_2IO_10ScoreTrack_12scoreTrackII_22write_bedGraph(((struct __pyx_obj_5MACS2_2IO_10ScoreTrack_scoreTrackII *)__pyx_v_self), __pyx_v_fhd, __pyx_v_name, __pyx_v_description, __pyx_v_column);
 
   /* function exit code */
@@ -17016,11 +17016,11 @@ static PyObject *__pyx_pf_5MACS2_2IO_10ScoreTrack_12scoreTrackII_22write_bedGrap
   PyObject *__pyx_t_1 = NULL;
   struct __pyx_opt_args_5MACS2_2IO_10ScoreTrack_12scoreTrackII_write_bedGraph __pyx_t_2;
   __Pyx_RefNannySetupContext("write_bedGraph", 0);
-  __Pyx_TraceCall("write_bedGraph (wrapper)", __pyx_f[0], 967, 0, __PYX_ERR(0, 967, __pyx_L1_error));
+  __Pyx_TraceCall("write_bedGraph (wrapper)", __pyx_f[0], 958, 0, __PYX_ERR(0, 958, __pyx_L1_error));
   __Pyx_XDECREF(__pyx_r);
   __pyx_t_2.__pyx_n = 1;
   __pyx_t_2.column = __pyx_v_column;
-  __pyx_t_1 = __pyx_vtabptr_5MACS2_2IO_10ScoreTrack_scoreTrackII->write_bedGraph(__pyx_v_self, __pyx_v_fhd, __pyx_v_name, __pyx_v_description, 1, &__pyx_t_2); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 967, __pyx_L1_error)
+  __pyx_t_1 = __pyx_vtabptr_5MACS2_2IO_10ScoreTrack_scoreTrackII->write_bedGraph(__pyx_v_self, __pyx_v_fhd, __pyx_v_name, __pyx_v_description, 1, &__pyx_t_2); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 958, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __pyx_r = __pyx_t_1;
   __pyx_t_1 = 0;
@@ -17038,7 +17038,7 @@ static PyObject *__pyx_pf_5MACS2_2IO_10ScoreTrack_12scoreTrackII_22write_bedGrap
   return __pyx_r;
 }
 
-/* "MACS2/IO/ScoreTrack.pyx":1073
+/* "MACS2/IO/ScoreTrack.pyx":1064
  *     #     return ret_peaks
  * 
  *     cpdef call_peaks (self, float cutoff=5.0, int min_length=200, int max_gap=50, bool call_summits=False):             # <<<<<<<<<<<<<<
@@ -17088,7 +17088,7 @@ static PyObject *__pyx_f_5MACS2_2IO_10ScoreTrack_12scoreTrackII_call_peaks(struc
   struct __pyx_opt_args_5MACS2_2IO_10ScoreTrack_12scoreTrackII___close_peak __pyx_t_17;
   int __pyx_t_18;
   __Pyx_RefNannySetupContext("call_peaks", 0);
-  __Pyx_TraceCall("call_peaks", __pyx_f[0], 1073, 0, __PYX_ERR(0, 1073, __pyx_L1_error));
+  __Pyx_TraceCall("call_peaks", __pyx_f[0], 1064, 0, __PYX_ERR(0, 1064, __pyx_L1_error));
   if (__pyx_optional_args) {
     if (__pyx_optional_args->__pyx_n > 0) {
       __pyx_v_cutoff = __pyx_optional_args->cutoff;
@@ -17112,15 +17112,15 @@ static PyObject *__pyx_f_5MACS2_2IO_10ScoreTrack_12scoreTrackII_call_peaks(struc
     if (unlikely(!__Pyx_object_dict_version_matches(((PyObject *)__pyx_v_self), __pyx_tp_dict_version, __pyx_obj_dict_version))) {
       PY_UINT64_T __pyx_type_dict_guard = __Pyx_get_tp_dict_version(((PyObject *)__pyx_v_self));
       #endif
-      __pyx_t_1 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_v_self), __pyx_n_s_call_peaks); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1073, __pyx_L1_error)
+      __pyx_t_1 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_v_self), __pyx_n_s_call_peaks); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1064, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_1);
       if (!PyCFunction_Check(__pyx_t_1) || (PyCFunction_GET_FUNCTION(__pyx_t_1) != (PyCFunction)(void*)__pyx_pw_5MACS2_2IO_10ScoreTrack_12scoreTrackII_25call_peaks)) {
         __Pyx_XDECREF(__pyx_r);
-        __pyx_t_3 = PyFloat_FromDouble(__pyx_v_cutoff); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 1073, __pyx_L1_error)
+        __pyx_t_3 = PyFloat_FromDouble(__pyx_v_cutoff); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 1064, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_3);
-        __pyx_t_4 = __Pyx_PyInt_From_int(__pyx_v_min_length); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 1073, __pyx_L1_error)
+        __pyx_t_4 = __Pyx_PyInt_From_int(__pyx_v_min_length); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 1064, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_4);
-        __pyx_t_5 = __Pyx_PyInt_From_int(__pyx_v_max_gap); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 1073, __pyx_L1_error)
+        __pyx_t_5 = __Pyx_PyInt_From_int(__pyx_v_max_gap); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 1064, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_5);
         __Pyx_INCREF(__pyx_t_1);
         __pyx_t_6 = __pyx_t_1; __pyx_t_7 = NULL;
@@ -17138,7 +17138,7 @@ static PyObject *__pyx_f_5MACS2_2IO_10ScoreTrack_12scoreTrackII_call_peaks(struc
         #if CYTHON_FAST_PYCALL
         if (PyFunction_Check(__pyx_t_6)) {
           PyObject *__pyx_temp[5] = {__pyx_t_7, __pyx_t_3, __pyx_t_4, __pyx_t_5, ((PyObject *)__pyx_v_call_summits)};
-          __pyx_t_2 = __Pyx_PyFunction_FastCall(__pyx_t_6, __pyx_temp+1-__pyx_t_8, 4+__pyx_t_8); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1073, __pyx_L1_error)
+          __pyx_t_2 = __Pyx_PyFunction_FastCall(__pyx_t_6, __pyx_temp+1-__pyx_t_8, 4+__pyx_t_8); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1064, __pyx_L1_error)
           __Pyx_XDECREF(__pyx_t_7); __pyx_t_7 = 0;
           __Pyx_GOTREF(__pyx_t_2);
           __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
@@ -17149,7 +17149,7 @@ static PyObject *__pyx_f_5MACS2_2IO_10ScoreTrack_12scoreTrackII_call_peaks(struc
         #if CYTHON_FAST_PYCCALL
         if (__Pyx_PyFastCFunction_Check(__pyx_t_6)) {
           PyObject *__pyx_temp[5] = {__pyx_t_7, __pyx_t_3, __pyx_t_4, __pyx_t_5, ((PyObject *)__pyx_v_call_summits)};
-          __pyx_t_2 = __Pyx_PyCFunction_FastCall(__pyx_t_6, __pyx_temp+1-__pyx_t_8, 4+__pyx_t_8); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1073, __pyx_L1_error)
+          __pyx_t_2 = __Pyx_PyCFunction_FastCall(__pyx_t_6, __pyx_temp+1-__pyx_t_8, 4+__pyx_t_8); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1064, __pyx_L1_error)
           __Pyx_XDECREF(__pyx_t_7); __pyx_t_7 = 0;
           __Pyx_GOTREF(__pyx_t_2);
           __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
@@ -17158,7 +17158,7 @@ static PyObject *__pyx_f_5MACS2_2IO_10ScoreTrack_12scoreTrackII_call_peaks(struc
         } else
         #endif
         {
-          __pyx_t_9 = PyTuple_New(4+__pyx_t_8); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 1073, __pyx_L1_error)
+          __pyx_t_9 = PyTuple_New(4+__pyx_t_8); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 1064, __pyx_L1_error)
           __Pyx_GOTREF(__pyx_t_9);
           if (__pyx_t_7) {
             __Pyx_GIVEREF(__pyx_t_7); PyTuple_SET_ITEM(__pyx_t_9, 0, __pyx_t_7); __pyx_t_7 = NULL;
@@ -17175,7 +17175,7 @@ static PyObject *__pyx_f_5MACS2_2IO_10ScoreTrack_12scoreTrackII_call_peaks(struc
           __pyx_t_3 = 0;
           __pyx_t_4 = 0;
           __pyx_t_5 = 0;
-          __pyx_t_2 = __Pyx_PyObject_Call(__pyx_t_6, __pyx_t_9, NULL); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1073, __pyx_L1_error)
+          __pyx_t_2 = __Pyx_PyObject_Call(__pyx_t_6, __pyx_t_9, NULL); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1064, __pyx_L1_error)
           __Pyx_GOTREF(__pyx_t_2);
           __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
         }
@@ -17198,26 +17198,26 @@ static PyObject *__pyx_f_5MACS2_2IO_10ScoreTrack_12scoreTrackII_call_peaks(struc
     #endif
   }
 
-  /* "MACS2/IO/ScoreTrack.pyx":1094
+  /* "MACS2/IO/ScoreTrack.pyx":1085
  *             list peak_content
  * 
  *         chrs  = self.get_chr_names()             # <<<<<<<<<<<<<<
  *         peaks = PeakIO()                      # dictionary to save peaks
  * 
  */
-  __pyx_t_1 = ((struct __pyx_vtabstruct_5MACS2_2IO_10ScoreTrack_scoreTrackII *)__pyx_v_self->__pyx_vtab)->get_chr_names(__pyx_v_self, 0); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1094, __pyx_L1_error)
+  __pyx_t_1 = ((struct __pyx_vtabstruct_5MACS2_2IO_10ScoreTrack_scoreTrackII *)__pyx_v_self->__pyx_vtab)->get_chr_names(__pyx_v_self, 0); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1085, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __pyx_v_chrs = __pyx_t_1;
   __pyx_t_1 = 0;
 
-  /* "MACS2/IO/ScoreTrack.pyx":1095
+  /* "MACS2/IO/ScoreTrack.pyx":1086
  * 
  *         chrs  = self.get_chr_names()
  *         peaks = PeakIO()                      # dictionary to save peaks             # <<<<<<<<<<<<<<
  * 
  *         self.cutoff = cutoff
  */
-  __Pyx_GetModuleGlobalName(__pyx_t_2, __pyx_n_s_PeakIO); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1095, __pyx_L1_error)
+  __Pyx_GetModuleGlobalName(__pyx_t_2, __pyx_n_s_PeakIO); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1086, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __pyx_t_6 = NULL;
   if (CYTHON_UNPACK_METHODS && unlikely(PyMethod_Check(__pyx_t_2))) {
@@ -17231,13 +17231,13 @@ static PyObject *__pyx_f_5MACS2_2IO_10ScoreTrack_12scoreTrackII_call_peaks(struc
   }
   __pyx_t_1 = (__pyx_t_6) ? __Pyx_PyObject_CallOneArg(__pyx_t_2, __pyx_t_6) : __Pyx_PyObject_CallNoArg(__pyx_t_2);
   __Pyx_XDECREF(__pyx_t_6); __pyx_t_6 = 0;
-  if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1095, __pyx_L1_error)
+  if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1086, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
   __pyx_v_peaks = __pyx_t_1;
   __pyx_t_1 = 0;
 
-  /* "MACS2/IO/ScoreTrack.pyx":1097
+  /* "MACS2/IO/ScoreTrack.pyx":1088
  *         peaks = PeakIO()                      # dictionary to save peaks
  * 
  *         self.cutoff = cutoff             # <<<<<<<<<<<<<<
@@ -17246,7 +17246,7 @@ static PyObject *__pyx_f_5MACS2_2IO_10ScoreTrack_12scoreTrackII_call_peaks(struc
  */
   __pyx_v_self->cutoff = __pyx_v_cutoff;
 
-  /* "MACS2/IO/ScoreTrack.pyx":1098
+  /* "MACS2/IO/ScoreTrack.pyx":1089
  * 
  *         self.cutoff = cutoff
  *         for chrom in chrs:             # <<<<<<<<<<<<<<
@@ -17257,26 +17257,26 @@ static PyObject *__pyx_f_5MACS2_2IO_10ScoreTrack_12scoreTrackII_call_peaks(struc
     __pyx_t_1 = __pyx_v_chrs; __Pyx_INCREF(__pyx_t_1); __pyx_t_10 = 0;
     __pyx_t_11 = NULL;
   } else {
-    __pyx_t_10 = -1; __pyx_t_1 = PyObject_GetIter(__pyx_v_chrs); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1098, __pyx_L1_error)
+    __pyx_t_10 = -1; __pyx_t_1 = PyObject_GetIter(__pyx_v_chrs); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1089, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
-    __pyx_t_11 = Py_TYPE(__pyx_t_1)->tp_iternext; if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 1098, __pyx_L1_error)
+    __pyx_t_11 = Py_TYPE(__pyx_t_1)->tp_iternext; if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 1089, __pyx_L1_error)
   }
   for (;;) {
     if (likely(!__pyx_t_11)) {
       if (likely(PyList_CheckExact(__pyx_t_1))) {
         if (__pyx_t_10 >= PyList_GET_SIZE(__pyx_t_1)) break;
         #if CYTHON_ASSUME_SAFE_MACROS && !CYTHON_AVOID_BORROWED_REFS
-        __pyx_t_2 = PyList_GET_ITEM(__pyx_t_1, __pyx_t_10); __Pyx_INCREF(__pyx_t_2); __pyx_t_10++; if (unlikely(0 < 0)) __PYX_ERR(0, 1098, __pyx_L1_error)
+        __pyx_t_2 = PyList_GET_ITEM(__pyx_t_1, __pyx_t_10); __Pyx_INCREF(__pyx_t_2); __pyx_t_10++; if (unlikely(0 < 0)) __PYX_ERR(0, 1089, __pyx_L1_error)
         #else
-        __pyx_t_2 = PySequence_ITEM(__pyx_t_1, __pyx_t_10); __pyx_t_10++; if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1098, __pyx_L1_error)
+        __pyx_t_2 = PySequence_ITEM(__pyx_t_1, __pyx_t_10); __pyx_t_10++; if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1089, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_2);
         #endif
       } else {
         if (__pyx_t_10 >= PyTuple_GET_SIZE(__pyx_t_1)) break;
         #if CYTHON_ASSUME_SAFE_MACROS && !CYTHON_AVOID_BORROWED_REFS
-        __pyx_t_2 = PyTuple_GET_ITEM(__pyx_t_1, __pyx_t_10); __Pyx_INCREF(__pyx_t_2); __pyx_t_10++; if (unlikely(0 < 0)) __PYX_ERR(0, 1098, __pyx_L1_error)
+        __pyx_t_2 = PyTuple_GET_ITEM(__pyx_t_1, __pyx_t_10); __Pyx_INCREF(__pyx_t_2); __pyx_t_10++; if (unlikely(0 < 0)) __PYX_ERR(0, 1089, __pyx_L1_error)
         #else
-        __pyx_t_2 = PySequence_ITEM(__pyx_t_1, __pyx_t_10); __pyx_t_10++; if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1098, __pyx_L1_error)
+        __pyx_t_2 = PySequence_ITEM(__pyx_t_1, __pyx_t_10); __pyx_t_10++; if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1089, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_2);
         #endif
       }
@@ -17286,29 +17286,29 @@ static PyObject *__pyx_f_5MACS2_2IO_10ScoreTrack_12scoreTrackII_call_peaks(struc
         PyObject* exc_type = PyErr_Occurred();
         if (exc_type) {
           if (likely(__Pyx_PyErr_GivenExceptionMatches(exc_type, PyExc_StopIteration))) PyErr_Clear();
-          else __PYX_ERR(0, 1098, __pyx_L1_error)
+          else __PYX_ERR(0, 1089, __pyx_L1_error)
         }
         break;
       }
       __Pyx_GOTREF(__pyx_t_2);
     }
-    if (!(likely(PyBytes_CheckExact(__pyx_t_2))||((__pyx_t_2) == Py_None)||(PyErr_Format(PyExc_TypeError, "Expected %.16s, got %.200s", "bytes", Py_TYPE(__pyx_t_2)->tp_name), 0))) __PYX_ERR(0, 1098, __pyx_L1_error)
+    if (!(likely(PyBytes_CheckExact(__pyx_t_2))||((__pyx_t_2) == Py_None)||(PyErr_Format(PyExc_TypeError, "Expected %.16s, got %.200s", "bytes", Py_TYPE(__pyx_t_2)->tp_name), 0))) __PYX_ERR(0, 1089, __pyx_L1_error)
     __Pyx_XDECREF_SET(__pyx_v_chrom, ((PyObject*)__pyx_t_2));
     __pyx_t_2 = 0;
 
-    /* "MACS2/IO/ScoreTrack.pyx":1099
+    /* "MACS2/IO/ScoreTrack.pyx":1090
  *         self.cutoff = cutoff
  *         for chrom in chrs:
  *             peak_content = []           # to store points above cutoff             # <<<<<<<<<<<<<<
  * 
  *             pos = self.data[chrom][ 0 ]
  */
-    __pyx_t_2 = PyList_New(0); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1099, __pyx_L1_error)
+    __pyx_t_2 = PyList_New(0); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1090, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
     __Pyx_XDECREF_SET(__pyx_v_peak_content, ((PyObject*)__pyx_t_2));
     __pyx_t_2 = 0;
 
-    /* "MACS2/IO/ScoreTrack.pyx":1101
+    /* "MACS2/IO/ScoreTrack.pyx":1092
  *             peak_content = []           # to store points above cutoff
  * 
  *             pos = self.data[chrom][ 0 ]             # <<<<<<<<<<<<<<
@@ -17317,18 +17317,18 @@ static PyObject *__pyx_f_5MACS2_2IO_10ScoreTrack_12scoreTrackII_call_peaks(struc
  */
     if (unlikely(__pyx_v_self->data == Py_None)) {
       PyErr_SetString(PyExc_TypeError, "'NoneType' object is not subscriptable");
-      __PYX_ERR(0, 1101, __pyx_L1_error)
+      __PYX_ERR(0, 1092, __pyx_L1_error)
     }
-    __pyx_t_2 = __Pyx_PyDict_GetItem(__pyx_v_self->data, __pyx_v_chrom); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1101, __pyx_L1_error)
+    __pyx_t_2 = __Pyx_PyDict_GetItem(__pyx_v_self->data, __pyx_v_chrom); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1092, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
-    __pyx_t_6 = __Pyx_GetItemInt(__pyx_t_2, 0, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 1101, __pyx_L1_error)
+    __pyx_t_6 = __Pyx_GetItemInt(__pyx_t_2, 0, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 1092, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_6);
     __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-    if (!(likely(((__pyx_t_6) == Py_None) || likely(__Pyx_TypeTest(__pyx_t_6, __pyx_ptype_5numpy_ndarray))))) __PYX_ERR(0, 1101, __pyx_L1_error)
+    if (!(likely(((__pyx_t_6) == Py_None) || likely(__Pyx_TypeTest(__pyx_t_6, __pyx_ptype_5numpy_ndarray))))) __PYX_ERR(0, 1092, __pyx_L1_error)
     __Pyx_XDECREF_SET(__pyx_v_pos, ((PyArrayObject *)__pyx_t_6));
     __pyx_t_6 = 0;
 
-    /* "MACS2/IO/ScoreTrack.pyx":1102
+    /* "MACS2/IO/ScoreTrack.pyx":1093
  * 
  *             pos = self.data[chrom][ 0 ]
  *             sample = self.data[chrom][ 1 ]             # <<<<<<<<<<<<<<
@@ -17337,18 +17337,18 @@ static PyObject *__pyx_f_5MACS2_2IO_10ScoreTrack_12scoreTrackII_call_peaks(struc
  */
     if (unlikely(__pyx_v_self->data == Py_None)) {
       PyErr_SetString(PyExc_TypeError, "'NoneType' object is not subscriptable");
-      __PYX_ERR(0, 1102, __pyx_L1_error)
+      __PYX_ERR(0, 1093, __pyx_L1_error)
     }
-    __pyx_t_6 = __Pyx_PyDict_GetItem(__pyx_v_self->data, __pyx_v_chrom); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 1102, __pyx_L1_error)
+    __pyx_t_6 = __Pyx_PyDict_GetItem(__pyx_v_self->data, __pyx_v_chrom); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 1093, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_6);
-    __pyx_t_2 = __Pyx_GetItemInt(__pyx_t_6, 1, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1102, __pyx_L1_error)
+    __pyx_t_2 = __Pyx_GetItemInt(__pyx_t_6, 1, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1093, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
     __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
-    if (!(likely(((__pyx_t_2) == Py_None) || likely(__Pyx_TypeTest(__pyx_t_2, __pyx_ptype_5numpy_ndarray))))) __PYX_ERR(0, 1102, __pyx_L1_error)
+    if (!(likely(((__pyx_t_2) == Py_None) || likely(__Pyx_TypeTest(__pyx_t_2, __pyx_ptype_5numpy_ndarray))))) __PYX_ERR(0, 1093, __pyx_L1_error)
     __Pyx_XDECREF_SET(__pyx_v_sample, ((PyArrayObject *)__pyx_t_2));
     __pyx_t_2 = 0;
 
-    /* "MACS2/IO/ScoreTrack.pyx":1103
+    /* "MACS2/IO/ScoreTrack.pyx":1094
  *             pos = self.data[chrom][ 0 ]
  *             sample = self.data[chrom][ 1 ]
  *             control = self.data[chrom][ 2 ]             # <<<<<<<<<<<<<<
@@ -17357,18 +17357,18 @@ static PyObject *__pyx_f_5MACS2_2IO_10ScoreTrack_12scoreTrackII_call_peaks(struc
  */
     if (unlikely(__pyx_v_self->data == Py_None)) {
       PyErr_SetString(PyExc_TypeError, "'NoneType' object is not subscriptable");
-      __PYX_ERR(0, 1103, __pyx_L1_error)
+      __PYX_ERR(0, 1094, __pyx_L1_error)
     }
-    __pyx_t_2 = __Pyx_PyDict_GetItem(__pyx_v_self->data, __pyx_v_chrom); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1103, __pyx_L1_error)
+    __pyx_t_2 = __Pyx_PyDict_GetItem(__pyx_v_self->data, __pyx_v_chrom); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1094, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
-    __pyx_t_6 = __Pyx_GetItemInt(__pyx_t_2, 2, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 1103, __pyx_L1_error)
+    __pyx_t_6 = __Pyx_GetItemInt(__pyx_t_2, 2, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 1094, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_6);
     __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-    if (!(likely(((__pyx_t_6) == Py_None) || likely(__Pyx_TypeTest(__pyx_t_6, __pyx_ptype_5numpy_ndarray))))) __PYX_ERR(0, 1103, __pyx_L1_error)
+    if (!(likely(((__pyx_t_6) == Py_None) || likely(__Pyx_TypeTest(__pyx_t_6, __pyx_ptype_5numpy_ndarray))))) __PYX_ERR(0, 1094, __pyx_L1_error)
     __Pyx_XDECREF_SET(__pyx_v_control, ((PyArrayObject *)__pyx_t_6));
     __pyx_t_6 = 0;
 
-    /* "MACS2/IO/ScoreTrack.pyx":1104
+    /* "MACS2/IO/ScoreTrack.pyx":1095
  *             sample = self.data[chrom][ 1 ]
  *             control = self.data[chrom][ 2 ]
  *             value = self.data[chrom][ 3 ]             # <<<<<<<<<<<<<<
@@ -17377,32 +17377,32 @@ static PyObject *__pyx_f_5MACS2_2IO_10ScoreTrack_12scoreTrackII_call_peaks(struc
  */
     if (unlikely(__pyx_v_self->data == Py_None)) {
       PyErr_SetString(PyExc_TypeError, "'NoneType' object is not subscriptable");
-      __PYX_ERR(0, 1104, __pyx_L1_error)
+      __PYX_ERR(0, 1095, __pyx_L1_error)
     }
-    __pyx_t_6 = __Pyx_PyDict_GetItem(__pyx_v_self->data, __pyx_v_chrom); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 1104, __pyx_L1_error)
+    __pyx_t_6 = __Pyx_PyDict_GetItem(__pyx_v_self->data, __pyx_v_chrom); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 1095, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_6);
-    __pyx_t_2 = __Pyx_GetItemInt(__pyx_t_6, 3, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1104, __pyx_L1_error)
+    __pyx_t_2 = __Pyx_GetItemInt(__pyx_t_6, 3, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1095, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
     __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
-    if (!(likely(((__pyx_t_2) == Py_None) || likely(__Pyx_TypeTest(__pyx_t_2, __pyx_ptype_5numpy_ndarray))))) __PYX_ERR(0, 1104, __pyx_L1_error)
+    if (!(likely(((__pyx_t_2) == Py_None) || likely(__Pyx_TypeTest(__pyx_t_2, __pyx_ptype_5numpy_ndarray))))) __PYX_ERR(0, 1095, __pyx_L1_error)
     __Pyx_XDECREF_SET(__pyx_v_value, ((PyArrayObject *)__pyx_t_2));
     __pyx_t_2 = 0;
 
-    /* "MACS2/IO/ScoreTrack.pyx":1106
+    /* "MACS2/IO/ScoreTrack.pyx":1097
  *             value = self.data[chrom][ 3 ]
  * 
  *             above_cutoff = np.nonzero( value >= cutoff )[0] # indices where score is above cutoff             # <<<<<<<<<<<<<<
  *             above_cutoff_v = value[above_cutoff] # scores where score is above cutoff
  * 
  */
-    __Pyx_GetModuleGlobalName(__pyx_t_6, __pyx_n_s_np); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 1106, __pyx_L1_error)
+    __Pyx_GetModuleGlobalName(__pyx_t_6, __pyx_n_s_np); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 1097, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_6);
-    __pyx_t_9 = __Pyx_PyObject_GetAttrStr(__pyx_t_6, __pyx_n_s_nonzero); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 1106, __pyx_L1_error)
+    __pyx_t_9 = __Pyx_PyObject_GetAttrStr(__pyx_t_6, __pyx_n_s_nonzero); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 1097, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_9);
     __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
-    __pyx_t_6 = PyFloat_FromDouble(__pyx_v_cutoff); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 1106, __pyx_L1_error)
+    __pyx_t_6 = PyFloat_FromDouble(__pyx_v_cutoff); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 1097, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_6);
-    __pyx_t_5 = PyObject_RichCompare(((PyObject *)__pyx_v_value), __pyx_t_6, Py_GE); __Pyx_XGOTREF(__pyx_t_5); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 1106, __pyx_L1_error)
+    __pyx_t_5 = PyObject_RichCompare(((PyObject *)__pyx_v_value), __pyx_t_6, Py_GE); __Pyx_XGOTREF(__pyx_t_5); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 1097, __pyx_L1_error)
     __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
     __pyx_t_6 = NULL;
     if (CYTHON_UNPACK_METHODS && unlikely(PyMethod_Check(__pyx_t_9))) {
@@ -17417,88 +17417,88 @@ static PyObject *__pyx_f_5MACS2_2IO_10ScoreTrack_12scoreTrackII_call_peaks(struc
     __pyx_t_2 = (__pyx_t_6) ? __Pyx_PyObject_Call2Args(__pyx_t_9, __pyx_t_6, __pyx_t_5) : __Pyx_PyObject_CallOneArg(__pyx_t_9, __pyx_t_5);
     __Pyx_XDECREF(__pyx_t_6); __pyx_t_6 = 0;
     __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
-    if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1106, __pyx_L1_error)
+    if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1097, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
     __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
-    __pyx_t_9 = __Pyx_GetItemInt(__pyx_t_2, 0, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 1106, __pyx_L1_error)
+    __pyx_t_9 = __Pyx_GetItemInt(__pyx_t_2, 0, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 1097, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_9);
     __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-    if (!(likely(((__pyx_t_9) == Py_None) || likely(__Pyx_TypeTest(__pyx_t_9, __pyx_ptype_5numpy_ndarray))))) __PYX_ERR(0, 1106, __pyx_L1_error)
+    if (!(likely(((__pyx_t_9) == Py_None) || likely(__Pyx_TypeTest(__pyx_t_9, __pyx_ptype_5numpy_ndarray))))) __PYX_ERR(0, 1097, __pyx_L1_error)
     __Pyx_XDECREF_SET(__pyx_v_above_cutoff, ((PyArrayObject *)__pyx_t_9));
     __pyx_t_9 = 0;
 
-    /* "MACS2/IO/ScoreTrack.pyx":1107
+    /* "MACS2/IO/ScoreTrack.pyx":1098
  * 
  *             above_cutoff = np.nonzero( value >= cutoff )[0] # indices where score is above cutoff
  *             above_cutoff_v = value[above_cutoff] # scores where score is above cutoff             # <<<<<<<<<<<<<<
  * 
  *             above_cutoff_endpos = pos[above_cutoff] # end positions of regions where score is above cutoff
  */
-    __pyx_t_9 = __Pyx_PyObject_GetItem(((PyObject *)__pyx_v_value), ((PyObject *)__pyx_v_above_cutoff)); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 1107, __pyx_L1_error)
+    __pyx_t_9 = __Pyx_PyObject_GetItem(((PyObject *)__pyx_v_value), ((PyObject *)__pyx_v_above_cutoff)); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 1098, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_9);
-    if (!(likely(((__pyx_t_9) == Py_None) || likely(__Pyx_TypeTest(__pyx_t_9, __pyx_ptype_5numpy_ndarray))))) __PYX_ERR(0, 1107, __pyx_L1_error)
+    if (!(likely(((__pyx_t_9) == Py_None) || likely(__Pyx_TypeTest(__pyx_t_9, __pyx_ptype_5numpy_ndarray))))) __PYX_ERR(0, 1098, __pyx_L1_error)
     __Pyx_XDECREF_SET(__pyx_v_above_cutoff_v, ((PyArrayObject *)__pyx_t_9));
     __pyx_t_9 = 0;
 
-    /* "MACS2/IO/ScoreTrack.pyx":1109
+    /* "MACS2/IO/ScoreTrack.pyx":1100
  *             above_cutoff_v = value[above_cutoff] # scores where score is above cutoff
  * 
  *             above_cutoff_endpos = pos[above_cutoff] # end positions of regions where score is above cutoff             # <<<<<<<<<<<<<<
  *             above_cutoff_startpos = pos[above_cutoff-1] # start positions of regions where score is above cutoff
  *             above_cutoff_sv= sample[above_cutoff] # sample pileup height where score is above cutoff
  */
-    __pyx_t_9 = __Pyx_PyObject_GetItem(((PyObject *)__pyx_v_pos), ((PyObject *)__pyx_v_above_cutoff)); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 1109, __pyx_L1_error)
+    __pyx_t_9 = __Pyx_PyObject_GetItem(((PyObject *)__pyx_v_pos), ((PyObject *)__pyx_v_above_cutoff)); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 1100, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_9);
-    if (!(likely(((__pyx_t_9) == Py_None) || likely(__Pyx_TypeTest(__pyx_t_9, __pyx_ptype_5numpy_ndarray))))) __PYX_ERR(0, 1109, __pyx_L1_error)
+    if (!(likely(((__pyx_t_9) == Py_None) || likely(__Pyx_TypeTest(__pyx_t_9, __pyx_ptype_5numpy_ndarray))))) __PYX_ERR(0, 1100, __pyx_L1_error)
     __Pyx_XDECREF_SET(__pyx_v_above_cutoff_endpos, ((PyArrayObject *)__pyx_t_9));
     __pyx_t_9 = 0;
 
-    /* "MACS2/IO/ScoreTrack.pyx":1110
+    /* "MACS2/IO/ScoreTrack.pyx":1101
  * 
  *             above_cutoff_endpos = pos[above_cutoff] # end positions of regions where score is above cutoff
  *             above_cutoff_startpos = pos[above_cutoff-1] # start positions of regions where score is above cutoff             # <<<<<<<<<<<<<<
  *             above_cutoff_sv= sample[above_cutoff] # sample pileup height where score is above cutoff
  * 
  */
-    __pyx_t_9 = PyNumber_Subtract(((PyObject *)__pyx_v_above_cutoff), __pyx_int_1); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 1110, __pyx_L1_error)
+    __pyx_t_9 = PyNumber_Subtract(((PyObject *)__pyx_v_above_cutoff), __pyx_int_1); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 1101, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_9);
-    __pyx_t_2 = __Pyx_PyObject_GetItem(((PyObject *)__pyx_v_pos), __pyx_t_9); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1110, __pyx_L1_error)
+    __pyx_t_2 = __Pyx_PyObject_GetItem(((PyObject *)__pyx_v_pos), __pyx_t_9); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1101, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
     __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
-    if (!(likely(((__pyx_t_2) == Py_None) || likely(__Pyx_TypeTest(__pyx_t_2, __pyx_ptype_5numpy_ndarray))))) __PYX_ERR(0, 1110, __pyx_L1_error)
+    if (!(likely(((__pyx_t_2) == Py_None) || likely(__Pyx_TypeTest(__pyx_t_2, __pyx_ptype_5numpy_ndarray))))) __PYX_ERR(0, 1101, __pyx_L1_error)
     __Pyx_XDECREF_SET(__pyx_v_above_cutoff_startpos, ((PyArrayObject *)__pyx_t_2));
     __pyx_t_2 = 0;
 
-    /* "MACS2/IO/ScoreTrack.pyx":1111
+    /* "MACS2/IO/ScoreTrack.pyx":1102
  *             above_cutoff_endpos = pos[above_cutoff] # end positions of regions where score is above cutoff
  *             above_cutoff_startpos = pos[above_cutoff-1] # start positions of regions where score is above cutoff
  *             above_cutoff_sv= sample[above_cutoff] # sample pileup height where score is above cutoff             # <<<<<<<<<<<<<<
  * 
  *             if above_cutoff_v.size == 0:
  */
-    __pyx_t_2 = __Pyx_PyObject_GetItem(((PyObject *)__pyx_v_sample), ((PyObject *)__pyx_v_above_cutoff)); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1111, __pyx_L1_error)
+    __pyx_t_2 = __Pyx_PyObject_GetItem(((PyObject *)__pyx_v_sample), ((PyObject *)__pyx_v_above_cutoff)); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1102, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
-    if (!(likely(((__pyx_t_2) == Py_None) || likely(__Pyx_TypeTest(__pyx_t_2, __pyx_ptype_5numpy_ndarray))))) __PYX_ERR(0, 1111, __pyx_L1_error)
+    if (!(likely(((__pyx_t_2) == Py_None) || likely(__Pyx_TypeTest(__pyx_t_2, __pyx_ptype_5numpy_ndarray))))) __PYX_ERR(0, 1102, __pyx_L1_error)
     __Pyx_XDECREF_SET(__pyx_v_above_cutoff_sv, ((PyArrayObject *)__pyx_t_2));
     __pyx_t_2 = 0;
 
-    /* "MACS2/IO/ScoreTrack.pyx":1113
+    /* "MACS2/IO/ScoreTrack.pyx":1104
  *             above_cutoff_sv= sample[above_cutoff] # sample pileup height where score is above cutoff
  * 
  *             if above_cutoff_v.size == 0:             # <<<<<<<<<<<<<<
  *                 # nothing above cutoff
  *                 continue
  */
-    __pyx_t_2 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_v_above_cutoff_v), __pyx_n_s_size); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1113, __pyx_L1_error)
+    __pyx_t_2 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_v_above_cutoff_v), __pyx_n_s_size); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1104, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
-    __pyx_t_9 = __Pyx_PyInt_EqObjC(__pyx_t_2, __pyx_int_0, 0, 0); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 1113, __pyx_L1_error)
+    __pyx_t_9 = __Pyx_PyInt_EqObjC(__pyx_t_2, __pyx_int_0, 0, 0); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 1104, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_9);
     __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-    __pyx_t_12 = __Pyx_PyObject_IsTrue(__pyx_t_9); if (unlikely(__pyx_t_12 < 0)) __PYX_ERR(0, 1113, __pyx_L1_error)
+    __pyx_t_12 = __Pyx_PyObject_IsTrue(__pyx_t_9); if (unlikely(__pyx_t_12 < 0)) __PYX_ERR(0, 1104, __pyx_L1_error)
     __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
     if (__pyx_t_12) {
 
-      /* "MACS2/IO/ScoreTrack.pyx":1115
+      /* "MACS2/IO/ScoreTrack.pyx":1106
  *             if above_cutoff_v.size == 0:
  *                 # nothing above cutoff
  *                 continue             # <<<<<<<<<<<<<<
@@ -17507,7 +17507,7 @@ static PyObject *__pyx_f_5MACS2_2IO_10ScoreTrack_12scoreTrackII_call_peaks(struc
  */
       goto __pyx_L3_continue;
 
-      /* "MACS2/IO/ScoreTrack.pyx":1113
+      /* "MACS2/IO/ScoreTrack.pyx":1104
  *             above_cutoff_sv= sample[above_cutoff] # sample pileup height where score is above cutoff
  * 
  *             if above_cutoff_v.size == 0:             # <<<<<<<<<<<<<<
@@ -17516,32 +17516,32 @@ static PyObject *__pyx_f_5MACS2_2IO_10ScoreTrack_12scoreTrackII_call_peaks(struc
  */
     }
 
-    /* "MACS2/IO/ScoreTrack.pyx":1117
+    /* "MACS2/IO/ScoreTrack.pyx":1108
  *                 continue
  * 
  *             if above_cutoff[0] == 0:             # <<<<<<<<<<<<<<
  *                 # first element > cutoff, fix the first point as 0. otherwise it would be the last item in data[chrom]['pos']
  *                 above_cutoff_startpos[0] = 0
  */
-    __pyx_t_9 = __Pyx_GetItemInt(((PyObject *)__pyx_v_above_cutoff), 0, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 1117, __pyx_L1_error)
+    __pyx_t_9 = __Pyx_GetItemInt(((PyObject *)__pyx_v_above_cutoff), 0, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 1108, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_9);
-    __pyx_t_2 = __Pyx_PyInt_EqObjC(__pyx_t_9, __pyx_int_0, 0, 0); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1117, __pyx_L1_error)
+    __pyx_t_2 = __Pyx_PyInt_EqObjC(__pyx_t_9, __pyx_int_0, 0, 0); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1108, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
     __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
-    __pyx_t_12 = __Pyx_PyObject_IsTrue(__pyx_t_2); if (unlikely(__pyx_t_12 < 0)) __PYX_ERR(0, 1117, __pyx_L1_error)
+    __pyx_t_12 = __Pyx_PyObject_IsTrue(__pyx_t_2); if (unlikely(__pyx_t_12 < 0)) __PYX_ERR(0, 1108, __pyx_L1_error)
     __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
     if (__pyx_t_12) {
 
-      /* "MACS2/IO/ScoreTrack.pyx":1119
+      /* "MACS2/IO/ScoreTrack.pyx":1110
  *             if above_cutoff[0] == 0:
  *                 # first element > cutoff, fix the first point as 0. otherwise it would be the last item in data[chrom]['pos']
  *                 above_cutoff_startpos[0] = 0             # <<<<<<<<<<<<<<
  * 
  *             # first bit of region above cutoff
  */
-      if (unlikely(__Pyx_SetItemInt(((PyObject *)__pyx_v_above_cutoff_startpos), 0, __pyx_int_0, long, 1, __Pyx_PyInt_From_long, 0, 0, 1) < 0)) __PYX_ERR(0, 1119, __pyx_L1_error)
+      if (unlikely(__Pyx_SetItemInt(((PyObject *)__pyx_v_above_cutoff_startpos), 0, __pyx_int_0, long, 1, __Pyx_PyInt_From_long, 0, 0, 1) < 0)) __PYX_ERR(0, 1110, __pyx_L1_error)
 
-      /* "MACS2/IO/ScoreTrack.pyx":1117
+      /* "MACS2/IO/ScoreTrack.pyx":1108
  *                 continue
  * 
  *             if above_cutoff[0] == 0:             # <<<<<<<<<<<<<<
@@ -17550,24 +17550,24 @@ static PyObject *__pyx_f_5MACS2_2IO_10ScoreTrack_12scoreTrackII_call_peaks(struc
  */
     }
 
-    /* "MACS2/IO/ScoreTrack.pyx":1122
+    /* "MACS2/IO/ScoreTrack.pyx":1113
  * 
  *             # first bit of region above cutoff
  *             peak_content.append( (above_cutoff_startpos[0], above_cutoff_endpos[0], above_cutoff_v[0], above_cutoff_sv[0], above_cutoff[0]) )             # <<<<<<<<<<<<<<
  *             for i in range( 1,above_cutoff_startpos.size ):
  *                 if above_cutoff_startpos[i] - peak_content[-1][1] <= max_gap:
  */
-    __pyx_t_2 = __Pyx_GetItemInt(((PyObject *)__pyx_v_above_cutoff_startpos), 0, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1122, __pyx_L1_error)
+    __pyx_t_2 = __Pyx_GetItemInt(((PyObject *)__pyx_v_above_cutoff_startpos), 0, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1113, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
-    __pyx_t_9 = __Pyx_GetItemInt(((PyObject *)__pyx_v_above_cutoff_endpos), 0, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 1122, __pyx_L1_error)
+    __pyx_t_9 = __Pyx_GetItemInt(((PyObject *)__pyx_v_above_cutoff_endpos), 0, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 1113, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_9);
-    __pyx_t_5 = __Pyx_GetItemInt(((PyObject *)__pyx_v_above_cutoff_v), 0, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 1122, __pyx_L1_error)
+    __pyx_t_5 = __Pyx_GetItemInt(((PyObject *)__pyx_v_above_cutoff_v), 0, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 1113, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_5);
-    __pyx_t_6 = __Pyx_GetItemInt(((PyObject *)__pyx_v_above_cutoff_sv), 0, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 1122, __pyx_L1_error)
+    __pyx_t_6 = __Pyx_GetItemInt(((PyObject *)__pyx_v_above_cutoff_sv), 0, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 1113, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_6);
-    __pyx_t_4 = __Pyx_GetItemInt(((PyObject *)__pyx_v_above_cutoff), 0, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 1122, __pyx_L1_error)
+    __pyx_t_4 = __Pyx_GetItemInt(((PyObject *)__pyx_v_above_cutoff), 0, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 1113, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_4);
-    __pyx_t_3 = PyTuple_New(5); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 1122, __pyx_L1_error)
+    __pyx_t_3 = PyTuple_New(5); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 1113, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_3);
     __Pyx_GIVEREF(__pyx_t_2);
     PyTuple_SET_ITEM(__pyx_t_3, 0, __pyx_t_2);
@@ -17584,69 +17584,69 @@ static PyObject *__pyx_f_5MACS2_2IO_10ScoreTrack_12scoreTrackII_call_peaks(struc
     __pyx_t_5 = 0;
     __pyx_t_6 = 0;
     __pyx_t_4 = 0;
-    __pyx_t_13 = __Pyx_PyList_Append(__pyx_v_peak_content, __pyx_t_3); if (unlikely(__pyx_t_13 == ((int)-1))) __PYX_ERR(0, 1122, __pyx_L1_error)
+    __pyx_t_13 = __Pyx_PyList_Append(__pyx_v_peak_content, __pyx_t_3); if (unlikely(__pyx_t_13 == ((int)-1))) __PYX_ERR(0, 1113, __pyx_L1_error)
     __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
 
-    /* "MACS2/IO/ScoreTrack.pyx":1123
+    /* "MACS2/IO/ScoreTrack.pyx":1114
  *             # first bit of region above cutoff
  *             peak_content.append( (above_cutoff_startpos[0], above_cutoff_endpos[0], above_cutoff_v[0], above_cutoff_sv[0], above_cutoff[0]) )
  *             for i in range( 1,above_cutoff_startpos.size ):             # <<<<<<<<<<<<<<
  *                 if above_cutoff_startpos[i] - peak_content[-1][1] <= max_gap:
  *                     # append
  */
-    __pyx_t_3 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_v_above_cutoff_startpos), __pyx_n_s_size); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 1123, __pyx_L1_error)
+    __pyx_t_3 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_v_above_cutoff_startpos), __pyx_n_s_size); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 1114, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_3);
-    __pyx_t_14 = __Pyx_PyInt_As_long(__pyx_t_3); if (unlikely((__pyx_t_14 == (long)-1) && PyErr_Occurred())) __PYX_ERR(0, 1123, __pyx_L1_error)
+    __pyx_t_14 = __Pyx_PyInt_As_long(__pyx_t_3); if (unlikely((__pyx_t_14 == (long)-1) && PyErr_Occurred())) __PYX_ERR(0, 1114, __pyx_L1_error)
     __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
     __pyx_t_15 = __pyx_t_14;
     for (__pyx_t_8 = 1; __pyx_t_8 < __pyx_t_15; __pyx_t_8+=1) {
       __pyx_v_i = __pyx_t_8;
 
-      /* "MACS2/IO/ScoreTrack.pyx":1124
+      /* "MACS2/IO/ScoreTrack.pyx":1115
  *             peak_content.append( (above_cutoff_startpos[0], above_cutoff_endpos[0], above_cutoff_v[0], above_cutoff_sv[0], above_cutoff[0]) )
  *             for i in range( 1,above_cutoff_startpos.size ):
  *                 if above_cutoff_startpos[i] - peak_content[-1][1] <= max_gap:             # <<<<<<<<<<<<<<
  *                     # append
  *                     peak_content.append( (above_cutoff_startpos[i], above_cutoff_endpos[i], above_cutoff_v[i], above_cutoff_sv[i], above_cutoff[i]) )
  */
-      __pyx_t_3 = __Pyx_GetItemInt(((PyObject *)__pyx_v_above_cutoff_startpos), __pyx_v_i, int, 1, __Pyx_PyInt_From_int, 0, 1, 1); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 1124, __pyx_L1_error)
+      __pyx_t_3 = __Pyx_GetItemInt(((PyObject *)__pyx_v_above_cutoff_startpos), __pyx_v_i, int, 1, __Pyx_PyInt_From_int, 0, 1, 1); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 1115, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_3);
-      __pyx_t_4 = __Pyx_GetItemInt_List(__pyx_v_peak_content, -1L, long, 1, __Pyx_PyInt_From_long, 1, 1, 1); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 1124, __pyx_L1_error)
+      __pyx_t_4 = __Pyx_GetItemInt_List(__pyx_v_peak_content, -1L, long, 1, __Pyx_PyInt_From_long, 1, 1, 1); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 1115, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_4);
-      __pyx_t_6 = __Pyx_GetItemInt(__pyx_t_4, 1, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 1124, __pyx_L1_error)
+      __pyx_t_6 = __Pyx_GetItemInt(__pyx_t_4, 1, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 1115, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_6);
       __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-      __pyx_t_4 = PyNumber_Subtract(__pyx_t_3, __pyx_t_6); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 1124, __pyx_L1_error)
+      __pyx_t_4 = PyNumber_Subtract(__pyx_t_3, __pyx_t_6); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 1115, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_4);
       __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
       __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
-      __pyx_t_6 = __Pyx_PyInt_From_int(__pyx_v_max_gap); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 1124, __pyx_L1_error)
+      __pyx_t_6 = __Pyx_PyInt_From_int(__pyx_v_max_gap); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 1115, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_6);
-      __pyx_t_3 = PyObject_RichCompare(__pyx_t_4, __pyx_t_6, Py_LE); __Pyx_XGOTREF(__pyx_t_3); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 1124, __pyx_L1_error)
+      __pyx_t_3 = PyObject_RichCompare(__pyx_t_4, __pyx_t_6, Py_LE); __Pyx_XGOTREF(__pyx_t_3); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 1115, __pyx_L1_error)
       __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
       __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
-      __pyx_t_12 = __Pyx_PyObject_IsTrue(__pyx_t_3); if (unlikely(__pyx_t_12 < 0)) __PYX_ERR(0, 1124, __pyx_L1_error)
+      __pyx_t_12 = __Pyx_PyObject_IsTrue(__pyx_t_3); if (unlikely(__pyx_t_12 < 0)) __PYX_ERR(0, 1115, __pyx_L1_error)
       __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
       if (__pyx_t_12) {
 
-        /* "MACS2/IO/ScoreTrack.pyx":1126
+        /* "MACS2/IO/ScoreTrack.pyx":1117
  *                 if above_cutoff_startpos[i] - peak_content[-1][1] <= max_gap:
  *                     # append
  *                     peak_content.append( (above_cutoff_startpos[i], above_cutoff_endpos[i], above_cutoff_v[i], above_cutoff_sv[i], above_cutoff[i]) )             # <<<<<<<<<<<<<<
  *                 else:
  *                     # close
  */
-        __pyx_t_3 = __Pyx_GetItemInt(((PyObject *)__pyx_v_above_cutoff_startpos), __pyx_v_i, int, 1, __Pyx_PyInt_From_int, 0, 1, 1); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 1126, __pyx_L1_error)
+        __pyx_t_3 = __Pyx_GetItemInt(((PyObject *)__pyx_v_above_cutoff_startpos), __pyx_v_i, int, 1, __Pyx_PyInt_From_int, 0, 1, 1); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 1117, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_3);
-        __pyx_t_6 = __Pyx_GetItemInt(((PyObject *)__pyx_v_above_cutoff_endpos), __pyx_v_i, int, 1, __Pyx_PyInt_From_int, 0, 1, 1); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 1126, __pyx_L1_error)
+        __pyx_t_6 = __Pyx_GetItemInt(((PyObject *)__pyx_v_above_cutoff_endpos), __pyx_v_i, int, 1, __Pyx_PyInt_From_int, 0, 1, 1); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 1117, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_6);
-        __pyx_t_4 = __Pyx_GetItemInt(((PyObject *)__pyx_v_above_cutoff_v), __pyx_v_i, int, 1, __Pyx_PyInt_From_int, 0, 1, 1); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 1126, __pyx_L1_error)
+        __pyx_t_4 = __Pyx_GetItemInt(((PyObject *)__pyx_v_above_cutoff_v), __pyx_v_i, int, 1, __Pyx_PyInt_From_int, 0, 1, 1); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 1117, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_4);
-        __pyx_t_5 = __Pyx_GetItemInt(((PyObject *)__pyx_v_above_cutoff_sv), __pyx_v_i, int, 1, __Pyx_PyInt_From_int, 0, 1, 1); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 1126, __pyx_L1_error)
+        __pyx_t_5 = __Pyx_GetItemInt(((PyObject *)__pyx_v_above_cutoff_sv), __pyx_v_i, int, 1, __Pyx_PyInt_From_int, 0, 1, 1); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 1117, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_5);
-        __pyx_t_9 = __Pyx_GetItemInt(((PyObject *)__pyx_v_above_cutoff), __pyx_v_i, int, 1, __Pyx_PyInt_From_int, 0, 1, 1); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 1126, __pyx_L1_error)
+        __pyx_t_9 = __Pyx_GetItemInt(((PyObject *)__pyx_v_above_cutoff), __pyx_v_i, int, 1, __Pyx_PyInt_From_int, 0, 1, 1); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 1117, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_9);
-        __pyx_t_2 = PyTuple_New(5); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1126, __pyx_L1_error)
+        __pyx_t_2 = PyTuple_New(5); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1117, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_2);
         __Pyx_GIVEREF(__pyx_t_3);
         PyTuple_SET_ITEM(__pyx_t_2, 0, __pyx_t_3);
@@ -17663,10 +17663,10 @@ static PyObject *__pyx_f_5MACS2_2IO_10ScoreTrack_12scoreTrackII_call_peaks(struc
         __pyx_t_4 = 0;
         __pyx_t_5 = 0;
         __pyx_t_9 = 0;
-        __pyx_t_13 = __Pyx_PyList_Append(__pyx_v_peak_content, __pyx_t_2); if (unlikely(__pyx_t_13 == ((int)-1))) __PYX_ERR(0, 1126, __pyx_L1_error)
+        __pyx_t_13 = __Pyx_PyList_Append(__pyx_v_peak_content, __pyx_t_2); if (unlikely(__pyx_t_13 == ((int)-1))) __PYX_ERR(0, 1117, __pyx_L1_error)
         __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
-        /* "MACS2/IO/ScoreTrack.pyx":1124
+        /* "MACS2/IO/ScoreTrack.pyx":1115
  *             peak_content.append( (above_cutoff_startpos[0], above_cutoff_endpos[0], above_cutoff_v[0], above_cutoff_sv[0], above_cutoff[0]) )
  *             for i in range( 1,above_cutoff_startpos.size ):
  *                 if above_cutoff_startpos[i] - peak_content[-1][1] <= max_gap:             # <<<<<<<<<<<<<<
@@ -17676,7 +17676,7 @@ static PyObject *__pyx_f_5MACS2_2IO_10ScoreTrack_12scoreTrackII_call_peaks(struc
         goto __pyx_L9;
       }
 
-      /* "MACS2/IO/ScoreTrack.pyx":1129
+      /* "MACS2/IO/ScoreTrack.pyx":1120
  *                 else:
  *                     # close
  *                     if call_summits:             # <<<<<<<<<<<<<<
@@ -17684,10 +17684,10 @@ static PyObject *__pyx_f_5MACS2_2IO_10ScoreTrack_12scoreTrackII_call_peaks(struc
  *                     else:
  */
       /*else*/ {
-        __pyx_t_12 = __Pyx_PyObject_IsTrue(((PyObject *)__pyx_v_call_summits)); if (unlikely(__pyx_t_12 < 0)) __PYX_ERR(0, 1129, __pyx_L1_error)
+        __pyx_t_12 = __Pyx_PyObject_IsTrue(((PyObject *)__pyx_v_call_summits)); if (unlikely(__pyx_t_12 < 0)) __PYX_ERR(0, 1120, __pyx_L1_error)
         if (__pyx_t_12) {
 
-          /* "MACS2/IO/ScoreTrack.pyx":1130
+          /* "MACS2/IO/ScoreTrack.pyx":1121
  *                     # close
  *                     if call_summits:
  *                         self.__close_peak2(peak_content, peaks, min_length, chrom, max_gap//2 )             # <<<<<<<<<<<<<<
@@ -17696,11 +17696,11 @@ static PyObject *__pyx_f_5MACS2_2IO_10ScoreTrack_12scoreTrackII_call_peaks(struc
  */
           __pyx_t_16.__pyx_n = 1;
           __pyx_t_16.smoothlen = __Pyx_div_long(__pyx_v_max_gap, 2);
-          __pyx_t_2 = ((PyObject *)((struct __pyx_vtabstruct_5MACS2_2IO_10ScoreTrack_scoreTrackII *)__pyx_v_self->__pyx_vtab)->__pyx___close_peak2(__pyx_v_self, __pyx_v_peak_content, __pyx_v_peaks, __pyx_v_min_length, __pyx_v_chrom, &__pyx_t_16)); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1130, __pyx_L1_error)
+          __pyx_t_2 = ((PyObject *)((struct __pyx_vtabstruct_5MACS2_2IO_10ScoreTrack_scoreTrackII *)__pyx_v_self->__pyx_vtab)->__pyx___close_peak2(__pyx_v_self, __pyx_v_peak_content, __pyx_v_peaks, __pyx_v_min_length, __pyx_v_chrom, &__pyx_t_16)); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1121, __pyx_L1_error)
           __Pyx_GOTREF(__pyx_t_2);
           __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
-          /* "MACS2/IO/ScoreTrack.pyx":1129
+          /* "MACS2/IO/ScoreTrack.pyx":1120
  *                 else:
  *                     # close
  *                     if call_summits:             # <<<<<<<<<<<<<<
@@ -17710,7 +17710,7 @@ static PyObject *__pyx_f_5MACS2_2IO_10ScoreTrack_12scoreTrackII_call_peaks(struc
           goto __pyx_L10;
         }
 
-        /* "MACS2/IO/ScoreTrack.pyx":1132
+        /* "MACS2/IO/ScoreTrack.pyx":1123
  *                         self.__close_peak2(peak_content, peaks, min_length, chrom, max_gap//2 )
  *                     else:
  *                         self.__close_peak(peak_content, peaks, min_length, chrom, max_gap//2 )             # <<<<<<<<<<<<<<
@@ -17720,30 +17720,30 @@ static PyObject *__pyx_f_5MACS2_2IO_10ScoreTrack_12scoreTrackII_call_peaks(struc
         /*else*/ {
           __pyx_t_17.__pyx_n = 1;
           __pyx_t_17.smoothlen = __Pyx_div_long(__pyx_v_max_gap, 2);
-          __pyx_t_2 = ((PyObject *)((struct __pyx_vtabstruct_5MACS2_2IO_10ScoreTrack_scoreTrackII *)__pyx_v_self->__pyx_vtab)->__pyx___close_peak(__pyx_v_self, __pyx_v_peak_content, __pyx_v_peaks, __pyx_v_min_length, __pyx_v_chrom, &__pyx_t_17)); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1132, __pyx_L1_error)
+          __pyx_t_2 = ((PyObject *)((struct __pyx_vtabstruct_5MACS2_2IO_10ScoreTrack_scoreTrackII *)__pyx_v_self->__pyx_vtab)->__pyx___close_peak(__pyx_v_self, __pyx_v_peak_content, __pyx_v_peaks, __pyx_v_min_length, __pyx_v_chrom, &__pyx_t_17)); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1123, __pyx_L1_error)
           __Pyx_GOTREF(__pyx_t_2);
           __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
         }
         __pyx_L10:;
 
-        /* "MACS2/IO/ScoreTrack.pyx":1133
+        /* "MACS2/IO/ScoreTrack.pyx":1124
  *                     else:
  *                         self.__close_peak(peak_content, peaks, min_length, chrom, max_gap//2 )
  *                     peak_content = [(above_cutoff_startpos[i], above_cutoff_endpos[i], above_cutoff_v[i], above_cutoff_sv[i], above_cutoff[i]),]             # <<<<<<<<<<<<<<
  * 
  *             # save the last peak
  */
-        __pyx_t_2 = __Pyx_GetItemInt(((PyObject *)__pyx_v_above_cutoff_startpos), __pyx_v_i, int, 1, __Pyx_PyInt_From_int, 0, 1, 1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1133, __pyx_L1_error)
+        __pyx_t_2 = __Pyx_GetItemInt(((PyObject *)__pyx_v_above_cutoff_startpos), __pyx_v_i, int, 1, __Pyx_PyInt_From_int, 0, 1, 1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1124, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_2);
-        __pyx_t_9 = __Pyx_GetItemInt(((PyObject *)__pyx_v_above_cutoff_endpos), __pyx_v_i, int, 1, __Pyx_PyInt_From_int, 0, 1, 1); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 1133, __pyx_L1_error)
+        __pyx_t_9 = __Pyx_GetItemInt(((PyObject *)__pyx_v_above_cutoff_endpos), __pyx_v_i, int, 1, __Pyx_PyInt_From_int, 0, 1, 1); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 1124, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_9);
-        __pyx_t_5 = __Pyx_GetItemInt(((PyObject *)__pyx_v_above_cutoff_v), __pyx_v_i, int, 1, __Pyx_PyInt_From_int, 0, 1, 1); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 1133, __pyx_L1_error)
+        __pyx_t_5 = __Pyx_GetItemInt(((PyObject *)__pyx_v_above_cutoff_v), __pyx_v_i, int, 1, __Pyx_PyInt_From_int, 0, 1, 1); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 1124, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_5);
-        __pyx_t_4 = __Pyx_GetItemInt(((PyObject *)__pyx_v_above_cutoff_sv), __pyx_v_i, int, 1, __Pyx_PyInt_From_int, 0, 1, 1); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 1133, __pyx_L1_error)
+        __pyx_t_4 = __Pyx_GetItemInt(((PyObject *)__pyx_v_above_cutoff_sv), __pyx_v_i, int, 1, __Pyx_PyInt_From_int, 0, 1, 1); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 1124, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_4);
-        __pyx_t_6 = __Pyx_GetItemInt(((PyObject *)__pyx_v_above_cutoff), __pyx_v_i, int, 1, __Pyx_PyInt_From_int, 0, 1, 1); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 1133, __pyx_L1_error)
+        __pyx_t_6 = __Pyx_GetItemInt(((PyObject *)__pyx_v_above_cutoff), __pyx_v_i, int, 1, __Pyx_PyInt_From_int, 0, 1, 1); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 1124, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_6);
-        __pyx_t_3 = PyTuple_New(5); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 1133, __pyx_L1_error)
+        __pyx_t_3 = PyTuple_New(5); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 1124, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_3);
         __Pyx_GIVEREF(__pyx_t_2);
         PyTuple_SET_ITEM(__pyx_t_3, 0, __pyx_t_2);
@@ -17760,7 +17760,7 @@ static PyObject *__pyx_f_5MACS2_2IO_10ScoreTrack_12scoreTrackII_call_peaks(struc
         __pyx_t_5 = 0;
         __pyx_t_4 = 0;
         __pyx_t_6 = 0;
-        __pyx_t_6 = PyList_New(1); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 1133, __pyx_L1_error)
+        __pyx_t_6 = PyList_New(1); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 1124, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_6);
         __Pyx_GIVEREF(__pyx_t_3);
         PyList_SET_ITEM(__pyx_t_6, 0, __pyx_t_3);
@@ -17771,7 +17771,7 @@ static PyObject *__pyx_f_5MACS2_2IO_10ScoreTrack_12scoreTrackII_call_peaks(struc
       __pyx_L9:;
     }
 
-    /* "MACS2/IO/ScoreTrack.pyx":1136
+    /* "MACS2/IO/ScoreTrack.pyx":1127
  * 
  *             # save the last peak
  *             if not peak_content:             # <<<<<<<<<<<<<<
@@ -17782,7 +17782,7 @@ static PyObject *__pyx_f_5MACS2_2IO_10ScoreTrack_12scoreTrackII_call_peaks(struc
     __pyx_t_18 = ((!__pyx_t_12) != 0);
     if (__pyx_t_18) {
 
-      /* "MACS2/IO/ScoreTrack.pyx":1137
+      /* "MACS2/IO/ScoreTrack.pyx":1128
  *             # save the last peak
  *             if not peak_content:
  *                 continue             # <<<<<<<<<<<<<<
@@ -17791,7 +17791,7 @@ static PyObject *__pyx_f_5MACS2_2IO_10ScoreTrack_12scoreTrackII_call_peaks(struc
  */
       goto __pyx_L3_continue;
 
-      /* "MACS2/IO/ScoreTrack.pyx":1136
+      /* "MACS2/IO/ScoreTrack.pyx":1127
  * 
  *             # save the last peak
  *             if not peak_content:             # <<<<<<<<<<<<<<
@@ -17800,7 +17800,7 @@ static PyObject *__pyx_f_5MACS2_2IO_10ScoreTrack_12scoreTrackII_call_peaks(struc
  */
     }
 
-    /* "MACS2/IO/ScoreTrack.pyx":1139
+    /* "MACS2/IO/ScoreTrack.pyx":1130
  *                 continue
  *             else:
  *                 if call_summits:             # <<<<<<<<<<<<<<
@@ -17808,10 +17808,10 @@ static PyObject *__pyx_f_5MACS2_2IO_10ScoreTrack_12scoreTrackII_call_peaks(struc
  *                 else:
  */
     /*else*/ {
-      __pyx_t_18 = __Pyx_PyObject_IsTrue(((PyObject *)__pyx_v_call_summits)); if (unlikely(__pyx_t_18 < 0)) __PYX_ERR(0, 1139, __pyx_L1_error)
+      __pyx_t_18 = __Pyx_PyObject_IsTrue(((PyObject *)__pyx_v_call_summits)); if (unlikely(__pyx_t_18 < 0)) __PYX_ERR(0, 1130, __pyx_L1_error)
       if (__pyx_t_18) {
 
-        /* "MACS2/IO/ScoreTrack.pyx":1140
+        /* "MACS2/IO/ScoreTrack.pyx":1131
  *             else:
  *                 if call_summits:
  *                     self.__close_peak2(peak_content, peaks, min_length, chrom, max_gap//2 )             # <<<<<<<<<<<<<<
@@ -17820,11 +17820,11 @@ static PyObject *__pyx_f_5MACS2_2IO_10ScoreTrack_12scoreTrackII_call_peaks(struc
  */
         __pyx_t_16.__pyx_n = 1;
         __pyx_t_16.smoothlen = __Pyx_div_long(__pyx_v_max_gap, 2);
-        __pyx_t_6 = ((PyObject *)((struct __pyx_vtabstruct_5MACS2_2IO_10ScoreTrack_scoreTrackII *)__pyx_v_self->__pyx_vtab)->__pyx___close_peak2(__pyx_v_self, __pyx_v_peak_content, __pyx_v_peaks, __pyx_v_min_length, __pyx_v_chrom, &__pyx_t_16)); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 1140, __pyx_L1_error)
+        __pyx_t_6 = ((PyObject *)((struct __pyx_vtabstruct_5MACS2_2IO_10ScoreTrack_scoreTrackII *)__pyx_v_self->__pyx_vtab)->__pyx___close_peak2(__pyx_v_self, __pyx_v_peak_content, __pyx_v_peaks, __pyx_v_min_length, __pyx_v_chrom, &__pyx_t_16)); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 1131, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_6);
         __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
 
-        /* "MACS2/IO/ScoreTrack.pyx":1139
+        /* "MACS2/IO/ScoreTrack.pyx":1130
  *                 continue
  *             else:
  *                 if call_summits:             # <<<<<<<<<<<<<<
@@ -17834,7 +17834,7 @@ static PyObject *__pyx_f_5MACS2_2IO_10ScoreTrack_12scoreTrackII_call_peaks(struc
         goto __pyx_L12;
       }
 
-      /* "MACS2/IO/ScoreTrack.pyx":1142
+      /* "MACS2/IO/ScoreTrack.pyx":1133
  *                     self.__close_peak2(peak_content, peaks, min_length, chrom, max_gap//2 )
  *                 else:
  *                     self.__close_peak(peak_content, peaks, min_length, chrom, max_gap//2 )             # <<<<<<<<<<<<<<
@@ -17844,14 +17844,14 @@ static PyObject *__pyx_f_5MACS2_2IO_10ScoreTrack_12scoreTrackII_call_peaks(struc
       /*else*/ {
         __pyx_t_17.__pyx_n = 1;
         __pyx_t_17.smoothlen = __Pyx_div_long(__pyx_v_max_gap, 2);
-        __pyx_t_6 = ((PyObject *)((struct __pyx_vtabstruct_5MACS2_2IO_10ScoreTrack_scoreTrackII *)__pyx_v_self->__pyx_vtab)->__pyx___close_peak(__pyx_v_self, __pyx_v_peak_content, __pyx_v_peaks, __pyx_v_min_length, __pyx_v_chrom, &__pyx_t_17)); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 1142, __pyx_L1_error)
+        __pyx_t_6 = ((PyObject *)((struct __pyx_vtabstruct_5MACS2_2IO_10ScoreTrack_scoreTrackII *)__pyx_v_self->__pyx_vtab)->__pyx___close_peak(__pyx_v_self, __pyx_v_peak_content, __pyx_v_peaks, __pyx_v_min_length, __pyx_v_chrom, &__pyx_t_17)); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 1133, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_6);
         __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
       }
       __pyx_L12:;
     }
 
-    /* "MACS2/IO/ScoreTrack.pyx":1098
+    /* "MACS2/IO/ScoreTrack.pyx":1089
  * 
  *         self.cutoff = cutoff
  *         for chrom in chrs:             # <<<<<<<<<<<<<<
@@ -17862,7 +17862,7 @@ static PyObject *__pyx_f_5MACS2_2IO_10ScoreTrack_12scoreTrackII_call_peaks(struc
   }
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-  /* "MACS2/IO/ScoreTrack.pyx":1144
+  /* "MACS2/IO/ScoreTrack.pyx":1135
  *                     self.__close_peak(peak_content, peaks, min_length, chrom, max_gap//2 )
  * 
  *         return peaks             # <<<<<<<<<<<<<<
@@ -17874,7 +17874,7 @@ static PyObject *__pyx_f_5MACS2_2IO_10ScoreTrack_12scoreTrackII_call_peaks(struc
   __pyx_r = __pyx_v_peaks;
   goto __pyx_L0;
 
-  /* "MACS2/IO/ScoreTrack.pyx":1073
+  /* "MACS2/IO/ScoreTrack.pyx":1064
  *     #     return ret_peaks
  * 
  *     cpdef call_peaks (self, float cutoff=5.0, int min_length=200, int max_gap=50, bool call_summits=False):             # <<<<<<<<<<<<<<
@@ -17971,7 +17971,7 @@ static PyObject *__pyx_pw_5MACS2_2IO_10ScoreTrack_12scoreTrackII_25call_peaks(Py
         }
       }
       if (unlikely(kw_args > 0)) {
-        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "call_peaks") < 0)) __PYX_ERR(0, 1073, __pyx_L3_error)
+        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "call_peaks") < 0)) __PYX_ERR(0, 1064, __pyx_L3_error)
       }
     } else {
       switch (PyTuple_GET_SIZE(__pyx_args)) {
@@ -17988,17 +17988,17 @@ static PyObject *__pyx_pw_5MACS2_2IO_10ScoreTrack_12scoreTrackII_25call_peaks(Py
       }
     }
     if (values[0]) {
-      __pyx_v_cutoff = __pyx_PyFloat_AsFloat(values[0]); if (unlikely((__pyx_v_cutoff == (float)-1) && PyErr_Occurred())) __PYX_ERR(0, 1073, __pyx_L3_error)
+      __pyx_v_cutoff = __pyx_PyFloat_AsFloat(values[0]); if (unlikely((__pyx_v_cutoff == (float)-1) && PyErr_Occurred())) __PYX_ERR(0, 1064, __pyx_L3_error)
     } else {
       __pyx_v_cutoff = ((float)5.0);
     }
     if (values[1]) {
-      __pyx_v_min_length = __Pyx_PyInt_As_int(values[1]); if (unlikely((__pyx_v_min_length == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 1073, __pyx_L3_error)
+      __pyx_v_min_length = __Pyx_PyInt_As_int(values[1]); if (unlikely((__pyx_v_min_length == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 1064, __pyx_L3_error)
     } else {
       __pyx_v_min_length = ((int)0xC8);
     }
     if (values[2]) {
-      __pyx_v_max_gap = __Pyx_PyInt_As_int(values[2]); if (unlikely((__pyx_v_max_gap == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 1073, __pyx_L3_error)
+      __pyx_v_max_gap = __Pyx_PyInt_As_int(values[2]); if (unlikely((__pyx_v_max_gap == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 1064, __pyx_L3_error)
     } else {
       __pyx_v_max_gap = ((int)50);
     }
@@ -18006,13 +18006,13 @@ static PyObject *__pyx_pw_5MACS2_2IO_10ScoreTrack_12scoreTrackII_25call_peaks(Py
   }
   goto __pyx_L4_argument_unpacking_done;
   __pyx_L5_argtuple_error:;
-  __Pyx_RaiseArgtupleInvalid("call_peaks", 0, 0, 4, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 1073, __pyx_L3_error)
+  __Pyx_RaiseArgtupleInvalid("call_peaks", 0, 0, 4, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 1064, __pyx_L3_error)
   __pyx_L3_error:;
   __Pyx_AddTraceback("MACS2.IO.ScoreTrack.scoreTrackII.call_peaks", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __Pyx_RefNannyFinishContext();
   return NULL;
   __pyx_L4_argument_unpacking_done:;
-  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_call_summits), __pyx_ptype_7cpython_4bool_bool, 1, "call_summits", 0))) __PYX_ERR(0, 1073, __pyx_L1_error)
+  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_call_summits), __pyx_ptype_7cpython_4bool_bool, 1, "call_summits", 0))) __PYX_ERR(0, 1064, __pyx_L1_error)
   __pyx_r = __pyx_pf_5MACS2_2IO_10ScoreTrack_12scoreTrackII_24call_peaks(((struct __pyx_obj_5MACS2_2IO_10ScoreTrack_scoreTrackII *)__pyx_v_self), __pyx_v_cutoff, __pyx_v_min_length, __pyx_v_max_gap, __pyx_v_call_summits);
 
   /* function exit code */
@@ -18031,14 +18031,14 @@ static PyObject *__pyx_pf_5MACS2_2IO_10ScoreTrack_12scoreTrackII_24call_peaks(st
   PyObject *__pyx_t_1 = NULL;
   struct __pyx_opt_args_5MACS2_2IO_10ScoreTrack_12scoreTrackII_call_peaks __pyx_t_2;
   __Pyx_RefNannySetupContext("call_peaks", 0);
-  __Pyx_TraceCall("call_peaks (wrapper)", __pyx_f[0], 1073, 0, __PYX_ERR(0, 1073, __pyx_L1_error));
+  __Pyx_TraceCall("call_peaks (wrapper)", __pyx_f[0], 1064, 0, __PYX_ERR(0, 1064, __pyx_L1_error));
   __Pyx_XDECREF(__pyx_r);
   __pyx_t_2.__pyx_n = 4;
   __pyx_t_2.cutoff = __pyx_v_cutoff;
   __pyx_t_2.min_length = __pyx_v_min_length;
   __pyx_t_2.max_gap = __pyx_v_max_gap;
   __pyx_t_2.call_summits = __pyx_v_call_summits;
-  __pyx_t_1 = __pyx_vtabptr_5MACS2_2IO_10ScoreTrack_scoreTrackII->call_peaks(__pyx_v_self, 1, &__pyx_t_2); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1073, __pyx_L1_error)
+  __pyx_t_1 = __pyx_vtabptr_5MACS2_2IO_10ScoreTrack_scoreTrackII->call_peaks(__pyx_v_self, 1, &__pyx_t_2); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1064, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __pyx_r = __pyx_t_1;
   __pyx_t_1 = 0;
@@ -18056,7 +18056,7 @@ static PyObject *__pyx_pf_5MACS2_2IO_10ScoreTrack_12scoreTrackII_24call_peaks(st
   return __pyx_r;
 }
 
-/* "MACS2/IO/ScoreTrack.pyx":1146
+/* "MACS2/IO/ScoreTrack.pyx":1137
  *         return peaks
  * 
  *     cdef bool __close_peak (self, list peak_content, peaks, int min_length,             # <<<<<<<<<<<<<<
@@ -18101,11 +18101,11 @@ static PyBoolObject *__pyx_f_5MACS2_2IO_10ScoreTrack_12scoreTrackII___close_peak
   int __pyx_t_17;
   int __pyx_t_18;
   __Pyx_RefNannySetupContext("__close_peak", 0);
-  __Pyx_TraceCall("__close_peak", __pyx_f[0], 1146, 0, __PYX_ERR(0, 1146, __pyx_L1_error));
+  __Pyx_TraceCall("__close_peak", __pyx_f[0], 1137, 0, __PYX_ERR(0, 1137, __pyx_L1_error));
   if (__pyx_optional_args) {
   }
 
-  /* "MACS2/IO/ScoreTrack.pyx":1158
+  /* "MACS2/IO/ScoreTrack.pyx":1149
  *             double summit_value, tvalue, tsummitvalue
  * 
  *         peak_length = peak_content[ -1 ][ 1 ] - peak_content[ 0 ][ 0 ]             # <<<<<<<<<<<<<<
@@ -18114,57 +18114,57 @@ static PyBoolObject *__pyx_f_5MACS2_2IO_10ScoreTrack_12scoreTrackII___close_peak
  */
   if (unlikely(__pyx_v_peak_content == Py_None)) {
     PyErr_SetString(PyExc_TypeError, "'NoneType' object is not subscriptable");
-    __PYX_ERR(0, 1158, __pyx_L1_error)
+    __PYX_ERR(0, 1149, __pyx_L1_error)
   }
-  __pyx_t_1 = __Pyx_GetItemInt_List(__pyx_v_peak_content, -1L, long, 1, __Pyx_PyInt_From_long, 1, 1, 1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1158, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_GetItemInt_List(__pyx_v_peak_content, -1L, long, 1, __Pyx_PyInt_From_long, 1, 1, 1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1149, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_2 = __Pyx_GetItemInt(__pyx_t_1, 1, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1158, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_GetItemInt(__pyx_t_1, 1, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1149, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   if (unlikely(__pyx_v_peak_content == Py_None)) {
     PyErr_SetString(PyExc_TypeError, "'NoneType' object is not subscriptable");
-    __PYX_ERR(0, 1158, __pyx_L1_error)
+    __PYX_ERR(0, 1149, __pyx_L1_error)
   }
-  __pyx_t_1 = __Pyx_GetItemInt_List(__pyx_v_peak_content, 0, long, 1, __Pyx_PyInt_From_long, 1, 0, 1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1158, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_GetItemInt_List(__pyx_v_peak_content, 0, long, 1, __Pyx_PyInt_From_long, 1, 0, 1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1149, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_3 = __Pyx_GetItemInt(__pyx_t_1, 0, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 1158, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_GetItemInt(__pyx_t_1, 0, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 1149, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-  __pyx_t_1 = PyNumber_Subtract(__pyx_t_2, __pyx_t_3); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1158, __pyx_L1_error)
+  __pyx_t_1 = PyNumber_Subtract(__pyx_t_2, __pyx_t_3); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1149, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
   __pyx_v_peak_length = __pyx_t_1;
   __pyx_t_1 = 0;
 
-  /* "MACS2/IO/ScoreTrack.pyx":1159
+  /* "MACS2/IO/ScoreTrack.pyx":1150
  * 
  *         peak_length = peak_content[ -1 ][ 1 ] - peak_content[ 0 ][ 0 ]
  *         if peak_length >= min_length: # if the peak is too small, reject it             # <<<<<<<<<<<<<<
  *             tsummit = []
  *             summit_pos   = 0
  */
-  __pyx_t_1 = __Pyx_PyInt_From_int(__pyx_v_min_length); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1159, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyInt_From_int(__pyx_v_min_length); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1150, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_3 = PyObject_RichCompare(__pyx_v_peak_length, __pyx_t_1, Py_GE); __Pyx_XGOTREF(__pyx_t_3); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 1159, __pyx_L1_error)
+  __pyx_t_3 = PyObject_RichCompare(__pyx_v_peak_length, __pyx_t_1, Py_GE); __Pyx_XGOTREF(__pyx_t_3); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 1150, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-  __pyx_t_4 = __Pyx_PyObject_IsTrue(__pyx_t_3); if (unlikely(__pyx_t_4 < 0)) __PYX_ERR(0, 1159, __pyx_L1_error)
+  __pyx_t_4 = __Pyx_PyObject_IsTrue(__pyx_t_3); if (unlikely(__pyx_t_4 < 0)) __PYX_ERR(0, 1150, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
   if (__pyx_t_4) {
 
-    /* "MACS2/IO/ScoreTrack.pyx":1160
+    /* "MACS2/IO/ScoreTrack.pyx":1151
  *         peak_length = peak_content[ -1 ][ 1 ] - peak_content[ 0 ][ 0 ]
  *         if peak_length >= min_length: # if the peak is too small, reject it
  *             tsummit = []             # <<<<<<<<<<<<<<
  *             summit_pos   = 0
  *             summit_value = 0
  */
-    __pyx_t_3 = PyList_New(0); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 1160, __pyx_L1_error)
+    __pyx_t_3 = PyList_New(0); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 1151, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_3);
     __pyx_v_tsummit = ((PyObject*)__pyx_t_3);
     __pyx_t_3 = 0;
 
-    /* "MACS2/IO/ScoreTrack.pyx":1161
+    /* "MACS2/IO/ScoreTrack.pyx":1152
  *         if peak_length >= min_length: # if the peak is too small, reject it
  *             tsummit = []
  *             summit_pos   = 0             # <<<<<<<<<<<<<<
@@ -18173,7 +18173,7 @@ static PyBoolObject *__pyx_f_5MACS2_2IO_10ScoreTrack_12scoreTrackII___close_peak
  */
     __pyx_v_summit_pos = 0;
 
-    /* "MACS2/IO/ScoreTrack.pyx":1162
+    /* "MACS2/IO/ScoreTrack.pyx":1153
  *             tsummit = []
  *             summit_pos   = 0
  *             summit_value = 0             # <<<<<<<<<<<<<<
@@ -18182,7 +18182,7 @@ static PyBoolObject *__pyx_f_5MACS2_2IO_10ScoreTrack_12scoreTrackII___close_peak
  */
     __pyx_v_summit_value = 0.0;
 
-    /* "MACS2/IO/ScoreTrack.pyx":1163
+    /* "MACS2/IO/ScoreTrack.pyx":1154
  *             summit_pos   = 0
  *             summit_value = 0
  *             for i in range(len(peak_content)):             # <<<<<<<<<<<<<<
@@ -18191,14 +18191,14 @@ static PyBoolObject *__pyx_f_5MACS2_2IO_10ScoreTrack_12scoreTrackII___close_peak
  */
     if (unlikely(__pyx_v_peak_content == Py_None)) {
       PyErr_SetString(PyExc_TypeError, "object of type 'NoneType' has no len()");
-      __PYX_ERR(0, 1163, __pyx_L1_error)
+      __PYX_ERR(0, 1154, __pyx_L1_error)
     }
-    __pyx_t_5 = PyList_GET_SIZE(__pyx_v_peak_content); if (unlikely(__pyx_t_5 == ((Py_ssize_t)-1))) __PYX_ERR(0, 1163, __pyx_L1_error)
+    __pyx_t_5 = PyList_GET_SIZE(__pyx_v_peak_content); if (unlikely(__pyx_t_5 == ((Py_ssize_t)-1))) __PYX_ERR(0, 1154, __pyx_L1_error)
     __pyx_t_6 = __pyx_t_5;
     for (__pyx_t_7 = 0; __pyx_t_7 < __pyx_t_6; __pyx_t_7+=1) {
       __pyx_v_i = __pyx_t_7;
 
-      /* "MACS2/IO/ScoreTrack.pyx":1164
+      /* "MACS2/IO/ScoreTrack.pyx":1155
  *             summit_value = 0
  *             for i in range(len(peak_content)):
  *                 (tstart,tend,tvalue,tsummitvalue, tindex) = peak_content[i]             # <<<<<<<<<<<<<<
@@ -18207,9 +18207,9 @@ static PyBoolObject *__pyx_f_5MACS2_2IO_10ScoreTrack_12scoreTrackII___close_peak
  */
       if (unlikely(__pyx_v_peak_content == Py_None)) {
         PyErr_SetString(PyExc_TypeError, "'NoneType' object is not subscriptable");
-        __PYX_ERR(0, 1164, __pyx_L1_error)
+        __PYX_ERR(0, 1155, __pyx_L1_error)
       }
-      __pyx_t_3 = __Pyx_GetItemInt_List(__pyx_v_peak_content, __pyx_v_i, int, 1, __Pyx_PyInt_From_int, 1, 1, 1); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 1164, __pyx_L1_error)
+      __pyx_t_3 = __Pyx_GetItemInt_List(__pyx_v_peak_content, __pyx_v_i, int, 1, __Pyx_PyInt_From_int, 1, 1, 1); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 1155, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_3);
       if ((likely(PyTuple_CheckExact(__pyx_t_3))) || (PyList_CheckExact(__pyx_t_3))) {
         PyObject* sequence = __pyx_t_3;
@@ -18217,7 +18217,7 @@ static PyBoolObject *__pyx_f_5MACS2_2IO_10ScoreTrack_12scoreTrackII___close_peak
         if (unlikely(size != 5)) {
           if (size > 5) __Pyx_RaiseTooManyValuesError(5);
           else if (size >= 0) __Pyx_RaiseNeedMoreValuesError(size);
-          __PYX_ERR(0, 1164, __pyx_L1_error)
+          __PYX_ERR(0, 1155, __pyx_L1_error)
         }
         #if CYTHON_ASSUME_SAFE_MACROS && !CYTHON_AVOID_BORROWED_REFS
         if (likely(PyTuple_CheckExact(sequence))) {
@@ -18243,7 +18243,7 @@ static PyBoolObject *__pyx_f_5MACS2_2IO_10ScoreTrack_12scoreTrackII___close_peak
           Py_ssize_t i;
           PyObject** temps[5] = {&__pyx_t_1,&__pyx_t_2,&__pyx_t_8,&__pyx_t_9,&__pyx_t_10};
           for (i=0; i < 5; i++) {
-            PyObject* item = PySequence_ITEM(sequence, i); if (unlikely(!item)) __PYX_ERR(0, 1164, __pyx_L1_error)
+            PyObject* item = PySequence_ITEM(sequence, i); if (unlikely(!item)) __PYX_ERR(0, 1155, __pyx_L1_error)
             __Pyx_GOTREF(item);
             *(temps[i]) = item;
           }
@@ -18253,7 +18253,7 @@ static PyBoolObject *__pyx_f_5MACS2_2IO_10ScoreTrack_12scoreTrackII___close_peak
       } else {
         Py_ssize_t index = -1;
         PyObject** temps[5] = {&__pyx_t_1,&__pyx_t_2,&__pyx_t_8,&__pyx_t_9,&__pyx_t_10};
-        __pyx_t_11 = PyObject_GetIter(__pyx_t_3); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 1164, __pyx_L1_error)
+        __pyx_t_11 = PyObject_GetIter(__pyx_t_3); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 1155, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_11);
         __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
         __pyx_t_12 = Py_TYPE(__pyx_t_11)->tp_iternext;
@@ -18262,7 +18262,7 @@ static PyBoolObject *__pyx_f_5MACS2_2IO_10ScoreTrack_12scoreTrackII___close_peak
           __Pyx_GOTREF(item);
           *(temps[index]) = item;
         }
-        if (__Pyx_IternextUnpackEndCheck(__pyx_t_12(__pyx_t_11), 5) < 0) __PYX_ERR(0, 1164, __pyx_L1_error)
+        if (__Pyx_IternextUnpackEndCheck(__pyx_t_12(__pyx_t_11), 5) < 0) __PYX_ERR(0, 1155, __pyx_L1_error)
         __pyx_t_12 = NULL;
         __Pyx_DECREF(__pyx_t_11); __pyx_t_11 = 0;
         goto __pyx_L7_unpacking_done;
@@ -18270,16 +18270,16 @@ static PyBoolObject *__pyx_f_5MACS2_2IO_10ScoreTrack_12scoreTrackII___close_peak
         __Pyx_DECREF(__pyx_t_11); __pyx_t_11 = 0;
         __pyx_t_12 = NULL;
         if (__Pyx_IterFinish() == 0) __Pyx_RaiseNeedMoreValuesError(index);
-        __PYX_ERR(0, 1164, __pyx_L1_error)
+        __PYX_ERR(0, 1155, __pyx_L1_error)
         __pyx_L7_unpacking_done:;
       }
-      __pyx_t_13 = __Pyx_PyInt_As_int(__pyx_t_1); if (unlikely((__pyx_t_13 == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 1164, __pyx_L1_error)
+      __pyx_t_13 = __Pyx_PyInt_As_int(__pyx_t_1); if (unlikely((__pyx_t_13 == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 1155, __pyx_L1_error)
       __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-      __pyx_t_14 = __Pyx_PyInt_As_int(__pyx_t_2); if (unlikely((__pyx_t_14 == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 1164, __pyx_L1_error)
+      __pyx_t_14 = __Pyx_PyInt_As_int(__pyx_t_2); if (unlikely((__pyx_t_14 == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 1155, __pyx_L1_error)
       __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-      __pyx_t_15 = __pyx_PyFloat_AsDouble(__pyx_t_8); if (unlikely((__pyx_t_15 == (double)-1) && PyErr_Occurred())) __PYX_ERR(0, 1164, __pyx_L1_error)
+      __pyx_t_15 = __pyx_PyFloat_AsDouble(__pyx_t_8); if (unlikely((__pyx_t_15 == (double)-1) && PyErr_Occurred())) __PYX_ERR(0, 1155, __pyx_L1_error)
       __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
-      __pyx_t_16 = __pyx_PyFloat_AsDouble(__pyx_t_9); if (unlikely((__pyx_t_16 == (double)-1) && PyErr_Occurred())) __PYX_ERR(0, 1164, __pyx_L1_error)
+      __pyx_t_16 = __pyx_PyFloat_AsDouble(__pyx_t_9); if (unlikely((__pyx_t_16 == (double)-1) && PyErr_Occurred())) __PYX_ERR(0, 1155, __pyx_L1_error)
       __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
       __pyx_v_tstart = __pyx_t_13;
       __pyx_v_tend = __pyx_t_14;
@@ -18288,7 +18288,7 @@ static PyBoolObject *__pyx_f_5MACS2_2IO_10ScoreTrack_12scoreTrackII___close_peak
       __Pyx_XDECREF_SET(__pyx_v_tindex, __pyx_t_10);
       __pyx_t_10 = 0;
 
-      /* "MACS2/IO/ScoreTrack.pyx":1166
+      /* "MACS2/IO/ScoreTrack.pyx":1157
  *                 (tstart,tend,tvalue,tsummitvalue, tindex) = peak_content[i]
  *                 #for (tstart,tend,tvalue,tsummitvalue, tindex) in peak_content:
  *                 if not summit_value or summit_value < tsummitvalue:             # <<<<<<<<<<<<<<
@@ -18306,16 +18306,16 @@ static PyBoolObject *__pyx_f_5MACS2_2IO_10ScoreTrack_12scoreTrackII___close_peak
       __pyx_L9_bool_binop_done:;
       if (__pyx_t_4) {
 
-        /* "MACS2/IO/ScoreTrack.pyx":1167
+        /* "MACS2/IO/ScoreTrack.pyx":1158
  *                 #for (tstart,tend,tvalue,tsummitvalue, tindex) in peak_content:
  *                 if not summit_value or summit_value < tsummitvalue:
  *                     tsummit = [(tend + tstart) / 2, ]             # <<<<<<<<<<<<<<
  *                     tsummit_index = [ tindex, ]
  *                     summit_value = tsummitvalue
  */
-        __pyx_t_3 = PyFloat_FromDouble((((double)(__pyx_v_tend + __pyx_v_tstart)) / 2.0)); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 1167, __pyx_L1_error)
+        __pyx_t_3 = PyFloat_FromDouble((((double)(__pyx_v_tend + __pyx_v_tstart)) / 2.0)); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 1158, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_3);
-        __pyx_t_10 = PyList_New(1); if (unlikely(!__pyx_t_10)) __PYX_ERR(0, 1167, __pyx_L1_error)
+        __pyx_t_10 = PyList_New(1); if (unlikely(!__pyx_t_10)) __PYX_ERR(0, 1158, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_10);
         __Pyx_GIVEREF(__pyx_t_3);
         PyList_SET_ITEM(__pyx_t_10, 0, __pyx_t_3);
@@ -18323,14 +18323,14 @@ static PyBoolObject *__pyx_f_5MACS2_2IO_10ScoreTrack_12scoreTrackII___close_peak
         __Pyx_DECREF_SET(__pyx_v_tsummit, ((PyObject*)__pyx_t_10));
         __pyx_t_10 = 0;
 
-        /* "MACS2/IO/ScoreTrack.pyx":1168
+        /* "MACS2/IO/ScoreTrack.pyx":1159
  *                 if not summit_value or summit_value < tsummitvalue:
  *                     tsummit = [(tend + tstart) / 2, ]
  *                     tsummit_index = [ tindex, ]             # <<<<<<<<<<<<<<
  *                     summit_value = tsummitvalue
  *                 elif summit_value == tsummitvalue:
  */
-        __pyx_t_10 = PyList_New(1); if (unlikely(!__pyx_t_10)) __PYX_ERR(0, 1168, __pyx_L1_error)
+        __pyx_t_10 = PyList_New(1); if (unlikely(!__pyx_t_10)) __PYX_ERR(0, 1159, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_10);
         __Pyx_INCREF(__pyx_v_tindex);
         __Pyx_GIVEREF(__pyx_v_tindex);
@@ -18338,7 +18338,7 @@ static PyBoolObject *__pyx_f_5MACS2_2IO_10ScoreTrack_12scoreTrackII___close_peak
         __Pyx_XDECREF_SET(__pyx_v_tsummit_index, ((PyObject*)__pyx_t_10));
         __pyx_t_10 = 0;
 
-        /* "MACS2/IO/ScoreTrack.pyx":1169
+        /* "MACS2/IO/ScoreTrack.pyx":1160
  *                     tsummit = [(tend + tstart) / 2, ]
  *                     tsummit_index = [ tindex, ]
  *                     summit_value = tsummitvalue             # <<<<<<<<<<<<<<
@@ -18347,7 +18347,7 @@ static PyBoolObject *__pyx_f_5MACS2_2IO_10ScoreTrack_12scoreTrackII___close_peak
  */
         __pyx_v_summit_value = __pyx_v_tsummitvalue;
 
-        /* "MACS2/IO/ScoreTrack.pyx":1166
+        /* "MACS2/IO/ScoreTrack.pyx":1157
  *                 (tstart,tend,tvalue,tsummitvalue, tindex) = peak_content[i]
  *                 #for (tstart,tend,tvalue,tsummitvalue, tindex) in peak_content:
  *                 if not summit_value or summit_value < tsummitvalue:             # <<<<<<<<<<<<<<
@@ -18357,7 +18357,7 @@ static PyBoolObject *__pyx_f_5MACS2_2IO_10ScoreTrack_12scoreTrackII___close_peak
         goto __pyx_L8;
       }
 
-      /* "MACS2/IO/ScoreTrack.pyx":1170
+      /* "MACS2/IO/ScoreTrack.pyx":1161
  *                     tsummit_index = [ tindex, ]
  *                     summit_value = tsummitvalue
  *                 elif summit_value == tsummitvalue:             # <<<<<<<<<<<<<<
@@ -18367,29 +18367,29 @@ static PyBoolObject *__pyx_f_5MACS2_2IO_10ScoreTrack_12scoreTrackII___close_peak
       __pyx_t_4 = ((__pyx_v_summit_value == __pyx_v_tsummitvalue) != 0);
       if (__pyx_t_4) {
 
-        /* "MACS2/IO/ScoreTrack.pyx":1172
+        /* "MACS2/IO/ScoreTrack.pyx":1163
  *                 elif summit_value == tsummitvalue:
  *                     # remember continuous summit values
  *                     tsummit.append(int((tend + tstart) / 2))             # <<<<<<<<<<<<<<
  *                     tsummit_index.append( tindex )
  *             # the middle of all highest points in peak region is defined as summit
  */
-        __pyx_t_10 = __Pyx_PyInt_FromDouble((((double)(__pyx_v_tend + __pyx_v_tstart)) / 2.0)); if (unlikely(!__pyx_t_10)) __PYX_ERR(0, 1172, __pyx_L1_error)
+        __pyx_t_10 = __Pyx_PyInt_FromDouble((((double)(__pyx_v_tend + __pyx_v_tstart)) / 2.0)); if (unlikely(!__pyx_t_10)) __PYX_ERR(0, 1163, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_10);
-        __pyx_t_18 = __Pyx_PyList_Append(__pyx_v_tsummit, __pyx_t_10); if (unlikely(__pyx_t_18 == ((int)-1))) __PYX_ERR(0, 1172, __pyx_L1_error)
+        __pyx_t_18 = __Pyx_PyList_Append(__pyx_v_tsummit, __pyx_t_10); if (unlikely(__pyx_t_18 == ((int)-1))) __PYX_ERR(0, 1163, __pyx_L1_error)
         __Pyx_DECREF(__pyx_t_10); __pyx_t_10 = 0;
 
-        /* "MACS2/IO/ScoreTrack.pyx":1173
+        /* "MACS2/IO/ScoreTrack.pyx":1164
  *                     # remember continuous summit values
  *                     tsummit.append(int((tend + tstart) / 2))
  *                     tsummit_index.append( tindex )             # <<<<<<<<<<<<<<
  *             # the middle of all highest points in peak region is defined as summit
  *             midindex = int((len(tsummit) + 1) / 2) - 1
  */
-        if (unlikely(!__pyx_v_tsummit_index)) { __Pyx_RaiseUnboundLocalError("tsummit_index"); __PYX_ERR(0, 1173, __pyx_L1_error) }
-        __pyx_t_18 = __Pyx_PyList_Append(__pyx_v_tsummit_index, __pyx_v_tindex); if (unlikely(__pyx_t_18 == ((int)-1))) __PYX_ERR(0, 1173, __pyx_L1_error)
+        if (unlikely(!__pyx_v_tsummit_index)) { __Pyx_RaiseUnboundLocalError("tsummit_index"); __PYX_ERR(0, 1164, __pyx_L1_error) }
+        __pyx_t_18 = __Pyx_PyList_Append(__pyx_v_tsummit_index, __pyx_v_tindex); if (unlikely(__pyx_t_18 == ((int)-1))) __PYX_ERR(0, 1164, __pyx_L1_error)
 
-        /* "MACS2/IO/ScoreTrack.pyx":1170
+        /* "MACS2/IO/ScoreTrack.pyx":1161
  *                     tsummit_index = [ tindex, ]
  *                     summit_value = tsummitvalue
  *                 elif summit_value == tsummitvalue:             # <<<<<<<<<<<<<<
@@ -18400,51 +18400,51 @@ static PyBoolObject *__pyx_f_5MACS2_2IO_10ScoreTrack_12scoreTrackII___close_peak
       __pyx_L8:;
     }
 
-    /* "MACS2/IO/ScoreTrack.pyx":1175
+    /* "MACS2/IO/ScoreTrack.pyx":1166
  *                     tsummit_index.append( tindex )
  *             # the middle of all highest points in peak region is defined as summit
  *             midindex = int((len(tsummit) + 1) / 2) - 1             # <<<<<<<<<<<<<<
  *             summit_pos    = tsummit[ midindex ]
  *             summit_index  = tsummit_index[ midindex ]
  */
-    __pyx_t_5 = PyList_GET_SIZE(__pyx_v_tsummit); if (unlikely(__pyx_t_5 == ((Py_ssize_t)-1))) __PYX_ERR(0, 1175, __pyx_L1_error)
-    __pyx_t_10 = __Pyx_PyInt_FromDouble((((double)(__pyx_t_5 + 1)) / 2.0)); if (unlikely(!__pyx_t_10)) __PYX_ERR(0, 1175, __pyx_L1_error)
+    __pyx_t_5 = PyList_GET_SIZE(__pyx_v_tsummit); if (unlikely(__pyx_t_5 == ((Py_ssize_t)-1))) __PYX_ERR(0, 1166, __pyx_L1_error)
+    __pyx_t_10 = __Pyx_PyInt_FromDouble((((double)(__pyx_t_5 + 1)) / 2.0)); if (unlikely(!__pyx_t_10)) __PYX_ERR(0, 1166, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_10);
-    __pyx_t_3 = __Pyx_PyInt_SubtractObjC(__pyx_t_10, __pyx_int_1, 1, 0, 0); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 1175, __pyx_L1_error)
+    __pyx_t_3 = __Pyx_PyInt_SubtractObjC(__pyx_t_10, __pyx_int_1, 1, 0, 0); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 1166, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_3);
     __Pyx_DECREF(__pyx_t_10); __pyx_t_10 = 0;
-    __pyx_t_7 = __Pyx_PyInt_As_int(__pyx_t_3); if (unlikely((__pyx_t_7 == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 1175, __pyx_L1_error)
+    __pyx_t_7 = __Pyx_PyInt_As_int(__pyx_t_3); if (unlikely((__pyx_t_7 == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 1166, __pyx_L1_error)
     __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
     __pyx_v_midindex = __pyx_t_7;
 
-    /* "MACS2/IO/ScoreTrack.pyx":1176
+    /* "MACS2/IO/ScoreTrack.pyx":1167
  *             # the middle of all highest points in peak region is defined as summit
  *             midindex = int((len(tsummit) + 1) / 2) - 1
  *             summit_pos    = tsummit[ midindex ]             # <<<<<<<<<<<<<<
  *             summit_index  = tsummit_index[ midindex ]
  *             if self.scoring_method == ord('q'):
  */
-    __pyx_t_3 = __Pyx_GetItemInt_List(__pyx_v_tsummit, __pyx_v_midindex, int, 1, __Pyx_PyInt_From_int, 1, 1, 1); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 1176, __pyx_L1_error)
+    __pyx_t_3 = __Pyx_GetItemInt_List(__pyx_v_tsummit, __pyx_v_midindex, int, 1, __Pyx_PyInt_From_int, 1, 1, 1); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 1167, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_3);
-    __pyx_t_7 = __Pyx_PyInt_As_int(__pyx_t_3); if (unlikely((__pyx_t_7 == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 1176, __pyx_L1_error)
+    __pyx_t_7 = __Pyx_PyInt_As_int(__pyx_t_3); if (unlikely((__pyx_t_7 == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 1167, __pyx_L1_error)
     __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
     __pyx_v_summit_pos = __pyx_t_7;
 
-    /* "MACS2/IO/ScoreTrack.pyx":1177
+    /* "MACS2/IO/ScoreTrack.pyx":1168
  *             midindex = int((len(tsummit) + 1) / 2) - 1
  *             summit_pos    = tsummit[ midindex ]
  *             summit_index  = tsummit_index[ midindex ]             # <<<<<<<<<<<<<<
  *             if self.scoring_method == ord('q'):
  *                 qscore = self.data[chrom][3][ summit_index ]
  */
-    if (unlikely(!__pyx_v_tsummit_index)) { __Pyx_RaiseUnboundLocalError("tsummit_index"); __PYX_ERR(0, 1177, __pyx_L1_error) }
-    __pyx_t_3 = __Pyx_GetItemInt_List(__pyx_v_tsummit_index, __pyx_v_midindex, int, 1, __Pyx_PyInt_From_int, 1, 1, 1); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 1177, __pyx_L1_error)
+    if (unlikely(!__pyx_v_tsummit_index)) { __Pyx_RaiseUnboundLocalError("tsummit_index"); __PYX_ERR(0, 1168, __pyx_L1_error) }
+    __pyx_t_3 = __Pyx_GetItemInt_List(__pyx_v_tsummit_index, __pyx_v_midindex, int, 1, __Pyx_PyInt_From_int, 1, 1, 1); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 1168, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_3);
-    __pyx_t_7 = __Pyx_PyInt_As_int(__pyx_t_3); if (unlikely((__pyx_t_7 == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 1177, __pyx_L1_error)
+    __pyx_t_7 = __Pyx_PyInt_As_int(__pyx_t_3); if (unlikely((__pyx_t_7 == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 1168, __pyx_L1_error)
     __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
     __pyx_v_summit_index = __pyx_t_7;
 
-    /* "MACS2/IO/ScoreTrack.pyx":1178
+    /* "MACS2/IO/ScoreTrack.pyx":1169
  *             summit_pos    = tsummit[ midindex ]
  *             summit_index  = tsummit_index[ midindex ]
  *             if self.scoring_method == ord('q'):             # <<<<<<<<<<<<<<
@@ -18454,7 +18454,7 @@ static PyBoolObject *__pyx_f_5MACS2_2IO_10ScoreTrack_12scoreTrackII___close_peak
     __pyx_t_4 = ((__pyx_v_self->scoring_method == 0x71) != 0);
     if (__pyx_t_4) {
 
-      /* "MACS2/IO/ScoreTrack.pyx":1179
+      /* "MACS2/IO/ScoreTrack.pyx":1170
  *             summit_index  = tsummit_index[ midindex ]
  *             if self.scoring_method == ord('q'):
  *                 qscore = self.data[chrom][3][ summit_index ]             # <<<<<<<<<<<<<<
@@ -18463,20 +18463,20 @@ static PyBoolObject *__pyx_f_5MACS2_2IO_10ScoreTrack_12scoreTrackII___close_peak
  */
       if (unlikely(__pyx_v_self->data == Py_None)) {
         PyErr_SetString(PyExc_TypeError, "'NoneType' object is not subscriptable");
-        __PYX_ERR(0, 1179, __pyx_L1_error)
+        __PYX_ERR(0, 1170, __pyx_L1_error)
       }
-      __pyx_t_3 = __Pyx_PyDict_GetItem(__pyx_v_self->data, __pyx_v_chrom); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 1179, __pyx_L1_error)
+      __pyx_t_3 = __Pyx_PyDict_GetItem(__pyx_v_self->data, __pyx_v_chrom); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 1170, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_3);
-      __pyx_t_10 = __Pyx_GetItemInt(__pyx_t_3, 3, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_10)) __PYX_ERR(0, 1179, __pyx_L1_error)
+      __pyx_t_10 = __Pyx_GetItemInt(__pyx_t_3, 3, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_10)) __PYX_ERR(0, 1170, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_10);
       __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-      __pyx_t_3 = __Pyx_GetItemInt(__pyx_t_10, __pyx_v_summit_index, int, 1, __Pyx_PyInt_From_int, 0, 1, 1); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 1179, __pyx_L1_error)
+      __pyx_t_3 = __Pyx_GetItemInt(__pyx_t_10, __pyx_v_summit_index, int, 1, __Pyx_PyInt_From_int, 0, 1, 1); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 1170, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_3);
       __Pyx_DECREF(__pyx_t_10); __pyx_t_10 = 0;
       __pyx_v_qscore = __pyx_t_3;
       __pyx_t_3 = 0;
 
-      /* "MACS2/IO/ScoreTrack.pyx":1178
+      /* "MACS2/IO/ScoreTrack.pyx":1169
  *             summit_pos    = tsummit[ midindex ]
  *             summit_index  = tsummit_index[ midindex ]
  *             if self.scoring_method == ord('q'):             # <<<<<<<<<<<<<<
@@ -18486,7 +18486,7 @@ static PyBoolObject *__pyx_f_5MACS2_2IO_10ScoreTrack_12scoreTrackII___close_peak
       goto __pyx_L11;
     }
 
-    /* "MACS2/IO/ScoreTrack.pyx":1182
+    /* "MACS2/IO/ScoreTrack.pyx":1173
  *             else:
  *                 # if q value is not computed, use -1
  *                 qscore = -1             # <<<<<<<<<<<<<<
@@ -18499,17 +18499,17 @@ static PyBoolObject *__pyx_f_5MACS2_2IO_10ScoreTrack_12scoreTrackII___close_peak
     }
     __pyx_L11:;
 
-    /* "MACS2/IO/ScoreTrack.pyx":1184
+    /* "MACS2/IO/ScoreTrack.pyx":1175
  *                 qscore = -1
  * 
  *             peaks.add( chrom,             # <<<<<<<<<<<<<<
  *                        peak_content[0][0],
  *                        peak_content[-1][1],
  */
-    __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_v_peaks, __pyx_n_s_add); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 1184, __pyx_L1_error)
+    __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_v_peaks, __pyx_n_s_add); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 1175, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_3);
 
-    /* "MACS2/IO/ScoreTrack.pyx":1185
+    /* "MACS2/IO/ScoreTrack.pyx":1176
  * 
  *             peaks.add( chrom,
  *                        peak_content[0][0],             # <<<<<<<<<<<<<<
@@ -18518,15 +18518,15 @@ static PyBoolObject *__pyx_f_5MACS2_2IO_10ScoreTrack_12scoreTrackII___close_peak
  */
     if (unlikely(__pyx_v_peak_content == Py_None)) {
       PyErr_SetString(PyExc_TypeError, "'NoneType' object is not subscriptable");
-      __PYX_ERR(0, 1185, __pyx_L1_error)
+      __PYX_ERR(0, 1176, __pyx_L1_error)
     }
-    __pyx_t_10 = __Pyx_GetItemInt_List(__pyx_v_peak_content, 0, long, 1, __Pyx_PyInt_From_long, 1, 0, 1); if (unlikely(!__pyx_t_10)) __PYX_ERR(0, 1185, __pyx_L1_error)
+    __pyx_t_10 = __Pyx_GetItemInt_List(__pyx_v_peak_content, 0, long, 1, __Pyx_PyInt_From_long, 1, 0, 1); if (unlikely(!__pyx_t_10)) __PYX_ERR(0, 1176, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_10);
-    __pyx_t_9 = __Pyx_GetItemInt(__pyx_t_10, 0, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 1185, __pyx_L1_error)
+    __pyx_t_9 = __Pyx_GetItemInt(__pyx_t_10, 0, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 1176, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_9);
     __Pyx_DECREF(__pyx_t_10); __pyx_t_10 = 0;
 
-    /* "MACS2/IO/ScoreTrack.pyx":1186
+    /* "MACS2/IO/ScoreTrack.pyx":1177
  *             peaks.add( chrom,
  *                        peak_content[0][0],
  *                        peak_content[-1][1],             # <<<<<<<<<<<<<<
@@ -18535,22 +18535,22 @@ static PyBoolObject *__pyx_f_5MACS2_2IO_10ScoreTrack_12scoreTrackII___close_peak
  */
     if (unlikely(__pyx_v_peak_content == Py_None)) {
       PyErr_SetString(PyExc_TypeError, "'NoneType' object is not subscriptable");
-      __PYX_ERR(0, 1186, __pyx_L1_error)
+      __PYX_ERR(0, 1177, __pyx_L1_error)
     }
-    __pyx_t_10 = __Pyx_GetItemInt_List(__pyx_v_peak_content, -1L, long, 1, __Pyx_PyInt_From_long, 1, 1, 1); if (unlikely(!__pyx_t_10)) __PYX_ERR(0, 1186, __pyx_L1_error)
+    __pyx_t_10 = __Pyx_GetItemInt_List(__pyx_v_peak_content, -1L, long, 1, __Pyx_PyInt_From_long, 1, 1, 1); if (unlikely(!__pyx_t_10)) __PYX_ERR(0, 1177, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_10);
-    __pyx_t_8 = __Pyx_GetItemInt(__pyx_t_10, 1, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 1186, __pyx_L1_error)
+    __pyx_t_8 = __Pyx_GetItemInt(__pyx_t_10, 1, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 1177, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_8);
     __Pyx_DECREF(__pyx_t_10); __pyx_t_10 = 0;
 
-    /* "MACS2/IO/ScoreTrack.pyx":1184
+    /* "MACS2/IO/ScoreTrack.pyx":1175
  *                 qscore = -1
  * 
  *             peaks.add( chrom,             # <<<<<<<<<<<<<<
  *                        peak_content[0][0],
  *                        peak_content[-1][1],
  */
-    __pyx_t_10 = PyTuple_New(3); if (unlikely(!__pyx_t_10)) __PYX_ERR(0, 1184, __pyx_L1_error)
+    __pyx_t_10 = PyTuple_New(3); if (unlikely(!__pyx_t_10)) __PYX_ERR(0, 1175, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_10);
     __Pyx_INCREF(__pyx_v_chrom);
     __Pyx_GIVEREF(__pyx_v_chrom);
@@ -18562,21 +18562,21 @@ static PyBoolObject *__pyx_f_5MACS2_2IO_10ScoreTrack_12scoreTrackII___close_peak
     __pyx_t_9 = 0;
     __pyx_t_8 = 0;
 
-    /* "MACS2/IO/ScoreTrack.pyx":1187
+    /* "MACS2/IO/ScoreTrack.pyx":1178
  *                        peak_content[0][0],
  *                        peak_content[-1][1],
  *                        summit      = summit_pos,             # <<<<<<<<<<<<<<
  *                        peak_score  = self.data[chrom][ 3 ][ summit_index ],
  *                        pileup      = self.data[chrom][ 1 ][ summit_index ], # should be the same as summit_value
  */
-    __pyx_t_8 = __Pyx_PyDict_NewPresized(6); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 1187, __pyx_L1_error)
+    __pyx_t_8 = __Pyx_PyDict_NewPresized(6); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 1178, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_8);
-    __pyx_t_9 = __Pyx_PyInt_From_int(__pyx_v_summit_pos); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 1187, __pyx_L1_error)
+    __pyx_t_9 = __Pyx_PyInt_From_int(__pyx_v_summit_pos); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 1178, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_9);
-    if (PyDict_SetItem(__pyx_t_8, __pyx_n_s_summit, __pyx_t_9) < 0) __PYX_ERR(0, 1187, __pyx_L1_error)
+    if (PyDict_SetItem(__pyx_t_8, __pyx_n_s_summit, __pyx_t_9) < 0) __PYX_ERR(0, 1178, __pyx_L1_error)
     __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
 
-    /* "MACS2/IO/ScoreTrack.pyx":1188
+    /* "MACS2/IO/ScoreTrack.pyx":1179
  *                        peak_content[-1][1],
  *                        summit      = summit_pos,
  *                        peak_score  = self.data[chrom][ 3 ][ summit_index ],             # <<<<<<<<<<<<<<
@@ -18585,20 +18585,20 @@ static PyBoolObject *__pyx_f_5MACS2_2IO_10ScoreTrack_12scoreTrackII___close_peak
  */
     if (unlikely(__pyx_v_self->data == Py_None)) {
       PyErr_SetString(PyExc_TypeError, "'NoneType' object is not subscriptable");
-      __PYX_ERR(0, 1188, __pyx_L1_error)
+      __PYX_ERR(0, 1179, __pyx_L1_error)
     }
-    __pyx_t_9 = __Pyx_PyDict_GetItem(__pyx_v_self->data, __pyx_v_chrom); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 1188, __pyx_L1_error)
+    __pyx_t_9 = __Pyx_PyDict_GetItem(__pyx_v_self->data, __pyx_v_chrom); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 1179, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_9);
-    __pyx_t_2 = __Pyx_GetItemInt(__pyx_t_9, 3, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1188, __pyx_L1_error)
+    __pyx_t_2 = __Pyx_GetItemInt(__pyx_t_9, 3, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1179, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
     __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
-    __pyx_t_9 = __Pyx_GetItemInt(__pyx_t_2, __pyx_v_summit_index, int, 1, __Pyx_PyInt_From_int, 0, 1, 1); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 1188, __pyx_L1_error)
+    __pyx_t_9 = __Pyx_GetItemInt(__pyx_t_2, __pyx_v_summit_index, int, 1, __Pyx_PyInt_From_int, 0, 1, 1); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 1179, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_9);
     __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-    if (PyDict_SetItem(__pyx_t_8, __pyx_n_s_peak_score, __pyx_t_9) < 0) __PYX_ERR(0, 1187, __pyx_L1_error)
+    if (PyDict_SetItem(__pyx_t_8, __pyx_n_s_peak_score, __pyx_t_9) < 0) __PYX_ERR(0, 1178, __pyx_L1_error)
     __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
 
-    /* "MACS2/IO/ScoreTrack.pyx":1189
+    /* "MACS2/IO/ScoreTrack.pyx":1180
  *                        summit      = summit_pos,
  *                        peak_score  = self.data[chrom][ 3 ][ summit_index ],
  *                        pileup      = self.data[chrom][ 1 ][ summit_index ], # should be the same as summit_value             # <<<<<<<<<<<<<<
@@ -18607,20 +18607,20 @@ static PyBoolObject *__pyx_f_5MACS2_2IO_10ScoreTrack_12scoreTrackII___close_peak
  */
     if (unlikely(__pyx_v_self->data == Py_None)) {
       PyErr_SetString(PyExc_TypeError, "'NoneType' object is not subscriptable");
-      __PYX_ERR(0, 1189, __pyx_L1_error)
+      __PYX_ERR(0, 1180, __pyx_L1_error)
     }
-    __pyx_t_9 = __Pyx_PyDict_GetItem(__pyx_v_self->data, __pyx_v_chrom); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 1189, __pyx_L1_error)
+    __pyx_t_9 = __Pyx_PyDict_GetItem(__pyx_v_self->data, __pyx_v_chrom); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 1180, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_9);
-    __pyx_t_2 = __Pyx_GetItemInt(__pyx_t_9, 1, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1189, __pyx_L1_error)
+    __pyx_t_2 = __Pyx_GetItemInt(__pyx_t_9, 1, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1180, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
     __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
-    __pyx_t_9 = __Pyx_GetItemInt(__pyx_t_2, __pyx_v_summit_index, int, 1, __Pyx_PyInt_From_int, 0, 1, 1); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 1189, __pyx_L1_error)
+    __pyx_t_9 = __Pyx_GetItemInt(__pyx_t_2, __pyx_v_summit_index, int, 1, __Pyx_PyInt_From_int, 0, 1, 1); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 1180, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_9);
     __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-    if (PyDict_SetItem(__pyx_t_8, __pyx_n_s_pileup, __pyx_t_9) < 0) __PYX_ERR(0, 1187, __pyx_L1_error)
+    if (PyDict_SetItem(__pyx_t_8, __pyx_n_s_pileup, __pyx_t_9) < 0) __PYX_ERR(0, 1178, __pyx_L1_error)
     __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
 
-    /* "MACS2/IO/ScoreTrack.pyx":1190
+    /* "MACS2/IO/ScoreTrack.pyx":1181
  *                        peak_score  = self.data[chrom][ 3 ][ summit_index ],
  *                        pileup      = self.data[chrom][ 1 ][ summit_index ], # should be the same as summit_value
  *                        pscore      = get_pscore(self.data[chrom][ 1 ][ summit_index ], self.data[chrom][ 2 ][ summit_index ]),             # <<<<<<<<<<<<<<
@@ -18629,38 +18629,38 @@ static PyBoolObject *__pyx_f_5MACS2_2IO_10ScoreTrack_12scoreTrackII___close_peak
  */
     if (unlikely(__pyx_v_self->data == Py_None)) {
       PyErr_SetString(PyExc_TypeError, "'NoneType' object is not subscriptable");
-      __PYX_ERR(0, 1190, __pyx_L1_error)
+      __PYX_ERR(0, 1181, __pyx_L1_error)
     }
-    __pyx_t_9 = __Pyx_PyDict_GetItem(__pyx_v_self->data, __pyx_v_chrom); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 1190, __pyx_L1_error)
+    __pyx_t_9 = __Pyx_PyDict_GetItem(__pyx_v_self->data, __pyx_v_chrom); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 1181, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_9);
-    __pyx_t_2 = __Pyx_GetItemInt(__pyx_t_9, 1, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1190, __pyx_L1_error)
+    __pyx_t_2 = __Pyx_GetItemInt(__pyx_t_9, 1, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1181, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
     __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
-    __pyx_t_9 = __Pyx_GetItemInt(__pyx_t_2, __pyx_v_summit_index, int, 1, __Pyx_PyInt_From_int, 0, 1, 1); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 1190, __pyx_L1_error)
+    __pyx_t_9 = __Pyx_GetItemInt(__pyx_t_2, __pyx_v_summit_index, int, 1, __Pyx_PyInt_From_int, 0, 1, 1); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 1181, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_9);
     __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-    __pyx_t_7 = __Pyx_PyInt_As_int(__pyx_t_9); if (unlikely((__pyx_t_7 == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 1190, __pyx_L1_error)
+    __pyx_t_7 = __Pyx_PyInt_As_int(__pyx_t_9); if (unlikely((__pyx_t_7 == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 1181, __pyx_L1_error)
     __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
     if (unlikely(__pyx_v_self->data == Py_None)) {
       PyErr_SetString(PyExc_TypeError, "'NoneType' object is not subscriptable");
-      __PYX_ERR(0, 1190, __pyx_L1_error)
+      __PYX_ERR(0, 1181, __pyx_L1_error)
     }
-    __pyx_t_9 = __Pyx_PyDict_GetItem(__pyx_v_self->data, __pyx_v_chrom); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 1190, __pyx_L1_error)
+    __pyx_t_9 = __Pyx_PyDict_GetItem(__pyx_v_self->data, __pyx_v_chrom); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 1181, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_9);
-    __pyx_t_2 = __Pyx_GetItemInt(__pyx_t_9, 2, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1190, __pyx_L1_error)
+    __pyx_t_2 = __Pyx_GetItemInt(__pyx_t_9, 2, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1181, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
     __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
-    __pyx_t_9 = __Pyx_GetItemInt(__pyx_t_2, __pyx_v_summit_index, int, 1, __Pyx_PyInt_From_int, 0, 1, 1); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 1190, __pyx_L1_error)
+    __pyx_t_9 = __Pyx_GetItemInt(__pyx_t_2, __pyx_v_summit_index, int, 1, __Pyx_PyInt_From_int, 0, 1, 1); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 1181, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_9);
     __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-    __pyx_t_16 = __pyx_PyFloat_AsDouble(__pyx_t_9); if (unlikely((__pyx_t_16 == (double)-1) && PyErr_Occurred())) __PYX_ERR(0, 1190, __pyx_L1_error)
+    __pyx_t_16 = __pyx_PyFloat_AsDouble(__pyx_t_9); if (unlikely((__pyx_t_16 == (double)-1) && PyErr_Occurred())) __PYX_ERR(0, 1181, __pyx_L1_error)
     __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
-    __pyx_t_9 = PyFloat_FromDouble(__pyx_f_5MACS2_2IO_10ScoreTrack_get_pscore(__pyx_t_7, __pyx_t_16)); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 1190, __pyx_L1_error)
+    __pyx_t_9 = PyFloat_FromDouble(__pyx_f_5MACS2_2IO_10ScoreTrack_get_pscore(__pyx_t_7, __pyx_t_16)); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 1181, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_9);
-    if (PyDict_SetItem(__pyx_t_8, __pyx_n_s_pscore, __pyx_t_9) < 0) __PYX_ERR(0, 1187, __pyx_L1_error)
+    if (PyDict_SetItem(__pyx_t_8, __pyx_n_s_pscore, __pyx_t_9) < 0) __PYX_ERR(0, 1178, __pyx_L1_error)
     __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
 
-    /* "MACS2/IO/ScoreTrack.pyx":1191
+    /* "MACS2/IO/ScoreTrack.pyx":1182
  *                        pileup      = self.data[chrom][ 1 ][ summit_index ], # should be the same as summit_value
  *                        pscore      = get_pscore(self.data[chrom][ 1 ][ summit_index ], self.data[chrom][ 2 ][ summit_index ]),
  *                        fold_change = float ( self.data[chrom][ 1 ][ summit_index ] + self.pseudocount ) / ( self.data[chrom][ 2 ][ summit_index ] + self.pseudocount ),             # <<<<<<<<<<<<<<
@@ -18669,74 +18669,74 @@ static PyBoolObject *__pyx_f_5MACS2_2IO_10ScoreTrack_12scoreTrackII___close_peak
  */
     if (unlikely(__pyx_v_self->data == Py_None)) {
       PyErr_SetString(PyExc_TypeError, "'NoneType' object is not subscriptable");
-      __PYX_ERR(0, 1191, __pyx_L1_error)
+      __PYX_ERR(0, 1182, __pyx_L1_error)
     }
-    __pyx_t_9 = __Pyx_PyDict_GetItem(__pyx_v_self->data, __pyx_v_chrom); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 1191, __pyx_L1_error)
+    __pyx_t_9 = __Pyx_PyDict_GetItem(__pyx_v_self->data, __pyx_v_chrom); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 1182, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_9);
-    __pyx_t_2 = __Pyx_GetItemInt(__pyx_t_9, 1, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1191, __pyx_L1_error)
+    __pyx_t_2 = __Pyx_GetItemInt(__pyx_t_9, 1, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1182, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
     __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
-    __pyx_t_9 = __Pyx_GetItemInt(__pyx_t_2, __pyx_v_summit_index, int, 1, __Pyx_PyInt_From_int, 0, 1, 1); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 1191, __pyx_L1_error)
+    __pyx_t_9 = __Pyx_GetItemInt(__pyx_t_2, __pyx_v_summit_index, int, 1, __Pyx_PyInt_From_int, 0, 1, 1); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 1182, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_9);
     __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-    __pyx_t_2 = PyFloat_FromDouble(__pyx_v_self->pseudocount); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1191, __pyx_L1_error)
+    __pyx_t_2 = PyFloat_FromDouble(__pyx_v_self->pseudocount); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1182, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
-    __pyx_t_1 = PyNumber_Add(__pyx_t_9, __pyx_t_2); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1191, __pyx_L1_error)
+    __pyx_t_1 = PyNumber_Add(__pyx_t_9, __pyx_t_2); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1182, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
     __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
     __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-    __pyx_t_2 = __Pyx_PyNumber_Float(__pyx_t_1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1191, __pyx_L1_error)
+    __pyx_t_2 = __Pyx_PyNumber_Float(__pyx_t_1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1182, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
     __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
     if (unlikely(__pyx_v_self->data == Py_None)) {
       PyErr_SetString(PyExc_TypeError, "'NoneType' object is not subscriptable");
-      __PYX_ERR(0, 1191, __pyx_L1_error)
+      __PYX_ERR(0, 1182, __pyx_L1_error)
     }
-    __pyx_t_1 = __Pyx_PyDict_GetItem(__pyx_v_self->data, __pyx_v_chrom); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1191, __pyx_L1_error)
+    __pyx_t_1 = __Pyx_PyDict_GetItem(__pyx_v_self->data, __pyx_v_chrom); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1182, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
-    __pyx_t_9 = __Pyx_GetItemInt(__pyx_t_1, 2, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 1191, __pyx_L1_error)
+    __pyx_t_9 = __Pyx_GetItemInt(__pyx_t_1, 2, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 1182, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_9);
     __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-    __pyx_t_1 = __Pyx_GetItemInt(__pyx_t_9, __pyx_v_summit_index, int, 1, __Pyx_PyInt_From_int, 0, 1, 1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1191, __pyx_L1_error)
+    __pyx_t_1 = __Pyx_GetItemInt(__pyx_t_9, __pyx_v_summit_index, int, 1, __Pyx_PyInt_From_int, 0, 1, 1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1182, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
     __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
-    __pyx_t_9 = PyFloat_FromDouble(__pyx_v_self->pseudocount); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 1191, __pyx_L1_error)
+    __pyx_t_9 = PyFloat_FromDouble(__pyx_v_self->pseudocount); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 1182, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_9);
-    __pyx_t_11 = PyNumber_Add(__pyx_t_1, __pyx_t_9); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 1191, __pyx_L1_error)
+    __pyx_t_11 = PyNumber_Add(__pyx_t_1, __pyx_t_9); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 1182, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_11);
     __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
     __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
-    __pyx_t_9 = __Pyx_PyNumber_Divide(__pyx_t_2, __pyx_t_11); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 1191, __pyx_L1_error)
+    __pyx_t_9 = __Pyx_PyNumber_Divide(__pyx_t_2, __pyx_t_11); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 1182, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_9);
     __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
     __Pyx_DECREF(__pyx_t_11); __pyx_t_11 = 0;
-    if (PyDict_SetItem(__pyx_t_8, __pyx_n_s_fold_change, __pyx_t_9) < 0) __PYX_ERR(0, 1187, __pyx_L1_error)
+    if (PyDict_SetItem(__pyx_t_8, __pyx_n_s_fold_change, __pyx_t_9) < 0) __PYX_ERR(0, 1178, __pyx_L1_error)
     __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
 
-    /* "MACS2/IO/ScoreTrack.pyx":1192
+    /* "MACS2/IO/ScoreTrack.pyx":1183
  *                        pscore      = get_pscore(self.data[chrom][ 1 ][ summit_index ], self.data[chrom][ 2 ][ summit_index ]),
  *                        fold_change = float ( self.data[chrom][ 1 ][ summit_index ] + self.pseudocount ) / ( self.data[chrom][ 2 ][ summit_index ] + self.pseudocount ),
  *                        qscore      = qscore,             # <<<<<<<<<<<<<<
  *                        )
  *             # start a new peak
  */
-    if (PyDict_SetItem(__pyx_t_8, __pyx_n_s_qscore, __pyx_v_qscore) < 0) __PYX_ERR(0, 1187, __pyx_L1_error)
+    if (PyDict_SetItem(__pyx_t_8, __pyx_n_s_qscore, __pyx_v_qscore) < 0) __PYX_ERR(0, 1178, __pyx_L1_error)
 
-    /* "MACS2/IO/ScoreTrack.pyx":1184
+    /* "MACS2/IO/ScoreTrack.pyx":1175
  *                 qscore = -1
  * 
  *             peaks.add( chrom,             # <<<<<<<<<<<<<<
  *                        peak_content[0][0],
  *                        peak_content[-1][1],
  */
-    __pyx_t_9 = __Pyx_PyObject_Call(__pyx_t_3, __pyx_t_10, __pyx_t_8); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 1184, __pyx_L1_error)
+    __pyx_t_9 = __Pyx_PyObject_Call(__pyx_t_3, __pyx_t_10, __pyx_t_8); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 1175, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_9);
     __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
     __Pyx_DECREF(__pyx_t_10); __pyx_t_10 = 0;
     __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
     __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
 
-    /* "MACS2/IO/ScoreTrack.pyx":1195
+    /* "MACS2/IO/ScoreTrack.pyx":1186
  *                        )
  *             # start a new peak
  *             return True             # <<<<<<<<<<<<<<
@@ -18748,7 +18748,7 @@ static PyBoolObject *__pyx_f_5MACS2_2IO_10ScoreTrack_12scoreTrackII___close_peak
     __pyx_r = ((PyBoolObject *)Py_True);
     goto __pyx_L0;
 
-    /* "MACS2/IO/ScoreTrack.pyx":1159
+    /* "MACS2/IO/ScoreTrack.pyx":1150
  * 
  *         peak_length = peak_content[ -1 ][ 1 ] - peak_content[ 0 ][ 0 ]
  *         if peak_length >= min_length: # if the peak is too small, reject it             # <<<<<<<<<<<<<<
@@ -18757,7 +18757,7 @@ static PyBoolObject *__pyx_f_5MACS2_2IO_10ScoreTrack_12scoreTrackII___close_peak
  */
   }
 
-  /* "MACS2/IO/ScoreTrack.pyx":1146
+  /* "MACS2/IO/ScoreTrack.pyx":1137
  *         return peaks
  * 
  *     cdef bool __close_peak (self, list peak_content, peaks, int min_length,             # <<<<<<<<<<<<<<
@@ -18790,7 +18790,7 @@ static PyBoolObject *__pyx_f_5MACS2_2IO_10ScoreTrack_12scoreTrackII___close_peak
   return __pyx_r;
 }
 
-/* "MACS2/IO/ScoreTrack.pyx":1197
+/* "MACS2/IO/ScoreTrack.pyx":1188
  *             return True
  * 
  *     cdef bool __close_peak2 (self, list peak_content, peaks, int min_length,             # <<<<<<<<<<<<<<
@@ -18851,7 +18851,7 @@ static PyBoolObject *__pyx_f_5MACS2_2IO_10ScoreTrack_12scoreTrackII___close_peak
   int __pyx_t_21;
   PyObject *(*__pyx_t_22)(PyObject *);
   __Pyx_RefNannySetupContext("__close_peak2", 0);
-  __Pyx_TraceCall("__close_peak2", __pyx_f[0], 1197, 0, __PYX_ERR(0, 1197, __pyx_L1_error));
+  __Pyx_TraceCall("__close_peak2", __pyx_f[0], 1188, 0, __PYX_ERR(0, 1188, __pyx_L1_error));
   if (__pyx_optional_args) {
     if (__pyx_optional_args->__pyx_n > 0) {
       __pyx_v_smoothlen = __pyx_optional_args->smoothlen;
@@ -18870,7 +18870,7 @@ static PyBoolObject *__pyx_f_5MACS2_2IO_10ScoreTrack_12scoreTrackII___close_peak
   __pyx_pybuffernd_summit_offsets.data = NULL;
   __pyx_pybuffernd_summit_offsets.rcbuffer = &__pyx_pybuffer_summit_offsets;
 
-  /* "MACS2/IO/ScoreTrack.pyx":1209
+  /* "MACS2/IO/ScoreTrack.pyx":1200
  * 
  *         # Add 10 bp padding to peak region so that we can get true minima
  *         end = peak_content[ -1 ][ 1 ] + 10             # <<<<<<<<<<<<<<
@@ -18879,21 +18879,21 @@ static PyBoolObject *__pyx_f_5MACS2_2IO_10ScoreTrack_12scoreTrackII___close_peak
  */
   if (unlikely(__pyx_v_peak_content == Py_None)) {
     PyErr_SetString(PyExc_TypeError, "'NoneType' object is not subscriptable");
-    __PYX_ERR(0, 1209, __pyx_L1_error)
+    __PYX_ERR(0, 1200, __pyx_L1_error)
   }
-  __pyx_t_1 = __Pyx_GetItemInt_List(__pyx_v_peak_content, -1L, long, 1, __Pyx_PyInt_From_long, 1, 1, 1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1209, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_GetItemInt_List(__pyx_v_peak_content, -1L, long, 1, __Pyx_PyInt_From_long, 1, 1, 1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1200, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_2 = __Pyx_GetItemInt(__pyx_t_1, 1, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1209, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_GetItemInt(__pyx_t_1, 1, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1200, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-  __pyx_t_1 = __Pyx_PyInt_AddObjC(__pyx_t_2, __pyx_int_10, 10, 0, 0); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1209, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyInt_AddObjC(__pyx_t_2, __pyx_int_10, 10, 0, 0); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1200, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-  __pyx_t_3 = __Pyx_PyInt_As_int(__pyx_t_1); if (unlikely((__pyx_t_3 == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 1209, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_PyInt_As_int(__pyx_t_1); if (unlikely((__pyx_t_3 == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 1200, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   __pyx_v_end = __pyx_t_3;
 
-  /* "MACS2/IO/ScoreTrack.pyx":1210
+  /* "MACS2/IO/ScoreTrack.pyx":1201
  *         # Add 10 bp padding to peak region so that we can get true minima
  *         end = peak_content[ -1 ][ 1 ] + 10
  *         start = peak_content[ 0 ][ 0 ] - 10             # <<<<<<<<<<<<<<
@@ -18902,21 +18902,21 @@ static PyBoolObject *__pyx_f_5MACS2_2IO_10ScoreTrack_12scoreTrackII___close_peak
  */
   if (unlikely(__pyx_v_peak_content == Py_None)) {
     PyErr_SetString(PyExc_TypeError, "'NoneType' object is not subscriptable");
-    __PYX_ERR(0, 1210, __pyx_L1_error)
+    __PYX_ERR(0, 1201, __pyx_L1_error)
   }
-  __pyx_t_1 = __Pyx_GetItemInt_List(__pyx_v_peak_content, 0, long, 1, __Pyx_PyInt_From_long, 1, 0, 1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1210, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_GetItemInt_List(__pyx_v_peak_content, 0, long, 1, __Pyx_PyInt_From_long, 1, 0, 1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1201, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_2 = __Pyx_GetItemInt(__pyx_t_1, 0, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1210, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_GetItemInt(__pyx_t_1, 0, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1201, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-  __pyx_t_1 = __Pyx_PyInt_SubtractObjC(__pyx_t_2, __pyx_int_10, 10, 0, 0); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1210, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyInt_SubtractObjC(__pyx_t_2, __pyx_int_10, 10, 0, 0); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1201, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-  __pyx_t_3 = __Pyx_PyInt_As_int(__pyx_t_1); if (unlikely((__pyx_t_3 == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 1210, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_PyInt_As_int(__pyx_t_1); if (unlikely((__pyx_t_3 == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 1201, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   __pyx_v_start = __pyx_t_3;
 
-  /* "MACS2/IO/ScoreTrack.pyx":1211
+  /* "MACS2/IO/ScoreTrack.pyx":1202
  *         end = peak_content[ -1 ][ 1 ] + 10
  *         start = peak_content[ 0 ][ 0 ] - 10
  *         if start < 0:             # <<<<<<<<<<<<<<
@@ -18926,7 +18926,7 @@ static PyBoolObject *__pyx_f_5MACS2_2IO_10ScoreTrack_12scoreTrackII___close_peak
   __pyx_t_4 = ((__pyx_v_start < 0) != 0);
   if (__pyx_t_4) {
 
-    /* "MACS2/IO/ScoreTrack.pyx":1212
+    /* "MACS2/IO/ScoreTrack.pyx":1203
  *         start = peak_content[ 0 ][ 0 ] - 10
  *         if start < 0:
  *             start_boundary = 10 + start             # <<<<<<<<<<<<<<
@@ -18935,7 +18935,7 @@ static PyBoolObject *__pyx_f_5MACS2_2IO_10ScoreTrack_12scoreTrackII___close_peak
  */
     __pyx_v_start_boundary = (10 + __pyx_v_start);
 
-    /* "MACS2/IO/ScoreTrack.pyx":1213
+    /* "MACS2/IO/ScoreTrack.pyx":1204
  *         if start < 0:
  *             start_boundary = 10 + start
  *             start = 0             # <<<<<<<<<<<<<<
@@ -18944,7 +18944,7 @@ static PyBoolObject *__pyx_f_5MACS2_2IO_10ScoreTrack_12scoreTrackII___close_peak
  */
     __pyx_v_start = 0;
 
-    /* "MACS2/IO/ScoreTrack.pyx":1211
+    /* "MACS2/IO/ScoreTrack.pyx":1202
  *         end = peak_content[ -1 ][ 1 ] + 10
  *         start = peak_content[ 0 ][ 0 ] - 10
  *         if start < 0:             # <<<<<<<<<<<<<<
@@ -18954,7 +18954,7 @@ static PyBoolObject *__pyx_f_5MACS2_2IO_10ScoreTrack_12scoreTrackII___close_peak
     goto __pyx_L3;
   }
 
-  /* "MACS2/IO/ScoreTrack.pyx":1215
+  /* "MACS2/IO/ScoreTrack.pyx":1206
  *             start = 0
  *         else:
  *             start_boundary = 10             # <<<<<<<<<<<<<<
@@ -18966,19 +18966,19 @@ static PyBoolObject *__pyx_f_5MACS2_2IO_10ScoreTrack_12scoreTrackII___close_peak
   }
   __pyx_L3:;
 
-  /* "MACS2/IO/ScoreTrack.pyx":1216
+  /* "MACS2/IO/ScoreTrack.pyx":1207
  *         else:
  *             start_boundary = 10
  *         peak_length = end - start             # <<<<<<<<<<<<<<
  *         if end - start < min_length: return # if the region is too small, reject it
  * 
  */
-  __pyx_t_1 = __Pyx_PyInt_From_int((__pyx_v_end - __pyx_v_start)); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1216, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyInt_From_int((__pyx_v_end - __pyx_v_start)); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1207, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __pyx_v_peak_length = __pyx_t_1;
   __pyx_t_1 = 0;
 
-  /* "MACS2/IO/ScoreTrack.pyx":1217
+  /* "MACS2/IO/ScoreTrack.pyx":1208
  *             start_boundary = 10
  *         peak_length = end - start
  *         if end - start < min_length: return # if the region is too small, reject it             # <<<<<<<<<<<<<<
@@ -18992,34 +18992,34 @@ static PyBoolObject *__pyx_f_5MACS2_2IO_10ScoreTrack_12scoreTrackII___close_peak
     goto __pyx_L0;
   }
 
-  /* "MACS2/IO/ScoreTrack.pyx":1219
+  /* "MACS2/IO/ScoreTrack.pyx":1210
  *         if end - start < min_length: return # if the region is too small, reject it
  * 
  *         peakdata = np.zeros(end - start, dtype='float32')             # <<<<<<<<<<<<<<
  *         peakindices = np.zeros(end - start, dtype='int32')
  *         for (tstart,tend,tvalue,tsvalue, tmpindex) in peak_content:
  */
-  __Pyx_GetModuleGlobalName(__pyx_t_1, __pyx_n_s_np); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1219, __pyx_L1_error)
+  __Pyx_GetModuleGlobalName(__pyx_t_1, __pyx_n_s_np); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1210, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_t_1, __pyx_n_s_zeros); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1219, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_t_1, __pyx_n_s_zeros); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1210, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-  __pyx_t_1 = __Pyx_PyInt_From_int((__pyx_v_end - __pyx_v_start)); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1219, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyInt_From_int((__pyx_v_end - __pyx_v_start)); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1210, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_5 = PyTuple_New(1); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 1219, __pyx_L1_error)
+  __pyx_t_5 = PyTuple_New(1); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 1210, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_5);
   __Pyx_GIVEREF(__pyx_t_1);
   PyTuple_SET_ITEM(__pyx_t_5, 0, __pyx_t_1);
   __pyx_t_1 = 0;
-  __pyx_t_1 = __Pyx_PyDict_NewPresized(1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1219, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyDict_NewPresized(1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1210, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  if (PyDict_SetItem(__pyx_t_1, __pyx_n_s_dtype, __pyx_n_u_float32) < 0) __PYX_ERR(0, 1219, __pyx_L1_error)
-  __pyx_t_6 = __Pyx_PyObject_Call(__pyx_t_2, __pyx_t_5, __pyx_t_1); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 1219, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_t_1, __pyx_n_s_dtype, __pyx_n_u_float32) < 0) __PYX_ERR(0, 1210, __pyx_L1_error)
+  __pyx_t_6 = __Pyx_PyObject_Call(__pyx_t_2, __pyx_t_5, __pyx_t_1); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 1210, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_6);
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
   __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-  if (!(likely(((__pyx_t_6) == Py_None) || likely(__Pyx_TypeTest(__pyx_t_6, __pyx_ptype_5numpy_ndarray))))) __PYX_ERR(0, 1219, __pyx_L1_error)
+  if (!(likely(((__pyx_t_6) == Py_None) || likely(__Pyx_TypeTest(__pyx_t_6, __pyx_ptype_5numpy_ndarray))))) __PYX_ERR(0, 1210, __pyx_L1_error)
   __pyx_t_7 = ((PyArrayObject *)__pyx_t_6);
   {
     __Pyx_BufFmt_StackElem __pyx_stack[1];
@@ -19036,40 +19036,40 @@ static PyBoolObject *__pyx_f_5MACS2_2IO_10ScoreTrack_12scoreTrackII___close_peak
       __pyx_t_8 = __pyx_t_9 = __pyx_t_10 = 0;
     }
     __pyx_pybuffernd_peakdata.diminfo[0].strides = __pyx_pybuffernd_peakdata.rcbuffer->pybuffer.strides[0]; __pyx_pybuffernd_peakdata.diminfo[0].shape = __pyx_pybuffernd_peakdata.rcbuffer->pybuffer.shape[0];
-    if (unlikely(__pyx_t_3 < 0)) __PYX_ERR(0, 1219, __pyx_L1_error)
+    if (unlikely(__pyx_t_3 < 0)) __PYX_ERR(0, 1210, __pyx_L1_error)
   }
   __pyx_t_7 = 0;
   __pyx_v_peakdata = ((PyArrayObject *)__pyx_t_6);
   __pyx_t_6 = 0;
 
-  /* "MACS2/IO/ScoreTrack.pyx":1220
+  /* "MACS2/IO/ScoreTrack.pyx":1211
  * 
  *         peakdata = np.zeros(end - start, dtype='float32')
  *         peakindices = np.zeros(end - start, dtype='int32')             # <<<<<<<<<<<<<<
  *         for (tstart,tend,tvalue,tsvalue, tmpindex) in peak_content:
  *             i = tstart - start + start_boundary
  */
-  __Pyx_GetModuleGlobalName(__pyx_t_6, __pyx_n_s_np); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 1220, __pyx_L1_error)
+  __Pyx_GetModuleGlobalName(__pyx_t_6, __pyx_n_s_np); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 1211, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_6);
-  __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_t_6, __pyx_n_s_zeros); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1220, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_t_6, __pyx_n_s_zeros); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1211, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
-  __pyx_t_6 = __Pyx_PyInt_From_int((__pyx_v_end - __pyx_v_start)); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 1220, __pyx_L1_error)
+  __pyx_t_6 = __Pyx_PyInt_From_int((__pyx_v_end - __pyx_v_start)); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 1211, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_6);
-  __pyx_t_5 = PyTuple_New(1); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 1220, __pyx_L1_error)
+  __pyx_t_5 = PyTuple_New(1); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 1211, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_5);
   __Pyx_GIVEREF(__pyx_t_6);
   PyTuple_SET_ITEM(__pyx_t_5, 0, __pyx_t_6);
   __pyx_t_6 = 0;
-  __pyx_t_6 = __Pyx_PyDict_NewPresized(1); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 1220, __pyx_L1_error)
+  __pyx_t_6 = __Pyx_PyDict_NewPresized(1); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 1211, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_6);
-  if (PyDict_SetItem(__pyx_t_6, __pyx_n_s_dtype, __pyx_n_u_int32) < 0) __PYX_ERR(0, 1220, __pyx_L1_error)
-  __pyx_t_2 = __Pyx_PyObject_Call(__pyx_t_1, __pyx_t_5, __pyx_t_6); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1220, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_t_6, __pyx_n_s_dtype, __pyx_n_u_int32) < 0) __PYX_ERR(0, 1211, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyObject_Call(__pyx_t_1, __pyx_t_5, __pyx_t_6); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1211, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
   __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
-  if (!(likely(((__pyx_t_2) == Py_None) || likely(__Pyx_TypeTest(__pyx_t_2, __pyx_ptype_5numpy_ndarray))))) __PYX_ERR(0, 1220, __pyx_L1_error)
+  if (!(likely(((__pyx_t_2) == Py_None) || likely(__Pyx_TypeTest(__pyx_t_2, __pyx_ptype_5numpy_ndarray))))) __PYX_ERR(0, 1211, __pyx_L1_error)
   __pyx_t_11 = ((PyArrayObject *)__pyx_t_2);
   {
     __Pyx_BufFmt_StackElem __pyx_stack[1];
@@ -19086,13 +19086,13 @@ static PyBoolObject *__pyx_f_5MACS2_2IO_10ScoreTrack_12scoreTrackII___close_peak
       __pyx_t_10 = __pyx_t_9 = __pyx_t_8 = 0;
     }
     __pyx_pybuffernd_peakindices.diminfo[0].strides = __pyx_pybuffernd_peakindices.rcbuffer->pybuffer.strides[0]; __pyx_pybuffernd_peakindices.diminfo[0].shape = __pyx_pybuffernd_peakindices.rcbuffer->pybuffer.shape[0];
-    if (unlikely(__pyx_t_3 < 0)) __PYX_ERR(0, 1220, __pyx_L1_error)
+    if (unlikely(__pyx_t_3 < 0)) __PYX_ERR(0, 1211, __pyx_L1_error)
   }
   __pyx_t_11 = 0;
   __pyx_v_peakindices = ((PyArrayObject *)__pyx_t_2);
   __pyx_t_2 = 0;
 
-  /* "MACS2/IO/ScoreTrack.pyx":1221
+  /* "MACS2/IO/ScoreTrack.pyx":1212
  *         peakdata = np.zeros(end - start, dtype='float32')
  *         peakindices = np.zeros(end - start, dtype='int32')
  *         for (tstart,tend,tvalue,tsvalue, tmpindex) in peak_content:             # <<<<<<<<<<<<<<
@@ -19101,15 +19101,15 @@ static PyBoolObject *__pyx_f_5MACS2_2IO_10ScoreTrack_12scoreTrackII___close_peak
  */
   if (unlikely(__pyx_v_peak_content == Py_None)) {
     PyErr_SetString(PyExc_TypeError, "'NoneType' object is not iterable");
-    __PYX_ERR(0, 1221, __pyx_L1_error)
+    __PYX_ERR(0, 1212, __pyx_L1_error)
   }
   __pyx_t_2 = __pyx_v_peak_content; __Pyx_INCREF(__pyx_t_2); __pyx_t_12 = 0;
   for (;;) {
     if (__pyx_t_12 >= PyList_GET_SIZE(__pyx_t_2)) break;
     #if CYTHON_ASSUME_SAFE_MACROS && !CYTHON_AVOID_BORROWED_REFS
-    __pyx_t_6 = PyList_GET_ITEM(__pyx_t_2, __pyx_t_12); __Pyx_INCREF(__pyx_t_6); __pyx_t_12++; if (unlikely(0 < 0)) __PYX_ERR(0, 1221, __pyx_L1_error)
+    __pyx_t_6 = PyList_GET_ITEM(__pyx_t_2, __pyx_t_12); __Pyx_INCREF(__pyx_t_6); __pyx_t_12++; if (unlikely(0 < 0)) __PYX_ERR(0, 1212, __pyx_L1_error)
     #else
-    __pyx_t_6 = PySequence_ITEM(__pyx_t_2, __pyx_t_12); __pyx_t_12++; if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 1221, __pyx_L1_error)
+    __pyx_t_6 = PySequence_ITEM(__pyx_t_2, __pyx_t_12); __pyx_t_12++; if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 1212, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_6);
     #endif
     if ((likely(PyTuple_CheckExact(__pyx_t_6))) || (PyList_CheckExact(__pyx_t_6))) {
@@ -19118,7 +19118,7 @@ static PyBoolObject *__pyx_f_5MACS2_2IO_10ScoreTrack_12scoreTrackII___close_peak
       if (unlikely(size != 5)) {
         if (size > 5) __Pyx_RaiseTooManyValuesError(5);
         else if (size >= 0) __Pyx_RaiseNeedMoreValuesError(size);
-        __PYX_ERR(0, 1221, __pyx_L1_error)
+        __PYX_ERR(0, 1212, __pyx_L1_error)
       }
       #if CYTHON_ASSUME_SAFE_MACROS && !CYTHON_AVOID_BORROWED_REFS
       if (likely(PyTuple_CheckExact(sequence))) {
@@ -19144,7 +19144,7 @@ static PyBoolObject *__pyx_f_5MACS2_2IO_10ScoreTrack_12scoreTrackII___close_peak
         Py_ssize_t i;
         PyObject** temps[5] = {&__pyx_t_5,&__pyx_t_1,&__pyx_t_13,&__pyx_t_14,&__pyx_t_15};
         for (i=0; i < 5; i++) {
-          PyObject* item = PySequence_ITEM(sequence, i); if (unlikely(!item)) __PYX_ERR(0, 1221, __pyx_L1_error)
+          PyObject* item = PySequence_ITEM(sequence, i); if (unlikely(!item)) __PYX_ERR(0, 1212, __pyx_L1_error)
           __Pyx_GOTREF(item);
           *(temps[i]) = item;
         }
@@ -19154,7 +19154,7 @@ static PyBoolObject *__pyx_f_5MACS2_2IO_10ScoreTrack_12scoreTrackII___close_peak
     } else {
       Py_ssize_t index = -1;
       PyObject** temps[5] = {&__pyx_t_5,&__pyx_t_1,&__pyx_t_13,&__pyx_t_14,&__pyx_t_15};
-      __pyx_t_16 = PyObject_GetIter(__pyx_t_6); if (unlikely(!__pyx_t_16)) __PYX_ERR(0, 1221, __pyx_L1_error)
+      __pyx_t_16 = PyObject_GetIter(__pyx_t_6); if (unlikely(!__pyx_t_16)) __PYX_ERR(0, 1212, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_16);
       __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
       __pyx_t_17 = Py_TYPE(__pyx_t_16)->tp_iternext;
@@ -19163,7 +19163,7 @@ static PyBoolObject *__pyx_f_5MACS2_2IO_10ScoreTrack_12scoreTrackII___close_peak
         __Pyx_GOTREF(item);
         *(temps[index]) = item;
       }
-      if (__Pyx_IternextUnpackEndCheck(__pyx_t_17(__pyx_t_16), 5) < 0) __PYX_ERR(0, 1221, __pyx_L1_error)
+      if (__Pyx_IternextUnpackEndCheck(__pyx_t_17(__pyx_t_16), 5) < 0) __PYX_ERR(0, 1212, __pyx_L1_error)
       __pyx_t_17 = NULL;
       __Pyx_DECREF(__pyx_t_16); __pyx_t_16 = 0;
       goto __pyx_L8_unpacking_done;
@@ -19171,16 +19171,16 @@ static PyBoolObject *__pyx_f_5MACS2_2IO_10ScoreTrack_12scoreTrackII___close_peak
       __Pyx_DECREF(__pyx_t_16); __pyx_t_16 = 0;
       __pyx_t_17 = NULL;
       if (__Pyx_IterFinish() == 0) __Pyx_RaiseNeedMoreValuesError(index);
-      __PYX_ERR(0, 1221, __pyx_L1_error)
+      __PYX_ERR(0, 1212, __pyx_L1_error)
       __pyx_L8_unpacking_done:;
     }
-    __pyx_t_3 = __Pyx_PyInt_As_int(__pyx_t_5); if (unlikely((__pyx_t_3 == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 1221, __pyx_L1_error)
+    __pyx_t_3 = __Pyx_PyInt_As_int(__pyx_t_5); if (unlikely((__pyx_t_3 == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 1212, __pyx_L1_error)
     __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
-    __pyx_t_18 = __Pyx_PyInt_As_int(__pyx_t_1); if (unlikely((__pyx_t_18 == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 1221, __pyx_L1_error)
+    __pyx_t_18 = __Pyx_PyInt_As_int(__pyx_t_1); if (unlikely((__pyx_t_18 == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 1212, __pyx_L1_error)
     __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-    __pyx_t_19 = __pyx_PyFloat_AsDouble(__pyx_t_13); if (unlikely((__pyx_t_19 == (double)-1) && PyErr_Occurred())) __PYX_ERR(0, 1221, __pyx_L1_error)
+    __pyx_t_19 = __pyx_PyFloat_AsDouble(__pyx_t_13); if (unlikely((__pyx_t_19 == (double)-1) && PyErr_Occurred())) __PYX_ERR(0, 1212, __pyx_L1_error)
     __Pyx_DECREF(__pyx_t_13); __pyx_t_13 = 0;
-    __pyx_t_20 = __Pyx_PyInt_As_int(__pyx_t_15); if (unlikely((__pyx_t_20 == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 1221, __pyx_L1_error)
+    __pyx_t_20 = __Pyx_PyInt_As_int(__pyx_t_15); if (unlikely((__pyx_t_20 == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 1212, __pyx_L1_error)
     __Pyx_DECREF(__pyx_t_15); __pyx_t_15 = 0;
     __pyx_v_tstart = __pyx_t_3;
     __pyx_v_tend = __pyx_t_18;
@@ -19189,7 +19189,7 @@ static PyBoolObject *__pyx_f_5MACS2_2IO_10ScoreTrack_12scoreTrackII___close_peak
     __pyx_t_14 = 0;
     __pyx_v_tmpindex = __pyx_t_20;
 
-    /* "MACS2/IO/ScoreTrack.pyx":1222
+    /* "MACS2/IO/ScoreTrack.pyx":1213
  *         peakindices = np.zeros(end - start, dtype='int32')
  *         for (tstart,tend,tvalue,tsvalue, tmpindex) in peak_content:
  *             i = tstart - start + start_boundary             # <<<<<<<<<<<<<<
@@ -19198,7 +19198,7 @@ static PyBoolObject *__pyx_f_5MACS2_2IO_10ScoreTrack_12scoreTrackII___close_peak
  */
     __pyx_v_i = ((__pyx_v_tstart - __pyx_v_start) + __pyx_v_start_boundary);
 
-    /* "MACS2/IO/ScoreTrack.pyx":1223
+    /* "MACS2/IO/ScoreTrack.pyx":1214
  *         for (tstart,tend,tvalue,tsvalue, tmpindex) in peak_content:
  *             i = tstart - start + start_boundary
  *             j = tend - start + start_boundary             # <<<<<<<<<<<<<<
@@ -19207,46 +19207,46 @@ static PyBoolObject *__pyx_f_5MACS2_2IO_10ScoreTrack_12scoreTrackII___close_peak
  */
     __pyx_v_j = ((__pyx_v_tend - __pyx_v_start) + __pyx_v_start_boundary);
 
-    /* "MACS2/IO/ScoreTrack.pyx":1224
+    /* "MACS2/IO/ScoreTrack.pyx":1215
  *             i = tstart - start + start_boundary
  *             j = tend - start + start_boundary
  *             peakdata[i:j] = tsvalue             # <<<<<<<<<<<<<<
  *             peakindices[i:j] = tmpindex
  *         # apply smoothing window of smoothlen
  */
-    __pyx_t_6 = __Pyx_PyInt_From_int(__pyx_v_i); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 1224, __pyx_L1_error)
+    __pyx_t_6 = __Pyx_PyInt_From_int(__pyx_v_i); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 1215, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_6);
-    __pyx_t_15 = __Pyx_PyInt_From_int(__pyx_v_j); if (unlikely(!__pyx_t_15)) __PYX_ERR(0, 1224, __pyx_L1_error)
+    __pyx_t_15 = __Pyx_PyInt_From_int(__pyx_v_j); if (unlikely(!__pyx_t_15)) __PYX_ERR(0, 1215, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_15);
-    __pyx_t_14 = PySlice_New(__pyx_t_6, __pyx_t_15, Py_None); if (unlikely(!__pyx_t_14)) __PYX_ERR(0, 1224, __pyx_L1_error)
+    __pyx_t_14 = PySlice_New(__pyx_t_6, __pyx_t_15, Py_None); if (unlikely(!__pyx_t_14)) __PYX_ERR(0, 1215, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_14);
     __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
     __Pyx_DECREF(__pyx_t_15); __pyx_t_15 = 0;
-    if (unlikely(PyObject_SetItem(((PyObject *)__pyx_v_peakdata), __pyx_t_14, __pyx_v_tsvalue) < 0)) __PYX_ERR(0, 1224, __pyx_L1_error)
+    if (unlikely(PyObject_SetItem(((PyObject *)__pyx_v_peakdata), __pyx_t_14, __pyx_v_tsvalue) < 0)) __PYX_ERR(0, 1215, __pyx_L1_error)
     __Pyx_DECREF(__pyx_t_14); __pyx_t_14 = 0;
 
-    /* "MACS2/IO/ScoreTrack.pyx":1225
+    /* "MACS2/IO/ScoreTrack.pyx":1216
  *             j = tend - start + start_boundary
  *             peakdata[i:j] = tsvalue
  *             peakindices[i:j] = tmpindex             # <<<<<<<<<<<<<<
  *         # apply smoothing window of smoothlen
  * #        w = np.ones(smoothlen, dtype='float32') / smoothlen
  */
-    __pyx_t_14 = __Pyx_PyInt_From_int(__pyx_v_tmpindex); if (unlikely(!__pyx_t_14)) __PYX_ERR(0, 1225, __pyx_L1_error)
+    __pyx_t_14 = __Pyx_PyInt_From_int(__pyx_v_tmpindex); if (unlikely(!__pyx_t_14)) __PYX_ERR(0, 1216, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_14);
-    __pyx_t_15 = __Pyx_PyInt_From_int(__pyx_v_i); if (unlikely(!__pyx_t_15)) __PYX_ERR(0, 1225, __pyx_L1_error)
+    __pyx_t_15 = __Pyx_PyInt_From_int(__pyx_v_i); if (unlikely(!__pyx_t_15)) __PYX_ERR(0, 1216, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_15);
-    __pyx_t_6 = __Pyx_PyInt_From_int(__pyx_v_j); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 1225, __pyx_L1_error)
+    __pyx_t_6 = __Pyx_PyInt_From_int(__pyx_v_j); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 1216, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_6);
-    __pyx_t_13 = PySlice_New(__pyx_t_15, __pyx_t_6, Py_None); if (unlikely(!__pyx_t_13)) __PYX_ERR(0, 1225, __pyx_L1_error)
+    __pyx_t_13 = PySlice_New(__pyx_t_15, __pyx_t_6, Py_None); if (unlikely(!__pyx_t_13)) __PYX_ERR(0, 1216, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_13);
     __Pyx_DECREF(__pyx_t_15); __pyx_t_15 = 0;
     __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
-    if (unlikely(PyObject_SetItem(((PyObject *)__pyx_v_peakindices), __pyx_t_13, __pyx_t_14) < 0)) __PYX_ERR(0, 1225, __pyx_L1_error)
+    if (unlikely(PyObject_SetItem(((PyObject *)__pyx_v_peakindices), __pyx_t_13, __pyx_t_14) < 0)) __PYX_ERR(0, 1216, __pyx_L1_error)
     __Pyx_DECREF(__pyx_t_13); __pyx_t_13 = 0;
     __Pyx_DECREF(__pyx_t_14); __pyx_t_14 = 0;
 
-    /* "MACS2/IO/ScoreTrack.pyx":1221
+    /* "MACS2/IO/ScoreTrack.pyx":1212
  *         peakdata = np.zeros(end - start, dtype='float32')
  *         peakindices = np.zeros(end - start, dtype='int32')
  *         for (tstart,tend,tvalue,tsvalue, tmpindex) in peak_content:             # <<<<<<<<<<<<<<
@@ -19256,16 +19256,16 @@ static PyBoolObject *__pyx_f_5MACS2_2IO_10ScoreTrack_12scoreTrackII___close_peak
   }
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
-  /* "MACS2/IO/ScoreTrack.pyx":1232
+  /* "MACS2/IO/ScoreTrack.pyx":1223
  * #        else:
  * #            smoothdata = peakdata.copy()
  *         summit_offsets = maxima(peakdata, smoothlen)             # <<<<<<<<<<<<<<
  *         if summit_offsets.shape[0] == 0:
  *             # **failsafe** if no summits, fall back on old approach #
  */
-  __Pyx_GetModuleGlobalName(__pyx_t_14, __pyx_n_s_maxima); if (unlikely(!__pyx_t_14)) __PYX_ERR(0, 1232, __pyx_L1_error)
+  __Pyx_GetModuleGlobalName(__pyx_t_14, __pyx_n_s_maxima); if (unlikely(!__pyx_t_14)) __PYX_ERR(0, 1223, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_14);
-  __pyx_t_13 = __Pyx_PyInt_From_int(__pyx_v_smoothlen); if (unlikely(!__pyx_t_13)) __PYX_ERR(0, 1232, __pyx_L1_error)
+  __pyx_t_13 = __Pyx_PyInt_From_int(__pyx_v_smoothlen); if (unlikely(!__pyx_t_13)) __PYX_ERR(0, 1223, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_13);
   __pyx_t_6 = NULL;
   __pyx_t_20 = 0;
@@ -19282,7 +19282,7 @@ static PyBoolObject *__pyx_f_5MACS2_2IO_10ScoreTrack_12scoreTrackII___close_peak
   #if CYTHON_FAST_PYCALL
   if (PyFunction_Check(__pyx_t_14)) {
     PyObject *__pyx_temp[3] = {__pyx_t_6, ((PyObject *)__pyx_v_peakdata), __pyx_t_13};
-    __pyx_t_2 = __Pyx_PyFunction_FastCall(__pyx_t_14, __pyx_temp+1-__pyx_t_20, 2+__pyx_t_20); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1232, __pyx_L1_error)
+    __pyx_t_2 = __Pyx_PyFunction_FastCall(__pyx_t_14, __pyx_temp+1-__pyx_t_20, 2+__pyx_t_20); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1223, __pyx_L1_error)
     __Pyx_XDECREF(__pyx_t_6); __pyx_t_6 = 0;
     __Pyx_GOTREF(__pyx_t_2);
     __Pyx_DECREF(__pyx_t_13); __pyx_t_13 = 0;
@@ -19291,14 +19291,14 @@ static PyBoolObject *__pyx_f_5MACS2_2IO_10ScoreTrack_12scoreTrackII___close_peak
   #if CYTHON_FAST_PYCCALL
   if (__Pyx_PyFastCFunction_Check(__pyx_t_14)) {
     PyObject *__pyx_temp[3] = {__pyx_t_6, ((PyObject *)__pyx_v_peakdata), __pyx_t_13};
-    __pyx_t_2 = __Pyx_PyCFunction_FastCall(__pyx_t_14, __pyx_temp+1-__pyx_t_20, 2+__pyx_t_20); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1232, __pyx_L1_error)
+    __pyx_t_2 = __Pyx_PyCFunction_FastCall(__pyx_t_14, __pyx_temp+1-__pyx_t_20, 2+__pyx_t_20); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1223, __pyx_L1_error)
     __Pyx_XDECREF(__pyx_t_6); __pyx_t_6 = 0;
     __Pyx_GOTREF(__pyx_t_2);
     __Pyx_DECREF(__pyx_t_13); __pyx_t_13 = 0;
   } else
   #endif
   {
-    __pyx_t_15 = PyTuple_New(2+__pyx_t_20); if (unlikely(!__pyx_t_15)) __PYX_ERR(0, 1232, __pyx_L1_error)
+    __pyx_t_15 = PyTuple_New(2+__pyx_t_20); if (unlikely(!__pyx_t_15)) __PYX_ERR(0, 1223, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_15);
     if (__pyx_t_6) {
       __Pyx_GIVEREF(__pyx_t_6); PyTuple_SET_ITEM(__pyx_t_15, 0, __pyx_t_6); __pyx_t_6 = NULL;
@@ -19309,12 +19309,12 @@ static PyBoolObject *__pyx_f_5MACS2_2IO_10ScoreTrack_12scoreTrackII___close_peak
     __Pyx_GIVEREF(__pyx_t_13);
     PyTuple_SET_ITEM(__pyx_t_15, 1+__pyx_t_20, __pyx_t_13);
     __pyx_t_13 = 0;
-    __pyx_t_2 = __Pyx_PyObject_Call(__pyx_t_14, __pyx_t_15, NULL); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1232, __pyx_L1_error)
+    __pyx_t_2 = __Pyx_PyObject_Call(__pyx_t_14, __pyx_t_15, NULL); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1223, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
     __Pyx_DECREF(__pyx_t_15); __pyx_t_15 = 0;
   }
   __Pyx_DECREF(__pyx_t_14); __pyx_t_14 = 0;
-  if (!(likely(((__pyx_t_2) == Py_None) || likely(__Pyx_TypeTest(__pyx_t_2, __pyx_ptype_5numpy_ndarray))))) __PYX_ERR(0, 1232, __pyx_L1_error)
+  if (!(likely(((__pyx_t_2) == Py_None) || likely(__Pyx_TypeTest(__pyx_t_2, __pyx_ptype_5numpy_ndarray))))) __PYX_ERR(0, 1223, __pyx_L1_error)
   __pyx_t_11 = ((PyArrayObject *)__pyx_t_2);
   {
     __Pyx_BufFmt_StackElem __pyx_stack[1];
@@ -19331,13 +19331,13 @@ static PyBoolObject *__pyx_f_5MACS2_2IO_10ScoreTrack_12scoreTrackII___close_peak
       __pyx_t_8 = __pyx_t_9 = __pyx_t_10 = 0;
     }
     __pyx_pybuffernd_summit_offsets.diminfo[0].strides = __pyx_pybuffernd_summit_offsets.rcbuffer->pybuffer.strides[0]; __pyx_pybuffernd_summit_offsets.diminfo[0].shape = __pyx_pybuffernd_summit_offsets.rcbuffer->pybuffer.shape[0];
-    if (unlikely(__pyx_t_20 < 0)) __PYX_ERR(0, 1232, __pyx_L1_error)
+    if (unlikely(__pyx_t_20 < 0)) __PYX_ERR(0, 1223, __pyx_L1_error)
   }
   __pyx_t_11 = 0;
   __pyx_v_summit_offsets = ((PyArrayObject *)__pyx_t_2);
   __pyx_t_2 = 0;
 
-  /* "MACS2/IO/ScoreTrack.pyx":1233
+  /* "MACS2/IO/ScoreTrack.pyx":1224
  * #            smoothdata = peakdata.copy()
  *         summit_offsets = maxima(peakdata, smoothlen)
  *         if summit_offsets.shape[0] == 0:             # <<<<<<<<<<<<<<
@@ -19347,7 +19347,7 @@ static PyBoolObject *__pyx_f_5MACS2_2IO_10ScoreTrack_12scoreTrackII___close_peak
   __pyx_t_4 = (((__pyx_v_summit_offsets->dimensions[0]) == 0) != 0);
   if (__pyx_t_4) {
 
-    /* "MACS2/IO/ScoreTrack.pyx":1235
+    /* "MACS2/IO/ScoreTrack.pyx":1226
  *         if summit_offsets.shape[0] == 0:
  *             # **failsafe** if no summits, fall back on old approach #
  *             return self.__close_peak(peak_content, peaks, min_length, chrom)             # <<<<<<<<<<<<<<
@@ -19355,13 +19355,13 @@ static PyBoolObject *__pyx_f_5MACS2_2IO_10ScoreTrack_12scoreTrackII___close_peak
  *             # remove maxima that occurred in padding
  */
     __Pyx_XDECREF(((PyObject *)__pyx_r));
-    __pyx_t_2 = ((PyObject *)((struct __pyx_vtabstruct_5MACS2_2IO_10ScoreTrack_scoreTrackII *)__pyx_v_self->__pyx_vtab)->__pyx___close_peak(__pyx_v_self, __pyx_v_peak_content, __pyx_v_peaks, __pyx_v_min_length, __pyx_v_chrom, NULL)); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1235, __pyx_L1_error)
+    __pyx_t_2 = ((PyObject *)((struct __pyx_vtabstruct_5MACS2_2IO_10ScoreTrack_scoreTrackII *)__pyx_v_self->__pyx_vtab)->__pyx___close_peak(__pyx_v_self, __pyx_v_peak_content, __pyx_v_peaks, __pyx_v_min_length, __pyx_v_chrom, NULL)); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1226, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
     __pyx_r = ((PyBoolObject *)__pyx_t_2);
     __pyx_t_2 = 0;
     goto __pyx_L0;
 
-    /* "MACS2/IO/ScoreTrack.pyx":1233
+    /* "MACS2/IO/ScoreTrack.pyx":1224
  * #            smoothdata = peakdata.copy()
  *         summit_offsets = maxima(peakdata, smoothlen)
  *         if summit_offsets.shape[0] == 0:             # <<<<<<<<<<<<<<
@@ -19370,7 +19370,7 @@ static PyBoolObject *__pyx_f_5MACS2_2IO_10ScoreTrack_12scoreTrackII___close_peak
  */
   }
 
-  /* "MACS2/IO/ScoreTrack.pyx":1238
+  /* "MACS2/IO/ScoreTrack.pyx":1229
  *         else:
  *             # remove maxima that occurred in padding
  *             i = np.searchsorted(summit_offsets, start_boundary)             # <<<<<<<<<<<<<<
@@ -19378,12 +19378,12 @@ static PyBoolObject *__pyx_f_5MACS2_2IO_10ScoreTrack_12scoreTrackII___close_peak
  *             summit_offsets = summit_offsets[i:j]
  */
   /*else*/ {
-    __Pyx_GetModuleGlobalName(__pyx_t_14, __pyx_n_s_np); if (unlikely(!__pyx_t_14)) __PYX_ERR(0, 1238, __pyx_L1_error)
+    __Pyx_GetModuleGlobalName(__pyx_t_14, __pyx_n_s_np); if (unlikely(!__pyx_t_14)) __PYX_ERR(0, 1229, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_14);
-    __pyx_t_15 = __Pyx_PyObject_GetAttrStr(__pyx_t_14, __pyx_n_s_searchsorted); if (unlikely(!__pyx_t_15)) __PYX_ERR(0, 1238, __pyx_L1_error)
+    __pyx_t_15 = __Pyx_PyObject_GetAttrStr(__pyx_t_14, __pyx_n_s_searchsorted); if (unlikely(!__pyx_t_15)) __PYX_ERR(0, 1229, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_15);
     __Pyx_DECREF(__pyx_t_14); __pyx_t_14 = 0;
-    __pyx_t_14 = __Pyx_PyInt_From_int(__pyx_v_start_boundary); if (unlikely(!__pyx_t_14)) __PYX_ERR(0, 1238, __pyx_L1_error)
+    __pyx_t_14 = __Pyx_PyInt_From_int(__pyx_v_start_boundary); if (unlikely(!__pyx_t_14)) __PYX_ERR(0, 1229, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_14);
     __pyx_t_13 = NULL;
     __pyx_t_20 = 0;
@@ -19400,7 +19400,7 @@ static PyBoolObject *__pyx_f_5MACS2_2IO_10ScoreTrack_12scoreTrackII___close_peak
     #if CYTHON_FAST_PYCALL
     if (PyFunction_Check(__pyx_t_15)) {
       PyObject *__pyx_temp[3] = {__pyx_t_13, ((PyObject *)__pyx_v_summit_offsets), __pyx_t_14};
-      __pyx_t_2 = __Pyx_PyFunction_FastCall(__pyx_t_15, __pyx_temp+1-__pyx_t_20, 2+__pyx_t_20); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1238, __pyx_L1_error)
+      __pyx_t_2 = __Pyx_PyFunction_FastCall(__pyx_t_15, __pyx_temp+1-__pyx_t_20, 2+__pyx_t_20); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1229, __pyx_L1_error)
       __Pyx_XDECREF(__pyx_t_13); __pyx_t_13 = 0;
       __Pyx_GOTREF(__pyx_t_2);
       __Pyx_DECREF(__pyx_t_14); __pyx_t_14 = 0;
@@ -19409,14 +19409,14 @@ static PyBoolObject *__pyx_f_5MACS2_2IO_10ScoreTrack_12scoreTrackII___close_peak
     #if CYTHON_FAST_PYCCALL
     if (__Pyx_PyFastCFunction_Check(__pyx_t_15)) {
       PyObject *__pyx_temp[3] = {__pyx_t_13, ((PyObject *)__pyx_v_summit_offsets), __pyx_t_14};
-      __pyx_t_2 = __Pyx_PyCFunction_FastCall(__pyx_t_15, __pyx_temp+1-__pyx_t_20, 2+__pyx_t_20); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1238, __pyx_L1_error)
+      __pyx_t_2 = __Pyx_PyCFunction_FastCall(__pyx_t_15, __pyx_temp+1-__pyx_t_20, 2+__pyx_t_20); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1229, __pyx_L1_error)
       __Pyx_XDECREF(__pyx_t_13); __pyx_t_13 = 0;
       __Pyx_GOTREF(__pyx_t_2);
       __Pyx_DECREF(__pyx_t_14); __pyx_t_14 = 0;
     } else
     #endif
     {
-      __pyx_t_6 = PyTuple_New(2+__pyx_t_20); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 1238, __pyx_L1_error)
+      __pyx_t_6 = PyTuple_New(2+__pyx_t_20); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 1229, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_6);
       if (__pyx_t_13) {
         __Pyx_GIVEREF(__pyx_t_13); PyTuple_SET_ITEM(__pyx_t_6, 0, __pyx_t_13); __pyx_t_13 = NULL;
@@ -19427,30 +19427,30 @@ static PyBoolObject *__pyx_f_5MACS2_2IO_10ScoreTrack_12scoreTrackII___close_peak
       __Pyx_GIVEREF(__pyx_t_14);
       PyTuple_SET_ITEM(__pyx_t_6, 1+__pyx_t_20, __pyx_t_14);
       __pyx_t_14 = 0;
-      __pyx_t_2 = __Pyx_PyObject_Call(__pyx_t_15, __pyx_t_6, NULL); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1238, __pyx_L1_error)
+      __pyx_t_2 = __Pyx_PyObject_Call(__pyx_t_15, __pyx_t_6, NULL); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1229, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_2);
       __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
     }
     __Pyx_DECREF(__pyx_t_15); __pyx_t_15 = 0;
-    __pyx_t_20 = __Pyx_PyInt_As_int(__pyx_t_2); if (unlikely((__pyx_t_20 == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 1238, __pyx_L1_error)
+    __pyx_t_20 = __Pyx_PyInt_As_int(__pyx_t_2); if (unlikely((__pyx_t_20 == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 1229, __pyx_L1_error)
     __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
     __pyx_v_i = __pyx_t_20;
 
-    /* "MACS2/IO/ScoreTrack.pyx":1239
+    /* "MACS2/IO/ScoreTrack.pyx":1230
  *             # remove maxima that occurred in padding
  *             i = np.searchsorted(summit_offsets, start_boundary)
  *             j = np.searchsorted(summit_offsets, peak_length + start_boundary, 'right')             # <<<<<<<<<<<<<<
  *             summit_offsets = summit_offsets[i:j]
  * 
  */
-    __Pyx_GetModuleGlobalName(__pyx_t_15, __pyx_n_s_np); if (unlikely(!__pyx_t_15)) __PYX_ERR(0, 1239, __pyx_L1_error)
+    __Pyx_GetModuleGlobalName(__pyx_t_15, __pyx_n_s_np); if (unlikely(!__pyx_t_15)) __PYX_ERR(0, 1230, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_15);
-    __pyx_t_6 = __Pyx_PyObject_GetAttrStr(__pyx_t_15, __pyx_n_s_searchsorted); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 1239, __pyx_L1_error)
+    __pyx_t_6 = __Pyx_PyObject_GetAttrStr(__pyx_t_15, __pyx_n_s_searchsorted); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 1230, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_6);
     __Pyx_DECREF(__pyx_t_15); __pyx_t_15 = 0;
-    __pyx_t_15 = __Pyx_PyInt_From_int(__pyx_v_start_boundary); if (unlikely(!__pyx_t_15)) __PYX_ERR(0, 1239, __pyx_L1_error)
+    __pyx_t_15 = __Pyx_PyInt_From_int(__pyx_v_start_boundary); if (unlikely(!__pyx_t_15)) __PYX_ERR(0, 1230, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_15);
-    __pyx_t_14 = PyNumber_Add(__pyx_v_peak_length, __pyx_t_15); if (unlikely(!__pyx_t_14)) __PYX_ERR(0, 1239, __pyx_L1_error)
+    __pyx_t_14 = PyNumber_Add(__pyx_v_peak_length, __pyx_t_15); if (unlikely(!__pyx_t_14)) __PYX_ERR(0, 1230, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_14);
     __Pyx_DECREF(__pyx_t_15); __pyx_t_15 = 0;
     __pyx_t_15 = NULL;
@@ -19468,7 +19468,7 @@ static PyBoolObject *__pyx_f_5MACS2_2IO_10ScoreTrack_12scoreTrackII___close_peak
     #if CYTHON_FAST_PYCALL
     if (PyFunction_Check(__pyx_t_6)) {
       PyObject *__pyx_temp[4] = {__pyx_t_15, ((PyObject *)__pyx_v_summit_offsets), __pyx_t_14, __pyx_n_u_right};
-      __pyx_t_2 = __Pyx_PyFunction_FastCall(__pyx_t_6, __pyx_temp+1-__pyx_t_20, 3+__pyx_t_20); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1239, __pyx_L1_error)
+      __pyx_t_2 = __Pyx_PyFunction_FastCall(__pyx_t_6, __pyx_temp+1-__pyx_t_20, 3+__pyx_t_20); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1230, __pyx_L1_error)
       __Pyx_XDECREF(__pyx_t_15); __pyx_t_15 = 0;
       __Pyx_GOTREF(__pyx_t_2);
       __Pyx_DECREF(__pyx_t_14); __pyx_t_14 = 0;
@@ -19477,14 +19477,14 @@ static PyBoolObject *__pyx_f_5MACS2_2IO_10ScoreTrack_12scoreTrackII___close_peak
     #if CYTHON_FAST_PYCCALL
     if (__Pyx_PyFastCFunction_Check(__pyx_t_6)) {
       PyObject *__pyx_temp[4] = {__pyx_t_15, ((PyObject *)__pyx_v_summit_offsets), __pyx_t_14, __pyx_n_u_right};
-      __pyx_t_2 = __Pyx_PyCFunction_FastCall(__pyx_t_6, __pyx_temp+1-__pyx_t_20, 3+__pyx_t_20); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1239, __pyx_L1_error)
+      __pyx_t_2 = __Pyx_PyCFunction_FastCall(__pyx_t_6, __pyx_temp+1-__pyx_t_20, 3+__pyx_t_20); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1230, __pyx_L1_error)
       __Pyx_XDECREF(__pyx_t_15); __pyx_t_15 = 0;
       __Pyx_GOTREF(__pyx_t_2);
       __Pyx_DECREF(__pyx_t_14); __pyx_t_14 = 0;
     } else
     #endif
     {
-      __pyx_t_13 = PyTuple_New(3+__pyx_t_20); if (unlikely(!__pyx_t_13)) __PYX_ERR(0, 1239, __pyx_L1_error)
+      __pyx_t_13 = PyTuple_New(3+__pyx_t_20); if (unlikely(!__pyx_t_13)) __PYX_ERR(0, 1230, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_13);
       if (__pyx_t_15) {
         __Pyx_GIVEREF(__pyx_t_15); PyTuple_SET_ITEM(__pyx_t_13, 0, __pyx_t_15); __pyx_t_15 = NULL;
@@ -19498,34 +19498,34 @@ static PyBoolObject *__pyx_f_5MACS2_2IO_10ScoreTrack_12scoreTrackII___close_peak
       __Pyx_GIVEREF(__pyx_n_u_right);
       PyTuple_SET_ITEM(__pyx_t_13, 2+__pyx_t_20, __pyx_n_u_right);
       __pyx_t_14 = 0;
-      __pyx_t_2 = __Pyx_PyObject_Call(__pyx_t_6, __pyx_t_13, NULL); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1239, __pyx_L1_error)
+      __pyx_t_2 = __Pyx_PyObject_Call(__pyx_t_6, __pyx_t_13, NULL); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1230, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_2);
       __Pyx_DECREF(__pyx_t_13); __pyx_t_13 = 0;
     }
     __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
-    __pyx_t_20 = __Pyx_PyInt_As_int(__pyx_t_2); if (unlikely((__pyx_t_20 == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 1239, __pyx_L1_error)
+    __pyx_t_20 = __Pyx_PyInt_As_int(__pyx_t_2); if (unlikely((__pyx_t_20 == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 1230, __pyx_L1_error)
     __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
     __pyx_v_j = __pyx_t_20;
 
-    /* "MACS2/IO/ScoreTrack.pyx":1240
+    /* "MACS2/IO/ScoreTrack.pyx":1231
  *             i = np.searchsorted(summit_offsets, start_boundary)
  *             j = np.searchsorted(summit_offsets, peak_length + start_boundary, 'right')
  *             summit_offsets = summit_offsets[i:j]             # <<<<<<<<<<<<<<
  * 
  *         summit_offsets = enforce_peakyness(peakdata, summit_offsets)
  */
-    __pyx_t_2 = __Pyx_PyInt_From_int(__pyx_v_i); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1240, __pyx_L1_error)
+    __pyx_t_2 = __Pyx_PyInt_From_int(__pyx_v_i); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1231, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
-    __pyx_t_6 = __Pyx_PyInt_From_int(__pyx_v_j); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 1240, __pyx_L1_error)
+    __pyx_t_6 = __Pyx_PyInt_From_int(__pyx_v_j); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 1231, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_6);
-    __pyx_t_13 = PySlice_New(__pyx_t_2, __pyx_t_6, Py_None); if (unlikely(!__pyx_t_13)) __PYX_ERR(0, 1240, __pyx_L1_error)
+    __pyx_t_13 = PySlice_New(__pyx_t_2, __pyx_t_6, Py_None); if (unlikely(!__pyx_t_13)) __PYX_ERR(0, 1231, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_13);
     __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
     __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
-    __pyx_t_6 = __Pyx_PyObject_GetItem(((PyObject *)__pyx_v_summit_offsets), __pyx_t_13); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 1240, __pyx_L1_error)
+    __pyx_t_6 = __Pyx_PyObject_GetItem(((PyObject *)__pyx_v_summit_offsets), __pyx_t_13); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 1231, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_6);
     __Pyx_DECREF(__pyx_t_13); __pyx_t_13 = 0;
-    if (!(likely(((__pyx_t_6) == Py_None) || likely(__Pyx_TypeTest(__pyx_t_6, __pyx_ptype_5numpy_ndarray))))) __PYX_ERR(0, 1240, __pyx_L1_error)
+    if (!(likely(((__pyx_t_6) == Py_None) || likely(__Pyx_TypeTest(__pyx_t_6, __pyx_ptype_5numpy_ndarray))))) __PYX_ERR(0, 1231, __pyx_L1_error)
     __pyx_t_11 = ((PyArrayObject *)__pyx_t_6);
     {
       __Pyx_BufFmt_StackElem __pyx_stack[1];
@@ -19542,21 +19542,21 @@ static PyBoolObject *__pyx_f_5MACS2_2IO_10ScoreTrack_12scoreTrackII___close_peak
         __pyx_t_10 = __pyx_t_9 = __pyx_t_8 = 0;
       }
       __pyx_pybuffernd_summit_offsets.diminfo[0].strides = __pyx_pybuffernd_summit_offsets.rcbuffer->pybuffer.strides[0]; __pyx_pybuffernd_summit_offsets.diminfo[0].shape = __pyx_pybuffernd_summit_offsets.rcbuffer->pybuffer.shape[0];
-      if (unlikely(__pyx_t_20 < 0)) __PYX_ERR(0, 1240, __pyx_L1_error)
+      if (unlikely(__pyx_t_20 < 0)) __PYX_ERR(0, 1231, __pyx_L1_error)
     }
     __pyx_t_11 = 0;
     __Pyx_DECREF_SET(__pyx_v_summit_offsets, ((PyArrayObject *)__pyx_t_6));
     __pyx_t_6 = 0;
   }
 
-  /* "MACS2/IO/ScoreTrack.pyx":1242
+  /* "MACS2/IO/ScoreTrack.pyx":1233
  *             summit_offsets = summit_offsets[i:j]
  * 
  *         summit_offsets = enforce_peakyness(peakdata, summit_offsets)             # <<<<<<<<<<<<<<
  *         if summit_offsets.shape[0] == 0:
  *             # **failsafe** if no summits, fall back on old approach #
  */
-  __Pyx_GetModuleGlobalName(__pyx_t_13, __pyx_n_s_enforce_peakyness); if (unlikely(!__pyx_t_13)) __PYX_ERR(0, 1242, __pyx_L1_error)
+  __Pyx_GetModuleGlobalName(__pyx_t_13, __pyx_n_s_enforce_peakyness); if (unlikely(!__pyx_t_13)) __PYX_ERR(0, 1233, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_13);
   __pyx_t_2 = NULL;
   __pyx_t_20 = 0;
@@ -19573,7 +19573,7 @@ static PyBoolObject *__pyx_f_5MACS2_2IO_10ScoreTrack_12scoreTrackII___close_peak
   #if CYTHON_FAST_PYCALL
   if (PyFunction_Check(__pyx_t_13)) {
     PyObject *__pyx_temp[3] = {__pyx_t_2, ((PyObject *)__pyx_v_peakdata), ((PyObject *)__pyx_v_summit_offsets)};
-    __pyx_t_6 = __Pyx_PyFunction_FastCall(__pyx_t_13, __pyx_temp+1-__pyx_t_20, 2+__pyx_t_20); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 1242, __pyx_L1_error)
+    __pyx_t_6 = __Pyx_PyFunction_FastCall(__pyx_t_13, __pyx_temp+1-__pyx_t_20, 2+__pyx_t_20); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 1233, __pyx_L1_error)
     __Pyx_XDECREF(__pyx_t_2); __pyx_t_2 = 0;
     __Pyx_GOTREF(__pyx_t_6);
   } else
@@ -19581,13 +19581,13 @@ static PyBoolObject *__pyx_f_5MACS2_2IO_10ScoreTrack_12scoreTrackII___close_peak
   #if CYTHON_FAST_PYCCALL
   if (__Pyx_PyFastCFunction_Check(__pyx_t_13)) {
     PyObject *__pyx_temp[3] = {__pyx_t_2, ((PyObject *)__pyx_v_peakdata), ((PyObject *)__pyx_v_summit_offsets)};
-    __pyx_t_6 = __Pyx_PyCFunction_FastCall(__pyx_t_13, __pyx_temp+1-__pyx_t_20, 2+__pyx_t_20); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 1242, __pyx_L1_error)
+    __pyx_t_6 = __Pyx_PyCFunction_FastCall(__pyx_t_13, __pyx_temp+1-__pyx_t_20, 2+__pyx_t_20); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 1233, __pyx_L1_error)
     __Pyx_XDECREF(__pyx_t_2); __pyx_t_2 = 0;
     __Pyx_GOTREF(__pyx_t_6);
   } else
   #endif
   {
-    __pyx_t_14 = PyTuple_New(2+__pyx_t_20); if (unlikely(!__pyx_t_14)) __PYX_ERR(0, 1242, __pyx_L1_error)
+    __pyx_t_14 = PyTuple_New(2+__pyx_t_20); if (unlikely(!__pyx_t_14)) __PYX_ERR(0, 1233, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_14);
     if (__pyx_t_2) {
       __Pyx_GIVEREF(__pyx_t_2); PyTuple_SET_ITEM(__pyx_t_14, 0, __pyx_t_2); __pyx_t_2 = NULL;
@@ -19598,12 +19598,12 @@ static PyBoolObject *__pyx_f_5MACS2_2IO_10ScoreTrack_12scoreTrackII___close_peak
     __Pyx_INCREF(((PyObject *)__pyx_v_summit_offsets));
     __Pyx_GIVEREF(((PyObject *)__pyx_v_summit_offsets));
     PyTuple_SET_ITEM(__pyx_t_14, 1+__pyx_t_20, ((PyObject *)__pyx_v_summit_offsets));
-    __pyx_t_6 = __Pyx_PyObject_Call(__pyx_t_13, __pyx_t_14, NULL); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 1242, __pyx_L1_error)
+    __pyx_t_6 = __Pyx_PyObject_Call(__pyx_t_13, __pyx_t_14, NULL); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 1233, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_6);
     __Pyx_DECREF(__pyx_t_14); __pyx_t_14 = 0;
   }
   __Pyx_DECREF(__pyx_t_13); __pyx_t_13 = 0;
-  if (!(likely(((__pyx_t_6) == Py_None) || likely(__Pyx_TypeTest(__pyx_t_6, __pyx_ptype_5numpy_ndarray))))) __PYX_ERR(0, 1242, __pyx_L1_error)
+  if (!(likely(((__pyx_t_6) == Py_None) || likely(__Pyx_TypeTest(__pyx_t_6, __pyx_ptype_5numpy_ndarray))))) __PYX_ERR(0, 1233, __pyx_L1_error)
   __pyx_t_11 = ((PyArrayObject *)__pyx_t_6);
   {
     __Pyx_BufFmt_StackElem __pyx_stack[1];
@@ -19620,13 +19620,13 @@ static PyBoolObject *__pyx_f_5MACS2_2IO_10ScoreTrack_12scoreTrackII___close_peak
       __pyx_t_8 = __pyx_t_9 = __pyx_t_10 = 0;
     }
     __pyx_pybuffernd_summit_offsets.diminfo[0].strides = __pyx_pybuffernd_summit_offsets.rcbuffer->pybuffer.strides[0]; __pyx_pybuffernd_summit_offsets.diminfo[0].shape = __pyx_pybuffernd_summit_offsets.rcbuffer->pybuffer.shape[0];
-    if (unlikely(__pyx_t_20 < 0)) __PYX_ERR(0, 1242, __pyx_L1_error)
+    if (unlikely(__pyx_t_20 < 0)) __PYX_ERR(0, 1233, __pyx_L1_error)
   }
   __pyx_t_11 = 0;
   __Pyx_DECREF_SET(__pyx_v_summit_offsets, ((PyArrayObject *)__pyx_t_6));
   __pyx_t_6 = 0;
 
-  /* "MACS2/IO/ScoreTrack.pyx":1243
+  /* "MACS2/IO/ScoreTrack.pyx":1234
  * 
  *         summit_offsets = enforce_peakyness(peakdata, summit_offsets)
  *         if summit_offsets.shape[0] == 0:             # <<<<<<<<<<<<<<
@@ -19636,7 +19636,7 @@ static PyBoolObject *__pyx_f_5MACS2_2IO_10ScoreTrack_12scoreTrackII___close_peak
   __pyx_t_4 = (((__pyx_v_summit_offsets->dimensions[0]) == 0) != 0);
   if (__pyx_t_4) {
 
-    /* "MACS2/IO/ScoreTrack.pyx":1245
+    /* "MACS2/IO/ScoreTrack.pyx":1236
  *         if summit_offsets.shape[0] == 0:
  *             # **failsafe** if no summits, fall back on old approach #
  *             return self.__close_peak(peak_content, peaks, min_length, chrom)             # <<<<<<<<<<<<<<
@@ -19644,13 +19644,13 @@ static PyBoolObject *__pyx_f_5MACS2_2IO_10ScoreTrack_12scoreTrackII___close_peak
  * #        summit_offsets = enforce_valleys(peakdata, summit_offsets, min_valley = min_valley)
  */
     __Pyx_XDECREF(((PyObject *)__pyx_r));
-    __pyx_t_6 = ((PyObject *)((struct __pyx_vtabstruct_5MACS2_2IO_10ScoreTrack_scoreTrackII *)__pyx_v_self->__pyx_vtab)->__pyx___close_peak(__pyx_v_self, __pyx_v_peak_content, __pyx_v_peaks, __pyx_v_min_length, __pyx_v_chrom, NULL)); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 1245, __pyx_L1_error)
+    __pyx_t_6 = ((PyObject *)((struct __pyx_vtabstruct_5MACS2_2IO_10ScoreTrack_scoreTrackII *)__pyx_v_self->__pyx_vtab)->__pyx___close_peak(__pyx_v_self, __pyx_v_peak_content, __pyx_v_peaks, __pyx_v_min_length, __pyx_v_chrom, NULL)); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 1236, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_6);
     __pyx_r = ((PyBoolObject *)__pyx_t_6);
     __pyx_t_6 = 0;
     goto __pyx_L0;
 
-    /* "MACS2/IO/ScoreTrack.pyx":1243
+    /* "MACS2/IO/ScoreTrack.pyx":1234
  * 
  *         summit_offsets = enforce_peakyness(peakdata, summit_offsets)
  *         if summit_offsets.shape[0] == 0:             # <<<<<<<<<<<<<<
@@ -19659,31 +19659,31 @@ static PyBoolObject *__pyx_f_5MACS2_2IO_10ScoreTrack_12scoreTrackII___close_peak
  */
   }
 
-  /* "MACS2/IO/ScoreTrack.pyx":1248
+  /* "MACS2/IO/ScoreTrack.pyx":1239
  * 
  * #        summit_offsets = enforce_valleys(peakdata, summit_offsets, min_valley = min_valley)
  *         summit_indices = peakindices[summit_offsets]             # <<<<<<<<<<<<<<
  *         summit_offsets -= start_boundary
  * 
  */
-  __pyx_t_6 = __Pyx_PyObject_GetItem(((PyObject *)__pyx_v_peakindices), ((PyObject *)__pyx_v_summit_offsets)); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 1248, __pyx_L1_error)
+  __pyx_t_6 = __Pyx_PyObject_GetItem(((PyObject *)__pyx_v_peakindices), ((PyObject *)__pyx_v_summit_offsets)); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 1239, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_6);
   __pyx_v_summit_indices = __pyx_t_6;
   __pyx_t_6 = 0;
 
-  /* "MACS2/IO/ScoreTrack.pyx":1249
+  /* "MACS2/IO/ScoreTrack.pyx":1240
  * #        summit_offsets = enforce_valleys(peakdata, summit_offsets, min_valley = min_valley)
  *         summit_indices = peakindices[summit_offsets]
  *         summit_offsets -= start_boundary             # <<<<<<<<<<<<<<
  * 
  *         peak_scores  = self.data[chrom][3][ summit_indices ]
  */
-  __pyx_t_6 = __Pyx_PyInt_From_int(__pyx_v_start_boundary); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 1249, __pyx_L1_error)
+  __pyx_t_6 = __Pyx_PyInt_From_int(__pyx_v_start_boundary); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 1240, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_6);
-  __pyx_t_13 = PyNumber_InPlaceSubtract(((PyObject *)__pyx_v_summit_offsets), __pyx_t_6); if (unlikely(!__pyx_t_13)) __PYX_ERR(0, 1249, __pyx_L1_error)
+  __pyx_t_13 = PyNumber_InPlaceSubtract(((PyObject *)__pyx_v_summit_offsets), __pyx_t_6); if (unlikely(!__pyx_t_13)) __PYX_ERR(0, 1240, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_13);
   __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
-  if (!(likely(((__pyx_t_13) == Py_None) || likely(__Pyx_TypeTest(__pyx_t_13, __pyx_ptype_5numpy_ndarray))))) __PYX_ERR(0, 1249, __pyx_L1_error)
+  if (!(likely(((__pyx_t_13) == Py_None) || likely(__Pyx_TypeTest(__pyx_t_13, __pyx_ptype_5numpy_ndarray))))) __PYX_ERR(0, 1240, __pyx_L1_error)
   __pyx_t_11 = ((PyArrayObject *)__pyx_t_13);
   {
     __Pyx_BufFmt_StackElem __pyx_stack[1];
@@ -19700,13 +19700,13 @@ static PyBoolObject *__pyx_f_5MACS2_2IO_10ScoreTrack_12scoreTrackII___close_peak
       __pyx_t_10 = __pyx_t_9 = __pyx_t_8 = 0;
     }
     __pyx_pybuffernd_summit_offsets.diminfo[0].strides = __pyx_pybuffernd_summit_offsets.rcbuffer->pybuffer.strides[0]; __pyx_pybuffernd_summit_offsets.diminfo[0].shape = __pyx_pybuffernd_summit_offsets.rcbuffer->pybuffer.shape[0];
-    if (unlikely(__pyx_t_20 < 0)) __PYX_ERR(0, 1249, __pyx_L1_error)
+    if (unlikely(__pyx_t_20 < 0)) __PYX_ERR(0, 1240, __pyx_L1_error)
   }
   __pyx_t_11 = 0;
   __Pyx_DECREF_SET(__pyx_v_summit_offsets, ((PyArrayObject *)__pyx_t_13));
   __pyx_t_13 = 0;
 
-  /* "MACS2/IO/ScoreTrack.pyx":1251
+  /* "MACS2/IO/ScoreTrack.pyx":1242
  *         summit_offsets -= start_boundary
  * 
  *         peak_scores  = self.data[chrom][3][ summit_indices ]             # <<<<<<<<<<<<<<
@@ -19715,31 +19715,31 @@ static PyBoolObject *__pyx_f_5MACS2_2IO_10ScoreTrack_12scoreTrackII___close_peak
  */
   if (unlikely(__pyx_v_self->data == Py_None)) {
     PyErr_SetString(PyExc_TypeError, "'NoneType' object is not subscriptable");
-    __PYX_ERR(0, 1251, __pyx_L1_error)
+    __PYX_ERR(0, 1242, __pyx_L1_error)
   }
-  __pyx_t_13 = __Pyx_PyDict_GetItem(__pyx_v_self->data, __pyx_v_chrom); if (unlikely(!__pyx_t_13)) __PYX_ERR(0, 1251, __pyx_L1_error)
+  __pyx_t_13 = __Pyx_PyDict_GetItem(__pyx_v_self->data, __pyx_v_chrom); if (unlikely(!__pyx_t_13)) __PYX_ERR(0, 1242, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_13);
-  __pyx_t_6 = __Pyx_GetItemInt(__pyx_t_13, 3, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 1251, __pyx_L1_error)
+  __pyx_t_6 = __Pyx_GetItemInt(__pyx_t_13, 3, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 1242, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_6);
   __Pyx_DECREF(__pyx_t_13); __pyx_t_13 = 0;
-  __pyx_t_13 = __Pyx_PyObject_GetItem(__pyx_t_6, __pyx_v_summit_indices); if (unlikely(!__pyx_t_13)) __PYX_ERR(0, 1251, __pyx_L1_error)
+  __pyx_t_13 = __Pyx_PyObject_GetItem(__pyx_t_6, __pyx_v_summit_indices); if (unlikely(!__pyx_t_13)) __PYX_ERR(0, 1242, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_13);
   __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
   __pyx_v_peak_scores = __pyx_t_13;
   __pyx_t_13 = 0;
 
-  /* "MACS2/IO/ScoreTrack.pyx":1252
+  /* "MACS2/IO/ScoreTrack.pyx":1243
  * 
  *         peak_scores  = self.data[chrom][3][ summit_indices ]
  *         if not (peak_scores > self.cutoff).all():             # <<<<<<<<<<<<<<
  *             return self.__close_peak(peak_content, peaks, min_length, chrom)
  *         for summit_offset, summit_index in zip(summit_offsets, summit_indices):
  */
-  __pyx_t_6 = PyFloat_FromDouble(__pyx_v_self->cutoff); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 1252, __pyx_L1_error)
+  __pyx_t_6 = PyFloat_FromDouble(__pyx_v_self->cutoff); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 1243, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_6);
-  __pyx_t_14 = PyObject_RichCompare(__pyx_v_peak_scores, __pyx_t_6, Py_GT); __Pyx_XGOTREF(__pyx_t_14); if (unlikely(!__pyx_t_14)) __PYX_ERR(0, 1252, __pyx_L1_error)
+  __pyx_t_14 = PyObject_RichCompare(__pyx_v_peak_scores, __pyx_t_6, Py_GT); __Pyx_XGOTREF(__pyx_t_14); if (unlikely(!__pyx_t_14)) __PYX_ERR(0, 1243, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
-  __pyx_t_6 = __Pyx_PyObject_GetAttrStr(__pyx_t_14, __pyx_n_s_all); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 1252, __pyx_L1_error)
+  __pyx_t_6 = __Pyx_PyObject_GetAttrStr(__pyx_t_14, __pyx_n_s_all); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 1243, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_6);
   __Pyx_DECREF(__pyx_t_14); __pyx_t_14 = 0;
   __pyx_t_14 = NULL;
@@ -19754,15 +19754,15 @@ static PyBoolObject *__pyx_f_5MACS2_2IO_10ScoreTrack_12scoreTrackII___close_peak
   }
   __pyx_t_13 = (__pyx_t_14) ? __Pyx_PyObject_CallOneArg(__pyx_t_6, __pyx_t_14) : __Pyx_PyObject_CallNoArg(__pyx_t_6);
   __Pyx_XDECREF(__pyx_t_14); __pyx_t_14 = 0;
-  if (unlikely(!__pyx_t_13)) __PYX_ERR(0, 1252, __pyx_L1_error)
+  if (unlikely(!__pyx_t_13)) __PYX_ERR(0, 1243, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_13);
   __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
-  __pyx_t_4 = __Pyx_PyObject_IsTrue(__pyx_t_13); if (unlikely(__pyx_t_4 < 0)) __PYX_ERR(0, 1252, __pyx_L1_error)
+  __pyx_t_4 = __Pyx_PyObject_IsTrue(__pyx_t_13); if (unlikely(__pyx_t_4 < 0)) __PYX_ERR(0, 1243, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_13); __pyx_t_13 = 0;
   __pyx_t_21 = ((!__pyx_t_4) != 0);
   if (__pyx_t_21) {
 
-    /* "MACS2/IO/ScoreTrack.pyx":1253
+    /* "MACS2/IO/ScoreTrack.pyx":1244
  *         peak_scores  = self.data[chrom][3][ summit_indices ]
  *         if not (peak_scores > self.cutoff).all():
  *             return self.__close_peak(peak_content, peaks, min_length, chrom)             # <<<<<<<<<<<<<<
@@ -19770,13 +19770,13 @@ static PyBoolObject *__pyx_f_5MACS2_2IO_10ScoreTrack_12scoreTrackII___close_peak
  *             if self.scoring_method == ord('q'):
  */
     __Pyx_XDECREF(((PyObject *)__pyx_r));
-    __pyx_t_13 = ((PyObject *)((struct __pyx_vtabstruct_5MACS2_2IO_10ScoreTrack_scoreTrackII *)__pyx_v_self->__pyx_vtab)->__pyx___close_peak(__pyx_v_self, __pyx_v_peak_content, __pyx_v_peaks, __pyx_v_min_length, __pyx_v_chrom, NULL)); if (unlikely(!__pyx_t_13)) __PYX_ERR(0, 1253, __pyx_L1_error)
+    __pyx_t_13 = ((PyObject *)((struct __pyx_vtabstruct_5MACS2_2IO_10ScoreTrack_scoreTrackII *)__pyx_v_self->__pyx_vtab)->__pyx___close_peak(__pyx_v_self, __pyx_v_peak_content, __pyx_v_peaks, __pyx_v_min_length, __pyx_v_chrom, NULL)); if (unlikely(!__pyx_t_13)) __PYX_ERR(0, 1244, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_13);
     __pyx_r = ((PyBoolObject *)__pyx_t_13);
     __pyx_t_13 = 0;
     goto __pyx_L0;
 
-    /* "MACS2/IO/ScoreTrack.pyx":1252
+    /* "MACS2/IO/ScoreTrack.pyx":1243
  * 
  *         peak_scores  = self.data[chrom][3][ summit_indices ]
  *         if not (peak_scores > self.cutoff).all():             # <<<<<<<<<<<<<<
@@ -19785,14 +19785,14 @@ static PyBoolObject *__pyx_f_5MACS2_2IO_10ScoreTrack_12scoreTrackII___close_peak
  */
   }
 
-  /* "MACS2/IO/ScoreTrack.pyx":1254
+  /* "MACS2/IO/ScoreTrack.pyx":1245
  *         if not (peak_scores > self.cutoff).all():
  *             return self.__close_peak(peak_content, peaks, min_length, chrom)
  *         for summit_offset, summit_index in zip(summit_offsets, summit_indices):             # <<<<<<<<<<<<<<
  *             if self.scoring_method == ord('q'):
  *                 qscore = self.data[chrom][3][ summit_index ]
  */
-  __pyx_t_13 = PyTuple_New(2); if (unlikely(!__pyx_t_13)) __PYX_ERR(0, 1254, __pyx_L1_error)
+  __pyx_t_13 = PyTuple_New(2); if (unlikely(!__pyx_t_13)) __PYX_ERR(0, 1245, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_13);
   __Pyx_INCREF(((PyObject *)__pyx_v_summit_offsets));
   __Pyx_GIVEREF(((PyObject *)__pyx_v_summit_offsets));
@@ -19800,16 +19800,16 @@ static PyBoolObject *__pyx_f_5MACS2_2IO_10ScoreTrack_12scoreTrackII___close_peak
   __Pyx_INCREF(__pyx_v_summit_indices);
   __Pyx_GIVEREF(__pyx_v_summit_indices);
   PyTuple_SET_ITEM(__pyx_t_13, 1, __pyx_v_summit_indices);
-  __pyx_t_6 = __Pyx_PyObject_Call(__pyx_builtin_zip, __pyx_t_13, NULL); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 1254, __pyx_L1_error)
+  __pyx_t_6 = __Pyx_PyObject_Call(__pyx_builtin_zip, __pyx_t_13, NULL); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 1245, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_6);
   __Pyx_DECREF(__pyx_t_13); __pyx_t_13 = 0;
   if (likely(PyList_CheckExact(__pyx_t_6)) || PyTuple_CheckExact(__pyx_t_6)) {
     __pyx_t_13 = __pyx_t_6; __Pyx_INCREF(__pyx_t_13); __pyx_t_12 = 0;
     __pyx_t_22 = NULL;
   } else {
-    __pyx_t_12 = -1; __pyx_t_13 = PyObject_GetIter(__pyx_t_6); if (unlikely(!__pyx_t_13)) __PYX_ERR(0, 1254, __pyx_L1_error)
+    __pyx_t_12 = -1; __pyx_t_13 = PyObject_GetIter(__pyx_t_6); if (unlikely(!__pyx_t_13)) __PYX_ERR(0, 1245, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_13);
-    __pyx_t_22 = Py_TYPE(__pyx_t_13)->tp_iternext; if (unlikely(!__pyx_t_22)) __PYX_ERR(0, 1254, __pyx_L1_error)
+    __pyx_t_22 = Py_TYPE(__pyx_t_13)->tp_iternext; if (unlikely(!__pyx_t_22)) __PYX_ERR(0, 1245, __pyx_L1_error)
   }
   __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
   for (;;) {
@@ -19817,17 +19817,17 @@ static PyBoolObject *__pyx_f_5MACS2_2IO_10ScoreTrack_12scoreTrackII___close_peak
       if (likely(PyList_CheckExact(__pyx_t_13))) {
         if (__pyx_t_12 >= PyList_GET_SIZE(__pyx_t_13)) break;
         #if CYTHON_ASSUME_SAFE_MACROS && !CYTHON_AVOID_BORROWED_REFS
-        __pyx_t_6 = PyList_GET_ITEM(__pyx_t_13, __pyx_t_12); __Pyx_INCREF(__pyx_t_6); __pyx_t_12++; if (unlikely(0 < 0)) __PYX_ERR(0, 1254, __pyx_L1_error)
+        __pyx_t_6 = PyList_GET_ITEM(__pyx_t_13, __pyx_t_12); __Pyx_INCREF(__pyx_t_6); __pyx_t_12++; if (unlikely(0 < 0)) __PYX_ERR(0, 1245, __pyx_L1_error)
         #else
-        __pyx_t_6 = PySequence_ITEM(__pyx_t_13, __pyx_t_12); __pyx_t_12++; if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 1254, __pyx_L1_error)
+        __pyx_t_6 = PySequence_ITEM(__pyx_t_13, __pyx_t_12); __pyx_t_12++; if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 1245, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_6);
         #endif
       } else {
         if (__pyx_t_12 >= PyTuple_GET_SIZE(__pyx_t_13)) break;
         #if CYTHON_ASSUME_SAFE_MACROS && !CYTHON_AVOID_BORROWED_REFS
-        __pyx_t_6 = PyTuple_GET_ITEM(__pyx_t_13, __pyx_t_12); __Pyx_INCREF(__pyx_t_6); __pyx_t_12++; if (unlikely(0 < 0)) __PYX_ERR(0, 1254, __pyx_L1_error)
+        __pyx_t_6 = PyTuple_GET_ITEM(__pyx_t_13, __pyx_t_12); __Pyx_INCREF(__pyx_t_6); __pyx_t_12++; if (unlikely(0 < 0)) __PYX_ERR(0, 1245, __pyx_L1_error)
         #else
-        __pyx_t_6 = PySequence_ITEM(__pyx_t_13, __pyx_t_12); __pyx_t_12++; if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 1254, __pyx_L1_error)
+        __pyx_t_6 = PySequence_ITEM(__pyx_t_13, __pyx_t_12); __pyx_t_12++; if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 1245, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_6);
         #endif
       }
@@ -19837,7 +19837,7 @@ static PyBoolObject *__pyx_f_5MACS2_2IO_10ScoreTrack_12scoreTrackII___close_peak
         PyObject* exc_type = PyErr_Occurred();
         if (exc_type) {
           if (likely(__Pyx_PyErr_GivenExceptionMatches(exc_type, PyExc_StopIteration))) PyErr_Clear();
-          else __PYX_ERR(0, 1254, __pyx_L1_error)
+          else __PYX_ERR(0, 1245, __pyx_L1_error)
         }
         break;
       }
@@ -19849,7 +19849,7 @@ static PyBoolObject *__pyx_f_5MACS2_2IO_10ScoreTrack_12scoreTrackII___close_peak
       if (unlikely(size != 2)) {
         if (size > 2) __Pyx_RaiseTooManyValuesError(2);
         else if (size >= 0) __Pyx_RaiseNeedMoreValuesError(size);
-        __PYX_ERR(0, 1254, __pyx_L1_error)
+        __PYX_ERR(0, 1245, __pyx_L1_error)
       }
       #if CYTHON_ASSUME_SAFE_MACROS && !CYTHON_AVOID_BORROWED_REFS
       if (likely(PyTuple_CheckExact(sequence))) {
@@ -19862,15 +19862,15 @@ static PyBoolObject *__pyx_f_5MACS2_2IO_10ScoreTrack_12scoreTrackII___close_peak
       __Pyx_INCREF(__pyx_t_14);
       __Pyx_INCREF(__pyx_t_2);
       #else
-      __pyx_t_14 = PySequence_ITEM(sequence, 0); if (unlikely(!__pyx_t_14)) __PYX_ERR(0, 1254, __pyx_L1_error)
+      __pyx_t_14 = PySequence_ITEM(sequence, 0); if (unlikely(!__pyx_t_14)) __PYX_ERR(0, 1245, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_14);
-      __pyx_t_2 = PySequence_ITEM(sequence, 1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1254, __pyx_L1_error)
+      __pyx_t_2 = PySequence_ITEM(sequence, 1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1245, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_2);
       #endif
       __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
     } else {
       Py_ssize_t index = -1;
-      __pyx_t_15 = PyObject_GetIter(__pyx_t_6); if (unlikely(!__pyx_t_15)) __PYX_ERR(0, 1254, __pyx_L1_error)
+      __pyx_t_15 = PyObject_GetIter(__pyx_t_6); if (unlikely(!__pyx_t_15)) __PYX_ERR(0, 1245, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_15);
       __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
       __pyx_t_17 = Py_TYPE(__pyx_t_15)->tp_iternext;
@@ -19878,7 +19878,7 @@ static PyBoolObject *__pyx_f_5MACS2_2IO_10ScoreTrack_12scoreTrackII___close_peak
       __Pyx_GOTREF(__pyx_t_14);
       index = 1; __pyx_t_2 = __pyx_t_17(__pyx_t_15); if (unlikely(!__pyx_t_2)) goto __pyx_L14_unpacking_failed;
       __Pyx_GOTREF(__pyx_t_2);
-      if (__Pyx_IternextUnpackEndCheck(__pyx_t_17(__pyx_t_15), 2) < 0) __PYX_ERR(0, 1254, __pyx_L1_error)
+      if (__Pyx_IternextUnpackEndCheck(__pyx_t_17(__pyx_t_15), 2) < 0) __PYX_ERR(0, 1245, __pyx_L1_error)
       __pyx_t_17 = NULL;
       __Pyx_DECREF(__pyx_t_15); __pyx_t_15 = 0;
       goto __pyx_L15_unpacking_done;
@@ -19886,17 +19886,17 @@ static PyBoolObject *__pyx_f_5MACS2_2IO_10ScoreTrack_12scoreTrackII___close_peak
       __Pyx_DECREF(__pyx_t_15); __pyx_t_15 = 0;
       __pyx_t_17 = NULL;
       if (__Pyx_IterFinish() == 0) __Pyx_RaiseNeedMoreValuesError(index);
-      __PYX_ERR(0, 1254, __pyx_L1_error)
+      __PYX_ERR(0, 1245, __pyx_L1_error)
       __pyx_L15_unpacking_done:;
     }
-    __pyx_t_20 = __Pyx_PyInt_As_int(__pyx_t_14); if (unlikely((__pyx_t_20 == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 1254, __pyx_L1_error)
+    __pyx_t_20 = __Pyx_PyInt_As_int(__pyx_t_14); if (unlikely((__pyx_t_20 == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 1245, __pyx_L1_error)
     __Pyx_DECREF(__pyx_t_14); __pyx_t_14 = 0;
-    __pyx_t_18 = __Pyx_PyInt_As_int(__pyx_t_2); if (unlikely((__pyx_t_18 == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 1254, __pyx_L1_error)
+    __pyx_t_18 = __Pyx_PyInt_As_int(__pyx_t_2); if (unlikely((__pyx_t_18 == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 1245, __pyx_L1_error)
     __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
     __pyx_v_summit_offset = __pyx_t_20;
     __pyx_v_summit_index = __pyx_t_18;
 
-    /* "MACS2/IO/ScoreTrack.pyx":1255
+    /* "MACS2/IO/ScoreTrack.pyx":1246
  *             return self.__close_peak(peak_content, peaks, min_length, chrom)
  *         for summit_offset, summit_index in zip(summit_offsets, summit_indices):
  *             if self.scoring_method == ord('q'):             # <<<<<<<<<<<<<<
@@ -19906,7 +19906,7 @@ static PyBoolObject *__pyx_f_5MACS2_2IO_10ScoreTrack_12scoreTrackII___close_peak
     __pyx_t_21 = ((__pyx_v_self->scoring_method == 0x71) != 0);
     if (__pyx_t_21) {
 
-      /* "MACS2/IO/ScoreTrack.pyx":1256
+      /* "MACS2/IO/ScoreTrack.pyx":1247
  *         for summit_offset, summit_index in zip(summit_offsets, summit_indices):
  *             if self.scoring_method == ord('q'):
  *                 qscore = self.data[chrom][3][ summit_index ]             # <<<<<<<<<<<<<<
@@ -19915,20 +19915,20 @@ static PyBoolObject *__pyx_f_5MACS2_2IO_10ScoreTrack_12scoreTrackII___close_peak
  */
       if (unlikely(__pyx_v_self->data == Py_None)) {
         PyErr_SetString(PyExc_TypeError, "'NoneType' object is not subscriptable");
-        __PYX_ERR(0, 1256, __pyx_L1_error)
+        __PYX_ERR(0, 1247, __pyx_L1_error)
       }
-      __pyx_t_6 = __Pyx_PyDict_GetItem(__pyx_v_self->data, __pyx_v_chrom); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 1256, __pyx_L1_error)
+      __pyx_t_6 = __Pyx_PyDict_GetItem(__pyx_v_self->data, __pyx_v_chrom); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 1247, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_6);
-      __pyx_t_2 = __Pyx_GetItemInt(__pyx_t_6, 3, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1256, __pyx_L1_error)
+      __pyx_t_2 = __Pyx_GetItemInt(__pyx_t_6, 3, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1247, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_2);
       __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
-      __pyx_t_6 = __Pyx_GetItemInt(__pyx_t_2, __pyx_v_summit_index, int, 1, __Pyx_PyInt_From_int, 0, 1, 1); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 1256, __pyx_L1_error)
+      __pyx_t_6 = __Pyx_GetItemInt(__pyx_t_2, __pyx_v_summit_index, int, 1, __Pyx_PyInt_From_int, 0, 1, 1); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 1247, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_6);
       __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
       __Pyx_XDECREF_SET(__pyx_v_qscore, __pyx_t_6);
       __pyx_t_6 = 0;
 
-      /* "MACS2/IO/ScoreTrack.pyx":1255
+      /* "MACS2/IO/ScoreTrack.pyx":1246
  *             return self.__close_peak(peak_content, peaks, min_length, chrom)
  *         for summit_offset, summit_index in zip(summit_offsets, summit_indices):
  *             if self.scoring_method == ord('q'):             # <<<<<<<<<<<<<<
@@ -19938,7 +19938,7 @@ static PyBoolObject *__pyx_f_5MACS2_2IO_10ScoreTrack_12scoreTrackII___close_peak
       goto __pyx_L16;
     }
 
-    /* "MACS2/IO/ScoreTrack.pyx":1259
+    /* "MACS2/IO/ScoreTrack.pyx":1250
  *             else:
  *                 # if q value is not computed, use -1
  *                 qscore = -1             # <<<<<<<<<<<<<<
@@ -19951,44 +19951,44 @@ static PyBoolObject *__pyx_f_5MACS2_2IO_10ScoreTrack_12scoreTrackII___close_peak
     }
     __pyx_L16:;
 
-    /* "MACS2/IO/ScoreTrack.pyx":1260
+    /* "MACS2/IO/ScoreTrack.pyx":1251
  *                 # if q value is not computed, use -1
  *                 qscore = -1
  *             peaks.add( chrom,             # <<<<<<<<<<<<<<
  *                        start,
  *                        end,
  */
-    __pyx_t_6 = __Pyx_PyObject_GetAttrStr(__pyx_v_peaks, __pyx_n_s_add); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 1260, __pyx_L1_error)
+    __pyx_t_6 = __Pyx_PyObject_GetAttrStr(__pyx_v_peaks, __pyx_n_s_add); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 1251, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_6);
 
-    /* "MACS2/IO/ScoreTrack.pyx":1261
+    /* "MACS2/IO/ScoreTrack.pyx":1252
  *                 qscore = -1
  *             peaks.add( chrom,
  *                        start,             # <<<<<<<<<<<<<<
  *                        end,
  *                        summit      = start + summit_offset,
  */
-    __pyx_t_2 = __Pyx_PyInt_From_int(__pyx_v_start); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1261, __pyx_L1_error)
+    __pyx_t_2 = __Pyx_PyInt_From_int(__pyx_v_start); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1252, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
 
-    /* "MACS2/IO/ScoreTrack.pyx":1262
+    /* "MACS2/IO/ScoreTrack.pyx":1253
  *             peaks.add( chrom,
  *                        start,
  *                        end,             # <<<<<<<<<<<<<<
  *                        summit      = start + summit_offset,
  *                        peak_score  = self.data[chrom][3][ summit_index ],
  */
-    __pyx_t_14 = __Pyx_PyInt_From_int(__pyx_v_end); if (unlikely(!__pyx_t_14)) __PYX_ERR(0, 1262, __pyx_L1_error)
+    __pyx_t_14 = __Pyx_PyInt_From_int(__pyx_v_end); if (unlikely(!__pyx_t_14)) __PYX_ERR(0, 1253, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_14);
 
-    /* "MACS2/IO/ScoreTrack.pyx":1260
+    /* "MACS2/IO/ScoreTrack.pyx":1251
  *                 # if q value is not computed, use -1
  *                 qscore = -1
  *             peaks.add( chrom,             # <<<<<<<<<<<<<<
  *                        start,
  *                        end,
  */
-    __pyx_t_15 = PyTuple_New(3); if (unlikely(!__pyx_t_15)) __PYX_ERR(0, 1260, __pyx_L1_error)
+    __pyx_t_15 = PyTuple_New(3); if (unlikely(!__pyx_t_15)) __PYX_ERR(0, 1251, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_15);
     __Pyx_INCREF(__pyx_v_chrom);
     __Pyx_GIVEREF(__pyx_v_chrom);
@@ -20000,21 +20000,21 @@ static PyBoolObject *__pyx_f_5MACS2_2IO_10ScoreTrack_12scoreTrackII___close_peak
     __pyx_t_2 = 0;
     __pyx_t_14 = 0;
 
-    /* "MACS2/IO/ScoreTrack.pyx":1263
+    /* "MACS2/IO/ScoreTrack.pyx":1254
  *                        start,
  *                        end,
  *                        summit      = start + summit_offset,             # <<<<<<<<<<<<<<
  *                        peak_score  = self.data[chrom][3][ summit_index ],
  *                        pileup      = self.data[chrom][1][ summit_index ], # should be the same as summit_value
  */
-    __pyx_t_14 = __Pyx_PyDict_NewPresized(6); if (unlikely(!__pyx_t_14)) __PYX_ERR(0, 1263, __pyx_L1_error)
+    __pyx_t_14 = __Pyx_PyDict_NewPresized(6); if (unlikely(!__pyx_t_14)) __PYX_ERR(0, 1254, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_14);
-    __pyx_t_2 = __Pyx_PyInt_From_int((__pyx_v_start + __pyx_v_summit_offset)); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1263, __pyx_L1_error)
+    __pyx_t_2 = __Pyx_PyInt_From_int((__pyx_v_start + __pyx_v_summit_offset)); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1254, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
-    if (PyDict_SetItem(__pyx_t_14, __pyx_n_s_summit, __pyx_t_2) < 0) __PYX_ERR(0, 1263, __pyx_L1_error)
+    if (PyDict_SetItem(__pyx_t_14, __pyx_n_s_summit, __pyx_t_2) < 0) __PYX_ERR(0, 1254, __pyx_L1_error)
     __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
-    /* "MACS2/IO/ScoreTrack.pyx":1264
+    /* "MACS2/IO/ScoreTrack.pyx":1255
  *                        end,
  *                        summit      = start + summit_offset,
  *                        peak_score  = self.data[chrom][3][ summit_index ],             # <<<<<<<<<<<<<<
@@ -20023,20 +20023,20 @@ static PyBoolObject *__pyx_f_5MACS2_2IO_10ScoreTrack_12scoreTrackII___close_peak
  */
     if (unlikely(__pyx_v_self->data == Py_None)) {
       PyErr_SetString(PyExc_TypeError, "'NoneType' object is not subscriptable");
-      __PYX_ERR(0, 1264, __pyx_L1_error)
+      __PYX_ERR(0, 1255, __pyx_L1_error)
     }
-    __pyx_t_2 = __Pyx_PyDict_GetItem(__pyx_v_self->data, __pyx_v_chrom); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1264, __pyx_L1_error)
+    __pyx_t_2 = __Pyx_PyDict_GetItem(__pyx_v_self->data, __pyx_v_chrom); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1255, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
-    __pyx_t_1 = __Pyx_GetItemInt(__pyx_t_2, 3, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1264, __pyx_L1_error)
+    __pyx_t_1 = __Pyx_GetItemInt(__pyx_t_2, 3, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1255, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
     __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-    __pyx_t_2 = __Pyx_GetItemInt(__pyx_t_1, __pyx_v_summit_index, int, 1, __Pyx_PyInt_From_int, 0, 1, 1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1264, __pyx_L1_error)
+    __pyx_t_2 = __Pyx_GetItemInt(__pyx_t_1, __pyx_v_summit_index, int, 1, __Pyx_PyInt_From_int, 0, 1, 1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1255, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
     __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-    if (PyDict_SetItem(__pyx_t_14, __pyx_n_s_peak_score, __pyx_t_2) < 0) __PYX_ERR(0, 1263, __pyx_L1_error)
+    if (PyDict_SetItem(__pyx_t_14, __pyx_n_s_peak_score, __pyx_t_2) < 0) __PYX_ERR(0, 1254, __pyx_L1_error)
     __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
-    /* "MACS2/IO/ScoreTrack.pyx":1265
+    /* "MACS2/IO/ScoreTrack.pyx":1256
  *                        summit      = start + summit_offset,
  *                        peak_score  = self.data[chrom][3][ summit_index ],
  *                        pileup      = self.data[chrom][1][ summit_index ], # should be the same as summit_value             # <<<<<<<<<<<<<<
@@ -20045,20 +20045,20 @@ static PyBoolObject *__pyx_f_5MACS2_2IO_10ScoreTrack_12scoreTrackII___close_peak
  */
     if (unlikely(__pyx_v_self->data == Py_None)) {
       PyErr_SetString(PyExc_TypeError, "'NoneType' object is not subscriptable");
-      __PYX_ERR(0, 1265, __pyx_L1_error)
+      __PYX_ERR(0, 1256, __pyx_L1_error)
     }
-    __pyx_t_2 = __Pyx_PyDict_GetItem(__pyx_v_self->data, __pyx_v_chrom); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1265, __pyx_L1_error)
+    __pyx_t_2 = __Pyx_PyDict_GetItem(__pyx_v_self->data, __pyx_v_chrom); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1256, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
-    __pyx_t_1 = __Pyx_GetItemInt(__pyx_t_2, 1, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1265, __pyx_L1_error)
+    __pyx_t_1 = __Pyx_GetItemInt(__pyx_t_2, 1, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1256, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
     __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-    __pyx_t_2 = __Pyx_GetItemInt(__pyx_t_1, __pyx_v_summit_index, int, 1, __Pyx_PyInt_From_int, 0, 1, 1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1265, __pyx_L1_error)
+    __pyx_t_2 = __Pyx_GetItemInt(__pyx_t_1, __pyx_v_summit_index, int, 1, __Pyx_PyInt_From_int, 0, 1, 1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1256, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
     __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-    if (PyDict_SetItem(__pyx_t_14, __pyx_n_s_pileup, __pyx_t_2) < 0) __PYX_ERR(0, 1263, __pyx_L1_error)
+    if (PyDict_SetItem(__pyx_t_14, __pyx_n_s_pileup, __pyx_t_2) < 0) __PYX_ERR(0, 1254, __pyx_L1_error)
     __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
-    /* "MACS2/IO/ScoreTrack.pyx":1266
+    /* "MACS2/IO/ScoreTrack.pyx":1257
  *                        peak_score  = self.data[chrom][3][ summit_index ],
  *                        pileup      = self.data[chrom][1][ summit_index ], # should be the same as summit_value
  *                        pscore      = get_pscore(self.data[chrom][ 1 ][ summit_index ], self.data[chrom][ 2 ][ summit_index ]),             # <<<<<<<<<<<<<<
@@ -20067,38 +20067,38 @@ static PyBoolObject *__pyx_f_5MACS2_2IO_10ScoreTrack_12scoreTrackII___close_peak
  */
     if (unlikely(__pyx_v_self->data == Py_None)) {
       PyErr_SetString(PyExc_TypeError, "'NoneType' object is not subscriptable");
-      __PYX_ERR(0, 1266, __pyx_L1_error)
+      __PYX_ERR(0, 1257, __pyx_L1_error)
     }
-    __pyx_t_2 = __Pyx_PyDict_GetItem(__pyx_v_self->data, __pyx_v_chrom); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1266, __pyx_L1_error)
+    __pyx_t_2 = __Pyx_PyDict_GetItem(__pyx_v_self->data, __pyx_v_chrom); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1257, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
-    __pyx_t_1 = __Pyx_GetItemInt(__pyx_t_2, 1, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1266, __pyx_L1_error)
+    __pyx_t_1 = __Pyx_GetItemInt(__pyx_t_2, 1, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1257, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
     __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-    __pyx_t_2 = __Pyx_GetItemInt(__pyx_t_1, __pyx_v_summit_index, int, 1, __Pyx_PyInt_From_int, 0, 1, 1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1266, __pyx_L1_error)
+    __pyx_t_2 = __Pyx_GetItemInt(__pyx_t_1, __pyx_v_summit_index, int, 1, __Pyx_PyInt_From_int, 0, 1, 1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1257, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
     __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-    __pyx_t_18 = __Pyx_PyInt_As_int(__pyx_t_2); if (unlikely((__pyx_t_18 == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 1266, __pyx_L1_error)
+    __pyx_t_18 = __Pyx_PyInt_As_int(__pyx_t_2); if (unlikely((__pyx_t_18 == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 1257, __pyx_L1_error)
     __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
     if (unlikely(__pyx_v_self->data == Py_None)) {
       PyErr_SetString(PyExc_TypeError, "'NoneType' object is not subscriptable");
-      __PYX_ERR(0, 1266, __pyx_L1_error)
+      __PYX_ERR(0, 1257, __pyx_L1_error)
     }
-    __pyx_t_2 = __Pyx_PyDict_GetItem(__pyx_v_self->data, __pyx_v_chrom); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1266, __pyx_L1_error)
+    __pyx_t_2 = __Pyx_PyDict_GetItem(__pyx_v_self->data, __pyx_v_chrom); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1257, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
-    __pyx_t_1 = __Pyx_GetItemInt(__pyx_t_2, 2, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1266, __pyx_L1_error)
+    __pyx_t_1 = __Pyx_GetItemInt(__pyx_t_2, 2, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1257, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
     __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-    __pyx_t_2 = __Pyx_GetItemInt(__pyx_t_1, __pyx_v_summit_index, int, 1, __Pyx_PyInt_From_int, 0, 1, 1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1266, __pyx_L1_error)
+    __pyx_t_2 = __Pyx_GetItemInt(__pyx_t_1, __pyx_v_summit_index, int, 1, __Pyx_PyInt_From_int, 0, 1, 1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1257, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
     __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-    __pyx_t_19 = __pyx_PyFloat_AsDouble(__pyx_t_2); if (unlikely((__pyx_t_19 == (double)-1) && PyErr_Occurred())) __PYX_ERR(0, 1266, __pyx_L1_error)
+    __pyx_t_19 = __pyx_PyFloat_AsDouble(__pyx_t_2); if (unlikely((__pyx_t_19 == (double)-1) && PyErr_Occurred())) __PYX_ERR(0, 1257, __pyx_L1_error)
     __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-    __pyx_t_2 = PyFloat_FromDouble(__pyx_f_5MACS2_2IO_10ScoreTrack_get_pscore(__pyx_t_18, __pyx_t_19)); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1266, __pyx_L1_error)
+    __pyx_t_2 = PyFloat_FromDouble(__pyx_f_5MACS2_2IO_10ScoreTrack_get_pscore(__pyx_t_18, __pyx_t_19)); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1257, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
-    if (PyDict_SetItem(__pyx_t_14, __pyx_n_s_pscore, __pyx_t_2) < 0) __PYX_ERR(0, 1263, __pyx_L1_error)
+    if (PyDict_SetItem(__pyx_t_14, __pyx_n_s_pscore, __pyx_t_2) < 0) __PYX_ERR(0, 1254, __pyx_L1_error)
     __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
-    /* "MACS2/IO/ScoreTrack.pyx":1267
+    /* "MACS2/IO/ScoreTrack.pyx":1258
  *                        pileup      = self.data[chrom][1][ summit_index ], # should be the same as summit_value
  *                        pscore      = get_pscore(self.data[chrom][ 1 ][ summit_index ], self.data[chrom][ 2 ][ summit_index ]),
  *                        fold_change = float ( self.data[chrom][ 1 ][ summit_index ] + self.pseudocount ) / ( self.data[chrom][ 2 ][ summit_index ] + self.pseudocount ),             # <<<<<<<<<<<<<<
@@ -20107,74 +20107,74 @@ static PyBoolObject *__pyx_f_5MACS2_2IO_10ScoreTrack_12scoreTrackII___close_peak
  */
     if (unlikely(__pyx_v_self->data == Py_None)) {
       PyErr_SetString(PyExc_TypeError, "'NoneType' object is not subscriptable");
-      __PYX_ERR(0, 1267, __pyx_L1_error)
+      __PYX_ERR(0, 1258, __pyx_L1_error)
     }
-    __pyx_t_2 = __Pyx_PyDict_GetItem(__pyx_v_self->data, __pyx_v_chrom); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1267, __pyx_L1_error)
+    __pyx_t_2 = __Pyx_PyDict_GetItem(__pyx_v_self->data, __pyx_v_chrom); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1258, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
-    __pyx_t_1 = __Pyx_GetItemInt(__pyx_t_2, 1, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1267, __pyx_L1_error)
+    __pyx_t_1 = __Pyx_GetItemInt(__pyx_t_2, 1, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1258, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
     __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-    __pyx_t_2 = __Pyx_GetItemInt(__pyx_t_1, __pyx_v_summit_index, int, 1, __Pyx_PyInt_From_int, 0, 1, 1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1267, __pyx_L1_error)
+    __pyx_t_2 = __Pyx_GetItemInt(__pyx_t_1, __pyx_v_summit_index, int, 1, __Pyx_PyInt_From_int, 0, 1, 1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1258, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
     __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-    __pyx_t_1 = PyFloat_FromDouble(__pyx_v_self->pseudocount); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1267, __pyx_L1_error)
+    __pyx_t_1 = PyFloat_FromDouble(__pyx_v_self->pseudocount); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1258, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
-    __pyx_t_5 = PyNumber_Add(__pyx_t_2, __pyx_t_1); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 1267, __pyx_L1_error)
+    __pyx_t_5 = PyNumber_Add(__pyx_t_2, __pyx_t_1); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 1258, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_5);
     __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
     __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-    __pyx_t_1 = __Pyx_PyNumber_Float(__pyx_t_5); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1267, __pyx_L1_error)
+    __pyx_t_1 = __Pyx_PyNumber_Float(__pyx_t_5); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1258, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
     __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
     if (unlikely(__pyx_v_self->data == Py_None)) {
       PyErr_SetString(PyExc_TypeError, "'NoneType' object is not subscriptable");
-      __PYX_ERR(0, 1267, __pyx_L1_error)
+      __PYX_ERR(0, 1258, __pyx_L1_error)
     }
-    __pyx_t_5 = __Pyx_PyDict_GetItem(__pyx_v_self->data, __pyx_v_chrom); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 1267, __pyx_L1_error)
+    __pyx_t_5 = __Pyx_PyDict_GetItem(__pyx_v_self->data, __pyx_v_chrom); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 1258, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_5);
-    __pyx_t_2 = __Pyx_GetItemInt(__pyx_t_5, 2, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1267, __pyx_L1_error)
+    __pyx_t_2 = __Pyx_GetItemInt(__pyx_t_5, 2, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1258, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
     __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
-    __pyx_t_5 = __Pyx_GetItemInt(__pyx_t_2, __pyx_v_summit_index, int, 1, __Pyx_PyInt_From_int, 0, 1, 1); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 1267, __pyx_L1_error)
+    __pyx_t_5 = __Pyx_GetItemInt(__pyx_t_2, __pyx_v_summit_index, int, 1, __Pyx_PyInt_From_int, 0, 1, 1); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 1258, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_5);
     __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-    __pyx_t_2 = PyFloat_FromDouble(__pyx_v_self->pseudocount); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1267, __pyx_L1_error)
+    __pyx_t_2 = PyFloat_FromDouble(__pyx_v_self->pseudocount); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1258, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
-    __pyx_t_16 = PyNumber_Add(__pyx_t_5, __pyx_t_2); if (unlikely(!__pyx_t_16)) __PYX_ERR(0, 1267, __pyx_L1_error)
+    __pyx_t_16 = PyNumber_Add(__pyx_t_5, __pyx_t_2); if (unlikely(!__pyx_t_16)) __PYX_ERR(0, 1258, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_16);
     __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
     __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-    __pyx_t_2 = __Pyx_PyNumber_Divide(__pyx_t_1, __pyx_t_16); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1267, __pyx_L1_error)
+    __pyx_t_2 = __Pyx_PyNumber_Divide(__pyx_t_1, __pyx_t_16); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1258, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
     __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
     __Pyx_DECREF(__pyx_t_16); __pyx_t_16 = 0;
-    if (PyDict_SetItem(__pyx_t_14, __pyx_n_s_fold_change, __pyx_t_2) < 0) __PYX_ERR(0, 1263, __pyx_L1_error)
+    if (PyDict_SetItem(__pyx_t_14, __pyx_n_s_fold_change, __pyx_t_2) < 0) __PYX_ERR(0, 1254, __pyx_L1_error)
     __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
-    /* "MACS2/IO/ScoreTrack.pyx":1268
+    /* "MACS2/IO/ScoreTrack.pyx":1259
  *                        pscore      = get_pscore(self.data[chrom][ 1 ][ summit_index ], self.data[chrom][ 2 ][ summit_index ]),
  *                        fold_change = float ( self.data[chrom][ 1 ][ summit_index ] + self.pseudocount ) / ( self.data[chrom][ 2 ][ summit_index ] + self.pseudocount ),
  *                        qscore      = qscore,             # <<<<<<<<<<<<<<
  *                        )
  *         # start a new peak
  */
-    if (PyDict_SetItem(__pyx_t_14, __pyx_n_s_qscore, __pyx_v_qscore) < 0) __PYX_ERR(0, 1263, __pyx_L1_error)
+    if (PyDict_SetItem(__pyx_t_14, __pyx_n_s_qscore, __pyx_v_qscore) < 0) __PYX_ERR(0, 1254, __pyx_L1_error)
 
-    /* "MACS2/IO/ScoreTrack.pyx":1260
+    /* "MACS2/IO/ScoreTrack.pyx":1251
  *                 # if q value is not computed, use -1
  *                 qscore = -1
  *             peaks.add( chrom,             # <<<<<<<<<<<<<<
  *                        start,
  *                        end,
  */
-    __pyx_t_2 = __Pyx_PyObject_Call(__pyx_t_6, __pyx_t_15, __pyx_t_14); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1260, __pyx_L1_error)
+    __pyx_t_2 = __Pyx_PyObject_Call(__pyx_t_6, __pyx_t_15, __pyx_t_14); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1251, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
     __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
     __Pyx_DECREF(__pyx_t_15); __pyx_t_15 = 0;
     __Pyx_DECREF(__pyx_t_14); __pyx_t_14 = 0;
     __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
-    /* "MACS2/IO/ScoreTrack.pyx":1254
+    /* "MACS2/IO/ScoreTrack.pyx":1245
  *         if not (peak_scores > self.cutoff).all():
  *             return self.__close_peak(peak_content, peaks, min_length, chrom)
  *         for summit_offset, summit_index in zip(summit_offsets, summit_indices):             # <<<<<<<<<<<<<<
@@ -20184,7 +20184,7 @@ static PyBoolObject *__pyx_f_5MACS2_2IO_10ScoreTrack_12scoreTrackII___close_peak
   }
   __Pyx_DECREF(__pyx_t_13); __pyx_t_13 = 0;
 
-  /* "MACS2/IO/ScoreTrack.pyx":1271
+  /* "MACS2/IO/ScoreTrack.pyx":1262
  *                        )
  *         # start a new peak
  *         return True             # <<<<<<<<<<<<<<
@@ -20196,7 +20196,7 @@ static PyBoolObject *__pyx_f_5MACS2_2IO_10ScoreTrack_12scoreTrackII___close_peak
   __pyx_r = ((PyBoolObject *)Py_True);
   goto __pyx_L0;
 
-  /* "MACS2/IO/ScoreTrack.pyx":1197
+  /* "MACS2/IO/ScoreTrack.pyx":1188
  *             return True
  * 
  *     cdef bool __close_peak2 (self, list peak_content, peaks, int min_length,             # <<<<<<<<<<<<<<
@@ -20244,7 +20244,7 @@ static PyBoolObject *__pyx_f_5MACS2_2IO_10ScoreTrack_12scoreTrackII___close_peak
   return __pyx_r;
 }
 
-/* "MACS2/IO/ScoreTrack.pyx":1273
+/* "MACS2/IO/ScoreTrack.pyx":1264
  *         return True
  * 
  *     cdef long total ( self ):             # <<<<<<<<<<<<<<
@@ -20268,9 +20268,9 @@ static long __pyx_f_5MACS2_2IO_10ScoreTrack_12scoreTrackII_total(struct __pyx_ob
   PyObject *__pyx_t_8 = NULL;
   long __pyx_t_9;
   __Pyx_RefNannySetupContext("total", 0);
-  __Pyx_TraceCall("total", __pyx_f[0], 1273, 0, __PYX_ERR(0, 1273, __pyx_L1_error));
+  __Pyx_TraceCall("total", __pyx_f[0], 1264, 0, __PYX_ERR(0, 1264, __pyx_L1_error));
 
-  /* "MACS2/IO/ScoreTrack.pyx":1281
+  /* "MACS2/IO/ScoreTrack.pyx":1272
  *             bytes chrom
  * 
  *         t = 0             # <<<<<<<<<<<<<<
@@ -20279,7 +20279,7 @@ static long __pyx_f_5MACS2_2IO_10ScoreTrack_12scoreTrackII_total(struct __pyx_ob
  */
   __pyx_v_t = 0;
 
-  /* "MACS2/IO/ScoreTrack.pyx":1282
+  /* "MACS2/IO/ScoreTrack.pyx":1273
  * 
  *         t = 0
  *         for chrom in self.data.keys():             # <<<<<<<<<<<<<<
@@ -20289,9 +20289,9 @@ static long __pyx_f_5MACS2_2IO_10ScoreTrack_12scoreTrackII_total(struct __pyx_ob
   __pyx_t_2 = 0;
   if (unlikely(__pyx_v_self->data == Py_None)) {
     PyErr_Format(PyExc_AttributeError, "'NoneType' object has no attribute '%.30s'", "keys");
-    __PYX_ERR(0, 1282, __pyx_L1_error)
+    __PYX_ERR(0, 1273, __pyx_L1_error)
   }
-  __pyx_t_5 = __Pyx_dict_iterator(__pyx_v_self->data, 1, __pyx_n_s_keys, (&__pyx_t_3), (&__pyx_t_4)); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 1282, __pyx_L1_error)
+  __pyx_t_5 = __Pyx_dict_iterator(__pyx_v_self->data, 1, __pyx_n_s_keys, (&__pyx_t_3), (&__pyx_t_4)); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 1273, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_5);
   __Pyx_XDECREF(__pyx_t_1);
   __pyx_t_1 = __pyx_t_5;
@@ -20299,38 +20299,38 @@ static long __pyx_f_5MACS2_2IO_10ScoreTrack_12scoreTrackII_total(struct __pyx_ob
   while (1) {
     __pyx_t_6 = __Pyx_dict_iter_next(__pyx_t_1, __pyx_t_3, &__pyx_t_2, &__pyx_t_5, NULL, NULL, __pyx_t_4);
     if (unlikely(__pyx_t_6 == 0)) break;
-    if (unlikely(__pyx_t_6 == -1)) __PYX_ERR(0, 1282, __pyx_L1_error)
+    if (unlikely(__pyx_t_6 == -1)) __PYX_ERR(0, 1273, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_5);
-    if (!(likely(PyBytes_CheckExact(__pyx_t_5))||((__pyx_t_5) == Py_None)||(PyErr_Format(PyExc_TypeError, "Expected %.16s, got %.200s", "bytes", Py_TYPE(__pyx_t_5)->tp_name), 0))) __PYX_ERR(0, 1282, __pyx_L1_error)
+    if (!(likely(PyBytes_CheckExact(__pyx_t_5))||((__pyx_t_5) == Py_None)||(PyErr_Format(PyExc_TypeError, "Expected %.16s, got %.200s", "bytes", Py_TYPE(__pyx_t_5)->tp_name), 0))) __PYX_ERR(0, 1273, __pyx_L1_error)
     __Pyx_XDECREF_SET(__pyx_v_chrom, ((PyObject*)__pyx_t_5));
     __pyx_t_5 = 0;
 
-    /* "MACS2/IO/ScoreTrack.pyx":1283
+    /* "MACS2/IO/ScoreTrack.pyx":1274
  *         t = 0
  *         for chrom in self.data.keys():
  *             t += self.datalength[chrom]             # <<<<<<<<<<<<<<
  *         return t
  * 
  */
-    __pyx_t_5 = __Pyx_PyInt_From_long(__pyx_v_t); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 1283, __pyx_L1_error)
+    __pyx_t_5 = __Pyx_PyInt_From_long(__pyx_v_t); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 1274, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_5);
     if (unlikely(__pyx_v_self->datalength == Py_None)) {
       PyErr_SetString(PyExc_TypeError, "'NoneType' object is not subscriptable");
-      __PYX_ERR(0, 1283, __pyx_L1_error)
+      __PYX_ERR(0, 1274, __pyx_L1_error)
     }
-    __pyx_t_7 = __Pyx_PyDict_GetItem(__pyx_v_self->datalength, __pyx_v_chrom); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 1283, __pyx_L1_error)
+    __pyx_t_7 = __Pyx_PyDict_GetItem(__pyx_v_self->datalength, __pyx_v_chrom); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 1274, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_7);
-    __pyx_t_8 = PyNumber_InPlaceAdd(__pyx_t_5, __pyx_t_7); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 1283, __pyx_L1_error)
+    __pyx_t_8 = PyNumber_InPlaceAdd(__pyx_t_5, __pyx_t_7); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 1274, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_8);
     __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
     __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
-    __pyx_t_9 = __Pyx_PyInt_As_long(__pyx_t_8); if (unlikely((__pyx_t_9 == (long)-1) && PyErr_Occurred())) __PYX_ERR(0, 1283, __pyx_L1_error)
+    __pyx_t_9 = __Pyx_PyInt_As_long(__pyx_t_8); if (unlikely((__pyx_t_9 == (long)-1) && PyErr_Occurred())) __PYX_ERR(0, 1274, __pyx_L1_error)
     __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
     __pyx_v_t = __pyx_t_9;
   }
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-  /* "MACS2/IO/ScoreTrack.pyx":1284
+  /* "MACS2/IO/ScoreTrack.pyx":1275
  *         for chrom in self.data.keys():
  *             t += self.datalength[chrom]
  *         return t             # <<<<<<<<<<<<<<
@@ -20340,7 +20340,7 @@ static long __pyx_f_5MACS2_2IO_10ScoreTrack_12scoreTrackII_total(struct __pyx_ob
   __pyx_r = __pyx_v_t;
   goto __pyx_L0;
 
-  /* "MACS2/IO/ScoreTrack.pyx":1273
+  /* "MACS2/IO/ScoreTrack.pyx":1264
  *         return True
  * 
  *     cdef long total ( self ):             # <<<<<<<<<<<<<<
@@ -20363,7 +20363,7 @@ static long __pyx_f_5MACS2_2IO_10ScoreTrack_12scoreTrackII_total(struct __pyx_ob
   return __pyx_r;
 }
 
-/* "MACS2/IO/ScoreTrack.pyx":1286
+/* "MACS2/IO/ScoreTrack.pyx":1277
  *         return t
  * 
  *     cpdef call_broadpeaks (self, float lvl1_cutoff=5.0, float lvl2_cutoff=1.0, int min_length=200, int lvl1_max_gap=50, int lvl2_max_gap=400):             # <<<<<<<<<<<<<<
@@ -20419,7 +20419,7 @@ static PyObject *__pyx_f_5MACS2_2IO_10ScoreTrack_12scoreTrackII_call_broadpeaks(
   int __pyx_t_23;
   Py_ssize_t __pyx_t_24;
   __Pyx_RefNannySetupContext("call_broadpeaks", 0);
-  __Pyx_TraceCall("call_broadpeaks", __pyx_f[0], 1286, 0, __PYX_ERR(0, 1286, __pyx_L1_error));
+  __Pyx_TraceCall("call_broadpeaks", __pyx_f[0], 1277, 0, __PYX_ERR(0, 1277, __pyx_L1_error));
   if (__pyx_optional_args) {
     if (__pyx_optional_args->__pyx_n > 0) {
       __pyx_v_lvl1_cutoff = __pyx_optional_args->lvl1_cutoff;
@@ -20446,19 +20446,19 @@ static PyObject *__pyx_f_5MACS2_2IO_10ScoreTrack_12scoreTrackII_call_broadpeaks(
     if (unlikely(!__Pyx_object_dict_version_matches(((PyObject *)__pyx_v_self), __pyx_tp_dict_version, __pyx_obj_dict_version))) {
       PY_UINT64_T __pyx_type_dict_guard = __Pyx_get_tp_dict_version(((PyObject *)__pyx_v_self));
       #endif
-      __pyx_t_1 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_v_self), __pyx_n_s_call_broadpeaks); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1286, __pyx_L1_error)
+      __pyx_t_1 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_v_self), __pyx_n_s_call_broadpeaks); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1277, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_1);
       if (!PyCFunction_Check(__pyx_t_1) || (PyCFunction_GET_FUNCTION(__pyx_t_1) != (PyCFunction)(void*)__pyx_pw_5MACS2_2IO_10ScoreTrack_12scoreTrackII_27call_broadpeaks)) {
         __Pyx_XDECREF(__pyx_r);
-        __pyx_t_3 = PyFloat_FromDouble(__pyx_v_lvl1_cutoff); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 1286, __pyx_L1_error)
+        __pyx_t_3 = PyFloat_FromDouble(__pyx_v_lvl1_cutoff); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 1277, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_3);
-        __pyx_t_4 = PyFloat_FromDouble(__pyx_v_lvl2_cutoff); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 1286, __pyx_L1_error)
+        __pyx_t_4 = PyFloat_FromDouble(__pyx_v_lvl2_cutoff); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 1277, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_4);
-        __pyx_t_5 = __Pyx_PyInt_From_int(__pyx_v_min_length); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 1286, __pyx_L1_error)
+        __pyx_t_5 = __Pyx_PyInt_From_int(__pyx_v_min_length); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 1277, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_5);
-        __pyx_t_6 = __Pyx_PyInt_From_int(__pyx_v_lvl1_max_gap); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 1286, __pyx_L1_error)
+        __pyx_t_6 = __Pyx_PyInt_From_int(__pyx_v_lvl1_max_gap); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 1277, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_6);
-        __pyx_t_7 = __Pyx_PyInt_From_int(__pyx_v_lvl2_max_gap); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 1286, __pyx_L1_error)
+        __pyx_t_7 = __Pyx_PyInt_From_int(__pyx_v_lvl2_max_gap); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 1277, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_7);
         __Pyx_INCREF(__pyx_t_1);
         __pyx_t_8 = __pyx_t_1; __pyx_t_9 = NULL;
@@ -20476,7 +20476,7 @@ static PyObject *__pyx_f_5MACS2_2IO_10ScoreTrack_12scoreTrackII_call_broadpeaks(
         #if CYTHON_FAST_PYCALL
         if (PyFunction_Check(__pyx_t_8)) {
           PyObject *__pyx_temp[6] = {__pyx_t_9, __pyx_t_3, __pyx_t_4, __pyx_t_5, __pyx_t_6, __pyx_t_7};
-          __pyx_t_2 = __Pyx_PyFunction_FastCall(__pyx_t_8, __pyx_temp+1-__pyx_t_10, 5+__pyx_t_10); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1286, __pyx_L1_error)
+          __pyx_t_2 = __Pyx_PyFunction_FastCall(__pyx_t_8, __pyx_temp+1-__pyx_t_10, 5+__pyx_t_10); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1277, __pyx_L1_error)
           __Pyx_XDECREF(__pyx_t_9); __pyx_t_9 = 0;
           __Pyx_GOTREF(__pyx_t_2);
           __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
@@ -20489,7 +20489,7 @@ static PyObject *__pyx_f_5MACS2_2IO_10ScoreTrack_12scoreTrackII_call_broadpeaks(
         #if CYTHON_FAST_PYCCALL
         if (__Pyx_PyFastCFunction_Check(__pyx_t_8)) {
           PyObject *__pyx_temp[6] = {__pyx_t_9, __pyx_t_3, __pyx_t_4, __pyx_t_5, __pyx_t_6, __pyx_t_7};
-          __pyx_t_2 = __Pyx_PyCFunction_FastCall(__pyx_t_8, __pyx_temp+1-__pyx_t_10, 5+__pyx_t_10); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1286, __pyx_L1_error)
+          __pyx_t_2 = __Pyx_PyCFunction_FastCall(__pyx_t_8, __pyx_temp+1-__pyx_t_10, 5+__pyx_t_10); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1277, __pyx_L1_error)
           __Pyx_XDECREF(__pyx_t_9); __pyx_t_9 = 0;
           __Pyx_GOTREF(__pyx_t_2);
           __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
@@ -20500,7 +20500,7 @@ static PyObject *__pyx_f_5MACS2_2IO_10ScoreTrack_12scoreTrackII_call_broadpeaks(
         } else
         #endif
         {
-          __pyx_t_11 = PyTuple_New(5+__pyx_t_10); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 1286, __pyx_L1_error)
+          __pyx_t_11 = PyTuple_New(5+__pyx_t_10); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 1277, __pyx_L1_error)
           __Pyx_GOTREF(__pyx_t_11);
           if (__pyx_t_9) {
             __Pyx_GIVEREF(__pyx_t_9); PyTuple_SET_ITEM(__pyx_t_11, 0, __pyx_t_9); __pyx_t_9 = NULL;
@@ -20520,7 +20520,7 @@ static PyObject *__pyx_f_5MACS2_2IO_10ScoreTrack_12scoreTrackII_call_broadpeaks(
           __pyx_t_5 = 0;
           __pyx_t_6 = 0;
           __pyx_t_7 = 0;
-          __pyx_t_2 = __Pyx_PyObject_Call(__pyx_t_8, __pyx_t_11, NULL); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1286, __pyx_L1_error)
+          __pyx_t_2 = __Pyx_PyObject_Call(__pyx_t_8, __pyx_t_11, NULL); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1277, __pyx_L1_error)
           __Pyx_GOTREF(__pyx_t_2);
           __Pyx_DECREF(__pyx_t_11); __pyx_t_11 = 0;
         }
@@ -20543,7 +20543,7 @@ static PyObject *__pyx_f_5MACS2_2IO_10ScoreTrack_12scoreTrackII_call_broadpeaks(
     #endif
   }
 
-  /* "MACS2/IO/ScoreTrack.pyx":1305
+  /* "MACS2/IO/ScoreTrack.pyx":1296
  *             bytes chrom
  * 
  *         assert lvl1_cutoff > lvl2_cutoff, "level 1 cutoff should be larger than level 2."             # <<<<<<<<<<<<<<
@@ -20554,12 +20554,12 @@ static PyObject *__pyx_f_5MACS2_2IO_10ScoreTrack_12scoreTrackII_call_broadpeaks(
   if (unlikely(!Py_OptimizeFlag)) {
     if (unlikely(!((__pyx_v_lvl1_cutoff > __pyx_v_lvl2_cutoff) != 0))) {
       PyErr_SetObject(PyExc_AssertionError, __pyx_kp_u_level_1_cutoff_should_be_larger);
-      __PYX_ERR(0, 1305, __pyx_L1_error)
+      __PYX_ERR(0, 1296, __pyx_L1_error)
     }
   }
   #endif
 
-  /* "MACS2/IO/ScoreTrack.pyx":1306
+  /* "MACS2/IO/ScoreTrack.pyx":1297
  * 
  *         assert lvl1_cutoff > lvl2_cutoff, "level 1 cutoff should be larger than level 2."
  *         assert lvl1_max_gap < lvl2_max_gap, "level 2 maximum gap should be larger than level 1."             # <<<<<<<<<<<<<<
@@ -20570,12 +20570,12 @@ static PyObject *__pyx_f_5MACS2_2IO_10ScoreTrack_12scoreTrackII_call_broadpeaks(
   if (unlikely(!Py_OptimizeFlag)) {
     if (unlikely(!((__pyx_v_lvl1_max_gap < __pyx_v_lvl2_max_gap) != 0))) {
       PyErr_SetObject(PyExc_AssertionError, __pyx_kp_u_level_2_maximum_gap_should_be_la);
-      __PYX_ERR(0, 1306, __pyx_L1_error)
+      __PYX_ERR(0, 1297, __pyx_L1_error)
     }
   }
   #endif
 
-  /* "MACS2/IO/ScoreTrack.pyx":1307
+  /* "MACS2/IO/ScoreTrack.pyx":1298
  *         assert lvl1_cutoff > lvl2_cutoff, "level 1 cutoff should be larger than level 2."
  *         assert lvl1_max_gap < lvl2_max_gap, "level 2 maximum gap should be larger than level 1."
  *         lvl1_peaks = self.call_peaks(cutoff=lvl1_cutoff, min_length=min_length, max_gap=lvl1_max_gap)             # <<<<<<<<<<<<<<
@@ -20586,12 +20586,12 @@ static PyObject *__pyx_f_5MACS2_2IO_10ScoreTrack_12scoreTrackII_call_broadpeaks(
   __pyx_t_12.cutoff = __pyx_v_lvl1_cutoff;
   __pyx_t_12.min_length = __pyx_v_min_length;
   __pyx_t_12.max_gap = __pyx_v_lvl1_max_gap;
-  __pyx_t_1 = ((struct __pyx_vtabstruct_5MACS2_2IO_10ScoreTrack_scoreTrackII *)__pyx_v_self->__pyx_vtab)->call_peaks(__pyx_v_self, 0, &__pyx_t_12); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1307, __pyx_L1_error)
+  __pyx_t_1 = ((struct __pyx_vtabstruct_5MACS2_2IO_10ScoreTrack_scoreTrackII *)__pyx_v_self->__pyx_vtab)->call_peaks(__pyx_v_self, 0, &__pyx_t_12); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1298, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __pyx_v_lvl1_peaks = __pyx_t_1;
   __pyx_t_1 = 0;
 
-  /* "MACS2/IO/ScoreTrack.pyx":1308
+  /* "MACS2/IO/ScoreTrack.pyx":1299
  *         assert lvl1_max_gap < lvl2_max_gap, "level 2 maximum gap should be larger than level 1."
  *         lvl1_peaks = self.call_peaks(cutoff=lvl1_cutoff, min_length=min_length, max_gap=lvl1_max_gap)
  *         lvl2_peaks = self.call_peaks(cutoff=lvl2_cutoff, min_length=min_length, max_gap=lvl2_max_gap)             # <<<<<<<<<<<<<<
@@ -20602,21 +20602,21 @@ static PyObject *__pyx_f_5MACS2_2IO_10ScoreTrack_12scoreTrackII_call_broadpeaks(
   __pyx_t_12.cutoff = __pyx_v_lvl2_cutoff;
   __pyx_t_12.min_length = __pyx_v_min_length;
   __pyx_t_12.max_gap = __pyx_v_lvl2_max_gap;
-  __pyx_t_1 = ((struct __pyx_vtabstruct_5MACS2_2IO_10ScoreTrack_scoreTrackII *)__pyx_v_self->__pyx_vtab)->call_peaks(__pyx_v_self, 0, &__pyx_t_12); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1308, __pyx_L1_error)
+  __pyx_t_1 = ((struct __pyx_vtabstruct_5MACS2_2IO_10ScoreTrack_scoreTrackII *)__pyx_v_self->__pyx_vtab)->call_peaks(__pyx_v_self, 0, &__pyx_t_12); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1299, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __pyx_v_lvl2_peaks = __pyx_t_1;
   __pyx_t_1 = 0;
 
-  /* "MACS2/IO/ScoreTrack.pyx":1309
+  /* "MACS2/IO/ScoreTrack.pyx":1300
  *         lvl1_peaks = self.call_peaks(cutoff=lvl1_cutoff, min_length=min_length, max_gap=lvl1_max_gap)
  *         lvl2_peaks = self.call_peaks(cutoff=lvl2_cutoff, min_length=min_length, max_gap=lvl2_max_gap)
  *         chrs = lvl1_peaks.peaks.keys()             # <<<<<<<<<<<<<<
  *         broadpeaks = BroadPeakIO()
  *         # use lvl2_peaks as linking regions between lvl1_peaks
  */
-  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_lvl1_peaks, __pyx_n_s_peaks); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1309, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_lvl1_peaks, __pyx_n_s_peaks); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1300, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
-  __pyx_t_8 = __Pyx_PyObject_GetAttrStr(__pyx_t_2, __pyx_n_s_keys); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 1309, __pyx_L1_error)
+  __pyx_t_8 = __Pyx_PyObject_GetAttrStr(__pyx_t_2, __pyx_n_s_keys); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 1300, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_8);
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
   __pyx_t_2 = NULL;
@@ -20631,20 +20631,20 @@ static PyObject *__pyx_f_5MACS2_2IO_10ScoreTrack_12scoreTrackII_call_broadpeaks(
   }
   __pyx_t_1 = (__pyx_t_2) ? __Pyx_PyObject_CallOneArg(__pyx_t_8, __pyx_t_2) : __Pyx_PyObject_CallNoArg(__pyx_t_8);
   __Pyx_XDECREF(__pyx_t_2); __pyx_t_2 = 0;
-  if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1309, __pyx_L1_error)
+  if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1300, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
   __pyx_v_chrs = __pyx_t_1;
   __pyx_t_1 = 0;
 
-  /* "MACS2/IO/ScoreTrack.pyx":1310
+  /* "MACS2/IO/ScoreTrack.pyx":1301
  *         lvl2_peaks = self.call_peaks(cutoff=lvl2_cutoff, min_length=min_length, max_gap=lvl2_max_gap)
  *         chrs = lvl1_peaks.peaks.keys()
  *         broadpeaks = BroadPeakIO()             # <<<<<<<<<<<<<<
  *         # use lvl2_peaks as linking regions between lvl1_peaks
  *         for chrom in chrs:
  */
-  __Pyx_GetModuleGlobalName(__pyx_t_8, __pyx_n_s_BroadPeakIO); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 1310, __pyx_L1_error)
+  __Pyx_GetModuleGlobalName(__pyx_t_8, __pyx_n_s_BroadPeakIO); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 1301, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_8);
   __pyx_t_2 = NULL;
   if (CYTHON_UNPACK_METHODS && unlikely(PyMethod_Check(__pyx_t_8))) {
@@ -20658,13 +20658,13 @@ static PyObject *__pyx_f_5MACS2_2IO_10ScoreTrack_12scoreTrackII_call_broadpeaks(
   }
   __pyx_t_1 = (__pyx_t_2) ? __Pyx_PyObject_CallOneArg(__pyx_t_8, __pyx_t_2) : __Pyx_PyObject_CallNoArg(__pyx_t_8);
   __Pyx_XDECREF(__pyx_t_2); __pyx_t_2 = 0;
-  if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1310, __pyx_L1_error)
+  if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1301, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
   __pyx_v_broadpeaks = __pyx_t_1;
   __pyx_t_1 = 0;
 
-  /* "MACS2/IO/ScoreTrack.pyx":1312
+  /* "MACS2/IO/ScoreTrack.pyx":1303
  *         broadpeaks = BroadPeakIO()
  *         # use lvl2_peaks as linking regions between lvl1_peaks
  *         for chrom in chrs:             # <<<<<<<<<<<<<<
@@ -20675,26 +20675,26 @@ static PyObject *__pyx_f_5MACS2_2IO_10ScoreTrack_12scoreTrackII_call_broadpeaks(
     __pyx_t_1 = __pyx_v_chrs; __Pyx_INCREF(__pyx_t_1); __pyx_t_13 = 0;
     __pyx_t_14 = NULL;
   } else {
-    __pyx_t_13 = -1; __pyx_t_1 = PyObject_GetIter(__pyx_v_chrs); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1312, __pyx_L1_error)
+    __pyx_t_13 = -1; __pyx_t_1 = PyObject_GetIter(__pyx_v_chrs); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1303, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
-    __pyx_t_14 = Py_TYPE(__pyx_t_1)->tp_iternext; if (unlikely(!__pyx_t_14)) __PYX_ERR(0, 1312, __pyx_L1_error)
+    __pyx_t_14 = Py_TYPE(__pyx_t_1)->tp_iternext; if (unlikely(!__pyx_t_14)) __PYX_ERR(0, 1303, __pyx_L1_error)
   }
   for (;;) {
     if (likely(!__pyx_t_14)) {
       if (likely(PyList_CheckExact(__pyx_t_1))) {
         if (__pyx_t_13 >= PyList_GET_SIZE(__pyx_t_1)) break;
         #if CYTHON_ASSUME_SAFE_MACROS && !CYTHON_AVOID_BORROWED_REFS
-        __pyx_t_8 = PyList_GET_ITEM(__pyx_t_1, __pyx_t_13); __Pyx_INCREF(__pyx_t_8); __pyx_t_13++; if (unlikely(0 < 0)) __PYX_ERR(0, 1312, __pyx_L1_error)
+        __pyx_t_8 = PyList_GET_ITEM(__pyx_t_1, __pyx_t_13); __Pyx_INCREF(__pyx_t_8); __pyx_t_13++; if (unlikely(0 < 0)) __PYX_ERR(0, 1303, __pyx_L1_error)
         #else
-        __pyx_t_8 = PySequence_ITEM(__pyx_t_1, __pyx_t_13); __pyx_t_13++; if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 1312, __pyx_L1_error)
+        __pyx_t_8 = PySequence_ITEM(__pyx_t_1, __pyx_t_13); __pyx_t_13++; if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 1303, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_8);
         #endif
       } else {
         if (__pyx_t_13 >= PyTuple_GET_SIZE(__pyx_t_1)) break;
         #if CYTHON_ASSUME_SAFE_MACROS && !CYTHON_AVOID_BORROWED_REFS
-        __pyx_t_8 = PyTuple_GET_ITEM(__pyx_t_1, __pyx_t_13); __Pyx_INCREF(__pyx_t_8); __pyx_t_13++; if (unlikely(0 < 0)) __PYX_ERR(0, 1312, __pyx_L1_error)
+        __pyx_t_8 = PyTuple_GET_ITEM(__pyx_t_1, __pyx_t_13); __Pyx_INCREF(__pyx_t_8); __pyx_t_13++; if (unlikely(0 < 0)) __PYX_ERR(0, 1303, __pyx_L1_error)
         #else
-        __pyx_t_8 = PySequence_ITEM(__pyx_t_1, __pyx_t_13); __pyx_t_13++; if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 1312, __pyx_L1_error)
+        __pyx_t_8 = PySequence_ITEM(__pyx_t_1, __pyx_t_13); __pyx_t_13++; if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 1303, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_8);
         #endif
       }
@@ -20704,74 +20704,74 @@ static PyObject *__pyx_f_5MACS2_2IO_10ScoreTrack_12scoreTrackII_call_broadpeaks(
         PyObject* exc_type = PyErr_Occurred();
         if (exc_type) {
           if (likely(__Pyx_PyErr_GivenExceptionMatches(exc_type, PyExc_StopIteration))) PyErr_Clear();
-          else __PYX_ERR(0, 1312, __pyx_L1_error)
+          else __PYX_ERR(0, 1303, __pyx_L1_error)
         }
         break;
       }
       __Pyx_GOTREF(__pyx_t_8);
     }
-    if (!(likely(PyBytes_CheckExact(__pyx_t_8))||((__pyx_t_8) == Py_None)||(PyErr_Format(PyExc_TypeError, "Expected %.16s, got %.200s", "bytes", Py_TYPE(__pyx_t_8)->tp_name), 0))) __PYX_ERR(0, 1312, __pyx_L1_error)
+    if (!(likely(PyBytes_CheckExact(__pyx_t_8))||((__pyx_t_8) == Py_None)||(PyErr_Format(PyExc_TypeError, "Expected %.16s, got %.200s", "bytes", Py_TYPE(__pyx_t_8)->tp_name), 0))) __PYX_ERR(0, 1303, __pyx_L1_error)
     __Pyx_XDECREF_SET(__pyx_v_chrom, ((PyObject*)__pyx_t_8));
     __pyx_t_8 = 0;
 
-    /* "MACS2/IO/ScoreTrack.pyx":1313
+    /* "MACS2/IO/ScoreTrack.pyx":1304
  *         # use lvl2_peaks as linking regions between lvl1_peaks
  *         for chrom in chrs:
  *             lvl1peakschrom = lvl1_peaks.peaks[chrom]             # <<<<<<<<<<<<<<
  *             lvl2peakschrom = lvl2_peaks.peaks[chrom]
  *             lvl1peakschrom_next = iter(lvl1peakschrom).__next__
  */
-    __pyx_t_8 = __Pyx_PyObject_GetAttrStr(__pyx_v_lvl1_peaks, __pyx_n_s_peaks); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 1313, __pyx_L1_error)
+    __pyx_t_8 = __Pyx_PyObject_GetAttrStr(__pyx_v_lvl1_peaks, __pyx_n_s_peaks); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 1304, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_8);
-    __pyx_t_2 = __Pyx_PyObject_GetItem(__pyx_t_8, __pyx_v_chrom); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1313, __pyx_L1_error)
+    __pyx_t_2 = __Pyx_PyObject_GetItem(__pyx_t_8, __pyx_v_chrom); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1304, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
     __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
     __Pyx_XDECREF_SET(__pyx_v_lvl1peakschrom, __pyx_t_2);
     __pyx_t_2 = 0;
 
-    /* "MACS2/IO/ScoreTrack.pyx":1314
+    /* "MACS2/IO/ScoreTrack.pyx":1305
  *         for chrom in chrs:
  *             lvl1peakschrom = lvl1_peaks.peaks[chrom]
  *             lvl2peakschrom = lvl2_peaks.peaks[chrom]             # <<<<<<<<<<<<<<
  *             lvl1peakschrom_next = iter(lvl1peakschrom).__next__
  *             tmppeakset = []             # to temporarily store lvl1 region inside a lvl2 region
  */
-    __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_lvl2_peaks, __pyx_n_s_peaks); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1314, __pyx_L1_error)
+    __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_lvl2_peaks, __pyx_n_s_peaks); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1305, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
-    __pyx_t_8 = __Pyx_PyObject_GetItem(__pyx_t_2, __pyx_v_chrom); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 1314, __pyx_L1_error)
+    __pyx_t_8 = __Pyx_PyObject_GetItem(__pyx_t_2, __pyx_v_chrom); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 1305, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_8);
     __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
     __Pyx_XDECREF_SET(__pyx_v_lvl2peakschrom, __pyx_t_8);
     __pyx_t_8 = 0;
 
-    /* "MACS2/IO/ScoreTrack.pyx":1315
+    /* "MACS2/IO/ScoreTrack.pyx":1306
  *             lvl1peakschrom = lvl1_peaks.peaks[chrom]
  *             lvl2peakschrom = lvl2_peaks.peaks[chrom]
  *             lvl1peakschrom_next = iter(lvl1peakschrom).__next__             # <<<<<<<<<<<<<<
  *             tmppeakset = []             # to temporarily store lvl1 region inside a lvl2 region
  *             # our assumption is lvl1 regions should be included in lvl2 regions
  */
-    __pyx_t_8 = PyObject_GetIter(__pyx_v_lvl1peakschrom); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 1315, __pyx_L1_error)
+    __pyx_t_8 = PyObject_GetIter(__pyx_v_lvl1peakschrom); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 1306, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_8);
-    __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_t_8, __pyx_n_s_next); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1315, __pyx_L1_error)
+    __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_t_8, __pyx_n_s_next); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1306, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
     __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
     __Pyx_XDECREF_SET(__pyx_v_lvl1peakschrom_next, __pyx_t_2);
     __pyx_t_2 = 0;
 
-    /* "MACS2/IO/ScoreTrack.pyx":1316
+    /* "MACS2/IO/ScoreTrack.pyx":1307
  *             lvl2peakschrom = lvl2_peaks.peaks[chrom]
  *             lvl1peakschrom_next = iter(lvl1peakschrom).__next__
  *             tmppeakset = []             # to temporarily store lvl1 region inside a lvl2 region             # <<<<<<<<<<<<<<
  *             # our assumption is lvl1 regions should be included in lvl2 regions
  *             try:
  */
-    __pyx_t_2 = PyList_New(0); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1316, __pyx_L1_error)
+    __pyx_t_2 = PyList_New(0); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1307, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
     __Pyx_XDECREF_SET(__pyx_v_tmppeakset, ((PyObject*)__pyx_t_2));
     __pyx_t_2 = 0;
 
-    /* "MACS2/IO/ScoreTrack.pyx":1318
+    /* "MACS2/IO/ScoreTrack.pyx":1309
  *             tmppeakset = []             # to temporarily store lvl1 region inside a lvl2 region
  *             # our assumption is lvl1 regions should be included in lvl2 regions
  *             try:             # <<<<<<<<<<<<<<
@@ -20787,7 +20787,7 @@ static PyObject *__pyx_f_5MACS2_2IO_10ScoreTrack_12scoreTrackII_call_broadpeaks(
       __Pyx_XGOTREF(__pyx_t_17);
       /*try:*/ {
 
-        /* "MACS2/IO/ScoreTrack.pyx":1319
+        /* "MACS2/IO/ScoreTrack.pyx":1310
  *             # our assumption is lvl1 regions should be included in lvl2 regions
  *             try:
  *                 lvl1 = lvl1peakschrom_next()             # <<<<<<<<<<<<<<
@@ -20807,37 +20807,37 @@ static PyObject *__pyx_f_5MACS2_2IO_10ScoreTrack_12scoreTrackII_call_broadpeaks(
         }
         __pyx_t_2 = (__pyx_t_11) ? __Pyx_PyObject_CallOneArg(__pyx_t_8, __pyx_t_11) : __Pyx_PyObject_CallNoArg(__pyx_t_8);
         __Pyx_XDECREF(__pyx_t_11); __pyx_t_11 = 0;
-        if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1319, __pyx_L5_error)
+        if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1310, __pyx_L5_error)
         __Pyx_GOTREF(__pyx_t_2);
         __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
         __Pyx_XDECREF_SET(__pyx_v_lvl1, __pyx_t_2);
         __pyx_t_2 = 0;
 
-        /* "MACS2/IO/ScoreTrack.pyx":1320
+        /* "MACS2/IO/ScoreTrack.pyx":1311
  *             try:
  *                 lvl1 = lvl1peakschrom_next()
  *                 for i in range( len(lvl2peakschrom) ):             # <<<<<<<<<<<<<<
  *                     # for each lvl2 peak, find all lvl1 peaks inside
  *                     # I assume lvl1 peaks can be ALL covered by lvl2 peaks.
  */
-        __pyx_t_18 = PyObject_Length(__pyx_v_lvl2peakschrom); if (unlikely(__pyx_t_18 == ((Py_ssize_t)-1))) __PYX_ERR(0, 1320, __pyx_L5_error)
+        __pyx_t_18 = PyObject_Length(__pyx_v_lvl2peakschrom); if (unlikely(__pyx_t_18 == ((Py_ssize_t)-1))) __PYX_ERR(0, 1311, __pyx_L5_error)
         __pyx_t_19 = __pyx_t_18;
         for (__pyx_t_10 = 0; __pyx_t_10 < __pyx_t_19; __pyx_t_10+=1) {
           __pyx_v_i = __pyx_t_10;
 
-          /* "MACS2/IO/ScoreTrack.pyx":1323
+          /* "MACS2/IO/ScoreTrack.pyx":1314
  *                     # for each lvl2 peak, find all lvl1 peaks inside
  *                     # I assume lvl1 peaks can be ALL covered by lvl2 peaks.
  *                     lvl2 = lvl2peakschrom[i]             # <<<<<<<<<<<<<<
  * 
  *                     while True:
  */
-          __pyx_t_2 = __Pyx_GetItemInt(__pyx_v_lvl2peakschrom, __pyx_v_i, int, 1, __Pyx_PyInt_From_int, 0, 1, 1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1323, __pyx_L5_error)
+          __pyx_t_2 = __Pyx_GetItemInt(__pyx_v_lvl2peakschrom, __pyx_v_i, int, 1, __Pyx_PyInt_From_int, 0, 1, 1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1314, __pyx_L5_error)
           __Pyx_GOTREF(__pyx_t_2);
           __Pyx_XDECREF_SET(__pyx_v_lvl2, __pyx_t_2);
           __pyx_t_2 = 0;
 
-          /* "MACS2/IO/ScoreTrack.pyx":1325
+          /* "MACS2/IO/ScoreTrack.pyx":1316
  *                     lvl2 = lvl2peakschrom[i]
  * 
  *                     while True:             # <<<<<<<<<<<<<<
@@ -20846,50 +20846,50 @@ static PyObject *__pyx_f_5MACS2_2IO_10ScoreTrack_12scoreTrackII_call_broadpeaks(
  */
           while (1) {
 
-            /* "MACS2/IO/ScoreTrack.pyx":1326
+            /* "MACS2/IO/ScoreTrack.pyx":1317
  * 
  *                     while True:
  *                         if lvl2["start"] <= lvl1["start"]  and lvl1["end"] <= lvl2["end"]:             # <<<<<<<<<<<<<<
  *                             tmppeakset.append(lvl1)
  *                             lvl1 = lvl1peakschrom_next()
  */
-            __pyx_t_2 = __Pyx_PyObject_Dict_GetItem(__pyx_v_lvl2, __pyx_n_u_start); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1326, __pyx_L5_error)
+            __pyx_t_2 = __Pyx_PyObject_Dict_GetItem(__pyx_v_lvl2, __pyx_n_u_start); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1317, __pyx_L5_error)
             __Pyx_GOTREF(__pyx_t_2);
-            __pyx_t_8 = __Pyx_PyObject_Dict_GetItem(__pyx_v_lvl1, __pyx_n_u_start); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 1326, __pyx_L5_error)
+            __pyx_t_8 = __Pyx_PyObject_Dict_GetItem(__pyx_v_lvl1, __pyx_n_u_start); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 1317, __pyx_L5_error)
             __Pyx_GOTREF(__pyx_t_8);
-            __pyx_t_11 = PyObject_RichCompare(__pyx_t_2, __pyx_t_8, Py_LE); __Pyx_XGOTREF(__pyx_t_11); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 1326, __pyx_L5_error)
+            __pyx_t_11 = PyObject_RichCompare(__pyx_t_2, __pyx_t_8, Py_LE); __Pyx_XGOTREF(__pyx_t_11); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 1317, __pyx_L5_error)
             __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
             __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
-            __pyx_t_21 = __Pyx_PyObject_IsTrue(__pyx_t_11); if (unlikely(__pyx_t_21 < 0)) __PYX_ERR(0, 1326, __pyx_L5_error)
+            __pyx_t_21 = __Pyx_PyObject_IsTrue(__pyx_t_11); if (unlikely(__pyx_t_21 < 0)) __PYX_ERR(0, 1317, __pyx_L5_error)
             __Pyx_DECREF(__pyx_t_11); __pyx_t_11 = 0;
             if (__pyx_t_21) {
             } else {
               __pyx_t_20 = __pyx_t_21;
               goto __pyx_L18_bool_binop_done;
             }
-            __pyx_t_11 = __Pyx_PyObject_Dict_GetItem(__pyx_v_lvl1, __pyx_n_u_end); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 1326, __pyx_L5_error)
+            __pyx_t_11 = __Pyx_PyObject_Dict_GetItem(__pyx_v_lvl1, __pyx_n_u_end); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 1317, __pyx_L5_error)
             __Pyx_GOTREF(__pyx_t_11);
-            __pyx_t_8 = __Pyx_PyObject_Dict_GetItem(__pyx_v_lvl2, __pyx_n_u_end); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 1326, __pyx_L5_error)
+            __pyx_t_8 = __Pyx_PyObject_Dict_GetItem(__pyx_v_lvl2, __pyx_n_u_end); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 1317, __pyx_L5_error)
             __Pyx_GOTREF(__pyx_t_8);
-            __pyx_t_2 = PyObject_RichCompare(__pyx_t_11, __pyx_t_8, Py_LE); __Pyx_XGOTREF(__pyx_t_2); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1326, __pyx_L5_error)
+            __pyx_t_2 = PyObject_RichCompare(__pyx_t_11, __pyx_t_8, Py_LE); __Pyx_XGOTREF(__pyx_t_2); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1317, __pyx_L5_error)
             __Pyx_DECREF(__pyx_t_11); __pyx_t_11 = 0;
             __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
-            __pyx_t_21 = __Pyx_PyObject_IsTrue(__pyx_t_2); if (unlikely(__pyx_t_21 < 0)) __PYX_ERR(0, 1326, __pyx_L5_error)
+            __pyx_t_21 = __Pyx_PyObject_IsTrue(__pyx_t_2); if (unlikely(__pyx_t_21 < 0)) __PYX_ERR(0, 1317, __pyx_L5_error)
             __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
             __pyx_t_20 = __pyx_t_21;
             __pyx_L18_bool_binop_done:;
             if (__pyx_t_20) {
 
-              /* "MACS2/IO/ScoreTrack.pyx":1327
+              /* "MACS2/IO/ScoreTrack.pyx":1318
  *                     while True:
  *                         if lvl2["start"] <= lvl1["start"]  and lvl1["end"] <= lvl2["end"]:
  *                             tmppeakset.append(lvl1)             # <<<<<<<<<<<<<<
  *                             lvl1 = lvl1peakschrom_next()
  *                         else:
  */
-              __pyx_t_22 = __Pyx_PyList_Append(__pyx_v_tmppeakset, __pyx_v_lvl1); if (unlikely(__pyx_t_22 == ((int)-1))) __PYX_ERR(0, 1327, __pyx_L5_error)
+              __pyx_t_22 = __Pyx_PyList_Append(__pyx_v_tmppeakset, __pyx_v_lvl1); if (unlikely(__pyx_t_22 == ((int)-1))) __PYX_ERR(0, 1318, __pyx_L5_error)
 
-              /* "MACS2/IO/ScoreTrack.pyx":1328
+              /* "MACS2/IO/ScoreTrack.pyx":1319
  *                         if lvl2["start"] <= lvl1["start"]  and lvl1["end"] <= lvl2["end"]:
  *                             tmppeakset.append(lvl1)
  *                             lvl1 = lvl1peakschrom_next()             # <<<<<<<<<<<<<<
@@ -20909,13 +20909,13 @@ static PyObject *__pyx_f_5MACS2_2IO_10ScoreTrack_12scoreTrackII_call_broadpeaks(
               }
               __pyx_t_2 = (__pyx_t_11) ? __Pyx_PyObject_CallOneArg(__pyx_t_8, __pyx_t_11) : __Pyx_PyObject_CallNoArg(__pyx_t_8);
               __Pyx_XDECREF(__pyx_t_11); __pyx_t_11 = 0;
-              if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1328, __pyx_L5_error)
+              if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1319, __pyx_L5_error)
               __Pyx_GOTREF(__pyx_t_2);
               __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
               __Pyx_DECREF_SET(__pyx_v_lvl1, __pyx_t_2);
               __pyx_t_2 = 0;
 
-              /* "MACS2/IO/ScoreTrack.pyx":1326
+              /* "MACS2/IO/ScoreTrack.pyx":1317
  * 
  *                     while True:
  *                         if lvl2["start"] <= lvl1["start"]  and lvl1["end"] <= lvl2["end"]:             # <<<<<<<<<<<<<<
@@ -20925,7 +20925,7 @@ static PyObject *__pyx_f_5MACS2_2IO_10ScoreTrack_12scoreTrackII_call_broadpeaks(
               goto __pyx_L17;
             }
 
-            /* "MACS2/IO/ScoreTrack.pyx":1332
+            /* "MACS2/IO/ScoreTrack.pyx":1323
  *                             # make a hierarchical broad peak
  *                             #print lvl2["start"], lvl2["end"], lvl2["score"]
  *                             self.__add_broadpeak ( broadpeaks, chrom, lvl2, tmppeakset)             # <<<<<<<<<<<<<<
@@ -20933,7 +20933,7 @@ static PyObject *__pyx_f_5MACS2_2IO_10ScoreTrack_12scoreTrackII_call_broadpeaks(
  *                             break
  */
             /*else*/ {
-              __pyx_t_8 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_v_self), __pyx_n_s_add_broadpeak); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 1332, __pyx_L5_error)
+              __pyx_t_8 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_v_self), __pyx_n_s_add_broadpeak); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 1323, __pyx_L5_error)
               __Pyx_GOTREF(__pyx_t_8);
               __pyx_t_11 = NULL;
               __pyx_t_23 = 0;
@@ -20950,7 +20950,7 @@ static PyObject *__pyx_f_5MACS2_2IO_10ScoreTrack_12scoreTrackII_call_broadpeaks(
               #if CYTHON_FAST_PYCALL
               if (PyFunction_Check(__pyx_t_8)) {
                 PyObject *__pyx_temp[5] = {__pyx_t_11, __pyx_v_broadpeaks, __pyx_v_chrom, __pyx_v_lvl2, __pyx_v_tmppeakset};
-                __pyx_t_2 = __Pyx_PyFunction_FastCall(__pyx_t_8, __pyx_temp+1-__pyx_t_23, 4+__pyx_t_23); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1332, __pyx_L5_error)
+                __pyx_t_2 = __Pyx_PyFunction_FastCall(__pyx_t_8, __pyx_temp+1-__pyx_t_23, 4+__pyx_t_23); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1323, __pyx_L5_error)
                 __Pyx_XDECREF(__pyx_t_11); __pyx_t_11 = 0;
                 __Pyx_GOTREF(__pyx_t_2);
               } else
@@ -20958,13 +20958,13 @@ static PyObject *__pyx_f_5MACS2_2IO_10ScoreTrack_12scoreTrackII_call_broadpeaks(
               #if CYTHON_FAST_PYCCALL
               if (__Pyx_PyFastCFunction_Check(__pyx_t_8)) {
                 PyObject *__pyx_temp[5] = {__pyx_t_11, __pyx_v_broadpeaks, __pyx_v_chrom, __pyx_v_lvl2, __pyx_v_tmppeakset};
-                __pyx_t_2 = __Pyx_PyCFunction_FastCall(__pyx_t_8, __pyx_temp+1-__pyx_t_23, 4+__pyx_t_23); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1332, __pyx_L5_error)
+                __pyx_t_2 = __Pyx_PyCFunction_FastCall(__pyx_t_8, __pyx_temp+1-__pyx_t_23, 4+__pyx_t_23); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1323, __pyx_L5_error)
                 __Pyx_XDECREF(__pyx_t_11); __pyx_t_11 = 0;
                 __Pyx_GOTREF(__pyx_t_2);
               } else
               #endif
               {
-                __pyx_t_7 = PyTuple_New(4+__pyx_t_23); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 1332, __pyx_L5_error)
+                __pyx_t_7 = PyTuple_New(4+__pyx_t_23); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 1323, __pyx_L5_error)
                 __Pyx_GOTREF(__pyx_t_7);
                 if (__pyx_t_11) {
                   __Pyx_GIVEREF(__pyx_t_11); PyTuple_SET_ITEM(__pyx_t_7, 0, __pyx_t_11); __pyx_t_11 = NULL;
@@ -20981,26 +20981,26 @@ static PyObject *__pyx_f_5MACS2_2IO_10ScoreTrack_12scoreTrackII_call_broadpeaks(
                 __Pyx_INCREF(__pyx_v_tmppeakset);
                 __Pyx_GIVEREF(__pyx_v_tmppeakset);
                 PyTuple_SET_ITEM(__pyx_t_7, 3+__pyx_t_23, __pyx_v_tmppeakset);
-                __pyx_t_2 = __Pyx_PyObject_Call(__pyx_t_8, __pyx_t_7, NULL); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1332, __pyx_L5_error)
+                __pyx_t_2 = __Pyx_PyObject_Call(__pyx_t_8, __pyx_t_7, NULL); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1323, __pyx_L5_error)
                 __Pyx_GOTREF(__pyx_t_2);
                 __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
               }
               __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
               __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
-              /* "MACS2/IO/ScoreTrack.pyx":1333
+              /* "MACS2/IO/ScoreTrack.pyx":1324
  *                             #print lvl2["start"], lvl2["end"], lvl2["score"]
  *                             self.__add_broadpeak ( broadpeaks, chrom, lvl2, tmppeakset)
  *                             tmppeakset = []             # <<<<<<<<<<<<<<
  *                             break
  *             except StopIteration:
  */
-              __pyx_t_2 = PyList_New(0); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1333, __pyx_L5_error)
+              __pyx_t_2 = PyList_New(0); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1324, __pyx_L5_error)
               __Pyx_GOTREF(__pyx_t_2);
               __Pyx_DECREF_SET(__pyx_v_tmppeakset, ((PyObject*)__pyx_t_2));
               __pyx_t_2 = 0;
 
-              /* "MACS2/IO/ScoreTrack.pyx":1334
+              /* "MACS2/IO/ScoreTrack.pyx":1325
  *                             self.__add_broadpeak ( broadpeaks, chrom, lvl2, tmppeakset)
  *                             tmppeakset = []
  *                             break             # <<<<<<<<<<<<<<
@@ -21014,7 +21014,7 @@ static PyObject *__pyx_f_5MACS2_2IO_10ScoreTrack_12scoreTrackII_call_broadpeaks(
           __pyx_L16_break:;
         }
 
-        /* "MACS2/IO/ScoreTrack.pyx":1318
+        /* "MACS2/IO/ScoreTrack.pyx":1309
  *             tmppeakset = []             # to temporarily store lvl1 region inside a lvl2 region
  *             # our assumption is lvl1 regions should be included in lvl2 regions
  *             try:             # <<<<<<<<<<<<<<
@@ -21037,7 +21037,7 @@ static PyObject *__pyx_f_5MACS2_2IO_10ScoreTrack_12scoreTrackII_call_broadpeaks(
       __Pyx_XDECREF(__pyx_t_8); __pyx_t_8 = 0;
       __Pyx_XDECREF(__pyx_t_9); __pyx_t_9 = 0;
 
-      /* "MACS2/IO/ScoreTrack.pyx":1335
+      /* "MACS2/IO/ScoreTrack.pyx":1326
  *                             tmppeakset = []
  *                             break
  *             except StopIteration:             # <<<<<<<<<<<<<<
@@ -21047,21 +21047,21 @@ static PyObject *__pyx_f_5MACS2_2IO_10ScoreTrack_12scoreTrackII_call_broadpeaks(
       __pyx_t_10 = __Pyx_PyErr_ExceptionMatches(__pyx_builtin_StopIteration);
       if (__pyx_t_10) {
         __Pyx_AddTraceback("MACS2.IO.ScoreTrack.scoreTrackII.call_broadpeaks", __pyx_clineno, __pyx_lineno, __pyx_filename);
-        if (__Pyx_GetException(&__pyx_t_2, &__pyx_t_8, &__pyx_t_7) < 0) __PYX_ERR(0, 1335, __pyx_L7_except_error)
+        if (__Pyx_GetException(&__pyx_t_2, &__pyx_t_8, &__pyx_t_7) < 0) __PYX_ERR(0, 1326, __pyx_L7_except_error)
         __Pyx_GOTREF(__pyx_t_2);
         __Pyx_GOTREF(__pyx_t_8);
         __Pyx_GOTREF(__pyx_t_7);
 
-        /* "MACS2/IO/ScoreTrack.pyx":1337
+        /* "MACS2/IO/ScoreTrack.pyx":1328
  *             except StopIteration:
  *                 # no more strong (aka lvl1) peaks left
  *                 self.__add_broadpeak ( broadpeaks, chrom, lvl2, tmppeakset)             # <<<<<<<<<<<<<<
  *                 tmppeakset = []
  *                 # add the rest lvl2 peaks
  */
-        __pyx_t_6 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_v_self), __pyx_n_s_add_broadpeak); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 1337, __pyx_L7_except_error)
+        __pyx_t_6 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_v_self), __pyx_n_s_add_broadpeak); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 1328, __pyx_L7_except_error)
         __Pyx_GOTREF(__pyx_t_6);
-        if (unlikely(!__pyx_v_lvl2)) { __Pyx_RaiseUnboundLocalError("lvl2"); __PYX_ERR(0, 1337, __pyx_L7_except_error) }
+        if (unlikely(!__pyx_v_lvl2)) { __Pyx_RaiseUnboundLocalError("lvl2"); __PYX_ERR(0, 1328, __pyx_L7_except_error) }
         __pyx_t_5 = NULL;
         __pyx_t_10 = 0;
         if (CYTHON_UNPACK_METHODS && likely(PyMethod_Check(__pyx_t_6))) {
@@ -21077,7 +21077,7 @@ static PyObject *__pyx_f_5MACS2_2IO_10ScoreTrack_12scoreTrackII_call_broadpeaks(
         #if CYTHON_FAST_PYCALL
         if (PyFunction_Check(__pyx_t_6)) {
           PyObject *__pyx_temp[5] = {__pyx_t_5, __pyx_v_broadpeaks, __pyx_v_chrom, __pyx_v_lvl2, __pyx_v_tmppeakset};
-          __pyx_t_11 = __Pyx_PyFunction_FastCall(__pyx_t_6, __pyx_temp+1-__pyx_t_10, 4+__pyx_t_10); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 1337, __pyx_L7_except_error)
+          __pyx_t_11 = __Pyx_PyFunction_FastCall(__pyx_t_6, __pyx_temp+1-__pyx_t_10, 4+__pyx_t_10); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 1328, __pyx_L7_except_error)
           __Pyx_XDECREF(__pyx_t_5); __pyx_t_5 = 0;
           __Pyx_GOTREF(__pyx_t_11);
         } else
@@ -21085,13 +21085,13 @@ static PyObject *__pyx_f_5MACS2_2IO_10ScoreTrack_12scoreTrackII_call_broadpeaks(
         #if CYTHON_FAST_PYCCALL
         if (__Pyx_PyFastCFunction_Check(__pyx_t_6)) {
           PyObject *__pyx_temp[5] = {__pyx_t_5, __pyx_v_broadpeaks, __pyx_v_chrom, __pyx_v_lvl2, __pyx_v_tmppeakset};
-          __pyx_t_11 = __Pyx_PyCFunction_FastCall(__pyx_t_6, __pyx_temp+1-__pyx_t_10, 4+__pyx_t_10); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 1337, __pyx_L7_except_error)
+          __pyx_t_11 = __Pyx_PyCFunction_FastCall(__pyx_t_6, __pyx_temp+1-__pyx_t_10, 4+__pyx_t_10); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 1328, __pyx_L7_except_error)
           __Pyx_XDECREF(__pyx_t_5); __pyx_t_5 = 0;
           __Pyx_GOTREF(__pyx_t_11);
         } else
         #endif
         {
-          __pyx_t_4 = PyTuple_New(4+__pyx_t_10); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 1337, __pyx_L7_except_error)
+          __pyx_t_4 = PyTuple_New(4+__pyx_t_10); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 1328, __pyx_L7_except_error)
           __Pyx_GOTREF(__pyx_t_4);
           if (__pyx_t_5) {
             __Pyx_GIVEREF(__pyx_t_5); PyTuple_SET_ITEM(__pyx_t_4, 0, __pyx_t_5); __pyx_t_5 = NULL;
@@ -21108,47 +21108,47 @@ static PyObject *__pyx_f_5MACS2_2IO_10ScoreTrack_12scoreTrackII_call_broadpeaks(
           __Pyx_INCREF(__pyx_v_tmppeakset);
           __Pyx_GIVEREF(__pyx_v_tmppeakset);
           PyTuple_SET_ITEM(__pyx_t_4, 3+__pyx_t_10, __pyx_v_tmppeakset);
-          __pyx_t_11 = __Pyx_PyObject_Call(__pyx_t_6, __pyx_t_4, NULL); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 1337, __pyx_L7_except_error)
+          __pyx_t_11 = __Pyx_PyObject_Call(__pyx_t_6, __pyx_t_4, NULL); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 1328, __pyx_L7_except_error)
           __Pyx_GOTREF(__pyx_t_11);
           __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
         }
         __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
         __Pyx_DECREF(__pyx_t_11); __pyx_t_11 = 0;
 
-        /* "MACS2/IO/ScoreTrack.pyx":1338
+        /* "MACS2/IO/ScoreTrack.pyx":1329
  *                 # no more strong (aka lvl1) peaks left
  *                 self.__add_broadpeak ( broadpeaks, chrom, lvl2, tmppeakset)
  *                 tmppeakset = []             # <<<<<<<<<<<<<<
  *                 # add the rest lvl2 peaks
  *                 for j in range( i+1, len(lvl2peakschrom) ):
  */
-        __pyx_t_11 = PyList_New(0); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 1338, __pyx_L7_except_error)
+        __pyx_t_11 = PyList_New(0); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 1329, __pyx_L7_except_error)
         __Pyx_GOTREF(__pyx_t_11);
         __Pyx_DECREF_SET(__pyx_v_tmppeakset, ((PyObject*)__pyx_t_11));
         __pyx_t_11 = 0;
 
-        /* "MACS2/IO/ScoreTrack.pyx":1340
+        /* "MACS2/IO/ScoreTrack.pyx":1331
  *                 tmppeakset = []
  *                 # add the rest lvl2 peaks
  *                 for j in range( i+1, len(lvl2peakschrom) ):             # <<<<<<<<<<<<<<
  *                     self.__add_broadpeak( broadpeaks, chrom, lvl2peakschrom[j], tmppeakset )
  * 
  */
-        __pyx_t_18 = PyObject_Length(__pyx_v_lvl2peakschrom); if (unlikely(__pyx_t_18 == ((Py_ssize_t)-1))) __PYX_ERR(0, 1340, __pyx_L7_except_error)
+        __pyx_t_18 = PyObject_Length(__pyx_v_lvl2peakschrom); if (unlikely(__pyx_t_18 == ((Py_ssize_t)-1))) __PYX_ERR(0, 1331, __pyx_L7_except_error)
         __pyx_t_19 = __pyx_t_18;
         for (__pyx_t_24 = (__pyx_v_i + 1); __pyx_t_24 < __pyx_t_19; __pyx_t_24+=1) {
           __pyx_v_j = __pyx_t_24;
 
-          /* "MACS2/IO/ScoreTrack.pyx":1341
+          /* "MACS2/IO/ScoreTrack.pyx":1332
  *                 # add the rest lvl2 peaks
  *                 for j in range( i+1, len(lvl2peakschrom) ):
  *                     self.__add_broadpeak( broadpeaks, chrom, lvl2peakschrom[j], tmppeakset )             # <<<<<<<<<<<<<<
  * 
  *         return broadpeaks
  */
-          __pyx_t_6 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_v_self), __pyx_n_s_add_broadpeak); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 1341, __pyx_L7_except_error)
+          __pyx_t_6 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_v_self), __pyx_n_s_add_broadpeak); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 1332, __pyx_L7_except_error)
           __Pyx_GOTREF(__pyx_t_6);
-          __pyx_t_4 = __Pyx_GetItemInt(__pyx_v_lvl2peakschrom, __pyx_v_j, Py_ssize_t, 1, PyInt_FromSsize_t, 0, 1, 1); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 1341, __pyx_L7_except_error)
+          __pyx_t_4 = __Pyx_GetItemInt(__pyx_v_lvl2peakschrom, __pyx_v_j, Py_ssize_t, 1, PyInt_FromSsize_t, 0, 1, 1); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 1332, __pyx_L7_except_error)
           __Pyx_GOTREF(__pyx_t_4);
           __pyx_t_5 = NULL;
           __pyx_t_10 = 0;
@@ -21165,7 +21165,7 @@ static PyObject *__pyx_f_5MACS2_2IO_10ScoreTrack_12scoreTrackII_call_broadpeaks(
           #if CYTHON_FAST_PYCALL
           if (PyFunction_Check(__pyx_t_6)) {
             PyObject *__pyx_temp[5] = {__pyx_t_5, __pyx_v_broadpeaks, __pyx_v_chrom, __pyx_t_4, __pyx_v_tmppeakset};
-            __pyx_t_11 = __Pyx_PyFunction_FastCall(__pyx_t_6, __pyx_temp+1-__pyx_t_10, 4+__pyx_t_10); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 1341, __pyx_L7_except_error)
+            __pyx_t_11 = __Pyx_PyFunction_FastCall(__pyx_t_6, __pyx_temp+1-__pyx_t_10, 4+__pyx_t_10); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 1332, __pyx_L7_except_error)
             __Pyx_XDECREF(__pyx_t_5); __pyx_t_5 = 0;
             __Pyx_GOTREF(__pyx_t_11);
             __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
@@ -21174,14 +21174,14 @@ static PyObject *__pyx_f_5MACS2_2IO_10ScoreTrack_12scoreTrackII_call_broadpeaks(
           #if CYTHON_FAST_PYCCALL
           if (__Pyx_PyFastCFunction_Check(__pyx_t_6)) {
             PyObject *__pyx_temp[5] = {__pyx_t_5, __pyx_v_broadpeaks, __pyx_v_chrom, __pyx_t_4, __pyx_v_tmppeakset};
-            __pyx_t_11 = __Pyx_PyCFunction_FastCall(__pyx_t_6, __pyx_temp+1-__pyx_t_10, 4+__pyx_t_10); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 1341, __pyx_L7_except_error)
+            __pyx_t_11 = __Pyx_PyCFunction_FastCall(__pyx_t_6, __pyx_temp+1-__pyx_t_10, 4+__pyx_t_10); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 1332, __pyx_L7_except_error)
             __Pyx_XDECREF(__pyx_t_5); __pyx_t_5 = 0;
             __Pyx_GOTREF(__pyx_t_11);
             __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
           } else
           #endif
           {
-            __pyx_t_3 = PyTuple_New(4+__pyx_t_10); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 1341, __pyx_L7_except_error)
+            __pyx_t_3 = PyTuple_New(4+__pyx_t_10); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 1332, __pyx_L7_except_error)
             __Pyx_GOTREF(__pyx_t_3);
             if (__pyx_t_5) {
               __Pyx_GIVEREF(__pyx_t_5); PyTuple_SET_ITEM(__pyx_t_3, 0, __pyx_t_5); __pyx_t_5 = NULL;
@@ -21198,7 +21198,7 @@ static PyObject *__pyx_f_5MACS2_2IO_10ScoreTrack_12scoreTrackII_call_broadpeaks(
             __Pyx_GIVEREF(__pyx_v_tmppeakset);
             PyTuple_SET_ITEM(__pyx_t_3, 3+__pyx_t_10, __pyx_v_tmppeakset);
             __pyx_t_4 = 0;
-            __pyx_t_11 = __Pyx_PyObject_Call(__pyx_t_6, __pyx_t_3, NULL); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 1341, __pyx_L7_except_error)
+            __pyx_t_11 = __Pyx_PyObject_Call(__pyx_t_6, __pyx_t_3, NULL); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 1332, __pyx_L7_except_error)
             __Pyx_GOTREF(__pyx_t_11);
             __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
           }
@@ -21213,7 +21213,7 @@ static PyObject *__pyx_f_5MACS2_2IO_10ScoreTrack_12scoreTrackII_call_broadpeaks(
       goto __pyx_L7_except_error;
       __pyx_L7_except_error:;
 
-      /* "MACS2/IO/ScoreTrack.pyx":1318
+      /* "MACS2/IO/ScoreTrack.pyx":1309
  *             tmppeakset = []             # to temporarily store lvl1 region inside a lvl2 region
  *             # our assumption is lvl1 regions should be included in lvl2 regions
  *             try:             # <<<<<<<<<<<<<<
@@ -21233,7 +21233,7 @@ static PyObject *__pyx_f_5MACS2_2IO_10ScoreTrack_12scoreTrackII_call_broadpeaks(
       __pyx_L12_try_end:;
     }
 
-    /* "MACS2/IO/ScoreTrack.pyx":1312
+    /* "MACS2/IO/ScoreTrack.pyx":1303
  *         broadpeaks = BroadPeakIO()
  *         # use lvl2_peaks as linking regions between lvl1_peaks
  *         for chrom in chrs:             # <<<<<<<<<<<<<<
@@ -21243,7 +21243,7 @@ static PyObject *__pyx_f_5MACS2_2IO_10ScoreTrack_12scoreTrackII_call_broadpeaks(
   }
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-  /* "MACS2/IO/ScoreTrack.pyx":1343
+  /* "MACS2/IO/ScoreTrack.pyx":1334
  *                     self.__add_broadpeak( broadpeaks, chrom, lvl2peakschrom[j], tmppeakset )
  * 
  *         return broadpeaks             # <<<<<<<<<<<<<<
@@ -21255,7 +21255,7 @@ static PyObject *__pyx_f_5MACS2_2IO_10ScoreTrack_12scoreTrackII_call_broadpeaks(
   __pyx_r = __pyx_v_broadpeaks;
   goto __pyx_L0;
 
-  /* "MACS2/IO/ScoreTrack.pyx":1286
+  /* "MACS2/IO/ScoreTrack.pyx":1277
  *         return t
  * 
  *     cpdef call_broadpeaks (self, float lvl1_cutoff=5.0, float lvl2_cutoff=1.0, int min_length=200, int lvl1_max_gap=50, int lvl2_max_gap=400):             # <<<<<<<<<<<<<<
@@ -21360,7 +21360,7 @@ static PyObject *__pyx_pw_5MACS2_2IO_10ScoreTrack_12scoreTrackII_27call_broadpea
         }
       }
       if (unlikely(kw_args > 0)) {
-        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "call_broadpeaks") < 0)) __PYX_ERR(0, 1286, __pyx_L3_error)
+        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "call_broadpeaks") < 0)) __PYX_ERR(0, 1277, __pyx_L3_error)
       }
     } else {
       switch (PyTuple_GET_SIZE(__pyx_args)) {
@@ -21379,34 +21379,34 @@ static PyObject *__pyx_pw_5MACS2_2IO_10ScoreTrack_12scoreTrackII_27call_broadpea
       }
     }
     if (values[0]) {
-      __pyx_v_lvl1_cutoff = __pyx_PyFloat_AsFloat(values[0]); if (unlikely((__pyx_v_lvl1_cutoff == (float)-1) && PyErr_Occurred())) __PYX_ERR(0, 1286, __pyx_L3_error)
+      __pyx_v_lvl1_cutoff = __pyx_PyFloat_AsFloat(values[0]); if (unlikely((__pyx_v_lvl1_cutoff == (float)-1) && PyErr_Occurred())) __PYX_ERR(0, 1277, __pyx_L3_error)
     } else {
       __pyx_v_lvl1_cutoff = ((float)5.0);
     }
     if (values[1]) {
-      __pyx_v_lvl2_cutoff = __pyx_PyFloat_AsFloat(values[1]); if (unlikely((__pyx_v_lvl2_cutoff == (float)-1) && PyErr_Occurred())) __PYX_ERR(0, 1286, __pyx_L3_error)
+      __pyx_v_lvl2_cutoff = __pyx_PyFloat_AsFloat(values[1]); if (unlikely((__pyx_v_lvl2_cutoff == (float)-1) && PyErr_Occurred())) __PYX_ERR(0, 1277, __pyx_L3_error)
     } else {
       __pyx_v_lvl2_cutoff = ((float)1.0);
     }
     if (values[2]) {
-      __pyx_v_min_length = __Pyx_PyInt_As_int(values[2]); if (unlikely((__pyx_v_min_length == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 1286, __pyx_L3_error)
+      __pyx_v_min_length = __Pyx_PyInt_As_int(values[2]); if (unlikely((__pyx_v_min_length == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 1277, __pyx_L3_error)
     } else {
       __pyx_v_min_length = ((int)0xC8);
     }
     if (values[3]) {
-      __pyx_v_lvl1_max_gap = __Pyx_PyInt_As_int(values[3]); if (unlikely((__pyx_v_lvl1_max_gap == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 1286, __pyx_L3_error)
+      __pyx_v_lvl1_max_gap = __Pyx_PyInt_As_int(values[3]); if (unlikely((__pyx_v_lvl1_max_gap == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 1277, __pyx_L3_error)
     } else {
       __pyx_v_lvl1_max_gap = ((int)50);
     }
     if (values[4]) {
-      __pyx_v_lvl2_max_gap = __Pyx_PyInt_As_int(values[4]); if (unlikely((__pyx_v_lvl2_max_gap == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 1286, __pyx_L3_error)
+      __pyx_v_lvl2_max_gap = __Pyx_PyInt_As_int(values[4]); if (unlikely((__pyx_v_lvl2_max_gap == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 1277, __pyx_L3_error)
     } else {
       __pyx_v_lvl2_max_gap = ((int)0x190);
     }
   }
   goto __pyx_L4_argument_unpacking_done;
   __pyx_L5_argtuple_error:;
-  __Pyx_RaiseArgtupleInvalid("call_broadpeaks", 0, 0, 5, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 1286, __pyx_L3_error)
+  __Pyx_RaiseArgtupleInvalid("call_broadpeaks", 0, 0, 5, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 1277, __pyx_L3_error)
   __pyx_L3_error:;
   __Pyx_AddTraceback("MACS2.IO.ScoreTrack.scoreTrackII.call_broadpeaks", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __Pyx_RefNannyFinishContext();
@@ -21426,7 +21426,7 @@ static PyObject *__pyx_pf_5MACS2_2IO_10ScoreTrack_12scoreTrackII_26call_broadpea
   PyObject *__pyx_t_1 = NULL;
   struct __pyx_opt_args_5MACS2_2IO_10ScoreTrack_12scoreTrackII_call_broadpeaks __pyx_t_2;
   __Pyx_RefNannySetupContext("call_broadpeaks", 0);
-  __Pyx_TraceCall("call_broadpeaks (wrapper)", __pyx_f[0], 1286, 0, __PYX_ERR(0, 1286, __pyx_L1_error));
+  __Pyx_TraceCall("call_broadpeaks (wrapper)", __pyx_f[0], 1277, 0, __PYX_ERR(0, 1277, __pyx_L1_error));
   __Pyx_XDECREF(__pyx_r);
   __pyx_t_2.__pyx_n = 5;
   __pyx_t_2.lvl1_cutoff = __pyx_v_lvl1_cutoff;
@@ -21434,7 +21434,7 @@ static PyObject *__pyx_pf_5MACS2_2IO_10ScoreTrack_12scoreTrackII_26call_broadpea
   __pyx_t_2.min_length = __pyx_v_min_length;
   __pyx_t_2.lvl1_max_gap = __pyx_v_lvl1_max_gap;
   __pyx_t_2.lvl2_max_gap = __pyx_v_lvl2_max_gap;
-  __pyx_t_1 = __pyx_vtabptr_5MACS2_2IO_10ScoreTrack_scoreTrackII->call_broadpeaks(__pyx_v_self, 1, &__pyx_t_2); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1286, __pyx_L1_error)
+  __pyx_t_1 = __pyx_vtabptr_5MACS2_2IO_10ScoreTrack_scoreTrackII->call_broadpeaks(__pyx_v_self, 1, &__pyx_t_2); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1277, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __pyx_r = __pyx_t_1;
   __pyx_t_1 = 0;
@@ -21452,7 +21452,7 @@ static PyObject *__pyx_pf_5MACS2_2IO_10ScoreTrack_12scoreTrackII_26call_broadpea
   return __pyx_r;
 }
 
-/* "MACS2/IO/ScoreTrack.pyx":1345
+/* "MACS2/IO/ScoreTrack.pyx":1336
  *         return broadpeaks
  * 
  *     def __add_broadpeak (self, bpeaks, bytes chrom, dict lvl2peak, list lvl1peakset):             # <<<<<<<<<<<<<<
@@ -21498,23 +21498,23 @@ static PyObject *__pyx_pw_5MACS2_2IO_10ScoreTrack_12scoreTrackII_29__add_broadpe
         case  1:
         if (likely((values[1] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_chrom)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("__add_broadpeak", 1, 4, 4, 1); __PYX_ERR(0, 1345, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("__add_broadpeak", 1, 4, 4, 1); __PYX_ERR(0, 1336, __pyx_L3_error)
         }
         CYTHON_FALLTHROUGH;
         case  2:
         if (likely((values[2] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_lvl2peak)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("__add_broadpeak", 1, 4, 4, 2); __PYX_ERR(0, 1345, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("__add_broadpeak", 1, 4, 4, 2); __PYX_ERR(0, 1336, __pyx_L3_error)
         }
         CYTHON_FALLTHROUGH;
         case  3:
         if (likely((values[3] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_lvl1peakset)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("__add_broadpeak", 1, 4, 4, 3); __PYX_ERR(0, 1345, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("__add_broadpeak", 1, 4, 4, 3); __PYX_ERR(0, 1336, __pyx_L3_error)
         }
       }
       if (unlikely(kw_args > 0)) {
-        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "__add_broadpeak") < 0)) __PYX_ERR(0, 1345, __pyx_L3_error)
+        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "__add_broadpeak") < 0)) __PYX_ERR(0, 1336, __pyx_L3_error)
       }
     } else if (PyTuple_GET_SIZE(__pyx_args) != 4) {
       goto __pyx_L5_argtuple_error;
@@ -21531,15 +21531,15 @@ static PyObject *__pyx_pw_5MACS2_2IO_10ScoreTrack_12scoreTrackII_29__add_broadpe
   }
   goto __pyx_L4_argument_unpacking_done;
   __pyx_L5_argtuple_error:;
-  __Pyx_RaiseArgtupleInvalid("__add_broadpeak", 1, 4, 4, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 1345, __pyx_L3_error)
+  __Pyx_RaiseArgtupleInvalid("__add_broadpeak", 1, 4, 4, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 1336, __pyx_L3_error)
   __pyx_L3_error:;
   __Pyx_AddTraceback("MACS2.IO.ScoreTrack.scoreTrackII.__add_broadpeak", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __Pyx_RefNannyFinishContext();
   return NULL;
   __pyx_L4_argument_unpacking_done:;
-  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_chrom), (&PyBytes_Type), 1, "chrom", 1))) __PYX_ERR(0, 1345, __pyx_L1_error)
-  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_lvl2peak), (&PyDict_Type), 1, "lvl2peak", 1))) __PYX_ERR(0, 1345, __pyx_L1_error)
-  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_lvl1peakset), (&PyList_Type), 1, "lvl1peakset", 1))) __PYX_ERR(0, 1345, __pyx_L1_error)
+  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_chrom), (&PyBytes_Type), 1, "chrom", 1))) __PYX_ERR(0, 1336, __pyx_L1_error)
+  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_lvl2peak), (&PyDict_Type), 1, "lvl2peak", 1))) __PYX_ERR(0, 1336, __pyx_L1_error)
+  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_lvl1peakset), (&PyList_Type), 1, "lvl1peakset", 1))) __PYX_ERR(0, 1336, __pyx_L1_error)
   __pyx_r = __pyx_pf_5MACS2_2IO_10ScoreTrack_12scoreTrackII_28__add_broadpeak(((struct __pyx_obj_5MACS2_2IO_10ScoreTrack_scoreTrackII *)__pyx_v_self), __pyx_v_bpeaks, __pyx_v_chrom, __pyx_v_lvl2peak, __pyx_v_lvl1peakset);
 
   /* function exit code */
@@ -21574,9 +21574,9 @@ static PyObject *__pyx_pf_5MACS2_2IO_10ScoreTrack_12scoreTrackII_28__add_broadpe
   PyObject *__pyx_t_8 = NULL;
   Py_ssize_t __pyx_t_9;
   __Pyx_RefNannySetupContext("__add_broadpeak", 0);
-  __Pyx_TraceCall("__add_broadpeak", __pyx_f[0], 1345, 0, __PYX_ERR(0, 1345, __pyx_L1_error));
+  __Pyx_TraceCall("__add_broadpeak", __pyx_f[0], 1336, 0, __PYX_ERR(0, 1336, __pyx_L1_error));
 
-  /* "MACS2/IO/ScoreTrack.pyx":1353
+  /* "MACS2/IO/ScoreTrack.pyx":1344
  *             bytes blockSizes, blockStarts
  * 
  *         start      = lvl2peak["start"]             # <<<<<<<<<<<<<<
@@ -21585,15 +21585,15 @@ static PyObject *__pyx_pf_5MACS2_2IO_10ScoreTrack_12scoreTrackII_28__add_broadpe
  */
   if (unlikely(__pyx_v_lvl2peak == Py_None)) {
     PyErr_SetString(PyExc_TypeError, "'NoneType' object is not subscriptable");
-    __PYX_ERR(0, 1353, __pyx_L1_error)
+    __PYX_ERR(0, 1344, __pyx_L1_error)
   }
-  __pyx_t_1 = __Pyx_PyDict_GetItem(__pyx_v_lvl2peak, __pyx_n_u_start); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1353, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyDict_GetItem(__pyx_v_lvl2peak, __pyx_n_u_start); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1344, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_2 = __Pyx_PyInt_As_int(__pyx_t_1); if (unlikely((__pyx_t_2 == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 1353, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyInt_As_int(__pyx_t_1); if (unlikely((__pyx_t_2 == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 1344, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   __pyx_v_start = __pyx_t_2;
 
-  /* "MACS2/IO/ScoreTrack.pyx":1354
+  /* "MACS2/IO/ScoreTrack.pyx":1345
  * 
  *         start      = lvl2peak["start"]
  *         end        = lvl2peak["end"]             # <<<<<<<<<<<<<<
@@ -21602,15 +21602,15 @@ static PyObject *__pyx_pf_5MACS2_2IO_10ScoreTrack_12scoreTrackII_28__add_broadpe
  */
   if (unlikely(__pyx_v_lvl2peak == Py_None)) {
     PyErr_SetString(PyExc_TypeError, "'NoneType' object is not subscriptable");
-    __PYX_ERR(0, 1354, __pyx_L1_error)
+    __PYX_ERR(0, 1345, __pyx_L1_error)
   }
-  __pyx_t_1 = __Pyx_PyDict_GetItem(__pyx_v_lvl2peak, __pyx_n_u_end); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1354, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyDict_GetItem(__pyx_v_lvl2peak, __pyx_n_u_end); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1345, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_2 = __Pyx_PyInt_As_int(__pyx_t_1); if (unlikely((__pyx_t_2 == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 1354, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyInt_As_int(__pyx_t_1); if (unlikely((__pyx_t_2 == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 1345, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   __pyx_v_end = __pyx_t_2;
 
-  /* "MACS2/IO/ScoreTrack.pyx":1357
+  /* "MACS2/IO/ScoreTrack.pyx":1348
  * 
  *         # the following code will add those broad/lvl2 peaks with no strong/lvl1 peaks inside
  *         if not lvl1peakset:             # <<<<<<<<<<<<<<
@@ -21621,20 +21621,20 @@ static PyObject *__pyx_pf_5MACS2_2IO_10ScoreTrack_12scoreTrackII_28__add_broadpe
   __pyx_t_4 = ((!__pyx_t_3) != 0);
   if (__pyx_t_4) {
 
-    /* "MACS2/IO/ScoreTrack.pyx":1360
+    /* "MACS2/IO/ScoreTrack.pyx":1351
  *             # will complement by adding 1bps start and end to this region
  *             # may change in the future if gappedPeak format was improved.
  *             bpeaks.add(chrom, start, end, score=lvl2peak["score"], thickStart=(b"%d" % start), thickEnd=(b"%d" % end),             # <<<<<<<<<<<<<<
  *                        blockNum = 2, blockSizes = b"1,1", blockStarts = (b"0,%d" % (end-start-1)), pileup = lvl2peak["pileup"],
  *                        pscore = lvl2peak["pscore"], fold_change = lvl2peak["fc"],
  */
-    __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_v_bpeaks, __pyx_n_s_add); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1360, __pyx_L1_error)
+    __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_v_bpeaks, __pyx_n_s_add); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1351, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
-    __pyx_t_5 = __Pyx_PyInt_From_int(__pyx_v_start); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 1360, __pyx_L1_error)
+    __pyx_t_5 = __Pyx_PyInt_From_int(__pyx_v_start); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 1351, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_5);
-    __pyx_t_6 = __Pyx_PyInt_From_int(__pyx_v_end); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 1360, __pyx_L1_error)
+    __pyx_t_6 = __Pyx_PyInt_From_int(__pyx_v_end); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 1351, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_6);
-    __pyx_t_7 = PyTuple_New(3); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 1360, __pyx_L1_error)
+    __pyx_t_7 = PyTuple_New(3); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 1351, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_7);
     __Pyx_INCREF(__pyx_v_chrom);
     __Pyx_GIVEREF(__pyx_v_chrom);
@@ -21645,57 +21645,57 @@ static PyObject *__pyx_pf_5MACS2_2IO_10ScoreTrack_12scoreTrackII_28__add_broadpe
     PyTuple_SET_ITEM(__pyx_t_7, 2, __pyx_t_6);
     __pyx_t_5 = 0;
     __pyx_t_6 = 0;
-    __pyx_t_6 = __Pyx_PyDict_NewPresized(10); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 1360, __pyx_L1_error)
+    __pyx_t_6 = __Pyx_PyDict_NewPresized(10); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 1351, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_6);
     if (unlikely(__pyx_v_lvl2peak == Py_None)) {
       PyErr_SetString(PyExc_TypeError, "'NoneType' object is not subscriptable");
-      __PYX_ERR(0, 1360, __pyx_L1_error)
+      __PYX_ERR(0, 1351, __pyx_L1_error)
     }
-    __pyx_t_5 = __Pyx_PyDict_GetItem(__pyx_v_lvl2peak, __pyx_n_u_score); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 1360, __pyx_L1_error)
+    __pyx_t_5 = __Pyx_PyDict_GetItem(__pyx_v_lvl2peak, __pyx_n_u_score); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 1351, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_5);
-    if (PyDict_SetItem(__pyx_t_6, __pyx_n_s_score, __pyx_t_5) < 0) __PYX_ERR(0, 1360, __pyx_L1_error)
+    if (PyDict_SetItem(__pyx_t_6, __pyx_n_s_score, __pyx_t_5) < 0) __PYX_ERR(0, 1351, __pyx_L1_error)
     __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
-    __pyx_t_5 = __Pyx_PyInt_From_int(__pyx_v_start); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 1360, __pyx_L1_error)
+    __pyx_t_5 = __Pyx_PyInt_From_int(__pyx_v_start); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 1351, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_5);
-    __pyx_t_8 = PyNumber_Remainder(__pyx_kp_b_d_2, __pyx_t_5); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 1360, __pyx_L1_error)
+    __pyx_t_8 = PyNumber_Remainder(__pyx_kp_b_d_2, __pyx_t_5); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 1351, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_8);
     __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
-    if (PyDict_SetItem(__pyx_t_6, __pyx_n_s_thickStart, __pyx_t_8) < 0) __PYX_ERR(0, 1360, __pyx_L1_error)
+    if (PyDict_SetItem(__pyx_t_6, __pyx_n_s_thickStart, __pyx_t_8) < 0) __PYX_ERR(0, 1351, __pyx_L1_error)
     __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
-    __pyx_t_8 = __Pyx_PyInt_From_int(__pyx_v_end); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 1360, __pyx_L1_error)
+    __pyx_t_8 = __Pyx_PyInt_From_int(__pyx_v_end); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 1351, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_8);
-    __pyx_t_5 = PyNumber_Remainder(__pyx_kp_b_d_2, __pyx_t_8); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 1360, __pyx_L1_error)
+    __pyx_t_5 = PyNumber_Remainder(__pyx_kp_b_d_2, __pyx_t_8); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 1351, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_5);
     __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
-    if (PyDict_SetItem(__pyx_t_6, __pyx_n_s_thickEnd, __pyx_t_5) < 0) __PYX_ERR(0, 1360, __pyx_L1_error)
+    if (PyDict_SetItem(__pyx_t_6, __pyx_n_s_thickEnd, __pyx_t_5) < 0) __PYX_ERR(0, 1351, __pyx_L1_error)
     __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
-    if (PyDict_SetItem(__pyx_t_6, __pyx_n_s_blockNum, __pyx_int_2) < 0) __PYX_ERR(0, 1360, __pyx_L1_error)
-    if (PyDict_SetItem(__pyx_t_6, __pyx_n_s_blockSizes, __pyx_kp_b_1_1) < 0) __PYX_ERR(0, 1360, __pyx_L1_error)
+    if (PyDict_SetItem(__pyx_t_6, __pyx_n_s_blockNum, __pyx_int_2) < 0) __PYX_ERR(0, 1351, __pyx_L1_error)
+    if (PyDict_SetItem(__pyx_t_6, __pyx_n_s_blockSizes, __pyx_kp_b_1_1) < 0) __PYX_ERR(0, 1351, __pyx_L1_error)
 
-    /* "MACS2/IO/ScoreTrack.pyx":1361
+    /* "MACS2/IO/ScoreTrack.pyx":1352
  *             # may change in the future if gappedPeak format was improved.
  *             bpeaks.add(chrom, start, end, score=lvl2peak["score"], thickStart=(b"%d" % start), thickEnd=(b"%d" % end),
  *                        blockNum = 2, blockSizes = b"1,1", blockStarts = (b"0,%d" % (end-start-1)), pileup = lvl2peak["pileup"],             # <<<<<<<<<<<<<<
  *                        pscore = lvl2peak["pscore"], fold_change = lvl2peak["fc"],
  *                        qscore = lvl2peak["qscore"] )
  */
-    __pyx_t_5 = __Pyx_PyInt_From_long(((__pyx_v_end - __pyx_v_start) - 1)); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 1361, __pyx_L1_error)
+    __pyx_t_5 = __Pyx_PyInt_From_long(((__pyx_v_end - __pyx_v_start) - 1)); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 1352, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_5);
-    __pyx_t_8 = PyNumber_Remainder(__pyx_kp_b_0_d, __pyx_t_5); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 1361, __pyx_L1_error)
+    __pyx_t_8 = PyNumber_Remainder(__pyx_kp_b_0_d, __pyx_t_5); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 1352, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_8);
     __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
-    if (PyDict_SetItem(__pyx_t_6, __pyx_n_s_blockStarts, __pyx_t_8) < 0) __PYX_ERR(0, 1360, __pyx_L1_error)
+    if (PyDict_SetItem(__pyx_t_6, __pyx_n_s_blockStarts, __pyx_t_8) < 0) __PYX_ERR(0, 1351, __pyx_L1_error)
     __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
     if (unlikely(__pyx_v_lvl2peak == Py_None)) {
       PyErr_SetString(PyExc_TypeError, "'NoneType' object is not subscriptable");
-      __PYX_ERR(0, 1361, __pyx_L1_error)
+      __PYX_ERR(0, 1352, __pyx_L1_error)
     }
-    __pyx_t_8 = __Pyx_PyDict_GetItem(__pyx_v_lvl2peak, __pyx_n_u_pileup); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 1361, __pyx_L1_error)
+    __pyx_t_8 = __Pyx_PyDict_GetItem(__pyx_v_lvl2peak, __pyx_n_u_pileup); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 1352, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_8);
-    if (PyDict_SetItem(__pyx_t_6, __pyx_n_s_pileup, __pyx_t_8) < 0) __PYX_ERR(0, 1360, __pyx_L1_error)
+    if (PyDict_SetItem(__pyx_t_6, __pyx_n_s_pileup, __pyx_t_8) < 0) __PYX_ERR(0, 1351, __pyx_L1_error)
     __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
 
-    /* "MACS2/IO/ScoreTrack.pyx":1362
+    /* "MACS2/IO/ScoreTrack.pyx":1353
  *             bpeaks.add(chrom, start, end, score=lvl2peak["score"], thickStart=(b"%d" % start), thickEnd=(b"%d" % end),
  *                        blockNum = 2, blockSizes = b"1,1", blockStarts = (b"0,%d" % (end-start-1)), pileup = lvl2peak["pileup"],
  *                        pscore = lvl2peak["pscore"], fold_change = lvl2peak["fc"],             # <<<<<<<<<<<<<<
@@ -21704,22 +21704,22 @@ static PyObject *__pyx_pf_5MACS2_2IO_10ScoreTrack_12scoreTrackII_28__add_broadpe
  */
     if (unlikely(__pyx_v_lvl2peak == Py_None)) {
       PyErr_SetString(PyExc_TypeError, "'NoneType' object is not subscriptable");
-      __PYX_ERR(0, 1362, __pyx_L1_error)
+      __PYX_ERR(0, 1353, __pyx_L1_error)
     }
-    __pyx_t_8 = __Pyx_PyDict_GetItem(__pyx_v_lvl2peak, __pyx_n_u_pscore); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 1362, __pyx_L1_error)
+    __pyx_t_8 = __Pyx_PyDict_GetItem(__pyx_v_lvl2peak, __pyx_n_u_pscore); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 1353, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_8);
-    if (PyDict_SetItem(__pyx_t_6, __pyx_n_s_pscore, __pyx_t_8) < 0) __PYX_ERR(0, 1360, __pyx_L1_error)
+    if (PyDict_SetItem(__pyx_t_6, __pyx_n_s_pscore, __pyx_t_8) < 0) __PYX_ERR(0, 1351, __pyx_L1_error)
     __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
     if (unlikely(__pyx_v_lvl2peak == Py_None)) {
       PyErr_SetString(PyExc_TypeError, "'NoneType' object is not subscriptable");
-      __PYX_ERR(0, 1362, __pyx_L1_error)
+      __PYX_ERR(0, 1353, __pyx_L1_error)
     }
-    __pyx_t_8 = __Pyx_PyDict_GetItem(__pyx_v_lvl2peak, __pyx_n_u_fc); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 1362, __pyx_L1_error)
+    __pyx_t_8 = __Pyx_PyDict_GetItem(__pyx_v_lvl2peak, __pyx_n_u_fc); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 1353, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_8);
-    if (PyDict_SetItem(__pyx_t_6, __pyx_n_s_fold_change, __pyx_t_8) < 0) __PYX_ERR(0, 1360, __pyx_L1_error)
+    if (PyDict_SetItem(__pyx_t_6, __pyx_n_s_fold_change, __pyx_t_8) < 0) __PYX_ERR(0, 1351, __pyx_L1_error)
     __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
 
-    /* "MACS2/IO/ScoreTrack.pyx":1363
+    /* "MACS2/IO/ScoreTrack.pyx":1354
  *                        blockNum = 2, blockSizes = b"1,1", blockStarts = (b"0,%d" % (end-start-1)), pileup = lvl2peak["pileup"],
  *                        pscore = lvl2peak["pscore"], fold_change = lvl2peak["fc"],
  *                        qscore = lvl2peak["qscore"] )             # <<<<<<<<<<<<<<
@@ -21728,28 +21728,28 @@ static PyObject *__pyx_pf_5MACS2_2IO_10ScoreTrack_12scoreTrackII_28__add_broadpe
  */
     if (unlikely(__pyx_v_lvl2peak == Py_None)) {
       PyErr_SetString(PyExc_TypeError, "'NoneType' object is not subscriptable");
-      __PYX_ERR(0, 1363, __pyx_L1_error)
+      __PYX_ERR(0, 1354, __pyx_L1_error)
     }
-    __pyx_t_8 = __Pyx_PyDict_GetItem(__pyx_v_lvl2peak, __pyx_n_u_qscore); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 1363, __pyx_L1_error)
+    __pyx_t_8 = __Pyx_PyDict_GetItem(__pyx_v_lvl2peak, __pyx_n_u_qscore); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 1354, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_8);
-    if (PyDict_SetItem(__pyx_t_6, __pyx_n_s_qscore, __pyx_t_8) < 0) __PYX_ERR(0, 1360, __pyx_L1_error)
+    if (PyDict_SetItem(__pyx_t_6, __pyx_n_s_qscore, __pyx_t_8) < 0) __PYX_ERR(0, 1351, __pyx_L1_error)
     __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
 
-    /* "MACS2/IO/ScoreTrack.pyx":1360
+    /* "MACS2/IO/ScoreTrack.pyx":1351
  *             # will complement by adding 1bps start and end to this region
  *             # may change in the future if gappedPeak format was improved.
  *             bpeaks.add(chrom, start, end, score=lvl2peak["score"], thickStart=(b"%d" % start), thickEnd=(b"%d" % end),             # <<<<<<<<<<<<<<
  *                        blockNum = 2, blockSizes = b"1,1", blockStarts = (b"0,%d" % (end-start-1)), pileup = lvl2peak["pileup"],
  *                        pscore = lvl2peak["pscore"], fold_change = lvl2peak["fc"],
  */
-    __pyx_t_8 = __Pyx_PyObject_Call(__pyx_t_1, __pyx_t_7, __pyx_t_6); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 1360, __pyx_L1_error)
+    __pyx_t_8 = __Pyx_PyObject_Call(__pyx_t_1, __pyx_t_7, __pyx_t_6); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 1351, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_8);
     __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
     __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
     __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
     __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
 
-    /* "MACS2/IO/ScoreTrack.pyx":1364
+    /* "MACS2/IO/ScoreTrack.pyx":1355
  *                        pscore = lvl2peak["pscore"], fold_change = lvl2peak["fc"],
  *                        qscore = lvl2peak["qscore"] )
  *             return bpeaks             # <<<<<<<<<<<<<<
@@ -21761,7 +21761,7 @@ static PyObject *__pyx_pf_5MACS2_2IO_10ScoreTrack_12scoreTrackII_28__add_broadpe
     __pyx_r = __pyx_v_bpeaks;
     goto __pyx_L0;
 
-    /* "MACS2/IO/ScoreTrack.pyx":1357
+    /* "MACS2/IO/ScoreTrack.pyx":1348
  * 
  *         # the following code will add those broad/lvl2 peaks with no strong/lvl1 peaks inside
  *         if not lvl1peakset:             # <<<<<<<<<<<<<<
@@ -21770,7 +21770,7 @@ static PyObject *__pyx_pf_5MACS2_2IO_10ScoreTrack_12scoreTrackII_28__add_broadpe
  */
   }
 
-  /* "MACS2/IO/ScoreTrack.pyx":1366
+  /* "MACS2/IO/ScoreTrack.pyx":1357
  *             return bpeaks
  * 
  *         thickStart = b"%d" % lvl1peakset[0]["start"]             # <<<<<<<<<<<<<<
@@ -21779,21 +21779,21 @@ static PyObject *__pyx_pf_5MACS2_2IO_10ScoreTrack_12scoreTrackII_28__add_broadpe
  */
   if (unlikely(__pyx_v_lvl1peakset == Py_None)) {
     PyErr_SetString(PyExc_TypeError, "'NoneType' object is not subscriptable");
-    __PYX_ERR(0, 1366, __pyx_L1_error)
+    __PYX_ERR(0, 1357, __pyx_L1_error)
   }
-  __pyx_t_8 = __Pyx_GetItemInt_List(__pyx_v_lvl1peakset, 0, long, 1, __Pyx_PyInt_From_long, 1, 0, 1); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 1366, __pyx_L1_error)
+  __pyx_t_8 = __Pyx_GetItemInt_List(__pyx_v_lvl1peakset, 0, long, 1, __Pyx_PyInt_From_long, 1, 0, 1); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 1357, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_8);
-  __pyx_t_6 = __Pyx_PyObject_Dict_GetItem(__pyx_t_8, __pyx_n_u_start); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 1366, __pyx_L1_error)
+  __pyx_t_6 = __Pyx_PyObject_Dict_GetItem(__pyx_t_8, __pyx_n_u_start); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 1357, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_6);
   __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
-  __pyx_t_8 = PyNumber_Remainder(__pyx_kp_b_d_2, __pyx_t_6); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 1366, __pyx_L1_error)
+  __pyx_t_8 = PyNumber_Remainder(__pyx_kp_b_d_2, __pyx_t_6); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 1357, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_8);
   __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
-  __pyx_t_2 = __Pyx_PyInt_As_int(__pyx_t_8); if (unlikely((__pyx_t_2 == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 1366, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyInt_As_int(__pyx_t_8); if (unlikely((__pyx_t_2 == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 1357, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
   __pyx_v_thickStart = __pyx_t_2;
 
-  /* "MACS2/IO/ScoreTrack.pyx":1367
+  /* "MACS2/IO/ScoreTrack.pyx":1358
  * 
  *         thickStart = b"%d" % lvl1peakset[0]["start"]
  *         thickEnd   = b"%d" % lvl1peakset[-1]["end"]             # <<<<<<<<<<<<<<
@@ -21802,21 +21802,21 @@ static PyObject *__pyx_pf_5MACS2_2IO_10ScoreTrack_12scoreTrackII_28__add_broadpe
  */
   if (unlikely(__pyx_v_lvl1peakset == Py_None)) {
     PyErr_SetString(PyExc_TypeError, "'NoneType' object is not subscriptable");
-    __PYX_ERR(0, 1367, __pyx_L1_error)
+    __PYX_ERR(0, 1358, __pyx_L1_error)
   }
-  __pyx_t_8 = __Pyx_GetItemInt_List(__pyx_v_lvl1peakset, -1L, long, 1, __Pyx_PyInt_From_long, 1, 1, 1); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 1367, __pyx_L1_error)
+  __pyx_t_8 = __Pyx_GetItemInt_List(__pyx_v_lvl1peakset, -1L, long, 1, __Pyx_PyInt_From_long, 1, 1, 1); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 1358, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_8);
-  __pyx_t_6 = __Pyx_PyObject_Dict_GetItem(__pyx_t_8, __pyx_n_u_end); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 1367, __pyx_L1_error)
+  __pyx_t_6 = __Pyx_PyObject_Dict_GetItem(__pyx_t_8, __pyx_n_u_end); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 1358, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_6);
   __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
-  __pyx_t_8 = PyNumber_Remainder(__pyx_kp_b_d_2, __pyx_t_6); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 1367, __pyx_L1_error)
+  __pyx_t_8 = PyNumber_Remainder(__pyx_kp_b_d_2, __pyx_t_6); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 1358, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_8);
   __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
-  __pyx_t_2 = __Pyx_PyInt_As_int(__pyx_t_8); if (unlikely((__pyx_t_2 == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 1367, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyInt_As_int(__pyx_t_8); if (unlikely((__pyx_t_2 == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 1358, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
   __pyx_v_thickEnd = __pyx_t_2;
 
-  /* "MACS2/IO/ScoreTrack.pyx":1368
+  /* "MACS2/IO/ScoreTrack.pyx":1359
  *         thickStart = b"%d" % lvl1peakset[0]["start"]
  *         thickEnd   = b"%d" % lvl1peakset[-1]["end"]
  *         blockNum   = int(len(lvl1peakset))             # <<<<<<<<<<<<<<
@@ -21825,12 +21825,12 @@ static PyObject *__pyx_pf_5MACS2_2IO_10ScoreTrack_12scoreTrackII_28__add_broadpe
  */
   if (unlikely(__pyx_v_lvl1peakset == Py_None)) {
     PyErr_SetString(PyExc_TypeError, "object of type 'NoneType' has no len()");
-    __PYX_ERR(0, 1368, __pyx_L1_error)
+    __PYX_ERR(0, 1359, __pyx_L1_error)
   }
-  __pyx_t_9 = PyList_GET_SIZE(__pyx_v_lvl1peakset); if (unlikely(__pyx_t_9 == ((Py_ssize_t)-1))) __PYX_ERR(0, 1368, __pyx_L1_error)
+  __pyx_t_9 = PyList_GET_SIZE(__pyx_v_lvl1peakset); if (unlikely(__pyx_t_9 == ((Py_ssize_t)-1))) __PYX_ERR(0, 1359, __pyx_L1_error)
   __pyx_v_blockNum = ((int)__pyx_t_9);
 
-  /* "MACS2/IO/ScoreTrack.pyx":1369
+  /* "MACS2/IO/ScoreTrack.pyx":1360
  *         thickEnd   = b"%d" % lvl1peakset[-1]["end"]
  *         blockNum   = int(len(lvl1peakset))
  *         blockSizes = b",".join( [b"%d" % x["length"] for x in lvl1peakset] )             # <<<<<<<<<<<<<<
@@ -21838,29 +21838,29 @@ static PyObject *__pyx_pf_5MACS2_2IO_10ScoreTrack_12scoreTrackII_28__add_broadpe
  * 
  */
   { /* enter inner scope */
-    __pyx_t_8 = PyList_New(0); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 1369, __pyx_L6_error)
+    __pyx_t_8 = PyList_New(0); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 1360, __pyx_L6_error)
     __Pyx_GOTREF(__pyx_t_8);
     if (unlikely(__pyx_v_lvl1peakset == Py_None)) {
       PyErr_SetString(PyExc_TypeError, "'NoneType' object is not iterable");
-      __PYX_ERR(0, 1369, __pyx_L6_error)
+      __PYX_ERR(0, 1360, __pyx_L6_error)
     }
     __pyx_t_6 = __pyx_v_lvl1peakset; __Pyx_INCREF(__pyx_t_6); __pyx_t_9 = 0;
     for (;;) {
       if (__pyx_t_9 >= PyList_GET_SIZE(__pyx_t_6)) break;
       #if CYTHON_ASSUME_SAFE_MACROS && !CYTHON_AVOID_BORROWED_REFS
-      __pyx_t_7 = PyList_GET_ITEM(__pyx_t_6, __pyx_t_9); __Pyx_INCREF(__pyx_t_7); __pyx_t_9++; if (unlikely(0 < 0)) __PYX_ERR(0, 1369, __pyx_L6_error)
+      __pyx_t_7 = PyList_GET_ITEM(__pyx_t_6, __pyx_t_9); __Pyx_INCREF(__pyx_t_7); __pyx_t_9++; if (unlikely(0 < 0)) __PYX_ERR(0, 1360, __pyx_L6_error)
       #else
-      __pyx_t_7 = PySequence_ITEM(__pyx_t_6, __pyx_t_9); __pyx_t_9++; if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 1369, __pyx_L6_error)
+      __pyx_t_7 = PySequence_ITEM(__pyx_t_6, __pyx_t_9); __pyx_t_9++; if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 1360, __pyx_L6_error)
       __Pyx_GOTREF(__pyx_t_7);
       #endif
       __Pyx_XDECREF_SET(__pyx_7genexpr__pyx_v_x, __pyx_t_7);
       __pyx_t_7 = 0;
-      __pyx_t_7 = __Pyx_PyObject_Dict_GetItem(__pyx_7genexpr__pyx_v_x, __pyx_n_u_length); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 1369, __pyx_L6_error)
+      __pyx_t_7 = __Pyx_PyObject_Dict_GetItem(__pyx_7genexpr__pyx_v_x, __pyx_n_u_length); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 1360, __pyx_L6_error)
       __Pyx_GOTREF(__pyx_t_7);
-      __pyx_t_1 = PyNumber_Remainder(__pyx_kp_b_d_2, __pyx_t_7); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1369, __pyx_L6_error)
+      __pyx_t_1 = PyNumber_Remainder(__pyx_kp_b_d_2, __pyx_t_7); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1360, __pyx_L6_error)
       __Pyx_GOTREF(__pyx_t_1);
       __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
-      if (unlikely(__Pyx_ListComp_Append(__pyx_t_8, (PyObject*)__pyx_t_1))) __PYX_ERR(0, 1369, __pyx_L6_error)
+      if (unlikely(__Pyx_ListComp_Append(__pyx_t_8, (PyObject*)__pyx_t_1))) __PYX_ERR(0, 1360, __pyx_L6_error)
       __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
     }
     __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
@@ -21871,14 +21871,14 @@ static PyObject *__pyx_pf_5MACS2_2IO_10ScoreTrack_12scoreTrackII_28__add_broadpe
     goto __pyx_L1_error;
     __pyx_L9_exit_scope:;
   } /* exit inner scope */
-  __pyx_t_6 = __Pyx_PyBytes_Join(__pyx_kp_b__20, __pyx_t_8); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 1369, __pyx_L1_error)
+  __pyx_t_6 = __Pyx_PyBytes_Join(__pyx_kp_b__20, __pyx_t_8); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 1360, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_6);
   __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
-  if (!(likely(PyBytes_CheckExact(__pyx_t_6))||((__pyx_t_6) == Py_None)||(PyErr_Format(PyExc_TypeError, "Expected %.16s, got %.200s", "bytes", Py_TYPE(__pyx_t_6)->tp_name), 0))) __PYX_ERR(0, 1369, __pyx_L1_error)
+  if (!(likely(PyBytes_CheckExact(__pyx_t_6))||((__pyx_t_6) == Py_None)||(PyErr_Format(PyExc_TypeError, "Expected %.16s, got %.200s", "bytes", Py_TYPE(__pyx_t_6)->tp_name), 0))) __PYX_ERR(0, 1360, __pyx_L1_error)
   __pyx_v_blockSizes = ((PyObject*)__pyx_t_6);
   __pyx_t_6 = 0;
 
-  /* "MACS2/IO/ScoreTrack.pyx":1370
+  /* "MACS2/IO/ScoreTrack.pyx":1361
  *         blockNum   = int(len(lvl1peakset))
  *         blockSizes = b",".join( [b"%d" % x["length"] for x in lvl1peakset] )
  *         blockStarts = b",".join( [b"%d" % (x["start"]-start) for x in lvl1peakset] )             # <<<<<<<<<<<<<<
@@ -21886,35 +21886,35 @@ static PyObject *__pyx_pf_5MACS2_2IO_10ScoreTrack_12scoreTrackII_28__add_broadpe
  *         if lvl2peak["start"] != thickStart:
  */
   { /* enter inner scope */
-    __pyx_t_6 = PyList_New(0); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 1370, __pyx_L12_error)
+    __pyx_t_6 = PyList_New(0); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 1361, __pyx_L12_error)
     __Pyx_GOTREF(__pyx_t_6);
     if (unlikely(__pyx_v_lvl1peakset == Py_None)) {
       PyErr_SetString(PyExc_TypeError, "'NoneType' object is not iterable");
-      __PYX_ERR(0, 1370, __pyx_L12_error)
+      __PYX_ERR(0, 1361, __pyx_L12_error)
     }
     __pyx_t_8 = __pyx_v_lvl1peakset; __Pyx_INCREF(__pyx_t_8); __pyx_t_9 = 0;
     for (;;) {
       if (__pyx_t_9 >= PyList_GET_SIZE(__pyx_t_8)) break;
       #if CYTHON_ASSUME_SAFE_MACROS && !CYTHON_AVOID_BORROWED_REFS
-      __pyx_t_1 = PyList_GET_ITEM(__pyx_t_8, __pyx_t_9); __Pyx_INCREF(__pyx_t_1); __pyx_t_9++; if (unlikely(0 < 0)) __PYX_ERR(0, 1370, __pyx_L12_error)
+      __pyx_t_1 = PyList_GET_ITEM(__pyx_t_8, __pyx_t_9); __Pyx_INCREF(__pyx_t_1); __pyx_t_9++; if (unlikely(0 < 0)) __PYX_ERR(0, 1361, __pyx_L12_error)
       #else
-      __pyx_t_1 = PySequence_ITEM(__pyx_t_8, __pyx_t_9); __pyx_t_9++; if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1370, __pyx_L12_error)
+      __pyx_t_1 = PySequence_ITEM(__pyx_t_8, __pyx_t_9); __pyx_t_9++; if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1361, __pyx_L12_error)
       __Pyx_GOTREF(__pyx_t_1);
       #endif
       __Pyx_XDECREF_SET(__pyx_8genexpr1__pyx_v_x, __pyx_t_1);
       __pyx_t_1 = 0;
-      __pyx_t_1 = __Pyx_PyObject_Dict_GetItem(__pyx_8genexpr1__pyx_v_x, __pyx_n_u_start); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1370, __pyx_L12_error)
+      __pyx_t_1 = __Pyx_PyObject_Dict_GetItem(__pyx_8genexpr1__pyx_v_x, __pyx_n_u_start); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1361, __pyx_L12_error)
       __Pyx_GOTREF(__pyx_t_1);
-      __pyx_t_7 = __Pyx_PyInt_From_int(__pyx_v_start); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 1370, __pyx_L12_error)
+      __pyx_t_7 = __Pyx_PyInt_From_int(__pyx_v_start); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 1361, __pyx_L12_error)
       __Pyx_GOTREF(__pyx_t_7);
-      __pyx_t_5 = PyNumber_Subtract(__pyx_t_1, __pyx_t_7); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 1370, __pyx_L12_error)
+      __pyx_t_5 = PyNumber_Subtract(__pyx_t_1, __pyx_t_7); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 1361, __pyx_L12_error)
       __Pyx_GOTREF(__pyx_t_5);
       __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
       __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
-      __pyx_t_7 = PyNumber_Remainder(__pyx_kp_b_d_2, __pyx_t_5); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 1370, __pyx_L12_error)
+      __pyx_t_7 = PyNumber_Remainder(__pyx_kp_b_d_2, __pyx_t_5); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 1361, __pyx_L12_error)
       __Pyx_GOTREF(__pyx_t_7);
       __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
-      if (unlikely(__Pyx_ListComp_Append(__pyx_t_6, (PyObject*)__pyx_t_7))) __PYX_ERR(0, 1370, __pyx_L12_error)
+      if (unlikely(__Pyx_ListComp_Append(__pyx_t_6, (PyObject*)__pyx_t_7))) __PYX_ERR(0, 1361, __pyx_L12_error)
       __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
     }
     __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
@@ -21925,14 +21925,14 @@ static PyObject *__pyx_pf_5MACS2_2IO_10ScoreTrack_12scoreTrackII_28__add_broadpe
     goto __pyx_L1_error;
     __pyx_L15_exit_scope:;
   } /* exit inner scope */
-  __pyx_t_8 = __Pyx_PyBytes_Join(__pyx_kp_b__20, __pyx_t_6); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 1370, __pyx_L1_error)
+  __pyx_t_8 = __Pyx_PyBytes_Join(__pyx_kp_b__20, __pyx_t_6); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 1361, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_8);
   __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
-  if (!(likely(PyBytes_CheckExact(__pyx_t_8))||((__pyx_t_8) == Py_None)||(PyErr_Format(PyExc_TypeError, "Expected %.16s, got %.200s", "bytes", Py_TYPE(__pyx_t_8)->tp_name), 0))) __PYX_ERR(0, 1370, __pyx_L1_error)
+  if (!(likely(PyBytes_CheckExact(__pyx_t_8))||((__pyx_t_8) == Py_None)||(PyErr_Format(PyExc_TypeError, "Expected %.16s, got %.200s", "bytes", Py_TYPE(__pyx_t_8)->tp_name), 0))) __PYX_ERR(0, 1361, __pyx_L1_error)
   __pyx_v_blockStarts = ((PyObject*)__pyx_t_8);
   __pyx_t_8 = 0;
 
-  /* "MACS2/IO/ScoreTrack.pyx":1372
+  /* "MACS2/IO/ScoreTrack.pyx":1363
  *         blockStarts = b",".join( [b"%d" % (x["start"]-start) for x in lvl1peakset] )
  * 
  *         if lvl2peak["start"] != thickStart:             # <<<<<<<<<<<<<<
@@ -21941,36 +21941,36 @@ static PyObject *__pyx_pf_5MACS2_2IO_10ScoreTrack_12scoreTrackII_28__add_broadpe
  */
   if (unlikely(__pyx_v_lvl2peak == Py_None)) {
     PyErr_SetString(PyExc_TypeError, "'NoneType' object is not subscriptable");
-    __PYX_ERR(0, 1372, __pyx_L1_error)
+    __PYX_ERR(0, 1363, __pyx_L1_error)
   }
-  __pyx_t_8 = __Pyx_PyDict_GetItem(__pyx_v_lvl2peak, __pyx_n_u_start); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 1372, __pyx_L1_error)
+  __pyx_t_8 = __Pyx_PyDict_GetItem(__pyx_v_lvl2peak, __pyx_n_u_start); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 1363, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_8);
-  __pyx_t_6 = __Pyx_PyInt_From_int(__pyx_v_thickStart); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 1372, __pyx_L1_error)
+  __pyx_t_6 = __Pyx_PyInt_From_int(__pyx_v_thickStart); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 1363, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_6);
-  __pyx_t_7 = PyObject_RichCompare(__pyx_t_8, __pyx_t_6, Py_NE); __Pyx_XGOTREF(__pyx_t_7); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 1372, __pyx_L1_error)
+  __pyx_t_7 = PyObject_RichCompare(__pyx_t_8, __pyx_t_6, Py_NE); __Pyx_XGOTREF(__pyx_t_7); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 1363, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
   __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
-  __pyx_t_4 = __Pyx_PyObject_IsTrue(__pyx_t_7); if (unlikely(__pyx_t_4 < 0)) __PYX_ERR(0, 1372, __pyx_L1_error)
+  __pyx_t_4 = __Pyx_PyObject_IsTrue(__pyx_t_7); if (unlikely(__pyx_t_4 < 0)) __PYX_ERR(0, 1363, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
   if (__pyx_t_4) {
 
-    /* "MACS2/IO/ScoreTrack.pyx":1374
+    /* "MACS2/IO/ScoreTrack.pyx":1365
  *         if lvl2peak["start"] != thickStart:
  *             # add 1bp mark for the start of lvl2 peak
  *             thickStart = b"%d" % start             # <<<<<<<<<<<<<<
  *             blockNum += 1
  *             blockSizes = b"1,"+blockSizes
  */
-    __pyx_t_7 = __Pyx_PyInt_From_int(__pyx_v_start); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 1374, __pyx_L1_error)
+    __pyx_t_7 = __Pyx_PyInt_From_int(__pyx_v_start); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 1365, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_7);
-    __pyx_t_6 = PyNumber_Remainder(__pyx_kp_b_d_2, __pyx_t_7); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 1374, __pyx_L1_error)
+    __pyx_t_6 = PyNumber_Remainder(__pyx_kp_b_d_2, __pyx_t_7); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 1365, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_6);
     __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
-    __pyx_t_2 = __Pyx_PyInt_As_int(__pyx_t_6); if (unlikely((__pyx_t_2 == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 1374, __pyx_L1_error)
+    __pyx_t_2 = __Pyx_PyInt_As_int(__pyx_t_6); if (unlikely((__pyx_t_2 == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 1365, __pyx_L1_error)
     __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
     __pyx_v_thickStart = __pyx_t_2;
 
-    /* "MACS2/IO/ScoreTrack.pyx":1375
+    /* "MACS2/IO/ScoreTrack.pyx":1366
  *             # add 1bp mark for the start of lvl2 peak
  *             thickStart = b"%d" % start
  *             blockNum += 1             # <<<<<<<<<<<<<<
@@ -21979,31 +21979,31 @@ static PyObject *__pyx_pf_5MACS2_2IO_10ScoreTrack_12scoreTrackII_28__add_broadpe
  */
     __pyx_v_blockNum = (__pyx_v_blockNum + 1);
 
-    /* "MACS2/IO/ScoreTrack.pyx":1376
+    /* "MACS2/IO/ScoreTrack.pyx":1367
  *             thickStart = b"%d" % start
  *             blockNum += 1
  *             blockSizes = b"1,"+blockSizes             # <<<<<<<<<<<<<<
  *             blockStarts = b"0,"+blockStarts
  *         if lvl2peak["end"] != thickEnd:
  */
-    __pyx_t_6 = PyNumber_Add(__pyx_kp_b_1, __pyx_v_blockSizes); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 1376, __pyx_L1_error)
+    __pyx_t_6 = PyNumber_Add(__pyx_kp_b_1, __pyx_v_blockSizes); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 1367, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_6);
     __Pyx_DECREF_SET(__pyx_v_blockSizes, ((PyObject*)__pyx_t_6));
     __pyx_t_6 = 0;
 
-    /* "MACS2/IO/ScoreTrack.pyx":1377
+    /* "MACS2/IO/ScoreTrack.pyx":1368
  *             blockNum += 1
  *             blockSizes = b"1,"+blockSizes
  *             blockStarts = b"0,"+blockStarts             # <<<<<<<<<<<<<<
  *         if lvl2peak["end"] != thickEnd:
  *             # add 1bp mark for the end of lvl2 peak
  */
-    __pyx_t_6 = PyNumber_Add(__pyx_kp_b_0, __pyx_v_blockStarts); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 1377, __pyx_L1_error)
+    __pyx_t_6 = PyNumber_Add(__pyx_kp_b_0, __pyx_v_blockStarts); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 1368, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_6);
     __Pyx_DECREF_SET(__pyx_v_blockStarts, ((PyObject*)__pyx_t_6));
     __pyx_t_6 = 0;
 
-    /* "MACS2/IO/ScoreTrack.pyx":1372
+    /* "MACS2/IO/ScoreTrack.pyx":1363
  *         blockStarts = b",".join( [b"%d" % (x["start"]-start) for x in lvl1peakset] )
  * 
  *         if lvl2peak["start"] != thickStart:             # <<<<<<<<<<<<<<
@@ -22012,7 +22012,7 @@ static PyObject *__pyx_pf_5MACS2_2IO_10ScoreTrack_12scoreTrackII_28__add_broadpe
  */
   }
 
-  /* "MACS2/IO/ScoreTrack.pyx":1378
+  /* "MACS2/IO/ScoreTrack.pyx":1369
  *             blockSizes = b"1,"+blockSizes
  *             blockStarts = b"0,"+blockStarts
  *         if lvl2peak["end"] != thickEnd:             # <<<<<<<<<<<<<<
@@ -22021,36 +22021,36 @@ static PyObject *__pyx_pf_5MACS2_2IO_10ScoreTrack_12scoreTrackII_28__add_broadpe
  */
   if (unlikely(__pyx_v_lvl2peak == Py_None)) {
     PyErr_SetString(PyExc_TypeError, "'NoneType' object is not subscriptable");
-    __PYX_ERR(0, 1378, __pyx_L1_error)
+    __PYX_ERR(0, 1369, __pyx_L1_error)
   }
-  __pyx_t_6 = __Pyx_PyDict_GetItem(__pyx_v_lvl2peak, __pyx_n_u_end); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 1378, __pyx_L1_error)
+  __pyx_t_6 = __Pyx_PyDict_GetItem(__pyx_v_lvl2peak, __pyx_n_u_end); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 1369, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_6);
-  __pyx_t_7 = __Pyx_PyInt_From_int(__pyx_v_thickEnd); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 1378, __pyx_L1_error)
+  __pyx_t_7 = __Pyx_PyInt_From_int(__pyx_v_thickEnd); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 1369, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_7);
-  __pyx_t_8 = PyObject_RichCompare(__pyx_t_6, __pyx_t_7, Py_NE); __Pyx_XGOTREF(__pyx_t_8); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 1378, __pyx_L1_error)
+  __pyx_t_8 = PyObject_RichCompare(__pyx_t_6, __pyx_t_7, Py_NE); __Pyx_XGOTREF(__pyx_t_8); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 1369, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
   __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
-  __pyx_t_4 = __Pyx_PyObject_IsTrue(__pyx_t_8); if (unlikely(__pyx_t_4 < 0)) __PYX_ERR(0, 1378, __pyx_L1_error)
+  __pyx_t_4 = __Pyx_PyObject_IsTrue(__pyx_t_8); if (unlikely(__pyx_t_4 < 0)) __PYX_ERR(0, 1369, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
   if (__pyx_t_4) {
 
-    /* "MACS2/IO/ScoreTrack.pyx":1380
+    /* "MACS2/IO/ScoreTrack.pyx":1371
  *         if lvl2peak["end"] != thickEnd:
  *             # add 1bp mark for the end of lvl2 peak
  *             thickEnd = b"%d" % end             # <<<<<<<<<<<<<<
  *             blockNum += 1
  *             blockSizes = blockSizes+b",1"
  */
-    __pyx_t_8 = __Pyx_PyInt_From_int(__pyx_v_end); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 1380, __pyx_L1_error)
+    __pyx_t_8 = __Pyx_PyInt_From_int(__pyx_v_end); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 1371, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_8);
-    __pyx_t_7 = PyNumber_Remainder(__pyx_kp_b_d_2, __pyx_t_8); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 1380, __pyx_L1_error)
+    __pyx_t_7 = PyNumber_Remainder(__pyx_kp_b_d_2, __pyx_t_8); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 1371, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_7);
     __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
-    __pyx_t_2 = __Pyx_PyInt_As_int(__pyx_t_7); if (unlikely((__pyx_t_2 == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 1380, __pyx_L1_error)
+    __pyx_t_2 = __Pyx_PyInt_As_int(__pyx_t_7); if (unlikely((__pyx_t_2 == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 1371, __pyx_L1_error)
     __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
     __pyx_v_thickEnd = __pyx_t_2;
 
-    /* "MACS2/IO/ScoreTrack.pyx":1381
+    /* "MACS2/IO/ScoreTrack.pyx":1372
  *             # add 1bp mark for the end of lvl2 peak
  *             thickEnd = b"%d" % end
  *             blockNum += 1             # <<<<<<<<<<<<<<
@@ -22059,40 +22059,40 @@ static PyObject *__pyx_pf_5MACS2_2IO_10ScoreTrack_12scoreTrackII_28__add_broadpe
  */
     __pyx_v_blockNum = (__pyx_v_blockNum + 1);
 
-    /* "MACS2/IO/ScoreTrack.pyx":1382
+    /* "MACS2/IO/ScoreTrack.pyx":1373
  *             thickEnd = b"%d" % end
  *             blockNum += 1
  *             blockSizes = blockSizes+b",1"             # <<<<<<<<<<<<<<
  *             blockStarts = blockStarts + b"," + (b"%d" % (end-start-1))
  * 
  */
-    __pyx_t_7 = PyNumber_Add(__pyx_v_blockSizes, __pyx_kp_b_1_2); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 1382, __pyx_L1_error)
+    __pyx_t_7 = PyNumber_Add(__pyx_v_blockSizes, __pyx_kp_b_1_2); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 1373, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_7);
     __Pyx_DECREF_SET(__pyx_v_blockSizes, ((PyObject*)__pyx_t_7));
     __pyx_t_7 = 0;
 
-    /* "MACS2/IO/ScoreTrack.pyx":1383
+    /* "MACS2/IO/ScoreTrack.pyx":1374
  *             blockNum += 1
  *             blockSizes = blockSizes+b",1"
  *             blockStarts = blockStarts + b"," + (b"%d" % (end-start-1))             # <<<<<<<<<<<<<<
  * 
  *         # add to BroadPeakIO object
  */
-    __pyx_t_7 = PyNumber_Add(__pyx_v_blockStarts, __pyx_kp_b__20); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 1383, __pyx_L1_error)
+    __pyx_t_7 = PyNumber_Add(__pyx_v_blockStarts, __pyx_kp_b__20); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 1374, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_7);
-    __pyx_t_8 = __Pyx_PyInt_From_long(((__pyx_v_end - __pyx_v_start) - 1)); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 1383, __pyx_L1_error)
+    __pyx_t_8 = __Pyx_PyInt_From_long(((__pyx_v_end - __pyx_v_start) - 1)); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 1374, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_8);
-    __pyx_t_6 = PyNumber_Remainder(__pyx_kp_b_d_2, __pyx_t_8); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 1383, __pyx_L1_error)
+    __pyx_t_6 = PyNumber_Remainder(__pyx_kp_b_d_2, __pyx_t_8); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 1374, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_6);
     __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
-    __pyx_t_8 = PyNumber_Add(__pyx_t_7, __pyx_t_6); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 1383, __pyx_L1_error)
+    __pyx_t_8 = PyNumber_Add(__pyx_t_7, __pyx_t_6); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 1374, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_8);
     __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
     __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
     __Pyx_DECREF_SET(__pyx_v_blockStarts, ((PyObject*)__pyx_t_8));
     __pyx_t_8 = 0;
 
-    /* "MACS2/IO/ScoreTrack.pyx":1378
+    /* "MACS2/IO/ScoreTrack.pyx":1369
  *             blockSizes = b"1,"+blockSizes
  *             blockStarts = b"0,"+blockStarts
  *         if lvl2peak["end"] != thickEnd:             # <<<<<<<<<<<<<<
@@ -22101,20 +22101,20 @@ static PyObject *__pyx_pf_5MACS2_2IO_10ScoreTrack_12scoreTrackII_28__add_broadpe
  */
   }
 
-  /* "MACS2/IO/ScoreTrack.pyx":1386
+  /* "MACS2/IO/ScoreTrack.pyx":1377
  * 
  *         # add to BroadPeakIO object
  *         bpeaks.add(chrom, start, end, score=lvl2peak["score"], thickStart=thickStart, thickEnd=thickEnd,             # <<<<<<<<<<<<<<
  *                    blockNum = blockNum, blockSizes = blockSizes, blockStarts = blockStarts)
  *         return bpeaks
  */
-  __pyx_t_8 = __Pyx_PyObject_GetAttrStr(__pyx_v_bpeaks, __pyx_n_s_add); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 1386, __pyx_L1_error)
+  __pyx_t_8 = __Pyx_PyObject_GetAttrStr(__pyx_v_bpeaks, __pyx_n_s_add); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 1377, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_8);
-  __pyx_t_6 = __Pyx_PyInt_From_int(__pyx_v_start); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 1386, __pyx_L1_error)
+  __pyx_t_6 = __Pyx_PyInt_From_int(__pyx_v_start); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 1377, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_6);
-  __pyx_t_7 = __Pyx_PyInt_From_int(__pyx_v_end); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 1386, __pyx_L1_error)
+  __pyx_t_7 = __Pyx_PyInt_From_int(__pyx_v_end); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 1377, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_7);
-  __pyx_t_5 = PyTuple_New(3); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 1386, __pyx_L1_error)
+  __pyx_t_5 = PyTuple_New(3); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 1377, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_5);
   __Pyx_INCREF(__pyx_v_chrom);
   __Pyx_GIVEREF(__pyx_v_chrom);
@@ -22125,54 +22125,54 @@ static PyObject *__pyx_pf_5MACS2_2IO_10ScoreTrack_12scoreTrackII_28__add_broadpe
   PyTuple_SET_ITEM(__pyx_t_5, 2, __pyx_t_7);
   __pyx_t_6 = 0;
   __pyx_t_7 = 0;
-  __pyx_t_7 = __Pyx_PyDict_NewPresized(6); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 1386, __pyx_L1_error)
+  __pyx_t_7 = __Pyx_PyDict_NewPresized(6); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 1377, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_7);
   if (unlikely(__pyx_v_lvl2peak == Py_None)) {
     PyErr_SetString(PyExc_TypeError, "'NoneType' object is not subscriptable");
-    __PYX_ERR(0, 1386, __pyx_L1_error)
+    __PYX_ERR(0, 1377, __pyx_L1_error)
   }
-  __pyx_t_6 = __Pyx_PyDict_GetItem(__pyx_v_lvl2peak, __pyx_n_u_score); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 1386, __pyx_L1_error)
+  __pyx_t_6 = __Pyx_PyDict_GetItem(__pyx_v_lvl2peak, __pyx_n_u_score); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 1377, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_6);
-  if (PyDict_SetItem(__pyx_t_7, __pyx_n_s_score, __pyx_t_6) < 0) __PYX_ERR(0, 1386, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_t_7, __pyx_n_s_score, __pyx_t_6) < 0) __PYX_ERR(0, 1377, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
-  __pyx_t_6 = __Pyx_PyInt_From_int(__pyx_v_thickStart); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 1386, __pyx_L1_error)
+  __pyx_t_6 = __Pyx_PyInt_From_int(__pyx_v_thickStart); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 1377, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_6);
-  if (PyDict_SetItem(__pyx_t_7, __pyx_n_s_thickStart, __pyx_t_6) < 0) __PYX_ERR(0, 1386, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_t_7, __pyx_n_s_thickStart, __pyx_t_6) < 0) __PYX_ERR(0, 1377, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
-  __pyx_t_6 = __Pyx_PyInt_From_int(__pyx_v_thickEnd); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 1386, __pyx_L1_error)
+  __pyx_t_6 = __Pyx_PyInt_From_int(__pyx_v_thickEnd); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 1377, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_6);
-  if (PyDict_SetItem(__pyx_t_7, __pyx_n_s_thickEnd, __pyx_t_6) < 0) __PYX_ERR(0, 1386, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_t_7, __pyx_n_s_thickEnd, __pyx_t_6) < 0) __PYX_ERR(0, 1377, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
 
-  /* "MACS2/IO/ScoreTrack.pyx":1387
+  /* "MACS2/IO/ScoreTrack.pyx":1378
  *         # add to BroadPeakIO object
  *         bpeaks.add(chrom, start, end, score=lvl2peak["score"], thickStart=thickStart, thickEnd=thickEnd,
  *                    blockNum = blockNum, blockSizes = blockSizes, blockStarts = blockStarts)             # <<<<<<<<<<<<<<
  *         return bpeaks
  * 
  */
-  __pyx_t_6 = __Pyx_PyInt_From_int(__pyx_v_blockNum); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 1387, __pyx_L1_error)
+  __pyx_t_6 = __Pyx_PyInt_From_int(__pyx_v_blockNum); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 1378, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_6);
-  if (PyDict_SetItem(__pyx_t_7, __pyx_n_s_blockNum, __pyx_t_6) < 0) __PYX_ERR(0, 1386, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_t_7, __pyx_n_s_blockNum, __pyx_t_6) < 0) __PYX_ERR(0, 1377, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
-  if (PyDict_SetItem(__pyx_t_7, __pyx_n_s_blockSizes, __pyx_v_blockSizes) < 0) __PYX_ERR(0, 1386, __pyx_L1_error)
-  if (PyDict_SetItem(__pyx_t_7, __pyx_n_s_blockStarts, __pyx_v_blockStarts) < 0) __PYX_ERR(0, 1386, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_t_7, __pyx_n_s_blockSizes, __pyx_v_blockSizes) < 0) __PYX_ERR(0, 1377, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_t_7, __pyx_n_s_blockStarts, __pyx_v_blockStarts) < 0) __PYX_ERR(0, 1377, __pyx_L1_error)
 
-  /* "MACS2/IO/ScoreTrack.pyx":1386
+  /* "MACS2/IO/ScoreTrack.pyx":1377
  * 
  *         # add to BroadPeakIO object
  *         bpeaks.add(chrom, start, end, score=lvl2peak["score"], thickStart=thickStart, thickEnd=thickEnd,             # <<<<<<<<<<<<<<
  *                    blockNum = blockNum, blockSizes = blockSizes, blockStarts = blockStarts)
  *         return bpeaks
  */
-  __pyx_t_6 = __Pyx_PyObject_Call(__pyx_t_8, __pyx_t_5, __pyx_t_7); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 1386, __pyx_L1_error)
+  __pyx_t_6 = __Pyx_PyObject_Call(__pyx_t_8, __pyx_t_5, __pyx_t_7); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 1377, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_6);
   __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
   __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
   __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
   __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
 
-  /* "MACS2/IO/ScoreTrack.pyx":1388
+  /* "MACS2/IO/ScoreTrack.pyx":1379
  *         bpeaks.add(chrom, start, end, score=lvl2peak["score"], thickStart=thickStart, thickEnd=thickEnd,
  *                    blockNum = blockNum, blockSizes = blockSizes, blockStarts = blockStarts)
  *         return bpeaks             # <<<<<<<<<<<<<<
@@ -22184,7 +22184,7 @@ static PyObject *__pyx_pf_5MACS2_2IO_10ScoreTrack_12scoreTrackII_28__add_broadpe
   __pyx_r = __pyx_v_bpeaks;
   goto __pyx_L0;
 
-  /* "MACS2/IO/ScoreTrack.pyx":1345
+  /* "MACS2/IO/ScoreTrack.pyx":1336
  *         return broadpeaks
  * 
  *     def __add_broadpeak (self, bpeaks, bytes chrom, dict lvl2peak, list lvl1peakset):             # <<<<<<<<<<<<<<
@@ -22597,7 +22597,7 @@ static PyObject *__pyx_pf_5MACS2_2IO_10ScoreTrack_12scoreTrackII_32__setstate_cy
   return __pyx_r;
 }
 
-/* "MACS2/IO/ScoreTrack.pyx":1403
+/* "MACS2/IO/ScoreTrack.pyx":1394
  *         dict pvalue_stat1, pvalue_stat2, pvalue_stat3
  * 
  *     def __init__ (self, t1bdg, c1bdg, t2bdg, c2bdg, float cond1_factor = 1.0, float cond2_factor = 1.0, float pseudocount = 0.01, proportion_background_empirical_distribution = 0.99999 ):             # <<<<<<<<<<<<<<
@@ -22659,19 +22659,19 @@ static int __pyx_pw_5MACS2_2IO_10ScoreTrack_18TwoConditionScores_1__init__(PyObj
         case  1:
         if (likely((values[1] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_c1bdg)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("__init__", 0, 4, 8, 1); __PYX_ERR(0, 1403, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("__init__", 0, 4, 8, 1); __PYX_ERR(0, 1394, __pyx_L3_error)
         }
         CYTHON_FALLTHROUGH;
         case  2:
         if (likely((values[2] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_t2bdg)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("__init__", 0, 4, 8, 2); __PYX_ERR(0, 1403, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("__init__", 0, 4, 8, 2); __PYX_ERR(0, 1394, __pyx_L3_error)
         }
         CYTHON_FALLTHROUGH;
         case  3:
         if (likely((values[3] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_c2bdg)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("__init__", 0, 4, 8, 3); __PYX_ERR(0, 1403, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("__init__", 0, 4, 8, 3); __PYX_ERR(0, 1394, __pyx_L3_error)
         }
         CYTHON_FALLTHROUGH;
         case  4:
@@ -22699,7 +22699,7 @@ static int __pyx_pw_5MACS2_2IO_10ScoreTrack_18TwoConditionScores_1__init__(PyObj
         }
       }
       if (unlikely(kw_args > 0)) {
-        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "__init__") < 0)) __PYX_ERR(0, 1403, __pyx_L3_error)
+        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "__init__") < 0)) __PYX_ERR(0, 1394, __pyx_L3_error)
       }
     } else {
       switch (PyTuple_GET_SIZE(__pyx_args)) {
@@ -22724,17 +22724,17 @@ static int __pyx_pw_5MACS2_2IO_10ScoreTrack_18TwoConditionScores_1__init__(PyObj
     __pyx_v_t2bdg = values[2];
     __pyx_v_c2bdg = values[3];
     if (values[4]) {
-      __pyx_v_cond1_factor = __pyx_PyFloat_AsFloat(values[4]); if (unlikely((__pyx_v_cond1_factor == (float)-1) && PyErr_Occurred())) __PYX_ERR(0, 1403, __pyx_L3_error)
+      __pyx_v_cond1_factor = __pyx_PyFloat_AsFloat(values[4]); if (unlikely((__pyx_v_cond1_factor == (float)-1) && PyErr_Occurred())) __PYX_ERR(0, 1394, __pyx_L3_error)
     } else {
       __pyx_v_cond1_factor = ((float)1.0);
     }
     if (values[5]) {
-      __pyx_v_cond2_factor = __pyx_PyFloat_AsFloat(values[5]); if (unlikely((__pyx_v_cond2_factor == (float)-1) && PyErr_Occurred())) __PYX_ERR(0, 1403, __pyx_L3_error)
+      __pyx_v_cond2_factor = __pyx_PyFloat_AsFloat(values[5]); if (unlikely((__pyx_v_cond2_factor == (float)-1) && PyErr_Occurred())) __PYX_ERR(0, 1394, __pyx_L3_error)
     } else {
       __pyx_v_cond2_factor = ((float)1.0);
     }
     if (values[6]) {
-      __pyx_v_pseudocount = __pyx_PyFloat_AsFloat(values[6]); if (unlikely((__pyx_v_pseudocount == (float)-1) && PyErr_Occurred())) __PYX_ERR(0, 1403, __pyx_L3_error)
+      __pyx_v_pseudocount = __pyx_PyFloat_AsFloat(values[6]); if (unlikely((__pyx_v_pseudocount == (float)-1) && PyErr_Occurred())) __PYX_ERR(0, 1394, __pyx_L3_error)
     } else {
       __pyx_v_pseudocount = ((float)0.01);
     }
@@ -22742,7 +22742,7 @@ static int __pyx_pw_5MACS2_2IO_10ScoreTrack_18TwoConditionScores_1__init__(PyObj
   }
   goto __pyx_L4_argument_unpacking_done;
   __pyx_L5_argtuple_error:;
-  __Pyx_RaiseArgtupleInvalid("__init__", 0, 4, 8, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 1403, __pyx_L3_error)
+  __Pyx_RaiseArgtupleInvalid("__init__", 0, 4, 8, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 1394, __pyx_L3_error)
   __pyx_L3_error:;
   __Pyx_AddTraceback("MACS2.IO.ScoreTrack.TwoConditionScores.__init__", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __Pyx_RefNannyFinishContext();
@@ -22761,16 +22761,16 @@ static int __pyx_pf_5MACS2_2IO_10ScoreTrack_18TwoConditionScores___init__(struct
   __Pyx_RefNannyDeclarations
   PyObject *__pyx_t_1 = NULL;
   __Pyx_RefNannySetupContext("__init__", 0);
-  __Pyx_TraceCall("__init__", __pyx_f[0], 1403, 0, __PYX_ERR(0, 1403, __pyx_L1_error));
+  __Pyx_TraceCall("__init__", __pyx_f[0], 1394, 0, __PYX_ERR(0, 1394, __pyx_L1_error));
 
-  /* "MACS2/IO/ScoreTrack.pyx":1419
+  /* "MACS2/IO/ScoreTrack.pyx":1410
  *         """
  * 
  *         self.data = {}           # for each chromosome, there is a l*4             # <<<<<<<<<<<<<<
  *                                  # matrix. First column: end position
  *                                  # of a region; Second: treatment
  */
-  __pyx_t_1 = __Pyx_PyDict_NewPresized(0); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1419, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyDict_NewPresized(0); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1410, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __Pyx_GIVEREF(__pyx_t_1);
   __Pyx_GOTREF(__pyx_v_self->data);
@@ -22778,14 +22778,14 @@ static int __pyx_pf_5MACS2_2IO_10ScoreTrack_18TwoConditionScores___init__(struct
   __pyx_v_self->data = ((PyObject*)__pyx_t_1);
   __pyx_t_1 = 0;
 
-  /* "MACS2/IO/ScoreTrack.pyx":1427
+  /* "MACS2/IO/ScoreTrack.pyx":1418
  *                                  # ratio/fold-enrichment/subtraction
  *                                  # depending on -c setting)
  *         self.datalength = {}             # <<<<<<<<<<<<<<
  *         self.cond1_factor = cond1_factor
  *         self.cond2_factor = cond2_factor
  */
-  __pyx_t_1 = __Pyx_PyDict_NewPresized(0); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1427, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyDict_NewPresized(0); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1418, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __Pyx_GIVEREF(__pyx_t_1);
   __Pyx_GOTREF(__pyx_v_self->datalength);
@@ -22793,7 +22793,7 @@ static int __pyx_pf_5MACS2_2IO_10ScoreTrack_18TwoConditionScores___init__(struct
   __pyx_v_self->datalength = ((PyObject*)__pyx_t_1);
   __pyx_t_1 = 0;
 
-  /* "MACS2/IO/ScoreTrack.pyx":1428
+  /* "MACS2/IO/ScoreTrack.pyx":1419
  *                                  # depending on -c setting)
  *         self.datalength = {}
  *         self.cond1_factor = cond1_factor             # <<<<<<<<<<<<<<
@@ -22802,7 +22802,7 @@ static int __pyx_pf_5MACS2_2IO_10ScoreTrack_18TwoConditionScores___init__(struct
  */
   __pyx_v_self->cond1_factor = __pyx_v_cond1_factor;
 
-  /* "MACS2/IO/ScoreTrack.pyx":1429
+  /* "MACS2/IO/ScoreTrack.pyx":1420
  *         self.datalength = {}
  *         self.cond1_factor = cond1_factor
  *         self.cond2_factor = cond2_factor             # <<<<<<<<<<<<<<
@@ -22811,7 +22811,7 @@ static int __pyx_pf_5MACS2_2IO_10ScoreTrack_18TwoConditionScores___init__(struct
  */
   __pyx_v_self->cond2_factor = __pyx_v_cond2_factor;
 
-  /* "MACS2/IO/ScoreTrack.pyx":1430
+  /* "MACS2/IO/ScoreTrack.pyx":1421
  *         self.cond1_factor = cond1_factor
  *         self.cond2_factor = cond2_factor
  *         self.pseudocount = pseudocount             # <<<<<<<<<<<<<<
@@ -22820,14 +22820,14 @@ static int __pyx_pf_5MACS2_2IO_10ScoreTrack_18TwoConditionScores___init__(struct
  */
   __pyx_v_self->pseudocount = __pyx_v_pseudocount;
 
-  /* "MACS2/IO/ScoreTrack.pyx":1431
+  /* "MACS2/IO/ScoreTrack.pyx":1422
  *         self.cond2_factor = cond2_factor
  *         self.pseudocount = pseudocount
  *         self.pvalue_stat1 = {}             # <<<<<<<<<<<<<<
  *         self.pvalue_stat2 = {}
  *         self.t1bdg = t1bdg
  */
-  __pyx_t_1 = __Pyx_PyDict_NewPresized(0); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1431, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyDict_NewPresized(0); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1422, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __Pyx_GIVEREF(__pyx_t_1);
   __Pyx_GOTREF(__pyx_v_self->pvalue_stat1);
@@ -22835,14 +22835,14 @@ static int __pyx_pf_5MACS2_2IO_10ScoreTrack_18TwoConditionScores___init__(struct
   __pyx_v_self->pvalue_stat1 = ((PyObject*)__pyx_t_1);
   __pyx_t_1 = 0;
 
-  /* "MACS2/IO/ScoreTrack.pyx":1432
+  /* "MACS2/IO/ScoreTrack.pyx":1423
  *         self.pseudocount = pseudocount
  *         self.pvalue_stat1 = {}
  *         self.pvalue_stat2 = {}             # <<<<<<<<<<<<<<
  *         self.t1bdg = t1bdg
  *         self.c1bdg = c1bdg
  */
-  __pyx_t_1 = __Pyx_PyDict_NewPresized(0); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1432, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyDict_NewPresized(0); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1423, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __Pyx_GIVEREF(__pyx_t_1);
   __Pyx_GOTREF(__pyx_v_self->pvalue_stat2);
@@ -22850,7 +22850,7 @@ static int __pyx_pf_5MACS2_2IO_10ScoreTrack_18TwoConditionScores___init__(struct
   __pyx_v_self->pvalue_stat2 = ((PyObject*)__pyx_t_1);
   __pyx_t_1 = 0;
 
-  /* "MACS2/IO/ScoreTrack.pyx":1433
+  /* "MACS2/IO/ScoreTrack.pyx":1424
  *         self.pvalue_stat1 = {}
  *         self.pvalue_stat2 = {}
  *         self.t1bdg = t1bdg             # <<<<<<<<<<<<<<
@@ -22863,7 +22863,7 @@ static int __pyx_pf_5MACS2_2IO_10ScoreTrack_18TwoConditionScores___init__(struct
   __Pyx_DECREF(__pyx_v_self->t1bdg);
   __pyx_v_self->t1bdg = __pyx_v_t1bdg;
 
-  /* "MACS2/IO/ScoreTrack.pyx":1434
+  /* "MACS2/IO/ScoreTrack.pyx":1425
  *         self.pvalue_stat2 = {}
  *         self.t1bdg = t1bdg
  *         self.c1bdg = c1bdg             # <<<<<<<<<<<<<<
@@ -22876,7 +22876,7 @@ static int __pyx_pf_5MACS2_2IO_10ScoreTrack_18TwoConditionScores___init__(struct
   __Pyx_DECREF(__pyx_v_self->c1bdg);
   __pyx_v_self->c1bdg = __pyx_v_c1bdg;
 
-  /* "MACS2/IO/ScoreTrack.pyx":1435
+  /* "MACS2/IO/ScoreTrack.pyx":1426
  *         self.t1bdg = t1bdg
  *         self.c1bdg = c1bdg
  *         self.t2bdg = t2bdg             # <<<<<<<<<<<<<<
@@ -22889,7 +22889,7 @@ static int __pyx_pf_5MACS2_2IO_10ScoreTrack_18TwoConditionScores___init__(struct
   __Pyx_DECREF(__pyx_v_self->t2bdg);
   __pyx_v_self->t2bdg = __pyx_v_t2bdg;
 
-  /* "MACS2/IO/ScoreTrack.pyx":1436
+  /* "MACS2/IO/ScoreTrack.pyx":1427
  *         self.c1bdg = c1bdg
  *         self.t2bdg = t2bdg
  *         self.c2bdg = c2bdg             # <<<<<<<<<<<<<<
@@ -22902,7 +22902,7 @@ static int __pyx_pf_5MACS2_2IO_10ScoreTrack_18TwoConditionScores___init__(struct
   __Pyx_DECREF(__pyx_v_self->c2bdg);
   __pyx_v_self->c2bdg = __pyx_v_c2bdg;
 
-  /* "MACS2/IO/ScoreTrack.pyx":1403
+  /* "MACS2/IO/ScoreTrack.pyx":1394
  *         dict pvalue_stat1, pvalue_stat2, pvalue_stat3
  * 
  *     def __init__ (self, t1bdg, c1bdg, t2bdg, c2bdg, float cond1_factor = 1.0, float cond2_factor = 1.0, float pseudocount = 0.01, proportion_background_empirical_distribution = 0.99999 ):             # <<<<<<<<<<<<<<
@@ -22923,7 +22923,7 @@ static int __pyx_pf_5MACS2_2IO_10ScoreTrack_18TwoConditionScores___init__(struct
   return __pyx_r;
 }
 
-/* "MACS2/IO/ScoreTrack.pyx":1440
+/* "MACS2/IO/ScoreTrack.pyx":1431
  *         #self.empirical_distr_llr = [] # save all values in histogram
  * 
  *     cpdef set_pseudocount( self, float pseudocount ):             # <<<<<<<<<<<<<<
@@ -22942,7 +22942,7 @@ static PyObject *__pyx_f_5MACS2_2IO_10ScoreTrack_18TwoConditionScores_set_pseudo
   PyObject *__pyx_t_4 = NULL;
   PyObject *__pyx_t_5 = NULL;
   __Pyx_RefNannySetupContext("set_pseudocount", 0);
-  __Pyx_TraceCall("set_pseudocount", __pyx_f[0], 1440, 0, __PYX_ERR(0, 1440, __pyx_L1_error));
+  __Pyx_TraceCall("set_pseudocount", __pyx_f[0], 1431, 0, __PYX_ERR(0, 1431, __pyx_L1_error));
   /* Check if called by wrapper */
   if (unlikely(__pyx_skip_dispatch)) ;
   /* Check if overridden in Python */
@@ -22952,11 +22952,11 @@ static PyObject *__pyx_f_5MACS2_2IO_10ScoreTrack_18TwoConditionScores_set_pseudo
     if (unlikely(!__Pyx_object_dict_version_matches(((PyObject *)__pyx_v_self), __pyx_tp_dict_version, __pyx_obj_dict_version))) {
       PY_UINT64_T __pyx_type_dict_guard = __Pyx_get_tp_dict_version(((PyObject *)__pyx_v_self));
       #endif
-      __pyx_t_1 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_v_self), __pyx_n_s_set_pseudocount); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1440, __pyx_L1_error)
+      __pyx_t_1 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_v_self), __pyx_n_s_set_pseudocount); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1431, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_1);
       if (!PyCFunction_Check(__pyx_t_1) || (PyCFunction_GET_FUNCTION(__pyx_t_1) != (PyCFunction)(void*)__pyx_pw_5MACS2_2IO_10ScoreTrack_18TwoConditionScores_3set_pseudocount)) {
         __Pyx_XDECREF(__pyx_r);
-        __pyx_t_3 = PyFloat_FromDouble(__pyx_v_pseudocount); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 1440, __pyx_L1_error)
+        __pyx_t_3 = PyFloat_FromDouble(__pyx_v_pseudocount); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 1431, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_3);
         __Pyx_INCREF(__pyx_t_1);
         __pyx_t_4 = __pyx_t_1; __pyx_t_5 = NULL;
@@ -22972,7 +22972,7 @@ static PyObject *__pyx_f_5MACS2_2IO_10ScoreTrack_18TwoConditionScores_set_pseudo
         __pyx_t_2 = (__pyx_t_5) ? __Pyx_PyObject_Call2Args(__pyx_t_4, __pyx_t_5, __pyx_t_3) : __Pyx_PyObject_CallOneArg(__pyx_t_4, __pyx_t_3);
         __Pyx_XDECREF(__pyx_t_5); __pyx_t_5 = 0;
         __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-        if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1440, __pyx_L1_error)
+        if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1431, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_2);
         __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
         __pyx_r = __pyx_t_2;
@@ -22993,7 +22993,7 @@ static PyObject *__pyx_f_5MACS2_2IO_10ScoreTrack_18TwoConditionScores_set_pseudo
     #endif
   }
 
-  /* "MACS2/IO/ScoreTrack.pyx":1441
+  /* "MACS2/IO/ScoreTrack.pyx":1432
  * 
  *     cpdef set_pseudocount( self, float pseudocount ):
  *         self.pseudocount = pseudocount             # <<<<<<<<<<<<<<
@@ -23002,7 +23002,7 @@ static PyObject *__pyx_f_5MACS2_2IO_10ScoreTrack_18TwoConditionScores_set_pseudo
  */
   __pyx_v_self->pseudocount = __pyx_v_pseudocount;
 
-  /* "MACS2/IO/ScoreTrack.pyx":1440
+  /* "MACS2/IO/ScoreTrack.pyx":1431
  *         #self.empirical_distr_llr = [] # save all values in histogram
  * 
  *     cpdef set_pseudocount( self, float pseudocount ):             # <<<<<<<<<<<<<<
@@ -23036,7 +23036,7 @@ static PyObject *__pyx_pw_5MACS2_2IO_10ScoreTrack_18TwoConditionScores_3set_pseu
   __Pyx_RefNannyDeclarations
   __Pyx_RefNannySetupContext("set_pseudocount (wrapper)", 0);
   assert(__pyx_arg_pseudocount); {
-    __pyx_v_pseudocount = __pyx_PyFloat_AsFloat(__pyx_arg_pseudocount); if (unlikely((__pyx_v_pseudocount == (float)-1) && PyErr_Occurred())) __PYX_ERR(0, 1440, __pyx_L3_error)
+    __pyx_v_pseudocount = __pyx_PyFloat_AsFloat(__pyx_arg_pseudocount); if (unlikely((__pyx_v_pseudocount == (float)-1) && PyErr_Occurred())) __PYX_ERR(0, 1431, __pyx_L3_error)
   }
   goto __pyx_L4_argument_unpacking_done;
   __pyx_L3_error:;
@@ -23057,9 +23057,9 @@ static PyObject *__pyx_pf_5MACS2_2IO_10ScoreTrack_18TwoConditionScores_2set_pseu
   __Pyx_RefNannyDeclarations
   PyObject *__pyx_t_1 = NULL;
   __Pyx_RefNannySetupContext("set_pseudocount", 0);
-  __Pyx_TraceCall("set_pseudocount (wrapper)", __pyx_f[0], 1440, 0, __PYX_ERR(0, 1440, __pyx_L1_error));
+  __Pyx_TraceCall("set_pseudocount (wrapper)", __pyx_f[0], 1431, 0, __PYX_ERR(0, 1431, __pyx_L1_error));
   __Pyx_XDECREF(__pyx_r);
-  __pyx_t_1 = __pyx_f_5MACS2_2IO_10ScoreTrack_18TwoConditionScores_set_pseudocount(__pyx_v_self, __pyx_v_pseudocount, 1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1440, __pyx_L1_error)
+  __pyx_t_1 = __pyx_f_5MACS2_2IO_10ScoreTrack_18TwoConditionScores_set_pseudocount(__pyx_v_self, __pyx_v_pseudocount, 1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1431, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __pyx_r = __pyx_t_1;
   __pyx_t_1 = 0;
@@ -23077,7 +23077,7 @@ static PyObject *__pyx_pf_5MACS2_2IO_10ScoreTrack_18TwoConditionScores_2set_pseu
   return __pyx_r;
 }
 
-/* "MACS2/IO/ScoreTrack.pyx":1443
+/* "MACS2/IO/ScoreTrack.pyx":1434
  *         self.pseudocount = pseudocount
  * 
  *     cpdef build ( self ):             # <<<<<<<<<<<<<<
@@ -23116,7 +23116,7 @@ static PyObject *__pyx_f_5MACS2_2IO_10ScoreTrack_18TwoConditionScores_build(stru
   Py_ssize_t __pyx_t_13;
   Py_ssize_t __pyx_t_14;
   __Pyx_RefNannySetupContext("build", 0);
-  __Pyx_TraceCall("build", __pyx_f[0], 1443, 0, __PYX_ERR(0, 1443, __pyx_L1_error));
+  __Pyx_TraceCall("build", __pyx_f[0], 1434, 0, __PYX_ERR(0, 1434, __pyx_L1_error));
   /* Check if called by wrapper */
   if (unlikely(__pyx_skip_dispatch)) ;
   /* Check if overridden in Python */
@@ -23126,7 +23126,7 @@ static PyObject *__pyx_f_5MACS2_2IO_10ScoreTrack_18TwoConditionScores_build(stru
     if (unlikely(!__Pyx_object_dict_version_matches(((PyObject *)__pyx_v_self), __pyx_tp_dict_version, __pyx_obj_dict_version))) {
       PY_UINT64_T __pyx_type_dict_guard = __Pyx_get_tp_dict_version(((PyObject *)__pyx_v_self));
       #endif
-      __pyx_t_1 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_v_self), __pyx_n_s_build); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1443, __pyx_L1_error)
+      __pyx_t_1 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_v_self), __pyx_n_s_build); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1434, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_1);
       if (!PyCFunction_Check(__pyx_t_1) || (PyCFunction_GET_FUNCTION(__pyx_t_1) != (PyCFunction)(void*)__pyx_pw_5MACS2_2IO_10ScoreTrack_18TwoConditionScores_5build)) {
         __Pyx_XDECREF(__pyx_r);
@@ -23143,7 +23143,7 @@ static PyObject *__pyx_f_5MACS2_2IO_10ScoreTrack_18TwoConditionScores_build(stru
         }
         __pyx_t_2 = (__pyx_t_4) ? __Pyx_PyObject_CallOneArg(__pyx_t_3, __pyx_t_4) : __Pyx_PyObject_CallNoArg(__pyx_t_3);
         __Pyx_XDECREF(__pyx_t_4); __pyx_t_4 = 0;
-        if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1443, __pyx_L1_error)
+        if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1434, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_2);
         __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
         __pyx_r = __pyx_t_2;
@@ -23164,14 +23164,14 @@ static PyObject *__pyx_f_5MACS2_2IO_10ScoreTrack_18TwoConditionScores_build(stru
     #endif
   }
 
-  /* "MACS2/IO/ScoreTrack.pyx":1451
+  /* "MACS2/IO/ScoreTrack.pyx":1442
  *             bytes chrname
  *         # common chromosome names
  *         common_chrs = self.get_common_chrs()             # <<<<<<<<<<<<<<
  *         for chrname in common_chrs:
  *             (cond1_treat_ps, cond1_treat_vs) = self.t1bdg.get_data_by_chr(chrname)
  */
-  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_v_self), __pyx_n_s_get_common_chrs); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1451, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_v_self), __pyx_n_s_get_common_chrs); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1442, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __pyx_t_3 = NULL;
   if (CYTHON_UNPACK_METHODS && likely(PyMethod_Check(__pyx_t_2))) {
@@ -23185,14 +23185,14 @@ static PyObject *__pyx_f_5MACS2_2IO_10ScoreTrack_18TwoConditionScores_build(stru
   }
   __pyx_t_1 = (__pyx_t_3) ? __Pyx_PyObject_CallOneArg(__pyx_t_2, __pyx_t_3) : __Pyx_PyObject_CallNoArg(__pyx_t_2);
   __Pyx_XDECREF(__pyx_t_3); __pyx_t_3 = 0;
-  if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1451, __pyx_L1_error)
+  if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1442, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-  if (!(likely(PySet_CheckExact(__pyx_t_1))||((__pyx_t_1) == Py_None)||(PyErr_Format(PyExc_TypeError, "Expected %.16s, got %.200s", "set", Py_TYPE(__pyx_t_1)->tp_name), 0))) __PYX_ERR(0, 1451, __pyx_L1_error)
+  if (!(likely(PySet_CheckExact(__pyx_t_1))||((__pyx_t_1) == Py_None)||(PyErr_Format(PyExc_TypeError, "Expected %.16s, got %.200s", "set", Py_TYPE(__pyx_t_1)->tp_name), 0))) __PYX_ERR(0, 1442, __pyx_L1_error)
   __pyx_v_common_chrs = ((PyObject*)__pyx_t_1);
   __pyx_t_1 = 0;
 
-  /* "MACS2/IO/ScoreTrack.pyx":1452
+  /* "MACS2/IO/ScoreTrack.pyx":1443
  *         # common chromosome names
  *         common_chrs = self.get_common_chrs()
  *         for chrname in common_chrs:             # <<<<<<<<<<<<<<
@@ -23200,7 +23200,7 @@ static PyObject *__pyx_f_5MACS2_2IO_10ScoreTrack_18TwoConditionScores_build(stru
  *             (cond1_control_ps, cond1_control_vs) = self.c1bdg.get_data_by_chr(chrname)
  */
   __pyx_t_5 = 0;
-  __pyx_t_2 = __Pyx_set_iterator(__pyx_v_common_chrs, 1, (&__pyx_t_6), (&__pyx_t_7)); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1452, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_set_iterator(__pyx_v_common_chrs, 1, (&__pyx_t_6), (&__pyx_t_7)); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1443, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __Pyx_XDECREF(__pyx_t_1);
   __pyx_t_1 = __pyx_t_2;
@@ -23208,20 +23208,20 @@ static PyObject *__pyx_f_5MACS2_2IO_10ScoreTrack_18TwoConditionScores_build(stru
   while (1) {
     __pyx_t_8 = __Pyx_set_iter_next(__pyx_t_1, __pyx_t_6, &__pyx_t_5, &__pyx_t_2, __pyx_t_7);
     if (unlikely(__pyx_t_8 == 0)) break;
-    if (unlikely(__pyx_t_8 == -1)) __PYX_ERR(0, 1452, __pyx_L1_error)
+    if (unlikely(__pyx_t_8 == -1)) __PYX_ERR(0, 1443, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
-    if (!(likely(PyBytes_CheckExact(__pyx_t_2))||((__pyx_t_2) == Py_None)||(PyErr_Format(PyExc_TypeError, "Expected %.16s, got %.200s", "bytes", Py_TYPE(__pyx_t_2)->tp_name), 0))) __PYX_ERR(0, 1452, __pyx_L1_error)
+    if (!(likely(PyBytes_CheckExact(__pyx_t_2))||((__pyx_t_2) == Py_None)||(PyErr_Format(PyExc_TypeError, "Expected %.16s, got %.200s", "bytes", Py_TYPE(__pyx_t_2)->tp_name), 0))) __PYX_ERR(0, 1443, __pyx_L1_error)
     __Pyx_XDECREF_SET(__pyx_v_chrname, ((PyObject*)__pyx_t_2));
     __pyx_t_2 = 0;
 
-    /* "MACS2/IO/ScoreTrack.pyx":1453
+    /* "MACS2/IO/ScoreTrack.pyx":1444
  *         common_chrs = self.get_common_chrs()
  *         for chrname in common_chrs:
  *             (cond1_treat_ps, cond1_treat_vs) = self.t1bdg.get_data_by_chr(chrname)             # <<<<<<<<<<<<<<
  *             (cond1_control_ps, cond1_control_vs) = self.c1bdg.get_data_by_chr(chrname)
  *             (cond2_treat_ps, cond2_treat_vs) = self.t2bdg.get_data_by_chr(chrname)
  */
-    __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_v_self->t1bdg, __pyx_n_s_get_data_by_chr); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 1453, __pyx_L1_error)
+    __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_v_self->t1bdg, __pyx_n_s_get_data_by_chr); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 1444, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_3);
     __pyx_t_4 = NULL;
     if (CYTHON_UNPACK_METHODS && likely(PyMethod_Check(__pyx_t_3))) {
@@ -23235,7 +23235,7 @@ static PyObject *__pyx_f_5MACS2_2IO_10ScoreTrack_18TwoConditionScores_build(stru
     }
     __pyx_t_2 = (__pyx_t_4) ? __Pyx_PyObject_Call2Args(__pyx_t_3, __pyx_t_4, __pyx_v_chrname) : __Pyx_PyObject_CallOneArg(__pyx_t_3, __pyx_v_chrname);
     __Pyx_XDECREF(__pyx_t_4); __pyx_t_4 = 0;
-    if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1453, __pyx_L1_error)
+    if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1444, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
     __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
     if ((likely(PyTuple_CheckExact(__pyx_t_2))) || (PyList_CheckExact(__pyx_t_2))) {
@@ -23244,7 +23244,7 @@ static PyObject *__pyx_f_5MACS2_2IO_10ScoreTrack_18TwoConditionScores_build(stru
       if (unlikely(size != 2)) {
         if (size > 2) __Pyx_RaiseTooManyValuesError(2);
         else if (size >= 0) __Pyx_RaiseNeedMoreValuesError(size);
-        __PYX_ERR(0, 1453, __pyx_L1_error)
+        __PYX_ERR(0, 1444, __pyx_L1_error)
       }
       #if CYTHON_ASSUME_SAFE_MACROS && !CYTHON_AVOID_BORROWED_REFS
       if (likely(PyTuple_CheckExact(sequence))) {
@@ -23257,15 +23257,15 @@ static PyObject *__pyx_f_5MACS2_2IO_10ScoreTrack_18TwoConditionScores_build(stru
       __Pyx_INCREF(__pyx_t_3);
       __Pyx_INCREF(__pyx_t_4);
       #else
-      __pyx_t_3 = PySequence_ITEM(sequence, 0); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 1453, __pyx_L1_error)
+      __pyx_t_3 = PySequence_ITEM(sequence, 0); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 1444, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_3);
-      __pyx_t_4 = PySequence_ITEM(sequence, 1); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 1453, __pyx_L1_error)
+      __pyx_t_4 = PySequence_ITEM(sequence, 1); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 1444, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_4);
       #endif
       __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
     } else {
       Py_ssize_t index = -1;
-      __pyx_t_9 = PyObject_GetIter(__pyx_t_2); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 1453, __pyx_L1_error)
+      __pyx_t_9 = PyObject_GetIter(__pyx_t_2); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 1444, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_9);
       __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
       __pyx_t_10 = Py_TYPE(__pyx_t_9)->tp_iternext;
@@ -23273,7 +23273,7 @@ static PyObject *__pyx_f_5MACS2_2IO_10ScoreTrack_18TwoConditionScores_build(stru
       __Pyx_GOTREF(__pyx_t_3);
       index = 1; __pyx_t_4 = __pyx_t_10(__pyx_t_9); if (unlikely(!__pyx_t_4)) goto __pyx_L5_unpacking_failed;
       __Pyx_GOTREF(__pyx_t_4);
-      if (__Pyx_IternextUnpackEndCheck(__pyx_t_10(__pyx_t_9), 2) < 0) __PYX_ERR(0, 1453, __pyx_L1_error)
+      if (__Pyx_IternextUnpackEndCheck(__pyx_t_10(__pyx_t_9), 2) < 0) __PYX_ERR(0, 1444, __pyx_L1_error)
       __pyx_t_10 = NULL;
       __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
       goto __pyx_L6_unpacking_done;
@@ -23281,7 +23281,7 @@ static PyObject *__pyx_f_5MACS2_2IO_10ScoreTrack_18TwoConditionScores_build(stru
       __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
       __pyx_t_10 = NULL;
       if (__Pyx_IterFinish() == 0) __Pyx_RaiseNeedMoreValuesError(index);
-      __PYX_ERR(0, 1453, __pyx_L1_error)
+      __PYX_ERR(0, 1444, __pyx_L1_error)
       __pyx_L6_unpacking_done:;
     }
     __Pyx_XDECREF_SET(__pyx_v_cond1_treat_ps, __pyx_t_3);
@@ -23289,14 +23289,14 @@ static PyObject *__pyx_f_5MACS2_2IO_10ScoreTrack_18TwoConditionScores_build(stru
     __Pyx_XDECREF_SET(__pyx_v_cond1_treat_vs, __pyx_t_4);
     __pyx_t_4 = 0;
 
-    /* "MACS2/IO/ScoreTrack.pyx":1454
+    /* "MACS2/IO/ScoreTrack.pyx":1445
  *         for chrname in common_chrs:
  *             (cond1_treat_ps, cond1_treat_vs) = self.t1bdg.get_data_by_chr(chrname)
  *             (cond1_control_ps, cond1_control_vs) = self.c1bdg.get_data_by_chr(chrname)             # <<<<<<<<<<<<<<
  *             (cond2_treat_ps, cond2_treat_vs) = self.t2bdg.get_data_by_chr(chrname)
  *             (cond2_control_ps, cond2_control_vs) = self.c2bdg.get_data_by_chr(chrname)
  */
-    __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_v_self->c1bdg, __pyx_n_s_get_data_by_chr); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 1454, __pyx_L1_error)
+    __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_v_self->c1bdg, __pyx_n_s_get_data_by_chr); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 1445, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_4);
     __pyx_t_3 = NULL;
     if (CYTHON_UNPACK_METHODS && likely(PyMethod_Check(__pyx_t_4))) {
@@ -23310,7 +23310,7 @@ static PyObject *__pyx_f_5MACS2_2IO_10ScoreTrack_18TwoConditionScores_build(stru
     }
     __pyx_t_2 = (__pyx_t_3) ? __Pyx_PyObject_Call2Args(__pyx_t_4, __pyx_t_3, __pyx_v_chrname) : __Pyx_PyObject_CallOneArg(__pyx_t_4, __pyx_v_chrname);
     __Pyx_XDECREF(__pyx_t_3); __pyx_t_3 = 0;
-    if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1454, __pyx_L1_error)
+    if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1445, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
     __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
     if ((likely(PyTuple_CheckExact(__pyx_t_2))) || (PyList_CheckExact(__pyx_t_2))) {
@@ -23319,7 +23319,7 @@ static PyObject *__pyx_f_5MACS2_2IO_10ScoreTrack_18TwoConditionScores_build(stru
       if (unlikely(size != 2)) {
         if (size > 2) __Pyx_RaiseTooManyValuesError(2);
         else if (size >= 0) __Pyx_RaiseNeedMoreValuesError(size);
-        __PYX_ERR(0, 1454, __pyx_L1_error)
+        __PYX_ERR(0, 1445, __pyx_L1_error)
       }
       #if CYTHON_ASSUME_SAFE_MACROS && !CYTHON_AVOID_BORROWED_REFS
       if (likely(PyTuple_CheckExact(sequence))) {
@@ -23332,15 +23332,15 @@ static PyObject *__pyx_f_5MACS2_2IO_10ScoreTrack_18TwoConditionScores_build(stru
       __Pyx_INCREF(__pyx_t_4);
       __Pyx_INCREF(__pyx_t_3);
       #else
-      __pyx_t_4 = PySequence_ITEM(sequence, 0); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 1454, __pyx_L1_error)
+      __pyx_t_4 = PySequence_ITEM(sequence, 0); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 1445, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_4);
-      __pyx_t_3 = PySequence_ITEM(sequence, 1); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 1454, __pyx_L1_error)
+      __pyx_t_3 = PySequence_ITEM(sequence, 1); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 1445, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_3);
       #endif
       __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
     } else {
       Py_ssize_t index = -1;
-      __pyx_t_9 = PyObject_GetIter(__pyx_t_2); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 1454, __pyx_L1_error)
+      __pyx_t_9 = PyObject_GetIter(__pyx_t_2); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 1445, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_9);
       __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
       __pyx_t_10 = Py_TYPE(__pyx_t_9)->tp_iternext;
@@ -23348,7 +23348,7 @@ static PyObject *__pyx_f_5MACS2_2IO_10ScoreTrack_18TwoConditionScores_build(stru
       __Pyx_GOTREF(__pyx_t_4);
       index = 1; __pyx_t_3 = __pyx_t_10(__pyx_t_9); if (unlikely(!__pyx_t_3)) goto __pyx_L7_unpacking_failed;
       __Pyx_GOTREF(__pyx_t_3);
-      if (__Pyx_IternextUnpackEndCheck(__pyx_t_10(__pyx_t_9), 2) < 0) __PYX_ERR(0, 1454, __pyx_L1_error)
+      if (__Pyx_IternextUnpackEndCheck(__pyx_t_10(__pyx_t_9), 2) < 0) __PYX_ERR(0, 1445, __pyx_L1_error)
       __pyx_t_10 = NULL;
       __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
       goto __pyx_L8_unpacking_done;
@@ -23356,7 +23356,7 @@ static PyObject *__pyx_f_5MACS2_2IO_10ScoreTrack_18TwoConditionScores_build(stru
       __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
       __pyx_t_10 = NULL;
       if (__Pyx_IterFinish() == 0) __Pyx_RaiseNeedMoreValuesError(index);
-      __PYX_ERR(0, 1454, __pyx_L1_error)
+      __PYX_ERR(0, 1445, __pyx_L1_error)
       __pyx_L8_unpacking_done:;
     }
     __Pyx_XDECREF_SET(__pyx_v_cond1_control_ps, __pyx_t_4);
@@ -23364,14 +23364,14 @@ static PyObject *__pyx_f_5MACS2_2IO_10ScoreTrack_18TwoConditionScores_build(stru
     __Pyx_XDECREF_SET(__pyx_v_cond1_control_vs, __pyx_t_3);
     __pyx_t_3 = 0;
 
-    /* "MACS2/IO/ScoreTrack.pyx":1455
+    /* "MACS2/IO/ScoreTrack.pyx":1446
  *             (cond1_treat_ps, cond1_treat_vs) = self.t1bdg.get_data_by_chr(chrname)
  *             (cond1_control_ps, cond1_control_vs) = self.c1bdg.get_data_by_chr(chrname)
  *             (cond2_treat_ps, cond2_treat_vs) = self.t2bdg.get_data_by_chr(chrname)             # <<<<<<<<<<<<<<
  *             (cond2_control_ps, cond2_control_vs) = self.c2bdg.get_data_by_chr(chrname)
  *             chrom_max_len = len(cond1_treat_ps) + len(cond1_control_ps) +\
  */
-    __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_v_self->t2bdg, __pyx_n_s_get_data_by_chr); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 1455, __pyx_L1_error)
+    __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_v_self->t2bdg, __pyx_n_s_get_data_by_chr); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 1446, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_3);
     __pyx_t_4 = NULL;
     if (CYTHON_UNPACK_METHODS && likely(PyMethod_Check(__pyx_t_3))) {
@@ -23385,7 +23385,7 @@ static PyObject *__pyx_f_5MACS2_2IO_10ScoreTrack_18TwoConditionScores_build(stru
     }
     __pyx_t_2 = (__pyx_t_4) ? __Pyx_PyObject_Call2Args(__pyx_t_3, __pyx_t_4, __pyx_v_chrname) : __Pyx_PyObject_CallOneArg(__pyx_t_3, __pyx_v_chrname);
     __Pyx_XDECREF(__pyx_t_4); __pyx_t_4 = 0;
-    if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1455, __pyx_L1_error)
+    if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1446, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
     __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
     if ((likely(PyTuple_CheckExact(__pyx_t_2))) || (PyList_CheckExact(__pyx_t_2))) {
@@ -23394,7 +23394,7 @@ static PyObject *__pyx_f_5MACS2_2IO_10ScoreTrack_18TwoConditionScores_build(stru
       if (unlikely(size != 2)) {
         if (size > 2) __Pyx_RaiseTooManyValuesError(2);
         else if (size >= 0) __Pyx_RaiseNeedMoreValuesError(size);
-        __PYX_ERR(0, 1455, __pyx_L1_error)
+        __PYX_ERR(0, 1446, __pyx_L1_error)
       }
       #if CYTHON_ASSUME_SAFE_MACROS && !CYTHON_AVOID_BORROWED_REFS
       if (likely(PyTuple_CheckExact(sequence))) {
@@ -23407,15 +23407,15 @@ static PyObject *__pyx_f_5MACS2_2IO_10ScoreTrack_18TwoConditionScores_build(stru
       __Pyx_INCREF(__pyx_t_3);
       __Pyx_INCREF(__pyx_t_4);
       #else
-      __pyx_t_3 = PySequence_ITEM(sequence, 0); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 1455, __pyx_L1_error)
+      __pyx_t_3 = PySequence_ITEM(sequence, 0); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 1446, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_3);
-      __pyx_t_4 = PySequence_ITEM(sequence, 1); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 1455, __pyx_L1_error)
+      __pyx_t_4 = PySequence_ITEM(sequence, 1); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 1446, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_4);
       #endif
       __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
     } else {
       Py_ssize_t index = -1;
-      __pyx_t_9 = PyObject_GetIter(__pyx_t_2); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 1455, __pyx_L1_error)
+      __pyx_t_9 = PyObject_GetIter(__pyx_t_2); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 1446, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_9);
       __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
       __pyx_t_10 = Py_TYPE(__pyx_t_9)->tp_iternext;
@@ -23423,7 +23423,7 @@ static PyObject *__pyx_f_5MACS2_2IO_10ScoreTrack_18TwoConditionScores_build(stru
       __Pyx_GOTREF(__pyx_t_3);
       index = 1; __pyx_t_4 = __pyx_t_10(__pyx_t_9); if (unlikely(!__pyx_t_4)) goto __pyx_L9_unpacking_failed;
       __Pyx_GOTREF(__pyx_t_4);
-      if (__Pyx_IternextUnpackEndCheck(__pyx_t_10(__pyx_t_9), 2) < 0) __PYX_ERR(0, 1455, __pyx_L1_error)
+      if (__Pyx_IternextUnpackEndCheck(__pyx_t_10(__pyx_t_9), 2) < 0) __PYX_ERR(0, 1446, __pyx_L1_error)
       __pyx_t_10 = NULL;
       __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
       goto __pyx_L10_unpacking_done;
@@ -23431,7 +23431,7 @@ static PyObject *__pyx_f_5MACS2_2IO_10ScoreTrack_18TwoConditionScores_build(stru
       __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
       __pyx_t_10 = NULL;
       if (__Pyx_IterFinish() == 0) __Pyx_RaiseNeedMoreValuesError(index);
-      __PYX_ERR(0, 1455, __pyx_L1_error)
+      __PYX_ERR(0, 1446, __pyx_L1_error)
       __pyx_L10_unpacking_done:;
     }
     __Pyx_XDECREF_SET(__pyx_v_cond2_treat_ps, __pyx_t_3);
@@ -23439,14 +23439,14 @@ static PyObject *__pyx_f_5MACS2_2IO_10ScoreTrack_18TwoConditionScores_build(stru
     __Pyx_XDECREF_SET(__pyx_v_cond2_treat_vs, __pyx_t_4);
     __pyx_t_4 = 0;
 
-    /* "MACS2/IO/ScoreTrack.pyx":1456
+    /* "MACS2/IO/ScoreTrack.pyx":1447
  *             (cond1_control_ps, cond1_control_vs) = self.c1bdg.get_data_by_chr(chrname)
  *             (cond2_treat_ps, cond2_treat_vs) = self.t2bdg.get_data_by_chr(chrname)
  *             (cond2_control_ps, cond2_control_vs) = self.c2bdg.get_data_by_chr(chrname)             # <<<<<<<<<<<<<<
  *             chrom_max_len = len(cond1_treat_ps) + len(cond1_control_ps) +\
  *                             len(cond2_treat_ps) + len(cond2_control_ps)
  */
-    __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_v_self->c2bdg, __pyx_n_s_get_data_by_chr); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 1456, __pyx_L1_error)
+    __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_v_self->c2bdg, __pyx_n_s_get_data_by_chr); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 1447, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_4);
     __pyx_t_3 = NULL;
     if (CYTHON_UNPACK_METHODS && likely(PyMethod_Check(__pyx_t_4))) {
@@ -23460,7 +23460,7 @@ static PyObject *__pyx_f_5MACS2_2IO_10ScoreTrack_18TwoConditionScores_build(stru
     }
     __pyx_t_2 = (__pyx_t_3) ? __Pyx_PyObject_Call2Args(__pyx_t_4, __pyx_t_3, __pyx_v_chrname) : __Pyx_PyObject_CallOneArg(__pyx_t_4, __pyx_v_chrname);
     __Pyx_XDECREF(__pyx_t_3); __pyx_t_3 = 0;
-    if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1456, __pyx_L1_error)
+    if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1447, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
     __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
     if ((likely(PyTuple_CheckExact(__pyx_t_2))) || (PyList_CheckExact(__pyx_t_2))) {
@@ -23469,7 +23469,7 @@ static PyObject *__pyx_f_5MACS2_2IO_10ScoreTrack_18TwoConditionScores_build(stru
       if (unlikely(size != 2)) {
         if (size > 2) __Pyx_RaiseTooManyValuesError(2);
         else if (size >= 0) __Pyx_RaiseNeedMoreValuesError(size);
-        __PYX_ERR(0, 1456, __pyx_L1_error)
+        __PYX_ERR(0, 1447, __pyx_L1_error)
       }
       #if CYTHON_ASSUME_SAFE_MACROS && !CYTHON_AVOID_BORROWED_REFS
       if (likely(PyTuple_CheckExact(sequence))) {
@@ -23482,15 +23482,15 @@ static PyObject *__pyx_f_5MACS2_2IO_10ScoreTrack_18TwoConditionScores_build(stru
       __Pyx_INCREF(__pyx_t_4);
       __Pyx_INCREF(__pyx_t_3);
       #else
-      __pyx_t_4 = PySequence_ITEM(sequence, 0); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 1456, __pyx_L1_error)
+      __pyx_t_4 = PySequence_ITEM(sequence, 0); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 1447, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_4);
-      __pyx_t_3 = PySequence_ITEM(sequence, 1); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 1456, __pyx_L1_error)
+      __pyx_t_3 = PySequence_ITEM(sequence, 1); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 1447, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_3);
       #endif
       __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
     } else {
       Py_ssize_t index = -1;
-      __pyx_t_9 = PyObject_GetIter(__pyx_t_2); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 1456, __pyx_L1_error)
+      __pyx_t_9 = PyObject_GetIter(__pyx_t_2); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 1447, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_9);
       __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
       __pyx_t_10 = Py_TYPE(__pyx_t_9)->tp_iternext;
@@ -23498,7 +23498,7 @@ static PyObject *__pyx_f_5MACS2_2IO_10ScoreTrack_18TwoConditionScores_build(stru
       __Pyx_GOTREF(__pyx_t_4);
       index = 1; __pyx_t_3 = __pyx_t_10(__pyx_t_9); if (unlikely(!__pyx_t_3)) goto __pyx_L11_unpacking_failed;
       __Pyx_GOTREF(__pyx_t_3);
-      if (__Pyx_IternextUnpackEndCheck(__pyx_t_10(__pyx_t_9), 2) < 0) __PYX_ERR(0, 1456, __pyx_L1_error)
+      if (__Pyx_IternextUnpackEndCheck(__pyx_t_10(__pyx_t_9), 2) < 0) __PYX_ERR(0, 1447, __pyx_L1_error)
       __pyx_t_10 = NULL;
       __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
       goto __pyx_L12_unpacking_done;
@@ -23506,7 +23506,7 @@ static PyObject *__pyx_f_5MACS2_2IO_10ScoreTrack_18TwoConditionScores_build(stru
       __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
       __pyx_t_10 = NULL;
       if (__Pyx_IterFinish() == 0) __Pyx_RaiseNeedMoreValuesError(index);
-      __PYX_ERR(0, 1456, __pyx_L1_error)
+      __PYX_ERR(0, 1447, __pyx_L1_error)
       __pyx_L12_unpacking_done:;
     }
     __Pyx_XDECREF_SET(__pyx_v_cond2_control_ps, __pyx_t_4);
@@ -23514,35 +23514,35 @@ static PyObject *__pyx_f_5MACS2_2IO_10ScoreTrack_18TwoConditionScores_build(stru
     __Pyx_XDECREF_SET(__pyx_v_cond2_control_vs, __pyx_t_3);
     __pyx_t_3 = 0;
 
-    /* "MACS2/IO/ScoreTrack.pyx":1457
+    /* "MACS2/IO/ScoreTrack.pyx":1448
  *             (cond2_treat_ps, cond2_treat_vs) = self.t2bdg.get_data_by_chr(chrname)
  *             (cond2_control_ps, cond2_control_vs) = self.c2bdg.get_data_by_chr(chrname)
  *             chrom_max_len = len(cond1_treat_ps) + len(cond1_control_ps) +\             # <<<<<<<<<<<<<<
  *                             len(cond2_treat_ps) + len(cond2_control_ps)
  *             self.add_chromosome( chrname, chrom_max_len )
  */
-    __pyx_t_11 = PyObject_Length(__pyx_v_cond1_treat_ps); if (unlikely(__pyx_t_11 == ((Py_ssize_t)-1))) __PYX_ERR(0, 1457, __pyx_L1_error)
-    __pyx_t_12 = PyObject_Length(__pyx_v_cond1_control_ps); if (unlikely(__pyx_t_12 == ((Py_ssize_t)-1))) __PYX_ERR(0, 1457, __pyx_L1_error)
+    __pyx_t_11 = PyObject_Length(__pyx_v_cond1_treat_ps); if (unlikely(__pyx_t_11 == ((Py_ssize_t)-1))) __PYX_ERR(0, 1448, __pyx_L1_error)
+    __pyx_t_12 = PyObject_Length(__pyx_v_cond1_control_ps); if (unlikely(__pyx_t_12 == ((Py_ssize_t)-1))) __PYX_ERR(0, 1448, __pyx_L1_error)
 
-    /* "MACS2/IO/ScoreTrack.pyx":1458
+    /* "MACS2/IO/ScoreTrack.pyx":1449
  *             (cond2_control_ps, cond2_control_vs) = self.c2bdg.get_data_by_chr(chrname)
  *             chrom_max_len = len(cond1_treat_ps) + len(cond1_control_ps) +\
  *                             len(cond2_treat_ps) + len(cond2_control_ps)             # <<<<<<<<<<<<<<
  *             self.add_chromosome( chrname, chrom_max_len )
  *             self.build_chromosome( chrname,
  */
-    __pyx_t_13 = PyObject_Length(__pyx_v_cond2_treat_ps); if (unlikely(__pyx_t_13 == ((Py_ssize_t)-1))) __PYX_ERR(0, 1458, __pyx_L1_error)
+    __pyx_t_13 = PyObject_Length(__pyx_v_cond2_treat_ps); if (unlikely(__pyx_t_13 == ((Py_ssize_t)-1))) __PYX_ERR(0, 1449, __pyx_L1_error)
 
-    /* "MACS2/IO/ScoreTrack.pyx":1457
+    /* "MACS2/IO/ScoreTrack.pyx":1448
  *             (cond2_treat_ps, cond2_treat_vs) = self.t2bdg.get_data_by_chr(chrname)
  *             (cond2_control_ps, cond2_control_vs) = self.c2bdg.get_data_by_chr(chrname)
  *             chrom_max_len = len(cond1_treat_ps) + len(cond1_control_ps) +\             # <<<<<<<<<<<<<<
  *                             len(cond2_treat_ps) + len(cond2_control_ps)
  *             self.add_chromosome( chrname, chrom_max_len )
  */
-    __pyx_t_14 = PyObject_Length(__pyx_v_cond2_control_ps); if (unlikely(__pyx_t_14 == ((Py_ssize_t)-1))) __PYX_ERR(0, 1458, __pyx_L1_error)
+    __pyx_t_14 = PyObject_Length(__pyx_v_cond2_control_ps); if (unlikely(__pyx_t_14 == ((Py_ssize_t)-1))) __PYX_ERR(0, 1449, __pyx_L1_error)
 
-    /* "MACS2/IO/ScoreTrack.pyx":1458
+    /* "MACS2/IO/ScoreTrack.pyx":1449
  *             (cond2_control_ps, cond2_control_vs) = self.c2bdg.get_data_by_chr(chrname)
  *             chrom_max_len = len(cond1_treat_ps) + len(cond1_control_ps) +\
  *                             len(cond2_treat_ps) + len(cond2_control_ps)             # <<<<<<<<<<<<<<
@@ -23551,31 +23551,31 @@ static PyObject *__pyx_f_5MACS2_2IO_10ScoreTrack_18TwoConditionScores_build(stru
  */
     __pyx_v_chrom_max_len = (((__pyx_t_11 + __pyx_t_12) + __pyx_t_13) + __pyx_t_14);
 
-    /* "MACS2/IO/ScoreTrack.pyx":1459
+    /* "MACS2/IO/ScoreTrack.pyx":1450
  *             chrom_max_len = len(cond1_treat_ps) + len(cond1_control_ps) +\
  *                             len(cond2_treat_ps) + len(cond2_control_ps)
  *             self.add_chromosome( chrname, chrom_max_len )             # <<<<<<<<<<<<<<
  *             self.build_chromosome( chrname,
  *                                    cond1_treat_ps, cond1_control_ps,
  */
-    __pyx_t_2 = ((struct __pyx_vtabstruct_5MACS2_2IO_10ScoreTrack_TwoConditionScores *)__pyx_v_self->__pyx_vtab)->add_chromosome(__pyx_v_self, __pyx_v_chrname, __pyx_v_chrom_max_len); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1459, __pyx_L1_error)
+    __pyx_t_2 = ((struct __pyx_vtabstruct_5MACS2_2IO_10ScoreTrack_TwoConditionScores *)__pyx_v_self->__pyx_vtab)->add_chromosome(__pyx_v_self, __pyx_v_chrname, __pyx_v_chrom_max_len); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1450, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
     __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
-    /* "MACS2/IO/ScoreTrack.pyx":1460
+    /* "MACS2/IO/ScoreTrack.pyx":1451
  *                             len(cond2_treat_ps) + len(cond2_control_ps)
  *             self.add_chromosome( chrname, chrom_max_len )
  *             self.build_chromosome( chrname,             # <<<<<<<<<<<<<<
  *                                    cond1_treat_ps, cond1_control_ps,
  *                                    cond2_treat_ps, cond2_control_ps,
  */
-    __pyx_t_2 = ((struct __pyx_vtabstruct_5MACS2_2IO_10ScoreTrack_TwoConditionScores *)__pyx_v_self->__pyx_vtab)->build_chromosome(__pyx_v_self, __pyx_v_chrname, __pyx_v_cond1_treat_ps, __pyx_v_cond1_control_ps, __pyx_v_cond2_treat_ps, __pyx_v_cond2_control_ps, __pyx_v_cond1_treat_vs, __pyx_v_cond1_control_vs, __pyx_v_cond2_treat_vs, __pyx_v_cond2_control_vs); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1460, __pyx_L1_error)
+    __pyx_t_2 = ((struct __pyx_vtabstruct_5MACS2_2IO_10ScoreTrack_TwoConditionScores *)__pyx_v_self->__pyx_vtab)->build_chromosome(__pyx_v_self, __pyx_v_chrname, __pyx_v_cond1_treat_ps, __pyx_v_cond1_control_ps, __pyx_v_cond2_treat_ps, __pyx_v_cond2_control_ps, __pyx_v_cond1_treat_vs, __pyx_v_cond1_control_vs, __pyx_v_cond2_treat_vs, __pyx_v_cond2_control_vs); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1451, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
     __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
   }
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-  /* "MACS2/IO/ScoreTrack.pyx":1443
+  /* "MACS2/IO/ScoreTrack.pyx":1434
  *         self.pseudocount = pseudocount
  * 
  *     cpdef build ( self ):             # <<<<<<<<<<<<<<
@@ -23631,9 +23631,9 @@ static PyObject *__pyx_pf_5MACS2_2IO_10ScoreTrack_18TwoConditionScores_4build(st
   __Pyx_RefNannyDeclarations
   PyObject *__pyx_t_1 = NULL;
   __Pyx_RefNannySetupContext("build", 0);
-  __Pyx_TraceCall("build (wrapper)", __pyx_f[0], 1443, 0, __PYX_ERR(0, 1443, __pyx_L1_error));
+  __Pyx_TraceCall("build (wrapper)", __pyx_f[0], 1434, 0, __PYX_ERR(0, 1434, __pyx_L1_error));
   __Pyx_XDECREF(__pyx_r);
-  __pyx_t_1 = __pyx_f_5MACS2_2IO_10ScoreTrack_18TwoConditionScores_build(__pyx_v_self, 1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1443, __pyx_L1_error)
+  __pyx_t_1 = __pyx_f_5MACS2_2IO_10ScoreTrack_18TwoConditionScores_build(__pyx_v_self, 1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1434, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __pyx_r = __pyx_t_1;
   __pyx_t_1 = 0;
@@ -23651,7 +23651,7 @@ static PyObject *__pyx_pf_5MACS2_2IO_10ScoreTrack_18TwoConditionScores_4build(st
   return __pyx_r;
 }
 
-/* "MACS2/IO/ScoreTrack.pyx":1467
+/* "MACS2/IO/ScoreTrack.pyx":1458
  * 
  * 
  *     cdef build_chromosome( self, chrname,             # <<<<<<<<<<<<<<
@@ -23697,129 +23697,129 @@ static PyObject *__pyx_f_5MACS2_2IO_10ScoreTrack_18TwoConditionScores_build_chro
   float __pyx_t_14;
   float __pyx_t_15;
   __Pyx_RefNannySetupContext("build_chromosome", 0);
-  __Pyx_TraceCall("build_chromosome", __pyx_f[0], 1467, 0, __PYX_ERR(0, 1467, __pyx_L1_error));
+  __Pyx_TraceCall("build_chromosome", __pyx_f[0], 1458, 0, __PYX_ERR(0, 1458, __pyx_L1_error));
 
-  /* "MACS2/IO/ScoreTrack.pyx":1481
+  /* "MACS2/IO/ScoreTrack.pyx":1472
  *         """
  * 
  *         c1tpn = iter(cond1_treat_ps).__next__             # <<<<<<<<<<<<<<
  *         c1cpn = iter(cond1_control_ps).__next__
  *         c2tpn = iter(cond2_treat_ps).__next__
  */
-  __pyx_t_1 = PyObject_GetIter(__pyx_v_cond1_treat_ps); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1481, __pyx_L1_error)
+  __pyx_t_1 = PyObject_GetIter(__pyx_v_cond1_treat_ps); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1472, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_t_1, __pyx_n_s_next); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1481, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_t_1, __pyx_n_s_next); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1472, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   __pyx_v_c1tpn = __pyx_t_2;
   __pyx_t_2 = 0;
 
-  /* "MACS2/IO/ScoreTrack.pyx":1482
+  /* "MACS2/IO/ScoreTrack.pyx":1473
  * 
  *         c1tpn = iter(cond1_treat_ps).__next__
  *         c1cpn = iter(cond1_control_ps).__next__             # <<<<<<<<<<<<<<
  *         c2tpn = iter(cond2_treat_ps).__next__
  *         c2cpn = iter(cond2_control_ps).__next__
  */
-  __pyx_t_2 = PyObject_GetIter(__pyx_v_cond1_control_ps); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1482, __pyx_L1_error)
+  __pyx_t_2 = PyObject_GetIter(__pyx_v_cond1_control_ps); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1473, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
-  __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_t_2, __pyx_n_s_next); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1482, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_t_2, __pyx_n_s_next); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1473, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
   __pyx_v_c1cpn = __pyx_t_1;
   __pyx_t_1 = 0;
 
-  /* "MACS2/IO/ScoreTrack.pyx":1483
+  /* "MACS2/IO/ScoreTrack.pyx":1474
  *         c1tpn = iter(cond1_treat_ps).__next__
  *         c1cpn = iter(cond1_control_ps).__next__
  *         c2tpn = iter(cond2_treat_ps).__next__             # <<<<<<<<<<<<<<
  *         c2cpn = iter(cond2_control_ps).__next__
  *         c1tvn = iter(cond1_treat_vs).__next__
  */
-  __pyx_t_1 = PyObject_GetIter(__pyx_v_cond2_treat_ps); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1483, __pyx_L1_error)
+  __pyx_t_1 = PyObject_GetIter(__pyx_v_cond2_treat_ps); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1474, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_t_1, __pyx_n_s_next); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1483, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_t_1, __pyx_n_s_next); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1474, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   __pyx_v_c2tpn = __pyx_t_2;
   __pyx_t_2 = 0;
 
-  /* "MACS2/IO/ScoreTrack.pyx":1484
+  /* "MACS2/IO/ScoreTrack.pyx":1475
  *         c1cpn = iter(cond1_control_ps).__next__
  *         c2tpn = iter(cond2_treat_ps).__next__
  *         c2cpn = iter(cond2_control_ps).__next__             # <<<<<<<<<<<<<<
  *         c1tvn = iter(cond1_treat_vs).__next__
  *         c1cvn = iter(cond1_control_vs).__next__
  */
-  __pyx_t_2 = PyObject_GetIter(__pyx_v_cond2_control_ps); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1484, __pyx_L1_error)
+  __pyx_t_2 = PyObject_GetIter(__pyx_v_cond2_control_ps); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1475, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
-  __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_t_2, __pyx_n_s_next); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1484, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_t_2, __pyx_n_s_next); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1475, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
   __pyx_v_c2cpn = __pyx_t_1;
   __pyx_t_1 = 0;
 
-  /* "MACS2/IO/ScoreTrack.pyx":1485
+  /* "MACS2/IO/ScoreTrack.pyx":1476
  *         c2tpn = iter(cond2_treat_ps).__next__
  *         c2cpn = iter(cond2_control_ps).__next__
  *         c1tvn = iter(cond1_treat_vs).__next__             # <<<<<<<<<<<<<<
  *         c1cvn = iter(cond1_control_vs).__next__
  *         c2tvn = iter(cond2_treat_vs).__next__
  */
-  __pyx_t_1 = PyObject_GetIter(__pyx_v_cond1_treat_vs); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1485, __pyx_L1_error)
+  __pyx_t_1 = PyObject_GetIter(__pyx_v_cond1_treat_vs); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1476, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_t_1, __pyx_n_s_next); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1485, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_t_1, __pyx_n_s_next); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1476, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   __pyx_v_c1tvn = __pyx_t_2;
   __pyx_t_2 = 0;
 
-  /* "MACS2/IO/ScoreTrack.pyx":1486
+  /* "MACS2/IO/ScoreTrack.pyx":1477
  *         c2cpn = iter(cond2_control_ps).__next__
  *         c1tvn = iter(cond1_treat_vs).__next__
  *         c1cvn = iter(cond1_control_vs).__next__             # <<<<<<<<<<<<<<
  *         c2tvn = iter(cond2_treat_vs).__next__
  *         c2cvn = iter(cond2_control_vs).__next__
  */
-  __pyx_t_2 = PyObject_GetIter(__pyx_v_cond1_control_vs); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1486, __pyx_L1_error)
+  __pyx_t_2 = PyObject_GetIter(__pyx_v_cond1_control_vs); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1477, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
-  __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_t_2, __pyx_n_s_next); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1486, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_t_2, __pyx_n_s_next); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1477, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
   __pyx_v_c1cvn = __pyx_t_1;
   __pyx_t_1 = 0;
 
-  /* "MACS2/IO/ScoreTrack.pyx":1487
+  /* "MACS2/IO/ScoreTrack.pyx":1478
  *         c1tvn = iter(cond1_treat_vs).__next__
  *         c1cvn = iter(cond1_control_vs).__next__
  *         c2tvn = iter(cond2_treat_vs).__next__             # <<<<<<<<<<<<<<
  *         c2cvn = iter(cond2_control_vs).__next__
  * 
  */
-  __pyx_t_1 = PyObject_GetIter(__pyx_v_cond2_treat_vs); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1487, __pyx_L1_error)
+  __pyx_t_1 = PyObject_GetIter(__pyx_v_cond2_treat_vs); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1478, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_t_1, __pyx_n_s_next); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1487, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_t_1, __pyx_n_s_next); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1478, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   __pyx_v_c2tvn = __pyx_t_2;
   __pyx_t_2 = 0;
 
-  /* "MACS2/IO/ScoreTrack.pyx":1488
+  /* "MACS2/IO/ScoreTrack.pyx":1479
  *         c1cvn = iter(cond1_control_vs).__next__
  *         c2tvn = iter(cond2_treat_vs).__next__
  *         c2cvn = iter(cond2_control_vs).__next__             # <<<<<<<<<<<<<<
  * 
  *         pre_p = 0
  */
-  __pyx_t_2 = PyObject_GetIter(__pyx_v_cond2_control_vs); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1488, __pyx_L1_error)
+  __pyx_t_2 = PyObject_GetIter(__pyx_v_cond2_control_vs); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1479, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
-  __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_t_2, __pyx_n_s_next); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1488, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_t_2, __pyx_n_s_next); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1479, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
   __pyx_v_c2cvn = __pyx_t_1;
   __pyx_t_1 = 0;
 
-  /* "MACS2/IO/ScoreTrack.pyx":1490
+  /* "MACS2/IO/ScoreTrack.pyx":1481
  *         c2cvn = iter(cond2_control_vs).__next__
  * 
  *         pre_p = 0             # <<<<<<<<<<<<<<
@@ -23829,7 +23829,7 @@ static PyObject *__pyx_f_5MACS2_2IO_10ScoreTrack_18TwoConditionScores_build_chro
   __Pyx_INCREF(__pyx_int_0);
   __pyx_v_pre_p = __pyx_int_0;
 
-  /* "MACS2/IO/ScoreTrack.pyx":1492
+  /* "MACS2/IO/ScoreTrack.pyx":1483
  *         pre_p = 0
  * 
  *         try:             # <<<<<<<<<<<<<<
@@ -23845,7 +23845,7 @@ static PyObject *__pyx_f_5MACS2_2IO_10ScoreTrack_18TwoConditionScores_build_chro
     __Pyx_XGOTREF(__pyx_t_5);
     /*try:*/ {
 
-      /* "MACS2/IO/ScoreTrack.pyx":1493
+      /* "MACS2/IO/ScoreTrack.pyx":1484
  * 
  *         try:
  *             c1tp = c1tpn()             # <<<<<<<<<<<<<<
@@ -23865,13 +23865,13 @@ static PyObject *__pyx_f_5MACS2_2IO_10ScoreTrack_18TwoConditionScores_build_chro
       }
       __pyx_t_1 = (__pyx_t_6) ? __Pyx_PyObject_CallOneArg(__pyx_t_2, __pyx_t_6) : __Pyx_PyObject_CallNoArg(__pyx_t_2);
       __Pyx_XDECREF(__pyx_t_6); __pyx_t_6 = 0;
-      if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1493, __pyx_L3_error)
+      if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1484, __pyx_L3_error)
       __Pyx_GOTREF(__pyx_t_1);
       __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
       __pyx_v_c1tp = __pyx_t_1;
       __pyx_t_1 = 0;
 
-      /* "MACS2/IO/ScoreTrack.pyx":1494
+      /* "MACS2/IO/ScoreTrack.pyx":1485
  *         try:
  *             c1tp = c1tpn()
  *             c1tv = c1tvn()             # <<<<<<<<<<<<<<
@@ -23891,13 +23891,13 @@ static PyObject *__pyx_f_5MACS2_2IO_10ScoreTrack_18TwoConditionScores_build_chro
       }
       __pyx_t_1 = (__pyx_t_6) ? __Pyx_PyObject_CallOneArg(__pyx_t_2, __pyx_t_6) : __Pyx_PyObject_CallNoArg(__pyx_t_2);
       __Pyx_XDECREF(__pyx_t_6); __pyx_t_6 = 0;
-      if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1494, __pyx_L3_error)
+      if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1485, __pyx_L3_error)
       __Pyx_GOTREF(__pyx_t_1);
       __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
       __pyx_v_c1tv = __pyx_t_1;
       __pyx_t_1 = 0;
 
-      /* "MACS2/IO/ScoreTrack.pyx":1496
+      /* "MACS2/IO/ScoreTrack.pyx":1487
  *             c1tv = c1tvn()
  * 
  *             c1cp = c1cpn()             # <<<<<<<<<<<<<<
@@ -23917,13 +23917,13 @@ static PyObject *__pyx_f_5MACS2_2IO_10ScoreTrack_18TwoConditionScores_build_chro
       }
       __pyx_t_1 = (__pyx_t_6) ? __Pyx_PyObject_CallOneArg(__pyx_t_2, __pyx_t_6) : __Pyx_PyObject_CallNoArg(__pyx_t_2);
       __Pyx_XDECREF(__pyx_t_6); __pyx_t_6 = 0;
-      if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1496, __pyx_L3_error)
+      if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1487, __pyx_L3_error)
       __Pyx_GOTREF(__pyx_t_1);
       __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
       __pyx_v_c1cp = __pyx_t_1;
       __pyx_t_1 = 0;
 
-      /* "MACS2/IO/ScoreTrack.pyx":1497
+      /* "MACS2/IO/ScoreTrack.pyx":1488
  * 
  *             c1cp = c1cpn()
  *             c1cv = c1cvn()             # <<<<<<<<<<<<<<
@@ -23943,13 +23943,13 @@ static PyObject *__pyx_f_5MACS2_2IO_10ScoreTrack_18TwoConditionScores_build_chro
       }
       __pyx_t_1 = (__pyx_t_6) ? __Pyx_PyObject_CallOneArg(__pyx_t_2, __pyx_t_6) : __Pyx_PyObject_CallNoArg(__pyx_t_2);
       __Pyx_XDECREF(__pyx_t_6); __pyx_t_6 = 0;
-      if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1497, __pyx_L3_error)
+      if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1488, __pyx_L3_error)
       __Pyx_GOTREF(__pyx_t_1);
       __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
       __pyx_v_c1cv = __pyx_t_1;
       __pyx_t_1 = 0;
 
-      /* "MACS2/IO/ScoreTrack.pyx":1499
+      /* "MACS2/IO/ScoreTrack.pyx":1490
  *             c1cv = c1cvn()
  * 
  *             c2tp = c2tpn()             # <<<<<<<<<<<<<<
@@ -23969,13 +23969,13 @@ static PyObject *__pyx_f_5MACS2_2IO_10ScoreTrack_18TwoConditionScores_build_chro
       }
       __pyx_t_1 = (__pyx_t_6) ? __Pyx_PyObject_CallOneArg(__pyx_t_2, __pyx_t_6) : __Pyx_PyObject_CallNoArg(__pyx_t_2);
       __Pyx_XDECREF(__pyx_t_6); __pyx_t_6 = 0;
-      if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1499, __pyx_L3_error)
+      if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1490, __pyx_L3_error)
       __Pyx_GOTREF(__pyx_t_1);
       __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
       __pyx_v_c2tp = __pyx_t_1;
       __pyx_t_1 = 0;
 
-      /* "MACS2/IO/ScoreTrack.pyx":1500
+      /* "MACS2/IO/ScoreTrack.pyx":1491
  * 
  *             c2tp = c2tpn()
  *             c2tv = c2tvn()             # <<<<<<<<<<<<<<
@@ -23995,13 +23995,13 @@ static PyObject *__pyx_f_5MACS2_2IO_10ScoreTrack_18TwoConditionScores_build_chro
       }
       __pyx_t_1 = (__pyx_t_6) ? __Pyx_PyObject_CallOneArg(__pyx_t_2, __pyx_t_6) : __Pyx_PyObject_CallNoArg(__pyx_t_2);
       __Pyx_XDECREF(__pyx_t_6); __pyx_t_6 = 0;
-      if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1500, __pyx_L3_error)
+      if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1491, __pyx_L3_error)
       __Pyx_GOTREF(__pyx_t_1);
       __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
       __pyx_v_c2tv = __pyx_t_1;
       __pyx_t_1 = 0;
 
-      /* "MACS2/IO/ScoreTrack.pyx":1502
+      /* "MACS2/IO/ScoreTrack.pyx":1493
  *             c2tv = c2tvn()
  * 
  *             c2cp = c2cpn()             # <<<<<<<<<<<<<<
@@ -24021,13 +24021,13 @@ static PyObject *__pyx_f_5MACS2_2IO_10ScoreTrack_18TwoConditionScores_build_chro
       }
       __pyx_t_1 = (__pyx_t_6) ? __Pyx_PyObject_CallOneArg(__pyx_t_2, __pyx_t_6) : __Pyx_PyObject_CallNoArg(__pyx_t_2);
       __Pyx_XDECREF(__pyx_t_6); __pyx_t_6 = 0;
-      if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1502, __pyx_L3_error)
+      if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1493, __pyx_L3_error)
       __Pyx_GOTREF(__pyx_t_1);
       __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
       __pyx_v_c2cp = __pyx_t_1;
       __pyx_t_1 = 0;
 
-      /* "MACS2/IO/ScoreTrack.pyx":1503
+      /* "MACS2/IO/ScoreTrack.pyx":1494
  * 
  *             c2cp = c2cpn()
  *             c2cv = c2cvn()             # <<<<<<<<<<<<<<
@@ -24047,13 +24047,13 @@ static PyObject *__pyx_f_5MACS2_2IO_10ScoreTrack_18TwoConditionScores_build_chro
       }
       __pyx_t_1 = (__pyx_t_6) ? __Pyx_PyObject_CallOneArg(__pyx_t_2, __pyx_t_6) : __Pyx_PyObject_CallNoArg(__pyx_t_2);
       __Pyx_XDECREF(__pyx_t_6); __pyx_t_6 = 0;
-      if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1503, __pyx_L3_error)
+      if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1494, __pyx_L3_error)
       __Pyx_GOTREF(__pyx_t_1);
       __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
       __pyx_v_c2cv = __pyx_t_1;
       __pyx_t_1 = 0;
 
-      /* "MACS2/IO/ScoreTrack.pyx":1505
+      /* "MACS2/IO/ScoreTrack.pyx":1496
  *             c2cv = c2cvn()
  * 
  *             while True:             # <<<<<<<<<<<<<<
@@ -24062,7 +24062,7 @@ static PyObject *__pyx_f_5MACS2_2IO_10ScoreTrack_18TwoConditionScores_build_chro
  */
       while (1) {
 
-        /* "MACS2/IO/ScoreTrack.pyx":1506
+        /* "MACS2/IO/ScoreTrack.pyx":1497
  * 
  *             while True:
  *                 minp = min(c1tp, c1cp, c2tp, c2cp)             # <<<<<<<<<<<<<<
@@ -24077,8 +24077,8 @@ static PyObject *__pyx_f_5MACS2_2IO_10ScoreTrack_18TwoConditionScores_build_chro
         __pyx_t_6 = __pyx_v_c2cp;
         __Pyx_INCREF(__pyx_v_c1tp);
         __pyx_t_7 = __pyx_v_c1tp;
-        __pyx_t_9 = PyObject_RichCompare(__pyx_t_1, __pyx_t_7, Py_LT); __Pyx_XGOTREF(__pyx_t_9); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 1506, __pyx_L3_error)
-        __pyx_t_10 = __Pyx_PyObject_IsTrue(__pyx_t_9); if (unlikely(__pyx_t_10 < 0)) __PYX_ERR(0, 1506, __pyx_L3_error)
+        __pyx_t_9 = PyObject_RichCompare(__pyx_t_1, __pyx_t_7, Py_LT); __Pyx_XGOTREF(__pyx_t_9); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 1497, __pyx_L3_error)
+        __pyx_t_10 = __Pyx_PyObject_IsTrue(__pyx_t_9); if (unlikely(__pyx_t_10 < 0)) __PYX_ERR(0, 1497, __pyx_L3_error)
         __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
         if (__pyx_t_10) {
           __Pyx_INCREF(__pyx_t_1);
@@ -24091,8 +24091,8 @@ static PyObject *__pyx_f_5MACS2_2IO_10ScoreTrack_18TwoConditionScores_build_chro
         __Pyx_INCREF(__pyx_t_8);
         __pyx_t_7 = __pyx_t_8;
         __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
-        __pyx_t_9 = PyObject_RichCompare(__pyx_t_2, __pyx_t_7, Py_LT); __Pyx_XGOTREF(__pyx_t_9); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 1506, __pyx_L3_error)
-        __pyx_t_10 = __Pyx_PyObject_IsTrue(__pyx_t_9); if (unlikely(__pyx_t_10 < 0)) __PYX_ERR(0, 1506, __pyx_L3_error)
+        __pyx_t_9 = PyObject_RichCompare(__pyx_t_2, __pyx_t_7, Py_LT); __Pyx_XGOTREF(__pyx_t_9); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 1497, __pyx_L3_error)
+        __pyx_t_10 = __Pyx_PyObject_IsTrue(__pyx_t_9); if (unlikely(__pyx_t_10 < 0)) __PYX_ERR(0, 1497, __pyx_L3_error)
         __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
         if (__pyx_t_10) {
           __Pyx_INCREF(__pyx_t_2);
@@ -24105,8 +24105,8 @@ static PyObject *__pyx_f_5MACS2_2IO_10ScoreTrack_18TwoConditionScores_build_chro
         __Pyx_INCREF(__pyx_t_8);
         __pyx_t_7 = __pyx_t_8;
         __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
-        __pyx_t_9 = PyObject_RichCompare(__pyx_t_6, __pyx_t_7, Py_LT); __Pyx_XGOTREF(__pyx_t_9); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 1506, __pyx_L3_error)
-        __pyx_t_10 = __Pyx_PyObject_IsTrue(__pyx_t_9); if (unlikely(__pyx_t_10 < 0)) __PYX_ERR(0, 1506, __pyx_L3_error)
+        __pyx_t_9 = PyObject_RichCompare(__pyx_t_6, __pyx_t_7, Py_LT); __Pyx_XGOTREF(__pyx_t_9); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 1497, __pyx_L3_error)
+        __pyx_t_10 = __Pyx_PyObject_IsTrue(__pyx_t_9); if (unlikely(__pyx_t_10 < 0)) __PYX_ERR(0, 1497, __pyx_L3_error)
         __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
         if (__pyx_t_10) {
           __Pyx_INCREF(__pyx_t_6);
@@ -24125,24 +24125,24 @@ static PyObject *__pyx_f_5MACS2_2IO_10ScoreTrack_18TwoConditionScores_build_chro
         __Pyx_XDECREF_SET(__pyx_v_minp, __pyx_t_1);
         __pyx_t_1 = 0;
 
-        /* "MACS2/IO/ScoreTrack.pyx":1507
+        /* "MACS2/IO/ScoreTrack.pyx":1498
  *             while True:
  *                 minp = min(c1tp, c1cp, c2tp, c2cp)
  *                 self.add( chrname, pre_p, c1tv, c1cv, c2tv, c2cv )             # <<<<<<<<<<<<<<
  *                 pre_p = minp
  *                 if c1tp == minp:
  */
-        if (!(likely(PyBytes_CheckExact(__pyx_v_chrname))||((__pyx_v_chrname) == Py_None)||(PyErr_Format(PyExc_TypeError, "Expected %.16s, got %.200s", "bytes", Py_TYPE(__pyx_v_chrname)->tp_name), 0))) __PYX_ERR(0, 1507, __pyx_L3_error)
-        __pyx_t_11 = __Pyx_PyInt_As_int(__pyx_v_pre_p); if (unlikely((__pyx_t_11 == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 1507, __pyx_L3_error)
-        __pyx_t_12 = __pyx_PyFloat_AsFloat(__pyx_v_c1tv); if (unlikely((__pyx_t_12 == (float)-1) && PyErr_Occurred())) __PYX_ERR(0, 1507, __pyx_L3_error)
-        __pyx_t_13 = __pyx_PyFloat_AsFloat(__pyx_v_c1cv); if (unlikely((__pyx_t_13 == (float)-1) && PyErr_Occurred())) __PYX_ERR(0, 1507, __pyx_L3_error)
-        __pyx_t_14 = __pyx_PyFloat_AsFloat(__pyx_v_c2tv); if (unlikely((__pyx_t_14 == (float)-1) && PyErr_Occurred())) __PYX_ERR(0, 1507, __pyx_L3_error)
-        __pyx_t_15 = __pyx_PyFloat_AsFloat(__pyx_v_c2cv); if (unlikely((__pyx_t_15 == (float)-1) && PyErr_Occurred())) __PYX_ERR(0, 1507, __pyx_L3_error)
-        __pyx_t_1 = ((struct __pyx_vtabstruct_5MACS2_2IO_10ScoreTrack_TwoConditionScores *)__pyx_v_self->__pyx_vtab)->add(__pyx_v_self, ((PyObject*)__pyx_v_chrname), __pyx_t_11, __pyx_t_12, __pyx_t_13, __pyx_t_14, __pyx_t_15); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1507, __pyx_L3_error)
+        if (!(likely(PyBytes_CheckExact(__pyx_v_chrname))||((__pyx_v_chrname) == Py_None)||(PyErr_Format(PyExc_TypeError, "Expected %.16s, got %.200s", "bytes", Py_TYPE(__pyx_v_chrname)->tp_name), 0))) __PYX_ERR(0, 1498, __pyx_L3_error)
+        __pyx_t_11 = __Pyx_PyInt_As_int(__pyx_v_pre_p); if (unlikely((__pyx_t_11 == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 1498, __pyx_L3_error)
+        __pyx_t_12 = __pyx_PyFloat_AsFloat(__pyx_v_c1tv); if (unlikely((__pyx_t_12 == (float)-1) && PyErr_Occurred())) __PYX_ERR(0, 1498, __pyx_L3_error)
+        __pyx_t_13 = __pyx_PyFloat_AsFloat(__pyx_v_c1cv); if (unlikely((__pyx_t_13 == (float)-1) && PyErr_Occurred())) __PYX_ERR(0, 1498, __pyx_L3_error)
+        __pyx_t_14 = __pyx_PyFloat_AsFloat(__pyx_v_c2tv); if (unlikely((__pyx_t_14 == (float)-1) && PyErr_Occurred())) __PYX_ERR(0, 1498, __pyx_L3_error)
+        __pyx_t_15 = __pyx_PyFloat_AsFloat(__pyx_v_c2cv); if (unlikely((__pyx_t_15 == (float)-1) && PyErr_Occurred())) __PYX_ERR(0, 1498, __pyx_L3_error)
+        __pyx_t_1 = ((struct __pyx_vtabstruct_5MACS2_2IO_10ScoreTrack_TwoConditionScores *)__pyx_v_self->__pyx_vtab)->add(__pyx_v_self, ((PyObject*)__pyx_v_chrname), __pyx_t_11, __pyx_t_12, __pyx_t_13, __pyx_t_14, __pyx_t_15); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1498, __pyx_L3_error)
         __Pyx_GOTREF(__pyx_t_1);
         __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-        /* "MACS2/IO/ScoreTrack.pyx":1508
+        /* "MACS2/IO/ScoreTrack.pyx":1499
  *                 minp = min(c1tp, c1cp, c2tp, c2cp)
  *                 self.add( chrname, pre_p, c1tv, c1cv, c2tv, c2cv )
  *                 pre_p = minp             # <<<<<<<<<<<<<<
@@ -24152,19 +24152,19 @@ static PyObject *__pyx_f_5MACS2_2IO_10ScoreTrack_18TwoConditionScores_build_chro
         __Pyx_INCREF(__pyx_v_minp);
         __Pyx_DECREF_SET(__pyx_v_pre_p, __pyx_v_minp);
 
-        /* "MACS2/IO/ScoreTrack.pyx":1509
+        /* "MACS2/IO/ScoreTrack.pyx":1500
  *                 self.add( chrname, pre_p, c1tv, c1cv, c2tv, c2cv )
  *                 pre_p = minp
  *                 if c1tp == minp:             # <<<<<<<<<<<<<<
  *                     c1tp = c1tpn()
  *                     c1tv = c1tvn()
  */
-        __pyx_t_1 = PyObject_RichCompare(__pyx_v_c1tp, __pyx_v_minp, Py_EQ); __Pyx_XGOTREF(__pyx_t_1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1509, __pyx_L3_error)
-        __pyx_t_10 = __Pyx_PyObject_IsTrue(__pyx_t_1); if (unlikely(__pyx_t_10 < 0)) __PYX_ERR(0, 1509, __pyx_L3_error)
+        __pyx_t_1 = PyObject_RichCompare(__pyx_v_c1tp, __pyx_v_minp, Py_EQ); __Pyx_XGOTREF(__pyx_t_1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1500, __pyx_L3_error)
+        __pyx_t_10 = __Pyx_PyObject_IsTrue(__pyx_t_1); if (unlikely(__pyx_t_10 < 0)) __PYX_ERR(0, 1500, __pyx_L3_error)
         __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
         if (__pyx_t_10) {
 
-          /* "MACS2/IO/ScoreTrack.pyx":1510
+          /* "MACS2/IO/ScoreTrack.pyx":1501
  *                 pre_p = minp
  *                 if c1tp == minp:
  *                     c1tp = c1tpn()             # <<<<<<<<<<<<<<
@@ -24184,13 +24184,13 @@ static PyObject *__pyx_f_5MACS2_2IO_10ScoreTrack_18TwoConditionScores_build_chro
           }
           __pyx_t_1 = (__pyx_t_2) ? __Pyx_PyObject_CallOneArg(__pyx_t_8, __pyx_t_2) : __Pyx_PyObject_CallNoArg(__pyx_t_8);
           __Pyx_XDECREF(__pyx_t_2); __pyx_t_2 = 0;
-          if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1510, __pyx_L3_error)
+          if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1501, __pyx_L3_error)
           __Pyx_GOTREF(__pyx_t_1);
           __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
           __Pyx_DECREF_SET(__pyx_v_c1tp, __pyx_t_1);
           __pyx_t_1 = 0;
 
-          /* "MACS2/IO/ScoreTrack.pyx":1511
+          /* "MACS2/IO/ScoreTrack.pyx":1502
  *                 if c1tp == minp:
  *                     c1tp = c1tpn()
  *                     c1tv = c1tvn()             # <<<<<<<<<<<<<<
@@ -24210,13 +24210,13 @@ static PyObject *__pyx_f_5MACS2_2IO_10ScoreTrack_18TwoConditionScores_build_chro
           }
           __pyx_t_1 = (__pyx_t_2) ? __Pyx_PyObject_CallOneArg(__pyx_t_8, __pyx_t_2) : __Pyx_PyObject_CallNoArg(__pyx_t_8);
           __Pyx_XDECREF(__pyx_t_2); __pyx_t_2 = 0;
-          if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1511, __pyx_L3_error)
+          if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1502, __pyx_L3_error)
           __Pyx_GOTREF(__pyx_t_1);
           __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
           __Pyx_DECREF_SET(__pyx_v_c1tv, __pyx_t_1);
           __pyx_t_1 = 0;
 
-          /* "MACS2/IO/ScoreTrack.pyx":1509
+          /* "MACS2/IO/ScoreTrack.pyx":1500
  *                 self.add( chrname, pre_p, c1tv, c1cv, c2tv, c2cv )
  *                 pre_p = minp
  *                 if c1tp == minp:             # <<<<<<<<<<<<<<
@@ -24225,19 +24225,19 @@ static PyObject *__pyx_f_5MACS2_2IO_10ScoreTrack_18TwoConditionScores_build_chro
  */
         }
 
-        /* "MACS2/IO/ScoreTrack.pyx":1512
+        /* "MACS2/IO/ScoreTrack.pyx":1503
  *                     c1tp = c1tpn()
  *                     c1tv = c1tvn()
  *                 if c1cp == minp:             # <<<<<<<<<<<<<<
  *                     c1cp = c1cpn()
  *                     c1cv = c1cvn()
  */
-        __pyx_t_1 = PyObject_RichCompare(__pyx_v_c1cp, __pyx_v_minp, Py_EQ); __Pyx_XGOTREF(__pyx_t_1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1512, __pyx_L3_error)
-        __pyx_t_10 = __Pyx_PyObject_IsTrue(__pyx_t_1); if (unlikely(__pyx_t_10 < 0)) __PYX_ERR(0, 1512, __pyx_L3_error)
+        __pyx_t_1 = PyObject_RichCompare(__pyx_v_c1cp, __pyx_v_minp, Py_EQ); __Pyx_XGOTREF(__pyx_t_1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1503, __pyx_L3_error)
+        __pyx_t_10 = __Pyx_PyObject_IsTrue(__pyx_t_1); if (unlikely(__pyx_t_10 < 0)) __PYX_ERR(0, 1503, __pyx_L3_error)
         __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
         if (__pyx_t_10) {
 
-          /* "MACS2/IO/ScoreTrack.pyx":1513
+          /* "MACS2/IO/ScoreTrack.pyx":1504
  *                     c1tv = c1tvn()
  *                 if c1cp == minp:
  *                     c1cp = c1cpn()             # <<<<<<<<<<<<<<
@@ -24257,13 +24257,13 @@ static PyObject *__pyx_f_5MACS2_2IO_10ScoreTrack_18TwoConditionScores_build_chro
           }
           __pyx_t_1 = (__pyx_t_2) ? __Pyx_PyObject_CallOneArg(__pyx_t_8, __pyx_t_2) : __Pyx_PyObject_CallNoArg(__pyx_t_8);
           __Pyx_XDECREF(__pyx_t_2); __pyx_t_2 = 0;
-          if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1513, __pyx_L3_error)
+          if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1504, __pyx_L3_error)
           __Pyx_GOTREF(__pyx_t_1);
           __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
           __Pyx_DECREF_SET(__pyx_v_c1cp, __pyx_t_1);
           __pyx_t_1 = 0;
 
-          /* "MACS2/IO/ScoreTrack.pyx":1514
+          /* "MACS2/IO/ScoreTrack.pyx":1505
  *                 if c1cp == minp:
  *                     c1cp = c1cpn()
  *                     c1cv = c1cvn()             # <<<<<<<<<<<<<<
@@ -24283,13 +24283,13 @@ static PyObject *__pyx_f_5MACS2_2IO_10ScoreTrack_18TwoConditionScores_build_chro
           }
           __pyx_t_1 = (__pyx_t_2) ? __Pyx_PyObject_CallOneArg(__pyx_t_8, __pyx_t_2) : __Pyx_PyObject_CallNoArg(__pyx_t_8);
           __Pyx_XDECREF(__pyx_t_2); __pyx_t_2 = 0;
-          if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1514, __pyx_L3_error)
+          if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1505, __pyx_L3_error)
           __Pyx_GOTREF(__pyx_t_1);
           __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
           __Pyx_DECREF_SET(__pyx_v_c1cv, __pyx_t_1);
           __pyx_t_1 = 0;
 
-          /* "MACS2/IO/ScoreTrack.pyx":1512
+          /* "MACS2/IO/ScoreTrack.pyx":1503
  *                     c1tp = c1tpn()
  *                     c1tv = c1tvn()
  *                 if c1cp == minp:             # <<<<<<<<<<<<<<
@@ -24298,19 +24298,19 @@ static PyObject *__pyx_f_5MACS2_2IO_10ScoreTrack_18TwoConditionScores_build_chro
  */
         }
 
-        /* "MACS2/IO/ScoreTrack.pyx":1515
+        /* "MACS2/IO/ScoreTrack.pyx":1506
  *                     c1cp = c1cpn()
  *                     c1cv = c1cvn()
  *                 if c2tp == minp:             # <<<<<<<<<<<<<<
  *                     c2tp = c2tpn()
  *                     c2tv = c2tvn()
  */
-        __pyx_t_1 = PyObject_RichCompare(__pyx_v_c2tp, __pyx_v_minp, Py_EQ); __Pyx_XGOTREF(__pyx_t_1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1515, __pyx_L3_error)
-        __pyx_t_10 = __Pyx_PyObject_IsTrue(__pyx_t_1); if (unlikely(__pyx_t_10 < 0)) __PYX_ERR(0, 1515, __pyx_L3_error)
+        __pyx_t_1 = PyObject_RichCompare(__pyx_v_c2tp, __pyx_v_minp, Py_EQ); __Pyx_XGOTREF(__pyx_t_1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1506, __pyx_L3_error)
+        __pyx_t_10 = __Pyx_PyObject_IsTrue(__pyx_t_1); if (unlikely(__pyx_t_10 < 0)) __PYX_ERR(0, 1506, __pyx_L3_error)
         __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
         if (__pyx_t_10) {
 
-          /* "MACS2/IO/ScoreTrack.pyx":1516
+          /* "MACS2/IO/ScoreTrack.pyx":1507
  *                     c1cv = c1cvn()
  *                 if c2tp == minp:
  *                     c2tp = c2tpn()             # <<<<<<<<<<<<<<
@@ -24330,13 +24330,13 @@ static PyObject *__pyx_f_5MACS2_2IO_10ScoreTrack_18TwoConditionScores_build_chro
           }
           __pyx_t_1 = (__pyx_t_2) ? __Pyx_PyObject_CallOneArg(__pyx_t_8, __pyx_t_2) : __Pyx_PyObject_CallNoArg(__pyx_t_8);
           __Pyx_XDECREF(__pyx_t_2); __pyx_t_2 = 0;
-          if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1516, __pyx_L3_error)
+          if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1507, __pyx_L3_error)
           __Pyx_GOTREF(__pyx_t_1);
           __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
           __Pyx_DECREF_SET(__pyx_v_c2tp, __pyx_t_1);
           __pyx_t_1 = 0;
 
-          /* "MACS2/IO/ScoreTrack.pyx":1517
+          /* "MACS2/IO/ScoreTrack.pyx":1508
  *                 if c2tp == minp:
  *                     c2tp = c2tpn()
  *                     c2tv = c2tvn()             # <<<<<<<<<<<<<<
@@ -24356,13 +24356,13 @@ static PyObject *__pyx_f_5MACS2_2IO_10ScoreTrack_18TwoConditionScores_build_chro
           }
           __pyx_t_1 = (__pyx_t_2) ? __Pyx_PyObject_CallOneArg(__pyx_t_8, __pyx_t_2) : __Pyx_PyObject_CallNoArg(__pyx_t_8);
           __Pyx_XDECREF(__pyx_t_2); __pyx_t_2 = 0;
-          if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1517, __pyx_L3_error)
+          if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1508, __pyx_L3_error)
           __Pyx_GOTREF(__pyx_t_1);
           __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
           __Pyx_DECREF_SET(__pyx_v_c2tv, __pyx_t_1);
           __pyx_t_1 = 0;
 
-          /* "MACS2/IO/ScoreTrack.pyx":1515
+          /* "MACS2/IO/ScoreTrack.pyx":1506
  *                     c1cp = c1cpn()
  *                     c1cv = c1cvn()
  *                 if c2tp == minp:             # <<<<<<<<<<<<<<
@@ -24371,19 +24371,19 @@ static PyObject *__pyx_f_5MACS2_2IO_10ScoreTrack_18TwoConditionScores_build_chro
  */
         }
 
-        /* "MACS2/IO/ScoreTrack.pyx":1518
+        /* "MACS2/IO/ScoreTrack.pyx":1509
  *                     c2tp = c2tpn()
  *                     c2tv = c2tvn()
  *                 if c2cp == minp:             # <<<<<<<<<<<<<<
  *                     c2cp = c2cpn()
  *                     c2cv = c2cvn()
  */
-        __pyx_t_1 = PyObject_RichCompare(__pyx_v_c2cp, __pyx_v_minp, Py_EQ); __Pyx_XGOTREF(__pyx_t_1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1518, __pyx_L3_error)
-        __pyx_t_10 = __Pyx_PyObject_IsTrue(__pyx_t_1); if (unlikely(__pyx_t_10 < 0)) __PYX_ERR(0, 1518, __pyx_L3_error)
+        __pyx_t_1 = PyObject_RichCompare(__pyx_v_c2cp, __pyx_v_minp, Py_EQ); __Pyx_XGOTREF(__pyx_t_1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1509, __pyx_L3_error)
+        __pyx_t_10 = __Pyx_PyObject_IsTrue(__pyx_t_1); if (unlikely(__pyx_t_10 < 0)) __PYX_ERR(0, 1509, __pyx_L3_error)
         __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
         if (__pyx_t_10) {
 
-          /* "MACS2/IO/ScoreTrack.pyx":1519
+          /* "MACS2/IO/ScoreTrack.pyx":1510
  *                     c2tv = c2tvn()
  *                 if c2cp == minp:
  *                     c2cp = c2cpn()             # <<<<<<<<<<<<<<
@@ -24403,13 +24403,13 @@ static PyObject *__pyx_f_5MACS2_2IO_10ScoreTrack_18TwoConditionScores_build_chro
           }
           __pyx_t_1 = (__pyx_t_2) ? __Pyx_PyObject_CallOneArg(__pyx_t_8, __pyx_t_2) : __Pyx_PyObject_CallNoArg(__pyx_t_8);
           __Pyx_XDECREF(__pyx_t_2); __pyx_t_2 = 0;
-          if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1519, __pyx_L3_error)
+          if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1510, __pyx_L3_error)
           __Pyx_GOTREF(__pyx_t_1);
           __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
           __Pyx_DECREF_SET(__pyx_v_c2cp, __pyx_t_1);
           __pyx_t_1 = 0;
 
-          /* "MACS2/IO/ScoreTrack.pyx":1520
+          /* "MACS2/IO/ScoreTrack.pyx":1511
  *                 if c2cp == minp:
  *                     c2cp = c2cpn()
  *                     c2cv = c2cvn()             # <<<<<<<<<<<<<<
@@ -24429,13 +24429,13 @@ static PyObject *__pyx_f_5MACS2_2IO_10ScoreTrack_18TwoConditionScores_build_chro
           }
           __pyx_t_1 = (__pyx_t_2) ? __Pyx_PyObject_CallOneArg(__pyx_t_8, __pyx_t_2) : __Pyx_PyObject_CallNoArg(__pyx_t_8);
           __Pyx_XDECREF(__pyx_t_2); __pyx_t_2 = 0;
-          if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1520, __pyx_L3_error)
+          if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1511, __pyx_L3_error)
           __Pyx_GOTREF(__pyx_t_1);
           __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
           __Pyx_DECREF_SET(__pyx_v_c2cv, __pyx_t_1);
           __pyx_t_1 = 0;
 
-          /* "MACS2/IO/ScoreTrack.pyx":1518
+          /* "MACS2/IO/ScoreTrack.pyx":1509
  *                     c2tp = c2tpn()
  *                     c2tv = c2tvn()
  *                 if c2cp == minp:             # <<<<<<<<<<<<<<
@@ -24445,7 +24445,7 @@ static PyObject *__pyx_f_5MACS2_2IO_10ScoreTrack_18TwoConditionScores_build_chro
         }
       }
 
-      /* "MACS2/IO/ScoreTrack.pyx":1492
+      /* "MACS2/IO/ScoreTrack.pyx":1483
  *         pre_p = 0
  * 
  *         try:             # <<<<<<<<<<<<<<
@@ -24465,7 +24465,7 @@ static PyObject *__pyx_f_5MACS2_2IO_10ScoreTrack_18TwoConditionScores_build_chro
     __Pyx_XDECREF(__pyx_t_8); __pyx_t_8 = 0;
     __Pyx_XDECREF(__pyx_t_9); __pyx_t_9 = 0;
 
-    /* "MACS2/IO/ScoreTrack.pyx":1521
+    /* "MACS2/IO/ScoreTrack.pyx":1512
  *                     c2cp = c2cpn()
  *                     c2cv = c2cvn()
  *         except StopIteration:             # <<<<<<<<<<<<<<
@@ -24480,7 +24480,7 @@ static PyObject *__pyx_f_5MACS2_2IO_10ScoreTrack_18TwoConditionScores_build_chro
     goto __pyx_L5_except_error;
     __pyx_L5_except_error:;
 
-    /* "MACS2/IO/ScoreTrack.pyx":1492
+    /* "MACS2/IO/ScoreTrack.pyx":1483
  *         pre_p = 0
  * 
  *         try:             # <<<<<<<<<<<<<<
@@ -24500,7 +24500,7 @@ static PyObject *__pyx_f_5MACS2_2IO_10ScoreTrack_18TwoConditionScores_build_chro
     __pyx_L8_try_end:;
   }
 
-  /* "MACS2/IO/ScoreTrack.pyx":1467
+  /* "MACS2/IO/ScoreTrack.pyx":1458
  * 
  * 
  *     cdef build_chromosome( self, chrname,             # <<<<<<<<<<<<<<
@@ -24545,7 +24545,7 @@ static PyObject *__pyx_f_5MACS2_2IO_10ScoreTrack_18TwoConditionScores_build_chro
   return __pyx_r;
 }
 
-/* "MACS2/IO/ScoreTrack.pyx":1525
+/* "MACS2/IO/ScoreTrack.pyx":1516
  *             pass
  * 
  *     def get_common_chrs ( self ):             # <<<<<<<<<<<<<<
@@ -24566,7 +24566,7 @@ static PyObject *__pyx_pw_5MACS2_2IO_10ScoreTrack_18TwoConditionScores_7get_comm
   return __pyx_r;
 }
 
-/* "MACS2/IO/ScoreTrack.pyx":1530
+/* "MACS2/IO/ScoreTrack.pyx":1521
  *         t2chrs = self.t2bdg.get_chr_names()
  *         c2chrs = self.c2bdg.get_chr_names()
  *         common = reduce(lambda x,y:x.intersection(y), (t1chrs,c1chrs,t2chrs,c2chrs))             # <<<<<<<<<<<<<<
@@ -24606,11 +24606,11 @@ static PyObject *__pyx_pw_5MACS2_2IO_10ScoreTrack_18TwoConditionScores_15get_com
         case  1:
         if (likely((values[1] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_y)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("lambda", 1, 2, 2, 1); __PYX_ERR(0, 1530, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("lambda", 1, 2, 2, 1); __PYX_ERR(0, 1521, __pyx_L3_error)
         }
       }
       if (unlikely(kw_args > 0)) {
-        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "lambda") < 0)) __PYX_ERR(0, 1530, __pyx_L3_error)
+        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "lambda") < 0)) __PYX_ERR(0, 1521, __pyx_L3_error)
       }
     } else if (PyTuple_GET_SIZE(__pyx_args) != 2) {
       goto __pyx_L5_argtuple_error;
@@ -24623,7 +24623,7 @@ static PyObject *__pyx_pw_5MACS2_2IO_10ScoreTrack_18TwoConditionScores_15get_com
   }
   goto __pyx_L4_argument_unpacking_done;
   __pyx_L5_argtuple_error:;
-  __Pyx_RaiseArgtupleInvalid("lambda", 1, 2, 2, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 1530, __pyx_L3_error)
+  __Pyx_RaiseArgtupleInvalid("lambda", 1, 2, 2, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 1521, __pyx_L3_error)
   __pyx_L3_error:;
   __Pyx_AddTraceback("MACS2.IO.ScoreTrack.TwoConditionScores.get_common_chrs.lambda", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __Pyx_RefNannyFinishContext();
@@ -24644,9 +24644,9 @@ static PyObject *__pyx_lambda_funcdef_lambda(CYTHON_UNUSED PyObject *__pyx_self,
   PyObject *__pyx_t_2 = NULL;
   PyObject *__pyx_t_3 = NULL;
   __Pyx_RefNannySetupContext("lambda", 0);
-  __Pyx_TraceCall("lambda", __pyx_f[0], 1530, 0, __PYX_ERR(0, 1530, __pyx_L1_error));
+  __Pyx_TraceCall("lambda", __pyx_f[0], 1521, 0, __PYX_ERR(0, 1521, __pyx_L1_error));
   __Pyx_XDECREF(__pyx_r);
-  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_x, __pyx_n_s_intersection); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1530, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_x, __pyx_n_s_intersection); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1521, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __pyx_t_3 = NULL;
   if (CYTHON_UNPACK_METHODS && likely(PyMethod_Check(__pyx_t_2))) {
@@ -24660,7 +24660,7 @@ static PyObject *__pyx_lambda_funcdef_lambda(CYTHON_UNUSED PyObject *__pyx_self,
   }
   __pyx_t_1 = (__pyx_t_3) ? __Pyx_PyObject_Call2Args(__pyx_t_2, __pyx_t_3, __pyx_v_y) : __Pyx_PyObject_CallOneArg(__pyx_t_2, __pyx_v_y);
   __Pyx_XDECREF(__pyx_t_3); __pyx_t_3 = 0;
-  if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1530, __pyx_L1_error)
+  if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1521, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
   __pyx_r = __pyx_t_1;
@@ -24681,7 +24681,7 @@ static PyObject *__pyx_lambda_funcdef_lambda(CYTHON_UNUSED PyObject *__pyx_self,
   return __pyx_r;
 }
 
-/* "MACS2/IO/ScoreTrack.pyx":1525
+/* "MACS2/IO/ScoreTrack.pyx":1516
  *             pass
  * 
  *     def get_common_chrs ( self ):             # <<<<<<<<<<<<<<
@@ -24706,16 +24706,16 @@ static PyObject *__pyx_pf_5MACS2_2IO_10ScoreTrack_18TwoConditionScores_6get_comm
   int __pyx_t_6;
   PyObject *__pyx_t_7 = NULL;
   __Pyx_RefNannySetupContext("get_common_chrs", 0);
-  __Pyx_TraceCall("get_common_chrs", __pyx_f[0], 1525, 0, __PYX_ERR(0, 1525, __pyx_L1_error));
+  __Pyx_TraceCall("get_common_chrs", __pyx_f[0], 1516, 0, __PYX_ERR(0, 1516, __pyx_L1_error));
 
-  /* "MACS2/IO/ScoreTrack.pyx":1526
+  /* "MACS2/IO/ScoreTrack.pyx":1517
  * 
  *     def get_common_chrs ( self ):
  *         t1chrs = self.t1bdg.get_chr_names()             # <<<<<<<<<<<<<<
  *         c1chrs = self.c1bdg.get_chr_names()
  *         t2chrs = self.t2bdg.get_chr_names()
  */
-  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_self->t1bdg, __pyx_n_s_get_chr_names); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1526, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_self->t1bdg, __pyx_n_s_get_chr_names); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1517, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __pyx_t_3 = NULL;
   if (CYTHON_UNPACK_METHODS && likely(PyMethod_Check(__pyx_t_2))) {
@@ -24729,20 +24729,20 @@ static PyObject *__pyx_pf_5MACS2_2IO_10ScoreTrack_18TwoConditionScores_6get_comm
   }
   __pyx_t_1 = (__pyx_t_3) ? __Pyx_PyObject_CallOneArg(__pyx_t_2, __pyx_t_3) : __Pyx_PyObject_CallNoArg(__pyx_t_2);
   __Pyx_XDECREF(__pyx_t_3); __pyx_t_3 = 0;
-  if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1526, __pyx_L1_error)
+  if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1517, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
   __pyx_v_t1chrs = __pyx_t_1;
   __pyx_t_1 = 0;
 
-  /* "MACS2/IO/ScoreTrack.pyx":1527
+  /* "MACS2/IO/ScoreTrack.pyx":1518
  *     def get_common_chrs ( self ):
  *         t1chrs = self.t1bdg.get_chr_names()
  *         c1chrs = self.c1bdg.get_chr_names()             # <<<<<<<<<<<<<<
  *         t2chrs = self.t2bdg.get_chr_names()
  *         c2chrs = self.c2bdg.get_chr_names()
  */
-  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_self->c1bdg, __pyx_n_s_get_chr_names); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1527, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_self->c1bdg, __pyx_n_s_get_chr_names); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1518, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __pyx_t_3 = NULL;
   if (CYTHON_UNPACK_METHODS && likely(PyMethod_Check(__pyx_t_2))) {
@@ -24756,20 +24756,20 @@ static PyObject *__pyx_pf_5MACS2_2IO_10ScoreTrack_18TwoConditionScores_6get_comm
   }
   __pyx_t_1 = (__pyx_t_3) ? __Pyx_PyObject_CallOneArg(__pyx_t_2, __pyx_t_3) : __Pyx_PyObject_CallNoArg(__pyx_t_2);
   __Pyx_XDECREF(__pyx_t_3); __pyx_t_3 = 0;
-  if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1527, __pyx_L1_error)
+  if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1518, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
   __pyx_v_c1chrs = __pyx_t_1;
   __pyx_t_1 = 0;
 
-  /* "MACS2/IO/ScoreTrack.pyx":1528
+  /* "MACS2/IO/ScoreTrack.pyx":1519
  *         t1chrs = self.t1bdg.get_chr_names()
  *         c1chrs = self.c1bdg.get_chr_names()
  *         t2chrs = self.t2bdg.get_chr_names()             # <<<<<<<<<<<<<<
  *         c2chrs = self.c2bdg.get_chr_names()
  *         common = reduce(lambda x,y:x.intersection(y), (t1chrs,c1chrs,t2chrs,c2chrs))
  */
-  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_self->t2bdg, __pyx_n_s_get_chr_names); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1528, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_self->t2bdg, __pyx_n_s_get_chr_names); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1519, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __pyx_t_3 = NULL;
   if (CYTHON_UNPACK_METHODS && likely(PyMethod_Check(__pyx_t_2))) {
@@ -24783,20 +24783,20 @@ static PyObject *__pyx_pf_5MACS2_2IO_10ScoreTrack_18TwoConditionScores_6get_comm
   }
   __pyx_t_1 = (__pyx_t_3) ? __Pyx_PyObject_CallOneArg(__pyx_t_2, __pyx_t_3) : __Pyx_PyObject_CallNoArg(__pyx_t_2);
   __Pyx_XDECREF(__pyx_t_3); __pyx_t_3 = 0;
-  if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1528, __pyx_L1_error)
+  if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1519, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
   __pyx_v_t2chrs = __pyx_t_1;
   __pyx_t_1 = 0;
 
-  /* "MACS2/IO/ScoreTrack.pyx":1529
+  /* "MACS2/IO/ScoreTrack.pyx":1520
  *         c1chrs = self.c1bdg.get_chr_names()
  *         t2chrs = self.t2bdg.get_chr_names()
  *         c2chrs = self.c2bdg.get_chr_names()             # <<<<<<<<<<<<<<
  *         common = reduce(lambda x,y:x.intersection(y), (t1chrs,c1chrs,t2chrs,c2chrs))
  *         return common
  */
-  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_self->c2bdg, __pyx_n_s_get_chr_names); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1529, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_self->c2bdg, __pyx_n_s_get_chr_names); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1520, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __pyx_t_3 = NULL;
   if (CYTHON_UNPACK_METHODS && likely(PyMethod_Check(__pyx_t_2))) {
@@ -24810,24 +24810,24 @@ static PyObject *__pyx_pf_5MACS2_2IO_10ScoreTrack_18TwoConditionScores_6get_comm
   }
   __pyx_t_1 = (__pyx_t_3) ? __Pyx_PyObject_CallOneArg(__pyx_t_2, __pyx_t_3) : __Pyx_PyObject_CallNoArg(__pyx_t_2);
   __Pyx_XDECREF(__pyx_t_3); __pyx_t_3 = 0;
-  if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1529, __pyx_L1_error)
+  if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1520, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
   __pyx_v_c2chrs = __pyx_t_1;
   __pyx_t_1 = 0;
 
-  /* "MACS2/IO/ScoreTrack.pyx":1530
+  /* "MACS2/IO/ScoreTrack.pyx":1521
  *         t2chrs = self.t2bdg.get_chr_names()
  *         c2chrs = self.c2bdg.get_chr_names()
  *         common = reduce(lambda x,y:x.intersection(y), (t1chrs,c1chrs,t2chrs,c2chrs))             # <<<<<<<<<<<<<<
  *         return common
  * 
  */
-  __Pyx_GetModuleGlobalName(__pyx_t_2, __pyx_n_s_reduce); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1530, __pyx_L1_error)
+  __Pyx_GetModuleGlobalName(__pyx_t_2, __pyx_n_s_reduce); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1521, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
-  __pyx_t_3 = __Pyx_CyFunction_NewEx(&__pyx_mdef_5MACS2_2IO_10ScoreTrack_18TwoConditionScores_15get_common_chrs_lambda, 0, __pyx_n_s_get_common_chrs_locals_lambda, NULL, __pyx_n_s_MACS2_IO_ScoreTrack, __pyx_d, NULL); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 1530, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_CyFunction_NewEx(&__pyx_mdef_5MACS2_2IO_10ScoreTrack_18TwoConditionScores_15get_common_chrs_lambda, 0, __pyx_n_s_get_common_chrs_locals_lambda, NULL, __pyx_n_s_MACS2_IO_ScoreTrack, __pyx_d, NULL); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 1521, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
-  __pyx_t_4 = PyTuple_New(4); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 1530, __pyx_L1_error)
+  __pyx_t_4 = PyTuple_New(4); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 1521, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_4);
   __Pyx_INCREF(__pyx_v_t1chrs);
   __Pyx_GIVEREF(__pyx_v_t1chrs);
@@ -24856,7 +24856,7 @@ static PyObject *__pyx_pf_5MACS2_2IO_10ScoreTrack_18TwoConditionScores_6get_comm
   #if CYTHON_FAST_PYCALL
   if (PyFunction_Check(__pyx_t_2)) {
     PyObject *__pyx_temp[3] = {__pyx_t_5, __pyx_t_3, __pyx_t_4};
-    __pyx_t_1 = __Pyx_PyFunction_FastCall(__pyx_t_2, __pyx_temp+1-__pyx_t_6, 2+__pyx_t_6); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1530, __pyx_L1_error)
+    __pyx_t_1 = __Pyx_PyFunction_FastCall(__pyx_t_2, __pyx_temp+1-__pyx_t_6, 2+__pyx_t_6); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1521, __pyx_L1_error)
     __Pyx_XDECREF(__pyx_t_5); __pyx_t_5 = 0;
     __Pyx_GOTREF(__pyx_t_1);
     __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
@@ -24866,7 +24866,7 @@ static PyObject *__pyx_pf_5MACS2_2IO_10ScoreTrack_18TwoConditionScores_6get_comm
   #if CYTHON_FAST_PYCCALL
   if (__Pyx_PyFastCFunction_Check(__pyx_t_2)) {
     PyObject *__pyx_temp[3] = {__pyx_t_5, __pyx_t_3, __pyx_t_4};
-    __pyx_t_1 = __Pyx_PyCFunction_FastCall(__pyx_t_2, __pyx_temp+1-__pyx_t_6, 2+__pyx_t_6); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1530, __pyx_L1_error)
+    __pyx_t_1 = __Pyx_PyCFunction_FastCall(__pyx_t_2, __pyx_temp+1-__pyx_t_6, 2+__pyx_t_6); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1521, __pyx_L1_error)
     __Pyx_XDECREF(__pyx_t_5); __pyx_t_5 = 0;
     __Pyx_GOTREF(__pyx_t_1);
     __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
@@ -24874,7 +24874,7 @@ static PyObject *__pyx_pf_5MACS2_2IO_10ScoreTrack_18TwoConditionScores_6get_comm
   } else
   #endif
   {
-    __pyx_t_7 = PyTuple_New(2+__pyx_t_6); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 1530, __pyx_L1_error)
+    __pyx_t_7 = PyTuple_New(2+__pyx_t_6); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 1521, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_7);
     if (__pyx_t_5) {
       __Pyx_GIVEREF(__pyx_t_5); PyTuple_SET_ITEM(__pyx_t_7, 0, __pyx_t_5); __pyx_t_5 = NULL;
@@ -24885,7 +24885,7 @@ static PyObject *__pyx_pf_5MACS2_2IO_10ScoreTrack_18TwoConditionScores_6get_comm
     PyTuple_SET_ITEM(__pyx_t_7, 1+__pyx_t_6, __pyx_t_4);
     __pyx_t_3 = 0;
     __pyx_t_4 = 0;
-    __pyx_t_1 = __Pyx_PyObject_Call(__pyx_t_2, __pyx_t_7, NULL); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1530, __pyx_L1_error)
+    __pyx_t_1 = __Pyx_PyObject_Call(__pyx_t_2, __pyx_t_7, NULL); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1521, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
     __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
   }
@@ -24893,7 +24893,7 @@ static PyObject *__pyx_pf_5MACS2_2IO_10ScoreTrack_18TwoConditionScores_6get_comm
   __pyx_v_common = __pyx_t_1;
   __pyx_t_1 = 0;
 
-  /* "MACS2/IO/ScoreTrack.pyx":1531
+  /* "MACS2/IO/ScoreTrack.pyx":1522
  *         c2chrs = self.c2bdg.get_chr_names()
  *         common = reduce(lambda x,y:x.intersection(y), (t1chrs,c1chrs,t2chrs,c2chrs))
  *         return common             # <<<<<<<<<<<<<<
@@ -24905,7 +24905,7 @@ static PyObject *__pyx_pf_5MACS2_2IO_10ScoreTrack_18TwoConditionScores_6get_comm
   __pyx_r = __pyx_v_common;
   goto __pyx_L0;
 
-  /* "MACS2/IO/ScoreTrack.pyx":1525
+  /* "MACS2/IO/ScoreTrack.pyx":1516
  *             pass
  * 
  *     def get_common_chrs ( self ):             # <<<<<<<<<<<<<<
@@ -24935,7 +24935,7 @@ static PyObject *__pyx_pf_5MACS2_2IO_10ScoreTrack_18TwoConditionScores_6get_comm
   return __pyx_r;
 }
 
-/* "MACS2/IO/ScoreTrack.pyx":1533
+/* "MACS2/IO/ScoreTrack.pyx":1524
  *         return common
  * 
  *     cdef add_chromosome ( self, bytes chrom, int chrom_max_len ):             # <<<<<<<<<<<<<<
@@ -24957,9 +24957,9 @@ static PyObject *__pyx_f_5MACS2_2IO_10ScoreTrack_18TwoConditionScores_add_chromo
   PyObject *__pyx_t_8 = NULL;
   PyObject *__pyx_t_9 = NULL;
   __Pyx_RefNannySetupContext("add_chromosome", 0);
-  __Pyx_TraceCall("add_chromosome", __pyx_f[0], 1533, 0, __PYX_ERR(0, 1533, __pyx_L1_error));
+  __Pyx_TraceCall("add_chromosome", __pyx_f[0], 1524, 0, __PYX_ERR(0, 1524, __pyx_L1_error));
 
-  /* "MACS2/IO/ScoreTrack.pyx":1539
+  /* "MACS2/IO/ScoreTrack.pyx":1530
  * 
  *         """
  *         if chrom not in self.data:             # <<<<<<<<<<<<<<
@@ -24968,132 +24968,132 @@ static PyObject *__pyx_f_5MACS2_2IO_10ScoreTrack_18TwoConditionScores_add_chromo
  */
   if (unlikely(__pyx_v_self->data == Py_None)) {
     PyErr_SetString(PyExc_TypeError, "'NoneType' object is not iterable");
-    __PYX_ERR(0, 1539, __pyx_L1_error)
+    __PYX_ERR(0, 1530, __pyx_L1_error)
   }
-  __pyx_t_1 = (__Pyx_PyDict_ContainsTF(__pyx_v_chrom, __pyx_v_self->data, Py_NE)); if (unlikely(__pyx_t_1 < 0)) __PYX_ERR(0, 1539, __pyx_L1_error)
+  __pyx_t_1 = (__Pyx_PyDict_ContainsTF(__pyx_v_chrom, __pyx_v_self->data, Py_NE)); if (unlikely(__pyx_t_1 < 0)) __PYX_ERR(0, 1530, __pyx_L1_error)
   __pyx_t_2 = (__pyx_t_1 != 0);
   if (__pyx_t_2) {
 
-    /* "MACS2/IO/ScoreTrack.pyx":1540
+    /* "MACS2/IO/ScoreTrack.pyx":1531
  *         """
  *         if chrom not in self.data:
  *             self.data[chrom] = [ np.zeros( chrom_max_len, dtype="int32" ), # pos             # <<<<<<<<<<<<<<
  *                                  np.zeros( chrom_max_len, dtype="float32" ), # LLR t1 vs c1
  *                                  np.zeros( chrom_max_len, dtype="float32" ), # LLR t2 vs c2
  */
-    __Pyx_GetModuleGlobalName(__pyx_t_3, __pyx_n_s_np); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 1540, __pyx_L1_error)
+    __Pyx_GetModuleGlobalName(__pyx_t_3, __pyx_n_s_np); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 1531, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_3);
-    __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_t_3, __pyx_n_s_zeros); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 1540, __pyx_L1_error)
+    __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_t_3, __pyx_n_s_zeros); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 1531, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_4);
     __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-    __pyx_t_3 = __Pyx_PyInt_From_int(__pyx_v_chrom_max_len); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 1540, __pyx_L1_error)
+    __pyx_t_3 = __Pyx_PyInt_From_int(__pyx_v_chrom_max_len); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 1531, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_3);
-    __pyx_t_5 = PyTuple_New(1); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 1540, __pyx_L1_error)
+    __pyx_t_5 = PyTuple_New(1); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 1531, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_5);
     __Pyx_GIVEREF(__pyx_t_3);
     PyTuple_SET_ITEM(__pyx_t_5, 0, __pyx_t_3);
     __pyx_t_3 = 0;
-    __pyx_t_3 = __Pyx_PyDict_NewPresized(1); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 1540, __pyx_L1_error)
+    __pyx_t_3 = __Pyx_PyDict_NewPresized(1); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 1531, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_3);
-    if (PyDict_SetItem(__pyx_t_3, __pyx_n_s_dtype, __pyx_n_u_int32) < 0) __PYX_ERR(0, 1540, __pyx_L1_error)
-    __pyx_t_6 = __Pyx_PyObject_Call(__pyx_t_4, __pyx_t_5, __pyx_t_3); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 1540, __pyx_L1_error)
+    if (PyDict_SetItem(__pyx_t_3, __pyx_n_s_dtype, __pyx_n_u_int32) < 0) __PYX_ERR(0, 1531, __pyx_L1_error)
+    __pyx_t_6 = __Pyx_PyObject_Call(__pyx_t_4, __pyx_t_5, __pyx_t_3); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 1531, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_6);
     __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
     __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
     __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
 
-    /* "MACS2/IO/ScoreTrack.pyx":1541
+    /* "MACS2/IO/ScoreTrack.pyx":1532
  *         if chrom not in self.data:
  *             self.data[chrom] = [ np.zeros( chrom_max_len, dtype="int32" ), # pos
  *                                  np.zeros( chrom_max_len, dtype="float32" ), # LLR t1 vs c1             # <<<<<<<<<<<<<<
  *                                  np.zeros( chrom_max_len, dtype="float32" ), # LLR t2 vs c2
  *                                  np.zeros( chrom_max_len, dtype="float32" )] # LLR t1 vs t2
  */
-    __Pyx_GetModuleGlobalName(__pyx_t_3, __pyx_n_s_np); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 1541, __pyx_L1_error)
+    __Pyx_GetModuleGlobalName(__pyx_t_3, __pyx_n_s_np); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 1532, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_3);
-    __pyx_t_5 = __Pyx_PyObject_GetAttrStr(__pyx_t_3, __pyx_n_s_zeros); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 1541, __pyx_L1_error)
+    __pyx_t_5 = __Pyx_PyObject_GetAttrStr(__pyx_t_3, __pyx_n_s_zeros); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 1532, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_5);
     __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-    __pyx_t_3 = __Pyx_PyInt_From_int(__pyx_v_chrom_max_len); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 1541, __pyx_L1_error)
+    __pyx_t_3 = __Pyx_PyInt_From_int(__pyx_v_chrom_max_len); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 1532, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_3);
-    __pyx_t_4 = PyTuple_New(1); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 1541, __pyx_L1_error)
+    __pyx_t_4 = PyTuple_New(1); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 1532, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_4);
     __Pyx_GIVEREF(__pyx_t_3);
     PyTuple_SET_ITEM(__pyx_t_4, 0, __pyx_t_3);
     __pyx_t_3 = 0;
-    __pyx_t_3 = __Pyx_PyDict_NewPresized(1); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 1541, __pyx_L1_error)
+    __pyx_t_3 = __Pyx_PyDict_NewPresized(1); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 1532, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_3);
-    if (PyDict_SetItem(__pyx_t_3, __pyx_n_s_dtype, __pyx_n_u_float32) < 0) __PYX_ERR(0, 1541, __pyx_L1_error)
-    __pyx_t_7 = __Pyx_PyObject_Call(__pyx_t_5, __pyx_t_4, __pyx_t_3); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 1541, __pyx_L1_error)
+    if (PyDict_SetItem(__pyx_t_3, __pyx_n_s_dtype, __pyx_n_u_float32) < 0) __PYX_ERR(0, 1532, __pyx_L1_error)
+    __pyx_t_7 = __Pyx_PyObject_Call(__pyx_t_5, __pyx_t_4, __pyx_t_3); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 1532, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_7);
     __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
     __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
     __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
 
-    /* "MACS2/IO/ScoreTrack.pyx":1542
+    /* "MACS2/IO/ScoreTrack.pyx":1533
  *             self.data[chrom] = [ np.zeros( chrom_max_len, dtype="int32" ), # pos
  *                                  np.zeros( chrom_max_len, dtype="float32" ), # LLR t1 vs c1
  *                                  np.zeros( chrom_max_len, dtype="float32" ), # LLR t2 vs c2             # <<<<<<<<<<<<<<
  *                                  np.zeros( chrom_max_len, dtype="float32" )] # LLR t1 vs t2
  *             self.datalength[chrom] = 0
  */
-    __Pyx_GetModuleGlobalName(__pyx_t_3, __pyx_n_s_np); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 1542, __pyx_L1_error)
+    __Pyx_GetModuleGlobalName(__pyx_t_3, __pyx_n_s_np); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 1533, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_3);
-    __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_t_3, __pyx_n_s_zeros); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 1542, __pyx_L1_error)
+    __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_t_3, __pyx_n_s_zeros); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 1533, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_4);
     __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-    __pyx_t_3 = __Pyx_PyInt_From_int(__pyx_v_chrom_max_len); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 1542, __pyx_L1_error)
+    __pyx_t_3 = __Pyx_PyInt_From_int(__pyx_v_chrom_max_len); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 1533, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_3);
-    __pyx_t_5 = PyTuple_New(1); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 1542, __pyx_L1_error)
+    __pyx_t_5 = PyTuple_New(1); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 1533, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_5);
     __Pyx_GIVEREF(__pyx_t_3);
     PyTuple_SET_ITEM(__pyx_t_5, 0, __pyx_t_3);
     __pyx_t_3 = 0;
-    __pyx_t_3 = __Pyx_PyDict_NewPresized(1); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 1542, __pyx_L1_error)
+    __pyx_t_3 = __Pyx_PyDict_NewPresized(1); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 1533, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_3);
-    if (PyDict_SetItem(__pyx_t_3, __pyx_n_s_dtype, __pyx_n_u_float32) < 0) __PYX_ERR(0, 1542, __pyx_L1_error)
-    __pyx_t_8 = __Pyx_PyObject_Call(__pyx_t_4, __pyx_t_5, __pyx_t_3); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 1542, __pyx_L1_error)
+    if (PyDict_SetItem(__pyx_t_3, __pyx_n_s_dtype, __pyx_n_u_float32) < 0) __PYX_ERR(0, 1533, __pyx_L1_error)
+    __pyx_t_8 = __Pyx_PyObject_Call(__pyx_t_4, __pyx_t_5, __pyx_t_3); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 1533, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_8);
     __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
     __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
     __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
 
-    /* "MACS2/IO/ScoreTrack.pyx":1543
+    /* "MACS2/IO/ScoreTrack.pyx":1534
  *                                  np.zeros( chrom_max_len, dtype="float32" ), # LLR t1 vs c1
  *                                  np.zeros( chrom_max_len, dtype="float32" ), # LLR t2 vs c2
  *                                  np.zeros( chrom_max_len, dtype="float32" )] # LLR t1 vs t2             # <<<<<<<<<<<<<<
  *             self.datalength[chrom] = 0
  * 
  */
-    __Pyx_GetModuleGlobalName(__pyx_t_3, __pyx_n_s_np); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 1543, __pyx_L1_error)
+    __Pyx_GetModuleGlobalName(__pyx_t_3, __pyx_n_s_np); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 1534, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_3);
-    __pyx_t_5 = __Pyx_PyObject_GetAttrStr(__pyx_t_3, __pyx_n_s_zeros); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 1543, __pyx_L1_error)
+    __pyx_t_5 = __Pyx_PyObject_GetAttrStr(__pyx_t_3, __pyx_n_s_zeros); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 1534, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_5);
     __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-    __pyx_t_3 = __Pyx_PyInt_From_int(__pyx_v_chrom_max_len); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 1543, __pyx_L1_error)
+    __pyx_t_3 = __Pyx_PyInt_From_int(__pyx_v_chrom_max_len); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 1534, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_3);
-    __pyx_t_4 = PyTuple_New(1); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 1543, __pyx_L1_error)
+    __pyx_t_4 = PyTuple_New(1); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 1534, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_4);
     __Pyx_GIVEREF(__pyx_t_3);
     PyTuple_SET_ITEM(__pyx_t_4, 0, __pyx_t_3);
     __pyx_t_3 = 0;
-    __pyx_t_3 = __Pyx_PyDict_NewPresized(1); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 1543, __pyx_L1_error)
+    __pyx_t_3 = __Pyx_PyDict_NewPresized(1); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 1534, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_3);
-    if (PyDict_SetItem(__pyx_t_3, __pyx_n_s_dtype, __pyx_n_u_float32) < 0) __PYX_ERR(0, 1543, __pyx_L1_error)
-    __pyx_t_9 = __Pyx_PyObject_Call(__pyx_t_5, __pyx_t_4, __pyx_t_3); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 1543, __pyx_L1_error)
+    if (PyDict_SetItem(__pyx_t_3, __pyx_n_s_dtype, __pyx_n_u_float32) < 0) __PYX_ERR(0, 1534, __pyx_L1_error)
+    __pyx_t_9 = __Pyx_PyObject_Call(__pyx_t_5, __pyx_t_4, __pyx_t_3); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 1534, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_9);
     __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
     __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
     __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
 
-    /* "MACS2/IO/ScoreTrack.pyx":1540
+    /* "MACS2/IO/ScoreTrack.pyx":1531
  *         """
  *         if chrom not in self.data:
  *             self.data[chrom] = [ np.zeros( chrom_max_len, dtype="int32" ), # pos             # <<<<<<<<<<<<<<
  *                                  np.zeros( chrom_max_len, dtype="float32" ), # LLR t1 vs c1
  *                                  np.zeros( chrom_max_len, dtype="float32" ), # LLR t2 vs c2
  */
-    __pyx_t_3 = PyList_New(4); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 1540, __pyx_L1_error)
+    __pyx_t_3 = PyList_New(4); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 1531, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_3);
     __Pyx_GIVEREF(__pyx_t_6);
     PyList_SET_ITEM(__pyx_t_3, 0, __pyx_t_6);
@@ -25109,12 +25109,12 @@ static PyObject *__pyx_f_5MACS2_2IO_10ScoreTrack_18TwoConditionScores_add_chromo
     __pyx_t_9 = 0;
     if (unlikely(__pyx_v_self->data == Py_None)) {
       PyErr_SetString(PyExc_TypeError, "'NoneType' object is not subscriptable");
-      __PYX_ERR(0, 1540, __pyx_L1_error)
+      __PYX_ERR(0, 1531, __pyx_L1_error)
     }
-    if (unlikely(PyDict_SetItem(__pyx_v_self->data, __pyx_v_chrom, __pyx_t_3) < 0)) __PYX_ERR(0, 1540, __pyx_L1_error)
+    if (unlikely(PyDict_SetItem(__pyx_v_self->data, __pyx_v_chrom, __pyx_t_3) < 0)) __PYX_ERR(0, 1531, __pyx_L1_error)
     __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
 
-    /* "MACS2/IO/ScoreTrack.pyx":1544
+    /* "MACS2/IO/ScoreTrack.pyx":1535
  *                                  np.zeros( chrom_max_len, dtype="float32" ), # LLR t2 vs c2
  *                                  np.zeros( chrom_max_len, dtype="float32" )] # LLR t1 vs t2
  *             self.datalength[chrom] = 0             # <<<<<<<<<<<<<<
@@ -25123,11 +25123,11 @@ static PyObject *__pyx_f_5MACS2_2IO_10ScoreTrack_18TwoConditionScores_add_chromo
  */
     if (unlikely(__pyx_v_self->datalength == Py_None)) {
       PyErr_SetString(PyExc_TypeError, "'NoneType' object is not subscriptable");
-      __PYX_ERR(0, 1544, __pyx_L1_error)
+      __PYX_ERR(0, 1535, __pyx_L1_error)
     }
-    if (unlikely(PyDict_SetItem(__pyx_v_self->datalength, __pyx_v_chrom, __pyx_int_0) < 0)) __PYX_ERR(0, 1544, __pyx_L1_error)
+    if (unlikely(PyDict_SetItem(__pyx_v_self->datalength, __pyx_v_chrom, __pyx_int_0) < 0)) __PYX_ERR(0, 1535, __pyx_L1_error)
 
-    /* "MACS2/IO/ScoreTrack.pyx":1539
+    /* "MACS2/IO/ScoreTrack.pyx":1530
  * 
  *         """
  *         if chrom not in self.data:             # <<<<<<<<<<<<<<
@@ -25136,7 +25136,7 @@ static PyObject *__pyx_f_5MACS2_2IO_10ScoreTrack_18TwoConditionScores_add_chromo
  */
   }
 
-  /* "MACS2/IO/ScoreTrack.pyx":1533
+  /* "MACS2/IO/ScoreTrack.pyx":1524
  *         return common
  * 
  *     cdef add_chromosome ( self, bytes chrom, int chrom_max_len ):             # <<<<<<<<<<<<<<
@@ -25164,7 +25164,7 @@ static PyObject *__pyx_f_5MACS2_2IO_10ScoreTrack_18TwoConditionScores_add_chromo
   return __pyx_r;
 }
 
-/* "MACS2/IO/ScoreTrack.pyx":1546
+/* "MACS2/IO/ScoreTrack.pyx":1537
  *             self.datalength[chrom] = 0
  * 
  *     cdef add (self, bytes chromosome, int endpos, float t1, float c1, float t2, float c2):             # <<<<<<<<<<<<<<
@@ -25184,9 +25184,9 @@ static PyObject *__pyx_f_5MACS2_2IO_10ScoreTrack_18TwoConditionScores_add(struct
   PyObject *__pyx_t_4 = NULL;
   PyObject *__pyx_t_5 = NULL;
   __Pyx_RefNannySetupContext("add", 0);
-  __Pyx_TraceCall("add", __pyx_f[0], 1546, 0, __PYX_ERR(0, 1546, __pyx_L1_error));
+  __Pyx_TraceCall("add", __pyx_f[0], 1537, 0, __PYX_ERR(0, 1537, __pyx_L1_error));
 
-  /* "MACS2/IO/ScoreTrack.pyx":1561
+  /* "MACS2/IO/ScoreTrack.pyx":1552
  *         """
  *         cdef int i
  *         i = self.datalength[chromosome]             # <<<<<<<<<<<<<<
@@ -25195,15 +25195,15 @@ static PyObject *__pyx_f_5MACS2_2IO_10ScoreTrack_18TwoConditionScores_add(struct
  */
   if (unlikely(__pyx_v_self->datalength == Py_None)) {
     PyErr_SetString(PyExc_TypeError, "'NoneType' object is not subscriptable");
-    __PYX_ERR(0, 1561, __pyx_L1_error)
+    __PYX_ERR(0, 1552, __pyx_L1_error)
   }
-  __pyx_t_1 = __Pyx_PyDict_GetItem(__pyx_v_self->datalength, __pyx_v_chromosome); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1561, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyDict_GetItem(__pyx_v_self->datalength, __pyx_v_chromosome); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1552, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_2 = __Pyx_PyInt_As_int(__pyx_t_1); if (unlikely((__pyx_t_2 == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 1561, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyInt_As_int(__pyx_t_1); if (unlikely((__pyx_t_2 == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 1552, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   __pyx_v_i = __pyx_t_2;
 
-  /* "MACS2/IO/ScoreTrack.pyx":1562
+  /* "MACS2/IO/ScoreTrack.pyx":1553
  *         cdef int i
  *         i = self.datalength[chromosome]
  *         c = self.data[chromosome]             # <<<<<<<<<<<<<<
@@ -25212,74 +25212,74 @@ static PyObject *__pyx_f_5MACS2_2IO_10ScoreTrack_18TwoConditionScores_add(struct
  */
   if (unlikely(__pyx_v_self->data == Py_None)) {
     PyErr_SetString(PyExc_TypeError, "'NoneType' object is not subscriptable");
-    __PYX_ERR(0, 1562, __pyx_L1_error)
+    __PYX_ERR(0, 1553, __pyx_L1_error)
   }
-  __pyx_t_1 = __Pyx_PyDict_GetItem(__pyx_v_self->data, __pyx_v_chromosome); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1562, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyDict_GetItem(__pyx_v_self->data, __pyx_v_chromosome); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1553, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __pyx_v_c = __pyx_t_1;
   __pyx_t_1 = 0;
 
-  /* "MACS2/IO/ScoreTrack.pyx":1563
+  /* "MACS2/IO/ScoreTrack.pyx":1554
  *         i = self.datalength[chromosome]
  *         c = self.data[chromosome]
  *         c[0][ i ] = endpos             # <<<<<<<<<<<<<<
  *         c[1][ i ] = logLR_asym( (t1+self.pseudocount)*self.cond1_factor, (c1+self.pseudocount)*self.cond1_factor )
  *         c[2][ i ] = logLR_asym( (t2+self.pseudocount)*self.cond2_factor, (c2+self.pseudocount)*self.cond2_factor )
  */
-  __pyx_t_1 = __Pyx_PyInt_From_int(__pyx_v_endpos); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1563, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyInt_From_int(__pyx_v_endpos); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1554, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_3 = __Pyx_GetItemInt(__pyx_v_c, 0, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 1563, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_GetItemInt(__pyx_v_c, 0, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 1554, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
-  if (unlikely(__Pyx_SetItemInt(__pyx_t_3, __pyx_v_i, __pyx_t_1, int, 1, __Pyx_PyInt_From_int, 0, 1, 1) < 0)) __PYX_ERR(0, 1563, __pyx_L1_error)
+  if (unlikely(__Pyx_SetItemInt(__pyx_t_3, __pyx_v_i, __pyx_t_1, int, 1, __Pyx_PyInt_From_int, 0, 1, 1) < 0)) __PYX_ERR(0, 1554, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-  /* "MACS2/IO/ScoreTrack.pyx":1564
+  /* "MACS2/IO/ScoreTrack.pyx":1555
  *         c = self.data[chromosome]
  *         c[0][ i ] = endpos
  *         c[1][ i ] = logLR_asym( (t1+self.pseudocount)*self.cond1_factor, (c1+self.pseudocount)*self.cond1_factor )             # <<<<<<<<<<<<<<
  *         c[2][ i ] = logLR_asym( (t2+self.pseudocount)*self.cond2_factor, (c2+self.pseudocount)*self.cond2_factor )
  *         c[3][ i ] = logLR_sym( (t1+self.pseudocount)*self.cond1_factor, (t2+self.pseudocount)*self.cond2_factor )
  */
-  __pyx_t_1 = PyFloat_FromDouble(__pyx_f_5MACS2_2IO_10ScoreTrack_logLR_asym(((__pyx_v_t1 + __pyx_v_self->pseudocount) * __pyx_v_self->cond1_factor), ((__pyx_v_c1 + __pyx_v_self->pseudocount) * __pyx_v_self->cond1_factor))); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1564, __pyx_L1_error)
+  __pyx_t_1 = PyFloat_FromDouble(__pyx_f_5MACS2_2IO_10ScoreTrack_logLR_asym(((__pyx_v_t1 + __pyx_v_self->pseudocount) * __pyx_v_self->cond1_factor), ((__pyx_v_c1 + __pyx_v_self->pseudocount) * __pyx_v_self->cond1_factor))); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1555, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_3 = __Pyx_GetItemInt(__pyx_v_c, 1, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 1564, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_GetItemInt(__pyx_v_c, 1, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 1555, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
-  if (unlikely(__Pyx_SetItemInt(__pyx_t_3, __pyx_v_i, __pyx_t_1, int, 1, __Pyx_PyInt_From_int, 0, 1, 1) < 0)) __PYX_ERR(0, 1564, __pyx_L1_error)
+  if (unlikely(__Pyx_SetItemInt(__pyx_t_3, __pyx_v_i, __pyx_t_1, int, 1, __Pyx_PyInt_From_int, 0, 1, 1) < 0)) __PYX_ERR(0, 1555, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-  /* "MACS2/IO/ScoreTrack.pyx":1565
+  /* "MACS2/IO/ScoreTrack.pyx":1556
  *         c[0][ i ] = endpos
  *         c[1][ i ] = logLR_asym( (t1+self.pseudocount)*self.cond1_factor, (c1+self.pseudocount)*self.cond1_factor )
  *         c[2][ i ] = logLR_asym( (t2+self.pseudocount)*self.cond2_factor, (c2+self.pseudocount)*self.cond2_factor )             # <<<<<<<<<<<<<<
  *         c[3][ i ] = logLR_sym( (t1+self.pseudocount)*self.cond1_factor, (t2+self.pseudocount)*self.cond2_factor )
  *         self.datalength[chromosome] += 1
  */
-  __pyx_t_1 = PyFloat_FromDouble(__pyx_f_5MACS2_2IO_10ScoreTrack_logLR_asym(((__pyx_v_t2 + __pyx_v_self->pseudocount) * __pyx_v_self->cond2_factor), ((__pyx_v_c2 + __pyx_v_self->pseudocount) * __pyx_v_self->cond2_factor))); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1565, __pyx_L1_error)
+  __pyx_t_1 = PyFloat_FromDouble(__pyx_f_5MACS2_2IO_10ScoreTrack_logLR_asym(((__pyx_v_t2 + __pyx_v_self->pseudocount) * __pyx_v_self->cond2_factor), ((__pyx_v_c2 + __pyx_v_self->pseudocount) * __pyx_v_self->cond2_factor))); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1556, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_3 = __Pyx_GetItemInt(__pyx_v_c, 2, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 1565, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_GetItemInt(__pyx_v_c, 2, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 1556, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
-  if (unlikely(__Pyx_SetItemInt(__pyx_t_3, __pyx_v_i, __pyx_t_1, int, 1, __Pyx_PyInt_From_int, 0, 1, 1) < 0)) __PYX_ERR(0, 1565, __pyx_L1_error)
+  if (unlikely(__Pyx_SetItemInt(__pyx_t_3, __pyx_v_i, __pyx_t_1, int, 1, __Pyx_PyInt_From_int, 0, 1, 1) < 0)) __PYX_ERR(0, 1556, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-  /* "MACS2/IO/ScoreTrack.pyx":1566
+  /* "MACS2/IO/ScoreTrack.pyx":1557
  *         c[1][ i ] = logLR_asym( (t1+self.pseudocount)*self.cond1_factor, (c1+self.pseudocount)*self.cond1_factor )
  *         c[2][ i ] = logLR_asym( (t2+self.pseudocount)*self.cond2_factor, (c2+self.pseudocount)*self.cond2_factor )
  *         c[3][ i ] = logLR_sym( (t1+self.pseudocount)*self.cond1_factor, (t2+self.pseudocount)*self.cond2_factor )             # <<<<<<<<<<<<<<
  *         self.datalength[chromosome] += 1
  * 
  */
-  __pyx_t_1 = PyFloat_FromDouble(__pyx_f_5MACS2_2IO_10ScoreTrack_logLR_sym(((__pyx_v_t1 + __pyx_v_self->pseudocount) * __pyx_v_self->cond1_factor), ((__pyx_v_t2 + __pyx_v_self->pseudocount) * __pyx_v_self->cond2_factor))); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1566, __pyx_L1_error)
+  __pyx_t_1 = PyFloat_FromDouble(__pyx_f_5MACS2_2IO_10ScoreTrack_logLR_sym(((__pyx_v_t1 + __pyx_v_self->pseudocount) * __pyx_v_self->cond1_factor), ((__pyx_v_t2 + __pyx_v_self->pseudocount) * __pyx_v_self->cond2_factor))); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1557, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_3 = __Pyx_GetItemInt(__pyx_v_c, 3, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 1566, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_GetItemInt(__pyx_v_c, 3, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 1557, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
-  if (unlikely(__Pyx_SetItemInt(__pyx_t_3, __pyx_v_i, __pyx_t_1, int, 1, __Pyx_PyInt_From_int, 0, 1, 1) < 0)) __PYX_ERR(0, 1566, __pyx_L1_error)
+  if (unlikely(__Pyx_SetItemInt(__pyx_t_3, __pyx_v_i, __pyx_t_1, int, 1, __Pyx_PyInt_From_int, 0, 1, 1) < 0)) __PYX_ERR(0, 1557, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-  /* "MACS2/IO/ScoreTrack.pyx":1567
+  /* "MACS2/IO/ScoreTrack.pyx":1558
  *         c[2][ i ] = logLR_asym( (t2+self.pseudocount)*self.cond2_factor, (c2+self.pseudocount)*self.cond2_factor )
  *         c[3][ i ] = logLR_sym( (t1+self.pseudocount)*self.cond1_factor, (t2+self.pseudocount)*self.cond2_factor )
  *         self.datalength[chromosome] += 1             # <<<<<<<<<<<<<<
@@ -25288,7 +25288,7 @@ static PyObject *__pyx_f_5MACS2_2IO_10ScoreTrack_18TwoConditionScores_add(struct
  */
   if (unlikely(__pyx_v_self->datalength == Py_None)) {
     PyErr_SetString(PyExc_TypeError, "'NoneType' object is not subscriptable");
-    __PYX_ERR(0, 1567, __pyx_L1_error)
+    __PYX_ERR(0, 1558, __pyx_L1_error)
   }
   __Pyx_INCREF(__pyx_v_self->datalength);
   __pyx_t_4 = __pyx_v_self->datalength;
@@ -25296,23 +25296,23 @@ static PyObject *__pyx_f_5MACS2_2IO_10ScoreTrack_18TwoConditionScores_add(struct
   __pyx_t_5 = __pyx_v_chromosome;
   if (unlikely(__pyx_t_4 == Py_None)) {
     PyErr_SetString(PyExc_TypeError, "'NoneType' object is not subscriptable");
-    __PYX_ERR(0, 1567, __pyx_L1_error)
+    __PYX_ERR(0, 1558, __pyx_L1_error)
   }
-  __pyx_t_1 = __Pyx_PyDict_GetItem(__pyx_t_4, __pyx_t_5); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1567, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyDict_GetItem(__pyx_t_4, __pyx_t_5); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1558, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_3 = __Pyx_PyInt_AddObjC(__pyx_t_1, __pyx_int_1, 1, 1, 0); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 1567, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_PyInt_AddObjC(__pyx_t_1, __pyx_int_1, 1, 1, 0); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 1558, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   if (unlikely(__pyx_t_4 == Py_None)) {
     PyErr_SetString(PyExc_TypeError, "'NoneType' object is not subscriptable");
-    __PYX_ERR(0, 1567, __pyx_L1_error)
+    __PYX_ERR(0, 1558, __pyx_L1_error)
   }
-  if (unlikely(PyDict_SetItem(__pyx_t_4, __pyx_t_5, __pyx_t_3) < 0)) __PYX_ERR(0, 1567, __pyx_L1_error)
+  if (unlikely(PyDict_SetItem(__pyx_t_4, __pyx_t_5, __pyx_t_3) < 0)) __PYX_ERR(0, 1558, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
   __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
   __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
 
-  /* "MACS2/IO/ScoreTrack.pyx":1546
+  /* "MACS2/IO/ScoreTrack.pyx":1537
  *             self.datalength[chrom] = 0
  * 
  *     cdef add (self, bytes chromosome, int endpos, float t1, float c1, float t2, float c2):             # <<<<<<<<<<<<<<
@@ -25338,7 +25338,7 @@ static PyObject *__pyx_f_5MACS2_2IO_10ScoreTrack_18TwoConditionScores_add(struct
   return __pyx_r;
 }
 
-/* "MACS2/IO/ScoreTrack.pyx":1569
+/* "MACS2/IO/ScoreTrack.pyx":1560
  *         self.datalength[chromosome] += 1
  * 
  *     cpdef finalize ( self ):             # <<<<<<<<<<<<<<
@@ -25364,7 +25364,7 @@ static PyObject *__pyx_f_5MACS2_2IO_10ScoreTrack_18TwoConditionScores_finalize(s
   int __pyx_t_8;
   PyObject *__pyx_t_9 = NULL;
   __Pyx_RefNannySetupContext("finalize", 0);
-  __Pyx_TraceCall("finalize", __pyx_f[0], 1569, 0, __PYX_ERR(0, 1569, __pyx_L1_error));
+  __Pyx_TraceCall("finalize", __pyx_f[0], 1560, 0, __PYX_ERR(0, 1560, __pyx_L1_error));
   /* Check if called by wrapper */
   if (unlikely(__pyx_skip_dispatch)) ;
   /* Check if overridden in Python */
@@ -25374,7 +25374,7 @@ static PyObject *__pyx_f_5MACS2_2IO_10ScoreTrack_18TwoConditionScores_finalize(s
     if (unlikely(!__Pyx_object_dict_version_matches(((PyObject *)__pyx_v_self), __pyx_tp_dict_version, __pyx_obj_dict_version))) {
       PY_UINT64_T __pyx_type_dict_guard = __Pyx_get_tp_dict_version(((PyObject *)__pyx_v_self));
       #endif
-      __pyx_t_1 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_v_self), __pyx_n_s_finalize); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1569, __pyx_L1_error)
+      __pyx_t_1 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_v_self), __pyx_n_s_finalize); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1560, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_1);
       if (!PyCFunction_Check(__pyx_t_1) || (PyCFunction_GET_FUNCTION(__pyx_t_1) != (PyCFunction)(void*)__pyx_pw_5MACS2_2IO_10ScoreTrack_18TwoConditionScores_9finalize)) {
         __Pyx_XDECREF(__pyx_r);
@@ -25391,7 +25391,7 @@ static PyObject *__pyx_f_5MACS2_2IO_10ScoreTrack_18TwoConditionScores_finalize(s
         }
         __pyx_t_2 = (__pyx_t_4) ? __Pyx_PyObject_CallOneArg(__pyx_t_3, __pyx_t_4) : __Pyx_PyObject_CallNoArg(__pyx_t_3);
         __Pyx_XDECREF(__pyx_t_4); __pyx_t_4 = 0;
-        if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1569, __pyx_L1_error)
+        if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1560, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_2);
         __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
         __pyx_r = __pyx_t_2;
@@ -25412,7 +25412,7 @@ static PyObject *__pyx_f_5MACS2_2IO_10ScoreTrack_18TwoConditionScores_finalize(s
     #endif
   }
 
-  /* "MACS2/IO/ScoreTrack.pyx":1578
+  /* "MACS2/IO/ScoreTrack.pyx":1569
  *             int l
  * 
  *         for chrom in self.data.keys():             # <<<<<<<<<<<<<<
@@ -25422,9 +25422,9 @@ static PyObject *__pyx_f_5MACS2_2IO_10ScoreTrack_18TwoConditionScores_finalize(s
   __pyx_t_5 = 0;
   if (unlikely(__pyx_v_self->data == Py_None)) {
     PyErr_Format(PyExc_AttributeError, "'NoneType' object has no attribute '%.30s'", "keys");
-    __PYX_ERR(0, 1578, __pyx_L1_error)
+    __PYX_ERR(0, 1569, __pyx_L1_error)
   }
-  __pyx_t_2 = __Pyx_dict_iterator(__pyx_v_self->data, 1, __pyx_n_s_keys, (&__pyx_t_6), (&__pyx_t_7)); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1578, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_dict_iterator(__pyx_v_self->data, 1, __pyx_n_s_keys, (&__pyx_t_6), (&__pyx_t_7)); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1569, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __Pyx_XDECREF(__pyx_t_1);
   __pyx_t_1 = __pyx_t_2;
@@ -25432,13 +25432,13 @@ static PyObject *__pyx_f_5MACS2_2IO_10ScoreTrack_18TwoConditionScores_finalize(s
   while (1) {
     __pyx_t_8 = __Pyx_dict_iter_next(__pyx_t_1, __pyx_t_6, &__pyx_t_5, &__pyx_t_2, NULL, NULL, __pyx_t_7);
     if (unlikely(__pyx_t_8 == 0)) break;
-    if (unlikely(__pyx_t_8 == -1)) __PYX_ERR(0, 1578, __pyx_L1_error)
+    if (unlikely(__pyx_t_8 == -1)) __PYX_ERR(0, 1569, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
-    if (!(likely(PyBytes_CheckExact(__pyx_t_2))||((__pyx_t_2) == Py_None)||(PyErr_Format(PyExc_TypeError, "Expected %.16s, got %.200s", "bytes", Py_TYPE(__pyx_t_2)->tp_name), 0))) __PYX_ERR(0, 1578, __pyx_L1_error)
+    if (!(likely(PyBytes_CheckExact(__pyx_t_2))||((__pyx_t_2) == Py_None)||(PyErr_Format(PyExc_TypeError, "Expected %.16s, got %.200s", "bytes", Py_TYPE(__pyx_t_2)->tp_name), 0))) __PYX_ERR(0, 1569, __pyx_L1_error)
     __Pyx_XDECREF_SET(__pyx_v_chrom, ((PyObject*)__pyx_t_2));
     __pyx_t_2 = 0;
 
-    /* "MACS2/IO/ScoreTrack.pyx":1579
+    /* "MACS2/IO/ScoreTrack.pyx":1570
  * 
  *         for chrom in self.data.keys():
  *             d = self.data[chrom]             # <<<<<<<<<<<<<<
@@ -25447,14 +25447,14 @@ static PyObject *__pyx_f_5MACS2_2IO_10ScoreTrack_18TwoConditionScores_finalize(s
  */
     if (unlikely(__pyx_v_self->data == Py_None)) {
       PyErr_SetString(PyExc_TypeError, "'NoneType' object is not subscriptable");
-      __PYX_ERR(0, 1579, __pyx_L1_error)
+      __PYX_ERR(0, 1570, __pyx_L1_error)
     }
-    __pyx_t_2 = __Pyx_PyDict_GetItem(__pyx_v_self->data, __pyx_v_chrom); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1579, __pyx_L1_error)
+    __pyx_t_2 = __Pyx_PyDict_GetItem(__pyx_v_self->data, __pyx_v_chrom); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1570, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
     __Pyx_XDECREF_SET(__pyx_v_d, __pyx_t_2);
     __pyx_t_2 = 0;
 
-    /* "MACS2/IO/ScoreTrack.pyx":1580
+    /* "MACS2/IO/ScoreTrack.pyx":1571
  *         for chrom in self.data.keys():
  *             d = self.data[chrom]
  *             l = self.datalength[chrom]             # <<<<<<<<<<<<<<
@@ -25463,124 +25463,124 @@ static PyObject *__pyx_f_5MACS2_2IO_10ScoreTrack_18TwoConditionScores_finalize(s
  */
     if (unlikely(__pyx_v_self->datalength == Py_None)) {
       PyErr_SetString(PyExc_TypeError, "'NoneType' object is not subscriptable");
-      __PYX_ERR(0, 1580, __pyx_L1_error)
+      __PYX_ERR(0, 1571, __pyx_L1_error)
     }
-    __pyx_t_2 = __Pyx_PyDict_GetItem(__pyx_v_self->datalength, __pyx_v_chrom); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1580, __pyx_L1_error)
+    __pyx_t_2 = __Pyx_PyDict_GetItem(__pyx_v_self->datalength, __pyx_v_chrom); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1571, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
-    __pyx_t_8 = __Pyx_PyInt_As_int(__pyx_t_2); if (unlikely((__pyx_t_8 == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 1580, __pyx_L1_error)
+    __pyx_t_8 = __Pyx_PyInt_As_int(__pyx_t_2); if (unlikely((__pyx_t_8 == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 1571, __pyx_L1_error)
     __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
     __pyx_v_l = __pyx_t_8;
 
-    /* "MACS2/IO/ScoreTrack.pyx":1581
+    /* "MACS2/IO/ScoreTrack.pyx":1572
  *             d = self.data[chrom]
  *             l = self.datalength[chrom]
  *             d[0].resize( l, refcheck = False )             # <<<<<<<<<<<<<<
  *             d[1].resize( l, refcheck = False )
  *             d[2].resize( l, refcheck = False )
  */
-    __pyx_t_2 = __Pyx_GetItemInt(__pyx_v_d, 0, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1581, __pyx_L1_error)
+    __pyx_t_2 = __Pyx_GetItemInt(__pyx_v_d, 0, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1572, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
-    __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_t_2, __pyx_n_s_resize); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 1581, __pyx_L1_error)
+    __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_t_2, __pyx_n_s_resize); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 1572, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_3);
     __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-    __pyx_t_2 = __Pyx_PyInt_From_int(__pyx_v_l); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1581, __pyx_L1_error)
+    __pyx_t_2 = __Pyx_PyInt_From_int(__pyx_v_l); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1572, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
-    __pyx_t_4 = PyTuple_New(1); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 1581, __pyx_L1_error)
+    __pyx_t_4 = PyTuple_New(1); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 1572, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_4);
     __Pyx_GIVEREF(__pyx_t_2);
     PyTuple_SET_ITEM(__pyx_t_4, 0, __pyx_t_2);
     __pyx_t_2 = 0;
-    __pyx_t_2 = __Pyx_PyDict_NewPresized(1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1581, __pyx_L1_error)
+    __pyx_t_2 = __Pyx_PyDict_NewPresized(1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1572, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
-    if (PyDict_SetItem(__pyx_t_2, __pyx_n_s_refcheck, Py_False) < 0) __PYX_ERR(0, 1581, __pyx_L1_error)
-    __pyx_t_9 = __Pyx_PyObject_Call(__pyx_t_3, __pyx_t_4, __pyx_t_2); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 1581, __pyx_L1_error)
+    if (PyDict_SetItem(__pyx_t_2, __pyx_n_s_refcheck, Py_False) < 0) __PYX_ERR(0, 1572, __pyx_L1_error)
+    __pyx_t_9 = __Pyx_PyObject_Call(__pyx_t_3, __pyx_t_4, __pyx_t_2); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 1572, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_9);
     __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
     __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
     __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
     __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
 
-    /* "MACS2/IO/ScoreTrack.pyx":1582
+    /* "MACS2/IO/ScoreTrack.pyx":1573
  *             l = self.datalength[chrom]
  *             d[0].resize( l, refcheck = False )
  *             d[1].resize( l, refcheck = False )             # <<<<<<<<<<<<<<
  *             d[2].resize( l, refcheck = False )
  *             d[3].resize( l, refcheck = False )
  */
-    __pyx_t_9 = __Pyx_GetItemInt(__pyx_v_d, 1, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 1582, __pyx_L1_error)
+    __pyx_t_9 = __Pyx_GetItemInt(__pyx_v_d, 1, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 1573, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_9);
-    __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_t_9, __pyx_n_s_resize); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1582, __pyx_L1_error)
+    __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_t_9, __pyx_n_s_resize); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1573, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
     __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
-    __pyx_t_9 = __Pyx_PyInt_From_int(__pyx_v_l); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 1582, __pyx_L1_error)
+    __pyx_t_9 = __Pyx_PyInt_From_int(__pyx_v_l); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 1573, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_9);
-    __pyx_t_4 = PyTuple_New(1); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 1582, __pyx_L1_error)
+    __pyx_t_4 = PyTuple_New(1); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 1573, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_4);
     __Pyx_GIVEREF(__pyx_t_9);
     PyTuple_SET_ITEM(__pyx_t_4, 0, __pyx_t_9);
     __pyx_t_9 = 0;
-    __pyx_t_9 = __Pyx_PyDict_NewPresized(1); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 1582, __pyx_L1_error)
+    __pyx_t_9 = __Pyx_PyDict_NewPresized(1); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 1573, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_9);
-    if (PyDict_SetItem(__pyx_t_9, __pyx_n_s_refcheck, Py_False) < 0) __PYX_ERR(0, 1582, __pyx_L1_error)
-    __pyx_t_3 = __Pyx_PyObject_Call(__pyx_t_2, __pyx_t_4, __pyx_t_9); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 1582, __pyx_L1_error)
+    if (PyDict_SetItem(__pyx_t_9, __pyx_n_s_refcheck, Py_False) < 0) __PYX_ERR(0, 1573, __pyx_L1_error)
+    __pyx_t_3 = __Pyx_PyObject_Call(__pyx_t_2, __pyx_t_4, __pyx_t_9); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 1573, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_3);
     __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
     __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
     __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
     __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
 
-    /* "MACS2/IO/ScoreTrack.pyx":1583
+    /* "MACS2/IO/ScoreTrack.pyx":1574
  *             d[0].resize( l, refcheck = False )
  *             d[1].resize( l, refcheck = False )
  *             d[2].resize( l, refcheck = False )             # <<<<<<<<<<<<<<
  *             d[3].resize( l, refcheck = False )
  *         return
  */
-    __pyx_t_3 = __Pyx_GetItemInt(__pyx_v_d, 2, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 1583, __pyx_L1_error)
+    __pyx_t_3 = __Pyx_GetItemInt(__pyx_v_d, 2, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 1574, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_3);
-    __pyx_t_9 = __Pyx_PyObject_GetAttrStr(__pyx_t_3, __pyx_n_s_resize); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 1583, __pyx_L1_error)
+    __pyx_t_9 = __Pyx_PyObject_GetAttrStr(__pyx_t_3, __pyx_n_s_resize); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 1574, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_9);
     __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-    __pyx_t_3 = __Pyx_PyInt_From_int(__pyx_v_l); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 1583, __pyx_L1_error)
+    __pyx_t_3 = __Pyx_PyInt_From_int(__pyx_v_l); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 1574, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_3);
-    __pyx_t_4 = PyTuple_New(1); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 1583, __pyx_L1_error)
+    __pyx_t_4 = PyTuple_New(1); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 1574, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_4);
     __Pyx_GIVEREF(__pyx_t_3);
     PyTuple_SET_ITEM(__pyx_t_4, 0, __pyx_t_3);
     __pyx_t_3 = 0;
-    __pyx_t_3 = __Pyx_PyDict_NewPresized(1); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 1583, __pyx_L1_error)
+    __pyx_t_3 = __Pyx_PyDict_NewPresized(1); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 1574, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_3);
-    if (PyDict_SetItem(__pyx_t_3, __pyx_n_s_refcheck, Py_False) < 0) __PYX_ERR(0, 1583, __pyx_L1_error)
-    __pyx_t_2 = __Pyx_PyObject_Call(__pyx_t_9, __pyx_t_4, __pyx_t_3); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1583, __pyx_L1_error)
+    if (PyDict_SetItem(__pyx_t_3, __pyx_n_s_refcheck, Py_False) < 0) __PYX_ERR(0, 1574, __pyx_L1_error)
+    __pyx_t_2 = __Pyx_PyObject_Call(__pyx_t_9, __pyx_t_4, __pyx_t_3); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1574, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
     __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
     __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
     __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
     __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
-    /* "MACS2/IO/ScoreTrack.pyx":1584
+    /* "MACS2/IO/ScoreTrack.pyx":1575
  *             d[1].resize( l, refcheck = False )
  *             d[2].resize( l, refcheck = False )
  *             d[3].resize( l, refcheck = False )             # <<<<<<<<<<<<<<
  *         return
  * 
  */
-    __pyx_t_2 = __Pyx_GetItemInt(__pyx_v_d, 3, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1584, __pyx_L1_error)
+    __pyx_t_2 = __Pyx_GetItemInt(__pyx_v_d, 3, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1575, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
-    __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_t_2, __pyx_n_s_resize); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 1584, __pyx_L1_error)
+    __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_t_2, __pyx_n_s_resize); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 1575, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_3);
     __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-    __pyx_t_2 = __Pyx_PyInt_From_int(__pyx_v_l); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1584, __pyx_L1_error)
+    __pyx_t_2 = __Pyx_PyInt_From_int(__pyx_v_l); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1575, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
-    __pyx_t_4 = PyTuple_New(1); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 1584, __pyx_L1_error)
+    __pyx_t_4 = PyTuple_New(1); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 1575, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_4);
     __Pyx_GIVEREF(__pyx_t_2);
     PyTuple_SET_ITEM(__pyx_t_4, 0, __pyx_t_2);
     __pyx_t_2 = 0;
-    __pyx_t_2 = __Pyx_PyDict_NewPresized(1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1584, __pyx_L1_error)
+    __pyx_t_2 = __Pyx_PyDict_NewPresized(1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1575, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
-    if (PyDict_SetItem(__pyx_t_2, __pyx_n_s_refcheck, Py_False) < 0) __PYX_ERR(0, 1584, __pyx_L1_error)
-    __pyx_t_9 = __Pyx_PyObject_Call(__pyx_t_3, __pyx_t_4, __pyx_t_2); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 1584, __pyx_L1_error)
+    if (PyDict_SetItem(__pyx_t_2, __pyx_n_s_refcheck, Py_False) < 0) __PYX_ERR(0, 1575, __pyx_L1_error)
+    __pyx_t_9 = __Pyx_PyObject_Call(__pyx_t_3, __pyx_t_4, __pyx_t_2); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 1575, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_9);
     __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
     __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
@@ -25589,7 +25589,7 @@ static PyObject *__pyx_f_5MACS2_2IO_10ScoreTrack_18TwoConditionScores_finalize(s
   }
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-  /* "MACS2/IO/ScoreTrack.pyx":1585
+  /* "MACS2/IO/ScoreTrack.pyx":1576
  *             d[2].resize( l, refcheck = False )
  *             d[3].resize( l, refcheck = False )
  *         return             # <<<<<<<<<<<<<<
@@ -25600,7 +25600,7 @@ static PyObject *__pyx_f_5MACS2_2IO_10ScoreTrack_18TwoConditionScores_finalize(s
   __pyx_r = Py_None; __Pyx_INCREF(Py_None);
   goto __pyx_L0;
 
-  /* "MACS2/IO/ScoreTrack.pyx":1569
+  /* "MACS2/IO/ScoreTrack.pyx":1560
  *         self.datalength[chromosome] += 1
  * 
  *     cpdef finalize ( self ):             # <<<<<<<<<<<<<<
@@ -25646,9 +25646,9 @@ static PyObject *__pyx_pf_5MACS2_2IO_10ScoreTrack_18TwoConditionScores_8finalize
   __Pyx_RefNannyDeclarations
   PyObject *__pyx_t_1 = NULL;
   __Pyx_RefNannySetupContext("finalize", 0);
-  __Pyx_TraceCall("finalize (wrapper)", __pyx_f[0], 1569, 0, __PYX_ERR(0, 1569, __pyx_L1_error));
+  __Pyx_TraceCall("finalize (wrapper)", __pyx_f[0], 1560, 0, __PYX_ERR(0, 1560, __pyx_L1_error));
   __Pyx_XDECREF(__pyx_r);
-  __pyx_t_1 = __pyx_f_5MACS2_2IO_10ScoreTrack_18TwoConditionScores_finalize(__pyx_v_self, 1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1569, __pyx_L1_error)
+  __pyx_t_1 = __pyx_f_5MACS2_2IO_10ScoreTrack_18TwoConditionScores_finalize(__pyx_v_self, 1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1560, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __pyx_r = __pyx_t_1;
   __pyx_t_1 = 0;
@@ -25666,7 +25666,7 @@ static PyObject *__pyx_pf_5MACS2_2IO_10ScoreTrack_18TwoConditionScores_8finalize
   return __pyx_r;
 }
 
-/* "MACS2/IO/ScoreTrack.pyx":1587
+/* "MACS2/IO/ScoreTrack.pyx":1578
  *         return
  * 
  *     cpdef get_data_by_chr (self, bytes chromosome):             # <<<<<<<<<<<<<<
@@ -25686,7 +25686,7 @@ static PyObject *__pyx_f_5MACS2_2IO_10ScoreTrack_18TwoConditionScores_get_data_b
   int __pyx_t_5;
   int __pyx_t_6;
   __Pyx_RefNannySetupContext("get_data_by_chr", 0);
-  __Pyx_TraceCall("get_data_by_chr", __pyx_f[0], 1587, 0, __PYX_ERR(0, 1587, __pyx_L1_error));
+  __Pyx_TraceCall("get_data_by_chr", __pyx_f[0], 1578, 0, __PYX_ERR(0, 1578, __pyx_L1_error));
   /* Check if called by wrapper */
   if (unlikely(__pyx_skip_dispatch)) ;
   /* Check if overridden in Python */
@@ -25696,7 +25696,7 @@ static PyObject *__pyx_f_5MACS2_2IO_10ScoreTrack_18TwoConditionScores_get_data_b
     if (unlikely(!__Pyx_object_dict_version_matches(((PyObject *)__pyx_v_self), __pyx_tp_dict_version, __pyx_obj_dict_version))) {
       PY_UINT64_T __pyx_type_dict_guard = __Pyx_get_tp_dict_version(((PyObject *)__pyx_v_self));
       #endif
-      __pyx_t_1 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_v_self), __pyx_n_s_get_data_by_chr); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1587, __pyx_L1_error)
+      __pyx_t_1 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_v_self), __pyx_n_s_get_data_by_chr); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1578, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_1);
       if (!PyCFunction_Check(__pyx_t_1) || (PyCFunction_GET_FUNCTION(__pyx_t_1) != (PyCFunction)(void*)__pyx_pw_5MACS2_2IO_10ScoreTrack_18TwoConditionScores_11get_data_by_chr)) {
         __Pyx_XDECREF(__pyx_r);
@@ -25713,7 +25713,7 @@ static PyObject *__pyx_f_5MACS2_2IO_10ScoreTrack_18TwoConditionScores_get_data_b
         }
         __pyx_t_2 = (__pyx_t_4) ? __Pyx_PyObject_Call2Args(__pyx_t_3, __pyx_t_4, __pyx_v_chromosome) : __Pyx_PyObject_CallOneArg(__pyx_t_3, __pyx_v_chromosome);
         __Pyx_XDECREF(__pyx_t_4); __pyx_t_4 = 0;
-        if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1587, __pyx_L1_error)
+        if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1578, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_2);
         __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
         __pyx_r = __pyx_t_2;
@@ -25734,7 +25734,7 @@ static PyObject *__pyx_f_5MACS2_2IO_10ScoreTrack_18TwoConditionScores_get_data_b
     #endif
   }
 
-  /* "MACS2/IO/ScoreTrack.pyx":1593
+  /* "MACS2/IO/ScoreTrack.pyx":1584
  *         ([end pos],[value])
  *         """
  *         if chromosome in self.data:             # <<<<<<<<<<<<<<
@@ -25743,13 +25743,13 @@ static PyObject *__pyx_f_5MACS2_2IO_10ScoreTrack_18TwoConditionScores_get_data_b
  */
   if (unlikely(__pyx_v_self->data == Py_None)) {
     PyErr_SetString(PyExc_TypeError, "'NoneType' object is not iterable");
-    __PYX_ERR(0, 1593, __pyx_L1_error)
+    __PYX_ERR(0, 1584, __pyx_L1_error)
   }
-  __pyx_t_5 = (__Pyx_PyDict_ContainsTF(__pyx_v_chromosome, __pyx_v_self->data, Py_EQ)); if (unlikely(__pyx_t_5 < 0)) __PYX_ERR(0, 1593, __pyx_L1_error)
+  __pyx_t_5 = (__Pyx_PyDict_ContainsTF(__pyx_v_chromosome, __pyx_v_self->data, Py_EQ)); if (unlikely(__pyx_t_5 < 0)) __PYX_ERR(0, 1584, __pyx_L1_error)
   __pyx_t_6 = (__pyx_t_5 != 0);
   if (__pyx_t_6) {
 
-    /* "MACS2/IO/ScoreTrack.pyx":1594
+    /* "MACS2/IO/ScoreTrack.pyx":1585
  *         """
  *         if chromosome in self.data:
  *             return self.data[chromosome]             # <<<<<<<<<<<<<<
@@ -25759,15 +25759,15 @@ static PyObject *__pyx_f_5MACS2_2IO_10ScoreTrack_18TwoConditionScores_get_data_b
     __Pyx_XDECREF(__pyx_r);
     if (unlikely(__pyx_v_self->data == Py_None)) {
       PyErr_SetString(PyExc_TypeError, "'NoneType' object is not subscriptable");
-      __PYX_ERR(0, 1594, __pyx_L1_error)
+      __PYX_ERR(0, 1585, __pyx_L1_error)
     }
-    __pyx_t_1 = __Pyx_PyDict_GetItem(__pyx_v_self->data, __pyx_v_chromosome); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1594, __pyx_L1_error)
+    __pyx_t_1 = __Pyx_PyDict_GetItem(__pyx_v_self->data, __pyx_v_chromosome); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1585, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
     __pyx_r = __pyx_t_1;
     __pyx_t_1 = 0;
     goto __pyx_L0;
 
-    /* "MACS2/IO/ScoreTrack.pyx":1593
+    /* "MACS2/IO/ScoreTrack.pyx":1584
  *         ([end pos],[value])
  *         """
  *         if chromosome in self.data:             # <<<<<<<<<<<<<<
@@ -25776,7 +25776,7 @@ static PyObject *__pyx_f_5MACS2_2IO_10ScoreTrack_18TwoConditionScores_get_data_b
  */
   }
 
-  /* "MACS2/IO/ScoreTrack.pyx":1596
+  /* "MACS2/IO/ScoreTrack.pyx":1587
  *             return self.data[chromosome]
  *         else:
  *             return None             # <<<<<<<<<<<<<<
@@ -25789,7 +25789,7 @@ static PyObject *__pyx_f_5MACS2_2IO_10ScoreTrack_18TwoConditionScores_get_data_b
     goto __pyx_L0;
   }
 
-  /* "MACS2/IO/ScoreTrack.pyx":1587
+  /* "MACS2/IO/ScoreTrack.pyx":1578
  *         return
  * 
  *     cpdef get_data_by_chr (self, bytes chromosome):             # <<<<<<<<<<<<<<
@@ -25819,7 +25819,7 @@ static PyObject *__pyx_pw_5MACS2_2IO_10ScoreTrack_18TwoConditionScores_11get_dat
   PyObject *__pyx_r = 0;
   __Pyx_RefNannyDeclarations
   __Pyx_RefNannySetupContext("get_data_by_chr (wrapper)", 0);
-  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_chromosome), (&PyBytes_Type), 1, "chromosome", 1))) __PYX_ERR(0, 1587, __pyx_L1_error)
+  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_chromosome), (&PyBytes_Type), 1, "chromosome", 1))) __PYX_ERR(0, 1578, __pyx_L1_error)
   __pyx_r = __pyx_pf_5MACS2_2IO_10ScoreTrack_18TwoConditionScores_10get_data_by_chr(((struct __pyx_obj_5MACS2_2IO_10ScoreTrack_TwoConditionScores *)__pyx_v_self), ((PyObject*)__pyx_v_chromosome));
 
   /* function exit code */
@@ -25837,9 +25837,9 @@ static PyObject *__pyx_pf_5MACS2_2IO_10ScoreTrack_18TwoConditionScores_10get_dat
   __Pyx_RefNannyDeclarations
   PyObject *__pyx_t_1 = NULL;
   __Pyx_RefNannySetupContext("get_data_by_chr", 0);
-  __Pyx_TraceCall("get_data_by_chr (wrapper)", __pyx_f[0], 1587, 0, __PYX_ERR(0, 1587, __pyx_L1_error));
+  __Pyx_TraceCall("get_data_by_chr (wrapper)", __pyx_f[0], 1578, 0, __PYX_ERR(0, 1578, __pyx_L1_error));
   __Pyx_XDECREF(__pyx_r);
-  __pyx_t_1 = __pyx_f_5MACS2_2IO_10ScoreTrack_18TwoConditionScores_get_data_by_chr(__pyx_v_self, __pyx_v_chromosome, 1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1587, __pyx_L1_error)
+  __pyx_t_1 = __pyx_f_5MACS2_2IO_10ScoreTrack_18TwoConditionScores_get_data_by_chr(__pyx_v_self, __pyx_v_chromosome, 1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1578, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __pyx_r = __pyx_t_1;
   __pyx_t_1 = 0;
@@ -25857,7 +25857,7 @@ static PyObject *__pyx_pf_5MACS2_2IO_10ScoreTrack_18TwoConditionScores_10get_dat
   return __pyx_r;
 }
 
-/* "MACS2/IO/ScoreTrack.pyx":1598
+/* "MACS2/IO/ScoreTrack.pyx":1589
  *             return None
  * 
  *     cpdef get_chr_names (self):             # <<<<<<<<<<<<<<
@@ -25876,7 +25876,7 @@ static PyObject *__pyx_f_5MACS2_2IO_10ScoreTrack_18TwoConditionScores_get_chr_na
   PyObject *__pyx_t_3 = NULL;
   PyObject *__pyx_t_4 = NULL;
   __Pyx_RefNannySetupContext("get_chr_names", 0);
-  __Pyx_TraceCall("get_chr_names", __pyx_f[0], 1598, 0, __PYX_ERR(0, 1598, __pyx_L1_error));
+  __Pyx_TraceCall("get_chr_names", __pyx_f[0], 1589, 0, __PYX_ERR(0, 1589, __pyx_L1_error));
   /* Check if called by wrapper */
   if (unlikely(__pyx_skip_dispatch)) ;
   /* Check if overridden in Python */
@@ -25886,7 +25886,7 @@ static PyObject *__pyx_f_5MACS2_2IO_10ScoreTrack_18TwoConditionScores_get_chr_na
     if (unlikely(!__Pyx_object_dict_version_matches(((PyObject *)__pyx_v_self), __pyx_tp_dict_version, __pyx_obj_dict_version))) {
       PY_UINT64_T __pyx_type_dict_guard = __Pyx_get_tp_dict_version(((PyObject *)__pyx_v_self));
       #endif
-      __pyx_t_1 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_v_self), __pyx_n_s_get_chr_names); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1598, __pyx_L1_error)
+      __pyx_t_1 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_v_self), __pyx_n_s_get_chr_names); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1589, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_1);
       if (!PyCFunction_Check(__pyx_t_1) || (PyCFunction_GET_FUNCTION(__pyx_t_1) != (PyCFunction)(void*)__pyx_pw_5MACS2_2IO_10ScoreTrack_18TwoConditionScores_13get_chr_names)) {
         __Pyx_XDECREF(__pyx_r);
@@ -25903,7 +25903,7 @@ static PyObject *__pyx_f_5MACS2_2IO_10ScoreTrack_18TwoConditionScores_get_chr_na
         }
         __pyx_t_2 = (__pyx_t_4) ? __Pyx_PyObject_CallOneArg(__pyx_t_3, __pyx_t_4) : __Pyx_PyObject_CallNoArg(__pyx_t_3);
         __Pyx_XDECREF(__pyx_t_4); __pyx_t_4 = 0;
-        if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1598, __pyx_L1_error)
+        if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1589, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_2);
         __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
         __pyx_r = __pyx_t_2;
@@ -25924,7 +25924,7 @@ static PyObject *__pyx_f_5MACS2_2IO_10ScoreTrack_18TwoConditionScores_get_chr_na
     #endif
   }
 
-  /* "MACS2/IO/ScoreTrack.pyx":1602
+  /* "MACS2/IO/ScoreTrack.pyx":1593
  * 
  *         """
  *         l = set(self.data.keys())             # <<<<<<<<<<<<<<
@@ -25933,17 +25933,17 @@ static PyObject *__pyx_f_5MACS2_2IO_10ScoreTrack_18TwoConditionScores_get_chr_na
  */
   if (unlikely(__pyx_v_self->data == Py_None)) {
     PyErr_Format(PyExc_AttributeError, "'NoneType' object has no attribute '%.30s'", "keys");
-    __PYX_ERR(0, 1602, __pyx_L1_error)
+    __PYX_ERR(0, 1593, __pyx_L1_error)
   }
-  __pyx_t_1 = __Pyx_PyDict_Keys(__pyx_v_self->data); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1602, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyDict_Keys(__pyx_v_self->data); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1593, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_2 = PySet_New(__pyx_t_1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1602, __pyx_L1_error)
+  __pyx_t_2 = PySet_New(__pyx_t_1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1593, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   __pyx_v_l = ((PyObject*)__pyx_t_2);
   __pyx_t_2 = 0;
 
-  /* "MACS2/IO/ScoreTrack.pyx":1603
+  /* "MACS2/IO/ScoreTrack.pyx":1594
  *         """
  *         l = set(self.data.keys())
  *         return l             # <<<<<<<<<<<<<<
@@ -25955,7 +25955,7 @@ static PyObject *__pyx_f_5MACS2_2IO_10ScoreTrack_18TwoConditionScores_get_chr_na
   __pyx_r = __pyx_v_l;
   goto __pyx_L0;
 
-  /* "MACS2/IO/ScoreTrack.pyx":1598
+  /* "MACS2/IO/ScoreTrack.pyx":1589
  *             return None
  * 
  *     cpdef get_chr_names (self):             # <<<<<<<<<<<<<<
@@ -25999,9 +25999,9 @@ static PyObject *__pyx_pf_5MACS2_2IO_10ScoreTrack_18TwoConditionScores_12get_chr
   __Pyx_RefNannyDeclarations
   PyObject *__pyx_t_1 = NULL;
   __Pyx_RefNannySetupContext("get_chr_names", 0);
-  __Pyx_TraceCall("get_chr_names (wrapper)", __pyx_f[0], 1598, 0, __PYX_ERR(0, 1598, __pyx_L1_error));
+  __Pyx_TraceCall("get_chr_names (wrapper)", __pyx_f[0], 1589, 0, __PYX_ERR(0, 1589, __pyx_L1_error));
   __Pyx_XDECREF(__pyx_r);
-  __pyx_t_1 = __pyx_f_5MACS2_2IO_10ScoreTrack_18TwoConditionScores_get_chr_names(__pyx_v_self, 1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1598, __pyx_L1_error)
+  __pyx_t_1 = __pyx_f_5MACS2_2IO_10ScoreTrack_18TwoConditionScores_get_chr_names(__pyx_v_self, 1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1589, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __pyx_r = __pyx_t_1;
   __pyx_t_1 = 0;
@@ -26019,7 +26019,7 @@ static PyObject *__pyx_pf_5MACS2_2IO_10ScoreTrack_18TwoConditionScores_12get_chr
   return __pyx_r;
 }
 
-/* "MACS2/IO/ScoreTrack.pyx":1605
+/* "MACS2/IO/ScoreTrack.pyx":1596
  *         return l
  * 
  *     cpdef write_bedGraph ( self, fhd, str name, str description, short column = 3):             # <<<<<<<<<<<<<<
@@ -26062,7 +26062,7 @@ static PyObject *__pyx_f_5MACS2_2IO_10ScoreTrack_18TwoConditionScores_write_bedG
   Py_ssize_t __pyx_t_16;
   Py_UCS4 __pyx_t_17;
   __Pyx_RefNannySetupContext("write_bedGraph", 0);
-  __Pyx_TraceCall("write_bedGraph", __pyx_f[0], 1605, 0, __PYX_ERR(0, 1605, __pyx_L1_error));
+  __Pyx_TraceCall("write_bedGraph", __pyx_f[0], 1596, 0, __PYX_ERR(0, 1596, __pyx_L1_error));
   if (__pyx_optional_args) {
     if (__pyx_optional_args->__pyx_n > 0) {
       __pyx_v_column = __pyx_optional_args->column;
@@ -26077,11 +26077,11 @@ static PyObject *__pyx_f_5MACS2_2IO_10ScoreTrack_18TwoConditionScores_write_bedG
     if (unlikely(!__Pyx_object_dict_version_matches(((PyObject *)__pyx_v_self), __pyx_tp_dict_version, __pyx_obj_dict_version))) {
       PY_UINT64_T __pyx_type_dict_guard = __Pyx_get_tp_dict_version(((PyObject *)__pyx_v_self));
       #endif
-      __pyx_t_1 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_v_self), __pyx_n_s_write_bedGraph); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1605, __pyx_L1_error)
+      __pyx_t_1 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_v_self), __pyx_n_s_write_bedGraph); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1596, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_1);
       if (!PyCFunction_Check(__pyx_t_1) || (PyCFunction_GET_FUNCTION(__pyx_t_1) != (PyCFunction)(void*)__pyx_pw_5MACS2_2IO_10ScoreTrack_18TwoConditionScores_15write_bedGraph)) {
         __Pyx_XDECREF(__pyx_r);
-        __pyx_t_3 = __Pyx_PyInt_From_short(__pyx_v_column); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 1605, __pyx_L1_error)
+        __pyx_t_3 = __Pyx_PyInt_From_short(__pyx_v_column); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 1596, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_3);
         __Pyx_INCREF(__pyx_t_1);
         __pyx_t_4 = __pyx_t_1; __pyx_t_5 = NULL;
@@ -26099,7 +26099,7 @@ static PyObject *__pyx_f_5MACS2_2IO_10ScoreTrack_18TwoConditionScores_write_bedG
         #if CYTHON_FAST_PYCALL
         if (PyFunction_Check(__pyx_t_4)) {
           PyObject *__pyx_temp[5] = {__pyx_t_5, __pyx_v_fhd, __pyx_v_name, __pyx_v_description, __pyx_t_3};
-          __pyx_t_2 = __Pyx_PyFunction_FastCall(__pyx_t_4, __pyx_temp+1-__pyx_t_6, 4+__pyx_t_6); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1605, __pyx_L1_error)
+          __pyx_t_2 = __Pyx_PyFunction_FastCall(__pyx_t_4, __pyx_temp+1-__pyx_t_6, 4+__pyx_t_6); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1596, __pyx_L1_error)
           __Pyx_XDECREF(__pyx_t_5); __pyx_t_5 = 0;
           __Pyx_GOTREF(__pyx_t_2);
           __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
@@ -26108,14 +26108,14 @@ static PyObject *__pyx_f_5MACS2_2IO_10ScoreTrack_18TwoConditionScores_write_bedG
         #if CYTHON_FAST_PYCCALL
         if (__Pyx_PyFastCFunction_Check(__pyx_t_4)) {
           PyObject *__pyx_temp[5] = {__pyx_t_5, __pyx_v_fhd, __pyx_v_name, __pyx_v_description, __pyx_t_3};
-          __pyx_t_2 = __Pyx_PyCFunction_FastCall(__pyx_t_4, __pyx_temp+1-__pyx_t_6, 4+__pyx_t_6); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1605, __pyx_L1_error)
+          __pyx_t_2 = __Pyx_PyCFunction_FastCall(__pyx_t_4, __pyx_temp+1-__pyx_t_6, 4+__pyx_t_6); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1596, __pyx_L1_error)
           __Pyx_XDECREF(__pyx_t_5); __pyx_t_5 = 0;
           __Pyx_GOTREF(__pyx_t_2);
           __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
         } else
         #endif
         {
-          __pyx_t_7 = PyTuple_New(4+__pyx_t_6); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 1605, __pyx_L1_error)
+          __pyx_t_7 = PyTuple_New(4+__pyx_t_6); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 1596, __pyx_L1_error)
           __Pyx_GOTREF(__pyx_t_7);
           if (__pyx_t_5) {
             __Pyx_GIVEREF(__pyx_t_5); PyTuple_SET_ITEM(__pyx_t_7, 0, __pyx_t_5); __pyx_t_5 = NULL;
@@ -26132,7 +26132,7 @@ static PyObject *__pyx_f_5MACS2_2IO_10ScoreTrack_18TwoConditionScores_write_bedG
           __Pyx_GIVEREF(__pyx_t_3);
           PyTuple_SET_ITEM(__pyx_t_7, 3+__pyx_t_6, __pyx_t_3);
           __pyx_t_3 = 0;
-          __pyx_t_2 = __Pyx_PyObject_Call(__pyx_t_4, __pyx_t_7, NULL); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1605, __pyx_L1_error)
+          __pyx_t_2 = __Pyx_PyObject_Call(__pyx_t_4, __pyx_t_7, NULL); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1596, __pyx_L1_error)
           __Pyx_GOTREF(__pyx_t_2);
           __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
         }
@@ -26155,7 +26155,7 @@ static PyObject *__pyx_f_5MACS2_2IO_10ScoreTrack_18TwoConditionScores_write_bedG
     #endif
   }
 
-  /* "MACS2/IO/ScoreTrack.pyx":1621
+  /* "MACS2/IO/ScoreTrack.pyx":1612
  *             np.ndarray pos, value
  * 
  *         assert column in range( 1, 4 ), "column should be between 1, 2 or 3."             # <<<<<<<<<<<<<<
@@ -26164,45 +26164,45 @@ static PyObject *__pyx_f_5MACS2_2IO_10ScoreTrack_18TwoConditionScores_write_bedG
  */
   #ifndef CYTHON_WITHOUT_ASSERTIONS
   if (unlikely(!Py_OptimizeFlag)) {
-    __pyx_t_1 = __Pyx_PyInt_From_short(__pyx_v_column); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1621, __pyx_L1_error)
+    __pyx_t_1 = __Pyx_PyInt_From_short(__pyx_v_column); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1612, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
-    __pyx_t_2 = __Pyx_PyObject_Call(__pyx_builtin_range, __pyx_tuple__18, NULL); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1621, __pyx_L1_error)
+    __pyx_t_2 = __Pyx_PyObject_Call(__pyx_builtin_range, __pyx_tuple__18, NULL); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1612, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
-    __pyx_t_8 = (__Pyx_PySequence_ContainsTF(__pyx_t_1, __pyx_t_2, Py_EQ)); if (unlikely(__pyx_t_8 < 0)) __PYX_ERR(0, 1621, __pyx_L1_error)
+    __pyx_t_8 = (__Pyx_PySequence_ContainsTF(__pyx_t_1, __pyx_t_2, Py_EQ)); if (unlikely(__pyx_t_8 < 0)) __PYX_ERR(0, 1612, __pyx_L1_error)
     __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
     __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
     if (unlikely(!(__pyx_t_8 != 0))) {
       PyErr_SetObject(PyExc_AssertionError, __pyx_kp_u_column_should_be_between_1_2_or);
-      __PYX_ERR(0, 1621, __pyx_L1_error)
+      __PYX_ERR(0, 1612, __pyx_L1_error)
     }
   }
   #endif
 
-  /* "MACS2/IO/ScoreTrack.pyx":1623
+  /* "MACS2/IO/ScoreTrack.pyx":1614
  *         assert column in range( 1, 4 ), "column should be between 1, 2 or 3."
  * 
  *         write = fhd.write             # <<<<<<<<<<<<<<
  * 
  *         #if self.trackline:
  */
-  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_fhd, __pyx_n_s_write); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1623, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_fhd, __pyx_n_s_write); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1614, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __pyx_v_write = __pyx_t_2;
   __pyx_t_2 = 0;
 
-  /* "MACS2/IO/ScoreTrack.pyx":1629
+  /* "MACS2/IO/ScoreTrack.pyx":1620
  *         #    write( "track type=bedGraph name=\"%s\" description=\"%s\"\n" % ( name.decode(), description ) )
  * 
  *         chrs = self.get_chr_names()             # <<<<<<<<<<<<<<
  *         for chrom in chrs:
  *             pos = self.data[ chrom ][ 0 ]
  */
-  __pyx_t_2 = ((struct __pyx_vtabstruct_5MACS2_2IO_10ScoreTrack_TwoConditionScores *)__pyx_v_self->__pyx_vtab)->get_chr_names(__pyx_v_self, 0); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1629, __pyx_L1_error)
+  __pyx_t_2 = ((struct __pyx_vtabstruct_5MACS2_2IO_10ScoreTrack_TwoConditionScores *)__pyx_v_self->__pyx_vtab)->get_chr_names(__pyx_v_self, 0); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1620, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __pyx_v_chrs = __pyx_t_2;
   __pyx_t_2 = 0;
 
-  /* "MACS2/IO/ScoreTrack.pyx":1630
+  /* "MACS2/IO/ScoreTrack.pyx":1621
  * 
  *         chrs = self.get_chr_names()
  *         for chrom in chrs:             # <<<<<<<<<<<<<<
@@ -26213,26 +26213,26 @@ static PyObject *__pyx_f_5MACS2_2IO_10ScoreTrack_18TwoConditionScores_write_bedG
     __pyx_t_2 = __pyx_v_chrs; __Pyx_INCREF(__pyx_t_2); __pyx_t_9 = 0;
     __pyx_t_10 = NULL;
   } else {
-    __pyx_t_9 = -1; __pyx_t_2 = PyObject_GetIter(__pyx_v_chrs); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1630, __pyx_L1_error)
+    __pyx_t_9 = -1; __pyx_t_2 = PyObject_GetIter(__pyx_v_chrs); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1621, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
-    __pyx_t_10 = Py_TYPE(__pyx_t_2)->tp_iternext; if (unlikely(!__pyx_t_10)) __PYX_ERR(0, 1630, __pyx_L1_error)
+    __pyx_t_10 = Py_TYPE(__pyx_t_2)->tp_iternext; if (unlikely(!__pyx_t_10)) __PYX_ERR(0, 1621, __pyx_L1_error)
   }
   for (;;) {
     if (likely(!__pyx_t_10)) {
       if (likely(PyList_CheckExact(__pyx_t_2))) {
         if (__pyx_t_9 >= PyList_GET_SIZE(__pyx_t_2)) break;
         #if CYTHON_ASSUME_SAFE_MACROS && !CYTHON_AVOID_BORROWED_REFS
-        __pyx_t_1 = PyList_GET_ITEM(__pyx_t_2, __pyx_t_9); __Pyx_INCREF(__pyx_t_1); __pyx_t_9++; if (unlikely(0 < 0)) __PYX_ERR(0, 1630, __pyx_L1_error)
+        __pyx_t_1 = PyList_GET_ITEM(__pyx_t_2, __pyx_t_9); __Pyx_INCREF(__pyx_t_1); __pyx_t_9++; if (unlikely(0 < 0)) __PYX_ERR(0, 1621, __pyx_L1_error)
         #else
-        __pyx_t_1 = PySequence_ITEM(__pyx_t_2, __pyx_t_9); __pyx_t_9++; if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1630, __pyx_L1_error)
+        __pyx_t_1 = PySequence_ITEM(__pyx_t_2, __pyx_t_9); __pyx_t_9++; if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1621, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_1);
         #endif
       } else {
         if (__pyx_t_9 >= PyTuple_GET_SIZE(__pyx_t_2)) break;
         #if CYTHON_ASSUME_SAFE_MACROS && !CYTHON_AVOID_BORROWED_REFS
-        __pyx_t_1 = PyTuple_GET_ITEM(__pyx_t_2, __pyx_t_9); __Pyx_INCREF(__pyx_t_1); __pyx_t_9++; if (unlikely(0 < 0)) __PYX_ERR(0, 1630, __pyx_L1_error)
+        __pyx_t_1 = PyTuple_GET_ITEM(__pyx_t_2, __pyx_t_9); __Pyx_INCREF(__pyx_t_1); __pyx_t_9++; if (unlikely(0 < 0)) __PYX_ERR(0, 1621, __pyx_L1_error)
         #else
-        __pyx_t_1 = PySequence_ITEM(__pyx_t_2, __pyx_t_9); __pyx_t_9++; if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1630, __pyx_L1_error)
+        __pyx_t_1 = PySequence_ITEM(__pyx_t_2, __pyx_t_9); __pyx_t_9++; if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1621, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_1);
         #endif
       }
@@ -26242,17 +26242,17 @@ static PyObject *__pyx_f_5MACS2_2IO_10ScoreTrack_18TwoConditionScores_write_bedG
         PyObject* exc_type = PyErr_Occurred();
         if (exc_type) {
           if (likely(__Pyx_PyErr_GivenExceptionMatches(exc_type, PyExc_StopIteration))) PyErr_Clear();
-          else __PYX_ERR(0, 1630, __pyx_L1_error)
+          else __PYX_ERR(0, 1621, __pyx_L1_error)
         }
         break;
       }
       __Pyx_GOTREF(__pyx_t_1);
     }
-    if (!(likely(PyBytes_CheckExact(__pyx_t_1))||((__pyx_t_1) == Py_None)||(PyErr_Format(PyExc_TypeError, "Expected %.16s, got %.200s", "bytes", Py_TYPE(__pyx_t_1)->tp_name), 0))) __PYX_ERR(0, 1630, __pyx_L1_error)
+    if (!(likely(PyBytes_CheckExact(__pyx_t_1))||((__pyx_t_1) == Py_None)||(PyErr_Format(PyExc_TypeError, "Expected %.16s, got %.200s", "bytes", Py_TYPE(__pyx_t_1)->tp_name), 0))) __PYX_ERR(0, 1621, __pyx_L1_error)
     __Pyx_XDECREF_SET(__pyx_v_chrom, ((PyObject*)__pyx_t_1));
     __pyx_t_1 = 0;
 
-    /* "MACS2/IO/ScoreTrack.pyx":1631
+    /* "MACS2/IO/ScoreTrack.pyx":1622
  *         chrs = self.get_chr_names()
  *         for chrom in chrs:
  *             pos = self.data[ chrom ][ 0 ]             # <<<<<<<<<<<<<<
@@ -26261,18 +26261,18 @@ static PyObject *__pyx_f_5MACS2_2IO_10ScoreTrack_18TwoConditionScores_write_bedG
  */
     if (unlikely(__pyx_v_self->data == Py_None)) {
       PyErr_SetString(PyExc_TypeError, "'NoneType' object is not subscriptable");
-      __PYX_ERR(0, 1631, __pyx_L1_error)
+      __PYX_ERR(0, 1622, __pyx_L1_error)
     }
-    __pyx_t_1 = __Pyx_PyDict_GetItem(__pyx_v_self->data, __pyx_v_chrom); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1631, __pyx_L1_error)
+    __pyx_t_1 = __Pyx_PyDict_GetItem(__pyx_v_self->data, __pyx_v_chrom); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1622, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
-    __pyx_t_4 = __Pyx_GetItemInt(__pyx_t_1, 0, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 1631, __pyx_L1_error)
+    __pyx_t_4 = __Pyx_GetItemInt(__pyx_t_1, 0, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 1622, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_4);
     __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-    if (!(likely(((__pyx_t_4) == Py_None) || likely(__Pyx_TypeTest(__pyx_t_4, __pyx_ptype_5numpy_ndarray))))) __PYX_ERR(0, 1631, __pyx_L1_error)
+    if (!(likely(((__pyx_t_4) == Py_None) || likely(__Pyx_TypeTest(__pyx_t_4, __pyx_ptype_5numpy_ndarray))))) __PYX_ERR(0, 1622, __pyx_L1_error)
     __Pyx_XDECREF_SET(__pyx_v_pos, ((PyArrayObject *)__pyx_t_4));
     __pyx_t_4 = 0;
 
-    /* "MACS2/IO/ScoreTrack.pyx":1632
+    /* "MACS2/IO/ScoreTrack.pyx":1623
  *         for chrom in chrs:
  *             pos = self.data[ chrom ][ 0 ]
  *             value = self.data[ chrom ][ column ]             # <<<<<<<<<<<<<<
@@ -26281,18 +26281,18 @@ static PyObject *__pyx_f_5MACS2_2IO_10ScoreTrack_18TwoConditionScores_write_bedG
  */
     if (unlikely(__pyx_v_self->data == Py_None)) {
       PyErr_SetString(PyExc_TypeError, "'NoneType' object is not subscriptable");
-      __PYX_ERR(0, 1632, __pyx_L1_error)
+      __PYX_ERR(0, 1623, __pyx_L1_error)
     }
-    __pyx_t_4 = __Pyx_PyDict_GetItem(__pyx_v_self->data, __pyx_v_chrom); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 1632, __pyx_L1_error)
+    __pyx_t_4 = __Pyx_PyDict_GetItem(__pyx_v_self->data, __pyx_v_chrom); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 1623, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_4);
-    __pyx_t_1 = __Pyx_GetItemInt(__pyx_t_4, __pyx_v_column, short, 1, __Pyx_PyInt_From_short, 0, 1, 1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1632, __pyx_L1_error)
+    __pyx_t_1 = __Pyx_GetItemInt(__pyx_t_4, __pyx_v_column, short, 1, __Pyx_PyInt_From_short, 0, 1, 1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1623, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
     __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-    if (!(likely(((__pyx_t_1) == Py_None) || likely(__Pyx_TypeTest(__pyx_t_1, __pyx_ptype_5numpy_ndarray))))) __PYX_ERR(0, 1632, __pyx_L1_error)
+    if (!(likely(((__pyx_t_1) == Py_None) || likely(__Pyx_TypeTest(__pyx_t_1, __pyx_ptype_5numpy_ndarray))))) __PYX_ERR(0, 1623, __pyx_L1_error)
     __Pyx_XDECREF_SET(__pyx_v_value, ((PyArrayObject *)__pyx_t_1));
     __pyx_t_1 = 0;
 
-    /* "MACS2/IO/ScoreTrack.pyx":1633
+    /* "MACS2/IO/ScoreTrack.pyx":1624
  *             pos = self.data[ chrom ][ 0 ]
  *             value = self.data[ chrom ][ column ]
  *             l = self.datalength[ chrom ]             # <<<<<<<<<<<<<<
@@ -26301,15 +26301,15 @@ static PyObject *__pyx_f_5MACS2_2IO_10ScoreTrack_18TwoConditionScores_write_bedG
  */
     if (unlikely(__pyx_v_self->datalength == Py_None)) {
       PyErr_SetString(PyExc_TypeError, "'NoneType' object is not subscriptable");
-      __PYX_ERR(0, 1633, __pyx_L1_error)
+      __PYX_ERR(0, 1624, __pyx_L1_error)
     }
-    __pyx_t_1 = __Pyx_PyDict_GetItem(__pyx_v_self->datalength, __pyx_v_chrom); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1633, __pyx_L1_error)
+    __pyx_t_1 = __Pyx_PyDict_GetItem(__pyx_v_self->datalength, __pyx_v_chrom); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1624, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
-    __pyx_t_6 = __Pyx_PyInt_As_int(__pyx_t_1); if (unlikely((__pyx_t_6 == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 1633, __pyx_L1_error)
+    __pyx_t_6 = __Pyx_PyInt_As_int(__pyx_t_1); if (unlikely((__pyx_t_6 == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 1624, __pyx_L1_error)
     __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
     __pyx_v_l = __pyx_t_6;
 
-    /* "MACS2/IO/ScoreTrack.pyx":1634
+    /* "MACS2/IO/ScoreTrack.pyx":1625
  *             value = self.data[ chrom ][ column ]
  *             l = self.datalength[ chrom ]
  *             pre = 0             # <<<<<<<<<<<<<<
@@ -26318,7 +26318,7 @@ static PyObject *__pyx_f_5MACS2_2IO_10ScoreTrack_18TwoConditionScores_write_bedG
  */
     __pyx_v_pre = 0;
 
-    /* "MACS2/IO/ScoreTrack.pyx":1635
+    /* "MACS2/IO/ScoreTrack.pyx":1626
  *             l = self.datalength[ chrom ]
  *             pre = 0
  *             if pos.shape[ 0 ] == 0: continue # skip if there's no data             # <<<<<<<<<<<<<<
@@ -26330,20 +26330,20 @@ static PyObject *__pyx_f_5MACS2_2IO_10ScoreTrack_18TwoConditionScores_write_bedG
       goto __pyx_L3_continue;
     }
 
-    /* "MACS2/IO/ScoreTrack.pyx":1636
+    /* "MACS2/IO/ScoreTrack.pyx":1627
  *             pre = 0
  *             if pos.shape[ 0 ] == 0: continue # skip if there's no data
  *             pre_v = value[ 0 ]             # <<<<<<<<<<<<<<
  *             for i in range( 1, l ):
  *                 v = value[ i ]
  */
-    __pyx_t_1 = __Pyx_GetItemInt(((PyObject *)__pyx_v_value), 0, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1636, __pyx_L1_error)
+    __pyx_t_1 = __Pyx_GetItemInt(((PyObject *)__pyx_v_value), 0, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1627, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
-    __pyx_t_11 = __pyx_PyFloat_AsFloat(__pyx_t_1); if (unlikely((__pyx_t_11 == (float)-1) && PyErr_Occurred())) __PYX_ERR(0, 1636, __pyx_L1_error)
+    __pyx_t_11 = __pyx_PyFloat_AsFloat(__pyx_t_1); if (unlikely((__pyx_t_11 == (float)-1) && PyErr_Occurred())) __PYX_ERR(0, 1627, __pyx_L1_error)
     __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
     __pyx_v_pre_v = __pyx_t_11;
 
-    /* "MACS2/IO/ScoreTrack.pyx":1637
+    /* "MACS2/IO/ScoreTrack.pyx":1628
  *             if pos.shape[ 0 ] == 0: continue # skip if there's no data
  *             pre_v = value[ 0 ]
  *             for i in range( 1, l ):             # <<<<<<<<<<<<<<
@@ -26355,20 +26355,20 @@ static PyObject *__pyx_f_5MACS2_2IO_10ScoreTrack_18TwoConditionScores_write_bedG
     for (__pyx_t_13 = 1; __pyx_t_13 < __pyx_t_12; __pyx_t_13+=1) {
       __pyx_v_i = __pyx_t_13;
 
-      /* "MACS2/IO/ScoreTrack.pyx":1638
+      /* "MACS2/IO/ScoreTrack.pyx":1629
  *             pre_v = value[ 0 ]
  *             for i in range( 1, l ):
  *                 v = value[ i ]             # <<<<<<<<<<<<<<
  *                 p = pos[ i-1 ]
  *                 if abs(pre_v - v)>=1e-6:
  */
-      __pyx_t_1 = __Pyx_GetItemInt(((PyObject *)__pyx_v_value), __pyx_v_i, int, 1, __Pyx_PyInt_From_int, 0, 1, 1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1638, __pyx_L1_error)
+      __pyx_t_1 = __Pyx_GetItemInt(((PyObject *)__pyx_v_value), __pyx_v_i, int, 1, __Pyx_PyInt_From_int, 0, 1, 1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1629, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_1);
-      __pyx_t_11 = __pyx_PyFloat_AsFloat(__pyx_t_1); if (unlikely((__pyx_t_11 == (float)-1) && PyErr_Occurred())) __PYX_ERR(0, 1638, __pyx_L1_error)
+      __pyx_t_11 = __pyx_PyFloat_AsFloat(__pyx_t_1); if (unlikely((__pyx_t_11 == (float)-1) && PyErr_Occurred())) __PYX_ERR(0, 1629, __pyx_L1_error)
       __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
       __pyx_v_v = __pyx_t_11;
 
-      /* "MACS2/IO/ScoreTrack.pyx":1639
+      /* "MACS2/IO/ScoreTrack.pyx":1630
  *             for i in range( 1, l ):
  *                 v = value[ i ]
  *                 p = pos[ i-1 ]             # <<<<<<<<<<<<<<
@@ -26376,13 +26376,13 @@ static PyObject *__pyx_f_5MACS2_2IO_10ScoreTrack_18TwoConditionScores_write_bedG
  *                     write( "%s\t%d\t%d\t%.5f\n" % ( chrom.decode(), pre, p, pre_v ) )
  */
       __pyx_t_14 = (__pyx_v_i - 1);
-      __pyx_t_1 = __Pyx_GetItemInt(((PyObject *)__pyx_v_pos), __pyx_t_14, long, 1, __Pyx_PyInt_From_long, 0, 1, 1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1639, __pyx_L1_error)
+      __pyx_t_1 = __Pyx_GetItemInt(((PyObject *)__pyx_v_pos), __pyx_t_14, long, 1, __Pyx_PyInt_From_long, 0, 1, 1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1630, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_1);
-      __pyx_t_15 = __Pyx_PyInt_As_int(__pyx_t_1); if (unlikely((__pyx_t_15 == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 1639, __pyx_L1_error)
+      __pyx_t_15 = __Pyx_PyInt_As_int(__pyx_t_1); if (unlikely((__pyx_t_15 == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 1630, __pyx_L1_error)
       __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
       __pyx_v_p = __pyx_t_15;
 
-      /* "MACS2/IO/ScoreTrack.pyx":1640
+      /* "MACS2/IO/ScoreTrack.pyx":1631
  *                 v = value[ i ]
  *                 p = pos[ i-1 ]
  *                 if abs(pre_v - v)>=1e-6:             # <<<<<<<<<<<<<<
@@ -26392,22 +26392,22 @@ static PyObject *__pyx_f_5MACS2_2IO_10ScoreTrack_18TwoConditionScores_write_bedG
       __pyx_t_8 = ((fabsf((__pyx_v_pre_v - __pyx_v_v)) >= 1e-6) != 0);
       if (__pyx_t_8) {
 
-        /* "MACS2/IO/ScoreTrack.pyx":1641
+        /* "MACS2/IO/ScoreTrack.pyx":1632
  *                 p = pos[ i-1 ]
  *                 if abs(pre_v - v)>=1e-6:
  *                     write( "%s\t%d\t%d\t%.5f\n" % ( chrom.decode(), pre, p, pre_v ) )             # <<<<<<<<<<<<<<
  *                     pre_v = v
  *                     pre = p
  */
-        __pyx_t_4 = PyTuple_New(8); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 1641, __pyx_L1_error)
+        __pyx_t_4 = PyTuple_New(8); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 1632, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_4);
         __pyx_t_16 = 0;
         __pyx_t_17 = 127;
         if (unlikely(__pyx_v_chrom == Py_None)) {
           PyErr_Format(PyExc_AttributeError, "'NoneType' object has no attribute '%.30s'", "decode");
-          __PYX_ERR(0, 1641, __pyx_L1_error)
+          __PYX_ERR(0, 1632, __pyx_L1_error)
         }
-        __pyx_t_7 = __Pyx_decode_bytes(__pyx_v_chrom, 0, PY_SSIZE_T_MAX, NULL, NULL, NULL); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 1641, __pyx_L1_error)
+        __pyx_t_7 = __Pyx_decode_bytes(__pyx_v_chrom, 0, PY_SSIZE_T_MAX, NULL, NULL, NULL); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 1632, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_7);
         __pyx_t_17 = (__Pyx_PyUnicode_MAX_CHAR_VALUE(__pyx_t_7) > __pyx_t_17) ? __Pyx_PyUnicode_MAX_CHAR_VALUE(__pyx_t_7) : __pyx_t_17;
         __pyx_t_16 += __Pyx_PyUnicode_GET_LENGTH(__pyx_t_7);
@@ -26418,7 +26418,7 @@ static PyObject *__pyx_f_5MACS2_2IO_10ScoreTrack_18TwoConditionScores_write_bedG
         __pyx_t_16 += 1;
         __Pyx_GIVEREF(__pyx_kp_u__11);
         PyTuple_SET_ITEM(__pyx_t_4, 1, __pyx_kp_u__11);
-        __pyx_t_7 = __Pyx_PyUnicode_From_int(__pyx_v_pre, 0, ' ', 'd'); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 1641, __pyx_L1_error)
+        __pyx_t_7 = __Pyx_PyUnicode_From_int(__pyx_v_pre, 0, ' ', 'd'); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 1632, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_7);
         __pyx_t_16 += __Pyx_PyUnicode_GET_LENGTH(__pyx_t_7);
         __Pyx_GIVEREF(__pyx_t_7);
@@ -26428,7 +26428,7 @@ static PyObject *__pyx_f_5MACS2_2IO_10ScoreTrack_18TwoConditionScores_write_bedG
         __pyx_t_16 += 1;
         __Pyx_GIVEREF(__pyx_kp_u__11);
         PyTuple_SET_ITEM(__pyx_t_4, 3, __pyx_kp_u__11);
-        __pyx_t_7 = __Pyx_PyUnicode_From_int(__pyx_v_p, 0, ' ', 'd'); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 1641, __pyx_L1_error)
+        __pyx_t_7 = __Pyx_PyUnicode_From_int(__pyx_v_p, 0, ' ', 'd'); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 1632, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_7);
         __pyx_t_16 += __Pyx_PyUnicode_GET_LENGTH(__pyx_t_7);
         __Pyx_GIVEREF(__pyx_t_7);
@@ -26438,9 +26438,9 @@ static PyObject *__pyx_f_5MACS2_2IO_10ScoreTrack_18TwoConditionScores_write_bedG
         __pyx_t_16 += 1;
         __Pyx_GIVEREF(__pyx_kp_u__11);
         PyTuple_SET_ITEM(__pyx_t_4, 5, __pyx_kp_u__11);
-        __pyx_t_7 = PyFloat_FromDouble(__pyx_v_pre_v); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 1641, __pyx_L1_error)
+        __pyx_t_7 = PyFloat_FromDouble(__pyx_v_pre_v); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 1632, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_7);
-        __pyx_t_3 = __Pyx_PyObject_Format(__pyx_t_7, __pyx_kp_u_5f); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 1641, __pyx_L1_error)
+        __pyx_t_3 = __Pyx_PyObject_Format(__pyx_t_7, __pyx_kp_u_5f); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 1632, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_3);
         __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
         __pyx_t_17 = (__Pyx_PyUnicode_MAX_CHAR_VALUE(__pyx_t_3) > __pyx_t_17) ? __Pyx_PyUnicode_MAX_CHAR_VALUE(__pyx_t_3) : __pyx_t_17;
@@ -26452,7 +26452,7 @@ static PyObject *__pyx_f_5MACS2_2IO_10ScoreTrack_18TwoConditionScores_write_bedG
         __pyx_t_16 += 1;
         __Pyx_GIVEREF(__pyx_kp_u__12);
         PyTuple_SET_ITEM(__pyx_t_4, 7, __pyx_kp_u__12);
-        __pyx_t_3 = __Pyx_PyUnicode_Join(__pyx_t_4, 8, __pyx_t_16, __pyx_t_17); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 1641, __pyx_L1_error)
+        __pyx_t_3 = __Pyx_PyUnicode_Join(__pyx_t_4, 8, __pyx_t_16, __pyx_t_17); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 1632, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_3);
         __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
         __Pyx_INCREF(__pyx_v_write);
@@ -26469,12 +26469,12 @@ static PyObject *__pyx_f_5MACS2_2IO_10ScoreTrack_18TwoConditionScores_write_bedG
         __pyx_t_1 = (__pyx_t_7) ? __Pyx_PyObject_Call2Args(__pyx_t_4, __pyx_t_7, __pyx_t_3) : __Pyx_PyObject_CallOneArg(__pyx_t_4, __pyx_t_3);
         __Pyx_XDECREF(__pyx_t_7); __pyx_t_7 = 0;
         __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-        if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1641, __pyx_L1_error)
+        if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1632, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_1);
         __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
         __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-        /* "MACS2/IO/ScoreTrack.pyx":1642
+        /* "MACS2/IO/ScoreTrack.pyx":1633
  *                 if abs(pre_v - v)>=1e-6:
  *                     write( "%s\t%d\t%d\t%.5f\n" % ( chrom.decode(), pre, p, pre_v ) )
  *                     pre_v = v             # <<<<<<<<<<<<<<
@@ -26483,7 +26483,7 @@ static PyObject *__pyx_f_5MACS2_2IO_10ScoreTrack_18TwoConditionScores_write_bedG
  */
         __pyx_v_pre_v = __pyx_v_v;
 
-        /* "MACS2/IO/ScoreTrack.pyx":1643
+        /* "MACS2/IO/ScoreTrack.pyx":1634
  *                     write( "%s\t%d\t%d\t%.5f\n" % ( chrom.decode(), pre, p, pre_v ) )
  *                     pre_v = v
  *                     pre = p             # <<<<<<<<<<<<<<
@@ -26492,7 +26492,7 @@ static PyObject *__pyx_f_5MACS2_2IO_10ScoreTrack_18TwoConditionScores_write_bedG
  */
         __pyx_v_pre = __pyx_v_p;
 
-        /* "MACS2/IO/ScoreTrack.pyx":1640
+        /* "MACS2/IO/ScoreTrack.pyx":1631
  *                 v = value[ i ]
  *                 p = pos[ i-1 ]
  *                 if abs(pre_v - v)>=1e-6:             # <<<<<<<<<<<<<<
@@ -26502,35 +26502,35 @@ static PyObject *__pyx_f_5MACS2_2IO_10ScoreTrack_18TwoConditionScores_write_bedG
       }
     }
 
-    /* "MACS2/IO/ScoreTrack.pyx":1644
+    /* "MACS2/IO/ScoreTrack.pyx":1635
  *                     pre_v = v
  *                     pre = p
  *             p = pos[ -1 ]             # <<<<<<<<<<<<<<
  *             # last one
  *             write( "%s\t%d\t%d\t%.5f\n" % ( chrom.decode(), pre, p, pre_v ) )
  */
-    __pyx_t_1 = __Pyx_GetItemInt(((PyObject *)__pyx_v_pos), -1L, long, 1, __Pyx_PyInt_From_long, 0, 1, 1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1644, __pyx_L1_error)
+    __pyx_t_1 = __Pyx_GetItemInt(((PyObject *)__pyx_v_pos), -1L, long, 1, __Pyx_PyInt_From_long, 0, 1, 1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1635, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
-    __pyx_t_6 = __Pyx_PyInt_As_int(__pyx_t_1); if (unlikely((__pyx_t_6 == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 1644, __pyx_L1_error)
+    __pyx_t_6 = __Pyx_PyInt_As_int(__pyx_t_1); if (unlikely((__pyx_t_6 == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 1635, __pyx_L1_error)
     __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
     __pyx_v_p = __pyx_t_6;
 
-    /* "MACS2/IO/ScoreTrack.pyx":1646
+    /* "MACS2/IO/ScoreTrack.pyx":1637
  *             p = pos[ -1 ]
  *             # last one
  *             write( "%s\t%d\t%d\t%.5f\n" % ( chrom.decode(), pre, p, pre_v ) )             # <<<<<<<<<<<<<<
  * 
  *         return True
  */
-    __pyx_t_4 = PyTuple_New(8); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 1646, __pyx_L1_error)
+    __pyx_t_4 = PyTuple_New(8); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 1637, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_4);
     __pyx_t_16 = 0;
     __pyx_t_17 = 127;
     if (unlikely(__pyx_v_chrom == Py_None)) {
       PyErr_Format(PyExc_AttributeError, "'NoneType' object has no attribute '%.30s'", "decode");
-      __PYX_ERR(0, 1646, __pyx_L1_error)
+      __PYX_ERR(0, 1637, __pyx_L1_error)
     }
-    __pyx_t_3 = __Pyx_decode_bytes(__pyx_v_chrom, 0, PY_SSIZE_T_MAX, NULL, NULL, NULL); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 1646, __pyx_L1_error)
+    __pyx_t_3 = __Pyx_decode_bytes(__pyx_v_chrom, 0, PY_SSIZE_T_MAX, NULL, NULL, NULL); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 1637, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_3);
     __pyx_t_17 = (__Pyx_PyUnicode_MAX_CHAR_VALUE(__pyx_t_3) > __pyx_t_17) ? __Pyx_PyUnicode_MAX_CHAR_VALUE(__pyx_t_3) : __pyx_t_17;
     __pyx_t_16 += __Pyx_PyUnicode_GET_LENGTH(__pyx_t_3);
@@ -26541,7 +26541,7 @@ static PyObject *__pyx_f_5MACS2_2IO_10ScoreTrack_18TwoConditionScores_write_bedG
     __pyx_t_16 += 1;
     __Pyx_GIVEREF(__pyx_kp_u__11);
     PyTuple_SET_ITEM(__pyx_t_4, 1, __pyx_kp_u__11);
-    __pyx_t_3 = __Pyx_PyUnicode_From_int(__pyx_v_pre, 0, ' ', 'd'); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 1646, __pyx_L1_error)
+    __pyx_t_3 = __Pyx_PyUnicode_From_int(__pyx_v_pre, 0, ' ', 'd'); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 1637, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_3);
     __pyx_t_16 += __Pyx_PyUnicode_GET_LENGTH(__pyx_t_3);
     __Pyx_GIVEREF(__pyx_t_3);
@@ -26551,7 +26551,7 @@ static PyObject *__pyx_f_5MACS2_2IO_10ScoreTrack_18TwoConditionScores_write_bedG
     __pyx_t_16 += 1;
     __Pyx_GIVEREF(__pyx_kp_u__11);
     PyTuple_SET_ITEM(__pyx_t_4, 3, __pyx_kp_u__11);
-    __pyx_t_3 = __Pyx_PyUnicode_From_int(__pyx_v_p, 0, ' ', 'd'); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 1646, __pyx_L1_error)
+    __pyx_t_3 = __Pyx_PyUnicode_From_int(__pyx_v_p, 0, ' ', 'd'); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 1637, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_3);
     __pyx_t_16 += __Pyx_PyUnicode_GET_LENGTH(__pyx_t_3);
     __Pyx_GIVEREF(__pyx_t_3);
@@ -26561,9 +26561,9 @@ static PyObject *__pyx_f_5MACS2_2IO_10ScoreTrack_18TwoConditionScores_write_bedG
     __pyx_t_16 += 1;
     __Pyx_GIVEREF(__pyx_kp_u__11);
     PyTuple_SET_ITEM(__pyx_t_4, 5, __pyx_kp_u__11);
-    __pyx_t_3 = PyFloat_FromDouble(__pyx_v_pre_v); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 1646, __pyx_L1_error)
+    __pyx_t_3 = PyFloat_FromDouble(__pyx_v_pre_v); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 1637, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_3);
-    __pyx_t_7 = __Pyx_PyObject_Format(__pyx_t_3, __pyx_kp_u_5f); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 1646, __pyx_L1_error)
+    __pyx_t_7 = __Pyx_PyObject_Format(__pyx_t_3, __pyx_kp_u_5f); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 1637, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_7);
     __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
     __pyx_t_17 = (__Pyx_PyUnicode_MAX_CHAR_VALUE(__pyx_t_7) > __pyx_t_17) ? __Pyx_PyUnicode_MAX_CHAR_VALUE(__pyx_t_7) : __pyx_t_17;
@@ -26575,7 +26575,7 @@ static PyObject *__pyx_f_5MACS2_2IO_10ScoreTrack_18TwoConditionScores_write_bedG
     __pyx_t_16 += 1;
     __Pyx_GIVEREF(__pyx_kp_u__12);
     PyTuple_SET_ITEM(__pyx_t_4, 7, __pyx_kp_u__12);
-    __pyx_t_7 = __Pyx_PyUnicode_Join(__pyx_t_4, 8, __pyx_t_16, __pyx_t_17); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 1646, __pyx_L1_error)
+    __pyx_t_7 = __Pyx_PyUnicode_Join(__pyx_t_4, 8, __pyx_t_16, __pyx_t_17); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 1637, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_7);
     __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
     __Pyx_INCREF(__pyx_v_write);
@@ -26592,12 +26592,12 @@ static PyObject *__pyx_f_5MACS2_2IO_10ScoreTrack_18TwoConditionScores_write_bedG
     __pyx_t_1 = (__pyx_t_3) ? __Pyx_PyObject_Call2Args(__pyx_t_4, __pyx_t_3, __pyx_t_7) : __Pyx_PyObject_CallOneArg(__pyx_t_4, __pyx_t_7);
     __Pyx_XDECREF(__pyx_t_3); __pyx_t_3 = 0;
     __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
-    if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1646, __pyx_L1_error)
+    if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1637, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
     __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
     __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-    /* "MACS2/IO/ScoreTrack.pyx":1630
+    /* "MACS2/IO/ScoreTrack.pyx":1621
  * 
  *         chrs = self.get_chr_names()
  *         for chrom in chrs:             # <<<<<<<<<<<<<<
@@ -26608,7 +26608,7 @@ static PyObject *__pyx_f_5MACS2_2IO_10ScoreTrack_18TwoConditionScores_write_bedG
   }
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
-  /* "MACS2/IO/ScoreTrack.pyx":1648
+  /* "MACS2/IO/ScoreTrack.pyx":1639
  *             write( "%s\t%d\t%d\t%.5f\n" % ( chrom.decode(), pre, p, pre_v ) )
  * 
  *         return True             # <<<<<<<<<<<<<<
@@ -26620,7 +26620,7 @@ static PyObject *__pyx_f_5MACS2_2IO_10ScoreTrack_18TwoConditionScores_write_bedG
   __pyx_r = Py_True;
   goto __pyx_L0;
 
-  /* "MACS2/IO/ScoreTrack.pyx":1605
+  /* "MACS2/IO/ScoreTrack.pyx":1596
  *         return l
  * 
  *     cpdef write_bedGraph ( self, fhd, str name, str description, short column = 3):             # <<<<<<<<<<<<<<
@@ -26688,13 +26688,13 @@ static PyObject *__pyx_pw_5MACS2_2IO_10ScoreTrack_18TwoConditionScores_15write_b
         case  1:
         if (likely((values[1] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_name)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("write_bedGraph", 0, 3, 4, 1); __PYX_ERR(0, 1605, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("write_bedGraph", 0, 3, 4, 1); __PYX_ERR(0, 1596, __pyx_L3_error)
         }
         CYTHON_FALLTHROUGH;
         case  2:
         if (likely((values[2] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_description)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("write_bedGraph", 0, 3, 4, 2); __PYX_ERR(0, 1605, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("write_bedGraph", 0, 3, 4, 2); __PYX_ERR(0, 1596, __pyx_L3_error)
         }
         CYTHON_FALLTHROUGH;
         case  3:
@@ -26704,7 +26704,7 @@ static PyObject *__pyx_pw_5MACS2_2IO_10ScoreTrack_18TwoConditionScores_15write_b
         }
       }
       if (unlikely(kw_args > 0)) {
-        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "write_bedGraph") < 0)) __PYX_ERR(0, 1605, __pyx_L3_error)
+        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "write_bedGraph") < 0)) __PYX_ERR(0, 1596, __pyx_L3_error)
       }
     } else {
       switch (PyTuple_GET_SIZE(__pyx_args)) {
@@ -26721,21 +26721,21 @@ static PyObject *__pyx_pw_5MACS2_2IO_10ScoreTrack_18TwoConditionScores_15write_b
     __pyx_v_name = ((PyObject*)values[1]);
     __pyx_v_description = ((PyObject*)values[2]);
     if (values[3]) {
-      __pyx_v_column = __Pyx_PyInt_As_short(values[3]); if (unlikely((__pyx_v_column == (short)-1) && PyErr_Occurred())) __PYX_ERR(0, 1605, __pyx_L3_error)
+      __pyx_v_column = __Pyx_PyInt_As_short(values[3]); if (unlikely((__pyx_v_column == (short)-1) && PyErr_Occurred())) __PYX_ERR(0, 1596, __pyx_L3_error)
     } else {
       __pyx_v_column = ((short)3);
     }
   }
   goto __pyx_L4_argument_unpacking_done;
   __pyx_L5_argtuple_error:;
-  __Pyx_RaiseArgtupleInvalid("write_bedGraph", 0, 3, 4, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 1605, __pyx_L3_error)
+  __Pyx_RaiseArgtupleInvalid("write_bedGraph", 0, 3, 4, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 1596, __pyx_L3_error)
   __pyx_L3_error:;
   __Pyx_AddTraceback("MACS2.IO.ScoreTrack.TwoConditionScores.write_bedGraph", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __Pyx_RefNannyFinishContext();
   return NULL;
   __pyx_L4_argument_unpacking_done:;
-  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_name), (&PyUnicode_Type), 1, "name", 1))) __PYX_ERR(0, 1605, __pyx_L1_error)
-  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_description), (&PyUnicode_Type), 1, "description", 1))) __PYX_ERR(0, 1605, __pyx_L1_error)
+  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_name), (&PyUnicode_Type), 1, "name", 1))) __PYX_ERR(0, 1596, __pyx_L1_error)
+  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_description), (&PyUnicode_Type), 1, "description", 1))) __PYX_ERR(0, 1596, __pyx_L1_error)
   __pyx_r = __pyx_pf_5MACS2_2IO_10ScoreTrack_18TwoConditionScores_14write_bedGraph(((struct __pyx_obj_5MACS2_2IO_10ScoreTrack_TwoConditionScores *)__pyx_v_self), __pyx_v_fhd, __pyx_v_name, __pyx_v_description, __pyx_v_column);
 
   /* function exit code */
@@ -26754,11 +26754,11 @@ static PyObject *__pyx_pf_5MACS2_2IO_10ScoreTrack_18TwoConditionScores_14write_b
   PyObject *__pyx_t_1 = NULL;
   struct __pyx_opt_args_5MACS2_2IO_10ScoreTrack_18TwoConditionScores_write_bedGraph __pyx_t_2;
   __Pyx_RefNannySetupContext("write_bedGraph", 0);
-  __Pyx_TraceCall("write_bedGraph (wrapper)", __pyx_f[0], 1605, 0, __PYX_ERR(0, 1605, __pyx_L1_error));
+  __Pyx_TraceCall("write_bedGraph (wrapper)", __pyx_f[0], 1596, 0, __PYX_ERR(0, 1596, __pyx_L1_error));
   __Pyx_XDECREF(__pyx_r);
   __pyx_t_2.__pyx_n = 1;
   __pyx_t_2.column = __pyx_v_column;
-  __pyx_t_1 = __pyx_vtabptr_5MACS2_2IO_10ScoreTrack_TwoConditionScores->write_bedGraph(__pyx_v_self, __pyx_v_fhd, __pyx_v_name, __pyx_v_description, 1, &__pyx_t_2); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1605, __pyx_L1_error)
+  __pyx_t_1 = __pyx_vtabptr_5MACS2_2IO_10ScoreTrack_TwoConditionScores->write_bedGraph(__pyx_v_self, __pyx_v_fhd, __pyx_v_name, __pyx_v_description, 1, &__pyx_t_2); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1596, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __pyx_r = __pyx_t_1;
   __pyx_t_1 = 0;
@@ -26776,7 +26776,7 @@ static PyObject *__pyx_pf_5MACS2_2IO_10ScoreTrack_18TwoConditionScores_14write_b
   return __pyx_r;
 }
 
-/* "MACS2/IO/ScoreTrack.pyx":1650
+/* "MACS2/IO/ScoreTrack.pyx":1641
  *         return True
  * 
  *     cpdef write_matrix ( self, fhd, str name, str description ):             # <<<<<<<<<<<<<<
@@ -26822,7 +26822,7 @@ static PyObject *__pyx_f_5MACS2_2IO_10ScoreTrack_18TwoConditionScores_write_matr
   Py_ssize_t __pyx_t_17;
   Py_UCS4 __pyx_t_18;
   __Pyx_RefNannySetupContext("write_matrix", 0);
-  __Pyx_TraceCall("write_matrix", __pyx_f[0], 1650, 0, __PYX_ERR(0, 1650, __pyx_L1_error));
+  __Pyx_TraceCall("write_matrix", __pyx_f[0], 1641, 0, __PYX_ERR(0, 1641, __pyx_L1_error));
   /* Check if called by wrapper */
   if (unlikely(__pyx_skip_dispatch)) ;
   /* Check if overridden in Python */
@@ -26832,7 +26832,7 @@ static PyObject *__pyx_f_5MACS2_2IO_10ScoreTrack_18TwoConditionScores_write_matr
     if (unlikely(!__Pyx_object_dict_version_matches(((PyObject *)__pyx_v_self), __pyx_tp_dict_version, __pyx_obj_dict_version))) {
       PY_UINT64_T __pyx_type_dict_guard = __Pyx_get_tp_dict_version(((PyObject *)__pyx_v_self));
       #endif
-      __pyx_t_1 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_v_self), __pyx_n_s_write_matrix); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1650, __pyx_L1_error)
+      __pyx_t_1 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_v_self), __pyx_n_s_write_matrix); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1641, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_1);
       if (!PyCFunction_Check(__pyx_t_1) || (PyCFunction_GET_FUNCTION(__pyx_t_1) != (PyCFunction)(void*)__pyx_pw_5MACS2_2IO_10ScoreTrack_18TwoConditionScores_17write_matrix)) {
         __Pyx_XDECREF(__pyx_r);
@@ -26852,7 +26852,7 @@ static PyObject *__pyx_f_5MACS2_2IO_10ScoreTrack_18TwoConditionScores_write_matr
         #if CYTHON_FAST_PYCALL
         if (PyFunction_Check(__pyx_t_3)) {
           PyObject *__pyx_temp[4] = {__pyx_t_4, __pyx_v_fhd, __pyx_v_name, __pyx_v_description};
-          __pyx_t_2 = __Pyx_PyFunction_FastCall(__pyx_t_3, __pyx_temp+1-__pyx_t_5, 3+__pyx_t_5); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1650, __pyx_L1_error)
+          __pyx_t_2 = __Pyx_PyFunction_FastCall(__pyx_t_3, __pyx_temp+1-__pyx_t_5, 3+__pyx_t_5); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1641, __pyx_L1_error)
           __Pyx_XDECREF(__pyx_t_4); __pyx_t_4 = 0;
           __Pyx_GOTREF(__pyx_t_2);
         } else
@@ -26860,13 +26860,13 @@ static PyObject *__pyx_f_5MACS2_2IO_10ScoreTrack_18TwoConditionScores_write_matr
         #if CYTHON_FAST_PYCCALL
         if (__Pyx_PyFastCFunction_Check(__pyx_t_3)) {
           PyObject *__pyx_temp[4] = {__pyx_t_4, __pyx_v_fhd, __pyx_v_name, __pyx_v_description};
-          __pyx_t_2 = __Pyx_PyCFunction_FastCall(__pyx_t_3, __pyx_temp+1-__pyx_t_5, 3+__pyx_t_5); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1650, __pyx_L1_error)
+          __pyx_t_2 = __Pyx_PyCFunction_FastCall(__pyx_t_3, __pyx_temp+1-__pyx_t_5, 3+__pyx_t_5); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1641, __pyx_L1_error)
           __Pyx_XDECREF(__pyx_t_4); __pyx_t_4 = 0;
           __Pyx_GOTREF(__pyx_t_2);
         } else
         #endif
         {
-          __pyx_t_6 = PyTuple_New(3+__pyx_t_5); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 1650, __pyx_L1_error)
+          __pyx_t_6 = PyTuple_New(3+__pyx_t_5); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 1641, __pyx_L1_error)
           __Pyx_GOTREF(__pyx_t_6);
           if (__pyx_t_4) {
             __Pyx_GIVEREF(__pyx_t_4); PyTuple_SET_ITEM(__pyx_t_6, 0, __pyx_t_4); __pyx_t_4 = NULL;
@@ -26880,7 +26880,7 @@ static PyObject *__pyx_f_5MACS2_2IO_10ScoreTrack_18TwoConditionScores_write_matr
           __Pyx_INCREF(__pyx_v_description);
           __Pyx_GIVEREF(__pyx_v_description);
           PyTuple_SET_ITEM(__pyx_t_6, 2+__pyx_t_5, __pyx_v_description);
-          __pyx_t_2 = __Pyx_PyObject_Call(__pyx_t_3, __pyx_t_6, NULL); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1650, __pyx_L1_error)
+          __pyx_t_2 = __Pyx_PyObject_Call(__pyx_t_3, __pyx_t_6, NULL); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1641, __pyx_L1_error)
           __Pyx_GOTREF(__pyx_t_2);
           __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
         }
@@ -26903,31 +26903,31 @@ static PyObject *__pyx_f_5MACS2_2IO_10ScoreTrack_18TwoConditionScores_write_matr
     #endif
   }
 
-  /* "MACS2/IO/ScoreTrack.pyx":1667
+  /* "MACS2/IO/ScoreTrack.pyx":1658
  *             np.ndarray pos, value1, value2, value3
  * 
  *         write = fhd.write             # <<<<<<<<<<<<<<
  * 
  *         chrs = self.get_chr_names()
  */
-  __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_v_fhd, __pyx_n_s_write); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1667, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_v_fhd, __pyx_n_s_write); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1658, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __pyx_v_write = __pyx_t_1;
   __pyx_t_1 = 0;
 
-  /* "MACS2/IO/ScoreTrack.pyx":1669
+  /* "MACS2/IO/ScoreTrack.pyx":1660
  *         write = fhd.write
  * 
  *         chrs = self.get_chr_names()             # <<<<<<<<<<<<<<
  *         for chrom in chrs:
  *             [ pos, value1, value2, value3 ] = self.data[ chrom ]
  */
-  __pyx_t_1 = ((struct __pyx_vtabstruct_5MACS2_2IO_10ScoreTrack_TwoConditionScores *)__pyx_v_self->__pyx_vtab)->get_chr_names(__pyx_v_self, 0); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1669, __pyx_L1_error)
+  __pyx_t_1 = ((struct __pyx_vtabstruct_5MACS2_2IO_10ScoreTrack_TwoConditionScores *)__pyx_v_self->__pyx_vtab)->get_chr_names(__pyx_v_self, 0); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1660, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __pyx_v_chrs = __pyx_t_1;
   __pyx_t_1 = 0;
 
-  /* "MACS2/IO/ScoreTrack.pyx":1670
+  /* "MACS2/IO/ScoreTrack.pyx":1661
  * 
  *         chrs = self.get_chr_names()
  *         for chrom in chrs:             # <<<<<<<<<<<<<<
@@ -26938,26 +26938,26 @@ static PyObject *__pyx_f_5MACS2_2IO_10ScoreTrack_18TwoConditionScores_write_matr
     __pyx_t_1 = __pyx_v_chrs; __Pyx_INCREF(__pyx_t_1); __pyx_t_7 = 0;
     __pyx_t_8 = NULL;
   } else {
-    __pyx_t_7 = -1; __pyx_t_1 = PyObject_GetIter(__pyx_v_chrs); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1670, __pyx_L1_error)
+    __pyx_t_7 = -1; __pyx_t_1 = PyObject_GetIter(__pyx_v_chrs); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1661, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
-    __pyx_t_8 = Py_TYPE(__pyx_t_1)->tp_iternext; if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 1670, __pyx_L1_error)
+    __pyx_t_8 = Py_TYPE(__pyx_t_1)->tp_iternext; if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 1661, __pyx_L1_error)
   }
   for (;;) {
     if (likely(!__pyx_t_8)) {
       if (likely(PyList_CheckExact(__pyx_t_1))) {
         if (__pyx_t_7 >= PyList_GET_SIZE(__pyx_t_1)) break;
         #if CYTHON_ASSUME_SAFE_MACROS && !CYTHON_AVOID_BORROWED_REFS
-        __pyx_t_2 = PyList_GET_ITEM(__pyx_t_1, __pyx_t_7); __Pyx_INCREF(__pyx_t_2); __pyx_t_7++; if (unlikely(0 < 0)) __PYX_ERR(0, 1670, __pyx_L1_error)
+        __pyx_t_2 = PyList_GET_ITEM(__pyx_t_1, __pyx_t_7); __Pyx_INCREF(__pyx_t_2); __pyx_t_7++; if (unlikely(0 < 0)) __PYX_ERR(0, 1661, __pyx_L1_error)
         #else
-        __pyx_t_2 = PySequence_ITEM(__pyx_t_1, __pyx_t_7); __pyx_t_7++; if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1670, __pyx_L1_error)
+        __pyx_t_2 = PySequence_ITEM(__pyx_t_1, __pyx_t_7); __pyx_t_7++; if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1661, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_2);
         #endif
       } else {
         if (__pyx_t_7 >= PyTuple_GET_SIZE(__pyx_t_1)) break;
         #if CYTHON_ASSUME_SAFE_MACROS && !CYTHON_AVOID_BORROWED_REFS
-        __pyx_t_2 = PyTuple_GET_ITEM(__pyx_t_1, __pyx_t_7); __Pyx_INCREF(__pyx_t_2); __pyx_t_7++; if (unlikely(0 < 0)) __PYX_ERR(0, 1670, __pyx_L1_error)
+        __pyx_t_2 = PyTuple_GET_ITEM(__pyx_t_1, __pyx_t_7); __Pyx_INCREF(__pyx_t_2); __pyx_t_7++; if (unlikely(0 < 0)) __PYX_ERR(0, 1661, __pyx_L1_error)
         #else
-        __pyx_t_2 = PySequence_ITEM(__pyx_t_1, __pyx_t_7); __pyx_t_7++; if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1670, __pyx_L1_error)
+        __pyx_t_2 = PySequence_ITEM(__pyx_t_1, __pyx_t_7); __pyx_t_7++; if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1661, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_2);
         #endif
       }
@@ -26967,17 +26967,17 @@ static PyObject *__pyx_f_5MACS2_2IO_10ScoreTrack_18TwoConditionScores_write_matr
         PyObject* exc_type = PyErr_Occurred();
         if (exc_type) {
           if (likely(__Pyx_PyErr_GivenExceptionMatches(exc_type, PyExc_StopIteration))) PyErr_Clear();
-          else __PYX_ERR(0, 1670, __pyx_L1_error)
+          else __PYX_ERR(0, 1661, __pyx_L1_error)
         }
         break;
       }
       __Pyx_GOTREF(__pyx_t_2);
     }
-    if (!(likely(PyBytes_CheckExact(__pyx_t_2))||((__pyx_t_2) == Py_None)||(PyErr_Format(PyExc_TypeError, "Expected %.16s, got %.200s", "bytes", Py_TYPE(__pyx_t_2)->tp_name), 0))) __PYX_ERR(0, 1670, __pyx_L1_error)
+    if (!(likely(PyBytes_CheckExact(__pyx_t_2))||((__pyx_t_2) == Py_None)||(PyErr_Format(PyExc_TypeError, "Expected %.16s, got %.200s", "bytes", Py_TYPE(__pyx_t_2)->tp_name), 0))) __PYX_ERR(0, 1661, __pyx_L1_error)
     __Pyx_XDECREF_SET(__pyx_v_chrom, ((PyObject*)__pyx_t_2));
     __pyx_t_2 = 0;
 
-    /* "MACS2/IO/ScoreTrack.pyx":1671
+    /* "MACS2/IO/ScoreTrack.pyx":1662
  *         chrs = self.get_chr_names()
  *         for chrom in chrs:
  *             [ pos, value1, value2, value3 ] = self.data[ chrom ]             # <<<<<<<<<<<<<<
@@ -26986,9 +26986,9 @@ static PyObject *__pyx_f_5MACS2_2IO_10ScoreTrack_18TwoConditionScores_write_matr
  */
     if (unlikely(__pyx_v_self->data == Py_None)) {
       PyErr_SetString(PyExc_TypeError, "'NoneType' object is not subscriptable");
-      __PYX_ERR(0, 1671, __pyx_L1_error)
+      __PYX_ERR(0, 1662, __pyx_L1_error)
     }
-    __pyx_t_2 = __Pyx_PyDict_GetItem(__pyx_v_self->data, __pyx_v_chrom); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1671, __pyx_L1_error)
+    __pyx_t_2 = __Pyx_PyDict_GetItem(__pyx_v_self->data, __pyx_v_chrom); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1662, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
     if ((likely(PyTuple_CheckExact(__pyx_t_2))) || (PyList_CheckExact(__pyx_t_2))) {
       PyObject* sequence = __pyx_t_2;
@@ -26996,7 +26996,7 @@ static PyObject *__pyx_f_5MACS2_2IO_10ScoreTrack_18TwoConditionScores_write_matr
       if (unlikely(size != 4)) {
         if (size > 4) __Pyx_RaiseTooManyValuesError(4);
         else if (size >= 0) __Pyx_RaiseNeedMoreValuesError(size);
-        __PYX_ERR(0, 1671, __pyx_L1_error)
+        __PYX_ERR(0, 1662, __pyx_L1_error)
       }
       #if CYTHON_ASSUME_SAFE_MACROS && !CYTHON_AVOID_BORROWED_REFS
       if (likely(PyTuple_CheckExact(sequence))) {
@@ -27019,7 +27019,7 @@ static PyObject *__pyx_f_5MACS2_2IO_10ScoreTrack_18TwoConditionScores_write_matr
         Py_ssize_t i;
         PyObject** temps[4] = {&__pyx_t_3,&__pyx_t_6,&__pyx_t_4,&__pyx_t_9};
         for (i=0; i < 4; i++) {
-          PyObject* item = PySequence_ITEM(sequence, i); if (unlikely(!item)) __PYX_ERR(0, 1671, __pyx_L1_error)
+          PyObject* item = PySequence_ITEM(sequence, i); if (unlikely(!item)) __PYX_ERR(0, 1662, __pyx_L1_error)
           __Pyx_GOTREF(item);
           *(temps[i]) = item;
         }
@@ -27029,7 +27029,7 @@ static PyObject *__pyx_f_5MACS2_2IO_10ScoreTrack_18TwoConditionScores_write_matr
     } else {
       Py_ssize_t index = -1;
       PyObject** temps[4] = {&__pyx_t_3,&__pyx_t_6,&__pyx_t_4,&__pyx_t_9};
-      __pyx_t_10 = PyObject_GetIter(__pyx_t_2); if (unlikely(!__pyx_t_10)) __PYX_ERR(0, 1671, __pyx_L1_error)
+      __pyx_t_10 = PyObject_GetIter(__pyx_t_2); if (unlikely(!__pyx_t_10)) __PYX_ERR(0, 1662, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_10);
       __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
       __pyx_t_11 = Py_TYPE(__pyx_t_10)->tp_iternext;
@@ -27038,7 +27038,7 @@ static PyObject *__pyx_f_5MACS2_2IO_10ScoreTrack_18TwoConditionScores_write_matr
         __Pyx_GOTREF(item);
         *(temps[index]) = item;
       }
-      if (__Pyx_IternextUnpackEndCheck(__pyx_t_11(__pyx_t_10), 4) < 0) __PYX_ERR(0, 1671, __pyx_L1_error)
+      if (__Pyx_IternextUnpackEndCheck(__pyx_t_11(__pyx_t_10), 4) < 0) __PYX_ERR(0, 1662, __pyx_L1_error)
       __pyx_t_11 = NULL;
       __Pyx_DECREF(__pyx_t_10); __pyx_t_10 = 0;
       goto __pyx_L6_unpacking_done;
@@ -27046,13 +27046,13 @@ static PyObject *__pyx_f_5MACS2_2IO_10ScoreTrack_18TwoConditionScores_write_matr
       __Pyx_DECREF(__pyx_t_10); __pyx_t_10 = 0;
       __pyx_t_11 = NULL;
       if (__Pyx_IterFinish() == 0) __Pyx_RaiseNeedMoreValuesError(index);
-      __PYX_ERR(0, 1671, __pyx_L1_error)
+      __PYX_ERR(0, 1662, __pyx_L1_error)
       __pyx_L6_unpacking_done:;
     }
-    if (!(likely(((__pyx_t_3) == Py_None) || likely(__Pyx_TypeTest(__pyx_t_3, __pyx_ptype_5numpy_ndarray))))) __PYX_ERR(0, 1671, __pyx_L1_error)
-    if (!(likely(((__pyx_t_6) == Py_None) || likely(__Pyx_TypeTest(__pyx_t_6, __pyx_ptype_5numpy_ndarray))))) __PYX_ERR(0, 1671, __pyx_L1_error)
-    if (!(likely(((__pyx_t_4) == Py_None) || likely(__Pyx_TypeTest(__pyx_t_4, __pyx_ptype_5numpy_ndarray))))) __PYX_ERR(0, 1671, __pyx_L1_error)
-    if (!(likely(((__pyx_t_9) == Py_None) || likely(__Pyx_TypeTest(__pyx_t_9, __pyx_ptype_5numpy_ndarray))))) __PYX_ERR(0, 1671, __pyx_L1_error)
+    if (!(likely(((__pyx_t_3) == Py_None) || likely(__Pyx_TypeTest(__pyx_t_3, __pyx_ptype_5numpy_ndarray))))) __PYX_ERR(0, 1662, __pyx_L1_error)
+    if (!(likely(((__pyx_t_6) == Py_None) || likely(__Pyx_TypeTest(__pyx_t_6, __pyx_ptype_5numpy_ndarray))))) __PYX_ERR(0, 1662, __pyx_L1_error)
+    if (!(likely(((__pyx_t_4) == Py_None) || likely(__Pyx_TypeTest(__pyx_t_4, __pyx_ptype_5numpy_ndarray))))) __PYX_ERR(0, 1662, __pyx_L1_error)
+    if (!(likely(((__pyx_t_9) == Py_None) || likely(__Pyx_TypeTest(__pyx_t_9, __pyx_ptype_5numpy_ndarray))))) __PYX_ERR(0, 1662, __pyx_L1_error)
     __Pyx_XDECREF_SET(__pyx_v_pos, ((PyArrayObject *)__pyx_t_3));
     __pyx_t_3 = 0;
     __Pyx_XDECREF_SET(__pyx_v_value1, ((PyArrayObject *)__pyx_t_6));
@@ -27062,7 +27062,7 @@ static PyObject *__pyx_f_5MACS2_2IO_10ScoreTrack_18TwoConditionScores_write_matr
     __Pyx_XDECREF_SET(__pyx_v_value3, ((PyArrayObject *)__pyx_t_9));
     __pyx_t_9 = 0;
 
-    /* "MACS2/IO/ScoreTrack.pyx":1672
+    /* "MACS2/IO/ScoreTrack.pyx":1663
  *         for chrom in chrs:
  *             [ pos, value1, value2, value3 ] = self.data[ chrom ]
  *             l = self.datalength[ chrom ]             # <<<<<<<<<<<<<<
@@ -27071,15 +27071,15 @@ static PyObject *__pyx_f_5MACS2_2IO_10ScoreTrack_18TwoConditionScores_write_matr
  */
     if (unlikely(__pyx_v_self->datalength == Py_None)) {
       PyErr_SetString(PyExc_TypeError, "'NoneType' object is not subscriptable");
-      __PYX_ERR(0, 1672, __pyx_L1_error)
+      __PYX_ERR(0, 1663, __pyx_L1_error)
     }
-    __pyx_t_2 = __Pyx_PyDict_GetItem(__pyx_v_self->datalength, __pyx_v_chrom); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1672, __pyx_L1_error)
+    __pyx_t_2 = __Pyx_PyDict_GetItem(__pyx_v_self->datalength, __pyx_v_chrom); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1663, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
-    __pyx_t_5 = __Pyx_PyInt_As_int(__pyx_t_2); if (unlikely((__pyx_t_5 == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 1672, __pyx_L1_error)
+    __pyx_t_5 = __Pyx_PyInt_As_int(__pyx_t_2); if (unlikely((__pyx_t_5 == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 1663, __pyx_L1_error)
     __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
     __pyx_v_l = __pyx_t_5;
 
-    /* "MACS2/IO/ScoreTrack.pyx":1673
+    /* "MACS2/IO/ScoreTrack.pyx":1664
  *             [ pos, value1, value2, value3 ] = self.data[ chrom ]
  *             l = self.datalength[ chrom ]
  *             pre = 0             # <<<<<<<<<<<<<<
@@ -27088,7 +27088,7 @@ static PyObject *__pyx_f_5MACS2_2IO_10ScoreTrack_18TwoConditionScores_write_matr
  */
     __pyx_v_pre = 0;
 
-    /* "MACS2/IO/ScoreTrack.pyx":1674
+    /* "MACS2/IO/ScoreTrack.pyx":1665
  *             l = self.datalength[ chrom ]
  *             pre = 0
  *             if pos.shape[ 0 ] == 0: continue # skip if there's no data             # <<<<<<<<<<<<<<
@@ -27100,7 +27100,7 @@ static PyObject *__pyx_f_5MACS2_2IO_10ScoreTrack_18TwoConditionScores_write_matr
       goto __pyx_L3_continue;
     }
 
-    /* "MACS2/IO/ScoreTrack.pyx":1675
+    /* "MACS2/IO/ScoreTrack.pyx":1666
  *             pre = 0
  *             if pos.shape[ 0 ] == 0: continue # skip if there's no data
  *             for i in range( 0, l ):             # <<<<<<<<<<<<<<
@@ -27112,74 +27112,74 @@ static PyObject *__pyx_f_5MACS2_2IO_10ScoreTrack_18TwoConditionScores_write_matr
     for (__pyx_t_14 = 0; __pyx_t_14 < __pyx_t_13; __pyx_t_14+=1) {
       __pyx_v_i = __pyx_t_14;
 
-      /* "MACS2/IO/ScoreTrack.pyx":1676
+      /* "MACS2/IO/ScoreTrack.pyx":1667
  *             if pos.shape[ 0 ] == 0: continue # skip if there's no data
  *             for i in range( 0, l ):
  *                 v1 = value1[ i ]             # <<<<<<<<<<<<<<
  *                 v2 = value2[ i ]
  *                 v3 = value3[ i ]
  */
-      __pyx_t_2 = __Pyx_GetItemInt(((PyObject *)__pyx_v_value1), __pyx_v_i, int, 1, __Pyx_PyInt_From_int, 0, 1, 1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1676, __pyx_L1_error)
+      __pyx_t_2 = __Pyx_GetItemInt(((PyObject *)__pyx_v_value1), __pyx_v_i, int, 1, __Pyx_PyInt_From_int, 0, 1, 1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1667, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_2);
-      __pyx_t_15 = __pyx_PyFloat_AsFloat(__pyx_t_2); if (unlikely((__pyx_t_15 == (float)-1) && PyErr_Occurred())) __PYX_ERR(0, 1676, __pyx_L1_error)
+      __pyx_t_15 = __pyx_PyFloat_AsFloat(__pyx_t_2); if (unlikely((__pyx_t_15 == (float)-1) && PyErr_Occurred())) __PYX_ERR(0, 1667, __pyx_L1_error)
       __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
       __pyx_v_v1 = __pyx_t_15;
 
-      /* "MACS2/IO/ScoreTrack.pyx":1677
+      /* "MACS2/IO/ScoreTrack.pyx":1668
  *             for i in range( 0, l ):
  *                 v1 = value1[ i ]
  *                 v2 = value2[ i ]             # <<<<<<<<<<<<<<
  *                 v3 = value3[ i ]
  *                 p = pos[ i ]
  */
-      __pyx_t_2 = __Pyx_GetItemInt(((PyObject *)__pyx_v_value2), __pyx_v_i, int, 1, __Pyx_PyInt_From_int, 0, 1, 1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1677, __pyx_L1_error)
+      __pyx_t_2 = __Pyx_GetItemInt(((PyObject *)__pyx_v_value2), __pyx_v_i, int, 1, __Pyx_PyInt_From_int, 0, 1, 1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1668, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_2);
-      __pyx_t_15 = __pyx_PyFloat_AsFloat(__pyx_t_2); if (unlikely((__pyx_t_15 == (float)-1) && PyErr_Occurred())) __PYX_ERR(0, 1677, __pyx_L1_error)
+      __pyx_t_15 = __pyx_PyFloat_AsFloat(__pyx_t_2); if (unlikely((__pyx_t_15 == (float)-1) && PyErr_Occurred())) __PYX_ERR(0, 1668, __pyx_L1_error)
       __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
       __pyx_v_v2 = __pyx_t_15;
 
-      /* "MACS2/IO/ScoreTrack.pyx":1678
+      /* "MACS2/IO/ScoreTrack.pyx":1669
  *                 v1 = value1[ i ]
  *                 v2 = value2[ i ]
  *                 v3 = value3[ i ]             # <<<<<<<<<<<<<<
  *                 p = pos[ i ]
  *                 write( "%s:%d_%d\t%.5f\t%.5f\t%.5f\n" % ( chrom.decode(), pre, p, v1, v2, v3 ) )
  */
-      __pyx_t_2 = __Pyx_GetItemInt(((PyObject *)__pyx_v_value3), __pyx_v_i, int, 1, __Pyx_PyInt_From_int, 0, 1, 1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1678, __pyx_L1_error)
+      __pyx_t_2 = __Pyx_GetItemInt(((PyObject *)__pyx_v_value3), __pyx_v_i, int, 1, __Pyx_PyInt_From_int, 0, 1, 1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1669, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_2);
-      __pyx_t_15 = __pyx_PyFloat_AsFloat(__pyx_t_2); if (unlikely((__pyx_t_15 == (float)-1) && PyErr_Occurred())) __PYX_ERR(0, 1678, __pyx_L1_error)
+      __pyx_t_15 = __pyx_PyFloat_AsFloat(__pyx_t_2); if (unlikely((__pyx_t_15 == (float)-1) && PyErr_Occurred())) __PYX_ERR(0, 1669, __pyx_L1_error)
       __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
       __pyx_v_v3 = __pyx_t_15;
 
-      /* "MACS2/IO/ScoreTrack.pyx":1679
+      /* "MACS2/IO/ScoreTrack.pyx":1670
  *                 v2 = value2[ i ]
  *                 v3 = value3[ i ]
  *                 p = pos[ i ]             # <<<<<<<<<<<<<<
  *                 write( "%s:%d_%d\t%.5f\t%.5f\t%.5f\n" % ( chrom.decode(), pre, p, v1, v2, v3 ) )
  *                 pre = p
  */
-      __pyx_t_2 = __Pyx_GetItemInt(((PyObject *)__pyx_v_pos), __pyx_v_i, int, 1, __Pyx_PyInt_From_int, 0, 1, 1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1679, __pyx_L1_error)
+      __pyx_t_2 = __Pyx_GetItemInt(((PyObject *)__pyx_v_pos), __pyx_v_i, int, 1, __Pyx_PyInt_From_int, 0, 1, 1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1670, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_2);
-      __pyx_t_16 = __Pyx_PyInt_As_int(__pyx_t_2); if (unlikely((__pyx_t_16 == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 1679, __pyx_L1_error)
+      __pyx_t_16 = __Pyx_PyInt_As_int(__pyx_t_2); if (unlikely((__pyx_t_16 == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 1670, __pyx_L1_error)
       __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
       __pyx_v_p = __pyx_t_16;
 
-      /* "MACS2/IO/ScoreTrack.pyx":1680
+      /* "MACS2/IO/ScoreTrack.pyx":1671
  *                 v3 = value3[ i ]
  *                 p = pos[ i ]
  *                 write( "%s:%d_%d\t%.5f\t%.5f\t%.5f\n" % ( chrom.decode(), pre, p, v1, v2, v3 ) )             # <<<<<<<<<<<<<<
  *                 pre = p
  * 
  */
-      __pyx_t_9 = PyTuple_New(12); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 1680, __pyx_L1_error)
+      __pyx_t_9 = PyTuple_New(12); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 1671, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_9);
       __pyx_t_17 = 0;
       __pyx_t_18 = 127;
       if (unlikely(__pyx_v_chrom == Py_None)) {
         PyErr_Format(PyExc_AttributeError, "'NoneType' object has no attribute '%.30s'", "decode");
-        __PYX_ERR(0, 1680, __pyx_L1_error)
+        __PYX_ERR(0, 1671, __pyx_L1_error)
       }
-      __pyx_t_4 = __Pyx_decode_bytes(__pyx_v_chrom, 0, PY_SSIZE_T_MAX, NULL, NULL, NULL); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 1680, __pyx_L1_error)
+      __pyx_t_4 = __Pyx_decode_bytes(__pyx_v_chrom, 0, PY_SSIZE_T_MAX, NULL, NULL, NULL); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 1671, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_4);
       __pyx_t_18 = (__Pyx_PyUnicode_MAX_CHAR_VALUE(__pyx_t_4) > __pyx_t_18) ? __Pyx_PyUnicode_MAX_CHAR_VALUE(__pyx_t_4) : __pyx_t_18;
       __pyx_t_17 += __Pyx_PyUnicode_GET_LENGTH(__pyx_t_4);
@@ -27190,7 +27190,7 @@ static PyObject *__pyx_f_5MACS2_2IO_10ScoreTrack_18TwoConditionScores_write_matr
       __pyx_t_17 += 1;
       __Pyx_GIVEREF(__pyx_kp_u__21);
       PyTuple_SET_ITEM(__pyx_t_9, 1, __pyx_kp_u__21);
-      __pyx_t_4 = __Pyx_PyUnicode_From_int(__pyx_v_pre, 0, ' ', 'd'); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 1680, __pyx_L1_error)
+      __pyx_t_4 = __Pyx_PyUnicode_From_int(__pyx_v_pre, 0, ' ', 'd'); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 1671, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_4);
       __pyx_t_17 += __Pyx_PyUnicode_GET_LENGTH(__pyx_t_4);
       __Pyx_GIVEREF(__pyx_t_4);
@@ -27200,7 +27200,7 @@ static PyObject *__pyx_f_5MACS2_2IO_10ScoreTrack_18TwoConditionScores_write_matr
       __pyx_t_17 += 1;
       __Pyx_GIVEREF(__pyx_n_u__22);
       PyTuple_SET_ITEM(__pyx_t_9, 3, __pyx_n_u__22);
-      __pyx_t_4 = __Pyx_PyUnicode_From_int(__pyx_v_p, 0, ' ', 'd'); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 1680, __pyx_L1_error)
+      __pyx_t_4 = __Pyx_PyUnicode_From_int(__pyx_v_p, 0, ' ', 'd'); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 1671, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_4);
       __pyx_t_17 += __Pyx_PyUnicode_GET_LENGTH(__pyx_t_4);
       __Pyx_GIVEREF(__pyx_t_4);
@@ -27210,9 +27210,9 @@ static PyObject *__pyx_f_5MACS2_2IO_10ScoreTrack_18TwoConditionScores_write_matr
       __pyx_t_17 += 1;
       __Pyx_GIVEREF(__pyx_kp_u__11);
       PyTuple_SET_ITEM(__pyx_t_9, 5, __pyx_kp_u__11);
-      __pyx_t_4 = PyFloat_FromDouble(__pyx_v_v1); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 1680, __pyx_L1_error)
+      __pyx_t_4 = PyFloat_FromDouble(__pyx_v_v1); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 1671, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_4);
-      __pyx_t_6 = __Pyx_PyObject_Format(__pyx_t_4, __pyx_kp_u_5f); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 1680, __pyx_L1_error)
+      __pyx_t_6 = __Pyx_PyObject_Format(__pyx_t_4, __pyx_kp_u_5f); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 1671, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_6);
       __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
       __pyx_t_18 = (__Pyx_PyUnicode_MAX_CHAR_VALUE(__pyx_t_6) > __pyx_t_18) ? __Pyx_PyUnicode_MAX_CHAR_VALUE(__pyx_t_6) : __pyx_t_18;
@@ -27224,9 +27224,9 @@ static PyObject *__pyx_f_5MACS2_2IO_10ScoreTrack_18TwoConditionScores_write_matr
       __pyx_t_17 += 1;
       __Pyx_GIVEREF(__pyx_kp_u__11);
       PyTuple_SET_ITEM(__pyx_t_9, 7, __pyx_kp_u__11);
-      __pyx_t_6 = PyFloat_FromDouble(__pyx_v_v2); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 1680, __pyx_L1_error)
+      __pyx_t_6 = PyFloat_FromDouble(__pyx_v_v2); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 1671, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_6);
-      __pyx_t_4 = __Pyx_PyObject_Format(__pyx_t_6, __pyx_kp_u_5f); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 1680, __pyx_L1_error)
+      __pyx_t_4 = __Pyx_PyObject_Format(__pyx_t_6, __pyx_kp_u_5f); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 1671, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_4);
       __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
       __pyx_t_18 = (__Pyx_PyUnicode_MAX_CHAR_VALUE(__pyx_t_4) > __pyx_t_18) ? __Pyx_PyUnicode_MAX_CHAR_VALUE(__pyx_t_4) : __pyx_t_18;
@@ -27238,9 +27238,9 @@ static PyObject *__pyx_f_5MACS2_2IO_10ScoreTrack_18TwoConditionScores_write_matr
       __pyx_t_17 += 1;
       __Pyx_GIVEREF(__pyx_kp_u__11);
       PyTuple_SET_ITEM(__pyx_t_9, 9, __pyx_kp_u__11);
-      __pyx_t_4 = PyFloat_FromDouble(__pyx_v_v3); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 1680, __pyx_L1_error)
+      __pyx_t_4 = PyFloat_FromDouble(__pyx_v_v3); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 1671, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_4);
-      __pyx_t_6 = __Pyx_PyObject_Format(__pyx_t_4, __pyx_kp_u_5f); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 1680, __pyx_L1_error)
+      __pyx_t_6 = __Pyx_PyObject_Format(__pyx_t_4, __pyx_kp_u_5f); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 1671, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_6);
       __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
       __pyx_t_18 = (__Pyx_PyUnicode_MAX_CHAR_VALUE(__pyx_t_6) > __pyx_t_18) ? __Pyx_PyUnicode_MAX_CHAR_VALUE(__pyx_t_6) : __pyx_t_18;
@@ -27252,7 +27252,7 @@ static PyObject *__pyx_f_5MACS2_2IO_10ScoreTrack_18TwoConditionScores_write_matr
       __pyx_t_17 += 1;
       __Pyx_GIVEREF(__pyx_kp_u__12);
       PyTuple_SET_ITEM(__pyx_t_9, 11, __pyx_kp_u__12);
-      __pyx_t_6 = __Pyx_PyUnicode_Join(__pyx_t_9, 12, __pyx_t_17, __pyx_t_18); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 1680, __pyx_L1_error)
+      __pyx_t_6 = __Pyx_PyUnicode_Join(__pyx_t_9, 12, __pyx_t_17, __pyx_t_18); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 1671, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_6);
       __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
       __Pyx_INCREF(__pyx_v_write);
@@ -27269,12 +27269,12 @@ static PyObject *__pyx_f_5MACS2_2IO_10ScoreTrack_18TwoConditionScores_write_matr
       __pyx_t_2 = (__pyx_t_4) ? __Pyx_PyObject_Call2Args(__pyx_t_9, __pyx_t_4, __pyx_t_6) : __Pyx_PyObject_CallOneArg(__pyx_t_9, __pyx_t_6);
       __Pyx_XDECREF(__pyx_t_4); __pyx_t_4 = 0;
       __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
-      if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1680, __pyx_L1_error)
+      if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1671, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_2);
       __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
       __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
-      /* "MACS2/IO/ScoreTrack.pyx":1681
+      /* "MACS2/IO/ScoreTrack.pyx":1672
  *                 p = pos[ i ]
  *                 write( "%s:%d_%d\t%.5f\t%.5f\t%.5f\n" % ( chrom.decode(), pre, p, v1, v2, v3 ) )
  *                 pre = p             # <<<<<<<<<<<<<<
@@ -27284,7 +27284,7 @@ static PyObject *__pyx_f_5MACS2_2IO_10ScoreTrack_18TwoConditionScores_write_matr
       __pyx_v_pre = __pyx_v_p;
     }
 
-    /* "MACS2/IO/ScoreTrack.pyx":1670
+    /* "MACS2/IO/ScoreTrack.pyx":1661
  * 
  *         chrs = self.get_chr_names()
  *         for chrom in chrs:             # <<<<<<<<<<<<<<
@@ -27295,7 +27295,7 @@ static PyObject *__pyx_f_5MACS2_2IO_10ScoreTrack_18TwoConditionScores_write_matr
   }
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-  /* "MACS2/IO/ScoreTrack.pyx":1683
+  /* "MACS2/IO/ScoreTrack.pyx":1674
  *                 pre = p
  * 
  *         return True             # <<<<<<<<<<<<<<
@@ -27307,7 +27307,7 @@ static PyObject *__pyx_f_5MACS2_2IO_10ScoreTrack_18TwoConditionScores_write_matr
   __pyx_r = Py_True;
   goto __pyx_L0;
 
-  /* "MACS2/IO/ScoreTrack.pyx":1650
+  /* "MACS2/IO/ScoreTrack.pyx":1641
  *         return True
  * 
  *     cpdef write_matrix ( self, fhd, str name, str description ):             # <<<<<<<<<<<<<<
@@ -27375,17 +27375,17 @@ static PyObject *__pyx_pw_5MACS2_2IO_10ScoreTrack_18TwoConditionScores_17write_m
         case  1:
         if (likely((values[1] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_name)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("write_matrix", 1, 3, 3, 1); __PYX_ERR(0, 1650, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("write_matrix", 1, 3, 3, 1); __PYX_ERR(0, 1641, __pyx_L3_error)
         }
         CYTHON_FALLTHROUGH;
         case  2:
         if (likely((values[2] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_description)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("write_matrix", 1, 3, 3, 2); __PYX_ERR(0, 1650, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("write_matrix", 1, 3, 3, 2); __PYX_ERR(0, 1641, __pyx_L3_error)
         }
       }
       if (unlikely(kw_args > 0)) {
-        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "write_matrix") < 0)) __PYX_ERR(0, 1650, __pyx_L3_error)
+        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "write_matrix") < 0)) __PYX_ERR(0, 1641, __pyx_L3_error)
       }
     } else if (PyTuple_GET_SIZE(__pyx_args) != 3) {
       goto __pyx_L5_argtuple_error;
@@ -27400,14 +27400,14 @@ static PyObject *__pyx_pw_5MACS2_2IO_10ScoreTrack_18TwoConditionScores_17write_m
   }
   goto __pyx_L4_argument_unpacking_done;
   __pyx_L5_argtuple_error:;
-  __Pyx_RaiseArgtupleInvalid("write_matrix", 1, 3, 3, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 1650, __pyx_L3_error)
+  __Pyx_RaiseArgtupleInvalid("write_matrix", 1, 3, 3, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 1641, __pyx_L3_error)
   __pyx_L3_error:;
   __Pyx_AddTraceback("MACS2.IO.ScoreTrack.TwoConditionScores.write_matrix", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __Pyx_RefNannyFinishContext();
   return NULL;
   __pyx_L4_argument_unpacking_done:;
-  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_name), (&PyUnicode_Type), 1, "name", 1))) __PYX_ERR(0, 1650, __pyx_L1_error)
-  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_description), (&PyUnicode_Type), 1, "description", 1))) __PYX_ERR(0, 1650, __pyx_L1_error)
+  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_name), (&PyUnicode_Type), 1, "name", 1))) __PYX_ERR(0, 1641, __pyx_L1_error)
+  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_description), (&PyUnicode_Type), 1, "description", 1))) __PYX_ERR(0, 1641, __pyx_L1_error)
   __pyx_r = __pyx_pf_5MACS2_2IO_10ScoreTrack_18TwoConditionScores_16write_matrix(((struct __pyx_obj_5MACS2_2IO_10ScoreTrack_TwoConditionScores *)__pyx_v_self), __pyx_v_fhd, __pyx_v_name, __pyx_v_description);
 
   /* function exit code */
@@ -27425,9 +27425,9 @@ static PyObject *__pyx_pf_5MACS2_2IO_10ScoreTrack_18TwoConditionScores_16write_m
   __Pyx_RefNannyDeclarations
   PyObject *__pyx_t_1 = NULL;
   __Pyx_RefNannySetupContext("write_matrix", 0);
-  __Pyx_TraceCall("write_matrix (wrapper)", __pyx_f[0], 1650, 0, __PYX_ERR(0, 1650, __pyx_L1_error));
+  __Pyx_TraceCall("write_matrix (wrapper)", __pyx_f[0], 1641, 0, __PYX_ERR(0, 1641, __pyx_L1_error));
   __Pyx_XDECREF(__pyx_r);
-  __pyx_t_1 = __pyx_f_5MACS2_2IO_10ScoreTrack_18TwoConditionScores_write_matrix(__pyx_v_self, __pyx_v_fhd, __pyx_v_name, __pyx_v_description, 1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1650, __pyx_L1_error)
+  __pyx_t_1 = __pyx_f_5MACS2_2IO_10ScoreTrack_18TwoConditionScores_write_matrix(__pyx_v_self, __pyx_v_fhd, __pyx_v_name, __pyx_v_description, 1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1641, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __pyx_r = __pyx_t_1;
   __pyx_t_1 = 0;
@@ -27445,7 +27445,7 @@ static PyObject *__pyx_pf_5MACS2_2IO_10ScoreTrack_18TwoConditionScores_16write_m
   return __pyx_r;
 }
 
-/* "MACS2/IO/ScoreTrack.pyx":1685
+/* "MACS2/IO/ScoreTrack.pyx":1676
  *         return True
  * 
  *     cpdef tuple call_peaks (self, float cutoff=3, int min_length=200, int max_gap = 100,             # <<<<<<<<<<<<<<
@@ -27459,7 +27459,7 @@ static PyObject *__pyx_f_5MACS2_2IO_10ScoreTrack_18TwoConditionScores_call_peaks
   int __pyx_v_min_length = ((int)0xC8);
   int __pyx_v_max_gap = ((int)0x64);
 
-  /* "MACS2/IO/ScoreTrack.pyx":1686
+  /* "MACS2/IO/ScoreTrack.pyx":1677
  * 
  *     cpdef tuple call_peaks (self, float cutoff=3, int min_length=200, int max_gap = 100,
  *                       bool call_summits=False):             # <<<<<<<<<<<<<<
@@ -27506,7 +27506,7 @@ static PyObject *__pyx_f_5MACS2_2IO_10ScoreTrack_18TwoConditionScores_call_peaks
   Py_ssize_t __pyx_t_10;
   PyObject *(*__pyx_t_11)(PyObject *);
   __Pyx_RefNannySetupContext("call_peaks", 0);
-  __Pyx_TraceCall("call_peaks", __pyx_f[0], 1685, 0, __PYX_ERR(0, 1685, __pyx_L1_error));
+  __Pyx_TraceCall("call_peaks", __pyx_f[0], 1676, 0, __PYX_ERR(0, 1676, __pyx_L1_error));
   if (__pyx_optional_args) {
     if (__pyx_optional_args->__pyx_n > 0) {
       __pyx_v_cutoff = __pyx_optional_args->cutoff;
@@ -27522,7 +27522,7 @@ static PyObject *__pyx_f_5MACS2_2IO_10ScoreTrack_18TwoConditionScores_call_peaks
     }
   }
 
-  /* "MACS2/IO/ScoreTrack.pyx":1685
+  /* "MACS2/IO/ScoreTrack.pyx":1676
  *         return True
  * 
  *     cpdef tuple call_peaks (self, float cutoff=3, int min_length=200, int max_gap = 100,             # <<<<<<<<<<<<<<
@@ -27538,15 +27538,15 @@ static PyObject *__pyx_f_5MACS2_2IO_10ScoreTrack_18TwoConditionScores_call_peaks
     if (unlikely(!__Pyx_object_dict_version_matches(((PyObject *)__pyx_v_self), __pyx_tp_dict_version, __pyx_obj_dict_version))) {
       PY_UINT64_T __pyx_type_dict_guard = __Pyx_get_tp_dict_version(((PyObject *)__pyx_v_self));
       #endif
-      __pyx_t_1 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_v_self), __pyx_n_s_call_peaks); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1685, __pyx_L1_error)
+      __pyx_t_1 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_v_self), __pyx_n_s_call_peaks); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1676, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_1);
       if (!PyCFunction_Check(__pyx_t_1) || (PyCFunction_GET_FUNCTION(__pyx_t_1) != (PyCFunction)(void*)__pyx_pw_5MACS2_2IO_10ScoreTrack_18TwoConditionScores_19call_peaks)) {
         __Pyx_XDECREF(__pyx_r);
-        __pyx_t_3 = PyFloat_FromDouble(__pyx_v_cutoff); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 1685, __pyx_L1_error)
+        __pyx_t_3 = PyFloat_FromDouble(__pyx_v_cutoff); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 1676, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_3);
-        __pyx_t_4 = __Pyx_PyInt_From_int(__pyx_v_min_length); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 1685, __pyx_L1_error)
+        __pyx_t_4 = __Pyx_PyInt_From_int(__pyx_v_min_length); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 1676, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_4);
-        __pyx_t_5 = __Pyx_PyInt_From_int(__pyx_v_max_gap); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 1685, __pyx_L1_error)
+        __pyx_t_5 = __Pyx_PyInt_From_int(__pyx_v_max_gap); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 1676, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_5);
         __Pyx_INCREF(__pyx_t_1);
         __pyx_t_6 = __pyx_t_1; __pyx_t_7 = NULL;
@@ -27564,7 +27564,7 @@ static PyObject *__pyx_f_5MACS2_2IO_10ScoreTrack_18TwoConditionScores_call_peaks
         #if CYTHON_FAST_PYCALL
         if (PyFunction_Check(__pyx_t_6)) {
           PyObject *__pyx_temp[5] = {__pyx_t_7, __pyx_t_3, __pyx_t_4, __pyx_t_5, ((PyObject *)__pyx_v_call_summits)};
-          __pyx_t_2 = __Pyx_PyFunction_FastCall(__pyx_t_6, __pyx_temp+1-__pyx_t_8, 4+__pyx_t_8); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1685, __pyx_L1_error)
+          __pyx_t_2 = __Pyx_PyFunction_FastCall(__pyx_t_6, __pyx_temp+1-__pyx_t_8, 4+__pyx_t_8); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1676, __pyx_L1_error)
           __Pyx_XDECREF(__pyx_t_7); __pyx_t_7 = 0;
           __Pyx_GOTREF(__pyx_t_2);
           __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
@@ -27575,7 +27575,7 @@ static PyObject *__pyx_f_5MACS2_2IO_10ScoreTrack_18TwoConditionScores_call_peaks
         #if CYTHON_FAST_PYCCALL
         if (__Pyx_PyFastCFunction_Check(__pyx_t_6)) {
           PyObject *__pyx_temp[5] = {__pyx_t_7, __pyx_t_3, __pyx_t_4, __pyx_t_5, ((PyObject *)__pyx_v_call_summits)};
-          __pyx_t_2 = __Pyx_PyCFunction_FastCall(__pyx_t_6, __pyx_temp+1-__pyx_t_8, 4+__pyx_t_8); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1685, __pyx_L1_error)
+          __pyx_t_2 = __Pyx_PyCFunction_FastCall(__pyx_t_6, __pyx_temp+1-__pyx_t_8, 4+__pyx_t_8); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1676, __pyx_L1_error)
           __Pyx_XDECREF(__pyx_t_7); __pyx_t_7 = 0;
           __Pyx_GOTREF(__pyx_t_2);
           __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
@@ -27584,7 +27584,7 @@ static PyObject *__pyx_f_5MACS2_2IO_10ScoreTrack_18TwoConditionScores_call_peaks
         } else
         #endif
         {
-          __pyx_t_9 = PyTuple_New(4+__pyx_t_8); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 1685, __pyx_L1_error)
+          __pyx_t_9 = PyTuple_New(4+__pyx_t_8); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 1676, __pyx_L1_error)
           __Pyx_GOTREF(__pyx_t_9);
           if (__pyx_t_7) {
             __Pyx_GIVEREF(__pyx_t_7); PyTuple_SET_ITEM(__pyx_t_9, 0, __pyx_t_7); __pyx_t_7 = NULL;
@@ -27601,12 +27601,12 @@ static PyObject *__pyx_f_5MACS2_2IO_10ScoreTrack_18TwoConditionScores_call_peaks
           __pyx_t_3 = 0;
           __pyx_t_4 = 0;
           __pyx_t_5 = 0;
-          __pyx_t_2 = __Pyx_PyObject_Call(__pyx_t_6, __pyx_t_9, NULL); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1685, __pyx_L1_error)
+          __pyx_t_2 = __Pyx_PyObject_Call(__pyx_t_6, __pyx_t_9, NULL); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1676, __pyx_L1_error)
           __Pyx_GOTREF(__pyx_t_2);
           __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
         }
         __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
-        if (!(likely(PyTuple_CheckExact(__pyx_t_2))||((__pyx_t_2) == Py_None)||(PyErr_Format(PyExc_TypeError, "Expected %.16s, got %.200s", "tuple", Py_TYPE(__pyx_t_2)->tp_name), 0))) __PYX_ERR(0, 1685, __pyx_L1_error)
+        if (!(likely(PyTuple_CheckExact(__pyx_t_2))||((__pyx_t_2) == Py_None)||(PyErr_Format(PyExc_TypeError, "Expected %.16s, got %.200s", "tuple", Py_TYPE(__pyx_t_2)->tp_name), 0))) __PYX_ERR(0, 1676, __pyx_L1_error)
         __pyx_r = ((PyObject*)__pyx_t_2);
         __pyx_t_2 = 0;
         __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
@@ -27625,26 +27625,26 @@ static PyObject *__pyx_f_5MACS2_2IO_10ScoreTrack_18TwoConditionScores_call_peaks
     #endif
   }
 
-  /* "MACS2/IO/ScoreTrack.pyx":1711
+  /* "MACS2/IO/ScoreTrack.pyx":1702
  *             list peak_content
  * 
  *         chrs  = self.get_chr_names()             # <<<<<<<<<<<<<<
  *         cat1_peaks = PeakIO()       # dictionary to save peaks significant at condition 1
  *         cat2_peaks = PeakIO()       # dictionary to save peaks significant at condition 2
  */
-  __pyx_t_1 = ((struct __pyx_vtabstruct_5MACS2_2IO_10ScoreTrack_TwoConditionScores *)__pyx_v_self->__pyx_vtab)->get_chr_names(__pyx_v_self, 0); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1711, __pyx_L1_error)
+  __pyx_t_1 = ((struct __pyx_vtabstruct_5MACS2_2IO_10ScoreTrack_TwoConditionScores *)__pyx_v_self->__pyx_vtab)->get_chr_names(__pyx_v_self, 0); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1702, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __pyx_v_chrs = __pyx_t_1;
   __pyx_t_1 = 0;
 
-  /* "MACS2/IO/ScoreTrack.pyx":1712
+  /* "MACS2/IO/ScoreTrack.pyx":1703
  * 
  *         chrs  = self.get_chr_names()
  *         cat1_peaks = PeakIO()       # dictionary to save peaks significant at condition 1             # <<<<<<<<<<<<<<
  *         cat2_peaks = PeakIO()       # dictionary to save peaks significant at condition 2
  *         cat3_peaks = PeakIO()       # dictionary to save peaks significant in both conditions
  */
-  __Pyx_GetModuleGlobalName(__pyx_t_2, __pyx_n_s_PeakIO); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1712, __pyx_L1_error)
+  __Pyx_GetModuleGlobalName(__pyx_t_2, __pyx_n_s_PeakIO); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1703, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __pyx_t_6 = NULL;
   if (CYTHON_UNPACK_METHODS && unlikely(PyMethod_Check(__pyx_t_2))) {
@@ -27658,20 +27658,20 @@ static PyObject *__pyx_f_5MACS2_2IO_10ScoreTrack_18TwoConditionScores_call_peaks
   }
   __pyx_t_1 = (__pyx_t_6) ? __Pyx_PyObject_CallOneArg(__pyx_t_2, __pyx_t_6) : __Pyx_PyObject_CallNoArg(__pyx_t_2);
   __Pyx_XDECREF(__pyx_t_6); __pyx_t_6 = 0;
-  if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1712, __pyx_L1_error)
+  if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1703, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
   __pyx_v_cat1_peaks = __pyx_t_1;
   __pyx_t_1 = 0;
 
-  /* "MACS2/IO/ScoreTrack.pyx":1713
+  /* "MACS2/IO/ScoreTrack.pyx":1704
  *         chrs  = self.get_chr_names()
  *         cat1_peaks = PeakIO()       # dictionary to save peaks significant at condition 1
  *         cat2_peaks = PeakIO()       # dictionary to save peaks significant at condition 2             # <<<<<<<<<<<<<<
  *         cat3_peaks = PeakIO()       # dictionary to save peaks significant in both conditions
  * 
  */
-  __Pyx_GetModuleGlobalName(__pyx_t_2, __pyx_n_s_PeakIO); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1713, __pyx_L1_error)
+  __Pyx_GetModuleGlobalName(__pyx_t_2, __pyx_n_s_PeakIO); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1704, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __pyx_t_6 = NULL;
   if (CYTHON_UNPACK_METHODS && unlikely(PyMethod_Check(__pyx_t_2))) {
@@ -27685,20 +27685,20 @@ static PyObject *__pyx_f_5MACS2_2IO_10ScoreTrack_18TwoConditionScores_call_peaks
   }
   __pyx_t_1 = (__pyx_t_6) ? __Pyx_PyObject_CallOneArg(__pyx_t_2, __pyx_t_6) : __Pyx_PyObject_CallNoArg(__pyx_t_2);
   __Pyx_XDECREF(__pyx_t_6); __pyx_t_6 = 0;
-  if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1713, __pyx_L1_error)
+  if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1704, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
   __pyx_v_cat2_peaks = __pyx_t_1;
   __pyx_t_1 = 0;
 
-  /* "MACS2/IO/ScoreTrack.pyx":1714
+  /* "MACS2/IO/ScoreTrack.pyx":1705
  *         cat1_peaks = PeakIO()       # dictionary to save peaks significant at condition 1
  *         cat2_peaks = PeakIO()       # dictionary to save peaks significant at condition 2
  *         cat3_peaks = PeakIO()       # dictionary to save peaks significant in both conditions             # <<<<<<<<<<<<<<
  * 
  *         self.cutoff = cutoff
  */
-  __Pyx_GetModuleGlobalName(__pyx_t_2, __pyx_n_s_PeakIO); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1714, __pyx_L1_error)
+  __Pyx_GetModuleGlobalName(__pyx_t_2, __pyx_n_s_PeakIO); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1705, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __pyx_t_6 = NULL;
   if (CYTHON_UNPACK_METHODS && unlikely(PyMethod_Check(__pyx_t_2))) {
@@ -27712,13 +27712,13 @@ static PyObject *__pyx_f_5MACS2_2IO_10ScoreTrack_18TwoConditionScores_call_peaks
   }
   __pyx_t_1 = (__pyx_t_6) ? __Pyx_PyObject_CallOneArg(__pyx_t_2, __pyx_t_6) : __Pyx_PyObject_CallNoArg(__pyx_t_2);
   __Pyx_XDECREF(__pyx_t_6); __pyx_t_6 = 0;
-  if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1714, __pyx_L1_error)
+  if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1705, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
   __pyx_v_cat3_peaks = __pyx_t_1;
   __pyx_t_1 = 0;
 
-  /* "MACS2/IO/ScoreTrack.pyx":1716
+  /* "MACS2/IO/ScoreTrack.pyx":1707
  *         cat3_peaks = PeakIO()       # dictionary to save peaks significant in both conditions
  * 
  *         self.cutoff = cutoff             # <<<<<<<<<<<<<<
@@ -27727,7 +27727,7 @@ static PyObject *__pyx_f_5MACS2_2IO_10ScoreTrack_18TwoConditionScores_call_peaks
  */
   __pyx_v_self->cutoff = __pyx_v_cutoff;
 
-  /* "MACS2/IO/ScoreTrack.pyx":1718
+  /* "MACS2/IO/ScoreTrack.pyx":1709
  *         self.cutoff = cutoff
  * 
  *         for chrom in chrs:             # <<<<<<<<<<<<<<
@@ -27738,26 +27738,26 @@ static PyObject *__pyx_f_5MACS2_2IO_10ScoreTrack_18TwoConditionScores_call_peaks
     __pyx_t_1 = __pyx_v_chrs; __Pyx_INCREF(__pyx_t_1); __pyx_t_10 = 0;
     __pyx_t_11 = NULL;
   } else {
-    __pyx_t_10 = -1; __pyx_t_1 = PyObject_GetIter(__pyx_v_chrs); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1718, __pyx_L1_error)
+    __pyx_t_10 = -1; __pyx_t_1 = PyObject_GetIter(__pyx_v_chrs); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1709, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
-    __pyx_t_11 = Py_TYPE(__pyx_t_1)->tp_iternext; if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 1718, __pyx_L1_error)
+    __pyx_t_11 = Py_TYPE(__pyx_t_1)->tp_iternext; if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 1709, __pyx_L1_error)
   }
   for (;;) {
     if (likely(!__pyx_t_11)) {
       if (likely(PyList_CheckExact(__pyx_t_1))) {
         if (__pyx_t_10 >= PyList_GET_SIZE(__pyx_t_1)) break;
         #if CYTHON_ASSUME_SAFE_MACROS && !CYTHON_AVOID_BORROWED_REFS
-        __pyx_t_2 = PyList_GET_ITEM(__pyx_t_1, __pyx_t_10); __Pyx_INCREF(__pyx_t_2); __pyx_t_10++; if (unlikely(0 < 0)) __PYX_ERR(0, 1718, __pyx_L1_error)
+        __pyx_t_2 = PyList_GET_ITEM(__pyx_t_1, __pyx_t_10); __Pyx_INCREF(__pyx_t_2); __pyx_t_10++; if (unlikely(0 < 0)) __PYX_ERR(0, 1709, __pyx_L1_error)
         #else
-        __pyx_t_2 = PySequence_ITEM(__pyx_t_1, __pyx_t_10); __pyx_t_10++; if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1718, __pyx_L1_error)
+        __pyx_t_2 = PySequence_ITEM(__pyx_t_1, __pyx_t_10); __pyx_t_10++; if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1709, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_2);
         #endif
       } else {
         if (__pyx_t_10 >= PyTuple_GET_SIZE(__pyx_t_1)) break;
         #if CYTHON_ASSUME_SAFE_MACROS && !CYTHON_AVOID_BORROWED_REFS
-        __pyx_t_2 = PyTuple_GET_ITEM(__pyx_t_1, __pyx_t_10); __Pyx_INCREF(__pyx_t_2); __pyx_t_10++; if (unlikely(0 < 0)) __PYX_ERR(0, 1718, __pyx_L1_error)
+        __pyx_t_2 = PyTuple_GET_ITEM(__pyx_t_1, __pyx_t_10); __Pyx_INCREF(__pyx_t_2); __pyx_t_10++; if (unlikely(0 < 0)) __PYX_ERR(0, 1709, __pyx_L1_error)
         #else
-        __pyx_t_2 = PySequence_ITEM(__pyx_t_1, __pyx_t_10); __pyx_t_10++; if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1718, __pyx_L1_error)
+        __pyx_t_2 = PySequence_ITEM(__pyx_t_1, __pyx_t_10); __pyx_t_10++; if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1709, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_2);
         #endif
       }
@@ -27767,17 +27767,17 @@ static PyObject *__pyx_f_5MACS2_2IO_10ScoreTrack_18TwoConditionScores_call_peaks
         PyObject* exc_type = PyErr_Occurred();
         if (exc_type) {
           if (likely(__Pyx_PyErr_GivenExceptionMatches(exc_type, PyExc_StopIteration))) PyErr_Clear();
-          else __PYX_ERR(0, 1718, __pyx_L1_error)
+          else __PYX_ERR(0, 1709, __pyx_L1_error)
         }
         break;
       }
       __Pyx_GOTREF(__pyx_t_2);
     }
-    if (!(likely(PyBytes_CheckExact(__pyx_t_2))||((__pyx_t_2) == Py_None)||(PyErr_Format(PyExc_TypeError, "Expected %.16s, got %.200s", "bytes", Py_TYPE(__pyx_t_2)->tp_name), 0))) __PYX_ERR(0, 1718, __pyx_L1_error)
+    if (!(likely(PyBytes_CheckExact(__pyx_t_2))||((__pyx_t_2) == Py_None)||(PyErr_Format(PyExc_TypeError, "Expected %.16s, got %.200s", "bytes", Py_TYPE(__pyx_t_2)->tp_name), 0))) __PYX_ERR(0, 1709, __pyx_L1_error)
     __Pyx_XDECREF_SET(__pyx_v_chrom, ((PyObject*)__pyx_t_2));
     __pyx_t_2 = 0;
 
-    /* "MACS2/IO/ScoreTrack.pyx":1719
+    /* "MACS2/IO/ScoreTrack.pyx":1710
  * 
  *         for chrom in chrs:
  *             pos = self.data[chrom][ 0 ]             # <<<<<<<<<<<<<<
@@ -27786,18 +27786,18 @@ static PyObject *__pyx_f_5MACS2_2IO_10ScoreTrack_18TwoConditionScores_call_peaks
  */
     if (unlikely(__pyx_v_self->data == Py_None)) {
       PyErr_SetString(PyExc_TypeError, "'NoneType' object is not subscriptable");
-      __PYX_ERR(0, 1719, __pyx_L1_error)
+      __PYX_ERR(0, 1710, __pyx_L1_error)
     }
-    __pyx_t_2 = __Pyx_PyDict_GetItem(__pyx_v_self->data, __pyx_v_chrom); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1719, __pyx_L1_error)
+    __pyx_t_2 = __Pyx_PyDict_GetItem(__pyx_v_self->data, __pyx_v_chrom); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1710, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
-    __pyx_t_6 = __Pyx_GetItemInt(__pyx_t_2, 0, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 1719, __pyx_L1_error)
+    __pyx_t_6 = __Pyx_GetItemInt(__pyx_t_2, 0, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 1710, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_6);
     __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-    if (!(likely(((__pyx_t_6) == Py_None) || likely(__Pyx_TypeTest(__pyx_t_6, __pyx_ptype_5numpy_ndarray))))) __PYX_ERR(0, 1719, __pyx_L1_error)
+    if (!(likely(((__pyx_t_6) == Py_None) || likely(__Pyx_TypeTest(__pyx_t_6, __pyx_ptype_5numpy_ndarray))))) __PYX_ERR(0, 1710, __pyx_L1_error)
     __Pyx_XDECREF_SET(__pyx_v_pos, ((PyArrayObject *)__pyx_t_6));
     __pyx_t_6 = 0;
 
-    /* "MACS2/IO/ScoreTrack.pyx":1720
+    /* "MACS2/IO/ScoreTrack.pyx":1711
  *         for chrom in chrs:
  *             pos = self.data[chrom][ 0 ]
  *             t1_vs_c1 = self.data[chrom][ 1 ]             # <<<<<<<<<<<<<<
@@ -27806,17 +27806,17 @@ static PyObject *__pyx_f_5MACS2_2IO_10ScoreTrack_18TwoConditionScores_call_peaks
  */
     if (unlikely(__pyx_v_self->data == Py_None)) {
       PyErr_SetString(PyExc_TypeError, "'NoneType' object is not subscriptable");
-      __PYX_ERR(0, 1720, __pyx_L1_error)
+      __PYX_ERR(0, 1711, __pyx_L1_error)
     }
-    __pyx_t_6 = __Pyx_PyDict_GetItem(__pyx_v_self->data, __pyx_v_chrom); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 1720, __pyx_L1_error)
+    __pyx_t_6 = __Pyx_PyDict_GetItem(__pyx_v_self->data, __pyx_v_chrom); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 1711, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_6);
-    __pyx_t_2 = __Pyx_GetItemInt(__pyx_t_6, 1, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1720, __pyx_L1_error)
+    __pyx_t_2 = __Pyx_GetItemInt(__pyx_t_6, 1, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1711, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
     __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
     __Pyx_XDECREF_SET(__pyx_v_t1_vs_c1, __pyx_t_2);
     __pyx_t_2 = 0;
 
-    /* "MACS2/IO/ScoreTrack.pyx":1721
+    /* "MACS2/IO/ScoreTrack.pyx":1712
  *             pos = self.data[chrom][ 0 ]
  *             t1_vs_c1 = self.data[chrom][ 1 ]
  *             t2_vs_c2 = self.data[chrom][ 2 ]             # <<<<<<<<<<<<<<
@@ -27825,17 +27825,17 @@ static PyObject *__pyx_f_5MACS2_2IO_10ScoreTrack_18TwoConditionScores_call_peaks
  */
     if (unlikely(__pyx_v_self->data == Py_None)) {
       PyErr_SetString(PyExc_TypeError, "'NoneType' object is not subscriptable");
-      __PYX_ERR(0, 1721, __pyx_L1_error)
+      __PYX_ERR(0, 1712, __pyx_L1_error)
     }
-    __pyx_t_2 = __Pyx_PyDict_GetItem(__pyx_v_self->data, __pyx_v_chrom); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1721, __pyx_L1_error)
+    __pyx_t_2 = __Pyx_PyDict_GetItem(__pyx_v_self->data, __pyx_v_chrom); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1712, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
-    __pyx_t_6 = __Pyx_GetItemInt(__pyx_t_2, 2, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 1721, __pyx_L1_error)
+    __pyx_t_6 = __Pyx_GetItemInt(__pyx_t_2, 2, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 1712, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_6);
     __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
     __Pyx_XDECREF_SET(__pyx_v_t2_vs_c2, __pyx_t_6);
     __pyx_t_6 = 0;
 
-    /* "MACS2/IO/ScoreTrack.pyx":1722
+    /* "MACS2/IO/ScoreTrack.pyx":1713
  *             t1_vs_c1 = self.data[chrom][ 1 ]
  *             t2_vs_c2 = self.data[chrom][ 2 ]
  *             t1_vs_t2 = self.data[chrom][ 3 ]             # <<<<<<<<<<<<<<
@@ -27844,73 +27844,73 @@ static PyObject *__pyx_f_5MACS2_2IO_10ScoreTrack_18TwoConditionScores_call_peaks
  */
     if (unlikely(__pyx_v_self->data == Py_None)) {
       PyErr_SetString(PyExc_TypeError, "'NoneType' object is not subscriptable");
-      __PYX_ERR(0, 1722, __pyx_L1_error)
+      __PYX_ERR(0, 1713, __pyx_L1_error)
     }
-    __pyx_t_6 = __Pyx_PyDict_GetItem(__pyx_v_self->data, __pyx_v_chrom); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 1722, __pyx_L1_error)
+    __pyx_t_6 = __Pyx_PyDict_GetItem(__pyx_v_self->data, __pyx_v_chrom); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 1713, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_6);
-    __pyx_t_2 = __Pyx_GetItemInt(__pyx_t_6, 3, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1722, __pyx_L1_error)
+    __pyx_t_2 = __Pyx_GetItemInt(__pyx_t_6, 3, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1713, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
     __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
     __Pyx_XDECREF_SET(__pyx_v_t1_vs_t2, __pyx_t_2);
     __pyx_t_2 = 0;
 
-    /* "MACS2/IO/ScoreTrack.pyx":1723
+    /* "MACS2/IO/ScoreTrack.pyx":1714
  *             t2_vs_c2 = self.data[chrom][ 2 ]
  *             t1_vs_t2 = self.data[chrom][ 3 ]
  *             and_ = np.logical_and             # <<<<<<<<<<<<<<
  *             cond1_over_cond2 = t1_vs_t2 >= cutoff # regions with stronger cond1 signals
  *             cond2_over_cond1 = t1_vs_t2 <= -1*cutoff # regions with stronger cond2 signals
  */
-    __Pyx_GetModuleGlobalName(__pyx_t_2, __pyx_n_s_np); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1723, __pyx_L1_error)
+    __Pyx_GetModuleGlobalName(__pyx_t_2, __pyx_n_s_np); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1714, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
-    __pyx_t_6 = __Pyx_PyObject_GetAttrStr(__pyx_t_2, __pyx_n_s_logical_and); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 1723, __pyx_L1_error)
+    __pyx_t_6 = __Pyx_PyObject_GetAttrStr(__pyx_t_2, __pyx_n_s_logical_and); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 1714, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_6);
     __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
     __Pyx_XDECREF_SET(__pyx_v_and_, __pyx_t_6);
     __pyx_t_6 = 0;
 
-    /* "MACS2/IO/ScoreTrack.pyx":1724
+    /* "MACS2/IO/ScoreTrack.pyx":1715
  *             t1_vs_t2 = self.data[chrom][ 3 ]
  *             and_ = np.logical_and
  *             cond1_over_cond2 = t1_vs_t2 >= cutoff # regions with stronger cond1 signals             # <<<<<<<<<<<<<<
  *             cond2_over_cond1 = t1_vs_t2 <= -1*cutoff # regions with stronger cond2 signals
  *             cond1_equal_cond2= and_( t1_vs_t2 >= -1*cutoff, t1_vs_t2 <= cutoff )
  */
-    __pyx_t_6 = PyFloat_FromDouble(__pyx_v_cutoff); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 1724, __pyx_L1_error)
+    __pyx_t_6 = PyFloat_FromDouble(__pyx_v_cutoff); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 1715, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_6);
-    __pyx_t_2 = PyObject_RichCompare(__pyx_v_t1_vs_t2, __pyx_t_6, Py_GE); __Pyx_XGOTREF(__pyx_t_2); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1724, __pyx_L1_error)
+    __pyx_t_2 = PyObject_RichCompare(__pyx_v_t1_vs_t2, __pyx_t_6, Py_GE); __Pyx_XGOTREF(__pyx_t_2); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1715, __pyx_L1_error)
     __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
     __Pyx_XDECREF_SET(__pyx_v_cond1_over_cond2, __pyx_t_2);
     __pyx_t_2 = 0;
 
-    /* "MACS2/IO/ScoreTrack.pyx":1725
+    /* "MACS2/IO/ScoreTrack.pyx":1716
  *             and_ = np.logical_and
  *             cond1_over_cond2 = t1_vs_t2 >= cutoff # regions with stronger cond1 signals
  *             cond2_over_cond1 = t1_vs_t2 <= -1*cutoff # regions with stronger cond2 signals             # <<<<<<<<<<<<<<
  *             cond1_equal_cond2= and_( t1_vs_t2 >= -1*cutoff, t1_vs_t2 <= cutoff )
  *             cond1_sig = t1_vs_c1 >= cutoff # enriched regions in condition 1
  */
-    __pyx_t_2 = PyFloat_FromDouble((-1.0 * __pyx_v_cutoff)); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1725, __pyx_L1_error)
+    __pyx_t_2 = PyFloat_FromDouble((-1.0 * __pyx_v_cutoff)); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1716, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
-    __pyx_t_6 = PyObject_RichCompare(__pyx_v_t1_vs_t2, __pyx_t_2, Py_LE); __Pyx_XGOTREF(__pyx_t_6); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 1725, __pyx_L1_error)
+    __pyx_t_6 = PyObject_RichCompare(__pyx_v_t1_vs_t2, __pyx_t_2, Py_LE); __Pyx_XGOTREF(__pyx_t_6); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 1716, __pyx_L1_error)
     __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
     __Pyx_XDECREF_SET(__pyx_v_cond2_over_cond1, __pyx_t_6);
     __pyx_t_6 = 0;
 
-    /* "MACS2/IO/ScoreTrack.pyx":1726
+    /* "MACS2/IO/ScoreTrack.pyx":1717
  *             cond1_over_cond2 = t1_vs_t2 >= cutoff # regions with stronger cond1 signals
  *             cond2_over_cond1 = t1_vs_t2 <= -1*cutoff # regions with stronger cond2 signals
  *             cond1_equal_cond2= and_( t1_vs_t2 >= -1*cutoff, t1_vs_t2 <= cutoff )             # <<<<<<<<<<<<<<
  *             cond1_sig = t1_vs_c1 >= cutoff # enriched regions in condition 1
  *             cond2_sig = t2_vs_c2 >= cutoff # enriched regions in condition 2
  */
-    __pyx_t_2 = PyFloat_FromDouble((-1.0 * __pyx_v_cutoff)); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1726, __pyx_L1_error)
+    __pyx_t_2 = PyFloat_FromDouble((-1.0 * __pyx_v_cutoff)); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1717, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
-    __pyx_t_9 = PyObject_RichCompare(__pyx_v_t1_vs_t2, __pyx_t_2, Py_GE); __Pyx_XGOTREF(__pyx_t_9); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 1726, __pyx_L1_error)
+    __pyx_t_9 = PyObject_RichCompare(__pyx_v_t1_vs_t2, __pyx_t_2, Py_GE); __Pyx_XGOTREF(__pyx_t_9); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 1717, __pyx_L1_error)
     __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-    __pyx_t_2 = PyFloat_FromDouble(__pyx_v_cutoff); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1726, __pyx_L1_error)
+    __pyx_t_2 = PyFloat_FromDouble(__pyx_v_cutoff); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1717, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
-    __pyx_t_5 = PyObject_RichCompare(__pyx_v_t1_vs_t2, __pyx_t_2, Py_LE); __Pyx_XGOTREF(__pyx_t_5); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 1726, __pyx_L1_error)
+    __pyx_t_5 = PyObject_RichCompare(__pyx_v_t1_vs_t2, __pyx_t_2, Py_LE); __Pyx_XGOTREF(__pyx_t_5); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 1717, __pyx_L1_error)
     __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
     __Pyx_INCREF(__pyx_v_and_);
     __pyx_t_2 = __pyx_v_and_; __pyx_t_4 = NULL;
@@ -27928,7 +27928,7 @@ static PyObject *__pyx_f_5MACS2_2IO_10ScoreTrack_18TwoConditionScores_call_peaks
     #if CYTHON_FAST_PYCALL
     if (PyFunction_Check(__pyx_t_2)) {
       PyObject *__pyx_temp[3] = {__pyx_t_4, __pyx_t_9, __pyx_t_5};
-      __pyx_t_6 = __Pyx_PyFunction_FastCall(__pyx_t_2, __pyx_temp+1-__pyx_t_8, 2+__pyx_t_8); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 1726, __pyx_L1_error)
+      __pyx_t_6 = __Pyx_PyFunction_FastCall(__pyx_t_2, __pyx_temp+1-__pyx_t_8, 2+__pyx_t_8); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 1717, __pyx_L1_error)
       __Pyx_XDECREF(__pyx_t_4); __pyx_t_4 = 0;
       __Pyx_GOTREF(__pyx_t_6);
       __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
@@ -27938,7 +27938,7 @@ static PyObject *__pyx_f_5MACS2_2IO_10ScoreTrack_18TwoConditionScores_call_peaks
     #if CYTHON_FAST_PYCCALL
     if (__Pyx_PyFastCFunction_Check(__pyx_t_2)) {
       PyObject *__pyx_temp[3] = {__pyx_t_4, __pyx_t_9, __pyx_t_5};
-      __pyx_t_6 = __Pyx_PyCFunction_FastCall(__pyx_t_2, __pyx_temp+1-__pyx_t_8, 2+__pyx_t_8); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 1726, __pyx_L1_error)
+      __pyx_t_6 = __Pyx_PyCFunction_FastCall(__pyx_t_2, __pyx_temp+1-__pyx_t_8, 2+__pyx_t_8); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 1717, __pyx_L1_error)
       __Pyx_XDECREF(__pyx_t_4); __pyx_t_4 = 0;
       __Pyx_GOTREF(__pyx_t_6);
       __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
@@ -27946,7 +27946,7 @@ static PyObject *__pyx_f_5MACS2_2IO_10ScoreTrack_18TwoConditionScores_call_peaks
     } else
     #endif
     {
-      __pyx_t_3 = PyTuple_New(2+__pyx_t_8); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 1726, __pyx_L1_error)
+      __pyx_t_3 = PyTuple_New(2+__pyx_t_8); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 1717, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_3);
       if (__pyx_t_4) {
         __Pyx_GIVEREF(__pyx_t_4); PyTuple_SET_ITEM(__pyx_t_3, 0, __pyx_t_4); __pyx_t_4 = NULL;
@@ -27957,7 +27957,7 @@ static PyObject *__pyx_f_5MACS2_2IO_10ScoreTrack_18TwoConditionScores_call_peaks
       PyTuple_SET_ITEM(__pyx_t_3, 1+__pyx_t_8, __pyx_t_5);
       __pyx_t_9 = 0;
       __pyx_t_5 = 0;
-      __pyx_t_6 = __Pyx_PyObject_Call(__pyx_t_2, __pyx_t_3, NULL); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 1726, __pyx_L1_error)
+      __pyx_t_6 = __Pyx_PyObject_Call(__pyx_t_2, __pyx_t_3, NULL); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 1717, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_6);
       __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
     }
@@ -27965,44 +27965,44 @@ static PyObject *__pyx_f_5MACS2_2IO_10ScoreTrack_18TwoConditionScores_call_peaks
     __Pyx_XDECREF_SET(__pyx_v_cond1_equal_cond2, __pyx_t_6);
     __pyx_t_6 = 0;
 
-    /* "MACS2/IO/ScoreTrack.pyx":1727
+    /* "MACS2/IO/ScoreTrack.pyx":1718
  *             cond2_over_cond1 = t1_vs_t2 <= -1*cutoff # regions with stronger cond2 signals
  *             cond1_equal_cond2= and_( t1_vs_t2 >= -1*cutoff, t1_vs_t2 <= cutoff )
  *             cond1_sig = t1_vs_c1 >= cutoff # enriched regions in condition 1             # <<<<<<<<<<<<<<
  *             cond2_sig = t2_vs_c2 >= cutoff # enriched regions in condition 2
  *             # indices where score is above cutoff
  */
-    __pyx_t_6 = PyFloat_FromDouble(__pyx_v_cutoff); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 1727, __pyx_L1_error)
+    __pyx_t_6 = PyFloat_FromDouble(__pyx_v_cutoff); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 1718, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_6);
-    __pyx_t_2 = PyObject_RichCompare(__pyx_v_t1_vs_c1, __pyx_t_6, Py_GE); __Pyx_XGOTREF(__pyx_t_2); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1727, __pyx_L1_error)
+    __pyx_t_2 = PyObject_RichCompare(__pyx_v_t1_vs_c1, __pyx_t_6, Py_GE); __Pyx_XGOTREF(__pyx_t_2); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1718, __pyx_L1_error)
     __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
     __Pyx_XDECREF_SET(__pyx_v_cond1_sig, __pyx_t_2);
     __pyx_t_2 = 0;
 
-    /* "MACS2/IO/ScoreTrack.pyx":1728
+    /* "MACS2/IO/ScoreTrack.pyx":1719
  *             cond1_equal_cond2= and_( t1_vs_t2 >= -1*cutoff, t1_vs_t2 <= cutoff )
  *             cond1_sig = t1_vs_c1 >= cutoff # enriched regions in condition 1
  *             cond2_sig = t2_vs_c2 >= cutoff # enriched regions in condition 2             # <<<<<<<<<<<<<<
  *             # indices where score is above cutoff
  *             cat1 = np.where( and_( cond1_sig, cond1_over_cond2 ) )[ 0 ] # cond1 stronger than cond2, the indices
  */
-    __pyx_t_2 = PyFloat_FromDouble(__pyx_v_cutoff); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1728, __pyx_L1_error)
+    __pyx_t_2 = PyFloat_FromDouble(__pyx_v_cutoff); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1719, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
-    __pyx_t_6 = PyObject_RichCompare(__pyx_v_t2_vs_c2, __pyx_t_2, Py_GE); __Pyx_XGOTREF(__pyx_t_6); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 1728, __pyx_L1_error)
+    __pyx_t_6 = PyObject_RichCompare(__pyx_v_t2_vs_c2, __pyx_t_2, Py_GE); __Pyx_XGOTREF(__pyx_t_6); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 1719, __pyx_L1_error)
     __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
     __Pyx_XDECREF_SET(__pyx_v_cond2_sig, __pyx_t_6);
     __pyx_t_6 = 0;
 
-    /* "MACS2/IO/ScoreTrack.pyx":1730
+    /* "MACS2/IO/ScoreTrack.pyx":1721
  *             cond2_sig = t2_vs_c2 >= cutoff # enriched regions in condition 2
  *             # indices where score is above cutoff
  *             cat1 = np.where( and_( cond1_sig, cond1_over_cond2 ) )[ 0 ] # cond1 stronger than cond2, the indices             # <<<<<<<<<<<<<<
  *             cat2 = np.where( and_( cond2_over_cond1, cond2_sig ) )[ 0 ] # cond2 stronger than cond1, the indices
  *             cat3 = np.where( and_( and_( cond1_sig, cond2_sig ), # cond1 and cond2 are equal, the indices
  */
-    __Pyx_GetModuleGlobalName(__pyx_t_2, __pyx_n_s_np); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1730, __pyx_L1_error)
+    __Pyx_GetModuleGlobalName(__pyx_t_2, __pyx_n_s_np); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1721, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
-    __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_t_2, __pyx_n_s_where); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 1730, __pyx_L1_error)
+    __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_t_2, __pyx_n_s_where); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 1721, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_3);
     __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
     __Pyx_INCREF(__pyx_v_and_);
@@ -28021,7 +28021,7 @@ static PyObject *__pyx_f_5MACS2_2IO_10ScoreTrack_18TwoConditionScores_call_peaks
     #if CYTHON_FAST_PYCALL
     if (PyFunction_Check(__pyx_t_5)) {
       PyObject *__pyx_temp[3] = {__pyx_t_9, __pyx_v_cond1_sig, __pyx_v_cond1_over_cond2};
-      __pyx_t_2 = __Pyx_PyFunction_FastCall(__pyx_t_5, __pyx_temp+1-__pyx_t_8, 2+__pyx_t_8); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1730, __pyx_L1_error)
+      __pyx_t_2 = __Pyx_PyFunction_FastCall(__pyx_t_5, __pyx_temp+1-__pyx_t_8, 2+__pyx_t_8); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1721, __pyx_L1_error)
       __Pyx_XDECREF(__pyx_t_9); __pyx_t_9 = 0;
       __Pyx_GOTREF(__pyx_t_2);
     } else
@@ -28029,13 +28029,13 @@ static PyObject *__pyx_f_5MACS2_2IO_10ScoreTrack_18TwoConditionScores_call_peaks
     #if CYTHON_FAST_PYCCALL
     if (__Pyx_PyFastCFunction_Check(__pyx_t_5)) {
       PyObject *__pyx_temp[3] = {__pyx_t_9, __pyx_v_cond1_sig, __pyx_v_cond1_over_cond2};
-      __pyx_t_2 = __Pyx_PyCFunction_FastCall(__pyx_t_5, __pyx_temp+1-__pyx_t_8, 2+__pyx_t_8); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1730, __pyx_L1_error)
+      __pyx_t_2 = __Pyx_PyCFunction_FastCall(__pyx_t_5, __pyx_temp+1-__pyx_t_8, 2+__pyx_t_8); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1721, __pyx_L1_error)
       __Pyx_XDECREF(__pyx_t_9); __pyx_t_9 = 0;
       __Pyx_GOTREF(__pyx_t_2);
     } else
     #endif
     {
-      __pyx_t_4 = PyTuple_New(2+__pyx_t_8); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 1730, __pyx_L1_error)
+      __pyx_t_4 = PyTuple_New(2+__pyx_t_8); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 1721, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_4);
       if (__pyx_t_9) {
         __Pyx_GIVEREF(__pyx_t_9); PyTuple_SET_ITEM(__pyx_t_4, 0, __pyx_t_9); __pyx_t_9 = NULL;
@@ -28046,7 +28046,7 @@ static PyObject *__pyx_f_5MACS2_2IO_10ScoreTrack_18TwoConditionScores_call_peaks
       __Pyx_INCREF(__pyx_v_cond1_over_cond2);
       __Pyx_GIVEREF(__pyx_v_cond1_over_cond2);
       PyTuple_SET_ITEM(__pyx_t_4, 1+__pyx_t_8, __pyx_v_cond1_over_cond2);
-      __pyx_t_2 = __Pyx_PyObject_Call(__pyx_t_5, __pyx_t_4, NULL); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1730, __pyx_L1_error)
+      __pyx_t_2 = __Pyx_PyObject_Call(__pyx_t_5, __pyx_t_4, NULL); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1721, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_2);
       __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
     }
@@ -28064,25 +28064,25 @@ static PyObject *__pyx_f_5MACS2_2IO_10ScoreTrack_18TwoConditionScores_call_peaks
     __pyx_t_6 = (__pyx_t_5) ? __Pyx_PyObject_Call2Args(__pyx_t_3, __pyx_t_5, __pyx_t_2) : __Pyx_PyObject_CallOneArg(__pyx_t_3, __pyx_t_2);
     __Pyx_XDECREF(__pyx_t_5); __pyx_t_5 = 0;
     __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-    if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 1730, __pyx_L1_error)
+    if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 1721, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_6);
     __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-    __pyx_t_3 = __Pyx_GetItemInt(__pyx_t_6, 0, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 1730, __pyx_L1_error)
+    __pyx_t_3 = __Pyx_GetItemInt(__pyx_t_6, 0, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 1721, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_3);
     __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
     __Pyx_XDECREF_SET(__pyx_v_cat1, __pyx_t_3);
     __pyx_t_3 = 0;
 
-    /* "MACS2/IO/ScoreTrack.pyx":1731
+    /* "MACS2/IO/ScoreTrack.pyx":1722
  *             # indices where score is above cutoff
  *             cat1 = np.where( and_( cond1_sig, cond1_over_cond2 ) )[ 0 ] # cond1 stronger than cond2, the indices
  *             cat2 = np.where( and_( cond2_over_cond1, cond2_sig ) )[ 0 ] # cond2 stronger than cond1, the indices             # <<<<<<<<<<<<<<
  *             cat3 = np.where( and_( and_( cond1_sig, cond2_sig ), # cond1 and cond2 are equal, the indices
  *                                    cond1_equal_cond2 ) ) [ 0 ]
  */
-    __Pyx_GetModuleGlobalName(__pyx_t_6, __pyx_n_s_np); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 1731, __pyx_L1_error)
+    __Pyx_GetModuleGlobalName(__pyx_t_6, __pyx_n_s_np); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 1722, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_6);
-    __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_t_6, __pyx_n_s_where); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1731, __pyx_L1_error)
+    __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_t_6, __pyx_n_s_where); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1722, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
     __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
     __Pyx_INCREF(__pyx_v_and_);
@@ -28101,7 +28101,7 @@ static PyObject *__pyx_f_5MACS2_2IO_10ScoreTrack_18TwoConditionScores_call_peaks
     #if CYTHON_FAST_PYCALL
     if (PyFunction_Check(__pyx_t_5)) {
       PyObject *__pyx_temp[3] = {__pyx_t_4, __pyx_v_cond2_over_cond1, __pyx_v_cond2_sig};
-      __pyx_t_6 = __Pyx_PyFunction_FastCall(__pyx_t_5, __pyx_temp+1-__pyx_t_8, 2+__pyx_t_8); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 1731, __pyx_L1_error)
+      __pyx_t_6 = __Pyx_PyFunction_FastCall(__pyx_t_5, __pyx_temp+1-__pyx_t_8, 2+__pyx_t_8); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 1722, __pyx_L1_error)
       __Pyx_XDECREF(__pyx_t_4); __pyx_t_4 = 0;
       __Pyx_GOTREF(__pyx_t_6);
     } else
@@ -28109,13 +28109,13 @@ static PyObject *__pyx_f_5MACS2_2IO_10ScoreTrack_18TwoConditionScores_call_peaks
     #if CYTHON_FAST_PYCCALL
     if (__Pyx_PyFastCFunction_Check(__pyx_t_5)) {
       PyObject *__pyx_temp[3] = {__pyx_t_4, __pyx_v_cond2_over_cond1, __pyx_v_cond2_sig};
-      __pyx_t_6 = __Pyx_PyCFunction_FastCall(__pyx_t_5, __pyx_temp+1-__pyx_t_8, 2+__pyx_t_8); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 1731, __pyx_L1_error)
+      __pyx_t_6 = __Pyx_PyCFunction_FastCall(__pyx_t_5, __pyx_temp+1-__pyx_t_8, 2+__pyx_t_8); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 1722, __pyx_L1_error)
       __Pyx_XDECREF(__pyx_t_4); __pyx_t_4 = 0;
       __Pyx_GOTREF(__pyx_t_6);
     } else
     #endif
     {
-      __pyx_t_9 = PyTuple_New(2+__pyx_t_8); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 1731, __pyx_L1_error)
+      __pyx_t_9 = PyTuple_New(2+__pyx_t_8); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 1722, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_9);
       if (__pyx_t_4) {
         __Pyx_GIVEREF(__pyx_t_4); PyTuple_SET_ITEM(__pyx_t_9, 0, __pyx_t_4); __pyx_t_4 = NULL;
@@ -28126,7 +28126,7 @@ static PyObject *__pyx_f_5MACS2_2IO_10ScoreTrack_18TwoConditionScores_call_peaks
       __Pyx_INCREF(__pyx_v_cond2_sig);
       __Pyx_GIVEREF(__pyx_v_cond2_sig);
       PyTuple_SET_ITEM(__pyx_t_9, 1+__pyx_t_8, __pyx_v_cond2_sig);
-      __pyx_t_6 = __Pyx_PyObject_Call(__pyx_t_5, __pyx_t_9, NULL); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 1731, __pyx_L1_error)
+      __pyx_t_6 = __Pyx_PyObject_Call(__pyx_t_5, __pyx_t_9, NULL); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 1722, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_6);
       __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
     }
@@ -28144,25 +28144,25 @@ static PyObject *__pyx_f_5MACS2_2IO_10ScoreTrack_18TwoConditionScores_call_peaks
     __pyx_t_3 = (__pyx_t_5) ? __Pyx_PyObject_Call2Args(__pyx_t_2, __pyx_t_5, __pyx_t_6) : __Pyx_PyObject_CallOneArg(__pyx_t_2, __pyx_t_6);
     __Pyx_XDECREF(__pyx_t_5); __pyx_t_5 = 0;
     __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
-    if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 1731, __pyx_L1_error)
+    if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 1722, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_3);
     __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-    __pyx_t_2 = __Pyx_GetItemInt(__pyx_t_3, 0, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1731, __pyx_L1_error)
+    __pyx_t_2 = __Pyx_GetItemInt(__pyx_t_3, 0, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1722, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
     __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
     __Pyx_XDECREF_SET(__pyx_v_cat2, __pyx_t_2);
     __pyx_t_2 = 0;
 
-    /* "MACS2/IO/ScoreTrack.pyx":1732
+    /* "MACS2/IO/ScoreTrack.pyx":1723
  *             cat1 = np.where( and_( cond1_sig, cond1_over_cond2 ) )[ 0 ] # cond1 stronger than cond2, the indices
  *             cat2 = np.where( and_( cond2_over_cond1, cond2_sig ) )[ 0 ] # cond2 stronger than cond1, the indices
  *             cat3 = np.where( and_( and_( cond1_sig, cond2_sig ), # cond1 and cond2 are equal, the indices             # <<<<<<<<<<<<<<
  *                                    cond1_equal_cond2 ) ) [ 0 ]
  * 
  */
-    __Pyx_GetModuleGlobalName(__pyx_t_3, __pyx_n_s_np); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 1732, __pyx_L1_error)
+    __Pyx_GetModuleGlobalName(__pyx_t_3, __pyx_n_s_np); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 1723, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_3);
-    __pyx_t_6 = __Pyx_PyObject_GetAttrStr(__pyx_t_3, __pyx_n_s_where); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 1732, __pyx_L1_error)
+    __pyx_t_6 = __Pyx_PyObject_GetAttrStr(__pyx_t_3, __pyx_n_s_where); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 1723, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_6);
     __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
     __Pyx_INCREF(__pyx_v_and_);
@@ -28181,7 +28181,7 @@ static PyObject *__pyx_f_5MACS2_2IO_10ScoreTrack_18TwoConditionScores_call_peaks
     #if CYTHON_FAST_PYCALL
     if (PyFunction_Check(__pyx_t_9)) {
       PyObject *__pyx_temp[3] = {__pyx_t_4, __pyx_v_cond1_sig, __pyx_v_cond2_sig};
-      __pyx_t_5 = __Pyx_PyFunction_FastCall(__pyx_t_9, __pyx_temp+1-__pyx_t_8, 2+__pyx_t_8); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 1732, __pyx_L1_error)
+      __pyx_t_5 = __Pyx_PyFunction_FastCall(__pyx_t_9, __pyx_temp+1-__pyx_t_8, 2+__pyx_t_8); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 1723, __pyx_L1_error)
       __Pyx_XDECREF(__pyx_t_4); __pyx_t_4 = 0;
       __Pyx_GOTREF(__pyx_t_5);
     } else
@@ -28189,13 +28189,13 @@ static PyObject *__pyx_f_5MACS2_2IO_10ScoreTrack_18TwoConditionScores_call_peaks
     #if CYTHON_FAST_PYCCALL
     if (__Pyx_PyFastCFunction_Check(__pyx_t_9)) {
       PyObject *__pyx_temp[3] = {__pyx_t_4, __pyx_v_cond1_sig, __pyx_v_cond2_sig};
-      __pyx_t_5 = __Pyx_PyCFunction_FastCall(__pyx_t_9, __pyx_temp+1-__pyx_t_8, 2+__pyx_t_8); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 1732, __pyx_L1_error)
+      __pyx_t_5 = __Pyx_PyCFunction_FastCall(__pyx_t_9, __pyx_temp+1-__pyx_t_8, 2+__pyx_t_8); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 1723, __pyx_L1_error)
       __Pyx_XDECREF(__pyx_t_4); __pyx_t_4 = 0;
       __Pyx_GOTREF(__pyx_t_5);
     } else
     #endif
     {
-      __pyx_t_7 = PyTuple_New(2+__pyx_t_8); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 1732, __pyx_L1_error)
+      __pyx_t_7 = PyTuple_New(2+__pyx_t_8); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 1723, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_7);
       if (__pyx_t_4) {
         __Pyx_GIVEREF(__pyx_t_4); PyTuple_SET_ITEM(__pyx_t_7, 0, __pyx_t_4); __pyx_t_4 = NULL;
@@ -28206,13 +28206,13 @@ static PyObject *__pyx_f_5MACS2_2IO_10ScoreTrack_18TwoConditionScores_call_peaks
       __Pyx_INCREF(__pyx_v_cond2_sig);
       __Pyx_GIVEREF(__pyx_v_cond2_sig);
       PyTuple_SET_ITEM(__pyx_t_7, 1+__pyx_t_8, __pyx_v_cond2_sig);
-      __pyx_t_5 = __Pyx_PyObject_Call(__pyx_t_9, __pyx_t_7, NULL); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 1732, __pyx_L1_error)
+      __pyx_t_5 = __Pyx_PyObject_Call(__pyx_t_9, __pyx_t_7, NULL); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 1723, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_5);
       __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
     }
     __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
 
-    /* "MACS2/IO/ScoreTrack.pyx":1733
+    /* "MACS2/IO/ScoreTrack.pyx":1724
  *             cat2 = np.where( and_( cond2_over_cond1, cond2_sig ) )[ 0 ] # cond2 stronger than cond1, the indices
  *             cat3 = np.where( and_( and_( cond1_sig, cond2_sig ), # cond1 and cond2 are equal, the indices
  *                                    cond1_equal_cond2 ) ) [ 0 ]             # <<<<<<<<<<<<<<
@@ -28235,7 +28235,7 @@ static PyObject *__pyx_f_5MACS2_2IO_10ScoreTrack_18TwoConditionScores_call_peaks
     #if CYTHON_FAST_PYCALL
     if (PyFunction_Check(__pyx_t_9)) {
       PyObject *__pyx_temp[3] = {__pyx_t_7, __pyx_t_5, __pyx_v_cond1_equal_cond2};
-      __pyx_t_3 = __Pyx_PyFunction_FastCall(__pyx_t_9, __pyx_temp+1-__pyx_t_8, 2+__pyx_t_8); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 1732, __pyx_L1_error)
+      __pyx_t_3 = __Pyx_PyFunction_FastCall(__pyx_t_9, __pyx_temp+1-__pyx_t_8, 2+__pyx_t_8); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 1723, __pyx_L1_error)
       __Pyx_XDECREF(__pyx_t_7); __pyx_t_7 = 0;
       __Pyx_GOTREF(__pyx_t_3);
       __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
@@ -28244,14 +28244,14 @@ static PyObject *__pyx_f_5MACS2_2IO_10ScoreTrack_18TwoConditionScores_call_peaks
     #if CYTHON_FAST_PYCCALL
     if (__Pyx_PyFastCFunction_Check(__pyx_t_9)) {
       PyObject *__pyx_temp[3] = {__pyx_t_7, __pyx_t_5, __pyx_v_cond1_equal_cond2};
-      __pyx_t_3 = __Pyx_PyCFunction_FastCall(__pyx_t_9, __pyx_temp+1-__pyx_t_8, 2+__pyx_t_8); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 1732, __pyx_L1_error)
+      __pyx_t_3 = __Pyx_PyCFunction_FastCall(__pyx_t_9, __pyx_temp+1-__pyx_t_8, 2+__pyx_t_8); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 1723, __pyx_L1_error)
       __Pyx_XDECREF(__pyx_t_7); __pyx_t_7 = 0;
       __Pyx_GOTREF(__pyx_t_3);
       __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
     } else
     #endif
     {
-      __pyx_t_4 = PyTuple_New(2+__pyx_t_8); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 1732, __pyx_L1_error)
+      __pyx_t_4 = PyTuple_New(2+__pyx_t_8); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 1723, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_4);
       if (__pyx_t_7) {
         __Pyx_GIVEREF(__pyx_t_7); PyTuple_SET_ITEM(__pyx_t_4, 0, __pyx_t_7); __pyx_t_7 = NULL;
@@ -28262,7 +28262,7 @@ static PyObject *__pyx_f_5MACS2_2IO_10ScoreTrack_18TwoConditionScores_call_peaks
       __Pyx_GIVEREF(__pyx_v_cond1_equal_cond2);
       PyTuple_SET_ITEM(__pyx_t_4, 1+__pyx_t_8, __pyx_v_cond1_equal_cond2);
       __pyx_t_5 = 0;
-      __pyx_t_3 = __Pyx_PyObject_Call(__pyx_t_9, __pyx_t_4, NULL); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 1732, __pyx_L1_error)
+      __pyx_t_3 = __Pyx_PyObject_Call(__pyx_t_9, __pyx_t_4, NULL); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 1723, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_3);
       __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
     }
@@ -28280,148 +28280,148 @@ static PyObject *__pyx_f_5MACS2_2IO_10ScoreTrack_18TwoConditionScores_call_peaks
     __pyx_t_2 = (__pyx_t_9) ? __Pyx_PyObject_Call2Args(__pyx_t_6, __pyx_t_9, __pyx_t_3) : __Pyx_PyObject_CallOneArg(__pyx_t_6, __pyx_t_3);
     __Pyx_XDECREF(__pyx_t_9); __pyx_t_9 = 0;
     __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-    if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1732, __pyx_L1_error)
+    if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1723, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
     __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
-    __pyx_t_6 = __Pyx_GetItemInt(__pyx_t_2, 0, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 1733, __pyx_L1_error)
+    __pyx_t_6 = __Pyx_GetItemInt(__pyx_t_2, 0, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 1724, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_6);
     __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
     __Pyx_XDECREF_SET(__pyx_v_cat3, __pyx_t_6);
     __pyx_t_6 = 0;
 
-    /* "MACS2/IO/ScoreTrack.pyx":1735
+    /* "MACS2/IO/ScoreTrack.pyx":1726
  *                                    cond1_equal_cond2 ) ) [ 0 ]
  * 
  *             cat1_endpos = pos[cat1] # end positions of regions where score is above cutoff             # <<<<<<<<<<<<<<
  *             cat1_startpos = pos[cat1-1] # start positions of regions where score is above cutoff
  *             cat2_endpos = pos[cat2] # end positions of regions where score is above cutoff
  */
-    __pyx_t_6 = __Pyx_PyObject_GetItem(((PyObject *)__pyx_v_pos), __pyx_v_cat1); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 1735, __pyx_L1_error)
+    __pyx_t_6 = __Pyx_PyObject_GetItem(((PyObject *)__pyx_v_pos), __pyx_v_cat1); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 1726, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_6);
     __Pyx_XDECREF_SET(__pyx_v_cat1_endpos, __pyx_t_6);
     __pyx_t_6 = 0;
 
-    /* "MACS2/IO/ScoreTrack.pyx":1736
+    /* "MACS2/IO/ScoreTrack.pyx":1727
  * 
  *             cat1_endpos = pos[cat1] # end positions of regions where score is above cutoff
  *             cat1_startpos = pos[cat1-1] # start positions of regions where score is above cutoff             # <<<<<<<<<<<<<<
  *             cat2_endpos = pos[cat2] # end positions of regions where score is above cutoff
  *             cat2_startpos = pos[cat2-1] # start positions of regions where score is above cutoff
  */
-    __pyx_t_6 = __Pyx_PyInt_SubtractObjC(__pyx_v_cat1, __pyx_int_1, 1, 0, 0); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 1736, __pyx_L1_error)
+    __pyx_t_6 = __Pyx_PyInt_SubtractObjC(__pyx_v_cat1, __pyx_int_1, 1, 0, 0); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 1727, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_6);
-    __pyx_t_2 = __Pyx_PyObject_GetItem(((PyObject *)__pyx_v_pos), __pyx_t_6); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1736, __pyx_L1_error)
+    __pyx_t_2 = __Pyx_PyObject_GetItem(((PyObject *)__pyx_v_pos), __pyx_t_6); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1727, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
     __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
     __Pyx_XDECREF_SET(__pyx_v_cat1_startpos, __pyx_t_2);
     __pyx_t_2 = 0;
 
-    /* "MACS2/IO/ScoreTrack.pyx":1737
+    /* "MACS2/IO/ScoreTrack.pyx":1728
  *             cat1_endpos = pos[cat1] # end positions of regions where score is above cutoff
  *             cat1_startpos = pos[cat1-1] # start positions of regions where score is above cutoff
  *             cat2_endpos = pos[cat2] # end positions of regions where score is above cutoff             # <<<<<<<<<<<<<<
  *             cat2_startpos = pos[cat2-1] # start positions of regions where score is above cutoff
  *             cat3_endpos = pos[cat3] # end positions of regions where score is above cutoff
  */
-    __pyx_t_2 = __Pyx_PyObject_GetItem(((PyObject *)__pyx_v_pos), __pyx_v_cat2); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1737, __pyx_L1_error)
+    __pyx_t_2 = __Pyx_PyObject_GetItem(((PyObject *)__pyx_v_pos), __pyx_v_cat2); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1728, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
     __Pyx_XDECREF_SET(__pyx_v_cat2_endpos, __pyx_t_2);
     __pyx_t_2 = 0;
 
-    /* "MACS2/IO/ScoreTrack.pyx":1738
+    /* "MACS2/IO/ScoreTrack.pyx":1729
  *             cat1_startpos = pos[cat1-1] # start positions of regions where score is above cutoff
  *             cat2_endpos = pos[cat2] # end positions of regions where score is above cutoff
  *             cat2_startpos = pos[cat2-1] # start positions of regions where score is above cutoff             # <<<<<<<<<<<<<<
  *             cat3_endpos = pos[cat3] # end positions of regions where score is above cutoff
  *             cat3_startpos = pos[cat3-1] # start positions of regions where score is above cutoff
  */
-    __pyx_t_2 = __Pyx_PyInt_SubtractObjC(__pyx_v_cat2, __pyx_int_1, 1, 0, 0); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1738, __pyx_L1_error)
+    __pyx_t_2 = __Pyx_PyInt_SubtractObjC(__pyx_v_cat2, __pyx_int_1, 1, 0, 0); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1729, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
-    __pyx_t_6 = __Pyx_PyObject_GetItem(((PyObject *)__pyx_v_pos), __pyx_t_2); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 1738, __pyx_L1_error)
+    __pyx_t_6 = __Pyx_PyObject_GetItem(((PyObject *)__pyx_v_pos), __pyx_t_2); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 1729, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_6);
     __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
     __Pyx_XDECREF_SET(__pyx_v_cat2_startpos, __pyx_t_6);
     __pyx_t_6 = 0;
 
-    /* "MACS2/IO/ScoreTrack.pyx":1739
+    /* "MACS2/IO/ScoreTrack.pyx":1730
  *             cat2_endpos = pos[cat2] # end positions of regions where score is above cutoff
  *             cat2_startpos = pos[cat2-1] # start positions of regions where score is above cutoff
  *             cat3_endpos = pos[cat3] # end positions of regions where score is above cutoff             # <<<<<<<<<<<<<<
  *             cat3_startpos = pos[cat3-1] # start positions of regions where score is above cutoff
  * 
  */
-    __pyx_t_6 = __Pyx_PyObject_GetItem(((PyObject *)__pyx_v_pos), __pyx_v_cat3); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 1739, __pyx_L1_error)
+    __pyx_t_6 = __Pyx_PyObject_GetItem(((PyObject *)__pyx_v_pos), __pyx_v_cat3); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 1730, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_6);
     __Pyx_XDECREF_SET(__pyx_v_cat3_endpos, __pyx_t_6);
     __pyx_t_6 = 0;
 
-    /* "MACS2/IO/ScoreTrack.pyx":1740
+    /* "MACS2/IO/ScoreTrack.pyx":1731
  *             cat2_startpos = pos[cat2-1] # start positions of regions where score is above cutoff
  *             cat3_endpos = pos[cat3] # end positions of regions where score is above cutoff
  *             cat3_startpos = pos[cat3-1] # start positions of regions where score is above cutoff             # <<<<<<<<<<<<<<
  * 
  *             # for cat1: condition 1 stronger regions
  */
-    __pyx_t_6 = __Pyx_PyInt_SubtractObjC(__pyx_v_cat3, __pyx_int_1, 1, 0, 0); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 1740, __pyx_L1_error)
+    __pyx_t_6 = __Pyx_PyInt_SubtractObjC(__pyx_v_cat3, __pyx_int_1, 1, 0, 0); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 1731, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_6);
-    __pyx_t_2 = __Pyx_PyObject_GetItem(((PyObject *)__pyx_v_pos), __pyx_t_6); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1740, __pyx_L1_error)
+    __pyx_t_2 = __Pyx_PyObject_GetItem(((PyObject *)__pyx_v_pos), __pyx_t_6); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1731, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
     __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
     __Pyx_XDECREF_SET(__pyx_v_cat3_startpos, __pyx_t_2);
     __pyx_t_2 = 0;
 
-    /* "MACS2/IO/ScoreTrack.pyx":1743
+    /* "MACS2/IO/ScoreTrack.pyx":1734
  * 
  *             # for cat1: condition 1 stronger regions
  *             self.__add_a_peak ( cat1_peaks, chrom, cat1, cat1_startpos, cat1_endpos, t1_vs_t2, max_gap, min_length )             # <<<<<<<<<<<<<<
  *             # for cat2: condition 2 stronger regions
  *             self.__add_a_peak ( cat2_peaks, chrom, cat2, cat2_startpos, cat2_endpos, -1 * t1_vs_t2, max_gap, min_length )
  */
-    if (!(likely(((__pyx_v_cat1) == Py_None) || likely(__Pyx_TypeTest(__pyx_v_cat1, __pyx_ptype_5numpy_ndarray))))) __PYX_ERR(0, 1743, __pyx_L1_error)
-    if (!(likely(((__pyx_v_cat1_startpos) == Py_None) || likely(__Pyx_TypeTest(__pyx_v_cat1_startpos, __pyx_ptype_5numpy_ndarray))))) __PYX_ERR(0, 1743, __pyx_L1_error)
-    if (!(likely(((__pyx_v_cat1_endpos) == Py_None) || likely(__Pyx_TypeTest(__pyx_v_cat1_endpos, __pyx_ptype_5numpy_ndarray))))) __PYX_ERR(0, 1743, __pyx_L1_error)
-    if (!(likely(((__pyx_v_t1_vs_t2) == Py_None) || likely(__Pyx_TypeTest(__pyx_v_t1_vs_t2, __pyx_ptype_5numpy_ndarray))))) __PYX_ERR(0, 1743, __pyx_L1_error)
-    __pyx_t_2 = ((struct __pyx_vtabstruct_5MACS2_2IO_10ScoreTrack_TwoConditionScores *)__pyx_v_self->__pyx_vtab)->__pyx___add_a_peak(__pyx_v_self, __pyx_v_cat1_peaks, __pyx_v_chrom, ((PyArrayObject *)__pyx_v_cat1), ((PyArrayObject *)__pyx_v_cat1_startpos), ((PyArrayObject *)__pyx_v_cat1_endpos), ((PyArrayObject *)__pyx_v_t1_vs_t2), __pyx_v_max_gap, __pyx_v_min_length); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1743, __pyx_L1_error)
+    if (!(likely(((__pyx_v_cat1) == Py_None) || likely(__Pyx_TypeTest(__pyx_v_cat1, __pyx_ptype_5numpy_ndarray))))) __PYX_ERR(0, 1734, __pyx_L1_error)
+    if (!(likely(((__pyx_v_cat1_startpos) == Py_None) || likely(__Pyx_TypeTest(__pyx_v_cat1_startpos, __pyx_ptype_5numpy_ndarray))))) __PYX_ERR(0, 1734, __pyx_L1_error)
+    if (!(likely(((__pyx_v_cat1_endpos) == Py_None) || likely(__Pyx_TypeTest(__pyx_v_cat1_endpos, __pyx_ptype_5numpy_ndarray))))) __PYX_ERR(0, 1734, __pyx_L1_error)
+    if (!(likely(((__pyx_v_t1_vs_t2) == Py_None) || likely(__Pyx_TypeTest(__pyx_v_t1_vs_t2, __pyx_ptype_5numpy_ndarray))))) __PYX_ERR(0, 1734, __pyx_L1_error)
+    __pyx_t_2 = ((struct __pyx_vtabstruct_5MACS2_2IO_10ScoreTrack_TwoConditionScores *)__pyx_v_self->__pyx_vtab)->__pyx___add_a_peak(__pyx_v_self, __pyx_v_cat1_peaks, __pyx_v_chrom, ((PyArrayObject *)__pyx_v_cat1), ((PyArrayObject *)__pyx_v_cat1_startpos), ((PyArrayObject *)__pyx_v_cat1_endpos), ((PyArrayObject *)__pyx_v_t1_vs_t2), __pyx_v_max_gap, __pyx_v_min_length); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1734, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
     __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
-    /* "MACS2/IO/ScoreTrack.pyx":1745
+    /* "MACS2/IO/ScoreTrack.pyx":1736
  *             self.__add_a_peak ( cat1_peaks, chrom, cat1, cat1_startpos, cat1_endpos, t1_vs_t2, max_gap, min_length )
  *             # for cat2: condition 2 stronger regions
  *             self.__add_a_peak ( cat2_peaks, chrom, cat2, cat2_startpos, cat2_endpos, -1 * t1_vs_t2, max_gap, min_length )             # <<<<<<<<<<<<<<
  *             # for cat3: commonly strong regions
  *             self.__add_a_peak ( cat3_peaks, chrom, cat3, cat3_startpos, cat3_endpos, abs(t1_vs_t2), max_gap, min_length )
  */
-    if (!(likely(((__pyx_v_cat2) == Py_None) || likely(__Pyx_TypeTest(__pyx_v_cat2, __pyx_ptype_5numpy_ndarray))))) __PYX_ERR(0, 1745, __pyx_L1_error)
-    if (!(likely(((__pyx_v_cat2_startpos) == Py_None) || likely(__Pyx_TypeTest(__pyx_v_cat2_startpos, __pyx_ptype_5numpy_ndarray))))) __PYX_ERR(0, 1745, __pyx_L1_error)
-    if (!(likely(((__pyx_v_cat2_endpos) == Py_None) || likely(__Pyx_TypeTest(__pyx_v_cat2_endpos, __pyx_ptype_5numpy_ndarray))))) __PYX_ERR(0, 1745, __pyx_L1_error)
-    __pyx_t_2 = PyNumber_Multiply(__pyx_int_neg_1, __pyx_v_t1_vs_t2); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1745, __pyx_L1_error)
+    if (!(likely(((__pyx_v_cat2) == Py_None) || likely(__Pyx_TypeTest(__pyx_v_cat2, __pyx_ptype_5numpy_ndarray))))) __PYX_ERR(0, 1736, __pyx_L1_error)
+    if (!(likely(((__pyx_v_cat2_startpos) == Py_None) || likely(__Pyx_TypeTest(__pyx_v_cat2_startpos, __pyx_ptype_5numpy_ndarray))))) __PYX_ERR(0, 1736, __pyx_L1_error)
+    if (!(likely(((__pyx_v_cat2_endpos) == Py_None) || likely(__Pyx_TypeTest(__pyx_v_cat2_endpos, __pyx_ptype_5numpy_ndarray))))) __PYX_ERR(0, 1736, __pyx_L1_error)
+    __pyx_t_2 = PyNumber_Multiply(__pyx_int_neg_1, __pyx_v_t1_vs_t2); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1736, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
-    if (!(likely(((__pyx_t_2) == Py_None) || likely(__Pyx_TypeTest(__pyx_t_2, __pyx_ptype_5numpy_ndarray))))) __PYX_ERR(0, 1745, __pyx_L1_error)
-    __pyx_t_6 = ((struct __pyx_vtabstruct_5MACS2_2IO_10ScoreTrack_TwoConditionScores *)__pyx_v_self->__pyx_vtab)->__pyx___add_a_peak(__pyx_v_self, __pyx_v_cat2_peaks, __pyx_v_chrom, ((PyArrayObject *)__pyx_v_cat2), ((PyArrayObject *)__pyx_v_cat2_startpos), ((PyArrayObject *)__pyx_v_cat2_endpos), ((PyArrayObject *)__pyx_t_2), __pyx_v_max_gap, __pyx_v_min_length); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 1745, __pyx_L1_error)
+    if (!(likely(((__pyx_t_2) == Py_None) || likely(__Pyx_TypeTest(__pyx_t_2, __pyx_ptype_5numpy_ndarray))))) __PYX_ERR(0, 1736, __pyx_L1_error)
+    __pyx_t_6 = ((struct __pyx_vtabstruct_5MACS2_2IO_10ScoreTrack_TwoConditionScores *)__pyx_v_self->__pyx_vtab)->__pyx___add_a_peak(__pyx_v_self, __pyx_v_cat2_peaks, __pyx_v_chrom, ((PyArrayObject *)__pyx_v_cat2), ((PyArrayObject *)__pyx_v_cat2_startpos), ((PyArrayObject *)__pyx_v_cat2_endpos), ((PyArrayObject *)__pyx_t_2), __pyx_v_max_gap, __pyx_v_min_length); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 1736, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_6);
     __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
     __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
 
-    /* "MACS2/IO/ScoreTrack.pyx":1747
+    /* "MACS2/IO/ScoreTrack.pyx":1738
  *             self.__add_a_peak ( cat2_peaks, chrom, cat2, cat2_startpos, cat2_endpos, -1 * t1_vs_t2, max_gap, min_length )
  *             # for cat3: commonly strong regions
  *             self.__add_a_peak ( cat3_peaks, chrom, cat3, cat3_startpos, cat3_endpos, abs(t1_vs_t2), max_gap, min_length )             # <<<<<<<<<<<<<<
  * 
  *         return (cat1_peaks, cat2_peaks, cat3_peaks)
  */
-    if (!(likely(((__pyx_v_cat3) == Py_None) || likely(__Pyx_TypeTest(__pyx_v_cat3, __pyx_ptype_5numpy_ndarray))))) __PYX_ERR(0, 1747, __pyx_L1_error)
-    if (!(likely(((__pyx_v_cat3_startpos) == Py_None) || likely(__Pyx_TypeTest(__pyx_v_cat3_startpos, __pyx_ptype_5numpy_ndarray))))) __PYX_ERR(0, 1747, __pyx_L1_error)
-    if (!(likely(((__pyx_v_cat3_endpos) == Py_None) || likely(__Pyx_TypeTest(__pyx_v_cat3_endpos, __pyx_ptype_5numpy_ndarray))))) __PYX_ERR(0, 1747, __pyx_L1_error)
-    __pyx_t_6 = __Pyx_PyNumber_Absolute(__pyx_v_t1_vs_t2); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 1747, __pyx_L1_error)
+    if (!(likely(((__pyx_v_cat3) == Py_None) || likely(__Pyx_TypeTest(__pyx_v_cat3, __pyx_ptype_5numpy_ndarray))))) __PYX_ERR(0, 1738, __pyx_L1_error)
+    if (!(likely(((__pyx_v_cat3_startpos) == Py_None) || likely(__Pyx_TypeTest(__pyx_v_cat3_startpos, __pyx_ptype_5numpy_ndarray))))) __PYX_ERR(0, 1738, __pyx_L1_error)
+    if (!(likely(((__pyx_v_cat3_endpos) == Py_None) || likely(__Pyx_TypeTest(__pyx_v_cat3_endpos, __pyx_ptype_5numpy_ndarray))))) __PYX_ERR(0, 1738, __pyx_L1_error)
+    __pyx_t_6 = __Pyx_PyNumber_Absolute(__pyx_v_t1_vs_t2); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 1738, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_6);
-    if (!(likely(((__pyx_t_6) == Py_None) || likely(__Pyx_TypeTest(__pyx_t_6, __pyx_ptype_5numpy_ndarray))))) __PYX_ERR(0, 1747, __pyx_L1_error)
-    __pyx_t_2 = ((struct __pyx_vtabstruct_5MACS2_2IO_10ScoreTrack_TwoConditionScores *)__pyx_v_self->__pyx_vtab)->__pyx___add_a_peak(__pyx_v_self, __pyx_v_cat3_peaks, __pyx_v_chrom, ((PyArrayObject *)__pyx_v_cat3), ((PyArrayObject *)__pyx_v_cat3_startpos), ((PyArrayObject *)__pyx_v_cat3_endpos), ((PyArrayObject *)__pyx_t_6), __pyx_v_max_gap, __pyx_v_min_length); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1747, __pyx_L1_error)
+    if (!(likely(((__pyx_t_6) == Py_None) || likely(__Pyx_TypeTest(__pyx_t_6, __pyx_ptype_5numpy_ndarray))))) __PYX_ERR(0, 1738, __pyx_L1_error)
+    __pyx_t_2 = ((struct __pyx_vtabstruct_5MACS2_2IO_10ScoreTrack_TwoConditionScores *)__pyx_v_self->__pyx_vtab)->__pyx___add_a_peak(__pyx_v_self, __pyx_v_cat3_peaks, __pyx_v_chrom, ((PyArrayObject *)__pyx_v_cat3), ((PyArrayObject *)__pyx_v_cat3_startpos), ((PyArrayObject *)__pyx_v_cat3_endpos), ((PyArrayObject *)__pyx_t_6), __pyx_v_max_gap, __pyx_v_min_length); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1738, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
     __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
     __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
-    /* "MACS2/IO/ScoreTrack.pyx":1718
+    /* "MACS2/IO/ScoreTrack.pyx":1709
  *         self.cutoff = cutoff
  * 
  *         for chrom in chrs:             # <<<<<<<<<<<<<<
@@ -28431,7 +28431,7 @@ static PyObject *__pyx_f_5MACS2_2IO_10ScoreTrack_18TwoConditionScores_call_peaks
   }
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-  /* "MACS2/IO/ScoreTrack.pyx":1749
+  /* "MACS2/IO/ScoreTrack.pyx":1740
  *             self.__add_a_peak ( cat3_peaks, chrom, cat3, cat3_startpos, cat3_endpos, abs(t1_vs_t2), max_gap, min_length )
  * 
  *         return (cat1_peaks, cat2_peaks, cat3_peaks)             # <<<<<<<<<<<<<<
@@ -28439,7 +28439,7 @@ static PyObject *__pyx_f_5MACS2_2IO_10ScoreTrack_18TwoConditionScores_call_peaks
  *     cdef object __add_a_peak ( self, object peaks, bytes chrom, np.ndarray indices, np.ndarray startpos, np.ndarray endpos,
  */
   __Pyx_XDECREF(__pyx_r);
-  __pyx_t_1 = PyTuple_New(3); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1749, __pyx_L1_error)
+  __pyx_t_1 = PyTuple_New(3); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1740, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __Pyx_INCREF(__pyx_v_cat1_peaks);
   __Pyx_GIVEREF(__pyx_v_cat1_peaks);
@@ -28454,7 +28454,7 @@ static PyObject *__pyx_f_5MACS2_2IO_10ScoreTrack_18TwoConditionScores_call_peaks
   __pyx_t_1 = 0;
   goto __pyx_L0;
 
-  /* "MACS2/IO/ScoreTrack.pyx":1685
+  /* "MACS2/IO/ScoreTrack.pyx":1676
  *         return True
  * 
  *     cpdef tuple call_peaks (self, float cutoff=3, int min_length=200, int max_gap = 100,             # <<<<<<<<<<<<<<
@@ -28520,7 +28520,7 @@ static PyObject *__pyx_pw_5MACS2_2IO_10ScoreTrack_18TwoConditionScores_19call_pe
     static PyObject **__pyx_pyargnames[] = {&__pyx_n_s_cutoff,&__pyx_n_s_min_length,&__pyx_n_s_max_gap,&__pyx_n_s_call_summits,0};
     PyObject* values[4] = {0,0,0,0};
 
-    /* "MACS2/IO/ScoreTrack.pyx":1686
+    /* "MACS2/IO/ScoreTrack.pyx":1677
  * 
  *     cpdef tuple call_peaks (self, float cutoff=3, int min_length=200, int max_gap = 100,
  *                       bool call_summits=False):             # <<<<<<<<<<<<<<
@@ -28570,7 +28570,7 @@ static PyObject *__pyx_pw_5MACS2_2IO_10ScoreTrack_18TwoConditionScores_19call_pe
         }
       }
       if (unlikely(kw_args > 0)) {
-        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "call_peaks") < 0)) __PYX_ERR(0, 1685, __pyx_L3_error)
+        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "call_peaks") < 0)) __PYX_ERR(0, 1676, __pyx_L3_error)
       }
     } else {
       switch (PyTuple_GET_SIZE(__pyx_args)) {
@@ -28587,17 +28587,17 @@ static PyObject *__pyx_pw_5MACS2_2IO_10ScoreTrack_18TwoConditionScores_19call_pe
       }
     }
     if (values[0]) {
-      __pyx_v_cutoff = __pyx_PyFloat_AsFloat(values[0]); if (unlikely((__pyx_v_cutoff == (float)-1) && PyErr_Occurred())) __PYX_ERR(0, 1685, __pyx_L3_error)
+      __pyx_v_cutoff = __pyx_PyFloat_AsFloat(values[0]); if (unlikely((__pyx_v_cutoff == (float)-1) && PyErr_Occurred())) __PYX_ERR(0, 1676, __pyx_L3_error)
     } else {
       __pyx_v_cutoff = ((float)3.0);
     }
     if (values[1]) {
-      __pyx_v_min_length = __Pyx_PyInt_As_int(values[1]); if (unlikely((__pyx_v_min_length == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 1685, __pyx_L3_error)
+      __pyx_v_min_length = __Pyx_PyInt_As_int(values[1]); if (unlikely((__pyx_v_min_length == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 1676, __pyx_L3_error)
     } else {
       __pyx_v_min_length = ((int)0xC8);
     }
     if (values[2]) {
-      __pyx_v_max_gap = __Pyx_PyInt_As_int(values[2]); if (unlikely((__pyx_v_max_gap == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 1685, __pyx_L3_error)
+      __pyx_v_max_gap = __Pyx_PyInt_As_int(values[2]); if (unlikely((__pyx_v_max_gap == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 1676, __pyx_L3_error)
     } else {
       __pyx_v_max_gap = ((int)0x64);
     }
@@ -28605,16 +28605,16 @@ static PyObject *__pyx_pw_5MACS2_2IO_10ScoreTrack_18TwoConditionScores_19call_pe
   }
   goto __pyx_L4_argument_unpacking_done;
   __pyx_L5_argtuple_error:;
-  __Pyx_RaiseArgtupleInvalid("call_peaks", 0, 0, 4, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 1685, __pyx_L3_error)
+  __Pyx_RaiseArgtupleInvalid("call_peaks", 0, 0, 4, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 1676, __pyx_L3_error)
   __pyx_L3_error:;
   __Pyx_AddTraceback("MACS2.IO.ScoreTrack.TwoConditionScores.call_peaks", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __Pyx_RefNannyFinishContext();
   return NULL;
   __pyx_L4_argument_unpacking_done:;
-  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_call_summits), __pyx_ptype_7cpython_4bool_bool, 1, "call_summits", 0))) __PYX_ERR(0, 1686, __pyx_L1_error)
+  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_call_summits), __pyx_ptype_7cpython_4bool_bool, 1, "call_summits", 0))) __PYX_ERR(0, 1677, __pyx_L1_error)
   __pyx_r = __pyx_pf_5MACS2_2IO_10ScoreTrack_18TwoConditionScores_18call_peaks(((struct __pyx_obj_5MACS2_2IO_10ScoreTrack_TwoConditionScores *)__pyx_v_self), __pyx_v_cutoff, __pyx_v_min_length, __pyx_v_max_gap, __pyx_v_call_summits);
 
-  /* "MACS2/IO/ScoreTrack.pyx":1685
+  /* "MACS2/IO/ScoreTrack.pyx":1676
  *         return True
  * 
  *     cpdef tuple call_peaks (self, float cutoff=3, int min_length=200, int max_gap = 100,             # <<<<<<<<<<<<<<
@@ -28638,14 +28638,14 @@ static PyObject *__pyx_pf_5MACS2_2IO_10ScoreTrack_18TwoConditionScores_18call_pe
   PyObject *__pyx_t_1 = NULL;
   struct __pyx_opt_args_5MACS2_2IO_10ScoreTrack_18TwoConditionScores_call_peaks __pyx_t_2;
   __Pyx_RefNannySetupContext("call_peaks", 0);
-  __Pyx_TraceCall("call_peaks (wrapper)", __pyx_f[0], 1685, 0, __PYX_ERR(0, 1685, __pyx_L1_error));
+  __Pyx_TraceCall("call_peaks (wrapper)", __pyx_f[0], 1676, 0, __PYX_ERR(0, 1676, __pyx_L1_error));
   __Pyx_XDECREF(__pyx_r);
   __pyx_t_2.__pyx_n = 4;
   __pyx_t_2.cutoff = __pyx_v_cutoff;
   __pyx_t_2.min_length = __pyx_v_min_length;
   __pyx_t_2.max_gap = __pyx_v_max_gap;
   __pyx_t_2.call_summits = __pyx_v_call_summits;
-  __pyx_t_1 = __pyx_vtabptr_5MACS2_2IO_10ScoreTrack_TwoConditionScores->call_peaks(__pyx_v_self, 1, &__pyx_t_2); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1685, __pyx_L1_error)
+  __pyx_t_1 = __pyx_vtabptr_5MACS2_2IO_10ScoreTrack_TwoConditionScores->call_peaks(__pyx_v_self, 1, &__pyx_t_2); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1676, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __pyx_r = __pyx_t_1;
   __pyx_t_1 = 0;
@@ -28663,7 +28663,7 @@ static PyObject *__pyx_pf_5MACS2_2IO_10ScoreTrack_18TwoConditionScores_18call_pe
   return __pyx_r;
 }
 
-/* "MACS2/IO/ScoreTrack.pyx":1751
+/* "MACS2/IO/ScoreTrack.pyx":1742
  *         return (cat1_peaks, cat2_peaks, cat3_peaks)
  * 
  *     cdef object __add_a_peak ( self, object peaks, bytes chrom, np.ndarray indices, np.ndarray startpos, np.ndarray endpos,             # <<<<<<<<<<<<<<
@@ -28688,61 +28688,61 @@ static PyObject *__pyx_f_5MACS2_2IO_10ScoreTrack_18TwoConditionScores___add_a_pe
   PyObject *(*__pyx_t_8)(PyObject *);
   PyObject *__pyx_t_9 = NULL;
   __Pyx_RefNannySetupContext("__add_a_peak", 0);
-  __Pyx_TraceCall("__add_a_peak", __pyx_f[0], 1751, 0, __PYX_ERR(0, 1751, __pyx_L1_error));
+  __Pyx_TraceCall("__add_a_peak", __pyx_f[0], 1742, 0, __PYX_ERR(0, 1742, __pyx_L1_error));
 
-  /* "MACS2/IO/ScoreTrack.pyx":1762
+  /* "MACS2/IO/ScoreTrack.pyx":1753
  *              float mean_logLR
  * 
  *          if startpos.size > 0:             # <<<<<<<<<<<<<<
  *              # if it is not empty
  *              peak_content = []
  */
-  __pyx_t_1 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_v_startpos), __pyx_n_s_size); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1762, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_v_startpos), __pyx_n_s_size); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1753, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_2 = PyObject_RichCompare(__pyx_t_1, __pyx_int_0, Py_GT); __Pyx_XGOTREF(__pyx_t_2); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1762, __pyx_L1_error)
+  __pyx_t_2 = PyObject_RichCompare(__pyx_t_1, __pyx_int_0, Py_GT); __Pyx_XGOTREF(__pyx_t_2); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1753, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-  __pyx_t_3 = __Pyx_PyObject_IsTrue(__pyx_t_2); if (unlikely(__pyx_t_3 < 0)) __PYX_ERR(0, 1762, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_PyObject_IsTrue(__pyx_t_2); if (unlikely(__pyx_t_3 < 0)) __PYX_ERR(0, 1753, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
   if (__pyx_t_3) {
 
-    /* "MACS2/IO/ScoreTrack.pyx":1764
+    /* "MACS2/IO/ScoreTrack.pyx":1755
  *          if startpos.size > 0:
  *              # if it is not empty
  *              peak_content = []             # <<<<<<<<<<<<<<
  *              if indices[0] == 0:
  *                  # first element > cutoff, fix the first point as 0. otherwise it would be the last item in data[chrom]['pos']
  */
-    __pyx_t_2 = PyList_New(0); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1764, __pyx_L1_error)
+    __pyx_t_2 = PyList_New(0); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1755, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
     __pyx_v_peak_content = ((PyObject*)__pyx_t_2);
     __pyx_t_2 = 0;
 
-    /* "MACS2/IO/ScoreTrack.pyx":1765
+    /* "MACS2/IO/ScoreTrack.pyx":1756
  *              # if it is not empty
  *              peak_content = []
  *              if indices[0] == 0:             # <<<<<<<<<<<<<<
  *                  # first element > cutoff, fix the first point as 0. otherwise it would be the last item in data[chrom]['pos']
  *                  startpos[0] = 0
  */
-    __pyx_t_2 = __Pyx_GetItemInt(((PyObject *)__pyx_v_indices), 0, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1765, __pyx_L1_error)
+    __pyx_t_2 = __Pyx_GetItemInt(((PyObject *)__pyx_v_indices), 0, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1756, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
-    __pyx_t_1 = __Pyx_PyInt_EqObjC(__pyx_t_2, __pyx_int_0, 0, 0); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1765, __pyx_L1_error)
+    __pyx_t_1 = __Pyx_PyInt_EqObjC(__pyx_t_2, __pyx_int_0, 0, 0); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1756, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
     __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-    __pyx_t_3 = __Pyx_PyObject_IsTrue(__pyx_t_1); if (unlikely(__pyx_t_3 < 0)) __PYX_ERR(0, 1765, __pyx_L1_error)
+    __pyx_t_3 = __Pyx_PyObject_IsTrue(__pyx_t_1); if (unlikely(__pyx_t_3 < 0)) __PYX_ERR(0, 1756, __pyx_L1_error)
     __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
     if (__pyx_t_3) {
 
-      /* "MACS2/IO/ScoreTrack.pyx":1767
+      /* "MACS2/IO/ScoreTrack.pyx":1758
  *              if indices[0] == 0:
  *                  # first element > cutoff, fix the first point as 0. otherwise it would be the last item in data[chrom]['pos']
  *                  startpos[0] = 0             # <<<<<<<<<<<<<<
  *              # first bit of region above cutoff
  *              peak_content.append( (startpos[0], endpos[0], score[indices[ 0 ]]) )
  */
-      if (unlikely(__Pyx_SetItemInt(((PyObject *)__pyx_v_startpos), 0, __pyx_int_0, long, 1, __Pyx_PyInt_From_long, 0, 0, 1) < 0)) __PYX_ERR(0, 1767, __pyx_L1_error)
+      if (unlikely(__Pyx_SetItemInt(((PyObject *)__pyx_v_startpos), 0, __pyx_int_0, long, 1, __Pyx_PyInt_From_long, 0, 0, 1) < 0)) __PYX_ERR(0, 1758, __pyx_L1_error)
 
-      /* "MACS2/IO/ScoreTrack.pyx":1765
+      /* "MACS2/IO/ScoreTrack.pyx":1756
  *              # if it is not empty
  *              peak_content = []
  *              if indices[0] == 0:             # <<<<<<<<<<<<<<
@@ -28751,23 +28751,23 @@ static PyObject *__pyx_f_5MACS2_2IO_10ScoreTrack_18TwoConditionScores___add_a_pe
  */
     }
 
-    /* "MACS2/IO/ScoreTrack.pyx":1769
+    /* "MACS2/IO/ScoreTrack.pyx":1760
  *                  startpos[0] = 0
  *              # first bit of region above cutoff
  *              peak_content.append( (startpos[0], endpos[0], score[indices[ 0 ]]) )             # <<<<<<<<<<<<<<
  *              for i in range( 1, startpos.size ):
  *                  if startpos[i] - peak_content[-1][1] <= max_gap:
  */
-    __pyx_t_1 = __Pyx_GetItemInt(((PyObject *)__pyx_v_startpos), 0, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1769, __pyx_L1_error)
+    __pyx_t_1 = __Pyx_GetItemInt(((PyObject *)__pyx_v_startpos), 0, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1760, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
-    __pyx_t_2 = __Pyx_GetItemInt(((PyObject *)__pyx_v_endpos), 0, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1769, __pyx_L1_error)
+    __pyx_t_2 = __Pyx_GetItemInt(((PyObject *)__pyx_v_endpos), 0, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1760, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
-    __pyx_t_4 = __Pyx_GetItemInt(((PyObject *)__pyx_v_indices), 0, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 1769, __pyx_L1_error)
+    __pyx_t_4 = __Pyx_GetItemInt(((PyObject *)__pyx_v_indices), 0, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 1760, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_4);
-    __pyx_t_5 = __Pyx_PyObject_GetItem(((PyObject *)__pyx_v_score), __pyx_t_4); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 1769, __pyx_L1_error)
+    __pyx_t_5 = __Pyx_PyObject_GetItem(((PyObject *)__pyx_v_score), __pyx_t_4); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 1760, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_5);
     __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-    __pyx_t_4 = PyTuple_New(3); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 1769, __pyx_L1_error)
+    __pyx_t_4 = PyTuple_New(3); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 1760, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_4);
     __Pyx_GIVEREF(__pyx_t_1);
     PyTuple_SET_ITEM(__pyx_t_4, 0, __pyx_t_1);
@@ -28778,19 +28778,19 @@ static PyObject *__pyx_f_5MACS2_2IO_10ScoreTrack_18TwoConditionScores___add_a_pe
     __pyx_t_1 = 0;
     __pyx_t_2 = 0;
     __pyx_t_5 = 0;
-    __pyx_t_6 = __Pyx_PyList_Append(__pyx_v_peak_content, __pyx_t_4); if (unlikely(__pyx_t_6 == ((int)-1))) __PYX_ERR(0, 1769, __pyx_L1_error)
+    __pyx_t_6 = __Pyx_PyList_Append(__pyx_v_peak_content, __pyx_t_4); if (unlikely(__pyx_t_6 == ((int)-1))) __PYX_ERR(0, 1760, __pyx_L1_error)
     __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
 
-    /* "MACS2/IO/ScoreTrack.pyx":1770
+    /* "MACS2/IO/ScoreTrack.pyx":1761
  *              # first bit of region above cutoff
  *              peak_content.append( (startpos[0], endpos[0], score[indices[ 0 ]]) )
  *              for i in range( 1, startpos.size ):             # <<<<<<<<<<<<<<
  *                  if startpos[i] - peak_content[-1][1] <= max_gap:
  *                      # append
  */
-    __pyx_t_4 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_v_startpos), __pyx_n_s_size); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 1770, __pyx_L1_error)
+    __pyx_t_4 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_v_startpos), __pyx_n_s_size); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 1761, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_4);
-    __pyx_t_5 = PyTuple_New(2); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 1770, __pyx_L1_error)
+    __pyx_t_5 = PyTuple_New(2); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 1761, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_5);
     __Pyx_INCREF(__pyx_int_1);
     __Pyx_GIVEREF(__pyx_int_1);
@@ -28798,16 +28798,16 @@ static PyObject *__pyx_f_5MACS2_2IO_10ScoreTrack_18TwoConditionScores___add_a_pe
     __Pyx_GIVEREF(__pyx_t_4);
     PyTuple_SET_ITEM(__pyx_t_5, 1, __pyx_t_4);
     __pyx_t_4 = 0;
-    __pyx_t_4 = __Pyx_PyObject_Call(__pyx_builtin_range, __pyx_t_5, NULL); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 1770, __pyx_L1_error)
+    __pyx_t_4 = __Pyx_PyObject_Call(__pyx_builtin_range, __pyx_t_5, NULL); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 1761, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_4);
     __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
     if (likely(PyList_CheckExact(__pyx_t_4)) || PyTuple_CheckExact(__pyx_t_4)) {
       __pyx_t_5 = __pyx_t_4; __Pyx_INCREF(__pyx_t_5); __pyx_t_7 = 0;
       __pyx_t_8 = NULL;
     } else {
-      __pyx_t_7 = -1; __pyx_t_5 = PyObject_GetIter(__pyx_t_4); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 1770, __pyx_L1_error)
+      __pyx_t_7 = -1; __pyx_t_5 = PyObject_GetIter(__pyx_t_4); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 1761, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_5);
-      __pyx_t_8 = Py_TYPE(__pyx_t_5)->tp_iternext; if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 1770, __pyx_L1_error)
+      __pyx_t_8 = Py_TYPE(__pyx_t_5)->tp_iternext; if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 1761, __pyx_L1_error)
     }
     __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
     for (;;) {
@@ -28815,17 +28815,17 @@ static PyObject *__pyx_f_5MACS2_2IO_10ScoreTrack_18TwoConditionScores___add_a_pe
         if (likely(PyList_CheckExact(__pyx_t_5))) {
           if (__pyx_t_7 >= PyList_GET_SIZE(__pyx_t_5)) break;
           #if CYTHON_ASSUME_SAFE_MACROS && !CYTHON_AVOID_BORROWED_REFS
-          __pyx_t_4 = PyList_GET_ITEM(__pyx_t_5, __pyx_t_7); __Pyx_INCREF(__pyx_t_4); __pyx_t_7++; if (unlikely(0 < 0)) __PYX_ERR(0, 1770, __pyx_L1_error)
+          __pyx_t_4 = PyList_GET_ITEM(__pyx_t_5, __pyx_t_7); __Pyx_INCREF(__pyx_t_4); __pyx_t_7++; if (unlikely(0 < 0)) __PYX_ERR(0, 1761, __pyx_L1_error)
           #else
-          __pyx_t_4 = PySequence_ITEM(__pyx_t_5, __pyx_t_7); __pyx_t_7++; if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 1770, __pyx_L1_error)
+          __pyx_t_4 = PySequence_ITEM(__pyx_t_5, __pyx_t_7); __pyx_t_7++; if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 1761, __pyx_L1_error)
           __Pyx_GOTREF(__pyx_t_4);
           #endif
         } else {
           if (__pyx_t_7 >= PyTuple_GET_SIZE(__pyx_t_5)) break;
           #if CYTHON_ASSUME_SAFE_MACROS && !CYTHON_AVOID_BORROWED_REFS
-          __pyx_t_4 = PyTuple_GET_ITEM(__pyx_t_5, __pyx_t_7); __Pyx_INCREF(__pyx_t_4); __pyx_t_7++; if (unlikely(0 < 0)) __PYX_ERR(0, 1770, __pyx_L1_error)
+          __pyx_t_4 = PyTuple_GET_ITEM(__pyx_t_5, __pyx_t_7); __Pyx_INCREF(__pyx_t_4); __pyx_t_7++; if (unlikely(0 < 0)) __PYX_ERR(0, 1761, __pyx_L1_error)
           #else
-          __pyx_t_4 = PySequence_ITEM(__pyx_t_5, __pyx_t_7); __pyx_t_7++; if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 1770, __pyx_L1_error)
+          __pyx_t_4 = PySequence_ITEM(__pyx_t_5, __pyx_t_7); __pyx_t_7++; if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 1761, __pyx_L1_error)
           __Pyx_GOTREF(__pyx_t_4);
           #endif
         }
@@ -28835,7 +28835,7 @@ static PyObject *__pyx_f_5MACS2_2IO_10ScoreTrack_18TwoConditionScores___add_a_pe
           PyObject* exc_type = PyErr_Occurred();
           if (exc_type) {
             if (likely(__Pyx_PyErr_GivenExceptionMatches(exc_type, PyExc_StopIteration))) PyErr_Clear();
-            else __PYX_ERR(0, 1770, __pyx_L1_error)
+            else __PYX_ERR(0, 1761, __pyx_L1_error)
           }
           break;
         }
@@ -28844,50 +28844,50 @@ static PyObject *__pyx_f_5MACS2_2IO_10ScoreTrack_18TwoConditionScores___add_a_pe
       __Pyx_XDECREF_SET(__pyx_v_i, __pyx_t_4);
       __pyx_t_4 = 0;
 
-      /* "MACS2/IO/ScoreTrack.pyx":1771
+      /* "MACS2/IO/ScoreTrack.pyx":1762
  *              peak_content.append( (startpos[0], endpos[0], score[indices[ 0 ]]) )
  *              for i in range( 1, startpos.size ):
  *                  if startpos[i] - peak_content[-1][1] <= max_gap:             # <<<<<<<<<<<<<<
  *                      # append
  *                      peak_content.append( ( startpos[i], endpos[i], score[indices[ i ]] ) )
  */
-      __pyx_t_4 = __Pyx_PyObject_GetItem(((PyObject *)__pyx_v_startpos), __pyx_v_i); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 1771, __pyx_L1_error)
+      __pyx_t_4 = __Pyx_PyObject_GetItem(((PyObject *)__pyx_v_startpos), __pyx_v_i); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 1762, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_4);
-      __pyx_t_2 = __Pyx_GetItemInt_List(__pyx_v_peak_content, -1L, long, 1, __Pyx_PyInt_From_long, 1, 1, 1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1771, __pyx_L1_error)
+      __pyx_t_2 = __Pyx_GetItemInt_List(__pyx_v_peak_content, -1L, long, 1, __Pyx_PyInt_From_long, 1, 1, 1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1762, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_2);
-      __pyx_t_1 = __Pyx_GetItemInt(__pyx_t_2, 1, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1771, __pyx_L1_error)
+      __pyx_t_1 = __Pyx_GetItemInt(__pyx_t_2, 1, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1762, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_1);
       __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-      __pyx_t_2 = PyNumber_Subtract(__pyx_t_4, __pyx_t_1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1771, __pyx_L1_error)
+      __pyx_t_2 = PyNumber_Subtract(__pyx_t_4, __pyx_t_1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1762, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_2);
       __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
       __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-      __pyx_t_1 = __Pyx_PyInt_From_int(__pyx_v_max_gap); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1771, __pyx_L1_error)
+      __pyx_t_1 = __Pyx_PyInt_From_int(__pyx_v_max_gap); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1762, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_1);
-      __pyx_t_4 = PyObject_RichCompare(__pyx_t_2, __pyx_t_1, Py_LE); __Pyx_XGOTREF(__pyx_t_4); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 1771, __pyx_L1_error)
+      __pyx_t_4 = PyObject_RichCompare(__pyx_t_2, __pyx_t_1, Py_LE); __Pyx_XGOTREF(__pyx_t_4); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 1762, __pyx_L1_error)
       __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
       __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-      __pyx_t_3 = __Pyx_PyObject_IsTrue(__pyx_t_4); if (unlikely(__pyx_t_3 < 0)) __PYX_ERR(0, 1771, __pyx_L1_error)
+      __pyx_t_3 = __Pyx_PyObject_IsTrue(__pyx_t_4); if (unlikely(__pyx_t_3 < 0)) __PYX_ERR(0, 1762, __pyx_L1_error)
       __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
       if (__pyx_t_3) {
 
-        /* "MACS2/IO/ScoreTrack.pyx":1773
+        /* "MACS2/IO/ScoreTrack.pyx":1764
  *                  if startpos[i] - peak_content[-1][1] <= max_gap:
  *                      # append
  *                      peak_content.append( ( startpos[i], endpos[i], score[indices[ i ]] ) )             # <<<<<<<<<<<<<<
  *                  else:
  *                      # close
  */
-        __pyx_t_4 = __Pyx_PyObject_GetItem(((PyObject *)__pyx_v_startpos), __pyx_v_i); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 1773, __pyx_L1_error)
+        __pyx_t_4 = __Pyx_PyObject_GetItem(((PyObject *)__pyx_v_startpos), __pyx_v_i); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 1764, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_4);
-        __pyx_t_1 = __Pyx_PyObject_GetItem(((PyObject *)__pyx_v_endpos), __pyx_v_i); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1773, __pyx_L1_error)
+        __pyx_t_1 = __Pyx_PyObject_GetItem(((PyObject *)__pyx_v_endpos), __pyx_v_i); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1764, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_1);
-        __pyx_t_2 = __Pyx_PyObject_GetItem(((PyObject *)__pyx_v_indices), __pyx_v_i); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1773, __pyx_L1_error)
+        __pyx_t_2 = __Pyx_PyObject_GetItem(((PyObject *)__pyx_v_indices), __pyx_v_i); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1764, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_2);
-        __pyx_t_9 = __Pyx_PyObject_GetItem(((PyObject *)__pyx_v_score), __pyx_t_2); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 1773, __pyx_L1_error)
+        __pyx_t_9 = __Pyx_PyObject_GetItem(((PyObject *)__pyx_v_score), __pyx_t_2); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 1764, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_9);
         __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-        __pyx_t_2 = PyTuple_New(3); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1773, __pyx_L1_error)
+        __pyx_t_2 = PyTuple_New(3); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1764, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_2);
         __Pyx_GIVEREF(__pyx_t_4);
         PyTuple_SET_ITEM(__pyx_t_2, 0, __pyx_t_4);
@@ -28898,10 +28898,10 @@ static PyObject *__pyx_f_5MACS2_2IO_10ScoreTrack_18TwoConditionScores___add_a_pe
         __pyx_t_4 = 0;
         __pyx_t_1 = 0;
         __pyx_t_9 = 0;
-        __pyx_t_6 = __Pyx_PyList_Append(__pyx_v_peak_content, __pyx_t_2); if (unlikely(__pyx_t_6 == ((int)-1))) __PYX_ERR(0, 1773, __pyx_L1_error)
+        __pyx_t_6 = __Pyx_PyList_Append(__pyx_v_peak_content, __pyx_t_2); if (unlikely(__pyx_t_6 == ((int)-1))) __PYX_ERR(0, 1764, __pyx_L1_error)
         __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
-        /* "MACS2/IO/ScoreTrack.pyx":1771
+        /* "MACS2/IO/ScoreTrack.pyx":1762
  *              peak_content.append( (startpos[0], endpos[0], score[indices[ 0 ]]) )
  *              for i in range( 1, startpos.size ):
  *                  if startpos[i] - peak_content[-1][1] <= max_gap:             # <<<<<<<<<<<<<<
@@ -28911,7 +28911,7 @@ static PyObject *__pyx_f_5MACS2_2IO_10ScoreTrack_18TwoConditionScores___add_a_pe
         goto __pyx_L7;
       }
 
-      /* "MACS2/IO/ScoreTrack.pyx":1776
+      /* "MACS2/IO/ScoreTrack.pyx":1767
  *                  else:
  *                      # close
  *                      if peak_content[ -1 ][ 1 ] - peak_content[ 0 ][ 0 ] >= min_length:             # <<<<<<<<<<<<<<
@@ -28919,30 +28919,30 @@ static PyObject *__pyx_f_5MACS2_2IO_10ScoreTrack_18TwoConditionScores___add_a_pe
  *                          peaks.add( chrom, peak_content[0][0], peak_content[-1][1],
  */
       /*else*/ {
-        __pyx_t_2 = __Pyx_GetItemInt_List(__pyx_v_peak_content, -1L, long, 1, __Pyx_PyInt_From_long, 1, 1, 1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1776, __pyx_L1_error)
+        __pyx_t_2 = __Pyx_GetItemInt_List(__pyx_v_peak_content, -1L, long, 1, __Pyx_PyInt_From_long, 1, 1, 1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1767, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_2);
-        __pyx_t_9 = __Pyx_GetItemInt(__pyx_t_2, 1, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 1776, __pyx_L1_error)
+        __pyx_t_9 = __Pyx_GetItemInt(__pyx_t_2, 1, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 1767, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_9);
         __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-        __pyx_t_2 = __Pyx_GetItemInt_List(__pyx_v_peak_content, 0, long, 1, __Pyx_PyInt_From_long, 1, 0, 1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1776, __pyx_L1_error)
+        __pyx_t_2 = __Pyx_GetItemInt_List(__pyx_v_peak_content, 0, long, 1, __Pyx_PyInt_From_long, 1, 0, 1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1767, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_2);
-        __pyx_t_1 = __Pyx_GetItemInt(__pyx_t_2, 0, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1776, __pyx_L1_error)
+        __pyx_t_1 = __Pyx_GetItemInt(__pyx_t_2, 0, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1767, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_1);
         __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-        __pyx_t_2 = PyNumber_Subtract(__pyx_t_9, __pyx_t_1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1776, __pyx_L1_error)
+        __pyx_t_2 = PyNumber_Subtract(__pyx_t_9, __pyx_t_1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1767, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_2);
         __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
         __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-        __pyx_t_1 = __Pyx_PyInt_From_int(__pyx_v_min_length); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1776, __pyx_L1_error)
+        __pyx_t_1 = __Pyx_PyInt_From_int(__pyx_v_min_length); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1767, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_1);
-        __pyx_t_9 = PyObject_RichCompare(__pyx_t_2, __pyx_t_1, Py_GE); __Pyx_XGOTREF(__pyx_t_9); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 1776, __pyx_L1_error)
+        __pyx_t_9 = PyObject_RichCompare(__pyx_t_2, __pyx_t_1, Py_GE); __Pyx_XGOTREF(__pyx_t_9); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 1767, __pyx_L1_error)
         __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
         __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-        __pyx_t_3 = __Pyx_PyObject_IsTrue(__pyx_t_9); if (unlikely(__pyx_t_3 < 0)) __PYX_ERR(0, 1776, __pyx_L1_error)
+        __pyx_t_3 = __Pyx_PyObject_IsTrue(__pyx_t_9); if (unlikely(__pyx_t_3 < 0)) __PYX_ERR(0, 1767, __pyx_L1_error)
         __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
         if (__pyx_t_3) {
 
-          /* "MACS2/IO/ScoreTrack.pyx":1777
+          /* "MACS2/IO/ScoreTrack.pyx":1768
  *                      # close
  *                      if peak_content[ -1 ][ 1 ] - peak_content[ 0 ][ 0 ] >= min_length:
  *                          mean_logLR = self.mean_from_peakcontent( peak_content )             # <<<<<<<<<<<<<<
@@ -28951,26 +28951,26 @@ static PyObject *__pyx_f_5MACS2_2IO_10ScoreTrack_18TwoConditionScores___add_a_pe
  */
           __pyx_v_mean_logLR = ((struct __pyx_vtabstruct_5MACS2_2IO_10ScoreTrack_TwoConditionScores *)__pyx_v_self->__pyx_vtab)->mean_from_peakcontent(__pyx_v_self, __pyx_v_peak_content);
 
-          /* "MACS2/IO/ScoreTrack.pyx":1778
+          /* "MACS2/IO/ScoreTrack.pyx":1769
  *                      if peak_content[ -1 ][ 1 ] - peak_content[ 0 ][ 0 ] >= min_length:
  *                          mean_logLR = self.mean_from_peakcontent( peak_content )
  *                          peaks.add( chrom, peak_content[0][0], peak_content[-1][1],             # <<<<<<<<<<<<<<
  *                                     summit = -1, peak_score  = mean_logLR, pileup = 0, pscore = 0,
  *                                     fold_change = 0, qscore = 0,
  */
-          __pyx_t_9 = __Pyx_PyObject_GetAttrStr(__pyx_v_peaks, __pyx_n_s_add); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 1778, __pyx_L1_error)
+          __pyx_t_9 = __Pyx_PyObject_GetAttrStr(__pyx_v_peaks, __pyx_n_s_add); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 1769, __pyx_L1_error)
           __Pyx_GOTREF(__pyx_t_9);
-          __pyx_t_1 = __Pyx_GetItemInt_List(__pyx_v_peak_content, 0, long, 1, __Pyx_PyInt_From_long, 1, 0, 1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1778, __pyx_L1_error)
+          __pyx_t_1 = __Pyx_GetItemInt_List(__pyx_v_peak_content, 0, long, 1, __Pyx_PyInt_From_long, 1, 0, 1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1769, __pyx_L1_error)
           __Pyx_GOTREF(__pyx_t_1);
-          __pyx_t_2 = __Pyx_GetItemInt(__pyx_t_1, 0, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1778, __pyx_L1_error)
+          __pyx_t_2 = __Pyx_GetItemInt(__pyx_t_1, 0, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1769, __pyx_L1_error)
           __Pyx_GOTREF(__pyx_t_2);
           __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-          __pyx_t_1 = __Pyx_GetItemInt_List(__pyx_v_peak_content, -1L, long, 1, __Pyx_PyInt_From_long, 1, 1, 1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1778, __pyx_L1_error)
+          __pyx_t_1 = __Pyx_GetItemInt_List(__pyx_v_peak_content, -1L, long, 1, __Pyx_PyInt_From_long, 1, 1, 1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1769, __pyx_L1_error)
           __Pyx_GOTREF(__pyx_t_1);
-          __pyx_t_4 = __Pyx_GetItemInt(__pyx_t_1, 1, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 1778, __pyx_L1_error)
+          __pyx_t_4 = __Pyx_GetItemInt(__pyx_t_1, 1, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 1769, __pyx_L1_error)
           __Pyx_GOTREF(__pyx_t_4);
           __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-          __pyx_t_1 = PyTuple_New(3); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1778, __pyx_L1_error)
+          __pyx_t_1 = PyTuple_New(3); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1769, __pyx_L1_error)
           __Pyx_GOTREF(__pyx_t_1);
           __Pyx_INCREF(__pyx_v_chrom);
           __Pyx_GIVEREF(__pyx_v_chrom);
@@ -28982,40 +28982,40 @@ static PyObject *__pyx_f_5MACS2_2IO_10ScoreTrack_18TwoConditionScores___add_a_pe
           __pyx_t_2 = 0;
           __pyx_t_4 = 0;
 
-          /* "MACS2/IO/ScoreTrack.pyx":1779
+          /* "MACS2/IO/ScoreTrack.pyx":1770
  *                          mean_logLR = self.mean_from_peakcontent( peak_content )
  *                          peaks.add( chrom, peak_content[0][0], peak_content[-1][1],
  *                                     summit = -1, peak_score  = mean_logLR, pileup = 0, pscore = 0,             # <<<<<<<<<<<<<<
  *                                     fold_change = 0, qscore = 0,
  *                                     )
  */
-          __pyx_t_4 = __Pyx_PyDict_NewPresized(6); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 1779, __pyx_L1_error)
+          __pyx_t_4 = __Pyx_PyDict_NewPresized(6); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 1770, __pyx_L1_error)
           __Pyx_GOTREF(__pyx_t_4);
-          if (PyDict_SetItem(__pyx_t_4, __pyx_n_s_summit, __pyx_int_neg_1) < 0) __PYX_ERR(0, 1779, __pyx_L1_error)
-          __pyx_t_2 = PyFloat_FromDouble(__pyx_v_mean_logLR); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1779, __pyx_L1_error)
+          if (PyDict_SetItem(__pyx_t_4, __pyx_n_s_summit, __pyx_int_neg_1) < 0) __PYX_ERR(0, 1770, __pyx_L1_error)
+          __pyx_t_2 = PyFloat_FromDouble(__pyx_v_mean_logLR); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1770, __pyx_L1_error)
           __Pyx_GOTREF(__pyx_t_2);
-          if (PyDict_SetItem(__pyx_t_4, __pyx_n_s_peak_score, __pyx_t_2) < 0) __PYX_ERR(0, 1779, __pyx_L1_error)
+          if (PyDict_SetItem(__pyx_t_4, __pyx_n_s_peak_score, __pyx_t_2) < 0) __PYX_ERR(0, 1770, __pyx_L1_error)
           __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-          if (PyDict_SetItem(__pyx_t_4, __pyx_n_s_pileup, __pyx_int_0) < 0) __PYX_ERR(0, 1779, __pyx_L1_error)
-          if (PyDict_SetItem(__pyx_t_4, __pyx_n_s_pscore, __pyx_int_0) < 0) __PYX_ERR(0, 1779, __pyx_L1_error)
-          if (PyDict_SetItem(__pyx_t_4, __pyx_n_s_fold_change, __pyx_int_0) < 0) __PYX_ERR(0, 1779, __pyx_L1_error)
-          if (PyDict_SetItem(__pyx_t_4, __pyx_n_s_qscore, __pyx_int_0) < 0) __PYX_ERR(0, 1779, __pyx_L1_error)
+          if (PyDict_SetItem(__pyx_t_4, __pyx_n_s_pileup, __pyx_int_0) < 0) __PYX_ERR(0, 1770, __pyx_L1_error)
+          if (PyDict_SetItem(__pyx_t_4, __pyx_n_s_pscore, __pyx_int_0) < 0) __PYX_ERR(0, 1770, __pyx_L1_error)
+          if (PyDict_SetItem(__pyx_t_4, __pyx_n_s_fold_change, __pyx_int_0) < 0) __PYX_ERR(0, 1770, __pyx_L1_error)
+          if (PyDict_SetItem(__pyx_t_4, __pyx_n_s_qscore, __pyx_int_0) < 0) __PYX_ERR(0, 1770, __pyx_L1_error)
 
-          /* "MACS2/IO/ScoreTrack.pyx":1778
+          /* "MACS2/IO/ScoreTrack.pyx":1769
  *                      if peak_content[ -1 ][ 1 ] - peak_content[ 0 ][ 0 ] >= min_length:
  *                          mean_logLR = self.mean_from_peakcontent( peak_content )
  *                          peaks.add( chrom, peak_content[0][0], peak_content[-1][1],             # <<<<<<<<<<<<<<
  *                                     summit = -1, peak_score  = mean_logLR, pileup = 0, pscore = 0,
  *                                     fold_change = 0, qscore = 0,
  */
-          __pyx_t_2 = __Pyx_PyObject_Call(__pyx_t_9, __pyx_t_1, __pyx_t_4); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1778, __pyx_L1_error)
+          __pyx_t_2 = __Pyx_PyObject_Call(__pyx_t_9, __pyx_t_1, __pyx_t_4); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1769, __pyx_L1_error)
           __Pyx_GOTREF(__pyx_t_2);
           __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
           __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
           __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
           __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
-          /* "MACS2/IO/ScoreTrack.pyx":1776
+          /* "MACS2/IO/ScoreTrack.pyx":1767
  *                  else:
  *                      # close
  *                      if peak_content[ -1 ][ 1 ] - peak_content[ 0 ][ 0 ] >= min_length:             # <<<<<<<<<<<<<<
@@ -29024,23 +29024,23 @@ static PyObject *__pyx_f_5MACS2_2IO_10ScoreTrack_18TwoConditionScores___add_a_pe
  */
         }
 
-        /* "MACS2/IO/ScoreTrack.pyx":1782
+        /* "MACS2/IO/ScoreTrack.pyx":1773
  *                                     fold_change = 0, qscore = 0,
  *                                     )
  *                      peak_content = [(startpos[i], endpos[i], score[ indices[ i ] ]),]             # <<<<<<<<<<<<<<
  * 
  *              # save the last peak
  */
-        __pyx_t_2 = __Pyx_PyObject_GetItem(((PyObject *)__pyx_v_startpos), __pyx_v_i); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1782, __pyx_L1_error)
+        __pyx_t_2 = __Pyx_PyObject_GetItem(((PyObject *)__pyx_v_startpos), __pyx_v_i); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1773, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_2);
-        __pyx_t_4 = __Pyx_PyObject_GetItem(((PyObject *)__pyx_v_endpos), __pyx_v_i); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 1782, __pyx_L1_error)
+        __pyx_t_4 = __Pyx_PyObject_GetItem(((PyObject *)__pyx_v_endpos), __pyx_v_i); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 1773, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_4);
-        __pyx_t_1 = __Pyx_PyObject_GetItem(((PyObject *)__pyx_v_indices), __pyx_v_i); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1782, __pyx_L1_error)
+        __pyx_t_1 = __Pyx_PyObject_GetItem(((PyObject *)__pyx_v_indices), __pyx_v_i); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1773, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_1);
-        __pyx_t_9 = __Pyx_PyObject_GetItem(((PyObject *)__pyx_v_score), __pyx_t_1); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 1782, __pyx_L1_error)
+        __pyx_t_9 = __Pyx_PyObject_GetItem(((PyObject *)__pyx_v_score), __pyx_t_1); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 1773, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_9);
         __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-        __pyx_t_1 = PyTuple_New(3); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1782, __pyx_L1_error)
+        __pyx_t_1 = PyTuple_New(3); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1773, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_1);
         __Pyx_GIVEREF(__pyx_t_2);
         PyTuple_SET_ITEM(__pyx_t_1, 0, __pyx_t_2);
@@ -29051,7 +29051,7 @@ static PyObject *__pyx_f_5MACS2_2IO_10ScoreTrack_18TwoConditionScores___add_a_pe
         __pyx_t_2 = 0;
         __pyx_t_4 = 0;
         __pyx_t_9 = 0;
-        __pyx_t_9 = PyList_New(1); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 1782, __pyx_L1_error)
+        __pyx_t_9 = PyList_New(1); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 1773, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_9);
         __Pyx_GIVEREF(__pyx_t_1);
         PyList_SET_ITEM(__pyx_t_9, 0, __pyx_t_1);
@@ -29061,7 +29061,7 @@ static PyObject *__pyx_f_5MACS2_2IO_10ScoreTrack_18TwoConditionScores___add_a_pe
       }
       __pyx_L7:;
 
-      /* "MACS2/IO/ScoreTrack.pyx":1770
+      /* "MACS2/IO/ScoreTrack.pyx":1761
  *              # first bit of region above cutoff
  *              peak_content.append( (startpos[0], endpos[0], score[indices[ 0 ]]) )
  *              for i in range( 1, startpos.size ):             # <<<<<<<<<<<<<<
@@ -29071,7 +29071,7 @@ static PyObject *__pyx_f_5MACS2_2IO_10ScoreTrack_18TwoConditionScores___add_a_pe
     }
     __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
 
-    /* "MACS2/IO/ScoreTrack.pyx":1785
+    /* "MACS2/IO/ScoreTrack.pyx":1776
  * 
  *              # save the last peak
  *              if peak_content:             # <<<<<<<<<<<<<<
@@ -29081,37 +29081,37 @@ static PyObject *__pyx_f_5MACS2_2IO_10ScoreTrack_18TwoConditionScores___add_a_pe
     __pyx_t_3 = (PyList_GET_SIZE(__pyx_v_peak_content) != 0);
     if (__pyx_t_3) {
 
-      /* "MACS2/IO/ScoreTrack.pyx":1786
+      /* "MACS2/IO/ScoreTrack.pyx":1777
  *              # save the last peak
  *              if peak_content:
  *                  if peak_content[ -1 ][ 1 ] - peak_content[ 0 ][ 0 ] >= min_length:             # <<<<<<<<<<<<<<
  *                      mean_logLR = self.mean_from_peakcontent( peak_content )
  *                      peaks.add( chrom, peak_content[0][0], peak_content[-1][1],
  */
-      __pyx_t_5 = __Pyx_GetItemInt_List(__pyx_v_peak_content, -1L, long, 1, __Pyx_PyInt_From_long, 1, 1, 1); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 1786, __pyx_L1_error)
+      __pyx_t_5 = __Pyx_GetItemInt_List(__pyx_v_peak_content, -1L, long, 1, __Pyx_PyInt_From_long, 1, 1, 1); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 1777, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_5);
-      __pyx_t_9 = __Pyx_GetItemInt(__pyx_t_5, 1, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 1786, __pyx_L1_error)
+      __pyx_t_9 = __Pyx_GetItemInt(__pyx_t_5, 1, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 1777, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_9);
       __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
-      __pyx_t_5 = __Pyx_GetItemInt_List(__pyx_v_peak_content, 0, long, 1, __Pyx_PyInt_From_long, 1, 0, 1); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 1786, __pyx_L1_error)
+      __pyx_t_5 = __Pyx_GetItemInt_List(__pyx_v_peak_content, 0, long, 1, __Pyx_PyInt_From_long, 1, 0, 1); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 1777, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_5);
-      __pyx_t_1 = __Pyx_GetItemInt(__pyx_t_5, 0, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1786, __pyx_L1_error)
+      __pyx_t_1 = __Pyx_GetItemInt(__pyx_t_5, 0, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1777, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_1);
       __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
-      __pyx_t_5 = PyNumber_Subtract(__pyx_t_9, __pyx_t_1); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 1786, __pyx_L1_error)
+      __pyx_t_5 = PyNumber_Subtract(__pyx_t_9, __pyx_t_1); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 1777, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_5);
       __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
       __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-      __pyx_t_1 = __Pyx_PyInt_From_int(__pyx_v_min_length); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1786, __pyx_L1_error)
+      __pyx_t_1 = __Pyx_PyInt_From_int(__pyx_v_min_length); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1777, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_1);
-      __pyx_t_9 = PyObject_RichCompare(__pyx_t_5, __pyx_t_1, Py_GE); __Pyx_XGOTREF(__pyx_t_9); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 1786, __pyx_L1_error)
+      __pyx_t_9 = PyObject_RichCompare(__pyx_t_5, __pyx_t_1, Py_GE); __Pyx_XGOTREF(__pyx_t_9); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 1777, __pyx_L1_error)
       __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
       __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-      __pyx_t_3 = __Pyx_PyObject_IsTrue(__pyx_t_9); if (unlikely(__pyx_t_3 < 0)) __PYX_ERR(0, 1786, __pyx_L1_error)
+      __pyx_t_3 = __Pyx_PyObject_IsTrue(__pyx_t_9); if (unlikely(__pyx_t_3 < 0)) __PYX_ERR(0, 1777, __pyx_L1_error)
       __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
       if (__pyx_t_3) {
 
-        /* "MACS2/IO/ScoreTrack.pyx":1787
+        /* "MACS2/IO/ScoreTrack.pyx":1778
  *              if peak_content:
  *                  if peak_content[ -1 ][ 1 ] - peak_content[ 0 ][ 0 ] >= min_length:
  *                      mean_logLR = self.mean_from_peakcontent( peak_content )             # <<<<<<<<<<<<<<
@@ -29120,26 +29120,26 @@ static PyObject *__pyx_f_5MACS2_2IO_10ScoreTrack_18TwoConditionScores___add_a_pe
  */
         __pyx_v_mean_logLR = ((struct __pyx_vtabstruct_5MACS2_2IO_10ScoreTrack_TwoConditionScores *)__pyx_v_self->__pyx_vtab)->mean_from_peakcontent(__pyx_v_self, __pyx_v_peak_content);
 
-        /* "MACS2/IO/ScoreTrack.pyx":1788
+        /* "MACS2/IO/ScoreTrack.pyx":1779
  *                  if peak_content[ -1 ][ 1 ] - peak_content[ 0 ][ 0 ] >= min_length:
  *                      mean_logLR = self.mean_from_peakcontent( peak_content )
  *                      peaks.add( chrom, peak_content[0][0], peak_content[-1][1],             # <<<<<<<<<<<<<<
  *                                 summit = -1, peak_score  = mean_logLR, pileup = 0, pscore = 0,
  *                                 fold_change = 0, qscore = 0,
  */
-        __pyx_t_9 = __Pyx_PyObject_GetAttrStr(__pyx_v_peaks, __pyx_n_s_add); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 1788, __pyx_L1_error)
+        __pyx_t_9 = __Pyx_PyObject_GetAttrStr(__pyx_v_peaks, __pyx_n_s_add); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 1779, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_9);
-        __pyx_t_1 = __Pyx_GetItemInt_List(__pyx_v_peak_content, 0, long, 1, __Pyx_PyInt_From_long, 1, 0, 1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1788, __pyx_L1_error)
+        __pyx_t_1 = __Pyx_GetItemInt_List(__pyx_v_peak_content, 0, long, 1, __Pyx_PyInt_From_long, 1, 0, 1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1779, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_1);
-        __pyx_t_5 = __Pyx_GetItemInt(__pyx_t_1, 0, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 1788, __pyx_L1_error)
+        __pyx_t_5 = __Pyx_GetItemInt(__pyx_t_1, 0, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 1779, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_5);
         __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-        __pyx_t_1 = __Pyx_GetItemInt_List(__pyx_v_peak_content, -1L, long, 1, __Pyx_PyInt_From_long, 1, 1, 1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1788, __pyx_L1_error)
+        __pyx_t_1 = __Pyx_GetItemInt_List(__pyx_v_peak_content, -1L, long, 1, __Pyx_PyInt_From_long, 1, 1, 1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1779, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_1);
-        __pyx_t_4 = __Pyx_GetItemInt(__pyx_t_1, 1, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 1788, __pyx_L1_error)
+        __pyx_t_4 = __Pyx_GetItemInt(__pyx_t_1, 1, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 1779, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_4);
         __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-        __pyx_t_1 = PyTuple_New(3); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1788, __pyx_L1_error)
+        __pyx_t_1 = PyTuple_New(3); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1779, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_1);
         __Pyx_INCREF(__pyx_v_chrom);
         __Pyx_GIVEREF(__pyx_v_chrom);
@@ -29151,40 +29151,40 @@ static PyObject *__pyx_f_5MACS2_2IO_10ScoreTrack_18TwoConditionScores___add_a_pe
         __pyx_t_5 = 0;
         __pyx_t_4 = 0;
 
-        /* "MACS2/IO/ScoreTrack.pyx":1789
+        /* "MACS2/IO/ScoreTrack.pyx":1780
  *                      mean_logLR = self.mean_from_peakcontent( peak_content )
  *                      peaks.add( chrom, peak_content[0][0], peak_content[-1][1],
  *                                 summit = -1, peak_score  = mean_logLR, pileup = 0, pscore = 0,             # <<<<<<<<<<<<<<
  *                                 fold_change = 0, qscore = 0,
  *                                 )
  */
-        __pyx_t_4 = __Pyx_PyDict_NewPresized(6); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 1789, __pyx_L1_error)
+        __pyx_t_4 = __Pyx_PyDict_NewPresized(6); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 1780, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_4);
-        if (PyDict_SetItem(__pyx_t_4, __pyx_n_s_summit, __pyx_int_neg_1) < 0) __PYX_ERR(0, 1789, __pyx_L1_error)
-        __pyx_t_5 = PyFloat_FromDouble(__pyx_v_mean_logLR); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 1789, __pyx_L1_error)
+        if (PyDict_SetItem(__pyx_t_4, __pyx_n_s_summit, __pyx_int_neg_1) < 0) __PYX_ERR(0, 1780, __pyx_L1_error)
+        __pyx_t_5 = PyFloat_FromDouble(__pyx_v_mean_logLR); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 1780, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_5);
-        if (PyDict_SetItem(__pyx_t_4, __pyx_n_s_peak_score, __pyx_t_5) < 0) __PYX_ERR(0, 1789, __pyx_L1_error)
+        if (PyDict_SetItem(__pyx_t_4, __pyx_n_s_peak_score, __pyx_t_5) < 0) __PYX_ERR(0, 1780, __pyx_L1_error)
         __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
-        if (PyDict_SetItem(__pyx_t_4, __pyx_n_s_pileup, __pyx_int_0) < 0) __PYX_ERR(0, 1789, __pyx_L1_error)
-        if (PyDict_SetItem(__pyx_t_4, __pyx_n_s_pscore, __pyx_int_0) < 0) __PYX_ERR(0, 1789, __pyx_L1_error)
-        if (PyDict_SetItem(__pyx_t_4, __pyx_n_s_fold_change, __pyx_int_0) < 0) __PYX_ERR(0, 1789, __pyx_L1_error)
-        if (PyDict_SetItem(__pyx_t_4, __pyx_n_s_qscore, __pyx_int_0) < 0) __PYX_ERR(0, 1789, __pyx_L1_error)
+        if (PyDict_SetItem(__pyx_t_4, __pyx_n_s_pileup, __pyx_int_0) < 0) __PYX_ERR(0, 1780, __pyx_L1_error)
+        if (PyDict_SetItem(__pyx_t_4, __pyx_n_s_pscore, __pyx_int_0) < 0) __PYX_ERR(0, 1780, __pyx_L1_error)
+        if (PyDict_SetItem(__pyx_t_4, __pyx_n_s_fold_change, __pyx_int_0) < 0) __PYX_ERR(0, 1780, __pyx_L1_error)
+        if (PyDict_SetItem(__pyx_t_4, __pyx_n_s_qscore, __pyx_int_0) < 0) __PYX_ERR(0, 1780, __pyx_L1_error)
 
-        /* "MACS2/IO/ScoreTrack.pyx":1788
+        /* "MACS2/IO/ScoreTrack.pyx":1779
  *                  if peak_content[ -1 ][ 1 ] - peak_content[ 0 ][ 0 ] >= min_length:
  *                      mean_logLR = self.mean_from_peakcontent( peak_content )
  *                      peaks.add( chrom, peak_content[0][0], peak_content[-1][1],             # <<<<<<<<<<<<<<
  *                                 summit = -1, peak_score  = mean_logLR, pileup = 0, pscore = 0,
  *                                 fold_change = 0, qscore = 0,
  */
-        __pyx_t_5 = __Pyx_PyObject_Call(__pyx_t_9, __pyx_t_1, __pyx_t_4); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 1788, __pyx_L1_error)
+        __pyx_t_5 = __Pyx_PyObject_Call(__pyx_t_9, __pyx_t_1, __pyx_t_4); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 1779, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_5);
         __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
         __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
         __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
         __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
 
-        /* "MACS2/IO/ScoreTrack.pyx":1786
+        /* "MACS2/IO/ScoreTrack.pyx":1777
  *              # save the last peak
  *              if peak_content:
  *                  if peak_content[ -1 ][ 1 ] - peak_content[ 0 ][ 0 ] >= min_length:             # <<<<<<<<<<<<<<
@@ -29193,7 +29193,7 @@ static PyObject *__pyx_f_5MACS2_2IO_10ScoreTrack_18TwoConditionScores___add_a_pe
  */
       }
 
-      /* "MACS2/IO/ScoreTrack.pyx":1785
+      /* "MACS2/IO/ScoreTrack.pyx":1776
  * 
  *              # save the last peak
  *              if peak_content:             # <<<<<<<<<<<<<<
@@ -29202,7 +29202,7 @@ static PyObject *__pyx_f_5MACS2_2IO_10ScoreTrack_18TwoConditionScores___add_a_pe
  */
     }
 
-    /* "MACS2/IO/ScoreTrack.pyx":1762
+    /* "MACS2/IO/ScoreTrack.pyx":1753
  *              float mean_logLR
  * 
  *          if startpos.size > 0:             # <<<<<<<<<<<<<<
@@ -29211,7 +29211,7 @@ static PyObject *__pyx_f_5MACS2_2IO_10ScoreTrack_18TwoConditionScores___add_a_pe
  */
   }
 
-  /* "MACS2/IO/ScoreTrack.pyx":1793
+  /* "MACS2/IO/ScoreTrack.pyx":1784
  *                                 )
  * 
  *          return             # <<<<<<<<<<<<<<
@@ -29222,7 +29222,7 @@ static PyObject *__pyx_f_5MACS2_2IO_10ScoreTrack_18TwoConditionScores___add_a_pe
   __pyx_r = Py_None; __Pyx_INCREF(Py_None);
   goto __pyx_L0;
 
-  /* "MACS2/IO/ScoreTrack.pyx":1751
+  /* "MACS2/IO/ScoreTrack.pyx":1742
  *         return (cat1_peaks, cat2_peaks, cat3_peaks)
  * 
  *     cdef object __add_a_peak ( self, object peaks, bytes chrom, np.ndarray indices, np.ndarray startpos, np.ndarray endpos,             # <<<<<<<<<<<<<<
@@ -29248,7 +29248,7 @@ static PyObject *__pyx_f_5MACS2_2IO_10ScoreTrack_18TwoConditionScores___add_a_pe
   return __pyx_r;
 }
 
-/* "MACS2/IO/ScoreTrack.pyx":1795
+/* "MACS2/IO/ScoreTrack.pyx":1786
  *          return
  * 
  *     cdef float mean_from_peakcontent ( self, list peakcontent ):             # <<<<<<<<<<<<<<
@@ -29277,9 +29277,9 @@ static float __pyx_f_5MACS2_2IO_10ScoreTrack_18TwoConditionScores_mean_from_peak
   int32_t __pyx_t_10;
   float __pyx_t_11;
   __Pyx_RefNannySetupContext("mean_from_peakcontent", 0);
-  __Pyx_TraceCall("mean_from_peakcontent", __pyx_f[0], 1795, 0, __PYX_ERR(0, 1795, __pyx_L1_error));
+  __Pyx_TraceCall("mean_from_peakcontent", __pyx_f[0], 1786, 0, __PYX_ERR(0, 1786, __pyx_L1_error));
 
-  /* "MACS2/IO/ScoreTrack.pyx":1804
+  /* "MACS2/IO/ScoreTrack.pyx":1795
  *             float tmp_v, sum_v
  * 
  *         sum_v = 0             # <<<<<<<<<<<<<<
@@ -29288,7 +29288,7 @@ static float __pyx_f_5MACS2_2IO_10ScoreTrack_18TwoConditionScores_mean_from_peak
  */
   __pyx_v_sum_v = 0.0;
 
-  /* "MACS2/IO/ScoreTrack.pyx":1805
+  /* "MACS2/IO/ScoreTrack.pyx":1796
  * 
  *         sum_v = 0
  *         l = 0             # <<<<<<<<<<<<<<
@@ -29297,7 +29297,7 @@ static float __pyx_f_5MACS2_2IO_10ScoreTrack_18TwoConditionScores_mean_from_peak
  */
   __pyx_v_l = 0;
 
-  /* "MACS2/IO/ScoreTrack.pyx":1806
+  /* "MACS2/IO/ScoreTrack.pyx":1797
  *         sum_v = 0
  *         l = 0
  *         for (tmp_s, tmp_e, tmp_v) in peakcontent:             # <<<<<<<<<<<<<<
@@ -29306,15 +29306,15 @@ static float __pyx_f_5MACS2_2IO_10ScoreTrack_18TwoConditionScores_mean_from_peak
  */
   if (unlikely(__pyx_v_peakcontent == Py_None)) {
     PyErr_SetString(PyExc_TypeError, "'NoneType' object is not iterable");
-    __PYX_ERR(0, 1806, __pyx_L1_error)
+    __PYX_ERR(0, 1797, __pyx_L1_error)
   }
   __pyx_t_1 = __pyx_v_peakcontent; __Pyx_INCREF(__pyx_t_1); __pyx_t_2 = 0;
   for (;;) {
     if (__pyx_t_2 >= PyList_GET_SIZE(__pyx_t_1)) break;
     #if CYTHON_ASSUME_SAFE_MACROS && !CYTHON_AVOID_BORROWED_REFS
-    __pyx_t_3 = PyList_GET_ITEM(__pyx_t_1, __pyx_t_2); __Pyx_INCREF(__pyx_t_3); __pyx_t_2++; if (unlikely(0 < 0)) __PYX_ERR(0, 1806, __pyx_L1_error)
+    __pyx_t_3 = PyList_GET_ITEM(__pyx_t_1, __pyx_t_2); __Pyx_INCREF(__pyx_t_3); __pyx_t_2++; if (unlikely(0 < 0)) __PYX_ERR(0, 1797, __pyx_L1_error)
     #else
-    __pyx_t_3 = PySequence_ITEM(__pyx_t_1, __pyx_t_2); __pyx_t_2++; if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 1806, __pyx_L1_error)
+    __pyx_t_3 = PySequence_ITEM(__pyx_t_1, __pyx_t_2); __pyx_t_2++; if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 1797, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_3);
     #endif
     if ((likely(PyTuple_CheckExact(__pyx_t_3))) || (PyList_CheckExact(__pyx_t_3))) {
@@ -29323,7 +29323,7 @@ static float __pyx_f_5MACS2_2IO_10ScoreTrack_18TwoConditionScores_mean_from_peak
       if (unlikely(size != 3)) {
         if (size > 3) __Pyx_RaiseTooManyValuesError(3);
         else if (size >= 0) __Pyx_RaiseNeedMoreValuesError(size);
-        __PYX_ERR(0, 1806, __pyx_L1_error)
+        __PYX_ERR(0, 1797, __pyx_L1_error)
       }
       #if CYTHON_ASSUME_SAFE_MACROS && !CYTHON_AVOID_BORROWED_REFS
       if (likely(PyTuple_CheckExact(sequence))) {
@@ -29339,17 +29339,17 @@ static float __pyx_f_5MACS2_2IO_10ScoreTrack_18TwoConditionScores_mean_from_peak
       __Pyx_INCREF(__pyx_t_5);
       __Pyx_INCREF(__pyx_t_6);
       #else
-      __pyx_t_4 = PySequence_ITEM(sequence, 0); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 1806, __pyx_L1_error)
+      __pyx_t_4 = PySequence_ITEM(sequence, 0); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 1797, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_4);
-      __pyx_t_5 = PySequence_ITEM(sequence, 1); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 1806, __pyx_L1_error)
+      __pyx_t_5 = PySequence_ITEM(sequence, 1); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 1797, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_5);
-      __pyx_t_6 = PySequence_ITEM(sequence, 2); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 1806, __pyx_L1_error)
+      __pyx_t_6 = PySequence_ITEM(sequence, 2); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 1797, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_6);
       #endif
       __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
     } else {
       Py_ssize_t index = -1;
-      __pyx_t_7 = PyObject_GetIter(__pyx_t_3); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 1806, __pyx_L1_error)
+      __pyx_t_7 = PyObject_GetIter(__pyx_t_3); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 1797, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_7);
       __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
       __pyx_t_8 = Py_TYPE(__pyx_t_7)->tp_iternext;
@@ -29359,7 +29359,7 @@ static float __pyx_f_5MACS2_2IO_10ScoreTrack_18TwoConditionScores_mean_from_peak
       __Pyx_GOTREF(__pyx_t_5);
       index = 2; __pyx_t_6 = __pyx_t_8(__pyx_t_7); if (unlikely(!__pyx_t_6)) goto __pyx_L5_unpacking_failed;
       __Pyx_GOTREF(__pyx_t_6);
-      if (__Pyx_IternextUnpackEndCheck(__pyx_t_8(__pyx_t_7), 3) < 0) __PYX_ERR(0, 1806, __pyx_L1_error)
+      if (__Pyx_IternextUnpackEndCheck(__pyx_t_8(__pyx_t_7), 3) < 0) __PYX_ERR(0, 1797, __pyx_L1_error)
       __pyx_t_8 = NULL;
       __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
       goto __pyx_L6_unpacking_done;
@@ -29367,20 +29367,20 @@ static float __pyx_f_5MACS2_2IO_10ScoreTrack_18TwoConditionScores_mean_from_peak
       __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
       __pyx_t_8 = NULL;
       if (__Pyx_IterFinish() == 0) __Pyx_RaiseNeedMoreValuesError(index);
-      __PYX_ERR(0, 1806, __pyx_L1_error)
+      __PYX_ERR(0, 1797, __pyx_L1_error)
       __pyx_L6_unpacking_done:;
     }
-    __pyx_t_9 = __Pyx_PyInt_As_int32_t(__pyx_t_4); if (unlikely((__pyx_t_9 == ((int32_t)-1)) && PyErr_Occurred())) __PYX_ERR(0, 1806, __pyx_L1_error)
+    __pyx_t_9 = __Pyx_PyInt_As_int32_t(__pyx_t_4); if (unlikely((__pyx_t_9 == ((int32_t)-1)) && PyErr_Occurred())) __PYX_ERR(0, 1797, __pyx_L1_error)
     __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-    __pyx_t_10 = __Pyx_PyInt_As_int32_t(__pyx_t_5); if (unlikely((__pyx_t_10 == ((int32_t)-1)) && PyErr_Occurred())) __PYX_ERR(0, 1806, __pyx_L1_error)
+    __pyx_t_10 = __Pyx_PyInt_As_int32_t(__pyx_t_5); if (unlikely((__pyx_t_10 == ((int32_t)-1)) && PyErr_Occurred())) __PYX_ERR(0, 1797, __pyx_L1_error)
     __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
-    __pyx_t_11 = __pyx_PyFloat_AsFloat(__pyx_t_6); if (unlikely((__pyx_t_11 == (float)-1) && PyErr_Occurred())) __PYX_ERR(0, 1806, __pyx_L1_error)
+    __pyx_t_11 = __pyx_PyFloat_AsFloat(__pyx_t_6); if (unlikely((__pyx_t_11 == (float)-1) && PyErr_Occurred())) __PYX_ERR(0, 1797, __pyx_L1_error)
     __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
     __pyx_v_tmp_s = __pyx_t_9;
     __pyx_v_tmp_e = __pyx_t_10;
     __pyx_v_tmp_v = __pyx_t_11;
 
-    /* "MACS2/IO/ScoreTrack.pyx":1807
+    /* "MACS2/IO/ScoreTrack.pyx":1798
  *         l = 0
  *         for (tmp_s, tmp_e, tmp_v) in peakcontent:
  *             sum_v += tmp_v * ( tmp_e - tmp_s )             # <<<<<<<<<<<<<<
@@ -29389,7 +29389,7 @@ static float __pyx_f_5MACS2_2IO_10ScoreTrack_18TwoConditionScores_mean_from_peak
  */
     __pyx_v_sum_v = (__pyx_v_sum_v + (__pyx_v_tmp_v * (__pyx_v_tmp_e - __pyx_v_tmp_s)));
 
-    /* "MACS2/IO/ScoreTrack.pyx":1808
+    /* "MACS2/IO/ScoreTrack.pyx":1799
  *         for (tmp_s, tmp_e, tmp_v) in peakcontent:
  *             sum_v += tmp_v * ( tmp_e - tmp_s )
  *             l +=  tmp_e - tmp_s             # <<<<<<<<<<<<<<
@@ -29398,7 +29398,7 @@ static float __pyx_f_5MACS2_2IO_10ScoreTrack_18TwoConditionScores_mean_from_peak
  */
     __pyx_v_l = (__pyx_v_l + (__pyx_v_tmp_e - __pyx_v_tmp_s));
 
-    /* "MACS2/IO/ScoreTrack.pyx":1806
+    /* "MACS2/IO/ScoreTrack.pyx":1797
  *         sum_v = 0
  *         l = 0
  *         for (tmp_s, tmp_e, tmp_v) in peakcontent:             # <<<<<<<<<<<<<<
@@ -29408,7 +29408,7 @@ static float __pyx_f_5MACS2_2IO_10ScoreTrack_18TwoConditionScores_mean_from_peak
   }
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-  /* "MACS2/IO/ScoreTrack.pyx":1810
+  /* "MACS2/IO/ScoreTrack.pyx":1801
  *             l +=  tmp_e - tmp_s
  * 
  *         return sum_v / l             # <<<<<<<<<<<<<<
@@ -29417,12 +29417,12 @@ static float __pyx_f_5MACS2_2IO_10ScoreTrack_18TwoConditionScores_mean_from_peak
  */
   if (unlikely(__pyx_v_l == 0)) {
     PyErr_SetString(PyExc_ZeroDivisionError, "float division");
-    __PYX_ERR(0, 1810, __pyx_L1_error)
+    __PYX_ERR(0, 1801, __pyx_L1_error)
   }
   __pyx_r = (__pyx_v_sum_v / ((float)__pyx_v_l));
   goto __pyx_L0;
 
-  /* "MACS2/IO/ScoreTrack.pyx":1795
+  /* "MACS2/IO/ScoreTrack.pyx":1786
  *          return
  * 
  *     cdef float mean_from_peakcontent ( self, list peakcontent ):             # <<<<<<<<<<<<<<
@@ -29446,7 +29446,7 @@ static float __pyx_f_5MACS2_2IO_10ScoreTrack_18TwoConditionScores_mean_from_peak
   return __pyx_r;
 }
 
-/* "MACS2/IO/ScoreTrack.pyx":1813
+/* "MACS2/IO/ScoreTrack.pyx":1804
  * 
  * 
  *     cdef long total ( self ):             # <<<<<<<<<<<<<<
@@ -29470,9 +29470,9 @@ static long __pyx_f_5MACS2_2IO_10ScoreTrack_18TwoConditionScores_total(struct __
   PyObject *__pyx_t_8 = NULL;
   long __pyx_t_9;
   __Pyx_RefNannySetupContext("total", 0);
-  __Pyx_TraceCall("total", __pyx_f[0], 1813, 0, __PYX_ERR(0, 1813, __pyx_L1_error));
+  __Pyx_TraceCall("total", __pyx_f[0], 1804, 0, __PYX_ERR(0, 1804, __pyx_L1_error));
 
-  /* "MACS2/IO/ScoreTrack.pyx":1821
+  /* "MACS2/IO/ScoreTrack.pyx":1812
  *             bytes chrom
  * 
  *         t = 0             # <<<<<<<<<<<<<<
@@ -29481,7 +29481,7 @@ static long __pyx_f_5MACS2_2IO_10ScoreTrack_18TwoConditionScores_total(struct __
  */
   __pyx_v_t = 0;
 
-  /* "MACS2/IO/ScoreTrack.pyx":1822
+  /* "MACS2/IO/ScoreTrack.pyx":1813
  * 
  *         t = 0
  *         for chrom in self.data.keys():             # <<<<<<<<<<<<<<
@@ -29491,9 +29491,9 @@ static long __pyx_f_5MACS2_2IO_10ScoreTrack_18TwoConditionScores_total(struct __
   __pyx_t_2 = 0;
   if (unlikely(__pyx_v_self->data == Py_None)) {
     PyErr_Format(PyExc_AttributeError, "'NoneType' object has no attribute '%.30s'", "keys");
-    __PYX_ERR(0, 1822, __pyx_L1_error)
+    __PYX_ERR(0, 1813, __pyx_L1_error)
   }
-  __pyx_t_5 = __Pyx_dict_iterator(__pyx_v_self->data, 1, __pyx_n_s_keys, (&__pyx_t_3), (&__pyx_t_4)); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 1822, __pyx_L1_error)
+  __pyx_t_5 = __Pyx_dict_iterator(__pyx_v_self->data, 1, __pyx_n_s_keys, (&__pyx_t_3), (&__pyx_t_4)); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 1813, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_5);
   __Pyx_XDECREF(__pyx_t_1);
   __pyx_t_1 = __pyx_t_5;
@@ -29501,38 +29501,38 @@ static long __pyx_f_5MACS2_2IO_10ScoreTrack_18TwoConditionScores_total(struct __
   while (1) {
     __pyx_t_6 = __Pyx_dict_iter_next(__pyx_t_1, __pyx_t_3, &__pyx_t_2, &__pyx_t_5, NULL, NULL, __pyx_t_4);
     if (unlikely(__pyx_t_6 == 0)) break;
-    if (unlikely(__pyx_t_6 == -1)) __PYX_ERR(0, 1822, __pyx_L1_error)
+    if (unlikely(__pyx_t_6 == -1)) __PYX_ERR(0, 1813, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_5);
-    if (!(likely(PyBytes_CheckExact(__pyx_t_5))||((__pyx_t_5) == Py_None)||(PyErr_Format(PyExc_TypeError, "Expected %.16s, got %.200s", "bytes", Py_TYPE(__pyx_t_5)->tp_name), 0))) __PYX_ERR(0, 1822, __pyx_L1_error)
+    if (!(likely(PyBytes_CheckExact(__pyx_t_5))||((__pyx_t_5) == Py_None)||(PyErr_Format(PyExc_TypeError, "Expected %.16s, got %.200s", "bytes", Py_TYPE(__pyx_t_5)->tp_name), 0))) __PYX_ERR(0, 1813, __pyx_L1_error)
     __Pyx_XDECREF_SET(__pyx_v_chrom, ((PyObject*)__pyx_t_5));
     __pyx_t_5 = 0;
 
-    /* "MACS2/IO/ScoreTrack.pyx":1823
+    /* "MACS2/IO/ScoreTrack.pyx":1814
  *         t = 0
  *         for chrom in self.data.keys():
  *             t += self.datalength[chrom]             # <<<<<<<<<<<<<<
  *         return t
  * 
  */
-    __pyx_t_5 = __Pyx_PyInt_From_long(__pyx_v_t); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 1823, __pyx_L1_error)
+    __pyx_t_5 = __Pyx_PyInt_From_long(__pyx_v_t); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 1814, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_5);
     if (unlikely(__pyx_v_self->datalength == Py_None)) {
       PyErr_SetString(PyExc_TypeError, "'NoneType' object is not subscriptable");
-      __PYX_ERR(0, 1823, __pyx_L1_error)
+      __PYX_ERR(0, 1814, __pyx_L1_error)
     }
-    __pyx_t_7 = __Pyx_PyDict_GetItem(__pyx_v_self->datalength, __pyx_v_chrom); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 1823, __pyx_L1_error)
+    __pyx_t_7 = __Pyx_PyDict_GetItem(__pyx_v_self->datalength, __pyx_v_chrom); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 1814, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_7);
-    __pyx_t_8 = PyNumber_InPlaceAdd(__pyx_t_5, __pyx_t_7); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 1823, __pyx_L1_error)
+    __pyx_t_8 = PyNumber_InPlaceAdd(__pyx_t_5, __pyx_t_7); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 1814, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_8);
     __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
     __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
-    __pyx_t_9 = __Pyx_PyInt_As_long(__pyx_t_8); if (unlikely((__pyx_t_9 == (long)-1) && PyErr_Occurred())) __PYX_ERR(0, 1823, __pyx_L1_error)
+    __pyx_t_9 = __Pyx_PyInt_As_long(__pyx_t_8); if (unlikely((__pyx_t_9 == (long)-1) && PyErr_Occurred())) __PYX_ERR(0, 1814, __pyx_L1_error)
     __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
     __pyx_v_t = __pyx_t_9;
   }
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-  /* "MACS2/IO/ScoreTrack.pyx":1824
+  /* "MACS2/IO/ScoreTrack.pyx":1815
  *         for chrom in self.data.keys():
  *             t += self.datalength[chrom]
  *         return t             # <<<<<<<<<<<<<<
@@ -29542,7 +29542,7 @@ static long __pyx_f_5MACS2_2IO_10ScoreTrack_18TwoConditionScores_total(struct __
   __pyx_r = __pyx_v_t;
   goto __pyx_L0;
 
-  /* "MACS2/IO/ScoreTrack.pyx":1813
+  /* "MACS2/IO/ScoreTrack.pyx":1804
  * 
  * 
  *     cdef long total ( self ):             # <<<<<<<<<<<<<<
@@ -31004,7 +31004,7 @@ static PyObject *__pyx_f_5MACS2_2IO_10ScoreTrack___pyx_unpickle_TwoConditionScor
   return __pyx_r;
 }
 
-/* "../../../DataAnalysis/Codes/TLPython37/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":258
+/* "../../../Codes/TLPython3/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":258
  *         # experimental exception made for __getbuffer__ and __releasebuffer__
  *         # -- the details of this may change.
  *         def __getbuffer__(ndarray self, Py_buffer* info, int flags):             # <<<<<<<<<<<<<<
@@ -31055,7 +31055,7 @@ static int __pyx_pf_5numpy_7ndarray___getbuffer__(PyArrayObject *__pyx_v_self, P
   __Pyx_GIVEREF(__pyx_v_info->obj);
   __Pyx_TraceCall("__getbuffer__", __pyx_f[2], 258, 0, __PYX_ERR(2, 258, __pyx_L1_error));
 
-  /* "../../../DataAnalysis/Codes/TLPython37/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":265
+  /* "../../../Codes/TLPython3/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":265
  * 
  *             cdef int i, ndim
  *             cdef int endian_detector = 1             # <<<<<<<<<<<<<<
@@ -31064,7 +31064,7 @@ static int __pyx_pf_5numpy_7ndarray___getbuffer__(PyArrayObject *__pyx_v_self, P
  */
   __pyx_v_endian_detector = 1;
 
-  /* "../../../DataAnalysis/Codes/TLPython37/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":266
+  /* "../../../Codes/TLPython3/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":266
  *             cdef int i, ndim
  *             cdef int endian_detector = 1
  *             cdef bint little_endian = ((<char*>&endian_detector)[0] != 0)             # <<<<<<<<<<<<<<
@@ -31073,7 +31073,7 @@ static int __pyx_pf_5numpy_7ndarray___getbuffer__(PyArrayObject *__pyx_v_self, P
  */
   __pyx_v_little_endian = ((((char *)(&__pyx_v_endian_detector))[0]) != 0);
 
-  /* "../../../DataAnalysis/Codes/TLPython37/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":268
+  /* "../../../Codes/TLPython3/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":268
  *             cdef bint little_endian = ((<char*>&endian_detector)[0] != 0)
  * 
  *             ndim = PyArray_NDIM(self)             # <<<<<<<<<<<<<<
@@ -31082,7 +31082,7 @@ static int __pyx_pf_5numpy_7ndarray___getbuffer__(PyArrayObject *__pyx_v_self, P
  */
   __pyx_v_ndim = PyArray_NDIM(__pyx_v_self);
 
-  /* "../../../DataAnalysis/Codes/TLPython37/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":270
+  /* "../../../Codes/TLPython3/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":270
  *             ndim = PyArray_NDIM(self)
  * 
  *             if ((flags & pybuf.PyBUF_C_CONTIGUOUS == pybuf.PyBUF_C_CONTIGUOUS)             # <<<<<<<<<<<<<<
@@ -31096,7 +31096,7 @@ static int __pyx_pf_5numpy_7ndarray___getbuffer__(PyArrayObject *__pyx_v_self, P
     goto __pyx_L4_bool_binop_done;
   }
 
-  /* "../../../DataAnalysis/Codes/TLPython37/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":271
+  /* "../../../Codes/TLPython3/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":271
  * 
  *             if ((flags & pybuf.PyBUF_C_CONTIGUOUS == pybuf.PyBUF_C_CONTIGUOUS)
  *                 and not PyArray_CHKFLAGS(self, NPY_ARRAY_C_CONTIGUOUS)):             # <<<<<<<<<<<<<<
@@ -31107,7 +31107,7 @@ static int __pyx_pf_5numpy_7ndarray___getbuffer__(PyArrayObject *__pyx_v_self, P
   __pyx_t_1 = __pyx_t_2;
   __pyx_L4_bool_binop_done:;
 
-  /* "../../../DataAnalysis/Codes/TLPython37/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":270
+  /* "../../../Codes/TLPython3/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":270
  *             ndim = PyArray_NDIM(self)
  * 
  *             if ((flags & pybuf.PyBUF_C_CONTIGUOUS == pybuf.PyBUF_C_CONTIGUOUS)             # <<<<<<<<<<<<<<
@@ -31116,7 +31116,7 @@ static int __pyx_pf_5numpy_7ndarray___getbuffer__(PyArrayObject *__pyx_v_self, P
  */
   if (unlikely(__pyx_t_1)) {
 
-    /* "../../../DataAnalysis/Codes/TLPython37/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":272
+    /* "../../../Codes/TLPython3/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":272
  *             if ((flags & pybuf.PyBUF_C_CONTIGUOUS == pybuf.PyBUF_C_CONTIGUOUS)
  *                 and not PyArray_CHKFLAGS(self, NPY_ARRAY_C_CONTIGUOUS)):
  *                 raise ValueError(u"ndarray is not C contiguous")             # <<<<<<<<<<<<<<
@@ -31129,7 +31129,7 @@ static int __pyx_pf_5numpy_7ndarray___getbuffer__(PyArrayObject *__pyx_v_self, P
     __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
     __PYX_ERR(2, 272, __pyx_L1_error)
 
-    /* "../../../DataAnalysis/Codes/TLPython37/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":270
+    /* "../../../Codes/TLPython3/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":270
  *             ndim = PyArray_NDIM(self)
  * 
  *             if ((flags & pybuf.PyBUF_C_CONTIGUOUS == pybuf.PyBUF_C_CONTIGUOUS)             # <<<<<<<<<<<<<<
@@ -31138,7 +31138,7 @@ static int __pyx_pf_5numpy_7ndarray___getbuffer__(PyArrayObject *__pyx_v_self, P
  */
   }
 
-  /* "../../../DataAnalysis/Codes/TLPython37/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":274
+  /* "../../../Codes/TLPython3/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":274
  *                 raise ValueError(u"ndarray is not C contiguous")
  * 
  *             if ((flags & pybuf.PyBUF_F_CONTIGUOUS == pybuf.PyBUF_F_CONTIGUOUS)             # <<<<<<<<<<<<<<
@@ -31152,7 +31152,7 @@ static int __pyx_pf_5numpy_7ndarray___getbuffer__(PyArrayObject *__pyx_v_self, P
     goto __pyx_L7_bool_binop_done;
   }
 
-  /* "../../../DataAnalysis/Codes/TLPython37/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":275
+  /* "../../../Codes/TLPython3/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":275
  * 
  *             if ((flags & pybuf.PyBUF_F_CONTIGUOUS == pybuf.PyBUF_F_CONTIGUOUS)
  *                 and not PyArray_CHKFLAGS(self, NPY_ARRAY_F_CONTIGUOUS)):             # <<<<<<<<<<<<<<
@@ -31163,7 +31163,7 @@ static int __pyx_pf_5numpy_7ndarray___getbuffer__(PyArrayObject *__pyx_v_self, P
   __pyx_t_1 = __pyx_t_2;
   __pyx_L7_bool_binop_done:;
 
-  /* "../../../DataAnalysis/Codes/TLPython37/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":274
+  /* "../../../Codes/TLPython3/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":274
  *                 raise ValueError(u"ndarray is not C contiguous")
  * 
  *             if ((flags & pybuf.PyBUF_F_CONTIGUOUS == pybuf.PyBUF_F_CONTIGUOUS)             # <<<<<<<<<<<<<<
@@ -31172,7 +31172,7 @@ static int __pyx_pf_5numpy_7ndarray___getbuffer__(PyArrayObject *__pyx_v_self, P
  */
   if (unlikely(__pyx_t_1)) {
 
-    /* "../../../DataAnalysis/Codes/TLPython37/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":276
+    /* "../../../Codes/TLPython3/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":276
  *             if ((flags & pybuf.PyBUF_F_CONTIGUOUS == pybuf.PyBUF_F_CONTIGUOUS)
  *                 and not PyArray_CHKFLAGS(self, NPY_ARRAY_F_CONTIGUOUS)):
  *                 raise ValueError(u"ndarray is not Fortran contiguous")             # <<<<<<<<<<<<<<
@@ -31185,7 +31185,7 @@ static int __pyx_pf_5numpy_7ndarray___getbuffer__(PyArrayObject *__pyx_v_self, P
     __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
     __PYX_ERR(2, 276, __pyx_L1_error)
 
-    /* "../../../DataAnalysis/Codes/TLPython37/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":274
+    /* "../../../Codes/TLPython3/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":274
  *                 raise ValueError(u"ndarray is not C contiguous")
  * 
  *             if ((flags & pybuf.PyBUF_F_CONTIGUOUS == pybuf.PyBUF_F_CONTIGUOUS)             # <<<<<<<<<<<<<<
@@ -31194,7 +31194,7 @@ static int __pyx_pf_5numpy_7ndarray___getbuffer__(PyArrayObject *__pyx_v_self, P
  */
   }
 
-  /* "../../../DataAnalysis/Codes/TLPython37/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":278
+  /* "../../../Codes/TLPython3/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":278
  *                 raise ValueError(u"ndarray is not Fortran contiguous")
  * 
  *             info.buf = PyArray_DATA(self)             # <<<<<<<<<<<<<<
@@ -31203,7 +31203,7 @@ static int __pyx_pf_5numpy_7ndarray___getbuffer__(PyArrayObject *__pyx_v_self, P
  */
   __pyx_v_info->buf = PyArray_DATA(__pyx_v_self);
 
-  /* "../../../DataAnalysis/Codes/TLPython37/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":279
+  /* "../../../Codes/TLPython3/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":279
  * 
  *             info.buf = PyArray_DATA(self)
  *             info.ndim = ndim             # <<<<<<<<<<<<<<
@@ -31212,7 +31212,7 @@ static int __pyx_pf_5numpy_7ndarray___getbuffer__(PyArrayObject *__pyx_v_self, P
  */
   __pyx_v_info->ndim = __pyx_v_ndim;
 
-  /* "../../../DataAnalysis/Codes/TLPython37/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":280
+  /* "../../../Codes/TLPython3/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":280
  *             info.buf = PyArray_DATA(self)
  *             info.ndim = ndim
  *             if sizeof(npy_intp) != sizeof(Py_ssize_t):             # <<<<<<<<<<<<<<
@@ -31222,7 +31222,7 @@ static int __pyx_pf_5numpy_7ndarray___getbuffer__(PyArrayObject *__pyx_v_self, P
   __pyx_t_1 = (((sizeof(npy_intp)) != (sizeof(Py_ssize_t))) != 0);
   if (__pyx_t_1) {
 
-    /* "../../../DataAnalysis/Codes/TLPython37/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":283
+    /* "../../../Codes/TLPython3/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":283
  *                 # Allocate new buffer for strides and shape info.
  *                 # This is allocated as one block, strides first.
  *                 info.strides = <Py_ssize_t*>PyObject_Malloc(sizeof(Py_ssize_t) * 2 * <size_t>ndim)             # <<<<<<<<<<<<<<
@@ -31231,7 +31231,7 @@ static int __pyx_pf_5numpy_7ndarray___getbuffer__(PyArrayObject *__pyx_v_self, P
  */
     __pyx_v_info->strides = ((Py_ssize_t *)PyObject_Malloc((((sizeof(Py_ssize_t)) * 2) * ((size_t)__pyx_v_ndim))));
 
-    /* "../../../DataAnalysis/Codes/TLPython37/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":284
+    /* "../../../Codes/TLPython3/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":284
  *                 # This is allocated as one block, strides first.
  *                 info.strides = <Py_ssize_t*>PyObject_Malloc(sizeof(Py_ssize_t) * 2 * <size_t>ndim)
  *                 info.shape = info.strides + ndim             # <<<<<<<<<<<<<<
@@ -31240,7 +31240,7 @@ static int __pyx_pf_5numpy_7ndarray___getbuffer__(PyArrayObject *__pyx_v_self, P
  */
     __pyx_v_info->shape = (__pyx_v_info->strides + __pyx_v_ndim);
 
-    /* "../../../DataAnalysis/Codes/TLPython37/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":285
+    /* "../../../Codes/TLPython3/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":285
  *                 info.strides = <Py_ssize_t*>PyObject_Malloc(sizeof(Py_ssize_t) * 2 * <size_t>ndim)
  *                 info.shape = info.strides + ndim
  *                 for i in range(ndim):             # <<<<<<<<<<<<<<
@@ -31252,7 +31252,7 @@ static int __pyx_pf_5numpy_7ndarray___getbuffer__(PyArrayObject *__pyx_v_self, P
     for (__pyx_t_6 = 0; __pyx_t_6 < __pyx_t_5; __pyx_t_6+=1) {
       __pyx_v_i = __pyx_t_6;
 
-      /* "../../../DataAnalysis/Codes/TLPython37/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":286
+      /* "../../../Codes/TLPython3/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":286
  *                 info.shape = info.strides + ndim
  *                 for i in range(ndim):
  *                     info.strides[i] = PyArray_STRIDES(self)[i]             # <<<<<<<<<<<<<<
@@ -31261,7 +31261,7 @@ static int __pyx_pf_5numpy_7ndarray___getbuffer__(PyArrayObject *__pyx_v_self, P
  */
       (__pyx_v_info->strides[__pyx_v_i]) = (PyArray_STRIDES(__pyx_v_self)[__pyx_v_i]);
 
-      /* "../../../DataAnalysis/Codes/TLPython37/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":287
+      /* "../../../Codes/TLPython3/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":287
  *                 for i in range(ndim):
  *                     info.strides[i] = PyArray_STRIDES(self)[i]
  *                     info.shape[i] = PyArray_DIMS(self)[i]             # <<<<<<<<<<<<<<
@@ -31271,7 +31271,7 @@ static int __pyx_pf_5numpy_7ndarray___getbuffer__(PyArrayObject *__pyx_v_self, P
       (__pyx_v_info->shape[__pyx_v_i]) = (PyArray_DIMS(__pyx_v_self)[__pyx_v_i]);
     }
 
-    /* "../../../DataAnalysis/Codes/TLPython37/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":280
+    /* "../../../Codes/TLPython3/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":280
  *             info.buf = PyArray_DATA(self)
  *             info.ndim = ndim
  *             if sizeof(npy_intp) != sizeof(Py_ssize_t):             # <<<<<<<<<<<<<<
@@ -31281,7 +31281,7 @@ static int __pyx_pf_5numpy_7ndarray___getbuffer__(PyArrayObject *__pyx_v_self, P
     goto __pyx_L9;
   }
 
-  /* "../../../DataAnalysis/Codes/TLPython37/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":289
+  /* "../../../Codes/TLPython3/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":289
  *                     info.shape[i] = PyArray_DIMS(self)[i]
  *             else:
  *                 info.strides = <Py_ssize_t*>PyArray_STRIDES(self)             # <<<<<<<<<<<<<<
@@ -31291,7 +31291,7 @@ static int __pyx_pf_5numpy_7ndarray___getbuffer__(PyArrayObject *__pyx_v_self, P
   /*else*/ {
     __pyx_v_info->strides = ((Py_ssize_t *)PyArray_STRIDES(__pyx_v_self));
 
-    /* "../../../DataAnalysis/Codes/TLPython37/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":290
+    /* "../../../Codes/TLPython3/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":290
  *             else:
  *                 info.strides = <Py_ssize_t*>PyArray_STRIDES(self)
  *                 info.shape = <Py_ssize_t*>PyArray_DIMS(self)             # <<<<<<<<<<<<<<
@@ -31302,7 +31302,7 @@ static int __pyx_pf_5numpy_7ndarray___getbuffer__(PyArrayObject *__pyx_v_self, P
   }
   __pyx_L9:;
 
-  /* "../../../DataAnalysis/Codes/TLPython37/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":291
+  /* "../../../Codes/TLPython3/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":291
  *                 info.strides = <Py_ssize_t*>PyArray_STRIDES(self)
  *                 info.shape = <Py_ssize_t*>PyArray_DIMS(self)
  *             info.suboffsets = NULL             # <<<<<<<<<<<<<<
@@ -31311,7 +31311,7 @@ static int __pyx_pf_5numpy_7ndarray___getbuffer__(PyArrayObject *__pyx_v_self, P
  */
   __pyx_v_info->suboffsets = NULL;
 
-  /* "../../../DataAnalysis/Codes/TLPython37/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":292
+  /* "../../../Codes/TLPython3/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":292
  *                 info.shape = <Py_ssize_t*>PyArray_DIMS(self)
  *             info.suboffsets = NULL
  *             info.itemsize = PyArray_ITEMSIZE(self)             # <<<<<<<<<<<<<<
@@ -31320,7 +31320,7 @@ static int __pyx_pf_5numpy_7ndarray___getbuffer__(PyArrayObject *__pyx_v_self, P
  */
   __pyx_v_info->itemsize = PyArray_ITEMSIZE(__pyx_v_self);
 
-  /* "../../../DataAnalysis/Codes/TLPython37/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":293
+  /* "../../../Codes/TLPython3/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":293
  *             info.suboffsets = NULL
  *             info.itemsize = PyArray_ITEMSIZE(self)
  *             info.readonly = not PyArray_ISWRITEABLE(self)             # <<<<<<<<<<<<<<
@@ -31329,7 +31329,7 @@ static int __pyx_pf_5numpy_7ndarray___getbuffer__(PyArrayObject *__pyx_v_self, P
  */
   __pyx_v_info->readonly = (!(PyArray_ISWRITEABLE(__pyx_v_self) != 0));
 
-  /* "../../../DataAnalysis/Codes/TLPython37/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":296
+  /* "../../../Codes/TLPython3/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":296
  * 
  *             cdef int t
  *             cdef char* f = NULL             # <<<<<<<<<<<<<<
@@ -31338,7 +31338,7 @@ static int __pyx_pf_5numpy_7ndarray___getbuffer__(PyArrayObject *__pyx_v_self, P
  */
   __pyx_v_f = NULL;
 
-  /* "../../../DataAnalysis/Codes/TLPython37/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":297
+  /* "../../../Codes/TLPython3/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":297
  *             cdef int t
  *             cdef char* f = NULL
  *             cdef dtype descr = <dtype>PyArray_DESCR(self)             # <<<<<<<<<<<<<<
@@ -31351,7 +31351,7 @@ static int __pyx_pf_5numpy_7ndarray___getbuffer__(PyArrayObject *__pyx_v_self, P
   __pyx_v_descr = ((PyArray_Descr *)__pyx_t_3);
   __pyx_t_3 = 0;
 
-  /* "../../../DataAnalysis/Codes/TLPython37/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":300
+  /* "../../../Codes/TLPython3/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":300
  *             cdef int offset
  * 
  *             info.obj = self             # <<<<<<<<<<<<<<
@@ -31364,7 +31364,7 @@ static int __pyx_pf_5numpy_7ndarray___getbuffer__(PyArrayObject *__pyx_v_self, P
   __Pyx_DECREF(__pyx_v_info->obj);
   __pyx_v_info->obj = ((PyObject *)__pyx_v_self);
 
-  /* "../../../DataAnalysis/Codes/TLPython37/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":302
+  /* "../../../Codes/TLPython3/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":302
  *             info.obj = self
  * 
  *             if not PyDataType_HASFIELDS(descr):             # <<<<<<<<<<<<<<
@@ -31374,7 +31374,7 @@ static int __pyx_pf_5numpy_7ndarray___getbuffer__(PyArrayObject *__pyx_v_self, P
   __pyx_t_1 = ((!(PyDataType_HASFIELDS(__pyx_v_descr) != 0)) != 0);
   if (__pyx_t_1) {
 
-    /* "../../../DataAnalysis/Codes/TLPython37/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":303
+    /* "../../../Codes/TLPython3/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":303
  * 
  *             if not PyDataType_HASFIELDS(descr):
  *                 t = descr.type_num             # <<<<<<<<<<<<<<
@@ -31384,7 +31384,7 @@ static int __pyx_pf_5numpy_7ndarray___getbuffer__(PyArrayObject *__pyx_v_self, P
     __pyx_t_4 = __pyx_v_descr->type_num;
     __pyx_v_t = __pyx_t_4;
 
-    /* "../../../DataAnalysis/Codes/TLPython37/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":304
+    /* "../../../Codes/TLPython3/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":304
  *             if not PyDataType_HASFIELDS(descr):
  *                 t = descr.type_num
  *                 if ((descr.byteorder == c'>' and little_endian) or             # <<<<<<<<<<<<<<
@@ -31404,7 +31404,7 @@ static int __pyx_pf_5numpy_7ndarray___getbuffer__(PyArrayObject *__pyx_v_self, P
     }
     __pyx_L15_next_or:;
 
-    /* "../../../DataAnalysis/Codes/TLPython37/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":305
+    /* "../../../Codes/TLPython3/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":305
  *                 t = descr.type_num
  *                 if ((descr.byteorder == c'>' and little_endian) or
  *                     (descr.byteorder == c'<' and not little_endian)):             # <<<<<<<<<<<<<<
@@ -31421,7 +31421,7 @@ static int __pyx_pf_5numpy_7ndarray___getbuffer__(PyArrayObject *__pyx_v_self, P
     __pyx_t_1 = __pyx_t_2;
     __pyx_L14_bool_binop_done:;
 
-    /* "../../../DataAnalysis/Codes/TLPython37/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":304
+    /* "../../../Codes/TLPython3/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":304
  *             if not PyDataType_HASFIELDS(descr):
  *                 t = descr.type_num
  *                 if ((descr.byteorder == c'>' and little_endian) or             # <<<<<<<<<<<<<<
@@ -31430,7 +31430,7 @@ static int __pyx_pf_5numpy_7ndarray___getbuffer__(PyArrayObject *__pyx_v_self, P
  */
     if (unlikely(__pyx_t_1)) {
 
-      /* "../../../DataAnalysis/Codes/TLPython37/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":306
+      /* "../../../Codes/TLPython3/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":306
  *                 if ((descr.byteorder == c'>' and little_endian) or
  *                     (descr.byteorder == c'<' and not little_endian)):
  *                     raise ValueError(u"Non-native byte order not supported")             # <<<<<<<<<<<<<<
@@ -31443,7 +31443,7 @@ static int __pyx_pf_5numpy_7ndarray___getbuffer__(PyArrayObject *__pyx_v_self, P
       __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
       __PYX_ERR(2, 306, __pyx_L1_error)
 
-      /* "../../../DataAnalysis/Codes/TLPython37/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":304
+      /* "../../../Codes/TLPython3/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":304
  *             if not PyDataType_HASFIELDS(descr):
  *                 t = descr.type_num
  *                 if ((descr.byteorder == c'>' and little_endian) or             # <<<<<<<<<<<<<<
@@ -31452,7 +31452,7 @@ static int __pyx_pf_5numpy_7ndarray___getbuffer__(PyArrayObject *__pyx_v_self, P
  */
     }
 
-    /* "../../../DataAnalysis/Codes/TLPython37/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":307
+    /* "../../../Codes/TLPython3/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":307
  *                     (descr.byteorder == c'<' and not little_endian)):
  *                     raise ValueError(u"Non-native byte order not supported")
  *                 if   t == NPY_BYTE:        f = "b"             # <<<<<<<<<<<<<<
@@ -31465,7 +31465,7 @@ static int __pyx_pf_5numpy_7ndarray___getbuffer__(PyArrayObject *__pyx_v_self, P
       break;
       case NPY_UBYTE:
 
-      /* "../../../DataAnalysis/Codes/TLPython37/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":308
+      /* "../../../Codes/TLPython3/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":308
  *                     raise ValueError(u"Non-native byte order not supported")
  *                 if   t == NPY_BYTE:        f = "b"
  *                 elif t == NPY_UBYTE:       f = "B"             # <<<<<<<<<<<<<<
@@ -31476,7 +31476,7 @@ static int __pyx_pf_5numpy_7ndarray___getbuffer__(PyArrayObject *__pyx_v_self, P
       break;
       case NPY_SHORT:
 
-      /* "../../../DataAnalysis/Codes/TLPython37/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":309
+      /* "../../../Codes/TLPython3/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":309
  *                 if   t == NPY_BYTE:        f = "b"
  *                 elif t == NPY_UBYTE:       f = "B"
  *                 elif t == NPY_SHORT:       f = "h"             # <<<<<<<<<<<<<<
@@ -31487,7 +31487,7 @@ static int __pyx_pf_5numpy_7ndarray___getbuffer__(PyArrayObject *__pyx_v_self, P
       break;
       case NPY_USHORT:
 
-      /* "../../../DataAnalysis/Codes/TLPython37/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":310
+      /* "../../../Codes/TLPython3/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":310
  *                 elif t == NPY_UBYTE:       f = "B"
  *                 elif t == NPY_SHORT:       f = "h"
  *                 elif t == NPY_USHORT:      f = "H"             # <<<<<<<<<<<<<<
@@ -31498,7 +31498,7 @@ static int __pyx_pf_5numpy_7ndarray___getbuffer__(PyArrayObject *__pyx_v_self, P
       break;
       case NPY_INT:
 
-      /* "../../../DataAnalysis/Codes/TLPython37/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":311
+      /* "../../../Codes/TLPython3/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":311
  *                 elif t == NPY_SHORT:       f = "h"
  *                 elif t == NPY_USHORT:      f = "H"
  *                 elif t == NPY_INT:         f = "i"             # <<<<<<<<<<<<<<
@@ -31509,7 +31509,7 @@ static int __pyx_pf_5numpy_7ndarray___getbuffer__(PyArrayObject *__pyx_v_self, P
       break;
       case NPY_UINT:
 
-      /* "../../../DataAnalysis/Codes/TLPython37/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":312
+      /* "../../../Codes/TLPython3/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":312
  *                 elif t == NPY_USHORT:      f = "H"
  *                 elif t == NPY_INT:         f = "i"
  *                 elif t == NPY_UINT:        f = "I"             # <<<<<<<<<<<<<<
@@ -31520,7 +31520,7 @@ static int __pyx_pf_5numpy_7ndarray___getbuffer__(PyArrayObject *__pyx_v_self, P
       break;
       case NPY_LONG:
 
-      /* "../../../DataAnalysis/Codes/TLPython37/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":313
+      /* "../../../Codes/TLPython3/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":313
  *                 elif t == NPY_INT:         f = "i"
  *                 elif t == NPY_UINT:        f = "I"
  *                 elif t == NPY_LONG:        f = "l"             # <<<<<<<<<<<<<<
@@ -31531,7 +31531,7 @@ static int __pyx_pf_5numpy_7ndarray___getbuffer__(PyArrayObject *__pyx_v_self, P
       break;
       case NPY_ULONG:
 
-      /* "../../../DataAnalysis/Codes/TLPython37/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":314
+      /* "../../../Codes/TLPython3/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":314
  *                 elif t == NPY_UINT:        f = "I"
  *                 elif t == NPY_LONG:        f = "l"
  *                 elif t == NPY_ULONG:       f = "L"             # <<<<<<<<<<<<<<
@@ -31542,7 +31542,7 @@ static int __pyx_pf_5numpy_7ndarray___getbuffer__(PyArrayObject *__pyx_v_self, P
       break;
       case NPY_LONGLONG:
 
-      /* "../../../DataAnalysis/Codes/TLPython37/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":315
+      /* "../../../Codes/TLPython3/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":315
  *                 elif t == NPY_LONG:        f = "l"
  *                 elif t == NPY_ULONG:       f = "L"
  *                 elif t == NPY_LONGLONG:    f = "q"             # <<<<<<<<<<<<<<
@@ -31553,7 +31553,7 @@ static int __pyx_pf_5numpy_7ndarray___getbuffer__(PyArrayObject *__pyx_v_self, P
       break;
       case NPY_ULONGLONG:
 
-      /* "../../../DataAnalysis/Codes/TLPython37/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":316
+      /* "../../../Codes/TLPython3/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":316
  *                 elif t == NPY_ULONG:       f = "L"
  *                 elif t == NPY_LONGLONG:    f = "q"
  *                 elif t == NPY_ULONGLONG:   f = "Q"             # <<<<<<<<<<<<<<
@@ -31564,7 +31564,7 @@ static int __pyx_pf_5numpy_7ndarray___getbuffer__(PyArrayObject *__pyx_v_self, P
       break;
       case NPY_FLOAT:
 
-      /* "../../../DataAnalysis/Codes/TLPython37/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":317
+      /* "../../../Codes/TLPython3/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":317
  *                 elif t == NPY_LONGLONG:    f = "q"
  *                 elif t == NPY_ULONGLONG:   f = "Q"
  *                 elif t == NPY_FLOAT:       f = "f"             # <<<<<<<<<<<<<<
@@ -31575,7 +31575,7 @@ static int __pyx_pf_5numpy_7ndarray___getbuffer__(PyArrayObject *__pyx_v_self, P
       break;
       case NPY_DOUBLE:
 
-      /* "../../../DataAnalysis/Codes/TLPython37/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":318
+      /* "../../../Codes/TLPython3/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":318
  *                 elif t == NPY_ULONGLONG:   f = "Q"
  *                 elif t == NPY_FLOAT:       f = "f"
  *                 elif t == NPY_DOUBLE:      f = "d"             # <<<<<<<<<<<<<<
@@ -31586,7 +31586,7 @@ static int __pyx_pf_5numpy_7ndarray___getbuffer__(PyArrayObject *__pyx_v_self, P
       break;
       case NPY_LONGDOUBLE:
 
-      /* "../../../DataAnalysis/Codes/TLPython37/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":319
+      /* "../../../Codes/TLPython3/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":319
  *                 elif t == NPY_FLOAT:       f = "f"
  *                 elif t == NPY_DOUBLE:      f = "d"
  *                 elif t == NPY_LONGDOUBLE:  f = "g"             # <<<<<<<<<<<<<<
@@ -31597,7 +31597,7 @@ static int __pyx_pf_5numpy_7ndarray___getbuffer__(PyArrayObject *__pyx_v_self, P
       break;
       case NPY_CFLOAT:
 
-      /* "../../../DataAnalysis/Codes/TLPython37/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":320
+      /* "../../../Codes/TLPython3/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":320
  *                 elif t == NPY_DOUBLE:      f = "d"
  *                 elif t == NPY_LONGDOUBLE:  f = "g"
  *                 elif t == NPY_CFLOAT:      f = "Zf"             # <<<<<<<<<<<<<<
@@ -31608,7 +31608,7 @@ static int __pyx_pf_5numpy_7ndarray___getbuffer__(PyArrayObject *__pyx_v_self, P
       break;
       case NPY_CDOUBLE:
 
-      /* "../../../DataAnalysis/Codes/TLPython37/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":321
+      /* "../../../Codes/TLPython3/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":321
  *                 elif t == NPY_LONGDOUBLE:  f = "g"
  *                 elif t == NPY_CFLOAT:      f = "Zf"
  *                 elif t == NPY_CDOUBLE:     f = "Zd"             # <<<<<<<<<<<<<<
@@ -31619,7 +31619,7 @@ static int __pyx_pf_5numpy_7ndarray___getbuffer__(PyArrayObject *__pyx_v_self, P
       break;
       case NPY_CLONGDOUBLE:
 
-      /* "../../../DataAnalysis/Codes/TLPython37/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":322
+      /* "../../../Codes/TLPython3/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":322
  *                 elif t == NPY_CFLOAT:      f = "Zf"
  *                 elif t == NPY_CDOUBLE:     f = "Zd"
  *                 elif t == NPY_CLONGDOUBLE: f = "Zg"             # <<<<<<<<<<<<<<
@@ -31630,7 +31630,7 @@ static int __pyx_pf_5numpy_7ndarray___getbuffer__(PyArrayObject *__pyx_v_self, P
       break;
       case NPY_OBJECT:
 
-      /* "../../../DataAnalysis/Codes/TLPython37/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":323
+      /* "../../../Codes/TLPython3/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":323
  *                 elif t == NPY_CDOUBLE:     f = "Zd"
  *                 elif t == NPY_CLONGDOUBLE: f = "Zg"
  *                 elif t == NPY_OBJECT:      f = "O"             # <<<<<<<<<<<<<<
@@ -31641,7 +31641,7 @@ static int __pyx_pf_5numpy_7ndarray___getbuffer__(PyArrayObject *__pyx_v_self, P
       break;
       default:
 
-      /* "../../../DataAnalysis/Codes/TLPython37/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":325
+      /* "../../../Codes/TLPython3/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":325
  *                 elif t == NPY_OBJECT:      f = "O"
  *                 else:
  *                     raise ValueError(u"unknown dtype code in numpy.pxd (%d)" % t)             # <<<<<<<<<<<<<<
@@ -31662,7 +31662,7 @@ static int __pyx_pf_5numpy_7ndarray___getbuffer__(PyArrayObject *__pyx_v_self, P
       break;
     }
 
-    /* "../../../DataAnalysis/Codes/TLPython37/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":326
+    /* "../../../Codes/TLPython3/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":326
  *                 else:
  *                     raise ValueError(u"unknown dtype code in numpy.pxd (%d)" % t)
  *                 info.format = f             # <<<<<<<<<<<<<<
@@ -31671,7 +31671,7 @@ static int __pyx_pf_5numpy_7ndarray___getbuffer__(PyArrayObject *__pyx_v_self, P
  */
     __pyx_v_info->format = __pyx_v_f;
 
-    /* "../../../DataAnalysis/Codes/TLPython37/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":327
+    /* "../../../Codes/TLPython3/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":327
  *                     raise ValueError(u"unknown dtype code in numpy.pxd (%d)" % t)
  *                 info.format = f
  *                 return             # <<<<<<<<<<<<<<
@@ -31681,7 +31681,7 @@ static int __pyx_pf_5numpy_7ndarray___getbuffer__(PyArrayObject *__pyx_v_self, P
     __pyx_r = 0;
     goto __pyx_L0;
 
-    /* "../../../DataAnalysis/Codes/TLPython37/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":302
+    /* "../../../Codes/TLPython3/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":302
  *             info.obj = self
  * 
  *             if not PyDataType_HASFIELDS(descr):             # <<<<<<<<<<<<<<
@@ -31690,7 +31690,7 @@ static int __pyx_pf_5numpy_7ndarray___getbuffer__(PyArrayObject *__pyx_v_self, P
  */
   }
 
-  /* "../../../DataAnalysis/Codes/TLPython37/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":329
+  /* "../../../Codes/TLPython3/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":329
  *                 return
  *             else:
  *                 info.format = <char*>PyObject_Malloc(_buffer_format_string_len)             # <<<<<<<<<<<<<<
@@ -31700,7 +31700,7 @@ static int __pyx_pf_5numpy_7ndarray___getbuffer__(PyArrayObject *__pyx_v_self, P
   /*else*/ {
     __pyx_v_info->format = ((char *)PyObject_Malloc(0xFF));
 
-    /* "../../../DataAnalysis/Codes/TLPython37/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":330
+    /* "../../../Codes/TLPython3/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":330
  *             else:
  *                 info.format = <char*>PyObject_Malloc(_buffer_format_string_len)
  *                 info.format[0] = c'^' # Native data types, manual alignment             # <<<<<<<<<<<<<<
@@ -31709,7 +31709,7 @@ static int __pyx_pf_5numpy_7ndarray___getbuffer__(PyArrayObject *__pyx_v_self, P
  */
     (__pyx_v_info->format[0]) = '^';
 
-    /* "../../../DataAnalysis/Codes/TLPython37/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":331
+    /* "../../../Codes/TLPython3/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":331
  *                 info.format = <char*>PyObject_Malloc(_buffer_format_string_len)
  *                 info.format[0] = c'^' # Native data types, manual alignment
  *                 offset = 0             # <<<<<<<<<<<<<<
@@ -31718,7 +31718,7 @@ static int __pyx_pf_5numpy_7ndarray___getbuffer__(PyArrayObject *__pyx_v_self, P
  */
     __pyx_v_offset = 0;
 
-    /* "../../../DataAnalysis/Codes/TLPython37/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":332
+    /* "../../../Codes/TLPython3/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":332
  *                 info.format[0] = c'^' # Native data types, manual alignment
  *                 offset = 0
  *                 f = _util_dtypestring(descr, info.format + 1,             # <<<<<<<<<<<<<<
@@ -31728,7 +31728,7 @@ static int __pyx_pf_5numpy_7ndarray___getbuffer__(PyArrayObject *__pyx_v_self, P
     __pyx_t_9 = __pyx_f_5numpy__util_dtypestring(__pyx_v_descr, (__pyx_v_info->format + 1), (__pyx_v_info->format + 0xFF), (&__pyx_v_offset)); if (unlikely(__pyx_t_9 == ((char *)NULL))) __PYX_ERR(2, 332, __pyx_L1_error)
     __pyx_v_f = __pyx_t_9;
 
-    /* "../../../DataAnalysis/Codes/TLPython37/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":335
+    /* "../../../Codes/TLPython3/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":335
  *                                       info.format + _buffer_format_string_len,
  *                                       &offset)
  *                 f[0] = c'\0' # Terminate format string             # <<<<<<<<<<<<<<
@@ -31738,7 +31738,7 @@ static int __pyx_pf_5numpy_7ndarray___getbuffer__(PyArrayObject *__pyx_v_self, P
     (__pyx_v_f[0]) = '\x00';
   }
 
-  /* "../../../DataAnalysis/Codes/TLPython37/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":258
+  /* "../../../Codes/TLPython3/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":258
  *         # experimental exception made for __getbuffer__ and __releasebuffer__
  *         # -- the details of this may change.
  *         def __getbuffer__(ndarray self, Py_buffer* info, int flags):             # <<<<<<<<<<<<<<
@@ -31771,7 +31771,7 @@ static int __pyx_pf_5numpy_7ndarray___getbuffer__(PyArrayObject *__pyx_v_self, P
   return __pyx_r;
 }
 
-/* "../../../DataAnalysis/Codes/TLPython37/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":337
+/* "../../../Codes/TLPython3/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":337
  *                 f[0] = c'\0' # Terminate format string
  * 
  *         def __releasebuffer__(ndarray self, Py_buffer* info):             # <<<<<<<<<<<<<<
@@ -31797,7 +31797,7 @@ static void __pyx_pf_5numpy_7ndarray_2__releasebuffer__(PyArrayObject *__pyx_v_s
   __Pyx_RefNannySetupContext("__releasebuffer__", 0);
   __Pyx_TraceCall("__releasebuffer__", __pyx_f[2], 337, 0, __PYX_ERR(2, 337, __pyx_L1_error));
 
-  /* "../../../DataAnalysis/Codes/TLPython37/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":338
+  /* "../../../Codes/TLPython3/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":338
  * 
  *         def __releasebuffer__(ndarray self, Py_buffer* info):
  *             if PyArray_HASFIELDS(self):             # <<<<<<<<<<<<<<
@@ -31807,7 +31807,7 @@ static void __pyx_pf_5numpy_7ndarray_2__releasebuffer__(PyArrayObject *__pyx_v_s
   __pyx_t_1 = (PyArray_HASFIELDS(__pyx_v_self) != 0);
   if (__pyx_t_1) {
 
-    /* "../../../DataAnalysis/Codes/TLPython37/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":339
+    /* "../../../Codes/TLPython3/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":339
  *         def __releasebuffer__(ndarray self, Py_buffer* info):
  *             if PyArray_HASFIELDS(self):
  *                 PyObject_Free(info.format)             # <<<<<<<<<<<<<<
@@ -31816,7 +31816,7 @@ static void __pyx_pf_5numpy_7ndarray_2__releasebuffer__(PyArrayObject *__pyx_v_s
  */
     PyObject_Free(__pyx_v_info->format);
 
-    /* "../../../DataAnalysis/Codes/TLPython37/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":338
+    /* "../../../Codes/TLPython3/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":338
  * 
  *         def __releasebuffer__(ndarray self, Py_buffer* info):
  *             if PyArray_HASFIELDS(self):             # <<<<<<<<<<<<<<
@@ -31825,7 +31825,7 @@ static void __pyx_pf_5numpy_7ndarray_2__releasebuffer__(PyArrayObject *__pyx_v_s
  */
   }
 
-  /* "../../../DataAnalysis/Codes/TLPython37/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":340
+  /* "../../../Codes/TLPython3/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":340
  *             if PyArray_HASFIELDS(self):
  *                 PyObject_Free(info.format)
  *             if sizeof(npy_intp) != sizeof(Py_ssize_t):             # <<<<<<<<<<<<<<
@@ -31835,7 +31835,7 @@ static void __pyx_pf_5numpy_7ndarray_2__releasebuffer__(PyArrayObject *__pyx_v_s
   __pyx_t_1 = (((sizeof(npy_intp)) != (sizeof(Py_ssize_t))) != 0);
   if (__pyx_t_1) {
 
-    /* "../../../DataAnalysis/Codes/TLPython37/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":341
+    /* "../../../Codes/TLPython3/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":341
  *                 PyObject_Free(info.format)
  *             if sizeof(npy_intp) != sizeof(Py_ssize_t):
  *                 PyObject_Free(info.strides)             # <<<<<<<<<<<<<<
@@ -31844,7 +31844,7 @@ static void __pyx_pf_5numpy_7ndarray_2__releasebuffer__(PyArrayObject *__pyx_v_s
  */
     PyObject_Free(__pyx_v_info->strides);
 
-    /* "../../../DataAnalysis/Codes/TLPython37/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":340
+    /* "../../../Codes/TLPython3/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":340
  *             if PyArray_HASFIELDS(self):
  *                 PyObject_Free(info.format)
  *             if sizeof(npy_intp) != sizeof(Py_ssize_t):             # <<<<<<<<<<<<<<
@@ -31853,7 +31853,7 @@ static void __pyx_pf_5numpy_7ndarray_2__releasebuffer__(PyArrayObject *__pyx_v_s
  */
   }
 
-  /* "../../../DataAnalysis/Codes/TLPython37/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":337
+  /* "../../../Codes/TLPython3/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":337
  *                 f[0] = c'\0' # Terminate format string
  * 
  *         def __releasebuffer__(ndarray self, Py_buffer* info):             # <<<<<<<<<<<<<<
@@ -31870,7 +31870,7 @@ static void __pyx_pf_5numpy_7ndarray_2__releasebuffer__(PyArrayObject *__pyx_v_s
   __Pyx_RefNannyFinishContext();
 }
 
-/* "../../../DataAnalysis/Codes/TLPython37/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":821
+/* "../../../Codes/TLPython3/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":821
  * ctypedef npy_cdouble     complex_t
  * 
  * cdef inline object PyArray_MultiIterNew1(a):             # <<<<<<<<<<<<<<
@@ -31886,7 +31886,7 @@ static CYTHON_INLINE PyObject *__pyx_f_5numpy_PyArray_MultiIterNew1(PyObject *__
   __Pyx_RefNannySetupContext("PyArray_MultiIterNew1", 0);
   __Pyx_TraceCall("PyArray_MultiIterNew1", __pyx_f[2], 821, 0, __PYX_ERR(2, 821, __pyx_L1_error));
 
-  /* "../../../DataAnalysis/Codes/TLPython37/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":822
+  /* "../../../Codes/TLPython3/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":822
  * 
  * cdef inline object PyArray_MultiIterNew1(a):
  *     return PyArray_MultiIterNew(1, <void*>a)             # <<<<<<<<<<<<<<
@@ -31900,7 +31900,7 @@ static CYTHON_INLINE PyObject *__pyx_f_5numpy_PyArray_MultiIterNew1(PyObject *__
   __pyx_t_1 = 0;
   goto __pyx_L0;
 
-  /* "../../../DataAnalysis/Codes/TLPython37/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":821
+  /* "../../../Codes/TLPython3/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":821
  * ctypedef npy_cdouble     complex_t
  * 
  * cdef inline object PyArray_MultiIterNew1(a):             # <<<<<<<<<<<<<<
@@ -31920,7 +31920,7 @@ static CYTHON_INLINE PyObject *__pyx_f_5numpy_PyArray_MultiIterNew1(PyObject *__
   return __pyx_r;
 }
 
-/* "../../../DataAnalysis/Codes/TLPython37/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":824
+/* "../../../Codes/TLPython3/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":824
  *     return PyArray_MultiIterNew(1, <void*>a)
  * 
  * cdef inline object PyArray_MultiIterNew2(a, b):             # <<<<<<<<<<<<<<
@@ -31936,7 +31936,7 @@ static CYTHON_INLINE PyObject *__pyx_f_5numpy_PyArray_MultiIterNew2(PyObject *__
   __Pyx_RefNannySetupContext("PyArray_MultiIterNew2", 0);
   __Pyx_TraceCall("PyArray_MultiIterNew2", __pyx_f[2], 824, 0, __PYX_ERR(2, 824, __pyx_L1_error));
 
-  /* "../../../DataAnalysis/Codes/TLPython37/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":825
+  /* "../../../Codes/TLPython3/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":825
  * 
  * cdef inline object PyArray_MultiIterNew2(a, b):
  *     return PyArray_MultiIterNew(2, <void*>a, <void*>b)             # <<<<<<<<<<<<<<
@@ -31950,7 +31950,7 @@ static CYTHON_INLINE PyObject *__pyx_f_5numpy_PyArray_MultiIterNew2(PyObject *__
   __pyx_t_1 = 0;
   goto __pyx_L0;
 
-  /* "../../../DataAnalysis/Codes/TLPython37/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":824
+  /* "../../../Codes/TLPython3/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":824
  *     return PyArray_MultiIterNew(1, <void*>a)
  * 
  * cdef inline object PyArray_MultiIterNew2(a, b):             # <<<<<<<<<<<<<<
@@ -31970,7 +31970,7 @@ static CYTHON_INLINE PyObject *__pyx_f_5numpy_PyArray_MultiIterNew2(PyObject *__
   return __pyx_r;
 }
 
-/* "../../../DataAnalysis/Codes/TLPython37/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":827
+/* "../../../Codes/TLPython3/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":827
  *     return PyArray_MultiIterNew(2, <void*>a, <void*>b)
  * 
  * cdef inline object PyArray_MultiIterNew3(a, b, c):             # <<<<<<<<<<<<<<
@@ -31986,7 +31986,7 @@ static CYTHON_INLINE PyObject *__pyx_f_5numpy_PyArray_MultiIterNew3(PyObject *__
   __Pyx_RefNannySetupContext("PyArray_MultiIterNew3", 0);
   __Pyx_TraceCall("PyArray_MultiIterNew3", __pyx_f[2], 827, 0, __PYX_ERR(2, 827, __pyx_L1_error));
 
-  /* "../../../DataAnalysis/Codes/TLPython37/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":828
+  /* "../../../Codes/TLPython3/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":828
  * 
  * cdef inline object PyArray_MultiIterNew3(a, b, c):
  *     return PyArray_MultiIterNew(3, <void*>a, <void*>b, <void*> c)             # <<<<<<<<<<<<<<
@@ -32000,7 +32000,7 @@ static CYTHON_INLINE PyObject *__pyx_f_5numpy_PyArray_MultiIterNew3(PyObject *__
   __pyx_t_1 = 0;
   goto __pyx_L0;
 
-  /* "../../../DataAnalysis/Codes/TLPython37/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":827
+  /* "../../../Codes/TLPython3/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":827
  *     return PyArray_MultiIterNew(2, <void*>a, <void*>b)
  * 
  * cdef inline object PyArray_MultiIterNew3(a, b, c):             # <<<<<<<<<<<<<<
@@ -32020,7 +32020,7 @@ static CYTHON_INLINE PyObject *__pyx_f_5numpy_PyArray_MultiIterNew3(PyObject *__
   return __pyx_r;
 }
 
-/* "../../../DataAnalysis/Codes/TLPython37/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":830
+/* "../../../Codes/TLPython3/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":830
  *     return PyArray_MultiIterNew(3, <void*>a, <void*>b, <void*> c)
  * 
  * cdef inline object PyArray_MultiIterNew4(a, b, c, d):             # <<<<<<<<<<<<<<
@@ -32036,7 +32036,7 @@ static CYTHON_INLINE PyObject *__pyx_f_5numpy_PyArray_MultiIterNew4(PyObject *__
   __Pyx_RefNannySetupContext("PyArray_MultiIterNew4", 0);
   __Pyx_TraceCall("PyArray_MultiIterNew4", __pyx_f[2], 830, 0, __PYX_ERR(2, 830, __pyx_L1_error));
 
-  /* "../../../DataAnalysis/Codes/TLPython37/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":831
+  /* "../../../Codes/TLPython3/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":831
  * 
  * cdef inline object PyArray_MultiIterNew4(a, b, c, d):
  *     return PyArray_MultiIterNew(4, <void*>a, <void*>b, <void*>c, <void*> d)             # <<<<<<<<<<<<<<
@@ -32050,7 +32050,7 @@ static CYTHON_INLINE PyObject *__pyx_f_5numpy_PyArray_MultiIterNew4(PyObject *__
   __pyx_t_1 = 0;
   goto __pyx_L0;
 
-  /* "../../../DataAnalysis/Codes/TLPython37/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":830
+  /* "../../../Codes/TLPython3/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":830
  *     return PyArray_MultiIterNew(3, <void*>a, <void*>b, <void*> c)
  * 
  * cdef inline object PyArray_MultiIterNew4(a, b, c, d):             # <<<<<<<<<<<<<<
@@ -32070,7 +32070,7 @@ static CYTHON_INLINE PyObject *__pyx_f_5numpy_PyArray_MultiIterNew4(PyObject *__
   return __pyx_r;
 }
 
-/* "../../../DataAnalysis/Codes/TLPython37/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":833
+/* "../../../Codes/TLPython3/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":833
  *     return PyArray_MultiIterNew(4, <void*>a, <void*>b, <void*>c, <void*> d)
  * 
  * cdef inline object PyArray_MultiIterNew5(a, b, c, d, e):             # <<<<<<<<<<<<<<
@@ -32086,7 +32086,7 @@ static CYTHON_INLINE PyObject *__pyx_f_5numpy_PyArray_MultiIterNew5(PyObject *__
   __Pyx_RefNannySetupContext("PyArray_MultiIterNew5", 0);
   __Pyx_TraceCall("PyArray_MultiIterNew5", __pyx_f[2], 833, 0, __PYX_ERR(2, 833, __pyx_L1_error));
 
-  /* "../../../DataAnalysis/Codes/TLPython37/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":834
+  /* "../../../Codes/TLPython3/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":834
  * 
  * cdef inline object PyArray_MultiIterNew5(a, b, c, d, e):
  *     return PyArray_MultiIterNew(5, <void*>a, <void*>b, <void*>c, <void*> d, <void*> e)             # <<<<<<<<<<<<<<
@@ -32100,7 +32100,7 @@ static CYTHON_INLINE PyObject *__pyx_f_5numpy_PyArray_MultiIterNew5(PyObject *__
   __pyx_t_1 = 0;
   goto __pyx_L0;
 
-  /* "../../../DataAnalysis/Codes/TLPython37/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":833
+  /* "../../../Codes/TLPython3/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":833
  *     return PyArray_MultiIterNew(4, <void*>a, <void*>b, <void*>c, <void*> d)
  * 
  * cdef inline object PyArray_MultiIterNew5(a, b, c, d, e):             # <<<<<<<<<<<<<<
@@ -32120,7 +32120,7 @@ static CYTHON_INLINE PyObject *__pyx_f_5numpy_PyArray_MultiIterNew5(PyObject *__
   return __pyx_r;
 }
 
-/* "../../../DataAnalysis/Codes/TLPython37/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":836
+/* "../../../Codes/TLPython3/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":836
  *     return PyArray_MultiIterNew(5, <void*>a, <void*>b, <void*>c, <void*> d, <void*> e)
  * 
  * cdef inline tuple PyDataType_SHAPE(dtype d):             # <<<<<<<<<<<<<<
@@ -32136,7 +32136,7 @@ static CYTHON_INLINE PyObject *__pyx_f_5numpy_PyDataType_SHAPE(PyArray_Descr *__
   __Pyx_RefNannySetupContext("PyDataType_SHAPE", 0);
   __Pyx_TraceCall("PyDataType_SHAPE", __pyx_f[2], 836, 0, __PYX_ERR(2, 836, __pyx_L1_error));
 
-  /* "../../../DataAnalysis/Codes/TLPython37/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":837
+  /* "../../../Codes/TLPython3/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":837
  * 
  * cdef inline tuple PyDataType_SHAPE(dtype d):
  *     if PyDataType_HASSUBARRAY(d):             # <<<<<<<<<<<<<<
@@ -32146,7 +32146,7 @@ static CYTHON_INLINE PyObject *__pyx_f_5numpy_PyDataType_SHAPE(PyArray_Descr *__
   __pyx_t_1 = (PyDataType_HASSUBARRAY(__pyx_v_d) != 0);
   if (__pyx_t_1) {
 
-    /* "../../../DataAnalysis/Codes/TLPython37/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":838
+    /* "../../../Codes/TLPython3/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":838
  * cdef inline tuple PyDataType_SHAPE(dtype d):
  *     if PyDataType_HASSUBARRAY(d):
  *         return <tuple>d.subarray.shape             # <<<<<<<<<<<<<<
@@ -32158,7 +32158,7 @@ static CYTHON_INLINE PyObject *__pyx_f_5numpy_PyDataType_SHAPE(PyArray_Descr *__
     __pyx_r = ((PyObject*)__pyx_v_d->subarray->shape);
     goto __pyx_L0;
 
-    /* "../../../DataAnalysis/Codes/TLPython37/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":837
+    /* "../../../Codes/TLPython3/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":837
  * 
  * cdef inline tuple PyDataType_SHAPE(dtype d):
  *     if PyDataType_HASSUBARRAY(d):             # <<<<<<<<<<<<<<
@@ -32167,7 +32167,7 @@ static CYTHON_INLINE PyObject *__pyx_f_5numpy_PyDataType_SHAPE(PyArray_Descr *__
  */
   }
 
-  /* "../../../DataAnalysis/Codes/TLPython37/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":840
+  /* "../../../Codes/TLPython3/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":840
  *         return <tuple>d.subarray.shape
  *     else:
  *         return ()             # <<<<<<<<<<<<<<
@@ -32181,7 +32181,7 @@ static CYTHON_INLINE PyObject *__pyx_f_5numpy_PyDataType_SHAPE(PyArray_Descr *__
     goto __pyx_L0;
   }
 
-  /* "../../../DataAnalysis/Codes/TLPython37/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":836
+  /* "../../../Codes/TLPython3/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":836
  *     return PyArray_MultiIterNew(5, <void*>a, <void*>b, <void*>c, <void*> d, <void*> e)
  * 
  * cdef inline tuple PyDataType_SHAPE(dtype d):             # <<<<<<<<<<<<<<
@@ -32200,7 +32200,7 @@ static CYTHON_INLINE PyObject *__pyx_f_5numpy_PyDataType_SHAPE(PyArray_Descr *__
   return __pyx_r;
 }
 
-/* "../../../DataAnalysis/Codes/TLPython37/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":842
+/* "../../../Codes/TLPython3/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":842
  *         return ()
  * 
  * cdef inline char* _util_dtypestring(dtype descr, char* f, char* end, int* offset) except NULL:             # <<<<<<<<<<<<<<
@@ -32231,7 +32231,7 @@ static CYTHON_INLINE char *__pyx_f_5numpy__util_dtypestring(PyArray_Descr *__pyx
   __Pyx_RefNannySetupContext("_util_dtypestring", 0);
   __Pyx_TraceCall("_util_dtypestring", __pyx_f[2], 842, 0, __PYX_ERR(2, 842, __pyx_L1_error));
 
-  /* "../../../DataAnalysis/Codes/TLPython37/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":847
+  /* "../../../Codes/TLPython3/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":847
  * 
  *     cdef dtype child
  *     cdef int endian_detector = 1             # <<<<<<<<<<<<<<
@@ -32240,7 +32240,7 @@ static CYTHON_INLINE char *__pyx_f_5numpy__util_dtypestring(PyArray_Descr *__pyx
  */
   __pyx_v_endian_detector = 1;
 
-  /* "../../../DataAnalysis/Codes/TLPython37/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":848
+  /* "../../../Codes/TLPython3/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":848
  *     cdef dtype child
  *     cdef int endian_detector = 1
  *     cdef bint little_endian = ((<char*>&endian_detector)[0] != 0)             # <<<<<<<<<<<<<<
@@ -32249,7 +32249,7 @@ static CYTHON_INLINE char *__pyx_f_5numpy__util_dtypestring(PyArray_Descr *__pyx
  */
   __pyx_v_little_endian = ((((char *)(&__pyx_v_endian_detector))[0]) != 0);
 
-  /* "../../../DataAnalysis/Codes/TLPython37/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":851
+  /* "../../../Codes/TLPython3/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":851
  *     cdef tuple fields
  * 
  *     for childname in descr.names:             # <<<<<<<<<<<<<<
@@ -32272,7 +32272,7 @@ static CYTHON_INLINE char *__pyx_f_5numpy__util_dtypestring(PyArray_Descr *__pyx
     __Pyx_XDECREF_SET(__pyx_v_childname, __pyx_t_3);
     __pyx_t_3 = 0;
 
-    /* "../../../DataAnalysis/Codes/TLPython37/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":852
+    /* "../../../Codes/TLPython3/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":852
  * 
  *     for childname in descr.names:
  *         fields = descr.fields[childname]             # <<<<<<<<<<<<<<
@@ -32289,7 +32289,7 @@ static CYTHON_INLINE char *__pyx_f_5numpy__util_dtypestring(PyArray_Descr *__pyx
     __Pyx_XDECREF_SET(__pyx_v_fields, ((PyObject*)__pyx_t_3));
     __pyx_t_3 = 0;
 
-    /* "../../../DataAnalysis/Codes/TLPython37/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":853
+    /* "../../../Codes/TLPython3/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":853
  *     for childname in descr.names:
  *         fields = descr.fields[childname]
  *         child, new_offset = fields             # <<<<<<<<<<<<<<
@@ -32324,7 +32324,7 @@ static CYTHON_INLINE char *__pyx_f_5numpy__util_dtypestring(PyArray_Descr *__pyx
     __Pyx_XDECREF_SET(__pyx_v_new_offset, __pyx_t_4);
     __pyx_t_4 = 0;
 
-    /* "../../../DataAnalysis/Codes/TLPython37/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":855
+    /* "../../../Codes/TLPython3/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":855
  *         child, new_offset = fields
  * 
  *         if (end - f) - <int>(new_offset - offset[0]) < 15:             # <<<<<<<<<<<<<<
@@ -32341,7 +32341,7 @@ static CYTHON_INLINE char *__pyx_f_5numpy__util_dtypestring(PyArray_Descr *__pyx
     __pyx_t_6 = ((((__pyx_v_end - __pyx_v_f) - ((int)__pyx_t_5)) < 15) != 0);
     if (unlikely(__pyx_t_6)) {
 
-      /* "../../../DataAnalysis/Codes/TLPython37/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":856
+      /* "../../../Codes/TLPython3/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":856
  * 
  *         if (end - f) - <int>(new_offset - offset[0]) < 15:
  *             raise RuntimeError(u"Format string allocated too short, see comment in numpy.pxd")             # <<<<<<<<<<<<<<
@@ -32354,7 +32354,7 @@ static CYTHON_INLINE char *__pyx_f_5numpy__util_dtypestring(PyArray_Descr *__pyx
       __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
       __PYX_ERR(2, 856, __pyx_L1_error)
 
-      /* "../../../DataAnalysis/Codes/TLPython37/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":855
+      /* "../../../Codes/TLPython3/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":855
  *         child, new_offset = fields
  * 
  *         if (end - f) - <int>(new_offset - offset[0]) < 15:             # <<<<<<<<<<<<<<
@@ -32363,7 +32363,7 @@ static CYTHON_INLINE char *__pyx_f_5numpy__util_dtypestring(PyArray_Descr *__pyx
  */
     }
 
-    /* "../../../DataAnalysis/Codes/TLPython37/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":858
+    /* "../../../Codes/TLPython3/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":858
  *             raise RuntimeError(u"Format string allocated too short, see comment in numpy.pxd")
  * 
  *         if ((child.byteorder == c'>' and little_endian) or             # <<<<<<<<<<<<<<
@@ -32383,7 +32383,7 @@ static CYTHON_INLINE char *__pyx_f_5numpy__util_dtypestring(PyArray_Descr *__pyx
     }
     __pyx_L8_next_or:;
 
-    /* "../../../DataAnalysis/Codes/TLPython37/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":859
+    /* "../../../Codes/TLPython3/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":859
  * 
  *         if ((child.byteorder == c'>' and little_endian) or
  *             (child.byteorder == c'<' and not little_endian)):             # <<<<<<<<<<<<<<
@@ -32400,7 +32400,7 @@ static CYTHON_INLINE char *__pyx_f_5numpy__util_dtypestring(PyArray_Descr *__pyx
     __pyx_t_6 = __pyx_t_7;
     __pyx_L7_bool_binop_done:;
 
-    /* "../../../DataAnalysis/Codes/TLPython37/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":858
+    /* "../../../Codes/TLPython3/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":858
  *             raise RuntimeError(u"Format string allocated too short, see comment in numpy.pxd")
  * 
  *         if ((child.byteorder == c'>' and little_endian) or             # <<<<<<<<<<<<<<
@@ -32409,7 +32409,7 @@ static CYTHON_INLINE char *__pyx_f_5numpy__util_dtypestring(PyArray_Descr *__pyx
  */
     if (unlikely(__pyx_t_6)) {
 
-      /* "../../../DataAnalysis/Codes/TLPython37/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":860
+      /* "../../../Codes/TLPython3/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":860
  *         if ((child.byteorder == c'>' and little_endian) or
  *             (child.byteorder == c'<' and not little_endian)):
  *             raise ValueError(u"Non-native byte order not supported")             # <<<<<<<<<<<<<<
@@ -32422,7 +32422,7 @@ static CYTHON_INLINE char *__pyx_f_5numpy__util_dtypestring(PyArray_Descr *__pyx
       __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
       __PYX_ERR(2, 860, __pyx_L1_error)
 
-      /* "../../../DataAnalysis/Codes/TLPython37/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":858
+      /* "../../../Codes/TLPython3/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":858
  *             raise RuntimeError(u"Format string allocated too short, see comment in numpy.pxd")
  * 
  *         if ((child.byteorder == c'>' and little_endian) or             # <<<<<<<<<<<<<<
@@ -32431,7 +32431,7 @@ static CYTHON_INLINE char *__pyx_f_5numpy__util_dtypestring(PyArray_Descr *__pyx
  */
     }
 
-    /* "../../../DataAnalysis/Codes/TLPython37/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":870
+    /* "../../../Codes/TLPython3/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":870
  * 
  *         # Output padding bytes
  *         while offset[0] < new_offset:             # <<<<<<<<<<<<<<
@@ -32447,7 +32447,7 @@ static CYTHON_INLINE char *__pyx_f_5numpy__util_dtypestring(PyArray_Descr *__pyx
       __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
       if (!__pyx_t_6) break;
 
-      /* "../../../DataAnalysis/Codes/TLPython37/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":871
+      /* "../../../Codes/TLPython3/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":871
  *         # Output padding bytes
  *         while offset[0] < new_offset:
  *             f[0] = 120 # "x"; pad byte             # <<<<<<<<<<<<<<
@@ -32456,7 +32456,7 @@ static CYTHON_INLINE char *__pyx_f_5numpy__util_dtypestring(PyArray_Descr *__pyx
  */
       (__pyx_v_f[0]) = 0x78;
 
-      /* "../../../DataAnalysis/Codes/TLPython37/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":872
+      /* "../../../Codes/TLPython3/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":872
  *         while offset[0] < new_offset:
  *             f[0] = 120 # "x"; pad byte
  *             f += 1             # <<<<<<<<<<<<<<
@@ -32465,7 +32465,7 @@ static CYTHON_INLINE char *__pyx_f_5numpy__util_dtypestring(PyArray_Descr *__pyx
  */
       __pyx_v_f = (__pyx_v_f + 1);
 
-      /* "../../../DataAnalysis/Codes/TLPython37/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":873
+      /* "../../../Codes/TLPython3/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":873
  *             f[0] = 120 # "x"; pad byte
  *             f += 1
  *             offset[0] += 1             # <<<<<<<<<<<<<<
@@ -32476,7 +32476,7 @@ static CYTHON_INLINE char *__pyx_f_5numpy__util_dtypestring(PyArray_Descr *__pyx
       (__pyx_v_offset[__pyx_t_8]) = ((__pyx_v_offset[__pyx_t_8]) + 1);
     }
 
-    /* "../../../DataAnalysis/Codes/TLPython37/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":875
+    /* "../../../Codes/TLPython3/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":875
  *             offset[0] += 1
  * 
  *         offset[0] += child.itemsize             # <<<<<<<<<<<<<<
@@ -32486,7 +32486,7 @@ static CYTHON_INLINE char *__pyx_f_5numpy__util_dtypestring(PyArray_Descr *__pyx
     __pyx_t_8 = 0;
     (__pyx_v_offset[__pyx_t_8]) = ((__pyx_v_offset[__pyx_t_8]) + __pyx_v_child->elsize);
 
-    /* "../../../DataAnalysis/Codes/TLPython37/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":877
+    /* "../../../Codes/TLPython3/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":877
  *         offset[0] += child.itemsize
  * 
  *         if not PyDataType_HASFIELDS(child):             # <<<<<<<<<<<<<<
@@ -32496,7 +32496,7 @@ static CYTHON_INLINE char *__pyx_f_5numpy__util_dtypestring(PyArray_Descr *__pyx
     __pyx_t_6 = ((!(PyDataType_HASFIELDS(__pyx_v_child) != 0)) != 0);
     if (__pyx_t_6) {
 
-      /* "../../../DataAnalysis/Codes/TLPython37/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":878
+      /* "../../../Codes/TLPython3/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":878
  * 
  *         if not PyDataType_HASFIELDS(child):
  *             t = child.type_num             # <<<<<<<<<<<<<<
@@ -32508,7 +32508,7 @@ static CYTHON_INLINE char *__pyx_f_5numpy__util_dtypestring(PyArray_Descr *__pyx
       __Pyx_XDECREF_SET(__pyx_v_t, __pyx_t_4);
       __pyx_t_4 = 0;
 
-      /* "../../../DataAnalysis/Codes/TLPython37/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":879
+      /* "../../../Codes/TLPython3/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":879
  *         if not PyDataType_HASFIELDS(child):
  *             t = child.type_num
  *             if end - f < 5:             # <<<<<<<<<<<<<<
@@ -32518,7 +32518,7 @@ static CYTHON_INLINE char *__pyx_f_5numpy__util_dtypestring(PyArray_Descr *__pyx
       __pyx_t_6 = (((__pyx_v_end - __pyx_v_f) < 5) != 0);
       if (unlikely(__pyx_t_6)) {
 
-        /* "../../../DataAnalysis/Codes/TLPython37/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":880
+        /* "../../../Codes/TLPython3/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":880
  *             t = child.type_num
  *             if end - f < 5:
  *                 raise RuntimeError(u"Format string allocated too short.")             # <<<<<<<<<<<<<<
@@ -32531,7 +32531,7 @@ static CYTHON_INLINE char *__pyx_f_5numpy__util_dtypestring(PyArray_Descr *__pyx
         __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
         __PYX_ERR(2, 880, __pyx_L1_error)
 
-        /* "../../../DataAnalysis/Codes/TLPython37/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":879
+        /* "../../../Codes/TLPython3/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":879
  *         if not PyDataType_HASFIELDS(child):
  *             t = child.type_num
  *             if end - f < 5:             # <<<<<<<<<<<<<<
@@ -32540,7 +32540,7 @@ static CYTHON_INLINE char *__pyx_f_5numpy__util_dtypestring(PyArray_Descr *__pyx
  */
       }
 
-      /* "../../../DataAnalysis/Codes/TLPython37/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":883
+      /* "../../../Codes/TLPython3/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":883
  * 
  *             # Until ticket #99 is fixed, use integers to avoid warnings
  *             if   t == NPY_BYTE:        f[0] =  98 #"b"             # <<<<<<<<<<<<<<
@@ -32558,7 +32558,7 @@ static CYTHON_INLINE char *__pyx_f_5numpy__util_dtypestring(PyArray_Descr *__pyx
         goto __pyx_L15;
       }
 
-      /* "../../../DataAnalysis/Codes/TLPython37/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":884
+      /* "../../../Codes/TLPython3/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":884
  *             # Until ticket #99 is fixed, use integers to avoid warnings
  *             if   t == NPY_BYTE:        f[0] =  98 #"b"
  *             elif t == NPY_UBYTE:       f[0] =  66 #"B"             # <<<<<<<<<<<<<<
@@ -32576,7 +32576,7 @@ static CYTHON_INLINE char *__pyx_f_5numpy__util_dtypestring(PyArray_Descr *__pyx
         goto __pyx_L15;
       }
 
-      /* "../../../DataAnalysis/Codes/TLPython37/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":885
+      /* "../../../Codes/TLPython3/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":885
  *             if   t == NPY_BYTE:        f[0] =  98 #"b"
  *             elif t == NPY_UBYTE:       f[0] =  66 #"B"
  *             elif t == NPY_SHORT:       f[0] = 104 #"h"             # <<<<<<<<<<<<<<
@@ -32594,7 +32594,7 @@ static CYTHON_INLINE char *__pyx_f_5numpy__util_dtypestring(PyArray_Descr *__pyx
         goto __pyx_L15;
       }
 
-      /* "../../../DataAnalysis/Codes/TLPython37/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":886
+      /* "../../../Codes/TLPython3/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":886
  *             elif t == NPY_UBYTE:       f[0] =  66 #"B"
  *             elif t == NPY_SHORT:       f[0] = 104 #"h"
  *             elif t == NPY_USHORT:      f[0] =  72 #"H"             # <<<<<<<<<<<<<<
@@ -32612,7 +32612,7 @@ static CYTHON_INLINE char *__pyx_f_5numpy__util_dtypestring(PyArray_Descr *__pyx
         goto __pyx_L15;
       }
 
-      /* "../../../DataAnalysis/Codes/TLPython37/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":887
+      /* "../../../Codes/TLPython3/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":887
  *             elif t == NPY_SHORT:       f[0] = 104 #"h"
  *             elif t == NPY_USHORT:      f[0] =  72 #"H"
  *             elif t == NPY_INT:         f[0] = 105 #"i"             # <<<<<<<<<<<<<<
@@ -32630,7 +32630,7 @@ static CYTHON_INLINE char *__pyx_f_5numpy__util_dtypestring(PyArray_Descr *__pyx
         goto __pyx_L15;
       }
 
-      /* "../../../DataAnalysis/Codes/TLPython37/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":888
+      /* "../../../Codes/TLPython3/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":888
  *             elif t == NPY_USHORT:      f[0] =  72 #"H"
  *             elif t == NPY_INT:         f[0] = 105 #"i"
  *             elif t == NPY_UINT:        f[0] =  73 #"I"             # <<<<<<<<<<<<<<
@@ -32648,7 +32648,7 @@ static CYTHON_INLINE char *__pyx_f_5numpy__util_dtypestring(PyArray_Descr *__pyx
         goto __pyx_L15;
       }
 
-      /* "../../../DataAnalysis/Codes/TLPython37/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":889
+      /* "../../../Codes/TLPython3/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":889
  *             elif t == NPY_INT:         f[0] = 105 #"i"
  *             elif t == NPY_UINT:        f[0] =  73 #"I"
  *             elif t == NPY_LONG:        f[0] = 108 #"l"             # <<<<<<<<<<<<<<
@@ -32666,7 +32666,7 @@ static CYTHON_INLINE char *__pyx_f_5numpy__util_dtypestring(PyArray_Descr *__pyx
         goto __pyx_L15;
       }
 
-      /* "../../../DataAnalysis/Codes/TLPython37/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":890
+      /* "../../../Codes/TLPython3/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":890
  *             elif t == NPY_UINT:        f[0] =  73 #"I"
  *             elif t == NPY_LONG:        f[0] = 108 #"l"
  *             elif t == NPY_ULONG:       f[0] = 76  #"L"             # <<<<<<<<<<<<<<
@@ -32684,7 +32684,7 @@ static CYTHON_INLINE char *__pyx_f_5numpy__util_dtypestring(PyArray_Descr *__pyx
         goto __pyx_L15;
       }
 
-      /* "../../../DataAnalysis/Codes/TLPython37/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":891
+      /* "../../../Codes/TLPython3/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":891
  *             elif t == NPY_LONG:        f[0] = 108 #"l"
  *             elif t == NPY_ULONG:       f[0] = 76  #"L"
  *             elif t == NPY_LONGLONG:    f[0] = 113 #"q"             # <<<<<<<<<<<<<<
@@ -32702,7 +32702,7 @@ static CYTHON_INLINE char *__pyx_f_5numpy__util_dtypestring(PyArray_Descr *__pyx
         goto __pyx_L15;
       }
 
-      /* "../../../DataAnalysis/Codes/TLPython37/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":892
+      /* "../../../Codes/TLPython3/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":892
  *             elif t == NPY_ULONG:       f[0] = 76  #"L"
  *             elif t == NPY_LONGLONG:    f[0] = 113 #"q"
  *             elif t == NPY_ULONGLONG:   f[0] = 81  #"Q"             # <<<<<<<<<<<<<<
@@ -32720,7 +32720,7 @@ static CYTHON_INLINE char *__pyx_f_5numpy__util_dtypestring(PyArray_Descr *__pyx
         goto __pyx_L15;
       }
 
-      /* "../../../DataAnalysis/Codes/TLPython37/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":893
+      /* "../../../Codes/TLPython3/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":893
  *             elif t == NPY_LONGLONG:    f[0] = 113 #"q"
  *             elif t == NPY_ULONGLONG:   f[0] = 81  #"Q"
  *             elif t == NPY_FLOAT:       f[0] = 102 #"f"             # <<<<<<<<<<<<<<
@@ -32738,7 +32738,7 @@ static CYTHON_INLINE char *__pyx_f_5numpy__util_dtypestring(PyArray_Descr *__pyx
         goto __pyx_L15;
       }
 
-      /* "../../../DataAnalysis/Codes/TLPython37/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":894
+      /* "../../../Codes/TLPython3/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":894
  *             elif t == NPY_ULONGLONG:   f[0] = 81  #"Q"
  *             elif t == NPY_FLOAT:       f[0] = 102 #"f"
  *             elif t == NPY_DOUBLE:      f[0] = 100 #"d"             # <<<<<<<<<<<<<<
@@ -32756,7 +32756,7 @@ static CYTHON_INLINE char *__pyx_f_5numpy__util_dtypestring(PyArray_Descr *__pyx
         goto __pyx_L15;
       }
 
-      /* "../../../DataAnalysis/Codes/TLPython37/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":895
+      /* "../../../Codes/TLPython3/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":895
  *             elif t == NPY_FLOAT:       f[0] = 102 #"f"
  *             elif t == NPY_DOUBLE:      f[0] = 100 #"d"
  *             elif t == NPY_LONGDOUBLE:  f[0] = 103 #"g"             # <<<<<<<<<<<<<<
@@ -32774,7 +32774,7 @@ static CYTHON_INLINE char *__pyx_f_5numpy__util_dtypestring(PyArray_Descr *__pyx
         goto __pyx_L15;
       }
 
-      /* "../../../DataAnalysis/Codes/TLPython37/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":896
+      /* "../../../Codes/TLPython3/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":896
  *             elif t == NPY_DOUBLE:      f[0] = 100 #"d"
  *             elif t == NPY_LONGDOUBLE:  f[0] = 103 #"g"
  *             elif t == NPY_CFLOAT:      f[0] = 90; f[1] = 102; f += 1 # Zf             # <<<<<<<<<<<<<<
@@ -32794,7 +32794,7 @@ static CYTHON_INLINE char *__pyx_f_5numpy__util_dtypestring(PyArray_Descr *__pyx
         goto __pyx_L15;
       }
 
-      /* "../../../DataAnalysis/Codes/TLPython37/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":897
+      /* "../../../Codes/TLPython3/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":897
  *             elif t == NPY_LONGDOUBLE:  f[0] = 103 #"g"
  *             elif t == NPY_CFLOAT:      f[0] = 90; f[1] = 102; f += 1 # Zf
  *             elif t == NPY_CDOUBLE:     f[0] = 90; f[1] = 100; f += 1 # Zd             # <<<<<<<<<<<<<<
@@ -32814,7 +32814,7 @@ static CYTHON_INLINE char *__pyx_f_5numpy__util_dtypestring(PyArray_Descr *__pyx
         goto __pyx_L15;
       }
 
-      /* "../../../DataAnalysis/Codes/TLPython37/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":898
+      /* "../../../Codes/TLPython3/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":898
  *             elif t == NPY_CFLOAT:      f[0] = 90; f[1] = 102; f += 1 # Zf
  *             elif t == NPY_CDOUBLE:     f[0] = 90; f[1] = 100; f += 1 # Zd
  *             elif t == NPY_CLONGDOUBLE: f[0] = 90; f[1] = 103; f += 1 # Zg             # <<<<<<<<<<<<<<
@@ -32834,7 +32834,7 @@ static CYTHON_INLINE char *__pyx_f_5numpy__util_dtypestring(PyArray_Descr *__pyx
         goto __pyx_L15;
       }
 
-      /* "../../../DataAnalysis/Codes/TLPython37/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":899
+      /* "../../../Codes/TLPython3/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":899
  *             elif t == NPY_CDOUBLE:     f[0] = 90; f[1] = 100; f += 1 # Zd
  *             elif t == NPY_CLONGDOUBLE: f[0] = 90; f[1] = 103; f += 1 # Zg
  *             elif t == NPY_OBJECT:      f[0] = 79 #"O"             # <<<<<<<<<<<<<<
@@ -32852,7 +32852,7 @@ static CYTHON_INLINE char *__pyx_f_5numpy__util_dtypestring(PyArray_Descr *__pyx
         goto __pyx_L15;
       }
 
-      /* "../../../DataAnalysis/Codes/TLPython37/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":901
+      /* "../../../Codes/TLPython3/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":901
  *             elif t == NPY_OBJECT:      f[0] = 79 #"O"
  *             else:
  *                 raise ValueError(u"unknown dtype code in numpy.pxd (%d)" % t)             # <<<<<<<<<<<<<<
@@ -32871,7 +32871,7 @@ static CYTHON_INLINE char *__pyx_f_5numpy__util_dtypestring(PyArray_Descr *__pyx
       }
       __pyx_L15:;
 
-      /* "../../../DataAnalysis/Codes/TLPython37/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":902
+      /* "../../../Codes/TLPython3/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":902
  *             else:
  *                 raise ValueError(u"unknown dtype code in numpy.pxd (%d)" % t)
  *             f += 1             # <<<<<<<<<<<<<<
@@ -32880,7 +32880,7 @@ static CYTHON_INLINE char *__pyx_f_5numpy__util_dtypestring(PyArray_Descr *__pyx
  */
       __pyx_v_f = (__pyx_v_f + 1);
 
-      /* "../../../DataAnalysis/Codes/TLPython37/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":877
+      /* "../../../Codes/TLPython3/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":877
  *         offset[0] += child.itemsize
  * 
  *         if not PyDataType_HASFIELDS(child):             # <<<<<<<<<<<<<<
@@ -32890,7 +32890,7 @@ static CYTHON_INLINE char *__pyx_f_5numpy__util_dtypestring(PyArray_Descr *__pyx
       goto __pyx_L13;
     }
 
-    /* "../../../DataAnalysis/Codes/TLPython37/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":906
+    /* "../../../Codes/TLPython3/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":906
  *             # Cython ignores struct boundary information ("T{...}"),
  *             # so don't output it
  *             f = _util_dtypestring(child, f, end, offset)             # <<<<<<<<<<<<<<
@@ -32903,7 +32903,7 @@ static CYTHON_INLINE char *__pyx_f_5numpy__util_dtypestring(PyArray_Descr *__pyx
     }
     __pyx_L13:;
 
-    /* "../../../DataAnalysis/Codes/TLPython37/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":851
+    /* "../../../Codes/TLPython3/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":851
  *     cdef tuple fields
  * 
  *     for childname in descr.names:             # <<<<<<<<<<<<<<
@@ -32913,7 +32913,7 @@ static CYTHON_INLINE char *__pyx_f_5numpy__util_dtypestring(PyArray_Descr *__pyx
   }
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-  /* "../../../DataAnalysis/Codes/TLPython37/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":907
+  /* "../../../Codes/TLPython3/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":907
  *             # so don't output it
  *             f = _util_dtypestring(child, f, end, offset)
  *     return f             # <<<<<<<<<<<<<<
@@ -32923,7 +32923,7 @@ static CYTHON_INLINE char *__pyx_f_5numpy__util_dtypestring(PyArray_Descr *__pyx
   __pyx_r = __pyx_v_f;
   goto __pyx_L0;
 
-  /* "../../../DataAnalysis/Codes/TLPython37/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":842
+  /* "../../../Codes/TLPython3/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":842
  *         return ()
  * 
  * cdef inline char* _util_dtypestring(dtype descr, char* f, char* end, int* offset) except NULL:             # <<<<<<<<<<<<<<
@@ -32949,7 +32949,7 @@ static CYTHON_INLINE char *__pyx_f_5numpy__util_dtypestring(PyArray_Descr *__pyx
   return __pyx_r;
 }
 
-/* "../../../DataAnalysis/Codes/TLPython37/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":1022
+/* "../../../Codes/TLPython3/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":1022
  *     int _import_umath() except -1
  * 
  * cdef inline void set_array_base(ndarray arr, object base):             # <<<<<<<<<<<<<<
@@ -32963,7 +32963,7 @@ static CYTHON_INLINE void __pyx_f_5numpy_set_array_base(PyArrayObject *__pyx_v_a
   __Pyx_RefNannySetupContext("set_array_base", 0);
   __Pyx_TraceCall("set_array_base", __pyx_f[2], 1022, 0, __PYX_ERR(2, 1022, __pyx_L1_error));
 
-  /* "../../../DataAnalysis/Codes/TLPython37/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":1023
+  /* "../../../Codes/TLPython3/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":1023
  * 
  * cdef inline void set_array_base(ndarray arr, object base):
  *     Py_INCREF(base) # important to do this before stealing the reference below!             # <<<<<<<<<<<<<<
@@ -32972,7 +32972,7 @@ static CYTHON_INLINE void __pyx_f_5numpy_set_array_base(PyArrayObject *__pyx_v_a
  */
   Py_INCREF(__pyx_v_base);
 
-  /* "../../../DataAnalysis/Codes/TLPython37/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":1024
+  /* "../../../Codes/TLPython3/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":1024
  * cdef inline void set_array_base(ndarray arr, object base):
  *     Py_INCREF(base) # important to do this before stealing the reference below!
  *     PyArray_SetBaseObject(arr, base)             # <<<<<<<<<<<<<<
@@ -32981,7 +32981,7 @@ static CYTHON_INLINE void __pyx_f_5numpy_set_array_base(PyArrayObject *__pyx_v_a
  */
   (void)(PyArray_SetBaseObject(__pyx_v_arr, __pyx_v_base));
 
-  /* "../../../DataAnalysis/Codes/TLPython37/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":1022
+  /* "../../../Codes/TLPython3/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":1022
  *     int _import_umath() except -1
  * 
  * cdef inline void set_array_base(ndarray arr, object base):             # <<<<<<<<<<<<<<
@@ -32998,7 +32998,7 @@ static CYTHON_INLINE void __pyx_f_5numpy_set_array_base(PyArrayObject *__pyx_v_a
   __Pyx_RefNannyFinishContext();
 }
 
-/* "../../../DataAnalysis/Codes/TLPython37/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":1026
+/* "../../../Codes/TLPython3/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":1026
  *     PyArray_SetBaseObject(arr, base)
  * 
  * cdef inline object get_array_base(ndarray arr):             # <<<<<<<<<<<<<<
@@ -33015,7 +33015,7 @@ static CYTHON_INLINE PyObject *__pyx_f_5numpy_get_array_base(PyArrayObject *__py
   __Pyx_RefNannySetupContext("get_array_base", 0);
   __Pyx_TraceCall("get_array_base", __pyx_f[2], 1026, 0, __PYX_ERR(2, 1026, __pyx_L1_error));
 
-  /* "../../../DataAnalysis/Codes/TLPython37/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":1027
+  /* "../../../Codes/TLPython3/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":1027
  * 
  * cdef inline object get_array_base(ndarray arr):
  *     base = PyArray_BASE(arr)             # <<<<<<<<<<<<<<
@@ -33024,7 +33024,7 @@ static CYTHON_INLINE PyObject *__pyx_f_5numpy_get_array_base(PyArrayObject *__py
  */
   __pyx_v_base = PyArray_BASE(__pyx_v_arr);
 
-  /* "../../../DataAnalysis/Codes/TLPython37/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":1028
+  /* "../../../Codes/TLPython3/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":1028
  * cdef inline object get_array_base(ndarray arr):
  *     base = PyArray_BASE(arr)
  *     if base is NULL:             # <<<<<<<<<<<<<<
@@ -33034,7 +33034,7 @@ static CYTHON_INLINE PyObject *__pyx_f_5numpy_get_array_base(PyArrayObject *__py
   __pyx_t_1 = ((__pyx_v_base == NULL) != 0);
   if (__pyx_t_1) {
 
-    /* "../../../DataAnalysis/Codes/TLPython37/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":1029
+    /* "../../../Codes/TLPython3/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":1029
  *     base = PyArray_BASE(arr)
  *     if base is NULL:
  *         return None             # <<<<<<<<<<<<<<
@@ -33045,7 +33045,7 @@ static CYTHON_INLINE PyObject *__pyx_f_5numpy_get_array_base(PyArrayObject *__py
     __pyx_r = Py_None; __Pyx_INCREF(Py_None);
     goto __pyx_L0;
 
-    /* "../../../DataAnalysis/Codes/TLPython37/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":1028
+    /* "../../../Codes/TLPython3/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":1028
  * cdef inline object get_array_base(ndarray arr):
  *     base = PyArray_BASE(arr)
  *     if base is NULL:             # <<<<<<<<<<<<<<
@@ -33054,7 +33054,7 @@ static CYTHON_INLINE PyObject *__pyx_f_5numpy_get_array_base(PyArrayObject *__py
  */
   }
 
-  /* "../../../DataAnalysis/Codes/TLPython37/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":1030
+  /* "../../../Codes/TLPython3/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":1030
  *     if base is NULL:
  *         return None
  *     return <object>base             # <<<<<<<<<<<<<<
@@ -33066,7 +33066,7 @@ static CYTHON_INLINE PyObject *__pyx_f_5numpy_get_array_base(PyArrayObject *__py
   __pyx_r = ((PyObject *)__pyx_v_base);
   goto __pyx_L0;
 
-  /* "../../../DataAnalysis/Codes/TLPython37/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":1026
+  /* "../../../Codes/TLPython3/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":1026
  *     PyArray_SetBaseObject(arr, base)
  * 
  * cdef inline object get_array_base(ndarray arr):             # <<<<<<<<<<<<<<
@@ -33085,7 +33085,7 @@ static CYTHON_INLINE PyObject *__pyx_f_5numpy_get_array_base(PyArrayObject *__py
   return __pyx_r;
 }
 
-/* "../../../DataAnalysis/Codes/TLPython37/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":1034
+/* "../../../Codes/TLPython3/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":1034
  * # Versions of the import_* functions which are more suitable for
  * # Cython code.
  * cdef inline int import_array() except -1:             # <<<<<<<<<<<<<<
@@ -33108,7 +33108,7 @@ static CYTHON_INLINE int __pyx_f_5numpy_import_array(void) {
   __Pyx_RefNannySetupContext("import_array", 0);
   __Pyx_TraceCall("import_array", __pyx_f[2], 1034, 0, __PYX_ERR(2, 1034, __pyx_L1_error));
 
-  /* "../../../DataAnalysis/Codes/TLPython37/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":1035
+  /* "../../../Codes/TLPython3/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":1035
  * # Cython code.
  * cdef inline int import_array() except -1:
  *     try:             # <<<<<<<<<<<<<<
@@ -33124,7 +33124,7 @@ static CYTHON_INLINE int __pyx_f_5numpy_import_array(void) {
     __Pyx_XGOTREF(__pyx_t_3);
     /*try:*/ {
 
-      /* "../../../DataAnalysis/Codes/TLPython37/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":1036
+      /* "../../../Codes/TLPython3/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":1036
  * cdef inline int import_array() except -1:
  *     try:
  *         _import_array()             # <<<<<<<<<<<<<<
@@ -33133,7 +33133,7 @@ static CYTHON_INLINE int __pyx_f_5numpy_import_array(void) {
  */
       __pyx_t_4 = _import_array(); if (unlikely(__pyx_t_4 == ((int)-1))) __PYX_ERR(2, 1036, __pyx_L3_error)
 
-      /* "../../../DataAnalysis/Codes/TLPython37/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":1035
+      /* "../../../Codes/TLPython3/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":1035
  * # Cython code.
  * cdef inline int import_array() except -1:
  *     try:             # <<<<<<<<<<<<<<
@@ -33147,7 +33147,7 @@ static CYTHON_INLINE int __pyx_f_5numpy_import_array(void) {
     goto __pyx_L8_try_end;
     __pyx_L3_error:;
 
-    /* "../../../DataAnalysis/Codes/TLPython37/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":1037
+    /* "../../../Codes/TLPython3/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":1037
  *     try:
  *         _import_array()
  *     except Exception:             # <<<<<<<<<<<<<<
@@ -33162,7 +33162,7 @@ static CYTHON_INLINE int __pyx_f_5numpy_import_array(void) {
       __Pyx_GOTREF(__pyx_t_6);
       __Pyx_GOTREF(__pyx_t_7);
 
-      /* "../../../DataAnalysis/Codes/TLPython37/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":1038
+      /* "../../../Codes/TLPython3/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":1038
  *         _import_array()
  *     except Exception:
  *         raise ImportError("numpy.core.multiarray failed to import")             # <<<<<<<<<<<<<<
@@ -33178,7 +33178,7 @@ static CYTHON_INLINE int __pyx_f_5numpy_import_array(void) {
     goto __pyx_L5_except_error;
     __pyx_L5_except_error:;
 
-    /* "../../../DataAnalysis/Codes/TLPython37/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":1035
+    /* "../../../Codes/TLPython3/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":1035
  * # Cython code.
  * cdef inline int import_array() except -1:
  *     try:             # <<<<<<<<<<<<<<
@@ -33193,7 +33193,7 @@ static CYTHON_INLINE int __pyx_f_5numpy_import_array(void) {
     __pyx_L8_try_end:;
   }
 
-  /* "../../../DataAnalysis/Codes/TLPython37/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":1034
+  /* "../../../Codes/TLPython3/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":1034
  * # Versions of the import_* functions which are more suitable for
  * # Cython code.
  * cdef inline int import_array() except -1:             # <<<<<<<<<<<<<<
@@ -33217,7 +33217,7 @@ static CYTHON_INLINE int __pyx_f_5numpy_import_array(void) {
   return __pyx_r;
 }
 
-/* "../../../DataAnalysis/Codes/TLPython37/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":1040
+/* "../../../Codes/TLPython3/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":1040
  *         raise ImportError("numpy.core.multiarray failed to import")
  * 
  * cdef inline int import_umath() except -1:             # <<<<<<<<<<<<<<
@@ -33240,7 +33240,7 @@ static CYTHON_INLINE int __pyx_f_5numpy_import_umath(void) {
   __Pyx_RefNannySetupContext("import_umath", 0);
   __Pyx_TraceCall("import_umath", __pyx_f[2], 1040, 0, __PYX_ERR(2, 1040, __pyx_L1_error));
 
-  /* "../../../DataAnalysis/Codes/TLPython37/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":1041
+  /* "../../../Codes/TLPython3/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":1041
  * 
  * cdef inline int import_umath() except -1:
  *     try:             # <<<<<<<<<<<<<<
@@ -33256,7 +33256,7 @@ static CYTHON_INLINE int __pyx_f_5numpy_import_umath(void) {
     __Pyx_XGOTREF(__pyx_t_3);
     /*try:*/ {
 
-      /* "../../../DataAnalysis/Codes/TLPython37/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":1042
+      /* "../../../Codes/TLPython3/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":1042
  * cdef inline int import_umath() except -1:
  *     try:
  *         _import_umath()             # <<<<<<<<<<<<<<
@@ -33265,7 +33265,7 @@ static CYTHON_INLINE int __pyx_f_5numpy_import_umath(void) {
  */
       __pyx_t_4 = _import_umath(); if (unlikely(__pyx_t_4 == ((int)-1))) __PYX_ERR(2, 1042, __pyx_L3_error)
 
-      /* "../../../DataAnalysis/Codes/TLPython37/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":1041
+      /* "../../../Codes/TLPython3/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":1041
  * 
  * cdef inline int import_umath() except -1:
  *     try:             # <<<<<<<<<<<<<<
@@ -33279,7 +33279,7 @@ static CYTHON_INLINE int __pyx_f_5numpy_import_umath(void) {
     goto __pyx_L8_try_end;
     __pyx_L3_error:;
 
-    /* "../../../DataAnalysis/Codes/TLPython37/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":1043
+    /* "../../../Codes/TLPython3/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":1043
  *     try:
  *         _import_umath()
  *     except Exception:             # <<<<<<<<<<<<<<
@@ -33294,7 +33294,7 @@ static CYTHON_INLINE int __pyx_f_5numpy_import_umath(void) {
       __Pyx_GOTREF(__pyx_t_6);
       __Pyx_GOTREF(__pyx_t_7);
 
-      /* "../../../DataAnalysis/Codes/TLPython37/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":1044
+      /* "../../../Codes/TLPython3/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":1044
  *         _import_umath()
  *     except Exception:
  *         raise ImportError("numpy.core.umath failed to import")             # <<<<<<<<<<<<<<
@@ -33310,7 +33310,7 @@ static CYTHON_INLINE int __pyx_f_5numpy_import_umath(void) {
     goto __pyx_L5_except_error;
     __pyx_L5_except_error:;
 
-    /* "../../../DataAnalysis/Codes/TLPython37/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":1041
+    /* "../../../Codes/TLPython3/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":1041
  * 
  * cdef inline int import_umath() except -1:
  *     try:             # <<<<<<<<<<<<<<
@@ -33325,7 +33325,7 @@ static CYTHON_INLINE int __pyx_f_5numpy_import_umath(void) {
     __pyx_L8_try_end:;
   }
 
-  /* "../../../DataAnalysis/Codes/TLPython37/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":1040
+  /* "../../../Codes/TLPython3/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":1040
  *         raise ImportError("numpy.core.multiarray failed to import")
  * 
  * cdef inline int import_umath() except -1:             # <<<<<<<<<<<<<<
@@ -33349,7 +33349,7 @@ static CYTHON_INLINE int __pyx_f_5numpy_import_umath(void) {
   return __pyx_r;
 }
 
-/* "../../../DataAnalysis/Codes/TLPython37/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":1046
+/* "../../../Codes/TLPython3/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":1046
  *         raise ImportError("numpy.core.umath failed to import")
  * 
  * cdef inline int import_ufunc() except -1:             # <<<<<<<<<<<<<<
@@ -33372,7 +33372,7 @@ static CYTHON_INLINE int __pyx_f_5numpy_import_ufunc(void) {
   __Pyx_RefNannySetupContext("import_ufunc", 0);
   __Pyx_TraceCall("import_ufunc", __pyx_f[2], 1046, 0, __PYX_ERR(2, 1046, __pyx_L1_error));
 
-  /* "../../../DataAnalysis/Codes/TLPython37/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":1047
+  /* "../../../Codes/TLPython3/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":1047
  * 
  * cdef inline int import_ufunc() except -1:
  *     try:             # <<<<<<<<<<<<<<
@@ -33388,7 +33388,7 @@ static CYTHON_INLINE int __pyx_f_5numpy_import_ufunc(void) {
     __Pyx_XGOTREF(__pyx_t_3);
     /*try:*/ {
 
-      /* "../../../DataAnalysis/Codes/TLPython37/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":1048
+      /* "../../../Codes/TLPython3/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":1048
  * cdef inline int import_ufunc() except -1:
  *     try:
  *         _import_umath()             # <<<<<<<<<<<<<<
@@ -33397,7 +33397,7 @@ static CYTHON_INLINE int __pyx_f_5numpy_import_ufunc(void) {
  */
       __pyx_t_4 = _import_umath(); if (unlikely(__pyx_t_4 == ((int)-1))) __PYX_ERR(2, 1048, __pyx_L3_error)
 
-      /* "../../../DataAnalysis/Codes/TLPython37/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":1047
+      /* "../../../Codes/TLPython3/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":1047
  * 
  * cdef inline int import_ufunc() except -1:
  *     try:             # <<<<<<<<<<<<<<
@@ -33411,7 +33411,7 @@ static CYTHON_INLINE int __pyx_f_5numpy_import_ufunc(void) {
     goto __pyx_L8_try_end;
     __pyx_L3_error:;
 
-    /* "../../../DataAnalysis/Codes/TLPython37/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":1049
+    /* "../../../Codes/TLPython3/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":1049
  *     try:
  *         _import_umath()
  *     except Exception:             # <<<<<<<<<<<<<<
@@ -33425,7 +33425,7 @@ static CYTHON_INLINE int __pyx_f_5numpy_import_ufunc(void) {
       __Pyx_GOTREF(__pyx_t_6);
       __Pyx_GOTREF(__pyx_t_7);
 
-      /* "../../../DataAnalysis/Codes/TLPython37/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":1050
+      /* "../../../Codes/TLPython3/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":1050
  *         _import_umath()
  *     except Exception:
  *         raise ImportError("numpy.core.umath failed to import")             # <<<<<<<<<<<<<<
@@ -33439,7 +33439,7 @@ static CYTHON_INLINE int __pyx_f_5numpy_import_ufunc(void) {
     goto __pyx_L5_except_error;
     __pyx_L5_except_error:;
 
-    /* "../../../DataAnalysis/Codes/TLPython37/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":1047
+    /* "../../../Codes/TLPython3/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":1047
  * 
  * cdef inline int import_ufunc() except -1:
  *     try:             # <<<<<<<<<<<<<<
@@ -33454,7 +33454,7 @@ static CYTHON_INLINE int __pyx_f_5numpy_import_ufunc(void) {
     __pyx_L8_try_end:;
   }
 
-  /* "../../../DataAnalysis/Codes/TLPython37/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":1046
+  /* "../../../Codes/TLPython3/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":1046
  *         raise ImportError("numpy.core.umath failed to import")
  * 
  * cdef inline int import_ufunc() except -1:             # <<<<<<<<<<<<<<
@@ -34155,7 +34155,7 @@ static CYTHON_SMALL_CODE int __Pyx_InitCachedBuiltins(void) {
   __pyx_builtin_range = __Pyx_GetBuiltinName(__pyx_n_s_range); if (!__pyx_builtin_range) __PYX_ERR(0, 254, __pyx_L1_error)
   __pyx_builtin_StopIteration = __Pyx_GetBuiltinName(__pyx_n_s_StopIteration); if (!__pyx_builtin_StopIteration) __PYX_ERR(0, 355, __pyx_L1_error)
   __pyx_builtin_NotImplemented = __Pyx_GetBuiltinName(__pyx_n_s_NotImplemented); if (!__pyx_builtin_NotImplemented) __PYX_ERR(0, 615, __pyx_L1_error)
-  __pyx_builtin_sorted = __Pyx_GetBuiltinName(__pyx_n_s_sorted); if (!__pyx_builtin_sorted) __PYX_ERR(0, 804, __pyx_L1_error)
+  __pyx_builtin_sorted = __Pyx_GetBuiltinName(__pyx_n_s_sorted); if (!__pyx_builtin_sorted) __PYX_ERR(0, 795, __pyx_L1_error)
   __pyx_builtin_ValueError = __Pyx_GetBuiltinName(__pyx_n_s_ValueError); if (!__pyx_builtin_ValueError) __PYX_ERR(2, 272, __pyx_L1_error)
   __pyx_builtin_RuntimeError = __Pyx_GetBuiltinName(__pyx_n_s_RuntimeError); if (!__pyx_builtin_RuntimeError) __PYX_ERR(2, 856, __pyx_L1_error)
   __pyx_builtin_ImportError = __Pyx_GetBuiltinName(__pyx_n_s_ImportError); if (!__pyx_builtin_ImportError) __PYX_ERR(2, 1038, __pyx_L1_error)
@@ -34201,18 +34201,18 @@ static CYTHON_SMALL_CODE int __Pyx_InitCachedConstants(void) {
   __Pyx_GOTREF(__pyx_tuple__5);
   __Pyx_GIVEREF(__pyx_tuple__5);
 
-  /* "MACS2/IO/ScoreTrack.pyx":984
+  /* "MACS2/IO/ScoreTrack.pyx":975
  *             np.ndarray pos, value
  * 
  *         assert column in range( 1, 4 ), "column should be between 1, 2 or 3."             # <<<<<<<<<<<<<<
  * 
  *         write = fhd.write
  */
-  __pyx_tuple__18 = PyTuple_Pack(2, __pyx_int_1, __pyx_int_4); if (unlikely(!__pyx_tuple__18)) __PYX_ERR(0, 984, __pyx_L1_error)
+  __pyx_tuple__18 = PyTuple_Pack(2, __pyx_int_1, __pyx_int_4); if (unlikely(!__pyx_tuple__18)) __PYX_ERR(0, 975, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_tuple__18);
   __Pyx_GIVEREF(__pyx_tuple__18);
 
-  /* "../../../DataAnalysis/Codes/TLPython37/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":272
+  /* "../../../Codes/TLPython3/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":272
  *             if ((flags & pybuf.PyBUF_C_CONTIGUOUS == pybuf.PyBUF_C_CONTIGUOUS)
  *                 and not PyArray_CHKFLAGS(self, NPY_ARRAY_C_CONTIGUOUS)):
  *                 raise ValueError(u"ndarray is not C contiguous")             # <<<<<<<<<<<<<<
@@ -34223,7 +34223,7 @@ static CYTHON_SMALL_CODE int __Pyx_InitCachedConstants(void) {
   __Pyx_GOTREF(__pyx_tuple__25);
   __Pyx_GIVEREF(__pyx_tuple__25);
 
-  /* "../../../DataAnalysis/Codes/TLPython37/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":276
+  /* "../../../Codes/TLPython3/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":276
  *             if ((flags & pybuf.PyBUF_F_CONTIGUOUS == pybuf.PyBUF_F_CONTIGUOUS)
  *                 and not PyArray_CHKFLAGS(self, NPY_ARRAY_F_CONTIGUOUS)):
  *                 raise ValueError(u"ndarray is not Fortran contiguous")             # <<<<<<<<<<<<<<
@@ -34234,7 +34234,7 @@ static CYTHON_SMALL_CODE int __Pyx_InitCachedConstants(void) {
   __Pyx_GOTREF(__pyx_tuple__26);
   __Pyx_GIVEREF(__pyx_tuple__26);
 
-  /* "../../../DataAnalysis/Codes/TLPython37/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":306
+  /* "../../../Codes/TLPython3/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":306
  *                 if ((descr.byteorder == c'>' and little_endian) or
  *                     (descr.byteorder == c'<' and not little_endian)):
  *                     raise ValueError(u"Non-native byte order not supported")             # <<<<<<<<<<<<<<
@@ -34245,7 +34245,7 @@ static CYTHON_SMALL_CODE int __Pyx_InitCachedConstants(void) {
   __Pyx_GOTREF(__pyx_tuple__27);
   __Pyx_GIVEREF(__pyx_tuple__27);
 
-  /* "../../../DataAnalysis/Codes/TLPython37/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":856
+  /* "../../../Codes/TLPython3/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":856
  * 
  *         if (end - f) - <int>(new_offset - offset[0]) < 15:
  *             raise RuntimeError(u"Format string allocated too short, see comment in numpy.pxd")             # <<<<<<<<<<<<<<
@@ -34256,7 +34256,7 @@ static CYTHON_SMALL_CODE int __Pyx_InitCachedConstants(void) {
   __Pyx_GOTREF(__pyx_tuple__28);
   __Pyx_GIVEREF(__pyx_tuple__28);
 
-  /* "../../../DataAnalysis/Codes/TLPython37/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":880
+  /* "../../../Codes/TLPython3/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":880
  *             t = child.type_num
  *             if end - f < 5:
  *                 raise RuntimeError(u"Format string allocated too short.")             # <<<<<<<<<<<<<<
@@ -34267,7 +34267,7 @@ static CYTHON_SMALL_CODE int __Pyx_InitCachedConstants(void) {
   __Pyx_GOTREF(__pyx_tuple__29);
   __Pyx_GIVEREF(__pyx_tuple__29);
 
-  /* "../../../DataAnalysis/Codes/TLPython37/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":1038
+  /* "../../../Codes/TLPython3/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":1038
  *         _import_array()
  *     except Exception:
  *         raise ImportError("numpy.core.multiarray failed to import")             # <<<<<<<<<<<<<<
@@ -34278,7 +34278,7 @@ static CYTHON_SMALL_CODE int __Pyx_InitCachedConstants(void) {
   __Pyx_GOTREF(__pyx_tuple__30);
   __Pyx_GIVEREF(__pyx_tuple__30);
 
-  /* "../../../DataAnalysis/Codes/TLPython37/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":1044
+  /* "../../../Codes/TLPython3/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":1044
  *         _import_umath()
  *     except Exception:
  *         raise ImportError("numpy.core.umath failed to import")             # <<<<<<<<<<<<<<
@@ -34561,7 +34561,7 @@ static int __Pyx_modinit_type_init_code(void) {
   __pyx_vtable_5MACS2_2IO_10ScoreTrack_TwoConditionScores.__pyx___add_a_peak = (PyObject *(*)(struct __pyx_obj_5MACS2_2IO_10ScoreTrack_TwoConditionScores *, PyObject *, PyObject *, PyArrayObject *, PyArrayObject *, PyArrayObject *, PyArrayObject *, int, int))__pyx_f_5MACS2_2IO_10ScoreTrack_18TwoConditionScores___add_a_peak;
   __pyx_vtable_5MACS2_2IO_10ScoreTrack_TwoConditionScores.mean_from_peakcontent = (float (*)(struct __pyx_obj_5MACS2_2IO_10ScoreTrack_TwoConditionScores *, PyObject *))__pyx_f_5MACS2_2IO_10ScoreTrack_18TwoConditionScores_mean_from_peakcontent;
   __pyx_vtable_5MACS2_2IO_10ScoreTrack_TwoConditionScores.total = (long (*)(struct __pyx_obj_5MACS2_2IO_10ScoreTrack_TwoConditionScores *))__pyx_f_5MACS2_2IO_10ScoreTrack_18TwoConditionScores_total;
-  if (PyType_Ready(&__pyx_type_5MACS2_2IO_10ScoreTrack_TwoConditionScores) < 0) __PYX_ERR(0, 1390, __pyx_L1_error)
+  if (PyType_Ready(&__pyx_type_5MACS2_2IO_10ScoreTrack_TwoConditionScores) < 0) __PYX_ERR(0, 1381, __pyx_L1_error)
   #if PY_VERSION_HEX < 0x030800B1
   __pyx_type_5MACS2_2IO_10ScoreTrack_TwoConditionScores.tp_print = 0;
   #endif
@@ -34570,7 +34570,7 @@ static int __Pyx_modinit_type_init_code(void) {
   }
   #if CYTHON_COMPILING_IN_CPYTHON
   {
-    PyObject *wrapper = PyObject_GetAttrString((PyObject *)&__pyx_type_5MACS2_2IO_10ScoreTrack_TwoConditionScores, "__init__"); if (unlikely(!wrapper)) __PYX_ERR(0, 1390, __pyx_L1_error)
+    PyObject *wrapper = PyObject_GetAttrString((PyObject *)&__pyx_type_5MACS2_2IO_10ScoreTrack_TwoConditionScores, "__init__"); if (unlikely(!wrapper)) __PYX_ERR(0, 1381, __pyx_L1_error)
     if (Py_TYPE(wrapper) == &PyWrapperDescr_Type) {
       __pyx_wrapperbase_5MACS2_2IO_10ScoreTrack_18TwoConditionScores___init__ = *((PyWrapperDescrObject *)wrapper)->d_base;
       __pyx_wrapperbase_5MACS2_2IO_10ScoreTrack_18TwoConditionScores___init__.doc = __pyx_doc_5MACS2_2IO_10ScoreTrack_18TwoConditionScores___init__;
@@ -34578,9 +34578,9 @@ static int __Pyx_modinit_type_init_code(void) {
     }
   }
   #endif
-  if (__Pyx_SetVtable(__pyx_type_5MACS2_2IO_10ScoreTrack_TwoConditionScores.tp_dict, __pyx_vtabptr_5MACS2_2IO_10ScoreTrack_TwoConditionScores) < 0) __PYX_ERR(0, 1390, __pyx_L1_error)
-  if (PyObject_SetAttr(__pyx_m, __pyx_n_s_TwoConditionScores, (PyObject *)&__pyx_type_5MACS2_2IO_10ScoreTrack_TwoConditionScores) < 0) __PYX_ERR(0, 1390, __pyx_L1_error)
-  if (__Pyx_setup_reduce((PyObject*)&__pyx_type_5MACS2_2IO_10ScoreTrack_TwoConditionScores) < 0) __PYX_ERR(0, 1390, __pyx_L1_error)
+  if (__Pyx_SetVtable(__pyx_type_5MACS2_2IO_10ScoreTrack_TwoConditionScores.tp_dict, __pyx_vtabptr_5MACS2_2IO_10ScoreTrack_TwoConditionScores) < 0) __PYX_ERR(0, 1381, __pyx_L1_error)
+  if (PyObject_SetAttr(__pyx_m, __pyx_n_s_TwoConditionScores, (PyObject *)&__pyx_type_5MACS2_2IO_10ScoreTrack_TwoConditionScores) < 0) __PYX_ERR(0, 1381, __pyx_L1_error)
+  if (__Pyx_setup_reduce((PyObject*)&__pyx_type_5MACS2_2IO_10ScoreTrack_TwoConditionScores) < 0) __PYX_ERR(0, 1381, __pyx_L1_error)
   __pyx_ptype_5MACS2_2IO_10ScoreTrack_TwoConditionScores = &__pyx_type_5MACS2_2IO_10ScoreTrack_TwoConditionScores;
   __Pyx_RefNannyFinishContext();
   return 0;
@@ -35303,7 +35303,7 @@ if (!__Pyx_RefNanny) {
   if (PyDict_SetItem(__pyx_d, __pyx_n_s_test, __pyx_t_1) < 0) __PYX_ERR(0, 1, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-  /* "../../../DataAnalysis/Codes/TLPython37/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":1046
+  /* "../../../Codes/TLPython3/lib/python3.7/site-packages/Cython/Includes/numpy/__init__.pxd":1046
  *         raise ImportError("numpy.core.umath failed to import")
  * 
  * cdef inline int import_ufunc() except -1:             # <<<<<<<<<<<<<<

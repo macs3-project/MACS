@@ -1,4 +1,4 @@
-# Time-stamp: <2019-09-25 10:03:54 taoliu>
+# Time-stamp: <2019-11-04 10:41:13 taoliu>
 
 """Description: MACS 2 main executable
 
@@ -92,8 +92,8 @@ def run( args ):
             info("#1 filter out redundant fragments by allowing at most %d identical fragment(s)", treatment_max_dup_tags)
         else:
             info("#1 filter out redundant tags at the same location and the same strand by allowing at most %d tag(s)", treatment_max_dup_tags)
-        treat.separate_dups(treatment_max_dup_tags) # changed 5-29
-#        treat.filter_dup(treatment_max_dup_tags)
+        #treat.separate_dups(treatment_max_dup_tags) # changed 5-29; changed back since we don't need to addbackdup+refinepeak anymore
+        treat.filter_dup(treatment_max_dup_tags)
         t1 = treat.total
         info("#1  %ss after filtering in treatment: %d", tag, t1)
         tagsinfo += "# %ss after filtering in treatment: %d\n" % (tag, t1)
@@ -130,8 +130,8 @@ def run( args ):
                 info("#1 filter out redundant fragments by allowing at most %d identical fragment(s)", treatment_max_dup_tags)
             else:
                 info("#1 filter out redundant tags at the same location and the same strand by allowing at most %d tag(s)", treatment_max_dup_tags)
-#            control.filter_dup(treatment_max_dup_tags)
-            control.separate_dups(treatment_max_dup_tags) # changed 5-29
+            control.filter_dup(treatment_max_dup_tags)
+            #control.separate_dups(treatment_max_dup_tags) # changed 5-29; changed back since we don't need to call addbackdup+refinepeak anymore
             c1 = control.total
             
             info("#1  %ss after filtering in control: %d", tag, c1)

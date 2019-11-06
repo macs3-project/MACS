@@ -1,3 +1,30 @@
+2019-11-05  Tao Liu  <vladimir.liu@gmail.com>
+	MACS version 2.2.6a1
+
+	* New Features
+
+	1) Speed up MACS2. Some programming tricks and code cleanup. The
+	filter_dup function replaces separate_dups. The later one was
+	implemented for potentially putting back duplicate reads in
+	certain downstream analysis. However such analysis hasn't been
+	implemented.
+
+	2) Do not check "track" and "comment" lines in BED file. So please
+	avoid them. 
+
+	* Bugs fixed
+
+	1) Cutoff-analysis in callpeak command. #341
+
+	* Other
+
+	1) cmdlinetest script in test/ folder has been updated to: 1. test
+	cutoff-analysis with callpeak cmd; 2. output the 2 lines before
+	and after the error or warning message during tests; 3. output
+	only the first 10 lines if the difference between test result and
+	standard result can be found; 4. prockreport monitor CPU time and
+	memory usage in 1 sec interval -- a bit more accurate.
+
 2019-10-31  Tao Liu  <vladimir.liu@gmail.com>
 	MACS version 2.2.5 (Py3 speed up)
 

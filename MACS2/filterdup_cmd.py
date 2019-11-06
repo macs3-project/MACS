@@ -1,4 +1,4 @@
-# Time-stamp: <2019-09-25 10:30:22 taoliu>
+# Time-stamp: <2019-11-05 10:59:31 taoliu>
 
 """Description: Filter duplicate reads depending on sequencing depth.
 
@@ -70,7 +70,8 @@ def run( o_options ):
             max_dup_tags = int(options.keepduplicates)
             info("filter out redundant tags at the same location and the same strand by allowing at most %d tag(s)" % (max_dup_tags))
 
-        t1 = inputtrack.filter_dup( max_dup_tags )
+        inputtrack.filter_dup( max_dup_tags )
+        t1 = inputtrack.total
 
         info(" tags after filtering in alignment file: %d" % (t1))
         info(" Redundant rate of alignment file: %.2f" % (float(t0-t1)/t0))

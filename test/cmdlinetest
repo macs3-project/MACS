@@ -172,7 +172,7 @@ echo "13. search for errors or warnings in log files"
 flag=0
 for i in `ls ${TAG}_run_*/*.log`;do
     echo " checking $i..."
-    egrep -i "error|warning" $i;
+    egrep -A 2 -B 2 -i "error|warning" $i;
     if [[ $? == 0 ]];then
 	echo " ... error/warning found!"
 	let "flag=1";
@@ -210,7 +210,7 @@ for i in ${subfolders[@]};do
 	    echo " ... success!"
 	else
 	    echo " ... failed! Difference:"
-	    echo $d
+	    diff tmp_fq.txt tmp_fs.txt | head -10
 	    let "flag=1";
 	fi
     done
@@ -226,7 +226,7 @@ echo "15. brief speed test"
 
 macs2 callpeak -t CTCF_12878_5M.bed.gz -c Input_12878_5M.bed.gz -n speedtest.py37 -B &> speedtest.py37.log &
 # monitor the macs2 callpeak run and output CPU and mem usage
-./prockreport 2 $!
+./prockreport 1 $!
 wait;
 
 # END of test

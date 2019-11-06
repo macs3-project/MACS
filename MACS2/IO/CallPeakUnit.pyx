@@ -1,6 +1,7 @@
 # cython: language_level=3
 # cython: profile=True
-# Time-stamp: <2019-10-30 16:33:01 taoliu>
+# cython: linetrace=True
+# Time-stamp: <2019-10-31 12:18:02 taoliu>
 
 """Module for Calculate Scores.
 
@@ -40,28 +41,53 @@ from MACS2.IO.PeakIO import PeakIO, BroadPeakIO, parse_peakname
 from MACS2.IO.FixWidthTrack import FWTrack
 from MACS2.IO.PairedEndTrack import PETrackI
 from MACS2.Statistics import P_Score_Upper_Tail, LogLR_Asym # pure C code for calculating p-value scores/logLR of Poisson
-#
-pscore_table = P_Score_Upper_Tail() # this table will cache pscore being calculated.
-get_pscore = pscore_table.get_pscore
 
-logLR_table = LogLR_Asym() # this table will cache pscore being calculated.
-get_logLR_asym = logLR_table.get_logLR_asym
+# --------------------------------------------
+# cached pscore function and LR_asym functions
+# --------------------------------------------
+from MACS2.Prob import poisson_cdf
+pscore_dict = dict()
+logLR_dict = dict()
+
+#cdef float get_pscore ( int x, float l ):
+cdef float get_pscore ( tuple x ):
+    cdef:
+        float val
+    if x in pscore_dict:
+        return pscore_dict [ x ]
+    else:
+        # calculate and cache
+        val = -1 * poisson_cdf ( x[0], x[1], False, True )
+        pscore_dict[ x ] = val
+        return val
+
+cdef float get_logLR_asym ( float x, float y ):
+    cdef:
+        float val
+
+    if ( x, y ) in logLR_dict:
+        return logLR_dict[ ( x, y ) ]
+    else:
+        # calculate and cache
+        if x > y:
+            val = (x*(log10(x)-log10(y))+y-x)
+        elif x < y:
+            val = (x*(-log10(x)+log10(y))-y+x)
+        else:
+            val = 0
+        logLR_dict[ ( x, y ) ] = val
+        return val
 
 # ------------------------------------
 # constants
 # ------------------------------------
-__version__ = "scoreCalculate $Revision$"
+__version__ = "CallPeakUnit $Revision$"
 __author__ = "Tao Liu <vladimir.liu@gmail.com>"
-__doc__ = "scoreTrackI classes"
+__doc__ = "CallPeakUnit"
 
 # ------------------------------------
 # Misc functions
 # ------------------------------------
-cdef inline int int_max(int a, int b): return a if a >= b else b
-cdef inline int int_min(int a, int b): return a if a <= b else b
-def do_nothing(*args, **kwargs):
-    pass
-
 LOG10_E = 0.43429448190325176
 
 cdef void clean_up_ndarray ( np.ndarray x ):
@@ -283,7 +309,7 @@ cdef class CallerFromAlignments:
         bool no_lambda_flag              # whether ignore local bias, and to use global bias instead
         bool PE_mode                     # whether it's in PE mode, will be detected during initiation
         # temporary data buffer
-        bytes chrom                        # name of current chromosome
+        #bytes chrom                        # name of current chromosome
         list chr_pos_treat_ctrl          # temporary [position, treat_pileup, ctrl_pileup] for a given chromosome
         bytes bedGraph_treat_filename
         bytes bedGraph_control_filename
@@ -292,7 +318,7 @@ cdef class CallerFromAlignments:
         #object bedGraph_treat            # file handler to write ChIP pileup
         #object bedGraph_ctrl             # file handler to write Control pileup
         # data needed to be pre-computed before peak calling
-        object pqtable                   # remember pvalue->qvalue convertion
+        dict pqtable                   # remember pvalue->qvalue convertion
         bool pvalue_all_done             # whether the pvalue of whole genome is all calculated. If yes, it's OK to calculate q-value.
 
         dict pvalue_npeaks               # record for each pvalue cutoff, how many peaks can be called  
@@ -469,12 +495,6 @@ cdef class CallerFromAlignments:
             clean_up_ndarray( self.chr_pos_treat_ctrl[0] )
             clean_up_ndarray( self.chr_pos_treat_ctrl[1] )
             clean_up_ndarray( self.chr_pos_treat_ctrl[2] )
-            #self.chr_pos_treat_ctrl[0].resize(10000,refcheck=False)
-            #self.chr_pos_treat_ctrl[1].resize(10000,refcheck=False)
-            #self.chr_pos_treat_ctrl[2].resize(10000,refcheck=False)
-            #self.chr_pos_treat_ctrl[0].resize(0,refcheck=False)
-            #self.chr_pos_treat_ctrl[1].resize(0,refcheck=False)
-            #self.chr_pos_treat_ctrl[2].resize(0,refcheck=False)            
 
         if self.PE_mode:
             treat_pv = self.treat.pileup_a_chromosome ( chrom, [self.treat_scaling_factor,], baseline_value = 0.0 )
@@ -623,7 +643,7 @@ cdef class CallerFromAlignments:
             #ptr += 1
         return s
 
-    cdef object __cal_pvalue_qvalue_table ( self ):
+    cdef void __cal_pvalue_qvalue_table ( self ):
         """After this function is called, self.pqtable is built. All
         chromosomes will be iterated. So it will take some time.
         
@@ -631,7 +651,7 @@ cdef class CallerFromAlignments:
         cdef:
             bytes chrom
             np.ndarray pos_array, treat_array, ctrl_array, score_array
-            dict pvalue_stat = {}
+            dict pvalue_stat
             long n, pre_p, length, j, pre_l, l, i
             float this_v, pre_v, v, q, pre_q
             long N, k, this_l
@@ -646,6 +666,7 @@ cdef class CallerFromAlignments:
 
         logging.debug ( "Start to calculate pvalue stat..." )
 
+        pvalue_stat = dict()
         for i in range( len( self.chromosomes ) ):
             chrom = self.chromosomes[ i ]
             pre_p = 0
@@ -658,7 +679,8 @@ cdef class CallerFromAlignments:
             ctrl_value_ptr = <float32_t *> ctrl_array.data
 
             for j in range(pos_array.shape[0]):
-                this_v = get_pscore( int(treat_value_ptr[0]), ctrl_value_ptr[0] )
+                #this_v = get_pscore( int(treat_value_ptr[0]), ctrl_value_ptr[0] )
+                this_v = get_pscore( (int(treat_value_ptr[0]), ctrl_value_ptr[0] ) )
                 this_l = pos_ptr[0] - pre_p
 
                 if this_v in pvalue_stat:
@@ -669,7 +691,7 @@ cdef class CallerFromAlignments:
                 pos_ptr += 1
                 treat_value_ptr += 1
                 ctrl_value_ptr += 1
-
+   
             nhcal += pos_array.shape[0]            
 
         #logging.debug ( "make pvalue_stat cost %.5f seconds" % t )
@@ -685,7 +707,6 @@ cdef class CallerFromAlignments:
         pre_q = 2147483647              # save the previous q-value
 
         self.pqtable = {}
-        #self.pqtable = Float64HashTable()
         unique_values = sorted(list(pvalue_stat.keys()), reverse=True) #sorted(unique_values,reverse=True)
         for i in range(len(unique_values)):
             v = unique_values[i]
@@ -695,15 +716,15 @@ cdef class CallerFromAlignments:
             self.pqtable[ v ] = q
             pre_v = v
             pre_q = q
-            k+=l
+            k += l
             nhcal += 1
             
         logging.debug( "access pq hash for %d times" % nhcal )
 
-        return self.pqtable
+        return
 
 
-    cdef object __pre_computes ( self, int max_gap = 50, int min_length = 200 ):
+    cdef void __pre_computes ( self, int max_gap = 50, int min_length = 200 ):
         """After this function is called, self.pqtable and self.pvalue_length is built. All
         chromosomes will be iterated. So it will take some time.
         
@@ -711,7 +732,7 @@ cdef class CallerFromAlignments:
         cdef:
             bytes chrom
             np.ndarray pos_array, treat_array, ctrl_array, score_array
-            dict pvalue_stat = {}
+            dict pvalue_stat
             long n, pre_p, this_p, length, j, pre_l, l, i
             float this_v, pre_v, v, q, pre_q, this_t, this_c
             long N, k, this_l
@@ -736,7 +757,8 @@ cdef class CallerFromAlignments:
         logging.debug ( "Start to calculate pvalue stat..." )
 
         tmplist = sorted( list(np.arange(0.3, 10.0, 0.3)), reverse = True )
-        
+
+        pvalue_stat = dict()
         for i in range( len( self.chromosomes ) ):
             chrom = self.chromosomes[ i ]
             self.__pileup_treat_ctrl_a_chromosome( chrom )
@@ -824,7 +846,6 @@ cdef class CallerFromAlignments:
         pre_q = 2147483647              # save the previous q-value
 
         self.pqtable = {}
-        #self.pqtable = Float64HashTable()
         unique_values = sorted(list(pvalue_stat.keys()), reverse=True) #sorted(unique_values,reverse=True)
         for i in range(len(unique_values)):
             v = unique_values[i]
@@ -853,11 +874,10 @@ cdef class CallerFromAlignments:
         #logging.info( "#3 Suggest a cutoff..." )
         #optimal_cutoff, optimal_length = find_optimal_cutoff( x, y )
         #logging.info( "#3 -10log10pvalue cutoff %.2f will call approximately %.0f bps regions as significant regions" % ( optimal_cutoff, optimal_length ) )
-        return self.pqtable
-
+        return
 
     cpdef call_peaks ( self, list scoring_function_symbols, list score_cutoff_s, int min_length = 200, 
-                       int max_gap = 50, bool call_summits = False, bool auto_cutoff = False ):
+                       int max_gap = 50, bool call_summits = False, bool cutoff_analysis = False ):
         """Call peaks for all chromosomes. Return a PeakIO object.
         
         scoring_function_s: symbols of functions to calculate score. 'p' for pscore, 'q' for qscore, 'f' for fold change, 's' for subtraction. for example: ['p', 'q']
@@ -876,8 +896,8 @@ cdef class CallerFromAlignments:
         # prepare p-q table
         if not self.pqtable:
             logging.info("#3 Pre-compute pvalue-qvalue table...")
-            if auto_cutoff:
-                logging.info("#3 Cutoff will be automatically decided!")
+            if cutoff_analysis:
+                logging.info("#3 Cutoff vs peaks called will be analyzed!")
                 self.__pre_computes( max_gap = max_gap, min_length = min_length )
             else:
                 self.__cal_pvalue_qvalue_table()
@@ -922,7 +942,7 @@ cdef class CallerFromAlignments:
 
         return peaks
 
-    cdef __chrom_call_peak_using_certain_criteria ( self, peaks, bytes chrom, list scoring_function_s, list score_cutoff_s, int min_length, 
+    cdef void __chrom_call_peak_using_certain_criteria ( self, peaks, bytes chrom, list scoring_function_s, list score_cutoff_s, int min_length, 
                                                    int max_gap, bool call_summits, bool save_bedGraph ):
         """ Call peaks for a chromosome.
 
@@ -997,7 +1017,7 @@ cdef class CallerFromAlignments:
 
         if above_cutoff.size == 0:
             # nothing above cutoff
-            return peaks
+            return
 
         if above_cutoff[0] == 0:
             # first element > cutoff, fix the first point as 0. otherwise it would be the last item in data[chrom]['pos']
@@ -1050,7 +1070,7 @@ cdef class CallerFromAlignments:
                 lastp = te #above_cutoff_endpos[i]
         # save the last peak
         if not peak_content:
-            return peaks
+            return
         else:
             if call_summits:
                 self.__close_peak_with_subpeaks (peak_content, peaks, min_length, chrom, min_length, score_array_s, score_cutoff_s = score_cutoff_s ) # smooth length is min_length, i.e. fragment size 'd'
@@ -1058,7 +1078,7 @@ cdef class CallerFromAlignments:
                 self.__close_peak_wo_subpeaks   (peak_content, peaks, min_length, chrom, min_length, score_array_s, score_cutoff_s = score_cutoff_s ) # smooth length is min_length, i.e. fragment size 'd'
 
         #print "close peaks -- chrom:",chrom,"  time:", ttime() - t0
-        return peaks
+        return
 
     cdef bool __close_peak_wo_subpeaks (self, list peak_content, peaks, int min_length,
                                           bytes chrom, int smoothlen, list score_array_s, list score_cutoff_s=[]):
@@ -1104,7 +1124,8 @@ cdef class CallerFromAlignments:
                 if score_cutoff_s[i] > score_array_s[ i ][ peak_content[ summit_index ][ 4 ] ]:
                     return False # not passed, then disgard this peak.
 
-            summit_p_score = get_pscore( int(summit_treat), summit_ctrl )
+            #summit_p_score = get_pscore( int(summit_treat), summit_ctrl )
+            summit_p_score = get_pscore(( int(summit_treat), summit_ctrl ) )
             summit_q_score = self.pqtable[ summit_p_score ]
 
             peaks.add( chrom,           # chromosome
@@ -1187,7 +1208,8 @@ cdef class CallerFromAlignments:
             summit_treat = peak_content[ summit_index ][ 2 ]
             summit_ctrl = peak_content[ summit_index ][ 3 ]            
 
-            summit_p_score = get_pscore( int(summit_treat), summit_ctrl )
+            #summit_p_score = get_pscore( int(summit_treat), summit_ctrl )
+            summit_p_score = get_pscore(( int(summit_treat), summit_ctrl ) )
             summit_q_score = self.pqtable[ summit_p_score ]
 
             for i in range(len(score_cutoff_s)):
@@ -1225,7 +1247,8 @@ cdef class CallerFromAlignments:
         array1_size = array1.shape[0]
         
         for i in range(array1_size):
-            s_ptr[0] = get_pscore( int(a1_ptr[0]), a2_ptr[0] )
+            #s_ptr[0] = get_pscore( int(a1_ptr[0]), a2_ptr[0] )
+            s_ptr[0] = get_pscore(( int(a1_ptr[0]), a2_ptr[0] ))
             s_ptr += 1
             a1_ptr += 1
             a2_ptr += 1
@@ -1247,7 +1270,8 @@ cdef class CallerFromAlignments:
         s_ptr = <float32_t *> s.data
 
         for i in range(array1.shape[0]):
-            s_ptr[0] = self.pqtable[ get_pscore( int(a1_ptr[0]), a2_ptr[0] ) ]
+            #s_ptr[0] = self.pqtable[ get_pscore( int(a1_ptr[0]), a2_ptr[0] ) ]
+            s_ptr[0] = self.pqtable[ get_pscore(( int(a1_ptr[0]), a2_ptr[0] )) ]
             s_ptr += 1
             a1_ptr += 1
             a2_ptr += 1
@@ -1424,7 +1448,7 @@ cdef class CallerFromAlignments:
 
         return True
 
-    cpdef call_broadpeaks (self, list scoring_function_symbols, list lvl1_cutoff_s, list lvl2_cutoff_s, int min_length=200, int lvl1_max_gap=50, int lvl2_max_gap=400, bool auto_cutoff = False):
+    cpdef call_broadpeaks (self, list scoring_function_symbols, list lvl1_cutoff_s, list lvl2_cutoff_s, int min_length=200, int lvl1_max_gap=50, int lvl2_max_gap=400, bool cutoff_analysis = False):
         """This function try to find enriched regions within which,
         scores are continuously higher than a given cutoff for level
         1, and link them using the gap above level 2 cutoff with a
@@ -1456,8 +1480,8 @@ cdef class CallerFromAlignments:
         # prepare p-q table
         if not self.pqtable:
             logging.info("#3 Pre-compute pvalue-qvalue table...")
-            if auto_cutoff:
-                logging.info("#3 Cutoff for broad region will be automatically decided!")
+            if cutoff_analysis:
+                logging.info("#3 Cutoff value vs broad region calls will be analyzed!")
                 self.__pre_computes( max_gap = lvl2_max_gap, min_length = min_length )
             else:
                 self.__cal_pvalue_qvalue_table()
@@ -1527,7 +1551,7 @@ cdef class CallerFromAlignments:
 
         return broadpeaks
 
-    cdef __chrom_call_broadpeak_using_certain_criteria ( self, lvl1peaks, lvl2peaks, bytes chrom, list scoring_function_s, list lvl1_cutoff_s, list lvl2_cutoff_s,
+    cdef void  __chrom_call_broadpeak_using_certain_criteria ( self, lvl1peaks, lvl2peaks, bytes chrom, list scoring_function_s, list lvl1_cutoff_s, list lvl2_cutoff_s,
                                                          int min_length, int lvl1_max_gap, int lvl2_max_gap, bool save_bedGraph):
         """ Call peaks for a chromosome.
 

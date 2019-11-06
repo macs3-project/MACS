@@ -39,9 +39,10 @@ from time import time as ttime
 # functions
 # ------------------------------------
 
-cdef inline int int_max(int a, int b): return a if a >= b else b
-cdef inline long long_max(long a, long b): return a if a >= b else b
-cdef inline float float_max(float a, float b): return a if a >= b else b
+# use python3 max function instead
+#cdef inline int int_max(int a, int b): return a if a > b else b
+#cdef inline long long_max(long a, long b): return a if a > b else b
+#cdef inline float float_max(float a, float b): return a if a > b else b
 
 cdef void clean_up_ndarray ( np.ndarray x ):
     # clean numpy ndarray in two steps
@@ -122,6 +123,7 @@ cpdef pileup_and_write( trackI,
 
 
 # function to pileup BAMPE/BEDPE stored in PETrackI object and write to a BEDGraph file
+# this function uses c function
 cpdef pileup_and_write_pe( petrackI,
                            bytes output_filename,
                            float scale_factor = 1,
@@ -572,7 +574,7 @@ cdef int * fix_coordinates_2 ( int * poss, int l_of_poss, int rlength) nogil:
     
     return poss
 
-# general pileup function
+# general pileup function implemented in cython
 cpdef se_all_in_one_pileup ( np.ndarray[np.int32_t, ndim=1] plus_tags, np.ndarray[np.int32_t, ndim=1] minus_tags, long five_shift, long three_shift, int rlength, float scale_factor, float baseline_value ):
     """Return pileup given 5' end of fragment at plus or minus strand
     separately, and given shift at both direction to recover a
@@ -647,7 +649,7 @@ cpdef se_all_in_one_pileup ( np.ndarray[np.int32_t, ndim=1] plus_tags, np.ndarra
     if pre_p != 0:
         # the first chunk of 0
         ret_p_ptr[0] = pre_p
-        ret_v_ptr[0] = float_max(0,baseline_value) 
+        ret_v_ptr[0] = max(0,baseline_value) 
         ret_p_ptr += 1
         ret_v_ptr += 1
         I += 1
@@ -662,7 +664,7 @@ cpdef se_all_in_one_pileup ( np.ndarray[np.int32_t, ndim=1] plus_tags, np.ndarra
             p = start_poss_ptr[0]
             if p != pre_p:
                 ret_p_ptr[0] = p
-                ret_v_ptr[0] = float_max(pileup * scale_factor, baseline_value)
+                ret_v_ptr[0] = max(pileup * scale_factor, baseline_value)
                 ret_p_ptr += 1
                 ret_v_ptr += 1
                 I += 1
@@ -674,7 +676,7 @@ cpdef se_all_in_one_pileup ( np.ndarray[np.int32_t, ndim=1] plus_tags, np.ndarra
             p = end_poss_ptr[0]
             if p != pre_p:
                 ret_p_ptr[0] = p
-                ret_v_ptr[0] = float_max(pileup * scale_factor, baseline_value)
+                ret_v_ptr[0] = max(pileup * scale_factor, baseline_value)
                 ret_p_ptr += 1
                 ret_v_ptr += 1
                 I += 1
@@ -694,7 +696,7 @@ cpdef se_all_in_one_pileup ( np.ndarray[np.int32_t, ndim=1] plus_tags, np.ndarra
             p = end_poss_ptr[0]
             if p != pre_p:
                 ret_p_ptr[0] = p
-                ret_v_ptr[0] = float_max(pileup * scale_factor, baseline_value)
+                ret_v_ptr[0] = max(pileup * scale_factor, baseline_value)
                 ret_p_ptr += 1
                 ret_v_ptr += 1
                 I += 1
@@ -720,6 +722,7 @@ cdef int compare(const void * a, const void * b) nogil:
     if a - b > 0: return 1
     return 0
 
+# quick pileup implemented in cython
 cpdef quick_pileup ( np.ndarray[np.int32_t, ndim=1] start_poss, np.ndarray[np.int32_t, ndim=1] end_poss, float scale_factor, float baseline_value ):
     """Return pileup given plus strand and minus strand positions of fragments.
     
@@ -775,7 +778,7 @@ cpdef quick_pileup ( np.ndarray[np.int32_t, ndim=1] start_poss, np.ndarray[np.in
     if pre_p != 0:
         # the first chunk of 0
         ret_p_ptr[0] = pre_p
-        ret_v_ptr[0] = float_max(0,baseline_value) 
+        ret_v_ptr[0] = max(0,baseline_value) 
         ret_p_ptr += 1
         ret_v_ptr += 1
         I += 1
@@ -787,7 +790,7 @@ cpdef quick_pileup ( np.ndarray[np.int32_t, ndim=1] start_poss, np.ndarray[np.in
             p = start_poss_ptr[0]
             if p != pre_p:
                 ret_p_ptr[0] = p
-                ret_v_ptr[0] = float_max(pileup * scale_factor, baseline_value)
+                ret_v_ptr[0] = max(pileup * scale_factor, baseline_value)
                 ret_p_ptr += 1
                 ret_v_ptr += 1
                 I += 1
@@ -801,7 +804,7 @@ cpdef quick_pileup ( np.ndarray[np.int32_t, ndim=1] start_poss, np.ndarray[np.in
             p = end_poss_ptr[0]
             if p != pre_p:
                 ret_p_ptr[0] = p
-                ret_v_ptr[0] = float_max(pileup * scale_factor, baseline_value)
+                ret_v_ptr[0] = max(pileup * scale_factor, baseline_value)
                 ret_p_ptr += 1
                 ret_v_ptr += 1
                 I += 1
@@ -822,7 +825,7 @@ cpdef quick_pileup ( np.ndarray[np.int32_t, ndim=1] start_poss, np.ndarray[np.in
             #for p in minus_tags[i_e:]:
             if p != pre_p:
                 ret_p_ptr[0] = p
-                ret_v_ptr[0] = float_max(pileup * scale_factor, baseline_value)
+                ret_v_ptr[0] = max(pileup * scale_factor, baseline_value)
                 ret_p_ptr += 1
                 ret_v_ptr += 1
                 I += 1
@@ -835,8 +838,7 @@ cpdef quick_pileup ( np.ndarray[np.int32_t, ndim=1] start_poss, np.ndarray[np.in
 
     return tmp
 
-# general function to calculate maximum between two arrays.
-
+# general function to calculate maximum between two arrays in cython.
 cpdef list max_over_two_pv_array ( list tmparray1, list tmparray2 ):
     """Merge two position-value arrays. For intersection regions, take
     the maximum value within region.
@@ -884,7 +886,7 @@ cpdef list max_over_two_pv_array ( list tmparray1, list tmparray2 ):
         if a1_pos_ptr[0] < a2_pos_ptr[0]:
             # clip a region from pre_p to p1, then set pre_p as p1.
             ret_pos_ptr[0] = a1_pos_ptr[0]
-            ret_v_ptr[0] =  float_max( a1_v_ptr[0], a2_v_ptr[0] )
+            ret_v_ptr[0] =  max( a1_v_ptr[0], a2_v_ptr[0] )
             ret_pos_ptr += 1
             ret_v_ptr += 1
             I += 1
@@ -896,7 +898,7 @@ cpdef list max_over_two_pv_array ( list tmparray1, list tmparray2 ):
         elif a1_pos_ptr[0] > a2_pos_ptr[0]:
             # clip a region from pre_p to p2, then set pre_p as p2.
             ret_pos_ptr[0] = a2_pos_ptr[0]
-            ret_v_ptr[0] =  float_max( a1_v_ptr[0], a2_v_ptr[0] )
+            ret_v_ptr[0] =  max( a1_v_ptr[0], a2_v_ptr[0] )
             ret_pos_ptr += 1
             ret_v_ptr += 1
             I += 1
@@ -908,7 +910,7 @@ cpdef list max_over_two_pv_array ( list tmparray1, list tmparray2 ):
         else:
             # from pre_p to p1 or p2, then set pre_p as p1 or p2.
             ret_pos_ptr[0] = a1_pos_ptr[0]
-            ret_v_ptr[0] =  float_max( a1_v_ptr[0], a2_v_ptr[0] )
+            ret_v_ptr[0] =  max( a1_v_ptr[0], a2_v_ptr[0] )
             ret_pos_ptr += 1
             ret_v_ptr += 1
             I += 1
