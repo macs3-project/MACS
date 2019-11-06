@@ -1,7 +1,7 @@
 # cython: language_level=3
 # cython: profile=True
 # cython: linetrace=True
-# Time-stamp: <2019-11-06 14:41:06 taoliu>
+# Time-stamp: <2019-11-06 15:43:38 taoliu>
 
 """Module for all MACS Parser classes for input.
 
@@ -20,7 +20,6 @@ from struct import unpack
 from re import findall
 import gzip
 import io
-from multiprocessing import Pool
 
 from MACS2.Constants import *
 from MACS2.IO.FixWidthTrack import FWTrack
@@ -885,16 +884,24 @@ cdef class BAMParser( GenericParser ):
             int entrylength, fpos, strand, chrid
             list references
             dict rlengths
+            long b = 0
+            long e
+            long rem
         
         fwtrack = FWTrack( buffer_size = self.buffer_size )
-        references, rlengths = self.get_references()
+        references, rlengths = self.get_references() # after this, ptr at list of alignments
         fseek = self.fhd.seek
         fread = self.fhd.read
         ftell = self.fhd.tell
-        
+        #b = ftell()
+        #fseek(0,2)
+        #e = ftell()
+        #fseek( b )
+        #rem = e - b
+
         while True:
             try:
-                entrylength = unpack( '<i', fread( 4 ) )[ 0 ]
+                entrylength = unpack( "<i", fread( 4 ) )[0]
             except struct.error:
                 break
             ( chrid, fpos, strand ) = self.__fw_binary_parse( fread( entrylength ) )
@@ -903,6 +910,7 @@ cdef class BAMParser( GenericParser ):
             i += 1
             if i % 1000000 == 0:
                 info( " %d" % i )
+            rem = rem - 4 - entrylength
         info( "%d reads have been read." % i ) 
         self.fhd.close()
         fwtrack.set_rlengths( rlengths )
@@ -994,12 +1002,9 @@ cdef class BAMParser( GenericParser ):
             for cigar_code in ui32[:n_cigar_op]:#unpack( '<%dI' % (n_cigar_op) , data[ 32 + l_read_name : 32 + l_read_name + n_cigar_op*4 ] ):
                 if cigar_code & 15 in [ 0, 2, 3, 7, 8 ]:   # they are CIGAR op M/D/N/=/X
                     thisstart += cigar_code >> 4
-                    #ret.start += cigar_code >> 4
             thisstrand = 1
-            #ret.strand = 1
         else:
             thisstrand = 0
-            #ret.strand = 0
             
         return ( thisref, thisstart, thisstrand )
         #return
