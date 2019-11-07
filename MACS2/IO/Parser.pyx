@@ -1052,7 +1052,6 @@ cdef class BAMPEParser(BAMParser):
             try:
                 entrylength = unpack( '<i', fread(4) )[0]
             except err:
-                print( data )
                 break
             ( chrid, fpos, tlen ) = self.__pe_binary_parse( fread(entrylength) )
             if chrid == -1: continue
