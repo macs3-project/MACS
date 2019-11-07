@@ -1,7 +1,7 @@
 # cython: language_level=3
 # cython: profile=True
 # cython: linetrace=True
-# Time-stamp: <2019-11-06 15:43:38 taoliu>
+# Time-stamp: <2019-11-06 17:15:18 taoliu>
 
 """Module for all MACS Parser classes for input.
 
@@ -884,20 +884,12 @@ cdef class BAMParser( GenericParser ):
             int entrylength, fpos, strand, chrid
             list references
             dict rlengths
-            long b = 0
-            long e
-            long rem
         
         fwtrack = FWTrack( buffer_size = self.buffer_size )
         references, rlengths = self.get_references() # after this, ptr at list of alignments
         fseek = self.fhd.seek
         fread = self.fhd.read
         ftell = self.fhd.tell
-        #b = ftell()
-        #fseek(0,2)
-        #e = ftell()
-        #fseek( b )
-        #rem = e - b
 
         while True:
             try:
@@ -910,7 +902,6 @@ cdef class BAMParser( GenericParser ):
             i += 1
             if i % 1000000 == 0:
                 info( " %d" % i )
-            rem = rem - 4 - entrylength
         info( "%d reads have been read." % i ) 
         self.fhd.close()
         fwtrack.set_rlengths( rlengths )
@@ -1046,6 +1037,7 @@ cdef class BAMPEParser(BAMParser):
             int entrylength, fpos, chrid, tlen
             list references
             dict rlengths
+            bytes data
         
         petrack = PETrackI( buffer_size = self.buffer_size )
 
@@ -1058,8 +1050,12 @@ cdef class BAMPEParser(BAMParser):
         add_loc = petrack.add_loc
         err = struct.error
         while True:
-            try: entrylength = unpack('<i', fread(4))[0]
-            except err: break
+            try:
+                data = fread(4)
+                entrylength = unpack('<i', data)[0]
+            except err:
+                print( data )
+                break
             ( chrid, fpos, tlen ) = self.__pe_binary_parse( fread(entrylength) )
             if chrid == -1: continue
             add_loc(references[ chrid ], fpos, fpos + tlen)
@@ -1070,8 +1066,8 @@ cdef class BAMPEParser(BAMParser):
 
         self.d = m / i
         self.n = i
-        assert self.d >= 0, "Something went wrong (mean fragment size was negative)"
         info( "%d fragments have been read." % i )
+        assert self.d >= 0, "Something went wrong (mean fragment size was negative: %d = %d / %d)" % (self.d, m, i)
         self.fhd.close()
         petrack.set_rlengths( rlengths )
         return petrack
@@ -1107,8 +1103,8 @@ cdef class BAMPEParser(BAMParser):
 
         self.d = ( self.d * self.n + m ) / ( self.n + i )
         self.n += i
-        assert self.d >= 0, "Something went wrong (mean fragment size was negative)"
         info( "%d fragments have been read." % i )         
+        assert self.d >= 0, "Something went wrong (mean fragment size was negative: %d = %d / %d)" % (self.d, m, i)
         self.fhd.close()
         # this is the problematic part. If fwtrack is finalized, then it's impossible to increase the length of it in a step of buffer_size for multiple input files.
         # petrack.finalize()
