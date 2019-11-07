@@ -1032,12 +1032,11 @@ cdef class BAMPEParser(BAMParser):
         """Build PETrackI from all lines, return a FWTrack object.
         """
         cdef:
-            int i = 0          # number of fragments kept
-            int m = 0          # sum of fragment lengths
+            long i = 0          # number of fragments kept
+            long m = 0          # sum of fragment lengths
             int entrylength, fpos, chrid, tlen
             list references
             dict rlengths
-            bytes data
         
         petrack = PETrackI( buffer_size = self.buffer_size )
 
@@ -1051,8 +1050,7 @@ cdef class BAMPEParser(BAMParser):
         err = struct.error
         while True:
             try:
-                data = fread(4)
-                entrylength = unpack('<i', data)[0]
+                entrylength = unpack( '<i', fread(4) )[0]
             except err:
                 print( data )
                 break
