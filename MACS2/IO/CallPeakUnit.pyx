@@ -1,7 +1,7 @@
 # cython: language_level=3
 # cython: profile=True
 # cython: linetrace=True
-# Time-stamp: <2019-10-31 12:18:02 taoliu>
+# Time-stamp: <2019-11-06 13:00:01 taoliu>
 
 """Module for Calculate Scores.
 
@@ -1426,25 +1426,19 @@ cdef class CallerFromAlignments:
             ctrl_array_ptr += 1
 
             if abs(pre_v_t - v_t) > 1e-5: # precision is 5 digits
-                tmp_bytes = b"%s\t%d\t%d\t%.5f\n" % ( chrom, pre_p_t, p, pre_v_t )
-                #t_write_func( "%s\t%d\t%d\t%.5f\n" % ( chrom, pre_p_t, p, pre_v_t ) )
-                fprintf( ft, tmp_bytes )
+                fprintf( ft, b"%s\t%d\t%d\t%.5f\n", chrom, pre_p_t, p, pre_v_t )
                 pre_v_t = v_t
                 pre_p_t = p
 
             if abs(pre_v_c - v_c) > 1e-5: # precision is 5 digits
-                tmp_bytes = b"%s\t%d\t%d\t%.5f\n" % ( chrom, pre_p_c, p, pre_v_c )
-                fprintf( fc, tmp_bytes )
-                #c_write_func( "%s\t%d\t%d\t%.5f\n" % ( chrom, pre_p_c, p, pre_v_c ) )
+                fprintf( fc, b"%s\t%d\t%d\t%.5f\n", chrom, pre_p_c, p, pre_v_c )
                 pre_v_c = v_c
                 pre_p_c = p
 
         p = pos_array_ptr[ 0 ]
         # last one
-        tmp_bytes = b"%s\t%d\t%d\t%.5f\n" % ( chrom, pre_p_t, p, pre_v_t )
-        fprintf( ft, tmp_bytes )
-        tmp_bytes = b"%s\t%d\t%d\t%.5f\n" % ( chrom, pre_p_c, p, pre_v_c )
-        fprintf( fc, tmp_bytes )
+        fprintf( ft, b"%s\t%d\t%d\t%.5f\n", chrom, pre_p_t, p, pre_v_t )        
+        fprintf( fc, b"%s\t%d\t%d\t%.5f\n", chrom, pre_p_c, p, pre_v_c )        
 
         return True
 

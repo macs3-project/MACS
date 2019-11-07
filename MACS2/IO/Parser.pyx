@@ -1,7 +1,7 @@
 # cython: language_level=3
 # cython: profile=True
 # cython: linetrace=True
-# Time-stamp: <2019-11-04 15:06:29 taoliu>
+# Time-stamp: <2019-11-06 17:15:18 taoliu>
 
 """Module for all MACS Parser classes for input.
 
@@ -20,6 +20,7 @@ from struct import unpack
 from re import findall
 import gzip
 import io
+
 from MACS2.Constants import *
 from MACS2.IO.FixWidthTrack import FWTrack
 from MACS2.IO.PairedEndTrack import PETrackI
@@ -28,7 +29,7 @@ from cpython cimport bool
 
 import numpy as np
 cimport numpy as np
-from numpy cimport uint32_t, uint64_t, int32_t, int64_t
+from numpy cimport uint8_t, uint16_t, uint32_t, uint64_t, int32_t, int64_t
 
 cdef extern from "stdlib.h":
     ctypedef unsigned int size_t
@@ -885,14 +886,14 @@ cdef class BAMParser( GenericParser ):
             dict rlengths
         
         fwtrack = FWTrack( buffer_size = self.buffer_size )
-        references, rlengths = self.get_references()
+        references, rlengths = self.get_references() # after this, ptr at list of alignments
         fseek = self.fhd.seek
         fread = self.fhd.read
         ftell = self.fhd.tell
-        
+
         while True:
             try:
-                entrylength = unpack( '<i', fread( 4 ) )[ 0 ]
+                entrylength = unpack( "<i", fread( 4 ) )[0]
             except struct.error:
                 break
             ( chrid, fpos, strand ) = self.__fw_binary_parse( fread( entrylength ) )
@@ -941,12 +942,15 @@ cdef class BAMParser( GenericParser ):
         fwtrack.set_rlengths( rlengths )
         return fwtrack
     
-    cdef tuple __fw_binary_parse (self, data ):
+    cdef tuple __fw_binary_parse (self, const unsigned char * data ):
         cdef:
             int thisref, thisstart, thisstrand
             short bwflag, l_read_name, n_cigar_op
             int cigar_code
-            tuple readout
+            uint8_t *ui8
+            int32_t *i32
+            uint16_t *ui16
+            uint32_t *ui32
 
         # we skip lot of the available information in data (i.e. tag name, quality etc etc)        
 
@@ -954,8 +958,8 @@ cdef class BAMParser( GenericParser ):
         if not data: return ( -1, -1, -1 )
 
         #(thisref, thisstart, l_read_name, unused1, unused2, unused3, n_cigar_op, bwflag) = unpack( '<iiBBBBHH', data [ : 16 ])
-        readout = unpack( '<iiBBBBHH', data [ : 16 ])
-        bwflag = readout[7]
+        ui16 = <uint16_t *>data
+        bwflag = ui16[7]
         if (bwflag & 2820) or (bwflag & 1 and (bwflag & 136 or not bwflag & 2)): return ( -1, -1, -1 )
         #simple form of the expression below 
         #if bwflag & 4 or bwflag & 512 or bwflag & 256 or bwflag & 2048: return (-1, -1, -1)
@@ -972,30 +976,26 @@ cdef class BAMParser( GenericParser ):
         #        # this is not the first read in a pair
         #        return ( -1, -1, -1 )
         
-        #(ret.ref, ret.start, l_read_name, unused1, unused2, unused3, n_cigar_op) = unpack( '<iiBBBBH', data [ : 14 ])
-        thisref = readout[0]
-        thisstart = readout[1]
-        l_read_name = readout[2]
-        n_cigar_op = readout[6]
-        #thisref = unpack( '<i', data[ 0:4 ] )[ 0 ]
-        #thisstart = unpack( '<i', data[ 4:8 ] )[ 0 ]
+        i32 = <int32_t *>data
+        thisref = i32[0]
+        thisstart = i32[1]
+        n_cigar_op = ui16[6]
         # In case of paired-end we have now skipped all possible "bad" pairs
         # in case of proper pair we have skipped the rightmost one... if the leftmost pair comes
         # we can treat it as a single read, so just check the strand and calculate its
         # start position... hope I'm right!
         if bwflag & 16:
-            # read mapped to minus strand
-            #l_read_name = unpack( '<B', data[ 8:9 ] )[ 0 ]
+            # read mapped to minus strand; then we have to compute cigar to find the rightmost position
+            ui8 = <uint8_t *>data
+            l_read_name = ui8[8]
             # need to decipher CIGAR string
-            for cigar_code in unpack( '<%dI' % (n_cigar_op) , data[ 32 + l_read_name : 32 + l_read_name + n_cigar_op*4 ] ):
+            ui32 = <uint32_t *>(data + 32 + l_read_name) # move pointer to cigar_code
+            for cigar_code in ui32[:n_cigar_op]:#unpack( '<%dI' % (n_cigar_op) , data[ 32 + l_read_name : 32 + l_read_name + n_cigar_op*4 ] ):
                 if cigar_code & 15 in [ 0, 2, 3, 7, 8 ]:   # they are CIGAR op M/D/N/=/X
                     thisstart += cigar_code >> 4
-                    #ret.start += cigar_code >> 4
             thisstrand = 1
-            #ret.strand = 1
         else:
             thisstrand = 0
-            #ret.strand = 0
             
         return ( thisref, thisstart, thisstrand )
         #return
@@ -1032,8 +1032,8 @@ cdef class BAMPEParser(BAMParser):
         """Build PETrackI from all lines, return a FWTrack object.
         """
         cdef:
-            int i = 0          # number of fragments kept
-            int m = 0          # sum of fragment lengths
+            long i = 0          # number of fragments kept
+            long m = 0          # sum of fragment lengths
             int entrylength, fpos, chrid, tlen
             list references
             dict rlengths
@@ -1049,8 +1049,10 @@ cdef class BAMPEParser(BAMParser):
         add_loc = petrack.add_loc
         err = struct.error
         while True:
-            try: entrylength = unpack('<i', fread(4))[0]
-            except err: break
+            try:
+                entrylength = unpack( '<i', fread(4) )[0]
+            except err:
+                break
             ( chrid, fpos, tlen ) = self.__pe_binary_parse( fread(entrylength) )
             if chrid == -1: continue
             add_loc(references[ chrid ], fpos, fpos + tlen)
@@ -1061,8 +1063,8 @@ cdef class BAMPEParser(BAMParser):
 
         self.d = m / i
         self.n = i
-        assert self.d >= 0, "Something went wrong (mean fragment size was negative)"
         info( "%d fragments have been read." % i )
+        assert self.d >= 0, "Something went wrong (mean fragment size was negative: %d = %d / %d)" % (self.d, m, i)
         self.fhd.close()
         petrack.set_rlengths( rlengths )
         return petrack
@@ -1098,46 +1100,60 @@ cdef class BAMPEParser(BAMParser):
 
         self.d = ( self.d * self.n + m ) / ( self.n + i )
         self.n += i
-        assert self.d >= 0, "Something went wrong (mean fragment size was negative)"
         info( "%d fragments have been read." % i )         
+        assert self.d >= 0, "Something went wrong (mean fragment size was negative: %d = %d / %d)" % (self.d, m, i)
         self.fhd.close()
         # this is the problematic part. If fwtrack is finalized, then it's impossible to increase the length of it in a step of buffer_size for multiple input files.
         # petrack.finalize()
         petrack.set_rlengths( rlengths )
         return petrack
         
-    cdef tuple __pe_binary_parse (self, bytes data):
+    cdef tuple __pe_binary_parse (self, const unsigned char * data):
         cdef:
             int thisref, thisstart, thistlen
             int nextpos, pos
             short bwflag
-            tuple readout
+            uint8_t *ui8
+            int32_t *i32
+            uint16_t *ui16            
         
         # we skip lot of the available information in data (i.e. tag name, quality etc etc)
         if not data: return ( -1, -1, -1 )
 
         #( thisref, pos, unused1, n_cigar_op, bwflag, unused2, unused3, nextpos, thistlen ) = \
-        readout = unpack( '<iiiHHiiii', data[:32] )
+        #  unpack( '<iiiHHiiii', data[:32] )
 
-        bwflag = readout[4]
-        if (bwflag & 2820) or (bwflag & 1 and (bwflag & 136 or not bwflag & 2)): return (-1, -1, -1)
+        ui16 = <uint16_t *>data
+        bwflag = ui16[7]
+        if (bwflag & 2820) or (bwflag & 1 and (bwflag & 136 or not bwflag & 2)): return ( -1, -1, -1 )
         #simple form of the expression below 
-        # if bwflag & 4 or bwflag & 512 or bwflag & 256 or bwflag & 2048:
-        #     return ret       #unmapped sequence or bad sequence or 2nd or sup alignment
-        # if bwflag & 1:
-        #     # paired read. We should only keep sequence if the mate is mapped
-        #     # and if this is the left mate, all is within  the flag! 
-        #     if not bwflag & 2:
-        #         return ret  # not a proper pair
-        #     if bwflag & 8:
-        #         return ret  # the mate is unmapped
-        #     if bwflag & 128:
-        #         # this is not the first read in a pair
-        #         return ret
-        thisref = readout[0]
-        pos = readout[1]
-        nextpos = readout[7]
-        thistlen = readout[8]
+        #if bwflag & 4 or bwflag & 512 or bwflag & 256 or bwflag & 2048: return (-1, -1, -1)
+        ## unmapped sequence or bad sequence or  secondary or supplementary alignment             
+        #if bwflag & 1:
+        #    # paired read. We should only keep sequence if the mate is mapped
+        #    # and if this is the left mate, all is within  the flag! 
+        #    if not bwflag & 2:
+        #        return ( -1, -1, -1 )   # not a proper pair
+        #    if bwflag & 8:
+        #        return ( -1, -1, -1 )   # the mate is unmapped
+        #    # From Benjamin Schiller https://github.com/benjschiller
+        #    if bwflag & 128:
+        #        # this is not the first read in a pair
+        #        return ( -1, -1, -1 )
+        
+        i32 = <int32_t *>data
+        ui8 = <uint8_t *>data
+        thisref = i32[0]
+        thisstart = i32[1]
+        l_read_name = ui8[8]
+        n_cigar_op = ui16[6]
+        thisref = i32[0]
+        thisstart = i32[1]
+        n_cigar_op = ui16[6]
+
+        pos = i32[1]
+        nextpos = i32[6]
+        thistlen = i32[7]
         thisstart = min(pos, nextpos) # we keep only the leftmost
                                       # position which means this must
                                       # be at + strand. So we don't
