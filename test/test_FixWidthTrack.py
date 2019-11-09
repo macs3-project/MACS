@@ -90,14 +90,6 @@ class Test_FWTrack(unittest.TestCase):
 
         fw.sample_percent( 0.5 )
         self.assertEqual( fw.total, 8 )        
-        
-        #fw.print_to_bed()
-        #self.assertTrue( abs(result - expect) < 1e-5*result)
-
-        #self.assertEqual(result, expect)
-
-        #self.assertEqual(result, expect)
-        #self.assertEqual_float( result, expect )
 
 
 if __name__ == '__main__':
