@@ -206,6 +206,3 @@ chrY	161	210	50	186	20.00	7.09102	3.50000	-1.00000	MACS_peak_2
         p.write_to_xls( strio )
         self.assertEqual( strio.getvalue(), self.xls1 )        
 
-
-if __name__ == '__main__':
-    unittest.main()

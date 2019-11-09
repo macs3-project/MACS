@@ -76,6 +76,3 @@ class Test_PETrackI(unittest.TestCase):
         pe.sample_percent( 0.5 )
         self.assertEqual( pe.total, 8 )        
 
-
-if __name__ == '__main__':
-    unittest.main()
