@@ -6,9 +6,9 @@ import unittest
 from numpy.testing import assert_equal,  assert_almost_equal, assert_array_equal
 
 from MACS2.IO.ScoreTrack import *
+from MACS2.IO.BedGraph import bedGraphTrackI
 
 class Test_TwoConditionScores(unittest.TestCase):
-
     def setUp(self):
         self.t1bdg = bedGraphTrackI()
         self.t2bdg = bedGraphTrackI()
@@ -108,9 +108,6 @@ chrY	1	60	60	6	100.00	63.27251	9.18182	-1.00000	MACS_peak_1
 chrY	161	210	50	186	20.00	7.09102	3.50000	-1.00000	MACS_peak_2
 """
         
-    def assertEqual_float ( self, a, b, roundn = 5 ):
-        self.assertEqual( round( a, roundn ), round( b, roundn ) )
-
     def assertListAlmostEqual ( self, a, b, places =2 ):
         return all( [self.assertAlmostEqual(x, y, places=places) for (x, y) in zip( a, b)] )
 
