@@ -7,12 +7,12 @@
 	filter_dup function replaces separate_dups. The later one was
 	implemented for potentially putting back duplicate reads in
 	certain downstream analysis. However such analysis hasn't been
-	implemented. Optimize speed of writing bedGraph files. Optimize
-	BAM and BAMPE parsing with pointer casting instead of python
-	unpack.
+	implemented. Optimize the speed of writing bedGraph
+	files. Optimize BAM and BAMPE parsing with pointer casting instead
+	of python unpack.
 
-	2) Do not check "track" and "comment" lines in BED file. So please
-	avoid them.
+	2) Do not check "track" and "comment" lines in the BED file. So
+	please pre-filter such lines from BED input before using MACS2.
 
 	* Bugs fixed
 
