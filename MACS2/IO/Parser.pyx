@@ -1,7 +1,7 @@
 # cython: language_level=3
 # cython: profile=True
 # cython: linetrace=True
-# Time-stamp: <2019-11-06 17:15:18 taoliu>
+# Time-stamp: <2019-12-12 10:58:44 taoliu>
 
 """Module for all MACS Parser classes for input.
 
@@ -53,41 +53,28 @@ __doc__ = "All Parser classes"
 # Misc functions
 # ------------------------------------
 
-cpdef guess_parser ( fhd, long buffer_size = 100000 ):
+cpdef guess_parser ( fname, long buffer_size = 100000 ):
     # Note: BAMPE and BEDPE can't be automatically detected.
-    order_list = ("BAM",
-                  "BED",
-                  "ELAND",
-                  "ELANDMULTI",
-                  "ELANDEXPORT",
-                  "SAM",
-                  "BOWTIE",
-                  )
+    ordered_parser_dict = {"BAM":BAMParser,
+                           "BED":BEDParser,
+                           "ELAND":ELANDResultParser,
+                           "ELANDMULTI":ELANDMultiParser,
+                           "ELANDEXPORT":ELANDExportParser,
+                           "SAM":SAMParser,
+                           "BOWTIE":BowtieParser}
 
-    for f in order_list:
-        if f == 'BED':
-            p = BEDParser( fhd, buffer_size = buffer_size )
-        elif f == "ELAND":
-            p = ELANDResultParser( fhd, buffer_size = buffer_size )
-        elif f ==  "ELANDMULTI":
-            p = ELANDMultiParser( fhd, buffer_size = buffer_size )
-        elif f == "ELANDEXPORT":
-            p = ELANDExportParser( fhd, buffer_size = buffer_size )
-        elif f == "SAM":
-            p = SAMParser( fhd, buffer_size = buffer_size )
-        elif f == "BAM":
-            p = BAMParser( fhd, buffer_size = buffer_size )
-        elif f == "BOWTIE":
-            p = BowtieParser( fhd, buffer_size = buffer_size )
+    for f in ordered_parser_dict:
+        p = ordered_parser_dict[ f ]
+        t_parser = p( fname, buffer_size = buffer_size )
         debug( "Testing format %s" % f )
-        s = p.sniff()
+        s = t_parser.sniff()
         if s:
             info( "Detected format is: %s" % ( f ) )
-            if p.gzipped:
+            if t_parser.is_gzipped():
                 info( "* Input file is gzipped." )
-            return p
+            return t_parser
         else:
-            p.close()
+            t_parser.close()
     raise Exception( "Can't detect format!" )
 
 # ------------------------------------
@@ -105,7 +92,7 @@ class StrandFormatError( Exception ):
         
     def __str__ ( self ):
         return repr( "Strand information can not be recognized in this line: \"%s\",\"%s\"" % ( self.string, self.strand ) )
-        
+
 cdef class GenericParser:
     """Generic Parser class.
 
@@ -149,7 +136,15 @@ cdef class GenericParser:
             self.fhd = io.BufferedReader( gzip.open( filename, mode='rb' ), buffer_size = 1048576 ) # buffersize set to 1M
         else:
             self.fhd = io.open( filename, mode='rb' ) # binary mode! I don't expect unicode here!
+        self.__skip_first_commentlines()
 
+    cdef void __skip_first_commentlines ( self ):
+        """Some parser needs to skip the first several comment lines. 
+
+        Redefine this if it's necessary!
+        """
+        return
+    
     cpdef int tsize( self ):
         """General function to detect tag size.
 
@@ -162,7 +157,7 @@ cdef class GenericParser:
             int m = 0     # number of trials
             int this_taglength
             bytes thisline
-        
+
         if self.tag_size != -1:
             # if we have already calculated tag size (!= -1),  return it.
             return self.tag_size
@@ -179,7 +174,9 @@ cdef class GenericParser:
                 n += 1
         # done
         self.fhd.seek( 0 )
-        self.tag_size = int(s/n)
+        self.__skip_first_commentlines()
+        if n != 0:              # else tsize = -1
+            self.tag_size = int(s/n)
         return self.tag_size
 
     cdef int __tlen_parse_line ( self, bytes thisline ):
@@ -264,18 +261,14 @@ cdef class GenericParser:
         """
         cdef int t
         
-        try:
-            t = self.tsize()
-        except:
+        t = self.tsize()
+        if t <= 10 or t >= 10000: # tsize too small or too big
             self.fhd.seek( 0 )
             return False
         else:
-            if t <= 10 or t >= 10000:
-                self.fhd.seek( 0 )
-                return False
-            else:
-                self.fhd.seek( 0 )
-                return True
+            self.fhd.seek( 0 )
+            self.__skip_first_commentlines()
+            return True
             
     cpdef close ( self ):
         """Run this when this Parser will be never used.
@@ -284,10 +277,30 @@ cdef class GenericParser:
         """
         self.fhd.close()
 
+    cpdef bool is_gzipped ( self ):
+        return self.gzipped
+        
 cdef class BEDParser( GenericParser ):
     """File Parser Class for BED File.
 
     """
+    cdef void __skip_first_commentlines ( self ):
+        """BEDParser needs to skip the first several comment lines. 
+        """
+        cdef:
+            int l_line
+            bytes this_line
+        for thisline in self.fhd:
+            l_line = len( thisline )
+            if thisline and ( thisline[ :5 ] != b"track" ) \
+               and ( thisline[ :7 ] != b"browser" ) \
+               and ( thisline[ 0 ] != 35 ): # 35 is b"#"
+                break
+
+        # rewind from SEEK_CUR
+        self.fhd.seek( -l_line, 1 )
+        return
+    
     cdef int __tlen_parse_line ( self, bytes thisline ):
         """Parse 5' and 3' position, then calculate frag length.
 
@@ -353,6 +366,23 @@ cdef class BEDPEParser(GenericParser):
 
     cdef public int n
     cdef public float d
+
+    cdef void __skip_first_commentlines ( self ):
+        """BEDPEParser needs to skip the first several comment lines. 
+        """
+        cdef:
+            int l_line
+            bytes this_line
+        for thisline in self.fhd:
+            l_line = len( thisline )
+            if thisline and ( thisline[ :5 ] != b"track" ) \
+               and ( thisline[ :7 ] != b"browser" ) \
+               and ( thisline[ 0 ] != 35 ): # 35 is b"#"
+                break
+
+        # rewind from SEEK_CUR
+        self.fhd.seek( -l_line, 1 )
+        return
 
     cdef __pe_parse_line ( self, bytes thisline ):
         """ Parse each line, and return chromosome, left and right positions
@@ -455,13 +485,28 @@ cdef class ELANDResultParser( GenericParser ):
     """File Parser Class for tabular File.
 
     """
+    cdef void __skip_first_commentlines ( self ):
+        """ELANDResultParser needs to skip the first several comment lines. 
+        """
+        cdef:
+            int l_line
+            bytes this_line
+        for thisline in self.fhd:
+            l_line = len( thisline )
+            if thisline and thisline[ 0 ] != 35: # 35 is b"#"
+                break
+
+        # rewind from SEEK_CUR
+        self.fhd.seek( -l_line, 1 )
+        return
+
     cdef int __tlen_parse_line ( self, bytes thisline ):
         """Parse tag sequence, then tag length.
 
         """
         thisline = thisline.rstrip()
         if not thisline: return 0
-        thisfields = thisline.split( '\t' )
+        thisfields = thisline.split( b'\t' )
         if thisfields[1].isdigit():
             return 0
         else:
@@ -520,6 +565,21 @@ cdef class ELANDMultiParser( GenericParser ):
     starting at position 160322 with one error, one in the forward direction starting at 
     position 170128 with two errors. There is also a single-error match to E_coli.fa.
     """
+    cdef void __skip_first_commentlines ( self ):
+        """ELANDResultParser needs to skip the first several comment lines. 
+        """
+        cdef:
+            int l_line
+            bytes this_line
+        for thisline in self.fhd:
+            l_line = len( thisline )
+            if thisline and thisline[ 0 ] != 35: # 35 is b"#"
+                break
+
+        # rewind from SEEK_CUR
+        self.fhd.seek( -l_line, 1 )
+        return
+    
     cdef int __tlen_parse_line ( self, bytes thisline ):
         """Parse tag sequence, then tag length.
 
@@ -580,6 +640,21 @@ cdef class ELANDExportParser( GenericParser ):
     """File Parser Class for ELAND Export File.
 
     """
+    cdef void __skip_first_commentlines ( self ):
+        """ELANDResultParser needs to skip the first several comment lines. 
+        """
+        cdef:
+            int l_line
+            bytes this_line
+        for thisline in self.fhd:
+            l_line = len( thisline )
+            if thisline and thisline[ 0 ] != 35: # 35 is b"#"
+                break
+
+        # rewind from SEEK_CUR
+        self.fhd.seek( -l_line, 1 )
+        return
+    
     cdef int __tlen_parse_line ( self, bytes thisline ):
         """Parse tag sequence, then tag length.
 
@@ -651,7 +726,22 @@ cdef class SAMParser( GenericParser ):
     1024	PCR or optical duplicate
     2048	supplementary alignment
     """
+    
+    cdef void __skip_first_commentlines ( self ):
+        """SAMParser needs to skip the first several comment lines. 
+        """
+        cdef:
+            int l_line
+            bytes this_line
+        for thisline in self.fhd:
+            l_line = len( thisline )
+            if thisline and thisline[ 0 ] != 64: # 64 is b"@"
+                break
 
+        # rewind from SEEK_CUR
+        self.fhd.seek( -l_line, 1 )
+        return
+    
     cdef int __tlen_parse_line ( self, bytes thisline ):
         """Parse tag sequence, then tag length.
 
@@ -718,7 +808,7 @@ cdef class SAMParser( GenericParser ):
         if bwflag & 16:
             # minus strand, we have to decipher CIGAR string
             thisstrand = 1
-            thisstart = atoi( thisfields[ 3 ] ) - 1 + sum( [ int(x) for x in findall("(\d+)[MDNX=]",CIGAR) ] )	#reverse strand should be shifted alen bp 
+            thisstart = atoi( thisfields[ 3 ] ) - 1 + sum( [ int(x) for x in findall(b"(\d+)[MDNX=]",CIGAR) ] )	#reverse strand should be shifted alen bp 
         else:
             thisstrand = 0
             thisstart = atoi( thisfields[ 3 ] ) - 1
