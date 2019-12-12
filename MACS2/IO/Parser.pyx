@@ -1,7 +1,7 @@
 # cython: language_level=3
 # cython: profile=True
 # cython: linetrace=True
-# Time-stamp: <2019-12-12 10:58:44 taoliu>
+# Time-stamp: <2019-12-12 12:55:02 taoliu>
 
 """Module for all MACS Parser classes for input.
 
@@ -752,7 +752,6 @@ cdef class SAMParser( GenericParser ):
         
         thisline = thisline.rstrip()
         if not thisline: return 0
-        if thisline[ 0 ] == b"@": return 0 # header line started with '@' is skipped
         thisfields = thisline.split( b'\t' )
         bwflag = atoi( thisfields[ 1 ] )
         if bwflag & 4 or bwflag & 512 or bwflag & 256 or bwflag & 2048:
