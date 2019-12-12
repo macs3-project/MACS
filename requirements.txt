@@ -1,4 +1,4 @@
-numpy==1.17.4
+numpy>=1.17
 cython>=0.29
 pytest>=4.6
 pytest-cov>=2.8
