@@ -112,7 +112,3 @@ class Test_bedGraphTrackI_overlie(unittest.TestCase):
             self.assertEqual_float( self.test_overlie_fisher[i][6], value )            
             pre = pos                        
 
-
-
-if __name__ == '__main__':
-    unittest.main()

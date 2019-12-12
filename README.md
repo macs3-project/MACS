@@ -28,7 +28,40 @@ applied to any "DNA enrichment assays" if the question to be asked is
 simply: *where we can find significant reads coverage than the random
 background*.
 
-## Recent Changes for MACS (2.2.5)
+## Recent Changes for MACS (2.2.6)
+
+### 2.2.6
+	* New Features 
+
+	1) Speed up MACS2. Some programming tricks and code cleanup. The 
+	filter_dup function replaces separate_dups. The later one was 
+	implemented for potentially putting back duplicate reads in 
+	certain downstream analysis. However such analysis hasn't been 
+	implemented. Optimize speed of writing bedGraph files. Optimize 
+	BAM and BAMPE parsing with pointer casting instead of python 
+	unpack. 
+
+	2) The comment lines in the headers of BED or SAM files will be
+	correctly skipped. However, MACS2 won't check comment lines in the
+	middle of the file.
+
+	* Bugs fixed 
+
+	1) Cutoff-analysis in callpeak command. #341
+	
+	2) Issues related to SAMParser and three ELAND Parsers are
+	fixed. #347
+	
+	* Other 
+
+	1) cmdlinetest script in test/ folder has been updated to: 1. test 
+	cutoff-analysis with callpeak cmd; 2. output the 2 lines before 
+	and after the error or warning message during tests; 3. output 
+	only the first 10 lines if the difference between test result and 
+	standard result can be found; 4. prockreport monitor CPU time and 
+	memory usage in 1 sec interval -- a bit more accurate.
+	
+	2) Python3.5 support is removed. Now MACS2 requires Python>=3.6.
 
 ### 2.2.5
 	* Features added
@@ -59,23 +92,6 @@ background*.
 
 	1) More Python3 related fixes, e.g. the return value of keys from
 	py3 dict. #333 #337
-
-### 2.2.4
-	* Features added
-	
-	1) First Python3 version MACS2 released.
-
-	2) Version number 2.2.X will be used for MACS2 in Python3, in
-	parallel to 2.1.X.
-
-	3) More comprehensive test.sh script to check the consistency of
-	results from Python2 version and Python3 version.
-	
-	4) Simplify setup.py script since the newest version transparently
-	supports cython. And when cython is not installed by the user,
-	setup.py can still compile using only C codes.
-	
-	5) Fix Signal.pyx to use np.array instead of np.mat.
 
 ## Install
 

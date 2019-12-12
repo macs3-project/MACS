@@ -98,6 +98,3 @@ class Test_pileup(unittest.TestCase):
         # check result
         self.assertEqual(self.result, self.expect2)
         
-
-if __name__ == '__main__':
-    unittest.main()

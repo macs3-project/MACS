@@ -49,9 +49,3 @@ class Test_Region(unittest.TestCase):
         self.mr.merge_overlap()
         self.mr.write_to_bed(sys.stdout)
 
-#    def test_subpeak_letters(self):
-#        for i in self.subpeak_n:
-#            print subpeak_letters(i)
-
-if __name__ == '__main__':
-    unittest.main()

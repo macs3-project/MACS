@@ -164,5 +164,3 @@ class Test_binomial_pdf(unittest.TestCase):
         result = round(log10(result),4)
         self.assertEqual( result, expect )
 
-if __name__ == '__main__':
-    unittest.main()
