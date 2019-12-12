@@ -41,13 +41,17 @@ background*.
 	BAM and BAMPE parsing with pointer casting instead of python 
 	unpack. 
 
-	2) Do not check "track" and "comment" lines in BED file. So please 
-	avoid them. 
+	2) The comment lines in the headers of BED or SAM files will be
+	correctly skipped. However, MACS2 won't check comment lines in the
+	middle of the file.
 
 	* Bugs fixed 
 
-	1) Cutoff-analysis in callpeak command. #341 
-
+	1) Cutoff-analysis in callpeak command. #341
+	
+	2) Issues related to SAMParser and three ELAND Parsers are
+	fixed. #347
+	
 	* Other 
 
 	1) cmdlinetest script in test/ folder has been updated to: 1. test 
@@ -56,6 +60,8 @@ background*.
 	only the first 10 lines if the difference between test result and 
 	standard result can be found; 4. prockreport monitor CPU time and 
 	memory usage in 1 sec interval -- a bit more accurate.
+	
+	2) Python3.5 support is removed. Now MACS2 requires Python>=3.6.
 
 ### 2.2.5
 	* Features added

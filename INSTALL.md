@@ -1,13 +1,12 @@
 # INSTALL Guide For MACS
-Time-stamp: <2019-10-03 11:56:03 taoliu>
+Time-stamp: <2019-12-12 13:26:11 taoliu>
 
 Please check the following instructions to complete your installation.
 
 ## Prerequisites
 
-MACS v2.2.x requires Python3. We have tested MACS in Python3.5, 3.6
-and 3.7. MACS runs slower under Python3.5, so Python3.6 or Python3.7
-is recommended.
+MACS v2.2.x requires Python3. We have tested MACS in Python3.6, 3.7
+and 3.8. 
 
 MACS also requires [Numpy](http://www.scipy.org/Download) (>=1.17).
 

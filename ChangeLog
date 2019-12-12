@@ -1,4 +1,4 @@
-2019-11-08  Tao Liu  <vladimir.liu@gmail.com>
+2019-12-12  Tao Liu  <vladimir.liu@gmail.com>
 	MACS version 2.2.6
 
 	* New Features
@@ -11,12 +11,16 @@
 	files. Optimize BAM and BAMPE parsing with pointer casting instead
 	of python unpack.
 
-	2) Do not check "track" and "comment" lines in the BED file. So
-	please pre-filter such lines from BED input before using MACS2.
+	2) The comment lines in the headers of BED or SAM files will be
+	correctly skipped. However, MACS2 won't check comment lines in the
+	middle of the file.
 
 	* Bugs fixed
 
 	1) Cutoff-analysis in callpeak command. #341
+
+	2) Issues related to SAMParser and three ELAND Parsers are
+	fixed. #347
 
 	* Other
 
@@ -26,6 +30,8 @@
 	only the first 10 lines if the difference between test result and
 	standard result can be found; 4. prockreport monitor CPU time and
 	memory usage in 1 sec interval -- a bit more accurate.
+
+	2) Python3.5 support is removed. Now MACS2 requires Python>=3.6.
 
 2019-10-31  Tao Liu  <vladimir.liu@gmail.com>
 	MACS version 2.2.5 (Py3 speed up)
