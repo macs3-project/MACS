@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# Time-stamp: <2019-12-18 14:51:48 taoliu>
+# Time-stamp: <2019-12-18 15:05:30 taoliu>
 
 """Module Description: Test functions for Signal.pyx
 
@@ -245,8 +245,22 @@ class Test_maxima(unittest.TestCase):
         
         sign = np.sign( self.smooth )
         self.assertEqual_nparray1d( sign, self.sign )
-        sign = np.sign( s )
-        self.assertEqual_nparray1d( sign, self.sign )        
+        sign2= np.sign( s )
+
+        print ("expected:")
+        print (self.smooth[160:165])
+        print ("calculated:")
+        print (s[160:165])
+
+        print ("expected:")        
+        print (self.sign[160:165])
+        print ("calculated from expected smoothed data:")        
+        print (sign[160:165])
+        print ("calculated from recalculated smoothed data:")        
+        print (sign2[160:165])        
+        
+        self.assertEqual_nparray1d( sign, sign2 )
+        self.assertEqual_nparray1d( sign2, self.sign )        
 
         diff = np.diff( self.sign )
         self.assertEqual_nparray1d( diff, self.diff )
