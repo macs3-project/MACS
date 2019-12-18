@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# Time-stamp: <2019-12-18 14:25:36 taoliu>
+# Time-stamp: <2019-12-18 14:27:57 taoliu>
 
 """Module Description: Test functions for Signal.pyx
 
@@ -353,6 +353,14 @@ class Test_maxima(unittest.TestCase):
         self.assertEqual_nparray1d( diff, np_diff )
         m = np.where( diff <= -1)[0].astype('int32')
         self.assertEqual( m, 5 )
+        
+    def test_numpy_2 ( self ):
+        sign = np.sign( self.smooth1 )
+        self.assertEqual_nparray1d( sign, self.sign )
+        diff = np.diff( self.sign )
+        self.assertEqual_nparray1d( diff, self.diff )
+        m = np.where( self.diff <= -1)[0].astype('int32')
+        self.assertEqual( m, 161 )
         
     def test_enforce_valleys(self):
         pass
