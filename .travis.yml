@@ -1,15 +1,12 @@
 language: python
 python:
-  - "3.8"
-  - "3.7"
-  - "3.6"
   - "3.8-dev"
 install:
   - pip install --upgrade pip
   - pip install --upgrade -r requirements.txt
   - python setup.py install
 script:
-  - pytest --cov-report term --cov=test/
+  - pytest --runxfail --cov-report term --cov=test/
   - cd test
   - ./cmdlinetest macs2
   - cd ..
