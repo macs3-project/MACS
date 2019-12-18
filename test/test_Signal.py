@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# Time-stamp: <2019-12-18 15:11:28 taoliu>
+# Time-stamp: <2019-12-18 16:23:57 taoliu>
 
 """Module Description: Test functions for Signal.pyx
 
@@ -12,7 +12,7 @@ import unittest
 
 from math import log10
 import numpy as np
-from MACS2.Signal import maxima, savitzky_golay, savitzky_golay_order2
+from MACS2.Signal import maxima, savitzky_golay, savitzky_golay_order2_deriv1
 
 # ------------------------------------
 # Main function
@@ -212,8 +212,8 @@ class Test_maxima(unittest.TestCase):
         result = savitzky_golay( self.signal, self.windowsize, 2, deriv = 1 )
         self.assertEqual_nparray1d( result, self.smooth )
 
-    def test_savitzky_golay_order2(self):
-        result = savitzky_golay_order2( self.signal, self.windowsize, deriv = 1 )
+    def test_savitzky_golay_order2_deriv1(self):
+        result = savitzky_golay_order2_deriv1( self.signal, self.windowsize )
         self.assertEqual_nparray1d( result, self.smooth )
 
     def test_numpy( self ):
@@ -240,7 +240,7 @@ class Test_maxima(unittest.TestCase):
 
     # test predefined smoothed data
     def test_numpy_2 ( self ):
-        s = savitzky_golay_order2( self.signal, self.windowsize, deriv = 1 )
+        s = savitzky_golay_order2_deriv1( self.signal, self.windowsize )
         self.assertEqual_nparray1d( s, self.smooth )
         print ("expected smoothed:")
         print (self.smooth[160:165])
@@ -271,7 +271,6 @@ class Test_maxima(unittest.TestCase):
 
         m = np.where( self.diff <= -1)[0].astype('int32')
         self.assertEqual( m, 161 )
-        self.assertEqual( 1, 2 )
         
     def test_maxima(self):
         expect = self.summit
