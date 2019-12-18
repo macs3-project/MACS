@@ -1,6 +1,6 @@
 # cython: language_level=3
 # cython: profile=True
-# Time-stamp: <2019-10-30 17:48:30 taoliu>
+# Time-stamp: <2019-12-18 12:15:01 taoliu>
 
 """Module Description: functions to find maxima minima or smooth the
 signal tracks.
@@ -22,13 +22,17 @@ cpdef np.ndarray[np.int32_t, ndim=1] maxima(np.ndarray[np.float32_t, ndim=1] sig
     """return the local maxima in a signal after applying a 2nd order
     Savitsky-Golay (polynomial) filter using window_size specified  
     """
-    cdef np.ndarray[np.int32_t, ndim=1] m 
+    cdef:
+        np.ndarray[np.int32_t, ndim=1] m
+        np.ndarray[np.float32_t, ndim=1] smoothed, sign, diff
 
     window_size = window_size//2*2+1 # to make a even number
 
     #m = np.where(np.diff(np.sign(savitzky_golay(signal, window_size, order=2, deriv=1))) <= -1)[0].astype('int32')
-    m = np.where(np.diff(np.sign(savitzky_golay_order2(signal, window_size, deriv=1))) <= -1)[0].astype('int32')
-
+    smoothed = savitzky_golay_order2(signal, window_size, deriv=1)
+    sign = np.sign( smoothed )
+    diff = np.diff( sign )
+    m = np.where( diff <= -1)[0].astype('int32')
     return m
 
 cdef np.ndarray[np.int32_t, ndim=1] internal_minima( np.ndarray[np.float32_t, ndim=1] signal,
@@ -194,8 +198,6 @@ cpdef enforce_valleys(np.ndarray[np.float32_t, ndim=1] signal,
     # Step 2: Re-find peaks from subtracted signal
     # 
     return valid_summits
-    
-        
 
 # Modified from http://www.scipy.org/Cookbook/SavitzkyGolay
 # positive window_size not enforced anymore
@@ -203,7 +205,7 @@ cpdef enforce_valleys(np.ndarray[np.float32_t, ndim=1] signal,
 # switched to double precision for internal accuracy
 cpdef savitzky_golay_order2(np.ndarray[np.float32_t, ndim=1] signal,
                      int window_size, int deriv=0):
-    r"""Smooth (and optionally differentiate) data with a Savitzky-Golay filter.
+    """Smooth (and optionally differentiate) data with a Savitzky-Golay filter.
     The Savitzky-Golay filter removes high frequency noise from data.
     It has the advantage of preserving the original shape and
     features of the signal better than other types of filtering
@@ -262,7 +264,7 @@ cpdef savitzky_golay_order2(np.ndarray[np.float32_t, ndim=1] signal,
 # Another modified version from http://www.scipy.org/Cookbook/SavitzkyGolay
 cpdef np.ndarray[np.float32_t, ndim=1] savitzky_golay( np.ndarray[np.float32_t, ndim=1] y, int window_size,
                                                        int order, int deriv = 0, int rate = 1 ):
-    r"""Smooth (and optionally differentiate) data with a Savitzky-Golay filter.
+    """Smooth (and optionally differentiate) data with a Savitzky-Golay filter.
     The Savitzky-Golay filter removes high frequency noise from data.
     It has the advantage of preserving the original shape and
     features of the signal better than other types of filtering
