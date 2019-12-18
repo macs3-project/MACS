@@ -1,6 +1,6 @@
 # cython: language_level=3
 # cython: profile=True
-# Time-stamp: <2019-12-18 16:14:43 taoliu>
+# Time-stamp: <2019-12-18 16:49:03 taoliu>
 
 """Module Description: functions to find maxima minima or smooth the
 signal tracks.
@@ -257,7 +257,9 @@ cpdef np.ndarray[np.float64_t, ndim=1] savitzky_golay_order2_deriv1(np.ndarray[n
     firstvals = signal[0] - np.abs(signal[1:half_window+1][::-1] - signal[0])
     lastvals = signal[-1] + np.abs(signal[-half_window-1:-1][::-1] - signal[-1])
     signal = np.concatenate((firstvals, signal, lastvals))
+    #print (repr(m))
     ret = np.convolve( m[::-1], signal.astype("float64"), mode='valid') #.astype("float32").round(8) # round to 8 decimals to avoid signing issue
+    #print (ret[160:165])
     return ret
 
 

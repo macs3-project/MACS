@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# Time-stamp: <2019-12-18 16:23:57 taoliu>
+# Time-stamp: <2019-12-18 16:48:36 taoliu>
 
 """Module Description: Test functions for Signal.pyx
 
@@ -271,6 +271,28 @@ class Test_maxima(unittest.TestCase):
 
         m = np.where( self.diff <= -1)[0].astype('int32')
         self.assertEqual( m, 161 )
+
+    def test_implement_smooth_here ( self ):
+        signal = self.signal
+        window_size = self.windowsize
+        half_window = (window_size - 1) // 2
+        # precompute coefficients
+        b = np.array([[1, k, k**2] for k in range(-half_window, half_window+1)], dtype='int64')
+        m = np.linalg.pinv(b)[1]
+        # pad the signal at the extremes with
+        # values taken from the signal itself
+        firstvals = signal[0] - np.abs(signal[1:half_window+1][::-1] - signal[0])
+        lastvals = signal[-1] + np.abs(signal[-half_window-1:-1][::-1] - signal[-1])
+        signal = np.concatenate((firstvals, signal, lastvals))
+        ret = np.convolve( m[::-1], signal.astype("float64"), mode='valid') #.astype("float32").round(8) # round to 8 decimals to avoid signing issue
+        p = ret[160:165]
+        p2 = savitzky_golay_order2_deriv1( self.signal, self.windowsize )[160:165]
+        e = self.smooth[160:165]
+        print (m[150:170], p, p2, e)
+        self.assertEqual_nparray1d( p, e )
+        self.assertEqual_nparray1d( p2, e )
+        self.assertEqual(1, 2)
+
         
     def test_maxima(self):
         expect = self.summit
@@ -281,5 +303,5 @@ class Test_maxima(unittest.TestCase):
         self.assertEqual( a.shape[0], b.shape[0] )
         l = a.shape[0]
         for i in range( l ):
-            self.assertAlmostEqual( a[i], b[i], places = 4, msg=f"Not equal at {i} {a[i]} {b[i]}" )
+            self.assertAlmostEqual( a[i], b[i], places = roundn, msg=f"Not equal at {i} {a[i]} {b[i]}" )
             
