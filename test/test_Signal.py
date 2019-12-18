@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# Time-stamp: <2019-12-18 14:14:06 taoliu>
+# Time-stamp: <2019-12-18 14:25:36 taoliu>
 
 """Module Description: Test functions for Signal.pyx
 
@@ -192,7 +192,7 @@ class Test_maxima(unittest.TestCase):
                     , 5.39458259e-03, 5.00925527e-03, 4.62392794e-03, 4.23860061e-03
                     , 3.85327328e-03, 3.46794595e-03, 3.08261863e-03, 2.69729130e-03
                     , 2.31196397e-03, 1.92663664e-03, 1.54130931e-03, 1.15598198e-03
-                    , 7.70654656e-04, 3.85327328e-04, -2.98155597e-18, -3.85327328e-04 # here is the maximum point smoothed1[161]
+                    , 7.70654656e-04, 3.85327328e-04, -2.98155597e-18, -3.85327328e-04 # 3.85327328e-04  is the maximum point smoothed1[161]
                     , -7.70654656e-04, -1.15598198e-03, -1.44720052e-03, -1.73767805e-03
                     , -2.02741456e-03, -2.31641005e-03, -2.60466454e-03, -2.89217800e-03
                     , -3.17895046e-03, -3.46498190e-03, -3.75027232e-03, -4.03482173e-03
@@ -270,7 +270,7 @@ class Test_maxima(unittest.TestCase):
                  , 1., 1., 1., 1., 1., 1., 1., 1., 1., 1., 1., 1., 1., 1., 1., 1., 1., 1.
                  , 1., 1., 1., 1., 1., 1., 1., 1., 1., 1., 1., 1., 1., 1., 1., 1., 1., 1.
                  , 1., 1., 1., 1., 1., 1., 1., 1., 1., 1., 1., 1., 1., 1., 1., 1., 1., 1.
-                 , 1., 1., 1., 1., 1., 1., 1., 1., 1., 1., 1., 1., 1., 1., 1., 1., 1., 1.
+                 , 1., 1., 1., 1., 1., 1., 1., 1., 1., 1., 1., 1., 1., 1., 1., 1., 1., 1. #<- the last 1 is #162 or sign[161]
                  ,-1.,-1.,-1.,-1.,-1.,-1.,-1.,-1.,-1.,-1.,-1.,-1.,-1.,-1.,-1.,-1.,-1.,-1.
                  ,-1.,-1.,-1.,-1.,-1.,-1.,-1.,-1.,-1.,-1.,-1.,-1.,-1.,-1.,-1.,-1.,-1.,-1.
                  ,-1.,-1.,-1.,-1.,-1.,-1.,-1.,-1.,-1.,-1.,-1.,-1.,-1.,-1.,-1.,-1.,-1.,-1.
@@ -295,7 +295,7 @@ class Test_maxima(unittest.TestCase):
                  , 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0.
                  , 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0.
                  , 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0.
-                 , 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0.,-2.
+                 , 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0.,-2. #<- this -2 is #162 or diff[161]
                  , 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0.
                  , 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0.
                  , 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0.
@@ -333,14 +333,26 @@ class Test_maxima(unittest.TestCase):
         self.assertEqual_nparray1d( result, self.smooth1 )
 
     def test_numpy( self ):
-        s = savitzky_golay_order2( self.signal, self.windowsize, deriv = 1 )
-        self.assertEqual_nparray1d( s, self.smooth1 )
-        sign = np.sign( s )
-        self.assertEqual_nparray1d( sign, self.sign )
-        diff = np.diff( sign )
-        self.assertEqual_nparray1d( diff, self.diff )
+        smoothed = [  6.61562562e-02,  6.61510691e-02,  6.61355078e-02,  6.61095723e-02,
+                       7.70654656e-04,  3.85327328e-04, -2.98155597e-18, -3.85327328e-04, # 3.85327328e-04  is the maximum point smoothed1[161]
+                      -7.70654656e-04, -1.15598198e-03, -1.44720052e-03, -1.73767805e-03 ]
+        sign = [ 1., 1., 1., 1.,
+                 1., 1.,-1.,-1.,
+                -1.,-1.,-1.,-1. ]
+        diff = [ 0., 0., 0., 0.,
+                 0.,-2., 0., 0.,
+                 0., 0., 0. ]
+
+        np_smoothed= np.array(smoothed, dtype=np.float32 )        
+        np_sign = np.array(sign, dtype=np.float32 )
+        np_diff = np.array(diff, dtype=np.float32 )       
+
+        sign = np.sign( np_smoothed )
+        self.assertEqual_nparray1d( sign, np_sign )
+        diff = np.diff( np_sign )
+        self.assertEqual_nparray1d( diff, np_diff )
         m = np.where( diff <= -1)[0].astype('int32')
-        self.assertEqual( m, 161 )
+        self.assertEqual( m, 5 )
         
     def test_enforce_valleys(self):
         pass
