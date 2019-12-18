@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# Time-stamp: <2019-12-18 15:05:30 taoliu>
+# Time-stamp: <2019-12-18 15:11:28 taoliu>
 
 """Module Description: Test functions for Signal.pyx
 
@@ -242,21 +242,25 @@ class Test_maxima(unittest.TestCase):
     def test_numpy_2 ( self ):
         s = savitzky_golay_order2( self.signal, self.windowsize, deriv = 1 )
         self.assertEqual_nparray1d( s, self.smooth )
+        print ("expected smoothed:")
+        print (self.smooth[160:165])
+        print ("calculated smoothed:")
+        print (s[160:165])
         
         sign = np.sign( self.smooth )
         self.assertEqual_nparray1d( sign, self.sign )
         sign2= np.sign( s )
 
-        print ("expected:")
+        print ("expected smoothed (output again):")
         print (self.smooth[160:165])
-        print ("calculated:")
+        print ("calculated smoothed (output again):")
         print (s[160:165])
 
-        print ("expected:")        
+        print ("expected sign:")        
         print (self.sign[160:165])
-        print ("calculated from expected smoothed data:")        
+        print ("calculated sign from expected smoothed data:")        
         print (sign[160:165])
-        print ("calculated from recalculated smoothed data:")        
+        print ("calculated sign from recalculated smoothed data:")        
         print (sign2[160:165])        
         
         self.assertEqual_nparray1d( sign, sign2 )
@@ -267,6 +271,7 @@ class Test_maxima(unittest.TestCase):
 
         m = np.where( self.diff <= -1)[0].astype('int32')
         self.assertEqual( m, 161 )
+        self.assertEqual( 1, 2 )
         
     def test_maxima(self):
         expect = self.summit
