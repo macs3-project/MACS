@@ -28,7 +28,7 @@ cpdef np.ndarray[np.int32_t, ndim=1] maxima(np.ndarray[np.float32_t, ndim=1] sig
         np.ndarray[np.float32_t, ndim=1] sign, diff
 
     window_size = window_size//2*2+1 # to make an odd number
-    smoothed = savitzky_golay_order2_deriv1(signal, window_size)
+    smoothed = savitzky_golay_order2_deriv1(signal, window_size).round(16)
     sign = np.sign( smoothed.astype("float32") )
     diff = np.diff( sign )
     m = np.where( diff <= -1)[0].astype('int32')
