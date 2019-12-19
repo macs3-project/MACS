@@ -1,6 +1,8 @@
 language: python
 python:
+  - "3.8"
   - "3.7"
+  - "3.6"  
   - "3.8-dev"
 install:
   - pip install --upgrade pip
@@ -23,4 +25,4 @@ deploy:
   distributions: sdist
 after_success:
   - codecov
-  
+
