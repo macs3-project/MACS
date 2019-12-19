@@ -2,14 +2,14 @@ language: python
 python:
   - "3.8"
   - "3.7"
-  - "3.6"
+  - "3.6"  
   - "3.8-dev"
 install:
   - pip install --upgrade pip
   - pip install --upgrade -r requirements.txt
   - python setup.py install
 script:
-  - pytest --cov-report term --cov=test/
+  - pytest --runxfail
   - cd test
   - ./cmdlinetest macs2
   - cd ..
@@ -23,6 +23,4 @@ deploy:
     tags: true
   skip_existing: true
   distributions: sdist
-after_success:
-  - codecov
-  
+

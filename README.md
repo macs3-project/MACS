@@ -1,6 +1,6 @@
 # MACS: Model-based Analysis for ChIP-Seq
 
-![Status](https://img.shields.io/pypi/status/macs2.svg) [![License](https://img.shields.io/github/license/taoliu/MACS)](https://github.com/taoliu/MACS/blob/master/LICENSE) ![Programming languages](https://img.shields.io/github/languages/top/taoliu/MACS) ![Commit activity](https://img.shields.io/github/commit-activity/m/taoliu/MACS) [![Codecov](https://img.shields.io/codecov/c/github/taoliu/MACS)](https://codecov.io/gh/taoliu/MACS) [![TravisCI Build Status](https://img.shields.io/travis/com/taoliu/MACS/master)](https://travis-ci.com/taoliu/MACS)
+![Status](https://img.shields.io/pypi/status/macs2.svg) [![License](https://img.shields.io/github/license/taoliu/MACS)](https://github.com/taoliu/MACS/blob/master/LICENSE) ![Programming languages](https://img.shields.io/github/languages/top/taoliu/MACS) ![Commit activity](https://img.shields.io/github/commit-activity/m/taoliu/MACS) [![TravisCI Build Status](https://img.shields.io/travis/com/taoliu/MACS/master)](https://travis-ci.com/taoliu/MACS)
 
 [![PyPI download](https://img.shields.io/pypi/dm/macs2?label=pypi%20downloads)](https://pypistats.org/packages/macs2) [![Bioconda download](https://img.shields.io/conda/dn/bioconda/macs2?label=bioconda%20downloads)](https://anaconda.org/bioconda/macs2)
 
