@@ -61,13 +61,31 @@ class Test_maxima(unittest.TestCase):
         #print (repr(signal))
         ret = np.convolve( m[::-1], signal.astype("float64"), mode='valid').astype("float32")
         p = ret[162]
-        p2 = savitzky_golay_order2_deriv1( self.signal, self.windowsize ).astype("float32")[162]
-        print ("calculated step by step:\n", p, "\ncalculated with func:\n", p2)
+        print ("calculated step by step:\n", p)
+        print ("expected:\n", self.smoothed162)
         self.assertAlmostEqual( p, self.smoothed162, places = 4 )
         self.assertEqual( np.sign(p), np.sign(self.smoothed162) )
-        self.assertAlmostEqual( p2, self.smoothed162, places = 4 )
-        self.assertEqual( np.sign(p2), np.sign(self.smoothed162) )
-        self.assertEqual( 1, 2 )
+
+    def test_implement_smooth_here2 ( self ): # try to tweak some dtypes to see if problem exists
+        signal = self.signal
+        window_size = self.windowsize
+        half_window = (window_size - 1) // 2
+        # precompute coefficients
+        b = np.array([[1, k, k**2] for k in range(-half_window, half_window+1)], dtype='int32')
+        m = np.linalg.pinv(b)[1]
+        # pad the signal at the extremes with
+        # values taken from the signal itself
+        firstvals = signal[0] - np.abs(signal[1:half_window+1][::-1] - signal[0])
+        lastvals = signal[-1] + np.abs(signal[-half_window-1:-1][::-1] - signal[-1])
+        signal = np.concatenate((firstvals, signal, lastvals))
+        #print (repr(m))
+        #print (repr(signal))
+        ret = np.convolve( m[::-1], signal.astype("float32"), mode='valid')
+        p = ret[162]
+        print ("calculated step by step:\n", p)
+        print ("expected:\n", self.smoothed162)
+        self.assertAlmostEqual( p, self.smoothed162, places = 4 )
+        self.assertEqual( np.sign(p), np.sign(self.smoothed162) )        
 
     def test_maxima(self):
         expect = self.summit
