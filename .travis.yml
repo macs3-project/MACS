@@ -1,13 +1,13 @@
 arch:
   - amd64
-  - arm64
+  #- arm64
 os: linux
 matrix:
   include:
    - os: linux
      arch: amd64
-   - os: linux
-     arch: arm64
+   #- os: linux
+   #  arch: arm64
 language: python
 python:
   - "3.8"
