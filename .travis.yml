@@ -1,4 +1,9 @@
 language: python
+arch:
+  - amd64
+  - arm64
+  - ppc64le
+  - s390x
 python:
   - "3.8"
   - "3.7"
