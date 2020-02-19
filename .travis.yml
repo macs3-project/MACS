@@ -1,18 +1,42 @@
 language: python
-arch:
-  - amd64
-  - arm64
-  - ppc64le
-  - s390x
-python:
-  - "3.8"
-  - "3.7"
-  - "3.6"  
-  - "3.8-dev"
+jobs:
+  include:
+     - name: "amd64 py3.8"
+       arch: amd64
+       python: 3.8
+       # - name: "i686 py3.5"
+       #   dist: bionic
+       #   arch: amd64
+       #   env:
+       #     - ARCH_FLAGS="-m32"
+       #   addons:
+       #     apt:
+       #       packages:
+       #       - libc6:i386
+       #       - libc6-dev:i386
+       #       - gcc-8:i386
+       #       - g++-8:i386
+       #       - cpp-8:i386
+       #       - binutils:i386
+       #       - binutils-i686-linux-gnu:i386
+       #       - python3.5:i386
+     - name: "amd64 py3.7"
+       arch: amd64
+       python: 3.7
+     - name: "amd64 py3.6"
+       arch: amd64
+       python: 3.6
+     - name: "arm64"
+       arch: arm64
+     - name: "ppc64le"
+       arch: ppc64le
+     - name: "s390x"
+       arch: s390x
+
 install:
-  - sudo pip install --upgrade pip
-  - sudo pip install --upgrade -r requirements.txt
-  - sudo python setup.py install
+  - pip install --upgrade pip
+  - pip install --upgrade -r requirements.txt
+  - python setup.py install
 script:
   - pytest --runxfail
   - cd test
