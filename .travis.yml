@@ -4,36 +4,41 @@ jobs:
      - name: "amd64 py3.8"
        arch: amd64
        python: 3.8
-       # - name: "i686 py3.5"
-       #   dist: bionic
-       #   arch: amd64
-       #   env:
-       #     - ARCH_FLAGS="-m32"
-       #   addons:
-       #     apt:
-       #       packages:
-       #       - libc6:i386
-       #       - libc6-dev:i386
-       #       - gcc-8:i386
-       #       - g++-8:i386
-       #       - cpp-8:i386
-       #       - binutils:i386
-       #       - binutils-i686-linux-gnu:i386
-       #       - python3.5:i386
+     # - name: "i686 py3.5"
+     #   dist: bionic
+     #   arch: amd64
+     #   env:
+     #     - ARCH_FLAGS="-m32"
+     #   addons:
+     #     apt:
+     #       packages:
+     #       - libc6:i386
+     #       - libc6-dev:i386
+     #       - gcc-8:i386
+     #       - g++-8:i386
+     #       - cpp-8:i386
+     #       - binutils:i386
+     #       - binutils-i686-linux-gnu:i386
+     #       - python3.5:i386
      - name: "amd64 py3.7"
        arch: amd64
        python: 3.7
      - name: "amd64 py3.6"
        arch: amd64
        python: 3.6
-     - name: "arm64"
+     - name: "arm64 py3.8"
        arch: arm64
+       python: 3.8
      - name: "ppc64le"
        arch: ppc64le
-     - name: "s390x"
+       python: 3.8
+     - name: "s390x py3.8"
        arch: s390x
+       python: 3.8
 
 install:
+  - ls -la $HOME/.cache/pip
+  - mkdir -p $HOME/.cache/pip
   - pip install --upgrade pip
   - pip install --upgrade -r requirements.txt
   - python setup.py install
