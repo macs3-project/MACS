@@ -37,10 +37,8 @@ jobs:
        python: 3.8
 
 install:
-  - ls -la $HOME/.cache/pip
-  - mkdir -p $HOME/.cache/pip
   - pip install --upgrade pip
-  - pip install --upgrade -r requirements.txt
+  - pip install --upgrade -r requirements.txt --no-cache-dir
   - python setup.py install
 script:
   - pytest --runxfail
