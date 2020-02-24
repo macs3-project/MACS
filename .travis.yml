@@ -4,6 +4,19 @@ python:
   - "3.7"
   - "3.6"  
   - "3.8-dev"
+matrix:
+  include:
+    # i386: Intel 32-bit
+    - name: i386
+      language: minimal
+      install: |
+        docker run --rm --privileged multiarch/qemu-user-static --reset -p yes &&
+          docker build --rm --build-arg BASE_IMAGE="i386/ubuntu:bionic" -t macs -f test/Dockerfile .
+      script: |
+        docker run --rm -t macs bash -cx "pytest --runxfail && cd test && ./cmdlinetest macs2"
+  allow_failures:
+    - name: i386
+  fast_finish: true
 install:
   - pip install --upgrade pip
   - pip install --upgrade -r requirements.txt
