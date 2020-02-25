@@ -1,41 +1,46 @@
 language: python
+python:
+  - "3.8"
+  - "3.7"
+  - "3.6"  
+  - "3.8-dev"
 jobs:
   include:
-     - name: "amd64 py3.8"
-       arch: amd64
-       python: 3.8
-     # - name: "i686 py3.5"
-     #   dist: bionic
-     #   arch: amd64
-     #   env:
-     #     - ARCH_FLAGS="-m32"
-     #   addons:
-     #     apt:
-     #       packages:
-     #       - libc6:i386
-     #       - libc6-dev:i386
-     #       - gcc-8:i386
-     #       - g++-8:i386
-     #       - cpp-8:i386
-     #       - binutils:i386
-     #       - binutils-i686-linux-gnu:i386
-     #       - python3.5:i386
-     - name: "amd64 py3.7"
-       arch: amd64
-       python: 3.7
-     - name: "amd64 py3.6"
-       arch: amd64
-       python: 3.6
-     - name: "arm64 py3.8"
-       arch: arm64
-       python: 3.8
-     - name: "ppc64le"
-       arch: ppc64le
-       python: 3.8
-     - name: "s390x py3.8"
-       arch: s390x
-       python: 3.8
-
+    # i386: Intel 32-bit
+    - name: i386
+      language: minimal
+      install: |
+        docker run --rm --privileged multiarch/qemu-user-static --reset -p yes &&
+          docker build --rm --build-arg BASE_IMAGE="i386/ubuntu:bionic" -t macs -f test/Dockerfile .
+      script: |
+        docker run --rm -t macs bash -cx "pytest --runxfail && cd test && ./cmdlinetest macs2"
+    # - name: "i686 py3.5"
+    #   dist: bionic
+    #   arch: amd64
+    #   env:
+    #     - ARCH_FLAGS="-m32"
+    #   addons:
+    #     apt:
+    #       packages:
+    #       - libc6:i386
+    #       - libc6-dev:i386
+    #       - gcc-8:i386
+    #       - g++-8:i386
+    #       - cpp-8:i386
+    #       - binutils:i386
+    #       - binutils-i686-linux-gnu:i386
+    #       - python3.5:i386        
+    - name: "amd64"
+      arch: amd64
+    - name: "arm64"
+      arch: arm64
+    - name: "ppc64le"
+      arch: ppc64le
+    - name: "s390x"
+      arch: s390x
+  allow_failures:
+    - name: i386
+  fast_finish: true
 install:
   - pip install --upgrade pip
   - pip install --upgrade -r requirements.txt --no-cache-dir
