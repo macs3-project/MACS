@@ -1,14 +1,11 @@
 language: python
-python:
-  - "3.8"
-  - "3.7"
-  - "3.6"  
-  - "3.8-dev"
+os: linux
+dist: bionic
 jobs:
   include:
     # i386: Intel 32-bit
     - name: i386
-      language: minimal
+      language: shell
       install: |
         docker run --rm --privileged multiarch/qemu-user-static --reset -p yes &&
           docker build --rm --build-arg BASE_IMAGE="i386/ubuntu:bionic" -t macs -f test/Dockerfile .
@@ -32,12 +29,16 @@ jobs:
     #       - python3.5:i386        
     - name: "amd64"
       arch: amd64
+      python: 3.8
     - name: "arm64"
       arch: arm64
+      python: 3.8
     - name: "ppc64le"
       arch: ppc64le
+      python: 3.8     
     - name: "s390x"
       arch: s390x
+      python: 3.8
   allow_failures:
     - name: i386
   fast_finish: true
@@ -52,7 +53,7 @@ script:
   - cd ..
 deploy:
   provider: pypi
-  user:
+  username:
     secure: lguBZWd+H2u4jqWgq4xFrlDnTniJtGm4eGddGpXGWFrhX4qno2YdJMd5S6L+FVUezrwTXLptyWcKSrJRcddAzR5vvXIX0ibpMThiVjXRrQGtlGkuffAXjiCleIk0QxsOafTElHW4zzGXf3us8ECLcdHwcJdJOjJPUSVLjeWJsTVPJqxySq1eWT9I7E8Wh0yeaZ/WiA3Val5Brc7B6P0ZpDnS5Y0bpSDgWb4uCvbkCJhf74Owj7D2yrbrsfM6H/QZRR2zr97d4w8/mserFQSIdM5GnhNyxbWrtgVUDIoNB4o7X+2og+jfvZUEaZu0xEtST39W2Z89++5NxRXYrn7t3Zsr8+V2+mnspQD1ktdeCJtzrgIcuGtLzVIEVS0vu+358qGXaCnjjxxlGymG8sodsUc0c51GfcPxeqla9aYEgasUATRA43NGFBQNZrusN2Ov+bPKST37lVVRJXEVUtYRVcrJz8AJN1Gdim12luQDHBfhjBq2w4Rl2aBBUDWkL5KuE5TQffdzpIqp/47QKVgxqACUG7CJElNwhHoyHP6GhyMnGHMC4hl4FidqXdq9qJOJtZbKJU/kGYPpclnMa82GU9nYb6JEesItVWAtudlbU7Df4X/JHxUfi0E3VgkrZG6XDHFAkU4LBBUBaeMhP4UVlBMyjv6TNhd0LWBqA17Y1zk=
   password:
     secure: NBq2RSTUjhQf4GlxSGg1e9P8vIQrtVskhOc1j6mIYE1zRGEIQFlrujE11+KDrGBoD7KAtWS4HjTFZEctI5nI+YYrZOg0Fu5XgDHD7rRD10qp3/Ipmack3i4pl6JDyyOiIJVmt0+IcN4+fxfIsTrs0XRLSGDw1GaO91V05RpY5GJZ5+crXaUQKsFzvwFgznnqQPK2dY/NsqC63TkYvpiiI4Sn5Eb78XW8kjtEzM84bYFcwMWofib75v8qqRGEabHxUBlXBfWOoDS78T58MdZK+DQ/HJT9XFU0yF1yJ2IhMOHUxnvH2E/nKuLwA3fUBXsPpHFmsbRhgKlCyPUhqjKAhsRyZHqfU6BaF7yJOejeCwbcY6EzQzwQvGr4UQUG6EX49YskKYrwb7IXqC8Y3OjD8maUMdpWU249dPwqDvkwjASa8FlN6LIxJ28f0qd7y1EDFZwM12kS0pdNimxTmxEMYBy76jBxOKDG3Hr349E6Q67trVktbNfp0PdUFVSWqxeJrdujl38w4h07hPKTESugqasPVO/gaY+8+f+xrB7F3TXLDSN+5Dcr9srVX4V2Z72rJtoxrggMbY/n8RUXNC1+45QnRAv/6iLoingtlOwo3p0xA25J7kl7akWqPaP2MwQ+eoPvMgZwrS/S+5Q+7t/rwZn0SkjjSJZIIwB++Ccjbfc=
