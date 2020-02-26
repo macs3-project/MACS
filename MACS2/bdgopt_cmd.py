@@ -1,4 +1,4 @@
-# Time-stamp: <2019-09-20 11:30:27 taoliu>
+# Time-stamp: <2020-02-26 17:21:19 taoliu>
 
 """Description: Modify bedGraph file
 
@@ -64,7 +64,7 @@ def run( options ):
         
     ofile = os.path.join( options.outdir, options.ofile )
     info("Write bedGraph of modified scores...")
-    ofhd = open(ofile,"wb")
+    ofhd = open(ofile,"w")
     btrack.write_bedGraph(ofhd,name="%s_modified_scores" % (options.method.upper()),description="Scores calculated by %s" % (options.method.upper()))
     info("Finished '%s'! Please check '%s'!" % (options.method, ofile))
 
