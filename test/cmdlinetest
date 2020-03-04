@@ -151,24 +151,33 @@ macs2 cmbreps -i ${TAG}_run_callpeak_narrow/run_callpeak_narrow0_treat_pileup.bd
 macs2 cmbreps -i ${TAG}_run_callpeak_narrow/run_callpeak_narrow0_treat_pileup.bdg ${TAG}_run_callpeak_narrow/run_callpeak_narrow0_control_lambda.bdg ${TAG}_run_bdgcmp/run_bdgcmp_ppois.bdg -m mean -o run_cmbreps_mean.bdg --outdir ${TAG}_run_cmbreps &> ${TAG}_run_cmbreps/run_cmbreps_mean.log
 macs2 cmbreps -i ${TAG}_run_callpeak_narrow/run_callpeak_narrow0_treat_pileup.bdg ${TAG}_run_callpeak_narrow/run_callpeak_narrow0_control_lambda.bdg ${TAG}_run_bdgcmp/run_bdgcmp_ppois.bdg -m fisher -o run_cmbreps_fisher.bdg --outdir ${TAG}_run_cmbreps &> ${TAG}_run_cmbreps/run_cmbreps_fisher.log
 
+# bdgopt
+echo "12. bdgopt"
+
+mkdir ${TAG}_run_bdgopt
+
+macs2 bdgopt -m min -p 10 -i ${TAG}_run_callpeak_narrow/run_callpeak_narrow0_treat_pileup.bdg -o run_bdgopt_min.bdg --outdir ${TAG}_run_bdgopt &> ${TAG}_run_bdgopt/run_bdgopt_min.log
+
+macs2 bdgopt -m max -p 2 -i ${TAG}_run_callpeak_narrow/run_callpeak_narrow0_treat_pileup.bdg -o run_bdgopt_max.bdg --outdir ${TAG}_run_bdgopt &> ${TAG}_run_bdgopt/run_bdgopt_max.log
+
 # test large amount of contigs
-echo "12. 50k contigs with buffersize"
+echo "13. 50k contigs with buffersize"
 
 mkdir ${TAG}_run_50kcontigs
 
-echo "12.1 callpeak"
+echo "13.1 callpeak"
 macs2 callpeak -g 10000000 -t $CHIPCONTIGS50K -n run_callpeak_50kcontigs --outdir ${TAG}_run_50kcontigs --buffer-size 1000 --nomodel --extsize 200 &> ${TAG}_run_50kcontigs/run_callpeak_50kcontigs.log
 
-echo "12.2 filterdup"
+echo "13.2 filterdup"
 macs2 filterdup -g 10000000 -i $CHIPCONTIGS50K --outdir ${TAG}_run_50kcontigs -o run_filterdup_result.bed --buffer-size 1000 &> ${TAG}_run_50kcontigs/run_filterdup_50kcontigs.log
 
-echo "12.3 pileup"
+echo "13.3 pileup"
 macs2 pileup -f BED -i $CHIPCONTIGS50K --extsize 200 --outdir ${TAG}_run_50kcontigs -o run_pileup_ChIP.bed.bdg --buffer-size 1000 &> ${TAG}_run_50kcontigs/run_pileup_ChIP.bed.log
 
-echo "12.4 randsample"
+echo "13.4 randsample"
 macs2 randsample -i $CHIPCONTIGS50K -n 100000 --seed 31415926 --outdir ${TAG}_run_50kcontigs -o run_randsample.bed --buffer-size 1000 &> ${TAG}_run_50kcontigs/run_randsample.log
 
-echo "13. search for errors or warnings in log files"
+echo "14. search for errors or warnings in log files"
 flag=0
 for i in `ls ${TAG}_run_*/*.log`;do
     echo " checking $i..."
@@ -186,11 +195,11 @@ if [[ $flag == 1 ]]; then
     exit 1;
 fi
 
-echo "14. compare with standard outputs"
+echo "15. compare with standard outputs"
 
 flag=0
 # we do not check the consistency of random subsampling results
-subfolders=(50kcontigs bdgbroadcall bdgcmp bdgdiff bdgpeakcall callpeak_broad callpeak_narrow callpeak_narrow_revert callpeak_pe_broad callpeak_pe_narrow cmbreps filterdup pileup refinepeak)
+subfolders=(50kcontigs bdgbroadcall bdgcmp bdgdiff bdgpeakcall callpeak_broad callpeak_narrow callpeak_narrow_revert callpeak_pe_broad callpeak_pe_narrow cmbreps filterdup pileup refinepeak bdgopt)
 
 m=0
 n=0
@@ -222,7 +231,7 @@ if [ $flag -eq 1 ];then
     exit $flag;
 fi
 
-echo "15. brief speed test"
+echo "16. brief speed test"
 
 macs2 callpeak -t CTCF_12878_5M.bed.gz -c Input_12878_5M.bed.gz -n speedtest.py37 -B &> speedtest.py37.log &
 # monitor the macs2 callpeak run and output CPU and mem usage
