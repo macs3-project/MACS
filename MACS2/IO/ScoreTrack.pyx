@@ -1792,13 +1792,12 @@ cdef class TwoConditionScores:
             int32_t l
             float tmp_v, sum_v
 
-        sum_v = 0
         l = 0
         for (tmp_s, tmp_e, tmp_v) in peakcontent:
             sum_v += tmp_v * ( tmp_e - tmp_s )
             l +=  tmp_e - tmp_s
 
-        return sum_v / l
+        return sum_v / float(l)
         
 
     cdef long total ( self ):
