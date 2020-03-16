@@ -38,6 +38,13 @@ class Test_TwoConditionScores(unittest.TestCase):
         self.twoconditionscore.finalize()
         (self.cat1,self.cat2,self.cat3) = twoconditionscore.call_peaks(min_length=10, max_gap=10, cutoff=3)
 
+    def test_mean(self):
+        sum_v = 2739.834228515625
+        l = 251
+        mean_v = 10.915674209594727
+        
+        result_v = sum_v / l
+        self.assertAlmostEqual(x, y, places=6)
             
 class Test_ScoreTrackII(unittest.TestCase):
 

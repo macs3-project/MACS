@@ -51,9 +51,9 @@ install:
   - python setup.py install
 script:
   - pytest --runxfail
-  - cd test
-  - ./cmdlinetest macs2
-  - cd ..
+  #- cd test
+  #- ./cmdlinetest macs2
+  #- cd ..
 deploy:
   provider: pypi
   username:
