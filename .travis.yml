@@ -37,6 +37,7 @@ script:
   - pytest --runxfail
   - cd test
   - ./cmdlinetest2 macs2
+  - cat macs2_run_callpeak_broad/run_callpeak_broad.log
   #- cd ..
 deploy:
   provider: pypi

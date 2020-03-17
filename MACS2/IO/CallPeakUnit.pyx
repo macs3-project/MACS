@@ -240,6 +240,14 @@ cdef float mean_from_value_length ( np.ndarray value, list length ):
         tmp_v = value[ i ]
         sum_v += tmp_v * tmp_l
         l += tmp_l 
+
+
+    if abs(sum_v / l - 13.48574) <= 1e-4:
+        print (value)
+        print (length)
+        print (sum_v)
+        print (l)
+        print (sum_v/l)
         
     return sum_v / l
 
