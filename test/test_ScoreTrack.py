@@ -37,33 +37,7 @@ class Test_TwoConditionScores(unittest.TestCase):
         self.twoconditionscore.build()
         self.twoconditionscore.finalize()
         (self.cat1,self.cat2,self.cat3) = self.twoconditionscore.call_peaks(min_length=10, max_gap=10, cutoff=3)
-
-    def test_mean(self):
-        sum_v = 2739.834228515625
-        l = 251
-        mean_v = 10.915674209594727
         
-        result_v = sum_v / l
-        self.assertAlmostEqual(result_v, mean_v, places=6)
-
-    def test_mean2(self):
-        e = [17753017, 17753032, 17753036, 17753055, 17753057, 17753067, 17753073, 17753142, 17753157, 17753161, 17753175, 17753182, 17753229, 17753234, 17753262]
-        s = [17753011, 17753017, 17753032, 17753036, 17753055, 17753057, 17753067, 17753073, 17753142, 17753157, 17753161, 17753175, 17753182, 17753229, 17753234]
-        v = [8.701431274414062, 8.701431274414062, 11.354715347290039, 11.354715347290039, 8.701431274414062, 11.354715347290039, 14.095269203186035, 14.095269203186035, 11.354715347290039, 11.354715347290039, 8.701431274414062, 8.701431274414062, 8.701431274414062, 11.354715347290039, 8.701431274414062]
-
-        sum_v = 0
-        l = 0
-        for i in range(len(e)):
-            tmp_v = v[i]
-            tmp_e = e[i]
-            tmp_s = s[i]
-            sum_v += tmp_v * ( tmp_e - tmp_s )
-            l +=  tmp_e - tmp_s
-
-        mean_v = 10.91567
-        result_v = sum_v / l
-        self.assertAlmostEqual(result_v, mean_v, places=5)        
-            
 class Test_ScoreTrackII(unittest.TestCase):
 
     def setUp(self):

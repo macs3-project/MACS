@@ -206,14 +206,13 @@ cdef wtd_find_summit(chrom, np.ndarray plus, np.ndarray minus, int32_t search_st
 
     return (wtd_other_max_pos, wtd_other_max_val > cutoff)
 
-cdef float median_from_value_length ( np.ndarray value, list length ):
+cdef float32_t median_from_value_length ( np.ndarray value, list length ):
     """
     """
     cdef:
         list tmp
         int32_t c, tmp_l
-        float tmp_v
-        float mid_l
+        float32_t tmp_v, mid_l
 
     c = 0
     tmp = sorted(list(zip( value, length )))
@@ -223,14 +222,14 @@ cdef float median_from_value_length ( np.ndarray value, list length ):
         if c > mid_l:
             return tmp_v
 
-cdef float mean_from_value_length ( np.ndarray value, list length ):
+cdef float32_t mean_from_value_length ( np.ndarray value, list length ):
     """take list of values and list of corresponding lengths, calculate the mean.
     An important function for bedGraph type of data.
     """
     cdef:
-        int i
+        int32_t i
         int32_t tmp_l, l
-        float tmp_v, sum_v
+        float32_t tmp_v, sum_v, ret
 
     sum_v = 0
     l = 0
@@ -241,15 +240,16 @@ cdef float mean_from_value_length ( np.ndarray value, list length ):
         sum_v += tmp_v * tmp_l
         l += tmp_l 
 
-
-    if abs(sum_v / l - 13.48574) <= 1e-4:
+    ret = sum_v/l
+        
+    if abs(ret - 13.48574) <= 1e-4:
         print (value)
         print (length)
-        print (sum_v)
+        print ("%7e" % sum_v)
         print (l)
-        print (sum_v/l)
+        print ("%7e" % ret)
         
-    return sum_v / l
+    return ret
 
 
 cdef tuple find_optimal_cutoff( list x, list y ):

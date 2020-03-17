@@ -2505,7 +2505,7 @@ static CYTHON_INLINE int32_t __pyx_f_5MACS2_2IO_12CallPeakUnit_right_sum(PyObjec
 static CYTHON_INLINE int32_t __pyx_f_5MACS2_2IO_12CallPeakUnit_left_forward(PyObject *, int, int); /*proto*/
 static CYTHON_INLINE int32_t __pyx_f_5MACS2_2IO_12CallPeakUnit_right_forward(PyObject *, int, int); /*proto*/
 static PyObject *__pyx_f_5MACS2_2IO_12CallPeakUnit_wtd_find_summit(PyObject *, PyArrayObject *, PyArrayObject *, int32_t, int32_t, int32_t, float); /*proto*/
-static float __pyx_f_5MACS2_2IO_12CallPeakUnit_mean_from_value_length(PyArrayObject *, PyObject *); /*proto*/
+static __pyx_t_5MACS2_2IO_12CallPeakUnit_float32_t __pyx_f_5MACS2_2IO_12CallPeakUnit_mean_from_value_length(PyArrayObject *, PyObject *); /*proto*/
 static __Pyx_TypeInfo __Pyx_TypeInfo_nn___pyx_t_5numpy_int32_t = { "int32_t", NULL, sizeof(__pyx_t_5numpy_int32_t), { 0 }, 0, IS_UNSIGNED(__pyx_t_5numpy_int32_t) ? 'U' : 'I', IS_UNSIGNED(__pyx_t_5numpy_int32_t), 0 };
 static __Pyx_TypeInfo __Pyx_TypeInfo_nn___pyx_t_5numpy_float32_t = { "float32_t", NULL, sizeof(__pyx_t_5numpy_float32_t), { 0 }, 0, 'R', 0, 0 };
 #define __Pyx_MODULE_NAME "MACS2.IO.CallPeakUnit"
@@ -2534,6 +2534,7 @@ static const char __pyx_k_q[] = "q";
 static const char __pyx_k_s[] = "s";
 static const char __pyx_k_w[] = "w";
 static const char __pyx_k_2f[] = ".2f";
+static const char __pyx_k_7e[] = "%7e";
 static const char __pyx_k__9[] = "\t";
 static const char __pyx_k_fc[] = "fc";
 static const char __pyx_k_np[] = "np";
@@ -2758,6 +2759,7 @@ static PyObject *__pyx_kp_u_3_Pre_compute_pvalue_qvalue_tab;
 static PyObject *__pyx_kp_u_3_SPMR_is_requested_so_pileup_w;
 static PyObject *__pyx_kp_u_3_Write_bedGraph_files_for_cont;
 static PyObject *__pyx_kp_u_3_Write_bedGraph_files_for_trea;
+static PyObject *__pyx_kp_u_7e;
 static PyObject *__pyx_n_s_BroadPeakIO;
 static PyObject *__pyx_kp_u_CTRL_bdg;
 static PyObject *__pyx_n_u_CallPeakUnit;
@@ -5328,7 +5330,7 @@ static PyObject *__pyx_f_5MACS2_2IO_12CallPeakUnit_wtd_find_summit(CYTHON_UNUSED
  * 
  *     return (wtd_other_max_pos, wtd_other_max_val > cutoff)             # <<<<<<<<<<<<<<
  * 
- * cdef float median_from_value_length ( np.ndarray value, list length ):
+ * cdef float32_t median_from_value_length ( np.ndarray value, list length ):
  */
   __Pyx_TraceLine(207,0,__PYX_ERR(0, 207, __pyx_L1_error))
   __Pyx_XDECREF(__pyx_r);
@@ -5379,25 +5381,25 @@ static PyObject *__pyx_f_5MACS2_2IO_12CallPeakUnit_wtd_find_summit(CYTHON_UNUSED
 /* "MACS2/IO/CallPeakUnit.pyx":209
  *     return (wtd_other_max_pos, wtd_other_max_val > cutoff)
  * 
- * cdef float median_from_value_length ( np.ndarray value, list length ):             # <<<<<<<<<<<<<<
+ * cdef float32_t median_from_value_length ( np.ndarray value, list length ):             # <<<<<<<<<<<<<<
  *     """
  *     """
  */
 
-static float __pyx_f_5MACS2_2IO_12CallPeakUnit_median_from_value_length(PyArrayObject *__pyx_v_value, PyObject *__pyx_v_length) {
+static __pyx_t_5MACS2_2IO_12CallPeakUnit_float32_t __pyx_f_5MACS2_2IO_12CallPeakUnit_median_from_value_length(PyArrayObject *__pyx_v_value, PyObject *__pyx_v_length) {
   PyObject *__pyx_v_tmp = 0;
   int32_t __pyx_v_c;
   int32_t __pyx_v_tmp_l;
-  float __pyx_v_tmp_v;
-  float __pyx_v_mid_l;
-  float __pyx_r;
+  __pyx_t_5MACS2_2IO_12CallPeakUnit_float32_t __pyx_v_tmp_v;
+  __pyx_t_5MACS2_2IO_12CallPeakUnit_float32_t __pyx_v_mid_l;
+  __pyx_t_5MACS2_2IO_12CallPeakUnit_float32_t __pyx_r;
   __Pyx_TraceDeclarations
   __Pyx_RefNannyDeclarations
   PyObject *__pyx_t_1 = NULL;
   PyObject *__pyx_t_2 = NULL;
   PyObject *__pyx_t_3 = NULL;
   int __pyx_t_4;
-  float __pyx_t_5;
+  __pyx_t_5MACS2_2IO_12CallPeakUnit_float32_t __pyx_t_5;
   Py_ssize_t __pyx_t_6;
   PyObject *__pyx_t_7 = NULL;
   PyObject *__pyx_t_8 = NULL;
@@ -5407,25 +5409,25 @@ static float __pyx_f_5MACS2_2IO_12CallPeakUnit_median_from_value_length(PyArrayO
   __Pyx_RefNannySetupContext("median_from_value_length", 0);
   __Pyx_TraceCall("median_from_value_length", __pyx_f[0], 209, 0, __PYX_ERR(0, 209, __pyx_L1_error));
 
-  /* "MACS2/IO/CallPeakUnit.pyx":218
- *         float mid_l
+  /* "MACS2/IO/CallPeakUnit.pyx":217
+ *         float32_t tmp_v, mid_l
  * 
  *     c = 0             # <<<<<<<<<<<<<<
  *     tmp = sorted(list(zip( value, length )))
  *     mid_l = sum( length )/2
  */
-  __Pyx_TraceLine(218,0,__PYX_ERR(0, 218, __pyx_L1_error))
+  __Pyx_TraceLine(217,0,__PYX_ERR(0, 217, __pyx_L1_error))
   __pyx_v_c = 0;
 
-  /* "MACS2/IO/CallPeakUnit.pyx":219
+  /* "MACS2/IO/CallPeakUnit.pyx":218
  * 
  *     c = 0
  *     tmp = sorted(list(zip( value, length )))             # <<<<<<<<<<<<<<
  *     mid_l = sum( length )/2
  *     for (tmp_v, tmp_l) in tmp:
  */
-  __Pyx_TraceLine(219,0,__PYX_ERR(0, 219, __pyx_L1_error))
-  __pyx_t_2 = PyTuple_New(2); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 219, __pyx_L1_error)
+  __Pyx_TraceLine(218,0,__PYX_ERR(0, 218, __pyx_L1_error))
+  __pyx_t_2 = PyTuple_New(2); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 218, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __Pyx_INCREF(((PyObject *)__pyx_v_value));
   __Pyx_GIVEREF(((PyObject *)__pyx_v_value));
@@ -5433,57 +5435,57 @@ static float __pyx_f_5MACS2_2IO_12CallPeakUnit_median_from_value_length(PyArrayO
   __Pyx_INCREF(__pyx_v_length);
   __Pyx_GIVEREF(__pyx_v_length);
   PyTuple_SET_ITEM(__pyx_t_2, 1, __pyx_v_length);
-  __pyx_t_3 = __Pyx_PyObject_Call(__pyx_builtin_zip, __pyx_t_2, NULL); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 219, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_PyObject_Call(__pyx_builtin_zip, __pyx_t_2, NULL); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 218, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-  __pyx_t_2 = PySequence_List(__pyx_t_3); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 219, __pyx_L1_error)
+  __pyx_t_2 = PySequence_List(__pyx_t_3); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 218, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-  __pyx_t_3 = PySequence_List(__pyx_t_2); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 219, __pyx_L1_error)
+  __pyx_t_3 = PySequence_List(__pyx_t_2); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 218, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
   __pyx_t_1 = ((PyObject*)__pyx_t_3);
   __pyx_t_3 = 0;
-  __pyx_t_4 = PyList_Sort(__pyx_t_1); if (unlikely(__pyx_t_4 == ((int)-1))) __PYX_ERR(0, 219, __pyx_L1_error)
+  __pyx_t_4 = PyList_Sort(__pyx_t_1); if (unlikely(__pyx_t_4 == ((int)-1))) __PYX_ERR(0, 218, __pyx_L1_error)
   __pyx_v_tmp = ((PyObject*)__pyx_t_1);
   __pyx_t_1 = 0;
 
-  /* "MACS2/IO/CallPeakUnit.pyx":220
+  /* "MACS2/IO/CallPeakUnit.pyx":219
  *     c = 0
  *     tmp = sorted(list(zip( value, length )))
  *     mid_l = sum( length )/2             # <<<<<<<<<<<<<<
  *     for (tmp_v, tmp_l) in tmp:
  *         c += tmp_l
  */
-  __Pyx_TraceLine(220,0,__PYX_ERR(0, 220, __pyx_L1_error))
-  __pyx_t_1 = __Pyx_PyObject_CallOneArg(__pyx_builtin_sum, __pyx_v_length); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 220, __pyx_L1_error)
+  __Pyx_TraceLine(219,0,__PYX_ERR(0, 219, __pyx_L1_error))
+  __pyx_t_1 = __Pyx_PyObject_CallOneArg(__pyx_builtin_sum, __pyx_v_length); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 219, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_3 = __Pyx_PyInt_TrueDivideObjC(__pyx_t_1, __pyx_int_2, 2, 0, 0); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 220, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_PyInt_TrueDivideObjC(__pyx_t_1, __pyx_int_2, 2, 0, 0); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 219, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-  __pyx_t_5 = __pyx_PyFloat_AsFloat(__pyx_t_3); if (unlikely((__pyx_t_5 == (float)-1) && PyErr_Occurred())) __PYX_ERR(0, 220, __pyx_L1_error)
+  __pyx_t_5 = __pyx_PyFloat_AsFloat(__pyx_t_3); if (unlikely((__pyx_t_5 == ((npy_float32)-1)) && PyErr_Occurred())) __PYX_ERR(0, 219, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
   __pyx_v_mid_l = __pyx_t_5;
 
-  /* "MACS2/IO/CallPeakUnit.pyx":221
+  /* "MACS2/IO/CallPeakUnit.pyx":220
  *     tmp = sorted(list(zip( value, length )))
  *     mid_l = sum( length )/2
  *     for (tmp_v, tmp_l) in tmp:             # <<<<<<<<<<<<<<
  *         c += tmp_l
  *         if c > mid_l:
  */
-  __Pyx_TraceLine(221,0,__PYX_ERR(0, 221, __pyx_L1_error))
+  __Pyx_TraceLine(220,0,__PYX_ERR(0, 220, __pyx_L1_error))
   if (unlikely(__pyx_v_tmp == Py_None)) {
     PyErr_SetString(PyExc_TypeError, "'NoneType' object is not iterable");
-    __PYX_ERR(0, 221, __pyx_L1_error)
+    __PYX_ERR(0, 220, __pyx_L1_error)
   }
   __pyx_t_3 = __pyx_v_tmp; __Pyx_INCREF(__pyx_t_3); __pyx_t_6 = 0;
   for (;;) {
     if (__pyx_t_6 >= PyList_GET_SIZE(__pyx_t_3)) break;
     #if CYTHON_ASSUME_SAFE_MACROS && !CYTHON_AVOID_BORROWED_REFS
-    __pyx_t_1 = PyList_GET_ITEM(__pyx_t_3, __pyx_t_6); __Pyx_INCREF(__pyx_t_1); __pyx_t_6++; if (unlikely(0 < 0)) __PYX_ERR(0, 221, __pyx_L1_error)
+    __pyx_t_1 = PyList_GET_ITEM(__pyx_t_3, __pyx_t_6); __Pyx_INCREF(__pyx_t_1); __pyx_t_6++; if (unlikely(0 < 0)) __PYX_ERR(0, 220, __pyx_L1_error)
     #else
-    __pyx_t_1 = PySequence_ITEM(__pyx_t_3, __pyx_t_6); __pyx_t_6++; if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 221, __pyx_L1_error)
+    __pyx_t_1 = PySequence_ITEM(__pyx_t_3, __pyx_t_6); __pyx_t_6++; if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 220, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
     #endif
     if ((likely(PyTuple_CheckExact(__pyx_t_1))) || (PyList_CheckExact(__pyx_t_1))) {
@@ -5492,7 +5494,7 @@ static float __pyx_f_5MACS2_2IO_12CallPeakUnit_median_from_value_length(PyArrayO
       if (unlikely(size != 2)) {
         if (size > 2) __Pyx_RaiseTooManyValuesError(2);
         else if (size >= 0) __Pyx_RaiseNeedMoreValuesError(size);
-        __PYX_ERR(0, 221, __pyx_L1_error)
+        __PYX_ERR(0, 220, __pyx_L1_error)
       }
       #if CYTHON_ASSUME_SAFE_MACROS && !CYTHON_AVOID_BORROWED_REFS
       if (likely(PyTuple_CheckExact(sequence))) {
@@ -5505,15 +5507,15 @@ static float __pyx_f_5MACS2_2IO_12CallPeakUnit_median_from_value_length(PyArrayO
       __Pyx_INCREF(__pyx_t_2);
       __Pyx_INCREF(__pyx_t_7);
       #else
-      __pyx_t_2 = PySequence_ITEM(sequence, 0); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 221, __pyx_L1_error)
+      __pyx_t_2 = PySequence_ITEM(sequence, 0); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 220, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_2);
-      __pyx_t_7 = PySequence_ITEM(sequence, 1); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 221, __pyx_L1_error)
+      __pyx_t_7 = PySequence_ITEM(sequence, 1); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 220, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_7);
       #endif
       __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
     } else {
       Py_ssize_t index = -1;
-      __pyx_t_8 = PyObject_GetIter(__pyx_t_1); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 221, __pyx_L1_error)
+      __pyx_t_8 = PyObject_GetIter(__pyx_t_1); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 220, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_8);
       __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
       __pyx_t_9 = Py_TYPE(__pyx_t_8)->tp_iternext;
@@ -5521,7 +5523,7 @@ static float __pyx_f_5MACS2_2IO_12CallPeakUnit_median_from_value_length(PyArrayO
       __Pyx_GOTREF(__pyx_t_2);
       index = 1; __pyx_t_7 = __pyx_t_9(__pyx_t_8); if (unlikely(!__pyx_t_7)) goto __pyx_L5_unpacking_failed;
       __Pyx_GOTREF(__pyx_t_7);
-      if (__Pyx_IternextUnpackEndCheck(__pyx_t_9(__pyx_t_8), 2) < 0) __PYX_ERR(0, 221, __pyx_L1_error)
+      if (__Pyx_IternextUnpackEndCheck(__pyx_t_9(__pyx_t_8), 2) < 0) __PYX_ERR(0, 220, __pyx_L1_error)
       __pyx_t_9 = NULL;
       __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
       goto __pyx_L6_unpacking_done;
@@ -5529,50 +5531,50 @@ static float __pyx_f_5MACS2_2IO_12CallPeakUnit_median_from_value_length(PyArrayO
       __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
       __pyx_t_9 = NULL;
       if (__Pyx_IterFinish() == 0) __Pyx_RaiseNeedMoreValuesError(index);
-      __PYX_ERR(0, 221, __pyx_L1_error)
+      __PYX_ERR(0, 220, __pyx_L1_error)
       __pyx_L6_unpacking_done:;
     }
-    __pyx_t_5 = __pyx_PyFloat_AsFloat(__pyx_t_2); if (unlikely((__pyx_t_5 == (float)-1) && PyErr_Occurred())) __PYX_ERR(0, 221, __pyx_L1_error)
+    __pyx_t_5 = __pyx_PyFloat_AsFloat(__pyx_t_2); if (unlikely((__pyx_t_5 == ((npy_float32)-1)) && PyErr_Occurred())) __PYX_ERR(0, 220, __pyx_L1_error)
     __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-    __pyx_t_10 = __Pyx_PyInt_As_int32_t(__pyx_t_7); if (unlikely((__pyx_t_10 == ((int32_t)-1)) && PyErr_Occurred())) __PYX_ERR(0, 221, __pyx_L1_error)
+    __pyx_t_10 = __Pyx_PyInt_As_int32_t(__pyx_t_7); if (unlikely((__pyx_t_10 == ((int32_t)-1)) && PyErr_Occurred())) __PYX_ERR(0, 220, __pyx_L1_error)
     __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
     __pyx_v_tmp_v = __pyx_t_5;
     __pyx_v_tmp_l = __pyx_t_10;
 
-    /* "MACS2/IO/CallPeakUnit.pyx":222
+    /* "MACS2/IO/CallPeakUnit.pyx":221
  *     mid_l = sum( length )/2
  *     for (tmp_v, tmp_l) in tmp:
  *         c += tmp_l             # <<<<<<<<<<<<<<
  *         if c > mid_l:
  *             return tmp_v
  */
-    __Pyx_TraceLine(222,0,__PYX_ERR(0, 222, __pyx_L1_error))
+    __Pyx_TraceLine(221,0,__PYX_ERR(0, 221, __pyx_L1_error))
     __pyx_v_c = (__pyx_v_c + __pyx_v_tmp_l);
 
-    /* "MACS2/IO/CallPeakUnit.pyx":223
+    /* "MACS2/IO/CallPeakUnit.pyx":222
  *     for (tmp_v, tmp_l) in tmp:
  *         c += tmp_l
  *         if c > mid_l:             # <<<<<<<<<<<<<<
  *             return tmp_v
  * 
  */
-    __Pyx_TraceLine(223,0,__PYX_ERR(0, 223, __pyx_L1_error))
+    __Pyx_TraceLine(222,0,__PYX_ERR(0, 222, __pyx_L1_error))
     __pyx_t_11 = ((__pyx_v_c > __pyx_v_mid_l) != 0);
     if (__pyx_t_11) {
 
-      /* "MACS2/IO/CallPeakUnit.pyx":224
+      /* "MACS2/IO/CallPeakUnit.pyx":223
  *         c += tmp_l
  *         if c > mid_l:
  *             return tmp_v             # <<<<<<<<<<<<<<
  * 
- * cdef float mean_from_value_length ( np.ndarray value, list length ):
+ * cdef float32_t mean_from_value_length ( np.ndarray value, list length ):
  */
-      __Pyx_TraceLine(224,0,__PYX_ERR(0, 224, __pyx_L1_error))
+      __Pyx_TraceLine(223,0,__PYX_ERR(0, 223, __pyx_L1_error))
       __pyx_r = __pyx_v_tmp_v;
       __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
       goto __pyx_L0;
 
-      /* "MACS2/IO/CallPeakUnit.pyx":223
+      /* "MACS2/IO/CallPeakUnit.pyx":222
  *     for (tmp_v, tmp_l) in tmp:
  *         c += tmp_l
  *         if c > mid_l:             # <<<<<<<<<<<<<<
@@ -5581,21 +5583,21 @@ static float __pyx_f_5MACS2_2IO_12CallPeakUnit_median_from_value_length(PyArrayO
  */
     }
 
-    /* "MACS2/IO/CallPeakUnit.pyx":221
+    /* "MACS2/IO/CallPeakUnit.pyx":220
  *     tmp = sorted(list(zip( value, length )))
  *     mid_l = sum( length )/2
  *     for (tmp_v, tmp_l) in tmp:             # <<<<<<<<<<<<<<
  *         c += tmp_l
  *         if c > mid_l:
  */
-    __Pyx_TraceLine(221,0,__PYX_ERR(0, 221, __pyx_L1_error))
+    __Pyx_TraceLine(220,0,__PYX_ERR(0, 220, __pyx_L1_error))
   }
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
 
   /* "MACS2/IO/CallPeakUnit.pyx":209
  *     return (wtd_other_max_pos, wtd_other_max_val > cutoff)
  * 
- * cdef float median_from_value_length ( np.ndarray value, list length ):             # <<<<<<<<<<<<<<
+ * cdef float32_t median_from_value_length ( np.ndarray value, list length ):             # <<<<<<<<<<<<<<
  *     """
  *     """
  */
@@ -5618,145 +5620,156 @@ static float __pyx_f_5MACS2_2IO_12CallPeakUnit_median_from_value_length(PyArrayO
   return __pyx_r;
 }
 
-/* "MACS2/IO/CallPeakUnit.pyx":226
+/* "MACS2/IO/CallPeakUnit.pyx":225
  *             return tmp_v
  * 
- * cdef float mean_from_value_length ( np.ndarray value, list length ):             # <<<<<<<<<<<<<<
+ * cdef float32_t mean_from_value_length ( np.ndarray value, list length ):             # <<<<<<<<<<<<<<
  *     """take list of values and list of corresponding lengths, calculate the mean.
  *     An important function for bedGraph type of data.
  */
 
-static float __pyx_f_5MACS2_2IO_12CallPeakUnit_mean_from_value_length(PyArrayObject *__pyx_v_value, PyObject *__pyx_v_length) {
-  int __pyx_v_i;
+static __pyx_t_5MACS2_2IO_12CallPeakUnit_float32_t __pyx_f_5MACS2_2IO_12CallPeakUnit_mean_from_value_length(PyArrayObject *__pyx_v_value, PyObject *__pyx_v_length) {
+  int32_t __pyx_v_i;
   int32_t __pyx_v_tmp_l;
   int32_t __pyx_v_l;
-  float __pyx_v_tmp_v;
-  float __pyx_v_sum_v;
-  float __pyx_r;
+  __pyx_t_5MACS2_2IO_12CallPeakUnit_float32_t __pyx_v_tmp_v;
+  __pyx_t_5MACS2_2IO_12CallPeakUnit_float32_t __pyx_v_sum_v;
+  __pyx_t_5MACS2_2IO_12CallPeakUnit_float32_t __pyx_v_ret;
+  __pyx_t_5MACS2_2IO_12CallPeakUnit_float32_t __pyx_r;
   __Pyx_TraceDeclarations
   __Pyx_RefNannyDeclarations
   Py_ssize_t __pyx_t_1;
   Py_ssize_t __pyx_t_2;
-  int __pyx_t_3;
+  int32_t __pyx_t_3;
   PyObject *__pyx_t_4 = NULL;
   int32_t __pyx_t_5;
-  float __pyx_t_6;
+  __pyx_t_5MACS2_2IO_12CallPeakUnit_float32_t __pyx_t_6;
   int __pyx_t_7;
   PyObject *__pyx_t_8 = NULL;
   __Pyx_RefNannySetupContext("mean_from_value_length", 0);
-  __Pyx_TraceCall("mean_from_value_length", __pyx_f[0], 226, 0, __PYX_ERR(0, 226, __pyx_L1_error));
+  __Pyx_TraceCall("mean_from_value_length", __pyx_f[0], 225, 0, __PYX_ERR(0, 225, __pyx_L1_error));
 
-  /* "MACS2/IO/CallPeakUnit.pyx":235
- *         float tmp_v, sum_v
+  /* "MACS2/IO/CallPeakUnit.pyx":234
+ *         float32_t tmp_v, sum_v, ret
  * 
  *     sum_v = 0             # <<<<<<<<<<<<<<
  *     l = 0
  * 
  */
-  __Pyx_TraceLine(235,0,__PYX_ERR(0, 235, __pyx_L1_error))
+  __Pyx_TraceLine(234,0,__PYX_ERR(0, 234, __pyx_L1_error))
   __pyx_v_sum_v = 0.0;
 
-  /* "MACS2/IO/CallPeakUnit.pyx":236
+  /* "MACS2/IO/CallPeakUnit.pyx":235
  * 
  *     sum_v = 0
  *     l = 0             # <<<<<<<<<<<<<<
  * 
  *     for i in range( len(length) ):
  */
-  __Pyx_TraceLine(236,0,__PYX_ERR(0, 236, __pyx_L1_error))
+  __Pyx_TraceLine(235,0,__PYX_ERR(0, 235, __pyx_L1_error))
   __pyx_v_l = 0;
 
-  /* "MACS2/IO/CallPeakUnit.pyx":238
+  /* "MACS2/IO/CallPeakUnit.pyx":237
  *     l = 0
  * 
  *     for i in range( len(length) ):             # <<<<<<<<<<<<<<
  *         tmp_l = length[ i ]
  *         tmp_v = value[ i ]
  */
-  __Pyx_TraceLine(238,0,__PYX_ERR(0, 238, __pyx_L1_error))
+  __Pyx_TraceLine(237,0,__PYX_ERR(0, 237, __pyx_L1_error))
   if (unlikely(__pyx_v_length == Py_None)) {
     PyErr_SetString(PyExc_TypeError, "object of type 'NoneType' has no len()");
-    __PYX_ERR(0, 238, __pyx_L1_error)
+    __PYX_ERR(0, 237, __pyx_L1_error)
   }
-  __pyx_t_1 = PyList_GET_SIZE(__pyx_v_length); if (unlikely(__pyx_t_1 == ((Py_ssize_t)-1))) __PYX_ERR(0, 238, __pyx_L1_error)
+  __pyx_t_1 = PyList_GET_SIZE(__pyx_v_length); if (unlikely(__pyx_t_1 == ((Py_ssize_t)-1))) __PYX_ERR(0, 237, __pyx_L1_error)
   __pyx_t_2 = __pyx_t_1;
   for (__pyx_t_3 = 0; __pyx_t_3 < __pyx_t_2; __pyx_t_3+=1) {
     __pyx_v_i = __pyx_t_3;
 
-    /* "MACS2/IO/CallPeakUnit.pyx":239
+    /* "MACS2/IO/CallPeakUnit.pyx":238
  * 
  *     for i in range( len(length) ):
  *         tmp_l = length[ i ]             # <<<<<<<<<<<<<<
  *         tmp_v = value[ i ]
  *         sum_v += tmp_v * tmp_l
  */
-    __Pyx_TraceLine(239,0,__PYX_ERR(0, 239, __pyx_L1_error))
+    __Pyx_TraceLine(238,0,__PYX_ERR(0, 238, __pyx_L1_error))
     if (unlikely(__pyx_v_length == Py_None)) {
       PyErr_SetString(PyExc_TypeError, "'NoneType' object is not subscriptable");
-      __PYX_ERR(0, 239, __pyx_L1_error)
+      __PYX_ERR(0, 238, __pyx_L1_error)
     }
-    __pyx_t_4 = __Pyx_GetItemInt_List(__pyx_v_length, __pyx_v_i, int, 1, __Pyx_PyInt_From_int, 1, 1, 1); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 239, __pyx_L1_error)
+    __pyx_t_4 = __Pyx_GetItemInt_List(__pyx_v_length, __pyx_v_i, int32_t, 1, __Pyx_PyInt_From_int32_t, 1, 1, 1); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 238, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_4);
-    __pyx_t_5 = __Pyx_PyInt_As_int32_t(__pyx_t_4); if (unlikely((__pyx_t_5 == ((int32_t)-1)) && PyErr_Occurred())) __PYX_ERR(0, 239, __pyx_L1_error)
+    __pyx_t_5 = __Pyx_PyInt_As_int32_t(__pyx_t_4); if (unlikely((__pyx_t_5 == ((int32_t)-1)) && PyErr_Occurred())) __PYX_ERR(0, 238, __pyx_L1_error)
     __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
     __pyx_v_tmp_l = __pyx_t_5;
 
-    /* "MACS2/IO/CallPeakUnit.pyx":240
+    /* "MACS2/IO/CallPeakUnit.pyx":239
  *     for i in range( len(length) ):
  *         tmp_l = length[ i ]
  *         tmp_v = value[ i ]             # <<<<<<<<<<<<<<
  *         sum_v += tmp_v * tmp_l
  *         l += tmp_l
  */
-    __Pyx_TraceLine(240,0,__PYX_ERR(0, 240, __pyx_L1_error))
-    __pyx_t_4 = __Pyx_GetItemInt(((PyObject *)__pyx_v_value), __pyx_v_i, int, 1, __Pyx_PyInt_From_int, 0, 1, 1); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 240, __pyx_L1_error)
+    __Pyx_TraceLine(239,0,__PYX_ERR(0, 239, __pyx_L1_error))
+    __pyx_t_4 = __Pyx_GetItemInt(((PyObject *)__pyx_v_value), __pyx_v_i, int32_t, 1, __Pyx_PyInt_From_int32_t, 0, 1, 1); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 239, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_4);
-    __pyx_t_6 = __pyx_PyFloat_AsFloat(__pyx_t_4); if (unlikely((__pyx_t_6 == (float)-1) && PyErr_Occurred())) __PYX_ERR(0, 240, __pyx_L1_error)
+    __pyx_t_6 = __pyx_PyFloat_AsFloat(__pyx_t_4); if (unlikely((__pyx_t_6 == ((npy_float32)-1)) && PyErr_Occurred())) __PYX_ERR(0, 239, __pyx_L1_error)
     __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
     __pyx_v_tmp_v = __pyx_t_6;
 
-    /* "MACS2/IO/CallPeakUnit.pyx":241
+    /* "MACS2/IO/CallPeakUnit.pyx":240
  *         tmp_l = length[ i ]
  *         tmp_v = value[ i ]
  *         sum_v += tmp_v * tmp_l             # <<<<<<<<<<<<<<
  *         l += tmp_l
  * 
  */
-    __Pyx_TraceLine(241,0,__PYX_ERR(0, 241, __pyx_L1_error))
+    __Pyx_TraceLine(240,0,__PYX_ERR(0, 240, __pyx_L1_error))
     __pyx_v_sum_v = (__pyx_v_sum_v + (__pyx_v_tmp_v * __pyx_v_tmp_l));
 
-    /* "MACS2/IO/CallPeakUnit.pyx":242
+    /* "MACS2/IO/CallPeakUnit.pyx":241
  *         tmp_v = value[ i ]
  *         sum_v += tmp_v * tmp_l
  *         l += tmp_l             # <<<<<<<<<<<<<<
  * 
- * 
+ *     ret = sum_v/l
  */
-    __Pyx_TraceLine(242,0,__PYX_ERR(0, 242, __pyx_L1_error))
+    __Pyx_TraceLine(241,0,__PYX_ERR(0, 241, __pyx_L1_error))
     __pyx_v_l = (__pyx_v_l + __pyx_v_tmp_l);
   }
 
+  /* "MACS2/IO/CallPeakUnit.pyx":243
+ *         l += tmp_l
+ * 
+ *     ret = sum_v/l             # <<<<<<<<<<<<<<
+ * 
+ *     if abs(ret - 13.48574) <= 1e-4:
+ */
+  __Pyx_TraceLine(243,0,__PYX_ERR(0, 243, __pyx_L1_error))
+  if (unlikely(__pyx_v_l == 0)) {
+    PyErr_SetString(PyExc_ZeroDivisionError, "float division");
+    __PYX_ERR(0, 243, __pyx_L1_error)
+  }
+  __pyx_v_ret = (__pyx_v_sum_v / ((__pyx_t_5MACS2_2IO_12CallPeakUnit_float32_t)__pyx_v_l));
+
   /* "MACS2/IO/CallPeakUnit.pyx":245
+ *     ret = sum_v/l
  * 
- * 
- *     if abs(sum_v / l - 13.48574) <= 1e-4:             # <<<<<<<<<<<<<<
+ *     if abs(ret - 13.48574) <= 1e-4:             # <<<<<<<<<<<<<<
  *         print (value)
  *         print (length)
  */
   __Pyx_TraceLine(245,0,__PYX_ERR(0, 245, __pyx_L1_error))
-  if (unlikely(__pyx_v_l == 0)) {
-    PyErr_SetString(PyExc_ZeroDivisionError, "float division");
-    __PYX_ERR(0, 245, __pyx_L1_error)
-  }
-  __pyx_t_7 = ((fabs(((__pyx_v_sum_v / ((float)__pyx_v_l)) - 13.48574)) <= 1e-4) != 0);
+  __pyx_t_7 = ((fabs((__pyx_v_ret - 13.48574)) <= 1e-4) != 0);
   if (__pyx_t_7) {
 
     /* "MACS2/IO/CallPeakUnit.pyx":246
  * 
- *     if abs(sum_v / l - 13.48574) <= 1e-4:
+ *     if abs(ret - 13.48574) <= 1e-4:
  *         print (value)             # <<<<<<<<<<<<<<
  *         print (length)
- *         print (sum_v)
+ *         print ("%7e" % sum_v)
  */
     __Pyx_TraceLine(246,0,__PYX_ERR(0, 246, __pyx_L1_error))
     __pyx_t_4 = __Pyx_PyObject_CallOneArg(__pyx_builtin_print, ((PyObject *)__pyx_v_value)); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 246, __pyx_L1_error)
@@ -5764,10 +5777,10 @@ static float __pyx_f_5MACS2_2IO_12CallPeakUnit_mean_from_value_length(PyArrayObj
     __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
 
     /* "MACS2/IO/CallPeakUnit.pyx":247
- *     if abs(sum_v / l - 13.48574) <= 1e-4:
+ *     if abs(ret - 13.48574) <= 1e-4:
  *         print (value)
  *         print (length)             # <<<<<<<<<<<<<<
- *         print (sum_v)
+ *         print ("%7e" % sum_v)
  *         print (l)
  */
     __Pyx_TraceLine(247,0,__PYX_ERR(0, 247, __pyx_L1_error))
@@ -5778,80 +5791,78 @@ static float __pyx_f_5MACS2_2IO_12CallPeakUnit_mean_from_value_length(PyArrayObj
     /* "MACS2/IO/CallPeakUnit.pyx":248
  *         print (value)
  *         print (length)
- *         print (sum_v)             # <<<<<<<<<<<<<<
+ *         print ("%7e" % sum_v)             # <<<<<<<<<<<<<<
  *         print (l)
- *         print (sum_v/l)
+ *         print ("%7e" % ret)
  */
     __Pyx_TraceLine(248,0,__PYX_ERR(0, 248, __pyx_L1_error))
     __pyx_t_4 = PyFloat_FromDouble(__pyx_v_sum_v); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 248, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_4);
-    __pyx_t_8 = __Pyx_PyObject_CallOneArg(__pyx_builtin_print, __pyx_t_4); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 248, __pyx_L1_error)
+    __pyx_t_8 = PyUnicode_Format(__pyx_kp_u_7e, __pyx_t_4); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 248, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_8);
     __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
+    __pyx_t_4 = __Pyx_PyObject_CallOneArg(__pyx_builtin_print, __pyx_t_8); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 248, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_4);
     __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
+    __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
 
     /* "MACS2/IO/CallPeakUnit.pyx":249
  *         print (length)
- *         print (sum_v)
+ *         print ("%7e" % sum_v)
  *         print (l)             # <<<<<<<<<<<<<<
- *         print (sum_v/l)
+ *         print ("%7e" % ret)
  * 
  */
     __Pyx_TraceLine(249,0,__PYX_ERR(0, 249, __pyx_L1_error))
-    __pyx_t_8 = __Pyx_PyInt_From_int32_t(__pyx_v_l); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 249, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_8);
-    __pyx_t_4 = __Pyx_PyObject_CallOneArg(__pyx_builtin_print, __pyx_t_8); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 249, __pyx_L1_error)
+    __pyx_t_4 = __Pyx_PyInt_From_int32_t(__pyx_v_l); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 249, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_4);
-    __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
+    __pyx_t_8 = __Pyx_PyObject_CallOneArg(__pyx_builtin_print, __pyx_t_4); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 249, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_8);
     __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
+    __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
 
     /* "MACS2/IO/CallPeakUnit.pyx":250
- *         print (sum_v)
+ *         print ("%7e" % sum_v)
  *         print (l)
- *         print (sum_v/l)             # <<<<<<<<<<<<<<
+ *         print ("%7e" % ret)             # <<<<<<<<<<<<<<
  * 
- *     return sum_v / l
+ *     return ret
  */
     __Pyx_TraceLine(250,0,__PYX_ERR(0, 250, __pyx_L1_error))
-    if (unlikely(__pyx_v_l == 0)) {
-      PyErr_SetString(PyExc_ZeroDivisionError, "float division");
-      __PYX_ERR(0, 250, __pyx_L1_error)
-    }
-    __pyx_t_4 = PyFloat_FromDouble((__pyx_v_sum_v / ((float)__pyx_v_l))); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 250, __pyx_L1_error)
+    __pyx_t_8 = PyFloat_FromDouble(__pyx_v_ret); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 250, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_8);
+    __pyx_t_4 = PyUnicode_Format(__pyx_kp_u_7e, __pyx_t_8); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 250, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_4);
+    __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
     __pyx_t_8 = __Pyx_PyObject_CallOneArg(__pyx_builtin_print, __pyx_t_4); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 250, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_8);
     __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
     __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
 
     /* "MACS2/IO/CallPeakUnit.pyx":245
+ *     ret = sum_v/l
  * 
- * 
- *     if abs(sum_v / l - 13.48574) <= 1e-4:             # <<<<<<<<<<<<<<
+ *     if abs(ret - 13.48574) <= 1e-4:             # <<<<<<<<<<<<<<
  *         print (value)
  *         print (length)
  */
   }
 
   /* "MACS2/IO/CallPeakUnit.pyx":252
- *         print (sum_v/l)
+ *         print ("%7e" % ret)
  * 
- *     return sum_v / l             # <<<<<<<<<<<<<<
+ *     return ret             # <<<<<<<<<<<<<<
  * 
  * 
  */
   __Pyx_TraceLine(252,0,__PYX_ERR(0, 252, __pyx_L1_error))
-  if (unlikely(__pyx_v_l == 0)) {
-    PyErr_SetString(PyExc_ZeroDivisionError, "float division");
-    __PYX_ERR(0, 252, __pyx_L1_error)
-  }
-  __pyx_r = (__pyx_v_sum_v / ((float)__pyx_v_l));
+  __pyx_r = __pyx_v_ret;
   goto __pyx_L0;
 
-  /* "MACS2/IO/CallPeakUnit.pyx":226
+  /* "MACS2/IO/CallPeakUnit.pyx":225
  *             return tmp_v
  * 
- * cdef float mean_from_value_length ( np.ndarray value, list length ):             # <<<<<<<<<<<<<<
+ * cdef float32_t mean_from_value_length ( np.ndarray value, list length ):             # <<<<<<<<<<<<<<
  *     """take list of values and list of corresponding lengths, calculate the mean.
  *     An important function for bedGraph type of data.
  */
@@ -29203,6 +29214,7 @@ static __Pyx_StringTabEntry __pyx_string_tab[] = {
   {&__pyx_kp_u_3_SPMR_is_requested_so_pileup_w, __pyx_k_3_SPMR_is_requested_so_pileup_w, sizeof(__pyx_k_3_SPMR_is_requested_so_pileup_w), 0, 1, 0, 0},
   {&__pyx_kp_u_3_Write_bedGraph_files_for_cont, __pyx_k_3_Write_bedGraph_files_for_cont, sizeof(__pyx_k_3_Write_bedGraph_files_for_cont), 0, 1, 0, 0},
   {&__pyx_kp_u_3_Write_bedGraph_files_for_trea, __pyx_k_3_Write_bedGraph_files_for_trea, sizeof(__pyx_k_3_Write_bedGraph_files_for_trea), 0, 1, 0, 0},
+  {&__pyx_kp_u_7e, __pyx_k_7e, sizeof(__pyx_k_7e), 0, 1, 0, 0},
   {&__pyx_n_s_BroadPeakIO, __pyx_k_BroadPeakIO, sizeof(__pyx_k_BroadPeakIO), 0, 0, 1, 1},
   {&__pyx_kp_u_CTRL_bdg, __pyx_k_CTRL_bdg, sizeof(__pyx_k_CTRL_bdg), 0, 1, 0, 0},
   {&__pyx_n_u_CallPeakUnit, __pyx_k_CallPeakUnit, sizeof(__pyx_k_CallPeakUnit), 0, 1, 0, 1},
@@ -29413,7 +29425,7 @@ static __Pyx_StringTabEntry __pyx_string_tab[] = {
 static CYTHON_SMALL_CODE int __Pyx_InitCachedBuiltins(void) {
   __pyx_builtin_range = __Pyx_GetBuiltinName(__pyx_n_s_range); if (!__pyx_builtin_range) __PYX_ERR(0, 127, __pyx_L1_error)
   __pyx_builtin_sum = __Pyx_GetBuiltinName(__pyx_n_s_sum); if (!__pyx_builtin_sum) __PYX_ERR(0, 164, __pyx_L1_error)
-  __pyx_builtin_zip = __Pyx_GetBuiltinName(__pyx_n_s_zip); if (!__pyx_builtin_zip) __PYX_ERR(0, 219, __pyx_L1_error)
+  __pyx_builtin_zip = __Pyx_GetBuiltinName(__pyx_n_s_zip); if (!__pyx_builtin_zip) __PYX_ERR(0, 218, __pyx_L1_error)
   __pyx_builtin_print = __Pyx_GetBuiltinName(__pyx_n_s_print); if (!__pyx_builtin_print) __PYX_ERR(0, 246, __pyx_L1_error)
   __pyx_builtin_open = __Pyx_GetBuiltinName(__pyx_n_s_open); if (!__pyx_builtin_open) __PYX_ERR(0, 490, __pyx_L1_error)
   __pyx_builtin_sorted = __Pyx_GetBuiltinName(__pyx_n_s_sorted); if (!__pyx_builtin_sorted) __PYX_ERR(0, 720, __pyx_L1_error)
@@ -30546,21 +30558,21 @@ if (!__Pyx_RefNanny) {
   /* "MACS2/IO/CallPeakUnit.pyx":209
  *     return (wtd_other_max_pos, wtd_other_max_val > cutoff)
  * 
- * cdef float median_from_value_length ( np.ndarray value, list length ):             # <<<<<<<<<<<<<<
+ * cdef float32_t median_from_value_length ( np.ndarray value, list length ):             # <<<<<<<<<<<<<<
  *     """
  *     """
  */
   __Pyx_TraceLine(209,0,__PYX_ERR(0, 209, __pyx_L1_error))
 
 
-  /* "MACS2/IO/CallPeakUnit.pyx":226
+  /* "MACS2/IO/CallPeakUnit.pyx":225
  *             return tmp_v
  * 
- * cdef float mean_from_value_length ( np.ndarray value, list length ):             # <<<<<<<<<<<<<<
+ * cdef float32_t mean_from_value_length ( np.ndarray value, list length ):             # <<<<<<<<<<<<<<
  *     """take list of values and list of corresponding lengths, calculate the mean.
  *     An important function for bedGraph type of data.
  */
-  __Pyx_TraceLine(226,0,__PYX_ERR(0, 226, __pyx_L1_error))
+  __Pyx_TraceLine(225,0,__PYX_ERR(0, 225, __pyx_L1_error))
 
 
   /* "MACS2/IO/CallPeakUnit.pyx":255
