@@ -49,6 +49,9 @@ if [[ $flag == 1 ]]; then
     exit 1;
 fi
 
+echo "cat"
+cat ${TAG}_run_callpeak_broad/run_callpeak_broad.log
+
 echo "15. compare with standard outputs"
 
 flag=0

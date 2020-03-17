@@ -222,14 +222,14 @@ cdef float32_t median_from_value_length ( np.ndarray value, list length ):
         if c > mid_l:
             return tmp_v
 
-cdef float32_t mean_from_value_length ( np.ndarray value, list length ):
+cdef float32_t mean_from_value_length ( np.ndarray[np.float32_t, ndim=1] value, list length ):
     """take list of values and list of corresponding lengths, calculate the mean.
     An important function for bedGraph type of data.
     """
     cdef:
         int32_t i
         int32_t tmp_l, l
-        float32_t tmp_v, sum_v, ret
+        float32_t tmp_v, sum_v, tmp_sum, ret
 
     sum_v = 0
     l = 0
@@ -237,7 +237,8 @@ cdef float32_t mean_from_value_length ( np.ndarray value, list length ):
     for i in range( len(length) ):
         tmp_l = length[ i ]
         tmp_v = value[ i ]
-        sum_v += tmp_v * tmp_l
+        tmp_sum = tmp_v * tmp_l
+        sum_v = tmp_sum + sum_v
         l += tmp_l 
 
     ret = sum_v/l
@@ -647,10 +648,8 @@ cdef class CallerFromAlignments:
             np.ndarray[np.float32_t, ndim=1] s
         assert array1.shape[0] == array2.shape[0]
         s = np.zeros(array1.shape[0], dtype="float32")
-        #ptr = <float *> s.data
         for i in range(array1.shape[0]):
             s[i] = cal_func( array1[i], array2[i] )
-            #ptr += 1
         return s
 
     cdef void __cal_pvalue_qvalue_table ( self ):
@@ -980,7 +979,7 @@ cdef class CallerFromAlignments:
                                         #  5. list of scores at this
                                         #  chunk
             long tl, lastp, ts, te, ti
-            float tp, cp
+            float32_t tp, cp
             int32_t * acs_ptr
             int32_t * ace_ptr
             int32_t * acia_ptr
