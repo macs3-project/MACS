@@ -228,17 +228,19 @@ cdef float mean_from_value_length ( np.ndarray value, list length ):
     An important function for bedGraph type of data.
     """
     cdef:
-        list tmp
+        int i
         int32_t tmp_l, l
         float tmp_v, sum_v
 
     sum_v = 0
-    tmp = list(zip( value, length ))
-    l = sum( length )
+    l = 0
 
-    for (tmp_v, tmp_l) in tmp:
+    for i in range( len(length) ):
+        tmp_l = length[ i ]
+        tmp_v = value[ i ]
         sum_v += tmp_v * tmp_l
-
+        l += tmp_l 
+        
     return sum_v / l
 
 
