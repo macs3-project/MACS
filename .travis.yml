@@ -10,7 +10,7 @@ jobs:
         docker run --rm --privileged multiarch/qemu-user-static --reset -p yes &&
           docker build --rm --build-arg BASE_IMAGE="i386/ubuntu:bionic" -t macs -f test/Dockerfile .
       script: |
-        docker run --rm -t macs bash -cx "pytest --runxfail"
+        docker run --rm -t macs bash -cx "pytest --runxfail && cd test && ./cmdlinetest2 macs2"
     - name: amd64
       arch: amd64
       python: 3.8
@@ -35,8 +35,8 @@ install:
   - python setup.py install
 script:
   - pytest --runxfail
-  #- cd test
-  #- ./cmdlinetest macs2
+  - cd test
+  - ./cmdlinetest2 macs2
   #- cd ..
 deploy:
   provider: pypi
