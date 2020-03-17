@@ -96,15 +96,15 @@ chrY	110	160	0.00006
 chrY	160	210	6.40804
 """
         # for peak calls
-        self.peak1 = """chrY	0	60	peak_1	60.48912
+        self.peak1 = """chrY	0	60	peak_1	60.4891
 chrY	160	210	peak_2	6.40804
 """
-        self.summit1 = """chrY	5	6	peak_1	60.48912
+        self.summit1 = """chrY	5	6	peak_1	60.4891
 chrY	185	186	peak_2	6.40804
 """
         self.xls1    ="""chr	start	end	length	abs_summit	pileup	-log10(pvalue)	fold_enrichment	-log10(qvalue)	name
-chrY	1	60	60	6	100.00	63.27251	9.18182	-1.00000	MACS_peak_1
-chrY	161	210	50	186	20.00	7.09102	3.50000	-1.00000	MACS_peak_2
+chrY	1	60	60	6	100	63.2725	9.18182	-1	MACS_peak_1
+chrY	161	210	50	186	20	7.09102	3.5	-1	MACS_peak_2
 """
         
     def assertListAlmostEqual ( self, a, b, places =2 ):
