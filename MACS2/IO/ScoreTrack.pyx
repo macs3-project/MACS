@@ -14,6 +14,7 @@ the distribution).
 # ------------------------------------
 import numpy as np
 cimport numpy as np
+ctypedef np.float64_t float64_t
 
 from copy import copy
 from functools import reduce
@@ -1790,14 +1791,16 @@ cdef class TwoConditionScores:
         cdef:
             int32_t tmp_s, tmp_e
             int32_t l
-            float tmp_v, sum_v
+            float64_t tmp_v, sum_v
+            float r
 
         l = 0
         for (tmp_s, tmp_e, tmp_v) in peakcontent:
             sum_v += tmp_v * ( tmp_e - tmp_s )
             l +=  tmp_e - tmp_s
 
-        return sum_v / float(l)
+        r = float( sum_v / l )
+        return r
         
 
     cdef long total ( self ):
