@@ -15,6 +15,7 @@ the distribution).
 import numpy as np
 cimport numpy as np
 ctypedef np.float64_t float64_t
+ctypedef np.float32_t float32_t
 
 from copy import copy
 from functools import reduce
@@ -124,40 +125,6 @@ cdef float get_subtraction ( float x, float y):
     """ return subtraction.
     """
     return x - y
-
-cdef float median_from_value_length ( np.ndarray value, list length ):
-    """
-    """
-    cdef:
-        list tmp
-        int32_t c, tmp_l
-        float l_half
-        float tmp_v
-
-    c = 0
-    tmp = sorted(list(zip( value, length )))
-    l_half = sum( length )/2
-    for (tmp_v, tmp_l) in tmp:
-        c += tmp_l
-        if c > l_half:
-            return tmp_v
-
-cdef float mean_from_value_length ( np.ndarray value, list length ):
-    """
-    """
-    cdef:
-        list tmp
-        int32_t tmp_l, l
-        float tmp_v, sum_v
-
-    sum_v = 0
-    tmp = zip( value, length )
-    l = sum( length )
-
-    for (tmp_v, tmp_l) in tmp:
-        sum_v += tmp_v * tmp_l
-
-    return sum_v / l
 
 # ------------------------------------
 # Classes
@@ -1003,65 +970,6 @@ cdef class scoreTrackII:
             
         return True
 
-    # @cython.boundscheck(False)
-    # cpdef reassign_peaks ( self, peaks ):
-    #     """Re-assign values of score, pileup, pscore, qscore, fold
-    #     change to predefined peaks.
-
-    #     peaks should be a PeakIO object.
-
-    #     *Note* assume positions in scoreTrackIII object are sorted
-    #      from small to large.
-
-    #     """
-    #     cdef:
-    #         str chrom
-    #         set chrs
-    #         int i, j, t_index, tmp_summit, l
-    #         float cutoff
-
-    #     assert isinstance( peaks, PeakIO ), "peaks must be a PeakIO object!"
-        
-    #     ret_peaks = PeakIO()
-
-    #     peaks.sort()
-        
-    #     chrs = self.get_chr_names()
-    #     for chrom in chrs:
-    #         cpeaks = peaks.peaks[chrom]
-    #         ret_peaks.peaks[chrom] = []
-    #         npeaks = ret_peaks.peaks[chrom]
-
-    #         pos = self.data[chrom][ 0 ]
-    #         sample = self.data[chrom][ 1 ]
-    #         control = self.data[chrom][ 2 ]            
-    #         value = self.data[chrom][ 3 ]
-
-    #         l = pos.shape[0]
-
-    #         t_index = 0
-
-    #         for i in range(len(cpeaks)):
-    #             thispeak = cpeaks[i]
-    #             # we need to assign values for each peak -- actuall peak summit
-    #             tmp_summit = thispeak["summit"]
-    #             while t_index < l and pos[t_index] < tmp_summit:
-    #                 t_index += 1
-    #             # find the summit
-    #             if value[t_index] >= cutoff:
-    #                 tmppeak = copy(thispeak)
-    #                 tmppeak["score"] = value[t_index]
-    #                 tmppeak["pileup"]= sample[t_index]
-    #                 tmppeak["pscore"]= get_pscore(sample[ t_index ], control[ t_index ])
-    #                 if self.scoring_method == ord('q'):
-    #                     tmppeak["qscore"]= value[ t_index ]
-    #                 else:
-    #                     tmppeak["qscore"]= -1
-    #                 tmppeak["fc"] = float ( sample[ t_index ] + self.pseudocount ) / ( control[ t_index ] + self.pseudocount )
-    #                 npeaks.append(tmppeak)
-
-    #     return ret_peaks
-
     cpdef call_peaks (self, float cutoff=5.0, int min_length=200, int max_gap=50, bool call_summits=False):
         """This function try to find regions within which, scores
         are continuously higher than a given cutoff.
@@ -1749,7 +1657,7 @@ cdef class TwoConditionScores:
          """
          cdef:
              list peak_content
-             float mean_logLR
+             float32_t mean_logLR
 
          if startpos.size > 0:
              # if it is not empty
@@ -1784,7 +1692,7 @@ cdef class TwoConditionScores:
          
          return
         
-    cdef float mean_from_peakcontent ( self, list peakcontent ):
+    cdef float32_t mean_from_peakcontent ( self, list peakcontent ):
         """
 
         """
@@ -1792,14 +1700,14 @@ cdef class TwoConditionScores:
             int32_t tmp_s, tmp_e
             int32_t l
             float64_t tmp_v, sum_v
-            float r
+            float32_t r
 
         l = 0
         for (tmp_s, tmp_e, tmp_v) in peakcontent:
             sum_v += tmp_v * ( tmp_e - tmp_s )
             l +=  tmp_e - tmp_s
 
-        r = float( sum_v / l )
+        r = <float32_t>( sum_v / l )
         return r
         
 
