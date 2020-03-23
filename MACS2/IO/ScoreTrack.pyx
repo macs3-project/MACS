@@ -1705,6 +1705,7 @@ cdef class TwoConditionScores:
             int i
             
         l = 0
+        sum_v = 0
         a = []
         b = []
         c = []
