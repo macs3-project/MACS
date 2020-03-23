@@ -872,7 +872,7 @@ struct __pyx_opt_args_5MACS2_2IO_6PeakIO_6PeakIO__to_bed {
 };
 
 /* "MACS2/IO/PeakIO.pyx":296
- *                     print_func("%s\t%d\t%d\t%s%d\t%.5g\n" % (chrom.decode(),peak['start'],peak['end'],peakprefix.decode(),n_peak,peak[score_column]))
+ *                     print_func("%s\t%d\t%d\t%s%d\t%.6g\n" % (chrom.decode(),peak['start'],peak['end'],peakprefix.decode(),n_peak,peak[score_column]))
  * 
  *     cdef _to_summits_bed(self, bytes name_prefix=b"%s_peak_", bytes name=b"MACS",             # <<<<<<<<<<<<<<
  *                         bytes description = b"%s", str score_column="score",
@@ -2008,7 +2008,7 @@ static const char __pyx_k_D[] = "(\\D.*)";
 static const char __pyx_k_d[] = "d";
 static const char __pyx_k_f[] = "f";
 static const char __pyx_k_s[] = "\t%s";
-static const char __pyx_k_5g[] = "\t%.5g";
+static const char __pyx_k_6g[] = "\t%.6g";
 static const char __pyx_k_NA[] = "NA";
 static const char __pyx_k__2[] = "\t";
 static const char __pyx_k__4[] = "\n";
@@ -2122,7 +2122,7 @@ static const char __pyx_k_PeakIO_class[] = "PeakIO class";
 static const char __pyx_k_log10_pvalue[] = "-log10(pvalue)";
 static const char __pyx_k_log10_qvalue[] = "-log10(qvalue)";
 static const char __pyx_k_pyx_checksum[] = "__pyx_checksum";
-static const char __pyx_k_s_d_d_s_d_5g[] = "%s\t%d\t%d\t%s%d\t%.5g\n";
+static const char __pyx_k_s_d_d_s_d_6g[] = "%s\t%d\t%d\t%s%d\t%.6g\n";
 static const char __pyx_k_score_column[] = "score_column";
 static const char __pyx_k_stringsource[] = "stringsource";
 static const char __pyx_k_visibility_1[] = "\" visibility=1\n";
@@ -2130,7 +2130,7 @@ static const char __pyx_k_StopIteration[] = "StopIteration";
 static const char __pyx_k_description_2[] = "\" description=\"";
 static const char __pyx_k_get_chr_names[] = "get_chr_names";
 static const char __pyx_k_reduce_cython[] = "__reduce_cython__";
-static const char __pyx_k_s_d_d_s_d_s_5g[] = "%s\t%d\t%d\t%s%d%s\t%.5g\n";
+static const char __pyx_k_s_d_d_s_d_s_6g[] = "%s\t%d\t%d\t%s%d%s\t%.6g\n";
 static const char __pyx_k_MACS2_Constants[] = "MACS2.Constants";
 static const char __pyx_k_MACS2_IO_PeakIO[] = "MACS2.IO.PeakIO";
 static const char __pyx_k_PeakIO_Revision[] = "PeakIO $Revision$";
@@ -2142,13 +2142,13 @@ static const char __pyx_k_BroadPeakContent[] = "BroadPeakContent";
 static const char __pyx_k_nextItemButton_on[] = "\" nextItemButton=on\n";
 static const char __pyx_k_peaks_description[] = " (peaks)\" description=\"";
 static const char __pyx_k_cline_in_traceback[] = "cline_in_traceback";
-static const char __pyx_k_s_d_d_s_d_5g_5g_5g[] = "%s\t%d\t%d\t%s\t%d\t.\t%.5g\t%.5g\t%.5g\n";
+static const char __pyx_k_s_d_d_s_d_6g_6g_6g[] = "%s\t%d\t%d\t%s\t%d\t.\t%.6g\t%.6g\t%.6g\n";
 static const char __pyx_k_sort_locals_lambda[] = "sort.<locals>.<lambda>";
 static const char __pyx_k_NotImplementedError[] = "NotImplementedError";
 static const char __pyx_k_pyx_unpickle_PeakIO[] = "__pyx_unpickle_PeakIO";
 static const char __pyx_k_pyx_unpickle_Region[] = "__pyx_unpickle_Region";
 static const char __pyx_k_summits_description[] = " (summits)\" description=\"";
-static const char __pyx_k_s_d_d_s_d_5g_5g_5g_d[] = "%s\t%d\t%d\t%s\t%d\t.\t%.5g\t%.5g\t%.5g\t%d\n";
+static const char __pyx_k_s_d_d_s_d_6g_6g_6g_d[] = "%s\t%d\t%d\t%s\t%d\t.\t%.6g\t%.6g\t%.6g\t%d\n";
 static const char __pyx_k_Malformed_peak_at_line[] = "Malformed peak at line ";
 static const char __pyx_k_column_s_not_recognized[] = "column %s not recognized";
 static const char __pyx_k_pyx_unpickle_BroadPeakIO[] = "__pyx_unpickle_BroadPeakIO";
@@ -2158,7 +2158,7 @@ static const char __pyx_k_track_type_narrowPeak_name[] = "track type=narrowPeak 
 static const char __pyx_k_type_bed_nextItemButton_on[] = "\" type=bed nextItemButton=on\n";
 static const char __pyx_k_pyx_unpickle_BroadPeakContent[] = "__pyx_unpickle_BroadPeakContent";
 static const char __pyx_k_type_gappedPeak_nextItemButton[] = "\" type=gappedPeak nextItemButton=on\n";
-static const char __pyx_k_s_d_d_s_d_d_s_s_0_d_s_s_5g_5g_5[] = "%s\t%d\t%d\t%s%d\t%d\t.\t%s\t%s\t0\t%d\t%s\t%s\t%.5g\t%.5g\t%.5g\n";
+static const char __pyx_k_s_d_d_s_d_d_s_s_0_d_s_s_6g_6g_6[] = "%s\t%d\t%d\t%s%d\t%d\t.\t%s\t%s\t0\t%d\t%s\t%s\t%.6g\t%.6g\t%.6g\n";
 static const char __pyx_k_Incompatible_checksums_s_vs_0x14[] = "Incompatible checksums (%s vs 0x14d2d55 = (end, fc, length, name, pileup, pscore, qscore, score, start, summit))";
 static const char __pyx_k_Incompatible_checksums_s_vs_0x8b[] = "Incompatible checksums (%s vs 0x8b1a038 = (peaks))";
 static const char __pyx_k_Incompatible_checksums_s_vs_0x99[] = "Incompatible checksums (%s vs 0x99f489e = (__flag_sorted, regions))";
@@ -2168,7 +2168,7 @@ static const char __pyx_k_Tao_Liu_taoliu_jimmy_harvard_edu[] = "Tao Liu <taoliu@
 static const char __pyx_k_track_name_MACS_description_Unkn[] = "track name=MACS description=Unknown\n";
 static const char __pyx_k_track_name_MACS_description_Unkn_2[] = "track name=MACS description=Unknown";
 static PyObject *__pyx_kp_u_0;
-static PyObject *__pyx_kp_u_5g;
+static PyObject *__pyx_kp_u_6g;
 static PyObject *__pyx_n_s_BroadPeakContent;
 static PyObject *__pyx_n_s_BroadPeakIO;
 static PyObject *__pyx_kp_u_D;
@@ -2302,11 +2302,11 @@ static PyObject *__pyx_n_s_round;
 static PyObject *__pyx_n_s_rstrip;
 static PyObject *__pyx_kp_u_s;
 static PyObject *__pyx_kp_b_s_2;
-static PyObject *__pyx_kp_u_s_d_d_s_d_5g;
-static PyObject *__pyx_kp_u_s_d_d_s_d_5g_5g_5g;
-static PyObject *__pyx_kp_u_s_d_d_s_d_5g_5g_5g_d;
-static PyObject *__pyx_kp_u_s_d_d_s_d_d_s_s_0_d_s_s_5g_5g_5;
-static PyObject *__pyx_kp_u_s_d_d_s_d_s_5g;
+static PyObject *__pyx_kp_u_s_d_d_s_d_6g;
+static PyObject *__pyx_kp_u_s_d_d_s_d_6g_6g_6g;
+static PyObject *__pyx_kp_u_s_d_d_s_d_6g_6g_6g_d;
+static PyObject *__pyx_kp_u_s_d_d_s_d_d_s_s_0_d_s_s_6g_6g_6;
+static PyObject *__pyx_kp_u_s_d_d_s_d_s_6g;
 static PyObject *__pyx_kp_b_s_peak;
 static PyObject *__pyx_n_s_score;
 static PyObject *__pyx_n_u_score;
@@ -7237,7 +7237,7 @@ static PyObject *__pyx_f_5MACS2_2IO_6PeakIO_6PeakIO__to_xls(struct __pyx_obj_5MA
  *                         #[start,end,end-start,summit,peak_height,number_tags,pvalue,fold_change,qvalue]
  *                         print_func("%s\t%d\t%d\t%d" % (chrom.decode(),peak['start']+1,peak['end'],peak['length']))             # <<<<<<<<<<<<<<
  *                         print_func("\t%d" % (peak['summit']+1)) # summit position
- *                         print_func("\t%.5g" % (round(peak['pileup'],2))) # pileup height at summit
+ *                         print_func("\t%.6g" % (round(peak['pileup'],2))) # pileup height at summit
  */
           __pyx_t_5 = PyTuple_New(7); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 245, __pyx_L1_error)
           __Pyx_GOTREF(__pyx_t_5);
@@ -7339,8 +7339,8 @@ static PyObject *__pyx_f_5MACS2_2IO_6PeakIO_6PeakIO__to_xls(struct __pyx_obj_5MA
  *                         #[start,end,end-start,summit,peak_height,number_tags,pvalue,fold_change,qvalue]
  *                         print_func("%s\t%d\t%d\t%d" % (chrom.decode(),peak['start']+1,peak['end'],peak['length']))
  *                         print_func("\t%d" % (peak['summit']+1)) # summit position             # <<<<<<<<<<<<<<
- *                         print_func("\t%.5g" % (round(peak['pileup'],2))) # pileup height at summit
- *                         print_func("\t%.5g" % (peak['pscore'])) # -log10pvalue at summit
+ *                         print_func("\t%.6g" % (round(peak['pileup'],2))) # pileup height at summit
+ *                         print_func("\t%.6g" % (peak['pscore'])) # -log10pvalue at summit
  */
           __pyx_t_5 = __Pyx_PyObject_Dict_GetItem(__pyx_v_peak, __pyx_n_u_summit); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 246, __pyx_L1_error)
           __Pyx_GOTREF(__pyx_t_5);
@@ -7372,9 +7372,9 @@ static PyObject *__pyx_f_5MACS2_2IO_6PeakIO_6PeakIO__to_xls(struct __pyx_obj_5MA
           /* "MACS2/IO/PeakIO.pyx":247
  *                         print_func("%s\t%d\t%d\t%d" % (chrom.decode(),peak['start']+1,peak['end'],peak['length']))
  *                         print_func("\t%d" % (peak['summit']+1)) # summit position
- *                         print_func("\t%.5g" % (round(peak['pileup'],2))) # pileup height at summit             # <<<<<<<<<<<<<<
- *                         print_func("\t%.5g" % (peak['pscore'])) # -log10pvalue at summit
- *                         print_func("\t%.5g" % (peak['fc'])) # fold change at summit
+ *                         print_func("\t%.6g" % (round(peak['pileup'],2))) # pileup height at summit             # <<<<<<<<<<<<<<
+ *                         print_func("\t%.6g" % (peak['pscore'])) # -log10pvalue at summit
+ *                         print_func("\t%.6g" % (peak['fc'])) # fold change at summit
  */
           __pyx_t_21 = __Pyx_PyObject_Dict_GetItem(__pyx_v_peak, __pyx_n_u_pileup); if (unlikely(!__pyx_t_21)) __PYX_ERR(0, 247, __pyx_L1_error)
           __Pyx_GOTREF(__pyx_t_21);
@@ -7389,7 +7389,7 @@ static PyObject *__pyx_f_5MACS2_2IO_6PeakIO_6PeakIO__to_xls(struct __pyx_obj_5MA
           __pyx_t_21 = __Pyx_PyObject_Call(__pyx_builtin_round, __pyx_t_5, NULL); if (unlikely(!__pyx_t_21)) __PYX_ERR(0, 247, __pyx_L1_error)
           __Pyx_GOTREF(__pyx_t_21);
           __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
-          __pyx_t_5 = __Pyx_PyUnicode_FormatSafe(__pyx_kp_u_5g, __pyx_t_21); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 247, __pyx_L1_error)
+          __pyx_t_5 = __Pyx_PyUnicode_FormatSafe(__pyx_kp_u_6g, __pyx_t_21); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 247, __pyx_L1_error)
           __Pyx_GOTREF(__pyx_t_5);
           __Pyx_DECREF(__pyx_t_21); __pyx_t_21 = 0;
           __Pyx_INCREF(__pyx_v_print_func);
@@ -7413,14 +7413,14 @@ static PyObject *__pyx_f_5MACS2_2IO_6PeakIO_6PeakIO__to_xls(struct __pyx_obj_5MA
 
           /* "MACS2/IO/PeakIO.pyx":248
  *                         print_func("\t%d" % (peak['summit']+1)) # summit position
- *                         print_func("\t%.5g" % (round(peak['pileup'],2))) # pileup height at summit
- *                         print_func("\t%.5g" % (peak['pscore'])) # -log10pvalue at summit             # <<<<<<<<<<<<<<
- *                         print_func("\t%.5g" % (peak['fc'])) # fold change at summit
- *                         print_func("\t%.5g" % (peak['qscore'])) # -log10qvalue at summit
+ *                         print_func("\t%.6g" % (round(peak['pileup'],2))) # pileup height at summit
+ *                         print_func("\t%.6g" % (peak['pscore'])) # -log10pvalue at summit             # <<<<<<<<<<<<<<
+ *                         print_func("\t%.6g" % (peak['fc'])) # fold change at summit
+ *                         print_func("\t%.6g" % (peak['qscore'])) # -log10qvalue at summit
  */
           __pyx_t_21 = __Pyx_PyObject_Dict_GetItem(__pyx_v_peak, __pyx_n_u_pscore); if (unlikely(!__pyx_t_21)) __PYX_ERR(0, 248, __pyx_L1_error)
           __Pyx_GOTREF(__pyx_t_21);
-          __pyx_t_5 = __Pyx_PyUnicode_FormatSafe(__pyx_kp_u_5g, __pyx_t_21); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 248, __pyx_L1_error)
+          __pyx_t_5 = __Pyx_PyUnicode_FormatSafe(__pyx_kp_u_6g, __pyx_t_21); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 248, __pyx_L1_error)
           __Pyx_GOTREF(__pyx_t_5);
           __Pyx_DECREF(__pyx_t_21); __pyx_t_21 = 0;
           __Pyx_INCREF(__pyx_v_print_func);
@@ -7443,15 +7443,15 @@ static PyObject *__pyx_f_5MACS2_2IO_6PeakIO_6PeakIO__to_xls(struct __pyx_obj_5MA
           __Pyx_DECREF(__pyx_t_13); __pyx_t_13 = 0;
 
           /* "MACS2/IO/PeakIO.pyx":249
- *                         print_func("\t%.5g" % (round(peak['pileup'],2))) # pileup height at summit
- *                         print_func("\t%.5g" % (peak['pscore'])) # -log10pvalue at summit
- *                         print_func("\t%.5g" % (peak['fc'])) # fold change at summit             # <<<<<<<<<<<<<<
- *                         print_func("\t%.5g" % (peak['qscore'])) # -log10qvalue at summit
+ *                         print_func("\t%.6g" % (round(peak['pileup'],2))) # pileup height at summit
+ *                         print_func("\t%.6g" % (peak['pscore'])) # -log10pvalue at summit
+ *                         print_func("\t%.6g" % (peak['fc'])) # fold change at summit             # <<<<<<<<<<<<<<
+ *                         print_func("\t%.6g" % (peak['qscore'])) # -log10qvalue at summit
  *                         print_func("\t%s" % peakname)
  */
           __pyx_t_21 = __Pyx_PyObject_Dict_GetItem(__pyx_v_peak, __pyx_n_u_fc); if (unlikely(!__pyx_t_21)) __PYX_ERR(0, 249, __pyx_L1_error)
           __Pyx_GOTREF(__pyx_t_21);
-          __pyx_t_5 = __Pyx_PyUnicode_FormatSafe(__pyx_kp_u_5g, __pyx_t_21); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 249, __pyx_L1_error)
+          __pyx_t_5 = __Pyx_PyUnicode_FormatSafe(__pyx_kp_u_6g, __pyx_t_21); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 249, __pyx_L1_error)
           __Pyx_GOTREF(__pyx_t_5);
           __Pyx_DECREF(__pyx_t_21); __pyx_t_21 = 0;
           __Pyx_INCREF(__pyx_v_print_func);
@@ -7474,15 +7474,15 @@ static PyObject *__pyx_f_5MACS2_2IO_6PeakIO_6PeakIO__to_xls(struct __pyx_obj_5MA
           __Pyx_DECREF(__pyx_t_13); __pyx_t_13 = 0;
 
           /* "MACS2/IO/PeakIO.pyx":250
- *                         print_func("\t%.5g" % (peak['pscore'])) # -log10pvalue at summit
- *                         print_func("\t%.5g" % (peak['fc'])) # fold change at summit
- *                         print_func("\t%.5g" % (peak['qscore'])) # -log10qvalue at summit             # <<<<<<<<<<<<<<
+ *                         print_func("\t%.6g" % (peak['pscore'])) # -log10pvalue at summit
+ *                         print_func("\t%.6g" % (peak['fc'])) # fold change at summit
+ *                         print_func("\t%.6g" % (peak['qscore'])) # -log10qvalue at summit             # <<<<<<<<<<<<<<
  *                         print_func("\t%s" % peakname)
  *                         print_func("\n")
  */
           __pyx_t_21 = __Pyx_PyObject_Dict_GetItem(__pyx_v_peak, __pyx_n_u_qscore); if (unlikely(!__pyx_t_21)) __PYX_ERR(0, 250, __pyx_L1_error)
           __Pyx_GOTREF(__pyx_t_21);
-          __pyx_t_5 = __Pyx_PyUnicode_FormatSafe(__pyx_kp_u_5g, __pyx_t_21); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 250, __pyx_L1_error)
+          __pyx_t_5 = __Pyx_PyUnicode_FormatSafe(__pyx_kp_u_6g, __pyx_t_21); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 250, __pyx_L1_error)
           __Pyx_GOTREF(__pyx_t_5);
           __Pyx_DECREF(__pyx_t_21); __pyx_t_21 = 0;
           __Pyx_INCREF(__pyx_v_print_func);
@@ -7505,8 +7505,8 @@ static PyObject *__pyx_f_5MACS2_2IO_6PeakIO_6PeakIO__to_xls(struct __pyx_obj_5MA
           __Pyx_DECREF(__pyx_t_13); __pyx_t_13 = 0;
 
           /* "MACS2/IO/PeakIO.pyx":251
- *                         print_func("\t%.5g" % (peak['fc'])) # fold change at summit
- *                         print_func("\t%.5g" % (peak['qscore'])) # -log10qvalue at summit
+ *                         print_func("\t%.6g" % (peak['fc'])) # fold change at summit
+ *                         print_func("\t%.6g" % (peak['qscore'])) # -log10qvalue at summit
  *                         print_func("\t%s" % peakname)             # <<<<<<<<<<<<<<
  *                         print_func("\n")
  *                 else:
@@ -7533,7 +7533,7 @@ static PyObject *__pyx_f_5MACS2_2IO_6PeakIO_6PeakIO__to_xls(struct __pyx_obj_5MA
           __Pyx_DECREF(__pyx_t_13); __pyx_t_13 = 0;
 
           /* "MACS2/IO/PeakIO.pyx":252
- *                         print_func("\t%.5g" % (peak['qscore'])) # -log10qvalue at summit
+ *                         print_func("\t%.6g" % (peak['qscore'])) # -log10qvalue at summit
  *                         print_func("\t%s" % peakname)
  *                         print_func("\n")             # <<<<<<<<<<<<<<
  *                 else:
@@ -7618,7 +7618,7 @@ static PyObject *__pyx_f_5MACS2_2IO_6PeakIO_6PeakIO__to_xls(struct __pyx_obj_5MA
  *                     #[start,end,end-start,summit,peak_height,number_tags,pvalue,fold_change,qvalue]
  *                     print_func("%s\t%d\t%d\t%d" % (chrom.decode(),peak['start']+1,peak['end'],peak['length']))             # <<<<<<<<<<<<<<
  *                     print_func("\t%d" % (peak['summit']+1)) # summit position
- *                     print_func("\t%.5g" % (round(peak['pileup'],2))) # pileup height at summit
+ *                     print_func("\t%.6g" % (round(peak['pileup'],2))) # pileup height at summit
  */
         __pyx_t_4 = PyTuple_New(7); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 257, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_4);
@@ -7720,8 +7720,8 @@ static PyObject *__pyx_f_5MACS2_2IO_6PeakIO_6PeakIO__to_xls(struct __pyx_obj_5MA
  *                     #[start,end,end-start,summit,peak_height,number_tags,pvalue,fold_change,qvalue]
  *                     print_func("%s\t%d\t%d\t%d" % (chrom.decode(),peak['start']+1,peak['end'],peak['length']))
  *                     print_func("\t%d" % (peak['summit']+1)) # summit position             # <<<<<<<<<<<<<<
- *                     print_func("\t%.5g" % (round(peak['pileup'],2))) # pileup height at summit
- *                     print_func("\t%.5g" % (peak['pscore'])) # -log10pvalue at summit
+ *                     print_func("\t%.6g" % (round(peak['pileup'],2))) # pileup height at summit
+ *                     print_func("\t%.6g" % (peak['pscore'])) # -log10pvalue at summit
  */
         __pyx_t_4 = __Pyx_PyObject_Dict_GetItem(__pyx_v_peak, __pyx_n_u_summit); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 258, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_4);
@@ -7753,9 +7753,9 @@ static PyObject *__pyx_f_5MACS2_2IO_6PeakIO_6PeakIO__to_xls(struct __pyx_obj_5MA
         /* "MACS2/IO/PeakIO.pyx":259
  *                     print_func("%s\t%d\t%d\t%d" % (chrom.decode(),peak['start']+1,peak['end'],peak['length']))
  *                     print_func("\t%d" % (peak['summit']+1)) # summit position
- *                     print_func("\t%.5g" % (round(peak['pileup'],2))) # pileup height at summit             # <<<<<<<<<<<<<<
- *                     print_func("\t%.5g" % (peak['pscore'])) # -log10pvalue at summit
- *                     print_func("\t%.5g" % (peak['fc'])) # fold change at summit
+ *                     print_func("\t%.6g" % (round(peak['pileup'],2))) # pileup height at summit             # <<<<<<<<<<<<<<
+ *                     print_func("\t%.6g" % (peak['pscore'])) # -log10pvalue at summit
+ *                     print_func("\t%.6g" % (peak['fc'])) # fold change at summit
  */
         __pyx_t_5 = __Pyx_PyObject_Dict_GetItem(__pyx_v_peak, __pyx_n_u_pileup); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 259, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_5);
@@ -7770,7 +7770,7 @@ static PyObject *__pyx_f_5MACS2_2IO_6PeakIO_6PeakIO__to_xls(struct __pyx_obj_5MA
         __pyx_t_5 = __Pyx_PyObject_Call(__pyx_builtin_round, __pyx_t_4, NULL); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 259, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_5);
         __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-        __pyx_t_4 = __Pyx_PyUnicode_FormatSafe(__pyx_kp_u_5g, __pyx_t_5); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 259, __pyx_L1_error)
+        __pyx_t_4 = __Pyx_PyUnicode_FormatSafe(__pyx_kp_u_6g, __pyx_t_5); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 259, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_4);
         __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
         __Pyx_INCREF(__pyx_v_print_func);
@@ -7794,14 +7794,14 @@ static PyObject *__pyx_f_5MACS2_2IO_6PeakIO_6PeakIO__to_xls(struct __pyx_obj_5MA
 
         /* "MACS2/IO/PeakIO.pyx":260
  *                     print_func("\t%d" % (peak['summit']+1)) # summit position
- *                     print_func("\t%.5g" % (round(peak['pileup'],2))) # pileup height at summit
- *                     print_func("\t%.5g" % (peak['pscore'])) # -log10pvalue at summit             # <<<<<<<<<<<<<<
- *                     print_func("\t%.5g" % (peak['fc'])) # fold change at summit
- *                     print_func("\t%.5g" % (peak['qscore'])) # -log10qvalue at summit
+ *                     print_func("\t%.6g" % (round(peak['pileup'],2))) # pileup height at summit
+ *                     print_func("\t%.6g" % (peak['pscore'])) # -log10pvalue at summit             # <<<<<<<<<<<<<<
+ *                     print_func("\t%.6g" % (peak['fc'])) # fold change at summit
+ *                     print_func("\t%.6g" % (peak['qscore'])) # -log10qvalue at summit
  */
         __pyx_t_5 = __Pyx_PyObject_Dict_GetItem(__pyx_v_peak, __pyx_n_u_pscore); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 260, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_5);
-        __pyx_t_4 = __Pyx_PyUnicode_FormatSafe(__pyx_kp_u_5g, __pyx_t_5); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 260, __pyx_L1_error)
+        __pyx_t_4 = __Pyx_PyUnicode_FormatSafe(__pyx_kp_u_6g, __pyx_t_5); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 260, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_4);
         __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
         __Pyx_INCREF(__pyx_v_print_func);
@@ -7824,15 +7824,15 @@ static PyObject *__pyx_f_5MACS2_2IO_6PeakIO_6PeakIO__to_xls(struct __pyx_obj_5MA
         __Pyx_DECREF(__pyx_t_13); __pyx_t_13 = 0;
 
         /* "MACS2/IO/PeakIO.pyx":261
- *                     print_func("\t%.5g" % (round(peak['pileup'],2))) # pileup height at summit
- *                     print_func("\t%.5g" % (peak['pscore'])) # -log10pvalue at summit
- *                     print_func("\t%.5g" % (peak['fc'])) # fold change at summit             # <<<<<<<<<<<<<<
- *                     print_func("\t%.5g" % (peak['qscore'])) # -log10qvalue at summit
+ *                     print_func("\t%.6g" % (round(peak['pileup'],2))) # pileup height at summit
+ *                     print_func("\t%.6g" % (peak['pscore'])) # -log10pvalue at summit
+ *                     print_func("\t%.6g" % (peak['fc'])) # fold change at summit             # <<<<<<<<<<<<<<
+ *                     print_func("\t%.6g" % (peak['qscore'])) # -log10qvalue at summit
  *                     print_func("\t%s" % peakname)
  */
         __pyx_t_5 = __Pyx_PyObject_Dict_GetItem(__pyx_v_peak, __pyx_n_u_fc); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 261, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_5);
-        __pyx_t_4 = __Pyx_PyUnicode_FormatSafe(__pyx_kp_u_5g, __pyx_t_5); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 261, __pyx_L1_error)
+        __pyx_t_4 = __Pyx_PyUnicode_FormatSafe(__pyx_kp_u_6g, __pyx_t_5); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 261, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_4);
         __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
         __Pyx_INCREF(__pyx_v_print_func);
@@ -7855,15 +7855,15 @@ static PyObject *__pyx_f_5MACS2_2IO_6PeakIO_6PeakIO__to_xls(struct __pyx_obj_5MA
         __Pyx_DECREF(__pyx_t_13); __pyx_t_13 = 0;
 
         /* "MACS2/IO/PeakIO.pyx":262
- *                     print_func("\t%.5g" % (peak['pscore'])) # -log10pvalue at summit
- *                     print_func("\t%.5g" % (peak['fc'])) # fold change at summit
- *                     print_func("\t%.5g" % (peak['qscore'])) # -log10qvalue at summit             # <<<<<<<<<<<<<<
+ *                     print_func("\t%.6g" % (peak['pscore'])) # -log10pvalue at summit
+ *                     print_func("\t%.6g" % (peak['fc'])) # fold change at summit
+ *                     print_func("\t%.6g" % (peak['qscore'])) # -log10qvalue at summit             # <<<<<<<<<<<<<<
  *                     print_func("\t%s" % peakname)
  *                     print_func("\n")
  */
         __pyx_t_5 = __Pyx_PyObject_Dict_GetItem(__pyx_v_peak, __pyx_n_u_qscore); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 262, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_5);
-        __pyx_t_4 = __Pyx_PyUnicode_FormatSafe(__pyx_kp_u_5g, __pyx_t_5); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 262, __pyx_L1_error)
+        __pyx_t_4 = __Pyx_PyUnicode_FormatSafe(__pyx_kp_u_6g, __pyx_t_5); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 262, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_4);
         __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
         __Pyx_INCREF(__pyx_v_print_func);
@@ -7886,8 +7886,8 @@ static PyObject *__pyx_f_5MACS2_2IO_6PeakIO_6PeakIO__to_xls(struct __pyx_obj_5MA
         __Pyx_DECREF(__pyx_t_13); __pyx_t_13 = 0;
 
         /* "MACS2/IO/PeakIO.pyx":263
- *                     print_func("\t%.5g" % (peak['fc'])) # fold change at summit
- *                     print_func("\t%.5g" % (peak['qscore'])) # -log10qvalue at summit
+ *                     print_func("\t%.6g" % (peak['fc'])) # fold change at summit
+ *                     print_func("\t%.6g" % (peak['qscore'])) # -log10qvalue at summit
  *                     print_func("\t%s" % peakname)             # <<<<<<<<<<<<<<
  *                     print_func("\n")
  *         return
@@ -7914,7 +7914,7 @@ static PyObject *__pyx_f_5MACS2_2IO_6PeakIO_6PeakIO__to_xls(struct __pyx_obj_5MA
         __Pyx_DECREF(__pyx_t_13); __pyx_t_13 = 0;
 
         /* "MACS2/IO/PeakIO.pyx":264
- *                     print_func("\t%.5g" % (peak['qscore'])) # -log10qvalue at summit
+ *                     print_func("\t%.6g" % (peak['qscore'])) # -log10qvalue at summit
  *                     print_func("\t%s" % peakname)
  *                     print_func("\n")             # <<<<<<<<<<<<<<
  *         return
@@ -8669,7 +8669,7 @@ static PyObject *__pyx_f_5MACS2_2IO_6PeakIO_6PeakIO__to_bed(struct __pyx_obj_5MA
  *                 peaks = list(group)
  *                 if len(peaks) > 1:             # <<<<<<<<<<<<<<
  *                     for i, peak in enumerate(peaks):
- *                         print_func("%s\t%d\t%d\t%s%d%s\t%.5g\n" % (chrom.decode(),peak['start'],peak['end'],peakprefix.decode(),n_peak,subpeak_letters(i),peak[score_column]))
+ *                         print_func("%s\t%d\t%d\t%s%d%s\t%.6g\n" % (chrom.decode(),peak['start'],peak['end'],peakprefix.decode(),n_peak,subpeak_letters(i),peak[score_column]))
  */
       __pyx_t_18 = PyList_GET_SIZE(__pyx_v_peaks); if (unlikely(__pyx_t_18 == ((Py_ssize_t)-1))) __PYX_ERR(0, 289, __pyx_L1_error)
       __pyx_t_8 = ((__pyx_t_18 > 1) != 0);
@@ -8679,7 +8679,7 @@ static PyObject *__pyx_f_5MACS2_2IO_6PeakIO_6PeakIO__to_bed(struct __pyx_obj_5MA
  *                 peaks = list(group)
  *                 if len(peaks) > 1:
  *                     for i, peak in enumerate(peaks):             # <<<<<<<<<<<<<<
- *                         print_func("%s\t%d\t%d\t%s%d%s\t%.5g\n" % (chrom.decode(),peak['start'],peak['end'],peakprefix.decode(),n_peak,subpeak_letters(i),peak[score_column]))
+ *                         print_func("%s\t%d\t%d\t%s%d%s\t%.6g\n" % (chrom.decode(),peak['start'],peak['end'],peakprefix.decode(),n_peak,subpeak_letters(i),peak[score_column]))
  *                 else:
  */
         __Pyx_INCREF(__pyx_int_0);
@@ -8706,7 +8706,7 @@ static PyObject *__pyx_f_5MACS2_2IO_6PeakIO_6PeakIO__to_bed(struct __pyx_obj_5MA
           /* "MACS2/IO/PeakIO.pyx":291
  *                 if len(peaks) > 1:
  *                     for i, peak in enumerate(peaks):
- *                         print_func("%s\t%d\t%d\t%s%d%s\t%.5g\n" % (chrom.decode(),peak['start'],peak['end'],peakprefix.decode(),n_peak,subpeak_letters(i),peak[score_column]))             # <<<<<<<<<<<<<<
+ *                         print_func("%s\t%d\t%d\t%s%d%s\t%.6g\n" % (chrom.decode(),peak['start'],peak['end'],peakprefix.decode(),n_peak,subpeak_letters(i),peak[score_column]))             # <<<<<<<<<<<<<<
  *                 else:
  *                     peak = peaks[0]
  */
@@ -8765,7 +8765,7 @@ static PyObject *__pyx_f_5MACS2_2IO_6PeakIO_6PeakIO__to_bed(struct __pyx_obj_5MA
           __pyx_t_20 = 0;
           __pyx_t_22 = 0;
           __pyx_t_23 = 0;
-          __pyx_t_23 = PyUnicode_Format(__pyx_kp_u_s_d_d_s_d_s_5g, __pyx_t_24); if (unlikely(!__pyx_t_23)) __PYX_ERR(0, 291, __pyx_L1_error)
+          __pyx_t_23 = PyUnicode_Format(__pyx_kp_u_s_d_d_s_d_s_6g, __pyx_t_24); if (unlikely(!__pyx_t_23)) __PYX_ERR(0, 291, __pyx_L1_error)
           __Pyx_GOTREF(__pyx_t_23);
           __Pyx_DECREF(__pyx_t_24); __pyx_t_24 = 0;
           __Pyx_INCREF(__pyx_v_print_func);
@@ -8791,7 +8791,7 @@ static PyObject *__pyx_f_5MACS2_2IO_6PeakIO_6PeakIO__to_bed(struct __pyx_obj_5MA
  *                 peaks = list(group)
  *                 if len(peaks) > 1:
  *                     for i, peak in enumerate(peaks):             # <<<<<<<<<<<<<<
- *                         print_func("%s\t%d\t%d\t%s%d%s\t%.5g\n" % (chrom.decode(),peak['start'],peak['end'],peakprefix.decode(),n_peak,subpeak_letters(i),peak[score_column]))
+ *                         print_func("%s\t%d\t%d\t%s%d%s\t%.6g\n" % (chrom.decode(),peak['start'],peak['end'],peakprefix.decode(),n_peak,subpeak_letters(i),peak[score_column]))
  *                 else:
  */
         }
@@ -8803,16 +8803,16 @@ static PyObject *__pyx_f_5MACS2_2IO_6PeakIO_6PeakIO__to_bed(struct __pyx_obj_5MA
  *                 peaks = list(group)
  *                 if len(peaks) > 1:             # <<<<<<<<<<<<<<
  *                     for i, peak in enumerate(peaks):
- *                         print_func("%s\t%d\t%d\t%s%d%s\t%.5g\n" % (chrom.decode(),peak['start'],peak['end'],peakprefix.decode(),n_peak,subpeak_letters(i),peak[score_column]))
+ *                         print_func("%s\t%d\t%d\t%s%d%s\t%.6g\n" % (chrom.decode(),peak['start'],peak['end'],peakprefix.decode(),n_peak,subpeak_letters(i),peak[score_column]))
  */
         goto __pyx_L34;
       }
 
       /* "MACS2/IO/PeakIO.pyx":293
- *                         print_func("%s\t%d\t%d\t%s%d%s\t%.5g\n" % (chrom.decode(),peak['start'],peak['end'],peakprefix.decode(),n_peak,subpeak_letters(i),peak[score_column]))
+ *                         print_func("%s\t%d\t%d\t%s%d%s\t%.6g\n" % (chrom.decode(),peak['start'],peak['end'],peakprefix.decode(),n_peak,subpeak_letters(i),peak[score_column]))
  *                 else:
  *                     peak = peaks[0]             # <<<<<<<<<<<<<<
- *                     print_func("%s\t%d\t%d\t%s%d\t%.5g\n" % (chrom.decode(),peak['start'],peak['end'],peakprefix.decode(),n_peak,peak[score_column]))
+ *                     print_func("%s\t%d\t%d\t%s%d\t%.6g\n" % (chrom.decode(),peak['start'],peak['end'],peakprefix.decode(),n_peak,peak[score_column]))
  * 
  */
       /*else*/ {
@@ -8824,7 +8824,7 @@ static PyObject *__pyx_f_5MACS2_2IO_6PeakIO_6PeakIO__to_bed(struct __pyx_obj_5MA
         /* "MACS2/IO/PeakIO.pyx":294
  *                 else:
  *                     peak = peaks[0]
- *                     print_func("%s\t%d\t%d\t%s%d\t%.5g\n" % (chrom.decode(),peak['start'],peak['end'],peakprefix.decode(),n_peak,peak[score_column]))             # <<<<<<<<<<<<<<
+ *                     print_func("%s\t%d\t%d\t%s%d\t%.6g\n" % (chrom.decode(),peak['start'],peak['end'],peakprefix.decode(),n_peak,peak[score_column]))             # <<<<<<<<<<<<<<
  * 
  *     cdef _to_summits_bed(self, bytes name_prefix=b"%s_peak_", bytes name=b"MACS",
  */
@@ -8877,7 +8877,7 @@ static PyObject *__pyx_f_5MACS2_2IO_6PeakIO_6PeakIO__to_bed(struct __pyx_obj_5MA
         __pyx_t_24 = 0;
         __pyx_t_23 = 0;
         __pyx_t_22 = 0;
-        __pyx_t_22 = PyUnicode_Format(__pyx_kp_u_s_d_d_s_d_5g, __pyx_t_20); if (unlikely(!__pyx_t_22)) __PYX_ERR(0, 294, __pyx_L1_error)
+        __pyx_t_22 = PyUnicode_Format(__pyx_kp_u_s_d_d_s_d_6g, __pyx_t_20); if (unlikely(!__pyx_t_22)) __PYX_ERR(0, 294, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_22);
         __Pyx_DECREF(__pyx_t_20); __pyx_t_20 = 0;
         __Pyx_INCREF(__pyx_v_print_func);
@@ -8965,7 +8965,7 @@ static PyObject *__pyx_f_5MACS2_2IO_6PeakIO_6PeakIO__to_bed(struct __pyx_obj_5MA
 }
 
 /* "MACS2/IO/PeakIO.pyx":296
- *                     print_func("%s\t%d\t%d\t%s%d\t%.5g\n" % (chrom.decode(),peak['start'],peak['end'],peakprefix.decode(),n_peak,peak[score_column]))
+ *                     print_func("%s\t%d\t%d\t%s%d\t%.6g\n" % (chrom.decode(),peak['start'],peak['end'],peakprefix.decode(),n_peak,peak[score_column]))
  * 
  *     cdef _to_summits_bed(self, bytes name_prefix=b"%s_peak_", bytes name=b"MACS",             # <<<<<<<<<<<<<<
  *                         bytes description = b"%s", str score_column="score",
@@ -9634,7 +9634,7 @@ static PyObject *__pyx_f_5MACS2_2IO_6PeakIO_6PeakIO__to_summits_bed(struct __pyx
  *                 if len(peaks) > 1:
  *                     for i, peak in enumerate(peaks):             # <<<<<<<<<<<<<<
  *                         summit_p = peak['summit']
- *                         print_func("%s\t%d\t%d\t%s%d%s\t%.5g\n" % (chrom.decode(),summit_p,summit_p+1,peakprefix.decode(),n_peak,subpeak_letters(i),peak[score_column]))
+ *                         print_func("%s\t%d\t%d\t%s%d%s\t%.6g\n" % (chrom.decode(),summit_p,summit_p+1,peakprefix.decode(),n_peak,subpeak_letters(i),peak[score_column]))
  */
         __Pyx_INCREF(__pyx_int_0);
         __pyx_t_7 = __pyx_int_0;
@@ -9661,7 +9661,7 @@ static PyObject *__pyx_f_5MACS2_2IO_6PeakIO_6PeakIO__to_summits_bed(struct __pyx
  *                 if len(peaks) > 1:
  *                     for i, peak in enumerate(peaks):
  *                         summit_p = peak['summit']             # <<<<<<<<<<<<<<
- *                         print_func("%s\t%d\t%d\t%s%d%s\t%.5g\n" % (chrom.decode(),summit_p,summit_p+1,peakprefix.decode(),n_peak,subpeak_letters(i),peak[score_column]))
+ *                         print_func("%s\t%d\t%d\t%s%d%s\t%.6g\n" % (chrom.decode(),summit_p,summit_p+1,peakprefix.decode(),n_peak,subpeak_letters(i),peak[score_column]))
  *                 else:
  */
           __pyx_t_12 = __Pyx_PyObject_Dict_GetItem(__pyx_v_peak, __pyx_n_u_summit); if (unlikely(!__pyx_t_12)) __PYX_ERR(0, 319, __pyx_L1_error)
@@ -9672,7 +9672,7 @@ static PyObject *__pyx_f_5MACS2_2IO_6PeakIO_6PeakIO__to_summits_bed(struct __pyx
           /* "MACS2/IO/PeakIO.pyx":320
  *                     for i, peak in enumerate(peaks):
  *                         summit_p = peak['summit']
- *                         print_func("%s\t%d\t%d\t%s%d%s\t%.5g\n" % (chrom.decode(),summit_p,summit_p+1,peakprefix.decode(),n_peak,subpeak_letters(i),peak[score_column]))             # <<<<<<<<<<<<<<
+ *                         print_func("%s\t%d\t%d\t%s%d%s\t%.6g\n" % (chrom.decode(),summit_p,summit_p+1,peakprefix.decode(),n_peak,subpeak_letters(i),peak[score_column]))             # <<<<<<<<<<<<<<
  *                 else:
  *                     peak = peaks[0]
  */
@@ -9729,7 +9729,7 @@ static PyObject *__pyx_f_5MACS2_2IO_6PeakIO_6PeakIO__to_summits_bed(struct __pyx
           __pyx_t_19 = 0;
           __pyx_t_21 = 0;
           __pyx_t_22 = 0;
-          __pyx_t_22 = PyUnicode_Format(__pyx_kp_u_s_d_d_s_d_s_5g, __pyx_t_23); if (unlikely(!__pyx_t_22)) __PYX_ERR(0, 320, __pyx_L1_error)
+          __pyx_t_22 = PyUnicode_Format(__pyx_kp_u_s_d_d_s_d_s_6g, __pyx_t_23); if (unlikely(!__pyx_t_22)) __PYX_ERR(0, 320, __pyx_L1_error)
           __Pyx_GOTREF(__pyx_t_22);
           __Pyx_DECREF(__pyx_t_23); __pyx_t_23 = 0;
           __Pyx_INCREF(__pyx_v_print_func);
@@ -9756,7 +9756,7 @@ static PyObject *__pyx_f_5MACS2_2IO_6PeakIO_6PeakIO__to_summits_bed(struct __pyx
  *                 if len(peaks) > 1:
  *                     for i, peak in enumerate(peaks):             # <<<<<<<<<<<<<<
  *                         summit_p = peak['summit']
- *                         print_func("%s\t%d\t%d\t%s%d%s\t%.5g\n" % (chrom.decode(),summit_p,summit_p+1,peakprefix.decode(),n_peak,subpeak_letters(i),peak[score_column]))
+ *                         print_func("%s\t%d\t%d\t%s%d%s\t%.6g\n" % (chrom.decode(),summit_p,summit_p+1,peakprefix.decode(),n_peak,subpeak_letters(i),peak[score_column]))
  */
         }
         __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
@@ -9773,11 +9773,11 @@ static PyObject *__pyx_f_5MACS2_2IO_6PeakIO_6PeakIO__to_summits_bed(struct __pyx
       }
 
       /* "MACS2/IO/PeakIO.pyx":322
- *                         print_func("%s\t%d\t%d\t%s%d%s\t%.5g\n" % (chrom.decode(),summit_p,summit_p+1,peakprefix.decode(),n_peak,subpeak_letters(i),peak[score_column]))
+ *                         print_func("%s\t%d\t%d\t%s%d%s\t%.6g\n" % (chrom.decode(),summit_p,summit_p+1,peakprefix.decode(),n_peak,subpeak_letters(i),peak[score_column]))
  *                 else:
  *                     peak = peaks[0]             # <<<<<<<<<<<<<<
  *                     summit_p = peak['summit']
- *                     print_func("%s\t%d\t%d\t%s%d\t%.5g\n" % (chrom.decode(),summit_p,summit_p+1,peakprefix.decode(),n_peak,peak[score_column]))
+ *                     print_func("%s\t%d\t%d\t%s%d\t%.6g\n" % (chrom.decode(),summit_p,summit_p+1,peakprefix.decode(),n_peak,peak[score_column]))
  */
       /*else*/ {
         __pyx_t_7 = __Pyx_GetItemInt_List(__pyx_v_peaks, 0, long, 1, __Pyx_PyInt_From_long, 1, 0, 1); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 322, __pyx_L1_error)
@@ -9789,7 +9789,7 @@ static PyObject *__pyx_f_5MACS2_2IO_6PeakIO_6PeakIO__to_summits_bed(struct __pyx
  *                 else:
  *                     peak = peaks[0]
  *                     summit_p = peak['summit']             # <<<<<<<<<<<<<<
- *                     print_func("%s\t%d\t%d\t%s%d\t%.5g\n" % (chrom.decode(),summit_p,summit_p+1,peakprefix.decode(),n_peak,peak[score_column]))
+ *                     print_func("%s\t%d\t%d\t%s%d\t%.6g\n" % (chrom.decode(),summit_p,summit_p+1,peakprefix.decode(),n_peak,peak[score_column]))
  * 
  */
         __pyx_t_7 = __Pyx_PyObject_Dict_GetItem(__pyx_v_peak, __pyx_n_u_summit); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 323, __pyx_L1_error)
@@ -9800,7 +9800,7 @@ static PyObject *__pyx_f_5MACS2_2IO_6PeakIO_6PeakIO__to_summits_bed(struct __pyx
         /* "MACS2/IO/PeakIO.pyx":324
  *                     peak = peaks[0]
  *                     summit_p = peak['summit']
- *                     print_func("%s\t%d\t%d\t%s%d\t%.5g\n" % (chrom.decode(),summit_p,summit_p+1,peakprefix.decode(),n_peak,peak[score_column]))             # <<<<<<<<<<<<<<
+ *                     print_func("%s\t%d\t%d\t%s%d\t%.6g\n" % (chrom.decode(),summit_p,summit_p+1,peakprefix.decode(),n_peak,peak[score_column]))             # <<<<<<<<<<<<<<
  * 
  *     def tobed (self):
  */
@@ -9851,7 +9851,7 @@ static PyObject *__pyx_f_5MACS2_2IO_6PeakIO_6PeakIO__to_summits_bed(struct __pyx
         __pyx_t_12 = 0;
         __pyx_t_23 = 0;
         __pyx_t_22 = 0;
-        __pyx_t_22 = PyUnicode_Format(__pyx_kp_u_s_d_d_s_d_5g, __pyx_t_21); if (unlikely(!__pyx_t_22)) __PYX_ERR(0, 324, __pyx_L1_error)
+        __pyx_t_22 = PyUnicode_Format(__pyx_kp_u_s_d_d_s_d_6g, __pyx_t_21); if (unlikely(!__pyx_t_22)) __PYX_ERR(0, 324, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_22);
         __Pyx_DECREF(__pyx_t_21); __pyx_t_21 = 0;
         __Pyx_INCREF(__pyx_v_print_func);
@@ -9896,7 +9896,7 @@ static PyObject *__pyx_f_5MACS2_2IO_6PeakIO_6PeakIO__to_summits_bed(struct __pyx
   __Pyx_DECREF(__pyx_t_11); __pyx_t_11 = 0;
 
   /* "MACS2/IO/PeakIO.pyx":296
- *                     print_func("%s\t%d\t%d\t%s%d\t%.5g\n" % (chrom.decode(),peak['start'],peak['end'],peakprefix.decode(),n_peak,peak[score_column]))
+ *                     print_func("%s\t%d\t%d\t%s%d\t%.6g\n" % (chrom.decode(),peak['start'],peak['end'],peakprefix.decode(),n_peak,peak[score_column]))
  * 
  *     cdef _to_summits_bed(self, bytes name_prefix=b"%s_peak_", bytes name=b"MACS",             # <<<<<<<<<<<<<<
  *                         bytes description = b"%s", str score_column="score",
@@ -9939,7 +9939,7 @@ static PyObject *__pyx_f_5MACS2_2IO_6PeakIO_6PeakIO__to_summits_bed(struct __pyx
 }
 
 /* "MACS2/IO/PeakIO.pyx":326
- *                     print_func("%s\t%d\t%d\t%s%d\t%.5g\n" % (chrom.decode(),summit_p,summit_p+1,peakprefix.decode(),n_peak,peak[score_column]))
+ *                     print_func("%s\t%d\t%d\t%s%d\t%.6g\n" % (chrom.decode(),summit_p,summit_p+1,peakprefix.decode(),n_peak,peak[score_column]))
  * 
  *     def tobed (self):             # <<<<<<<<<<<<<<
  *         """Print out peaks in BED5 format.
@@ -9989,7 +9989,7 @@ static PyObject *__pyx_pf_5MACS2_2IO_6PeakIO_6PeakIO_22tobed(struct __pyx_obj_5M
   goto __pyx_L0;
 
   /* "MACS2/IO/PeakIO.pyx":326
- *                     print_func("%s\t%d\t%d\t%s%d\t%.5g\n" % (chrom.decode(),summit_p,summit_p+1,peakprefix.decode(),n_peak,peak[score_column]))
+ *                     print_func("%s\t%d\t%d\t%s%d\t%.6g\n" % (chrom.decode(),summit_p,summit_p+1,peakprefix.decode(),n_peak,peak[score_column]))
  * 
  *     def tobed (self):             # <<<<<<<<<<<<<<
  *         """Print out peaks in BED5 format.
@@ -11195,7 +11195,7 @@ static PyObject *__pyx_pf_5MACS2_2IO_6PeakIO_6PeakIO_30write_to_narrowPeak(struc
  *                             s = -1
  *                         else:
  *                             s = peak['summit'] - peak['start']             # <<<<<<<<<<<<<<
- *                         fhd.write( "%s\t%d\t%d\t%s\t%d\t.\t%.5g\t%.5g\t%.5g\t%d\n"
+ *                         fhd.write( "%s\t%d\t%d\t%s\t%d\t.\t%.6g\t%.6g\t%.6g\t%d\n"
  *                                    %
  */
           /*else*/ {
@@ -11216,7 +11216,7 @@ static PyObject *__pyx_pf_5MACS2_2IO_6PeakIO_6PeakIO_30write_to_narrowPeak(struc
           /* "MACS2/IO/PeakIO.pyx":482
  *                         else:
  *                             s = peak['summit'] - peak['start']
- *                         fhd.write( "%s\t%d\t%d\t%s\t%d\t.\t%.5g\t%.5g\t%.5g\t%d\n"             # <<<<<<<<<<<<<<
+ *                         fhd.write( "%s\t%d\t%d\t%s\t%d\t.\t%.6g\t%.6g\t%.6g\t%d\n"             # <<<<<<<<<<<<<<
  *                                    %
  *                                    (chrom.decode(),peak['start'],peak['end'],peakname,int(10*peak[score_column]),
  */
@@ -11224,7 +11224,7 @@ static PyObject *__pyx_pf_5MACS2_2IO_6PeakIO_6PeakIO_30write_to_narrowPeak(struc
           __Pyx_GOTREF(__pyx_t_14);
 
           /* "MACS2/IO/PeakIO.pyx":484
- *                         fhd.write( "%s\t%d\t%d\t%s\t%d\t.\t%.5g\t%.5g\t%.5g\t%d\n"
+ *                         fhd.write( "%s\t%d\t%d\t%s\t%d\t.\t%.6g\t%.6g\t%.6g\t%d\n"
  *                                    %
  *                                    (chrom.decode(),peak['start'],peak['end'],peakname,int(10*peak[score_column]),             # <<<<<<<<<<<<<<
  *                                     peak['fc'],peak['pscore'],peak['qscore'],s) )
@@ -11266,7 +11266,7 @@ static PyObject *__pyx_pf_5MACS2_2IO_6PeakIO_6PeakIO_30write_to_narrowPeak(struc
           __Pyx_GOTREF(__pyx_t_28);
 
           /* "MACS2/IO/PeakIO.pyx":484
- *                         fhd.write( "%s\t%d\t%d\t%s\t%d\t.\t%.5g\t%.5g\t%.5g\t%d\n"
+ *                         fhd.write( "%s\t%d\t%d\t%s\t%d\t.\t%.6g\t%.6g\t%.6g\t%d\n"
  *                                    %
  *                                    (chrom.decode(),peak['start'],peak['end'],peakname,int(10*peak[score_column]),             # <<<<<<<<<<<<<<
  *                                     peak['fc'],peak['pscore'],peak['qscore'],s) )
@@ -11304,12 +11304,12 @@ static PyObject *__pyx_pf_5MACS2_2IO_6PeakIO_6PeakIO_30write_to_narrowPeak(struc
 
           /* "MACS2/IO/PeakIO.pyx":483
  *                             s = peak['summit'] - peak['start']
- *                         fhd.write( "%s\t%d\t%d\t%s\t%d\t.\t%.5g\t%.5g\t%.5g\t%d\n"
+ *                         fhd.write( "%s\t%d\t%d\t%s\t%d\t.\t%.6g\t%.6g\t%.6g\t%d\n"
  *                                    %             # <<<<<<<<<<<<<<
  *                                    (chrom.decode(),peak['start'],peak['end'],peakname,int(10*peak[score_column]),
  *                                     peak['fc'],peak['pscore'],peak['qscore'],s) )
  */
-          __pyx_t_28 = PyUnicode_Format(__pyx_kp_u_s_d_d_s_d_5g_5g_5g_d, __pyx_t_29); if (unlikely(!__pyx_t_28)) __PYX_ERR(0, 483, __pyx_L1_error)
+          __pyx_t_28 = PyUnicode_Format(__pyx_kp_u_s_d_d_s_d_6g_6g_6g_d, __pyx_t_29); if (unlikely(!__pyx_t_28)) __PYX_ERR(0, 483, __pyx_L1_error)
           __Pyx_GOTREF(__pyx_t_28);
           __Pyx_DECREF(__pyx_t_29); __pyx_t_29 = 0;
           __pyx_t_29 = NULL;
@@ -11425,7 +11425,7 @@ static PyObject *__pyx_pf_5MACS2_2IO_6PeakIO_6PeakIO_30write_to_narrowPeak(struc
  *                         s = -1
  *                     else:
  *                         s = peak['summit'] - peak['start']             # <<<<<<<<<<<<<<
- *                     fhd.write( "%s\t%d\t%d\t%s\t%d\t.\t%.5g\t%.5g\t%.5g\t%d\n"
+ *                     fhd.write( "%s\t%d\t%d\t%s\t%d\t.\t%.6g\t%.6g\t%.6g\t%d\n"
  *                                %
  */
         /*else*/ {
@@ -11446,7 +11446,7 @@ static PyObject *__pyx_pf_5MACS2_2IO_6PeakIO_6PeakIO_30write_to_narrowPeak(struc
         /* "MACS2/IO/PeakIO.pyx":493
  *                     else:
  *                         s = peak['summit'] - peak['start']
- *                     fhd.write( "%s\t%d\t%d\t%s\t%d\t.\t%.5g\t%.5g\t%.5g\t%d\n"             # <<<<<<<<<<<<<<
+ *                     fhd.write( "%s\t%d\t%d\t%s\t%d\t.\t%.6g\t%.6g\t%.6g\t%d\n"             # <<<<<<<<<<<<<<
  *                                %
  *                                (chrom.decode(),peak['start'],peak['end'],peakname,int(10*peak[score_column]),
  */
@@ -11454,7 +11454,7 @@ static PyObject *__pyx_pf_5MACS2_2IO_6PeakIO_6PeakIO_30write_to_narrowPeak(struc
         __Pyx_GOTREF(__pyx_t_13);
 
         /* "MACS2/IO/PeakIO.pyx":495
- *                     fhd.write( "%s\t%d\t%d\t%s\t%d\t.\t%.5g\t%.5g\t%.5g\t%d\n"
+ *                     fhd.write( "%s\t%d\t%d\t%s\t%d\t.\t%.6g\t%.6g\t%.6g\t%d\n"
  *                                %
  *                                (chrom.decode(),peak['start'],peak['end'],peakname,int(10*peak[score_column]),             # <<<<<<<<<<<<<<
  *                                 peak['fc'],peak['pscore'],peak['qscore'],s) )
@@ -11496,7 +11496,7 @@ static PyObject *__pyx_pf_5MACS2_2IO_6PeakIO_6PeakIO_30write_to_narrowPeak(struc
         __Pyx_GOTREF(__pyx_t_24);
 
         /* "MACS2/IO/PeakIO.pyx":495
- *                     fhd.write( "%s\t%d\t%d\t%s\t%d\t.\t%.5g\t%.5g\t%.5g\t%d\n"
+ *                     fhd.write( "%s\t%d\t%d\t%s\t%d\t.\t%.6g\t%.6g\t%.6g\t%d\n"
  *                                %
  *                                (chrom.decode(),peak['start'],peak['end'],peakname,int(10*peak[score_column]),             # <<<<<<<<<<<<<<
  *                                 peak['fc'],peak['pscore'],peak['qscore'],s) )
@@ -11534,12 +11534,12 @@ static PyObject *__pyx_pf_5MACS2_2IO_6PeakIO_6PeakIO_30write_to_narrowPeak(struc
 
         /* "MACS2/IO/PeakIO.pyx":494
  *                         s = peak['summit'] - peak['start']
- *                     fhd.write( "%s\t%d\t%d\t%s\t%d\t.\t%.5g\t%.5g\t%.5g\t%d\n"
+ *                     fhd.write( "%s\t%d\t%d\t%s\t%d\t.\t%.6g\t%.6g\t%.6g\t%d\n"
  *                                %             # <<<<<<<<<<<<<<
  *                                (chrom.decode(),peak['start'],peak['end'],peakname,int(10*peak[score_column]),
  *                                 peak['fc'],peak['pscore'],peak['qscore'],s) )
  */
-        __pyx_t_24 = PyUnicode_Format(__pyx_kp_u_s_d_d_s_d_5g_5g_5g_d, __pyx_t_23); if (unlikely(!__pyx_t_24)) __PYX_ERR(0, 494, __pyx_L1_error)
+        __pyx_t_24 = PyUnicode_Format(__pyx_kp_u_s_d_d_s_d_6g_6g_6g_d, __pyx_t_23); if (unlikely(!__pyx_t_24)) __PYX_ERR(0, 494, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_24);
         __Pyx_DECREF(__pyx_t_23); __pyx_t_23 = 0;
         __pyx_t_23 = NULL;
@@ -12206,7 +12206,7 @@ static PyObject *__pyx_pf_5MACS2_2IO_6PeakIO_6PeakIO_32write_to_xls(struct __pyx
  *                         #[start,end,end-start,summit,peak_height,number_tags,pvalue,fold_change,qvalue]
  *                         write("%s\t%d\t%d\t%d" % (chrom.decode(),peak['start']+1,peak['end'],peak['length']))             # <<<<<<<<<<<<<<
  *                         write("\t%d" % (peak['summit']+1)) # summit position
- *                         write("\t%.5g" % (round(peak['pileup'],2))) # pileup height at summit
+ *                         write("\t%.6g" % (round(peak['pileup'],2))) # pileup height at summit
  */
           __pyx_t_4 = PyTuple_New(7); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 525, __pyx_L1_error)
           __Pyx_GOTREF(__pyx_t_4);
@@ -12308,8 +12308,8 @@ static PyObject *__pyx_pf_5MACS2_2IO_6PeakIO_6PeakIO_32write_to_xls(struct __pyx
  *                         #[start,end,end-start,summit,peak_height,number_tags,pvalue,fold_change,qvalue]
  *                         write("%s\t%d\t%d\t%d" % (chrom.decode(),peak['start']+1,peak['end'],peak['length']))
  *                         write("\t%d" % (peak['summit']+1)) # summit position             # <<<<<<<<<<<<<<
- *                         write("\t%.5g" % (round(peak['pileup'],2))) # pileup height at summit
- *                         write("\t%.5g" % (peak['pscore'])) # -log10pvalue at summit
+ *                         write("\t%.6g" % (round(peak['pileup'],2))) # pileup height at summit
+ *                         write("\t%.6g" % (peak['pscore'])) # -log10pvalue at summit
  */
           __pyx_t_4 = __Pyx_PyObject_Dict_GetItem(__pyx_v_peak, __pyx_n_u_summit); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 526, __pyx_L1_error)
           __Pyx_GOTREF(__pyx_t_4);
@@ -12341,9 +12341,9 @@ static PyObject *__pyx_pf_5MACS2_2IO_6PeakIO_6PeakIO_32write_to_xls(struct __pyx
           /* "MACS2/IO/PeakIO.pyx":527
  *                         write("%s\t%d\t%d\t%d" % (chrom.decode(),peak['start']+1,peak['end'],peak['length']))
  *                         write("\t%d" % (peak['summit']+1)) # summit position
- *                         write("\t%.5g" % (round(peak['pileup'],2))) # pileup height at summit             # <<<<<<<<<<<<<<
- *                         write("\t%.5g" % (peak['pscore'])) # -log10pvalue at summit
- *                         write("\t%.5g" % (peak['fc'])) # fold change at summit
+ *                         write("\t%.6g" % (round(peak['pileup'],2))) # pileup height at summit             # <<<<<<<<<<<<<<
+ *                         write("\t%.6g" % (peak['pscore'])) # -log10pvalue at summit
+ *                         write("\t%.6g" % (peak['fc'])) # fold change at summit
  */
           __pyx_t_21 = __Pyx_PyObject_Dict_GetItem(__pyx_v_peak, __pyx_n_u_pileup); if (unlikely(!__pyx_t_21)) __PYX_ERR(0, 527, __pyx_L1_error)
           __Pyx_GOTREF(__pyx_t_21);
@@ -12358,7 +12358,7 @@ static PyObject *__pyx_pf_5MACS2_2IO_6PeakIO_6PeakIO_32write_to_xls(struct __pyx
           __pyx_t_21 = __Pyx_PyObject_Call(__pyx_builtin_round, __pyx_t_4, NULL); if (unlikely(!__pyx_t_21)) __PYX_ERR(0, 527, __pyx_L1_error)
           __Pyx_GOTREF(__pyx_t_21);
           __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-          __pyx_t_4 = __Pyx_PyUnicode_FormatSafe(__pyx_kp_u_5g, __pyx_t_21); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 527, __pyx_L1_error)
+          __pyx_t_4 = __Pyx_PyUnicode_FormatSafe(__pyx_kp_u_6g, __pyx_t_21); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 527, __pyx_L1_error)
           __Pyx_GOTREF(__pyx_t_4);
           __Pyx_DECREF(__pyx_t_21); __pyx_t_21 = 0;
           __Pyx_INCREF(__pyx_v_write);
@@ -12382,14 +12382,14 @@ static PyObject *__pyx_pf_5MACS2_2IO_6PeakIO_6PeakIO_32write_to_xls(struct __pyx
 
           /* "MACS2/IO/PeakIO.pyx":528
  *                         write("\t%d" % (peak['summit']+1)) # summit position
- *                         write("\t%.5g" % (round(peak['pileup'],2))) # pileup height at summit
- *                         write("\t%.5g" % (peak['pscore'])) # -log10pvalue at summit             # <<<<<<<<<<<<<<
- *                         write("\t%.5g" % (peak['fc'])) # fold change at summit
- *                         write("\t%.5g" % (peak['qscore'])) # -log10qvalue at summit
+ *                         write("\t%.6g" % (round(peak['pileup'],2))) # pileup height at summit
+ *                         write("\t%.6g" % (peak['pscore'])) # -log10pvalue at summit             # <<<<<<<<<<<<<<
+ *                         write("\t%.6g" % (peak['fc'])) # fold change at summit
+ *                         write("\t%.6g" % (peak['qscore'])) # -log10qvalue at summit
  */
           __pyx_t_21 = __Pyx_PyObject_Dict_GetItem(__pyx_v_peak, __pyx_n_u_pscore); if (unlikely(!__pyx_t_21)) __PYX_ERR(0, 528, __pyx_L1_error)
           __Pyx_GOTREF(__pyx_t_21);
-          __pyx_t_4 = __Pyx_PyUnicode_FormatSafe(__pyx_kp_u_5g, __pyx_t_21); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 528, __pyx_L1_error)
+          __pyx_t_4 = __Pyx_PyUnicode_FormatSafe(__pyx_kp_u_6g, __pyx_t_21); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 528, __pyx_L1_error)
           __Pyx_GOTREF(__pyx_t_4);
           __Pyx_DECREF(__pyx_t_21); __pyx_t_21 = 0;
           __Pyx_INCREF(__pyx_v_write);
@@ -12412,15 +12412,15 @@ static PyObject *__pyx_pf_5MACS2_2IO_6PeakIO_6PeakIO_32write_to_xls(struct __pyx
           __Pyx_DECREF(__pyx_t_12); __pyx_t_12 = 0;
 
           /* "MACS2/IO/PeakIO.pyx":529
- *                         write("\t%.5g" % (round(peak['pileup'],2))) # pileup height at summit
- *                         write("\t%.5g" % (peak['pscore'])) # -log10pvalue at summit
- *                         write("\t%.5g" % (peak['fc'])) # fold change at summit             # <<<<<<<<<<<<<<
- *                         write("\t%.5g" % (peak['qscore'])) # -log10qvalue at summit
+ *                         write("\t%.6g" % (round(peak['pileup'],2))) # pileup height at summit
+ *                         write("\t%.6g" % (peak['pscore'])) # -log10pvalue at summit
+ *                         write("\t%.6g" % (peak['fc'])) # fold change at summit             # <<<<<<<<<<<<<<
+ *                         write("\t%.6g" % (peak['qscore'])) # -log10qvalue at summit
  *                         write("\t%s" % peakname)
  */
           __pyx_t_21 = __Pyx_PyObject_Dict_GetItem(__pyx_v_peak, __pyx_n_u_fc); if (unlikely(!__pyx_t_21)) __PYX_ERR(0, 529, __pyx_L1_error)
           __Pyx_GOTREF(__pyx_t_21);
-          __pyx_t_4 = __Pyx_PyUnicode_FormatSafe(__pyx_kp_u_5g, __pyx_t_21); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 529, __pyx_L1_error)
+          __pyx_t_4 = __Pyx_PyUnicode_FormatSafe(__pyx_kp_u_6g, __pyx_t_21); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 529, __pyx_L1_error)
           __Pyx_GOTREF(__pyx_t_4);
           __Pyx_DECREF(__pyx_t_21); __pyx_t_21 = 0;
           __Pyx_INCREF(__pyx_v_write);
@@ -12443,15 +12443,15 @@ static PyObject *__pyx_pf_5MACS2_2IO_6PeakIO_6PeakIO_32write_to_xls(struct __pyx
           __Pyx_DECREF(__pyx_t_12); __pyx_t_12 = 0;
 
           /* "MACS2/IO/PeakIO.pyx":530
- *                         write("\t%.5g" % (peak['pscore'])) # -log10pvalue at summit
- *                         write("\t%.5g" % (peak['fc'])) # fold change at summit
- *                         write("\t%.5g" % (peak['qscore'])) # -log10qvalue at summit             # <<<<<<<<<<<<<<
+ *                         write("\t%.6g" % (peak['pscore'])) # -log10pvalue at summit
+ *                         write("\t%.6g" % (peak['fc'])) # fold change at summit
+ *                         write("\t%.6g" % (peak['qscore'])) # -log10qvalue at summit             # <<<<<<<<<<<<<<
  *                         write("\t%s" % peakname)
  *                         write("\n")
  */
           __pyx_t_21 = __Pyx_PyObject_Dict_GetItem(__pyx_v_peak, __pyx_n_u_qscore); if (unlikely(!__pyx_t_21)) __PYX_ERR(0, 530, __pyx_L1_error)
           __Pyx_GOTREF(__pyx_t_21);
-          __pyx_t_4 = __Pyx_PyUnicode_FormatSafe(__pyx_kp_u_5g, __pyx_t_21); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 530, __pyx_L1_error)
+          __pyx_t_4 = __Pyx_PyUnicode_FormatSafe(__pyx_kp_u_6g, __pyx_t_21); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 530, __pyx_L1_error)
           __Pyx_GOTREF(__pyx_t_4);
           __Pyx_DECREF(__pyx_t_21); __pyx_t_21 = 0;
           __Pyx_INCREF(__pyx_v_write);
@@ -12474,8 +12474,8 @@ static PyObject *__pyx_pf_5MACS2_2IO_6PeakIO_6PeakIO_32write_to_xls(struct __pyx
           __Pyx_DECREF(__pyx_t_12); __pyx_t_12 = 0;
 
           /* "MACS2/IO/PeakIO.pyx":531
- *                         write("\t%.5g" % (peak['fc'])) # fold change at summit
- *                         write("\t%.5g" % (peak['qscore'])) # -log10qvalue at summit
+ *                         write("\t%.6g" % (peak['fc'])) # fold change at summit
+ *                         write("\t%.6g" % (peak['qscore'])) # -log10qvalue at summit
  *                         write("\t%s" % peakname)             # <<<<<<<<<<<<<<
  *                         write("\n")
  *                 else:
@@ -12502,7 +12502,7 @@ static PyObject *__pyx_pf_5MACS2_2IO_6PeakIO_6PeakIO_32write_to_xls(struct __pyx
           __Pyx_DECREF(__pyx_t_12); __pyx_t_12 = 0;
 
           /* "MACS2/IO/PeakIO.pyx":532
- *                         write("\t%.5g" % (peak['qscore'])) # -log10qvalue at summit
+ *                         write("\t%.6g" % (peak['qscore'])) # -log10qvalue at summit
  *                         write("\t%s" % peakname)
  *                         write("\n")             # <<<<<<<<<<<<<<
  *                 else:
@@ -12587,7 +12587,7 @@ static PyObject *__pyx_pf_5MACS2_2IO_6PeakIO_6PeakIO_32write_to_xls(struct __pyx
  *                     #[start,end,end-start,summit,peak_height,number_tags,pvalue,fold_change,qvalue]
  *                     write("%s\t%d\t%d\t%d" % (chrom.decode(),peak['start']+1,peak['end'],peak['length']))             # <<<<<<<<<<<<<<
  *                     write("\t%d" % (peak['summit']+1)) # summit position
- *                     write("\t%.5g" % (round(peak['pileup'],2))) # pileup height at summit
+ *                     write("\t%.6g" % (round(peak['pileup'],2))) # pileup height at summit
  */
         __pyx_t_3 = PyTuple_New(7); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 537, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_3);
@@ -12689,8 +12689,8 @@ static PyObject *__pyx_pf_5MACS2_2IO_6PeakIO_6PeakIO_32write_to_xls(struct __pyx
  *                     #[start,end,end-start,summit,peak_height,number_tags,pvalue,fold_change,qvalue]
  *                     write("%s\t%d\t%d\t%d" % (chrom.decode(),peak['start']+1,peak['end'],peak['length']))
  *                     write("\t%d" % (peak['summit']+1)) # summit position             # <<<<<<<<<<<<<<
- *                     write("\t%.5g" % (round(peak['pileup'],2))) # pileup height at summit
- *                     write("\t%.5g" % (peak['pscore'])) # -log10pvalue at summit
+ *                     write("\t%.6g" % (round(peak['pileup'],2))) # pileup height at summit
+ *                     write("\t%.6g" % (peak['pscore'])) # -log10pvalue at summit
  */
         __pyx_t_3 = __Pyx_PyObject_Dict_GetItem(__pyx_v_peak, __pyx_n_u_summit); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 538, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_3);
@@ -12722,9 +12722,9 @@ static PyObject *__pyx_pf_5MACS2_2IO_6PeakIO_6PeakIO_32write_to_xls(struct __pyx
         /* "MACS2/IO/PeakIO.pyx":539
  *                     write("%s\t%d\t%d\t%d" % (chrom.decode(),peak['start']+1,peak['end'],peak['length']))
  *                     write("\t%d" % (peak['summit']+1)) # summit position
- *                     write("\t%.5g" % (round(peak['pileup'],2))) # pileup height at summit             # <<<<<<<<<<<<<<
- *                     write("\t%.5g" % (peak['pscore'])) # -log10pvalue at summit
- *                     write("\t%.5g" % (peak['fc'])) # fold change at summit
+ *                     write("\t%.6g" % (round(peak['pileup'],2))) # pileup height at summit             # <<<<<<<<<<<<<<
+ *                     write("\t%.6g" % (peak['pscore'])) # -log10pvalue at summit
+ *                     write("\t%.6g" % (peak['fc'])) # fold change at summit
  */
         __pyx_t_4 = __Pyx_PyObject_Dict_GetItem(__pyx_v_peak, __pyx_n_u_pileup); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 539, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_4);
@@ -12739,7 +12739,7 @@ static PyObject *__pyx_pf_5MACS2_2IO_6PeakIO_6PeakIO_32write_to_xls(struct __pyx
         __pyx_t_4 = __Pyx_PyObject_Call(__pyx_builtin_round, __pyx_t_3, NULL); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 539, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_4);
         __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-        __pyx_t_3 = __Pyx_PyUnicode_FormatSafe(__pyx_kp_u_5g, __pyx_t_4); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 539, __pyx_L1_error)
+        __pyx_t_3 = __Pyx_PyUnicode_FormatSafe(__pyx_kp_u_6g, __pyx_t_4); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 539, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_3);
         __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
         __Pyx_INCREF(__pyx_v_write);
@@ -12763,14 +12763,14 @@ static PyObject *__pyx_pf_5MACS2_2IO_6PeakIO_6PeakIO_32write_to_xls(struct __pyx
 
         /* "MACS2/IO/PeakIO.pyx":540
  *                     write("\t%d" % (peak['summit']+1)) # summit position
- *                     write("\t%.5g" % (round(peak['pileup'],2))) # pileup height at summit
- *                     write("\t%.5g" % (peak['pscore'])) # -log10pvalue at summit             # <<<<<<<<<<<<<<
- *                     write("\t%.5g" % (peak['fc'])) # fold change at summit
- *                     write("\t%.5g" % (peak['qscore'])) # -log10qvalue at summit
+ *                     write("\t%.6g" % (round(peak['pileup'],2))) # pileup height at summit
+ *                     write("\t%.6g" % (peak['pscore'])) # -log10pvalue at summit             # <<<<<<<<<<<<<<
+ *                     write("\t%.6g" % (peak['fc'])) # fold change at summit
+ *                     write("\t%.6g" % (peak['qscore'])) # -log10qvalue at summit
  */
         __pyx_t_4 = __Pyx_PyObject_Dict_GetItem(__pyx_v_peak, __pyx_n_u_pscore); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 540, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_4);
-        __pyx_t_3 = __Pyx_PyUnicode_FormatSafe(__pyx_kp_u_5g, __pyx_t_4); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 540, __pyx_L1_error)
+        __pyx_t_3 = __Pyx_PyUnicode_FormatSafe(__pyx_kp_u_6g, __pyx_t_4); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 540, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_3);
         __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
         __Pyx_INCREF(__pyx_v_write);
@@ -12793,15 +12793,15 @@ static PyObject *__pyx_pf_5MACS2_2IO_6PeakIO_6PeakIO_32write_to_xls(struct __pyx
         __Pyx_DECREF(__pyx_t_12); __pyx_t_12 = 0;
 
         /* "MACS2/IO/PeakIO.pyx":541
- *                     write("\t%.5g" % (round(peak['pileup'],2))) # pileup height at summit
- *                     write("\t%.5g" % (peak['pscore'])) # -log10pvalue at summit
- *                     write("\t%.5g" % (peak['fc'])) # fold change at summit             # <<<<<<<<<<<<<<
- *                     write("\t%.5g" % (peak['qscore'])) # -log10qvalue at summit
+ *                     write("\t%.6g" % (round(peak['pileup'],2))) # pileup height at summit
+ *                     write("\t%.6g" % (peak['pscore'])) # -log10pvalue at summit
+ *                     write("\t%.6g" % (peak['fc'])) # fold change at summit             # <<<<<<<<<<<<<<
+ *                     write("\t%.6g" % (peak['qscore'])) # -log10qvalue at summit
  *                     write("\t%s" % peakname)
  */
         __pyx_t_4 = __Pyx_PyObject_Dict_GetItem(__pyx_v_peak, __pyx_n_u_fc); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 541, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_4);
-        __pyx_t_3 = __Pyx_PyUnicode_FormatSafe(__pyx_kp_u_5g, __pyx_t_4); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 541, __pyx_L1_error)
+        __pyx_t_3 = __Pyx_PyUnicode_FormatSafe(__pyx_kp_u_6g, __pyx_t_4); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 541, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_3);
         __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
         __Pyx_INCREF(__pyx_v_write);
@@ -12824,15 +12824,15 @@ static PyObject *__pyx_pf_5MACS2_2IO_6PeakIO_6PeakIO_32write_to_xls(struct __pyx
         __Pyx_DECREF(__pyx_t_12); __pyx_t_12 = 0;
 
         /* "MACS2/IO/PeakIO.pyx":542
- *                     write("\t%.5g" % (peak['pscore'])) # -log10pvalue at summit
- *                     write("\t%.5g" % (peak['fc'])) # fold change at summit
- *                     write("\t%.5g" % (peak['qscore'])) # -log10qvalue at summit             # <<<<<<<<<<<<<<
+ *                     write("\t%.6g" % (peak['pscore'])) # -log10pvalue at summit
+ *                     write("\t%.6g" % (peak['fc'])) # fold change at summit
+ *                     write("\t%.6g" % (peak['qscore'])) # -log10qvalue at summit             # <<<<<<<<<<<<<<
  *                     write("\t%s" % peakname)
  *                     write("\n")
  */
         __pyx_t_4 = __Pyx_PyObject_Dict_GetItem(__pyx_v_peak, __pyx_n_u_qscore); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 542, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_4);
-        __pyx_t_3 = __Pyx_PyUnicode_FormatSafe(__pyx_kp_u_5g, __pyx_t_4); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 542, __pyx_L1_error)
+        __pyx_t_3 = __Pyx_PyUnicode_FormatSafe(__pyx_kp_u_6g, __pyx_t_4); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 542, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_3);
         __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
         __Pyx_INCREF(__pyx_v_write);
@@ -12855,8 +12855,8 @@ static PyObject *__pyx_pf_5MACS2_2IO_6PeakIO_6PeakIO_32write_to_xls(struct __pyx
         __Pyx_DECREF(__pyx_t_12); __pyx_t_12 = 0;
 
         /* "MACS2/IO/PeakIO.pyx":543
- *                     write("\t%.5g" % (peak['fc'])) # fold change at summit
- *                     write("\t%.5g" % (peak['qscore'])) # -log10qvalue at summit
+ *                     write("\t%.6g" % (peak['fc'])) # fold change at summit
+ *                     write("\t%.6g" % (peak['qscore'])) # -log10qvalue at summit
  *                     write("\t%s" % peakname)             # <<<<<<<<<<<<<<
  *                     write("\n")
  *         return
@@ -12883,7 +12883,7 @@ static PyObject *__pyx_pf_5MACS2_2IO_6PeakIO_6PeakIO_32write_to_xls(struct __pyx
         __Pyx_DECREF(__pyx_t_12); __pyx_t_12 = 0;
 
         /* "MACS2/IO/PeakIO.pyx":544
- *                     write("\t%.5g" % (peak['qscore'])) # -log10qvalue at summit
+ *                     write("\t%.6g" % (peak['qscore'])) # -log10qvalue at summit
  *                     write("\t%s" % peakname)
  *                     write("\n")             # <<<<<<<<<<<<<<
  *         return
@@ -20503,7 +20503,7 @@ static PyObject *__pyx_pf_5MACS2_2IO_6PeakIO_11BroadPeakIO_12write_to_gappedPeak
  *             for peak in self.peaks[chrom]:
  *                 n_peak += 1             # <<<<<<<<<<<<<<
  *                 if peak["thickStart"] != b".":
- *                     fhd.write( "%s\t%d\t%d\t%s%d\t%d\t.\t%s\t%s\t0\t%d\t%s\t%s\t%.5g\t%.5g\t%.5g\n"
+ *                     fhd.write( "%s\t%d\t%d\t%s%d\t%d\t.\t%s\t%s\t0\t%d\t%s\t%s\t%.6g\t%.6g\t%.6g\n"
  */
       __pyx_t_1 = __Pyx_PyInt_AddObjC(__pyx_v_n_peak, __pyx_int_1, 1, 1, 0); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 983, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_1);
@@ -20514,7 +20514,7 @@ static PyObject *__pyx_pf_5MACS2_2IO_6PeakIO_11BroadPeakIO_12write_to_gappedPeak
  *             for peak in self.peaks[chrom]:
  *                 n_peak += 1
  *                 if peak["thickStart"] != b".":             # <<<<<<<<<<<<<<
- *                     fhd.write( "%s\t%d\t%d\t%s%d\t%d\t.\t%s\t%s\t0\t%d\t%s\t%s\t%.5g\t%.5g\t%.5g\n"
+ *                     fhd.write( "%s\t%d\t%d\t%s%d\t%d\t.\t%s\t%s\t0\t%d\t%s\t%s\t%.6g\t%.6g\t%.6g\n"
  *                                %
  */
       __pyx_t_1 = __Pyx_PyObject_Dict_GetItem(__pyx_v_peak, __pyx_n_u_thickStart); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 984, __pyx_L1_error)
@@ -20526,7 +20526,7 @@ static PyObject *__pyx_pf_5MACS2_2IO_6PeakIO_11BroadPeakIO_12write_to_gappedPeak
         /* "MACS2/IO/PeakIO.pyx":985
  *                 n_peak += 1
  *                 if peak["thickStart"] != b".":
- *                     fhd.write( "%s\t%d\t%d\t%s%d\t%d\t.\t%s\t%s\t0\t%d\t%s\t%s\t%.5g\t%.5g\t%.5g\n"             # <<<<<<<<<<<<<<
+ *                     fhd.write( "%s\t%d\t%d\t%s%d\t%d\t.\t%s\t%s\t0\t%d\t%s\t%s\t%.6g\t%.6g\t%.6g\n"             # <<<<<<<<<<<<<<
  *                                %
  *                                (chrom.decode(),peak["start"],peak["end"],peakprefix.decode(),n_peak,int(10*peak["qscore"]),
  */
@@ -20534,7 +20534,7 @@ static PyObject *__pyx_pf_5MACS2_2IO_6PeakIO_11BroadPeakIO_12write_to_gappedPeak
         __Pyx_GOTREF(__pyx_t_7);
 
         /* "MACS2/IO/PeakIO.pyx":987
- *                     fhd.write( "%s\t%d\t%d\t%s%d\t%d\t.\t%s\t%s\t0\t%d\t%s\t%s\t%.5g\t%.5g\t%.5g\n"
+ *                     fhd.write( "%s\t%d\t%d\t%s%d\t%d\t.\t%s\t%s\t0\t%d\t%s\t%s\t%.6g\t%.6g\t%.6g\n"
  *                                %
  *                                (chrom.decode(),peak["start"],peak["end"],peakprefix.decode(),n_peak,int(10*peak["qscore"]),             # <<<<<<<<<<<<<<
  *                                 peak["thickStart"].decode(),peak["thickEnd"].decode(),
@@ -20681,7 +20681,7 @@ static PyObject *__pyx_pf_5MACS2_2IO_6PeakIO_11BroadPeakIO_12write_to_gappedPeak
         __Pyx_GOTREF(__pyx_t_26);
 
         /* "MACS2/IO/PeakIO.pyx":987
- *                     fhd.write( "%s\t%d\t%d\t%s%d\t%d\t.\t%s\t%s\t0\t%d\t%s\t%s\t%.5g\t%.5g\t%.5g\n"
+ *                     fhd.write( "%s\t%d\t%d\t%s%d\t%d\t.\t%s\t%s\t0\t%d\t%s\t%s\t%.6g\t%.6g\t%.6g\n"
  *                                %
  *                                (chrom.decode(),peak["start"],peak["end"],peakprefix.decode(),n_peak,int(10*peak["qscore"]),             # <<<<<<<<<<<<<<
  *                                 peak["thickStart"].decode(),peak["thickEnd"].decode(),
@@ -20734,12 +20734,12 @@ static PyObject *__pyx_pf_5MACS2_2IO_6PeakIO_11BroadPeakIO_12write_to_gappedPeak
 
         /* "MACS2/IO/PeakIO.pyx":986
  *                 if peak["thickStart"] != b".":
- *                     fhd.write( "%s\t%d\t%d\t%s%d\t%d\t.\t%s\t%s\t0\t%d\t%s\t%s\t%.5g\t%.5g\t%.5g\n"
+ *                     fhd.write( "%s\t%d\t%d\t%s%d\t%d\t.\t%s\t%s\t0\t%d\t%s\t%s\t%.6g\t%.6g\t%.6g\n"
  *                                %             # <<<<<<<<<<<<<<
  *                                (chrom.decode(),peak["start"],peak["end"],peakprefix.decode(),n_peak,int(10*peak["qscore"]),
  *                                 peak["thickStart"].decode(),peak["thickEnd"].decode(),
  */
-        __pyx_t_26 = PyUnicode_Format(__pyx_kp_u_s_d_d_s_d_d_s_s_0_d_s_s_5g_5g_5, __pyx_t_27); if (unlikely(!__pyx_t_26)) __PYX_ERR(0, 986, __pyx_L1_error)
+        __pyx_t_26 = PyUnicode_Format(__pyx_kp_u_s_d_d_s_d_d_s_s_0_d_s_s_6g_6g_6, __pyx_t_27); if (unlikely(!__pyx_t_26)) __PYX_ERR(0, 986, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_26);
         __Pyx_DECREF(__pyx_t_27); __pyx_t_27 = 0;
         __pyx_t_27 = NULL;
@@ -20764,7 +20764,7 @@ static PyObject *__pyx_pf_5MACS2_2IO_6PeakIO_11BroadPeakIO_12write_to_gappedPeak
  *             for peak in self.peaks[chrom]:
  *                 n_peak += 1
  *                 if peak["thickStart"] != b".":             # <<<<<<<<<<<<<<
- *                     fhd.write( "%s\t%d\t%d\t%s%d\t%d\t.\t%s\t%s\t0\t%d\t%s\t%s\t%.5g\t%.5g\t%.5g\n"
+ *                     fhd.write( "%s\t%d\t%d\t%s%d\t%d\t.\t%s\t%s\t0\t%d\t%s\t%s\t%.6g\t%.6g\t%.6g\n"
  *                                %
  */
       }
@@ -22422,7 +22422,7 @@ static PyObject *__pyx_pf_5MACS2_2IO_6PeakIO_11BroadPeakIO_16write_to_broadPeak(
  *                 these_peaks = list(group)
  *                 peak = these_peaks[0]             # <<<<<<<<<<<<<<
  *                 peakname = "%s%d" % (peakprefix.decode(), n_peak)
- *                 fhd.write( "%s\t%d\t%d\t%s\t%d\t.\t%.5g\t%.5g\t%.5g\n" %
+ *                 fhd.write( "%s\t%d\t%d\t%s\t%d\t.\t%.6g\t%.6g\t%.6g\n" %
  */
       __pyx_t_12 = __Pyx_GetItemInt_List(__pyx_v_these_peaks, 0, long, 1, __Pyx_PyInt_From_long, 1, 0, 1); if (unlikely(!__pyx_t_12)) __PYX_ERR(0, 1138, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_12);
@@ -22433,7 +22433,7 @@ static PyObject *__pyx_pf_5MACS2_2IO_6PeakIO_11BroadPeakIO_16write_to_broadPeak(
  *                 these_peaks = list(group)
  *                 peak = these_peaks[0]
  *                 peakname = "%s%d" % (peakprefix.decode(), n_peak)             # <<<<<<<<<<<<<<
- *                 fhd.write( "%s\t%d\t%d\t%s\t%d\t.\t%.5g\t%.5g\t%.5g\n" %
+ *                 fhd.write( "%s\t%d\t%d\t%s\t%d\t.\t%.6g\t%.6g\t%.6g\n" %
  *                            (chrom.decode(),peak['start'],peak['end'],peakname,int(10*peak["qscore"]),
  */
       if (unlikely(__pyx_v_peakprefix == Py_None)) {
@@ -22454,7 +22454,7 @@ static PyObject *__pyx_pf_5MACS2_2IO_6PeakIO_11BroadPeakIO_16write_to_broadPeak(
       /* "MACS2/IO/PeakIO.pyx":1140
  *                 peak = these_peaks[0]
  *                 peakname = "%s%d" % (peakprefix.decode(), n_peak)
- *                 fhd.write( "%s\t%d\t%d\t%s\t%d\t.\t%.5g\t%.5g\t%.5g\n" %             # <<<<<<<<<<<<<<
+ *                 fhd.write( "%s\t%d\t%d\t%s\t%d\t.\t%.6g\t%.6g\t%.6g\n" %             # <<<<<<<<<<<<<<
  *                            (chrom.decode(),peak['start'],peak['end'],peakname,int(10*peak["qscore"]),
  *                             peak['fc'],peak['pscore'],peak['qscore'] ) )
  */
@@ -22463,7 +22463,7 @@ static PyObject *__pyx_pf_5MACS2_2IO_6PeakIO_11BroadPeakIO_16write_to_broadPeak(
 
       /* "MACS2/IO/PeakIO.pyx":1141
  *                 peakname = "%s%d" % (peakprefix.decode(), n_peak)
- *                 fhd.write( "%s\t%d\t%d\t%s\t%d\t.\t%.5g\t%.5g\t%.5g\n" %
+ *                 fhd.write( "%s\t%d\t%d\t%s\t%d\t.\t%.6g\t%.6g\t%.6g\n" %
  *                            (chrom.decode(),peak['start'],peak['end'],peakname,int(10*peak["qscore"]),             # <<<<<<<<<<<<<<
  *                             peak['fc'],peak['pscore'],peak['qscore'] ) )
  *         return
@@ -22488,7 +22488,7 @@ static PyObject *__pyx_pf_5MACS2_2IO_6PeakIO_11BroadPeakIO_16write_to_broadPeak(
       __Pyx_DECREF(__pyx_t_19); __pyx_t_19 = 0;
 
       /* "MACS2/IO/PeakIO.pyx":1142
- *                 fhd.write( "%s\t%d\t%d\t%s\t%d\t.\t%.5g\t%.5g\t%.5g\n" %
+ *                 fhd.write( "%s\t%d\t%d\t%s\t%d\t.\t%.6g\t%.6g\t%.6g\n" %
  *                            (chrom.decode(),peak['start'],peak['end'],peakname,int(10*peak["qscore"]),
  *                             peak['fc'],peak['pscore'],peak['qscore'] ) )             # <<<<<<<<<<<<<<
  *         return
@@ -22503,7 +22503,7 @@ static PyObject *__pyx_pf_5MACS2_2IO_6PeakIO_11BroadPeakIO_16write_to_broadPeak(
 
       /* "MACS2/IO/PeakIO.pyx":1141
  *                 peakname = "%s%d" % (peakprefix.decode(), n_peak)
- *                 fhd.write( "%s\t%d\t%d\t%s\t%d\t.\t%.5g\t%.5g\t%.5g\n" %
+ *                 fhd.write( "%s\t%d\t%d\t%s\t%d\t.\t%.6g\t%.6g\t%.6g\n" %
  *                            (chrom.decode(),peak['start'],peak['end'],peakname,int(10*peak["qscore"]),             # <<<<<<<<<<<<<<
  *                             peak['fc'],peak['pscore'],peak['qscore'] ) )
  *         return
@@ -22538,11 +22538,11 @@ static PyObject *__pyx_pf_5MACS2_2IO_6PeakIO_11BroadPeakIO_16write_to_broadPeak(
       /* "MACS2/IO/PeakIO.pyx":1140
  *                 peak = these_peaks[0]
  *                 peakname = "%s%d" % (peakprefix.decode(), n_peak)
- *                 fhd.write( "%s\t%d\t%d\t%s\t%d\t.\t%.5g\t%.5g\t%.5g\n" %             # <<<<<<<<<<<<<<
+ *                 fhd.write( "%s\t%d\t%d\t%s\t%d\t.\t%.6g\t%.6g\t%.6g\n" %             # <<<<<<<<<<<<<<
  *                            (chrom.decode(),peak['start'],peak['end'],peakname,int(10*peak["qscore"]),
  *                             peak['fc'],peak['pscore'],peak['qscore'] ) )
  */
-      __pyx_t_21 = PyUnicode_Format(__pyx_kp_u_s_d_d_s_d_5g_5g_5g, __pyx_t_22); if (unlikely(!__pyx_t_21)) __PYX_ERR(0, 1140, __pyx_L1_error)
+      __pyx_t_21 = PyUnicode_Format(__pyx_kp_u_s_d_d_s_d_6g_6g_6g, __pyx_t_22); if (unlikely(!__pyx_t_21)) __PYX_ERR(0, 1140, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_21);
       __Pyx_DECREF(__pyx_t_22); __pyx_t_22 = 0;
       __pyx_t_22 = NULL;
@@ -23124,7 +23124,7 @@ static PyObject *__pyx_pf_5MACS2_2IO_6PeakIO_11BroadPeakIO_18write_to_xls(struct
  *                 peak = these_peaks[0]
  *                 peakname = "%s%d" % (peakprefix.decode(), n_peak)             # <<<<<<<<<<<<<<
  *                 write("%s\t%d\t%d\t%d" % (chrom.decode(),peak['start']+1,peak['end'],peak['length']))
- *                 write("\t%.5g" % (round(peak['pileup'],2))) # pileup height at summit
+ *                 write("\t%.6g" % (round(peak['pileup'],2))) # pileup height at summit
  */
       if (unlikely(__pyx_v_peakprefix == Py_None)) {
         PyErr_Format(PyExc_AttributeError, "'NoneType' object has no attribute '%.30s'", "decode");
@@ -23145,8 +23145,8 @@ static PyObject *__pyx_pf_5MACS2_2IO_6PeakIO_11BroadPeakIO_18write_to_xls(struct
  *                 peak = these_peaks[0]
  *                 peakname = "%s%d" % (peakprefix.decode(), n_peak)
  *                 write("%s\t%d\t%d\t%d" % (chrom.decode(),peak['start']+1,peak['end'],peak['length']))             # <<<<<<<<<<<<<<
- *                 write("\t%.5g" % (round(peak['pileup'],2))) # pileup height at summit
- *                 write("\t%.5g" % (peak['pscore'])) # -log10pvalue at summit
+ *                 write("\t%.6g" % (round(peak['pileup'],2))) # pileup height at summit
+ *                 write("\t%.6g" % (peak['pscore'])) # -log10pvalue at summit
  */
       __pyx_t_3 = PyTuple_New(7); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 1170, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_3);
@@ -23247,9 +23247,9 @@ static PyObject *__pyx_pf_5MACS2_2IO_6PeakIO_11BroadPeakIO_18write_to_xls(struct
       /* "MACS2/IO/PeakIO.pyx":1171
  *                 peakname = "%s%d" % (peakprefix.decode(), n_peak)
  *                 write("%s\t%d\t%d\t%d" % (chrom.decode(),peak['start']+1,peak['end'],peak['length']))
- *                 write("\t%.5g" % (round(peak['pileup'],2))) # pileup height at summit             # <<<<<<<<<<<<<<
- *                 write("\t%.5g" % (peak['pscore'])) # -log10pvalue at summit
- *                 write("\t%.5g" % (peak['fc'])) # fold change at summit
+ *                 write("\t%.6g" % (round(peak['pileup'],2))) # pileup height at summit             # <<<<<<<<<<<<<<
+ *                 write("\t%.6g" % (peak['pscore'])) # -log10pvalue at summit
+ *                 write("\t%.6g" % (peak['fc'])) # fold change at summit
  */
       __pyx_t_3 = __Pyx_PyObject_Dict_GetItem(__pyx_v_peak, __pyx_n_u_pileup); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 1171, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_3);
@@ -23264,7 +23264,7 @@ static PyObject *__pyx_pf_5MACS2_2IO_6PeakIO_11BroadPeakIO_18write_to_xls(struct
       __pyx_t_3 = __Pyx_PyObject_Call(__pyx_builtin_round, __pyx_t_11, NULL); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 1171, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_3);
       __Pyx_DECREF(__pyx_t_11); __pyx_t_11 = 0;
-      __pyx_t_11 = __Pyx_PyUnicode_FormatSafe(__pyx_kp_u_5g, __pyx_t_3); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 1171, __pyx_L1_error)
+      __pyx_t_11 = __Pyx_PyUnicode_FormatSafe(__pyx_kp_u_6g, __pyx_t_3); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 1171, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_11);
       __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
       __Pyx_INCREF(__pyx_v_write);
@@ -23288,14 +23288,14 @@ static PyObject *__pyx_pf_5MACS2_2IO_6PeakIO_11BroadPeakIO_18write_to_xls(struct
 
       /* "MACS2/IO/PeakIO.pyx":1172
  *                 write("%s\t%d\t%d\t%d" % (chrom.decode(),peak['start']+1,peak['end'],peak['length']))
- *                 write("\t%.5g" % (round(peak['pileup'],2))) # pileup height at summit
- *                 write("\t%.5g" % (peak['pscore'])) # -log10pvalue at summit             # <<<<<<<<<<<<<<
- *                 write("\t%.5g" % (peak['fc'])) # fold change at summit
- *                 write("\t%.5g" % (peak['qscore'])) # -log10qvalue at summit
+ *                 write("\t%.6g" % (round(peak['pileup'],2))) # pileup height at summit
+ *                 write("\t%.6g" % (peak['pscore'])) # -log10pvalue at summit             # <<<<<<<<<<<<<<
+ *                 write("\t%.6g" % (peak['fc'])) # fold change at summit
+ *                 write("\t%.6g" % (peak['qscore'])) # -log10qvalue at summit
  */
       __pyx_t_3 = __Pyx_PyObject_Dict_GetItem(__pyx_v_peak, __pyx_n_u_pscore); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 1172, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_3);
-      __pyx_t_11 = __Pyx_PyUnicode_FormatSafe(__pyx_kp_u_5g, __pyx_t_3); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 1172, __pyx_L1_error)
+      __pyx_t_11 = __Pyx_PyUnicode_FormatSafe(__pyx_kp_u_6g, __pyx_t_3); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 1172, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_11);
       __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
       __Pyx_INCREF(__pyx_v_write);
@@ -23318,15 +23318,15 @@ static PyObject *__pyx_pf_5MACS2_2IO_6PeakIO_11BroadPeakIO_18write_to_xls(struct
       __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
 
       /* "MACS2/IO/PeakIO.pyx":1173
- *                 write("\t%.5g" % (round(peak['pileup'],2))) # pileup height at summit
- *                 write("\t%.5g" % (peak['pscore'])) # -log10pvalue at summit
- *                 write("\t%.5g" % (peak['fc'])) # fold change at summit             # <<<<<<<<<<<<<<
- *                 write("\t%.5g" % (peak['qscore'])) # -log10qvalue at summit
+ *                 write("\t%.6g" % (round(peak['pileup'],2))) # pileup height at summit
+ *                 write("\t%.6g" % (peak['pscore'])) # -log10pvalue at summit
+ *                 write("\t%.6g" % (peak['fc'])) # fold change at summit             # <<<<<<<<<<<<<<
+ *                 write("\t%.6g" % (peak['qscore'])) # -log10qvalue at summit
  *                 write("\t%s" % peakname)
  */
       __pyx_t_3 = __Pyx_PyObject_Dict_GetItem(__pyx_v_peak, __pyx_n_u_fc); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 1173, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_3);
-      __pyx_t_11 = __Pyx_PyUnicode_FormatSafe(__pyx_kp_u_5g, __pyx_t_3); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 1173, __pyx_L1_error)
+      __pyx_t_11 = __Pyx_PyUnicode_FormatSafe(__pyx_kp_u_6g, __pyx_t_3); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 1173, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_11);
       __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
       __Pyx_INCREF(__pyx_v_write);
@@ -23349,15 +23349,15 @@ static PyObject *__pyx_pf_5MACS2_2IO_6PeakIO_11BroadPeakIO_18write_to_xls(struct
       __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
 
       /* "MACS2/IO/PeakIO.pyx":1174
- *                 write("\t%.5g" % (peak['pscore'])) # -log10pvalue at summit
- *                 write("\t%.5g" % (peak['fc'])) # fold change at summit
- *                 write("\t%.5g" % (peak['qscore'])) # -log10qvalue at summit             # <<<<<<<<<<<<<<
+ *                 write("\t%.6g" % (peak['pscore'])) # -log10pvalue at summit
+ *                 write("\t%.6g" % (peak['fc'])) # fold change at summit
+ *                 write("\t%.6g" % (peak['qscore'])) # -log10qvalue at summit             # <<<<<<<<<<<<<<
  *                 write("\t%s" % peakname)
  *                 write("\n")
  */
       __pyx_t_3 = __Pyx_PyObject_Dict_GetItem(__pyx_v_peak, __pyx_n_u_qscore); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 1174, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_3);
-      __pyx_t_11 = __Pyx_PyUnicode_FormatSafe(__pyx_kp_u_5g, __pyx_t_3); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 1174, __pyx_L1_error)
+      __pyx_t_11 = __Pyx_PyUnicode_FormatSafe(__pyx_kp_u_6g, __pyx_t_3); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 1174, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_11);
       __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
       __Pyx_INCREF(__pyx_v_write);
@@ -23380,8 +23380,8 @@ static PyObject *__pyx_pf_5MACS2_2IO_6PeakIO_11BroadPeakIO_18write_to_xls(struct
       __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
 
       /* "MACS2/IO/PeakIO.pyx":1175
- *                 write("\t%.5g" % (peak['fc'])) # fold change at summit
- *                 write("\t%.5g" % (peak['qscore'])) # -log10qvalue at summit
+ *                 write("\t%.6g" % (peak['fc'])) # fold change at summit
+ *                 write("\t%.6g" % (peak['qscore'])) # -log10qvalue at summit
  *                 write("\t%s" % peakname)             # <<<<<<<<<<<<<<
  *                 write("\n")
  *         return
@@ -23408,7 +23408,7 @@ static PyObject *__pyx_pf_5MACS2_2IO_6PeakIO_11BroadPeakIO_18write_to_xls(struct
       __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
 
       /* "MACS2/IO/PeakIO.pyx":1176
- *                 write("\t%.5g" % (peak['qscore'])) # -log10qvalue at summit
+ *                 write("\t%.6g" % (peak['qscore'])) # -log10qvalue at summit
  *                 write("\t%s" % peakname)
  *                 write("\n")             # <<<<<<<<<<<<<<
  *         return
@@ -26858,7 +26858,7 @@ static struct PyModuleDef __pyx_moduledef = {
 
 static __Pyx_StringTabEntry __pyx_string_tab[] = {
   {&__pyx_kp_u_0, __pyx_k_0, sizeof(__pyx_k_0), 0, 1, 0, 0},
-  {&__pyx_kp_u_5g, __pyx_k_5g, sizeof(__pyx_k_5g), 0, 1, 0, 0},
+  {&__pyx_kp_u_6g, __pyx_k_6g, sizeof(__pyx_k_6g), 0, 1, 0, 0},
   {&__pyx_n_s_BroadPeakContent, __pyx_k_BroadPeakContent, sizeof(__pyx_k_BroadPeakContent), 0, 0, 1, 1},
   {&__pyx_n_s_BroadPeakIO, __pyx_k_BroadPeakIO, sizeof(__pyx_k_BroadPeakIO), 0, 0, 1, 1},
   {&__pyx_kp_u_D, __pyx_k_D, sizeof(__pyx_k_D), 0, 1, 0, 0},
@@ -26992,11 +26992,11 @@ static __Pyx_StringTabEntry __pyx_string_tab[] = {
   {&__pyx_n_s_rstrip, __pyx_k_rstrip, sizeof(__pyx_k_rstrip), 0, 0, 1, 1},
   {&__pyx_kp_u_s, __pyx_k_s, sizeof(__pyx_k_s), 0, 1, 0, 0},
   {&__pyx_kp_b_s_2, __pyx_k_s_2, sizeof(__pyx_k_s_2), 0, 0, 0, 0},
-  {&__pyx_kp_u_s_d_d_s_d_5g, __pyx_k_s_d_d_s_d_5g, sizeof(__pyx_k_s_d_d_s_d_5g), 0, 1, 0, 0},
-  {&__pyx_kp_u_s_d_d_s_d_5g_5g_5g, __pyx_k_s_d_d_s_d_5g_5g_5g, sizeof(__pyx_k_s_d_d_s_d_5g_5g_5g), 0, 1, 0, 0},
-  {&__pyx_kp_u_s_d_d_s_d_5g_5g_5g_d, __pyx_k_s_d_d_s_d_5g_5g_5g_d, sizeof(__pyx_k_s_d_d_s_d_5g_5g_5g_d), 0, 1, 0, 0},
-  {&__pyx_kp_u_s_d_d_s_d_d_s_s_0_d_s_s_5g_5g_5, __pyx_k_s_d_d_s_d_d_s_s_0_d_s_s_5g_5g_5, sizeof(__pyx_k_s_d_d_s_d_d_s_s_0_d_s_s_5g_5g_5), 0, 1, 0, 0},
-  {&__pyx_kp_u_s_d_d_s_d_s_5g, __pyx_k_s_d_d_s_d_s_5g, sizeof(__pyx_k_s_d_d_s_d_s_5g), 0, 1, 0, 0},
+  {&__pyx_kp_u_s_d_d_s_d_6g, __pyx_k_s_d_d_s_d_6g, sizeof(__pyx_k_s_d_d_s_d_6g), 0, 1, 0, 0},
+  {&__pyx_kp_u_s_d_d_s_d_6g_6g_6g, __pyx_k_s_d_d_s_d_6g_6g_6g, sizeof(__pyx_k_s_d_d_s_d_6g_6g_6g), 0, 1, 0, 0},
+  {&__pyx_kp_u_s_d_d_s_d_6g_6g_6g_d, __pyx_k_s_d_d_s_d_6g_6g_6g_d, sizeof(__pyx_k_s_d_d_s_d_6g_6g_6g_d), 0, 1, 0, 0},
+  {&__pyx_kp_u_s_d_d_s_d_d_s_s_0_d_s_s_6g_6g_6, __pyx_k_s_d_d_s_d_d_s_s_0_d_s_s_6g_6g_6, sizeof(__pyx_k_s_d_d_s_d_d_s_s_0_d_s_s_6g_6g_6), 0, 1, 0, 0},
+  {&__pyx_kp_u_s_d_d_s_d_s_6g, __pyx_k_s_d_d_s_d_s_6g, sizeof(__pyx_k_s_d_d_s_d_s_6g), 0, 1, 0, 0},
   {&__pyx_kp_b_s_peak, __pyx_k_s_peak, sizeof(__pyx_k_s_peak), 0, 0, 0, 0},
   {&__pyx_n_s_score, __pyx_k_score, sizeof(__pyx_k_score), 0, 0, 1, 1},
   {&__pyx_n_u_score, __pyx_k_score, sizeof(__pyx_k_score), 0, 1, 0, 1},

@@ -26,6 +26,7 @@ import os
 import numpy as np
 cimport numpy as np
 ctypedef np.float32_t float32_t
+ctypedef np.float64_t float64_t
 
 # cython
 from cpython cimport bool
@@ -206,7 +207,7 @@ cdef wtd_find_summit(chrom, np.ndarray plus, np.ndarray minus, int32_t search_st
 
     return (wtd_other_max_pos, wtd_other_max_val > cutoff)
 
-cdef float32_t median_from_value_length ( np.ndarray value, list length ):
+cdef float median_from_value_length ( np.ndarray[np.float32_t, ndim=1] value, list length ):
     """
     """
     cdef:
@@ -222,33 +223,27 @@ cdef float32_t median_from_value_length ( np.ndarray value, list length ):
         if c > mid_l:
             return tmp_v
 
-cdef float32_t mean_from_value_length ( np.ndarray[np.float32_t, ndim=1] value, list length ):
+cdef float mean_from_value_length ( np.ndarray[np.float32_t, ndim=1] value, list length ):
     """take list of values and list of corresponding lengths, calculate the mean.
     An important function for bedGraph type of data.
     """
     cdef:
-        int32_t i
-        int32_t tmp_l, l
-        float32_t tmp_v, sum_v, tmp_sum, ret
+        int i
+        int tmp_l, l
+        float64_t tmp_v, sum_v, tmp_sum   #try to solve precision issue
+        float ret
 
     sum_v = 0
     l = 0
 
     for i in range( len(length) ):
         tmp_l = length[ i ]
-        tmp_v = value[ i ]
+        tmp_v = <float64_t>value[ i ]
         tmp_sum = tmp_v * tmp_l
         sum_v = tmp_sum + sum_v
         l += tmp_l 
 
-    ret = sum_v/l
-        
-    if abs(ret - 13.48574) <= 1e-4:
-        print (value)
-        print (length)
-        print ("%7e" % sum_v)
-        print (l)
-        print ("%7e" % ret)
+    ret = float(sum_v/l)
         
     return ret
 
