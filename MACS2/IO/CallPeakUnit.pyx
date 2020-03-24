@@ -1148,7 +1148,7 @@ cdef class CallerFromAlignments:
                        peak_score  = summit_q_score, # score at summit
                        pileup      = summit_treat, # pileup
                        pscore      = summit_p_score, # pvalue
-                       fold_change = float ( summit_treat + self.pseudocount ) / ( summit_ctrl + self.pseudocount ), # fold change
+                       fold_change = float( ( summit_treat + self.pseudocount ) / ( summit_ctrl + self.pseudocount ) ), # fold change
                        qscore      = summit_q_score # qvalue
                        )
             # start a new peak

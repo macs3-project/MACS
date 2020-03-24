@@ -16375,7 +16375,7 @@ static PyBoolObject *__pyx_f_5MACS2_2IO_12CallPeakUnit_20CallerFromAlignments___
  *                        peak_score  = summit_q_score, # score at summit
  *                        pileup      = summit_treat, # pileup             # <<<<<<<<<<<<<<
  *                        pscore      = summit_p_score, # pvalue
- *                        fold_change = float ( summit_treat + self.pseudocount ) / ( summit_ctrl + self.pseudocount ), # fold change
+ *                        fold_change = float( ( summit_treat + self.pseudocount ) / ( summit_ctrl + self.pseudocount ) ), # fold change
  */
     __Pyx_TraceLine(1149,0,__PYX_ERR(0, 1149, __pyx_L1_error))
     __pyx_t_8 = PyFloat_FromDouble(__pyx_v_summit_treat); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 1149, __pyx_L1_error)
@@ -16387,7 +16387,7 @@ static PyBoolObject *__pyx_f_5MACS2_2IO_12CallPeakUnit_20CallerFromAlignments___
  *                        peak_score  = summit_q_score, # score at summit
  *                        pileup      = summit_treat, # pileup
  *                        pscore      = summit_p_score, # pvalue             # <<<<<<<<<<<<<<
- *                        fold_change = float ( summit_treat + self.pseudocount ) / ( summit_ctrl + self.pseudocount ), # fold change
+ *                        fold_change = float( ( summit_treat + self.pseudocount ) / ( summit_ctrl + self.pseudocount ) ), # fold change
  *                        qscore      = summit_q_score # qvalue
  */
     __Pyx_TraceLine(1150,0,__PYX_ERR(0, 1150, __pyx_L1_error))
@@ -16399,24 +16399,25 @@ static PyBoolObject *__pyx_f_5MACS2_2IO_12CallPeakUnit_20CallerFromAlignments___
     /* "MACS2/IO/CallPeakUnit.pyx":1151
  *                        pileup      = summit_treat, # pileup
  *                        pscore      = summit_p_score, # pvalue
- *                        fold_change = float ( summit_treat + self.pseudocount ) / ( summit_ctrl + self.pseudocount ), # fold change             # <<<<<<<<<<<<<<
+ *                        fold_change = float( ( summit_treat + self.pseudocount ) / ( summit_ctrl + self.pseudocount ) ), # fold change             # <<<<<<<<<<<<<<
  *                        qscore      = summit_q_score # qvalue
  *                        )
  */
     __Pyx_TraceLine(1151,0,__PYX_ERR(0, 1151, __pyx_L1_error))
-    __pyx_t_16 = (__pyx_v_summit_ctrl + __pyx_v_self->pseudocount);
-    if (unlikely(__pyx_t_16 == 0)) {
+    __pyx_t_16 = (__pyx_v_summit_treat + __pyx_v_self->pseudocount);
+    __pyx_t_15 = (__pyx_v_summit_ctrl + __pyx_v_self->pseudocount);
+    if (unlikely(__pyx_t_15 == 0)) {
       PyErr_SetString(PyExc_ZeroDivisionError, "float division");
       __PYX_ERR(0, 1151, __pyx_L1_error)
     }
-    __pyx_t_8 = PyFloat_FromDouble((((double)(__pyx_v_summit_treat + __pyx_v_self->pseudocount)) / ((double)__pyx_t_16))); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 1151, __pyx_L1_error)
+    __pyx_t_8 = PyFloat_FromDouble(((double)(__pyx_t_16 / __pyx_t_15))); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 1151, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_8);
     if (PyDict_SetItem(__pyx_t_10, __pyx_n_s_fold_change, __pyx_t_8) < 0) __PYX_ERR(0, 1147, __pyx_L1_error)
     __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
 
     /* "MACS2/IO/CallPeakUnit.pyx":1152
  *                        pscore      = summit_p_score, # pvalue
- *                        fold_change = float ( summit_treat + self.pseudocount ) / ( summit_ctrl + self.pseudocount ), # fold change
+ *                        fold_change = float( ( summit_treat + self.pseudocount ) / ( summit_ctrl + self.pseudocount ) ), # fold change
  *                        qscore      = summit_q_score # qvalue             # <<<<<<<<<<<<<<
  *                        )
  *             # start a new peak
