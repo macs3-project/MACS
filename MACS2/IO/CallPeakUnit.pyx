@@ -885,8 +885,8 @@ cdef class CallerFromAlignments:
         #optimal_cutoff, optimal_length = find_optimal_cutoff( x, y )
         #logging.info( "#3 -10log10pvalue cutoff %.2f will call approximately %.0f bps regions as significant regions" % ( optimal_cutoff, optimal_length ) )
         #print (list(pqtable.keys()))
-        #print (list(self.pvalue_length.keys()))
-        #print (list(self.pvalue_npeaks.keys()))        
+        print (list(self.pvalue_length.keys()))
+        print (list(self.pvalue_npeaks.keys()))        
         return
 
     cpdef call_peaks ( self, list scoring_function_symbols, list score_cutoff_s, int min_length = 200, 

@@ -2527,6 +2527,7 @@ static PyObject *__pyx_builtin_sum;
 static PyObject *__pyx_builtin_zip;
 static PyObject *__pyx_builtin_open;
 static PyObject *__pyx_builtin_sorted;
+static PyObject *__pyx_builtin_print;
 static PyObject *__pyx_builtin_round;
 static PyObject *__pyx_builtin_StopIteration;
 static PyObject *__pyx_builtin_TypeError;
@@ -2589,6 +2590,7 @@ static const char __pyx_k_log10[] = "log10";
 static const char __pyx_k_lstsq[] = "lstsq";
 static const char __pyx_k_numpy[] = "numpy";
 static const char __pyx_k_peaks[] = "peaks";
+static const char __pyx_k_print[] = "print";
 static const char __pyx_k_range[] = "range";
 static const char __pyx_k_rcond[] = "rcond";
 static const char __pyx_k_right[] = "right";
@@ -2906,6 +2908,7 @@ static PyObject *__pyx_n_s_pileup_a_chromosome;
 static PyObject *__pyx_n_s_pileup_a_chromosome_c;
 static PyObject *__pyx_n_s_poisson_cdf;
 static PyObject *__pyx_n_s_pop;
+static PyObject *__pyx_n_s_print;
 static PyObject *__pyx_n_s_protocol;
 static PyObject *__pyx_n_s_pscore;
 static PyObject *__pyx_n_u_pscore;
@@ -13212,9 +13215,53 @@ static void __pyx_f_5MACS2_2IO_12CallPeakUnit_20CallerFromAlignments___pre_compu
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
   __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
 
+  /* "MACS2/IO/CallPeakUnit.pyx":888
+ *         #logging.info( "#3 -10log10pvalue cutoff %.2f will call approximately %.0f bps regions as significant regions" % ( optimal_cutoff, optimal_length ) )
+ *         #print (list(pqtable.keys()))
+ *         print (list(self.pvalue_length.keys()))             # <<<<<<<<<<<<<<
+ *         print (list(self.pvalue_npeaks.keys()))
+ *         return
+ */
+  __Pyx_TraceLine(888,0,__PYX_ERR(0, 888, __pyx_L1_error))
+  if (unlikely(__pyx_v_self->pvalue_length == Py_None)) {
+    PyErr_Format(PyExc_AttributeError, "'NoneType' object has no attribute '%.30s'", "keys");
+    __PYX_ERR(0, 888, __pyx_L1_error)
+  }
+  __pyx_t_4 = __Pyx_PyDict_Keys(__pyx_v_self->pvalue_length); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 888, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_4);
+  __pyx_t_3 = PySequence_List(__pyx_t_4); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 888, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_3);
+  __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
+  __pyx_t_4 = __Pyx_PyObject_CallOneArg(__pyx_builtin_print, __pyx_t_3); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 888, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_4);
+  __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
+  __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
+
+  /* "MACS2/IO/CallPeakUnit.pyx":889
+ *         #print (list(pqtable.keys()))
+ *         print (list(self.pvalue_length.keys()))
+ *         print (list(self.pvalue_npeaks.keys()))             # <<<<<<<<<<<<<<
+ *         return
+ * 
+ */
+  __Pyx_TraceLine(889,0,__PYX_ERR(0, 889, __pyx_L1_error))
+  if (unlikely(__pyx_v_self->pvalue_npeaks == Py_None)) {
+    PyErr_Format(PyExc_AttributeError, "'NoneType' object has no attribute '%.30s'", "keys");
+    __PYX_ERR(0, 889, __pyx_L1_error)
+  }
+  __pyx_t_4 = __Pyx_PyDict_Keys(__pyx_v_self->pvalue_npeaks); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 889, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_4);
+  __pyx_t_3 = PySequence_List(__pyx_t_4); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 889, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_3);
+  __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
+  __pyx_t_4 = __Pyx_PyObject_CallOneArg(__pyx_builtin_print, __pyx_t_3); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 889, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_4);
+  __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
+  __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
+
   /* "MACS2/IO/CallPeakUnit.pyx":890
- *         #print (list(self.pvalue_length.keys()))
- *         #print (list(self.pvalue_npeaks.keys()))
+ *         print (list(self.pvalue_length.keys()))
+ *         print (list(self.pvalue_npeaks.keys()))
  *         return             # <<<<<<<<<<<<<<
  * 
  *     cpdef call_peaks ( self, list scoring_function_symbols, list score_cutoff_s, int min_length = 200,
@@ -29403,6 +29450,7 @@ static __Pyx_StringTabEntry __pyx_string_tab[] = {
   {&__pyx_n_s_pileup_a_chromosome_c, __pyx_k_pileup_a_chromosome_c, sizeof(__pyx_k_pileup_a_chromosome_c), 0, 0, 1, 1},
   {&__pyx_n_s_poisson_cdf, __pyx_k_poisson_cdf, sizeof(__pyx_k_poisson_cdf), 0, 0, 1, 1},
   {&__pyx_n_s_pop, __pyx_k_pop, sizeof(__pyx_k_pop), 0, 0, 1, 1},
+  {&__pyx_n_s_print, __pyx_k_print, sizeof(__pyx_k_print), 0, 0, 1, 1},
   {&__pyx_n_s_protocol, __pyx_k_protocol, sizeof(__pyx_k_protocol), 0, 0, 1, 1},
   {&__pyx_n_s_pscore, __pyx_k_pscore, sizeof(__pyx_k_pscore), 0, 0, 1, 1},
   {&__pyx_n_u_pscore, __pyx_k_pscore, sizeof(__pyx_k_pscore), 0, 1, 0, 1},
@@ -29477,6 +29525,7 @@ static CYTHON_SMALL_CODE int __Pyx_InitCachedBuiltins(void) {
   __pyx_builtin_zip = __Pyx_GetBuiltinName(__pyx_n_s_zip); if (!__pyx_builtin_zip) __PYX_ERR(0, 219, __pyx_L1_error)
   __pyx_builtin_open = __Pyx_GetBuiltinName(__pyx_n_s_open); if (!__pyx_builtin_open) __PYX_ERR(0, 487, __pyx_L1_error)
   __pyx_builtin_sorted = __Pyx_GetBuiltinName(__pyx_n_s_sorted); if (!__pyx_builtin_sorted) __PYX_ERR(0, 715, __pyx_L1_error)
+  __pyx_builtin_print = __Pyx_GetBuiltinName(__pyx_n_s_print); if (!__pyx_builtin_print) __PYX_ERR(0, 888, __pyx_L1_error)
   __pyx_builtin_round = __Pyx_GetBuiltinName(__pyx_n_s_round); if (!__pyx_builtin_round) __PYX_ERR(0, 765, __pyx_L1_error)
   __pyx_builtin_StopIteration = __Pyx_GetBuiltinName(__pyx_n_s_StopIteration); if (!__pyx_builtin_StopIteration) __PYX_ERR(0, 1551, __pyx_L1_error)
   __pyx_builtin_TypeError = __Pyx_GetBuiltinName(__pyx_n_s_TypeError); if (!__pyx_builtin_TypeError) __PYX_ERR(1, 2, __pyx_L1_error)
