@@ -51,14 +51,14 @@ pscore_dict = dict()
 logLR_dict = dict()
 
 #cdef float get_pscore ( int x, float l ):
-cdef float get_pscore ( tuple x ):
+cdef float32_t get_pscore ( tuple x ):
     cdef:
-        float val
+        float32_t val
     if x in pscore_dict:
         return pscore_dict [ x ]
     else:
         # calculate and cache
-        val = -1 * poisson_cdf ( x[0], x[1], False, True )
+        val = <float32_t> -1 * poisson_cdf ( x[0], x[1], False, True )
         pscore_dict[ x ] = val
         return val
 
@@ -760,6 +760,7 @@ cdef class CallerFromAlignments:
 
         logging.debug ( "Start to calculate pvalue stat..." )
 
+        # tmplist contains a list of log pvalue cutoffs from 0.3 to 10
         tmplist = sorted( list(np.arange(0.3, 10.0, 0.3)), reverse = True )
 
         pvalue_stat = dict()

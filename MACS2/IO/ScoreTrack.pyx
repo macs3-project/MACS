@@ -1701,30 +1701,18 @@ cdef class TwoConditionScores:
             int32_t l
             float64_t tmp_v, sum_v
             float r
-            list a, b, c
             int i
             
         l = 0
-        sum_v = 0
-        a = []
-        b = []
-        c = []
+        sum_v = 0                         #initialize sum_v as 0
         for i in range( len(peakcontent) ):
             tmp_s = peakcontent[i][0]
             tmp_e = peakcontent[i][1]
             tmp_v = <float64_t> peakcontent[i][2]
             sum_v += tmp_v * ( tmp_e - tmp_s )
             l +=  tmp_e - tmp_s
-            a.append( tmp_s )
-            b.append( tmp_e )
-            c.append( tmp_v )
 
         r = float( sum_v / l )
-        if a[0] == 17255459:
-            print (a)
-            print (b)
-            print (c)
-            print (r)
         return r
         
 
