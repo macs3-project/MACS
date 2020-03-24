@@ -43,8 +43,6 @@ macs2 bdgdiff --t1 ${TAG}_run_callpeak_narrow/run_callpeak_narrow0_treat_pileup.
 
 macs2 bdgdiff --t1 ${TAG}_run_callpeak_narrow/run_callpeak_narrow0_treat_pileup.bdg --c1 ${TAG}_run_callpeak_narrow/run_callpeak_narrow0_control_lambda.bdg --t2 ${TAG}_run_callpeak_narrow_revert/run_callpeak_narrow_revert_treat_pileup.bdg --c2 ${TAG}_run_callpeak_narrow_revert/run_callpeak_narrow_revert_control_lambda.bdg -o cond1.bed cond2.bed common.bed --outdir ${TAG}_run_bdgdiff &> ${TAG}_run_bdgdiff/run_bdgdiff_w_o_file.log
 
-tail ${TAG}_run_bdgdiff/run_bdgdiff_w_o_file.log
-
 echo "14. search for errors or warnings in log files"
 flag=0
 for i in `ls ${TAG}_run_*/*.log`;do

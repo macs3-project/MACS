@@ -2504,7 +2504,7 @@ static CYTHON_INLINE char *__pyx_f_5numpy__util_dtypestring(PyArray_Descr *, cha
 /* Module declarations from 'MACS2.IO.CallPeakUnit' */
 static PyTypeObject *__pyx_ptype_5MACS2_2IO_12CallPeakUnit_CallerFromAlignments = 0;
 static __pyx_t_5MACS2_2IO_12CallPeakUnit_float32_t __pyx_f_5MACS2_2IO_12CallPeakUnit_get_pscore(PyObject *); /*proto*/
-static float __pyx_f_5MACS2_2IO_12CallPeakUnit_get_logLR_asym(float, float); /*proto*/
+static __pyx_t_5MACS2_2IO_12CallPeakUnit_float32_t __pyx_f_5MACS2_2IO_12CallPeakUnit_get_logLR_asym(float, float); /*proto*/
 static void __pyx_f_5MACS2_2IO_12CallPeakUnit_clean_up_ndarray(PyArrayObject *); /*proto*/
 static CYTHON_INLINE PyArrayObject *__pyx_f_5MACS2_2IO_12CallPeakUnit_apply_multiple_cutoffs(PyObject *, PyObject *); /*proto*/
 static CYTHON_INLINE float __pyx_f_5MACS2_2IO_12CallPeakUnit_get_logFE(float, float); /*proto*/
@@ -3203,7 +3203,7 @@ static __pyx_t_5MACS2_2IO_12CallPeakUnit_float32_t __pyx_f_5MACS2_2IO_12CallPeak
  *         pscore_dict[ x ] = val
  *         return val             # <<<<<<<<<<<<<<
  * 
- * cdef float get_logLR_asym ( float x, float y ):
+ * cdef float32_t get_logLR_asym ( float x, float y ):
  */
     __Pyx_TraceLine(63,0,__PYX_ERR(0, 63, __pyx_L1_error))
     __pyx_r = __pyx_v_val;
@@ -3238,14 +3238,14 @@ static __pyx_t_5MACS2_2IO_12CallPeakUnit_float32_t __pyx_f_5MACS2_2IO_12CallPeak
 /* "MACS2/IO/CallPeakUnit.pyx":65
  *         return val
  * 
- * cdef float get_logLR_asym ( float x, float y ):             # <<<<<<<<<<<<<<
+ * cdef float32_t get_logLR_asym ( float x, float y ):             # <<<<<<<<<<<<<<
  *     cdef:
- *         float val
+ *         float32_t val
  */
 
-static float __pyx_f_5MACS2_2IO_12CallPeakUnit_get_logLR_asym(float __pyx_v_x, float __pyx_v_y) {
-  float __pyx_v_val;
-  float __pyx_r;
+static __pyx_t_5MACS2_2IO_12CallPeakUnit_float32_t __pyx_f_5MACS2_2IO_12CallPeakUnit_get_logLR_asym(float __pyx_v_x, float __pyx_v_y) {
+  __pyx_t_5MACS2_2IO_12CallPeakUnit_float32_t __pyx_v_val;
+  __pyx_t_5MACS2_2IO_12CallPeakUnit_float32_t __pyx_r;
   __Pyx_TraceDeclarations
   __Pyx_RefNannyDeclarations
   PyObject *__pyx_t_1 = NULL;
@@ -3254,13 +3254,13 @@ static float __pyx_f_5MACS2_2IO_12CallPeakUnit_get_logLR_asym(float __pyx_v_x, f
   int __pyx_t_4;
   int __pyx_t_5;
   PyObject *__pyx_t_6 = NULL;
-  float __pyx_t_7;
+  __pyx_t_5MACS2_2IO_12CallPeakUnit_float32_t __pyx_t_7;
   PyObject *__pyx_t_8 = NULL;
   __Pyx_RefNannySetupContext("get_logLR_asym", 0);
   __Pyx_TraceCall("get_logLR_asym", __pyx_f[0], 65, 0, __PYX_ERR(0, 65, __pyx_L1_error));
 
   /* "MACS2/IO/CallPeakUnit.pyx":69
- *         float val
+ *         float32_t val
  * 
  *     if ( x, y ) in logLR_dict:             # <<<<<<<<<<<<<<
  *         return logLR_dict[ ( x, y ) ]
@@ -3313,13 +3313,13 @@ static float __pyx_f_5MACS2_2IO_12CallPeakUnit_get_logLR_asym(float __pyx_v_x, f
     __Pyx_GOTREF(__pyx_t_1);
     __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
     __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
-    __pyx_t_7 = __pyx_PyFloat_AsFloat(__pyx_t_1); if (unlikely((__pyx_t_7 == (float)-1) && PyErr_Occurred())) __PYX_ERR(0, 70, __pyx_L1_error)
+    __pyx_t_7 = __pyx_PyFloat_AsFloat(__pyx_t_1); if (unlikely((__pyx_t_7 == ((npy_float32)-1)) && PyErr_Occurred())) __PYX_ERR(0, 70, __pyx_L1_error)
     __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
     __pyx_r = __pyx_t_7;
     goto __pyx_L0;
 
     /* "MACS2/IO/CallPeakUnit.pyx":69
- *         float val
+ *         float32_t val
  * 
  *     if ( x, y ) in logLR_dict:             # <<<<<<<<<<<<<<
  *         return logLR_dict[ ( x, y ) ]
@@ -3447,9 +3447,9 @@ static float __pyx_f_5MACS2_2IO_12CallPeakUnit_get_logLR_asym(float __pyx_v_x, f
   /* "MACS2/IO/CallPeakUnit.pyx":65
  *         return val
  * 
- * cdef float get_logLR_asym ( float x, float y ):             # <<<<<<<<<<<<<<
+ * cdef float32_t get_logLR_asym ( float x, float y ):             # <<<<<<<<<<<<<<
  *     cdef:
- *         float val
+ *         float32_t val
  */
 
   /* function exit code */
@@ -11359,11 +11359,12 @@ static void __pyx_f_5MACS2_2IO_12CallPeakUnit_20CallerFromAlignments___pre_compu
   CYTHON_UNUSED long __pyx_v_pre_l;
   long __pyx_v_l;
   long __pyx_v_i;
-  float __pyx_v_this_v;
-  CYTHON_UNUSED float __pyx_v_pre_v;
-  float __pyx_v_v;
   float __pyx_v_q;
   float __pyx_v_pre_q;
+  __pyx_t_5MACS2_2IO_12CallPeakUnit_float32_t __pyx_v_this_v;
+  CYTHON_UNUSED __pyx_t_5MACS2_2IO_12CallPeakUnit_float32_t __pyx_v_pre_v;
+  __pyx_t_5MACS2_2IO_12CallPeakUnit_float32_t __pyx_v_v;
+  __pyx_t_5MACS2_2IO_12CallPeakUnit_float32_t __pyx_v_cutoff;
   long __pyx_v_N;
   long __pyx_v_k;
   long __pyx_v_this_l;
@@ -11371,7 +11372,6 @@ static void __pyx_f_5MACS2_2IO_12CallPeakUnit_20CallerFromAlignments___pre_compu
   long __pyx_v_nhcal;
   CYTHON_UNUSED long __pyx_v_npcal;
   PyObject *__pyx_v_unique_values = 0;
-  float __pyx_v_cutoff;
   PyArrayObject *__pyx_v_above_cutoff = 0;
   PyArrayObject *__pyx_v_above_cutoff_endpos = 0;
   PyArrayObject *__pyx_v_above_cutoff_startpos = 0;
@@ -11402,7 +11402,7 @@ static void __pyx_f_5MACS2_2IO_12CallPeakUnit_20CallerFromAlignments___pre_compu
   Py_ssize_t __pyx_t_8;
   Py_ssize_t __pyx_t_9;
   long __pyx_t_10;
-  float __pyx_t_11;
+  __pyx_t_5MACS2_2IO_12CallPeakUnit_float32_t __pyx_t_11;
   int __pyx_t_12;
   long __pyx_t_13;
   long __pyx_t_14;
@@ -11414,10 +11414,11 @@ static void __pyx_f_5MACS2_2IO_12CallPeakUnit_20CallerFromAlignments___pre_compu
   int __pyx_t_20;
   float __pyx_t_21;
   float __pyx_t_22;
-  Py_UCS4 __pyx_t_23;
-  PyObject *__pyx_t_24 = NULL;
+  float __pyx_t_23;
+  Py_UCS4 __pyx_t_24;
   PyObject *__pyx_t_25 = NULL;
   PyObject *__pyx_t_26 = NULL;
+  PyObject *__pyx_t_27 = NULL;
   __Pyx_RefNannySetupContext("__pre_computes", 0);
   __Pyx_TraceCall("__pre_computes", __pyx_f[0], 731, 0, __PYX_ERR(0, 731, __pyx_L1_error));
   if (__pyx_optional_args) {
@@ -11429,24 +11430,24 @@ static void __pyx_f_5MACS2_2IO_12CallPeakUnit_20CallerFromAlignments___pre_compu
     }
   }
 
-  /* "MACS2/IO/CallPeakUnit.pyx":744
+  /* "MACS2/IO/CallPeakUnit.pyx":745
  *             long N, k, this_l
  *             float f
  *             long nhcal = 0             # <<<<<<<<<<<<<<
  *             long npcal = 0
  *             list unique_values
  */
-  __Pyx_TraceLine(744,0,__PYX_ERR(0, 744, __pyx_L1_error))
+  __Pyx_TraceLine(745,0,__PYX_ERR(0, 745, __pyx_L1_error))
   __pyx_v_nhcal = 0;
 
-  /* "MACS2/IO/CallPeakUnit.pyx":745
+  /* "MACS2/IO/CallPeakUnit.pyx":746
  *             float f
  *             long nhcal = 0
  *             long npcal = 0             # <<<<<<<<<<<<<<
  *             list unique_values
  *             double t0, t1, t
  */
-  __Pyx_TraceLine(745,0,__PYX_ERR(0, 745, __pyx_L1_error))
+  __Pyx_TraceLine(746,0,__PYX_ERR(0, 746, __pyx_L1_error))
   __pyx_v_npcal = 0;
 
   /* "MACS2/IO/CallPeakUnit.pyx":761
@@ -11668,7 +11669,7 @@ static void __pyx_f_5MACS2_2IO_12CallPeakUnit_20CallerFromAlignments___pre_compu
       }
       __pyx_t_2 = __Pyx_GetItemInt_List(__pyx_v_tmplist, __pyx_v_n, long, 1, __Pyx_PyInt_From_long, 1, 1, 1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 775, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_2);
-      __pyx_t_11 = __pyx_PyFloat_AsFloat(__pyx_t_2); if (unlikely((__pyx_t_11 == (float)-1) && PyErr_Occurred())) __PYX_ERR(0, 775, __pyx_L1_error)
+      __pyx_t_11 = __pyx_PyFloat_AsFloat(__pyx_t_2); if (unlikely((__pyx_t_11 == ((npy_float32)-1)) && PyErr_Occurred())) __PYX_ERR(0, 775, __pyx_L1_error)
       __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
       __pyx_v_cutoff = __pyx_t_11;
 
@@ -12448,7 +12449,7 @@ static void __pyx_f_5MACS2_2IO_12CallPeakUnit_20CallerFromAlignments___pre_compu
     __pyx_t_7 = PySequence_ITEM(__pyx_t_1, __pyx_t_4); __pyx_t_4++; if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 841, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_7);
     #endif
-    __pyx_t_11 = __pyx_PyFloat_AsFloat(__pyx_t_7); if (unlikely((__pyx_t_11 == (float)-1) && PyErr_Occurred())) __PYX_ERR(0, 841, __pyx_L1_error)
+    __pyx_t_11 = __pyx_PyFloat_AsFloat(__pyx_t_7); if (unlikely((__pyx_t_11 == ((npy_float32)-1)) && PyErr_Occurred())) __PYX_ERR(0, 841, __pyx_L1_error)
     __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
     __pyx_v_cutoff = __pyx_t_11;
 
@@ -12629,7 +12630,7 @@ static void __pyx_f_5MACS2_2IO_12CallPeakUnit_20CallerFromAlignments___pre_compu
     }
     __pyx_t_2 = __Pyx_GetItemInt_List(__pyx_v_unique_values, __pyx_v_i, long, 1, __Pyx_PyInt_From_long, 1, 1, 1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 856, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
-    __pyx_t_11 = __pyx_PyFloat_AsFloat(__pyx_t_2); if (unlikely((__pyx_t_11 == (float)-1) && PyErr_Occurred())) __PYX_ERR(0, 856, __pyx_L1_error)
+    __pyx_t_11 = __pyx_PyFloat_AsFloat(__pyx_t_2); if (unlikely((__pyx_t_11 == ((npy_float32)-1)) && PyErr_Occurred())) __PYX_ERR(0, 856, __pyx_L1_error)
     __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
     __pyx_v_v = __pyx_t_11;
 
@@ -12668,21 +12669,21 @@ static void __pyx_f_5MACS2_2IO_12CallPeakUnit_20CallerFromAlignments___pre_compu
  *             pre_v = v
  */
     __Pyx_TraceLine(859,0,__PYX_ERR(0, 859, __pyx_L1_error))
-    __pyx_t_11 = __pyx_v_q;
-    __pyx_t_21 = __pyx_v_pre_q;
-    if (((__pyx_t_11 < __pyx_t_21) != 0)) {
-      __pyx_t_22 = __pyx_t_11;
+    __pyx_t_21 = __pyx_v_q;
+    __pyx_t_22 = __pyx_v_pre_q;
+    if (((__pyx_t_21 < __pyx_t_22) != 0)) {
+      __pyx_t_23 = __pyx_t_21;
     } else {
-      __pyx_t_22 = __pyx_t_21;
+      __pyx_t_23 = __pyx_t_22;
     }
-    __pyx_t_11 = __pyx_t_22;
+    __pyx_t_21 = __pyx_t_23;
     __pyx_t_10 = 0;
-    if (((__pyx_t_11 > __pyx_t_10) != 0)) {
-      __pyx_t_22 = __pyx_t_11;
+    if (((__pyx_t_21 > __pyx_t_10) != 0)) {
+      __pyx_t_23 = __pyx_t_21;
     } else {
-      __pyx_t_22 = __pyx_t_10;
+      __pyx_t_23 = __pyx_t_10;
     }
-    __pyx_v_q = __pyx_t_22;
+    __pyx_v_q = __pyx_t_23;
 
     /* "MACS2/IO/CallPeakUnit.pyx":860
  *             q = v + (log10(k) + f)
@@ -12877,9 +12878,9 @@ static void __pyx_f_5MACS2_2IO_12CallPeakUnit_20CallerFromAlignments___pre_compu
     __pyx_t_1 = PySequence_ITEM(__pyx_t_7, __pyx_t_4); __pyx_t_4++; if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 873, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
     #endif
-    __pyx_t_22 = __pyx_PyFloat_AsFloat(__pyx_t_1); if (unlikely((__pyx_t_22 == (float)-1) && PyErr_Occurred())) __PYX_ERR(0, 873, __pyx_L1_error)
+    __pyx_t_11 = __pyx_PyFloat_AsFloat(__pyx_t_1); if (unlikely((__pyx_t_11 == ((npy_float32)-1)) && PyErr_Occurred())) __PYX_ERR(0, 873, __pyx_L1_error)
     __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-    __pyx_v_cutoff = __pyx_t_22;
+    __pyx_v_cutoff = __pyx_t_11;
 
     /* "MACS2/IO/CallPeakUnit.pyx":874
  *         y = []
@@ -12894,17 +12895,17 @@ static void __pyx_f_5MACS2_2IO_12CallPeakUnit_20CallerFromAlignments___pre_compu
     __pyx_t_2 = PyTuple_New(10); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 874, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
     __pyx_t_5 = 0;
-    __pyx_t_23 = 127;
-    __pyx_t_24 = PyFloat_FromDouble(__pyx_v_cutoff); if (unlikely(!__pyx_t_24)) __PYX_ERR(0, 874, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_24);
-    __pyx_t_25 = __Pyx_PyObject_Format(__pyx_t_24, __pyx_kp_u_2f); if (unlikely(!__pyx_t_25)) __PYX_ERR(0, 874, __pyx_L1_error)
+    __pyx_t_24 = 127;
+    __pyx_t_25 = PyFloat_FromDouble(__pyx_v_cutoff); if (unlikely(!__pyx_t_25)) __PYX_ERR(0, 874, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_25);
-    __Pyx_DECREF(__pyx_t_24); __pyx_t_24 = 0;
-    __pyx_t_23 = (__Pyx_PyUnicode_MAX_CHAR_VALUE(__pyx_t_25) > __pyx_t_23) ? __Pyx_PyUnicode_MAX_CHAR_VALUE(__pyx_t_25) : __pyx_t_23;
-    __pyx_t_5 += __Pyx_PyUnicode_GET_LENGTH(__pyx_t_25);
-    __Pyx_GIVEREF(__pyx_t_25);
-    PyTuple_SET_ITEM(__pyx_t_2, 0, __pyx_t_25);
-    __pyx_t_25 = 0;
+    __pyx_t_26 = __Pyx_PyObject_Format(__pyx_t_25, __pyx_kp_u_2f); if (unlikely(!__pyx_t_26)) __PYX_ERR(0, 874, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_26);
+    __Pyx_DECREF(__pyx_t_25); __pyx_t_25 = 0;
+    __pyx_t_24 = (__Pyx_PyUnicode_MAX_CHAR_VALUE(__pyx_t_26) > __pyx_t_24) ? __Pyx_PyUnicode_MAX_CHAR_VALUE(__pyx_t_26) : __pyx_t_24;
+    __pyx_t_5 += __Pyx_PyUnicode_GET_LENGTH(__pyx_t_26);
+    __Pyx_GIVEREF(__pyx_t_26);
+    PyTuple_SET_ITEM(__pyx_t_2, 0, __pyx_t_26);
+    __pyx_t_26 = 0;
     __Pyx_INCREF(__pyx_kp_u__9);
     __pyx_t_5 += 1;
     __Pyx_GIVEREF(__pyx_kp_u__9);
@@ -12913,19 +12914,19 @@ static void __pyx_f_5MACS2_2IO_12CallPeakUnit_20CallerFromAlignments___pre_compu
       PyErr_SetString(PyExc_TypeError, "'NoneType' object is not subscriptable");
       __PYX_ERR(0, 874, __pyx_L1_error)
     }
-    __pyx_t_25 = PyFloat_FromDouble(__pyx_v_cutoff); if (unlikely(!__pyx_t_25)) __PYX_ERR(0, 874, __pyx_L1_error)
+    __pyx_t_26 = PyFloat_FromDouble(__pyx_v_cutoff); if (unlikely(!__pyx_t_26)) __PYX_ERR(0, 874, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_26);
+    __pyx_t_25 = __Pyx_PyDict_GetItem(__pyx_v_self->pqtable, __pyx_t_26); if (unlikely(!__pyx_t_25)) __PYX_ERR(0, 874, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_25);
-    __pyx_t_24 = __Pyx_PyDict_GetItem(__pyx_v_self->pqtable, __pyx_t_25); if (unlikely(!__pyx_t_24)) __PYX_ERR(0, 874, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_24);
+    __Pyx_DECREF(__pyx_t_26); __pyx_t_26 = 0;
+    __pyx_t_26 = __Pyx_PyObject_Format(__pyx_t_25, __pyx_kp_u_2f); if (unlikely(!__pyx_t_26)) __PYX_ERR(0, 874, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_26);
     __Pyx_DECREF(__pyx_t_25); __pyx_t_25 = 0;
-    __pyx_t_25 = __Pyx_PyObject_Format(__pyx_t_24, __pyx_kp_u_2f); if (unlikely(!__pyx_t_25)) __PYX_ERR(0, 874, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_25);
-    __Pyx_DECREF(__pyx_t_24); __pyx_t_24 = 0;
-    __pyx_t_23 = (__Pyx_PyUnicode_MAX_CHAR_VALUE(__pyx_t_25) > __pyx_t_23) ? __Pyx_PyUnicode_MAX_CHAR_VALUE(__pyx_t_25) : __pyx_t_23;
-    __pyx_t_5 += __Pyx_PyUnicode_GET_LENGTH(__pyx_t_25);
-    __Pyx_GIVEREF(__pyx_t_25);
-    PyTuple_SET_ITEM(__pyx_t_2, 2, __pyx_t_25);
-    __pyx_t_25 = 0;
+    __pyx_t_24 = (__Pyx_PyUnicode_MAX_CHAR_VALUE(__pyx_t_26) > __pyx_t_24) ? __Pyx_PyUnicode_MAX_CHAR_VALUE(__pyx_t_26) : __pyx_t_24;
+    __pyx_t_5 += __Pyx_PyUnicode_GET_LENGTH(__pyx_t_26);
+    __Pyx_GIVEREF(__pyx_t_26);
+    PyTuple_SET_ITEM(__pyx_t_2, 2, __pyx_t_26);
+    __pyx_t_26 = 0;
     __Pyx_INCREF(__pyx_kp_u__9);
     __pyx_t_5 += 1;
     __Pyx_GIVEREF(__pyx_kp_u__9);
@@ -12934,19 +12935,19 @@ static void __pyx_f_5MACS2_2IO_12CallPeakUnit_20CallerFromAlignments___pre_compu
       PyErr_SetString(PyExc_TypeError, "'NoneType' object is not subscriptable");
       __PYX_ERR(0, 874, __pyx_L1_error)
     }
-    __pyx_t_25 = PyFloat_FromDouble(__pyx_v_cutoff); if (unlikely(!__pyx_t_25)) __PYX_ERR(0, 874, __pyx_L1_error)
+    __pyx_t_26 = PyFloat_FromDouble(__pyx_v_cutoff); if (unlikely(!__pyx_t_26)) __PYX_ERR(0, 874, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_26);
+    __pyx_t_25 = __Pyx_PyDict_GetItem(__pyx_v_self->pvalue_npeaks, __pyx_t_26); if (unlikely(!__pyx_t_25)) __PYX_ERR(0, 874, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_25);
-    __pyx_t_24 = __Pyx_PyDict_GetItem(__pyx_v_self->pvalue_npeaks, __pyx_t_25); if (unlikely(!__pyx_t_24)) __PYX_ERR(0, 874, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_24);
+    __Pyx_DECREF(__pyx_t_26); __pyx_t_26 = 0;
+    __pyx_t_26 = __Pyx_PyObject_Format(__pyx_t_25, __pyx_n_u_d); if (unlikely(!__pyx_t_26)) __PYX_ERR(0, 874, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_26);
     __Pyx_DECREF(__pyx_t_25); __pyx_t_25 = 0;
-    __pyx_t_25 = __Pyx_PyObject_Format(__pyx_t_24, __pyx_n_u_d); if (unlikely(!__pyx_t_25)) __PYX_ERR(0, 874, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_25);
-    __Pyx_DECREF(__pyx_t_24); __pyx_t_24 = 0;
-    __pyx_t_23 = (__Pyx_PyUnicode_MAX_CHAR_VALUE(__pyx_t_25) > __pyx_t_23) ? __Pyx_PyUnicode_MAX_CHAR_VALUE(__pyx_t_25) : __pyx_t_23;
-    __pyx_t_5 += __Pyx_PyUnicode_GET_LENGTH(__pyx_t_25);
-    __Pyx_GIVEREF(__pyx_t_25);
-    PyTuple_SET_ITEM(__pyx_t_2, 4, __pyx_t_25);
-    __pyx_t_25 = 0;
+    __pyx_t_24 = (__Pyx_PyUnicode_MAX_CHAR_VALUE(__pyx_t_26) > __pyx_t_24) ? __Pyx_PyUnicode_MAX_CHAR_VALUE(__pyx_t_26) : __pyx_t_24;
+    __pyx_t_5 += __Pyx_PyUnicode_GET_LENGTH(__pyx_t_26);
+    __Pyx_GIVEREF(__pyx_t_26);
+    PyTuple_SET_ITEM(__pyx_t_2, 4, __pyx_t_26);
+    __pyx_t_26 = 0;
     __Pyx_INCREF(__pyx_kp_u__9);
     __pyx_t_5 += 1;
     __Pyx_GIVEREF(__pyx_kp_u__9);
@@ -12955,19 +12956,19 @@ static void __pyx_f_5MACS2_2IO_12CallPeakUnit_20CallerFromAlignments___pre_compu
       PyErr_SetString(PyExc_TypeError, "'NoneType' object is not subscriptable");
       __PYX_ERR(0, 874, __pyx_L1_error)
     }
-    __pyx_t_25 = PyFloat_FromDouble(__pyx_v_cutoff); if (unlikely(!__pyx_t_25)) __PYX_ERR(0, 874, __pyx_L1_error)
+    __pyx_t_26 = PyFloat_FromDouble(__pyx_v_cutoff); if (unlikely(!__pyx_t_26)) __PYX_ERR(0, 874, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_26);
+    __pyx_t_25 = __Pyx_PyDict_GetItem(__pyx_v_self->pvalue_length, __pyx_t_26); if (unlikely(!__pyx_t_25)) __PYX_ERR(0, 874, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_25);
-    __pyx_t_24 = __Pyx_PyDict_GetItem(__pyx_v_self->pvalue_length, __pyx_t_25); if (unlikely(!__pyx_t_24)) __PYX_ERR(0, 874, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_24);
+    __Pyx_DECREF(__pyx_t_26); __pyx_t_26 = 0;
+    __pyx_t_26 = __Pyx_PyObject_Format(__pyx_t_25, __pyx_n_u_d); if (unlikely(!__pyx_t_26)) __PYX_ERR(0, 874, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_26);
     __Pyx_DECREF(__pyx_t_25); __pyx_t_25 = 0;
-    __pyx_t_25 = __Pyx_PyObject_Format(__pyx_t_24, __pyx_n_u_d); if (unlikely(!__pyx_t_25)) __PYX_ERR(0, 874, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_25);
-    __Pyx_DECREF(__pyx_t_24); __pyx_t_24 = 0;
-    __pyx_t_23 = (__Pyx_PyUnicode_MAX_CHAR_VALUE(__pyx_t_25) > __pyx_t_23) ? __Pyx_PyUnicode_MAX_CHAR_VALUE(__pyx_t_25) : __pyx_t_23;
-    __pyx_t_5 += __Pyx_PyUnicode_GET_LENGTH(__pyx_t_25);
-    __Pyx_GIVEREF(__pyx_t_25);
-    PyTuple_SET_ITEM(__pyx_t_2, 6, __pyx_t_25);
-    __pyx_t_25 = 0;
+    __pyx_t_24 = (__Pyx_PyUnicode_MAX_CHAR_VALUE(__pyx_t_26) > __pyx_t_24) ? __Pyx_PyUnicode_MAX_CHAR_VALUE(__pyx_t_26) : __pyx_t_24;
+    __pyx_t_5 += __Pyx_PyUnicode_GET_LENGTH(__pyx_t_26);
+    __Pyx_GIVEREF(__pyx_t_26);
+    PyTuple_SET_ITEM(__pyx_t_2, 6, __pyx_t_26);
+    __pyx_t_26 = 0;
     __Pyx_INCREF(__pyx_kp_u__9);
     __pyx_t_5 += 1;
     __Pyx_GIVEREF(__pyx_kp_u__9);
@@ -12976,38 +12977,38 @@ static void __pyx_f_5MACS2_2IO_12CallPeakUnit_20CallerFromAlignments___pre_compu
       PyErr_SetString(PyExc_TypeError, "'NoneType' object is not subscriptable");
       __PYX_ERR(0, 874, __pyx_L1_error)
     }
-    __pyx_t_25 = PyFloat_FromDouble(__pyx_v_cutoff); if (unlikely(!__pyx_t_25)) __PYX_ERR(0, 874, __pyx_L1_error)
+    __pyx_t_26 = PyFloat_FromDouble(__pyx_v_cutoff); if (unlikely(!__pyx_t_26)) __PYX_ERR(0, 874, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_26);
+    __pyx_t_25 = __Pyx_PyDict_GetItem(__pyx_v_self->pvalue_length, __pyx_t_26); if (unlikely(!__pyx_t_25)) __PYX_ERR(0, 874, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_25);
-    __pyx_t_24 = __Pyx_PyDict_GetItem(__pyx_v_self->pvalue_length, __pyx_t_25); if (unlikely(!__pyx_t_24)) __PYX_ERR(0, 874, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_24);
-    __Pyx_DECREF(__pyx_t_25); __pyx_t_25 = 0;
+    __Pyx_DECREF(__pyx_t_26); __pyx_t_26 = 0;
     if (unlikely(__pyx_v_self->pvalue_npeaks == Py_None)) {
       PyErr_SetString(PyExc_TypeError, "'NoneType' object is not subscriptable");
       __PYX_ERR(0, 874, __pyx_L1_error)
     }
-    __pyx_t_25 = PyFloat_FromDouble(__pyx_v_cutoff); if (unlikely(!__pyx_t_25)) __PYX_ERR(0, 874, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_25);
-    __pyx_t_26 = __Pyx_PyDict_GetItem(__pyx_v_self->pvalue_npeaks, __pyx_t_25); if (unlikely(!__pyx_t_26)) __PYX_ERR(0, 874, __pyx_L1_error)
+    __pyx_t_26 = PyFloat_FromDouble(__pyx_v_cutoff); if (unlikely(!__pyx_t_26)) __PYX_ERR(0, 874, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_26);
-    __Pyx_DECREF(__pyx_t_25); __pyx_t_25 = 0;
-    __pyx_t_25 = __Pyx_PyNumber_Divide(__pyx_t_24, __pyx_t_26); if (unlikely(!__pyx_t_25)) __PYX_ERR(0, 874, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_25);
-    __Pyx_DECREF(__pyx_t_24); __pyx_t_24 = 0;
+    __pyx_t_27 = __Pyx_PyDict_GetItem(__pyx_v_self->pvalue_npeaks, __pyx_t_26); if (unlikely(!__pyx_t_27)) __PYX_ERR(0, 874, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_27);
     __Pyx_DECREF(__pyx_t_26); __pyx_t_26 = 0;
-    __pyx_t_26 = __Pyx_PyObject_Format(__pyx_t_25, __pyx_kp_u_2f); if (unlikely(!__pyx_t_26)) __PYX_ERR(0, 874, __pyx_L1_error)
+    __pyx_t_26 = __Pyx_PyNumber_Divide(__pyx_t_25, __pyx_t_27); if (unlikely(!__pyx_t_26)) __PYX_ERR(0, 874, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_26);
     __Pyx_DECREF(__pyx_t_25); __pyx_t_25 = 0;
-    __pyx_t_23 = (__Pyx_PyUnicode_MAX_CHAR_VALUE(__pyx_t_26) > __pyx_t_23) ? __Pyx_PyUnicode_MAX_CHAR_VALUE(__pyx_t_26) : __pyx_t_23;
-    __pyx_t_5 += __Pyx_PyUnicode_GET_LENGTH(__pyx_t_26);
-    __Pyx_GIVEREF(__pyx_t_26);
-    PyTuple_SET_ITEM(__pyx_t_2, 8, __pyx_t_26);
-    __pyx_t_26 = 0;
+    __Pyx_DECREF(__pyx_t_27); __pyx_t_27 = 0;
+    __pyx_t_27 = __Pyx_PyObject_Format(__pyx_t_26, __pyx_kp_u_2f); if (unlikely(!__pyx_t_27)) __PYX_ERR(0, 874, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_27);
+    __Pyx_DECREF(__pyx_t_26); __pyx_t_26 = 0;
+    __pyx_t_24 = (__Pyx_PyUnicode_MAX_CHAR_VALUE(__pyx_t_27) > __pyx_t_24) ? __Pyx_PyUnicode_MAX_CHAR_VALUE(__pyx_t_27) : __pyx_t_24;
+    __pyx_t_5 += __Pyx_PyUnicode_GET_LENGTH(__pyx_t_27);
+    __Pyx_GIVEREF(__pyx_t_27);
+    PyTuple_SET_ITEM(__pyx_t_2, 8, __pyx_t_27);
+    __pyx_t_27 = 0;
     __Pyx_INCREF(__pyx_kp_u__10);
     __pyx_t_5 += 1;
     __Pyx_GIVEREF(__pyx_kp_u__10);
     PyTuple_SET_ITEM(__pyx_t_2, 9, __pyx_kp_u__10);
-    __pyx_t_26 = __Pyx_PyUnicode_Join(__pyx_t_2, 10, __pyx_t_5, __pyx_t_23); if (unlikely(!__pyx_t_26)) __PYX_ERR(0, 874, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_26);
+    __pyx_t_27 = __Pyx_PyUnicode_Join(__pyx_t_2, 10, __pyx_t_5, __pyx_t_24); if (unlikely(!__pyx_t_27)) __PYX_ERR(0, 874, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_27);
     __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
     __pyx_t_2 = NULL;
     if (CYTHON_UNPACK_METHODS && likely(PyMethod_Check(__pyx_t_3))) {
@@ -13019,9 +13020,9 @@ static void __pyx_f_5MACS2_2IO_12CallPeakUnit_20CallerFromAlignments___pre_compu
         __Pyx_DECREF_SET(__pyx_t_3, function);
       }
     }
-    __pyx_t_1 = (__pyx_t_2) ? __Pyx_PyObject_Call2Args(__pyx_t_3, __pyx_t_2, __pyx_t_26) : __Pyx_PyObject_CallOneArg(__pyx_t_3, __pyx_t_26);
+    __pyx_t_1 = (__pyx_t_2) ? __Pyx_PyObject_Call2Args(__pyx_t_3, __pyx_t_2, __pyx_t_27) : __Pyx_PyObject_CallOneArg(__pyx_t_3, __pyx_t_27);
     __Pyx_XDECREF(__pyx_t_2); __pyx_t_2 = 0;
-    __Pyx_DECREF(__pyx_t_26); __pyx_t_26 = 0;
+    __Pyx_DECREF(__pyx_t_27); __pyx_t_27 = 0;
     if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 874, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
     __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
@@ -13113,18 +13114,18 @@ static void __pyx_f_5MACS2_2IO_12CallPeakUnit_20CallerFromAlignments___pre_compu
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
   __pyx_t_3 = PyUnicode_Format(__pyx_kp_u_3_Analysis_of_cutoff_vs_num_of, __pyx_v_self->cutoff_analysis_filename); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 878, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
-  __pyx_t_26 = NULL;
+  __pyx_t_27 = NULL;
   if (CYTHON_UNPACK_METHODS && unlikely(PyMethod_Check(__pyx_t_1))) {
-    __pyx_t_26 = PyMethod_GET_SELF(__pyx_t_1);
-    if (likely(__pyx_t_26)) {
+    __pyx_t_27 = PyMethod_GET_SELF(__pyx_t_1);
+    if (likely(__pyx_t_27)) {
       PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_1);
-      __Pyx_INCREF(__pyx_t_26);
+      __Pyx_INCREF(__pyx_t_27);
       __Pyx_INCREF(function);
       __Pyx_DECREF_SET(__pyx_t_1, function);
     }
   }
-  __pyx_t_7 = (__pyx_t_26) ? __Pyx_PyObject_Call2Args(__pyx_t_1, __pyx_t_26, __pyx_t_3) : __Pyx_PyObject_CallOneArg(__pyx_t_1, __pyx_t_3);
-  __Pyx_XDECREF(__pyx_t_26); __pyx_t_26 = 0;
+  __pyx_t_7 = (__pyx_t_27) ? __Pyx_PyObject_Call2Args(__pyx_t_1, __pyx_t_27, __pyx_t_3) : __Pyx_PyObject_CallOneArg(__pyx_t_1, __pyx_t_3);
+  __Pyx_XDECREF(__pyx_t_27); __pyx_t_27 = 0;
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
   if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 878, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_7);
@@ -13155,9 +13156,9 @@ static void __pyx_f_5MACS2_2IO_12CallPeakUnit_20CallerFromAlignments___pre_compu
   __Pyx_XDECREF(__pyx_t_2);
   __Pyx_XDECREF(__pyx_t_3);
   __Pyx_XDECREF(__pyx_t_7);
-  __Pyx_XDECREF(__pyx_t_24);
   __Pyx_XDECREF(__pyx_t_25);
   __Pyx_XDECREF(__pyx_t_26);
+  __Pyx_XDECREF(__pyx_t_27);
   __Pyx_WriteUnraisable("MACS2.IO.CallPeakUnit.CallerFromAlignments.__pre_computes", __pyx_clineno, __pyx_lineno, __pyx_filename, 1, 0);
   __pyx_L0:;
   __Pyx_XDECREF(__pyx_v_chrom);
@@ -30303,9 +30304,9 @@ if (!__Pyx_RefNanny) {
   /* "MACS2/IO/CallPeakUnit.pyx":65
  *         return val
  * 
- * cdef float get_logLR_asym ( float x, float y ):             # <<<<<<<<<<<<<<
+ * cdef float32_t get_logLR_asym ( float x, float y ):             # <<<<<<<<<<<<<<
  *     cdef:
- *         float val
+ *         float32_t val
  */
   __Pyx_TraceLine(65,0,__PYX_ERR(0, 65, __pyx_L1_error))
 

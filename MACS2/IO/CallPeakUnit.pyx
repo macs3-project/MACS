@@ -62,9 +62,9 @@ cdef float32_t get_pscore ( tuple x ):
         pscore_dict[ x ] = val
         return val
 
-cdef float get_logLR_asym ( float x, float y ):
+cdef float32_t get_logLR_asym ( float x, float y ):
     cdef:
-        float val
+        float32_t val
 
     if ( x, y ) in logLR_dict:
         return logLR_dict[ ( x, y ) ]
@@ -738,7 +738,8 @@ cdef class CallerFromAlignments:
             np.ndarray pos_array, treat_array, ctrl_array, score_array
             dict pvalue_stat
             long n, pre_p, this_p, length, j, pre_l, l, i
-            float this_v, pre_v, v, q, pre_q, this_t, this_c
+            float q, pre_q, this_t, this_c
+            float32_t this_v, pre_v, v, cutoff
             long N, k, this_l
             float f
             long nhcal = 0
@@ -746,7 +747,6 @@ cdef class CallerFromAlignments:
             list unique_values
             double t0, t1, t 
 
-            float cutoff
             np.ndarray above_cutoff, above_cutoff_endpos, above_cutoff_startpos
             list peak_content
             long peak_length, total_l, total_p
