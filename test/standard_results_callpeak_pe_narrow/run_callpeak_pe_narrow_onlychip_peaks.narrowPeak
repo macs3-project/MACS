@@ -33,7 +33,7 @@ chr22	18558737	18559244	run_callpeak_pe_narrow_onlychip_peak_32	624	.	17.07	66.1
 chr22	18639960	18640332	run_callpeak_pe_narrow_onlychip_peak_33	155	.	10.4053	18.1778	15.5232	132
 chr22	18646771	18647024	run_callpeak_pe_narrow_onlychip_peak_34	43	.	4.83132	6.6454	4.32559	64
 chr22	18841737	18842067	run_callpeak_pe_narrow_onlychip_peak_35	57	.	5.63654	8.10879	5.73457	189
-chr22	18895970	18896340	run_callpeak_pe_narrow_onlychip_peak_36	304	.	13.7631	33.3975	30.4142	172
+chr22	18895970	18896340	run_callpeak_pe_narrow_onlychip_peak_36	304	.	13.763	33.3975	30.4142	172
 chr22	18941849	18942323	run_callpeak_pe_narrow_onlychip_peak_37	421	.	18.2522	45.3723	42.1362	234
 chr22	18975372	18975708	run_callpeak_pe_narrow_onlychip_peak_38	75	.	6.76911	10.0269	7.58819	128
 chr22	18986489	18986924	run_callpeak_pe_narrow_onlychip_peak_39	112	.	8.60137	13.8127	11.2666	204
@@ -167,7 +167,7 @@ chr22	23298042	23298463	run_callpeak_pe_narrow_onlychip_peak_166	395	.	7.99988	4
 chr22	23301306	23301768	run_callpeak_pe_narrow_onlychip_peak_167	929	.	13.7271	97.6981	92.9632	244
 chr22	23470528	23471034	run_callpeak_pe_narrow_onlychip_peak_168	765	.	22.8218	80.7035	76.5465	279
 chr22	23499019	23499427	run_callpeak_pe_narrow_onlychip_peak_169	58	.	5.84968	8.22417	5.84659	174
-chr22	23516084	23516498	run_callpeak_pe_narrow_onlychip_peak_170	323	.	9.94022	35.3328	32.3083	181
+chr22	23516084	23516498	run_callpeak_pe_narrow_onlychip_peak_170	323	.	9.94021	35.3328	32.3083	181
 chr22	23520669	23521059	run_callpeak_pe_narrow_onlychip_peak_171	600	.	14.1588	63.7476	60.0498	182
 chr22	23583052	23583695	run_callpeak_pe_narrow_onlychip_peak_172	105	.	8.21183	13.0746	10.549	196
 chr22	23611753	23612018	run_callpeak_pe_narrow_onlychip_peak_173	28	.	3.94885	5.04925	2.81491	87

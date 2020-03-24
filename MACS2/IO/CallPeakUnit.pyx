@@ -304,7 +304,7 @@ cdef class CallerFromAlignments:
         list ctrl_scaling_factor_s       # scaling factor for Control, corresponding to each extension size.
         float lambda_bg                  # minimum local bias to fill missing values
         list chromosomes                 # name of common chromosomes in ChIP and Control data
-        float pseudocount                # the pseudocount used to calcuate logLR, FE or logFE
+        float64_t pseudocount                # the pseudocount used to calcuate logLR, FE or logFE
         bytes bedGraph_filename_prefix     # prefix will be added to _pileup.bdg for treatment and _lambda.bdg for control
 
         #SHIFTCONTROL is obsolete
@@ -341,7 +341,7 @@ cdef class CallerFromAlignments:
                   int d = 200, list ctrl_d_s = [200, 1000, 10000], 
                   float treat_scaling_factor = 1.0, list ctrl_scaling_factor_s = [1.0, 0.2, 0.02], 
                   bool stderr_on = False, 
-                  float pseudocount = 1.0, 
+                  float pseudocount = 1, 
                   int end_shift = 0, 
                   float lambda_bg = 0, 
                   bool save_bedGraph = False,
@@ -1105,7 +1105,7 @@ cdef class CallerFromAlignments:
         """
         cdef:
             int summit_pos, tstart, tend, tmpindex, summit_index, i, midindex
-            float treat_v, ctrl_v, tsummitvalue, ttreat_p, tctrl_p, tscore, summit_treat, summit_ctrl, summit_p_score, summit_q_score
+            float64_t treat_v, ctrl_v, tsummitvalue, ttreat_p, tctrl_p, tscore, summit_treat, summit_ctrl, summit_p_score, summit_q_score
             int tlist_scores_p
 
         peak_length = peak_content[ -1 ][ 1 ] - peak_content[ 0 ][ 0 ]
@@ -1148,12 +1148,11 @@ cdef class CallerFromAlignments:
                        peak_score  = summit_q_score, # score at summit
                        pileup      = summit_treat, # pileup
                        pscore      = summit_p_score, # pvalue
-                       fold_change = float( ( summit_treat + self.pseudocount ) / ( summit_ctrl + self.pseudocount ) ), # fold change
+                       fold_change = ( summit_treat + self.pseudocount ) / ( summit_ctrl + self.pseudocount ), # fold change
                        qscore      = summit_q_score # qvalue
                        )
             if peak_content[0][0] == 18020165 :
-                print( summit_treat, summit_ctrl, self.pseudocount )
-                print( float( ( summit_treat + self.pseudocount ) / ( summit_ctrl + self.pseudocount ) ) )
+                print( f"{summit_ctrl:} + {self.pseudocount:} = {summit_ctrl+self.pseudocount}" )                
             # start a new peak
             return True
 
@@ -1168,10 +1167,9 @@ cdef class CallerFromAlignments:
         cdef:
             int summit_pos, tstart, tend, tmpindex, summit_index, summit_offset
             int start, end, i, j, start_boundary, m, n, l
-            float summit_value, tvalue, tsummitvalue
+            float64_t summit_value, tvalue, tsummitvalue, ttreat_p, tctrl_p, tscore, summit_treat, summit_ctrl, summit_p_score, summit_q_score
             np.ndarray[np.float32_t, ndim=1] peakdata
             np.ndarray[np.int32_t, ndim=1] peakindices, summit_offsets
-            float ttreat_p, tctrl_p, tscore, summit_treat, summit_ctrl, summit_p_score, summit_q_score
             int tlist_scores_p
 
         peak_length = peak_content[ -1 ][ 1 ] - peak_content[ 0 ][ 0 ]
@@ -1749,7 +1747,7 @@ cdef class CallerFromAlignments:
         """
         cdef:
             int summit_pos, tstart, tend, tmpindex, summit_index, i, midindex
-            float treat_v, ctrl_v, tsummitvalue, ttreat_p, tctrl_p, tscore, summit_treat, summit_ctrl, summit_p_score, summit_q_score
+            float64_t treat_v, ctrl_v, tsummitvalue, ttreat_p, tctrl_p, tscore, summit_treat, summit_ctrl, summit_p_score, summit_q_score
             list tlist_pileup, tlist_control, tlist_length
             int tlist_scores_p
             np.ndarray tarray_pileup, tarray_control, tarray_pscore, tarray_qscore, tarray_fc

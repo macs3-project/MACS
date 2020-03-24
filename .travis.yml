@@ -10,24 +10,24 @@ jobs:
         docker run --rm --privileged multiarch/qemu-user-static --reset -p yes &&
           docker build --rm --build-arg BASE_IMAGE="i386/ubuntu:bionic" -t macs -f test/Dockerfile .
       script: |
-        docker run --rm -t macs bash -cx "pytest --runxfail && cd test && ./cmdlinetest_narrowpeak macs2"
+        docker run --rm -t macs bash -cx "pytest --runxfail && cd test && ./cmdlinetest macs2"
     - name: amd64
       arch: amd64
       python: 3.8
-    #- name: arm64
-    #  arch: arm64
-    #  python: 3.8
-    #- name: ppc64le
-    #  arch: ppc64le
-    #  python: 3.8     
-    #- name: s390x
-    #  arch: s390x
-    #  python: 3.8
+    - name: arm64
+      arch: arm64
+      python: 3.8
+    - name: ppc64le
+      arch: ppc64le
+      python: 3.8     
+    - name: s390x
+      arch: s390x
+      python: 3.8
   allow_failures:
     - name: i386 
-    #- name: arm64
-    #- name: ppc64le
-    #- name: s390x
+    - name: arm64
+    - name: ppc64le
+    - name: s390x
   fast_finish: true
 install:
   - pip install --upgrade pip
@@ -36,7 +36,7 @@ install:
 script:
   - pytest --runxfail
   - cd test
-  - ./cmdlinetest_narrowpeak macs2
+  - ./cmdlinetest macs2
   #- cd ..
 deploy:
   provider: pypi
