@@ -383,6 +383,7 @@ cdef class CallerFromAlignments:
             int i
             char * tmp
             bytes tmp_bytes
+            float32_t p
 
 
         if isinstance(treat, FWTrack):
@@ -434,9 +435,9 @@ cdef class CallerFromAlignments:
         
         self.pvalue_length = {}
         self.pvalue_npeaks = {}
-        for i in np.arange( 0.3, 10, 0.3 ): # step for optimal cutoff is 0.3 in -log10pvalue, we try from pvalue 1E-10 (-10logp=10) to 0.5 (-10logp=0.3)
-            self.pvalue_length[ i ] = 0
-            self.pvalue_npeaks[ i ] = 0
+        for p in np.arange( 0.3, 10, 0.3 ): # step for optimal cutoff is 0.3 in -log10pvalue, we try from pvalue 1E-10 (-10logp=10) to 0.5 (-10logp=0.3)
+            self.pvalue_length[ p ] = 0
+            self.pvalue_npeaks[ p ] = 0
         self.optimal_p_cutoff = 0
         self.cutoff_analysis_filename = cutoff_analysis_filename.encode()
 
@@ -761,9 +762,12 @@ cdef class CallerFromAlignments:
         logging.debug ( "Start to calculate pvalue stat..." )
 
         # tmplist contains a list of log pvalue cutoffs from 0.3 to 10
-        tmplist = sorted( list(np.arange(0.3, 10.0, 0.3)), reverse = True )
+        tmplist = [round(x,5) for x in sorted( list(np.arange(0.3, 10.0, 0.3)), reverse = True )]
 
         pvalue_stat = dict()
+        #print (list(pvalue_stat.keys()))
+        #print (list(self.pvalue_length.keys()))
+        #print (list(self.pvalue_npeaks.keys()))        
         for i in range( len( self.chromosomes ) ):
             chrom = self.chromosomes[ i ]
             self.__pileup_treat_ctrl_a_chromosome( chrom )
@@ -839,7 +843,8 @@ cdef class CallerFromAlignments:
         # add all pvalue cutoffs from cutoff-analysis part. So that we
         # can get the corresponding qvalues for them.
         for cutoff in tmplist:
-            pvalue_stat[ cutoff ] = 0
+            if cutoff not in pvalue_stat: 
+                pvalue_stat[ cutoff ] = 0
 
         nhval = 0
 
@@ -879,6 +884,9 @@ cdef class CallerFromAlignments:
         #logging.info( "#3 Suggest a cutoff..." )
         #optimal_cutoff, optimal_length = find_optimal_cutoff( x, y )
         #logging.info( "#3 -10log10pvalue cutoff %.2f will call approximately %.0f bps regions as significant regions" % ( optimal_cutoff, optimal_length ) )
+        #print (list(pqtable.keys()))
+        #print (list(self.pvalue_length.keys()))
+        #print (list(self.pvalue_npeaks.keys()))        
         return
 
     cpdef call_peaks ( self, list scoring_function_symbols, list score_cutoff_s, int min_length = 200, 
