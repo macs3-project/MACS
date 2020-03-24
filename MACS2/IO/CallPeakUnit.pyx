@@ -885,8 +885,8 @@ cdef class CallerFromAlignments:
         #optimal_cutoff, optimal_length = find_optimal_cutoff( x, y )
         #logging.info( "#3 -10log10pvalue cutoff %.2f will call approximately %.0f bps regions as significant regions" % ( optimal_cutoff, optimal_length ) )
         #print (list(pqtable.keys()))
-        print (list(self.pvalue_length.keys()))
-        print (list(self.pvalue_npeaks.keys()))        
+        #print (list(self.pvalue_length.keys()))
+        #print (list(self.pvalue_npeaks.keys()))        
         return
 
     cpdef call_peaks ( self, list scoring_function_symbols, list score_cutoff_s, int min_length = 200, 
@@ -1151,6 +1151,9 @@ cdef class CallerFromAlignments:
                        fold_change = float( ( summit_treat + self.pseudocount ) / ( summit_ctrl + self.pseudocount ) ), # fold change
                        qscore      = summit_q_score # qvalue
                        )
+            if peak_content[0][0] == 18020165 :
+                print( summit_treat, summit_ctrl, self.pseudocount )
+                print( float( ( summit_treat + self.pseudocount ) / ( summit_ctrl + self.pseudocount ) ) )
             # start a new peak
             return True
 
