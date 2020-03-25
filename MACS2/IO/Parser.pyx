@@ -1128,8 +1128,8 @@ cdef class BAMPEParser(BAMParser):
             int32_t entrylength, fpos, chrid, tlen
             list references
             dict rlengths
-            int64_t e1 = 0
-            int64_t e2 = 0
+            #int64_t e1 = 0
+            #int64_t e2 = 0
 
         i = 0
         m = 0
@@ -1147,28 +1147,25 @@ cdef class BAMPEParser(BAMParser):
             try:
                 entrylength = unpack( '<i', fread(4) )[0]
             except err:
-                e1 += 1
+                #e1 += 1
                 break
             ( chrid, fpos, tlen ) = self.__pe_binary_parse( fread(entrylength) )
             if chrid == -1:
-                e2 += 1
+                #e2 += 1
                 continue
             add_loc(references[ chrid ], fpos, fpos + tlen)
             m += tlen
             i += 1
             if i % 1000000 == 0:
                 info( " %d" % i )
-            if i == 4:
-                raise Exception("I want to quit!")
-                
 
         info( "%d fragments have been read." % i )
-        debug( f" {e1} Can't identify the length of entry, it may be the end of file, stop looping..." )
-        debug( f" {e2} Chromosome name can't be found which means this entry is skipped ..." )
-        assert i > 0, "Something went wrong, no fragment has been read! Check input file!"
+        #debug( f" {e1} Can't identify the length of entry, it may be the end of file, stop looping..." )
+        #debug( f" {e2} Chromosome name can't be found which means this entry is skipped ..." )
+        #assert i > 0, "Something went wrong, no fragment has been read! Check input file!"
         self.d = m / i
         self.n = i
-        assert self.d >= 0, "Something went wrong (mean fragment size was negative: %d = %d / %d)" % (self.d, m, i)
+        #assert self.d >= 0, "Something went wrong (mean fragment size was negative: %d = %d / %d)" % (self.d, m, i)
         self.fhd.close()
         petrack.set_rlengths( rlengths )
         return petrack
@@ -1195,11 +1192,9 @@ cdef class BAMPEParser(BAMParser):
             try:
                 entrylength = unpack('<i', fread(4))[0]
             except err:
-                #debug( " Can't identify the length of entry, it may be the end of file, stop looping..." )
                 break
             ( chrid, fpos, tlen ) = self.__pe_binary_parse( fread(entrylength) )
             if chrid == -1:
-                #debug( " Chromosome name can't be found which means this entry is skipped ..." )
                 continue
             add_loc(references[ chrid ], fpos, fpos + tlen)
             m += tlen
@@ -1210,7 +1205,7 @@ cdef class BAMPEParser(BAMParser):
         info( "%d fragments have been read." % i )         
         self.d = ( self.d * self.n + m ) / ( self.n + i )
         self.n += i
-        assert self.d >= 0, "Something went wrong (mean fragment size was negative: %d = %d / %d)" % (self.d, m, i)
+        #assert self.d >= 0, "Something went wrong (mean fragment size was negative: %d = %d / %d)" % (self.d, m, i)
         self.fhd.close()
         # this is the problematic part. If fwtrack is finalized, then it's impossible to increase the length of it in a step of buffer_size for multiple input files.
         # petrack.finalize()
@@ -1238,10 +1233,10 @@ cdef class BAMPEParser(BAMParser):
 
         ui16 = <uint16_t *>data
         bwflag = ui16[7]
-        print ( f"Got {bwflag:}" )
+        #print ( f"Got {bwflag:}" )
         if (bwflag & 2820) or (bwflag & 1 and (bwflag & 136 or not bwflag & 2)):
             #debug( " inside of parser: this entry is filtered according to bwflag, return..." )
-            print ( f" {bwflag:} is filterred" )            
+            #print ( f" {bwflag:} is filterred" )            
             return ( -1, -1, -1 )
         #simple form of the expression below 
         #if bwflag & 4 or bwflag & 512 or bwflag & 256 or bwflag & 2048: return (-1, -1, -1)
@@ -1262,11 +1257,6 @@ cdef class BAMPEParser(BAMParser):
         ui8 = <uint8_t *>data
         thisref = i32[0]
         thisstart = i32[1]
-        #l_read_name = ui8[8]
-        #n_cigar_op = ui16[6]
-        #thisref = i32[0]
-        #thisstart = i32[1]
-        #n_cigar_op = ui16[6]
 
         pos = i32[1]
         nextpos = i32[6]
