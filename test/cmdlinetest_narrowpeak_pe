@@ -25,16 +25,15 @@ CHIPBIGSPEEDTEST=CTCF_12878_5M.bed.gz
 CTRLBIGSPEEDTEST=input_12878_5M.bed.gz
 
 # callpeak
-echo "1. callpeak"
-echo "1.1 callpeak narrow"
+echo "1. callpeak pe"
 
-mkdir ${TAG}_run_callpeak_narrow
+mkdir ${TAG}_run_callpeak_narrow_pe
 
-macs2 callpeak -g 52000000 -t $CHIP -c $CTRL -n run_callpeak_narrow0 -B --outdir ${TAG}_run_callpeak_narrow --cutoff-analysis --verbose 3 &> ${TAG}_run_callpeak_narrow/run_callpeak_narrow0.log
+macs2 callpeak -g 52000000 -f BAMPE -t $CHIPPE -c $CTRLPE -n run_callpeak_bampe_narrow -B --outdir ${TAG}_run_callpeak_pe_narrow --call-summits &> ${TAG}_run_callpeak_pe_narrow/run_callpeak_bampe_narrow.log
 
-cat ${TAG}_run_callpeak_narrow/run_callpeak_narrow0.log
+cat ${TAG}_run_callpeak_pe_narrow/run_callpeak_bampe_narrow.log
 
-echo "14. search for errors or warnings in log files"
+echo "2. search for errors or warnings in log files"
 flag=0
 for i in `ls ${TAG}_run_*/*.log`;do
     echo " checking $i..."
@@ -52,11 +51,11 @@ if [[ $flag == 1 ]]; then
     exit 1;
 fi
 
-echo "15. compare with standard outputs"
+echo "3. compare with standard outputs"
 
 flag=0
 # we do not check the consistency of random subsampling results
-subfolders=(callpeak_narrow)
+subfolders=(callpeak_pe_narrow)
 
 m=0
 n=0
