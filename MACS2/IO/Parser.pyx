@@ -1126,6 +1126,8 @@ cdef class BAMPEParser(BAMParser):
             int32_t entrylength, fpos, chrid, tlen
             list references
             dict rlengths
+            int64_t e1 = 0
+            int64_t e2 = 0
 
         i = 0
         m = 0
@@ -1143,11 +1145,11 @@ cdef class BAMPEParser(BAMParser):
             try:
                 entrylength = unpack( '<i', fread(4) )[0]
             except err:
-                print( " Can't identify the length of entry, it may be the end of file, stop looping..." )
+                e1 += 1
                 break
             ( chrid, fpos, tlen ) = self.__pe_binary_parse( fread(entrylength) )
             if chrid == -1:
-                print( " Chromosome name can't be found which means this entry is skipped ..." )                
+                e2 += 1
                 continue
             add_loc(references[ chrid ], fpos, fpos + tlen)
             m += tlen
@@ -1156,6 +1158,8 @@ cdef class BAMPEParser(BAMParser):
                 info( " %d" % i )
 
         info( "%d fragments have been read." % i )
+        debug( f" {e1} Can't identify the length of entry, it may be the end of file, stop looping..." )
+        debug( f" {e2} Chromosome name can't be found which means this entry is skipped ..." )
         assert i > 0, "Something went wrong, no fragment has been read! Check input file!"
         self.d = m / i
         self.n = i
@@ -1186,11 +1190,11 @@ cdef class BAMPEParser(BAMParser):
             try:
                 entrylength = unpack('<i', fread(4))[0]
             except err:
-                print( " Can't identify the length of entry, it may be the end of file, stop looping..." )
+                #debug( " Can't identify the length of entry, it may be the end of file, stop looping..." )
                 break
             ( chrid, fpos, tlen ) = self.__pe_binary_parse( fread(entrylength) )
             if chrid == -1:
-                print( " Chromosome name can't be found which means this entry is skipped ..." )
+                #debug( " Chromosome name can't be found which means this entry is skipped ..." )
                 continue
             add_loc(references[ chrid ], fpos, fpos + tlen)
             m += tlen
@@ -1219,7 +1223,7 @@ cdef class BAMPEParser(BAMParser):
         
         # we skip lot of the available information in data (i.e. tag name, quality etc etc)
         if not data:
-            print( " inside of parser: data is empty, return..." )
+            #debug( " inside of parser: data is empty, return..." )
             return ( -1, -1, -1 )
 
         #( thisref, pos, unused1, n_cigar_op, bwflag, unused2, unused3, nextpos, thistlen ) = \
@@ -1228,7 +1232,7 @@ cdef class BAMPEParser(BAMParser):
         ui16 = <uint16_t *>data
         bwflag = ui16[7]
         if (bwflag & 2820) or (bwflag & 1 and (bwflag & 136 or not bwflag & 2)):
-            print( " inside of parser: this entry is filtered according to bwflag, return..." )
+            #debug( " inside of parser: this entry is filtered according to bwflag, return..." )
             return ( -1, -1, -1 )
         #simple form of the expression below 
         #if bwflag & 4 or bwflag & 512 or bwflag & 256 or bwflag & 2048: return (-1, -1, -1)
