@@ -27,7 +27,7 @@ CTRLBIGSPEEDTEST=input_12878_5M.bed.gz
 # callpeak
 echo "1. callpeak pe"
 
-mkdir ${TAG}_run_callpeak_narrow_pe
+mkdir ${TAG}_run_callpeak_pe_narrow
 
 macs2 callpeak -g 52000000 -f BAMPE -t $CHIPPE -c $CTRLPE -n run_callpeak_bampe_narrow -B --outdir ${TAG}_run_callpeak_pe_narrow --call-summits &> ${TAG}_run_callpeak_pe_narrow/run_callpeak_bampe_narrow.log
 
