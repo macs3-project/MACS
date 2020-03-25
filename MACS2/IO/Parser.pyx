@@ -1129,8 +1129,8 @@ cdef class BAMPEParser(BAMParser):
 
         i = 0
         m = 0
+        
         petrack = PETrackI( buffer_size = self.buffer_size )
-
         references, rlengths = self.get_references()
         fseek = self.fhd.seek
         fread = self.fhd.read
@@ -1143,14 +1143,17 @@ cdef class BAMPEParser(BAMParser):
             try:
                 entrylength = unpack( '<i', fread(4) )[0]
             except err:
+                debug( " Can't identify the length of entry, it may be the end of file, stop looping..." )
                 break
             ( chrid, fpos, tlen ) = self.__pe_binary_parse( fread(entrylength) )
-            if chrid == -1: continue
+            if chrid == -1:
+                debug( " Chromosome name can't be found which means this entry is skipped ..." )                
+                continue
             add_loc(references[ chrid ], fpos, fpos + tlen)
             m += tlen
             i += 1
             if i % 1000000 == 0:
-                info(" %d" % i)
+                info( " %d" % i )
 
         info( "%d fragments have been read." % i )
         assert i > 0, "Something went wrong, no fragment has been read! Check input file!"
@@ -1180,10 +1183,15 @@ cdef class BAMPEParser(BAMParser):
         add_loc = petrack.add_loc
         err = struct.error
         while True:
-            try: entrylength = unpack('<i', fread(4))[0]
-            except err: break
+            try:
+                entrylength = unpack('<i', fread(4))[0]
+            except err:
+                debug( " Can't identify the length of entry, it may be the end of file, stop looping..." )
+                break
             ( chrid, fpos, tlen ) = self.__pe_binary_parse( fread(entrylength) )
-            if chrid == -1: continue
+            if chrid == -1:
+                debug( " Chromosome name can't be found which means this entry is skipped ..." )
+                continue
             add_loc(references[ chrid ], fpos, fpos + tlen)
             m += tlen
             i += 1
@@ -1210,14 +1218,18 @@ cdef class BAMPEParser(BAMParser):
             uint16_t *ui16            
         
         # we skip lot of the available information in data (i.e. tag name, quality etc etc)
-        if not data: return ( -1, -1, -1 )
+        if not data:
+            debug( " inside of parser: data is empty, return..." )
+            return ( -1, -1, -1 )
 
         #( thisref, pos, unused1, n_cigar_op, bwflag, unused2, unused3, nextpos, thistlen ) = \
         #  unpack( '<iiiHHiiii', data[:32] )
 
         ui16 = <uint16_t *>data
         bwflag = ui16[7]
-        if (bwflag & 2820) or (bwflag & 1 and (bwflag & 136 or not bwflag & 2)): return ( -1, -1, -1 )
+        if (bwflag & 2820) or (bwflag & 1 and (bwflag & 136 or not bwflag & 2)):
+            debug( " inside of parser: this entry is filtered according to bwflag, return..." )
+            return ( -1, -1, -1 )
         #simple form of the expression below 
         #if bwflag & 4 or bwflag & 512 or bwflag & 256 or bwflag & 2048: return (-1, -1, -1)
         ## unmapped sequence or bad sequence or  secondary or supplementary alignment             
