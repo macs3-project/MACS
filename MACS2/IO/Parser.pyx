@@ -1158,6 +1158,9 @@ cdef class BAMPEParser(BAMParser):
             i += 1
             if i % 1000000 == 0:
                 info( " %d" % i )
+            if i == 4:
+                raise Exception("I want to quit!")
+                
 
         info( "%d fragments have been read." % i )
         debug( f" {e1} Can't identify the length of entry, it may be the end of file, stop looping..." )
@@ -1235,8 +1238,10 @@ cdef class BAMPEParser(BAMParser):
 
         ui16 = <uint16_t *>data
         bwflag = ui16[7]
+        print ( f"Got {bwflag:}" )
         if (bwflag & 2820) or (bwflag & 1 and (bwflag & 136 or not bwflag & 2)):
             #debug( " inside of parser: this entry is filtered according to bwflag, return..." )
+            print ( f" {bwflag:} is filterred" )            
             return ( -1, -1, -1 )
         #simple form of the expression below 
         #if bwflag & 4 or bwflag & 512 or bwflag & 256 or bwflag & 2048: return (-1, -1, -1)
