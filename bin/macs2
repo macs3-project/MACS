@@ -252,8 +252,6 @@ def add_callpeak_parser( subparsers ):
     # about scaling
     group_callpeak.add_argument( "--scale-to", dest = "scaleto", type = str, choices = ("large", "small"),
                                 help = "When set to 'small', scale the larger sample up to the smaller sample. When set to 'larger', scale the smaller sample up to the bigger sample. By default, scale to 'small'. This option replaces the obsolete '--to-large' option. The default behavior is recommended since it will lead to less significant p/q-values in general but more specific results. Keep in mind that scaling down will influence control/input sample more. DEFAULT: 'small', the choice is either 'small' or 'large'." )
-    group_callpeak.add_argument( "--ratio", dest = "ratio", type = float, default = 1.0,
-                                help = "When set, use a custom scaling ratio of ChIP/control (e.g. calculated using NCIS) for linear scaling. DEFAULT: ingore" )
     group_callpeak.add_argument( "--down-sample", dest = "downsample", action = "store_true", default = False,
                                  help = "When set, random sampling method will scale down the bigger sample. By default, MACS uses linear scaling. Warning: This option will make your result unstable and irreproducible since each time, random reads would be selected. Consider to use 'randsample' script instead. <not implmented>If used together with --SPMR, 1 million unique reads will be randomly picked.</not implemented> Caution: due to the implementation, the final number of selected reads may not be as you expected! DEFAULT: False" )
     group_callpeak.add_argument( "--seed", dest = "seed", type = int, default = -1, 
@@ -298,6 +296,8 @@ def add_callpeak_parser( subparsers ):
     group_obsolete = argparser_callpeak.add_argument_group( "Obsolete options" )
     group_obsolete.add_argument( "--to-large", dest = "tolarge", action = "store_true", default = False,
                                      help = "Obsolete option. Please use '--scale-to large' instead." )
+    group_obsolete.add_argument( "--ratio", dest = "ratio", type = float, default = 1.0,
+                                     help = "Obsolete option. Originally designed to normalize treatment and control with customized ratio, now it won't have any effect." )
     return
 
 def add_diffpeak_parser( subparsers ):
