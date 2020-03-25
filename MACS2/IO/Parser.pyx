@@ -1121,12 +1121,14 @@ cdef class BAMPEParser(BAMParser):
         """Build PETrackI from all lines, return a FWTrack object.
         """
         cdef:
-            int64_t i = 0          # number of fragments kept
-            int64_t m = 0          # sum of fragment lengths
+            int64_t i          # number of fragments kept
+            int64_t m          # sum of fragment lengths
             int32_t entrylength, fpos, chrid, tlen
             list references
             dict rlengths
-        
+
+        i = 0
+        m = 0
         petrack = PETrackI( buffer_size = self.buffer_size )
 
         references, rlengths = self.get_references()
