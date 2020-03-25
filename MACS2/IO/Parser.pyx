@@ -1034,7 +1034,9 @@ cdef class BAMParser( GenericParser ):
     cdef tuple __fw_binary_parse (self, const unsigned char * data ):
         cdef:
             int32_t thisref, thisstart, thisstrand
-            short bwflag, l_read_name, n_cigar_op
+            uint16_t bwflag
+            uint8_t l_read_name
+            uint16_t n_cigar_op
             int32_t cigar_code
             uint8_t *ui8
             int32_t *i32
@@ -1216,7 +1218,9 @@ cdef class BAMPEParser(BAMParser):
         cdef:
             int32_t thisref, thisstart, thistlen
             int32_t nextpos, pos
-            short bwflag
+            uint16_t bwflag
+            #uint8_t l_read_name
+            #uint16_t n_cigar_op
             uint8_t *ui8
             int32_t *i32
             uint16_t *ui16            
@@ -1253,11 +1257,11 @@ cdef class BAMPEParser(BAMParser):
         ui8 = <uint8_t *>data
         thisref = i32[0]
         thisstart = i32[1]
-        l_read_name = ui8[8]
-        n_cigar_op = ui16[6]
-        thisref = i32[0]
-        thisstart = i32[1]
-        n_cigar_op = ui16[6]
+        #l_read_name = ui8[8]
+        #n_cigar_op = ui16[6]
+        #thisref = i32[0]
+        #thisstart = i32[1]
+        #n_cigar_op = ui16[6]
 
         pos = i32[1]
         nextpos = i32[6]
