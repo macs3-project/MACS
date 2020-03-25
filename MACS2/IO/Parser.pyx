@@ -29,18 +29,18 @@ from cpython cimport bool
 
 import numpy as np
 cimport numpy as np
-from numpy cimport uint8_t, uint16_t, uint32_t, uint64_t, int32_t, int64_t
+from numpy cimport uint8_t, uint16_t, uint32_t, uint64_t, int8_t, int16_t, int32_t, int64_t, float32_t, float64_t
 
 cdef extern from "stdlib.h":
-    ctypedef unsigned int size_t
+    ctypedef uint32_t size_t
     size_t strlen(char *s)
     void *malloc(size_t size)
     void *calloc(size_t n, size_t size)
     void free(void *ptr)
-    int strcmp(char *a, char *b)
+    int32_t strcmp(char *a, char *b)
     char * strcpy(char *a, char *b)
-    long atol(char *str)
-    int atoi(char *str)
+    int64_t atol(char *str)
+    int32_t atoi(char *str)
 
 # ------------------------------------
 # constants
@@ -53,7 +53,7 @@ __doc__ = "All Parser classes"
 # Misc functions
 # ------------------------------------
 
-cpdef guess_parser ( fname, long buffer_size = 100000 ):
+cpdef guess_parser ( fname, int64_t buffer_size = 100000 ):
     # Note: BAMPE and BEDPE can't be automatically detected.
     ordered_parser_dict = {"BAM":BAMParser,
                            "BED":BEDParser,
@@ -104,11 +104,11 @@ cdef class GenericParser:
     cdef:
         str filename
         bool gzipped
-        int tag_size
+        int32_t tag_size
         object fhd
-        long buffer_size
+        int64_t buffer_size
     
-    def __init__ ( self, str filename, long buffer_size = 100000 ):
+    def __init__ ( self, str filename, int64_t buffer_size = 100000 ):
         """Open input file. Determine whether it's a gzipped file.
 
         'filename' must be a string object.
@@ -145,17 +145,17 @@ cdef class GenericParser:
         """
         return
     
-    cpdef int tsize( self ):
+    cpdef int32_t tsize( self ):
         """General function to detect tag size.
 
         * Although it can be used by most parsers, it must be
           rewritten by BAMParser!
         """
         cdef:
-            int s = 0
-            int n = 0     # number of successful/valid read alignments
-            int m = 0     # number of trials
-            int this_taglength
+            int32_t s = 0
+            int32_t n = 0     # number of successful/valid read alignments
+            int32_t m = 0     # number of trials
+            int32_t this_taglength
             bytes thisline
 
         if self.tag_size != -1:
@@ -176,10 +176,10 @@ cdef class GenericParser:
         self.fhd.seek( 0 )
         self.__skip_first_commentlines()
         if n != 0:              # else tsize = -1
-            self.tag_size = int(s/n)
+            self.tag_size = <int32_t>(s/n)
         return self.tag_size
 
-    cdef int __tlen_parse_line ( self, bytes thisline ):
+    cdef int32_t __tlen_parse_line ( self, bytes thisline ):
         """Abstract function to detect tag length.
         
         """
@@ -193,7 +193,7 @@ cdef class GenericParser:
         * BAMParser for binary BAM format should have a different one.
         """
         cdef:
-            long i, m, fpos, strand
+            int64_t i, m, fpos, strand
             bytes chromosome
         
         fwtrack = FWTrack( buffer_size = self.buffer_size )
@@ -246,8 +246,8 @@ cdef class GenericParser:
         
         """
         cdef bytes chromosome = b""
-        cdef int fpos = -1
-        cdef int strand = -1
+        cdef int32_t fpos = -1
+        cdef int32_t strand = -1
         return ( chromosome, fpos, strand )
 
     cpdef sniff ( self ):
@@ -259,7 +259,7 @@ cdef class GenericParser:
 
         * BAMParser has a different sniff function.
         """
-        cdef int t
+        cdef int32_t t
         
         t = self.tsize()
         if t <= 10 or t >= 10000: # tsize too small or too big
@@ -288,7 +288,7 @@ cdef class BEDParser( GenericParser ):
         """BEDParser needs to skip the first several comment lines. 
         """
         cdef:
-            int l_line
+            int32_t l_line
             bytes this_line
         for thisline in self.fhd:
             l_line = len( thisline )
@@ -301,7 +301,7 @@ cdef class BEDParser( GenericParser ):
         self.fhd.seek( -l_line, 1 )
         return
     
-    cdef int __tlen_parse_line ( self, bytes thisline ):
+    cdef int32_t __tlen_parse_line ( self, bytes thisline ):
         """Parse 5' and 3' position, then calculate frag length.
 
         """
@@ -364,14 +364,14 @@ cdef class BEDPEParser(GenericParser):
     Note: Only the first columns are used!
     """
 
-    cdef public int n
-    cdef public float d
+    cdef public int32_t n
+    cdef public float32_t d
 
     cdef void __skip_first_commentlines ( self ):
         """BEDPEParser needs to skip the first several comment lines. 
         """
         cdef:
-            int l_line
+            int32_t l_line
             bytes this_line
         for thisline in self.fhd:
             l_line = len( thisline )
@@ -414,10 +414,10 @@ cdef class BEDPEParser(GenericParser):
         """
         cdef:
             bytes chromname
-            int left_pos
-            int right_pos
-            long i = 0          # number of fragments
-            long m = 0          # sum of fragment lengths
+            int32_t left_pos
+            int32_t right_pos
+            int64_t i = 0          # number of fragments
+            int64_t m = 0          # sum of fragment lengths
 
         petrack = PETrackI( buffer_size = self.buffer_size )
         add_loc = petrack.add_loc
@@ -436,7 +436,7 @@ cdef class BEDPEParser(GenericParser):
 
             add_loc( chromosome, left_pos, right_pos )
 
-        self.d = float( m ) / i
+        self.d = <float32_t>( m ) / i
         self.n = i
 
         assert self.d >= 0, "Something went wrong (mean fragment size was negative)"
@@ -450,10 +450,10 @@ cdef class BEDPEParser(GenericParser):
         """
         cdef:
             bytes chromname
-            int left_pos
-            int right_pos
-            long i = 0          # number of fragments
-            long m = 0          # sum of fragment lengths
+            int32_t left_pos
+            int32_t right_pos
+            int64_t i = 0          # number of fragments
+            int64_t m = 0          # sum of fragment lengths
 
         add_loc = petrack.add_loc
 
@@ -489,7 +489,7 @@ cdef class ELANDResultParser( GenericParser ):
         """ELANDResultParser needs to skip the first several comment lines. 
         """
         cdef:
-            int l_line
+            int32_t l_line
             bytes this_line
         for thisline in self.fhd:
             l_line = len( thisline )
@@ -500,7 +500,7 @@ cdef class ELANDResultParser( GenericParser ):
         self.fhd.seek( -l_line, 1 )
         return
 
-    cdef int __tlen_parse_line ( self, bytes thisline ):
+    cdef int32_t __tlen_parse_line ( self, bytes thisline ):
         """Parse tag sequence, then tag length.
 
         """
@@ -515,7 +515,7 @@ cdef class ELANDResultParser( GenericParser ):
     cdef tuple __fw_parse_line ( self, bytes thisline ):
         cdef:
             bytes chromname, strand
-            int thistaglength
+            int32_t thistaglength
         #if thisline.startswith("#") or thisline.startswith("track") or thisline.startswith("browser"): return ("comment line",None,None) # comment line is skipped
         thisline = thisline.rstrip()
         if not thisline: return ( b"", -1, -1 )
@@ -569,7 +569,7 @@ cdef class ELANDMultiParser( GenericParser ):
         """ELANDResultParser needs to skip the first several comment lines. 
         """
         cdef:
-            int l_line
+            int32_t l_line
             bytes this_line
         for thisline in self.fhd:
             l_line = len( thisline )
@@ -580,7 +580,7 @@ cdef class ELANDMultiParser( GenericParser ):
         self.fhd.seek( -l_line, 1 )
         return
     
-    cdef int __tlen_parse_line ( self, bytes thisline ):
+    cdef int32_t __tlen_parse_line ( self, bytes thisline ):
         """Parse tag sequence, then tag length.
 
         """
@@ -596,7 +596,7 @@ cdef class ELANDMultiParser( GenericParser ):
         cdef:
             list thisfields
             bytes thistagname, pos, strand
-            int thistaglength, thistaghits
+            int32_t thistaglength, thistaghits
         
         if not thisline: return ( b"", -1, -1 )
         thisline = thisline.rstrip()
@@ -644,7 +644,7 @@ cdef class ELANDExportParser( GenericParser ):
         """ELANDResultParser needs to skip the first several comment lines. 
         """
         cdef:
-            int l_line
+            int32_t l_line
             bytes this_line
         for thisline in self.fhd:
             l_line = len( thisline )
@@ -655,7 +655,7 @@ cdef class ELANDExportParser( GenericParser ):
         self.fhd.seek( -l_line, 1 )
         return
     
-    cdef int __tlen_parse_line ( self, bytes thisline ):
+    cdef int32_t __tlen_parse_line ( self, bytes thisline ):
         """Parse tag sequence, then tag length.
 
         """
@@ -672,7 +672,7 @@ cdef class ELANDExportParser( GenericParser ):
         cdef:
             list thisfields
             bytes thisname, strand
-            int thistaglength
+            int32_t thistaglength
         
         #if thisline.startswith("#") : return ("comment line",None,None) # comment line is skipped
         thisline = thisline.rstrip()
@@ -731,7 +731,7 @@ cdef class SAMParser( GenericParser ):
         """SAMParser needs to skip the first several comment lines. 
         """
         cdef:
-            int l_line
+            int32_t l_line
             bytes this_line
         for thisline in self.fhd:
             l_line = len( thisline )
@@ -742,13 +742,13 @@ cdef class SAMParser( GenericParser ):
         self.fhd.seek( -l_line, 1 )
         return
     
-    cdef int __tlen_parse_line ( self, bytes thisline ):
+    cdef int32_t __tlen_parse_line ( self, bytes thisline ):
         """Parse tag sequence, then tag length.
 
         """
         cdef:
             list thisfields
-            int bwflag
+            int32_t bwflag
         
         thisline = thisline.rstrip()
         if not thisline: return 0
@@ -773,7 +773,7 @@ cdef class SAMParser( GenericParser ):
         cdef:
             list thisfields
             bytes thistagname, thisref
-            int bwflag, thisstrand, thisstart
+            int32_t bwflag, thisstrand, thisstart
 
         thisline = thisline.rstrip()
         if not thisline: return ( b"", -1, -1 )
@@ -841,7 +841,7 @@ cdef class BAMParser( GenericParser ):
     1024	PCR or optical duplicate
     2048	supplementary alignment
     """
-    def __init__ ( self, str filename, long buffer_size = 100000 ):
+    def __init__ ( self, str filename, int64_t buffer_size = 100000 ):
         """Open input file. Determine whether it's a gzipped file.
 
         'filename' must be a string object.
@@ -888,7 +888,7 @@ cdef class BAMParser( GenericParser ):
             self.fhd.seek( 0 )
             return False
 
-    cpdef int tsize ( self ):
+    cpdef int32_t tsize ( self ):
         """Get tag size from BAM file -- read l_seq field.
 
         Refer to: http://samtools.sourceforge.net/SAM1.pdf
@@ -898,9 +898,9 @@ cdef class BAMParser( GenericParser ):
         """
         
         cdef:
-            int x, header_len, nc, nlength
-            int n = 0                   # successful read of tag size
-            double s = 0                # sum of tag sizes
+            int32_t x, header_len, nc, nlength
+            int32_t n = 0                   # successful read of tag size
+            float64_t s = 0                # sum of tag sizes
 
         if self.tag_size != -1:
             # if we have already calculated tag size (!= -1),  return it.
@@ -928,7 +928,7 @@ cdef class BAMParser( GenericParser ):
             s += a
             n += 1
         fseek( 0 )
-        self.tag_size = int(s/n)
+        self.tag_size = <int32_t>(s/n)
         return self.tag_size
 
     cpdef tuple get_references( self ):
@@ -939,7 +939,7 @@ cdef class BAMParser( GenericParser ):
                         rlengths (dict of lengths)
         """
         cdef:
-            int header_len, x, nc, nlength
+            int32_t header_len, x, nc, nlength
             bytes refname
             list references = []
             dict rlengths = {}
@@ -969,8 +969,8 @@ cdef class BAMParser( GenericParser ):
         Note only the unique match for a tag is kept.
         """
         cdef:
-            long i = 0                           #number of reads kept
-            int entrylength, fpos, strand, chrid
+            int64_t i = 0                           #number of reads kept
+            int32_t entrylength, fpos, strand, chrid
             list references
             dict rlengths
         
@@ -1002,8 +1002,8 @@ cdef class BAMParser( GenericParser ):
         Note only the unique match for a tag is kept.
         """
         cdef:
-            long i = 0                     #number of reads kept
-            int entrylength, fpos, strand, chrid
+            int64_t i = 0                     #number of reads kept
+            int32_t entrylength, fpos, strand, chrid
             list references
             dict rlengths
         
@@ -1033,9 +1033,9 @@ cdef class BAMParser( GenericParser ):
     
     cdef tuple __fw_binary_parse (self, const unsigned char * data ):
         cdef:
-            int thisref, thisstart, thisstrand
+            int32_t thisref, thisstart, thisstrand
             short bwflag, l_read_name, n_cigar_op
-            int cigar_code
+            int32_t cigar_code
             uint8_t *ui8
             int32_t *i32
             uint16_t *ui16
@@ -1114,16 +1114,16 @@ cdef class BAMPEParser(BAMParser):
     1024    PCR or optical duplicate
     2048    supplementary alignment
     """
-    cdef public int n           # total number of fragments
-    cdef public float d         # the average length of fragments
+    cdef public int32_t n           # total number of fragments
+    cdef public float32_t d         # the average length of fragments
 
     cpdef object build_petrack ( self ):
         """Build PETrackI from all lines, return a FWTrack object.
         """
         cdef:
-            long i = 0          # number of fragments kept
-            long m = 0          # sum of fragment lengths
-            int entrylength, fpos, chrid, tlen
+            int64_t i = 0          # number of fragments kept
+            int64_t m = 0          # sum of fragment lengths
+            int32_t entrylength, fpos, chrid, tlen
             list references
             dict rlengths
         
@@ -1162,9 +1162,9 @@ cdef class BAMPEParser(BAMParser):
         """Build PETrackI from all lines, return a PETrackI object.
         """
         cdef:
-            long i = 0          # number of fragments kept
-            long m = 0          # sum of fragment lengths
-            int entrylength, fpos, chrid, tlen
+            int64_t i = 0          # number of fragments kept
+            int64_t m = 0          # sum of fragment lengths
+            int32_t entrylength, fpos, chrid, tlen
             list references
             dict rlengths
         
@@ -1199,8 +1199,8 @@ cdef class BAMPEParser(BAMParser):
         
     cdef tuple __pe_binary_parse (self, const unsigned char * data):
         cdef:
-            int thisref, thisstart, thistlen
-            int nextpos, pos
+            int32_t thisref, thisstart, thistlen
+            int32_t nextpos, pos
             short bwflag
             uint8_t *ui8
             int32_t *i32
@@ -1262,7 +1262,7 @@ cdef class BowtieParser( GenericParser ):
     program.
 
     """
-    cdef int __tlen_parse_line ( self, bytes thisline ):
+    cdef int32_t __tlen_parse_line ( self, bytes thisline ):
         """Parse tag sequence, then tag length.
 
         """

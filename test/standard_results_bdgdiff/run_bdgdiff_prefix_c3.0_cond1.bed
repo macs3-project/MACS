@@ -294,7 +294,7 @@ chr22	31151350	31151763	run_bdgdiff_prefix_cond1_292	84.6555
 chr22	31159693	31160135	run_bdgdiff_prefix_cond1_293	20.8546
 chr22	31286558	31286984	run_bdgdiff_prefix_cond1_294	24.9735
 chr22	31316253	31316753	run_bdgdiff_prefix_cond1_295	56.0216
-chr22	31343788	31344163	run_bdgdiff_prefix_cond1_296	8.81869
+chr22	31343788	31344163	run_bdgdiff_prefix_cond1_296	8.81868
 chr22	31478726	31478961	run_bdgdiff_prefix_cond1_297	8.70083
 chr22	31481145	31481602	run_bdgdiff_prefix_cond1_298	33.9054
 chr22	31485055	31485525	run_bdgdiff_prefix_cond1_299	20.3757
@@ -322,7 +322,7 @@ chr22	32519626	32519883	run_bdgdiff_prefix_cond1_320	10.2617
 chr22	32536663	32536965	run_bdgdiff_prefix_cond1_321	23.3482
 chr22	32596877	32597141	run_bdgdiff_prefix_cond1_322	11.0218
 chr22	32602850	32603278	run_bdgdiff_prefix_cond1_323	22.899
-chr22	32662122	32662580	run_bdgdiff_prefix_cond1_324	79.8223
+chr22	32662122	32662580	run_bdgdiff_prefix_cond1_324	79.8224
 chr22	32785724	32786039	run_bdgdiff_prefix_cond1_325	16.3558
 chr22	32809687	32810101	run_bdgdiff_prefix_cond1_326	25.7946
 chr22	32840228	32840527	run_bdgdiff_prefix_cond1_327	20.8987
@@ -344,7 +344,7 @@ chr22	33670200	33670616	run_bdgdiff_prefix_cond1_342	27.4094
 chr22	33697932	33698435	run_bdgdiff_prefix_cond1_343	69.6109
 chr22	33915253	33915753	run_bdgdiff_prefix_cond1_344	30.8758
 chr22	33975412	33975849	run_bdgdiff_prefix_cond1_345	31.4515
-chr22	34313743	34314155	run_bdgdiff_prefix_cond1_346	37.0611
+chr22	34313743	34314155	run_bdgdiff_prefix_cond1_346	37.0612
 chr22	34319555	34320068	run_bdgdiff_prefix_cond1_347	40.4527
 chr22	34501412	34501912	run_bdgdiff_prefix_cond1_348	22.4104
 chr22	34507237	34507617	run_bdgdiff_prefix_cond1_349	32.4365
@@ -506,7 +506,7 @@ chr22	41295032	41295483	run_bdgdiff_prefix_cond1_504	53.8338
 chr22	41318713	41319154	run_bdgdiff_prefix_cond1_505	56.5413
 chr22	41633505	41633948	run_bdgdiff_prefix_cond1_506	43.4763
 chr22	41697379	41697699	run_bdgdiff_prefix_cond1_507	9.21926
-chr22	41799760	41800216	run_bdgdiff_prefix_cond1_508	75.8134
+chr22	41799760	41800216	run_bdgdiff_prefix_cond1_508	75.8135
 chr22	41897201	41897538	run_bdgdiff_prefix_cond1_509	8.23765
 chr22	41913711	41914123	run_bdgdiff_prefix_cond1_510	22.8497
 chr22	41922597	41923137	run_bdgdiff_prefix_cond1_511	77.4551
@@ -650,5 +650,5 @@ chr22	51058766	51059249	run_bdgdiff_prefix_cond1_648	33.675
 chr22	51060635	51060974	run_bdgdiff_prefix_cond1_649	12.2283
 chr22	51129903	51130339	run_bdgdiff_prefix_cond1_650	26.9041
 chr22	51170513	51170942	run_bdgdiff_prefix_cond1_651	32.5537
-chr22	51195414	51195671	run_bdgdiff_prefix_cond1_652	5.64795
+chr22	51195414	51195671	run_bdgdiff_prefix_cond1_652	5.64794
 chr22	51213645	51213924	run_bdgdiff_prefix_cond1_653	24.6751

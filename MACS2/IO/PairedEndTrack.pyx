@@ -13,22 +13,31 @@ from MACS2.Constants import *
 import io
 import sys
 from logging import debug, info
+
 import numpy as np
 cimport numpy as np
+from numpy cimport uint8_t, uint16_t, uint32_t, uint64_t, int8_t, int16_t, int32_t, int64_t, float32_t, float64_t
+#ctypedef np.float64_t float64_t
+#ctypedef np.float32_t float32_t
+#ctypedef np.int64_t int64_t
+#ctypedef np.int32_t int32_t
+#ctypedef np.uint64_t uint64_t
+#ctypedef np.uint32_t uint32_t
+
 from copy import copy
 
 from cpython cimport bool
 cimport cython
-from libc.stdint cimport uint32_t, uint64_t, int32_t, int64_t
+#from libc.stdint cimport uint32_t, uint64_t, int32_t, int64_t
 
 from MACS2.Constants import *
 from MACS2.Pileup import quick_pileup, max_over_two_pv_array, se_all_in_one_pileup
 
-cdef INT_MAX = <int>((<unsigned int>-1)>>1)
+cdef INT_MAX = <int32_t>((<uint32_t>(-1))>>1)
 
 cdef packed struct peLoc:
-    np.int32_t l
-    np.int32_t r
+    int32_t l
+    int32_t r
   
 # Let numpy enforce PE-ness using ndarray, gives bonus speedup when sorting
 # PE data doesn't have strandedness
@@ -44,20 +53,20 @@ cdef class PETrackI:
         public dict __locations
         public dict __pointer
         public bool __sorted
-        public unsigned long total
+        public uint64_t total
         public dict __dup_locations
         public dict __dup_pointer
         public bool __dup_sorted
-        public unsigned long dup_total
+        public uint64_t dup_total
         public object annotation
         public dict rlengths
         public object dups
-        public long buffer_size
-        public long length
-        public float average_template_length
+        public int64_t buffer_size
+        public int64_t length
+        public float32_t average_template_length
         bool   __destroyed
     
-    def __init__ (self, char * anno="", long buffer_size = 100000 ):
+    def __init__ (self, char * anno="", int64_t buffer_size = 100000 ):
         """fw is the fixed-width for all locations.
         
         """
@@ -75,14 +84,14 @@ cdef class PETrackI:
         self.length = 0
         self.average_template_length = 0.0
         
-    cpdef void add_loc ( self, bytes chromosome, int start, int end):
+    cpdef void add_loc ( self, bytes chromosome, int32_t start, int32_t end):
         """Add a location to the list according to the sequence name.
         
         chromosome -- mostly the chromosome name
         fiveendpos -- 5' end pos, left for plus strand, right for neg strand
         """
         cdef:
-            int i
+            int32_t i
 
         if chromosome not in self.__locations:
             self.__locations[chromosome] = np.zeros(shape=self.buffer_size, dtype=[('l','int32'),('r','int32')]) # note: ['l'] is the leftmost end, ['r'] is the rightmost end of fragment.
@@ -177,7 +186,7 @@ cdef class PETrackI:
             self.total += self.__locations[c].shape[0]
 
         self.__sorted = True
-        self.average_template_length = float( self.length ) / self.total
+        self.average_template_length = <float32_t>( self.length ) / self.total
         return
 
     cpdef get_locations_by_chr ( self, bytes chromosome ):
@@ -200,7 +209,7 @@ cdef class PETrackI:
     #     TL: efficient?
     #     """
     #     cdef:
-    #         long l = 0
+    #         int64_t l = 0
     #         np.ndarray[np.int32_t, ndim=2] v
     #     for v in self.__locations.values():
     #         l += (v[:,1] - v[:,0]).sum() 
@@ -224,7 +233,7 @@ cdef class PETrackI:
         self.__sorted = True
         return
 
-#    def centered_fake_fragments(track, int d):
+#    def centered_fake_fragments(track, int32_t d):
 #        """Return a copy of the PETrackI object so that its locations are all
 #        the same fixed distance d about the center of each fragment 
 #        """
@@ -253,8 +262,8 @@ cdef class PETrackI:
            np.ndarray[np.int64_t, ndim=1] bins
            np.ndarray[np.int32_t, ndim=1] sizes, locs
            bytes c
-           int i, bins_len
-           int max_bins = 0
+           int32_t i, bins_len
+           int32_t max_bins = 0
            set chrnames
            
         chrnames = self.get_chr_names()
@@ -274,18 +283,18 @@ cdef class PETrackI:
         return pmf
 
     @cython.boundscheck(False) # do not check that np indices are valid
-    cpdef void separate_dups ( self , int maxnum = 1 ):
+    cpdef void separate_dups ( self , int32_t maxnum = 1 ):
         """Filter the duplicated reads.
     
         Run it right after you add all data into this object.
         """
         cdef:
-            int i_chrom, n, start, end, size
+            int32_t i_chrom, n, start, end, size
 #            np.ndarray[np.int32_t, ndim=1] loc #= np.zeros([1,2], np.int32)
 #            np.ndarray[np.int32_t, ndim=1] current_loc #= np.zeros([1,2], np.int32)
-            int loc_start, loc_end, current_loc_start, current_loc_end
+            int32_t loc_start, loc_end, current_loc_start, current_loc_end
             np.ndarray locs, new_locs, dup_locs
-            unsigned long i_old, i_new, i_dup, new_size, dup_size
+            uint64_t i_old, i_new, i_dup, new_size, dup_size
             set chrnames
             bytes k
 
@@ -363,15 +372,15 @@ cdef class PETrackI:
         return
     
     @cython.boundscheck(False) # do not check that np indices are valid
-    cpdef void filter_dup ( self, int maxnum=-1):
+    cpdef void filter_dup ( self, int32_t maxnum=-1):
         """Filter the duplicated reads.
     
         Run it right after you add all data into this object.
         """
         cdef:
-            int i_chrom, n, start, end
-            int loc_start, loc_end, current_loc_start, current_loc_end
-            unsigned long i_old, i_new, size, new_size
+            int32_t i_chrom, n, start, end
+            int32_t loc_start, loc_end, current_loc_start, current_loc_end
+            uint64_t i_old, i_new, size, new_size
             bytes k
             np.ndarray locs, new_locs
             set chrnames
@@ -443,7 +452,7 @@ cdef class PETrackI:
         self.average_template_length = self.length / self.total
         return
 
-    cpdef void sample_percent (self, float percent, int seed = -1):
+    cpdef void sample_percent (self, float32_t percent, int32_t seed = -1):
         """Sample the tags for a given percentage.
 
         Warning: the current object is changed!
@@ -473,17 +482,17 @@ cdef class PETrackI:
             self.__pointer[k] = self.__locations[k].shape[0]
             self.length += ( self.__locations[k]['r'] - self.__locations[k]['l'] ).sum()
             self.total += self.__pointer[k]
-        self.average_template_length = float( self.length )/ self.total
+        self.average_template_length = <float32_t>( self.length )/ self.total
         return
 
-    cpdef void sample_num (self, uint64_t samplesize, int seed = -1):
+    cpdef void sample_num (self, uint64_t samplesize, int32_t seed = -1):
         """Sample the tags for a given percentage.
 
         Warning: the current object is changed!
         """
-        cdef float percent
+        cdef float32_t percent
 
-        percent = float(samplesize)/self.total
+        percent = <float32_t>(samplesize)/self.total
         self.sample_percent ( percent, seed )
         return
 
@@ -516,7 +525,7 @@ cdef class PETrackI:
 
         return
     
-    cpdef list pileup_a_chromosome ( self, bytes chrom, list scale_factor_s, float baseline_value = 0.0 ):
+    cpdef list pileup_a_chromosome ( self, bytes chrom, list scale_factor_s, float32_t baseline_value = 0.0 ):
         """pileup a certain chromosome, return [p,v] (end position and value) list.
         
         scale_factor_s  : linearly scale the pileup value applied to each d in ds. The list should have the same length as ds.
@@ -524,7 +533,7 @@ cdef class PETrackI:
         """
         cdef:
             list tmp_pileup, prev_pileup
-            float scale_factor
+            float32_t scale_factor
             
         #if not self.__sorted: 
         #    self.sort()
@@ -543,7 +552,7 @@ cdef class PETrackI:
 
         return prev_pileup
 
-    cpdef list pileup_a_chromosome_c ( self, bytes chrom, list ds, list scale_factor_s, float baseline_value = 0.0 ):
+    cpdef list pileup_a_chromosome_c ( self, bytes chrom, list ds, list scale_factor_s, float32_t baseline_value = 0.0 ):
         """pileup a certain chromosome, return [p,v] (end position and value) list.
 
         This function is for control track. Basically, here is a
@@ -559,9 +568,9 @@ cdef class PETrackI:
         """
         cdef:
             list tmp_pileup, prev_pileup
-            float scale_factor
-            long d, five_shift, three_shift
-            long rlength = self.get_rlengths()[chrom]
+            float32_t scale_factor
+            int64_t d, five_shift, three_shift
+            int64_t rlength = self.get_rlengths()[chrom]
 
         if not self.__sorted: self.sort()
 

@@ -22,8 +22,7 @@ from MACS2.Constants import *
 import numpy as np
 cimport numpy as np
 
-from numpy cimport int32_t
-ctypedef np.float32_t float32_t
+from numpy cimport int32_t, float32_t
 
 from cpython cimport bool
 from cpython cimport PyObject
