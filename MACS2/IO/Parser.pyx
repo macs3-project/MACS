@@ -1152,9 +1152,10 @@ cdef class BAMPEParser(BAMParser):
             if i % 1000000 == 0:
                 info(" %d" % i)
 
+        info( "%d fragments have been read." % i )
+        assert i > 0, "Something went wrong, no fragment has been read! Check input file!"
         self.d = m / i
         self.n = i
-        info( "%d fragments have been read." % i )
         assert self.d >= 0, "Something went wrong (mean fragment size was negative: %d = %d / %d)" % (self.d, m, i)
         self.fhd.close()
         petrack.set_rlengths( rlengths )
@@ -1189,9 +1190,9 @@ cdef class BAMPEParser(BAMParser):
             if i % 1000000 == 0:
                 info(" %d" % i)
 
+        info( "%d fragments have been read." % i )         
         self.d = ( self.d * self.n + m ) / ( self.n + i )
         self.n += i
-        info( "%d fragments have been read." % i )         
         assert self.d >= 0, "Something went wrong (mean fragment size was negative: %d = %d / %d)" % (self.d, m, i)
         self.fhd.close()
         # this is the problematic part. If fwtrack is finalized, then it's impossible to increase the length of it in a step of buffer_size for multiple input files.
