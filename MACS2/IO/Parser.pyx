@@ -1143,11 +1143,11 @@ cdef class BAMPEParser(BAMParser):
             try:
                 entrylength = unpack( '<i', fread(4) )[0]
             except err:
-                debug( " Can't identify the length of entry, it may be the end of file, stop looping..." )
+                print( " Can't identify the length of entry, it may be the end of file, stop looping..." )
                 break
             ( chrid, fpos, tlen ) = self.__pe_binary_parse( fread(entrylength) )
             if chrid == -1:
-                debug( " Chromosome name can't be found which means this entry is skipped ..." )                
+                print( " Chromosome name can't be found which means this entry is skipped ..." )                
                 continue
             add_loc(references[ chrid ], fpos, fpos + tlen)
             m += tlen
@@ -1186,11 +1186,11 @@ cdef class BAMPEParser(BAMParser):
             try:
                 entrylength = unpack('<i', fread(4))[0]
             except err:
-                debug( " Can't identify the length of entry, it may be the end of file, stop looping..." )
+                print( " Can't identify the length of entry, it may be the end of file, stop looping..." )
                 break
             ( chrid, fpos, tlen ) = self.__pe_binary_parse( fread(entrylength) )
             if chrid == -1:
-                debug( " Chromosome name can't be found which means this entry is skipped ..." )
+                print( " Chromosome name can't be found which means this entry is skipped ..." )
                 continue
             add_loc(references[ chrid ], fpos, fpos + tlen)
             m += tlen
@@ -1219,7 +1219,7 @@ cdef class BAMPEParser(BAMParser):
         
         # we skip lot of the available information in data (i.e. tag name, quality etc etc)
         if not data:
-            debug( " inside of parser: data is empty, return..." )
+            print( " inside of parser: data is empty, return..." )
             return ( -1, -1, -1 )
 
         #( thisref, pos, unused1, n_cigar_op, bwflag, unused2, unused3, nextpos, thistlen ) = \
@@ -1228,7 +1228,7 @@ cdef class BAMPEParser(BAMParser):
         ui16 = <uint16_t *>data
         bwflag = ui16[7]
         if (bwflag & 2820) or (bwflag & 1 and (bwflag & 136 or not bwflag & 2)):
-            debug( " inside of parser: this entry is filtered according to bwflag, return..." )
+            print( " inside of parser: this entry is filtered according to bwflag, return..." )
             return ( -1, -1, -1 )
         #simple form of the expression below 
         #if bwflag & 4 or bwflag & 512 or bwflag & 256 or bwflag & 2048: return (-1, -1, -1)
