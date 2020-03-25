@@ -49,6 +49,7 @@ def run( options ):
     info("Modify bedGraph...")
     if options.method.lower() == "p2q":
         btrack.p2q()
+
     else:
         extraparam = float(options.extraparam[0])
         if options.method.lower() == "multiply":

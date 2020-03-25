@@ -4,6 +4,8 @@
 
 """Module Description: Statistics function wrappers.
 
+NOTE: This file is no longer used in any other MACS2 codes.
+
 This code is free software; you can redistribute it and/or modify it
 under the terms of the BSD License (see the file LICENSE included with
 the distribution).

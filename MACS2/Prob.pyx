@@ -19,47 +19,55 @@ from math import sqrt
 
 import numpy as np
 cimport numpy as np
+from numpy cimport uint8_t, uint16_t, uint32_t, uint64_t, int8_t, int16_t, int32_t, int64_t, float32_t, float64_t
+
+#ctypedef np.float64_t float64_t
+#ctypedef np.float32_t float32_t
+#ctypedef np.int64_t int64_t
+#ctypedef np.int32_t int32_t
+#ctypedef np.uint64_t uint64_t
+#ctypedef np.uint32_t uint32_t
 
 from cpython cimport bool
 # ------------------------------------
 # constants
 # ------------------------------------
-cdef int LSTEP = 200
-cdef double EXPTHRES = exp(LSTEP)
-cdef double EXPSTEP  = exp(-1*LSTEP)
-cdef double bigx = 20
+cdef int32_t LSTEP = 200
+cdef float64_t EXPTHRES = exp(LSTEP)
+cdef float64_t EXPSTEP  = exp(-1*LSTEP)
+cdef float64_t bigx = 20
 
 # ------------------------------------
 # Normal distribution functions
 # ------------------------------------
 # x is the value, u is the mean, v is the variance
-cpdef pnorm(int x, int u, int v):
+cpdef pnorm(int32_t x, int32_t u, int32_t v):
     """The probability of X=x when X=Norm(u,v)
     """
-    return 1.0/sqrt(2.0 * 3.141592653589793 * <float>v) * exp(-<float>(x-u)**2 / (2.0 * <float>v))
+    return 1.0/sqrt(2.0 * 3.141592653589793 * <float32_t>(v)) * exp(-<float32_t>(x-u)**2 / (2.0 * <float32_t>(v)))
 
 # ------------------------------------
 # Misc functions
 # ------------------------------------
 
-cpdef factorial ( unsigned int n ):
+cpdef factorial ( uint32_t n ):
     """Calculate N!.
     
     """
-    cdef double fact = 1
-    cdef unsigned long i
+    cdef float64_t fact = 1
+    cdef uint64_t i
     if n < 0:
         return 0
-    for i in xrange( 2,n+1 ):
+    for i in range( 2,n+1 ):
         fact = fact * i
     return fact
 
-cdef double poz(double z):
+cdef float64_t poz(float64_t z):
     """ probability of normal z value
     """
     cdef:
-        double y, x, w
-        double Z_MAX = 6.0 # Maximum meaningful z value 
+        float64_t y, x, w
+        float64_t Z_MAX = 6.0 # Maximum meaningful z value 
     if z == 0.0:
         x = 0.0;
     else:
@@ -88,7 +96,7 @@ cdef double poz(double z):
     else:
         return ((1.0 - x) * 0.5)
 
-cdef double ex20 ( double x ):
+cdef float64_t ex20 ( float64_t x ):
     """Wrapper on exp function. It will return 0 if x is smaller than -20.
     """
     if x < -20.0:
@@ -96,7 +104,7 @@ cdef double ex20 ( double x ):
     else:
         return exp(x)
 
-cpdef double chisq_pvalue_e ( double x, unsigned int df ):
+cpdef float64_t chisq_pvalue_e ( float64_t x, uint32_t df ):
     """Chisq CDF function for upper tail and even degree of freedom.
     Good for p-value calculation and designed for combining pvalues.
 
@@ -107,8 +115,8 @@ cpdef double chisq_pvalue_e ( double x, unsigned int df ):
 
     """
     cdef:
-        double  a, y, s
-        double  e, c, z
+        float64_t  a, y, s
+        float64_t  e, c, z
 
     if x <= 0.0:
         return 1.0
@@ -139,7 +147,7 @@ cpdef double chisq_pvalue_e ( double x, unsigned int df ):
     else:
         return s
 
-cpdef double chisq_logp_e ( double x, unsigned int df, bool log10 = False ):
+cpdef float64_t chisq_logp_e ( float64_t x, uint32_t df, bool log10 = False ):
     """Chisq CDF function in log space for upper tail and even degree of freedom
     Good for p-value calculation and designed for combining pvalues.
 
@@ -151,9 +159,9 @@ cpdef double chisq_logp_e ( double x, unsigned int df, bool log10 = False ):
 
     """
     cdef:
-        double a, y
-        double s                # s is the return value
-        double e, c, z
+        float64_t a, y
+        float64_t s                # s is the return value
+        float64_t e, c, z
 
     if x <= 0.0:
         return 0.0
@@ -186,7 +194,7 @@ cpdef double chisq_logp_e ( double x, unsigned int df, bool log10 = False ):
     else:
         return -s
     
-cpdef double poisson_cdf ( unsigned int n, double lam, bool lower=False, bool log10=False ):
+cpdef float64_t poisson_cdf ( uint32_t n, float64_t lam, bool lower=False, bool log10=False ):
     """Poisson CDF evaluater.
 
     This is a more stable CDF function. It can tolerate large lambda
@@ -221,7 +229,7 @@ cpdef double poisson_cdf ( unsigned int n, double lam, bool lower=False, bool lo
         else:
             return __poisson_cdf_Q(n,lam)
 
-cdef inline double __poisson_cdf ( unsigned int k, double a ):
+cdef inline float64_t __poisson_cdf ( uint32_t k, float64_t a ):
     """Poisson CDF For small lambda. If a > 745, this will return
     incorrect result.
 
@@ -230,10 +238,10 @@ cdef inline double __poisson_cdf ( unsigned int k, double a ):
     a	: lambda
     """
     cdef:
-        double nextcdf
-        double cdf
-        unsigned int i
-        double lastcdf
+        float64_t nextcdf
+        float64_t cdf
+        uint32_t i
+        float64_t lastcdf
 
     if k < 0:
         return 0.0                        # special cases
@@ -250,7 +258,7 @@ cdef inline double __poisson_cdf ( unsigned int k, double a ):
     else:
         return cdf
     
-cdef inline double __poisson_cdf_large_lambda ( unsigned int k, double a ):
+cdef inline float64_t __poisson_cdf_large_lambda ( uint32_t k, float64_t a ):
     """Slower poisson cdf for large lambda ( > 700 )
 
     Parameters:
@@ -258,18 +266,18 @@ cdef inline double __poisson_cdf_large_lambda ( unsigned int k, double a ):
     a	: lambda
     """
     cdef:
-        int num_parts
-        double lastexp
-        double nextcdf
-        double cdf
-        unsigned int i
-        double lastcdf
+        int32_t num_parts
+        float64_t lastexp
+        float64_t nextcdf
+        float64_t cdf
+        uint32_t i
+        float64_t lastcdf
     
     assert a > 700
     if k < 0:
         return 0.0                        # special cases
 
-    num_parts = int( a / LSTEP )
+    num_parts = <int32_t>( a / LSTEP )
     lastexp = exp( -1 * ( a % LSTEP ) )
     nextcdf = EXPSTEP
 
@@ -293,7 +301,7 @@ cdef inline double __poisson_cdf_large_lambda ( unsigned int k, double a ):
     cdf *= lastexp
     return cdf
 
-cdef inline double __poisson_cdf_Q ( unsigned int k, double a ):
+cdef inline float64_t __poisson_cdf_Q ( uint32_t k, float64_t a ):
     """internal Poisson CDF evaluater for upper tail with small
     lambda.
 
@@ -301,19 +309,19 @@ cdef inline double __poisson_cdf_Q ( unsigned int k, double a ):
     k	: observation
     a	: lambda
     """
-    cdef unsigned int i
+    cdef uint32_t i
 
     if k < 0:
         return 1.0                        # special cases
-    cdef double nextcdf
+    cdef float64_t nextcdf
     nextcdf = exp( -1 * a )
-    cdef double lastcdf
+    cdef float64_t lastcdf
 
-    for i in xrange(1,k+1):
+    for i in range(1,k+1):
         lastcdf = nextcdf
         nextcdf = lastcdf * a / i
 
-    cdef double cdf = 0.0
+    cdef float64_t cdf = 0.0
     i = k+1
     while nextcdf >0.0:
         lastcdf = nextcdf
@@ -322,7 +330,7 @@ cdef inline double __poisson_cdf_Q ( unsigned int k, double a ):
         i+=1
     return cdf
 
-cdef inline double __poisson_cdf_Q_large_lambda ( unsigned int k, double a ):
+cdef inline float64_t __poisson_cdf_Q_large_lambda ( uint32_t k, float64_t a ):
     """Slower internal Poisson CDF evaluater for upper tail with large
     lambda.
 
@@ -331,17 +339,16 @@ cdef inline double __poisson_cdf_Q_large_lambda ( unsigned int k, double a ):
     a	: lambda    
     """
     assert a > 700
-    if k < 0:
-        return 1.0                        # special cases
-    cdef unsigned int num_parts = int(a/LSTEP)
-    cdef double lastexp = exp(-1 * (a % LSTEP) )
-    cdef double nextcdf = EXPSTEP
-    cdef unsigned int i
-    cdef double lastcdf
+    if k < 0: return 1.0                        # special cases
+    cdef uint32_t num_parts = <int32_t>(a/LSTEP)
+    cdef float64_t lastexp = exp(-1 * (a % LSTEP) )
+    cdef float64_t nextcdf = EXPSTEP
+    cdef uint32_t i
+    cdef float64_t lastcdf
 
     num_parts -= 1
 
-    for i in xrange(1,k+1):
+    for i in range(1,k+1):
         lastcdf = nextcdf
         nextcdf = lastcdf * a / i
         if nextcdf > EXPTHRES:
@@ -353,7 +360,7 @@ cdef inline double __poisson_cdf_Q_large_lambda ( unsigned int k, double a ):
                raise Exception("Unexpected error")
                #cdf *= lastexp
                #lastexp = 1
-    cdef double cdf = 0.0
+    cdef float64_t cdf = 0.0
     i = k+1
     while nextcdf >0.0:
         lastcdf = nextcdf
@@ -369,12 +376,12 @@ cdef inline double __poisson_cdf_Q_large_lambda ( unsigned int k, double a ):
                cdf *= lastexp
                lastexp = 1
 
-    for i in xrange(num_parts):
+    for i in range(num_parts):
         cdf *= EXPSTEP
     cdf *= lastexp
     return cdf
 
-cdef inline double log10_poisson_cdf_P_large_lambda ( unsigned int k, double lbd ):
+cdef inline float64_t log10_poisson_cdf_P_large_lambda ( uint32_t k, float64_t lbd ):
     """Slower Poisson CDF evaluater for lower tail which allow
     calculation in log space. Better for the pvalue < 10^-310.
 
@@ -388,14 +395,14 @@ cdef inline double log10_poisson_cdf_P_large_lambda ( unsigned int k, double lbd
 
     Return the log10(pvalue)
     """
-    cdef double residue = 0
-    cdef double logx = 0
-    cdef double ln_lbd = log(lbd)
+    cdef float64_t residue = 0
+    cdef float64_t logx = 0
+    cdef float64_t ln_lbd = log(lbd)
 
     # first residue
-    cdef int m = k
-    cdef double sum_ln_m = 0
-    cdef int i = 0
+    cdef int32_t m = k
+    cdef float64_t sum_ln_m = 0
+    cdef int32_t i = 0
     for i in range(1,m+1):
         sum_ln_m += log(i)
     logx = m*ln_lbd - sum_ln_m
@@ -412,7 +419,7 @@ cdef inline double log10_poisson_cdf_P_large_lambda ( unsigned int k, double lbd
 
     return round((residue-lbd)/M_LN10,5)
 
-cdef inline double log10_poisson_cdf_Q_large_lambda ( unsigned int k, double lbd ):
+cdef inline float64_t log10_poisson_cdf_Q_large_lambda ( uint32_t k, float64_t lbd ):
     """Slower Poisson CDF evaluater for upper tail which allow
     calculation in log space. Better for the pvalue < 10^-310.
 
@@ -426,14 +433,14 @@ cdef inline double log10_poisson_cdf_Q_large_lambda ( unsigned int k, double lbd
 
     Return the log10(pvalue)
     """
-    cdef double residue = 0
-    cdef double logx = 0
-    cdef double ln_lbd = log(lbd)
+    cdef float64_t residue = 0
+    cdef float64_t logx = 0
+    cdef float64_t ln_lbd = log(lbd)
 
     # first residue
-    cdef int m = k+1
-    cdef double sum_ln_m = 0
-    cdef int i = 0
+    cdef int32_t m = k+1
+    cdef float64_t sum_ln_m = 0
+    cdef int32_t i = 0
     for i in range(1,m+1):
         sum_ln_m += log(i)
     logx = m*ln_lbd - sum_ln_m
@@ -450,7 +457,7 @@ cdef inline double log10_poisson_cdf_Q_large_lambda ( unsigned int k, double lbd
 
     return round((residue-lbd)/log(10),5)
 
-cdef inline double logspace_add ( double logx, double logy ):
+cdef inline float64_t logspace_add ( float64_t logx, float64_t logy ):
     """addition in log space. 
 
     Given two log values, such as logx and logy, return
@@ -459,7 +466,7 @@ cdef inline double logspace_add ( double logx, double logy ):
     """
     return max (logx, logy) + log1p (exp (-fabs (logx - logy)))
 
-cpdef poisson_cdf_inv ( double cdf, double lam, int maximum=1000 ):
+cpdef poisson_cdf_inv ( float64_t cdf, float64_t lam, int32_t maximum=1000 ):
     """inverse poisson distribution.
 
     cdf : the CDF
@@ -473,15 +480,15 @@ cpdef poisson_cdf_inv ( double cdf, double lam, int maximum=1000 ):
         raise Exception ("CDF must >= 0 and <= 1")
     elif cdf == 0:
         return 0
-    cdef double sum2 = 0
-    cdef double newval = exp( -1*lam )
+    cdef float64_t sum2 = 0
+    cdef float64_t newval = exp( -1*lam )
     sum2 = newval
 
-    cdef int i
-    cdef double sumold
-    cdef double lastval
+    cdef int32_t i
+    cdef float64_t sumold
+    cdef float64_t lastval
 
-    for i in xrange(1,maximum+1):
+    for i in range(1,maximum+1):
         sumold = sum2
         lastval = newval
         newval = lastval * lam / i
@@ -491,7 +498,7 @@ cpdef poisson_cdf_inv ( double cdf, double lam, int maximum=1000 ):
     
     return maximum
 
-cpdef poisson_cdf_Q_inv ( double cdf, double lam, int maximum=1000 ):
+cpdef poisson_cdf_Q_inv ( float64_t cdf, float64_t lam, int32_t maximum=1000 ):
     """inverse poisson distribution.
 
     cdf : the CDF
@@ -505,15 +512,15 @@ cpdef poisson_cdf_Q_inv ( double cdf, double lam, int maximum=1000 ):
         raise Exception ("CDF must >= 0 and <= 1")
     elif cdf == 0:
         return 0
-    cdef double sum2 = 0
-    cdef double newval = exp( -1 * lam )
+    cdef float64_t sum2 = 0
+    cdef float64_t newval = exp( -1 * lam )
     sum2 = newval
 
-    cdef int i
-    cdef double lastval
-    cdef double sumold
+    cdef int32_t i
+    cdef float64_t lastval
+    cdef float64_t sumold
 
-    for i in xrange(1,maximum+1):
+    for i in range(1,maximum+1):
         sumold = sum2
         lastval = newval
         newval = lastval * lam / i
@@ -523,7 +530,7 @@ cpdef poisson_cdf_Q_inv ( double cdf, double lam, int maximum=1000 ):
     
     return maximum
 
-cpdef poisson_pdf ( unsigned int k, double a ):
+cpdef poisson_pdf ( uint32_t k, float64_t a ):
     """Poisson PDF.
 
     PDF(K,A) is the probability that the number of events observed in
@@ -535,27 +542,27 @@ cpdef poisson_pdf ( unsigned int k, double a ):
     return exp(-a) * pow (a, k, None) / factorial (k)
     
 
-cdef binomial_coef ( long n, long k ):
+cdef binomial_coef ( int64_t n, int64_t k ):
     """BINOMIAL_COEF computes the Binomial coefficient C(N,K)
 
     n,k are integers.
     """
-    cdef long mn = min (k, n-k)
-    cdef long mx
-    cdef double cnk
-    cdef long i
+    cdef int64_t mn = min (k, n-k)
+    cdef int64_t mx
+    cdef float64_t cnk
+    cdef int64_t i
     if mn < 0:
         return 0
     elif mn == 0:
         return 1
     else:
         mx = max(k,n-k)
-        cnk = float(mx+1)
-        for i in xrange(2,mn+1):
+        cnk = <float32_t>(mx+1)
+        for i in range(2,mn+1):
             cnk = cnk * (mx+i) / i
     return cnk
 
-cpdef binomial_cdf ( long x, long a, double b, bool lower=True ):
+cpdef binomial_cdf ( int64_t x, int64_t a, float64_t b, bool lower=True ):
     """ BINOMIAL_CDF compute the binomial CDF.
 
     CDF(x)(A,B) is the probability of at most X successes in A trials,
@@ -566,7 +573,7 @@ cpdef binomial_cdf ( long x, long a, double b, bool lower=True ):
     else:
         return _binomial_cdf_r (x,a,b)
 
-cpdef binomial_sf ( long x, long a, double b, bool lower=True ):
+cpdef binomial_sf ( int64_t x, int64_t a, float64_t b, bool lower=True ):
     """ BINOMIAL_SF compute the binomial survival function (1-CDF)
 
     SF(x)(A,B) is the probability of more than X successes in A trials,
@@ -577,21 +584,27 @@ cpdef binomial_sf ( long x, long a, double b, bool lower=True ):
     else:
         return 1.0 - _binomial_cdf_r (x,a,b)
 
-cpdef pduplication (np.ndarray[np.float64_t] pmf, int N_obs):
+cpdef pduplication (np.ndarray[np.float64_t] pmf, int32_t N_obs):
     """return the probability of a duplicate fragment given a pmf
     and a number of observed fragments N_obs
     """
     cdef:
         n = pmf.shape[0]
-        float p, sf = 0.0
+        float32_t p, sf = 0.0
     for p in pmf:
         sf += binomial_sf(2, N_obs, p)
-    return sf / <float>n
+    return sf / <float32_t>n
 
-cdef _binomial_cdf_r ( long x, long a, double b ):
+cdef _binomial_cdf_r ( int64_t x, int64_t a, float64_t b ):
     """ Binomial CDF for upper tail.
 
     """
+    cdef int64_t argmax=<int32_t>(a*b)
+    cdef float64_t seedpdf
+    cdef float64_t cdf
+    cdef float64_t pdf
+    cdef int64_t i
+
     if x < 0:
         return 1
     elif a < x:
@@ -600,18 +613,12 @@ cdef _binomial_cdf_r ( long x, long a, double b ):
         return 0
     elif b == 1:
         return 1
-
-    cdef long argmax=int(a*b)
-    cdef double seedpdf
-    cdef double cdf
-    cdef double pdf
-    cdef long i
     
     if x<argmax:
         seedpdf=binomial_pdf(argmax,a,b)
         pdf=seedpdf
         cdf = pdf
-        for i in xrange(argmax-1,x,-1):
+        for i in range(argmax-1,x,-1):
             pdf/=(a-i)*b/(1-b)/(i+1)
             if pdf==0.0: break
             cdf += pdf
@@ -623,8 +630,8 @@ cdef _binomial_cdf_r ( long x, long a, double b ):
             if pdf==0.0: break
             cdf+=pdf
             i+=1
-        cdf=min(1,cdf)
-        cdf = float("%.10e" %cdf)
+        cdf = min(1,cdf)
+        #cdf = float("%.10e" %cdf)
         return cdf
     else:
         pdf=binomial_pdf(x+1,a,b)
@@ -635,15 +642,21 @@ cdef _binomial_cdf_r ( long x, long a, double b ):
             if pdf==0.0: break
             cdf += pdf
             i+=1
-        cdf=min(1,cdf)
-        cdf = float("%.10e" %cdf)
+        cdf = min(1,cdf)
+        #cdf = float("%.10e" %cdf)
         return cdf
 
 
-cdef _binomial_cdf_f ( long x, long a, double b ):
+cdef _binomial_cdf_f ( int64_t x, int64_t a, float64_t b ):
     """ Binomial CDF for lower tail.
 
     """    
+    cdef int64_t argmax=<int32_t>(a*b)
+    cdef float64_t seedpdf
+    cdef float64_t cdf
+    cdef float64_t pdf
+    cdef int64_t i
+
     if x < 0:
         return 0
     elif a < x:
@@ -653,58 +666,52 @@ cdef _binomial_cdf_f ( long x, long a, double b ):
     elif b == 1:
         return 0
 
-    cdef long argmax=int(a*b)
-    cdef double seedpdf
-    cdef double cdf
-    cdef double pdf
-    cdef long i
-
     if x>argmax:
         seedpdf=binomial_pdf(argmax,a,b)
         pdf=seedpdf
         cdf = pdf
-        for i in xrange(argmax-1,-1,-1):
+        for i in range(argmax-1,-1,-1):
             pdf/=(a-i)*b/(1-b)/(i+1)
             if pdf==0.0: break
             cdf += pdf
             
         pdf = seedpdf
-        for i in xrange(argmax,x):
+        for i in range(argmax,x):
             pdf*=(a-i)*b/(1-b)/(i+1)
             if pdf==0.0: break
             cdf+=pdf
         cdf=min(1,cdf)
-        cdf = float("%.10e" %cdf)
+        #cdf = float("%.10e" %cdf)
         return cdf
     else:
         pdf=binomial_pdf(x,a,b)
         cdf = pdf
-        for i in xrange(x-1,-1,-1):
+        for i in range(x-1,-1,-1):
             pdf/=(a-i)*b/(1-b)/(i+1)
             if pdf==0.0: break
             cdf += pdf
         cdf=min(1,cdf)
-        cdf = float("%.10e" %cdf)
+        #cdf = float("%.10e" %cdf)
         return cdf
 
-cpdef binomial_cdf_inv ( double cdf, long a, double b ):
+cpdef binomial_cdf_inv ( float64_t cdf, int64_t a, float64_t b ):
     """BINOMIAL_CDF_INV inverts the binomial CDF. For lower tail only!
 
     """
     if cdf < 0 or cdf >1:
         raise Exception("CDF must >= 0 or <= 1")
 
-    cdef double cdf2 = 0
-    cdef long x
+    cdef float64_t cdf2 = 0
+    cdef int64_t x
 
-    for x in xrange(0,a+1):
+    for x in range(0,a+1):
         pdf = binomial_pdf (x,a,b)
         cdf2 = cdf2 + pdf
         if cdf < cdf2:
             return x
     return a
     
-cpdef binomial_pdf( long x, long a, double b ):
+cpdef binomial_pdf( int64_t x, int64_t a, float64_t b ):
     """binomial PDF by H. Gene Shin
     
     """
@@ -724,12 +731,12 @@ cpdef binomial_pdf( long x, long a, double b ):
         else:
             return 0
 
-    cdef double p
-    cdef long mn
-    cdef long mx
-    cdef double pdf
-    cdef long t
-    cdef long q
+    cdef float64_t p
+    cdef int64_t mn
+    cdef int64_t mx
+    cdef float64_t pdf
+    cdef int64_t t
+    cdef int64_t q
 
     if x>a-x:
         p=1-b
@@ -741,7 +748,7 @@ cpdef binomial_pdf( long x, long a, double b ):
         mx=a-x
     pdf=1
     t = 0
-    for q in xrange(1,mn+1):
+    for q in range(1,mn+1):
         pdf*=(a-q+1)*p/(mn-q+1)
         if pdf < 1e-100:
             while pdf < 1e-3:
@@ -752,35 +759,35 @@ cpdef binomial_pdf( long x, long a, double b ):
                 pdf *= 1-p
                 t+=1
 
-    for i in xrange(mx-t):
+    for i in range(mx-t):
         pdf *= 1-p
         
-    pdf=float("%.10e" % pdf)
+    #pdf=float("%.10e" % pdf)
     return pdf
 
-# cdef normal_01_cdf ( double x ):
+# cdef normal_01_cdf ( float64_t x ):
 #     """NORMAL_01_CDF evaluates the Normal 01 CDF.
 #     """
-#     cdef double a1 = 0.398942280444
-#     cdef double a2 = 0.399903438504
-#     cdef double a3 = 5.75885480458
-#     cdef double a4 = 29.8213557808
-#     cdef double a5 = 2.62433121679
-#     cdef double a6 = 48.6959930692
-#     cdef double a7 = 5.92885724438
-#     cdef double b0 = 0.398942280385
-#     cdef double b1 = 3.8052E-08
-#     cdef double b2 = 1.00000615302
-#     cdef double b3 = 3.98064794E-04
-#     cdef double b4 = 1.98615381364
-#     cdef double b5 = 0.151679116635
-#     cdef double b6 = 5.29330324926
-#     cdef double b7 = 4.8385912808
-#     cdef double b8 = 15.1508972451
-#     cdef double b9 = 0.742380924027
-#     cdef double b10 = 30.789933034
-#     cdef double b11 = 3.99019417011
-#     cdef double cdf
+#     cdef float64_t a1 = 0.398942280444
+#     cdef float64_t a2 = 0.399903438504
+#     cdef float64_t a3 = 5.75885480458
+#     cdef float64_t a4 = 29.8213557808
+#     cdef float64_t a5 = 2.62433121679
+#     cdef float64_t a6 = 48.6959930692
+#     cdef float64_t a7 = 5.92885724438
+#     cdef float64_t b0 = 0.398942280385
+#     cdef float64_t b1 = 3.8052E-08
+#     cdef float64_t b2 = 1.00000615302
+#     cdef float64_t b3 = 3.98064794E-04
+#     cdef float64_t b4 = 1.98615381364
+#     cdef float64_t b5 = 0.151679116635
+#     cdef float64_t b6 = 5.29330324926
+#     cdef float64_t b7 = 4.8385912808
+#     cdef float64_t b8 = 15.1508972451
+#     cdef float64_t b9 = 0.742380924027
+#     cdef float64_t b10 = 30.789933034
+#     cdef float64_t b11 = 3.99019417011
+#     cdef float64_t cdf
 
 #     if abs ( x ) <= 1.28:
 #         y = 0.5 * x * x

@@ -30,7 +30,7 @@ echo "1.1 callpeak narrow"
 
 mkdir ${TAG}_run_callpeak_narrow
 
-macs2 callpeak -g 52000000 -t $CHIP -c $CTRL -n run_callpeak_narrow0 -B --outdir ${TAG}_run_callpeak_narrow --cutoff-analysis &> ${TAG}_run_callpeak_narrow/run_callpeak_narrow0.log
+macs2 callpeak -g 52000000 -t $CHIP -c $CTRL -n run_callpeak_narrow0 -B --outdir ${TAG}_run_callpeak_narrow --cutoff-analysis --verbose 3 &> ${TAG}_run_callpeak_narrow/run_callpeak_narrow0.log
 macs2 callpeak -g 52000000 -t $CHIP -c $CTRL -n run_callpeak_narrow1 -B --outdir ${TAG}_run_callpeak_narrow --d-min 15 --call-summits &> ${TAG}_run_callpeak_narrow/run_callpeak_narrow1.log
 macs2 callpeak -g 52000000 -t $CHIP -c $CTRL -n run_callpeak_narrow2 -B --outdir ${TAG}_run_callpeak_narrow --nomodel --extsize 100 &> ${TAG}_run_callpeak_narrow/run_callpeak_narrow2.log
 macs2 callpeak -g 52000000 -t $CHIP -c $CTRL -n run_callpeak_narrow3 -B --outdir ${TAG}_run_callpeak_narrow --nomodel --extsize 100 --shift -50 &> ${TAG}_run_callpeak_narrow/run_callpeak_narrow3.log
@@ -181,9 +181,11 @@ echo "14. search for errors or warnings in log files"
 flag=0
 for i in `ls ${TAG}_run_*/*.log`;do
     echo " checking $i..."
-    egrep -A 2 -B 2 -i "error|warning" $i;
+    egrep -i "error|warning" $i;
     if [[ $? == 0 ]];then
 	echo " ... error/warning found!"
+	echo "the log file:"
+	cat $i;
 	let "flag=1";
     else
 	echo " ... clear!"
@@ -233,9 +235,9 @@ fi
 
 echo "16. brief speed test"
 
-macs2 callpeak -t CTCF_12878_5M.bed.gz -c Input_12878_5M.bed.gz -n speedtest.py37 -B &> speedtest.py37.log &
+macs2 callpeak -t CTCF_12878_5M.bed.gz -c Input_12878_5M.bed.gz -n speedtest -B &> speedtest.log &
 # monitor the macs2 callpeak run and output CPU and mem usage
-./prockreport 1 $!
+./prockreport 0.5 $!
 wait;
 
 # END of test

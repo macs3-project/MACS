@@ -14,6 +14,14 @@ the distribution).
 # ------------------------------------
 import numpy as np
 cimport numpy as np
+from numpy cimport uint8_t, uint16_t, uint32_t, uint64_t, int8_t, int16_t, int32_t, int64_t, float32_t, float64_t
+
+#ctypedef np.float64_t float64_t
+#ctypedef np.float32_t float32_t
+#ctypedef np.int64_t int64_t
+#ctypedef np.int32_t int32_t
+#ctypedef np.uint64_t uint64_t
+#ctypedef np.uint32_t uint32_t
 
 from copy import copy
 from functools import reduce
@@ -25,7 +33,6 @@ from MACS2.Signal import maxima, enforce_valleys, enforce_peakyness
 cimport cython
 
 from libc.math cimport log10,log, floor, ceil
-from libc.stdint cimport uint32_t, uint64_t, int32_t, int64_t
 
 from MACS2.Constants import BYTE4, FBYTE4, array
 from MACS2.Prob import poisson_cdf
@@ -43,21 +50,21 @@ __doc__ = "scoreTrack classes"
 # ------------------------------------
 # Misc functions
 # ------------------------------------
-cdef inline int int_max(int a, int b): return a if a >= b else b
-cdef inline int int_min(int a, int b): return a if a <= b else b
+cdef inline int32_t int_max(int32_t a, int32_t b): return a if a >= b else b
+cdef inline int32_t int_min(int32_t a, int32_t b): return a if a <= b else b
 
 LOG10_E = 0.43429448190325176
 
 pscore_dict = dict()
 
-cdef double get_pscore ( int observed, double expectation ):
+cdef float64_t get_pscore ( int32_t observed, float64_t expectation ):
     """Get p-value score from Poisson test. First check existing
     table, if failed, call poisson_cdf function, then store the result
     in table.
     
     """
     cdef:
-        double score
+        float64_t score
 
     try:
         return pscore_dict[(observed, expectation)]
@@ -68,7 +75,7 @@ cdef double get_pscore ( int observed, double expectation ):
 
 asym_logLR_dict = dict()
 
-cdef double logLR_asym ( double x, double y ):
+cdef float64_t logLR_asym ( float64_t x, float64_t y ):
     """Calculate log10 Likelihood between H1 ( enriched ) and H0 (
     chromatin bias ). Set minus sign for depletion.
     
@@ -76,7 +83,7 @@ cdef double logLR_asym ( double x, double y ):
 
     """
     cdef:
-        double s
+        float64_t s
 
     if (x,y) in asym_logLR_dict:
         return asym_logLR_dict[ ( x, y ) ]
@@ -92,7 +99,7 @@ cdef double logLR_asym ( double x, double y ):
 
 sym_logLR_dict = dict()
 
-cdef double logLR_sym ( double x, double y ):
+cdef float64_t logLR_sym ( float64_t x, float64_t y ):
     """Calculate log10 Likelihood between H1 ( enriched ) and H0 (
     another enriched ). Set minus sign for H0>H1.
     
@@ -100,7 +107,7 @@ cdef double logLR_sym ( double x, double y ):
 
     """
     cdef:
-        double s
+        float64_t s
     
     if (x,y) in sym_logLR_dict:
         return sym_logLR_dict[ ( x, y ) ]
@@ -114,49 +121,15 @@ cdef double logLR_sym ( double x, double y ):
         sym_logLR_dict[ ( x, y ) ] = s
         return s
     
-cdef double get_logFE ( float x, float y ):
+cdef float64_t get_logFE ( float64_t x, float64_t y ):
     """ return 100* log10 fold enrichment with +1 pseudocount.
     """
     return log10( x/y )
 
-cdef float get_subtraction ( float x, float y):
+cdef float64_t get_subtraction ( float64_t x, float64_t y):
     """ return subtraction.
     """
     return x - y
-
-cdef float median_from_value_length ( np.ndarray value, list length ):
-    """
-    """
-    cdef:
-        list tmp
-        int32_t c, tmp_l
-        float l_half
-        float tmp_v
-
-    c = 0
-    tmp = sorted(list(zip( value, length )))
-    l_half = sum( length )/2
-    for (tmp_v, tmp_l) in tmp:
-        c += tmp_l
-        if c > l_half:
-            return tmp_v
-
-cdef float mean_from_value_length ( np.ndarray value, list length ):
-    """
-    """
-    cdef:
-        list tmp
-        int32_t tmp_l, l
-        float tmp_v, sum_v
-
-    sum_v = 0
-    tmp = zip( value, length )
-    l = sum( length )
-
-    for (tmp_v, tmp_l) in tmp:
-        sum_v += tmp_v * tmp_l
-
-    return sum_v / l
 
 # ------------------------------------
 # Classes
@@ -174,7 +147,7 @@ class CombinedTwoTrack:
         self.data = {}
         self.pointer = {}
 
-    def add_chromosome ( self, bytes chrom, int chrom_max_len ):
+    def add_chromosome ( self, bytes chrom, int32_t chrom_max_len ):
         if chrom not in self.data:
             self.data[chrom] = np.zeros(chrom_max_len,dtype=[('pos','int32'),
                                                              ('V1','float32'), # value for the first track
@@ -182,14 +155,14 @@ class CombinedTwoTrack:
                                                              ])
             self.pointer[chrom] = 0
 
-    def add ( self, bytes chromosome, int endpos, double V1, double V2 ):
+    def add ( self, bytes chromosome, int32_t endpos, float64_t V1, float64_t V2 ):
         """Add a chr-endpos-sample-control block into data
         dictionary. At the mean time, calculate pvalues.
 
         """
         cdef:
             list c
-            int i
+            int32_t i
             
         c = self.data[chromosome]
         i = self.pointer[chromosome]
@@ -237,7 +210,7 @@ class CombinedTwoTrack:
         cdef:
             bytes chrom
             set chrs
-            int pre, i, l
+            int32_t pre, i, l
             np.ndarray[np.int32_t, ndim=1] pos
             np.ndarray[np.float32_t, ndim=1] value
         
@@ -262,7 +235,7 @@ class CombinedTwoTrack:
 
         """
         cdef:
-            long t
+            int64_t t
             bytes chrom
             
         t = 0
@@ -280,8 +253,8 @@ class CombinedTwoTrack:
         cdef:
             set chr1, chr2, common_chr
             bytes chrom
-            int pre_p, p1, p2
-            double v11, v21, v2
+            int32_t pre_p, p1, p2
+            float64_t v11, v21, v2
         
         #assert isinstance(bdgTrack2,bedGraphTrackI), "bdgTrack2 is not a bedGraphTrackI object"
 
@@ -363,7 +336,7 @@ class CombinedTwoTrack:
 
     def extract_average (self, bdgTrack2):
         cdef:
-            int i, l
+            int32_t i, l
             bytes chrom, start, end
         
         (rarray,v1array,v2array,larray)  = self.extract_value(bdgTrack2)
@@ -382,13 +355,13 @@ class CombinedTwoTrack:
                 if cur_region[0]:
                     l = int(cur_region[2])-int(cur_region[1])
                     radd(b"%s\.%d\.%d" % (cur_region[0],cur_region[1],cur_region[2]))
-                    v1add(cur_region[3]/float(l))
-                    v2add(cur_region[4]/float(l))                    
+                    v1add(cur_region[3]/<float32_t>(l))
+                    v2add(cur_region[4]/<float32_t>(l))                    
                 cur_region = [chrom, start, end, v1array[i]*larray[i], v2array[i]*larray[i]]
 
         radd(b"%s\.%d\.%d" % (cur_region[0],cur_region[1],cur_region[2]))
-        v1add(cur_region[3]/float(l))
-        v2add(cur_region[4]/float(l))
+        v1add(cur_region[3]/<float32_t>(l))
+        v2add(cur_region[4]/<float32_t>(l))
         return ret
 
     def extract_sum (self, bdgTrack2):
@@ -396,7 +369,7 @@ class CombinedTwoTrack:
         
         """
         cdef:
-            int i
+            int32_t i
             bytes chrom, start, end
         
         (rarray,v1array,v2array,larray)  = self.extract_value(bdgTrack2)
@@ -440,16 +413,16 @@ cdef class scoreTrackII:
         dict datalength                 # length of data array of each chromosome
         bool trackline                  # whether trackline should be saved in bedGraph
         bool stderr_on                  # whether to calculate stderr
-        double treat_edm                 # seq depth in million of treatment
-        double ctrl_edm                  # seq depth in million of control
+        float64_t treat_edm                 # seq depth in million of treatment
+        float64_t ctrl_edm                  # seq depth in million of control
         char scoring_method              # method for calculating scores.
         char normalization_method        # scale to control? scale to treatment? both scale to 1million reads?
-        float pseudocount                # the pseudocount used to calcuate logLR, FE or logFE
-        float cutoff
+        float64_t pseudocount                # the pseudocount used to calcuate logLR, FE or logFE
+        float64_t cutoff
         dict pvalue_stat                 # save pvalue<->length dictionary
 
     
-    def __init__ (self, float treat_depth, float ctrl_depth, bool stderr_on = False, float pseudocount = 1.0 ):
+    def __init__ (self, float64_t treat_depth, float64_t ctrl_depth, bool stderr_on = False, float64_t pseudocount = 1.0 ):
         """Initialize.
 
         treat_depth and ctrl_depth are effective depth in million:
@@ -499,7 +472,7 @@ cdef class scoreTrackII:
         self.pseudocount = pseudocount
         self.pvalue_stat = {}
 
-    cpdef set_pseudocount( self, float pseudocount ):
+    cpdef set_pseudocount( self, float64_t pseudocount ):
         self.pseudocount = pseudocount
         
     cpdef enable_trackline( self ):
@@ -507,7 +480,7 @@ cdef class scoreTrackII:
         """
         self.trackline = True
 
-    cpdef add_chromosome ( self, bytes chrom, int chrom_max_len ):
+    cpdef add_chromosome ( self, bytes chrom, int32_t chrom_max_len ):
         """
         chrom: chromosome name
         chrom_max_len: maximum number of data points in this chromosome
@@ -516,12 +489,12 @@ cdef class scoreTrackII:
         if chrom not in self.data:
             #self.data[chrom] = np.zeros( ( chrom_max_len, 4 ), dtype="int32" ) # remember col #2-4 is actual value * 100, I use integer here.
             self.data[chrom] = [ np.zeros( chrom_max_len, dtype="int32" ), # pos
-                                 np.zeros( chrom_max_len, dtype="float32" ), # pileup at each interval, in float format
-                                 np.zeros( chrom_max_len, dtype="float32" ), # control at each interval, in float format
-                                 np.zeros( chrom_max_len, dtype="float32" ) ] # score at each interval, in float format
+                                 np.zeros( chrom_max_len, dtype="float32" ), # pileup at each interval, in float32 format
+                                 np.zeros( chrom_max_len, dtype="float32" ), # control at each interval, in float32 format
+                                 np.zeros( chrom_max_len, dtype="float32" ) ] # score at each interval, in float32 format
             self.datalength[chrom] = 0
 
-    cpdef add (self, bytes chromosome, int endpos, float chip, float control):
+    cpdef add (self, bytes chromosome, int32_t endpos, float64_t chip, float64_t control):
         """Add a chr-endpos-sample-control block into data
         dictionary.
 
@@ -532,7 +505,7 @@ cdef class scoreTrackII:
 
         *Warning* Need to add regions continuously.
         """
-        cdef int i
+        cdef int32_t i
         i = self.datalength[chromosome]
         c = self.data[chromosome]
         c[0][ i ] = endpos
@@ -547,7 +520,7 @@ cdef class scoreTrackII:
         """
         cdef:
             bytes chrom, k
-            int l
+            int32_t l
 
         for chrom in self.data.keys():
             d = self.data[chrom]
@@ -558,7 +531,7 @@ cdef class scoreTrackII:
             d[3].resize( l, refcheck = False )            
         return
 
-    # cpdef sort ( self, int column = 1 ):
+    # cpdef sort ( self, int32_t column = 1 ):
     #     """ Sort data for each chromosome, by certain column.
 
     #     column: 1: position, 2: sample, 3: control, 4: score
@@ -651,10 +624,10 @@ cdef class scoreTrackII:
                 raise NotImplemented
             self.normalization_method = ord('N')            
 
-    cdef normalize ( self, double treat_scale, double control_scale ):
+    cdef normalize ( self, float64_t treat_scale, float64_t control_scale ):
         cdef:
             np.ndarray p, c
-            long l, i
+            int64_t l, i
         
         for chrom in self.data.keys():
             p = self.data[chrom][1]
@@ -707,7 +680,7 @@ cdef class scoreTrackII:
         cdef:
             np.ndarray[np.float32_t] p, c, v
             np.ndarray[np.int32_t] pos
-            long l, i, prev_pos
+            int64_t l, i, prev_pos
             bytes chrom
         
         for chrom in self.data.keys():
@@ -718,7 +691,7 @@ cdef class scoreTrackII:
             v = self.data[chrom][3]
             l = self.datalength[chrom]
             for i in range(l):
-                v[ i ] =  get_pscore( int(p[ i ])  + self.pseudocount , c[ i ]  + self.pseudocount )
+                v[ i ] =  get_pscore( <int32_t>(p[ i ]  + self.pseudocount) , c[ i ]  + self.pseudocount )
                 try:
                     self.pvalue_stat[v[ i ]] += pos[ i ] - prev_pos
                 except:
@@ -733,8 +706,8 @@ cdef class scoreTrackII:
         """
         cdef:
             dict pqtable
-            long i,l,j
-            double k
+            int64_t i,l,j
+            float64_t k
             bytes chrom
             np.ndarray p, c, v
             
@@ -764,10 +737,10 @@ cdef class scoreTrackII:
         Return a dictionary of {-log10pvalue:(-log10qvalue,rank,basepairs)} relationships.
         """
         cdef:
-            long n, pre_p, this_p, length, j, pre_l, l, i
-            double this_v, pre_v, v, q, pre_q
-            long N, k
-            double f
+            int64_t n, pre_p, this_p, length, j, pre_l, l, i
+            float64_t this_v, pre_v, v, q, pre_q
+            int64_t N, k
+            float64_t f
             bytes chrom
             np.ndarray v_chrom, pos_chrom
             dict pvalue2qvalue
@@ -813,10 +786,10 @@ cdef class scoreTrackII:
         """
         cdef:
             #np.ndarray v, p, c
-            long l, i
+            int64_t l, i
             bytes chrom
-            float v1, v2
-            float pseudocount
+            float64_t v1, v2
+            float64_t pseudocount
 
         pseudocount = self.pseudocount
         
@@ -841,10 +814,10 @@ cdef class scoreTrackII:
         """
         cdef:
             #np.ndarray v, p, c
-            long l, i
+            int64_t l, i
             bytes chrom
-            float v1, v2
-            float pseudocount
+            float64_t v1, v2
+            float64_t pseudocount
 
         pseudocount = self.pseudocount
         
@@ -868,8 +841,8 @@ cdef class scoreTrackII:
         """
         cdef:
             np.ndarray p, c, v
-            long l, i
-            float pseudocount
+            int64_t l, i
+            float64_t pseudocount
 
         pseudocount = self.pseudocount
         
@@ -889,8 +862,8 @@ cdef class scoreTrackII:
         """
         cdef:
             np.ndarray p, c, v
-            long l, i
-            float pseudocount
+            int64_t l, i
+            float64_t pseudocount
 
         pseudocount = self.pseudocount
         
@@ -907,7 +880,7 @@ cdef class scoreTrackII:
     cdef compute_subtraction ( self ):
         cdef:
             np.ndarray p, c, v
-            long l, i
+            int64_t l, i
         
         for chrom in self.data.keys():
             p = self.data[chrom][1]
@@ -922,8 +895,8 @@ cdef class scoreTrackII:
     cdef compute_SPMR ( self ):
         cdef:
             np.ndarray p, v
-            long l, i
-            float scale
+            int64_t l, i
+            float64_t scale
         if self.normalization_method == ord('T') or self.normalization_method == ord('N'):
             scale = self.treat_edm
         elif self.normalization_method == ord('C'):
@@ -943,7 +916,7 @@ cdef class scoreTrackII:
     cdef compute_max ( self ):
         cdef:
             np.ndarray p, c, v
-            long l, i
+            int64_t l, i
         
         for chrom in self.data.keys():
             p = self.data[chrom][1]
@@ -967,8 +940,8 @@ cdef class scoreTrackII:
         """
         cdef:
             bytes chrom
-            int l, pre, i, p 
-            float pre_v, v
+            int32_t l, pre, i, p 
+            float64_t pre_v, v
             set chrs
             np.ndarray pos, value
 
@@ -1002,66 +975,7 @@ cdef class scoreTrackII:
             
         return True
 
-    # @cython.boundscheck(False)
-    # cpdef reassign_peaks ( self, peaks ):
-    #     """Re-assign values of score, pileup, pscore, qscore, fold
-    #     change to predefined peaks.
-
-    #     peaks should be a PeakIO object.
-
-    #     *Note* assume positions in scoreTrackIII object are sorted
-    #      from small to large.
-
-    #     """
-    #     cdef:
-    #         str chrom
-    #         set chrs
-    #         int i, j, t_index, tmp_summit, l
-    #         float cutoff
-
-    #     assert isinstance( peaks, PeakIO ), "peaks must be a PeakIO object!"
-        
-    #     ret_peaks = PeakIO()
-
-    #     peaks.sort()
-        
-    #     chrs = self.get_chr_names()
-    #     for chrom in chrs:
-    #         cpeaks = peaks.peaks[chrom]
-    #         ret_peaks.peaks[chrom] = []
-    #         npeaks = ret_peaks.peaks[chrom]
-
-    #         pos = self.data[chrom][ 0 ]
-    #         sample = self.data[chrom][ 1 ]
-    #         control = self.data[chrom][ 2 ]            
-    #         value = self.data[chrom][ 3 ]
-
-    #         l = pos.shape[0]
-
-    #         t_index = 0
-
-    #         for i in range(len(cpeaks)):
-    #             thispeak = cpeaks[i]
-    #             # we need to assign values for each peak -- actuall peak summit
-    #             tmp_summit = thispeak["summit"]
-    #             while t_index < l and pos[t_index] < tmp_summit:
-    #                 t_index += 1
-    #             # find the summit
-    #             if value[t_index] >= cutoff:
-    #                 tmppeak = copy(thispeak)
-    #                 tmppeak["score"] = value[t_index]
-    #                 tmppeak["pileup"]= sample[t_index]
-    #                 tmppeak["pscore"]= get_pscore(sample[ t_index ], control[ t_index ])
-    #                 if self.scoring_method == ord('q'):
-    #                     tmppeak["qscore"]= value[ t_index ]
-    #                 else:
-    #                     tmppeak["qscore"]= -1
-    #                 tmppeak["fc"] = float ( sample[ t_index ] + self.pseudocount ) / ( control[ t_index ] + self.pseudocount )
-    #                 npeaks.append(tmppeak)
-
-    #     return ret_peaks
-
-    cpdef call_peaks (self, float cutoff=5.0, int min_length=200, int max_gap=50, bool call_summits=False):
+    cpdef call_peaks (self, float64_t cutoff=5.0, int32_t min_length=200, int32_t max_gap=50, bool call_summits=False):
         """This function try to find regions within which, scores
         are continuously higher than a given cutoff.
 
@@ -1077,7 +991,7 @@ cdef class scoreTrackII:
         ptrack:  an optional track for pileup heights. If it's not None, use it to find summits. Otherwise, use self/scoreTrack.
         """
         cdef:
-            int i
+            int32_t i
             bytes chrom
             np.ndarray pos, sample, control, value, above_cutoff, above_cutoff_v, above_cutoff_endpos, above_cutoff_startpos, above_cutoff_sv
             list peak_content
@@ -1134,8 +1048,8 @@ cdef class scoreTrackII:
 
         return peaks
 
-    cdef bool __close_peak (self, list peak_content, peaks, int min_length,
-                            bytes chrom, int smoothlen=0):
+    cdef bool __close_peak (self, list peak_content, peaks, int32_t min_length,
+                            bytes chrom, int32_t smoothlen=0):
         """Close the peak region, output peak boundaries, peak summit
         and scores, then add the peak to peakIO object.
 
@@ -1143,8 +1057,8 @@ cdef class scoreTrackII:
 
         """
         cdef:
-            int summit_pos, tstart, tend, tmpindex, summit_index, i, midindex
-            double summit_value, tvalue, tsummitvalue
+            int32_t summit_pos, tstart, tend, tmpindex, summit_index, i, midindex
+            float64_t summit_value, tvalue, tsummitvalue
 
         peak_length = peak_content[ -1 ][ 1 ] - peak_content[ 0 ][ 0 ]
         if peak_length >= min_length: # if the peak is too small, reject it
@@ -1179,19 +1093,19 @@ cdef class scoreTrackII:
                        peak_score  = self.data[chrom][ 3 ][ summit_index ],
                        pileup      = self.data[chrom][ 1 ][ summit_index ], # should be the same as summit_value
                        pscore      = get_pscore(self.data[chrom][ 1 ][ summit_index ], self.data[chrom][ 2 ][ summit_index ]),
-                       fold_change = float ( self.data[chrom][ 1 ][ summit_index ] + self.pseudocount ) / ( self.data[chrom][ 2 ][ summit_index ] + self.pseudocount ),
+                       fold_change = ( self.data[chrom][ 1 ][ summit_index ] + self.pseudocount ) / ( self.data[chrom][ 2 ][ summit_index ] + self.pseudocount ),
                        qscore      = qscore,
                        )
             # start a new peak
             return True
 
-    cdef bool __close_peak2 (self, list peak_content, peaks, int min_length,
-                             bytes chrom, int smoothlen=51,
-                             float min_valley = 0.9):
+    cdef bool __close_peak2 (self, list peak_content, peaks, int32_t min_length,
+                             bytes chrom, int32_t smoothlen=51,
+                             float64_t min_valley = 0.9):
         cdef:
-            int summit_pos, tstart, tend, tmpindex, summit_index, summit_offset
-            int start, end, i, j, start_boundary
-            double summit_value, tvalue, tsummitvalue
+            int32_t summit_pos, tstart, tend, tmpindex, summit_index, summit_offset
+            int32_t start, end, i, j, start_boundary
+            float64_t summit_value, tvalue, tsummitvalue
 #            np.ndarray[np.float32_t, ndim=1] w
             np.ndarray[np.float32_t, ndim=1] peakdata
             np.ndarray[np.int32_t, ndim=1] peakindices, summit_offsets
@@ -1255,18 +1169,18 @@ cdef class scoreTrackII:
                        peak_score  = self.data[chrom][3][ summit_index ],
                        pileup      = self.data[chrom][1][ summit_index ], # should be the same as summit_value
                        pscore      = get_pscore(self.data[chrom][ 1 ][ summit_index ], self.data[chrom][ 2 ][ summit_index ]),
-                       fold_change = float ( self.data[chrom][ 1 ][ summit_index ] + self.pseudocount ) / ( self.data[chrom][ 2 ][ summit_index ] + self.pseudocount ),
+                       fold_change = ( self.data[chrom][ 1 ][ summit_index ] + self.pseudocount ) / ( self.data[chrom][ 2 ][ summit_index ] + self.pseudocount ),
                        qscore      = qscore,
                        )
         # start a new peak
         return True
         
-    cdef long total ( self ):
+    cdef int64_t total ( self ):
         """Return the number of regions in this object.
 
         """
         cdef:
-            long t
+            int64_t t
             bytes chrom
         
         t = 0
@@ -1274,7 +1188,7 @@ cdef class scoreTrackII:
             t += self.datalength[chrom]
         return t
 
-    cpdef call_broadpeaks (self, float lvl1_cutoff=5.0, float lvl2_cutoff=1.0, int min_length=200, int lvl1_max_gap=50, int lvl2_max_gap=400):
+    cpdef call_broadpeaks (self, float64_t lvl1_cutoff=5.0, float64_t lvl2_cutoff=1.0, int32_t min_length=200, int32_t lvl1_max_gap=50, int32_t lvl2_max_gap=400):
         """This function try to find enriched regions within which,
         scores are continuously higher than a given cutoff for level
         1, and link them using the gap above level 2 cutoff with a
@@ -1290,7 +1204,7 @@ cdef class scoreTrackII:
         and gapped broad regions in BroadPeakIO.
         """
         cdef:
-            int i
+            int32_t i
             bytes chrom
         
         assert lvl1_cutoff > lvl2_cutoff, "level 1 cutoff should be larger than level 2."
@@ -1338,7 +1252,7 @@ cdef class scoreTrackII:
         """
         
         cdef:
-            int blockNum, thickStart, thickEnd, start, end
+            int32_t blockNum, thickStart, thickEnd, start, end
             bytes blockSizes, blockStarts
 
         start      = lvl2peak["start"]
@@ -1384,14 +1298,14 @@ cdef class TwoConditionScores:
     cdef:
         dict data                       # dictionary for data of each chromosome
         dict datalength                 # length of data array of each chromosome
-        float cond1_factor              # factor to apply to cond1 pileup values
-        float cond2_factor              # factor to apply to cond2 pileup values
-        float pseudocount               # the pseudocount used to calcuate LLR
-        float cutoff
+        float64_t cond1_factor              # factor to apply to cond1 pileup values
+        float64_t cond2_factor              # factor to apply to cond2 pileup values
+        float64_t pseudocount               # the pseudocount used to calcuate LLR
+        float64_t cutoff
         object t1bdg, c1bdg, t2bdg, c2bdg
         dict pvalue_stat1, pvalue_stat2, pvalue_stat3
 
-    def __init__ (self, t1bdg, c1bdg, t2bdg, c2bdg, float cond1_factor = 1.0, float cond2_factor = 1.0, float pseudocount = 0.01, proportion_background_empirical_distribution = 0.99999 ):
+    def __init__ (self, t1bdg, c1bdg, t2bdg, c2bdg, float64_t cond1_factor = 1.0, float64_t cond2_factor = 1.0, float64_t pseudocount = 0.01, proportion_background_empirical_distribution = 0.99999 ):
         """
         t1bdg: a bedGraphTrackI object for treat 1
         c1bdg: a bedGraphTrackI object for control 1
@@ -1428,7 +1342,7 @@ cdef class TwoConditionScores:
         
         #self.empirical_distr_llr = [] # save all values in histogram
         
-    cpdef set_pseudocount( self, float pseudocount ):
+    cpdef set_pseudocount( self, float64_t pseudocount ):
         self.pseudocount = pseudocount
         
     cpdef build ( self ):
@@ -1521,7 +1435,7 @@ cdef class TwoConditionScores:
         common = reduce(lambda x,y:x.intersection(y), (t1chrs,c1chrs,t2chrs,c2chrs))
         return common
 
-    cdef add_chromosome ( self, bytes chrom, int chrom_max_len ):
+    cdef add_chromosome ( self, bytes chrom, int32_t chrom_max_len ):
         """
         chrom: chromosome name
         chrom_max_len: maximum number of data points in this chromosome
@@ -1534,7 +1448,7 @@ cdef class TwoConditionScores:
                                  np.zeros( chrom_max_len, dtype="float32" )] # LLR t1 vs t2
             self.datalength[chrom] = 0
 
-    cdef add (self, bytes chromosome, int endpos, float t1, float c1, float t2, float c2):
+    cdef add (self, bytes chromosome, int32_t endpos, float64_t t1, float64_t c1, float64_t t2, float64_t c2):
         """Take chr-endpos-sample1-control1-sample2-control2 and
         compute logLR for t1 vs c1, t2 vs c2, and t1 vs t2, then save
         values.
@@ -1548,7 +1462,7 @@ cdef class TwoConditionScores:
 
         *Warning* Need to add regions continuously.
         """
-        cdef int i
+        cdef int32_t i
         i = self.datalength[chromosome]
         c = self.data[chromosome]
         c[0][ i ] = endpos
@@ -1564,7 +1478,7 @@ cdef class TwoConditionScores:
         """
         cdef:
             bytes chrom, k
-            int l
+            int32_t l
 
         for chrom in self.data.keys():
             d = self.data[chrom]
@@ -1605,8 +1519,8 @@ cdef class TwoConditionScores:
         """
         cdef:
             bytes chrom
-            int l, pre, i, p 
-            float pre_v, v
+            int32_t l, pre, i, p 
+            float64_t pre_v, v
             np.ndarray pos, value
 
         assert column in range( 1, 4 ), "column should be between 1, 2 or 3."
@@ -1651,8 +1565,8 @@ cdef class TwoConditionScores:
         """
         cdef:
             bytes chrom
-            int l, pre, i, p 
-            float v1, v2, v3
+            int32_t l, pre, i, p 
+            float64_t v1, v2, v3
             np.ndarray pos, value1, value2, value3
 
         write = fhd.write
@@ -1673,7 +1587,7 @@ cdef class TwoConditionScores:
             
         return True
 
-    cpdef tuple call_peaks (self, float cutoff=3, int min_length=200, int max_gap = 100,
+    cpdef tuple call_peaks (self, float64_t cutoff=3, int32_t min_length=200, int32_t max_gap = 100,
                       bool call_summits=False):
         """This function try to find regions within which, scores
         are continuously higher than a given cutoff.
@@ -1692,7 +1606,7 @@ cdef class TwoConditionScores:
         ptrack:  an optional track for pileup heights. If it's not None, use it to find summits. Otherwise, use self/scoreTrack.
         """
         cdef:
-            int i
+            int32_t i
             bytes chrom
             np.ndarray pos, sample, control, value, above_cutoff, \
                        above_cutoff_v, above_cutoff_endpos, \
@@ -1740,7 +1654,7 @@ cdef class TwoConditionScores:
         return (cat1_peaks, cat2_peaks, cat3_peaks)
     
     cdef object __add_a_peak ( self, object peaks, bytes chrom, np.ndarray indices, np.ndarray startpos, np.ndarray endpos,
-                               np.ndarray score, int max_gap, int min_length ):
+                               np.ndarray score, int32_t max_gap, int32_t min_length ):
          """For a given chromosome, merge nearby significant regions,
          filter out smaller regions, then add regions to PeakIO
          object.
@@ -1748,7 +1662,7 @@ cdef class TwoConditionScores:
          """
          cdef:
              list peak_content
-             float mean_logLR
+             float32_t mean_logLR
 
          if startpos.size > 0:
              # if it is not empty
@@ -1783,30 +1697,36 @@ cdef class TwoConditionScores:
          
          return
         
-    cdef float mean_from_peakcontent ( self, list peakcontent ):
+    cdef float64_t mean_from_peakcontent ( self, list peakcontent ):
         """
 
         """
         cdef:
             int32_t tmp_s, tmp_e
             int32_t l
-            float tmp_v, sum_v
-
-        sum_v = 0
+            float64_t tmp_v, sum_v        #for better precision
+            float64_t r
+            int32_t i
+            
         l = 0
-        for (tmp_s, tmp_e, tmp_v) in peakcontent:
+        sum_v = 0                         #initialize sum_v as 0
+        for i in range( len(peakcontent) ):
+            tmp_s = peakcontent[i][0]
+            tmp_e = peakcontent[i][1]
+            tmp_v = <float64_t> peakcontent[i][2]
             sum_v += tmp_v * ( tmp_e - tmp_s )
             l +=  tmp_e - tmp_s
 
-        return sum_v / l
+        r = sum_v / l
+        return r
         
 
-    cdef long total ( self ):
+    cdef int64_t total ( self ):
         """Return the number of regions in this object.
 
         """
         cdef:
-            long t
+            int64_t t
             bytes chrom
         
         t = 0

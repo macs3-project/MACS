@@ -244,10 +244,10 @@ cdef class PeakIO:
                         #[start,end,end-start,summit,peak_height,number_tags,pvalue,fold_change,qvalue]
                         print_func("%s\t%d\t%d\t%d" % (chrom.decode(),peak['start']+1,peak['end'],peak['length']))
                         print_func("\t%d" % (peak['summit']+1)) # summit position
-                        print_func("\t%.2f" % (round(peak['pileup'],2))) # pileup height at summit
-                        print_func("\t%.5f" % (peak['pscore'])) # -log10pvalue at summit
-                        print_func("\t%.5f" % (peak['fc'])) # fold change at summit                
-                        print_func("\t%.5f" % (peak['qscore'])) # -log10qvalue at summit
+                        print_func("\t%.6g" % (round(peak['pileup'],2))) # pileup height at summit
+                        print_func("\t%.6g" % (peak['pscore'])) # -log10pvalue at summit
+                        print_func("\t%.6g" % (peak['fc'])) # fold change at summit                
+                        print_func("\t%.6g" % (peak['qscore'])) # -log10qvalue at summit
                         print_func("\t%s" % peakname)
                         print_func("\n")
                 else:
@@ -256,10 +256,10 @@ cdef class PeakIO:
                     #[start,end,end-start,summit,peak_height,number_tags,pvalue,fold_change,qvalue]
                     print_func("%s\t%d\t%d\t%d" % (chrom.decode(),peak['start']+1,peak['end'],peak['length']))
                     print_func("\t%d" % (peak['summit']+1)) # summit position
-                    print_func("\t%.2f" % (round(peak['pileup'],2))) # pileup height at summit
-                    print_func("\t%.5f" % (peak['pscore'])) # -log10pvalue at summit
-                    print_func("\t%.5f" % (peak['fc'])) # fold change at summit                
-                    print_func("\t%.5f" % (peak['qscore'])) # -log10qvalue at summit
+                    print_func("\t%.6g" % (round(peak['pileup'],2))) # pileup height at summit
+                    print_func("\t%.6g" % (peak['pscore'])) # -log10pvalue at summit
+                    print_func("\t%.6g" % (peak['fc'])) # fold change at summit                
+                    print_func("\t%.6g" % (peak['qscore'])) # -log10qvalue at summit
                     print_func("\t%s" % peakname)
                     print_func("\n")
         return
@@ -288,10 +288,10 @@ cdef class PeakIO:
                 peaks = list(group)
                 if len(peaks) > 1:
                     for i, peak in enumerate(peaks):
-                        print_func("%s\t%d\t%d\t%s%d%s\t%.5f\n" % (chrom.decode(),peak['start'],peak['end'],peakprefix.decode(),n_peak,subpeak_letters(i),peak[score_column]))
+                        print_func("%s\t%d\t%d\t%s%d%s\t%.6g\n" % (chrom.decode(),peak['start'],peak['end'],peakprefix.decode(),n_peak,subpeak_letters(i),peak[score_column]))
                 else:
                     peak = peaks[0]
-                    print_func("%s\t%d\t%d\t%s%d\t%.5f\n" % (chrom.decode(),peak['start'],peak['end'],peakprefix.decode(),n_peak,peak[score_column])) 
+                    print_func("%s\t%d\t%d\t%s%d\t%.6g\n" % (chrom.decode(),peak['start'],peak['end'],peakprefix.decode(),n_peak,peak[score_column])) 
 
     cdef _to_summits_bed(self, bytes name_prefix=b"%s_peak_", bytes name=b"MACS",
                         bytes description = b"%s", str score_column="score",
@@ -317,11 +317,11 @@ cdef class PeakIO:
                 if len(peaks) > 1:
                     for i, peak in enumerate(peaks):
                         summit_p = peak['summit']
-                        print_func("%s\t%d\t%d\t%s%d%s\t%.5f\n" % (chrom.decode(),summit_p,summit_p+1,peakprefix.decode(),n_peak,subpeak_letters(i),peak[score_column]))
+                        print_func("%s\t%d\t%d\t%s%d%s\t%.6g\n" % (chrom.decode(),summit_p,summit_p+1,peakprefix.decode(),n_peak,subpeak_letters(i),peak[score_column]))
                 else:
                     peak = peaks[0]
                     summit_p = peak['summit']
-                    print_func("%s\t%d\t%d\t%s%d\t%.5f\n" % (chrom.decode(),summit_p,summit_p+1,peakprefix.decode(),n_peak,peak[score_column]))
+                    print_func("%s\t%d\t%d\t%s%d\t%.6g\n" % (chrom.decode(),summit_p,summit_p+1,peakprefix.decode(),n_peak,peak[score_column]))
 
     def tobed (self):
         """Print out peaks in BED5 format.
@@ -479,7 +479,7 @@ cdef class PeakIO:
                             s = -1
                         else:
                             s = peak['summit'] - peak['start']
-                        fhd.write( "%s\t%d\t%d\t%s\t%d\t.\t%.5f\t%.5f\t%.5f\t%d\n"
+                        fhd.write( "%s\t%d\t%d\t%s\t%d\t.\t%.6g\t%.6g\t%.6g\t%d\n"
                                    %
                                    (chrom.decode(),peak['start'],peak['end'],peakname,int(10*peak[score_column]),
                                     peak['fc'],peak['pscore'],peak['qscore'],s) )
@@ -490,7 +490,7 @@ cdef class PeakIO:
                         s = -1
                     else:
                         s = peak['summit'] - peak['start']
-                    fhd.write( "%s\t%d\t%d\t%s\t%d\t.\t%.5f\t%.5f\t%.5f\t%d\n"
+                    fhd.write( "%s\t%d\t%d\t%s\t%d\t.\t%.6g\t%.6g\t%.6g\t%d\n"
                                %
                                (chrom.decode(),peak['start'],peak['end'],peakname,int(10*peak[score_column]),
                                 peak['fc'],peak['pscore'],peak['qscore'],s) )
@@ -524,10 +524,10 @@ cdef class PeakIO:
                         #[start,end,end-start,summit,peak_height,number_tags,pvalue,fold_change,qvalue]
                         write("%s\t%d\t%d\t%d" % (chrom.decode(),peak['start']+1,peak['end'],peak['length']))
                         write("\t%d" % (peak['summit']+1)) # summit position
-                        write("\t%.2f" % (round(peak['pileup'],2))) # pileup height at summit
-                        write("\t%.5f" % (peak['pscore'])) # -log10pvalue at summit
-                        write("\t%.5f" % (peak['fc'])) # fold change at summit
-                        write("\t%.5f" % (peak['qscore'])) # -log10qvalue at summit
+                        write("\t%.6g" % (round(peak['pileup'],2))) # pileup height at summit
+                        write("\t%.6g" % (peak['pscore'])) # -log10pvalue at summit
+                        write("\t%.6g" % (peak['fc'])) # fold change at summit
+                        write("\t%.6g" % (peak['qscore'])) # -log10qvalue at summit
                         write("\t%s" % peakname)
                         write("\n")
                 else:
@@ -536,10 +536,10 @@ cdef class PeakIO:
                     #[start,end,end-start,summit,peak_height,number_tags,pvalue,fold_change,qvalue]
                     write("%s\t%d\t%d\t%d" % (chrom.decode(),peak['start']+1,peak['end'],peak['length']))
                     write("\t%d" % (peak['summit']+1)) # summit position
-                    write("\t%.2f" % (round(peak['pileup'],2))) # pileup height at summit
-                    write("\t%.5f" % (peak['pscore'])) # -log10pvalue at summit
-                    write("\t%.5f" % (peak['fc'])) # fold change at summit
-                    write("\t%.5f" % (peak['qscore'])) # -log10qvalue at summit                    
+                    write("\t%.6g" % (round(peak['pileup'],2))) # pileup height at summit
+                    write("\t%.6g" % (peak['pscore'])) # -log10pvalue at summit
+                    write("\t%.6g" % (peak['fc'])) # fold change at summit
+                    write("\t%.6g" % (peak['qscore'])) # -log10qvalue at summit                    
                     write("\t%s" % peakname)
                     write("\n")
         return
@@ -982,7 +982,7 @@ cdef class BroadPeakIO:
             for peak in self.peaks[chrom]:
                 n_peak += 1
                 if peak["thickStart"] != b".":
-                    fhd.write( "%s\t%d\t%d\t%s%d\t%d\t.\t%s\t%s\t0\t%d\t%s\t%s\t%.5f\t%.5f\t%.5f\n"
+                    fhd.write( "%s\t%d\t%d\t%s%d\t%d\t.\t%s\t%s\t0\t%d\t%s\t%s\t%.6g\t%.6g\t%.6g\n"
                                %
                                (chrom.decode(),peak["start"],peak["end"],peakprefix.decode(),n_peak,int(10*peak["qscore"]),
                                 peak["thickStart"].decode(),peak["thickEnd"].decode(),
@@ -1137,7 +1137,7 @@ cdef class BroadPeakIO:
                 these_peaks = list(group)
                 peak = these_peaks[0]
                 peakname = "%s%d" % (peakprefix.decode(), n_peak)
-                fhd.write( "%s\t%d\t%d\t%s\t%d\t.\t%.5f\t%.5f\t%.5f\n" %
+                fhd.write( "%s\t%d\t%d\t%s\t%d\t.\t%.6g\t%.6g\t%.6g\n" %
                            (chrom.decode(),peak['start'],peak['end'],peakname,int(10*peak["qscore"]),
                             peak['fc'],peak['pscore'],peak['qscore'] ) )
         return
@@ -1168,10 +1168,10 @@ cdef class BroadPeakIO:
                 peak = these_peaks[0]
                 peakname = "%s%d" % (peakprefix.decode(), n_peak)
                 write("%s\t%d\t%d\t%d" % (chrom.decode(),peak['start']+1,peak['end'],peak['length']))
-                write("\t%.2f" % (round(peak['pileup'],2))) # pileup height at summit
-                write("\t%.5f" % (peak['pscore'])) # -log10pvalue at summit
-                write("\t%.5f" % (peak['fc'])) # fold change at summit
-                write("\t%.5f" % (peak['qscore'])) # -log10qvalue at summit                    
+                write("\t%.6g" % (round(peak['pileup'],2))) # pileup height at summit
+                write("\t%.6g" % (peak['pscore'])) # -log10pvalue at summit
+                write("\t%.6g" % (peak['fc'])) # fold change at summit
+                write("\t%.6g" % (peak['qscore'])) # -log10qvalue at summit                    
                 write("\t%s" % peakname)
                 write("\n")
         return

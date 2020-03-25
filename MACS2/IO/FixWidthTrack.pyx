@@ -26,12 +26,20 @@ from MACS2.Signal import *
 from MACS2.IO.PeakIO import PeakIO
 from MACS2.Pileup import se_all_in_one_pileup, max_over_two_pv_array
 
-from libc.stdint cimport uint32_t, uint64_t, int32_t, int64_t
+#from libc.stdint cimport uint32_t, uint64_t, int32_t, int64_t
 from cpython cimport bool
 cimport cython
 
 import numpy as np
 cimport numpy as np
+from numpy cimport uint8_t, uint16_t, uint32_t, uint64_t, int8_t, int16_t, int32_t, int64_t, float32_t, float64_t
+
+#ctypedef np.float64_t float64_t
+#ctypedef np.float32_t float32_t
+#ctypedef np.int64_t int64_t
+#ctypedef np.int32_t int32_t
+#ctypedef np.uint64_t uint64_t
+#ctypedef np.uint32_t uint32_t
 
 # ------------------------------------
 # constants
@@ -40,7 +48,7 @@ __version__ = "FixWidthTrack $Revision$"
 __author__ = "Tao Liu <taoliu@jimmy.harvard.edu>"
 __doc__ = "FWTrackII class"
 
-cdef INT_MAX = <int>((<unsigned int>-1)>>1)
+cdef INT_MAX = <int32_t>((<uint32_t>(-1))>>1)
 
 # ------------------------------------
 # Misc functions
@@ -68,15 +76,15 @@ cdef class FWTrack:
         bool __destroyed
         bool __dup_separated
         dict rlengths
-        public long buffer_size
-        public long total
-        public unsigned long dup_total
+        public int64_t buffer_size
+        public int64_t total
+        public uint64_t dup_total
         public object annotation
         public object dups
-        public int fw
-        public long length
+        public int32_t fw
+        public int64_t length
     
-    def __init__ (self, int32_t fw=0, char * anno="", long buffer_size = 100000 ):
+    def __init__ (self, int32_t fw=0, char * anno="", int64_t buffer_size = 100000 ):
         """fw is the fixed-width for all locations.
         
         """
@@ -123,7 +131,7 @@ cdef class FWTrack:
         return
 
 
-    cpdef void add_loc ( self, bytes chromosome, int32_t fiveendpos, int strand ):
+    cpdef void add_loc ( self, bytes chromosome, int32_t fiveendpos, int32_t strand ):
         """Add a location to the list according to the sequence name.
         
         chromosome -- mostly the chromosome name
@@ -131,7 +139,7 @@ cdef class FWTrack:
         strand     -- 0: plus, 1: minus
         """
         cdef:
-            long i
+            int64_t i
 
         if chromosome not in self.__locations:
             self.__locations[chromosome] = [ np.zeros(self.buffer_size, dtype='int32'), np.zeros(self.buffer_size, dtype='int32') ] # [plus,minus strand]
@@ -246,14 +254,14 @@ cdef class FWTrack:
         return
 
     @cython.boundscheck(False)
-    cpdef void separate_dups( self, int maxnum = 1 ):
+    cpdef void separate_dups( self, int32_t maxnum = 1 ):
         """Separate the duplicated reads into a different track
         stored at self.dup
         """
         cdef:
-            int p, m, n, current_loc
-            unsigned long i_old, i_new          # index for old array, and index for new one
-            unsigned long i_dup, size, new_size, dup_size
+            int32_t p, m, n, current_loc
+            uint64_t i_old, i_new          # index for old array, and index for new one
+            uint64_t i_dup, size, new_size, dup_size
             bytes k
             np.ndarray[np.int32_t, ndim=1] plus, new_plus, dup_plus, minus, new_minus, dup_minus
             set chrnames
@@ -376,9 +384,9 @@ cdef class FWTrack:
         """Add back the duplicate reads stored in self.__dup_locations to self.__locations
         """
         cdef:
-            int p, m, n, current_loc
-            unsigned long i_old, i_new          # index for old array, and index for new one
-            unsigned long i_dup, size, new_size, dup_size
+            int32_t p, m, n, current_loc
+            uint64_t i_old, i_new          # index for old array, and index for new one
+            uint64_t i_dup, size, new_size, dup_size
             bytes k
             np.ndarray[np.int32_t, ndim=1] plus, new_plus, dup_plus, minus, new_minus, dup_minus
             set chrnames
@@ -434,7 +442,7 @@ cdef class FWTrack:
         return 0
 
     @cython.boundscheck(False) # do not check that np indices are valid
-    cpdef unsigned long filter_dup ( self, int maxnum = -1):
+    cpdef uint64_t filter_dup ( self, int32_t maxnum = -1):
         """Filter the duplicated reads.
 
         Run it right after you add all data into this object.
@@ -444,9 +452,9 @@ cdef class FWTrack:
         instead.
         """
         cdef:
-            int p, m, n, current_loc
+            int32_t p, m, n, current_loc
             # index for old array, and index for new one
-            unsigned long i_old, i_new, size, new_size 
+            uint64_t i_old, i_new, size, new_size 
             bytes k
             np.ndarray[np.int32_t, ndim=1] plus, new_plus, minus, new_minus
             set chrnames
@@ -540,7 +548,7 @@ cdef class FWTrack:
         self.length = self.fw * self.total
         return self.total
 
-    cpdef void sample_percent (self, float percent, int seed = -1 ):
+    cpdef void sample_percent (self, float32_t percent, int32_t seed = -1 ):
         """Sample the tags for a given percentage.
 
         Warning: the current object is changed!
@@ -579,15 +587,15 @@ cdef class FWTrack:
         self.length = self.fw * self.total
         return
 
-    cpdef void sample_num (self, uint64_t samplesize, int seed = -1):
+    cpdef void sample_num (self, uint64_t samplesize, int32_t seed = -1):
         """Sample the tags for a given percentage.
 
         Warning: the current object is changed!
         """
         cdef:
-            float percent
+            float32_t percent
 
-        percent = float(samplesize)/self.total
+        percent = <float32_t>(samplesize)/self.total
         self.sample_percent ( percent, seed )
         return
 
@@ -662,7 +670,7 @@ cdef class FWTrack:
         rt_minus = np.array(temp)
         return (rt_plus, rt_minus)
 
-    cpdef list compute_region_tags_from_peaks ( self, peaks, func, int window_size = 100, float cutoff = 5 ):
+    cpdef list compute_region_tags_from_peaks ( self, peaks, func, int32_t window_size = 100, float32_t cutoff = 5 ):
         """Extract tags in peak, then apply func on extracted tags.
         
         peaks: redefined regions to extract raw tags in PeakIO type: check cPeakIO.pyx.
@@ -746,7 +754,7 @@ cdef class FWTrack:
                 
         return retval
 
-    cpdef object refine_peak_from_tags_distribution ( self, peaks, int window_size = 100, float cutoff = 5 ):
+    cpdef object refine_peak_from_tags_distribution ( self, peaks, int32_t window_size = 100, float32_t cutoff = 5 ):
         """Extract tags in peak, then apply func on extracted tags.
         
         peaks: redefined regions to extract raw tags in PeakIO type: check cPeakIO.pyx.
@@ -852,7 +860,7 @@ cdef class FWTrack:
                 # end of a loop
         return ret_peaks
 
-    cpdef list pileup_a_chromosome ( self, bytes chrom, list ds, list scale_factor_s, float baseline_value = 0.0, bint directional = True, int end_shift = 0 ):
+    cpdef list pileup_a_chromosome ( self, bytes chrom, list ds, list scale_factor_s, float32_t baseline_value = 0.0, bint directional = True, int32_t end_shift = 0 ):
         """pileup a certain chromosome, return [p,v] (end position and value) list.
         
         ds             : tag will be extended to this value to 3' direction,
@@ -867,10 +875,10 @@ cdef class FWTrack:
         p and v are numpy.ndarray objects.
         """
         cdef:
-            long d
-            long five_shift, three_shift  # adjustment to 5' end and 3' end positions to make a fragment
+            int64_t d
+            int64_t five_shift, three_shift  # adjustment to 5' end and 3' end positions to make a fragment
             dict chrlengths = self.get_rlengths ()
-            long rlength = chrlengths[chrom]
+            int64_t rlength = chrlengths[chrom]
             object ends
             list five_shift_s = []
             list three_shift_s = []
@@ -904,29 +912,29 @@ cdef class FWTrack:
 
         return prev_pileup
 
-cdef inline int32_t left_sum ( data, int pos, int width ):
+cdef inline int32_t left_sum ( data, int32_t pos, int32_t width ):
     """
     """
     return sum([data[x] for x in data if x <= pos and x >= pos - width])
 
-cdef inline int32_t right_sum ( data, int pos, int width ):
+cdef inline int32_t right_sum ( data, int32_t pos, int32_t width ):
     """
     """
     return sum([data[x] for x in data if x >= pos and x <= pos + width])
 
-cdef inline int32_t left_forward ( data, int pos, int window_size ):
+cdef inline int32_t left_forward ( data, int32_t pos, int32_t window_size ):
     return data.get(pos,0) - data.get(pos-window_size, 0)
 
-cdef inline int32_t right_forward ( data, int pos, int window_size ):
+cdef inline int32_t right_forward ( data, int32_t pos, int32_t window_size ):
     return data.get(pos + window_size, 0) - data.get(pos, 0)
 
-cdef tuple wtd_find_summit(chrom, np.ndarray[np.int32_t, ndim=1] plus, np.ndarray[np.int32_t, ndim=1] minus, int32_t search_start, int32_t search_end, int32_t window_size, float cutoff):
+cdef tuple wtd_find_summit(chrom, np.ndarray[np.int32_t, ndim=1] plus, np.ndarray[np.int32_t, ndim=1] minus, int32_t search_start, int32_t search_end, int32_t window_size, float32_t cutoff):
     """internal function to be called by refine_peak_from_tags_distribution()
 
     """
     cdef:
         int32_t i, j, watson_left, watson_right, crick_left, crick_right, wtd_max_pos
-        float wtd_max_val
+        float32_t wtd_max_val
         np.ndarray wtd_list, wtd_other_max_pos, wtd_other_max_val
         
     watson, crick = (Counter(plus), Counter(minus))

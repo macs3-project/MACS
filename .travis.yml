@@ -11,22 +11,6 @@ jobs:
           docker build --rm --build-arg BASE_IMAGE="i386/ubuntu:bionic" -t macs -f test/Dockerfile .
       script: |
         docker run --rm -t macs bash -cx "pytest --runxfail && cd test && ./cmdlinetest macs2"
-    # - name: "i686 py3.5"
-    #   dist: bionic
-    #   arch: amd64
-    #   env:
-    #     - ARCH_FLAGS="-m32"
-    #   addons:
-    #     apt:
-    #       packages:
-    #       - libc6:i386
-    #       - libc6-dev:i386
-    #       - gcc-8:i386
-    #       - g++-8:i386
-    #       - cpp-8:i386
-    #       - binutils:i386
-    #       - binutils-i686-linux-gnu:i386
-    #       - python3.5:i386        
     - name: amd64
       arch: amd64
       python: 3.8
@@ -40,9 +24,9 @@ jobs:
       arch: s390x
       python: 3.8
   allow_failures:
-    - name: i386 
-    - name: arm64
-    - name: ppc64le
+  #  - name: i386 
+  #  - name: arm64
+  #  - name: ppc64le
     - name: s390x
   fast_finish: true
 install:
@@ -53,7 +37,7 @@ script:
   - pytest --runxfail
   - cd test
   - ./cmdlinetest macs2
-  - cd ..
+  #- cd ..
 deploy:
   provider: pypi
   username:
