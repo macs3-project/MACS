@@ -240,6 +240,7 @@ cdef tuple __pe_binary_parse_be (const unsigned char * data):
         uint16_t bwflag
         uint8_t *ui8
         int8_t *i8
+        int32_t *i32
         
     # we skip lot of the available information in data (i.e. tag name, quality etc etc)
     if not data:
@@ -255,14 +256,15 @@ cdef tuple __pe_binary_parse_be (const unsigned char * data):
         return ( -1, -1, -1 )
 
     i8 = <int8_t *>data
-    #thisref = i32[0]
-    thisref = ui8[3] << 24 | ui8[2] << 16 | ui8[1] << 8 | ui8[0]
-    #pos = i32[1]
-    pos = i8[7] << 24 | i8[6] << 16 | i8[5] << 8 | i8[4]
-    #nextpos = i32[6]
-    nextpos = i8[27] << 24 | i8[26] << 16 | i8[25] << 8 | i8[24]
-    #thistlen = i32[7]
-    thistlen = i8[31] << 24 | i8[30] << 16 | i8[29] << 8 | i8[28]
+    i32 = <int32_t *>data
+    thisref = i32[0]
+    #thisref = ui8[3] << 24 | ui8[2] << 16 | ui8[1] << 8 | ui8[0]
+    pos = i32[1]
+    #pos = i8[7] << 24 | i8[6] << 16 | i8[5] << 8 | i8[4]
+    nextpos = i32[6]
+    #nextpos = i8[27] << 24 | i8[26] << 16 | i8[25] << 8 | i8[24]
+    thistlen = i32[7]
+    #thistlen = i8[31] << 24 | i8[30] << 16 | i8[29] << 8 | i8[28]
     thisstart = min(pos, nextpos) # we keep only the leftmost
     # position which means this must
     # be at + strand. So we don't
