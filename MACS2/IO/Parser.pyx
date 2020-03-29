@@ -261,22 +261,22 @@ cdef tuple __pe_binary_parse_be (const unsigned char * data):
         return ( -1, -1, -1 )
 
     i8 = <int8_t *>data
-    i32 = <int32_t *>data    
-    ui32 = <uint32_t *>data
+    #i32 = <int32_t *>data    
+    #ui32 = <uint32_t *>data
 
     # the following three lins are for little-endian
-    thisref = i32[0]
-    pos = i32[1]
-    nextpos = i32[6]
-    tmp_thistlen = ui32[7]
+    #thisref = i32[0]
+    #pos = i32[1]
+    #nextpos = i32[6]
+    #tmp_thistlen = ui32[7]
     # to simplify the byte swap, we pretend all original numbers (thisref, pos, nextpos) positive
-    #thisref = ui8[3] << 24 | ui8[2] << 16 | ui8[1] << 8 | ui8[0]
-    #pos = ui8[7] << 24 | ui8[6] << 16 | ui8[5] << 8 | ui8[4]
-    #nextpos = ui8[27] << 24 | ui8[26] << 16 | ui8[25] << 8 | ui8[24]
+    thisref = ui8[3] << 24 | ui8[2] << 16 | ui8[1] << 8 | ui8[0]
+    pos = ui8[7] << 24 | ui8[6] << 16 | ui8[5] << 8 | ui8[4]
+    nextpos = ui8[27] << 24 | ui8[26] << 16 | ui8[25] << 8 | ui8[24]
 
     # thistlen can be negative, so we byte swap it then convert to int32_t then take abs (maybe there is more effecient way?)
     
-    #tmp_thistlen = ui8[31] << 24 | ui8[30] << 16 | ui8[29] << 8 | ui8[28]
+    tmp_thistlen = ui8[31] << 24 | ui8[30] << 16 | ui8[29] << 8 | ui8[28]
     thistlen = abs(<int32_t> tmp_thistlen)
     
     thisstart = pos if nextpos > pos else nextpos #min(pos, nextpos) # we keep only the leftmost
@@ -1217,7 +1217,7 @@ cdef class BAMParser( GenericParser ):
             if i % 1000000 == 0:
                 info( " %d" % i )
                 
-        print( f"{references[chrid]:},{fpos:},{strand:}" )
+        #print( f"{references[chrid]:},{fpos:},{strand:}" )
         info( "%d reads have been read." % i ) 
         self.fhd.close()
         fwtrack.set_rlengths( rlengths )
@@ -1325,7 +1325,7 @@ cdef class BAMPEParser(BAMParser):
             if i % 1000000 == 0:
                 info( " %d" % i )
 
-        print( f"{references[chrid]:},{fpos:},{tlen:}" )
+        #print( f"{references[chrid]:},{fpos:},{tlen:}" )
         info( "%d fragments have been read." % i )
         #debug( f" {e1} Can't identify the length of entry, it may be the end of file, stop looping..." )
         #debug( f" {e2} Chromosome name can't be found which means this entry is skipped ..." )
