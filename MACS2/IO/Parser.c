@@ -4818,14 +4818,14 @@ static PyObject *__pyx_f_5MACS2_2IO_6Parser___pe_binary_parse_be(unsigned char c
   /* "MACS2/IO/Parser.pyx":276
  *     # be at + strand. So we don't
  *     # need to decipher CIGAR string.
- *     if thistlen < 0: thistlen += -1             # <<<<<<<<<<<<<<
+ *     if thistlen < 0: thistlen *= -1             # <<<<<<<<<<<<<<
  *     #thistlen = abs( thistlen )                    # Actually, if
  *     #                                             # the value
  */
   __Pyx_TraceLine(276,0,__PYX_ERR(0, 276, __pyx_L1_error))
   __pyx_t_1 = ((__pyx_v_thistlen < 0) != 0);
   if (__pyx_t_1) {
-    __pyx_v_thistlen = (__pyx_v_thistlen + -1L);
+    __pyx_v_thistlen = (__pyx_v_thistlen * -1L);
   }
 
   /* "MACS2/IO/Parser.pyx":285
@@ -33044,12 +33044,12 @@ static int __pyx_import_star_set(PyObject *o, PyObject* py_name, char *name) {
     "ELANDResultParser",
     "GenericParser",
     "SAMParser",
+    "__pyx_ctuple_15085____dunderpyx_t_5numpy_int32_t__and___dunderpyx_t_5numpy_int32_t__and___dunderpyx_t_5numpy_int32_t__etc",
+    "__pyx_ctuple_15085____dunderpyx_t_5numpy_int32_t__and___dunderpyx_t_5numpy_int32_t__and___dunderpyx_t_5numpy_int32_t__etc_struct",
     "__pyx_ctuple___dunderpyx_t_5numpy_int32_t",
     "__pyx_ctuple___dunderpyx_t_5numpy_int32_t__and_long",
     "__pyx_ctuple___dunderpyx_t_5numpy_int32_t__and_long_struct",
     "__pyx_ctuple___dunderpyx_t_5numpy_int32_t_struct",
-    "__pyx_ctuple_aef89____dunderpyx_t_5numpy_int32_t__and___dunderpyx_t_5numpy_int32_t__and___dunderpyx_t_5numpy_int32_t__etc",
-    "__pyx_ctuple_aef89____dunderpyx_t_5numpy_int32_t__and___dunderpyx_t_5numpy_int32_t__and___dunderpyx_t_5numpy_int32_t__etc_struct",
     "__pyx_ctuple_long",
     "__pyx_ctuple_long__and_long__and_long",
     "__pyx_ctuple_long__and_long__and_long_struct",

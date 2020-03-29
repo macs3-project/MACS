@@ -273,7 +273,7 @@ cdef tuple __pe_binary_parse_be (const unsigned char * data):
     # position which means this must
     # be at + strand. So we don't
     # need to decipher CIGAR string.
-    if thistlen < 0: thistlen += -1
+    if thistlen < 0: thistlen *= -1
     #thistlen = abs( thistlen )                    # Actually, if
     #                                             # the value
     #                                             # unpacked is
