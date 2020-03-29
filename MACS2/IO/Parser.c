@@ -4658,11 +4658,11 @@ static PyObject *__pyx_f_5MACS2_2IO_6Parser___pe_binary_parse_be(unsigned char c
   int __pyx_t_1;
   int __pyx_t_2;
   PyObject *__pyx_t_3 = NULL;
-  Py_ssize_t __pyx_t_4;
-  Py_UCS4 __pyx_t_5;
-  PyObject *__pyx_t_6 = NULL;
-  PyObject *__pyx_t_7 = NULL;
-  __pyx_t_5numpy_int32_t __pyx_t_8;
+  PyObject *__pyx_t_4 = NULL;
+  __pyx_t_5numpy_int32_t __pyx_t_5;
+  Py_ssize_t __pyx_t_6;
+  Py_UCS4 __pyx_t_7;
+  PyObject *__pyx_t_8 = NULL;
   PyObject *__pyx_t_9 = NULL;
   __Pyx_RefNannySetupContext("__pe_binary_parse_be", 0);
   __Pyx_TraceCall("__pe_binary_parse_be", __pyx_f[0], 238, 0, __PYX_ERR(0, 238, __pyx_L1_error));
@@ -4859,7 +4859,7 @@ static PyObject *__pyx_f_5MACS2_2IO_6Parser___pe_binary_parse_be(unsigned char c
  *     else:
  *         tmp_thistlen = ui8[31] << 24 | ui8[30] << 16 | ui8[29] << 8 | ui8[28] >> 1             # <<<<<<<<<<<<<<
  * 
- *     thistlen = <int32_t> tmp_thistlen
+ *     thistlen = abs(<int32_t> tmp_thistlen)
  */
   __Pyx_TraceLine(280,0,__PYX_ERR(0, 280, __pyx_L1_error))
   /*else*/ {
@@ -4870,111 +4870,23 @@ static PyObject *__pyx_f_5MACS2_2IO_6Parser___pe_binary_parse_be(unsigned char c
   /* "MACS2/IO/Parser.pyx":282
  *         tmp_thistlen = ui8[31] << 24 | ui8[30] << 16 | ui8[29] << 8 | ui8[28] >> 1
  * 
- *     thistlen = <int32_t> tmp_thistlen             # <<<<<<<<<<<<<<
- *     assert tmp_thistlen > 0, f"wrong parsing {thisref:} {pos:} {nextpos:} {tmp_thistlen:} {thistlen:}"
+ *     thistlen = abs(<int32_t> tmp_thistlen)             # <<<<<<<<<<<<<<
+ *     #assert tmp_thistlen > 0, f"wrong parsing {thisref:} {pos:} {nextpos:} {tmp_thistlen:} {thistlen:}"
  *     assert thistlen > 0, f"wrong parsing {thisref:} {pos:} {nextpos:} {tmp_thistlen:} {thistlen:}"
  */
   __Pyx_TraceLine(282,0,__PYX_ERR(0, 282, __pyx_L1_error))
-  __pyx_v_thistlen = ((__pyx_t_5numpy_int32_t)__pyx_v_tmp_thistlen);
-
-  /* "MACS2/IO/Parser.pyx":283
- * 
- *     thistlen = <int32_t> tmp_thistlen
- *     assert tmp_thistlen > 0, f"wrong parsing {thisref:} {pos:} {nextpos:} {tmp_thistlen:} {thistlen:}"             # <<<<<<<<<<<<<<
- *     assert thistlen > 0, f"wrong parsing {thisref:} {pos:} {nextpos:} {tmp_thistlen:} {thistlen:}"
- * 
- */
-  __Pyx_TraceLine(283,0,__PYX_ERR(0, 283, __pyx_L1_error))
-  #ifndef CYTHON_WITHOUT_ASSERTIONS
-  if (unlikely(!Py_OptimizeFlag)) {
-    if (unlikely(!((__pyx_v_tmp_thistlen > 0) != 0))) {
-      __pyx_t_3 = PyTuple_New(10); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 283, __pyx_L1_error)
-      __Pyx_GOTREF(__pyx_t_3);
-      __pyx_t_4 = 0;
-      __pyx_t_5 = 127;
-      __Pyx_INCREF(__pyx_kp_u_wrong_parsing);
-      __pyx_t_4 += 14;
-      __Pyx_GIVEREF(__pyx_kp_u_wrong_parsing);
-      PyTuple_SET_ITEM(__pyx_t_3, 0, __pyx_kp_u_wrong_parsing);
-      __pyx_t_6 = __Pyx_PyInt_From_npy_int32(__pyx_v_thisref); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 283, __pyx_L1_error)
-      __Pyx_GOTREF(__pyx_t_6);
-      __pyx_t_7 = __Pyx_PyObject_FormatSimple(__pyx_t_6, __pyx_empty_unicode); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 283, __pyx_L1_error)
-      __Pyx_GOTREF(__pyx_t_7);
-      __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
-      __pyx_t_5 = (__Pyx_PyUnicode_MAX_CHAR_VALUE(__pyx_t_7) > __pyx_t_5) ? __Pyx_PyUnicode_MAX_CHAR_VALUE(__pyx_t_7) : __pyx_t_5;
-      __pyx_t_4 += __Pyx_PyUnicode_GET_LENGTH(__pyx_t_7);
-      __Pyx_GIVEREF(__pyx_t_7);
-      PyTuple_SET_ITEM(__pyx_t_3, 1, __pyx_t_7);
-      __pyx_t_7 = 0;
-      __Pyx_INCREF(__pyx_kp_u__3);
-      __pyx_t_4 += 1;
-      __Pyx_GIVEREF(__pyx_kp_u__3);
-      PyTuple_SET_ITEM(__pyx_t_3, 2, __pyx_kp_u__3);
-      __pyx_t_7 = __Pyx_PyInt_From_npy_int32(__pyx_v_pos); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 283, __pyx_L1_error)
-      __Pyx_GOTREF(__pyx_t_7);
-      __pyx_t_6 = __Pyx_PyObject_FormatSimple(__pyx_t_7, __pyx_empty_unicode); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 283, __pyx_L1_error)
-      __Pyx_GOTREF(__pyx_t_6);
-      __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
-      __pyx_t_5 = (__Pyx_PyUnicode_MAX_CHAR_VALUE(__pyx_t_6) > __pyx_t_5) ? __Pyx_PyUnicode_MAX_CHAR_VALUE(__pyx_t_6) : __pyx_t_5;
-      __pyx_t_4 += __Pyx_PyUnicode_GET_LENGTH(__pyx_t_6);
-      __Pyx_GIVEREF(__pyx_t_6);
-      PyTuple_SET_ITEM(__pyx_t_3, 3, __pyx_t_6);
-      __pyx_t_6 = 0;
-      __Pyx_INCREF(__pyx_kp_u__3);
-      __pyx_t_4 += 1;
-      __Pyx_GIVEREF(__pyx_kp_u__3);
-      PyTuple_SET_ITEM(__pyx_t_3, 4, __pyx_kp_u__3);
-      __pyx_t_6 = __Pyx_PyInt_From_npy_int32(__pyx_v_nextpos); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 283, __pyx_L1_error)
-      __Pyx_GOTREF(__pyx_t_6);
-      __pyx_t_7 = __Pyx_PyObject_FormatSimple(__pyx_t_6, __pyx_empty_unicode); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 283, __pyx_L1_error)
-      __Pyx_GOTREF(__pyx_t_7);
-      __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
-      __pyx_t_5 = (__Pyx_PyUnicode_MAX_CHAR_VALUE(__pyx_t_7) > __pyx_t_5) ? __Pyx_PyUnicode_MAX_CHAR_VALUE(__pyx_t_7) : __pyx_t_5;
-      __pyx_t_4 += __Pyx_PyUnicode_GET_LENGTH(__pyx_t_7);
-      __Pyx_GIVEREF(__pyx_t_7);
-      PyTuple_SET_ITEM(__pyx_t_3, 5, __pyx_t_7);
-      __pyx_t_7 = 0;
-      __Pyx_INCREF(__pyx_kp_u__3);
-      __pyx_t_4 += 1;
-      __Pyx_GIVEREF(__pyx_kp_u__3);
-      PyTuple_SET_ITEM(__pyx_t_3, 6, __pyx_kp_u__3);
-      __pyx_t_7 = __Pyx_PyInt_From_npy_uint32(__pyx_v_tmp_thistlen); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 283, __pyx_L1_error)
-      __Pyx_GOTREF(__pyx_t_7);
-      __pyx_t_6 = __Pyx_PyObject_FormatSimple(__pyx_t_7, __pyx_empty_unicode); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 283, __pyx_L1_error)
-      __Pyx_GOTREF(__pyx_t_6);
-      __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
-      __pyx_t_5 = (__Pyx_PyUnicode_MAX_CHAR_VALUE(__pyx_t_6) > __pyx_t_5) ? __Pyx_PyUnicode_MAX_CHAR_VALUE(__pyx_t_6) : __pyx_t_5;
-      __pyx_t_4 += __Pyx_PyUnicode_GET_LENGTH(__pyx_t_6);
-      __Pyx_GIVEREF(__pyx_t_6);
-      PyTuple_SET_ITEM(__pyx_t_3, 7, __pyx_t_6);
-      __pyx_t_6 = 0;
-      __Pyx_INCREF(__pyx_kp_u__3);
-      __pyx_t_4 += 1;
-      __Pyx_GIVEREF(__pyx_kp_u__3);
-      PyTuple_SET_ITEM(__pyx_t_3, 8, __pyx_kp_u__3);
-      __pyx_t_6 = __Pyx_PyInt_From_npy_int32(__pyx_v_thistlen); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 283, __pyx_L1_error)
-      __Pyx_GOTREF(__pyx_t_6);
-      __pyx_t_7 = __Pyx_PyObject_FormatSimple(__pyx_t_6, __pyx_empty_unicode); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 283, __pyx_L1_error)
-      __Pyx_GOTREF(__pyx_t_7);
-      __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
-      __pyx_t_5 = (__Pyx_PyUnicode_MAX_CHAR_VALUE(__pyx_t_7) > __pyx_t_5) ? __Pyx_PyUnicode_MAX_CHAR_VALUE(__pyx_t_7) : __pyx_t_5;
-      __pyx_t_4 += __Pyx_PyUnicode_GET_LENGTH(__pyx_t_7);
-      __Pyx_GIVEREF(__pyx_t_7);
-      PyTuple_SET_ITEM(__pyx_t_3, 9, __pyx_t_7);
-      __pyx_t_7 = 0;
-      __pyx_t_7 = __Pyx_PyUnicode_Join(__pyx_t_3, 10, __pyx_t_4, __pyx_t_5); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 283, __pyx_L1_error)
-      __Pyx_GOTREF(__pyx_t_7);
-      __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-      PyErr_SetObject(PyExc_AssertionError, __pyx_t_7);
-      __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
-      __PYX_ERR(0, 283, __pyx_L1_error)
-    }
-  }
-  #endif
+  __pyx_t_3 = __Pyx_PyInt_From_npy_int32(((__pyx_t_5numpy_int32_t)__pyx_v_tmp_thistlen)); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 282, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_3);
+  __pyx_t_4 = __Pyx_PyNumber_Absolute(__pyx_t_3); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 282, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_4);
+  __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
+  __pyx_t_5 = __Pyx_PyInt_As_npy_int32(__pyx_t_4); if (unlikely((__pyx_t_5 == ((npy_int32)-1)) && PyErr_Occurred())) __PYX_ERR(0, 282, __pyx_L1_error)
+  __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
+  __pyx_v_thistlen = __pyx_t_5;
 
   /* "MACS2/IO/Parser.pyx":284
- *     thistlen = <int32_t> tmp_thistlen
- *     assert tmp_thistlen > 0, f"wrong parsing {thisref:} {pos:} {nextpos:} {tmp_thistlen:} {thistlen:}"
+ *     thistlen = abs(<int32_t> tmp_thistlen)
+ *     #assert tmp_thistlen > 0, f"wrong parsing {thisref:} {pos:} {nextpos:} {tmp_thistlen:} {thistlen:}"
  *     assert thistlen > 0, f"wrong parsing {thisref:} {pos:} {nextpos:} {tmp_thistlen:} {thistlen:}"             # <<<<<<<<<<<<<<
  * 
  *     thisstart = pos if nextpos > pos else pos #min(pos, nextpos) # we keep only the leftmost
@@ -4983,85 +4895,85 @@ static PyObject *__pyx_f_5MACS2_2IO_6Parser___pe_binary_parse_be(unsigned char c
   #ifndef CYTHON_WITHOUT_ASSERTIONS
   if (unlikely(!Py_OptimizeFlag)) {
     if (unlikely(!((__pyx_v_thistlen > 0) != 0))) {
-      __pyx_t_7 = PyTuple_New(10); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 284, __pyx_L1_error)
-      __Pyx_GOTREF(__pyx_t_7);
-      __pyx_t_4 = 0;
-      __pyx_t_5 = 127;
+      __pyx_t_4 = PyTuple_New(10); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 284, __pyx_L1_error)
+      __Pyx_GOTREF(__pyx_t_4);
+      __pyx_t_6 = 0;
+      __pyx_t_7 = 127;
       __Pyx_INCREF(__pyx_kp_u_wrong_parsing);
-      __pyx_t_4 += 14;
+      __pyx_t_6 += 14;
       __Pyx_GIVEREF(__pyx_kp_u_wrong_parsing);
-      PyTuple_SET_ITEM(__pyx_t_7, 0, __pyx_kp_u_wrong_parsing);
+      PyTuple_SET_ITEM(__pyx_t_4, 0, __pyx_kp_u_wrong_parsing);
       __pyx_t_3 = __Pyx_PyInt_From_npy_int32(__pyx_v_thisref); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 284, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_3);
-      __pyx_t_6 = __Pyx_PyObject_FormatSimple(__pyx_t_3, __pyx_empty_unicode); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 284, __pyx_L1_error)
-      __Pyx_GOTREF(__pyx_t_6);
+      __pyx_t_8 = __Pyx_PyObject_FormatSimple(__pyx_t_3, __pyx_empty_unicode); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 284, __pyx_L1_error)
+      __Pyx_GOTREF(__pyx_t_8);
       __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-      __pyx_t_5 = (__Pyx_PyUnicode_MAX_CHAR_VALUE(__pyx_t_6) > __pyx_t_5) ? __Pyx_PyUnicode_MAX_CHAR_VALUE(__pyx_t_6) : __pyx_t_5;
-      __pyx_t_4 += __Pyx_PyUnicode_GET_LENGTH(__pyx_t_6);
-      __Pyx_GIVEREF(__pyx_t_6);
-      PyTuple_SET_ITEM(__pyx_t_7, 1, __pyx_t_6);
-      __pyx_t_6 = 0;
+      __pyx_t_7 = (__Pyx_PyUnicode_MAX_CHAR_VALUE(__pyx_t_8) > __pyx_t_7) ? __Pyx_PyUnicode_MAX_CHAR_VALUE(__pyx_t_8) : __pyx_t_7;
+      __pyx_t_6 += __Pyx_PyUnicode_GET_LENGTH(__pyx_t_8);
+      __Pyx_GIVEREF(__pyx_t_8);
+      PyTuple_SET_ITEM(__pyx_t_4, 1, __pyx_t_8);
+      __pyx_t_8 = 0;
       __Pyx_INCREF(__pyx_kp_u__3);
-      __pyx_t_4 += 1;
+      __pyx_t_6 += 1;
       __Pyx_GIVEREF(__pyx_kp_u__3);
-      PyTuple_SET_ITEM(__pyx_t_7, 2, __pyx_kp_u__3);
-      __pyx_t_6 = __Pyx_PyInt_From_npy_int32(__pyx_v_pos); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 284, __pyx_L1_error)
-      __Pyx_GOTREF(__pyx_t_6);
-      __pyx_t_3 = __Pyx_PyObject_FormatSimple(__pyx_t_6, __pyx_empty_unicode); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 284, __pyx_L1_error)
+      PyTuple_SET_ITEM(__pyx_t_4, 2, __pyx_kp_u__3);
+      __pyx_t_8 = __Pyx_PyInt_From_npy_int32(__pyx_v_pos); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 284, __pyx_L1_error)
+      __Pyx_GOTREF(__pyx_t_8);
+      __pyx_t_3 = __Pyx_PyObject_FormatSimple(__pyx_t_8, __pyx_empty_unicode); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 284, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_3);
-      __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
-      __pyx_t_5 = (__Pyx_PyUnicode_MAX_CHAR_VALUE(__pyx_t_3) > __pyx_t_5) ? __Pyx_PyUnicode_MAX_CHAR_VALUE(__pyx_t_3) : __pyx_t_5;
-      __pyx_t_4 += __Pyx_PyUnicode_GET_LENGTH(__pyx_t_3);
+      __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
+      __pyx_t_7 = (__Pyx_PyUnicode_MAX_CHAR_VALUE(__pyx_t_3) > __pyx_t_7) ? __Pyx_PyUnicode_MAX_CHAR_VALUE(__pyx_t_3) : __pyx_t_7;
+      __pyx_t_6 += __Pyx_PyUnicode_GET_LENGTH(__pyx_t_3);
       __Pyx_GIVEREF(__pyx_t_3);
-      PyTuple_SET_ITEM(__pyx_t_7, 3, __pyx_t_3);
+      PyTuple_SET_ITEM(__pyx_t_4, 3, __pyx_t_3);
       __pyx_t_3 = 0;
       __Pyx_INCREF(__pyx_kp_u__3);
-      __pyx_t_4 += 1;
+      __pyx_t_6 += 1;
       __Pyx_GIVEREF(__pyx_kp_u__3);
-      PyTuple_SET_ITEM(__pyx_t_7, 4, __pyx_kp_u__3);
+      PyTuple_SET_ITEM(__pyx_t_4, 4, __pyx_kp_u__3);
       __pyx_t_3 = __Pyx_PyInt_From_npy_int32(__pyx_v_nextpos); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 284, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_3);
-      __pyx_t_6 = __Pyx_PyObject_FormatSimple(__pyx_t_3, __pyx_empty_unicode); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 284, __pyx_L1_error)
-      __Pyx_GOTREF(__pyx_t_6);
+      __pyx_t_8 = __Pyx_PyObject_FormatSimple(__pyx_t_3, __pyx_empty_unicode); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 284, __pyx_L1_error)
+      __Pyx_GOTREF(__pyx_t_8);
       __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-      __pyx_t_5 = (__Pyx_PyUnicode_MAX_CHAR_VALUE(__pyx_t_6) > __pyx_t_5) ? __Pyx_PyUnicode_MAX_CHAR_VALUE(__pyx_t_6) : __pyx_t_5;
-      __pyx_t_4 += __Pyx_PyUnicode_GET_LENGTH(__pyx_t_6);
-      __Pyx_GIVEREF(__pyx_t_6);
-      PyTuple_SET_ITEM(__pyx_t_7, 5, __pyx_t_6);
-      __pyx_t_6 = 0;
+      __pyx_t_7 = (__Pyx_PyUnicode_MAX_CHAR_VALUE(__pyx_t_8) > __pyx_t_7) ? __Pyx_PyUnicode_MAX_CHAR_VALUE(__pyx_t_8) : __pyx_t_7;
+      __pyx_t_6 += __Pyx_PyUnicode_GET_LENGTH(__pyx_t_8);
+      __Pyx_GIVEREF(__pyx_t_8);
+      PyTuple_SET_ITEM(__pyx_t_4, 5, __pyx_t_8);
+      __pyx_t_8 = 0;
       __Pyx_INCREF(__pyx_kp_u__3);
-      __pyx_t_4 += 1;
+      __pyx_t_6 += 1;
       __Pyx_GIVEREF(__pyx_kp_u__3);
-      PyTuple_SET_ITEM(__pyx_t_7, 6, __pyx_kp_u__3);
-      __pyx_t_6 = __Pyx_PyInt_From_npy_uint32(__pyx_v_tmp_thistlen); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 284, __pyx_L1_error)
-      __Pyx_GOTREF(__pyx_t_6);
-      __pyx_t_3 = __Pyx_PyObject_FormatSimple(__pyx_t_6, __pyx_empty_unicode); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 284, __pyx_L1_error)
+      PyTuple_SET_ITEM(__pyx_t_4, 6, __pyx_kp_u__3);
+      __pyx_t_8 = __Pyx_PyInt_From_npy_uint32(__pyx_v_tmp_thistlen); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 284, __pyx_L1_error)
+      __Pyx_GOTREF(__pyx_t_8);
+      __pyx_t_3 = __Pyx_PyObject_FormatSimple(__pyx_t_8, __pyx_empty_unicode); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 284, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_3);
-      __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
-      __pyx_t_5 = (__Pyx_PyUnicode_MAX_CHAR_VALUE(__pyx_t_3) > __pyx_t_5) ? __Pyx_PyUnicode_MAX_CHAR_VALUE(__pyx_t_3) : __pyx_t_5;
-      __pyx_t_4 += __Pyx_PyUnicode_GET_LENGTH(__pyx_t_3);
+      __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
+      __pyx_t_7 = (__Pyx_PyUnicode_MAX_CHAR_VALUE(__pyx_t_3) > __pyx_t_7) ? __Pyx_PyUnicode_MAX_CHAR_VALUE(__pyx_t_3) : __pyx_t_7;
+      __pyx_t_6 += __Pyx_PyUnicode_GET_LENGTH(__pyx_t_3);
       __Pyx_GIVEREF(__pyx_t_3);
-      PyTuple_SET_ITEM(__pyx_t_7, 7, __pyx_t_3);
+      PyTuple_SET_ITEM(__pyx_t_4, 7, __pyx_t_3);
       __pyx_t_3 = 0;
       __Pyx_INCREF(__pyx_kp_u__3);
-      __pyx_t_4 += 1;
+      __pyx_t_6 += 1;
       __Pyx_GIVEREF(__pyx_kp_u__3);
-      PyTuple_SET_ITEM(__pyx_t_7, 8, __pyx_kp_u__3);
+      PyTuple_SET_ITEM(__pyx_t_4, 8, __pyx_kp_u__3);
       __pyx_t_3 = __Pyx_PyInt_From_npy_int32(__pyx_v_thistlen); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 284, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_3);
-      __pyx_t_6 = __Pyx_PyObject_FormatSimple(__pyx_t_3, __pyx_empty_unicode); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 284, __pyx_L1_error)
-      __Pyx_GOTREF(__pyx_t_6);
+      __pyx_t_8 = __Pyx_PyObject_FormatSimple(__pyx_t_3, __pyx_empty_unicode); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 284, __pyx_L1_error)
+      __Pyx_GOTREF(__pyx_t_8);
       __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-      __pyx_t_5 = (__Pyx_PyUnicode_MAX_CHAR_VALUE(__pyx_t_6) > __pyx_t_5) ? __Pyx_PyUnicode_MAX_CHAR_VALUE(__pyx_t_6) : __pyx_t_5;
-      __pyx_t_4 += __Pyx_PyUnicode_GET_LENGTH(__pyx_t_6);
-      __Pyx_GIVEREF(__pyx_t_6);
-      PyTuple_SET_ITEM(__pyx_t_7, 9, __pyx_t_6);
-      __pyx_t_6 = 0;
-      __pyx_t_6 = __Pyx_PyUnicode_Join(__pyx_t_7, 10, __pyx_t_4, __pyx_t_5); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 284, __pyx_L1_error)
-      __Pyx_GOTREF(__pyx_t_6);
-      __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
-      PyErr_SetObject(PyExc_AssertionError, __pyx_t_6);
-      __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
+      __pyx_t_7 = (__Pyx_PyUnicode_MAX_CHAR_VALUE(__pyx_t_8) > __pyx_t_7) ? __Pyx_PyUnicode_MAX_CHAR_VALUE(__pyx_t_8) : __pyx_t_7;
+      __pyx_t_6 += __Pyx_PyUnicode_GET_LENGTH(__pyx_t_8);
+      __Pyx_GIVEREF(__pyx_t_8);
+      PyTuple_SET_ITEM(__pyx_t_4, 9, __pyx_t_8);
+      __pyx_t_8 = 0;
+      __pyx_t_8 = __Pyx_PyUnicode_Join(__pyx_t_4, 10, __pyx_t_6, __pyx_t_7); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 284, __pyx_L1_error)
+      __Pyx_GOTREF(__pyx_t_8);
+      __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
+      PyErr_SetObject(PyExc_AssertionError, __pyx_t_8);
+      __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
       __PYX_ERR(0, 284, __pyx_L1_error)
     }
   }
@@ -5076,11 +4988,11 @@ static PyObject *__pyx_f_5MACS2_2IO_6Parser___pe_binary_parse_be(unsigned char c
  */
   __Pyx_TraceLine(286,0,__PYX_ERR(0, 286, __pyx_L1_error))
   if (((__pyx_v_nextpos > __pyx_v_pos) != 0)) {
-    __pyx_t_8 = __pyx_v_pos;
+    __pyx_t_5 = __pyx_v_pos;
   } else {
-    __pyx_t_8 = __pyx_v_pos;
+    __pyx_t_5 = __pyx_v_pos;
   }
-  __pyx_v_thisstart = __pyx_t_8;
+  __pyx_v_thisstart = __pyx_t_5;
 
   /* "MACS2/IO/Parser.pyx":299
  *     #                                             # position.
@@ -5091,22 +5003,22 @@ static PyObject *__pyx_f_5MACS2_2IO_6Parser___pe_binary_parse_be(unsigned char c
  */
   __Pyx_TraceLine(299,0,__PYX_ERR(0, 299, __pyx_L1_error))
   __Pyx_XDECREF(__pyx_r);
-  __pyx_t_6 = __Pyx_PyInt_From_npy_int32(__pyx_v_thisref); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 299, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_6);
-  __pyx_t_7 = __Pyx_PyInt_From_npy_int32(__pyx_v_thisstart); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 299, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_7);
+  __pyx_t_8 = __Pyx_PyInt_From_npy_int32(__pyx_v_thisref); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 299, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_8);
+  __pyx_t_4 = __Pyx_PyInt_From_npy_int32(__pyx_v_thisstart); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 299, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_4);
   __pyx_t_3 = __Pyx_PyInt_From_npy_int32(((__pyx_t_5numpy_int32_t)__pyx_v_tmp_thistlen)); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 299, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
   __pyx_t_9 = PyTuple_New(3); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 299, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_9);
-  __Pyx_GIVEREF(__pyx_t_6);
-  PyTuple_SET_ITEM(__pyx_t_9, 0, __pyx_t_6);
-  __Pyx_GIVEREF(__pyx_t_7);
-  PyTuple_SET_ITEM(__pyx_t_9, 1, __pyx_t_7);
+  __Pyx_GIVEREF(__pyx_t_8);
+  PyTuple_SET_ITEM(__pyx_t_9, 0, __pyx_t_8);
+  __Pyx_GIVEREF(__pyx_t_4);
+  PyTuple_SET_ITEM(__pyx_t_9, 1, __pyx_t_4);
   __Pyx_GIVEREF(__pyx_t_3);
   PyTuple_SET_ITEM(__pyx_t_9, 2, __pyx_t_3);
-  __pyx_t_6 = 0;
-  __pyx_t_7 = 0;
+  __pyx_t_8 = 0;
+  __pyx_t_4 = 0;
   __pyx_t_3 = 0;
   __pyx_r = ((PyObject*)__pyx_t_9);
   __pyx_t_9 = 0;
@@ -5123,8 +5035,8 @@ static PyObject *__pyx_f_5MACS2_2IO_6Parser___pe_binary_parse_be(unsigned char c
   /* function exit code */
   __pyx_L1_error:;
   __Pyx_XDECREF(__pyx_t_3);
-  __Pyx_XDECREF(__pyx_t_6);
-  __Pyx_XDECREF(__pyx_t_7);
+  __Pyx_XDECREF(__pyx_t_4);
+  __Pyx_XDECREF(__pyx_t_8);
   __Pyx_XDECREF(__pyx_t_9);
   __Pyx_AddTraceback("MACS2.IO.Parser.__pe_binary_parse_be", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __pyx_r = 0;
@@ -33426,12 +33338,12 @@ static int __pyx_import_star_set(PyObject *o, PyObject* py_name, char *name) {
     "ELANDResultParser",
     "GenericParser",
     "SAMParser",
-    "__pyx_ctuple_843b____dunderpyx_t_5numpy_int32_t__and___dunderpyx_t_5numpy_int32_t__and___dunderpyx_t_5numpy_int32_t__etc",
-    "__pyx_ctuple_843b____dunderpyx_t_5numpy_int32_t__and___dunderpyx_t_5numpy_int32_t__and___dunderpyx_t_5numpy_int32_t__etc_struct",
     "__pyx_ctuple___dunderpyx_t_5numpy_int32_t",
     "__pyx_ctuple___dunderpyx_t_5numpy_int32_t__and_long",
     "__pyx_ctuple___dunderpyx_t_5numpy_int32_t__and_long_struct",
     "__pyx_ctuple___dunderpyx_t_5numpy_int32_t_struct",
+    "__pyx_ctuple_ba427____dunderpyx_t_5numpy_int32_t__and___dunderpyx_t_5numpy_int32_t__and___dunderpyx_t_5numpy_int32_t__etc",
+    "__pyx_ctuple_ba427____dunderpyx_t_5numpy_int32_t__and___dunderpyx_t_5numpy_int32_t__and___dunderpyx_t_5numpy_int32_t__etc_struct",
     "__pyx_ctuple_long",
     "__pyx_ctuple_long__and_long__and_long",
     "__pyx_ctuple_long__and_long__and_long_struct",

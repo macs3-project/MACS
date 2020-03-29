@@ -279,8 +279,8 @@ cdef tuple __pe_binary_parse_be (const unsigned char * data):
     else:
         tmp_thistlen = ui8[31] << 24 | ui8[30] << 16 | ui8[29] << 8 | ui8[28] >> 1
 
-    thistlen = <int32_t> tmp_thistlen
-    assert tmp_thistlen > 0, f"wrong parsing {thisref:} {pos:} {nextpos:} {tmp_thistlen:} {thistlen:}"
+    thistlen = abs(<int32_t> tmp_thistlen)
+    #assert tmp_thistlen > 0, f"wrong parsing {thisref:} {pos:} {nextpos:} {tmp_thistlen:} {thistlen:}"
     assert thistlen > 0, f"wrong parsing {thisref:} {pos:} {nextpos:} {tmp_thistlen:} {thistlen:}"    
     
     thisstart = pos if nextpos > pos else pos #min(pos, nextpos) # we keep only the leftmost
