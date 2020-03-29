@@ -129,7 +129,7 @@ cdef tuple __fw_binary_parse_le ( const unsigned char * data ):
     return ( thisref, thisstart, thisstrand )
 
 cdef tuple __fw_binary_parse_be ( const unsigned char * data ):
-    """Big endian version
+    """Big endian version. We need byte swap.
     """
     cdef:
         int32_t thisref, thisstart, thisstrand
@@ -138,10 +138,10 @@ cdef tuple __fw_binary_parse_be ( const unsigned char * data ):
         uint16_t n_cigar_op
         int32_t cigar_code
         uint8_t *ui8
-        int8_t *i8
-        uint16_t *ui16
-        uint32_t *ui32
-        int32_t *i32
+        #int8_t *i8
+        #uint16_t *ui16
+        #uint32_t *ui32
+        #int32_t *i32
         int32_t i
         uint32_t shift0, shift
 
@@ -158,15 +158,17 @@ cdef tuple __fw_binary_parse_be ( const unsigned char * data ):
     # we filter out 2nd mate, not a proper pair, mate is unmapped
     if (bwflag & 2820) or (bwflag & 1 and (bwflag & 136 or not bwflag & 2)): return ( -1, -1, -1 )
 
-    i8 = <int8_t *>data
-    i32 = <int32_t *>data
-    
+    #i8 = <int8_t *>data
+    #i32 = <int32_t *>data
+
+    # the following three lins are for little-endian    
     #thisref = i32[0]
     #thisstart = i32[1]
+    #n_cigar_op = ui16[6]
+
+    # to simplify the byte swap, we pretend all original numbers (thisref, pos, nextpos) positive    
     thisref = ui8[3] << 24 | ui8[2] << 16 | ui8[1] << 8 | ui8[0]
     thisstart = ui8[7] << 24 | ui8[6] << 16 | ui8[5] << 8 | ui8[4]
-        
-    #n_cigar_op = ui16[6]
     n_cigar_op = ui8[13] << 8 | i8[12]
     
     # In case of paired-end we have now skipped all possible "bad" pairs
@@ -236,7 +238,7 @@ cdef tuple __pe_binary_parse_le (const unsigned char * data):
     return ( thisref, thisstart, thistlen )
 
 cdef tuple __pe_binary_parse_be (const unsigned char * data):
-    """Parse a BAMPE record in big-endian system.
+    """Parse a BAMPE record in big-endian system. And we need byte swap.
     """    
     cdef:
         int32_t thisref, thisstart, thistlen
@@ -244,8 +246,8 @@ cdef tuple __pe_binary_parse_be (const unsigned char * data):
         int32_t nextpos, pos
         uint16_t bwflag
         uint8_t *ui8
-        int8_t *i8
-        int32_t *i32
+        #int8_t *i8
+        #int32_t *i32
         
     # we skip lot of the available information in data (i.e. tag name, quality etc etc)
     if not data:
