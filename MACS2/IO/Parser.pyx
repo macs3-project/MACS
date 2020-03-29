@@ -239,7 +239,8 @@ cdef tuple __pe_binary_parse_be (const unsigned char * data):
     """Parse a BAMPE record in big-endian system.
     """    
     cdef:
-        int32_t thisref, thisstart, thistlen
+        int32_t thisref, thisstart #, thistlen
+        uint32_t tmp_thistlen
         int32_t nextpos, pos
         uint16_t bwflag
         uint8_t *ui8
@@ -274,9 +275,9 @@ cdef tuple __pe_binary_parse_be (const unsigned char * data):
     #thistlen = i32[7]
     # thistlen can be negative, so we have to check the 'first byte'
     if i8[28] > 0:
-        thistlen = ui8[31] << 24 | ui8[30] << 16 | ui8[29] << 8 | ui8[28]
+        tmp_thistlen = ui8[31] << 24 | ui8[30] << 16 | ui8[29] << 8 | ui8[28]
     else:
-        thistlen = ui8[31] << 24 | ui8[30] << 16 | ui8[29] << 8 | ui8[28] >> 1
+        tmp_thistlen = ui8[31] << 24 | ui8[30] << 16 | ui8[29] << 8 | ui8[28] >> 1
     
     thisstart = pos if nextpos > pos else pos #min(pos, nextpos) # we keep only the leftmost
     # position which means this must
@@ -291,7 +292,7 @@ cdef tuple __pe_binary_parse_be (const unsigned char * data):
     #                                             # leftmost
     #                                             # position.
     
-    return ( thisref, thisstart, thistlen )
+    return ( thisref, thisstart, <int32_t> tmp_thistlen )
     
 
 # choose a parser
