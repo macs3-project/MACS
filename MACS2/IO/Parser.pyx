@@ -273,7 +273,7 @@ cdef tuple __pe_binary_parse_be (const unsigned char * data):
 
     #thistlen = i32[7]
     # thistlen can be negative, so we have to check the 'first byte'
-    if in8[28] > 0:
+    if i8[28] > 0:
         thistlen = ui8[31] << 24 | ui8[30] << 16 | ui8[29] << 8 | ui8[28]
     else:
         thistlen = ui8[31] << 24 | ui8[30] << 16 | ui8[29] << 8 | ui8[28] >> 1
