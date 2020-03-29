@@ -1208,6 +1208,52 @@ static PyObject* __Pyx_PyFloat_NeObjC(PyObject *op1, PyObject *op2, double float
     (PyObject_RichCompare(op1, op2, Py_NE))
     #endif
 
+/* PyObjectFormatSimple.proto */
+#if CYTHON_COMPILING_IN_PYPY
+    #define __Pyx_PyObject_FormatSimple(s, f) (\
+        likely(PyUnicode_CheckExact(s)) ? (Py_INCREF(s), s) :\
+        PyObject_Format(s, f))
+#elif PY_MAJOR_VERSION < 3
+    #define __Pyx_PyObject_FormatSimple(s, f) (\
+        likely(PyUnicode_CheckExact(s)) ? (Py_INCREF(s), s) :\
+        likely(PyString_CheckExact(s)) ? PyUnicode_FromEncodedObject(s, NULL, "strict") :\
+        PyObject_Format(s, f))
+#elif CYTHON_USE_TYPE_SLOTS
+    #define __Pyx_PyObject_FormatSimple(s, f) (\
+        likely(PyUnicode_CheckExact(s)) ? (Py_INCREF(s), s) :\
+        likely(PyLong_CheckExact(s)) ? PyLong_Type.tp_str(s) :\
+        likely(PyFloat_CheckExact(s)) ? PyFloat_Type.tp_str(s) :\
+        PyObject_Format(s, f))
+#else
+    #define __Pyx_PyObject_FormatSimple(s, f) (\
+        likely(PyUnicode_CheckExact(s)) ? (Py_INCREF(s), s) :\
+        PyObject_Format(s, f))
+#endif
+
+/* IncludeStringH.proto */
+#include <string.h>
+
+/* JoinPyUnicode.proto */
+static PyObject* __Pyx_PyUnicode_Join(PyObject* value_tuple, Py_ssize_t value_count, Py_ssize_t result_ulength,
+                                      Py_UCS4 max_char);
+
+/* ListAppend.proto */
+#if CYTHON_USE_PYLIST_INTERNALS && CYTHON_ASSUME_SAFE_MACROS
+static CYTHON_INLINE int __Pyx_PyList_Append(PyObject* list, PyObject* x) {
+    PyListObject* L = (PyListObject*) list;
+    Py_ssize_t len = Py_SIZE(list);
+    if (likely(L->allocated > len) & likely(len > (L->allocated >> 1))) {
+        Py_INCREF(x);
+        PyList_SET_ITEM(list, len, x);
+        Py_SIZE(list) = len+1;
+        return 0;
+    }
+    return PyList_Append(list, x);
+}
+#else
+#define __Pyx_PyList_Append(L,x) PyList_Append(L,x)
+#endif
+
 /* PyDictVersioning.proto */
 #if CYTHON_USE_DICT_VERSIONS && CYTHON_USE_TYPE_SLOTS
 #define __PYX_DICT_VERSION_INIT  ((PY_UINT64_T) -1)
@@ -1253,52 +1299,6 @@ static PyObject *__Pyx__GetModuleGlobalName(PyObject *name, PY_UINT64_T *dict_ve
 #define __Pyx_GetModuleGlobalName(var, name)  (var) = __Pyx__GetModuleGlobalName(name)
 #define __Pyx_GetModuleGlobalNameUncached(var, name)  (var) = __Pyx__GetModuleGlobalName(name)
 static CYTHON_INLINE PyObject *__Pyx__GetModuleGlobalName(PyObject *name);
-#endif
-
-/* PyObjectFormatSimple.proto */
-#if CYTHON_COMPILING_IN_PYPY
-    #define __Pyx_PyObject_FormatSimple(s, f) (\
-        likely(PyUnicode_CheckExact(s)) ? (Py_INCREF(s), s) :\
-        PyObject_Format(s, f))
-#elif PY_MAJOR_VERSION < 3
-    #define __Pyx_PyObject_FormatSimple(s, f) (\
-        likely(PyUnicode_CheckExact(s)) ? (Py_INCREF(s), s) :\
-        likely(PyString_CheckExact(s)) ? PyUnicode_FromEncodedObject(s, NULL, "strict") :\
-        PyObject_Format(s, f))
-#elif CYTHON_USE_TYPE_SLOTS
-    #define __Pyx_PyObject_FormatSimple(s, f) (\
-        likely(PyUnicode_CheckExact(s)) ? (Py_INCREF(s), s) :\
-        likely(PyLong_CheckExact(s)) ? PyLong_Type.tp_str(s) :\
-        likely(PyFloat_CheckExact(s)) ? PyFloat_Type.tp_str(s) :\
-        PyObject_Format(s, f))
-#else
-    #define __Pyx_PyObject_FormatSimple(s, f) (\
-        likely(PyUnicode_CheckExact(s)) ? (Py_INCREF(s), s) :\
-        PyObject_Format(s, f))
-#endif
-
-/* IncludeStringH.proto */
-#include <string.h>
-
-/* JoinPyUnicode.proto */
-static PyObject* __Pyx_PyUnicode_Join(PyObject* value_tuple, Py_ssize_t value_count, Py_ssize_t result_ulength,
-                                      Py_UCS4 max_char);
-
-/* ListAppend.proto */
-#if CYTHON_USE_PYLIST_INTERNALS && CYTHON_ASSUME_SAFE_MACROS
-static CYTHON_INLINE int __Pyx_PyList_Append(PyObject* list, PyObject* x) {
-    PyListObject* L = (PyListObject*) list;
-    Py_ssize_t len = Py_SIZE(list);
-    if (likely(L->allocated > len) & likely(len > (L->allocated >> 1))) {
-        Py_INCREF(x);
-        PyList_SET_ITEM(list, len, x);
-        Py_SIZE(list) = len+1;
-        return 0;
-    }
-    return PyList_Append(list, x);
-}
-#else
-#define __Pyx_PyList_Append(L,x) PyList_Append(L,x)
 #endif
 
 /* PyObjectFormat.proto */
@@ -3151,7 +3151,7 @@ static PyObject *__pyx_pf_5MACS2_10PeakDetect_10PeakDetect_4__call_peaks_w_contr
  * 
  *         # prepare d_s for control data
  *         if self.sregion:             # <<<<<<<<<<<<<<
- *             assert self.d <= self.sregion, f"{slocal:} can't be smaller than {d:}!"
+ *             assert self.d <= self.sregion, f"{self.sregion:} can't be smaller than {self.d:}!"
  *         if self.lregion:
  */
   __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_sregion); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 178, __pyx_L1_error)
@@ -3163,9 +3163,9 @@ static PyObject *__pyx_pf_5MACS2_10PeakDetect_10PeakDetect_4__call_peaks_w_contr
     /* "MACS2/PeakDetect.pyx":179
  *         # prepare d_s for control data
  *         if self.sregion:
- *             assert self.d <= self.sregion, f"{slocal:} can't be smaller than {d:}!"             # <<<<<<<<<<<<<<
+ *             assert self.d <= self.sregion, f"{self.sregion:} can't be smaller than {self.d:}!"             # <<<<<<<<<<<<<<
  *         if self.lregion:
- *             assert self.d <= self.lregion , f"{llocal:} can't be smaller than {d:}!"
+ *             assert self.d <= self.lregion , f"{self.lregion:} can't be smaller than {self.d:}!"
  */
     #ifndef CYTHON_WITHOUT_ASSERTIONS
     if (unlikely(!Py_OptimizeFlag)) {
@@ -3183,7 +3183,7 @@ static PyObject *__pyx_pf_5MACS2_10PeakDetect_10PeakDetect_4__call_peaks_w_contr
         __Pyx_GOTREF(__pyx_t_2);
         __pyx_t_7 = 0;
         __pyx_t_8 = 127;
-        __Pyx_GetModuleGlobalName(__pyx_t_6, __pyx_n_s_slocal); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 179, __pyx_L1_error)
+        __pyx_t_6 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_sregion); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 179, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_6);
         __pyx_t_1 = __Pyx_PyObject_FormatSimple(__pyx_t_6, __pyx_empty_unicode); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 179, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_1);
@@ -3197,7 +3197,7 @@ static PyObject *__pyx_pf_5MACS2_10PeakDetect_10PeakDetect_4__call_peaks_w_contr
         __pyx_t_7 += 23;
         __Pyx_GIVEREF(__pyx_kp_u_can_t_be_smaller_than);
         PyTuple_SET_ITEM(__pyx_t_2, 1, __pyx_kp_u_can_t_be_smaller_than);
-        __pyx_t_1 = PyFloat_FromDouble(__pyx_v_d); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 179, __pyx_L1_error)
+        __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_d); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 179, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_1);
         __pyx_t_6 = __Pyx_PyObject_FormatSimple(__pyx_t_1, __pyx_empty_unicode); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 179, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_6);
@@ -3225,17 +3225,17 @@ static PyObject *__pyx_pf_5MACS2_10PeakDetect_10PeakDetect_4__call_peaks_w_contr
  * 
  *         # prepare d_s for control data
  *         if self.sregion:             # <<<<<<<<<<<<<<
- *             assert self.d <= self.sregion, f"{slocal:} can't be smaller than {d:}!"
+ *             assert self.d <= self.sregion, f"{self.sregion:} can't be smaller than {self.d:}!"
  *         if self.lregion:
  */
   }
 
   /* "MACS2/PeakDetect.pyx":180
  *         if self.sregion:
- *             assert self.d <= self.sregion, f"{slocal:} can't be smaller than {d:}!"
+ *             assert self.d <= self.sregion, f"{self.sregion:} can't be smaller than {self.d:}!"
  *         if self.lregion:             # <<<<<<<<<<<<<<
- *             assert self.d <= self.lregion , f"{llocal:} can't be smaller than {d:}!"
- *             assert self.sregion <= self.lregion , f"{llocal:} can't be smaller than {slocal:}!"
+ *             assert self.d <= self.lregion , f"{self.lregion:} can't be smaller than {self.d:}!"
+ *             assert self.sregion <= self.lregion , f"{self.lregion:} can't be smaller than {self.sregion:}!"
  */
   __pyx_t_6 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_lregion); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 180, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_6);
@@ -3244,10 +3244,10 @@ static PyObject *__pyx_pf_5MACS2_10PeakDetect_10PeakDetect_4__call_peaks_w_contr
   if (__pyx_t_4) {
 
     /* "MACS2/PeakDetect.pyx":181
- *             assert self.d <= self.sregion, f"{slocal:} can't be smaller than {d:}!"
+ *             assert self.d <= self.sregion, f"{self.sregion:} can't be smaller than {self.d:}!"
  *         if self.lregion:
- *             assert self.d <= self.lregion , f"{llocal:} can't be smaller than {d:}!"             # <<<<<<<<<<<<<<
- *             assert self.sregion <= self.lregion , f"{llocal:} can't be smaller than {slocal:}!"
+ *             assert self.d <= self.lregion , f"{self.lregion:} can't be smaller than {self.d:}!"             # <<<<<<<<<<<<<<
+ *             assert self.sregion <= self.lregion , f"{self.lregion:} can't be smaller than {self.sregion:}!"
  * 
  */
     #ifndef CYTHON_WITHOUT_ASSERTIONS
@@ -3266,7 +3266,7 @@ static PyObject *__pyx_pf_5MACS2_10PeakDetect_10PeakDetect_4__call_peaks_w_contr
         __Pyx_GOTREF(__pyx_t_1);
         __pyx_t_7 = 0;
         __pyx_t_8 = 127;
-        __Pyx_GetModuleGlobalName(__pyx_t_2, __pyx_n_s_llocal); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 181, __pyx_L1_error)
+        __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_lregion); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 181, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_2);
         __pyx_t_6 = __Pyx_PyObject_FormatSimple(__pyx_t_2, __pyx_empty_unicode); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 181, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_6);
@@ -3280,7 +3280,7 @@ static PyObject *__pyx_pf_5MACS2_10PeakDetect_10PeakDetect_4__call_peaks_w_contr
         __pyx_t_7 += 23;
         __Pyx_GIVEREF(__pyx_kp_u_can_t_be_smaller_than);
         PyTuple_SET_ITEM(__pyx_t_1, 1, __pyx_kp_u_can_t_be_smaller_than);
-        __pyx_t_6 = PyFloat_FromDouble(__pyx_v_d); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 181, __pyx_L1_error)
+        __pyx_t_6 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_d); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 181, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_6);
         __pyx_t_2 = __Pyx_PyObject_FormatSimple(__pyx_t_6, __pyx_empty_unicode); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 181, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_2);
@@ -3306,8 +3306,8 @@ static PyObject *__pyx_pf_5MACS2_10PeakDetect_10PeakDetect_4__call_peaks_w_contr
 
     /* "MACS2/PeakDetect.pyx":182
  *         if self.lregion:
- *             assert self.d <= self.lregion , f"{llocal:} can't be smaller than {d:}!"
- *             assert self.sregion <= self.lregion , f"{llocal:} can't be smaller than {slocal:}!"             # <<<<<<<<<<<<<<
+ *             assert self.d <= self.lregion , f"{self.lregion:} can't be smaller than {self.d:}!"
+ *             assert self.sregion <= self.lregion , f"{self.lregion:} can't be smaller than {self.sregion:}!"             # <<<<<<<<<<<<<<
  * 
  *         # Now prepare a list of extension sizes
  */
@@ -3327,7 +3327,7 @@ static PyObject *__pyx_pf_5MACS2_10PeakDetect_10PeakDetect_4__call_peaks_w_contr
         __Pyx_GOTREF(__pyx_t_6);
         __pyx_t_7 = 0;
         __pyx_t_8 = 127;
-        __Pyx_GetModuleGlobalName(__pyx_t_1, __pyx_n_s_llocal); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 182, __pyx_L1_error)
+        __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_lregion); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 182, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_1);
         __pyx_t_2 = __Pyx_PyObject_FormatSimple(__pyx_t_1, __pyx_empty_unicode); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 182, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_2);
@@ -3341,7 +3341,7 @@ static PyObject *__pyx_pf_5MACS2_10PeakDetect_10PeakDetect_4__call_peaks_w_contr
         __pyx_t_7 += 23;
         __Pyx_GIVEREF(__pyx_kp_u_can_t_be_smaller_than);
         PyTuple_SET_ITEM(__pyx_t_6, 1, __pyx_kp_u_can_t_be_smaller_than);
-        __Pyx_GetModuleGlobalName(__pyx_t_2, __pyx_n_s_slocal); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 182, __pyx_L1_error)
+        __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_sregion); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 182, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_2);
         __pyx_t_1 = __Pyx_PyObject_FormatSimple(__pyx_t_2, __pyx_empty_unicode); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 182, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_1);
@@ -3367,10 +3367,10 @@ static PyObject *__pyx_pf_5MACS2_10PeakDetect_10PeakDetect_4__call_peaks_w_contr
 
     /* "MACS2/PeakDetect.pyx":180
  *         if self.sregion:
- *             assert self.d <= self.sregion, f"{slocal:} can't be smaller than {d:}!"
+ *             assert self.d <= self.sregion, f"{self.sregion:} can't be smaller than {self.d:}!"
  *         if self.lregion:             # <<<<<<<<<<<<<<
- *             assert self.d <= self.lregion , f"{llocal:} can't be smaller than {d:}!"
- *             assert self.sregion <= self.lregion , f"{llocal:} can't be smaller than {slocal:}!"
+ *             assert self.d <= self.lregion , f"{self.lregion:} can't be smaller than {self.d:}!"
+ *             assert self.sregion <= self.lregion , f"{self.lregion:} can't be smaller than {self.sregion:}!"
  */
   }
 
@@ -7835,67 +7835,6 @@ static PyObject* __Pyx_PyFloat_NeObjC(PyObject *op1, PyObject *op2, double float
 }
 #endif
 
-/* PyDictVersioning */
-  #if CYTHON_USE_DICT_VERSIONS && CYTHON_USE_TYPE_SLOTS
-static CYTHON_INLINE PY_UINT64_T __Pyx_get_tp_dict_version(PyObject *obj) {
-    PyObject *dict = Py_TYPE(obj)->tp_dict;
-    return likely(dict) ? __PYX_GET_DICT_VERSION(dict) : 0;
-}
-static CYTHON_INLINE PY_UINT64_T __Pyx_get_object_dict_version(PyObject *obj) {
-    PyObject **dictptr = NULL;
-    Py_ssize_t offset = Py_TYPE(obj)->tp_dictoffset;
-    if (offset) {
-#if CYTHON_COMPILING_IN_CPYTHON
-        dictptr = (likely(offset > 0)) ? (PyObject **) ((char *)obj + offset) : _PyObject_GetDictPtr(obj);
-#else
-        dictptr = _PyObject_GetDictPtr(obj);
-#endif
-    }
-    return (dictptr && *dictptr) ? __PYX_GET_DICT_VERSION(*dictptr) : 0;
-}
-static CYTHON_INLINE int __Pyx_object_dict_version_matches(PyObject* obj, PY_UINT64_T tp_dict_version, PY_UINT64_T obj_dict_version) {
-    PyObject *dict = Py_TYPE(obj)->tp_dict;
-    if (unlikely(!dict) || unlikely(tp_dict_version != __PYX_GET_DICT_VERSION(dict)))
-        return 0;
-    return obj_dict_version == __Pyx_get_object_dict_version(obj);
-}
-#endif
-
-/* GetModuleGlobalName */
-  #if CYTHON_USE_DICT_VERSIONS
-static PyObject *__Pyx__GetModuleGlobalName(PyObject *name, PY_UINT64_T *dict_version, PyObject **dict_cached_value)
-#else
-static CYTHON_INLINE PyObject *__Pyx__GetModuleGlobalName(PyObject *name)
-#endif
-{
-    PyObject *result;
-#if !CYTHON_AVOID_BORROWED_REFS
-#if CYTHON_COMPILING_IN_CPYTHON && PY_VERSION_HEX >= 0x030500A1
-    result = _PyDict_GetItem_KnownHash(__pyx_d, name, ((PyASCIIObject *) name)->hash);
-    __PYX_UPDATE_DICT_CACHE(__pyx_d, result, *dict_cached_value, *dict_version)
-    if (likely(result)) {
-        return __Pyx_NewRef(result);
-    } else if (unlikely(PyErr_Occurred())) {
-        return NULL;
-    }
-#else
-    result = PyDict_GetItem(__pyx_d, name);
-    __PYX_UPDATE_DICT_CACHE(__pyx_d, result, *dict_cached_value, *dict_version)
-    if (likely(result)) {
-        return __Pyx_NewRef(result);
-    }
-#endif
-#else
-    result = PyObject_GetItem(__pyx_d, name);
-    __PYX_UPDATE_DICT_CACHE(__pyx_d, result, *dict_cached_value, *dict_version)
-    if (likely(result)) {
-        return __Pyx_NewRef(result);
-    }
-    PyErr_Clear();
-#endif
-    return __Pyx_GetBuiltinName(name);
-}
-
 /* JoinPyUnicode */
   static PyObject* __Pyx_PyUnicode_Join(PyObject* value_tuple, Py_ssize_t value_count, Py_ssize_t result_ulength,
                                       CYTHON_UNUSED Py_UCS4 max_char) {
@@ -7956,6 +7895,67 @@ bad:
     value_count++;
     return PyUnicode_Join(__pyx_empty_unicode, value_tuple);
 #endif
+}
+
+/* PyDictVersioning */
+  #if CYTHON_USE_DICT_VERSIONS && CYTHON_USE_TYPE_SLOTS
+static CYTHON_INLINE PY_UINT64_T __Pyx_get_tp_dict_version(PyObject *obj) {
+    PyObject *dict = Py_TYPE(obj)->tp_dict;
+    return likely(dict) ? __PYX_GET_DICT_VERSION(dict) : 0;
+}
+static CYTHON_INLINE PY_UINT64_T __Pyx_get_object_dict_version(PyObject *obj) {
+    PyObject **dictptr = NULL;
+    Py_ssize_t offset = Py_TYPE(obj)->tp_dictoffset;
+    if (offset) {
+#if CYTHON_COMPILING_IN_CPYTHON
+        dictptr = (likely(offset > 0)) ? (PyObject **) ((char *)obj + offset) : _PyObject_GetDictPtr(obj);
+#else
+        dictptr = _PyObject_GetDictPtr(obj);
+#endif
+    }
+    return (dictptr && *dictptr) ? __PYX_GET_DICT_VERSION(*dictptr) : 0;
+}
+static CYTHON_INLINE int __Pyx_object_dict_version_matches(PyObject* obj, PY_UINT64_T tp_dict_version, PY_UINT64_T obj_dict_version) {
+    PyObject *dict = Py_TYPE(obj)->tp_dict;
+    if (unlikely(!dict) || unlikely(tp_dict_version != __PYX_GET_DICT_VERSION(dict)))
+        return 0;
+    return obj_dict_version == __Pyx_get_object_dict_version(obj);
+}
+#endif
+
+/* GetModuleGlobalName */
+  #if CYTHON_USE_DICT_VERSIONS
+static PyObject *__Pyx__GetModuleGlobalName(PyObject *name, PY_UINT64_T *dict_version, PyObject **dict_cached_value)
+#else
+static CYTHON_INLINE PyObject *__Pyx__GetModuleGlobalName(PyObject *name)
+#endif
+{
+    PyObject *result;
+#if !CYTHON_AVOID_BORROWED_REFS
+#if CYTHON_COMPILING_IN_CPYTHON && PY_VERSION_HEX >= 0x030500A1
+    result = _PyDict_GetItem_KnownHash(__pyx_d, name, ((PyASCIIObject *) name)->hash);
+    __PYX_UPDATE_DICT_CACHE(__pyx_d, result, *dict_cached_value, *dict_version)
+    if (likely(result)) {
+        return __Pyx_NewRef(result);
+    } else if (unlikely(PyErr_Occurred())) {
+        return NULL;
+    }
+#else
+    result = PyDict_GetItem(__pyx_d, name);
+    __PYX_UPDATE_DICT_CACHE(__pyx_d, result, *dict_cached_value, *dict_version)
+    if (likely(result)) {
+        return __Pyx_NewRef(result);
+    }
+#endif
+#else
+    result = PyObject_GetItem(__pyx_d, name);
+    __PYX_UPDATE_DICT_CACHE(__pyx_d, result, *dict_cached_value, *dict_version)
+    if (likely(result)) {
+        return __Pyx_NewRef(result);
+    }
+    PyErr_Clear();
+#endif
+    return __Pyx_GetBuiltinName(name);
 }
 
 /* PyObjectFormat */

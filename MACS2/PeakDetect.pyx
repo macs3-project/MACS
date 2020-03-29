@@ -176,10 +176,10 @@ class PeakDetect:
 
         # prepare d_s for control data
         if self.sregion:
-            assert self.d <= self.sregion, f"{slocal:} can't be smaller than {d:}!"
+            assert self.d <= self.sregion, f"{self.sregion:} can't be smaller than {self.d:}!"
         if self.lregion:
-            assert self.d <= self.lregion , f"{llocal:} can't be smaller than {d:}!"
-            assert self.sregion <= self.lregion , f"{llocal:} can't be smaller than {slocal:}!"
+            assert self.d <= self.lregion , f"{self.lregion:} can't be smaller than {self.d:}!"
+            assert self.sregion <= self.lregion , f"{self.lregion:} can't be smaller than {self.sregion:}!"
 
         # Now prepare a list of extension sizes
         ctrl_d_s = [ self.d ]   # note, d doesn't make sense in PE mode.
