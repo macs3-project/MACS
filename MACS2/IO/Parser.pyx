@@ -161,13 +161,13 @@ cdef tuple __fw_binary_parse_be ( const unsigned char * data ):
     i8 = <int8_t *>data
     i32 = <int32_t *>data
     
-    thisref = i32[0]
-    thisstart = i32[1]
-    #thisref = i8[3] << 24 | i8[2] << 16 | i8[1] << 8 | i8[0]
-    #thisstart = i8[7] << 24 | i8[6] << 16 | i8[5] << 8 | i8[4]
+    #thisref = i32[0]
+    #thisstart = i32[1]
+    thisref = ui8[3] << 24 | ui8[2] << 16 | ui8[1] << 8 | ui8[0]
+    thisstart = ui8[7] << 24 | ui8[6] << 16 | ui8[5] << 8 | ui8[4]
         
-    n_cigar_op = ui16[6]
-    #n_cigar_op = i8[13] << 8 | i8[12]
+    #n_cigar_op = ui16[6]
+    n_cigar_op = ui8[13] << 8 | i8[12]
     
     # In case of paired-end we have now skipped all possible "bad" pairs
     # in case of proper pair we have skipped the rightmost one... if the leftmost pair comes
@@ -177,12 +177,12 @@ cdef tuple __fw_binary_parse_be ( const unsigned char * data ):
         # read mapped to minus strand; then we have to compute cigar to find the rightmost position
         l_read_name = ui8[8]
         # need to decipher CIGAR string
-        ui32 = <uint32_t *>(data + 32 + l_read_name) # move pointer to cigar_code
-        #shift0 = 32 + l_read_name
-        #for i in range(n_cigar_op):
-        #    shift = shift0 + i*4
-        #    cigar_code = ui8[shift0+3] << 24 | ui8[shift0+2] << 16 | ui8[shift0+1] << 8 | ui8[shift0]
-        for cigar_code in ui32[:n_cigar_op]:#unpack( '<%dI' % (n_cigar_op) , data[ 32 + l_read_name : 32 + l_read_name + n_cigar_op*4 ] ):
+        #ui32 = <uint32_t *>(data + 32 + l_read_name) # move pointer to cigar_code
+        shift0 = 32 + l_read_name
+        for i in range(n_cigar_op):
+            shift = shift0 + i*4
+            cigar_code = ui8[shift0+3] << 24 | ui8[shift0+2] << 16 | ui8[shift0+1] << 8 | ui8[shift0]
+            #for cigar_code in ui32[:n_cigar_op]:#unpack( '<%dI' % (n_cigar_op) , data[ 32 + l_read_name : 32 + l_read_name + n_cigar_op*4 ] ):
             if cigar_code & 15 in [ 0, 2, 3, 7, 8 ]:   # they are CIGAR op M/D/N/=/X
                 thisstart += cigar_code >> 4
         thisstrand = 1
@@ -267,21 +267,15 @@ cdef tuple __pe_binary_parse_be (const unsigned char * data):
     #thisref = i32[0]
     #pos = i32[1]
     #nextpos = i32[6]
+    #thistlen = i32[7]
     # to simplify the byte swap, we pretend all original numbers (thisref, pos, nextpos) positive
     thisref = ui8[3] << 24 | ui8[2] << 16 | ui8[1] << 8 | ui8[0]
     pos = ui8[7] << 24 | ui8[6] << 16 | ui8[5] << 8 | ui8[4]
     nextpos = ui8[27] << 24 | ui8[26] << 16 | ui8[25] << 8 | ui8[24]
 
-    #thistlen = i32[7]
-    # thistlen can be negative, so we have to check the 'first byte'
-    #if i8[28] > 0:
+    # thistlen can be negative, so we byte swap it then convert to int32_t then take abs (maybe there is more effecient way?)
     tmp_thistlen = ui8[31] << 24 | ui8[30] << 16 | ui8[29] << 8 | ui8[28]
-    #else:
-    #    tmp_thistlen = ui8[31] << 24 | ui8[30] << 16 | ui8[29] << 8 | ui8[28] >> 1
-
     thistlen = abs(<int32_t> tmp_thistlen)
-    #assert tmp_thistlen > 0, f"wrong parsing {thisref:} {pos:} {nextpos:} {tmp_thistlen:} {thistlen:}"
-    assert thistlen > 0, f"wrong parsing {thisref:} {pos:} {nextpos:} {tmp_thistlen:} {thistlen:}"    
     
     thisstart = pos if nextpos > pos else nextpos #min(pos, nextpos) # we keep only the leftmost
     # position which means this must
@@ -295,7 +289,6 @@ cdef tuple __pe_binary_parse_be (const unsigned char * data):
     #                                             # nextpos is the
     #                                             # leftmost
     #                                             # position.
-    
     return ( thisref, thisstart, thistlen )
     
 
