@@ -31,6 +31,9 @@ import numpy as np
 cimport numpy as np
 from numpy cimport uint8_t, uint16_t, uint32_t, uint64_t, int8_t, int16_t, int32_t, int64_t, float32_t, float64_t
 
+import sys
+is_le = sys.byteorder == "little"
+
 cdef extern from "stdlib.h":
     ctypedef uint32_t size_t
     size_t strlen(char *s)
@@ -76,6 +79,230 @@ cpdef guess_parser ( fname, int64_t buffer_size = 100000 ):
         else:
             t_parser.close()
     raise Exception( "Can't detect format!" )
+
+cdef tuple __fw_binary_parse_le ( const unsigned char * data ):
+    """Parse a BAM SE entry in little endian system
+    """
+    cdef:
+        int32_t thisref, thisstart, thisstrand
+        uint16_t bwflag
+        uint8_t l_read_name
+        uint16_t n_cigar_op
+        int32_t cigar_code
+        uint8_t *ui8
+        int32_t *i32
+        uint16_t *ui16
+        uint32_t *ui32
+
+    # we skip lot of the available information in data (i.e. tag name, quality etc etc)        
+    # no data, return, does it really happen without raising struct.error?
+    if not data: return ( -1, -1, -1 )
+
+    ui16 = <uint16_t *>data
+    bwflag = ui16[7]
+
+    # we filter out unmapped sequence or bad sequence or  secondary or supplementary alignment
+    # we filter out 2nd mate, not a proper pair, mate is unmapped
+    if (bwflag & 2820) or (bwflag & 1 and (bwflag & 136 or not bwflag & 2)): return ( -1, -1, -1 )
+        
+    i32 = <int32_t *>data
+    thisref = i32[0]
+    thisstart = i32[1]
+    n_cigar_op = ui16[6]
+    # In case of paired-end we have now skipped all possible "bad" pairs
+    # in case of proper pair we have skipped the rightmost one... if the leftmost pair comes
+    # we can treat it as a single read, so just check the strand and calculate its
+    # start position... hope I'm right!
+    if bwflag & 16:
+        # read mapped to minus strand; then we have to compute cigar to find the rightmost position
+        ui8 = <uint8_t *>data
+        l_read_name = ui8[8]
+        # need to decipher CIGAR string
+        ui32 = <uint32_t *>(data + 32 + l_read_name) # move pointer to cigar_code
+        for cigar_code in ui32[:n_cigar_op]:#unpack( '<%dI' % (n_cigar_op) , data[ 32 + l_read_name : 32 + l_read_name + n_cigar_op*4 ] ):
+            if cigar_code & 15 in [ 0, 2, 3, 7, 8 ]:   # they are CIGAR op M/D/N/=/X
+                thisstart += cigar_code >> 4
+        thisstrand = 1
+    else:
+        thisstrand = 0
+            
+    return ( thisref, thisstart, thisstrand )
+
+cdef tuple __fw_binary_parse_be ( const unsigned char * data ):
+    """Big endian version. We need byte swap.
+    """
+    cdef:
+        int32_t thisref, thisstart, thisstrand
+        uint16_t bwflag
+        uint8_t l_read_name
+        uint16_t n_cigar_op
+        int32_t cigar_code
+        uint8_t *ui8
+        #int8_t *i8
+        #uint16_t *ui16
+        #uint32_t *ui32
+        #int32_t *i32
+        int32_t i
+        uint32_t shift0, shift
+
+
+    # we skip lot of the available information in data (i.e. tag name, quality etc etc)        
+    # no data, return, does it really happen without raising struct.error?
+    if not data: return ( -1, -1, -1 )
+
+    ui8 = <uint8_t *>data
+    #bwflag = ui16[7]
+    bwflag = ui8[15] << 8 | ui8[14]
+
+    # we filter out unmapped sequence or bad sequence or  secondary or supplementary alignment
+    # we filter out 2nd mate, not a proper pair, mate is unmapped
+    if (bwflag & 2820) or (bwflag & 1 and (bwflag & 136 or not bwflag & 2)): return ( -1, -1, -1 )
+
+    #i8 = <int8_t *>data
+    #i32 = <int32_t *>data
+
+    # the following three lins are for little-endian    
+    #thisref = i32[0]
+    #thisstart = i32[1]
+    #n_cigar_op = ui16[6]
+
+    # to simplify the byte swap, we pretend all original numbers (thisref, pos, nextpos) positive    
+    thisref = ui8[3] << 24 | ui8[2] << 16 | ui8[1] << 8 | ui8[0]
+    thisstart = ui8[7] << 24 | ui8[6] << 16 | ui8[5] << 8 | ui8[4]
+    n_cigar_op = ui8[13] << 8 | i8[12]
+    
+    # In case of paired-end we have now skipped all possible "bad" pairs
+    # in case of proper pair we have skipped the rightmost one... if the leftmost pair comes
+    # we can treat it as a single read, so just check the strand and calculate its
+    # start position... hope I'm right!
+    if bwflag & 16:
+        # read mapped to minus strand; then we have to compute cigar to find the rightmost position
+        l_read_name = ui8[8]
+        # need to decipher CIGAR string
+        #ui32 = <uint32_t *>(data + 32 + l_read_name) # move pointer to cigar_code
+        shift0 = 32 + l_read_name
+        for i in range(n_cigar_op):
+            shift = shift0 + i*4
+            cigar_code = ui8[shift0+3] << 24 | ui8[shift0+2] << 16 | ui8[shift0+1] << 8 | ui8[shift0]
+            #for cigar_code in ui32[:n_cigar_op]:#unpack( '<%dI' % (n_cigar_op) , data[ 32 + l_read_name : 32 + l_read_name + n_cigar_op*4 ] ):
+            if cigar_code & 15 in [ 0, 2, 3, 7, 8 ]:   # they are CIGAR op M/D/N/=/X
+                thisstart += cigar_code >> 4
+        thisstrand = 1
+    else:
+        thisstrand = 0
+            
+    return ( thisref, thisstart, thisstrand )
+
+cdef tuple __pe_binary_parse_le (const unsigned char * data):
+    """Parse a BAMPE record in little-endian system.
+    """
+    cdef:
+        int32_t thisref, thisstart, thistlen
+        int32_t nextpos, pos
+        uint16_t bwflag
+        uint8_t *ui8
+        int32_t *i32
+        uint16_t *ui16            
+        
+    # we skip lot of the available information in data (i.e. tag name, quality etc etc)
+    if not data:
+        return ( -1, -1, -1 )
+
+    ui16 = <uint16_t *>data
+    bwflag = ui16[7]
+    #print ( f"Got {bwflag:}" )
+    # we filter out unmapped, bad sequence, secondary/supplementary alignment
+    # we filter out other mate of paired reads, not a proper pair, or mate is unmapped
+    if (bwflag & 2820) or (bwflag & 1 and (bwflag & 136 or not bwflag & 2)):
+        return ( -1, -1, -1 )
+        
+    i32 = <int32_t *>data
+    ui8 = <uint8_t *>data
+    thisref = i32[0]
+    
+    pos = i32[1]
+    nextpos = i32[6]
+    thistlen = i32[7]
+    thisstart = min(pos, nextpos) # we keep only the leftmost
+                                  # position which means this must
+                                  # be at + strand. So we don't
+                                  # need to decipher CIGAR string.
+    thistlen = abs( thistlen )                    # Actually, if
+    #                                             # the value
+    #                                             # unpacked is
+    #                                             # negative, then
+    #                                             # nextpos is the
+    #                                             # leftmost
+    #                                             # position.
+        
+    return ( thisref, thisstart, thistlen )
+
+cdef tuple __pe_binary_parse_be (const unsigned char * data):
+    """Parse a BAMPE record in big-endian system. And we need byte swap.
+    """    
+    cdef:
+        int32_t thisref, thisstart, thistlen
+        uint32_t tmp_thistlen
+        int32_t nextpos, pos
+        uint16_t bwflag
+        uint8_t *ui8
+        #int8_t *i8
+        #int32_t *i32
+        
+    # we skip lot of the available information in data (i.e. tag name, quality etc etc)
+    if not data:
+        return ( -1, -1, -1 )
+
+    ui8 = <uint8_t *>data
+    #bwflag = ui16[7]
+    bwflag = ui8[15] << 8 | ui8[14]
+    #print ( f"Got {bwflag:}" )
+    # we filter out unmapped, bad sequence, secondary/supplementary alignment
+    # we filter out other mate of paired reads, not a proper pair, or mate is unmapped
+    if (bwflag & 2820) or (bwflag & 1 and (bwflag & 136 or not bwflag & 2)):
+        return ( -1, -1, -1 )
+
+    i8 = <int8_t *>data
+    #i32 = <int32_t *>data    
+    #ui32 = <uint32_t *>data
+
+    # the following three lins are for little-endian
+    #thisref = i32[0]
+    #pos = i32[1]
+    #nextpos = i32[6]
+    #tmp_thistlen = ui32[7]
+    # to simplify the byte swap, we pretend all original numbers (thisref, pos, nextpos) positive
+    thisref = ui8[3] << 24 | ui8[2] << 16 | ui8[1] << 8 | ui8[0]
+    pos = ui8[7] << 24 | ui8[6] << 16 | ui8[5] << 8 | ui8[4]
+    nextpos = ui8[27] << 24 | ui8[26] << 16 | ui8[25] << 8 | ui8[24]
+
+    # thistlen can be negative, so we byte swap it then convert to int32_t then take abs (maybe there is more effecient way?)
+    
+    tmp_thistlen = ui8[31] << 24 | ui8[30] << 16 | ui8[29] << 8 | ui8[28]
+    thistlen = abs(<int32_t> tmp_thistlen)
+    
+    thisstart = pos if nextpos > pos else nextpos #min(pos, nextpos) # we keep only the leftmost
+    # position which means this must
+    # be at + strand. So we don't
+    # need to decipher CIGAR string.
+    #if thistlen < 0: thistlen *= -1
+    #thistlen = abs( thistlen )                    # Actually, if
+    #                                             # the value
+    #                                             # unpacked is
+    #                                             # negative, then
+    #                                             # nextpos is the
+    #                                             # leftmost
+    #                                             # position.
+    return ( thisref, thisstart, thistlen )
+    
+
+# choose a parser
+if is_le:
+    se_entry_parser = __fw_binary_parse_le
+    pe_entry_parser = __pe_binary_parse_le
+else:
+    se_entry_parser = __fw_binary_parse_be
+    pe_entry_parser = __pe_binary_parse_be
 
 # ------------------------------------
 # Classes
@@ -979,18 +1206,20 @@ cdef class BAMParser( GenericParser ):
         fseek = self.fhd.seek
         fread = self.fhd.read
         ftell = self.fhd.tell
-
+            
         while True:
             try:
                 entrylength = unpack( "<i", fread( 4 ) )[0]
             except struct.error:
                 break
-            ( chrid, fpos, strand ) = self.__fw_binary_parse( fread( entrylength ) )
+            ( chrid, fpos, strand ) = se_entry_parser( fread( entrylength ) )
             if chrid == -1: continue
             fwtrack.add_loc( references[ chrid ], fpos, strand )
             i += 1
             if i % 1000000 == 0:
                 info( " %d" % i )
+                
+        #print( f"{references[chrid]:},{fpos:},{strand:}" )
         info( "%d reads have been read." % i ) 
         self.fhd.close()
         fwtrack.set_rlengths( rlengths )
@@ -1011,13 +1240,13 @@ cdef class BAMParser( GenericParser ):
         fseek = self.fhd.seek
         fread = self.fhd.read
         ftell = self.fhd.tell
-        
+            
         while True:
             try:
                 entrylength = unpack( '<i', fread( 4 ) )[ 0 ]
             except struct.error:
                 break
-            ( chrid, fpos, strand ) = self.__fw_binary_parse( fread( entrylength ) )
+            ( chrid, fpos, strand ) = se_entry_parser( fread( entrylength ) )
             if chrid == -1: continue
             fwtrack.add_loc( references[ chrid ], fpos, strand )
             i += 1
@@ -1031,66 +1260,6 @@ cdef class BAMParser( GenericParser ):
         fwtrack.set_rlengths( rlengths )
         return fwtrack
     
-    cdef tuple __fw_binary_parse (self, const unsigned char * data ):
-        cdef:
-            int32_t thisref, thisstart, thisstrand
-            uint16_t bwflag
-            uint8_t l_read_name
-            uint16_t n_cigar_op
-            int32_t cigar_code
-            uint8_t *ui8
-            int32_t *i32
-            uint16_t *ui16
-            uint32_t *ui32
-
-        # we skip lot of the available information in data (i.e. tag name, quality etc etc)        
-
-        # no data, return, does it really happen without raising struct.error?
-        if not data: return ( -1, -1, -1 )
-
-        #(thisref, thisstart, l_read_name, unused1, unused2, unused3, n_cigar_op, bwflag) = unpack( '<iiBBBBHH', data [ : 16 ])
-        ui16 = <uint16_t *>data
-        bwflag = ui16[7]
-        if (bwflag & 2820) or (bwflag & 1 and (bwflag & 136 or not bwflag & 2)): return ( -1, -1, -1 )
-        #simple form of the expression below 
-        #if bwflag & 4 or bwflag & 512 or bwflag & 256 or bwflag & 2048: return (-1, -1, -1)
-        ## unmapped sequence or bad sequence or  secondary or supplementary alignment             
-        #if bwflag & 1:
-        #    # paired read. We should only keep sequence if the mate is mapped
-        #    # and if this is the left mate, all is within  the flag! 
-        #    if not bwflag & 2:
-        #        return ( -1, -1, -1 )   # not a proper pair
-        #    if bwflag & 8:
-        #        return ( -1, -1, -1 )   # the mate is unmapped
-        #    # From Benjamin Schiller https://github.com/benjschiller
-        #    if bwflag & 128:
-        #        # this is not the first read in a pair
-        #        return ( -1, -1, -1 )
-        
-        i32 = <int32_t *>data
-        thisref = i32[0]
-        thisstart = i32[1]
-        n_cigar_op = ui16[6]
-        # In case of paired-end we have now skipped all possible "bad" pairs
-        # in case of proper pair we have skipped the rightmost one... if the leftmost pair comes
-        # we can treat it as a single read, so just check the strand and calculate its
-        # start position... hope I'm right!
-        if bwflag & 16:
-            # read mapped to minus strand; then we have to compute cigar to find the rightmost position
-            ui8 = <uint8_t *>data
-            l_read_name = ui8[8]
-            # need to decipher CIGAR string
-            ui32 = <uint32_t *>(data + 32 + l_read_name) # move pointer to cigar_code
-            for cigar_code in ui32[:n_cigar_op]:#unpack( '<%dI' % (n_cigar_op) , data[ 32 + l_read_name : 32 + l_read_name + n_cigar_op*4 ] ):
-                if cigar_code & 15 in [ 0, 2, 3, 7, 8 ]:   # they are CIGAR op M/D/N/=/X
-                    thisstart += cigar_code >> 4
-            thisstrand = 1
-        else:
-            thisstrand = 0
-            
-        return ( thisref, thisstart, thisstrand )
-        #return
-
 cdef class BAMPEParser(BAMParser):
     """File Parser Class for BAM File containing paired-end reads
     Only counts valid pairs, discards everything else
@@ -1128,8 +1297,6 @@ cdef class BAMPEParser(BAMParser):
             int32_t entrylength, fpos, chrid, tlen
             list references
             dict rlengths
-            #int64_t e1 = 0
-            #int64_t e2 = 0
 
         i = 0
         m = 0
@@ -1143,13 +1310,14 @@ cdef class BAMPEParser(BAMParser):
         # for convenience, only count valid pairs
         add_loc = petrack.add_loc
         err = struct.error
+
         while True:
             try:
                 entrylength = unpack( '<i', fread(4) )[0]
             except err:
                 #e1 += 1
                 break
-            ( chrid, fpos, tlen ) = self.__pe_binary_parse( fread(entrylength) )
+            ( chrid, fpos, tlen ) = pe_entry_parser( fread(entrylength) )
             if chrid == -1:
                 #e2 += 1
                 continue
@@ -1159,6 +1327,7 @@ cdef class BAMPEParser(BAMParser):
             if i % 1000000 == 0:
                 info( " %d" % i )
 
+        #print( f"{references[chrid]:},{fpos:},{tlen:}" )
         info( "%d fragments have been read." % i )
         #debug( f" {e1} Can't identify the length of entry, it may be the end of file, stop looping..." )
         #debug( f" {e2} Chromosome name can't be found which means this entry is skipped ..." )
@@ -1188,12 +1357,13 @@ cdef class BAMPEParser(BAMParser):
         # for convenience, only count valid pairs
         add_loc = petrack.add_loc
         err = struct.error
+
         while True:
             try:
                 entrylength = unpack('<i', fread(4))[0]
             except err:
                 break
-            ( chrid, fpos, tlen ) = self.__pe_binary_parse( fread(entrylength) )
+            ( chrid, fpos, tlen ) = pe_entry_parser( fread(entrylength) )
             if chrid == -1:
                 continue
             add_loc(references[ chrid ], fpos, fpos + tlen)
@@ -1212,69 +1382,6 @@ cdef class BAMPEParser(BAMParser):
         petrack.set_rlengths( rlengths )
         return petrack
         
-    cdef tuple __pe_binary_parse (self, const unsigned char * data):
-        cdef:
-            int32_t thisref, thisstart, thistlen
-            int32_t nextpos, pos
-            uint16_t bwflag
-            #uint8_t l_read_name
-            #uint16_t n_cigar_op
-            uint8_t *ui8
-            int32_t *i32
-            uint16_t *ui16            
-        
-        # we skip lot of the available information in data (i.e. tag name, quality etc etc)
-        if not data:
-            #debug( " inside of parser: data is empty, return..." )
-            return ( -1, -1, -1 )
-
-        #( thisref, pos, unused1, n_cigar_op, bwflag, unused2, unused3, nextpos, thistlen ) = \
-        #  unpack( '<iiiHHiiii', data[:32] )
-
-        ui16 = <uint16_t *>data
-        bwflag = ui16[7]
-        #print ( f"Got {bwflag:}" )
-        if (bwflag & 2820) or (bwflag & 1 and (bwflag & 136 or not bwflag & 2)):
-            #debug( " inside of parser: this entry is filtered according to bwflag, return..." )
-            #print ( f" {bwflag:} is filterred" )            
-            return ( -1, -1, -1 )
-        #simple form of the expression below 
-        #if bwflag & 4 or bwflag & 512 or bwflag & 256 or bwflag & 2048: return (-1, -1, -1)
-        ## unmapped sequence or bad sequence or  secondary or supplementary alignment             
-        #if bwflag & 1:
-        #    # paired read. We should only keep sequence if the mate is mapped
-        #    # and if this is the left mate, all is within  the flag! 
-        #    if not bwflag & 2:
-        #        return ( -1, -1, -1 )   # not a proper pair
-        #    if bwflag & 8:
-        #        return ( -1, -1, -1 )   # the mate is unmapped
-        #    # From Benjamin Schiller https://github.com/benjschiller
-        #    if bwflag & 128:
-        #        # this is not the first read in a pair
-        #        return ( -1, -1, -1 )
-        
-        i32 = <int32_t *>data
-        ui8 = <uint8_t *>data
-        thisref = i32[0]
-        thisstart = i32[1]
-
-        pos = i32[1]
-        nextpos = i32[6]
-        thistlen = i32[7]
-        thisstart = min(pos, nextpos) # we keep only the leftmost
-                                      # position which means this must
-                                      # be at + strand. So we don't
-                                      # need to decipher CIGAR string.
-        thistlen = abs( thistlen )                    # Actually, if
-        #                                             # the value
-        #                                             # unpacked is
-        #                                             # negative, then
-        #                                             # nextpos is the
-        #                                             # leftmost
-        #                                             # position.
-        
-        return ( thisref, thisstart, thistlen )
-
 cdef class BowtieParser( GenericParser ):
     """File Parser Class for map files from Bowtie or MAQ's maqview
     program.

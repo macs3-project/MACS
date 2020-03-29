@@ -27,7 +27,7 @@ jobs:
   #  - name: i386 
   #  - name: arm64
   #  - name: ppc64le
-    - name: s390x
+  #  - name: s390x
   fast_finish: true
 install:
   - pip install --upgrade pip

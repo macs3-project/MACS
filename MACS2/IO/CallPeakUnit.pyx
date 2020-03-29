@@ -1155,8 +1155,6 @@ cdef class CallerFromAlignments:
                        fold_change = ( summit_treat + self.pseudocount ) / ( summit_ctrl + self.pseudocount ), # fold change
                        qscore      = summit_q_score # qvalue
                        )
-            if peak_content[0][0] == 18020165 :
-                print( f"{summit_ctrl:} + {self.pseudocount:} = {summit_ctrl+self.pseudocount}" )                
             # start a new peak
             return True
 

@@ -25,9 +25,14 @@ CHIPBIGSPEEDTEST=CTCF_12878_5M.bed.gz
 CTRLBIGSPEEDTEST=input_12878_5M.bed.gz
 
 # callpeak
-echo "1. callpeak pe"
+echo "1. callpeak"
 
 mkdir ${TAG}_run_callpeak_pe_narrow
+mkdir ${TAG}_run_callpeak_narrow
+
+macs2 callpeak -g 52000000 -t $CHIP -c $CTRL -n run_callpeak_narrow0 -B --outdir ${TAG}_run_callpeak_narrow --cutoff-analysis &> ${TAG}_run_callpeak_narrow/run_callpeak_narrow0.log
+
+cat ${TAG}_run_callpeak_narrow/run_callpeak_narrow0.log
 
 macs2 callpeak -g 52000000 -f BAMPE -t $CHIPPE -c $CTRLPE -n run_callpeak_bampe_narrow -B --outdir ${TAG}_run_callpeak_pe_narrow --call-summits --verbose 3 &> ${TAG}_run_callpeak_pe_narrow/run_callpeak_bampe_narrow.log
 
@@ -55,7 +60,7 @@ echo "3. compare with standard outputs"
 
 flag=0
 # we do not check the consistency of random subsampling results
-subfolders=(callpeak_pe_narrow)
+subfolders=(callpeak_pe_narrow callpeak_narrow)
 
 m=0
 n=0
