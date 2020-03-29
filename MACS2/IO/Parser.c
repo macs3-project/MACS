@@ -4623,12 +4623,10 @@ static PyObject *__pyx_f_5MACS2_2IO_6Parser___pe_binary_parse_be(unsigned char c
   int __pyx_t_1;
   int __pyx_t_2;
   __pyx_t_5numpy_int32_t __pyx_t_3;
-  __pyx_t_5numpy_int32_t __pyx_t_4;
-  __pyx_t_5numpy_int32_t __pyx_t_5;
+  PyObject *__pyx_t_4 = NULL;
+  PyObject *__pyx_t_5 = NULL;
   PyObject *__pyx_t_6 = NULL;
   PyObject *__pyx_t_7 = NULL;
-  PyObject *__pyx_t_8 = NULL;
-  PyObject *__pyx_t_9 = NULL;
   __Pyx_RefNannySetupContext("__pe_binary_parse_be", 0);
   __Pyx_TraceCall("__pe_binary_parse_be", __pyx_f[0], 238, 0, __PYX_ERR(0, 238, __pyx_L1_error));
 
@@ -4792,7 +4790,7 @@ static PyObject *__pyx_f_5MACS2_2IO_6Parser___pe_binary_parse_be(unsigned char c
  *     #nextpos = i8[27] << 24 | i8[26] << 16 | i8[25] << 8 | i8[24]
  *     #thistlen = i32[7]
  *     thistlen = i8[31] << 24 | i8[30] << 16 | i8[29] << 8 | i8[28]             # <<<<<<<<<<<<<<
- *     thisstart = min(pos, nextpos) # we keep only the leftmost
+ *     thisstart = pos if nextpos > pos else pos #min(pos, nextpos) # we keep only the leftmost
  *     # position which means this must
  */
   __Pyx_TraceLine(271,0,__PYX_ERR(0, 271, __pyx_L1_error))
@@ -4801,19 +4799,17 @@ static PyObject *__pyx_f_5MACS2_2IO_6Parser___pe_binary_parse_be(unsigned char c
   /* "MACS2/IO/Parser.pyx":272
  *     #thistlen = i32[7]
  *     thistlen = i8[31] << 24 | i8[30] << 16 | i8[29] << 8 | i8[28]
- *     thisstart = min(pos, nextpos) # we keep only the leftmost             # <<<<<<<<<<<<<<
+ *     thisstart = pos if nextpos > pos else pos #min(pos, nextpos) # we keep only the leftmost             # <<<<<<<<<<<<<<
  *     # position which means this must
  *     # be at + strand. So we don't
  */
   __Pyx_TraceLine(272,0,__PYX_ERR(0, 272, __pyx_L1_error))
-  __pyx_t_3 = __pyx_v_nextpos;
-  __pyx_t_4 = __pyx_v_pos;
-  if (((__pyx_t_3 < __pyx_t_4) != 0)) {
-    __pyx_t_5 = __pyx_t_3;
+  if (((__pyx_v_nextpos > __pyx_v_pos) != 0)) {
+    __pyx_t_3 = __pyx_v_pos;
   } else {
-    __pyx_t_5 = __pyx_t_4;
+    __pyx_t_3 = __pyx_v_pos;
   }
-  __pyx_v_thisstart = __pyx_t_5;
+  __pyx_v_thisstart = __pyx_t_3;
 
   /* "MACS2/IO/Parser.pyx":276
  *     # be at + strand. So we don't
@@ -4837,25 +4833,25 @@ static PyObject *__pyx_f_5MACS2_2IO_6Parser___pe_binary_parse_be(unsigned char c
  */
   __Pyx_TraceLine(285,0,__PYX_ERR(0, 285, __pyx_L1_error))
   __Pyx_XDECREF(__pyx_r);
-  __pyx_t_6 = __Pyx_PyInt_From_npy_int32(__pyx_v_thisref); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 285, __pyx_L1_error)
+  __pyx_t_4 = __Pyx_PyInt_From_npy_int32(__pyx_v_thisref); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 285, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_4);
+  __pyx_t_5 = __Pyx_PyInt_From_npy_int32(__pyx_v_thisstart); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 285, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_5);
+  __pyx_t_6 = __Pyx_PyInt_From_npy_int32(__pyx_v_thistlen); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 285, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_6);
-  __pyx_t_7 = __Pyx_PyInt_From_npy_int32(__pyx_v_thisstart); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 285, __pyx_L1_error)
+  __pyx_t_7 = PyTuple_New(3); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 285, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_7);
-  __pyx_t_8 = __Pyx_PyInt_From_npy_int32(__pyx_v_thistlen); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 285, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_8);
-  __pyx_t_9 = PyTuple_New(3); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 285, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_9);
+  __Pyx_GIVEREF(__pyx_t_4);
+  PyTuple_SET_ITEM(__pyx_t_7, 0, __pyx_t_4);
+  __Pyx_GIVEREF(__pyx_t_5);
+  PyTuple_SET_ITEM(__pyx_t_7, 1, __pyx_t_5);
   __Pyx_GIVEREF(__pyx_t_6);
-  PyTuple_SET_ITEM(__pyx_t_9, 0, __pyx_t_6);
-  __Pyx_GIVEREF(__pyx_t_7);
-  PyTuple_SET_ITEM(__pyx_t_9, 1, __pyx_t_7);
-  __Pyx_GIVEREF(__pyx_t_8);
-  PyTuple_SET_ITEM(__pyx_t_9, 2, __pyx_t_8);
+  PyTuple_SET_ITEM(__pyx_t_7, 2, __pyx_t_6);
+  __pyx_t_4 = 0;
+  __pyx_t_5 = 0;
   __pyx_t_6 = 0;
+  __pyx_r = ((PyObject*)__pyx_t_7);
   __pyx_t_7 = 0;
-  __pyx_t_8 = 0;
-  __pyx_r = ((PyObject*)__pyx_t_9);
-  __pyx_t_9 = 0;
   goto __pyx_L0;
 
   /* "MACS2/IO/Parser.pyx":238
@@ -4868,10 +4864,10 @@ static PyObject *__pyx_f_5MACS2_2IO_6Parser___pe_binary_parse_be(unsigned char c
 
   /* function exit code */
   __pyx_L1_error:;
+  __Pyx_XDECREF(__pyx_t_4);
+  __Pyx_XDECREF(__pyx_t_5);
   __Pyx_XDECREF(__pyx_t_6);
   __Pyx_XDECREF(__pyx_t_7);
-  __Pyx_XDECREF(__pyx_t_8);
-  __Pyx_XDECREF(__pyx_t_9);
   __Pyx_AddTraceback("MACS2.IO.Parser.__pe_binary_parse_be", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __pyx_r = 0;
   __pyx_L0:;
@@ -33044,12 +33040,12 @@ static int __pyx_import_star_set(PyObject *o, PyObject* py_name, char *name) {
     "ELANDResultParser",
     "GenericParser",
     "SAMParser",
+    "__pyx_ctuple_41fb9____dunderpyx_t_5numpy_int32_t__and___dunderpyx_t_5numpy_int32_t__and___dunderpyx_t_5numpy_int32_t__etc",
+    "__pyx_ctuple_41fb9____dunderpyx_t_5numpy_int32_t__and___dunderpyx_t_5numpy_int32_t__and___dunderpyx_t_5numpy_int32_t__etc_struct",
     "__pyx_ctuple___dunderpyx_t_5numpy_int32_t",
     "__pyx_ctuple___dunderpyx_t_5numpy_int32_t__and_long",
     "__pyx_ctuple___dunderpyx_t_5numpy_int32_t__and_long_struct",
     "__pyx_ctuple___dunderpyx_t_5numpy_int32_t_struct",
-    "__pyx_ctuple_ec269____dunderpyx_t_5numpy_int32_t__and___dunderpyx_t_5numpy_int32_t__and___dunderpyx_t_5numpy_int32_t__etc",
-    "__pyx_ctuple_ec269____dunderpyx_t_5numpy_int32_t__and___dunderpyx_t_5numpy_int32_t__and___dunderpyx_t_5numpy_int32_t__etc_struct",
     "__pyx_ctuple_long",
     "__pyx_ctuple_long__and_long__and_long",
     "__pyx_ctuple_long__and_long__and_long_struct",

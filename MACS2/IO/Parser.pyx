@@ -269,7 +269,7 @@ cdef tuple __pe_binary_parse_be (const unsigned char * data):
     #nextpos = i8[27] << 24 | i8[26] << 16 | i8[25] << 8 | i8[24]
     #thistlen = i32[7]
     thistlen = i8[31] << 24 | i8[30] << 16 | i8[29] << 8 | i8[28]
-    thisstart = min(pos, nextpos) # we keep only the leftmost
+    thisstart = pos if nextpos > pos else pos #min(pos, nextpos) # we keep only the leftmost
     # position which means this must
     # be at + strand. So we don't
     # need to decipher CIGAR string.
