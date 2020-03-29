@@ -283,7 +283,7 @@ cdef tuple __pe_binary_parse_be (const unsigned char * data):
     #assert tmp_thistlen > 0, f"wrong parsing {thisref:} {pos:} {nextpos:} {tmp_thistlen:} {thistlen:}"
     assert thistlen > 0, f"wrong parsing {thisref:} {pos:} {nextpos:} {tmp_thistlen:} {thistlen:}"    
     
-    thisstart = pos if nextpos > pos else pos #min(pos, nextpos) # we keep only the leftmost
+    thisstart = pos if nextpos > pos else nextpos #min(pos, nextpos) # we keep only the leftmost
     # position which means this must
     # be at + strand. So we don't
     # need to decipher CIGAR string.
@@ -296,7 +296,7 @@ cdef tuple __pe_binary_parse_be (const unsigned char * data):
     #                                             # leftmost
     #                                             # position.
     
-    return ( thisref, thisstart, <int32_t> tmp_thistlen )
+    return ( thisref, thisstart, thistlen )
     
 
 # choose a parser

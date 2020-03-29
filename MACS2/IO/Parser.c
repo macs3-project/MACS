@@ -4889,7 +4889,7 @@ static PyObject *__pyx_f_5MACS2_2IO_6Parser___pe_binary_parse_be(unsigned char c
  *     #assert tmp_thistlen > 0, f"wrong parsing {thisref:} {pos:} {nextpos:} {tmp_thistlen:} {thistlen:}"
  *     assert thistlen > 0, f"wrong parsing {thisref:} {pos:} {nextpos:} {tmp_thistlen:} {thistlen:}"             # <<<<<<<<<<<<<<
  * 
- *     thisstart = pos if nextpos > pos else pos #min(pos, nextpos) # we keep only the leftmost
+ *     thisstart = pos if nextpos > pos else nextpos #min(pos, nextpos) # we keep only the leftmost
  */
   __Pyx_TraceLine(284,0,__PYX_ERR(0, 284, __pyx_L1_error))
   #ifndef CYTHON_WITHOUT_ASSERTIONS
@@ -4982,7 +4982,7 @@ static PyObject *__pyx_f_5MACS2_2IO_6Parser___pe_binary_parse_be(unsigned char c
   /* "MACS2/IO/Parser.pyx":286
  *     assert thistlen > 0, f"wrong parsing {thisref:} {pos:} {nextpos:} {tmp_thistlen:} {thistlen:}"
  * 
- *     thisstart = pos if nextpos > pos else pos #min(pos, nextpos) # we keep only the leftmost             # <<<<<<<<<<<<<<
+ *     thisstart = pos if nextpos > pos else nextpos #min(pos, nextpos) # we keep only the leftmost             # <<<<<<<<<<<<<<
  *     # position which means this must
  *     # be at + strand. So we don't
  */
@@ -4990,14 +4990,14 @@ static PyObject *__pyx_f_5MACS2_2IO_6Parser___pe_binary_parse_be(unsigned char c
   if (((__pyx_v_nextpos > __pyx_v_pos) != 0)) {
     __pyx_t_5 = __pyx_v_pos;
   } else {
-    __pyx_t_5 = __pyx_v_pos;
+    __pyx_t_5 = __pyx_v_nextpos;
   }
   __pyx_v_thisstart = __pyx_t_5;
 
   /* "MACS2/IO/Parser.pyx":299
  *     #                                             # position.
  * 
- *     return ( thisref, thisstart, <int32_t> tmp_thistlen )             # <<<<<<<<<<<<<<
+ *     return ( thisref, thisstart, thistlen )             # <<<<<<<<<<<<<<
  * 
  * 
  */
@@ -5007,7 +5007,7 @@ static PyObject *__pyx_f_5MACS2_2IO_6Parser___pe_binary_parse_be(unsigned char c
   __Pyx_GOTREF(__pyx_t_8);
   __pyx_t_4 = __Pyx_PyInt_From_npy_int32(__pyx_v_thisstart); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 299, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_4);
-  __pyx_t_3 = __Pyx_PyInt_From_npy_int32(((__pyx_t_5numpy_int32_t)__pyx_v_tmp_thistlen)); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 299, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_PyInt_From_npy_int32(__pyx_v_thistlen); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 299, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
   __pyx_t_9 = PyTuple_New(3); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 299, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_9);
@@ -33338,12 +33338,12 @@ static int __pyx_import_star_set(PyObject *o, PyObject* py_name, char *name) {
     "ELANDResultParser",
     "GenericParser",
     "SAMParser",
+    "__pyx_ctuple_6c67a____dunderpyx_t_5numpy_int32_t__and___dunderpyx_t_5numpy_int32_t__and___dunderpyx_t_5numpy_int32_t__etc",
+    "__pyx_ctuple_6c67a____dunderpyx_t_5numpy_int32_t__and___dunderpyx_t_5numpy_int32_t__and___dunderpyx_t_5numpy_int32_t__etc_struct",
     "__pyx_ctuple___dunderpyx_t_5numpy_int32_t",
     "__pyx_ctuple___dunderpyx_t_5numpy_int32_t__and_long",
     "__pyx_ctuple___dunderpyx_t_5numpy_int32_t__and_long_struct",
     "__pyx_ctuple___dunderpyx_t_5numpy_int32_t_struct",
-    "__pyx_ctuple_ba427____dunderpyx_t_5numpy_int32_t__and___dunderpyx_t_5numpy_int32_t__and___dunderpyx_t_5numpy_int32_t__etc",
-    "__pyx_ctuple_ba427____dunderpyx_t_5numpy_int32_t__and___dunderpyx_t_5numpy_int32_t__and___dunderpyx_t_5numpy_int32_t__etc_struct",
     "__pyx_ctuple_long",
     "__pyx_ctuple_long__and_long__and_long",
     "__pyx_ctuple_long__and_long__and_long_struct",
