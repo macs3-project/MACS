@@ -263,12 +263,12 @@ cdef tuple __pe_binary_parse_be (const unsigned char * data):
     i32 = <int32_t *>data
     #thisref = i32[0]
     thisref = i8[3] << 24 | i8[2] << 16 | i8[1] << 8 | i8[0]
-    #pos = i32[1]
-    pos = i8[7] << 24 | i8[6] << 16 | i8[5] << 8 | i8[4]
-    #nextpos = i32[6]
-    nextpos = i8[27] << 24 | i8[26] << 16 | i8[25] << 8 | i8[24]
-    #thistlen = i32[7]
-    thistlen = i8[31] << 24 | i8[30] << 16 | i8[29] << 8 | i8[28]
+    pos = i32[1]
+    #pos = i8[7] << 24 | i8[6] << 16 | i8[5] << 8 | i8[4]
+    nextpos = i32[6]
+    #nextpos = i8[27] << 24 | i8[26] << 16 | i8[25] << 8 | i8[24]
+    thistlen = i32[7]
+    #thistlen = i8[31] << 24 | i8[30] << 16 | i8[29] << 8 | i8[28]
     thisstart = min(pos, nextpos) # we keep only the leftmost
     # position which means this must
     # be at + strand. So we don't

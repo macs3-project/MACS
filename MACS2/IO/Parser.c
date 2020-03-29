@@ -4616,7 +4616,7 @@ static PyObject *__pyx_f_5MACS2_2IO_6Parser___pe_binary_parse_be(unsigned char c
   __pyx_t_5numpy_uint16_t __pyx_v_bwflag;
   __pyx_t_5numpy_uint8_t *__pyx_v_ui8;
   __pyx_t_5numpy_int8_t *__pyx_v_i8;
-  CYTHON_UNUSED __pyx_t_5numpy_int32_t *__pyx_v_i32;
+  __pyx_t_5numpy_int32_t *__pyx_v_i32;
   PyObject *__pyx_r = NULL;
   __Pyx_TraceDeclarations
   __Pyx_RefNannyDeclarations
@@ -4762,45 +4762,45 @@ static PyObject *__pyx_f_5MACS2_2IO_6Parser___pe_binary_parse_be(unsigned char c
  *     i32 = <int32_t *>data
  *     #thisref = i32[0]
  *     thisref = i8[3] << 24 | i8[2] << 16 | i8[1] << 8 | i8[0]             # <<<<<<<<<<<<<<
- *     #pos = i32[1]
- *     pos = i8[7] << 24 | i8[6] << 16 | i8[5] << 8 | i8[4]
+ *     pos = i32[1]
+ *     #pos = i8[7] << 24 | i8[6] << 16 | i8[5] << 8 | i8[4]
  */
   __Pyx_TraceLine(265,0,__PYX_ERR(0, 265, __pyx_L1_error))
   __pyx_v_thisref = (((((__pyx_v_i8[3]) << 24) | ((__pyx_v_i8[2]) << 16)) | ((__pyx_v_i8[1]) << 8)) | (__pyx_v_i8[0]));
 
-  /* "MACS2/IO/Parser.pyx":267
+  /* "MACS2/IO/Parser.pyx":266
+ *     #thisref = i32[0]
  *     thisref = i8[3] << 24 | i8[2] << 16 | i8[1] << 8 | i8[0]
- *     #pos = i32[1]
- *     pos = i8[7] << 24 | i8[6] << 16 | i8[5] << 8 | i8[4]             # <<<<<<<<<<<<<<
- *     #nextpos = i32[6]
- *     nextpos = i8[27] << 24 | i8[26] << 16 | i8[25] << 8 | i8[24]
+ *     pos = i32[1]             # <<<<<<<<<<<<<<
+ *     #pos = i8[7] << 24 | i8[6] << 16 | i8[5] << 8 | i8[4]
+ *     nextpos = i32[6]
  */
-  __Pyx_TraceLine(267,0,__PYX_ERR(0, 267, __pyx_L1_error))
-  __pyx_v_pos = (((((__pyx_v_i8[7]) << 24) | ((__pyx_v_i8[6]) << 16)) | ((__pyx_v_i8[5]) << 8)) | (__pyx_v_i8[4]));
+  __Pyx_TraceLine(266,0,__PYX_ERR(0, 266, __pyx_L1_error))
+  __pyx_v_pos = (__pyx_v_i32[1]);
 
-  /* "MACS2/IO/Parser.pyx":269
- *     pos = i8[7] << 24 | i8[6] << 16 | i8[5] << 8 | i8[4]
- *     #nextpos = i32[6]
- *     nextpos = i8[27] << 24 | i8[26] << 16 | i8[25] << 8 | i8[24]             # <<<<<<<<<<<<<<
- *     #thistlen = i32[7]
- *     thistlen = i8[31] << 24 | i8[30] << 16 | i8[29] << 8 | i8[28]
+  /* "MACS2/IO/Parser.pyx":268
+ *     pos = i32[1]
+ *     #pos = i8[7] << 24 | i8[6] << 16 | i8[5] << 8 | i8[4]
+ *     nextpos = i32[6]             # <<<<<<<<<<<<<<
+ *     #nextpos = i8[27] << 24 | i8[26] << 16 | i8[25] << 8 | i8[24]
+ *     thistlen = i32[7]
  */
-  __Pyx_TraceLine(269,0,__PYX_ERR(0, 269, __pyx_L1_error))
-  __pyx_v_nextpos = (((((__pyx_v_i8[27]) << 24) | ((__pyx_v_i8[26]) << 16)) | ((__pyx_v_i8[25]) << 8)) | (__pyx_v_i8[24]));
+  __Pyx_TraceLine(268,0,__PYX_ERR(0, 268, __pyx_L1_error))
+  __pyx_v_nextpos = (__pyx_v_i32[6]);
 
-  /* "MACS2/IO/Parser.pyx":271
- *     nextpos = i8[27] << 24 | i8[26] << 16 | i8[25] << 8 | i8[24]
- *     #thistlen = i32[7]
- *     thistlen = i8[31] << 24 | i8[30] << 16 | i8[29] << 8 | i8[28]             # <<<<<<<<<<<<<<
+  /* "MACS2/IO/Parser.pyx":270
+ *     nextpos = i32[6]
+ *     #nextpos = i8[27] << 24 | i8[26] << 16 | i8[25] << 8 | i8[24]
+ *     thistlen = i32[7]             # <<<<<<<<<<<<<<
+ *     #thistlen = i8[31] << 24 | i8[30] << 16 | i8[29] << 8 | i8[28]
  *     thisstart = min(pos, nextpos) # we keep only the leftmost
- *     # position which means this must
  */
-  __Pyx_TraceLine(271,0,__PYX_ERR(0, 271, __pyx_L1_error))
-  __pyx_v_thistlen = (((((__pyx_v_i8[31]) << 24) | ((__pyx_v_i8[30]) << 16)) | ((__pyx_v_i8[29]) << 8)) | (__pyx_v_i8[28]));
+  __Pyx_TraceLine(270,0,__PYX_ERR(0, 270, __pyx_L1_error))
+  __pyx_v_thistlen = (__pyx_v_i32[7]);
 
   /* "MACS2/IO/Parser.pyx":272
- *     #thistlen = i32[7]
- *     thistlen = i8[31] << 24 | i8[30] << 16 | i8[29] << 8 | i8[28]
+ *     thistlen = i32[7]
+ *     #thistlen = i8[31] << 24 | i8[30] << 16 | i8[29] << 8 | i8[28]
  *     thisstart = min(pos, nextpos) # we keep only the leftmost             # <<<<<<<<<<<<<<
  *     # position which means this must
  *     # be at + strand. So we don't
@@ -33048,12 +33048,12 @@ static int __pyx_import_star_set(PyObject *o, PyObject* py_name, char *name) {
     "ELANDResultParser",
     "GenericParser",
     "SAMParser",
-    "__pyx_ctuple_34900____dunderpyx_t_5numpy_int32_t__and___dunderpyx_t_5numpy_int32_t__and___dunderpyx_t_5numpy_int32_t__etc",
-    "__pyx_ctuple_34900____dunderpyx_t_5numpy_int32_t__and___dunderpyx_t_5numpy_int32_t__and___dunderpyx_t_5numpy_int32_t__etc_struct",
     "__pyx_ctuple___dunderpyx_t_5numpy_int32_t",
     "__pyx_ctuple___dunderpyx_t_5numpy_int32_t__and_long",
     "__pyx_ctuple___dunderpyx_t_5numpy_int32_t__and_long_struct",
     "__pyx_ctuple___dunderpyx_t_5numpy_int32_t_struct",
+    "__pyx_ctuple_e6b98____dunderpyx_t_5numpy_int32_t__and___dunderpyx_t_5numpy_int32_t__and___dunderpyx_t_5numpy_int32_t__etc",
+    "__pyx_ctuple_e6b98____dunderpyx_t_5numpy_int32_t__and___dunderpyx_t_5numpy_int32_t__and___dunderpyx_t_5numpy_int32_t__etc_struct",
     "__pyx_ctuple_long",
     "__pyx_ctuple_long__and_long__and_long",
     "__pyx_ctuple_long__and_long__and_long_struct",
