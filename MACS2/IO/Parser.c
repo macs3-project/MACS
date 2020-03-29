@@ -4783,24 +4783,24 @@ static PyObject *__pyx_f_5MACS2_2IO_6Parser___pe_binary_parse_be(unsigned char c
  *     #pos = i8[7] << 24 | i8[6] << 16 | i8[5] << 8 | i8[4]
  *     nextpos = i32[6]             # <<<<<<<<<<<<<<
  *     #nextpos = i8[27] << 24 | i8[26] << 16 | i8[25] << 8 | i8[24]
- *     thistlen = i32[7]
+ *     #thistlen = i32[7]
  */
   __Pyx_TraceLine(268,0,__PYX_ERR(0, 268, __pyx_L1_error))
   __pyx_v_nextpos = (__pyx_v_i32[6]);
 
-  /* "MACS2/IO/Parser.pyx":270
- *     nextpos = i32[6]
+  /* "MACS2/IO/Parser.pyx":271
  *     #nextpos = i8[27] << 24 | i8[26] << 16 | i8[25] << 8 | i8[24]
- *     thistlen = i32[7]             # <<<<<<<<<<<<<<
- *     #thistlen = i8[31] << 24 | i8[30] << 16 | i8[29] << 8 | i8[28]
+ *     #thistlen = i32[7]
+ *     thistlen = i8[31] << 24 | i8[30] << 16 | i8[29] << 8 | i8[28]             # <<<<<<<<<<<<<<
  *     thisstart = min(pos, nextpos) # we keep only the leftmost
+ *     # position which means this must
  */
-  __Pyx_TraceLine(270,0,__PYX_ERR(0, 270, __pyx_L1_error))
-  __pyx_v_thistlen = (__pyx_v_i32[7]);
+  __Pyx_TraceLine(271,0,__PYX_ERR(0, 271, __pyx_L1_error))
+  __pyx_v_thistlen = (((((__pyx_v_i8[31]) << 24) | ((__pyx_v_i8[30]) << 16)) | ((__pyx_v_i8[29]) << 8)) | (__pyx_v_i8[28]));
 
   /* "MACS2/IO/Parser.pyx":272
- *     thistlen = i32[7]
- *     #thistlen = i8[31] << 24 | i8[30] << 16 | i8[29] << 8 | i8[28]
+ *     #thistlen = i32[7]
+ *     thistlen = i8[31] << 24 | i8[30] << 16 | i8[29] << 8 | i8[28]
  *     thisstart = min(pos, nextpos) # we keep only the leftmost             # <<<<<<<<<<<<<<
  *     # position which means this must
  *     # be at + strand. So we don't
@@ -33044,12 +33044,12 @@ static int __pyx_import_star_set(PyObject *o, PyObject* py_name, char *name) {
     "ELANDResultParser",
     "GenericParser",
     "SAMParser",
-    "__pyx_ctuple_15085____dunderpyx_t_5numpy_int32_t__and___dunderpyx_t_5numpy_int32_t__and___dunderpyx_t_5numpy_int32_t__etc",
-    "__pyx_ctuple_15085____dunderpyx_t_5numpy_int32_t__and___dunderpyx_t_5numpy_int32_t__and___dunderpyx_t_5numpy_int32_t__etc_struct",
     "__pyx_ctuple___dunderpyx_t_5numpy_int32_t",
     "__pyx_ctuple___dunderpyx_t_5numpy_int32_t__and_long",
     "__pyx_ctuple___dunderpyx_t_5numpy_int32_t__and_long_struct",
     "__pyx_ctuple___dunderpyx_t_5numpy_int32_t_struct",
+    "__pyx_ctuple_ec269____dunderpyx_t_5numpy_int32_t__and___dunderpyx_t_5numpy_int32_t__and___dunderpyx_t_5numpy_int32_t__etc",
+    "__pyx_ctuple_ec269____dunderpyx_t_5numpy_int32_t__and___dunderpyx_t_5numpy_int32_t__and___dunderpyx_t_5numpy_int32_t__etc_struct",
     "__pyx_ctuple_long",
     "__pyx_ctuple_long__and_long__and_long",
     "__pyx_ctuple_long__and_long__and_long_struct",
