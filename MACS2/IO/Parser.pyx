@@ -261,14 +261,23 @@ cdef tuple __pe_binary_parse_be (const unsigned char * data):
 
     i8 = <int8_t *>data
     i32 = <int32_t *>data
+
+    # the following three lins are for little-endian
     #thisref = i32[0]
-    thisref = ui8[3] << 24 | ui8[2] << 16 | ui8[1] << 8 | ui8[0]
     #pos = i32[1]
-    pos = ui8[7] << 24 | ui8[6] << 16 | ui8[5] << 8 | ui8[4]
     #nextpos = i32[6]
+    # to simplify the byte swap, we pretend all original numbers (thisref, pos, nextpos) positive
+    thisref = ui8[3] << 24 | ui8[2] << 16 | ui8[1] << 8 | ui8[0]
+    pos = ui8[7] << 24 | ui8[6] << 16 | ui8[5] << 8 | ui8[4]
     nextpos = ui8[27] << 24 | ui8[26] << 16 | ui8[25] << 8 | ui8[24]
+
     #thistlen = i32[7]
-    thistlen = ui8[31] << 24 | ui8[30] << 16 | ui8[29] << 8 | ui8[28]
+    # thistlen can be negative, so we have to check the 'first byte'
+    if in8[28] > 0:
+        thistlen = ui8[31] << 24 | ui8[30] << 16 | ui8[29] << 8 | ui8[28]
+    else:
+        thistlen = ui8[31] << 24 | ui8[30] << 16 | ui8[29] << 8 | ui8[28] >> 1
+    
     thisstart = pos if nextpos > pos else pos #min(pos, nextpos) # we keep only the leftmost
     # position which means this must
     # be at + strand. So we don't
@@ -1207,6 +1216,8 @@ cdef class BAMParser( GenericParser ):
             i += 1
             if i % 1000000 == 0:
                 info( " %d" % i )
+                
+        print( f"{references[chrid]:},{fpos:},{strand:}" )
         info( "%d reads have been read." % i ) 
         self.fhd.close()
         fwtrack.set_rlengths( rlengths )
@@ -1314,6 +1325,7 @@ cdef class BAMPEParser(BAMParser):
             if i % 1000000 == 0:
                 info( " %d" % i )
 
+        print( f"{references[chrid]:},{fpos:},{tlen:}" )
         info( "%d fragments have been read." % i )
         #debug( f" {e1} Can't identify the length of entry, it may be the end of file, stop looping..." )
         #debug( f" {e2} Chromosome name can't be found which means this entry is skipped ..." )
