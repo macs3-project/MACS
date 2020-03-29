@@ -262,18 +262,18 @@ cdef tuple __pe_binary_parse_be (const unsigned char * data):
     i8 = <int8_t *>data
     i32 = <int32_t *>data
     #thisref = i32[0]
-    thisref = ui8[3] << 23 | ui8[2] << 15 | ui8[1] << 7 | ui8[0] >> 1
+    thisref = ui8[3] << 24 | ui8[2] << 16 | ui8[1] << 8 | ui8[0]
     #pos = i32[1]
-    pos = ui8[7] << 23 | ui8[6] << 15 | ui8[5] << 7 | ui8[4] >> 1
+    pos = ui8[7] << 24 | ui8[6] << 16 | ui8[5] << 8 | ui8[4]
     #nextpos = i32[6]
-    nextpos = ui8[27] << 23 | ui8[26] << 15 | ui8[25] << 7 | ui8[24] >> 1
+    nextpos = ui8[27] << 24 | ui8[26] << 16 | ui8[25] << 8 | ui8[24]
     #thistlen = i32[7]
-    thistlen = ui8[31] << 23 | ui8[30] << 15 | ui8[29] << 7 | ui8[28] >> 1
+    thistlen = ui8[31] << 24 | ui8[30] << 16 | ui8[29] << 8 | ui8[28]
     thisstart = pos if nextpos > pos else pos #min(pos, nextpos) # we keep only the leftmost
     # position which means this must
     # be at + strand. So we don't
     # need to decipher CIGAR string.
-    if thistlen < 0: thistlen *= -1
+    #if thistlen < 0: thistlen *= -1
     #thistlen = abs( thistlen )                    # Actually, if
     #                                             # the value
     #                                             # unpacked is

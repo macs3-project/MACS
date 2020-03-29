@@ -4751,7 +4751,7 @@ static PyObject *__pyx_f_5MACS2_2IO_6Parser___pe_binary_parse_be(unsigned char c
  *     i8 = <int8_t *>data
  *     i32 = <int32_t *>data             # <<<<<<<<<<<<<<
  *     #thisref = i32[0]
- *     thisref = ui8[3] << 23 | ui8[2] << 15 | ui8[1] << 7 | ui8[0] >> 1
+ *     thisref = ui8[3] << 24 | ui8[2] << 16 | ui8[1] << 8 | ui8[0]
  */
   __Pyx_TraceLine(263,0,__PYX_ERR(0, 263, __pyx_L1_error))
   __pyx_v_i32 = ((__pyx_t_5numpy_int32_t *)__pyx_v_data);
@@ -4759,46 +4759,46 @@ static PyObject *__pyx_f_5MACS2_2IO_6Parser___pe_binary_parse_be(unsigned char c
   /* "MACS2/IO/Parser.pyx":265
  *     i32 = <int32_t *>data
  *     #thisref = i32[0]
- *     thisref = ui8[3] << 23 | ui8[2] << 15 | ui8[1] << 7 | ui8[0] >> 1             # <<<<<<<<<<<<<<
+ *     thisref = ui8[3] << 24 | ui8[2] << 16 | ui8[1] << 8 | ui8[0]             # <<<<<<<<<<<<<<
  *     #pos = i32[1]
- *     pos = ui8[7] << 23 | ui8[6] << 15 | ui8[5] << 7 | ui8[4] >> 1
+ *     pos = ui8[7] << 24 | ui8[6] << 16 | ui8[5] << 8 | ui8[4]
  */
   __Pyx_TraceLine(265,0,__PYX_ERR(0, 265, __pyx_L1_error))
-  __pyx_v_thisref = (((((__pyx_v_ui8[3]) << 23) | ((__pyx_v_ui8[2]) << 15)) | ((__pyx_v_ui8[1]) << 7)) | ((__pyx_v_ui8[0]) >> 1));
+  __pyx_v_thisref = (((((__pyx_v_ui8[3]) << 24) | ((__pyx_v_ui8[2]) << 16)) | ((__pyx_v_ui8[1]) << 8)) | (__pyx_v_ui8[0]));
 
   /* "MACS2/IO/Parser.pyx":267
- *     thisref = ui8[3] << 23 | ui8[2] << 15 | ui8[1] << 7 | ui8[0] >> 1
+ *     thisref = ui8[3] << 24 | ui8[2] << 16 | ui8[1] << 8 | ui8[0]
  *     #pos = i32[1]
- *     pos = ui8[7] << 23 | ui8[6] << 15 | ui8[5] << 7 | ui8[4] >> 1             # <<<<<<<<<<<<<<
+ *     pos = ui8[7] << 24 | ui8[6] << 16 | ui8[5] << 8 | ui8[4]             # <<<<<<<<<<<<<<
  *     #nextpos = i32[6]
- *     nextpos = ui8[27] << 23 | ui8[26] << 15 | ui8[25] << 7 | ui8[24] >> 1
+ *     nextpos = ui8[27] << 24 | ui8[26] << 16 | ui8[25] << 8 | ui8[24]
  */
   __Pyx_TraceLine(267,0,__PYX_ERR(0, 267, __pyx_L1_error))
-  __pyx_v_pos = (((((__pyx_v_ui8[7]) << 23) | ((__pyx_v_ui8[6]) << 15)) | ((__pyx_v_ui8[5]) << 7)) | ((__pyx_v_ui8[4]) >> 1));
+  __pyx_v_pos = (((((__pyx_v_ui8[7]) << 24) | ((__pyx_v_ui8[6]) << 16)) | ((__pyx_v_ui8[5]) << 8)) | (__pyx_v_ui8[4]));
 
   /* "MACS2/IO/Parser.pyx":269
- *     pos = ui8[7] << 23 | ui8[6] << 15 | ui8[5] << 7 | ui8[4] >> 1
+ *     pos = ui8[7] << 24 | ui8[6] << 16 | ui8[5] << 8 | ui8[4]
  *     #nextpos = i32[6]
- *     nextpos = ui8[27] << 23 | ui8[26] << 15 | ui8[25] << 7 | ui8[24] >> 1             # <<<<<<<<<<<<<<
+ *     nextpos = ui8[27] << 24 | ui8[26] << 16 | ui8[25] << 8 | ui8[24]             # <<<<<<<<<<<<<<
  *     #thistlen = i32[7]
- *     thistlen = ui8[31] << 23 | ui8[30] << 15 | ui8[29] << 7 | ui8[28] >> 1
+ *     thistlen = ui8[31] << 24 | ui8[30] << 16 | ui8[29] << 8 | ui8[28]
  */
   __Pyx_TraceLine(269,0,__PYX_ERR(0, 269, __pyx_L1_error))
-  __pyx_v_nextpos = (((((__pyx_v_ui8[27]) << 23) | ((__pyx_v_ui8[26]) << 15)) | ((__pyx_v_ui8[25]) << 7)) | ((__pyx_v_ui8[24]) >> 1));
+  __pyx_v_nextpos = (((((__pyx_v_ui8[27]) << 24) | ((__pyx_v_ui8[26]) << 16)) | ((__pyx_v_ui8[25]) << 8)) | (__pyx_v_ui8[24]));
 
   /* "MACS2/IO/Parser.pyx":271
- *     nextpos = ui8[27] << 23 | ui8[26] << 15 | ui8[25] << 7 | ui8[24] >> 1
+ *     nextpos = ui8[27] << 24 | ui8[26] << 16 | ui8[25] << 8 | ui8[24]
  *     #thistlen = i32[7]
- *     thistlen = ui8[31] << 23 | ui8[30] << 15 | ui8[29] << 7 | ui8[28] >> 1             # <<<<<<<<<<<<<<
+ *     thistlen = ui8[31] << 24 | ui8[30] << 16 | ui8[29] << 8 | ui8[28]             # <<<<<<<<<<<<<<
  *     thisstart = pos if nextpos > pos else pos #min(pos, nextpos) # we keep only the leftmost
  *     # position which means this must
  */
   __Pyx_TraceLine(271,0,__PYX_ERR(0, 271, __pyx_L1_error))
-  __pyx_v_thistlen = (((((__pyx_v_ui8[31]) << 23) | ((__pyx_v_ui8[30]) << 15)) | ((__pyx_v_ui8[29]) << 7)) | ((__pyx_v_ui8[28]) >> 1));
+  __pyx_v_thistlen = (((((__pyx_v_ui8[31]) << 24) | ((__pyx_v_ui8[30]) << 16)) | ((__pyx_v_ui8[29]) << 8)) | (__pyx_v_ui8[28]));
 
   /* "MACS2/IO/Parser.pyx":272
  *     #thistlen = i32[7]
- *     thistlen = ui8[31] << 23 | ui8[30] << 15 | ui8[29] << 7 | ui8[28] >> 1
+ *     thistlen = ui8[31] << 24 | ui8[30] << 16 | ui8[29] << 8 | ui8[28]
  *     thisstart = pos if nextpos > pos else pos #min(pos, nextpos) # we keep only the leftmost             # <<<<<<<<<<<<<<
  *     # position which means this must
  *     # be at + strand. So we don't
@@ -4810,19 +4810,6 @@ static PyObject *__pyx_f_5MACS2_2IO_6Parser___pe_binary_parse_be(unsigned char c
     __pyx_t_3 = __pyx_v_pos;
   }
   __pyx_v_thisstart = __pyx_t_3;
-
-  /* "MACS2/IO/Parser.pyx":276
- *     # be at + strand. So we don't
- *     # need to decipher CIGAR string.
- *     if thistlen < 0: thistlen *= -1             # <<<<<<<<<<<<<<
- *     #thistlen = abs( thistlen )                    # Actually, if
- *     #                                             # the value
- */
-  __Pyx_TraceLine(276,0,__PYX_ERR(0, 276, __pyx_L1_error))
-  __pyx_t_1 = ((__pyx_v_thistlen < 0) != 0);
-  if (__pyx_t_1) {
-    __pyx_v_thistlen = (__pyx_v_thistlen * -1L);
-  }
 
   /* "MACS2/IO/Parser.pyx":285
  *     #                                             # position.
@@ -33040,12 +33027,12 @@ static int __pyx_import_star_set(PyObject *o, PyObject* py_name, char *name) {
     "ELANDResultParser",
     "GenericParser",
     "SAMParser",
+    "__pyx_ctuple_32169____dunderpyx_t_5numpy_int32_t__and___dunderpyx_t_5numpy_int32_t__and___dunderpyx_t_5numpy_int32_t__etc",
+    "__pyx_ctuple_32169____dunderpyx_t_5numpy_int32_t__and___dunderpyx_t_5numpy_int32_t__and___dunderpyx_t_5numpy_int32_t__etc_struct",
     "__pyx_ctuple___dunderpyx_t_5numpy_int32_t",
     "__pyx_ctuple___dunderpyx_t_5numpy_int32_t__and_long",
     "__pyx_ctuple___dunderpyx_t_5numpy_int32_t__and_long_struct",
     "__pyx_ctuple___dunderpyx_t_5numpy_int32_t_struct",
-    "__pyx_ctuple_cf9d____dunderpyx_t_5numpy_int32_t__and___dunderpyx_t_5numpy_int32_t__and___dunderpyx_t_5numpy_int32_t__etc",
-    "__pyx_ctuple_cf9d____dunderpyx_t_5numpy_int32_t__and___dunderpyx_t_5numpy_int32_t__and___dunderpyx_t_5numpy_int32_t__etc_struct",
     "__pyx_ctuple_long",
     "__pyx_ctuple_long__and_long__and_long",
     "__pyx_ctuple_long__and_long__and_long_struct",
