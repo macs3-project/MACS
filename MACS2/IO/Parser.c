@@ -4650,7 +4650,7 @@ static PyObject *__pyx_f_5MACS2_2IO_6Parser___pe_binary_parse_be(unsigned char c
   __pyx_t_5numpy_int32_t __pyx_v_pos;
   __pyx_t_5numpy_uint16_t __pyx_v_bwflag;
   __pyx_t_5numpy_uint8_t *__pyx_v_ui8;
-  __pyx_t_5numpy_int8_t *__pyx_v_i8;
+  CYTHON_UNUSED __pyx_t_5numpy_int8_t *__pyx_v_i8;
   CYTHON_UNUSED __pyx_t_5numpy_int32_t *__pyx_v_i32;
   PyObject *__pyx_r = NULL;
   __Pyx_TraceDeclarations
@@ -4823,52 +4823,18 @@ static PyObject *__pyx_f_5MACS2_2IO_6Parser___pe_binary_parse_be(unsigned char c
   __Pyx_TraceLine(273,0,__PYX_ERR(0, 273, __pyx_L1_error))
   __pyx_v_nextpos = (((((__pyx_v_ui8[27]) << 24) | ((__pyx_v_ui8[26]) << 16)) | ((__pyx_v_ui8[25]) << 8)) | (__pyx_v_ui8[24]));
 
-  /* "MACS2/IO/Parser.pyx":277
- *     #thistlen = i32[7]
+  /* "MACS2/IO/Parser.pyx":278
  *     # thistlen can be negative, so we have to check the 'first byte'
- *     if i8[28] > 0:             # <<<<<<<<<<<<<<
- *         tmp_thistlen = ui8[31] << 24 | ui8[30] << 16 | ui8[29] << 8 | ui8[28]
- *     else:
+ *     #if i8[28] > 0:
+ *     tmp_thistlen = ui8[31] << 24 | ui8[30] << 16 | ui8[29] << 8 | ui8[28]             # <<<<<<<<<<<<<<
+ *     #else:
+ *     #    tmp_thistlen = ui8[31] << 24 | ui8[30] << 16 | ui8[29] << 8 | ui8[28] >> 1
  */
-  __Pyx_TraceLine(277,0,__PYX_ERR(0, 277, __pyx_L1_error))
-  __pyx_t_1 = (((__pyx_v_i8[28]) > 0) != 0);
-  if (__pyx_t_1) {
-
-    /* "MACS2/IO/Parser.pyx":278
- *     # thistlen can be negative, so we have to check the 'first byte'
- *     if i8[28] > 0:
- *         tmp_thistlen = ui8[31] << 24 | ui8[30] << 16 | ui8[29] << 8 | ui8[28]             # <<<<<<<<<<<<<<
- *     else:
- *         tmp_thistlen = ui8[31] << 24 | ui8[30] << 16 | ui8[29] << 8 | ui8[28] >> 1
- */
-    __Pyx_TraceLine(278,0,__PYX_ERR(0, 278, __pyx_L1_error))
-    __pyx_v_tmp_thistlen = (((((__pyx_v_ui8[31]) << 24) | ((__pyx_v_ui8[30]) << 16)) | ((__pyx_v_ui8[29]) << 8)) | (__pyx_v_ui8[28]));
-
-    /* "MACS2/IO/Parser.pyx":277
- *     #thistlen = i32[7]
- *     # thistlen can be negative, so we have to check the 'first byte'
- *     if i8[28] > 0:             # <<<<<<<<<<<<<<
- *         tmp_thistlen = ui8[31] << 24 | ui8[30] << 16 | ui8[29] << 8 | ui8[28]
- *     else:
- */
-    goto __pyx_L9;
-  }
-
-  /* "MACS2/IO/Parser.pyx":280
- *         tmp_thistlen = ui8[31] << 24 | ui8[30] << 16 | ui8[29] << 8 | ui8[28]
- *     else:
- *         tmp_thistlen = ui8[31] << 24 | ui8[30] << 16 | ui8[29] << 8 | ui8[28] >> 1             # <<<<<<<<<<<<<<
- * 
- *     thistlen = abs(<int32_t> tmp_thistlen)
- */
-  __Pyx_TraceLine(280,0,__PYX_ERR(0, 280, __pyx_L1_error))
-  /*else*/ {
-    __pyx_v_tmp_thistlen = (((((__pyx_v_ui8[31]) << 24) | ((__pyx_v_ui8[30]) << 16)) | ((__pyx_v_ui8[29]) << 8)) | ((__pyx_v_ui8[28]) >> 1));
-  }
-  __pyx_L9:;
+  __Pyx_TraceLine(278,0,__PYX_ERR(0, 278, __pyx_L1_error))
+  __pyx_v_tmp_thistlen = (((((__pyx_v_ui8[31]) << 24) | ((__pyx_v_ui8[30]) << 16)) | ((__pyx_v_ui8[29]) << 8)) | (__pyx_v_ui8[28]));
 
   /* "MACS2/IO/Parser.pyx":282
- *         tmp_thistlen = ui8[31] << 24 | ui8[30] << 16 | ui8[29] << 8 | ui8[28] >> 1
+ *     #    tmp_thistlen = ui8[31] << 24 | ui8[30] << 16 | ui8[29] << 8 | ui8[28] >> 1
  * 
  *     thistlen = abs(<int32_t> tmp_thistlen)             # <<<<<<<<<<<<<<
  *     #assert tmp_thistlen > 0, f"wrong parsing {thisref:} {pos:} {nextpos:} {tmp_thistlen:} {thistlen:}"
@@ -33338,8 +33304,8 @@ static int __pyx_import_star_set(PyObject *o, PyObject* py_name, char *name) {
     "ELANDResultParser",
     "GenericParser",
     "SAMParser",
-    "__pyx_ctuple_6c67a____dunderpyx_t_5numpy_int32_t__and___dunderpyx_t_5numpy_int32_t__and___dunderpyx_t_5numpy_int32_t__etc",
-    "__pyx_ctuple_6c67a____dunderpyx_t_5numpy_int32_t__and___dunderpyx_t_5numpy_int32_t__and___dunderpyx_t_5numpy_int32_t__etc_struct",
+    "__pyx_ctuple_88e2d____dunderpyx_t_5numpy_int32_t__and___dunderpyx_t_5numpy_int32_t__and___dunderpyx_t_5numpy_int32_t__etc",
+    "__pyx_ctuple_88e2d____dunderpyx_t_5numpy_int32_t__and___dunderpyx_t_5numpy_int32_t__and___dunderpyx_t_5numpy_int32_t__etc_struct",
     "__pyx_ctuple___dunderpyx_t_5numpy_int32_t",
     "__pyx_ctuple___dunderpyx_t_5numpy_int32_t__and_long",
     "__pyx_ctuple___dunderpyx_t_5numpy_int32_t__and_long_struct",
