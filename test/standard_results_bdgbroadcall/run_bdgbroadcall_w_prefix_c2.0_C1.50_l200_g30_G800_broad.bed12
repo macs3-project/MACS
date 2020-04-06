@@ -1,3 +1,4 @@
+track name="peak" description="peak" type=gappedPeak nextItemButton=on
 chr22	16058731	16058931	run_bdgbroadcall_w_prefix_broadRegion1	20	.	16058731	16058931	0	1	200	0	0	0	0
 chr22	16110142	16110342	run_bdgbroadcall_w_prefix_broadRegion2	20	.	16110142	16110342	0	1	200	0	0	0	0
 chr22	16114618	16114818	run_bdgbroadcall_w_prefix_broadRegion3	20	.	16114618	16114818	0	1	200	0	0	0	0
