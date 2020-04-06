@@ -57,5 +57,5 @@ def run( options ):
         options.oprefix = options.ofile
     else:
         bf = open ( os.path.join( options.outdir, "%s_c%.1f_C%.2f_l%d_g%d_G%d_broad.bed12" % (options.oprefix,options.cutoffpeak,options.cutofflink,options.minlen,options.lvl1maxgap,options.lvl2maxgap)), "w" )
-    bpeaks.write_to_gappedPeak(bf, name_prefix=(options.oprefix+"_broadRegion").encode())
+    bpeaks.write_to_gappedPeak(bf, name_prefix=(options.oprefix+"_broadRegion").encode(), score_column="score", trackline=options.trackline)
     info("Done")

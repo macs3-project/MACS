@@ -2392,9 +2392,9 @@ static PyObject *__pyx_pf_5MACS2_2IO_6PeakIO_11BroadPeakIO_4filter_pscore(struct
 static PyObject *__pyx_pf_5MACS2_2IO_6PeakIO_11BroadPeakIO_6filter_qscore(struct __pyx_obj_5MACS2_2IO_6PeakIO_BroadPeakIO *__pyx_v_self, double __pyx_v_qscore_cut); /* proto */
 static PyObject *__pyx_pf_5MACS2_2IO_6PeakIO_11BroadPeakIO_8filter_fc(struct __pyx_obj_5MACS2_2IO_6PeakIO_BroadPeakIO *__pyx_v_self, PyObject *__pyx_v_fc_low, PyObject *__pyx_v_fc_up); /* proto */
 static PyObject *__pyx_pf_5MACS2_2IO_6PeakIO_11BroadPeakIO_10total(struct __pyx_obj_5MACS2_2IO_6PeakIO_BroadPeakIO *__pyx_v_self); /* proto */
-static PyObject *__pyx_pf_5MACS2_2IO_6PeakIO_11BroadPeakIO_12write_to_gappedPeak(struct __pyx_obj_5MACS2_2IO_6PeakIO_BroadPeakIO *__pyx_v_self, PyObject *__pyx_v_fhd, PyObject *__pyx_v_name_prefix, PyObject *__pyx_v_name, PyObject *__pyx_v_description, PyObject *__pyx_v_trackline); /* proto */
-static PyObject *__pyx_pf_5MACS2_2IO_6PeakIO_11BroadPeakIO_14write_to_Bed12(struct __pyx_obj_5MACS2_2IO_6PeakIO_BroadPeakIO *__pyx_v_self, PyObject *__pyx_v_fhd, PyObject *__pyx_v_name_prefix, PyObject *__pyx_v_name, PyObject *__pyx_v_description, PyObject *__pyx_v_trackline); /* proto */
-static PyObject *__pyx_pf_5MACS2_2IO_6PeakIO_11BroadPeakIO_16write_to_broadPeak(struct __pyx_obj_5MACS2_2IO_6PeakIO_BroadPeakIO *__pyx_v_self, PyObject *__pyx_v_fhd, PyObject *__pyx_v_name_prefix, PyObject *__pyx_v_name, CYTHON_UNUSED PyObject *__pyx_v_description, PyObject *__pyx_v_trackline); /* proto */
+static PyObject *__pyx_pf_5MACS2_2IO_6PeakIO_11BroadPeakIO_12write_to_gappedPeak(struct __pyx_obj_5MACS2_2IO_6PeakIO_BroadPeakIO *__pyx_v_self, PyObject *__pyx_v_fhd, PyObject *__pyx_v_name_prefix, PyObject *__pyx_v_name, PyObject *__pyx_v_description, PyObject *__pyx_v_score_column, PyObject *__pyx_v_trackline); /* proto */
+static PyObject *__pyx_pf_5MACS2_2IO_6PeakIO_11BroadPeakIO_14write_to_Bed12(struct __pyx_obj_5MACS2_2IO_6PeakIO_BroadPeakIO *__pyx_v_self, PyObject *__pyx_v_fhd, PyObject *__pyx_v_name_prefix, PyObject *__pyx_v_name, PyObject *__pyx_v_description, PyObject *__pyx_v_score_column, PyObject *__pyx_v_trackline); /* proto */
+static PyObject *__pyx_pf_5MACS2_2IO_6PeakIO_11BroadPeakIO_16write_to_broadPeak(struct __pyx_obj_5MACS2_2IO_6PeakIO_BroadPeakIO *__pyx_v_self, PyObject *__pyx_v_fhd, PyObject *__pyx_v_name_prefix, PyObject *__pyx_v_name, CYTHON_UNUSED PyObject *__pyx_v_description, PyObject *__pyx_v_score_column, PyObject *__pyx_v_trackline); /* proto */
 static PyObject *__pyx_pf_5MACS2_2IO_6PeakIO_11BroadPeakIO_18write_to_xls(struct __pyx_obj_5MACS2_2IO_6PeakIO_BroadPeakIO *__pyx_v_self, PyObject *__pyx_v_ofhd, PyObject *__pyx_v_name_prefix, PyObject *__pyx_v_name); /* proto */
 static PyObject *__pyx_pf_5MACS2_2IO_6PeakIO_11BroadPeakIO_20__reduce_cython__(struct __pyx_obj_5MACS2_2IO_6PeakIO_BroadPeakIO *__pyx_v_self); /* proto */
 static PyObject *__pyx_pf_5MACS2_2IO_6PeakIO_11BroadPeakIO_22__setstate_cython__(struct __pyx_obj_5MACS2_2IO_6PeakIO_BroadPeakIO *__pyx_v_self, PyObject *__pyx_v___pyx_state); /* proto */
@@ -19964,7 +19964,7 @@ static PyObject *__pyx_pf_5MACS2_2IO_6PeakIO_11BroadPeakIO_10total(struct __pyx_
  *             x += len(peaks[chrom])
  *         return x             # <<<<<<<<<<<<<<
  * 
- *     def write_to_gappedPeak (self, fhd, bytes name_prefix=b"peak_", bytes name=b'peak', bytes description=b"%s", trackline=True):
+ *     def write_to_gappedPeak (self, fhd, bytes name_prefix=b"peak_", bytes name=b'peak', bytes description=b"%s", str score_column="score", trackline=True):
  */
   __Pyx_XDECREF(__pyx_r);
   __pyx_t_2 = __Pyx_PyInt_From_long(__pyx_v_x); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 902, __pyx_L1_error)
@@ -20000,7 +20000,7 @@ static PyObject *__pyx_pf_5MACS2_2IO_6PeakIO_11BroadPeakIO_10total(struct __pyx_
 /* "MACS2/IO/PeakIO.pyx":904
  *         return x
  * 
- *     def write_to_gappedPeak (self, fhd, bytes name_prefix=b"peak_", bytes name=b'peak', bytes description=b"%s", trackline=True):             # <<<<<<<<<<<<<<
+ *     def write_to_gappedPeak (self, fhd, bytes name_prefix=b"peak_", bytes name=b'peak', bytes description=b"%s", str score_column="score", trackline=True):             # <<<<<<<<<<<<<<
  *         """Print out peaks in gappedBed format. Only those with stronger enrichment regions are saved.
  * 
  */
@@ -20013,21 +20013,25 @@ static PyObject *__pyx_pw_5MACS2_2IO_6PeakIO_11BroadPeakIO_13write_to_gappedPeak
   PyObject *__pyx_v_name_prefix = 0;
   PyObject *__pyx_v_name = 0;
   PyObject *__pyx_v_description = 0;
+  PyObject *__pyx_v_score_column = 0;
   PyObject *__pyx_v_trackline = 0;
   PyObject *__pyx_r = 0;
   __Pyx_RefNannyDeclarations
   __Pyx_RefNannySetupContext("write_to_gappedPeak (wrapper)", 0);
   {
-    static PyObject **__pyx_pyargnames[] = {&__pyx_n_s_fhd,&__pyx_n_s_name_prefix,&__pyx_n_s_name,&__pyx_n_s_description,&__pyx_n_s_trackline,0};
-    PyObject* values[5] = {0,0,0,0,0};
+    static PyObject **__pyx_pyargnames[] = {&__pyx_n_s_fhd,&__pyx_n_s_name_prefix,&__pyx_n_s_name,&__pyx_n_s_description,&__pyx_n_s_score_column,&__pyx_n_s_trackline,0};
+    PyObject* values[6] = {0,0,0,0,0,0};
     values[1] = ((PyObject*)__pyx_n_b_peak);
     values[2] = ((PyObject*)__pyx_n_b_peak_2);
     values[3] = ((PyObject*)__pyx_kp_b_s_2);
-    values[4] = ((PyObject *)Py_True);
+    values[4] = ((PyObject*)__pyx_n_u_score);
+    values[5] = ((PyObject *)Py_True);
     if (unlikely(__pyx_kwds)) {
       Py_ssize_t kw_args;
       const Py_ssize_t pos_args = PyTuple_GET_SIZE(__pyx_args);
       switch (pos_args) {
+        case  6: values[5] = PyTuple_GET_ITEM(__pyx_args, 5);
+        CYTHON_FALLTHROUGH;
         case  5: values[4] = PyTuple_GET_ITEM(__pyx_args, 4);
         CYTHON_FALLTHROUGH;
         case  4: values[3] = PyTuple_GET_ITEM(__pyx_args, 3);
@@ -20067,8 +20071,14 @@ static PyObject *__pyx_pw_5MACS2_2IO_6PeakIO_11BroadPeakIO_13write_to_gappedPeak
         CYTHON_FALLTHROUGH;
         case  4:
         if (kw_args > 0) {
-          PyObject* value = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_trackline);
+          PyObject* value = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_score_column);
           if (value) { values[4] = value; kw_args--; }
+        }
+        CYTHON_FALLTHROUGH;
+        case  5:
+        if (kw_args > 0) {
+          PyObject* value = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_trackline);
+          if (value) { values[5] = value; kw_args--; }
         }
       }
       if (unlikely(kw_args > 0)) {
@@ -20076,6 +20086,8 @@ static PyObject *__pyx_pw_5MACS2_2IO_6PeakIO_11BroadPeakIO_13write_to_gappedPeak
       }
     } else {
       switch (PyTuple_GET_SIZE(__pyx_args)) {
+        case  6: values[5] = PyTuple_GET_ITEM(__pyx_args, 5);
+        CYTHON_FALLTHROUGH;
         case  5: values[4] = PyTuple_GET_ITEM(__pyx_args, 4);
         CYTHON_FALLTHROUGH;
         case  4: values[3] = PyTuple_GET_ITEM(__pyx_args, 3);
@@ -20093,11 +20105,12 @@ static PyObject *__pyx_pw_5MACS2_2IO_6PeakIO_11BroadPeakIO_13write_to_gappedPeak
     __pyx_v_name_prefix = ((PyObject*)values[1]);
     __pyx_v_name = ((PyObject*)values[2]);
     __pyx_v_description = ((PyObject*)values[3]);
-    __pyx_v_trackline = values[4];
+    __pyx_v_score_column = ((PyObject*)values[4]);
+    __pyx_v_trackline = values[5];
   }
   goto __pyx_L4_argument_unpacking_done;
   __pyx_L5_argtuple_error:;
-  __Pyx_RaiseArgtupleInvalid("write_to_gappedPeak", 0, 1, 5, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 904, __pyx_L3_error)
+  __Pyx_RaiseArgtupleInvalid("write_to_gappedPeak", 0, 1, 6, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 904, __pyx_L3_error)
   __pyx_L3_error:;
   __Pyx_AddTraceback("MACS2.IO.PeakIO.BroadPeakIO.write_to_gappedPeak", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __Pyx_RefNannyFinishContext();
@@ -20106,7 +20119,8 @@ static PyObject *__pyx_pw_5MACS2_2IO_6PeakIO_11BroadPeakIO_13write_to_gappedPeak
   if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_name_prefix), (&PyBytes_Type), 1, "name_prefix", 1))) __PYX_ERR(0, 904, __pyx_L1_error)
   if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_name), (&PyBytes_Type), 1, "name", 1))) __PYX_ERR(0, 904, __pyx_L1_error)
   if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_description), (&PyBytes_Type), 1, "description", 1))) __PYX_ERR(0, 904, __pyx_L1_error)
-  __pyx_r = __pyx_pf_5MACS2_2IO_6PeakIO_11BroadPeakIO_12write_to_gappedPeak(((struct __pyx_obj_5MACS2_2IO_6PeakIO_BroadPeakIO *)__pyx_v_self), __pyx_v_fhd, __pyx_v_name_prefix, __pyx_v_name, __pyx_v_description, __pyx_v_trackline);
+  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_score_column), (&PyUnicode_Type), 1, "score_column", 1))) __PYX_ERR(0, 904, __pyx_L1_error)
+  __pyx_r = __pyx_pf_5MACS2_2IO_6PeakIO_11BroadPeakIO_12write_to_gappedPeak(((struct __pyx_obj_5MACS2_2IO_6PeakIO_BroadPeakIO *)__pyx_v_self), __pyx_v_fhd, __pyx_v_name_prefix, __pyx_v_name, __pyx_v_description, __pyx_v_score_column, __pyx_v_trackline);
 
   /* function exit code */
   goto __pyx_L0;
@@ -20117,7 +20131,7 @@ static PyObject *__pyx_pw_5MACS2_2IO_6PeakIO_11BroadPeakIO_13write_to_gappedPeak
   return __pyx_r;
 }
 
-static PyObject *__pyx_pf_5MACS2_2IO_6PeakIO_11BroadPeakIO_12write_to_gappedPeak(struct __pyx_obj_5MACS2_2IO_6PeakIO_BroadPeakIO *__pyx_v_self, PyObject *__pyx_v_fhd, PyObject *__pyx_v_name_prefix, PyObject *__pyx_v_name, PyObject *__pyx_v_description, PyObject *__pyx_v_trackline) {
+static PyObject *__pyx_pf_5MACS2_2IO_6PeakIO_11BroadPeakIO_12write_to_gappedPeak(struct __pyx_obj_5MACS2_2IO_6PeakIO_BroadPeakIO *__pyx_v_self, PyObject *__pyx_v_fhd, PyObject *__pyx_v_name_prefix, PyObject *__pyx_v_name, PyObject *__pyx_v_description, PyObject *__pyx_v_score_column, PyObject *__pyx_v_trackline) {
   PyObject *__pyx_v_chrs = NULL;
   PyObject *__pyx_v_n_peak = NULL;
   PyObject *__pyx_v_peakprefix = NULL;
@@ -20528,7 +20542,7 @@ static PyObject *__pyx_pf_5MACS2_2IO_6PeakIO_11BroadPeakIO_12write_to_gappedPeak
  *                 if peak["thickStart"] != b".":
  *                     fhd.write( "%s\t%d\t%d\t%s%d\t%d\t.\t%s\t%s\t0\t%d\t%s\t%s\t%.6g\t%.6g\t%.6g\n"             # <<<<<<<<<<<<<<
  *                                %
- *                                (chrom.decode(),peak["start"],peak["end"],peakprefix.decode(),n_peak,int(10*peak["qscore"]),
+ *                                (chrom.decode(),peak["start"],peak["end"],peakprefix.decode(),n_peak,int(10*peak[score_column]),
  */
         __pyx_t_7 = __Pyx_PyObject_GetAttrStr(__pyx_v_fhd, __pyx_n_s_write); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 985, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_7);
@@ -20536,7 +20550,7 @@ static PyObject *__pyx_pf_5MACS2_2IO_6PeakIO_11BroadPeakIO_12write_to_gappedPeak
         /* "MACS2/IO/PeakIO.pyx":987
  *                     fhd.write( "%s\t%d\t%d\t%s%d\t%d\t.\t%s\t%s\t0\t%d\t%s\t%s\t%.6g\t%.6g\t%.6g\n"
  *                                %
- *                                (chrom.decode(),peak["start"],peak["end"],peakprefix.decode(),n_peak,int(10*peak["qscore"]),             # <<<<<<<<<<<<<<
+ *                                (chrom.decode(),peak["start"],peak["end"],peakprefix.decode(),n_peak,int(10*peak[score_column]),             # <<<<<<<<<<<<<<
  *                                 peak["thickStart"].decode(),peak["thickEnd"].decode(),
  *                                 peak["blockNum"],peak["blockSizes"].decode(),peak["blockStarts"].decode(), peak['fc'], peak['pscore'], peak['qscore'] ) )
  */
@@ -20567,7 +20581,7 @@ static PyObject *__pyx_pf_5MACS2_2IO_6PeakIO_11BroadPeakIO_12write_to_gappedPeak
         }
         __pyx_t_17 = __Pyx_decode_bytes(__pyx_v_peakprefix, 0, PY_SSIZE_T_MAX, NULL, NULL, NULL); if (unlikely(!__pyx_t_17)) __PYX_ERR(0, 987, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_17);
-        __pyx_t_18 = __Pyx_PyObject_Dict_GetItem(__pyx_v_peak, __pyx_n_u_qscore); if (unlikely(!__pyx_t_18)) __PYX_ERR(0, 987, __pyx_L1_error)
+        __pyx_t_18 = __Pyx_PyObject_Dict_GetItem(__pyx_v_peak, __pyx_v_score_column); if (unlikely(!__pyx_t_18)) __PYX_ERR(0, 987, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_18);
         __pyx_t_19 = PyNumber_Multiply(__pyx_int_10, __pyx_t_18); if (unlikely(!__pyx_t_19)) __PYX_ERR(0, 987, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_19);
@@ -20578,7 +20592,7 @@ static PyObject *__pyx_pf_5MACS2_2IO_6PeakIO_11BroadPeakIO_12write_to_gappedPeak
 
         /* "MACS2/IO/PeakIO.pyx":988
  *                                %
- *                                (chrom.decode(),peak["start"],peak["end"],peakprefix.decode(),n_peak,int(10*peak["qscore"]),
+ *                                (chrom.decode(),peak["start"],peak["end"],peakprefix.decode(),n_peak,int(10*peak[score_column]),
  *                                 peak["thickStart"].decode(),peak["thickEnd"].decode(),             # <<<<<<<<<<<<<<
  *                                 peak["blockNum"],peak["blockSizes"].decode(),peak["blockStarts"].decode(), peak['fc'], peak['pscore'], peak['qscore'] ) )
  * 
@@ -20625,11 +20639,11 @@ static PyObject *__pyx_pf_5MACS2_2IO_6PeakIO_11BroadPeakIO_12write_to_gappedPeak
         __Pyx_DECREF(__pyx_t_22); __pyx_t_22 = 0;
 
         /* "MACS2/IO/PeakIO.pyx":989
- *                                (chrom.decode(),peak["start"],peak["end"],peakprefix.decode(),n_peak,int(10*peak["qscore"]),
+ *                                (chrom.decode(),peak["start"],peak["end"],peakprefix.decode(),n_peak,int(10*peak[score_column]),
  *                                 peak["thickStart"].decode(),peak["thickEnd"].decode(),
  *                                 peak["blockNum"],peak["blockSizes"].decode(),peak["blockStarts"].decode(), peak['fc'], peak['pscore'], peak['qscore'] ) )             # <<<<<<<<<<<<<<
  * 
- *     def write_to_Bed12 (self, fhd, bytes name_prefix=b"peak_", bytes name=b'peak', bytes description=b"%s", trackline=True):
+ *     def write_to_Bed12 (self, fhd, bytes name_prefix=b"peak_", bytes name=b'peak', bytes description=b"%s", str score_column="score", trackline=True):
  */
         __pyx_t_22 = __Pyx_PyObject_Dict_GetItem(__pyx_v_peak, __pyx_n_u_blockNum); if (unlikely(!__pyx_t_22)) __PYX_ERR(0, 989, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_22);
@@ -20683,7 +20697,7 @@ static PyObject *__pyx_pf_5MACS2_2IO_6PeakIO_11BroadPeakIO_12write_to_gappedPeak
         /* "MACS2/IO/PeakIO.pyx":987
  *                     fhd.write( "%s\t%d\t%d\t%s%d\t%d\t.\t%s\t%s\t0\t%d\t%s\t%s\t%.6g\t%.6g\t%.6g\n"
  *                                %
- *                                (chrom.decode(),peak["start"],peak["end"],peakprefix.decode(),n_peak,int(10*peak["qscore"]),             # <<<<<<<<<<<<<<
+ *                                (chrom.decode(),peak["start"],peak["end"],peakprefix.decode(),n_peak,int(10*peak[score_column]),             # <<<<<<<<<<<<<<
  *                                 peak["thickStart"].decode(),peak["thickEnd"].decode(),
  *                                 peak["blockNum"],peak["blockSizes"].decode(),peak["blockStarts"].decode(), peak['fc'], peak['pscore'], peak['qscore'] ) )
  */
@@ -20736,7 +20750,7 @@ static PyObject *__pyx_pf_5MACS2_2IO_6PeakIO_11BroadPeakIO_12write_to_gappedPeak
  *                 if peak["thickStart"] != b".":
  *                     fhd.write( "%s\t%d\t%d\t%s%d\t%d\t.\t%s\t%s\t0\t%d\t%s\t%s\t%.6g\t%.6g\t%.6g\n"
  *                                %             # <<<<<<<<<<<<<<
- *                                (chrom.decode(),peak["start"],peak["end"],peakprefix.decode(),n_peak,int(10*peak["qscore"]),
+ *                                (chrom.decode(),peak["start"],peak["end"],peakprefix.decode(),n_peak,int(10*peak[score_column]),
  *                                 peak["thickStart"].decode(),peak["thickEnd"].decode(),
  */
         __pyx_t_26 = PyUnicode_Format(__pyx_kp_u_s_d_d_s_d_d_s_s_0_d_s_s_6g_6g_6, __pyx_t_27); if (unlikely(!__pyx_t_26)) __PYX_ERR(0, 986, __pyx_L1_error)
@@ -20792,7 +20806,7 @@ static PyObject *__pyx_pf_5MACS2_2IO_6PeakIO_11BroadPeakIO_12write_to_gappedPeak
   /* "MACS2/IO/PeakIO.pyx":904
  *         return x
  * 
- *     def write_to_gappedPeak (self, fhd, bytes name_prefix=b"peak_", bytes name=b'peak', bytes description=b"%s", trackline=True):             # <<<<<<<<<<<<<<
+ *     def write_to_gappedPeak (self, fhd, bytes name_prefix=b"peak_", bytes name=b'peak', bytes description=b"%s", str score_column="score", trackline=True):             # <<<<<<<<<<<<<<
  *         """Print out peaks in gappedBed format. Only those with stronger enrichment regions are saved.
  * 
  */
@@ -20837,7 +20851,7 @@ static PyObject *__pyx_pf_5MACS2_2IO_6PeakIO_11BroadPeakIO_12write_to_gappedPeak
 /* "MACS2/IO/PeakIO.pyx":991
  *                                 peak["blockNum"],peak["blockSizes"].decode(),peak["blockStarts"].decode(), peak['fc'], peak['pscore'], peak['qscore'] ) )
  * 
- *     def write_to_Bed12 (self, fhd, bytes name_prefix=b"peak_", bytes name=b'peak', bytes description=b"%s", trackline=True):             # <<<<<<<<<<<<<<
+ *     def write_to_Bed12 (self, fhd, bytes name_prefix=b"peak_", bytes name=b'peak', bytes description=b"%s", str score_column="score", trackline=True):             # <<<<<<<<<<<<<<
  *         """Print out peaks in Bed12 format.
  * 
  */
@@ -20850,21 +20864,25 @@ static PyObject *__pyx_pw_5MACS2_2IO_6PeakIO_11BroadPeakIO_15write_to_Bed12(PyOb
   PyObject *__pyx_v_name_prefix = 0;
   PyObject *__pyx_v_name = 0;
   PyObject *__pyx_v_description = 0;
+  PyObject *__pyx_v_score_column = 0;
   PyObject *__pyx_v_trackline = 0;
   PyObject *__pyx_r = 0;
   __Pyx_RefNannyDeclarations
   __Pyx_RefNannySetupContext("write_to_Bed12 (wrapper)", 0);
   {
-    static PyObject **__pyx_pyargnames[] = {&__pyx_n_s_fhd,&__pyx_n_s_name_prefix,&__pyx_n_s_name,&__pyx_n_s_description,&__pyx_n_s_trackline,0};
-    PyObject* values[5] = {0,0,0,0,0};
+    static PyObject **__pyx_pyargnames[] = {&__pyx_n_s_fhd,&__pyx_n_s_name_prefix,&__pyx_n_s_name,&__pyx_n_s_description,&__pyx_n_s_score_column,&__pyx_n_s_trackline,0};
+    PyObject* values[6] = {0,0,0,0,0,0};
     values[1] = ((PyObject*)__pyx_n_b_peak);
     values[2] = ((PyObject*)__pyx_n_b_peak_2);
     values[3] = ((PyObject*)__pyx_kp_b_s_2);
-    values[4] = ((PyObject *)Py_True);
+    values[4] = ((PyObject*)__pyx_n_u_score);
+    values[5] = ((PyObject *)Py_True);
     if (unlikely(__pyx_kwds)) {
       Py_ssize_t kw_args;
       const Py_ssize_t pos_args = PyTuple_GET_SIZE(__pyx_args);
       switch (pos_args) {
+        case  6: values[5] = PyTuple_GET_ITEM(__pyx_args, 5);
+        CYTHON_FALLTHROUGH;
         case  5: values[4] = PyTuple_GET_ITEM(__pyx_args, 4);
         CYTHON_FALLTHROUGH;
         case  4: values[3] = PyTuple_GET_ITEM(__pyx_args, 3);
@@ -20904,8 +20922,14 @@ static PyObject *__pyx_pw_5MACS2_2IO_6PeakIO_11BroadPeakIO_15write_to_Bed12(PyOb
         CYTHON_FALLTHROUGH;
         case  4:
         if (kw_args > 0) {
-          PyObject* value = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_trackline);
+          PyObject* value = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_score_column);
           if (value) { values[4] = value; kw_args--; }
+        }
+        CYTHON_FALLTHROUGH;
+        case  5:
+        if (kw_args > 0) {
+          PyObject* value = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_trackline);
+          if (value) { values[5] = value; kw_args--; }
         }
       }
       if (unlikely(kw_args > 0)) {
@@ -20913,6 +20937,8 @@ static PyObject *__pyx_pw_5MACS2_2IO_6PeakIO_11BroadPeakIO_15write_to_Bed12(PyOb
       }
     } else {
       switch (PyTuple_GET_SIZE(__pyx_args)) {
+        case  6: values[5] = PyTuple_GET_ITEM(__pyx_args, 5);
+        CYTHON_FALLTHROUGH;
         case  5: values[4] = PyTuple_GET_ITEM(__pyx_args, 4);
         CYTHON_FALLTHROUGH;
         case  4: values[3] = PyTuple_GET_ITEM(__pyx_args, 3);
@@ -20930,11 +20956,12 @@ static PyObject *__pyx_pw_5MACS2_2IO_6PeakIO_11BroadPeakIO_15write_to_Bed12(PyOb
     __pyx_v_name_prefix = ((PyObject*)values[1]);
     __pyx_v_name = ((PyObject*)values[2]);
     __pyx_v_description = ((PyObject*)values[3]);
-    __pyx_v_trackline = values[4];
+    __pyx_v_score_column = ((PyObject*)values[4]);
+    __pyx_v_trackline = values[5];
   }
   goto __pyx_L4_argument_unpacking_done;
   __pyx_L5_argtuple_error:;
-  __Pyx_RaiseArgtupleInvalid("write_to_Bed12", 0, 1, 5, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 991, __pyx_L3_error)
+  __Pyx_RaiseArgtupleInvalid("write_to_Bed12", 0, 1, 6, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 991, __pyx_L3_error)
   __pyx_L3_error:;
   __Pyx_AddTraceback("MACS2.IO.PeakIO.BroadPeakIO.write_to_Bed12", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __Pyx_RefNannyFinishContext();
@@ -20943,7 +20970,8 @@ static PyObject *__pyx_pw_5MACS2_2IO_6PeakIO_11BroadPeakIO_15write_to_Bed12(PyOb
   if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_name_prefix), (&PyBytes_Type), 1, "name_prefix", 1))) __PYX_ERR(0, 991, __pyx_L1_error)
   if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_name), (&PyBytes_Type), 1, "name", 1))) __PYX_ERR(0, 991, __pyx_L1_error)
   if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_description), (&PyBytes_Type), 1, "description", 1))) __PYX_ERR(0, 991, __pyx_L1_error)
-  __pyx_r = __pyx_pf_5MACS2_2IO_6PeakIO_11BroadPeakIO_14write_to_Bed12(((struct __pyx_obj_5MACS2_2IO_6PeakIO_BroadPeakIO *)__pyx_v_self), __pyx_v_fhd, __pyx_v_name_prefix, __pyx_v_name, __pyx_v_description, __pyx_v_trackline);
+  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_score_column), (&PyUnicode_Type), 1, "score_column", 1))) __PYX_ERR(0, 991, __pyx_L1_error)
+  __pyx_r = __pyx_pf_5MACS2_2IO_6PeakIO_11BroadPeakIO_14write_to_Bed12(((struct __pyx_obj_5MACS2_2IO_6PeakIO_BroadPeakIO *)__pyx_v_self), __pyx_v_fhd, __pyx_v_name_prefix, __pyx_v_name, __pyx_v_description, __pyx_v_score_column, __pyx_v_trackline);
 
   /* function exit code */
   goto __pyx_L0;
@@ -20954,7 +20982,7 @@ static PyObject *__pyx_pw_5MACS2_2IO_6PeakIO_11BroadPeakIO_15write_to_Bed12(PyOb
   return __pyx_r;
 }
 
-static PyObject *__pyx_pf_5MACS2_2IO_6PeakIO_11BroadPeakIO_14write_to_Bed12(struct __pyx_obj_5MACS2_2IO_6PeakIO_BroadPeakIO *__pyx_v_self, PyObject *__pyx_v_fhd, PyObject *__pyx_v_name_prefix, PyObject *__pyx_v_name, PyObject *__pyx_v_description, PyObject *__pyx_v_trackline) {
+static PyObject *__pyx_pf_5MACS2_2IO_6PeakIO_11BroadPeakIO_14write_to_Bed12(struct __pyx_obj_5MACS2_2IO_6PeakIO_BroadPeakIO *__pyx_v_self, PyObject *__pyx_v_fhd, PyObject *__pyx_v_name_prefix, PyObject *__pyx_v_name, PyObject *__pyx_v_description, PyObject *__pyx_v_score_column, PyObject *__pyx_v_trackline) {
   PyObject *__pyx_v_chrs = NULL;
   PyObject *__pyx_v_n_peak = NULL;
   PyObject *__pyx_v_peakprefix = NULL;
@@ -21356,7 +21384,7 @@ static PyObject *__pyx_pf_5MACS2_2IO_6PeakIO_11BroadPeakIO_14write_to_Bed12(stru
  *                     # this will violate gappedPeak format, since it's a complement like broadPeak line.
  *                     fhd.write( "%s\t%d\t%d\t%s%d\t%d\t.\n"             # <<<<<<<<<<<<<<
  *                                %
- *                                (chrom.decode(),peak["start"],peak["end"],peakprefix.decode(),n_peak,int(10*peak["qscore"]) ) )
+ *                                (chrom.decode(),peak["start"],peak["end"],peakprefix.decode(),n_peak,int(10*peak[score_column]) ) )
  */
         __pyx_t_7 = __Pyx_PyObject_GetAttrStr(__pyx_v_fhd, __pyx_n_s_write); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 1060, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_7);
@@ -21368,7 +21396,7 @@ static PyObject *__pyx_pf_5MACS2_2IO_6PeakIO_11BroadPeakIO_14write_to_Bed12(stru
         /* "MACS2/IO/PeakIO.pyx":1062
  *                     fhd.write( "%s\t%d\t%d\t%s%d\t%d\t.\n"
  *                                %
- *                                (chrom.decode(),peak["start"],peak["end"],peakprefix.decode(),n_peak,int(10*peak["qscore"]) ) )             # <<<<<<<<<<<<<<
+ *                                (chrom.decode(),peak["start"],peak["end"],peakprefix.decode(),n_peak,int(10*peak[score_column]) ) )             # <<<<<<<<<<<<<<
  *                 else:
  *                     fhd.write( "%s\t%d\t%d\t%s%d\t%d\t.\t%s\t%s\t0\t%d\t%s\t%s\n"
  */
@@ -21451,7 +21479,7 @@ static PyObject *__pyx_pf_5MACS2_2IO_6PeakIO_11BroadPeakIO_14write_to_Bed12(stru
         __pyx_t_15 += 1;
         __Pyx_GIVEREF(__pyx_kp_u__2);
         PyTuple_SET_ITEM(__pyx_t_14, 8, __pyx_kp_u__2);
-        __pyx_t_17 = __Pyx_PyObject_Dict_GetItem(__pyx_v_peak, __pyx_n_u_qscore); if (unlikely(!__pyx_t_17)) __PYX_ERR(0, 1062, __pyx_L1_error)
+        __pyx_t_17 = __Pyx_PyObject_Dict_GetItem(__pyx_v_peak, __pyx_v_score_column); if (unlikely(!__pyx_t_17)) __PYX_ERR(0, 1062, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_17);
         __pyx_t_16 = PyNumber_Multiply(__pyx_int_10, __pyx_t_17); if (unlikely(!__pyx_t_16)) __PYX_ERR(0, 1062, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_16);
@@ -21477,7 +21505,7 @@ static PyObject *__pyx_pf_5MACS2_2IO_6PeakIO_11BroadPeakIO_14write_to_Bed12(stru
  *                     # this will violate gappedPeak format, since it's a complement like broadPeak line.
  *                     fhd.write( "%s\t%d\t%d\t%s%d\t%d\t.\n"             # <<<<<<<<<<<<<<
  *                                %
- *                                (chrom.decode(),peak["start"],peak["end"],peakprefix.decode(),n_peak,int(10*peak["qscore"]) ) )
+ *                                (chrom.decode(),peak["start"],peak["end"],peakprefix.decode(),n_peak,int(10*peak[score_column]) ) )
  */
         __pyx_t_16 = __Pyx_PyUnicode_Join(__pyx_t_14, 11, __pyx_t_15, __pyx_t_10); if (unlikely(!__pyx_t_16)) __PYX_ERR(0, 1060, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_16);
@@ -21511,11 +21539,11 @@ static PyObject *__pyx_pf_5MACS2_2IO_6PeakIO_11BroadPeakIO_14write_to_Bed12(stru
       }
 
       /* "MACS2/IO/PeakIO.pyx":1064
- *                                (chrom.decode(),peak["start"],peak["end"],peakprefix.decode(),n_peak,int(10*peak["qscore"]) ) )
+ *                                (chrom.decode(),peak["start"],peak["end"],peakprefix.decode(),n_peak,int(10*peak[score_column]) ) )
  *                 else:
  *                     fhd.write( "%s\t%d\t%d\t%s%d\t%d\t.\t%s\t%s\t0\t%d\t%s\t%s\n"             # <<<<<<<<<<<<<<
  *                                %
- *                                (chrom.decode(), peak["start"], peak["end"], peakprefix.decode(), n_peak, int(10*peak["qscore"]),
+ *                                (chrom.decode(), peak["start"], peak["end"], peakprefix.decode(), n_peak, int(10*peak[score_column]),
  */
       /*else*/ {
         __pyx_t_7 = __Pyx_PyObject_GetAttrStr(__pyx_v_fhd, __pyx_n_s_write); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 1064, __pyx_L1_error)
@@ -21528,7 +21556,7 @@ static PyObject *__pyx_pf_5MACS2_2IO_6PeakIO_11BroadPeakIO_14write_to_Bed12(stru
         /* "MACS2/IO/PeakIO.pyx":1066
  *                     fhd.write( "%s\t%d\t%d\t%s%d\t%d\t.\t%s\t%s\t0\t%d\t%s\t%s\n"
  *                                %
- *                                (chrom.decode(), peak["start"], peak["end"], peakprefix.decode(), n_peak, int(10*peak["qscore"]),             # <<<<<<<<<<<<<<
+ *                                (chrom.decode(), peak["start"], peak["end"], peakprefix.decode(), n_peak, int(10*peak[score_column]),             # <<<<<<<<<<<<<<
  *                                 peak["thickStart"].decode(), peak["thickEnd"].decode(),
  *                                 peak["blockNum"], peak["blockSizes"].decode(), peak["blockStarts"].decode() ))
  */
@@ -21611,7 +21639,7 @@ static PyObject *__pyx_pf_5MACS2_2IO_6PeakIO_11BroadPeakIO_14write_to_Bed12(stru
         __pyx_t_15 += 1;
         __Pyx_GIVEREF(__pyx_kp_u__2);
         PyTuple_SET_ITEM(__pyx_t_16, 8, __pyx_kp_u__2);
-        __pyx_t_17 = __Pyx_PyObject_Dict_GetItem(__pyx_v_peak, __pyx_n_u_qscore); if (unlikely(!__pyx_t_17)) __PYX_ERR(0, 1066, __pyx_L1_error)
+        __pyx_t_17 = __Pyx_PyObject_Dict_GetItem(__pyx_v_peak, __pyx_v_score_column); if (unlikely(!__pyx_t_17)) __PYX_ERR(0, 1066, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_17);
         __pyx_t_14 = PyNumber_Multiply(__pyx_int_10, __pyx_t_17); if (unlikely(!__pyx_t_14)) __PYX_ERR(0, 1066, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_14);
@@ -21634,7 +21662,7 @@ static PyObject *__pyx_pf_5MACS2_2IO_6PeakIO_11BroadPeakIO_14write_to_Bed12(stru
 
         /* "MACS2/IO/PeakIO.pyx":1067
  *                                %
- *                                (chrom.decode(), peak["start"], peak["end"], peakprefix.decode(), n_peak, int(10*peak["qscore"]),
+ *                                (chrom.decode(), peak["start"], peak["end"], peakprefix.decode(), n_peak, int(10*peak[score_column]),
  *                                 peak["thickStart"].decode(), peak["thickEnd"].decode(),             # <<<<<<<<<<<<<<
  *                                 peak["blockNum"], peak["blockSizes"].decode(), peak["blockStarts"].decode() ))
  * 
@@ -21705,7 +21733,7 @@ static PyObject *__pyx_pf_5MACS2_2IO_6PeakIO_11BroadPeakIO_14write_to_Bed12(stru
         PyTuple_SET_ITEM(__pyx_t_16, 14, __pyx_kp_u_0);
 
         /* "MACS2/IO/PeakIO.pyx":1068
- *                                (chrom.decode(), peak["start"], peak["end"], peakprefix.decode(), n_peak, int(10*peak["qscore"]),
+ *                                (chrom.decode(), peak["start"], peak["end"], peakprefix.decode(), n_peak, int(10*peak[score_column]),
  *                                 peak["thickStart"].decode(), peak["thickEnd"].decode(),
  *                                 peak["blockNum"], peak["blockSizes"].decode(), peak["blockStarts"].decode() ))             # <<<<<<<<<<<<<<
  * 
@@ -21791,11 +21819,11 @@ static PyObject *__pyx_pf_5MACS2_2IO_6PeakIO_11BroadPeakIO_14write_to_Bed12(stru
         PyTuple_SET_ITEM(__pyx_t_16, 20, __pyx_kp_u__4);
 
         /* "MACS2/IO/PeakIO.pyx":1064
- *                                (chrom.decode(),peak["start"],peak["end"],peakprefix.decode(),n_peak,int(10*peak["qscore"]) ) )
+ *                                (chrom.decode(),peak["start"],peak["end"],peakprefix.decode(),n_peak,int(10*peak[score_column]) ) )
  *                 else:
  *                     fhd.write( "%s\t%d\t%d\t%s%d\t%d\t.\t%s\t%s\t0\t%d\t%s\t%s\n"             # <<<<<<<<<<<<<<
  *                                %
- *                                (chrom.decode(), peak["start"], peak["end"], peakprefix.decode(), n_peak, int(10*peak["qscore"]),
+ *                                (chrom.decode(), peak["start"], peak["end"], peakprefix.decode(), n_peak, int(10*peak[score_column]),
  */
         __pyx_t_17 = __Pyx_PyUnicode_Join(__pyx_t_16, 21, __pyx_t_15, __pyx_t_10); if (unlikely(!__pyx_t_17)) __PYX_ERR(0, 1064, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_17);
@@ -21843,7 +21871,7 @@ static PyObject *__pyx_pf_5MACS2_2IO_6PeakIO_11BroadPeakIO_14write_to_Bed12(stru
   /* "MACS2/IO/PeakIO.pyx":991
  *                                 peak["blockNum"],peak["blockSizes"].decode(),peak["blockStarts"].decode(), peak['fc'], peak['pscore'], peak['qscore'] ) )
  * 
- *     def write_to_Bed12 (self, fhd, bytes name_prefix=b"peak_", bytes name=b'peak', bytes description=b"%s", trackline=True):             # <<<<<<<<<<<<<<
+ *     def write_to_Bed12 (self, fhd, bytes name_prefix=b"peak_", bytes name=b'peak', bytes description=b"%s", str score_column="score", trackline=True):             # <<<<<<<<<<<<<<
  *         """Print out peaks in Bed12 format.
  * 
  */
@@ -21878,7 +21906,7 @@ static PyObject *__pyx_pf_5MACS2_2IO_6PeakIO_11BroadPeakIO_14write_to_Bed12(stru
 /* "MACS2/IO/PeakIO.pyx":1071
  * 
  * 
- *     def write_to_broadPeak (self, fhd, bytes name_prefix=b"peak_", bytes name=b'peak', bytes description=b"%s", trackline=True):             # <<<<<<<<<<<<<<
+ *     def write_to_broadPeak (self, fhd, bytes name_prefix=b"peak_", bytes name=b'peak', bytes description=b"%s", str score_column="score", trackline=True):             # <<<<<<<<<<<<<<
  *         """Print out peaks in broadPeak format.
  * 
  */
@@ -21891,21 +21919,25 @@ static PyObject *__pyx_pw_5MACS2_2IO_6PeakIO_11BroadPeakIO_17write_to_broadPeak(
   PyObject *__pyx_v_name_prefix = 0;
   PyObject *__pyx_v_name = 0;
   CYTHON_UNUSED PyObject *__pyx_v_description = 0;
+  PyObject *__pyx_v_score_column = 0;
   PyObject *__pyx_v_trackline = 0;
   PyObject *__pyx_r = 0;
   __Pyx_RefNannyDeclarations
   __Pyx_RefNannySetupContext("write_to_broadPeak (wrapper)", 0);
   {
-    static PyObject **__pyx_pyargnames[] = {&__pyx_n_s_fhd,&__pyx_n_s_name_prefix,&__pyx_n_s_name,&__pyx_n_s_description,&__pyx_n_s_trackline,0};
-    PyObject* values[5] = {0,0,0,0,0};
+    static PyObject **__pyx_pyargnames[] = {&__pyx_n_s_fhd,&__pyx_n_s_name_prefix,&__pyx_n_s_name,&__pyx_n_s_description,&__pyx_n_s_score_column,&__pyx_n_s_trackline,0};
+    PyObject* values[6] = {0,0,0,0,0,0};
     values[1] = ((PyObject*)__pyx_n_b_peak);
     values[2] = ((PyObject*)__pyx_n_b_peak_2);
     values[3] = ((PyObject*)__pyx_kp_b_s_2);
-    values[4] = ((PyObject *)Py_True);
+    values[4] = ((PyObject*)__pyx_n_u_score);
+    values[5] = ((PyObject *)Py_True);
     if (unlikely(__pyx_kwds)) {
       Py_ssize_t kw_args;
       const Py_ssize_t pos_args = PyTuple_GET_SIZE(__pyx_args);
       switch (pos_args) {
+        case  6: values[5] = PyTuple_GET_ITEM(__pyx_args, 5);
+        CYTHON_FALLTHROUGH;
         case  5: values[4] = PyTuple_GET_ITEM(__pyx_args, 4);
         CYTHON_FALLTHROUGH;
         case  4: values[3] = PyTuple_GET_ITEM(__pyx_args, 3);
@@ -21945,8 +21977,14 @@ static PyObject *__pyx_pw_5MACS2_2IO_6PeakIO_11BroadPeakIO_17write_to_broadPeak(
         CYTHON_FALLTHROUGH;
         case  4:
         if (kw_args > 0) {
-          PyObject* value = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_trackline);
+          PyObject* value = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_score_column);
           if (value) { values[4] = value; kw_args--; }
+        }
+        CYTHON_FALLTHROUGH;
+        case  5:
+        if (kw_args > 0) {
+          PyObject* value = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_trackline);
+          if (value) { values[5] = value; kw_args--; }
         }
       }
       if (unlikely(kw_args > 0)) {
@@ -21954,6 +21992,8 @@ static PyObject *__pyx_pw_5MACS2_2IO_6PeakIO_11BroadPeakIO_17write_to_broadPeak(
       }
     } else {
       switch (PyTuple_GET_SIZE(__pyx_args)) {
+        case  6: values[5] = PyTuple_GET_ITEM(__pyx_args, 5);
+        CYTHON_FALLTHROUGH;
         case  5: values[4] = PyTuple_GET_ITEM(__pyx_args, 4);
         CYTHON_FALLTHROUGH;
         case  4: values[3] = PyTuple_GET_ITEM(__pyx_args, 3);
@@ -21971,11 +22011,12 @@ static PyObject *__pyx_pw_5MACS2_2IO_6PeakIO_11BroadPeakIO_17write_to_broadPeak(
     __pyx_v_name_prefix = ((PyObject*)values[1]);
     __pyx_v_name = ((PyObject*)values[2]);
     __pyx_v_description = ((PyObject*)values[3]);
-    __pyx_v_trackline = values[4];
+    __pyx_v_score_column = ((PyObject*)values[4]);
+    __pyx_v_trackline = values[5];
   }
   goto __pyx_L4_argument_unpacking_done;
   __pyx_L5_argtuple_error:;
-  __Pyx_RaiseArgtupleInvalid("write_to_broadPeak", 0, 1, 5, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 1071, __pyx_L3_error)
+  __Pyx_RaiseArgtupleInvalid("write_to_broadPeak", 0, 1, 6, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 1071, __pyx_L3_error)
   __pyx_L3_error:;
   __Pyx_AddTraceback("MACS2.IO.PeakIO.BroadPeakIO.write_to_broadPeak", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __Pyx_RefNannyFinishContext();
@@ -21984,7 +22025,8 @@ static PyObject *__pyx_pw_5MACS2_2IO_6PeakIO_11BroadPeakIO_17write_to_broadPeak(
   if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_name_prefix), (&PyBytes_Type), 1, "name_prefix", 1))) __PYX_ERR(0, 1071, __pyx_L1_error)
   if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_name), (&PyBytes_Type), 1, "name", 1))) __PYX_ERR(0, 1071, __pyx_L1_error)
   if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_description), (&PyBytes_Type), 1, "description", 1))) __PYX_ERR(0, 1071, __pyx_L1_error)
-  __pyx_r = __pyx_pf_5MACS2_2IO_6PeakIO_11BroadPeakIO_16write_to_broadPeak(((struct __pyx_obj_5MACS2_2IO_6PeakIO_BroadPeakIO *)__pyx_v_self), __pyx_v_fhd, __pyx_v_name_prefix, __pyx_v_name, __pyx_v_description, __pyx_v_trackline);
+  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_score_column), (&PyUnicode_Type), 1, "score_column", 1))) __PYX_ERR(0, 1071, __pyx_L1_error)
+  __pyx_r = __pyx_pf_5MACS2_2IO_6PeakIO_11BroadPeakIO_16write_to_broadPeak(((struct __pyx_obj_5MACS2_2IO_6PeakIO_BroadPeakIO *)__pyx_v_self), __pyx_v_fhd, __pyx_v_name_prefix, __pyx_v_name, __pyx_v_description, __pyx_v_score_column, __pyx_v_trackline);
 
   /* function exit code */
   goto __pyx_L0;
@@ -21995,7 +22037,7 @@ static PyObject *__pyx_pw_5MACS2_2IO_6PeakIO_11BroadPeakIO_17write_to_broadPeak(
   return __pyx_r;
 }
 
-static PyObject *__pyx_pf_5MACS2_2IO_6PeakIO_11BroadPeakIO_16write_to_broadPeak(struct __pyx_obj_5MACS2_2IO_6PeakIO_BroadPeakIO *__pyx_v_self, PyObject *__pyx_v_fhd, PyObject *__pyx_v_name_prefix, PyObject *__pyx_v_name, CYTHON_UNUSED PyObject *__pyx_v_description, PyObject *__pyx_v_trackline) {
+static PyObject *__pyx_pf_5MACS2_2IO_6PeakIO_11BroadPeakIO_16write_to_broadPeak(struct __pyx_obj_5MACS2_2IO_6PeakIO_BroadPeakIO *__pyx_v_self, PyObject *__pyx_v_fhd, PyObject *__pyx_v_name_prefix, PyObject *__pyx_v_name, CYTHON_UNUSED PyObject *__pyx_v_description, PyObject *__pyx_v_score_column, PyObject *__pyx_v_trackline) {
   int __pyx_v_n_peak;
   PyObject *__pyx_v_chrom = 0;
   PyObject *__pyx_v_peakname = 0;
@@ -22434,7 +22476,7 @@ static PyObject *__pyx_pf_5MACS2_2IO_6PeakIO_11BroadPeakIO_16write_to_broadPeak(
  *                 peak = these_peaks[0]
  *                 peakname = "%s%d" % (peakprefix.decode(), n_peak)             # <<<<<<<<<<<<<<
  *                 fhd.write( "%s\t%d\t%d\t%s\t%d\t.\t%.6g\t%.6g\t%.6g\n" %
- *                            (chrom.decode(),peak['start'],peak['end'],peakname,int(10*peak["qscore"]),
+ *                            (chrom.decode(),peak['start'],peak['end'],peakname,int(10*peak[score_column]),
  */
       if (unlikely(__pyx_v_peakprefix == Py_None)) {
         PyErr_Format(PyExc_AttributeError, "'NoneType' object has no attribute '%.30s'", "decode");
@@ -22455,7 +22497,7 @@ static PyObject *__pyx_pf_5MACS2_2IO_6PeakIO_11BroadPeakIO_16write_to_broadPeak(
  *                 peak = these_peaks[0]
  *                 peakname = "%s%d" % (peakprefix.decode(), n_peak)
  *                 fhd.write( "%s\t%d\t%d\t%s\t%d\t.\t%.6g\t%.6g\t%.6g\n" %             # <<<<<<<<<<<<<<
- *                            (chrom.decode(),peak['start'],peak['end'],peakname,int(10*peak["qscore"]),
+ *                            (chrom.decode(),peak['start'],peak['end'],peakname,int(10*peak[score_column]),
  *                             peak['fc'],peak['pscore'],peak['qscore'] ) )
  */
       __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_v_fhd, __pyx_n_s_write); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1140, __pyx_L1_error)
@@ -22464,7 +22506,7 @@ static PyObject *__pyx_pf_5MACS2_2IO_6PeakIO_11BroadPeakIO_16write_to_broadPeak(
       /* "MACS2/IO/PeakIO.pyx":1141
  *                 peakname = "%s%d" % (peakprefix.decode(), n_peak)
  *                 fhd.write( "%s\t%d\t%d\t%s\t%d\t.\t%.6g\t%.6g\t%.6g\n" %
- *                            (chrom.decode(),peak['start'],peak['end'],peakname,int(10*peak["qscore"]),             # <<<<<<<<<<<<<<
+ *                            (chrom.decode(),peak['start'],peak['end'],peakname,int(10*peak[score_column]),             # <<<<<<<<<<<<<<
  *                             peak['fc'],peak['pscore'],peak['qscore'] ) )
  *         return
  */
@@ -22478,7 +22520,7 @@ static PyObject *__pyx_pf_5MACS2_2IO_6PeakIO_11BroadPeakIO_16write_to_broadPeak(
       __Pyx_GOTREF(__pyx_t_13);
       __pyx_t_14 = __Pyx_PyObject_Dict_GetItem(__pyx_v_peak, __pyx_n_u_end); if (unlikely(!__pyx_t_14)) __PYX_ERR(0, 1141, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_14);
-      __pyx_t_18 = __Pyx_PyObject_Dict_GetItem(__pyx_v_peak, __pyx_n_u_qscore); if (unlikely(!__pyx_t_18)) __PYX_ERR(0, 1141, __pyx_L1_error)
+      __pyx_t_18 = __Pyx_PyObject_Dict_GetItem(__pyx_v_peak, __pyx_v_score_column); if (unlikely(!__pyx_t_18)) __PYX_ERR(0, 1141, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_18);
       __pyx_t_19 = PyNumber_Multiply(__pyx_int_10, __pyx_t_18); if (unlikely(!__pyx_t_19)) __PYX_ERR(0, 1141, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_19);
@@ -22489,7 +22531,7 @@ static PyObject *__pyx_pf_5MACS2_2IO_6PeakIO_11BroadPeakIO_16write_to_broadPeak(
 
       /* "MACS2/IO/PeakIO.pyx":1142
  *                 fhd.write( "%s\t%d\t%d\t%s\t%d\t.\t%.6g\t%.6g\t%.6g\n" %
- *                            (chrom.decode(),peak['start'],peak['end'],peakname,int(10*peak["qscore"]),
+ *                            (chrom.decode(),peak['start'],peak['end'],peakname,int(10*peak[score_column]),
  *                             peak['fc'],peak['pscore'],peak['qscore'] ) )             # <<<<<<<<<<<<<<
  *         return
  * 
@@ -22504,7 +22546,7 @@ static PyObject *__pyx_pf_5MACS2_2IO_6PeakIO_11BroadPeakIO_16write_to_broadPeak(
       /* "MACS2/IO/PeakIO.pyx":1141
  *                 peakname = "%s%d" % (peakprefix.decode(), n_peak)
  *                 fhd.write( "%s\t%d\t%d\t%s\t%d\t.\t%.6g\t%.6g\t%.6g\n" %
- *                            (chrom.decode(),peak['start'],peak['end'],peakname,int(10*peak["qscore"]),             # <<<<<<<<<<<<<<
+ *                            (chrom.decode(),peak['start'],peak['end'],peakname,int(10*peak[score_column]),             # <<<<<<<<<<<<<<
  *                             peak['fc'],peak['pscore'],peak['qscore'] ) )
  *         return
  */
@@ -22539,7 +22581,7 @@ static PyObject *__pyx_pf_5MACS2_2IO_6PeakIO_11BroadPeakIO_16write_to_broadPeak(
  *                 peak = these_peaks[0]
  *                 peakname = "%s%d" % (peakprefix.decode(), n_peak)
  *                 fhd.write( "%s\t%d\t%d\t%s\t%d\t.\t%.6g\t%.6g\t%.6g\n" %             # <<<<<<<<<<<<<<
- *                            (chrom.decode(),peak['start'],peak['end'],peakname,int(10*peak["qscore"]),
+ *                            (chrom.decode(),peak['start'],peak['end'],peakname,int(10*peak[score_column]),
  *                             peak['fc'],peak['pscore'],peak['qscore'] ) )
  */
       __pyx_t_21 = PyUnicode_Format(__pyx_kp_u_s_d_d_s_d_6g_6g_6g, __pyx_t_22); if (unlikely(!__pyx_t_21)) __PYX_ERR(0, 1140, __pyx_L1_error)
@@ -22584,7 +22626,7 @@ static PyObject *__pyx_pf_5MACS2_2IO_6PeakIO_11BroadPeakIO_16write_to_broadPeak(
   __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
 
   /* "MACS2/IO/PeakIO.pyx":1143
- *                            (chrom.decode(),peak['start'],peak['end'],peakname,int(10*peak["qscore"]),
+ *                            (chrom.decode(),peak['start'],peak['end'],peakname,int(10*peak[score_column]),
  *                             peak['fc'],peak['pscore'],peak['qscore'] ) )
  *         return             # <<<<<<<<<<<<<<
  * 
@@ -22597,7 +22639,7 @@ static PyObject *__pyx_pf_5MACS2_2IO_6PeakIO_11BroadPeakIO_16write_to_broadPeak(
   /* "MACS2/IO/PeakIO.pyx":1071
  * 
  * 
- *     def write_to_broadPeak (self, fhd, bytes name_prefix=b"peak_", bytes name=b'peak', bytes description=b"%s", trackline=True):             # <<<<<<<<<<<<<<
+ *     def write_to_broadPeak (self, fhd, bytes name_prefix=b"peak_", bytes name=b'peak', bytes description=b"%s", str score_column="score", trackline=True):             # <<<<<<<<<<<<<<
  *         """Print out peaks in broadPeak format.
  * 
  */
