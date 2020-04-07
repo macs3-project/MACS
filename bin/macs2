@@ -434,7 +434,8 @@ def add_bdgbroadcall_parser( subparsers ):
                                          help = "maximum gap between significant peaks, better to set it as tag size. DEFAULT: 30", default = 30 )
     argparser_bdgbroadcall.add_argument( "-G", "--lvl2-max-gap", dest = "lvl2maxgap", type = int,
                                          help = "maximum linking between significant peaks, better to set it as 4 times of d value. DEFAULT: 800", default = 800)
-
+    argparser_bdgbroadcall.add_argument("--no-trackline", dest="trackline", action="store_false", default=True,
+                                         help="Tells MACS not to include trackline with bedGraph files. The trackline is required by UCSC.")
     add_outdir_option( argparser_bdgbroadcall )    
     add_output_group( argparser_bdgbroadcall )    
     return

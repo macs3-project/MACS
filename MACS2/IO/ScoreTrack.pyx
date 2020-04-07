@@ -1286,10 +1286,12 @@ cdef class scoreTrackII:
             blockNum += 1
             blockSizes = blockSizes+b",1"
             blockStarts = blockStarts + b"," + (b"%d" % (end-start-1))
-        
+
         # add to BroadPeakIO object
         bpeaks.add(chrom, start, end, score=lvl2peak["score"], thickStart=thickStart, thickEnd=thickEnd,
-                   blockNum = blockNum, blockSizes = blockSizes, blockStarts = blockStarts)
+                   blockNum = blockNum, blockSizes = blockSizes, blockStarts = blockStarts,  pileup = lvl2peak["pileup"],
+                   pscore = lvl2peak["pscore"], fold_change = lvl2peak["fc"],
+                   qscore = lvl2peak["qscore"] )
         return bpeaks
 
 cdef class TwoConditionScores:

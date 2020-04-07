@@ -901,7 +901,7 @@ cdef class BroadPeakIO:
             x += len(peaks[chrom])
         return x
   
-    def write_to_gappedPeak (self, fhd, bytes name_prefix=b"peak_", bytes name=b'peak', bytes description=b"%s", trackline=True):
+    def write_to_gappedPeak (self, fhd, bytes name_prefix=b"peak_", bytes name=b'peak', bytes description=b"%s", str score_column="score", trackline=True):
         """Print out peaks in gappedBed format. Only those with stronger enrichment regions are saved.
 
         This format is basically a BED12+3 format.
@@ -984,11 +984,11 @@ cdef class BroadPeakIO:
                 if peak["thickStart"] != b".":
                     fhd.write( "%s\t%d\t%d\t%s%d\t%d\t.\t%s\t%s\t0\t%d\t%s\t%s\t%.6g\t%.6g\t%.6g\n"
                                %
-                               (chrom.decode(),peak["start"],peak["end"],peakprefix.decode(),n_peak,int(10*peak["qscore"]),
+                               (chrom.decode(),peak["start"],peak["end"],peakprefix.decode(),n_peak,int(10*peak[score_column]),
                                 peak["thickStart"].decode(),peak["thickEnd"].decode(),
                                 peak["blockNum"],peak["blockSizes"].decode(),peak["blockStarts"].decode(), peak['fc'], peak['pscore'], peak['qscore'] ) )
 
-    def write_to_Bed12 (self, fhd, bytes name_prefix=b"peak_", bytes name=b'peak', bytes description=b"%s", trackline=True):
+    def write_to_Bed12 (self, fhd, bytes name_prefix=b"peak_", bytes name=b'peak', bytes description=b"%s", str score_column="score", trackline=True):
         """Print out peaks in Bed12 format.
 
         +--------------+------+----------------------------------------+
@@ -1059,16 +1059,16 @@ cdef class BroadPeakIO:
                     # this will violate gappedPeak format, since it's a complement like broadPeak line.
                     fhd.write( "%s\t%d\t%d\t%s%d\t%d\t.\n"
                                %
-                               (chrom.decode(),peak["start"],peak["end"],peakprefix.decode(),n_peak,int(10*peak["qscore"]) ) )
+                               (chrom.decode(),peak["start"],peak["end"],peakprefix.decode(),n_peak,int(10*peak[score_column]) ) )
                 else:
                     fhd.write( "%s\t%d\t%d\t%s%d\t%d\t.\t%s\t%s\t0\t%d\t%s\t%s\n"
                                %
-                               (chrom.decode(), peak["start"], peak["end"], peakprefix.decode(), n_peak, int(10*peak["qscore"]),
+                               (chrom.decode(), peak["start"], peak["end"], peakprefix.decode(), n_peak, int(10*peak[score_column]),
                                 peak["thickStart"].decode(), peak["thickEnd"].decode(),
                                 peak["blockNum"], peak["blockSizes"].decode(), peak["blockStarts"].decode() ))
 
 
-    def write_to_broadPeak (self, fhd, bytes name_prefix=b"peak_", bytes name=b'peak', bytes description=b"%s", trackline=True):
+    def write_to_broadPeak (self, fhd, bytes name_prefix=b"peak_", bytes name=b'peak', bytes description=b"%s", str score_column="score", trackline=True):
         """Print out peaks in broadPeak format.
 
         This format is designed for ENCODE project, and basically a
@@ -1138,7 +1138,7 @@ cdef class BroadPeakIO:
                 peak = these_peaks[0]
                 peakname = "%s%d" % (peakprefix.decode(), n_peak)
                 fhd.write( "%s\t%d\t%d\t%s\t%d\t.\t%.6g\t%.6g\t%.6g\n" %
-                           (chrom.decode(),peak['start'],peak['end'],peakname,int(10*peak["qscore"]),
+                           (chrom.decode(),peak['start'],peak['end'],peakname,int(10*peak[score_column]),
                             peak['fc'],peak['pscore'],peak['qscore'] ) )
         return
 

@@ -137,11 +137,7 @@ cdef tuple __fw_binary_parse_be ( const unsigned char * data ):
         uint8_t l_read_name
         uint16_t n_cigar_op
         int32_t cigar_code
-        uint8_t *ui8
-        #int8_t *i8
-        #uint16_t *ui16
-        #uint32_t *ui32
-        #int32_t *i32
+        uint8_t *ui8                      # we will only cast 1 byte at a time 
         int32_t i
         uint32_t shift0, shift
 
@@ -151,15 +147,11 @@ cdef tuple __fw_binary_parse_be ( const unsigned char * data ):
     if not data: return ( -1, -1, -1 )
 
     ui8 = <uint8_t *>data
-    #bwflag = ui16[7]
-    bwflag = ui8[15] << 8 | ui8[14]
+    bwflag = ui8[15] << 8 | ui8[14]       # it works as bwflag = ui16[7] in little-endian
 
     # we filter out unmapped sequence or bad sequence or  secondary or supplementary alignment
     # we filter out 2nd mate, not a proper pair, mate is unmapped
     if (bwflag & 2820) or (bwflag & 1 and (bwflag & 136 or not bwflag & 2)): return ( -1, -1, -1 )
-
-    #i8 = <int8_t *>data
-    #i32 = <int32_t *>data
 
     # the following three lins are for little-endian    
     #thisref = i32[0]
@@ -179,12 +171,11 @@ cdef tuple __fw_binary_parse_be ( const unsigned char * data ):
         # read mapped to minus strand; then we have to compute cigar to find the rightmost position
         l_read_name = ui8[8]
         # need to decipher CIGAR string
-        #ui32 = <uint32_t *>(data + 32 + l_read_name) # move pointer to cigar_code
+        # move pointer to cigar_code
         shift0 = 32 + l_read_name
         for i in range(n_cigar_op):
-            shift = shift0 + i*4
-            cigar_code = ui8[shift0+3] << 24 | ui8[shift0+2] << 16 | ui8[shift0+1] << 8 | ui8[shift0]
-            #for cigar_code in ui32[:n_cigar_op]:#unpack( '<%dI' % (n_cigar_op) , data[ 32 + l_read_name : 32 + l_read_name + n_cigar_op*4 ] ):
+            shift = shift0 + i*4          # move 32bit at a time
+            cigar_code = ui8[shift0+3] << 24 | ui8[shift0+2] << 16 | ui8[shift0+1] << 8 | ui8[shift0] # it works like cigar_code = ui32[...] in little-endian
             if cigar_code & 15 in [ 0, 2, 3, 7, 8 ]:   # they are CIGAR op M/D/N/=/X
                 thisstart += cigar_code >> 4
         thisstrand = 1
@@ -210,7 +201,6 @@ cdef tuple __pe_binary_parse_le (const unsigned char * data):
 
     ui16 = <uint16_t *>data
     bwflag = ui16[7]
-    #print ( f"Got {bwflag:}" )
     # we filter out unmapped, bad sequence, secondary/supplementary alignment
     # we filter out other mate of paired reads, not a proper pair, or mate is unmapped
     if (bwflag & 2820) or (bwflag & 1 and (bwflag & 136 or not bwflag & 2)):
@@ -245,58 +235,44 @@ cdef tuple __pe_binary_parse_be (const unsigned char * data):
         uint32_t tmp_thistlen
         int32_t nextpos, pos
         uint16_t bwflag
-        uint8_t *ui8
-        #int8_t *i8
-        #int32_t *i32
+        uint8_t *ui8                      # we will only cast 1 byte at a time 
         
     # we skip lot of the available information in data (i.e. tag name, quality etc etc)
     if not data:
         return ( -1, -1, -1 )
 
     ui8 = <uint8_t *>data
-    #bwflag = ui16[7]
-    bwflag = ui8[15] << 8 | ui8[14]
-    #print ( f"Got {bwflag:}" )
+
+    bwflag = ui8[15] << 8 | ui8[14]       # as le: bwflag = ui16[7]
     # we filter out unmapped, bad sequence, secondary/supplementary alignment
     # we filter out other mate of paired reads, not a proper pair, or mate is unmapped
     if (bwflag & 2820) or (bwflag & 1 and (bwflag & 136 or not bwflag & 2)):
         return ( -1, -1, -1 )
 
     i8 = <int8_t *>data
-    #i32 = <int32_t *>data    
-    #ui32 = <uint32_t *>data
 
     # the following three lins are for little-endian
-    #thisref = i32[0]
-    #pos = i32[1]
-    #nextpos = i32[6]
-    #tmp_thistlen = ui32[7]
+
+
+
     # to simplify the byte swap, we pretend all original numbers (thisref, pos, nextpos) positive
-    thisref = ui8[3] << 24 | ui8[2] << 16 | ui8[1] << 8 | ui8[0]
-    pos = ui8[7] << 24 | ui8[6] << 16 | ui8[5] << 8 | ui8[4]
-    nextpos = ui8[27] << 24 | ui8[26] << 16 | ui8[25] << 8 | ui8[24]
+    thisref = ui8[3] << 24 | ui8[2] << 16 | ui8[1] << 8 | ui8[0]   # as le:thisref = i32[0]
+    pos = ui8[7] << 24 | ui8[6] << 16 | ui8[5] << 8 | ui8[4]       # as le:pos = i32[1]
+    nextpos = ui8[27] << 24 | ui8[26] << 16 | ui8[25] << 8 | ui8[24] # as le:nextpos = i32[6]
 
     # thistlen can be negative, so we byte swap it then convert to int32_t then take abs (maybe there is more effecient way?)
-    
-    tmp_thistlen = ui8[31] << 24 | ui8[30] << 16 | ui8[29] << 8 | ui8[28]
+    tmp_thistlen = ui8[31] << 24 | ui8[30] << 16 | ui8[29] << 8 | ui8[28] # as le:tmp_thistlen = ui32[7]
     thistlen = abs(<int32_t> tmp_thistlen)
     
-    thisstart = pos if nextpos > pos else nextpos #min(pos, nextpos) # we keep only the leftmost
     # position which means this must
     # be at + strand. So we don't
     # need to decipher CIGAR string.
-    #if thistlen < 0: thistlen *= -1
-    #thistlen = abs( thistlen )                    # Actually, if
-    #                                             # the value
-    #                                             # unpacked is
-    #                                             # negative, then
-    #                                             # nextpos is the
-    #                                             # leftmost
-    #                                             # position.
+    thisstart = pos if nextpos > pos else nextpos #min(pos, nextpos) # we keep only the leftmost
+
     return ( thisref, thisstart, thistlen )
     
 
-# choose a parser
+# choose a parser according to endian
 if is_le:
     se_entry_parser = __fw_binary_parse_le
     pe_entry_parser = __pe_binary_parse_le

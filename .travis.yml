@@ -4,30 +4,39 @@ dist: bionic
 jobs:
   include:
     # i386: Intel 32-bit
-    - name: i386
+    # Python is determined by test/Dockerfile
+    # Since the docker uses default bionic, python 3.6 is used for this test.
+    - name: i386_py3.6
       language: shell
       install: |
         docker run --rm --privileged multiarch/qemu-user-static --reset -p yes &&
           docker build --rm --build-arg BASE_IMAGE="i386/ubuntu:bionic" -t macs -f test/Dockerfile .
       script: |
         docker run --rm -t macs bash -cx "pytest --runxfail && cd test && ./cmdlinetest macs2"
-    - name: amd64
+    - name: amd64_py3.8
       arch: amd64
       python: 3.8
-    - name: arm64
+    - name: amd64_py3.7
+      arch: amd64
+      python: 3.7
+    - name: amd64_py3.6
+      arch: amd64
+      python: 3.6      
+    - name: arm64_py3.8
       arch: arm64
       python: 3.8
-    - name: ppc64le
+    - name: ppc64le_py3.8
       arch: ppc64le
       python: 3.8     
-    - name: s390x
+    - name: s390x_py3.8
       arch: s390x
       python: 3.8
   allow_failures:
-  #  - name: i386 
-  #  - name: arm64
-  #  - name: ppc64le
-  #  - name: s390x
+  #  - name: i386_py3.6
+    # this one may time out depending on the load on travis CI
+    - name: arm64_py3.8
+  #  - name: ppc64le_py3.8
+  #  - name: s390x_py3.8
   fast_finish: true
 install:
   - pip install --upgrade pip
