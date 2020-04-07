@@ -322,11 +322,11 @@ def run( args ):
     else:
         info("#4 Write broad peak in broadPeak format file... %s" % (options.peakBroadPeak))
         ofhd_bed = open( options.peakBroadPeak, "w" )
-        peakdetect.peaks.write_to_broadPeak (ofhd_bed, name_prefix=b"%s_peak_", name=options.name.encode(), description=options.name.encode(), trackline=options.trackline)
+        peakdetect.peaks.write_to_broadPeak (ofhd_bed, name_prefix=b"%s_peak_", name=options.name.encode(), description=options.name.encode(), score_column=score_column, trackline=options.trackline)
         ofhd_bed.close()
         info("#4 Write broad peak in bed12/gappedPeak format file... %s" % (options.peakGappedPeak))
         ofhd_bed = open( options.peakGappedPeak, "w" )
-        peakdetect.peaks.write_to_gappedPeak (ofhd_bed, name_prefix=b"%s_peak_", name=options.name.encode(), description=options.name.encode(), trackline=options.trackline)
+        peakdetect.peaks.write_to_gappedPeak (ofhd_bed, name_prefix=b"%s_peak_", name=options.name.encode(), description=options.name.encode(), score_column=score_column, trackline=options.trackline)
         ofhd_bed.close()
 
     info("Done!")
