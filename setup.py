@@ -27,7 +27,7 @@ def main():
     cwd = os.path.abspath(os.path.dirname(__file__))
 
     # install required numpy
-    p = subprocess.call(['pip','install', f'numpy{numpy_requires}'],cwd=cwd)
+    p = subprocess.call([sys.executable, "-m", 'pip', 'install', f'numpy{numpy_requires}'],cwd=cwd)
     if p != 0:
         # Could be due to a too old pip version and build isolation, check that
         try:
