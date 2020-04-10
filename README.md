@@ -56,9 +56,10 @@ background*.
 	5) The obsolete option `--ratio` from `callpeak` subcommand has
 	been removed. PR #369, issue #366
 
-	6) Fixed the incorrect description in README on the 'maximum
-	length of broad region is 4 tims of d' to 'maximum gap for merging
-	broad regions is 4 times of tag size by default'. PR #, issue #365.
+	6) Fixed the incorrect description in README on the 'maximum 
+	length of broad region is 4 times of d' to 'maximum gap for 
+	merging broad regions is 4 times of tag size by default'. PR #380, 
+	issue #365.
 
 	* Other
 
