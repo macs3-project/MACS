@@ -28,7 +28,42 @@ applied to any "DNA enrichment assays" if the question to be asked is
 simply: *where we can find significant reads coverage than the random
 background*.
 
-## Recent Changes for MACS (2.2.6)
+## Recent Changes for MACS (2.2.7)
+
+### 2.2.7
+	* Bugs fixed
+
+	1) MACS2 has been tested on multiple architectures to make sure it
+	can successfully generate consistent results. Current supported
+	architectures are: AMD64, ARM64, i386, PPC64LE, and S390X. Thanks
+	to @mr-c, @junaruga, and @tillea! Related to issue #340, #349,
+	#351, and #359; to PR #348, #350, #360, #361, #367, and #370. The
+	lesson is that if the project is built on Cython and is aimed at
+	memory efficiency, we should specifically define all int/float
+	types in pyx files such as int8_t or uint32_t using either libc or
+	numpy (c version) instead of relying on Cython types such as
+	short, long, double.
+
+	2) MACS2 setup script will check numpy and install numpy if
+	necessary. PR #378, issue #364
+
+	3) `bdgbroadcall` command will correctly add the score column (5th
+	column). The score (5th) column contain 10 times of the average
+	score in the broad region. PR #373, issue #362
+
+	4) The missing test on `bdgopt` subcommand has been added. PR #363
+
+	5) The obsolete option `--ratio` from `callpeak` subcommand has
+	been removed. PR #369, issue #366
+
+	6) Fixed the incorrect description in README on the 'maximum
+	length of broad region is 4 tims of d' to 'maximum gap for merging
+	broad regions is 4 times of tag size by default'. PR #, issue #365.
+
+	* Other
+
+	1) CODE OF CONDUCT document has been added to MACS2 github
+	repository. PR #358
 
 ### 2.2.6
 	* New Features 
@@ -62,36 +97,6 @@ background*.
 	memory usage in 1 sec interval -- a bit more accurate.
 	
 	2) Python3.5 support is removed. Now MACS2 requires Python>=3.6.
-
-### 2.2.5
-	* Features added
-
-	1) *Github code only and Not included in MACS2 release* New
-	testing data for performance test. An subsampled ENCODE2 CTCF
-	ChIP-seq dataset, including 5million ChIP reads and 5 million
-	control reads, has been included in the test folder for testing
-	CPU and memory usage (i.e. 5M test). Several related scripts ,
-	including `prockreport` for output cpu memory usage, `pyprofile`
-	and `pyprofile_stat` for debuging and profiling MACS2 codes, have
-	been included.
-
-	2) Speed up pvalue-qvalue checkup (pqtable checkup) #335 #338.
-	The old hashtable.pyx implementation copied from Pandas (very old
-	version) doesn't work well in Python3+Cython. It slows down the
-	pqtable checkup using the identical Cython codes as in
-	v2.1.4. While running 5M test, the `__getitem__` function in the
-	hashtable.pyx took 3.5s with 37,382,037 calls in MACS2 v2.1.4, but
-	148.6s with the same number of calls in MACS2 v2.2.4. As a
-	consequence, the standard python dictionary implementation has
-	replaced hashtable.pyx for pqtable checkup. Now MACS2 runs a bit
-	faster than py2 version, but uses a bit more memory. In general,
-	v2.2.5 can finish 5M reads test in 20% less time than MACS2
-	v2.1.4, but use 15% more memory.
-
-	* Bug fixed
-
-	1) More Python3 related fixes, e.g. the return value of keys from
-	py3 dict. #333 #337
 
 ## Install
 
@@ -127,32 +132,31 @@ Subcommand | Description
 `randsample` | Randomly choose a number/percentage of total reads.
 `refinepeak` | Take raw reads alignment, refine peak summits.
 
-We only cover `callpeak` module in this document. Please use `macs2
-COMMAND -h` to see the detail description for each option of each
-module.
+We only cover `callpeak` subcommand in this document. Please use
+`macs2 COMMAND -h` to see the detail description for each option of
+each subcommand.
 
 ### Call peaks
 
-This is the main function in MACS2. It can be invoked by 'macs2
-callpeak' command. If you type this command without parameters, you
-will see a full description of command-line options. Here we only list
-the essential options.
+This is the main function in MACS2. It can be invoked by `macs2
+callpeak` . If you type this command with `-h`, you will see a full
+description of command-line options. Here we only list the essentials.
 
 #### Essential Options
 
-##### `-t/--treatment FILENAME`
+##### `-t`/`--treatment FILENAME`
 
 This is the only REQUIRED parameter for MACS. The file can be in any
-supported format specified by `--format` option. Check `--format` for
-detail. If you have more than one alignment file, you can specify them
-as `-t A B C`. MACS will pool up all these files together.
+supported format -- see detail in the `--format` option. If you have
+more than one alignment file, you can specify them as `-t A B C`. MACS
+will pool up all these files together.
 
-##### `-c/--control`
+##### `-c`/`--control`
 
-The control or mock data file. Please follow the same direction as for
-`-t`/`--treatment`.
+The control, genomic input or mock IP data file. Please follow the
+same direction as for `-t`/`--treatment`.
 
-##### `-n/--name`
+##### `-n`/`--name`
 
 The name string of the experiment. MACS will use this string NAME to
 create output files like `NAME_peaks.xls`, `NAME_negative_peaks.xls`,
@@ -163,21 +167,29 @@ files.
 ##### `--outdir`
 
 MACS2 will save all output files into the specified folder for this
-option.
+option. A new folder will be created if necessary.
 
-##### `-f/--format FORMAT`
+##### `-f`/`--format FORMAT`
 
 Format of tag file can be `ELAND`, `BED`, `ELANDMULTI`, `ELANDEXPORT`,
-`ELANDMULTIPET` (for pair-end tags), `SAM`, `BAM`, `BOWTIE`, `BAMPE`
-or `BEDPE`. Default is `AUTO` which will allow MACS to decide the
-format automatically. `AUTO` is also useful when you combine different
-formats of files. Note that MACS can't detect `BAMPE` or `BEDPE`
-format with `AUTO`, and you have to implicitly specify the format for
-`BAMPE` and `BEDPE`.
+`SAM`, `BAM`, `BOWTIE`, `BAMPE`, or `BEDPE`. Default is `AUTO` which
+will allow MACS to decide the format automatically. `AUTO` is also
+useful when you combine different formats of files. Note that MACS
+can't detect `BAMPE` or `BEDPE` format with `AUTO`, and you have to
+implicitly specify the format for `BAMPE` and `BEDPE`.
 
-Nowadays, the most common formats are BED or BAM/SAM.
+Nowadays, the most common formats are `BED` or `BAM` (including
+`BEDPE` and `BAMPE`). Our recommandation is to convert your data to
+`BED` or `BAM` first.
 
-###### BED
+Also, MACS2 can detect and read gzipped file. For example, `.bed.gz`
+file can be directly used without being uncompressed with `--format
+BED`.
+
+Here are detailed explanation of the recommanded formats:
+
+###### `BED`
+
 The BED format can be found at [UCSC genome browser
 website](http://genome.ucsc.edu/FAQ/FAQformat#format1).
 
@@ -185,43 +197,44 @@ The essential columns in BED format input are the 1st column
 `chromosome name`, the 2nd `start position`, the 3rd `end position`,
 and the 6th, `strand`.
 
-Note that, for BED format, the 6th column of strand information is
+Note that, for `BED` format, the 6th column of strand information is
 required by MACS. And please pay attention that the coordinates in BED
-format are zero-based and half-open
-(http://genome.ucsc.edu/FAQ/FAQtracks#tracks1).
+format are zero-based and half-open. See more detail at
+[UCSC site](http://genome.ucsc.edu/FAQ/FAQtracks#tracks1).
 
-###### BAM/SAM
+###### `BAM`/`SAM`
 
-If the format is BAM/SAM, please check the definition in
-(http://samtools.sourceforge.net/samtools.shtml).  If the BAM file is
+If the format is `BAM`/`SAM`, please check the definition in
+(http://samtools.sourceforge.net/samtools.shtml).  If the `BAM` file is
 generated for paired-end data, MACS will only keep the left mate(5'
-end) tag. However, when format BAMPE is specified, MACS will use the
+end) tag. However, when format `BAMPE` is specified, MACS will use the
 real fragments inferred from alignment results for reads pileup.
 
-###### BEDPE or BAMPE
+###### `BEDPE` or `BAMPE`
 
 A special mode will be triggered while the format is specified as
-'BAMPE' or 'BEDPE'. In this way, MACS2 will process the BAM or BED
+`BAMPE` or `BEDPE`. In this way, MACS2 will process the `BAM` or `BED`
 files as paired-end data. Instead of building a bimodal distribution
 of plus and minus strand reads to predict fragment size, MACS2 will
 use actual insert sizes of pairs of reads to build fragment pileup.
 
-The BAMPE format is just a BAM format containing paired-end alignment
-information, such as those from BWA or BOWTIE.
+The `BAMPE` format is just a `BAM` format containing paired-end alignment
+information, such as those from `BWA` or `BOWTIE`.
 
-The BEDPE format is a simplified and more flexible BED format, which
-only contains the first three columns defining the chromosome name,
-left and right position of the fragment from Paired-end
-sequencing. Please note, this is NOT the same format used by BEDTOOLS,
-and the BEDTOOLS version of BEDPE is actually not in a standard BED
-format. You can use MACS2 subcommand `randsample` to convert a BAM
-file containing paired-end information to a BEDPE format file:
+The `BEDPE` format is a simplified and more flexible `BED` format,
+which only contains the first three columns defining the chromosome
+name, left and right position of the fragment from Paired-end
+sequencing. Please note, this is NOT the same format used by
+`BEDTOOLS`, and the `BEDTOOLS` version of `BEDPE` is actually not in a
+standard `BED` format. You can use MACS2 subcommand `randsample` to
+convert a `BAM` file containing paired-end information to a `BEDPE`
+format file:
 
 ```
 macs2 randsample -i the_BAMPE_file.bam -f BAMPE -p 100 -o the_BEDPE_file.bed
 ```
 
-##### `-g/--gsize`
+##### `-g`/`--gsize`
 
 PLEASE assign this parameter to fit your needs!
 
@@ -246,20 +259,20 @@ difference of peak calls, because this number is used to estimate a
 genome-wide noise level which is usually the least significant one
 compared with the *local biases* modeled by MACS.
 
-##### `-s/--tsize`
+##### `-s`/`--tsize`
 
 The size of sequencing tags. If you don't specify it, MACS will try to
 use the first 10 sequences from your input treatment file to determine
 the tag size. Specifying it will override the automatically determined
 tag size.
 
-##### `-q/--qvalue`
+##### `-q`/`--qvalue`
 
 The q-value (minimum FDR) cutoff to call significant regions. Default
 is 0.05. For broad marks, you can try 0.05 as the cutoff. Q-values are
 calculated from p-values using the Benjamini-Hochberg procedure.
 
-##### `-p/--pvalue`
+##### `-p`/`--pvalue`
 
 The p-value cutoff. If `-p` is specified, MACS2 will use p-value instead
 of q-value.
@@ -269,16 +282,19 @@ of q-value.
 These two options can be used to fine-tune the peak calling behavior
 by specifying the minimum length of a called peak and the maximum
 allowed a gap between two nearby regions to be merged. In another
-word, a called peak has to be longer than *min-length*, and if the
-distance between two nearby peaks is smaller than *max-gap* then they
+word, a called peak has to be longer than `min-length`, and if the
+distance between two nearby peaks is smaller than `max-gap` then they
 will be merged as one. If they are not set, MACS2 will set the DEFAULT
-value for *min-length* as the predicted fragment size *d*, and the
-DEFAULT value for *max-gap* as the detected read length. Note, if you
-set a *min-length* value smaller than the fragment size, it may have
-NO effect on the result. For BROAD peak calling, try to set a large
-value such as 500bps. You can also use '--cutoff-analysis' option with
-the default setting, and check the column 'avelpeak' under different
-cutoff values to decide a reasonable *min-length* value.
+value for `min-length` as the predicted fragment size `d`, and the
+DEFAULT value for `max-gap` as the detected read length. Note, if you
+set a `min-length` value smaller than the fragment size, it may have
+NO effect on the result. For broad peak calling with `--broad` option
+set, the DEFAULT `max-gap` for merging nearby stonger peaks will be
+the same as narrow peak calling, and 4 times of the `max-gap` will be
+used to merge nearby weaker (broad) peaks. You can also use
+`--cutoff-analysis` option with the default setting, and check the
+column `avelpeak` under different cutoff values to decide a reasonable
+`min-length` value.
 
 ##### `--nolambda`
 
@@ -340,9 +356,9 @@ nucleosomes using a half-nucleosome size for wavelet analysis
 
 It controls the MACS behavior towards duplicate tags at the exact same
 location -- the same coordination and the same strand. The default
-'auto' option makes MACS calculate the maximum tags at the exact same
+`auto` option makes MACS calculate the maximum tags at the exact same
 location based on binomial distribution using 1e-5 as p-value cutoff;
-and the 'all' option keeps every tags.  If an integer is given, at
+and the `all` option keeps every tags.  If an integer is given, at
 most this number of tags will be kept at the same location. The
 default is to keep one tag at the same location. Default: 1
 
@@ -351,9 +367,11 @@ default is to keep one tag at the same location. Default: 1
 When this flag is on, MACS will try to composite broad regions in
 BED12 ( a gene-model-like format ) by putting nearby highly enriched
 regions into a broad region with loose cutoff. The broad region is
-controlled by another cutoff through `--broad-cutoff`. The maximum
-length of broad region length is 4 times of d from MACS. DEFAULT:
-False
+controlled by another cutoff through `--broad-cutoff`. Please note
+that, the `max-gap` value for merging nearby weaker/broad peaks is 4
+times of `max-gap` for merging nearby stronger peaks. The later one
+can be controlled by `--max-gap` option, and by default it is the
+average fragment/insertion length in the PE data. DEFAULT: False
 
 ##### `--broad-cutoff`
 
@@ -363,12 +381,12 @@ it's a q-value cutoff.  DEFAULT: 0.1
 
 ##### `--scale-to <large|small>`
 
-When set to "large", linearly scale the smaller dataset to the same
-depth as larger dataset. By default or being set as "small", the
+When set to `large`, linearly scale the smaller dataset to the same
+depth as larger dataset. By default or being set as `small`, the
 larger dataset will be scaled towards the smaller dataset. Beware, to
 scale up small data would cause more false positives.
 
-##### `-B/--bdg`
+##### `-B`/`--bdg`
 
 If this flag is on, MACS will store the fragment pileup, control
 lambda in bedGraph files. The bedGraph files will be stored in the

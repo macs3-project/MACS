@@ -1,3 +1,40 @@
+2020-04-10  Tao Liu  <vladimir.liu@gmail.com>
+	MACS version 2.2.7
+
+	* Bugs fixed
+
+	1) MACS2 has been tested on multiple architectures to make sure it
+	can successfully generate consistent results. Current supported
+	architectures are: AMD64, ARM64, i386, PPC64LE, and S390X. Thanks
+	to @mr-c, @junaruga, and @tillea! Related to issue #340, #349,
+	#351, and #359; to PR #348, #350, #360, #361, #367, and #370. The
+	lesson is that if the project is built on Cython and is aimed at
+	memory efficiency, we should specifically define all int/float
+	types in pyx files such as int8_t or uint32_t using either libc or
+	numpy (c version) instead of relying on Cython types such as
+	short, long, double.
+
+	2) MACS2 setup script will check numpy and install numpy if
+	necessary. PR #378, issue #364
+
+	3) `bdgbroadcall` command will correctly add the score column (5th
+	column). The score (5th) column contain 10 times of the average
+	score in the broad region. PR #373, issue #362
+
+	4) The missing test on `bdgopt` subcommand has been added. PR #363
+
+	5) The obsolete option `--ratio` from `callpeak` subcommand has
+	been removed. PR #369, issue #366
+
+	6) Fixed the incorrect description in README on the 'maximum
+	length of broad region is 4 tims of d' to 'maximum gap for merging
+	broad regions is 4 times of tag size by default'. PR #, issue #365.
+
+	* Other
+
+	1) CODE OF CONDUCT document has been added to MACS2 github
+	repository. PR #358
+
 2019-12-12  Tao Liu  <vladimir.liu@gmail.com>
 	MACS version 2.2.6
 
