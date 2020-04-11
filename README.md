@@ -34,21 +34,21 @@ background*.
 	* Bugs fixed
 
 	1) MACS2 has been tested on multiple architectures to make sure it
-	can successfully generate consistent results. Current supported
-	architectures are: AMD64, ARM64, i386, PPC64LE, and S390X. Thanks
-	to @mr-c, @junaruga, and @tillea! Related to issue #340, #349,
-	#351, and #359; to PR #348, #350, #360, #361, #367, and #370. The
-	lesson is that if the project is built on Cython and is aimed at
-	memory efficiency, we should specifically define all int/float
-	types in pyx files such as int8_t or uint32_t using either libc or
-	numpy (c version) instead of relying on Cython types such as
-	short, long, double.
+	can successfully generate consistent results. Currently the
+	supported architectures are: AMD64, ARM64, i386, PPC64LE, and
+	S390X. Thanks to @mr-c, @junaruga, and @tillea! Related to issue
+	#340, #349, #351, and #359; to PR #348, #350, #360, #361, #367,
+	and #370. The lesson is that if the project is built on Cython and
+	is aimed at memory efficiency, we should specifically define all
+	int/float types in pyx files such as int8_t or uint32_t using
+	either libc or numpy (c version) instead of relying on Cython
+	types such as short, long, double.
 
 	2) MACS2 setup script will check numpy and install numpy if
 	necessary. PR #378, issue #364
 
 	3) `bdgbroadcall` command will correctly add the score column (5th
-	column). The score (5th) column contain 10 times of the average
+	column). The score (5th) column contains 10 times of the average
 	score in the broad region. PR #373, issue #362
 
 	4) The missing test on `bdgopt` subcommand has been added. PR #363
@@ -56,9 +56,9 @@ background*.
 	5) The obsolete option `--ratio` from `callpeak` subcommand has
 	been removed. PR #369, issue #366
 
-	6) Fixed the incorrect description in README on the 'maximum 
-	length of broad region is 4 times of d' to 'maximum gap for 
-	merging broad regions is 4 times of tag size by default'. PR #380, 
+	6) Fixed the incorrect description in README on the 'maximum
+	length of broad region is 4 times of d' to 'maximum gap for
+	merging broad regions is 4 times of tag size by default'. PR #380,
 	issue #365.
 
 	* Other
@@ -180,7 +180,7 @@ can't detect `BAMPE` or `BEDPE` format with `AUTO`, and you have to
 implicitly specify the format for `BAMPE` and `BEDPE`.
 
 Nowadays, the most common formats are `BED` or `BAM` (including
-`BEDPE` and `BAMPE`). Our recommandation is to convert your data to
+`BEDPE` and `BAMPE`). Our recommendation is to convert your data to
 `BED` or `BAM` first.
 
 Also, MACS2 can detect and read gzipped file. For example, `.bed.gz`
@@ -282,15 +282,15 @@ of q-value.
 
 These two options can be used to fine-tune the peak calling behavior
 by specifying the minimum length of a called peak and the maximum
-allowed a gap between two nearby regions to be merged. In another
-word, a called peak has to be longer than `min-length`, and if the
-distance between two nearby peaks is smaller than `max-gap` then they
-will be merged as one. If they are not set, MACS2 will set the DEFAULT
-value for `min-length` as the predicted fragment size `d`, and the
-DEFAULT value for `max-gap` as the detected read length. Note, if you
-set a `min-length` value smaller than the fragment size, it may have
-NO effect on the result. For broad peak calling with `--broad` option
-set, the DEFAULT `max-gap` for merging nearby stonger peaks will be
+allowed a gap between two nearby regions to be merged. In other words,
+a called peak has to be longer than `min-length`, and if the distance
+between two nearby peaks is smaller than `max-gap` then they will be
+merged as one. If they are not set, MACS2 will set the DEFAULT value
+for `min-length` as the predicted fragment size `d`, and the DEFAULT
+value for `max-gap` as the detected read length. Note, if you set a
+`min-length` value smaller than the fragment size, it may have NO
+effect on the result. For broad peak calling with `--broad` option
+set, the DEFAULT `max-gap` for merging nearby stronger peaks will be
 the same as narrow peak calling, and 4 times of the `max-gap` will be
 used to merge nearby weaker (broad) peaks. You can also use
 `--cutoff-analysis` option with the default setting, and check the
@@ -359,9 +359,9 @@ It controls the MACS behavior towards duplicate tags at the exact same
 location -- the same coordination and the same strand. The default
 `auto` option makes MACS calculate the maximum tags at the exact same
 location based on binomial distribution using 1e-5 as p-value cutoff;
-and the `all` option keeps every tags.  If an integer is given, at
-most this number of tags will be kept at the same location. The
-default is to keep one tag at the same location. Default: 1
+and the `all` option keeps every tag.  If an integer is given, at most
+this number of tags will be kept at the same location. The default is
+to keep one tag at the same location. Default: 1
 
 ##### `--broad`
 
@@ -383,7 +383,7 @@ it's a q-value cutoff.  DEFAULT: 0.1
 ##### `--scale-to <large|small>`
 
 When set to `large`, linearly scale the smaller dataset to the same
-depth as larger dataset. By default or being set as `small`, the
+depth as the larger dataset. By default or being set as `small`, the
 larger dataset will be scaled towards the smaller dataset. Beware, to
 scale up small data would cause more false positives.
 
