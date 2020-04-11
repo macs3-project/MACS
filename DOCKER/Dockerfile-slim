@@ -1,16 +1,16 @@
 # Use an official Python runtime as a parent image
-FROM python:3.7 AS build
+FROM python:3.8 AS build
 
 # install numpy and MACS2
 RUN git clone https://github.com/taoliu/MACS.git /MACS
 RUN pip install --trusted-host pypi.python.org --upgrade pip && pip install --trusted-host pypi.python.org -r /MACS/requirements.txt
 RUN cd /MACS && python setup.py install
 
-FROM python:3.7-slim
+FROM python:3.8-slim
 
 # copy compiled files over to python-slim
 COPY --from=build /usr/local/bin/macs2 /usr/local/bin/
-COPY --from=build /usr/local/lib/python3.7/site-packages/ /usr/local/lib/python3.7/site-packages/
+COPY --from=build /usr/local/lib/python3.8/site-packages/ /usr/local/lib/python3.8/site-packages/
 
 # Define environment variable
 ENTRYPOINT ["macs2"]

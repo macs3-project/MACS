@@ -1,4 +1,4 @@
-# Official MACS2 v2.2.6 docker
+# Official MACS2 v2.2.7 docker
 
 MACS2 is a bioinformatics algorithm to analyze ChIP-seq datasets. 
 
@@ -6,13 +6,13 @@ MACS2 is a bioinformatics algorithm to analyze ChIP-seq datasets.
 
 ## Pull the image
 
-Currently, there are two types of MACS2 images, one based on official Python3.7 docker image, and the other based on official Python3.7-slim docker image. Only if space is a concern, and you keep using Python3.7-slim docker for all the Python 3.7 applications, pull the slim one.
+Currently, there are two types of MACS2 images, one based on official Python3.8 docker image, and the other based on official Python3.8-slim docker image. Only if space is a concern, and you keep using Python3.8-slim docker for all the Python 3.8 applications, pull the slim one.
 
 To pull the regular MACS2 image:
 
 ```docker pull fooliu/macs2```
 
-To pull the MACS2 image based on Python3.7-slim
+To pull the MACS2 image based on Python3.8-slim
 
 ```docker pull fooliu/macs2:py37-slim```
 
@@ -28,7 +28,7 @@ The first part ```-v $PWD:/data/``` will mount the CURRENT directory ```$PWD``` 
 
 # Built with
 
-* Python3.7 docker image 3.7
+* Python3.8 docker image 3.8
 * pip install numpy version 1.17, cython 0.29, and pytest 4.6 
 * git clone MACS codes from github master branch then run ```setup.py```
 
