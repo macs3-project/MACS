@@ -46,7 +46,7 @@ script:
   - pytest --runxfail
   - cd test
   - ./cmdlinetest macs2
-  #- cd ..
+  - cd ..
 deploy:
   provider: pypi
   username:
@@ -54,7 +54,9 @@ deploy:
   password:
     secure: NBq2RSTUjhQf4GlxSGg1e9P8vIQrtVskhOc1j6mIYE1zRGEIQFlrujE11+KDrGBoD7KAtWS4HjTFZEctI5nI+YYrZOg0Fu5XgDHD7rRD10qp3/Ipmack3i4pl6JDyyOiIJVmt0+IcN4+fxfIsTrs0XRLSGDw1GaO91V05RpY5GJZ5+crXaUQKsFzvwFgznnqQPK2dY/NsqC63TkYvpiiI4Sn5Eb78XW8kjtEzM84bYFcwMWofib75v8qqRGEabHxUBlXBfWOoDS78T58MdZK+DQ/HJT9XFU0yF1yJ2IhMOHUxnvH2E/nKuLwA3fUBXsPpHFmsbRhgKlCyPUhqjKAhsRyZHqfU6BaF7yJOejeCwbcY6EzQzwQvGr4UQUG6EX49YskKYrwb7IXqC8Y3OjD8maUMdpWU249dPwqDvkwjASa8FlN6LIxJ28f0qd7y1EDFZwM12kS0pdNimxTmxEMYBy76jBxOKDG3Hr349E6Q67trVktbNfp0PdUFVSWqxeJrdujl38w4h07hPKTESugqasPVO/gaY+8+f+xrB7F3TXLDSN+5Dcr9srVX4V2Z72rJtoxrggMbY/n8RUXNC1+45QnRAv/6iLoingtlOwo3p0xA25J7kl7akWqPaP2MwQ+eoPvMgZwrS/S+5Q+7t/rwZn0SkjjSJZIIwB++Ccjbfc=
   on:
+    repo: taoliu/MACS
     tags: true
+    condition: $TRAVIS_JOB_NAME =~ ^amd64_py3.8$
   skip_existing: true
   distributions: sdist
 
