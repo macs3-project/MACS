@@ -1,7 +1,10 @@
-2020-04-11  Tao Liu  <taoliu@taos-mbp.lan>
+2020-04-11  Tao Liu  <vladimir.liu@gmail.com>
 	MACS version 2.2.7.1
 
-	* hot fix: Add 'wheel' and 'pip' to pyproject.toml
+	* hotfix:
+
+	Add 'wheel' and 'pip' to pyproject.toml so that `pip install` can
+	work.
 
 2020-04-10  Tao Liu  <vladimir.liu@gmail.com>
 	MACS version 2.2.7

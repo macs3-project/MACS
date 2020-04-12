@@ -28,7 +28,14 @@ applied to any "DNA enrichment assays" if the question to be asked is
 simply: *where we can find significant reads coverage than the random
 background*.
 
-## Recent Changes for MACS (2.2.7)
+## Recent Changes for MACS (2.2.7.1)
+
+### 2.2.7.1
+	* hotfix: 
+
+	Add 'wheel' and 'pip' to pyproject.toml so that `pip install` can 
+	work.
+
 
 ### 2.2.7
 	* Bugs fixed
