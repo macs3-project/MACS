@@ -446,7 +446,7 @@ cdef class CallerFromAlignments:
         self.cutoff_analysis_filename = cutoff_analysis_filename.encode()
 
     cpdef destroy ( self ):
-        """Remove temparary files for pileup values of each chromosome.
+        """Remove temporary files for pileup values of each chromosome.
 
         Note: This function MUST be called if the class object won't
         be used anymore.

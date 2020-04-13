@@ -7357,7 +7357,7 @@ static int __pyx_pf_5MACS2_2IO_12CallPeakUnit_20CallerFromAlignments___init__(st
  *         self.cutoff_analysis_filename = cutoff_analysis_filename.encode()
  * 
  *     cpdef destroy ( self ):             # <<<<<<<<<<<<<<
- *         """Remove temparary files for pileup values of each chromosome.
+ *         """Remove temporary files for pileup values of each chromosome.
  * 
  */
 
@@ -7544,7 +7544,7 @@ static PyObject *__pyx_f_5MACS2_2IO_12CallPeakUnit_20CallerFromAlignments_destro
  *         self.cutoff_analysis_filename = cutoff_analysis_filename.encode()
  * 
  *     cpdef destroy ( self ):             # <<<<<<<<<<<<<<
- *         """Remove temparary files for pileup values of each chromosome.
+ *         """Remove temporary files for pileup values of each chromosome.
  * 
  */
 
@@ -7566,7 +7566,7 @@ static PyObject *__pyx_f_5MACS2_2IO_12CallPeakUnit_20CallerFromAlignments_destro
 
 /* Python wrapper */
 static PyObject *__pyx_pw_5MACS2_2IO_12CallPeakUnit_20CallerFromAlignments_3destroy(PyObject *__pyx_v_self, CYTHON_UNUSED PyObject *unused); /*proto*/
-static char __pyx_doc_5MACS2_2IO_12CallPeakUnit_20CallerFromAlignments_2destroy[] = "Remove temparary files for pileup values of each chromosome.\n\n        Note: This function MUST be called if the class object won't\n        be used anymore.\n\n        ";
+static char __pyx_doc_5MACS2_2IO_12CallPeakUnit_20CallerFromAlignments_2destroy[] = "Remove temporary files for pileup values of each chromosome.\n\n        Note: This function MUST be called if the class object won't\n        be used anymore.\n\n        ";
 static PyObject *__pyx_pw_5MACS2_2IO_12CallPeakUnit_20CallerFromAlignments_3destroy(PyObject *__pyx_v_self, CYTHON_UNUSED PyObject *unused) {
   PyObject *__pyx_r = 0;
   __Pyx_RefNannyDeclarations
@@ -30646,7 +30646,7 @@ if (!__Pyx_RefNanny) {
  *         self.cutoff_analysis_filename = cutoff_analysis_filename.encode()
  * 
  *     cpdef destroy ( self ):             # <<<<<<<<<<<<<<
- *         """Remove temparary files for pileup values of each chromosome.
+ *         """Remove temporary files for pileup values of each chromosome.
  * 
  */
   __Pyx_TraceLine(448,0,__PYX_ERR(0, 448, __pyx_L1_error))
