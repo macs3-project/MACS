@@ -85,6 +85,10 @@ echo "4. predictd"
 
 mkdir ${TAG}_run_predictd
 
+macs2 predictd -i $CHIPPE -f BAMPE --outdir ${TAG}_run_predictd &> ${TAG}_run_predictd/run_predictd_bampe.log
+
+macs2 predictd -i $CHIPBEDPE -f BEDPE --outdir ${TAG}_run_predictd &> ${TAG}_run_predictd/run_predictd_bedpe.log
+
 macs2 predictd -g 52000000 -i $CHIP --d-min 10 --outdir ${TAG}_run_predictd --rfile run_predictd.R &> ${TAG}_run_predictd/run_predictd.log
 
 # randsample

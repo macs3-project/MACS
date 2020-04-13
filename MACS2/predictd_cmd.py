@@ -51,7 +51,7 @@ def run( o_options ):
         treat = load_tag_files_options  (options)
         t0 = treat.total    
         info("# tag size = %d" % options.tsize)
-        inputtrack.fw = options.tsize
+        treat.fw = options.tsize
         info("# total tags in alignment file: %d", t0)
 
     #2 Build Model
@@ -60,6 +60,7 @@ def run( o_options ):
         d = treat.average_template_length
         info("# Average insertion length of all pairs is %d bps" % d)
         return
+    
     try:
         peakmodel = PeakModel(treatment = treat,
                               max_pairnum = MAX_PAIRNUM,
