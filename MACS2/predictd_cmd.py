@@ -38,20 +38,28 @@ def run( o_options ):
     debug = options.debug
     error = options.error
     #0 output arguments
-    assert options.format != 'BAMPE', "Pair-end data with BAMPE option doesn't work with predictd command. You can pretend your data to be single-end with -f BAM. Please try again!"
+    options.PE_MODE = options.format in ('BAMPE','BEDPE')
     
     #1 Read tag files
-    info("# read alignment files...")
-    treat = load_tag_files_options  (options)
-    
-    info("# tag size = %d", options.tsize)
-    
-    t0 = treat.total
-    info("# total tags in alignment file: %d", t0)
+    if options.PE_MODE:
+        info("# read input file in Paired-end mode.")
+        treat = load_frag_files_options ( options ) # return PETrackI object
+        t0 = treat.total
+        info("# total fragments/pairs in alignment file: %d" % (t0) )
+    else:
+        info("# read alignment files...")
+        treat = load_tag_files_options  (options)
+        t0 = treat.total    
+        info("# tag size = %d" % options.tsize)
+        inputtrack.fw = options.tsize
+        info("# total tags in alignment file: %d", t0)
 
     #2 Build Model
     info("# Build Peak Model...")
-
+    if options.PE_MODE:
+        d = treat.average_template_length
+        info("# Average insertion length of all pairs is %d bps" % d)
+        return
     try:
         peakmodel = PeakModel(treatment = treat,
                               max_pairnum = MAX_PAIRNUM,
@@ -90,4 +98,20 @@ def load_tag_files_options ( options ):
     treat.finalize()
 
     options.info("tag size is determined as %d bps" % options.tsize)
+    return treat
+
+def load_frag_files_options ( options ):
+    """From the options, load treatment fragments and control fragments (if available).
+
+    """
+    options.info("# read treatment fragments...")
+
+    tp = options.parser(options.ifile[0], buffer_size=options.buffer_size)
+    treat = tp.build_petrack()
+    if len(options.ifile) > 1:
+        # multiple input
+        for tfile in options.ifile[1:]:
+            tp = options.parser(ifile, buffer_size=options.buffer_size)
+            treat = tp.append_petrack( treat )
+    treat.finalize()
     return treat
