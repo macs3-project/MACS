@@ -175,7 +175,6 @@ cdef class PETrackI:
             bytes c
             set chrnames
         
-        
         self.total = 0
 
         chrnames = self.get_chr_names()
