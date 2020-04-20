@@ -875,14 +875,16 @@ cdef class CallerFromAlignments:
         logging.debug( "access pq hash for %d times" % nhcal )
 
         # write pvalue and total length of predicted peaks
+        # this is the output from cutoff-analysis
         fhd = open( self.cutoff_analysis_filename, "w" )
         fhd.write( "pscore\tqscore\tnpeaks\tlpeaks\tavelpeak\n" )
         x = []
         y = []
         for cutoff in tmplist:
-            fhd.write( "%.2f\t%.2f\t%d\t%d\t%.2f\n" % ( cutoff, self.pqtable[ cutoff ], self.pvalue_npeaks[ cutoff ], self.pvalue_length[ cutoff ], self.pvalue_length[ cutoff ]/self.pvalue_npeaks[ cutoff ] ) )
-            x.append( cutoff )
-            y.append( self.pvalue_length[ cutoff ] )
+            if self.pvalue_npeaks[ cutoff ] > 0:
+                fhd.write( "%.2f\t%.2f\t%d\t%d\t%.2f\n" % ( cutoff, self.pqtable[ cutoff ], self.pvalue_npeaks[ cutoff ], self.pvalue_length[ cutoff ], self.pvalue_length[ cutoff ]/self.pvalue_npeaks[ cutoff ] ) )
+                x.append( cutoff )
+                y.append( self.pvalue_length[ cutoff ] )
         fhd.close()
         logging.info( "#3 Analysis of cutoff vs num of peaks or total length has been saved in %s" % self.cutoff_analysis_filename )
         #logging.info( "#3 Suggest a cutoff..." )
