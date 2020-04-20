@@ -590,7 +590,7 @@ def add_refinepeak_parser( subparsers ):
 def add_predictd_parser( subparsers ):
     """Add main function 'predictd' argument parsers.
     """
-    argparser_predictd = subparsers.add_parser("predictd", help="Predict d or fragment size from alignment results. *Will NOT filter duplicates*")
+    argparser_predictd = subparsers.add_parser("predictd", help="Predict d or fragment size from alignment results. In case of PE data, report the average insertion/fragment size from all pairs. *Will NOT filter duplicates*")
     
     # group for input files
     argparser_predictd.add_argument( "-i", "--ifile", dest = "ifile", type = str, required = True, nargs = "+",
@@ -599,7 +599,7 @@ def add_predictd_parser( subparsers ):
                                      choices = ("AUTO", "BAM", "SAM", "BED", "ELAND",
                                                 "ELANDMULTI", "ELANDEXPORT", "BOWTIE",
                                                 "BAMPE", "BEDPE"),
-                                     help = "Format of tag file, \"AUTO\", \"BED\" or \"ELAND\" or \"ELANDMULTI\" or \"ELANDEXPORT\" or \"SAM\" or \"BAM\" or \"BOWTIE\" or \"BAMPE\" or \"BEDPE\". The default AUTO option will let MACS decide which format the file is. Please check the definition in README file if you choose ELAND/ELANDMULTI/ELANDEXPORT/SAM/BAM/BOWTIE. DEFAULT: \"AUTO\"",
+                                     help = "Format of tag file, \"AUTO\", \"BED\" or \"ELAND\" or \"ELANDMULTI\" or \"ELANDEXPORT\" or \"SAM\" or \"BAM\" or \"BOWTIE\" or \"BAMPE\" or \"BEDPE\". The default AUTO option will let MACS decide which format the file is. However, if you want to decide the average insertion size/fragment size from PE data such as BEDPE or BAMPE, please specify the format as BAMPE or BEDPE since MACS2 won't automatically recognize three two formats with -f AUTO. Please be aware that in PE mode, -g, -s, --bw, --d-min, -m, and --rfile have NO effect. DEFAULT: \"AUTO\"",
                                      default = "AUTO" )
     argparser_predictd.add_argument( "-g", "--gsize", dest = "gsize", type = str, default = "hs",
                                      help = "Effective genome size. It can be 1.0e+9 or 1000000000, or shortcuts:'hs' for human (2.7e9), 'mm' for mouse (1.87e9), 'ce' for C. elegans (9e7) and 'dm' for fruitfly (1.2e8), Default:hs" )

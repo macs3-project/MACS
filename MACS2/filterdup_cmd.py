@@ -50,14 +50,14 @@ def run( o_options ):
         t0 = inputtrack.total # total fragments
         info("# total fragments/pairs in alignment file: %d" % (t0) )
     else:
-        info("read tag files...")
+        info("# read tag files...")
         inputtrack = load_tag_files_options (options)
     
-        info("tag size = %d" % options.tsize)
+        info("# tag size = %d" % options.tsize)
         inputtrack.fw = options.tsize
 
         t0 = inputtrack.total
-        info(" total tags in alignment file: %d" % (t0))
+        info("# total tags in alignment file: %d" % (t0))
 
     if options.keepduplicates != "all":
         if options.keepduplicates == "auto":
