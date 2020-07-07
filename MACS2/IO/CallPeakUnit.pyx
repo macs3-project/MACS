@@ -14,6 +14,7 @@ the distribution).
 # python modules
 # ------------------------------------
 
+from cykhash.khashmaps cimport Float64to64Map
 from collections import Counter
 from copy import copy
 import logging
@@ -328,17 +329,16 @@ cdef class CallerFromAlignments:
         #object bedGraph_treat            # file handler to write ChIP pileup
         #object bedGraph_ctrl             # file handler to write Control pileup
         # data needed to be pre-computed before peak calling
-        dict pqtable                   # remember pvalue->qvalue convertion
-        bool pvalue_all_done             # whether the pvalue of whole genome is all calculated. If yes, it's OK to calculate q-value.
+        Float64to64Map pqtable            # remember pvalue->qvalue convertion
+        bool pvalue_all_done              # whether the pvalue of whole genome is all calculated. If yes, it's OK to calculate q-value.
 
-        dict pvalue_npeaks               # record for each pvalue cutoff, how many peaks can be called  
-        dict pvalue_length               # record for each pvalue cutoff, the total length of called peaks
-        float32_t optimal_p_cutoff           # automatically decide the p-value cutoff ( can be translated into qvalue cutoff ) based 
-                                         # on p-value to total peak length analysis. 
-        bytes cutoff_analysis_filename     # file to save the pvalue-npeaks-totallength table
+        Float64to64Map pvalue_npeaks      # record for each pvalue cutoff, how many peaks can be called  
+        Float64to64Map pvalue_length      # record for each pvalue cutoff, the total length of called peaks
+        float32_t optimal_p_cutoff        # automatically decide the p-value cutoff ( can be translated into qvalue cutoff ) based on p-value to total peak length analysis. 
+        bytes cutoff_analysis_filename    # file to save the pvalue-npeaks-totallength table
 
         float64_t test_time
-        dict pileup_data_files           # Record the names of temporary files for storing pileup values of each chromosome
+        dict pileup_data_files            # Record the names of temporary files for storing pileup values of each chromosome
 
 
     def __init__ (self, treat, ctrl,
@@ -437,8 +437,8 @@ cdef class CallerFromAlignments:
         self.test_time = 0
         self.pileup_data_files = {}
         
-        self.pvalue_length = {}
-        self.pvalue_npeaks = {}
+        self.pvalue_length = Float64to64Map(for_int=False)
+        self.pvalue_npeaks = Float64to64Map(for_int=False)
         for p in np.arange( 0.3, 10, 0.3 ): # step for optimal cutoff is 0.3 in -log10pvalue, we try from pvalue 1E-10 (-10logp=10) to 0.5 (-10logp=0.3)
             self.pvalue_length[ p ] = 0
             self.pvalue_npeaks[ p ] = 0
@@ -660,22 +660,24 @@ cdef class CallerFromAlignments:
         cdef:
             bytes chrom
             np.ndarray pos_array, treat_array, ctrl_array, score_array
-            dict pvalue_stat
-            int64_t n, pre_p, length, j, pre_l, l, i
+            Float64to64Map pvalue_stat
+            np.ndarray[np.float32_t, ndim=1] pvalue_stat_key
+            np.ndarray[np.int64_t, ndim=1] pvalue_stat_value
+            int64_t n, pre_p, length, j, pre_l, l, i, index_in_pvalue_stat=0
             float32_t this_v, pre_v, v, q, pre_q
             int64_t N, k, this_l
             float32_t f
             int64_t nhcal = 0
             int64_t npcal = 0
-            list unique_values
             float64_t t0, t1, t2, t 
             int32_t * pos_ptr
             float32_t * treat_value_ptr
             float32_t * ctrl_value_ptr
+            dict cyhash_ele
 
         logging.debug ( "Start to calculate pvalue stat..." )
 
-        pvalue_stat = dict()
+        pvalue_stat = Float64to64Map(for_int=False)
         for i in range( len( self.chromosomes ) ):
             chrom = self.chromosomes[ i ]
             pre_p = 0
@@ -689,18 +691,15 @@ cdef class CallerFromAlignments:
 
             for j in range(pos_array.shape[0]):
                 #this_v = get_pscore( int(treat_value_ptr[0]), ctrl_value_ptr[0] )
-                this_v = get_pscore( (<int32_t>(treat_value_ptr[0]), ctrl_value_ptr[0] ) )
-                this_l = pos_ptr[0] - pre_p
+                this_v = get_pscore( (<int32_t>(treat_value_ptr[j]), ctrl_value_ptr[j] ) )
+                this_l = pos_ptr[j] - pre_p
 
                 if this_v in pvalue_stat:
                     pvalue_stat[ this_v ] += this_l
                 else:
                     pvalue_stat[ this_v ] = this_l
-                pre_p = pos_ptr[0]
-                pos_ptr += 1
-                treat_value_ptr += 1
-                ctrl_value_ptr += 1
-   
+                pre_p = pos_ptr[j]
+
             nhcal += pos_array.shape[0]            
 
         #logging.debug ( "make pvalue_stat cost %.5f seconds" % t )
@@ -708,17 +707,25 @@ cdef class CallerFromAlignments:
         #logging.debug ( "access hash for %d times" % nhcal )
         nhval = 0
 
-        N = sum(pvalue_stat.values()) # total length
+        pvalue_stat_key = np.ones(len(pvalue_stat),dtype=np.float32)
+        pvalue_stat_value = np.ones(len(pvalue_stat),dtype=np.int64)
+        
+        for m in pvalue_stat:
+            pvalue_stat_key[index_in_pvalue_stat] = <float32_t>list(m.items())[0][1]
+            pvalue_stat_value[index_in_pvalue_stat] = <int64_t>pvalue_stat[pvalue_stat_key[index_in_pvalue_stat]]
+            index_in_pvalue_stat += 1
+
+        N = np.sum(pvalue_stat_value) # total length
         k = 1                           # rank
         f = -log10(N)
         pre_v = -2147483647
         pre_l = 0
         pre_q = 2147483647              # save the previous q-value
 
-        self.pqtable = {}
-        unique_values = sorted(list(pvalue_stat.keys()), reverse=True) #sorted(unique_values,reverse=True)
-        for i in range(len(unique_values)):
-            v = unique_values[i]
+        self.pqtable = Float64to64Map(for_int=False)
+        pvalue_stat_key = np.sort(pvalue_stat_key)[::-1]
+        for i in range(len(pvalue_stat_key)):
+            v = pvalue_stat_key[i]
             l = pvalue_stat[v]
             q = v + (log10(k) + f)
             q = max(0,min(pre_q,q))           # make q-score monotonic
@@ -741,15 +748,16 @@ cdef class CallerFromAlignments:
         cdef:
             bytes chrom
             np.ndarray pos_array, treat_array, ctrl_array, score_array
-            dict pvalue_stat
-            int64_t n, pre_p, this_p, length, j, pre_l, l, i
+            Float64to64Map pvalue_stat
+            np.ndarray[np.float32_t, ndim=1] pvalue_stat_key
+            np.ndarray[np.int64_t, ndim=1] pvalue_stat_value
+            int64_t n, pre_p, this_p, length, j, pre_l, l, i, index_in_pvalue_stat=0
             float32_t q, pre_q, this_t, this_c
             float32_t this_v, pre_v, v, cutoff
             int64_t N, k, this_l
             float32_t f
             int64_t nhcal = 0
             int64_t npcal = 0
-            list unique_values
             float64_t t0, t1, t 
 
             np.ndarray above_cutoff, above_cutoff_endpos, above_cutoff_startpos
@@ -768,7 +776,7 @@ cdef class CallerFromAlignments:
         # tmplist contains a list of log pvalue cutoffs from 0.3 to 10
         tmplist = [round(x,5) for x in sorted( list(np.arange(0.3, 10.0, 0.3)), reverse = True )]
 
-        pvalue_stat = dict()
+        pvalue_stat = Float64to64Map(for_int=False)
         #print (list(pvalue_stat.keys()))
         #print (list(self.pvalue_length.keys()))
         #print (list(self.pvalue_npeaks.keys()))        
@@ -820,8 +828,17 @@ cdef class CallerFromAlignments:
                     if peak_length >= min_length: # if the peak is too small, reject it
                         total_l +=  peak_length
                         total_p += 1
-                self.pvalue_length[ cutoff ] = self.pvalue_length.get( cutoff, 0 ) + total_l
-                self.pvalue_npeaks[ cutoff ] = self.pvalue_npeaks.get( cutoff, 0 ) + total_p
+
+                if cutoff in self.pvalue_length:
+                    pvalue_length_value = self.pvalue_length[ cutoff ] + total_p
+                else:
+                    pvalue_length_value = 0
+                self.pvalue_length[ cutoff ] = <int64_t>pvalue_length_value
+                if cutoff in self.pvalue_npeaks:
+                    pvalue_npeaks_value = self.pvalue_npeaks[ cutoff ] + total_p
+                else:
+                    pvalue_npeaks_value = 0
+                self.pvalue_npeaks[ cutoff ] = <int64_t>pvalue_npeaks_value
             
             pos_array_ptr = <int32_t *> pos_array.data
             score_array_ptr = <float32_t *> score_array.data
@@ -852,17 +869,25 @@ cdef class CallerFromAlignments:
 
         nhval = 0
 
-        N = sum(pvalue_stat.values()) # total length
+        pvalue_stat_key = np.ones(len(pvalue_stat),dtype=np.float32)
+        pvalue_stat_value = np.ones(len(pvalue_stat),dtype=np.int64)
+        
+        for m in pvalue_stat:
+            pvalue_stat_key[index_in_pvalue_stat]=<float32_t>list(m.items())[0][1]
+            pvalue_stat_value[index_in_pvalue_stat] = <int64_t>pvalue_stat[pvalue_stat_key[index_in_pvalue_stat]]
+            index_in_pvalue_stat+=1
+
+        N = np.sum(pvalue_stat_value) # total length
         k = 1                           # rank
         f = -log10(N)
         pre_v = -2147483647
         pre_l = 0
         pre_q = 2147483647              # save the previous q-value
 
-        self.pqtable = {}
-        unique_values = sorted(list(pvalue_stat.keys()), reverse=True) #sorted(unique_values,reverse=True)
-        for i in range(len(unique_values)):
-            v = unique_values[i]
+        self.pqtable = Float64to64Map(for_int=False)
+        pvalue_stat_key = np.sort(pvalue_stat_key)[::-1]
+        for i in range(len(pvalue_stat_key)):
+            v = pvalue_stat_key[i]
             l = pvalue_stat[v]
             q = v + (log10(k) + f)
             q = max(0,min(pre_q,q))           # make q-score monotonic
