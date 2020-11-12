@@ -101,7 +101,7 @@ cdef tuple __fw_binary_parse_le ( const unsigned char * data ):
     ui16 = <uint16_t *>data
     bwflag = ui16[7]
 
-    # we filter out unmapped sequence or bad sequence or  secondary or supplementary alignment
+    # we filter out unmapped sequence or bad sequence or secondary or supplementary alignment
     # we filter out 2nd mate, not a proper pair, mate is unmapped
     if (bwflag & 2820) or (bwflag & 1 and (bwflag & 136 or not bwflag & 2)): return ( -1, -1, -1 )
         
