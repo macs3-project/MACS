@@ -61,8 +61,8 @@ def zwig_write (trackI, subdir, fileprefix, d, log=None,space=10, single=False):
         log("write to a wiggle file")
         f = os.path.join(subdir,fileprefix+"_all"+".wig")
         wigfhd = open(f,"w")
-        wigfhd.write("track type=wiggle_0 name=\"%s_all\" description=\"Extended tag pileup from MACS version %s for every %d bp\"\n" % (fileprefix.replace('_afterfiting',''), MACS_VERSION, space)) # data type line        
-    
+        wigfhd.write("track type=wiggle_0 name=\"%s_all\" description=\"Extended tag pileup from MACS version %s for every %d bp\"\n" % (fileprefix.replace('_afterfiting',''), MACS_VERSION, space)) # data type line
+
     for chrom in chrs:
         if not single:
             f = os.path.join(subdir,fileprefix+"_"+chrom+".wig")
@@ -72,7 +72,7 @@ def zwig_write (trackI, subdir, fileprefix, d, log=None,space=10, single=False):
             wigfhd.write("track type=wiggle_0 name=\"%s_%s\" description=\"Extended tag pileup from MACS version %s for every %d bp\"\n" % ( fileprefix.replace('_afterfiting',''), chrom, MACS_VERSION, space)) # data type line
         else:
             log("write data for chromosome "+chrom)
-            
+
         wigfhd.write("variableStep chrom=%s span=%d\n" % (chrom,space))
         tags = trackI.get_locations_by_chr(chrom)[0]
         l = len(tags)
@@ -80,11 +80,11 @@ def zwig_write (trackI, subdir, fileprefix, d, log=None,space=10, single=False):
         startp = -1*d
         endp   = startp+step
         index_tag = 0
-		
+
         while index_tag<l:
             s = tags[index_tag]-d/2     # start of tag
             e = s+d                     # end of tag
-            
+
             if e < endp:
                 # project tag to window_counts line
                 ps = s-startp # projection start
@@ -145,8 +145,8 @@ def zbdg_write (trackI, subdir, fileprefix, d, log=None, single=False):
         log("write to a bedGraph file")
         f = os.path.join(subdir,fileprefix+"_all"+".bdg")
         bdgfhd = open(f,"w")
-        bdgfhd.write("track type=bedGraph name=\"%s_all\" description=\"Extended tag pileup from MACS version %s\"\n" % (fileprefix.replace('_afterfiting',''), MACS_VERSION)) # data type line        
-    
+        bdgfhd.write("track type=bedGraph name=\"%s_all\" description=\"Extended tag pileup from MACS version %s\"\n" % (fileprefix.replace('_afterfiting',''), MACS_VERSION)) # data type line
+
     for chrom in chrs:
         if not single:
             f = os.path.join(subdir,fileprefix+"_"+chrom+".bdg")
@@ -155,18 +155,18 @@ def zbdg_write (trackI, subdir, fileprefix, d, log=None, single=False):
             bdgfhd.write("track type=bedGraph name=\"%s_%s\" description=\"Extended tag pileup from MACS version %s\"\n" % (fileprefix.replace('_afterfiting',''), chrom, MACS_VERSION)) # data type line
         else:
             log("write data for chromosome "+chrom)
-            
+
         tags = trackI.get_locations_by_chr(chrom)[0]
         l = len(tags)
         window_counts = array(BYTE4,[0]*step)
         startp = -1*d
         endp   = startp+step
         index_tag = 0
-		
+
         while index_tag<l:
             s = tags[index_tag]-d/2     # start of tag
             e = s+d                     # end of tag
-            
+
             if e < endp:
                 # project tag to window_counts line
                 ps = s-startp # projection start
@@ -192,9 +192,9 @@ def zbdg_write (trackI, subdir, fileprefix, d, log=None, single=False):
                         left = right
                         right = left + 1
                 # last bin
-                if prev != 0:                
+                if prev != 0:
                     bdgfhd.write("%s\t%d\t%d\t%d\n" % (chrom,left,right,prev))
-                    
+
                 # reset
                 window_counts_next = array(BYTE4,[0]*step)
                 # copy d values from the tail of previous window to next window
@@ -213,15 +213,15 @@ def zbdg_write (trackI, subdir, fileprefix, d, log=None, single=False):
                 right += 1
             else:
                 # diff value, close
-                if prev != 0:                
+                if prev != 0:
                     bdgfhd.write("%s\t%d\t%d\t%d\n" % (chrom,left,right,prev))
                 prev = window_counts[i]
                 left = right
                 right = left + 1
         # last bin
-        if prev != 0:        
+        if prev != 0:
             bdgfhd.write("%s\t%d\t%d\t%d\n" % (chrom,left,right,prev))
-            
+
         if not single:
             bdgfhd.close()
             log("compress the bedGraph file using gzip...")

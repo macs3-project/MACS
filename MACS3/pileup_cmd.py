@@ -26,7 +26,7 @@ from MACS3.Constants import *
 # ------------------------------------
 def run( o_options ):
     """The Main function/pipeline for duplication filter.
-    
+
     """
     # Parse options...
     options = opt_validate( o_options )
@@ -45,7 +45,7 @@ def run( o_options ):
     if os.path.isfile( outfile ):
         info("# Existing file %s will be replaced!" % outfile )
         os.unlink( outfile )
-        
+
     #1 Read tag files
     info("# read alignment files...")
     if options.PE_MODE:
@@ -55,12 +55,12 @@ def run( o_options ):
         info("# total fragments/pairs in alignment file: %d" % (t0) )
         info("# Pileup paired-end alignment file.")
         pileup_and_write_pe(treat, outfile )
-        
+
     else:
         (tsize, treat) = load_tag_files_options  (options)
-    
+
         info("# tag size = %d", tsize)
-    
+
         t0 = treat.total
         info("# total tags in alignment file: %d", t0)
 

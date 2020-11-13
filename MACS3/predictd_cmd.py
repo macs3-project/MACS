@@ -28,7 +28,7 @@ from MACS3.Constants import *
 # ------------------------------------
 def run( o_options ):
     """The Main function/pipeline for duplication filter.
-    
+
     """
     # Parse options...
     options = opt_validate( o_options )
@@ -39,7 +39,7 @@ def run( o_options ):
     error = options.error
     #0 output arguments
     options.PE_MODE = options.format in ('BAMPE','BEDPE')
-    
+
     #1 Read tag files
     if options.PE_MODE:
         info("# read input file in Paired-end mode.")
@@ -49,7 +49,7 @@ def run( o_options ):
     else:
         info("# read alignment files...")
         treat = load_tag_files_options  (options)
-        t0 = treat.total    
+        t0 = treat.total
         info("# tag size = %d" % options.tsize)
         treat.fw = options.tsize
         info("# total tags in alignment file: %d", t0)
@@ -60,7 +60,7 @@ def run( o_options ):
         d = treat.average_template_length
         info("# Average insertion length of all pairs is %d bps" % d)
         return
-    
+
     try:
         peakmodel = PeakModel(treatment = treat,
                               max_pairnum = MAX_PAIRNUM,

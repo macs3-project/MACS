@@ -42,7 +42,7 @@ def check_names(treat, control, error_stream):
 
 def run( args ):
     """The Main function/pipeline for MACS.
-    
+
     """
     # Parse options...
     options = opt_validate( args )
@@ -67,7 +67,7 @@ def run( args ):
 
     info("#1 %s size = %.1f", tag, options.tsize)
     tagsinfo  = "# %s size is determined as %d bps\n" % (tag, options.tsize)
-    
+
     t0 = treat.total
     tagsinfo += "# total %ss in treatment: %d\n" % (tag, t0)
     info("#1  total %ss in treatment: %d", tag, t0)
@@ -133,14 +133,14 @@ def run( args ):
             control.filter_dup(treatment_max_dup_tags)
             #control.separate_dups(treatment_max_dup_tags) # changed 5-29; changed back since we don't need to call addbackdup+refinepeak anymore
             c1 = control.total
-            
+
             info("#1  %ss after filtering in control: %d", tag, c1)
             tagsinfo += "# %ss after filtering in control: %d\n" % (tag, c1)
             if options.PE_MODE:
                 tagsinfo += "# maximum duplicate fragments in control = %d\n" % (treatment_max_dup_tags)
             else:
                 tagsinfo += "# maximum duplicate tags at the same position in control = %d\n" % (treatment_max_dup_tags)
-            
+
             info("#1  Redundant rate of control: %.2f" % (float(c0-c1)/c0))
             tagsinfo += "# Redundant rate in control: %.2f\n" % (float(c0-c1)/c0)
         else:
@@ -184,18 +184,18 @@ def run( args ):
                 warn("#2 Since the d (%.0f) calculated from paired-peaks are smaller than 2*tag length, it may be influenced by unknown sequencing problem!" % (options.d))
                 if options.onauto:
                     options.d=options.extsize
-                    options.scanwindow=2*options.d 
+                    options.scanwindow=2*options.d
                     warn("#2 MACS will use %d as EXTSIZE/fragment length d. NOTE: if the d calculated is still acceptable, please do not use --fix-bimodal option!" % (options.d))
                 else:
                     warn("#2 You may need to consider one of the other alternative d(s): %s" %  ','.join(map(str,peakmodel.alternative_d)))
                     warn("#2 You can restart the process with --nomodel --extsize XXX with your choice or an arbitrary number. Nontheless, MACS will continute computing.")
-                
+
         except NotEnoughPairsException:
             if not options.onauto:
                 sys.exit(1)
             warn("#2 Skipped...")
             options.d=options.extsize
-            options.scanwindow=2*options.d 
+            options.scanwindow=2*options.d
             warn("#2 Since --fix-bimodal is set, MACS will use %d as fragment length" % (options.d))
 
     #3 Call Peaks
@@ -206,7 +206,7 @@ def run( args ):
     # decide options.tocontrol according to options.tolarge
     if control and options.PE_MODE:
         c1 = c1 * 2
-    
+
     if control:
         if options.downsample:
             # use random sampling to balance treatment and control
@@ -218,8 +218,8 @@ def run( args ):
                 else:
                     info("#3 Random seed (%d) is used." % options.seed)
                 treat.sample_num(c1, options.seed)
-                info("#3 %d Tags from treatment are kept", treat.total)                
-            elif c1 > t1: 
+                info("#3 %d Tags from treatment are kept", treat.total)
+            elif c1 > t1:
                 info("#3 MACS is random sampling control %ss...", tag)
                 if options.seed < 0:
                     warn("#3 Your results may not be reproducible due to the random sampling!")
@@ -330,13 +330,13 @@ def run( args ):
         ofhd_bed.close()
 
     info("Done!")
-    
+
 def cal_max_dup_tags ( genome_size, tags_number, p=1e-5 ):
     """Calculate the maximum duplicated tag number based on genome
     size, total tag number and a p-value based on binomial
     distribution. Brute force algorithm to calculate reverse CDF no
     more than MAX_LAMBDA(100000).
-    
+
     """
     return binomial_cdf_inv(1-p,tags_number,1.0/genome_size)
 
@@ -397,7 +397,7 @@ def load_tag_files_options ( options ):
             treat = tp.append_fwtrack( treat )
             #treat.sort()
     treat.finalize()
-    
+
     if options.cfile:
         options.info("#1.2 read input tags...")
         control = options.parser(options.cfile[0], buffer_size=options.buffer_size).build_fwtrack()

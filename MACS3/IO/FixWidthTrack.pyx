@@ -83,10 +83,10 @@ cdef class FWTrack:
         public object dups
         public int32_t fw
         public int64_t length
-    
+
     def __init__ (self, int32_t fw=0, char * anno="", int64_t buffer_size = 100000 ):
         """fw is the fixed-width for all locations.
-        
+
         """
         self.fw = fw
         self.__locations = {}    # location pairs
@@ -110,7 +110,7 @@ cdef class FWTrack:
         cdef:
             set chrs
             bytes chromosome
-            
+
         chrs = self.get_chr_names()
         for chromosome in chrs:
             if chromosome in self.__locations:
@@ -133,7 +133,7 @@ cdef class FWTrack:
 
     cpdef void add_loc ( self, bytes chromosome, int32_t fiveendpos, int32_t strand ):
         """Add a location to the list according to the sequence name.
-        
+
         chromosome -- mostly the chromosome name
         fiveendpos -- 5' end pos, left for plus strand, right for neg strand
         strand     -- 0: plus, 1: minus
@@ -163,12 +163,12 @@ cdef class FWTrack:
 
         Note: If this function is called, it's impossible to append more files to this FWTrack object. So remember to call it after all the files are read!
         """
-        
+
         cdef:
             int32_t i
             bytes c
             set chrnames
-        
+
         self.total = 0
 
         chrnames = self.get_chr_names()
@@ -231,13 +231,13 @@ cdef class FWTrack:
         return set(sorted(self.__locations.keys()))
 
     # cpdef length ( self ):
-    #     """Total sequenced length = total number of tags * width of tag		
+    #     """Total sequenced length = total number of tags * width of tag
     #     """
     #     return self.total*self.fw
 
     cpdef void sort ( self ):
         """Naive sorting for locations.
-        
+
         """
         cdef:
             int32_t i
@@ -275,11 +275,11 @@ cdef class FWTrack:
         self.length = 0
 
         chrnames = self.get_chr_names()
-        
+
         for k in chrnames:
             # for each chromosome.
             # This loop body is too big, I may need to split code later...
-            
+
             # + strand
             i_new = 0
             i_dup = 0
@@ -306,7 +306,7 @@ cdef class FWTrack:
                         i_dup += 1
                     else:
                         new_plus[ i_new ] = p
-                        i_new += 1           
+                        i_new += 1
                 new_plus.resize( i_new, refcheck=False )
                 dup_plus.resize( i_dup, refcheck=False )
                 self.total += i_new
@@ -352,26 +352,26 @@ cdef class FWTrack:
                         i_dup += 1
                     else:
                         new_minus[ i_new ] = p
-                        i_new += 1                        
-                new_minus.resize( i_new , refcheck = False) 
-                dup_minus.resize( i_dup , refcheck = False) 
-                # shape calls unnecessary                      
+                        i_new += 1
+                new_minus.resize( i_new , refcheck = False)
+                dup_minus.resize( i_dup , refcheck = False)
+                # shape calls unnecessary
                 self.total +=  i_new
                 self.dup_total +=  i_dup
-                self.__pointer[k][1] = i_new                
-                self.__dup_pointer[k][1] = i_dup                
+                self.__pointer[k][1] = i_new
+                self.__dup_pointer[k][1] = i_dup
 #                self.total +=  new_minus.shape[0]
 #                dups.total +=  dup_minus.shape[0]
-#                self.__pointer[k][1] = new_minus.shape[0]                
-#                dups.__pointer[k][1] = dup_minus.shape[0]                
+#                self.__pointer[k][1] = new_minus.shape[0]
+#                dups.__pointer[k][1] = dup_minus.shape[0]
                 # free memory ?
                 # I know I should shrink it to 0 size directly,
                 # however, on Mac OSX, it seems directly assigning 0
                 # doesn't do a thing.
                 minus.resize( self.buffer_size, refcheck=False )
                 minus.resize( 0, refcheck=False )
-                # hope there would be no mem leak...                
-            
+                # hope there would be no mem leak...
+
             self.__locations[k]=[new_plus, new_minus]
             self.__dup_locations[k]=[dup_plus, dup_minus]
 
@@ -399,7 +399,7 @@ cdef class FWTrack:
         self.length = 0
 
         chrnames = self.get_chr_names()
-        
+
         for k in chrnames:
             # for each chromosome.
             # This loop body is too big, I may need to split code later...
@@ -407,7 +407,7 @@ cdef class FWTrack:
             dup_plus = self.__dup_locations[k][0]
             minus = self.__locations[k][1]
             dup_minus = self.__dup_locations[k][1]
-            
+
             # concatenate
             new_plus = np.concatenate((plus, dup_plus))
             new_minus= np.concatenate((minus, dup_minus))
@@ -420,7 +420,7 @@ cdef class FWTrack:
             minus.resize( self.buffer_size, refcheck=False )
             minus.resize( 0, refcheck=False )
             dup_minus.resize( self.buffer_size, refcheck=False )
-            dup_minus.resize( 0, refcheck=False )            
+            dup_minus.resize( 0, refcheck=False )
 
             # sort then assign
             new_plus.sort()
@@ -428,12 +428,12 @@ cdef class FWTrack:
             self.__locations[k][0] = new_plus
             self.__locations[k][1] = new_minus
             self.__dup_locations[k][0] = None
-            self.__dup_locations[k][1] = None            
+            self.__dup_locations[k][1] = None
 
             self.__pointer[k][0] = plus.shape[0]
             self.__pointer[k][1] = minus.shape[0]
             self.__dup_pointer[k][0] = 0
-            self.__dup_pointer[k][1] = 0            
+            self.__dup_pointer[k][1] = 0
             self.total +=  plus.shape[0] + minus.shape[0]
 
         self.dup_total =  0
@@ -454,7 +454,7 @@ cdef class FWTrack:
         cdef:
             int32_t p, m, n, current_loc
             # index for old array, and index for new one
-            uint64_t i_old, i_new, size, new_size 
+            uint64_t i_old, i_new, size, new_size
             bytes k
             np.ndarray[np.int32_t, ndim=1] plus, new_plus, minus, new_minus
             set chrnames
@@ -468,11 +468,11 @@ cdef class FWTrack:
         self.length = 0
 
         chrnames = self.get_chr_names()
-        
+
         for k in chrnames:
             # for each chromosome.
             # This loop body is too big, I may need to split code later...
-            
+
             # + strand
             i_new = 0
             plus = self.__locations[k][0]
@@ -532,17 +532,17 @@ cdef class FWTrack:
                         i_new += 1
                 new_minus.resize( i_new, refcheck=False )
                 self.total +=  i_new
-                self.__pointer[k][1] = i_new                
+                self.__pointer[k][1] = i_new
 #                self.total +=  new_minus.shape[0]
-#                self.__pointer[k][1] = new_minus.shape[0]                
+#                self.__pointer[k][1] = new_minus.shape[0]
                 # free memory ?
                 # I know I should shrink it to 0 size directly,
                 # however, on Mac OSX, it seems directly assigning 0
                 # doesn't do a thing.
                 minus.resize( self.buffer_size, refcheck=False )
                 minus.resize( 0, refcheck=False )
-                # hope there would be no mem leak...                
-            
+                # hope there would be no mem leak...
+
             self.__locations[k]=[new_plus,new_minus]
 
         self.length = self.fw * self.total
@@ -557,19 +557,19 @@ cdef class FWTrack:
             int32_t num, i_chrom      # num: number of reads allowed on a certain chromosome
             bytes k
             set chrnames
-        
+
         self.total = 0
         self.length = 0
 
         chrnames = self.get_chr_names()
-        
+
         if seed >= 0:
             np.random.seed(seed)
 
         for k in chrnames:
             # for each chromosome.
             # This loop body is too big, I may need to split code later...
-            
+
             num = <int32_t>round(self.__locations[k][0].shape[0] * percent, 5 )
             np.random.shuffle( self.__locations[k][0] )
             self.__locations[k][0].resize( num, refcheck=False )
@@ -580,8 +580,8 @@ cdef class FWTrack:
             np.random.shuffle( self.__locations[k][1] )
             self.__locations[k][1].resize( num, refcheck=False )
             self.__locations[k][1].sort()
-            self.__pointer[k][1] = self.__locations[k][1].shape[0]            
-            
+            self.__pointer[k][1] = self.__locations[k][1].shape[0]
+
             self.total += self.__pointer[k][0] + self.__pointer[k][1]
 
         self.length = self.fw * self.total
@@ -602,24 +602,24 @@ cdef class FWTrack:
     cpdef void print_to_bed (self, fhd=None):
         """Output FWTrack to BED format files. If fhd is given,
         write to a file, otherwise, output to standard output.
-        
+
         """
         cdef:
             int32_t i, i_chrom, p
             bytes k
             set chrnames
-        
+
         if not fhd:
             fhd = sys.stdout
         assert isinstance(fhd,io.IOBase)
         assert self.fw > 0, "FWTrack object .fw should be set larger than 0!"
 
         chrnames = self.get_chr_names()
-        
+
         for k in chrnames:
             # for each chromosome.
             # This loop body is too big, I may need to split code later...
-            
+
             plus = self.__locations[k][0]
 
             for i in range(plus.shape[0]):
@@ -627,12 +627,12 @@ cdef class FWTrack:
                 fhd.write("%s\t%d\t%d\t.\t.\t%s\n" % (k.decode(),p,p+self.fw,"+") )
 
             minus = self.__locations[k][1]
-            
+
             for i in range(minus.shape[0]):
                 p = minus[i]
                 fhd.write("%s\t%d\t%d\t.\t.\t%s\n" % (k.decode(),p-self.fw,p,"-") )
         return
-    
+
     cpdef tuple extract_region_tags ( self, bytes chromosome, int32_t startpos, int32_t endpos ):
         cdef:
             int32_t i, pos
@@ -641,10 +641,10 @@ cdef class FWTrack:
             set chrnames
 
         if not self.__sorted: self.sort()
-        
+
         chrnames = self.get_chr_names()
         assert chromosome in chrnames, "chromosome %s can't be found in the FWTrack object." % chromosome
-        
+
         (plus, minus) = self.__locations[chromosome]
 
         temp = []
@@ -672,7 +672,7 @@ cdef class FWTrack:
 
     cpdef list compute_region_tags_from_peaks ( self, peaks, func, int32_t window_size = 100, float32_t cutoff = 5 ):
         """Extract tags in peak, then apply func on extracted tags.
-        
+
         peaks: redefined regions to extract raw tags in PeakIO type: check cPeakIO.pyx.
 
         func:  a function to compute *something* from tags found in a predefined region
@@ -686,7 +686,7 @@ cdef class FWTrack:
         wtd_find_summit(chrom, plus, minus, peak_start, peak_end, name , window_size, cutoff):
 
         """
-        
+
         cdef:
             int32_t m, i, j, pre_i, pre_j, pos, startpos, endpos
             np.ndarray[np.int32_t, ndim=1] plus, minus, rt_plus, rt_minus
@@ -701,7 +701,7 @@ cdef class FWTrack:
         if not self.__sorted: self.sort()
         # PeakIO object should be sorted
         peaks.sort()
-        
+
         chrnames = self.get_chr_names()
 
         for chrom in pchrnames:
@@ -726,7 +726,7 @@ cdef class FWTrack:
                     else:
                         temp.append(pos)
                 rt_plus = np.array(temp, dtype=np.int32)
-                
+
                 temp = []
                 for j in range(prev_j,minus.shape[0]):
                     pos = minus[j]
@@ -749,14 +749,14 @@ cdef class FWTrack:
                 for j in range(prev_j, 0, -1):
                     if minus[prev_j] - minus[j] >= window_size:
                         break
-                prev_j = j                
+                prev_j = j
                 # end of a loop
-                
+
         return retval
 
     cpdef object refine_peak_from_tags_distribution ( self, peaks, int32_t window_size = 100, float32_t cutoff = 5 ):
         """Extract tags in peak, then apply func on extracted tags.
-        
+
         peaks: redefined regions to extract raw tags in PeakIO type: check cPeakIO.pyx.
 
         window_size: this will be passed to func.
@@ -768,7 +768,7 @@ cdef class FWTrack:
         wtd_find_summit(chrom, plus, minus, peak_start, peak_end, name , window_size, cutoff):
 
         """
-        
+
         cdef:
             int32_t m, i, j, pre_i, pre_j, pos, startpos, endpos #, n_peaks
             np.ndarray[np.int32_t, ndim=1] plus, minus, rt_plus, rt_minus
@@ -785,19 +785,19 @@ cdef class FWTrack:
         if not self.__sorted: self.sort()
         # PeakIO object should be sorted
         peaks.sort()
-        
+
         chrnames = self.get_chr_names()
 
         #n_peaks = 1
         ret_peaks = PeakIO()
-        
+
         for chrom in pchrnames:
             assert chrom in chrnames, "chromosome %s can't be found in the FWTrack object. %s" % (chrom, str(chrnames))
             (plus, minus) = self.__locations[chrom]
             cpeaks = peaks.get_data_from_chrom(chrom)
             #ret_peaks.peaks[chrom] = []
             #npeaks = ret_peaks.peaks[chrom]
-            
+
             prev_i = 0
             prev_j = 0
             for m in range(len(cpeaks)):
@@ -815,7 +815,7 @@ cdef class FWTrack:
                     else:
                         temp.append(pos)
                 rt_plus = np.array(temp)
-                
+
                 temp = []
                 for j in range(prev_j,minus.shape[0]):
                     pos = minus[j]
@@ -838,7 +838,7 @@ cdef class FWTrack:
                         tmppeak = copy(thispeak)
                         tmppeak["summit"] = adjusted_summit
                         ret_peaks.add_PeakContent(chrom, tmppeak)
-                    
+
                 #thispeak["summit"] = adjusted_summit
                 #if passflag:
                 #    thispeak["name"] = "passed"
@@ -846,7 +846,7 @@ cdef class FWTrack:
                 #    thispeak["name"] = "failed"
                 #retval.append( wtd_find_summit(chrom, rt_plus, rt_minus, startpos, endpos, peak_name, window_size, cutoff) )
                 #n_peaks += 1
-                
+
                 # rewind window_size
                 for i in range(prev_i, 0, -1):
                     if plus[prev_i] - plus[i] >= window_size:
@@ -856,13 +856,13 @@ cdef class FWTrack:
                 for j in range(prev_j, 0, -1):
                     if minus[prev_j] - minus[j] >= window_size:
                         break
-                prev_j = j                
+                prev_j = j
                 # end of a loop
         return ret_peaks
 
     cpdef list pileup_a_chromosome ( self, bytes chrom, list ds, list scale_factor_s, float32_t baseline_value = 0.0, bint directional = True, int32_t end_shift = 0 ):
         """pileup a certain chromosome, return [p,v] (end position and value) list.
-        
+
         ds             : tag will be extended to this value to 3' direction,
                          unless directional is False. Can contain multiple extension
                          values. Final pileup will the maximum.
@@ -936,7 +936,7 @@ cdef tuple wtd_find_summit(chrom, np.ndarray[np.int32_t, ndim=1] plus, np.ndarra
         int32_t i, j, watson_left, watson_right, crick_left, crick_right, wtd_max_pos
         float32_t wtd_max_val
         np.ndarray wtd_list, wtd_other_max_pos, wtd_other_max_val
-        
+
     watson, crick = (Counter(plus), Counter(minus))
     watson_left = left_sum(watson, search_start, window_size)
     crick_left = left_sum(crick, search_start, window_size)

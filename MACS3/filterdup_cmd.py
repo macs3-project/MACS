@@ -26,7 +26,7 @@ from MACS3.Constants import *
 # ------------------------------------
 def run( o_options ):
     """The Main function/pipeline for duplication filter.
-    
+
     """
     # Parse options...
     options = opt_validate( o_options )
@@ -37,12 +37,12 @@ def run( o_options ):
     error = options.error
 
     options.PE_MODE = options.format in ('BAMPE','BEDPE')
-    
+
     if options.outputfile != "stdout":
         outfhd = open( os.path.join( options.outdir, options.outputfile ) ,"w" )
     else:
         outfhd = sys.stdout
-    
+
     #1 Read tag files
     if options.PE_MODE:
         info("# read input file in Paired-end mode.")
@@ -52,7 +52,7 @@ def run( o_options ):
     else:
         info("# read tag files...")
         inputtrack = load_tag_files_options (options)
-    
+
         info("# tag size = %d" % options.tsize)
         inputtrack.fw = options.tsize
 
@@ -75,7 +75,7 @@ def run( o_options ):
 
         info(" tags after filtering in alignment file: %d" % (t1))
         info(" Redundant rate of alignment file: %.2f" % (float(t0-t1)/t0))
-            
+
     if not options.dryrun:
         info( "Write to BED file" )
         inputtrack.print_to_bed( fhd=outfhd )
@@ -88,7 +88,7 @@ def cal_max_dup_tags ( genome_size, tags_number, p=1e-5 ):
     size, total tag number and a p-value based on binomial
     distribution. Brute force algorithm to calculate reverse CDF no
     more than MAX_LAMBDA(100000).
-    
+
     """
     return binomial_cdf_inv(1-p,tags_number,1.0/genome_size)
 

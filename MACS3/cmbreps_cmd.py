@@ -58,4 +58,4 @@ def run( options ):
     ofhd = open(ofile,"w")
     cmbtrack.write_bedGraph(ofhd,name="%s_combined_scores" % (options.method.upper()),description="Scores calculated by %s" % (options.method.upper()))
     info("Finished '%s'! Please check '%s'!" % (options.method, ofile))
-    
+

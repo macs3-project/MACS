@@ -52,7 +52,7 @@ cpdef pnorm(int32_t x, int32_t u, int32_t v):
 
 cpdef factorial ( uint32_t n ):
     """Calculate N!.
-    
+
     """
     cdef float64_t fact = 1
     cdef uint64_t i
@@ -67,7 +67,7 @@ cdef float64_t poz(float64_t z):
     """
     cdef:
         float64_t y, x, w
-        float64_t Z_MAX = 6.0 # Maximum meaningful z value 
+        float64_t Z_MAX = 6.0 # Maximum meaningful z value
     if z == 0.0:
         x = 0.0;
     else:
@@ -120,7 +120,7 @@ cpdef float64_t chisq_pvalue_e ( float64_t x, uint32_t df ):
 
     if x <= 0.0:
         return 1.0
-       
+
     a = 0.5 * x
     even = ((2*(df/2)) == df)
     y = ex20(-a)
@@ -165,7 +165,7 @@ cpdef float64_t chisq_logp_e ( float64_t x, uint32_t df, bool log10 = False ):
 
     if x <= 0.0:
         return 0.0
-       
+
     a = 0.5 * x
     y = exp(-a)             # y is for small number calculation
     # initialize s
@@ -193,7 +193,7 @@ cpdef float64_t chisq_logp_e ( float64_t x, uint32_t df, bool log10 = False ):
         return -s/log(10)
     else:
         return -s
-    
+
 cpdef float64_t poisson_cdf ( uint32_t n, float64_t lam, bool lower=False, bool log10=False ):
     """Poisson CDF evaluater.
 
@@ -216,7 +216,7 @@ cpdef float64_t poisson_cdf ( uint32_t n, float64_t lam, bool lower=False, bool 
         else:
             # upper tail
             return log10_poisson_cdf_Q_large_lambda(n, lam)
-        
+
     if lower:
         if lam > 700: # may be problematic
             return __poisson_cdf_large_lambda (n, lam)
@@ -248,7 +248,7 @@ cdef inline float64_t __poisson_cdf ( uint32_t k, float64_t a ):
 
     nextcdf = exp( -1 * a )
     cdf = nextcdf
-    
+
     for i in range( 1, k + 1 ):
         lastcdf = nextcdf
         nextcdf = lastcdf * a / i
@@ -257,7 +257,7 @@ cdef inline float64_t __poisson_cdf ( uint32_t k, float64_t a ):
         return 1.0
     else:
         return cdf
-    
+
 cdef inline float64_t __poisson_cdf_large_lambda ( uint32_t k, float64_t a ):
     """Slower poisson cdf for large lambda ( > 700 )
 
@@ -272,7 +272,7 @@ cdef inline float64_t __poisson_cdf_large_lambda ( uint32_t k, float64_t a ):
         float64_t cdf
         uint32_t i
         float64_t lastcdf
-    
+
     assert a > 700
     if k < 0:
         return 0.0                        # special cases
@@ -336,7 +336,7 @@ cdef inline float64_t __poisson_cdf_Q_large_lambda ( uint32_t k, float64_t a ):
 
     Parameters:
     k	: observation
-    a	: lambda    
+    a	: lambda
     """
     assert a > 700
     if k < 0: return 1.0                        # special cases
@@ -458,7 +458,7 @@ cdef inline float64_t log10_poisson_cdf_Q_large_lambda ( uint32_t k, float64_t l
     return round((residue-lbd)/log(10),5)
 
 cdef inline float64_t logspace_add ( float64_t logx, float64_t logy ):
-    """addition in log space. 
+    """addition in log space.
 
     Given two log values, such as logx and logy, return
     log(exp(logx)+exp(logy)).
@@ -495,7 +495,7 @@ cpdef poisson_cdf_inv ( float64_t cdf, float64_t lam, int32_t maximum=1000 ):
         sum2 = sum2 + newval
         if sumold <= cdf and cdf <= sum2:
             return i
-    
+
     return maximum
 
 cpdef poisson_cdf_Q_inv ( float64_t cdf, float64_t lam, int32_t maximum=1000 ):
@@ -527,7 +527,7 @@ cpdef poisson_cdf_Q_inv ( float64_t cdf, float64_t lam, int32_t maximum=1000 ):
         sum2 = sum2 + newval
         if sumold <= cdf and cdf <= sum2:
             return i
-    
+
     return maximum
 
 cpdef poisson_pdf ( uint32_t k, float64_t a ):
@@ -540,7 +540,7 @@ cpdef poisson_pdf ( uint32_t k, float64_t a ):
     if a <= 0:
         return 0
     return exp(-a) * pow (a, k, None) / factorial (k)
-    
+
 
 cdef binomial_coef ( int64_t n, int64_t k ):
     """BINOMIAL_COEF computes the Binomial coefficient C(N,K)
@@ -613,7 +613,7 @@ cdef _binomial_cdf_r ( int64_t x, int64_t a, float64_t b ):
         return 0
     elif b == 1:
         return 1
-    
+
     if x<argmax:
         seedpdf=binomial_pdf(argmax,a,b)
         pdf=seedpdf
@@ -622,7 +622,7 @@ cdef _binomial_cdf_r ( int64_t x, int64_t a, float64_t b ):
             pdf/=(a-i)*b/(1-b)/(i+1)
             if pdf==0.0: break
             cdf += pdf
-            
+
         pdf = seedpdf
         i = argmax
         while True:
@@ -650,7 +650,7 @@ cdef _binomial_cdf_r ( int64_t x, int64_t a, float64_t b ):
 cdef _binomial_cdf_f ( int64_t x, int64_t a, float64_t b ):
     """ Binomial CDF for lower tail.
 
-    """    
+    """
     cdef int64_t argmax=<int32_t>(a*b)
     cdef float64_t seedpdf
     cdef float64_t cdf
@@ -674,7 +674,7 @@ cdef _binomial_cdf_f ( int64_t x, int64_t a, float64_t b ):
             pdf/=(a-i)*b/(1-b)/(i+1)
             if pdf==0.0: break
             cdf += pdf
-            
+
         pdf = seedpdf
         for i in range(argmax,x):
             pdf*=(a-i)*b/(1-b)/(i+1)
@@ -710,12 +710,12 @@ cpdef binomial_cdf_inv ( float64_t cdf, int64_t a, float64_t b ):
         if cdf < cdf2:
             return x
     return a
-    
+
 cpdef binomial_pdf( int64_t x, int64_t a, float64_t b ):
     """binomial PDF by H. Gene Shin
-    
+
     """
-    
+
     if a<1:
         return 0
     elif x<0 or a<x:
@@ -761,7 +761,7 @@ cpdef binomial_pdf( int64_t x, int64_t a, float64_t b ):
 
     for i in range(mx-t):
         pdf *= 1-p
-        
+
     #pdf=float("%.10e" % pdf)
     return pdf
 
@@ -818,7 +818,7 @@ cpdef binomial_pdf( int64_t x, int64_t a, float64_t b ):
 #     upper = not lower
 #     if p < 0 or p > 1:
 #         raise Exception("Illegal argument %f for qnorm(p)." % p)
-    
+
 #     split = 0.42
 #     a0 = 2.50662823884
 #     a1 = -18.61500062529
@@ -835,10 +835,10 @@ cpdef binomial_pdf( int64_t x, int64_t a, float64_t b ):
 #     d1 = 3.54388924762
 #     d2 = 1.63706781897
 #     q = p - 0.5
-    
+
 #     r = 0.0
 #     ppnd = 0.0
-    
+
 #     if abs(q) <= split:
 #         r = q * q
 #         ppnd = q * (((a3 * r + a2) * r + a1) * r + a0) / ((((b4 * r + b3) * r + b2) * r + b1) * r + 1)
@@ -846,30 +846,30 @@ cpdef binomial_pdf( int64_t x, int64_t a, float64_t b ):
 #         r = p
 #         if q > 0:
 #             r = 1 - p
-        
+
 #         if r > 0:
 #             r = math.sqrt(- math.log(r))
 #             ppnd = (((c3 * r + c2) * r + c1) * r + c0) / ((d2 * r + d1) * r + 1)
-            
+
 #             if q < 0:
 #                 ppnd = - ppnd
 #         else:
 #             ppnd = 0
-            
+
 #     if upper:
 #         ppnd = - ppnd
-    
+
 #     if mu != None and sigma2 != None:
 #         return ppnd * math.sqrt(sigma2) + mu
 #     else:
 #         return ppnd
 
 # def normal_cdf (z, mu = 0.0, sigma2 = 1.0, lower=True):
-    
+
 #     upper = not lower
 
 #     z = (z - mu) / math.sqrt(sigma2)
-    
+
 #     ltone = 7.0
 #     utzero = 18.66
 #     con = 1.28
@@ -895,11 +895,11 @@ cpdef binomial_pdf( int64_t x, int64_t a, float64_t b ):
 
 #     y = 0.0
 #     alnorm = 0.0
-    
+
 #     if z < 0:
 #         upper = not upper
 #         z = - z
-    
+
 #     if z <= ltone or upper and z <= utzero:
 #         y = 0.5 * z * z
 #         if z > con:

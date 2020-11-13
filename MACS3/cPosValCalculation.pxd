@@ -9,7 +9,7 @@ cdef extern from "cPosValCalculation.h":
     cdef struct PosVal:
         int pos
         float value
-    
+
     PosVal * single_end_pileup ( int * plus_tags, long l_plus_tags, int * minus_tags, long l_minus_tags, int five_shift, int three_shift, int leftmost_coord, int rightmost_coord,  float scale_factor, float baseline_value, long * final_length ) nogil
 
     PosVal * quick_pileup ( int * start_poss, int * end_poss, long length_poss, float scale_factor, float baseline_value, long * final_length ) nogil

@@ -36,7 +36,7 @@ cdef str subpeak_letters( int i):
         return chr(97+i)
     else:
         return subpeak_letters(i // 26) + chr(97 + (i % 26))
-    
+
 # ------------------------------------
 # Classes
 # ------------------------------------
@@ -54,8 +54,8 @@ cdef class PeakContent:
         float qscore
         bytes name
 
-    def __init__ ( self, int start, int end, int summit, 
-                   float peak_score, float pileup, 
+    def __init__ ( self, int start, int end, int summit,
+                   float peak_score, float pileup,
                    float pscore, float fold_change, float qscore,
                    bytes name= b"NA" ):
         self.start = start
@@ -125,9 +125,9 @@ cdef class PeakIO:
 
     def __init__ (self):
         self.peaks = {}
-    
-    cpdef add (self, bytes chromosome, int start, int end, int summit = 0, 
-               float peak_score = 0, float pileup = 0, 
+
+    cpdef add (self, bytes chromosome, int start, int end, int summit = 0,
+               float peak_score = 0, float pileup = 0,
                float pscore = 0, float fold_change = 0, float qscore = 0,
                bytes name = b"NA"):
         """items:
@@ -164,15 +164,15 @@ cdef class PeakIO:
         for chrom in chrs:
             self.peaks[chrom].sort(key=lambda x:x['start'])
         return
-        
+
 
     def filter_pscore (self, double pscore_cut ):
         cdef bytes chrom
-        
+
         peaks = self.peaks
         new_peaks = {}
         chrs = sorted(list(peaks.keys()))
-        
+
         for chrom in chrs:
             new_peaks[chrom]=[p for p in peaks[chrom] if p['pscore'] >= pscore_cut]
         self.peaks = new_peaks
@@ -183,7 +183,7 @@ cdef class PeakIO:
         peaks = self.peaks
         new_peaks = {}
         chrs = sorted(list(peaks.keys()))
-        
+
         for chrom in chrs:
             new_peaks[chrom]=[p for p in peaks[chrom] if p['qscore'] >= qscore_cut]
         self.peaks = new_peaks
@@ -192,7 +192,7 @@ cdef class PeakIO:
         """Filter peaks in a given fc range.
 
         If fc_low and fc_up is assigned, the peaks with fc in [fc_low,fc_up)
-        
+
         """
         peaks = self.peaks
         new_peaks = {}
@@ -214,7 +214,7 @@ cdef class PeakIO:
         for chrom in chrs:
             x += len(peaks[chrom])
         return x
-  
+
     # these methods are very fast, specifying types is unnecessary
     def write_to_xls (self, fhd, bytes name_prefix=b"%s_peak_", bytes name=b"MACS"):
         return self._to_xls(name_prefix=name_prefix, name=name,
@@ -226,7 +226,7 @@ cdef class PeakIO:
             print_func("\t".join(("chr","start", "end",  "length",  "abs_summit", "pileup", "-log10(pvalue)", "fold_enrichment", "-log10(qvalue)", "name"))+"\n")
         else:
             return
-        
+
         try: peakprefix = name_prefix % name
         except: peakprefix = name_prefix
 
@@ -246,7 +246,7 @@ cdef class PeakIO:
                         print_func("\t%d" % (peak['summit']+1)) # summit position
                         print_func("\t%.6g" % (round(peak['pileup'],2))) # pileup height at summit
                         print_func("\t%.6g" % (peak['pscore'])) # -log10pvalue at summit
-                        print_func("\t%.6g" % (peak['fc'])) # fold change at summit                
+                        print_func("\t%.6g" % (peak['fc'])) # fold change at summit
                         print_func("\t%.6g" % (peak['qscore'])) # -log10qvalue at summit
                         print_func("\t%s" % peakname)
                         print_func("\n")
@@ -258,7 +258,7 @@ cdef class PeakIO:
                     print_func("\t%d" % (peak['summit']+1)) # summit position
                     print_func("\t%.6g" % (round(peak['pileup'],2))) # pileup height at summit
                     print_func("\t%.6g" % (peak['pscore'])) # -log10pvalue at summit
-                    print_func("\t%.6g" % (peak['fc'])) # fold change at summit                
+                    print_func("\t%.6g" % (peak['fc'])) # fold change at summit
                     print_func("\t%.6g" % (peak['qscore'])) # -log10qvalue at summit
                     print_func("\t%s" % peakname)
                     print_func("\n")
@@ -270,7 +270,7 @@ cdef class PeakIO:
         """
         generalization of tobed and write_to_bed
         """
-        #print(description)        
+        #print(description)
         chrs = list(self.peaks.keys())
         chrs.sort()
         n_peak = 0
@@ -281,7 +281,7 @@ cdef class PeakIO:
         if trackline:
             try: print_func('track name="%s (peaks)" description="%s" visibility=1\n' % ( name.replace(b"\"", b"\\\"").decode(),\
                                                                                           desc.replace(b"\"", b"\\\"").decode() ) )
-            except: print_func('track name=MACS description=Unknown\n') 
+            except: print_func('track name=MACS description=Unknown\n')
         for chrom in chrs:
             for end, group in groupby(self.peaks[chrom], key=itemgetter("end")):
                 n_peak += 1
@@ -291,12 +291,12 @@ cdef class PeakIO:
                         print_func("%s\t%d\t%d\t%s%d%s\t%.6g\n" % (chrom.decode(),peak['start'],peak['end'],peakprefix.decode(),n_peak,subpeak_letters(i),peak[score_column]))
                 else:
                     peak = peaks[0]
-                    print_func("%s\t%d\t%d\t%s%d\t%.6g\n" % (chrom.decode(),peak['start'],peak['end'],peakprefix.decode(),n_peak,peak[score_column])) 
+                    print_func("%s\t%d\t%d\t%s%d\t%.6g\n" % (chrom.decode(),peak['start'],peak['end'],peakprefix.decode(),n_peak,peak[score_column]))
 
     cdef _to_summits_bed(self, bytes name_prefix=b"%s_peak_", bytes name=b"MACS",
                         bytes description = b"%s", str score_column="score",
                         bool trackline=False, print_func=sys.stdout.write):
-        """ 
+        """
         generalization of to_summits_bed and write_to_summit_bed
         """
         chrs = list(self.peaks.keys())
@@ -309,7 +309,7 @@ cdef class PeakIO:
         if trackline:
             try: print_func('track name="%s (summits)" description="%s" visibility=1\n' % ( name.replace(b"\"", b"\\\"").decode(),\
                                                                                             desc.replace(b"\"", b"\\\"").decode() ) )
-            except: print_func('track name=MACS description=Unknown') 
+            except: print_func('track name=MACS description=Unknown')
         for chrom in chrs:
             for end, group in groupby(self.peaks[chrom], key=itemgetter("end")):
                 n_peak += 1
@@ -369,7 +369,7 @@ cdef class PeakIO:
         pileup:pileup,
         pscore:pvalue,
         fc:fold_change,
-        qscore:qvalue        
+        qscore:qvalue
         """
         #print(description)
         return self._to_bed(name_prefix=name_prefix, name=name,
@@ -453,7 +453,7 @@ cdef class PeakIO:
         |           |      |0-based offset from chromStart. Use -1  |
         |           |      |if no point-source called.              |
         +-----------+------+----------------------------------------+
-        
+
         """
         cdef int n_peak
         cdef bytes chrom
@@ -502,11 +502,11 @@ cdef class PeakIO:
 
 
         wait... why I have two write_to_xls in this class?
-        
+
         """
         write = ofhd.write
         write("\t".join(("chr","start", "end",  "length",  "abs_summit", "pileup", "-log10(pvalue)", "fold_enrichment", "-log10(qvalue)", "name"))+"\n")
-        
+
         try: peakprefix = name_prefix % name
         except: peakprefix = name_prefix
 
@@ -539,7 +539,7 @@ cdef class PeakIO:
                     write("\t%.6g" % (round(peak['pileup'],2))) # pileup height at summit
                     write("\t%.6g" % (peak['pscore'])) # -log10pvalue at summit
                     write("\t%.6g" % (peak['fc'])) # fold change at summit
-                    write("\t%.6g" % (peak['qscore'])) # -log10qvalue at summit                    
+                    write("\t%.6g" % (peak['qscore'])) # -log10qvalue at summit
                     write("\t%s" % peakname)
                     write("\n")
         return
@@ -555,7 +555,7 @@ cdef class PeakIO:
         cdef int total_num
         cdef list chrs1, chrs2, a
         cdef bytes k
-        
+
         peaks1 = self.peaks
         if isinstance(peaks2,PeakIO):
             peaks2 = peaks2.peaks
@@ -590,7 +590,7 @@ cdef class PeakIO:
     def read_from_xls (self, ofhd):
         """Save the peak results in a tab-delimited plain text file
         with suffix .xls.
-        
+
         """
         cdef:
             bytes line = b''
@@ -602,7 +602,7 @@ cdef class PeakIO:
         while True:
             if not (line.startswith('#') or line.strip() == ''): break
             line = ofhd.readline()
-        
+
         # sanity check
         columns = line.rstrip().split('\t')
         for a,b in zip(columns, ("chr","start", "end",  "length", "abs_summit",
@@ -630,9 +630,9 @@ cdef class PeakIO:
             peakname = rstrip(fields[9])
             add(chrom, start, end, summit, qscore, pileup, pscore, fc, qscore,
                 peakname)
-            
+
 cpdef parse_peakname(peakname):
-    """returns peaknumber, subpeak  
+    """returns peaknumber, subpeak
     """
     cdef:
         bytes peak_id, peaknumber, subpeak
@@ -651,7 +651,7 @@ cdef class Region:
     cdef:
         dict regions
         bool __flag_sorted
-    
+
     def __init__ (self):
         self.regions= {}
         self.__flag_sorted = False
@@ -661,7 +661,7 @@ cdef class Region:
             self.regions[chrom].append( (start,end) )
         else:
             self.regions[chrom] = [(start,end), ]
-        self.__flag_sorted = False            
+        self.__flag_sorted = False
         return
 
     def sort (self):
@@ -670,11 +670,11 @@ cdef class Region:
         for chrom in list(self.regions.keys()):
             self.regions[chrom].sort()
         self.__flag_sorted = True
-    
+
     def merge_overlap ( self ):
         cdef bytes chrom
         cdef int s_new_region, e_new_region, i, j
-        
+
         if not self.__flag_sorted:
             self.sort()
         regions = self.regions
@@ -709,7 +709,7 @@ cdef class Region:
     def write_to_bed (self, fhd ):
         cdef int i
         cdef bytes chrom
-        
+
         chrs = list(self.regions.keys())
         chrs.sort()
         for i in range( len(chrs) ):
@@ -737,9 +737,9 @@ cdef class BroadPeakContent:
 
     def __init__ ( self, long start, long end, float score,
                    bytes thickStart, bytes thickEnd,
-                   long blockNum, bytes blockSizes, 
-                   bytes blockStarts, float pileup, 
-                   float pscore, float fold_change, 
+                   long blockNum, bytes blockSizes,
+                   bytes blockStarts, float pileup,
+                   float pscore, float fold_change,
                    float qscore, bytes name = b"NA" ):
         self.start = start
         self.end = end
@@ -800,10 +800,10 @@ cdef class BroadPeakIO:
 
     def __init__ (self):
         self.peaks = {}
-    
+
     def add (self, char * chromosome, long start, long end, long score = 0,
              bytes thickStart=b".", bytes thickEnd=b".",
-             long blockNum=0, bytes blockSizes=b".", 
+             long blockNum=0, bytes blockSizes=b".",
              bytes blockStarts=b".", float pileup = 0,
              float pscore = 0, float fold_change = 0,
              float qscore = 0, bytes name = b"NA" ):
@@ -825,8 +825,8 @@ cdef class BroadPeakIO:
         """
         if not self.peaks.has_key(chromosome):
             self.peaks[chromosome] = []
-        self.peaks[chromosome].append( BroadPeakContent( start, end, score, thickStart, thickEnd, 
-                                                         blockNum, blockSizes, blockStarts, 
+        self.peaks[chromosome].append( BroadPeakContent( start, end, score, thickStart, thickEnd,
+                                                         blockNum, blockSizes, blockStarts,
                                                          pileup, pscore, fold_change, qscore, name ) )
 
     def filter_pscore (self, double pscore_cut ):
@@ -836,11 +836,11 @@ cdef class BroadPeakIO:
             dict new_peaks
             list chrs
             BroadPeakContent p
-        
+
         peaks = self.peaks
         new_peaks = {}
         chrs = sorted(list(peaks.keys()))
-        
+
         for chrom in chrs:
             new_peaks[chrom]=[p for p in peaks[chrom] if p['pscore'] >= pscore_cut]
         self.peaks = new_peaks
@@ -856,7 +856,7 @@ cdef class BroadPeakIO:
         peaks = self.peaks
         new_peaks = {}
         chrs = sorted(list(peaks.keys()))
-        
+
         for chrom in chrs:
             new_peaks[chrom]=[p for p in peaks[chrom] if p['qscore'] >= qscore_cut]
         self.peaks = new_peaks
@@ -865,7 +865,7 @@ cdef class BroadPeakIO:
         """Filter peaks in a given fc range.
 
         If fc_low and fc_up is assigned, the peaks with fc in [fc_low,fc_up)
-        
+
         """
         cdef:
             bytes chrom
@@ -892,7 +892,7 @@ cdef class BroadPeakIO:
             dict peaks
             list chrs
             long x
-        
+
         peaks = self.peaks
         chrs = list(peaks.keys())
         chrs.sort()
@@ -900,7 +900,7 @@ cdef class BroadPeakIO:
         for chrom in chrs:
             x += len(peaks[chrom])
         return x
-  
+
     def write_to_gappedPeak (self, fhd, bytes name_prefix=b"peak_", bytes name=b'peak', bytes description=b"%s", str score_column="score", trackline=True):
         """Print out peaks in gappedBed format. Only those with stronger enrichment regions are saved.
 
@@ -967,7 +967,7 @@ cdef class BroadPeakIO:
         |              |      |using false discovery rate. Use -1 if no|
         |              |      |qValue is assigned.                     |
         +--------------+------+----------------------------------------+
-       
+
         """
         chrs = list(self.peaks.keys())
         chrs.sort()
@@ -1041,7 +1041,7 @@ cdef class BroadPeakIO:
         +--------------+------+----------------------------------------+
         |blockStarts   |string| A comma-separated list of block starts.|
         +--------------+------+----------------------------------------+
-       
+
         """
         chrs = list(self.peaks.keys())
         chrs.sort()
@@ -1116,7 +1116,7 @@ cdef class BroadPeakIO:
         |           |      |using false discovery rate. Use -1 if no|
         |           |      |qValue is assigned.                     |
         +-----------+------+----------------------------------------+
-        
+
         """
         cdef int n_peak
         cdef bytes chrom
@@ -1149,11 +1149,11 @@ cdef class BroadPeakIO:
 
 
         wait... why I have two write_to_xls in this class?
-        
+
         """
         write = ofhd.write
         write("\t".join(("chr","start", "end",  "length",  "pileup", "-log10(pvalue)", "fold_enrichment", "-log10(qvalue)", "name"))+"\n")
-        
+
         try: peakprefix = name_prefix % name
         except: peakprefix = name_prefix
 
@@ -1171,7 +1171,7 @@ cdef class BroadPeakIO:
                 write("\t%.6g" % (round(peak['pileup'],2))) # pileup height at summit
                 write("\t%.6g" % (peak['pscore'])) # -log10pvalue at summit
                 write("\t%.6g" % (peak['fc'])) # fold change at summit
-                write("\t%.6g" % (peak['qscore'])) # -log10qvalue at summit                    
+                write("\t%.6g" % (peak['qscore'])) # -log10qvalue at summit
                 write("\t%s" % peakname)
                 write("\n")
         return

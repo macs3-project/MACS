@@ -38,7 +38,7 @@ cdef INT_MAX = <int32_t>((<uint32_t>(-1))>>1)
 cdef packed struct peLoc:
     int32_t l
     int32_t r
-  
+
 # Let numpy enforce PE-ness using ndarray, gives bonus speedup when sorting
 # PE data doesn't have strandedness
 cdef class PETrackI:
@@ -65,10 +65,10 @@ cdef class PETrackI:
         public int64_t length
         public float32_t average_template_length
         bool   __destroyed
-    
+
     def __init__ (self, char * anno="", int64_t buffer_size = 100000 ):
         """fw is the fixed-width for all locations.
-        
+
         """
         self.__locations = {}    # location pairs
         self.__pointer = {}      # location pairs
@@ -83,10 +83,10 @@ cdef class PETrackI:
         self.buffer_size = buffer_size
         self.length = 0
         self.average_template_length = 0.0
-        
+
     cpdef void add_loc ( self, bytes chromosome, int32_t start, int32_t end):
         """Add a location to the list according to the sequence name.
-        
+
         chromosome -- mostly the chromosome name
         fiveendpos -- 5' end pos, left for plus strand, right for neg strand
         """
@@ -112,7 +112,7 @@ cdef class PETrackI:
         cdef:
             set chrs
             bytes chromosome
-            
+
         chrs = self.get_chr_names()
         for chromosome in chrs:
             if chromosome in self.__locations:
@@ -163,18 +163,18 @@ cdef class PETrackI:
         if not self.rlengths:
             self.rlengths = dict([(k, INT_MAX) for k in self.__locations.keys()])
         return self.rlengths
-    
+
     cpdef void finalize ( self ):
         """ Resize np arrays for 5' positions and sort them in place
 
-        Note: If this function is called, it's impossible to append more files to this FWTrack object. So remember to call it after all the files are read!        
+        Note: If this function is called, it's impossible to append more files to this FWTrack object. So remember to call it after all the files are read!
         """
-        
+
         cdef:
             int32_t i
             bytes c
             set chrnames
-        
+
         self.total = 0
 
         chrnames = self.get_chr_names()
@@ -203,7 +203,7 @@ cdef class PETrackI:
         return set(sorted(self.__locations.keys()))
 
     # cpdef length ( self ):
-    #     """Total sequenced length = sum(end-start) over chroms 
+    #     """Total sequenced length = sum(end-start) over chroms
 
     #     TL: efficient?
     #     """
@@ -211,12 +211,12 @@ cdef class PETrackI:
     #         int64_t l = 0
     #         np.ndarray[np.int32_t, ndim=2] v
     #     for v in self.__locations.values():
-    #         l += (v[:,1] - v[:,0]).sum() 
+    #         l += (v[:,1] - v[:,0]).sum()
     #     return l
 
     cpdef void sort ( self ):
         """Naive sorting for locations.
-        
+
         """
         cdef:
             uint32_t i
@@ -234,7 +234,7 @@ cdef class PETrackI:
 
 #    def centered_fake_fragments(track, int32_t d):
 #        """Return a copy of the PETrackI object so that its locations are all
-#        the same fixed distance d about the center of each fragment 
+#        the same fixed distance d about the center of each fragment
 #        """
 #        new = PETrackI()
 #        new.__pointer = deepcopy(self.__pointer)
@@ -242,13 +242,13 @@ cdef class PETrackI:
 #        new.total = self.total
 #        new.__sorted = self.__sorted
 #        new.__locations = {}
-#        
+#
 #        five_shift = d / 2
 #        three_shift = d - five_shift
 #        for k, v in self.__locations.items():
 #            midpoints = (v[:,0] + v[:,1]) / 2
 #            new.__locations[k] = np.vstack((midpoints - five_shift,
-#                                             midpoints + three_shift))  
+#                                             midpoints + three_shift))
 #        return new
 
     def pmf( self ):
@@ -264,7 +264,7 @@ cdef class PETrackI:
            int32_t i, bins_len
            int32_t max_bins = 0
            set chrnames
-           
+
         chrnames = self.get_chr_names()
 
         for c in chrnames:
@@ -276,7 +276,7 @@ cdef class PETrackI:
             if counts.shape[0] < max_bins:
                     counts.resize(max_bins, refcheck=False)
             counts += bins
-        
+
         counts.resize(max_bins, refcheck=False)
         pmf = counts.astype('float64') / counts.astype('float64').sum()
         return pmf
@@ -284,7 +284,7 @@ cdef class PETrackI:
     @cython.boundscheck(False) # do not check that np indices are valid
     cpdef void separate_dups ( self , int32_t maxnum = 1 ):
         """Filter the duplicated reads.
-    
+
         Run it right after you add all data into this object.
         """
         cdef:
@@ -300,9 +300,9 @@ cdef class PETrackI:
         if maxnum < 0: return # condition to return if not filtering
 
         chrnames = self.get_chr_names()
-         
+
         if not self.__sorted: self.sort()
-        
+
         self.__dup_pointer = copy(self.__pointer)
         self.dup_total = 0
         self.total = 0
@@ -350,8 +350,8 @@ cdef class PETrackI:
                     # otherwise, put the fragment in new_locs
                     new_locs[i_new][0] = loc_start
                     new_locs[i_new][1] = loc_end
-                    self.length += loc_end - loc_start                            
-                    i_new += 1                        
+                    self.length += loc_end - loc_start
+                    i_new += 1
             new_locs.resize( i_new , refcheck = False)
             dup_locs.resize( i_dup , refcheck = False)
             self.total += i_new
@@ -369,11 +369,11 @@ cdef class PETrackI:
             self.__dup_locations[k] = dup_locs
         self.average_template_length = self.length / self.total
         return
-    
+
     @cython.boundscheck(False) # do not check that np indices are valid
     cpdef void filter_dup ( self, int32_t maxnum=-1):
         """Filter the duplicated reads.
-    
+
         Run it right after you add all data into this object.
         """
         cdef:
@@ -384,20 +384,20 @@ cdef class PETrackI:
             np.ndarray locs, new_locs
             set chrnames
             #peLoc current_range, this_range
-                
+
         if maxnum < 0: return # condition to return if not filtering
-        
+
         if not self.__sorted: self.sort()
-        
+
         self.total = 0
         self.length = 0
         self.average_template_length = 0.0
-        
+
         chrnames = self.get_chr_names()
-        
+
         for k in chrnames: # for each chromosome
             locs = self.__locations[k]
-            size = locs.shape[0]            
+            size = locs.shape[0]
             if size == 1:
                 # do nothing and continue
                 self.total += size
@@ -460,20 +460,20 @@ cdef class PETrackI:
             uint32_t num, i_chrom      # num: number of reads allowed on a certain chromosome
             bytes k
             set chrnames
-        
+
         self.total = 0
         self.length = 0
         self.average_template_length = 0.0
-        
+
         chrnames = self.get_chr_names()
 
         if seed >= 0:
             np.random.seed(seed)
-        
+
         for k in chrnames:
             # for each chromosome.
             # This loop body is too big, I may need to split code later...
-            
+
             num = <uint32_t>round(self.__locations[k].shape[0] * percent, 5 )
             np.random.shuffle( self.__locations[k] )
             self.__locations[k].resize( num, refcheck = False )
@@ -498,20 +498,20 @@ cdef class PETrackI:
     cpdef void print_to_bed (self, fhd=None):
         """Output to BEDPE format files. If fhd is given, write to a
         file, otherwise, output to standard output.
-        
+
         """
         cdef:
             int32_t i, i_chrom, s, e
             bytes k
             set chrnames
-        
-        
+
+
         if not fhd:
             fhd = sys.stdout
         assert isinstance(fhd, io.IOBase)
 
         chrnames = self.get_chr_names()
-        
+
         for k in chrnames:
             # for each chromosome.
             # This loop body is too big, I may need to split code later...
@@ -523,18 +523,18 @@ cdef class PETrackI:
                 fhd.write("%s\t%d\t%d\n" % (k.decode(), s, e))
 
         return
-    
+
     cpdef list pileup_a_chromosome ( self, bytes chrom, list scale_factor_s, float32_t baseline_value = 0.0 ):
         """pileup a certain chromosome, return [p,v] (end position and value) list.
-        
+
         scale_factor_s  : linearly scale the pileup value applied to each d in ds. The list should have the same length as ds.
         baseline_value : a value to be filled for missing values, and will be the minimum pileup.
         """
         cdef:
             list tmp_pileup, prev_pileup
             float32_t scale_factor
-            
-        #if not self.__sorted: 
+
+        #if not self.__sorted:
         #    self.sort()
 
         prev_pileup = None
@@ -558,7 +558,7 @@ cdef class PETrackI:
         simplified function from FixWidthTrack. We pretend the PE is
         SE data and left read is on plus strand and right read is on
         minus strand.
-        
+
         ds             : tag will be extended to this value to 3' direction,
                          unless directional is False. Can contain multiple extension
                          values. Final pileup will the maximum.

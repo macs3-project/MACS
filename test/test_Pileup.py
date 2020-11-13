@@ -34,7 +34,7 @@ class Test_pileup(unittest.TestCase):
                         ( 3, 4, 3.0 ),
                         ( 4, 6, 4.0 ),
                         ( 6, 8, 3.0 ),
-                        ( 8, 9, 2.0 ),                            
+                        ( 8, 9, 2.0 ),
                         ( 9, 10, 1.0 )
                         ]
         self.expect2 = [(0, 1, 13.0),
@@ -54,9 +54,9 @@ class Test_pileup(unittest.TestCase):
         for i in self.plus_pos:
             self.fwtrack2.add_loc(self.chrom, i, 0)
         for i in self.minus_pos:
-            self.fwtrack2.add_loc(self.chrom, i, 1)            
+            self.fwtrack2.add_loc(self.chrom, i, 1)
         self.fwtrack2.finalize()
-        
+
         self.pileup = unified_pileup_bdg(self.fwtrack2, self.d, self.scale_factor, halfextension=False)
         self.result = []
         chrs = self.pileup.get_chr_names()
@@ -79,7 +79,7 @@ class Test_pileup(unittest.TestCase):
         for i in self.plus_pos:
             self.fwtrack2.add_loc(self.chrom, i, 0)
         for i in self.minus_pos:
-            self.fwtrack2.add_loc(self.chrom, i, 1)            
+            self.fwtrack2.add_loc(self.chrom, i, 1)
         self.fwtrack2.finalize()
         # pileup test
         self.pileup = unified_pileup_bdg(self.fwtrack2, self.d_s, self.scale_factor_s, baseline_value=13, halfextension=False)
@@ -97,4 +97,4 @@ class Test_pileup(unittest.TestCase):
                 pre = pos
         # check result
         self.assertEqual(self.result, self.expect2)
-        
+

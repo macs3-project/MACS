@@ -10,7 +10,7 @@ under the terms of the BSD License (see the file LICENSE included with
 the distribution).
 """
 
-# smoothing function 
+# smoothing function
 import numpy as np
 cimport numpy as np
 from cpython cimport bool
@@ -20,7 +20,7 @@ from math import factorial as mathfactorial
 cpdef np.ndarray[np.int32_t, ndim=1] maxima(np.ndarray[np.float32_t, ndim=1] signal,
                                             int window_size=51):
     """return the local maxima in a signal after applying a 2nd order
-    Savitsky-Golay (polynomial) filter using window_size specified  
+    Savitsky-Golay (polynomial) filter using window_size specified
     """
     cdef:
         np.ndarray[np.int32_t, ndim=1] m
@@ -54,14 +54,14 @@ cdef np.ndarray[np.int32_t, ndim=1] internal_minima( np.ndarray[np.float32_t, nd
 
 cdef inline float sqrt(float threshold):
     return mathsqrt(threshold)
-    
+
 cpdef enforce_peakyness(np.ndarray[np.float32_t, ndim=1] signal,
                         np.ndarray[np.int32_t, ndim=1] maxima):
     """requires peaks described by a signal and a set of points where the signal
     is at a maximum to meet a certain set of criteria
-    
+
     maxima which do not meet the required criteria are discarded
-    
+
     criteria:
         for each peak:
             calculate a threshold of the maximum of its adjacent two minima
@@ -69,7 +69,7 @@ cpdef enforce_peakyness(np.ndarray[np.float32_t, ndim=1] signal,
             subtract the threshold from the region bounded by those minima
             clip that region if negative values occur inside it
             require it be > 50 bp in width
-            require that it not be too flat (< 6 unique values) 
+            require that it not be too flat (< 6 unique values)
     """
     cdef:
         np.ndarray[np.int32_t, ndim=1] minima = internal_minima(signal, maxima)
@@ -105,7 +105,7 @@ cpdef enforce_peakyness(np.ndarray[np.float32_t, ndim=1] signal,
     peaky_maxima.resize(j, refcheck=False)
     return peaky_maxima
 
-# hardcoded minimum peak width = 50            
+# hardcoded minimum peak width = 50
 cdef bool is_valid_peak(np.ndarray[np.float32_t, ndim=1] signal, int maximum):
     cdef:
         s = hard_clip(signal, maximum)
@@ -137,7 +137,7 @@ cdef np.ndarray[np.float32_t, ndim=1] hard_clip(np.ndarray[np.float32_t, ndim=1]
     for i in range(maximum, right):
         if signal[i] < 0:
             right = i
-            break 
+            break
     return signal[left:right]
 
 # for all maxima, set min_subpeak_width = 0
@@ -195,7 +195,7 @@ cpdef enforce_valleys(np.ndarray[np.float32_t, ndim=1] signal,
             valid_summits[n_valid_summits-1] = summit_pos
     valid_summits.resize(n_valid_summits, refcheck=False)
     # Step 2: Re-find peaks from subtracted signal
-    # 
+    #
     return valid_summits
 
 # Modified from http://www.scipy.org/Cookbook/SavitzkyGolay
@@ -245,7 +245,7 @@ cpdef np.ndarray[np.float64_t, ndim=1] savitzky_golay_order2_deriv1(np.ndarray[n
         # values taken from the signal itself
         np.ndarray[np.float32_t, ndim=1] firstvals, lastvals
         np.ndarray[np.float64_t, ndim=1] m, ret
-        
+
     if window_size % 2 != 1: window_size += 1
     half_window = (window_size - 1) // 2
     # precompute coefficients

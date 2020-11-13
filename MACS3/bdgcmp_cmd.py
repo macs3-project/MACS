@@ -85,11 +85,11 @@ def run( options ):
             sbtrack.change_score_method( ord('l') )
         elif method == 'slogLR':             # log likelihood
             sbtrack.change_score_method( ord('s') )
-        elif method == 'max':             
-            sbtrack.change_score_method( ord('M') )            
+        elif method == 'max':
+            sbtrack.change_score_method( ord('M') )
         else:
             raise Exception("Can't reach here!")
-        
+
         info("Write bedGraph of scores...")
         ofhd = open(ofile,"w")
         sbtrack.write_bedGraph(ofhd,name="%s_Scores" % (method.upper()),description="Scores calculated by %s" % (method.upper()), column = 3)

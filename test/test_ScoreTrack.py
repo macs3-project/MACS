@@ -37,7 +37,7 @@ class Test_TwoConditionScores(unittest.TestCase):
         self.twoconditionscore.build()
         self.twoconditionscore.finalize()
         (self.cat1,self.cat2,self.cat3) = self.twoconditionscore.call_peaks(min_length=10, max_gap=10, cutoff=3)
-        
+
 class Test_ScoreTrackII(unittest.TestCase):
 
     def setUp(self):
@@ -106,7 +106,7 @@ chrY	185	186	peak_2	6.40804
 chrY	1	60	60	6	100	63.2725	9.18182	-1	MACS_peak_1
 chrY	161	210	50	186	20	7.09102	3.5	-1	MACS_peak_2
 """
-        
+
     def assertListAlmostEqual ( self, a, b, places =2 ):
         return all( [self.assertAlmostEqual(x, y, places=places) for (x, y) in zip( a, b)] )
 
@@ -125,7 +125,7 @@ chrY	161	210	50	186	20	7.09102	3.5	-1	MACS_peak_2
         s1.change_score_method( ord('q') )
         r = s1.get_data_by_chr(b"chrY")
         self.assertListAlmostEqual( [round(x,2) for x in list(r[3])], self.q_result )
-        
+
         s1.change_score_method( ord('l') )
         r = s1.get_data_by_chr(b"chrY")
         self.assertListAlmostEqual( [round(x,2) for x in list(r[3])], self.l_result )
@@ -175,10 +175,10 @@ chrY	161	210	50	186	20	7.09102	3.5	-1	MACS_peak_2
         strio = io.StringIO()
         s1.write_bedGraph( strio, "NAME", "DESC", 1 )
         self.assertEqual( strio.getvalue(), self.bdg1 )
-        strio = io.StringIO()        
+        strio = io.StringIO()
         s1.write_bedGraph( strio, "NAME", "DESC", 2 )
         self.assertEqual( strio.getvalue(), self.bdg2 )
-        strio = io.StringIO()        
+        strio = io.StringIO()
         s1.write_bedGraph( strio, "NAME", "DESC", 3 )
         self.assertEqual( strio.getvalue(), self.bdg3 )
 
@@ -200,5 +200,5 @@ chrY	161	210	50	186	20	7.09102	3.5	-1	MACS_peak_2
 
         strio = io.StringIO()
         p.write_to_xls( strio )
-        self.assertEqual( strio.getvalue(), self.xls1 )        
+        self.assertEqual( strio.getvalue(), self.xls1 )
 

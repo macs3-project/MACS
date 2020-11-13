@@ -128,7 +128,7 @@ cdef inline np.ndarray apply_multiple_cutoffs ( list multiple_score_arrays, list
         np.ndarray ret
 
     ret = multiple_score_arrays[0] > multiple_cutoffs[0]
-    
+
     for i in range(1,len(multiple_score_arrays)):
         ret += multiple_score_arrays[i] > multiple_cutoffs[i]
 
@@ -157,7 +157,7 @@ cdef inline float32_t get_subtraction ( float32_t x, float32_t y):
 cdef inline list getitem_then_subtract ( list peakset, int32_t start ):
     cdef:
         list a
-    
+
     a = [x["start"] for x in peakset]
     for i in range(len(a)):
         a[i] = a[i] - start
@@ -187,7 +187,7 @@ cdef wtd_find_summit(chrom, np.ndarray plus, np.ndarray minus, int32_t search_st
         int32_t i, j, watson_left, watson_right, crick_left, crick_right, wtd_max_pos
         float32_t wtd_max_val
         np.ndarray wtd_list, wtd_other_max_pos, wtd_other_max_val
-        
+
     watson, crick = (Counter(plus), Counter(minus))
     watson_left = left_sum(watson, search_start, window_size)
     crick_left = left_sum(crick, search_start, window_size)
@@ -245,21 +245,21 @@ cdef float32_t mean_from_value_length ( np.ndarray[np.float32_t, ndim=1] value, 
         tmp_v = <float64_t>value[ i ]
         tmp_sum = tmp_v * tmp_l
         sum_v = tmp_sum + sum_v
-        l += tmp_l 
+        l += tmp_l
 
     ret = <float32_t>(sum_v/l)
-        
+
     return ret
 
 
 cdef tuple find_optimal_cutoff( list x, list y ):
-    """Return the best cutoff x and y. 
+    """Return the best cutoff x and y.
 
     We assume that total peak length increase exponentially while
     decreasing cutoff value. But while cutoff decreases to a point
     that background noises are captured, total length increases much
     faster. So we fit a linear model by taking the first 10 points,
-    then look for the largest cutoff that 
+    then look for the largest cutoff that
 
     """
     cdef:
@@ -285,7 +285,7 @@ cdef tuple find_optimal_cutoff( list x, list y ):
         rsq = 1 - sse/sst
         #print i, x[i], y[i], m, c, rsq
     return ( 1.0, 1.0 )
-    
+
 
 
 # ------------------------------------
@@ -331,10 +331,10 @@ cdef class CallerFromAlignments:
         dict pqtable                   # remember pvalue->qvalue convertion
         bool pvalue_all_done             # whether the pvalue of whole genome is all calculated. If yes, it's OK to calculate q-value.
 
-        dict pvalue_npeaks               # record for each pvalue cutoff, how many peaks can be called  
+        dict pvalue_npeaks               # record for each pvalue cutoff, how many peaks can be called
         dict pvalue_length               # record for each pvalue cutoff, the total length of called peaks
-        float32_t optimal_p_cutoff           # automatically decide the p-value cutoff ( can be translated into qvalue cutoff ) based 
-                                         # on p-value to total peak length analysis. 
+        float32_t optimal_p_cutoff           # automatically decide the p-value cutoff ( can be translated into qvalue cutoff ) based
+                                         # on p-value to total peak length analysis.
         bytes cutoff_analysis_filename     # file to save the pvalue-npeaks-totallength table
 
         float64_t test_time
@@ -342,12 +342,12 @@ cdef class CallerFromAlignments:
 
 
     def __init__ (self, treat, ctrl,
-                  int32_t d = 200, list ctrl_d_s = [200, 1000, 10000], 
-                  float32_t treat_scaling_factor = 1.0, list ctrl_scaling_factor_s = [1.0, 0.2, 0.02], 
-                  bool stderr_on = False, 
-                  float32_t pseudocount = 1, 
-                  int32_t end_shift = 0, 
-                  float32_t lambda_bg = 0, 
+                  int32_t d = 200, list ctrl_d_s = [200, 1000, 10000],
+                  float32_t treat_scaling_factor = 1.0, list ctrl_scaling_factor_s = [1.0, 0.2, 0.02],
+                  bool stderr_on = False,
+                  float32_t pseudocount = 1,
+                  int32_t end_shift = 0,
+                  float32_t lambda_bg = 0,
                   bool save_bedGraph = False,
                   str  bedGraph_filename_prefix = "PREFIX",
                   str bedGraph_treat_filename = "TREAT.bdg",
@@ -373,7 +373,7 @@ cdef class CallerFromAlignments:
         d, sregion, lregion: d is the fragment size, sregion is the
                              small region size, lregion is the large
                              region size
-                                    
+
         pseudocount: a pseudocount used to calculate logLR, FE or
                      logFE. Please note this value will not be changed
                      with normalization method. So if you really want
@@ -396,7 +396,7 @@ cdef class CallerFromAlignments:
             self.PE_mode = True
         else:
             raise Exception("Should be FWTrack or PETrackI object!")
-        
+
         self.treat = treat
         if ctrl:
             self.ctrl = ctrl
@@ -436,7 +436,7 @@ cdef class CallerFromAlignments:
 
         self.test_time = 0
         self.pileup_data_files = {}
-        
+
         self.pvalue_length = {}
         self.pvalue_npeaks = {}
         for p in np.arange( 0.3, 10, 0.3 ): # step for optimal cutoff is 0.3 in -log10pvalue, we try from pvalue 1E-10 (-10logp=10) to 0.5 (-10logp=0.3)
@@ -462,7 +462,7 @@ cdef class CallerFromAlignments:
 
     cpdef set_pseudocount( self, float32_t pseudocount ):
         self.pseudocount = pseudocount
-        
+
     cpdef enable_trackline( self ):
         """Turn on trackline with bedgraph output
         """
@@ -472,7 +472,7 @@ cdef class CallerFromAlignments:
         """After this function is called, self.chr_pos_treat_ctrl will
         be reset and assigned to the pileup values of the given
         chromosome.
-        
+
         """
         cdef:
             list treat_pv, ctrl_pv
@@ -511,9 +511,9 @@ cdef class CallerFromAlignments:
             treat_pv = self.treat.pileup_a_chromosome ( chrom, [self.treat_scaling_factor,], baseline_value = 0.0 )
         else:
             treat_pv = self.treat.pileup_a_chromosome( chrom, [self.d,], [self.treat_scaling_factor,], baseline_value = 0.0,
-                                                       directional = True, 
+                                                       directional = True,
                                                        end_shift = self.end_shift )
-        
+
         if not self.no_lambda_flag:
             if self.PE_mode:
                 # note, we pileup up PE control as SE control because
@@ -545,7 +545,7 @@ cdef class CallerFromAlignments:
 
     cdef list __chrom_pair_treat_ctrl ( self, treat_pv, ctrl_pv ):
         """*private* Pair treat and ctrl pileup for each region.
-        
+
         treat_pv and ctrl_pv are [np.ndarray, np.ndarray].
 
         return [p, t, c] list, each element is a numpy array.
@@ -553,8 +553,8 @@ cdef class CallerFromAlignments:
         cdef:
             list ret
             int64_t pre_p, index_ret, it, ic, lt, lc
-            np.ndarray[np.int32_t, ndim=1] t_p, c_p, ret_p 
-            np.ndarray[np.float32_t, ndim=1] t_v, c_v, ret_t, ret_c 
+            np.ndarray[np.int32_t, ndim=1] t_p, c_p, ret_p
+            np.ndarray[np.float32_t, ndim=1] t_v, c_v, ret_t, ret_c
 
             int32_t * t_p_ptr
             int32_t * c_p_ptr
@@ -575,7 +575,7 @@ cdef class CallerFromAlignments:
 
         ret_p = np.zeros( chrom_max_len, dtype="int32" ) # position
         ret_t = np.zeros( chrom_max_len, dtype="float32" ) # value from treatment
-        ret_c = np.zeros( chrom_max_len, dtype="float32" ) # value from control        
+        ret_c = np.zeros( chrom_max_len, dtype="float32" ) # value from control
 
         t_p_ptr = <int32_t *> t_p.data
         t_v_ptr = <float32_t *> t_v.data
@@ -635,7 +635,7 @@ cdef class CallerFromAlignments:
                 t_p_ptr += 1
                 t_v_ptr += 1
                 c_p_ptr += 1
-                c_v_ptr += 1                
+                c_v_ptr += 1
 
         ret_p.resize( index_ret, refcheck=False)
         ret_t.resize( index_ret, refcheck=False)
@@ -655,7 +655,7 @@ cdef class CallerFromAlignments:
     cdef void __cal_pvalue_qvalue_table ( self ):
         """After this function is called, self.pqtable is built. All
         chromosomes will be iterated. So it will take some time.
-        
+
         """
         cdef:
             bytes chrom
@@ -668,7 +668,7 @@ cdef class CallerFromAlignments:
             int64_t nhcal = 0
             int64_t npcal = 0
             list unique_values
-            float64_t t0, t1, t2, t 
+            float64_t t0, t1, t2, t
             int32_t * pos_ptr
             float32_t * treat_value_ptr
             float32_t * ctrl_value_ptr
@@ -700,8 +700,8 @@ cdef class CallerFromAlignments:
                 pos_ptr += 1
                 treat_value_ptr += 1
                 ctrl_value_ptr += 1
-   
-            nhcal += pos_array.shape[0]            
+
+            nhcal += pos_array.shape[0]
 
         #logging.debug ( "make pvalue_stat cost %.5f seconds" % t )
         #logging.debug ( "calculate pvalue/access hash for %d times" % nhcal )
@@ -727,7 +727,7 @@ cdef class CallerFromAlignments:
             pre_q = q
             k += l
             nhcal += 1
-            
+
         logging.debug( "access pq hash for %d times" % nhcal )
 
         return
@@ -736,7 +736,7 @@ cdef class CallerFromAlignments:
     cdef void __pre_computes ( self, int32_t max_gap = 50, int32_t min_length = 200 ):
         """After this function is called, self.pqtable and self.pvalue_length is built. All
         chromosomes will be iterated. So it will take some time.
-        
+
         """
         cdef:
             bytes chrom
@@ -750,7 +750,7 @@ cdef class CallerFromAlignments:
             int64_t nhcal = 0
             int64_t npcal = 0
             list unique_values
-            float64_t t0, t1, t 
+            float64_t t0, t1, t
 
             np.ndarray above_cutoff, above_cutoff_endpos, above_cutoff_startpos
             list peak_content
@@ -771,7 +771,7 @@ cdef class CallerFromAlignments:
         pvalue_stat = dict()
         #print (list(pvalue_stat.keys()))
         #print (list(self.pvalue_length.keys()))
-        #print (list(self.pvalue_npeaks.keys()))        
+        #print (list(self.pvalue_npeaks.keys()))
         for i in range( len( self.chromosomes ) ):
             chrom = self.chromosomes[ i ]
             self.__pileup_treat_ctrl_a_chromosome( chrom )
@@ -783,7 +783,7 @@ cdef class CallerFromAlignments:
                 cutoff = tmplist[ n ]
                 total_l = 0           # total length in potential peak
                 total_p = 0
-                
+
                 # get the regions with scores above cutoffs
                 above_cutoff = np.nonzero( score_array > cutoff )[0]# this is not an optimized method. It would be better to store score array in a 2-D ndarray?
                 above_cutoff_endpos = pos_array[above_cutoff] # end positions of regions where score is above cutoff
@@ -800,7 +800,7 @@ cdef class CallerFromAlignments:
                 lastp = ace_ptr[ 0 ]
                 acs_ptr += 1
                 ace_ptr += 1
-        
+
                 for i in range( 1, above_cutoff_startpos.size ):
                     tl = acs_ptr[ 0 ] - lastp
                     if tl <= max_gap:
@@ -822,7 +822,7 @@ cdef class CallerFromAlignments:
                         total_p += 1
                 self.pvalue_length[ cutoff ] = self.pvalue_length.get( cutoff, 0 ) + total_l
                 self.pvalue_npeaks[ cutoff ] = self.pvalue_npeaks.get( cutoff, 0 ) + total_p
-            
+
             pos_array_ptr = <int32_t *> pos_array.data
             score_array_ptr = <float32_t *> score_array.data
 
@@ -839,7 +839,7 @@ cdef class CallerFromAlignments:
                 pos_array_ptr += 1
                 score_array_ptr += 1
 
-            nhcal += pos_array.shape[0]            
+            nhcal += pos_array.shape[0]
 
         #logging.debug ( "make pvalue_stat cost %.5f seconds" % t )
         #logging.debug ( "calculate pvalue/access hash for %d times" % nhcal )
@@ -847,7 +847,7 @@ cdef class CallerFromAlignments:
         # add all pvalue cutoffs from cutoff-analysis part. So that we
         # can get the corresponding qvalues for them.
         for cutoff in tmplist:
-            if cutoff not in pvalue_stat: 
+            if cutoff not in pvalue_stat:
                 pvalue_stat[ cutoff ] = 0
 
         nhval = 0
@@ -892,13 +892,13 @@ cdef class CallerFromAlignments:
         #logging.info( "#3 -10log10pvalue cutoff %.2f will call approximately %.0f bps regions as significant regions" % ( optimal_cutoff, optimal_length ) )
         #print (list(pqtable.keys()))
         #print (list(self.pvalue_length.keys()))
-        #print (list(self.pvalue_npeaks.keys()))        
+        #print (list(self.pvalue_npeaks.keys()))
         return
 
-    cpdef call_peaks ( self, list scoring_function_symbols, list score_cutoff_s, int32_t min_length = 200, 
+    cpdef call_peaks ( self, list scoring_function_symbols, list score_cutoff_s, int32_t min_length = 200,
                        int32_t max_gap = 50, bool call_summits = False, bool cutoff_analysis = False ):
         """Call peaks for all chromosomes. Return a PeakIO object.
-        
+
         scoring_function_s: symbols of functions to calculate score. 'p' for pscore, 'q' for qscore, 'f' for fold change, 's' for subtraction. for example: ['p', 'q']
         score_cutoff_s    : cutoff values corresponding to scoring functions
         min_length        : minimum length of peak
@@ -961,7 +961,7 @@ cdef class CallerFromAlignments:
 
         return peaks
 
-    cdef void __chrom_call_peak_using_certain_criteria ( self, peaks, bytes chrom, list scoring_function_s, list score_cutoff_s, int32_t min_length, 
+    cdef void __chrom_call_peak_using_certain_criteria ( self, peaks, bytes chrom, list scoring_function_s, list score_cutoff_s, int32_t min_length,
                                                    int32_t max_gap, bool call_summits, bool save_bedGraph ):
         """ Call peaks for a chromosome.
 
@@ -998,7 +998,7 @@ cdef class CallerFromAlignments:
 
 
         assert len(scoring_function_s) == len(score_cutoff_s), "number of functions and cutoffs should be the same!"
-        
+
         peak_content = []           # to store points above cutoff
 
         # first, build pileup, self.chr_pos_treat_ctrl
@@ -1057,14 +1057,14 @@ cdef class CallerFromAlignments:
         te = ace_ptr[ 0 ]
         ti = acia_ptr[ 0 ]
         tp = treat_array_ptr[ ti ]
-        cp = ctrl_array_ptr[ ti ]        
+        cp = ctrl_array_ptr[ ti ]
 
         peak_content.append( ( ts, te, tp, cp, ti ) )
         lastp = te
         acs_ptr += 1
         ace_ptr += 1
         acia_ptr+= 1
-        
+
         for i in range( 1, above_cutoff_startpos.shape[0] ):
             ts = acs_ptr[ 0 ]
             te = ace_ptr[ 0 ]
@@ -1073,10 +1073,10 @@ cdef class CallerFromAlignments:
             ace_ptr += 1
             acia_ptr+= 1
             tp = treat_array_ptr[ ti ]
-            cp = ctrl_array_ptr[ ti ]        
+            cp = ctrl_array_ptr[ ti ]
             tl = ts - lastp
             if tl <= max_gap:
-                # append. 
+                # append.
                 peak_content.append( ( ts, te, tp, cp, ti ) )
                 lastp = te #above_cutoff_endpos[i]
             else:
@@ -1136,8 +1136,8 @@ cdef class CallerFromAlignments:
             summit_index  = tsummit_index[ midindex ]
 
             summit_treat = peak_content[ summit_index ][ 2 ]
-            summit_ctrl = peak_content[ summit_index ][ 3 ]            
-            
+            summit_ctrl = peak_content[ summit_index ][ 3 ]
+
             # this is a double-check to see if the summit can pass cutoff values.
             for i in range(len(score_cutoff_s)):
                 if score_cutoff_s[i] > score_array_s[ i ][ peak_content[ summit_index ][ 4 ] ]:
@@ -1166,7 +1166,7 @@ cdef class CallerFromAlignments:
         """Algorithm implemented by Ben, to profile the pileup signals
         within a peak region then find subpeak summits. This method is
         highly recommended for TFBS or DNAase I sites.
-        
+
         """
         cdef:
             int32_t summit_pos, tstart, tend, tmpindex, summit_index, summit_offset
@@ -1177,7 +1177,7 @@ cdef class CallerFromAlignments:
             int32_t tlist_scores_p
 
         peak_length = peak_content[ -1 ][ 1 ] - peak_content[ 0 ][ 0 ]
-            
+
         if peak_length < min_length: return  # if the region is too small, reject it
 
         # Add 10 bp padding to peak region so that we can get true minima
@@ -1210,21 +1210,21 @@ cdef class CallerFromAlignments:
             m = np.searchsorted(summit_offsets, start_boundary)
             n = np.searchsorted(summit_offsets, peak_length + start_boundary, 'right')
             summit_offsets = summit_offsets[m:n]
-        
+
         summit_offsets = enforce_peakyness(peakdata, summit_offsets)
 
         #print "enforced:",summit_offsets
         if summit_offsets.shape[0] == 0:
             # **failsafe** if no summits, fall back on old approach #
             return self.__close_peak_wo_subpeaks(peak_content, peaks, min_length, chrom, smoothlen, score_array_s, score_cutoff_s)
-        
+
         summit_indices = peakindices[summit_offsets] # indices are those point to peak_content
         summit_offsets -= start_boundary
 
         for summit_offset, summit_index in list(zip(summit_offsets, summit_indices)):
 
             summit_treat = peak_content[ summit_index ][ 2 ]
-            summit_ctrl = peak_content[ summit_index ][ 3 ]            
+            summit_ctrl = peak_content[ summit_index ][ 3 ]
 
             #summit_p_score = get_pscore( int(summit_treat), summit_ctrl )
             summit_p_score = get_pscore(( <int32_t>(summit_treat), summit_ctrl ) )
@@ -1251,19 +1251,19 @@ cdef class CallerFromAlignments:
         cdef:
             int64_t i, array1_size
             np.ndarray[np.float32_t, ndim=1] s
-            float32_t * a1_ptr 
+            float32_t * a1_ptr
             float32_t * a2_ptr
             float32_t * s_ptr
 
         assert array1.shape[0] == array2.shape[0]
         s = np.zeros(array1.shape[0], dtype="float32")
-        
+
         a1_ptr = <float32_t *> array1.data
         a2_ptr = <float32_t *> array2.data
         s_ptr = <float32_t *> s.data
 
         array1_size = array1.shape[0]
-        
+
         for i in range(array1_size):
             #s_ptr[0] = get_pscore( int(a1_ptr[0]), a2_ptr[0] )
             s_ptr[0] = get_pscore(( <int32_t>(a1_ptr[0]), a2_ptr[0] ))
@@ -1276,13 +1276,13 @@ cdef class CallerFromAlignments:
         cdef:
             int64_t i, array1_size
             np.ndarray[np.float32_t, ndim=1] s
-            float32_t * a1_ptr 
+            float32_t * a1_ptr
             float32_t * a2_ptr
             float32_t * s_ptr
 
         assert array1.shape[0] == array2.shape[0]
         s = np.zeros(array1.shape[0], dtype="float32")
-        
+
         a1_ptr = <float32_t *> array1.data
         a2_ptr = <float32_t *> array2.data
         s_ptr = <float32_t *> s.data
@@ -1299,19 +1299,19 @@ cdef class CallerFromAlignments:
         cdef:
             int64_t i, array1_size
             np.ndarray[np.float32_t, ndim=1] s
-            float32_t * a1_ptr 
+            float32_t * a1_ptr
             float32_t * a2_ptr
             float32_t * s_ptr
 
         assert array1.shape[0] == array2.shape[0]
         s = np.zeros(array1.shape[0], dtype="float32")
-        
+
         a1_ptr = <float32_t *> array1.data
         a2_ptr = <float32_t *> array2.data
         s_ptr = <float32_t *> s.data
 
         for i in range(array1.shape[0]):
-            s_ptr[0] = get_logLR_asym( a1_ptr[0] + self.pseudocount, a2_ptr[0] + self.pseudocount ) 
+            s_ptr[0] = get_logLR_asym( a1_ptr[0] + self.pseudocount, a2_ptr[0] + self.pseudocount )
             s_ptr += 1
             a1_ptr += 1
             a2_ptr += 1
@@ -1321,19 +1321,19 @@ cdef class CallerFromAlignments:
         cdef:
             int64_t i, array1_size
             np.ndarray[np.float32_t, ndim=1] s
-            float32_t * a1_ptr 
+            float32_t * a1_ptr
             float32_t * a2_ptr
             float32_t * s_ptr
 
         assert array1.shape[0] == array2.shape[0]
         s = np.zeros(array1.shape[0], dtype="float32")
-        
+
         a1_ptr = <float32_t *> array1.data
         a2_ptr = <float32_t *> array2.data
         s_ptr = <float32_t *> s.data
 
         for i in range(array1.shape[0]):
-            s_ptr[0] = get_logFE( a1_ptr[0] + self.pseudocount, a2_ptr[0] + self.pseudocount ) 
+            s_ptr[0] = get_logFE( a1_ptr[0] + self.pseudocount, a2_ptr[0] + self.pseudocount )
             s_ptr += 1
             a1_ptr += 1
             a2_ptr += 1
@@ -1343,19 +1343,19 @@ cdef class CallerFromAlignments:
         cdef:
             int64_t i, array1_size
             np.ndarray[np.float32_t, ndim=1] s
-            float32_t * a1_ptr 
+            float32_t * a1_ptr
             float32_t * a2_ptr
             float32_t * s_ptr
 
         assert array1.shape[0] == array2.shape[0]
         s = np.zeros(array1.shape[0], dtype="float32")
-        
+
         a1_ptr = <float32_t *> array1.data
         a2_ptr = <float32_t *> array2.data
         s_ptr = <float32_t *> s.data
 
         for i in range(array1.shape[0]):
-            s_ptr[0] = (a1_ptr[0] + self.pseudocount) / ( a2_ptr[0] + self.pseudocount ) 
+            s_ptr[0] = (a1_ptr[0] + self.pseudocount) / ( a2_ptr[0] + self.pseudocount )
             s_ptr += 1
             a1_ptr += 1
             a2_ptr += 1
@@ -1365,13 +1365,13 @@ cdef class CallerFromAlignments:
         cdef:
             int64_t i, array1_size
             np.ndarray[np.float32_t, ndim=1] s
-            float32_t * a1_ptr 
+            float32_t * a1_ptr
             float32_t * a2_ptr
             float32_t * s_ptr
 
         assert array1.shape[0] == array2.shape[0]
         s = np.zeros(array1.shape[0], dtype="float32")
-        
+
         a1_ptr = <float32_t *> array1.data
         a2_ptr = <float32_t *> array2.data
         s_ptr = <float32_t *> s.data
@@ -1427,14 +1427,14 @@ cdef class CallerFromAlignments:
         fc = self.bedGraph_ctrl_f
         #t_write_func = self.bedGraph_treat.write
         #c_write_func = self.bedGraph_ctrl.write
-        
+
         pre_p_t = 0
         pre_p_c = 0
         pre_v_t = treat_array_ptr[ 0 ]/denominator
         pre_v_c = ctrl_array_ptr [ 0 ]/denominator
         treat_array_ptr += 1
         ctrl_array_ptr += 1
-        
+
         for i in range( 1, l ):
             v_t = treat_array_ptr[ 0 ]/denominator
             v_c = ctrl_array_ptr [ 0 ]/denominator
@@ -1455,8 +1455,8 @@ cdef class CallerFromAlignments:
 
         p = pos_array_ptr[ 0 ]
         # last one
-        fprintf( ft, b"%s\t%d\t%d\t%.5f\n", chrom, pre_p_t, p, pre_v_t )        
-        fprintf( fc, b"%s\t%d\t%d\t%.5f\n", chrom, pre_p_c, p, pre_v_c )        
+        fprintf( ft, b"%s\t%d\t%d\t%.5f\n", chrom, pre_p_t, p, pre_v_t )
+        fprintf( fc, b"%s\t%d\t%d\t%.5f\n", chrom, pre_p_c, p, pre_v_c )
 
         return True
 
@@ -1472,7 +1472,7 @@ cdef class CallerFromAlignments:
         lvl2_cutoff_s:  list of cutoffs at less enriched regions, corresponding to scoring functions.
         min_length :    minimum peak length, default 200.
         lvl1_max_gap   :  maximum gap to merge nearby enriched peaks, default 50.
-        lvl2_max_gap   :  maximum length of linkage regions, default 400.        
+        lvl2_max_gap   :  maximum length of linkage regions, default 400.
 
         Return both general PeakIO object for highly enriched regions
         and gapped broad regions in BroadPeakIO.
@@ -1548,14 +1548,14 @@ cdef class CallerFromAlignments:
                             tmppeakset.append(lvl1)
                             lvl1 = lvl1peakschrom_next()
                         else:
-                            # make a hierarchical broad peak 
+                            # make a hierarchical broad peak
                             #print lvl2["start"], lvl2["end"], lvl2["score"]
                             self.__add_broadpeak ( broadpeaks, chrom, lvl2, tmppeakset)
                             tmppeakset = []
                             break
             except StopIteration:
                 # no more strong (aka lvl1) peaks left
-                self.__add_broadpeak ( broadpeaks, chrom, lvl2, tmppeakset)  
+                self.__add_broadpeak ( broadpeaks, chrom, lvl2, tmppeakset)
                 tmppeakset = []
                 # add the rest lvl2 peaks
                 for j in range( i+1, len(lvl2peakschrom) ):
@@ -1589,7 +1589,7 @@ cdef class CallerFromAlignments:
 
         assert len(scoring_function_s) == len(lvl1_cutoff_s), "number of functions and cutoffs should be the same!"
         assert len(scoring_function_s) == len(lvl2_cutoff_s), "number of functions and cutoffs should be the same!"
-        
+
         # first, build pileup, self.chr_pos_treat_ctrl
         self.__pileup_treat_ctrl_a_chromosome( chrom )
         [pos_array, treat_array, ctrl_array] = self.chr_pos_treat_ctrl
@@ -1622,7 +1622,7 @@ cdef class CallerFromAlignments:
 
         if above_cutoff.size == 0:
             # nothing above cutoff
-            return 
+            return
 
         if above_cutoff[0] == 0:
             # first element > cutoff, fix the first point as 0. otherwise it would be the last item in data[chrom]['pos']
@@ -1639,7 +1639,7 @@ cdef class CallerFromAlignments:
         te = ace_ptr[ 0 ]
         ti = acia_ptr[ 0 ]
         tp = treat_array_ptr[ ti ]
-        cp = ctrl_array_ptr[ ti ]        
+        cp = ctrl_array_ptr[ ti ]
 
         peak_content.append( ( ts, te, tp, cp, ti ) )
         acs_ptr += 1 # move ptr
@@ -1656,7 +1656,7 @@ cdef class CallerFromAlignments:
             ace_ptr += 1
             acia_ptr+= 1
             tp = treat_array_ptr[ ti ]
-            cp = ctrl_array_ptr[ ti ]        
+            cp = ctrl_array_ptr[ ti ]
             tl = ts - lastp
             if tl <= lvl1_max_gap:
                 # append
@@ -1669,7 +1669,7 @@ cdef class CallerFromAlignments:
                 #peak_content = [ (above_cutoff_startpos[i], above_cutoff_endpos[i], treat_array[above_cutoff_index_array[i]], ctrl_array[above_cutoff_index_array[i]], score_array_s, above_cutoff_index_array[i]) , ]
                 peak_content = [ ( ts, te, tp, cp, ti ), ]
                 lastp = te #above_cutoff_endpos[i]
-            
+
         # save the last peak
         if peak_content:
             self.__close_peak_for_broad_region (peak_content, lvl1peaks, min_length, chrom, lvl1_max_gap//2, score_array_s )
@@ -1702,7 +1702,7 @@ cdef class CallerFromAlignments:
         te = ace_ptr[ 0 ]
         ti = acia_ptr[ 0 ]
         tp = treat_array_ptr[ ti ]
-        cp = ctrl_array_ptr[ ti ]        
+        cp = ctrl_array_ptr[ ti ]
         peak_content.append( ( ts, te, tp, cp, ti ) )
         acs_ptr += 1 # move ptr
         ace_ptr += 1
@@ -1729,13 +1729,13 @@ cdef class CallerFromAlignments:
             else:
                 # close
                 self.__close_peak_for_broad_region (peak_content, lvl2peaks, min_length, chrom, lvl2_max_gap//2, score_array_s )
-                
+
                 peak_content = [ ( ts, te, tp, cp, ti ), ]
                 lastp = te
 
         # save the last peak
         if peak_content:
-            self.__close_peak_for_broad_region (peak_content, lvl2peaks, min_length, chrom, lvl2_max_gap//2, score_array_s )  
+            self.__close_peak_for_broad_region (peak_content, lvl2peaks, min_length, chrom, lvl2_max_gap//2, score_array_s )
 
         return
 
@@ -1779,7 +1779,7 @@ cdef class CallerFromAlignments:
                        peak_content[-1][1], # end
                        summit = 0,
                        peak_score  = mean_from_value_length( tarray_qscore, tlist_length ),
-                       pileup      = mean_from_value_length( tarray_pileup, tlist_length ), 
+                       pileup      = mean_from_value_length( tarray_pileup, tlist_length ),
                        pscore      = mean_from_value_length( tarray_pscore, tlist_length ),
                        fold_change = mean_from_value_length( tarray_fc, tlist_length ),
                        qscore      = mean_from_value_length( tarray_qscore, tlist_length ),
@@ -1794,10 +1794,10 @@ cdef class CallerFromAlignments:
 
         *Note* lvl1peakset/strong_regions might be empty
         """
-        
+
         cdef:
             int32_t blockNum, start, end
-            bytes blockSizes, blockStarts, thickStart, thickEnd, 
+            bytes blockSizes, blockStarts, thickStart, thickEnd,
 
         start      = lvl2peak["start"]
         end        = lvl2peak["end"]
@@ -1830,7 +1830,7 @@ cdef class CallerFromAlignments:
             blockNum += 1
             blockSizes = blockSizes + b",1"
             blockStarts = blockStarts + b"," + (b"%d" % (end-start-1))
-        
+
         bpeaks.add(chrom, start, end, score=lvl2peak["score"], thickStart=thickStart, thickEnd=thickEnd,
                    blockNum = blockNum, blockSizes = blockSizes, blockStarts = blockStarts, pileup = lvl2peak["pileup"],
                    pscore = lvl2peak["pscore"], fold_change = lvl2peak["fc"],
@@ -1839,7 +1839,7 @@ cdef class CallerFromAlignments:
 
     cpdef refine_peak_from_tags_distribution ( self, peaks, int32_t window_size = 100, float32_t cutoff = 5 ):
         """Extract tags in peak, then apply func on extracted tags.
-        
+
         peaks: redefined regions to extract raw tags in PeakIO type: check cPeakIO.pyx.
 
         window_size: this will be passed to func.
@@ -1851,7 +1851,7 @@ cdef class CallerFromAlignments:
         wtd_find_summit(chrom, plus, minus, peak_start, peak_end, name , window_size, cutoff):
 
         """
-        
+
         cdef:
             int32_t c, m, i, j, pre_i, pre_j, pos, startpos, endpos
             np.ndarray plus, minus, rt_plus, rt_minus
@@ -1870,17 +1870,17 @@ cdef class CallerFromAlignments:
         if not self.treat.__sorted: self.treat.sort()
         # PeakIO object should be sorted
         peaks.sort()
-        
+
         chrnames = self.treat.get_chr_names()
 
         ret_peaks = PeakIO()
-        
+
         for c in range(len(pchrnames)):
             chrom = pchrnames[c]
             assert chrom in chrnames, "chromosome %s can't be found in the FWTrack object." % (chrom.decode())
             (plus, minus) = self.treat.__locations[chrom]
             cpeaks = peaks.get_data_from_chrom(chrom)
-            
+
             prev_i = 0
             prev_j = 0
             for m in range(len(cpeaks)):
@@ -1898,7 +1898,7 @@ cdef class CallerFromAlignments:
                     else:
                         temp.append(pos)
                 rt_plus = np.array(temp)
-                
+
                 temp = []
                 for j in range(prev_j,minus.shape[0]):
                     pos = minus[j]
@@ -1920,7 +1920,7 @@ cdef class CallerFromAlignments:
                         tmppeak = copy(thispeak)
                         tmppeak["summit"] = adjusted_summit
                         ret_peaks.add_PeakContent(chrom, tmppeak)
-                
+
                 # rewind window_size
                 for i in range(prev_i, 0, -1):
                     if plus[prev_i] - plus[i] >= window_size:
@@ -1930,7 +1930,7 @@ cdef class CallerFromAlignments:
                 for j in range(prev_j, 0, -1):
                     if minus[prev_j] - minus[j] >= window_size:
                         break
-                prev_j = j                
+                prev_j = j
                 # end of a loop
         return ret_peaks
 

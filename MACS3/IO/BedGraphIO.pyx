@@ -41,7 +41,7 @@ from MACS3.IO.BedGraph import bedGraphTrackI,bedRegionTrackI
 
 from libc.stdio cimport *
 from libc.stdlib cimport *
-    
+
 # ------------------------------------
 # Misc functions
 # ------------------------------------
@@ -57,7 +57,7 @@ cdef class bedGraphIO:
 
     1. Continuous: the next region should be after the previous one
     unless they are on different chromosomes;
-    
+
     2. Non-overlapping: the next region should never have overlaps
     with preceding region.
 
@@ -68,7 +68,7 @@ cdef class bedGraphIO:
 
     def __init__ ( self, str bedGraph_filename ):
         """f must be a filename or a file handler.
-        
+
         """
         self.bedGraph_filename = bedGraph_filename
 
@@ -90,7 +90,7 @@ cdef class bedGraphIO:
         add_func = data.add_loc
         # python open file
         bedGraph_file = open( self.bedGraph_filename, "rb" )
-        
+
         for i in bedGraph_file:
             if i.startswith(b"track"):
                 continue
@@ -112,7 +112,7 @@ cdef class genericBedIO:
 
     1. Continuous: the next region should be after the previous one
     unless they are on different chromosomes;
-    
+
     2. Non-overlapping: the next region should never have overlaps
     with preceding region.
 
@@ -122,7 +122,7 @@ cdef class genericBedIO:
     """
     def __init__ (self,f):
         """f must be a filename or a file handler.
-        
+
         """
         if type(f) == str:
             self.fhd = open(f,"rb")
@@ -144,13 +144,13 @@ cdef class genericBedIO:
         baseline_value. Default of baseline_value is 0.
         """
         cdef str i
-        
+
         data = bedRegionTrackI() #(baseline_value=baseline_value)
         add_func = data.safe_add_loc
         chrom_itemcount = {}
 
         self.fhd.seek(0)
-        
+
         for i in self.fhd:
             fs = i.split()
             add_func(fs[0],atoi(fs[1]),atoi(fs[2])) #,float(value))

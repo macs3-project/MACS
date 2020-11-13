@@ -54,7 +54,7 @@ class PeakDetect:
         #self.femax = opt.femax
         #self.femin = opt.femin
         #self.festep = opt.festep
-                
+
         self.log_pvalue = opt.log_pvalue    # -log10pvalue
         self.log_qvalue = opt.log_qvalue    # -log10qvalue
         if d != None:
@@ -66,7 +66,7 @@ class PeakDetect:
             self.maxgap = opt.maxgap
         else:
             self.maxgap = opt.tsize
-            
+
         if opt.minlen:
             self.minlen = opt.minlen
         else:
@@ -74,7 +74,7 @@ class PeakDetect:
 
         self.end_shift = self.opt.shift
         self.gsize = opt.gsize
-        
+
         self.nolambda = opt.nolambda
 
         if slocal != None:
@@ -143,12 +143,12 @@ class PeakDetect:
             long treat_total, control_total
             long treat_sum              # approx sum of treatment pileup values
             long control_sum            # approx sum of control pileup values
-            
+
         treat_total   = self.treat.total
-        
+
         if self.PE_MODE:
             d = self.treat.average_template_length
-            control_total = self.control.total * 2 # in PE mode, entire fragment is counted as 1 
+            control_total = self.control.total * 2 # in PE mode, entire fragment is counted as 1
                                                    # in treatment whereas both ends of fragment are counted in control/input.
             treat_sum = self.treat.length
             control_sum = control_total * self.treat.average_template_length
@@ -158,7 +158,7 @@ class PeakDetect:
             control_total = self.control.total
             treat_sum = self.treat.total * self.d
             control_sum = self.control.total * self.d
-            self.ratio_treat2control = float(treat_sum)/control_sum            
+            self.ratio_treat2control = float(treat_sum)/control_sum
 
         if self.opt.ratio != 1.0:
             self.ratio_treat2control = self.opt.ratio
@@ -212,8 +212,8 @@ class PeakDetect:
                 tmp_v = float(self.d)/self.lregion*self.ratio_treat2control
             else:
                 tmp_v = float(self.d)/self.lregion
-            ctrl_scale_s.append( tmp_v )                            
-            
+            ctrl_scale_s.append( tmp_v )
+
         #if self.PE_MODE:        # first d/scale are useless in PE mode
         #    ctrl_d_s = ctrl_d_s[1:]
         #    ctrl_scale_s = ctrl_scale_s[1:]
@@ -224,8 +224,8 @@ class PeakDetect:
             ctrl_scale_s = []
 
         scorecalculator = CallerFromAlignments( self.treat, self.control,
-                                                d = d, ctrl_d_s = ctrl_d_s, 
-                                                treat_scaling_factor = treat_scale, 
+                                                d = d, ctrl_d_s = ctrl_d_s,
+                                                treat_scaling_factor = treat_scale,
                                                 ctrl_scaling_factor_s = ctrl_scale_s,
                                                 end_shift = self.end_shift,
                                                 lambda_bg = lambda_bg,
@@ -310,7 +310,7 @@ class PeakDetect:
         else: d = self.d
         treat_length = self.treat.length
         treat_total = self.treat.total
-        
+
         effective_depth_in_million = treat_total / 1000000.0
 
         # global lambda
@@ -323,7 +323,7 @@ class PeakDetect:
 
         # slocal and d-size local bias are not calculated!
         # nothing done here. should this match w control??
-        
+
         if not self.nolambda:
             if self.PE_MODE:
                 ctrl_scale_s = [ float(treat_length) / (self.lregion*treat_total*2), ]
@@ -334,9 +334,9 @@ class PeakDetect:
             ctrl_scale_s = []
             ctrl_d_s     = []
 
-        scorecalculator = CallerFromAlignments( self.treat, None, 
-                                                d = d, ctrl_d_s = ctrl_d_s, 
-                                                treat_scaling_factor = treat_scale, 
+        scorecalculator = CallerFromAlignments( self.treat, None,
+                                                d = d, ctrl_d_s = ctrl_d_s,
+                                                treat_scaling_factor = treat_scale,
                                                 ctrl_scaling_factor_s = ctrl_scale_s,
                                                 end_shift = self.end_shift,
                                                 lambda_bg = lambda_bg,
@@ -413,11 +413,11 @@ class PeakDetect:
 
     #     self.info("#3 diag: call negative peak candidates")
     #     negative_peak_candidates = self.__call_peaks_from_trackI (self.control)
-        
+
     #     self.info("#3 diag: use control data to filter peak candidates...")
     #     final_peaks_percent = self.__filter_w_control(peak_candidates,self.treat,self.control, ratio_treat2control)
     #     return final_peaks_percent
-        
+
     # def __diag_wo_control (self):
     #     # sample
     #     sample_peaks = {}
@@ -442,7 +442,7 @@ class PeakDetect:
     # def __overlap (self, gold_peaks, sample_peaks, top=90,bottom=10,step=-10):
     #     """Calculate the overlap between several fe range for the
     #     golden peaks set and results from sampled data.
-        
+
     #     """
     #     gp = PeakIO()
     #     gp.init_from_dict(gold_peaks)
@@ -453,11 +453,11 @@ class PeakDetect:
     #     femin = self.femin
     #     diag_result = []
     #     for f in xrange(femin, femax, self.festep):
-            
+
     #         fe_low = f
     #         fe_up = f + self.festep
     #         self.debug("#3 diag: fe range = %d -- %d" % (fe_low, fe_up))
-            
+
     #         r = self.__overlap_fe(gold_peaks, sample_peaks, fe_low, fe_up, top, bottom, step)
     #         if r:
     #             diag_result.append(r)

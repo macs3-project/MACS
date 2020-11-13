@@ -60,7 +60,7 @@ def run( options ):
             btrack.apply_func( lambda x: x if x> extraparam else extraparam )
         elif options.method.lower() == "min":
             btrack.apply_func( lambda x: x if x< extraparam else extraparam )
-        
+
     ofile = os.path.join( options.outdir, options.ofile )
     info("Write bedGraph of modified scores...")
     ofhd = open(ofile,"w")

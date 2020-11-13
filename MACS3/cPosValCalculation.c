@@ -16,7 +16,7 @@ int cmpfunc_simple (const void * a, const void * b)
    return ( *(int*)a - *(int*)b );
 }
 
-/* Fix coordinates 
+/* Fix coordinates
 
    Input:
 
@@ -47,7 +47,7 @@ int * fix_coordinates ( int * poss, long l, int leftmost_coord, int rightmost_co
 }
 
 /* Pileup function for single end data.
-   Input: 
+   Input:
    1. int * plus_tags: the 5' ends of tags aligned to plus strand. Start from 0.
    2. long l_plus_tags:  number of plus tags.
    3. int * minus_tags: the 3' ends of tags aligned to minus strand. Start from 0.
@@ -64,7 +64,7 @@ int * fix_coordinates ( int * poss, long l, int leftmost_coord, int rightmost_co
    2. long * final_length: the final length for the returned array of PosVal.
 
    Example of usage:
-   
+
    pileup = single_end_pileup ( {1,2,3}, 3, {2,3,4}, 3, 0, 3, 0, 20, 0.5, 1.0, &final_length );
    for ( i = 0; i < final_length; i++ )
     {
@@ -79,7 +79,7 @@ struct PosVal * single_end_pileup( int * plus_tags, long l_plus_tags, int * minu
   long l = l_plus_tags + l_minus_tags;
   int * start_poss, * end_poss, * ptr_start_poss, * ptr_end_poss;
   struct PosVal * pos_value_array;
-  
+
   start_poss = (int *) malloc( l * sizeof( int ) );
   end_poss = (int *) malloc( l * sizeof( int ) );
 
@@ -91,7 +91,7 @@ struct PosVal * single_end_pileup( int * plus_tags, long l_plus_tags, int * minu
       *ptr_start_poss = plus_tags[ i ] - five_shift; ptr_start_poss++;
       *ptr_end_poss   = plus_tags[ i ] + three_shift; ptr_end_poss++;
     }
-  
+
   for ( i = 0; i < l_minus_tags; i++ )
     {
       *ptr_start_poss = minus_tags[ i ] - three_shift; ptr_start_poss++;
@@ -125,7 +125,7 @@ struct PosVal * quick_pileup ( int * start_poss, int * end_poss, long length_pos
   pos_value_array = (struct PosVal *) malloc ( 2 * l * sizeof( struct PosVal ) );
 
   i_s = 0; i_e = 0;
-  
+
   ptr_pos_value_array = pos_value_array; ptr_start_poss = start_poss; ptr_end_poss = end_poss;
 
   pileup = 0;
@@ -343,14 +343,14 @@ struct PosValVal * align_two_pv_array ( struct PosVal * pva1, long l_pva1, struc
 }
 
 /* Write pos-value array to a bedGraph file. If append is non-zero then just add content to the existing file. */
-void write_pv_array_to_bedGraph ( struct PosVal * pv_array, long l_pv_array, char * chromosome, char * bdgfile, short append ) 
+void write_pv_array_to_bedGraph ( struct PosVal * pv_array, long l_pv_array, char * chromosome, char * bdgfile, short append )
 {
   int pre_s, pre_e;
   float pre_v;
   long i;
   FILE * fp;
 
-  if ( append > 0 ) 
+  if ( append > 0 )
     fp = fopen ( bdgfile, "a" );
   else
     fp = fopen ( bdgfile, "w" );
@@ -426,7 +426,7 @@ int main()
     }
 
   printf( "write to bedGraph\n" );
-  
+
   write_pv_array_to_bedGraph ( max_pileup, final_length_max, "chr1", "test.bdg", 0 );
 
 }
@@ -446,7 +446,7 @@ long quick_pileup_simple ( int * ret_poss, float * ret_values, int * start_poss,
   ptr_start_poss = start_poss; ptr_end_poss = end_poss;
 
   i_s = 0; i_e = 0;
-  
+
   pileup = 0;
   pre_p = min( *ptr_start_poss, *ptr_end_poss );
   ptr_start_poss++; ptr_end_poss++;

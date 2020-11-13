@@ -94,7 +94,7 @@ cdef tuple __fw_binary_parse_le ( const unsigned char * data ):
         uint16_t *ui16
         uint32_t *ui32
 
-    # we skip lot of the available information in data (i.e. tag name, quality etc etc)        
+    # we skip lot of the available information in data (i.e. tag name, quality etc etc)
     # no data, return, does it really happen without raising struct.error?
     if not data: return ( -1, -1, -1 )
 
@@ -104,7 +104,7 @@ cdef tuple __fw_binary_parse_le ( const unsigned char * data ):
     # we filter out unmapped sequence or bad sequence or  secondary or supplementary alignment
     # we filter out 2nd mate, not a proper pair, mate is unmapped
     if (bwflag & 2820) or (bwflag & 1 and (bwflag & 136 or not bwflag & 2)): return ( -1, -1, -1 )
-        
+
     i32 = <int32_t *>data
     thisref = i32[0]
     thisstart = i32[1]
@@ -125,7 +125,7 @@ cdef tuple __fw_binary_parse_le ( const unsigned char * data ):
         thisstrand = 1
     else:
         thisstrand = 0
-            
+
     return ( thisref, thisstart, thisstrand )
 
 cdef tuple __fw_binary_parse_be ( const unsigned char * data ):
@@ -137,12 +137,12 @@ cdef tuple __fw_binary_parse_be ( const unsigned char * data ):
         uint8_t l_read_name
         uint16_t n_cigar_op
         int32_t cigar_code
-        uint8_t *ui8                      # we will only cast 1 byte at a time 
+        uint8_t *ui8                      # we will only cast 1 byte at a time
         int32_t i
         uint32_t shift0, shift
 
 
-    # we skip lot of the available information in data (i.e. tag name, quality etc etc)        
+    # we skip lot of the available information in data (i.e. tag name, quality etc etc)
     # no data, return, does it really happen without raising struct.error?
     if not data: return ( -1, -1, -1 )
 
@@ -153,16 +153,16 @@ cdef tuple __fw_binary_parse_be ( const unsigned char * data ):
     # we filter out 2nd mate, not a proper pair, mate is unmapped
     if (bwflag & 2820) or (bwflag & 1 and (bwflag & 136 or not bwflag & 2)): return ( -1, -1, -1 )
 
-    # the following three lins are for little-endian    
+    # the following three lins are for little-endian
     #thisref = i32[0]
     #thisstart = i32[1]
     #n_cigar_op = ui16[6]
 
-    # to simplify the byte swap, we pretend all original numbers (thisref, pos, nextpos) positive    
+    # to simplify the byte swap, we pretend all original numbers (thisref, pos, nextpos) positive
     thisref = ui8[3] << 24 | ui8[2] << 16 | ui8[1] << 8 | ui8[0]
     thisstart = ui8[7] << 24 | ui8[6] << 16 | ui8[5] << 8 | ui8[4]
     n_cigar_op = ui8[13] << 8 | i8[12]
-    
+
     # In case of paired-end we have now skipped all possible "bad" pairs
     # in case of proper pair we have skipped the rightmost one... if the leftmost pair comes
     # we can treat it as a single read, so just check the strand and calculate its
@@ -181,7 +181,7 @@ cdef tuple __fw_binary_parse_be ( const unsigned char * data ):
         thisstrand = 1
     else:
         thisstrand = 0
-            
+
     return ( thisref, thisstart, thisstrand )
 
 cdef tuple __pe_binary_parse_le (const unsigned char * data):
@@ -193,8 +193,8 @@ cdef tuple __pe_binary_parse_le (const unsigned char * data):
         uint16_t bwflag
         uint8_t *ui8
         int32_t *i32
-        uint16_t *ui16            
-        
+        uint16_t *ui16
+
     # we skip lot of the available information in data (i.e. tag name, quality etc etc)
     if not data:
         return ( -1, -1, -1 )
@@ -205,11 +205,11 @@ cdef tuple __pe_binary_parse_le (const unsigned char * data):
     # we filter out other mate of paired reads, not a proper pair, or mate is unmapped
     if (bwflag & 2820) or (bwflag & 1 and (bwflag & 136 or not bwflag & 2)):
         return ( -1, -1, -1 )
-        
+
     i32 = <int32_t *>data
     ui8 = <uint8_t *>data
     thisref = i32[0]
-    
+
     pos = i32[1]
     nextpos = i32[6]
     thistlen = i32[7]
@@ -224,19 +224,19 @@ cdef tuple __pe_binary_parse_le (const unsigned char * data):
     #                                             # nextpos is the
     #                                             # leftmost
     #                                             # position.
-        
+
     return ( thisref, thisstart, thistlen )
 
 cdef tuple __pe_binary_parse_be (const unsigned char * data):
     """Parse a BAMPE record in big-endian system. And we need byte swap.
-    """    
+    """
     cdef:
         int32_t thisref, thisstart, thistlen
         uint32_t tmp_thistlen
         int32_t nextpos, pos
         uint16_t bwflag
-        uint8_t *ui8                      # we will only cast 1 byte at a time 
-        
+        uint8_t *ui8                      # we will only cast 1 byte at a time
+
     # we skip lot of the available information in data (i.e. tag name, quality etc etc)
     if not data:
         return ( -1, -1, -1 )
@@ -263,14 +263,14 @@ cdef tuple __pe_binary_parse_be (const unsigned char * data):
     # thistlen can be negative, so we byte swap it then convert to int32_t then take abs (maybe there is more effecient way?)
     tmp_thistlen = ui8[31] << 24 | ui8[30] << 16 | ui8[29] << 8 | ui8[28] # as le:tmp_thistlen = ui32[7]
     thistlen = abs(<int32_t> tmp_thistlen)
-    
+
     # position which means this must
     # be at + strand. So we don't
     # need to decipher CIGAR string.
     thisstart = pos if nextpos > pos else nextpos #min(pos, nextpos) # we keep only the leftmost
 
     return ( thisref, thisstart, thistlen )
-    
+
 
 # choose a parser according to endian
 if is_le:
@@ -292,7 +292,7 @@ class StrandFormatError( Exception ):
     def __init__ ( self, string, strand ):
         self.strand = strand
         self.string = string
-        
+
     def __str__ ( self ):
         return repr( "Strand information can not be recognized in this line: \"%s\",\"%s\"" % ( self.string, self.strand ) )
 
@@ -310,7 +310,7 @@ cdef class GenericParser:
         int32_t tag_size
         object fhd
         int64_t buffer_size
-    
+
     def __init__ ( self, str filename, int64_t buffer_size = 100000 ):
         """Open input file. Determine whether it's a gzipped file.
 
@@ -342,12 +342,12 @@ cdef class GenericParser:
         self.__skip_first_commentlines()
 
     cdef void __skip_first_commentlines ( self ):
-        """Some parser needs to skip the first several comment lines. 
+        """Some parser needs to skip the first several comment lines.
 
         Redefine this if it's necessary!
         """
         return
-    
+
     cpdef int32_t tsize( self ):
         """General function to detect tag size.
 
@@ -364,7 +364,7 @@ cdef class GenericParser:
         if self.tag_size != -1:
             # if we have already calculated tag size (!= -1),  return it.
             return self.tag_size
-        
+
         # try 10k times or retrieve 10 successfule alignments
         while n < 10 and m < 10000:
             m += 1
@@ -384,10 +384,10 @@ cdef class GenericParser:
 
     cdef int32_t __tlen_parse_line ( self, bytes thisline ):
         """Abstract function to detect tag length.
-        
+
         """
         raise NotImplemented
-    
+
     cpdef build_fwtrack ( self ):
         """Generic function to build FWTrack object. Create a new
         FWTrack object. If you want to append new records to an
@@ -398,7 +398,7 @@ cdef class GenericParser:
         cdef:
             int64_t i, m, fpos, strand
             bytes chromosome
-        
+
         fwtrack = FWTrack( buffer_size = self.buffer_size )
         i = 0
         m = 0
@@ -421,7 +421,7 @@ cdef class GenericParser:
         return fwtrack
 
     cpdef append_fwtrack ( self, fwtrack ):
-        """Add more records to an existing FWTrack object. 
+        """Add more records to an existing FWTrack object.
 
         """
         i = 0
@@ -442,11 +442,11 @@ cdef class GenericParser:
         # this is the problematic part. If fwtrack is finalized, then it's impossible to increase the length of it in a step of buffer_size for multiple input files.
         self.close()
         return fwtrack
-        
+
     cdef tuple __fw_parse_line ( self, bytes thisline ):
         """Abstract function to parse chromosome, 5' end position and
         strand.
-        
+
         """
         cdef bytes chromosome = b""
         cdef int32_t fpos = -1
@@ -463,7 +463,7 @@ cdef class GenericParser:
         * BAMParser has a different sniff function.
         """
         cdef int32_t t
-        
+
         t = self.tsize()
         if t <= 10 or t >= 10000: # tsize too small or too big
             self.fhd.seek( 0 )
@@ -472,7 +472,7 @@ cdef class GenericParser:
             self.fhd.seek( 0 )
             self.__skip_first_commentlines()
             return True
-            
+
     cpdef close ( self ):
         """Run this when this Parser will be never used.
 
@@ -482,13 +482,13 @@ cdef class GenericParser:
 
     cpdef bool is_gzipped ( self ):
         return self.gzipped
-        
+
 cdef class BEDParser( GenericParser ):
     """File Parser Class for BED File.
 
     """
     cdef void __skip_first_commentlines ( self ):
-        """BEDParser needs to skip the first several comment lines. 
+        """BEDParser needs to skip the first several comment lines.
         """
         cdef:
             int32_t l_line
@@ -503,7 +503,7 @@ cdef class BEDParser( GenericParser ):
         # rewind from SEEK_CUR
         self.fhd.seek( -l_line, 1 )
         return
-    
+
     cdef int32_t __tlen_parse_line ( self, bytes thisline ):
         """Parse 5' and 3' position, then calculate frag length.
 
@@ -518,7 +518,7 @@ cdef class BEDParser( GenericParser ):
 
         thisfields = thisline.split( b'\t' )
         return atoi( thisfields[ 2 ] )-atoi( thisfields[ 1 ] )
-    
+
     cdef tuple __fw_parse_line ( self, bytes thisline ):
         #cdef list thisfields
         cdef:
@@ -549,7 +549,7 @@ cdef class BEDParser( GenericParser ):
                 raise StrandFormatError( thisline, thisfields[ 5 ] )
         except IndexError:
             # default pos strand if no strand
-            # info can be found            
+            # info can be found
             return ( chromname,
                      atoi( thisfields[ 1 ] ),
                      0 )
@@ -571,7 +571,7 @@ cdef class BEDPEParser(GenericParser):
     cdef public float32_t d
 
     cdef void __skip_first_commentlines ( self ):
-        """BEDPEParser needs to skip the first several comment lines. 
+        """BEDPEParser needs to skip the first several comment lines.
         """
         cdef:
             int32_t l_line
@@ -593,7 +593,7 @@ cdef class BEDPEParser(GenericParser):
         """
         cdef:
             list thisfields
-            
+
         thisline = thisline.rstrip()
 
         # skip track/browser/comment lines
@@ -683,13 +683,13 @@ cdef class BEDPEParser(GenericParser):
         self.close()
         petrack.set_rlengths( {"DUMMYCHROM":0} )
         return petrack
-            
+
 cdef class ELANDResultParser( GenericParser ):
     """File Parser Class for tabular File.
 
     """
     cdef void __skip_first_commentlines ( self ):
-        """ELANDResultParser needs to skip the first several comment lines. 
+        """ELANDResultParser needs to skip the first several comment lines.
         """
         cdef:
             int32_t l_line
@@ -756,20 +756,20 @@ cdef class ELANDMultiParser( GenericParser ):
 
     Note this parser can only work for s_N_eland_multi.txt format.
 
-    Each line of the output file contains the following fields: 
-    1. Sequence name 
-    2. Sequence 
-    3. Either NM, QC, RM (as described above) or the following: 
-    4. x:y:z where x, y, and z are the number of exact, single-error, and 2-error matches 
-    found 
-    5. Blank, if no matches found or if too many matches found, or the following: 
-    BAC_plus_vector.fa:163022R1,170128F2,E_coli.fa:3909847R1 
-    This says there are two matches to BAC_plus_vector.fa: one in the reverse direction 
-    starting at position 160322 with one error, one in the forward direction starting at 
+    Each line of the output file contains the following fields:
+    1. Sequence name
+    2. Sequence
+    3. Either NM, QC, RM (as described above) or the following:
+    4. x:y:z where x, y, and z are the number of exact, single-error, and 2-error matches
+    found
+    5. Blank, if no matches found or if too many matches found, or the following:
+    BAC_plus_vector.fa:163022R1,170128F2,E_coli.fa:3909847R1
+    This says there are two matches to BAC_plus_vector.fa: one in the reverse direction
+    starting at position 160322 with one error, one in the forward direction starting at
     position 170128 with two errors. There is also a single-error match to E_coli.fa.
     """
     cdef void __skip_first_commentlines ( self ):
-        """ELANDResultParser needs to skip the first several comment lines. 
+        """ELANDResultParser needs to skip the first several comment lines.
         """
         cdef:
             int32_t l_line
@@ -782,7 +782,7 @@ cdef class ELANDMultiParser( GenericParser ):
         # rewind from SEEK_CUR
         self.fhd.seek( -l_line, 1 )
         return
-    
+
     cdef int32_t __tlen_parse_line ( self, bytes thisline ):
         """Parse tag sequence, then tag length.
 
@@ -800,13 +800,13 @@ cdef class ELANDMultiParser( GenericParser ):
             list thisfields
             bytes thistagname, pos, strand
             int32_t thistaglength, thistaghits
-        
+
         if not thisline: return ( b"", -1, -1 )
         thisline = thisline.rstrip()
         if not thisline: return ( b"", -1, -1 )
 
         #if thisline[ 0 ] == "#": return ( "", -1, -1 ) # comment line is skipped
-        
+
         thisfields = thisline.split( b'\t' )
         thistagname = thisfields[ 0 ]        # name of tag
         thistaglength = len( thisfields[ 1 ] ) # length of tag
@@ -825,7 +825,7 @@ cdef class ELANDMultiParser( GenericParser ):
                     chromname = chromname[ :chromname.rindex( b".fa" ) ]
                 except ValueError:
                     pass
-                
+
                 strand  = pos[ -2 ]
                 if strand == b"F":
                     return ( chromname,
@@ -844,7 +844,7 @@ cdef class ELANDExportParser( GenericParser ):
 
     """
     cdef void __skip_first_commentlines ( self ):
-        """ELANDResultParser needs to skip the first several comment lines. 
+        """ELANDResultParser needs to skip the first several comment lines.
         """
         cdef:
             int32_t l_line
@@ -857,7 +857,7 @@ cdef class ELANDExportParser( GenericParser ):
         # rewind from SEEK_CUR
         self.fhd.seek( -l_line, 1 )
         return
-    
+
     cdef int32_t __tlen_parse_line ( self, bytes thisline ):
         """Parse tag sequence, then tag length.
 
@@ -870,17 +870,17 @@ cdef class ELANDExportParser( GenericParser ):
             return len( thisfields[ 8 ] )
         else:
             return 0
-        
+
     cdef tuple __fw_parse_line ( self, bytes thisline ):
         cdef:
             list thisfields
             bytes thisname, strand
             int32_t thistaglength
-        
+
         #if thisline.startswith("#") : return ("comment line",None,None) # comment line is skipped
         thisline = thisline.rstrip()
         if not thisline: return ( b"", -1, -1 )
-    
+
         thisfields = thisline.split( b"\t" )
 
         if len(thisfields) > 12 and thisfields[ 12 ]:
@@ -900,8 +900,8 @@ cdef class ELANDExportParser( GenericParser ):
 cdef class SAMParser( GenericParser ):
     """File Parser Class for SAM File.
 
-    Each line of the output file contains at least: 
-    1. Sequence name 
+    Each line of the output file contains at least:
+    1. Sequence name
     2. Bitwise flag
     3. Reference name
     4. 1-based leftmost position fo clipped alignment
@@ -912,7 +912,7 @@ cdef class SAMParser( GenericParser ):
     9. Inferred insert size
     10. Query sequence on the same strand as the reference
     11. Query quality
-    
+
     The bitwise flag is made like this:
     dec	meaning
     ---	-------
@@ -929,9 +929,9 @@ cdef class SAMParser( GenericParser ):
     1024	PCR or optical duplicate
     2048	supplementary alignment
     """
-    
+
     cdef void __skip_first_commentlines ( self ):
-        """SAMParser needs to skip the first several comment lines. 
+        """SAMParser needs to skip the first several comment lines.
         """
         cdef:
             int32_t l_line
@@ -944,7 +944,7 @@ cdef class SAMParser( GenericParser ):
         # rewind from SEEK_CUR
         self.fhd.seek( -l_line, 1 )
         return
-    
+
     cdef int32_t __tlen_parse_line ( self, bytes thisline ):
         """Parse tag sequence, then tag length.
 
@@ -952,7 +952,7 @@ cdef class SAMParser( GenericParser ):
         cdef:
             list thisfields
             int32_t bwflag
-        
+
         thisline = thisline.rstrip()
         if not thisline: return 0
         thisfields = thisline.split( b'\t' )
@@ -961,7 +961,7 @@ cdef class SAMParser( GenericParser ):
             return 0       #unmapped sequence or bad sequence or 2nd or sup alignment
         if bwflag & 1:
             # paired read. We should only keep sequence if the mate is mapped
-            # and if this is the left mate, all is within  the flag! 
+            # and if this is the left mate, all is within  the flag!
             if not bwflag & 2:
                 return 0   # not a proper pair
             if bwflag & 8:
@@ -993,7 +993,7 @@ cdef class SAMParser( GenericParser ):
         #    return ( b"", -1, -1 )       #unmapped sequence or bad sequence or 2nd or sup alignment
         #if bwflag & 1:
         #    # paired read. We should only keep sequence if the mate is mapped
-        #    # and if this is the left mate, all is within  the flag! 
+        #    # and if this is the left mate, all is within  the flag!
         #    if not bwflag & 2:
         #        return ( b"", -1, -1 )   # not a proper pair
         #    if bwflag & 8:
@@ -1010,7 +1010,7 @@ cdef class SAMParser( GenericParser ):
         if bwflag & 16:
             # minus strand, we have to decipher CIGAR string
             thisstrand = 1
-            thisstart = atoi( thisfields[ 3 ] ) - 1 + sum( [ int(x) for x in findall(b"(\d+)[MDNX=]",CIGAR) ] )	#reverse strand should be shifted alen bp 
+            thisstart = atoi( thisfields[ 3 ] ) - 1 + sum( [ int(x) for x in findall(b"(\d+)[MDNX=]",CIGAR) ] )	#reverse strand should be shifted alen bp
         else:
             thisstrand = 0
             thisstart = atoi( thisfields[ 3 ] ) - 1
@@ -1027,7 +1027,7 @@ cdef class BAMParser( GenericParser ):
 
     File is gzip-compatible and binary.
     Information available is the same that is in SAM format.
-    
+
     The bitwise flag is made like this:
     dec	meaning
     ---	-------
@@ -1099,7 +1099,7 @@ cdef class BAMParser( GenericParser ):
         * This may not work for BAM file from bedToBAM (bedtools),
         since the l_seq field seems to be 0.
         """
-        
+
         cdef:
             int32_t x, header_len, nc, nlength
             int32_t n = 0                   # successful read of tag size
@@ -1137,7 +1137,7 @@ cdef class BAMParser( GenericParser ):
     cpdef tuple get_references( self ):
         """
         read in references from BAM header
-        
+
         return a tuple (references (list of names),
                         rlengths (dict of lengths)
         """
@@ -1146,7 +1146,7 @@ cdef class BAMParser( GenericParser ):
             bytes refname
             list references = []
             dict rlengths = {}
-            
+
         fseek = self.fhd.seek
         fread = self.fhd.read
         ftell = self.fhd.tell
@@ -1176,13 +1176,13 @@ cdef class BAMParser( GenericParser ):
             int32_t entrylength, fpos, strand, chrid
             list references
             dict rlengths
-        
+
         fwtrack = FWTrack( buffer_size = self.buffer_size )
         references, rlengths = self.get_references() # after this, ptr at list of alignments
         fseek = self.fhd.seek
         fread = self.fhd.read
         ftell = self.fhd.tell
-            
+
         while True:
             try:
                 entrylength = unpack( "<i", fread( 4 ) )[0]
@@ -1194,9 +1194,9 @@ cdef class BAMParser( GenericParser ):
             i += 1
             if i % 1000000 == 0:
                 info( " %d" % i )
-                
+
         #print( f"{references[chrid]:},{fpos:},{strand:}" )
-        info( "%d reads have been read." % i ) 
+        info( "%d reads have been read." % i )
         self.fhd.close()
         fwtrack.set_rlengths( rlengths )
         return fwtrack
@@ -1211,12 +1211,12 @@ cdef class BAMParser( GenericParser ):
             int32_t entrylength, fpos, strand, chrid
             list references
             dict rlengths
-        
+
         references, rlengths = self.get_references()
         fseek = self.fhd.seek
         fread = self.fhd.read
         ftell = self.fhd.tell
-            
+
         while True:
             try:
                 entrylength = unpack( '<i', fread( 4 ) )[ 0 ]
@@ -1229,13 +1229,13 @@ cdef class BAMParser( GenericParser ):
             if i % 1000000 == 0:
                 info( " %d" % i )
 
-        info( "%d reads have been read." % i ) 
+        info( "%d reads have been read." % i )
         self.fhd.close()
         #fwtrack.finalize()
         # this is the problematic part. If fwtrack is finalized, then it's impossible to increase the length of it in a step of buffer_size for multiple input files.
         fwtrack.set_rlengths( rlengths )
         return fwtrack
-    
+
 cdef class BAMPEParser(BAMParser):
     """File Parser Class for BAM File containing paired-end reads
     Only counts valid pairs, discards everything else
@@ -1244,7 +1244,7 @@ cdef class BAMPEParser(BAMParser):
 
     File is gzip-compatible and binary.
     Information available is the same that is in SAM format.
-    
+
     The bitwise flag is made like this:
     dec    meaning
     ---    -------
@@ -1276,13 +1276,13 @@ cdef class BAMPEParser(BAMParser):
 
         i = 0
         m = 0
-        
+
         petrack = PETrackI( buffer_size = self.buffer_size )
         references, rlengths = self.get_references()
         fseek = self.fhd.seek
         fread = self.fhd.read
         ftell = self.fhd.tell
-        
+
         # for convenience, only count valid pairs
         add_loc = petrack.add_loc
         err = struct.error
@@ -1324,12 +1324,12 @@ cdef class BAMPEParser(BAMParser):
             int32_t entrylength, fpos, chrid, tlen
             list references
             dict rlengths
-        
+
         references, rlengths = self.get_references()
         fseek = self.fhd.seek
         fread = self.fhd.read
         ftell = self.fhd.tell
-        
+
         # for convenience, only count valid pairs
         add_loc = petrack.add_loc
         err = struct.error
@@ -1348,7 +1348,7 @@ cdef class BAMPEParser(BAMParser):
             if i % 1000000 == 0:
                 info(" %d" % i)
 
-        info( "%d fragments have been read." % i )         
+        info( "%d fragments have been read." % i )
         self.d = ( self.d * self.n + m ) / ( self.n + i )
         self.n += i
         #assert self.d >= 0, "Something went wrong (mean fragment size was negative: %d = %d / %d)" % (self.d, m, i)
@@ -1357,7 +1357,7 @@ cdef class BAMPEParser(BAMParser):
         # petrack.finalize()
         petrack.set_rlengths( rlengths )
         return petrack
-        
+
 cdef class BowtieParser( GenericParser ):
     """File Parser Class for map files from Bowtie or MAQ's maqview
     program.
@@ -1368,7 +1368,7 @@ cdef class BowtieParser( GenericParser ):
 
         """
         cdef list thisfields
-        
+
         thisline = thisline.rstrip()
         if not thisline: return ( b"", -1, -1 )
         if thisline[ 0 ] == b"#": return ( b"", -1 , -1 ) # comment line is skipped
@@ -1378,7 +1378,7 @@ cdef class BowtieParser( GenericParser ):
     cdef tuple __fw_parse_line (self, bytes thisline ):
         """
         The following definition comes from bowtie website:
-        
+
         The bowtie aligner outputs each alignment on a separate
         line. Each line is a collection of 8 fields separated by tabs;
         from left to right, the fields are:
@@ -1419,7 +1419,7 @@ cdef class BowtieParser( GenericParser ):
         cdef:
             list thisfields
             bytes chromname
-        
+
         thisline = thisline.rstrip()
         if not thisline: return ( b"", -1, -1 )
         if thisline[ 0 ] == b"#": return ( b"", -1, -1 ) # comment line is skipped

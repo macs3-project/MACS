@@ -108,7 +108,7 @@ class Test_chisq_p_e(unittest.TestCase):
         expect = [round(x[4],4) for x in self.c]
         result = [round(chisq_logp_e(x[0],x[1],log10=True),4) for x in self.c]
         self.assertEqual( result, expect )
-        
+
 class Test_binomial_cdf(unittest.TestCase):
 
     def setUp(self):

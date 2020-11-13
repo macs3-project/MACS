@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Description: 
+"""Description:
 
 Setup script for MACS -- Model Based Analysis for ChIP-Seq data
 
@@ -39,10 +39,10 @@ def main():
                 raise RuntimeError("Installing requirements failed!")
         except ImportError:
             raise RuntimeError("Installing requirement failed! `pip` has to be installed!")
-        
+
     from numpy import get_include as numpy_get_include
     numpy_include_dir = [numpy_get_include()]
-    
+
     # I intend to use -Ofast, however if gcc version < 4.6, this option is unavailable so...
     extra_c_args = ["-w","-O3","-ffast-math","-g0"] # for C, -Ofast implies -O3 and -ffast-math
 
@@ -53,7 +53,7 @@ def main():
                     Extension("MACS3.PeakDetect", ["MACS3/PeakDetect.pyx"], extra_compile_args=extra_c_args),
                     Extension("MACS3.Signal", ["MACS3/Signal.pyx"], include_dirs=numpy_include_dir, extra_compile_args=extra_c_args),
                     Extension("MACS3.IO.PeakIO", ["MACS3/IO/PeakIO.pyx"], extra_compile_args=extra_c_args),
-                    Extension("MACS3.IO.BedGraphIO", ["MACS3/IO/BedGraphIO.pyx"], extra_compile_args=extra_c_args),                   
+                    Extension("MACS3.IO.BedGraphIO", ["MACS3/IO/BedGraphIO.pyx"], extra_compile_args=extra_c_args),
                     Extension("MACS3.IO.FixWidthTrack", ["MACS3/IO/FixWidthTrack.pyx"], include_dirs=numpy_include_dir, extra_compile_args=extra_c_args),
                     Extension("MACS3.IO.PairedEndTrack", ["MACS3/IO/PairedEndTrack.pyx"], include_dirs=numpy_include_dir, extra_compile_args=extra_c_args),
                     Extension("MACS3.IO.BedGraph", ["MACS3/IO/BedGraph.pyx"], libraries=["m"], extra_compile_args=extra_c_args),
@@ -62,7 +62,7 @@ def main():
 
     with open("README.md", "r") as fh:
         long_description = fh.read()
-        
+
     setup(name="MACS3",
           version="3.0.0",
           description="Model Based Analysis for ChIP-Seq data",
@@ -79,18 +79,18 @@ def main():
               'Development Status :: 5 - Production/Stable',
               'Environment :: Console',
               'Intended Audience :: Developers',
-              'Intended Audience :: Science/Research',              
+              'Intended Audience :: Science/Research',
               'License :: OSI Approved :: BSD License',
               'Operating System :: MacOS :: MacOS X',
               'Operating System :: POSIX',
               'Topic :: Scientific/Engineering :: Bio-Informatics',
               'Programming Language :: Python :: 3.6',
               'Programming Language :: Python :: 3.7',
-              'Programming Language :: Python :: 3.8',              
+              'Programming Language :: Python :: 3.8',
               'Programming Language :: Cython',
               ],
           install_requires=install_requires,
-          setup_requires=install_requires,          
+          setup_requires=install_requires,
           python_requires='>=3.6',
           ext_modules = ext_modules
           )

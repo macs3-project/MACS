@@ -39,7 +39,7 @@ def run( options0 ):
         outfhd = open( os.path.join( options.outdir, options.outputfile ), "w" )
     else:
         outfhd = sys.stdout
-    
+
     #1 Read tag files
     if options.PE_MODE:
         info("# read input file in Paired-end mode.")
@@ -49,13 +49,13 @@ def run( options0 ):
     else:
         info("read tag files...")
         treat = load_tag_files_options (options)
-    
+
         info("tag size = %d" % options.tsize)
         treat.fw = options.tsize
 
         t0 = treat.total
         info(" total tags in alignment file: %d" % (t0))
-        
+
     if options.number:
         if options.number > t0:
             error(" Number you want is bigger than total number of tags in alignment file! Please specify a smaller number and try again!")

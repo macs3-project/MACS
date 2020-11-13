@@ -79,7 +79,7 @@ cdef class PeakModel:
         #else:
         #    self.gz = gz
         #    self.umfold = umfold
-        #    self.lmfold = lmfold            
+        #    self.lmfold = lmfold
         #    self.tag_expansion_size = ts
         #    self.bg = bg
         #    self.bw = bw
@@ -92,7 +92,7 @@ cdef class PeakModel:
         #    self.debug = lambda x: None
         #    self.warn = lambda x: None
         #    self.error = lambda x: None
-            
+
         self.max_pairnum = max_pairnum
         #self.summary = ""
         #self.plus_line = None
@@ -103,7 +103,7 @@ cdef class PeakModel:
         #self.min_tags = None
         #self.peaksize = None
         self.build()
-    
+
     cpdef build (self):
         """Build the model.
 
@@ -114,7 +114,7 @@ cdef class PeakModel:
             dict paired_peaks
             long num_paired_peakpos, num_paired_peakpos_remained, num_paired_peakpos_picked
             bytes c                       #chromosome
-        
+
 
         self.peaksize = 2*self.bw
         self.min_tags = int(round(float(self.treatment.total) * self.lmfold * self.peaksize / self.gz / 2)) # mininum unique hits on single strand
@@ -169,7 +169,7 @@ Summary of Peak Model:
             object paired_peakpos_chrom
             np.ndarray[np.int32_t, ndim=1] tags_plus, tags_minus, plus_start, plus_end, minus_start, minus_end, plus_line, minus_line
             np.ndarray plus_data, minus_data, xcorr, ycorr, i_l_max
-        
+
         window_size = 1+2*self.peaksize+self.tag_expansion_size
         self.plus_line = np.zeros(window_size, dtype="int32") # for plus strand pileup
         self.minus_line = np.zeros(window_size, dtype="int32")# for minus strand pileup
@@ -178,10 +178,10 @@ Summary of Peak Model:
         minus_start = np.zeros(window_size, dtype="int32")    # for fast pileup
         minus_end = np.zeros(window_size, dtype="int32")      # for fast pileup
         #self.plus_line = [0]*window_size
-        #self.minus_line = [0]*window_size        
+        #self.minus_line = [0]*window_size
         self.info("start model_add_line...")
         chroms = list(paired_peakpos.keys())
-        
+
         for i in range(len(chroms)):
             paired_peakpos_chrom = paired_peakpos[chroms[i]]
             (tags_plus, tags_minus) = self.treatment.get_locations_by_chr(chroms[i])
@@ -202,7 +202,7 @@ Summary of Peak Model:
         #minus_line = np.asarray(self.minus_line,dtype="int32")
         plus_line = self.plus_line
         minus_line = self.minus_line
-        
+
         # normalize first
         minus_data = (minus_line - minus_line.mean())/(minus_line.std()*len(minus_line))
         plus_data = (plus_line - plus_line.mean())/(plus_line.std()*len(plus_line))
@@ -213,7 +213,7 @@ Summary of Peak Model:
         ycorr = np.correlate(minus_data,plus_data,mode="full")[window_size-self.peaksize:window_size+self.peaksize]
         xcorr = np.linspace(len(ycorr)//2*-1, len(ycorr)//2, num=len(ycorr))
 
-        # smooth correlation values to get rid of local maximums from small fluctuations. 
+        # smooth correlation values to get rid of local maximums from small fluctuations.
         ycorr = smooth(ycorr, window="flat") # window size is by default 11.
 
         # all local maximums could be alternative ds.
@@ -223,44 +223,44 @@ Summary of Peak Model:
         i_l_max = i_l_max[ np.argsort(ycorr[i_l_max])[::-1]]
 #         filter(lambda i: xcorr[i]>self.d_min, i_l_max )
 #         i_l_max = sorted(i_l_max,
-#                          key=ycorr.__getitem__, 
+#                          key=ycorr.__getitem__,
 #                          reverse=True)
         self.alternative_d = sorted([int(x) for x in xcorr[i_l_max]])
         assert len(self.alternative_d) > 0, "No proper d can be found! Tweak --mfold?"
-        
+
         self.d = xcorr[i_l_max[0]]
 #         i_l_max = filter(lambda: ycorr)
 #         tmp_cor_alternative_d = ycorr[ i_l_max ]
 #         tmp_alternative_d = xcorr[ i_l_max ]
 #         cor_alternative_d =  tmp_cor_alternative_d [ tmp_alternative_d > 0 ]
 #         self.alternative_d = map( int, tmp_alternative_d[ tmp_alternative_d > 0 ] )
-        
+
         # best cross-correlation point
-        
+
 #         d_cand = xcorr[ np.where( ycorr == sorted( cor_alternative_d [::-1] ) ) ]
 #         print (cor_alternative_d)
 #         print (d_cand)
 #         d_cand = xcorr[ np.where( ycorr== max( cor_alternative_d ) )[0] ]
-        
+
         #### make sure fragment size is not zero
-        
-#         self.d = [ x for x in d_cand if x > self.d_min ] [0] 
+
+#         self.d = [ x for x in d_cand if x > self.d_min ] [0]
         #self.d = xcorr[np.where(ycorr==max(ycorr))[0][0]] #+self.tag_expansion_size
 
         # get rid of the last local maximum if it's at the right end of curve.
-        
-        
+
+
         self.ycorr = ycorr
         self.xcorr = xcorr
 
         #shift_size = self.d/2
-        
+
         self.scan_window = max(self.d,self.tag_expansion_size)*2
         # a shifted model
         #self.shifted_line = [0]*window_size
 
         self.info("end of X-cor")
-        
+
         return True
 
     cdef __model_add_line (self, object pos1, np.ndarray[np.int32_t, ndim=1] pos2, np.ndarray[np.int32_t, ndim=1] start, np.ndarray[np.int32_t, ndim=1] end): #, int plus_strand=1):
@@ -274,7 +274,7 @@ Summary of Peak Model:
         """
         cdef:
             int i1, i2, i2_prev, i1_max, i2_max, last_p2, psize_adjusted1, psize_adjusted2, p1, p2, max_index, s, e
-        
+
         i1 = 0                  # index for pos1
         i2 = 0                  # index for pos2
         i2_prev = 0             # index for pos2 in previous pos1
@@ -297,11 +297,11 @@ Summary of Peak Model:
             #    p2 = pos2[i2] - self.tag_expansion_size
 
             p2 = pos2[i2] #- self.tag_expansion_size/2
-                
+
             if p1-psize_adjusted1 > p2: # move pos2
                 i2 += 1
             elif p1+psize_adjusted1 < p2: # move pos1
-                i1 += 1                 
+                i1 += 1
                 i2 = i2_prev    # search minus peaks from previous index
                 flag_find_overlap = False
             else:               # overlap!
@@ -320,7 +320,7 @@ Summary of Peak Model:
                 #    line[i]+=1
                 i2+=1
         return
-    
+
     cdef __count ( self, np.ndarray[np.int32_t, ndim=1] start, np.ndarray[np.int32_t, ndim=1] end, np.ndarray[np.int32_t, ndim=1] line ):
         """
         """
@@ -378,7 +378,7 @@ Summary of Peak Model:
             bool flag_find_overlap
             long pp, pn
             long mp, mn
-            
+
         pair_centers = array.array(BYTE4,[])
         ip_max = len(pluspeaks)
         im_max = len(minuspeaks)
@@ -389,7 +389,7 @@ Summary of Peak Model:
             if pp-self.peaksize > mp: # move minus
                 im += 1
             elif pp+self.peaksize < mp: # move plus
-                ip += 1                 
+                ip += 1
                 im = im_prev    # search minus peaks from previous index
                 flag_find_overlap = False
             else:               # overlap!
@@ -402,9 +402,9 @@ Summary of Peak Model:
                         #self.debug ( "distance: %d, minus: %d, plus: %d" % (mp-pp,mp,pp))
                 im += 1
         return pair_centers
-            
+
     cdef __naive_find_peaks (self, np.ndarray[np.int32_t, ndim=1] taglist, int plus_strand=1 ):
-        """Naively call peaks based on tags counting. 
+        """Naively call peaks based on tags counting.
 
         if plus_strand == 0, call peak on minus strand.
 
@@ -416,7 +416,7 @@ Summary of Peak Model:
             list peak_info
             int32_t * taglist_ptr
             list current_tag_list
-        
+
         taglist_ptr = <int32_t *> taglist.data
 
         peak_info = []    # store peak pos in every peak region and
@@ -441,7 +441,7 @@ Summary of Peak Model:
             current_tag_list.append( pos )   # add pos while 1. no
                                              # need to call peak;
                                              # 2. current_tag_list is []
-            
+
         return peak_info
 
     cdef __naive_peak_pos (self, pos_list, int plus_strand ):
@@ -472,7 +472,7 @@ Summary of Peak Model:
         es = []
 
         #horizon_line = np.zeros(peak_length, dtype="int32") # the line for tags to be projected
-        
+
         horizon_line = np.zeros( peak_length, dtype="int32") # the line for tags to be projected
         #horizon_line = array('i',[0]*peak_length)
         #for pos in pos_list:
@@ -484,7 +484,7 @@ Summary of Peak Model:
 
         ss.sort()
         es.sort()
-        
+
         pileup = 0
 
         ls = len( ss )
@@ -492,7 +492,7 @@ Summary of Peak Model:
 
         i_s = 0
         i_e = 0
-        
+
         pre_p = min( ss[ 0 ], es[ 0 ] )
         if pre_p != 0:
             for i in range( pre_p ):
@@ -542,7 +542,7 @@ Summary of Peak Model:
                top_pos = [pp]
            elif horizon_line[pp] == top_p_num:
                top_pos.append(pp)
-        
+
         #print top_pos[int(len(top_pos)/2)]+start
         return (top_pos[len(top_pos)//2]+start)
 
@@ -554,10 +554,10 @@ Summary of Peak Model:
         return the highest peak summit position.
         """
         cdef int peak_length, start, pos, i, pp, top_p_num
-        
+
         peak_length = pos_list[-1]+1-pos_list[0]+self.tag_expansion_size
         if plus_strand:
-            start = pos_list[0] 
+            start = pos_list[0]
         else:
             start = pos_list[0] - self.tag_expansion_size
         horizon_line = np.zeros(peak_length, dtype="int32") # the line for tags to be projected
@@ -580,32 +580,32 @@ Summary of Peak Model:
 # smooth function from SciPy cookbook: http://www.scipy.org/Cookbook/SignalSmooth
 cpdef smooth(x, int window_len=11, str window='hanning'):
     """smooth the data using a window with requested size.
-    
+
     This method is based on the convolution of a scaled window with the signal.
-    The signal is prepared by introducing reflected copies of the signal 
+    The signal is prepared by introducing reflected copies of the signal
     (with the window size) in both ends so that transient parts are minimized
     in the beginning and end part of the output signal.
-    
+
     input:
-        x: the input signal 
+        x: the input signal
         window_len: the dimension of the smoothing window; should be an odd integer
         window: the type of window from 'flat', 'hanning', 'hamming', 'bartlett', 'blackman'
             flat window will produce a moving average smoothing.
 
     output:
         the smoothed signal
-        
+
     example:
 
     t=linspace(-2,2,0.1)
     x=sin(t)+randn(len(t))*0.1
     y=smooth(x)
-    
-    see also: 
-    
+
+    see also:
+
     numpy.hanning, numpy.hamming, numpy.bartlett, numpy.blackman, numpy.convolve
     scipy.signal.lfilter
- 
+
     TODO: the window parameter could be the window itself if an array instead of a string
     NOTE: length(output) != length(input), to correct this: return y[(window_len/2-1):-(window_len/2)] instead of just y.
     """
