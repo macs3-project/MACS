@@ -14,7 +14,7 @@ the distribution).
 # ------------------------------------
 import io
 
-from MACS2.IO.BedGraph import bedGraphTrackI,bedRegionTrackI
+from MACS3.IO.BedGraph import bedGraphTrackI,bedRegionTrackI
 
 # ------------------------------------
 # constants

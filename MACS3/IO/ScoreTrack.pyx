@@ -28,15 +28,15 @@ from functools import reduce
 
 from cpython cimport bool
 
-from MACS2.Signal import maxima, enforce_valleys, enforce_peakyness
+from MACS3.Signal import maxima, enforce_valleys, enforce_peakyness
 
 cimport cython
 
 from libc.math cimport log10,log, floor, ceil
 
-from MACS2.Constants import BYTE4, FBYTE4, array
-from MACS2.Prob import poisson_cdf
-from MACS2.IO.PeakIO import PeakIO, BroadPeakIO, parse_peakname
+from MACS3.Constants import BYTE4, FBYTE4, array
+from MACS3.Prob import poisson_cdf
+from MACS3.IO.PeakIO import PeakIO, BroadPeakIO, parse_peakname
 
 import logging
 

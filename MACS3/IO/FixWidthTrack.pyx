@@ -21,10 +21,10 @@ import io
 from copy import copy
 from collections import Counter
 
-from MACS2.Constants import *
-from MACS2.Signal import *
-from MACS2.IO.PeakIO import PeakIO
-from MACS2.Pileup import se_all_in_one_pileup, max_over_two_pv_array
+from MACS3.Constants import *
+from MACS3.Signal import *
+from MACS3.IO.PeakIO import PeakIO
+from MACS3.Pileup import se_all_in_one_pileup, max_over_two_pv_array
 
 #from libc.stdint cimport uint32_t, uint64_t, int32_t, int64_t
 from cpython cimport bool

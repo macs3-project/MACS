@@ -13,7 +13,7 @@ import numpy as np
 cimport numpy as np
 from cpython cimport array
 import array
-from MACS2.Constants import *
+from MACS3.Constants import *
 
 from cpython cimport bool
 from libc.stdint cimport uint32_t, uint64_t, int32_t, int64_t

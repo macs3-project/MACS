@@ -9,7 +9,7 @@ under the terms of the BSD License (see the file LICENSE included with
 the distribution).
 """
 
-from MACS2.Constants import *
+from MACS3.Constants import *
 import io
 import sys
 from logging import debug, info
@@ -30,8 +30,8 @@ from cpython cimport bool
 cimport cython
 #from libc.stdint cimport uint32_t, uint64_t, int32_t, int64_t
 
-from MACS2.Constants import *
-from MACS2.Pileup import quick_pileup, max_over_two_pv_array, se_all_in_one_pileup
+from MACS3.Constants import *
+from MACS3.Pileup import quick_pileup, max_over_two_pv_array, se_all_in_one_pileup
 
 cdef INT_MAX = <int32_t>((<uint32_t>(-1))>>1)
 

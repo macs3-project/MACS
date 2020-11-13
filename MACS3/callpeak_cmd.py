@@ -20,12 +20,12 @@ import tempfile
 # ------------------------------------
 # own python modules
 # ------------------------------------
-from MACS2.OptValidator import opt_validate
-from MACS2.Prob import binomial_cdf_inv
-from MACS2.PeakModel import PeakModel,NotEnoughPairsException
-from MACS2.PeakDetect import PeakDetect
-from MACS2.OutputWriter import model2r_script
-from MACS2.Constants import *
+from MACS3.OptValidator import opt_validate
+from MACS3.Prob import binomial_cdf_inv
+from MACS3.PeakModel import PeakModel,NotEnoughPairsException
+from MACS3.PeakDetect import PeakDetect
+from MACS3.OutputWriter import model2r_script
+from MACS3.Constants import *
 # ------------------------------------
 # Main function
 # ------------------------------------

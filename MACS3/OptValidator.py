@@ -17,7 +17,7 @@ import logging
 from argparse import ArgumentError
 from subprocess import Popen, PIPE
 from math import log
-from MACS2.IO.Parser import BEDParser, ELANDResultParser, ELANDMultiParser, \
+from MACS3.IO.Parser import BEDParser, ELANDResultParser, ELANDMultiParser, \
     ELANDExportParser, SAMParser, BAMParser, BAMPEParser,\
     BEDPEParser, BowtieParser,  guess_parser
 # ------------------------------------

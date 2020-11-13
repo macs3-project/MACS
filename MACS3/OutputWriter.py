@@ -13,7 +13,7 @@ the distribution).
 import os
 import sys
 from array import array
-from MACS2.Constants import *
+from MACS3.Constants import *
 
 # ------------------------------------
 # constants

@@ -11,8 +11,8 @@ import sys
 import os
 import logging
 
-from MACS2.IO import BedGraphIO
-from MACS2.OptValidator import opt_validate_bdgcmp as opt_validate
+from MACS3.IO import BedGraphIO
+from MACS3.OptValidator import opt_validate_bdgcmp as opt_validate
 
 from math import log as mlog
 
@@ -53,7 +53,7 @@ def run( options ):
     info("Build scoreTrackII...")
     sbtrack = tbtrack.make_scoreTrackII_for_macs( cbtrack, depth1 = pseudo_depth, depth2 = pseudo_depth )
     if abs(scaling_factor-1) > 1e-6:
-        # Only for the case while your input is SPMR from MACS2 callpeak; Let's override SPMR.
+        # Only for the case while your input is SPMR from MACS3 callpeak; Let's override SPMR.
         info("Values in your input bedGraph files will be multiplied by %f ..." % scaling_factor)
         sbtrack.change_normalization_method( ord('M') ) # a hack to override SPMR
     sbtrack.set_pseudocount( options.pseudocount )

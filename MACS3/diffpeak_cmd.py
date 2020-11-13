@@ -19,14 +19,14 @@ from time import strftime
 # ------------------------------------
 # own python modules
 # ------------------------------------
-from MACS2.IO import cBedGraphIO
-from MACS2.IO.cDiffScore import DiffScoreTrackI
-from MACS2.IO.cPeakIO import PeakIO
-from MACS2.OptValidator import diff_opt_validate
-from MACS2.Prob import binomial_cdf_inv
-from MACS2.PeakModel import PeakModel,NotEnoughPairsException
-from MACS2.PeakDetect import PeakDetect
-from MACS2.Constants import *
+from MACS3.IO import cBedGraphIO
+from MACS3.IO.cDiffScore import DiffScoreTrackI
+from MACS3.IO.cPeakIO import PeakIO
+from MACS3.OptValidator import diff_opt_validate
+from MACS3.Prob import binomial_cdf_inv
+from MACS3.PeakModel import PeakModel,NotEnoughPairsException
+from MACS3.PeakDetect import PeakDetect
+from MACS3.Constants import *
 # ------------------------------------
 # constants
 # ------------------------------------

@@ -16,7 +16,7 @@ the distribution).
 import sys
 import os
 import logging
-from MACS2.IO import BedGraphIO
+from MACS3.IO import BedGraphIO
 # ------------------------------------
 # constants
 # ------------------------------------

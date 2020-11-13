@@ -18,9 +18,9 @@ import logging
 # ------------------------------------
 # own python modules
 # ------------------------------------
-from MACS2.OptValidator import opt_validate_filterdup as opt_validate
-from MACS2.Prob import binomial_cdf_inv
-from MACS2.Constants import *
+from MACS3.OptValidator import opt_validate_filterdup as opt_validate
+from MACS3.Prob import binomial_cdf_inv
+from MACS3.Constants import *
 # ------------------------------------
 # Main function
 # ------------------------------------

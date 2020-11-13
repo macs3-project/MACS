@@ -13,8 +13,8 @@ the distribution).
 import sys
 import os
 import logging
-from MACS2.IO import BedGraphIO
-from MACS2.OptValidator import opt_validate_bdgopt as opt_validate
+from MACS3.IO import BedGraphIO
+from MACS3.OptValidator import opt_validate_bdgopt as opt_validate
 
 # ------------------------------------
 # constants

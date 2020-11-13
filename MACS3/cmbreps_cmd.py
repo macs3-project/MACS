@@ -11,8 +11,8 @@ import sys
 import os
 import logging
 
-from MACS2.IO import BedGraphIO
-from MACS2.OptValidator import opt_validate_cmbreps as opt_validate
+from MACS3.IO import BedGraphIO
+from MACS3.OptValidator import opt_validate_cmbreps as opt_validate
 
 from math import log as mlog
 

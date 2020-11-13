@@ -18,8 +18,8 @@ import logging
 # ------------------------------------
 # own python modules
 # ------------------------------------
-from MACS2.OptValidator import opt_validate_randsample as opt_validate
-from MACS2.Constants import *
+from MACS3.OptValidator import opt_validate_randsample as opt_validate
+from MACS3.Constants import *
 
 # ------------------------------------
 # Main function

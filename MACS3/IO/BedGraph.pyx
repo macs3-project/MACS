@@ -22,10 +22,10 @@ from libc.math cimport sqrt
 from libc.math cimport log
 from cpython cimport bool
 
-from MACS2.Constants import *
-from MACS2.IO.ScoreTrack import scoreTrackII,CombinedTwoTrack
-from MACS2.IO.PeakIO import PeakIO, BroadPeakIO
-from MACS2.Prob import chisq_logp_e
+from MACS3.Constants import *
+from MACS3.IO.ScoreTrack import scoreTrackII,CombinedTwoTrack
+from MACS3.IO.PeakIO import PeakIO, BroadPeakIO
+from MACS3.Prob import chisq_logp_e
 
 # ------------------------------------
 # constants

@@ -18,9 +18,9 @@ import logging
 # ------------------------------------
 # own python modules
 # ------------------------------------
-from MACS2.OptValidator import opt_validate_pileup as opt_validate
-from MACS2.Pileup import pileup_and_write, pileup_and_write_pe
-from MACS2.Constants import *
+from MACS3.OptValidator import opt_validate_pileup as opt_validate
+from MACS3.Pileup import pileup_and_write, pileup_and_write_pe
+from MACS3.Constants import *
 # ------------------------------------
 # Main function
 # ------------------------------------

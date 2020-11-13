@@ -14,10 +14,10 @@ from operator import itemgetter
 import io
 import gc                               # use garbage collectior
 
-from MACS2.IO.PeakIO import PeakIO
-from MACS2.IO.BedGraphIO import bedGraphIO
-from MACS2.Constants import *
-from MACS2.IO.CallPeakUnit import CallerFromAlignments
+from MACS3.IO.PeakIO import PeakIO
+from MACS3.IO.BedGraphIO import bedGraphIO
+from MACS3.Constants import *
+from MACS3.IO.CallPeakUnit import CallerFromAlignments
 
 cdef bytes subpeak_letters(short i):
     if i < 26:
@@ -29,7 +29,7 @@ class PeakDetect:
     """Class to do the peak calling.
 
     e.g
-    >>> from MACS2.cPeakDetect import cPeakDetect
+    >>> from MACS3.cPeakDetect import cPeakDetect
     >>> pd = PeakDetect(treat=treatdata, control=controldata, pvalue=pvalue_cutoff, d=100, gsize=3000000000)
     >>> pd.call_peaks()
     """

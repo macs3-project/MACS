@@ -19,11 +19,11 @@ from collections import Counter
 # ------------------------------------
 # own python modules
 # ------------------------------------
-from MACS2.OptValidator import opt_validate_refinepeak as opt_validate
-from MACS2.Prob import binomial_cdf_inv
-from MACS2.IO.BedGraphIO import bedGraphIO,genericBedIO
-from MACS2.IO.PeakIO import PeakIO
-from MACS2.Constants import *
+from MACS3.OptValidator import opt_validate_refinepeak as opt_validate
+from MACS3.Prob import binomial_cdf_inv
+from MACS3.IO.BedGraphIO import bedGraphIO,genericBedIO
+from MACS3.IO.PeakIO import PeakIO
+from MACS3.Constants import *
 
 
 # ------------------------------------

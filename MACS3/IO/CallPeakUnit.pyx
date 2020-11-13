@@ -41,16 +41,16 @@ from cpython cimport bool
 from libc.stdio cimport *
 from libc.math cimport exp,log,log10, M_LN10, log1p, erf, sqrt, floor, ceil
 
-# MACS2
-from MACS2.Signal import maxima, enforce_valleys, enforce_peakyness
-from MACS2.IO.PeakIO import PeakIO, BroadPeakIO, parse_peakname
-from MACS2.IO.FixWidthTrack import FWTrack
-from MACS2.IO.PairedEndTrack import PETrackI
+# MACS3
+from MACS3.Signal import maxima, enforce_valleys, enforce_peakyness
+from MACS3.IO.PeakIO import PeakIO, BroadPeakIO, parse_peakname
+from MACS3.IO.FixWidthTrack import FWTrack
+from MACS3.IO.PairedEndTrack import PETrackI
 
 # --------------------------------------------
 # cached pscore function and LR_asym functions
 # --------------------------------------------
-from MACS2.Prob import poisson_cdf
+from MACS3.Prob import poisson_cdf
 pscore_dict = dict()
 logLR_dict = dict()
 

@@ -21,9 +21,9 @@ from re import findall
 import gzip
 import io
 
-from MACS2.Constants import *
-from MACS2.IO.FixWidthTrack import FWTrack
-from MACS2.IO.PairedEndTrack import PETrackI
+from MACS3.Constants import *
+from MACS3.IO.FixWidthTrack import FWTrack
+from MACS3.IO.PairedEndTrack import PETrackI
 
 from cpython cimport bool
 

@@ -14,10 +14,10 @@ the distribution).
 # ------------------------------------
 from libc.stdlib cimport malloc, free, qsort
 
-from MACS2.IO.FixWidthTrack import FWTrack
-from MACS2.IO.PairedEndTrack import PETrackI
-from MACS2.IO.BedGraph import bedGraphTrackI
-from MACS2.Constants import *
+from MACS3.IO.FixWidthTrack import FWTrack
+from MACS3.IO.PairedEndTrack import PETrackI
+from MACS3.IO.BedGraph import bedGraphTrackI
+from MACS3.Constants import *
 
 import numpy as np
 cimport numpy as np
@@ -27,10 +27,10 @@ from numpy cimport int32_t, float32_t
 from cpython cimport bool
 from cpython cimport PyObject
 
-from MACS2.cPosValCalculation cimport single_end_pileup as c_single_end_pileup
-from MACS2.cPosValCalculation cimport write_pv_array_to_bedGraph as c_write_pv_array_to_bedGraph
-from MACS2.cPosValCalculation cimport PosVal
-from MACS2.cPosValCalculation cimport quick_pileup as c_quick_pileup
+from MACS3.cPosValCalculation cimport single_end_pileup as c_single_end_pileup
+from MACS3.cPosValCalculation cimport write_pv_array_to_bedGraph as c_write_pv_array_to_bedGraph
+from MACS3.cPosValCalculation cimport PosVal
+from MACS3.cPosValCalculation cimport quick_pileup as c_quick_pileup
 
 from time import time as ttime
 
@@ -589,7 +589,7 @@ cpdef se_all_in_one_pileup ( np.ndarray[np.int32_t, ndim=1] plus_tags, np.ndarra
     bedGraph. There are two python arrays:
     
     [end positions, values] or '[p,v] array' in other description for
-    functions within MACS2.
+    functions within MACS3.
 
     Two arrays have the same length and can be matched by index. End
     position at index x (p[x]) record continuous value of v[x] from

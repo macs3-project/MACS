@@ -12,7 +12,7 @@ the distribution).
 # ------------------------------------
 # python modules
 # ------------------------------------
-from MACS2.Constants import *
+from MACS3.Constants import *
 from itertools import groupby
 from operator import itemgetter
 from cpython cimport bool
@@ -429,7 +429,7 @@ cdef class PeakIO:
         +-----------+------+----------------------------------------+
         |score      |int   |Indicates how dark the peak will be     |
         |(-logpvalue|      |displayed in the browser (1-1000). If   |
-        |in MACS2 * |      |'0', the DCC will assign this based on  |
+        |in MACS3 * |      |'0', the DCC will assign this based on  |
         |10)        |      |signal value. Ideally average           |
         |           |      |signalValue per base spread between     |
         |           |      |100-1000.                               |
@@ -1096,7 +1096,7 @@ cdef class BroadPeakIO:
         +-----------+------+----------------------------------------+
         |score      |int   |Indicates how dark the peak will be     |
         |(-logqvalue|      |displayed in the browser (1-1000). If   |
-        |in MACS2 * |      |'0', the DCC will assign this based on  |
+        |in MACS3 * |      |'0', the DCC will assign this based on  |
         |10)        |      |signal value. Ideally average           |
         |           |      |signalValue per base spread between     |
         |           |      |100-1000.                               |
