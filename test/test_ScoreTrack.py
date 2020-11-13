@@ -5,8 +5,8 @@ import io
 import unittest
 from numpy.testing import assert_equal,  assert_almost_equal, assert_array_equal
 
-from MACS2.IO.ScoreTrack import *
-from MACS2.IO.BedGraph import bedGraphTrackI
+from MACS3.IO.ScoreTrack import *
+from MACS3.IO.BedGraph import bedGraphTrackI
 
 class Test_TwoConditionScores(unittest.TestCase):
     def setUp(self):

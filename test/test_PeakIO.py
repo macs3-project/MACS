@@ -4,7 +4,7 @@
 import unittest
 import sys
 
-from MACS2.IO.PeakIO import *
+from MACS3.IO.PeakIO import *
 
 class Test_Region(unittest.TestCase):
 

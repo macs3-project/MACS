@@ -3,7 +3,7 @@
 
 import unittest
 
-from MACS2.IO.Parser import *
+from MACS3.IO.Parser import *
 
 class Test_auto_guess ( unittest.TestCase ):
 

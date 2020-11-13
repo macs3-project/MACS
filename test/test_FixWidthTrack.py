@@ -3,7 +3,7 @@
 
 import unittest
 
-from MACS2.IO.FixWidthTrack import *
+from MACS3.IO.FixWidthTrack import *
 
 class Test_FWTrack(unittest.TestCase):
 

@@ -11,7 +11,7 @@ the distribution).
 import unittest
 
 from math import log10
-from MACS2.Prob import *
+from MACS3.Prob import *
 
 # ------------------------------------
 # Main function

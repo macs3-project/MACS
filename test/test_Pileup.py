@@ -11,8 +11,8 @@ the distribution).
 import unittest
 
 from math import log10
-from MACS2.Pileup import *
-from MACS2.IO.FixWidthTrack import FWTrack
+from MACS3.Pileup import *
+from MACS3.IO.FixWidthTrack import FWTrack
 
 # ------------------------------------
 # Main function
