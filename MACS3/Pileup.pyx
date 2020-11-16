@@ -1,6 +1,6 @@
 # cython: language_level=3
 # cython: profile=True
-# Time-stamp: <2019-10-30 17:27:47 taoliu>
+# Time-stamp: <2020-11-15 18:00:43 ta32852>
 
 """Module Description: For pileup functions.
 
@@ -722,7 +722,7 @@ cdef int compare(const void * a, const void * b) nogil:
     return 0
 
 # quick pileup implemented in cython
-cpdef quick_pileup ( np.ndarray[np.int32_t, ndim=1] start_poss, np.ndarray[np.int32_t, ndim=1] end_poss, float scale_factor, float baseline_value ):
+cpdef list quick_pileup ( np.ndarray[np.int32_t, ndim=1] start_poss, np.ndarray[np.int32_t, ndim=1] end_poss, float scale_factor, float baseline_value ):
     """Return pileup given plus strand and minus strand positions of fragments.
 
     A super-fast and simple algorithm proposed by Jie Wang. It will

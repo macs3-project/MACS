@@ -1,6 +1,5 @@
 # cython: language_level=3
 # cython: profile=True
-# Time-stamp: <2019-10-30 16:33:42 taoliu>
 
 """Module Description: Build shifting model
 
@@ -8,6 +7,7 @@ This code is free software; you can redistribute it and/or modify it
 under the terms of the BSD License (see the file LICENSE included with
 the distribution).
 """
+
 import sys, time, random
 import numpy as np
 cimport numpy as np
@@ -18,21 +18,6 @@ from MACS3.Constants import *
 from cpython cimport bool
 from libc.stdint cimport uint32_t, uint64_t, int32_t, int64_t
 ctypedef np.float32_t float32_t
-
-cpdef median (nums):
-    """Calculate Median.
-
-    Parameters:
-    nums:  list of numbers
-    Return Value:
-    median value
-    """
-    p = sorted(nums)
-    l = len(p)
-    if l%2 == 0:
-        return (p[l//2]+p[l//2-1])/2
-    else:
-        return p[l//2]
 
 class NotEnoughPairsException(Exception):
     def __init__ (self,value):
@@ -54,96 +39,65 @@ cdef class PeakModel:
         int tag_expansion_size
         object info, debug, warn, error
         str summary
+        int max_tags
+        int peaksize
         public np.ndarray plus_line, minus_line, shifted_line
         public int d
         public int scan_window
         public int min_tags
-        int max_tags
-        int peaksize
         public list alternative_d
         public np.ndarray xcorr, ycorr
 
     def __init__ ( self, opt , treatment, int max_pairnum=500 ): #, double gz = 0, int umfold=30, int lmfold=10, int bw=200, int ts = 25, int bg=0, bool quiet=False):
         self.treatment = treatment
-        #if opt:
         self.gz = opt.gsize
         self.umfold = opt.umfold
         self.lmfold = opt.lmfold
         self.tag_expansion_size = 10         #opt.tsize| test 10bps. The reason is that we want the best 'lag' between left & right cutting sides. A tag will be expanded to 10bps centered at cutting point.
-        self.d_min = opt.d_min ### discard any fragment size < d_min
+        self.d_min = opt.d_min               #discard any predicted fragment sizes < d_min
         self.bw = opt.bw
         self.info  = opt.info
         self.debug = opt.debug
         self.warn  = opt.warn
         self.error = opt.warn
-        #else:
-        #    self.gz = gz
-        #    self.umfold = umfold
-        #    self.lmfold = lmfold
-        #    self.tag_expansion_size = ts
-        #    self.bg = bg
-        #    self.bw = bw
-        #    self.info  = lambda x: sys.stderr.write(x+"\n")
-        #    self.debug = lambda x: sys.stderr.write(x+"\n")
-        #    self.warn  = lambda x: sys.stderr.write(x+"\n")
-        #    self.error = lambda x: sys.stderr.write(x+"\n")
-        #if quiet:
-        #    self.info = lambda x: None
-        #    self.debug = lambda x: None
-        #    self.warn = lambda x: None
-        #    self.error = lambda x: None
-
         self.max_pairnum = max_pairnum
-        #self.summary = ""
-        #self.plus_line = None
-        #self.minus_line = None
-        #self.shifted_line = None
-        #self.d = None
-        #self.scan_window = None
-        #self.min_tags = None
-        #self.peaksize = None
-        self.build()
 
     cpdef build (self):
-        """Build the model.
+        """Build the model. Main function of PeakModel class.
 
-        prepare self.d, self.scan_window, self.plus_line,
-        self.minus_line and self.shifted_line to use.
+        1. prepare self.d, self.scan_window, self.plus_line,
+        self.minus_line and self.shifted_line.
+
+        2. find paired + and - strand peaks
+
+        3. find the best d using x-correlation
         """
         cdef:
             dict paired_peaks
             long num_paired_peakpos, num_paired_peakpos_remained, num_paired_peakpos_picked
             bytes c                       #chromosome
 
-
         self.peaksize = 2*self.bw
-        self.min_tags = int(round(float(self.treatment.total) * self.lmfold * self.peaksize / self.gz / 2)) # mininum unique hits on single strand
-        self.max_tags = int(round(float(self.treatment.total) * self.umfold * self.peaksize / self.gz /2)) # maximum unique hits on single strand
-        #print self.min_tags, self.max_tags
-        #print self.min_tags
-        #print self.max_tags
-        # use treatment data to build model
-        self.info("#2 looking for paired plus/minus strand peaks...")
-        paired_peakpos = self.__paired_peaks ()
-        # select up to 1000 pairs of peaks to build model
-        num_paired_peakpos = 0
-        num_paired_peakpos_remained = self.max_pairnum
-        num_paired_peakpos_picked = 0
-        # select only num_paired_peakpos_remained pairs.
-        for c in list(paired_peakpos.keys()):
-            num_paired_peakpos +=len(paired_peakpos[c])
-        # TL: Now I want to use everything
+        self.min_tags = int(round(float(self.treatment.total) * self.lmfold * self.peaksize / self.gz / 2)) # mininum unique hits on single strand, decided by lmfold
+        self.max_tags = int(round(float(self.treatment.total) * self.umfold * self.peaksize / self.gz /2)) # maximum unique hits on single strand, decided by umfold
+        self.debug( f"#2 min_tags: {min_tags}; max_tags:{max_tags}; " )
+        
+        self.info( "#2 looking for paired plus/minus strand peaks..." )
+        # find paired + and - strand peaks
+        paired_peakpos = self.__find_paired_peaks ()
 
-        num_paired_peakpos_picked = num_paired_peakpos
+        num_paired_peakpos_picked = 0
+        for c in list( paired_peakpos.keys() ):
+            num_paired_peakpos += len (paired_peakpos[c] )
 
         self.info("#2 number of paired peaks: %d" % (num_paired_peakpos))
+
         if num_paired_peakpos < 100:
-            self.error("Too few paired peaks (%d) so I can not build the model! Broader your MFOLD range parameter may erase this error. If it still can't build the model, we suggest to use --nomodel and --extsize 147 or other fixed number instead." % (num_paired_peakpos))
-            self.error("Process for pairing-model is terminated!")
+            self.error(f"#2 MACS3 needs at least 100 paired peaks at + and - strand to build the model, but can only find {num_paired_peakpos}! Please make your MFOLD range broader and try again. If MACS3 still can't build the model, we suggest to use --nomodel and --extsize 147 or other fixed number instead.")
+            self.error("#2 Process for pairing-model is terminated!")
             raise NotEnoughPairsException("No enough pairs to build model")
-        elif num_paired_peakpos < self.max_pairnum:
-            self.warn("Fewer paired peaks (%d) than %d! Model may not be build well! Lower your MFOLD parameter may erase this warning. Now I will use %d pairs to build model!" % (num_paired_peakpos,self.max_pairnum,num_paired_peakpos_picked))
-        self.debug("Use %d pairs to build the model." % (num_paired_peakpos_picked))
+
+        # build model, find the best d using cross-correlation
         self.__paired_peak_model(paired_peakpos)
 
     def __str__ (self):
@@ -157,6 +111,85 @@ Summary of Peak Model:
   Fragment size: %d
   Scan window size: %d
 """ % (self.min_tags,self.max_tags,self.d,self.scan_window)
+
+    cdef dict __find_paired_peaks (self):
+        """Call paired peaks from fwtrackI object.
+
+        Return paired peaks center positions.
+        """
+        cdef:
+           int i
+           list chrs
+           bytes chrom
+           np.ndarray[np.int32_t, ndim=1] plus_tags, minus_tags
+           dict paired_peaks_pos # return
+
+        chrs = list(self.treatment.get_chr_names())
+        chrs.sort()
+        paired_peaks_pos = {}
+        for i in range( len(chrs) ):
+            chrom = chrs[ i ]
+            self.debug( f"Chromosome: {chrom}" )
+            # extract tag positions
+            [ plus_tags, minus_tags ] = self.treatment.get_locations_by_chr( chrom )
+            # look for + strand peaks
+            plus_peaksinfo = self.__naive_find_peaks ( plus_tags, 1 )
+            self.debug("Number of unique tags on + strand: %d" % ( plus_tags.shape[0] ) )
+            self.debug("Number of peaks in + strand: %d" % ( len(plus_peaksinfo) ) )
+            # look for - strand peaks
+            minus_peaksinfo = self.__naive_find_peaks ( minus_tags, 0 )
+            self.debug("Number of unique tags on - strand: %d" % ( minus_tags.shape[0] ) )
+            self.debug("Number of peaks in - strand: %d" % ( len( minus_peaksinfo ) ) )
+            if not plus_peaksinfo or not minus_peaksinfo:
+                self.debug("Chrom %s is discarded!" % (chrom) )
+                continue
+            else:
+                paired_peaks_pos[chrom] = self.__find_pair_center (plus_peaksinfo, minus_peaksinfo)
+                self.debug("Number of paired peaks: %d" %(len(paired_peaks_pos[chrom])))
+        return paired_peaks_pos
+
+    cdef list __naive_find_peaks (self, np.ndarray[np.int32_t, ndim=1] taglist, int plus_strand=1 ):
+        """Naively call peaks based on tags counting.
+
+        if plus_strand == 0, call peak on minus strand.
+
+        Return peak positions and the tag number in peak region by a tuple list [(pos,num)].
+        """
+        cdef:
+            long i
+            int pos
+            list peak_info
+            int32_t * taglist_ptr
+            list current_tag_list
+
+        taglist_ptr = <int32_t *> taglist.data
+
+        peak_info = []    # store peak pos in every peak region and
+                          # unique tag number in every peak region
+        if taglist.shape[0] < 2: # less than 2 tags, no need to call peaks, return []
+            return peak_info
+
+        pilup_array = quick_pileup( taglist_m_half, taglist_p_half, 1, 0 )
+
+
+
+        
+        for i in range( 0, taglist.shape[0] ):
+            pos = taglist_ptr[0]
+            taglist_ptr += 1
+
+            if ( pos - current_tag_list[0] + 1 ) > self.peaksize: # call peak in current_tag_list when the region is long enough
+                # a peak will be called if tag number is ge min tags.
+                if len(current_tag_list) >= self.min_tags and len(current_tag_list) <= self.max_tags:
+                    peak_info.append( ( self.__naive_peak_pos(current_tag_list,plus_strand), len(current_tag_list) ) )
+                #current_tag_list = array(BYTE4, []) # reset current_tag_list
+                current_tag_list = []
+
+            current_tag_list.append( pos )   # add pos while 1. no
+                                             # need to call peak;
+                                             # 2. current_tag_list is []
+
+        return peak_info
 
     cdef __paired_peak_model (self, paired_peakpos,):
         """Use paired peak positions and treatment tag positions to build the model.
@@ -333,40 +366,6 @@ Summary of Peak Model:
             line[i] = pileup
         return
 
-
-    cdef __paired_peaks (self):
-        """Call paired peaks from fwtrackI object.
-
-        Return paired peaks center positions.
-        """
-        cdef:
-           int i
-           list chrs
-           bytes chrom
-           dict paired_peaks_pos
-           np.ndarray[np.int32_t, ndim=1] plus_tags, minus_tags
-
-        chrs = list(self.treatment.get_chr_names())
-        chrs.sort()
-        paired_peaks_pos = {}
-        for i in range( len(chrs) ):
-            chrom = chrs[ i ]
-            self.debug("Chromosome: %s" % (chrom) )
-            [ plus_tags, minus_tags ] = self.treatment.get_locations_by_chr( chrom )
-            plus_peaksinfo = self.__naive_find_peaks ( plus_tags, 1 )
-            self.debug("Number of unique tags on + strand: %d" % ( plus_tags.shape[0] ) )
-            self.debug("Number of peaks in + strand: %d" % ( len(plus_peaksinfo) ) )
-            minus_peaksinfo = self.__naive_find_peaks ( minus_tags, 0 )
-            self.debug("Number of unique tags on - strand: %d" % ( minus_tags.shape[0] ) )
-            self.debug("Number of peaks in - strand: %d" % ( len( minus_peaksinfo ) ) )
-            if not plus_peaksinfo or not minus_peaksinfo:
-                self.debug("Chrom %s is discarded!" % (chrom) )
-                continue
-            else:
-                paired_peaks_pos[chrom] = self.__find_pair_center (plus_peaksinfo, minus_peaksinfo)
-                self.debug("Number of paired peaks: %d" %(len(paired_peaks_pos[chrom])))
-        return paired_peaks_pos
-
     cdef __find_pair_center (self, list pluspeaks, list minuspeaks):
         cdef:
             long ip = 0                  # index for plus peaks
@@ -402,47 +401,6 @@ Summary of Peak Model:
                         #self.debug ( "distance: %d, minus: %d, plus: %d" % (mp-pp,mp,pp))
                 im += 1
         return pair_centers
-
-    cdef __naive_find_peaks (self, np.ndarray[np.int32_t, ndim=1] taglist, int plus_strand=1 ):
-        """Naively call peaks based on tags counting.
-
-        if plus_strand == 0, call peak on minus strand.
-
-        Return peak positions and the tag number in peak region by a tuple list [(pos,num)].
-        """
-        cdef:
-            long i
-            int pos
-            list peak_info
-            int32_t * taglist_ptr
-            list current_tag_list
-
-        taglist_ptr = <int32_t *> taglist.data
-
-        peak_info = []    # store peak pos in every peak region and
-                          # unique tag number in every peak region
-        if taglist.shape[0] < 2:
-            return peak_info
-        pos = taglist[0]
-
-        current_tag_list = [ pos ]
-
-        for i in range( 1, taglist.shape[0] ):
-            pos = taglist_ptr[0]
-            taglist_ptr += 1
-
-            if ( pos - current_tag_list[0] + 1 ) > self.peaksize: # call peak in current_tag_list when the region is long enough
-                # a peak will be called if tag number is ge min tags.
-                if len(current_tag_list) >= self.min_tags and len(current_tag_list) <= self.max_tags:
-                    peak_info.append( ( self.__naive_peak_pos(current_tag_list,plus_strand), len(current_tag_list) ) )
-                #current_tag_list = array(BYTE4, []) # reset current_tag_list
-                current_tag_list = []
-
-            current_tag_list.append( pos )   # add pos while 1. no
-                                             # need to call peak;
-                                             # 2. current_tag_list is []
-
-        return peak_info
 
     cdef __naive_peak_pos (self, pos_list, int plus_strand ):
         """Naively calculate the position of peak.
@@ -634,3 +592,106 @@ cpdef smooth(x, int window_len=11, str window='hanning'):
 
     y=np.convolve(w/w.sum(),s,mode='valid')
     return y[(window_len//2):-(window_len//2)]
+
+# quick pileup implemented in cython
+cdef tuple naive_quick_pileup ( np.ndarray[np.int32_t, ndim=1] poss, int extension):
+    """Simple pileup, every tag will be extended left and right with length `extension`.
+
+    """
+    cdef:
+        long i_s, i_e, i, I
+        int a, b, p, pre_p, pileup
+        list tmp
+        long l = poss.shape[0]
+        np.ndarray[np.int32_t, ndim=1] start_poss
+        np.ndarray[np.int32_t, ndim=1] end_poss
+        np.ndarray[np.int32_t, ndim=1] ret_p
+        np.ndarray[np.float32_t, ndim=1] ret_v
+        # pointers are used for numpy arrays
+        int32_t * start_poss_ptr
+        int32_t * end_poss_ptr
+        int32_t * ret_p_ptr     # pointer for position array
+        float32_t * ret_v_ptr     # pointer for value array
+        #int max_pileup = 0
+
+    start_poss = poss - extension
+    end_poss = poss + extension
+
+    ret_p = np.zeros( 2*l, dtype="int32" )
+    ret_v = np.zeros( 2*l, dtype="float32" )
+
+    ret_p_ptr = <int32_t *> ret_p.data
+    ret_v_ptr = <float32_t *> ret_v.data
+
+    tmp = [ret_p, ret_v] # for (endpos,value)
+
+    i_s = 0                         # index of plus_tags
+    i_e = 0                         # index of minus_tags
+    I = 0
+
+    pileup = 0
+    if ls == 0: return tmp
+    pre_p = min(start_poss_ptr[0], end_poss_ptr[0])
+
+    if pre_p != 0:
+        # the first chunk of 0
+        ret_p_ptr[0] = pre_p
+        ret_v_ptr[0] = max(0,baseline_value)
+        ret_p_ptr += 1
+        ret_v_ptr += 1
+        I += 1
+
+    pre_v = pileup
+
+    while i_s < ls and i_e < le:
+        if start_poss_ptr[0] < end_poss_ptr[0]:
+            p = start_poss_ptr[0]
+            if p != pre_p:
+                ret_p_ptr[0] = p
+                ret_v_ptr[0] = max(pileup * scale_factor, baseline_value)
+                ret_p_ptr += 1
+                ret_v_ptr += 1
+                I += 1
+                pre_p = p
+            pileup += 1
+            #if pileup > max_pileup:
+            #    max_pileup = pileup
+            i_s += 1
+            start_poss_ptr += 1
+        elif start_poss_ptr[0] > end_poss_ptr[0]:
+            p = end_poss_ptr[0]
+            if p != pre_p:
+                ret_p_ptr[0] = p
+                ret_v_ptr[0] = max(pileup * scale_factor, baseline_value)
+                ret_p_ptr += 1
+                ret_v_ptr += 1
+                I += 1
+                pre_p = p
+            pileup -= 1
+            i_e += 1
+            end_poss_ptr += 1
+        else:
+            i_s += 1
+            i_e += 1
+            start_poss_ptr += 1
+            end_poss_ptr += 1
+
+    if i_e < le:
+        # add rest of end positions
+        for i in range(i_e, le):
+            p = end_poss_ptr[0]
+            #for p in minus_tags[i_e:]:
+            if p != pre_p:
+                ret_p_ptr[0] = p
+                ret_v_ptr[0] = max(pileup * scale_factor, baseline_value)
+                ret_p_ptr += 1
+                ret_v_ptr += 1
+                I += 1
+                pre_p = p
+            pileup -= 1
+            end_poss_ptr += 1
+
+    ret_p.resize( I, refcheck=False )
+    ret_v.resize( I, refcheck=False )
+
+    return tmp

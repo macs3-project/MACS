@@ -1,4 +1,4 @@
-# Time-stamp: <2019-11-04 10:41:13 taoliu>
+# Time-stamp: <2020-11-15 01:02:20 ta32852>
 
 """Description: MACS 2 main executable
 
@@ -164,11 +164,12 @@ def run( args ):
             info("#2 Sequencing ends will be shifted towards 5' by %d bp(s)" % (options.shift * -1))
         options.scanwindow=2*options.d  # remove the effect of --bw
     else:
+        peakmodel = PeakModel(treatment = treat,
+                              max_pairnum = MAX_PAIRNUM,
+                              opt = options
+                              )
         try:
-            peakmodel = PeakModel(treatment = treat,
-                                  max_pairnum = MAX_PAIRNUM,
-                                  opt = options
-                                  )
+            peakmodel.build()
             info("#2 finished!")
             debug("#2  Summary Model:")
             debug("#2   min_tags: %d" % (peakmodel.min_tags))
