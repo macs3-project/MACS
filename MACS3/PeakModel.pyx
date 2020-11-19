@@ -1,6 +1,6 @@
 # cython: language_level=3
 # cython: profile=True
-# Time-stamp: <2020-11-16 14:17:05 Tao Liu>
+# Time-stamp: <2020-11-19 09:30:14 Tao Liu>
 """Module Description: Build shifting model
 
 This code is free software; you can redistribute it and/or modify it
@@ -81,7 +81,7 @@ cdef class PeakModel:
         self.peaksize = 2*self.bw
         self.min_tags = int(round(float(self.treatment.total) * self.lmfold * self.peaksize / self.gz / 2)) # mininum unique hits on single strand, decided by lmfold
         self.max_tags = int(round(float(self.treatment.total) * self.umfold * self.peaksize / self.gz /2)) # maximum unique hits on single strand, decided by umfold
-        self.debug( f"#2 min_tags: {min_tags}; max_tags:{max_tags}; " )
+        self.debug( f"#2 min_tags: {self.min_tags}; max_tags:{self.max_tags}; " )
         
         self.info( "#2 looking for paired plus/minus strand peaks..." )
         # find paired + and - strand peaks
