@@ -1,6 +1,6 @@
 # cython: language_level=3
 # cython: profile=True
-# Time-stamp: <2020-11-15 18:00:43 ta32852>
+# Time-stamp: <2020-11-19 01:16:33 Tao Liu>
 
 """Module Description: For pileup functions.
 
@@ -35,483 +35,22 @@ from MACS3.cPosValCalculation cimport quick_pileup as c_quick_pileup
 from time import time as ttime
 
 # ------------------------------------
-# functions
+# utility internal functions
 # ------------------------------------
-
-# use python3 max function instead
-#cdef inline int int_max(int a, int b): return a if a > b else b
-#cdef inline long long_max(long a, long b): return a if a > b else b
-#cdef inline float float_max(float a, float b): return a if a > b else b
+cdef class Ends:
+    cdef:
+        np.ndarray startposs
+        np.ndarray endposs
 
 cdef void clean_up_ndarray ( np.ndarray x ):
-    # clean numpy ndarray in two steps
+    """ Clean up numpy array in two steps
+    """
     cdef:
         long i
     i = x.shape[0] // 2
     x.resize( 100000 if i > 100000 else i, refcheck=False)
     x.resize( 0, refcheck=False)
     return
-
-# This function uses pure C code for pileup
-cpdef pileup_and_write( trackI,
-                        bytes output_filename,
-                        int d,
-                        float scale_factor,
-                        float baseline_value = 0.0,
-                        bint directional = True,
-                        bint halfextension = True ):
-
-    cdef:
-        long five_shift, three_shift, l, i
-        list chroms
-        int n_chroms
-        bytes chrom
-        np.ndarray[np.int32_t, ndim=1] plus_tags, minus_tags
-        dict chrlengths = trackI.get_rlengths ()
-        int * plus_tags_pos
-        int * minus_tags_pos
-        long rlength
-        long fl
-        bytes py_bytes
-        char * chrom_char
-        PosVal * _data
-        long l_data
-
-    # This block should be reused to determine the actual shift values
-    if directional:
-        # only extend to 3' side
-        if halfextension:
-            five_shift = d//-4  # five shift is used to move cursor towards 5' direction to find the start of fragment
-            three_shift = d*3//4 # three shift is used to move cursor towards 3' direction to find the end of fragment
-        else:
-            five_shift = 0
-            three_shift = d
-    else:
-        # both sides
-        if halfextension:
-            five_shift = d//4
-            three_shift = five_shift
-        else:
-            five_shift = d//2
-            three_shift = d - five_shift
-    # end of the block
-
-    chroms = list(chrlengths.keys())
-    n_chroms = len( chroms )
-
-    fh = open(output_filename, "w")
-    fh.write("")
-    fh.close()
-
-    for i in range( n_chroms ):
-        chrom = chroms[ i ]
-        (plus_tags, minus_tags) = trackI.get_locations_by_chr(chrom)
-        rlength = <long> chrlengths[ chrom ]
-        plus_tags_pos = <int *> plus_tags.data
-        minus_tags_pos = <int *> minus_tags.data
-
-        _data = c_single_end_pileup( plus_tags_pos, plus_tags.shape[0], minus_tags_pos, minus_tags.shape[0], five_shift, three_shift, 0, rlength, scale_factor, baseline_value, &l_data )
-
-        # write
-        py_bytes = chrom
-        chrom_char = py_bytes
-        c_write_pv_array_to_bedGraph( _data, l_data, chrom_char, output_filename, 1 )
-
-        # clean
-        free( _data )
-
-
-# function to pileup BAMPE/BEDPE stored in PETrackI object and write to a BEDGraph file
-# this function uses c function
-cpdef pileup_and_write_pe( petrackI,
-                           bytes output_filename,
-                           float scale_factor = 1,
-                           float baseline_value = 0.0):
-
-    cdef:
-        dict chrlengths = petrackI.get_rlengths ()
-        list chroms
-        int n_chroms
-        int i
-        bytes chrom
-
-        np.ndarray locs
-        np.ndarray[np.int32_t, ndim=1] locs0
-        np.ndarray[np.int32_t, ndim=1] locs1
-
-        int * start_pos
-        int * end_pos
-        long fl
-        bytes py_bytes
-        char * chrom_char
-        PosVal * _data
-        long l_data
-
-    chroms = list(chrlengths.keys())
-    n_chroms = len( chroms )
-
-    fh = open(output_filename, "w")
-    fh.write("")
-    fh.close()
-
-    for i in range( n_chroms ):
-        chrom = chroms[ i ]
-        locs = petrackI.get_locations_by_chr(chrom)
-
-        locs0 = np.sort(locs['l'])
-        locs1 = np.sort(locs['r'])
-        start_pos = <int *> locs0.data
-        end_pos   = <int *> locs1.data
-
-        _data = c_quick_pileup ( start_pos, end_pos, locs0.shape[0], scale_factor, baseline_value, &l_data )
-
-        py_bytes = chrom
-        chrom_char = py_bytes
-        c_write_pv_array_to_bedGraph( _data, l_data, chrom_char, output_filename, 1 )
-
-
-# Unified pileup function #
-cpdef unified_pileup_bdg(track,
-                         ds,
-                         scale_factors,
-                         float baseline_value = 0.0,
-                         bint directional = True,
-                         bint halfextension = True):
-    """This function will call corresponding function for FWTrack
-    or PETrackI to pileup fragments.
-
-    It will call pileup_w_multiple_d* functions for control input, then
-    calculate maximum values; or call normal pileup functions for
-    treatment data.
-
-    """
-
-    chrs = track.get_chr_names()
-    if type(ds) is list:
-        # multiple pileup (e.g. control with 1k, 10k and d extension)
-        if isinstance(track, FWTrack):
-            return pileup_w_multiple_d_bdg(track, ds, scale_factors,
-                                           baseline_value,
-                                           directional, halfextension)
-        elif isinstance(track, PETrackI):
-            return pileup_w_multiple_d_bdg_pe(track, ds, scale_factors,
-                                              baseline_value)
-        else:
-            raise ValueError("track must be of type FWTrack or PETrackI")
-    else:
-        # single extension (e.g. treatment data)
-        if isinstance(track, FWTrack):
-            return pileup_bdg_se(track, ds, scale_factors,
-                                 baseline_value,
-                                 directional, halfextension)
-        elif isinstance(track, PETrackI):
-            if ds is None:      # do not extend pair end library
-                return pileup_bdg_pe(track, scale_factors, baseline_value)
-            else:               # still extend pair end library centered at middle point of fragment.
-                return pileup_bdg_pe_w_ext(track, ds, scale_factors,
-                                           baseline_value)
-        else:
-            raise ValueError("track must be of type FWTrack or PETrackI")
-
-## Fixed-width functions for single end library##
-cdef pileup_bdg_se(object trackI, int d,
-                    float scale_factor = 1.0,
-                    float baseline_value = 0.0,
-                    bool directional = True,
-                    bool halfextension = True ):
-    """Pileup tags into bedGraphTrackI object with extension. Tag will
-    be extended towards 3' side with size of d if directional is Ture,
-    or both sides with d/2 if directional is False.
-
-    A tag is a single genomic location.
-
-    trackI  : A FWTrack object with raw plus and minus 5' end positions
-    d       : tag will be extended to this value to 3' direction, unless directional is False.
-    baseline_value : a value to be filled for missing values.
-    directional: if False, the strand or direction of tag will be ignored, so that extension will be both sides with d/2.
-    halfextension: only make a fragment of d/2 size centered at fragment center
-
-    Return a bedGraphTrackI object.
-    """
-    cdef:
-        long five_shift, three_shift, l
-        int rlength
-        bytes chrom
-        Ends ends
-        np.ndarray[np.int32_t, ndim=1] plus_tags, minus_tags
-        dict chrlengths = trackI.get_rlengths ()
-
-    ret = bedGraphTrackI(baseline_value=baseline_value) # bedGraphTrackI object to be returned.
-
-
-    if directional:
-        # only extend to 3' side
-        if halfextension:
-            five_shift = d//-4  # five shift is used to move cursor towards 5' direction to find the start of fragment
-            three_shift = d*3//4 # three shift is used to move cursor towards 3' direction to find the end of fragment
-        else:
-            five_shift = 0
-            three_shift = d
-    else:
-        # both sides
-        if halfextension:
-            five_shift = d//4
-            three_shift = five_shift
-        else:
-            five_shift = d//2
-            three_shift = d - five_shift
-
-    for chrom in sorted(list(chrlengths.keys())):
-        rlength = chrlengths[chrom]
-        (plus_tags, minus_tags) = trackI.get_locations_by_chr(chrom)
-
-        ends = start_and_end_poss( plus_tags, minus_tags, five_shift, three_shift , rlength)
-
-        ret.add_a_chromosome( chrom, quick_pileup ( ends.startposs, ends.endposs, scale_factor, baseline_value ) )
-
-        # free mem
-        clean_up_ndarray( ends.startposs )
-        clean_up_ndarray( ends.endposs )
-        #ends.startposs.resize(100000, refcheck=False)
-        #ends.startposs.resize(0, refcheck=False)
-        #ends.endposs.resize(100000, refcheck=False)
-        #ends.endposs.resize(0, refcheck=False)
-
-    return ret
-
-cdef pileup_w_multiple_d_bdg(object trackI, list d_s, list scale_factor_s = [],
-                              float baseline_value = 0.0,
-                              bool directional = True,
-                              bool halfextension = True):
-    """Pileup tags into bedGraphTrackI object with extension. Tag will
-    be extended towards 3' side with size of d if directional is Ture,
-    or both sides with d/2 if directional is False.
-
-    A tag is a single genomic location.
-
-    trackI  : A FWTrack object with raw plus and minus 5' end positions
-    d       : tag will be extended to this value to 3' direction, unless directional is False.
-    baseline_value : a value to be filled for missing values.
-    directional: if False, the strand or direction of tag will be ignored, so that extension will be both sides with d/2.
-    halfextension: only make a fragment of d/2 size centered at fragment center
-
-    Return a bedGraphTrackI object.
-    """
-    cdef:
-        long d, five_shift, three_shift, l, i
-        float scale_factor
-        dict chrlengths = trackI.get_rlengths()
-        Ends ends
-
-    assert len(d_s) == len(scale_factor_s), "Arguments d_s and scale_factor_s should have the same length!"
-
-    ret = bedGraphTrackI(baseline_value=baseline_value) # bedGraphTrackI object to be returned.
-
-    chrs = trackI.get_chr_names()
-
-    five_shift_s = []
-    three_shift_s = []
-
-    for d in d_s:
-        if directional:
-            # only extend to 3' side
-            if halfextension:
-                five_shift_s.append(d//-4)  # five shift is used to move cursor towards 5' direction to find the start of fragment
-                three_shift_s.append(d*3//4) # three shift is used to move cursor towards 3' direction to find the end of fragment
-            else:
-                five_shift_s.append(0)
-                three_shift_s.append(d)
-        else:
-            # both sides
-            if halfextension:
-                five_shift_s.append(d//4)
-                three_shift_s.append(d//4)
-            else:
-                five_shift_s.append(d//2)
-                three_shift_s.append(d - d//2)
-
-    for chrom in sorted(list(chrlengths.keys())):
-        rlength = chrlengths[chrom]
-        (plus_tags,minus_tags) = trackI.get_locations_by_chr(chrom)
-
-        prev_pileup = None
-
-        for i in range(len(d_s)):
-
-            five_shift = five_shift_s[i]
-            three_shift = three_shift_s[i]
-            scale_factor = scale_factor_s[i]
-
-            ends = start_and_end_poss( plus_tags, minus_tags, five_shift, three_shift, rlength )
-
-            tmp_pileup = quick_pileup ( ends.startposs, ends.endposs, scale_factor, baseline_value )
-
-            # free mem
-            clean_up_ndarray( ends.startposs )
-            clean_up_ndarray( ends.endposs )
-            #ends.startposs.resize(100000, refcheck=False)
-            #ends.startposs.resize(0, refcheck=False)
-            #ends.endposs.resize(100000, refcheck=False)
-            #ends.endposs.resize(0, refcheck=False)
-
-            if prev_pileup:
-                prev_pileup = max_over_two_pv_array ( prev_pileup, tmp_pileup )
-            else:
-                prev_pileup = tmp_pileup
-
-        ret.add_a_chromosome( chrom, prev_pileup )
-
-    return ret
-
-## Paired-end functions ##
-
-# baseline_value needs to be float not int, otherwise we cause error in
-# poisson CDF
-cdef pileup_bdg_pe(object trackI, float scale_factor, float baseline_value):
-    """Pileup fragments into bedGraphTrackI object.
-
-    trackI  : A PETrackI object with genomic locations
-    baseline_value : a value to be filled for missing values.
-    scale_factor : value to be multiplied at each position
-
-    Return a bedGraphTrackI object.
-    """
-    cdef:
-        int rlength
-        bytes chrom
-        np.ndarray[np.int32_t, ndim=2] locs
-        dict chrlengths = trackI.get_rlengths ()
-
-    ret = bedGraphTrackI(baseline_value=baseline_value) # bedGraphTrackI object to be returned.
-    for chrom in sorted(list(chrlengths.keys())):
-        rlength = chrlengths[chrom]
-        locs = trackI.get_locations_by_chr(chrom) # we have to sort before doing quick_pileup!
-        ret.add_a_chromosome(chrom, quick_pileup(np.sort(locs[:,0]), np.sort(locs[:,1]),
-                                                    scale_factor,
-                                                    baseline_value))
-    return ret
-
-cdef pileup_bdg_pe_w_ext (object trackI, int d, float scale_factor = 1.0,
-                           float baseline_value = 0.0):
-    """Pileup fragments into bedGraphTrackI object with extension. Fragment will
-    be extended both directions from midpoint by distance d/2, or the original
-    width will be used if d = 0
-
-    trackI  : A PETrackI object with genomic locations
-    d       : fragments will be extended by 1/2 this value in both directions
-              from their midpoint
-    baseline_value : a value to be filled for missing values.
-    scale_factor : value to be multiplied at each position
-
-    Return a bedGraphTrackI object.
-    """
-    cdef:
-        int five_shift, three_shift
-        int rlength
-        bytes chrom
-        np.ndarray[np.int32_t, ndim=2] locs
-        np.ndarray[np.int32_t, ndim=1] start_poss, end_poss
-        dict chrlengths = trackI.get_rlengths ()
-
-    ret = bedGraphTrackI(baseline_value=baseline_value) # bedGraphTrackI object to be returned.
-
-    five_shift = d//2
-    three_shift = d - five_shift
-
-    for chrom in sorted(list(chrlengths.keys())):
-        rlength = chrlengths[chrom]
-        locs = trackI.get_locations_by_chr(chrom)
-        midpoints = locs[:,0] + (locs[:,1] - locs[:,0]) // 2
-
-        # fix negative coordinations
-        start_poss = midpoints - five_shift
-        start_poss = fix_coordinates(start_poss, rlength)
-        end_poss = midpoints + three_shift
-        end_poss = fix_coordinates( end_poss, rlength)
-
-        pileup = quick_pileup ( start_poss, end_poss, scale_factor,
-                                baseline_value )
-        ret.add_a_chromosome( chrom, pileup )
-
-        # free mem
-        clean_up_ndarray( start_poss )
-        clean_up_ndarray( end_poss)
-        #start_poss.resize(100000, refcheck=False)
-        #start_poss.resize(0, refcheck=False)
-        #end_poss.resize(100000, refcheck=False)
-        #end_poss.resize(0, refcheck=False)
-
-    return ret
-
-cdef pileup_w_multiple_d_bdg_pe ( object trackI, list d_s = [],
-                                   list scale_factor_s = [],
-                                   float baseline_value = 0):
-    """Pileup fragments into bedGraphTrackI object with extension. Fragment will
-    be extended by d / 2 in both directions from midpoint
-
-    trackI  : A PETrackI object
-    d_s       : tag will be extended by 1/2 this value in both directions by
-                each d and multiplied by corresponding scale_factor
-    baseline_value : a value to be filled for missing values.
-    scale_factor_s: same length as d_s, scale factor for each d
-    scale_factor_0: scale factor for original fragments
-
-    Return a bedGraphTrackI object.
-    """
-    cdef:
-        long d, five_shift, three_shift, l, i
-        float scale_factor
-        dict chrlengths = trackI.get_rlengths ()
-
-    assert len(d_s) == len(scale_factor_s), "Arguments d_s and scale_factor_s should have the same length!"
-
-    ret = bedGraphTrackI(baseline_value=baseline_value) # bedGraphTrackI object to be returned.
-
-    chrs = trackI.get_chr_names()
-
-    five_shift_s = [d // 2 for d in d_s[1:]]
-    three_shift_s = [d - d // 2 for d in d_s[1:]]
-
-    for chrom in sorted(list(chrlengths.keys())):
-        rlength = chrlengths[chrom]
-        locs = trackI.get_locations_by_chr(chrom)
-        midpoints = locs[:,0] + (locs[:,1] - locs[:,0]) // 2
-
-        prev_pileup = quick_pileup(locs[:,0], locs[:,1],
-                                   scale_factor_s[0], baseline_value)
-
-        for i in range(len(five_shift_s)):
-            five_shift = five_shift_s[i]
-            three_shift = three_shift_s[i]
-            scale_factor = scale_factor_s[i + 1]
-
-            # fix negative coordinations
-            start_poss = midpoints - five_shift
-            start_poss = fix_coordinates(start_poss, rlength)
-            end_poss = midpoints + three_shift
-            end_poss = fix_coordinates( end_poss, rlength)
-
-            tmp_pileup = quick_pileup(start_poss, end_poss, scale_factor,
-                                      baseline_value)
-
-            # free mem
-            clean_up_ndarray( start_poss )
-            clean_up_ndarray( end_poss )
-            #start_poss.resize(100000, refcheck=False)
-            #start_poss.resize(0, refcheck=False)
-            #end_poss.resize(100000, refcheck=False)
-            #end_poss.resize(0, refcheck=False)
-
-            prev_pileup = max_over_two_pv_array ( prev_pileup, tmp_pileup )
-
-        ret.add_a_chromosome( chrom, prev_pileup )
-
-    return ret
-
-cdef class Ends:
-    cdef:
-        np.ndarray startposs
-        np.ndarray endposs
 
 cdef start_and_end_poss ( np.ndarray plus_tags, np.ndarray minus_tags,
                           long five_shift, long three_shift, int rlength):
@@ -573,8 +112,154 @@ cdef int * fix_coordinates_2 ( int * poss, int l_of_poss, int rlength) nogil:
 
     return poss
 
+# ------------------------------------
+# functions
+# ------------------------------------
+
+# ------------------------------------
+# functions for pileup_cmd only
+# ------------------------------------
+
+# This function uses pure C code for pileup
+cpdef void pileup_and_write_se( trackI,
+                        bytes output_filename,
+                        int d,
+                        float scale_factor,
+                        float baseline_value = 0.0,
+                        bint directional = True,
+                        bint halfextension = True ):
+    """ Pileup a FWTrackI object and write the pileup result into a
+    bedGraph file.
+
+    This function calls pure C functions from cPosValCalculation.
+
+    This function is currently only used `macs3 pileup` cmd.
+    """
+    cdef:
+        long five_shift, three_shift, l, i
+        list chroms
+        int n_chroms
+        bytes chrom
+        np.ndarray[np.int32_t, ndim=1] plus_tags, minus_tags
+        dict chrlengths = trackI.get_rlengths ()
+        int * plus_tags_pos
+        int * minus_tags_pos
+        long rlength
+        long fl
+        bytes py_bytes
+        char * chrom_char
+        PosVal * _data
+        long l_data
+
+    # This block should be reused to determine the actual shift values
+    if directional:
+        # only extend to 3' side
+        if halfextension:
+            five_shift = d//-4  # five shift is used to move cursor towards 5' direction to find the start of fragment
+            three_shift = d*3//4 # three shift is used to move cursor towards 3' direction to find the end of fragment
+        else:
+            five_shift = 0
+            three_shift = d
+    else:
+        # both sides
+        if halfextension:
+            five_shift = d//4
+            three_shift = five_shift
+        else:
+            five_shift = d//2
+            three_shift = d - five_shift
+    # end of the block
+
+    chroms = list(chrlengths.keys())
+    n_chroms = len( chroms )
+
+    fh = open(output_filename, "w")
+    fh.write("")
+    fh.close()
+
+    for i in range( n_chroms ):
+        chrom = chroms[ i ]
+        (plus_tags, minus_tags) = trackI.get_locations_by_chr(chrom)
+        rlength = <long> chrlengths[ chrom ]
+        plus_tags_pos = <int *> plus_tags.data
+        minus_tags_pos = <int *> minus_tags.data
+
+        _data = c_single_end_pileup( plus_tags_pos, plus_tags.shape[0], minus_tags_pos, minus_tags.shape[0], five_shift, three_shift, 0, rlength, scale_factor, baseline_value, &l_data )
+
+        # write
+        py_bytes = chrom
+        chrom_char = py_bytes
+        c_write_pv_array_to_bedGraph( _data, l_data, chrom_char, output_filename, 1 )
+
+        # clean
+        free( _data )
+    return
+
+# function to pileup BAMPE/BEDPE stored in PETrackI object and write to a BEDGraph file
+# this function uses c function
+cpdef pileup_and_write_pe( petrackI,
+                           bytes output_filename,
+                           float scale_factor = 1,
+                           float baseline_value = 0.0):
+    """ Pileup a PETrackI object and write the pileup result into a
+    bedGraph file.
+
+    This function calls pure C functions from cPosValCalculation.
+
+    This function is currently only used `macs3 pileup` cmd.
+    """
+    cdef:
+        dict chrlengths = petrackI.get_rlengths ()
+        list chroms
+        int n_chroms
+        int i
+        bytes chrom
+
+        np.ndarray locs
+        np.ndarray[np.int32_t, ndim=1] locs0
+        np.ndarray[np.int32_t, ndim=1] locs1
+
+        int * start_pos
+        int * end_pos
+        long fl
+        bytes py_bytes
+        char * chrom_char
+        PosVal * _data
+        long l_data
+
+    chroms = list(chrlengths.keys())
+    n_chroms = len( chroms )
+
+    fh = open(output_filename, "w")
+    fh.write("")
+    fh.close()
+
+    for i in range( n_chroms ):
+        chrom = chroms[ i ]
+        locs = petrackI.get_locations_by_chr(chrom)
+
+        locs0 = np.sort(locs['l'])
+        locs1 = np.sort(locs['r'])
+        start_pos = <int *> locs0.data
+        end_pos   = <int *> locs1.data
+
+        _data = c_quick_pileup ( start_pos, end_pos, locs0.shape[0], scale_factor, baseline_value, &l_data )
+
+        # write
+        py_bytes = chrom
+        chrom_char = py_bytes
+        c_write_pv_array_to_bedGraph( _data, l_data, chrom_char, output_filename, 1 )
+
+        # clean
+        free( _data )        
+    return
+
+# ------------------------------------
+# functions for other codes
+# ------------------------------------
+
 # general pileup function implemented in cython
-cpdef se_all_in_one_pileup ( np.ndarray[np.int32_t, ndim=1] plus_tags, np.ndarray[np.int32_t, ndim=1] minus_tags, long five_shift, long three_shift, int rlength, float scale_factor, float baseline_value ):
+cpdef list se_all_in_one_pileup ( np.ndarray[np.int32_t, ndim=1] plus_tags, np.ndarray[np.int32_t, ndim=1] minus_tags, long five_shift, long three_shift, int rlength, float scale_factor, float baseline_value ):
     """Return pileup given 5' end of fragment at plus or minus strand
     separately, and given shift at both direction to recover a
     fragment. This function is for single end sequencing library
@@ -635,8 +320,6 @@ cpdef se_all_in_one_pileup ( np.ndarray[np.int32_t, ndim=1] plus_tags, np.ndarra
     ret_v_ptr = <float32_t *> ret_v.data
 
     tmp = [ret_p, ret_v] # for (endpos,value)
-    # #tmppadd = tmp[0].append
-    # #tmpvadd = tmp[1].append
     i_s = 0                         # index of start_poss
     i_e = 0                         # index of end_poss
     I = 0
@@ -706,20 +389,12 @@ cpdef se_all_in_one_pileup ( np.ndarray[np.int32_t, ndim=1] plus_tags, np.ndarra
     # clean mem
     clean_up_ndarray( start_poss )
     clean_up_ndarray( end_poss )
-    #start_poss.resize(100000, refcheck=False)
-    #start_poss.resize(0, refcheck=False)
-    #end_poss.resize(100000, refcheck=False)
-    #end_poss.resize(0, refcheck=False)
 
     # resize
     ret_p.resize( I, refcheck=False )
     ret_v.resize( I, refcheck=False )
 
     return tmp
-
-cdef int compare(const void * a, const void * b) nogil:
-    if a - b > 0: return 1
-    return 0
 
 # quick pileup implemented in cython
 cpdef list quick_pileup ( np.ndarray[np.int32_t, ndim=1] start_poss, np.ndarray[np.int32_t, ndim=1] end_poss, float scale_factor, float baseline_value ):
@@ -926,4 +601,107 @@ cpdef list max_over_two_pv_array ( list tmparray1, list tmparray2 ):
     ret_v.resize( I, refcheck=False )
     return [ret_pos, ret_v]
 
+# quick pileup implemented in cython
+cpdef list naive_quick_pileup ( np.ndarray[np.int32_t, ndim=1] sorted_poss, int extension):
+    """Simple pileup, every tag will be extended left and right with length `extension`.
 
+    Note: Assumption is that `poss` has to be pre-sorted! There is no
+    check on whether it's sorted.
+    """
+    cdef:
+        long i_s, i_e, i, I
+        int a, b, p, pre_p, pileup
+        long l = sorted_poss.shape[0]
+        np.ndarray[np.int32_t, ndim=1] start_poss
+        np.ndarray[np.int32_t, ndim=1] end_poss
+        np.ndarray[np.int32_t, ndim=1] ret_p
+        np.ndarray[np.float32_t, ndim=1] ret_v
+        # pointers are used for numpy arrays
+        int32_t * start_poss_ptr
+        int32_t * end_poss_ptr
+        int32_t * ret_p_ptr     # pointer for position array
+        float32_t * ret_v_ptr     # pointer for value array
+
+    start_poss = sorted_poss - extension
+    start_poss[ start_poss < 0 ] = 0
+    end_poss = sorted_poss + extension
+
+    start_poss_ptr = <int32_t *> start_poss.data
+    end_poss_ptr = <int32_t *> end_poss.data
+
+    
+    ret_p = np.zeros( 2*l, dtype="int32" )
+    ret_v = np.zeros( 2*l, dtype="float32" )
+
+    ret_p_ptr = <int32_t *> ret_p.data
+    ret_v_ptr = <float32_t *> ret_v.data
+
+    i_s = 0                         # index of plus_tags
+    i_e = 0                         # index of minus_tags
+    I = 0
+    
+    pileup = 0
+    if l == 0: return ret
+    pre_p = min(start_poss_ptr[0], end_poss_ptr[0])
+
+    if pre_p != 0:
+        # the first chunk of 0
+        ret_p_ptr[0] = pre_p
+        ret_v_ptr[0] = 0
+        ret_p_ptr += 1
+        ret_v_ptr += 1
+        I += 1
+
+    pre_v = pileup
+
+    while i_s < l and i_e < l:
+        if start_poss_ptr[0] < end_poss_ptr[0]:
+            p = start_poss_ptr[0]
+            if p != pre_p:
+                ret_p_ptr[0] = p
+                ret_v_ptr[0] = pileup
+                ret_p_ptr += 1
+                ret_v_ptr += 1
+                I += 1
+                pre_p = p
+            pileup += 1
+            i_s += 1
+            start_poss_ptr += 1
+        elif start_poss_ptr[0] > end_poss_ptr[0]:
+            p = end_poss_ptr[0]
+            if p != pre_p:
+                ret_p_ptr[0] = p
+                ret_v_ptr[0] = pileup
+                ret_p_ptr += 1
+                ret_v_ptr += 1
+                I += 1
+                pre_p = p
+            pileup -= 1
+            i_e += 1
+            end_poss_ptr += 1
+        else:
+            i_s += 1
+            i_e += 1
+            start_poss_ptr += 1
+            end_poss_ptr += 1
+
+    # add rest of end positions
+    print(start_poss)
+    print(end_poss)    
+    if i_e < l:
+        for i in range(i_e, l):
+            p = end_poss_ptr[0]
+            if p != pre_p:
+                ret_p_ptr[0] = p
+                ret_v_ptr[0] = pileup
+                ret_p_ptr += 1
+                ret_v_ptr += 1
+                I += 1
+                pre_p = p
+            pileup -= 1
+            end_poss_ptr += 1
+
+    ret_p.resize( I, refcheck=False )
+    ret_v.resize( I, refcheck=False )
+
+    return [ ret_p, ret_v ]

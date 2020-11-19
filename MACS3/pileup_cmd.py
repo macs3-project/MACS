@@ -1,12 +1,10 @@
-# Time-stamp: <2019-09-25 10:03:31 taoliu>
-
 """Description: Pileup alignment files
 
 This code is free software; you can redistribute it and/or modify it
 under the terms of the BSD License (see the file LICENSE included with
 the distribution).
 """
-
+# Time-stamp: <2020-11-16 14:14:55 Tao Liu>
 # ------------------------------------
 # python modules
 # ------------------------------------
@@ -19,7 +17,7 @@ import logging
 # own python modules
 # ------------------------------------
 from MACS3.OptValidator import opt_validate_pileup as opt_validate
-from MACS3.Pileup import pileup_and_write, pileup_and_write_pe
+from MACS3.Pileup import pileup_and_write_se, pileup_and_write_pe
 from MACS3.Constants import *
 # ------------------------------------
 # Main function
@@ -66,10 +64,10 @@ def run( o_options ):
 
         if options.bothdirection:
             info("# Pileup alignment file, extend each read towards up/downstream direction with %d bps" % options.extsize)
-            pileup_and_write(treat, outfile, options.extsize * 2, 1, directional=False, halfextension=False)
+            pileup_and_write_se(treat, outfile, options.extsize * 2, 1, directional=False, halfextension=False)
         else:
             info("# Pileup alignment file, extend each read towards downstream direction with %d bps" % options.extsize)
-            pileup_and_write(treat, outfile, options.extsize, 1, directional=True, halfextension=False)
+            pileup_and_write_se(treat, outfile, options.extsize, 1, directional=True, halfextension=False)
 
     info("# Done! Check %s" % options.outputfile)
 

@@ -1,6 +1,6 @@
 # cython: language_level=3
 # cython: profile=True
-
+# Time-stamp: <2020-11-16 14:17:05 Tao Liu>
 """Module Description: Build shifting model
 
 This code is free software; you can redistribute it and/or modify it
@@ -14,6 +14,7 @@ cimport numpy as np
 from cpython cimport array
 import array
 from MACS3.Constants import *
+from MACS3.Pileup import naive_quick_pileup
 
 from cpython cimport bool
 from libc.stdint cimport uint32_t, uint64_t, int32_t, int64_t
@@ -593,105 +594,3 @@ cpdef smooth(x, int window_len=11, str window='hanning'):
     y=np.convolve(w/w.sum(),s,mode='valid')
     return y[(window_len//2):-(window_len//2)]
 
-# quick pileup implemented in cython
-cdef tuple naive_quick_pileup ( np.ndarray[np.int32_t, ndim=1] poss, int extension):
-    """Simple pileup, every tag will be extended left and right with length `extension`.
-
-    """
-    cdef:
-        long i_s, i_e, i, I
-        int a, b, p, pre_p, pileup
-        list tmp
-        long l = poss.shape[0]
-        np.ndarray[np.int32_t, ndim=1] start_poss
-        np.ndarray[np.int32_t, ndim=1] end_poss
-        np.ndarray[np.int32_t, ndim=1] ret_p
-        np.ndarray[np.float32_t, ndim=1] ret_v
-        # pointers are used for numpy arrays
-        int32_t * start_poss_ptr
-        int32_t * end_poss_ptr
-        int32_t * ret_p_ptr     # pointer for position array
-        float32_t * ret_v_ptr     # pointer for value array
-        #int max_pileup = 0
-
-    start_poss = poss - extension
-    end_poss = poss + extension
-
-    ret_p = np.zeros( 2*l, dtype="int32" )
-    ret_v = np.zeros( 2*l, dtype="float32" )
-
-    ret_p_ptr = <int32_t *> ret_p.data
-    ret_v_ptr = <float32_t *> ret_v.data
-
-    tmp = [ret_p, ret_v] # for (endpos,value)
-
-    i_s = 0                         # index of plus_tags
-    i_e = 0                         # index of minus_tags
-    I = 0
-
-    pileup = 0
-    if ls == 0: return tmp
-    pre_p = min(start_poss_ptr[0], end_poss_ptr[0])
-
-    if pre_p != 0:
-        # the first chunk of 0
-        ret_p_ptr[0] = pre_p
-        ret_v_ptr[0] = max(0,baseline_value)
-        ret_p_ptr += 1
-        ret_v_ptr += 1
-        I += 1
-
-    pre_v = pileup
-
-    while i_s < ls and i_e < le:
-        if start_poss_ptr[0] < end_poss_ptr[0]:
-            p = start_poss_ptr[0]
-            if p != pre_p:
-                ret_p_ptr[0] = p
-                ret_v_ptr[0] = max(pileup * scale_factor, baseline_value)
-                ret_p_ptr += 1
-                ret_v_ptr += 1
-                I += 1
-                pre_p = p
-            pileup += 1
-            #if pileup > max_pileup:
-            #    max_pileup = pileup
-            i_s += 1
-            start_poss_ptr += 1
-        elif start_poss_ptr[0] > end_poss_ptr[0]:
-            p = end_poss_ptr[0]
-            if p != pre_p:
-                ret_p_ptr[0] = p
-                ret_v_ptr[0] = max(pileup * scale_factor, baseline_value)
-                ret_p_ptr += 1
-                ret_v_ptr += 1
-                I += 1
-                pre_p = p
-            pileup -= 1
-            i_e += 1
-            end_poss_ptr += 1
-        else:
-            i_s += 1
-            i_e += 1
-            start_poss_ptr += 1
-            end_poss_ptr += 1
-
-    if i_e < le:
-        # add rest of end positions
-        for i in range(i_e, le):
-            p = end_poss_ptr[0]
-            #for p in minus_tags[i_e:]:
-            if p != pre_p:
-                ret_p_ptr[0] = p
-                ret_v_ptr[0] = max(pileup * scale_factor, baseline_value)
-                ret_p_ptr += 1
-                ret_v_ptr += 1
-                I += 1
-                pre_p = p
-            pileup -= 1
-            end_poss_ptr += 1
-
-    ret_p.resize( I, refcheck=False )
-    ret_v.resize( I, refcheck=False )
-
-    return tmp
