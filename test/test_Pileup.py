@@ -166,3 +166,42 @@ class Test_Naive_Pileup(unittest.TestCase):
         #check result
         self.assertEqual( result, self.expect_pileup_1 )
 
+class Test_Max_Over_Two_PV_Array(unittest.TestCase):
+    """Unittest for max_over_two_pv_array function
+
+    Function to test: max_over_two_pv_array
+
+    """
+    def setUp(self):
+        self.pv1 = [ np.array( ( 2, 5, 7, 8, 9, 12 ), dtype="int32" ),\
+                     np.array( ( 1, 2, 3, 4, 3, 2), dtype="float32" ) ]
+        self.pv2 = [ np.array( ( 1, 4, 6, 8, 10, 11 ), dtype="int32" ),\
+                     np.array( ( 5, 3, 2, 1, 0, 3), dtype="float32" ) ]
+        # expected result from pileup_bdg_se: ( start, end, value )
+        self.expect_pv = \
+          [ ( 0,  1, 5.0 ),
+            ( 1,  2, 3.0 ),
+            ( 2,  4, 3.0 ),
+            ( 4,  5, 2.0 ),
+            ( 5,  6, 3.0 ),
+            ( 6,  7, 3.0 ),
+            ( 7,  8, 4.0 ),
+            ( 8,  9, 3.0 ),
+            ( 9, 10, 2.0 ),
+            (10, 11, 3.0 ) ]
+
+    def test_pileup_1(self):
+        pileup = max_over_two_pv_array ( self.pv1, self.pv2 )
+        result = []
+        (p,v) = pileup
+        print(p, v)
+        pnext = iter(p).__next__
+        vnext = iter(v).__next__
+        pre = 0
+        for i in range(len(p)):
+           pos = pnext()
+           value = vnext()
+           result.append( (pre,pos,value) )
+           pre = pos
+        #check result
+        self.assertEqual( result, self.expect_pv )
