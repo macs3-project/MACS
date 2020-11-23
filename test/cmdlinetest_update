@@ -1,5 +1,5 @@
 #!/bin/bash
-# Time-stamp: <2020-11-23 16:09:35 Tao Liu>
+# Time-stamp: <2020-11-23 16:42:22 Tao Liu>
 
 # integrative subcmds testing
 
@@ -87,10 +87,14 @@ echo "4. predictd"
 mkdir ${TAG}_run_predictd
 
 macs3 predictd -i $CHIPPE -f BAMPE --outdir ${TAG}_run_predictd &> ${TAG}_run_predictd/run_predictd_bampe.log
+grep "Average insertion length" ${TAG}_run_predictd/run_predictd_bampe.log | perl -pe 's/^.*\s(\d+)\sbps/$1/' > ${TAG}_run_predictd/run_predictd_bampe.txt
 
 macs3 predictd -i $CHIPBEDPE -f BEDPE --outdir ${TAG}_run_predictd &> ${TAG}_run_predictd/run_predictd_bedpe.log
+grep "Average insertion length" ${TAG}_run_predictd/run_predictd_bedpe.log | perl -pe 's/^.*\s(\d+)\sbps/$1/' > ${TAG}_run_predictd/run_predictd_bedpe.txt
 
 macs3 predictd -g 52000000 -i $CHIP --d-min 10 --outdir ${TAG}_run_predictd --rfile run_predictd.R &> ${TAG}_run_predictd/run_predictd.log
+grep "predicted fragment length" ${TAG}_run_predictd/run_predictd.log | perl -pe 's/^.*\s(\d+)\sbps/$1/' > ${TAG}_run_predictd/run_predictd.txt
+grep "alternative fragment length" ${TAG}_run_predictd/run_predictd.log | perl -pe 's/^.*\s(\S+)\sbps/$1/' >> ${TAG}_run_predictd/run_predictd.txt
 
 # randsample
 echo "5. randsample"
