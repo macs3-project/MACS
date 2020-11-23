@@ -166,10 +166,10 @@ class Test_Naive_Pileup(unittest.TestCase):
         #check result
         self.assertEqual( result, self.expect_pileup_1 )
 
-class Test_Max_Over_Two_PV_Array(unittest.TestCase):
-    """Unittest for max_over_two_pv_array function
+class Test_Over_Two_PV_Array(unittest.TestCase):
+    """Unittest for over_two_pv_array function
 
-    Function to test: max_over_two_pv_array
+    Function to test: over_two_pv_array
 
     """
     def setUp(self):
@@ -178,7 +178,7 @@ class Test_Max_Over_Two_PV_Array(unittest.TestCase):
         self.pv2 = [ np.array( ( 1, 4, 6, 8, 10, 11 ), dtype="int32" ),\
                      np.array( ( 5, 3, 2, 1, 0, 3), dtype="float32" ) ]
         # expected result from pileup_bdg_se: ( start, end, value )
-        self.expect_pv = \
+        self.expect_pv_max = \
           [ ( 0,  1, 5.0 ),
             ( 1,  2, 3.0 ),
             ( 2,  4, 3.0 ),
@@ -189,9 +189,31 @@ class Test_Max_Over_Two_PV_Array(unittest.TestCase):
             ( 8,  9, 3.0 ),
             ( 9, 10, 2.0 ),
             (10, 11, 3.0 ) ]
+        self.expect_pv_min = \
+          [ ( 0,  1, 1.0 ),
+            ( 1,  2, 1.0 ),
+            ( 2,  4, 2.0 ),
+            ( 4,  5, 2.0 ),
+            ( 5,  6, 2.0 ),
+            ( 6,  7, 1.0 ),
+            ( 7,  8, 1.0 ),
+            ( 8,  9, 0.0 ),
+            ( 9, 10, 0.0 ),
+            (10, 11, 2.0 ) ]
+        self.expect_pv_mean = \
+          [ ( 0,  1, 3.0 ),
+            ( 1,  2, 2.0 ),
+            ( 2,  4, 2.5 ),
+            ( 4,  5, 2.0 ),
+            ( 5,  6, 2.5 ),
+            ( 6,  7, 2.0 ),
+            ( 7,  8, 2.5 ),
+            ( 8,  9, 1.5 ),
+            ( 9, 10, 1.0 ),
+            (10, 11, 2.5 ) ]
 
-    def test_pileup_1(self):
-        pileup = max_over_two_pv_array ( self.pv1, self.pv2 )
+    def test_max(self):
+        pileup = over_two_pv_array ( self.pv1, self.pv2, func="max" )
         result = []
         (p,v) = pileup
         print(p, v)
@@ -204,4 +226,36 @@ class Test_Max_Over_Two_PV_Array(unittest.TestCase):
            result.append( (pre,pos,value) )
            pre = pos
         #check result
-        self.assertEqual( result, self.expect_pv )
+        self.assertEqual( result, self.expect_pv_max )
+
+    def test_min(self):
+        pileup = over_two_pv_array ( self.pv1, self.pv2, func="min" )
+        result = []
+        (p,v) = pileup
+        print(p, v)
+        pnext = iter(p).__next__
+        vnext = iter(v).__next__
+        pre = 0
+        for i in range(len(p)):
+           pos = pnext()
+           value = vnext()
+           result.append( (pre,pos,value) )
+           pre = pos
+        #check result
+        self.assertEqual( result, self.expect_pv_min )
+
+    def test_mean(self):
+        pileup = over_two_pv_array ( self.pv1, self.pv2, func="mean" )
+        result = []
+        (p,v) = pileup
+        print(p, v)
+        pnext = iter(p).__next__
+        vnext = iter(v).__next__
+        pre = 0
+        for i in range(len(p)):
+           pos = pnext()
+           value = vnext()
+           result.append( (pre,pos,value) )
+           pre = pos
+        #check result
+        self.assertEqual( result, self.expect_pv_mean )

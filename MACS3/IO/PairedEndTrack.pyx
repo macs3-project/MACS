@@ -1,6 +1,6 @@
 # cython: language_level=3
 # cython: profile=True
-# Time-stamp: <2019-11-04 13:23:29 taoliu>
+# Time-stamp: <2020-11-23 15:15:59 Tao Liu>
 
 """Module for filter duplicate tags from paired-end data
 
@@ -31,7 +31,7 @@ cimport cython
 #from libc.stdint cimport uint32_t, uint64_t, int32_t, int64_t
 
 from MACS3.Constants import *
-from MACS3.Pileup import quick_pileup, max_over_two_pv_array, se_all_in_one_pileup
+from MACS3.Pileup import quick_pileup, over_two_pv_array, se_all_in_one_pileup
 
 cdef INT_MAX = <int32_t>((<uint32_t>(-1))>>1)
 
@@ -545,7 +545,7 @@ cdef class PETrackI:
             tmp_pileup = quick_pileup ( np.sort(self.__locations[chrom]['l']), np.sort(self.__locations[chrom]['r']), scale_factor, baseline_value ) # Can't directly pass partial nparray there since that will mess up with pointer calculation.
 
             if prev_pileup:
-                prev_pileup = max_over_two_pv_array ( prev_pileup, tmp_pileup )
+                prev_pileup = over_two_pv_array ( prev_pileup, tmp_pileup, func="max" )
             else:
                 prev_pileup = tmp_pileup
 
@@ -586,7 +586,7 @@ cdef class PETrackI:
             tmp_pileup = se_all_in_one_pileup ( self.__locations[chrom]['l'], self.__locations[chrom]['r'], five_shift, three_shift, rlength, scale_factor, baseline_value )
 
             if prev_pileup:
-                prev_pileup = max_over_two_pv_array ( prev_pileup, tmp_pileup )
+                prev_pileup = over_two_pv_array ( prev_pileup, tmp_pileup, func="max" )
             else:
                 prev_pileup = tmp_pileup
 

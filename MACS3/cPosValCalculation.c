@@ -1,4 +1,4 @@
-/* Time-stamp: <2019-09-20 11:32:53 taoliu>
+/* Time-stamp: <2020-11-23 14:52:31 Tao Liu>
 
  This code is free software; you can redistribute it and/or modify it
  under the terms of the BSD License (see the file LICENSE included
@@ -202,6 +202,91 @@ struct PosVal * quick_pileup ( int * start_poss, int * end_poss, long length_pos
   pos_value_array = (struct PosVal *) realloc ( pos_value_array, I * sizeof( struct PosVal ) );
   *final_length = I;		/* return the final length of pos_value_array */
   return pos_value_array;
+}
+
+long quick_pileup_simple ( int * ret_poss, float * ret_values, int * start_poss, int * end_poss, long length_poss, float scale_factor, float baseline_value )
+{
+  long i_s, i_e, i, I;
+  int p, pre_p, pileup;
+  int * ptr_ret_poss;
+  int * ptr_start_poss, * ptr_end_poss;
+  float * ptr_ret_values;
+  long l = length_poss;
+
+  ptr_ret_poss = ret_poss; ptr_ret_values = ret_values;
+  ptr_start_poss = start_poss; ptr_end_poss = end_poss;
+
+  i_s = 0; i_e = 0;
+
+  pileup = 0;
+  pre_p = min( *ptr_start_poss, *ptr_end_poss );
+  ptr_start_poss++; ptr_end_poss++;
+
+  I = 0;
+  if ( pre_p != 0 )
+    {
+      *ptr_ret_poss = pre_p;
+      *ptr_ret_values = max( 0, baseline_value );
+      ptr_ret_poss++; ptr_ret_values++; I++;
+    }
+
+  while (i_s < l && i_e < l)
+    {
+      if ( *ptr_start_poss < *ptr_end_poss )
+	{
+	  p = *ptr_start_poss;
+	  if ( p != pre_p )
+	    {
+	      *ptr_ret_poss = p;
+	      *ptr_ret_values = max( pileup * scale_factor, baseline_value );
+	      ptr_ret_poss++;ptr_ret_values++; I++;
+	      pre_p = p;
+	    }
+	  pileup += 1;
+	  i_s += 1;
+	  ptr_start_poss++;
+	}
+      else if ( *ptr_start_poss > *ptr_end_poss )
+	{
+	  p = *ptr_end_poss;
+	  if ( p != pre_p )
+	    {
+	      *ptr_ret_poss = p;
+	      *ptr_ret_values = max( pileup * scale_factor, baseline_value );
+	      ptr_ret_poss++;ptr_ret_values++; I++;
+	      pre_p = p;
+	    }
+	  pileup -= 1;
+	  i_e += 1;
+	  ptr_end_poss++;
+	}
+      else
+	{
+	  i_s += 1;
+	  i_e += 1;
+	  ptr_start_poss++;
+          ptr_end_poss++;
+	}
+    }
+
+  // add the rest of end positions.
+  if ( i_e < l )
+    {
+      for ( i = i_e; i < l; i++ )
+	{
+	  p = *ptr_end_poss;
+	  if ( p != pre_p )
+	    {
+	      *ptr_ret_poss = p;
+	      *ptr_ret_values = max( pileup * scale_factor, baseline_value );
+	      ptr_ret_poss++;ptr_ret_values++; I++;
+	      pre_p = p;
+	    }
+	  pileup -= 1;
+	  ptr_end_poss++;
+	}
+    }
+  return I;
 }
 
 /* Calculate the maximum value between two sets of PosVal arrays (like bedGraph type of data) */
@@ -433,87 +518,3 @@ int main()
 
 
 
-long quick_pileup_simple ( int * ret_poss, float * ret_values, int * start_poss, int * end_poss, long length_poss, float scale_factor, float baseline_value )
-{
-  long i_s, i_e, i, I;
-  int p, pre_p, pileup;
-  int * ptr_ret_poss;
-  int * ptr_start_poss, * ptr_end_poss;
-  float * ptr_ret_values;
-  long l = length_poss;
-
-  ptr_ret_poss = ret_poss; ptr_ret_values = ret_values;
-  ptr_start_poss = start_poss; ptr_end_poss = end_poss;
-
-  i_s = 0; i_e = 0;
-
-  pileup = 0;
-  pre_p = min( *ptr_start_poss, *ptr_end_poss );
-  ptr_start_poss++; ptr_end_poss++;
-
-  I = 0;
-  if ( pre_p != 0 )
-    {
-      *ptr_ret_poss = pre_p;
-      *ptr_ret_values = max( 0, baseline_value );
-      ptr_ret_poss++; ptr_ret_values++; I++;
-    }
-
-  while (i_s < l && i_e < l)
-    {
-      if ( *ptr_start_poss < *ptr_end_poss )
-	{
-	  p = *ptr_start_poss;
-	  if ( p != pre_p )
-	    {
-	      *ptr_ret_poss = p;
-	      *ptr_ret_values = max( pileup * scale_factor, baseline_value );
-	      ptr_ret_poss++;ptr_ret_values++; I++;
-	      pre_p = p;
-	    }
-	  pileup += 1;
-	  i_s += 1;
-	  ptr_start_poss++;
-	}
-      else if ( *ptr_start_poss > *ptr_end_poss )
-	{
-	  p = *ptr_end_poss;
-	  if ( p != pre_p )
-	    {
-	      *ptr_ret_poss = p;
-	      *ptr_ret_values = max( pileup * scale_factor, baseline_value );
-	      ptr_ret_poss++;ptr_ret_values++; I++;
-	      pre_p = p;
-	    }
-	  pileup -= 1;
-	  i_e += 1;
-	  ptr_end_poss++;
-	}
-      else
-	{
-	  i_s += 1;
-	  i_e += 1;
-	  ptr_start_poss++;
-          ptr_end_poss++;
-	}
-    }
-
-  // add the rest of end positions.
-  if ( i_e < l )
-    {
-      for ( i = i_e; i < l; i++ )
-	{
-	  p = *ptr_end_poss;
-	  if ( p != pre_p )
-	    {
-	      *ptr_ret_poss = p;
-	      *ptr_ret_values = max( pileup * scale_factor, baseline_value );
-	      ptr_ret_poss++;ptr_ret_values++; I++;
-	      pre_p = p;
-	    }
-	  pileup -= 1;
-	  ptr_end_poss++;
-	}
-    }
-  return I;
-}

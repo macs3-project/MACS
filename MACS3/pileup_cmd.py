@@ -4,7 +4,7 @@ This code is free software; you can redistribute it and/or modify it
 under the terms of the BSD License (see the file LICENSE included with
 the distribution).
 """
-# Time-stamp: <2020-11-16 14:14:55 Tao Liu>
+# Time-stamp: <2020-11-20 16:36:00 Tao Liu>
 # ------------------------------------
 # python modules
 # ------------------------------------
@@ -35,8 +35,6 @@ def run( o_options ):
     error = options.error
     #0 output arguments
     options.PE_MODE = options.format in ('BAMPE','BEDPE')
-    #assert options.format != 'BAMPE', "Pair-end data with BAMPE option currently doesn't work with pileup command. You can pretend your data to be single-end with -f BAM. Please try again!"
-
 
     #0 prepare output file
     outfile = os.path.join( options.outdir, options.outputfile ).encode()

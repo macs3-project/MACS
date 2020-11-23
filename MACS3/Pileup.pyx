@@ -1,6 +1,6 @@
 # cython: language_level=3
 # cython: profile=True
-# Time-stamp: <2020-11-19 01:16:33 Tao Liu>
+# Time-stamp: <2020-11-23 15:34:34 Tao Liu>
 
 """Module Description: For pileup functions.
 
@@ -37,6 +37,9 @@ from time import time as ttime
 # ------------------------------------
 # utility internal functions
 # ------------------------------------
+cdef inline float mean( float a, float b ):
+    return ( a + b ) / 2
+
 cdef class Ends:
     cdef:
         np.ndarray startposs
@@ -512,95 +515,6 @@ cpdef list quick_pileup ( np.ndarray[np.int32_t, ndim=1] start_poss, np.ndarray[
 
     return tmp
 
-# general function to calculate maximum between two arrays in cython.
-cpdef list max_over_two_pv_array ( list tmparray1, list tmparray2 ):
-    """Merge two position-value arrays. For intersection regions, take
-    the maximum value within region.
-
-    tmparray1 and tmparray2 are [p,v] type lists, same as the output
-    from quick_pileup function. 'p' and 'v' are numpy arrays of int32
-    and float32.
-    """
-
-    cdef:
-        int pre_p, p1, p2
-        float v1, v2
-        np.ndarray[np.int32_t, ndim=1] a1_pos, a2_pos, ret_pos
-        np.ndarray[np.float32_t, ndim=1] a1_v, a2_v, ret_v
-        int32_t * a1_pos_ptr
-        int32_t * a2_pos_ptr
-        int32_t * ret_pos_ptr
-        float32_t * a1_v_ptr
-        float32_t * a2_v_ptr
-        float32_t * ret_v_ptr
-        long l1, l2, l, i1, i2, I
-
-    [ a1_pos, a1_v ] = tmparray1
-    [ a2_pos, a2_v ] = tmparray2
-    ret_pos = np.zeros( a1_pos.shape[0] + a2_pos.shape[0], dtype="int32" )
-    ret_v   = np.zeros( a1_pos.shape[0] + a2_pos.shape[0], dtype="float32" )
-
-    a1_pos_ptr = <int32_t *> a1_pos.data
-    a1_v_ptr = <float32_t *> a1_v.data
-    a2_pos_ptr = <int32_t *> a2_pos.data
-    a2_v_ptr = <float32_t *> a2_v.data
-    ret_pos_ptr = <int32_t *> ret_pos.data
-    ret_v_ptr = <float32_t *> ret_v.data
-
-    l1 = a1_pos.shape[0]
-    l2 = a2_pos.shape[0]
-
-    i1 = 0
-    i2 = 0
-    I = 0
-
-    pre_p = 0                   # remember the previous position in the new bedGraphTrackI object ret
-
-    while i1 < l1 and i2 < l2:
-        if a1_pos_ptr[0] < a2_pos_ptr[0]:
-            # clip a region from pre_p to p1, then set pre_p as p1.
-            ret_pos_ptr[0] = a1_pos_ptr[0]
-            ret_v_ptr[0] =  max( a1_v_ptr[0], a2_v_ptr[0] )
-            ret_pos_ptr += 1
-            ret_v_ptr += 1
-            I += 1
-            pre_p = a1_pos_ptr[0]
-            # call for the next p1 and v1
-            a1_pos_ptr += 1
-            a1_v_ptr += 1
-            i1 += 1
-        elif a1_pos_ptr[0] > a2_pos_ptr[0]:
-            # clip a region from pre_p to p2, then set pre_p as p2.
-            ret_pos_ptr[0] = a2_pos_ptr[0]
-            ret_v_ptr[0] =  max( a1_v_ptr[0], a2_v_ptr[0] )
-            ret_pos_ptr += 1
-            ret_v_ptr += 1
-            I += 1
-            pre_p = a2_pos_ptr[0]
-            # call for the next p1 and v1
-            a2_pos_ptr += 1
-            a2_v_ptr += 1
-            i2 += 1
-        else:
-            # from pre_p to p1 or p2, then set pre_p as p1 or p2.
-            ret_pos_ptr[0] = a1_pos_ptr[0]
-            ret_v_ptr[0] =  max( a1_v_ptr[0], a2_v_ptr[0] )
-            ret_pos_ptr += 1
-            ret_v_ptr += 1
-            I += 1
-            pre_p = a1_pos_ptr[0]
-            # call for the next p1, v1, p2, v2.
-            a1_pos_ptr += 1
-            a1_v_ptr += 1
-            i1 += 1
-            a2_pos_ptr += 1
-            a2_v_ptr += 1
-            i2 += 1
-
-    ret_pos.resize( I, refcheck=False )
-    ret_v.resize( I, refcheck=False )
-    return [ret_pos, ret_v]
-
 # quick pileup implemented in cython
 cpdef list naive_quick_pileup ( np.ndarray[np.int32_t, ndim=1] sorted_poss, int extension):
     """Simple pileup, every tag will be extended left and right with length `extension`.
@@ -686,8 +600,6 @@ cpdef list naive_quick_pileup ( np.ndarray[np.int32_t, ndim=1] sorted_poss, int 
             end_poss_ptr += 1
 
     # add rest of end positions
-    print(start_poss)
-    print(end_poss)    
     if i_e < l:
         for i in range(i_e, l):
             p = end_poss_ptr[0]
@@ -705,3 +617,178 @@ cpdef list naive_quick_pileup ( np.ndarray[np.int32_t, ndim=1] sorted_poss, int 
     ret_v.resize( I, refcheck=False )
 
     return [ ret_p, ret_v ]
+
+# general function to compare two pv arrays in cython.
+cpdef list over_two_pv_array ( list pv_array1, list pv_array2, func="max" ):
+    """Merge two position-value arrays. For intersection regions, take
+    the maximum value within region.
+
+    pv_array1 and pv_array2 are [p,v] type lists, same as the output
+    from quick_pileup function. 'p' and 'v' are numpy arrays of int32
+    and float32.
+
+    available operations are 'max', 'min', and 'mean'
+    """
+
+    cdef:
+        int pre_p, p1, p2
+        float v1, v2
+        np.ndarray[np.int32_t, ndim=1] a1_pos, a2_pos, ret_pos
+        np.ndarray[np.float32_t, ndim=1] a1_v, a2_v, ret_v
+        int32_t * a1_pos_ptr
+        int32_t * a2_pos_ptr
+        int32_t * ret_pos_ptr
+        float32_t * a1_v_ptr
+        float32_t * a2_v_ptr
+        float32_t * ret_v_ptr
+        long l1, l2, l, i1, i2, I
+
+    if func == "max":
+        f = max
+    elif func == "min":
+        f = min
+    elif func == "mean":
+        f = mean
+    else:
+        raise Exception("Invalid function")
+
+    [ a1_pos, a1_v ] = pv_array1
+    [ a2_pos, a2_v ] = pv_array2
+    ret_pos = np.zeros( a1_pos.shape[0] + a2_pos.shape[0], dtype="int32" )
+    ret_v   = np.zeros( a1_pos.shape[0] + a2_pos.shape[0], dtype="float32" )
+
+    a1_pos_ptr = <int32_t *> a1_pos.data
+    a1_v_ptr = <float32_t *> a1_v.data
+    a2_pos_ptr = <int32_t *> a2_pos.data
+    a2_v_ptr = <float32_t *> a2_v.data
+    ret_pos_ptr = <int32_t *> ret_pos.data
+    ret_v_ptr = <float32_t *> ret_v.data
+
+    l1 = a1_pos.shape[0]
+    l2 = a2_pos.shape[0]
+
+    i1 = 0
+    i2 = 0
+    I = 0
+
+    pre_p = 0                   # remember the previous position in the new bedGraphTrackI object ret
+
+    while i1 < l1 and i2 < l2:
+        if a1_pos_ptr[0] < a2_pos_ptr[0]:
+            # clip a region from pre_p to p1, then set pre_p as p1.
+            ret_pos_ptr[0] = a1_pos_ptr[0]
+            ret_v_ptr[0] =  f( a1_v_ptr[0], a2_v_ptr[0] )
+            ret_pos_ptr += 1
+            ret_v_ptr += 1
+            I += 1
+            pre_p = a1_pos_ptr[0]
+            # call for the next p1 and v1
+            a1_pos_ptr += 1
+            a1_v_ptr += 1
+            i1 += 1
+        elif a1_pos_ptr[0] > a2_pos_ptr[0]:
+            # clip a region from pre_p to p2, then set pre_p as p2.
+            ret_pos_ptr[0] = a2_pos_ptr[0]
+            ret_v_ptr[0] =  f( a1_v_ptr[0], a2_v_ptr[0] )
+            ret_pos_ptr += 1
+            ret_v_ptr += 1
+            I += 1
+            pre_p = a2_pos_ptr[0]
+            # call for the next p1 and v1
+            a2_pos_ptr += 1
+            a2_v_ptr += 1
+            i2 += 1
+        else:
+            # from pre_p to p1 or p2, then set pre_p as p1 or p2.
+            ret_pos_ptr[0] = a1_pos_ptr[0]
+            ret_v_ptr[0] =  f( a1_v_ptr[0], a2_v_ptr[0] )
+            ret_pos_ptr += 1
+            ret_v_ptr += 1
+            I += 1
+            pre_p = a1_pos_ptr[0]
+            # call for the next p1, v1, p2, v2.
+            a1_pos_ptr += 1
+            a1_v_ptr += 1
+            i1 += 1
+            a2_pos_ptr += 1
+            a2_v_ptr += 1
+            i2 += 1
+
+    ret_pos.resize( I, refcheck=False )
+    ret_v.resize( I, refcheck=False )
+    return [ret_pos, ret_v]
+
+cpdef naive_call_peaks ( list pv_array, float min_v, float max_v = 1e38, int max_gap = 50, int min_length = 200 ):
+    cdef:
+        int peak_length, x, pre_p, p, i, summit, tstart, tend
+        double v, summit_value, tvalue
+        bytes chrom
+        set chrs
+        list peak_content       # (pre_p, p, v) for each region in the peak
+        list ret_peaks = []     # returned peak summit and height
+
+    peak_content = []
+    ( ps,vs ) = pv_array
+    psn = iter(ps).__next__         # assign the next function to a viable to speed up
+    vsn = iter(vs).__next__
+    x = 0
+    pre_p = 0                   # remember previous position
+    while True:
+        # find the first region above min_v
+        try:                    # try to read the first data range for this chrom
+            p = psn()
+            v = vsn()
+        except:
+            break
+        x += 1                  # index for the next point
+        if v >= min_v:
+            peak_content = [ ( pre_p , p, v ), ]
+            pre_p = p
+            break               # found the first range above min_v
+        else:
+            pre_p = p
+
+    for i in range( x, len( ps ) ):
+        # continue scan the rest regions
+        p = psn()
+        v = vsn()
+        if v < min_v: # not be detected as 'peak'
+            pre_p = p
+            continue
+        # for points above min_v
+        # if the gap is allowed
+        # gap = pre_p - peak_content[-1][1] or the dist between pre_p and the last p
+        if pre_p - peak_content[ -1 ][ 1 ] <= max_gap:
+            peak_content.append( ( pre_p, p, v ) )
+        else:
+            # when the gap is not allowed, close this peak IF length is larger than min_length
+            if peak_content[ -1 ][ 1 ] - peak_content[ 0 ][ 0 ] >= min_length:
+                __close_peak( peak_content, ret_peaks, max_v, min_length )
+            # reset and start a new peak
+            peak_content = [ ( pre_p, p, v ), ]
+        pre_p = p
+
+    # save the last peak
+    if peak_content:
+        if peak_content[ -1 ][ 1 ] - peak_content[ 0 ][ 0 ] >= min_length:        
+            __close_peak( peak_content, ret_peaks, max_v, min_length )
+    return ret_peaks
+
+cdef void __close_peak( peak_content, peaks, float max_v, int min_length ):
+    """Internal function to find the summit and height
+
+    If the height is larger than max_v, skip
+    """
+    tsummit = []
+    summit = 0
+    summit_value = 0
+    for (tstart,tend,tvalue) in peak_content:
+        if not summit_value or summit_value < tvalue:
+            tsummit = [int((tend+tstart)/2),]
+            summit_value = tvalue
+        elif summit_value == tvalue:
+            tsummit.append( int((tend+tstart)/2) )
+    summit = tsummit[int((len(tsummit)+1)/2)-1 ]
+    if summit_value < max_v:
+        peaks.append( (summit, summit_value) )
+    return

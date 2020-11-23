@@ -1,4 +1,4 @@
-# Time-stamp: <2019-09-20 11:59:26 taoliu>
+# Time-stamp: <2020-11-23 15:23:13 Tao Liu>
 
 """Description: predict fragment size.
 
@@ -66,6 +66,7 @@ def run( o_options ):
                               max_pairnum = MAX_PAIRNUM,
                               opt = options
                               )
+        peakmodel.build()
         info("# finished!")
         debug("#  Summary Model:")
         debug("#   min_tags: %d" % (peakmodel.min_tags))

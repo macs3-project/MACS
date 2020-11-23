@@ -1,6 +1,6 @@
 # cython: language_level=3
 # cython: profile=True
-# Time-stamp: <2020-11-16 14:15:21 Tao Liu>
+# Time-stamp: <2020-11-23 15:15:24 Tao Liu>
 
 """Module for FWTrack classes.
 
@@ -24,7 +24,7 @@ from collections import Counter
 from MACS3.Constants import *
 from MACS3.Signal import *
 from MACS3.IO.PeakIO import PeakIO
-from MACS3.Pileup import se_all_in_one_pileup, max_over_two_pv_array
+from MACS3.Pileup import se_all_in_one_pileup, over_two_pv_array
 
 #from libc.stdint cimport uint32_t, uint64_t, int32_t, int64_t
 from cpython cimport bool
@@ -906,7 +906,7 @@ cdef class FWTrack:
             tmp_pileup = se_all_in_one_pileup ( self.__locations[chrom][0], self.__locations[chrom][1], five_shift, three_shift, rlength, scale_factor, baseline_value )
 
             if prev_pileup:
-                prev_pileup = max_over_two_pv_array ( prev_pileup, tmp_pileup )
+                prev_pileup = over_two_pv_array ( prev_pileup, tmp_pileup, func="max" )
             else:
                 prev_pileup = tmp_pileup
 
