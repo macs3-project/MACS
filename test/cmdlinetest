@@ -1,5 +1,5 @@
 #!/bin/bash
-# Time-stamp: <2020-11-16 14:16:00 Tao Liu>
+# Time-stamp: <2020-11-23 16:03:00 Tao Liu>
 
 # integrative subcmds testing
 
@@ -206,7 +206,7 @@ echo "15. compare with standard outputs"
 
 flag=0
 # we do not check the consistency of random subsampling results
-subfolders=(50kcontigs bdgbroadcall bdgcmp bdgdiff bdgpeakcall callpeak_broad callpeak_narrow callpeak_narrow_revert callpeak_pe_broad callpeak_pe_narrow cmbreps filterdup pileup refinepeak bdgopt)
+subfolders=(50kcontigs bdgbroadcall bdgcmp bdgdiff bdgpeakcall callpeak_broad callpeak_narrow callpeak_narrow_revert callpeak_pe_broad callpeak_pe_narrow cmbreps filterdup pileup refinepeak bdgopt predictd)
 
 m=0
 n=0
