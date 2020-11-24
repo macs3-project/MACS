@@ -1,6 +1,6 @@
 # cython: language_level=3
 # cython: profile=True
-# Time-stamp: <2020-11-24 01:54:33 Tao Liu>
+# Time-stamp: <2020-11-24 09:54:34 Tao Liu>
 """Module Description: Build shifting model
 
 This code is free software; you can redistribute it and/or modify it
@@ -75,7 +75,7 @@ cdef class PeakModel:
         """
         cdef:
             dict paired_peakpos
-            long num_paired_peakpos, num_paired_peakpos_remained, num_paired_peakpos_picked
+            long num_paired_peakpos
             bytes c                       #chromosome
 
         self.peaksize = 2*self.bw
@@ -87,11 +87,11 @@ cdef class PeakModel:
         # find paired + and - strand peaks
         paired_peakpos = self.__find_paired_peaks ()
 
-        num_paired_peakpos_picked = 0
+        num_paired_peakpos = 0
         for c in list( paired_peakpos.keys() ):
             num_paired_peakpos += len (paired_peakpos[c] )
 
-        self.info("#2 number of paired peaks: %d" % (num_paired_peakpos))
+        self.info("#2 Total number of paired peaks: %d" % (num_paired_peakpos))
 
         if num_paired_peakpos < 100:
             self.error(f"#2 MACS3 needs at least 100 paired peaks at + and - strand to build the model, but can only find {num_paired_peakpos}! Please make your MFOLD range broader and try again. If MACS3 still can't build the model, we suggest to use --nomodel and --extsize 147 or other fixed number instead.")
@@ -139,18 +139,18 @@ Summary of Peak Model:
             plus_peaksinfo = self.__naive_find_peaks ( plus_tags )
             self.debug("Number of unique tags on + strand: %d" % ( plus_tags.shape[0] ) )
             self.debug("Number of peaks in + strand: %d" % ( len(plus_peaksinfo) ) )
-            self.debug(f"plus peaks: {plus_peaksinfo}")
+            self.debug(f"plus peaks: first - {plus_peaksinfo[0]} ... last - {plus_peaksinfo[-1]}")
             # look for - strand peaks
             minus_peaksinfo = self.__naive_find_peaks ( minus_tags )
             self.debug("Number of unique tags on - strand: %d" % ( minus_tags.shape[0] ) )
             self.debug("Number of peaks in - strand: %d" % ( len( minus_peaksinfo ) ) )
-            self.debug(f"minus peaks: {minus_peaksinfo}")
+            self.debug(f"minus peaks: first - {minus_peaksinfo[0]} ... last - {minus_peaksinfo[-1]}")
             if not plus_peaksinfo or not minus_peaksinfo:
                 self.debug("Chrom %s is discarded!" % (chrom) )
                 continue
             else:
                 paired_peaks_pos[chrom] = self.__find_pair_center (plus_peaksinfo, minus_peaksinfo)
-                self.debug("Number of paired peaks: %d" %(len(paired_peaks_pos[chrom])))
+                self.debug("Number of paired peaks in this chromosome: %d" %(len(paired_peaks_pos[chrom])))
         return paired_peaks_pos
 
     cdef list __naive_find_peaks ( self, np.ndarray[np.int32_t, ndim=1] taglist ):
@@ -193,7 +193,7 @@ Summary of Peak Model:
         plus_end = np.zeros(window_size, dtype="int32")       # for fast pileup
         minus_start = np.zeros(window_size, dtype="int32")    # for fast pileup
         minus_end = np.zeros(window_size, dtype="int32")      # for fast pileup
-        self.info("start model_add_line...")
+        self.debug("start model_add_line...")
         chroms = list(paired_peakpos.keys())
 
         for i in range(len(chroms)):
@@ -206,7 +206,7 @@ Summary of Peak Model:
         self.__count ( plus_start, plus_end, self.plus_line )
         self.__count ( minus_start, minus_end, self.minus_line )
 
-        self.info("start X-correlation...")
+        self.debug("start X-correlation...")
         # Now I use cross-correlation to find the best d
         plus_line = self.plus_line
         minus_line = self.minus_line
@@ -233,16 +233,12 @@ Summary of Peak Model:
 
         self.d = xcorr[i_l_max[0]]
 
-
-
         self.ycorr = ycorr
         self.xcorr = xcorr
 
-        #shift_size = self.d/2
-
         self.scan_window = max(self.d,self.tag_expansion_size)*2
 
-        self.info("end of X-cor")
+        self.info("#2 Model building with cross-correlation: Done")
 
         return True
 
@@ -250,7 +246,7 @@ Summary of Peak Model:
         """Project each pos in pos2 which is included in
         [pos1-self.peaksize,pos1+self.peaksize] to the line.
 
-        pos1: paired centers -- array.array
+        pos1: paired centers -- list of coordinates
         pos2: tags of certain strand -- a numpy.array object
         line: numpy array object where we pileup tags
 
@@ -274,11 +270,6 @@ Summary of Peak Model:
 
         while i1<i1_max and i2<i2_max:
             p1 = pos1[i1]
-            #if plus_strand:
-            #    p2 = pos2[i2]
-            #else:
-            #    p2 = pos2[i2] - self.tag_expansion_size
-
             p2 = pos2[i2] #- self.tag_expansion_size/2
 
             if p1-psize_adjusted1 > p2: # move pos2
@@ -292,15 +283,10 @@ Summary of Peak Model:
                     flag_find_overlap = True
                     i2_prev = i2 # only the first index is recorded
                 # project
-                #for i in range(p2-p1+self.peaksize,p2-p1+self.peaksize+self.tag_expansion_size):
                 s = max(int(p2-self.tag_expansion_size/2-p1+psize_adjusted1), 0)
                 start[s] += 1
                 e = min(int(p2+self.tag_expansion_size/2-p1+psize_adjusted1), max_index)
                 end[e] -= 1
-                #line[s:e] += 1
-                #for i in range(s,e):
-                #    #if i>=0 and i<length_l:
-                #    line[i]+=1
                 i2+=1
         return
 
@@ -331,6 +317,7 @@ Summary of Peak Model:
         pair_centers = []
         ip_max = len(pluspeaks)
         im_max = len(minuspeaks)
+        self.debug(f"ip_max: {ip_max}; im_max: {im_max}")
         flag_find_overlap = False
         while ip<ip_max and im<im_max:
             (pp,pn) = pluspeaks[ip] # for (peakposition, tagnumber in peak)
@@ -350,6 +337,7 @@ Summary of Peak Model:
                         pair_centers.append((pp+mp)//2)
                         #self.debug ( "distance: %d, minus: %d, plus: %d" % (mp-pp,mp,pp))
                 im += 1
+        self.debug(f"Paired centers: first - {pair_centers[0]} ... second - {pair_centers[-1]} ")
         return pair_centers
 
 # smooth function from SciPy cookbook: http://www.scipy.org/Cookbook/SignalSmooth
