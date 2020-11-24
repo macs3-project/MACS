@@ -1,4 +1,4 @@
-ARG BASE_IMAGE=ubuntu:focal
+ARG BASE_IMAGE=ubuntu:bionic
 FROM ${BASE_IMAGE}
 
 ENV TEST_USER macs
