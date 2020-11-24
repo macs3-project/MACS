@@ -1,6 +1,6 @@
 # cython: language_level=3
 # cython: profile=True
-# Time-stamp: <2020-11-23 15:34:34 Tao Liu>
+# Time-stamp: <2020-11-24 01:12:37 Tao Liu>
 
 """Module Description: For pileup functions.
 
@@ -718,9 +718,10 @@ cpdef list over_two_pv_array ( list pv_array1, list pv_array2, func="max" ):
     ret_v.resize( I, refcheck=False )
     return [ret_pos, ret_v]
 
-cpdef naive_call_peaks ( list pv_array, float min_v, float max_v = 1e38, int max_gap = 50, int min_length = 200 ):
+cpdef naive_call_peaks ( list pv_array, float min_v, float max_v = 1e30, int max_gap = 50, int min_length = 200 ):
     cdef:
-        int peak_length, x, pre_p, p, i, summit, tstart, tend
+        int peak_length, pre_p, p, i, summit, tstart, tend
+        long x                  # index used for searching the first peak
         double v, summit_value, tvalue
         bytes chrom
         set chrs

@@ -1,6 +1,6 @@
 # cython: language_level=3
 # cython: profile=True
-# Time-stamp: <2020-11-23 15:26:02 Tao Liu>
+# Time-stamp: <2020-11-24 01:54:33 Tao Liu>
 """Module Description: Build shifting model
 
 This code is free software; you can redistribute it and/or modify it
@@ -74,7 +74,7 @@ cdef class PeakModel:
         3. find the best d using x-correlation
         """
         cdef:
-            dict paired_peaks
+            dict paired_peakpos
             long num_paired_peakpos, num_paired_peakpos_remained, num_paired_peakpos_picked
             bytes c                       #chromosome
 
@@ -139,10 +139,12 @@ Summary of Peak Model:
             plus_peaksinfo = self.__naive_find_peaks ( plus_tags )
             self.debug("Number of unique tags on + strand: %d" % ( plus_tags.shape[0] ) )
             self.debug("Number of peaks in + strand: %d" % ( len(plus_peaksinfo) ) )
+            self.debug(f"plus peaks: {plus_peaksinfo}")
             # look for - strand peaks
             minus_peaksinfo = self.__naive_find_peaks ( minus_tags )
             self.debug("Number of unique tags on - strand: %d" % ( minus_tags.shape[0] ) )
             self.debug("Number of peaks in - strand: %d" % ( len( minus_peaksinfo ) ) )
+            self.debug(f"minus peaks: {minus_peaksinfo}")
             if not plus_peaksinfo or not minus_peaksinfo:
                 self.debug("Chrom %s is discarded!" % (chrom) )
                 continue
@@ -172,7 +174,7 @@ Summary of Peak Model:
 
         return peak_info
 
-    cdef __paired_peak_model (self, paired_peakpos,):
+    cdef __paired_peak_model (self, dict paired_peakpos,):
         """Use paired peak positions and treatment tag positions to build the model.
 
         Modify self.(d, model_shift size and scan_window size. and extra, plus_line, minus_line and shifted_line for plotting).
@@ -191,8 +193,6 @@ Summary of Peak Model:
         plus_end = np.zeros(window_size, dtype="int32")       # for fast pileup
         minus_start = np.zeros(window_size, dtype="int32")    # for fast pileup
         minus_end = np.zeros(window_size, dtype="int32")      # for fast pileup
-        #self.plus_line = [0]*window_size
-        #self.minus_line = [0]*window_size
         self.info("start model_add_line...")
         chroms = list(paired_peakpos.keys())
 
@@ -200,28 +200,20 @@ Summary of Peak Model:
             paired_peakpos_chrom = paired_peakpos[chroms[i]]
             (tags_plus, tags_minus) = self.treatment.get_locations_by_chr(chroms[i])
             # every paired peak has plus line and minus line
-            #  add plus_line
-            #self.plus_line = self.__model_add_line (paired_peakpos_chrom, tags_plus, self.plus_line) #, plus_strand=1)
             self.__model_add_line (paired_peakpos_chrom, tags_plus, plus_start, plus_end) #, plus_strand=1)
             self.__model_add_line (paired_peakpos_chrom, tags_minus, minus_start, minus_end) #, plus_strand=0)
-            #  add minus_line
-            #self.minus_line = self.__model_add_line (paired_peakpos_chrom, tags_minus, self.minus_line) #, plus_strand=0)
 
         self.__count ( plus_start, plus_end, self.plus_line )
         self.__count ( minus_start, minus_end, self.minus_line )
 
         self.info("start X-correlation...")
         # Now I use cross-correlation to find the best d
-        #plus_line = np.asarray(self.plus_line,dtype="int32")
-        #minus_line = np.asarray(self.minus_line,dtype="int32")
         plus_line = self.plus_line
         minus_line = self.minus_line
 
         # normalize first
         minus_data = (minus_line - minus_line.mean())/(minus_line.std()*len(minus_line))
         plus_data = (plus_line - plus_line.mean())/(plus_line.std()*len(plus_line))
-        #print "plus:",len(plus_data)
-        #print "minus:",len(minus_data)
 
         # cross-correlation
         ycorr = np.correlate(minus_data,plus_data,mode="full")[window_size-self.peaksize:window_size+self.peaksize]
@@ -235,33 +227,12 @@ Summary of Peak Model:
         i_l_max = np.where(i_l_max)[0]
         i_l_max = i_l_max[ xcorr[i_l_max] > self.d_min ]
         i_l_max = i_l_max[ np.argsort(ycorr[i_l_max])[::-1]]
-#         filter(lambda i: xcorr[i]>self.d_min, i_l_max )
-#         i_l_max = sorted(i_l_max,
-#                          key=ycorr.__getitem__,
-#                          reverse=True)
+
         self.alternative_d = sorted([int(x) for x in xcorr[i_l_max]])
         assert len(self.alternative_d) > 0, "No proper d can be found! Tweak --mfold?"
 
         self.d = xcorr[i_l_max[0]]
-#         i_l_max = filter(lambda: ycorr)
-#         tmp_cor_alternative_d = ycorr[ i_l_max ]
-#         tmp_alternative_d = xcorr[ i_l_max ]
-#         cor_alternative_d =  tmp_cor_alternative_d [ tmp_alternative_d > 0 ]
-#         self.alternative_d = map( int, tmp_alternative_d[ tmp_alternative_d > 0 ] )
 
-        # best cross-correlation point
-
-#         d_cand = xcorr[ np.where( ycorr == sorted( cor_alternative_d [::-1] ) ) ]
-#         print (cor_alternative_d)
-#         print (d_cand)
-#         d_cand = xcorr[ np.where( ycorr== max( cor_alternative_d ) )[0] ]
-
-        #### make sure fragment size is not zero
-
-#         self.d = [ x for x in d_cand if x > self.d_min ] [0]
-        #self.d = xcorr[np.where(ycorr==max(ycorr))[0][0]] #+self.tag_expansion_size
-
-        # get rid of the last local maximum if it's at the right end of curve.
 
 
         self.ycorr = ycorr
@@ -270,14 +241,12 @@ Summary of Peak Model:
         #shift_size = self.d/2
 
         self.scan_window = max(self.d,self.tag_expansion_size)*2
-        # a shifted model
-        #self.shifted_line = [0]*window_size
 
         self.info("end of X-cor")
 
         return True
 
-    cdef __model_add_line (self, object pos1, np.ndarray[np.int32_t, ndim=1] pos2, np.ndarray[np.int32_t, ndim=1] start, np.ndarray[np.int32_t, ndim=1] end): #, int plus_strand=1):
+    cdef __model_add_line (self, list pos1, np.ndarray[np.int32_t, ndim=1] pos2, np.ndarray[np.int32_t, ndim=1] start, np.ndarray[np.int32_t, ndim=1] end): #, int plus_strand=1):
         """Project each pos in pos2 which is included in
         [pos1-self.peaksize,pos1+self.peaksize] to the line.
 
@@ -352,14 +321,14 @@ Summary of Peak Model:
             long ip = 0                  # index for plus peaks
             long im = 0                  # index for minus peaks
             long im_prev = 0             # index for minus peaks in previous plus peak
-            array.array pair_centers
+            list pair_centers
             long ip_max
             long im_max
             bool flag_find_overlap
-            long pp, pn
-            long mp, mn
+            int pp, mp
+            float pn, mn
 
-        pair_centers = array.array(BYTE4,[])
+        pair_centers = []
         ip_max = len(pluspeaks)
         im_max = len(minuspeaks)
         flag_find_overlap = False
@@ -376,7 +345,7 @@ Summary of Peak Model:
                 if not flag_find_overlap:
                     flag_find_overlap = True
                     im_prev = im # only the first index is recorded
-                if float(pn)/mn < 2 and float(pn)/mn > 0.5: # number tags in plus and minus peak region are comparable...
+                if pn/mn < 2 and pn/mn > 0.5: # number tags in plus and minus peak region are comparable...
                     if pp < mp:
                         pair_centers.append((pp+mp)//2)
                         #self.debug ( "distance: %d, minus: %d, plus: %d" % (mp-pp,mp,pp))
