@@ -1,6 +1,6 @@
 # cython: language_level=3
 # cython: profile=True
-# Time-stamp: <2020-11-24 09:54:34 Tao Liu>
+# Time-stamp: <2020-11-24 10:40:02 Tao Liu>
 """Module Description: Build shifting model
 
 This code is free software; you can redistribute it and/or modify it
@@ -139,12 +139,14 @@ Summary of Peak Model:
             plus_peaksinfo = self.__naive_find_peaks ( plus_tags )
             self.debug("Number of unique tags on + strand: %d" % ( plus_tags.shape[0] ) )
             self.debug("Number of peaks in + strand: %d" % ( len(plus_peaksinfo) ) )
-            self.debug(f"plus peaks: first - {plus_peaksinfo[0]} ... last - {plus_peaksinfo[-1]}")
+            if plus_peaksinfo:
+                self.debug(f"plus peaks: first - {plus_peaksinfo[0]} ... last - {plus_peaksinfo[-1]}")
             # look for - strand peaks
             minus_peaksinfo = self.__naive_find_peaks ( minus_tags )
             self.debug("Number of unique tags on - strand: %d" % ( minus_tags.shape[0] ) )
             self.debug("Number of peaks in - strand: %d" % ( len( minus_peaksinfo ) ) )
-            self.debug(f"minus peaks: first - {minus_peaksinfo[0]} ... last - {minus_peaksinfo[-1]}")
+            if minus_peaksinfo:
+                self.debug(f"minus peaks: first - {minus_peaksinfo[0]} ... last - {minus_peaksinfo[-1]}")
             if not plus_peaksinfo or not minus_peaksinfo:
                 self.debug("Chrom %s is discarded!" % (chrom) )
                 continue
@@ -337,7 +339,8 @@ Summary of Peak Model:
                         pair_centers.append((pp+mp)//2)
                         #self.debug ( "distance: %d, minus: %d, plus: %d" % (mp-pp,mp,pp))
                 im += 1
-        self.debug(f"Paired centers: first - {pair_centers[0]} ... second - {pair_centers[-1]} ")
+        if pair_centers:
+            self.debug(f"Paired centers: first - {pair_centers[0]} ... second - {pair_centers[-1]} ")
         return pair_centers
 
 # smooth function from SciPy cookbook: http://www.scipy.org/Cookbook/SignalSmooth
