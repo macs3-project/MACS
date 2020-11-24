@@ -1,7 +1,7 @@
 # cython: language_level=3
 # cython: profile=True
 # cython: linetrace=True
-# Time-stamp: <2019-11-06 13:00:01 taoliu>
+# Time-stamp: <2020-11-24 17:16:00 Tao Liu>
 
 """Module for Calculate Scores.
 
@@ -22,35 +22,32 @@ import _pickle as cPickle
 from tempfile import mkstemp
 import os
 
-# numpy
+# ------------------------------------
+# Other modules
+# ------------------------------------
 import numpy as np
 cimport numpy as np
 from numpy cimport uint8_t, uint16_t, uint32_t, uint64_t, int8_t, int16_t, int32_t, int64_t, float32_t, float64_t
-
-#ctypedef np.float64_t float64_t
-#ctypedef np.float32_t float32_t
-#ctypedef np.int64_t int64_t
-#ctypedef np.int32_t int32_t
-#ctypedef np.uint64_t uint64_t
-#ctypedef np.uint32_t uint32_t
-
-# cython
 from cpython cimport bool
 
+# ------------------------------------
 # C lib
+# ------------------------------------
 from libc.stdio cimport *
 from libc.math cimport exp,log,log10, M_LN10, log1p, erf, sqrt, floor, ceil
 
-# MACS3
-from MACS3.Signal import maxima, enforce_valleys, enforce_peakyness
+# ------------------------------------
+# MACS3 modules
+# ------------------------------------
+from MACS3.Data.Signal import maxima, enforce_valleys, enforce_peakyness
 from MACS3.IO.PeakIO import PeakIO, BroadPeakIO, parse_peakname
-from MACS3.IO.FixWidthTrack import FWTrack
-from MACS3.IO.PairedEndTrack import PETrackI
+from MACS3.Data.FixWidthTrack import FWTrack
+from MACS3.Data.PairedEndTrack import PETrackI
+from MACS3.Data.Prob import poisson_cdf
 
 # --------------------------------------------
 # cached pscore function and LR_asym functions
 # --------------------------------------------
-from MACS3.Prob import poisson_cdf
 pscore_dict = dict()
 logLR_dict = dict()
 

@@ -1,4 +1,4 @@
-# Time-stamp: <2019-11-05 10:59:31 taoliu>
+# Time-stamp: <2020-11-24 16:49:34 Tao Liu>
 
 """Description: Filter duplicate reads depending on sequencing depth.
 
@@ -18,9 +18,9 @@ import logging
 # ------------------------------------
 # own python modules
 # ------------------------------------
-from MACS3.OptValidator import opt_validate_filterdup as opt_validate
-from MACS3.Prob import binomial_cdf_inv
-from MACS3.Constants import *
+from MACS3.Utilities.Constants import *
+from MACS3.Utilities.OptValidator import opt_validate_filterdup
+from MACS3.Data.Prob import binomial_cdf_inv
 # ------------------------------------
 # Main function
 # ------------------------------------
@@ -29,7 +29,7 @@ def run( o_options ):
 
     """
     # Parse options...
-    options = opt_validate( o_options )
+    options = opt_validate_filterdup( o_options )
     # end of parsing commandline options
     info = options.info
     warn = options.warn

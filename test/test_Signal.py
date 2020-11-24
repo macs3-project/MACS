@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# Time-stamp: <2019-12-18 17:02:57 taoliu>
+# Time-stamp: <2020-11-24 17:52:34 Tao Liu>
 
 """Module Description: Test functions for Signal.pyx
 
@@ -13,7 +13,7 @@ import pytest
 
 from math import log10
 import numpy as np
-from MACS3.Signal import maxima, savitzky_golay, savitzky_golay_order2_deriv1
+from MACS3.Data.Signal import maxima, savitzky_golay, savitzky_golay_order2_deriv1
 
 # ------------------------------------
 # Main function

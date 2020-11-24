@@ -1,6 +1,6 @@
 # cython: language_level=3
 # cython: profile=True
-# Time-stamp: <2020-11-23 15:15:24 Tao Liu>
+# Time-stamp: <2020-11-24 18:00:21 Tao Liu>
 
 """Module for FWTrack classes.
 
@@ -13,40 +13,35 @@ the distribution).
 # python modules
 # ------------------------------------
 import logging
-
-#from array import array
-#from random import sample as random_sample
 import sys
 import io
 from copy import copy
 from collections import Counter
 
-from MACS3.Constants import *
-from MACS3.Signal import *
-from MACS3.IO.PeakIO import PeakIO
-from MACS3.Pileup import se_all_in_one_pileup, over_two_pv_array
+# ------------------------------------
+# MACS3 modules
+# ------------------------------------
 
-#from libc.stdint cimport uint32_t, uint64_t, int32_t, int64_t
+from MACS3.Utilities.Constants import *
+from MACS3.Data.Signal import *
+from MACS3.IO.PeakIO import PeakIO
+from MACS3.Data.Pileup import se_all_in_one_pileup, over_two_pv_array
+
+# ------------------------------------
+# Other modules
+# ------------------------------------
 from cpython cimport bool
 cimport cython
-
 import numpy as np
 cimport numpy as np
 from numpy cimport uint8_t, uint16_t, uint32_t, uint64_t, int8_t, int16_t, int32_t, int64_t, float32_t, float64_t
-
-#ctypedef np.float64_t float64_t
-#ctypedef np.float32_t float32_t
-#ctypedef np.int64_t int64_t
-#ctypedef np.int32_t int32_t
-#ctypedef np.uint64_t uint64_t
-#ctypedef np.uint32_t uint32_t
 
 # ------------------------------------
 # constants
 # ------------------------------------
 __version__ = "FixWidthTrack $Revision$"
 __author__ = "Tao Liu <taoliu@jimmy.harvard.edu>"
-__doc__ = "FWTrackII class"
+__doc__ = "FWTrack class"
 
 cdef INT_MAX = <int32_t>((<uint32_t>(-1))>>1)
 
@@ -230,11 +225,6 @@ cdef class FWTrack:
         """
         return set(sorted(self.__locations.keys()))
 
-    # cpdef length ( self ):
-    #     """Total sequenced length = total number of tags * width of tag
-    #     """
-    #     return self.total*self.fw
-
     cpdef void sort ( self ):
         """Naive sorting for locations.
 
@@ -313,11 +303,6 @@ cdef class FWTrack:
                 self.dup_total += i_dup
                 self.__pointer[k][0] = i_new
                 self.__dup_pointer[k][0] = i_dup
-                # unnecessary shape calls
-#                self.total +=  new_plus.shape[0]
-#                dups.total += dup_plus.shape[0]
-#                self.__pointer[k][0] = new_plus.shape[0]
-#                dups.__pointer[k][0] = dup_plus.shape[0]
                 # free memory?
                 # I know I should shrink it to 0 size directly,
                 # however, on Mac OSX, it seems directly assigning 0
@@ -325,7 +310,6 @@ cdef class FWTrack:
                 plus.resize( self.buffer_size, refcheck=False )
                 plus.resize( 0, refcheck=False )
                 # hope there would be no mem leak...
-
             # - strand
             i_new = 0
             i_dup = 0
@@ -360,10 +344,6 @@ cdef class FWTrack:
                 self.dup_total +=  i_dup
                 self.__pointer[k][1] = i_new
                 self.__dup_pointer[k][1] = i_dup
-#                self.total +=  new_minus.shape[0]
-#                dups.total +=  dup_minus.shape[0]
-#                self.__pointer[k][1] = new_minus.shape[0]
-#                dups.__pointer[k][1] = dup_minus.shape[0]
                 # free memory ?
                 # I know I should shrink it to 0 size directly,
                 # however, on Mac OSX, it seems directly assigning 0
@@ -498,8 +478,6 @@ cdef class FWTrack:
                 new_plus.resize( i_new, refcheck=False )
                 self.total +=  i_new
                 self.__pointer[k][0] = i_new
-#                self.total +=  new_plus.shape[0]
-#                self.__pointer[k][0] = new_plus.shape[0]
                 # free memory?
                 # I know I should shrink it to 0 size directly,
                 # however, on Mac OSX, it seems directly assigning 0
@@ -533,8 +511,6 @@ cdef class FWTrack:
                 new_minus.resize( i_new, refcheck=False )
                 self.total +=  i_new
                 self.__pointer[k][1] = i_new
-#                self.total +=  new_minus.shape[0]
-#                self.__pointer[k][1] = new_minus.shape[0]
                 # free memory ?
                 # I know I should shrink it to 0 size directly,
                 # however, on Mac OSX, it seems directly assigning 0
@@ -780,24 +756,16 @@ cdef class FWTrack:
 
         pchrnames = peaks.get_chr_names()
         retval = []
-
         # this object should be sorted
         if not self.__sorted: self.sort()
         # PeakIO object should be sorted
         peaks.sort()
-
         chrnames = self.get_chr_names()
-
-        #n_peaks = 1
         ret_peaks = PeakIO()
-
         for chrom in pchrnames:
             assert chrom in chrnames, "chromosome %s can't be found in the FWTrack object. %s" % (chrom, str(chrnames))
             (plus, minus) = self.__locations[chrom]
             cpeaks = peaks.get_data_from_chrom(chrom)
-            #ret_peaks.peaks[chrom] = []
-            #npeaks = ret_peaks.peaks[chrom]
-
             prev_i = 0
             prev_j = 0
             for m in range(len(cpeaks)):
@@ -815,7 +783,6 @@ cdef class FWTrack:
                     else:
                         temp.append(pos)
                 rt_plus = np.array(temp)
-
                 temp = []
                 for j in range(prev_j,minus.shape[0]):
                     pos = minus[j]
@@ -827,7 +794,6 @@ cdef class FWTrack:
                     else:
                         temp.append(pos)
                 rt_minus = np.array(temp)
-
                 #peak_name = name + "_" + str(n_peaks)
                 (adjusted_summits, passflags) = wtd_find_summit(chrom, rt_plus, rt_minus, startpos, endpos, window_size, cutoff)
                 # those local maxima above cutoff will be defined as good summits
@@ -838,21 +804,11 @@ cdef class FWTrack:
                         tmppeak = copy(thispeak)
                         tmppeak["summit"] = adjusted_summit
                         ret_peaks.add_PeakContent(chrom, tmppeak)
-
-                #thispeak["summit"] = adjusted_summit
-                #if passflag:
-                #    thispeak["name"] = "passed"
-                #else:
-                #    thispeak["name"] = "failed"
-                #retval.append( wtd_find_summit(chrom, rt_plus, rt_minus, startpos, endpos, peak_name, window_size, cutoff) )
-                #n_peaks += 1
-
                 # rewind window_size
                 for i in range(prev_i, 0, -1):
                     if plus[prev_i] - plus[i] >= window_size:
                         break
                 prev_i = i
-
                 for j in range(prev_j, 0, -1):
                     if minus[prev_j] - minus[j] >= window_size:
                         break
@@ -953,31 +909,10 @@ cdef tuple wtd_find_summit(chrom, np.ndarray[np.int32_t, ndim=1] plus, np.ndarra
         crick_right += right_forward(crick, j, window_size)
         i += 1
 
-    #wtd_max_val = max(wtd_list)
-    #wtd_max_pos = wtd_list.index(wtd_max_val) + search_start
-
-    # smooth
-    #wtd_list = smooth(wtd_list, window="flat") # window size is by default 11.
-    #wtd_max_pos = np.where(wtd_list==max(wtd_list))[0][0]
-    #wtd_max_val = wtd_list[wtd_max_pos]
-    #wtd_max_pos += search_start
-    # search for other local maxima
-    #wtd_other_max_pos = np.arange(len(wtd_list))[np.r_[False, wtd_list[1:] > wtd_list[:-1]] & np.r_[wtd_list[:-1] > wtd_list[1:], False]]
-    #wtd_other_max_val = wtd_list[wtd_other_max_pos]
-    #wtd_other_max_pos = wtd_other_max_pos + search_start
-
     wtd_other_max_pos = maxima(wtd_list, window_size = window_size)
     wtd_other_max_pos = enforce_peakyness( wtd_list, wtd_other_max_pos )
     wtd_other_max_val = wtd_list[wtd_other_max_pos]
     wtd_other_max_pos = wtd_other_max_pos + search_start
 
-    #return (chrom, wtd_max_pos, wtd_max_pos+1, wtd_max_val)
-
     return (wtd_other_max_pos, wtd_other_max_val > cutoff)
 
-    #if wtd_max_val > cutoff:
-    #    return (wtd_max_pos, True)
-    #    #return (chrom, wtd_max_pos, wtd_max_pos+1, name+"_R" , wtd_max_val) # 'R'efined
-    #else:
-    #    return (wtd_max_pos, False)
-    #    #return (chrom, wtd_max_pos, wtd_max_pos+1, name+"_F" , wtd_max_val) # 'F'ailed

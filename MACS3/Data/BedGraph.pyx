@@ -1,6 +1,6 @@
 # cython: language_level=3
 # cython: profile=True
-# Time-stamp: <2019-10-30 17:48:55 taoliu>
+# Time-stamp: <2020-11-24 17:14:17 Tao Liu>
 
 """Module for BedGraph data class.
 
@@ -13,19 +13,29 @@ the distribution).
 # python modules
 # ------------------------------------
 import logging
-
 from array import array
 
-import numpy as np
+# ------------------------------------
+# MACS3 modules
+# ------------------------------------
 
-from libc.math cimport sqrt
-from libc.math cimport log
+from MACS3.Utilities.Constants import *
+from MACS3.Data.ScoreTrack import scoreTrackII,CombinedTwoTrack
+from MACS3.IO.PeakIO import PeakIO, BroadPeakIO
+from MACS3.Data.Prob import chisq_logp_e
+
+# ------------------------------------
+# Other modules
+# ------------------------------------
+
+import numpy as np
 from cpython cimport bool
 
-from MACS3.Constants import *
-from MACS3.IO.ScoreTrack import scoreTrackII,CombinedTwoTrack
-from MACS3.IO.PeakIO import PeakIO, BroadPeakIO
-from MACS3.Prob import chisq_logp_e
+# ------------------------------------
+# C lib
+# ------------------------------------
+
+from libc.math cimport sqrt, log, log1p, exp, log10
 
 # ------------------------------------
 # constants
@@ -38,8 +48,6 @@ __doc__ = "bedGraphTrackI class"
 # Misc functions
 # ------------------------------------
 LOG10_E = 0.43429448190325176
-
-from libc.math cimport log1p, exp, log10
 
 cdef inline float fisher_method_combining_two_log10pvalues ( float p1, float p2 ):
     return ( p1 + p2 ) - log1p( ( p1 + p2 ) / LOG10_E ) * LOG10_E

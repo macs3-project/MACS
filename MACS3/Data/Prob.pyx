@@ -1,6 +1,6 @@
 # cython: language_level=3
 # cython: profile=True
-# Time-stamp: <2019-10-30 17:28:00 taoliu>
+# Time-stamp: <2020-11-24 17:31:16 Tao Liu>
 
 """Module Description: statistics functions to calculate p-values
 
@@ -12,23 +12,23 @@ the distribution).
 # ------------------------------------
 # python modules
 # ------------------------------------
-from libc.math cimport exp,log,log10, M_LN10 #,fabs,log1p
 from math import fabs
 from math import log1p #as py_log1p
 from math import sqrt
 
+# ------------------------------------
+# Other modules
+# ------------------------------------
 import numpy as np
 cimport numpy as np
 from numpy cimport uint8_t, uint16_t, uint32_t, uint64_t, int8_t, int16_t, int32_t, int64_t, float32_t, float64_t
-
-#ctypedef np.float64_t float64_t
-#ctypedef np.float32_t float32_t
-#ctypedef np.int64_t int64_t
-#ctypedef np.int32_t int32_t
-#ctypedef np.uint64_t uint64_t
-#ctypedef np.uint32_t uint32_t
-
 from cpython cimport bool
+
+# ------------------------------------
+# C lib
+# ------------------------------------
+from libc.math cimport exp,log,log10, M_LN10 #,fabs,log1p
+
 # ------------------------------------
 # constants
 # ------------------------------------

@@ -1,4 +1,4 @@
-# Time-stamp: <2019-09-25 12:43:53 taoliu>
+# Time-stamp: <2020-11-24 16:47:11 Tao Liu>
 
 """Description: combine replicates
 
@@ -10,11 +10,10 @@ the distribution).
 import sys
 import os
 import logging
+from math import log as mlog
 
 from MACS3.IO import BedGraphIO
-from MACS3.OptValidator import opt_validate_cmbreps as opt_validate
-
-from math import log as mlog
+from MACS3.Utilities.OptValidator import opt_validate_cmbreps
 
 # ------------------------------------
 # constants
@@ -38,8 +37,7 @@ info    = logging.info
 # ------------------------------------
 
 def run( options ):
-    options = opt_validate( options )
-    #weights = options.weights
+    options = opt_validate_cmbreps( options )
 
     info("Read and build bedGraph for each replicate...")
     reps = []

@@ -1,12 +1,12 @@
 #!/usr/bin/env python
-# Time-stamp: <2019-09-25 14:44:07 taoliu>
+# Time-stamp: <2020-11-24 17:52:24 Tao Liu>
 
 import io
 import unittest
 from numpy.testing import assert_equal,  assert_almost_equal, assert_array_equal
 
-from MACS3.IO.ScoreTrack import *
-from MACS3.IO.BedGraph import bedGraphTrackI
+from MACS3.Data.ScoreTrack import *
+from MACS3.Data.BedGraph import bedGraphTrackI
 
 class Test_TwoConditionScores(unittest.TestCase):
     def setUp(self):

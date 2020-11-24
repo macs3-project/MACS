@@ -1,9 +1,9 @@
 #!/usr/bin/env python
-# Time-stamp: <2020-11-13 10:02:20 ta32852>
+# Time-stamp: <2020-11-24 17:50:39 Tao Liu>
 
 import unittest
 
-from MACS3.IO.BedGraph import *
+from MACS3.Data.BedGraph import *
 
 class Test_bedGraphTrackI_add_loc(unittest.TestCase):
 

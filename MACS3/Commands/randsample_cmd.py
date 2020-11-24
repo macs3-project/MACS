@@ -1,4 +1,4 @@
-# Time-stamp: <2019-09-20 11:36:33 taoliu>
+# Time-stamp: <2020-11-24 17:00:16 Tao Liu>
 
 """Description: Random sample certain number/percentage of tags.
 
@@ -18,14 +18,14 @@ import logging
 # ------------------------------------
 # own python modules
 # ------------------------------------
-from MACS3.OptValidator import opt_validate_randsample as opt_validate
-from MACS3.Constants import *
+from MACS3.Utilities.Constants import *
+from MACS3.Utilities.OptValidator import opt_validate_randsample
 
 # ------------------------------------
 # Main function
 # ------------------------------------
 def run( options0 ):
-    options = opt_validate( options0 )
+    options = opt_validate_randsample( options0 )
     # end of parsing commandline options
     info = options.info
     warn = options.warn

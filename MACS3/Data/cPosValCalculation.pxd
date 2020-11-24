@@ -1,5 +1,8 @@
 # cython: language_level=3
 
+# ------------------------------------
+# NumPy modules
+# ------------------------------------
 import numpy as np
 cimport numpy as np
 from numpy cimport int32_t
@@ -21,3 +24,4 @@ cdef extern from "cPosValCalculation.h":
     void write_pv_array_to_bedGraph ( PosVal * pv_array, long l_pv_array, char * chromosome, char * bdgfile, short append )
 
     long quick_pileup_simple ( int32_t * ret_poss, float32_t * ret_values, int32_t * start_poss, int32_t * end_poss, long length_poss, float scale_factor, float baseline_value )
+

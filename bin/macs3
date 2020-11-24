@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# Time-stamp: <2020-11-16 14:16:37 Tao Liu>
+# Time-stamp: <2020-11-24 16:43:29 Tao Liu>
 """Description: MACS v3 main executable.
 
 This code is free software; you can redistribute it and/or modify it
@@ -19,7 +19,7 @@ import tempfile
 # ------------------------------------
 # own python modules
 # ------------------------------------
-from MACS3.Constants import *
+from MACS3.Utilities.Constants import *
 
 # ------------------------------------
 # Main function
@@ -44,63 +44,63 @@ def main():
 
     if subcommand == "callpeak":
         # General call peak
-        from MACS3.callpeak_cmd import run
+        from MACS3.Commands.callpeak_cmd import run
         run( args )
     #elif subcommand == "diffpeak":
     #    # differential peak calling w/ bedgraphs + optional peak regions
-    #    from MACS3.diffpeak_cmd import run
+    #    from MACS3.Commands.diffpeak_cmd import run
     #    run( args )
     elif subcommand == "bdgpeakcall":
         # call peak from bedGraph
-        from MACS3.bdgpeakcall_cmd import run
+        from MACS3.Commands.bdgpeakcall_cmd import run
         run( args )
     elif subcommand == "bdgbroadcall":
         # call broad peak from bedGraph
-        from MACS3.bdgbroadcall_cmd import run
+        from MACS3.Commands.bdgbroadcall_cmd import run
         run( args )
     elif subcommand == "bdgcmp":
         # compare treatment and control to make enrichment scores
-        from MACS3.bdgcmp_cmd import run
+        from MACS3.Commands.bdgcmp_cmd import run
         run( args )
     elif subcommand == "bdgopt":
         # operations on the score column of bedGraph file
-        from MACS3.bdgopt_cmd import run
+        from MACS3.Commands.bdgopt_cmd import run
         run( args )
     elif subcommand == "cmbreps":
         # combine replicates
-        from MACS3.cmbreps_cmd import run
+        from MACS3.Commands.cmbreps_cmd import run
         run( args )
     elif subcommand == "randsample":
         # randomly sample sequencing reads, and save as bed file
-        from MACS3.randsample_cmd import run
+        from MACS3.Commands.randsample_cmd import run
         run( args )
     elif subcommand == "filterdup":
         # filter out duplicate reads, and save as bed file
-        from MACS3.filterdup_cmd import run
+        from MACS3.Commands.filterdup_cmd import run
         run( args )
     elif subcommand == "bdgdiff":
         # differential calling
-        from MACS3.bdgdiff_cmd import run
+        from MACS3.Commands.bdgdiff_cmd import run
         run( args )
     elif subcommand == "refinepeak":
         # refine peak summits
-        from MACS3.refinepeak_cmd import run
+        from MACS3.Commands.refinepeak_cmd import run
         run( args )
     elif subcommand == "predictd":
         # predict d or fragment size
-        from MACS3.predictd_cmd import run
+        from MACS3.Commands.predictd_cmd import run
         run( args )
     elif subcommand == "pileup":
         # pileup alignment results with a given extension method
-        from MACS3.pileup_cmd import run
+        from MACS3.Commands.pileup_cmd import run
         run( args )
     #elif subcommand == "hmmratac":
     #    # pileup alignment results with a given extension method
-    #    from MACS3.diffpeak_cmd import run
+    #    from MACS3.Commands.diffpeak_cmd import run
     #    run( args )
     #elif subcommand == "callvar":
     #    # pileup alignment results with a given extension method
-    #    from MACS3.diffpeak_cmd import run
+    #    from MACS3.Commands.diffpeak_cmd import run
     #    run( args )
 
 
@@ -275,10 +275,8 @@ def add_callpeak_parser( subparsers ):
 
     postprocess_group.add_argument( "--call-summits", dest="call_summits", action="store_true",
                                     help="If set, MACS will use a more sophisticated signal processing approach to find subpeak summits in each enriched peak region. DEFAULT: False",default=False)
-    # postprocess_group.add_argument( "--refine-peaks", dest="refine_peaks", action="store_true",
-    #                                 help="If set, MACS will refine peak summits by measuring balance of waston/crick tags. Those peaks without balancing tags will be disgarded. Peak summits will be redefined and reassgined with scores. Note, duplicate reads will be put back while calculating read balance. And more memory will be used. Default: False", default=False )
     group_postprocessing.add_argument( "--fe-cutoff", dest="fecutoff", type=float, default = 1.0,
-                                       help = "When set, the value will be used to filter out peaks with low fold-enrichment. Note, MACS3 use 1.0 as pseudocount while calculating fold-enrichment. DEFAULT: 1.0")
+                                       help = "When set, the value will be used to filter out peaks with low fold-enrichment. Note, MACS3 adds one as pseudocount while calculating fold-enrichment. By default, it is set as 1 so there is no filtering. DEFAULT: 1.0")
 
     # other options
     group_other = argparser_callpeak.add_argument_group( "Other options" )

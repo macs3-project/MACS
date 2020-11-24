@@ -1,6 +1,6 @@
 # cython: language_level=3
 # cython: profile=True
-# Time-stamp: <2019-10-30 16:33:14 taoliu>
+# Time-stamp: <2020-11-24 17:11:29 Tao Liu>
 
 """Module for PeakIO IO classes.
 
@@ -12,14 +12,22 @@ the distribution).
 # ------------------------------------
 # python modules
 # ------------------------------------
-from MACS3.Constants import *
 from itertools import groupby
 from operator import itemgetter
-from cpython cimport bool
 import re
+import sys
+
+# ------------------------------------
+# MACS3 modules
+# ------------------------------------
+
+from MACS3.Utilities.Constants import *
+
+# ------------------------------------
+# Other modules
+# ------------------------------------
 
 from cpython cimport bool
-import sys
 
 # ------------------------------------
 # constants

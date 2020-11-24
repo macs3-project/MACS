@@ -1,6 +1,6 @@
 # cython: language_level=3
 # cython: profile=True
-# Time-stamp: <2019-10-30 17:49:01 taoliu>
+# Time-stamp: <2020-11-24 17:08:51 Tao Liu>
 
 """Module Description:  IO Module for bedGraph file
 
@@ -14,7 +14,7 @@ the distribution).
 # ------------------------------------
 import io
 
-from MACS3.IO.BedGraph import bedGraphTrackI,bedRegionTrackI
+from MACS3.Data.BedGraph import bedGraphTrackI,bedRegionTrackI
 
 # ------------------------------------
 # constants
@@ -38,6 +38,10 @@ from MACS3.IO.BedGraph import bedGraphTrackI,bedRegionTrackI
 #     long atol(char *str)
 #     int atoi(char *str)
 #     double atof(char *str)
+
+# ------------------------------------
+# C lib
+# ------------------------------------
 
 from libc.stdio cimport *
 from libc.stdlib cimport *

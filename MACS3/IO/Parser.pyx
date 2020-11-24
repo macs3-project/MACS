@@ -1,7 +1,7 @@
 # cython: language_level=3
 # cython: profile=True
 # cython: linetrace=True
-# Time-stamp: <2019-12-12 12:55:02 taoliu>
+# Time-stamp: <2020-11-24 17:10:14 Tao Liu>
 
 """Module for all MACS Parser classes for input.
 
@@ -20,18 +20,25 @@ from struct import unpack
 from re import findall
 import gzip
 import io
+import sys
 
-from MACS3.Constants import *
-from MACS3.IO.FixWidthTrack import FWTrack
-from MACS3.IO.PairedEndTrack import PETrackI
+# ------------------------------------
+# MACS3 modules
+# ------------------------------------
 
+from MACS3.Utilities.Constants import *
+from MACS3.Data.FixWidthTrack import FWTrack
+from MACS3.Data.PairedEndTrack import PETrackI
+
+# ------------------------------------
+# Other modules
+# ------------------------------------
 from cpython cimport bool
 
 import numpy as np
 cimport numpy as np
 from numpy cimport uint8_t, uint16_t, uint32_t, uint64_t, int8_t, int16_t, int32_t, int64_t, float32_t, float64_t
 
-import sys
 is_le = sys.byteorder == "little"
 
 cdef extern from "stdlib.h":

@@ -1,6 +1,6 @@
 # cython: language_level=3
 # cython: profile=True
-# Time-stamp: <2020-11-16 14:15:13 Tao Liu>
+# Time-stamp: <2020-11-24 17:39:12 Tao Liu>
 
 """Module Description: Detect peaks, main module
 
@@ -8,16 +8,21 @@ This code is free software; you can redistribute it and/or modify it
 under the terms of the BSD License (see the file LICENSE included with
 the distribution).
 """
-
+# ------------------------------------
+# Python modules
+# ------------------------------------
 from itertools import groupby
 from operator import itemgetter
 import io
 import gc                               # use garbage collectior
 
+# ------------------------------------
+# MACS3 modules
+# ------------------------------------
 from MACS3.IO.PeakIO import PeakIO
 from MACS3.IO.BedGraphIO import bedGraphIO
-from MACS3.Constants import *
-from MACS3.IO.CallPeakUnit import CallerFromAlignments
+from MACS3.Utilities.Constants import *
+from MACS3.Data.CallPeakUnit import CallerFromAlignments
 
 cdef bytes subpeak_letters(short i):
     if i < 26:
@@ -388,132 +393,4 @@ class PeakDetect:
                                                     cutoff_analysis=self.opt.cutoff_analysis )
         scorecalculator.destroy()
         return peaks
-
-    # def __diag_w_control (self):
-    #     # sample
-    #     sample_peaks = {}
-    #     for i in xrange(90,10,-10):
-    #         self.info("#3 diag: sample %d%%" % i)
-    #         sample_peaks[i]=self.__diag_peakfinding_w_control_sample(float(i)/(i+10))
-    #     return self.__overlap (self.final_peaks, sample_peaks,top=90,bottom=10,step=-10)
-
-    # def __diag_peakfinding_w_control_sample (self, percent):
-    #     self.treat.sample(percent) # because sampling is after
-    #                                # shifting, track.total is used
-    #                                # now.
-    #     self.control.sample(percent)
-    #     ratio_treat2control = float(self.treat.total)/self.control.total
-
-    #     #self.lambda_bg = float(self.scan_window)*self.treat.total/self.gsize # bug fixed...
-    #     #self.min_tags = poisson_cdf_inv(1-pow(10,self.pvalue/-10),self.lambda_bg)+1
-
-    #     self.debug("#3 diag: after shift and merging, treat: %d, control: %d" % (self.treat.total,self.control.total))
-    #     self.info("#3 diag: call peak candidates")
-    #     peak_candidates = self.__call_peaks_from_trackI (self.treat)
-
-    #     self.info("#3 diag: call negative peak candidates")
-    #     negative_peak_candidates = self.__call_peaks_from_trackI (self.control)
-
-    #     self.info("#3 diag: use control data to filter peak candidates...")
-    #     final_peaks_percent = self.__filter_w_control(peak_candidates,self.treat,self.control, ratio_treat2control)
-    #     return final_peaks_percent
-
-    # def __diag_wo_control (self):
-    #     # sample
-    #     sample_peaks = {}
-    #     for i in xrange(90,10,-10):
-    #         self.info("#3 diag: sample %d%%" % i)
-    #         sample_peaks[i]=self.__diag_peakfinding_wo_control_sample(float(i)/(i+10))
-    #     return self.__overlap (self.final_peaks, sample_peaks,top=90,bottom=10,step=-10)
-
-    # def __diag_peakfinding_wo_control_sample (self, percent):
-
-    #     #self.lambda_bg = float(self.scan_window)*self.treat.total/self.gsize # bug fixed...
-    #     #self.min_tags = poisson_cdf_inv(1-pow(10,self.pvalue/-10),self.lambda_bg)+1
-
-    #     self.treat.sample(percent)
-    #     self.debug("#3 diag: after shift and merging, tags: %d" % (self.treat.total))
-    #     self.info("#3 diag: call peak candidates")
-    #     peak_candidates = self.__call_peaks_from_trackI (self.treat)
-    #     self.info("#3 diag: use self to calculate local lambda and  filter peak candidates...")
-    #     final_peaks_percent = self.__filter_w_control(peak_candidates,self.treat,self.treat,pass_sregion=True) # bug fixed...
-    #     return final_peaks_percent
-
-    # def __overlap (self, gold_peaks, sample_peaks, top=90,bottom=10,step=-10):
-    #     """Calculate the overlap between several fe range for the
-    #     golden peaks set and results from sampled data.
-
-    #     """
-    #     gp = PeakIO()
-    #     gp.init_from_dict(gold_peaks)
-    #     if self.femax:
-    #         femax = min(self.femax, (int(gp.max_fold_enrichment())//self.festep+1)*self.festep)
-    #     else:
-    #         femax = (int(gp.max_fold_enrichment())//self.festep+1)*self.festep
-    #     femin = self.femin
-    #     diag_result = []
-    #     for f in xrange(femin, femax, self.festep):
-
-    #         fe_low = f
-    #         fe_up = f + self.festep
-    #         self.debug("#3 diag: fe range = %d -- %d" % (fe_low, fe_up))
-
-    #         r = self.__overlap_fe(gold_peaks, sample_peaks, fe_low, fe_up, top, bottom, step)
-    #         if r:
-    #             diag_result.append(r)
-    #     return diag_result
-
-    # def __overlap_fe (self, gold_peaks, sample_peaks, fe_low, fe_up, top, bottom, step):
-    #     ret = ["%d-%d" % (fe_low,fe_up)]
-    #     gp = PeakIO()
-    #     gp.init_from_dict(gold_peaks)
-    #     gp.filter_fc(fe_low,fe_up)
-    #     gptotal =  gp.total()
-    #     if gptotal <= 0:
-    #         return None
-
-    #     ret.append(gptotal)
-    #     for i in xrange(top,bottom,step):
-    #         p = PeakIO()
-    #         p.init_from_dict(sample_peaks[i])
-    #         percent = 100.0*gp.overlap_with_other_peaks(p)/gptotal
-    #         ret.append(percent)
-    #         del p
-    #     return ret
-
-
-    # def __remove_overlapping_peaks (self, peaks ):
-    #     """peak_candidates[chrom] = [(peak_start,peak_end,peak_length,peak_summit,peak_height,number_cpr_tags)...]
-
-    #     """
-    #     new_peaks = {}
-    #     chrs = peaks.keys()
-    #     chrs.sort()
-    #     for chrom in chrs:
-    #         new_peaks[chrom]=[]
-    #         n_append = new_peaks[chrom].append
-    #         prev_peak = None
-    #         peaks_chr = peaks[chrom]
-    #         for i in xrange(len(peaks_chr)):
-    #             if not prev_peak:
-    #                 prev_peak = peaks_chr[i]
-    #                 continue
-    #             else:
-    #                 if peaks_chr[i][0] <= prev_peak[1]:
-    #                     s_new_peak = prev_peak[0]
-    #                     e_new_peak = peaks_chr[i][1]
-    #                     l_new_peak = e_new_peak-s_new_peak
-    #                     if peaks_chr[i][4] > prev_peak[4]:
-    #                         summit_new_peak = peaks_chr[i][3]
-    #                         h_new_peak = peaks_chr[i][4]
-    #                     else:
-    #                         summit_new_peak = prev_peak[3]
-    #                         h_new_peak = prev_peak[4]
-    #                     prev_peak = (s_new_peak,e_new_peak,l_new_peak,summit_new_peak,h_new_peak,peaks_chr[i][5]+prev_peak[5])
-    #                 else:
-    #                     n_append(prev_peak)
-    #                     prev_peak = peaks_chr[i]
-    #         if prev_peak:
-    #             n_append(prev_peak)
-    #     return new_peaks
 

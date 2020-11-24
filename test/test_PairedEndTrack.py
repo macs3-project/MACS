@@ -1,9 +1,9 @@
 #!/usr/bin/env python
-# Time-stamp: <2019-08-09 14:19:31 taoliu>
+# Time-stamp: <2020-11-24 17:51:32 Tao Liu>
 
 import unittest
 
-from MACS3.IO.PairedEndTrack import *
+from MACS3.Data.PairedEndTrack import *
 
 class Test_PETrackI(unittest.TestCase):
 

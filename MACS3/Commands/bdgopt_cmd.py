@@ -1,4 +1,4 @@
-# Time-stamp: <2020-02-26 17:21:19 taoliu>
+# Time-stamp: <2020-11-24 16:46:33 Tao Liu>
 
 """Description: Modify bedGraph file
 
@@ -13,8 +13,9 @@ the distribution).
 import sys
 import os
 import logging
+
 from MACS3.IO import BedGraphIO
-from MACS3.OptValidator import opt_validate_bdgopt as opt_validate
+from MACS3.Utilities.OptValidator import opt_validate_bdgopt
 
 # ------------------------------------
 # constants
@@ -41,7 +42,7 @@ info    = logging.info
 # Main function
 # ------------------------------------
 def run( options ):
-    options = opt_validate( options )
+    options = opt_validate_bdgopt( options )
     info("Read and build bedGraph...")
     bio = BedGraphIO.bedGraphIO(options.ifile)
     btrack = bio.build_bdgtrack(baseline_value=0)

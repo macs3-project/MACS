@@ -1,4 +1,4 @@
-# Time-stamp: <2019-09-25 10:03:13 taoliu>
+# Time-stamp: <2020-11-24 17:01:10 Tao Liu>
 
 """Description: refine peak summits
 
@@ -19,12 +19,11 @@ from collections import Counter
 # ------------------------------------
 # own python modules
 # ------------------------------------
-from MACS3.OptValidator import opt_validate_refinepeak as opt_validate
-from MACS3.Prob import binomial_cdf_inv
+from MACS3.Utilities.Constants import *
+from MACS3.Utilities.OptValidator import opt_validate_refinepeak
+from MACS3.Data.Prob import binomial_cdf_inv
 from MACS3.IO.BedGraphIO import bedGraphIO,genericBedIO
 from MACS3.IO.PeakIO import PeakIO
-from MACS3.Constants import *
-
 
 # ------------------------------------
 # Main function
@@ -34,7 +33,7 @@ def run( o_options ):
 
     """
     # Parse options...
-    options = opt_validate( o_options )
+    options = opt_validate_refinepeak( o_options )
     # end of parsing commandline options
     info = options.info
     warn = options.warn
@@ -96,66 +95,6 @@ def find_summit(chrom, plus, minus, peak_start, peak_end, name = b"peak", window
         return (chrom, wtd_max_pos, wtd_max_pos+1, name+b"_R" , wtd_max_val) # 'R'efined
     else:
         return (chrom, wtd_max_pos, wtd_max_pos+1, name+b"_F" , wtd_max_val) # 'F'ailed
-
-    #return "{}\t{}\t{}\tRefinePeak_summit\t{:.2f}\n".format(chrom,
-    #                                                        wtd_max_pos,
-    #                                                        wtd_max_pos+1,
-    #                                                        wtd_max_val,)
-
-
-
-# def find_summit(bed_file, sam_file, window_size, output_file):
-#     def count_by_strand(ialign):
-#         pred = lambda x:x.is_reverse
-#         watson_5_end = lambda x:x.pos
-#         crick_5_end = lambda x:x.aend
-#         ialign1, ialign2 = tee(ialign)
-
-#         return (Counter(map(watson_5_end,
-#                             ifilterfalse(pred, ialign1))),
-#                 Counter(map(crick_5_end,
-#                             ifilter(pred, ialign2))))
-
-#     left_sum = lambda strand, pos, width = window_size: sum([strand[x] for x in strand if x <= pos and x >= pos - width])
-#     right_sum = lambda strand, pos, width = window_size: sum([strand[x] for x in strand if x >= pos and x <= pos + width])
-#     left_forward = lambda strand, pos: strand.get(pos,0) - strand.get(pos-window_size, 0)
-#     right_forward = lambda strand, pos: strand.get(pos + window_size, 0) - strand.get(pos, 0)
-#     samfile = pysam.Samfile(sam_file, "rb" )
-
-#     cnt = 0
-#     with open(bed_file) as bfile, open(output_file,"w") as ofile:
-#         for i in bfile:
-#             i = i.split("\t")
-#             chrom = i[0]
-#             peak_start = int(i[1])
-#             peak_end = int(i[2])
-
-#             watson, crick = count_by_strand(samfile.fetch(chrom, peak_start-window_size, peak_end+window_size))
-#             watson_left = left_sum(watson, peak_start)
-#             crick_left = left_sum(crick, peak_start)
-#             watson_right = right_sum(watson, peak_start)
-#             crick_right = right_sum(crick, peak_start)
-
-#             wtd_list = []
-#             for j in range(peak_start, peak_end+1):
-#                 wtd_list.append(2 * sqrt(watson_left * crick_right) - watson_right - crick_left)
-#                 watson_left += left_forward(watson, j)
-#                 watson_right += right_forward(watson, j)
-#                 crick_left += left_forward(crick, j)
-#                 crick_right += right_forward(crick,j)
-
-#             wtd_max_val = max(wtd_list)
-#             wtd_max_pos = wtd_list.index(wtd_max_val) + peak_start
-#             cnt += 1
-
-#             ofile.write("{}\t{}\t{}\tSPP_summit_{}\t{:.2f}\n".format(chrom,
-#                                                                      wtd_max_pos,
-#                                                                      wtd_max_pos+1,
-#                                                                      cnt,
-#                                                                      wtd_max_val,))
-#     samfile.close()
-
-
 
 def load_tag_files_options ( options ):
     """From the options, load alignment tags.

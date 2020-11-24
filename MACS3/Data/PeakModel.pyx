@@ -1,6 +1,6 @@
 # cython: language_level=3
 # cython: profile=True
-# Time-stamp: <2020-11-24 10:40:02 Tao Liu>
+# Time-stamp: <2020-11-24 17:37:21 Tao Liu>
 """Module Description: Build shifting model
 
 This code is free software; you can redistribute it and/or modify it
@@ -8,16 +8,31 @@ under the terms of the BSD License (see the file LICENSE included with
 the distribution).
 """
 
+# ------------------------------------
+# Python modules
+# ------------------------------------
 import sys, time, random
+import array
+
+# ------------------------------------
+# MACS3 modules
+# ------------------------------------
+from MACS3.Utilities.Constants import *
+from MACS3.Data.Pileup import naive_quick_pileup, naive_call_peaks
+
+# ------------------------------------
+# Other modules
+# ------------------------------------
+from cpython cimport bool
+from cpython cimport array
 import numpy as np
 cimport numpy as np
-from cpython cimport array
-import array
-from MACS3.Constants import *
-from MACS3.Pileup import naive_quick_pileup, naive_call_peaks
 
-from cpython cimport bool
+# ------------------------------------
+# C lib
+# ------------------------------------
 from libc.stdint cimport uint32_t, uint64_t, int32_t, int64_t
+
 ctypedef np.float32_t float32_t
 
 class NotEnoughPairsException(Exception):

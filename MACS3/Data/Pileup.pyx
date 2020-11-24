@@ -1,6 +1,6 @@
 # cython: language_level=3
 # cython: profile=True
-# Time-stamp: <2020-11-24 01:12:37 Tao Liu>
+# Time-stamp: <2020-11-24 17:29:32 Tao Liu>
 
 """Module Description: For pileup functions.
 
@@ -12,27 +12,33 @@ the distribution).
 # ------------------------------------
 # python modules
 # ------------------------------------
-from libc.stdlib cimport malloc, free, qsort
+from time import time as ttime
 
-from MACS3.IO.FixWidthTrack import FWTrack
-from MACS3.IO.PairedEndTrack import PETrackI
-from MACS3.IO.BedGraph import bedGraphTrackI
-from MACS3.Constants import *
+# ------------------------------------
+# MACS3 modules
+# ------------------------------------
+from MACS3.Utilities.Constants import *
+from MACS3.Data.FixWidthTrack import FWTrack
+from MACS3.Data.PairedEndTrack import PETrackI
+from MACS3.Data.BedGraph import bedGraphTrackI
+from MACS3.Data.cPosValCalculation cimport single_end_pileup as c_single_end_pileup
+from MACS3.Data.cPosValCalculation cimport write_pv_array_to_bedGraph as c_write_pv_array_to_bedGraph
+from MACS3.Data.cPosValCalculation cimport PosVal
+from MACS3.Data.cPosValCalculation cimport quick_pileup as c_quick_pileup
 
+# ------------------------------------
+# Other modules
+# ------------------------------------
 import numpy as np
 cimport numpy as np
-
 from numpy cimport int32_t, float32_t
-
 from cpython cimport bool
 from cpython cimport PyObject
 
-from MACS3.cPosValCalculation cimport single_end_pileup as c_single_end_pileup
-from MACS3.cPosValCalculation cimport write_pv_array_to_bedGraph as c_write_pv_array_to_bedGraph
-from MACS3.cPosValCalculation cimport PosVal
-from MACS3.cPosValCalculation cimport quick_pileup as c_quick_pileup
-
-from time import time as ttime
+# ------------------------------------
+# C lib
+# ------------------------------------
+from libc.stdlib cimport malloc, free, qsort
 
 # ------------------------------------
 # utility internal functions

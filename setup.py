@@ -46,25 +46,25 @@ def main():
     # I intend to use -Ofast, however if gcc version < 4.6, this option is unavailable so...
     extra_c_args = ["-w","-O3","-ffast-math","-g0"] # for C, -Ofast implies -O3 and -ffast-math
 
-    ext_modules = [ Extension("MACS3.Prob", ["MACS3/Prob.pyx"], libraries=["m"], include_dirs=numpy_include_dir, extra_compile_args=extra_c_args ),
+    ext_modules = [ Extension("MACS3.Data.Prob", ["MACS3/Data/Prob.pyx"], libraries=["m"], include_dirs=numpy_include_dir, extra_compile_args=extra_c_args ),
+                    Extension("MACS3.Data.Pileup", ["MACS3/Data/Pileup.pyx","MACS3/Data/cPosValCalculation.c"], include_dirs=numpy_include_dir, extra_compile_args=extra_c_args ),
+                    Extension("MACS3.Data.PeakModel", ["MACS3/Data/PeakModel.pyx"], include_dirs=numpy_include_dir, extra_compile_args=extra_c_args),
+                    Extension("MACS3.Data.PeakDetect", ["MACS3/Data/PeakDetect.pyx"], extra_compile_args=extra_c_args),
+                    Extension("MACS3.Data.Signal", ["MACS3/Data/Signal.pyx"], include_dirs=numpy_include_dir, extra_compile_args=extra_c_args),
+                    Extension("MACS3.Data.FixWidthTrack", ["MACS3/Data/FixWidthTrack.pyx"], include_dirs=numpy_include_dir, extra_compile_args=extra_c_args),
+                    Extension("MACS3.Data.PairedEndTrack", ["MACS3/Data/PairedEndTrack.pyx"], include_dirs=numpy_include_dir, extra_compile_args=extra_c_args),
+                    Extension("MACS3.Data.BedGraph", ["MACS3/Data/BedGraph.pyx"], libraries=["m"], extra_compile_args=extra_c_args),
+                    Extension("MACS3.Data.ScoreTrack", ["MACS3/Data/ScoreTrack.pyx"], include_dirs=numpy_include_dir, extra_compile_args=extra_c_args ),
+                    Extension("MACS3.Data.CallPeakUnit", ["MACS3/Data/CallPeakUnit.pyx"], include_dirs=numpy_include_dir, extra_compile_args=extra_c_args),
                     Extension("MACS3.IO.Parser",["MACS3/IO/Parser.pyx"], include_dirs=numpy_include_dir, extra_compile_args=extra_c_args),
-                    Extension("MACS3.Pileup", ["MACS3/Pileup.pyx","MACS3/cPosValCalculation.c"], include_dirs=numpy_include_dir, extra_compile_args=extra_c_args ),
-                    Extension("MACS3.PeakModel", ["MACS3/PeakModel.pyx"], include_dirs=numpy_include_dir, extra_compile_args=extra_c_args),
-                    Extension("MACS3.PeakDetect", ["MACS3/PeakDetect.pyx"], extra_compile_args=extra_c_args),
-                    Extension("MACS3.Signal", ["MACS3/Signal.pyx"], include_dirs=numpy_include_dir, extra_compile_args=extra_c_args),
                     Extension("MACS3.IO.PeakIO", ["MACS3/IO/PeakIO.pyx"], extra_compile_args=extra_c_args),
-                    Extension("MACS3.IO.BedGraphIO", ["MACS3/IO/BedGraphIO.pyx"], extra_compile_args=extra_c_args),
-                    Extension("MACS3.IO.FixWidthTrack", ["MACS3/IO/FixWidthTrack.pyx"], include_dirs=numpy_include_dir, extra_compile_args=extra_c_args),
-                    Extension("MACS3.IO.PairedEndTrack", ["MACS3/IO/PairedEndTrack.pyx"], include_dirs=numpy_include_dir, extra_compile_args=extra_c_args),
-                    Extension("MACS3.IO.BedGraph", ["MACS3/IO/BedGraph.pyx"], libraries=["m"], extra_compile_args=extra_c_args),
-                    Extension("MACS3.IO.ScoreTrack", ["MACS3/IO/ScoreTrack.pyx"], include_dirs=numpy_include_dir, extra_compile_args=extra_c_args ),
-                    Extension("MACS3.IO.CallPeakUnit", ["MACS3/IO/CallPeakUnit.pyx"], include_dirs=numpy_include_dir, extra_compile_args=extra_c_args),]
+                    Extension("MACS3.IO.BedGraphIO", ["MACS3/IO/BedGraphIO.pyx"], extra_compile_args=extra_c_args), ]
 
     with open("README.md", "r") as fh:
         long_description = fh.read()
 
     setup(name="MACS3",
-          version="3.0.0",
+          version="3.0.0a",
           description="Model Based Analysis for ChIP-Seq data",
           long_description = long_description,
           long_description_content_type="text/markdown",
@@ -72,7 +72,7 @@ def main():
           author_email='vladimir.liu@gmail.com',
           url='http://github.com/taoliu/MACS/',
           package_dir={'MACS3' : 'MACS3'},
-          packages=['MACS3', 'MACS3.IO'],
+          packages=['MACS3', 'MACS3.IO', 'MACS3.Data', 'MACS3.Commands','MACS3.Utilities'],
           package_data={'MACS3':['*.pxd']},
           scripts=['bin/macs3', ],
           classifiers=[

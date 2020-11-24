@@ -1,6 +1,6 @@
 # cython: language_level=3
 # cython: profile=True
-# Time-stamp: <2020-11-16 14:15:35 Tao Liu>
+# Time-stamp: <2020-11-24 17:33:47 Tao Liu>
 
 """Module for Feature IO classes.
 
@@ -12,38 +12,36 @@ the distribution).
 # ------------------------------------
 # python modules
 # ------------------------------------
+from copy import copy
+from functools import reduce
+import logging
+
+# ------------------------------------
+# MACS3 modules
+# ------------------------------------
+from MACS3.Utilities.Constants import BYTE4, FBYTE4, array
+from MACS3.Data.Signal import maxima, enforce_valleys, enforce_peakyness
+from MACS3.Data.Prob import poisson_cdf
+from MACS3.IO.PeakIO import PeakIO, BroadPeakIO, parse_peakname
+
+# ------------------------------------
+# Other modules
+# ------------------------------------
+cimport cython
 import numpy as np
 cimport numpy as np
 from numpy cimport uint8_t, uint16_t, uint32_t, uint64_t, int8_t, int16_t, int32_t, int64_t, float32_t, float64_t
-
-#ctypedef np.float64_t float64_t
-#ctypedef np.float32_t float32_t
-#ctypedef np.int64_t int64_t
-#ctypedef np.int32_t int32_t
-#ctypedef np.uint64_t uint64_t
-#ctypedef np.uint32_t uint32_t
-
-from copy import copy
-from functools import reduce
-
 from cpython cimport bool
 
-from MACS3.Signal import maxima, enforce_valleys, enforce_peakyness
-
-cimport cython
-
+# ------------------------------------
+# C lib
+# ------------------------------------
 from libc.math cimport log10,log, floor, ceil
-
-from MACS3.Constants import BYTE4, FBYTE4, array
-from MACS3.Prob import poisson_cdf
-from MACS3.IO.PeakIO import PeakIO, BroadPeakIO, parse_peakname
-
-import logging
 
 # ------------------------------------
 # constants
 # ------------------------------------
-__version__ = "scoreTrackI $Revision$"
+__version__ = "scoreTrack $Revision$"
 __author__ = "Tao Liu <vladimir.liu@gmail.com>"
 __doc__ = "scoreTrack classes"
 

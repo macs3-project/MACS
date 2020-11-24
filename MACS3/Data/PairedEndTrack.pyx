@@ -1,6 +1,6 @@
 # cython: language_level=3
 # cython: profile=True
-# Time-stamp: <2020-11-23 15:15:59 Tao Liu>
+# Time-stamp: <2020-11-24 17:27:29 Tao Liu>
 
 """Module for filter duplicate tags from paired-end data
 
@@ -9,29 +9,29 @@ under the terms of the BSD License (see the file LICENSE included with
 the distribution).
 """
 
-from MACS3.Constants import *
+# ------------------------------------
+# Python modules
+# ------------------------------------
 import io
 import sys
 from logging import debug, info
+from copy import copy
 
+# ------------------------------------
+# MACS3 modules
+# ------------------------------------
+from MACS3.Utilities.Constants import *
+from MACS3.Data.Pileup import quick_pileup, over_two_pv_array, se_all_in_one_pileup
+
+# ------------------------------------
+# Other modules
+# ------------------------------------
 import numpy as np
 cimport numpy as np
 from numpy cimport uint8_t, uint16_t, uint32_t, uint64_t, int8_t, int16_t, int32_t, int64_t, float32_t, float64_t
-#ctypedef np.float64_t float64_t
-#ctypedef np.float32_t float32_t
-#ctypedef np.int64_t int64_t
-#ctypedef np.int32_t int32_t
-#ctypedef np.uint64_t uint64_t
-#ctypedef np.uint32_t uint32_t
-
-from copy import copy
-
 from cpython cimport bool
 cimport cython
-#from libc.stdint cimport uint32_t, uint64_t, int32_t, int64_t
 
-from MACS3.Constants import *
-from MACS3.Pileup import quick_pileup, over_two_pv_array, se_all_in_one_pileup
 
 cdef INT_MAX = <int32_t>((<uint32_t>(-1))>>1)
 

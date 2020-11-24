@@ -1,4 +1,4 @@
-# Time-stamp: <2019-09-25 10:15:20 taoliu>
+# Time-stamp: <2020-11-24 17:40:03 Tao Liu>
 
 """Module Description
 
@@ -17,9 +17,14 @@ import logging
 from argparse import ArgumentError
 from subprocess import Popen, PIPE
 from math import log
+
+# ------------------------------------
+# MACS3 modules
+# ------------------------------------
 from MACS3.IO.Parser import BEDParser, ELANDResultParser, ELANDMultiParser, \
     ELANDExportParser, SAMParser, BAMParser, BAMPEParser,\
     BEDPEParser, BowtieParser,  guess_parser
+
 # ------------------------------------
 # constants
 # ------------------------------------
@@ -32,7 +37,7 @@ efgsize = {"hs":2.7e9,
 # ------------------------------------
 # Misc functions
 # ------------------------------------
-def opt_validate ( options ):
+def opt_validate_callpeak ( options ):
     """Validate options from a OptParser object.
 
     Ret: Validated options object.
@@ -240,7 +245,7 @@ def opt_validate ( options ):
 
     return options
 
-def diff_opt_validate ( options ):
+def opt_validate_diffpeak ( options ):
     """Validate options from a OptParser object.
 
     Ret: Validated options object.

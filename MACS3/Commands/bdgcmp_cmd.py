@@ -1,4 +1,4 @@
-# Time-stamp: <2019-09-25 10:04:37 taoliu>
+# Time-stamp: <2020-11-24 16:45:30 Tao Liu>
 
 """Description: compare bdg files
 
@@ -12,7 +12,7 @@ import os
 import logging
 
 from MACS3.IO import BedGraphIO
-from MACS3.OptValidator import opt_validate_bdgcmp as opt_validate
+from MACS3.Utilities.OptValidator import opt_validate_bdgcmp
 
 from math import log as mlog
 
@@ -38,7 +38,7 @@ info    = logging.info
 # ------------------------------------
 
 def run( options ):
-    options = opt_validate( options )
+    options = opt_validate_bdgcmp( options )
     scaling_factor = options.sfactor
     pseudo_depth = 1.0/scaling_factor   # not an actual depth, but its reciprocal, a trick to override SPMR while necessary.
 

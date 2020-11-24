@@ -1,6 +1,6 @@
 # cython: language_level=3
 # cython: profile=True
-# Time-stamp: <2019-12-18 16:49:03 taoliu>
+# Time-stamp: <2020-11-24 17:35:01 Tao Liu>
 
 """Module Description: functions to find maxima minima or smooth the
 signal tracks.
@@ -9,13 +9,19 @@ This code is free software; you can redistribute it and/or modify it
 under the terms of the BSD License (see the file LICENSE included with
 the distribution).
 """
+# ------------------------------------
+# Python modules
+# ------------------------------------
+from math import factorial as mathfactorial
+from math import sqrt as mathsqrt
 
+# ------------------------------------
+# Other modules
+# ------------------------------------
 # smoothing function
 import numpy as np
 cimport numpy as np
 from cpython cimport bool
-from math import sqrt as mathsqrt
-from math import factorial as mathfactorial
 
 cpdef np.ndarray[np.int32_t, ndim=1] maxima(np.ndarray[np.float32_t, ndim=1] signal,
                                             int window_size=51):

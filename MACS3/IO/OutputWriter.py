@@ -1,4 +1,4 @@
-# Time-stamp: <2019-09-20 11:59:32 taoliu>
+# Time-stamp: <2020-11-24 17:09:09 Tao Liu>
 
 """Module Description: Functions to write file
 
@@ -13,7 +13,8 @@ the distribution).
 import os
 import sys
 from array import array
-from MACS3.Constants import *
+
+from MACS3.Utilities.Constants import *
 
 # ------------------------------------
 # constants
