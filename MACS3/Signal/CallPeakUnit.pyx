@@ -1,7 +1,7 @@
 # cython: language_level=3
 # cython: profile=True
 # cython: linetrace=True
-# Time-stamp: <2020-11-24 17:16:00 Tao Liu>
+# Time-stamp: <2020-11-25 11:53:54 Tao Liu>
 
 """Module for Calculate Scores.
 
@@ -39,11 +39,11 @@ from libc.math cimport exp,log,log10, M_LN10, log1p, erf, sqrt, floor, ceil
 # ------------------------------------
 # MACS3 modules
 # ------------------------------------
-from MACS3.Data.Signal import maxima, enforce_valleys, enforce_peakyness
+from MACS3.Signal.SignalProcessing import maxima, enforce_valleys, enforce_peakyness
 from MACS3.IO.PeakIO import PeakIO, BroadPeakIO, parse_peakname
-from MACS3.Data.FixWidthTrack import FWTrack
-from MACS3.Data.PairedEndTrack import PETrackI
-from MACS3.Data.Prob import poisson_cdf
+from MACS3.Signal.FixWidthTrack import FWTrack
+from MACS3.Signal.PairedEndTrack import PETrackI
+from MACS3.Signal.Prob import poisson_cdf
 
 # --------------------------------------------
 # cached pscore function and LR_asym functions
@@ -87,10 +87,11 @@ __version__ = "CallPeakUnit $Revision$"
 __author__ = "Tao Liu <vladimir.liu@gmail.com>"
 __doc__ = "CallPeakUnit"
 
+LOG10_E = 0.43429448190325176
+
 # ------------------------------------
 # Misc functions
 # ------------------------------------
-LOG10_E = 0.43429448190325176
 
 cdef void clean_up_ndarray ( np.ndarray x ):
     # clean numpy ndarray in two steps

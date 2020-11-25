@@ -3,7 +3,7 @@
 
 import unittest
 
-from MACS3.Data.PairedEndTrack import *
+from MACS3.Signal.PairedEndTrack import *
 
 class Test_PETrackI(unittest.TestCase):
 

@@ -3,7 +3,7 @@
 
 import unittest
 
-from MACS3.Data.BedGraph import *
+from MACS3.Signal.BedGraph import *
 
 class Test_bedGraphTrackI_add_loc(unittest.TestCase):
 

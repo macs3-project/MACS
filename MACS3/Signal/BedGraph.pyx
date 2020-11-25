@@ -20,9 +20,9 @@ from array import array
 # ------------------------------------
 
 from MACS3.Utilities.Constants import *
-from MACS3.Data.ScoreTrack import scoreTrackII,CombinedTwoTrack
+from MACS3.Signal.ScoreTrack import scoreTrackII,CombinedTwoTrack
 from MACS3.IO.PeakIO import PeakIO, BroadPeakIO
-from MACS3.Data.Prob import chisq_logp_e
+from MACS3.Signal.Prob import chisq_logp_e
 
 # ------------------------------------
 # Other modules

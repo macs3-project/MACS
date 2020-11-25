@@ -21,7 +21,7 @@ from collections import Counter
 # ------------------------------------
 from MACS3.Utilities.Constants import *
 from MACS3.Utilities.OptValidator import opt_validate_refinepeak
-from MACS3.Data.Prob import binomial_cdf_inv
+from MACS3.Signal.Prob import binomial_cdf_inv
 from MACS3.IO.BedGraphIO import bedGraphIO,genericBedIO
 from MACS3.IO.PeakIO import PeakIO
 

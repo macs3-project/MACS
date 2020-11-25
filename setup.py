@@ -46,16 +46,16 @@ def main():
     # I intend to use -Ofast, however if gcc version < 4.6, this option is unavailable so...
     extra_c_args = ["-w","-O3","-ffast-math","-g0"] # for C, -Ofast implies -O3 and -ffast-math
 
-    ext_modules = [ Extension("MACS3.Data.Prob", ["MACS3/Data/Prob.pyx"], libraries=["m"], include_dirs=numpy_include_dir, extra_compile_args=extra_c_args ),
-                    Extension("MACS3.Data.Pileup", ["MACS3/Data/Pileup.pyx","MACS3/Data/cPosValCalculation.c"], include_dirs=numpy_include_dir, extra_compile_args=extra_c_args ),
-                    Extension("MACS3.Data.PeakModel", ["MACS3/Data/PeakModel.pyx"], include_dirs=numpy_include_dir, extra_compile_args=extra_c_args),
-                    Extension("MACS3.Data.PeakDetect", ["MACS3/Data/PeakDetect.pyx"], extra_compile_args=extra_c_args),
-                    Extension("MACS3.Data.Signal", ["MACS3/Data/Signal.pyx"], include_dirs=numpy_include_dir, extra_compile_args=extra_c_args),
-                    Extension("MACS3.Data.FixWidthTrack", ["MACS3/Data/FixWidthTrack.pyx"], include_dirs=numpy_include_dir, extra_compile_args=extra_c_args),
-                    Extension("MACS3.Data.PairedEndTrack", ["MACS3/Data/PairedEndTrack.pyx"], include_dirs=numpy_include_dir, extra_compile_args=extra_c_args),
-                    Extension("MACS3.Data.BedGraph", ["MACS3/Data/BedGraph.pyx"], libraries=["m"], extra_compile_args=extra_c_args),
-                    Extension("MACS3.Data.ScoreTrack", ["MACS3/Data/ScoreTrack.pyx"], include_dirs=numpy_include_dir, extra_compile_args=extra_c_args ),
-                    Extension("MACS3.Data.CallPeakUnit", ["MACS3/Data/CallPeakUnit.pyx"], include_dirs=numpy_include_dir, extra_compile_args=extra_c_args),
+    ext_modules = [ Extension("MACS3.Signal.Prob", ["MACS3/Signal/Prob.pyx"], libraries=["m"], include_dirs=numpy_include_dir, extra_compile_args=extra_c_args ),
+                    Extension("MACS3.Signal.Pileup", ["MACS3/Signal/Pileup.pyx","MACS3/Signal/cPosValCalculation.c"], include_dirs=numpy_include_dir, extra_compile_args=extra_c_args ),
+                    Extension("MACS3.Signal.PeakModel", ["MACS3/Signal/PeakModel.pyx"], include_dirs=numpy_include_dir, extra_compile_args=extra_c_args),
+                    Extension("MACS3.Signal.PeakDetect", ["MACS3/Signal/PeakDetect.pyx"], extra_compile_args=extra_c_args),
+                    Extension("MACS3.Signal.SignalProcessing", ["MACS3/Signal/SignalProcessing.pyx"], include_dirs=numpy_include_dir, extra_compile_args=extra_c_args),
+                    Extension("MACS3.Signal.FixWidthTrack", ["MACS3/Signal/FixWidthTrack.pyx"], include_dirs=numpy_include_dir, extra_compile_args=extra_c_args),
+                    Extension("MACS3.Signal.PairedEndTrack", ["MACS3/Signal/PairedEndTrack.pyx"], include_dirs=numpy_include_dir, extra_compile_args=extra_c_args),
+                    Extension("MACS3.Signal.BedGraph", ["MACS3/Signal/BedGraph.pyx"], libraries=["m"], extra_compile_args=extra_c_args),
+                    Extension("MACS3.Signal.ScoreTrack", ["MACS3/Signal/ScoreTrack.pyx"], include_dirs=numpy_include_dir, extra_compile_args=extra_c_args ),
+                    Extension("MACS3.Signal.CallPeakUnit", ["MACS3/Signal/CallPeakUnit.pyx"], include_dirs=numpy_include_dir, extra_compile_args=extra_c_args),
                     Extension("MACS3.IO.Parser",["MACS3/IO/Parser.pyx"], include_dirs=numpy_include_dir, extra_compile_args=extra_c_args),
                     Extension("MACS3.IO.PeakIO", ["MACS3/IO/PeakIO.pyx"], extra_compile_args=extra_c_args),
                     Extension("MACS3.IO.BedGraphIO", ["MACS3/IO/BedGraphIO.pyx"], extra_compile_args=extra_c_args), ]
@@ -72,7 +72,7 @@ def main():
           author_email='vladimir.liu@gmail.com',
           url='http://github.com/taoliu/MACS/',
           package_dir={'MACS3' : 'MACS3'},
-          packages=['MACS3', 'MACS3.IO', 'MACS3.Data', 'MACS3.Commands','MACS3.Utilities'],
+          packages=['MACS3', 'MACS3.IO', 'MACS3.Signal', 'MACS3.Commands','MACS3.Utilities'],
           package_data={'MACS3':['*.pxd']},
           scripts=['bin/macs3', ],
           classifiers=[

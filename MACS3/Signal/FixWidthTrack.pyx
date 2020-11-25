@@ -23,9 +23,9 @@ from collections import Counter
 # ------------------------------------
 
 from MACS3.Utilities.Constants import *
-from MACS3.Data.Signal import *
+from MACS3.Signal.SignalProcessing import *
 from MACS3.IO.PeakIO import PeakIO
-from MACS3.Data.Pileup import se_all_in_one_pileup, over_two_pv_array
+from MACS3.Signal.Pileup import se_all_in_one_pileup, over_two_pv_array
 
 # ------------------------------------
 # Other modules

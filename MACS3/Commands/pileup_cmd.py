@@ -18,7 +18,7 @@ import logging
 # ------------------------------------
 from MACS3.Utilities.Constants import *
 from MACS3.Utilities.OptValidator import opt_validate_pileup
-from MACS3.Data.Pileup import pileup_and_write_se, pileup_and_write_pe
+from MACS3.Signal.Pileup import pileup_and_write_se, pileup_and_write_pe
 # ------------------------------------
 # Main function
 # ------------------------------------

@@ -13,7 +13,7 @@ import pytest
 
 from math import log10
 import numpy as np
-from MACS3.Data.Signal import maxima, savitzky_golay, savitzky_golay_order2_deriv1
+from MACS3.Signal.SignalProcessing import maxima, savitzky_golay, savitzky_golay_order2_deriv1
 
 # ------------------------------------
 # Main function

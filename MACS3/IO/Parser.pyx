@@ -27,8 +27,8 @@ import sys
 # ------------------------------------
 
 from MACS3.Utilities.Constants import *
-from MACS3.Data.FixWidthTrack import FWTrack
-from MACS3.Data.PairedEndTrack import PETrackI
+from MACS3.Signal.FixWidthTrack import FWTrack
+from MACS3.Signal.PairedEndTrack import PETrackI
 
 # ------------------------------------
 # Other modules

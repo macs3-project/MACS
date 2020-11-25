@@ -9,7 +9,7 @@ the distribution).
 import unittest
 import numpy as np
 from math import log10
-from MACS3.Data.Pileup import *
+from MACS3.Signal.Pileup import *
 
 # ------------------------------------
 # Main function

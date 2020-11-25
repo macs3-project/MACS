@@ -21,7 +21,7 @@ from copy import copy
 # MACS3 modules
 # ------------------------------------
 from MACS3.Utilities.Constants import *
-from MACS3.Data.Pileup import quick_pileup, over_two_pv_array, se_all_in_one_pileup
+from MACS3.Signal.Pileup import quick_pileup, over_two_pv_array, se_all_in_one_pileup
 
 # ------------------------------------
 # Other modules

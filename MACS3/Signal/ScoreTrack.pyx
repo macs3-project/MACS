@@ -20,8 +20,8 @@ import logging
 # MACS3 modules
 # ------------------------------------
 from MACS3.Utilities.Constants import BYTE4, FBYTE4, array
-from MACS3.Data.Signal import maxima, enforce_valleys, enforce_peakyness
-from MACS3.Data.Prob import poisson_cdf
+from MACS3.Signal.SignalProcessing import maxima, enforce_valleys, enforce_peakyness
+from MACS3.Signal.Prob import poisson_cdf
 from MACS3.IO.PeakIO import PeakIO, BroadPeakIO, parse_peakname
 
 # ------------------------------------

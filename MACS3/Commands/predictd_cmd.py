@@ -20,8 +20,8 @@ import logging
 # ------------------------------------
 from MACS3.Utilities.Constants import *
 from MACS3.Utilities.OptValidator import opt_validate_predictd
-from MACS3.Data.PeakModel import PeakModel,NotEnoughPairsException
-from MACS3.Data.Prob import binomial_cdf_inv
+from MACS3.Signal.PeakModel import PeakModel,NotEnoughPairsException
+from MACS3.Signal.Prob import binomial_cdf_inv
 from MACS3.IO.OutputWriter import model2r_script
 # ------------------------------------
 # Main function

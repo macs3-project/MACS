@@ -22,7 +22,7 @@ import gc                               # use garbage collectior
 from MACS3.IO.PeakIO import PeakIO
 from MACS3.IO.BedGraphIO import bedGraphIO
 from MACS3.Utilities.Constants import *
-from MACS3.Data.CallPeakUnit import CallerFromAlignments
+from MACS3.Signal.CallPeakUnit import CallerFromAlignments
 
 cdef bytes subpeak_letters(short i):
     if i < 26:

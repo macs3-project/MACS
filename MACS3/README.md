@@ -27,9 +27,9 @@ The *IO* directory contains Python and Cython source codes for *read* and *write
 3. Parser.pyx
 4. PeakIO.pyx
 
-## Data
+## Signal
 
-The *Data* directory contains Python, Cython and C source codes for data transformation and calculation.
+The *Signal* directory contains Python, Cython and C source codes for data transformation and calculation.
 
 1. BedGraph.pyx
 2. CallPeakUnit.pyx

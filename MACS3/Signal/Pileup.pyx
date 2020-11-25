@@ -18,13 +18,13 @@ from time import time as ttime
 # MACS3 modules
 # ------------------------------------
 from MACS3.Utilities.Constants import *
-from MACS3.Data.FixWidthTrack import FWTrack
-from MACS3.Data.PairedEndTrack import PETrackI
-from MACS3.Data.BedGraph import bedGraphTrackI
-from MACS3.Data.cPosValCalculation cimport single_end_pileup as c_single_end_pileup
-from MACS3.Data.cPosValCalculation cimport write_pv_array_to_bedGraph as c_write_pv_array_to_bedGraph
-from MACS3.Data.cPosValCalculation cimport PosVal
-from MACS3.Data.cPosValCalculation cimport quick_pileup as c_quick_pileup
+from MACS3.Signal.FixWidthTrack import FWTrack
+from MACS3.Signal.PairedEndTrack import PETrackI
+from MACS3.Signal.BedGraph import bedGraphTrackI
+from MACS3.Signal.cPosValCalculation cimport single_end_pileup as c_single_end_pileup
+from MACS3.Signal.cPosValCalculation cimport write_pv_array_to_bedGraph as c_write_pv_array_to_bedGraph
+from MACS3.Signal.cPosValCalculation cimport PosVal
+from MACS3.Signal.cPosValCalculation cimport quick_pileup as c_quick_pileup
 
 # ------------------------------------
 # Other modules
