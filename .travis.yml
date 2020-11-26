@@ -10,7 +10,7 @@ jobs:
       language: shell
       install: |
         docker run --rm --privileged multiarch/qemu-user-static --reset -p yes &&
-          docker build --rm --build-arg BASE_IMAGE="i386/ubuntu:bionic" -t macs -f test/Dockerfile .
+          docker build --rm --build-arg BASE_IMAGE="i386/ubuntu:bionic" -t macs -f test/Dockerfile.i386.py36 .
       script: |
         docker run --rm -t macs bash -cx "pytest --runxfail && cd test && ./cmdlinetest macs3"
     # main tests on amd64, three python versions

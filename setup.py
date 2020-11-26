@@ -76,7 +76,7 @@ def main():
           package_data={'MACS3':['*.pxd']},
           scripts=['bin/macs3', ],
           classifiers=[
-              'Development Status :: 5 - Production/Stable',
+              'Development Status :: 3 - Alpha',
               'Environment :: Console',
               'Intended Audience :: Developers',
               'Intended Audience :: Science/Research',
