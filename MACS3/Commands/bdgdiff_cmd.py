@@ -1,4 +1,4 @@
-# Time-stamp: <2020-11-24 16:45:56 Tao Liu>
+# Time-stamp: <2020-11-26 17:04:26 Tao Liu>
 
 """Description: Naive call differential peaks from 4 bedGraph tracks for scores.
 
@@ -16,7 +16,7 @@ import os
 import logging
 
 from MACS3.IO import BedGraphIO
-from MACS3.Data import ScoreTrack
+from MACS3.Signal import ScoreTrack
 
 # ------------------------------------
 # constants
