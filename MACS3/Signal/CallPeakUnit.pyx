@@ -1,7 +1,7 @@
 # cython: language_level=3
 # cython: profile=True
 # cython: linetrace=True
-# Time-stamp: <2020-11-25 11:53:54 Tao Liu>
+# Time-stamp: <2020-11-26 16:35:14 Tao Liu>
 
 """Module for Calculate Scores.
 
@@ -21,7 +21,6 @@ from time import time as ttime
 import _pickle as cPickle
 from tempfile import mkstemp
 import os
-
 # ------------------------------------
 # Other modules
 # ------------------------------------

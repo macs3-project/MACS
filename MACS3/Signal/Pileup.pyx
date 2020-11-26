@@ -1,6 +1,6 @@
 # cython: language_level=3
 # cython: profile=True
-# Time-stamp: <2020-11-24 17:29:32 Tao Liu>
+# Time-stamp: <2020-11-25 16:00:21 Tao Liu>
 
 """Module Description: For pileup functions.
 
@@ -46,11 +46,6 @@ from libc.stdlib cimport malloc, free, qsort
 cdef inline float mean( float a, float b ):
     return ( a + b ) / 2
 
-cdef class Ends:
-    cdef:
-        np.ndarray startposs
-        np.ndarray endposs
-
 cdef void clean_up_ndarray ( np.ndarray x ):
     """ Clean up numpy array in two steps
     """
@@ -61,64 +56,28 @@ cdef void clean_up_ndarray ( np.ndarray x ):
     x.resize( 0, refcheck=False)
     return
 
-cdef start_and_end_poss ( np.ndarray plus_tags, np.ndarray minus_tags,
-                          long five_shift, long three_shift, int rlength):
-    cdef:
-        long i
-        long lp = plus_tags.shape[0]
-        long lm = minus_tags.shape[0]
-        long l = lp + lm
-
-    start_poss = np.concatenate( ( plus_tags-five_shift, minus_tags-three_shift ) )
-    end_poss   = np.concatenate( ( plus_tags+three_shift, minus_tags+five_shift ) )
-
-    # sort
-    start_poss.sort()
-    end_poss.sort()
-
-    # fix negative coordinations and those extends over end of chromosomes
-    ends = Ends()
-    ends.startposs = fix_coordinates(start_poss, rlength)
-    ends.endposs = fix_coordinates(end_poss, rlength)
-
-    return ends
-
 cdef np.ndarray[np.int32_t, ndim=1] fix_coordinates(np.ndarray[np.int32_t, ndim=1] poss, int rlength):
+    """Fix the coordinates.
+    """
     cdef:
         long i
         int32_t * ptr
 
     ptr = <int32_t *> poss.data
 
+    # fix those negative coordinates
     for i in range( poss.shape[0] ):
         if ptr[i] < 0:
             ptr[i] = 0
         else:
             break
 
+    # fix those over-boundary coordinates
     for i in range( poss.shape[0]-1, -1, -1 ):
         if ptr[i] > rlength:
             ptr[i] = rlength
         else:
             break
-
-    return poss
-
-cdef int * fix_coordinates_2 ( int * poss, int l_of_poss, int rlength) nogil:
-    cdef long i
-
-    for i in range( l_of_poss ):
-        if poss[i] < 0:
-            poss[i] = 0
-        else:
-            break
-
-    for i in range( l_of_poss-1, -1, -1 ):
-        if poss[i] > rlength:
-            poss[i] = rlength
-        else:
-            break
-
     return poss
 
 # ------------------------------------
@@ -328,9 +287,9 @@ cpdef list se_all_in_one_pileup ( np.ndarray[np.int32_t, ndim=1] plus_tags, np.n
     ret_p_ptr = <int32_t *> ret_p.data
     ret_v_ptr = <float32_t *> ret_v.data
 
-    tmp = [ret_p, ret_v] # for (endpos,value)
-    i_s = 0                         # index of start_poss
-    i_e = 0                         # index of end_poss
+    tmp = [ret_p, ret_v]        # for (endpos,value)
+    i_s = 0                     # index of start_poss
+    i_e = 0                     # index of end_poss
     I = 0
 
     pileup = 0

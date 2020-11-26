@@ -1,6 +1,6 @@
 # cython: language_level=3
 # cython: profile=True
-# Time-stamp: <2020-11-24 17:31:16 Tao Liu>
+# Time-stamp: <2020-11-26 16:34:50 Tao Liu>
 
 """Module Description: statistics functions to calculate p-values
 
@@ -15,7 +15,6 @@ the distribution).
 from math import fabs
 from math import log1p #as py_log1p
 from math import sqrt
-
 # ------------------------------------
 # Other modules
 # ------------------------------------
@@ -464,7 +463,11 @@ cdef inline float64_t logspace_add ( float64_t logx, float64_t logy ):
     log(exp(logx)+exp(logy)).
 
     """
-    return max (logx, logy) + log1p (exp (-fabs (logx - logy)))
+    if logx > logy:
+        return logx + log1p( exp ( logy - logx ) )
+    else:
+        return logy + log1p( exp ( logx - logy ) )
+    #return max (logx, logy) + log1p (exp (-fabs (logx - logy)))
 
 cpdef poisson_cdf_inv ( float64_t cdf, float64_t lam, int32_t maximum=1000 ):
     """inverse poisson distribution.
