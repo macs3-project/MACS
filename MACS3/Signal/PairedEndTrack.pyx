@@ -1,6 +1,6 @@
 # cython: language_level=3
 # cython: profile=True
-# Time-stamp: <2020-11-26 15:47:39 Tao Liu>
+# Time-stamp: <2020-11-26 21:11:10 Tao Liu>
 
 """Module for filter duplicate tags from paired-end data
 
@@ -93,7 +93,7 @@ cdef class PETrackI:
             self.__pointer[chromosome] = 1
         else:
             i = self.__pointer[chromosome]
-            if self.__buf_size[chromosome] == self.__pointer[chromosome]:
+            if self.__buf_size[chromosome] == i:
                 self.__buf_size[chromosome] += self.buffer_size
                 self.__locations[chromosome].resize((self.__buf_size[chromosome]), refcheck = False )
             self.__locations[chromosome][ i ] = ( start, end )

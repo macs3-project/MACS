@@ -1,6 +1,6 @@
 # cython: language_level=3
 # cython: profile=True
-# Time-stamp: <2020-11-24 18:00:21 Tao Liu>
+# Time-stamp: <2020-11-26 21:19:54 Tao Liu>
 
 """Module for FWTrack classes.
 
@@ -64,16 +64,12 @@ cdef class FWTrack:
     cdef:
         dict __locations
         dict __pointer
+        dict __buf_size
         bool __sorted
-        dict __dup_locations
-        dict __dup_pointer
-        bool __dup_sorted
         bool __destroyed
-        bool __dup_separated
         dict rlengths
         public int64_t buffer_size
         public int64_t total
-        public uint64_t dup_total
         public object annotation
         public object dups
         public int32_t fw
@@ -86,13 +82,9 @@ cdef class FWTrack:
         self.fw = fw
         self.__locations = {}    # location pairs
         self.__pointer = {}      # location pairs
-        self.__dup_locations = {}    # location pairs
-        self.__dup_pointer = {}      # location pairs
+        self.__buf_size = {}     # location pairs
         self.__sorted = False
-        self.__dup_sorted = False
-        self.__dup_separated = False
         self.total = 0           # total tags
-        self.dup_total = 0           # total tags
         self.annotation = anno   # need to be figured out
         self.rlengths = {}       # lengths of reference sequences, e.g. each chromosome in a genome
         self.buffer_size = buffer_size
@@ -115,16 +107,8 @@ cdef class FWTrack:
                 self.__locations[chromosome][1].resize( 0, refcheck=False )
                 self.__locations[chromosome] = [None, None]
                 self.__locations.pop(chromosome)
-            if chromosome in self.__dup_locations:
-                self.__dup_locations[chromosome][0].resize( self.buffer_size, refcheck=False )
-                self.__dup_locations[chromosome][0].resize( 0, refcheck=False )
-                self.__dup_locations[chromosome][1].resize( self.buffer_size, refcheck=False )
-                self.__dup_locations[chromosome][1].resize( 0, refcheck=False )
-                self.__dup_locations[chromosome] = [None, None]
-                self.__dup_locations.pop(chromosome)
         self.__destroyed = True
         return
-
 
     cpdef void add_loc ( self, bytes chromosome, int32_t fiveendpos, int32_t strand ):
         """Add a location to the list according to the sequence name.
@@ -134,23 +118,26 @@ cdef class FWTrack:
         strand     -- 0: plus, 1: minus
         """
         cdef:
-            int64_t i
+            int32_t i
+            int32_t b
+            np.ndarray arr
 
         if chromosome not in self.__locations:
+            self.__buf_size[chromosome] = [ self.buffer_size, self.buffer_size ]
             self.__locations[chromosome] = [ np.zeros(self.buffer_size, dtype='int32'), np.zeros(self.buffer_size, dtype='int32') ] # [plus,minus strand]
             self.__pointer[chromosome] = [ 0, 0 ]
             self.__locations[chromosome][strand][0] = fiveendpos
             self.__pointer[chromosome][strand] = 1
         else:
             i = self.__pointer[chromosome][strand]
-            if i % self.buffer_size == 0:
-                self.__expand__ ( self.__locations[chromosome][strand] )
-            self.__locations[chromosome][strand][i]= fiveendpos
+            b = self.__buf_size[chromosome][strand]
+            arr = self.__locations[chromosome][strand]
+            if b == i:
+                b += self.buffer_size
+                arr.resize( b, refcheck = False )
+                self.__buf_size[chromosome][strand] = b
+            arr[i]= fiveendpos
             self.__pointer[chromosome][strand] += 1
-        return
-
-    cdef void __expand__ ( self, np.ndarray[np.int32_t, ndim=1] arr ):
-        arr.resize( arr.shape[0] + self.buffer_size, refcheck = False )
         return
 
     cpdef void finalize ( self ):
@@ -242,184 +229,6 @@ cdef class FWTrack:
 
         self.__sorted = True
         return
-
-    @cython.boundscheck(False)
-    cpdef void separate_dups( self, int32_t maxnum = 1 ):
-        """Separate the duplicated reads into a different track
-        stored at self.dup
-        """
-        cdef:
-            int32_t p, m, n, current_loc
-            uint64_t i_old, i_new          # index for old array, and index for new one
-            uint64_t i_dup, size, new_size, dup_size
-            bytes k
-            np.ndarray[np.int32_t, ndim=1] plus, new_plus, dup_plus, minus, new_minus, dup_minus
-            set chrnames
-
-        if not self.__sorted:
-            self.sort()
-
-        self.__dup_pointer = copy(self.__pointer)
-        self.dup_total = 0
-        self.total = 0
-        self.length = 0
-
-        chrnames = self.get_chr_names()
-
-        for k in chrnames:
-            # for each chromosome.
-            # This loop body is too big, I may need to split code later...
-
-            # + strand
-            i_new = 0
-            i_dup = 0
-            plus = self.__locations[k][0]
-            size = plus.shape[0]
-            dup_plus = np.zeros( self.__pointer[k][0] + 1,dtype='int32' )
-            if len(plus) <= 1:
-                new_plus = plus         # do nothing
-            else:
-                new_plus = np.zeros( self.__pointer[k][0] + 1,dtype='int32' )
-                new_plus[ i_new ] = plus[ i_new ] # first item
-                i_new += 1
-                current_loc = plus[0]
-                n = 1
-                for i_old in range( 1, size ):
-                    p = plus[ i_old ]
-                    if p == current_loc:
-                        n += 1
-                    else:
-                        current_loc = p
-                        n = 1
-                    if n > maxnum:
-                        dup_plus [ i_dup ] = p
-                        i_dup += 1
-                    else:
-                        new_plus[ i_new ] = p
-                        i_new += 1
-                new_plus.resize( i_new, refcheck=False )
-                dup_plus.resize( i_dup, refcheck=False )
-                self.total += i_new
-                self.dup_total += i_dup
-                self.__pointer[k][0] = i_new
-                self.__dup_pointer[k][0] = i_dup
-                # free memory?
-                # I know I should shrink it to 0 size directly,
-                # however, on Mac OSX, it seems directly assigning 0
-                # doesn't do a thing.
-                plus.resize( self.buffer_size, refcheck=False )
-                plus.resize( 0, refcheck=False )
-                # hope there would be no mem leak...
-            # - strand
-            i_new = 0
-            i_dup = 0
-            minus = self.__locations[k][1]
-            size = minus.shape[0]
-            dup_minus = np.zeros( self.__pointer[k][1] + 1,dtype='int32' )
-            if len(minus) <= 1:
-                new_minus = minus         # do nothing
-            else:
-                new_minus = np.zeros( self.__pointer[k][1] + 1,dtype='int32' )
-                new_minus[ i_new ] = minus[ i_new ] # first item
-                i_new += 1
-                current_loc = minus[0]
-                n = 1
-                for i_old in range( 1, size ):
-                    p = minus[ i_old ]
-                    if p == current_loc:
-                        n += 1
-                    else:
-                        current_loc = p
-                        n = 1
-                    if n > maxnum:
-                        dup_minus [ i_dup ] = p
-                        i_dup += 1
-                    else:
-                        new_minus[ i_new ] = p
-                        i_new += 1
-                new_minus.resize( i_new , refcheck = False)
-                dup_minus.resize( i_dup , refcheck = False)
-                # shape calls unnecessary
-                self.total +=  i_new
-                self.dup_total +=  i_dup
-                self.__pointer[k][1] = i_new
-                self.__dup_pointer[k][1] = i_dup
-                # free memory ?
-                # I know I should shrink it to 0 size directly,
-                # however, on Mac OSX, it seems directly assigning 0
-                # doesn't do a thing.
-                minus.resize( self.buffer_size, refcheck=False )
-                minus.resize( 0, refcheck=False )
-                # hope there would be no mem leak...
-
-            self.__locations[k]=[new_plus, new_minus]
-            self.__dup_locations[k]=[dup_plus, dup_minus]
-
-        self.__dup_separated = True
-        self.length = self.fw * self.total
-        return
-
-    @cython.boundscheck(False) # do not check that np indices are valid
-    cpdef addback_dups( self ):
-        """Add back the duplicate reads stored in self.__dup_locations to self.__locations
-        """
-        cdef:
-            int32_t p, m, n, current_loc
-            uint64_t i_old, i_new          # index for old array, and index for new one
-            uint64_t i_dup, size, new_size, dup_size
-            bytes k
-            np.ndarray[np.int32_t, ndim=1] plus, new_plus, dup_plus, minus, new_minus, dup_minus
-            set chrnames
-
-        if not self.__sorted:
-            self.sort()
-
-        assert self.__dup_separated == True, "need to run separate_dups first."
-        self.total = 0
-        self.length = 0
-
-        chrnames = self.get_chr_names()
-
-        for k in chrnames:
-            # for each chromosome.
-            # This loop body is too big, I may need to split code later...
-            plus = self.__locations[k][0]
-            dup_plus = self.__dup_locations[k][0]
-            minus = self.__locations[k][1]
-            dup_minus = self.__dup_locations[k][1]
-
-            # concatenate
-            new_plus = np.concatenate((plus, dup_plus))
-            new_minus= np.concatenate((minus, dup_minus))
-
-            # clean old data
-            plus.resize( self.buffer_size, refcheck=False )
-            plus.resize( 0, refcheck=False )
-            dup_plus.resize( self.buffer_size, refcheck=False )
-            dup_plus.resize( 0, refcheck=False )
-            minus.resize( self.buffer_size, refcheck=False )
-            minus.resize( 0, refcheck=False )
-            dup_minus.resize( self.buffer_size, refcheck=False )
-            dup_minus.resize( 0, refcheck=False )
-
-            # sort then assign
-            new_plus.sort()
-            new_minus.sort()
-            self.__locations[k][0] = new_plus
-            self.__locations[k][1] = new_minus
-            self.__dup_locations[k][0] = None
-            self.__dup_locations[k][1] = None
-
-            self.__pointer[k][0] = plus.shape[0]
-            self.__pointer[k][1] = minus.shape[0]
-            self.__dup_pointer[k][0] = 0
-            self.__dup_pointer[k][1] = 0
-            self.total +=  plus.shape[0] + minus.shape[0]
-
-        self.dup_total =  0
-        self.__dup_separated = False
-        self.length = self.fw * self.total
-        return 0
 
     @cython.boundscheck(False) # do not check that np indices are valid
     cpdef uint64_t filter_dup ( self, int32_t maxnum = -1):

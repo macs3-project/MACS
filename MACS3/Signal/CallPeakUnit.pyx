@@ -1,7 +1,7 @@
 # cython: language_level=3
 # cython: profile=True
 # cython: linetrace=True
-# Time-stamp: <2020-11-26 16:35:14 Tao Liu>
+# Time-stamp: <2020-11-26 21:27:26 Tao Liu>
 
 """Module for Calculate Scores.
 
@@ -52,6 +52,8 @@ logLR_dict = dict()
 
 #cdef float32_t get_pscore ( int32_t x, float32_t l ):
 cdef float32_t get_pscore ( tuple x ):
+    """x: ( lambda, observation )
+    """
     cdef:
         float32_t val
     if x in pscore_dict:
