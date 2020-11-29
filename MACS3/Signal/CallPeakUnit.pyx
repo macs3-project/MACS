@@ -1,7 +1,7 @@
 # cython: language_level=3
 # cython: profile=True
 # cython: linetrace=True
-# Time-stamp: <2020-11-26 21:27:26 Tao Liu>
+# Time-stamp: <2020-11-29 11:03:54 Tao Liu>
 
 """Module for Calculate Scores.
 
@@ -47,10 +47,9 @@ from MACS3.Signal.Prob import poisson_cdf
 # --------------------------------------------
 # cached pscore function and LR_asym functions
 # --------------------------------------------
-pscore_dict = dict()
-logLR_dict = dict()
+pscore_dict = {} #dict()          
+logLR_dict = {} #dict()
 
-#cdef float32_t get_pscore ( int32_t x, float32_t l ):
 cdef float32_t get_pscore ( tuple x ):
     """x: ( lambda, observation )
     """
@@ -412,16 +411,8 @@ cdef class CallerFromAlignments:
         self.save_bedGraph = save_bedGraph
         self.save_SPMR = save_SPMR
         self.bedGraph_filename_prefix =  bedGraph_filename_prefix.encode()
-        #tmp_bytes = bedGraph_treat_filename.encode('UTF-8')
-        #print bedGraph_treat_filename, tmp_bytes
         self.bedGraph_treat_filename = bedGraph_treat_filename.encode()
-        #tmp_bytes = bedGraph_control_filename.encode('UTF-8')
-        #print bedGraph_control_filename, tmp_bytes
         self.bedGraph_control_filename = bedGraph_control_filename.encode()
-
-        #print  ">>", self.bedGraph_treat_filename
-        #print  ">>", self.bedGraph_control_filename
-
         if not self.ctrl_d_s or not self.ctrl_scaling_factor_s:
             self.no_lambda_flag = True
         else:
@@ -664,8 +655,6 @@ cdef class CallerFromAlignments:
             float32_t this_v, pre_v, v, q, pre_q
             int64_t N, k, this_l
             float32_t f
-            int64_t nhcal = 0
-            int64_t npcal = 0
             list unique_values
             float64_t t0, t1, t2, t
             int32_t * pos_ptr
@@ -674,7 +663,7 @@ cdef class CallerFromAlignments:
 
         logging.debug ( "Start to calculate pvalue stat..." )
 
-        pvalue_stat = dict()
+        pvalue_stat = {} #dict()
         for i in range( len( self.chromosomes ) ):
             chrom = self.chromosomes[ i ]
             pre_p = 0
@@ -687,7 +676,6 @@ cdef class CallerFromAlignments:
             ctrl_value_ptr = <float32_t *> ctrl_array.data
 
             for j in range(pos_array.shape[0]):
-                #this_v = get_pscore( int(treat_value_ptr[0]), ctrl_value_ptr[0] )
                 this_v = get_pscore( (<int32_t>(treat_value_ptr[0]), ctrl_value_ptr[0] ) )
                 this_l = pos_ptr[0] - pre_p
 
@@ -700,19 +688,12 @@ cdef class CallerFromAlignments:
                 treat_value_ptr += 1
                 ctrl_value_ptr += 1
 
-            nhcal += pos_array.shape[0]
-
-        #logging.debug ( "make pvalue_stat cost %.5f seconds" % t )
-        #logging.debug ( "calculate pvalue/access hash for %d times" % nhcal )
-        #logging.debug ( "access hash for %d times" % nhcal )
-        nhval = 0
-
         N = sum(pvalue_stat.values()) # total length
-        k = 1                           # rank
+        k = 1                         # rank
         f = -log10(N)
         pre_v = -2147483647
         pre_l = 0
-        pre_q = 2147483647              # save the previous q-value
+        pre_q = 2147483647      # save the previous q-value
 
         self.pqtable = {}
         unique_values = sorted(list(pvalue_stat.keys()), reverse=True) #sorted(unique_values,reverse=True)
@@ -720,17 +701,19 @@ cdef class CallerFromAlignments:
             v = unique_values[i]
             l = pvalue_stat[v]
             q = v + (log10(k) + f)
-            q = max(0,min(pre_q,q))           # make q-score monotonic
+            if q > pre_q:
+                q = pre_q
+            if q <= 0:
+                q = 0
+                break
+            #q = max(0,min(pre_q,q))           # make q-score monotonic
             self.pqtable[ v ] = q
-            pre_v = v
             pre_q = q
             k += l
-            nhcal += 1
-
-        logging.debug( "access pq hash for %d times" % nhcal )
-
+        for j in range(i, len(unique_values) ):
+            v = unique_values[ j ]
+            self.pqtable[ v ] = 0
         return
-
 
     cdef void __pre_computes ( self, int32_t max_gap = 50, int32_t min_length = 200 ):
         """After this function is called, self.pqtable and self.pvalue_length is built. All
@@ -746,8 +729,6 @@ cdef class CallerFromAlignments:
             float32_t this_v, pre_v, v, cutoff
             int64_t N, k, this_l
             float32_t f
-            int64_t nhcal = 0
-            int64_t npcal = 0
             list unique_values
             float64_t t0, t1, t
 
@@ -767,7 +748,7 @@ cdef class CallerFromAlignments:
         # tmplist contains a list of log pvalue cutoffs from 0.3 to 10
         tmplist = [round(x,5) for x in sorted( list(np.arange(0.3, 10.0, 0.3)), reverse = True )]
 
-        pvalue_stat = dict()
+        pvalue_stat = {} #dict()
         #print (list(pvalue_stat.keys()))
         #print (list(self.pvalue_length.keys()))
         #print (list(self.pvalue_npeaks.keys()))
@@ -838,10 +819,7 @@ cdef class CallerFromAlignments:
                 pos_array_ptr += 1
                 score_array_ptr += 1
 
-            nhcal += pos_array.shape[0]
-
         #logging.debug ( "make pvalue_stat cost %.5f seconds" % t )
-        #logging.debug ( "calculate pvalue/access hash for %d times" % nhcal )
 
         # add all pvalue cutoffs from cutoff-analysis part. So that we
         # can get the corresponding qvalues for them.
@@ -864,14 +842,19 @@ cdef class CallerFromAlignments:
             v = unique_values[i]
             l = pvalue_stat[v]
             q = v + (log10(k) + f)
-            q = max(0,min(pre_q,q))           # make q-score monotonic
+            if q > pre_q:
+                q = pre_q
+            if q <= 0:
+                q = 0
+                break
+            #q = max(0,min(pre_q,q))           # make q-score monotonic
             self.pqtable[ v ] = q
             pre_v = v
             pre_q = q
             k+=l
-            nhcal += 1
-
-        logging.debug( "access pq hash for %d times" % nhcal )
+        for j in range(i, len(unique_values) ):
+            v = unique_values[ j ]
+            self.pqtable[ v ] = 0
 
         # write pvalue and total length of predicted peaks
         # this is the output from cutoff-analysis

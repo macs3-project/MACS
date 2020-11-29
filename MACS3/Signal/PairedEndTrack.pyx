@@ -1,6 +1,6 @@
 # cython: language_level=3
 # cython: profile=True
-# Time-stamp: <2020-11-26 21:11:10 Tao Liu>
+# Time-stamp: <2020-11-28 17:04:15 Tao Liu>
 
 """Module for filter duplicate tags from paired-end data
 
@@ -237,6 +237,95 @@ cdef class PETrackI:
         pmf = counts.astype('float64') / counts.astype('float64').sum()
         return pmf
 
+    # @cython.boundscheck(False) # do not check that np indices are valid
+    # cpdef void filter_dup ( self, int32_t maxnum=-1):
+    #     """Filter the duplicated reads.
+
+    #     Run it right after you add all data into this object.
+    #     """
+    #     cdef:
+    #         int32_t i_chrom, n, start, end
+    #         int32_t loc_start, loc_end, current_loc_start, current_loc_end
+    #         uint64_t i_old, i_new, size, new_size
+    #         bytes k
+    #         np.ndarray locs
+    #         np.ndarray new_locs
+    #         set chrnames
+    #         np.ndarray selected_idx
+    #         #peLoc current_range, this_range
+
+    #     if maxnum < 0: return # condition to return if not filtering
+
+    #     if not self.__sorted: self.sort()
+
+    #     self.total = 0
+    #     self.length = 0
+    #     self.average_template_length = 0.0
+
+    #     chrnames = self.get_chr_names()
+
+    #     for k in chrnames: # for each chromosome
+    #         locs = self.__locations[k]
+    #         size = locs.shape[0]
+    #         if size == 1:
+    #             # do nothing and continue
+    #             self.total += size
+    #             self.__pointer[k] = size
+    #             self.length += locs[0][1] - locs[0][0]
+    #             continue
+    #         # discard duplicate reads and make a new __locations[k]
+    #         # initialize boolean array as all TRUE, or all being kept
+    #         selected_idx = np.ones( size, dtype=bool)
+    #         # initialize a new `locs`
+    #         new_locs = np.zeros( self.__pointer[k] + 1, dtype=[('l','int32'),('r','int32')]) # note: ['l'] is the leftmost end, ['r'] is the rightmost end of fragment.
+    #         # get the first loc
+    #         #current_loc_start = locs[0][0]
+    #         #current_loc_end = locs[0][1]
+    #         ( current_loc_start, current_loc_end ) = locs[0]
+    #         #new_locs[0][0] = current_loc_start
+    #         #new_locs[0][1] = current_loc_end
+    #         new_locs[0] = ( current_loc_start, current_loc_end )
+    #         self.length += current_loc_end - current_loc_start
+    #         i_new = 1           # index of new_locs
+    #         n = 1               # the number of tags in the current genomic location
+    #         for i_old in range(1, size):
+    #             #loc_start = locs[i_old][0]
+    #             #loc_end = locs[i_old][1]
+    #             ( loc_start, loc_end ) = locs[i_old]
+    #             if loc_start == current_loc_start and loc_end == current_loc_end:
+    #                 # both ends are the same, add 1 to duplicate number n
+    #                 n += 1
+    #             else:
+    #                 # not the same, update currnet_loc, reset n
+    #                 current_loc_start = loc_start
+    #                 current_loc_end = loc_end
+    #                 n = 1
+    #             if n > maxnum:
+    #                 selected_idx[ i_old ] = False
+    #             #if n <= maxnum:
+    #             #    # smaller than maxnum, then add to new_locs,
+    #             #    # otherwise, discard
+    #             #    #new_locs[i_new][0] = loc_start
+    #             #    #new_locs[i_new][1] = loc_end
+    #             #    new_locs[i_new] = (loc_start, loc_end)
+    #             #    self.length += loc_end - loc_start
+    #             #    i_new += 1
+    #         new_locs.resize( i_new, refcheck = False )
+    #         new_size = new_locs.shape[0]
+    #         self.__pointer[k] = new_size
+    #         self.total += new_size
+    #         # free memory?
+    #         # I know I should shrink it to 0 size directly,
+    #         # however, on Mac OSX, it seems directly assigning 0
+    #         # doesn't do a thing.
+    #         locs.resize( self.buffer_size, refcheck=False )
+    #         locs.resize( 0, refcheck=False )
+    #         # hope there would be no mem leak...
+    #         self.__locations[k] = new_locs
+    #     self.average_template_length = self.length / self.total
+    #     return
+
+        
     @cython.boundscheck(False) # do not check that np indices are valid
     cpdef void filter_dup ( self, int32_t maxnum=-1):
         """Filter the duplicated reads.
@@ -246,80 +335,69 @@ cdef class PETrackI:
         cdef:
             int32_t i_chrom, n, start, end
             int32_t loc_start, loc_end, current_loc_start, current_loc_end
-            uint64_t i_old, i_new, size, new_size
+            uint64_t i
             bytes k
             np.ndarray locs
-            np.ndarray new_locs
+            uint64_t locs_size
             set chrnames
-            #peLoc current_range, this_range
+            np.ndarray selected_idx
 
         if maxnum < 0: return # condition to return if not filtering
 
         if not self.__sorted: self.sort()
 
         self.total = 0
-        self.length = 0
+        #self.length = 0
         self.average_template_length = 0.0
-
+        
         chrnames = self.get_chr_names()
 
         for k in chrnames: # for each chromosome
             locs = self.__locations[k]
-            size = locs.shape[0]
-            if size == 1:
+            locs_size = locs.shape[0]
+            if locs_size == 1:
                 # do nothing and continue
-                self.total += size
-                self.__pointer[k] = size
-                self.length += locs[0][1] - locs[0][0]
                 continue
             # discard duplicate reads and make a new __locations[k]
-            # initialize a new `locs`
-            new_locs = np.zeros( self.__pointer[k] + 1, dtype=[('l','int32'),('r','int32')]) # note: ['l'] is the leftmost end, ['r'] is the rightmost end of fragment.
+            # initialize boolean array as all TRUE, or all being kept
+            selected_idx = np.ones( locs_size, dtype=bool)
             # get the first loc
-            #current_loc_start = locs[0][0]
-            #current_loc_end = locs[0][1]
             ( current_loc_start, current_loc_end ) = locs[0]
-            #new_locs[0][0] = current_loc_start
-            #new_locs[0][1] = current_loc_end
-            new_locs[0] = ( current_loc_start, current_loc_end )
-            self.length += current_loc_end - current_loc_start
-            i_new = 1           # index of new_locs
-            n = 1               # the number of tags in the current genomic location
-            for i_old in range(1, size):
-                #loc_start = locs[i_old][0]
-                #loc_end = locs[i_old][1]
-                ( loc_start, loc_end ) = locs[i_old]
-                if loc_start == current_loc_start and loc_end == current_loc_end:
-                    # both ends are the same, add 1 to duplicate number n
-                    n += 1
-                else:
-                    # not the same, update currnet_loc, reset n
+            i = 1 # index of new_locs
+            n = 1 # the number of tags in the current genomic location
+            for i in range(1, locs_size):
+                ( loc_start, loc_end ) = locs[i]
+                if loc_start != current_loc_start or loc_end != current_loc_end:
+                    # not the same, update currnet_loc_start/end/l, reset n
                     current_loc_start = loc_start
                     current_loc_end = loc_end
                     n = 1
-                if n <= maxnum:
-                    # smaller than maxnum, then add to new_locs,
-                    # otherwise, discard
-                    #new_locs[i_new][0] = loc_start
-                    #new_locs[i_new][1] = loc_end
-                    new_locs[i_new] = (loc_start, loc_end)
-                    self.length += loc_end - loc_start
-                    i_new += 1
-            new_locs.resize( i_new, refcheck = False )
-            new_size = new_locs.shape[0]
-            self.__pointer[k] = new_size
-            self.total += new_size
+                    continue
+                else:
+                    # both ends are the same, add 1 to duplicate number n
+                    n += 1
+                    if n > maxnum:
+                        # change the flag to False
+                        selected_idx[ i ] = False
+                        # subtract current_loc_l from self.length
+                        self.length -= current_loc_end - current_loc_start
+            self.__locations[k] = locs[ selected_idx ]
+            self.__pointer[k] = self.__locations[k].shape[0]
+            self.total += self.__locations[k].shape[0]
             # free memory?
             # I know I should shrink it to 0 size directly,
             # however, on Mac OSX, it seems directly assigning 0
             # doesn't do a thing.
-            locs.resize( self.buffer_size, refcheck=False )
-            locs.resize( 0, refcheck=False )
+            selected_idx.resize( self.buffer_size, refcheck=False)
+            selected_idx.resize( 0, refcheck=False)
+            #locs.resize( self.buffer_size, refcheck=False )
+            #locs.resize( 0, refcheck=False )
             # hope there would be no mem leak...
-            self.__locations[k] = new_locs
+            #self.__locations[k] = new_locs
         self.average_template_length = self.length / self.total
         return
 
+    
     cpdef void sample_percent (self, float32_t percent, int32_t seed = -1):
         """Sample the tags for a given percentage.
 

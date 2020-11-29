@@ -1,6 +1,6 @@
 # cython: language_level=3
 # cython: profile=True
-# Time-stamp: <2020-11-25 16:00:21 Tao Liu>
+# Time-stamp: <2020-11-28 17:14:02 Tao Liu>
 
 """Module Description: For pileup functions.
 
@@ -639,13 +639,13 @@ cpdef list over_two_pv_array ( list pv_array1, list pv_array2, func="max" ):
     pre_p = 0                   # remember the previous position in the new bedGraphTrackI object ret
 
     while i1 < l1 and i2 < l2:
+        ret_v_ptr[0] =  f( a1_v_ptr[0], a2_v_ptr[0] )
+        I += 1
         if a1_pos_ptr[0] < a2_pos_ptr[0]:
             # clip a region from pre_p to p1, then set pre_p as p1.
             ret_pos_ptr[0] = a1_pos_ptr[0]
-            ret_v_ptr[0] =  f( a1_v_ptr[0], a2_v_ptr[0] )
             ret_pos_ptr += 1
             ret_v_ptr += 1
-            I += 1
             pre_p = a1_pos_ptr[0]
             # call for the next p1 and v1
             a1_pos_ptr += 1
@@ -654,10 +654,8 @@ cpdef list over_two_pv_array ( list pv_array1, list pv_array2, func="max" ):
         elif a1_pos_ptr[0] > a2_pos_ptr[0]:
             # clip a region from pre_p to p2, then set pre_p as p2.
             ret_pos_ptr[0] = a2_pos_ptr[0]
-            ret_v_ptr[0] =  f( a1_v_ptr[0], a2_v_ptr[0] )
             ret_pos_ptr += 1
             ret_v_ptr += 1
-            I += 1
             pre_p = a2_pos_ptr[0]
             # call for the next p1 and v1
             a2_pos_ptr += 1
@@ -666,10 +664,8 @@ cpdef list over_two_pv_array ( list pv_array1, list pv_array2, func="max" ):
         else:
             # from pre_p to p1 or p2, then set pre_p as p1 or p2.
             ret_pos_ptr[0] = a1_pos_ptr[0]
-            ret_v_ptr[0] =  f( a1_v_ptr[0], a2_v_ptr[0] )
             ret_pos_ptr += 1
             ret_v_ptr += 1
-            I += 1
             pre_p = a1_pos_ptr[0]
             # call for the next p1, v1, p2, v2.
             a1_pos_ptr += 1
