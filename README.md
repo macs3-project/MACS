@@ -28,7 +28,21 @@ applied to any "DNA enrichment assays" if the question to be asked is
 simply: *where we can find significant reads coverage than the random
 background*.
 
-## Recent Changes for MACS (2.2.7.1)
+## Recent Changes for MACS (3.0.0a1)
+
+### 3.0.0a1
+	* Features
+	
+	1) Speed/memory optimization, including using the cykhash to
+    replace python dictionary
+
+	2) Code cleanup
+
+	3) Unit testing
+
+	4) R wrappers for MACS
+
+	5) Multiple processing support
 
 ### 2.2.7.1
 	* hotfix: 
