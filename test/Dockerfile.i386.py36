@@ -23,6 +23,7 @@ ENV PATH "/home/${TEST_USER}/.local/bin:${PATH}"
 RUN python3 --version
 RUN pip3 --version
 
+RUN pip3 install --user cython
 RUN pip3 install --user --upgrade -r requirements.txt
 RUN pip3 install --user .
 
