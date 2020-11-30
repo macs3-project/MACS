@@ -1,6 +1,6 @@
 # cython: language_level=3
 # cython: profile=True
-# Time-stamp: <2020-11-24 17:14:17 Tao Liu>
+# Time-stamp: <2020-11-30 13:49:17 Tao Liu>
 
 """Module for BedGraph data class.
 
@@ -20,7 +20,7 @@ from array import array
 # ------------------------------------
 
 from MACS3.Utilities.Constants import *
-from MACS3.Signal.ScoreTrack import scoreTrackII,CombinedTwoTrack
+from MACS3.Signal.ScoreTrack import ScoreTrackII,CombinedTwoTrack
 from MACS3.IO.PeakIO import PeakIO, BroadPeakIO
 from MACS3.Signal.Prob import chisq_logp_e
 
@@ -915,7 +915,7 @@ cdef class bedGraphTrackI:
 
         return ret
 
-    def make_scoreTrackII_for_macs (self, bdgTrack2, float depth1 = 1.0, float depth2 = 1.0 ):
+    def make_ScoreTrackII_for_macs (self, bdgTrack2, float depth1 = 1.0, float depth2 = 1.0 ):
         """A modified overlie function for MACS v2.
 
         effective_depth_in_million: sequencing depth in million after
@@ -934,7 +934,7 @@ cdef class bedGraphTrackI:
 
         assert isinstance(bdgTrack2,bedGraphTrackI), "bdgTrack2 is not a bedGraphTrackI object"
 
-        ret = scoreTrackII( treat_depth = depth1, ctrl_depth = depth2 )
+        ret = ScoreTrackII( treat_depth = depth1, ctrl_depth = depth2 )
         retadd = ret.add
 
         chr1 = set(self.get_chr_names())
