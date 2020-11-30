@@ -1,7 +1,7 @@
 # cython: language_level=3
 # cython: profile=True
 # cython: linetrace=True
-# Time-stamp: <2020-11-29 11:03:54 Tao Liu>
+# Time-stamp: <2020-11-30 14:18:19 Tao Liu>
 
 """Module for Calculate Scores.
 
@@ -43,33 +43,39 @@ from MACS3.IO.PeakIO import PeakIO, BroadPeakIO, parse_peakname
 from MACS3.Signal.FixWidthTrack import FWTrack
 from MACS3.Signal.PairedEndTrack import PETrackI
 from MACS3.Signal.Prob import poisson_cdf
-
+from cykhash import PyObjectMap, Float32to32Map
 # --------------------------------------------
 # cached pscore function and LR_asym functions
 # --------------------------------------------
-pscore_dict = {} #dict()          
-logLR_dict = {} #dict()
+pscore_dict = PyObjectMap()
+logLR_dict = PyObjectMap()
 
-cdef float32_t get_pscore ( tuple x ):
-    """x: ( lambda, observation )
+cdef float32_t get_pscore ( tuple t ):
+    """t: tuple of ( lambda, observation )
     """
     cdef:
         float32_t val
-    if x in pscore_dict:
-        return pscore_dict [ x ]
+    if t in pscore_dict:
+        return pscore_dict[ t ]
     else:
         # calculate and cache
-        val = -1.0 * poisson_cdf ( x[0], x[1], False, True )
-        pscore_dict[ x ] = val
+        val = -1.0 * poisson_cdf ( t[0], t[1], False, True )
+        pscore_dict[ t ] = val
         return val
 
-cdef float32_t get_logLR_asym ( float32_t x, float32_t y ):
+cdef float32_t get_logLR_asym ( tuple t ):
+    """Calculate log10 Likelihood between H1 ( enriched ) and H0 (
+    chromatin bias ). Set minus sign for depletion.
+    """
     cdef:
         float32_t val
-
-    if ( x, y ) in logLR_dict:
-        return logLR_dict[ ( x, y ) ]
+        float32_t x
+        float32_t y
+    if t in logLR_dict:
+        return logLR_dict[ t ]
     else:
+        x = t[0]
+        y = t[1]
         # calculate and cache
         if x > y:
             val = (x*(log10(x)-log10(y))+y-x)
@@ -77,7 +83,7 @@ cdef float32_t get_logLR_asym ( float32_t x, float32_t y ):
             val = (x*(-log10(x)+log10(y))-y+x)
         else:
             val = 0
-        logLR_dict[ ( x, y ) ] = val
+        logLR_dict[ t ] = val
         return val
 
 # ------------------------------------
@@ -291,7 +297,7 @@ cdef tuple find_optimal_cutoff( list x, list y ):
 # ------------------------------------
 cdef class CallerFromAlignments:
     """A unit to calculate scores and call peaks from alignments --
-    FWTrack or PETrackI objects.
+    FWTrack or PETrack objects.
 
     It will compute for each chromosome separately in order to save
     memory usage.
@@ -317,16 +323,14 @@ cdef class CallerFromAlignments:
         bool no_lambda_flag              # whether ignore local bias, and to use global bias instead
         bool PE_mode                     # whether it's in PE mode, will be detected during initiation
         # temporary data buffer
-        #bytes chrom                        # name of current chromosome
         list chr_pos_treat_ctrl          # temporary [position, treat_pileup, ctrl_pileup] for a given chromosome
         bytes bedGraph_treat_filename
         bytes bedGraph_control_filename
         FILE * bedGraph_treat_f
         FILE * bedGraph_ctrl_f
-        #object bedGraph_treat            # file handler to write ChIP pileup
-        #object bedGraph_ctrl             # file handler to write Control pileup
         # data needed to be pre-computed before peak calling
-        dict pqtable                   # remember pvalue->qvalue convertion
+        #dict pqtable                   # remember pvalue->qvalue convertion
+        object pqtable
         bool pvalue_all_done             # whether the pvalue of whole genome is all calculated. If yes, it's OK to calculate q-value.
 
         dict pvalue_npeaks               # record for each pvalue cutoff, how many peaks can be called
@@ -407,7 +411,7 @@ cdef class CallerFromAlignments:
         self.ctrl_scaling_factor_s= ctrl_scaling_factor_s
         self.end_shift = end_shift
         self.lambda_bg = lambda_bg
-        self.pqtable = None
+        self.pqtable = Float32to32Map( for_int = False )
         self.save_bedGraph = save_bedGraph
         self.save_SPMR = save_SPMR
         self.bedGraph_filename_prefix =  bedGraph_filename_prefix.encode()
@@ -651,12 +655,11 @@ cdef class CallerFromAlignments:
             bytes chrom
             np.ndarray pos_array, treat_array, ctrl_array, score_array
             dict pvalue_stat
-            int64_t n, pre_p, length, j, pre_l, l, i
+            int64_t n, pre_p, length, pre_l, l, i, j
             float32_t this_v, pre_v, v, q, pre_q
             int64_t N, k, this_l
             float32_t f
             list unique_values
-            float64_t t0, t1, t2, t
             int32_t * pos_ptr
             float32_t * treat_value_ptr
             float32_t * ctrl_value_ptr
@@ -678,7 +681,6 @@ cdef class CallerFromAlignments:
             for j in range(pos_array.shape[0]):
                 this_v = get_pscore( (<int32_t>(treat_value_ptr[0]), ctrl_value_ptr[0] ) )
                 this_l = pos_ptr[0] - pre_p
-
                 if this_v in pvalue_stat:
                     pvalue_stat[ this_v ] += this_l
                 else:
@@ -695,8 +697,8 @@ cdef class CallerFromAlignments:
         pre_l = 0
         pre_q = 2147483647      # save the previous q-value
 
-        self.pqtable = {}
-        unique_values = sorted(list(pvalue_stat.keys()), reverse=True) #sorted(unique_values,reverse=True)
+        self.pqtable = Float32to32Map( for_int = False )
+        unique_values = sorted(list(pvalue_stat.keys()), reverse=True) 
         for i in range(len(unique_values)):
             v = unique_values[i]
             l = pvalue_stat[v]
@@ -710,6 +712,7 @@ cdef class CallerFromAlignments:
             self.pqtable[ v ] = q
             pre_q = q
             k += l
+        # bottom rank pscores all have qscores 0
         for j in range(i, len(unique_values) ):
             v = unique_values[ j ]
             self.pqtable[ v ] = 0
@@ -836,7 +839,7 @@ cdef class CallerFromAlignments:
         pre_l = 0
         pre_q = 2147483647              # save the previous q-value
 
-        self.pqtable = {}
+        self.pqtable = Float32to32Map( for_int = False ) #{}
         unique_values = sorted(list(pvalue_stat.keys()), reverse=True) #sorted(unique_values,reverse=True)
         for i in range(len(unique_values)):
             v = unique_values[i]
@@ -895,7 +898,7 @@ cdef class CallerFromAlignments:
         peaks = PeakIO()
 
         # prepare p-q table
-        if not self.pqtable:
+        if len( self.pqtable ) == 0:
             logging.info("#3 Pre-compute pvalue-qvalue table...")
             if cutoff_analysis:
                 logging.info("#3 Cutoff vs peaks called will be analyzed!")
@@ -1293,7 +1296,7 @@ cdef class CallerFromAlignments:
         s_ptr = <float32_t *> s.data
 
         for i in range(array1.shape[0]):
-            s_ptr[0] = get_logLR_asym( a1_ptr[0] + self.pseudocount, a2_ptr[0] + self.pseudocount )
+            s_ptr[0] = get_logLR_asym( (a1_ptr[0] + self.pseudocount, a2_ptr[0] + self.pseudocount ) )
             s_ptr += 1
             a1_ptr += 1
             a2_ptr += 1
@@ -1472,7 +1475,7 @@ cdef class CallerFromAlignments:
         lvl2peaks = PeakIO()
 
         # prepare p-q table
-        if not self.pqtable:
+        if len( self.pqtable ) == 0:
             logging.info("#3 Pre-compute pvalue-qvalue table...")
             if cutoff_analysis:
                 logging.info("#3 Cutoff value vs broad region calls will be analyzed!")

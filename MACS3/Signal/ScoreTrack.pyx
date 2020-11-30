@@ -1,6 +1,6 @@
 # cython: language_level=3
 # cython: profile=True
-# Time-stamp: <2020-11-24 17:33:47 Tao Liu>
+# Time-stamp: <2020-11-30 14:12:23 Tao Liu>
 
 """Module for Feature IO classes.
 
@@ -32,6 +32,7 @@ import numpy as np
 cimport numpy as np
 from numpy cimport uint8_t, uint16_t, uint32_t, uint64_t, int8_t, int16_t, int32_t, int64_t, float32_t, float64_t
 from cpython cimport bool
+from cykhash import PyObjectMap, Float32to32Map
 
 # ------------------------------------
 # C lib
@@ -53,9 +54,9 @@ cdef inline int32_t int_min(int32_t a, int32_t b): return a if a <= b else b
 
 LOG10_E = 0.43429448190325176
 
-pscore_dict = dict()
+pscore_dict = PyObjectMap()
 
-cdef float64_t get_pscore ( int32_t observed, float64_t expectation ):
+cdef float32_t get_pscore ( int32_t observed, float32_t expectation ):
     """Get p-value score from Poisson test. First check existing
     table, if failed, call poisson_cdf function, then store the result
     in table.
@@ -71,9 +72,9 @@ cdef float64_t get_pscore ( int32_t observed, float64_t expectation ):
         pscore_dict[(observed, expectation)] = score
         return score
 
-asym_logLR_dict = dict()
+asym_logLR_dict = PyObjectMap()
 
-cdef float64_t logLR_asym ( float64_t x, float64_t y ):
+cdef float32_t logLR_asym ( float32_t x, float32_t y ):
     """Calculate log10 Likelihood between H1 ( enriched ) and H0 (
     chromatin bias ). Set minus sign for depletion.
 
@@ -81,7 +82,7 @@ cdef float64_t logLR_asym ( float64_t x, float64_t y ):
 
     """
     cdef:
-        float64_t s
+        float32_t s
 
     if (x,y) in asym_logLR_dict:
         return asym_logLR_dict[ ( x, y ) ]
@@ -95,9 +96,9 @@ cdef float64_t logLR_asym ( float64_t x, float64_t y ):
         asym_logLR_dict[ ( x, y ) ] = s
         return s
 
-sym_logLR_dict = dict()
+sym_logLR_dict = PyObjectMap()
 
-cdef float64_t logLR_sym ( float64_t x, float64_t y ):
+cdef float32_t logLR_sym ( float32_t x, float32_t y ):
     """Calculate log10 Likelihood between H1 ( enriched ) and H0 (
     another enriched ). Set minus sign for H0>H1.
 
@@ -105,7 +106,7 @@ cdef float64_t logLR_sym ( float64_t x, float64_t y ):
 
     """
     cdef:
-        float64_t s
+        float32_t s
 
     if (x,y) in sym_logLR_dict:
         return sym_logLR_dict[ ( x, y ) ]
@@ -119,12 +120,12 @@ cdef float64_t logLR_sym ( float64_t x, float64_t y ):
         sym_logLR_dict[ ( x, y ) ] = s
         return s
 
-cdef float64_t get_logFE ( float64_t x, float64_t y ):
+cdef float32_t get_logFE ( float32_t x, float32_t y ):
     """ return 100* log10 fold enrichment with +1 pseudocount.
     """
     return log10( x/y )
 
-cdef float64_t get_subtraction ( float64_t x, float64_t y):
+cdef float32_t get_subtraction ( float32_t x, float32_t y):
     """ return subtraction.
     """
     return x - y
@@ -252,7 +253,7 @@ class CombinedTwoTrack:
             set chr1, chr2, common_chr
             bytes chrom
             int32_t pre_p, p1, p2
-            float64_t v11, v21, v2
+            float32_t v11, v21, v2
 
         #assert isinstance(bdgTrack2,bedGraphTrackI), "bdgTrack2 is not a bedGraphTrackI object"
 
@@ -394,7 +395,7 @@ class CombinedTwoTrack:
         v2add(cur_region[4])
         return ret
 
-cdef class scoreTrackII:
+cdef class ScoreTrackII:
     """Class for scoreGraph type data. Modified from scoreTrackI. The
     difference is that we store a single score data, not
     p/q/loglikelihood altogether. Score (the 4th) column is calculated
@@ -411,13 +412,13 @@ cdef class scoreTrackII:
         dict datalength                 # length of data array of each chromosome
         bool trackline                  # whether trackline should be saved in bedGraph
         bool stderr_on                  # whether to calculate stderr
-        float64_t treat_edm                 # seq depth in million of treatment
-        float64_t ctrl_edm                  # seq depth in million of control
-        char scoring_method              # method for calculating scores.
-        char normalization_method        # scale to control? scale to treatment? both scale to 1million reads?
-        float64_t pseudocount                # the pseudocount used to calcuate logLR, FE or logFE
-        float64_t cutoff
-        dict pvalue_stat                 # save pvalue<->length dictionary
+        float32_t treat_edm             # seq depth in million of treatment
+        float32_t ctrl_edm              # seq depth in million of control
+        char scoring_method             # method for calculating scores.
+        char normalization_method       # scale to control? scale to treatment? both scale to 1million reads?
+        float32_t pseudocount           # the pseudocount used to calcuate logLR, FE or logFE
+        float32_t cutoff
+        dict pvalue_stat                # save pvalue<->length dictionary
 
 
     def __init__ (self, float64_t treat_depth, float64_t ctrl_depth, bool stderr_on = False, float64_t pseudocount = 1.0 ):
@@ -492,7 +493,7 @@ cdef class scoreTrackII:
                                  np.zeros( chrom_max_len, dtype="float32" ) ] # score at each interval, in float32 format
             self.datalength[chrom] = 0
 
-    cpdef add (self, bytes chromosome, int32_t endpos, float64_t chip, float64_t control):
+    cpdef add (self, bytes chromosome, int32_t endpos, float32_t chip, float32_t control):
         """Add a chr-endpos-sample-control block into data
         dictionary.
 
@@ -528,22 +529,6 @@ cdef class scoreTrackII:
             d[2].resize( l, refcheck = False )
             d[3].resize( l, refcheck = False )
         return
-
-    # cpdef sort ( self, int32_t column = 1 ):
-    #     """ Sort data for each chromosome, by certain column.
-
-    #     column: 1: position, 2: sample, 3: control, 4: score
-
-    #     Default: sort by positions.
-    #     """
-    #     cdef:
-    #         str chrom
-
-
-    #     for chrom in self.data.keys():
-    #         d = self.data[chrom]
-    #         d.view('int32,int32,int32,int32').sort(axis=0,order=column-1)
-    #     return
 
     cpdef get_data_by_chr (self, bytes chromosome):
         """Return array of counts by chromosome.
@@ -622,7 +607,7 @@ cdef class scoreTrackII:
                 raise NotImplemented
             self.normalization_method = ord('N')
 
-    cdef normalize ( self, float64_t treat_scale, float64_t control_scale ):
+    cdef normalize ( self, float32_t treat_scale, float32_t control_scale ):
         cdef:
             np.ndarray p, c
             int64_t l, i
@@ -703,9 +688,8 @@ cdef class scoreTrackII:
         """Compute -log_{10}(qvalue)
         """
         cdef:
-            dict pqtable
+            object pqtable
             int64_t i,l,j
-            float64_t k
             bytes chrom
             np.ndarray p, c, v
 
@@ -725,7 +709,7 @@ cdef class scoreTrackII:
         self.scoring_method = ord('q')
         return
 
-    cpdef dict make_pq_table ( self ):
+    cpdef object make_pq_table ( self ):
         """Make pvalue-qvalue table.
 
         Step1: get all pvalue and length of block with this pvalue
@@ -735,47 +719,45 @@ cdef class scoreTrackII:
         Return a dictionary of {-log10pvalue:(-log10qvalue,rank,basepairs)} relationships.
         """
         cdef:
-            int64_t n, pre_p, this_p, length, j, pre_l, l, i
-            float64_t this_v, pre_v, v, q, pre_q
+            int64_t n, pre_p, this_p, length, pre_l, l, i, j
+            float32_t this_v, pre_v, v, q, pre_q # store the p and q scores
             int64_t N, k
-            float64_t f
+            float32_t f
             bytes chrom
             np.ndarray v_chrom, pos_chrom
-            dict pvalue2qvalue
-            dict value_dict
+            object pvalue2qvalue
+            dict pvalue_stat
             list unique_values
 
         assert self.scoring_method == ord('p')
 
-        value_dict = self.pvalue_stat
+        pvalue_stat = self.pvalue_stat
 
-        #for p in sorted(self.pvalue_stat.keys()):
-        #    print p,self.pvalue_stat[p]
-
-        #logging.info("####test#### 2")
-        N = sum(value_dict.values())
-        #for i in range(len(unique_values)):
-            #N += value_dict.get_item(unique_values[i])
+        N = sum(pvalue_stat.values())
         k = 1                           # rank
         f = -log10(N)
         pre_v = -2147483647
         pre_l = 0
         pre_q = 2147483647              # save the previous q-value
 
-        pvalue2qvalue = {}#Float64HashTable()
-        unique_values = sorted(value_dict.keys(), reverse=True) #sorted(unique_values,reverse=True)
+        pvalue2qvalue = Float32to32Map( for_int = False )
+        unique_values = sorted(list(pvalue_stat.keys()), reverse=True)
         for i in range(len(unique_values)):
             v = unique_values[i]
-
-            l = value_dict[v]
+            l = pvalue_stat[v]
             q = v + (log10(k) + f)
-            q = max(0,min(pre_q,q))           # make q-score monotonic
-
+            if q > pre_q:
+                q = pre_q
+            if q <= 0:
+                q = 0
+                break
             pvalue2qvalue[ v ] = q
-
-            pre_v = v
             pre_q = q
             k+=l
+        # bottom rank pscores all have qscores 0
+        for j in range(i, len(unique_values) ):
+            v = unique_values[ j ]
+            pvalue2qvalue[ v ] = 0
         return pvalue2qvalue
 
     cdef compute_likelihood ( self ):
@@ -786,15 +768,15 @@ cdef class scoreTrackII:
             #np.ndarray v, p, c
             int64_t l, i
             bytes chrom
-            float64_t v1, v2
-            float64_t pseudocount
+            float32_t v1, v2
+            float32_t pseudocount
 
         pseudocount = self.pseudocount
 
         for chrom in self.data.keys():
-            p = self.data[chrom][ 1 ].flat.__next__
-            c = self.data[chrom][ 2 ].flat.__next__
-            v = self.data[chrom][ 3 ]
+            p = self.data[chrom][ 1 ].flat.__next__ # pileup in treatment
+            c = self.data[chrom][ 2 ].flat.__next__ # pileup in control
+            v = self.data[chrom][ 3 ]               # score
             l = self.datalength[chrom]
             v1 = 2
             v2 = 1
@@ -814,8 +796,8 @@ cdef class scoreTrackII:
             #np.ndarray v, p, c
             int64_t l, i
             bytes chrom
-            float64_t v1, v2
-            float64_t pseudocount
+            float32_t v1, v2
+            float32_t pseudocount
 
         pseudocount = self.pseudocount
 
@@ -840,7 +822,7 @@ cdef class scoreTrackII:
         cdef:
             np.ndarray p, c, v
             int64_t l, i
-            float64_t pseudocount
+            float32_t pseudocount
 
         pseudocount = self.pseudocount
 
@@ -861,7 +843,7 @@ cdef class scoreTrackII:
         cdef:
             np.ndarray p, c, v
             int64_t l, i
-            float64_t pseudocount
+            float32_t pseudocount
 
         pseudocount = self.pseudocount
 
@@ -894,7 +876,7 @@ cdef class scoreTrackII:
         cdef:
             np.ndarray p, v
             int64_t l, i
-            float64_t scale
+            float32_t scale
         if self.normalization_method == ord('T') or self.normalization_method == ord('N'):
             scale = self.treat_edm
         elif self.normalization_method == ord('C'):
@@ -939,7 +921,7 @@ cdef class scoreTrackII:
         cdef:
             bytes chrom
             int32_t l, pre, i, p
-            float64_t pre_v, v
+            float32_t pre_v, v
             set chrs
             np.ndarray pos, value
 
@@ -973,7 +955,7 @@ cdef class scoreTrackII:
 
         return True
 
-    cpdef call_peaks (self, float64_t cutoff=5.0, int32_t min_length=200, int32_t max_gap=50, bool call_summits=False):
+    cpdef call_peaks (self, float32_t cutoff=5.0, int32_t min_length=200, int32_t max_gap=50, bool call_summits=False):
         """This function try to find regions within which, scores
         are continuously higher than a given cutoff.
 
@@ -1056,7 +1038,7 @@ cdef class scoreTrackII:
         """
         cdef:
             int32_t summit_pos, tstart, tend, tmpindex, summit_index, i, midindex
-            float64_t summit_value, tvalue, tsummitvalue
+            float32_t summit_value, tvalue, tsummitvalue
 
         peak_length = peak_content[ -1 ][ 1 ] - peak_content[ 0 ][ 0 ]
         if peak_length >= min_length: # if the peak is too small, reject it
@@ -1099,11 +1081,11 @@ cdef class scoreTrackII:
 
     cdef bool __close_peak2 (self, list peak_content, peaks, int32_t min_length,
                              bytes chrom, int32_t smoothlen=51,
-                             float64_t min_valley = 0.9):
+                             float32_t min_valley = 0.9):
         cdef:
             int32_t summit_pos, tstart, tend, tmpindex, summit_index, summit_offset
             int32_t start, end, i, j, start_boundary
-            float64_t summit_value, tvalue, tsummitvalue
+            float32_t summit_value, tvalue, tsummitvalue
 #            np.ndarray[np.float32_t, ndim=1] w
             np.ndarray[np.float32_t, ndim=1] peakdata
             np.ndarray[np.int32_t, ndim=1] peakindices, summit_offsets
@@ -1186,7 +1168,7 @@ cdef class scoreTrackII:
             t += self.datalength[chrom]
         return t
 
-    cpdef call_broadpeaks (self, float64_t lvl1_cutoff=5.0, float64_t lvl2_cutoff=1.0, int32_t min_length=200, int32_t lvl1_max_gap=50, int32_t lvl2_max_gap=400):
+    cpdef call_broadpeaks (self, float32_t lvl1_cutoff=5.0, float32_t lvl2_cutoff=1.0, int32_t min_length=200, int32_t lvl1_max_gap=50, int32_t lvl2_max_gap=400):
         """This function try to find enriched regions within which,
         scores are continuously higher than a given cutoff for level
         1, and link them using the gap above level 2 cutoff with a
@@ -1298,14 +1280,14 @@ cdef class TwoConditionScores:
     cdef:
         dict data                       # dictionary for data of each chromosome
         dict datalength                 # length of data array of each chromosome
-        float64_t cond1_factor              # factor to apply to cond1 pileup values
-        float64_t cond2_factor              # factor to apply to cond2 pileup values
-        float64_t pseudocount               # the pseudocount used to calcuate LLR
-        float64_t cutoff
+        float32_t cond1_factor              # factor to apply to cond1 pileup values
+        float32_t cond2_factor              # factor to apply to cond2 pileup values
+        float32_t pseudocount               # the pseudocount used to calcuate LLR
+        float32_t cutoff
         object t1bdg, c1bdg, t2bdg, c2bdg
         dict pvalue_stat1, pvalue_stat2, pvalue_stat3
 
-    def __init__ (self, t1bdg, c1bdg, t2bdg, c2bdg, float64_t cond1_factor = 1.0, float64_t cond2_factor = 1.0, float64_t pseudocount = 0.01, proportion_background_empirical_distribution = 0.99999 ):
+    def __init__ (self, t1bdg, c1bdg, t2bdg, c2bdg, float32_t cond1_factor = 1.0, float32_t cond2_factor = 1.0, float32_t pseudocount = 0.01, proportion_background_empirical_distribution = 0.99999 ):
         """
         t1bdg: a bedGraphTrackI object for treat 1
         c1bdg: a bedGraphTrackI object for control 1
@@ -1342,7 +1324,7 @@ cdef class TwoConditionScores:
 
         #self.empirical_distr_llr = [] # save all values in histogram
 
-    cpdef set_pseudocount( self, float64_t pseudocount ):
+    cpdef set_pseudocount( self, float32_t pseudocount ):
         self.pseudocount = pseudocount
 
     cpdef build ( self ):
@@ -1448,7 +1430,7 @@ cdef class TwoConditionScores:
                                  np.zeros( chrom_max_len, dtype="float32" )] # LLR t1 vs t2
             self.datalength[chrom] = 0
 
-    cdef add (self, bytes chromosome, int32_t endpos, float64_t t1, float64_t c1, float64_t t2, float64_t c2):
+    cdef add (self, bytes chromosome, int32_t endpos, float32_t t1, float32_t c1, float32_t t2, float32_t c2):
         """Take chr-endpos-sample1-control1-sample2-control2 and
         compute logLR for t1 vs c1, t2 vs c2, and t1 vs t2, then save
         values.
@@ -1520,7 +1502,7 @@ cdef class TwoConditionScores:
         cdef:
             bytes chrom
             int32_t l, pre, i, p
-            float64_t pre_v, v
+            float32_t pre_v, v
             np.ndarray pos, value
 
         assert column in range( 1, 4 ), "column should be between 1, 2 or 3."
@@ -1566,7 +1548,7 @@ cdef class TwoConditionScores:
         cdef:
             bytes chrom
             int32_t l, pre, i, p
-            float64_t v1, v2, v3
+            float32_t v1, v2, v3
             np.ndarray pos, value1, value2, value3
 
         write = fhd.write
@@ -1587,7 +1569,7 @@ cdef class TwoConditionScores:
 
         return True
 
-    cpdef tuple call_peaks (self, float64_t cutoff=3, int32_t min_length=200, int32_t max_gap = 100,
+    cpdef tuple call_peaks (self, float32_t cutoff=3, int32_t min_length=200, int32_t max_gap = 100,
                       bool call_summits=False):
         """This function try to find regions within which, scores
         are continuously higher than a given cutoff.
@@ -1697,15 +1679,15 @@ cdef class TwoConditionScores:
 
          return
 
-    cdef float64_t mean_from_peakcontent ( self, list peakcontent ):
+    cdef float32_t mean_from_peakcontent ( self, list peakcontent ):
         """
 
         """
         cdef:
             int32_t tmp_s, tmp_e
             int32_t l
-            float64_t tmp_v, sum_v        #for better precision
-            float64_t r
+            float32_t tmp_v, sum_v        #for better precision
+            float32_t r
             int32_t i
 
         l = 0
@@ -1713,7 +1695,7 @@ cdef class TwoConditionScores:
         for i in range( len(peakcontent) ):
             tmp_s = peakcontent[i][0]
             tmp_e = peakcontent[i][1]
-            tmp_v = <float64_t> peakcontent[i][2]
+            tmp_v = <float32_t> peakcontent[i][2]
             sum_v += tmp_v * ( tmp_e - tmp_s )
             l +=  tmp_e - tmp_s
 

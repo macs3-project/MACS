@@ -15,7 +15,8 @@ from distutils.version import LooseVersion
 import subprocess
 
 numpy_requires = '>=1.17'
-install_requires = [f"numpy>={numpy_requires}",]
+cykhash_requires = '>=1.0.2'
+install_requires = [f"numpy>={numpy_requires}",f"cykhash>={cykhash_requires}"]
 
 def main():
     if float(sys.version[:3])<3.6:

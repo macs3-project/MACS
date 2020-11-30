@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# Time-stamp: <2020-11-24 17:52:24 Tao Liu>
+# Time-stamp: <2020-11-30 14:12:58 Tao Liu>
 
 import io
 import unittest
@@ -111,7 +111,7 @@ chrY	161	210	50	186	20	7.09102	3.5	-1	MACS_peak_2
         return all( [self.assertAlmostEqual(x, y, places=places) for (x, y) in zip( a, b)] )
 
     def test_compute_scores(self):
-        s1 = scoreTrackII( self.treat_edm, self.ctrl_edm )
+        s1 = ScoreTrackII( self.treat_edm, self.ctrl_edm )
         s1.add_chromosome( b"chrY", 5 )
         for a in self.test_regions1:
             s1.add( a[0],a[1],a[2],a[3] )
@@ -143,7 +143,7 @@ chrY	161	210	50	186	20	7.09102	3.5	-1	MACS_peak_2
         self.assertListAlmostEqual( [round(x,2) for x in list(r[3])], self.m_result )
 
     def test_normalize(self):
-        s1 = scoreTrackII( self.treat_edm, self.ctrl_edm )
+        s1 = ScoreTrackII( self.treat_edm, self.ctrl_edm )
         s1.add_chromosome( b"chrY", 5 )
         for a in self.test_regions1:
             s1.add( a[0],a[1],a[2],a[3] )
@@ -165,7 +165,7 @@ chrY	161	210	50	186	20	7.09102	3.5	-1	MACS_peak_2
         assert_array_equal( r, self.norm_N )
 
     def test_writebedgraph ( self ):
-        s1 = scoreTrackII( self.treat_edm, self.ctrl_edm )
+        s1 = ScoreTrackII( self.treat_edm, self.ctrl_edm )
         s1.add_chromosome( b"chrY", 5 )
         for a in self.test_regions1:
             s1.add( a[0],a[1],a[2],a[3] )
@@ -183,7 +183,7 @@ chrY	161	210	50	186	20	7.09102	3.5	-1	MACS_peak_2
         self.assertEqual( strio.getvalue(), self.bdg3 )
 
     def test_callpeak ( self ):
-        s1 = scoreTrackII( self.treat_edm, self.ctrl_edm )
+        s1 = ScoreTrackII( self.treat_edm, self.ctrl_edm )
         s1.add_chromosome( b"chrY", 5 )
         for a in self.test_regions1:
             s1.add( a[0],a[1],a[2],a[3] )

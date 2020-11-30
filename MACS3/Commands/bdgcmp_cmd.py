@@ -1,4 +1,4 @@
-# Time-stamp: <2020-11-24 16:45:30 Tao Liu>
+# Time-stamp: <2020-11-30 13:49:34 Tao Liu>
 
 """Description: compare bdg files
 
@@ -50,8 +50,8 @@ def run( options ):
     cbio = BedGraphIO.bedGraphIO(options.cfile)
     cbtrack = cbio.build_bdgtrack()
 
-    info("Build scoreTrackII...")
-    sbtrack = tbtrack.make_scoreTrackII_for_macs( cbtrack, depth1 = pseudo_depth, depth2 = pseudo_depth )
+    info("Build ScoreTrackII...")
+    sbtrack = tbtrack.make_ScoreTrackII_for_macs( cbtrack, depth1 = pseudo_depth, depth2 = pseudo_depth )
     if abs(scaling_factor-1) > 1e-6:
         # Only for the case while your input is SPMR from MACS3 callpeak; Let's override SPMR.
         info("Values in your input bedGraph files will be multiplied by %f ..." % scaling_factor)
