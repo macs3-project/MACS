@@ -1,7 +1,7 @@
 # cython: language_level=3
 # cython: profile=True
 # cython: linetrace=True
-# Time-stamp: <2020-11-24 17:10:14 Tao Liu>
+# Time-stamp: <2020-11-30 11:32:30 Tao Liu>
 
 """Module for all MACS Parser classes for input.
 
@@ -516,10 +516,6 @@ cdef class BEDParser( GenericParser ):
 
         """
         thisline = thisline.rstrip()
-        #if not thisline \
-        #   or thisline[ :5 ] == b"track" \
-        #   or thisline[ :7 ] == b"browser"\
-        #   or thisline[ 0 ] == b"#":
         if not thisline:
             return 0
 
@@ -533,12 +529,6 @@ cdef class BEDParser( GenericParser ):
             list thisfields
 
         thisline = thisline.rstrip()
-
-        #if not thisline or thisline[ :5 ] == b"track" \
-        #    or thisline[ :7 ] == b"browser" \
-        #    or thisline[ 0 ] == b"#":
-        if not thisline:
-            return ( b"", -1, -1 )
         thisfields = thisline.split( b'\t' )
         chromname = thisfields[ 0 ]
         try:
@@ -602,12 +592,6 @@ cdef class BEDPEParser(GenericParser):
             list thisfields
 
         thisline = thisline.rstrip()
-
-        # skip track/browser/comment lines
-        if not thisline or thisline[ :5 ] == b"track" \
-            or thisline[ :7 ] == b"browser" \
-            or thisline[ 0 ] == b"#":
-             return ( b"", -1, -1 )
 
         # still only support tabular as delimiter.
         thisfields = thisline.split( b'\t' )
@@ -726,7 +710,6 @@ cdef class ELANDResultParser( GenericParser ):
         cdef:
             bytes chromname, strand
             int32_t thistaglength
-        #if thisline.startswith("#") or thisline.startswith("track") or thisline.startswith("browser"): return ("comment line",None,None) # comment line is skipped
         thisline = thisline.rstrip()
         if not thisline: return ( b"", -1, -1 )
 
@@ -812,8 +795,6 @@ cdef class ELANDMultiParser( GenericParser ):
         thisline = thisline.rstrip()
         if not thisline: return ( b"", -1, -1 )
 
-        #if thisline[ 0 ] == "#": return ( "", -1, -1 ) # comment line is skipped
-
         thisfields = thisline.split( b'\t' )
         thistagname = thisfields[ 0 ]        # name of tag
         thistaglength = len( thisfields[ 1 ] ) # length of tag
@@ -884,7 +865,6 @@ cdef class ELANDExportParser( GenericParser ):
             bytes thisname, strand
             int32_t thistaglength
 
-        #if thisline.startswith("#") : return ("comment line",None,None) # comment line is skipped
         thisline = thisline.rstrip()
         if not thisline: return ( b"", -1, -1 )
 
@@ -987,7 +967,6 @@ cdef class SAMParser( GenericParser ):
 
         thisline = thisline.rstrip()
         if not thisline: return ( b"", -1, -1 )
-        if thisline[ 0 ] == b"@": return ( b"", -1, -1 ) # header line started with '@' is skipped
         thisfields = thisline.split( b'\t' )
         thistagname = thisfields[ 0 ]         # name of tag
         thisref = thisfields[ 2 ]
