@@ -1,6 +1,6 @@
 # cython: language_level=3
 # cython: profile=True
-# Time-stamp: <2020-11-24 17:08:51 Tao Liu>
+# Time-stamp: <2020-11-30 16:14:59 Tao Liu>
 
 """Module Description:  IO Module for bedGraph file
 
@@ -14,7 +14,7 @@ the distribution).
 # ------------------------------------
 import io
 
-from MACS3.Signal.BedGraph import bedGraphTrackI,bedRegionTrackI
+from MACS3.Signal.BedGraph import bedGraphTrackI
 
 # ------------------------------------
 # constants
@@ -108,58 +108,4 @@ cdef class bedGraphIO:
 
         bedGraph_file.close()
         return data
-
-cdef class genericBedIO:
-    """File Parser Class for generic bed File with at least column #1,#2,#3,and #5.
-
-    There are two assumptions in my bedGraphTrackI object:
-
-    1. Continuous: the next region should be after the previous one
-    unless they are on different chromosomes;
-
-    2. Non-overlapping: the next region should never have overlaps
-    with preceding region.
-
-    If any of the above two criteria is violated, parsering will
-    fail. You'd better use it to read peak file from MACS. Or sort BED
-    by chromosome and start position.
-    """
-    def __init__ (self,f):
-        """f must be a filename or a file handler.
-
-        """
-        if type(f) == str:
-            self.fhd = open(f,"rb")
-        elif type(f) == io.IOBase:
-            self.fhd = f
-        else:
-            raise Exception("f must be a filename or a file handler.")
-
-    def build_bedtrack (self):
-        """Use this function to return a bedGraphTrackI object.
-
-        baseline_value is the value to fill in the regions not defined
-        in bedGraph. For example, if the bedGraph is like:
-
-        chr1  100 200  1
-        chr1  250 350  2
-
-        Then the region chr1:200..250 should be filled with
-        baseline_value. Default of baseline_value is 0.
-        """
-        cdef str i
-
-        data = bedRegionTrackI() #(baseline_value=baseline_value)
-        add_func = data.safe_add_loc
-        chrom_itemcount = {}
-
-        self.fhd.seek(0)
-
-        for i in self.fhd:
-            fs = i.split()
-            add_func(fs[0],atoi(fs[1]),atoi(fs[2])) #,float(value))
-        self.fhd.seek(0)
-        return data
-
-
 

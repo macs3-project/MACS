@@ -1,4 +1,4 @@
-# Time-stamp: <2020-11-24 17:01:10 Tao Liu>
+# Time-stamp: <2020-11-30 16:14:14 Tao Liu>
 
 """Description: refine peak summits
 
@@ -22,7 +22,6 @@ from collections import Counter
 from MACS3.Utilities.Constants import *
 from MACS3.Utilities.OptValidator import opt_validate_refinepeak
 from MACS3.Signal.Prob import binomial_cdf_inv
-from MACS3.IO.BedGraphIO import bedGraphIO,genericBedIO
 from MACS3.IO.PeakIO import PeakIO
 
 # ------------------------------------

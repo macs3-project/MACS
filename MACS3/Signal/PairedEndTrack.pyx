@@ -1,6 +1,6 @@
 # cython: language_level=3
 # cython: profile=True
-# Time-stamp: <2020-11-28 17:04:15 Tao Liu>
+# Time-stamp: <2020-11-30 11:33:02 Tao Liu>
 
 """Module for filter duplicate tags from paired-end data
 
@@ -38,6 +38,18 @@ cdef INT_MAX = <int32_t>((<uint32_t>(-1))>>1)
 cdef packed struct peLoc:
     int32_t l
     int32_t r
+
+
+cdef class PETrackChromosome:
+    cdef:
+        public np.ndarray locations
+        public uint32_t pointer
+        public uint32_t buffer_size
+        public uint64_t coverage
+        public uint64_t chrlen
+        uint32_t __buffer_increment
+        bool __sorted
+        bool __destroyed
 
 # Let numpy enforce PE-ness using ndarray, gives bonus speedup when sorting
 # PE data doesn't have strandedness
@@ -237,95 +249,6 @@ cdef class PETrackI:
         pmf = counts.astype('float64') / counts.astype('float64').sum()
         return pmf
 
-    # @cython.boundscheck(False) # do not check that np indices are valid
-    # cpdef void filter_dup ( self, int32_t maxnum=-1):
-    #     """Filter the duplicated reads.
-
-    #     Run it right after you add all data into this object.
-    #     """
-    #     cdef:
-    #         int32_t i_chrom, n, start, end
-    #         int32_t loc_start, loc_end, current_loc_start, current_loc_end
-    #         uint64_t i_old, i_new, size, new_size
-    #         bytes k
-    #         np.ndarray locs
-    #         np.ndarray new_locs
-    #         set chrnames
-    #         np.ndarray selected_idx
-    #         #peLoc current_range, this_range
-
-    #     if maxnum < 0: return # condition to return if not filtering
-
-    #     if not self.__sorted: self.sort()
-
-    #     self.total = 0
-    #     self.length = 0
-    #     self.average_template_length = 0.0
-
-    #     chrnames = self.get_chr_names()
-
-    #     for k in chrnames: # for each chromosome
-    #         locs = self.__locations[k]
-    #         size = locs.shape[0]
-    #         if size == 1:
-    #             # do nothing and continue
-    #             self.total += size
-    #             self.__pointer[k] = size
-    #             self.length += locs[0][1] - locs[0][0]
-    #             continue
-    #         # discard duplicate reads and make a new __locations[k]
-    #         # initialize boolean array as all TRUE, or all being kept
-    #         selected_idx = np.ones( size, dtype=bool)
-    #         # initialize a new `locs`
-    #         new_locs = np.zeros( self.__pointer[k] + 1, dtype=[('l','int32'),('r','int32')]) # note: ['l'] is the leftmost end, ['r'] is the rightmost end of fragment.
-    #         # get the first loc
-    #         #current_loc_start = locs[0][0]
-    #         #current_loc_end = locs[0][1]
-    #         ( current_loc_start, current_loc_end ) = locs[0]
-    #         #new_locs[0][0] = current_loc_start
-    #         #new_locs[0][1] = current_loc_end
-    #         new_locs[0] = ( current_loc_start, current_loc_end )
-    #         self.length += current_loc_end - current_loc_start
-    #         i_new = 1           # index of new_locs
-    #         n = 1               # the number of tags in the current genomic location
-    #         for i_old in range(1, size):
-    #             #loc_start = locs[i_old][0]
-    #             #loc_end = locs[i_old][1]
-    #             ( loc_start, loc_end ) = locs[i_old]
-    #             if loc_start == current_loc_start and loc_end == current_loc_end:
-    #                 # both ends are the same, add 1 to duplicate number n
-    #                 n += 1
-    #             else:
-    #                 # not the same, update currnet_loc, reset n
-    #                 current_loc_start = loc_start
-    #                 current_loc_end = loc_end
-    #                 n = 1
-    #             if n > maxnum:
-    #                 selected_idx[ i_old ] = False
-    #             #if n <= maxnum:
-    #             #    # smaller than maxnum, then add to new_locs,
-    #             #    # otherwise, discard
-    #             #    #new_locs[i_new][0] = loc_start
-    #             #    #new_locs[i_new][1] = loc_end
-    #             #    new_locs[i_new] = (loc_start, loc_end)
-    #             #    self.length += loc_end - loc_start
-    #             #    i_new += 1
-    #         new_locs.resize( i_new, refcheck = False )
-    #         new_size = new_locs.shape[0]
-    #         self.__pointer[k] = new_size
-    #         self.total += new_size
-    #         # free memory?
-    #         # I know I should shrink it to 0 size directly,
-    #         # however, on Mac OSX, it seems directly assigning 0
-    #         # doesn't do a thing.
-    #         locs.resize( self.buffer_size, refcheck=False )
-    #         locs.resize( 0, refcheck=False )
-    #         # hope there would be no mem leak...
-    #         self.__locations[k] = new_locs
-    #     self.average_template_length = self.length / self.total
-    #     return
-
-        
     @cython.boundscheck(False) # do not check that np indices are valid
     cpdef void filter_dup ( self, int32_t maxnum=-1):
         """Filter the duplicated reads.
@@ -390,14 +313,9 @@ cdef class PETrackI:
             # doesn't do a thing.
             selected_idx.resize( self.buffer_size, refcheck=False)
             selected_idx.resize( 0, refcheck=False)
-            #locs.resize( self.buffer_size, refcheck=False )
-            #locs.resize( 0, refcheck=False )
-            # hope there would be no mem leak...
-            #self.__locations[k] = new_locs
         self.average_template_length = self.length / self.total
         return
 
-    
     cpdef void sample_percent (self, float32_t percent, int32_t seed = -1):
         """Sample the tags for a given percentage.
 
@@ -468,7 +386,6 @@ cdef class PETrackI:
             for i in range(locs.shape[0]):
                 s, e = locs[ i ]
                 fhd.write("%s\t%d\t%d\n" % (k.decode(), s, e))
-
         return
 
     cpdef list pileup_a_chromosome ( self, bytes chrom, list scale_factor_s, float32_t baseline_value = 0.0 ):
@@ -480,9 +397,6 @@ cdef class PETrackI:
         cdef:
             list tmp_pileup, prev_pileup
             float32_t scale_factor
-
-        #if not self.__sorted:
-        #    self.sort()
 
         prev_pileup = None
 

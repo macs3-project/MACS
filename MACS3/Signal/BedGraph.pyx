@@ -1,6 +1,6 @@
 # cython: language_level=3
 # cython: profile=True
-# Time-stamp: <2020-11-30 13:49:17 Tao Liu>
+# Time-stamp: <2020-11-30 16:17:45 Tao Liu>
 
 """Module for BedGraph data class.
 
@@ -20,7 +20,7 @@ from array import array
 # ------------------------------------
 
 from MACS3.Utilities.Constants import *
-from MACS3.Signal.ScoreTrack import ScoreTrackII,CombinedTwoTrack
+from MACS3.Signal.ScoreTrack import ScoreTrackII
 from MACS3.IO.PeakIO import PeakIO, BroadPeakIO
 from MACS3.Signal.Prob import chisq_logp_e
 
@@ -28,8 +28,10 @@ from MACS3.Signal.Prob import chisq_logp_e
 # Other modules
 # ------------------------------------
 
-import numpy as np
 from cpython cimport bool
+import numpy as np
+cimport numpy as np
+from numpy cimport uint8_t, uint16_t, uint32_t, uint64_t, int8_t, int16_t, int32_t, int64_t, float32_t, float64_t
 
 # ------------------------------------
 # C lib
@@ -48,12 +50,6 @@ __doc__ = "bedGraphTrackI class"
 # Misc functions
 # ------------------------------------
 LOG10_E = 0.43429448190325176
-
-cdef inline float fisher_method_combining_two_log10pvalues ( float p1, float p2 ):
-    return ( p1 + p2 ) - log1p( ( p1 + p2 ) / LOG10_E ) * LOG10_E
-
-cdef inline float mean ( float p1, float p2 ):
-    return ( p1 + p2 ) / 2
 
 # ------------------------------------
 # Classes
@@ -81,11 +77,11 @@ cdef class bedGraphTrackI:
     """
     cdef:
         dict __data
-        double maxvalue
-        double minvalue
-        double baseline_value
+        float32_t maxvalue
+        float32_t minvalue
+        float32_t baseline_value
 
-    def __init__ (self, double baseline_value=0):
+    def __init__ (self, float32_t baseline_value=0):
         """
         baseline_value is the value to fill in the regions not defined
         in bedGraph. For example, if the bedGraph is like:
@@ -106,7 +102,7 @@ cdef class bedGraphTrackI:
         """
         self.__data[chrom] = d
 
-    cpdef add_loc ( self, bytes chromosome, int startpos, int endpos, float value ):
+    cpdef add_loc ( self, bytes chromosome, int startpos, int32_t endpos, float32_t value ):
         """Add a chr-start-end-value block into __data dictionary.
 
         Difference between safe_add_loc: no check, but faster. Save
@@ -114,7 +110,7 @@ cdef class bedGraphTrackI:
         are continuous without gaps.
 
         """
-        cdef float pre_v
+        cdef float32_t pre_v
         # basic assumption, end pos should > start pos
 
         if endpos <= 0:
@@ -166,7 +162,7 @@ cdef class bedGraphTrackI:
                 self.__data.pop(chromosome)
         return True
 
-    def safe_add_loc ( self, bytes chromosome, int startpos, int endpos, double value):
+    def safe_add_loc ( self, bytes chromosome, int32_t startpos, int32_t endpos, float32_t value):
         """Add a chr-start-end-value block into __data dictionary.
 
         """
@@ -245,8 +241,8 @@ cdef class bedGraphTrackI:
         shift will be used to shift the coordinates. default: 0
         """
         cdef:
-            int pre, pos, i
-            double value
+            int32_t pre, pos, i
+            float32_t value
             bytes chrom
             set chrs
 
@@ -268,7 +264,7 @@ cdef class bedGraphTrackI:
                 fhd.write("%s\t%d\t%d\t%.5f\n" % (chrom.decode(),pre,pos,value))
                 pre = pos
 
-    def reset_baseline (self, double baseline_value):
+    def reset_baseline (self, float32_t baseline_value):
         """Reset baseline value to baseline_value.
 
         So any region between self.baseline_value and baseline_value
@@ -284,8 +280,8 @@ cdef class bedGraphTrackI:
 
         """
         cdef:
-            int new_pre_pos, pos, i
-            double new_pre_value, value
+            int32_t new_pre_pos, pos, i
+            float32_t new_pre_value, value
             bytes chrom
             set chrs
 
@@ -305,7 +301,7 @@ cdef class bedGraphTrackI:
             new_pre_pos = new_pos[0]
             new_pre_value = new_value[0]
 
-            for i in xrange(1,len(p)):
+            for i in range(1,len(p)):
                 pos = pnext()
                 value = vnext()
                 if value == new_pre_value:
@@ -319,15 +315,15 @@ cdef class bedGraphTrackI:
             self.__data[chrom] = [new_pos,new_value]
         return True
 
-    def filter_score (self, double cutoff=0):
+    def filter_score (self, float32_t cutoff=0):
         """Filter using a score cutoff. Any region lower than score
         cutoff will be set to self.baseline_value.
 
         Self will be modified.
         """
         cdef:
-            int new_pre_pos, pos, i
-            double new_pre_value, value
+            int32_t new_pre_pos, pos, i
+            float32_t new_pre_value, value
             bytes chrom
             set chrs
 
@@ -343,7 +339,7 @@ cdef class bedGraphTrackI:
             new_pre_pos = 0
             new_pre_value = 0
 
-            for i in xrange(len(p)):
+            for i in range(len(p)):
                 pos = pnext()
                 value = vnext()
 
@@ -370,9 +366,9 @@ cdef class bedGraphTrackI:
 
         """
         cdef:
-            long n_v
-            double sum_v, max_v, min_v, mean_v, variance, tmp, std_v
-            int pre_p, l, i
+            int64_tn_v
+            float32_t sum_v, max_v, min_v, mean_v, variance, tmp, std_v
+            int32_t pre_p, l, i
 
         pre_p = 0
         n_v = 0
@@ -404,7 +400,7 @@ cdef class bedGraphTrackI:
         std_v = sqrt(variance)
         return (sum_v, n_v, max_v, min_v, mean_v, std_v)
 
-    def call_peaks (self, double cutoff=1, double up_limit=1e310, int min_length=200, int max_gap=50,
+    def call_peaks (self, float32_t cutoff=1, float32_t up_limit=1e310, int32_t min_length=200, int32_t max_gap=50,
                     bool call_summits=False):
         """This function try to find regions within which, scores
         are continuously higher than a given cutoff.
@@ -422,8 +418,8 @@ cdef class bedGraphTrackI:
         gap   :  maximum gap to merge nearby peaks, default 50.
         """
         cdef:
-            int peak_length, x, pre_p, p, i, summit, tstart, tend
-            double v, summit_value, tvalue
+            int32_t peak_length, x, pre_p, p, i, summit, tstart, tend
+            float32_t v, summit_value, tvalue
             bytes chrom
             set chrs
 
@@ -479,7 +475,7 @@ cdef class bedGraphTrackI:
             close_peak(peak_content, peaks, min_length, chrom) #, smoothlen=max_gap / 2 )
         return peaks
 
-    def __close_peak( self, peak_content, peaks, int min_length, bytes chrom ):
+    def __close_peak( self, peak_content, peaks, int32_t min_length, bytes chrom ):
 
         peak_length = peak_content[-1][1]-peak_content[0][0]
         if peak_length >= min_length: # if the peak is too small, reject it
@@ -505,8 +501,8 @@ cdef class bedGraphTrackI:
                        )
             return True
 
-    def call_broadpeaks (self, double lvl1_cutoff=500, double lvl2_cutoff=100, int min_length=200,
-                         int lvl1_max_gap=50, int lvl2_max_gap=400):
+    def call_broadpeaks (self, float32_t lvl1_cutoff=500, float32_t lvl2_cutoff=100, int32_t min_length=200,
+                         int32_t lvl1_max_gap=50, int32_t lvl2_max_gap=400):
         """This function try to find enriched regions within which,
         scores are continuously higher than a given cutoff for level
         1, and link them using the gap above level 2 cutoff with a
@@ -523,9 +519,9 @@ cdef class bedGraphTrackI:
         and gapped broad regions in BroadPeakIO.
         """
         cdef bytes chrom
-        cdef int i, j
+        cdef int32_t i, j
         cdef set chrs
-        #cdef int tmp_n
+        #cdef int32_t tmp_n
 
         assert lvl1_cutoff > lvl2_cutoff, "level 1 cutoff should be larger than level 2."
         assert lvl1_max_gap < lvl2_max_gap, "level 2 maximum gap should be larger than level 1."
@@ -572,7 +568,7 @@ cdef class bedGraphTrackI:
 
         """
         cdef:
-            long start, end, blockNum
+            int64_tstart, end, blockNum
             bytes blockSizes, blockStarts, thickStart, thickEnd
 
         start      = lvl2peak["start"]
@@ -619,20 +615,20 @@ cdef class bedGraphTrackI:
         """Return the number of regions in this object.
 
         """
-        cdef long t
+        cdef int64_tt
         t = 0
         for (p,s) in self.__data.values():
             t += len(p)
         return t
 
-    def set_single_value (self, double new_value):
+    def set_single_value (self, float32_t new_value):
         """Change all the values in bedGraph to the same new_value,
         return a new bedGraphTrackI.
 
         """
         cdef:
             bytes chrom
-            int max_p
+            int32_t max_p
 
         ret = bedGraphTrackI()
         chroms = set(self.get_chr_names())
@@ -677,8 +673,8 @@ cdef class bedGraphTrackI:
         Return value is a bedGraphTrackI object.
         """
         cdef:
-            int pre_p, p1, p2
-            double v1, v2
+            int32_t pre_p, p1, p2
+            float32_t v1, v2
             bytes chrom
 
         nr_tracks = len(bdgTracks) + 1  # +1 for self
@@ -748,10 +744,10 @@ cdef class bedGraphTrackI:
         *Two adjacent regions with same value after applying func will
         not be merged.
         """
-        cdef int i
+        cdef int32_t i
 
         for (p,s) in self.__data.values():
-            for i in xrange(len(s)):
+            for i in range(len(s)):
                 s[i] = func(s[i])
         self.maxvalue = func(self.maxvalue)
         self.minvalue = func(self.minvalue)
@@ -768,14 +764,14 @@ cdef class bedGraphTrackI:
             object pos_array, pscore_array
             dict pvalue_stat = {}
             dict pqtable = {}
-            long n, pre_p, this_p, length, j, pre_l, l, i
-            double this_v, pre_v, v, q, pre_q, this_t, this_c
-            long N, k, this_l
-            double f
-            long nhcal = 0
-            long npcal = 0
+            int64_t n, pre_p, this_p, length, j, pre_l, l, i
+            float32_t this_v, pre_v, v, q, pre_q, this_t, this_c
+            int64_t N, k, this_l
+            float32_t f
+            int64_t nhcal = 0
+            int64_t npcal = 0
             list unique_values
-            double t0, t1, t
+            float32_t t0, t1, t
 
         # calculate frequencies of each p-score
         for chrom in self.get_chr_names():
@@ -840,8 +836,8 @@ cdef class bedGraphTrackI:
 
         """
         cdef:
-            int pre_p, p1, p2, i
-            double v1, v2
+            int32_t pre_p, p1, p2, i
+            float32_t v1, v2
             bytes chrom
 
         assert isinstance(bdgTrack2,bedGraphTrackI), "bdgTrack2 is not a bedGraphTrackI object"
@@ -915,7 +911,7 @@ cdef class bedGraphTrackI:
 
         return ret
 
-    def make_ScoreTrackII_for_macs (self, bdgTrack2, float depth1 = 1.0, float depth2 = 1.0 ):
+    def make_ScoreTrackII_for_macs (self, bdgTrack2, float32_t depth1 = 1.0, float32_t depth2 = 1.0 ):
         """A modified overlie function for MACS v2.
 
         effective_depth_in_million: sequencing depth in million after
@@ -925,12 +921,13 @@ cdef class bedGraphTrackI:
                                     should be control sample size in
                                     million. And vice versa.
 
-        Return value is a bedGraphTrackI object.
+        Return value is a ScoreTrackII object.
         """
         cdef:
-            int pre_p, p1, p2
-            double v1, v2
+            int32_t pre_p, p1, p2
+            float32_t v1, v2
             bytes chrom
+            object ret
 
         assert isinstance(bdgTrack2,bedGraphTrackI), "bdgTrack2 is not a bedGraphTrackI object"
 
@@ -995,16 +992,16 @@ cdef class bedGraphTrackI:
         #ret.merge_regions()
         return ret
 
-    cpdef str cutoff_analysis ( self, int max_gap, int min_length, int steps = 100 ):
+    cpdef str cutoff_analysis ( self, int32_t max_gap, int32_t min_length, int32_t steps = 100 ):
         cdef:
             set chrs
             list tmplist, peak_content
             bytes  chrom
             str ret
-            float cutoff
-            long total_l, total_p, i, n, ts, te, lastp, tl, peak_length
+            float32_t cutoff
+            int64_t total_l, total_p, i, n, ts, te, lastp, tl, peak_length
             dict cutoff_npeaks, cutoff_lpeaks
-            float s, midvalue
+            float32_t s, midvalue
 
         chrs = self.get_chr_names()
 
@@ -1071,102 +1068,4 @@ cdef class bedGraphTrackI:
             if cutoff_npeaks[ cutoff ] > 0:
                 ret += "%.2f\t%d\t%d\t%.2f\n" % ( cutoff, cutoff_npeaks[ cutoff ], cutoff_lpeaks[ cutoff ], cutoff_lpeaks[ cutoff ]/cutoff_npeaks[ cutoff ] )
         return ret
-
-def scoreTracktoBedGraph (scoretrack, str colname):
-    """Produce a bedGraphTrackI object with certain column as scores.
-
-    colname: can be 'sample','control','-100logp','-100logq'
-
-    """
-    cdef:
-        int pre, i
-        bytes chrom
-        set chrs
-
-    bdgtrack = bedGraphTrackI( baseline_value = 0 )
-    if colname not in ['sample','control','-100logp','-100logq']:
-        raise Exception("%s not supported!" % colname)
-    if colname in ['-100logp', '-100logq']:
-        flag100 = True              # for pvalue or qvalue, divide them by 100 while writing to bedGraph file
-    else:
-        flag100 = False
-    chrs = scoretrack.get_chr_names()
-    for chrom in chrs:
-        d = scoretrack.data[chrom]
-        l = scoretrack.pointer[chrom]
-        pre = 0
-        pos   = d['pos']
-        if flag100:
-            value = d[colname]/100.0
-        else:
-            value = d[colname]
-        for i in xrange( l ):
-            bdgtrack.add_loc( chrom, pre, pos[i] ,value[i] )
-            pre = pos[i]
-
-    return bdgtrack
-
-class bedRegionTrackI (bedGraphTrackI):
-    """A similar class to bedGraphTrackI, but is designed to save
-    traditional 3-fields BED format data.
-
-    """
-    def __init__ (self):
-        self.__data = {}
-        self.maxvalue = 1
-        self.minvalue = 0
-        self.baseline_value = 0
-
-    def safe_add_loc (self, bytes chromosome, int startpos, int endpos):
-        """Add a chr-start-end-value block into __data dictionary.
-
-        """
-        cdef:
-            int pre_pos
-            double pre_v
-
-        # basic assumption, end pos should > start pos
-        assert endpos > startpos, "endpos %d can't be smaller than start pos %d" % (endpos,startpos)
-
-        if endpos <= 0:
-            return
-        if startpos < 0:
-            startpos = 0
-
-        if chromosome not in self.__data:
-            self.__data[chromosome] = [array(BYTE4,[]),array(FBYTE4,[])] # for (endpos,value)
-            c = self.__data[chromosome]
-            if startpos:
-                # start pos is not 0, then add two blocks, the first
-                # with "baseline_value"; the second with "value"
-                c[0].append(startpos)
-                c[1].append(self.baseline_value)
-            c[0].append(endpos)
-            c[1].append(1)
-        else:
-            c = self.__data[chromosome]
-            # get the preceding region
-            pre_pos = c[0][-1]
-            pre_v   = c[1][-1]
-            # to check 1. continuity; 2. non-overlapping
-            assert pre_pos < endpos , "bedGraph regions are not continuous."
-            assert pre_pos <= startpos , "bedGraph regions have overlappings."
-
-            if startpos != pre_pos:
-                # there is a gap, so fill it with baseline_value
-                c[0].append(startpos)
-                c[1].append(self.baseline_value)
-                # then add this region
-                c[0].append(endpos)
-                c[1].append(1)
-            else:
-                # if this region is next to the previous one.
-                if pre_v == 1:
-                    # if value is the same, simply extend it.
-                    c[0][-1] = endpos
-                else:
-                    # otherwise, add a new region
-                    c[0].append(endpos)
-                    c[1].append(1)
-
 

@@ -1,6 +1,6 @@
 # cython: language_level=3
 # cython: profile=True
-# Time-stamp: <2020-11-30 14:12:23 Tao Liu>
+# Time-stamp: <2020-11-30 16:22:20 Tao Liu>
 
 """Module for Feature IO classes.
 
@@ -133,285 +133,19 @@ cdef float32_t get_subtraction ( float32_t x, float32_t y):
 # ------------------------------------
 # Classes
 # ------------------------------------
-
-class CombinedTwoTrack:
-    """ For differential peak calling.
-
-    """
-    def __init__ (self):
-        """Different with bedGraphTrackI, missing values are simply
-        replaced with 0.
-
-        """
-        self.data = {}
-        self.pointer = {}
-
-    def add_chromosome ( self, bytes chrom, int32_t chrom_max_len ):
-        if chrom not in self.data:
-            self.data[chrom] = np.zeros(chrom_max_len,dtype=[('pos','int32'),
-                                                             ('V1','float32'), # value for the first track
-                                                             ('V2','float32'), # value for the second track
-                                                             ])
-            self.pointer[chrom] = 0
-
-    def add ( self, bytes chromosome, int32_t endpos, float64_t V1, float64_t V2 ):
-        """Add a chr-endpos-sample-control block into data
-        dictionary. At the mean time, calculate pvalues.
-
-        """
-        cdef:
-            list c
-            int32_t i
-
-        c = self.data[chromosome]
-        i = self.pointer[chromosome]
-        # get the preceding region
-        c[i] = (endpos,V1,V2)
-        self.pointer[chromosome] += 1
-
-    def finalize ( self ):
-        cdef bytes chrom
-
-        for chrom in self.data.keys():
-            d = self.data[chrom]
-            l = self.pointer[chrom]
-            d.resize(l,refcheck=False)
-
-    def get_data_by_chr (self, bytes chromosome):
-        """Return array of counts by chromosome.
-
-        The return value is a tuple:
-        ([end pos],[value])
-        """
-        if chromosome in self.data:
-            return self.data[chromosome]
-        else:
-            return None
-
-    def get_chr_names (self):
-        """Return all the chromosome names stored.
-
-        """
-        cdef set l
-
-        l = set(self.data.keys())
-        return l
-
-    def write_bedGraph (self, fhd, str name, str description, str colname):
-        """Write all data to fhd in Wiggle Format.
-
-        fhd: a filehandler to save bedGraph.
-        name/description: the name and description in track line.
-
-        colname: can be 'sample','control','-100logp','-100logq'
-
-        """
-        cdef:
-            bytes chrom
-            set chrs
-            int32_t pre, i, l
-            np.ndarray[np.int32_t, ndim=1] pos
-            np.ndarray[np.float32_t, ndim=1] value
-
-        if colname not in ['V1','V2']:
-            raise Exception("%s not supported!" % colname)
-        chrs = self.get_chr_names()
-        write = fhd.write
-        for chrom in chrs:
-            d = self.data[chrom]
-            l = self.pointer[chrom]
-            pos   = d['pos']
-            value = d[colname]
-            pre = 0
-            for i in range( l ):
-                write("%s\t%d\t%d\t%.5f\n" % (chrom.decode(),pre,pos[i],value[i]))
-                pre = pos[i]
-
-        return True
-
-    def total ( self ):
-        """Return the number of regions in this object.
-
-        """
-        cdef:
-            int64_t t
-            bytes chrom
-
-        t = 0
-        for chrom in self.data.keys():
-            t += self.pointer[chrom]
-        return t
-
-    def extract_value ( self, bdgTrack2 ):
-        """It's like overlie function. THe overlapped regions between
-        bdgTrack2 and self, will be recorded. The values from self in
-        the overlapped regions will be outputed in a single array for
-        follow statistics.
-
-        """
-        cdef:
-            set chr1, chr2, common_chr
-            bytes chrom
-            int32_t pre_p, p1, p2
-            float32_t v11, v21, v2
-
-        #assert isinstance(bdgTrack2,bedGraphTrackI), "bdgTrack2 is not a bedGraphTrackI object"
-
-        ret = [[],array(FBYTE4,[]),array(FBYTE4,[]),array(BYTE4,[])] # region,V1,V1,length
-        radd = ret[0].append
-        v1add = ret[1].append
-        v2add = ret[2].append
-        ladd = ret[3].append
-
-        chr1 = set(self.get_chr_names())
-        chr2 = set(bdgTrack2.get_chr_names())
-        common_chr = chr1.intersection(chr2)
-        for chrom in common_chr:
-            chrom_data = self.get_data_by_chr(chrom) # arrays for position and values
-            p1n = chrom_data['pos'].flat.__next__
-            v11n = chrom_data['V1'].flat.__next__
-            v21n = chrom_data['V2'].flat.__next__
-
-            (p2s,v2s) = bdgTrack2.get_data_by_chr(chrom) # arrays for position and values
-            p2n = iter(p2s).__next__         # assign the next function to a viable to speed up
-            v2n = iter(v2s).__next__
-
-            pre_p = 0                   # remember the previous position in the new bedGraphTrackI object ret
-
-            try:
-                p1 = p1n()
-                v11 = v11n()
-                v21 = v21n()
-
-                p2 = p2n()
-                v2 = v2n()
-
-                while True:
-                    if p1 < p2:
-                        # clip a region from pre_p to p1, then set pre_p as p1.
-                        if v2>0:
-                            radd(b"%s\.%d\.%d" % (chrom,pre_p,p1))
-                            v1add(v11)
-                            v2add(v21)
-                            ladd(p1-pre_p)
-                        pre_p = p1
-                        # call for the next p1 and v1
-                        p1 = p1n()
-                        v11 = v11n()
-                        v21 = v21n()
-                    elif p2 < p1:
-                        # clip a region from pre_p to p2, then set pre_p as p2.
-                        if v2>0:
-                            radd(b"%s\.%d\.%d" % (chrom,pre_p,p2))
-                            v1add(v11)
-                            v2add(v21)
-                            ladd(p2-pre_p)
-                        pre_p = p2
-                        # call for the next p2 and v2
-                        p2 = p2n()
-                        v2 = v2n()
-                    elif p1 == p2:
-                        # from pre_p to p1 or p2, then set pre_p as p1 or p2.
-                        if v2>0:
-                            radd(b"%s\.%d\.%d" % (chrom,pre_p,p1))
-                            v1add(v11)
-                            v2add(v21)
-                            ladd(p1-pre_p)
-                        pre_p = p1
-                        # call for the next p1, v1, p2, v2.
-                        p1 = p1n()
-                        v11 = v11n()
-                        v21 = v21n()
-                        p2 = p2n()
-                        v2 = v2n()
-            except StopIteration:
-                # meet the end of either bedGraphTrackI, simply exit
-                pass
-
-        # convert to np.array
-        #ret = np.array([ret[0],ret[1],ret[2]]).transpose()
-        #ret = ret[ret[0,0,:].argsort()]
-        return ret
-
-    def extract_average (self, bdgTrack2):
-        cdef:
-            int32_t i, l
-            bytes chrom, start, end
-
-        (rarray,v1array,v2array,larray)  = self.extract_value(bdgTrack2)
-        ret = [[],array(FBYTE4,[]),array(FBYTE4,[])] # region,V1,V1
-        radd = ret[0].append
-        v1add = ret[1].append
-        v2add = ret[2].append
-        cur_region = [None,None,None,None,None]      # chrom, start, end, s1, s2
-        for i in range(len(rarray)):
-            (chrom,start,end) = rarray[i].split(b'.')
-            if chrom == cur_region[0] and start == cur_region[2]:
-                cur_region[2] =  end
-                cur_region[3] += v1array[i]*larray[i]
-                cur_region[4] += v2array[i]*larray[i]
-            else:
-                if cur_region[0]:
-                    l = int(cur_region[2])-int(cur_region[1])
-                    radd(b"%s\.%d\.%d" % (cur_region[0],cur_region[1],cur_region[2]))
-                    v1add(cur_region[3]/<float32_t>(l))
-                    v2add(cur_region[4]/<float32_t>(l))
-                cur_region = [chrom, start, end, v1array[i]*larray[i], v2array[i]*larray[i]]
-
-        radd(b"%s\.%d\.%d" % (cur_region[0],cur_region[1],cur_region[2]))
-        v1add(cur_region[3]/<float32_t>(l))
-        v2add(cur_region[4]/<float32_t>(l))
-        return ret
-
-    def extract_sum (self, bdgTrack2):
-        """Get sum values in each region defined in bdgTrack2.
-
-        """
-        cdef:
-            int32_t i
-            bytes chrom, start, end
-
-        (rarray,v1array,v2array,larray)  = self.extract_value(bdgTrack2)
-        ret = [[],array(FBYTE4,[]),array(FBYTE4,[])] # region,V1,V1
-        radd = ret[0].append
-        v1add = ret[1].append
-        v2add = ret[2].append
-        cur_region = [None,None,None,None,None]      # chrom, start, end, s1, s2
-        for i in range(len(rarray)):
-            (chrom,start,end) = rarray[i].split(b'.')
-            if chrom == cur_region[0] and start == cur_region[2]:
-                cur_region[2] =  end
-                cur_region[3] += v1array[i]*larray[i]
-                cur_region[4] += v2array[i]*larray[i]
-            else:
-                if cur_region[0]:
-                    radd(b"%s\.%d\.%d" % (cur_region[0],cur_region[1],cur_region[2]))
-                    v1add(cur_region[3])
-                    v2add(cur_region[4])
-                cur_region = [chrom, start, end, v1array[i]*larray[i], v2array[i]*larray[i]]
-
-        radd(b"%s\.%d\.%d" % (cur_region[0],cur_region[1],cur_region[2]))
-        v1add(cur_region[3])
-        v2add(cur_region[4])
-        return ret
-
 cdef class ScoreTrackII:
-    """Class for scoreGraph type data. Modified from scoreTrackI. The
+    """Class for a container to keep signals of each scoreGraph type data. Modified from scoreTrackI. The
     difference is that we store a single score data, not
     p/q/loglikelihood altogether. Score (the 4th) column is calculated
-    through calling change_method() function. Individual scores for
-    filling PeakIO object are calculated by prepare_peakIO_scores()
-    function.
+    through calling change_method() function.
 
     I want to save mem and simplify calculation in this new class.
 
     """
     cdef:
         dict data                       # dictionary for data of each chromosome
-        dict data_stderr                # dictionary for data stderr for each chromosome
         dict datalength                 # length of data array of each chromosome
         bool trackline                  # whether trackline should be saved in bedGraph
-        bool stderr_on                  # whether to calculate stderr
         float32_t treat_edm             # seq depth in million of treatment
         float32_t ctrl_edm              # seq depth in million of control
         char scoring_method             # method for calculating scores.
@@ -421,7 +155,7 @@ cdef class ScoreTrackII:
         dict pvalue_stat                # save pvalue<->length dictionary
 
 
-    def __init__ (self, float64_t treat_depth, float64_t ctrl_depth, bool stderr_on = False, float64_t pseudocount = 1.0 ):
+    def __init__ (self, float32_t treat_depth, float32_t ctrl_depth, float32_t pseudocount = 1.0 ):
         """Initialize.
 
         treat_depth and ctrl_depth are effective depth in million:
@@ -471,7 +205,7 @@ cdef class ScoreTrackII:
         self.pseudocount = pseudocount
         self.pvalue_stat = {}
 
-    cpdef set_pseudocount( self, float64_t pseudocount ):
+    cpdef set_pseudocount( self, float32_t pseudocount ):
         self.pseudocount = pseudocount
 
     cpdef enable_trackline( self ):
