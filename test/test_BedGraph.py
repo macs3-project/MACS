@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# Time-stamp: <2020-11-24 17:50:39 Tao Liu>
+# Time-stamp: <2020-12-01 11:28:20 Tao Liu>
 
 import unittest
 
@@ -59,13 +59,13 @@ class Test_bedGraphTrackI_overlie(unittest.TestCase):
         self.bdg2 = bedGraphTrackI()
         self.bdg3 = bedGraphTrackI()
         for a in self.test_regions1:
-            self.bdg1.safe_add_loc(a[0],a[1],a[2],a[3])
+            self.bdg1.add_loc(a[0],a[1],a[2],a[3])
 
         for a in self.test_regions2:
-            self.bdg2.safe_add_loc(a[0],a[1],a[2],a[3])
+            self.bdg2.add_loc(a[0],a[1],a[2],a[3])
 
         for a in self.test_regions3:
-            self.bdg3.safe_add_loc(a[0],a[1],a[2],a[3])
+            self.bdg3.add_loc(a[0],a[1],a[2],a[3])
 
     def assertEqual_float ( self, a, b, roundn = 4 ):
         self.assertEqual( round( a, roundn ), round( b, roundn ) )

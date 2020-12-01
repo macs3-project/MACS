@@ -1,6 +1,6 @@
 # cython: language_level=3
 # cython: profile=True
-# Time-stamp: <2020-11-30 16:17:45 Tao Liu>
+# Time-stamp: <2020-12-01 11:27:11 Tao Liu>
 
 """Module for BedGraph data class.
 
@@ -13,13 +13,13 @@ the distribution).
 # python modules
 # ------------------------------------
 import logging
-from array import array
+#from array import array
+from cpython cimport array
+from array import array as pyarray
 
 # ------------------------------------
 # MACS3 modules
 # ------------------------------------
-
-from MACS3.Utilities.Constants import *
 from MACS3.Signal.ScoreTrack import ScoreTrackII
 from MACS3.IO.PeakIO import PeakIO, BroadPeakIO
 from MACS3.Signal.Prob import chisq_logp_e
@@ -81,7 +81,7 @@ cdef class bedGraphTrackI:
         float32_t minvalue
         float32_t baseline_value
 
-    def __init__ (self, float32_t baseline_value=0):
+    def __init__ (self, float32_t baseline_value=0 ):
         """
         baseline_value is the value to fill in the regions not defined
         in bedGraph. For example, if the bedGraph is like:
@@ -97,12 +97,7 @@ cdef class bedGraphTrackI:
         self.minvalue = 10000000  # initial minimum value is large since I want safe_add_loc to update it
         self.baseline_value = baseline_value
 
-    def add_a_chromosome ( self, bytes chrom, d ):
-        """Unsafe method. Only to be used by cPileup.pyx.
-        """
-        self.__data[chrom] = d
-
-    cpdef add_loc ( self, bytes chromosome, int startpos, int32_t endpos, float32_t value ):
+    cpdef add_loc ( self, bytes chromosome, int32_t startpos, int32_t endpos, float32_t value ):
         """Add a chr-start-end-value block into __data dictionary.
 
         Difference between safe_add_loc: no check, but faster. Save
@@ -119,7 +114,7 @@ cdef class bedGraphTrackI:
             startpos = 0
 
         if chromosome not in self.__data:
-            self.__data[chromosome] = [array(BYTE4,[]),array(FBYTE4,[])] # for (endpos,value)
+            self.__data[chromosome] = [ pyarray('L',[]), pyarray('f',[]) ]
             c = self.__data[chromosome]
             if startpos:
                 # start pos is not 0, then add two blocks, the first
@@ -161,59 +156,6 @@ cdef class bedGraphTrackI:
                 self.__data[chromosome] = [None, None]
                 self.__data.pop(chromosome)
         return True
-
-    def safe_add_loc ( self, bytes chromosome, int32_t startpos, int32_t endpos, float32_t value):
-        """Add a chr-start-end-value block into __data dictionary.
-
-        """
-        # basic assumption, end pos should > start pos
-        assert endpos > startpos, "endpos %d can't be smaller than start pos %d" % (endpos,startpos)
-
-        if endpos <= 0:
-            return
-        if startpos < 0:
-            startpos = 0
-
-        if chromosome not in self.__data:
-            self.__data[chromosome] = [array(BYTE4,[]),array(FBYTE4,[])] # for (endpos,value)
-            c = self.__data[chromosome]
-            if startpos:
-                # start pos is not 0, then add two blocks, the first
-                # with "baseline_value"; the second with "value"
-                c[0].append(startpos)
-                c[1].append(self.baseline_value)
-            c[0].append(endpos)
-            c[1].append(value)
-        else:
-            c = self.__data[chromosome]
-            # get the preceding region
-            pre_pos = c[0][-1]
-            pre_v   = c[1][-1]
-            # to check 1. continuity; 2. non-overlapping
-            assert pre_pos < endpos , "bedGraph regions are not continuous."
-            assert pre_pos <= startpos , "bedGraph regions have overlappings."
-
-            if startpos != pre_pos:
-                # there is a gap, so fill it with baseline_value
-                c[0].append(startpos)
-                c[1].append(self.baseline_value)
-                # then add this region
-                c[0].append(endpos)
-                c[1].append(value)
-            else:
-                # if this region is next to the previous one.
-                if pre_v == value:
-                    # if value is the same, simply extend it.
-                    c[0][-1] = endpos
-                else:
-                    # otherwise, add a new region
-                    c[0].append(endpos)
-                    c[1].append(value)
-
-        if value > self.maxvalue:
-            self.maxvalue = value
-        if value < self.minvalue:
-            self.minvalue = value
 
     def get_data_by_chr (self, bytes chromosome):
         """Return array of counts by chromosome.
@@ -292,8 +234,8 @@ cdef class bedGraphTrackI:
             vnext = iter(v).__next__
 
             # new arrays
-            new_pos = array(BYTE4,[pnext(),])
-            new_value = array(FBYTE4,[vnext(),])
+            new_pos = pyarray('L',[pnext(),])
+            new_value = pyarray('f',[vnext(),])
 
             newpa = new_pos.append
             newva = new_value.append
@@ -334,8 +276,8 @@ cdef class bedGraphTrackI:
             vnext = iter(v).__next__
 
             # new arrays
-            new_pos = array(BYTE4,[])
-            new_value = array(FBYTE4,[])
+            new_pos = pyarray('L',[])
+            new_value = pyarray('f',[])
             new_pre_pos = 0
             new_pre_value = 0
 
@@ -842,10 +784,7 @@ cdef class bedGraphTrackI:
 
         assert isinstance(bdgTrack2,bedGraphTrackI), "bdgTrack2 is not a bedGraphTrackI object"
 
-        ret = [[],array(FBYTE4,[]),array(BYTE4,[])] # 1: region in
-                                                    # bdgTrack2; 2:
-                                                    # value; 3: length
-                                                    # with the value
+        ret = [ [], pyarray('f',[]), pyarray('L',[]) ] # 1: region in bdgTrack2; 2: value; 3: length with the value
         radd = ret[0].append
         vadd = ret[1].append
         ladd = ret[2].append

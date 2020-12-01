@@ -1,4 +1,4 @@
-# Time-stamp: <2020-11-24 17:09:09 Tao Liu>
+# Time-stamp: <2020-12-01 11:26:01 Tao Liu>
 
 """Module Description: Functions to write file
 
@@ -12,31 +12,11 @@ the distribution).
 # ------------------------------------
 import os
 import sys
-from array import array
-
-from MACS3.Utilities.Constants import *
+from array import array as pyarray
 
 # ------------------------------------
 # constants
 # ------------------------------------
-# to determine the byte size
-if array('h',[1]).itemsize == 2:
-    BYTE2 = 'h'
-else:
-    raise Exception("BYTE2 type cannot be determined!")
-if array('i',[1]).itemsize == 4:
-    BYTE4 = 'i'
-elif array('l',[1]).itemsize == 4:
-    BYTE4 = 'l'
-else:
-    raise Exception("BYTE4 type cannot be determined!")
-
-if array('f',[1]).itemsize == 4:
-    FBYTE4 = 'f'
-elif array('d',[1]).itemsize == 4:
-    FBYTE4 = 'd'
-else:
-    raise Exception("FBYTE4 type cannot be determined!")
 
 # ------------------------------------
 # Misc functions
@@ -77,7 +57,7 @@ def zwig_write (trackI, subdir, fileprefix, d, log=None,space=10, single=False):
         wigfhd.write("variableStep chrom=%s span=%d\n" % (chrom,space))
         tags = trackI.get_locations_by_chr(chrom)[0]
         l = len(tags)
-        window_counts = array(BYTE4,[0]*step)
+        window_counts = pyarray('L',[0]*step)
         startp = -1*d
         endp   = startp+step
         index_tag = 0
@@ -102,7 +82,7 @@ def zwig_write (trackI, subdir, fileprefix, d, log=None,space=10, single=False):
                     else:
                         wigfhd.write("%d\t%d\n" % (i+startp+1,window_counts[i]))
                 # reset
-                window_counts_next = array(BYTE4,[0]*step)
+                window_counts_next = pyarray('L',[0]*step)
                 # copy d values from the tail of previous window to next window
                 for n,i in enumerate(range(step-2*d,step)): # debug
                     window_counts_next[n] = window_counts[i]
@@ -159,7 +139,7 @@ def zbdg_write (trackI, subdir, fileprefix, d, log=None, single=False):
 
         tags = trackI.get_locations_by_chr(chrom)[0]
         l = len(tags)
-        window_counts = array(BYTE4,[0]*step)
+        window_counts = pyarray('L',[0]*step)
         startp = -1*d
         endp   = startp+step
         index_tag = 0
@@ -197,7 +177,7 @@ def zbdg_write (trackI, subdir, fileprefix, d, log=None, single=False):
                     bdgfhd.write("%s\t%d\t%d\t%d\n" % (chrom,left,right,prev))
 
                 # reset
-                window_counts_next = array(BYTE4,[0]*step)
+                window_counts_next = pyarray('L',[0]*step)
                 # copy d values from the tail of previous window to next window
                 for n,i in enumerate(range(step-2*d,step)): # debug
                     window_counts_next[n] = window_counts[i]

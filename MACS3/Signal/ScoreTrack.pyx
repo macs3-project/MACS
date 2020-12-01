@@ -1,6 +1,6 @@
 # cython: language_level=3
 # cython: profile=True
-# Time-stamp: <2020-11-30 16:22:20 Tao Liu>
+# Time-stamp: <2020-12-01 10:46:52 Tao Liu>
 
 """Module for Feature IO classes.
 
@@ -19,7 +19,6 @@ import logging
 # ------------------------------------
 # MACS3 modules
 # ------------------------------------
-from MACS3.Utilities.Constants import BYTE4, FBYTE4, array
 from MACS3.Signal.SignalProcessing import maxima, enforce_valleys, enforce_peakyness
 from MACS3.Signal.Prob import poisson_cdf
 from MACS3.IO.PeakIO import PeakIO, BroadPeakIO, parse_peakname
@@ -133,14 +132,12 @@ cdef float32_t get_subtraction ( float32_t x, float32_t y):
 # ------------------------------------
 # Classes
 # ------------------------------------
+
 cdef class ScoreTrackII:
-    """Class for a container to keep signals of each scoreGraph type data. Modified from scoreTrackI. The
-    difference is that we store a single score data, not
-    p/q/loglikelihood altogether. Score (the 4th) column is calculated
-    through calling change_method() function.
+    """Class for a container to keep signals of each genomic position,
+    including 1. score, 2. treatment and 2. control pileup.
 
-    I want to save mem and simplify calculation in this new class.
-
+    It also contains scoring methods and call_peak functions.
     """
     cdef:
         dict data                       # dictionary for data of each chromosome
@@ -842,12 +839,6 @@ cdef class ScoreTrackII:
             j = tend - start + start_boundary
             peakdata[i:j] = tsvalue
             peakindices[i:j] = tmpindex
-        # apply smoothing window of smoothlen
-#        w = np.ones(smoothlen, dtype='float32') / smoothlen
-#        if smoothlen > 0:
-#            smoothdata = np_convolve(w, peakdata, mode='same')
-#        else:
-#            smoothdata = peakdata.copy()
         summit_offsets = maxima(peakdata, smoothlen)
         if summit_offsets.shape[0] == 0:
             # **failsafe** if no summits, fall back on old approach #
@@ -863,7 +854,6 @@ cdef class ScoreTrackII:
             # **failsafe** if no summits, fall back on old approach #
             return self.__close_peak(peak_content, peaks, min_length, chrom)
 
-#        summit_offsets = enforce_valleys(peakdata, summit_offsets, min_valley = min_valley)
         summit_indices = peakindices[summit_offsets]
         summit_offsets -= start_boundary
 
