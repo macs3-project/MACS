@@ -11,7 +11,7 @@ on:
 
 jobs:
   build_job:
-    runs-on: ubuntu20.04
+    runs-on: ubuntu-20.04
     name: MACS3 Build on ${{ matrix.arch }}
     strategy:
       matrix:
@@ -22,8 +22,6 @@ jobs:
             distro: stretch
           - arch: s390x
             distro: stretch
-
-
     steps:
       - name: Checkout MACS
         uses: actions/checkout@v2.1.0
