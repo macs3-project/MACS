@@ -41,14 +41,14 @@ jobs:
             TEST_USER: macs3
 
           # Mount the artifacts directory as /artifacts in the container 
-          dockerRunArgs: |
-            -v "${PWD}/build:/build" 
+          #dockerRunArgs: |
+          #  -v "${PWD}/build:/build" 
 
-        # Create an artifacts directory
-          setup: |
-            mkdir -p "${PWD}/build/"
-            cp -r "${GITHUB_WORKSPACE}/*" "${PWD}/build/"
-            
+          # Create an artifacts directory
+          #setup: |
+          #  #mkdir -p "${PWD}/build/"
+          #  #cp -r "${GITHUB_WORKSPACE}/*" "${PWD}/build/"
+
           # Install some dependencies in the container. This speeds up builds if
           # you are also using githubToken. Any dependencies installed here will
           # be part of the container image that gets cached, so subsequent
@@ -56,8 +56,13 @@ jobs:
           # publicly in your project's package repository, so it is vital that
           # no secrets are present in the container state or logs.
           install: |
-            ls /build
-            cd /build
+            #ls /build
+            #cd /build
+            pwd
+            ls -l
+            cd ${GITHUB_WORKSPACE}
+            pwd
+            ls -l
             useradd -m "${TEST_USER}"
             chown -R "${TEST_USER}:${TEST_USER}" /build
             apt-get update -qq -y
@@ -71,8 +76,9 @@ jobs:
             pytest --version
           run: |
             # install macs3
+            cd ${GITHUB_WORKSPACE}
+            
             su - ${TEST_USER}
-            cd /build
             python setup.py install --user
             # display python version
             python --version
