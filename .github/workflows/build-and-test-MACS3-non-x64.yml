@@ -37,9 +37,6 @@ jobs:
           # The shell to run commands with in the container
           shell: /bin/bash
 
-          env: |
-            TEST_USER: macs3
-
           # Mount the artifacts directory as /artifacts in the container 
           #dockerRunArgs: |
           #  -v "${PWD}/build:/build" 
@@ -56,13 +53,14 @@ jobs:
           # publicly in your project's package repository, so it is vital that
           # no secrets are present in the container state or logs.
           install: |
-            useradd -m "${TEST_USER}"
-            chown -R "${TEST_USER}:${TEST_USER}" /build
+            useradd -m macs3
+            mkdir -p /build/
+            chown -R macs3:macs3 /build
             apt-get update -qq -y
             apt-get install -yq python3 python3-pip python3-setuptools python3-wheel
             python3 --version
-            su ${TEST_USER}
-            export PATH="/home/${TEST_USER}/.local/bin:${PATH}"
+            su macs3
+            export PATH="/home/macs3/.local/bin:${PATH}"
             pip3 --version
             pip3 install --user cython
             pip3 install --user --upgrade -r requirements.txt
@@ -70,8 +68,8 @@ jobs:
           run: |
             pwd
             ls -l
-            su - ${TEST_USER}
-            export PATH="/home/${TEST_USER}/.local/bin:${PATH}"
+            su - macs3
+            export PATH="/home/macs3/.local/bin:${PATH}"
             pwd
             ls -l
             python setup.py install --user
