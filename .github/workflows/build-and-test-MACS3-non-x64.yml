@@ -10,7 +10,9 @@ on:
     branches:  [ feat-macs3* ]
 
 jobs:
-  build:
+  build_job:
+    runs-on: stretch
+    name: MACS3 Build on ${{ matrix.arch }}
     strategy:
       matrix:
         include:
@@ -20,14 +22,14 @@ jobs:
             distro: stretch
           - arch: s390x
             distro: stretch
-    runs-on: stretch
-    name: MACS3 Build on ${{ matrix.arch }} ${{ matrix.python-version }} ${{ matrix.arch }} 
+
 
     steps:
       - name: Checkout MACS
         uses: actions/checkout@v2.1.0
       - name: Set up arch and run
         uses: uraimo/run-on-arch-action@v2.0.5
+        id: build
         with:
           arch: ${{ matrix.arch }}
           distro: ${{ matrix.distro }}
