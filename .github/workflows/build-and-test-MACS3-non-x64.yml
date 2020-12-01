@@ -17,11 +17,11 @@ jobs:
       matrix:
         include:
           - arch: armv7
-            distro: stretch
+            distro: ubuntu20.04
           - arch: ppc64le
-            distro: stretch
+            distro: ubuntu20.04
           - arch: s390x
-            distro: stretch
+            distro: ubuntu20.04
 
 
     steps:
