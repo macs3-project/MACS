@@ -11,13 +11,10 @@ on:
 
 jobs:
   build:
-
     runs-on: ubuntu-latest
     strategy:
       matrix:
         python-version: [3.6, 3.7, 3.8]
-        
-
     steps:
       - name: Checkout MACS
         uses: actions/checkout@v2
@@ -46,4 +43,4 @@ jobs:
           cd test
           ./cmdlinetest macs2
           cd ..
-          
+
