@@ -44,7 +44,8 @@ jobs:
           # Create an artifacts directory
           setup: |
             mkdir -p "${PWD}/build/"
-            cp -r "${GITHUB_WORKSPACE}/*" "${PWD}/build/"
+            echo `ls -l .`
+            cp -r "./*" "${PWD}/build/"
 
           # Install some dependencies in the container. This speeds up builds if
           # you are also using githubToken. Any dependencies installed here will
