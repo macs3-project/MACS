@@ -56,13 +56,6 @@ jobs:
           # publicly in your project's package repository, so it is vital that
           # no secrets are present in the container state or logs.
           install: |
-            #ls /build
-            #cd /build
-            pwd
-            ls -l
-            cd ${GITHUB_WORKSPACE}
-            pwd
-            ls -l
             useradd -m "${TEST_USER}"
             chown -R "${TEST_USER}:${TEST_USER}" /build
             apt-get update -qq -y
@@ -75,10 +68,12 @@ jobs:
             pip3 install --user --upgrade -r requirements.txt
             pytest --version
           run: |
-            # install macs3
-            cd ${GITHUB_WORKSPACE}
-            
+            pwd
+            ls -l
             su - ${TEST_USER}
+            export PATH="/home/${TEST_USER}/.local/bin:${PATH}"
+            pwd
+            ls -l
             python setup.py install --user
             # display python version
             python --version
