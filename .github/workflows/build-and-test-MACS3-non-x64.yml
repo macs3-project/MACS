@@ -11,17 +11,17 @@ on:
 
 jobs:
   build_job:
-    runs-on: stretch
+    runs-on: ubuntu20.04
     name: MACS3 Build on ${{ matrix.arch }}
     strategy:
       matrix:
         include:
           - arch: armv7
-            distro: ubuntu20.04
+            distro: stretch
           - arch: ppc64le
-            distro: ubuntu20.04
+            distro: stretch
           - arch: s390x
-            distro: ubuntu20.04
+            distro: stretch
 
 
     steps:
