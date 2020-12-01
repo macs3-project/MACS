@@ -1,7 +1,7 @@
 # This workflow will install Python dependencies, run tests and lint with a single version of Python
 # For more information see: https://help.github.com/actions/language-and-framework-guides/using-python-with-github-actions
 
-name: MACS3 application (non x64)
+name: MACS3 application (non x64, python 3.7)
 
 on:
   push:
@@ -17,11 +17,11 @@ jobs:
       matrix:
         include:
           - arch: armv7
-            distro: stretch
-          - arch: ppc64le
-            distro: stretch
-          - arch: s390x
-            distro: stretch
+            distro: buster
+          #- arch: ppc64le
+          #  distro: buster
+          #- arch: s390x
+          #  distro: buster
     steps:
       - name: Checkout MACS
         uses: actions/checkout@v2.1.0
@@ -40,11 +40,7 @@ jobs:
           # Create an artifacts directory
           setup: |
             mkdir -p "${PWD}/build/"
-            ls
-            pwd
-            ls ${GITHUB_WORKSPACE}
             cp -r "${GITHUB_WORKSPACE}/*" "${PWD}/build/"
-            ls ${PWD}/build/
           # Mount the artifacts directory as /artifacts in the container
           dockerRunArgs: |
             --volume "${PWD}/build:/build"
@@ -56,12 +52,14 @@ jobs:
           # publicly in your project's package repository, so it is vital that
           # no secrets are present in the container state or logs.
           install: |
+            pwd
+            ls .
             apt-get update -qq -y
             apt-get install -yq python3 python3-pip python3-setuptools python3-wheel
             python3 --version
             pip3 --version
-            pip install --user cython
-            pip install --user --upgrade -r requirements.txt
+            pip3 install --user cython
+            pip3 install --user --upgrade -r requirements.txt
             pytest --version
           run: |
             # install macs3
