@@ -1,4 +1,4 @@
-# Time-stamp: <2020-12-01 12:11:14 Tao Liu>
+# Time-stamp: <2020-12-01 12:57:23 Tao Liu>
 
 """Module Description: Functions to write file
 
@@ -14,7 +14,7 @@ import os
 import sys
 from array import array as pyarray
 
-from Utilities.Constants import MACS_VERSION
+from MACS3.Utilities.Constants import MACS_VERSION
 
 # ------------------------------------
 # constants
