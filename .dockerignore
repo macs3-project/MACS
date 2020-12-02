@@ -1,0 +1,15 @@
+temp*
+MACS3/IO/BedGraphIO.c
+MACS3/IO/Parser.c
+MACS3/IO/PeakIO.c
+MACS3/Signal/BedGraph.c
+MACS3/Signal/CallPeakUnit.c
+MACS3/Signal/FixWidthTrack.c
+MACS3/Signal/PairedEndTrack.c
+MACS3/Signal/PeakDetect.c
+MACS3/Signal/PeakModel.c
+MACS3/Signal/Pileup.c
+MACS3/Signal/Prob.c
+MACS3/Signal/ScoreTrack.c
+MACS3/Signal/Signal.c
+MACS3/Signal/SignalProcessing.c
