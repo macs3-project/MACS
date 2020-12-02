@@ -16,7 +16,7 @@ jobs:
       matrix: 
         python-version: [3.7, 3.8]
         arch: ['x64']
-    name: Build on Ubuntu-20.04 x64 with Python ${{ matrix.python-version }}
+    name: Build on x64 with Python ${{ matrix.python-version }}
     steps:
       - name: Checkout MACS
         uses: actions/checkout@v2
@@ -51,3 +51,15 @@ jobs:
           cd test
           ./cmdlinetest macs2
           cd ..
+      - name: Build sdist
+        run: |
+          python setup.py sdist
+      - name: Archive sdist
+        uses: actions/upload-artifact@v2
+        with:
+          name: sdist file
+          path: |
+            dist/*.tar.gz
+
+
+          

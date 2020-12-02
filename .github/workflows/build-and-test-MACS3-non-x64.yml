@@ -12,7 +12,7 @@ on:
 jobs:
   build_job:
     runs-on: ubuntu-20.04
-    name: MACS3 Build on ${{ matrix.arch }}
+    name: Build on ${{ matrix.arch }}
     strategy:
       matrix:
         include:
