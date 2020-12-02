@@ -1,6 +1,6 @@
 # cython: language_level=3
 # cython: profile=True
-# Time-stamp: <2020-11-24 17:35:01 Tao Liu>
+# Time-stamp: <2020-12-02 14:09:19 Tao Liu>
 
 """Module Description: functions to find maxima minima or smooth the
 signal tracks.
@@ -21,17 +21,19 @@ from math import sqrt as mathsqrt
 # smoothing function
 import numpy as np
 cimport numpy as np
+from numpy cimport uint8_t, uint16_t, uint32_t, uint64_t, int8_t, int16_t, int32_t, int64_t, float32_t, float64_t
 from cpython cimport bool
 
-cpdef np.ndarray[np.int32_t, ndim=1] maxima(np.ndarray[np.float32_t, ndim=1] signal,
+
+cpdef np.ndarray[int32_t, ndim=1] maxima(np.ndarray[float32_t, ndim=1] signal,
                                             int window_size=51):
     """return the local maxima in a signal after applying a 2nd order
     Savitsky-Golay (polynomial) filter using window_size specified
     """
     cdef:
-        np.ndarray[np.int32_t, ndim=1] m
-        np.ndarray[np.float64_t, ndim=1] smoothed
-        np.ndarray[np.float32_t, ndim=1] sign, diff
+        np.ndarray[int32_t, ndim=1] m
+        np.ndarray[float64_t, ndim=1] smoothed
+        np.ndarray[float32_t, ndim=1] sign, diff
 
     window_size = window_size//2*2+1 # to make an odd number
     smoothed = savitzky_golay_order2_deriv1(signal, window_size).round(16)
@@ -40,12 +42,12 @@ cpdef np.ndarray[np.int32_t, ndim=1] maxima(np.ndarray[np.float32_t, ndim=1] sig
     m = np.where( diff <= -1)[0].astype('int32')
     return m
 
-cdef np.ndarray[np.int32_t, ndim=1] internal_minima( np.ndarray[np.float32_t, ndim=1] signal,
-                                                     np.ndarray[np.int32_t, ndim=1] maxima ):
+cdef np.ndarray[int32_t, ndim=1] internal_minima( np.ndarray[float32_t, ndim=1] signal,
+                                                  np.ndarray[int32_t, ndim=1] maxima ):
     cdef:
-        np.ndarray[np.int32_t, ndim=1] ret
-        int n = maxima.shape[0]
-        int i, v, v2
+        np.ndarray[int32_t, ndim=1] ret
+        int32_t n = maxima.shape[0]
+        int32_t i, v, v2
     if n == 0 or n == 1:
         ret = np.ndarray(0, 'int32')
         return ret
@@ -58,11 +60,11 @@ cdef np.ndarray[np.int32_t, ndim=1] internal_minima( np.ndarray[np.float32_t, nd
             pos1 = pos2
         return ret
 
-cdef inline float sqrt(float threshold):
+cdef inline float32_t sqrt(float32_t threshold):
     return mathsqrt(threshold)
 
-cpdef enforce_peakyness(np.ndarray[np.float32_t, ndim=1] signal,
-                        np.ndarray[np.int32_t, ndim=1] maxima):
+cpdef enforce_peakyness(np.ndarray[float32_t, ndim=1] signal,
+                        np.ndarray[int32_t, ndim=1] maxima):
     """requires peaks described by a signal and a set of points where the signal
     is at a maximum to meet a certain set of criteria
 
@@ -78,12 +80,12 @@ cpdef enforce_peakyness(np.ndarray[np.float32_t, ndim=1] signal,
             require that it not be too flat (< 6 unique values)
     """
     cdef:
-        np.ndarray[np.int32_t, ndim=1] minima = internal_minima(signal, maxima)
-        np.ndarray[np.float32_t, ndim=1] new_signal
-        int n = minima.shape[0]
-        float threshold
-        np.ndarray[np.int32_t, ndim=1] peaky_maxima = maxima.copy()
-        int j = 0
+        np.ndarray[int32_t, ndim=1] minima = internal_minima(signal, maxima)
+        np.ndarray[float32_t, ndim=1] new_signal
+        int32_t n = minima.shape[0]
+        float32_t threshold
+        np.ndarray[int32_t, ndim=1] peaky_maxima = maxima.copy()
+        int32_t j = 0
     if n == 0: return maxima
 #    else:
     threshold = signal[minima[0]]
@@ -112,104 +114,81 @@ cpdef enforce_peakyness(np.ndarray[np.float32_t, ndim=1] signal,
     return peaky_maxima
 
 # hardcoded minimum peak width = 50
-cdef bool is_valid_peak(np.ndarray[np.float32_t, ndim=1] signal, int maximum):
+cdef bool is_valid_peak(np.ndarray[float32_t, ndim=1] signal, int maximum):
     cdef:
-        s = hard_clip(signal, maximum)
-        int length = s.shape[0]
-    if length < 50: return False
-    elif too_flat(s): return False
+        np.ndarray s
+        int32_t length
+    s = hard_clip(signal, maximum)
+    length = s.shape[0]
+    if length < 50:
+        return False
+    elif too_flat(s):
+        return False
     return True
 
 # require at least 6 different float values -- prevents broad flat peaks
-cdef bool too_flat(np.ndarray[np.float32_t, ndim=1] signal):
+cdef bool too_flat(np.ndarray[float32_t, ndim=1] signal):
 #    """return whether signal has at least 6 unique values
 #    """
     return np.unique(signal).shape[0] < 6
 
 # hard clip a region with negative values
-cdef np.ndarray[np.float32_t, ndim=1] hard_clip(np.ndarray[np.float32_t, ndim=1] signal, int maximum):
+cdef np.ndarray[float32_t, ndim=1] hard_clip(np.ndarray[float32_t, ndim=1] signal, int32_t maximum):
 #    """clip the signal in both directions at the nearest values <= 0
 #    to position maximum
 #    """
     cdef:
-        int i
-        int left = 0
-        int right = signal.shape[0]
+        int32_t i
+        int32_t left = 0
+        int32_t right = signal.shape[0]
     # clip left
-    for i in range(right - maximum, 0):
-        if signal[-i] < 0:
+    for i in range( right - maximum, 0 ):
+        if signal[ -i ] < 0:
             left = i
             break
     for i in range(maximum, right):
         if signal[i] < 0:
             right = i
             break
-    return signal[left:right]
+    return signal[ left:right ]
 
-# for all maxima, set min_subpeak_width = 0
-#cpdef peak_maxima(np.ndarray[np.float32_t, ndim=1] signal,
-#             int window_size=51, int min_subpeak_width=5):
-#    cdef:
-#        np.ndarray[np.float32_t, ndim=1] D = savitzky_golay_order2(signal, window_size, deriv=1)
-#        np.ndarray[np.int32_t, ndim=1] m = np.where(np.diff(np.sign(D)) == 2)[0].astype('int32') + 1
-#        np.ndarray[np.int32_t, ndim=1] n = np.zeros_like(m)
-#        int i_max
-#        int halfw = (min_subpeak_width - 1) / 2
-#        int signalw = D.shape[0]
-#        int i_new = 0
-#        int pos, start, end
-#    if m.shape[0] == 0: return m
-#    elif m.shape[0] == 1: return m
-#    else:
-#        i_max = np.where(signal[m] == signal[m].max())[0][0]
-#    for pos in m:
-#        start = max(pos - halfw, 0)
-#        end = min(pos + halfw, signalw)
-#        if ((D[start:pos] >= 0).all() and (D[(pos + 1):end] <= 0).all()):
-#            n[i_new] = pos
-#            i_new += 1
-#    if i_new == 0:
-#        return m[i_max:(i_max + 1)]
-#    else:
-#        n.resize(i_new, refcheck=False)
-#        return n
-
-cpdef enforce_valleys(np.ndarray[np.float32_t, ndim=1] signal,
-                      np.ndarray[np.int32_t, ndim=1] summits,
-                      float min_valley = 0.8):
+cpdef np.ndarray[ int32_t, ndim=1 ] enforce_valleys(np.ndarray[ float32_t, ndim=1 ] signal,
+                                                    np.ndarray[ int32_t, ndim=1 ] summits,
+                                                    float32_t min_valley = 0.8 ):
     """require a value of <= min_valley * lower summit
     between each pair of summits
     """
     cdef:
-        float req_min, v, prev_v
-        int summit_pos, prev_summit_pos
-        int n_summits = summits.shape[0]
-        int n_valid_summits = 1
-        np.ndarray[np.int32_t, ndim=1] valid_summits = summits.copy()
-    # Step 1: Remove peaks that do not have sufficient valleys
+        float32_t req_min, v, prev_v
+        int32_t summit_pos, prev_summit_pos
+        int32_t n_summits
+        int32_t n_valid_summits
+        np.ndarray[ int32_t, ndim=1 ] valid_summits
+    n_summits = summits.shape[0]
+    n_valid_summits = 1    
+    valid_summits = summits.copy()        
+    # Remove peaks that do not have sufficient valleys
     if n_summits == 1: return summits
-    for i in range(1, n_summits):
-        prev_summit_pos = valid_summits[n_valid_summits-1]
-        summit_pos = summits[i]
-        prev_v = signal[prev_summit_pos]
-        v = signal[summit_pos]
-        req_min = min_valley * min(prev_v, v)
-        if (signal[prev_summit_pos:summit_pos] < req_min).any():
-            valid_summits[n_valid_summits] = summit_pos
+    for i in range( 1, n_summits ):
+        prev_summit_pos = valid_summits[ n_valid_summits-1 ]
+        summit_pos = summits[ i ]
+        prev_v = signal[ prev_summit_pos ]
+        v = signal[ summit_pos ]
+        req_min = min_valley * min( prev_v, v )
+        if ( signal[ prev_summit_pos:summit_pos ] < req_min ).any():
+            valid_summits[ n_valid_summits ] = summit_pos
             n_valid_summits += 1
         elif v > prev_v:
-            valid_summits[n_valid_summits-1] = summit_pos
-    valid_summits.resize(n_valid_summits, refcheck=False)
-    # Step 2: Re-find peaks from subtracted signal
-    #
+            valid_summits[ n_valid_summits-1 ] = summit_pos
+    valid_summits.resize( n_valid_summits, refcheck=False )
     return valid_summits
 
 # Modified from http://www.scipy.org/Cookbook/SavitzkyGolay
 # positive window_size not enforced anymore
 # needs sane input paramters, window size > 4
 # switched to double precision for internal accuracy
-cpdef np.ndarray[np.float64_t, ndim=1] savitzky_golay_order2_deriv1(np.ndarray[np.float32_t, ndim=1] signal,
-                     int window_size):
+cpdef np.ndarray[float64_t, ndim=1] savitzky_golay_order2_deriv1(np.ndarray[float32_t, ndim=1] signal,
+                                                                 int32_t window_size):
     """Smooth (and optionally differentiate) data with a Savitzky-Golay filter.
     The Savitzky-Golay filter removes high frequency noise from data.
     It has the advantage of preserving the original shape and
@@ -245,12 +224,12 @@ cpdef np.ndarray[np.float64_t, ndim=1] savitzky_golay_order2_deriv1(np.ndarray[n
        Cambridge University Press ISBN-13: 9780521880688
     """
     cdef:
-        int half_window, k
-        np.ndarray[np.int64_t, ndim=2] b
+        int32_t half_window, k
+        np.ndarray[int64_t, ndim=2] b
         # pad the signal at the extremes with
         # values taken from the signal itself
-        np.ndarray[np.float32_t, ndim=1] firstvals, lastvals
-        np.ndarray[np.float64_t, ndim=1] m, ret
+        np.ndarray[float32_t, ndim=1] firstvals, lastvals
+        np.ndarray[float64_t, ndim=1] m, ret
 
     if window_size % 2 != 1: window_size += 1
     half_window = (window_size - 1) // 2
@@ -263,15 +242,12 @@ cpdef np.ndarray[np.float64_t, ndim=1] savitzky_golay_order2_deriv1(np.ndarray[n
     firstvals = signal[0] - np.abs(signal[1:half_window+1][::-1] - signal[0])
     lastvals = signal[-1] + np.abs(signal[-half_window-1:-1][::-1] - signal[-1])
     signal = np.concatenate((firstvals, signal, lastvals))
-    #print (repr(m))
     ret = np.convolve( m[::-1], signal.astype("float64"), mode='valid') #.astype("float32").round(8) # round to 8 decimals to avoid signing issue
-    #print (ret[160:165])
     return ret
 
-
 # Another modified version from http://www.scipy.org/Cookbook/SavitzkyGolay
-cpdef np.ndarray[np.float32_t, ndim=1] savitzky_golay( np.ndarray[np.float32_t, ndim=1] y, int window_size,
-                                                       int order, int deriv = 0, int rate = 1 ):
+cpdef np.ndarray[float32_t, ndim=1] savitzky_golay( np.ndarray[float32_t, ndim=1] y, int32_t window_size,
+                                                    int32_t order, int32_t deriv = 0, int32_t rate = 1 ):
     """Smooth (and optionally differentiate) data with a Savitzky-Golay filter.
     The Savitzky-Golay filter removes high frequency noise from data.
     It has the advantage of preserving the original shape and
@@ -320,12 +296,12 @@ cpdef np.ndarray[np.float32_t, ndim=1] savitzky_golay( np.ndarray[np.float32_t, 
        Cambridge University Press ISBN-13: 9780521880688
     """
     cdef:
-        int half_window, k
-        np.ndarray[np.int64_t, ndim=2] b
+        int32_t half_window, k
+        np.ndarray[int64_t, ndim=2] b
         # pad the signal at the extremes with
         # values taken from the signal itself
-        np.ndarray[np.float32_t, ndim=1] firstvals, lastvals, ret
-        np.ndarray[np.float64_t, ndim=1] m
+        np.ndarray[float32_t, ndim=1] firstvals, lastvals, ret
+        np.ndarray[float64_t, ndim=1] m
 
     try:
         window_size = np.abs( np.int( window_size ) )

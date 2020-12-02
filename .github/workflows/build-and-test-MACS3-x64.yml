@@ -48,9 +48,9 @@ jobs:
       - name: Test with pytest
         run: |
           pytest --runxfail
-          cd test
-          ./cmdlinetest macs2
-          cd ..
+          #cd test
+          #./cmdlinetest macs2
+          #cd ..
       - name: Build sdist
         run: |
           python setup.py sdist

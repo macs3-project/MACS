@@ -67,5 +67,5 @@ jobs:
             pip3 install --user --upgrade -r requirements.txt --no-cache-dir
             python3 setup.py install --user
             # run test
-            pytest --runxfail && cd test && ./cmdlinetest macs3
+            pytest --runxfail # && cd test && ./cmdlinetest macs3
 
