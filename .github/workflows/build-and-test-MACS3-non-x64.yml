@@ -58,6 +58,7 @@ jobs:
             apt-get install -yq python3 python3-pip python3-setuptools python3-wheel
           run: |
             echo `uname -a`
+            cd /home/macs3/
             cp -r /MACS3 .
             cd MACS3
             export PATH="/home/macs3/.local/bin:${PATH}"
