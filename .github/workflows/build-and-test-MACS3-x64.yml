@@ -5,16 +5,16 @@ name: MACS3 application (x64)
 
 on:
   push:
-    branches:  [ feat-macs3-norun* ]
+    branches:  [ feat-macs3* ]
   pull_request:
-    branches:  [ feat-macs3-norun* ]
+    branches:  [ feat-macs3* ]
 
 jobs:
   build:
     runs-on: ubuntu-20.04
     strategy: 
       matrix: 
-        python-version: [3.8]
+        python-version: [3.7, 3.8]
         arch: ['x64']
     name: Build on Ubuntu-20.04 x64 with Python ${{ matrix.python-version }}
     steps:

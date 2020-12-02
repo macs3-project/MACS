@@ -37,13 +37,11 @@ jobs:
           # The shell to run commands with in the container
           shell: /bin/bash
 
-          # Mount the current working directory as /MACS3 in the container
+          # Mount the current working directory (with checked-out codes) as /MACS3 in the container
           dockerRunArgs: |
             -v "${PWD}:/MACS3" -u macs3
 
           # Create an artifacts directory on runner
-          #setup: |
-          #  mkdir -p "${PWD}/artifacts/"
 
           # Install some dependencies in the container. This speeds up builds if
           # you are also using githubToken. Any dependencies installed here will
@@ -59,10 +57,14 @@ jobs:
             apt-get update -qq -y
             apt-get install -yq python3 python3-pip python3-setuptools python3-wheel
           run: |
-            cd /MACS3
-            export PATH="/home/macs3/.local/bin:${PATH}" 
-            pip3 install --user cython
-            pip3 install --user --upgrade -r requirements.txt
+            echo `uname -a`
+            cp -r /MACS3 .
+            cd MACS3
+            export PATH="/home/macs3/.local/bin:${PATH}"
+            pip3 install --user --upgrade pip --no-cache-dir
+            pip3 install --user cython --no-cache-dir
+            pip3 install --user --upgrade -r requirements.txt --no-cache-dir
             python3 setup.py install --user
             # run test
             pytest --runxfail && cd test && ./cmdlinetest macs3
+            
