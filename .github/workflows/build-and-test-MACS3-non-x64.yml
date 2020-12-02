@@ -18,10 +18,10 @@ jobs:
         include:
           - arch: armv7
             distro: buster
-          - arch: ppc64le
-            distro: buster
-          - arch: s390x
-            distro: buster
+          #- arch: ppc64le
+          #  distro: buster
+          #- arch: s390x
+          #  distro: buster
     steps:
       - name: Checkout MACS
         uses: actions/checkout@v2.1.0
