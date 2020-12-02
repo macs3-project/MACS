@@ -37,16 +37,13 @@ jobs:
           # The shell to run commands with in the container
           shell: /bin/bash
 
-          # Mount the artifacts directory as /artifacts in the container 
+          # Mount the current working directory as /MACS3 in the container
           dockerRunArgs: |
-            -v "${PWD}/build:/build" 
+            -v "${PWD}:/MACS3" 
 
-          # Create an artifacts directory
-          setup: |
-            mkdir -p "${PWD}/build/"
-            echo `pwd`
-            echo `ls -l .`
-            cp "*" "${PWD}/For/"
+          # Create an artifacts directory on runner
+          #setup: |
+          #  mkdir -p "${PWD}/artifacts/"
 
           # Install some dependencies in the container. This speeds up builds if
           # you are also using githubToken. Any dependencies installed here will
@@ -56,29 +53,19 @@ jobs:
           # no secrets are present in the container state or logs.
           install: |
             useradd -m macs3
-            mkdir -p /build/
-            chown -R macs3:macs3 /build
+            mkdir -p /MACS3
+            chown -R macs3:macs3 /MACS3
+            # install dependencies
             apt-get update -qq -y
             apt-get install -yq python3 python3-pip python3-setuptools python3-wheel
           run: |
-            pwd
-            ls -l
-            su - macs3
-            export PATH="/home/macs3/.local/bin:${PATH}"
-            pwd
-            ls -l
-            cd /build
-            ls -l
             # install
             python3 --version 
             su - macs3 
+            cd /build
             export PATH="/home/macs3/.local/bin:${PATH}" 
-            pip3 --version 
             pip3 install --user cython>=0.29 
             pip3 install --user --upgrade -r requirements.txt
-            pytest --version 
             python setup.py install --user
-            # display python version
-            python --version
             # run test
             pytest --runxfail && cd test && ./cmdlinetest macs3
