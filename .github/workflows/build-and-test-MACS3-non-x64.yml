@@ -39,7 +39,7 @@ jobs:
 
           # Mount the current working directory as /MACS3 in the container
           dockerRunArgs: |
-            -v "${PWD}:/MACS3" 
+            -v "${PWD}:/MACS3" -u macs3
 
           # Create an artifacts directory on runner
           #setup: |
@@ -59,10 +59,8 @@ jobs:
             apt-get update -qq -y
             apt-get install -yq python3 python3-pip python3-setuptools python3-wheel
           run: |
-            # install
-            python3 --version 
-            su - macs3 
-            cd /build
+            cd /MACS3
+            echo `ls`
             export PATH="/home/macs3/.local/bin:${PATH}" 
             pip3 install --user cython>=0.29 
             pip3 install --user --upgrade -r requirements.txt
