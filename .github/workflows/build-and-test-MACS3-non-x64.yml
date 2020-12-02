@@ -55,7 +55,7 @@ jobs:
             chown -R macs3:macs3 /MACS3
             # install dependencies
             apt-get update -qq -y
-            apt-get install -yq python3 python3-pip python3-setuptools python3-wheel
+            apt-get install -yq python3 python3-pip python3-setuptools python3-wheel procps
           run: |
             echo `uname -a`
             cd /home/macs3/
