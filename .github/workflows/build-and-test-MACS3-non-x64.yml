@@ -63,6 +63,6 @@ jobs:
             export PATH="/home/macs3/.local/bin:${PATH}" 
             pip3 install --user cython
             pip3 install --user --upgrade -r requirements.txt
-            python setup.py install --user
+            python3 setup.py install --user
             # run test
             pytest --runxfail && cd test && ./cmdlinetest macs3
