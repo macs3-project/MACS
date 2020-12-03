@@ -1,7 +1,7 @@
 # cython: language_level=3
 # cython: profile=True
 # cython: linetrace=True
-# Time-stamp: <2020-12-01 01:24:18 Tao Liu>
+# Time-stamp: <2020-12-03 16:07:01 Tao Liu>
 
 """Module for Calculate Scores.
 
@@ -28,6 +28,7 @@ import numpy as np
 cimport numpy as np
 from numpy cimport uint8_t, uint16_t, uint32_t, uint64_t, int8_t, int16_t, int32_t, int64_t, float32_t, float64_t
 from cpython cimport bool
+from cykhash import PyObjectMap, Float32to32Map
 
 # ------------------------------------
 # C lib
@@ -43,7 +44,6 @@ from MACS3.IO.PeakIO import PeakIO, BroadPeakIO, parse_peakname
 from MACS3.Signal.FixWidthTrack import FWTrack
 from MACS3.Signal.PairedEndTrack import PETrackI
 from MACS3.Signal.Prob import poisson_cdf
-from cykhash import PyObjectMap, Float32to32Map
 # --------------------------------------------
 # cached pscore function and LR_asym functions
 # --------------------------------------------
@@ -183,38 +183,6 @@ cdef inline int32_t left_forward ( data, int32_t pos, int32_t window_size ):
 cdef inline int32_t right_forward ( data, int32_t pos, int32_t window_size ):
     return data.get(pos + window_size, 0) - data.get(pos, 0)
 
-cdef wtd_find_summit(chrom, np.ndarray plus, np.ndarray minus, int32_t search_start, int32_t search_end, int32_t window_size, float32_t cutoff):
-    """internal function to be called by refine_peak_from_tags_distribution()
-
-    """
-    cdef:
-        int32_t i, j, watson_left, watson_right, crick_left, crick_right, wtd_max_pos
-        float32_t wtd_max_val
-        np.ndarray wtd_list, wtd_other_max_pos, wtd_other_max_val
-
-    watson, crick = (Counter(plus), Counter(minus))
-    watson_left = left_sum(watson, search_start, window_size)
-    crick_left = left_sum(crick, search_start, window_size)
-    watson_right = right_sum(watson, search_start, window_size)
-    crick_right = right_sum(crick, search_start, window_size)
-
-    wtd_list = np.zeros( search_end - search_start + 1, dtype="float32")
-    i = 0
-    for j in range(search_start, search_end+1):
-        wtd_list[i] = max((2 * (watson_left * crick_right)**0.5 - watson_right - crick_left),0) # minimum score is 0
-        watson_left += left_forward(watson, j, window_size)
-        watson_right += right_forward(watson, j, window_size)
-        crick_left += left_forward(crick, j, window_size)
-        crick_right += right_forward(crick, j, window_size)
-        i += 1
-
-    wtd_other_max_pos = maxima(wtd_list, window_size = window_size)
-    wtd_other_max_pos = enforce_peakyness( wtd_list, wtd_other_max_pos )
-    wtd_other_max_val = wtd_list[wtd_other_max_pos]
-    wtd_other_max_pos = wtd_other_max_pos + search_start
-
-    return (wtd_other_max_pos, wtd_other_max_val > cutoff)
-
 cdef float32_t median_from_value_length ( np.ndarray[np.float32_t, ndim=1] value, list length ):
     """
     """
@@ -315,22 +283,22 @@ cdef class CallerFromAlignments:
         float64_t pseudocount                # the pseudocount used to calcuate logLR, FE or logFE
         bytes bedGraph_filename_prefix     # prefix will be added to _pileup.bdg for treatment and _lambda.bdg for control
 
-        #SHIFTCONTROL is obsolete
         int32_t  end_shift                   # shift of cutting ends before extension
         bool trackline                   # whether trackline should be saved in bedGraph
         bool save_bedGraph               # whether to save pileup and local bias in bedGraph files
         bool save_SPMR                   # whether to save pileup normalized by sequencing depth in million reads
         bool no_lambda_flag              # whether ignore local bias, and to use global bias instead
         bool PE_mode                     # whether it's in PE mode, will be detected during initiation
+
         # temporary data buffer
         list chr_pos_treat_ctrl          # temporary [position, treat_pileup, ctrl_pileup] for a given chromosome
         bytes bedGraph_treat_filename
         bytes bedGraph_control_filename
         FILE * bedGraph_treat_f
         FILE * bedGraph_ctrl_f
+
         # data needed to be pre-computed before peak calling
-        #dict pqtable                   # remember pvalue->qvalue convertion
-        object pqtable
+        object pqtable          # remember pvalue->qvalue convertion; saved in cykhash Float32to32Map
         bool pvalue_all_done             # whether the pvalue of whole genome is all calculated. If yes, it's OK to calculate q-value.
 
         dict pvalue_npeaks               # record for each pvalue cutoff, how many peaks can be called
@@ -339,7 +307,6 @@ cdef class CallerFromAlignments:
                                          # on p-value to total peak length analysis.
         bytes cutoff_analysis_filename     # file to save the pvalue-npeaks-totallength table
 
-        float64_t test_time
         dict pileup_data_files           # Record the names of temporary files for storing pileup values of each chromosome
 
 
@@ -362,7 +329,7 @@ cdef class CallerFromAlignments:
         control. Treat_depth and ctrl_depth should not be changed
         during calculation.
 
-        treat and ctrl are two FWTrack or PETrackI objects.
+        treat and ctrl are either FWTrack or PETrackI objects.
 
         treat_depth and ctrl_depth are effective depth in million:
                                     sequencing depth in million after
@@ -390,15 +357,14 @@ cdef class CallerFromAlignments:
             char * tmp
             bytes tmp_bytes
             float32_t p
-
-
+        # decide PE mode
         if isinstance(treat, FWTrack):
             self.PE_mode = False
         elif isinstance(treat, PETrackI):
             self.PE_mode = True
         else:
             raise Exception("Should be FWTrack or PETrackI object!")
-
+        # decide if there is control
         self.treat = treat
         if ctrl:
             self.ctrl = ctrl
@@ -411,26 +377,23 @@ cdef class CallerFromAlignments:
         self.ctrl_scaling_factor_s= ctrl_scaling_factor_s
         self.end_shift = end_shift
         self.lambda_bg = lambda_bg
-        self.pqtable = Float32to32Map( for_int = False )
+        self.pqtable = Float32to32Map( for_int = False ) # Float32 -> Float32 map
         self.save_bedGraph = save_bedGraph
         self.save_SPMR = save_SPMR
-        self.bedGraph_filename_prefix =  bedGraph_filename_prefix.encode()
+        self.bedGraph_filename_prefix = bedGraph_filename_prefix.encode()
         self.bedGraph_treat_filename = bedGraph_treat_filename.encode()
         self.bedGraph_control_filename = bedGraph_control_filename.encode()
         if not self.ctrl_d_s or not self.ctrl_scaling_factor_s:
             self.no_lambda_flag = True
         else:
             self.no_lambda_flag = False
-
         self.pseudocount = pseudocount
-
+        # get the common chromosome names from both treatment and control
         chr1 = set(self.treat.get_chr_names())
         chr2 = set(self.ctrl.get_chr_names())
         self.chromosomes = sorted(list(chr1.intersection(chr2)))
 
-        self.test_time = 0
         self.pileup_data_files = {}
-
         self.pvalue_length = {}
         self.pvalue_npeaks = {}
         for p in np.arange( 0.3, 10, 0.3 ): # step for optimal cutoff is 0.3 in -log10pvalue, we try from pvalue 1E-10 (-10logp=10) to 0.5 (-10logp=0.3)
@@ -934,15 +897,12 @@ cdef class CallerFromAlignments:
         for chrom in self.chromosomes:
             # treat/control bedGraph will be saved if requested by user.
             self.__chrom_call_peak_using_certain_criteria ( peaks, chrom, scoring_function_symbols, score_cutoff_s, min_length, max_gap, call_summits, self.save_bedGraph )
-            #print chrom, ":", ttime() - t0
 
         # close bedGraph file
         if self.save_bedGraph:
             fclose(self.bedGraph_treat_f)
             fclose(self.bedGraph_ctrl_f)
             self.save_bedGraph = False
-
-        #print "time to build peak regions: %f" % self.test_time
 
         return peaks
 
@@ -1009,10 +969,6 @@ cdef class CallerFromAlignments:
             elif s == 's':
                 score_array_s.append( self.__cal_subtraction( treat_array, ctrl_array ) )
 
-        #self.test_time += ttime() - t0
-        #print "cal scores -- chrom:",chrom,"  time:", ttime() - t0
-
-        #t0 = ttime()
         # get the regions with scores above cutoffs
         above_cutoff = np.nonzero( apply_multiple_cutoffs(score_array_s,score_cutoff_s) )[0] # this is not an optimized method. It would be better to store score array in a 2-D ndarray?
         above_cutoff_index_array = np.arange(pos_array.shape[0],dtype="int32")[above_cutoff] # indices
@@ -1106,7 +1062,7 @@ cdef class CallerFromAlignments:
             summit_value = 0
             for i in range(len(peak_content)):
                 (tstart, tend, ttreat_p, tctrl_p, tlist_scores_p) = peak_content[i]
-                tscore = ttreat_p #self.pqtable[ get_pscore(int(ttreat_p), tctrl_p) ] # use qscore as general score to find summit
+                tscore = ttreat_p # use pscore as general score to find summit
                 if not summit_value or summit_value < tscore:
                     tsummit = [(tend + tstart) // 2, ]
                     tsummit_index = [ i, ]
@@ -1128,8 +1084,7 @@ cdef class CallerFromAlignments:
                 if score_cutoff_s[i] > score_array_s[ i ][ peak_content[ summit_index ][ 4 ] ]:
                     return False # not passed, then disgard this peak.
 
-            #summit_p_score = get_pscore( int(summit_treat), summit_ctrl )
-            summit_p_score = get_pscore(( <int32_t>(summit_treat), summit_ctrl ) )
+            summit_p_score = pscore_dict[ ( <int32_t>(summit_treat), summit_ctrl ) ] #get_pscore(( <int32_t>(summit_treat), summit_ctrl ) )
             summit_q_score = self.pqtable[ summit_p_score ]
 
             peaks.add( chrom,           # chromosome
@@ -1178,7 +1133,6 @@ cdef class CallerFromAlignments:
         peakindices = np.zeros(end - start, dtype='int32') # save the indices for each position in this region
         for i in range(len(peak_content)):
             (tstart, tend, ttreat_p, tctrl_p, tlist_scores_p) = peak_content[i]
-            #tscore = self.pqtable[ get_pscore(int(ttreat_p), tctrl_p) ] # use qscore as general score to find summit
             tscore = ttreat_p # use pileup as general score to find summit
             m = tstart - start + start_boundary
             n = tend - start + start_boundary
@@ -1211,8 +1165,7 @@ cdef class CallerFromAlignments:
             summit_treat = peak_content[ summit_index ][ 2 ]
             summit_ctrl = peak_content[ summit_index ][ 3 ]
 
-            #summit_p_score = get_pscore( int(summit_treat), summit_ctrl )
-            summit_p_score = get_pscore(( <int32_t>(summit_treat), summit_ctrl ) )
+            summit_p_score = pscore_dict[ ( <int32_t>(summit_treat), summit_ctrl ) ] # get_pscore(( <int32_t>(summit_treat), summit_ctrl ) )
             summit_q_score = self.pqtable[ summit_p_score ]
 
             for i in range(len(score_cutoff_s)):
@@ -1250,7 +1203,6 @@ cdef class CallerFromAlignments:
         array1_size = array1.shape[0]
 
         for i in range(array1_size):
-            #s_ptr[0] = get_pscore( int(a1_ptr[0]), a2_ptr[0] )
             s_ptr[0] = get_pscore(( <int32_t>(a1_ptr[0]), a2_ptr[0] ))
             s_ptr += 1
             a1_ptr += 1
@@ -1273,7 +1225,6 @@ cdef class CallerFromAlignments:
         s_ptr = <float32_t *> s.data
 
         for i in range(array1.shape[0]):
-            #s_ptr[0] = self.pqtable[ get_pscore( int(a1_ptr[0]), a2_ptr[0] ) ]
             s_ptr[0] = self.pqtable[ get_pscore(( <int32_t>(a1_ptr[0]), a2_ptr[0] )) ]
             s_ptr += 1
             a1_ptr += 1
@@ -1748,7 +1699,6 @@ cdef class CallerFromAlignments:
             tlist_length = []
             for i in range(len(peak_content)): # each position in broad peak
                 (tstart, tend, ttreat_p, tctrl_p, tlist_scores_p) = peak_content[i]
-                #tscore = ttreat_p #self.pqtable[ get_pscore(int(ttreat_p), tctrl_p) ] # use qscore as general score to find summit
                 tlist_pileup.append( ttreat_p )
                 tlist_control.append( tctrl_p )
                 tlist_length.append( tend - tstart )
@@ -1822,100 +1772,4 @@ cdef class CallerFromAlignments:
                    qscore = lvl2peak["qscore"] )
         return bpeaks
 
-    cpdef refine_peak_from_tags_distribution ( self, peaks, int32_t window_size = 100, float32_t cutoff = 5 ):
-        """Extract tags in peak, then apply func on extracted tags.
-
-        peaks: redefined regions to extract raw tags in PeakIO type: check cPeakIO.pyx.
-
-        window_size: this will be passed to func.
-
-        cutoff: this will be passed to func.
-
-        func needs the fixed number of parameters, so it's not flexible. Here is an example:
-
-        wtd_find_summit(chrom, plus, minus, peak_start, peak_end, name , window_size, cutoff):
-
-        """
-
-        cdef:
-            int32_t c, m, i, j, pre_i, pre_j, pos, startpos, endpos
-            np.ndarray plus, minus, rt_plus, rt_minus
-            bytes chrom
-            set pchrnames, chrnames
-            list temp, retval, cpeaks
-            np.ndarray adjusted_summits, passflags
-
-        if self.PE_mode:
-            return None
-
-        pchrnames = sorted(peaks.get_chr_names())
-        retval = []
-
-        # this object should be sorted
-        if not self.treat.__sorted: self.treat.sort()
-        # PeakIO object should be sorted
-        peaks.sort()
-
-        chrnames = self.treat.get_chr_names()
-
-        ret_peaks = PeakIO()
-
-        for c in range(len(pchrnames)):
-            chrom = pchrnames[c]
-            assert chrom in chrnames, "chromosome %s can't be found in the FWTrack object." % (chrom.decode())
-            (plus, minus) = self.treat.__locations[chrom]
-            cpeaks = peaks.get_data_from_chrom(chrom)
-
-            prev_i = 0
-            prev_j = 0
-            for m in range(len(cpeaks)):
-                thispeak = cpeaks[m]
-                startpos = thispeak["start"] - window_size
-                endpos   = thispeak["end"] + window_size
-                temp = []
-                for i in range(prev_i,plus.shape[0]):
-                    pos = plus[i]
-                    if pos < startpos:
-                        continue
-                    elif pos > endpos:
-                        prev_i = i
-                        break
-                    else:
-                        temp.append(pos)
-                rt_plus = np.array(temp)
-
-                temp = []
-                for j in range(prev_j,minus.shape[0]):
-                    pos = minus[j]
-                    if pos < startpos:
-                        continue
-                    elif pos > endpos:
-                        prev_j = j
-                        break
-                    else:
-                        temp.append(pos)
-                rt_minus = np.array(temp)
-
-                (adjusted_summits, passflags) = wtd_find_summit(chrom, rt_plus, rt_minus, startpos, endpos, window_size, cutoff)
-                # those local maxima above cutoff will be defined as good summits
-                for i in range(len(adjusted_summits)):
-                    adjusted_summit = adjusted_summits[i]
-                    passflag = passflags[i]
-                    if passflag:
-                        tmppeak = copy(thispeak)
-                        tmppeak["summit"] = adjusted_summit
-                        ret_peaks.add_PeakContent(chrom, tmppeak)
-
-                # rewind window_size
-                for i in range(prev_i, 0, -1):
-                    if plus[prev_i] - plus[i] >= window_size:
-                        break
-                prev_i = i
-
-                for j in range(prev_j, 0, -1):
-                    if minus[prev_j] - minus[j] >= window_size:
-                        break
-                prev_j = j
-                # end of a loop
-        return ret_peaks
-
+ 

@@ -1,7 +1,7 @@
 # cython: language_level=3
 # cython: profile=True
 # cython: linetrace=True
-# Time-stamp: <2020-11-30 11:32:30 Tao Liu>
+# Time-stamp: <2020-12-03 11:48:43 Tao Liu>
 
 """Module for all MACS Parser classes for input.
 
@@ -802,7 +802,7 @@ cdef class ELANDMultiParser( GenericParser ):
         if len( thisfields ) < 4:
             return ( b"", -1, -1 )
         else:
-            thistaghits = sum( [int(x) for x in thisfields[ 2 ].split( b':' ) ] )
+            thistaghits = sum( [<int32_t>(x) for x in thisfields[ 2 ].split( b':' ) ] )
             if thistaghits > 1:
                 # multiple hits
                 return ( b"", -1, -1 )
@@ -817,11 +817,11 @@ cdef class ELANDMultiParser( GenericParser ):
                 strand  = pos[ -2 ]
                 if strand == b"F":
                     return ( chromname,
-                             int( pos[ :-2 ] )-1,
+                             <int32_t>( pos[ :-2 ] )-1,
                              0 )
                 elif strand == b"R":
                     return ( chromname,
-                             int( pos[ :-2 ] ) + thistaglength - 1,
+                             <int32_t>( pos[ :-2 ] ) + thistaglength - 1,
                              1 )
                 else:
                     raise StrandFormatError( thisline,strand )
@@ -996,7 +996,7 @@ cdef class SAMParser( GenericParser ):
         if bwflag & 16:
             # minus strand, we have to decipher CIGAR string
             thisstrand = 1
-            thisstart = atoi( thisfields[ 3 ] ) - 1 + sum( [ int(x) for x in findall(b"(\d+)[MDNX=]",CIGAR) ] )	#reverse strand should be shifted alen bp
+            thisstart = atoi( thisfields[ 3 ] ) - 1 + sum( [ <int32_t>(x) for x in findall(b"(\d+)[MDNX=]",CIGAR) ] )	#reverse strand should be shifted alen bp
         else:
             thisstrand = 0
             thisstart = atoi( thisfields[ 3 ] ) - 1

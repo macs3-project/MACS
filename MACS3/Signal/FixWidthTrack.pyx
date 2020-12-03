@@ -1,6 +1,6 @@
 # cython: language_level=3
 # cython: profile=True
-# Time-stamp: <2020-12-01 01:23:30 Tao Liu>
+# Time-stamp: <2020-12-02 16:00:25 Tao Liu>
 
 """Module for FWTrack classes.
 
@@ -245,7 +245,7 @@ cdef class FWTrack:
             # index for old array, and index for new one
             uint64_t i_old, i_new, size, new_size
             bytes k
-            np.ndarray[np.int32_t, ndim=1] plus, new_plus, minus, new_minus
+            np.ndarray[int32_t, ndim=1] plus, new_plus, minus, new_minus
             set chrnames
 
         if maxnum < 0: return self.total         # do nothing
@@ -421,7 +421,7 @@ cdef class FWTrack:
     cpdef tuple extract_region_tags ( self, bytes chromosome, int32_t startpos, int32_t endpos ):
         cdef:
             int32_t i, pos
-            np.ndarray[np.int32_t, ndim=1] rt_plus, rt_minus
+            np.ndarray[int32_t, ndim=1] rt_plus, rt_minus
             list temp
             set chrnames
 
@@ -474,7 +474,7 @@ cdef class FWTrack:
 
         cdef:
             int32_t m, i, j, pre_i, pre_j, pos, startpos, endpos
-            np.ndarray[np.int32_t, ndim=1] plus, minus, rt_plus, rt_minus
+            np.ndarray[int32_t, ndim=1] plus, minus, rt_plus, rt_minus
             bytes chrom, name
             list temp, retval
             set pchrnames, chrnames
@@ -510,7 +510,7 @@ cdef class FWTrack:
                         break
                     else:
                         temp.append(pos)
-                rt_plus = np.array(temp, dtype=np.int32)
+                rt_plus = np.array(temp, dtype="int32")
 
                 temp = []
                 for j in range(prev_j,minus.shape[0]):
@@ -522,7 +522,7 @@ cdef class FWTrack:
                         break
                     else:
                         temp.append(pos)
-                rt_minus = np.array(temp, dtype=np.int32)
+                rt_minus = np.array(temp, dtype="int32")
 
                 retval.append( func(chrom, rt_plus, rt_minus, startpos, endpos, name = name, window_size = window_size, cutoff = cutoff) )
                 # rewind window_size
@@ -538,92 +538,6 @@ cdef class FWTrack:
                 # end of a loop
 
         return retval
-
-    cpdef object refine_peak_from_tags_distribution ( self, peaks, int32_t window_size = 100, float32_t cutoff = 5 ):
-        """Extract tags in peak, then apply func on extracted tags.
-
-        peaks: redefined regions to extract raw tags in PeakIO type: check cPeakIO.pyx.
-
-        window_size: this will be passed to func.
-
-        cutoff: this will be passed to func.
-
-        func needs the fixed number of parameters, so it's not flexible. Here is an example:
-
-        wtd_find_summit(chrom, plus, minus, peak_start, peak_end, name , window_size, cutoff):
-
-        """
-
-        cdef:
-            int32_t m, i, j, pre_i, pre_j, pos, startpos, endpos #, n_peaks
-            np.ndarray[np.int32_t, ndim=1] plus, minus, rt_plus, rt_minus
-            bytes chrom #, peak_name
-            set pchrnames, chrnames
-            list temp, retval, cpeaks
-            np.ndarray[np.int32_t, ndim=1] adjusted_summits, passflags
-            object ret_peaks
-
-        pchrnames = peaks.get_chr_names()
-        retval = []
-        # this object should be sorted
-        if not self.__sorted: self.sort()
-        # PeakIO object should be sorted
-        peaks.sort()
-        chrnames = self.get_chr_names()
-        ret_peaks = PeakIO()
-        for chrom in pchrnames:
-            assert chrom in chrnames, "chromosome %s can't be found in the FWTrack object. %s" % (chrom, str(chrnames))
-            (plus, minus) = self.__locations[chrom]
-            cpeaks = peaks.get_data_from_chrom(chrom)
-            prev_i = 0
-            prev_j = 0
-            for m in range(len(cpeaks)):
-                thispeak = cpeaks[m]
-                startpos = thispeak["start"] - window_size
-                endpos   = thispeak["end"] + window_size
-                temp = []
-                for i in range(prev_i,plus.shape[0]):
-                    pos = plus[i]
-                    if pos < startpos:
-                        continue
-                    elif pos > endpos:
-                        prev_i = i
-                        break
-                    else:
-                        temp.append(pos)
-                rt_plus = np.array(temp)
-                temp = []
-                for j in range(prev_j,minus.shape[0]):
-                    pos = minus[j]
-                    if pos < startpos:
-                        continue
-                    elif pos > endpos:
-                        prev_j = j
-                        break
-                    else:
-                        temp.append(pos)
-                rt_minus = np.array(temp)
-                #peak_name = name + "_" + str(n_peaks)
-                (adjusted_summits, passflags) = wtd_find_summit(chrom, rt_plus, rt_minus, startpos, endpos, window_size, cutoff)
-                # those local maxima above cutoff will be defined as good summits
-                for i in range(len(adjusted_summits)):
-                    adjusted_summit = adjusted_summits[i]
-                    passflag = passflags[i]
-                    if passflag:
-                        tmppeak = copy(thispeak)
-                        tmppeak["summit"] = adjusted_summit
-                        ret_peaks.add_PeakContent(chrom, tmppeak)
-                # rewind window_size
-                for i in range(prev_i, 0, -1):
-                    if plus[prev_i] - plus[i] >= window_size:
-                        break
-                prev_i = i
-                for j in range(prev_j, 0, -1):
-                    if minus[prev_j] - minus[j] >= window_size:
-                        break
-                prev_j = j
-                # end of a loop
-        return ret_peaks
 
     cpdef list pileup_a_chromosome ( self, bytes chrom, list ds, list scale_factor_s, float32_t baseline_value = 0.0, bint directional = True, int32_t end_shift = 0 ):
         """pileup a certain chromosome, return [p,v] (end position and value) list.
@@ -692,36 +606,4 @@ cdef inline int32_t left_forward ( data, int32_t pos, int32_t window_size ):
 
 cdef inline int32_t right_forward ( data, int32_t pos, int32_t window_size ):
     return data.get(pos + window_size, 0) - data.get(pos, 0)
-
-cdef tuple wtd_find_summit(chrom, np.ndarray[np.int32_t, ndim=1] plus, np.ndarray[np.int32_t, ndim=1] minus, int32_t search_start, int32_t search_end, int32_t window_size, float32_t cutoff):
-    """internal function to be called by refine_peak_from_tags_distribution()
-
-    """
-    cdef:
-        int32_t i, j, watson_left, watson_right, crick_left, crick_right, wtd_max_pos
-        float32_t wtd_max_val
-        np.ndarray wtd_list, wtd_other_max_pos, wtd_other_max_val
-
-    watson, crick = (Counter(plus), Counter(minus))
-    watson_left = left_sum(watson, search_start, window_size)
-    crick_left = left_sum(crick, search_start, window_size)
-    watson_right = right_sum(watson, search_start, window_size)
-    crick_right = right_sum(crick, search_start, window_size)
-
-    wtd_list = np.zeros( search_end - search_start + 1, dtype="float32")
-    i = 0
-    for j in range(search_start, search_end+1):
-        wtd_list[i] = max((2 * (watson_left * crick_right)**0.5 - watson_right - crick_left),0) # minimum score is 0
-        watson_left += left_forward(watson, j, window_size)
-        watson_right += right_forward(watson, j, window_size)
-        crick_left += left_forward(crick, j, window_size)
-        crick_right += right_forward(crick, j, window_size)
-        i += 1
-
-    wtd_other_max_pos = maxima(wtd_list, window_size = window_size)
-    wtd_other_max_pos = enforce_peakyness( wtd_list, wtd_other_max_pos )
-    wtd_other_max_val = wtd_list[wtd_other_max_pos]
-    wtd_other_max_pos = wtd_other_max_pos + search_start
-
-    return (wtd_other_max_pos, wtd_other_max_val > cutoff)
 

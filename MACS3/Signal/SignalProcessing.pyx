@@ -1,6 +1,6 @@
 # cython: language_level=3
 # cython: profile=True
-# Time-stamp: <2020-12-02 14:09:19 Tao Liu>
+# Time-stamp: <2020-12-02 15:49:58 Tao Liu>
 
 """Module Description: functions to find maxima minima or smooth the
 signal tracks.
@@ -128,15 +128,15 @@ cdef bool is_valid_peak(np.ndarray[float32_t, ndim=1] signal, int maximum):
 
 # require at least 6 different float values -- prevents broad flat peaks
 cdef bool too_flat(np.ndarray[float32_t, ndim=1] signal):
-#    """return whether signal has at least 6 unique values
-#    """
+    """return whether signal has at least 6 unique values
+    """
     return np.unique(signal).shape[0] < 6
 
 # hard clip a region with negative values
 cdef np.ndarray[float32_t, ndim=1] hard_clip(np.ndarray[float32_t, ndim=1] signal, int32_t maximum):
-#    """clip the signal in both directions at the nearest values <= 0
-#    to position maximum
-#    """
+    """clip the signal in both directions at the nearest values <= 0
+    to position maximum
+    """
     cdef:
         int32_t i
         int32_t left = 0

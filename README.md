@@ -42,9 +42,7 @@ background*.
 
 	4) R wrappers for MACS
 
-    5) Multiple processing support
-
-    6) Switching to Github Action for CI
+    5) Switching to Github Action for CI
 
 ### 2.2.7.1
 	* hotfix: 
