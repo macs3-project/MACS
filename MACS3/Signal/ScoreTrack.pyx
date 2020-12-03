@@ -1,6 +1,6 @@
 # cython: language_level=3
 # cython: profile=True
-# Time-stamp: <2020-12-01 10:46:52 Tao Liu>
+# Time-stamp: <2020-12-03 15:56:48 Tao Liu>
 
 """Module for Feature IO classes.
 
@@ -1011,7 +1011,7 @@ cdef class TwoConditionScores:
         object t1bdg, c1bdg, t2bdg, c2bdg
         dict pvalue_stat1, pvalue_stat2, pvalue_stat3
 
-    def __init__ (self, t1bdg, c1bdg, t2bdg, c2bdg, float32_t cond1_factor = 1.0, float32_t cond2_factor = 1.0, float32_t pseudocount = 0.01, proportion_background_empirical_distribution = 0.99999 ):
+    def __init__ (self, t1bdg, c1bdg, t2bdg, c2bdg, float32_t cond1_factor = 1.0, float32_t cond2_factor = 1.0, float32_t pseudocount = 0.01, float32_t proportion_background_empirical_distribution = 0.99999 ):
         """
         t1bdg: a bedGraphTrackI object for treat 1
         c1bdg: a bedGraphTrackI object for control 1
@@ -1058,6 +1058,7 @@ cdef class TwoConditionScores:
         cdef:
             set common_chrs
             bytes chrname
+            int32_t chrom_max_len
         # common chromosome names
         common_chrs = self.get_common_chrs()
         for chrname in common_chrs:
@@ -1088,7 +1089,9 @@ cdef class TwoConditionScores:
         cond2_treat_vs, cond2_control_vs: value of treat and control of condition 2
 
         """
-
+        cdef:
+            int32_t c1tp, c1cp, c2tp, c2cp, minp, pre_p
+            float32_t c1tv, c1cv, c2tv, c2cv 
         c1tpn = iter(cond1_treat_ps).__next__
         c1cpn = iter(cond1_control_ps).__next__
         c2tpn = iter(cond2_treat_ps).__next__
@@ -1132,8 +1135,11 @@ cdef class TwoConditionScores:
         except StopIteration:
             # meet the end of either bedGraphTrackI, simply exit
             pass
+        return
 
-    def get_common_chrs ( self ):
+    cdef set get_common_chrs ( self ):
+        cdef:
+            set t1chrs, c1chrs, t2chrs, c2chrs, common
         t1chrs = self.t1bdg.get_chr_names()
         c1chrs = self.c1bdg.get_chr_names()
         t2chrs = self.t2bdg.get_chr_names()
@@ -1168,7 +1174,9 @@ cdef class TwoConditionScores:
 
         *Warning* Need to add regions continuously.
         """
-        cdef int32_t i
+        cdef:
+            int32_t i
+            list c
         i = self.datalength[chromosome]
         c = self.data[chromosome]
         c[0][ i ] = endpos
@@ -1176,6 +1184,7 @@ cdef class TwoConditionScores:
         c[2][ i ] = logLR_asym( (t2+self.pseudocount)*self.cond2_factor, (c2+self.pseudocount)*self.cond2_factor )
         c[3][ i ] = logLR_sym( (t1+self.pseudocount)*self.cond1_factor, (t2+self.pseudocount)*self.cond2_factor )
         self.datalength[chromosome] += 1
+        return
 
     cpdef finalize ( self ):
         """
@@ -1183,8 +1192,9 @@ cdef class TwoConditionScores:
 
         """
         cdef:
-            bytes chrom, k
+            bytes chrom
             int32_t l
+            list d
 
         for chrom in self.data.keys():
             d = self.data[chrom]
@@ -1213,7 +1223,7 @@ cdef class TwoConditionScores:
         l = set(self.data.keys())
         return l
 
-    cpdef write_bedGraph ( self, fhd, str name, str description, short column = 3):
+    cpdef write_bedGraph ( self, fhd, str name, str description, int32_t column = 3):
         """Write all data to fhd in bedGraph Format.
 
         fhd: a filehandler to save bedGraph.
@@ -1314,11 +1324,12 @@ cdef class TwoConditionScores:
         cdef:
             int32_t i
             bytes chrom
-            np.ndarray pos, sample, control, value, above_cutoff, \
-                       above_cutoff_v, above_cutoff_endpos, \
-                       above_cutoff_startpos, above_cutoff_sv
-            list peak_content
-
+            np.ndarray pos, t1_vs_c1, t2_vs_c2, t1_vs_t2, \
+                       cond1_over_cond2, cond2_over_cond1, cond1_equal_cond2, \
+                       cond1_sig, cond2_sig,\
+                       cat1, cat2, cat3, \
+                       cat1_startpos, cat1_endpos, cat2_startpos, cat2_endpos, \
+                       cat3_startpos, cat3_endpos
         chrs  = self.get_chr_names()
         cat1_peaks = PeakIO()       # dictionary to save peaks significant at condition 1
         cat2_peaks = PeakIO()       # dictionary to save peaks significant at condition 2
@@ -1367,6 +1378,7 @@ cdef class TwoConditionScores:
 
          """
          cdef:
+             int32_t i
              list peak_content
              float32_t mean_logLR
 
@@ -1386,6 +1398,8 @@ cdef class TwoConditionScores:
                      # close
                      if peak_content[ -1 ][ 1 ] - peak_content[ 0 ][ 0 ] >= min_length:
                          mean_logLR = self.mean_from_peakcontent( peak_content )
+                         #if peak_content[0][0] == 22414956:
+                         #    print(f"{peak_content} {mean_logLR}")
                          peaks.add( chrom, peak_content[0][0], peak_content[-1][1],
                                     summit = -1, peak_score  = mean_logLR, pileup = 0, pscore = 0,
                                     fold_change = 0, qscore = 0,
@@ -1410,7 +1424,7 @@ cdef class TwoConditionScores:
         cdef:
             int32_t tmp_s, tmp_e
             int32_t l
-            float32_t tmp_v, sum_v        #for better precision
+            float64_t tmp_v, sum_v        #for better precision
             float32_t r
             int32_t i
 
@@ -1419,11 +1433,11 @@ cdef class TwoConditionScores:
         for i in range( len(peakcontent) ):
             tmp_s = peakcontent[i][0]
             tmp_e = peakcontent[i][1]
-            tmp_v = <float32_t> peakcontent[i][2]
+            tmp_v = peakcontent[i][2]
             sum_v += tmp_v * ( tmp_e - tmp_s )
             l +=  tmp_e - tmp_s
 
-        r = sum_v / l
+        r = <float32_t>( sum_v / l )
         return r
 
 

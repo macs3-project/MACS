@@ -1,6 +1,6 @@
 # cython: language_level=3
 # cython: profile=True
-# Time-stamp: <2020-11-30 16:14:59 Tao Liu>
+# Time-stamp: <2020-12-03 11:46:58 Tao Liu>
 
 """Module Description:  IO Module for bedGraph file
 
@@ -19,25 +19,6 @@ from MACS3.Signal.BedGraph import bedGraphTrackI
 # ------------------------------------
 # constants
 # ------------------------------------
-# cdef extern from "stdio.h":
-#     ctypedef struct FILE
-#     FILE *fopen   (const char *filename, const char  *opentype)
-#     int fclose   (FILE *stream)
-#     int fscanf   (FILE *stream, const char *template, ...)
-#     int fprintf  (FILE *stream, const char *template, ...)
-#     enum: EOF
-
-# cdef extern from "stdlib.h":
-#     ctypedef unsigned int size_t
-#     size_t strlen(char *s)
-#     void *malloc(size_t size)
-#     void *calloc(size_t n, size_t size)
-#     void free(void *ptr)
-#     int strcmp(char *a, char *b)
-#     char * strcpy(char *a, char *b)
-#     long atol(char *str)
-#     int atoi(char *str)
-#     double atof(char *str)
 
 # ------------------------------------
 # C lib

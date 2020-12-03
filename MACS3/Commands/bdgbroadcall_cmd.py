@@ -1,4 +1,4 @@
-# Time-stamp: <2019-09-25 10:04:48 taoliu>
+# Time-stamp: <2020-12-03 14:26:29 Tao Liu>
 
 """Description: Fine-tuning script to call broad peaks from a single
 bedGraph track for scores.
@@ -48,7 +48,7 @@ def run( options ):
 
     info("Call peaks from bedGraph...")
 
-    bpeaks = btrack.call_broadpeaks (lvl1_cutoff=options.cutoffpeak, lvl2_cutoff=options.cutofflink, min_length=options.minlen, lvl1_max_gap=options.lvl1maxgap, lvl2_max_gap=options.lvl2maxgap)
+    bpeaks = btrack.call_broadpeaks (options.cutoffpeak, options.cutofflink, options.minlen, options.lvl1maxgap, options.lvl2maxgap)
 
     info("Write peaks...")
 
