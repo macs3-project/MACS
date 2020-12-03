@@ -1,15 +1,11 @@
-ARG BASE_IMAGE=macs_ppc64le
+ARG BASE_IMAGE=${BASE_IMAGE}
 FROM ${BASE_IMAGE}
 
 ENV TEST_USER macs
 
-RUN uname -a
 WORKDIR /build
 COPY . .
 RUN chown -R "${TEST_USER}:${TEST_USER}" /build
 USER "${TEST_USER}"
-RUN env | grep ^PATH
 ENV PATH "/home/${TEST_USER}/.local/bin:${PATH}"
-RUN python3 --version
-RUN pip3 --version
 RUN pip3 install --user . --no-cache-dir

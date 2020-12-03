@@ -1,9 +1,8 @@
-ARG BASE_IMAGE=debian:buster
+ARG BASE_IMAGE=${BASE_IMAGE}
 FROM ${BASE_IMAGE}
 
 ENV TEST_USER macs
 
-RUN uname -a
 RUN apt-get update -qq && \
   apt-get install -yq \
   python3 \
@@ -13,17 +12,9 @@ RUN apt-get update -qq && \
   procps
 
 RUN useradd -m "${TEST_USER}"
-WORKDIR /build
-COPY . .
-RUN chown -R "${TEST_USER}:${TEST_USER}" /build
-
 USER "${TEST_USER}"
-RUN env | grep ^PATH
+WORKDIR /build
+COPY requirements.txt .
 ENV PATH "/home/${TEST_USER}/.local/bin:${PATH}"
-
-RUN python3 --version
-RUN pip3 --version
-
 RUN pip3 install --user cython --no-cache-dir
 RUN pip3 install --user --upgrade -r requirements.txt --no-cache-dir
-RUN pip3 install --user . --no-cache-dir

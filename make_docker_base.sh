@@ -1,6 +1,6 @@
 # This script contains commands to create docker images for multi-arch
-# testing of MACS3 Note that The dependencies to compile and run MACS3
-# have been installed in these images; however, MACS3 is not
+# testing of MACS3. Note that The dependencies to compile and run
+# MACS3 have been installed in these images; however, MACS3 is not
 # installed.
 
 # base images are from Debian official images
@@ -25,4 +25,4 @@ docker run --rm --privileged multiarch/qemu-user-static --reset -p yes &&
 docker run --rm --privileged multiarch/qemu-user-static --reset -p yes &&
     docker build --rm --build-arg BASE_IMAGE="s390x/debian:buster" -t macs_s390x_base -f test/Dockerfile.multiarch.base.buster.py37 .
 
-
+# The final images are macs_ppc64le_base, macs_i386_base, macs_arm32v7_base, macs_arm64v8_base, and macs_s390x_base
