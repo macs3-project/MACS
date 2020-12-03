@@ -14,7 +14,7 @@ jobs:
     runs-on: ubuntu-20.04
     strategy: 
       matrix: 
-        python-version: [3.8] #[3.7, 3.8]
+        python-version: [3.7, 3.8]
         arch: ['x64']
     name: Build on x64 with Python ${{ matrix.python-version }}
     steps:
@@ -48,9 +48,9 @@ jobs:
       - name: Test with pytest
         run: |
           pytest --runxfail
-          #cd test
-          #./cmdlinetest macs2
-          #cd ..
+          cd test
+          ./cmdlinetest macs3
+          cd ..
       - name: Build sdist
         run: |
           python setup.py sdist

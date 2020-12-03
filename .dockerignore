@@ -14,10 +14,11 @@ MACS3/Signal/ScoreTrack.c
 MACS3/Signal/Signal.c
 MACS3/Signal/SignalProcessing.c
 other_test/*
+.git/*
 .pytest_cache
 .coverage
 .DS_Store
 MACS3.egg-info
-.cache
+.cache/*
 build/*
 dist/*
