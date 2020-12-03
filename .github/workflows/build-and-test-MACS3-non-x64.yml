@@ -5,9 +5,9 @@ name: CI non x64, python 3.7
 
 on:
   push:
-    branches:  [ feat-macs3-donot-run* ]
+    branches:  [ feat-macs3* ]
   pull_request:
-    branches:  [ feat-macs3-donot-run* ]
+    branches:  [ feat-macs3* ]
 
 jobs:
   build_job:
