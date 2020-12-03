@@ -1,4 +1,4 @@
-ARG BASE_IMAGE=ubuntu:bionic
+ARG BASE_IMAGE=debian:buster
 FROM ${BASE_IMAGE}
 
 ENV TEST_USER macs
@@ -9,7 +9,8 @@ RUN apt-get update -qq && \
   python3 \
   python3-pip \
   python3-setuptools \
-  python3-wheel
+  python3-wheel\
+  procps
 
 RUN useradd -m "${TEST_USER}"
 WORKDIR /build
@@ -23,8 +24,6 @@ ENV PATH "/home/${TEST_USER}/.local/bin:${PATH}"
 RUN python3 --version
 RUN pip3 --version
 
-RUN pip3 install --user cython
-RUN pip3 install --user --upgrade -r requirements.txt
-RUN pip3 install --user .
-
-RUN pytest --version
+RUN pip3 install --user cython --no-cache-dir
+RUN pip3 install --user --upgrade -r requirements.txt --no-cache-dir
+RUN pip3 install --user . --no-cache-dir

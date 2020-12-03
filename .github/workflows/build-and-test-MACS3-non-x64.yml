@@ -65,7 +65,7 @@ jobs:
             pip3 install --user --upgrade pip --no-cache-dir
             pip3 install --user cython --no-cache-dir
             pip3 install --user --upgrade -r requirements.txt --no-cache-dir
-            python3 setup.py install --user
+            pip3 install --user .  --no-cache-dir
             # run test
             pytest --runxfail # && cd test && ./cmdlinetest macs3
 
