@@ -1,6 +1,6 @@
 # cython: language_level=3
 # cython: profile=True
-# Time-stamp: <2020-12-03 17:16:24 Tao Liu>
+# Time-stamp: <2020-12-03 20:00:30 Tao Liu>
 
 """Module Description: functions to find maxima minima or smooth the
 signal tracks.
@@ -37,13 +37,9 @@ cpdef np.ndarray[int32_t, ndim=1] maxima(np.ndarray[float32_t, ndim=1] signal,
 
     window_size = window_size//2*2+1 # to make an odd number
     smoothed = savitzky_golay_order2_deriv1(signal, window_size).round(16)
-    #print(f"\n{smoothed}")
     sign = np.sign( smoothed )
-    #print(f"\n{sign}")
     diff = np.diff( sign )
-    #print(f"\n{diff}")    
     m = np.where( diff <= -1)[0].astype("int32")
-    #print(f"\n{m}")
     return m
 
 cdef np.ndarray[int32_t, ndim=1] internal_minima( np.ndarray[float32_t, ndim=1] signal,

@@ -18,6 +18,8 @@ jobs:
         include:
           - arch: armv7
             distro: buster
+          - arch: aarch64
+            distro: buster
           - arch: ppc64le
             distro: buster
           - arch: s390x
