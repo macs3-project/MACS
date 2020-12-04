@@ -58,35 +58,36 @@ The common way to install MACS is through
 
 ## Usage
 
-There are currently twelve functions available in MAC2S serving as sub-commands.
+Example for regular peak calling on TF ChIP-seq:
 
-```
-macs3 [-h] [--version]
-    {callpeak,bdgpeakcall,bdgbroadcall,bdgcmp,bdgopt,cmbreps,bdgdiff,filterdup,predictd,pileup,randsample,refinepeak}
-```
+`macs2 callpeak -t ChIP.bam -c Control.bam -f BAM -g hs -n test -B -q 0.01`
 
-Example for regular peak calling: `macs2 callpeak -t ChIP.bam -c
-Control.bam -f BAM -g hs -n test -B -q 0.01`
+Example for broad peak calling on Histone Mark ChIP-seq:
 
-Example for broad peak calling: `macs2 callpeak -t ChIP.bam -c
-Control.bam --broad -g hs --broad-cutoff 0.1`
+`macs2 callpeak -t ChIP.bam -c Control.bam --broad -g hs --broad-cutoff 0.1`
 
-Please click on the link to see the detail description of the subcommands.
+Example for peak calling on ATAC-seq (paired-end mode):
+
+`macs2 callpeak -f BAMPE -t ATAC.bam -g hs -n test -B -q 0.01`
+
+There are currently twelve functions available in MAC3 serving as
+sub-commands. Please click on the link to see the detail description
+of the subcommands.
 
 Subcommand | Description
 -----------|----------
-`callpeak` | Main MACS2 Function to call peaks from alignment results.
-`bdgpeakcall` | Call peaks from bedGraph output.
-`bdgbroadcall` | Call broad peaks from bedGraph output.
-`bdgcmp` | Comparing two signal tracks in bedGraph format.
-`bdgopt` | Operate the score column of bedGraph file.
-`cmbreps` | Combine BEDGraphs of scores from replicates.
-`bdgdiff` | Differential peak detection based on paired four bedGraph files.
-`filterdup` | Remove duplicate reads, then save in BED/BEDPE format.
-`predictd` | Predict d or fragment size from alignment results.
-`pileup` | Pileup aligned reads (single-end) or fragments (paired-end)
-`randsample` | Randomly choose a number/percentage of total reads.
-`refinepeak` | Take raw reads alignment, refine peak summits.
+[`callpeak`](./docs/callpeak.md) | Main MACS3 Function to call peaks from alignment results.
+[`bdgpeakcall`](./docs/bdgpeakcall.md) | Call peaks from bedGraph output.
+[`bdgbroadcall`](./docs/bdgbroadcall.md) | Call broad peaks from bedGraph output.
+[`bdgcmp`](./docs/bdgcmp.md) | Comparing two signal tracks in bedGraph format.
+[`bdgopt`](./docs/bdgopt.md) | Operate the score column of bedGraph file.
+[`cmbreps`](./docs/cmbreps.md) | Combine BEDGraphs of scores from replicates.
+[`bdgdiff`](./docs/bdgdiff.md) | Differential peak detection based on paired four bedGraph files.
+[`filterdup`](./docs/filterdup.md) | Remove duplicate reads, then save in BED/BEDPE format.
+[`predictd`](./docs/predictd.md) | Predict d or fragment size from alignment results.
+[`pileup`](./docs/pileup.md) | Pileup aligned reads (single-end) or fragments (paired-end)
+[`randsample`](./docs/randsample.md) | Randomly choose a number/percentage of total reads.
+[`refinepeak`](./docs/refinepeak.md) | Take raw reads alignment, refine peak summits.
 
 For advanced usage, for example, to run `macs3` in a modular way,
 please read the [advanced usage](./docs/advanced_usage.md). There is a
@@ -107,33 +108,8 @@ contributions over the years.
 
 ## Other useful links
 
- * [Cistrome](http://cistrome.org/ap/)
+ * [Cistrome](http://cistrome.org/)
  * [bedTools](http://code.google.com/p/bedtools/)
  * [UCSC toolkits](http://hgdownload.cse.ucsc.edu/admin/exe/)
+ * [deepTools](https://github.com/deeptools/deepTools/)
 
-## Tips of fine-tuning peak calling
-
-There are several subcommands within MACSv2 package to fine-tune or
-customize your analysis:
-
-1. `bdgcmp` can be used on `*_treat_pileup.bdg` and
-   `*_control_lambda.bdg` or bedGraph files from other resources to
-   calculate the score track.
-
-2. `bdgpeakcall` can be used on `*_treat_pvalue.bdg` or the file
-   generated from bdgcmp or bedGraph file from other resources to call
-   peaks with given cutoff, maximum-gap between nearby mergeable peaks
-   and a minimum length of peak. bdgbroadcall works similarly to
-   bdgpeakcall, however, it will output `_broad_peaks.bed` in BED12
-   format.
-
-3. Differential calling tool -- `bdgdiff`, can be used on 4 bedGraph
-   files which are scores between treatment 1 and control 1, treatment
-   2 and control 2, treatment 1 and treatment 2, treatment 2 and
-   treatment 1. It will output consistent and unique sites according
-   to parameter settings for minimum length, the maximum gap and
-   cutoff.
-
-4. You can combine subcommands to do a step-by-step peak calling. Read
-   detail at [MACS2
-   wikipage](https://github.com/taoliu/MACS/wiki/Advanced%3A-Call-peaks-using-MACS2-subcommands)
