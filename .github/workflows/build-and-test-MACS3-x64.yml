@@ -3,11 +3,7 @@
 
 name: CI x64
 
-on:
-  push:
-    branches:  [ feat-macs3* ]
-  pull_request:
-    branches:  [ feat-macs3* ]
+on: [push, pull_request]
 
 jobs:
   build:
@@ -61,5 +57,3 @@ jobs:
           path: |
             dist/*.tar.gz
 
-
-          

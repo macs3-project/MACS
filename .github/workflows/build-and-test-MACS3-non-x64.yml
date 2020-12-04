@@ -3,11 +3,7 @@
 
 name: CI non x64, python 3.7
 
-on:
-  push:
-    branches:  [ feat-macs3* ]
-  pull_request:
-    branches:  [ feat-macs3* ]
+on: [push, pull_request]
 
 jobs:
   build_job:
