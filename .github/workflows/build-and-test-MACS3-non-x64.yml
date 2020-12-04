@@ -1,0 +1,73 @@
+# This workflow will install Python dependencies, run tests and lint with a single version of Python
+# For more information see: https://help.github.com/actions/language-and-framework-guides/using-python-with-github-actions
+
+name: CI non x64, python 3.7
+
+on:
+  push:
+    branches:  [ feat-macs3* ]
+  pull_request:
+    branches:  [ feat-macs3* ]
+
+jobs:
+  build_job:
+    runs-on: ubuntu-20.04
+    name: Build on ${{ matrix.arch }}
+    strategy:
+      matrix:
+        include:
+          - arch: armv7
+            distro: buster
+          - arch: aarch64
+            distro: buster
+          - arch: ppc64le
+            distro: buster
+          - arch: s390x
+            distro: buster
+    steps:
+      - name: Checkout MACS
+        uses: actions/checkout@v2.1.0
+      - name: Set up arch and run
+        uses: uraimo/run-on-arch-action@v2.0.5
+        id: build
+        with:
+          arch: ${{ matrix.arch }}
+          distro: ${{ matrix.distro }}
+
+          githubToken: ${{ github.token }}
+
+          # The shell to run commands with in the container
+          shell: /bin/bash
+
+          # Mount the current working directory (with checked-out codes) as /MACS3 in the container
+          dockerRunArgs: |
+            -v "${PWD}:/MACS3" -u macs3
+
+          # Create an artifacts directory on runner
+
+          # Install some dependencies in the container. This speeds up builds if
+          # you are also using githubToken. Any dependencies installed here will
+          # be part of the container image that gets cached, so subsequent
+          # builds don't have to re-install them. The image layer is cached
+          # publicly in your project's package repository, so it is vital that
+          # no secrets are present in the container state or logs.
+          install: |
+            useradd -m macs3
+            mkdir -p /MACS3
+            chown -R macs3:macs3 /MACS3
+            # install dependencies
+            apt-get update -qq -y
+            apt-get install -yq python3 python3-pip python3-setuptools python3-wheel procps
+          run: |
+            echo `uname -a`
+            cd /home/macs3/
+            cp -r /MACS3 .
+            cd MACS3
+            export PATH="/home/macs3/.local/bin:${PATH}"
+            pip3 install --user --upgrade pip --no-cache-dir
+            pip3 install --user cython --no-cache-dir
+            pip3 install --user --upgrade -r requirements.txt --no-cache-dir
+            pip3 install --user .  --no-cache-dir
+            # run test
+            pytest --runxfail && cd test && ./cmdlinetest macs3
+

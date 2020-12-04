@@ -1,9 +1,9 @@
 #!/usr/bin/env python
-# Time-stamp: <2019-09-25 14:16:56 taoliu>
+# Time-stamp: <2020-12-01 11:28:20 Tao Liu>
 
 import unittest
 
-from MACS2.IO.BedGraph import *
+from MACS3.Signal.BedGraph import *
 
 class Test_bedGraphTrackI_add_loc(unittest.TestCase):
 
@@ -53,19 +53,19 @@ class Test_bedGraphTrackI_overlie(unittest.TestCase):
                                     (b"chrY", 80, 85, (0,0,35), 161.1809565095832, 3.329003070922764e-32, 31.4777),
                                     (b"chrY", 85, 90, (0,75,35), 506.56872045869005, 3.233076792862357e-106, 105.4904),
                                     (b"chrY", 90,150, (0,0,10), 46.051701859880914, 2.8912075645386016e-08, 7.5389),
-                                    (b"chrY",150,155, (0,0,0), 0, 1.0, 0.0)]        
-        
+                                    (b"chrY",150,155, (0,0,0), 0, 1.0, 0.0)]
+
         self.bdg1 = bedGraphTrackI()
         self.bdg2 = bedGraphTrackI()
         self.bdg3 = bedGraphTrackI()
         for a in self.test_regions1:
-            self.bdg1.safe_add_loc(a[0],a[1],a[2],a[3])
+            self.bdg1.add_loc(a[0],a[1],a[2],a[3])
 
         for a in self.test_regions2:
-            self.bdg2.safe_add_loc(a[0],a[1],a[2],a[3])
+            self.bdg2.add_loc(a[0],a[1],a[2],a[3])
 
         for a in self.test_regions3:
-            self.bdg3.safe_add_loc(a[0],a[1],a[2],a[3])
+            self.bdg3.add_loc(a[0],a[1],a[2],a[3])
 
     def assertEqual_float ( self, a, b, roundn = 4 ):
         self.assertEqual( round( a, roundn ), round( b, roundn ) )
@@ -81,7 +81,7 @@ class Test_bedGraphTrackI_overlie(unittest.TestCase):
             value = v[i]
             self.assertEqual_float( self.test_overlie_max[i][1], pre )
             self.assertEqual_float( self.test_overlie_max[i][2], pos )
-            self.assertEqual_float( self.test_overlie_max[i][3], value )            
+            self.assertEqual_float( self.test_overlie_max[i][3], value )
             pre = pos
 
     def test_overlie_mean(self):
@@ -95,7 +95,7 @@ class Test_bedGraphTrackI_overlie(unittest.TestCase):
             value = v[i]
             self.assertEqual_float( self.test_overlie_mean[i][1], pre )
             self.assertEqual_float( self.test_overlie_mean[i][2], pos )
-            self.assertEqual_float( self.test_overlie_mean[i][3], value )            
+            self.assertEqual_float( self.test_overlie_mean[i][3], value )
             pre = pos
 
     def test_overlie_fisher(self):
@@ -109,6 +109,6 @@ class Test_bedGraphTrackI_overlie(unittest.TestCase):
             value = v[i]
             self.assertEqual_float( self.test_overlie_fisher[i][1], pre )
             self.assertEqual_float( self.test_overlie_fisher[i][2], pos )
-            self.assertEqual_float( self.test_overlie_fisher[i][6], value )            
-            pre = pos                        
+            self.assertEqual_float( self.test_overlie_fisher[i][6], value )
+            pre = pos
 

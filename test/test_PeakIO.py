@@ -4,7 +4,7 @@
 import unittest
 import sys
 
-from MACS2.IO.PeakIO import *
+from MACS3.IO.PeakIO import *
 
 class Test_Region(unittest.TestCase):
 
@@ -45,7 +45,7 @@ class Test_Region(unittest.TestCase):
         for a in self.test_regions1:
             self.mr.add_loc(a[0],a[1],a[2])
         for a in self.test_regions2:
-            self.mr.add_loc(a[0],a[1],a[2])            
+            self.mr.add_loc(a[0],a[1],a[2])
         self.mr.merge_overlap()
         self.mr.write_to_bed(sys.stdout)
 

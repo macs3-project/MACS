@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# Time-stamp: <2019-09-25 11:35:54 taoliu>
+# Time-stamp: <2020-11-24 17:52:13 Tao Liu>
 
 """Module Description: Test functions to calculate probabilities.
 
@@ -11,7 +11,7 @@ the distribution).
 import unittest
 
 from math import log10
-from MACS2.Prob import *
+from MACS3.Signal.Prob import *
 
 # ------------------------------------
 # Main function
@@ -108,7 +108,7 @@ class Test_chisq_p_e(unittest.TestCase):
         expect = [round(x[4],4) for x in self.c]
         result = [round(chisq_logp_e(x[0],x[1],log10=True),4) for x in self.c]
         self.assertEqual( result, expect )
-        
+
 class Test_binomial_cdf(unittest.TestCase):
 
     def setUp(self):

@@ -1,5 +1,6 @@
 numpy>=1.17
 cython>=0.29
+cykhash>=1.0.2  
 pytest>=4.6
 pytest-cov>=2.8
 codecov>=2.0

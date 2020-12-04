@@ -1,12 +1,12 @@
 #!/usr/bin/env python
-# Time-stamp: <2019-09-25 14:44:07 taoliu>
+# Time-stamp: <2020-11-30 14:12:58 Tao Liu>
 
 import io
 import unittest
 from numpy.testing import assert_equal,  assert_almost_equal, assert_array_equal
 
-from MACS2.IO.ScoreTrack import *
-from MACS2.IO.BedGraph import bedGraphTrackI
+from MACS3.Signal.ScoreTrack import *
+from MACS3.Signal.BedGraph import bedGraphTrackI
 
 class Test_TwoConditionScores(unittest.TestCase):
     def setUp(self):
@@ -37,7 +37,7 @@ class Test_TwoConditionScores(unittest.TestCase):
         self.twoconditionscore.build()
         self.twoconditionscore.finalize()
         (self.cat1,self.cat2,self.cat3) = self.twoconditionscore.call_peaks(min_length=10, max_gap=10, cutoff=3)
-        
+
 class Test_ScoreTrackII(unittest.TestCase):
 
     def setUp(self):
@@ -106,12 +106,12 @@ chrY	185	186	peak_2	6.40804
 chrY	1	60	60	6	100	63.2725	9.18182	-1	MACS_peak_1
 chrY	161	210	50	186	20	7.09102	3.5	-1	MACS_peak_2
 """
-        
+
     def assertListAlmostEqual ( self, a, b, places =2 ):
         return all( [self.assertAlmostEqual(x, y, places=places) for (x, y) in zip( a, b)] )
 
     def test_compute_scores(self):
-        s1 = scoreTrackII( self.treat_edm, self.ctrl_edm )
+        s1 = ScoreTrackII( self.treat_edm, self.ctrl_edm )
         s1.add_chromosome( b"chrY", 5 )
         for a in self.test_regions1:
             s1.add( a[0],a[1],a[2],a[3] )
@@ -125,7 +125,7 @@ chrY	161	210	50	186	20	7.09102	3.5	-1	MACS_peak_2
         s1.change_score_method( ord('q') )
         r = s1.get_data_by_chr(b"chrY")
         self.assertListAlmostEqual( [round(x,2) for x in list(r[3])], self.q_result )
-        
+
         s1.change_score_method( ord('l') )
         r = s1.get_data_by_chr(b"chrY")
         self.assertListAlmostEqual( [round(x,2) for x in list(r[3])], self.l_result )
@@ -143,7 +143,7 @@ chrY	161	210	50	186	20	7.09102	3.5	-1	MACS_peak_2
         self.assertListAlmostEqual( [round(x,2) for x in list(r[3])], self.m_result )
 
     def test_normalize(self):
-        s1 = scoreTrackII( self.treat_edm, self.ctrl_edm )
+        s1 = ScoreTrackII( self.treat_edm, self.ctrl_edm )
         s1.add_chromosome( b"chrY", 5 )
         for a in self.test_regions1:
             s1.add( a[0],a[1],a[2],a[3] )
@@ -165,7 +165,7 @@ chrY	161	210	50	186	20	7.09102	3.5	-1	MACS_peak_2
         assert_array_equal( r, self.norm_N )
 
     def test_writebedgraph ( self ):
-        s1 = scoreTrackII( self.treat_edm, self.ctrl_edm )
+        s1 = ScoreTrackII( self.treat_edm, self.ctrl_edm )
         s1.add_chromosome( b"chrY", 5 )
         for a in self.test_regions1:
             s1.add( a[0],a[1],a[2],a[3] )
@@ -175,15 +175,15 @@ chrY	161	210	50	186	20	7.09102	3.5	-1	MACS_peak_2
         strio = io.StringIO()
         s1.write_bedGraph( strio, "NAME", "DESC", 1 )
         self.assertEqual( strio.getvalue(), self.bdg1 )
-        strio = io.StringIO()        
+        strio = io.StringIO()
         s1.write_bedGraph( strio, "NAME", "DESC", 2 )
         self.assertEqual( strio.getvalue(), self.bdg2 )
-        strio = io.StringIO()        
+        strio = io.StringIO()
         s1.write_bedGraph( strio, "NAME", "DESC", 3 )
         self.assertEqual( strio.getvalue(), self.bdg3 )
 
     def test_callpeak ( self ):
-        s1 = scoreTrackII( self.treat_edm, self.ctrl_edm )
+        s1 = ScoreTrackII( self.treat_edm, self.ctrl_edm )
         s1.add_chromosome( b"chrY", 5 )
         for a in self.test_regions1:
             s1.add( a[0],a[1],a[2],a[3] )
@@ -200,5 +200,5 @@ chrY	161	210	50	186	20	7.09102	3.5	-1	MACS_peak_2
 
         strio = io.StringIO()
         p.write_to_xls( strio )
-        self.assertEqual( strio.getvalue(), self.xls1 )        
+        self.assertEqual( strio.getvalue(), self.xls1 )
 
