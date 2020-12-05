@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# Time-stamp: <2020-11-24 16:43:29 Tao Liu>
+# Time-stamp: <2020-12-04 18:54:45 Tao Liu>
 """Description: MACS v3 main executable.
 
 This code is free software; you can redistribute it and/or modify it
@@ -98,10 +98,10 @@ def main():
     #    # pileup alignment results with a given extension method
     #    from MACS3.Commands.diffpeak_cmd import run
     #    run( args )
-    #elif subcommand == "callvar":
-    #    # pileup alignment results with a given extension method
-    #    from MACS3.Commands.diffpeak_cmd import run
-    #    run( args )
+    elif subcommand == "callvar":
+        # assemble reads in peak region and call variants
+        from MACS3.Commands.callvar_cmd import run
+        run( args )
 
 
 def prepare_argparser ():
@@ -156,8 +156,8 @@ def prepare_argparser ():
     # command for 'refinepeak'
     add_refinepeak_parser( subparsers )
 
-    ## command for 'refinepeak'
-    #add_callvar_parser( subparsers )
+    ## command for 'callvar'
+    add_callvar_parser( subparsers )
 
     ## command for 'refinepeak'
     #add_hmmratac_parser( subparsers )
@@ -638,8 +638,80 @@ def add_pileup_parser( subparsers ):
                                       help = "Set verbose level. 0: only show critical message, 1: show additional warning message, 2: show process information, 3: show debug messages. If you want to know where are the duplicate reads, use 3. DEFAULT:2" )
     return
 
+def add_callvar_parser( subparsers ):
+    """Add function 'variant calling' argument parsers. From SAPPER package
+    """
+    argparser_callvar = subparsers.add_parser("callvar",
+                                              formatter_class = ap.RawDescriptionHelpFormatter,
+                                              help="Call variants in given peak regions from the alignment BAM files.",
+                                              epilog = """Tips to prepare your input BAM files:
+*Note: please modify the following command lines accordingly*
+Assuming you have two types of BAM files. The first type, what we call
+`TREAT`, is from DNA enrichment assay such as ChIP-seq or ATAC-seq
+where the DNA fragments in the sequencing library are enriched in
+certain genomics regions with potential allele biases; the second
+type, called `CTRL` for control, is from genomic assay in which the
+DNA enrichment is less biased in multiploid chromosomes and more
+uniform across the whole genome (the later one is optional).
+1. Clean the BAM files:
+    $ samtools view -q 30 -F 4 -F 256 -F 2048 -b TREAT.bam -o TREAT_clean.bam
+    $ samtools view -q 30 -F 4 -F 256 -F 2048 -b CTRL.bam -o CTRL_clean.bam
+2. Sort the BAM file:
+    $ samtools sort  TREAT_clean.bam  TREAT_clean_sorted
+    $ samtools sort  CTRL_clean.bam  CTRL_clean_sorted
+3. Peak calling (example is for paired-end data):
+    $ macs2 callpeak -f BAMPE -t TREAT_clean_sort.bam -c CTRL_clean_sort.bam -n MyFactor
+4. Sort peak file:
+    $ sort -k1,1 -k2,2n MyFactor_peaks.narrowPeak > MyFactor_peaks.sorted.bed
+5. Extract reads in peak regions:
+    $ samtools view -b TREAT_clean_sorted.bam -L MyFactor_peaks.sorted.bed -o TREAT_peaks.bam
+    $ samtools view -b CTRL_clean_sorted.bam -L MyFactor_peaks.sorted.bed -o CTRL_peaks.bam
+Finally, to call variants:
+    $ macs3 callvar -b MyFactor_peaks.sorted.bed -t TREAT_peaks.bam -c CTRL_peaks.bam -o MyFactor.vcf
+""")
+    # group for input files
+    group_input = argparser_callvar.add_argument_group( "Input files arguments" )
+    group_input.add_argument( "-b", "--peak", dest = "peakbed", type = str, required =True,
+                              help = "Peak regions in BED format, sorted by coordinates. REQUIRED." )
+    group_input.add_argument( "-t", "--treatment", dest = "tfile", type = str, required = True, 
+                              help = "ChIP-seq/ATAC-seq treatment file in BAM format, containing only records in peak regions, sorted by coordinates. Check instruction on how to make the file using samtools. REQUIRED." )
+    group_input.add_argument( "-c", "--control", dest = "cfile", type = str, required = False, 
+                              help = "Control file in BAM format, containing only records in peak regions, sorted by coordinates. Check instruction on how to make the file using samtools. ")
+    # group for output files
+    group_output = argparser_callvar.add_argument_group( "Output arguments" )
+    add_outdir_option( group_output )
+    group_output.add_argument( "-o", "--ofile", dest = "ofile", type = str, required = True,
+                               help = "Output VCF file name." )    
+    group_output.add_argument( "--verbose", dest = "verbose", type = int, default = 2,
+                               help = "Set verbose level of runtime message. 0: only show critical message, 1: show additional warning message, 2: show process information, 3: show debug messages. DEFAULT:2" )
+    # group for parameters
+    group_para = argparser_callvar.add_argument_group( "Variant calling arguments" )
+    group_para.add_argument( "-g", "--gq-hetero", dest = "GQCutoffHetero", type = float,
+                             help = "Genotype Quality score (-10log10((L00+L11)/(L01+L00+L11))) cutoff for Heterozygous allele type. Default:0, or there is no cutoff on GQ.", default = 0 )
+    group_para.add_argument( "-G", "--gq-homo", dest = "GQCutoffHomo", type = float,
+                             help = "Genotype Quality score (-10log10((L00+L01)/(L01+L00+L11))) cutoff for Homozygous allele (not the same as reference) type. Default:0, or ther is no cutoff on GQ.", default = 0 )
+    group_para.add_argument( "-Q", dest = "Q", type = int, default = 20,
+                             help = "Only consider bases with quality score greater than this value. Default: 20, which means Q20 or 0.01 error rate." )
+    group_para.add_argument( "-D", dest = "maxDuplicate", type = int, default = 1,
+                             help = "Maximum duplicated reads allowed per mapping position, mapping strand and the same CIGAR code. Default: 1. When sequencing depth is high, to set a higher value might help evaluate the correct allele ratio.")
+    group_para.add_argument( "-F", "--fermi", dest = "fermi", type = str, default = "auto",
+                             help = "Option to control when to apply local assembly through Fermi. By default (set as 'auto'), while SAPPER detects any INDEL variant in a peak region, it will utilize Fermi to recover the actual DNA sequences to refine the read alignments. If set as 'on', Fermi will be always invoked. It can increase specificity however sensivity and speed will be significantly lower. If set as 'off', Fermi won't be invoked at all. If so, speed and sensitivity can be higher but specificity will be significantly lower. Default: auto" )
+    group_para.add_argument( "--fermi-overlap", dest = "fermiMinOverlap", type = int,
+                             help = "The minimal overlap for fermi to initially assemble two reads. Must be between 1 and read length. A longer fermiMinOverlap is needed while read length is small (e.g. 30 for 36bp read, but 33 for 100bp read may work). Default:30", default = 30 )
+    group_para.add_argument( "--top2alleles-mratio", dest = "top2allelesMinRatio", type = float,
+                             help = "The reads for the top 2 most frequent alleles (e.g. a ref allele and an alternative allele) at a loci shouldn't be too few comparing to total reads mapped. The minimum ratio is set by this optoin. Must be a float between 0.5 and 1.  Default:0.8 which means at least 80%% of reads contain the top 2 alleles.", default = 0.8 )
+    group_para.add_argument( "--altallele-count", dest = "altalleleMinCount", type = int,
+                             help = "The count of the alternative (non-reference) allele at a loci shouldn't be too few. By default, we require at least two reads support the alternative allele. Default:2", default = 2 )
+    group_para.add_argument( "--max-ar", dest = "maxAR", type = float,
+                             help = "The maximum Allele-Ratio allowed while calculating likelihood for allele-specific binding. If we allow higher maxAR, we may mistakenly assign some homozygous loci as heterozygous. Default:0.95", default = 0.95 )
+    # group for misc
+    group_misc = argparser_callvar.add_argument_group( "Misc arguments" )
+    group_misc.add_argument( "-m", "--multiple-processing", dest = "np", type = int, default = 1,
+                             help = "CPU used for mutliple processing. Please note that, assigning more CPUs does not guarantee the process being faster. Creating too many parrallel processes need memory operations and  may negate benefit from multi processing. Default: 1" )
+    return
 
 if __name__ == '__main__':
+    __spec__ = None
     try:
         main()
     except KeyboardInterrupt:

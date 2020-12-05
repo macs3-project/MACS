@@ -33,9 +33,9 @@ utilize Github Action to implement the CI (Continous Integration) to
 make sure that the main branch passes unit testing on certain
 functions and subcommands. More new featuer will be added soon.**
 
-## Recent Changes for MACS (3.0.0a1)
+## Recent Changes for MACS (3.0.0a2)
 
-### 3.0.0a1
+### 3.0.0a2
 	* Features
 	
 	1) Speed/memory optimization, including using the cykhash to
@@ -47,7 +47,9 @@ functions and subcommands. More new featuer will be added soon.**
 
 	4) R wrappers for MACS
 
-    5) Switching to Github Action for CI, support multi-arch testing.
+    5) Switching to Github Action for CI, support multi-arch testing
+
+    6) Call variants in peak regions directly from BAM files
 
 ## Install
 
@@ -60,15 +62,15 @@ The common way to install MACS is through
 
 Example for regular peak calling on TF ChIP-seq:
 
-`macs2 callpeak -t ChIP.bam -c Control.bam -f BAM -g hs -n test -B -q 0.01`
+`macs3 callpeak -t ChIP.bam -c Control.bam -f BAM -g hs -n test -B -q 0.01`
 
 Example for broad peak calling on Histone Mark ChIP-seq:
 
-`macs2 callpeak -t ChIP.bam -c Control.bam --broad -g hs --broad-cutoff 0.1`
+`macs3 callpeak -t ChIP.bam -c Control.bam --broad -g hs --broad-cutoff 0.1`
 
 Example for peak calling on ATAC-seq (paired-end mode):
 
-`macs2 callpeak -f BAMPE -t ATAC.bam -g hs -n test -B -q 0.01`
+`macs3 callpeak -f BAMPE -t ATAC.bam -g hs -n test -B -q 0.01`
 
 There are currently twelve functions available in MAC3 serving as
 sub-commands. Please click on the link to see the detail description
@@ -88,6 +90,8 @@ Subcommand | Description
 [`pileup`](./docs/pileup.md) | Pileup aligned reads (single-end) or fragments (paired-end)
 [`randsample`](./docs/randsample.md) | Randomly choose a number/percentage of total reads.
 [`refinepeak`](./docs/refinepeak.md) | Take raw reads alignment, refine peak summits.
+[`callvar`](./docs/callvar.md) | Call variants in given peak regions from the alignment BAM files.
+
 
 For advanced usage, for example, to run `macs3` in a modular way,
 please read the [advanced usage](./docs/advanced_usage.md). There is a
