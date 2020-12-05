@@ -1,3 +1,3 @@
 [submodule "lib/simde"]
-    path = lib/simde
+    path = MACS3/fermi-lite/libsimde
     url = https://github.com/nemequ/simde.git
