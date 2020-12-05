@@ -1,5 +1,5 @@
 #!/bin/bash
-# Time-stamp: <2020-12-02 17:43:08 Tao Liu>
+# Time-stamp: <2020-12-04 23:12:53 Tao Liu>
 
 # integrative subcmds testing
 
@@ -34,6 +34,14 @@ CHIPCONTIGS50K=contigs50k.bed.gz
 
 CHIPBIGSPEEDTEST=CTCF_12878_5M.bed.gz
 CTRLBIGSPEEDTEST=input_12878_5M.bed.gz
+
+CALLVAR_SE_BED=callvar_examples/PE_demo/PEsample_peaks_sorted.bed
+CALLVAR_SE_TBAM=callvar_examples/PE_demo/PEsample_peaks_sorted.bam
+CALLVAR_SE_CBAM=callvar_examples/PE_demo/PEcontrol_peaks_sorted.bam
+
+CALLVAR_PE_BED=callvar_examples/SE_demo/SEsample_peaks_sorted.bed
+CALLVAR_PE_TBAM=callvar_examples/SE_demo/SEsample_peaks_sorted.bam
+CALLVAR_PE_CBAM=callvar_examples/SE_demo/SEcontrol_peaks_sorted.bam
 
 # callpeak
 echo "1. callpeak"
@@ -178,6 +186,14 @@ mkdir ${OUTPUTDIR_PREFIX}_run_bdgopt
 macs3 bdgopt -m min -p 10 -i ${OUTPUTDIR_PREFIX}_run_callpeak_narrow/run_callpeak_narrow0_treat_pileup.bdg -o run_bdgopt_min.bdg --outdir ${OUTPUTDIR_PREFIX}_run_bdgopt &> ${OUTPUTDIR_PREFIX}_run_bdgopt/run_bdgopt_min.log
 
 macs3 bdgopt -m max -p 2 -i ${OUTPUTDIR_PREFIX}_run_callpeak_narrow/run_callpeak_narrow0_treat_pileup.bdg -o run_bdgopt_max.bdg --outdir ${OUTPUTDIR_PREFIX}_run_bdgopt &> ${OUTPUTDIR_PREFIX}_run_bdgopt/run_bdgopt_max.log
+
+# callvar
+
+mkdir ${OUTPUTDIR_PREFIX}_run_callvar
+
+macs3 callvar -b ${CALLVAR_SE_BED} -t ${CALLVAR_SE_TBAM} -c ${CALLVAR_SE_CBAM} -o ${OUTPUTDIR_PREFIX}_run_callvar/SEsample.vcf &> ${OUTPUTDIR_PREFIX}_run_callvar/run_callvar_SE.log
+
+macs3 callvar -b ${CALLVAR_PE_BED} -t ${CALLVAR_PE_TBAM} -c ${CALLVAR_PE_CBAM} -o ${OUTPUTDIR_PREFIX}_run_callvar/PEsample.vcf &> ${OUTPUTDIR_PREFIX}_run_callvar/run_callvar_PE.log
 
 # test large amount of contigs
 echo "13. 50k contigs with buffersize"

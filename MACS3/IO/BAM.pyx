@@ -1,6 +1,6 @@
 # cython: language_level=3
 # cython: profile=True
-# Time-stamp: <2020-12-04 18:38:09 Tao Liu>
+# Time-stamp: <2020-12-04 23:09:32 Tao Liu>
 
 """Module for SAPPER BAMParser class
 
@@ -24,7 +24,7 @@ import struct
 from struct import unpack
 import gzip
 import io
-from MACS3.CallVar.ReadAlignment import ReadAlignment
+from MACS3.Signal.ReadAlignment import ReadAlignment
 
 from cpython cimport bool
 
