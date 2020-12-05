@@ -1,5 +1,5 @@
-CC=			gcc
-CFLAGS=		-g -Wall -O2 -Wno-unused-function -DNO_WARN_X86_INTRINSICS #-fno-inline-functions -fno-inline-functions-called-once
+CC=		gcc
+CFLAGS=		-g -Wall -O2 -Wno-unused-function -DNO_WARN_X86_INTRINSICS  #-fno-inline-functions -fno-inline-functions-called-once
 CPPFLAGS=
 INCLUDES=	
 OBJS=		kthread.o misc.o \
@@ -8,6 +8,11 @@ OBJS=		kthread.o misc.o \
 			unitig.o mag.o bubble.o ksw.o
 PROG=		fml-asm
 LIBS=		-lm -lz -lpthread
+
+# for simde: https://github.com/lh3/bwa/pull/283/
+
+CFLAGS += -DUSE_SIMDE -DSIMDE_ENABLE_NATIVE_ALIASES -DSIMDE_ENABLE_OPENMP -fopenmp-simd
+INCLUDES += -Ilib/simde
 
 .SUFFIXES:.c .o
 

@@ -25,7 +25,14 @@
 
 #include <stdlib.h>
 #include <stdint.h>
+
+/* I modified this according to https://github.com/lh3/bwa/pull/283/*/
+#ifdef USE_SIMDE
+#include <simde/x86/sse2.h>
+#else
 #include <emmintrin.h>
+#endif
+
 #include "ksw.h"
 
 #ifdef __GNUC__
