@@ -28,10 +28,11 @@ applied to any "DNA enrichment assays" if the question to be asked is
 simply: *where we can find significant reads coverage than the random
 background*.
 
-**Please note that current MACS3 is still in alpha stage, although we
+**Please note that current MACS3 is still in alpha stage. However, we
 utilize Github Action to implement the CI (Continous Integration) to
 make sure that the main branch passes unit testing on certain
-functions and subcommands. More new featuer will be added soon.**
+functions and subcommands to reproduce the correct outputs. We will
+add more new features in the future.**
 
 ## Recent Changes for MACS (3.0.0a2)
 
@@ -45,11 +46,18 @@ functions and subcommands. More new featuer will be added soon.**
 
 	3) Unit testing
 
-	4) R wrappers for MACS
+	4) R wrappers for MACS -- MACSr
 
     5) Switching to Github Action for CI, support multi-arch testing
 
-    6) Call variants in peak regions directly from BAM files
+    6) MACS tag-shifting model has been refined. Now it will use a
+    naive peak calling approach to find ALL possible paired peaks at +
+    and - strand, then use all of them to calculate the
+    cross-correlation.
+
+    7) Call variants in peak regions directly from BAM files. The
+    function was originally developed under code name SAPPER. Now
+    SAPPER has been merged into MACS. 
 
 ## Install
 
