@@ -1,6 +1,6 @@
 # cython: language_level=3
 # cython: profile=True
-# Time-stamp: <2020-12-04 23:09:32 Tao Liu>
+# Time-stamp: <2020-12-05 16:18:36 Tao Liu>
 
 """Module for SAPPER BAMParser class
 
@@ -342,7 +342,7 @@ cdef class BAMParser:
             return None       #unmapped sequence or bad sequence or  secondary or supplementary alignment 
         if bwflag & 1:
             # paired read. We should only keep sequence if the mate is mapped
-            # Different with MACS2, both reads will be kept.
+            # Different with MACS, both reads will be kept.
             if not bwflag & 2:
                 return None   # not a proper pair
             if bwflag & 8:

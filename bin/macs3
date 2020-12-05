@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# Time-stamp: <2020-12-04 18:54:45 Tao Liu>
+# Time-stamp: <2020-12-05 16:03:31 Tao Liu>
 """Description: MACS v3 main executable.
 
 This code is free software; you can redistribute it and/or modify it
@@ -178,7 +178,18 @@ def add_output_group ( parser, required = True ):
 def add_callpeak_parser( subparsers ):
     """Add main function 'peak calling' argument parsers.
     """
-    argparser_callpeak = subparsers.add_parser("callpeak", help="Main MACS3 Function: Call peaks from alignment results.")
+    argparser_callpeak = subparsers.add_parser("callpeak", help="Main MACS3 Function: Call peaks from alignment results.",
+                                               formatter_class = ap.RawDescriptionHelpFormatter,
+                                               epilog = """Examples:
+1. Peak calling for regular TF ChIP-seq:
+    $ macs3 callpeak -t ChIP.bam -c Control.bam -f BAM -g hs -n test -B -q 0.01
+2. Broad peak calling on Histone Mark ChIP-seq:
+    $ macs3 callpeak -t ChIP.bam -c Control.bam --broad -g hs --broad-cutoff 0.1
+3. Peak calling on ATAC-seq (paired-end mode):
+    $ macs3 callpeak -f BAMPE -t ATAC.bam -g hs -n test -B -q 0.01
+4. Peak calling on ATAC-seq ( focusing on insertion sites, and using single-end mode):
+    $ macs3 callpeak -f BAM -t ATAC.bam -g hs -n test -B -q 0.01 --shift -50 --extension 100
+""")
 
     # group for input files
     group_input = argparser_callpeak.add_argument_group( "Input files arguments" )
@@ -312,7 +323,7 @@ def add_diffpeak_parser( subparsers ):
     group_input.add_argument( "--peaks2", dest="peaks2", type = str, default='',
                                     help = "MACS peaks.xls file for condition 2. Optional but must specify peaks1 if present" )
     group_input.add_argument( "-d", "--depth-multiplier", dest = "depth", type = float, default = [1.0], nargs = "+",
-                                    help = "Sequence depth in million reads. If two depths are different, use '-d X -d Y' for X million reads in condition 1 and Y million reads in condition 2. If they are same, use '-d X' for X million reads in both condition 1 and condition 2 (e.g. the bedGraph files are from 'callpeak --SPMR'). Default: 1 (if you use 'macs2 callpeak --SPMR' to generate bdg files, we recommend using the smaller depth as a multiplier)" )
+                                    help = "Sequence depth in million reads. If two depths are different, use '-d X -d Y' for X million reads in condition 1 and Y million reads in condition 2. If they are same, use '-d X' for X million reads in both condition 1 and condition 2 (e.g. the bedGraph files are from 'callpeak --SPMR'). Default: 1 (if you use 'macs3 callpeak --SPMR' to generate bdg files, we recommend using the smaller depth as a multiplier)" )
 #    group_input.add_argument( "-f", "--format", dest = "format", type = str,
 #                              choices = ("AUTO", "BED", "XLS"),
 #                              help = "Format of peak regions file, \"AUTO\", \"BED\" or \"XLS\". The default AUTO option will let MACS decide which format the file is based on the file extension. DEFAULT: \"AUTO\"",
@@ -660,7 +671,7 @@ uniform across the whole genome (the later one is optional).
     $ samtools sort  TREAT_clean.bam  TREAT_clean_sorted
     $ samtools sort  CTRL_clean.bam  CTRL_clean_sorted
 3. Peak calling (example is for paired-end data):
-    $ macs2 callpeak -f BAMPE -t TREAT_clean_sort.bam -c CTRL_clean_sort.bam -n MyFactor
+    $ macs3 callpeak -f BAMPE -t TREAT_clean_sort.bam -c CTRL_clean_sort.bam -n MyFactor
 4. Sort peak file:
     $ sort -k1,1 -k2,2n MyFactor_peaks.narrowPeak > MyFactor_peaks.sorted.bed
 5. Extract reads in peak regions:
