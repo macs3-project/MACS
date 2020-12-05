@@ -1,5 +1,5 @@
 #!/bin/bash
-# Time-stamp: <2020-12-04 23:12:53 Tao Liu>
+# Time-stamp: <2020-12-05 10:34:06 Tao Liu>
 
 # integrative subcmds testing
 
@@ -188,6 +188,7 @@ macs3 bdgopt -m min -p 10 -i ${OUTPUTDIR_PREFIX}_run_callpeak_narrow/run_callpea
 macs3 bdgopt -m max -p 2 -i ${OUTPUTDIR_PREFIX}_run_callpeak_narrow/run_callpeak_narrow0_treat_pileup.bdg -o run_bdgopt_max.bdg --outdir ${OUTPUTDIR_PREFIX}_run_bdgopt &> ${OUTPUTDIR_PREFIX}_run_bdgopt/run_bdgopt_max.log
 
 # callvar
+echo "13. callvar"
 
 mkdir ${OUTPUTDIR_PREFIX}_run_callvar
 
@@ -196,23 +197,23 @@ macs3 callvar -b ${CALLVAR_SE_BED} -t ${CALLVAR_SE_TBAM} -c ${CALLVAR_SE_CBAM} -
 macs3 callvar -b ${CALLVAR_PE_BED} -t ${CALLVAR_PE_TBAM} -c ${CALLVAR_PE_CBAM} -o ${OUTPUTDIR_PREFIX}_run_callvar/PEsample.vcf &> ${OUTPUTDIR_PREFIX}_run_callvar/run_callvar_PE.log
 
 # test large amount of contigs
-echo "13. 50k contigs with buffersize"
+echo "14. 50k contigs with buffersize"
 
 mkdir ${OUTPUTDIR_PREFIX}_run_50kcontigs
 
-echo "13.1 callpeak"
+echo "14.1 callpeak"
 macs3 callpeak -g 10000000 -t $CHIPCONTIGS50K -n run_callpeak_50kcontigs --outdir ${OUTPUTDIR_PREFIX}_run_50kcontigs --buffer-size 1000 --nomodel --extsize 200 &> ${OUTPUTDIR_PREFIX}_run_50kcontigs/run_callpeak_50kcontigs.log
 
-echo "13.2 filterdup"
+echo "14.2 filterdup"
 macs3 filterdup -g 10000000 -i $CHIPCONTIGS50K --outdir ${OUTPUTDIR_PREFIX}_run_50kcontigs -o run_filterdup_result.bed --buffer-size 1000 &> ${OUTPUTDIR_PREFIX}_run_50kcontigs/run_filterdup_50kcontigs.log
 
-echo "13.3 pileup"
+echo "14.3 pileup"
 macs3 pileup -f BED -i $CHIPCONTIGS50K --extsize 200 --outdir ${OUTPUTDIR_PREFIX}_run_50kcontigs -o run_pileup_ChIP.bed.bdg --buffer-size 1000 &> ${OUTPUTDIR_PREFIX}_run_50kcontigs/run_pileup_ChIP.bed.log
 
-echo "13.4 randsample"
+echo "14.4 randsample"
 macs3 randsample -i $CHIPCONTIGS50K -n 100000 --seed 31415926 --outdir ${OUTPUTDIR_PREFIX}_run_50kcontigs -o run_randsample.bed --buffer-size 1000 &> ${OUTPUTDIR_PREFIX}_run_50kcontigs/run_randsample.log
 
-echo "14. search for errors or warnings in log files"
+echo "15. search for errors or warnings in log files"
 flag=0
 for i in `ls ${OUTPUTDIR_PREFIX}_run_*/*.log`;do
     echo " checking $i..."
@@ -232,7 +233,7 @@ if [[ $flag == 1 ]]; then
     exit 1;
 fi
 
-echo "15. compare with standard outputs"
+echo "16. compare with standard outputs"
 
 flag=0
 # we do not check the consistency of random subsampling results
@@ -246,7 +247,7 @@ for i in ${subfolders[@]};do
     for j in `ls standard_results_${i}/*`; do
 	k=`basename $j`
 	let "n+=1"
-	echo "14.${m}.${n} checking $i $k ..."
+	echo "16.${m}.${n} checking $i $k ..."
 	fq=${OUTPUTDIR_PREFIX}_run_${i}/${k}
 	fs=standard_results_${i}/${k}
 	if [ "${REPLACE}" = "Y" ]; then
@@ -273,7 +274,7 @@ if [ $flag -eq 1 ];then
     exit $flag;
 fi
 
-echo "16. brief speed test"
+echo "17. brief speed test"
 
 mkdir ${OUTPUTDIR_PREFIX}_speedtest
 macs3 callpeak -t CTCF_12878_5M.bed.gz -c Input_12878_5M.bed.gz -n speedtest -B --outdir ${OUTPUTDIR_PREFIX}_speedtest &> ${OUTPUTDIR_PREFIX}_speedtest/speedtest.log &

@@ -12,14 +12,14 @@ jobs:
     strategy:
       matrix:
         include:
-          - arch: armv7
-            distro: buster
-          - arch: aarch64
-            distro: buster
+          #- arch: armv7
+          #  distro: buster
+          #- arch: aarch64
+          #  distro: buster
           - arch: ppc64le
             distro: buster
-          - arch: s390x
-            distro: buster
+          #- arch: s390x
+          #  distro: buster
     steps:
       - name: Checkout MACS
         uses: actions/checkout@v2.1.0
@@ -53,7 +53,7 @@ jobs:
             chown -R macs3:macs3 /MACS3
             # install dependencies
             apt-get update -qq -y
-            apt-get install -yq python3 python3-pip python3-setuptools python3-wheel procps zlib1g zlib1g-dev libc-dev
+            apt-get install -yq python3 python3-pip python3-setuptools python3-wheel procps zlib1g zlib1g-dev libgcc-8-dev
           run: |
             echo `uname -a`
             cd /home/macs3/
