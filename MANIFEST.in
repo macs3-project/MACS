@@ -1,5 +1,6 @@
-include README.md LICENSE ChangeLog INSTALL.md MANIFEST.in setup.py bin/macs3 MACS3/cPosValCalculation.c
+include README.md LICENSE ChangeLog MANIFEST.in setup.py bin/macs3
 recursive-include MACS3 *.py *.pyx *.pxd *.c *.h
+recursive-include docs *.md
 exclude .gitignore .travis.yml
 prune test
 prune .github

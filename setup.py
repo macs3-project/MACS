@@ -59,18 +59,22 @@ def main():
                     Extension("MACS3.Signal.BedGraph", ["MACS3/Signal/BedGraph.pyx"], libraries=["m"], include_dirs=numpy_include_dir, extra_compile_args=extra_c_args),
                     Extension("MACS3.Signal.ScoreTrack", ["MACS3/Signal/ScoreTrack.pyx"], include_dirs=numpy_include_dir, extra_compile_args=extra_c_args ),
                     Extension("MACS3.Signal.CallPeakUnit", ["MACS3/Signal/CallPeakUnit.pyx"], include_dirs=numpy_include_dir, extra_compile_args=extra_c_args),
+                    Extension("MACS3.Signal.VariantStat",["MACS3/Signal/VariantStat.pyx",],libraries=["m"], include_dirs=numpy_include_dir, extra_compile_args=extra_c_args),
+                    Extension("MACS3.Signal.ReadAlignment",["MACS3/Signal/ReadAlignment.pyx",],libraries=["m"],include_dirs=numpy_include_dir, extra_compile_args=extra_c_args),
+                    Extension("MACS3.Signal.RACollection",["MACS3/Signal/RACollection.pyx","MACS3/fermi-lite/bfc.c","MACS3/fermi-lite/bseq.c",\
+                                                           "MACS3/fermi-lite/bubble.c","MACS3/fermi-lite/htab.c","MACS3/fermi-lite/ksw.c","MACS3/fermi-lite/kthread.c",\
+                                                           "MACS3/fermi-lite/mag.c","MACS3/fermi-lite/misc.c","MACS3/fermi-lite/mrope.c","MACS3/fermi-lite/rld0.c",\
+                                                           "MACS3/fermi-lite/rle.c","MACS3/fermi-lite/rope.c","MACS3/fermi-lite/unitig.c", "MACS3/Signal/swalign.c" ], \
+                              libraries=["m","z"], include_dirs=numpy_include_dir+["./","./MACS3/fermi-lite/","./MACS3/Signal/"], extra_compile_args=extra_c_args),
+                    Extension("MACS3.Signal.UnitigRACollection",["MACS3/Signal/UnitigRACollection.pyx"],libraries=["m"], include_dirs=numpy_include_dir, extra_compile_args=extra_c_args),
+                    Extension("MACS3.Signal.PosReadsInfo",["MACS3/Signal/PosReadsInfo.pyx",],libraries=["m"], include_dirs=numpy_include_dir, extra_compile_args=extra_c_args),
+                    Extension("MACS3.Signal.PeakVariants",["MACS3/Signal/PeakVariants.pyx",],libraries=["m"], include_dirs=numpy_include_dir, extra_compile_args=extra_c_args),
                     # IO
                     Extension("MACS3.IO.Parser",["MACS3/IO/Parser.pyx"], include_dirs=numpy_include_dir, extra_compile_args=extra_c_args),
                     Extension("MACS3.IO.PeakIO", ["MACS3/IO/PeakIO.pyx"], extra_compile_args=extra_c_args),
                     Extension("MACS3.IO.BedGraphIO", ["MACS3/IO/BedGraphIO.pyx"], extra_compile_args=extra_c_args),
-                    # CallVar/SAPPER
-                    Extension("MACS3.CallVar.ReadAlignment",["MACS3/CallVar/ReadAlignment.pyx",],libraries=["m"],include_dirs=numpy_include_dir, extra_compile_args=extra_c_args),
-                    Extension("MACS3.CallVar.RACollection",["MACS3/CallVar/RACollection.pyx","MACS3/fermi-lite/bfc.c","MACS3/fermi-lite/bseq.c","MACS3/fermi-lite/bubble.c","MACS3/fermi-lite/htab.c","MACS3/fermi-lite/ksw.c","MACS3/fermi-lite/kthread.c","MACS3/fermi-lite/mag.c","MACS3/fermi-lite/misc.c","MACS3/fermi-lite/mrope.c","MACS3/fermi-lite/rld0.c","MACS3/fermi-lite/rle.c","MACS3/fermi-lite/rope.c","MACS3/fermi-lite/unitig.c", "MACS3/CallVar/swalign.c"],libraries=["m","z"], include_dirs=numpy_include_dir+["./","./MACS3/fermi-lite/","./MACS3/CallVar/"], extra_compile_args=extra_c_args),
-                    Extension("MACS3.CallVar.UnitigRACollection",["MACS3/CallVar/UnitigRACollection.pyx"],libraries=["m"], include_dirs=numpy_include_dir, extra_compile_args=extra_c_args),
-                    Extension("MACS3.CallVar.PosReadsInfo",["MACS3/CallVar/PosReadsInfo.pyx",],libraries=["m"], include_dirs=numpy_include_dir, extra_compile_args=extra_c_args),
-                    Extension("MACS3.CallVar.PeakVariants",["MACS3/CallVar/PeakVariants.pyx",],libraries=["m"], include_dirs=numpy_include_dir, extra_compile_args=extra_c_args),
-                    Extension("MACS3.CallVar.Stat",["MACS3/CallVar/Stat.pyx",],libraries=["m"], include_dirs=numpy_include_dir, extra_compile_args=extra_c_args),
-                    Extension("MACS3.CallVar.BAM",["MACS3/CallVar/BAM.pyx",],libraries=["m"], include_dirs=numpy_include_dir, extra_compile_args=extra_c_args) ]
+                    Extension("MACS3.IO.BAM",["MACS3/IO/BAM.pyx",],libraries=["m"], include_dirs=numpy_include_dir, extra_compile_args=extra_c_args) ]
+
 
     with open("README.md", "r") as fh:
         long_description = fh.read()
@@ -84,7 +88,7 @@ def main():
           author_email='vladimir.liu@gmail.com',
           url='http://github.com/taoliu/MACS/',
           package_dir={'MACS3' : 'MACS3'},
-          packages=['MACS3', 'MACS3.IO', 'MACS3.Signal', 'MACS3.CallVar', 'MACS3.Commands','MACS3.Utilities'],
+          packages=['MACS3', 'MACS3.IO', 'MACS3.Signal', 'MACS3.Commands','MACS3.Utilities'],
           package_data={'MACS3':['*.pxd']},
           scripts=['bin/macs3', ],
           classifiers=[

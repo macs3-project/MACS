@@ -1,4 +1,4 @@
-# Time-stamp: <2020-12-04 18:50:26 Tao Liu>
+# Time-stamp: <2020-12-04 22:51:27 Tao Liu>
 
 """Description: macs call
 
@@ -32,9 +32,9 @@ from math import ceil
 # ------------------------------------
 from MACS3.Utilities.Constants import *
 from MACS3.IO.PeakIO import PeakIO
-from MACS3.CallVar.BAM import BAMParser
-from MACS3.CallVar.RACollection import RACollection
-from MACS3.CallVar.PeakVariants import PeakVariants
+from MACS3.IO.BAM import BAMParser
+from MACS3.Signal.RACollection import RACollection
+from MACS3.Signal.PeakVariants import PeakVariants
 
 
 VCFHEADER_0="""##fileformat=VCFv4.1

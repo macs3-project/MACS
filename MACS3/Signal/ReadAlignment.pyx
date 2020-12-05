@@ -1,27 +1,17 @@
 # cython: language_level=3
 # cython: profile=True
-# Time-stamp: <2020-12-04 18:42:44 Tao Liu>
+# Time-stamp: <2020-12-04 22:48:42 Tao Liu>
 
 """Module for SAPPER ReadAlignment class
-
-Copyright (c) 2017 Tao Liu <tliu4@buffalo.edu>
 
 This code is free software; you can redistribute it and/or modify it
 under the terms of the BSD License (see the file COPYING included
 with the distribution).
-
-@status:  experimental
-@version: $Revision$
-@author:  Tao Liu
-@contact: tliu4@buffalo.edu
 """
 
 # ------------------------------------
 # python modules
 # ------------------------------------
-import logging
-import gzip
-import io
 from cpython cimport bool
 
 cdef extern from "stdlib.h":
@@ -38,8 +28,6 @@ cdef extern from "stdlib.h":
 # ------------------------------------
 # constants
 # ------------------------------------
-# cython: language_level=3
-# cython: profile=True
 
 __BAMDNACODE__ = b"=ACMGRSVTWYHKDBN"
 __CIGARCODE__ = "MIDNSHP=X"

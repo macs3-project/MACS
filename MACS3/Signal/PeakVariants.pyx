@@ -1,19 +1,12 @@
 # cython: language_level=3
 # cython: profile=True
-# Time-stamp: <2020-12-04 18:38:28 Tao Liu>
+# Time-stamp: <2020-12-04 22:11:09 Tao Liu>
 
 """Module for SAPPER PeakVariants class.
-
-Copyright (c) 2017 Tao Liu <tliu4@buffalo.edu>
 
 This code is free software; you can redistribute it and/or modify it
 under the terms of the BSD License (see the file COPYING included
 with the distribution).
-
-@status:  experimental
-@version: $Revision$
-@author:  Tao Liu
-@contact: tliu4@buffalo.edu
 """
 
 # ------------------------------------
@@ -60,7 +53,6 @@ cdef class Variant:
                    int PLUS1T, int PLUS2T, int MINUS1T, int MINUS2T, 
                    float deltaBIC, float BIC_homo_major, float BIC_homo_minor, float BIC_heter_noAS, float BIC_heter_AS,
                    float AR, str GT, int DP, int PL_00, int PL_01, int PL_11):
-        #self.v_ref_pos = ref_pos
         self.v_ref_allele = ref_allele
         self.v_alt_allele = alt_allele
         self.v_GQ = GQ

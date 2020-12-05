@@ -1,19 +1,12 @@
 # cython: language_level=3
 # cython: profile=True
-# Time-stamp: <2020-12-04 18:41:50 Tao Liu>
+# Time-stamp: <2020-12-04 22:49:03 Tao Liu>
 
 """Module for SAPPER BAMParser class
-
-Copyright (c) 2017 Tao Liu <tliu4@buffalo.edu>
 
 This code is free software; you can redistribute it and/or modify it
 under the terms of the BSD License (see the file COPYING included
 with the distribution).
-
-@status:  experimental
-@version: $Revision$
-@author:  Tao Liu
-@contact: tliu4@buffalo.edu
 """
 # ------------------------------------
 # python modules
@@ -22,8 +15,8 @@ from collections import Counter
 from operator import itemgetter
 from copy import copy
 
-from MACS3.CallVar.ReadAlignment import ReadAlignment
-from MACS3.CallVar.PosReadsInfo import PosReadsInfo
+from MACS3.Signal.ReadAlignment import ReadAlignment
+from MACS3.Signal.PosReadsInfo import PosReadsInfo
 from MACS3.IO.PeakIO import PeakIO
 
 from cpython cimport bool

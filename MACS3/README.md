@@ -17,6 +17,7 @@ The *Commands* directory  contains source codes for all subcommands.
 11. predictd_cmd.py
 12. randsample_cmd.py
 13. refinepeak_cmd.py
+14. callvar_cmd.py
 
 ## IO
 

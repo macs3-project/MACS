@@ -1,6 +1,6 @@
 # cython: language_level=3
 # cython: profile=True
-# Time-stamp: <2020-12-04 18:40:22 Tao Liu>
+# Time-stamp: <2020-12-04 22:29:06 Tao Liu>
 
 """Module for SAPPER PosReadsInfo class.
 
@@ -19,9 +19,9 @@ with the distribution).
 # ------------------------------------
 # python modules
 # ------------------------------------
-from MACS3.CallVar.Stat import CalModel_Homo, CalModel_Heter_noAS, CalModel_Heter_AS, calculate_GQ, calculate_GQ_heterASsig
+from MACS3.Signal.Stat import CalModel_Homo, CalModel_Heter_noAS, CalModel_Heter_AS, calculate_GQ, calculate_GQ_heterASsig
 from MACS3.Signal.Prob import binomial_cdf
-from MACS3.CallVar.PeakVariants import Variant
+from MACS3.Signal.PeakVariants import Variant
 
 from cpython cimport bool
 

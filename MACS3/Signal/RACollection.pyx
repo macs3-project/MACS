@@ -1,6 +1,6 @@
 # cython: language_level=3
 # cython: profile=True
-# Time-stamp: <2020-12-04 18:40:32 Tao Liu>
+# Time-stamp: <2020-12-04 22:47:07 Tao Liu>
 
 """Module for SAPPER BAMParser class
 
@@ -18,16 +18,15 @@ with the distribution).
 # ------------------------------------
 # python modules
 # ------------------------------------
-import logging
 import struct
 from collections import Counter
 from operator import itemgetter
 from copy import copy
 
-from MACS3.CallVar.ReadAlignment import ReadAlignment
-from MACS3.CallVar.PosReadsInfo import PosReadsInfo
+from MACS3.Signal.ReadAlignment import ReadAlignment
+from MACS3.Signal.PosReadsInfo import PosReadsInfo
+from MACS3.Signal.UnitigRACollection import UnitigRAs, UnitigCollection
 from MACS3.IO.PeakIO import PeakIO
-from MACS3.CallVar.UnitigRACollection import UnitigRAs, UnitigCollection
 
 from cpython cimport bool
 from cpython.mem cimport PyMem_Malloc, PyMem_Realloc, PyMem_Free
