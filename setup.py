@@ -41,12 +41,15 @@ def main():
         except ImportError:
             raise RuntimeError("Installing requirement failed! `pip` has to be installed!")
 
+    # include dir
     from numpy import get_include as numpy_get_include
     numpy_include_dir = [numpy_get_include()]
-
+    
+    # CFLAG
     # I intend to use -Ofast, however if gcc version < 4.6, this option is unavailable so...
     extra_c_args = ["-w","-O3","-ffast-math","-g0"] # for C, -Ofast implies -O3 and -ffast-math
-
+    extra_c_args_for_fermi = extra_c_args + ["-DUSE_SIMDE", "-DSIMDE_ENABLE_NATIVE_ALIASES", "-DSIMDE_ENABLE_OPENMP", "-fopenmp-simd"]
+    
     ext_modules = [ \
                     # Signal
                     Extension("MACS3.Signal.Prob", ["MACS3/Signal/Prob.pyx"], libraries=["m"], include_dirs=numpy_include_dir, extra_compile_args=extra_c_args ),
@@ -65,7 +68,7 @@ def main():
                                                            "MACS3/fermi-lite/bubble.c","MACS3/fermi-lite/htab.c","MACS3/fermi-lite/ksw.c","MACS3/fermi-lite/kthread.c",\
                                                            "MACS3/fermi-lite/mag.c","MACS3/fermi-lite/misc.c","MACS3/fermi-lite/mrope.c","MACS3/fermi-lite/rld0.c",\
                                                            "MACS3/fermi-lite/rle.c","MACS3/fermi-lite/rope.c","MACS3/fermi-lite/unitig.c", "MACS3/Signal/swalign.c" ], \
-                              libraries=["m","z"], include_dirs=numpy_include_dir+["./","./MACS3/fermi-lite/","./MACS3/Signal/"], extra_compile_args=extra_c_args),
+                              libraries=["m","z"], include_dirs=numpy_include_dir+["./","./MACS3/fermi-lite/","./MACS3/Signal/"], extra_compile_args=extra_c_args_for_fermi),
                     Extension("MACS3.Signal.UnitigRACollection",["MACS3/Signal/UnitigRACollection.pyx"],libraries=["m"], include_dirs=numpy_include_dir, extra_compile_args=extra_c_args),
                     Extension("MACS3.Signal.PosReadsInfo",["MACS3/Signal/PosReadsInfo.pyx",],libraries=["m"], include_dirs=numpy_include_dir, extra_compile_args=extra_c_args),
                     Extension("MACS3.Signal.PeakVariants",["MACS3/Signal/PeakVariants.pyx",],libraries=["m"], include_dirs=numpy_include_dir, extra_compile_args=extra_c_args),
