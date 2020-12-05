@@ -1,3 +1,5 @@
+# this Makefile is not used by MACS3, but I kept here for debugging.
+
 CC=		gcc
 CFLAGS=		-g -Wall -O2 -Wno-unused-function -DNO_WARN_X86_INTRINSICS  #-fno-inline-functions -fno-inline-functions-called-once
 CPPFLAGS=

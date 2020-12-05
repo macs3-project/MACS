@@ -24,7 +24,7 @@ jobs:
       - name: Checkout MACS
         uses: actions/checkout@v2.1.0
         with:
-          submodules: 'true'
+          submodules: 'recursive'
       - name: Set up arch and run
         uses: uraimo/run-on-arch-action@v2.0.5
         id: build

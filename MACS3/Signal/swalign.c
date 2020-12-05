@@ -1,5 +1,4 @@
 /*  
- *  Copyright (c) 2017 Tao Liu
  *  Copyright (c) 2010 Nicolaus Lance Hepler
  *  
  * 
@@ -27,6 +26,8 @@
 // Note: That's an MIT license.
 // All double-commented comments below are from Nicolaus Lance Hepler.
 // Original repository: https://code.google.com/archive/p/swalign/
+
+/* Tao Liu made some modifications.... Note to myself: maybe I should use ksw.c/h instead */
 
 #include "swalign.h"
 
