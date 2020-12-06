@@ -8,8 +8,10 @@ RUN apt-get update -qq && \
   python3 \
   python3-pip \
   python3-setuptools \
-  python3-wheel\
-  procps
+  python3-wheel \
+  procps \
+  zlib1g \
+  zlib1g-dev
 
 RUN useradd -m "${TEST_USER}"
 USER "${TEST_USER}"

@@ -1,0 +1,3 @@
+[submodule "MACS3/fermi-lite/lib"]
+	path = MACS3/fermi-lite/lib
+	url = https://github.com/simd-everywhere/simde/

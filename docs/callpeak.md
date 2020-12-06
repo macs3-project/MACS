@@ -1,6 +1,6 @@
 # Call peaks
 
-This is the main function in MACS2. It can be invoked by `macs2
+This is the main function in MACS3. It can be invoked by `macs3
 callpeak` . If you type this command with `-h`, you will see a full
 description of command-line options. Here we only list the essentials.
 
@@ -28,7 +28,7 @@ files.
 
 ### `--outdir`
 
-MACS2 will save all output files into the specified folder for this
+MACS3 will save all output files into the specified folder for this
 option. A new folder will be created if necessary.
 
 ### `-f`/`--format FORMAT`
@@ -44,7 +44,7 @@ Nowadays, the most common formats are `BED` or `BAM` (including
 `BEDPE` and `BAMPE`). Our recommendation is to convert your data to
 `BED` or `BAM` first.
 
-Also, MACS2 can detect and read gzipped file. For example, `.bed.gz`
+Also, MACS3 can detect and read gzipped file. For example, `.bed.gz`
 file can be directly used without being uncompressed with `--format
 BED`.
 
@@ -75,9 +75,9 @@ real fragments inferred from alignment results for reads pileup.
 ## `BEDPE` or `BAMPE`
 
 A special mode will be triggered while the format is specified as
-`BAMPE` or `BEDPE`. In this way, MACS2 will process the `BAM` or `BED`
+`BAMPE` or `BEDPE`. In this way, MACS3 will process the `BAM` or `BED`
 files as paired-end data. Instead of building a bimodal distribution
-of plus and minus strand reads to predict fragment size, MACS2 will
+of plus and minus strand reads to predict fragment size, MACS3 will
 use actual insert sizes of pairs of reads to build fragment pileup.
 
 The `BAMPE` format is just a `BAM` format containing paired-end alignment
@@ -88,12 +88,12 @@ which only contains the first three columns defining the chromosome
 name, left and right position of the fragment from Paired-end
 sequencing. Please note, this is NOT the same format used by
 `BEDTOOLS`, and the `BEDTOOLS` version of `BEDPE` is actually not in a
-standard `BED` format. You can use MACS2 subcommand `randsample` to
+standard `BED` format. You can use MACS3 subcommand `randsample` to
 convert a `BAM` file containing paired-end information to a `BEDPE`
 format file:
 
 ```
-macs2 randsample -i the_BAMPE_file.bam -f BAMPE -p 100 -o the_BEDPE_file.bed
+macs3 randsample -i the_BAMPE_file.bam -f BAMPE -p 100 -o the_BEDPE_file.bed
 ```
 
 ### `-g`/`--gsize`
@@ -136,7 +136,7 @@ calculated from p-values using the Benjamini-Hochberg procedure.
 
 ### `-p`/`--pvalue`
 
-The p-value cutoff. If `-p` is specified, MACS2 will use p-value instead
+The p-value cutoff. If `-p` is specified, MACS3 will use p-value instead
 of q-value.
 
 ### `--min-length`, `--max-gap`
@@ -146,7 +146,7 @@ by specifying the minimum length of a called peak and the maximum
 allowed a gap between two nearby regions to be merged. In other words,
 a called peak has to be longer than `min-length`, and if the distance
 between two nearby peaks is smaller than `max-gap` then they will be
-merged as one. If they are not set, MACS2 will set the DEFAULT value
+merged as one. If they are not set, MACS3 will set the DEFAULT value
 for `min-length` as the predicted fragment size `d`, and the DEFAULT
 value for `max-gap` as the detected read length. Note, if you set a
 `min-length` value smaller than the fragment size, it may have NO

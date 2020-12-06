@@ -3,11 +3,7 @@
 
 name: CI x64
 
-on:
-  push:
-    branches:  [ feat-macs3* ]
-  pull_request:
-    branches:  [ feat-macs3* ]
+on: [push, pull_request]
 
 jobs:
   build:
@@ -20,6 +16,8 @@ jobs:
     steps:
       - name: Checkout MACS
         uses: actions/checkout@v2
+        with:
+          submodules: 'true'
       - name: Set up Python ${{ matrix.python-version }}
         uses: actions/setup-python@v2
         with:
@@ -61,5 +59,3 @@ jobs:
           path: |
             dist/*.tar.gz
 
-
-          

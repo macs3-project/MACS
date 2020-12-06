@@ -1,29 +1,54 @@
-# INSTALL Guide For MACS
-Time-stamp: <2019-12-12 13:26:11 taoliu>
+# INSTALL Guide For MACS3
+Time-stamp: <2020-12-05 16:35:26 Tao Liu>
 
 Please check the following instructions to complete your installation.
 
 ## Prerequisites
 
-MACS v2.2.x requires Python3. We have tested MACS in Python3.6, 3.7
-and 3.8. 
+### Python3
+
+MACS v3.x.x requires Python3. We have tested MACS in Python3.6, 3.7 and 3.8. 
+
+### NumPy
 
 MACS also requires [Numpy](http://www.scipy.org/Download) (>=1.17).
 
-GCC is required to compile `.c` codes in MACS v2 package, and python
-header files are needed. If you are using Mac OSX, I recommend you
-install Xcode; if you are using Linux, you need to make sure
-`python-dev` package is installed -- the actual package name depends
-on the Linux OS distribution, you are using.
+### Cython
 
-[Cython](http://cython.org/) is **NOT** required although most of MACS
-codes are written in Cython. But if you plan to generate `.c` files
-from `.pyx` by yourself, you can install Cython (>=0.29), then use
-`setup.py` script.
+[Cython](http://cython.org/) is required to translate .pyx codes to .c
+code. The version of Cython has to be >=0.29.
+
+### cykhash
+
+[cykhash](https://github.com/realead/cykhash) is a fast and efficient
+hash implementation in Cython. It is used to replace python dictionary
+in MACS3 codes. Since it requires Cython, make sure you install Cython
+first, then install cykhash. 
+
+### fermi-lite and simde
+
+A newly added `callvar` subcommand in MACS3 uses
+[fermi-lite](https://github.com/lh3/fermi-lite) to assemble the DNA
+sequence in a peak region while necessary. A modified fermi-lite has
+been included in MACS3 package. Since fermi-lite was implemented using
+intel SSE2 intrinsics for x86 CPUs, we added
+[simde](https://github.com/simd-everywhere/simde) as submodule to
+solve the compatibility issues on non-x86 architectures. Note that, we
+may remove this submodule and add simde in *dependencies* of MACS3
+later.
+
+### GCC and Python-dev 
+
+GCC is required to compile `.c` codes in MACS v3 package, and python 
+header files are needed. If you are using Mac OSX, I recommend you 
+install Xcode; if you are using Linux, you need to make sure 
+`python-dev` package is installed -- the actual package name depends 
+on the Linux OS distribution, you are using. 
+
 
 ## Prepare a virtual Python environment 
 
-I strongly recommend installing your MACS program in a virtual
+We strongly recommend installing your MACS program in a virtual
 environment, so that you have full control of your installation and
 won't mess up with your system libraries. To learn about virtual
 environment, read [this
@@ -43,22 +68,15 @@ it's not available in your system. If you create a virtual environment
 as described before, your `pip` command will install everything under
 the folder you specified previously through `python3 -m env` command.
 
-Then under the command line, type `pip install macs2`. PyPI will
+Then under the command line, type `pip install macs3`. PyPI will
 install Numpy automatically if it is absent.
 
-To upgrade MACS2, type `pip install --upgrade macs2`. It will check
-currently installed MACS2, compare the version with the one on PyPI
+To upgrade MACS3, type `pip install --upgrade macs3`. It will check
+currently installed MACS3, compare the version with the one on PyPI
 repository, download and install a newer version while necessary.
 
-## Install through Conda
-
-Please check [MACS2 page on
-bioconda](https://anaconda.org/bioconda/macs2) for instructions.
-
-## Install through Debian APT
-
-MACS is included in Debian Stretch/Buster/Unstable blessed by some
-kind of Supper Cow Powers.
+If you plan to install MACS in your own user directory, use `pip
+install macs3 --user`.
 
 ## Install from source
 
@@ -86,7 +104,7 @@ list of available options:
 For example, if I want to install everything under my own HOME
 directory, use this command:
 
- `$ python setup.py install --prefix /home/taoliu/`
+ `$ python setup.py install --prefix /home/myaccount/`
 
 As mentioned in *Prerequisites*, you don't need to install Cython in
 order to install MACS. When Cython is available, this setup script
@@ -136,6 +154,5 @@ you'll need to add `PREFIX/bin` to your PATH environment variable. The
 process for updating this is the same as described above for the
 `PYTHONPATH` variable::
 
- `$ export PATH=/home/taoliu/bin:$PATH`
+ `$ export PATH=/home/myaccount/bin:$PATH`
 
--- Tao Liu <vladimir.liu@gmail.com>
