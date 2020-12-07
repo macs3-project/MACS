@@ -12,10 +12,10 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - name: Check out MACS3
+    - name: Check out MACS3 with submodules
       uses: actions/checkout@v2
       with:
-          submodules: 'true'
+        submodules: 'true'
     - name: Set up Python
       uses: actions/setup-python@v2
       with:
