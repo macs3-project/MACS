@@ -1,7 +1,7 @@
 # cython: language_level=3
 # cython: profile=True
 # cython: linetrace=True
-# Time-stamp: <2020-12-03 16:07:01 Tao Liu>
+# Time-stamp: <2020-12-06 23:54:17 Tao Liu>
 
 """Module for Calculate Scores.
 
@@ -617,7 +617,7 @@ cdef class CallerFromAlignments:
         cdef:
             bytes chrom
             np.ndarray pos_array, treat_array, ctrl_array, score_array
-            dict pvalue_stat
+            dict pscore_stat
             int64_t n, pre_p, length, pre_l, l, i, j
             float32_t this_v, pre_v, v, q, pre_q
             int64_t N, k, this_l
@@ -629,7 +629,7 @@ cdef class CallerFromAlignments:
 
         logging.debug ( "Start to calculate pvalue stat..." )
 
-        pvalue_stat = {} #dict()
+        pscore_stat = {} #dict()
         for i in range( len( self.chromosomes ) ):
             chrom = self.chromosomes[ i ]
             pre_p = 0
@@ -644,16 +644,16 @@ cdef class CallerFromAlignments:
             for j in range(pos_array.shape[0]):
                 this_v = get_pscore( (<int32_t>(treat_value_ptr[0]), ctrl_value_ptr[0] ) )
                 this_l = pos_ptr[0] - pre_p
-                if this_v in pvalue_stat:
-                    pvalue_stat[ this_v ] += this_l
+                if this_v in pscore_stat:
+                    pscore_stat[ this_v ] += this_l
                 else:
-                    pvalue_stat[ this_v ] = this_l
+                    pscore_stat[ this_v ] = this_l
                 pre_p = pos_ptr[0]
                 pos_ptr += 1
                 treat_value_ptr += 1
                 ctrl_value_ptr += 1
 
-        N = sum(pvalue_stat.values()) # total length
+        N = sum(pscore_stat.values()) # total length
         k = 1                         # rank
         f = -log10(N)
         pre_v = -2147483647
@@ -661,10 +661,10 @@ cdef class CallerFromAlignments:
         pre_q = 2147483647      # save the previous q-value
 
         self.pqtable = Float32to32Map( for_int = False )
-        unique_values = sorted(list(pvalue_stat.keys()), reverse=True) 
+        unique_values = sorted(list(pscore_stat.keys()), reverse=True) 
         for i in range(len(unique_values)):
             v = unique_values[i]
-            l = pvalue_stat[v]
+            l = pscore_stat[v]
             q = v + (log10(k) + f)
             if q > pre_q:
                 q = pre_q
@@ -689,7 +689,7 @@ cdef class CallerFromAlignments:
         cdef:
             bytes chrom
             np.ndarray pos_array, treat_array, ctrl_array, score_array
-            dict pvalue_stat
+            dict pscore_stat
             int64_t n, pre_p, this_p, length, j, pre_l, l, i
             float32_t q, pre_q, this_t, this_c
             float32_t this_v, pre_v, v, cutoff
@@ -714,8 +714,8 @@ cdef class CallerFromAlignments:
         # tmplist contains a list of log pvalue cutoffs from 0.3 to 10
         tmplist = [round(x,5) for x in sorted( list(np.arange(0.3, 10.0, 0.3)), reverse = True )]
 
-        pvalue_stat = {} #dict()
-        #print (list(pvalue_stat.keys()))
+        pscore_stat = {} #dict()
+        #print (list(pscore_stat.keys()))
         #print (list(self.pvalue_length.keys()))
         #print (list(self.pvalue_npeaks.keys()))
         for i in range( len( self.chromosomes ) ):
@@ -777,25 +777,25 @@ cdef class CallerFromAlignments:
                 this_p = pos_array_ptr[ 0 ]
                 this_l = this_p - pre_p
                 this_v = score_array_ptr[ 0 ]
-                if this_v in pvalue_stat:
-                    pvalue_stat[ this_v ] += this_l
+                if this_v in pscore_stat:
+                    pscore_stat[ this_v ] += this_l
                 else:
-                    pvalue_stat[ this_v ] = this_l
+                    pscore_stat[ this_v ] = this_l
                 pre_p = this_p #pos_array[ i ]
                 pos_array_ptr += 1
                 score_array_ptr += 1
 
-        #logging.debug ( "make pvalue_stat cost %.5f seconds" % t )
+        #logging.debug ( "make pscore_stat cost %.5f seconds" % t )
 
         # add all pvalue cutoffs from cutoff-analysis part. So that we
         # can get the corresponding qvalues for them.
         for cutoff in tmplist:
-            if cutoff not in pvalue_stat:
-                pvalue_stat[ cutoff ] = 0
+            if cutoff not in pscore_stat:
+                pscore_stat[ cutoff ] = 0
 
         nhval = 0
 
-        N = sum(pvalue_stat.values()) # total length
+        N = sum(pscore_stat.values()) # total length
         k = 1                           # rank
         f = -log10(N)
         pre_v = -2147483647
@@ -803,10 +803,10 @@ cdef class CallerFromAlignments:
         pre_q = 2147483647              # save the previous q-value
 
         self.pqtable = Float32to32Map( for_int = False ) #{}
-        unique_values = sorted(list(pvalue_stat.keys()), reverse=True) #sorted(unique_values,reverse=True)
+        unique_values = sorted(list(pscore_stat.keys()), reverse=True) #sorted(unique_values,reverse=True)
         for i in range(len(unique_values)):
             v = unique_values[i]
-            l = pvalue_stat[v]
+            l = pscore_stat[v]
             q = v + (log10(k) + f)
             if q > pre_q:
                 q = pre_q
