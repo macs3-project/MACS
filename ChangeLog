@@ -1,3 +1,30 @@
+2020-12-06  Tao Liu  <vladimir.liu@gmail.com>
+	MACS 3.0.0a2
+
+	* New features:
+
+	1) Speed/memory optimization.  Use the cykhash to replace python
+	dictionary. Use buffer (10MB) to read and parse input file (not
+	available for BAM file parser). And many optimization tweaks.
+
+	2) Code cleanup. Reorganize source codes.
+
+	3) Unit testing.
+
+	4) R wrappers for MACS -- MACSr
+
+	5) Switch to Github Action for CI, support multi-arch testing
+	including x64, armv7, aarch64, s390x and ppc64le.
+
+	6) MACS tag-shifting model has been refined. Now it will use a
+	naive peak calling approach to find ALL possible paired peaks at +
+	and - strand, then use all of them to calculate the
+	cross-correlation.
+
+	7) Call variants in peak regions directly from BAM files. The
+	function was originally developed under code name SAPPER. Now
+	SAPPER has been merged into MACS.
+
 2020-04-11  Tao Liu  <vladimir.liu@gmail.com>
 	MACS version 2.2.7.1
 

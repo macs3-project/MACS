@@ -37,7 +37,7 @@ add more new features in the future.**
 ## Recent Changes for MACS (3.0.0a2)
 
 ### 3.0.0a2
-	* Features
+	* New features
 	
 	1) Speed/memory optimization.  Use the cykhash to replace python
     dictionary. Use buffer (10MB) to read and parse input file (not
@@ -58,8 +58,10 @@ add more new features in the future.**
     cross-correlation.
 
     7) Call variants in peak regions directly from BAM files. The
-    function was originally developed under code name SAPPER. Now
-    SAPPER has been merged into MACS. 
+	function was originally developed under code name SAPPER. Now
+	SAPPER has been merged into MACS. Also, `simde` has been added as
+	a submodule in order to support fermi-lite library under non-x64
+	architectures.
 
 ## Install
 
