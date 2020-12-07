@@ -1,7 +1,7 @@
 # cython: language_level=3
 # cython: profile=True
 # cython: linetrace=True
-# Time-stamp: <2020-12-06 23:24:53 Tao Liu>
+# Time-stamp: <2020-12-06 23:32:28 Tao Liu>
 
 """Module for all MACS Parser classes for input.
 
@@ -405,11 +405,10 @@ cdef class GenericParser:
         cdef:
             int64_t i, fpos, strand
             bytes chromosome
-            bytes tmp
+            bytes tmp = b""
 
         fwtrack = FWTrack( buffer_size = self.buffer_size )
         i = 0
-        tmp = b""
         while True:
             # for each block of input
             tmp += self.fhd.read( READ_BUFFER_SIZE )
@@ -444,9 +443,8 @@ cdef class GenericParser:
         cdef:
             int64_t i, fpos, strand
             bytes chromosome
-            bytes tmp
+            bytes tmp = b""
         i = 0
-        tmp = "b"
         while True:
             # for each block of input
             tmp += self.fhd.read( READ_BUFFER_SIZE )
