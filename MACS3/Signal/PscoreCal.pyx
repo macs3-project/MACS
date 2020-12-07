@@ -1,7 +1,7 @@
 # cython: language_level=3
 # cython: profile=True
 # cython: linetrace=True
-# Time-stamp: <2020-12-06 19:36:10 Tao Liu>
+# Time-stamp: <2020-12-06 19:43:00 Tao Liu>
 import numpy as np
 cimport numpy as np
 from numpy cimport ndarray
@@ -20,7 +20,7 @@ def cal_pscore_mp ( int32_t N, ndarray pos, ndarray treat, ndarray ctrl, dict p_
     n_mp_range = n_queries // N + 1
     # [0*n_mp_range .. 1*n_mp_range] [1*n_mp_range .. 2*n_mp_range] ...
     # start to pool
-    P = mp.Pool( 4 )
+    P = mp.Pool( N )
     args = []
     # prepare args
     for i in range( N ):
