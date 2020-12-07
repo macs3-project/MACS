@@ -1,7 +1,7 @@
 # cython: language_level=3
 # cython: profile=True
 # cython: linetrace=True
-# Time-stamp: <2020-12-03 11:48:43 Tao Liu>
+# Time-stamp: <2020-12-06 23:32:28 Tao Liu>
 
 """Module for all MACS Parser classes for input.
 
@@ -87,7 +87,7 @@ cpdef guess_parser ( fname, int64_t buffer_size = 100000 ):
             t_parser.close()
     raise Exception( "Can't detect format!" )
 
-cdef tuple __fw_binary_parse_le ( const unsigned char * data ):
+cdef tuple __bam_fw_binary_parse_le ( const unsigned char * data ):
     """Parse a BAM SE entry in little endian system
     """
     cdef:
@@ -135,7 +135,7 @@ cdef tuple __fw_binary_parse_le ( const unsigned char * data ):
 
     return ( thisref, thisstart, thisstrand )
 
-cdef tuple __fw_binary_parse_be ( const unsigned char * data ):
+cdef tuple __bam_fw_binary_parse_be ( const unsigned char * data ):
     """Big endian version. We need byte swap.
     """
     cdef:
@@ -191,7 +191,7 @@ cdef tuple __fw_binary_parse_be ( const unsigned char * data ):
 
     return ( thisref, thisstart, thisstrand )
 
-cdef tuple __pe_binary_parse_le (const unsigned char * data):
+cdef tuple __bampe_pe_binary_parse_le (const unsigned char * data):
     """Parse a BAMPE record in little-endian system.
     """
     cdef:
@@ -234,7 +234,7 @@ cdef tuple __pe_binary_parse_le (const unsigned char * data):
 
     return ( thisref, thisstart, thistlen )
 
-cdef tuple __pe_binary_parse_be (const unsigned char * data):
+cdef tuple __bampe_pe_binary_parse_be (const unsigned char * data):
     """Parse a BAMPE record in big-endian system. And we need byte swap.
     """
     cdef:
@@ -281,11 +281,11 @@ cdef tuple __pe_binary_parse_be (const unsigned char * data):
 
 # choose a parser according to endian
 if is_le:
-    se_entry_parser = __fw_binary_parse_le
-    pe_entry_parser = __pe_binary_parse_le
+    bam_se_entry_parser = __bam_fw_binary_parse_le
+    bampe_pe_entry_parser = __bampe_pe_binary_parse_le
 else:
-    se_entry_parser = __fw_binary_parse_be
-    pe_entry_parser = __pe_binary_parse_be
+    bam_se_entry_parser = __bam_fw_binary_parse_be
+    bampe_pe_entry_parser = __bampe_pe_binary_parse_be
 
 # ------------------------------------
 # Classes
@@ -343,7 +343,7 @@ cdef class GenericParser:
         f.close()
         if self.gzipped:
             # open with gzip.open, then wrap it with BufferedReader!
-            self.fhd = io.BufferedReader( gzip.open( filename, mode='rb' ), buffer_size = 1048576 ) # buffersize set to 1M
+            self.fhd = io.BufferedReader( gzip.open( filename, mode='rb' ), buffer_size = READ_BUFFER_SIZE ) # buffersize set to 10M
         else:
             self.fhd = io.open( filename, mode='rb' ) # binary mode! I don't expect unicode here!
         self.__skip_first_commentlines()
@@ -403,26 +403,35 @@ cdef class GenericParser:
         * BAMParser for binary BAM format should have a different one.
         """
         cdef:
-            int64_t i, m, fpos, strand
+            int64_t i, fpos, strand
             bytes chromosome
+            bytes tmp = b""
 
         fwtrack = FWTrack( buffer_size = self.buffer_size )
         i = 0
-        m = 0
-        for thisline in self.fhd:
-            ( chromosome, fpos, strand ) = self.__fw_parse_line( thisline )
-            i+=1
-            if fpos < 0 or not chromosome:
-                # normally __fw_parse_line will return -1 if the line
-                # contains no successful alignment.
-                continue
-            if i % 1000000 == 0:
-                info( " %d" % i )
-            fwtrack.add_loc( chromosome, fpos, strand )
-
-        # close fwtrack and sort
-        # fwtrack.finalize()
-        # this is the problematic part. If fwtrack is finalized, then it's impossible to increase the length of it in a step of buffer_size for multiple input files.
+        while True:
+            # for each block of input
+            tmp += self.fhd.read( READ_BUFFER_SIZE )
+            if not tmp:
+                break
+            lines = tmp.split(b"\n")
+            tmp = lines[ -1 ]
+            for thisline in lines[ :-1 ]:
+                ( chromosome, fpos, strand ) = self.__fw_parse_line( thisline )
+                if fpos < 0 or not chromosome:
+                    # normally __fw_parse_line will return -1 if the line
+                    # contains no successful alignment.
+                    continue
+                i += 1
+                if i % 1000000 == 0:
+                    info( " %d reads parsed" % i )
+                fwtrack.add_loc( chromosome, fpos, strand )
+        # last one
+        if tmp:
+            ( chromosome, fpos, strand ) = self.__fw_parse_line( tmp )
+            if fpos >= 0 and chromosome:
+                i += 1
+                fwtrack.add_loc( chromosome, fpos, strand )
         # close file stream.
         self.close()
         return fwtrack
@@ -431,22 +440,36 @@ cdef class GenericParser:
         """Add more records to an existing FWTrack object.
 
         """
+        cdef:
+            int64_t i, fpos, strand
+            bytes chromosome
+            bytes tmp = b""
         i = 0
-        m = 0
-        for thisline in self.fhd:
-            ( chromosome, fpos, strand ) = self.__fw_parse_line( thisline )
-            i+=1
-            if fpos < 0 or not chromosome:
-                # normally __fw_parse_line will return -1 if the line
-                # contains no successful alignment.
-                continue
-            if i % 1000000 == 0:
-                info( " %d" % i )
-            fwtrack.add_loc( chromosome, fpos, strand )
+        while True:
+            # for each block of input
+            tmp += self.fhd.read( READ_BUFFER_SIZE )
+            if not tmp:
+                break
+            lines = tmp.split(b"\n")
+            tmp = lines[ -1 ]
+            for thisline in lines[ :-1 ]:
+                ( chromosome, fpos, strand ) = self.__fw_parse_line( thisline )
+                if fpos < 0 or not chromosome:
+                    # normally __fw_parse_line will return -1 if the line
+                    # contains no successful alignment.
+                    continue
+                i += 1
+                if i % 1000000 == 0:
+                    info( " %d reads parsed" % i )
+                fwtrack.add_loc( chromosome, fpos, strand )
 
-        # close fwtrack and sort
-        #fwtrack.finalize()
-        # this is the problematic part. If fwtrack is finalized, then it's impossible to increase the length of it in a step of buffer_size for multiple input files.
+        # last one
+        if tmp:
+            ( chromosome, fpos, strand ) = self.__fw_parse_line( tmp )
+            if fpos >= 0 and chromosome:
+                i += 1
+                fwtrack.add_loc( chromosome, fpos, strand )
+        # close file stream.
         self.close()
         return fwtrack
 
@@ -612,27 +635,39 @@ cdef class BEDPEParser(GenericParser):
             int32_t right_pos
             int64_t i = 0          # number of fragments
             int64_t m = 0          # sum of fragment lengths
+            bytes tmp = b""
 
         petrack = PETrackI( buffer_size = self.buffer_size )
         add_loc = petrack.add_loc
 
-        for thisline in self.fhd:
+        while True:
+            # for each block of input
+            tmp += self.fhd.read( READ_BUFFER_SIZE )
+            if not tmp:
+                break
+            lines = tmp.split(b"\n")
+            tmp = lines[ -1 ]
+            for thisline in lines[ :-1 ]:
+                ( chromosome, left_pos, right_pos ) = self.__pe_parse_line( thisline )
+                if left_pos < 0 or not chromosome:
+                    continue
+                assert right_pos > left_pos, "Right position must be larger than left position, check your BED file at line: %s" % thisline
+                m += right_pos - left_pos
+                i += 1
+                if i % 1000000 == 0:
+                    info( " %d fragments parsed" % i )
+                add_loc( chromosome, left_pos, right_pos )
+        # last one
+        if tmp:
             ( chromosome, left_pos, right_pos ) = self.__pe_parse_line( thisline )
-            if left_pos < 0 or not chromosome:
-                continue
-
-            assert right_pos > left_pos, "Right position must be larger than left position, check your BED file at line: %s" % thisline
-            m += right_pos - left_pos
-            i += 1
-
-            if i % 1000000 == 0:
-                info( " %d" % i )
-
-            add_loc( chromosome, left_pos, right_pos )
-
+            if left_pos >= 0 and chromosome:
+                assert right_pos > left_pos, "Right position must be larger than left position, check your BED file at line: %s" % thisline
+                i += 1
+                m += right_pos - left_pos
+                add_loc( chromosome, left_pos, right_pos )
+                
         self.d = <float32_t>( m ) / i
         self.n = i
-
         assert self.d >= 0, "Something went wrong (mean fragment size was negative)"
 
         self.close()
@@ -648,29 +683,39 @@ cdef class BEDPEParser(GenericParser):
             int32_t right_pos
             int64_t i = 0          # number of fragments
             int64_t m = 0          # sum of fragment lengths
+            bytes tmp = b""
 
         add_loc = petrack.add_loc
-
-        for thisline in self.fhd:
+        while True:
+            # for each block of input
+            tmp += self.fhd.read( READ_BUFFER_SIZE )
+            if not tmp:
+                break
+            lines = tmp.split(b"\n")
+            tmp = lines[ -1 ]
+            for thisline in lines[ :-1 ]:
+                ( chromosome, left_pos, right_pos ) = self.__pe_parse_line( thisline )
+                if left_pos < 0 or not chromosome:
+                    continue
+                assert right_pos > left_pos, "Right position must be larger than left position, check your BED file at line: %s" % thisline
+                m += right_pos - left_pos
+                i += 1
+                if i % 1000000 == 0:
+                    info( " %d fragments parsed" % i )
+                add_loc( chromosome, left_pos, right_pos )
+        # last one
+        if tmp:
             ( chromosome, left_pos, right_pos ) = self.__pe_parse_line( thisline )
-
-            if left_pos < 0 or not chromosome:
-                continue
-
-            assert right_pos > left_pos, "Right position must be larger than left position, check your BED file at line: %s" % thisline
-            m += right_pos - left_pos
-            i += 1
-
-            if i % 1000000 == 0:
-                info( " %d" % i )
-
-            add_loc( chromosome, left_pos, right_pos )
+            if left_pos >= 0 and chromosome:
+                assert right_pos > left_pos, "Right position must be larger than left position, check your BED file at line: %s" % thisline
+                i += 1
+                m += right_pos - left_pos
+                add_loc( chromosome, left_pos, right_pos )
 
         self.d = ( self.d * self.n + m ) / ( self.n + i )
         self.n += i
 
         assert self.d >= 0, "Something went wrong (mean fragment size was negative)"
-
         self.close()
         petrack.set_rlengths( {"DUMMYCHROM":0} )
         return petrack
@@ -1055,7 +1100,7 @@ cdef class BAMParser( GenericParser ):
         f.close()
         if self.gzipped:
             # open with gzip.open, then wrap it with BufferedReader!
-            self.fhd = io.BufferedReader( gzip.open( filename, mode='rb' ), buffer_size = 1048576) # buffersize set to 1M
+            self.fhd = io.BufferedReader( gzip.open( filename, mode='rb' ), buffer_size = READ_BUFFER_SIZE) # buffersize set to 1M
         else:
             self.fhd = io.open( filename, mode='rb' ) # binary mode! I don't expect unicode here!
 
@@ -1174,12 +1219,12 @@ cdef class BAMParser( GenericParser ):
                 entrylength = unpack( "<i", fread( 4 ) )[0]
             except struct.error:
                 break
-            ( chrid, fpos, strand ) = se_entry_parser( fread( entrylength ) )
+            ( chrid, fpos, strand ) = bam_se_entry_parser( fread( entrylength ) )
             if chrid == -1: continue
             fwtrack.add_loc( references[ chrid ], fpos, strand )
             i += 1
             if i % 1000000 == 0:
-                info( " %d" % i )
+                info( " %d reads parsed" % i )
 
         #print( f"{references[chrid]:},{fpos:},{strand:}" )
         info( "%d reads have been read." % i )
@@ -1208,12 +1253,12 @@ cdef class BAMParser( GenericParser ):
                 entrylength = unpack( '<i', fread( 4 ) )[ 0 ]
             except struct.error:
                 break
-            ( chrid, fpos, strand ) = se_entry_parser( fread( entrylength ) )
+            ( chrid, fpos, strand ) = bam_se_entry_parser( fread( entrylength ) )
             if chrid == -1: continue
             fwtrack.add_loc( references[ chrid ], fpos, strand )
             i += 1
             if i % 1000000 == 0:
-                info( " %d" % i )
+                info( " %d reads parsed" % i )
 
         info( "%d reads have been read." % i )
         self.fhd.close()
@@ -1279,7 +1324,7 @@ cdef class BAMPEParser(BAMParser):
             except err:
                 #e1 += 1
                 break
-            ( chrid, fpos, tlen ) = pe_entry_parser( fread(entrylength) )
+            ( chrid, fpos, tlen ) = bampe_pe_entry_parser( fread(entrylength) )
             if chrid == -1:
                 #e2 += 1
                 continue
@@ -1287,7 +1332,7 @@ cdef class BAMPEParser(BAMParser):
             m += tlen
             i += 1
             if i % 1000000 == 0:
-                info( " %d" % i )
+                info( " %d fragments parsed" % i )
 
         #print( f"{references[chrid]:},{fpos:},{tlen:}" )
         info( "%d fragments have been read." % i )
@@ -1325,14 +1370,14 @@ cdef class BAMPEParser(BAMParser):
                 entrylength = unpack('<i', fread(4))[0]
             except err:
                 break
-            ( chrid, fpos, tlen ) = pe_entry_parser( fread(entrylength) )
+            ( chrid, fpos, tlen ) = bampe_pe_entry_parser( fread(entrylength) )
             if chrid == -1:
                 continue
             add_loc(references[ chrid ], fpos, fpos + tlen)
             m += tlen
             i += 1
             if i % 1000000 == 0:
-                info(" %d" % i)
+                info(" %d fragments parsed" % i)
 
         info( "%d fragments have been read." % i )
         self.d = ( self.d * self.n + m ) / ( self.n + i )
