@@ -1,7 +1,7 @@
 # cython: language_level=3
 # cython: profile=True
 # cython: linetrace=True
-# Time-stamp: <2020-12-03 16:07:01 Tao Liu>
+# Time-stamp: <2020-12-06 19:01:17 Tao Liu>
 
 """Module for Calculate Scores.
 
@@ -21,11 +21,13 @@ from time import time as ttime
 import _pickle as cPickle
 from tempfile import mkstemp
 import os
+
 # ------------------------------------
 # Other modules
 # ------------------------------------
 import numpy as np
 cimport numpy as np
+from numpy cimport ndarray
 from numpy cimport uint8_t, uint16_t, uint32_t, uint64_t, int8_t, int16_t, int32_t, int64_t, float32_t, float64_t
 from cpython cimport bool
 from cykhash import PyObjectMap, Float32to32Map
@@ -44,10 +46,89 @@ from MACS3.IO.PeakIO import PeakIO, BroadPeakIO, parse_peakname
 from MACS3.Signal.FixWidthTrack import FWTrack
 from MACS3.Signal.PairedEndTrack import PETrackI
 from MACS3.Signal.Prob import poisson_cdf
+from MACS3.Signal.PscoreCal import cal_pscore_mp
 # --------------------------------------------
 # cached pscore function and LR_asym functions
 # --------------------------------------------
-pscore_dict = PyObjectMap()
+    
+cdef class Cached_PScore:
+    """ A p-score calculator with cached pscore_map
+
+    We defined __getstate__ and __setstate__ to enable
+    multi-threading.
+    """
+    cdef:
+        object pscore_dict
+        dict pscore_stat
+
+    def __init__ ( self ):
+        self.pscore_dict = {} #PyObjectMap()
+        self.pscore_stat = {}
+
+    def __getstate__ ( self ):
+        return ( self.pscore_dict, self.pscore_stat )
+
+    def __setstate__ ( self, state ):
+        ( self.pscore_dict, self.pscore_stat ) = state
+
+    cdef float32_t __get_pscore ( self, tuple t ):
+        """t: tuple of ( lambda, observation )
+        """
+        cdef:
+            float32_t val
+        if t in self.pscore_dict:
+            return self.pscore_dict[ t ]
+        else:
+            # calculate and cache
+            val = -1.0 * poisson_cdf ( t[0], t[1], False, True )
+            self.pscore_dict[ t ] = val
+        return val
+
+    cpdef void update ( self, int32_t p0, np.ndarray p, np.ndarray t, np.ndarray c ):
+        cdef:
+            int32_t i
+            float32_t v
+            int32_t *p_ptr
+            float32_t *t_ptr
+            float32_t *c_ptr
+
+        p_ptr = <int32_t *> p.data
+        t_ptr = <float32_t *> t.data
+        c_ptr = <float32_t *> c.data
+
+        pre_p = p0
+        for i in range(p.shape[0]):
+            v = self.__get_pscore( ( <int32_t> ( t_ptr[0] ), c_ptr[0] ) )
+            l = p_ptr[0] - pre_p
+            if v in self.pscore_stat:
+                self.pscore_stat[ v ] += l
+            else:
+                self.pscore_stat[ v ] = l
+            pre_p = p_ptr[0]
+            p_ptr += 1
+            t_ptr += 1
+            c_ptr += 1
+        return
+    
+    cpdef void merge_to_pscore_stat ( self, dict total_pscore_stat ):
+        """
+        """
+        for k in self.pscore_stat:
+            if k in total_pscore_stat:
+                total_pscore_stat[ k ] += self.pscore_stat[ k ]
+            else:
+                total_pscore_stat[ k ] = self.pscore_stat[ k ]
+        return
+
+    cpdef void merge_to_pscore_map ( self, object total_pscore_dict ):
+        """
+        """
+        for k in self.pscore_dict:
+            if k not in total_pscore_dict:
+                total_pscore_dict[ k ] = self.pscore_dict[ k ]
+        return
+
+pscore_dict = {} #PyObjectMap()
 logLR_dict = PyObjectMap()
 
 cdef float32_t get_pscore ( tuple t ):
@@ -298,7 +379,7 @@ cdef class CallerFromAlignments:
         FILE * bedGraph_ctrl_f
 
         # data needed to be pre-computed before peak calling
-        object pqtable          # remember pvalue->qvalue convertion; saved in cykhash Float32to32Map
+        dict pqtable          # remember pvalue->qvalue convertion; saved in cykhash Float32to32Map
         bool pvalue_all_done             # whether the pvalue of whole genome is all calculated. If yes, it's OK to calculate q-value.
 
         dict pvalue_npeaks               # record for each pvalue cutoff, how many peaks can be called
@@ -308,7 +389,7 @@ cdef class CallerFromAlignments:
         bytes cutoff_analysis_filename     # file to save the pvalue-npeaks-totallength table
 
         dict pileup_data_files           # Record the names of temporary files for storing pileup values of each chromosome
-
+        int32_t N_mp                     # number of multiple-processing
 
     def __init__ (self, treat, ctrl,
                   int32_t d = 200, list ctrl_d_s = [200, 1000, 10000],
@@ -322,7 +403,8 @@ cdef class CallerFromAlignments:
                   str bedGraph_treat_filename = "TREAT.bdg",
                   str bedGraph_control_filename = "CTRL.bdg",
                   str cutoff_analysis_filename = "TMP.txt",
-                  bool save_SPMR = False ):
+                  bool save_SPMR = False,
+                  int32_t N_mp = 2):
         """Initialize.
 
         A calculator is unique to each comparison of treat and
@@ -349,6 +431,7 @@ cdef class CallerFromAlignments:
                      to set pseudocount 1 per million reads, set it
                      after you normalize treat and control by million
                      reads by `change_normalizetion_method(ord('M'))`.
+        N_mp: N of multi-processing
 
         """
         cdef:
@@ -377,7 +460,7 @@ cdef class CallerFromAlignments:
         self.ctrl_scaling_factor_s= ctrl_scaling_factor_s
         self.end_shift = end_shift
         self.lambda_bg = lambda_bg
-        self.pqtable = Float32to32Map( for_int = False ) # Float32 -> Float32 map
+        self.pqtable = {} #Float32to32Map( for_int = False ) # Float32 -> Float32 map
         self.save_bedGraph = save_bedGraph
         self.save_SPMR = save_SPMR
         self.bedGraph_filename_prefix = bedGraph_filename_prefix.encode()
@@ -401,6 +484,7 @@ cdef class CallerFromAlignments:
             self.pvalue_npeaks[ p ] = 0
         self.optimal_p_cutoff = 0
         self.cutoff_analysis_filename = cutoff_analysis_filename.encode()
+        self.N_mp = N_mp
 
     cpdef destroy ( self ):
         """Remove temporary files for pileup values of each chromosome.
@@ -618,50 +702,56 @@ cdef class CallerFromAlignments:
             bytes chrom
             np.ndarray pos_array, treat_array, ctrl_array, score_array
             dict pvalue_stat
-            int64_t n, pre_p, length, pre_l, l, i, j
-            float32_t this_v, pre_v, v, q, pre_q
-            int64_t N, k, this_l
-            float32_t f
+            int32_t i, j, pre_p
+            int64_t l, k, N
+            float32_t this_v, pre_v, v, q, pre_q, f
             list unique_values
-            int32_t * pos_ptr
-            float32_t * treat_value_ptr
-            float32_t * ctrl_value_ptr
+            int32_t n_queries
+            int32_t n_mp_range
+            dict tmp_p_dict
+            dict tmp_p_stat
+            tuple tmp_t
 
         logging.debug ( "Start to calculate pvalue stat..." )
 
         pvalue_stat = {} #dict()
-        for i in range( len( self.chromosomes ) ):
-            chrom = self.chromosomes[ i ]
-            pre_p = 0
+
+        for j in range( len( self.chromosomes ) ):
+            chrom = self.chromosomes[ j ]
+            #print(f"{chrom}")
+            #pre_p = 0
 
             self.__pileup_treat_ctrl_a_chromosome( chrom )
             [pos_array, treat_array, ctrl_array] = self.chr_pos_treat_ctrl
 
-            pos_ptr = <int32_t *> pos_array.data
-            treat_value_ptr = <float32_t *> treat_array.data
-            ctrl_value_ptr = <float32_t *> ctrl_array.data
-
-            for j in range(pos_array.shape[0]):
-                this_v = get_pscore( (<int32_t>(treat_value_ptr[0]), ctrl_value_ptr[0] ) )
-                this_l = pos_ptr[0] - pre_p
-                if this_v in pvalue_stat:
-                    pvalue_stat[ this_v ] += this_l
-                else:
-                    pvalue_stat[ this_v ] = this_l
-                pre_p = pos_ptr[0]
-                pos_ptr += 1
-                treat_value_ptr += 1
-                ctrl_value_ptr += 1
+            results = cal_pscore_mp ( self.N_mp, pos_array, treat_array, ctrl_array, pscore_dict )
+            
+            for i in range( self.N_mp ):
+                # merge pscore_dict
+                tmp_p_dict = results[ i ][ 0 ]
+                #print( tmp_p_dict )
+                for tmp_t in list(tmp_p_dict.keys()):
+                    if tmp_t not in pscore_dict:
+                        pscore_dict[ tmp_t ] = tmp_p_dict[ tmp_t ]
+                # merge pscore_stat
+                tmp_p_stat = results[ i ][ 1 ]
+                for v in list(tmp_p_stat.keys()):
+                    if v in pvalue_stat:
+                        pvalue_stat[ v ] += tmp_p_stat[ v ]
+                    else:
+                        pvalue_stat[ v ] = tmp_p_stat[ v ]
+                #print(tmp_p_stat)
+                #print(pvalue_stat)
 
         N = sum(pvalue_stat.values()) # total length
         k = 1                         # rank
         f = -log10(N)
         pre_v = -2147483647
-        pre_l = 0
+        #pre_l = 0
         pre_q = 2147483647      # save the previous q-value
 
-        self.pqtable = Float32to32Map( for_int = False )
-        unique_values = sorted(list(pvalue_stat.keys()), reverse=True) 
+        self.pqtable = {} #Float32to32Map( for_int = False )
+        unique_values = sorted(list(pvalue_stat.keys()), reverse=True)
         for i in range(len(unique_values)):
             v = unique_values[i]
             l = pvalue_stat[v]
@@ -802,7 +892,7 @@ cdef class CallerFromAlignments:
         pre_l = 0
         pre_q = 2147483647              # save the previous q-value
 
-        self.pqtable = Float32to32Map( for_int = False ) #{}
+        self.pqtable = {} #Float32to32Map( for_int = False ) #{}
         unique_values = sorted(list(pvalue_stat.keys()), reverse=True) #sorted(unique_values,reverse=True)
         for i in range(len(unique_values)):
             v = unique_values[i]
@@ -861,6 +951,7 @@ cdef class CallerFromAlignments:
         peaks = PeakIO()
 
         # prepare p-q table
+        # in fact, p-q table and pscore_dict should be ready after this
         if len( self.pqtable ) == 0:
             logging.info("#3 Pre-compute pvalue-qvalue table...")
             if cutoff_analysis:
@@ -1203,10 +1294,11 @@ cdef class CallerFromAlignments:
         array1_size = array1.shape[0]
 
         for i in range(array1_size):
-            s_ptr[0] = get_pscore(( <int32_t>(a1_ptr[0]), a2_ptr[0] ))
+            s_ptr[0] = pscore_dict[ ( <int32_t>(a1_ptr[0]), a2_ptr[0] ) ] #get_pscore(( <int32_t>(a1_ptr[0]), a2_ptr[0] ))
             s_ptr += 1
             a1_ptr += 1
             a2_ptr += 1
+        logging.debug( f" check pscore_dict {array1_size} times in __cal_pscore" )
         return s
 
     cdef np.ndarray __cal_qscore ( self, np.ndarray[np.float32_t, ndim=1] array1, np.ndarray[np.float32_t, ndim=1] array2 ):
@@ -1223,12 +1315,14 @@ cdef class CallerFromAlignments:
         a1_ptr = <float32_t *> array1.data
         a2_ptr = <float32_t *> array2.data
         s_ptr = <float32_t *> s.data
+        array1_size = array1.shape[0]
 
         for i in range(array1.shape[0]):
-            s_ptr[0] = self.pqtable[ get_pscore(( <int32_t>(a1_ptr[0]), a2_ptr[0] )) ]
+            s_ptr[0] = self.pqtable[ pscore_dict[ ( <int32_t>(a1_ptr[0]), a2_ptr[0] ) ] ] #get_pscore(( <int32_t>(a1_ptr[0]), a2_ptr[0] )) ]
             s_ptr += 1
             a1_ptr += 1
             a2_ptr += 1
+        logging.debug( f" check pscore_dict and pqtable each for {array1_size} times in __cal_qscore" )
         return s
 
     cdef np.ndarray __cal_logLR ( self, np.ndarray[np.float32_t, ndim=1] array1, np.ndarray[np.float32_t, ndim=1] array2 ):
