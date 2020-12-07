@@ -83,7 +83,7 @@ def main():
         long_description = fh.read()
 
     setup(name="MACS3",
-          version="3.0.0a2",
+          version="3.0.0a3",
           description="Model Based Analysis for ChIP-Seq data",
           long_description = long_description,
           long_description_content_type="text/markdown",
