@@ -1,7 +1,7 @@
 # cython: language_level=3
 # cython: profile=True
 # cython: linetrace=True
-# Time-stamp: <2020-12-06 19:43:00 Tao Liu>
+# Time-stamp: <2020-12-06 21:32:47 Tao Liu>
 import numpy as np
 cimport numpy as np
 from numpy cimport ndarray
@@ -58,9 +58,11 @@ cpdef __update_pscore ( tuple x ):
         float32_t *t_ptr
         float32_t *c_ptr
         dict pscore_stat
+        dict extra_p_dict
         #int i
         #tuple tu
 
+    extra_p_dict = {}
     pscore_stat = {}
     ( p_dict, p0, p, t, c, s, e ) = x
     pscore_stat = {}
@@ -80,6 +82,7 @@ cpdef __update_pscore ( tuple x ):
             # calculate and cache
             v = -1.0 * poisson_cdf ( tmp_tuple[0], tmp_tuple[1], False, True )
             p_dict[ tmp_tuple ] = v
+            extra_p_dict[ tmp_tuple ] = v 
         l = p_ptr[0] - pre_p
         if v in pscore_stat:
             pscore_stat[ v ] += l
@@ -89,4 +92,4 @@ cpdef __update_pscore ( tuple x ):
         p_ptr += 1
         t_ptr += 1
         c_ptr += 1
-    return ( p_dict, pscore_stat )
+    return ( extra_p_dict, pscore_stat )

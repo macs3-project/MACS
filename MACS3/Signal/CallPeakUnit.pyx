@@ -1,7 +1,7 @@
 # cython: language_level=3
 # cython: profile=True
 # cython: linetrace=True
-# Time-stamp: <2020-12-06 19:42:45 Tao Liu>
+# Time-stamp: <2020-12-06 21:33:56 Tao Liu>
 
 """Module for Calculate Scores.
 
@@ -727,12 +727,10 @@ cdef class CallerFromAlignments:
             results = cal_pscore_mp ( self.N_mp, pos_array, treat_array, ctrl_array, pscore_dict )
             
             for i in range( self.N_mp ):
-                # merge pscore_dict
+                # merge pscore_dict with extra_p_dict from cal_pscore_mp
                 tmp_p_dict = results[ i ][ 0 ]
-                #print( tmp_p_dict )
                 for tmp_t in list(tmp_p_dict.keys()):
-                    if tmp_t not in pscore_dict:
-                        pscore_dict[ tmp_t ] = tmp_p_dict[ tmp_t ]
+                    pscore_dict[ tmp_t ] = tmp_p_dict[ tmp_t ]
                 # merge pscore_stat
                 tmp_p_stat = results[ i ][ 1 ]
                 for v in list(tmp_p_stat.keys()):
