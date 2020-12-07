@@ -1,7 +1,7 @@
 # cython: language_level=3
 # cython: profile=True
 # cython: linetrace=True
-# Time-stamp: <2020-12-06 19:01:17 Tao Liu>
+# Time-stamp: <2020-12-06 19:13:42 Tao Liu>
 
 """Module for Calculate Scores.
 
@@ -404,7 +404,7 @@ cdef class CallerFromAlignments:
                   str bedGraph_control_filename = "CTRL.bdg",
                   str cutoff_analysis_filename = "TMP.txt",
                   bool save_SPMR = False,
-                  int32_t N_mp = 2):
+                  int32_t N_mp = 4):
         """Initialize.
 
         A calculator is unique to each comparison of treat and
