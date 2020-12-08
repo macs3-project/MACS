@@ -14,7 +14,7 @@ LIBS=		-lm -lz -lpthread
 # for simde: https://github.com/lh3/bwa/pull/283/
 
 CFLAGS += -DUSE_SIMDE -DSIMDE_ENABLE_NATIVE_ALIASES -DSIMDE_ENABLE_OPENMP -fopenmp-simd
-INCLUDES += -Ilib/simde
+INCLUDES += -I.
 
 .SUFFIXES:.c .o
 
