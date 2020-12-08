@@ -48,7 +48,7 @@ def main():
     # CFLAG
     # I intend to use -Ofast, however if gcc version < 4.6, this option is unavailable so...
     extra_c_args = ["-w","-O3","-ffast-math","-g0"] # for C, -Ofast implies -O3 and -ffast-math
-    extra_c_args_for_fermi = extra_c_args + ["-DUSE_SIMDE", "-DSIMDE_ENABLE_NATIVE_ALIASES", "-DSIMDE_ENABLE_OPENMP", "-fopenmp-simd"]
+    extra_c_args_for_fermi = extra_c_args + ["-std=gnu99","-DUSE_SIMDE", "-DSIMDE_ENABLE_NATIVE_ALIASES"]
     
     ext_modules = [ \
                     # Signal
@@ -83,7 +83,7 @@ def main():
         long_description = fh.read()
 
     setup(name="MACS3",
-          version="3.0.0a3",
+          version="3.0.0a4",
           description="Model Based Analysis for ChIP-Seq data",
           long_description = long_description,
           long_description_content_type="text/markdown",

@@ -1,5 +1,8 @@
-include README.md LICENSE ChangeLog MANIFEST.in setup.py bin/macs3
-recursive-include MACS3 *.py *.pyx *.pxd *.c *.h
+include README.md LICENSE ChangeLog MANIFEST.in setup.py bin/macs3 requirements.txt make_docker_base.sh pyproject.toml
+recursive-include MACS3 *.py *.pyx *.pxd
+recursive-exclude MACS3 *.c *.h
+include MACS3/Signal/cPosValCalculation.c MACS3/Signal/cPosValCalculation.h MACS3/Signal/swalign.h MACS3/Signal/swalign.c
 recursive-include docs *.md
+recursive-include MACS3/fermi-lite *.c *.h
 prune test
 prune MACS3/fermi-lite/lib/test/

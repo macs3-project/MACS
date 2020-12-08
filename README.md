@@ -34,9 +34,9 @@ make sure that the main branch passes unit testing on certain
 functions and subcommands to reproduce the correct outputs. We will
 add more new features in the future.**
 
-## Recent Changes for MACS (3.0.0a3)
+## Recent Changes for MACS (3.0.0a4)
 
-### 3.0.0a3
+### 3.0.0a4
 	* New features
 	
 	1) Speed/memory optimization.  Use the cykhash to replace python
