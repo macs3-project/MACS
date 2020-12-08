@@ -1,2 +1,2 @@
 [build-system]
-requires=['pip', 'setuptools>=41.2', 'numpy>=1.17', 'cykhash>=1.0.2', 'cython>=0.29', 'wheel' ]
+requires=['pip', 'setuptools>=41.2', 'numpy>=1.17', 'cykhash>=1.0.2', 'Cython>=0.29', 'wheel' ]
