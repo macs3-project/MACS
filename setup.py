@@ -10,7 +10,7 @@ the distribution).
 
 import sys
 import os
-import platform
+import re
 from setuptools import setup, Extension
 import subprocess
 import sysconfig
@@ -58,6 +58,7 @@ def main():
     # CFLAG for fermi-lite related codes
     clang = False
     icc = False
+    new_gcc = False
     try:
         if os.environ['CC'] == "clang":
             clang = True
@@ -66,10 +67,16 @@ def main():
 
     if not clang:
         try:
-            if subprocess.check_output(
-                    ["gcc", "--version"],
-                    universal_newlines=True).find("clang") != -1:
+            gcc_version_check = subprocess.check_output( ["gcc", "--version"], universal_newlines=True)
+            if gcc_version_check.find("clang") != -1:
                 clang = True
+            else:
+                gcc_version_check = gcc_version_check.split('\n')[0] # get the first line
+                m = re.search( "\s+(\d+\.\d+)\.\d+", gcc_version_check )
+                if m:
+                    gcc_version = float( m[1] )
+                    if gcc_version > 4.8:
+                        new_gcc = True
         except subprocess.CalledProcessError:
             pass
 
@@ -82,7 +89,7 @@ def main():
     extra_c_args_for_fermi = ["-std=gnu99","-DUSE_SIMDE", "-DSIMDE_ENABLE_NATIVE_ALIASES"]
     if icc or sysconfig.get_config_vars()['CC'] == 'icc':
         extra_c_args_for_fermi.extend(['-qopenmp-simd', '-DSIMDE_ENABLE_OPENMP'])
-    elif not (clang or sysconfig.get_config_vars()['CC'] == 'clang'):
+    elif new_gcc or clang or sysconfig.get_config_vars()['CC'] == 'clang':
         extra_c_args_for_fermi.extend(['-fopenmp-simd', '-DSIMDE_ENABLE_OPENMP'])
 
     # extensions, those has to be processed by Cython
@@ -133,7 +140,7 @@ def main():
            classifiers = classifiers,
            install_requires = install_requires,
            setup_requires = install_requires,
-           test_require = tests_requires,
+           tests_require = tests_requires,
            python_requires = '>=3.6',
            ext_modules = ext_modules )
 
