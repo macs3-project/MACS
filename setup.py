@@ -10,46 +10,89 @@ the distribution).
 
 import sys
 import os
+import re
 from setuptools import setup, Extension
-from distutils.version import LooseVersion
 import subprocess
+import sysconfig
+import numpy
 
-numpy_requires = '>=1.17'
-cykhash_requires = '>=1.0.2'
-install_requires = [f"numpy>={numpy_requires}",f"cykhash>={cykhash_requires}"]
+# get MACS version
+exec(open("MACS3/Utilities/Constants.py").read())
+
+# classifiers
+classifiers =[\
+              'Development Status :: 3 - Alpha',
+              'Environment :: Console',
+              'Intended Audience :: Developers',
+              'Intended Audience :: Science/Research',
+              'License :: OSI Approved :: BSD License',
+              'Operating System :: MacOS :: MacOS X',
+              'Operating System :: POSIX',
+              'Operating System :: Unix',
+              'Topic :: Scientific/Engineering :: Bio-Informatics',
+              'Programming Language :: Python :: 3.6',
+              'Programming Language :: Python :: 3.7',
+              'Programming Language :: Python :: 3.8',
+              'Programming Language :: Cython', ]
+
+install_requires = [ "numpy>=1.17",
+                     "cykhash>=1.0.2",
+                     "Cython>=0.29" ]
+
+tests_requires = [ 'pytest' ]
+
 
 def main():
     if float(sys.version[:3])<3.6:
         sys.stderr.write("CRITICAL: Python version must >= 3.6!\n")
         sys.exit(1)
 
-    cwd = os.path.abspath(os.path.dirname(__file__))
+    # NumPy include dir
+    numpy_include_dir = [ numpy.get_include() ]
 
-    # install required numpy
-    p = subprocess.call([sys.executable, "-m", 'pip', 'install', f'numpy{numpy_requires}'],cwd=cwd)
-    if p != 0:
-        # Could be due to a too old pip version and build isolation, check that
-        try:
-            # Note, pip may not be installed or not have been used
-            import pip
-            if LooseVersion(pip.__version__) < LooseVersion('18.0.0'):
-                raise RuntimeError("Installing requirements failed. Possibly due "
-                                   "to `pip` being too old, found version {}, "
-                                   "needed is >= 18.0.0.".format(pip.__version__))
-            else:
-                raise RuntimeError("Installing requirements failed!")
-        except ImportError:
-            raise RuntimeError("Installing requirement failed! `pip` has to be installed!")
-
-    # include dir
-    from numpy import get_include as numpy_get_include
-    numpy_include_dir = [numpy_get_include()]
-    
     # CFLAG
     # I intend to use -Ofast, however if gcc version < 4.6, this option is unavailable so...
-    extra_c_args = ["-w","-O3","-ffast-math","-g0"] # for C, -Ofast implies -O3 and -ffast-math
-    extra_c_args_for_fermi = extra_c_args + ["-std=gnu99","-DUSE_SIMDE", "-DSIMDE_ENABLE_NATIVE_ALIASES"]
-    
+    # should I care about old gcc compiler?...
+    extra_c_args = ["-w","-Ofast", "-g0"] # for C, -Ofast implies -O3 and -ffast-math
+
+    # CFLAG for fermi-lite related codes
+    clang = False
+    icc = False
+    new_gcc = False
+    try:
+        if os.environ['CC'] == "clang":
+            clang = True
+    except KeyError:
+        pass
+
+    if not clang:
+        try:
+            gcc_version_check = subprocess.check_output( ["gcc", "--version"], universal_newlines=True)
+            if gcc_version_check.find("clang") != -1:
+                clang = True
+            else:
+                gcc_version_check = gcc_version_check.split('\n')[0] # get the first line
+                m = re.search( "\s+(\d+\.\d+)\.\d+", gcc_version_check )
+                if m:
+                    gcc_version = float( m[1] )
+                    if gcc_version > 4.8:
+                        new_gcc = True
+        except subprocess.CalledProcessError:
+            pass
+
+    try:
+        if os.environ['CC'] == "icc":
+            icc = True
+    except KeyError:
+        pass
+
+    extra_c_args_for_fermi = ["-std=gnu99","-DUSE_SIMDE", "-DSIMDE_ENABLE_NATIVE_ALIASES"]
+    if icc or sysconfig.get_config_vars()['CC'] == 'icc':
+        extra_c_args_for_fermi.extend(['-qopenmp-simd', '-DSIMDE_ENABLE_OPENMP'])
+    elif new_gcc or clang or sysconfig.get_config_vars()['CC'] == 'clang':
+        extra_c_args_for_fermi.extend(['-fopenmp-simd', '-DSIMDE_ENABLE_OPENMP'])
+
+    # extensions, those has to be processed by Cython
     ext_modules = [ \
                     # Signal
                     Extension("MACS3.Signal.Prob", ["MACS3/Signal/Prob.pyx"], libraries=["m"], include_dirs=numpy_include_dir, extra_compile_args=extra_c_args ),
@@ -68,7 +111,7 @@ def main():
                                                            "MACS3/fermi-lite/bubble.c","MACS3/fermi-lite/htab.c","MACS3/fermi-lite/ksw.c","MACS3/fermi-lite/kthread.c",\
                                                            "MACS3/fermi-lite/mag.c","MACS3/fermi-lite/misc.c","MACS3/fermi-lite/mrope.c","MACS3/fermi-lite/rld0.c",\
                                                            "MACS3/fermi-lite/rle.c","MACS3/fermi-lite/rope.c","MACS3/fermi-lite/unitig.c", "MACS3/Signal/swalign.c" ], \
-                              libraries=["m","z"], include_dirs=numpy_include_dir+["./","./MACS3/fermi-lite/","./MACS3/Signal/"], extra_compile_args=extra_c_args_for_fermi),
+                              libraries=["m","z"], include_dirs=numpy_include_dir+["./","./MACS3/fermi-lite/","./MACS3/Signal/"], extra_compile_args=extra_c_args+extra_c_args_for_fermi),
                     Extension("MACS3.Signal.UnitigRACollection",["MACS3/Signal/UnitigRACollection.pyx"],libraries=["m"], include_dirs=numpy_include_dir, extra_compile_args=extra_c_args),
                     Extension("MACS3.Signal.PosReadsInfo",["MACS3/Signal/PosReadsInfo.pyx",],libraries=["m"], include_dirs=numpy_include_dir, extra_compile_args=extra_c_args),
                     Extension("MACS3.Signal.PeakVariants",["MACS3/Signal/PeakVariants.pyx",],libraries=["m"], include_dirs=numpy_include_dir, extra_compile_args=extra_c_args),
@@ -82,37 +125,24 @@ def main():
     with open("README.md", "r") as fh:
         long_description = fh.read()
 
-    setup(name="MACS3",
-          version="3.0.0a4",
-          description="Model Based Analysis for ChIP-Seq data",
-          long_description = long_description,
-          long_description_content_type="text/markdown",
-          author='Tao Liu',
-          author_email='vladimir.liu@gmail.com',
-          url='http://github.com/taoliu/MACS/',
-          package_dir={'MACS3' : 'MACS3'},
-          packages=['MACS3', 'MACS3.IO', 'MACS3.Signal', 'MACS3.Commands','MACS3.Utilities'],
-          package_data={'MACS3':['*.pxd']},
-          scripts=['bin/macs3', ],
-          classifiers=[
-              'Development Status :: 3 - Alpha',
-              'Environment :: Console',
-              'Intended Audience :: Developers',
-              'Intended Audience :: Science/Research',
-              'License :: OSI Approved :: BSD License',
-              'Operating System :: MacOS :: MacOS X',
-              'Operating System :: POSIX',
-              'Topic :: Scientific/Engineering :: Bio-Informatics',
-              'Programming Language :: Python :: 3.6',
-              'Programming Language :: Python :: 3.7',
-              'Programming Language :: Python :: 3.8',
-              'Programming Language :: Cython',
-              ],
-          install_requires=install_requires,
-          setup_requires=install_requires,
-          python_requires='>=3.6',
-          ext_modules = ext_modules
-          )
+    setup( name = "MACS3",
+           version = MACS_VERSION,
+           description = "Model Based Analysis for ChIP-Seq data",
+           long_description = long_description,
+           long_description_content_type = "text/markdown",
+           author = 'Tao Liu',
+           author_email = 'vladimir.liu@gmail.com',
+           url = 'http://github.com/macs3-project/MACS/',
+           package_dir = {'MACS3' : 'MACS3'},
+           packages = ['MACS3', 'MACS3.IO', 'MACS3.Signal', 'MACS3.Commands','MACS3.Utilities'],
+           package_data = {'MACS3':['*.pxd']},
+           scripts = ['bin/macs3', ],
+           classifiers = classifiers,
+           install_requires = install_requires,
+           setup_requires = install_requires,
+           tests_require = tests_requires,
+           python_requires = '>=3.6',
+           ext_modules = ext_modules )
 
 if __name__ == '__main__':
     main()

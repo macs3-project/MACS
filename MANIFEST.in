@@ -5,4 +5,3 @@ include MACS3/Signal/cPosValCalculation.c MACS3/Signal/cPosValCalculation.h MACS
 recursive-include docs *.md
 recursive-include MACS3/fermi-lite *.c *.h
 prune test
-prune MACS3/fermi-lite/lib/test/

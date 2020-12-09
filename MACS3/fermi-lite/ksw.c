@@ -28,7 +28,7 @@
 
 /* I modified this according to https://github.com/lh3/bwa/pull/283/*/
 #ifdef USE_SIMDE
-#include "lib/simde/x86/sse2.h"
+#include "lib/x86/sse2.h"
 #else
 #include <emmintrin.h>
 #endif

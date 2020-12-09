@@ -34,9 +34,9 @@ make sure that the main branch passes unit testing on certain
 functions and subcommands to reproduce the correct outputs. We will
 add more new features in the future.**
 
-## Recent Changes for MACS (3.0.0a4)
+## Recent Changes for MACS (3.0.0a5)
 
-### 3.0.0a4
+### 3.0.0a5
 	* New features
 	
 	1) Speed/memory optimization.  Use the cykhash to replace python
@@ -47,7 +47,8 @@ add more new features in the future.**
 
 	3) Unit testing.
 
-	4) R wrappers for MACS -- MACSr
+	4) R wrappers for MACS -- MACSr matching the current version of
+    MACS
 
     5) Switch to Github Action for CI, support multi-arch testing
     including x64, armv7, aarch64, s390x and ppc64le.
@@ -69,6 +70,15 @@ The common way to install MACS is through
 [PYPI](https://pypi.org/project/macs3/)) or
 [conda](https://anaconda.org/bioconda/macs3). Please check the
 [INSTALL](./docs/INSTALL.md) document for detail.
+
+MACS3 has been tested in CI for every push and PR in the following
+architectures:
+
+ * x86_64
+ * aarch64
+ * armv7
+ * ppc64le
+ * s390x 
 
 ## Usage
 
@@ -113,7 +123,12 @@ from users.
 ## Contribute
 
 Please read our [CODE OF CONDUCT](./CODE_OF_CONDUCT.md) and
-[How to contribute](./CONTRIBUTING.md) documents.
+[How to contribute](./CONTRIBUTING.md) documents. If you have any
+questions, suggestion/ideas, or just want to have conversions with
+developers and other users in the community, we recommand you use the
+[MACS Discussions](https://github.com/macs3-project/MACS/discussions)
+instead of posting to our
+[Issues](https://github.com/macs3-project/MACS/issues) page.
 
 ## Ackowledgement
 
