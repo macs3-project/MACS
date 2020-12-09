@@ -123,7 +123,12 @@ from users.
 ## Contribute
 
 Please read our [CODE OF CONDUCT](./CODE_OF_CONDUCT.md) and
-[How to contribute](./CONTRIBUTING.md) documents.
+[How to contribute](./CONTRIBUTING.md) documents. If you have any
+questions, suggestion/ideas, or just want to have conversions with
+developers and other users in the community, we recommand you use the
+[MACS Discussions](https://github.com/macs3-project/MACS/discussions)
+instead of posting to our
+[Issues](https://github.com/macs3-project/MACS/issues) page.
 
 ## Ackowledgement
 
