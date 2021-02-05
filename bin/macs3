@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# Time-stamp: <2020-12-05 16:03:31 Tao Liu>
+# Time-stamp: <2020-12-31 15:53:40 Tao Liu>
 """Description: MACS v3 main executable.
 
 This code is free software; you can redistribute it and/or modify it
@@ -685,9 +685,9 @@ Finally, to call variants:
     group_input.add_argument( "-b", "--peak", dest = "peakbed", type = str, required =True,
                               help = "Peak regions in BED format, sorted by coordinates. REQUIRED." )
     group_input.add_argument( "-t", "--treatment", dest = "tfile", type = str, required = True, 
-                              help = "ChIP-seq/ATAC-seq treatment file in BAM format, containing only records in peak regions, sorted by coordinates. Check instruction on how to make the file using samtools. REQUIRED." )
+                              help = "ChIP-seq/ATAC-seq treatment file in BAM format, sorted by coordinates. Check instruction on how to make the file using samtools. REQUIRED." )
     group_input.add_argument( "-c", "--control", dest = "cfile", type = str, required = False, 
-                              help = "Control file in BAM format, containing only records in peak regions, sorted by coordinates. Check instruction on how to make the file using samtools. ")
+                              help = "Optional control file in BAM format, sorted by coordinates. Check instruction on how to make the file using samtools. If the control file is not provided, `callvar` will ")
     # group for output files
     group_output = argparser_callvar.add_argument_group( "Output arguments" )
     add_outdir_option( group_output )

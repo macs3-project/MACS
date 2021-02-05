@@ -1,36 +1,48 @@
 # cython: language_level=3
 # cython: profile=True
-# Time-stamp: <2020-12-05 16:18:36 Tao Liu>
+# Time-stamp: <2021-01-22 17:12:44 Tao Liu>
 
-"""Module for SAPPER BAMParser class
+"""Module for SAPPER BAMParser class. It's derived from BAMParser in
+Parser.pyx. The difference is that, in this new BAMParser class, we
+will keep the alignment information and read sequence. Also, we do not
+differentiate single-end vs paired-end data, and intend to read BAM
+always as single-end.
 
-Copyright (c) 2017 Tao Liu <tliu4@buffalo.edu>
+Copyright (c) 2021 Tao Liu <vladimir.liu@gmail.com>
 
 This code is free software; you can redistribute it and/or modify it
 under the terms of the BSD License (see the file COPYING included
 with the distribution).
 
-@status:  experimental
-@version: $Revision$
-@author:  Tao Liu
-@contact: tliu4@buffalo.edu
 """
 
 # ------------------------------------
 # python modules
 # ------------------------------------
 import logging
+from logging import info, debug
 import struct
 from struct import unpack
 import gzip
 import io
+import sys
+
+# ------------------------------------
+# MACS3 modules
+# ------------------------------------
+from MACS3.Utilities.Constants import *
 from MACS3.Signal.ReadAlignment import ReadAlignment
 
+# ------------------------------------
+# Other modules
+# ------------------------------------
 from cpython cimport bool
 
 import numpy as np
 cimport numpy as np
-from numpy cimport uint32_t, uint64_t, int32_t
+from numpy cimport uint32_t, uint64_t, int32_t, int64_t
+
+is_le = sys.byteorder == "little"
 
 cdef extern from "stdlib.h":
     ctypedef unsigned int size_t
@@ -46,9 +58,9 @@ cdef extern from "stdlib.h":
 # ------------------------------------
 # constants
 # ------------------------------------
-__version__ = "Parser $Revision$"
-__author__ = "Tao Liu <tliu4@buffalo.edu>"
-__doc__ = "All Parser classes"
+__version__ = "BAM $Revision$"
+__author__ = "Tao Liu <vladimir.liu@gmail.com>"
+__doc__ = "SAPPER BAMParser class"
 
 # ------------------------------------
 # Misc functions
@@ -109,7 +121,6 @@ cdef class BAMParser:
     """
     cdef str filename
     cdef bool gzipped
-    #cdef int tag_size
     cdef object fhd             # BAM file handler
     cdef list references        # name of references/chromosomes, contain the order of chromosomes
     cdef dict rlengths          # lengths of references/chromosomes
@@ -129,7 +140,7 @@ cdef class BAMParser:
         """
         self.filename = filename
         self.gzipped = True
-        #self.tag_size = -1
+
         # try gzip first
         f = gzip.open( filename )
         try:
@@ -140,7 +151,7 @@ cdef class BAMParser:
         f.close()
         if self.gzipped:
             # open with gzip.open, then wrap it with BufferedReader!
-            self.fhd = io.BufferedReader( gzip.open( filename, mode='rb' ) )
+            self.fhd = io.BufferedReader( gzip.open( filename, mode='rb' ), buffer_size = READ_BUFFER_SIZE )
         else:
             self.fhd = io.open( filename, mode='rb' ) # binary mode! I don't expect unicode here!
         #self.get_tsize()
