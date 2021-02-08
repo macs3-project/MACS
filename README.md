@@ -34,9 +34,9 @@ make sure that the main branch passes unit testing on certain
 functions and subcommands to reproduce the correct outputs. We will
 add more new features in the future.**
 
-## Recent Changes for MACS (3.0.0a5)
+## Recent Changes for MACS (3.0.0a6)
 
-### 3.0.0a5
+### 3.0.0a6
 	* New features
 	
 	1) Speed/memory optimization.  Use the cykhash to replace python
@@ -56,7 +56,7 @@ add more new features in the future.**
     6) MACS tag-shifting model has been refined. Now it will use a
     naive peak calling approach to find ALL possible paired peaks at +
     and - strand, then use all of them to calculate the
-    cross-correlation.
+    cross-correlation. (a related bug has been fix #442)
 
     7) Call variants in peak regions directly from BAM files. The
 	function was originally developed under code name SAPPER. Now

@@ -1,6 +1,6 @@
 # cython: language_level=3
 # cython: profile=True
-# Time-stamp: <2020-11-28 17:14:02 Tao Liu>
+# Time-stamp: <2021-02-05 16:31:53 Tao Liu>
 
 """Module Description: For pileup functions.
 
@@ -703,7 +703,7 @@ cpdef naive_call_peaks ( list pv_array, float min_v, float max_v = 1e30, int max
         except:
             break
         x += 1                  # index for the next point
-        if v >= min_v:
+        if v > min_v:
             peak_content = [ ( pre_p , p, v ), ]
             pre_p = p
             break               # found the first range above min_v
@@ -714,7 +714,7 @@ cpdef naive_call_peaks ( list pv_array, float min_v, float max_v = 1e30, int max
         # continue scan the rest regions
         p = psn()
         v = vsn()
-        if v < min_v: # not be detected as 'peak'
+        if v <= min_v: # not be detected as 'peak'
             pre_p = p
             continue
         # for points above min_v

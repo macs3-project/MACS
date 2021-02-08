@@ -1,5 +1,5 @@
-2020-12-08  Tao Liu  <vladimir.liu@gmail.com>
-	MACS 3.0.0a5
+2021-02-07  Tao Liu  <vladimir.liu@gmail.com>
+	MACS 3.0.0a6
 
 	* New features:
 
@@ -19,7 +19,7 @@
 	6) MACS tag-shifting model has been refined. Now it will use a
 	naive peak calling approach to find ALL possible paired peaks at +
 	and - strand, then use all of them to calculate the
-	cross-correlation.
+	cross-correlation. (a related bug has been fix #442)
 
 	7) Call variants in peak regions directly from BAM files. The 
 	function was originally developed under code name SAPPER. Now 
