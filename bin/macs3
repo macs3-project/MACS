@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# Time-stamp: <2020-12-31 15:53:40 Tao Liu>
+# Time-stamp: <2021-03-03 17:09:26 Tao Liu>
 """Description: MACS v3 main executable.
 
 This code is free software; you can redistribute it and/or modify it
@@ -94,14 +94,19 @@ def main():
         # pileup alignment results with a given extension method
         from MACS3.Commands.pileup_cmd import run
         run( args )
-    #elif subcommand == "hmmratac":
-    #    # pileup alignment results with a given extension method
-    #    from MACS3.Commands.diffpeak_cmd import run
-    #    run( args )
+    elif subcommand == "hmmratac":
+        # pileup alignment results with a given extension method
+        pass
+        #from MACS3.Commands.diffpeak_cmd import run
+        #run( args )
     elif subcommand == "callvar":
         # assemble reads in peak region and call variants
         from MACS3.Commands.callvar_cmd import run
         run( args )
+    #elif subcommand == "callvar2":
+    #    # assemble reads in peak region and call variants
+    #    from MACS3.Commands.callvar2_cmd import run
+    #    run( args )        
 
 
 def prepare_argparser ():
@@ -156,11 +161,14 @@ def prepare_argparser ():
     # command for 'refinepeak'
     add_refinepeak_parser( subparsers )
 
-    ## command for 'callvar'
+    # command for 'callvar'
     add_callvar_parser( subparsers )
 
-    ## command for 'refinepeak'
-    #add_hmmratac_parser( subparsers )
+    # command for 'callvar'
+    #add_callvar2_parser( subparsers )    
+
+    ## command for 'hmmratac'
+    add_hmmratac_parser( subparsers )
 
     return argparser
 
@@ -287,7 +295,7 @@ def add_callpeak_parser( subparsers ):
     postprocess_group.add_argument( "--call-summits", dest="call_summits", action="store_true",
                                     help="If set, MACS will use a more sophisticated signal processing approach to find subpeak summits in each enriched peak region. DEFAULT: False",default=False)
     group_postprocessing.add_argument( "--fe-cutoff", dest="fecutoff", type=float, default = 1.0,
-                                       help = "When set, the value will be used to filter out peaks with low fold-enrichment. Note, MACS3 adds one as pseudocount while calculating fold-enrichment. By default, it is set as 1 so there is no filtering. DEFAULT: 1.0")
+                                       help = "When set, the value will be used as the minimum requirement to filter out peaks with low fold-enrichment. Note, MACS3 adds one as pseudocount while calculating fold-enrichment. By default, it is set as 1 so there is no filtering. DEFAULT: 1.0")
 
     # other options
     group_other = argparser_callpeak.add_argument_group( "Other options" )
@@ -401,7 +409,7 @@ def add_bdgpeakcall_parser( subparsers ):
     argparser_bdgpeakcall.add_argument( "-i", "--ifile", dest = "ifile", type = str, required = True,
                                         help = "MACS score in bedGraph. REQUIRED" )
     argparser_bdgpeakcall.add_argument( "-c", "--cutoff" , dest = "cutoff", type = float,
-                                        help = "Cutoff depends on which method you used for score track. If the file contains pvalue scores from MACS3, score 5 means pvalue 1e-5. DEFAULT: 5", default = 5 )
+                                        help = "Cutoff depends on which method you used for score track. If the file contains pvalue scores from MACS3, score 5 means pvalue 1e-5. Regions with signals lower than cutoff will not be considerred as enriched regions. DEFAULT: 5", default = 5 )
     argparser_bdgpeakcall.add_argument( "-l", "--min-length", dest = "minlen", type = int,
                                        help = "minimum length of peak, better to set it as d value. DEFAULT: 200", default = 200 )
     argparser_bdgpeakcall.add_argument( "-g", "--max-gap", dest = "maxgap", type = int,
@@ -426,7 +434,7 @@ def add_bdgbroadcall_parser( subparsers ):
     argparser_bdgbroadcall.add_argument( "-i", "--ifile", dest = "ifile" , type = str, required = True,
                                          help = "MACS score in bedGraph. REQUIRED" )
     argparser_bdgbroadcall.add_argument( "-c", "--cutoff-peak", dest = "cutoffpeak", type = float,
-                                         help = "Cutoff for peaks depending on which method you used for score track. If the file contains qvalue scores from MACS3, score 2 means qvalue 0.01. DEFAULT: 2",
+                                         help = "Cutoff for peaks depending on which method you used for score track. If the file contains qvalue scores from MACS3, score 2 means qvalue 0.01. Regions with signals lower than cutoff will not be considerred as enriched regions. DEFAULT: 2",
                                          default = 2 )
     argparser_bdgbroadcall.add_argument( "-C", "--cutoff-link", dest = "cutofflink", type = float,
                                          help = "Cutoff for linking regions/low abundance regions depending on which method you used for score track. If the file contains qvalue scores from MACS3, score 1 means qvalue 0.1, and score 0.3 means qvalue 0.5. DEFAULT: 1", default = 1 )
@@ -544,7 +552,7 @@ def add_bdgdiff_parser( subparsers ):
     argparser_bdgdiff.add_argument( "--c2", dest="c2bdg", type = str, required = True,
                                     help = "MACS control lambda bedGraph for condition 2. Incompatible with callpeak --SPMR output. REQUIRED" )
     argparser_bdgdiff.add_argument( "-C", "--cutoff", dest = "cutoff", type = float,
-                                    help = "logLR cutoff. DEFAULT: 3 (likelihood ratio=1000)", default = 3 )
+                                    help = "logLR cutoff. Regions with signals lower than cutoff will not be considerred as enriched regions. DEFAULT: 3 (likelihood ratio=1000)", default = 3 )
     argparser_bdgdiff.add_argument( "-l", "--min-len", dest = "minlen", type = int,
                                     help = "Minimum length of differential region. Try bigger value to remove small regions. DEFAULT: 200", default = 200 )
     argparser_bdgdiff.add_argument( "-g", "--max-gap", dest = "maxgap", type = int,
@@ -575,7 +583,7 @@ def add_refinepeak_parser( subparsers ):
                                       help = "Format of tag file, \"AUTO\", \"BED\" or \"ELAND\" or \"ELANDMULTI\" or \"ELANDEXPORT\" or \"SAM\" or \"BAM\" or \"BOWTIE\". The default AUTO option will let '%(prog)s' decide which format the file is. Please check the definition in README file if you choose ELAND/ELANDMULTI/ELANDEXPORT/SAM/BAM/BOWTIE. DEFAULT: \"AUTO\"",
                                       default = "AUTO" )
     argparser_refinepeak.add_argument( "-c", "--cutoff" , dest = "cutoff", type = float,
-                                        help = "Cutoff  DEFAULT: 5", default = 5 )
+                                        help = "Cutoff. Regions with SPP wtd score lower than cutoff will not be considerred.  DEFAULT: 5", default = 5 )
     argparser_refinepeak.add_argument( "-w", "--window-size", dest= "windowsize", help = 'Scan window size on both side of the summit (default: 100bp)',
                                         type = int, default = 200)
     argparser_refinepeak.add_argument( "--buffer-size", dest = "buffer_size", type = int, default = "100000",
@@ -720,6 +728,127 @@ Finally, to call variants:
     group_misc.add_argument( "-m", "--multiple-processing", dest = "np", type = int, default = 1,
                              help = "CPU used for mutliple processing. Please note that, assigning more CPUs does not guarantee the process being faster. Creating too many parrallel processes need memory operations and  may negate benefit from multi processing. Default: 1" )
     return
+
+def add_hmmratac_parser( subparsers ):
+    """Add function 'HMMRATAC' argument parsers. From SAPPER package
+    """
+    argparser_hmmratac = subparsers.add_parser("hmmratac",
+                                                formatter_class = ap.RawDescriptionHelpFormatter,
+                                                help="Dedicated peak calling based on Hidden Markov Model for ATAC-seq data.",
+                                                epilog = "TBA...")
+    # group for input files
+    group_input = argparser_hmmratac.add_argument_group( "Input files arguments" )
+    group_input.add_argument( "-i", dest = "ifile", type = str, required = True, 
+                              help = "ATAC-seq alignment file in BAM format, sorted by coordinates. Please note HMMRATAC needs .bai (index file for bam) in the same directory. So if you provide `-i a.bam`, please make sure `./a.bam.bai` is accessible. REQUIRED." )
+    
+    # group for output files
+    group_output = argparser_hmmratac.add_argument_group( "Output arguments" )
+    add_outdir_option( group_output )
+    #-o , --output <String> Name for output files. Default = NA
+    #--bedgraph <true || false> Whether to report whole genome bedgraph of all state anntations. Default = false
+    #--bgscore <true || false> Whether to add the HMMR score to each state annotation in bedgraph. Note: this adds considerable time. Default = False
+    #-p , --peaks <true || false> Whether to report peaks in bed format. Default = true
+    #--printExclude <true || false> Whether to output excluded regions into Output_exclude.bed. Default = false
+    #--printTrain <true || false> Whether to output training regions into Output_training.bed. Default = true
+
+    add_output_group( group_output )
+    group_output.add_argument( "-B", "--bdg", "--bedgraph", dest = "store_bdg", action = "store_true",
+                               help = "Whether to report whole genome bedgraph of all state anntations. DEFAULT: False",
+                               default = False )
+    group_output.add_argument( "-S", "--bgscore", dest = "store_bgscore", action = "store_true",
+                               help = "Whether to add the HMMR score to each state annotation in bedgraph. Note: this adds considerable time. DEFAULT: False",
+                               default = False )
+    group_output.add_argument( "-p", "--peaks", dest = "store_peaks", action = "store_false", default = True,
+                               help = "Whether to report peaks in bed format. Default: True" )
+    group_output.add_argument( "--printExclude", dest = "print_exclude", action = "store_true",
+                               help = "Whether to output excluded regions into Output_exclude.bed. Default: False",
+                               default = False )
+    group_output.add_argument( "--printTrain", dest = "print_train", action = "store_true",
+                               help = "Whether to output training regions into Output_training.bed. Default: False",
+                               default = False )
+
+    # group for EM
+    group_em = argparser_hmmratac.add_argument_group( "EM algorithm arguments" )
+    # 	-f , --fragem <true || false> Whether to perform EM training on the fragment distribution. Default = True
+    #   -m , --means <double> Comma separated list of initial mean values for the fragment distribution. Default = 50,200,400,600
+    #   -s , --stddev <double> Comma separated list of initial standard deviation values for fragment distribution. Default = 20,20,20,20
+    group_em.add_argument( "-f", "--fragem", dest = "em_do", action = "store_false", default = True,
+                               help = "Whether to perform EM training on the fragment distribution. Default: True")
+    group_em.add_argument( "--means", dest = "em_means", type = float, default = [50, 200, 400, 600], nargs = 4,
+                            help = "Space separated list of initial mean values for the fragment distribution. Default: 50 200 400 600" )
+
+    group_em.add_argument( "--stddev", dest = "em_stddev", type = float, default = [20, 20, 20, 20], nargs = 4,
+                            help = "Comma separated list of initial standard deviation values for fragment distribution. Default: 20 20 20 20" )
+    
+    # group for HMM
+    #-u , --upper <int> Upper limit on fold change range for choosing training sites. Default = 20
+    #-l , --lower <int> Lower limit on fold change range for choosing training sites. Default = 10
+    #-z , --zscore <int> Zscored read depth to mask during Viterbi decoding. Default = 100
+    #--randomSeed <long> Seed to set for random sampling of training regions. Default is 10151
+    #--window <int> Size of the bins to split the genome into for Viterbi decoding.
+    #  To save memory, the genome is split into <int> long bins and viterbi decoding occurs across each bin.
+    #  Default = 25000000. Note: For machines with limited memory, it is recomended to reduce the size of the bins.
+    #--model <File> Binary model file (generated from previous HMMR run) to use instead of creating new one
+    #--modelonly <true || false> Whether or not to stop the program after generating model. Default = false
+    #--maxTrain <int> Maximum number of training regions to use. Default == 1000
+    #-k , --kmeans <int> Number of States in the model. Default = 3. If not k=3, recommend NOT calling peaks, use bedgraph
+    #-t , --training <BED_File> BED file of training regions to use for training model, instead of foldchange settings
+    
+    group_hmm = argparser_hmmratac.add_argument_group( "Hidden Markov Model arguments" )
+    group_hmm.add_argument( "-s", "--states", dest = "hmm_states", type = int, default = 3,
+                            help = "Number of States in the model. Default = 3. If not k=3, recommend NOT calling peaks, use bedgraph. This option is named as `--kmeans` in HMMRATAC since it will also control the number of clusters in the k-means clustering process to decide the initial emissions for HMM training." )
+    group_hmm.add_argument( "-u", "--upper", dest = "hmm_upper", type = int, default = 20,
+                            help = "Upper limit on fold change range for choosing training sites. Default: 20" )
+    group_hmm.add_argument( "-l", "--lower", dest = "hmm_lower", type = int, default = 10,
+                            help = "Lower limit on fold change range for choosing training sites. Default: 10" )
+    group_hmm.add_argument( "--maxTrain", dest = "hmm_maxTrain", type = int, default = 1000,
+                            help = "Maximum number of training regions to use. Default: 10" )
+    group_hmm.add_argument( "-t", "--training", dest = "hmm_training_regions", type = str, required = False, 
+                              help = "BED file of training regions to use for training model, instead of using foldchange settings. Default: NA" )    
+    group_hmm.add_argument( "-z", "--zscore", dest = "hmm_zscore", type = int, default = 100,
+                            help = "Zscored read depth to mask during Viterbi decoding. Default: 100" )
+    group_hmm.add_argument( "--randomSeed", dest = "hmm_randomSeed", type = int, default = 10151,
+                            help = "Seed to set for random sampling of training regions. Default: 10151" )
+    group_hmm.add_argument( "--window", dest = "hmm_window", type = int, default = 25000000,
+                            help = "Size of the bins to split the genome into for Viterbi decoding. To save memory, the genome is split into WINDOW long bins and viterbi decoding occurs across each bin. Default = 25000000. Note: For machines with limited memory, it is recomended to reduce the size of the bins." )
+    group_hmm.add_argument( "--model", dest = "hmm_file", type = str, required = False, 
+                              help = "Binary model file (generated from previous HMMR run) to use instead of creating new one. When provided, HMM training will be skipped. Default: NA" )
+    group_hmm.add_argument( "--modelonly", dest = "hmm_modelonly", action = "store_true", default = False,
+                            help = "Whether or not to stop the program after generating model. Default: False")
+
+    # group for peak calling arguments
+    #--minlen <int> Minimum length of open region to call peak. Note: -p , --peaks must be set. Default = 200
+    #--score <max || ave || med || fc || zscore || all> What type of score system to use for peaks. Can be used for ranking peaks. Default = max
+    #--threshold <double> threshold for reporting peaks. Only peaks who's score is >= this value will be reported.
+    group_call = argparser_hmmratac.add_argument_group( "Peak calling arguments" )
+    group_call.add_argument( "--minlen", dest = "call_minlen", type = int, default = 200,
+                             help = "Minimum length of open region to call peak. Note: -p , --peaks must be set. Default: 20" )
+    group_call.add_argument( "--score", dest = "call_score", type = str, choices = ("max", "ave", "med", "fc", "zscore", "all"),
+                             help = "What type of score system to use for peaks. Can be used for ranking peaks. Default: max" )
+    group_call.add_argument( "--threshold", dest = "call_threshold", type = float, default = 100,
+                             help = "Threshold for reporting peaks. Only peaks who's score is >= this value will be reported. Default: 100" )
+
+    # group for misc
+    #-e , --blacklist <BED_File> bed file of blacklisted regions to exclude
+    #--removeDuplicates <true || false> Whether or not to remove duplicate reads from analysis. Default = true
+    #--trim <int> How many signals from the end to trim off (ie starting with tri signal then di etc). This may be useful if your data doesn't contain many large fragments. Default = 0
+
+    group_misc = argparser_hmmratac.add_argument_group( "Misc arguments" )
+    group_misc.add_argument( "-e", "--blacklist", dest = "misc_blacklist", type = str, required = False, 
+                              help = "BED file of blacklisted regions to exclude. Examples are those from ENCODE. Default: NA" )
+    group_misc.add_argument( "--removeDuplicates", dest = "misc_removeDuplicates", action = "store_false", default = True, 
+                            help = "Whether or not to remove duplicate reads from analysis. Default: True" )    
+    group_misc.add_argument( "--trim", dest = "misc_trim", type = int, default = 0,
+                             help = "How many signals from the end to trim off (ie starting with tri signal then di etc). This may be useful if your data doesn't contain many large fragments. Default: 0" )
+    group_misc.add_argument( "-m", "--multiple-processing", dest = "np", type = int, default = 1,
+                             help = "CPU used for mutliple processing. Please note that, assigning more CPUs does not guarantee the process being faster. Creating too many parrallel processes need memory operations and  may negate benefit from multi processing. Default: 1" )
+    group_misc.add_argument( "--verbose", dest = "verbose", type = int, default = 2,
+                             help = "Set verbose level of runtime message. 0: only show critical message, 1: show additional warning message, 2: show process information, 3: show debug messages. DEFAULT:2" )
+
+    
+    return
+
+
 
 if __name__ == '__main__':
     __spec__ = None
