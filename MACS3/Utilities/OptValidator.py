@@ -1,4 +1,4 @@
-# Time-stamp: <2020-11-24 17:40:03 Tao Liu>
+# Time-stamp: <2021-03-04 11:00:12 Tao Liu>
 
 """Module Description
 
@@ -780,6 +780,26 @@ def opt_validate_bdgopt ( options ):
     if options.method.lower() in [ 'multiply', 'add' ] and not options.extraparam:
         logging.error( "Need EXTRAPARAM for method multiply or add!")
         sys.exit( 1 )
+
+    return options
+
+def opt_validate_hmmratac ( options ):
+    """Validate options from a OptParser object.
+
+    Ret: Validated options object.
+    """
+    # logging object
+    logging.basicConfig(level=20,
+                        format='%(levelname)-5s @ %(asctime)s: %(message)s ',
+                        datefmt='%a, %d %b %Y %H:%M:%S',
+                        stream=sys.stderr,
+                        filemode="w"
+                        )
+
+    options.error   = logging.critical        # function alias
+    options.warn    = logging.warning
+    options.debug   = logging.debug
+    options.info    = logging.info
 
     return options
 
