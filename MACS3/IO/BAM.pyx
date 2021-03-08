@@ -1,19 +1,13 @@
 # cython: language_level=3
 # cython: profile=True
-# Time-stamp: <2021-01-22 17:12:44 Tao Liu>
+# cython: linetrace=True
+# Time-stamp: <2021-03-05 17:15:10 Tao Liu>
 
-"""Module for SAPPER BAMParser class. It's derived from BAMParser in
-Parser.pyx. The difference is that, in this new BAMParser class, we
-will keep the alignment information and read sequence. Also, we do not
-differentiate single-end vs paired-end data, and intend to read BAM
-always as single-end.
-
-Copyright (c) 2021 Tao Liu <vladimir.liu@gmail.com>
+"""
 
 This code is free software; you can redistribute it and/or modify it
-under the terms of the BSD License (see the file COPYING included
-with the distribution).
-
+under the terms of the BSD License (see the file LICENSE included with
+the distribution).
 """
 
 # ------------------------------------
@@ -40,7 +34,7 @@ from cpython cimport bool
 
 import numpy as np
 cimport numpy as np
-from numpy cimport uint32_t, uint64_t, int32_t, int64_t
+from numpy cimport uint8_t, uint16_t, uint32_t, uint64_t, int8_t, int16_t, int32_t, int64_t, float32_t, float64_t
 
 is_le = sys.byteorder == "little"
 
@@ -65,6 +59,24 @@ __doc__ = "SAPPER BAMParser class"
 # ------------------------------------
 # Misc functions
 # ------------------------------------
+cdef list get_bins_by_region ( uint32_t beg, uint32_t end ):
+    """ Get the possible bins by given a region
+    """
+    cdef:
+        list bins = [ 0 ]
+        uint32_t k
+    # for different levels
+    for k in range(1 + (beg>>26), 2 + (end>>26) ):
+        bins.append( k )
+    for k in range(9 + (beg>>23), 10 + (end>>23) ):
+        bins.append( k )
+    for k in range(73 + (beg>>20), 74 + (end>>20) ):
+        bins.append( k )
+    for k in range(585 + (beg>>17), 586 + (end>>17) ):
+        bins.append( k )
+    for k in range(4681 + (beg>>14), 4682 + (end>>14) ):
+        bins.append( k )
+    return bins
 
 # ------------------------------------
 # Classes
@@ -96,6 +108,175 @@ class MDTagMissingError( Exception ):
         
     def __str__ ( self ):
         return repr( "MD tag is missing! Please use \"samtools calmd\" command to add MD tags!\nName of sequence:%s\nCurrent auxiliary data section: %s" % (self.name.decode(), self.aux.decode() ) )
+
+
+cdef class BAIFile:
+    """BAI File Class for BAI (index of BAM) File.
+
+    While initiating the object, BAI file will be loaded and the
+    information of bins and chunks will be saved in the class object.
+
+    Please refer to https://samtools.github.io/hts-specs/SAMv1.pdf for
+    detail definition of BAI file.
+    """
+    cdef:
+        str filename            # filename
+        object fhd              # file handler
+        bytes magic             # magic code for this file
+        uint32_t n_ref          # number of refseqs/chromosomes
+        dict metadata           # metadata for ref seqs
+        uint64_t n_bins         # total number of bins
+        uint64_t n_chunks       # total number of chunks
+        uint64_t n_mapped       # total mapped reads
+        uint64_t n_unmapped     # total unmapped reads
+        list bins
+
+    def __init__ ( self, str filename ):
+        """Open input file. Determine whether it's a gzipped file.
+
+        'filename' must be a string object.
+
+        This function initialize the following attributes:
+
+        1. self.filename: the filename for input file.
+        2. self.gzipped: a boolean indicating whether input file is gzipped.
+        3. self.fhd: buffered I/O stream of input file
+        """
+        self.filename = filename
+        self.fhd = io.open( filename, mode='rb' ) # binary mode! I don't expect unicode here!
+        self.magic = self.fhd.read( 4 )
+        if self.magic != b"BAI\1":
+            raise Exception(f"Not a BAI file. The first 4 bytes are \'{self.magic}\'")
+        self.n_ref = self.__read_n_ref()
+        self.bins = list( range( self.n_ref ) )
+        self.metadata = dict.fromkeys( self.bins )
+        self.__load_bins()
+        self.fhd.close()
+        return
+
+    def __cinit__ ( self ):
+        self.n_ref = 0
+        self.n_bins = 0
+        self.n_chunks = 0
+        self.n_mapped = 0
+        self.n_unmapped = 0
+
+    def __str__ ( self ):
+        tmp = list(self.bins[0].keys())[:10]
+        return f"""
+Summary of BAI File:
+filename: {self.filename}
+magic: {self.magic}
+number of reference sequences/chromosomes: {self.n_ref}
+number of total bins: {self.n_bins}
+number of total chunks: {self.n_chunks}
+number of total mapped reads: {self.n_mapped}
+number of total unmapped reads: {self.n_unmapped}
+Example of bins: ref 0, {tmp} ..
+Example of metadata: ref 0, {self.metadata[ 0 ]}
+"""
+
+    cdef uint32_t __read_n_ref ( self ):
+        cdef:
+            uint32_t ret_val
+        self.fhd.seek( 4 )      # skip magic
+        ret_val = unpack( '<I', self.fhd.read( 4 ) )[ 0 ]
+        return ret_val
+
+    cdef __load_bins ( self ):
+        cdef:
+            uint32_t i, j, m
+            uint32_t this_n_bin, this_n_intv
+            uint32_t this_bin
+            uint32_t this_n_chunk
+            dict this_bin_dict
+            list this_chunks
+            list pseudobin
+        # skip the magic and n_ref
+        self.fhd.seek( 8 )
+        # for each ref seq/chromosome
+        for i in range( self.n_ref ):
+            # get number of bins
+            this_n_bin= unpack( '<I', self.fhd.read( 4 ) )[ 0 ]
+            # must be less than 37451
+            assert this_n_bin <= 37451
+            # increment the total n_bins counter
+            self.n_bins += this_n_bin
+            # initiate this_bin_dict for this ref seq
+            this_bin_dict = {}
+            # for each bin
+            for j in range( this_n_bin ):
+                ( this_bin, this_n_chunk ) = unpack( '<II', self.fhd.read( 8 ) )
+                # increment the total n_chunks counter
+                self.n_chunks += this_n_chunk
+                this_chunks = []
+                for m in range( this_n_chunk ):
+                    this_chunks.append( unpack( '<QQ', self.fhd.read( 16 ) ) )
+                # put the list of chunks in the this_bin_dict
+                this_bin_dict[ this_bin ] = this_chunks
+            # put the this_bin_dict in the list
+            self.bins[ i ] = this_bin_dict
+            # we will skip the next linear index part -- since I don't
+            # think we need them in regular
+            # ChIP-seq/ATAC-seq/other-seq analysis. Let me know if I am wrong!
+            this_n_intv = unpack( '<I', self.fhd.read( 4 ) )[ 0 ]
+            # skip each 64bits
+            self.fhd.seek( 8 * this_n_intv, 1 )
+        # we will also skip n_no_coor, the Number of unplaced unmapped reads
+        # now extract and clean up the pseudo-bins
+        # if empty, just skip
+        for i in range( self.n_ref ):
+            if self.bins[ i ]:
+                pseudobin = self.bins[ i ].pop( 37450 )
+                self.metadata[ i ] = {"ref_beg": pseudobin[0][0], "ref_end": pseudobin[0][1],
+                                    "n_mapped": pseudobin[1][0], "n_unmapped": pseudobin[1][1] }
+                self.n_mapped += pseudobin[1][0]
+                self.n_unmapped += pseudobin[1][1]
+        return
+
+    cpdef list get_chunks_by_bin ( self, uint32_t ref_n, uint32_t bin_n ):
+        """ get the chunks by bin number, for a given ref seq (not the name,
+        but the index).
+
+        The chunks will be sorted using default python sorted
+        function. Therefore the result will be the order of the offset
+        of beginning of each chunks.
+        """
+        return sorted( self.bins[ ref_n ].get( bin_n, [] ) )
+
+    cpdef list get_chunks_by_list_bins ( self, uint32_t ref_n, list bins ):
+        """Similar to get_chunks_by_bin, but accept a list of bins
+        """
+        cdef:
+            uint32_t bin_n
+            list chunks = []
+        for bin_n in bins:
+            chunks.extend( self.bins[ ref_n ].get( bin_n, [] ) )
+        return sorted( chunks )
+
+    cpdef dict get_metadata_by_refseq ( self, uint32_t ref_n ):
+        return self.metadata[ ref_n ]
+
+    cpdef list get_chunks_by_region ( self, uint32_t ref_n, uint32_t beg, uint32_t end ):
+        """ Get the chunks by given a region in a given refseq (not the name,
+        but the index) 
+        """
+        cdef:
+            list bins
+        bins = get_bins_by_region( beg, end )
+        return self.get_chunks_by_list_bins( ref_n, bins )
+
+    cpdef list get_chunks_by_list_regions ( self, uint32_t ref_n, list regions ):
+        """ Similar to get_chunks_by_region, but accept a list of regions
+        """
+        cdef:
+            list temp_bins
+            list bins = []
+            uint32_t beg, end
+        for ( beg, end ) in regions:
+            temp_bins = get_bins_by_region( beg, end )
+            bins.extend( temp_bins )
+        return self.get_chunks_by_list_bins( ref_n, bins )
 
 cdef class BAMParser:
     """File Parser Class for BAM File.
@@ -408,4 +589,5 @@ cdef class BAMParser:
 
         # construct a ReadAlignment object and return
         return ReadAlignment( read_name, self.references[ref], leftmost, rightmost, strand, seq, qual, cigar_op, MD )
+
 
