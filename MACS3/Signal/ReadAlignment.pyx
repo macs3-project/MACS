@@ -1,6 +1,6 @@
 # cython: language_level=3
 # cython: profile=True
-# Time-stamp: <2020-12-04 22:48:42 Tao Liu>
+# Time-stamp: <2021-03-10 16:21:51 Tao Liu>
 
 """Module for SAPPER ReadAlignment class
 
@@ -62,7 +62,7 @@ cdef class ReadAlignment:
         int strand              # strand information. 0 means forward strand, 1 means reverse strand.
         bytes binaryseq
         bytes binaryqual
-        int l                             #length of read
+        int l                   # length of read
         tuple cigar             # each item contains op_l|op
         bytes MD
         int n_edits             # number of edits; higher the number,
@@ -70,7 +70,7 @@ cdef class ReadAlignment:
         bytes SEQ               # sequence of read regarding to + strand
         bytes QUAL              # quality of read regarding to + strand
 
-    def __init__ ( self, 
+    def __init__ ( self,
                    bytes readname,
                    bytes chrom, int lpos, int rpos,
                    int strand,
@@ -112,6 +112,15 @@ cdef class ReadAlignment:
                 n_edits += 1
         return n_edits
 
+    def __str__ ( self ):
+        c = self.chrom.decode()
+        n = self.readname.decode()
+        if self.strand:
+            s = "-"
+        else:
+            s = "+"
+        return f"{c}\t{self.lpos}\t{self.rpos}\t{n}\t{self.l}\t{s}"
+    
     def __getitem__ ( self, keyname ):
         if keyname == "readname":
             return self.readname

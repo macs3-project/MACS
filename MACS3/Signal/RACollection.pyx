@@ -1,6 +1,6 @@
 # cython: language_level=3
 # cython: profile=True
-# Time-stamp: <2020-12-04 22:47:07 Tao Liu>
+# Time-stamp: <2021-03-10 23:39:52 Tao Liu>
 
 """Module for SAPPER BAMParser class
 
@@ -782,7 +782,7 @@ cdef class RACollection:
             int n_unmapped, n_unitigs_0, n_unitigs_1
 
         # first round of assembly
-        print (" First round to assemble unitigs")
+        # print (" First round to assemble unitigs")
         unitig_list = self.fermi_assemble( fermiMinOverlap, opt_flag = 0x80 )
         if len(unitig_list) == 0:
             return 0
@@ -797,7 +797,7 @@ cdef class RACollection:
         if len(unitig_list) == 0:
             # if stop here, it raises a flag that the region may contain too many mismapped reads, we return -1
             return -1
-        print (" # of Unitigs:", n_unitigs_1)
+        # print (" # of Unitigs:", n_unitigs_1)
         
         # assign RAs to unitigs
         [ RAlists_T, RAlists_C, unmapped_RAlist_T, unmapped_RAlist_C ] = self.remap_RAs_w_unitigs( unitig_list )
@@ -809,7 +809,7 @@ cdef class RACollection:
             # if there are unmapped reads AND we can get more unitigs
             # from last round of assembly, do assembly again
 
-            print (" # of RAs not mapped, will be assembled again:", n_unmapped)
+            # print (" # of RAs not mapped, will be assembled again:", n_unmapped)
             n_unitigs_0 = n_unitigs_1
             # another round of assembly
             unmapped_ra_collection = RACollection( self.chrom, self.peak, unmapped_RAlist_T, unmapped_RAlist_C )
@@ -828,7 +828,7 @@ cdef class RACollection:
             #    for r in unmapped_RAlist_T:
             #        print r.get_FASTQ().decode().lstrip()
 
-            print (" # of RAs not mapped, will be assembled again with 1/2 of fermiMinOverlap:", n_unmapped)
+            # print (" # of RAs not mapped, will be assembled again with 1/2 of fermiMinOverlap:", n_unmapped)
             # another round of assembly
             unmapped_ra_collection = RACollection( self.chrom, self.peak, unmapped_RAlist_T, unmapped_RAlist_C )
             unitigs_2nd = unmapped_ra_collection.fermi_assemble( fermiMinOverlap/2, opt_flag = 0x80 )
@@ -847,12 +847,12 @@ cdef class RACollection:
             #        print r.get_FASTQ().decode().lstrip()
             if len(unitig_list) == 0:
                 raise Exception("Shouldn't reach here")
-            print (" # of Unitigs:", n_unitigs_1)
+            # print (" # of Unitigs:", n_unitigs_1)
 
         if len(unitig_list) == 0:
             return None
-        print (" Final round: # of Unitigs:", len(unitig_list))
-        print (" Final round: # of RAs not mapped:", n_unmapped)
+        #print (" Final round: # of Unitigs:", len(unitig_list))
+        #print (" Final round: # of RAs not mapped:", n_unmapped)
 
         start = min( self.left, self.RAs_left )
         end = max( self.right, self.RAs_right )
