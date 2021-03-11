@@ -1,5 +1,5 @@
 #!/bin/bash
-# Time-stamp: <2021-03-10 19:33:43 Tao Liu>
+# Time-stamp: <2021-03-10 20:29:46 Tao Liu>
 
 # integrative subcmds testing
 
@@ -246,8 +246,8 @@ for i in ${subfolders[@]};do
 	    cp $fq $fs
 	    echo " ... replaced!"
 	else
-	    sort $fq > tmp_fq.txt
-	    sort $fs > tmp_fs.txt
+	    sort $fq| grep -v ^# > tmp_fq.txt
+	    sort $fs| grep -v ^# > tmp_fs.txt
 	    d=`diff tmp_fq.txt tmp_fs.txt`
 	    if [ -z "$d" ]; then
 		echo " ... success!"
