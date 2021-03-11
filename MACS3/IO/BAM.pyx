@@ -1,7 +1,7 @@
 # cython: language_level=3
 # cython: profile=True
 # cython: linetrace=True
-# Time-stamp: <2021-03-05 17:15:10 Tao Liu>
+# Time-stamp: <2021-03-10 18:50:23 Tao Liu>
 
 """
 
@@ -19,7 +19,9 @@ import struct
 from struct import unpack
 import gzip
 import io
+import os
 import sys
+from zlib import decompress, MAX_WBITS
 
 # ------------------------------------
 # MACS3 modules
@@ -78,6 +80,38 @@ cdef list get_bins_by_region ( uint32_t beg, uint32_t end ):
         bins.append( k )
     return bins
 
+cdef list reg2bins(rbeg, rend):
+    """Generates bin ids which overlap the specified region.
+    Args:
+        rbeg (int): inclusive beginning position of region
+        rend (int): exclusive end position of region
+    Yields:
+        (int): bin IDs for overlapping bins of region
+    Raises:
+        AssertionError (Exception): if the range is malformed or invalid
+    """
+    # Based off the algorithm presented in:
+    # https://samtools.github.io/hts-specs/SAMv1.pdf
+
+    # Bin calculation constants.
+    BIN_ID_STARTS = (0, 1, 9, 73, 585, 4681)
+
+    # Maximum range supported by specifications.
+    MAX_RNG = (2 ** 29) - 1
+
+    assert 0 <= rbeg <= rend <= MAX_RNG, 'Invalid region {}, {}'.format(rbeg, rend)
+
+    l = []
+    
+    for start, shift in zip(BIN_ID_STARTS, range(29, 13, -3)):
+        i = rbeg >> shift if rbeg > 0 else 0
+        j = rend >> shift if rend < MAX_RNG else MAX_RNG >> shift
+
+        for bin_id_offset in range(i, j + 1):
+            #yield start + bin_id_offset
+            l.append( start + bin_id_offset )
+    return l
+            
 # ------------------------------------
 # Classes
 # ------------------------------------
@@ -211,7 +245,7 @@ Example of metadata: ref 0, {self.metadata[ 0 ]}
                 self.n_chunks += this_n_chunk
                 this_chunks = []
                 for m in range( this_n_chunk ):
-                    this_chunks.append( unpack( '<QQ', self.fhd.read( 16 ) ) )
+                    this_chunks.append( unpack( '<qq', self.fhd.read( 16 ) ) )
                 # put the list of chunks in the this_bin_dict
                 this_bin_dict[ this_bin ] = this_chunks
             # put the this_bin_dict in the list
@@ -235,22 +269,28 @@ Example of metadata: ref 0, {self.metadata[ 0 ]}
         return
 
     cpdef list get_chunks_by_bin ( self, uint32_t ref_n, uint32_t bin_n ):
-        """ get the chunks by bin number, for a given ref seq (not the name,
+        """Get the chunks by bin number, for a given ref seq (not the name,
         but the index).
 
         The chunks will be sorted using default python sorted
         function. Therefore the result will be the order of the offset
         of beginning of each chunks.
+
         """
         return sorted( self.bins[ ref_n ].get( bin_n, [] ) )
 
-    cpdef list get_chunks_by_list_bins ( self, uint32_t ref_n, list bins ):
-        """Similar to get_chunks_by_bin, but accept a list of bins
+    cpdef list get_chunks_by_list_of_bins ( self, uint32_t ref_n, list bins ):
+        """Similar to get_chunks_by_bin, but accept a list of bins.
+
+        Note: The redudant bins in the list will be removed.
+
         """
         cdef:
             uint32_t bin_n
             list chunks = []
-        for bin_n in bins:
+            set bin_set
+        bin_set = set( bins )
+        for bin_n in bin_set:
             chunks.extend( self.bins[ ref_n ].get( bin_n, [] ) )
         return sorted( chunks )
 
@@ -258,119 +298,132 @@ Example of metadata: ref 0, {self.metadata[ 0 ]}
         return self.metadata[ ref_n ]
 
     cpdef list get_chunks_by_region ( self, uint32_t ref_n, uint32_t beg, uint32_t end ):
-        """ Get the chunks by given a region in a given refseq (not the name,
-        but the index) 
+        """Get the chunks by given a region in a given refseq (not the name,
+        but the index).
+
         """
         cdef:
             list bins
+            list chunks
         bins = get_bins_by_region( beg, end )
-        return self.get_chunks_by_list_bins( ref_n, bins )
+        chunks = self.get_chunks_by_list_of_bins( ref_n, bins )
+        return chunks
 
-    cpdef list get_chunks_by_list_regions ( self, uint32_t ref_n, list regions ):
+    cpdef list get_chunks_by_list_of_regions ( self, uint32_t ref_n, list regions ):
         """ Similar to get_chunks_by_region, but accept a list of regions
         """
         cdef:
+            int i
             list temp_bins
             list bins = []
             uint32_t beg, end
-        for ( beg, end ) in regions:
+
+        for i in range( len(regions) ):
+            beg = regions[ i ][ 0 ]
+            end = regions[ i ][ 1 ]
             temp_bins = get_bins_by_region( beg, end )
             bins.extend( temp_bins )
-        return self.get_chunks_by_list_bins( ref_n, bins )
+        return self.get_chunks_by_list_of_bins( ref_n, bins )
 
-cdef class BAMParser:
-    """File Parser Class for BAM File.
+    cpdef uint64_t get_coffset_by_region ( self, uint32_t ref_n, uint32_t beg, uint32_t end ):
+        """Find the offset to access the BGZF block which contains the
+        leftmost reads overlapping with the given genomic region.
+        """
+        cdef:
+            uint64_t voffset_tmp, coffset_tmp
+            list chunks
+            tuple chunk
+            int i
+            uint64_t coffset
 
-    File is gzip-compatible and binary.
-    Information available is the same that is in SAM format.
-    
-    The bitwise flag is made like this:
-    dec	meaning
-    ---	-------
-    1	paired read
-    2	proper pair
-    4	query unmapped
-    8	mate unmapped
-    16	strand of the query (1 -> reverse)
-    32	strand of the mate
-    64	first read in pair
-    128	second read in pair
-    256	alignment is not primary
-    512	does not pass quality check
-    1024	PCR or optical duplicate
-    2048	supplementary alignment
+        chunks = self.get_chunks_by_region( ref_n, beg, end )
+        if not chunks:
+            return 0
+        coffset = chunks[0][0] >> 16
+        for i in range( 1, len(chunks) ):
+            voffset_tmp = chunks[i][0]
+            coffset_tmp = voffset_tmp >> 16
+            if coffset_tmp < coffset:
+                coffset = coffset_tmp
+        return coffset
+
+    cpdef uint64_t get_coffsets_by_list_of_regions ( self, uint32_t ref_n, list regions ):
+        """Find the offset to access the BGZF block which contains the
+        leftmost reads overlapping with the given genomic region.  
+        """
+        cdef:
+            uint32_t beg, end
+            int i
+            uint64_t coffset
+            list coffset_list
+
+        coffset_list = []
+        for i in range( len(regions) ):
+            beg = regions[ i ][ 0 ]
+            end = regions[ i ][ 1 ]            
+            coffset = get_coffset_by_region( ref_n, beg, end )
+            coffset_list.append( coffset )
+        return coffset_list
+
+cdef class BAMaccessor:
+    """This BAM file reader is designed to access certain alignment
+    records that overlap with givin genomic coordinates.
+
+    The BAMaccessor needs a matching BAM index file (.bai) for fast
+    access. Please refer to SAM format specification:
+
+    https://samtools.github.io/hts-specs/SAMv1.pdf
+
+    Note, the header of BAM will still be read through 'traditional'
+    way -- using gzip to read through. But for accessing specific
+    alignments, we will read BAM as binary, access the compressed
+    chunk then use zlib.decompress.
+
     """
-    cdef str filename
-    cdef bool gzipped
-    cdef object fhd             # BAM file handler
-    cdef list references        # name of references/chromosomes, contain the order of chromosomes
-    cdef dict rlengths          # lengths of references/chromosomes
-    cdef bool sorted            # if BAM is sorted
-    cdef long SOA               # position in file for the Start of Alignment blocks
+    cdef:
+        # all private
+        str bam_filename        # BAM filename
+        str bai_filename        # BAI filename
+        object bamfile          # BAM file handler "rb" mode
+        BAIFile baifile         # Matching BAI file
+        list references         # name of references/chromosomes, contain the order of chromosomes
+        dict rlengths           # lengths of references/chromosomes
+        bytes bgzf_block_cache  # cache of decompressed bgzf_block
+        uint64_t coffset_cache  # coffset of the cached bgzf_block
+        uint64_t noffset_cache  # coffset of the next block of the cached bgzf_block
 
-    def __init__ ( self, str filename ):
+    def __init__ ( self, str BAM_filename ):
         """Open input file. Determine whether it's a gzipped file.
 
         'filename' must be a string object.
 
-        This function initialize the following attributes:
+        It will call __parse_header to check if the file is BAM format
+        (through magic string); check if it's sorted by coordinates
+        (SO). It will then check if BAI is available.
 
-        1. self.filename: the filename for input file.
-        2. self.gzipped: a boolean indicating whether input file is gzipped.
-        3. self.fhd: buffered I/O stream of input file
         """
-        self.filename = filename
-        self.gzipped = True
-
-        # try gzip first
-        f = gzip.open( filename )
-        try:
-            f.read( 10 )
-        except IOError:
-            # not a gzipped file
-            self.gzipped = False
-        f.close()
-        if self.gzipped:
-            # open with gzip.open, then wrap it with BufferedReader!
-            self.fhd = io.BufferedReader( gzip.open( filename, mode='rb' ), buffer_size = READ_BUFFER_SIZE )
+        self.bam_filename = BAM_filename
+        # parse the header
+        self.__parse_header()
+        # check if BAI is available
+        self.bai_filename = self.bam_filename + ".bai"
+        if os.path.exists( self.bai_filename ):
+            self.baifile = BAIFile( self.bai_filename ) # The baifile is not for IO, it already contains all content.
         else:
-            self.fhd = io.open( filename, mode='rb' ) # binary mode! I don't expect unicode here!
-        #self.get_tsize()
-        self.parse_header()
-        # if not sorted, raise expection and terminate the program!
-        if not self.sorted:
-            raise Exception("BAM should be sorted by coordinates!")
+            raise Exception("BAI is not available! Please make sure the .bai")
+        self.bamfile = io.BufferedReader( io.open( self.bam_filename, mode='rb' ), buffer_size = READ_BUFFER_SIZE )  # binary mode to read the raw BGZF file
+        self.bgzf_block_cache = b""
+        self.coffset_cache = 0
+        self.noffset_cache = 0
 
     cpdef close ( self ):
         """Run this when this Parser will be never used.
 
         Close file I/O stream.
         """
-        self.fhd.close()
+        self.bamfile.close()
 
-
-    cpdef reset ( self ):
-        self.fhd.seek( self.SOA )
-
-    cpdef sniff( self ):
-        """Check the first 3 bytes of BAM file. If it's 'BAM', check
-        is success.
-
-        """
-        magic_header = self.fhd.read( 3 )
-        if magic_header == b"BAM":
-            tsize  = self.tsize()
-            if tsize > 0:
-                self.fhd.seek( 0 )
-                return True
-            else:
-                self.fhd.seek( 0 )
-                raise Exception( "File is not of a valid BAM format! %d" % tsize )
-        else:
-            self.fhd.seek( 0 )
-            return False
-
-    cdef parse_header( self ):
+    cdef __parse_header( self ):
         """Parse the HEADER of BAM. It will do the following thing:
 
         1. read in references from BAM header, and save in
@@ -384,49 +437,48 @@ cdef class BAMParser:
         
         """
         cdef:
+            object fhd          # file handler from gzip.open; temporary use
             int header_len, x, nc, nlength
-            bytes refname
+            bytes magic, refname
             list references = []
             dict rlengths = {}
             bytes header_text
-            
-        fseek = self.fhd.seek
-        fread = self.fhd.read
-        ftell = self.fhd.tell
-        # move to pos 4, there starts something, the first 4 bytes is called magic string
-        fseek(4)
-        # next 4bytes is length of header 
-        header_len =  unpack( '<i', fread( 4 ) )[ 0 ]
-        header_text = unpack( '<%ds' % header_len, fread( header_len ) )[0]
 
+        # we use traditional way to read the header -- through gzip
+        fhd = io.BufferedReader( gzip.open( self.bam_filename, mode='rb' ), buffer_size = READ_BUFFER_SIZE )
+        # get the first 4 bytes
+        magic = fhd.read( 4 )
+        if magic != b"BAM\1":
+            raise Exception( f"File \"{self.filenmame}\" is not a BAM file. The magic string is not \"BAM\\1\", but \"{magic}\" " )
+        # next 4bytes is length of header 
+        header_len =  unpack( '<i', fhd.read( 4 ) )[ 0 ]
+        header_text = unpack( '<%ds' % header_len, fhd.read( header_len ) )[0]
         # get the number of chromosome
-        nc = unpack( '<i', fread( 4 ) )[ 0 ]
+        nc = unpack( '<i', fhd.read( 4 ) )[ 0 ]
         for x in range( nc ):
             # read each chromosome name
-            nlength = unpack( '<i', fread( 4 ) )[ 0 ]
-            refname = fread( nlength )[ :-1 ]
+            nlength = unpack( '<i', fhd.read( 4 ) )[ 0 ]
+            refname = fhd.read( nlength )[ :-1 ]
             references.append( refname )
             # don't jump over chromosome size
             # we can use it to avoid falling of chrom ends during peak calling
-            rlengths[refname] = unpack( '<i', fread( 4 ) )[ 0 ]
+            rlengths[refname] = unpack( '<i', fhd.read( 4 ) )[ 0 ]
         self.references = references
         self.rlengths = rlengths
-
         # read sorting information
-        self.check_sorted( header_text )
-        
-        # remember the Start of Alignment blocks
-        self.SOA = self.fhd.tell()
+        if not self.__check_sorted( header_text ):
+            raise Exception( f"BAM should be sorted by coordinates!" )
+        # close
+        fhd.close()
         return
 
-    cdef check_sorted( self, bytes header ):
+    cdef bool __check_sorted( self, bytes header ):
         """Check if the BAM is sorted by looking at the HEADER text
         """
         cdef:
             bytes l
             int i
 
-        self.sorted = False
         # HD line is the first line
         l = header.split(b"\n")[0]
         if l.startswith(b"@HD"):
@@ -435,22 +487,56 @@ cdef class BAMParser:
             if i != -1:
                 # I will only check the first 5 characters
                 if l[i+3:i+8] == b"coord":
-                    self.sorted = True
-        return
+                    return True
+        return False
     
-    cpdef get_chromosomes ( self ):
+    cpdef list get_chromosomes ( self ):
         """Get chromosomes in order of their appearance in BAM HEADER.
 
         """
         return self.references
 
-    cpdef get_rlengths ( self ):
+    cpdef dict get_rlengths ( self ):
         """Get chromosomes in order of their appearance in BAM HEADER.
 
         """
         return self.rlengths
 
-    cpdef get_reads_in_region ( self, bytes chrom, int left, int right, int maxDuplicate = 1 ):
+    cdef tuple __decode_voffset ( self, uint64_t voffset ):
+        """
+        """
+        cdef:
+            uint64_t coffset
+            uint32_t uoffset
+        coffset = voffset >> 16
+        uoffset = voffset ^ (coffset << 16)
+        return ( coffset, uoffset )
+
+    cdef bool __seek ( self, uint64_t offset ):
+        """Move to given position
+        """
+        self.bamfile.seek( offset, 0 )
+        return True
+    
+    cdef bool __retrieve_cdata_from_bgzf_block ( self ):
+        """Retrieve uncompressed CDATA from BGZF block
+        """
+        cdef:
+            uint16_t xlen, bsize
+            bytes extra, cdata
+
+        self.bamfile.seek( 10, 1 ) # skip 10 bytes
+        # get XLEN
+        xlen = unpack("<H", self.bamfile.read(2) )[0]
+        # get extra subfields
+        extra = self.bamfile.read(xlen)
+        bsize = unpack( '<H', extra[extra.index(b'BC\x02\x00') + 4 : ])[0]
+        cdata = self.bamfile.read( bsize - xlen - 19 )
+        self.bgzf_block_cache = decompress( cdata, -MAX_WBITS )
+        self.bamfile.seek( 8, 1 ) # move to the end of the block
+        return True
+
+    cpdef list get_reads_in_region ( self, bytes chrom, int left, int right, int maxDuplicate = 1 ):
         """Get reads in a given region. Initial call will start at
         'self.SOA', but will keep incrementing.
 
@@ -464,43 +550,71 @@ cdef class BAMParser:
             int cur_duplicates = 0
             object read
             object previous_read
-        
+            int chrom_index
+            list chunks
+            bytes chunk_bytes, cdata, dcdata
+            int chunk_start
+            int chunk_length
+            int i_chunk_bytes
+            bool flag_end_searching = False
+
+            uint64_t voffset_beg, coffset_beg, voffset_end, coffset_end
+            uint16_t uoffset_beg, uoffset_end
+
         readslist = []
-        fread = self.fhd.read
-        fseek = self.fhd.seek
-        ftell = self.fhd.tell
         cur_duplicates = 0
+
         previous_read = None
+        chrom_index = self.references.index( chrom )
+
+        # get the coffset from BAI
+        coffset = self.baifile.get_coffset_by_region ( chrom_index, left, right )
+        if coffset == 0:
+            return readslist
+        if coffset != self.coffset_cache:
+            self.coffset_cache = coffset
+            self.__seek( coffset )
+            self.__retrieve_cdata_from_bgzf_block ( ) # note: self.cached_bgzf_block will be updated.
+        dcdata = self.bgzf_block_cache
+
         while True:
-            try:
-                entrylength = unpack( '<i', fread( 4 ) )[ 0 ]
-            except struct.error:
-                # if reaching the EOF, this will trigger
-                break
-            read = self.__fw_binary_parse( fread( entrylength ) )
-            #print( "Got a record", left, right, "\n" )            
-            if read != None:
-                if read["chrom"] == chrom and read["lpos"] < right and read["rpos"] > left:
-                    #print( "Found an overlapped read", read["chrom"],read["lpos"],read["rpos"], "\n" )
-                    # an overlap is found
-                    if previous_read != None and previous_read["lpos"] == read["lpos"] and previous_read["rpos"] == read["rpos"] \
-                            and previous_read["strand"] ==  read["strand"] and previous_read["cigar"] == read["cigar"]:
+            dcdata_length = len(dcdata)
+            # now parse the reads in dcdata
+            i_bytes = 0
+            while i_bytes < dcdata_length:
+                entrylength = unpack( '<I', dcdata[ i_bytes : i_bytes + 4 ] )[ 0 ]
+                i_bytes += 4
+                #print( chunk_bytes[ i_bytes : i_bytes + entrylength ] )
+                read = self.__fw_binary_parse( dcdata[ i_bytes : i_bytes + entrylength ] )
+                i_bytes += entrylength
+
+                if read == None:
+                    # no mapping information, skip to next one
+                    continue
+                if read["lpos"] > right:
+                    # outside of region, end searching
+                    flag_end_searching = True
+                    break
+                elif read["rpos"] > left:
+                    # found overlap
+                    # check if redundant
+                    if previous_read != None and previous_read["lpos"] == read["lpos"] and previous_read["rpos"] == read["rpos"] and previous_read["strand"] ==  read["strand"] and previous_read["cigar"] == read["cigar"]:
                         cur_duplicates += 1
                     else:
                         cur_duplicates = 1
                     if cur_duplicates <= maxDuplicate:
                         readslist.append( read )
+                        #print( "Get read at:", read["chrom"], read["lpos"], read["rpos"] )
                     previous_read = read
-                elif read["chrom"] != chrom or read["lpos"] > right:
-                    # pass the region, rewind, then trigger 'break'
-                    fseek( ftell()-entrylength-4 )
-                    #print( "rewind:", ftell() )
-                    break
-                #else:
-                #    print( "NOT an overlapped read", read["chrom"],read["lpos"],read["rpos"], "\n" )
-
-        #print( "end", ftell() )
-        #print( "Get # of reads:", len(readslist),"\n")
+            if flag_end_searching:
+                break
+            # if not, get the next block, search again
+            self.coffset_cache = self.bamfile.tell()
+            self.__retrieve_cdata_from_bgzf_block ()
+            dcdata = self.bgzf_block_cache
+            if not dcdata:
+                # empty means EOF is reached.
+                break
         return readslist
 
     cdef object __fw_binary_parse (self, data, min_MAPQ=1 ):
@@ -534,7 +648,7 @@ cdef class BAMParser:
             return None       #unmapped sequence or bad sequence or  secondary or supplementary alignment 
         if bwflag & 1:
             # paired read. We should only keep sequence if the mate is mapped
-            # Different with MACS, both reads will be kept.
+            # Different with other MACS subcommands, both reads will be kept.
             if not bwflag & 2:
                 return None   # not a proper pair
             if bwflag & 8:
