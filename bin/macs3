@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# Time-stamp: <2020-12-31 15:53:40 Tao Liu>
+# Time-stamp: <2021-03-10 16:43:18 Tao Liu>
 """Description: MACS v3 main executable.
 
 This code is free software; you can redistribute it and/or modify it
@@ -655,39 +655,37 @@ def add_callvar_parser( subparsers ):
     argparser_callvar = subparsers.add_parser("callvar",
                                               formatter_class = ap.RawDescriptionHelpFormatter,
                                               help="Call variants in given peak regions from the alignment BAM files.",
-                                              epilog = """Tips to prepare your input BAM files:
-*Note: please modify the following command lines accordingly*
-Assuming you have two types of BAM files. The first type, what we call
-`TREAT`, is from DNA enrichment assay such as ChIP-seq or ATAC-seq
-where the DNA fragments in the sequencing library are enriched in
-certain genomics regions with potential allele biases; the second
-type, called `CTRL` for control, is from genomic assay in which the
-DNA enrichment is less biased in multiploid chromosomes and more
-uniform across the whole genome (the later one is optional).
-1. Clean the BAM files:
-    $ samtools view -q 30 -F 4 -F 256 -F 2048 -b TREAT.bam -o TREAT_clean.bam
-    $ samtools view -q 30 -F 4 -F 256 -F 2048 -b CTRL.bam -o CTRL_clean.bam
-2. Sort the BAM file:
-    $ samtools sort  TREAT_clean.bam  TREAT_clean_sorted
-    $ samtools sort  CTRL_clean.bam  CTRL_clean_sorted
-3. Peak calling (example is for paired-end data):
-    $ macs3 callpeak -f BAMPE -t TREAT_clean_sort.bam -c CTRL_clean_sort.bam -n MyFactor
-4. Sort peak file:
-    $ sort -k1,1 -k2,2n MyFactor_peaks.narrowPeak > MyFactor_peaks.sorted.bed
-5. Extract reads in peak regions:
-    $ samtools view -b TREAT_clean_sorted.bam -L MyFactor_peaks.sorted.bed -o TREAT_peaks.bam
-    $ samtools view -b CTRL_clean_sorted.bam -L MyFactor_peaks.sorted.bed -o CTRL_peaks.bam
-Finally, to call variants:
-    $ macs3 callvar -b MyFactor_peaks.sorted.bed -t TREAT_peaks.bam -c CTRL_peaks.bam -o MyFactor.vcf
+                                              epilog = """ Assuming you have two types of BAM files. The first type, what we
+call `TREAT`, is from DNA enrichment assay such as ChIP-seq or
+ATAC-seq where the DNA fragments in the sequencing library are
+enriched in certain genomics regions with potential allele biases; the
+second type, called `CTRL` for control, is from genomic assay in which
+the DNA enrichment is less biased in multiploid chromosomes and more
+uniform across the whole genome (the later one is optional). In order
+to run `callvar`, please sort (by coordinates) and index the BAM
+files. Example:
+
+1. Sort the BAM file:
+    $ samtools sort TREAT.bam -o TREAT_sorted.bam
+    $ samtools sort CTRL.bam -o CTRL_sorted.bam
+2. Index the BAM file:
+    $ samtools index TREAT_sorted.bam
+    $ samtools index CTRL_sorted.bam
+3. Make sure .bai files are available:
+    $ ls TREAT_sorted.bam.bai
+    $ ls CTRL_sorted.bam.bai
+
+To call variants:
+    $ macs3 callvar -b peaks.bed -t TREAT_sorted.bam -c CTRL_sorted.bam -o peaks.vcf
 """)
     # group for input files
     group_input = argparser_callvar.add_argument_group( "Input files arguments" )
     group_input.add_argument( "-b", "--peak", dest = "peakbed", type = str, required =True,
                               help = "Peak regions in BED format, sorted by coordinates. REQUIRED." )
     group_input.add_argument( "-t", "--treatment", dest = "tfile", type = str, required = True, 
-                              help = "ChIP-seq/ATAC-seq treatment file in BAM format, sorted by coordinates. Check instruction on how to make the file using samtools. REQUIRED." )
+                              help = "ChIP-seq/ATAC-seq treatment file in BAM format, sorted by coordinates. Make sure the .bai file is avaiable in the same directory. REQUIRED." )
     group_input.add_argument( "-c", "--control", dest = "cfile", type = str, required = False, 
-                              help = "Optional control file in BAM format, sorted by coordinates. Check instruction on how to make the file using samtools. If the control file is not provided, `callvar` will ")
+                              help = "Optional control file in BAM format, sorted by coordinates. Make sure the .bai file is avaiable in the same directory.")
     # group for output files
     group_output = argparser_callvar.add_argument_group( "Output arguments" )
     add_outdir_option( group_output )

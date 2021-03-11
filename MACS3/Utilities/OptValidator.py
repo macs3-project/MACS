@@ -1,4 +1,4 @@
-# Time-stamp: <2020-11-24 17:40:03 Tao Liu>
+# Time-stamp: <2021-03-10 19:06:52 Tao Liu>
 
 """Module Description
 
@@ -783,3 +783,27 @@ def opt_validate_bdgopt ( options ):
 
     return options
 
+def opt_validate_callvar ( options ):
+    """Validate options from a OptParser object.
+
+    Ret: Validated options object.
+    """
+    # logging object
+    logging.basicConfig(level=20,
+                        format='%(levelname)-5s @ %(asctime)s: %(message)s ',
+                        datefmt='%a, %d %b %Y %H:%M:%S',
+                        stream=sys.stderr,
+                        filemode="w"
+                        )
+
+    options.error   = logging.critical        # function alias
+    options.warn    = logging.warning
+    options.debug   = logging.debug
+    options.info    = logging.info
+
+    # methods should be valid:
+
+    if options.np <= 0:
+        options.np = 1
+
+    return options
