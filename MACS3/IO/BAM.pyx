@@ -1,7 +1,7 @@
 # cython: language_level=3
 # cython: profile=True
 # cython: linetrace=True
-# Time-stamp: <2021-03-10 18:50:23 Tao Liu>
+# Time-stamp: <2021-03-10 23:24:04 Tao Liu>
 
 """
 
@@ -537,29 +537,20 @@ cdef class BAMaccessor:
         return True
 
     cpdef list get_reads_in_region ( self, bytes chrom, int left, int right, int maxDuplicate = 1 ):
-        """Get reads in a given region. Initial call will start at
-        'self.SOA', but will keep incrementing.
+        """Get reads in a given region.
 
-        Return: 1. list of ReadAlignment; 2. current position in file
+        Return: list of ReadAlignment
         """
         cdef:
-            int i = 0
-            int m = 0
             int entrylength, fpos, strand, chrid
             list readslist
             int cur_duplicates = 0
             object read
             object previous_read
             int chrom_index
-            list chunks
-            bytes chunk_bytes, cdata, dcdata
-            int chunk_start
-            int chunk_length
-            int i_chunk_bytes
+            bytes dcdata
             bool flag_end_searching = False
-
-            uint64_t voffset_beg, coffset_beg, voffset_end, coffset_end
-            uint16_t uoffset_beg, uoffset_end
+            uint64_t coffset
 
         readslist = []
         cur_duplicates = 0
@@ -584,7 +575,7 @@ cdef class BAMaccessor:
             while i_bytes < dcdata_length:
                 entrylength = unpack( '<I', dcdata[ i_bytes : i_bytes + 4 ] )[ 0 ]
                 i_bytes += 4
-                #print( chunk_bytes[ i_bytes : i_bytes + entrylength ] )
+                # I am not sure if i_bytes+entrylength can be outside of dcdata_length...
                 read = self.__fw_binary_parse( dcdata[ i_bytes : i_bytes + entrylength ] )
                 i_bytes += entrylength
 
@@ -604,7 +595,6 @@ cdef class BAMaccessor:
                         cur_duplicates = 1
                     if cur_duplicates <= maxDuplicate:
                         readslist.append( read )
-                        #print( "Get read at:", read["chrom"], read["lpos"], read["rpos"] )
                     previous_read = read
             if flag_end_searching:
                 break

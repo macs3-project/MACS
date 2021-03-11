@@ -1,4 +1,4 @@
-# Time-stamp: <2021-03-10 19:08:54 Tao Liu>
+# Time-stamp: <2021-03-10 23:51:54 Tao Liu>
 
 """Description: macs call
 
@@ -214,7 +214,7 @@ def run( args ):
                 # first pass to call variant w/o assembly
                 # multiprocessing the following part
                 t_call_variants_0 = time()
-                info ( " Call varants w/o assembly")
+                info ( " Call variants w/o assembly")
 
                 # -- now make multi processes
                 # divide right-left into NP parts
@@ -246,7 +246,7 @@ def run( args ):
                 #print( peak_variants.has_refer_biased_01() )
                     
                 # invoke fermi to assemble local sequence and filter out those can not be mapped to unitigs.
-                info ( " Assemble using fermi-lite")
+                info ( " Try to call variants w/ fermi-lite assembly")
                 unitig_collection = ra_collection.build_unitig_collection( fermiMinOverlap )
                 if unitig_collection == -1:
                     info(" Too many mismatches found while assembling the sequence, we will skip this region entirely!")
