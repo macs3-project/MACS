@@ -1,5 +1,5 @@
 #!/bin/bash
-# Time-stamp: <2020-12-05 10:34:06 Tao Liu>
+# Time-stamp: <2021-03-10 19:33:43 Tao Liu>
 
 # integrative subcmds testing
 
@@ -35,13 +35,7 @@ CHIPCONTIGS50K=contigs50k.bed.gz
 CHIPBIGSPEEDTEST=CTCF_12878_5M.bed.gz
 CTRLBIGSPEEDTEST=input_12878_5M.bed.gz
 
-CALLVAR_SE_BED=callvar_examples/PE_demo/PEsample_peaks_sorted.bed
-CALLVAR_SE_TBAM=callvar_examples/PE_demo/PEsample_peaks_sorted.bam
-CALLVAR_SE_CBAM=callvar_examples/PE_demo/PEcontrol_peaks_sorted.bam
-
-CALLVAR_PE_BED=callvar_examples/SE_demo/SEsample_peaks_sorted.bed
-CALLVAR_PE_TBAM=callvar_examples/SE_demo/SEsample_peaks_sorted.bam
-CALLVAR_PE_CBAM=callvar_examples/SE_demo/SEcontrol_peaks_sorted.bam
+CALLVARPEAK=callvar_testing.narrowPeak
 
 # callpeak
 echo "1. callpeak"
@@ -192,9 +186,7 @@ echo "13. callvar"
 
 mkdir ${OUTPUTDIR_PREFIX}_run_callvar
 
-macs3 callvar -b ${CALLVAR_SE_BED} -t ${CALLVAR_SE_TBAM} -c ${CALLVAR_SE_CBAM} -o ${OUTPUTDIR_PREFIX}_run_callvar/SEsample.vcf &> ${OUTPUTDIR_PREFIX}_run_callvar/run_callvar_SE.log
-
-macs3 callvar -b ${CALLVAR_PE_BED} -t ${CALLVAR_PE_TBAM} -c ${CALLVAR_PE_CBAM} -o ${OUTPUTDIR_PREFIX}_run_callvar/PEsample.vcf &> ${OUTPUTDIR_PREFIX}_run_callvar/run_callvar_PE.log
+macs3 callvar -b ${CALLVARPEAK} -t ${CHIPPE} -c ${CTRLPE} -o ${OUTPUTDIR_PREFIX}_run_callvar/PEsample.vcf &> ${OUTPUTDIR_PREFIX}_run_callvar/run_callvar_PE.log
 
 # test large amount of contigs
 echo "14. 50k contigs with buffersize"
@@ -237,7 +229,7 @@ echo "16. compare with standard outputs"
 
 flag=0
 # we do not check the consistency of random subsampling results
-subfolders=(50kcontigs bdgbroadcall bdgcmp bdgdiff bdgpeakcall callpeak_broad callpeak_narrow callpeak_narrow_revert callpeak_pe_broad callpeak_pe_narrow cmbreps filterdup pileup refinepeak bdgopt predictd)
+subfolders=(50kcontigs bdgbroadcall bdgcmp bdgdiff bdgpeakcall callpeak_broad callpeak_narrow callpeak_narrow_revert callpeak_pe_broad callpeak_pe_narrow cmbreps filterdup pileup refinepeak bdgopt predictd callvar)
 
 m=0
 n=0
