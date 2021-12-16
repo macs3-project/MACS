@@ -83,7 +83,7 @@ install macs3 --user`.
 MACS uses Python's [setuptools](https://setuptools.readthedocs.io) for
 source code installations. To install a source distribution of MACS,
 unpack the distribution tarball, or clone Git repository with `git
-clone git@github.com:taoliu/MACS.git`. Go to the directory where you
+clone --recurse-submodules git@github.com:taoliu/MACS.git`. Go to the directory where you
 unpacked MACS, and simply run the install script:
 
  `$ python setup.py install`
