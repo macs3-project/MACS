@@ -1,4 +1,4 @@
-# Time-stamp: <2021-08-20 15:18:20 taoliu>
+# Time-stamp: <2021-12-20 09:19:28 ta32852>
 
 """Description: Main HMMR command
 
@@ -22,7 +22,7 @@ from time import strftime
 from MACS3.Utilities.Constants import *
 from MACS3.Utilities.OptValidator import opt_validate_hmmratac
 
-from MACS3.Math.EM import HMMR_EM
+#from MACS3.Math.EM import HMMR_EM
 
 
 # ------------------------------------

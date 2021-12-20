@@ -1,4 +1,4 @@
-# Time-stamp: <2021-12-20 09:16:55 ta32852>
+# Time-stamp: <2021-12-20 09:20:04 ta32852>
 
 """Module Description
 
@@ -805,6 +805,30 @@ def opt_validate_callvar ( options ):
 
     if options.np <= 0:
         options.np = 1
+    return options
+
+
+def opt_validate_hmmratac ( options ):
+    """Validate options from a OptParser object.
+
+    Ret: Validated options object.
+    """
+    # logging object
+    logging.basicConfig(level=20,
+                        format='%(levelname)-5s @ %(asctime)s: %(message)s ',
+                        datefmt='%a, %d %b %Y %H:%M:%S',
+                        stream=sys.stderr,
+                        filemode="w"
+                        )
+
+    options.error   = logging.critical        # function alias
+    options.warn    = logging.warning
+    options.debug   = logging.debug
+    options.info    = logging.info
+
+    # methods should be valid:
+    # ...
+    
     return options
 
 
