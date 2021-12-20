@@ -57,9 +57,9 @@ create a virtual environment of Python3 is
 
 `$ python3 -m venv MyPythonEnv/`
 
-Then active it by
+Then activate it by
 
-`$ source MyPythonEnv/bin/active`
+`$ source MyPythonEnv/bin/activate`
 
 ## Install through PyPI
 
