@@ -1,4 +1,4 @@
-# Time-stamp: <2021-03-04 11:00:12 Tao Liu>
+# Time-stamp: <2021-12-20 09:16:55 ta32852>
 
 """Module Description
 
@@ -783,7 +783,7 @@ def opt_validate_bdgopt ( options ):
 
     return options
 
-def opt_validate_hmmratac ( options ):
+def opt_validate_callvar ( options ):
     """Validate options from a OptParser object.
 
     Ret: Validated options object.
@@ -801,5 +801,10 @@ def opt_validate_hmmratac ( options ):
     options.debug   = logging.debug
     options.info    = logging.info
 
+    # methods should be valid:
+
+    if options.np <= 0:
+        options.np = 1
     return options
+
 

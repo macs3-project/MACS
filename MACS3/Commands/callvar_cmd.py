@@ -1,4 +1,4 @@
-# Time-stamp: <2020-12-04 22:51:27 Tao Liu>
+# Time-stamp: <2021-03-10 23:51:54 Tao Liu>
 
 """Description: macs call
 
@@ -31,8 +31,9 @@ from math import ceil
 # own python modules
 # ------------------------------------
 from MACS3.Utilities.Constants import *
+from MACS3.Utilities.OptValidator import opt_validate_callvar
 from MACS3.IO.PeakIO import PeakIO
-from MACS3.IO.BAM import BAMParser
+from MACS3.IO.BAM import BAMaccessor
 from MACS3.Signal.RACollection import RACollection
 from MACS3.Signal.PeakVariants import PeakVariants
 
@@ -109,23 +110,30 @@ def run( args ):
     """The Main function/pipeline for MACS
 
     """
-    peakbedfile = args.peakbed
-    peaktfile = args.tfile
-    peakcfile = args.cfile
-    top2allelesminr = args.top2allelesMinRatio
-    min_altallele_count = args.altalleleMinCount
-    max_allowed_ar = args.maxAR
-    NP = args.np
+    options = opt_validate_callvar( args )
+
+    info = options.info
+    warn = options.warn
+    debug = options.debug
+    error = options.error
+
+    peakbedfile = options.peakbed
+    peaktfile = options.tfile
+    peakcfile = options.cfile
+    top2allelesminr = options.top2allelesMinRatio
+    min_altallele_count = options.altalleleMinCount
+    max_allowed_ar = options.maxAR
+    NP = options.np
     if NP<=0:
         NP = 1
-    min_homo_GQ = args.GQCutoffHomo
-    min_heter_GQ = args.GQCutoffHetero
-    minQ = args.Q
-    maxDuplicate = args.maxDuplicate
+    min_homo_GQ = options.GQCutoffHomo
+    min_heter_GQ = options.GQCutoffHetero
+    minQ = options.Q
+    maxDuplicate = options.maxDuplicate
 
     # parameter for assembly
-    fermiMinOverlap = args.fermiMinOverlap
-    fermi = args.fermi
+    fermiMinOverlap = options.fermiMinOverlap
+    fermi = options.fermi
     
     peakio = open( peakbedfile )
     peaks = PeakIO()
@@ -138,9 +146,9 @@ def run( args ):
 
     chrs = peaks.get_chr_names()
 
-    tbam = BAMParser( peaktfile )
+    tbam = BAMaccessor( peaktfile )
     if peakcfile:
-        cbam = BAMParser( peakcfile )
+        cbam = BAMaccessor( peakcfile )
         assert tbam.get_chromosomes()[0] in cbam.get_chromosomes() or cbam.get_chromosomes()[0] in tbam.get_chromosomes(), Exception("It seems Treatment and Control BAM use different naming for chromosomes! Check headers of both files.")
         #assert tbam.get_chromosomes() == cbam.get_chromosomes(), Exception("Treatment and Control BAM files have different orders of sorted chromosomes! Please check BAM Headers and re-sort BAM files.")
     else:
@@ -150,7 +158,7 @@ def run( args ):
     ra_collections = []
 
     # prepare and write header of output file (.vcf)
-    ovcf = open(args.ofile, "w")
+    ovcf = open(options.ofile, "w")
     tmpcmdstr = " --fermi "+ fermi+ " --fermi-overlap "+str(fermiMinOverlap)
     ovcf.write ( VCFHEADER % (datetime.date.today().strftime("%Y%m%d"), MACS_VERSION, " ".join(sys.argv[1:] + ["-Q", str(minQ), "-D", str(maxDuplicate), "--max-ar", str(max_allowed_ar), "--top2alleles-mratio", str(top2allelesminr), "--top2allele-count", str(min_altallele_count), "-g", str(min_heter_GQ), "-G", str(min_homo_GQ), tmpcmdstr]) ) + "\n" )
     for (chrom, chrlength) in tbam.get_rlengths().items():
@@ -176,7 +184,7 @@ def run( args ):
             # should be generated from "samtools view -L" process.
 
             # print ( "---begin of peak---")
-            print ( "Peak:", chrom.decode(), peak["start"], peak["end"])
+            info ( f"Peak: {chrom.decode()} {peak['start']} {peak['end']}" )
 
             flag_todo_lassembly = False
 
@@ -187,7 +195,7 @@ def run( args ):
                 else:
                     ra_collection = RACollection( chrom, peak, tbam.get_reads_in_region( chrom, peak["start"], peak["end"], maxDuplicate=maxDuplicate ) )
             except:
-                print ("No reads found in peak: ", chrom.decode(), peak["start"], peak["end"], ". Skipped!")
+                info ("No reads found in peak: ", chrom.decode(), peak["start"], peak["end"], ". Skipped!")
                 # while there is no reads in peak region, simply skip it.
                 continue
             
@@ -206,7 +214,7 @@ def run( args ):
                 # first pass to call variant w/o assembly
                 # multiprocessing the following part
                 t_call_variants_0 = time()
-                print ( " Call varants w/o assembly")
+                info ( " Call variants w/o assembly")
 
                 # -- now make multi processes
                 # divide right-left into NP parts
@@ -238,13 +246,13 @@ def run( args ):
                 #print( peak_variants.has_refer_biased_01() )
                     
                 # invoke fermi to assemble local sequence and filter out those can not be mapped to unitigs.
-                print ( " Assemble using fermi-lite")
+                info ( " Try to call variants w/ fermi-lite assembly")
                 unitig_collection = ra_collection.build_unitig_collection( fermiMinOverlap )
                 if unitig_collection == -1:
-                    print(" Too many mismatches found while assembling the sequence, we will skip this region entirely!")
+                    info(" Too many mismatches found while assembling the sequence, we will skip this region entirely!")
                     continue
                 elif unitig_collection == 0:
-                    print ( "  Failed to assemble unitigs, fall back to previous results" )
+                    info ( "  Failed to assemble unitigs, fall back to previous results" )
                     if peak_variants.n_variants() > 0:
                         peak_variants.fix_indels()
                         ovcf.write( peak_variants.toVCF() )
