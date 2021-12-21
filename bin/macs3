@@ -737,15 +737,15 @@ def add_hmmratac_parser( subparsers ):
                                                 epilog = "TBA...")
     # group for input files
     group_input = argparser_hmmratac.add_argument_group( "Input files arguments" )
-    group_input.add_argument( "-i", dest = "ifile", type = str, required = True, 
-                              help = "ATAC-seq alignment file in BAM format, sorted by coordinates. Please note HMMRATAC needs .bai (index file for bam) in the same directory. So if you provide `-i a.bam`, please make sure `./a.bam.bai` is accessible. REQUIRED." )
-    
+    group_input.add_argument( "-b", "--bam", dest = "bam_file", type = str, required = True, 
+                              help = "Sorted BAM file containing the ATAC-seq reads" )
+
     # group for output files
     group_output = argparser_hmmratac.add_argument_group( "Output arguments" )
     add_outdir_option( group_output )
     add_output_group( group_output )
     group_output.add_argument( "-B", "--bdg", "--bedgraph", dest = "store_bdg", action = "store_true",
-                               help = "Report whole genome bedgraph of all state anntations. DEFAULT: False",
+                               help = "Report whole genome bedgraph of all state annotations. DEFAULT: False",
                                default = False )
     group_output.add_argument( "-S", "--bgscore", dest = "store_bgscore", action = "store_true",
                                help = "Add the HMMRATAC score to each state annotation in bedgraph. Note: this adds considerable time. DEFAULT: False",
@@ -759,6 +759,9 @@ def add_hmmratac_parser( subparsers ):
     group_output.add_argument( "--printTrain", dest = "print_train", action = "store_true",
                                help = "Output training regions into Output_training.bed. Default: False",
                                default = False )
+    group_output.add_argument( "-q", "--minmapq", dest = "min_map_quality", action = "store_true",
+                               help = "Minimum mapping quality of reads to keep. Default: 30",
+                               default = 30 )                           
     # group for EM
     group_em = argparser_hmmratac.add_argument_group( "EM algorithm arguments" )
     group_em.add_argument( "--no-fragem", dest = "em_skip", action = "store_true",
@@ -782,10 +785,10 @@ def add_hmmratac_parser( subparsers ):
                             help = "Lower limit on fold change range for choosing training sites. Default: 10",
                             default = 10 )
     group_hmm.add_argument( "--maxTrain", dest = "hmm_maxTrain", type = int,
-                            help = "Maximum number of training regions to use. Default: 10",
+                            help = "Maximum number of training regions to use. Default: 1000",
                             default = 1000 )
     group_hmm.add_argument( "-t", "--training", dest = "hmm_training_regions", type = str, required = False, 
-                            help = "BED file of training regions to use for training HMM, instead of using foldchange settings to select. Default: NA" )    
+                            help = "Filename of training regions (previously was BED_file) to use for training HMM, instead of using foldchange settings to select. Default: NA" )    
     group_hmm.add_argument( "-z", "--zscore", dest = "hmm_zscore", type = int,
                             help = "Zscored read depth to mask during Viterbi decoding. Default: 100",
                             default = 100 )
@@ -793,7 +796,7 @@ def add_hmmratac_parser( subparsers ):
                             help = "Seed to set for random sampling of training regions. Default: 10151",
                             default = 10151 )
     group_hmm.add_argument( "--window", dest = "hmm_window", type = int,
-                            help = "Size of the bins to split the genome into for Viterbi decoding. To save memory, the genome is split into WINDOW long bins and viterbi decoding occurs across each bin. Default = 25000000. Note: For machines with limited memory, it is recomended to reduce the size of the bins.",
+                            help = "Size of the bins to split the genome into for Viterbi decoding. To save memory, the genome is split into WINDOW long bins and viterbi decoding occurs across each bin. Default = 25000000. Note: For machines with limited memory, it is recommended to reduce the size of the bins.",
                             default = 25000000 )
     group_hmm.add_argument( "--model", dest = "hmm_file", type = str, required = False, 
                             help = "Binary model file (generated from previous HMMR run) to use instead of creating new one. When provided, HMM training will be skipped. Default: NA" )
@@ -803,7 +806,7 @@ def add_hmmratac_parser( subparsers ):
     # group for peak calling arguments
     group_call = argparser_hmmratac.add_argument_group( "Peak calling arguments" )
     group_call.add_argument( "--minlen", dest = "call_minlen", type = int,
-                             help = "Minimum length of open region to call peak. Note: -p , --peaks must be set. Default: 20",
+                             help = "Minimum length of open region to call peak. Note: -p , --peaks must be set. Default: 200",
                              default = 200 )
     group_call.add_argument( "--score", dest = "call_score", type = str, choices = ("max", "ave", "med", "fc", "zscore", "all"),
                              help = "What type of score system to use for peaks. Can be used for ranking peaks. Default: max",
@@ -814,10 +817,10 @@ def add_hmmratac_parser( subparsers ):
     # group for misc
     group_misc = argparser_hmmratac.add_argument_group( "Misc arguments" )
     group_misc.add_argument( "-e", "--blacklist", dest = "misc_blacklist", type = str, required = False, 
-                              help = "BED file of blacklisted regions to exclude. Examples are those from ENCODE. Default: NA" )
+                              help = "Filename of blacklisted regions to exclude (previously was BED_file). Examples are those from ENCODE. Default: NA" )
     group_misc.add_argument( "--keep-duplicates", dest = "misc_keep_duplicates", action = "store_true",
                              help = "Keep duplicate reads from analysis. By default, duplicate reads will be removed. Default: False",
-                             default = True )    
+                             default = False )    
     group_misc.add_argument( "--trim", dest = "misc_trim", type = int,
                              help = "How many signals from the end to trim off (ie starting with tri signal then di etc). This may be useful if your data doesn't contain many large fragments. Default: 0",
                              default = 0 )
