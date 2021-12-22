@@ -759,16 +759,14 @@ def add_hmmratac_parser( subparsers ):
     group_output.add_argument( "--printTrain", dest = "print_train", action = "store_true",
                                help = "Output training regions into Output_training.bed. Default: False",
                                default = False )
-    group_output.add_argument( "-q", "--minmapq", dest = "min_map_quality", action = "store_true",
-                               help = "Minimum mapping quality of reads to keep. Default: 30",
-                               default = 30 )                           
+                       
     # group for EM
     group_em = argparser_hmmratac.add_argument_group( "EM algorithm arguments" )
     group_em.add_argument( "--no-fragem", dest = "em_skip", action = "store_true",
                            help = "Do not perform EM training on the fragment distribution. Default: False",
                            default = False )
     group_em.add_argument( "--means", dest = "em_means", type = float, nargs = 4,
-                            help = "Space separated list of initial mean values for the fragment distribution for short fragments, mono-, di-, and tri-nucleosomal fragments. Default: 50 200 400 600",
+                            help = "Comma separated list of initial mean values for the fragment distribution for short fragments, mono-, di-, and tri-nucleosomal fragments. Default: 50 200 400 600",
                             default = [50, 200, 400, 600] )
     group_em.add_argument( "--stddev", dest = "em_stddev", type = float, nargs = 4,
                             help = "Comma separated list of initial standard deviation values for fragment distribution for short fragments, mono-, di-, and tri-nucleosomal fragments. Default: 20 20 20 20",
@@ -806,7 +804,7 @@ def add_hmmratac_parser( subparsers ):
     # group for peak calling arguments
     group_call = argparser_hmmratac.add_argument_group( "Peak calling arguments" )
     group_call.add_argument( "--minlen", dest = "call_minlen", type = int,
-                             help = "Minimum length of open region to call peak. Note: -p , --peaks must be set. Default: 200",
+                             help = "Minimum length of open region to call peak. Note: --no-peaks must NOT be set True (--no-peaks default set False). Default: 200",
                              default = 200 )
     group_call.add_argument( "--score", dest = "call_score", type = str, choices = ("max", "ave", "med", "fc", "zscore", "all"),
                              help = "What type of score system to use for peaks. Can be used for ranking peaks. Default: max",
@@ -830,7 +828,9 @@ def add_hmmratac_parser( subparsers ):
     group_misc.add_argument( "--verbose", dest = "verbose", type = int,
                              help = "Set verbose level of runtime message. 0: only show critical message, 1: show additional warning message, 2: show process information, 3: show debug messages. DEFAULT:2",
                              default = 2 )
-
+    group_output.add_argument( "-q", "--minmapq", dest = "min_map_quality", type = int,
+                               help = "Minimum mapping quality of reads to keep. Default: 30",
+                               default = 30 )    
     
     return
 

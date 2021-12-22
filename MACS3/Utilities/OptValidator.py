@@ -826,8 +826,94 @@ def opt_validate_hmmratac ( options ):
     options.debug   = logging.debug
     options.info    = logging.info
 
+   
+    # input options.argtxt for hmmratac
+    options.argtxt = "\n".join((
+            "# Command line: %s" % " ".join(sys.argv[1:]),\
+            "# ARGUMENTS LIST:",\
+            "# outfile = %s" % (options.ofile),\
+            "# input file = %s" % (options.bam_file),\
+    # ...
+            ))
     # methods should be valid:
     # ...
+
+    if options.store_bdg:
+        options.argtxt += " HMMRATAC will report whole genome bedgraph of all state annotations. \n"
+    
+    if options.store_bgscore:
+        options.argtxt += " HMMRATAC score will be added to each state annotation in bedgraph. \n"
+
+    if options.store_peaks:
+        options.artxt += " Peaks not reported in bed format"
+
+    if options.print_exclude:
+        options.print_exclude = os.path.join(options.outdir, options.ofile+"Output_exclude.bed")
+    else:
+        options.print_exclude = "None"
+    
+    if options.print_train:
+        options.print_train = os.path.join(options.outdir, options.ofile+"Output_training.bed")
+    else:
+        options.print_train = "None"
+
+
+    # EM
+    if options.em_skip:
+        pass
+        # Do not perform EM training 
+    # em_means, em_stddev specify non-negative?
+    
+
+    # HMM
+    if options.hmm_states <=0:
+        logging.error(" -s, --states must be an integer greater than or equal to 1.")
+        sys.exit( 1 )
+    elif options.hmm_states != 3 and options.hmm_states > 0 and options.store_peaks == False:
+        logging.warn(" If -s, --states not k=3, recommend NOT calling peaks, use bedgraph.")
+        sys.exit( 1 )
+
+    # options.hmm_upper #upper can not be less than lower
+    # options.hmm_lower #lower can not be greater than upper
+    # options.hmm_maxTrain #greater than 0
+    # options.hmm_training_regions
+    # options.hmm_zscore
+    # options.hmm_randomSeed
+    # options.hmm_window
+
+    if options.hmm_file:
+        pass # skip training hmm
+        #options.training = options.hmm_file  ?
+    options.hmm_modelonly # any specs?
+
+    #Peak Calling
+    if options.call_minlen == True and options.store_peaks == True:
+        logging.error(" In order to use --minlen, --no-states must be set False.")
+        sys.exit( 1 )
+
+    if options.call_score.lower() not in [ 'max', 'ave', 'med', 'fc', 'zscore', 'all']:
+        logging.error( "Invalid method: %s" % options.call_score )
+        sys.exit( 1 )
+
+    # call_threshold # greater than 0
+
+    #misc
+    # misc_blacklist 
+    if options.misc_keep_duplicates:
+        options.argtxt += " Duplicate reads from analysis will be stored. \n"
+
+    # misc_trim # greater then or equal to 0
+    # np # should this be mp? #positive value
+    # verbose 
+    # logging object
+    # logging.basicConfig(level=(4-options.verbose)*10,
+    #                     format='%(levelname)-5s @ %(asctime)s: %(message)s ',
+    #                     datefmt='%a, %d %b %Y %H:%M:%S',
+    #                     stream=sys.stderr,
+    #                     filemode="w"
+    #                     )
+    # min_map_quality # greater than 0?
+
     
     return options
 
