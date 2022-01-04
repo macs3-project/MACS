@@ -828,7 +828,7 @@ def add_hmmratac_parser( subparsers ):
     group_misc.add_argument( "--verbose", dest = "verbose", type = int,
                              help = "Set verbose level of runtime message. 0: only show critical message, 1: show additional warning message, 2: show process information, 3: show debug messages. DEFAULT:2",
                              default = 2 )
-    group_output.add_argument( "-q", "--minmapq", dest = "min_map_quality", type = int,
+    group_misc.add_argument( "-q", "--minmapq", dest = "min_map_quality", type = int,
                                help = "Minimum mapping quality of reads to keep. Default: 30",
                                default = 30 )    
     
