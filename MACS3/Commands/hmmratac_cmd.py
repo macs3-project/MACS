@@ -269,14 +269,82 @@ def run( args ):
 
     # Report the final results as peaks, bedgraphs and summits, if desired
     if storebdg:
-        pass
+        pass # print .bedgraph
     if store_peaks:
-        pass
-    if
-        # Execute the scoring commands if the state is a peak or if bedgraph scoring is on
+        pass # print _peaks.gappedPeak, _summits.bed
+    
+    bdg = fc.getMappedBedgraph
 
-        # report the bedgraph if desired
-        # report the peaks and summits if desired
+    hmmrBdg = bedGraphMath.toMap(genomeAnnotation)
+
+    # not exactly sure what is happening in java loop here (line 575+):
+    for chr in hmmrBdg.keys():
+        hmmr = hmmrBdg[chr]
+        signal = bdg[chr]
+        if signal:
+            hmmr.sort() # TagNode.basepairComparator
+            signal.sort() # TagNode.basepairComparator
+            for i in range(0, len(hmmr)):
+                TagNode.temp = hmmr[i]
+
+            # Execute the scoring commands if the state is a peak or if bedgraph scoring is on
+                if temp.getScore2 == peak or store_bgscore:
+                    overlaps = []
+                    hasHadOverlap = False
+                    for a in range(0, len(signal)):
+                        if SubtractBed.overlap(temp, signal[a]):
+                            overlaps.append(signal[a])
+                            hasHadOverlap = True
+                        else:
+                            if hasHadOverlap:
+                                index = a
+                                break
+                    scores = bedGraphMath(temp, overlaps)
+                    max_score = scores.getMax
+                    mean_score = scores.getMean
+                    median_score = scores.getMedian
+                    z_score = (scores.getMean - genomeMean)/genomeStd
+                    foldchange = scores.getMean/genomeMean
+                    
+                    if score == "ave":
+                        pass
+                    elif score == "fc":
+                        pass
+                    elif score == "zscore":
+                        pass
+                    elif score == "med":
+                        pass
+                    elif score == "all":
+                        pass
+                    else:
+                        pass
+                if temp.getScore2 == peak:
+                    temp = bedGraphMath.setSmooth(temp, overlaps)
+                    
+                    if i > 0:
+                        pass
+                    else:
+                        pass
+                    if i < len(hmmr):
+                        pass
+            # report the bedgraph if desired
+            if storebdg:
+                if store_bgscore:
+                    pass
+                else:
+                    pass
+
+            # report the peaks and summits if desired
+            if store_peaks and temp.getScore2 == peak and temp.getLength >= minlen and temp.getScore3 >= threshold:
+                if temp.getSummit:
+                    pass
+            
+    if storebdg:
+        pass #close file
+    if store_peaks:
+        count = 0
+        for i in range(0, len(addback)):
+            pass
 
     # print time to run
 
