@@ -43,7 +43,7 @@ tests_requires = [ 'pytest' ]
 
 
 def main():
-    if float(sys.version[:3])<3.6:
+    if sys.version_info < (3,6):
         sys.stderr.write("CRITICAL: Python version must >= 3.6!\n")
         sys.exit(1)
 
