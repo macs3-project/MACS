@@ -273,6 +273,9 @@ def diag_write (filename, diag_result):
     ofhd_diag.write( "".join( [format % tuple(x) for x in diag_result])  )
     ofhd_diag.close()
 
+
+def hmmratac_writer():
+    pass
 # ------------------------------------
 # Classes
 # ------------------------------------
