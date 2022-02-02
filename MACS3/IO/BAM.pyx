@@ -1,7 +1,7 @@
 # cython: language_level=3
 # cython: profile=True
 # cython: linetrace=True
-# Time-stamp: <2021-03-10 23:24:04 Tao Liu>
+# Time-stamp: <2022-02-02 00:04:16 Tao Liu>
 
 """
 
@@ -410,7 +410,7 @@ cdef class BAMaccessor:
         if os.path.exists( self.bai_filename ):
             self.baifile = BAIFile( self.bai_filename ) # The baifile is not for IO, it already contains all content.
         else:
-            raise Exception("BAI is not available! Please make sure the .bai")
+            raise Exception(f"BAI is not available! Please make sure the `{self.bai_filename}` file exists in the same path")
         self.bamfile = io.BufferedReader( io.open( self.bam_filename, mode='rb' ), buffer_size = READ_BUFFER_SIZE )  # binary mode to read the raw BGZF file
         self.bgzf_block_cache = b""
         self.coffset_cache = 0

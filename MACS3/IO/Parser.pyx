@@ -1,13 +1,15 @@
 # cython: language_level=3
 # cython: profile=True
 # cython: linetrace=True
-# Time-stamp: <2020-12-06 23:32:28 Tao Liu>
+# Time-stamp: <2022-02-02 13:24:26 Tao Liu>
 
-"""Module for all MACS Parser classes for input.
+"""Module for all MACS Parser classes for input. Please note that the
+parsers are for reading the alignment files ONLY.
 
 This code is free software; you can redistribute it and/or modify it
 under the terms of the BSD License (see the file LICENSE included with
 the distribution).
+
 """
 
 # ------------------------------------
