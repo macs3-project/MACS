@@ -8,7 +8,8 @@ This code is free software; you can redistribute it and/or modify it
 under the terms of the BSD License (see the file LICENSE included with
 the distribution).
 """
-
+import numpy as np
+from scipy.stats import norm
 cdef class HMMR_EM:
     """ Main HMMR EM class.
     
@@ -18,23 +19,29 @@ cdef class HMMR_EM:
         list fragMeans
         list fragStddevs
         
-    def __init__ ( option, genome ):
+    cdef __init__ ( self, options, genome ):
         # step1: initialize the values of fragMeans and fragStddevs
         # * Set fragment length distribution parameters. 
         #  * Use inputed values to set initial values, if provided. 
         #  * Else use defaults
         #  */
-        cdef:
-	private double[] weights;
-	private double[] mu;
-	private double[] lamda;
-	private double[] data;
-	private double epsilon = 0.0005;
-	private int maxIter=20;
-	private double jump = 1.5;
+
+        # cdef:
+        # private double[] weights;
+        # private double[] mu;
+        # private double[] lamda;
+        # private double[] data;
+        # private double epsilon = 0.0005;
+        # private int maxIter=20;
+        # private double jump = 1.5;
         
-        self.fragMeans = options.fragMeans
-        self.fragStddevs = options.fragStddevs
+
+        self.epsilon = 0.0005
+        self.maxIter = 20
+        self.jump = 1.5
+
+        self.fragMeans = np.array(options.em_means)
+        self.fragStddevs = np.array(options.em_stddev)
         
         # double[] fragMeans = new double[4];
         # double[] fragStddevs = new double[4];
@@ -232,9 +239,89 @@ cdef class HMMR_EM:
 # 	}
 
 # }
+    # java func takes hmmr_em(weights, fragMeans, fragStddev, lengths) all from pullLargeLengths
+    # should call hmmr_em during pullLargelengths since these are all used below
+    cdef hmmr_em( self, weights, mu, lam, data ):
+        self.weights = weights
+        self.mu = mu
+        self.lam = lam
+        self.data = data
+
+    cdef converges( self, value1, value2, epsilon ):
+        if (abs(value1 - value2) <= epsilon):
+            converged = True
+        else:
+            converged = False
+        return converged
+    
+    # https://docs.scipy.org/doc/scipy/reference/generated/scipy.stats.norm.html
+    cdef get_weighted_density( self, x, mean, lam, weights ):
+        normal_dist_density = norm.pdf(x = x, loc = mean, scale = lam)
+        return weights * normal_dist_density
+        # return np.multiply(weight, normal_dist_density) # make sure both are np.array types
+
+    cdef return_greater( self, data ):
+        largest_index = -1
+        greatest_value = -1.0
+        for i in range(0, len(data)):
+            if data[i] > greatest_value:
+                greatest_value = data[i]
+                largest_index = i
+        for i in range(0, len(data)):
+            if i != largest_index:
+                if data[i] == greatest_value:
+                    largest_index = -1
+        return largest_index
+    
+
+    # https://commons.apache.org/proper/commons-math/javadocs/api-3.1/org/apache/commons/math3/stat/descriptive/moment/Mean.html
+    # java version updates mean and std incrementally
+    cdef iterate(self):
+        temp = []
+        counter = []
+        total = 0.0
+        means = []
+        std = []
+        for i in range(0, len(hmmr_em.data)):
+            for j in range(0. len(hmmr_em.mu)):
+                temp[j] = get_weighted_density(hmmr_em.data[i], hmmr_em.mu[j], hmmr_em.lam[j], hmmr_em.weights[j])
+            index = return_greater(temp)
+            # is this too large of a file to save means,stds for each iteration?
+            if index != -1: # if greatest value is not in the last index:
+                means[index] = np.mean(hmmr_em.data[0:i]) #check - do we want means[index] or means[i] or means.append()
+                stds[index] = np.std(hmmr_em.data[0:i])
+                counter[index] += 1.0 # check on this - do we want it to be a list with increasing values?
+                total += 1.0
+        for i in range(0, len(hmmr_em.mu)): # what are the lengths of means, stds, data, mu?
+            hmmr_em.mu[i] = hmmr_em.mu[i] + (jump * (means[i] - hmmr_em.mu[i]))
+            hmmr_em.lam[i] = hmmr_em.lam[i] + (jump * (stds[i] - hmmr_em.lam[i]))
+            hmmr_em.weights[i] = counter[i] / total
+
+    cdef learn(self):
+        converged = False
+        itr = 0
+        
+        while converged == False:
+            for a in range(0, len(hmmr_em.mu)):
+                old_mu[a] = hmmr_em.mu[a]
+                old_lam[a] = hmmr_em.lam[a]
+                old_weights[a] = hmmr_em.weights[a]
+
+            iterate()
+
+            counter = 0
+            for a in range(0, len(hmmr_em.mu)):
+                if converges(old_mu[a], hmmr_em.mu[a], self.epsilon) and converges(old_weights[a], hmmr_em.weights[a], self.epsilon) and converges(old_lam[a], hmmr_em.lam[a], self.epsilon)
+                    counter += 1
+            if counter == len(hmmr_em.mu):
+                converged = True
+            itr += 1
+            if itr >= self.maxIter:
+                break 
 
 
-    cdef learn ():
+
+            
         # learn function is the major function in HMMR_EM
 # 	/**
 # 	 * Iterate through the EM algorithm until data convergence
