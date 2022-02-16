@@ -1,6 +1,6 @@
 # cython: language_level=3
 # cython: profile=True
-# Time-stamp: <2022-02-02 14:28:52 Tao Liu>
+# Time-stamp: <2022-02-16 13:58:11 Tao Liu>
 
 """Module description:
 
@@ -9,7 +9,39 @@ under the terms of the BSD License (see the file LICENSE included with
 the distribution).
 """
 import numpy as np
-from scipy.stats import norm
+#from scipy.stats import norm    # there is another implemented function MACS3.Signal.Prob.pnorm
+from MACS3.Signal.Prob import pnorm
+
+# https://docs.scipy.org/doc/scipy/reference/generated/scipy.stats.norm.html
+cdef inline float get_weighted_density( x, mean, stddev, weights ):
+    """Description:
+    
+    parameters:
+    return value:
+    """
+    return weight * pnorm( x, mean, stddev )
+    # return np.multiply(weight, normal_dist_density) # make sure both are np.array types
+
+cdef return_greater( self, list data ):
+    """
+    Return the index of the largest value in an array of doubles
+    @param data: an Array of doubles 
+    @return an integer representing thre index of the largest value in the inputted array
+    """    
+    # TL: there must be a easy function in numpy/scipy or even Python itself for this
+    # also, this function doesn't use any 'self', so could be a general function outside of this class
+    largest_index = -1
+    greatest_value = -1.0
+    for i in range(0, len(data)):
+        if data[i] > greatest_value:
+            greatest_value = data[i]
+            largest_index = i
+    for i in range(0, len(data)): # if there are other mostly likely category, ignore this data point
+        if i != largest_index:
+            if data[i] == greatest_value:
+                largest_index = -1
+    return largest_index
+    
 cdef class HMMR_EM:
     """ Main HMMR EM class.
     
@@ -18,77 +50,70 @@ cdef class HMMR_EM:
         # define the values that should be returned
         list fragMeans
         list fragStddevs
+        # private variables
+        float episilon = 0.0005
+        int maxIter = 20
+        float jump = 1.5
+        object bamfile # a MACS3.IO.BAM.BAMAccessor object
+
+        bool converged = False # when True, terminate the iterations
+        np.ndarray[np.int32_t, ndim=1] data # data for fragment lengths
+        list mu
+        list lamba
+        list weight
         
-    cdef __init__ ( self, options, genome ):
+    def __init__ ( self, object petrack, list em_means, list em_stddevs , dict genome, float sample_percentage ):
+        """Initialize HMMR_EM object.
+
+        parameters:
+            1. petrack: a MACS3.Signal.PairedEndTrack.PETrackI object
+            1. em_means: list of initial means of fragments, for short, mono, di, and tri signals
+            2. em_stddevs: list of initial stddevs of fragments, for short, mono, di, and tri signals
+            3. genome: a dictionary containing the lengths (as value) of each chromosomes (as key)
+        """
+    
         # step1: initialize the values of fragMeans and fragStddevs
         # * Set fragment length distribution parameters. 
         #  * Use inputed values to set initial values, if provided. 
         #  * Else use defaults
         #  */
-
-        # cdef:
-        # private double[] weights;
-        # private double[] mu;
-        # private double[] lamda;
-        # private double[] data;
-        # private double epsilon = 0.0005;
-        # private int maxIter=20;
-        # private double jump = 1.5;
-        
-
+        # initial values
+        self.petrack = petrack # we may need to use a deepcopy
         self.epsilon = 0.0005
         self.maxIter = 20
         self.jump = 1.5
+        self.fragMeans = np.array(em_means)
+        self.fragStddevs = np.array(em_stddev)
+        self.sample_percentage = sample_percentage
 
-        self.fragMeans = np.array(options.em_means)
-        self.fragStddevs = np.array(options.em_stddev)
+        # first, let's prepare the lengths data
+        # sample down
+        self.petrack.sample_percent( self.sample_percentage, seed=12345 ) # may need to provide seed option for init function
+        self.data = self.petrack.fraglengths()
+        # then we only keep those with fragment lengths > 100 and < 1000
+        self.data = self.data[ self.data > 100 ]
+        self.data = self.data[ self.data < 1000 ]
         
-        # double[] fragMeans = new double[4];
-        # double[] fragStddevs = new double[4];
-        # double[] mode = new double[4];
-        # mode[1] = mode[2] = mode[3] = 2;
-        # mode[0]=0.5;
-
-        # if (means != null){
-        # 	String[] mu = means.split(",");
-        # 	for (int i = 0; i < mu.length;i++){
-        # 		fragMeans[i] = Double.parseDouble(mu[i]);
-        # 	}
-        # } else{
-        # 	fragMeans[0] = 50.0;
-        # 	fragMeans[1] = 200.0; 
-        # 	fragMeans[2] = 400.0;
-        # 	fragMeans[3] = 600.0;
-        # }
-        # if (stddevs != null){
-        # 	String[] std = stddevs.split(",");
-        # 	for(int i = 0;i < std.length;i++){
-        # 		fragStddevs[i] = Double.parseDouble(std[i]);
-        # 	}
-        # } else{
-        # 	for (int i = 0;i < fragStddevs.length;i++){
-        # 		fragStddevs[i] = 20.0;
-        # 	}
-        # }
-
-        # step 2, pull large lengths
-        #
-        # pullLargeLengths puller = new pullLargeLengths(bam, index, minMapQ, genomeStats,java.util.Arrays.copyOf(fragMeans, 4));
-        # double[] lengths = puller.getSampledLengths(10);
-        # double[] weights = puller.getWeights();
-        # puller = null;
-        #
-        self.pullLargeLengths(options.bamfile, options.min_map_quality, GENOME, options.em_means)
-        # the results from pullLargeLengths will be used to initializae HMMR_EM
+        # next, we will calculate the weights -- ie the proportion of fragments in each length category
+        cutoff1 = em_means[ 1 ] - em_means[ 0 ]/2 + em_means[ 0 ]
+        cutoff2 = em_means[ 2 ] - em_means[ 1 ]/2 + em_means[ 1 ]
+        cutoff3 = em_means[ 3 ] - em_means[ 2 ]/2 + em_means[ 2 ]
         
-        # step 3, EM trainer
-	# //Perform EM training
-	# HMMR_EM em = new HMMR_EM(weights,java.util.Arrays.copyOfRange(fragMeans, 1,4),
-	# 		java.util.Arrays.copyOfRange(fragStddevs, 1, 4),lengths);
-	# em.learn();
-        self.learn()
-        self.getMeans()
-        self.getLambda()
+        sum4 = len( self.data )
+        sum3 = sumn( self.data < cutoff3 )
+        sum2 = sumn( self.data < cutoff2 )
+        sum1 = sumn( self.data < cutoff1 )
+
+        counter4 = sum4 - sum3
+        counter3 = sum3 - sum2
+        counter2 = sum2 - sum1
+        counter1 = sum1
+
+        self.weight = [ counter1/sum4, counter2/sum4, counter3/sum4, counter4/sum4]
+
+        self.__learn()
+        #self.__getMeans()
+        #self.__getLambda()
 	# double[] tempMeans = em.getMeans();
 	# double[] tempLam = em.getLamda();
 	# em = null;
@@ -106,7 +131,7 @@ cdef class HMMR_EM:
         return
 
 
-    cdef pullLargeLengths(options.bamfile, options.min_map_quality, GENOME, options.em_means):
+    #cdef void __pullLargeLengths(self, object bamfile, options.min_map_quality, GENOME, options.em_means):
         # TL: I will try to implement this
 # public class pullLargeLengths {
 	
@@ -227,205 +252,73 @@ cdef class HMMR_EM:
 # 		for (int i = 0;i < lengths.length;i++){
 # 			if (lengths[i] < cutone)
 # 				counter1++;
-# 			else if(lengths[i] >= cutone && lengths[i] <= cuttwo)
-# 				counter2++;
-# 			else
-# 				counter3++;
-# 		}
-# 		weights[0] = (double)counter1/(double)lengths.length; 
-# 		weights[1] = (double)counter2/(double)lengths.length;
-# 		weights[2] = (double)counter3/(double)lengths.length;
-		
-# 	}
 
-# }
-    # java func takes hmmr_em(weights, fragMeans, fragStddev, lengths) all from pullLargeLengths
-    # should call hmmr_em during pullLargelengths since these are all used below
-    cdef hmmr_em( self, weights, mu, lam, data ):
-        self.weights = weights
-        self.mu = mu
-        self.lam = lam
-        self.data = data
+    cdef __iterate(self):
+        """Description: This is a private function only used by HMMR_EM class
 
-    cdef converges( self, value1, value2, epsilon ):
-        if (abs(value1 - value2) <= epsilon):
-            converged = True
-        else:
-            converged = False
-        return converged
-    
-    # https://docs.scipy.org/doc/scipy/reference/generated/scipy.stats.norm.html
-    cdef get_weighted_density( self, x, mean, lam, weights ):
-        normal_dist_density = norm.pdf(x = x, loc = mean, scale = lam)
-        return weights * normal_dist_density
-        # return np.multiply(weight, normal_dist_density) # make sure both are np.array types
-
-    cdef return_greater( self, data ):
-        largest_index = -1
-        greatest_value = -1.0
-        for i in range(0, len(data)):
-            if data[i] > greatest_value:
-                greatest_value = data[i]
-                largest_index = i
-        for i in range(0, len(data)):
-            if i != largest_index:
-                if data[i] == greatest_value:
-                    largest_index = -1
-        return largest_index
-    
-
-    # https://commons.apache.org/proper/commons-math/javadocs/api-3.1/org/apache/commons/math3/stat/descriptive/moment/Mean.html
-    # java version updates mean and std incrementally
-    cdef iterate(self):
-        temp = []
-        counter = []
-        total = 0.0
-        means = []
-        std = []
-        for i in range(0, len(hmmr_em.data)):
-            for j in range(0. len(hmmr_em.mu)):
-                temp[j] = get_weighted_density(hmmr_em.data[i], hmmr_em.mu[j], hmmr_em.lam[j], hmmr_em.weights[j])
-            index = return_greater(temp)
+        parameters:
+        return value:
+        """
+        cdef:
+            list temp, counter, means, stds
+            float total
+            int i, j
+            
+        temp = []               # for each category, the likelihood
+        counter = []            # for each category, the number of data points/fragment
+        total = 0.0             # total number of data points/fragments assigned to four categories
+        means = []              # for each category, the new mean
+        stds = []               # for each category, the new stddev
+        for i in range( 0, len( self.data ) ):
+            for j in range( 0, len( self.mu ) ):
+                # for each category: short, mono, di, tri- (4 in total)
+                temp[j] = get_weighted_density( self.data[i], self.mu[j], self.lam[j], self.weights[j] )
+            # now look for the most likely category, as `index`
+            index = return_greater( temp )
+            
             # is this too large of a file to save means,stds for each iteration?
-            if index != -1: # if greatest value is not in the last index:
-                means[index] = np.mean(hmmr_em.data[0:i]) #check - do we want means[index] or means[i] or means.append()
-                stds[index] = np.std(hmmr_em.data[0:i])
+            if index != -1: # If we can find a mostly likely category
+                ##----
+                means[index] = np.mean( self.data[0:i] ) #check - do we want means[index] or means[i] or means.append()
+                stds[index] = np.std(self.data[0:i])
+                ##---- This block is wrong. We need to implement incremental way to calculate mean and stddev
+                ## https://en.wikipedia.org/wiki/Algorithms_for_calculating_variance#Welford's_online_algorithm
+                ## Check this
                 counter[index] += 1.0 # check on this - do we want it to be a list with increasing values?
                 total += 1.0
-        for i in range(0, len(hmmr_em.mu)): # what are the lengths of means, stds, data, mu?
-            hmmr_em.mu[i] = hmmr_em.mu[i] + (jump * (means[i] - hmmr_em.mu[i]))
-            hmmr_em.lam[i] = hmmr_em.lam[i] + (jump * (stds[i] - hmmr_em.lam[i]))
-            hmmr_em.weights[i] = counter[i] / total
+        for i in range( 0, len( self.mu ) ): # what are the lengths of means, stds, data, mu?
+            # we will emplify the difference between new and old means/stds, and update weights.
+            self.mu[i] = self.mu[i] + (jump * (means[i] - self.mu[i]))
+            self.lam[i] = self.lam[i] + (jump * (stds[i] - self.lam[i]))
+            self.weights[i] = counter[i] / total
 
-    cdef learn(self):
-        converged = False
-        itr = 0
-        
-        while converged == False:
-            for a in range(0, len(hmmr_em.mu)):
-                old_mu[a] = hmmr_em.mu[a]
-                old_lam[a] = hmmr_em.lam[a]
-                old_weights[a] = hmmr_em.weights[a]
+    cdef bool learn(self):
+        """Description:
 
-            iterate()
+        parameters:
+        return value:
+        """
+        cdef:
+            int itr = 0         # number of iterations
+            int i
+            int counter         # number of category that has been converged
+        self.converged = False
+        while self.converged == False:
+            for i in range( 0, len( self.mu ) ):
+                old_mu[a] = self.mu[a]
+                old_lam[a] = self.lam[a]
+                old_weights[a] = self.weights[a]
+
+            self.__iterate()
 
             counter = 0
-            for a in range(0, len(hmmr_em.mu)):
-                if converges(old_mu[a], hmmr_em.mu[a], self.epsilon) and converges(old_weights[a], hmmr_em.weights[a], self.epsilon) and converges(old_lam[a], hmmr_em.lam[a], self.epsilon)
+            for i in range(0, len(self.mu)):
+                if abs(old_mu[a] - self.mu[a]) < self.epsilon) and abs(old_weights[a] - self.weights[a]) < self.epsilon) and abs(old_lam[a] - self.lam[a]) < self.epsilon)
                     counter += 1
-            if counter == len(hmmr_em.mu):
-                converged = True
+            if counter == len( self.mu ):
+                self.converged = True
             itr += 1
             if itr >= self.maxIter:
-                break 
-
-
-
+                break
+        return self.converged
             
-        # learn function is the major function in HMMR_EM
-# 	/**
-# 	 * Iterate through the EM algorithm until data convergence
-# 	 */
-# 	public void learn(){
-		
-# 		double[] oldMu = new double[mu.length];
-# 		double[] oldWeights = new double[mu.length];
-# 		double[] oldLam = new double[mu.length];
-# 		boolean converged = false;
-# 		int iter = 0;
-# 		while(!converged){
-			
-# 			for (int a = 0;a < mu.length;a++){
-# 				oldMu[a] = mu[a];
-# 				oldLam[a] = lamda[a];
-# 				oldWeights[a] = weights[a];
-# 			}
-			
-			
-# 			iterate();
-			
-# 			int counter = 0;
-# 			for (int a = 0;a < mu.length;a++){
-				
-# 				if(converges(oldMu[a],mu[a],epsilon) && converges(oldWeights[a],weights[a],epsilon)
-# 						&& converges(oldLam[a],lamda[a],epsilon)){
-# 					counter+=1;
-# 				}
-# 			}
-# 			if (counter == mu.length){
-				
-# 				converged=true;
-# 			}
-# 			iter+=1;
-# 			if (iter >= maxIter){
-# 				break;
-# 			}
-# 			//Output values during iterations
-# 			/*
-# 			for (int a = 0;a < mu.length;a++){
-# 				System.out.println(mu[a]);
-				
-# 				System.out.println(lamda[a]);
-# 				System.out.println(weights[a]);
-# 				System.out.println(iter);
-# 			}
-# 			*/
-# 			//System.out.println(iter);
-# 		}
-		
-# 	}
-# 	/**
-# 	 * Determine if the EM algorithm has converged
-# 	 * @param value1 a double representing the value before EM algorithm
-# 	 * @param value2 a double representing the value after EM algorithm
-# 	 * @param epsilon a double representing the maximum difference allowed to be considered converged
-# 	 * @return a boolean indicating whether the values have converged
-# 	 */
-# 	private boolean converges(double value1,double value2, double epsilon){
-# 		if (Math.abs(value1 - value2) <= epsilon){
-# 			return true;
-# 		}
-# 		else{
-# 			return false;
-# 		}
-# 	}
-# 	/**
-# 	 * Access the weighted density of the multi-variate distribution
-# 	 * @param x a double representing the read length
-# 	 * @param mean a double representing the distribution mean
-# 	 * @param lamda	a double representing the distribution standard deviation
-# 	 * @param weight a double representing the distribution weight
-# 	 * @return a double representing the weighted density
-# 	 */
-# 	private double getWeightedDensity(double x, double mean, double lamda,double weight){
-		
-# 		NormalDistribution dis = new NormalDistribution(mean,lamda);
-# 		return weight * dis.density(x);
-		
-# 	}
-# 	/**
-# 	 * Return the index of the largest value in an array of doubles
-# 	 * @param data an Array of doubles 
-# 	 * @return an integer representing thre index of the largest value in the inputted array
-# 	 */
-# 	private int returnGreater(double[] data){
-# 		int largest = -1;
-# 		double greatest = -1.0;
-# 		for(int i = 0;i < data.length;i++){
-# 			if (data[i] > greatest){
-# 				greatest = data[i];
-# 				largest = i;
-# 			}
-# 		}
-# 		for (int i = 0;i < data.length;i++){
-# 			if (i != largest){
-# 				if(data[i] == greatest){
-# 					largest = -1;
-# 				}
-# 			}
-# 		}
-		
-# 		return largest;
-# 	}
-		
-# }

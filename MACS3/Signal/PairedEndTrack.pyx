@@ -1,6 +1,6 @@
 # cython: language_level=3
 # cython: profile=True
-# Time-stamp: <2020-11-30 11:33:02 Tao Liu>
+# Time-stamp: <2022-02-16 13:27:45 Tao Liu>
 
 """Module for filter duplicate tags from paired-end data
 
@@ -219,19 +219,37 @@ cdef class PETrackI:
         self.__sorted = True
         return
 
+    cpdef np.ndarray fraglengths ( self ):
+        """Return the sizes/fragment lengths of each pair.
+
+        This function is for HMMRATAC EM training.
+        """
+        cdef:
+            np.ndarray[np.int32_t, ndim=1] sizes, locs
+            set chrnames
+            int i
+
+        chrnames = self.get_chr_names()
+        locs = self.__locations[ chrnames[ 0 ] ]
+        sizes = locs['r'] - locs['l']
+        for i in range( 1, len(chrnames) ):
+            locs = self.__locations[ chrnames[i] ]
+            sizes.append( locs['r'] - locs['l'] )
+        return sizes
+    
     cpdef np.ndarray pmf( self ):
         """return a 1-D numpy array of the probabilities of observing each
         fragment size, indices are the bin number (first bin is 0)
         """
         cdef:
-           np.ndarray[np.int64_t, ndim=1] counts = np.zeros(self.buffer_size, dtype='int64')
-           np.ndarray[np.float64_t, ndim=1] pmf
-           np.ndarray[np.int64_t, ndim=1] bins
-           np.ndarray[np.int32_t, ndim=1] sizes, locs
-           bytes c
-           int32_t i, bins_len
-           int32_t max_bins = 0
-           set chrnames
+            np.ndarray[np.int64_t, ndim=1] counts = np.zeros(self.buffer_size, dtype='int64')
+            np.ndarray[np.float64_t, ndim=1] pmf
+            np.ndarray[np.int64_t, ndim=1] bins
+            np.ndarray[np.int32_t, ndim=1] sizes, locs
+            bytes c
+            int32_t i, bins_len
+            int32_t max_bins = 0
+            set chrnames
 
         chrnames = self.get_chr_names()
 
