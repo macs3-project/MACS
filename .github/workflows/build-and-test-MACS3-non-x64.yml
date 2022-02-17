@@ -9,6 +9,7 @@ jobs:
   build_job:
     runs-on: ubuntu-20.04
     name: Build on ${{ matrix.arch }}
+    python-version: 3.10.0
     strategy:
       matrix:
         include:
