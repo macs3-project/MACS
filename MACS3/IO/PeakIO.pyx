@@ -1,6 +1,6 @@
 # cython: language_level=3
 # cython: profile=True
-# Time-stamp: <2020-11-24 17:11:29 Tao Liu>
+# Time-stamp: <2022-02-17 12:06:52 Tao Liu>
 
 """Module for PeakIO IO classes.
 
@@ -222,55 +222,6 @@ cdef class PeakIO:
         for chrom in chrs:
             x += len(peaks[chrom])
         return x
-
-    # these methods are very fast, specifying types is unnecessary
-    def write_to_xls (self, fhd, bytes name_prefix=b"%s_peak_", bytes name=b"MACS"):
-        return self._to_xls(name_prefix=name_prefix, name=name,
-                            print_func=fhd.write)
-
-    cdef _to_xls (self, bytes name_prefix=b"%s_peak_", bytes name=b"MACS", print_func=sys.stdout.write):
-
-        if self.peaks:
-            print_func("\t".join(("chr","start", "end",  "length",  "abs_summit", "pileup", "-log10(pvalue)", "fold_enrichment", "-log10(qvalue)", "name"))+"\n")
-        else:
-            return
-
-        try: peakprefix = name_prefix % name
-        except: peakprefix = name_prefix
-
-        peaks = self.peaks
-        chrs = list(peaks.keys())
-        chrs.sort()
-        n_peak = 0
-        for chrom in chrs:
-            for end, group in groupby(peaks[chrom], key=itemgetter("end")):
-                n_peak += 1
-                these_peaks = list(group)
-                if len(these_peaks) > 1:
-                    for i, peak in enumerate(these_peaks):
-                        peakname = "%s%d%s" % (peakprefix.decode(), n_peak, subpeak_letters(i))
-                        #[start,end,end-start,summit,peak_height,number_tags,pvalue,fold_change,qvalue]
-                        print_func("%s\t%d\t%d\t%d" % (chrom.decode(),peak['start']+1,peak['end'],peak['length']))
-                        print_func("\t%d" % (peak['summit']+1)) # summit position
-                        print_func("\t%.6g" % (round(peak['pileup'],2))) # pileup height at summit
-                        print_func("\t%.6g" % (peak['pscore'])) # -log10pvalue at summit
-                        print_func("\t%.6g" % (peak['fc'])) # fold change at summit
-                        print_func("\t%.6g" % (peak['qscore'])) # -log10qvalue at summit
-                        print_func("\t%s" % peakname)
-                        print_func("\n")
-                else:
-                    peak = these_peaks[0]
-                    peakname = "%s%d" % (peakprefix.decode(), n_peak)
-                    #[start,end,end-start,summit,peak_height,number_tags,pvalue,fold_change,qvalue]
-                    print_func("%s\t%d\t%d\t%d" % (chrom.decode(),peak['start']+1,peak['end'],peak['length']))
-                    print_func("\t%d" % (peak['summit']+1)) # summit position
-                    print_func("\t%.6g" % (round(peak['pileup'],2))) # pileup height at summit
-                    print_func("\t%.6g" % (peak['pscore'])) # -log10pvalue at summit
-                    print_func("\t%.6g" % (peak['fc'])) # fold change at summit
-                    print_func("\t%.6g" % (peak['qscore'])) # -log10qvalue at summit
-                    print_func("\t%s" % peakname)
-                    print_func("\n")
-        return
 
     cdef _to_bed(self, bytes name_prefix=b"%s_peak_", bytes name=b"MACS",
                 bytes description=b"%s", str score_column="score",

@@ -1,6 +1,6 @@
 # cython: language_level=3
 # cython: profile=True
-# Time-stamp: <2020-12-04 22:49:03 Tao Liu>
+# Time-stamp: <2022-02-18 11:44:57 Tao Liu>
 
 """Module for SAPPER BAMParser class
 
@@ -168,6 +168,7 @@ cdef class UnitigRAs:
         if s == b'-':                     #deletion
             for ra in self.RAlists[ 0 ]:
                 ra_seq = ra["SEQ"]
+                l_read = ra["l"]
                 ra_pos = index_unitig - self.seq.find( ra_seq ) - 1
                 if ra_pos == 0 or ra_pos == l_read -1:
                     tip_list_t.append( True )
@@ -206,8 +207,9 @@ cdef class UnitigRAs:
 
         for ra in self.RAlists[1]:        #control
             ra_seq = ra["SEQ"]
+            l_read = ra["l"]
             ra_pos = index_unitig - self.seq.find( ra_seq ) - 1
-            if ra_pos < ra["l"] and ra_pos >= 0:
+            if ra_pos < l_read and ra_pos >= 0:
                 pos_list_c.append( ra_pos )
                 bq_list_c.append( ra["binaryqual"][ra_pos] )                
                 strand_list_c.append( ra["strand"] )

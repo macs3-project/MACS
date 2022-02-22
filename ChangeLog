@@ -1,5 +1,5 @@
-2021-02-07  Tao Liu  <vladimir.liu@gmail.com>
-	MACS 3.0.0a6
+2022-02-18  Tao Liu  <vladimir.liu@gmail.com>
+	MACS 3.0.0a7
 
 	* New features:
 
@@ -26,6 +26,16 @@
 	SAPPER has been merged into MACS. Also, `simde` has been added as 
 	a submodule in order to support fermi-lite library under non-x64 
 	architectures.
+
+	8) BAI index and random access to BAM file now is supported. #449
+	And user can use original BAM file (instead of the subset of BAM
+	file as in SAPPER) in the `callvar` command. 
+
+	9) Support of Python > 3.10 #497 #498
+
+	* Other fixes:
+
+	1) Missing header line while no peaks can be called #501 #502
 
 2020-04-11  Tao Liu  <vladimir.liu@gmail.com>
 	MACS version 2.2.7.1
