@@ -1,4 +1,4 @@
-# Time-stamp: <2022-02-23 01:55:55 Tao Liu>
+# Time-stamp: <2022-02-23 13:41:29 Tao Liu>
 
 """Description: Main HMMR command
 
@@ -58,9 +58,13 @@ def run( args ):
             petrack = bam.append_petrack( petrack )
     petrack.finalize()
 
+    # filter duplicates if needed
+    if options.misc_keep_duplicates:
+        petrack.filter_dup( maxnum=1 )
+
     # read in blacklisted if option entered    
     if options.blacklist:
-        options.info("Read blacklist file...")
+        options.info("# Read blacklist file...")
         peakio = open( options.blacklist )
         blacklist = PeakIO()
         i = 0
@@ -74,15 +78,18 @@ def run( args ):
     # 2. EM - created separate file for HMMR_EM
     #############################################
     # we will use EM to get the best means/stddevs for the mono-, di- and tri- modes of fragment sizes
-    em_trainer = HMMR_EM.HMMR_EM( petrack, options.em_means[1:4], options.em_stddevs[1:4] ) # we take the options and initialize the object, then let it run
+    options.info("# Use EM algorithm to estimate means and stddevs of fragment lengths")
+    options.info("  for mono-, di-, and tri-nucleosomal signals...") 
+    em_trainer = HMMR_EM.HMMR_EM( petrack, options.em_means[1:4], options.em_stddevs[1:4], seed = options.hmm_randomSeed ) # we take the options and initialize the object, then let it run
     # the mean and stddev after EM training
     em_means = [options.em_means[0],]
     em_means.extend(em_trainer.fragMeans)
     em_stddevs = [options.em_stddevs[0],]
     em_stddevs.extend(em_trainer.fragStddevs)    
-    options.info( f"The mean and stddevs after EM:")
-    options.info( f"Means: {em_means}")
-    options.info( f"Stddevs: {em_stddevs}")
+    options.info( f"# The mean and stddevs after EM:")
+    options.info( f"         [short,  mono-,  di-,  tri-]")
+    options.info( f"  Means: {em_means}")
+    options.info( f"  Stddevs: {em_stddevs}")
 
 
 #############################################

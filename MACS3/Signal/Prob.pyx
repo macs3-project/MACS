@@ -1,6 +1,6 @@
 # cython: language_level=3
 # cython: profile=True
-# Time-stamp: <2020-11-30 10:53:41 Tao Liu>
+# Time-stamp: <2022-02-23 12:15:32 Tao Liu>
 
 """Module Description: statistics functions to calculate p-values
 
@@ -44,6 +44,11 @@ cpdef pnorm(int32_t x, int32_t u, int32_t v):
     """The probability of X=x when X=Norm(u,v)
     """
     return 1.0/sqrt(2.0 * 3.141592653589793 * <float32_t>(v)) * exp(-<float32_t>(x-u)**2 / (2.0 * <float32_t>(v)))
+
+cpdef pnorm2(float32_t x, float32_t u, float32_t v):
+    """The probability of X=x when X=Norm(u,v)
+    """
+    return 1.0/sqrt(2.0 * 3.141592653589793 * v) * exp(-(x-u)**2 / (2.0 * v))
 
 # ------------------------------------
 # Misc functions

@@ -1,4 +1,4 @@
-# Time-stamp: <2022-02-22 18:05:29 Tao Liu>
+# Time-stamp: <2022-02-23 13:45:23 Tao Liu>
 
 """Module Description
 
@@ -832,19 +832,19 @@ def opt_validate_hmmratac ( options ):
             "# Command line: %s" % " ".join(sys.argv[1:]),\
             "# ARGUMENTS LIST:",\
             "# outfile = %s" % (options.ofile),\
-            "# input file = %s" % (options.bam_file),\
+            "# input file = %s\n" % (options.bam_file),\
     # ... add additional
             ))
 
     # Output options
     if options.store_bdg:
-        options.argtxt += " HMMRATAC will report whole genome bedgraph of all state annotations. \n"
+        options.argtxt += "# HMMRATAC will report whole genome bedgraph of all state annotations. \n"
     
     if options.store_bgscore:
-        options.argtxt += " HMMRATAC score will be added to each state annotation in bedgraph. \n"
+        options.argtxt += "# HMMRATAC score will be added to each state annotation in bedgraph. \n"
 
     if options.store_peaks:
-        options.artxt += " Peaks not reported in bed format"
+        options.argtxt += "# Peaks not reported in bed format\n"
 
     if options.print_exclude:
         options.print_exclude = os.path.join(options.outdir, options.ofile+"Output_exclude.bed")
@@ -860,7 +860,7 @@ def opt_validate_hmmratac ( options ):
     # EM
     # em_skip
     if options.em_skip:
-        options.artxt += " EM training not performed on fragment distribution. \n"
+        options.argtxt += "# EM training not performed on fragment distribution. \n"
     # em_means non-negative
     if sum( [ x < 0 for x in options.em_means ] ):
         logging.error(" --means should not be negative! ")
@@ -892,21 +892,21 @@ def opt_validate_hmmratac ( options ):
     
     # hmm_maxTrain non-negative
     if options.hmm_maxTrain <0:
-        logging.error(" --maxTrain should not be negative! ")
+        logging.error(" --maxTrain should not be negative!")
         sys.exit( 1 )
     
     # hmm_training_regions
     if options.hmm_training_regions:
-        options.artxt += " Using -t, --training input to train HMM instead of using fold change settings to select. \n"
+        options.argtxt += "# Using -t, --training input to train HMM instead of using fold change settings to select. \n"
     
     # hmm_zscore non-negative
     if options.hmm_zscore <0:
-        logging.error(" -z, --zscore should not be negative! ")
+        logging.error(" -z, --zscore should not be negative!")
         sys.exit( 1 )
     
     # hmm_randomSeed
     if options.hmm_randomSeed:
-        options.argtxt += " Random seed selected as: %d\n" % options.hmm_randomSeed
+        options.argtxt += "# Random seed selected as: %d\n" % options.hmm_randomSeed
     
     # hmm_window non-negative
     if options.hmm_window <0:
@@ -915,11 +915,11 @@ def opt_validate_hmmratac ( options ):
 
     # hmm_file
     if options.hmm_file:
-        options.argtxt += " HMM training will be skipped, --model input used instead. \n"
+        options.argtxt += "# HMM training will be skipped, --model input used instead. \n"
 
     # hmm_modelonly
     if options.hmm_modelonly:
-        options.argtxt += " Program will stop after generating model, which can be later applied with '--model'. \n"
+        options.argtxt += "# Program will stop after generating model, which can be later applied with '--model'. \n"
 
 
     # Peak Calling
@@ -940,7 +940,7 @@ def opt_validate_hmmratac ( options ):
     # Misc
     # misc_blacklist 
     if options.misc_keep_duplicates:
-        options.argtxt += " Duplicate reads from analysis will be stored. \n"
+        options.argtxt += "# Duplicate reads from analysis will be stored. \n"
 
     # misc_trim non-negative
     if options.misc_trim <0:

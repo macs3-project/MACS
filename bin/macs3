@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# Time-stamp: <2022-02-22 18:12:35 Tao Liu>
+# Time-stamp: <2022-02-23 13:47:04 Tao Liu>
 
 """Description: MACS v3 main executable.
 
@@ -789,9 +789,6 @@ def add_hmmratac_parser( subparsers ):
     group_hmm.add_argument( "-z", "--zscore", dest = "hmm_zscore", type = int,
                             help = "Zscored read depth to mask during Viterbi decoding. Default: 100",
                             default = 100 )
-    group_hmm.add_argument( "--randomSeed", dest = "hmm_randomSeed", type = int,
-                            help = "Seed to set for random sampling of training regions. Default: 10151",
-                            default = 10151 )
     group_hmm.add_argument( "--window", dest = "hmm_window", type = int,
                             help = "Size of the bins to split the genome into for Viterbi decoding. To save memory, the genome is split into WINDOW long bins and viterbi decoding occurs across each bin. Default = 25000000. Note: For machines with limited memory, it is recommended to reduce the size of the bins.",
                             default = 25000000 )
@@ -813,11 +810,14 @@ def add_hmmratac_parser( subparsers ):
                              default = 100 )
     # group for misc
     group_misc = argparser_hmmratac.add_argument_group( "Misc arguments" )
+    group_misc.add_argument( "--randomSeed", dest = "hmm_randomSeed", type = int,
+                             help = "Seed to set for random sampling of training regions. Default: 10151",
+                             default = 10151 )
     group_misc.add_argument( "-e", "--blacklist", dest = "blacklist", type = str, required = False, 
-                              help = "Filename of blacklisted regions to exclude (previously was BED_file). Examples are those from ENCODE. Default: NA" )
+                             help = "Filename of blacklisted regions to exclude (previously was BED_file). Examples are those from ENCODE. Default: NA" )
     group_misc.add_argument( "--keep-duplicates", dest = "misc_keep_duplicates", action = "store_true",
                              help = "Keep duplicate reads from analysis. By default, duplicate reads will be removed. Default: False",
-                             default = False )    
+                             default = False )
     group_misc.add_argument( "--trim", dest = "misc_trim", type = int,
                              help = "How many signals from the end to trim off (ie starting with tri signal then di etc). This may be useful if your data doesn't contain many large fragments. Default: 0",
                              default = 0 )
