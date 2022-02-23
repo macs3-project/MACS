@@ -1,6 +1,6 @@
 # cython: language_level=3
 # cython: profile=True
-# Time-stamp: <2022-02-16 13:27:45 Tao Liu>
+# Time-stamp: <2022-02-22 18:19:47 Tao Liu>
 
 """Module for filter duplicate tags from paired-end data
 
@@ -225,11 +225,12 @@ cdef class PETrackI:
         This function is for HMMRATAC EM training.
         """
         cdef:
-            np.ndarray[np.int32_t, ndim=1] sizes, locs
-            set chrnames
+            np.ndarray[np.int32_t, ndim=1] sizes
+            np.ndarray locs
+            list chrnames
             int i
 
-        chrnames = self.get_chr_names()
+        chrnames = list( self.get_chr_names() )
         locs = self.__locations[ chrnames[ 0 ] ]
         sizes = locs['r'] - locs['l']
         for i in range( 1, len(chrnames) ):

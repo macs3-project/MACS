@@ -1,6 +1,6 @@
 # cython: language_level=3
 # cython: profile=True
-# Time-stamp: <2022-02-17 11:21:42 Tao Liu>
+# Time-stamp: <2022-02-23 01:54:03 Tao Liu>
 
 """Module description:
 
@@ -11,6 +11,7 @@ the distribution).
 # ------------------------------------
 # python modules
 # ------------------------------------
+from math import sqrt
 # ------------------------------------
 # Other modules
 # ------------------------------------
@@ -28,6 +29,16 @@ from MACS3.Signal.Prob import pnorm
 # ------------------------------------
 # Misc functions
 # ------------------------------------
+cdef tuple online_update( float x, long c, float m, float s):
+    cdef:
+        float delta
+    c += 1
+    if c == 1:
+        return( 1, x, float(0.0) )
+    delta = x - m
+    m += delta / c
+    s += delta * (x - m)
+    return (c, m, s)
 
 # https://docs.scipy.org/doc/scipy/reference/generated/scipy.stats.norm.html
 cdef inline float get_weighted_density( x, mean, stddev, weight ):
@@ -55,30 +66,6 @@ cdef int return_greater( np.ndarray data ):
         largest_index = largest_inds[0][0]
     return largest_index
     
- # cdef int return_greater( list data ):
- #    """
- #    Return the index of the largest value in an array of doubles
- #    @param data: an Array of doubles 
- #    @return an integer representing thre index of the largest value in the inputted array
- #    """
- #    cdef:
- #        int largest_index
- #        float greatest_value = -1.0
- #        int i
- #    # TL: there must be a easy function in numpy/scipy or even Python itself for this
- #    # also, this function doesn't use any 'self', so could be a general function outside of this class
- #    largest_index = -1
- #    greatest_value = -1.0
- #    for i in range(0, len(data)):
- #        if data[i] > greatest_value:
- #            greatest_value = data[i]
- #            largest_index = i
- #    for i in range(0, len(data)): # if there are other mostly likely category, ignore this data point
- #        if i != largest_index:
- #            if data[i] == greatest_value:
- #                largest_index = -1
- #    return largest_index
-
 # ------------------------------------
 # Classes
 # ------------------------------------
@@ -94,23 +81,20 @@ cdef class HMMR_EM:
     
     """
     cdef:
-        # define the values that should be returned
-        np.ndarray fragMeans    # fragment length mean for each of the three modes
-        np.ndarray fragStddevs  # fragment length standard deviation for each of the three modes
+        public np.ndarray fragMeans    # fragment length mean for each of the three modes
+        public np.ndarray fragStddevs  # fragment length standard deviation for each of the three modes
         int min_fraglen
         int max_fraglen
-        float episilon          # maximum difference to call the value is converged
+        float epsilon          # maximum difference to call the value is converged
         int maxIter             # maximum iternation
-        float jump              # amplify the difference
         int seed                # random seed for downsampling
         bool converged          # wheter the EM is converged
-
-        # private variables
+        float sample_percentage
         object __petrack          # PETrackI object
         np.ndarray __data         # data for fragment lengths
-        np.ndarray __weight
+        np.ndarray __weights
         
-    def __init__ ( self, object petrack, list init_means, list init_stddevs , int min_fraglen = 100, int max_fraglen = 1000, float sample_percentage  = 10, float epsilon = 0.0005, int maxIter = 20, float jump = 1.5, int seed = 12345):
+    def __init__ ( self, object petrack, list init_means, list init_stddevs , int min_fraglen = 100, int max_fraglen = 1000, float sample_percentage  = 10, float epsilon = 0.0005, int maxIter = 20, int seed = 12345):
         """Initialize HMMR_EM object. The first three parameters are required.
 
         parameters:
@@ -122,35 +106,33 @@ cdef class HMMR_EM:
             6. sample_percentage: downsample the original data to get the lengths distribution, default 10
             7. epsilon
             8. maxIter
-            9. jump
-            10. seed
+            9. seed
         """
         cdef:
             float cutoff1, cutoff2
             long sum1, sum2, sum3, counter1, counter2, counter3
         # initial values
-        self.petrack = petrack # we may need to use a deepcopy
+        self.__petrack = petrack # we may need to use a deepcopy
         self.min_fraglen = min_fraglen
         self.max_fraglen = max_fraglen
         self.epsilon = epsilon
         self.maxIter = maxIter
-        self.jump = jump
         self.seed = seed
         self.converged = False
-        self.fragMeans = np.array(init_means)
-        self.fragStddevs = np.array(init_stddevs)
+        self.fragMeans = np.array(init_means, dtype=float)
+        self.fragStddevs = np.array(init_stddevs, dtype=float)
         self.sample_percentage = sample_percentage
 
         # first, let's prepare the lengths data
         # sample down
-        self.petrack.sample_percent( self.sample_percentage, seed = self.seed ) # may need to provide seed option for init function
-        self.__data = self.petrack.fraglengths()
+        self.__petrack.sample_percent( self.sample_percentage, seed = self.seed ) # may need to provide seed option for init function
+        self.__data = self.__petrack.fraglengths()
         # then we only keep those with fragment lengths within certain range
         self.__data = self.__data[ np.logical_and( self.__data >= self.min_fraglen, self.__data <= self.max_fraglen ) ]
 
         # next, we will calculate the weights -- ie the proportion of fragments in each length category
-        cutoff1 = init_means[ 1 ] - init_means[ 0 ]/2 + init_means[ 0 ]
-        cutoff2 = init_means[ 2 ] - init_means[ 1 ]/2 + init_means[ 1 ]
+        cutoff1 = (init_means[ 1 ] - init_means[ 0 ])/2 + init_means[ 0 ]
+        cutoff2 = (init_means[ 2 ] - init_means[ 1 ])/2 + init_means[ 1 ]
 
         sum3 = len( self.__data )
         sum2 = sum( self.__data < cutoff2 )
@@ -160,7 +142,8 @@ cdef class HMMR_EM:
         counter2 = sum2 - sum1
         counter1 = sum1
 
-        self.__weight = np.array([ counter1/sum3, counter2/sum3, counter3/sum3])
+        self.__weights = np.array([ counter1/sum3, counter2/sum3, counter3/sum3])
+        print( f"initial: means: {self.fragMeans}, stddevs: {self.fragStddevs}, weights: {self.__weights}" )
         self.learn()
         return
 
@@ -182,21 +165,23 @@ cdef class HMMR_EM:
         
         self.converged = False
         while self.converged == False:
-            for i in range( 0, 3 ):                
+            for i in range( 3 ):                
                 old_means[i] = self.fragMeans[i]
                 old_stddevs[i] = self.fragStddevs[i]
                 old_weights[i] = self.__weights[i]
 
             self.__iterate()
-
+            itr += 1
+            print( f"after iteration {itr}: means: {self.fragMeans}, stddevs: {self.fragStddevs}, weights: {self.__weights}" )
+            
             counter = 0
-            for i in range( 0, 3 ):
+            for i in range( 3 ):
                 if abs(old_means[i] - self.fragMeans[i]) < self.epsilon and abs(old_weights[i] - self.__weights[i]) < self.epsilon and abs(old_stddevs[i] - self.fragStddevs[i]) < self.epsilon:
                     counter += 1
             if counter == 3:
                 self.converged = True
-            itr += 1
             if itr >= self.maxIter:
+                print( "Reach maximum number of iterations, quit..." )
                 break
         return self.converged
 
@@ -207,7 +192,7 @@ cdef class HMMR_EM:
         return value:
         """
         cdef:
-            np.ndarray temp, counter, means, stds
+            np.ndarray temp, counter, means, stds, __s, __c
             long total
             int i, j, index
 
@@ -215,28 +200,38 @@ cdef class HMMR_EM:
         counter = np.zeros(3, dtype=int) # for each category, the number of data points/fragment
         total = 0 # total number of data points/fragments assigned to
                   # three categories
-        means = np.zeros(3, dtype=float)              # for each category, the new mean
-        stds = np.zeros(3, dtype=float)               # for each category, the new stddev
+        __means = np.zeros(3, dtype=float)              # for each category, the new mean
+        __stds = np.zeros(3, dtype=float)               # for each category, the new stddev
+        __s = np.zeros(3, dtype=float)                # for each
+                                                      # category, __s
+                                                      # is for storing
+                                                      # intermediate
+                                                      # values for the
+                                                      # online
+                                                      # algorithm
+        __c = np.zeros(3, dtype=long)                 # for each
+                                                      # category, __c
+                                                      # is for storing
+                                                      # intermediate
+                                                      # values for the
+                                                      # online
+                                                      # algorithm
         for i in range( 0, len( self.__data ) ):
-            for j in range( 0, 3 ):
-                # for each category: mono, di, tri- (4 in total)
+            for j in range( 3 ):
+                # for each category: mono, di, tri- (3 in total), we get the likelihoods
                 temp[j] = get_weighted_density( self.__data[i], self.fragMeans[j], self.fragStddevs[j], self.__weights[j] )
             # now look for the most likely category, as `index`
             index = return_greater( temp )
 
-            # is this too large of a file to save means,stds for each iteration?
+            # then we will update __means and __stds
             if index != -1: # If we can find a mostly likely category
-                ##----
-                means[index] = np.mean( self.__data[0:i] ) #check - do we want means[index] or means[i] or means.append()
-                stds[index] = np.std(self.__data[0:i])
-                ##---- This block is wrong. We need to implement incremental way to calculate mean and stddev
-                ## https://en.wikipedia.org/wiki/Algorithms_for_calculating_variance#Welford's_online_algorithm
-                ## Check this
-                counter[index] += 1.0 # check on this - do we want it to be a list with increasing values?
+                ##---- update with online algorithm --
+                (__c[ index ], __means[ index ], __s[ index ]) = online_update( self.__data[ i ], __c[ index ], __means[ index ], __s[ index ] )
+                __stds[index] = sqrt( __s[ index ]/__c[ index ] )
                 total += 1
                 
-        for j in range( 0, 3 ): # what are the lengths of means, stds, data, mu?
-            # we will emplify the difference between new and old means/stds, and update weights.
-            self.fragMeans[ j ] = self.fragMeans[ j ] + (self.jump * (means[ j ] - self.fragMeans[ j ]))
-            self.fragStddevs[ j ] = self.fragStddevs[ j ] + (self.jump * (stds[ j ] - self.fragStddevs[ j ]))
-            self.weights[ j ] = counter[ j ] / total
+        for j in range( 3 ): 
+            self.fragMeans[ j ] = __means[ j ]
+            self.fragStddevs[ j ] = __stds[ j ]
+            self.__weights[ j ] = __c[ j ] / total
+        return

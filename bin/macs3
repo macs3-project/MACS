@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# Time-stamp: <2021-12-20 09:17:28 ta32852>
+# Time-stamp: <2022-02-22 18:12:35 Tao Liu>
 
 """Description: MACS v3 main executable.
 
@@ -97,7 +97,6 @@ def main():
         run( args )
     elif subcommand == "hmmratac":
         # pileup alignment results with a given extension method
-        pass
         from MACS3.Commands.hmmratac_cmd import run
         run( args )
     elif subcommand == "callvar":
@@ -737,9 +736,9 @@ def add_hmmratac_parser( subparsers ):
                                                 epilog = "TBA...")
     # group for input files
     group_input = argparser_hmmratac.add_argument_group( "Input files arguments" )
-    group_input.add_argument( "-b", "--bam", dest = "bam_file", type = str, required = True, 
-                              help = "Sorted BAM file containing the ATAC-seq reads" )
-
+    group_input.add_argument( "-b", "--bam", dest = "bam_file", type = str, required = True, nargs = "+",
+                              help = "Sorted BAM files containing the ATAC-seq reads. If multiple files are given as '-t A B C', then they will all be read and pooled together. REQUIRED." )
+    
     # group for output files
     group_output = argparser_hmmratac.add_argument_group( "Output arguments" )
     add_outdir_option( group_output )
@@ -768,7 +767,7 @@ def add_hmmratac_parser( subparsers ):
     group_em.add_argument( "--means", dest = "em_means", type = float, nargs = 4,
                             help = "Comma separated list of initial mean values for the fragment distribution for short fragments, mono-, di-, and tri-nucleosomal fragments. Default: 50 200 400 600",
                             default = [50, 200, 400, 600] )
-    group_em.add_argument( "--stddev", dest = "em_stddev", type = float, nargs = 4,
+    group_em.add_argument( "--stddevs", dest = "em_stddevs", type = float, nargs = 4,
                             help = "Comma separated list of initial standard deviation values for fragment distribution for short fragments, mono-, di-, and tri-nucleosomal fragments. Default: 20 20 20 20",
                             default = [20, 20, 20, 20] )
     # group for HMM
@@ -814,7 +813,7 @@ def add_hmmratac_parser( subparsers ):
                              default = 100 )
     # group for misc
     group_misc = argparser_hmmratac.add_argument_group( "Misc arguments" )
-    group_misc.add_argument( "-e", "--blacklist", dest = "misc_blacklist", type = str, required = False, 
+    group_misc.add_argument( "-e", "--blacklist", dest = "blacklist", type = str, required = False, 
                               help = "Filename of blacklisted regions to exclude (previously was BED_file). Examples are those from ENCODE. Default: NA" )
     group_misc.add_argument( "--keep-duplicates", dest = "misc_keep_duplicates", action = "store_true",
                              help = "Keep duplicate reads from analysis. By default, duplicate reads will be removed. Default: False",
@@ -830,7 +829,9 @@ def add_hmmratac_parser( subparsers ):
                              default = 2 )
     group_misc.add_argument( "-q", "--minmapq", dest = "min_map_quality", type = int,
                                help = "Minimum mapping quality of reads to keep. Default: 30",
-                               default = 30 )    
+                               default = 30 )
+    group_misc.add_argument( "--buffer-size", dest = "buffer_size", type = int, default = "100000",
+                               help = "Buffer size for incrementally increasing internal array size to store reads alignment information. In most cases, you don't have to change this parameter. However, if there are large number of chromosomes/contigs/scaffolds in your alignment, it's recommended to specify a smaller buffer size in order to decrease memory usage (but it will take longer time to read alignment files). Minimum memory requested for reading an alignment file is about # of CHROMOSOME * BUFFER_SIZE * 8 Bytes. DEFAULT: 100000 " )
     
     return
 

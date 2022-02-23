@@ -1,4 +1,4 @@
-# Time-stamp: <2021-12-20 09:20:04 ta32852>
+# Time-stamp: <2022-02-22 18:05:29 Tao Liu>
 
 """Module Description
 
@@ -862,11 +862,11 @@ def opt_validate_hmmratac ( options ):
     if options.em_skip:
         options.artxt += " EM training not performed on fragment distribution. \n"
     # em_means non-negative
-    if options.em_means <0:
+    if sum( [ x < 0 for x in options.em_means ] ):
         logging.error(" --means should not be negative! ")
         sys.exit( 1 )
     # em_stddev non-negative
-    if options.en_stddev <0:
+    if sum( [ x < 0 for x in options.em_stddevs ] ):
         logging.error(" --stddev should not be negative! ")
         sys.exit( 1 )
 
@@ -900,13 +900,13 @@ def opt_validate_hmmratac ( options ):
         options.artxt += " Using -t, --training input to train HMM instead of using fold change settings to select. \n"
     
     # hmm_zscore non-negative
-    if options.zscore <0:
+    if options.hmm_zscore <0:
         logging.error(" -z, --zscore should not be negative! ")
         sys.exit( 1 )
     
     # hmm_randomSeed
-    if options.randomSeed:
-        options.argtxt += " Random seed selected as: %d\n" (options.randomSeed)
+    if options.hmm_randomSeed:
+        options.argtxt += " Random seed selected as: %d\n" % options.hmm_randomSeed
     
     # hmm_window non-negative
     if options.hmm_window <0:
