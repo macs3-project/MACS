@@ -1,6 +1,6 @@
 # cython: language_level=3
 # cython: profile=True
-# Time-stamp: <2020-12-03 15:01:28 Tao Liu>
+# Time-stamp: <2022-03-02 18:04:30 Tao Liu>
 
 """Module for BedGraph data class.
 
@@ -16,12 +16,12 @@ import logging
 #from array import array
 from cpython cimport array
 from array import array as pyarray
-
+from math import prod
 # ------------------------------------
 # MACS3 modules
 # ------------------------------------
 from MACS3.Signal.ScoreTrack import ScoreTrackII
-from MACS3.IO.PeakIO import PeakIO, BroadPeakIO
+from MACS3.IO.PeakIO import PeakIO, BroadPeakIO, RegionIO
 from MACS3.Signal.Prob import chisq_logp_e
 
 # ------------------------------------
@@ -57,6 +57,20 @@ cdef inline mean_func( x ):
 cdef inline fisher_func( x ):
     # combine -log10pvalues
     return chisq_logp_e( 2*sum (x )/LOG10_E, 2*len( x ), log10=True )
+
+cdef inline subtract_func( x ):
+    # subtraction of two items list
+    return x[1] - x[0]
+
+cdef inline divide_func( x ):
+    # division of two items list
+    return x[1] / x[2]
+
+cdef inline product_func( x ):
+    # production of a list of values
+    # only python 3.8 or above
+    return prod( x )
+    
 # ------------------------------------
 # Classes
 # ------------------------------------
@@ -148,6 +162,25 @@ cdef class bedGraphTrackI:
         if value < self.minvalue:
             self.minvalue = value
 
+    cpdef add_chrom_data( self, bytes chromosome, object p, object v ):
+        """Add a pv data to a chromosome. Replace the previous data.
+
+        p: a pyarray object 'i' for positions
+        v: a pyarray object 'f' for values
+
+        Note: no checks for error, use with caution
+        """
+        cdef:
+            float32_t maxv, minv
+
+        self.__data[ chromosome ] = [ p, v ]
+        maxv = max( v )
+        minv = min( v )
+        if maxv > self.maxvalue:
+            self.maxvalue = maxv
+        if minv < self.minvalue:
+            self.minvalue = minv
+        return
 
     cpdef bool destroy ( self ):
         """ destroy content, free memory.
@@ -311,7 +344,7 @@ cdef class bedGraphTrackI:
             self.__data[chrom]=[new_pos,new_value]
         return True
 
-    cpdef summary (self):
+    cpdef tuple summary (self):
         """Calculate the sum, max, min, mean, and std. Return a tuple for (sum, max, min, mean, std).
 
         """
@@ -592,7 +625,7 @@ cdef class bedGraphTrackI:
         return ret
 
     cpdef object overlie (self, object bdgTracks, str func="max" ):
-        """Calculate two bedGraphTrackI objects by letting self
+        """Calculate two or more bedGraphTrackI objects by letting self
         overlying bdgTrack2, with user-defined functions.
 
         Transition positions from both bedGraphTrackI objects will be
@@ -619,9 +652,13 @@ cdef class bedGraphTrackI:
 
         Then the given 'func' will be applied on each 2-tuple as func(#1,#2)
 
-        Supported 'func' are "max", "mean" and "fisher".
+        Supported 'func' are "sum", "subtract" (only for two bdg
+        objects), "product", "divide" (only for two bdg objects),
+        "max", "mean" and "fisher".
 
-        Return value is a bedGraphTrackI object.
+        Return value is a new bedGraphTrackI object.
+
+        Option: bdgTracks can be a list of bedGraphTrackI objects
         """
         cdef:
             int32_t pre_p, p1, p2
@@ -629,7 +666,7 @@ cdef class bedGraphTrackI:
             bytes chrom
 
         nr_tracks = len(bdgTracks) + 1  # +1 for self
-        assert nr_tracks >= 2, "Specify at least two replicates"
+        assert nr_tracks >= 2, "Specify at least one more bdg objects."
         for i, bdgTrack in enumerate(bdgTracks):
             assert isinstance(bdgTrack, bedGraphTrackI), "bdgTrack{} is not a bedGraphTrackI object".format(i + 1)
 
@@ -639,8 +676,22 @@ cdef class bedGraphTrackI:
             f = mean_func
         elif func == "fisher":
             f = fisher_func
+        elif func == "sum":
+            f = sum
+        elif func == "product":
+            f = product_func
+        elif func == "subtract":
+            if nr_tracks == 2:
+                f = subtract_func
+            else:
+                raise Exception(f"Only one more bdg object is allowed, but provided {nr_tracks-1}")
+        elif func == "divide":
+            if nr_tracks == 2:
+                f = divide_func
+            else:
+                raise Exception(f"Only one more bdg object is allowed, but provided {nr_tracks-1}")
         else:
-            raise Exception("Invalid function")
+            raise Exception("Invalid function {func}! Choose from 'sum', 'subtract' (only for two bdg objects), 'product', 'divide' (only for two bdg objects), 'max', 'mean' and 'fisher'. ")
 
         ret = bedGraphTrackI()
         retadd = ret.add_loc
@@ -775,10 +826,8 @@ cdef class bedGraphTrackI:
 
 
     cpdef object extract_value ( self, object bdgTrack2 ):
-        """It's like overlie function. THe overlapped regions between
-        bdgTrack2 and self, will be recorded. The values from self in
-        the overlapped regions will be outputed in a single array for
-        follow statistics.
+        """Extract values from regions defined in RegionIO class object
+        `regions`.
 
         """
         cdef:
@@ -787,7 +836,7 @@ cdef class bedGraphTrackI:
             bytes chrom
             object ret
 
-        assert isinstance(bdgTrack2,bedGraphTrackI), "bdgTrack2 is not a bedGraphTrackI object"
+        assert isinstance(bdgTrack2,bedGraphTrackI), "not a bedGraphTrackI object"
 
         ret = [ [], pyarray('f',[]), pyarray('L',[]) ] # 1: region in bdgTrack2; 2: value; 3: length with the value
         radd = ret[0].append

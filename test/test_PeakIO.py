@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# Time-stamp: <2019-08-09 14:43:31 taoliu>
+# Time-stamp: <2022-03-02 18:09:48 Tao Liu>
 
 import unittest
 import sys
@@ -7,7 +7,6 @@ import sys
 from MACS3.IO.PeakIO import *
 
 class Test_Region(unittest.TestCase):
-
     def setUp(self):
         self.test_regions1 = [(b"chrY",0,100),
                               (b"chrY",300,500),
@@ -30,18 +29,18 @@ class Test_Region(unittest.TestCase):
 
     def test_add_loc1(self):
         # make sure the shuffled sequence does not lose any elements
-        self.r1 = Region()
+        self.r1 = RegionIO()
         for a in self.test_regions1:
             self.r1.add_loc(a[0],a[1],a[2])
 
     def test_add_loc2(self):
         # make sure the shuffled sequence does not lose any elements
-        self.r2 = Region()
+        self.r2 = RegionIO()
         for a in self.test_regions2:
             self.r2.add_loc(a[0],a[1],a[2])
 
     def test_merge(self):
-        self.mr = Region()
+        self.mr = RegionIO()
         for a in self.test_regions1:
             self.mr.add_loc(a[0],a[1],a[2])
         for a in self.test_regions2:
