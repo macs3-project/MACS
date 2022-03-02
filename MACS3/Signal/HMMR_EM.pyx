@@ -1,6 +1,6 @@
 # cython: language_level=3
 # cython: profile=True
-# Time-stamp: <2022-02-23 13:41:41 Tao Liu>
+# Time-stamp: <2022-02-23 17:37:36 Tao Liu>
 
 """Module description:
 
@@ -121,7 +121,6 @@ cdef class HMMR_EM:
             float cutoff1, cutoff2
             long sum1, sum2, sum3, counter1, counter2, counter3
         # initial values
-        self.__petrack = petrack # we may need to use a deepcopy
         self.min_fraglen = min_fraglen
         self.max_fraglen = max_fraglen
         self.epsilon = epsilon
@@ -136,12 +135,12 @@ cdef class HMMR_EM:
 
         # first, let's prepare the lengths data
         # sample down
-        self.__petrack.sample_percent( self.sample_percentage/100.0, seed = self.seed ) # may need to provide seed option for init function
+        self.__petrack = petrack.sample_percent_copy( self.sample_percentage/100.0, seed = self.seed ) # may need to provide seed option for init function
         self.__data = self.__petrack.fraglengths()
         # then we only keep those with fragment lengths within certain range
         self.__data = self.__data[ np.logical_and( self.__data >= self.min_fraglen, self.__data <= self.max_fraglen ) ]
 
-        debug(f"totally {self.__data.shape[0]} fragments will be used for EM training...")
+        info(f"# Downsampled {self.__data.shape[0]} fragments will be used for EM training...")
         # next, we will calculate the weights -- ie the proportion of fragments in each length category
         cutoff1 = (init_means[ 1 ] - init_means[ 0 ])/2 + init_means[ 0 ]
         cutoff2 = (init_means[ 2 ] - init_means[ 1 ])/2 + init_means[ 1 ]

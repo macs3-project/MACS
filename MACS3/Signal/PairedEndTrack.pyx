@@ -1,6 +1,6 @@
 # cython: language_level=3
 # cython: profile=True
-# Time-stamp: <2022-02-22 18:19:47 Tao Liu>
+# Time-stamp: <2022-02-23 17:35:09 Tao Liu>
 
 """Module for filter duplicate tags from paired-end data
 
@@ -16,13 +16,14 @@ import io
 import sys
 from logging import debug, info
 from copy import copy
+from array import array as pyarray
 
 # ------------------------------------
 # MACS3 modules
 # ------------------------------------
 from MACS3.Utilities.Constants import *
 from MACS3.Signal.Pileup import quick_pileup, over_two_pv_array, se_all_in_one_pileup
-
+from MACS3.Signal.BedGraph import bedGraphTrackI
 # ------------------------------------
 # Other modules
 # ------------------------------------
@@ -338,7 +339,7 @@ cdef class PETrackI:
     cpdef void sample_percent (self, float32_t percent, int32_t seed = -1):
         """Sample the tags for a given percentage.
 
-        Warning: the current object is changed!
+        Warning: the current object is changed! If a new PETrackI is wanted, use sample_percent_copy instead.
         """
         cdef:
             uint32_t num, i_chrom      # num: number of reads allowed on a certain chromosome
@@ -367,6 +368,39 @@ cdef class PETrackI:
             self.total += self.__pointer[k]
         self.average_template_length = <float32_t>( self.length )/ self.total
         return
+
+    cpdef object sample_percent_copy (self, float32_t percent, int32_t seed = -1):
+        """Sample the tags for a given percentage. Return a new PETrackI object
+
+        """
+        cdef:
+            uint32_t num, i_chrom      # num: number of reads allowed on a certain chromosome
+            bytes k
+            set chrnames
+            object ret_petrackI
+            np.ndarray l
+
+        ret_petrackI = PETrackI( anno=self.annotation, buffer_size = self.buffer_size)
+        chrnames = self.get_chr_names()
+
+        if seed >= 0:
+            np.random.seed(seed)
+
+        for k in chrnames:
+            # for each chromosome.
+            # This loop body is too big, I may need to split code later...
+            l = np.copy( self.__locations[k] )
+            num = <uint32_t>round(l.shape[0] * percent, 5 )
+            np.random.shuffle( l )
+            l.resize( num, refcheck = False )
+            l.sort( order = ['l', 'r'] ) # sort by leftmost positions
+            ret_petrackI.__locations[ k ] = l
+            ret_petrackI.__pointer[ k ] = l.shape[0]
+            ret_petrackI.length += ( l['r'] - l['l'] ).sum()
+            ret_petrackI.total += ret_petrackI.__pointer[ k ]
+        ret_petrackI.average_template_length = <float32_t>( ret_petrackI.length )/ ret_petrackI.total
+        ret_petrackI.set_rlengths( self.get_rlengths() )
+        return ret_petrackI
 
     cpdef void sample_num (self, uint64_t samplesize, int32_t seed = -1):
         """Sample the tags for a given percentage.
@@ -473,3 +507,33 @@ cdef class PETrackI:
         return prev_pileup
 
 
+    cpdef object pileup_bdg ( self, list scale_factor_s, float32_t baseline_value = 0.0 ):
+        """pileup all chromosomes, and return a bedGraphTrackI object.
+
+        scale_factor_s  : linearly scale the pileup value applied to each d in ds. The list should have the same length as ds.
+        baseline_value : a value to be filled for missing values, and will be the minimum pileup.
+        """
+        cdef:
+            list tmp_pileup, prev_pileup
+            float32_t scale_factor
+            bytes chrom
+            object bdg
+            int32_t prev_s
+
+        info(f"start to pileup")
+        bdg = bedGraphTrackI( baseline_value = baseline_value )
+
+        for chrom in self.get_chr_names():
+            prev_pileup = None
+            for i in range(len(scale_factor_s)):
+                scale_factor = scale_factor_s[i]
+
+                tmp_pileup = quick_pileup ( np.sort(self.__locations[chrom]['l']), np.sort(self.__locations[chrom]['r']), scale_factor, baseline_value ) # Can't directly pass partial nparray there since that will mess up with pointer calculation.
+
+                if prev_pileup:
+                    prev_pileup = over_two_pv_array ( prev_pileup, tmp_pileup, func="max" )
+                else:
+                    prev_pileup = tmp_pileup
+            # save to bedGraph
+            bdg.add_chrom_data( chrom, pyarray('i', prev_pileup[0]), pyarray('f', prev_pileup[1]) )
+        return bdg
