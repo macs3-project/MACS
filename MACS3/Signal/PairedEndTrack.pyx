@@ -1,6 +1,6 @@
 # cython: language_level=3
 # cython: profile=True
-# Time-stamp: <2022-02-23 17:35:09 Tao Liu>
+# Time-stamp: <2022-03-09 11:14:43 Tao Liu>
 
 """Module for filter duplicate tags from paired-end data
 
@@ -17,6 +17,7 @@ import sys
 from logging import debug, info
 from copy import copy
 from array import array as pyarray
+from collections import Counter
 
 # ------------------------------------
 # MACS3 modules
@@ -36,24 +37,25 @@ cimport cython
 
 cdef INT_MAX = <int32_t>((<uint32_t>(-1))>>1)
 
-cdef packed struct peLoc:
-    int32_t l
-    int32_t r
+# We don't use the following structs anymore
+# cdef packed struct peLoc:
+#     int32_t l
+#     int32_t r
 
-
-cdef class PETrackChromosome:
-    cdef:
-        public np.ndarray locations
-        public uint32_t pointer
-        public uint32_t buffer_size
-        public uint64_t coverage
-        public uint64_t chrlen
-        uint32_t __buffer_increment
-        bool __sorted
-        bool __destroyed
+# cdef class PETrackChromosome:
+#     cdef:
+#         public np.ndarray locations
+#         public uint32_t pointer
+#         public uint32_t buffer_size
+#         public uint64_t coverage
+#         public uint64_t chrlen
+#         uint32_t __buffer_increment
+#         bool __sorted
+#         bool __destroyed
 
 # Let numpy enforce PE-ness using ndarray, gives bonus speedup when sorting
 # PE data doesn't have strandedness
+
 cdef class PETrackI:
     """Paired End Locations Track class I along the whole genome
     (commonly with the same annotation type), which are stored in a
@@ -64,7 +66,7 @@ cdef class PETrackI:
     """
     cdef:
         public dict __locations
-        public dict __pointer
+        public dict __size
         public dict __buf_size
         public bool __sorted
         public uint64_t total
@@ -80,7 +82,7 @@ cdef class PETrackI:
 
         """
         self.__locations = {}    # dictionary with chrname as key, nparray with [('l','int32'),('r','int32')] as value
-        self.__pointer = {}      # dictionary with chrname as key, size of the above nparray as value
+        self.__size = {}      # dictionary with chrname as key, size of the above nparray as value
         self.__buf_size = {}      # dictionary with chrname as key, size of the above nparray as value
         self.__sorted = False
         self.total = 0           # total fragments
@@ -103,14 +105,14 @@ cdef class PETrackI:
             self.__buf_size[chromosome] = self.buffer_size
             self.__locations[chromosome] = np.zeros(shape=self.buffer_size, dtype=[('l','int32'),('r','int32')]) # note: ['l'] is the leftmost end, ['r'] is the rightmost end of fragment.
             self.__locations[chromosome][0] = ( start, end )
-            self.__pointer[chromosome] = 1
+            self.__size[chromosome] = 1
         else:
-            i = self.__pointer[chromosome]
+            i = self.__size[chromosome]
             if self.__buf_size[chromosome] == i:
                 self.__buf_size[chromosome] += self.buffer_size
                 self.__locations[chromosome].resize((self.__buf_size[chromosome]), refcheck = False )
             self.__locations[chromosome][ i ] = ( start, end )
-            self.__pointer[chromosome] = i + 1
+            self.__size[chromosome] = i + 1
         self.length += end - start
         return
 
@@ -129,15 +131,14 @@ cdef class PETrackI:
                 self.__locations[chromosome] = None
                 self.__locations.pop(chromosome)
         self.__destroyed = True
-
         return
 
     cpdef bint set_rlengths ( self, dict rlengths ):
         """Set reference chromosome lengths dictionary.
 
-        Only the chromosome existing in this fwtrack object will be updated.
+        Only the chromosome existing in this petrack object will be updated.
 
-        If chromosome in this fwtrack is not covered by given
+        If a chromosome in this petrack is not covered by given
         rlengths, and it has no associated length, it will be set as
         maximum integer.
         """
@@ -179,9 +180,9 @@ cdef class PETrackI:
         chrnames = self.get_chr_names()
 
         for c in chrnames:
-            self.__locations[c].resize((self.__pointer[c]), refcheck=False)
+            self.__locations[c].resize((self.__size[c]), refcheck=False)
             self.__locations[c].sort( order=['l', 'r'] )
-            self.total += self.__locations[c].shape[0]
+            self.total += self.__size[c]
 
         self.__sorted = True
         self.average_template_length = <float32_t>( self.length ) / self.total
@@ -220,6 +221,29 @@ cdef class PETrackI:
         self.__sorted = True
         return
 
+    cpdef dict count_fraglengths ( self ):
+        """Return a dictionary of the counts for sizes/fragment lengths of each pair.
+
+        This function is for HMMRATAC.
+        """
+        cdef:
+            np.ndarray[np.int32_t, ndim=1] sizes
+            np.int32_t s
+            np.ndarray locs
+            list chrnames
+            int i
+            #dict ret_dict
+            bytes k
+
+        counter = Counter()
+        chrnames = list( self.get_chr_names() )
+        for i in range( len(chrnames) ):
+            locs = self.__locations[ chrnames[i] ]
+            sizes = locs['r'] - locs['l']
+            for s in sizes:
+                counter[ s ] += 1
+        return dict(counter)
+
     cpdef np.ndarray fraglengths ( self ):
         """Return the sizes/fragment lengths of each pair.
 
@@ -237,7 +261,7 @@ cdef class PETrackI:
         for i in range( 1, len(chrnames) ):
             locs = self.__locations[ chrnames[i] ]
             sizes.append( locs['r'] - locs['l'] )
-        return sizes
+        return sizes    
     
     cpdef np.ndarray pmf( self ):
         """return a 1-D numpy array of the probabilities of observing each
@@ -325,8 +349,8 @@ cdef class PETrackI:
                         # subtract current_loc_l from self.length
                         self.length -= current_loc_end - current_loc_start
             self.__locations[k] = locs[ selected_idx ]
-            self.__pointer[k] = self.__locations[k].shape[0]
-            self.total += self.__locations[k].shape[0]
+            self.__size[k] = self.__locations[k].shape[0]
+            self.total += self.__size[k]
             # free memory?
             # I know I should shrink it to 0 size directly,
             # however, on Mac OSX, it seems directly assigning 0
@@ -363,9 +387,9 @@ cdef class PETrackI:
             np.random.shuffle( self.__locations[k] )
             self.__locations[k].resize( num, refcheck = False )
             self.__locations[k].sort( order = ['l', 'r'] ) # sort by leftmost positions
-            self.__pointer[k] = self.__locations[k].shape[0]
+            self.__size[k] = self.__locations[k].shape[0]
             self.length += ( self.__locations[k]['r'] - self.__locations[k]['l'] ).sum()
-            self.total += self.__pointer[k]
+            self.total += self.__size[k]
         self.average_template_length = <float32_t>( self.length )/ self.total
         return
 
@@ -395,23 +419,33 @@ cdef class PETrackI:
             l.resize( num, refcheck = False )
             l.sort( order = ['l', 'r'] ) # sort by leftmost positions
             ret_petrackI.__locations[ k ] = l
-            ret_petrackI.__pointer[ k ] = l.shape[0]
+            ret_petrackI.__size[ k ] = l.shape[0]
             ret_petrackI.length += ( l['r'] - l['l'] ).sum()
-            ret_petrackI.total += ret_petrackI.__pointer[ k ]
+            ret_petrackI.total += ret_petrackI.__size[ k ]
         ret_petrackI.average_template_length = <float32_t>( ret_petrackI.length )/ ret_petrackI.total
         ret_petrackI.set_rlengths( self.get_rlengths() )
         return ret_petrackI
 
     cpdef void sample_num (self, uint64_t samplesize, int32_t seed = -1):
-        """Sample the tags for a given percentage.
+        """Sample the tags for a given number.
 
         Warning: the current object is changed!
         """
-        cdef float32_t percent
-
+        cdef:
+            float32_t percent
         percent = <float32_t>(samplesize)/self.total
         self.sample_percent ( percent, seed )
         return
+
+    cpdef object sample_num_copy (self, uint64_t samplesize, int32_t seed = -1):
+        """Sample the tags for a given number.
+
+        Warning: the current object is changed!
+        """
+        cdef:
+            float32_t percent
+        percent = <float32_t>(samplesize)/self.total
+        return self.sample_percent_copy ( percent, seed )
 
     cpdef void print_to_bed (self, fhd=None):
         """Output to BEDPE format files. If fhd is given, write to a
@@ -520,7 +554,7 @@ cdef class PETrackI:
             object bdg
             int32_t prev_s
 
-        info(f"start to pileup")
+        #info(f"start to pileup")
         bdg = bedGraphTrackI( baseline_value = baseline_value )
 
         for chrom in self.get_chr_names():
@@ -537,3 +571,35 @@ cdef class PETrackI:
             # save to bedGraph
             bdg.add_chrom_data( chrom, pyarray('i', prev_pileup[0]), pyarray('f', prev_pileup[1]) )
         return bdg
+
+    cpdef object pileup_bdg_hmmr ( self, list means, list stdevs, float32_t baseline_value = 0.0 ):
+        """pileup all chromosomes, and return a list of four bedGraphTrackI objects: short, mono, di, and tri nucleosomal signals.
+
+        The idea is that for each fragment length, we generate four bdg using four weights from four distributions. Then we add all sets of four bdgs together.
+
+        """
+        cdef:
+            list tmp_pileup, prev_pileup
+            float32_t scale_factor
+            bytes chrom
+            object bdg
+            int32_t prev_s
+
+        #info(f"start to pileup")
+        bdg = bedGraphTrackI( baseline_value = baseline_value )
+
+        for chrom in self.get_chr_names():
+            prev_pileup = None
+            for i in range(len(scale_factor_s)):
+                scale_factor = scale_factor_s[i]
+
+                tmp_pileup = quick_pileup ( np.sort(self.__locations[chrom]['l']), np.sort(self.__locations[chrom]['r']), scale_factor, baseline_value ) # Can't directly pass partial nparray there since that will mess up with pointer calculation.
+
+                if prev_pileup:
+                    prev_pileup = over_two_pv_array ( prev_pileup, tmp_pileup, func="max" )
+                else:
+                    prev_pileup = tmp_pileup
+            # save to bedGraph
+            bdg.add_chrom_data( chrom, pyarray('i', prev_pileup[0]), pyarray('f', prev_pileup[1]) )
+        return bdg
+

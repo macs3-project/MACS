@@ -46,8 +46,8 @@ tests_requires = [ 'pytest' ]
 
 
 def main():
-    if sys.version_info < (3,6):
-        sys.stderr.write("CRITICAL: Python version must >= 3.6!\n")
+    if sys.version_info < (3,8):
+        sys.stderr.write("CRITICAL: Python version must >= 3.8!\n")
         sys.exit(1)
 
     # NumPy include dir
@@ -145,7 +145,7 @@ def main():
            install_requires = install_requires,
            setup_requires = install_requires,
            tests_require = tests_requires,
-           python_requires = '>=3.6',
+           python_requires = '>=3.8',
            ext_modules = ext_modules )
 
 if __name__ == '__main__':

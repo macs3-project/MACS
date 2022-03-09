@@ -1,4 +1,4 @@
-# Time-stamp: <2022-02-23 13:41:29 Tao Liu>
+# Time-stamp: <2022-03-09 11:22:08 Tao Liu>
 
 """Description: Main HMMR command
 
@@ -56,6 +56,7 @@ def run( args ):
         for bamfile in options.bam_file[1:]:
             bam = BAMPEParser(bamfile, buffer_size=options.buffer_size)
             petrack = bam.append_petrack( petrack )
+    # remember to finalize the petrack
     petrack.finalize()
 
     # filter duplicates if needed
@@ -75,12 +76,12 @@ def run( args ):
             blacklist.sort()
 
     #############################################
-    # 2. EM - created separate file for HMMR_EM
+    # 2. EM
     #############################################
     # we will use EM to get the best means/stddevs for the mono-, di- and tri- modes of fragment sizes
     options.info("# Use EM algorithm to estimate means and stddevs of fragment lengths")
     options.info("  for mono-, di-, and tri-nucleosomal signals...") 
-    em_trainer = HMMR_EM.HMMR_EM( petrack, options.em_means[1:4], options.em_stddevs[1:4], seed = options.hmm_randomSeed ) # we take the options and initialize the object, then let it run
+    em_trainer = HMMR_EM.HMMR_EM( petrack, options.em_means[1:4], options.em_stddevs[1:4], seed = options.hmm_randomSeed )
     # the mean and stddev after EM training
     em_means = [options.em_means[0],]
     em_means.extend(em_trainer.fragMeans)
@@ -92,33 +93,65 @@ def run( args ):
     options.info( f"  Stddevs: {em_stddevs}")
 
 
-#############################################
-# 3. Pileup
-#############################################
-    
-    #pileup(SplitBed(GENOME, options.hmm_window), options.bamfile, options.index, options.misc_keep_duplicates)
-    #bedGraphMath(pileup.out)
-    #MergeBed(bedGraphMath.out, options.hmm_upper, options.hmm_lower) 
-    #ExtendBed()  
-    #SubtractedBed()
+    #############################################
+    # 3. Pileup and define training set by peak calling
+    #############################################
+
+    # Find regions with fold change within determined range to use as training sites.
+    # Find regions with zscore values above certain cutoff to exclude from viterbi.
+    # Pileup
+    options.info( f"# Look for training set from {petrack.total} fragments" )
+    options.info( f"# Pile up all fragments" )
+    bdg = petrack.pileup_bdg( [1.0,], baseline_value = 0 )
+    (sum_v, n_v, max_v, min_v, mean_v, std_v) = bdg.summary()
+    options.info( f"# Call peak above within FC range of {options.hmm_lower} and {options.hmm_upper}" )
+    options.info( f"# Convert pileup to fold-change over average signal" )
+    bdg.apply_func(lambda x: x/mean_v)
+    peaks = bdg.call_peaks (cutoff=options.hmm_lower, up_limit=options.hmm_upper, min_length=petrack.average_template_length, max_gap=petrack.average_template_length, call_summits=False)
+    options.info( f"# Total peaks within range: {peaks.total}" )
+    # remove peaks overlapping with blacklisted regions
+    if options.blacklist:
+        peaks.exclude( blacklist )
+    options.info( f"# after removing those overlapping with provided blacklisted regions, we have {peaks.total} left" )
+
 #############################################
 # 4. Train HMM
 #############################################
+    options.info( f"# Generate short, mono-, di-, and tri-nucleosomal signals in training regions")
+    options.info( f"# TBI")
+    fl_dict = petrack.count_fraglengths()
+    fl_list = list(fl_dict.keys())
+    fl_list.sort()
+    for fl in fl_list:
+        print ( fl, fl_dict[fl] )
     #FragmentPileupGenerator(options.bamfile, options.index, options.training_set, options.em_means, options.em_stddev, options.min_map_quality, options.keep_duplicates)
+    
+    options.info( f"# Use K-means method to build initial states")
+    options.info( f"# TBI")
     #KMeanstoHMM(FragmentPileupGenerator.out, options.hmm_states)
+    
+    options.info( f"# Use Baum-Welch algorithm to train the HMM")
+    options.info( f"# TBI")    
     #BaumWelch(KMeanstoHMM.out)
     #OpdfMultiGaussian(BaumWelch.out)
 #############################################
 # 5. Predict
 #############################################
+    options.info( f"# Generate short, mono-, di-, and tri-nucleosomal signals in the whole genome")
+    options.info( f"# TBI")
     #FragPileupGen(options.bamfile, options.index, tempBed, options.em_means, options.em_stddev, options.min_map_quality, options.keep_duplicatess, cpmScale)
     #HMMRTracksToBedgraph(FragPileupGen.out)
+    
+    options.info( f"# Use HMM to predict states")
+    options.info( f"# TBI")    
     #RobustHMM(FragPileupGen.out, BaumWelch.out)
     #PileupNode(RobustHMM.out)
 #############################################
 # 6. Output - add to OutputWriter
 #############################################
     # bedGraphMath #for scoring
+    options.info( f"# Write the output...")
+    options.info( f"# TBI")
     #from MACS3.IO.OutputWriter import hmmratac_writer
     #hmmratac_writer()
     #

@@ -1,6 +1,6 @@
 # cython: language_level=3
 # cython: profile=True
-# Time-stamp: <2022-03-02 18:08:43 Tao Liu>
+# Time-stamp: <2022-03-03 15:07:45 Tao Liu>
 
 """Module for PeakIO IO classes.
 
@@ -201,6 +201,8 @@ cdef class PeakIO:
             new_peaks[chrom]=[p for p in self.peaks[chrom] if p['pscore'] >= pscore_cut]
             self.total +=  len( new_peaks[chrom] )
         self.peaks = new_peaks
+        self.CO_sorted = True
+        self.sort()
 
     cpdef void filter_qscore (self, double qscore_cut ):
         cdef:
@@ -216,6 +218,8 @@ cdef class PeakIO:
             new_peaks[chrom]=[p for p in self.peaks[chrom] if p['qscore'] >= qscore_cut]
             self.total +=  len( new_peaks[chrom] )
         self.peaks = new_peaks
+        self.CO_sorted = True
+        self.sort()
 
     cpdef void filter_fc (self, float fc_low, float fc_up = 0 ):
         """Filter peaks in a given fc range.
@@ -242,6 +246,31 @@ cdef class PeakIO:
                 new_peaks[chrom]=[p for p in self.peaks[chrom] if p['fc'] >= fc_low]
                 self.total +=  len( new_peaks[chrom] )
         self.peaks = new_peaks
+        self.CO_sorted = True
+        self.sort()
+
+    def __str__ (self):
+        """convert to text -- BED format
+        """
+        cdef:
+            list chrs
+            int n_peak
+            str ret            
+        ret = ""
+        chrs = list(self.peaks.keys())
+        chrs.sort()
+        n_peak = 0
+        for chrom in chrs:
+            for end, group in groupby(self.peaks[chrom], key=itemgetter("end")):
+                n_peak += 1
+                peaks = list(group)
+                if len(peaks) > 1:
+                    for i, peak in enumerate(peaks):
+                        ret += "%s\t%d\t%d\tpeak_%d%s\t%.6g\n" % (chrom.decode(),peak['start'],peak['end'],n_peak,subpeak_letters(i),peak["score"])
+                else:
+                    peak = peaks[0]
+                    ret += "%s\t%d\t%d\tpeak_%d\t%.6g\n" % (chrom.decode(),peak['start'],peak['end'],n_peak,peak["score"])
+        return ret
 
     cdef void _to_bed(self, bytes name_prefix=b"%s_peak_", bytes name=b"MACS",
                       bytes description=b"%s", str score_column="score",
@@ -548,6 +577,7 @@ cdef class PeakIO:
 
         self.sort()
         peaks1 = self.peaks
+        self.total = 0
         assert isinstance(peaksio2,PeakIO)
         peaksio2.sort()
         peaks2 = peaksio2.peaks
@@ -556,6 +586,7 @@ cdef class PeakIO:
         chrs1 = list(peaks1.keys())
         chrs2 = list(peaks2.keys())
         for k in chrs1:
+            #print(f"chromosome {k}")
             if not chrs2.count(k):
                 # no such chromosome in peaks1, then don't touch the peaks in this chromosome
                 ret_peaks[ k ] = peaks1[ k ]
@@ -563,26 +594,39 @@ cdef class PeakIO:
             ret_peaks[ k ] = []
             n_rl1 = len( peaks1[k] )
             n_rl2 = len( peaks2[k] )
-            rl1_k = iter( peaks1[k] )
-            rl2_k = iter( peaks2[k] )
+            rl1_k = iter( peaks1[k] ).__next__
+            rl2_k = iter( peaks2[k] ).__next__
             overlap_found = False
-            r1 = rl1_k.next()
+            r1 = rl1_k()
             n_rl1 -= 1
-            r2 = rl2_k.next()
+            r2 = rl2_k()
             n_rl2 -= 1
             while ( True ):
-                # we do this until there is no r2 left.
+                # we do this until there is no r1 or r2 left.
                 if r2["start"] < r1["end"] and r1["start"] < r2["end"]:
                     # since we found an overlap, r1 will be skipped/excluded
+                    # and move to the next r1
                     overlap_found = True
+                    #print(f"found overlap of {r1['start']} {r1['end']} and {r2['start']} {r2['end']}, move to the next r1")
+                    n_rl1 -= 1
+                    if n_rl1 >= 0:
+                        r1 = rl1_k()
+                        #print(f"move to next r1 {r1['start']} {r1['end']}")
+                        overlap_found = False
+                        continue
+                    else:
+                        break
                 if r1["end"] < r2["end"]:
+                    #print(f"now we need to move r1 {r1['start']} {r1['end']}")
                     # in this case, we need to move to the next r1,
                     # we will check if overlap_found is true, if not, we put r1 in a new dict
                     if not overlap_found:
+                        #print(f"we add this r1 {r1['start']} {r1['end']} to list")
                         ret_peaks[ k ].append( r1 )
-                    if n_rl1:
-                        r1 = rl1_k.next()
-                        n_rl1 -= 1
+                    n_rl1 -= 1
+                    if n_rl1 >= 0:
+                        r1 = rl1_k()
+                        #print(f"move to next r1 {r1['start']} {r1['end']}")
                         overlap_found = False
                     else:
                         # no more r1 left
@@ -590,17 +634,26 @@ cdef class PeakIO:
                 else:
                     # in this case, we need to move the next r2
                     if n_rl2:
-                        r2 = rl2_k.next()
+                        r2 = rl2_k()
                         n_rl2 -= 1
+                        #print(f"move to next r2 {r2['start']} {r2['end']}")                      
                     else:
                         # no more r2 left
                         break
             # add the rest of r1
-            if overlap_found:
-                n_rl1 -= 1      #
-            if n_rl1 > 0:
-                ret_peaks[ k ].extend( peaks2[ k ][-n_rl1:] )
+            #print( f"n_rl1: {n_rl1} n_rl2:{n_rl2} last overlap_found is {overlap_found}" )
+            #if overlap_found:
+            #    n_rl1 -= 1
+            if n_rl1 >= 0:
+                ret_peaks[ k ].extend( peaks1[ k ][-n_rl1-1:] )
+                #print(f"we extend the list from {-n_rl1} to end")
+            #print(f"final nonoverlapping regions: {ret_peaks[k]}" )
+            self.total += len( ret_peaks[ k ] )
+        #print(f"assigning...")
         self.peaks = ret_peaks
+        self.CO_sorted = True
+        self.sort()        
+        #print(f"return: {self}")
         return
 
     def read_from_xls (self, ofhd):
