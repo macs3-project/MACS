@@ -10,7 +10,7 @@ jobs:
     runs-on: ubuntu-20.04
     strategy: 
       matrix: 
-        python-version: [3.7, 3.8, 3.9, 3.10.0]
+        python-version: [3.8, 3.9, 3.10.0]
         arch: ['x64']
     name: Build on x64 with Python ${{ matrix.python-version }}
     steps:
