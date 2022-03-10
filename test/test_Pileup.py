@@ -8,8 +8,9 @@ the distribution).
 
 import unittest
 import numpy as np
-from math import log10
+from math import log2
 from MACS3.Signal.Pileup import *
+from MACS3.Signal.PileupV2 import *
 
 # ------------------------------------
 # Main function
@@ -259,3 +260,30 @@ class Test_Over_Two_PV_Array(unittest.TestCase):
            pre = pos
         #check result
         self.assertEqual( result, self.expect_pv_mean )
+
+class Test_PileupV2(unittest.TestCase):
+    """Unittest for pileup functions in PileupV2.pyx.
+
+    Function to test: make_PV_from_chromosome_PETrackI and pileup_PV
+
+    """
+    def setUp(self):
+        self.LR_array1 = np.array( [ (0,5), (1,6), (3,8), (3,8), (4,9), (5,10) ], dtype= [('l','int32'),('r','int32')])
+        # expected result from pileup_bdg_se: ( start, end, value )
+        self.expect_pileup_1 = np.array( [  ( 1, 1.0 ),
+                                            ( 3, 2.0 ),
+                                            ( 4, 4.0 ),
+                                            ( 6, 5.0 ),
+                                            ( 8, 4.0 ),
+                                            ( 9, 2.0 ),
+                                            ( 10, 1.0 ) ] , dtype=[ ( 'p', 'uint32' ), ( 'v', 'float32' ) ] )
+
+    def test_pileup_1(self):
+        PV_array = make_PV_from_LR( self.LR_array1 )
+        pileup = pileup_PV( PV_array )
+        np.testing.assert_equal( pileup, self.expect_pileup_1 )
+
+    def test_pileup_2(self):
+        PV_array = make_PV_from_LR( self.LR_array1, lambda x,y: log2(y-x) )
+        pileup = pileup_PV( PV_array )
+        np.testing.assert_equal( pileup, self.expect_pileup_1 )
