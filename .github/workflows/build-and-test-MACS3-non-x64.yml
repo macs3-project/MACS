@@ -13,20 +13,20 @@ jobs:
       matrix:
         include:
           - arch: armv7
-            distro: buster
+            distro: bullseye
           - arch: aarch64
-            distro: buster
+            distro: bullseye
           - arch: ppc64le
-            distro: buster
+            distro: bullseye
           - arch: s390x
-            distro: buster
+            distro: bullseye
     steps:
       - name: Checkout MACS
         uses: actions/checkout@v2.1.0
         with:
           submodules: 'true'
-      - name: Set up arch and run
-        uses: uraimo/run-on-arch-action@v2.0.5
+      - name: Set up arch and run (bullseye Python 3.9)
+        uses: uraimo/run-on-arch-action@v2.1.1
         id: build
         with:
           arch: ${{ matrix.arch }}
