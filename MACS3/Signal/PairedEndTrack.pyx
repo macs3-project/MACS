@@ -263,36 +263,6 @@ cdef class PETrackI:
             sizes.append( locs['r'] - locs['l'] )
         return sizes    
     
-    cpdef np.ndarray pmf( self ):
-        """return a 1-D numpy array of the probabilities of observing each
-        fragment size, indices are the bin number (first bin is 0)
-        """
-        cdef:
-            np.ndarray[np.int64_t, ndim=1] counts = np.zeros(self.buffer_size, dtype='int64')
-            np.ndarray[np.float64_t, ndim=1] pmf
-            np.ndarray[np.int64_t, ndim=1] bins
-            np.ndarray[np.int32_t, ndim=1] sizes, locs
-            bytes c
-            int32_t i, bins_len
-            int32_t max_bins = 0
-            set chrnames
-
-        chrnames = self.get_chr_names()
-
-        for c in chrnames:
-            locs = self.__locations[c]
-            sizes = locs['r'] - locs['l'] # +1 ?? irrelevant for use
-            bins = np.bincount(sizes).astype('int64')
-            bins_len = bins.shape[0]
-            if bins_len > max_bins: max_bins = bins_len
-            if counts.shape[0] < max_bins:
-                counts.resize(max_bins, refcheck=False)
-            counts += bins
-
-        counts.resize(max_bins, refcheck=False)
-        pmf = counts.astype('float64') / counts.astype('float64').sum()
-        return pmf
-
     @cython.boundscheck(False) # do not check that np indices are valid
     cpdef void filter_dup ( self, int32_t maxnum=-1):
         """Filter the duplicated reads.

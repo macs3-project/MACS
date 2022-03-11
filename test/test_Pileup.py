@@ -10,7 +10,7 @@ import unittest
 import numpy as np
 from math import log2
 from MACS3.Signal.Pileup import *
-from MACS3.Signal.PileupV2 import *
+from MACS3.Signal.PileupV2 import pileup_from_LR, pileup_from_PN
 
 # ------------------------------------
 # Main function
@@ -261,10 +261,10 @@ class Test_Over_Two_PV_Array(unittest.TestCase):
         #check result
         self.assertEqual( result, self.expect_pv_mean )
 
-class Test_PileupV2(unittest.TestCase):
+class Test_PileupV2_PE(unittest.TestCase):
     """Unittest for pileup functions in PileupV2.pyx.
 
-    Function to test: make_PV_from_chromosome_PETrackI and pileup_PV
+    Function to test: pileup_from_LR
 
     """
     def setUp(self):
@@ -298,11 +298,33 @@ class Test_PileupV2(unittest.TestCase):
                                              dtype=[ ( 'p', 'uint32' ), ( 'v', 'float32' ) ] )
 
     def test_pileup_1(self):
-        PV_array = make_PV_from_LR( self.LR_array1 )
-        pileup = pileup_PV( PV_array )
+        pileup = pileup_from_LR( self.LR_array1 )
         np.testing.assert_equal( pileup, self.expect_pileup_1 )
 
     def test_pileup_2(self):
-        PV_array = make_PV_from_LR( self.LR_array1, lambda x,y: log2(y-x) )
-        pileup = pileup_PV( PV_array )
+        pileup = pileup_from_LR( self.LR_array1, lambda x,y: log2(y-x) )
         np.testing.assert_equal( pileup, self.expect_pileup_2 )
+
+class Test_PileupV2_PE(unittest.TestCase):
+    """Unittest for pileup functions in PileupV2.pyx.
+
+    Function to test: pileup_from_PN
+
+    """
+    def setUp(self):
+        self.P = np.array( ( 0, 1, 3, 3, 4, 5 ), dtype="int32")   #plus strand pos
+        self.N = np.array( ( 5, 6, 8, 8, 9, 10 ), dtype="int32")  #minus strand pos
+        # expected result from pileup_bdg_se: ( start, end, value )
+        self.extsize = 2
+        self.expect_pileup_1 = np.array( [  ( 1, 1.0 ),
+                                            ( 3, 2.0 ),
+                                            ( 4, 4.0 ),
+                                            ( 6, 5.0 ),
+                                            ( 8, 4.0 ),
+                                            ( 9, 2.0 ),
+                                            ( 10, 1.0 ) ],
+                                            dtype=[ ( 'p', 'uint32' ), ( 'v', 'float32' ) ] )\
+
+    def test_pileup_1(self):
+        pileup = pileup_from_PN( self.P, self.N, self.extsize )
+        np.testing.assert_equal( pileup, self.expect_pileup_1 )        

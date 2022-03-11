@@ -1,6 +1,6 @@
 # cython: language_level=3
 # cython: profile=True
-# Time-stamp: <2022-03-10 00:21:51 Tao Liu>
+# Time-stamp: <2022-03-10 18:39:52 Tao Liu>
 
 """Module Description: New pileup algorithm based on p-v array
 idea. It's modified from original algorithm in MACS2 proposed by Jie
@@ -67,11 +67,54 @@ from libc.stdlib cimport malloc, free, qsort
 cdef float32_t __mapping_function_always_1 ( int32_t L, int32_t R ):
     return 1
 
+cdef void clean_up_ndarray ( np.ndarray x ):
+    """ Clean up numpy array in two steps
+    """
+    cdef:
+        long i
+    i = x.shape[0] // 2
+    x.resize( 100000 if i > 100000 else i, refcheck=False)
+    x.resize( 0, refcheck=False)
+    return
+
 # ------------------------------------
-# functions
+# public python functions
+# ------------------------------------
+cpdef np.ndarray pileup_from_LR ( np.ndarray LR_array, mapping_func = __mapping_function_always_1 ):
+    """This function will pile up the ndarray containing left and
+    right positions, which is typically from PETrackI object. It's
+    useful when generating the pileup of a single chromosome is
+    needed.
+
+    """
+    cdef:
+        np.ndarray PV_array, pileup
+
+    PV_array = make_PV_from_LR( LR_array, mapping_func = mapping_func )
+    pileup = pileup_PV( PV_array )
+    clean_up_ndarray( PV_array )
+    return pileup
+
+cpdef np.ndarray pileup_from_PN ( np.ndarray P_array, np.ndarray N_array, int extsize ):
+    """This function will pile up the ndarray containing plus and
+    minus positions of all reads, which is typically from FWTrackI
+    object. It's useful when generating the pileup of a single
+    chromosome is needed.
+
+    """
+    cdef:
+        np.ndarray PV_array, pileup
+
+    PV_array = make_PV_from_PN( P_array, N_array, extsize )
+    pileup = pileup_PV( PV_array )
+    clean_up_ndarray( PV_array )
+    return pileup
+
+# ------------------------------------
+# C functions
 # ------------------------------------
 
-cpdef np.ndarray make_PV_from_LR ( np.ndarray LR_array, mapping_func = __mapping_function_always_1 ):
+cdef np.ndarray make_PV_from_LR ( np.ndarray LR_array, mapping_func = __mapping_function_always_1 ):
     """Make sorted PV array from a LR array for certain chromosome in a
     PETrackI object. The V/weight will be assigned as 
     mapping_func( L, R ) or simply 1 if mapping_func is the default.
@@ -96,7 +139,40 @@ cpdef np.ndarray make_PV_from_LR ( np.ndarray LR_array, mapping_func = __mapping
     PV.sort( order = 'p' )
     return PV
 
-cpdef np.ndarray pileup_PV ( np.ndarray PV_array ):
+cdef np.ndarray make_PV_from_PN ( np.ndarray P_array, np.ndarray N_array, int extsize ):
+    """Make sorted PV array from two arrays for certain chromosome in
+    a FWTrack object. P_array is for the 5' end positions in plus
+    strand, and N_array is for minus strand. We don't support weight
+    in this case since all positions should be extended with a fixed
+    'extsize'.
+
+    P_array or N_array is an np.ndarray with dtype='int32'
+
+    PV array is an np.ndarray with
+    dtype=[('p','uint32'),('v','float32')] with length of 2N """
+    cdef:
+        uint64_t l_PN, l_PV, i, t
+        int32_t L, R
+        np.ndarray PV
+
+    l_PN = P_array.shape[ 0 ]
+    assert l_PN == N_array.shape[ 0 ]
+    l_PV = 4 * l_PN
+    PV = np.zeros( shape=l_PV, dtype=[ ( 'p', 'uint32' ), ( 'v', 'float32' ) ] )
+    for i in range( l_PN ):
+        L = P_array[ i ]
+        R = L + extsize
+        PV[ i*2 ] = ( L, 1 )
+        PV[ i*2 + 1 ] = ( R, -1 )
+    for i in range( l_PN ):
+        R = N_array[ i ]
+        L = R - extsize
+        PV[ (l_PN + i)*2 ] = ( L, 1 )
+        PV[ (l_PN + i)*2 + 1 ] = ( R, -1 )
+    PV.sort( order = 'p' )
+    return PV
+
+cdef np.ndarray pileup_PV ( np.ndarray PV_array ):
     """The pileup algorithm to produce a bedGraph style pileup (another
     p-v array as in Pileup.pyx) can be simply described as:
     

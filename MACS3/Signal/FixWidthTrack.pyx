@@ -1,6 +1,6 @@
 # cython: language_level=3
 # cython: profile=True
-# Time-stamp: <2020-12-02 16:00:25 Tao Liu>
+# Time-stamp: <2022-03-10 17:23:19 Tao Liu>
 
 """Module for FWTrack classes.
 
@@ -80,7 +80,7 @@ cdef class FWTrack:
 
         """
         self.fw = fw
-        self.__locations = {}    # location pairs
+        self.__locations = {}    # location pairs: two strands
         self.__pointer = {}      # location pairs
         self.__buf_size = {}     # location pairs
         self.__sorted = False

@@ -826,7 +826,7 @@ cdef class bedGraphTrackI:
 
 
     cpdef object extract_value ( self, object bdgTrack2 ):
-        """Extract values from regions defined in RegionIO class object
+        """Extract values from regions defined in bedGraphTrackI class object
         `regions`.
 
         """
@@ -855,9 +855,7 @@ cdef class bedGraphTrackI:
             (p2s,v2s) = bdgTrack2.get_data_by_chr(chrom) # arrays for position and values
             p2n = iter(p2s).__next__         # assign the next function to a viable to speed up
             v2n = iter(v2s).__next__
-
             pre_p = 0                   # remember the previous position in the new bedGraphTrackI object ret
-
             try:
                 p1 = p1n()
                 v1 = v1n()
