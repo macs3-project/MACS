@@ -24,7 +24,7 @@ from MACS3.Utilities.OptValidator import opt_validate_hmmratac
 from MACS3.IO.PeakIO import PeakIO
 from MACS3.IO.Parser import BAMPEParser #BAMaccessor
 from MACS3.Signal.HMMR_EM import HMMR_EM
-from MACS3.Signal.HMMR_Signal_Processing import generate_weight_mapping,  generate_digested_signals, extract_signals_from_training_regions
+from MACS3.Signal.HMMR_Signal_Processing import generate_weight_mapping, generate_digested_signals, extract_signals_from_training_regions
 from MACS3.Signal.HMMR_HMM import initial_state_kmeans, hmm_training, hmm_predict
 
 
@@ -125,8 +125,8 @@ def run( args ):
     fl_list.sort()
     # now we will prepare the weights for each fragment length for each of the four distributions based on the EM results
     weight_mapping = generate_weight_mapping( fl_list, em_means, em_stddevs )
-
-    options.info( f"# Generate short, mono-, di-, and tri-nucleosomal signals")    
+    
+    options.info( f"# Generate short, mono-, di-, and tri-nucleosomal signals")
     digested_atac_signals = generate_digested_signals( petrack, weight_mapping )
 
     options.info( f"# Extract signals in training regions")
@@ -134,7 +134,7 @@ def run( args ):
     #FragmentPileupGenerator(options.bamfile, options.index, options.training_set, options.em_means, options.em_stddev, options.min_map_quality, options.keep_duplicates)
     
     options.info( f"# Use K-means method to build initial states")
-    initial_states = initial_state_kmeans( training_data, k=3 )
+    initial_state = initial_state_kmeans( training_data, k=3 )
     #KMeanstoHMM(FragmentPileupGenerator.out, options.hmm_states)
     
     options.info( f"# Use Baum-Welch algorithm to train the HMM")

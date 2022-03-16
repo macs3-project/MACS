@@ -52,10 +52,10 @@ cdef inline float get_weighted_density( int x, float m, float v, w ):
 # public functions
 # ------------------------------------
 
-cpdef inital_state_kmeans( dict training_data, k = 3 ):
+cpdef initial_state_kmeans( dict training_data, k = 3 ):
     return None
 
-cpdef hmm_training( dict training_data ):
+cpdef hmm_training( dict training_data, initial_state ):
     return None
 
 cpdef hmm_predict( dict signals, hmm_model, binsize = 10 ):

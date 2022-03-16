@@ -52,13 +52,43 @@ cdef inline float get_weighted_density( int x, float m, float v, w ):
 # public functions
 # ------------------------------------
 
-cpdef dict generate_weight_mapping( list fraglen_list, list means, list stddevs ):
+cpdef list generate_weight_mapping( list fraglen_list, list means, list stddevs ):
+    """
+    return: list of dict, with key as fraglen, value as [ w_s, w_m, w_d, w_t ]
+    """
     cdef:
-        dict ret_mapping
-    ret_mapping = {}
+        list ret_mapping
+        list variances
+        int l
+        float m_s, m_m, m_d, m_t
+        float v_s, v_m, v_d, v_t
+        float p_s, p_m, p_d, p_t
+        float w_s, w_m, w_d, w_t
+        float s
+        int i, j
+    assert len(means) == 4
+    assert len(stddevs) == 4
+    [m_s, m_m, m_d, m_t] = means
+    [v_s, v_m, v_d, v_t] = [ x**2 for x in stddevs ]
+    ret_mapping = [ {}, {}, {}, {} ]
+    for i in range( len(fraglen_list) ):
+        l = fraglen_list[ i ]
+        p_s = pnorm2( float(l), m_s, v_s )
+        p_m = pnorm2( float(l), m_m, v_m )
+        p_d = pnorm2( float(l), m_d, v_d )
+        p_t = pnorm2( float(l), m_t, v_t )
+        s = p_s + p_m + p_d + p_t
+        w_s = p_s / s
+        w_m = p_m / s
+        w_d = p_d / s
+        w_t = p_t / s
+        ret_mapping[ 0 ][ l ] = w_s
+        ret_mapping[ 1 ][ l ] = w_m
+        ret_mapping[ 2 ][ l ] = w_d
+        ret_mapping[ 3 ][ l ] = w_t
     return ret_mapping
 
-cpdef dict generate_digested_signals( object petrack, dict weight_mapping ):
+cpdef dict generate_digested_signals( object petrack, list weight_mapping ):
     cdef:
         dict ret_digested_signals
     ret_digested_signals = {}
