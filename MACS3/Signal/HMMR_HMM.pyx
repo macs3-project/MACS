@@ -68,8 +68,8 @@ cdef inline float get_weighted_density( int x, float m, float v, w ):
     # initial_cov = np.cov(initial_means)
     # return initial_state, initial_means, initial_cov
 
-cpdef hmm_training( list training_data ):
-    hmm_model = hmm.GaussianHMM( n_components=3 )
+cpdef hmm_training( list training_data, k = 3 ):
+    hmm_model = hmm.GaussianHMM( n_components = k )
     hmm_model.fit( training_data )
     return hmm_model
 
