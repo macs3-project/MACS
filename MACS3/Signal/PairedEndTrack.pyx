@@ -25,6 +25,7 @@ from collections import Counter
 from MACS3.Utilities.Constants import *
 from MACS3.Signal.Pileup import quick_pileup, over_two_pv_array, se_all_in_one_pileup
 from MACS3.Signal.BedGraph import bedGraphTrackI
+from MACS3.Signal.PileupV2 import pileup_from_LR_hmmratac
 # ------------------------------------
 # Other modules
 # ------------------------------------
@@ -542,34 +543,28 @@ cdef class PETrackI:
             bdg.add_chrom_data( chrom, pyarray('i', prev_pileup[0]), pyarray('f', prev_pileup[1]) )
         return bdg
 
-    cpdef object pileup_bdg_hmmr ( self, list means, list stdevs, float32_t baseline_value = 0.0 ):
+    cpdef list pileup_bdg_hmmr ( self, list mapping, float32_t baseline_value = 0.0 ):
         """pileup all chromosomes, and return a list of four bedGraphTrackI objects: short, mono, di, and tri nucleosomal signals.
 
         The idea is that for each fragment length, we generate four bdg using four weights from four distributions. Then we add all sets of four bdgs together.
 
+        Way to generate 'mapping', based on HMMR EM means and stddevs:
+        fl_dict = petrack.count_fraglengths()
+        fl_list = list(fl_dict.keys())
+        fl_list.sort()
+        weight_mapping = generate_weight_mapping( fl_list, em_means, em_stddevs )
         """
         cdef:
-            list tmp_pileup, prev_pileup
-            float32_t scale_factor
+            list ret_pileup
+            set chroms
             bytes chrom
-            object bdg
-            int32_t prev_s
+            int i
 
-        #info(f"start to pileup")
-        bdg = bedGraphTrackI( baseline_value = baseline_value )
-
-        for chrom in self.get_chr_names():
-            prev_pileup = None
-            for i in range(len(scale_factor_s)):
-                scale_factor = scale_factor_s[i]
-
-                tmp_pileup = quick_pileup ( np.sort(self.__locations[chrom]['l']), np.sort(self.__locations[chrom]['r']), scale_factor, baseline_value ) # Can't directly pass partial nparray there since that will mess up with pointer calculation.
-
-                if prev_pileup:
-                    prev_pileup = over_two_pv_array ( prev_pileup, tmp_pileup, func="max" )
-                else:
-                    prev_pileup = tmp_pileup
-            # save to bedGraph
-            bdg.add_chrom_data( chrom, pyarray('i', prev_pileup[0]), pyarray('f', prev_pileup[1]) )
-        return bdg
+        ret_pileup = []
+        for i in range( len(mapping) ): ret_pileup.append( {} )
+        chroms = self.get_chr_names()
+        for i in range( len(mapping) ):
+            for chrom in chroms:
+                ret_pileup[ i ][ chrom ] = pileup_from_LR_hmmratac( self.__locations[ chrom ], mapping[ i ] )
+        return ret_pileup
 

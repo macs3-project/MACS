@@ -25,7 +25,7 @@ from MACS3.IO.PeakIO import PeakIO
 from MACS3.IO.Parser import BAMPEParser #BAMaccessor
 from MACS3.Signal.HMMR_EM import HMMR_EM
 from MACS3.Signal.HMMR_Signal_Processing import generate_weight_mapping, generate_digested_signals, extract_signals_from_training_regions
-from MACS3.Signal.HMMR_HMM import initial_state_kmeans, hmm_training, hmm_predict
+from MACS3.Signal.HMMR_HMM import hmm_training, hmm_predict
 
 
 #from MACS3.IO.BED import BEDreader # this hasn't been implemented yet.
@@ -129,16 +129,42 @@ def run( args ):
     options.info( f"# Generate short, mono-, di-, and tri-nucleosomal signals")
     digested_atac_signals = generate_digested_signals( petrack, weight_mapping )
 
+    fhd = open("short.bdg","w")
+    digested_atac_signals[ 0 ].write_bedGraph(fhd, "short","short")
+    fhd.close()
+
+    fhd = open("mono.bdg","w")
+    digested_atac_signals[ 1 ].write_bedGraph(fhd, "mono","mono")
+    fhd.close()
+    
+    fhd = open("di.bdg","w")
+    digested_atac_signals[ 2 ].write_bedGraph(fhd, "di","di")
+    fhd.close()
+    
+    fhd = open("tri.bdg","w")
+    digested_atac_signals[ 3 ].write_bedGraph(fhd, "tri","tri")
+    fhd.close()
+    
     options.info( f"# Extract signals in training regions")
     training_data = extract_signals_from_training_regions( digested_atac_signals, peaks, binsize = 10 )
     #FragmentPileupGenerator(options.bamfile, options.index, options.training_set, options.em_means, options.em_stddev, options.min_map_quality, options.keep_duplicates)
     
-    options.info( f"# Use K-means method to build initial states")
-    initial_state = initial_state_kmeans( training_data, k=3 )
+    #options.info( f"# Use K-means method to build initial states")
+    #initial_state = initial_state_kmeans( training_data, k=3 )
     #KMeanstoHMM(FragmentPileupGenerator.out, options.hmm_states)
+    f = open("training.txt","w")
+    for v in training_data:
+        f.write( f"{v[0]}\t{v[1]}\t{v[2]}\t{v[3]}\n" )
+    f.close()
     
     options.info( f"# Use Baum-Welch algorithm to train the HMM")
-    hmm_model = hmm_training( training_data, initial_state )
+    hmm_model = hmm_training( training_data )
+    f = open("model.txt","w")
+    f.write( str(hmm_model.startprob_)+"\n" )
+    f.write( str(hmm_model.transmat_ )+"\n" )
+    f.write( str(hmm_model.means_ )+"\n" )
+    f.write( str(hmm_model.covars_ )+"\n" )
+    f.close()
 
 #############################################
 # 5. Predict
@@ -147,7 +173,12 @@ def run( args ):
     #HMMRTracksToBedgraph(FragPileupGen.out)
     
     options.info( f"# Use HMM to predict states")
-    predicted_states = hmm_predict( digested_atac_signals, hmm_model, binsize = 10 )
+    #predicted_states = hmm_predict( digested_atac_signals, hmm_model, binsize = 10 )
+    predicted_states = hmm_predict( training_data, hmm_model, binsize = 10 )
+    f = open("predicted.txt","w")
+    for l in range(len(predicted_states)):
+        f.write ( f"{training_data[l]} {predicted_states[l]}\n" )
+    f.close()
 
 #############################################
 # 6. Output - add to OutputWriter

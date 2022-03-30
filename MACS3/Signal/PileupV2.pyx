@@ -80,6 +80,24 @@ cdef void clean_up_ndarray ( np.ndarray x ):
 # ------------------------------------
 # public python functions
 # ------------------------------------
+cpdef np.ndarray pileup_from_LR_hmmratac ( np.ndarray LR_array, mapping_dict ):
+    cdef:
+        uint64_t l_LR, l_PV, i
+        int32_t L, R
+        np.ndarray PV, pileup
+
+    l_LR = LR_array.shape[ 0 ]
+    l_PV = 2 * l_LR
+    PV = np.zeros( shape=l_PV, dtype=[ ( 'p', 'uint32' ), ( 'v', 'float32' ) ] )
+    for i in range( l_LR ):
+        ( L, R ) = LR_array[ i ]
+        PV[ i*2 ] = ( L, mapping_dict[ R - L ] )
+        PV[ i*2 + 1 ] = ( R, -1 * mapping_dict[ R - L ] )
+    PV.sort( order = 'p' )
+    pileup = pileup_PV( PV )
+    clean_up_ndarray( PV )
+    return pileup    
+
 cpdef np.ndarray pileup_from_LR ( np.ndarray LR_array, mapping_func = __mapping_function_always_1 ):
     """This function will pile up the ndarray containing left and
     right positions, which is typically from PETrackI object. It's
@@ -207,5 +225,5 @@ cdef np.ndarray pileup_PV ( np.ndarray PV_array ):
         z +=  v
         s = e
     pileup_PV.resize( c, refcheck=False )
-    assert z == 0
+    #assert z == 0
     return pileup_PV

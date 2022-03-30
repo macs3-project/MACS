@@ -117,12 +117,13 @@ cdef class bedGraphTrackI:
         self.minvalue = 10000000  # initial minimum value is large since I want safe_add_loc to update it
         self.baseline_value = baseline_value
 
-    cpdef add_loc ( self, bytes chromosome, int32_t startpos, int32_t endpos, float32_t value ):
+    cpdef add_loc ( self, bytes chromosome, int32_t startpos, int32_t endpos, float32_t value):
         """Add a chr-start-end-value block into __data dictionary.
 
         Difference between safe_add_loc: no check, but faster. Save
         time while being called purely within MACS, so that regions
-        are continuous without gaps.
+        are continuous without gaps. Note: I forgot that I removed
+        safe_add_loc :P
 
         """
         cdef float32_t pre_v
@@ -162,6 +163,40 @@ cdef class bedGraphTrackI:
         if value < self.minvalue:
             self.minvalue = value
 
+    cpdef add_loc_wo_merge ( self, bytes chromosome, int32_t startpos, int32_t endpos, float32_t value):
+        """Add a chr-start-end-value block into __data dictionary.
+
+        Difference between safe_add_loc: no check, but faster. Save
+        time while being called purely within MACS, so that regions
+        are continuous without gaps. Note: I forgot that I removed
+        safe_add_loc :P
+
+        This one won't merge nearby ranges with the same value
+        """
+        if endpos <= 0:
+            return
+        if startpos < 0:
+            startpos = 0
+
+        if value < self.baseline_value:
+            value = self.baseline_value
+            
+        if chromosome not in self.__data:
+            self.__data[chromosome] = [ pyarray('i',[]), pyarray('f',[]) ]
+            c = self.__data[chromosome]
+            if startpos:
+                # start pos is not 0, then add two blocks, the first
+                # with "baseline_value"; the second with "value"
+                c[0].append(startpos)
+                c[1].append(self.baseline_value)
+        c = self.__data[chromosome]
+        c[0].append(endpos)
+        c[1].append(value)
+        if value > self.maxvalue:
+            self.maxvalue = value
+        if value < self.minvalue:
+            self.minvalue = value        
+
     cpdef add_chrom_data( self, bytes chromosome, object p, object v ):
         """Add a pv data to a chromosome. Replace the previous data.
 
@@ -182,6 +217,28 @@ cdef class bedGraphTrackI:
             self.minvalue = minv
         return
 
+    cpdef add_chrom_data_hmmr_PV( self, bytes chromosome, object pv ):
+        """Add a pv data to a chromosome. Replace the previous data.
+
+        This is a kinda silly function to waste time and convert a PV
+        array (2-d named numpy array) into two python arrays for this
+        BedGraph class. May have better function later.
+
+        Note: no checks for error, use with caution
+        """
+        cdef:
+            float32_t maxv, minv
+            int32_t i
+
+        self.__data[ chromosome ] = [ pyarray('i', pv['p']), pyarray('f',pv['v']) ]
+        minv = pv['v'].min()
+        maxv = pv['p'].max()
+        if maxv > self.maxvalue:
+            self.maxvalue = maxv
+        if minv < self.minvalue:
+            self.minvalue = minv
+        return
+    
     cpdef bool destroy ( self ):
         """ destroy content, free memory.
         """
@@ -345,7 +402,7 @@ cdef class bedGraphTrackI:
         return True
 
     cpdef tuple summary (self):
-        """Calculate the sum, max, min, mean, and std. Return a tuple for (sum, max, min, mean, std).
+        """Calculate the sum, total_length, max, min, mean, and std. Return a tuple for (sum, max, min, mean, std).
 
         """
         cdef:
@@ -597,10 +654,9 @@ cdef class bedGraphTrackI:
 
         """
         cdef:
-            int32_t t, p
-            float32_t s
+            int32_t t
         t = 0
-        for (p,s) in self.__data.values():
+        for ( p, v ) in self.__data.values():
             t += len(p)
         return t
 
@@ -867,7 +923,7 @@ cdef class bedGraphTrackI:
                     if p1 < p2:
                         # clip a region from pre_p to p1, then set pre_p as p1.
                         if v2>0:
-                            radd(chrom+"."+str(pre_p)+"."+str(p1))
+                            radd(str(chrom)+"."+str(pre_p)+"."+str(p1))
                             vadd(v1)
                             ladd(p1-pre_p)
                         pre_p = p1
@@ -877,7 +933,7 @@ cdef class bedGraphTrackI:
                     elif p2 < p1:
                         # clip a region from pre_p to p2, then set pre_p as p2.
                         if v2>0:
-                            radd(chrom+"."+str(pre_p)+"."+str(p2))
+                            radd(str(chrom)+"."+str(pre_p)+"."+str(p2))
                             vadd(v1)
                             ladd(p2-pre_p)
                         pre_p = p2
@@ -887,7 +943,87 @@ cdef class bedGraphTrackI:
                     elif p1 == p2:
                         # from pre_p to p1 or p2, then set pre_p as p1 or p2.
                         if v2>0:
-                            radd(chrom+"."+str(pre_p)+"."+str(p1))
+                            radd(str(chrom)+"."+str(pre_p)+"."+str(p1))
+                            vadd(v1)
+                            ladd(p1-pre_p)
+                        pre_p = p1
+                        # call for the next p1, v1, p2, v2.
+                        p1 = p1n()
+                        v1 = v1n()
+                        p2 = p2n()
+                        v2 = v2n()
+            except StopIteration:
+                # meet the end of either bedGraphTrackI, simply exit
+                pass
+
+        return ret
+
+    cpdef object extract_value2 ( self, object bdgTrack2 ):
+        """Extract values from regions defined in bedGraphTrackI class object
+        `regions`.
+
+        I will try to tweak this function to output only the values of
+        bdgTrack1 (self) in the regions in bdgTrack2
+        """
+        cdef:
+            int32_t pre_p, p1, p2, i
+            float32_t v1, v2
+            bytes chrom
+            object ret
+
+        assert isinstance(bdgTrack2,bedGraphTrackI), "not a bedGraphTrackI object"
+
+        ret = [ [], pyarray('f',[]), pyarray('L',[]) ] # 1: region in bdgTrack2; 2: value; 3: length with the value
+        radd = ret[0].append
+        vadd = ret[1].append
+        ladd = ret[2].append
+
+        chr1 = set(self.get_chr_names())
+        chr2 = set(bdgTrack2.get_chr_names())
+        common_chr = chr1.intersection(chr2)
+        for i in range( len( common_chr ) ):
+            chrom = common_chr.pop()
+            (p1s,v1s) = self.get_data_by_chr(chrom) # arrays for position and values
+            p1n = iter(p1s).__next__         # assign the next function to a viable to speed up
+            v1n = iter(v1s).__next__
+
+            (p2s,v2s) = bdgTrack2.get_data_by_chr(chrom) # arrays for position and values
+            p2n = iter(p2s).__next__         # assign the next function to a viable to speed up
+            v2n = iter(v2s).__next__
+            pre_p = 0                   # remember the previous position in the new bedGraphTrackI object ret
+            try:
+                p1 = p1n()
+                v1 = v1n()
+
+                p2 = p2n()
+                v2 = v2n()
+
+                while True:
+                    if p1 < p2:
+                        # clip a region from pre_p to p1, then set pre_p as p1.
+                        # in this case, we don't output any
+                        #if v2>0:
+                        #    radd(str(chrom)+"."+str(pre_p)+"."+str(p1))
+                        #    vadd(v1)
+                        #    ladd(p1-pre_p)
+                        pre_p = p1
+                        # call for the next p1 and v1
+                        p1 = p1n()
+                        v1 = v1n()
+                    elif p2 < p1:
+                        # clip a region from pre_p to p2, then set pre_p as p2.
+                        if v2>0:
+                            radd(str(chrom)+"."+str(pre_p)+"."+str(p2))
+                            vadd(v1)
+                            ladd(p2-pre_p)
+                        pre_p = p2
+                        # call for the next p2 and v2
+                        p2 = p2n()
+                        v2 = v2n()
+                    elif p1 == p2:
+                        # from pre_p to p1 or p2, then set pre_p as p1 or p2.
+                        if v2>0:
+                            radd(str(chrom)+"."+str(pre_p)+"."+str(p1))
                             vadd(v1)
                             ladd(p1-pre_p)
                         pre_p = p1

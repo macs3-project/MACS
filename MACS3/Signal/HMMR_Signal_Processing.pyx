@@ -27,12 +27,12 @@ from cpython cimport bool
 # MACS3 modules
 # ------------------------------------
 from MACS3.Signal.Prob import pnorm2
+from MACS3.Signal.BedGraph import bedGraphTrackI
 
 # ------------------------------------
 # Misc functions
 # ------------------------------------
 
-# https://docs.scipy.org/doc/scipy/reference/generated/scipy.stats.norm.html
 cdef inline float get_weighted_density( int x, float m, float v, w ):
     """Description:
     
@@ -53,8 +53,13 @@ cdef inline float get_weighted_density( int x, float m, float v, w ):
 # ------------------------------------
 
 cpdef list generate_weight_mapping( list fraglen_list, list means, list stddevs ):
-    """
-    return: list of dict, with key as fraglen, value as [ w_s, w_m, w_d, w_t ]
+    """Generate weights for each fragment length in short, mono, di, and tri-signals track
+
+    return: list of four dictionaries, with key as fraglen and value as the weight.
+            ret[0] -- dictionary for short
+            ret[1] -- dictionary for mono
+            ret[2] -- dictionary for di
+            ret[3] -- dictionary for tri
     """
     cdef:
         list ret_mapping
@@ -88,16 +93,93 @@ cpdef list generate_weight_mapping( list fraglen_list, list means, list stddevs 
         ret_mapping[ 3 ][ l ] = w_t
     return ret_mapping
 
-cpdef dict generate_digested_signals( object petrack, list weight_mapping ):
-    cdef:
-        dict ret_digested_signals
-    ret_digested_signals = {}
-    return ret_digested_signals
+cpdef list generate_digested_signals( object petrack, list weight_mapping ):
+    """Generate digested pileup signals (four tracks) using weight mapping 
 
-cpdef dict extract_signals_from_training_regions( dict signals, object peaks, binsize = 10 ):
+    return: list of four signals in dictionary, with key as chromosome name and value as a p-v array.
+            ret[0] -- dictionary for short
+            ret[1] -- dictionary for mono
+            ret[2] -- dictionary for di
+            ret[3] -- dictionary for tri
+    """
     cdef:
-        dict ret_training_data
-    ret_training_data = {}
+        list ret_digested_signals
+        list ret_bedgraphs
+        object bdg
+        int i
+        dict certain_signals
+        np.ndarray pv
+        bytes chrom
+    ret_digested_signals = petrack.pileup_bdg_hmmr( weight_mapping )
+    ret_bedgraphs = []
+    for i in range( 4 ):                  #yes I hardcoded 4!
+        certain_signals = ret_digested_signals[ i ]
+        bdg = bedGraphTrackI()
+        for chrom in certain_signals.keys():
+            bdg.add_chrom_data_hmmr_PV( chrom, certain_signals[ chrom ] )
+        ret_bedgraphs.append( bdg )
+    return ret_bedgraphs
+
+cpdef list extract_signals_from_training_regions( list signals, object peaks, binsize = 10 ):
+    # we will take regions in peaks, create a bedGraphTrackI with
+    # binned regions in peaks, then let them overlap with signals to
+    # create a list (4) of value arrays.
+    cdef:
+        list extracted_data
+        object signaltrack
+        object peaksbdg
+        bytes chrom
+        int i, s, e, tmp_s, tmp_e
+        list ps
+        object p
+        list ret_training_data
+
+    peaks.sort()
+
+    peaksbdg = bedGraphTrackI(baseline_value=0)
+
+    n = 0
+    for chrom in peaks.get_chr_names():
+        tmp_p = 0
+        ps = peaks.get_data_from_chrom( chrom )
+        for i in range( len( ps ) ):
+            p = ps[ i ]
+            s = p['start']
+            e = p['end']
+            # make bins, no need to be too accurate...
+            s = s//10*10
+            e = e//10*10
+            for r in range( s, e, 10 ):
+                tmp_s = r
+                tmp_e = r + 10
+                if tmp_s > tmp_p:
+                    peaksbdg.add_loc_wo_merge( chrom, tmp_p, tmp_s, 0 )
+                peaksbdg.add_loc_wo_merge( chrom, tmp_s, tmp_e, 1 )
+                n += 1
+                tmp_p = tmp_e
+    # we do not merge regions in peaksbdg object so each bin will be seperated.
+    print( f"added {n} bins" )
+    #print( peaksbdg.summary() )
+    #print( peaksbdg.total() )
+
+    #bfhd = open("a.bdg","w")
+    #peaksbdg.write_bedGraph( bfhd, "peaksbdg", "peaksbdg" )
+    #bfhd.close()
+    # now, let's overlap
+    extracted_data = []
+    for signaltrack in signals:
+        # signaltrack is bedGraphTrackI object
+        [ regions, values, lengths ] = signaltrack.extract_value2( peaksbdg )
+        # we only need values
+        #print( regions )
+        extracted_data.append( values )
+    ret_training_data = []
+    for i in range( len( extracted_data[0] ) ):
+        ret_training_data.append(
+            [ max( 0.0001, abs(round(extracted_data[0][i], 4))),
+              max( 0.0001, abs(round(extracted_data[1][i], 4))),
+              max( 0.0001, abs(round(extracted_data[2][i], 4))),
+              max( 0.0001, abs(round(extracted_data[3][i], 4))) ] )
     return ret_training_data
 
 

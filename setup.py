@@ -108,6 +108,7 @@ def main():
                     Extension("MACS3.Signal.FixWidthTrack", ["MACS3/Signal/FixWidthTrack.pyx"], include_dirs=numpy_include_dir, extra_compile_args=extra_c_args),
                     Extension("MACS3.Signal.PairedEndTrack", ["MACS3/Signal/PairedEndTrack.pyx"], include_dirs=numpy_include_dir, extra_compile_args=extra_c_args),
                     Extension("MACS3.Signal.BedGraph", ["MACS3/Signal/BedGraph.pyx"], libraries=["m"], include_dirs=numpy_include_dir, extra_compile_args=extra_c_args),
+                    #Extension("MACS3.Signal.BedGraphV2", ["MACS3/Signal/BedGraphV2.pyx"], libraries=["m"], include_dirs=numpy_include_dir, extra_compile_args=extra_c_args),                    
                     Extension("MACS3.Signal.ScoreTrack", ["MACS3/Signal/ScoreTrack.pyx"], include_dirs=numpy_include_dir, extra_compile_args=extra_c_args ),
                     Extension("MACS3.Signal.CallPeakUnit", ["MACS3/Signal/CallPeakUnit.pyx"], include_dirs=numpy_include_dir, extra_compile_args=extra_c_args),
                     Extension("MACS3.Signal.VariantStat",["MACS3/Signal/VariantStat.pyx",],libraries=["m"], include_dirs=numpy_include_dir, extra_compile_args=extra_c_args),

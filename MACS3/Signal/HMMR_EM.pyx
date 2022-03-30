@@ -66,7 +66,7 @@ cdef int return_greater( np.ndarray data ):
         int largest_index
         np.ndarray largest_inds
     largest_inds = np.argwhere(data == np.amax(data)) # find the indices of the most likely category(s) (max values)
-    if len(largest_inds) > 1: # if there are multiple "most-likely" categories, ignore data point
+    if len(largest_inds) > 1:    # if there are multiple "most-likely" categories, ignore data point
         largest_index = -1
     else:
         largest_index = largest_inds[0][0]

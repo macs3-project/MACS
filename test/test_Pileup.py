@@ -305,7 +305,7 @@ class Test_PileupV2_PE(unittest.TestCase):
         pileup = pileup_from_LR( self.LR_array1, lambda x,y: log2(y-x) )
         np.testing.assert_equal( pileup, self.expect_pileup_2 )
 
-class Test_PileupV2_PE(unittest.TestCase):
+class Test_PileupV2_SE(unittest.TestCase):
     """Unittest for pileup functions in PileupV2.pyx.
 
     Function to test: pileup_from_PN
@@ -327,4 +327,5 @@ class Test_PileupV2_PE(unittest.TestCase):
 
     def test_pileup_1(self):
         pileup = pileup_from_PN( self.P, self.N, self.extsize )
-        np.testing.assert_equal( pileup, self.expect_pileup_1 )        
+        np.testing.assert_equal( pileup, self.expect_pileup_1 )
+        
