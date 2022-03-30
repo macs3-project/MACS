@@ -23,9 +23,10 @@ import numpy as np
 cimport numpy as np
 from cpython cimport bool
 from hmmlearn import hmm
-#from hmmlearn cimport hmm
-from sklearn.cluster import KMeans 
-#from sklearn.cluster cimport KMeans
+# from hmmlearn cimport hmm
+# from sklearn.cluster import KMeans 
+# from sklearn.cluster cimport KMeans
+
 
 # ------------------------------------
 # MACS3 modules
@@ -55,6 +56,7 @@ cdef inline float get_weighted_density( int x, float m, float v, w ):
 # ------------------------------------
 # public functions
 # ------------------------------------
+
 
 cpdef hmm_training( list training_data, int n_states = 3 ):
     # training data should be in array like format: X = np.array([[.5, .3, .1, .1], [.6, .4, 0, 0]])
