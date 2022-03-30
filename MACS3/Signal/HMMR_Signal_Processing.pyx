@@ -120,7 +120,7 @@ cpdef list generate_digested_signals( object petrack, list weight_mapping ):
         ret_bedgraphs.append( bdg )
     return ret_bedgraphs
 
-cpdef list extract_signals_from_training_regions( list signals, object peaks, binsize = 10 ):
+cpdef list extract_signals_from_training_regions( list signals, object peaks, int binsize = 10 ):
     # we will take regions in peaks, create a bedGraphTrackI with
     # binned regions in peaks, then let them overlap with signals to
     # create a list (4) of value arrays.
@@ -147,12 +147,12 @@ cpdef list extract_signals_from_training_regions( list signals, object peaks, bi
             s = p['start']
             e = p['end']
             # make bins, no need to be too accurate...
-            s = s//10*10
-            e = e//10*10
-            tmp_n = int(( e - s )/10)
-            for r in range( s, e, 10 ):
+            s = s//binsize*binsize
+            e = e//binsize*binsize
+            tmp_n = int(( e - s )/binsize)
+            for r in range( s, e, binsize ):
                 tmp_s = r
-                tmp_e = r + 10
+                tmp_e = r + binsize
                 if tmp_s > tmp_p:
                     peaksbdg.add_loc_wo_merge( chrom, tmp_p, tmp_s, 0 )
                 peaksbdg.add_loc_wo_merge( chrom, tmp_s, tmp_e, tmp_n )

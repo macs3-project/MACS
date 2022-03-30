@@ -123,48 +123,50 @@ def run( args ):
     fl_dict = petrack.count_fraglengths()
     fl_list = list(fl_dict.keys())
     fl_list.sort()
-    # now we will prepare the weights for each fragment length for each of the four distributions based on the EM results
+    # now we will prepare the weights for each fragment length for
+    # each of the four distributions based on the EM results
     weight_mapping = generate_weight_mapping( fl_list, em_means, em_stddevs )
     
     options.info( f"# Generate short, mono-, di-, and tri-nucleosomal signals")
     digested_atac_signals = generate_digested_signals( petrack, weight_mapping )
-
-    fhd = open("short.bdg","w")
+    
+    options.info( f"# Saving short, mono-, di-, and tri-nucleosomal signals to bedGraph files")
+    
+    fhd = open(options.oprefix+"short.bdg","w")
     digested_atac_signals[ 0 ].write_bedGraph(fhd, "short","short")
     fhd.close()
 
-    fhd = open("mono.bdg","w")
+    fhd = open(options.oprefix+"mono.bdg","w")
     digested_atac_signals[ 1 ].write_bedGraph(fhd, "mono","mono")
     fhd.close()
     
-    fhd = open("di.bdg","w")
+    fhd = open(options.oprefix+"di.bdg","w")
     digested_atac_signals[ 2 ].write_bedGraph(fhd, "di","di")
     fhd.close()
     
-    fhd = open("tri.bdg","w")
+    fhd = open(options.oprefix+"tri.bdg","w")
     digested_atac_signals[ 3 ].write_bedGraph(fhd, "tri","tri")
     fhd.close()
-    
+
+    # We first bin the training regions then get four types of signals
+    # in the bins, at the same time, we record how many bins for each
+    # peak.
     options.info( f"# Extract signals in training regions")
     [ training_data, training_data_lengths ] = extract_signals_from_training_regions( digested_atac_signals, peaks, binsize = 10 )
-    #FragmentPileupGenerator(options.bamfile, options.index, options.training_set, options.em_means, options.em_stddev, options.min_map_quality, options.keep_duplicates)
-    
-    #options.info( f"# Use K-means method to build initial states")
-    #initial_state = initial_state_kmeans( training_data, k=3 )
-    #KMeanstoHMM(FragmentPileupGenerator.out, options.hmm_states)
-    f = open("training_data.txt","w")
+
+    f = open(options.oprefix+"training_data.txt","w")
     for v in training_data:
         f.write( f"{v[0]}\t{v[1]}\t{v[2]}\t{v[3]}\n" )
     f.close()
     
-    f = open("training_lens.txt","w")
+    f = open(options.oprefix+"training_lens.txt","w")
     for v in training_data_lengths:
         f.write( f"{v}\n" )
     f.close()    
     
     options.info( f"# Use Baum-Welch algorithm to train the HMM")
-    hmm_model = hmm_training( training_data )
-    f = open("model.txt","w")
+    hmm_model = hmm_training( training_data, training_data_lengths )
+    f = open(options.oprefix+"model.txt","w")
     f.write( str(hmm_model.startprob_)+"\n" )
     f.write( str(hmm_model.transmat_ )+"\n" )
     f.write( str(hmm_model.means_ )+"\n" )
@@ -174,13 +176,12 @@ def run( args ):
 #############################################
 # 5. Predict
 #############################################
-    #FragPileupGen(options.bamfile, options.index, tempBed, options.em_means, options.em_stddev, options.min_map_quality, options.keep_duplicatess, cpmScale)
-    #HMMRTracksToBedgraph(FragPileupGen.out)
+    # Our prediction strategy will be different with HMMRATAC, we will first ask MACS call peaks with loose cutoff, then for each peak we will run HMM prediction to figure out labels. And for the rest of genomic regions, just mark them as 'background'.
     
     options.info( f"# Use HMM to predict states")
     #predicted_states = hmm_predict( digested_atac_signals, hmm_model, binsize = 10 )
-    predicted_states = hmm_predict( training_data, hmm_model, binsize = 10 )
-    f = open("predicted.txt","w")
+    predicted_states = hmm_predict( training_data, training_data_lengths, hmm_model, binsize = 10 )
+    f = open(options.oprefix+"predicted.txt","w")
     for l in range(len(predicted_states)):
         f.write ( f"{training_data[l]} {predicted_states[l]}\n" )
     f.close()
