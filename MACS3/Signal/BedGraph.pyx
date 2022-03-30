@@ -958,12 +958,14 @@ cdef class bedGraphTrackI:
 
         return ret
 
-    cpdef object extract_value2 ( self, object bdgTrack2 ):
+    cpdef object extract_value_hmmr ( self, object bdgTrack2 ):
         """Extract values from regions defined in bedGraphTrackI class object
         `regions`.
 
         I will try to tweak this function to output only the values of
         bdgTrack1 (self) in the regions in bdgTrack2
+
+        This is specifically for HMMRATAC
         """
         cdef:
             int32_t pre_p, p1, p2, i
@@ -973,10 +975,9 @@ cdef class bedGraphTrackI:
 
         assert isinstance(bdgTrack2,bedGraphTrackI), "not a bedGraphTrackI object"
 
-        ret = [ [], pyarray('f',[]), pyarray('L',[]) ] # 1: region in bdgTrack2; 2: value; 3: length with the value
-        radd = ret[0].append
-        vadd = ret[1].append
-        ladd = ret[2].append
+        ret = [ pyarray('f',[]), pyarray('i',[]) ] # 1: value; 2: number of bins in this region
+        vadd = ret[0].append
+        ladd = ret[1].append
 
         chr1 = set(self.get_chr_names())
         chr2 = set(bdgTrack2.get_chr_names())
@@ -1013,9 +1014,8 @@ cdef class bedGraphTrackI:
                     elif p2 < p1:
                         # clip a region from pre_p to p2, then set pre_p as p2.
                         if v2>0:
-                            radd(str(chrom)+"."+str(pre_p)+"."+str(p2))
                             vadd(v1)
-                            ladd(p2-pre_p)
+                            ladd(int(v2))
                         pre_p = p2
                         # call for the next p2 and v2
                         p2 = p2n()
@@ -1023,9 +1023,8 @@ cdef class bedGraphTrackI:
                     elif p1 == p2:
                         # from pre_p to p1 or p2, then set pre_p as p1 or p2.
                         if v2>0:
-                            radd(str(chrom)+"."+str(pre_p)+"."+str(p1))
                             vadd(v1)
-                            ladd(p1-pre_p)
+                            ladd(int(v2))
                         pre_p = p1
                         # call for the next p1, v1, p2, v2.
                         p1 = p1n()

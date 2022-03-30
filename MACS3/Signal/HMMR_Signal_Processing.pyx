@@ -129,10 +129,10 @@ cpdef list extract_signals_from_training_regions( list signals, object peaks, bi
         object signaltrack
         object peaksbdg
         bytes chrom
-        int i, s, e, tmp_s, tmp_e
+        int i, s, e, tmp_s, tmp_e, tmp_n, n
         list ps
         object p
-        list ret_training_data
+        list ret_training_data, ret_training_lengths
 
     peaks.sort()
 
@@ -149,12 +149,13 @@ cpdef list extract_signals_from_training_regions( list signals, object peaks, bi
             # make bins, no need to be too accurate...
             s = s//10*10
             e = e//10*10
+            tmp_n = int(( e - s )/10)
             for r in range( s, e, 10 ):
                 tmp_s = r
                 tmp_e = r + 10
                 if tmp_s > tmp_p:
                     peaksbdg.add_loc_wo_merge( chrom, tmp_p, tmp_s, 0 )
-                peaksbdg.add_loc_wo_merge( chrom, tmp_s, tmp_e, 1 )
+                peaksbdg.add_loc_wo_merge( chrom, tmp_s, tmp_e, tmp_n )
                 n += 1
                 tmp_p = tmp_e
     # we do not merge regions in peaksbdg object so each bin will be seperated.
@@ -167,19 +168,27 @@ cpdef list extract_signals_from_training_regions( list signals, object peaks, bi
     #bfhd.close()
     # now, let's overlap
     extracted_data = []
+    extracted_len = []
     for signaltrack in signals:
         # signaltrack is bedGraphTrackI object
-        [ regions, values, lengths ] = signaltrack.extract_value2( peaksbdg )
+        [ values, lengths ] = signaltrack.extract_value_hmmr( peaksbdg )
         # we only need values
         #print( regions )
         extracted_data.append( values )
+        extracted_len.append( lengths )
     ret_training_data = []
-    for i in range( len( extracted_data[0] ) ):
+    ret_training_lengths = []
+    c = 0
+    for i in range( n ):
+        c += 1
         ret_training_data.append(
             [ max( 0.0001, abs(round(extracted_data[0][i], 4))),
               max( 0.0001, abs(round(extracted_data[1][i], 4))),
               max( 0.0001, abs(round(extracted_data[2][i], 4))),
               max( 0.0001, abs(round(extracted_data[3][i], 4))) ] )
-    return ret_training_data
+        if c == extracted_len[0][i]:
+            ret_training_lengths.append( extracted_len[0][i] )
+            c = 0
+    return [ ret_training_data, ret_training_lengths ]
 
 

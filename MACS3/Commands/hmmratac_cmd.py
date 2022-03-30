@@ -146,16 +146,21 @@ def run( args ):
     fhd.close()
     
     options.info( f"# Extract signals in training regions")
-    training_data = extract_signals_from_training_regions( digested_atac_signals, peaks, binsize = 10 )
+    [ training_data, training_data_lengths ] = extract_signals_from_training_regions( digested_atac_signals, peaks, binsize = 10 )
     #FragmentPileupGenerator(options.bamfile, options.index, options.training_set, options.em_means, options.em_stddev, options.min_map_quality, options.keep_duplicates)
     
     #options.info( f"# Use K-means method to build initial states")
     #initial_state = initial_state_kmeans( training_data, k=3 )
     #KMeanstoHMM(FragmentPileupGenerator.out, options.hmm_states)
-    f = open("training.txt","w")
+    f = open("training_data.txt","w")
     for v in training_data:
         f.write( f"{v[0]}\t{v[1]}\t{v[2]}\t{v[3]}\n" )
     f.close()
+    
+    f = open("training_lens.txt","w")
+    for v in training_data_lengths:
+        f.write( f"{v}\n" )
+    f.close()    
     
     options.info( f"# Use Baum-Welch algorithm to train the HMM")
     hmm_model = hmm_training( training_data )
