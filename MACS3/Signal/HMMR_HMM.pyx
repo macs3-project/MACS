@@ -64,7 +64,7 @@ cpdef hmm_training( list training_data, list training_data_lengths, int n_states
     # according to base documentation, if init_prob not stated, it is set to be equally likely for any state (1/ # of components)
     # if we have other known parameters, we should set these (ie: means_weights, covariance_type etc.)
     # hmm_model = hmm.GaussianHMM( n_components=3, covariance_type = 'full' )
-    hmm_model = hmm.GaussianHMM( n_components = n_states )
+    hmm_model = hmm.GMMHMM( n_components = n_states )
     hmm_model.fit( training_data, training_data_lengths )
     return hmm_model
 

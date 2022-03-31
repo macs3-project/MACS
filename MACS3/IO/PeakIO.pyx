@@ -14,6 +14,7 @@ the distribution).
 # ------------------------------------
 from itertools import groupby
 from operator import itemgetter
+import random
 import re
 import sys
 
@@ -51,6 +52,7 @@ cdef str subpeak_letters( int i):
 
 cdef class PeakContent:
     cdef:
+        bytes chrom
         int start
         int end
         int length
@@ -62,10 +64,11 @@ cdef class PeakContent:
         float qscore
         bytes name
 
-    def __init__ ( self, int start, int end, int summit,
+    def __init__ ( self, bytes chrom, int start, int end, int summit,
                    float peak_score, float pileup,
                    float pscore, float fold_change, float qscore,
                    bytes name= b"NA" ):
+        self.chrom = chrom
         self.start = start
         self.end = end
         self.length = end - start
@@ -78,7 +81,9 @@ cdef class PeakContent:
         self.name = name
 
     def __getitem__ ( self, a ):
-        if a == "start":
+        if a == "chrom":
+            return self.chrom
+        elif a == "start":
             return self.start
         elif a == "end":
             return self.end
@@ -100,7 +105,9 @@ cdef class PeakContent:
             return self.name
 
     def __setitem__ ( self, a, v ):
-        if a == "start":
+        if a == "chrom":
+            self.chrom = v
+        elif a == "start":
             self.start = v
         elif a == "end":
             self.end = v
@@ -122,7 +129,7 @@ cdef class PeakContent:
             self.name = v
 
     def __str__ (self):
-        return "start:%d;end:%d;score:%f" % ( self.start, self.end, self.score )
+        return "chrom:%s;start:%d;end:%d;score:%f" % ( self.chrom, self.start, self.end, self.score )
 
 cdef class PeakIO:
     """IO for peak information.
@@ -155,7 +162,7 @@ cdef class PeakIO:
         """
         if not self.peaks.has_key(chromosome):
             self.peaks[chromosome]=[]
-        self.peaks[chromosome].append(PeakContent( start, end, summit, peak_score, pileup, pscore, fold_change, qscore, name))
+        self.peaks[chromosome].append(PeakContent( chromosome, start, end, summit, peak_score, pileup, pscore, fold_change, qscore, name))
         self.total += 1
         self.CO_sorted = False
 
@@ -188,6 +195,27 @@ cdef class PeakIO:
         self.CO_sorted = True
         return
 
+    cpdef object randomly_pick ( self, int n, int seed = 12345 ):
+        """Shuffle the peaks and get n peaks out of it. Return a new
+        PeakIO object.
+        """
+        cdef:
+            list all_pc
+            list chrs
+            bytes chrom
+            object ret_peakio, p
+        assert n > 0
+        chrs = sorted(list(self.peaks.keys()))
+        all_pc = []
+        for chrom in chrs:
+            all_pc.extend(self.peaks[chrom])
+        random.seed( seed )
+        all_pc = random.shuffle( all_pc )[:n]
+        ret_peakio = PeakIO()
+        for p in all_pc:
+            ret_peakio.add_PeakContent ( p["chrom"], p )
+        return ret_peakio
+    
     cpdef void filter_pscore (self, double pscore_cut ):
         cdef:
             bytes chrom

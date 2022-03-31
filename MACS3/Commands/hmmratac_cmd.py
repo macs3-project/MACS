@@ -104,17 +104,21 @@ def run( args ):
     # 
     options.info( f"# Look for training set from {petrack.total} fragments" )
     options.info( f"# Pile up all fragments" )
-    bdg = petrack.pileup_bdg( [1.0,], baseline_value = 0 )
-    (sum_v, n_v, max_v, min_v, mean_v, std_v) = bdg.summary()
+    fc_bdg = petrack.pileup_bdg( [1.0,], baseline_value = 0 )
+    (sum_v, n_v, max_v, min_v, mean_v, std_v) = fc_bdg.summary()
     options.info( f"# Call peak above within FC range of {options.hmm_lower} and {options.hmm_upper}" )
     options.info( f"# Convert pileup to fold-change over average signal" )
-    bdg.apply_func(lambda x: x/mean_v)
-    peaks = bdg.call_peaks (cutoff=options.hmm_lower, up_limit=options.hmm_upper, min_length=petrack.average_template_length, max_gap=petrack.average_template_length, call_summits=False)
+    fc_bdg.apply_func(lambda x: x/mean_v)
+    peaks = fc_bdg.call_peaks (cutoff=options.hmm_lower, up_limit=options.hmm_upper, min_length=petrack.average_template_length, max_gap=petrack.average_template_length, call_summits=False)
     options.info( f"# Total peaks within range: {peaks.total}" )
     # remove peaks overlapping with blacklisted regions
     if options.blacklist:
         peaks.exclude( blacklist )
     options.info( f"# after removing those overlapping with provided blacklisted regions, we have {peaks.total} left" )
+    if peaks.total > options.hmm_maxTrain:
+        peaks = peaks.randomly_pick( options.hmm_maxTrain, seed = options.hmm_randomSeed )
+        options.info( f"# We randomly pick {options.hmm_maxTrain} peaks for training" )        
+    
 
 #############################################
 # 4. Train HMM
@@ -132,19 +136,19 @@ def run( args ):
     
     options.info( f"# Saving short, mono-, di-, and tri-nucleosomal signals to bedGraph files")
     
-    fhd = open(options.oprefix+"short.bdg","w")
+    fhd = open(options.oprefix+"_short.bdg","w")
     digested_atac_signals[ 0 ].write_bedGraph(fhd, "short","short")
     fhd.close()
 
-    fhd = open(options.oprefix+"mono.bdg","w")
+    fhd = open(options.oprefix+"_mono.bdg","w")
     digested_atac_signals[ 1 ].write_bedGraph(fhd, "mono","mono")
     fhd.close()
     
-    fhd = open(options.oprefix+"di.bdg","w")
+    fhd = open(options.oprefix+"_di.bdg","w")
     digested_atac_signals[ 2 ].write_bedGraph(fhd, "di","di")
     fhd.close()
     
-    fhd = open(options.oprefix+"tri.bdg","w")
+    fhd = open(options.oprefix+"_tri.bdg","w")
     digested_atac_signals[ 3 ].write_bedGraph(fhd, "tri","tri")
     fhd.close()
 
@@ -154,19 +158,19 @@ def run( args ):
     options.info( f"# Extract signals in training regions")
     [ training_data, training_data_lengths ] = extract_signals_from_training_regions( digested_atac_signals, peaks, binsize = 10 )
 
-    f = open(options.oprefix+"training_data.txt","w")
+    f = open(options.oprefix+"_training_data.txt","w")
     for v in training_data:
         f.write( f"{v[0]}\t{v[1]}\t{v[2]}\t{v[3]}\n" )
     f.close()
     
-    f = open(options.oprefix+"training_lens.txt","w")
+    f = open(options.oprefix+"_training_lens.txt","w")
     for v in training_data_lengths:
         f.write( f"{v}\n" )
     f.close()    
     
     options.info( f"# Use Baum-Welch algorithm to train the HMM")
     hmm_model = hmm_training( training_data, training_data_lengths )
-    f = open(options.oprefix+"model.txt","w")
+    f = open(options.oprefix+"_model.txt","w")
     f.write( str(hmm_model.startprob_)+"\n" )
     f.write( str(hmm_model.transmat_ )+"\n" )
     f.write( str(hmm_model.means_ )+"\n" )
@@ -177,13 +181,23 @@ def run( args ):
 # 5. Predict
 #############################################
     # Our prediction strategy will be different with HMMRATAC, we will first ask MACS call peaks with loose cutoff, then for each peak we will run HMM prediction to figure out labels. And for the rest of genomic regions, just mark them as 'background'.
+    candidate_peaks = fc_bdg.call_peaks (cutoff=options.hmm_lower/2, up_limit=options.hmm_upper*2, min_length=petrack.average_template_length, max_gap=petrack.average_template_length, call_summits=False)
+    options.info( f"# Total candidate peaks : {candidate_peaks.total}" )
+    # remove peaks overlapping with blacklisted regions
+    if options.blacklist:
+        candidate_peaks.exclude( blacklist )
+    options.info( f"# after removing those overlapping with provided blacklisted regions, we have {candidate_peaks.total} left" )
+
+    # extract signals
+    options.info( f"# Extract signals in candidate regions")
+    [ candidate_data, candidate_data_lengths ] = extract_signals_from_training_regions( digested_atac_signals, candidate_peaks, binsize = 10 )
     
     options.info( f"# Use HMM to predict states")
     #predicted_states = hmm_predict( digested_atac_signals, hmm_model, binsize = 10 )
-    predicted_states = hmm_predict( training_data, training_data_lengths, hmm_model, binsize = 10 )
-    f = open(options.oprefix+"predicted.txt","w")
+    predicted_states = hmm_predict( candidate_data, candidate_data_lengths, hmm_model, binsize = 10 )
+    f = open(options.oprefix+"_predicted.txt","w")
     for l in range(len(predicted_states)):
-        f.write ( f"{training_data[l]} {predicted_states[l]}\n" )
+        f.write ( f"{candidate_data[l]} {predicted_states[l]}\n" )
     f.close()
 
 #############################################
