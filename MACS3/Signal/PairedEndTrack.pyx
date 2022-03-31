@@ -261,7 +261,7 @@ cdef class PETrackI:
         sizes = locs['r'] - locs['l']
         for i in range( 1, len(chrnames) ):
             locs = self.__locations[ chrnames[i] ]
-            sizes.append( locs['r'] - locs['l'] )
+            sizes = np.concatenate( ( sizes, locs['r'] - locs['l'] ) )
         return sizes    
     
     @cython.boundscheck(False) # do not check that np indices are valid
