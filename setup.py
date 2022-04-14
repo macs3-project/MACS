@@ -101,6 +101,7 @@ def main():
                     Extension("MACS3.Signal.HMMR_Signal_Processing", ["MACS3/Signal/HMMR_Signal_Processing.pyx"], libraries=["m"], include_dirs=numpy_include_dir, extra_compile_args=extra_c_args ),
                     Extension("MACS3.Signal.HMMR_HMM", ["MACS3/Signal/HMMR_HMM.pyx"], libraries=["m"], include_dirs=numpy_include_dir, extra_compile_args=extra_c_args ),
                     Extension("MACS3.Signal.Prob", ["MACS3/Signal/Prob.pyx"], libraries=["m"], include_dirs=numpy_include_dir, extra_compile_args=extra_c_args ),
+                    Extension("MACS3.Signal.Region", ["MACS3/Signal/Region.pyx"], include_dirs=numpy_include_dir, extra_compile_args=extra_c_args ),
                     Extension("MACS3.Signal.Pileup", ["MACS3/Signal/Pileup.pyx","MACS3/Signal/cPosValCalculation.c"], include_dirs=numpy_include_dir, extra_compile_args=extra_c_args ),
                     Extension("MACS3.Signal.PileupV2", ["MACS3/Signal/PileupV2.pyx"], include_dirs=numpy_include_dir, extra_compile_args=extra_c_args ),                    
                     Extension("MACS3.Signal.PeakModel", ["MACS3/Signal/PeakModel.pyx"], include_dirs=numpy_include_dir, extra_compile_args=extra_c_args),
