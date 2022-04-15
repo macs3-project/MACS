@@ -176,10 +176,10 @@ def run( args ):
     f.close()    
     
     options.info( f"# Use Baum-Welch algorithm to train the HMM")
-    hmm_model = hmm_training( training_data, training_data_lengths )
 
+    hmm_model = hmm_training( training_data, training_data_lengths )
     # label hidden states
-    open_region = np.where(hmm_model.means_ == max(hmm_model.means_[0:3,0]))[0][0]
+    open_region = np.where(hmm_model.means_[0:3,0,0] == max(hmm_model.means_[0:3,0,0]))[0][0]
     background_region = np.where(hmm_model.transmat_ == min(hmm_model.transmat_[0:3, open_region]))[0][0]
     nucleosomal_region = list(set([0, 1, 2]) - set([open_region, background_region]))[0]
 
