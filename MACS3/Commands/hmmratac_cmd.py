@@ -1,4 +1,4 @@
-# Time-stamp: <2022-03-10 17:05:08 Tao Liu>
+# Time-stamp: <2022-04-14 16:00:18 Tao Liu>
 
 """Description: Main HMMR command
 
@@ -112,14 +112,20 @@ def run( args ):
     fc_bdg.apply_func(lambda x: x/mean_v)
     peaks = fc_bdg.call_peaks (cutoff=options.hmm_lower, up_limit=options.hmm_upper, min_length=petrack.average_template_length, max_gap=petrack.average_template_length, call_summits=False)
     options.info( f"# Total peaks within range: {peaks.total}" )
+
+    # we will extend the training regions to both side of 500bps to include background regions ...
+    
     # remove peaks overlapping with blacklisted regions
     if options.blacklist:
         peaks.exclude( blacklist )
     options.info( f"# after removing those overlapping with provided blacklisted regions, we have {peaks.total} left" )
     if peaks.total > options.hmm_maxTrain:
         peaks = peaks.randomly_pick( options.hmm_maxTrain, seed = options.hmm_randomSeed )
-        options.info( f"# We randomly pick {options.hmm_maxTrain} peaks for training" )        
-    
+        options.info( f"# We randomly pick {options.hmm_maxTrain} peaks for training" )
+
+    fhd = open(options.oprefix+"_training_peaks.bed","w")
+    peaks.write_to_bed( fhd )
+    fhd.close()
 
 #############################################
 # 4. Train HMM
@@ -157,7 +163,7 @@ def run( args ):
     # in the bins, at the same time, we record how many bins for each
     # peak.
     options.info( f"# Extract signals in training regions")
-    [ training_data, training_data_lengths ] = extract_signals_from_training_regions( digested_atac_signals, peaks, binsize = 10 )
+    [ training_data, training_data_lengths ] = extract_signals_from_training_regions( digested_atac_signals, peaks, binsize = 10, flanking = options.hmm_training_flanking )
 
     f = open(options.oprefix+"_training_data.txt","w")
     for v in training_data:

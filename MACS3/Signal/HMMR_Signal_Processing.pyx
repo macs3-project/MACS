@@ -1,6 +1,6 @@
 # cython: language_level=3
 # cython: profile=True
-# Time-stamp: <2022-02-23 17:37:36 Tao Liu>
+# Time-stamp: <2022-04-14 16:06:06 Tao Liu>
 
 """Module description:
 
@@ -28,6 +28,7 @@ from cpython cimport bool
 # ------------------------------------
 from MACS3.Signal.Prob import pnorm2
 from MACS3.Signal.BedGraph import bedGraphTrackI
+from MACS3.Signal.Region import Regions
 
 # ------------------------------------
 # Misc functions
@@ -120,10 +121,12 @@ cpdef list generate_digested_signals( object petrack, list weight_mapping ):
         ret_bedgraphs.append( bdg )
     return ret_bedgraphs
 
-cpdef list extract_signals_from_training_regions( list signals, object peaks, int binsize = 10 ):
+cpdef list extract_signals_from_training_regions( list signals, object peaks, int binsize = 10, flanking = 500 ):
     # we will take regions in peaks, create a bedGraphTrackI with
     # binned regions in peaks, then let them overlap with signals to
-    # create a list (4) of value arrays.
+    # create a list (4) of value arrays.  flanking: flanking regions
+    # beyond the peak region, we want to include some background
+    # regions.
     cdef:
         list extracted_data
         object signaltrack
@@ -133,19 +136,39 @@ cpdef list extract_signals_from_training_regions( list signals, object peaks, in
         list ps
         object p
         list ret_training_data, ret_training_lengths
+        object regions
 
-    peaks.sort()
+    # peaks.sort()
+    # fhd = open("original_peaks.bed","w")
+    # peaks.write_to_bed( fhd )
+    # fhd.close()
+    
+    regions = Regions()
+    regions.init_from_PeakIO( peaks )
+
+    # fhd = open("before.bed","w")
+    # regions.write_to_bed( fhd )
+    # fhd.close()
+
+    regions.expand( flanking )
+    regions.merge_overlap()
+
+    # fhd = open("after.bed","w")
+    # regions.write_to_bed( fhd )
+    # fhd.close()
 
     peaksbdg = bedGraphTrackI(baseline_value=0)
 
     n = 0
-    for chrom in peaks.get_chr_names():
+    # here we convert peaks from a PeakIO to BedGraph object with a
+    # given binsize.
+    for chrom in regions.get_chr_names():
         tmp_p = 0
-        ps = peaks.get_data_from_chrom( chrom )
+        ps = regions[ chrom ]
         for i in range( len( ps ) ):
             p = ps[ i ]
-            s = p['start']
-            e = p['end']
+            s = p[ 0 ]
+            e = p[ 1 ]
             # make bins, no need to be too accurate...
             s = s//binsize*binsize
             e = e//binsize*binsize
@@ -163,9 +186,9 @@ cpdef list extract_signals_from_training_regions( list signals, object peaks, in
     #print( peaksbdg.summary() )
     #print( peaksbdg.total() )
 
-    #bfhd = open("a.bdg","w")
-    #peaksbdg.write_bedGraph( bfhd, "peaksbdg", "peaksbdg" )
-    #bfhd.close()
+    # bfhd = open("a.bdg","w")
+    # peaksbdg.write_bedGraph( bfhd, "peaksbdg", "peaksbdg" )
+    # bfhd.close()
     # now, let's overlap
     extracted_data = []
     extracted_len = []
