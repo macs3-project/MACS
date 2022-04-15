@@ -1,4 +1,4 @@
-# Time-stamp: <2022-04-14 17:39:17 Tao Liu>
+# Time-stamp: <2022-04-15 11:01:22 Tao Liu>
 
 """Module Description
 
@@ -873,12 +873,17 @@ def opt_validate_hmmratac ( options ):
 
     # HMM
     # hmm_states non-negative int, warn if not k=3
-    if options.hmm_states <=0:
-        logging.error(" -s, --states must be an integer >= 0.")
+    #if options.hmm_states <=0:
+    #    logging.error(" -s, --states must be an integer >= 0.")
+    #    sys.exit( 1 )
+    #elif options.hmm_states != 3 and options.hmm_states > 0 and options.store_peaks == False:
+    #    logging.warn(" If -s, --states not k=3, recommend NOT calling peaks, use bedgraph.")
+
+    # hmm_binsize > 0
+    if options.hmm_binsize <=0:
+        logging.error(" --binsize must be larger than 0.")
         sys.exit( 1 )
-    elif options.hmm_states != 3 and options.hmm_states > 0 and options.store_peaks == False:
-        logging.warn(" If -s, --states not k=3, recommend NOT calling peaks, use bedgraph.")
-    
+
     # hmm_lower less than hmm_upper, non-negative 
     if options.hmm_lower <0:
         logging.error(" -l, --lower should not be negative! ")
@@ -891,66 +896,66 @@ def opt_validate_hmmratac ( options ):
         sys.exit(1)
     
     # hmm_maxTrain non-negative
-    if options.hmm_maxTrain <0:
-        logging.error(" --maxTrain should not be negative!")
+    if options.hmm_maxTrain <= 0:
+        logging.error(" --maxTrain should be larger than 0!")
         sys.exit( 1 )
     
     # hmm_training_regions
-    if options.hmm_training_regions:
-        options.argtxt += "# Using -t, --training input to train HMM instead of using fold change settings to select. \n"
+    #if options.hmm_training_regions:
+    #    options.argtxt += "# Using -t, --training input to train HMM instead of using fold change settings to select. \n"
     
     # hmm_zscore non-negative
-    if options.hmm_zscore <0:
-        logging.error(" -z, --zscore should not be negative!")
-        sys.exit( 1 )
+    #if options.hmm_zscore <0:
+    #    logging.error(" -z, --zscore should not be negative!")
+    #    sys.exit( 1 )
     
     # hmm_randomSeed
     if options.hmm_randomSeed:
         options.argtxt += "# Random seed selected as: %d\n" % options.hmm_randomSeed
     
     # hmm_window non-negative
-    if options.hmm_window <0:
-        logging.error(" --window should not be negative! ")
-        sys.exit( 1 )
+    #if options.hmm_window <0:
+    #    logging.error(" --window should not be negative! ")
+    #    sys.exit( 1 )
 
     # hmm_file
-    if options.hmm_file:
-        options.argtxt += "# HMM training will be skipped, --model input used instead. \n"
+    #if options.hmm_file:
+    #    options.argtxt += "# HMM training will be skipped, --model input used instead. \n"
 
     # hmm_modelonly
-    if options.hmm_modelonly:
-        options.argtxt += "# Program will stop after generating model, which can be later applied with '--model'. \n"
+    #if options.hmm_modelonly:
+    #    options.argtxt += "# Program will stop after generating model, which can be later applied with '--model'. \n"
 
 
     # Peak Calling
-    if options.call_minlen == True and options.store_peaks == True:
-        logging.error(" In order to use --minlen, --no-states must be set False.")
-        sys.exit( 1 )
+    #if options.call_minlen == True and options.store_peaks == True:
+    #    logging.error(" In order to use --minlen, --no-states must be set False.")
+    #    sys.exit( 1 )
 
-    if options.call_score.lower() not in [ 'max', 'ave', 'med', 'fc', 'zscore', 'all']:
-        logging.error( " Invalid method: %s" % options.call_score )
-        sys.exit( 1 )
+    #if options.call_score.lower() not in [ 'max', 'ave', 'med', 'fc', 'zscore', 'all']:
+    #    logging.error( " Invalid method: %s" % options.call_score )
+    #    sys.exit( 1 )
 
     # call_threshold non-negative
-    if options.call_threshold <0:
-        logging.error(" --threshold should not be negative! ")
-        sys.exit( 1 )
+    #if options.call_threshold <0:
+    #    logging.error(" --threshold should not be negative! ")
+    #    sys.exit( 1 )
     
 
     # Misc
     # misc_blacklist 
-    if options.misc_keep_duplicates:
-        options.argtxt += "# Duplicate reads from analysis will be stored. \n"
+    #if options.misc_keep_duplicates:
+    #    options.argtxt += "# Duplicate reads from analysis will be stored. \n"
 
     # misc_trim non-negative
-    if options.misc_trim <0:
-        logging.error(" --trim should not be negative! ")
-        sys.exit( 1 )
+    #if options.misc_trim <0:
+    #    logging.error(" --trim should not be negative! ")
+    #    sys.exit( 1 )
 
     # np # should this be mp? non-negative
-    if options.np <0:
-        logging.error(" -m, --multiple-processing should not be negative! ")
-        sys.exit( 1 )
+    #if options.np <0:
+    #    logging.error(" -m, --multiple-processing should not be negative! ")
+    #    sys.exit( 1 )
     
     # verbose 
     # logging object
@@ -962,9 +967,9 @@ def opt_validate_hmmratac ( options ):
                         )
     
     # min_map_quality non-negative
-    if options.min_map_quality <0:
-        logging.error(" -q, --minmapq should not be negative! ")
-        sys.exit( 1 )
+    #if options.min_map_quality <0:
+    #    logging.error(" -q, --minmapq should not be negative! ")
+    #    sys.exit( 1 )
 
     
     return options

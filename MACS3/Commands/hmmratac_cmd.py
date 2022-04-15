@@ -1,4 +1,4 @@
-# Time-stamp: <2022-04-15 00:38:05 Tao Liu>
+# Time-stamp: <2022-04-15 11:10:40 Tao Liu>
 
 """Description: Main HMMR command
 
@@ -51,7 +51,7 @@ def run( args ):
     #############################################
     options = opt_validate_hmmratac( args )
     options.info("\n" + options.argtxt)    
-    options.info("# Read fragments from BAM file...")
+    options.info("#1 Read fragments from BAM file...")
 
     bam = BAMPEParser(options.bam_file[0], buffer_size=options.buffer_size)
     petrack = bam.build_petrack()
@@ -69,7 +69,7 @@ def run( args ):
 
     # read in blacklisted if option entered    
     if options.blacklist:
-        options.info("# Read blacklist file...")
+        options.info("#  Read blacklist file...")
         peakio = open( options.blacklist )
         blacklist = PeakIO()
         i = 0
@@ -82,19 +82,25 @@ def run( args ):
     #############################################
     # 2. EM
     #############################################
-    # we will use EM to get the best means/stddevs for the mono-, di- and tri- modes of fragment sizes
-    options.info("# Use EM algorithm to estimate means and stddevs of fragment lengths")
-    options.info("  for mono-, di-, and tri-nucleosomal signals...") 
-    em_trainer = HMMR_EM( petrack, options.em_means[1:4], options.em_stddevs[1:4], seed = options.hmm_randomSeed )
-    # the mean and stddev after EM training
-    em_means = [options.em_means[0],]
-    em_means.extend(em_trainer.fragMeans)
-    em_stddevs = [options.em_stddevs[0],]
-    em_stddevs.extend(em_trainer.fragStddevs)    
-    options.info( f"# The mean and stddevs after EM:")
-    options.info( f"         [short,  mono-,  di-,  tri-]")
-    options.info( f"  Means: {em_means}")
-    options.info( f"  Stddevs: {em_stddevs}")
+    if options.em_skip:
+        # Skip EM and use the options.em_means and options.em_stddevs
+        em_means = options.em_means
+        em_stddevs = options.em_stddevs
+        options.info( "#2 EM is skipped. The following means and stddevs will be used:" )
+    else:
+        # we will use EM to get the best means/stddevs for the mono-, di- and tri- modes of fragment sizes
+        options.info("#2 Use EM algorithm to estimate means and stddevs of fragment lengths")
+        options.info("#  for mono-, di-, and tri-nucleosomal signals...") 
+        em_trainer = HMMR_EM( petrack, options.em_means[1:4], options.em_stddevs[1:4], seed = options.hmm_randomSeed )
+        # the mean and stddev after EM training
+        em_means = [options.em_means[0],]
+        em_means.extend(em_trainer.fragMeans)
+        em_stddevs = [options.em_stddevs[0],]
+        em_stddevs.extend(em_trainer.fragStddevs)    
+        options.info( f"#  The means and stddevs after EM:")
+    options.info(     f"#            [short,  mono-,  di-,  tri-]")
+    options.info(     f"#   Means:   {em_means}")
+    options.info(     f"#   Stddevs: {em_stddevs}")
 
     #############################################
     # 3. Define training set by peak calling
@@ -103,34 +109,37 @@ def run( args ):
     # Find regions with fold change within determined range to use as training sites.
     # Find regions with zscore values above certain cutoff to exclude from viterbi.
     # 
-    options.info( f"# Look for training set from {petrack.total} fragments" )
-    options.info( f"# Pile up all fragments" )
+    options.info( f"#3 Looking for training set from {petrack.total} fragments" )
+    options.info( f"#  Pile up all fragments" )
     fc_bdg = petrack.pileup_bdg( [1.0,], baseline_value = 0 )
     (sum_v, n_v, max_v, min_v, mean_v, std_v) = fc_bdg.summary()
-    options.info( f"# Call peak above within FC range of {options.hmm_lower} and {options.hmm_upper}" )
-    options.info( f"# Convert pileup to fold-change over average signal" )
+    options.info( f"#  Convert pileup to fold-change over average signal" )
     fc_bdg.apply_func(lambda x: x/mean_v)
-    peaks = fc_bdg.call_peaks (cutoff=options.hmm_lower, up_limit=options.hmm_upper, min_length=petrack.average_template_length, max_gap=petrack.average_template_length, call_summits=False)
-    options.info( f"# Total peaks within range: {peaks.total}" )
-
-    # we will extend the training regions to both side of 500bps to include background regions ...
+    options.info( f"#  Call peak above within fold-change range of {options.hmm_lower} and {options.hmm_upper}." )
+    options.info( f"#   The minimum length of the region is set as the average template/fragment length in the dataset: {petrack.average_template_length}" )
+    options.info( f"#   The maximum gap to merge nearby significant regions into one is set as the flanking size to extend training regions: {options.hmm_training_flanking}" )    
+    peaks = fc_bdg.call_peaks (cutoff=options.hmm_lower, up_limit=options.hmm_upper, min_length=petrack.average_template_length, max_gap=options.hmm_training_flanking, call_summits=False)
+    options.info( f"#  Total training regions called: {peaks.total}" )
     
     # remove peaks overlapping with blacklisted regions
     if options.blacklist:
         peaks.exclude( blacklist )
-    options.info( f"# after removing those overlapping with provided blacklisted regions, we have {peaks.total} left" )
+        options.info( f"#  after removing those overlapping with provided blacklisted regions, we have {peaks.total} left" )
     if peaks.total > options.hmm_maxTrain:
         peaks = peaks.randomly_pick( options.hmm_maxTrain, seed = options.hmm_randomSeed )
-        options.info( f"# We randomly pick {options.hmm_maxTrain} peaks for training" )
+        options.info( f"#  We randomly pick {options.hmm_maxTrain} regions for training" )
 
-    fhd = open(options.oprefix+"_training_peaks.bed","w")
-    peaks.write_to_bed( fhd )
-    fhd.close()
+    if ( options.print_train ):
+        fhd = open(options.name+"_training_regions.bed","w")
+        peaks.write_to_bed( fhd )
+        fhd.close()
+        options.info( f"#  Training regions have been saved to `{options.name}_training_regions.bed` " )
 
-#############################################
-# 4. Train HMM
-#############################################
-    options.info( f"# Compute the weights for each fragment length for each of the four signal types")
+    #############################################
+    # 4. Train HMM
+    #############################################
+    options.info( f"#4 Train Hidden Markov Model with Gaussian Mixed Model" )
+    options.info( f"#  Compute the weights for each fragment length for each of the four signal types")
     fl_dict = petrack.count_fraglengths()
     fl_list = list(fl_dict.keys())
     fl_list.sort()
@@ -138,44 +147,45 @@ def run( args ):
     # each of the four distributions based on the EM results
     weight_mapping = generate_weight_mapping( fl_list, em_means, em_stddevs )
     
-    options.info( f"# Generate short, mono-, di-, and tri-nucleosomal signals")
+    options.info( f"#  Generate short, mono-, di-, and tri-nucleosomal signals")
     digested_atac_signals = generate_digested_signals( petrack, weight_mapping )
     
-    options.info( f"# Saving short, mono-, di-, and tri-nucleosomal signals to bedGraph files")
+    # options.info( f"#  Saving short, mono-, di-, and tri-nucleosomal signals to bedGraph files")
     
-    fhd = open(options.oprefix+"_short.bdg","w")
-    digested_atac_signals[ 0 ].write_bedGraph(fhd, "short","short")
-    fhd.close()
+    # fhd = open(options.oprefix+"_short.bdg","w")
+    # digested_atac_signals[ 0 ].write_bedGraph(fhd, "short","short")
+    # fhd.close()
 
-    fhd = open(options.oprefix+"_mono.bdg","w")
-    digested_atac_signals[ 1 ].write_bedGraph(fhd, "mono","mono")
-    fhd.close()
+    # fhd = open(options.oprefix+"_mono.bdg","w")
+    # digested_atac_signals[ 1 ].write_bedGraph(fhd, "mono","mono")
+    # fhd.close()
     
-    fhd = open(options.oprefix+"_di.bdg","w")
-    digested_atac_signals[ 2 ].write_bedGraph(fhd, "di","di")
-    fhd.close()
+    # fhd = open(options.oprefix+"_di.bdg","w")
+    # digested_atac_signals[ 2 ].write_bedGraph(fhd, "di","di")
+    # fhd.close()
     
-    fhd = open(options.oprefix+"_tri.bdg","w")
-    digested_atac_signals[ 3 ].write_bedGraph(fhd, "tri","tri")
-    fhd.close()
+    # fhd = open(options.oprefix+"_tri.bdg","w")
+    # digested_atac_signals[ 3 ].write_bedGraph(fhd, "tri","tri")
+    # fhd.close()
 
     # We first bin the training regions then get four types of signals
     # in the bins, at the same time, we record how many bins for each
     # peak.
-    options.info( f"# Extract signals in training regions")
-    [ training_data, training_data_lengths ] = extract_signals_from_regions( digested_atac_signals, peaks, binsize = 10, flanking = options.hmm_training_flanking )
+    options.info( f"#  Extract signals in training regions with extension of {options.hmm_training_flanking} to both sides, and bin size of {options.binsize}")
+    [ training_data, training_data_lengths ] = extract_signals_from_regions( digested_atac_signals, peaks, binsize = options.binsize, flanking = options.hmm_training_flanking )
 
-    f = open(options.oprefix+"_training_data.txt","w")
-    for v in training_data:
-        f.write( f"{v[0]}\t{v[1]}\t{v[2]}\t{v[3]}\n" )
-    f.close()
+    # f = open(options.oprefix+"_training_data.txt","w")
+    # for v in training_data:
+    #     f.write( f"{v[0]}\t{v[1]}\t{v[2]}\t{v[3]}\n" )
+    # f.close()
     
-    f = open(options.oprefix+"_training_lens.txt","w")
-    for v in training_data_lengths:
-        f.write( f"{v}\n" )
-    f.close()    
+    # f = open(options.oprefix+"_training_lens.txt","w")
+    # for v in training_data_lengths:
+    #     f.write( f"{v}\n" )
+    #     f.close()  
+  
     
-    options.info( f"# Use Baum-Welch algorithm to train the HMM")
+    options.info( f"#  Use Baum-Welch algorithm to train the HMM")
     hmm_model = hmm_training( training_data, training_data_lengths )
 
     # label hidden states
@@ -199,18 +209,20 @@ def run( args ):
 # 5. Predict
 #############################################
     # Our prediction strategy will be different with HMMRATAC, we will first ask MACS call peaks with loose cutoff, then for each peak we will run HMM prediction to figure out labels. And for the rest of genomic regions, just mark them as 'background'.
-    candidate_peaks = fc_bdg.call_peaks (cutoff=options.hmm_lower/2, up_limit=options.hmm_upper*2, min_length=petrack.average_template_length, max_gap=petrack.average_template_length, call_summits=False)
-    options.info( f"# Total candidate peaks : {candidate_peaks.total}" )
+    options.info( f"#5 Decode with Viterbi to predict states" )    
+    candidate_peaks = fc_bdg.call_peaks (cutoff=options.hmm_lower/2, up_limit=options.hmm_upper*2, min_length=petrack.average_template_length, max_gap=petrack.hmm_training_flanking, call_summits=False)
+    options.info( f"#5  Total candidate peaks : {candidate_peaks.total}" )
     # remove peaks overlapping with blacklisted regions
     if options.blacklist:
         candidate_peaks.exclude( blacklist )
-    options.info( f"# after removing those overlapping with provided blacklisted regions, we have {candidate_peaks.total} left" )
+    options.info( f"#  after removing those overlapping with provided blacklisted regions, we have {candidate_peaks.total} left" )
 
     # extract signals
-    options.info( f"# Extract signals in candidate regions")
+    options.info( f"#  Extract signals in candidate regions")
+    # Note: we can implement in a different way to extract then predict for each candidate region.
     [ candidate_data, candidate_data_lengths ] = extract_signals_from_regions( digested_atac_signals, candidate_peaks, binsize = 10 )
     
-    options.info( f"# Use HMM to predict states")
+    options.info( f"#  Use HMM to predict states")
     #predicted_states = hmm_predict( digested_atac_signals, hmm_model, binsize = 10 )
     predicted_states = hmm_predict( candidate_data, candidate_data_lengths, hmm_model, binsize = 10 )
     f = open(options.oprefix+"_predicted.txt","w")

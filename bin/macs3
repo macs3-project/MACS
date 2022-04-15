@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# Time-stamp: <2022-04-14 17:30:37 Tao Liu>
+# Time-stamp: <2022-04-15 11:08:27 Tao Liu>
 
 """Description: MACS v3 main executable.
 
@@ -741,20 +741,24 @@ def add_hmmratac_parser( subparsers ):
     
     # group for output files
     group_output = argparser_hmmratac.add_argument_group( "Output arguments" )
+
     add_outdir_option( group_output )
-    add_output_group( group_output )
+    group_output.add_argument( "-n", "--name", dest = "name", type = str,
+                               help = "Name for this experiment, which will be used as a prefix to generate output file names. DEFAULT: \"NA\"",
+                               default = "NA" )
+
     group_output.add_argument( "-B", "--bdg", "--bedgraph", dest = "store_bdg", action = "store_true",
                                help = "Report whole genome bedgraph of all state annotations. DEFAULT: False",
                                default = False )
-    group_output.add_argument( "-S", "--bgscore", dest = "store_bgscore", action = "store_true",
-                               help = "Add the HMMRATAC score to each state annotation in bedgraph. Note: this adds considerable time. DEFAULT: False",
-                               default = False )
-    group_output.add_argument( "--no-peaks", dest = "store_peaks", action = "store_true",
-                               help = "Do not report peaks in bed format. Default: false",
-                               default = False )
-    group_output.add_argument( "--printExclude", dest = "print_exclude", action = "store_true",
-                               help = "Output excluded regions into Output_exclude.bed. Default: False",
-                               default = False )
+    #group_output.add_argument( "-S", "--bgscore", dest = "store_bgscore", action = "store_true",
+    #                           help = "Add the HMMRATAC score to each state annotation in bedgraph. Note: this adds considerable time. DEFAULT: False",
+    #                           default = False )
+    #group_output.add_argument( "--no-peaks", dest = "store_peaks", action = "store_true",
+    #                           help = "Do not report peaks in bed format. Default: false",
+    #                           default = False )
+    #group_output.add_argument( "--printExclude", dest = "print_exclude", action = "store_true",
+    #                           help = "Output excluded regions into Output_exclude.bed. Default: False",
+    #                           default = False )
     group_output.add_argument( "--printTrain", dest = "print_train", action = "store_true",
                                help = "Output training regions into Output_training.bed. Default: False",
                                default = False )
@@ -762,7 +766,7 @@ def add_hmmratac_parser( subparsers ):
     # group for EM
     group_em = argparser_hmmratac.add_argument_group( "EM algorithm arguments" )
     group_em.add_argument( "--no-fragem", dest = "em_skip", action = "store_true",
-                           help = "Do not perform EM training on the fragment distribution. Default: False",
+                           help = "Do not perform EM training on the fragment distribution. If set, EM_MEANS and EM.STDDEVS will be used instead. Default: False",
                            default = False )
     group_em.add_argument( "--means", dest = "em_means", type = float, nargs = 4,
                             help = "Comma separated list of initial mean values for the fragment distribution for short fragments, mono-, di-, and tri-nucleosomal fragments. Default: 50 200 400 600",
@@ -772,9 +776,12 @@ def add_hmmratac_parser( subparsers ):
                             default = [20, 20, 20, 20] )
     # group for HMM
     group_hmm = argparser_hmmratac.add_argument_group( "Hidden Markov Model arguments" )
-    group_hmm.add_argument( "-s", "--states", dest = "hmm_states", type = int,
-                            help = "Number of States in the model. Default = 3. If not k=3, recommend NOT calling peaks, use bedgraph. This option is named as `--kmeans` in HMMRATAC since it will also control the number of clusters in the k-means clustering process to decide the initial emissions for HMM training.",
-                            default = 3 )
+    #group_hmm.add_argument( "-s", "--states", dest = "hmm_states", type = int,
+    #                        help = "Number of States in the model. Default = 3. If not k=3, recommend NOT calling peaks, use bedgraph. This option is named as `--kmeans` in HMMRATAC since it will also control the number of clusters in the k-means clustering process to decide the initial emissions for HMM training.",
+    #                        default = 3 )
+    group_hmm.add_argument( "--binsize", dest = "hmm_binsize", type = int,
+                            help = "Size of the bins to split the pileup signals for training and decoding. Must >= 1. Smaller the binsize, higher the resolution of the results, slower the process. Default = 10",
+                            default = 10 )    
     group_hmm.add_argument( "-u", "--upper", dest = "hmm_upper", type = int,
                             help = "Upper limit on fold change range for choosing training sites. Default: 20",
                             default = 20 )
@@ -787,30 +794,30 @@ def add_hmmratac_parser( subparsers ):
     group_hmm.add_argument( "--training-flanking", dest = "hmm_training_flanking", type = int, required = False,
                             help = "Training regions will be expanded to both side with this number of basepairs. The purpose is to include more background regions. Default: 1000",
                             default = 1000 )
-    group_hmm.add_argument( "-t", "--training", dest = "hmm_training_regions", type = str, required = False, 
-                            help = "Filename of training regions (previously was BED_file) to use for training HMM, instead of using foldchange settings to select. Default: NA" )    
-    group_hmm.add_argument( "-z", "--zscore", dest = "hmm_zscore", type = int,
-                            help = "Zscored read depth to mask during Viterbi decoding. Default: 100",
-                            default = 100 )
-    group_hmm.add_argument( "--window", dest = "hmm_window", type = int,
-                            help = "Size of the bins to split the genome into for Viterbi decoding. To save memory, the genome is split into WINDOW long bins and viterbi decoding occurs across each bin. Default = 25000000. Note: For machines with limited memory, it is recommended to reduce the size of the bins.",
-                            default = 25000000 )
+    #group_hmm.add_argument( "-t", "--training", dest = "hmm_training_regions", type = str, required = False, 
+    #                        help = "Filename of training regions (previously was BED_file) to use for training HMM, instead of using foldchange settings to select. Default: NA" )    
+    #group_hmm.add_argument( "-z", "--zscore", dest = "hmm_zscore", type = int,
+    #                        help = "Zscored read depth to mask during Viterbi decoding. Default: 100",
+    #                        default = 100 )
+    #group_hmm.add_argument( "--window", dest = "hmm_window", type = int,
+    #                        help = "Size of the bins to split the genome into for Viterbi decoding. To save memory, the genome is split into WINDOW long bins and viterbi decoding occurs across each bin. Default = 25000000. Note: For machines with limited memory, it is recommended to reduce the size of the bins.",
+    #                        default = 25000000 )
     group_hmm.add_argument( "--model", dest = "hmm_file", type = str, required = False, 
                             help = "Binary model file (generated from previous HMMR run) to use instead of creating new one. When provided, HMM training will be skipped. Default: NA" )
-    group_hmm.add_argument( "--modelonly", dest = "hmm_modelonly", action = "store_true", default = False,
-                            help = "Stop the program after generating model. Use this option to generate HMM model ONLY, which can be later applied with `--model`. Default: False")
+    #group_hmm.add_argument( "--modelonly", dest = "hmm_modelonly", action = "store_true", default = False,
+    #                        help = "Stop the program after generating model. Use this option to generate HMM model ONLY, which can be later applied with `--model`. Default: False")
 
     # group for peak calling arguments
-    group_call = argparser_hmmratac.add_argument_group( "Peak calling arguments" )
-    group_call.add_argument( "--minlen", dest = "call_minlen", type = int,
-                             help = "Minimum length of open region to call peak. Note: --no-peaks must NOT be set True (--no-peaks default set False). Default: 200",
-                             default = 200 )
-    group_call.add_argument( "--score", dest = "call_score", type = str, choices = ("max", "ave", "med", "fc", "zscore", "all"),
-                             help = "What type of score system to use for peaks. Can be used for ranking peaks. Default: max",
-                             default = "max" )
-    group_call.add_argument( "--threshold", dest = "call_threshold", type = float,
-                             help = "Threshold for reporting peaks. Only peaks who's score is >= this value will be reported. Default: 100",
-                             default = 100 )
+    #group_call = argparser_hmmratac.add_argument_group( "Peak calling arguments" )
+    #group_call.add_argument( "--minlen", dest = "call_minlen", type = int,
+    #                         help = "Minimum length of open region to call peak. Note: --no-peaks must NOT be set True (--no-peaks default set False). Default: 200",
+    #                         default = 200 )
+    #group_call.add_argument( "--score", dest = "call_score", type = str, choices = ("max", "ave", "med", "fc", "zscore", "all"),
+    #                         help = "What type of score system to use for peaks. Can be used for ranking peaks. Default: max",
+    #                         default = "max" )
+    #group_call.add_argument( "--threshold", dest = "call_threshold", type = float,
+    #                         help = "Threshold for reporting peaks. Only peaks who's score is >= this value will be reported. Default: 100",
+    #                         default = 100 )
     # group for misc
     group_misc = argparser_hmmratac.add_argument_group( "Misc arguments" )
     group_misc.add_argument( "--randomSeed", dest = "hmm_randomSeed", type = int,
@@ -818,23 +825,23 @@ def add_hmmratac_parser( subparsers ):
                              default = 10151 )
     group_misc.add_argument( "-e", "--blacklist", dest = "blacklist", type = str, required = False, 
                              help = "Filename of blacklisted regions to exclude (previously was BED_file). Examples are those from ENCODE. Default: NA" )
-    group_misc.add_argument( "--keep-duplicates", dest = "misc_keep_duplicates", action = "store_true",
-                             help = "Keep duplicate reads from analysis. By default, duplicate reads will be removed. Default: False",
-                             default = False )
-    group_misc.add_argument( "--trim", dest = "misc_trim", type = int,
-                             help = "How many signals from the end to trim off (ie starting with tri signal then di etc). This may be useful if your data doesn't contain many large fragments. Default: 0",
-                             default = 0 )
-    group_misc.add_argument( "-m", "--multiple-processing", dest = "np", type = int,
-                             help = "CPU used for mutliple processing. Please note that, assigning more CPUs does not guarantee the process being faster. Creating too many parrallel processes need memory operations and  may negate benefit from multi processing. Default: 1",
-                             default = 1 )
+    #group_misc.add_argument( "--keep-duplicates", dest = "misc_keep_duplicates", action = "store_true",
+    #                         help = "Keep duplicate reads from analysis. By default, duplicate reads will be removed. Default: False",
+    #                         default = False )
+    #group_misc.add_argument( "--trim", dest = "misc_trim", type = int,
+    #                         help = "How many signals from the end to trim off (ie starting with tri signal then di etc). This may be useful if your data doesn't contain many large fragments. Default: 0",
+    #                         default = 0 )
+    #group_misc.add_argument( "-m", "--multiple-processing", dest = "np", type = int,
+    #                         help = "CPU used for mutliple processing. Please note that, assigning more CPUs does not guarantee the process being faster. Creating too many parrallel processes need memory operations and  may negate benefit from multi processing. Default: 1",
+    #                         default = 1 )
     group_misc.add_argument( "--verbose", dest = "verbose", type = int,
                              help = "Set verbose level of runtime message. 0: only show critical message, 1: show additional warning message, 2: show process information, 3: show debug messages. DEFAULT:2",
                              default = 2 )
-    group_misc.add_argument( "-q", "--minmapq", dest = "min_map_quality", type = int,
-                               help = "Minimum mapping quality of reads to keep. Default: 30",
-                               default = 30 )
-    group_misc.add_argument( "--buffer-size", dest = "buffer_size", type = int, default = "100000",
-                               help = "Buffer size for incrementally increasing internal array size to store reads alignment information. In most cases, you don't have to change this parameter. However, if there are large number of chromosomes/contigs/scaffolds in your alignment, it's recommended to specify a smaller buffer size in order to decrease memory usage (but it will take longer time to read alignment files). Minimum memory requested for reading an alignment file is about # of CHROMOSOME * BUFFER_SIZE * 8 Bytes. DEFAULT: 100000 " )
+    #group_misc.add_argument( "-q", "--minmapq", dest = "min_map_quality", type = int,
+    #                           help = "Minimum mapping quality of reads to keep. Default: 30",
+    #                           default = 30 )
+    #group_misc.add_argument( "--buffer-size", dest = "buffer_size", type = int, default = "100000",
+    #                           help = "Buffer size for incrementally increasing internal array size to store reads alignment information. In most cases, you don't have to change this parameter. However, if there are large number of chromosomes/contigs/scaffolds in your alignment, it's recommended to specify a smaller buffer size in order to decrease memory usage (but it will take longer time to read alignment files). Minimum memory requested for reading an alignment file is about # of CHROMOSOME * BUFFER_SIZE * 8 Bytes. DEFAULT: 100000 " )
     
     return
 
