@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# Time-stamp: <2022-04-14 16:05:54 Tao Liu>
+# Time-stamp: <2022-04-14 17:30:37 Tao Liu>
 
 """Description: MACS v3 main executable.
 
@@ -849,4 +849,6 @@ if __name__ == '__main__':
         sys.exit(0)
     except MemoryError:
         sys.exit( "MemoryError occurred. If your input file has a large number of contigs/chromosomes, decrease the buffer_size value by setting --buffer-size option." )
+        sys.exit(1)
+    except ValueError:
         sys.exit(1)

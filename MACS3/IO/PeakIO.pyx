@@ -1,6 +1,6 @@
 # cython: language_level=3
 # cython: profile=True
-# Time-stamp: <2022-03-03 15:07:45 Tao Liu>
+# Time-stamp: <2022-04-15 00:34:06 Tao Liu>
 
 """Module for PeakIO IO classes.
 
@@ -674,14 +674,13 @@ cdef class PeakIO:
             #    n_rl1 -= 1
             if n_rl1 >= 0:
                 ret_peaks[ k ].extend( peaks1[ k ][-n_rl1-1:] )
-                #print(f"we extend the list from {-n_rl1} to end")
-            #print(f"final nonoverlapping regions: {ret_peaks[k]}" )
+
+        for k in ret_peaks.keys():
             self.total += len( ret_peaks[ k ] )
-        #print(f"assigning...")
+
         self.peaks = ret_peaks
         self.CO_sorted = True
         self.sort()        
-        #print(f"return: {self}")
         return
 
     def read_from_xls (self, ofhd):

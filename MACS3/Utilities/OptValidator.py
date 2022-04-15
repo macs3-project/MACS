@@ -1,4 +1,4 @@
-# Time-stamp: <2022-02-23 13:45:23 Tao Liu>
+# Time-stamp: <2022-04-14 17:39:17 Tao Liu>
 
 """Module Description
 
@@ -814,7 +814,7 @@ def opt_validate_hmmratac ( options ):
     Ret: Validated options object.
     """
     # logging object
-    logging.basicConfig(level=20,
+    logging.basicConfig(level=(4-options.verbose)*10,
                         format='%(levelname)-5s @ %(asctime)s: %(message)s ',
                         datefmt='%a, %d %b %Y %H:%M:%S',
                         stream=sys.stderr,

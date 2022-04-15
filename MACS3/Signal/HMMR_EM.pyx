@@ -1,6 +1,6 @@
 # cython: language_level=3
 # cython: profile=True
-# Time-stamp: <2022-02-23 17:37:36 Tao Liu>
+# Time-stamp: <2022-04-15 00:36:51 Tao Liu>
 
 """Module description:
 
@@ -137,6 +137,10 @@ cdef class HMMR_EM:
         # sample down
         self.__petrack = petrack.sample_percent_copy( self.sample_percentage/100.0, seed = self.seed ) # may need to provide seed option for init function
         self.__data = self.__petrack.fraglengths()
+        fhd = open("allfrag.txt","w")
+        for d in self.__data:
+            fhd.write(f"{d}\n")
+        fhd.close()
         # then we only keep those with fragment lengths within certain range
         self.__data = self.__data[ np.logical_and( self.__data >= self.min_fraglen, self.__data <= self.max_fraglen ) ]
 
@@ -190,7 +194,7 @@ cdef class HMMR_EM:
                     counter += 1
             if counter == 3:
                 self.converged = True
-                info( f"# Reached convergence after {itr} iterations" )                
+                info( f"# Reached convergence after {itr} iterations" )
             if itr >= self.maxIter:
                 info( f"# Reached maximum number ({self.maxIter}) of iterations" )
                 break
@@ -224,6 +228,7 @@ cdef class HMMR_EM:
         for i in range( len( self.__data ) ):
             for j in range( 3 ):
                 # for each category: mono, di, tri- (3 in total), we get the likelihoods
+                #debug( f"j:{j} {self.__data[i]}, {self.fragMeans[j]}, {self.fragVars[j]}, {self.__weights[j]}" )
                 temp[j] = get_weighted_density( self.__data[i], self.fragMeans[j], self.fragVars[j], self.__weights[j] )
             # now look for the most likely category, as `index`
             index = return_greater( temp )
@@ -234,9 +239,16 @@ cdef class HMMR_EM:
                 (c[ index ], means[ index ], s[ index ]) = online_update( self.__data[ i ], c[ index ], means[ index ], s[ index ] )
                 variances[index] = s[ index ]/c[ index ]
                 total += 1
+            #debug( f"index: {index} mean: {means[index]}" )
 
         # Set fragMeans, fragStddevs, and fragVars
-        for j in range( 3 ): 
+        #debug( f"counts: {c[0]} {c[1]} {c[2]}" )
+        #debug( f"means: {means[0]} {means[1]} {means[2]}" )
+        #debug( f"vars: {variances[0]} {variances[1]} {variances[2]}")
+        for j in range( 3 ):
+            if c[ j ] == 0:
+                # if there is no fragment size in this category, ignore
+                continue
             self.fragMeans[ j ] = self.fragMeans[ j ] + self.jump*(means[ j ] - self.fragMeans[ j ])
             self.fragVars[ j ] = self.fragVars[ j ] + self.jump*(variances[ j ] - self.fragVars[ j ])
             self.fragStddevs[ j ] = sqrt( self.fragVars[ j ] )

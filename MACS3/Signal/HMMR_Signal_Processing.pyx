@@ -1,6 +1,6 @@
 # cython: language_level=3
 # cython: profile=True
-# Time-stamp: <2022-04-14 16:06:06 Tao Liu>
+# Time-stamp: <2022-04-15 00:37:37 Tao Liu>
 
 """Module description:
 
@@ -121,7 +121,7 @@ cpdef list generate_digested_signals( object petrack, list weight_mapping ):
         ret_bedgraphs.append( bdg )
     return ret_bedgraphs
 
-cpdef list extract_signals_from_training_regions( list signals, object peaks, int binsize = 10, flanking = 500 ):
+cpdef list extract_signals_from_regions( list signals, object peaks, int binsize = 10, flanking = 500 ):
     # we will take regions in peaks, create a bedGraphTrackI with
     # binned regions in peaks, then let them overlap with signals to
     # create a list (4) of value arrays.  flanking: flanking regions
@@ -182,7 +182,7 @@ cpdef list extract_signals_from_training_regions( list signals, object peaks, in
                 n += 1
                 tmp_p = tmp_e
     # we do not merge regions in peaksbdg object so each bin will be seperated.
-    print( f"added {n} bins" )
+    debug( f"added {n} bins" )
     #print( peaksbdg.summary() )
     #print( peaksbdg.total() )
 
@@ -202,7 +202,10 @@ cpdef list extract_signals_from_training_regions( list signals, object peaks, in
     ret_training_data = []
     ret_training_lengths = []
     c = 0
-    for i in range( n ):
+    nn = len( extracted_data[0] )
+    nnn =len( extracted_len[0] )
+    debug( f"{n} bins, {nn}, {nnn}" )
+    for i in range( nn ):
         c += 1
         ret_training_data.append(
             [ max( 0.0001, abs(round(extracted_data[0][i], 4))),

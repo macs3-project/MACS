@@ -1,6 +1,6 @@
 # cython: language_level=3
 # cython: profile=True
-# Time-stamp: <2022-02-23 12:15:32 Tao Liu>
+# Time-stamp: <2022-04-14 17:47:31 Tao Liu>
 
 """Module Description: statistics functions to calculate p-values
 
@@ -15,6 +15,7 @@ the distribution).
 from math import fabs
 from math import log1p #as py_log1p
 from math import sqrt
+import sys
 # ------------------------------------
 # Other modules
 # ------------------------------------
@@ -45,10 +46,17 @@ cpdef pnorm(int32_t x, int32_t u, int32_t v):
     """
     return 1.0/sqrt(2.0 * 3.141592653589793 * <float32_t>(v)) * exp(-<float32_t>(x-u)**2 / (2.0 * <float32_t>(v)))
 
-cpdef pnorm2(float32_t x, float32_t u, float32_t v):
+cpdef float32_t pnorm2(float32_t x, float32_t u, float32_t v):
     """The probability of X=x when X=Norm(u,v)
     """
-    return 1.0/sqrt(2.0 * 3.141592653589793 * v) * exp(-(x-u)**2 / (2.0 * v))
+    cdef:
+        float32_t ret
+
+    try:
+        ret =1.0/sqrt(2.0 * 3.141592653589793 * v) * exp(-(x-u)**2 / (2.0 * v))
+    except ValueError:
+        sys.exit(1)
+    return ret
 
 # ------------------------------------
 # Misc functions

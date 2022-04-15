@@ -1,4 +1,4 @@
-# Time-stamp: <2022-04-14 16:00:18 Tao Liu>
+# Time-stamp: <2022-04-15 00:38:05 Tao Liu>
 
 """Description: Main HMMR command
 
@@ -24,7 +24,7 @@ from MACS3.Utilities.OptValidator import opt_validate_hmmratac
 from MACS3.IO.PeakIO import PeakIO
 from MACS3.IO.Parser import BAMPEParser #BAMaccessor
 from MACS3.Signal.HMMR_EM import HMMR_EM
-from MACS3.Signal.HMMR_Signal_Processing import generate_weight_mapping, generate_digested_signals, extract_signals_from_training_regions
+from MACS3.Signal.HMMR_Signal_Processing import generate_weight_mapping, generate_digested_signals, extract_signals_from_regions
 from MACS3.Signal.HMMR_HMM import hmm_training, hmm_predict
 
 
@@ -162,7 +162,7 @@ def run( args ):
     # in the bins, at the same time, we record how many bins for each
     # peak.
     options.info( f"# Extract signals in training regions")
-    [ training_data, training_data_lengths ] = extract_signals_from_training_regions( digested_atac_signals, peaks, binsize = 10, flanking = options.hmm_training_flanking )
+    [ training_data, training_data_lengths ] = extract_signals_from_regions( digested_atac_signals, peaks, binsize = 10, flanking = options.hmm_training_flanking )
 
     f = open(options.oprefix+"_training_data.txt","w")
     for v in training_data:
@@ -196,7 +196,7 @@ def run( args ):
 
     # extract signals
     options.info( f"# Extract signals in candidate regions")
-    [ candidate_data, candidate_data_lengths ] = extract_signals_from_training_regions( digested_atac_signals, candidate_peaks, binsize = 10 )
+    [ candidate_data, candidate_data_lengths ] = extract_signals_from_regions( digested_atac_signals, candidate_peaks, binsize = 10 )
     
     options.info( f"# Use HMM to predict states")
     #predicted_states = hmm_predict( digested_atac_signals, hmm_model, binsize = 10 )
