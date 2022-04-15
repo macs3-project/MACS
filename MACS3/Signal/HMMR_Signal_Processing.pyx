@@ -1,6 +1,6 @@
 # cython: language_level=3
 # cython: profile=True
-# Time-stamp: <2022-04-15 00:37:37 Tao Liu>
+# Time-stamp: <2022-04-15 12:06:56 Tao Liu>
 
 """Module description:
 
@@ -121,7 +121,7 @@ cpdef list generate_digested_signals( object petrack, list weight_mapping ):
         ret_bedgraphs.append( bdg )
     return ret_bedgraphs
 
-cpdef list extract_signals_from_regions( list signals, object peaks, int binsize = 10, flanking = 500 ):
+cpdef list extract_signals_from_regions( list signals, object regions, int binsize = 10, flanking = 500 ):
     # we will take regions in peaks, create a bedGraphTrackI with
     # binned regions in peaks, then let them overlap with signals to
     # create a list (4) of value arrays.  flanking: flanking regions
@@ -130,34 +130,14 @@ cpdef list extract_signals_from_regions( list signals, object peaks, int binsize
     cdef:
         list extracted_data
         object signaltrack
-        object peaksbdg
+        object regionsbdg
         bytes chrom
         int i, s, e, tmp_s, tmp_e, tmp_n, n
         list ps
         object p
         list ret_training_data, ret_training_lengths
-        object regions
 
-    # peaks.sort()
-    # fhd = open("original_peaks.bed","w")
-    # peaks.write_to_bed( fhd )
-    # fhd.close()
-    
-    regions = Regions()
-    regions.init_from_PeakIO( peaks )
-
-    # fhd = open("before.bed","w")
-    # regions.write_to_bed( fhd )
-    # fhd.close()
-
-    regions.expand( flanking )
-    regions.merge_overlap()
-
-    # fhd = open("after.bed","w")
-    # regions.write_to_bed( fhd )
-    # fhd.close()
-
-    peaksbdg = bedGraphTrackI(baseline_value=0)
+    regionsbdg = bedGraphTrackI(baseline_value=0)
 
     n = 0
     # here we convert peaks from a PeakIO to BedGraph object with a
@@ -177,24 +157,19 @@ cpdef list extract_signals_from_regions( list signals, object peaks, int binsize
                 tmp_s = r
                 tmp_e = r + binsize
                 if tmp_s > tmp_p:
-                    peaksbdg.add_loc_wo_merge( chrom, tmp_p, tmp_s, 0 )
-                peaksbdg.add_loc_wo_merge( chrom, tmp_s, tmp_e, tmp_n )
+                    regionsbdg.add_loc_wo_merge( chrom, tmp_p, tmp_s, 0 )
+                regionsbdg.add_loc_wo_merge( chrom, tmp_s, tmp_e, tmp_n )
                 n += 1
                 tmp_p = tmp_e
-    # we do not merge regions in peaksbdg object so each bin will be seperated.
+    # we do not merge regions in regionsbdg object so each bin will be seperated.
     debug( f"added {n} bins" )
-    #print( peaksbdg.summary() )
-    #print( peaksbdg.total() )
 
-    # bfhd = open("a.bdg","w")
-    # peaksbdg.write_bedGraph( bfhd, "peaksbdg", "peaksbdg" )
-    # bfhd.close()
     # now, let's overlap
     extracted_data = []
     extracted_len = []
     for signaltrack in signals:
         # signaltrack is bedGraphTrackI object
-        [ values, lengths ] = signaltrack.extract_value_hmmr( peaksbdg )
+        [ values, lengths ] = signaltrack.extract_value_hmmr( regionsbdg )
         # we only need values
         #print( regions )
         extracted_data.append( values )

@@ -1,4 +1,4 @@
-# Time-stamp: <2022-04-15 11:01:22 Tao Liu>
+# Time-stamp: <2022-04-15 11:18:24 Tao Liu>
 
 """Module Description
 
@@ -828,33 +828,31 @@ def opt_validate_hmmratac ( options ):
 
    
     # input options.argtxt for hmmratac
-    options.argtxt = "\n".join((
-            "# Command line: %s" % " ".join(sys.argv[1:]),\
-            "# ARGUMENTS LIST:",\
-            "# outfile = %s" % (options.ofile),\
-            "# input file = %s\n" % (options.bam_file),\
+    options.argtxt = "# Command line: %s" % " ".join(sys.argv[1:])
+    #        "# ARGUMENTS LIST:",\
+    #        "# outfile = %s" % (options.ofile),\
+    #        "# input file = %s\n" % (options.bam_file),\
     # ... add additional
-            ))
 
     # Output options
-    if options.store_bdg:
-        options.argtxt += "# HMMRATAC will report whole genome bedgraph of all state annotations. \n"
+    #if options.store_bdg:
+    #    options.argtxt += "# HMMRATAC will report whole genome bedgraph of all state annotations. \n"
     
-    if options.store_bgscore:
-        options.argtxt += "# HMMRATAC score will be added to each state annotation in bedgraph. \n"
+    #if options.store_bgscore:
+    #    options.argtxt += "# HMMRATAC score will be added to each state annotation in bedgraph. \n"
 
-    if options.store_peaks:
-        options.argtxt += "# Peaks not reported in bed format\n"
+    #if options.store_peaks:
+    #    options.argtxt += "# Peaks not reported in bed format\n"
 
-    if options.print_exclude:
-        options.print_exclude = os.path.join(options.outdir, options.ofile+"Output_exclude.bed")
-    else:
-        options.print_exclude = "None"
+    #if options.print_exclude:
+    #    options.print_exclude = os.path.join(options.outdir, options.ofile+"Output_exclude.bed")
+    #else:
+    #    options.print_exclude = "None"
     
-    if options.print_train:
-        options.print_train = os.path.join(options.outdir, options.ofile+"Output_training.bed")
-    else:
-        options.print_train = "None"
+    #if options.print_train:
+    #    options.print_train = os.path.join(options.outdir, options.ofile+"Output_training.bed")
+    #else:
+    #    options.print_train = "None"
 
 
     # EM

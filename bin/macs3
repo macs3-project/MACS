@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# Time-stamp: <2022-04-15 11:08:27 Tao Liu>
+# Time-stamp: <2022-04-15 12:53:12 Tao Liu>
 
 """Description: MACS v3 main executable.
 
@@ -780,8 +780,8 @@ def add_hmmratac_parser( subparsers ):
     #                        help = "Number of States in the model. Default = 3. If not k=3, recommend NOT calling peaks, use bedgraph. This option is named as `--kmeans` in HMMRATAC since it will also control the number of clusters in the k-means clustering process to decide the initial emissions for HMM training.",
     #                        default = 3 )
     group_hmm.add_argument( "--binsize", dest = "hmm_binsize", type = int,
-                            help = "Size of the bins to split the pileup signals for training and decoding. Must >= 1. Smaller the binsize, higher the resolution of the results, slower the process. Default = 10",
-                            default = 10 )    
+                            help = "Size of the bins to split the pileup signals for training and decoding. Must >= 1. Smaller the binsize, higher the resolution of the results, slower the process. However, since HMMRATAC is designed to detect nucleosome structures from ATAC-seq, a too-small binsize may capture unncessary noises. Therefore, we recommand a binsize around 50. Default = 50",
+                            default = 50 )    
     group_hmm.add_argument( "-u", "--upper", dest = "hmm_upper", type = int,
                             help = "Upper limit on fold change range for choosing training sites. Default: 20",
                             default = 20 )
@@ -825,9 +825,9 @@ def add_hmmratac_parser( subparsers ):
                              default = 10151 )
     group_misc.add_argument( "-e", "--blacklist", dest = "blacklist", type = str, required = False, 
                              help = "Filename of blacklisted regions to exclude (previously was BED_file). Examples are those from ENCODE. Default: NA" )
-    #group_misc.add_argument( "--keep-duplicates", dest = "misc_keep_duplicates", action = "store_true",
-    #                         help = "Keep duplicate reads from analysis. By default, duplicate reads will be removed. Default: False",
-    #                         default = False )
+    group_misc.add_argument( "--keep-duplicates", dest = "misc_keep_duplicates", action = "store_true",
+                             help = "Keep duplicate reads from analysis. By default, duplicate reads will be removed. Default: False",
+                             default = False )
     #group_misc.add_argument( "--trim", dest = "misc_trim", type = int,
     #                         help = "How many signals from the end to trim off (ie starting with tri signal then di etc). This may be useful if your data doesn't contain many large fragments. Default: 0",
     #                         default = 0 )
@@ -840,8 +840,8 @@ def add_hmmratac_parser( subparsers ):
     #group_misc.add_argument( "-q", "--minmapq", dest = "min_map_quality", type = int,
     #                           help = "Minimum mapping quality of reads to keep. Default: 30",
     #                           default = 30 )
-    #group_misc.add_argument( "--buffer-size", dest = "buffer_size", type = int, default = "100000",
-    #                           help = "Buffer size for incrementally increasing internal array size to store reads alignment information. In most cases, you don't have to change this parameter. However, if there are large number of chromosomes/contigs/scaffolds in your alignment, it's recommended to specify a smaller buffer size in order to decrease memory usage (but it will take longer time to read alignment files). Minimum memory requested for reading an alignment file is about # of CHROMOSOME * BUFFER_SIZE * 8 Bytes. DEFAULT: 100000 " )
+    group_misc.add_argument( "--buffer-size", dest = "buffer_size", type = int, default = "100000",
+                               help = "Buffer size for incrementally increasing internal array size to store reads alignment information. In most cases, you don't have to change this parameter. However, if there are large number of chromosomes/contigs/scaffolds in your alignment, it's recommended to specify a smaller buffer size in order to decrease memory usage (but it will take longer time to read alignment files). Minimum memory requested for reading an alignment file is about # of CHROMOSOME * BUFFER_SIZE * 8 Bytes. DEFAULT: 100000 " )
     
     return
 

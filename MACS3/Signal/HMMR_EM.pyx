@@ -1,6 +1,6 @@
 # cython: language_level=3
 # cython: profile=True
-# Time-stamp: <2022-04-15 00:36:51 Tao Liu>
+# Time-stamp: <2022-04-15 11:24:58 Tao Liu>
 
 """Module description:
 
@@ -137,10 +137,10 @@ cdef class HMMR_EM:
         # sample down
         self.__petrack = petrack.sample_percent_copy( self.sample_percentage/100.0, seed = self.seed ) # may need to provide seed option for init function
         self.__data = self.__petrack.fraglengths()
-        fhd = open("allfrag.txt","w")
-        for d in self.__data:
-            fhd.write(f"{d}\n")
-        fhd.close()
+        #fhd = open("allfrag.txt","w")
+        #for d in self.__data:
+        #    fhd.write(f"{d}\n")
+        #fhd.close()
         # then we only keep those with fragment lengths within certain range
         self.__data = self.__data[ np.logical_and( self.__data >= self.min_fraglen, self.__data <= self.max_fraglen ) ]
 

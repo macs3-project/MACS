@@ -1,4 +1,4 @@
-# Time-stamp: <2022-04-15 11:12:56 Tao Liu>
+# Time-stamp: <2022-04-15 13:12:01 Tao Liu>
 
 """Description: Main HMMR command
 
@@ -27,6 +27,7 @@ from MACS3.IO.Parser import BAMPEParser #BAMaccessor
 from MACS3.Signal.HMMR_EM import HMMR_EM
 from MACS3.Signal.HMMR_Signal_Processing import generate_weight_mapping, generate_digested_signals, extract_signals_from_regions
 from MACS3.Signal.HMMR_HMM import hmm_training, hmm_predict
+from MACS3.Signal.Region import Regions
 
 
 #from MACS3.IO.BED import BEDreader # this hasn't been implemented yet.
@@ -78,6 +79,8 @@ def run( args ):
             i += 1
             blacklist.add( fs[0].encode(), int(fs[1]), int(fs[2]), name=b"%d" % i )
             blacklist.sort()
+        blacklist_regions = Regions()
+        blacklist_regions.init_from_PeakIO( blacklist )
 
     #############################################
     # 2. EM
@@ -115,23 +118,33 @@ def run( args ):
     (sum_v, n_v, max_v, min_v, mean_v, std_v) = fc_bdg.summary()
     options.info( f"#  Convert pileup to fold-change over average signal" )
     fc_bdg.apply_func(lambda x: x/mean_v)
+    minlen = int(petrack.average_template_length)
     options.info( f"#  Call peak above within fold-change range of {options.hmm_lower} and {options.hmm_upper}." )
-    options.info( f"#   The minimum length of the region is set as the average template/fragment length in the dataset: {petrack.average_template_length}" )
+    options.info( f"#   The minimum length of the region is set as the average template/fragment length in the dataset: {minlen}" )
     options.info( f"#   The maximum gap to merge nearby significant regions into one is set as the flanking size to extend training regions: {options.hmm_training_flanking}" )    
-    peaks = fc_bdg.call_peaks (cutoff=options.hmm_lower, up_limit=options.hmm_upper, min_length=petrack.average_template_length, max_gap=options.hmm_training_flanking, call_summits=False)
+    peaks = fc_bdg.call_peaks (cutoff=options.hmm_lower, up_limit=options.hmm_upper, min_length=minlen, max_gap=options.hmm_training_flanking, call_summits=False)
     options.info( f"#  Total training regions called: {peaks.total}" )
     
-    # remove peaks overlapping with blacklisted regions
-    if options.blacklist:
-        peaks.exclude( blacklist )
-        options.info( f"#  after removing those overlapping with provided blacklisted regions, we have {peaks.total} left" )
     if peaks.total > options.hmm_maxTrain:
         peaks = peaks.randomly_pick( options.hmm_maxTrain, seed = options.hmm_randomSeed )
         options.info( f"#  We randomly pick {options.hmm_maxTrain} regions for training" )
 
+    # Now we convert PeakIO to Regions and filter blacklisted regions
+    training_regions = Regions()
+    training_regions.init_from_PeakIO( peaks )
+    # We will expand the regions to both directions and merge overlap
+    options.info( f"#  We expand the training regions with {options.hmm_training_flanking} and merge overlap" )
+    training_regions.expand( options.hmm_training_flanking )
+    training_regions.merge_overlap()
+    
+    # remove peaks overlapping with blacklisted regions
+    if options.blacklist:
+        training_regions.exclude( blacklist_regions )
+        options.info( f"#  after removing those overlapping with provided blacklisted regions, we have {training_regions.total} left" )
+
     if ( options.print_train ):
         fhd = open(options.name+"_training_regions.bed","w")
-        peaks.write_to_bed( fhd )
+        training_regions.write_to_bed( fhd )
         fhd.close()
         options.info( f"#  Training regions have been saved to `{options.name}_training_regions.bed` " )
 
@@ -171,37 +184,36 @@ def run( args ):
     # We first bin the training regions then get four types of signals
     # in the bins, at the same time, we record how many bins for each
     # peak.
-    options.info( f"#  Extract signals in training regions with extension of {options.hmm_training_flanking} to both sides, and bin size of {options.binsize}")
-    [ training_data, training_data_lengths ] = extract_signals_from_regions( digested_atac_signals, peaks, binsize = options.binsize, flanking = options.hmm_training_flanking )
+    options.info( f"#  Extract signals in training regions with extension of {options.hmm_training_flanking} to both sides, and bin size of {options.hmm_binsize}")
+    [ training_data, training_data_lengths ] = extract_signals_from_regions( digested_atac_signals, training_regions, binsize = options.hmm_binsize, flanking = options.hmm_training_flanking )
 
-    # f = open(options.oprefix+"_training_data.txt","w")
-    # for v in training_data:
-    #     f.write( f"{v[0]}\t{v[1]}\t{v[2]}\t{v[3]}\n" )
-    # f.close()
+    f = open(options.name+"_training_data.txt","w")
+    for v in training_data:
+        f.write( f"{v[0]}\t{v[1]}\t{v[2]}\t{v[3]}\n" )
+    f.close()
     
-    # f = open(options.oprefix+"_training_lens.txt","w")
-    # for v in training_data_lengths:
-    #     f.write( f"{v}\n" )
-    #     f.close()  
-  
+    f = open(options.name+"_training_lens.txt","w")
+    for v in training_data_lengths:
+        f.write( f"{v}\n" )
+    f.close()
     
     options.info( f"#  Use Baum-Welch algorithm to train the HMM")
-    hmm_model = hmm_training( training_data, training_data_lengths )
+    hmm_model = hmm_training( training_data, training_data_lengths, random_seed = options.hmm_randomSeed )
 
     # label hidden states
-    open_region = np.where(hmm_model.means_[0:3,0,0] == max(hmm_model.means_[0:3,0,0]))[0][0]
+    open_region = np.where(hmm_model.means_ == max(hmm_model.means_[0:3,0]))[0][0]
     background_region = np.where(hmm_model.transmat_ == min(hmm_model.transmat_[0:3, open_region]))[0][0]
     nucleosomal_region = list(set([0, 1, 2]) - set([open_region, background_region]))[0]
 
-    f = open(options.oprefix+"_model.txt","w")
+    f = open(options.name+"_model.txt","w")
     f.write( str(hmm_model.startprob_)+"\n" )
     f.write( str(hmm_model.transmat_ )+"\n" )
     f.write( str(hmm_model.means_ )+"\n" )
     f.write( str(hmm_model.covars_ )+"\n" )
 
-    f.write( 'open region = state ', str(open_region)+"\n" )
-    f.write( 'background region = state ', str(background_region)+"\n" )
-    f.write( 'nucleosomal region = state ', str(nucleosomal_region)+"\n" )
+    f.write( 'open region = state ' + str(open_region)+"\n" )
+    f.write( 'background region = state ' + str(background_region)+"\n" )
+    f.write( 'nucleosomal region = state ' + str(nucleosomal_region)+"\n" )
    
     f.close()
 
@@ -210,22 +222,32 @@ def run( args ):
 #############################################
     # Our prediction strategy will be different with HMMRATAC, we will first ask MACS call peaks with loose cutoff, then for each peak we will run HMM prediction to figure out labels. And for the rest of genomic regions, just mark them as 'background'.
     options.info( f"#5 Decode with Viterbi to predict states" )    
-    candidate_peaks = fc_bdg.call_peaks (cutoff=options.hmm_lower/2, up_limit=options.hmm_upper*2, min_length=petrack.average_template_length, max_gap=petrack.hmm_training_flanking, call_summits=False)
+    candidate_peaks = fc_bdg.call_peaks (cutoff=options.hmm_lower/2, up_limit=options.hmm_upper*2, min_length=minlen, max_gap=options.hmm_training_flanking, call_summits=False)
     options.info( f"#5  Total candidate peaks : {candidate_peaks.total}" )
+
+
+    # Now we convert PeakIO to Regions and filter blacklisted regions
+    candidate_regions = Regions()
+    candidate_regions.init_from_PeakIO( candidate_peaks )
+    # We will expand the regions to both directions and merge overlap
+    options.info( f"#  We expand the candidate regions with {options.hmm_training_flanking} and merge overlap" )
+    candidate_regions.expand( options.hmm_training_flanking )
+    candidate_regions.merge_overlap()
+    
     # remove peaks overlapping with blacklisted regions
     if options.blacklist:
-        candidate_peaks.exclude( blacklist )
-    options.info( f"#  after removing those overlapping with provided blacklisted regions, we have {candidate_peaks.total} left" )
+        candidate_regions.exclude( blacklist_regions )
+        options.info( f"#  after removing those overlapping with provided blacklisted regions, we have {candidate_regions.total} left" )
 
     # extract signals
     options.info( f"#  Extract signals in candidate regions")
     # Note: we can implement in a different way to extract then predict for each candidate region.
-    [ candidate_data, candidate_data_lengths ] = extract_signals_from_regions( digested_atac_signals, candidate_peaks, binsize = 10 )
+    [ candidate_data, candidate_data_lengths ] = extract_signals_from_regions( digested_atac_signals, candidate_regions, binsize = options.hmm_binsize )
     
     options.info( f"#  Use HMM to predict states")
     #predicted_states = hmm_predict( digested_atac_signals, hmm_model, binsize = 10 )
-    predicted_states = hmm_predict( candidate_data, candidate_data_lengths, hmm_model, binsize = 10 )
-    f = open(options.oprefix+"_predicted.txt","w")
+    predicted_states = hmm_predict( candidate_data, candidate_data_lengths, hmm_model )
+    f = open(options.name+"_predicted.txt","w")
     for l in range(len(predicted_states)):
         f.write ( f"{candidate_data[l]} {predicted_states[l]}\n" )
     f.close()
