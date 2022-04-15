@@ -1,6 +1,6 @@
 # cython: language_level=3
 # cython: profile=True
-# Time-stamp: <2022-04-15 00:34:06 Tao Liu>
+# Time-stamp: <2022-04-15 15:16:22 Tao Liu>
 
 """Module for PeakIO IO classes.
 
@@ -210,7 +210,8 @@ cdef class PeakIO:
         for chrom in chrs:
             all_pc.extend(self.peaks[chrom])
         random.seed( seed )
-        all_pc = random.shuffle( all_pc )[:n]
+        random.shuffle( all_pc )
+        all_pc = all_pc[:n]
         ret_peakio = PeakIO()
         for p in all_pc:
             ret_peakio.add_PeakContent ( p["chrom"], p )

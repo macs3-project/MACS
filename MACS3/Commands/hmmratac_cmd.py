@@ -1,4 +1,4 @@
-# Time-stamp: <2022-04-15 14:31:31 Tao Liu>
+# Time-stamp: <2022-04-15 15:02:02 Tao Liu>
 
 """Description: Main HMMR command
 
@@ -212,8 +212,8 @@ def run( args ):
     f.write( str(hmm_model.covars_ )+"\n" )
 
     f.write( 'open region = state ' + str(i_open_region)+"\n" )
-    f.write( 'background region = state ' + str(i_background_region)+"\n" )
     f.write( 'nucleosomal region = state ' + str(i_nucleosomal_region)+"\n" )
+    f.write( 'background region = state ' + str(i_background_region)+"\n" )
 
     f.close()
 
@@ -222,7 +222,7 @@ def run( args ):
 #############################################
     # Our prediction strategy will be different with HMMRATAC, we will first ask MACS call peaks with loose cutoff, then for each peak we will run HMM prediction to figure out labels. And for the rest of genomic regions, just mark them as 'background'.
     options.info( f"#5 Decode with Viterbi to predict states" )    
-    candidate_peaks = fc_bdg.call_peaks (cutoff=options.hmm_lower/2, up_limit=options.hmm_upper*2, min_length=minlen, max_gap=options.hmm_training_flanking, call_summits=False)
+    candidate_peaks = fc_bdg.call_peaks (cutoff=options.hmm_lower/2, min_length=minlen, max_gap=options.hmm_training_flanking, call_summits=False)
     options.info( f"#5  Total candidate peaks : {candidate_peaks.total}" )
 
 

@@ -1,4 +1,4 @@
-# Time-stamp: <2022-04-15 11:18:24 Tao Liu>
+# Time-stamp: <2022-04-15 15:09:01 Tao Liu>
 
 """Module Description
 
@@ -828,7 +828,7 @@ def opt_validate_hmmratac ( options ):
 
    
     # input options.argtxt for hmmratac
-    options.argtxt = "# Command line: %s" % " ".join(sys.argv[1:])
+    options.argtxt = "# Command line: %s\n" % " ".join(sys.argv[1:])
     #        "# ARGUMENTS LIST:",\
     #        "# outfile = %s" % (options.ofile),\
     #        "# input file = %s\n" % (options.bam_file),\
