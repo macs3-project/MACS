@@ -1,6 +1,6 @@
 # cython: language_level=3
 # cython: profile=True
-# Time-stamp: <2022-03-02 18:04:30 Tao Liu>
+# Time-stamp: <2022-04-15 14:02:36 Tao Liu>
 
 """Module for BedGraph data class.
 
@@ -975,9 +975,10 @@ cdef class bedGraphTrackI:
 
         assert isinstance(bdgTrack2,bedGraphTrackI), "not a bedGraphTrackI object"
 
-        ret = [ pyarray('f',[]), pyarray('i',[]) ] # 1: value; 2: number of bins in this region
-        vadd = ret[0].append
-        ladd = ret[1].append
+        ret = [ [], pyarray('f',[]), pyarray('i',[]) ] # 0: bin location (chrom, position); 1: value; 2: number of bins in this region
+        padd = ret[0].append
+        vadd = ret[1].append
+        ladd = ret[2].append
 
         chr1 = set(self.get_chr_names())
         chr2 = set(bdgTrack2.get_chr_names())
@@ -1014,6 +1015,7 @@ cdef class bedGraphTrackI:
                     elif p2 < p1:
                         # clip a region from pre_p to p2, then set pre_p as p2.
                         if v2>0:
+                            padd( (chrom, p2) )
                             vadd(v1)
                             ladd(int(v2))
                         pre_p = p2
@@ -1023,6 +1025,7 @@ cdef class bedGraphTrackI:
                     elif p1 == p2:
                         # from pre_p to p1 or p2, then set pre_p as p1 or p2.
                         if v2>0:
+                            padd( (chrom, p2) )
                             vadd(v1)
                             ladd(int(v2))
                         pre_p = p1

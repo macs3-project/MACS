@@ -1,6 +1,6 @@
 # cython: language_level=3
 # cython: profile=True
-# Time-stamp: <2022-04-15 12:06:56 Tao Liu>
+# Time-stamp: <2022-04-15 14:08:27 Tao Liu>
 
 """Module description:
 
@@ -128,14 +128,14 @@ cpdef list extract_signals_from_regions( list signals, object regions, int binsi
     # beyond the peak region, we want to include some background
     # regions.
     cdef:
-        list extracted_data
+        list extracted_data, extracted_len, extracted_positions
         object signaltrack
         object regionsbdg
         bytes chrom
         int i, s, e, tmp_s, tmp_e, tmp_n, n
         list ps
         object p
-        list ret_training_data, ret_training_lengths
+        list ret_training_data, ret_training_lengths, ret_training_bins
 
     regionsbdg = bedGraphTrackI(baseline_value=0)
 
@@ -165,23 +165,25 @@ cpdef list extract_signals_from_regions( list signals, object regions, int binsi
     debug( f"added {n} bins" )
 
     # now, let's overlap
+    extracted_positions = []
     extracted_data = []
     extracted_len = []
     for signaltrack in signals:
         # signaltrack is bedGraphTrackI object
-        [ values, lengths ] = signaltrack.extract_value_hmmr( regionsbdg )
-        # we only need values
-        #print( regions )
+        [ positions, values, lengths ] = signaltrack.extract_value_hmmr( regionsbdg )
+        extracted_positions.append( positions )
         extracted_data.append( values )
         extracted_len.append( lengths )
+    ret_training_bins = []
     ret_training_data = []
     ret_training_lengths = []
     c = 0
     nn = len( extracted_data[0] )
-    nnn =len( extracted_len[0] )
-    debug( f"{n} bins, {nn}, {nnn}" )
+    #nnn =len( extracted_len[0] )
+    #debug( f"{n} bins, {nn}, {nnn}" )
     for i in range( nn ):
         c += 1
+        ret_training_bins.append( extracted_positions[0][i] )
         ret_training_data.append(
             [ max( 0.0001, abs(round(extracted_data[0][i], 4))),
               max( 0.0001, abs(round(extracted_data[1][i], 4))),
@@ -190,6 +192,6 @@ cpdef list extract_signals_from_regions( list signals, object regions, int binsi
         if c == extracted_len[0][i]:
             ret_training_lengths.append( extracted_len[0][i] )
             c = 0
-    return [ ret_training_data, ret_training_lengths ]
+    return [ ret_training_bins, ret_training_data, ret_training_lengths ]
 
 

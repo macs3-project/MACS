@@ -1,4 +1,4 @@
-# Time-stamp: <2022-04-15 13:12:01 Tao Liu>
+# Time-stamp: <2022-04-15 14:31:31 Tao Liu>
 
 """Description: Main HMMR command
 
@@ -151,7 +151,7 @@ def run( args ):
     #############################################
     # 4. Train HMM
     #############################################
-    options.info( f"#4 Train Hidden Markov Model with Gaussian Mixed Model" )
+    options.info( f"#4 Train Hidden Markov Model with Gaussian Emission" )
     options.info( f"#  Compute the weights for each fragment length for each of the four signal types")
     fl_dict = petrack.count_fraglengths()
     fl_list = list(fl_dict.keys())
@@ -185,7 +185,7 @@ def run( args ):
     # in the bins, at the same time, we record how many bins for each
     # peak.
     options.info( f"#  Extract signals in training regions with extension of {options.hmm_training_flanking} to both sides, and bin size of {options.hmm_binsize}")
-    [ training_data, training_data_lengths ] = extract_signals_from_regions( digested_atac_signals, training_regions, binsize = options.hmm_binsize, flanking = options.hmm_training_flanking )
+    [ training_bins, training_data, training_data_lengths ] = extract_signals_from_regions( digested_atac_signals, training_regions, binsize = options.hmm_binsize, flanking = options.hmm_training_flanking )
 
     f = open(options.name+"_training_data.txt","w")
     for v in training_data:
@@ -201,9 +201,9 @@ def run( args ):
     hmm_model = hmm_training( training_data, training_data_lengths, random_seed = options.hmm_randomSeed )
 
     # label hidden states
-    open_region = np.where(hmm_model.means_ == max(hmm_model.means_[0:3,0]))[0][0]
-    background_region = np.where(hmm_model.transmat_ == min(hmm_model.transmat_[0:3, open_region]))[0][0]
-    nucleosomal_region = list(set([0, 1, 2]) - set([open_region, background_region]))[0]
+    i_open_region = np.where(hmm_model.means_ == max(hmm_model.means_[0:3,0]))[0][0]
+    i_background_region = np.where(hmm_model.transmat_ == min(hmm_model.transmat_[0:3, i_open_region]))[0][0]
+    i_nucleosomal_region = list(set([0, 1, 2]) - set([i_open_region, i_background_region]))[0]
 
     f = open(options.name+"_model.txt","w")
     f.write( str(hmm_model.startprob_)+"\n" )
@@ -211,10 +211,10 @@ def run( args ):
     f.write( str(hmm_model.means_ )+"\n" )
     f.write( str(hmm_model.covars_ )+"\n" )
 
-    f.write( 'open region = state ' + str(open_region)+"\n" )
-    f.write( 'background region = state ' + str(background_region)+"\n" )
-    f.write( 'nucleosomal region = state ' + str(nucleosomal_region)+"\n" )
-   
+    f.write( 'open region = state ' + str(i_open_region)+"\n" )
+    f.write( 'background region = state ' + str(i_background_region)+"\n" )
+    f.write( 'nucleosomal region = state ' + str(i_nucleosomal_region)+"\n" )
+
     f.close()
 
 #############################################
@@ -242,14 +242,18 @@ def run( args ):
     # extract signals
     options.info( f"#  Extract signals in candidate regions")
     # Note: we can implement in a different way to extract then predict for each candidate region.
-    [ candidate_data, candidate_data_lengths ] = extract_signals_from_regions( digested_atac_signals, candidate_regions, binsize = options.hmm_binsize )
+    [ candidate_bins, candidate_data, candidate_data_lengths ] = extract_signals_from_regions( digested_atac_signals, candidate_regions, binsize = options.hmm_binsize )
     
     options.info( f"#  Use HMM to predict states")
-    #predicted_states = hmm_predict( digested_atac_signals, hmm_model, binsize = 10 )
-    predicted_states = hmm_predict( candidate_data, candidate_data_lengths, hmm_model )
+    predicted_proba = hmm_predict( candidate_data, candidate_data_lengths, hmm_model )
     f = open(options.name+"_predicted.txt","w")
-    for l in range(len(predicted_states)):
-        f.write ( f"{candidate_data[l]} {predicted_states[l]}\n" )
+    f.write("chromosome\tposition\tsignal\topen_proba\tnuc_prob\tbg_prob\tpredicted_state\n")
+    # The following part is for debugging/dev purpose, it's not efficient!
+    labels_list = ["open","nuc","bg"]
+    for l in range(len(predicted_proba)):
+        proba = np.array([ predicted_proba[l][ i_open_region ], predicted_proba[l][ i_nucleosomal_region ], predicted_proba[l][ i_background_region ] ])
+        label = labels_list[ np.argmax(proba) ]
+        f.write ( "%s\t%d\t%s\t%.3f\t%.3f\t%.3f\t%s\n" % ( candidate_bins[l][0].decode(), candidate_bins[l][1], str(candidate_data[l]), proba[0], proba[1], proba[2], label ) )        
     f.close()
 
 #############################################
