@@ -14,6 +14,7 @@ the distribution).
 import os
 import sys
 import logging
+import numpy as np
 #from typing import Sized
 
 # ------------------------------------
@@ -176,11 +177,22 @@ def run( args ):
     
     options.info( f"# Use Baum-Welch algorithm to train the HMM")
     hmm_model = hmm_training( training_data, training_data_lengths )
+
+    # label hidden states
+    open_region = np.where(hmm_model.means_ == max(hmm_model.means_[0:3,0]))[0][0]
+    background_region = np.where(hmm_model.transmat_ == min(hmm_model.transmat_[0:3, open_region]))[0][0]
+    nucleosomal_region = list(set([0, 1, 2]) - set([open_region, background_region]))[0]
+
     f = open(options.oprefix+"_model.txt","w")
     f.write( str(hmm_model.startprob_)+"\n" )
     f.write( str(hmm_model.transmat_ )+"\n" )
     f.write( str(hmm_model.means_ )+"\n" )
     f.write( str(hmm_model.covars_ )+"\n" )
+
+    f.write( 'open region = state ', str(open_region)+"\n" )
+    f.write( 'background region = state ', str(background_region)+"\n" )
+    f.write( 'nucleosomal region = state ', str(nucleosomal_region)+"\n" )
+   
     f.close()
 
 #############################################
