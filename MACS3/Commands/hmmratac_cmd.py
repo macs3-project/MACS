@@ -1,4 +1,4 @@
-# Time-stamp: <2022-04-15 11:10:40 Tao Liu>
+# Time-stamp: <2022-04-15 11:12:56 Tao Liu>
 
 """Description: Main HMMR command
 
@@ -189,7 +189,7 @@ def run( args ):
     hmm_model = hmm_training( training_data, training_data_lengths )
 
     # label hidden states
-    open_region = np.where(hmm_model.means_ == max(hmm_model.means_[0:3,0]))[0][0]
+    open_region = np.where(hmm_model.means_[0:3,0,0] == max(hmm_model.means_[0:3,0,0]))[0][0]
     background_region = np.where(hmm_model.transmat_ == min(hmm_model.transmat_[0:3, open_region]))[0][0]
     nucleosomal_region = list(set([0, 1, 2]) - set([open_region, background_region]))[0]
 
