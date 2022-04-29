@@ -264,11 +264,9 @@ def run( args ):
             end_pos = candidate_bins[i-1]
             f.write("%s\t%d\t%d\t%s\n" % (candidate_bins[l][0].decode(), start_pos, end_pos, label[i-1]) )
             start_pos = candidate_bins[i]
-        elif i == len(predicted_proba):
+        elif i == len(predicted_proba)-1:
             end_pos = candidate_bins[i]
             f.write("%s\t%d\t%d\t%s\n" % (candidate_bins[l][0].decode(), start_pos, end_pos, label[i-1]) )
-        else:
-            i +=1
 
             
 
