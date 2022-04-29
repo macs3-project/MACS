@@ -256,6 +256,22 @@ def run( args ):
         f.write ( "%s\t%d\t%s\t%.3f\t%.3f\t%.3f\t%s\n" % ( candidate_bins[l][0].decode(), candidate_bins[l][1], str(candidate_data[l]), proba[0], proba[1], proba[2], label ) )        
     f.close()
 
+    # cleaning up outputs:
+    f.write("chromosome\tstart_pos\tend_pos\tpredicted_state\n")
+    start_pos = candidate_bins[0]
+    for i in range(len(predicted_proba)):
+        if label[i] != label[i-1]:
+            end_pos = candidate_bins[i-1]
+            f.write("%s\t%d\t%d\t%s\n" % (candidate_bins[l][0].decode(), start_pos, end_pos, label[i-1]) )
+            start_pos = candidate_bins[i]
+        elif i == len(predicted_proba):
+            end_pos = candidate_bins[i]
+            f.write("%s\t%d\t%d\t%s\n" % (candidate_bins[l][0].decode(), start_pos, end_pos, label[i-1]) )
+        else:
+            i +=1
+
+            
+
 #############################################
 # 6. Output - add to OutputWriter
 #############################################
