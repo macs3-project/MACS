@@ -259,17 +259,20 @@ def run( args ):
     # cleaning up outputs:
     f = open(options.name+"_cleaned_predictions.txt","w")
     f.write("chromosome\tstart_pos\tend_pos\tpredicted_state\n")
-    start_pos = candidate_bins[0]
-    for i in range(len(predicted_proba)):
-        if label[i] != label[i-1]:
-            end_pos = candidate_bins[i-1]
-            f.write("%s\t%d\t%d\t%s\n" % (candidate_bins[i][0].decode(), start_pos, end_pos, label[i-1]) )
-            start_pos = candidate_bins[i]
-        elif i == len(predicted_proba)-1:
-            end_pos = candidate_bins[i]
-            f.write("%s\t%d\t%d\t%s\n" % (candidate_bins[i][0].decode(), start_pos, end_pos, label[i-1]) )
+    start_pos = candidate_bins[0][1]
+    for l in range(1, len(predicted_proba)):
+        proba_prev = np.array([ predicted_proba[l-1][ i_open_region ], predicted_proba[l-1][ i_nucleosomal_region ], predicted_proba[l-1][ i_background_region ] ])
+        label_prev = labels_list[ np.argmax(proba_prev) ]
+        proba_curr = np.array([ predicted_proba[l][ i_open_region ], predicted_proba[l][ i_nucleosomal_region ], predicted_proba[l][ i_background_region ] ])
+        label_curr = labels_list[ np.argmax(proba_curr) ]
+        if label_prev != label_curr:
+            end_pos = candidate_bins[l-1][1]
+            f.write("%s\t%s\t%s\t%s\n" % (candidate_bins[l][0].decode(), start_pos, end_pos, label_prev) )
+            start_pos = candidate_bins[l][1]
+        elif l == len(predicted_proba)-1:
+            end_pos = candidate_bins[l][1]
+            f.write("%s\t%s\t%s\t%s\n" % (candidate_bins[l][0].decode(), start_pos, end_pos, label_prev) )
     f.close()
-            
 
 #############################################
 # 6. Output - add to OutputWriter
