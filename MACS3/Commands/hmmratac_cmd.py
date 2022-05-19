@@ -257,7 +257,7 @@ def run( args ):
     f.close()
 
     # cleaning up outputs:
-    f = open(options.name+"_cleaned_predictions.txt","w")
+    f = open(options.name+"_states.bed","w")
     f.write("chromosome\tstart_pos\tend_pos\tpredicted_state\n")
     start_pos = candidate_bins[0][1]
     for l in range(1, len(predicted_proba)):
