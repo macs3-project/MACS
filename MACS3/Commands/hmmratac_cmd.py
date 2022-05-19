@@ -266,11 +266,11 @@ def run( args ):
         proba_curr = np.array([ predicted_proba[l][ i_open_region ], predicted_proba[l][ i_nucleosomal_region ], predicted_proba[l][ i_background_region ] ])
         label_curr = labels_list[ np.argmax(proba_curr) ]
         if label_prev != label_curr:
-            end_pos = candidate_bins[l-1][1]
+            end_pos = candidate_bins[l-1][1]+options.hmm_binsize
             f.write("%s\t%s\t%s\t%s\n" % (candidate_bins[l][0].decode(), start_pos, end_pos, label_prev) )
             start_pos = candidate_bins[l][1]
         elif l == len(predicted_proba)-1:
-            end_pos = candidate_bins[l][1]
+            end_pos = candidate_bins[l][1]+options.hmm_binsize
             f.write("%s\t%s\t%s\t%s\n" % (candidate_bins[l][0].decode(), start_pos, end_pos, label_prev) )
     f.close()
 
