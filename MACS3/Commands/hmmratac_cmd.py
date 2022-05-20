@@ -11,6 +11,7 @@ the distribution).
 # python modules
 # ------------------------------------
 
+from logging.handlers import RotatingFileHandler
 import os
 import sys
 import logging
@@ -273,6 +274,17 @@ def run( args ):
             end_pos = candidate_bins[l][1]+options.hmm_binsize
             f.write("%s\t%s\t%s\t%s\n" % (candidate_bins[l][0].decode(), start_pos, end_pos, label_prev) )
     f.close()
+    
+    # isolate accessible regions:
+    cleaned_data = np.genfromtxt(options.name+"_states.bed", dtype=str, encoding=None, delimiter="\t", skip_header= 1)
+    g = open(options.name+"_accessible_regions.txt", "w")
+    g.write("chromosome\tstart_pos\tend_pos\tpredicted_state\n")
+    for i in range(len(cleaned_data)-2):
+        if cleaned_data[i][3] == 'nuc' and cleaned_data[i+1][3] == 'open' and cleaned_data[i+2][3] == 'nuc':
+            g.write("%s\t%s\t%s\t%s\n" % (cleaned_data[i][0], cleaned_data[i][1], cleaned_data[i][2], cleaned_data[i][3]))
+            g.write("%s\t%s\t%s\t%s\n" % (cleaned_data[i+1][0], cleaned_data[i+1][1], cleaned_data[i+1][2], cleaned_data[i+1][3]))
+            g.write("%s\t%s\t%s\t%s\n" % (cleaned_data[i+2][0], cleaned_data[i+2][1], cleaned_data[i+2][2], cleaned_data[i+2][3]))
+    g.close()
 
 #############################################
 # 6. Output - add to OutputWriter
