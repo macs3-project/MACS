@@ -24,12 +24,12 @@ import numpy as np
 from MACS3.Utilities.Constants import *
 from MACS3.Utilities.OptValidator import opt_validate_hmmratac
 from MACS3.IO.PeakIO import PeakIO
+from MACS3.IO.PeakIO import BroadPeakIO
 from MACS3.IO.Parser import BAMPEParser #BAMaccessor
 from MACS3.Signal.HMMR_EM import HMMR_EM
 from MACS3.Signal.HMMR_Signal_Processing import generate_weight_mapping, generate_digested_signals, extract_signals_from_regions
 from MACS3.Signal.HMMR_HMM import hmm_training, hmm_predict
 from MACS3.Signal.Region import Regions
-
 
 #from MACS3.IO.BED import BEDreader # this hasn't been implemented yet.
 
@@ -275,17 +275,53 @@ def run( args ):
             f.write("%s\t%s\t%s\t%s\n" % (candidate_bins[l][0].decode(), start_pos, end_pos, label_prev) )
     f.close()
     
-    # isolate accessible regions:
+    ##### in progress:
+    broadpeak = BroadPeakIO()
     cleaned_data = np.genfromtxt(options.name+"_states.bed", dtype=str, encoding=None, delimiter="\t", skip_header= 1)
-    g = open(options.name+"_accessible_regions.txt", "w")
-    g.write("chromosome\tstart_pos\tend_pos\tpredicted_state\n")
+    accessible_regions = []
+    # add all accessible regions (nuc-open-nuc) to list
     for i in range(len(cleaned_data)-2):
         if cleaned_data[i][3] == 'nuc' and cleaned_data[i+1][3] == 'open' and cleaned_data[i+2][3] == 'nuc':
-            g.write("%s\t%s\t%s\t%s\n" % (cleaned_data[i][0], cleaned_data[i][1], cleaned_data[i][2], cleaned_data[i][3]))
-            g.write("%s\t%s\t%s\t%s\n" % (cleaned_data[i+1][0], cleaned_data[i+1][1], cleaned_data[i+1][2], cleaned_data[i+1][3]))
-            g.write("%s\t%s\t%s\t%s\n" % (cleaned_data[i+2][0], cleaned_data[i+2][1], cleaned_data[i+2][2], cleaned_data[i+2][3]))
-    g.close()
+            accessible_regions.append([(cleaned_data[i][0], int(cleaned_data[i][1]), int(cleaned_data[i][2]), cleaned_data[i][3]),
+            (cleaned_data[i+1][0], int(cleaned_data[i+1][1]), int(cleaned_data[i+1][2]), cleaned_data[i+1][3]),
+            (cleaned_data[i+2][0], int(cleaned_data[i+2][1]), int(cleaned_data[i+2][2]), cleaned_data[i+2][3])])
+    
+    ## currently, loop is going through all accessible regions individually (if regions are connected they are not treated as so ... yet)
+    # if current list start_pos == previous list end_pos, combine list ... 
+    # for k in range(1, len(accessible_regions)-1, 3):
+    #     pass
 
+    # for each list of tuples ... [nuc, open, nuc] or [nuc, open, nuc, nuc, open, nuc ... etc. ...]
+    for i in range(len(accessible_regions)):
+        block_num = len(accessible_regions[i])/3
+        block_sizes = []
+        block_starts = []
+        for j in range(1,len(accessible_regions[i])-1):
+            block_sizes.append(accessible_regions[i][j][2]-accessible_regions[i][j][1])
+            block_starts.append(accessible_regions[i][j][1])
+
+        broadpeak.add(bytes(accessible_regions[i][1][0], encoding="raw_unicode_escape"), #chromosome
+            accessible_regions[i][0][1], #left left
+            accessible_regions[i][-1][2], #right right
+            thickStart=bytes(str(accessible_regions[i][1][1]), encoding="raw_unicode_escape"), #first open left
+            thickEnd=bytes(str(accessible_regions[i][-2][2]), encoding="raw_unicode_escape"), #last open right
+            blockNum=block_num, #len(group)/3
+            blockSizes=bytes(str(block_sizes), encoding="raw_unicode_escape"), #?
+            blockStarts=bytes(str(block_starts), encoding="raw_unicode_escape")) #each center left .. list()
+
+    ofhd = open("some_accessible_regions.bed","w")
+    broadpeak.write_to_gappedPeak(ofhd)
+
+    # isolate accessible regions:
+    # cleaned_data = np.genfromtxt(options.name+"_states.bed", dtype=str, encoding=None, delimiter="\t", skip_header= 1)
+    # g = open(options.name+"_accessible_regions.txt", "w")
+    # g.write("chromosome\tstart_pos\tend_pos\tpredicted_state\n")
+    # for i in range(len(cleaned_data)-2):
+    #     if cleaned_data[i][3] == 'nuc' and cleaned_data[i+1][3] == 'open' and cleaned_data[i+2][3] == 'nuc':
+    #         g.write("%s\t%s\t%s\t%s\n" % (cleaned_data[i][0], cleaned_data[i][1], cleaned_data[i][2], cleaned_data[i][3]))
+    #         g.write("%s\t%s\t%s\t%s\n" % (cleaned_data[i+1][0], cleaned_data[i+1][1], cleaned_data[i+1][2], cleaned_data[i+1][3]))
+    #         g.write("%s\t%s\t%s\t%s\n" % (cleaned_data[i+2][0], cleaned_data[i+2][1], cleaned_data[i+2][2], cleaned_data[i+2][3]))
+    # g.close()
 #############################################
 # 6. Output - add to OutputWriter
 #############################################
