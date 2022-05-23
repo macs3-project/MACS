@@ -275,12 +275,8 @@ def run( args ):
             f.write("%s\t%s\t%s\t%s\n" % (candidate_bins[l][0].decode(), start_pos, end_pos, label_prev) )
     f.close()
     
-    ##### in progress:
-    # select only accessible regions from _states.bed
+    # select only accessible regions from _states.bed, look for nuc-open-nuc pattern
     cleaned_data = np.genfromtxt(options.name+"_states.bed", dtype=str, encoding=None, delimiter="\t", skip_header= 1)
-    # options.info("cleaned_data[0] "+str(cleaned_data[0]))
-    
-    # look for nuc-open-nuc pattern, add each state to accessible_regions list
     accessible_regions = []
     for i in range(len(cleaned_data)-2):
         if cleaned_data[i][3] == 'nuc' and cleaned_data[i+1][3] == 'open' and cleaned_data[i+2][3] == 'nuc':
@@ -296,15 +292,14 @@ def run( args ):
                 accessible_regions.append((cleaned_data[i][0], int(cleaned_data[i][1]), int(cleaned_data[i][2]), cleaned_data[i][3]))
                 accessible_regions.append((cleaned_data[i+1][0], int(cleaned_data[i+1][1]), int(cleaned_data[i+1][2]), cleaned_data[i+1][3]))
                 accessible_regions.append((cleaned_data[i+2][0], int(cleaned_data[i+2][1]), int(cleaned_data[i+2][2]), cleaned_data[i+2][3]))
-    # options.info("accessible_regions[-1] "+str(accessible_regions[-1]))
     
     # group states by region
     list_of_groups = []
     one_group = []
     one_group.append(accessible_regions[0])
     for j in range(1, len(accessible_regions)):
-        # if start_pos of current is == to end_pos of previous (then current state is connected to previous state)
-        # future: add gap here ... if accessible_regions[j][1] == accessible_regions[j-1][2]+options.hmm_binsize or +options.gap (this will need to be addressed in how _states.bed and the nuc-open-nuc pattern is selected)
+        # future: add gap here ... if accessible_regions[j][1] == accessible_regions[j-1][2]+options.hmm_binsize or +options.gap 
+        # (this will need to be addressed in how _states.bed and the nuc-open-nuc pattern is selected)
         if accessible_regions[j][1] == accessible_regions[j-1][2]:
             one_group.append(accessible_regions[j])
         elif accessible_regions[j][1] != accessible_regions[j-1][2]:
@@ -312,7 +307,6 @@ def run( args ):
             one_group = []
             one_group.append(accessible_regions[j])
     accessible_regions = list_of_groups
-    # options.info( str(list_of_groups[20:40]))
 
     # generate broadpeak object
     broadpeak = BroadPeakIO()
