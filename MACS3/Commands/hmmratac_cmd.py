@@ -284,15 +284,15 @@ def run( args ):
     accessible_regions = []
     for i in range(len(cleaned_data)-2):
         if cleaned_data[i][3] == 'nuc' and cleaned_data[i+1][3] == 'open' and cleaned_data[i+2][3] == 'nuc':
-            try:  
-                if cleaned_data[i][2] == accessible_regions[-1][2]: #if element already in list, don't repeat
+            if len(accessible_regions) > 0:  
+                if int(cleaned_data[i][2]) == int(accessible_regions[-1][2]): #if element already in list, don't repeat
                     accessible_regions.append((cleaned_data[i+1][0], int(cleaned_data[i+1][1]), int(cleaned_data[i+1][2]), cleaned_data[i+1][3]))
                     accessible_regions.append((cleaned_data[i+2][0], int(cleaned_data[i+2][1]), int(cleaned_data[i+2][2]), cleaned_data[i+2][3]))
                 else:
                     accessible_regions.append((cleaned_data[i][0], int(cleaned_data[i][1]), int(cleaned_data[i][2]), cleaned_data[i][3]))
                     accessible_regions.append((cleaned_data[i+1][0], int(cleaned_data[i+1][1]), int(cleaned_data[i+1][2]), cleaned_data[i+1][3]))
                     accessible_regions.append((cleaned_data[i+2][0], int(cleaned_data[i+2][1]), int(cleaned_data[i+2][2]), cleaned_data[i+2][3]))
-            except:
+            elif len(accessible_regions) == 0:
                 accessible_regions.append((cleaned_data[i][0], int(cleaned_data[i][1]), int(cleaned_data[i][2]), cleaned_data[i][3]))
                 accessible_regions.append((cleaned_data[i+1][0], int(cleaned_data[i+1][1]), int(cleaned_data[i+1][2]), cleaned_data[i+1][3]))
                 accessible_regions.append((cleaned_data[i+2][0], int(cleaned_data[i+2][1]), int(cleaned_data[i+2][2]), cleaned_data[i+2][3]))
