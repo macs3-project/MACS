@@ -276,52 +276,66 @@ def run( args ):
     f.close()
     
     ##### in progress:
-    broadpeak = BroadPeakIO()
+    # select only accessible regions from _states.bed
     cleaned_data = np.genfromtxt(options.name+"_states.bed", dtype=str, encoding=None, delimiter="\t", skip_header= 1)
+    # options.info("cleaned_data[0] "+str(cleaned_data[0]))
+    
+    # look for nuc-open-nuc pattern, add each state to accessible_regions list
     accessible_regions = []
-    # add all accessible regions (nuc-open-nuc) to list
     for i in range(len(cleaned_data)-2):
         if cleaned_data[i][3] == 'nuc' and cleaned_data[i+1][3] == 'open' and cleaned_data[i+2][3] == 'nuc':
-            accessible_regions.append([(cleaned_data[i][0], int(cleaned_data[i][1]), int(cleaned_data[i][2]), cleaned_data[i][3]),
-            (cleaned_data[i+1][0], int(cleaned_data[i+1][1]), int(cleaned_data[i+1][2]), cleaned_data[i+1][3]),
-            (cleaned_data[i+2][0], int(cleaned_data[i+2][1]), int(cleaned_data[i+2][2]), cleaned_data[i+2][3])])
+            try:  
+                if cleaned_data[i][2] == accessible_regions[-1][2]: #if element already in list, don't repeat
+                    accessible_regions.append((cleaned_data[i+1][0], int(cleaned_data[i+1][1]), int(cleaned_data[i+1][2]), cleaned_data[i+1][3]))
+                    accessible_regions.append((cleaned_data[i+2][0], int(cleaned_data[i+2][1]), int(cleaned_data[i+2][2]), cleaned_data[i+2][3]))
+                else:
+                    accessible_regions.append((cleaned_data[i][0], int(cleaned_data[i][1]), int(cleaned_data[i][2]), cleaned_data[i][3]))
+                    accessible_regions.append((cleaned_data[i+1][0], int(cleaned_data[i+1][1]), int(cleaned_data[i+1][2]), cleaned_data[i+1][3]))
+                    accessible_regions.append((cleaned_data[i+2][0], int(cleaned_data[i+2][1]), int(cleaned_data[i+2][2]), cleaned_data[i+2][3]))
+            except:
+                accessible_regions.append((cleaned_data[i][0], int(cleaned_data[i][1]), int(cleaned_data[i][2]), cleaned_data[i][3]))
+                accessible_regions.append((cleaned_data[i+1][0], int(cleaned_data[i+1][1]), int(cleaned_data[i+1][2]), cleaned_data[i+1][3]))
+                accessible_regions.append((cleaned_data[i+2][0], int(cleaned_data[i+2][1]), int(cleaned_data[i+2][2]), cleaned_data[i+2][3]))
+    # options.info("accessible_regions[-1] "+str(accessible_regions[-1]))
     
-    ## currently, loop is going through all accessible regions individually (if regions are connected they are not treated as so ... yet)
-    # if current list start_pos == previous list end_pos, combine list ... 
-    # for k in range(1, len(accessible_regions)-1, 3):
-    #     pass
+    # group states by region
+    list_of_groups = []
+    one_group = []
+    one_group.append(accessible_regions[0])
+    for j in range(1, len(accessible_regions)):
+        # if start_pos of current is == to end_pos of previous (then current state is connected to previous state)
+        # future: add gap here ... if accessible_regions[j][1] == accessible_regions[j-1][2]+options.hmm_binsize or +options.gap (this will need to be addressed in how _states.bed and the nuc-open-nuc pattern is selected)
+        if accessible_regions[j][1] == accessible_regions[j-1][2]:
+            one_group.append(accessible_regions[j])
+        elif accessible_regions[j][1] != accessible_regions[j-1][2]:
+            list_of_groups.append(one_group)
+            one_group = []
+            one_group.append(accessible_regions[j])
+    accessible_regions = list_of_groups
+    # options.info( str(list_of_groups[20:40]))
 
-    # for each list of tuples ... [nuc, open, nuc] or [nuc, open, nuc, nuc, open, nuc ... etc. ...]
+    # generate broadpeak object
+    broadpeak = BroadPeakIO()
     for i in range(len(accessible_regions)):
-        block_num = len(accessible_regions[i])/3
+        block_num = sum('open' in tup for tup in accessible_regions[i]) #number of open states in the region
         block_sizes = []
         block_starts = []
-        for j in range(1,len(accessible_regions[i])-1):
-            block_sizes.append(accessible_regions[i][j][2]-accessible_regions[i][j][1])
-            block_starts.append(accessible_regions[i][j][1])
+        for j in range(1, len(accessible_regions[i])-1, 2):
+            block_sizes.append(accessible_regions[i][j][2]-accessible_regions[i][j][1]) #distance between start_pos and end_pos in each open state
+            block_starts.append(accessible_regions[i][j][1]) #start_pos for each open state
 
         broadpeak.add(bytes(accessible_regions[i][1][0], encoding="raw_unicode_escape"), #chromosome
-            accessible_regions[i][0][1], #left left
-            accessible_regions[i][-1][2], #right right
-            thickStart=bytes(str(accessible_regions[i][1][1]), encoding="raw_unicode_escape"), #first open left
-            thickEnd=bytes(str(accessible_regions[i][-2][2]), encoding="raw_unicode_escape"), #last open right
-            blockNum=block_num, #len(group)/3
-            blockSizes=bytes(str(block_sizes), encoding="raw_unicode_escape"), #?
-            blockStarts=bytes(str(block_starts), encoding="raw_unicode_escape")) #each center left .. list()
+            accessible_regions[i][0][1], #start_pos of first nuc state in the region
+            accessible_regions[i][-1][2], #end_pos of the last nuc state in the region
+            thickStart=bytes(str(accessible_regions[i][1][1]), encoding="raw_unicode_escape"), #start_pos of the first open state
+            thickEnd=bytes(str(accessible_regions[i][-2][2]), encoding="raw_unicode_escape"), #end_pos of the last open state
+            blockNum=block_num,
+            blockSizes=bytes(str(block_sizes), encoding="raw_unicode_escape"),
+            blockStarts=bytes(str(block_starts), encoding="raw_unicode_escape"))
 
     ofhd = open("some_accessible_regions.bed","w")
     broadpeak.write_to_gappedPeak(ofhd)
 
-    # isolate accessible regions:
-    # cleaned_data = np.genfromtxt(options.name+"_states.bed", dtype=str, encoding=None, delimiter="\t", skip_header= 1)
-    # g = open(options.name+"_accessible_regions.txt", "w")
-    # g.write("chromosome\tstart_pos\tend_pos\tpredicted_state\n")
-    # for i in range(len(cleaned_data)-2):
-    #     if cleaned_data[i][3] == 'nuc' and cleaned_data[i+1][3] == 'open' and cleaned_data[i+2][3] == 'nuc':
-    #         g.write("%s\t%s\t%s\t%s\n" % (cleaned_data[i][0], cleaned_data[i][1], cleaned_data[i][2], cleaned_data[i][3]))
-    #         g.write("%s\t%s\t%s\t%s\n" % (cleaned_data[i+1][0], cleaned_data[i+1][1], cleaned_data[i+1][2], cleaned_data[i+1][3]))
-    #         g.write("%s\t%s\t%s\t%s\n" % (cleaned_data[i+2][0], cleaned_data[i+2][1], cleaned_data[i+2][2], cleaned_data[i+2][3]))
-    # g.close()
 #############################################
 # 6. Output - add to OutputWriter
 #############################################
