@@ -260,18 +260,18 @@ def run( args ):
     # cleaning up outputs:
     f = open(options.name+"_states.bed","w")
     f.write("chromosome\tstart_pos\tend_pos\tpredicted_state\n")
-    start_pos = candidate_bins[0][1]
+    start_pos = candidate_bins[0][1]-options.hmm_binsize
     for l in range(1, len(predicted_proba)):
         proba_prev = np.array([ predicted_proba[l-1][ i_open_region ], predicted_proba[l-1][ i_nucleosomal_region ], predicted_proba[l-1][ i_background_region ] ])
         label_prev = labels_list[ np.argmax(proba_prev) ]
         proba_curr = np.array([ predicted_proba[l][ i_open_region ], predicted_proba[l][ i_nucleosomal_region ], predicted_proba[l][ i_background_region ] ])
         label_curr = labels_list[ np.argmax(proba_curr) ]
         if label_prev != label_curr:
-            end_pos = candidate_bins[l-1][1]+options.hmm_binsize
+            end_pos = candidate_bins[l-1][1]
             f.write("%s\t%s\t%s\t%s\n" % (candidate_bins[l][0].decode(), start_pos, end_pos, label_prev) )
-            start_pos = candidate_bins[l][1]
+            start_pos = candidate_bins[l][1]-options.hmm_binsize
         elif l == len(predicted_proba)-1:
-            end_pos = candidate_bins[l][1]+options.hmm_binsize
+            end_pos = candidate_bins[l][1]
             f.write("%s\t%s\t%s\t%s\n" % (candidate_bins[l][0].decode(), start_pos, end_pos, label_prev) )
     f.close()
     
