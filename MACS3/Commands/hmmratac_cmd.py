@@ -312,11 +312,12 @@ def run( args ):
     broadpeak = BroadPeakIO()
     for i in range(len(accessible_regions)):
         block_num = sum('open' in tup for tup in accessible_regions[i]) #number of open states in the region
-        block_sizes = []
-        block_starts = []
+        block_sizes = ''
+        block_starts = ''
         for j in range(1, len(accessible_regions[i])-1, 2):
-            block_sizes.append(accessible_regions[i][j][2]-accessible_regions[i][j][1]) #distance between start_pos and end_pos in each open state
-            block_starts.append(accessible_regions[i][j][1]) #start_pos for each open state
+            block_sizes = block_sizes + str(accessible_regions[i][j][2] - accessible_regions[i][j][1]) + ',' #distance between start_pos and end_pos in each open state
+            block_starts = block_starts + str(accessible_regions[i][j][1]) + ',' #start_pos for each open state
+
 
         broadpeak.add(bytes(accessible_regions[i][1][0], encoding="raw_unicode_escape"), #chromosome
             accessible_regions[i][0][1], #start_pos of first nuc state in the region
@@ -324,8 +325,8 @@ def run( args ):
             thickStart=bytes(str(accessible_regions[i][1][1]), encoding="raw_unicode_escape"), #start_pos of the first open state
             thickEnd=bytes(str(accessible_regions[i][-2][2]), encoding="raw_unicode_escape"), #end_pos of the last open state
             blockNum=block_num,
-            blockSizes=bytes(str(block_sizes), encoding="raw_unicode_escape"),
-            blockStarts=bytes(str(block_starts), encoding="raw_unicode_escape"))
+            blockSizes=bytes(str(block_sizes[0:-1]), encoding="raw_unicode_escape"),
+            blockStarts=bytes(str(block_starts[0:-1]), encoding="raw_unicode_escape"))
 
     ofhd = open("some_accessible_regions.bed","w")
     broadpeak.write_to_gappedPeak(ofhd)
