@@ -1,4 +1,4 @@
-# Time-stamp: <2022-04-15 15:02:02 Tao Liu>
+# Time-stamp: <2022-05-26 12:32:55 Tao Liu>
 
 """Description: Main HMMR command
 
@@ -30,6 +30,7 @@ from MACS3.Signal.HMMR_EM import HMMR_EM
 from MACS3.Signal.HMMR_Signal_Processing import generate_weight_mapping, generate_digested_signals, extract_signals_from_regions
 from MACS3.Signal.HMMR_HMM import hmm_training, hmm_predict
 from MACS3.Signal.Region import Regions
+from MACS3.Signal.BedGraph import bedGraphTrackI
 
 #from MACS3.IO.BED import BEDreader # this hasn't been implemented yet.
 
@@ -247,6 +248,24 @@ def run( args ):
     
     options.info( f"#  Use HMM to predict states")
     predicted_proba = hmm_predict( candidate_data, candidate_data_lengths, hmm_model )
+
+    # Now taken the candidate_bins and predicted_proba, we can generate various
+    # outputs
+    
+    # One thing to remember about candidate_bins is that the position
+    # in this array is the 'end' of the bin, the actual region is the
+    # 'end'-'binsize' to the 'end'.
+    
+    # First, the likelihoods for each of the three states in a bedGraph
+    if options.store_bgscore:
+        open_state_bdg_file = open( options.name+"_open.bdg","w" )
+        nuc_state_bdg_file = open( options.name+"_nucleosomal.bdg","w" )
+        bg_state_bdg_file = open( options.name+"_background.bdg","w" )
+        save_proba_to_bedGraph( candidate_bins, predicted_proba, options.hmm_binsize, open_state_bdg_file, nuc_state_bdg_file, bg_state_bdg_file, i_open_region, i_nucleosomal_region, i_background_region )
+        open_state_bdg_file.close()
+        nuc_state_bdg_file.close()
+        bg_state_bdg_file.close()
+    
     f = open(options.name+"_predicted.txt","w")
     f.write("chromosome\tposition\tsignal\topen_proba\tnuc_prob\tbg_prob\tpredicted_state\n")
     # The following part is for debugging/dev purpose, it's not efficient!
@@ -316,7 +335,7 @@ def run( args ):
         block_starts = ''
         for j in range(1, len(accessible_regions[i])-1, 2):
             block_sizes = block_sizes + str(accessible_regions[i][j][2] - accessible_regions[i][j][1]) + ',' #distance between start_pos and end_pos in each open state
-            block_starts = block_starts + str(accessible_regions[i][j][1]) + ',' #start_pos for each open state
+            block_starts = block_starts + str(accessible_regions[i][j][1] - accessible_regions[i][0][1] ) + ',' #start_pos for each open state, it's relative position to the start_pos of the whole broad region
 
 
         broadpeak.add(bytes(accessible_regions[i][1][0], encoding="raw_unicode_escape"), #chromosome
@@ -328,8 +347,9 @@ def run( args ):
             blockSizes=bytes(str(block_sizes[0:-1]), encoding="raw_unicode_escape"),
             blockStarts=bytes(str(block_starts[0:-1]), encoding="raw_unicode_escape"))
 
-    ofhd = open("some_accessible_regions.bed","w")
+    ofhd = open(options.name+"_accessible_regions.gappedPeak","w")
     broadpeak.write_to_gappedPeak(ofhd)
+    ofhd.close()
 
 #############################################
 # 6. Output - add to OutputWriter
@@ -337,3 +357,40 @@ def run( args ):
     options.info( f"# Write the output...")
     #predicted_states.write_to_bdg( file="" )
 
+def save_proba_to_bedGraph( candidate_bins, predicted_proba, binsize, open_state_bdg_file, nuc_state_bdg_file, bg_state_bdg_file, i_open, i_nuc, i_bg ):
+    open_state_bdg = bedGraphTrackI( baseline_value = 0 )
+    nuc_state_bdg = bedGraphTrackI( baseline_value = 0 )
+    bg_state_bdg = bedGraphTrackI( baseline_value = 0 )
+
+    # get the first bin
+    is_first_bin_of_chromosome = False
+    prev_chrom_name = None
+    prev_bin_end = None
+    for l in range(len(predicted_proba)):
+        # note that any region not in the candidate bins will be
+        # treated as absolutely the background
+        chrname = candidate_bins[l][0]
+        end_pos = candidate_bins[l][1]
+        start_pos = end_pos - binsize
+        if chrname != prev_chrom_name:
+            prev_chrom_name = chrname
+            # add the first region as background
+            if start_pos > 0:
+                open_state_bdg.add_loc( chrname, 0, start_pos, 0.0 )
+                nuc_state_bdg.add_loc( chrname, 0, start_pos, 0.0 )
+                bg_state_bdg.add_loc( chrname, 0, start_pos, 1.0 )
+                prev_bin_end = start_pos
+        # now check if the prev_bin_end is start_pos, if not, add a gap of background
+        if prev_bin_end < start_pos:
+            open_state_bdg.add_loc( chrname, prev_bin_end, start_pos, 0.0 )
+            nuc_state_bdg.add_loc( chrname, prev_bin_end, start_pos, 0.0 )
+            bg_state_bdg.add_loc( chrname, prev_bin_end, start_pos, 1.0 )
+
+        open_state_bdg.add_loc( chrname, start_pos, end_pos, predicted_proba[l][ i_open ] )
+        nuc_state_bdg.add_loc( chrname, start_pos, end_pos, predicted_proba[l][ i_nuc ] )
+        bg_state_bdg.add_loc( chrname, start_pos, end_pos, predicted_proba[l][ i_bg ] )
+        prev_bin_end = start_pos
+
+    open_state_bdg.write_bedGraph( open_state_bdg_file, "Open States", "Likelihoods of being Open States" )
+    nuc_state_bdg.write_bedGraph( nuc_state_bdg_file, "Nucleosomal States", "Likelihoods of being Nucleosomal States" )
+    bg_state_bdg.write_bedGraph( bg_state_bdg_file, "Background States", "Likelihoods of being Background States" )    

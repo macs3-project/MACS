@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# Time-stamp: <2022-04-15 12:53:12 Tao Liu>
+# Time-stamp: <2022-05-25 23:42:25 Tao Liu>
 
 """Description: MACS v3 main executable.
 
@@ -750,9 +750,9 @@ def add_hmmratac_parser( subparsers ):
     group_output.add_argument( "-B", "--bdg", "--bedgraph", dest = "store_bdg", action = "store_true",
                                help = "Report whole genome bedgraph of all state annotations. DEFAULT: False",
                                default = False )
-    #group_output.add_argument( "-S", "--bgscore", dest = "store_bgscore", action = "store_true",
-    #                           help = "Add the HMMRATAC score to each state annotation in bedgraph. Note: this adds considerable time. DEFAULT: False",
-    #                           default = False )
+    group_output.add_argument( "-S", "--bgscore", dest = "store_bgscore", action = "store_true",
+                               help = "Add the HMMRATAC score to each state annotation in bedgraph. Note: this adds considerable time. DEFAULT: False",
+                               default = False )
     #group_output.add_argument( "--no-peaks", dest = "store_peaks", action = "store_true",
     #                           help = "Do not report peaks in bed format. Default: false",
     #                           default = False )
