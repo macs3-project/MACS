@@ -1,4 +1,4 @@
-# Time-stamp: <2022-06-01 00:11:50 Tao Liu>
+# Time-stamp: <2022-06-01 10:19:12 Tao Liu>
 
 """Description: Main HMMR command
 
@@ -326,8 +326,10 @@ def save_proba_to_bedGraph( candidate_bins, predicted_proba, binsize, open_state
     return
 
 def save_states_bed( states_path, states_bedfile ):
+    # we do not need to output background state. 
     for l in range( len( states_path ) ):
-        states_bedfile.write( "%s\t%s\t%s\t%s\n" % states_path[l] )
+        if states_path[l][3] != "bg":
+            states_bedfile.write( "%s\t%s\t%s\t%s\n" % states_path[l] )
     return
 
 def generate_states_path( candidate_bins, predicted_proba, binsize, i_open_region, i_nucleosomal_region, i_background_region ):
@@ -345,7 +347,7 @@ def generate_states_path( candidate_bins, predicted_proba, binsize, i_open_regio
             start_pos = candidate_bins[l][1]-binsize
         elif l == len(predicted_proba)-1:
             end_pos = candidate_bins[l][1]
-            ret_states_path.append( (candidate_bins[l][0].decode(), start_pos, end_pos, label_prev) )            
+            ret_states_path.append( (candidate_bins[l][0].decode(), start_pos, end_pos, label_prev) )
     return ret_states_path
 
 def save_accessible_regions( states_path, accessible_region_file ):

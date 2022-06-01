@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# Time-stamp: <2022-06-01 00:11:14 Tao Liu>
+# Time-stamp: <2022-06-01 10:16:20 Tao Liu>
 
 """Description: MACS v3 main executable.
 
@@ -748,7 +748,7 @@ def add_hmmratac_parser( subparsers ):
                                default = "NA" )
 
     group_output.add_argument( "--save-states", dest = "save_states", action = "store_true",
-                               help = "Save all state annotations into a BED file with the name NAME_states.bed. DEFAULT: False",
+                               help = "Save all open and nucleosomal state annotations into a BED file with the name NAME_states.bed. DEFAULT: False",
                                default = False )
     group_output.add_argument( "--save-likelihoods", dest = "save_likelihoods", action = "store_true",
                                help = "Save the likelihoods to each state annotation in three BedGraph files, named with NAME_open.bdg for open states, NAME_nuc.bdg for nucleosomal states, and NAME_bg.bdg for the background states. DEFAULT: False",
