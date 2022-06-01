@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# Time-stamp: <2022-05-25 23:42:25 Tao Liu>
+# Time-stamp: <2022-06-01 00:11:14 Tao Liu>
 
 """Description: MACS v3 main executable.
 
@@ -747,11 +747,11 @@ def add_hmmratac_parser( subparsers ):
                                help = "Name for this experiment, which will be used as a prefix to generate output file names. DEFAULT: \"NA\"",
                                default = "NA" )
 
-    group_output.add_argument( "-B", "--bdg", "--bedgraph", dest = "store_bdg", action = "store_true",
-                               help = "Report whole genome bedgraph of all state annotations. DEFAULT: False",
+    group_output.add_argument( "--save-states", dest = "save_states", action = "store_true",
+                               help = "Save all state annotations into a BED file with the name NAME_states.bed. DEFAULT: False",
                                default = False )
-    group_output.add_argument( "-S", "--bgscore", dest = "store_bgscore", action = "store_true",
-                               help = "Add the HMMRATAC score to each state annotation in bedgraph. Note: this adds considerable time. DEFAULT: False",
+    group_output.add_argument( "--save-likelihoods", dest = "save_likelihoods", action = "store_true",
+                               help = "Save the likelihoods to each state annotation in three BedGraph files, named with NAME_open.bdg for open states, NAME_nuc.bdg for nucleosomal states, and NAME_bg.bdg for the background states. DEFAULT: False",
                                default = False )
     #group_output.add_argument( "--no-peaks", dest = "store_peaks", action = "store_true",
     #                           help = "Do not report peaks in bed format. Default: false",
@@ -760,7 +760,7 @@ def add_hmmratac_parser( subparsers ):
     #                           help = "Output excluded regions into Output_exclude.bed. Default: False",
     #                           default = False )
     group_output.add_argument( "--printTrain", dest = "print_train", action = "store_true",
-                               help = "Output training regions into Output_training.bed. Default: False",
+                               help = "Output training data into NAME_training_data.txt. Default: False",
                                default = False )
                        
     # group for EM
