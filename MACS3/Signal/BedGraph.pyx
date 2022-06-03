@@ -1,6 +1,6 @@
 # cython: language_level=3
 # cython: profile=True
-# Time-stamp: <2022-04-15 14:02:36 Tao Liu>
+# Time-stamp: <2022-06-03 13:28:38 Tao Liu>
 
 """Module for BedGraph data class.
 
@@ -982,7 +982,7 @@ cdef class bedGraphTrackI:
 
         chr1 = set(self.get_chr_names())
         chr2 = set(bdgTrack2.get_chr_names())
-        common_chr = chr1.intersection(chr2)
+        common_chr = sorted(list(chr1.intersection(chr2)))
         for i in range( len( common_chr ) ):
             chrom = common_chr.pop()
             (p1s,v1s) = self.get_data_by_chr(chrom) # arrays for position and values

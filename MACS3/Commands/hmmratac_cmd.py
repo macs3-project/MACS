@@ -1,4 +1,4 @@
-# Time-stamp: <2022-06-03 12:51:49 Tao Liu>
+# Time-stamp: <2022-06-03 13:32:04 Tao Liu>
 
 """Description: Main HMMR command
 
@@ -186,8 +186,8 @@ def run( args ):
     # We first bin the training regions then get four types of signals
     # in the bins, at the same time, we record how many bins for each
     # peak.
-    options.info( f"#  Extract signals in training regions with extension of {options.hmm_training_flanking} to both sides, and bin size of {options.hmm_binsize}")
-    [ training_bins, training_data, training_data_lengths ] = extract_signals_from_regions( digested_atac_signals, training_regions, binsize = options.hmm_binsize, flanking = options.hmm_training_flanking )
+    options.info( f"#  Extract signals in training regions with bin size of {options.hmm_binsize}")
+    [ training_bins, training_data, training_data_lengths ] = extract_signals_from_regions( digested_atac_signals, training_regions, binsize = options.hmm_binsize )
 
     if options.print_train:
         f = open(options.name+"_training_data.txt","w")
