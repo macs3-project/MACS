@@ -1,4 +1,4 @@
-# Time-stamp: <2022-06-01 10:19:12 Tao Liu>
+# Time-stamp: <2022-06-03 10:24:06 Tao Liu>
 
 """Description: Main HMMR command
 
@@ -309,6 +309,9 @@ def save_proba_to_bedGraph( candidate_bins, predicted_proba, binsize, open_state
                 nuc_state_bdg.add_loc( chrname, 0, start_pos, 0.0 )
                 bg_state_bdg.add_loc( chrname, 0, start_pos, 1.0 )
                 prev_bin_end = start_pos
+            elif start_pos == 0:
+                # if start_pos == 0, then the first bin has to be assigned, we set prev_bin_end as 0 
+                prev_bin_end = 0
         # now check if the prev_bin_end is start_pos, if not, add a gap of background
         if prev_bin_end < start_pos:
             open_state_bdg.add_loc( chrname, prev_bin_end, start_pos, 0.0 )
@@ -405,6 +408,4 @@ def save_accessible_regions( states_path, accessible_region_file ):
 
     broadpeak.write_to_gappedPeak(accessible_region_file)
     return
-
-
 
