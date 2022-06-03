@@ -1,6 +1,6 @@
 # cython: language_level=3
 # cython: profile=True
-# Time-stamp: <2022-04-15 14:08:27 Tao Liu>
+# Time-stamp: <2022-06-03 13:11:14 Tao Liu>
 
 """Module description:
 
@@ -116,17 +116,15 @@ cpdef list generate_digested_signals( object petrack, list weight_mapping ):
     for i in range( 4 ):                  #yes I hardcoded 4!
         certain_signals = ret_digested_signals[ i ]
         bdg = bedGraphTrackI()
-        for chrom in certain_signals.keys():
+        for chrom in sorted(certain_signals.keys()):
             bdg.add_chrom_data_hmmr_PV( chrom, certain_signals[ chrom ] )
         ret_bedgraphs.append( bdg )
     return ret_bedgraphs
 
-cpdef list extract_signals_from_regions( list signals, object regions, int binsize = 10, flanking = 500 ):
+cpdef list extract_signals_from_regions( list signals, object regions, int binsize = 10  ):
     # we will take regions in peaks, create a bedGraphTrackI with
     # binned regions in peaks, then let them overlap with signals to
-    # create a list (4) of value arrays.  flanking: flanking regions
-    # beyond the peak region, we want to include some background
-    # regions.
+    # create a list (4) of value arrays. 
     cdef:
         list extracted_data, extracted_len, extracted_positions
         object signaltrack
@@ -142,7 +140,7 @@ cpdef list extract_signals_from_regions( list signals, object regions, int binsi
     n = 0
     # here we convert peaks from a PeakIO to BedGraph object with a
     # given binsize.
-    for chrom in regions.get_chr_names():
+    for chrom in sorted(regions.get_chr_names()):
         tmp_p = 0
         ps = regions[ chrom ]
         for i in range( len( ps ) ):

@@ -1,6 +1,6 @@
 # cython: language_level=3
 # cython: profile=True
-# Time-stamp: <2022-04-15 12:32:30 Tao Liu>
+# Time-stamp: <2022-06-03 12:58:42 Tao Liu>
 
 """Module for Region classe.
 
@@ -113,7 +113,7 @@ cdef class Regions:
         for chrom in self.regions.keys():
             ps = self.regions[ chrom ]
             for i in range( len( ps ) ):
-                ps[i] = ( ps[i][0] - flanking, ps[i][1] + flanking )
+                ps[i] = ( max(0, ps[i][0] - flanking), ps[i][1] + flanking )
             ps.sort()
             self.regions[chrom] = ps
     

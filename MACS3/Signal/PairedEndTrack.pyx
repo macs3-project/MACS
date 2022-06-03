@@ -1,6 +1,6 @@
 # cython: language_level=3
 # cython: profile=True
-# Time-stamp: <2022-06-03 11:32:58 Tao Liu>
+# Time-stamp: <2022-06-03 12:51:09 Tao Liu>
 
 """Module for filter duplicate tags from paired-end data
 
@@ -199,9 +199,9 @@ cdef class PETrackI:
             raise Exception("No such chromosome name (%s) in TrackI object!\n" % (chromosome))
 
     cpdef set get_chr_names ( self ):
-        """Return all the chromosome names stored in this track object.
+        """Return all the chromosome names in this track object as a python set.
         """
-        return set(sorted(self.__locations.keys()))
+        return set(self.__locations.keys())
 
 
     cpdef void sort ( self ):
@@ -355,7 +355,7 @@ cdef class PETrackI:
         else:
             rs_shuffle = np.random.shuffle
 
-        for k in chrnames:
+        for k in sorted(chrnames):
             # for each chromosome.
             # This loop body is too big, I may need to split code later...
 
@@ -390,7 +390,7 @@ cdef class PETrackI:
             rs = np.random.default_rng()
 
         rs_shuffle = rs.shuffle
-        for k in chrnames:
+        for k in sorted(chrnames): # chrnames need to be sorted otherwise we can't assure reproducibility
             # for each chromosome.
             # This loop body is too big, I may need to split code later...
             l = np.copy( self.__locations[k] )
