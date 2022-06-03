@@ -1,6 +1,6 @@
 # cython: language_level=3
 # cython: profile=True
-# Time-stamp: <2022-03-09 11:14:43 Tao Liu>
+# Time-stamp: <2022-06-03 11:32:58 Tao Liu>
 
 """Module for filter duplicate tags from paired-end data
 
@@ -340,6 +340,7 @@ cdef class PETrackI:
             uint32_t num, i_chrom      # num: number of reads allowed on a certain chromosome
             bytes k
             set chrnames
+            object rs, rs_shuffle
 
         self.total = 0
         self.length = 0
@@ -348,14 +349,18 @@ cdef class PETrackI:
         chrnames = self.get_chr_names()
 
         if seed >= 0:
-            np.random.seed(seed)
+            info(f"#   A random seed {seed} has been used")
+            rs = np.random.RandomState(np.random.MT19937(np.random.SeedSequence(seed)))
+            rs_shuffle = rs.shuffle
+        else:
+            rs_shuffle = np.random.shuffle
 
         for k in chrnames:
             # for each chromosome.
             # This loop body is too big, I may need to split code later...
 
             num = <uint32_t>round(self.__locations[k].shape[0] * percent, 5 )
-            np.random.shuffle( self.__locations[k] )
+            rs_shuffle( self.__locations[k] )
             self.__locations[k].resize( num, refcheck = False )
             self.__locations[k].sort( order = ['l', 'r'] ) # sort by leftmost positions
             self.__size[k] = self.__locations[k].shape[0]
@@ -372,21 +377,25 @@ cdef class PETrackI:
             uint32_t num, i_chrom      # num: number of reads allowed on a certain chromosome
             bytes k
             set chrnames
-            object ret_petrackI
+            object ret_petrackI, rs, rs_shuffle
             np.ndarray l
 
         ret_petrackI = PETrackI( anno=self.annotation, buffer_size = self.buffer_size)
         chrnames = self.get_chr_names()
 
         if seed >= 0:
-            np.random.seed(seed)
+            info(f"# A random seed {seed} has been used in the sampling function")
+            rs = np.random.default_rng(seed)
+        else:
+            rs = np.random.default_rng()
 
+        rs_shuffle = rs.shuffle
         for k in chrnames:
             # for each chromosome.
             # This loop body is too big, I may need to split code later...
             l = np.copy( self.__locations[k] )
             num = <uint32_t>round(l.shape[0] * percent, 5 )
-            np.random.shuffle( l )
+            rs_shuffle( l )
             l.resize( num, refcheck = False )
             l.sort( order = ['l', 'r'] ) # sort by leftmost positions
             ret_petrackI.__locations[ k ] = l

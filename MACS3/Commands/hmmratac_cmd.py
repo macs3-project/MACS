@@ -1,4 +1,4 @@
-# Time-stamp: <2022-06-03 10:24:06 Tao Liu>
+# Time-stamp: <2022-06-03 11:39:36 Tao Liu>
 
 """Description: Main HMMR command
 
@@ -107,6 +107,8 @@ def run( args ):
     options.info(     f"#   Means:   {em_means}")
     options.info(     f"#   Stddevs: {em_stddevs}")
 
+    return
+    
     #############################################
     # 3. Define training set by peak calling
     #############################################
