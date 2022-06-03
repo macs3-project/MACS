@@ -390,7 +390,7 @@ cdef class PETrackI:
             rs = np.random.default_rng()
 
         rs_shuffle = rs.shuffle
-        for k in chrnames:
+        for k in sorted(chrnames):
             # for each chromosome.
             # This loop body is too big, I may need to split code later...
             l = np.copy( self.__locations[k] )
