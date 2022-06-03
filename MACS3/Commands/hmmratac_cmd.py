@@ -1,4 +1,4 @@
-# Time-stamp: <2022-06-03 13:32:04 Tao Liu>
+# Time-stamp: <2022-06-03 14:49:00 Tao Liu>
 
 """Description: Main HMMR command
 
@@ -124,8 +124,12 @@ def run( args ):
     options.info( f"#  Call peak above within fold-change range of {options.hmm_lower} and {options.hmm_upper}." )
     options.info( f"#   The minimum length of the region is set as the average template/fragment length in the dataset: {minlen}" )
     options.info( f"#   The maximum gap to merge nearby significant regions into one is set as the flanking size to extend training regions: {options.hmm_training_flanking}" )    
-    peaks = fc_bdg.call_peaks (cutoff=options.hmm_lower, up_limit=options.hmm_upper, min_length=minlen, max_gap=options.hmm_training_flanking, call_summits=False)
+    peaks = fc_bdg.call_peaks (cutoff=options.hmm_lower, min_length=minlen, max_gap=options.hmm_training_flanking, call_summits=False)
+    f = open("a.bed","w")
+    peaks.write_to_bed( f )
     options.info( f"#  Total training regions called: {peaks.total}" )
+    peaks.filter_score( options.hmm_lower, options.hmm_upper )
+    options.info( f"#  Total training regions after filtering with lower and upper cutoff: {peaks.total}" )
     
     if peaks.total > options.hmm_maxTrain:
         peaks = peaks.randomly_pick( options.hmm_maxTrain, seed = options.hmm_randomSeed )

@@ -1,6 +1,6 @@
 # cython: language_level=3
 # cython: profile=True
-# Time-stamp: <2022-06-03 13:28:38 Tao Liu>
+# Time-stamp: <2022-06-03 14:38:34 Tao Liu>
 
 """Module for BedGraph data class.
 
@@ -440,7 +440,7 @@ cdef class bedGraphTrackI:
         std_v = sqrt(variance)
         return (sum_v, n_v, max_v, min_v, mean_v, std_v)
 
-    cpdef object call_peaks (self, float32_t cutoff=1, float32_t up_limit=1e310,
+    cpdef object call_peaks (self, float32_t cutoff=1,
                              int32_t min_length=200, int32_t max_gap=50,
                              bool call_summits=False):
         """This function try to find regions within which, scores
@@ -453,10 +453,17 @@ cdef class bedGraphTrackI:
         min_length.
 
         cutoff:  cutoff of value, default 1.
-        up_limit: the highest acceptable value. Default 10^{310}
-          * so only allow peak with value >=cutoff and <=up_limit
         min_length :  minimum peak length, default 200.
         gap   :  maximum gap to merge nearby peaks, default 50.
+
+        Removed option:
+
+        up_limit: the highest acceptable value. Default 10^{310}
+          * so only allow peak with value >=cutoff and <=up_limit
+
+        This does not work. The region above upper limit may still be
+        included as `gap` .
+
         """
         cdef:
             int32_t peak_length, x, pre_p, p, i, summit, tstart, tend
@@ -483,7 +490,7 @@ cdef class bedGraphTrackI:
                 except:
                     break
                 x += 1                  # index for the next point
-                if v >= cutoff and v <= up_limit:
+                if v >= cutoff:
                     peak_content = [(pre_p,p,v),]
                     pre_p = p
                     break               # found the first range above cutoff
@@ -494,7 +501,7 @@ cdef class bedGraphTrackI:
                 # continue scan the rest regions
                 p = psn()
                 v = vsn()
-                if v < cutoff or v > up_limit: # not be detected as 'peak'
+                if v < cutoff: # not be detected as 'peak'
                     pre_p = p
                     continue
                 # for points above cutoff
@@ -570,8 +577,8 @@ cdef class bedGraphTrackI:
             
         assert lvl1_cutoff > lvl2_cutoff, "level 1 cutoff should be larger than level 2."
         assert lvl1_max_gap < lvl2_max_gap, "level 2 maximum gap should be larger than level 1."
-        lvl1_peaks = self.call_peaks( cutoff=lvl1_cutoff, up_limit=1e310, min_length=min_length, max_gap=lvl1_max_gap, call_summits=False )
-        lvl2_peaks = self.call_peaks( cutoff=lvl2_cutoff, up_limit=1e310, min_length=min_length, max_gap=lvl2_max_gap, call_summits=False )
+        lvl1_peaks = self.call_peaks( cutoff=lvl1_cutoff, min_length=min_length, max_gap=lvl1_max_gap, call_summits=False )
+        lvl2_peaks = self.call_peaks( cutoff=lvl2_cutoff, min_length=min_length, max_gap=lvl2_max_gap, call_summits=False )
         chrs = lvl1_peaks.get_chr_names()
         broadpeaks = BroadPeakIO()
         # use lvl2_peaks as linking regions between lvl1_peaks

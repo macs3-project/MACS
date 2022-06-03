@@ -1,6 +1,6 @@
 # cython: language_level=3
 # cython: profile=True
-# Time-stamp: <2022-04-15 15:16:22 Tao Liu>
+# Time-stamp: <2022-06-03 14:48:48 Tao Liu>
 
 """Module for PeakIO IO classes.
 
@@ -273,6 +273,32 @@ cdef class PeakIO:
         else:
             for chrom in chrs:
                 new_peaks[chrom]=[p for p in self.peaks[chrom] if p['fc'] >= fc_low]
+                self.total +=  len( new_peaks[chrom] )
+        self.peaks = new_peaks
+        self.CO_sorted = True
+        self.sort()
+
+    cpdef void filter_score (self, float lower_score, float upper_score = 0 ):
+        """Filter peaks in a given score range.
+
+        """
+        cdef:
+            bytes chrom
+            dict new_peaks
+            list chrs
+            object p
+
+        new_peaks = {}
+        chrs = list(self.peaks.keys())
+        chrs.sort()
+        self.total = 0
+        if upper_score > 0 and upper_score > lower_score:
+            for chrom in chrs:
+                new_peaks[chrom]=[p for p in self.peaks[chrom] if p['score'] >= lower_score and p['score']<upper_score]
+                self.total +=  len( new_peaks[chrom] )
+        else:
+            for chrom in chrs:
+                new_peaks[chrom]=[p for p in self.peaks[chrom] if p['score'] >= lower_score]
                 self.total +=  len( new_peaks[chrom] )
         self.peaks = new_peaks
         self.CO_sorted = True
