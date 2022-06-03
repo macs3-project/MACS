@@ -1,6 +1,6 @@
 # cython: language_level=3
 # cython: profile=True
-# Time-stamp: <2022-06-03 12:51:09 Tao Liu>
+# Time-stamp: <2022-06-03 13:26:32 Tao Liu>
 
 """Module for filter duplicate tags from paired-end data
 
