@@ -1,4 +1,4 @@
-# Time-stamp: <2022-06-03 14:49:00 Tao Liu>
+# Time-stamp: <2022-06-06 14:29:48 Tao Liu>
 
 """Description: Main HMMR command
 
@@ -49,10 +49,24 @@ def run( args ):
     """The HMMRATAC function/pipeline for MACS.
 
     """
+    options = opt_validate_hmmratac( args )
+
+    #############################################
+    # 0. Names of output files
+    #############################################
+    training_region_bedfile = os.path.join( options.outdir, options.name+"_training_regions.bed" )
+    training_datafile = os.path.join( options.outdir, options.name+"_training_data.txt" )
+    hmm_modelfile = os.path.join( options.outdir, options.name+"_model.txt" )
+    open_state_bdgfile = os.path.join( options.outdir, options.name+"_open.bdg" )
+    nuc_state_bdgfile = os.path.join( options.outdir, options.name+"_nuc.bdg" )
+    bg_state_bdgfile = os.path.join( options.outdir, options.name+"_bg.bdg" )
+    states_file = os.path.join( options.outdir, options.name+"_states.bed" )
+    accessible_file = os.path.join( options.outdir, options.name+"_accessible_regions.gappedPeak" )
+    
+    
     #############################################
     # 1. Read the input BAM files
     #############################################
-    options = opt_validate_hmmratac( args )
     options.info("\n" + options.argtxt)    
     options.info("#1 Read fragments from BAM file...")
 
@@ -125,8 +139,6 @@ def run( args ):
     options.info( f"#   The minimum length of the region is set as the average template/fragment length in the dataset: {minlen}" )
     options.info( f"#   The maximum gap to merge nearby significant regions into one is set as the flanking size to extend training regions: {options.hmm_training_flanking}" )    
     peaks = fc_bdg.call_peaks (cutoff=options.hmm_lower, min_length=minlen, max_gap=options.hmm_training_flanking, call_summits=False)
-    f = open("a.bed","w")
-    peaks.write_to_bed( f )
     options.info( f"#  Total training regions called: {peaks.total}" )
     peaks.filter_score( options.hmm_lower, options.hmm_upper )
     options.info( f"#  Total training regions after filtering with lower and upper cutoff: {peaks.total}" )
@@ -149,7 +161,7 @@ def run( args ):
         options.info( f"#  after removing those overlapping with provided blacklisted regions, we have {training_regions.total} left" )
 
     if ( options.print_train ):
-        fhd = open(options.name+"_training_regions.bed","w")
+        fhd = open( training_region_bedfile, "w" )
         training_regions.write_to_bed( fhd )
         fhd.close()
         options.info( f"#  Training regions have been saved to `{options.name}_training_regions.bed` " )
@@ -194,7 +206,7 @@ def run( args ):
     [ training_bins, training_data, training_data_lengths ] = extract_signals_from_regions( digested_atac_signals, training_regions, binsize = options.hmm_binsize )
 
     if options.print_train:
-        f = open(options.name+"_training_data.txt","w")
+        f = open( training_datafile, "w" )
         for v in training_data:
             f.write( f"{v[0]}\t{v[1]}\t{v[2]}\t{v[3]}\n" )
         f.close()
@@ -212,7 +224,7 @@ def run( args ):
     i_background_region = np.where(hmm_model.transmat_ == min(hmm_model.transmat_[0:3, i_open_region]))[0][0]
     i_nucleosomal_region = list(set([0, 1, 2]) - set([i_open_region, i_background_region]))[0]
 
-    f = open(options.name+"_model.txt","w")
+    f = open( hmm_modelfile, "w" )
     f.write( str(hmm_model.startprob_)+"\n" )
     f.write( str(hmm_model.transmat_ )+"\n" )
     f.write( str(hmm_model.means_ )+"\n" )
@@ -268,13 +280,13 @@ def run( args ):
     # First, the likelihoods for each of the three states in a bedGraph
     if options.save_likelihoods:
         options.info( f"# Write the likelihoods for each states into three bedGraph files {options.name}_open.bdg, {options.name}_nuc.bdg, and {options.name}_bg.bdg")
-        open_state_bdg_file = open( options.name+"_open.bdg","w" )
-        nuc_state_bdg_file = open( options.name+"_nuc.bdg","w" )
-        bg_state_bdg_file = open( options.name+"_bg.bdg","w" )
-        save_proba_to_bedGraph( candidate_bins, predicted_proba, options.hmm_binsize, open_state_bdg_file, nuc_state_bdg_file, bg_state_bdg_file, i_open_region, i_nucleosomal_region, i_background_region )
-        open_state_bdg_file.close()
-        nuc_state_bdg_file.close()
-        bg_state_bdg_file.close()
+        open_state_bdg_fhd = open( open_state_bdgfile, "w" )
+        nuc_state_bdg_fhd = open( nuc_state_bdgfile, "w" )
+        bg_state_bdg_fhd = open( bg_state_bdgfile, "w" )
+        save_proba_to_bedGraph( candidate_bins, predicted_proba, options.hmm_binsize, open_state_bdg_fhd, nuc_state_bdg_fhd, bg_state_bdg_fhd, i_open_region, i_nucleosomal_region, i_background_region )
+        open_state_bdg_fhd.close()
+        nuc_state_bdg_fhd.close()
+        bg_state_bdg_fhd.close()
     
     # Generate states path:
     states_path = generate_states_path( candidate_bins, predicted_proba, options.hmm_binsize, i_open_region, i_nucleosomal_region, i_background_region )
@@ -283,12 +295,12 @@ def run( args ):
     # PS: we need to implement extra feature to include those regions NOT in candidate_bins and assign them as 'background state'.
     if options.save_states:
         options.info( f"# Write states assignments in a BED file: {options.name}_states.bed" )
-        f = open(options.name+"_states.bed","w")
+        f = open( states_file, "w" )
         save_states_bed( states_path, f )
         f.close()
 
     options.info( f"# Write accessible regions in a gappedPeak file: {options.name}_accessible_regions.gappedPeak")
-    ofhd = open(options.name+"_accessible_regions.gappedPeak","w")
+    ofhd = open( accessible_file, "w" )
     save_accessible_regions( states_path, ofhd )
     ofhd.close()
 
