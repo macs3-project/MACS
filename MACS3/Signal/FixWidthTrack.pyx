@@ -1,6 +1,6 @@
 # cython: language_level=3
 # cython: profile=True
-# Time-stamp: <2022-03-10 17:23:19 Tao Liu>
+# Time-stamp: <2022-06-06 11:16:29 Tao Liu>
 
 """Module for FWTrack classes.
 
@@ -114,7 +114,7 @@ cdef class FWTrack:
         """Add a location to the list according to the sequence name.
 
         chromosome -- mostly the chromosome name
-        fiveendpos -- 5' end pos, left for plus strand, right for neg strand
+        fiveendpos -- 5' end pos, left for plus strand, right for minus strand
         strand     -- 0: plus, 1: minus
         """
         cdef:

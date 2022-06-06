@@ -270,7 +270,7 @@ class Test_PileupV2_PE(unittest.TestCase):
     def setUp(self):
         self.LR_array1 = np.array( [ (1,5), (2,6), (4,8), (4,8), (5,9), (6,10),
                                      (12,14), (13,17), (14,18), (17,19) ], dtype= [('l','int32'),('r','int32')])
-        # expected result from pileup_bdg_se: ( start, end, value )
+        # expected result from pileup_from_LR: ( end, value )
         self.expect_pileup_1 = np.array( [  ( 1, 0.0 ),
                                             ( 2, 1.0 ),
                                             ( 4, 2.0 ),
@@ -304,7 +304,7 @@ class Test_PileupV2_PE(unittest.TestCase):
     def test_pileup_2(self):
         pileup = pileup_from_LR( self.LR_array1, lambda x,y: log2(y-x) )
         np.testing.assert_equal( pileup, self.expect_pileup_2 )
-
+ 
 class Test_PileupV2_SE(unittest.TestCase):
     """Unittest for pileup functions in PileupV2.pyx.
 
@@ -317,10 +317,11 @@ class Test_PileupV2_SE(unittest.TestCase):
         # expected result from pileup_bdg_se: ( start, end, value )
         self.extsize = 2
         self.expect_pileup_1 = np.array( [  ( 1, 1.0 ),
-                                            ( 3, 2.0 ),
-                                            ( 4, 4.0 ),
-                                            ( 6, 5.0 ),
-                                            ( 8, 4.0 ),
+                                            ( 2, 2.0 ),
+                                            ( 3, 1.0 ),
+                                            ( 4, 3.0 ),
+                                            ( 5, 5.0 ),
+                                            ( 8, 3.0 ),
                                             ( 9, 2.0 ),
                                             ( 10, 1.0 ) ],
                                             dtype=[ ( 'p', 'uint32' ), ( 'v', 'float32' ) ] )\
