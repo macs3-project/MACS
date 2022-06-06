@@ -1,4 +1,4 @@
-# Time-stamp: <2022-04-15 15:09:01 Tao Liu>
+# Time-stamp: <2022-06-06 14:44:32 Tao Liu>
 
 """Module Description
 
@@ -25,14 +25,10 @@ from MACS3.IO.Parser import BEDParser, ELANDResultParser, ELANDMultiParser, \
     ELANDExportParser, SAMParser, BAMParser, BAMPEParser,\
     BEDPEParser, BowtieParser,  guess_parser
 
+from MACS3.Utilities.Constants import EFFECTIVEGS as efgsize
 # ------------------------------------
 # constants
 # ------------------------------------
-
-efgsize = {"hs":2.7e9,
-           "mm":1.87e9,
-           "ce":9e7,
-           "dm":1.2e8}
 
 # ------------------------------------
 # Misc functions
