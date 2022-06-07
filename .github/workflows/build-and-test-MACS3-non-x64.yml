@@ -59,10 +59,6 @@ jobs:
             apt-get install -yq libblas3 liblapack3 libblas-dev liblapack-dev
             apt-get install -yq python3 python3-pip python3-wheel
             apt-get install -yq procps zlib1g zlib1g-dev
-            # install dependencies through debian APT
-            # pip install may not work on certain platform
-            # apt-get install -yq python3-numpy python3-sklearn cython3
-            # apt-get install -yq python3-pytest python3-pytest-cov python3-setuptools
           run: |
             echo `uname -a`
             cd /home/macs3/
@@ -70,13 +66,8 @@ jobs:
             cd MACS3
             export PATH="/home/macs3/.local/bin:${PATH}"
             pip3 install --no-cache-dir --user --upgrade pip
-            #pip3 install --no-cache-dir --user hmmlearn
-            #pip3 install --no-cache-dir --user cykhash
-            #pip3 install --no-cache-dir --user codecov
             pip3 install --user --upgrade -r requirements.txt --no-cache-dir
             pip3 install --user .  --no-cache-dir
             # run test
-            # Note that since we installed pytest through APT, the
-            # name is pytest-3 instead of pytest
-            pytest-3 --runxfail && cd test && ./cmdlinetest macs3
+            pytest --runxfail && cd test && ./cmdlinetest macs3
 
