@@ -1,9 +1,9 @@
-numpy>=1.17
-scikit-learn>=0.16
+numpy>=1.22
+scikit-learn>=1.0
 hmmlearn>=0.2.7
 Cython>=0.29
-cykhash>=1.0.2  
-pytest>=4.6
+cykhash>=2.0
+pytest>=7.0
 pytest-cov>=2.8
 codecov>=2.0
-setuptools>=41.2
+setuptools>=58.0
