@@ -245,13 +245,16 @@ cdef class HMMR_EM:
         #debug( f"counts: {c[0]} {c[1]} {c[2]}" )
         #debug( f"means: {means[0]} {means[1]} {means[2]}" )
         #debug( f"vars: {variances[0]} {variances[1]} {variances[2]}")
-        for j in range( 3 ):
-            if c[ j ] == 0:
-                # if there is no fragment size in this category, ignore
-                continue
-            self.fragMeans[ j ] = self.fragMeans[ j ] + self.jump*(means[ j ] - self.fragMeans[ j ])
-            self.fragVars[ j ] = self.fragVars[ j ] + self.jump*(variances[ j ] - self.fragVars[ j ])
-            self.fragStddevs[ j ] = sqrt( self.fragVars[ j ] )
-            self.__weights[ j ] = c[ j ] / total
+        try:
+            for j in range( 3 ):
+                if c[ j ] == 0:
+                    # if there is no fragment size in this category, ignore
+                    continue
+                self.fragMeans[ j ] = self.fragMeans[ j ] + self.jump*(means[ j ] - self.fragMeans[ j ])
+                self.fragVars[ j ] = self.fragVars[ j ] + self.jump*(variances[ j ] - self.fragVars[ j ])
+                self.fragStddevs[ j ] = sqrt( self.fragVars[ j ] )
+                self.__weights[ j ] = c[ j ] / total
+        except ValueError:
+            print(' ValueError:  Adjust --means and --stddev options and re-run command')
         debug( f"After this iteration, {total} fragments have been assigned with either of the three modes" )
         return
