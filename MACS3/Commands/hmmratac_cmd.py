@@ -383,7 +383,7 @@ def save_accessible_regions( states_path, accessible_region_file ):
     # This by default is the only final output from HMMRATAC
     accessible_regions = []
     for i in range(len(states_path)-1):
-        if states_path[i][3] == 'nuc' and states_path[i+1][3] == 'open' and states_path[i+2][3] == 'nuc':
+        if states_path[i][3] == 'nuc' and states_path[i+1][3] == 'open' and states_path[i+2][3] == 'nuc' and states_path[i][0] == states_path[i+1][0] and states_path[i+1][0] == states_path[i+2][0]:
             if len(accessible_regions) > 0:  
                 if int(states_path[i][2]) == int(accessible_regions[-1][2]): #if element already in list, don't repeat
                     accessible_regions.append((states_path[i+1][0], int(states_path[i+1][1]), int(states_path[i+1][2]), states_path[i+1][3]))
