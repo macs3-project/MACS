@@ -415,9 +415,6 @@ def save_accessible_regions( states_path, accessible_region_file ):
     # generate broadpeak object
     broadpeak = BroadPeakIO()
     for i in range(len(accessible_regions)-1):
-        if len(accessible_regions[i]) < 3:
-            print ( accessible_regions[i] )
-            continue # added by TL
         block_num = sum('open' in tup for tup in accessible_regions[i]) #number of open states in the region
         block_sizes = ''
         block_starts = ''
