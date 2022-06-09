@@ -1,4 +1,4 @@
-# Time-stamp: <2022-06-06 14:44:32 Tao Liu>
+# Time-stamp: <2022-06-09 14:42:48 Tao Liu>
 
 """Module Description
 
@@ -922,6 +922,10 @@ def opt_validate_hmmratac ( options ):
 
 
     # Peak Calling
+    if options.prescan_cutoff <= 1:
+        logging.error(" In order to use -c or --prescan-cutoff, the cutoff must be larger than 1.")
+        sys.exit( 1 )
+    
     #if options.call_minlen == True and options.store_peaks == True:
     #    logging.error(" In order to use --minlen, --no-states must be set False.")
     #    sys.exit( 1 )

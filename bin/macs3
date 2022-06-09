@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# Time-stamp: <2022-06-06 14:38:30 Tao Liu>
+# Time-stamp: <2022-06-09 14:41:36 Tao Liu>
 
 """Description: MACS v3 main executable.
 
@@ -780,8 +780,8 @@ def add_hmmratac_parser( subparsers ):
     #                        help = "Number of States in the model. Default = 3. If not k=3, recommend NOT calling peaks, use bedgraph. This option is named as `--kmeans` in HMMRATAC since it will also control the number of clusters in the k-means clustering process to decide the initial emissions for HMM training.",
     #                        default = 3 )
     group_hmm.add_argument( "--binsize", dest = "hmm_binsize", type = int,
-                            help = "Size of the bins to split the pileup signals for training and decoding. Must >= 1. Smaller the binsize, higher the resolution of the results, slower the process. However, since HMMRATAC is designed to detect nucleosome structures from ATAC-seq, a too-small binsize may capture unncessary noises. Therefore, we recommand a binsize around 50. Default = 50",
-                            default = 50 )    
+                            help = "Size of the bins to split the pileup signals for training and decoding with Hidden Markov Model. Must >= 1. Smaller the binsize, higher the resolution of the results, slower the process. Default = 10",
+                            default = 10 )    
     group_hmm.add_argument( "-u", "--upper", dest = "hmm_upper", type = int,
                             help = "Upper limit on fold change range for choosing training sites. Default: 20",
                             default = 20 )
@@ -808,7 +808,11 @@ def add_hmmratac_parser( subparsers ):
     #                        help = "Stop the program after generating model. Use this option to generate HMM model ONLY, which can be later applied with `--model`. Default: False")
 
     # group for peak calling arguments
-    #group_call = argparser_hmmratac.add_argument_group( "Peak calling arguments" )
+    group_call = argparser_hmmratac.add_argument_group( "Peak calling arguments" )
+    group_call.add_argument( "-c", "--prescan-cutoff", dest = "prescan_cutoff", type = float,
+                             help = "The fold change cutoff for prescanning candidate regions in the whole dataset then apply HMM to predict states. Higher the prescan cutoff, fewer regions will be considered. Must > 1. Default: 1.2",
+                             default = 1.2 )
+    
     #group_call.add_argument( "--minlen", dest = "call_minlen", type = int,
     #                         help = "Minimum length of open region to call peak. Note: --no-peaks must NOT be set True (--no-peaks default set False). Default: 200",
     #                         default = 200 )
