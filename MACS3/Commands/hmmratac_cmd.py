@@ -1,4 +1,4 @@
-# Time-stamp: <2022-06-08 23:06:35 Tao Liu>
+# Time-stamp: <2022-06-09 14:38:45 Tao Liu>
 
 """Description: Main HMMR command
 
@@ -244,7 +244,7 @@ def run( args ):
     # Our prediction strategy will be different with HMMRATAC, we will first ask MACS call peaks with loose cutoff, then for each peak we will run HMM prediction to figure out labels. And for the rest of genomic regions, just mark them as 'background'.
     options.info( f"#5 Decode with Viterbi to predict states" )
     # the following /4 is totally arbitrary, we may need to fix it
-    candidate_peaks = fc_bdg.call_peaks (cutoff=options.hmm_lower/4, min_length=minlen, max_gap=options.hmm_training_flanking, call_summits=False)
+    candidate_peaks = fc_bdg.call_peaks (cutoff=options.prescan_cutoff, min_length=minlen, max_gap=options.hmm_training_flanking, call_summits=False)
     options.info( f"#5  Total candidate peaks : {candidate_peaks.total}" )
 
     # Now we convert PeakIO to Regions and filter blacklisted regions
