@@ -1,6 +1,6 @@
 numpy>=1.22
 scikit-learn>=1.0
-hmmlearn>=0.2.7
+hmmlearn>=0.2.6
 Cython>=0.29
 cykhash>=2.0
 pytest>=7.0

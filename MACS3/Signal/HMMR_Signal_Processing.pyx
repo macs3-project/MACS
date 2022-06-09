@@ -1,6 +1,6 @@
 # cython: language_level=3
 # cython: profile=True
-# Time-stamp: <2022-06-03 13:11:14 Tao Liu>
+# Time-stamp: <2022-06-08 23:07:49 Tao Liu>
 
 """Module description:
 
@@ -130,35 +130,39 @@ cpdef list extract_signals_from_regions( list signals, object regions, int binsi
         object signaltrack
         object regionsbdg
         bytes chrom
-        int i, s, e, tmp_s, tmp_e, tmp_n, n
+        int i, s, e, tmp_s, tmp_e, tmp_n, n, c, counter, prev_c
         list ps
         object p
         list ret_training_data, ret_training_lengths, ret_training_bins
 
-    regionsbdg = bedGraphTrackI(baseline_value=0)
+    regionsbdg = bedGraphTrackI(baseline_value=-100)
 
     n = 0
     # here we convert peaks from a PeakIO to BedGraph object with a
     # given binsize.
     for chrom in sorted(regions.get_chr_names()):
-        tmp_p = 0
+        tmp_p = 0                         #this is to make gap in bedgraph for not covered regions.
         ps = regions[ chrom ]
+        mark_bin = 1                      #this is to mark the continuous bins in the same region, it will iterate between 1 and -1 in different regions
         for i in range( len( ps ) ):
+            # for each region
             p = ps[ i ]
             s = p[ 0 ]
             e = p[ 1 ]
             # make bins, no need to be too accurate...
             s = s//binsize*binsize
             e = e//binsize*binsize
-            tmp_n = int(( e - s )/binsize)
+            #tmp_n = int(( e - s )/binsize)
             for r in range( s, e, binsize ):
                 tmp_s = r
                 tmp_e = r + binsize
                 if tmp_s > tmp_p:
                     regionsbdg.add_loc_wo_merge( chrom, tmp_p, tmp_s, 0 )
-                regionsbdg.add_loc_wo_merge( chrom, tmp_s, tmp_e, tmp_n )
+                regionsbdg.add_loc_wo_merge( chrom, tmp_s, tmp_e, mark_bin ) #the value we put in the bin bedgraph is the number of bins in this region
                 n += 1
                 tmp_p = tmp_e
+            # end of region, we change the mark_bin
+            mark_bin *= -1
     # we do not merge regions in regionsbdg object so each bin will be seperated.
     debug( f"added {n} bins" )
 
@@ -166,7 +170,7 @@ cpdef list extract_signals_from_regions( list signals, object regions, int binsi
     extracted_positions = []
     extracted_data = []
     extracted_len = []
-    for signaltrack in signals:
+    for signaltrack in signals: # four signal tracks
         # signaltrack is bedGraphTrackI object
         [ positions, values, lengths ] = signaltrack.extract_value_hmmr( regionsbdg )
         extracted_positions.append( positions )
@@ -177,19 +181,31 @@ cpdef list extract_signals_from_regions( list signals, object regions, int binsi
     ret_training_lengths = []
     c = 0
     nn = len( extracted_data[0] )
+    assert len( extracted_data[0] ) == len( extracted_data[1] )
+    assert len( extracted_data[0] ) == len( extracted_data[2] )
+    assert len( extracted_data[0] ) == len( extracted_data[3] )
     #nnn =len( extracted_len[0] )
     #debug( f"{n} bins, {nn}, {nnn}" )
+    counter = 0
+    prev_c = 0
+    c = 0
     for i in range( nn ):
-        c += 1
         ret_training_bins.append( extracted_positions[0][i] )
         ret_training_data.append(
             [ max( 0.0001, abs(round(extracted_data[0][i], 4))),
               max( 0.0001, abs(round(extracted_data[1][i], 4))),
               max( 0.0001, abs(round(extracted_data[2][i], 4))),
               max( 0.0001, abs(round(extracted_data[3][i], 4))) ] )
-        if c == extracted_len[0][i]:
-            ret_training_lengths.append( extracted_len[0][i] )
-            c = 0
+        c = extracted_len[0][i]
+        if counter != 0 and c != prev_c:
+            prev_c = c
+            ret_training_lengths.append( abs( counter ) )
+            counter = 0
+        counter +=  c
+    # last region
+    ret_training_lengths.append( abs( counter ) )
+    assert sum(ret_training_lengths) == len(ret_training_data)
+    assert len(ret_training_bins) == len(ret_training_data)
     return [ ret_training_bins, ret_training_data, ret_training_lengths ]
 
 

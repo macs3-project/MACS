@@ -1,4 +1,4 @@
-# Time-stamp: <2022-06-06 14:29:48 Tao Liu>
+# Time-stamp: <2022-06-08 23:06:35 Tao Liu>
 
 """Description: Main HMMR command
 
@@ -218,7 +218,9 @@ def run( args ):
     
     options.info( f"#  Use Baum-Welch algorithm to train the HMM")
     hmm_model = hmm_training( training_data, training_data_lengths, random_seed = options.hmm_randomSeed )
+    options.info( f" HMM whether converged or not: {hmm_model.monitor_.converged}")
 
+    
     # label hidden states
     i_open_region = np.where(hmm_model.means_ == max(hmm_model.means_[0:3,0]))[0][0]
     i_background_region = np.where(hmm_model.transmat_ == min(hmm_model.transmat_[0:3, i_open_region]))[0][0]
@@ -240,10 +242,10 @@ def run( args ):
 # 5. Predict
 #############################################
     # Our prediction strategy will be different with HMMRATAC, we will first ask MACS call peaks with loose cutoff, then for each peak we will run HMM prediction to figure out labels. And for the rest of genomic regions, just mark them as 'background'.
-    options.info( f"#5 Decode with Viterbi to predict states" )    
-    candidate_peaks = fc_bdg.call_peaks (cutoff=options.hmm_lower/2, min_length=minlen, max_gap=options.hmm_training_flanking, call_summits=False)
+    options.info( f"#5 Decode with Viterbi to predict states" )
+    # the following /4 is totally arbitrary, we may need to fix it
+    candidate_peaks = fc_bdg.call_peaks (cutoff=options.hmm_lower/4, min_length=minlen, max_gap=options.hmm_training_flanking, call_summits=False)
     options.info( f"#5  Total candidate peaks : {candidate_peaks.total}" )
-
 
     # Now we convert PeakIO to Regions and filter blacklisted regions
     candidate_regions = Regions()
@@ -262,7 +264,7 @@ def run( args ):
     options.info( f"#  Extract signals in candidate regions")
     # Note: we can implement in a different way to extract then predict for each candidate region.
     [ candidate_bins, candidate_data, candidate_data_lengths ] = extract_signals_from_regions( digested_atac_signals, candidate_regions, binsize = options.hmm_binsize )
-    
+
     options.info( f"#  Use HMM to predict states")
     predicted_proba = hmm_predict( candidate_data, candidate_data_lengths, hmm_model )
 
@@ -413,13 +415,16 @@ def save_accessible_regions( states_path, accessible_region_file ):
     # generate broadpeak object
     broadpeak = BroadPeakIO()
     for i in range(len(accessible_regions)-1):
+        if len(accessible_regions[i]) < 3:
+            print ( accessible_regions[i] )
+            continue # added by TL
         block_num = sum('open' in tup for tup in accessible_regions[i]) #number of open states in the region
         block_sizes = ''
         block_starts = ''
         for j in range(1, len(accessible_regions[i])-1, 2):
             block_sizes = block_sizes + str(accessible_regions[i][j][2] - accessible_regions[i][j][1]) + ',' #distance between start_pos and end_pos in each open state
             block_starts = block_starts + str(accessible_regions[i][j][1] - accessible_regions[i][0][1] ) + ',' #start_pos for each open state, it's relative position to the start_pos of the whole broad region
-
+        #print (accessible_regions[i])
         broadpeak.add(bytes(accessible_regions[i][1][0], encoding="raw_unicode_escape"), #chromosome
             accessible_regions[i][0][1], #start_pos of first nuc state in the region
             accessible_regions[i][-1][2], #end_pos of the last nuc state in the region

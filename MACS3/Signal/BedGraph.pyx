@@ -1,6 +1,6 @@
 # cython: language_level=3
 # cython: profile=True
-# Time-stamp: <2022-06-03 14:38:34 Tao Liu>
+# Time-stamp: <2022-06-08 17:01:59 Tao Liu>
 
 """Module for BedGraph data class.
 
@@ -1021,7 +1021,7 @@ cdef class bedGraphTrackI:
                         v1 = v1n()
                     elif p2 < p1:
                         # clip a region from pre_p to p2, then set pre_p as p2.
-                        if v2>0:
+                        if v2 != 0: #0 means it's a gap region, we should have 1 or -1
                             padd( (chrom, p2) )
                             vadd(v1)
                             ladd(int(v2))
@@ -1031,7 +1031,7 @@ cdef class bedGraphTrackI:
                         v2 = v2n()
                     elif p1 == p2:
                         # from pre_p to p1 or p2, then set pre_p as p1 or p2.
-                        if v2>0:
+                        if v2 != 0: #0 means it's a gap region, we should have 1 or -1
                             padd( (chrom, p2) )
                             vadd(v1)
                             ladd(int(v2))

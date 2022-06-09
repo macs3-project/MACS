@@ -1,6 +1,6 @@
 # cython: language_level=3
 # cython: profile=True
-# Time-stamp: <2022-04-15 13:43:07 Tao Liu>
+# Time-stamp: <2022-06-08 15:34:57 Tao Liu>
 
 """Module description:
 
@@ -70,5 +70,8 @@ cpdef hmm_training( list training_data, list training_data_lengths, int n_states
 
 cpdef hmm_predict( list signals, list lens, hmm_model ):
     predictions = hmm_model.predict_proba( signals, lens )
+    #print( len(predictions), len(signals) )
+    #print( sum( lens ) )
+    #print( predictions, signals )
     return predictions
 
