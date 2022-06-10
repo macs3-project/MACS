@@ -1,4 +1,4 @@
-# Time-stamp: <2022-06-09 14:38:45 Tao Liu>
+# Time-stamp: <2022-06-10 12:57:18 Tao Liu>
 
 """Description: Main HMMR command
 
@@ -137,7 +137,7 @@ def run( args ):
     minlen = int(petrack.average_template_length)
     options.info( f"#  Call peak above within fold-change range of {options.hmm_lower} and {options.hmm_upper}." )
     options.info( f"#   The minimum length of the region is set as the average template/fragment length in the dataset: {minlen}" )
-    options.info( f"#   The maximum gap to merge nearby significant regions into one is set as the flanking size to extend training regions: {options.hmm_training_flanking}" )    
+    options.info( f"#   The maximum gap to merge nearby significant regions is set as the flanking size to extend training regions: {options.hmm_training_flanking}" )    
     peaks = fc_bdg.call_peaks (cutoff=options.hmm_lower, min_length=minlen, max_gap=options.hmm_training_flanking, call_summits=False)
     options.info( f"#  Total training regions called: {peaks.total}" )
     peaks.filter_score( options.hmm_lower, options.hmm_upper )
@@ -218,7 +218,7 @@ def run( args ):
     
     options.info( f"#  Use Baum-Welch algorithm to train the HMM")
     hmm_model = hmm_training( training_data, training_data_lengths, random_seed = options.hmm_randomSeed )
-    options.info( f" HMM whether converged or not: {hmm_model.monitor_.converged}")
+    options.info( f" HMM converged: {hmm_model.monitor_.converged}")
 
     
     # label hidden states
@@ -414,7 +414,7 @@ def save_accessible_regions( states_path, accessible_region_file, openregion_min
             one_group = []
             one_group.append(accessible_regions[j])
     accessible_regions = list_of_groups
-    print(len(accessible_regions))
+    #print(len(accessible_regions))
     # generate broadpeak object
     broadpeak = BroadPeakIO()
     for i in range(len(accessible_regions)-1):

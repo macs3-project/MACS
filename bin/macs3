@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# Time-stamp: <2022-06-10 09:23:47 Tao Liu>
+# Time-stamp: <2022-06-10 12:58:15 Tao Liu>
 
 """Description: MACS v3 main executable.
 
@@ -814,8 +814,8 @@ def add_hmmratac_parser( subparsers ):
                              default = 1.2 )
     
     group_call.add_argument( "--minlen", dest = "openregion_minlen", type = int,
-                             help = "Minimum length of open region to call accessible regions. Must be larger than 0. If it is set as 0, it means no filtering on the length of the open regions called. Please note that, when bin size is small, setting a too small OPENREGION_MINLEN will bring a lot of false positives. Default: 200",
-                             default = 200 )
+                             help = "Minimum length of open region to call accessible regions. Must be larger than 0. If it is set as 0, it means no filtering on the length of the open regions called. Please note that, when bin size is small, setting a too small OPENREGION_MINLEN will bring a lot of false positives. Default: 100",
+                             default = 100 )
     #group_call.add_argument( "--score", dest = "call_score", type = str, choices = ("max", "ave", "med", "fc", "zscore", "all"),
     #                         help = "What type of score system to use for peaks. Can be used for ranking peaks. Default: max",
     #                         default = "max" )
