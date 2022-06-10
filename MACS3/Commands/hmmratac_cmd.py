@@ -303,7 +303,7 @@ def run( args ):
 
     options.info( f"# Write accessible regions in a gappedPeak file: {options.name}_accessible_regions.gappedPeak")
     ofhd = open( accessible_file, "w" )
-    save_accessible_regions( states_path, ofhd )
+    save_accessible_regions( states_path, ofhd, options.openregion_minlen )
     ofhd.close()
 
 def save_proba_to_bedGraph( candidate_bins, predicted_proba, binsize, open_state_bdg_file, nuc_state_bdg_file, bg_state_bdg_file, i_open, i_nuc, i_bg ):
@@ -378,7 +378,7 @@ def generate_states_path( candidate_bins, predicted_proba, binsize, i_open_regio
             
     return ret_states_path
 
-def save_accessible_regions( states_path, accessible_region_file ):
+def save_accessible_regions( states_path, accessible_region_file, openregion_minlen ):
     # select only accessible regions from _states.bed, look for nuc-open-nuc pattern
     # This by default is the only final output from HMMRATAC
     accessible_regions = []
@@ -407,11 +407,12 @@ def save_accessible_regions( states_path, accessible_region_file ):
         if accessible_regions[j][1] == accessible_regions[j-1][2]:
             one_group.append(accessible_regions[j])
         elif accessible_regions[j][1] != accessible_regions[j-1][2]:
-            list_of_groups.append(one_group)
+            if one_group[-2][2] - one_group[1][1] > openregion_minlen: #check: if distance between first open region start_pos and last open region end_pos is above threshold ... then add to list
+                list_of_groups.append(one_group)
             one_group = []
             one_group.append(accessible_regions[j])
     accessible_regions = list_of_groups
-
+    print(len(accessible_regions))
     # generate broadpeak object
     broadpeak = BroadPeakIO()
     for i in range(len(accessible_regions)-1):
