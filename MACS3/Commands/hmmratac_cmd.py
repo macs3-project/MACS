@@ -383,7 +383,9 @@ def save_accessible_regions( states_path, accessible_region_file, openregion_min
     # This by default is the only final output from HMMRATAC
     accessible_regions = []
     for i in range(len(states_path)-2):
-        if states_path[i][3] == 'nuc' and states_path[i+1][3] == 'open' and states_path[i+2][3] == 'nuc' and states_path[i][0] == states_path[i+1][0] and states_path[i+1][0] == states_path[i+2][0] and states_path[i][2] == states_path[i+1][1] and states_path[i+1][2] == states_path[i+2][1]:
+        #if region has pattern nuc-open-nuc (are the same chromosome and are consecutive bins) AND the open region size > minlen
+        if states_path[i][3] == 'nuc' and states_path[i+1][3] == 'open' and states_path[i+2][3] == 'nuc' and states_path[i][2] == states_path[i+1][1] and states_path[i+1][2] == states_path[i+2][1] and states_path[i+1][2] - states_path[i+1][1] > openregion_minlen:
+        # if states_path[i][3] == 'nuc' and states_path[i+1][3] == 'open' and states_path[i+2][3] == 'nuc' and states_path[i][0] == states_path[i+1][0] and states_path[i+1][0] == states_path[i+2][0] and states_path[i][2] == states_path[i+1][1] and states_path[i+1][2] == states_path[i+2][1]:
             if len(accessible_regions) > 0:  
                 if int(states_path[i][2]) == int(accessible_regions[-1][2]): #if element already in list, don't repeat
                     accessible_regions.append((states_path[i+1][0], int(states_path[i+1][1]), int(states_path[i+1][2]), states_path[i+1][3]))
@@ -407,8 +409,8 @@ def save_accessible_regions( states_path, accessible_region_file, openregion_min
         if accessible_regions[j][1] == accessible_regions[j-1][2]:
             one_group.append(accessible_regions[j])
         elif accessible_regions[j][1] != accessible_regions[j-1][2]:
-            if one_group[-2][2] - one_group[1][1] > openregion_minlen: #check: if distance between first open region start_pos and last open region end_pos is above threshold ... then add to list
-                list_of_groups.append(one_group)
+            # if one_group[-2][2] - one_group[1][1] > openregion_minlen: #check: if distance between first open region start_pos and last open region end_pos is above threshold ... then add to list
+            list_of_groups.append(one_group)
             one_group = []
             one_group.append(accessible_regions[j])
     accessible_regions = list_of_groups
