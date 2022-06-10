@@ -1,4 +1,4 @@
-# Time-stamp: <2022-06-09 14:42:48 Tao Liu>
+# Time-stamp: <2022-06-10 09:49:12 Tao Liu>
 
 """Module Description
 
@@ -926,9 +926,9 @@ def opt_validate_hmmratac ( options ):
         logging.error(" In order to use -c or --prescan-cutoff, the cutoff must be larger than 1.")
         sys.exit( 1 )
     
-    #if options.call_minlen == True and options.store_peaks == True:
-    #    logging.error(" In order to use --minlen, --no-states must be set False.")
-    #    sys.exit( 1 )
+    if options.openregion_minlen < 0 # and options.store_peaks == True:
+        logging.error(" In order to use --minlen, the length should not be negative.")
+        sys.exit( 1 )
 
     #if options.call_score.lower() not in [ 'max', 'ave', 'med', 'fc', 'zscore', 'all']:
     #    logging.error( " Invalid method: %s" % options.call_score )
