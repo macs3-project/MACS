@@ -1,4 +1,4 @@
-# Time-stamp: <2022-06-10 09:49:12 Tao Liu>
+# Time-stamp: <2022-06-10 10:24:34 Tao Liu>
 
 """Module Description
 
@@ -926,7 +926,7 @@ def opt_validate_hmmratac ( options ):
         logging.error(" In order to use -c or --prescan-cutoff, the cutoff must be larger than 1.")
         sys.exit( 1 )
     
-    if options.openregion_minlen < 0 # and options.store_peaks == True:
+    if options.openregion_minlen < 0: # and options.store_peaks == True:
         logging.error(" In order to use --minlen, the length should not be negative.")
         sys.exit( 1 )
 
