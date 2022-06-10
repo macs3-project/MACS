@@ -383,7 +383,7 @@ def save_accessible_regions( states_path, accessible_region_file ):
     # This by default is the only final output from HMMRATAC
     accessible_regions = []
     for i in range(len(states_path)-2):
-        if states_path[i][3] == 'nuc' and states_path[i+1][3] == 'open' and states_path[i+2][3] == 'nuc' and states_path[i][0] == states_path[i+1][0] and states_path[i+1][0] == states_path[i+2][0]:
+        if states_path[i][3] == 'nuc' and states_path[i+1][3] == 'open' and states_path[i+2][3] == 'nuc' and states_path[i][0] == states_path[i+1][0] and states_path[i+1][0] == states_path[i+2][0] and states_path[i][2] == states_path[i+1][1] and states_path[i+1][2] == states_path[i+2][1]:
             if len(accessible_regions) > 0:  
                 if int(states_path[i][2]) == int(accessible_regions[-1][2]): #if element already in list, don't repeat
                     accessible_regions.append((states_path[i+1][0], int(states_path[i+1][1]), int(states_path[i+1][2]), states_path[i+1][3]))
@@ -421,7 +421,6 @@ def save_accessible_regions( states_path, accessible_region_file ):
         for j in range(1, len(accessible_regions[i])-1, 2):
             block_sizes = block_sizes + str(accessible_regions[i][j][2] - accessible_regions[i][j][1]) + ',' #distance between start_pos and end_pos in each open state
             block_starts = block_starts + str(accessible_regions[i][j][1] - accessible_regions[i][0][1] ) + ',' #start_pos for each open state, it's relative position to the start_pos of the whole broad region
-        #print (accessible_regions[i])
         broadpeak.add(bytes(accessible_regions[i][1][0], encoding="raw_unicode_escape"), #chromosome
             accessible_regions[i][0][1], #start_pos of first nuc state in the region
             accessible_regions[i][-1][2], #end_pos of the last nuc state in the region
@@ -430,7 +429,6 @@ def save_accessible_regions( states_path, accessible_region_file ):
             blockNum=block_num,
             blockSizes=bytes(str(block_sizes[0:-1]), encoding="raw_unicode_escape"),
             blockStarts=bytes(str(block_starts[0:-1]), encoding="raw_unicode_escape"))
-
     broadpeak.write_to_gappedPeak(accessible_region_file)
     return
 
