@@ -16,6 +16,8 @@ import os
 import sys
 import logging
 import numpy as np
+import json
+from hmmlearn import hmm
 #from typing import Sized
 
 # ------------------------------------
@@ -217,7 +219,32 @@ def run( args ):
     #f.close()
     
     options.info( f"#  Use Baum-Welch algorithm to train the HMM")
-    hmm_model = hmm_training( training_data, training_data_lengths, random_seed = options.hmm_randomSeed )
+
+
+### adding trial here:
+    if options.HMM_FILE:
+        # f = open('macs3hmmratactrial_0718_model.txt', 'r')
+        f = open(options.HMM_FILE, 'r')
+        data_txt = f.read()
+        data_txt = data_txt.replace('  ', ' ').replace('[ ', '[').replace(' ', ',').replace('\n\n\n', ' $ ').replace('\n', '')
+        a,b,c,d = data_txt.split(" $ ")[0:4]
+        startprob = np.array(json.loads(a))
+        transmat = np.array(json.loads(b))
+        means = np.array(json.loads(c))
+        covars = np.array(json.loads(d))
+        hmm_model = hmm.GaussianHMM( n_components=3, covariance_type='full' ) #change 3 to variable
+        hmm_model.startprob_ = startprob
+        hmm_model.transmat_ = transmat
+        hmm_model.means_ = means
+        hmm_model.covars_ = covars
+        hmm_model.n_features = 4 # need to add this 
+    else:
+        hmm_model = hmm_training( training_data, training_data_lengths, random_seed = options.hmm_randomSeed )
+
+    
+    
+    
+    
     options.info( f" HMM converged: {hmm_model.monitor_.converged}")
 
     
@@ -227,10 +254,11 @@ def run( args ):
     i_nucleosomal_region = list(set([0, 1, 2]) - set([i_open_region, i_background_region]))[0]
 
     f = open( hmm_modelfile, "w" )
-    f.write( str(hmm_model.startprob_)+"\n" )
-    f.write( str(hmm_model.transmat_ )+"\n" )
-    f.write( str(hmm_model.means_ )+"\n" )
-    f.write( str(hmm_model.covars_ )+"\n" )
+    f.write( str(hmm_model.startprob_)+"\n\n\n" )
+    f.write( str(hmm_model.transmat_ )+"\n\n\n" )
+    f.write( str(hmm_model.means_ )+"\n\n\n" )
+    f.write( str(hmm_model.covars_ )+"\n\n\n" )
+    f.write( str(hmm_model.n_features )+"\n\n\n" )
 
     f.write( 'open region = state ' + str(i_open_region)+"\n" )
     f.write( 'nucleosomal region = state ' + str(i_nucleosomal_region)+"\n" )
