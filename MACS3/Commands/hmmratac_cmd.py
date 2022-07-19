@@ -30,7 +30,7 @@ from MACS3.IO.PeakIO import BroadPeakIO
 from MACS3.IO.Parser import BAMPEParser #BAMaccessor
 from MACS3.Signal.HMMR_EM import HMMR_EM
 from MACS3.Signal.HMMR_Signal_Processing import generate_weight_mapping, generate_digested_signals, extract_signals_from_regions
-from MACS3.Signal.HMMR_HMM import hmm_training, hmm_predict
+from MACS3.Signal.HMMR_HMM import hmm_training, hmm_predict, hmm_model_init
 from MACS3.Signal.Region import Regions
 from MACS3.Signal.BedGraph import bedGraphTrackI
 
@@ -221,30 +221,12 @@ def run( args ):
     options.info( f"#  Use Baum-Welch algorithm to train the HMM")
 
 
-### adding trial here:
+    # option to use previous hmm model file:
     if options.hmm_file:
-        # f = open('macs3hmmratactrial_0718_model.txt', 'r')
-        f = open(options.hmm_file, 'r')
-        model_txt = f.read()
-        model_txt = model_txt.replace('  ', ' ').replace('[ ', '[').replace(' ', ',').replace('\n\n\n', ' $ ').replace('\n', '')
-        a,b,c,d,e = model_txt.split(" $ ")[0:5]
-        startprob = np.array(json.loads(a))
-        transmat = np.array(json.loads(b))
-        means = np.array(json.loads(c))
-        covars = np.array(json.loads(d))
-        n_features = int(e)
-        hmm_model = hmm.GaussianHMM( n_components=3, covariance_type='full' ) #change 3 to variable
-        hmm_model.startprob_ = startprob
-        hmm_model.transmat_ = transmat
-        hmm_model.means_ = means
-        hmm_model.covars_ = covars
-        hmm_model.n_features = n_features
+        hmm_model = hmm_model_init( options.hmm_file )
     else:
         hmm_model = hmm_training( training_data, training_data_lengths, random_seed = options.hmm_randomSeed )
 
-    
-    
-    
     
     options.info( f" HMM converged: {hmm_model.monitor_.converged}")
 

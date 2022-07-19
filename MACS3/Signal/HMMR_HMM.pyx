@@ -23,6 +23,7 @@ import numpy as np
 cimport numpy as np
 from cpython cimport bool
 from hmmlearn import hmm
+import json
 # from hmmlearn cimport hmm
 # from sklearn.cluster import KMeans 
 # from sklearn.cluster cimport KMeans
@@ -75,3 +76,20 @@ cpdef hmm_predict( list signals, list lens, hmm_model ):
     #print( predictions, signals )
     return predictions
 
+cpdef hmm_model_init( model_file ):
+    f = open(model_file, 'r')
+    model_txt = f.read()
+    model_txt = model_txt.replace('  ', ' ').replace('[ ', '[').replace(' ', ',').replace('\n\n\n', ' $ ').replace('\n', '')
+    a,b,c,d,e = model_txt.split(" $ ")[0:5]
+    startprob = np.array(json.loads(a))
+    transmat = np.array(json.loads(b))
+    means = np.array(json.loads(c))
+    covars = np.array(json.loads(d))
+    n_features = int(e)
+    hmm_model = hmm.GaussianHMM( n_components=3, covariance_type='full' ) #change 3 to variable
+    hmm_model.startprob_ = startprob
+    hmm_model.transmat_ = transmat
+    hmm_model.means_ = means
+    hmm_model.covars_ = covars
+    hmm_model.n_features = n_features
+    return hmm_model
