@@ -225,7 +225,7 @@ def run( args ):
     if options.hmm_file:
         options.info( f"#  Use loaded HMM model file, skip training ")
 
-        hmm_model, i_open_region, i_background_region, i_nucleosomal_region, binsize = hmm_model_init( options.hmm_file )
+        hmm_model, i_open_region, i_background_region, i_nucleosomal_region, options.hmm_binsize = hmm_model_init( options.hmm_file )
         
         # options.info( f" HMM converged: {hmm_model.monitor_.converged}")
     else:
