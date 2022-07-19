@@ -223,31 +223,34 @@ def run( args ):
 
     # option to use previous hmm model file:
     if options.hmm_file:
-        hmm_model = hmm_model_init( options.hmm_file )
+        hmm_model, i_open_region, i_background_region, i_nucleosomal_region = hmm_model_init( options.hmm_file )
+        
+        options.info( f" HMM converged: {hmm_model.monitor_.converged}")
     else:
         hmm_model = hmm_training( training_data, training_data_lengths, random_seed = options.hmm_randomSeed )
 
-    
-    options.info( f" HMM converged: {hmm_model.monitor_.converged}")
+        options.info( f" HMM converged: {hmm_model.monitor_.converged}")
 
-    
-    # label hidden states
-    i_open_region = np.where(hmm_model.means_ == max(hmm_model.means_[0:3,0]))[0][0]
-    i_background_region = np.where(hmm_model.transmat_ == min(hmm_model.transmat_[0:3, i_open_region]))[0][0]
-    i_nucleosomal_region = list(set([0, 1, 2]) - set([i_open_region, i_background_region]))[0]
+        # label hidden states
+        i_open_region = np.where(hmm_model.means_ == max(hmm_model.means_[0:3,0]))[0][0]
+        i_background_region = np.where(hmm_model.transmat_ == min(hmm_model.transmat_[0:3, i_open_region]))[0][0]
+        i_nucleosomal_region = list(set([0, 1, 2]) - set([i_open_region, i_background_region]))[0]
 
-    f = open( hmm_modelfile, "w" )
-    f.write( str(hmm_model.startprob_)+"\n\n\n" )
-    f.write( str(hmm_model.transmat_ )+"\n\n\n" )
-    f.write( str(hmm_model.means_ )+"\n\n\n" )
-    f.write( str(hmm_model.covars_ )+"\n\n\n" )
-    f.write( str(hmm_model.n_features )+"\n\n\n" )
+        f = open( hmm_modelfile, "w" )
+        f.write( str(hmm_model.startprob_)+"\n\n\n" )
+        f.write( str(hmm_model.transmat_ )+"\n\n\n" )
+        f.write( str(hmm_model.means_ )+"\n\n\n" )
+        f.write( str(hmm_model.covars_ )+"\n\n\n" )
+        f.write( str(hmm_model.n_features )+"\n\n\n" )
+        f.write( str(i_open_region )+"\n\n\n" )
+        f.write( str(i_background_region )+"\n\n\n" )
+        f.write( str(i_nucleosomal_region )+"\n\n\n" )
 
-    f.write( 'open region = state ' + str(i_open_region)+"\n" )
-    f.write( 'nucleosomal region = state ' + str(i_nucleosomal_region)+"\n" )
-    f.write( 'background region = state ' + str(i_background_region)+"\n" )
+        f.write( 'open region = state ' + str(i_open_region)+"\n" )
+        f.write( 'nucleosomal region = state ' + str(i_nucleosomal_region)+"\n" )
+        f.write( 'background region = state ' + str(i_background_region)+"\n" )
 
-    f.close()
+        f.close()
 
 #############################################
 # 5. Predict

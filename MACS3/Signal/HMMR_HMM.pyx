@@ -80,16 +80,20 @@ cpdef hmm_model_init( model_file ):
     f = open(model_file, 'r')
     model_txt = f.read()
     model_txt = model_txt.replace('  ', ' ').replace('[ ', '[').replace(' ', ',').replace('\n\n\n', ' $ ').replace('\n', '')
-    a,b,c,d,e = model_txt.split(" $ ")[0:5]
+    a,b,c,d,e,f,g,h = model_txt.split(" $ ")[0:8]
     startprob = np.array(json.loads(a))
     transmat = np.array(json.loads(b))
     means = np.array(json.loads(c))
     covars = np.array(json.loads(d))
     n_features = int(e)
+    i_open_region = int(f)
+    i_background_region = int(g)
+    i_nucleosomal_region = int(h)
+
     hmm_model = hmm.GaussianHMM( n_components=3, covariance_type='full' ) #change 3 to variable
     hmm_model.startprob_ = startprob
     hmm_model.transmat_ = transmat
     hmm_model.means_ = means
     hmm_model.covars_ = covars
     hmm_model.n_features = n_features
-    return hmm_model
+    return hmm_model, i_open_region, i_background_region, i_nucleosomal_region
