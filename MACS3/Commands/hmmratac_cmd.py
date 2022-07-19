@@ -218,15 +218,19 @@ def run( args ):
     #    f.write( f"{v}\n" )
     #f.close()
     
-    options.info( f"#  Use Baum-Welch algorithm to train the HMM")
+    
 
 
     # option to use previous hmm model file:
     if options.hmm_file:
-        hmm_model, i_open_region, i_background_region, i_nucleosomal_region = hmm_model_init( options.hmm_file )
+        options.info( f"#  Use loaded HMM model file, skip training ")
+
+        hmm_model, i_open_region, i_background_region, i_nucleosomal_region, binsize = hmm_model_init( options.hmm_file )
         
-        options.info( f" HMM converged: {hmm_model.monitor_.converged}")
+        # options.info( f" HMM converged: {hmm_model.monitor_.converged}")
     else:
+        options.info( f"#  Use Baum-Welch algorithm to train the HMM")
+
         hmm_model = hmm_training( training_data, training_data_lengths, random_seed = options.hmm_randomSeed )
 
         options.info( f" HMM converged: {hmm_model.monitor_.converged}")
@@ -245,6 +249,7 @@ def run( args ):
         f.write( str(i_open_region )+"\n\n\n" )
         f.write( str(i_background_region )+"\n\n\n" )
         f.write( str(i_nucleosomal_region )+"\n\n\n" )
+        f.write( str(options.hmm_binsize )+"\n\n\n" )
 
         f.write( 'open region = state ' + str(i_open_region)+"\n" )
         f.write( 'nucleosomal region = state ' + str(i_nucleosomal_region)+"\n" )
