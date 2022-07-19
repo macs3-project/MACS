@@ -222,22 +222,23 @@ def run( args ):
 
 
 ### adding trial here:
-    if options.HMM_FILE:
+    if options.hmm_file:
         # f = open('macs3hmmratactrial_0718_model.txt', 'r')
-        f = open(options.HMM_FILE, 'r')
-        data_txt = f.read()
-        data_txt = data_txt.replace('  ', ' ').replace('[ ', '[').replace(' ', ',').replace('\n\n\n', ' $ ').replace('\n', '')
-        a,b,c,d = data_txt.split(" $ ")[0:4]
+        f = open(options.hmm_file, 'r')
+        model_txt = f.read()
+        model_txt = model_txt.replace('  ', ' ').replace('[ ', '[').replace(' ', ',').replace('\n\n\n', ' $ ').replace('\n', '')
+        a,b,c,d,e = model_txt.split(" $ ")[0:5]
         startprob = np.array(json.loads(a))
         transmat = np.array(json.loads(b))
         means = np.array(json.loads(c))
         covars = np.array(json.loads(d))
+        n_features = int(e)
         hmm_model = hmm.GaussianHMM( n_components=3, covariance_type='full' ) #change 3 to variable
         hmm_model.startprob_ = startprob
         hmm_model.transmat_ = transmat
         hmm_model.means_ = means
         hmm_model.covars_ = covars
-        hmm_model.n_features = 4 # need to add this 
+        hmm_model.n_features = n_features
     else:
         hmm_model = hmm_training( training_data, training_data_lengths, random_seed = options.hmm_randomSeed )
 
