@@ -1,4 +1,4 @@
-# Time-stamp: <2022-06-10 12:57:18 Tao Liu>
+# Time-stamp: <2022-07-21 17:07:46 Tao Liu>
 
 """Description: Main HMMR command
 
@@ -119,127 +119,108 @@ def run( args ):
         em_stddevs = [options.em_stddevs[0],]
         em_stddevs.extend(em_trainer.fragStddevs)    
         options.info( f"#  The means and stddevs after EM:")
-    options.info(     f"#            [short,  mono-,  di-,  tri-]")
-    options.info(     f"#   Means:   {em_means}")
-    options.info(     f"#   Stddevs: {em_stddevs}")
 
-    #############################################
-    # 3. Define training set by peak calling
-    #############################################
+    options.info(  "#           {0[0]:>10s} {0[1]:>10s} {0[2]:>10s} {0[3]:>10s}".format( ["short", "mono", "di", "tri"] ) )
+    options.info(  "#  Means:   {0[0]:>10.4g} {0[1]:>10.4g} {0[2]:>10.4g} {0[3]:>10.4g}".format( em_means ) )
+    options.info(  "#  Stddevs: {0[0]:>10.4g} {0[1]:>10.4g} {0[2]:>10.4g} {0[3]:>10.4g}".format( em_stddevs ) )    
 
-    # Find regions with fold change within determined range to use as training sites.
-    # Find regions with zscore values above certain cutoff to exclude from viterbi.
-    # 
-    options.info( f"#3 Looking for training set from {petrack.total} fragments" )
     options.info( f"#  Pile up all fragments" )
+    minlen = int(petrack.average_template_length)
     fc_bdg = petrack.pileup_bdg( [1.0,], baseline_value = 0 )
     (sum_v, n_v, max_v, min_v, mean_v, std_v) = fc_bdg.summary()
     options.info( f"#  Convert pileup to fold-change over average signal" )
     fc_bdg.apply_func(lambda x: x/mean_v)
-    minlen = int(petrack.average_template_length)
-    options.info( f"#  Call peak above within fold-change range of {options.hmm_lower} and {options.hmm_upper}." )
-    options.info( f"#   The minimum length of the region is set as the average template/fragment length in the dataset: {minlen}" )
-    options.info( f"#   The maximum gap to merge nearby significant regions is set as the flanking size to extend training regions: {options.hmm_training_flanking}" )    
-    peaks = fc_bdg.call_peaks (cutoff=options.hmm_lower, min_length=minlen, max_gap=options.hmm_training_flanking, call_summits=False)
-    options.info( f"#  Total training regions called: {peaks.total}" )
-    peaks.filter_score( options.hmm_lower, options.hmm_upper )
-    options.info( f"#  Total training regions after filtering with lower and upper cutoff: {peaks.total}" )
-    
-    if peaks.total > options.hmm_maxTrain:
-        peaks = peaks.randomly_pick( options.hmm_maxTrain, seed = options.hmm_randomSeed )
-        options.info( f"#  We randomly pick {options.hmm_maxTrain} regions for training" )
 
-    # Now we convert PeakIO to Regions and filter blacklisted regions
-    training_regions = Regions()
-    training_regions.init_from_PeakIO( peaks )
-    # We will expand the regions to both directions and merge overlap
-    options.info( f"#  We expand the training regions with {options.hmm_training_flanking} and merge overlap" )
-    training_regions.expand( options.hmm_training_flanking )
-    training_regions.merge_overlap()
-    
-    # remove peaks overlapping with blacklisted regions
-    if options.blacklist:
-        training_regions.exclude( blacklist_regions )
-        options.info( f"#  after removing those overlapping with provided blacklisted regions, we have {training_regions.total} left" )
-
-    if ( options.print_train ):
-        fhd = open( training_region_bedfile, "w" )
-        training_regions.write_to_bed( fhd )
-        fhd.close()
-        options.info( f"#  Training regions have been saved to `{options.name}_training_regions.bed` " )
-
-    #############################################
-    # 4. Train HMM
-    #############################################
-    options.info( f"#4 Train Hidden Markov Model with Gaussian Emission" )
+    # to finalize the EM training, we will decompose ATAC-seq into four signal tracks
     options.info( f"#  Compute the weights for each fragment length for each of the four signal types")
     fl_dict = petrack.count_fraglengths()
     fl_list = list(fl_dict.keys())
     fl_list.sort()
+
     # now we will prepare the weights for each fragment length for
     # each of the four distributions based on the EM results
     weight_mapping = generate_weight_mapping( fl_list, em_means, em_stddevs )
     
     options.info( f"#  Generate short, mono-, di-, and tri-nucleosomal signals")
     digested_atac_signals = generate_digested_signals( petrack, weight_mapping )
-    
-    # options.info( f"#  Saving short, mono-, di-, and tri-nucleosomal signals to bedGraph files")
-    
-    # fhd = open(options.oprefix+"_short.bdg","w")
-    # digested_atac_signals[ 0 ].write_bedGraph(fhd, "short","short")
-    # fhd.close()
 
-    # fhd = open(options.oprefix+"_mono.bdg","w")
-    # digested_atac_signals[ 1 ].write_bedGraph(fhd, "mono","mono")
-    # fhd.close()
-    
-    # fhd = open(options.oprefix+"_di.bdg","w")
-    # digested_atac_signals[ 2 ].write_bedGraph(fhd, "di","di")
-    # fhd.close()
-    
-    # fhd = open(options.oprefix+"_tri.bdg","w")
-    # digested_atac_signals[ 3 ].write_bedGraph(fhd, "tri","tri")
-    # fhd.close()
-
-    # We first bin the training regions then get four types of signals
-    # in the bins, at the same time, we record how many bins for each
-    # peak.
-    options.info( f"#  Extract signals in training regions with bin size of {options.hmm_binsize}")
-    [ training_bins, training_data, training_data_lengths ] = extract_signals_from_regions( digested_atac_signals, training_regions, binsize = options.hmm_binsize )
-
-    if options.print_train:
-        f = open( training_datafile, "w" )
-        for v in training_data:
-            f.write( f"{v[0]}\t{v[1]}\t{v[2]}\t{v[3]}\n" )
-        f.close()
-    
-    #f = open(options.name+"_training_lens.txt","w")
-    #for v in training_data_lengths:
-    #    f.write( f"{v}\n" )
-    #f.close()
-    
     
 
+    #############################################
+    # 3. Define training set by peak calling
+    #############################################
 
-    # option to use previous hmm model file:
     if options.hmm_file:
-        options.info( f"#  Use loaded HMM model file, skip training ")
-
-        hmm_model, i_open_region, i_background_region, i_nucleosomal_region, options.hmm_binsize = hmm_model_init( options.hmm_file )
-        
-        # options.info( f" HMM converged: {hmm_model.monitor_.converged}")
+        # skip this step if hmm_file is given
+        options.info( f"#3 Skip this step of looking for training set since a Hidden Markov Model file has been provided!")
     else:
+        # Find regions with fold change within determined range to use as training sites.
+        # Find regions with zscore values above certain cutoff to exclude from viterbi.
+        # 
+        options.info( f"#3 Look for training set from {petrack.total} fragments" )
+        options.info( f"#  Call peak above within fold-change range of {options.hmm_lower} and {options.hmm_upper}." )
+        options.info( f"#   The minimum length of the region is set as the average template/fragment length in the dataset: {minlen}" )
+        options.info( f"#   The maximum gap to merge nearby significant regions is set as the flanking size to extend training regions: {options.hmm_training_flanking}" )    
+        peaks = fc_bdg.call_peaks (cutoff=options.hmm_lower, min_length=minlen, max_gap=options.hmm_training_flanking, call_summits=False)
+        options.info( f"#  Total training regions called: {peaks.total}" )
+        peaks.filter_score( options.hmm_lower, options.hmm_upper )
+        options.info( f"#  Total training regions after filtering with lower and upper cutoff: {peaks.total}" )
+        
+        if peaks.total > options.hmm_maxTrain:
+            peaks = peaks.randomly_pick( options.hmm_maxTrain, seed = options.hmm_randomSeed )
+            options.info( f"#  We randomly pick {options.hmm_maxTrain} regions for training" )
+
+        # Now we convert PeakIO to Regions and filter blacklisted regions
+        training_regions = Regions()
+        training_regions.init_from_PeakIO( peaks )
+        # We will expand the regions to both directions and merge overlap
+        options.info( f"#  We expand the training regions with {options.hmm_training_flanking} and merge overlap" )
+        training_regions.expand( options.hmm_training_flanking )
+        training_regions.merge_overlap()
+    
+        # remove peaks overlapping with blacklisted regions
+        if options.blacklist:
+            training_regions.exclude( blacklist_regions )
+            options.info( f"#  after removing those overlapping with provided blacklisted regions, we have {training_regions.total} left" )
+        if ( options.print_train ):
+            fhd = open( training_region_bedfile, "w" )
+            training_regions.write_to_bed( fhd )
+            fhd.close()
+            options.info( f"#  Training regions have been saved to `{options.name}_training_regions.bed` " )
+    
+    #############################################
+    # 4. Train HMM
+    #############################################
+    # if model file is provided, we skip this step
+    if options.hmm_file:
+        options.info( f"#4 Load Hidden Markov Model from given model file")
+        hmm_model, i_open_region, i_background_region, i_nucleosomal_region, options.hmm_binsize = hmm_model_init( options.hmm_file )
+    else:
+        options.info( f"#4 Train Hidden Markov Model with Gaussian Emission" )
+
+        # extract signals within peak using the given binsize
+        options.info( f"#  Extract signals in training regions with bin size of {options.hmm_binsize}")
+        [ training_bins, training_data, training_data_lengths ] = extract_signals_from_regions( digested_atac_signals, training_regions, binsize = options.hmm_binsize )
+
+        if options.print_train:
+            f = open( training_datafile, "w" )
+            for v in training_data:
+                f.write( f"{v[0]}\t{v[1]}\t{v[2]}\t{v[3]}\n" )
+            f.close()
+
         options.info( f"#  Use Baum-Welch algorithm to train the HMM")
 
         hmm_model = hmm_training( training_data, training_data_lengths, random_seed = options.hmm_randomSeed )
 
-        options.info( f" HMM converged: {hmm_model.monitor_.converged}")
+        options.info( f"#   HMM converged: {hmm_model.monitor_.converged}")
 
         # label hidden states
         i_open_region = np.where(hmm_model.means_ == max(hmm_model.means_[0:3,0]))[0][0]
         i_background_region = np.where(hmm_model.transmat_ == min(hmm_model.transmat_[0:3, i_open_region]))[0][0]
         i_nucleosomal_region = list(set([0, 1, 2]) - set([i_open_region, i_background_region]))[0]
 
+        # write hmm into model file
+        options.info( f"#  Write HMM parameters into {hmm_modelfile}")        
         f = open( hmm_modelfile, "w" )
         f.write( str(hmm_model.startprob_)+"\n\n\n" )
         f.write( str(hmm_model.transmat_ )+"\n\n\n" )
@@ -251,11 +232,36 @@ def run( args ):
         f.write( str(i_nucleosomal_region )+"\n\n\n" )
         f.write( str(options.hmm_binsize )+"\n\n\n" )
 
-        f.write( 'open region = state ' + str(i_open_region)+"\n" )
-        f.write( 'nucleosomal region = state ' + str(i_nucleosomal_region)+"\n" )
-        f.write( 'background region = state ' + str(i_background_region)+"\n" )
-
+        #f.write( 'open region = state ' + str(i_open_region)+"\n" )
+        #f.write( 'nucleosomal region = state ' + str(i_nucleosomal_region)+"\n" )
+        #f.write( 'background region = state ' + str(i_background_region)+"\n" )
         f.close()
+
+    # Now tell users the parameters of the HMM
+    assignments = [ "", "", "" ]
+    assignments[ i_open_region ]        = "open"
+    assignments[ i_nucleosomal_region ] = "nuc"
+    assignments[ i_background_region ]  = "bg"
+    
+    options.info( f"#  The Hidden Markov Model for signals of binsize of {options.hmm_binsize} basepairs:")
+    options.info( f"#   open state index: state{i_open_region}" )
+    options.info( f"#   nucleosomal state index: state{i_nucleosomal_region}" )
+    options.info( f"#   background state index: state{i_background_region}" )
+    options.info( f"#   Starting probabilities of states:")
+    options.info(  "#                  {0[0]:>10s} {0[1]:>10s} {0[2]:>10s}".format( assignments ) )
+    options.info(  "#                  {0[0]:>10.4g} {0[1]:>10.4g} {0[2]:>10.4g}".format( hmm_model.startprob_ ) )
+    options.info( f"#   HMM Transition probabilities:")
+    options.info(  "#                    {0[0]:>10s} {0[1]:>10s} {0[2]:>10s}".format( assignments ) )
+    options.info(  "#       {0:>10s}-> {1[0]:>10.4g} {1[1]:>10.4g} {1[2]:>10.4g}".format(assignments[0], hmm_model.transmat_[0]) )
+    options.info(  "#       {0:>10s}-> {1[0]:>10.4g} {1[1]:>10.4g} {1[2]:>10.4g}".format(assignments[1], hmm_model.transmat_[1]) )
+    options.info(  "#       {0:>10s}-> {1[0]:>10.4g} {1[1]:>10.4g} {1[2]:>10.4g}".format(assignments[2], hmm_model.transmat_[2]) )
+    options.info( f"#   HMM Emissions (mean): ")
+    options.info(  "#                    {0[0]:>10s} {0[1]:>10s} {0[2]:>10s} {0[3]:>10s}".format( ["short", "mono", "di", "tri"] ) )
+    options.info(  "#       {0:>10s}-> {1[0]:>10.4g} {1[1]:>10.4g} {1[2]:>10.4g} {1[3]:>10.4g}".format(assignments[0], hmm_model.means_[0]) )
+    options.info(  "#       {0:>10s}-> {1[0]:>10.4g} {1[1]:>10.4g} {1[2]:>10.4g} {1[3]:>10.4g}".format(assignments[1], hmm_model.means_[1]) )
+    options.info(  "#       {0:>10s}-> {1[0]:>10.4g} {1[1]:>10.4g} {1[2]:>10.4g} {1[3]:>10.4g}".format(assignments[2], hmm_model.means_[2]) )
+    
+    #options.info( f"#   HMM Emissions (covar): {hmm_model.covars_}")
 
 #############################################
 # 5. Predict
