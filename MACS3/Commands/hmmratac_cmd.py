@@ -1,4 +1,4 @@
-# Time-stamp: <2022-07-21 17:07:46 Tao Liu>
+# Time-stamp: <2022-07-22 10:39:34 Tao Liu>
 
 """Description: Main HMMR command
 
@@ -120,9 +120,9 @@ def run( args ):
         em_stddevs.extend(em_trainer.fragStddevs)    
         options.info( f"#  The means and stddevs after EM:")
 
-    options.info(  "#           {0[0]:>10s} {0[1]:>10s} {0[2]:>10s} {0[3]:>10s}".format( ["short", "mono", "di", "tri"] ) )
-    options.info(  "#  Means:   {0[0]:>10.4g} {0[1]:>10.4g} {0[2]:>10.4g} {0[3]:>10.4g}".format( em_means ) )
-    options.info(  "#  Stddevs: {0[0]:>10.4g} {0[1]:>10.4g} {0[2]:>10.4g} {0[3]:>10.4g}".format( em_stddevs ) )    
+    options.info(  "#                    {0[0]:>10s} {0[1]:>10s} {0[2]:>10s} {0[3]:>10s}".format( ["short", "mono", "di", "tri"] ) )
+    options.info(  "#             means: {0[0]:>10.4g} {0[1]:>10.4g} {0[2]:>10.4g} {0[3]:>10.4g}".format( em_means ) )
+    options.info(  "#           stddevs: {0[0]:>10.4g} {0[1]:>10.4g} {0[2]:>10.4g} {0[3]:>10.4g}".format( em_stddevs ) )    
 
     options.info( f"#  Pile up all fragments" )
     minlen = int(petrack.average_template_length)
@@ -248,8 +248,8 @@ def run( args ):
     options.info( f"#   nucleosomal state index: state{i_nucleosomal_region}" )
     options.info( f"#   background state index: state{i_background_region}" )
     options.info( f"#   Starting probabilities of states:")
-    options.info(  "#                  {0[0]:>10s} {0[1]:>10s} {0[2]:>10s}".format( assignments ) )
-    options.info(  "#                  {0[0]:>10.4g} {0[1]:>10.4g} {0[2]:>10.4g}".format( hmm_model.startprob_ ) )
+    options.info(  "#                    {0[0]:>10s} {0[1]:>10s} {0[2]:>10s}".format( assignments ) )
+    options.info(  "#                    {0[0]:>10.4g} {0[1]:>10.4g} {0[2]:>10.4g}".format( hmm_model.startprob_ ) )
     options.info( f"#   HMM Transition probabilities:")
     options.info(  "#                    {0[0]:>10s} {0[1]:>10s} {0[2]:>10s}".format( assignments ) )
     options.info(  "#       {0:>10s}-> {1[0]:>10.4g} {1[1]:>10.4g} {1[2]:>10.4g}".format(assignments[0], hmm_model.transmat_[0]) )
@@ -257,9 +257,9 @@ def run( args ):
     options.info(  "#       {0:>10s}-> {1[0]:>10.4g} {1[1]:>10.4g} {1[2]:>10.4g}".format(assignments[2], hmm_model.transmat_[2]) )
     options.info( f"#   HMM Emissions (mean): ")
     options.info(  "#                    {0[0]:>10s} {0[1]:>10s} {0[2]:>10s} {0[3]:>10s}".format( ["short", "mono", "di", "tri"] ) )
-    options.info(  "#       {0:>10s}-> {1[0]:>10.4g} {1[1]:>10.4g} {1[2]:>10.4g} {1[3]:>10.4g}".format(assignments[0], hmm_model.means_[0]) )
-    options.info(  "#       {0:>10s}-> {1[0]:>10.4g} {1[1]:>10.4g} {1[2]:>10.4g} {1[3]:>10.4g}".format(assignments[1], hmm_model.means_[1]) )
-    options.info(  "#       {0:>10s}-> {1[0]:>10.4g} {1[1]:>10.4g} {1[2]:>10.4g} {1[3]:>10.4g}".format(assignments[2], hmm_model.means_[2]) )
+    options.info(  "#       {0:>10s}:  {1[0]:>10.4g} {1[1]:>10.4g} {1[2]:>10.4g} {1[3]:>10.4g}".format(assignments[0], hmm_model.means_[0]) )
+    options.info(  "#       {0:>10s}:  {1[0]:>10.4g} {1[1]:>10.4g} {1[2]:>10.4g} {1[3]:>10.4g}".format(assignments[1], hmm_model.means_[1]) )
+    options.info(  "#       {0:>10s}:  {1[0]:>10.4g} {1[1]:>10.4g} {1[2]:>10.4g} {1[3]:>10.4g}".format(assignments[2], hmm_model.means_[2]) )
     
     #options.info( f"#   HMM Emissions (covar): {hmm_model.covars_}")
 
@@ -286,8 +286,9 @@ def run( args ):
         options.info( f"#  after removing those overlapping with provided blacklisted regions, we have {candidate_regions.total} left" )
 
     # extract signals
-    options.info( f"#  Extract signals in candidate regions")
+    options.info( f"#  Extract signals in candidate regions and decode with HMM")
     # Note: we can implement in a different way to extract then predict for each candidate region.
+    # predicted_results = hmm_decode_each_region ( digested_atac_signals, candidate_regions, hmm_model, binsize = options.hmm_binsize )
     [ candidate_bins, candidate_data, candidate_data_lengths ] = extract_signals_from_regions( digested_atac_signals, candidate_regions, binsize = options.hmm_binsize )
 
     options.info( f"#  Use HMM to predict states")
