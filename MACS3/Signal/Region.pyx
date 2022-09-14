@@ -1,6 +1,6 @@
 # cython: language_level=3
 # cython: profile=True
-# Time-stamp: <2022-06-03 12:58:42 Tao Liu>
+# Time-stamp: <2022-09-14 15:14:55 Tao Liu>
 
 """Module for Region classe.
 
@@ -55,9 +55,41 @@ cdef class Regions:
         self.__flag_sorted = False
         self.total = 0
 
-    def __getitem__ ( self, chrom ):
+    def __getitem__ (self, chrom):
         return self.regions[ chrom ]
         
+    cpdef pop ( self, int n ):
+        # when called, pop the first n regions in Regions class. Self will be modified.
+        cdef:
+            list clist # for chromosomes
+            int tmp_l
+            bytes chrom
+            int n_taken # remember the number of regions prepared
+            object ret # returned Regions
+
+        if self.total == 0:
+            raise Exception("None left")
+            
+        clist = sorted(list(self.regions.keys()))
+        n_taken = n
+        ret = Regions()
+        for chrom in clist:
+            ret.regions[chrom] = self.regions[chrom][:n_taken]
+            self.regions[chrom] = self.regions[chrom][n_taken:]
+            if not self.regions[chrom]:
+                # remove this chromosome if there is none left
+                self.regions.pop( chrom )
+            tmp_l = len( ret.regions[chrom] )
+            ret.total +=  tmp_l
+            # calculate remained
+            self.total -= tmp_l
+            #print( ret.total, self.total )
+            n_taken -= tmp_l
+            if not n_taken:
+                # when there is no need, quit loop
+                break
+        return ret
+    
     cpdef init_from_PeakIO ( self, object peaks ):
         """Initialize the object with a PeakIO object.
 
@@ -174,6 +206,22 @@ cdef class Regions:
             for region in self.regions[chrom]:
                 fhd.write( "%s\t%d\t%d\n" % (chrom.decode(),region[0],region[1] ) )
 
+    def __str__ ( self ):
+        cdef:
+            int i
+            bytes chrom
+            tuple region
+            str ret
+            
+        ret = ""
+        chrs = list(self.regions.keys())
+        chrs.sort()
+        for i in range( len(chrs) ):
+            chrom = chrs[i]
+            for region in self.regions[chrom]:
+                ret += "%s\t%d\t%d\n" % (chrom.decode(),region[0],region[1] )
+        return ret
+    
     # cpdef object randomly_pick ( self, int n, int seed = 12345 ):
     #     """Shuffle the regions and get n regions out of it. Return a
     #     new Regions object.  

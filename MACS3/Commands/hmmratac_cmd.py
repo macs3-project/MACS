@@ -1,4 +1,4 @@
-# Time-stamp: <2022-07-22 10:39:34 Tao Liu>
+# Time-stamp: <2022-09-14 15:20:26 Tao Liu>
 
 """Description: Main HMMR command
 
@@ -287,12 +287,22 @@ def run( args ):
 
     # extract signals
     options.info( f"#  Extract signals in candidate regions and decode with HMM")
+    # we will do the extraction and prediction in a step of 1000 regions
+    
     # Note: we can implement in a different way to extract then predict for each candidate region.
     # predicted_results = hmm_decode_each_region ( digested_atac_signals, candidate_regions, hmm_model, binsize = options.hmm_binsize )
-    [ candidate_bins, candidate_data, candidate_data_lengths ] = extract_signals_from_regions( digested_atac_signals, candidate_regions, binsize = options.hmm_binsize )
-
+    # Note: we implement in a way that we will decode the candidate regions 100 regions at a time so 1. we can make it running in parallel in the future; 2. we can reduce the memory usage.
     options.info( f"#  Use HMM to predict states")
-    predicted_proba = hmm_predict( candidate_data, candidate_data_lengths, hmm_model )
+    n = 0
+    predicted_proba = []
+    candidate_bins = []
+    while candidate_regions.total != 0:
+        n += 1
+        cr_100 = candidate_regions.pop( 100 )
+        [ cr_100_bins, cr_100_data, cr_100_data_lengths ] = extract_signals_from_regions( digested_atac_signals, cr_100, binsize = options.hmm_binsize )
+        options.info( "#    decoding %d..." % ( n*100 ) )
+        candidate_bins.extend( cr_100_bins )
+        predicted_proba.extend( hmm_predict( cr_100_data, cr_100_data_lengths, hmm_model ) )
 
 #############################################
 # 6. Output - add to OutputWriter

@@ -1,6 +1,6 @@
 # cython: language_level=3
 # cython: profile=True
-# Time-stamp: <2022-07-22 17:52:30 Tao Liu>
+# Time-stamp: <2022-07-27 19:53:03 Tao Liu>
 
 """Module description:
 
@@ -178,7 +178,6 @@ cpdef list extract_signals_from_regions( list signals, object regions, int binsi
     assert sum(ret_training_lengths) == len(ret_training_data)
     assert len(ret_training_bins) == len(ret_training_data)
     return [ ret_training_bins, ret_training_data, ret_training_lengths ]
-
 
 cdef _make_bdg_of_bins_from_regions ( object regions, int binsize ):
     cdef:
