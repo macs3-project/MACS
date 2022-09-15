@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# Time-stamp: <2022-09-15 14:27:24 Tao Liu>
+# Time-stamp: <2022-09-15 17:38:34 Tao Liu>
 
 """Description: MACS v3 main executable.
 
@@ -829,8 +829,8 @@ def add_hmmratac_parser( subparsers ):
     group_misc.add_argument( "--randomSeed", dest = "hmm_randomSeed", type = int,
                              help = "Seed to set for random sampling of training regions. Default: 10151",
                              default = 10151 )
-    group_misc.add_argument( "--decoding-steps", dest = "decoding_steps", type = int, default = 1000, 
-                             help = "Number of candidate regions to be decoded at a time. The HMM model will be applied with Viterbi to find the optimal state path in each region. bigger the number, faster the decoding process, larger the memory usage. Default: 1000.")
+    group_misc.add_argument( "--decoding-steps", dest = "decoding_steps", type = int, default = 10000, 
+                             help = "Number of candidate regions to be decoded at a time. The HMM model will be applied with Viterbi to find the optimal state path in each region. bigger the number, faster the decoding process, larger the memory usage. Default: 10000.")
     group_misc.add_argument( "-e", "--blacklist", dest = "blacklist", type = str, required = False, 
                              help = "Filename of blacklisted regions to exclude (previously was BED_file). Examples are those from ENCODE. Default: NA" )
     group_misc.add_argument( "--keep-duplicates", dest = "misc_keep_duplicates", action = "store_true",

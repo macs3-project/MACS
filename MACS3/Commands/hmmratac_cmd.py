@@ -1,4 +1,4 @@
-# Time-stamp: <2022-09-15 14:30:18 Tao Liu>
+# Time-stamp: <2022-09-15 17:38:10 Tao Liu>
 
 """Description: Main HMMR command
 
@@ -194,7 +194,7 @@ def run( args ):
         training_regions = Regions()
         training_regions.init_from_PeakIO( peaks )
         # We will expand the regions to both directions and merge overlap
-        options.info( f"#  We expand the training regions with {options.hmm_training_flanking} and merge overlap" )
+        options.info( f"#  We expand the training regions with {options.hmm_training_flanking} basepairs and merge overlap" )
         training_regions.expand( options.hmm_training_flanking )
         training_regions.merge_overlap()
     
@@ -307,11 +307,11 @@ def run( args ):
 
     # extract signals
     options.info( f"#  Extract signals in candidate regions and decode with HMM")
-    # we will do the extraction and prediction in a step of 1000 regions by default
+    # we will do the extraction and prediction in a step of 10000 regions by default
     
     # Note: we can implement in a different way to extract then predict for each candidate region.
     # predicted_results = hmm_decode_each_region ( digested_atac_signals, candidate_regions, hmm_model, binsize = options.hmm_binsize )
-    # Note: we implement in a way that we will decode the candidate regions 1000 regions at a time so 1. we can make it running in parallel in the future; 2. we can reduce the memory usage.
+    # Note: we implement in a way that we will decode the candidate regions 10000 regions at a time so 1. we can make it running in parallel in the future; 2. we can reduce the memory usage.
     options.info( f"#  Use HMM to predict states")
     n = 0
     predicted_proba = []
