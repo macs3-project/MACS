@@ -67,7 +67,10 @@ cpdef hmm_training( list training_data, list training_data_lengths, int n_states
     rs = np.random.RandomState(np.random.MT19937(np.random.SeedSequence(random_seed)))
     hmm_model = hmm.GaussianHMM( n_components=3, covariance_type = 'full', random_state = rs )
     #hmm_model = hmm.GMMHMM( n_components = n_states, covariance_type = 'full' )
-    hmm_model.fit( training_data, training_data_lengths )
+    hmm_model = hmm_model.fit( training_data, training_data_lengths )
+    hmm_model.transmat_ = np.around(hmm_model.transmat_, decimals = 4)
+    #hmm_model.means_ = np.around(hmm_model.means_, decimals = 4)
+    #hmm_model.covars_ = np.around(hmm_model.covars_, decimals = 4)
     return hmm_model
 
 cpdef hmm_predict( list signals, list lens, hmm_model ):
