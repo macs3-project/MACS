@@ -1,4 +1,4 @@
-# Time-stamp: <2022-09-14 15:20:26 Tao Liu>
+# Time-stamp: <2022-09-15 01:18:03 Tao Liu>
 
 """Description: Main HMMR command
 
@@ -56,6 +56,10 @@ def run( args ):
     #############################################
     # 0. Names of output files
     #############################################
+    short_bdgfile = os.path.join( options.outdir, options.name+"_digested_short.bdg" )
+    mono_bdgfile = os.path.join( options.outdir, options.name+"_digested_mono.bdg" )
+    di_bdgfile = os.path.join( options.outdir, options.name+"_digested_di.bdg" )
+    tri_bdgfile = os.path.join( options.outdir, options.name+"_digested_tri.bdg" )
     training_region_bedfile = os.path.join( options.outdir, options.name+"_training_regions.bed" )
     training_datafile = os.path.join( options.outdir, options.name+"_training_data.txt" )
     hmm_modelfile = os.path.join( options.outdir, options.name+"_model.txt" )
@@ -64,7 +68,6 @@ def run( args ):
     bg_state_bdgfile = os.path.join( options.outdir, options.name+"_bg.bdg" )
     states_file = os.path.join( options.outdir, options.name+"_states.bed" )
     accessible_file = os.path.join( options.outdir, options.name+"_accessible_regions.gappedPeak" )
-    
     
     #############################################
     # 1. Read the input BAM files
@@ -118,6 +121,11 @@ def run( args ):
         em_means.extend(em_trainer.fragMeans)
         em_stddevs = [options.em_stddevs[0],]
         em_stddevs.extend(em_trainer.fragStddevs)    
+        # we will round to 1 decimal digit
+        for i in range(len(em_means)):
+            em_means[ i ] = round(em_means[ i ], 1)
+        for i in range(len(em_stddevs)):
+            em_stddevs[ i ] = round(em_stddevs[ i ], 1)        
         options.info( f"#  The means and stddevs after EM:")
 
     options.info(  "#                    {0[0]:>10s} {0[1]:>10s} {0[2]:>10s} {0[3]:>10s}".format( ["short", "mono", "di", "tri"] ) )
@@ -144,7 +152,19 @@ def run( args ):
     options.info( f"#  Generate short, mono-, di-, and tri-nucleosomal signals")
     digested_atac_signals = generate_digested_signals( petrack, weight_mapping )
 
-    
+    if options.save_digested:
+        fhd = open(short_bdgfile,"w")
+        digested_atac_signals[ 0 ].write_bedGraph(fhd, "short","short")
+        fhd.close()
+        fhd = open(mono_bdgfile,"w")
+        digested_atac_signals[ 0 ].write_bedGraph(fhd, "mono","mono")
+        fhd.close()
+        fhd = open(di_bdgfile,"w")
+        digested_atac_signals[ 0 ].write_bedGraph(fhd, "di","di")
+        fhd.close()
+        fhd = open(tri_bdgfile,"w")
+        digested_atac_signals[ 0 ].write_bedGraph(fhd, "tri","tri")
+        fhd.close()        
 
     #############################################
     # 3. Define training set by peak calling
@@ -182,7 +202,7 @@ def run( args ):
         if options.blacklist:
             training_regions.exclude( blacklist_regions )
             options.info( f"#  after removing those overlapping with provided blacklisted regions, we have {training_regions.total} left" )
-        if ( options.print_train ):
+        if ( options.save_train ):
             fhd = open( training_region_bedfile, "w" )
             training_regions.write_to_bed( fhd )
             fhd.close()
@@ -202,7 +222,7 @@ def run( args ):
         options.info( f"#  Extract signals in training regions with bin size of {options.hmm_binsize}")
         [ training_bins, training_data, training_data_lengths ] = extract_signals_from_regions( digested_atac_signals, training_regions, binsize = options.hmm_binsize )
 
-        if options.print_train:
+        if options.save_train:
             f = open( training_datafile, "w" )
             for v in training_data:
                 f.write( f"{v[0]}\t{v[1]}\t{v[2]}\t{v[3]}\n" )
