@@ -1,6 +1,6 @@
 # cython: language_level=3
 # cython: profile=True
-# Time-stamp: <2022-09-14 15:14:55 Tao Liu>
+# Time-stamp: <2022-09-15 16:13:48 Tao Liu>
 
 """Module for Region classe.
 
@@ -73,7 +73,7 @@ cdef class Regions:
         clist = sorted(list(self.regions.keys()))
         n_taken = n
         ret = Regions()
-        for chrom in clist:
+        for chrom in sorted(clist):
             ret.regions[chrom] = self.regions[chrom][:n_taken]
             self.regions[chrom] = self.regions[chrom][n_taken:]
             if not self.regions[chrom]:
@@ -104,7 +104,7 @@ cdef class Regions:
 
         peaks.sort()
         self.total = 0
-        for chrom in peaks.get_chr_names():
+        for chrom in sorted(peaks.get_chr_names()):
             ps = peaks.get_data_from_chrom( chrom )
             self.regions[chrom] = []
             for i in range( len( ps ) ):
@@ -128,7 +128,7 @@ cdef class Regions:
 
         if self.__flag_sorted:
             return
-        for chrom in self.regions.keys():
+        for chrom in sorted(self.regions.keys()):
             self.regions[chrom].sort()
         self.__flag_sorted = True
 
@@ -142,7 +142,7 @@ cdef class Regions:
             int i
 
         self.sort()
-        for chrom in self.regions.keys():
+        for chrom in sorted(self.regions.keys()):
             ps = self.regions[ chrom ]
             for i in range( len( ps ) ):
                 ps[i] = ( max(0, ps[i][0] - flanking), ps[i][1] + flanking )

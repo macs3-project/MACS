@@ -1,6 +1,6 @@
 # cython: language_level=3
 # cython: profile=True
-# Time-stamp: <2022-06-03 13:26:32 Tao Liu>
+# Time-stamp: <2022-09-15 17:07:26 Tao Liu>
 
 """Module for filter duplicate tags from paired-end data
 
@@ -125,7 +125,7 @@ cdef class PETrackI:
             bytes chromosome
 
         chrs = self.get_chr_names()
-        for chromosome in chrs:
+        for chromosome in sorted(chrs):
             if chromosome in self.__locations:
                 self.__locations[chromosome].resize( self.buffer_size, refcheck=False )
                 self.__locations[chromosome].resize( 0, refcheck=False )
@@ -148,10 +148,10 @@ cdef class PETrackI:
             bytes chrom
 
         valid_chroms = set(self.__locations.keys()).intersection(rlengths.keys())
-        for chrom in valid_chroms:
+        for chrom in sorted(valid_chroms):
             self.rlengths[chrom] = rlengths[chrom]
         missed_chroms = set(self.__locations.keys()).difference(rlengths.keys())
-        for chrom in missed_chroms:
+        for chrom in sorted(missed_chroms):
             self.rlengths[chrom] = INT_MAX
         return True
 
@@ -537,7 +537,7 @@ cdef class PETrackI:
         #info(f"start to pileup")
         bdg = bedGraphTrackI( baseline_value = baseline_value )
 
-        for chrom in self.get_chr_names():
+        for chrom in sorted(self.get_chr_names()):
             prev_pileup = None
             for i in range(len(scale_factor_s)):
                 scale_factor = scale_factor_s[i]
@@ -573,7 +573,7 @@ cdef class PETrackI:
         for i in range( len(mapping) ): ret_pileup.append( {} )
         chroms = self.get_chr_names()
         for i in range( len(mapping) ):
-            for chrom in chroms:
+            for chrom in sorted(chroms):
                 ret_pileup[ i ][ chrom ] = pileup_from_LR_hmmratac( self.__locations[ chrom ], mapping[ i ] )
         return ret_pileup
 

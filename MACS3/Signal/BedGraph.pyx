@@ -1,6 +1,6 @@
 # cython: language_level=3
 # cython: profile=True
-# Time-stamp: <2022-06-08 17:01:59 Tao Liu>
+# Time-stamp: <2022-09-15 17:09:48 Tao Liu>
 
 """Module for BedGraph data class.
 
@@ -244,13 +244,13 @@ cdef class bedGraphTrackI:
         """
         cdef:
             set chrs
-            bytes chromosome
+            bytes chrom
 
         chrs = self.get_chr_names()
-        for chromosome in chrs:
-            if chromosome in self.__data:
-                self.__data[chromosome] = [None, None]
-                self.__data.pop(chromosome)
+        for chrom in sorted(chrs):
+            if chrom in self.__data:
+                self.__data[chrom] = [None, None]
+                self.__data.pop(chrom)
         return True
 
     cpdef list get_data_by_chr (self, bytes chromosome):
@@ -288,7 +288,7 @@ cdef class bedGraphTrackI:
             trackcontents = (name.replace("\"", "\\\""), description.replace("\"", "\\\""))
             fhd.write("track type=bedGraph name=\"%s\" description=\"%s\" visibility=2 alwaysZero=on\n" % trackcontents)
         chrs = self.get_chr_names()
-        for chrom in chrs:
+        for chrom in sorted(chrs):
             (p,v) = self.__data[chrom]
             pnext = iter(p).__next__
             vnext = iter(v).__next__
@@ -326,7 +326,7 @@ cdef class bedGraphTrackI:
             set chrs
 
         chrs = self.get_chr_names()
-        for chrom in chrs:
+        for chrom in sorted(chrs):
             (p,v) = self.__data[chrom]
             pnext = iter(p).__next__
             vnext = iter(v).__next__
@@ -368,7 +368,7 @@ cdef class bedGraphTrackI:
             set chrs
 
         chrs = self.get_chr_names()
-        for chrom in chrs:
+        for chrom in sorted(chrs):
             (p,v) = self.__data[chrom]
             pnext = iter(p).__next__
             vnext = iter(v).__next__
@@ -474,7 +474,7 @@ cdef class bedGraphTrackI:
 
         chrs = self.get_chr_names()
         peaks = PeakIO()                      # dictionary to save peaks
-        for chrom in chrs:
+        for chrom in sorted(chrs):
             peak_content = None
             peak_length = 0
             (ps,vs) = self.get_data_by_chr(chrom) # arrays for position and values
@@ -582,7 +582,7 @@ cdef class bedGraphTrackI:
         chrs = lvl1_peaks.get_chr_names()
         broadpeaks = BroadPeakIO()
         # use lvl2_peaks as linking regions between lvl1_peaks
-        for chrom in chrs:
+        for chrom in sorted(chrs):
             lvl1peakschrom = lvl1_peaks.get_data_from_chrom(chrom)
             lvl2peakschrom = lvl2_peaks.get_data_from_chrom(chrom)
             lvl1peakschrom_next = iter(lvl1peakschrom).__next__
@@ -679,7 +679,7 @@ cdef class bedGraphTrackI:
 
         ret = bedGraphTrackI()
         chroms = set(self.get_chr_names())
-        for chrom in chroms:
+        for chrom in sorted(chroms):
             (p1,v1) = self.get_data_by_chr(chrom) # arrays for position and values
             # maximum p
             max_p = max(p1)
@@ -763,7 +763,7 @@ cdef class bedGraphTrackI:
         for track in bdgTracks:
             common_chr = common_chr.intersection(set(track.get_chr_names()))
 
-        for chrom in common_chr:
+        for chrom in sorted(common_chr):
             datas = [self.get_data_by_chr(chrom)]
             datas.extend([bdgTracks[i].get_data_by_chr(chrom) for i in range(len(bdgTracks))])
 
@@ -834,7 +834,7 @@ cdef class bedGraphTrackI:
             float32_t t0, t1, t
 
         # calculate frequencies of each p-score
-        for chrom in self.get_chr_names():
+        for chrom in sorted(self.get_chr_names()):
             pre_p = 0
 
             [pos_array, pscore_array] = self.__data[ chrom ]
@@ -878,7 +878,7 @@ cdef class bedGraphTrackI:
             nhcal += 1
 
         # convert pscore to qscore
-        for chrom in self.get_chr_names():
+        for chrom in sorted(self.get_chr_names()):
             [pos_array, pscore_array] = self.__data[ chrom ]
 
             for i in range( len( pos_array ) ):
@@ -1073,7 +1073,7 @@ cdef class bedGraphTrackI:
         chr1 = set(self.get_chr_names())
         chr2 = set(bdgTrack2.get_chr_names())
         common_chr = chr1.intersection(chr2)
-        for chrom in common_chr:
+        for chrom in sorted(common_chr):
 
             (p1s,v1s) = self.get_data_by_chr(chrom) # arrays for position and values
             p1n = iter(p1s).__next__         # assign the next function to a viable to speed up
@@ -1149,7 +1149,7 @@ cdef class bedGraphTrackI:
         cutoff_npeaks = {}
         cutoff_lpeaks = {}
 
-        for chrom in chrs:
+        for chrom in sorted(chrs):
             ( pos_array, score_array ) = self.__data[ chrom ]
             pos_array = np.array( self.__data[ chrom ][ 0 ] )
             score_array = np.array( self.__data[ chrom ][ 1 ] )

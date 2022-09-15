@@ -1,4 +1,4 @@
-# Time-stamp: <2022-02-22 17:26:52 Tao Liu>
+# Time-stamp: <2022-09-15 17:25:49 Tao Liu>
 
 """Description: macs call
 
@@ -176,7 +176,7 @@ def run( args ):
     #t_call_to_vcf = 0
     t_total_0 = time()
 
-    for chrom in tbam.get_chromosomes():
+    for chrom in sorted(tbam.get_chromosomes()):
         peaks_chr = peaks.get_data_from_chrom( chrom )
         for peak in peaks_chr:
             # note, when we extract reads from BAM within a peak

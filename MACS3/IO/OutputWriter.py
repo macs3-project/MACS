@@ -1,4 +1,4 @@
-# Time-stamp: <2020-12-01 12:57:23 Tao Liu>
+# Time-stamp: <2022-09-15 17:26:49 Tao Liu>
 
 """Module Description: Functions to write file
 
@@ -46,7 +46,7 @@ def zwig_write (trackI, subdir, fileprefix, d, log=None,space=10, single=False):
         wigfhd = open(f,"w")
         wigfhd.write("track type=wiggle_0 name=\"%s_all\" description=\"Extended tag pileup from MACS version %s for every %d bp\"\n" % (fileprefix.replace('_afterfiting',''), MACS_VERSION, space)) # data type line
 
-    for chrom in chrs:
+    for chrom in sorted(chrs):
         if not single:
             f = os.path.join(subdir,fileprefix+"_"+chrom+".wig")
             log("write to "+f+" for chromosome "+chrom)
@@ -130,7 +130,7 @@ def zbdg_write (trackI, subdir, fileprefix, d, log=None, single=False):
         bdgfhd = open(f,"w")
         bdgfhd.write("track type=bedGraph name=\"%s_all\" description=\"Extended tag pileup from MACS version %s\"\n" % (fileprefix.replace('_afterfiting',''), MACS_VERSION)) # data type line
 
-    for chrom in chrs:
+    for chrom in sorted(chrs):
         if not single:
             f = os.path.join(subdir,fileprefix+"_"+chrom+".bdg")
             log("write to "+f+" for chromosome "+chrom)
