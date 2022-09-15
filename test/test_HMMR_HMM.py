@@ -17,6 +17,7 @@ from MACS3.Signal.HMMR_HMM import hmm_training, hmm_predict
 #     predictions = hmm_model.predict( signals )
 #     return predictions
 
+@pytest.mark.skip(reason="need to refine later")
 class Test_HMM_train(unittest.TestCase):
     def setUp( self ):
         self.train_data = [[1, 2], [1, 4], [1, 0], [10, 2], [10, 4], [10, 0]] 
