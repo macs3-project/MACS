@@ -12,12 +12,12 @@ jobs:
     strategy:
       matrix:
         include:
-          - arch: armv7
-            distro: bullseye
+          #- arch: armv7 # scipy installation issue
+          #  distro: bullseye
           - arch: aarch64
             distro: bullseye
-          - arch: ppc64le
-            distro: bullseye
+          #- arch: ppc64le
+          #  distro: bullseye
           #- arch: s390x # let's skip s390x for now since scipy can't
           #be installed
           #  distro: bullseye
