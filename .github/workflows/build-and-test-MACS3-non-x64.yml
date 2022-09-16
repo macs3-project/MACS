@@ -18,8 +18,9 @@ jobs:
             distro: bullseye
           - arch: ppc64le
             distro: bullseye
-          - arch: s390x
-            distro: bullseye
+          #- arch: s390x # let's skip s390x for now since scipy can't
+          #be installed
+          #  distro: bullseye
     steps:
       - name: Checkout MACS
         uses: actions/checkout@v2.1.0

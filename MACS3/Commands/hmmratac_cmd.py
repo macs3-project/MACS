@@ -1,4 +1,4 @@
-# Time-stamp: <2022-09-15 17:38:10 Tao Liu>
+# Time-stamp: <2022-09-16 10:22:23 Tao Liu>
 
 """Description: Main HMMR command
 
@@ -120,12 +120,12 @@ def run( args ):
         em_means = [options.em_means[0],]
         em_means.extend(em_trainer.fragMeans)
         em_stddevs = [options.em_stddevs[0],]
-        em_stddevs.extend(em_trainer.fragStddevs)    
+        em_stddevs.extend(em_trainer.fragStddevs)
         # we will round to 1 decimal digit
         for i in range(len(em_means)):
             em_means[ i ] = round(em_means[ i ], 1)
         for i in range(len(em_stddevs)):
-            em_stddevs[ i ] = round(em_stddevs[ i ], 1)        
+            em_stddevs[ i ] = round(em_stddevs[ i ], 1)
         options.info( f"#  The means and stddevs after EM:")
 
     options.info(  "#                    {0[0]:>10s} {0[1]:>10s} {0[2]:>10s} {0[3]:>10s}".format( ["short", "mono", "di", "tri"] ) )
