@@ -1,4 +1,4 @@
-# Time-stamp: <2022-09-16 10:22:23 Tao Liu>
+# Time-stamp: <2022-09-19 09:59:23 Tao Liu>
 
 """Description: Main HMMR command
 
@@ -62,6 +62,7 @@ def run( args ):
     tri_bdgfile = os.path.join( options.outdir, options.name+"_digested_tri.bdg" )
     training_region_bedfile = os.path.join( options.outdir, options.name+"_training_regions.bed" )
     training_datafile = os.path.join( options.outdir, options.name+"_training_data.txt" )
+    training_datalengthfile = os.path.join( options.outdir, options.name+"_training_lengths.txt" )
     hmm_modelfile = os.path.join( options.outdir, options.name+"_model.txt" )
     open_state_bdgfile = os.path.join( options.outdir, options.name+"_open.bdg" )
     nuc_state_bdgfile = os.path.join( options.outdir, options.name+"_nuc.bdg" )
@@ -202,7 +203,7 @@ def run( args ):
         if options.blacklist:
             training_regions.exclude( blacklist_regions )
             options.info( f"#  after removing those overlapping with provided blacklisted regions, we have {training_regions.total} left" )
-        if ( options.save_train ):
+        if options.save_train:
             fhd = open( training_region_bedfile, "w" )
             training_regions.write_to_bed( fhd )
             fhd.close()
@@ -226,6 +227,11 @@ def run( args ):
             f = open( training_datafile, "w" )
             for v in training_data:
                 f.write( f"{v[0]}\t{v[1]}\t{v[2]}\t{v[3]}\n" )
+            f.close()
+
+            f = open( training_datalengthfile, "w" )
+            for v in training_data_lengths:
+                f.write( f"{v}\n" )
             f.close()
 
         options.info( f"#  Use Baum-Welch algorithm to train the HMM")
