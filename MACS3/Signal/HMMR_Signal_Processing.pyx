@@ -1,6 +1,6 @@
 # cython: language_level=3
 # cython: profile=True
-# Time-stamp: <2022-07-27 19:53:03 Tao Liu>
+# Time-stamp: <2022-09-20 17:29:47 Tao Liu>
 
 """Module description:
 
@@ -194,10 +194,10 @@ cdef _make_bdg_of_bins_from_regions ( object regions, int binsize ):
     n = 0
     # here we convert peaks from a PeakIO to BedGraph object with a
     # given binsize.
+    mark_bin = 1                      #this is to mark the continuous bins in the same region, it will iterate between 1 and -1 in different regions
     for chrom in sorted(regions.get_chr_names()):
         tmp_p = 0                         #this is to make gap in bedgraph for not covered regions.
         ps = regions[ chrom ]
-        mark_bin = 1                      #this is to mark the continuous bins in the same region, it will iterate between 1 and -1 in different regions
         for i in range( len( ps ) ):
             # for each region
             s = ps[ i ][ 0 ]
