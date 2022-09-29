@@ -1,6 +1,6 @@
 # cython: language_level=3
 # cython: profile=True
-# Time-stamp: <2022-09-15 17:09:48 Tao Liu>
+# Time-stamp: <2022-09-29 09:07:23 Tao Liu>
 
 """Module for BedGraph data class.
 
@@ -972,13 +972,16 @@ cdef class bedGraphTrackI:
         I will try to tweak this function to output only the values of
         bdgTrack1 (self) in the regions in bdgTrack2
 
-        This is specifically for HMMRATAC
+        This is specifically for HMMRATAC. bdgTrack2 should be a
+        bedgraph object containing the bins with value set to
+        'mark_bin' -- the bins in the same region will have the same
+        value.
         """
         cdef:
-            int32_t pre_p, p1, p2, i
-            float32_t v1, v2
-            bytes chrom
-            object ret
+             int32_t pre_p, p1, p2, i
+             float32_t v1, v2
+             bytes chrom
+             object ret
 
         assert isinstance(bdgTrack2,bedGraphTrackI), "not a bedGraphTrackI object"
 
@@ -1021,7 +1024,7 @@ cdef class bedGraphTrackI:
                         v1 = v1n()
                     elif p2 < p1:
                         # clip a region from pre_p to p2, then set pre_p as p2.
-                        if v2 != 0: #0 means it's a gap region, we should have 1 or -1
+                        if v2 != 0: #0 means it's a gap region, we should have value > 1
                             padd( (chrom, p2) )
                             vadd(v1)
                             ladd(int(v2))

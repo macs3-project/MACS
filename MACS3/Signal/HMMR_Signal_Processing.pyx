@@ -1,6 +1,6 @@
 # cython: language_level=3
 # cython: profile=True
-# Time-stamp: <2022-09-20 17:29:47 Tao Liu>
+# Time-stamp: <2022-09-29 14:58:12 Tao Liu>
 
 """Module description:
 
@@ -158,7 +158,7 @@ cpdef list extract_signals_from_regions( list signals, object regions, int binsi
     #nnn =len( extracted_len[0] )
     #debug( f"{n} bins, {nn}, {nnn}" )
     counter = 0
-    prev_c = 0
+    prev_c = extracted_len[0][0]
     c = 0
     for i in range( nn ):
         ret_training_bins.append( extracted_positions[0][i] )
@@ -168,13 +168,15 @@ cpdef list extract_signals_from_regions( list signals, object regions, int binsi
               max( 0.0001, abs(round(extracted_data[2][i], 4))),
               max( 0.0001, abs(round(extracted_data[3][i], 4))) ] )
         c = extracted_len[0][i]
+        #print(f"{extracted_positions[0][i]} {extracted_len[0][i]}")
         if counter != 0 and c != prev_c:
-            prev_c = c
-            ret_training_lengths.append( abs( counter ) )
+            ret_training_lengths.append( counter )
+            #print(f"### add a bin length {counter}")
             counter = 0
-        counter +=  c
+        prev_c = c
+        counter +=  1
     # last region
-    ret_training_lengths.append( abs( counter ) )
+    ret_training_lengths.append( counter )
     assert sum(ret_training_lengths) == len(ret_training_data)
     assert len(ret_training_bins) == len(ret_training_data)
     return [ ret_training_bins, ret_training_data, ret_training_lengths ]
@@ -194,7 +196,7 @@ cdef _make_bdg_of_bins_from_regions ( object regions, int binsize ):
     n = 0
     # here we convert peaks from a PeakIO to BedGraph object with a
     # given binsize.
-    mark_bin = 1                      #this is to mark the continuous bins in the same region, it will iterate between 1 and -1 in different regions
+    mark_bin = 1                      #this is to mark the continuous bins in the same region, it will increase by one while moving to the next region
     for chrom in sorted(regions.get_chr_names()):
         tmp_p = 0                         #this is to make gap in bedgraph for not covered regions.
         ps = regions[ chrom ]
@@ -210,12 +212,12 @@ cdef _make_bdg_of_bins_from_regions ( object regions, int binsize ):
                 tmp_s = r
                 tmp_e = r + binsize
                 if tmp_s > tmp_p:
-                    regionsbdg.add_loc_wo_merge( chrom, tmp_p, tmp_s, 0 )
+                    regionsbdg.add_loc_wo_merge( chrom, tmp_p, tmp_s, 0 ) #the gap
                 regionsbdg.add_loc_wo_merge( chrom, tmp_s, tmp_e, mark_bin ) #the value we put in the bin bedgraph is the number of bins in this region
                 n += 1
                 tmp_p = tmp_e
             # end of region, we change the mark_bin
-            mark_bin *= -1
+            mark_bin += 1
     # we do not merge regions in regionsbdg object so each bin will be seperated.
     debug( f"added {n} bins" )
     return regionsbdg

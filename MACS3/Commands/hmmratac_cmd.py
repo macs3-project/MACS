@@ -1,4 +1,4 @@
-# Time-stamp: <2022-09-19 09:59:23 Tao Liu>
+# Time-stamp: <2022-09-23 01:21:12 taoliu>
 
 """Description: Main HMMR command
 
@@ -225,8 +225,10 @@ def run( args ):
 
         if options.save_train:
             f = open( training_datafile, "w" )
-            for v in training_data:
-                f.write( f"{v[0]}\t{v[1]}\t{v[2]}\t{v[3]}\n" )
+            for i in range( len( training_data ) ):
+                v = training_data[ i ]
+                p = training_bins[ i ]
+                f.write( f"{p[0]}\t{p[1]}\t{v[0]}\t{v[1]}\t{v[2]}\t{v[3]}\n" )
             f.close()
 
             f = open( training_datalengthfile, "w" )

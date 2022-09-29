@@ -1,6 +1,6 @@
 # cython: language_level=3
 # cython: profile=True
-# Time-stamp: <2022-09-19 08:50:02 Tao Liu>
+# Time-stamp: <2022-09-29 15:07:16 Tao Liu>
 
 """Module description:
 
@@ -66,9 +66,9 @@ cpdef hmm_training( list training_data, list training_data_lengths, int n_states
     # if we have other known parameters, we should set these (ie: means_weights, covariance_type etc.)
     rs = np.random.RandomState(np.random.MT19937(np.random.SeedSequence(random_seed)))
     if mixedmodel:
-        hmm_model = hmm.GMMHMM( n_components = n_states, covariance_type = covar, random_state = rs )
+        hmm_model = hmm.GMMHMM( n_components = n_states, covariance_type = covar, random_state = rs, verbose = True )
     else:
-        hmm_model = hmm.GaussianHMM( n_components= n_states, covariance_type = covar, random_state = rs )
+        hmm_model = hmm.GaussianHMM( n_components= n_states, covariance_type = covar, random_state = rs, verbose = True )
     hmm_model = hmm_model.fit( training_data, training_data_lengths )
 
     hmm_model.transmat_ = np.around(hmm_model.transmat_, decimals = roundup)
