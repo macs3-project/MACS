@@ -12,8 +12,8 @@ import numpy as np
 # @pytest.mark.skip(reason="need to refine later")
 class Test_HMM_train(unittest.TestCase):
     def setUp( self ):
-        self.train_data = np.loadtxt("test/large_training_data.txt", delimiter="\t", dtype="float", usecols=(2,3,4,5))
-        self.training_data_lengths = np.loadtxt('test/large_training_lengths.txt', dtype="int")
+        self.train_data = np.loadtxt("test/large_training_data.txt", delimiter="\t", dtype="float", usecols=(2,3,4,5)).tolist()
+        self.training_data_lengths = np.loadtxt('test/large_training_lengths.txt', dtype="int").tolist()
         self.expected_converged = True
         self.not_expected_covars = None
         self.not_expected_means = None
