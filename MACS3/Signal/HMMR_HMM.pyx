@@ -1,6 +1,6 @@
 # cython: language_level=3
 # cython: profile=True
-# Time-stamp: <2022-09-29 15:07:16 Tao Liu>
+# Time-stamp: <2022-09-30 16:13:22 Tao Liu>
 
 """Module description:
 
@@ -59,21 +59,21 @@ cdef inline float get_weighted_density( int x, float m, float v, w ):
 # ------------------------------------
 
 
-cpdef hmm_training( list training_data, list training_data_lengths, int n_states = 3, int random_seed = 12345, mixedmodel = False, covar = 'full', roundup = 6 ):
+cpdef hmm_training( list training_data, list training_data_lengths, int n_states = 3, int random_seed = 12345, mixedmodel = False, covar = 'full' ):
     # training data should be in array like format: X = np.array([[.5, .3, .1, .1], [.6, .4, 0, 0]])
     # if we do not want init_prob to be updated through learning, set params = 'tmc' and init_prob = initial_state otherwise it will be overwritten
     # according to base documentation, if init_prob not stated, it is set to be equally likely for any state (1/ # of components)
     # if we have other known parameters, we should set these (ie: means_weights, covariance_type etc.)
     rs = np.random.RandomState(np.random.MT19937(np.random.SeedSequence(random_seed)))
     if mixedmodel:
-        hmm_model = hmm.GMMHMM( n_components = n_states, covariance_type = covar, random_state = rs, verbose = True )
+        hmm_model = hmm.GMMHMM( n_components = n_states, covariance_type = covar, random_state = rs, verbose = False )
     else:
-        hmm_model = hmm.GaussianHMM( n_components= n_states, covariance_type = covar, random_state = rs, verbose = True )
+        hmm_model = hmm.GaussianHMM( n_components= n_states, covariance_type = covar, random_state = rs, verbose = False )
     hmm_model = hmm_model.fit( training_data, training_data_lengths )
 
-    hmm_model.transmat_ = np.around(hmm_model.transmat_, decimals = roundup)
-    hmm_model.means_ = np.around(hmm_model.means_, decimals = roundup)
-    hmm_model.covars_ = np.around(hmm_model.covars_, decimals = roundup)
+    #hmm_model.transmat_ = np.around(hmm_model.transmat_, decimals = roundup)
+    #hmm_model.means_ = np.around(hmm_model.means_, decimals = roundup)
+    #hmm_model.covars_ = np.around(hmm_model.covars_, decimals = roundup)
     return hmm_model
 
 cpdef hmm_predict( list signals, list lens, hmm_model ):
