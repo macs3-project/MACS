@@ -3,34 +3,29 @@ import pytest
 import numpy as np
 from hmmlearn import hmm
 from MACS3.Signal.HMMR_HMM import hmm_training, hmm_predict
+import numpy as np
+import pandas as pd
 # ------------------------------------
 # Main function
 # ------------------------------------
 ''' This unittest is to check the ouputs of the hmm_training() and hmm_predict() functions
 '''
-# def hmm_training( training_data, k):
-#     hmm_model = hmm.GaussianHMM( n_components = k )
-#     hmm_model.fit( training_data )
-#     return hmm_model
 
-# def hmm_predict( signals, hmm_model ):
-#     predictions = hmm_model.predict( signals )
-#     return predictions
-
-@pytest.mark.skip(reason="need to refine later")
+# @pytest.mark.skip(reason="need to refine later")
 class Test_HMM_train(unittest.TestCase):
     def setUp( self ):
-        self.train_data = [[1, 2], [1, 4], [1, 0], [10, 2], [10, 4], [10, 0]] 
-        self.test_data = [[1, 2], [1, 4], [1, 0], [10, 2], [10, 4], [10, 0]]
-        self.model = hmm_training(training_data = self.train_data, training_data_lengths = [6], n_states = 2)
-        self.pred = hmm_predict(signals = self.test_data, lens = [6], hmm_model = self.model)
+        train_data = pd.read_csv('test/large_training/large_training_data.txt', sep='\t', names=['a', 'b', 'c', 'd', 'e', 'f'])
+        self.train_data = train_data[['b', 'c', 'd', 'e', 'f']].to_numpy().tolist()
+        self.training_data_lengths = np.loadtxt('test/large_training/large_training_lengths.txt', dtype=int).tolist()
+        self.expected_converged = True
+        self.not_expected_covars = None
+        self.not_expected_means = None
+        self.not_expected_transmat = None
 
-    #@pytest.mark.skip(reason="state label is random, so we need to fix this test")
     def test_predict( self ):
-        mod = hmm_training(self.train_data, [6], 2)
-        preds = hmm_predict(self.test_data, [6], mod)
-        # print(preds)
-        # print(self.pred)
-        self.assertEqual( self.pred.tolist(), preds.tolist() )
-        #self.assertAlmostEqual()
+        model = hmm_training(training_data = self.train_data, training_data_lengths = self.training_data_lengths, n_states = 3, random_seed = 12345)
 
+        self.assertEqual( model.monitor_.converged, self.expected_converged )
+        self.assertNotEqual( model.covars_.tolist(), self.not_expected_covars )
+        self.assertNotEqual( model.means_.tolist(), self.not_expected_means )
+        self.assertNotEqual( model.transmat_.tolist(), self.not_expected_transmat )
