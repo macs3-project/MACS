@@ -30,21 +30,22 @@ classifiers =[\
               'Operating System :: POSIX',
               'Operating System :: Unix',
               'Topic :: Scientific/Engineering :: Bio-Informatics',
-              'Programming Language :: Python :: 3.6',
-              'Programming Language :: Python :: 3.7',
               'Programming Language :: Python :: 3.8',
+              'Programming Language :: Python :: 3.9',
+              'Programming Language :: Python :: 3.10',
               'Programming Language :: Cython', ]
 
-install_requires = [ "numpy>=1.17",
-                     "cykhash>=1.0.2",
+install_requires = [ "numpy>=1.23",
+                     "hmmlearn>=0.2.8",
+                     "cykhash>=2.0",
                      "Cython>=0.29" ]
 
 tests_requires = [ 'pytest' ]
 
 
 def main():
-    if sys.version_info < (3,6):
-        sys.stderr.write("CRITICAL: Python version must >= 3.6!\n")
+    if sys.version_info < (3,8):
+        sys.stderr.write("CRITICAL: Python version must >= 3.8!\n")
         sys.exit(1)
 
     # NumPy include dir
@@ -95,14 +96,20 @@ def main():
     # extensions, those has to be processed by Cython
     ext_modules = [ \
                     # Signal
+                    Extension("MACS3.Signal.HMMR_EM", ["MACS3/Signal/HMMR_EM.pyx"], libraries=["m"], include_dirs=numpy_include_dir, extra_compile_args=extra_c_args ),
+                    Extension("MACS3.Signal.HMMR_Signal_Processing", ["MACS3/Signal/HMMR_Signal_Processing.pyx"], libraries=["m"], include_dirs=numpy_include_dir, extra_compile_args=extra_c_args ),
+                    Extension("MACS3.Signal.HMMR_HMM", ["MACS3/Signal/HMMR_HMM.pyx"], libraries=["m"], include_dirs=numpy_include_dir, extra_compile_args=extra_c_args ),
                     Extension("MACS3.Signal.Prob", ["MACS3/Signal/Prob.pyx"], libraries=["m"], include_dirs=numpy_include_dir, extra_compile_args=extra_c_args ),
+                    Extension("MACS3.Signal.Region", ["MACS3/Signal/Region.pyx"], include_dirs=numpy_include_dir, extra_compile_args=extra_c_args ),
                     Extension("MACS3.Signal.Pileup", ["MACS3/Signal/Pileup.pyx","MACS3/Signal/cPosValCalculation.c"], include_dirs=numpy_include_dir, extra_compile_args=extra_c_args ),
+                    Extension("MACS3.Signal.PileupV2", ["MACS3/Signal/PileupV2.pyx"], include_dirs=numpy_include_dir, extra_compile_args=extra_c_args ),                    
                     Extension("MACS3.Signal.PeakModel", ["MACS3/Signal/PeakModel.pyx"], include_dirs=numpy_include_dir, extra_compile_args=extra_c_args),
                     Extension("MACS3.Signal.PeakDetect", ["MACS3/Signal/PeakDetect.pyx"], extra_compile_args=extra_c_args),
                     Extension("MACS3.Signal.SignalProcessing", ["MACS3/Signal/SignalProcessing.pyx"], include_dirs=numpy_include_dir, extra_compile_args=extra_c_args),
                     Extension("MACS3.Signal.FixWidthTrack", ["MACS3/Signal/FixWidthTrack.pyx"], include_dirs=numpy_include_dir, extra_compile_args=extra_c_args),
                     Extension("MACS3.Signal.PairedEndTrack", ["MACS3/Signal/PairedEndTrack.pyx"], include_dirs=numpy_include_dir, extra_compile_args=extra_c_args),
                     Extension("MACS3.Signal.BedGraph", ["MACS3/Signal/BedGraph.pyx"], libraries=["m"], include_dirs=numpy_include_dir, extra_compile_args=extra_c_args),
+                    #Extension("MACS3.Signal.BedGraphV2", ["MACS3/Signal/BedGraphV2.pyx"], libraries=["m"], include_dirs=numpy_include_dir, extra_compile_args=extra_c_args),                    
                     Extension("MACS3.Signal.ScoreTrack", ["MACS3/Signal/ScoreTrack.pyx"], include_dirs=numpy_include_dir, extra_compile_args=extra_c_args ),
                     Extension("MACS3.Signal.CallPeakUnit", ["MACS3/Signal/CallPeakUnit.pyx"], include_dirs=numpy_include_dir, extra_compile_args=extra_c_args),
                     Extension("MACS3.Signal.VariantStat",["MACS3/Signal/VariantStat.pyx",],libraries=["m"], include_dirs=numpy_include_dir, extra_compile_args=extra_c_args),
@@ -141,7 +148,7 @@ def main():
            install_requires = install_requires,
            setup_requires = install_requires,
            tests_require = tests_requires,
-           python_requires = '>=3.6',
+           python_requires = '>=3.8',
            ext_modules = ext_modules )
 
 if __name__ == '__main__':

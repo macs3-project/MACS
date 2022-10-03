@@ -1,6 +1,6 @@
 # cython: language_level=3
 # cython: profile=True
-# Time-stamp: <2020-12-02 16:00:25 Tao Liu>
+# Time-stamp: <2022-09-15 17:17:37 Tao Liu>
 
 """Module for FWTrack classes.
 
@@ -80,7 +80,7 @@ cdef class FWTrack:
 
         """
         self.fw = fw
-        self.__locations = {}    # location pairs
+        self.__locations = {}    # location pairs: two strands
         self.__pointer = {}      # location pairs
         self.__buf_size = {}     # location pairs
         self.__sorted = False
@@ -99,7 +99,7 @@ cdef class FWTrack:
             bytes chromosome
 
         chrs = self.get_chr_names()
-        for chromosome in chrs:
+        for chromosome in sorted(chrs):
             if chromosome in self.__locations:
                 self.__locations[chromosome][0].resize( self.buffer_size, refcheck=False )
                 self.__locations[chromosome][0].resize( 0, refcheck=False )
@@ -114,7 +114,7 @@ cdef class FWTrack:
         """Add a location to the list according to the sequence name.
 
         chromosome -- mostly the chromosome name
-        fiveendpos -- 5' end pos, left for plus strand, right for neg strand
+        fiveendpos -- 5' end pos, left for plus strand, right for minus strand
         strand     -- 0: plus, 1: minus
         """
         cdef:
@@ -181,10 +181,10 @@ cdef class FWTrack:
             bytes chrom
 
         valid_chroms = set(self.__locations.keys()).intersection(rlengths.keys())
-        for chrom in valid_chroms:
+        for chrom in sorted(valid_chroms):
             self.rlengths[chrom] = rlengths[chrom]
         missed_chroms = set(self.__locations.keys()).difference(rlengths.keys())
-        for chrom in missed_chroms:
+        for chrom in sorted(missed_chroms):
             self.rlengths[chrom] = INT_MAX
         return True
 
@@ -489,7 +489,7 @@ cdef class FWTrack:
 
         chrnames = self.get_chr_names()
 
-        for chrom in pchrnames:
+        for chrom in sorted(pchrnames):
             assert chrom in chrnames, "chromosome %s can't be found in the FWTrack object." % chrom
             (plus, minus) = self.__locations[chrom]
             cpeaks = peaks.get_data_from_chrom(chrom)

@@ -1,7 +1,7 @@
 # cython: language_level=3
 # cython: profile=True
 # cython: linetrace=True
-# Time-stamp: <2020-12-06 23:54:17 Tao Liu>
+# Time-stamp: <2022-09-15 17:06:17 Tao Liu>
 
 """Module for Calculate Scores.
 
@@ -1466,7 +1466,7 @@ cdef class CallerFromAlignments:
         chrs = lvl1peaks.get_chr_names()
         broadpeaks = BroadPeakIO()
         # use lvl2_peaks as linking regions between lvl1_peaks
-        for chrom in chrs:
+        for chrom in sorted(chrs):
             lvl1peakschrom = lvl1peaks.get_data_from_chrom(chrom)
             lvl2peakschrom = lvl2peaks.get_data_from_chrom(chrom)
             lvl1peakschrom_next = iter(lvl1peakschrom).__next__

@@ -1,6 +1,6 @@
 # cython: language_level=3
 # cython: profile=True
-# Time-stamp: <2020-11-30 11:33:02 Tao Liu>
+# Time-stamp: <2022-09-15 17:07:26 Tao Liu>
 
 """Module for filter duplicate tags from paired-end data
 
@@ -16,13 +16,16 @@ import io
 import sys
 from logging import debug, info
 from copy import copy
+from array import array as pyarray
+from collections import Counter
 
 # ------------------------------------
 # MACS3 modules
 # ------------------------------------
 from MACS3.Utilities.Constants import *
 from MACS3.Signal.Pileup import quick_pileup, over_two_pv_array, se_all_in_one_pileup
-
+from MACS3.Signal.BedGraph import bedGraphTrackI
+from MACS3.Signal.PileupV2 import pileup_from_LR_hmmratac
 # ------------------------------------
 # Other modules
 # ------------------------------------
@@ -35,24 +38,25 @@ cimport cython
 
 cdef INT_MAX = <int32_t>((<uint32_t>(-1))>>1)
 
-cdef packed struct peLoc:
-    int32_t l
-    int32_t r
+# We don't use the following structs anymore
+# cdef packed struct peLoc:
+#     int32_t l
+#     int32_t r
 
-
-cdef class PETrackChromosome:
-    cdef:
-        public np.ndarray locations
-        public uint32_t pointer
-        public uint32_t buffer_size
-        public uint64_t coverage
-        public uint64_t chrlen
-        uint32_t __buffer_increment
-        bool __sorted
-        bool __destroyed
+# cdef class PETrackChromosome:
+#     cdef:
+#         public np.ndarray locations
+#         public uint32_t pointer
+#         public uint32_t buffer_size
+#         public uint64_t coverage
+#         public uint64_t chrlen
+#         uint32_t __buffer_increment
+#         bool __sorted
+#         bool __destroyed
 
 # Let numpy enforce PE-ness using ndarray, gives bonus speedup when sorting
 # PE data doesn't have strandedness
+
 cdef class PETrackI:
     """Paired End Locations Track class I along the whole genome
     (commonly with the same annotation type), which are stored in a
@@ -63,7 +67,7 @@ cdef class PETrackI:
     """
     cdef:
         public dict __locations
-        public dict __pointer
+        public dict __size
         public dict __buf_size
         public bool __sorted
         public uint64_t total
@@ -79,7 +83,7 @@ cdef class PETrackI:
 
         """
         self.__locations = {}    # dictionary with chrname as key, nparray with [('l','int32'),('r','int32')] as value
-        self.__pointer = {}      # dictionary with chrname as key, size of the above nparray as value
+        self.__size = {}      # dictionary with chrname as key, size of the above nparray as value
         self.__buf_size = {}      # dictionary with chrname as key, size of the above nparray as value
         self.__sorted = False
         self.total = 0           # total fragments
@@ -102,14 +106,14 @@ cdef class PETrackI:
             self.__buf_size[chromosome] = self.buffer_size
             self.__locations[chromosome] = np.zeros(shape=self.buffer_size, dtype=[('l','int32'),('r','int32')]) # note: ['l'] is the leftmost end, ['r'] is the rightmost end of fragment.
             self.__locations[chromosome][0] = ( start, end )
-            self.__pointer[chromosome] = 1
+            self.__size[chromosome] = 1
         else:
-            i = self.__pointer[chromosome]
+            i = self.__size[chromosome]
             if self.__buf_size[chromosome] == i:
                 self.__buf_size[chromosome] += self.buffer_size
                 self.__locations[chromosome].resize((self.__buf_size[chromosome]), refcheck = False )
             self.__locations[chromosome][ i ] = ( start, end )
-            self.__pointer[chromosome] = i + 1
+            self.__size[chromosome] = i + 1
         self.length += end - start
         return
 
@@ -121,22 +125,21 @@ cdef class PETrackI:
             bytes chromosome
 
         chrs = self.get_chr_names()
-        for chromosome in chrs:
+        for chromosome in sorted(chrs):
             if chromosome in self.__locations:
                 self.__locations[chromosome].resize( self.buffer_size, refcheck=False )
                 self.__locations[chromosome].resize( 0, refcheck=False )
                 self.__locations[chromosome] = None
                 self.__locations.pop(chromosome)
         self.__destroyed = True
-
         return
 
     cpdef bint set_rlengths ( self, dict rlengths ):
         """Set reference chromosome lengths dictionary.
 
-        Only the chromosome existing in this fwtrack object will be updated.
+        Only the chromosome existing in this petrack object will be updated.
 
-        If chromosome in this fwtrack is not covered by given
+        If a chromosome in this petrack is not covered by given
         rlengths, and it has no associated length, it will be set as
         maximum integer.
         """
@@ -145,10 +148,10 @@ cdef class PETrackI:
             bytes chrom
 
         valid_chroms = set(self.__locations.keys()).intersection(rlengths.keys())
-        for chrom in valid_chroms:
+        for chrom in sorted(valid_chroms):
             self.rlengths[chrom] = rlengths[chrom]
         missed_chroms = set(self.__locations.keys()).difference(rlengths.keys())
-        for chrom in missed_chroms:
+        for chrom in sorted(missed_chroms):
             self.rlengths[chrom] = INT_MAX
         return True
 
@@ -178,9 +181,9 @@ cdef class PETrackI:
         chrnames = self.get_chr_names()
 
         for c in chrnames:
-            self.__locations[c].resize((self.__pointer[c]), refcheck=False)
+            self.__locations[c].resize((self.__size[c]), refcheck=False)
             self.__locations[c].sort( order=['l', 'r'] )
-            self.total += self.__locations[c].shape[0]
+            self.total += self.__size[c]
 
         self.__sorted = True
         self.average_template_length = <float32_t>( self.length ) / self.total
@@ -196,9 +199,9 @@ cdef class PETrackI:
             raise Exception("No such chromosome name (%s) in TrackI object!\n" % (chromosome))
 
     cpdef set get_chr_names ( self ):
-        """Return all the chromosome names stored in this track object.
+        """Return all the chromosome names in this track object as a python set.
         """
-        return set(sorted(self.__locations.keys()))
+        return set(self.__locations.keys())
 
 
     cpdef void sort ( self ):
@@ -219,36 +222,48 @@ cdef class PETrackI:
         self.__sorted = True
         return
 
-    cpdef np.ndarray pmf( self ):
-        """return a 1-D numpy array of the probabilities of observing each
-        fragment size, indices are the bin number (first bin is 0)
+    cpdef dict count_fraglengths ( self ):
+        """Return a dictionary of the counts for sizes/fragment lengths of each pair.
+
+        This function is for HMMRATAC.
         """
         cdef:
-           np.ndarray[np.int64_t, ndim=1] counts = np.zeros(self.buffer_size, dtype='int64')
-           np.ndarray[np.float64_t, ndim=1] pmf
-           np.ndarray[np.int64_t, ndim=1] bins
-           np.ndarray[np.int32_t, ndim=1] sizes, locs
-           bytes c
-           int32_t i, bins_len
-           int32_t max_bins = 0
-           set chrnames
+            np.ndarray[np.int32_t, ndim=1] sizes
+            np.int32_t s
+            np.ndarray locs
+            list chrnames
+            int i
+            #dict ret_dict
+            bytes k
 
-        chrnames = self.get_chr_names()
+        counter = Counter()
+        chrnames = list( self.get_chr_names() )
+        for i in range( len(chrnames) ):
+            locs = self.__locations[ chrnames[i] ]
+            sizes = locs['r'] - locs['l']
+            for s in sizes:
+                counter[ s ] += 1
+        return dict(counter)
 
-        for c in chrnames:
-            locs = self.__locations[c]
-            sizes = locs['r'] - locs['l'] # +1 ?? irrelevant for use
-            bins = np.bincount(sizes).astype('int64')
-            bins_len = bins.shape[0]
-            if bins_len > max_bins: max_bins = bins_len
-            if counts.shape[0] < max_bins:
-                counts.resize(max_bins, refcheck=False)
-            counts += bins
+    cpdef np.ndarray fraglengths ( self ):
+        """Return the sizes/fragment lengths of each pair.
 
-        counts.resize(max_bins, refcheck=False)
-        pmf = counts.astype('float64') / counts.astype('float64').sum()
-        return pmf
+        This function is for HMMRATAC EM training.
+        """
+        cdef:
+            np.ndarray[np.int32_t, ndim=1] sizes
+            np.ndarray locs
+            list chrnames
+            int i
 
+        chrnames = list( self.get_chr_names() )
+        locs = self.__locations[ chrnames[ 0 ] ]
+        sizes = locs['r'] - locs['l']
+        for i in range( 1, len(chrnames) ):
+            locs = self.__locations[ chrnames[i] ]
+            sizes = np.concatenate( ( sizes, locs['r'] - locs['l'] ) )
+        return sizes    
+    
     @cython.boundscheck(False) # do not check that np indices are valid
     cpdef void filter_dup ( self, int32_t maxnum=-1):
         """Filter the duplicated reads.
@@ -305,8 +320,8 @@ cdef class PETrackI:
                         # subtract current_loc_l from self.length
                         self.length -= current_loc_end - current_loc_start
             self.__locations[k] = locs[ selected_idx ]
-            self.__pointer[k] = self.__locations[k].shape[0]
-            self.total += self.__locations[k].shape[0]
+            self.__size[k] = self.__locations[k].shape[0]
+            self.total += self.__size[k]
             # free memory?
             # I know I should shrink it to 0 size directly,
             # however, on Mac OSX, it seems directly assigning 0
@@ -319,12 +334,13 @@ cdef class PETrackI:
     cpdef void sample_percent (self, float32_t percent, int32_t seed = -1):
         """Sample the tags for a given percentage.
 
-        Warning: the current object is changed!
+        Warning: the current object is changed! If a new PETrackI is wanted, use sample_percent_copy instead.
         """
         cdef:
             uint32_t num, i_chrom      # num: number of reads allowed on a certain chromosome
             bytes k
             set chrnames
+            object rs, rs_shuffle
 
         self.total = 0
         self.length = 0
@@ -333,32 +349,83 @@ cdef class PETrackI:
         chrnames = self.get_chr_names()
 
         if seed >= 0:
-            np.random.seed(seed)
+            info(f"#   A random seed {seed} has been used")
+            rs = np.random.RandomState(np.random.MT19937(np.random.SeedSequence(seed)))
+            rs_shuffle = rs.shuffle
+        else:
+            rs_shuffle = np.random.shuffle
 
-        for k in chrnames:
+        for k in sorted(chrnames):
             # for each chromosome.
             # This loop body is too big, I may need to split code later...
 
             num = <uint32_t>round(self.__locations[k].shape[0] * percent, 5 )
-            np.random.shuffle( self.__locations[k] )
+            rs_shuffle( self.__locations[k] )
             self.__locations[k].resize( num, refcheck = False )
             self.__locations[k].sort( order = ['l', 'r'] ) # sort by leftmost positions
-            self.__pointer[k] = self.__locations[k].shape[0]
+            self.__size[k] = self.__locations[k].shape[0]
             self.length += ( self.__locations[k]['r'] - self.__locations[k]['l'] ).sum()
-            self.total += self.__pointer[k]
+            self.total += self.__size[k]
         self.average_template_length = <float32_t>( self.length )/ self.total
         return
 
+    cpdef object sample_percent_copy (self, float32_t percent, int32_t seed = -1):
+        """Sample the tags for a given percentage. Return a new PETrackI object
+
+        """
+        cdef:
+            uint32_t num, i_chrom      # num: number of reads allowed on a certain chromosome
+            bytes k
+            set chrnames
+            object ret_petrackI, rs, rs_shuffle
+            np.ndarray l
+
+        ret_petrackI = PETrackI( anno=self.annotation, buffer_size = self.buffer_size)
+        chrnames = self.get_chr_names()
+
+        if seed >= 0:
+            info(f"# A random seed {seed} has been used in the sampling function")
+            rs = np.random.default_rng(seed)
+        else:
+            rs = np.random.default_rng()
+
+        rs_shuffle = rs.shuffle
+        for k in sorted(chrnames): # chrnames need to be sorted otherwise we can't assure reproducibility
+            # for each chromosome.
+            # This loop body is too big, I may need to split code later...
+            l = np.copy( self.__locations[k] )
+            num = <uint32_t>round(l.shape[0] * percent, 5 )
+            rs_shuffle( l )
+            l.resize( num, refcheck = False )
+            l.sort( order = ['l', 'r'] ) # sort by leftmost positions
+            ret_petrackI.__locations[ k ] = l
+            ret_petrackI.__size[ k ] = l.shape[0]
+            ret_petrackI.length += ( l['r'] - l['l'] ).sum()
+            ret_petrackI.total += ret_petrackI.__size[ k ]
+        ret_petrackI.average_template_length = <float32_t>( ret_petrackI.length )/ ret_petrackI.total
+        ret_petrackI.set_rlengths( self.get_rlengths() )
+        return ret_petrackI
+
     cpdef void sample_num (self, uint64_t samplesize, int32_t seed = -1):
-        """Sample the tags for a given percentage.
+        """Sample the tags for a given number.
 
         Warning: the current object is changed!
         """
-        cdef float32_t percent
-
+        cdef:
+            float32_t percent
         percent = <float32_t>(samplesize)/self.total
         self.sample_percent ( percent, seed )
         return
+
+    cpdef object sample_num_copy (self, uint64_t samplesize, int32_t seed = -1):
+        """Sample the tags for a given number.
+
+        Warning: the current object is changed!
+        """
+        cdef:
+            float32_t percent
+        percent = <float32_t>(samplesize)/self.total
+        return self.sample_percent_copy ( percent, seed )
 
     cpdef void print_to_bed (self, fhd=None):
         """Output to BEDPE format files. If fhd is given, write to a
@@ -453,4 +520,60 @@ cdef class PETrackI:
 
         return prev_pileup
 
+
+    cpdef object pileup_bdg ( self, list scale_factor_s, float32_t baseline_value = 0.0 ):
+        """pileup all chromosomes, and return a bedGraphTrackI object.
+
+        scale_factor_s  : linearly scale the pileup value applied to each d in ds. The list should have the same length as ds.
+        baseline_value : a value to be filled for missing values, and will be the minimum pileup.
+        """
+        cdef:
+            list tmp_pileup, prev_pileup
+            float32_t scale_factor
+            bytes chrom
+            object bdg
+            int32_t prev_s
+
+        #info(f"start to pileup")
+        bdg = bedGraphTrackI( baseline_value = baseline_value )
+
+        for chrom in sorted(self.get_chr_names()):
+            prev_pileup = None
+            for i in range(len(scale_factor_s)):
+                scale_factor = scale_factor_s[i]
+
+                tmp_pileup = quick_pileup ( np.sort(self.__locations[chrom]['l']), np.sort(self.__locations[chrom]['r']), scale_factor, baseline_value ) # Can't directly pass partial nparray there since that will mess up with pointer calculation.
+
+                if prev_pileup:
+                    prev_pileup = over_two_pv_array ( prev_pileup, tmp_pileup, func="max" )
+                else:
+                    prev_pileup = tmp_pileup
+            # save to bedGraph
+            bdg.add_chrom_data( chrom, pyarray('i', prev_pileup[0]), pyarray('f', prev_pileup[1]) )
+        return bdg
+
+    cpdef list pileup_bdg_hmmr ( self, list mapping, float32_t baseline_value = 0.0 ):
+        """pileup all chromosomes, and return a list of four bedGraphTrackI objects: short, mono, di, and tri nucleosomal signals.
+
+        The idea is that for each fragment length, we generate four bdg using four weights from four distributions. Then we add all sets of four bdgs together.
+
+        Way to generate 'mapping', based on HMMR EM means and stddevs:
+        fl_dict = petrack.count_fraglengths()
+        fl_list = list(fl_dict.keys())
+        fl_list.sort()
+        weight_mapping = generate_weight_mapping( fl_list, em_means, em_stddevs )
+        """
+        cdef:
+            list ret_pileup
+            set chroms
+            bytes chrom
+            int i
+
+        ret_pileup = []
+        for i in range( len(mapping) ): ret_pileup.append( {} )
+        chroms = self.get_chr_names()
+        for i in range( len(mapping) ):
+            for chrom in sorted(chroms):
+                ret_pileup[ i ][ chrom ] = pileup_from_LR_hmmratac( self.__locations[ chrom ], mapping[ i ] )
+        return ret_pileup
 

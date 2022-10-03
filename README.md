@@ -34,45 +34,29 @@ make sure that the main branch passes unit testing on certain
 functions and subcommands to reproduce the correct outputs. We will
 add more new features in the future.**
 
-## Recent Changes for MACS (3.0.0a7)
+## Recent Changes for MACS (3.0.0b1)
 
-### 3.0.0a7
+### 3.0.0b1
+        The first beta version of MACS3, with HMMRATAC feature recently added.
+	   
+	* New features from alpha7:
 
-	* New features:
-
-	1) Speed/memory optimization.  Use the cykhash to replace python
-	dictionary. Use buffer (10MB) to read and parse input file (not
-	available for BAM file parser). And many optimization tweaks.
-
-	2) Code cleanup. Reorganize source codes.
-
-	3) Unit testing.
-
-	4) R wrappers for MACS -- MACSr
-
-	5) Switch to Github Action for CI, support multi-arch testing
-	including x64, armv7, aarch64, s390x and ppc64le.
-
-	6) MACS tag-shifting model has been refined. Now it will use a
-	naive peak calling approach to find ALL possible paired peaks at +
-	and - strand, then use all of them to calculate the
-	cross-correlation. (a related bug has been fix #442)
-
-	7) Call variants in peak regions directly from BAM files. The 
-	function was originally developed under code name SAPPER. Now 
-	SAPPER has been merged into MACS. Also, `simde` has been added as 
-	a submodule in order to support fermi-lite library under non-x64 
-	architectures.
-
-	8) BAI index and random access to BAM file now is supported. #449
-	And user can use original BAM file (instead of the subset of BAM
-	file as in SAPPER) in the `callvar` command. 
-
-	9) Support of Python > 3.10 #497 #498
-
-	* Other fixes:
-
-    1) Missing header line while no peaks can be called #501 #502
+	1) HMMRATAC module is added
+	HMMRATAC is a dedicated software to analyze ATAC-seq data. The
+	basic idea behind HMMRATAC is to digest ATAC-seq data according to
+	the fragment length of read pairs into four signal tracks: short
+	fragments, mononucleosomal fragments, di-nucleosomal fragments and
+	tri-nucleosomal fragments. Then integrate the four tracks again
+	using Hidden Markov Model to consider three hidden states: open
+	region, nucleosomal region, and background region. The orginal
+	paper was published in 2019 written in JAVA, by Evan Tarbell. We
+	implemented it in Python/Cython and optimize the whole process
+	using existing MACS functions and hmmlearn. Now it can run much
+	faster than the original JAVA version. Note: evaluation of the
+	peak calling results is underway.
+	
+	2) Multiple updates regarding dependencies, anaconda built, CI/CD
+	process.
 
 ## Install
 
@@ -123,7 +107,7 @@ Subcommand | Description
 [`randsample`](./docs/randsample.md) | Randomly choose a number/percentage of total reads.
 [`refinepeak`](./docs/refinepeak.md) | Take raw reads alignment, refine peak summits.
 [`callvar`](./docs/callvar.md) | Call variants in given peak regions from the alignment BAM files.
-
+[`hmmratac`](./docs/hmmratac.md) | Dedicated peak calling based on Hidden Markov Model for ATAC-seq data.
 
 For advanced usage, for example, to run `macs3` in a modular way,
 please read the [advanced usage](./docs/advanced_usage.md). There is a

@@ -1,4 +1,4 @@
-# Time-stamp: <2021-03-10 23:51:54 Tao Liu>
+# Time-stamp: <2022-09-15 17:25:49 Tao Liu>
 
 """Description: macs call
 
@@ -118,8 +118,8 @@ def run( args ):
     error = options.error
 
     peakbedfile = options.peakbed
-    peaktfile = options.tfile
-    peakcfile = options.cfile
+    tfile = options.tfile
+    cfile = options.cfile
     top2allelesminr = options.top2allelesMinRatio
     min_altallele_count = options.altalleleMinCount
     max_allowed_ar = options.maxAR
@@ -146,9 +146,9 @@ def run( args ):
 
     chrs = peaks.get_chr_names()
 
-    tbam = BAMaccessor( peaktfile )
-    if peakcfile:
-        cbam = BAMaccessor( peakcfile )
+    tbam = BAMaccessor( tfile )
+    if cfile:
+        cbam = BAMaccessor( cfile )
         assert tbam.get_chromosomes()[0] in cbam.get_chromosomes() or cbam.get_chromosomes()[0] in tbam.get_chromosomes(), Exception("It seems Treatment and Control BAM use different naming for chromosomes! Check headers of both files.")
         #assert tbam.get_chromosomes() == cbam.get_chromosomes(), Exception("Treatment and Control BAM files have different orders of sorted chromosomes! Please check BAM Headers and re-sort BAM files.")
     else:
@@ -176,7 +176,7 @@ def run( args ):
     #t_call_to_vcf = 0
     t_total_0 = time()
 
-    for chrom in tbam.get_chromosomes():
+    for chrom in sorted(tbam.get_chromosomes()):
         peaks_chr = peaks.get_data_from_chrom( chrom )
         for peak in peaks_chr:
             # note, when we extract reads from BAM within a peak

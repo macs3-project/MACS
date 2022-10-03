@@ -1,4 +1,4 @@
-# Time-stamp: <2021-03-10 19:06:52 Tao Liu>
+# Time-stamp: <2022-06-10 10:24:34 Tao Liu>
 
 """Module Description
 
@@ -25,14 +25,10 @@ from MACS3.IO.Parser import BEDParser, ELANDResultParser, ELANDMultiParser, \
     ELANDExportParser, SAMParser, BAMParser, BAMPEParser,\
     BEDPEParser, BowtieParser,  guess_parser
 
+from MACS3.Utilities.Constants import EFFECTIVEGS as efgsize
 # ------------------------------------
 # constants
 # ------------------------------------
-
-efgsize = {"hs":2.7e9,
-           "mm":1.87e9,
-           "ce":9e7,
-           "dm":1.2e8}
 
 # ------------------------------------
 # Misc functions
@@ -805,5 +801,175 @@ def opt_validate_callvar ( options ):
 
     if options.np <= 0:
         options.np = 1
-
     return options
+
+
+def opt_validate_hmmratac ( options ):
+    """Validate options from a OptParser object.
+
+    Ret: Validated options object.
+    """
+    # logging object
+    logging.basicConfig(level=(4-options.verbose)*10,
+                        format='%(levelname)-5s @ %(asctime)s: %(message)s ',
+                        datefmt='%a, %d %b %Y %H:%M:%S',
+                        stream=sys.stderr,
+                        filemode="w"
+                        )
+
+    options.error   = logging.critical        # function alias
+    options.warn    = logging.warning
+    options.debug   = logging.debug
+    options.info    = logging.info
+
+   
+    # input options.argtxt for hmmratac
+    options.argtxt = "# Command line: %s\n" % " ".join(sys.argv[1:])
+    #        "# ARGUMENTS LIST:",\
+    #        "# outfile = %s" % (options.ofile),\
+    #        "# input file = %s\n" % (options.bam_file),\
+    # ... add additional
+
+    # Output options
+    #if options.store_bdg:
+    #    options.argtxt += "# HMMRATAC will report whole genome bedgraph of all state annotations. \n"
+    
+    #if options.store_bgscore:
+    #    options.argtxt += "# HMMRATAC score will be added to each state annotation in bedgraph. \n"
+
+    #if options.store_peaks:
+    #    options.argtxt += "# Peaks not reported in bed format\n"
+
+    #if options.print_exclude:
+    #    options.print_exclude = os.path.join(options.outdir, options.ofile+"Output_exclude.bed")
+    #else:
+    #    options.print_exclude = "None"
+    
+    #if options.print_train:
+    #    options.print_train = os.path.join(options.outdir, options.ofile+"Output_training.bed")
+    #else:
+    #    options.print_train = "None"
+
+
+    # EM
+    # em_skip
+    if options.em_skip:
+        options.argtxt += "# EM training not performed on fragment distribution. \n"
+    # em_means non-negative
+    if sum( [ x < 0 for x in options.em_means ] ):
+        logging.error(" --means should not be negative! ")
+        sys.exit( 1 )
+    # em_stddev non-negative
+    if sum( [ x < 0 for x in options.em_stddevs ] ):
+        logging.error(" --stddev should not be negative! ")
+        sys.exit( 1 )
+
+
+    # HMM
+    # hmm_states non-negative int, warn if not k=3
+    #if options.hmm_states <=0:
+    #    logging.error(" -s, --states must be an integer >= 0.")
+    #    sys.exit( 1 )
+    #elif options.hmm_states != 3 and options.hmm_states > 0 and options.store_peaks == False:
+    #    logging.warn(" If -s, --states not k=3, recommend NOT calling peaks, use bedgraph.")
+
+    # hmm_binsize > 0
+    if options.hmm_binsize <=0:
+        logging.error(" --binsize must be larger than 0.")
+        sys.exit( 1 )
+
+    # hmm_lower less than hmm_upper, non-negative 
+    if options.hmm_lower <0:
+        logging.error(" -l, --lower should not be negative! ")
+        sys.exit( 1 )
+    if options.hmm_upper <0:
+        logging.error(" -u, --upper should not be negative! ")
+        sys.exit( 1 )
+    if options.hmm_lower > options.hmm_upper:
+        logging.error("Upper limit of fold change range should be greater than lower limit!" % options.mfold)
+        sys.exit(1)
+    
+    # hmm_maxTrain non-negative
+    if options.hmm_maxTrain <= 0:
+        logging.error(" --maxTrain should be larger than 0!")
+        sys.exit( 1 )
+    
+    # hmm_training_regions
+    #if options.hmm_training_regions:
+    #    options.argtxt += "# Using -t, --training input to train HMM instead of using fold change settings to select. \n"
+    
+    # hmm_zscore non-negative
+    #if options.hmm_zscore <0:
+    #    logging.error(" -z, --zscore should not be negative!")
+    #    sys.exit( 1 )
+    
+    # hmm_randomSeed
+    if options.hmm_randomSeed:
+        options.argtxt += "# Random seed selected as: %d\n" % options.hmm_randomSeed
+    
+    # hmm_window non-negative
+    #if options.hmm_window <0:
+    #    logging.error(" --window should not be negative! ")
+    #    sys.exit( 1 )
+
+    # hmm_file
+    #if options.hmm_file:
+    #    options.argtxt += "# HMM training will be skipped, --model input used instead. \n"
+
+    # hmm_modelonly
+    #if options.hmm_modelonly:
+    #    options.argtxt += "# Program will stop after generating model, which can be later applied with '--model'. \n"
+
+
+    # Peak Calling
+    if options.prescan_cutoff <= 1:
+        logging.error(" In order to use -c or --prescan-cutoff, the cutoff must be larger than 1.")
+        sys.exit( 1 )
+    
+    if options.openregion_minlen < 0: # and options.store_peaks == True:
+        logging.error(" In order to use --minlen, the length should not be negative.")
+        sys.exit( 1 )
+
+    #if options.call_score.lower() not in [ 'max', 'ave', 'med', 'fc', 'zscore', 'all']:
+    #    logging.error( " Invalid method: %s" % options.call_score )
+    #    sys.exit( 1 )
+
+    # call_threshold non-negative
+    #if options.call_threshold <0:
+    #    logging.error(" --threshold should not be negative! ")
+    #    sys.exit( 1 )
+    
+
+    # Misc
+    # misc_blacklist 
+    #if options.misc_keep_duplicates:
+    #    options.argtxt += "# Duplicate reads from analysis will be stored. \n"
+
+    # misc_trim non-negative
+    #if options.misc_trim <0:
+    #    logging.error(" --trim should not be negative! ")
+    #    sys.exit( 1 )
+
+    # np # should this be mp? non-negative
+    #if options.np <0:
+    #    logging.error(" -m, --multiple-processing should not be negative! ")
+    #    sys.exit( 1 )
+    
+    # verbose 
+    # logging object
+    logging.basicConfig(level=(4-options.verbose)*10,
+                        format='%(levelname)-5s @ %(asctime)s: %(message)s ',
+                        datefmt='%a, %d %b %Y %H:%M:%S',
+                        stream=sys.stderr,
+                        filemode="w"
+                        )
+    
+    # min_map_quality non-negative
+    #if options.min_map_quality <0:
+    #    logging.error(" -q, --minmapq should not be negative! ")
+    #    sys.exit( 1 )
+
+    
+    return options
+
+

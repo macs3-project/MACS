@@ -1,6 +1,6 @@
 # cython: language_level=3
 # cython: profile=True
-# Time-stamp: <2020-12-03 15:56:48 Tao Liu>
+# Time-stamp: <2022-09-15 17:24:53 Tao Liu>
 
 """Module for Feature IO classes.
 
@@ -252,7 +252,7 @@ cdef class ScoreTrackII:
             bytes chrom, k
             int32_t l
 
-        for chrom in self.data.keys():
+        for chrom in sorted(self.data.keys()):
             d = self.data[chrom]
             l = self.datalength[chrom]
             d[0].resize( l, refcheck = False )
@@ -343,7 +343,7 @@ cdef class ScoreTrackII:
             np.ndarray p, c
             int64_t l, i
 
-        for chrom in self.data.keys():
+        for chrom in sorted(self.data.keys()):
             p = self.data[chrom][1]
             c = self.data[chrom][2]
             l = self.datalength[chrom]
@@ -397,7 +397,7 @@ cdef class ScoreTrackII:
             int64_t l, i, prev_pos
             bytes chrom
 
-        for chrom in self.data.keys():
+        for chrom in sorted(self.data.keys()):
             prev_pos = 0
             pos = self.data[chrom][0]
             p = self.data[chrom][1]
@@ -430,7 +430,7 @@ cdef class ScoreTrackII:
         pqtable = self.make_pq_table()
 
         # convert p to q
-        for chrom in self.data.keys():
+        for chrom in sorted(self.data.keys()):
             v = self.data[chrom][3]
             l = self.datalength[chrom]
             for i in range(l):
@@ -504,7 +504,7 @@ cdef class ScoreTrackII:
 
         pseudocount = self.pseudocount
 
-        for chrom in self.data.keys():
+        for chrom in sorted(self.data.keys()):
             p = self.data[chrom][ 1 ].flat.__next__ # pileup in treatment
             c = self.data[chrom][ 2 ].flat.__next__ # pileup in control
             v = self.data[chrom][ 3 ]               # score
@@ -532,7 +532,7 @@ cdef class ScoreTrackII:
 
         pseudocount = self.pseudocount
 
-        for chrom in self.data.keys():
+        for chrom in sorted(self.data.keys()):
             p = self.data[chrom][ 1 ].flat.__next__
             c = self.data[chrom][ 2 ].flat.__next__
             v = self.data[chrom][ 3 ]
@@ -557,7 +557,7 @@ cdef class ScoreTrackII:
 
         pseudocount = self.pseudocount
 
-        for chrom in self.data.keys():
+        for chrom in sorted(self.data.keys()):
             p = self.data[chrom][1]
             c = self.data[chrom][2]
             v = self.data[chrom][3]
@@ -578,7 +578,7 @@ cdef class ScoreTrackII:
 
         pseudocount = self.pseudocount
 
-        for chrom in self.data.keys():
+        for chrom in sorted(self.data.keys()):
             p = self.data[chrom][1]
             c = self.data[chrom][2]
             v = self.data[chrom][3]
@@ -593,7 +593,7 @@ cdef class ScoreTrackII:
             np.ndarray p, c, v
             int64_t l, i
 
-        for chrom in self.data.keys():
+        for chrom in sorted(self.data.keys()):
             p = self.data[chrom][1]
             c = self.data[chrom][2]
             v = self.data[chrom][3]
@@ -615,7 +615,7 @@ cdef class ScoreTrackII:
         elif self.normalization_method == ord('M'):
             scale = 1
 
-        for chrom in self.data.keys():
+        for chrom in sorted(self.data.keys()):
             p = self.data[chrom][1]
             v = self.data[chrom][3]
             l = self.datalength[chrom]
@@ -629,7 +629,7 @@ cdef class ScoreTrackII:
             np.ndarray p, c, v
             int64_t l, i
 
-        for chrom in self.data.keys():
+        for chrom in sorted(self.data.keys()):
             p = self.data[chrom][1]
             c = self.data[chrom][2]
             v = self.data[chrom][3]
@@ -665,7 +665,7 @@ cdef class ScoreTrackII:
             write( "track type=bedGraph name=\"%s\" description=\"%s\"\n" % ( name.decode(), description ) )
 
         chrs = self.get_chr_names()
-        for chrom in chrs:
+        for chrom in sorted(chrs):
             pos = self.data[ chrom ][ 0 ]
             value = self.data[ chrom ][ column ]
             l = self.datalength[ chrom ]
@@ -711,7 +711,7 @@ cdef class ScoreTrackII:
         peaks = PeakIO()                      # dictionary to save peaks
 
         self.cutoff = cutoff
-        for chrom in chrs:
+        for chrom in sorted(chrs):
             peak_content = []           # to store points above cutoff
 
             pos = self.data[chrom][ 0 ]
@@ -888,7 +888,7 @@ cdef class ScoreTrackII:
             bytes chrom
 
         t = 0
-        for chrom in self.data.keys():
+        for chrom in sorted(self.data.keys()):
             t += self.datalength[chrom]
         return t
 
@@ -918,7 +918,7 @@ cdef class ScoreTrackII:
         chrs = lvl1_peaks.peaks.keys()
         broadpeaks = BroadPeakIO()
         # use lvl2_peaks as linking regions between lvl1_peaks
-        for chrom in chrs:
+        for chrom in sorted(chrs):
             lvl1peakschrom = lvl1_peaks.peaks[chrom]
             lvl2peakschrom = lvl2_peaks.peaks[chrom]
             lvl1peakschrom_next = iter(lvl1peakschrom).__next__
@@ -1196,7 +1196,7 @@ cdef class TwoConditionScores:
             int32_t l
             list d
 
-        for chrom in self.data.keys():
+        for chrom in sorted(self.data.keys()):
             d = self.data[chrom]
             l = self.datalength[chrom]
             d[0].resize( l, refcheck = False )
@@ -1248,7 +1248,7 @@ cdef class TwoConditionScores:
         #    write( "track type=bedGraph name=\"%s\" description=\"%s\"\n" % ( name.decode(), description ) )
 
         chrs = self.get_chr_names()
-        for chrom in chrs:
+        for chrom in sorted(chrs):
             pos = self.data[ chrom ][ 0 ]
             value = self.data[ chrom ][ column ]
             l = self.datalength[ chrom ]
@@ -1288,7 +1288,7 @@ cdef class TwoConditionScores:
         write = fhd.write
 
         chrs = self.get_chr_names()
-        for chrom in chrs:
+        for chrom in sorted(chrs):
             [ pos, value1, value2, value3 ] = self.data[ chrom ]
             l = self.datalength[ chrom ]
             pre = 0
@@ -1337,7 +1337,7 @@ cdef class TwoConditionScores:
 
         self.cutoff = cutoff
 
-        for chrom in chrs:
+        for chrom in sorted(chrs):
             pos = self.data[chrom][ 0 ]
             t1_vs_c1 = self.data[chrom][ 1 ]
             t2_vs_c2 = self.data[chrom][ 2 ]
@@ -1450,7 +1450,7 @@ cdef class TwoConditionScores:
             bytes chrom
 
         t = 0
-        for chrom in self.data.keys():
+        for chrom in sorted(self.data.keys()):
             t += self.datalength[chrom]
         return t
 

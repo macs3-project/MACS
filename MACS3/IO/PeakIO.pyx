@@ -1,6 +1,6 @@
 # cython: language_level=3
 # cython: profile=True
-# Time-stamp: <2022-02-17 12:06:52 Tao Liu>
+# Time-stamp: <2022-09-15 17:05:09 Tao Liu>
 
 """Module for PeakIO IO classes.
 
@@ -14,6 +14,7 @@ the distribution).
 # ------------------------------------
 from itertools import groupby
 from operator import itemgetter
+import random
 import re
 import sys
 
@@ -51,6 +52,7 @@ cdef str subpeak_letters( int i):
 
 cdef class PeakContent:
     cdef:
+        bytes chrom
         int start
         int end
         int length
@@ -62,10 +64,11 @@ cdef class PeakContent:
         float qscore
         bytes name
 
-    def __init__ ( self, int start, int end, int summit,
+    def __init__ ( self, bytes chrom, int start, int end, int summit,
                    float peak_score, float pileup,
                    float pscore, float fold_change, float qscore,
                    bytes name= b"NA" ):
+        self.chrom = chrom
         self.start = start
         self.end = end
         self.length = end - start
@@ -78,7 +81,9 @@ cdef class PeakContent:
         self.name = name
 
     def __getitem__ ( self, a ):
-        if a == "start":
+        if a == "chrom":
+            return self.chrom
+        elif a == "start":
             return self.start
         elif a == "end":
             return self.end
@@ -100,7 +105,9 @@ cdef class PeakContent:
             return self.name
 
     def __setitem__ ( self, a, v ):
-        if a == "start":
+        if a == "chrom":
+            self.chrom = v
+        elif a == "start":
             self.start = v
         elif a == "end":
             self.end = v
@@ -122,17 +129,21 @@ cdef class PeakContent:
             self.name = v
 
     def __str__ (self):
-        return "start:%d;end:%d;score:%f" % ( self.start, self.end, self.score )
+        return "chrom:%s;start:%d;end:%d;score:%f" % ( self.chrom, self.start, self.end, self.score )
 
 cdef class PeakIO:
     """IO for peak information.
 
     """
     cdef:
-        dict peaks
+        public dict peaks       # dictionary storing peak contents
+        public bool CO_sorted   # whether peaks have been sorted by coordinations
+        public long total       # total number of peaks
 
     def __init__ (self):
         self.peaks = {}
+        self.CO_sorted = False
+        self.total = 0
 
     cpdef add (self, bytes chromosome, int start, int end, int summit = 0,
                float peak_score = 0, float pileup = 0,
@@ -151,14 +162,18 @@ cdef class PeakIO:
         """
         if not self.peaks.has_key(chromosome):
             self.peaks[chromosome]=[]
-        self.peaks[chromosome].append(PeakContent( start, end, summit, peak_score, pileup, pscore, fold_change, qscore, name))
+        self.peaks[chromosome].append(PeakContent( chromosome, start, end, summit, peak_score, pileup, pscore, fold_change, qscore, name))
+        self.total += 1
+        self.CO_sorted = False
 
     cpdef add_PeakContent ( self, bytes chromosome, object peakcontent ):
         if not self.peaks.has_key(chromosome):
             self.peaks[chromosome]=[]
         self.peaks[chromosome].append(peakcontent)
+        self.total += 1
+        self.CO_sorted = False
 
-    def get_data_from_chrom (self, bytes chrom):
+    cpdef list get_data_from_chrom (self, bytes chrom):
         if not self.peaks.has_key( chrom ):
             self.peaks[chrom]= []
         return self.peaks[chrom]
@@ -167,81 +182,175 @@ cdef class PeakIO:
         return set(sorted(self.peaks.keys()))
 
     def sort ( self ):
+        cdef:
+            list chrs
+            bytes chrom
         # sort by position
+        if self.CO_sorted:
+            # if already sorted, quit
+            return
         chrs = sorted(list(self.peaks.keys()))
-        for chrom in chrs:
+        for chrom in sorted(chrs):
             self.peaks[chrom].sort(key=lambda x:x['start'])
+        self.CO_sorted = True
         return
 
-
-    def filter_pscore (self, double pscore_cut ):
-        cdef bytes chrom
-
-        peaks = self.peaks
+    cpdef object randomly_pick ( self, int n, int seed = 12345 ):
+        """Shuffle the peaks and get n peaks out of it. Return a new
+        PeakIO object.
+        """
+        cdef:
+            list all_pc
+            list chrs
+            bytes chrom
+            object ret_peakio, p
+        assert n > 0
+        chrs = sorted(list(self.peaks.keys()))
+        all_pc = []
+        for chrom in sorted(chrs):
+            all_pc.extend(self.peaks[chrom])
+        random.seed( seed )
+        random.shuffle( all_pc )
+        all_pc = all_pc[:n]
+        ret_peakio = PeakIO()
+        for p in all_pc:
+            ret_peakio.add_PeakContent ( p["chrom"], p )
+        return ret_peakio
+    
+    cpdef void filter_pscore (self, double pscore_cut ):
+        cdef:
+            bytes chrom
+            dict new_peaks
+            list chrs
+            object p
         new_peaks = {}
-        chrs = sorted(list(peaks.keys()))
-
-        for chrom in chrs:
-            new_peaks[chrom]=[p for p in peaks[chrom] if p['pscore'] >= pscore_cut]
+        chrs = sorted(list(self.peaks.keys()))
+        self.total = 0
+        for chrom in sorted(chrs):
+            new_peaks[chrom]=[p for p in self.peaks[chrom] if p['pscore'] >= pscore_cut]
+            self.total +=  len( new_peaks[chrom] )
         self.peaks = new_peaks
+        self.CO_sorted = True
+        self.sort()
 
-    def filter_qscore (self, double qscore_cut ):
-        cdef bytes chrom
+    cpdef void filter_qscore (self, double qscore_cut ):
+        cdef:
+            bytes chrom
+            dict new_peaks
+            list chrs
+            object p
 
-        peaks = self.peaks
         new_peaks = {}
-        chrs = sorted(list(peaks.keys()))
-
-        for chrom in chrs:
-            new_peaks[chrom]=[p for p in peaks[chrom] if p['qscore'] >= qscore_cut]
+        chrs = sorted(list(self.peaks.keys()))
+        self.total = 0
+        for chrom in sorted(chrs):
+            new_peaks[chrom]=[p for p in self.peaks[chrom] if p['qscore'] >= qscore_cut]
+            self.total +=  len( new_peaks[chrom] )
         self.peaks = new_peaks
+        self.CO_sorted = True
+        self.sort()
 
-    def filter_fc (self, fc_low, fc_up=None ):
+    cpdef void filter_fc (self, float fc_low, float fc_up = 0 ):
         """Filter peaks in a given fc range.
 
         If fc_low and fc_up is assigned, the peaks with fc in [fc_low,fc_up)
 
         """
-        peaks = self.peaks
+        cdef:
+            bytes chrom
+            dict new_peaks
+            list chrs
+            object p
+
         new_peaks = {}
-        chrs = list(peaks.keys())
-        chrs.sort()
-        if fc_up:
-            for chrom in chrs:
-                new_peaks[chrom]=[p for p in peaks[chrom] if p['fc'] >= fc_low and p['fc']<fc_up]
+        chrs = list(self.peaks.keys())
+        self.total = 0
+        if fc_up > 0 and fc_up > fc_low:
+            for chrom in sorted(chrs):
+                new_peaks[chrom]=[p for p in self.peaks[chrom] if p['fc'] >= fc_low and p['fc']<fc_up]
+                self.total +=  len( new_peaks[chrom] )
         else:
-            for chrom in chrs:
-                new_peaks[chrom]=[p for p in peaks[chrom] if p['fc'] >= fc_low]
+            for chrom in sorted(chrs):
+                new_peaks[chrom]=[p for p in self.peaks[chrom] if p['fc'] >= fc_low]
+                self.total +=  len( new_peaks[chrom] )
         self.peaks = new_peaks
+        self.CO_sorted = True
+        self.sort()
 
-    def total (self):
-        peaks = self.peaks
-        chrs = list(peaks.keys())
-        chrs.sort()
-        x = 0
-        for chrom in chrs:
-            x += len(peaks[chrom])
-        return x
+    cpdef void filter_score (self, float lower_score, float upper_score = 0 ):
+        """Filter peaks in a given score range.
 
-    cdef _to_bed(self, bytes name_prefix=b"%s_peak_", bytes name=b"MACS",
-                bytes description=b"%s", str score_column="score",
-                trackline=False, print_func=sys.stdout.write):
+        """
+        cdef:
+            bytes chrom
+            dict new_peaks
+            list chrs
+            object p
+
+        new_peaks = {}
+        chrs = list(self.peaks.keys())
+        self.total = 0
+        if upper_score > 0 and upper_score > lower_score:
+            for chrom in sorted(chrs):
+                new_peaks[chrom]=[p for p in self.peaks[chrom] if p['score'] >= lower_score and p['score']<upper_score]
+                self.total +=  len( new_peaks[chrom] )
+        else:
+            for chrom in sorted(chrs):
+                new_peaks[chrom]=[p for p in self.peaks[chrom] if p['score'] >= lower_score]
+                self.total +=  len( new_peaks[chrom] )
+        self.peaks = new_peaks
+        self.CO_sorted = True
+        self.sort()
+
+    def __str__ (self):
+        """convert to text -- BED format
+        """
+        cdef:
+            list chrs
+            int n_peak
+            str ret            
+        ret = ""
+        chrs = list(self.peaks.keys())
+        n_peak = 0
+        for chrom in sorted(chrs):
+            for end, group in groupby(self.peaks[chrom], key=itemgetter("end")):
+                n_peak += 1
+                peaks = list(group)
+                if len(peaks) > 1:
+                    for i, peak in enumerate(peaks):
+                        ret += "%s\t%d\t%d\tpeak_%d%s\t%.6g\n" % (chrom.decode(),peak['start'],peak['end'],n_peak,subpeak_letters(i),peak["score"])
+                else:
+                    peak = peaks[0]
+                    ret += "%s\t%d\t%d\tpeak_%d\t%.6g\n" % (chrom.decode(),peak['start'],peak['end'],n_peak,peak["score"])
+        return ret
+
+    cdef void _to_bed(self, bytes name_prefix=b"%s_peak_", bytes name=b"MACS",
+                      bytes description=b"%s", str score_column="score",
+                      bool trackline=False, print_func=sys.stdout.write):
         """
         generalization of tobed and write_to_bed
         """
-        #print(description)
+        cdef:
+            list chrs
+            int n_peak
+            bytes peakprefix, desc
         chrs = list(self.peaks.keys())
-        chrs.sort()
         n_peak = 0
-        try: peakprefix = name_prefix % name
-        except: peakprefix = name_prefix
-        try: desc = description % name
-        except: desc = description
+        try:
+            peakprefix = name_prefix % name
+        except:
+            peakprefix = name_prefix
+        try:
+            desc = description % name
+        except:
+            desc = description
         if trackline:
-            try: print_func('track name="%s (peaks)" description="%s" visibility=1\n' % ( name.replace(b"\"", b"\\\"").decode(),\
-                                                                                          desc.replace(b"\"", b"\\\"").decode() ) )
-            except: print_func('track name=MACS description=Unknown\n')
-        for chrom in chrs:
+            try:
+                print_func('track name="%s (peaks)" description="%s" visibility=1\n' % ( name.replace(b"\"", b"\\\"").decode(),
+                                                                                         desc.replace(b"\"", b"\\\"").decode() ) )
+            except:
+                print_func('track name=MACS description=Unknown\n')
+        for chrom in sorted(chrs):
             for end, group in groupby(self.peaks[chrom], key=itemgetter("end")):
                 n_peak += 1
                 peaks = list(group)
@@ -259,7 +368,6 @@ cdef class PeakIO:
         generalization of to_summits_bed and write_to_summit_bed
         """
         chrs = list(self.peaks.keys())
-        chrs.sort()
         n_peak = 0
         try: peakprefix = name_prefix % name
         except: peakprefix = name_prefix
@@ -269,7 +377,7 @@ cdef class PeakIO:
             try: print_func('track name="%s (summits)" description="%s" visibility=1\n' % ( name.replace(b"\"", b"\\\"").decode(),\
                                                                                             desc.replace(b"\"", b"\\\"").decode() ) )
             except: print_func('track name=MACS description=Unknown')
-        for chrom in chrs:
+        for chrom in sorted(chrs):
             for end, group in groupby(self.peaks[chrom], key=itemgetter("end")):
                 n_peak += 1
                 peaks = list(group)
@@ -420,14 +528,13 @@ cdef class PeakIO:
         cdef str peakname
 
         chrs = list(self.peaks.keys())
-        chrs.sort()
         n_peak = 0
         write = fhd.write
         try: peakprefix = name_prefix % name
         except: peakprefix = name_prefix
         if trackline:
             write("track type=narrowPeak name=\"%s\" description=\"%s\" nextItemButton=on\n" % (name.decode(), name.decode()))
-        for chrom in chrs:
+        for chrom in sorted(chrs):
             for end, group in groupby(self.peaks[chrom], key=itemgetter("end")):
                 n_peak += 1
                 these_peaks = list(group)
@@ -471,9 +578,8 @@ cdef class PeakIO:
 
         peaks = self.peaks
         chrs = list(peaks.keys())
-        chrs.sort()
         n_peak = 0
-        for chrom in chrs:
+        for chrom in sorted(chrs):
             for end, group in groupby(peaks[chrom], key=itemgetter("end")):
                 n_peak += 1
                 these_peaks = list(group)
@@ -504,47 +610,98 @@ cdef class PeakIO:
         return
 
 
-    def overlap_with_other_peaks (self, peaks2, double cover=0):
-        """Peaks2 is a PeakIO object or dictionary with can be
-        initialized as a PeakIO. check __init__ for PeakIO for detail.
+    cpdef void exclude (self, object peaksio2):
+        """ Remove overlapping peaks in peaksio2, another PeakIO object.
 
-        return how many peaks are intersected by peaks2 by percentage
-        coverage on peaks2(if 50%, cover = 0.5).
         """
-        cdef int total_num
-        cdef list chrs1, chrs2, a
-        cdef bytes k
+        cdef:
+            dict peaks1, peaks2
+            list chrs1, chrs2
+            bytes k
+            dict ret_peaks
+            bool overlap_found
+            object r1, r2       # PeakContent objects
+            long n_rl1, n_rl2
 
+        self.sort()
         peaks1 = self.peaks
-        if isinstance(peaks2,PeakIO):
-            peaks2 = peaks2.peaks
-        total_num = 0
+        self.total = 0
+        assert isinstance(peaksio2,PeakIO)
+        peaksio2.sort()
+        peaks2 = peaksio2.peaks
+
+        ret_peaks = dict()
         chrs1 = list(peaks1.keys())
         chrs2 = list(peaks2.keys())
         for k in chrs1:
+            #print(f"chromosome {k}")
             if not chrs2.count(k):
+                # no such chromosome in peaks1, then don't touch the peaks in this chromosome
+                ret_peaks[ k ] = peaks1[ k ]
                 continue
-            rl1_k = iter(peaks1[k])
-            rl2_k = iter(peaks2[k])
-            tmp_n = False
-            try:
-                r1 = rl1_k.next()
-                r2 = rl2_k.next()
-                while (True):
-                    if r2[0] < r1[1] and r1[0] < r2[1]:
-                        a = sorted([r1[0],r1[1],r2[0],r2[1]])
-                        if float(a[2]-a[1]+1)/r2[2] > cover:
-                            if not tmp_n:
-                                total_num+=1
-                                tmp_n = True
-                    if r1[1] < r2[1]:
-                        r1 = rl1_k.next()
-                        tmp_n = False
+            ret_peaks[ k ] = []
+            n_rl1 = len( peaks1[k] )
+            n_rl2 = len( peaks2[k] )
+            rl1_k = iter( peaks1[k] ).__next__
+            rl2_k = iter( peaks2[k] ).__next__
+            overlap_found = False
+            r1 = rl1_k()
+            n_rl1 -= 1
+            r2 = rl2_k()
+            n_rl2 -= 1
+            while ( True ):
+                # we do this until there is no r1 or r2 left.
+                if r2["start"] < r1["end"] and r1["start"] < r2["end"]:
+                    # since we found an overlap, r1 will be skipped/excluded
+                    # and move to the next r1
+                    overlap_found = True
+                    #print(f"found overlap of {r1['start']} {r1['end']} and {r2['start']} {r2['end']}, move to the next r1")
+                    n_rl1 -= 1
+                    if n_rl1 >= 0:
+                        r1 = rl1_k()
+                        #print(f"move to next r1 {r1['start']} {r1['end']}")
+                        overlap_found = False
+                        continue
                     else:
-                        r2 = rl2_k.next()
-            except StopIteration:
-                continue
-        return total_num
+                        break
+                if r1["end"] < r2["end"]:
+                    #print(f"now we need to move r1 {r1['start']} {r1['end']}")
+                    # in this case, we need to move to the next r1,
+                    # we will check if overlap_found is true, if not, we put r1 in a new dict
+                    if not overlap_found:
+                        #print(f"we add this r1 {r1['start']} {r1['end']} to list")
+                        ret_peaks[ k ].append( r1 )
+                    n_rl1 -= 1
+                    if n_rl1 >= 0:
+                        r1 = rl1_k()
+                        #print(f"move to next r1 {r1['start']} {r1['end']}")
+                        overlap_found = False
+                    else:
+                        # no more r1 left
+                        break
+                else:
+                    # in this case, we need to move the next r2
+                    if n_rl2:
+                        r2 = rl2_k()
+                        n_rl2 -= 1
+                        #print(f"move to next r2 {r2['start']} {r2['end']}")                      
+                    else:
+                        # no more r2 left
+                        break
+            # add the rest of r1
+            #print( f"n_rl1: {n_rl1} n_rl2:{n_rl2} last overlap_found is {overlap_found}" )
+            #if overlap_found:
+            #    n_rl1 -= 1
+            if n_rl1 >= 0:
+                ret_peaks[ k ].extend( peaks1[ k ][-n_rl1-1:] )
+
+        for k in ret_peaks.keys():
+            self.total += len( ret_peaks[ k ] )
+
+        self.peaks = ret_peaks
+        self.CO_sorted = True
+        self.sort()        
+        return
 
     def read_from_xls (self, ofhd):
         """Save the peak results in a tab-delimited plain text file
@@ -604,7 +761,7 @@ cpdef parse_peakname(peakname):
         subpeak = b''
     return (peaknumber, subpeak)
 
-cdef class Region:
+cdef class RegionIO:
     """For plain region of chrom, start and end
     """
     cdef:
@@ -626,11 +783,17 @@ cdef class Region:
     def sort (self):
         cdef bytes chrom
 
-        for chrom in list(self.regions.keys()):
+        for chrom in sorted(list(self.regions.keys())):
             self.regions[chrom].sort()
         self.__flag_sorted = True
 
+    cpdef set get_chr_names (self):
+        return set(sorted(self.regions.keys()))
+
     def merge_overlap ( self ):
+        """
+        merge overlapping regions
+        """
         cdef bytes chrom
         cdef int s_new_region, e_new_region, i, j
 
@@ -638,11 +801,9 @@ cdef class Region:
             self.sort()
         regions = self.regions
         new_regions = {}
-        chrs = list(regions.keys())
-        chrs.sort()
+        chrs = sorted(list(regions.keys()))
         for i in range(len(chrs)):
             chrom = chrs[i]
-        #for chrom in chrs:
             new_regions[chrom]=[]
             n_append = new_regions[chrom].append
             prev_region = None
@@ -669,8 +830,7 @@ cdef class Region:
         cdef int i
         cdef bytes chrom
 
-        chrs = list(self.regions.keys())
-        chrs.sort()
+        chrs = sorted(list(self.regions.keys()))
         for i in range( len(chrs) ):
             chrom = chrs[i]
             for region in self.regions[chrom]:
@@ -798,9 +958,9 @@ cdef class BroadPeakIO:
 
         peaks = self.peaks
         new_peaks = {}
-        chrs = sorted(list(peaks.keys()))
+        chrs = list(peaks.keys())
 
-        for chrom in chrs:
+        for chrom in sorted(chrs):
             new_peaks[chrom]=[p for p in peaks[chrom] if p['pscore'] >= pscore_cut]
         self.peaks = new_peaks
 
@@ -814,9 +974,9 @@ cdef class BroadPeakIO:
 
         peaks = self.peaks
         new_peaks = {}
-        chrs = sorted(list(peaks.keys()))
+        chrs = list(peaks.keys())
 
-        for chrom in chrs:
+        for chrom in sorted(chrs):
             new_peaks[chrom]=[p for p in peaks[chrom] if p['qscore'] >= qscore_cut]
         self.peaks = new_peaks
 
@@ -836,12 +996,11 @@ cdef class BroadPeakIO:
         peaks = self.peaks
         new_peaks = {}
         chrs = list(peaks.keys())
-        chrs.sort()
         if fc_up:
-            for chrom in chrs:
+            for chrom in sorted(chrs):
                 new_peaks[chrom]=[p for p in peaks[chrom] if p['fc'] >= fc_low and p['fc']<fc_up]
         else:
-            for chrom in chrs:
+            for chrom in sorted(chrs):
                 new_peaks[chrom]=[p for p in peaks[chrom] if p['fc'] >= fc_low]
         self.peaks = new_peaks
 
@@ -854,9 +1013,8 @@ cdef class BroadPeakIO:
 
         peaks = self.peaks
         chrs = list(peaks.keys())
-        chrs.sort()
         x = 0
-        for chrom in chrs:
+        for chrom in sorted(chrs):
             x += len(peaks[chrom])
         return x
 
@@ -929,7 +1087,6 @@ cdef class BroadPeakIO:
 
         """
         chrs = list(self.peaks.keys())
-        chrs.sort()
         n_peak = 0
         try: peakprefix = name_prefix % name
         except: peakprefix = name_prefix
@@ -937,7 +1094,7 @@ cdef class BroadPeakIO:
         except: desc = description
         if trackline:
             fhd.write("track name=\"%s\" description=\"%s\" type=gappedPeak nextItemButton=on\n" % (name.decode(), desc.decode()) )
-        for chrom in chrs:
+        for chrom in sorted(chrs):
             for peak in self.peaks[chrom]:
                 n_peak += 1
                 if peak["thickStart"] != b".":
@@ -1003,7 +1160,6 @@ cdef class BroadPeakIO:
 
         """
         chrs = list(self.peaks.keys())
-        chrs.sort()
         n_peak = 0
         try: peakprefix = name_prefix % name
         except: peakprefix = name_prefix
@@ -1011,7 +1167,7 @@ cdef class BroadPeakIO:
         except: desc = description
         if trackline:
             fhd.write("track name=\"%s\" description=\"%s\" type=bed nextItemButton=on\n" % (name.decode(), desc.decode()) )
-        for chrom in chrs:
+        for chrom in sorted(chrs):
             for peak in self.peaks[chrom]:
                 n_peak += 1
                 if peak["thickStart"] == b".":
@@ -1083,14 +1239,13 @@ cdef class BroadPeakIO:
         cdef str peakname
 
         chrs = list(self.peaks.keys())
-        chrs.sort()
         n_peak = 0
         write = fhd.write
         try: peakprefix = name_prefix % name
         except: peakprefix = name_prefix
         if trackline:
             write("track type=broadPeak name=\"%s\" description=\"%s\" nextItemButton=on\n" % (name.decode(), name.decode()))
-        for chrom in chrs:
+        for chrom in sorted(chrs):
             for end, group in groupby(self.peaks[chrom], key=itemgetter("end")):
                 n_peak += 1
                 these_peaks = list(group)
@@ -1118,9 +1273,8 @@ cdef class BroadPeakIO:
 
         peaks = self.peaks
         chrs = list(peaks.keys())
-        chrs.sort()
         n_peak = 0
-        for chrom in chrs:
+        for chrom in sorted(chrs):
             for end, group in groupby(peaks[chrom], key=itemgetter("end")):
                 n_peak += 1
                 these_peaks = list(group)

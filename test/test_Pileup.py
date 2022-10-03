@@ -8,8 +8,9 @@ the distribution).
 
 import unittest
 import numpy as np
-from math import log10
+from math import log2
 from MACS3.Signal.Pileup import *
+from MACS3.Signal.PileupV2 import pileup_from_LR, pileup_from_PN
 
 # ------------------------------------
 # Main function
@@ -259,3 +260,73 @@ class Test_Over_Two_PV_Array(unittest.TestCase):
            pre = pos
         #check result
         self.assertEqual( result, self.expect_pv_mean )
+
+class Test_PileupV2_PE(unittest.TestCase):
+    """Unittest for pileup functions in PileupV2.pyx.
+
+    Function to test: pileup_from_LR
+
+    """
+    def setUp(self):
+        self.LR_array1 = np.array( [ (1,5), (2,6), (4,8), (4,8), (5,9), (6,10),
+                                     (12,14), (13,17), (14,18), (17,19) ], dtype= [('l','int32'),('r','int32')])
+        # expected result from pileup_from_LR: ( end, value )
+        self.expect_pileup_1 = np.array( [  ( 1, 0.0 ),
+                                            ( 2, 1.0 ),
+                                            ( 4, 2.0 ),
+                                            ( 8, 4.0 ),
+                                            ( 9, 2.0 ),
+                                            ( 10, 1.0 ),
+                                            ( 12, 0.0 ),
+                                            ( 13, 1.0 ),
+                                            ( 18, 2.0 ),
+                                            ( 19, 1.0 ) ],
+                                             dtype=[ ( 'p', 'uint32' ), ( 'v', 'float32' ) ] )
+        # with log2(length) as weight
+        self.expect_pileup_2 = np.array( [  ( 1, 0.0 ),
+                                            ( 2, 2.0 ),
+                                            ( 4, 4.0 ),
+                                            ( 8, 8.0 ),
+                                            ( 9, 4.0 ),
+                                            ( 10, 2.0 ),
+                                            ( 12, 0.0 ),
+                                            ( 13, 1.0 ),
+                                            ( 14, 3.0 ),
+                                            ( 17, 4.0 ),
+                                            ( 18, 3.0 ),
+                                            ( 19, 1.0 ) ],
+                                             dtype=[ ( 'p', 'uint32' ), ( 'v', 'float32' ) ] )
+
+    def test_pileup_1(self):
+        pileup = pileup_from_LR( self.LR_array1 )
+        np.testing.assert_equal( pileup, self.expect_pileup_1 )
+
+    def test_pileup_2(self):
+        pileup = pileup_from_LR( self.LR_array1, lambda x,y: log2(y-x) )
+        np.testing.assert_equal( pileup, self.expect_pileup_2 )
+ 
+class Test_PileupV2_SE(unittest.TestCase):
+    """Unittest for pileup functions in PileupV2.pyx.
+
+    Function to test: pileup_from_PN
+
+    """
+    def setUp(self):
+        self.P = np.array( ( 0, 1, 3, 3, 4, 5 ), dtype="int32")   #plus strand pos
+        self.N = np.array( ( 5, 6, 8, 8, 9, 10 ), dtype="int32")  #minus strand pos
+        # expected result from pileup_bdg_se: ( start, end, value )
+        self.extsize = 2
+        self.expect_pileup_1 = np.array( [  ( 1, 1.0 ),
+                                            ( 2, 2.0 ),
+                                            ( 3, 1.0 ),
+                                            ( 4, 3.0 ),
+                                            ( 5, 5.0 ),
+                                            ( 8, 3.0 ),
+                                            ( 9, 2.0 ),
+                                            ( 10, 1.0 ) ],
+                                            dtype=[ ( 'p', 'uint32' ), ( 'v', 'float32' ) ] )\
+
+    def test_pileup_1(self):
+        pileup = pileup_from_PN( self.P, self.N, self.extsize )
+        np.testing.assert_equal( pileup, self.expect_pileup_1 )
+        

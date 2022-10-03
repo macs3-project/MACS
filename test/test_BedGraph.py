@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# Time-stamp: <2020-12-01 11:28:20 Tao Liu>
+# Time-stamp: <2022-03-01 00:16:44 Tao Liu>
 
 import unittest
 
@@ -54,6 +54,10 @@ class Test_bedGraphTrackI_overlie(unittest.TestCase):
                                     (b"chrY", 85, 90, (0,75,35), 506.56872045869005, 3.233076792862357e-106, 105.4904),
                                     (b"chrY", 90,150, (0,0,10), 46.051701859880914, 2.8912075645386016e-08, 7.5389),
                                     (b"chrY",150,155, (0,0,0), 0, 1.0, 0.0)]
+        self.test_sum = []
+        self.test_product = []
+        self.test_subtract = []
+        self.test_divide = []
 
         self.bdg1 = bedGraphTrackI()
         self.bdg2 = bedGraphTrackI()
