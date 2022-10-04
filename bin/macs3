@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# Time-stamp: <2022-10-04 12:14:31 Tao Liu>
+# Time-stamp: <2022-10-04 13:48:15 Tao Liu>
 
 """Description: MACS v3 main executable.
 
@@ -812,7 +812,7 @@ def add_hmmratac_parser( subparsers ):
     # group for peak calling arguments
     group_call = argparser_hmmratac.add_argument_group( "Peak calling arguments" )
     group_call.add_argument( "-c", "--prescan-cutoff", dest = "prescan_cutoff", type = float,
-                             help = "The fold change cutoff for prescanning candidate regions in the whole dataset. The we will use HMM to predict states on these candidate regions. Higher the prescan cutoff, fewer regions will be considered. Must > 1. Default: 1.2",
+                             help = "The fold change cutoff for prescanning candidate regions in the whole dataset. Then we will use HMM to predict states on these candidate regions. Higher the prescan cutoff, fewer regions will be considered. Must > 1. Default: 1.2",
                              default = 1.2 )
     
     group_call.add_argument( "--minlen", dest = "openregion_minlen", type = int,

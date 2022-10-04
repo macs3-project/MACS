@@ -1,4 +1,4 @@
-# Time-stamp: <2022-10-04 12:12:26 Tao Liu>
+# Time-stamp: <2022-10-04 15:13:57 Tao Liu>
 
 """Description: Main HMMR command
 
@@ -217,7 +217,7 @@ def run( args ):
         options.info( f"#4 Load Hidden Markov Model from given model file")
         hmm_model, i_open_region, i_background_region, i_nucleosomal_region, options.hmm_binsize = hmm_model_init( options.hmm_file )
     else:
-        options.info( f"#4 Train Hidden Markov Model with Multinormal Emission" )
+        options.info( f"#4 Train Hidden Markov Model with Multivariate Gaussian Emission" )
 
         # extract signals within peak using the given binsize
         options.info( f"#  Extract signals in training regions with bin size of {options.hmm_binsize}")
@@ -238,7 +238,7 @@ def run( args ):
 
         options.info( f"#  Use Baum-Welch algorithm to train the HMM")
 
-        hmm_model = hmm_training( training_data, training_data_lengths, random_seed = options.hmm_randomSeed, covar="diag" )
+        hmm_model = hmm_training( training_data, training_data_lengths, random_seed = options.hmm_randomSeed, covar="full" )
 
         options.info( f"#   HMM converged: {hmm_model.monitor_.converged}")
 

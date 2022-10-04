@@ -1,6 +1,6 @@
 # cython: language_level=3
 # cython: profile=True
-# Time-stamp: <2022-10-04 12:31:15 Tao Liu>
+# Time-stamp: <2022-10-04 15:14:15 Tao Liu>
 
 """Module description:
 
@@ -25,9 +25,6 @@ from cpython cimport bool
 from hmmlearn import hmm
 import json
 # from hmmlearn cimport hmm
-# from sklearn.cluster import KMeans 
-# from sklearn.cluster cimport KMeans
-
 
 # ------------------------------------
 # MACS3 modules
