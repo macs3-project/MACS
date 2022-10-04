@@ -1,4 +1,4 @@
-# Time-stamp: <2022-09-23 01:21:12 taoliu>
+# Time-stamp: <2022-10-04 12:12:26 Tao Liu>
 
 """Description: Main HMMR command
 
@@ -30,7 +30,7 @@ from MACS3.IO.PeakIO import BroadPeakIO
 from MACS3.IO.Parser import BAMPEParser #BAMaccessor
 from MACS3.Signal.HMMR_EM import HMMR_EM
 from MACS3.Signal.HMMR_Signal_Processing import generate_weight_mapping, generate_digested_signals, extract_signals_from_regions
-from MACS3.Signal.HMMR_HMM import hmm_training, hmm_predict, hmm_model_init
+from MACS3.Signal.HMMR_HMM import hmm_training, hmm_predict, hmm_model_init, hmm_model_save
 from MACS3.Signal.Region import Regions
 from MACS3.Signal.BedGraph import bedGraphTrackI
 
@@ -63,7 +63,7 @@ def run( args ):
     training_region_bedfile = os.path.join( options.outdir, options.name+"_training_regions.bed" )
     training_datafile = os.path.join( options.outdir, options.name+"_training_data.txt" )
     training_datalengthfile = os.path.join( options.outdir, options.name+"_training_lengths.txt" )
-    hmm_modelfile = os.path.join( options.outdir, options.name+"_model.txt" )
+    hmm_modelfile = os.path.join( options.outdir, options.name+"_model.json" )
     open_state_bdgfile = os.path.join( options.outdir, options.name+"_open.bdg" )
     nuc_state_bdgfile = os.path.join( options.outdir, options.name+"_nuc.bdg" )
     bg_state_bdgfile = os.path.join( options.outdir, options.name+"_bg.bdg" )
@@ -217,7 +217,7 @@ def run( args ):
         options.info( f"#4 Load Hidden Markov Model from given model file")
         hmm_model, i_open_region, i_background_region, i_nucleosomal_region, options.hmm_binsize = hmm_model_init( options.hmm_file )
     else:
-        options.info( f"#4 Train Hidden Markov Model with Gaussian Emission" )
+        options.info( f"#4 Train Hidden Markov Model with Multinormal Emission" )
 
         # extract signals within peak using the given binsize
         options.info( f"#  Extract signals in training regions with bin size of {options.hmm_binsize}")
@@ -238,7 +238,7 @@ def run( args ):
 
         options.info( f"#  Use Baum-Welch algorithm to train the HMM")
 
-        hmm_model = hmm_training( training_data, training_data_lengths, random_seed = options.hmm_randomSeed )
+        hmm_model = hmm_training( training_data, training_data_lengths, random_seed = options.hmm_randomSeed, covar="diag" )
 
         options.info( f"#   HMM converged: {hmm_model.monitor_.converged}")
 
@@ -248,22 +248,8 @@ def run( args ):
         i_nucleosomal_region = list(set([0, 1, 2]) - set([i_open_region, i_background_region]))[0]
 
         # write hmm into model file
-        options.info( f"#  Write HMM parameters into {hmm_modelfile}")        
-        f = open( hmm_modelfile, "w" )
-        f.write( str(hmm_model.startprob_)+"\n\n\n" )
-        f.write( str(hmm_model.transmat_ )+"\n\n\n" )
-        f.write( str(hmm_model.means_ )+"\n\n\n" )
-        f.write( str(hmm_model.covars_ )+"\n\n\n" )
-        f.write( str(hmm_model.n_features )+"\n\n\n" )
-        f.write( str(i_open_region )+"\n\n\n" )
-        f.write( str(i_background_region )+"\n\n\n" )
-        f.write( str(i_nucleosomal_region )+"\n\n\n" )
-        f.write( str(options.hmm_binsize )+"\n\n\n" )
-
-        #f.write( 'open region = state ' + str(i_open_region)+"\n" )
-        #f.write( 'nucleosomal region = state ' + str(i_nucleosomal_region)+"\n" )
-        #f.write( 'background region = state ' + str(i_background_region)+"\n" )
-        f.close()
+        options.info( f"#  Write HMM parameters into JSON: {hmm_modelfile}")
+        hmm_model_save( hmm_modelfile, hmm_model, options.hmm_binsize, i_open_region, i_nucleosomal_region, i_background_region )
 
     # Now tell users the parameters of the HMM
     assignments = [ "", "", "" ]
@@ -289,7 +275,6 @@ def run( args ):
     options.info(  "#       {0:>10s}:  {1[0]:>10.4g} {1[1]:>10.4g} {1[2]:>10.4g} {1[3]:>10.4g}".format(assignments[1], hmm_model.means_[1]) )
     options.info(  "#       {0:>10s}:  {1[0]:>10.4g} {1[1]:>10.4g} {1[2]:>10.4g} {1[3]:>10.4g}".format(assignments[2], hmm_model.means_[2]) )
     
-    #options.info( f"#   HMM Emissions (covar): {hmm_model.covars_}")
 
 #############################################
 # 5. Predict
@@ -438,8 +423,6 @@ def generate_states_path( candidate_bins, predicted_proba, binsize, i_open_regio
         else:
             start_pos = candidate_bins[l][1]-binsize
 
-        
-            
     return ret_states_path
 
 def save_accessible_regions( states_path, accessible_region_file, openregion_minlen ):
