@@ -1,4 +1,4 @@
-# Time-stamp: <2022-10-04 15:13:57 Tao Liu>
+# Time-stamp: <2022-10-04 16:58:30 Tao Liu>
 
 """Description: Main HMMR command
 
@@ -243,8 +243,15 @@ def run( args ):
         options.info( f"#   HMM converged: {hmm_model.monitor_.converged}")
 
         # label hidden states
-        i_open_region = np.where(hmm_model.means_ == max(hmm_model.means_[0:3,0]))[0][0]
-        i_background_region = np.where(hmm_model.transmat_ == min(hmm_model.transmat_[0:3, i_open_region]))[0][0]
+        means_sum = np.sum( hmm_model.means_, axis=1 )
+
+        # first, the state with the highest overall emission is the open state
+        i_open_region = np.where( means_sum == max(means_sum) )[0][0]
+
+        # second, the state with lowest overall emission is the bg state 
+        i_background_region = np.where( means_sum == min(means_sum) )[0][0]
+
+        # last one is the nuc state (note it may not be accurate though
         i_nucleosomal_region = list(set([0, 1, 2]) - set([i_open_region, i_background_region]))[0]
 
         # write hmm into model file
