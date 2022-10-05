@@ -1,6 +1,6 @@
 # cython: language_level=3
 # cython: profile=True
-# Time-stamp: <2022-09-29 09:07:23 Tao Liu>
+# Time-stamp: <2022-10-04 15:46:00 Tao Liu>
 
 """Module for BedGraph data class.
 
@@ -981,7 +981,7 @@ cdef class bedGraphTrackI:
              int32_t pre_p, p1, p2, i
              float32_t v1, v2
              bytes chrom
-             object ret
+             list ret
 
         assert isinstance(bdgTrack2,bedGraphTrackI), "not a bedGraphTrackI object"
 

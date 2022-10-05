@@ -1,6 +1,6 @@
 # cython: language_level=3
 # cython: profile=True
-# Time-stamp: <2022-09-29 14:58:12 Tao Liu>
+# Time-stamp: <2022-10-04 16:14:23 Tao Liu>
 
 """Module description:
 
@@ -155,23 +155,19 @@ cpdef list extract_signals_from_regions( list signals, object regions, int binsi
     assert len( extracted_data[0] ) == len( extracted_data[1] )
     assert len( extracted_data[0] ) == len( extracted_data[2] )
     assert len( extracted_data[0] ) == len( extracted_data[3] )
-    #nnn =len( extracted_len[0] )
-    #debug( f"{n} bins, {nn}, {nnn}" )
     counter = 0
     prev_c = extracted_len[0][0]
     c = 0
     for i in range( nn ):
         ret_training_bins.append( extracted_positions[0][i] )
         ret_training_data.append(
-            [ max( 0.0001, abs(round(extracted_data[0][i], 4))),
-              max( 0.0001, abs(round(extracted_data[1][i], 4))),
-              max( 0.0001, abs(round(extracted_data[2][i], 4))),
-              max( 0.0001, abs(round(extracted_data[3][i], 4))) ] )
+            [ max( 0.0001, extracted_data[0][i] ),
+              max( 0.0001, extracted_data[1][i] ),
+              max( 0.0001, extracted_data[2][i] ),
+              max( 0.0001, extracted_data[3][i] ) ] )
         c = extracted_len[0][i]
-        #print(f"{extracted_positions[0][i]} {extracted_len[0][i]}")
         if counter != 0 and c != prev_c:
             ret_training_lengths.append( counter )
-            #print(f"### add a bin length {counter}")
             counter = 0
         prev_c = c
         counter +=  1
