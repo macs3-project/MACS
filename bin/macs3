@@ -98,7 +98,30 @@ def main():
     elif subcommand == "hmmratac":
         # pileup alignment results with a given extension method
         from MACS3.Commands.hmmratac_cmd import run
+
+        import cProfile
+        import pstats
+        import io
+        
+        cprof = cProfile.Profile()
+        cprof.enable()
+
         run( args )
+
+        cprof.disable()
+        path = io.StringIO()
+        ps = pstats.Stats(cprof, stream = path).sort_stats('tottime')
+        ps.print_stats()
+
+        with open('cprofile_test.txt', 'w+') as f:
+            f.write(path.getvalue())
+
+        # from guppy import hpy
+        # h = hpy()
+        # print(h.heap())
+
+
+
     elif subcommand == "callvar":
         # assemble reads in peak region and call variants
         from MACS3.Commands.callvar_cmd import run
