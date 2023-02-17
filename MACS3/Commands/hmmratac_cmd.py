@@ -52,7 +52,7 @@ from MACS3.Signal.BedGraph import bedGraphTrackI
 from memory_profiler import profile
 fp=open('memory_profiler.log','w+')
 @profile(stream=fp)
-# @profile
+
 def run( args ):
     """The HMMRATAC function/pipeline for MACS.
 
