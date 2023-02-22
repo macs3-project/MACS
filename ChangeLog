@@ -1,3 +1,11 @@
+2023-02-17 Philippa Doherty <philippa.doherty@roswellpark.org>
+	MACS version 2.2.7.2
+
+	* Bug fix:
+
+	MACS2 typo in `setup.py`: `numpy>=>=1.17` -> `numpy>=1.17`
+	PR #543, issues #535, #541, #544
+
 2020-04-11  Tao Liu  <vladimir.liu@gmail.com>
 	MACS version 2.2.7.1
 
