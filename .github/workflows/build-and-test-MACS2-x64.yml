@@ -1,0 +1,60 @@
+# This workflow will install Python dependencies, run tests and lint with a single version of Python
+# For more information see: https://help.github.com/actions/language-and-framework-guides/using-python-with-github-actions
+
+name: CI x64
+
+on: [push, pull_request]
+
+jobs:
+  build:
+    runs-on: ubuntu-20.04
+    strategy: 
+      matrix: 
+        python-version: [3.6, 3.7, 3.8, 3.9, 3.10.7]
+        arch: ['x64']
+    name: Build on x64 with Python ${{ matrix.python-version }}
+    steps:
+      - name: Checkout MACS
+        uses: actions/checkout@v2
+        with:
+          submodules: 'true'
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v2
+        with:
+          python-version: ${{ matrix.python-version }}
+          architecture: ${{ matrix.arch }}
+      - name: Cache pip
+        uses: actions/cache@v2
+        with:
+          # This path is specific to Ubuntu
+          path: ~/.cache/pip
+          # Look to see if there is a cache hit for the corresponding requirements file
+          key: ${{ runner.os }}-pip-${{ hashFiles('requirements.txt') }}
+          restore-keys: |
+            ${{ runner.os }}-pip-
+            ${{ runner.os }}-        
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install pytest
+          # install cython first...
+          pip install cython
+          if [ -f requirements.txt ]; then pip install --upgrade -r requirements.txt; fi
+      - name: Install MACS
+        run: |
+          python setup.py install
+      - name: Test with pytest
+        run: |
+          pytest --runxfail
+          cd test
+          ./cmdlinetest macs3
+          cd ..
+      - name: Build sdist
+        run: |
+          python setup.py sdist
+      - name: Archive sdist
+        uses: actions/upload-artifact@v2
+        with:
+          name: sdist file
+          path: |
+            dist/*.tar.gz
