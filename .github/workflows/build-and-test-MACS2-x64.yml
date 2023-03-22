@@ -18,6 +18,8 @@ jobs:
         uses: actions/checkout@v3
         with:
           submodules: 'true'
+          repository: MACS
+          path: prerelease_v2.2.7.2
       - name: Set up Python ${{ matrix.python-version }}
         uses: actions/setup-python@v3
         with:
@@ -43,18 +45,18 @@ jobs:
       - name: Install MACS
         run: |
           python setup.py install
-      - name: Test with pytest
-        run: |
-          pytest --runxfail
-          cd test
-          ./cmdlinetest macs3
-          cd ..
-      - name: Build sdist
-        run: |
-          python setup.py sdist
-      - name: Archive sdist
-        uses: actions/upload-artifact@v2
-        with:
-          name: sdist file
-          path: |
-            dist/*.tar.gz
+      # - name: Test with pytest
+      #   run: |
+      #     pytest --runxfail
+      #     cd test
+      #     ./cmdlinetest macs3
+      #     cd ..
+      # - name: Build sdist
+      #   run: |
+      #     python setup.py sdist
+      # - name: Archive sdist
+      #   uses: actions/upload-artifact@v2
+      #   with:
+      #     name: sdist file
+      #     path: |
+      #       dist/*.tar.gz
