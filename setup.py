@@ -23,7 +23,9 @@ def main():
     # if float(sys.version[:3])<3.6:
     #     sys.stderr.write("CRITICAL: Python version must >= 3.6!\n")
     #     sys.exit(1)
-
+    if sys.version_info < (3,6):
+        sys.stderr.write("CRITICAL: Python version must >= 3.6!\n")
+        sys.exit(1)
     cwd = os.path.abspath(os.path.dirname(__file__))
 
     # install required numpy
