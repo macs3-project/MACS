@@ -54,7 +54,7 @@ jobs:
         run: |
           python setup.py sdist
       - name: Archive sdist
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         with:
           name: sdist file
           path: |

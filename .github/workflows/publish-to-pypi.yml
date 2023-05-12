@@ -17,7 +17,7 @@ jobs:
       with:
         submodules: 'true'
     - name: Set up Python
-      uses: actions/setup-python@v2 #does macs2 have actions set up ... ?
+      uses: actions/setup-python@v3 #does macs2 have actions set up ... ?
       with:
         python-version: '3.11'
     - name: Install dependencies

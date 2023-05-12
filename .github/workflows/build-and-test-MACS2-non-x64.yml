@@ -1,0 +1,72 @@
+# This workflow will install Python dependencies, run tests and lint with a single version of Python
+# For more information see: https://help.github.com/actions/language-and-framework-guides/using-python-with-github-actions
+
+name: CI non x64
+
+on: [push, pull_request]
+
+jobs:
+  build_job:
+    runs-on: ubuntu-20.04
+    name: Build on ${{ matrix.arch }}
+    strategy:
+      matrix:
+        include:
+          - arch: armv7 # scipy installation issue
+            distro: bullseye
+          - arch: aarch64
+            distro: bullseye
+          #- arch: ppc64le
+          #  distro: bullseye
+          #- arch: s390x # let's skip s390x for now since scipy can'tbe installed
+          #  distro: bullseye
+    steps:
+      - name: Checkout MACS
+        uses: actions/checkout@v3
+        with:
+          submodules: 'true'
+      - name: Set up arch and run (bullseye Python 3.9)
+        uses: uraimo/run-on-arch-action@v2.5
+        id: build
+        with:
+          arch: ${{ matrix.arch }}
+          distro: ${{ matrix.distro }}
+
+          githubToken: ${{ github.token }}
+
+          # The shell to run commands with in the container
+          shell: /bin/bash
+
+          # Mount the current working directory (with checked-out codes) as /MACS3 in the container
+          dockerRunArgs: |
+            -v "${PWD}:/MACS2" -u macs2
+
+          # Create an artifacts directory on runner
+
+          # Install some dependencies in the container. This speeds up builds if
+          # you are also using githubToken. Any dependencies installed here will
+          # be part of the container image that gets cached, so subsequent
+          # builds don't have to re-install them. The image layer is cached
+          # publicly in your project's package repository, so it is vital that
+          # no secrets are present in the container state or logs.
+          install: |
+            useradd -m macs2
+            mkdir -p /MACS2
+            chown -R macs2:macs2 /MACS2
+            # install dependencies
+            apt-get update -qq -y
+            apt-get install apt-utils
+            apt-get install -yq libblas3 liblapack3 libblas-dev liblapack-dev
+            apt-get install -yq python3 python3-pip python3-wheel
+            apt-get install -yq procps zlib1g zlib1g-dev gfortran
+          run: |
+            echo `uname -a`
+            cd /home/macs2/
+            cp -r /MACS2 .
+            cd MACS2
+            export PATH="/home/macs2/.local/bin:${PATH}"
+            pip3 install --no-cache-dir --user --upgrade pip
+            pip3 install --user --upgrade -r requirements.txt --no-cache-dir
+            pip3 install --user .  --no-cache-dir
+            # run test
+            pytest --runxfail && cd test && ./cmdlinetest macs2
