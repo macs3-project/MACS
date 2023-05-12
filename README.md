@@ -28,13 +28,15 @@ applied to any "DNA enrichment assays" if the question to be asked is
 simply: *where we can find significant reads coverage than the random
 background*.
 
-## Recent Changes for MACS (2.2.7.2)
+## Recent Changes for MACS (2.2.8)
 
-### 2.2.7.2
+### 2.2.8
    * Bug fix:
 
 	MACS2 typo in 'setup.py': 'numpy>=>=1.17' -> 'numpy>=1.17'
 	PR #543, issues #535, #541, #544
+
+	Now test on and support Python 3.6/3.7/3.8/3.9/3.10/3.11
 
 ### 2.2.7.1
 	* hotfix: 
