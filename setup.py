@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-# Time-stamp: <2019-12-12 13:04:02 taoliu>
+# Time-stamp: <2023-05-12 15:44:13 Tao Liu>
 
 """Description: 
 
@@ -20,9 +20,6 @@ numpy_requires = '>=1.17'
 install_requires = [f"numpy{numpy_requires}",]
 
 def main():
-    # if float(sys.version[:3])<3.6:
-    #     sys.stderr.write("CRITICAL: Python version must >= 3.6!\n")
-    #     sys.exit(1)
     if sys.version_info < (3,6):
         sys.stderr.write("CRITICAL: Python version must >= 3.6!\n")
         sys.exit(1)
@@ -92,7 +89,9 @@ def main():
               'Topic :: Scientific/Engineering :: Bio-Informatics',
               'Programming Language :: Python :: 3.6',
               'Programming Language :: Python :: 3.7',
-              'Programming Language :: Python :: 3.8',              
+              'Programming Language :: Python :: 3.9',
+              'Programming Language :: Python :: 3.10',
+              'Programming Language :: Python :: 3.11',              	      
               'Programming Language :: Cython',
               ],
           install_requires=install_requires,
