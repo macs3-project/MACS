@@ -10,21 +10,21 @@ jobs:
     runs-on: ubuntu-20.04
     strategy: 
       matrix: 
-        python-version: [3.8, 3.9, 3.10.7]
+        python-version: [3.8, 3.9, 3.10, 3.11]
         arch: ['x64']
     name: Build on x64 with Python ${{ matrix.python-version }}
     steps:
       - name: Checkout MACS
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
         with:
           submodules: 'true'
       - name: Set up Python ${{ matrix.python-version }}
-        uses: actions/setup-python@v2
+        uses: actions/setup-python@v3
         with:
           python-version: ${{ matrix.python-version }}
           architecture: ${{ matrix.arch }}
       - name: Cache pip
-        uses: actions/cache@v2
+        uses: actions/cache@v3
         with:
           # This path is specific to Ubuntu
           path: ~/.cache/pip
@@ -35,6 +35,7 @@ jobs:
             ${{ runner.os }}-        
       - name: Install dependencies
         run: |
+          # make sure pip is the lastest
           python -m pip install --upgrade pip
           pip install pytest
           # install cython first...
@@ -42,7 +43,8 @@ jobs:
           if [ -f requirements.txt ]; then pip install --upgrade -r requirements.txt; fi
       - name: Install MACS
         run: |
-          python setup.py install
+          # we use pip install instead of old fashion setup.py install
+          pip install .
       - name: Test with pytest
         run: |
           pytest --runxfail
@@ -53,7 +55,7 @@ jobs:
         run: |
           python setup.py sdist
       - name: Archive sdist
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         with:
           name: sdist file
           path: |

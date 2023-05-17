@@ -22,11 +22,11 @@ jobs:
           #  distro: bullseye
     steps:
       - name: Checkout MACS
-        uses: actions/checkout@v2.1.0
+        uses: actions/checkout@v3
         with:
           submodules: 'true'
       - name: Set up arch and run (bullseye Python 3.9)
-        uses: uraimo/run-on-arch-action@v2.2.1
+        uses: uraimo/run-on-arch-action@v2
         id: build
         with:
           arch: ${{ matrix.arch }}

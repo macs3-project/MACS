@@ -12,6 +12,7 @@ import sys
 import os
 import re
 from setuptools import setup, Extension
+from Cython.Build import cythonize
 import subprocess
 import sysconfig
 import numpy
@@ -33,6 +34,7 @@ classifiers =[\
               'Programming Language :: Python :: 3.8',
               'Programming Language :: Python :: 3.9',
               'Programming Language :: Python :: 3.10',
+              'Programming Language :: Python :: 3.11',
               'Programming Language :: Cython', ]
 
 install_requires = [ "numpy>=1.23",
@@ -149,7 +151,8 @@ def main():
            setup_requires = install_requires,
            tests_require = tests_requires,
            python_requires = '>=3.8',
-           ext_modules = ext_modules )
+           ext_modules=cythonize( ext_modules ) ),
+#                                  compiler_directives={'linetrace': True, 'binding': True}) )
 
 if __name__ == '__main__':
     main()
