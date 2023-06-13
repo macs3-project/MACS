@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# Time-stamp: <2022-10-04 13:48:15 Tao Liu>
+# Time-stamp: <2023-06-08 00:37:59 Tao Liu>
 
 """Description: MACS v3 main executable.
 
@@ -733,7 +733,56 @@ def add_hmmratac_parser( subparsers ):
     argparser_hmmratac = subparsers.add_parser("hmmratac",
                                                 formatter_class = ap.RawDescriptionHelpFormatter,
                                                 help="Dedicated peak calling based on Hidden Markov Model for ATAC-seq data.",
-                                                epilog = "TBA...")
+                                                epilog = """HMMRATAC is a dedicated tool for processing ATAC-seq data.
+                                                
+HMMRATAC was first released as a JAVA program in 2018. We have integrated it as
+subcommand in MACS3 `hmmratac`. We rewrote it in Python and Cython, so the 
+functionalities may be different with the JAVA version. The main idea behind
+HMMRATAC is to use the Hidden Markov Model to learn the nucleosome structure
+around open accessible chromatin regions. 
+
+Here is an example to run the `hmmratac` command:
+
+$ macs3 hmmratac -b test/yeast_500k_SRR1822137.bam -n hmmratac_yeast500k
+
+Please read carefully the help messages regarding each option and the default
+parameters. There are several crucial parameters that we usually need to 
+specify. They are the 1. the lower cutoff to pick the training regions through
+`-l`; 2. the upper cutoff to pick the training regions through `-u`; 3. the 
+pre-scanning cutoff to pick the candidate regions for decoding/predicting the
+states, including open, nucleosome, and background states, through `-c`. These
+three parameters will influence the results a lot. Therefore, it's highly
+recommended to run `macs3 hmmratac --cutoff-analysis-only -b your.bam` first,
+to help you decide the parameters for `-l`, `-u`, and `-c`. There is no
+automatically way to decide, so please use your own judgement! Please read the
+output from `macs3 hmmratac --cutoff-analysis-only -b your.bam` and the 
+following section `Choices of cutoff values` for instruction.
+
+* Choices of cutoff values *
+
+It's highy recommended to run with `--cutoff-analysis-only` for the first time.
+When this option is on, `hmmratac` will use EM to guess the best parameters for
+fragment sizes of short fragments, mono-, di-, and tri-nucleosomes, then pileup
+fragments, convert the pileup values into fold-change, and analyze at each 
+possible cutoff, how many peaks call be called, what their average peak length
+is, and what their total length is. After the report is generated, we can check
+its content and decide what the optimal `-l`, `-u` and `-c` are. There are four
+columns in the report: 1. score, the possible foldchange cutoff value; 2. 
+npeaks, the number of peaks; 3. lpeaks, the total length of all peaks; 4.
+avelpeak, the average length of peaks.
+
+There is no common rule but here are some suggestions. The lower cutoff should
+be the cutoff in the report that can capture moderate number ( about 10k ) of
+peaks with normal width ( average length 500-1000bps long); the upper cutoff
+should be the cutoff in report that can capture some (typically hundreds of)
+extremely high enrichment and unusually wide peaks, since the purpose is to
+exclude abnormal enrichment caused by artifacts such as repetitive regions; the
+pre-scanning cutoff should be the cutoff close to the BOTTOM of report that can
+capture a large number of possible peaks with normal length (average length
+500-1000bps), however we don't want to use the lowest cutoff value in the
+report since that will include too much noises from the genome. 
+
+""")
     # group for input files
     group_input = argparser_hmmratac.add_argument_group( "Input files arguments" )
     group_input.add_argument( "-b", "--bam", dest = "bam_file", type = str, required = True, nargs = "+",
@@ -746,6 +795,9 @@ def add_hmmratac_parser( subparsers ):
     group_output.add_argument( "-n", "--name", dest = "name", type = str,
                                help = "Name for this experiment, which will be used as a prefix to generate output file names. DEFAULT: \"NA\"",
                                default = "NA" )
+    group_output.add_argument( "--cutoff-analysis-only", dest = "cutoff_analysis_only", action = "store_true",
+                                help = "Only run the cutoff analysis and output a report. After generating the report, the process will stop. The report will help user decide the three crucial parameters for `-l`, `-u`, and `-c`. So it's highly recommanded to run this first! Please read the report and instructions in `Choices of cutoff values` on how to decide the three crucial parameters",
+                                default = False )
     group_output.add_argument( "--save-digested", dest = "save_digested", action = "store_true",
                                help = "Save the digested ATAC signals of short-, mono-, di-, and tri- signals in three BedGraph files with the names NAME_short.bdg, NAME_mono.bdg, NAME_di.bdg, and NAME_tri.bdg. DEFAULT: False",
                                default = False )    
@@ -785,19 +837,19 @@ def add_hmmratac_parser( subparsers ):
                             help = "Size of the bins to split the pileup signals for training and decoding with Hidden Markov Model. Must >= 1. Smaller the binsize, higher the resolution of the results, slower the process. Default = 10",
                             default = 10 )    
     group_hmm.add_argument( "-u", "--upper", dest = "hmm_upper", type = int,
-                            help = "Upper limit on fold change range for choosing training sites. Default: 20",
+                            help = "Upper limit on fold change range for choosing training sites. This is an important parameter for training so please read. The purpose of this parameter is to EXCLUDE those unusually highly enriched chromatin regions so we can get training samples in 'ordinary' regions instead. It's highly recommended to run the `--cutoff-analysis-only` first to decide the lower cutoff `-l`, the upper cutoff `-u`, and the pre-scanning cutoff `-c`. The upper cutoff should be the cutoff in the cutoff analysis result that can capture some (typically hundreds of) extremely high enrichment and unusually wide peaks. Default: 20",
                             default = 20 )
     group_hmm.add_argument( "-l", "--lower", dest = "hmm_lower", type = int,
-                            help = "Lower limit on fold change range for choosing training sites. Default: 10",
+                            help = "Lower limit on fold change range for choosing training sites. This is an important parameter for training so please read. The purpose of this parameter is to ONLY INCLUDE those chromatin regions having ordinary enrichment so we can get training samples to learn the common features through HMM. It's highly recommended to run the `--cutoff-analysis-only` first to decide the lower cutoff `-l`, the upper cutoff `-u`, and the pre-scanning cutoff `-c`. The lower cutoff should be the cutoff in the cutoff analysis result that can capture moderate number ( about 10k ) of peaks with normal width ( average length 500-1000bps long). Default: 10",
                             default = 10 )
     group_hmm.add_argument( "--maxTrain", dest = "hmm_maxTrain", type = int,
-                            help = "Maximum number of training regions to use. Default: 1000",
+                            help = "Maximum number of training regions to use. After we identify the training regions between `-l` and `-u`, the lower and upper cutoffs, we will randomly pick this number of regions for training. Default: 1000",
                             default = 1000 )
     group_hmm.add_argument( "--training-flanking", dest = "hmm_training_flanking", type = int, required = False,
                             help = "Training regions will be expanded to both side with this number of basepairs. The purpose is to include more background regions. Default: 1000",
                             default = 1000 )
     #group_hmm.add_argument( "-t", "--training", dest = "hmm_training_regions", type = str, required = False, 
-    #                        help = "Filename of training regions (previously was BED_file) to use for training HMM, instead of using foldchange settings to select. Default: NA" )    
+    #                        help = "Filename of training regions (previously was BED_file) to use for training HMM, instead of using foldchange settings to select. Default: NA" )
     #group_hmm.add_argument( "-z", "--zscore", dest = "hmm_zscore", type = int,
     #                        help = "Zscored read depth to mask during Viterbi decoding. Default: 100",
     #                        default = 100 )
@@ -810,9 +862,9 @@ def add_hmmratac_parser( subparsers ):
     #                        help = "Stop the program after generating model. Use this option to generate HMM model ONLY, which can be later applied with `--model`. Default: False")
 
     # group for peak calling arguments
-    group_call = argparser_hmmratac.add_argument_group( "Peak calling arguments" )
+    group_call = argparser_hmmratac.add_argument_group( "Peak calling/HMM decoding arguments" )
     group_call.add_argument( "-c", "--prescan-cutoff", dest = "prescan_cutoff", type = float,
-                             help = "The fold change cutoff for prescanning candidate regions in the whole dataset. Then we will use HMM to predict states on these candidate regions. Higher the prescan cutoff, fewer regions will be considered. Must > 1. Default: 1.2",
+                             help = "The fold change cutoff for prescanning candidate regions in the whole dataset. Then we will use HMM to predict/decode states on these candidate regions. Higher the prescan cutoff, fewer regions will be considered. Must > 1. This is an important parameter for decoding so please read. The purpose of this parameter is to EXCLUDE those chromatin regions having noises/random enrichment so we can have a large number of possible regions to predict the HMM states. It's highly recommended to run the `--cutoff-analysis-only` first to decide the lower cutoff `-l`, the upper cutoff `-u`, and the pre-scanning cutoff `-c`. The pre-scanning cutoff should be the cutoff close to the BOTTOM of the cutoff analysis result that can capture large number of possible peaks with normal length (average length 500-1000bps). In most cases, please do not pick a cutoff too low that capture almost all the background noises from the data. Default: 1.2",
                              default = 1.2 )
     
     group_call.add_argument( "--minlen", dest = "openregion_minlen", type = int,
@@ -826,6 +878,9 @@ def add_hmmratac_parser( subparsers ):
     #                         default = 100 )
     # group for misc
     group_misc = argparser_hmmratac.add_argument_group( "Misc arguments" )
+    group_misc.add_argument( "--pileup-short", dest = "pileup_short", action = "store_true",
+                             help = "By default, HMMRATAC will pileup all fragments in order to identify regions for training and candidate regions for decoding. When this option is on, it will pileup only the short fragments to do so. Although it sounds a good idea since we assume that open region should have a lot of short fragments, it may be possible that the overall short fragments are too few to be useful. Default: False",
+                             default = False )
     group_misc.add_argument( "--randomSeed", dest = "hmm_randomSeed", type = int,
                              help = "Seed to set for random sampling of training regions. Default: 10151",
                              default = 10151 )
@@ -852,7 +907,6 @@ def add_hmmratac_parser( subparsers ):
                                help = "Buffer size for incrementally increasing internal array size to store reads alignment information. In most cases, you don't have to change this parameter. However, if there are large number of chromosomes/contigs/scaffolds in your alignment, it's recommended to specify a smaller buffer size in order to decrease memory usage (but it will take longer time to read alignment files). Minimum memory requested for reading an alignment file is about # of CHROMOSOME * BUFFER_SIZE * 8 Bytes. DEFAULT: 100000 " )
     
     return
-
 
 
 if __name__ == '__main__':

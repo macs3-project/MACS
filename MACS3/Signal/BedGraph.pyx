@@ -1,6 +1,6 @@
 # cython: language_level=3
 # cython: profile=True
-# Time-stamp: <2022-10-04 15:46:00 Tao Liu>
+# Time-stamp: <2023-06-08 10:52:59 Tao Liu>
 
 """Module for BedGraph data class.
 
@@ -402,8 +402,9 @@ cdef class bedGraphTrackI:
         return True
 
     cpdef tuple summary (self):
-        """Calculate the sum, total_length, max, min, mean, and std. Return a tuple for (sum, max, min, mean, std).
+        """Calculate the sum, total_length, max, min, mean, and std. 
 
+        Return a tuple for (sum, total_length, max, min, mean, std).
         """
         cdef:
             int64_tn_v
@@ -1144,10 +1145,15 @@ cdef class bedGraphTrackI:
 
         chrs = self.get_chr_names()
 
-        midvalue = self.minvalue/2 + self.maxvalue/2
-        s = float(self.minvalue - midvalue)/steps
+        #midvalue = self.minvalue/2 + self.maxvalue/2
+        #s = float(self.minvalue - midvalue)/steps
+        minv = self.minvalue
+        maxv = self.maxvalue
 
-        tmplist = list( np.arange( midvalue, self.minvalue - s, s ) )
+        s = float(maxv - minv)/steps
+
+        
+        tmplist = list( np.arange( minv, maxv, s ) )
 
         cutoff_npeaks = {}
         cutoff_lpeaks = {}
@@ -1201,8 +1207,8 @@ cdef class bedGraphTrackI:
                 cutoff_lpeaks[ cutoff ] = cutoff_lpeaks.get( cutoff, 0 ) + total_l
                 cutoff_npeaks[ cutoff ] = cutoff_npeaks.get( cutoff, 0 ) + total_p
 
-        # write pvalue and total length of predicted peaks
-        ret = "pscore\tnpeaks\tlpeaks\tavelpeak\n"
+        # prepare the returnning text
+        ret = "score\tnpeaks\tlpeaks\tavelpeak\n"
         for cutoff in sorted(cutoff_lpeaks.keys(), reverse=True):
             if cutoff_npeaks[ cutoff ] > 0:
                 ret += "%.2f\t%d\t%d\t%.2f\n" % ( cutoff, cutoff_npeaks[ cutoff ], cutoff_lpeaks[ cutoff ], cutoff_lpeaks[ cutoff ]/cutoff_npeaks[ cutoff ] )

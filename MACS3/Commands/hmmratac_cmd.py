@@ -1,9 +1,9 @@
-# Time-stamp: <2022-10-04 16:58:30 Tao Liu>
+# Time-stamp: <2023-06-08 11:03:46 Tao Liu>
 
 """Description: Main HMMR command
 
 This code is free software; you can redistribute it and/or modify it
-under the terms of the BSD License (see thefile LICENSE included with
+under the terms of the BSD License (see the file LICENSE included with
 the distribution).
 """
 
@@ -69,11 +69,14 @@ def run( args ):
     bg_state_bdgfile = os.path.join( options.outdir, options.name+"_bg.bdg" )
     states_file = os.path.join( options.outdir, options.name+"_states.bed" )
     accessible_file = os.path.join( options.outdir, options.name+"_accessible_regions.gappedPeak" )
+    cutoffanalysis_file = os.path.join( options.outdir, options.name+"_cutoff_analysis.tsv" )
     
     #############################################
     # 1. Read the input BAM files
     #############################################
-    options.info("\n" + options.argtxt)    
+    options.info("\n" + options.argtxt)
+    #options.info("Some important parameters for this run")
+    #options.info(f" binsize for HMM: {options.binsize} ()")
     options.info("#1 Read fragments from BAM file...")
 
     bam = BAMPEParser(options.bam_file[0], buffer_size=options.buffer_size)
@@ -133,13 +136,6 @@ def run( args ):
     options.info(  "#             means: {0[0]:>10.4g} {0[1]:>10.4g} {0[2]:>10.4g} {0[3]:>10.4g}".format( em_means ) )
     options.info(  "#           stddevs: {0[0]:>10.4g} {0[1]:>10.4g} {0[2]:>10.4g} {0[3]:>10.4g}".format( em_stddevs ) )    
 
-    options.info( f"#  Pile up all fragments" )
-    minlen = int(petrack.average_template_length)
-    fc_bdg = petrack.pileup_bdg( [1.0,], baseline_value = 0 )
-    (sum_v, n_v, max_v, min_v, mean_v, std_v) = fc_bdg.summary()
-    options.info( f"#  Convert pileup to fold-change over average signal" )
-    fc_bdg.apply_func(lambda x: x/mean_v)
-
     # to finalize the EM training, we will decompose ATAC-seq into four signal tracks
     options.info( f"#  Compute the weights for each fragment length for each of the four signal types")
     fl_dict = petrack.count_fraglengths()
@@ -153,6 +149,7 @@ def run( args ):
     options.info( f"#  Generate short, mono-, di-, and tri-nucleosomal signals")
     digested_atac_signals = generate_digested_signals( petrack, weight_mapping )
 
+    # save three types of signals if needed
     if options.save_digested:
         fhd = open(short_bdgfile,"w")
         digested_atac_signals[ 0 ].write_bedGraph(fhd, "short","short")
@@ -167,6 +164,37 @@ def run( args ):
         digested_atac_signals[ 0 ].write_bedGraph(fhd, "tri","tri")
         fhd.close()        
 
+    minlen = int(petrack.average_template_length)
+    # if options.pileup_short is on, we pile up only the short fragments to identify training 
+    #  regions and to prescan for candidate regions for decoding.
+    if options.pileup_short:
+        options.info( f"#  Pile up ONLY short fragments" )
+        fc_bdg = digested_atac_signals[ 0 ]
+        (sum_v, n_v, max_v, min_v, mean_v, std_v) = fc_bdg.summary()
+        print(sum_v, n_v, max_v, min_v, mean_v, std_v)
+        options.info( f"#  Convert pileup to fold-change over average signal" )
+        fc_bdg.apply_func(lambda x: x/mean_v)
+    else:
+        options.info( f"#  Pile up all fragments" )
+        fc_bdg = petrack.pileup_bdg( [1.0,], baseline_value = 0 )
+        (sum_v, n_v, max_v, min_v, mean_v, std_v) = fc_bdg.summary()
+        options.info( f"#  Convert pileup to fold-change over average signal" )
+        fc_bdg.apply_func(lambda x: x/mean_v)
+       
+        
+    # if cutoff_analysis only, generate and save the report and quit
+    if options.cutoff_analysis_only:
+        # we will run cutoff analysis only and quit
+        options.info( f"#3 Generate cutoff analysis report from {petrack.total} fragments")
+        options.info( f"#   Please review the cutoff analysis result in {cutoffanalysis_file}" )
+
+        # Let MACS3 do the cutoff analysis to help decide the lower and upper cutoffs
+        with open(cutoffanalysis_file, "w") as ofhd_cutoff:
+            ofhd_cutoff.write( fc_bdg.cutoff_analysis( min_length=minlen, max_gap=options.hmm_training_flanking ) )
+        #raise Exception("Cutoff analysis only.")
+        sys.exit(1)
+        
+        
     #############################################
     # 3. Define training set by peak calling
     #############################################
@@ -183,14 +211,29 @@ def run( args ):
         options.info( f"#   The minimum length of the region is set as the average template/fragment length in the dataset: {minlen}" )
         options.info( f"#   The maximum gap to merge nearby significant regions is set as the flanking size to extend training regions: {options.hmm_training_flanking}" )    
         peaks = fc_bdg.call_peaks (cutoff=options.hmm_lower, min_length=minlen, max_gap=options.hmm_training_flanking, call_summits=False)
-        options.info( f"#  Total training regions called: {peaks.total}" )
+        options.info( f"#  Total training regions called after applying the lower cutoff {options.hmm_lower}: {peaks.total}" )
         peaks.filter_score( options.hmm_lower, options.hmm_upper )
-        options.info( f"#  Total training regions after filtering with lower and upper cutoff: {peaks.total}" )
+        options.info( f"#  Total training regions after filtering with upper cutoff {options.hmm_upper}: {peaks.total}" )
+
+        options.info( f"#  **IMPORTANT**")
+        options.info( f"#  Please review the cutoff analysis result in {cutoffanalysis_file} to verify" )
+        options.info( f"#   if the choices of lower, upper and prescanning cutoff are appropriate." )
+        options.info( f"#   Please read the message in the section 'Choices of cutoff values' by running" )
+        options.info( f"#   `macs3 hmmratac -h` for detail." )
+        options.info( f"#  ****" )
         
+        # Let MACS3 do the cutoff analysis to help decide the lower and upper cutoffs
+        with open(cutoffanalysis_file, "w") as ofhd_cutoff:
+            ofhd_cutoff.write( fc_bdg.cutoff_analysis( min_length=minlen, max_gap=options.hmm_training_flanking ) )
+            
+        # we will check if anything left after filtering
         if peaks.total > options.hmm_maxTrain:
             peaks = peaks.randomly_pick( options.hmm_maxTrain, seed = options.hmm_randomSeed )
             options.info( f"#  We randomly pick {options.hmm_maxTrain} regions for training" )
-
+        elif peaks.total == 0:
+            options.error( f"# No training regions found. Please adjust the lower or upper cutoff." )
+            raise Exception("Not enough training regions!")
+        
         # Now we convert PeakIO to Regions and filter blacklisted regions
         training_regions = Regions()
         training_regions.init_from_PeakIO( peaks )

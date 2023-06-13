@@ -1,6 +1,6 @@
 # cython: language_level=3
 # cython: profile=True
-# Time-stamp: <2022-10-04 16:14:23 Tao Liu>
+# Time-stamp: <2023-06-08 00:28:40 Tao Liu>
 
 """Module description:
 
@@ -124,7 +124,8 @@ cpdef list generate_digested_signals( object petrack, list weight_mapping ):
 cpdef list extract_signals_from_regions( list signals, object regions, int binsize = 10  ):
     # we will take regions in peaks, create a bedGraphTrackI with
     # binned regions in peaks, then let them overlap with signals to
-    # create a list (4) of value arrays. 
+    # create a list (4) of value arrays.
+    # 
     cdef:
         list extracted_data, extracted_len, extracted_positions
         object signaltrack
@@ -136,7 +137,6 @@ cpdef list extract_signals_from_regions( list signals, object regions, int binsi
         list ret_training_data, ret_training_lengths, ret_training_bins
 
     regionsbdg = _make_bdg_of_bins_from_regions( regions, binsize )
-
     # now, let's overlap
     extracted_positions = []
     extracted_data = []
@@ -152,9 +152,10 @@ cpdef list extract_signals_from_regions( list signals, object regions, int binsi
     ret_training_lengths = []
     c = 0
     nn = len( extracted_data[0] )
-    assert len( extracted_data[0] ) == len( extracted_data[1] )
-    assert len( extracted_data[0] ) == len( extracted_data[2] )
-    assert len( extracted_data[0] ) == len( extracted_data[3] )
+    assert nn > 0
+    assert nn == len( extracted_data[1] )
+    assert nn == len( extracted_data[2] )
+    assert nn == len( extracted_data[3] )
     counter = 0
     prev_c = extracted_len[0][0]
     c = 0
@@ -178,6 +179,7 @@ cpdef list extract_signals_from_regions( list signals, object regions, int binsi
     return [ ret_training_bins, ret_training_data, ret_training_lengths ]
 
 cdef _make_bdg_of_bins_from_regions ( object regions, int binsize ):
+    # this function will return a BedGraphTrackI object
     cdef:
         object regionsbdg
         long n
