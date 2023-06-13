@@ -733,55 +733,39 @@ def add_hmmratac_parser( subparsers ):
     argparser_hmmratac = subparsers.add_parser("hmmratac",
                                                 formatter_class = ap.RawDescriptionHelpFormatter,
                                                 help="Dedicated peak calling based on Hidden Markov Model for ATAC-seq data.",
-                                                epilog = """HMMRATAC is a dedicated tool for processing ATAC-seq data.
-                                                
-HMMRATAC was first released as a JAVA program in 2018. We have integrated it as
-subcommand in MACS3 `hmmratac`. We rewrote it in Python and Cython, so the 
-functionalities may be different with the JAVA version. The main idea behind
-HMMRATAC is to use the Hidden Markov Model to learn the nucleosome structure
-around open accessible chromatin regions. 
+                                                epilog = """HMMRATAC: A Dedicated Tool for Processing ATAC-seq Data
 
-Here is an example to run the `hmmratac` command:
+HMMRATAC, first released as a JAVA program in 2018, is a dedicated tool specifically designed for processing ATAC-seq data. In its current version, it has been integrated as a subcommand (`hmmratac`) in MACS3. Reimagined and rewritten in Python and Cython, this tool's functionality might vary from its JAVA version. The core principle of HMMRATAC involves utilizing the Hidden Markov Model to learn the nucleosome structure around open chromatin regions.
 
+Here's an example of how to run the `hmmratac` command:
+```
 $ macs3 hmmratac -b test/yeast_500k_SRR1822137.bam -n hmmratac_yeast500k
+```
 
-Please read carefully the help messages regarding each option and the default
-parameters. There are several crucial parameters that we usually need to 
-specify. They are the 1. the lower cutoff to pick the training regions through
-`-l`; 2. the upper cutoff to pick the training regions through `-u`; 3. the 
-pre-scanning cutoff to pick the candidate regions for decoding/predicting the
-states, including open, nucleosome, and background states, through `-c`. These
-three parameters will influence the results a lot. Therefore, it's highly
-recommended to run `macs3 hmmratac --cutoff-analysis-only -b your.bam` first,
-to help you decide the parameters for `-l`, `-u`, and `-c`. There is no
-automatically way to decide, so please use your own judgement! Please read the
-output from `macs3 hmmratac --cutoff-analysis-only -b your.bam` and the 
-following section `Choices of cutoff values` for instruction.
+Before proceeding, it's essential to carefully read the help messages concerning each option and the default parameters. There are several crucial parameters we usually need to specify:
+
+1. Lower cutoff to select training regions through `-l`.
+2. Upper cutoff to select training regions through `-u`.
+3. Pre-scanning cutoff to select candidate regions for decoding/predicting the states, including open, nucleosome, and background states, through `-c`.
+
+These three parameters can significantly influence the results. Therefore, it's highly recommended to run `macs3 hmmratac --cutoff-analysis-only -b your.bam` first, which will help you decide the parameters for `-l`, `-u`, and `-c`. Since there isn't an automatic way to determine these parameters, your judgement will be vital. Please read the output from `macs3 hmmratac --cutoff-analysis-only -b your.bam` and the following section `Choices of cutoff values` for guidance.
 
 * Choices of cutoff values *
 
-It's highy recommended to run with `--cutoff-analysis-only` for the first time.
-When this option is on, `hmmratac` will use EM to guess the best parameters for
-fragment sizes of short fragments, mono-, di-, and tri-nucleosomes, then pileup
-fragments, convert the pileup values into fold-change, and analyze at each 
-possible cutoff, how many peaks call be called, what their average peak length
-is, and what their total length is. After the report is generated, we can check
-its content and decide what the optimal `-l`, `-u` and `-c` are. There are four
-columns in the report: 1. score, the possible foldchange cutoff value; 2. 
-npeaks, the number of peaks; 3. lpeaks, the total length of all peaks; 4.
-avelpeak, the average length of peaks.
+Before you proceed, it's highly recommended to run with `--cutoff-analysis-only` for the initial attempt. When this option is activated, `hmmratac` will use EM to estimate the best parameters for fragment sizes of short fragments, mono-, di-, and tri-nucleosomes, pileup fragments, convert the pileup values into fold-change, and analyze each possible cutoff. This analysis includes the number of peaks that can be called, their average peak length, and their total length. After the report is generated, you can review its contents and decide on the optimal `-l`, `-u`, and `-c`.
 
-There is no common rule but here are some suggestions. The lower cutoff should
-be the cutoff in the report that can capture moderate number ( about 10k ) of
-peaks with normal width ( average length 500-1000bps long); the upper cutoff
-should be the cutoff in report that can capture some (typically hundreds of)
-extremely high enrichment and unusually wide peaks, since the purpose is to
-exclude abnormal enrichment caused by artifacts such as repetitive regions; the
-pre-scanning cutoff should be the cutoff close to the BOTTOM of report that can
-capture a large number of possible peaks with normal length (average length
-500-1000bps), however we don't want to use the lowest cutoff value in the
-report since that will include too much noises from the genome. 
+The report consists of four columns:
 
+1. Score: the possible fold change cutoff value.
+2. npeaks: the number of peaks.
+3. lpeaks: the total length of all peaks.
+4. avelpeak: the average length of peaks.
+
+While there's no universal rule, here are a few suggestions:
+
+- The lower cutoff should be the cutoff in the report that captures a moderate number (about 10k) of peaks with a normal width (average length 500-1000bps long).
+- The upper cutoff should capture some (typically hundreds of) extremely high enrichment and unusually wide peaks in the report. The aim here is to exclude abnormal enrichment caused by artifacts such as repetitive regions.
+- The pre-scanning cutoff should be the cutoff close to the BOTTOM of the report that can capture a large number of potential peaks with a normal length (average length 500-1000bps). However, it's recommended not to use the lowest cutoff value in the report as this may include too much noise from the genome.
 """)
     # group for input files
     group_input = argparser_hmmratac.add_argument_group( "Input files arguments" )
