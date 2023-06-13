@@ -733,7 +733,7 @@ def add_hmmratac_parser( subparsers ):
     argparser_hmmratac = subparsers.add_parser("hmmratac",
                                                 formatter_class = ap.RawDescriptionHelpFormatter,
                                                 help="Dedicated peak calling based on Hidden Markov Model for ATAC-seq data.",
-                                                epilog = """HMMRATAC: A Dedicated Tool for Processing ATAC-seq Data
+                                                epilog = """HMMRATAC is a dedicated tool for processing ATAC-seq data
 
 HMMRATAC, first released as a JAVA program in 2018, is a dedicated tool specifically designed for processing ATAC-seq data. In its current version, it has been integrated as a subcommand (`hmmratac`) in MACS3. Reimagined and rewritten in Python and Cython, this tool's functionality might vary from its JAVA version. The core principle of HMMRATAC involves utilizing the Hidden Markov Model to learn the nucleosome structure around open chromatin regions.
 
