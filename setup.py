@@ -95,9 +95,8 @@ def main():
     elif new_gcc or clang or sysconfig.get_config_vars()['CC'] == 'clang':
         extra_c_args_for_fermi.extend(['-fopenmp-simd', '-DSIMDE_ENABLE_OPENMP'])
 
-    # extensions, those has to be processed by Cython
+    # extensions, those have to be processed by Cython
     ext_modules = [ \
-                    # Signal
                     Extension("MACS3.Signal.HMMR_EM", ["MACS3/Signal/HMMR_EM.pyx"], libraries=["m"], include_dirs=numpy_include_dir, extra_compile_args=extra_c_args ),
                     Extension("MACS3.Signal.HMMR_Signal_Processing", ["MACS3/Signal/HMMR_Signal_Processing.pyx"], libraries=["m"], include_dirs=numpy_include_dir, extra_compile_args=extra_c_args ),
                     Extension("MACS3.Signal.HMMR_HMM", ["MACS3/Signal/HMMR_HMM.pyx"], libraries=["m"], include_dirs=numpy_include_dir, extra_compile_args=extra_c_args ),

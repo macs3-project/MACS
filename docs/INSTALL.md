@@ -7,7 +7,7 @@ Please check the following instructions to complete your installation.
 
 ### Python3
 
-MACS v3.x.x requires Python3. We have tested MACS in Python3.6, 3.7 and 3.8. 
+MACS v3.x.x requires Python3. We have tested MACS in Python3.8 to 3.11. 
 
 ### NumPy
 
@@ -84,9 +84,9 @@ MACS uses Python's [setuptools](https://setuptools.readthedocs.io) for
 source code installations. To install a source distribution of MACS,
 unpack the distribution tarball, or clone Git repository with `git
 clone --recurse-submodules git@github.com:taoliu/MACS.git`. Go to the directory where you
-unpacked MACS, and simply run the install script:
+unpacked MACS, and simply run the install command:
 
- `$ python setup.py install`
+ `$ pip install .`
 
 By default, the script will install python library and executable
 codes according to the environment. When you run the command under
@@ -94,23 +94,7 @@ virtualenv, the script will install to the virtual environment
 instead. When you run it without virtual environment, you may need to
 be root or administrator of the machine so as to complete the
 installation. Please contact the system administrator if you want
-their help. If you need to provide a nonstandard install prefix, or
-any other nonstandard options, you can provide many command line
-options to the install script. Use the `--help` option to see a brief
-list of available options:
-
- `$ python setup.py --help`
-
-For example, if I want to install everything under my own HOME
-directory, use this command:
-
- `$ python setup.py install --prefix /home/myaccount/`
-
-As mentioned in *Prerequisites*, you don't need to install Cython in
-order to install MACS. When Cython is available, this setup script
-will regenerate C codes from Pyx codes when necessary. When Cython is
-not available, this setup script will just use the C codes included in
-the release package (or your Github clone) for installation.
+their help. 
 
 ## Configure environment variables
 

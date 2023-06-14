@@ -34,7 +34,7 @@ make sure that the main branch passes unit testing on certain
 functions and subcommands to reproduce the correct outputs. We will
 add more new features in the future.**
 
-## Recent Changes for MACS (3.0.0b1)
+## Recent Changes for MACS (3.0.0b2)
 
 ### 3.0.0b1
         The first beta version of MACS3, with HMMRATAC feature recently added.
