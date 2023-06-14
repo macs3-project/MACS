@@ -36,28 +36,14 @@ add more new features in the future.**
 
 ## Recent Changes for MACS (3.0.0b2)
 
-### 3.0.0b1
-        The first beta version of MACS3, with HMMRATAC feature recently added.
+### 3.0.0b2
+        The second beta version of MACS3, with HMMRATAC feature recently added.
 	   
-	* New features from alpha7:
+	* New features from beta1:
 
-	1) HMMRATAC module is added
-	HMMRATAC is a dedicated software to analyze ATAC-seq data. The
-	basic idea behind HMMRATAC is to digest ATAC-seq data according to
-	the fragment length of read pairs into four signal tracks: short
-	fragments, mononucleosomal fragments, di-nucleosomal fragments and
-	tri-nucleosomal fragments. Then integrate the four tracks again
-	using Hidden Markov Model to consider three hidden states: open
-	region, nucleosomal region, and background region. The orginal
-	paper was published in 2019 written in JAVA, by Evan Tarbell. We
-	implemented it in Python/Cython and optimize the whole process
-	using existing MACS functions and hmmlearn. Now it can run much
-	faster than the original JAVA version. Note: evaluation of the
-	peak calling results is underway.
-	
-	2) Multiple updates regarding dependencies, anaconda built, CI/CD
-	process.
-
+	1) HMMRATAC module fixes
+    
+    
 ## Install
 
 The common way to install MACS is through
