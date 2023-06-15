@@ -9,7 +9,6 @@ the distribution).
 
 import sys
 import os
-import logging
 
 from MACS3.IO import BedGraphIO
 from MACS3.Utilities.OptValidator import opt_validate_bdgcmp
@@ -19,26 +18,22 @@ from math import log as mlog
 # ------------------------------------
 # constants
 # ------------------------------------
-logging.basicConfig(level=20,
-                    format='%(levelname)-5s @ %(asctime)s: %(message)s ',
-                    datefmt='%a, %d %b %Y %H:%M:%S',
-                    stream=sys.stderr,
-                    filemode="w"
-                    )
 
 # ------------------------------------
 # Misc functions
 # ------------------------------------
-error   = logging.critical		# function alias
-warn    = logging.warning
-debug   = logging.debug
-info    = logging.info
+
 # ------------------------------------
 # Main function
 # ------------------------------------
 
 def run( options ):
     options = opt_validate_bdgcmp( options )
+    info = options.info
+    warn = options.warn
+    debug = options.debug
+    error = options.error
+    
     scaling_factor = options.sfactor
     pseudo_depth = 1.0/scaling_factor   # not an actual depth, but its reciprocal, a trick to override SPMR while necessary.
 

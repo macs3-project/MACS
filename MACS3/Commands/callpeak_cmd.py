@@ -1,6 +1,6 @@
 # Time-stamp: <2020-11-28 17:06:30 Tao Liu>
 
-"""Description: MACS 2 main executable
+"""Description: MACS 3 call peak main executable
 
 This code is free software; you can redistribute it and/or modify it
 under the terms of the BSD License (see the file LICENSE included with
@@ -13,7 +13,6 @@ the distribution).
 
 import os
 import sys
-import logging
 from time import strftime
 import tempfile
 
@@ -52,6 +51,7 @@ def run( args ):
     warn = options.warn
     debug = options.debug
     error = options.error
+    
     #0 output arguments
     info("\n"+options.argtxt)
     options.PE_MODE = options.format in ('BAMPE','BEDPE')

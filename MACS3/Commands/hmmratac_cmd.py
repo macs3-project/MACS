@@ -11,10 +11,9 @@ the distribution).
 # python modules
 # ------------------------------------
 
-from logging.handlers import RotatingFileHandler
 import os
 import sys
-import logging
+import gc
 import numpy as np
 import json
 from hmmlearn import hmm
@@ -362,11 +361,16 @@ def run( args ):
     while candidate_regions.total != 0:
         n += 1
         cr = candidate_regions.pop( options.decoding_steps )
+        options.info( "#    decoding %d..." % ( n*options.decoding_steps ) )        
         [ cr_bins, cr_data, cr_data_lengths ] = extract_signals_from_regions( digested_atac_signals, cr, binsize = options.hmm_binsize )
-        options.info( "#    decoding %d..." % ( n*options.decoding_steps ) )
+        #options.info( "#     extracted signals in the candidate regions")
         candidate_bins.extend( cr_bins )
+        #options.info( "#     saving information regarding the candidate regions")        
         predicted_proba.extend( hmm_predict( cr_data, cr_data_lengths, hmm_model ) )
+        #options.info( "#     prediction done")
+        gc.collect()
 
+        
 #############################################
 # 6. Output - add to OutputWriter
 #############################################
@@ -517,3 +521,4 @@ def save_accessible_regions(states_path, accessible_region_file, openregion_minl
                       blockSizes=bytes(block_sizes, encoding="raw_unicode_escape"),
                       blockStarts=bytes(block_starts, encoding="raw_unicode_escape"))
     broadpeak.write_to_gappedPeak(accessible_region_file)
+    return

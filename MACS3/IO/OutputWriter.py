@@ -19,7 +19,12 @@ from MACS3.Utilities.Constants import MACS_VERSION
 # ------------------------------------
 # constants
 # ------------------------------------
+import logging
+import MACS3.Utilities.Logger
 
+logger = logging.getLogger(__name__)
+debug   = logger.debug
+info    = logger.info
 # ------------------------------------
 # Misc functions
 # ------------------------------------
@@ -34,14 +39,12 @@ def zwig_write (trackI, subdir, fileprefix, d, log=None,space=10, single=False):
     log   : logging function, default is sys.stderr.write
     space : space to write tag number on spots, default 10
     """
-    if not log:
-        log = lambda x: sys.stderr.write(x+"\n")
     chrs = trackI.get_chr_names()
     os.makedirs (subdir)
     step = 10000000 + 2*d
 
     if single:
-        log("write to a wiggle file")
+        info("write to a wiggle file")
         f = os.path.join(subdir,fileprefix+"_all"+".wig")
         wigfhd = open(f,"w")
         wigfhd.write("track type=wiggle_0 name=\"%s_all\" description=\"Extended tag pileup from MACS version %s for every %d bp\"\n" % (fileprefix.replace('_afterfiting',''), MACS_VERSION, space)) # data type line
@@ -49,12 +52,12 @@ def zwig_write (trackI, subdir, fileprefix, d, log=None,space=10, single=False):
     for chrom in sorted(chrs):
         if not single:
             f = os.path.join(subdir,fileprefix+"_"+chrom+".wig")
-            log("write to "+f+" for chromosome "+chrom)
+            info("write to "+f+" for chromosome "+chrom)
             wigfhd = open(f,"w")
             # suggested by dawe
             wigfhd.write("track type=wiggle_0 name=\"%s_%s\" description=\"Extended tag pileup from MACS version %s for every %d bp\"\n" % ( fileprefix.replace('_afterfiting',''), chrom, MACS_VERSION, space)) # data type line
         else:
-            log("write data for chromosome "+chrom)
+            info("write data for chromosome "+chrom)
 
         wigfhd.write("variableStep chrom=%s span=%d\n" % (chrom,space))
         tags = trackI.get_locations_by_chr(chrom)[0]
@@ -99,11 +102,11 @@ def zwig_write (trackI, subdir, fileprefix, d, log=None,space=10, single=False):
                 wigfhd.write("%d\t%d\n" % (i+startp+1,window_counts[i]))
         if not single:
             wigfhd.close()
-            log("compress the wiggle file using gzip...")
+            info("compress the wiggle file using gzip...")
             os.system("gzip "+f)
     if single:
         wigfhd.close()
-        log("compress the wiggle file using gzip...")
+        info("compress the wiggle file using gzip...")
         os.system("gzip "+f)
 
 
@@ -125,7 +128,7 @@ def zbdg_write (trackI, subdir, fileprefix, d, log=None, single=False):
     step = 10000000 + 2*d
 
     if single:
-        log("write to a bedGraph file")
+        info("write to a bedGraph file")
         f = os.path.join(subdir,fileprefix+"_all"+".bdg")
         bdgfhd = open(f,"w")
         bdgfhd.write("track type=bedGraph name=\"%s_all\" description=\"Extended tag pileup from MACS version %s\"\n" % (fileprefix.replace('_afterfiting',''), MACS_VERSION)) # data type line
@@ -133,11 +136,11 @@ def zbdg_write (trackI, subdir, fileprefix, d, log=None, single=False):
     for chrom in sorted(chrs):
         if not single:
             f = os.path.join(subdir,fileprefix+"_"+chrom+".bdg")
-            log("write to "+f+" for chromosome "+chrom)
+            info("write to "+f+" for chromosome "+chrom)
             bdgfhd = open(f,"w")
             bdgfhd.write("track type=bedGraph name=\"%s_%s\" description=\"Extended tag pileup from MACS version %s\"\n" % (fileprefix.replace('_afterfiting',''), chrom, MACS_VERSION)) # data type line
         else:
-            log("write data for chromosome "+chrom)
+            info("write data for chromosome "+chrom)
 
         tags = trackI.get_locations_by_chr(chrom)[0]
         l = len(tags)
@@ -207,11 +210,11 @@ def zbdg_write (trackI, subdir, fileprefix, d, log=None, single=False):
 
         if not single:
             bdgfhd.close()
-            log("compress the bedGraph file using gzip...")
+            info("compress the bedGraph file using gzip...")
             os.system("gzip "+f)
     if single:
         bdgfhd.close()
-        log("compress the bedGraph file using gzip...")
+        info("compress the bedGraph file using gzip...")
         os.system("gzip "+f)
 
 

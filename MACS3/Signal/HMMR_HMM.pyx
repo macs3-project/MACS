@@ -12,9 +12,7 @@ the distribution).
 # python modules
 # ------------------------------------
 from math import sqrt
-import logging
-debug   = logging.debug
-info    = logging.info
+
 # ------------------------------------
 # Other modules
 # ------------------------------------

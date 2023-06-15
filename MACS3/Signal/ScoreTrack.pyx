@@ -14,7 +14,6 @@ the distribution).
 # ------------------------------------
 from copy import copy
 from functools import reduce
-import logging
 
 # ------------------------------------
 # MACS3 modules

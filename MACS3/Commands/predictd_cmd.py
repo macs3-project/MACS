@@ -13,7 +13,6 @@ the distribution).
 
 import os
 import sys
-import logging
 
 # ------------------------------------
 # own python modules

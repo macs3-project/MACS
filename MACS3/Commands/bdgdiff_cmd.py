@@ -13,28 +13,24 @@ the distribution).
 
 import sys
 import os
-import logging
-
 from MACS3.IO import BedGraphIO
 from MACS3.Signal import ScoreTrack
 
 # ------------------------------------
 # constants
 # ------------------------------------
-logging.basicConfig(level=20,
-                    format='%(levelname)-5s @ %(asctime)s: %(message)s ',
-                    datefmt='%a, %d %b %Y %H:%M:%S',
-                    stream=sys.stderr,
-                    filemode="w"
-                    )
 
 # ------------------------------------
 # Misc functions
 # ------------------------------------
-error   = logging.critical		# function alias
-warn    = logging.warning
-debug   = logging.debug
-info    = logging.info
+import logging
+import MACS3.Utilities.Logger
+
+logger = logging.getLogger(__name__)
+debug   = logger.debug
+info    = logger.info
+error   = logger.critical
+warn    = logger.warning
 # ------------------------------------
 # Classes
 # ------------------------------------

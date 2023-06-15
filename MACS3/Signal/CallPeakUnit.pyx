@@ -16,11 +16,17 @@ the distribution).
 
 from collections import Counter
 from copy import copy
-import logging
 from time import time as ttime
 import _pickle as cPickle
 from tempfile import mkstemp
 import os
+
+import logging
+import MACS3.Utilities.Logger
+
+logger = logging.getLogger(__name__)
+debug   = logger.debug
+info    = logger.info
 # ------------------------------------
 # Other modules
 # ------------------------------------
@@ -627,7 +633,7 @@ cdef class CallerFromAlignments:
             float32_t * treat_value_ptr
             float32_t * ctrl_value_ptr
 
-        logging.debug ( "Start to calculate pvalue stat..." )
+        debug ( "Start to calculate pvalue stat..." )
 
         pscore_stat = {} #dict()
         for i in range( len( self.chromosomes ) ):
@@ -709,7 +715,7 @@ cdef class CallerFromAlignments:
             int32_t * pos_array_ptr # position array pointer
             float32_t * score_array_ptr # score array pointer
 
-        logging.debug ( "Start to calculate pvalue stat..." )
+        debug ( "Start to calculate pvalue stat..." )
 
         # tmplist contains a list of log pvalue cutoffs from 0.3 to 10
         tmplist = [round(x,5) for x in sorted( list(np.arange(0.3, 10.0, 0.3)), reverse = True )]
@@ -785,7 +791,7 @@ cdef class CallerFromAlignments:
                 pos_array_ptr += 1
                 score_array_ptr += 1
 
-        #logging.debug ( "make pscore_stat cost %.5f seconds" % t )
+        #debug ( "make pscore_stat cost %.5f seconds" % t )
 
         # add all pvalue cutoffs from cutoff-analysis part. So that we
         # can get the corresponding qvalues for them.
@@ -834,10 +840,10 @@ cdef class CallerFromAlignments:
                 x.append( cutoff )
                 y.append( self.pvalue_length[ cutoff ] )
         fhd.close()
-        logging.info( "#3 Analysis of cutoff vs num of peaks or total length has been saved in %s" % self.cutoff_analysis_filename )
-        #logging.info( "#3 Suggest a cutoff..." )
+        info( "#3 Analysis of cutoff vs num of peaks or total length has been saved in %s" % self.cutoff_analysis_filename )
+        #info( "#3 Suggest a cutoff..." )
         #optimal_cutoff, optimal_length = find_optimal_cutoff( x, y )
-        #logging.info( "#3 -10log10pvalue cutoff %.2f will call approximately %.0f bps regions as significant regions" % ( optimal_cutoff, optimal_length ) )
+        #info( "#3 -10log10pvalue cutoff %.2f will call approximately %.0f bps regions as significant regions" % ( optimal_cutoff, optimal_length ) )
         #print (list(pqtable.keys()))
         #print (list(self.pvalue_length.keys()))
         #print (list(self.pvalue_npeaks.keys()))
@@ -862,9 +868,9 @@ cdef class CallerFromAlignments:
 
         # prepare p-q table
         if len( self.pqtable ) == 0:
-            logging.info("#3 Pre-compute pvalue-qvalue table...")
+            info("#3 Pre-compute pvalue-qvalue table...")
             if cutoff_analysis:
-                logging.info("#3 Cutoff vs peaks called will be analyzed!")
+                info("#3 Cutoff vs peaks called will be analyzed!")
                 self.__pre_computes( max_gap = max_gap, min_length = min_length )
             else:
                 self.__cal_pvalue_qvalue_table()
@@ -875,16 +881,16 @@ cdef class CallerFromAlignments:
             self.bedGraph_treat_f = fopen( self.bedGraph_treat_filename, "w" )
             self.bedGraph_ctrl_f = fopen( self.bedGraph_control_filename, "w" )
 
-            logging.info ("#3 In the peak calling step, the following will be performed simultaneously:")
-            logging.info ("#3   Write bedGraph files for treatment pileup (after scaling if necessary)... %s" % self.bedGraph_filename_prefix.decode() + "_treat_pileup.bdg")
-            logging.info ("#3   Write bedGraph files for control lambda (after scaling if necessary)... %s" % self.bedGraph_filename_prefix.decode() + "_control_lambda.bdg")
+            info ("#3 In the peak calling step, the following will be performed simultaneously:")
+            info ("#3   Write bedGraph files for treatment pileup (after scaling if necessary)... %s" % self.bedGraph_filename_prefix.decode() + "_treat_pileup.bdg")
+            info ("#3   Write bedGraph files for control lambda (after scaling if necessary)... %s" % self.bedGraph_filename_prefix.decode() + "_control_lambda.bdg")
 
             if self.save_SPMR:
-                logging.info ( "#3   --SPMR is requested, so pileup will be normalized by sequencing depth in million reads." )
+                info ( "#3   --SPMR is requested, so pileup will be normalized by sequencing depth in million reads." )
             elif self.treat_scaling_factor == 1:
-                logging.info ( "#3   Pileup will be based on sequencing depth in treatment." )
+                info ( "#3   Pileup will be based on sequencing depth in treatment." )
             else:
-                logging.info ( "#3   Pileup will be based on sequencing depth in control." )
+                info ( "#3   Pileup will be based on sequencing depth in control." )
 
             if self.trackline:
                 # this line is REQUIRED by the wiggle format for UCSC browser
@@ -893,7 +899,7 @@ cdef class CallerFromAlignments:
                 tmp_bytes = ("track type=bedGraph name=\"control lambda\" description=\"control lambda after possible scaling for \'%s\'\"\n" % self.bedGraph_filename_prefix).encode()
                 fprintf( self.bedGraph_ctrl_f, tmp_bytes )
 
-        logging.info("#3 Call peaks for each chromosome...")
+        info("#3 Call peaks for each chromosome...")
         for chrom in self.chromosomes:
             # treat/control bedGraph will be saved if requested by user.
             self.__chrom_call_peak_using_certain_criteria ( peaks, chrom, scoring_function_symbols, score_cutoff_s, min_length, max_gap, call_summits, self.save_bedGraph )
@@ -1427,9 +1433,9 @@ cdef class CallerFromAlignments:
 
         # prepare p-q table
         if len( self.pqtable ) == 0:
-            logging.info("#3 Pre-compute pvalue-qvalue table...")
+            info("#3 Pre-compute pvalue-qvalue table...")
             if cutoff_analysis:
-                logging.info("#3 Cutoff value vs broad region calls will be analyzed!")
+                info("#3 Cutoff value vs broad region calls will be analyzed!")
                 self.__pre_computes( max_gap = lvl2_max_gap, min_length = min_length )
             else:
                 self.__cal_pvalue_qvalue_table()
@@ -1439,9 +1445,9 @@ cdef class CallerFromAlignments:
 
             self.bedGraph_treat_f = fopen( self.bedGraph_treat_filename, "w" )
             self.bedGraph_ctrl_f = fopen( self.bedGraph_control_filename, "w" )
-            logging.info ("#3 In the peak calling step, the following will be performed simultaneously:")
-            logging.info ("#3   Write bedGraph files for treatment pileup (after scaling if necessary)... %s" % self.bedGraph_filename_prefix.decode() + "_treat_pileup.bdg")
-            logging.info ("#3   Write bedGraph files for control lambda (after scaling if necessary)... %s" % self.bedGraph_filename_prefix.decode() + "_control_lambda.bdg")
+            info ("#3 In the peak calling step, the following will be performed simultaneously:")
+            info ("#3   Write bedGraph files for treatment pileup (after scaling if necessary)... %s" % self.bedGraph_filename_prefix.decode() + "_treat_pileup.bdg")
+            info ("#3   Write bedGraph files for control lambda (after scaling if necessary)... %s" % self.bedGraph_filename_prefix.decode() + "_control_lambda.bdg")
 
             if self.trackline:
                 # this line is REQUIRED by the wiggle format for UCSC browser
@@ -1451,7 +1457,7 @@ cdef class CallerFromAlignments:
                 fprintf( self.bedGraph_ctrl_f, tmp_bytes )
 
 
-        logging.info("#3 Call peaks for each chromosome...")
+        info("#3 Call peaks for each chromosome...")
         for chrom in self.chromosomes:
             self.__chrom_call_broadpeak_using_certain_criteria ( lvl1peaks, lvl2peaks, chrom, scoring_function_symbols, lvl1_cutoff_s, lvl2_cutoff_s, min_length, lvl1_max_gap, lvl2_max_gap, self.save_bedGraph )
 

@@ -13,8 +13,6 @@ the distribution).
 # ------------------------------------
 # python modules
 # ------------------------------------
-import logging
-from logging import info, debug
 import struct
 from struct import unpack
 import gzip

@@ -119,7 +119,7 @@ def prepare_argparser ():
     # top-level parser
     argparser = ap.ArgumentParser( description = description, epilog = epilog ) #, usage = usage )
     argparser.add_argument("--version", action="version", version="%(prog)s "+MACS_VERSION)
-    subparsers = argparser.add_subparsers( dest = 'subcommand' ) #help="sub-command help")
+    subparsers = argparser.add_subparsers( dest = 'subcommand' )
     subparsers.required = True
 
     # command for 'callpeak'

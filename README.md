@@ -43,6 +43,11 @@ add more new features in the future.**
 
 	1) HMMRATAC module fixes
     
+       Cutoff analysis function added
+       Description regarding it has been added
+    
+    2) Memory monitoring in the runtime message
+    
     
 ## Install
 

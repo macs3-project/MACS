@@ -12,7 +12,6 @@ the distribution).
 # ------------------------------------
 # python modules
 # ------------------------------------
-import logging
 #from array import array
 from cpython cimport array
 from array import array as pyarray
