@@ -1,17 +1,21 @@
 # INSTALL Guide For MACS3
-Time-stamp: <2020-12-05 16:35:26 Tao Liu>
+Time-stamp: <2023-06-16 11:46:32 Tao Liu>
 
 Please check the following instructions to complete your installation.
 
 ## Prerequisites
 
+Here we list some prerequisites for installing and running MACS3. But
+if you are using conda or pip to install, the installer will check the
+dependencies and install them if necessary.
+
 ### Python3
 
 MACS v3.x.x requires Python3. We have tested MACS in Python3.8 to 3.11. 
 
-### NumPy
+### NumPy, hmmlearn
 
-MACS also requires [Numpy](http://www.scipy.org/Download) (>=1.17).
+MACS requires NumPy>=1.24 and hmmlearn>=0.3 during installation.
 
 ### Cython
 
@@ -61,12 +65,16 @@ Then activate it by
 
 `$ source MyPythonEnv/bin/activate`
 
+If you use 'conda', it will also provide virtual environment. Please 
+read: [conda](https://docs.conda.io/projects/conda/en/latest/user-guide/getting-started.html) or [miniconda](https://docs.conda.io/en/latest/miniconda.html)
+
 ## Install through PyPI
 
 The easiest way to install MACS is through PyPI system. Get `pip` if
 it's not available in your system. If you create a virtual environment
 as described before, your `pip` command will install everything under
-the folder you specified previously through `python3 -m env` command.
+the folder you specified previously through `python3 -m env` command,
+or to your active conda environment. 
 
 Then under the command line, type `pip install macs3`. PyPI will
 install Numpy automatically if it is absent.
@@ -75,26 +83,23 @@ To upgrade MACS3, type `pip install --upgrade macs3`. It will check
 currently installed MACS3, compare the version with the one on PyPI
 repository, download and install a newer version while necessary.
 
-If you plan to install MACS in your own user directory, use `pip
-install macs3 --user`.
-
 ## Install from source
 
-MACS uses Python's [setuptools](https://setuptools.readthedocs.io) for
-source code installations. To install a source distribution of MACS,
-unpack the distribution tarball, or clone Git repository with `git
-clone --recurse-submodules git@github.com:taoliu/MACS.git`. Go to the directory where you
-unpacked MACS, and simply run the install command:
+MACS uses `pip` for source code installations. To install a source 
+distribution of MACS, unpack the distribution tarball, or clone Git 
+repository with `git clone --recurse-submodules git@github.com:taoliu/MACS.git`. 
+Go to the directory where you cloned MACS from github, and simply
+run the install command:
 
  `$ pip install .`
 
 By default, the script will install python library and executable
 codes according to the environment. When you run the command under
-virtualenv, the script will install to the virtual environment
-instead. When you run it without virtual environment, you may need to
-be root or administrator of the machine so as to complete the
-installation. Please contact the system administrator if you want
-their help. 
+virtualenv or conda environment, the script will install to the virtual
+environment instead. When you run it without virtual environment, 
+you may need to be root or administrator of the machine so as to 
+complete the installation. Please contact the system administrator
+if you want their help. 
 
 ## Configure environment variables
 
