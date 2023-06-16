@@ -28,7 +28,7 @@ applied to any "DNA enrichment assays" if the question to be asked is
 simply: *where we can find significant reads coverage than the random
 background*.
 
-**Please note that current MACS3 is still in alpha stage. However, we
+**Please note that current MACS3 is still in beta stage. However, we
 utilize Github Action to implement the CI (Continous Integration) to
 make sure that the main branch passes unit testing on certain
 functions and subcommands to reproduce the correct outputs. We will
@@ -37,7 +37,7 @@ add more new features in the future.**
 ## Recent Changes for MACS (3.0.0b2)
 
 ### 3.0.0b2
-        The second beta version of MACS3, with HMMRATAC feature recently added.
+    The second beta version of MACS3, with HMMRATAC feature refined.
 	   
 	* New features from beta1:
 
@@ -47,7 +47,6 @@ add more new features in the future.**
        Description regarding it has been added
     
     2) Memory monitoring in the runtime message
-    
     
 ## Install
 
@@ -79,7 +78,7 @@ Example for peak calling on ATAC-seq (paired-end mode):
 
 `macs3 callpeak -f BAMPE -t ATAC.bam -g hs -n test -B -q 0.01`
 
-There are currently twelve functions available in MAC3 serving as
+There are currently 14 functions available in MACS3 serving as
 sub-commands. Please click on the link to see the detail description
 of the subcommands.
 
