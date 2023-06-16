@@ -748,13 +748,12 @@ def add_hmmratac_parser( subparsers ):
                                                 help="Dedicated peak calling based on Hidden Markov Model for ATAC-seq data.",
                                                 epilog = """HMMRATAC is a dedicated tool for processing ATAC-seq data
 
-HMMRATAC, first released as a JAVA program in 2018, is a dedicated
-tool specifically designed for processing ATAC-seq data. In its
-current version, it has been integrated as a subcommand (`hmmratac`)
-in MACS3. Reimagined and rewritten in Python and Cython, this tool's
-functionality might vary from its JAVA version. The core principle of
-HMMRATAC involves utilizing the Hidden Markov Model to learn the
-nucleosome structure around open chromatin regions.
+HMMRATAC, first released as a JAVA program in 2018, is a dedicated tool
+specifically designed for processing ATAC-seq data. In MACS3, it has been
+integrated as a subcommand (`hmmratac`). Reimagined and rewritten in Python
+and Cython, this tool's functionality might vary from its JAVA version. The 
+core principle of HMMRATAC involves utilizing the Hidden Markov Model to learn
+the nucleosome structure around open chromatin regions.
 
 Here's an example of how to run the `hmmratac` command:
 
@@ -795,15 +794,15 @@ decide on the optimal `-l`, `-u`, and `-c`.
 
 The report consists of four columns:
 
-1. Score: the possible fold change cutoff value.
-2. npeaks: the number of peaks.
+1. score: the possible fold change cutoff value.
+2. npeaks: the number of peaks under this cutoff.
 3. lpeaks: the total length of all peaks.
 4. avelpeak: the average length of peaks.
 
 While there's no universal rule, here are a few suggestions:
 
 - The lower cutoff should be the cutoff in the report that captures a
-  moderate number (about 10k) of peaks with a normal width (average
+  moderate number (about 10k-30k) of peaks with a normal width (average
   length 500-1000bps long).
 - The upper cutoff should capture some (typically hundreds of)
   extremely high enrichment and unusually wide peaks in the
@@ -813,7 +812,65 @@ While there's no universal rule, here are a few suggestions:
   the report that can capture a large number of potential peaks with a
   normal length (average length 500-1000bps). However, it's
   recommended not to use the lowest cutoff value in the report as this
-  may include too much noise from the genome.  
+  may include too much noise from the genome.
+  
+* Tune the HMM model *
+
+It's highly recommended to check the runtime message of the HMM model
+after training. An example is like this:
+
+```
+#4 Train Hidden Markov Model with Multivariate Gaussian Emission
+#  Extract signals in training regions with bin size of 10
+#  Use Baum-Welch algorithm to train the HMM
+#   HMM converged: True
+#  Write HMM parameters into JSON: test_model.json
+#  The Hidden Markov Model for signals of binsize of 10 basepairs:
+#   open state index: state2
+#   nucleosomal state index: state1
+#   background state index: state0
+#   Starting probabilities of states:
+#                            bg        nuc       open
+#                        0.7994     0.1312    0.06942
+#   HMM Transition probabilities:
+#                            bg        nuc       open
+#               bg->     0.9842    0.01202   0.003759
+#              nuc->    0.03093     0.9562    0.01287
+#             open->   0.007891    0.01038     0.9817
+#   HMM Emissions (mean):
+#                         short       mono         di        tri
+#               bg:      0.2551      1.526     0.4646    0.07071
+#              nuc:       6.538      17.94      3.422    0.05819
+#             open:       5.016      17.47      6.897      2.121
+```
+
+In MACS3, we 'guess' which hidden state is for the open region, which is 
+the nucleosomal region, and which is the background. We compute from the
+HMM Emission matrix to pick the state with the highest sum of mean 
+signals as the open state, the lowest as the backgound state, then the 
+rest is the nucleosomal state. However it may not work in every case. In
+the above example, it may be tricky to call the second row as 'nuc' and 
+the third as 'open'. If the users want to exchange the state assignments 
+of the 'nuc' and 'open', they can modify the state assignment in the HMM
+model file (e.g. test_model.json). For the above example, the model.json
+looks like this (we skipped some detail):
+
+```
+{"startprob": [...], "transmat": [...], "means": [...], "covars": [...], 
+"covariance_type": "full", "n_features": 4, 
+"i_open_region": 2, "i_background_region": 0, "i_nucleosomal_region": 1,
+"hmm_binsize": 10}
+```
+
+We can modify the assignment of:
+`"i_open_region": 2, "i_background_region": 0, "i_nucleosomal_region": 1,`
+by assigning `1` to open, and `2` to nucleosomal as:
+`"i_open_region": 1, "i_background_region": 0, "i_nucleosomal_region": 2,`
+Then save the HMM in a new model file such as `new_model.json`. 
+
+Then next, we can re-run `macs3 hmmratac` with the same parameters plus an
+extra option for the HMM model file like `macs3 hmmratac --model new_model.json`
+
 """)
     
     # group for input files
