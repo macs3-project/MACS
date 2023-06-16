@@ -297,17 +297,18 @@ def add_callpeak_parser( subparsers ):
     group_postprocessing.add_argument( "--fe-cutoff", dest="fecutoff", type=float, default = 1.0,
                                        help = "When set, the value will be used as the minimum requirement to filter out peaks with low fold-enrichment. Note, MACS3 adds one as pseudocount while calculating fold-enrichment. By default, it is set as 1 so there is no filtering. DEFAULT: 1.0")
 
+    # obsolete options
+    group_obsolete = argparser_callpeak.add_argument_group( "Obsolete options" )
+    group_obsolete.add_argument( "--to-large", dest = "tolarge", action = "store_true", default = False,
+                                 help = "Obsolete option. Please use '--scale-to large' instead." )
+    group_obsolete.add_argument( "--ratio", dest = "ratio", type = float, default = 1.0,
+                                 help = "Obsolete option. Originally designed to normalize treatment and control with customized ratio, now it won't have any effect." )
+
     # other options
     group_other = argparser_callpeak.add_argument_group( "Other options" )
     group_other.add_argument( "--buffer-size", dest = "buffer_size", type = int, default = "100000",
                                   help = "Buffer size for incrementally increasing internal array size to store reads alignment information. In most cases, you don't have to change this parameter. However, if there are large number of chromosomes/contigs/scaffolds in your alignment, it's recommended to specify a smaller buffer size in order to decrease memory usage (but it will take longer time to read alignment files). Minimum memory requested for reading an alignment file is about # of CHROMOSOME * BUFFER_SIZE * 8 Bytes. DEFAULT: 100000 " )
 
-    # obsolete options
-    group_obsolete = argparser_callpeak.add_argument_group( "Obsolete options" )
-    group_obsolete.add_argument( "--to-large", dest = "tolarge", action = "store_true", default = False,
-                                     help = "Obsolete option. Please use '--scale-to large' instead." )
-    group_obsolete.add_argument( "--ratio", dest = "ratio", type = float, default = 1.0,
-                                     help = "Obsolete option. Originally designed to normalize treatment and control with customized ratio, now it won't have any effect." )
     return
 
 def add_diffpeak_parser( subparsers ):
@@ -420,6 +421,8 @@ def add_bdgpeakcall_parser( subparsers ):
                                         help = "While set, bdgpeakcall will analyze number or total length of peaks that can be called by different cutoff then output a summary table to help user decide a better cutoff. Note, minlen and maxgap may affect the results. DEFAULT: False", default = False )
     argparser_bdgpeakcall.add_argument("--no-trackline", dest="trackline", action="store_false", default=True,
                          help="Tells MACS not to include trackline with bedGraph files. The trackline is required by UCSC.")
+    argparser_bdgpeakcall.add_argument( "--verbose", dest = "verbose", type = int, default = 2,
+                                        help = "Set verbose level of runtime message. 0: only show critical message, 1: show additional warning message, 2: show process information, 3: show debug messages. DEFAULT:2" )
 
     add_outdir_option( argparser_bdgpeakcall )
     add_output_group( argparser_bdgpeakcall )
@@ -446,6 +449,8 @@ def add_bdgbroadcall_parser( subparsers ):
                                          help = "maximum linking between significant peaks, better to set it as 4 times of d value. DEFAULT: 800", default = 800)
     argparser_bdgbroadcall.add_argument("--no-trackline", dest="trackline", action="store_false", default=True,
                                          help="Tells MACS not to include trackline with bedGraph files. The trackline is required by UCSC.")
+    argparser_bdgbroadcall.add_argument( "--verbose", dest = "verbose", type = int, default = 2,
+                                         help = "Set verbose level of runtime message. 0: only show critical message, 1: show additional warning message, 2: show process information, 3: show debug messages. DEFAULT:2" )
     add_outdir_option( argparser_bdgbroadcall )
     add_output_group( argparser_bdgbroadcall )
     return
@@ -467,6 +472,8 @@ def add_bdgcmp_parser( subparsers ):
     argparser_bdgcmp.add_argument( "-m", "--method", dest = "method", type = str, nargs = "+",
                                    choices = ( "ppois", "qpois", "subtract", "logFE", "FE", "logLR", "slogLR", "max" ),
                                    help = "Method to use while calculating a score in any bin by comparing treatment value and control value. Available choices are: ppois, qpois, subtract, logFE, logLR, and slogLR. They represent Poisson Pvalue (-log10(pvalue) form) using control as lambda and treatment as observation, q-value through a BH process for poisson pvalues, subtraction from treatment, linear scale fold enrichment, log10 fold enrichment(need to set pseudocount), log10 likelihood between ChIP-enriched model and open chromatin model(need to set pseudocount), symmetric log10 likelihood between two ChIP-enrichment models, or maximum value between the two tracks. Default option is ppois.",default="ppois")
+    argparser_bdgcmp.add_argument( "--verbose", dest = "verbose", type = int, default = 2,
+                                   help = "Set verbose level of runtime message. 0: only show critical message, 1: show additional warning message, 2: show process information, 3: show debug messages. DEFAULT:2" )
 
     add_outdir_option( argparser_bdgcmp )
     output_group = argparser_bdgcmp.add_mutually_exclusive_group( required = True )
@@ -491,6 +498,8 @@ def add_bdgopt_parser( subparsers ):
     add_outdir_option( argparser_bdgopt )
     argparser_bdgopt.add_argument( "-o", "--ofile", dest = "ofile", type = str,
                                    help = "Output BEDGraph filename.", required = True )
+    argparser_bdgopt.add_argument( "--verbose", dest = "verbose", type = int, default = 2,
+                                   help = "Set verbose level of runtime message. 0: only show critical message, 1: show additional warning message, 2: show process information, 3: show debug messages. DEFAULT:2" )
     return
 
 def add_cmbreps_parser( subparsers ):
@@ -508,6 +517,8 @@ def add_cmbreps_parser( subparsers ):
     add_outdir_option( argparser_cmbreps )
     argparser_cmbreps.add_argument( "-o", "--ofile", dest = "ofile", type = str, required = True,
                                     help = "Output BEDGraph filename for combined scores." )
+    argparser_cmbreps.add_argument( "--verbose", dest = "verbose", type = int, default = 2,
+                                    help = "Set verbose level of runtime message. 0: only show critical message, 1: show additional warning message, 2: show process information, 3: show debug messages. DEFAULT:2" )
     return
 
 def add_randsample_parser( subparsers ):
@@ -561,7 +572,9 @@ def add_bdgdiff_parser( subparsers ):
                                     help = "Sequencing depth (# of non-redundant reads in million) for condition 1. It will be used together with --d2. See description for --d2 below for how to assign them. Default: 1" )
     argparser_bdgdiff.add_argument( "--d2", "--depth2", dest = "depth2", type = float, default = 1.0,
                                     help = "Sequencing depth (# of non-redundant reads in million) for condition 2. It will be used together with --d1. DEPTH1 and DEPTH2 will be used to calculate scaling factor for each sample, to down-scale larger sample to the level of smaller one. For example, while comparing 10 million condition 1 and 20 million condition 2, use --d1 10 --d2 20, then pileup value in bedGraph for condition 2 will be divided by 2. Default: 1" )
-
+    argparser_bdgdiff.add_argument( "--verbose", dest = "verbose", type = int, default = 2,
+                                    help = "Set verbose level of runtime message. 0: only show critical message, 1: show additional warning message, 2: show process information, 3: show debug messages. DEFAULT:2" )
+    
     add_outdir_option( argparser_bdgdiff )
     output_group = argparser_bdgdiff.add_mutually_exclusive_group( required = True )
     output_group.add_argument( "--o-prefix", dest = "oprefix", type = str,
@@ -654,7 +667,7 @@ def add_pileup_parser( subparsers ):
                                    help = "Buffer size for incrementally increasing internal array size to store reads alignment information. In most cases, you don't have to change this parameter. However, if there are large number of chromosomes/contigs/scaffolds in your alignment, it's recommended to specify a smaller buffer size in order to decrease memory usage (but it will take longer time to read alignment files). Minimum memory requested for reading an alignment file is about # of CHROMOSOME * BUFFER_SIZE * 8 Bytes. DEFAULT: 100000 " )
 
     argparser_pileup.add_argument( "--verbose", dest = "verbose", type = int, default = 2,
-                                      help = "Set verbose level. 0: only show critical message, 1: show additional warning message, 2: show process information, 3: show debug messages. If you want to know where are the duplicate reads, use 3. DEFAULT:2" )
+                                   help = "Set verbose level. 0: only show critical message, 1: show additional warning message, 2: show process information, 3: show debug messages. If you want to know where are the duplicate reads, use 3. DEFAULT:2" )
     return
 
 def add_callvar_parser( subparsers ):
