@@ -12,14 +12,14 @@ jobs:
     strategy:
       matrix:
         include:
-          #- arch: armv7 # scipy installation issue
-          #  distro: bullseye
           - arch: aarch64
+            distro: bullseye        
+          - arch: armv7 # scipy installation issue before, let's retest...
             distro: bullseye
-          #- arch: ppc64le
-          #  distro: bullseye
-          #- arch: s390x # let's skip s390x for now since scipy can'tbe installed
-          #  distro: bullseye
+          - arch: ppc64le
+            distro: bullseye
+          - arch: s390x # scipy installation issue before, let's retest...
+            distro: bullseye
     steps:
       - name: Checkout MACS
         uses: actions/checkout@v3
@@ -57,7 +57,7 @@ jobs:
             apt-get update -qq -y
             apt-get install apt-utils
             apt-get install -yq libblas3 liblapack3 libblas-dev liblapack-dev
-            apt-get install -yq python3 python3-pip python3-wheel
+            apt-get install -yq python3 python3-pip python3-wheel python3-scipy
             apt-get install -yq procps zlib1g zlib1g-dev gfortran
           run: |
             echo `uname -a`
