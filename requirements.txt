@@ -1,5 +1,5 @@
 Cython>=0.29
-numpy>=1.24
+numpy>=1.19
 hmmlearn>=0.3
 cykhash>=2.0 
 pytest>=7.0

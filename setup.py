@@ -31,13 +31,12 @@ classifiers =[\
               'Operating System :: POSIX',
               'Operating System :: Unix',
               'Topic :: Scientific/Engineering :: Bio-Informatics',
-              'Programming Language :: Python :: 3.8',
               'Programming Language :: Python :: 3.9',
               'Programming Language :: Python :: 3.10',
               'Programming Language :: Python :: 3.11',
               'Programming Language :: Cython', ]
 
-install_requires = [ "numpy>=1.24",
+install_requires = [ "numpy>=1.19",
                      "hmmlearn>=0.3",
                      "cykhash>=2.0",
                      "Cython>=0.29" ]
@@ -149,7 +148,7 @@ def main():
            install_requires = install_requires,
            setup_requires = install_requires,
            tests_require = tests_requires,
-           python_requires = '>=3.8',
+           python_requires = '>=3.9',
            ext_modules=cythonize( ext_modules ) ),
 #                                  compiler_directives={'linetrace': True, 'binding': True}) )
 
