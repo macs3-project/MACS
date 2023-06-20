@@ -64,7 +64,7 @@ jobs:
             cd /home/macs3/
             
             # create virtualenv and activate it
-            virtualenv macs3test
+            virtualenv --system-site-packages macs3test
             source macs3test/bin/activate
             
             # copy source code over
