@@ -57,9 +57,8 @@ jobs:
             apt-get update -qq -y
             apt-get install apt-utils
             apt-get install -yq libblas3 liblapack3 libblas-dev liblapack-dev
-            apt-get install -yq python3 python3-pip python3-wheel python3-numpy python3-scipy python3-sklearn
+            apt-get install -yq python3 python3-pip python3-virtualenv python3-wheel python3-numpy python3-scipy python3-sklearn
             apt-get install -yq procps zlib1g zlib1g-dev gfortran
-            apt install python3-virtualenv
           run: |
             echo `uname -a`
             cd /home/macs3/
