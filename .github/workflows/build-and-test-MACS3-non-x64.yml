@@ -66,8 +66,7 @@ jobs:
             cd MACS3
             export PATH="/home/macs3/.local/bin:${PATH}"
             pip3 install --no-cache-dir --user --upgrade pip
-            pip3 install --user -r requirements.txt --no-cache-dir # I turned off --upgrade to see if bullseye packages work
-            pip3 install --user .  --no-cache-dir
+            pip3 install --user -r requirements.txt --no-cache-dir . # I turned off --upgrade to see if bullseye packages work
             # run test
             pytest --runxfail && cd test && ./cmdlinetest macs3
 
