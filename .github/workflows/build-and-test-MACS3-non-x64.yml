@@ -59,14 +59,23 @@ jobs:
             apt-get install -yq libblas3 liblapack3 libblas-dev liblapack-dev
             apt-get install -yq python3 python3-pip python3-wheel python3-numpy python3-scipy python3-sklearn
             apt-get install -yq procps zlib1g zlib1g-dev gfortran
+            apt install python3-virtualenv
           run: |
             echo `uname -a`
             cd /home/macs3/
+            
+            # create virtualenv and activate it
+            virtualenv macs3test
+            source macs3test/bin/activate
+            
+            # copy source code over
             cp -r /MACS3 .
             cd MACS3
-            export PATH="/home/macs3/.local/bin:${PATH}"
+            
+            # install dependencies then MACS3
             pip3 install --no-cache-dir --user --upgrade pip
             pip3 install --user -r requirements.txt --ignore-installed --no-cache-dir . 
+            
             # run test
             pytest --runxfail && cd test && ./cmdlinetest macs3
 
