@@ -68,6 +68,9 @@ jobs:
             cd MACS3
             
             # pipenv
+            export LANG=en_US.UTF-8
+            export SHELL=bash
+            
             pipenv --site-packages --three shell
 
             # I want to check scipy version...
