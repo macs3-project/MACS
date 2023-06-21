@@ -72,7 +72,7 @@ jobs:
             cd MACS3
             
             # I want to check scipy version...
-            python -c "try: import scipy; print('scipy is installed, version:', scipy.__version__) except ImportError: print('scipy is not installed')"
+            python3 -c "import scipy; print(scipy.__version__)"
             
             # install dependencies then MACS3
             pip3 install --no-cache-dir --upgrade pip
