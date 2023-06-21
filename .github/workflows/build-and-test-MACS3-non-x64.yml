@@ -69,7 +69,7 @@ jobs:
             
             # pipenv
             export LANG=en_US.UTF-8
-            export SHELL=bash
+            export SHELL=/bin/bash
             
             pipenv --site-packages --three shell
 
