@@ -57,7 +57,7 @@ jobs:
             apt-get update -qq -y
             apt-get install apt-utils
             apt-get install -yq libblas3 liblapack3 libblas-dev liblapack-dev
-            apt-get install -yq python3 python3-pip python3-virtualenv python3-wheel python3-numpy python3-scipy python3-sklearn
+            apt-get install -yq python3 python3-pip python3-virtualenv python3-wheel python3-numpy python3-scipy python3-sklearn cython3 
             apt-get install -yq procps zlib1g zlib1g-dev gfortran
           run: |
             echo `uname -a`
@@ -76,6 +76,10 @@ jobs:
             
             # upgrade pip            
             pip install --progress-bar off --upgrade pip
+            
+            # install dependencies that are not in Debian/Linux
+            pip install --upgrade-strategy only-if-needed --progress-bar off hmmlearn
+            pip install --upgrade-strategy only-if-needed --progress-bar off cykhash
             
             # install MACS3; only-if-needed won't try to upgrade Debian/Linux python3 libs
             pip install --upgrade-strategy only-if-needed --no-build-isolation --progress-bar off . 
