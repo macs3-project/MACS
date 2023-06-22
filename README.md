@@ -48,6 +48,8 @@ add more new features in the future.**
     
     2) Memory monitoring in the runtime message
     
+    3) testing for s390x, armv7 and power64le is back
+    
 ## Install
 
 The common way to install MACS is through
