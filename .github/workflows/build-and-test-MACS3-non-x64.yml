@@ -80,6 +80,8 @@ jobs:
             # install dependencies that are not in Debian/Linux
             pip install --upgrade-strategy only-if-needed --progress-bar off hmmlearn
             pip install --upgrade-strategy only-if-needed --progress-bar off cykhash
+            pip install --upgrade-strategy only-if-needed --progress-bar off pytest
+
             
             # install MACS3; only-if-needed won't try to upgrade Debian/Linux python3 libs
             pip install --upgrade-strategy only-if-needed --no-build-isolation --progress-bar off . 
