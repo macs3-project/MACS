@@ -18,8 +18,8 @@ jobs:
             distro: bullseye
           - arch: ppc64le
             distro: bullseye
-          #- arch: s390x # scipy installation issue before, let's retest...
-          #  distro: bullseye
+          - arch: s390x # scipy installation issue before, let's retest...
+            distro: bullseye
     steps:
       - name: Checkout MACS
         uses: actions/checkout@v3
@@ -78,7 +78,7 @@ jobs:
             pip install --progress-bar off --upgrade pip
             
             # install MACS3; only-if-needed won't try to upgrade Debian/Linux python3 libs
-            pip install --upgrade-strategy only-if-needed --progress-bar off . 
+            pip install --upgrade-strategy only-if-needed --no-build-isolation --progress-bar off . 
             
             # run test
             pytest --runxfail && cd test && ./cmdlinetest macs3
