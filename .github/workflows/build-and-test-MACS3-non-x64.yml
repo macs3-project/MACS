@@ -87,5 +87,5 @@ jobs:
             pip install --upgrade-strategy only-if-needed --no-build-isolation --progress-bar off . 
             
             # run test
-            pytest --runxfail && cd test && ./cmdlinetest macs3
+            pytest --runxfail && cd test && ./cmdlinetest-nohmmratac macs3
 

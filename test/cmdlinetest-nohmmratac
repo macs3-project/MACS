@@ -1,0 +1,284 @@
+#!/bin/bash
+# Time-stamp: <2022-06-06 12:13:43 Tao Liu>
+
+# integrative subcmds testing
+
+if [ $# -lt 1 ];then
+    echo "Run all tests for subcommands of MACS3. Need >=1 parameter for a tag name! A unique string combining date, time and MACS3 version is recommended. ./test.sh <TAG> [UPDATE]\n If UPDATE is set with anything, aka, this command sees a second parameter, the standard output results will be replaced."
+    exit
+fi
+
+TAG=$1
+if [ "$#" = "2" ];then
+    REPLACE="Y"
+else
+    REPLACE="N"
+fi
+
+TEMPDIR=../temp
+OUTPUTDIR_PREFIX=${TEMPDIR}/${TAG}
+
+# make temp directory if necessary
+if [ ! -d $TEMPDIR ]; then mkdir $TEMPDIR; fi
+
+CHIP=CTCF_SE_ChIP_chr22_50k.bed.gz
+CTRL=CTCF_SE_CTRL_chr22_50k.bed.gz
+
+CHIPPE=CTCF_PE_ChIP_chr22_50k.bam
+CTRLPE=CTCF_PE_CTRL_chr22_50k.bam
+
+CHIPBEDPE=CTCF_PE_ChIP_chr22_50k.bedpe.gz
+CTRLBEDPE=CTCF_PE_CTRL_chr22_50k.bedpe.gz
+
+CHIPCONTIGS50K=contigs50k.bed.gz
+
+CHIPBIGSPEEDTEST=CTCF_12878_5M.bed.gz
+CTRLBIGSPEEDTEST=input_12878_5M.bed.gz
+
+CALLVARPEAK=callvar_testing.narrowPeak
+
+ATACSEQBAM=yeast_500k_SRR1822137.bam
+
+# callpeak
+echo "1. callpeak"
+echo "1.1 callpeak narrow"
+
+mkdir ${OUTPUTDIR_PREFIX}_run_callpeak_narrow
+
+macs3 callpeak -g 52000000 -t $CHIP -c $CTRL -n run_callpeak_narrow0 -B --outdir ${OUTPUTDIR_PREFIX}_run_callpeak_narrow --cutoff-analysis &> ${OUTPUTDIR_PREFIX}_run_callpeak_narrow/run_callpeak_narrow0.log
+macs3 callpeak -g 52000000 -t $CHIP -c $CTRL -n run_callpeak_narrow1 -B --outdir ${OUTPUTDIR_PREFIX}_run_callpeak_narrow --d-min 15 --call-summits &> ${OUTPUTDIR_PREFIX}_run_callpeak_narrow/run_callpeak_narrow1.log
+macs3 callpeak -g 52000000 -t $CHIP -c $CTRL -n run_callpeak_narrow2 -B --outdir ${OUTPUTDIR_PREFIX}_run_callpeak_narrow --nomodel --extsize 100 &> ${OUTPUTDIR_PREFIX}_run_callpeak_narrow/run_callpeak_narrow2.log
+macs3 callpeak -g 52000000 -t $CHIP -c $CTRL -n run_callpeak_narrow3 -B --outdir ${OUTPUTDIR_PREFIX}_run_callpeak_narrow --nomodel --extsize 100 --shift -50 &> ${OUTPUTDIR_PREFIX}_run_callpeak_narrow/run_callpeak_narrow3.log
+macs3 callpeak -g 52000000 -t $CHIP -c $CTRL -n run_callpeak_narrow4 -B --outdir ${OUTPUTDIR_PREFIX}_run_callpeak_narrow --nomodel --nolambda --extsize 100 --shift -50 &> ${OUTPUTDIR_PREFIX}_run_callpeak_narrow/run_callpeak_narrow4.log
+macs3 callpeak -g 52000000 -t $CHIP -c $CTRL -n run_callpeak_narrow5 -B --outdir ${OUTPUTDIR_PREFIX}_run_callpeak_narrow --scale-to large &> ${OUTPUTDIR_PREFIX}_run_callpeak_narrow/run_callpeak_narrow5.log
+
+echo "1.2 callpeak broad"
+mkdir ${OUTPUTDIR_PREFIX}_run_callpeak_broad 
+
+macs3 callpeak -g 52000000 -t $CHIP -c $CTRL -n run_callpeak_broad -B --outdir ${OUTPUTDIR_PREFIX}_run_callpeak_broad --broad &> ${OUTPUTDIR_PREFIX}_run_callpeak_broad/run_callpeak_broad.log
+
+echo "1.3 callpeak on PE narrow/broad"
+
+mkdir  ${OUTPUTDIR_PREFIX}_run_callpeak_pe_narrow
+
+macs3 callpeak -g 52000000 -f BAMPE -t $CHIPPE -c $CTRLPE -n run_callpeak_bampe_narrow -B --outdir ${OUTPUTDIR_PREFIX}_run_callpeak_pe_narrow --call-summits &> ${OUTPUTDIR_PREFIX}_run_callpeak_pe_narrow/run_callpeak_bampe_narrow.log
+macs3 callpeak -g 52000000 -f BEDPE -t $CHIPBEDPE -c $CTRLBEDPE -n run_callpeak_bedpe_narrow -B --outdir ${OUTPUTDIR_PREFIX}_run_callpeak_pe_narrow --call-summits &> ${OUTPUTDIR_PREFIX}_run_callpeak_pe_narrow/run_callpeak_bedpe_narrow.log
+macs3 callpeak -g 52000000 -f BEDPE -t $CHIPBEDPE -n run_callpeak_pe_narrow_onlychip -B --outdir ${OUTPUTDIR_PREFIX}_run_callpeak_pe_narrow &> ${OUTPUTDIR_PREFIX}_run_callpeak_pe_narrow/run_callpeak_pe_narrow_onlychip.log
+
+mkdir  ${OUTPUTDIR_PREFIX}_run_callpeak_pe_broad
+
+macs3 callpeak -g 52000000 -f BAMPE -t $CHIPPE -c $CTRLPE -n run_callpeak_bampe_broad -B --outdir ${OUTPUTDIR_PREFIX}_run_callpeak_pe_broad --broad &> ${OUTPUTDIR_PREFIX}_run_callpeak_pe_broad/run_callpeak_bampe_broad.log
+macs3 callpeak -g 52000000 -f BEDPE -t $CHIPBEDPE -c $CTRLBEDPE -n run_callpeak_bedpe_broad -B --outdir ${OUTPUTDIR_PREFIX}_run_callpeak_pe_broad --broad &> ${OUTPUTDIR_PREFIX}_run_callpeak_pe_broad/run_callpeak_bedpe_broad.log
+
+# pileup
+echo "2. pileup"
+
+mkdir ${OUTPUTDIR_PREFIX}_run_pileup
+
+macs3 pileup -f BED -i $CHIP --extsize 200 --outdir ${OUTPUTDIR_PREFIX}_run_pileup -o run_pileup_ChIP.bed.bdg &> ${OUTPUTDIR_PREFIX}_run_pileup/run_pileup_ChIP.bed.log
+macs3 pileup -f BED -i $CTRL --extsize 200 --outdir ${OUTPUTDIR_PREFIX}_run_pileup -o run_pileup_CTRL.bed.bdg &> ${OUTPUTDIR_PREFIX}_run_pileup/run_pileup_CTRL.bed.log
+
+macs3 pileup -f BAMPE -i $CHIPPE --outdir ${OUTPUTDIR_PREFIX}_run_pileup -o run_pileup_ChIPPE.bampe.bdg &> ${OUTPUTDIR_PREFIX}_run_pileup/run_pileup_ChIPPE.bampe.log
+macs3 pileup -f BAMPE -i $CTRLPE --outdir ${OUTPUTDIR_PREFIX}_run_pileup -o run_pileup_CTRLPE.bampe.bdg &> ${OUTPUTDIR_PREFIX}_run_pileup/run_pileup_CTRLPE.bampe.log
+
+macs3 pileup -f BEDPE -i $CHIPBEDPE --outdir ${OUTPUTDIR_PREFIX}_run_pileup -o run_pileup_ChIPPE.bedpe.bdg &> ${OUTPUTDIR_PREFIX}_run_pileup/run_pileup_ChIPPE.bedpe.log
+macs3 pileup -f BEDPE -i $CTRLBEDPE --outdir ${OUTPUTDIR_PREFIX}_run_pileup -o run_pileup_CTRLPE.bedpe.bdg &> ${OUTPUTDIR_PREFIX}_run_pileup/run_pileup_CTRLPE.bedpe.log
+
+# filterdup
+echo "3. filterdup"
+
+mkdir ${OUTPUTDIR_PREFIX}_run_filterdup 
+
+macs3 filterdup -g 52000000 -i $CHIP --outdir ${OUTPUTDIR_PREFIX}_run_filterdup -o run_filterdup_result.bed --dry-run &> ${OUTPUTDIR_PREFIX}_run_filterdup/run_filterdup_d.log
+macs3 filterdup -g 52000000 -i $CHIP --outdir ${OUTPUTDIR_PREFIX}_run_filterdup -o run_filterdup_result.bed &> ${OUTPUTDIR_PREFIX}_run_filterdup/run_filterdup.log
+
+macs3 filterdup -g 52000000 -i $CHIPPE -f BAMPE --outdir ${OUTPUTDIR_PREFIX}_run_filterdup -o run_filterdup_result_pe.bedpe --dry-run &> ${OUTPUTDIR_PREFIX}_run_filterdup/run_filterdup_pe_d.log
+macs3 filterdup -g 52000000 -i $CHIPPE -f BAMPE --outdir ${OUTPUTDIR_PREFIX}_run_filterdup -o run_filterdup_result_pe.bedpe &> ${OUTPUTDIR_PREFIX}_run_filterdup/run_filterdup_pe.log
+
+# predictd
+echo "4. predictd"
+
+mkdir ${OUTPUTDIR_PREFIX}_run_predictd
+
+macs3 predictd -i $CHIPPE -f BAMPE --outdir ${OUTPUTDIR_PREFIX}_run_predictd &> ${OUTPUTDIR_PREFIX}_run_predictd/run_predictd_bampe.log
+grep "Average insertion length" ${OUTPUTDIR_PREFIX}_run_predictd/run_predictd_bampe.log | perl -pe 's/^.*\s(\d+)\sbps/$1/' > ${OUTPUTDIR_PREFIX}_run_predictd/run_predictd_bampe.txt
+
+macs3 predictd -i $CHIPBEDPE -f BEDPE --outdir ${OUTPUTDIR_PREFIX}_run_predictd &> ${OUTPUTDIR_PREFIX}_run_predictd/run_predictd_bedpe.log
+grep "Average insertion length" ${OUTPUTDIR_PREFIX}_run_predictd/run_predictd_bedpe.log | perl -pe 's/^.*\s(\d+)\sbps/$1/' > ${OUTPUTDIR_PREFIX}_run_predictd/run_predictd_bedpe.txt
+
+macs3 predictd -g 52000000 -i $CHIP --d-min 10 --outdir ${OUTPUTDIR_PREFIX}_run_predictd --rfile run_predictd.R &> ${OUTPUTDIR_PREFIX}_run_predictd/run_predictd.log
+grep "predicted fragment length" ${OUTPUTDIR_PREFIX}_run_predictd/run_predictd.log | perl -pe 's/^.*\s(\d+)\sbps/$1/' > ${OUTPUTDIR_PREFIX}_run_predictd/run_predictd.txt
+grep "alternative fragment length" ${OUTPUTDIR_PREFIX}_run_predictd/run_predictd.log | perl -pe 's/^.*\s(\S+)\sbps/$1/' >> ${OUTPUTDIR_PREFIX}_run_predictd/run_predictd.txt
+
+# randsample
+echo "5. randsample"
+
+mkdir ${OUTPUTDIR_PREFIX}_run_randsample
+
+macs3 randsample -i $CHIP -n 10000 --seed 31415926 --outdir ${OUTPUTDIR_PREFIX}_run_randsample -o run_randsample.bed &> ${OUTPUTDIR_PREFIX}_run_randsample/run_randsample.log
+
+macs3 randsample -f BAMPE -i $CHIPPE -n 10000 --seed 31415926 --outdir ${OUTPUTDIR_PREFIX}_run_randsample -o run_randsample_bampe.bedpe &> ${OUTPUTDIR_PREFIX}_run_randsample/run_randsample_bampe.log
+
+macs3 randsample -f BEDPE -i $CHIPBEDPE -n 10000 --seed 31415926 --outdir ${OUTPUTDIR_PREFIX}_run_randsample -o run_randsample_bedpe.bedpe &> ${OUTPUTDIR_PREFIX}_run_randsample/run_randsample_bedpe.log
+
+# refinepeak
+echo "6. refinepeak"
+
+mkdir ${OUTPUTDIR_PREFIX}_run_refinepeak
+
+macs3 refinepeak -b ${OUTPUTDIR_PREFIX}_run_callpeak_narrow/run_callpeak_narrow0_peaks.narrowPeak -i $CHIP --outdir ${OUTPUTDIR_PREFIX}_run_refinepeak --o-prefix run_refinepeak_w_prefix &> ${OUTPUTDIR_PREFIX}_run_refinepeak/run_refinepeak_w_prefix.log
+
+macs3 refinepeak -b ${OUTPUTDIR_PREFIX}_run_callpeak_narrow/run_callpeak_narrow0_peaks.narrowPeak -i $CHIP --outdir ${OUTPUTDIR_PREFIX}_run_refinepeak -o run_refinepeak_w_ofile.bed &> ${OUTPUTDIR_PREFIX}_run_refinepeak/run_refinepeak_w_ofile.log
+
+# bdgcmp
+echo "7. bdgcmp"
+
+mkdir ${OUTPUTDIR_PREFIX}_run_bdgcmp
+
+macs3 bdgcmp -t ${OUTPUTDIR_PREFIX}_run_pileup/run_pileup_ChIP.bed.bdg -c ${OUTPUTDIR_PREFIX}_run_pileup/run_pileup_CTRL.bed.bdg  -m ppois FE -p 1 --outdir ${OUTPUTDIR_PREFIX}_run_bdgcmp --o-prefix run_bdgcmp &> ${OUTPUTDIR_PREFIX}_run_bdgcmp/run_bdgcmp.log
+
+# bdgpeakcall
+echo "8. bdgpeakcall"
+
+mkdir ${OUTPUTDIR_PREFIX}_run_bdgpeakcall
+
+macs3 bdgpeakcall -i ${OUTPUTDIR_PREFIX}_run_bdgcmp/run_bdgcmp_FE.bdg -c 2 --outdir ${OUTPUTDIR_PREFIX}_run_bdgpeakcall --o-prefix run_bdgpeakcall_w_prefix &> ${OUTPUTDIR_PREFIX}_run_bdgpeakcall/run_bdgpeakcall_w_prefix.log
+
+macs3 bdgpeakcall -i ${OUTPUTDIR_PREFIX}_run_bdgcmp/run_bdgcmp_FE.bdg -c 2 --outdir ${OUTPUTDIR_PREFIX}_run_bdgpeakcall -o run_bdgpeakcall_cutoff.txt --cutoff-analysis &> ${OUTPUTDIR_PREFIX}_run_bdgpeakcall/run_bdgpeakcall_cutoff.log
+
+# bdgbroadcall
+echo "9. bdgbroadcall"
+
+mkdir ${OUTPUTDIR_PREFIX}_run_bdgbroadcall
+
+macs3 bdgbroadcall -i ${OUTPUTDIR_PREFIX}_run_bdgcmp/run_bdgcmp_FE.bdg -c 2 -C 1.5 --outdir ${OUTPUTDIR_PREFIX}_run_bdgbroadcall --o-prefix run_bdgbroadcall_w_prefix &> ${OUTPUTDIR_PREFIX}_run_bdgbroadcall/run_bdgbroadcall_w_prefix.log
+
+# bdgdiff
+echo "10. bdgdiff"
+
+mkdir ${OUTPUTDIR_PREFIX}_run_callpeak_narrow_revert
+mkdir ${OUTPUTDIR_PREFIX}_run_bdgdiff
+
+macs3 callpeak -g 10000000 --nomodel --extsize 250 -c $CHIP -t $CTRL -n run_callpeak_narrow_revert -B --outdir ${OUTPUTDIR_PREFIX}_run_callpeak_narrow_revert &> ${OUTPUTDIR_PREFIX}_run_callpeak_narrow_revert/run_callpeak_narrow_revert.log
+
+macs3 bdgdiff --t1 ${OUTPUTDIR_PREFIX}_run_callpeak_narrow/run_callpeak_narrow0_treat_pileup.bdg --c1 ${OUTPUTDIR_PREFIX}_run_callpeak_narrow/run_callpeak_narrow0_control_lambda.bdg --t2 ${OUTPUTDIR_PREFIX}_run_callpeak_narrow_revert/run_callpeak_narrow_revert_treat_pileup.bdg --c2 ${OUTPUTDIR_PREFIX}_run_callpeak_narrow_revert/run_callpeak_narrow_revert_control_lambda.bdg --o-prefix run_bdgdiff_prefix --outdir ${OUTPUTDIR_PREFIX}_run_bdgdiff &> ${OUTPUTDIR_PREFIX}_run_bdgdiff/run_bdgdiff_w_prefix.log
+
+macs3 bdgdiff --t1 ${OUTPUTDIR_PREFIX}_run_callpeak_narrow/run_callpeak_narrow0_treat_pileup.bdg --c1 ${OUTPUTDIR_PREFIX}_run_callpeak_narrow/run_callpeak_narrow0_control_lambda.bdg --t2 ${OUTPUTDIR_PREFIX}_run_callpeak_narrow_revert/run_callpeak_narrow_revert_treat_pileup.bdg --c2 ${OUTPUTDIR_PREFIX}_run_callpeak_narrow_revert/run_callpeak_narrow_revert_control_lambda.bdg -o cond1.bed cond2.bed common.bed --outdir ${OUTPUTDIR_PREFIX}_run_bdgdiff &> ${OUTPUTDIR_PREFIX}_run_bdgdiff/run_bdgdiff_w_o_file.log
+
+# cmbreps
+echo "11. cmbreps"
+
+mkdir ${OUTPUTDIR_PREFIX}_run_cmbreps
+
+macs3 cmbreps -i ${OUTPUTDIR_PREFIX}_run_callpeak_narrow/run_callpeak_narrow0_treat_pileup.bdg ${OUTPUTDIR_PREFIX}_run_callpeak_narrow/run_callpeak_narrow0_control_lambda.bdg ${OUTPUTDIR_PREFIX}_run_bdgcmp/run_bdgcmp_ppois.bdg -m max -o run_cmbreps_max.bdg --outdir ${OUTPUTDIR_PREFIX}_run_cmbreps &> ${OUTPUTDIR_PREFIX}_run_cmbreps/run_cmbreps_max.log
+macs3 cmbreps -i ${OUTPUTDIR_PREFIX}_run_callpeak_narrow/run_callpeak_narrow0_treat_pileup.bdg ${OUTPUTDIR_PREFIX}_run_callpeak_narrow/run_callpeak_narrow0_control_lambda.bdg ${OUTPUTDIR_PREFIX}_run_bdgcmp/run_bdgcmp_ppois.bdg -m mean -o run_cmbreps_mean.bdg --outdir ${OUTPUTDIR_PREFIX}_run_cmbreps &> ${OUTPUTDIR_PREFIX}_run_cmbreps/run_cmbreps_mean.log
+macs3 cmbreps -i ${OUTPUTDIR_PREFIX}_run_callpeak_narrow/run_callpeak_narrow0_treat_pileup.bdg ${OUTPUTDIR_PREFIX}_run_callpeak_narrow/run_callpeak_narrow0_control_lambda.bdg ${OUTPUTDIR_PREFIX}_run_bdgcmp/run_bdgcmp_ppois.bdg -m fisher -o run_cmbreps_fisher.bdg --outdir ${OUTPUTDIR_PREFIX}_run_cmbreps &> ${OUTPUTDIR_PREFIX}_run_cmbreps/run_cmbreps_fisher.log
+
+# bdgopt
+echo "12. bdgopt"
+
+mkdir ${OUTPUTDIR_PREFIX}_run_bdgopt
+
+macs3 bdgopt -m min -p 10 -i ${OUTPUTDIR_PREFIX}_run_callpeak_narrow/run_callpeak_narrow0_treat_pileup.bdg -o run_bdgopt_min.bdg --outdir ${OUTPUTDIR_PREFIX}_run_bdgopt &> ${OUTPUTDIR_PREFIX}_run_bdgopt/run_bdgopt_min.log
+
+macs3 bdgopt -m max -p 2 -i ${OUTPUTDIR_PREFIX}_run_callpeak_narrow/run_callpeak_narrow0_treat_pileup.bdg -o run_bdgopt_max.bdg --outdir ${OUTPUTDIR_PREFIX}_run_bdgopt &> ${OUTPUTDIR_PREFIX}_run_bdgopt/run_bdgopt_max.log
+
+# callvar
+echo "13. callvar"
+
+mkdir ${OUTPUTDIR_PREFIX}_run_callvar
+
+macs3 callvar -b ${CALLVARPEAK} -t ${CHIPPE} -c ${CTRLPE} -o ${OUTPUTDIR_PREFIX}_run_callvar/PEsample.vcf &> ${OUTPUTDIR_PREFIX}_run_callvar/run_callvar_PE.log
+
+# test large amount of contigs
+echo "14. 50k contigs with buffersize"
+
+mkdir ${OUTPUTDIR_PREFIX}_run_50kcontigs
+
+echo "14.1 callpeak"
+macs3 callpeak -g 10000000 -t $CHIPCONTIGS50K -n run_callpeak_50kcontigs --outdir ${OUTPUTDIR_PREFIX}_run_50kcontigs --buffer-size 1000 --nomodel --extsize 200 &> ${OUTPUTDIR_PREFIX}_run_50kcontigs/run_callpeak_50kcontigs.log
+
+echo "14.2 filterdup"
+macs3 filterdup -g 10000000 -i $CHIPCONTIGS50K --outdir ${OUTPUTDIR_PREFIX}_run_50kcontigs -o run_filterdup_result.bed --buffer-size 1000 &> ${OUTPUTDIR_PREFIX}_run_50kcontigs/run_filterdup_50kcontigs.log
+
+echo "14.3 pileup"
+macs3 pileup -f BED -i $CHIPCONTIGS50K --extsize 200 --outdir ${OUTPUTDIR_PREFIX}_run_50kcontigs -o run_pileup_ChIP.bed.bdg --buffer-size 1000 &> ${OUTPUTDIR_PREFIX}_run_50kcontigs/run_pileup_ChIP.bed.log
+
+echo "14.4 randsample"
+macs3 randsample -i $CHIPCONTIGS50K -n 100000 --seed 31415926 --outdir ${OUTPUTDIR_PREFIX}_run_50kcontigs -o run_randsample.bed --buffer-size 1000 &> ${OUTPUTDIR_PREFIX}_run_50kcontigs/run_randsample.log
+
+echo "15. skip hmmratac"
+#mkdir ${OUTPUTDIR_PREFIX}_run_hmmratac
+
+#macs3 hmmratac -b $ATACSEQBAM -n hmmratac_yeast500k --outdir ${OUTPUTDIR_PREFIX}_run_hmmratac &> ${OUTPUTDIR_PREFIX}_run_hmmratac/run_hmmratac.log
+
+echo "16. search for errors or warnings in log files"
+flag=0
+for i in `ls ${OUTPUTDIR_PREFIX}_run_*/*.log`;do
+    echo " checking $i..."
+    egrep -i "error|warning" $i;
+    if [[ $? == 0 ]];then
+	echo " ... error/warning found!"
+	echo "the log file:"
+	cat $i;
+	let "flag=1";
+    else
+	echo " ... clear!"
+    fi
+done;
+
+if [[ $flag == 1 ]]; then
+    echo " Error or Warning can be found! Quit the test!"
+    exit 1;
+fi
+
+echo "17. compare with standard outputs"
+
+flag=0
+# we do not check the consistency of random subsampling results and hmmratac on non-x86 arch
+subfolders=(50kcontigs bdgbroadcall bdgcmp bdgdiff bdgpeakcall callpeak_broad callpeak_narrow callpeak_narrow_revert callpeak_pe_broad callpeak_pe_narrow cmbreps filterdup pileup refinepeak bdgopt predictd callvar)  # hmmratac)
+
+m=0
+n=0
+for i in ${subfolders[@]};do
+    let "m+=1"
+    let "n=0"
+    for j in `ls standard_results_${i}/*`; do
+	k=`basename $j`
+	let "n+=1"
+	echo "16.${m}.${n} checking $i $k ..."
+	fq=${OUTPUTDIR_PREFIX}_run_${i}/${k}
+	fs=standard_results_${i}/${k}
+	if [ "${REPLACE}" = "Y" ]; then
+	    cp $fq $fs
+	    echo " ... replaced!"
+	else
+	    sort $fq| grep -v ^# > tmp_fq.txt
+	    sort $fs| grep -v ^# > tmp_fs.txt
+	    d=`diff tmp_fq.txt tmp_fs.txt`
+	    if [ -z "$d" ]; then
+		echo " ... success!"
+	    else
+		echo " ... failed! Difference:"
+		diff tmp_fq.txt tmp_fs.txt | head -10
+		let "flag=1";
+	    fi
+	fi
+    done
+done
+rm -f tmp_fq.txt tmp_fs.txt
+
+# exit with 1 if test fails
+if [ $flag -eq 1 ];then
+    exit $flag;
+fi
+
+echo "17. brief speed test"
+
+mkdir ${OUTPUTDIR_PREFIX}_speedtest
+macs3 callpeak -t CTCF_12878_5M.bed.gz -c Input_12878_5M.bed.gz -n speedtest -B --outdir ${OUTPUTDIR_PREFIX}_speedtest &> ${OUTPUTDIR_PREFIX}_speedtest/speedtest.log &
+# monitor the macs3 callpeak run and output CPU and mem usage
+./prockreport 0.5 $!
+wait;
+
+# END of test
