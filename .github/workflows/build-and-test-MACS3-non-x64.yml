@@ -75,10 +75,10 @@ jobs:
             rm -f no-global-site-packages.txt
             
             # upgrade pip            
-            pip install --no-cache-dir --upgrade pip
+            pip install --no-cache-dir --progress-bar off --upgrade pip
             
             # install MACS3; only-if-needed won't try to upgrade Debian/Linux python3 libs
-            pip install --upgrade-strategy only-if-needed --no-cache-dir . 
+            pip install --upgrade-strategy only-if-needed --no-cache-dir --progress-bar off . 
             
             # run test
             pytest --runxfail && cd test && ./cmdlinetest macs3
