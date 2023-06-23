@@ -1,11 +1,11 @@
-2023-06-15  Tao Liu  <vladimir.liu@gmail.com>
+2023-06-23  Tao Liu  <vladimir.liu@gmail.com>
 	MACS 3.0.0b2
 	* New features in MACS3:
 
-	1) Speed/memory optimization.  Use the cykhash to replace python 
-	dictionary. Use buffer (10MB) to read and parse input file (not 
+	1) Speed/memory optimization.  Use the cykhash to replace python
+	dictionary. Use buffer (10MB) to read and parse input file (not
 	available for BAM file parser). And many optimization tweaks. We
-    added memory monitoring to the runtime messages.
+	added memory monitoring to the runtime messages.
 
 	2) Code cleanup. Reorganize source codes. 
 
@@ -48,8 +48,10 @@
 
 	11) The effective genome size parameters have been updated
 	according to deeptools. #508
+
+	12) Memory usage now will be displayed in the runtime message.
 	
-	12) Multiple updates regarding dependencies, anaconda built, CI/CD
+	13) Multiple updates regarding dependencies, anaconda built, CI/CD
 	process.
 	
 	* Other:
