@@ -1,9 +1,9 @@
-# Time-stamp: <2022-10-04 16:58:30 Tao Liu>
+# Time-stamp: <2023-06-08 11:03:46 Tao Liu>
 
 """Description: Main HMMR command
 
 This code is free software; you can redistribute it and/or modify it
-under the terms of the BSD License (see thefile LICENSE included with
+under the terms of the BSD License (see the file LICENSE included with
 the distribution).
 """
 
@@ -11,10 +11,9 @@ the distribution).
 # python modules
 # ------------------------------------
 
-from logging.handlers import RotatingFileHandler
 import os
 import sys
-import logging
+import gc
 import numpy as np
 import json
 from hmmlearn import hmm
@@ -69,11 +68,14 @@ def run( args ):
     bg_state_bdgfile = os.path.join( options.outdir, options.name+"_bg.bdg" )
     states_file = os.path.join( options.outdir, options.name+"_states.bed" )
     accessible_file = os.path.join( options.outdir, options.name+"_accessible_regions.gappedPeak" )
+    cutoffanalysis_file = os.path.join( options.outdir, options.name+"_cutoff_analysis.tsv" )
     
     #############################################
     # 1. Read the input BAM files
     #############################################
-    options.info("\n" + options.argtxt)    
+    options.info("\n" + options.argtxt)
+    #options.info("Some important parameters for this run")
+    #options.info(f" binsize for HMM: {options.binsize} ()")
     options.info("#1 Read fragments from BAM file...")
 
     bam = BAMPEParser(options.bam_file[0], buffer_size=options.buffer_size)
@@ -133,13 +135,6 @@ def run( args ):
     options.info(  "#             means: {0[0]:>10.4g} {0[1]:>10.4g} {0[2]:>10.4g} {0[3]:>10.4g}".format( em_means ) )
     options.info(  "#           stddevs: {0[0]:>10.4g} {0[1]:>10.4g} {0[2]:>10.4g} {0[3]:>10.4g}".format( em_stddevs ) )    
 
-    options.info( f"#  Pile up all fragments" )
-    minlen = int(petrack.average_template_length)
-    fc_bdg = petrack.pileup_bdg( [1.0,], baseline_value = 0 )
-    (sum_v, n_v, max_v, min_v, mean_v, std_v) = fc_bdg.summary()
-    options.info( f"#  Convert pileup to fold-change over average signal" )
-    fc_bdg.apply_func(lambda x: x/mean_v)
-
     # to finalize the EM training, we will decompose ATAC-seq into four signal tracks
     options.info( f"#  Compute the weights for each fragment length for each of the four signal types")
     fl_dict = petrack.count_fraglengths()
@@ -153,6 +148,7 @@ def run( args ):
     options.info( f"#  Generate short, mono-, di-, and tri-nucleosomal signals")
     digested_atac_signals = generate_digested_signals( petrack, weight_mapping )
 
+    # save three types of signals if needed
     if options.save_digested:
         fhd = open(short_bdgfile,"w")
         digested_atac_signals[ 0 ].write_bedGraph(fhd, "short","short")
@@ -167,6 +163,37 @@ def run( args ):
         digested_atac_signals[ 0 ].write_bedGraph(fhd, "tri","tri")
         fhd.close()        
 
+    minlen = int(petrack.average_template_length)
+    # if options.pileup_short is on, we pile up only the short fragments to identify training 
+    #  regions and to prescan for candidate regions for decoding.
+    if options.pileup_short:
+        options.info( f"#  Pile up ONLY short fragments" )
+        fc_bdg = digested_atac_signals[ 0 ]
+        (sum_v, n_v, max_v, min_v, mean_v, std_v) = fc_bdg.summary()
+        print(sum_v, n_v, max_v, min_v, mean_v, std_v)
+        options.info( f"#  Convert pileup to fold-change over average signal" )
+        fc_bdg.apply_func(lambda x: x/mean_v)
+    else:
+        options.info( f"#  Pile up all fragments" )
+        fc_bdg = petrack.pileup_bdg( [1.0,], baseline_value = 0 )
+        (sum_v, n_v, max_v, min_v, mean_v, std_v) = fc_bdg.summary()
+        options.info( f"#  Convert pileup to fold-change over average signal" )
+        fc_bdg.apply_func(lambda x: x/mean_v)
+       
+        
+    # if cutoff_analysis only, generate and save the report and quit
+    if options.cutoff_analysis_only:
+        # we will run cutoff analysis only and quit
+        options.info( f"#3 Generate cutoff analysis report from {petrack.total} fragments")
+        options.info( f"#   Please review the cutoff analysis result in {cutoffanalysis_file}" )
+
+        # Let MACS3 do the cutoff analysis to help decide the lower and upper cutoffs
+        with open(cutoffanalysis_file, "w") as ofhd_cutoff:
+            ofhd_cutoff.write( fc_bdg.cutoff_analysis( min_length=minlen, max_gap=options.hmm_training_flanking ) )
+        #raise Exception("Cutoff analysis only.")
+        sys.exit(1)
+        
+        
     #############################################
     # 3. Define training set by peak calling
     #############################################
@@ -183,14 +210,29 @@ def run( args ):
         options.info( f"#   The minimum length of the region is set as the average template/fragment length in the dataset: {minlen}" )
         options.info( f"#   The maximum gap to merge nearby significant regions is set as the flanking size to extend training regions: {options.hmm_training_flanking}" )    
         peaks = fc_bdg.call_peaks (cutoff=options.hmm_lower, min_length=minlen, max_gap=options.hmm_training_flanking, call_summits=False)
-        options.info( f"#  Total training regions called: {peaks.total}" )
+        options.info( f"#  Total training regions called after applying the lower cutoff {options.hmm_lower}: {peaks.total}" )
         peaks.filter_score( options.hmm_lower, options.hmm_upper )
-        options.info( f"#  Total training regions after filtering with lower and upper cutoff: {peaks.total}" )
+        options.info( f"#  Total training regions after filtering with upper cutoff {options.hmm_upper}: {peaks.total}" )
+
+        options.info( f"#  **IMPORTANT**")
+        options.info( f"#  Please review the cutoff analysis result in {cutoffanalysis_file} to verify" )
+        options.info( f"#   if the choices of lower, upper and prescanning cutoff are appropriate." )
+        options.info( f"#   Please read the message in the section 'Choices of cutoff values' by running" )
+        options.info( f"#   `macs3 hmmratac -h` for detail." )
+        options.info( f"#  ****" )
         
+        # Let MACS3 do the cutoff analysis to help decide the lower and upper cutoffs
+        with open(cutoffanalysis_file, "w") as ofhd_cutoff:
+            ofhd_cutoff.write( fc_bdg.cutoff_analysis( min_length=minlen, max_gap=options.hmm_training_flanking ) )
+            
+        # we will check if anything left after filtering
         if peaks.total > options.hmm_maxTrain:
             peaks = peaks.randomly_pick( options.hmm_maxTrain, seed = options.hmm_randomSeed )
             options.info( f"#  We randomly pick {options.hmm_maxTrain} regions for training" )
-
+        elif peaks.total == 0:
+            options.error( f"# No training regions found. Please adjust the lower or upper cutoff." )
+            raise Exception("Not enough training regions!")
+        
         # Now we convert PeakIO to Regions and filter blacklisted regions
         training_regions = Regions()
         training_regions.init_from_PeakIO( peaks )
@@ -319,11 +361,16 @@ def run( args ):
     while candidate_regions.total != 0:
         n += 1
         cr = candidate_regions.pop( options.decoding_steps )
+        options.info( "#    decoding %d..." % ( n*options.decoding_steps ) )        
         [ cr_bins, cr_data, cr_data_lengths ] = extract_signals_from_regions( digested_atac_signals, cr, binsize = options.hmm_binsize )
-        options.info( "#    decoding %d..." % ( n*options.decoding_steps ) )
+        #options.info( "#     extracted signals in the candidate regions")
         candidate_bins.extend( cr_bins )
+        #options.info( "#     saving information regarding the candidate regions")        
         predicted_proba.extend( hmm_predict( cr_data, cr_data_lengths, hmm_model ) )
+        #options.info( "#     prediction done")
+        gc.collect()
 
+        
 #############################################
 # 6. Output - add to OutputWriter
 #############################################
@@ -409,83 +456,69 @@ def save_states_bed( states_path, states_bedfile ):
             states_bedfile.write( "%s\t%s\t%s\t%s\n" % states_path[l] )
     return
 
-def generate_states_path( candidate_bins, predicted_proba, binsize, i_open_region, i_nucleosomal_region, i_background_region ):
+def generate_states_path(candidate_bins, predicted_proba, binsize, i_open_region, i_nucleosomal_region, i_background_region):
     ret_states_path = []
-    labels_list = ["open","nuc","bg"]
-    start_pos = candidate_bins[0][1]-binsize
+    labels_list = ["open", "nuc", "bg"]
+    start_pos = candidate_bins[0][1] - binsize
     for l in range(1, len(predicted_proba)):
-        proba_prev = np.array([ predicted_proba[l-1][ i_open_region ], predicted_proba[l-1][ i_nucleosomal_region ], predicted_proba[l-1][ i_background_region ] ])
-        label_prev = labels_list[ np.argmax(proba_prev) ]
-        proba_curr = np.array([ predicted_proba[l][ i_open_region ], predicted_proba[l][ i_nucleosomal_region ], predicted_proba[l][ i_background_region ] ])
-        label_curr = labels_list[ np.argmax(proba_curr) ]
-        if candidate_bins[l-1][0] == candidate_bins[l][0]: #if we are looking at the same chromosome ...
+        chromosome = candidate_bins[l][0].decode()
+        prev_open, prev_nuc, prev_bg = predicted_proba[l-1][i_open_region], predicted_proba[l-1][i_nucleosomal_region], predicted_proba[l-1][i_background_region]
+        curr_open, curr_nuc, curr_bg = predicted_proba[l][i_open_region], predicted_proba[l][i_nucleosomal_region], predicted_proba[l][i_background_region]
+        
+        label_prev = labels_list[max((prev_open, 0), (prev_nuc, 1), (prev_bg, 2), key=lambda x: x[0])[1]]
+        label_curr = labels_list[max((curr_open, 0), (curr_nuc, 1), (curr_bg, 2), key=lambda x: x[0])[1]]
+
+        if candidate_bins[l-1][0] == candidate_bins[l][0]:  # if we are looking at the same chromosome ...
             if label_prev != label_curr:
                 end_pos = candidate_bins[l-1][1]
-                ret_states_path.append( (candidate_bins[l][0].decode(), start_pos, end_pos, label_prev) )
-                start_pos = candidate_bins[l][1]-binsize
-            
-            elif l == len(predicted_proba)-1:
+                ret_states_path.append((chromosome, start_pos, end_pos, label_prev))
+                start_pos = candidate_bins[l][1] - binsize
+            elif l == len(predicted_proba) - 1:
                 end_pos = candidate_bins[l][1]
-                ret_states_path.append( (candidate_bins[l][0].decode(), start_pos, end_pos, label_prev) )
+                ret_states_path.append((chromosome, start_pos, end_pos, label_prev))
         else:
-            start_pos = candidate_bins[l][1]-binsize
-
+            start_pos = candidate_bins[l][1] - binsize
     return ret_states_path
 
-def save_accessible_regions( states_path, accessible_region_file, openregion_minlen ):
-    # select only accessible regions from _states.bed, look for nuc-open-nuc pattern
+def save_accessible_regions(states_path, accessible_region_file, openregion_minlen):
+    # Function to add regions to the list
+    def add_regions(i, regions):
+        for j in range(i, i+3):
+            if not regions or states_path[j][2] != regions[-1][2]:
+                regions.append((states_path[j][0], int(states_path[j][1]), int(states_path[j][2]), states_path[j][3]))
+        return regions
+
+    # Select only accessible regions from _states.bed, look for nuc-open-nuc pattern
     # This by default is the only final output from HMMRATAC
     accessible_regions = []
     for i in range(len(states_path)-2):
-        #if region has pattern nuc-open-nuc (are the same chromosome and are consecutive bins) AND the open region size > minlen
-        if states_path[i][3] == 'nuc' and states_path[i+1][3] == 'open' and states_path[i+2][3] == 'nuc' and states_path[i][2] == states_path[i+1][1] and states_path[i+1][2] == states_path[i+2][1] and states_path[i+1][2] - states_path[i+1][1] > openregion_minlen:
-        # if states_path[i][3] == 'nuc' and states_path[i+1][3] == 'open' and states_path[i+2][3] == 'nuc' and states_path[i][0] == states_path[i+1][0] and states_path[i+1][0] == states_path[i+2][0] and states_path[i][2] == states_path[i+1][1] and states_path[i+1][2] == states_path[i+2][1]:
-            if len(accessible_regions) > 0:  
-                if int(states_path[i][2]) == int(accessible_regions[-1][2]): #if element already in list, don't repeat
-                    accessible_regions.append((states_path[i+1][0], int(states_path[i+1][1]), int(states_path[i+1][2]), states_path[i+1][3]))
-                    accessible_regions.append((states_path[i+2][0], int(states_path[i+2][1]), int(states_path[i+2][2]), states_path[i+2][3]))
-                else:
-                    accessible_regions.append((states_path[i][0], int(states_path[i][1]), int(states_path[i][2]), states_path[i][3]))
-                    accessible_regions.append((states_path[i+1][0], int(states_path[i+1][1]), int(states_path[i+1][2]), states_path[i+1][3]))
-                    accessible_regions.append((states_path[i+2][0], int(states_path[i+2][1]), int(states_path[i+2][2]), states_path[i+2][3]))
-            elif len(accessible_regions) == 0:
-                accessible_regions.append((states_path[i][0], int(states_path[i][1]), int(states_path[i][2]), states_path[i][3]))
-                accessible_regions.append((states_path[i+1][0], int(states_path[i+1][1]), int(states_path[i+1][2]), states_path[i+1][3]))
-                accessible_regions.append((states_path[i+2][0], int(states_path[i+2][1]), int(states_path[i+2][2]), states_path[i+2][3]))
-    
-    # group states by region
+        if (states_path[i][3] == 'nuc' and states_path[i+1][3] == 'open' and states_path[i+2][3] == 'nuc' and 
+            states_path[i][2] == states_path[i+1][1] and states_path[i+1][2] == states_path[i+2][1] and 
+            states_path[i+1][2] - states_path[i+1][1] > openregion_minlen):
+            accessible_regions = add_regions(i, accessible_regions)
+
+    # Group states by region
     list_of_groups = []
-    one_group = []
-    one_group.append(accessible_regions[0])
+    one_group = [accessible_regions[0]]
     for j in range(1, len(accessible_regions)):
-        # future: add gap here ... if accessible_regions[j][1] == accessible_regions[j-1][2]+options.hmm_binsize or +options.gap 
-        # (this will need to be addressed in how _states.bed and the nuc-open-nuc pattern is selected)
         if accessible_regions[j][1] == accessible_regions[j-1][2]:
             one_group.append(accessible_regions[j])
-        elif accessible_regions[j][1] != accessible_regions[j-1][2]:
-            # if one_group[-2][2] - one_group[1][1] > openregion_minlen: #check: if distance between first open region start_pos and last open region end_pos is above threshold ... then add to list
+        else:
             list_of_groups.append(one_group)
-            one_group = []
-            one_group.append(accessible_regions[j])
+            one_group = [accessible_regions[j]]
     accessible_regions = list_of_groups
-    #print(len(accessible_regions))
-    # generate broadpeak object
+
+    # Generate broadpeak object
     broadpeak = BroadPeakIO()
-    for i in range(len(accessible_regions)-1):
-        block_num = sum('open' in tup for tup in accessible_regions[i]) #number of open states in the region
-        block_sizes = ''
-        block_starts = ''
-        for j in range(1, len(accessible_regions[i])-1, 2):
-            block_sizes = block_sizes + str(accessible_regions[i][j][2] - accessible_regions[i][j][1]) + ',' #distance between start_pos and end_pos in each open state
-            block_starts = block_starts + str(accessible_regions[i][j][1] - accessible_regions[i][0][1] ) + ',' #start_pos for each open state, it's relative position to the start_pos of the whole broad region
-        broadpeak.add(bytes(accessible_regions[i][1][0], encoding="raw_unicode_escape"), #chromosome
-            accessible_regions[i][0][1], #start_pos of first nuc state in the region
-            accessible_regions[i][-1][2], #end_pos of the last nuc state in the region
-            thickStart=bytes(str(accessible_regions[i][1][1]), encoding="raw_unicode_escape"), #start_pos of the first open state
-            thickEnd=bytes(str(accessible_regions[i][-2][2]), encoding="raw_unicode_escape"), #end_pos of the last open state
-            blockNum=block_num,
-            blockSizes=bytes(str(block_sizes[0:-1]), encoding="raw_unicode_escape"),
-            blockStarts=bytes(str(block_starts[0:-1]), encoding="raw_unicode_escape"))
+    for region in accessible_regions[:-1]:
+        block_num = sum('open' in tup for tup in region)
+        block_sizes = ','.join(str(region[j][2] - region[j][1]) for j in range(1, len(region) - 1, 2))
+        block_starts = ','.join(str(region[j][1] - region[0][1]) for j in range(1, len(region) - 1, 2))
+        broadpeak.add(bytes(region[1][0], encoding="raw_unicode_escape"), region[0][1], region[-1][2],
+                      thickStart=bytes(str(region[1][1]), encoding="raw_unicode_escape"),
+                      thickEnd=bytes(str(region[-2][2]), encoding="raw_unicode_escape"),
+                      blockNum=block_num,
+                      blockSizes=bytes(block_sizes, encoding="raw_unicode_escape"),
+                      blockStarts=bytes(block_starts, encoding="raw_unicode_escape"))
     broadpeak.write_to_gappedPeak(accessible_region_file)
     return
-

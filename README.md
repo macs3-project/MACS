@@ -28,36 +28,28 @@ applied to any "DNA enrichment assays" if the question to be asked is
 simply: *where we can find significant reads coverage than the random
 background*.
 
-**Please note that current MACS3 is still in alpha stage. However, we
+**Please note that current MACS3 is still in beta stage. However, we
 utilize Github Action to implement the CI (Continous Integration) to
 make sure that the main branch passes unit testing on certain
 functions and subcommands to reproduce the correct outputs. We will
 add more new features in the future.**
 
-## Recent Changes for MACS (3.0.0b1)
+## Recent Changes for MACS (3.0.0b2)
 
-### 3.0.0b1
-        The first beta version of MACS3, with HMMRATAC feature recently added.
+### 3.0.0b2
+    The second beta version of MACS3, with HMMRATAC feature refined.
 	   
-	* New features from alpha7:
+	* New features from beta1:
 
-	1) HMMRATAC module is added
-	HMMRATAC is a dedicated software to analyze ATAC-seq data. The
-	basic idea behind HMMRATAC is to digest ATAC-seq data according to
-	the fragment length of read pairs into four signal tracks: short
-	fragments, mononucleosomal fragments, di-nucleosomal fragments and
-	tri-nucleosomal fragments. Then integrate the four tracks again
-	using Hidden Markov Model to consider three hidden states: open
-	region, nucleosomal region, and background region. The orginal
-	paper was published in 2019 written in JAVA, by Evan Tarbell. We
-	implemented it in Python/Cython and optimize the whole process
-	using existing MACS functions and hmmlearn. Now it can run much
-	faster than the original JAVA version. Note: evaluation of the
-	peak calling results is underway.
-	
-	2) Multiple updates regarding dependencies, anaconda built, CI/CD
-	process.
-
+	1) HMMRATAC module fixes
+    
+       Cutoff analysis function added
+       Description regarding it has been added
+    
+    2) Memory monitoring in the runtime message
+    
+    3) testing for s390x, armv7 and power64le is back. However, we turned off the function to check if the `hmmratac` results from non-x86 architectures are the same as the standard results, because in order to let the testing run, we need to use old python libraries (scipy and sklearn) through the distribution of Debian/Linux bullseye.
+    
 ## Install
 
 The common way to install MACS is through
@@ -88,7 +80,7 @@ Example for peak calling on ATAC-seq (paired-end mode):
 
 `macs3 callpeak -f BAMPE -t ATAC.bam -g hs -n test -B -q 0.01`
 
-There are currently twelve functions available in MAC3 serving as
+There are currently 14 functions available in MACS3 serving as
 sub-commands. Please click on the link to see the detail description
 of the subcommands.
 

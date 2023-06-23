@@ -13,7 +13,7 @@ the distribution).
 import sys
 import os
 import re
-import logging
+import resource # we turn on memory monitoring inside of logging
 from argparse import ArgumentError
 from subprocess import Popen, PIPE
 from math import log
@@ -30,14 +30,29 @@ from MACS3.Utilities.Constants import EFFECTIVEGS as efgsize
 # constants
 # ------------------------------------
 
+import logging
+import MACS3.Utilities.Logger
+logger = logging.getLogger(__name__)
+
 # ------------------------------------
 # Misc functions
 # ------------------------------------
+
+logger = logging.getLogger(__name__)
+
 def opt_validate_callpeak ( options ):
     """Validate options from a OptParser object.
 
     Ret: Validated options object.
     """
+    # logging object
+    logger.setLevel((4-options.verbose)*10)
+
+    options.error   = logger.critical        # function alias
+    options.warn    = logger.warning
+    options.debug   = logger.debug
+    options.info    = logger.info
+    
     # gsize
     try:
         options.gsize = efgsize[options.gsize]
@@ -45,8 +60,8 @@ def opt_validate_callpeak ( options ):
         try:
             options.gsize = float(options.gsize)
         except:
-            logging.error("Error when interpreting --gsize option: %s" % options.gsize)
-            logging.error("Available shortcuts of effective genome sizes are %s" % ",".join(list(efgsize.keys())))
+            logger.error("Error when interpreting --gsize option: %s" % options.gsize)
+            logger.error("Available shortcuts of effective genome sizes are %s" % ",".join(list(efgsize.keys())))
             sys.exit(1)
 
     # format
@@ -78,13 +93,13 @@ def opt_validate_callpeak ( options ):
     elif options.format == "AUTO":
         options.parser = guess_parser
     else:
-        logging.error("Format \"%s\" cannot be recognized!" % (options.format))
+        logger.error("Format \"%s\" cannot be recognized!" % (options.format))
         sys.exit(1)
 
     # duplicate reads
     if options.keepduplicates != "auto" and options.keepduplicates != "all":
         if not options.keepduplicates.isdigit():
-            logging.error("--keep-dup should be 'auto', 'all' or an integer!")
+            logger.error("--keep-dup should be 'auto', 'all' or an integer!")
             sys.exit(1)
 
     # shiftsize>0
@@ -93,16 +108,16 @@ def opt_validate_callpeak ( options ):
     #else:                               # if --shiftsize is not set
     #    options.shiftsize = options.extsize / 2
     if options.extsize < 1 :
-        logging.error("--extsize must >= 1!")
+        logger.error("--extsize must >= 1!")
         sys.exit(1)
 
     # refine_peaks, call_summits can't be combined with --broad
     #if options.broad and (options.refine_peaks or options.call_summits):
-    #    logging.error("--broad can't be combined with --refine-peaks or --call-summits!")
+    #    logger.error("--broad can't be combined with --refine-peaks or --call-summits!")
     #    sys.exit(1)
 
     if options.broad and options.call_summits:
-        logging.error("--broad can't be combined with --call-summits!")
+        logger.error("--broad can't be combined with --call-summits!")
         sys.exit(1)
 
     if options.pvalue:
@@ -120,14 +135,14 @@ def opt_validate_callpeak ( options ):
 
     # d_min is non-negative
     if options.d_min < 0:
-        logging.error("Minimum fragment size shouldn't be negative!" % options.d_min)
+        logger.error("Minimum fragment size shouldn't be negative!" % options.d_min)
         sys.exit(1)
 
     # upper and lower mfold
     options.lmfold = options.mfold[0]
     options.umfold = options.mfold[1]
     if options.lmfold > options.umfold:
-        logging.error("Upper limit of mfold should be greater than lower limit!" % options.mfold)
+        logger.error("Upper limit of mfold should be greater than lower limit!" % options.mfold)
         sys.exit(1)
 
     # output filenames
@@ -147,19 +162,6 @@ def opt_validate_callpeak ( options ):
     #options.diagxls = os.path.join( options.name+"_diag.xls" )
     options.modelR  = os.path.join( options.outdir, options.name+"_model.r" )
     #options.pqtable  = os.path.join( options.outdir, options.name+"_pq_table.txt" )
-
-    # logging object
-    logging.basicConfig(level=(4-options.verbose)*10,
-                        format='%(levelname)-5s @ %(asctime)s: %(message)s ',
-                        datefmt='%a, %d %b %Y %H:%M:%S',
-                        stream=sys.stderr,
-                        filemode="w"
-                        )
-
-    options.error   = logging.critical        # function alias
-    options.warn    = logging.warning
-    options.debug   = logging.debug
-    options.info    = logging.info
 
     options.argtxt = "\n".join((
         "# Command line: %s" % " ".join(sys.argv[1:]),\
@@ -246,6 +248,14 @@ def opt_validate_diffpeak ( options ):
 
     Ret: Validated options object.
     """
+    # logging object
+    logger.setLevel((4-options.verbose)*10)
+
+    options.error   = logger.critical        # function alias
+    options.warn    = logger.warning
+    options.debug   = logger.debug
+    options.info    = logger.info
+    
     # format
     options.gzip_flag = False           # if the input is gzip file
 
@@ -255,7 +265,7 @@ def opt_validate_diffpeak ( options ):
 #    elif options.format == "AUTO":
 #        options.parser = guess_parser
 #    else:
-#        logging.error("Format \"%s\" cannot be recognized!" % (options.format))
+#        logger.error("Format \"%s\" cannot be recognized!" % (options.format))
 #        sys.exit(1)
 
     if options.peaks_pvalue:
@@ -330,19 +340,6 @@ def opt_validate_diffpeak ( options ):
     else:
         options.argtxt +=  "# differential qvalue cutoff = %.2e\n" % (options.log_qvalue)
 
-    # logging object
-    logging.basicConfig(level=(4-options.verbose)*10,
-                        format='%(levelname)-5s @ %(asctime)s: %(message)s ',
-                        datefmt='%a, %d %b %Y %H:%M:%S',
-                        stream=sys.stderr,
-                        filemode="w"
-                        )
-
-    options.error   = logging.critical        # function alias
-    options.warn    = logging.warning
-    options.debug   = logging.debug
-    options.info    = logging.info
-
     return options
 
 def opt_validate_filterdup ( options ):
@@ -350,6 +347,14 @@ def opt_validate_filterdup ( options ):
 
     Ret: Validated options object.
     """
+    # logging object
+    logger.setLevel((4-options.verbose)*10)
+
+    options.error   = logger.critical        # function alias
+    options.warn    = logger.warning
+    options.debug   = logger.debug
+    options.info    = logger.info
+    
     # gsize
     try:
         options.gsize = efgsize[options.gsize]
@@ -357,8 +362,8 @@ def opt_validate_filterdup ( options ):
         try:
             options.gsize = float(options.gsize)
         except:
-            logging.error("Error when interpreting --gsize option: %s" % options.gsize)
-            logging.error("Available shortcuts of effective genome sizes are %s" % ",".join(list(efgsize.keys())))
+            logger.error("Error when interpreting --gsize option: %s" % options.gsize)
+            logger.error("Available shortcuts of effective genome sizes are %s" % ",".join(list(efgsize.keys())))
             sys.exit(1)
 
     # format
@@ -391,30 +396,17 @@ def opt_validate_filterdup ( options ):
     elif options.format == "AUTO":
         options.parser = guess_parser
     else:
-        logging.error("Format \"%s\" cannot be recognized!" % (options.format))
+        logger.error("Format \"%s\" cannot be recognized!" % (options.format))
         sys.exit(1)
 
     # duplicate reads
     if options.keepduplicates != "auto" and options.keepduplicates != "all":
         if not options.keepduplicates.isdigit():
-            logging.error("--keep-dup should be 'auto', 'all' or an integer!")
+            logger.error("--keep-dup should be 'auto', 'all' or an integer!")
             sys.exit(1)
 
     # uppercase the format string
     options.format = options.format.upper()
-
-    # logging object
-    logging.basicConfig(level=(4-options.verbose)*10,
-                        format='%(levelname)-5s @ %(asctime)s: %(message)s ',
-                        datefmt='%a, %d %b %Y %H:%M:%S',
-                        stream=sys.stderr,
-                        filemode="w"
-                        )
-
-    options.error   = logging.critical        # function alias
-    options.warn    = logging.warning
-    options.debug   = logging.debug
-    options.info    = logging.info
 
     return options
 
@@ -423,6 +415,14 @@ def opt_validate_randsample ( options ):
 
     Ret: Validated options object.
     """
+    # logging object
+    logger.setLevel((4-options.verbose)*10)
+
+    options.error   = logger.critical        # function alias
+    options.warn    = logger.warning
+    options.debug   = logger.debug
+    options.info    = logger.info
+    
     # format
 
     options.gzip_flag = False           # if the input is gzip file
@@ -451,7 +451,7 @@ def opt_validate_randsample ( options ):
     elif options.format == "AUTO":
         options.parser = guess_parser
     else:
-        logging.error("Format \"%s\" cannot be recognized!" % (options.format))
+        logger.error("Format \"%s\" cannot be recognized!" % (options.format))
         sys.exit(1)
 
     # uppercase the format string
@@ -460,25 +460,12 @@ def opt_validate_randsample ( options ):
     # percentage or number
     if options.percentage:
         if options.percentage > 100.0:
-            logging.error("Percentage can't be bigger than 100.0. Please check your options and retry!")
+            logger.error("Percentage can't be bigger than 100.0. Please check your options and retry!")
             sys.exit(1)
     elif options.number:
         if options.number <= 0:
-            logging.error("Number of tags can't be smaller than or equal to 0. Please check your options and retry!")
+            logger.error("Number of tags can't be smaller than or equal to 0. Please check your options and retry!")
             sys.exit(1)
-
-    # logging object
-    logging.basicConfig(level=(4-options.verbose)*10,
-                        format='%(levelname)-5s @ %(asctime)s: %(message)s ',
-                        datefmt='%a, %d %b %Y %H:%M:%S',
-                        stream=sys.stderr,
-                        filemode="w"
-                        )
-
-    options.error   = logging.critical        # function alias
-    options.warn    = logging.warning
-    options.debug   = logging.debug
-    options.info    = logging.info
 
     return options
 
@@ -487,6 +474,14 @@ def opt_validate_refinepeak ( options ):
 
     Ret: Validated options object.
     """
+    # logging object
+    logger.setLevel((4-options.verbose)*10)
+
+    options.error   = logger.critical        # function alias
+    options.warn    = logger.warning
+    options.debug   = logger.debug
+    options.info    = logger.info
+    
     # format
 
     options.gzip_flag = False           # if the input is gzip file
@@ -510,24 +505,11 @@ def opt_validate_refinepeak ( options ):
     elif options.format == "AUTO":
         options.parser = guess_parser
     else:
-        logging.error("Format \"%s\" cannot be recognized!" % (options.format))
+        logger.error("Format \"%s\" cannot be recognized!" % (options.format))
         sys.exit(1)
 
     # uppercase the format string
     options.format = options.format.upper()
-
-    # logging object
-    logging.basicConfig(level=(4-options.verbose)*10,
-                        format='%(levelname)-5s @ %(asctime)s: %(message)s ',
-                        datefmt='%a, %d %b %Y %H:%M:%S',
-                        stream=sys.stderr,
-                        filemode="w"
-                        )
-
-    options.error   = logging.critical        # function alias
-    options.warn    = logging.warning
-    options.debug   = logging.debug
-    options.info    = logging.info
 
     return options
 
@@ -536,6 +518,14 @@ def opt_validate_predictd ( options ):
 
     Ret: Validated options object.
     """
+    # logging object
+    logger.setLevel((4-options.verbose)*10)
+
+    options.error   = logger.critical        # function alias
+    options.warn    = logger.warning
+    options.debug   = logger.debug
+    options.info    = logger.info
+    
     # gsize
     try:
         options.gsize = efgsize[options.gsize]
@@ -543,8 +533,8 @@ def opt_validate_predictd ( options ):
         try:
             options.gsize = float(options.gsize)
         except:
-            logging.error("Error when interpreting --gsize option: %s" % options.gsize)
-            logging.error("Available shortcuts of effective genome sizes are %s" % ",".join(list(efgsize.keys())))
+            logger.error("Error when interpreting --gsize option: %s" % options.gsize)
+            logger.error("Available shortcuts of effective genome sizes are %s" % ",".join(list(efgsize.keys())))
             sys.exit(1)
 
     # format
@@ -576,7 +566,7 @@ def opt_validate_predictd ( options ):
     elif options.format == "AUTO":
         options.parser = guess_parser
     else:
-        logging.error("Format \"%s\" cannot be recognized!" % (options.format))
+        logger.error("Format \"%s\" cannot be recognized!" % (options.format))
         sys.exit(1)
 
     # uppercase the format string
@@ -584,30 +574,17 @@ def opt_validate_predictd ( options ):
 
     # d_min is non-negative
     if options.d_min < 0:
-        logging.error("Minimum fragment size shouldn't be negative!" % options.d_min)
+        logger.error("Minimum fragment size shouldn't be negative!" % options.d_min)
         sys.exit(1)
 
     # upper and lower mfold
     options.lmfold = options.mfold[0]
     options.umfold = options.mfold[1]
     if options.lmfold > options.umfold:
-        logging.error("Upper limit of mfold should be greater than lower limit!" % options.mfold)
+        logger.error("Upper limit of mfold should be greater than lower limit!" % options.mfold)
         sys.exit(1)
 
     options.modelR  = os.path.join( options.outdir, options.rfile )
-
-    # logging object
-    logging.basicConfig(level=(4-options.verbose)*10,
-                        format='%(levelname)-5s @ %(asctime)s: %(message)s ',
-                        datefmt='%a, %d %b %Y %H:%M:%S',
-                        stream=sys.stderr,
-                        filemode="w"
-                        )
-
-    options.error   = logging.critical        # function alias
-    options.warn    = logging.warning
-    options.debug   = logging.debug
-    options.info    = logging.info
 
     return options
 
@@ -617,6 +594,14 @@ def opt_validate_pileup ( options ):
 
     Ret: Validated options object.
     """
+    # logging object
+    logger.setLevel((4-options.verbose)*10)
+
+    options.error   = logger.critical        # function alias
+    options.warn    = logger.warning
+    options.debug   = logger.debug
+    options.info    = logger.info
+    
     # format
 
     options.gzip_flag = False           # if the input is gzip file
@@ -643,28 +628,15 @@ def opt_validate_pileup ( options ):
     elif options.format == "BEDPE":
         options.parser = BEDPEParser
     else:
-        logging.error("Format \"%s\" cannot be recognized!" % (options.format))
+        logger.error("Format \"%s\" cannot be recognized!" % (options.format))
         sys.exit(1)
 
     # uppercase the format string
     options.format = options.format.upper()
 
-    # logging object
-    logging.basicConfig(level=(4-options.verbose)*10,
-                        format='%(levelname)-5s @ %(asctime)s: %(message)s ',
-                        datefmt='%a, %d %b %Y %H:%M:%S',
-                        stream=sys.stderr,
-                        filemode="w"
-                        )
-
-    options.error   = logging.critical        # function alias
-    options.warn    = logging.warning
-    options.debug   = logging.debug
-    options.info    = logging.info
-
     # extsize
     if options.extsize <= 0 :
-        logging.error("--extsize must > 0!")
+        logger.error("--extsize must > 0!")
         sys.exit(1)
 
     return options
@@ -675,30 +647,25 @@ def opt_validate_bdgcmp ( options ):
     Ret: Validated options object.
     """
     # logging object
-    logging.basicConfig(level=20,
-                        format='%(levelname)-5s @ %(asctime)s: %(message)s ',
-                        datefmt='%a, %d %b %Y %H:%M:%S',
-                        stream=sys.stderr,
-                        filemode="w"
-                        )
+    logger.setLevel((4-options.verbose)*10)
 
-    options.error   = logging.critical        # function alias
-    options.warn    = logging.warning
-    options.debug   = logging.debug
-    options.info    = logging.info
+    options.error   = logger.critical        # function alias
+    options.warn    = logger.warning
+    options.debug   = logger.debug
+    options.info    = logger.info
 
     # methods should be valid:
 
     for method in set(options.method):
         if method not in [ 'ppois', 'qpois', 'subtract', 'logFE', 'FE', 'logLR', 'slogLR', 'max' ]:
-            logging.error( "Invalid method: %s" % method )
+            logger.error( "Invalid method: %s" % method )
             sys.exit( 1 )
 
     # # of --ofile must == # of -m
 
     if options.ofile:
         if len(options.method) != len(options.ofile):
-            logging.error("The number and the order of arguments for --ofile must be the same as for -m.")
+            logger.error("The number and the order of arguments for --ofile must be the same as for -m.")
             sys.exit(1)
 
     return options
@@ -710,27 +677,22 @@ def opt_validate_cmbreps ( options ):
     Ret: Validated options object.
     """
     # logging object
-    logging.basicConfig(level=20,
-                        format='%(levelname)-5s @ %(asctime)s: %(message)s ',
-                        datefmt='%a, %d %b %Y %H:%M:%S',
-                        stream=sys.stderr,
-                        filemode="w"
-                        )
+    logger.setLevel((4-options.verbose)*10)
 
-    options.error   = logging.critical        # function alias
-    options.warn    = logging.warning
-    options.debug   = logging.debug
-    options.info    = logging.info
+    options.error   = logger.critical        # function alias
+    options.warn    = logger.warning
+    options.debug   = logger.debug
+    options.info    = logger.info
 
     # methods should be valid:
 
 
     if options.method not in [ 'fisher', 'max', 'mean']:
-        logging.error( "Invalid method: %s" % options.method )
+        logger.error( "Invalid method: %s" % options.method )
         sys.exit( 1 )
 
     if len( options.ifile ) < 2:
-        logging.error("Combining replicates needs at least two replicates!")
+        logger.error("Combining replicates needs at least two replicates!")
         sys.exit( 1 )
 
     # # of -i must == # of -w
@@ -739,11 +701,11 @@ def opt_validate_cmbreps ( options ):
     #     options.weights = [ 1.0 ] * len( options.ifile )
 
     # if len( options.ifile ) != len( options.weights ):
-    #     logging.error("Must provide same number of weights as number of input files.")
+    #     logger.error("Must provide same number of weights as number of input files.")
     #     sys.exit( 1 )
 
     # if options.method == "fisher" and len( options.ifile ) > 3:
-    #     logging.error("NOT IMPLEMENTED! Can't combine more than 3 replicates using Fisher's method.")
+    #     logger.error("NOT IMPLEMENTED! Can't combine more than 3 replicates using Fisher's method.")
     #     sys.exit( 1 )
 
     return options
@@ -755,26 +717,21 @@ def opt_validate_bdgopt ( options ):
     Ret: Validated options object.
     """
     # logging object
-    logging.basicConfig(level=20,
-                        format='%(levelname)-5s @ %(asctime)s: %(message)s ',
-                        datefmt='%a, %d %b %Y %H:%M:%S',
-                        stream=sys.stderr,
-                        filemode="w"
-                        )
+    logger.setLevel((4-options.verbose)*10)
 
-    options.error   = logging.critical        # function alias
-    options.warn    = logging.warning
-    options.debug   = logging.debug
-    options.info    = logging.info
+    options.error   = logger.critical        # function alias
+    options.warn    = logger.warning
+    options.debug   = logger.debug
+    options.info    = logger.info
 
     # methods should be valid:
 
     if options.method.lower() not in [ 'multiply', 'add', 'p2q', 'max', 'min']:
-        logging.error( "Invalid method: %s" % options.method )
+        logger.error( "Invalid method: %s" % options.method )
         sys.exit( 1 )
 
     if options.method.lower() in [ 'multiply', 'add' ] and not options.extraparam:
-        logging.error( "Need EXTRAPARAM for method multiply or add!")
+        logger.error( "Need EXTRAPARAM for method multiply or add!")
         sys.exit( 1 )
 
     return options
@@ -785,17 +742,12 @@ def opt_validate_callvar ( options ):
     Ret: Validated options object.
     """
     # logging object
-    logging.basicConfig(level=20,
-                        format='%(levelname)-5s @ %(asctime)s: %(message)s ',
-                        datefmt='%a, %d %b %Y %H:%M:%S',
-                        stream=sys.stderr,
-                        filemode="w"
-                        )
+    logger.setLevel((4-options.verbose)*10)
 
-    options.error   = logging.critical        # function alias
-    options.warn    = logging.warning
-    options.debug   = logging.debug
-    options.info    = logging.info
+    options.error   = logger.critical        # function alias
+    options.warn    = logger.warning
+    options.debug   = logger.debug
+    options.info    = logger.info
 
     # methods should be valid:
 
@@ -810,18 +762,12 @@ def opt_validate_hmmratac ( options ):
     Ret: Validated options object.
     """
     # logging object
-    logging.basicConfig(level=(4-options.verbose)*10,
-                        format='%(levelname)-5s @ %(asctime)s: %(message)s ',
-                        datefmt='%a, %d %b %Y %H:%M:%S',
-                        stream=sys.stderr,
-                        filemode="w"
-                        )
+    logger.setLevel((4-options.verbose)*10)
 
-    options.error   = logging.critical        # function alias
-    options.warn    = logging.warning
-    options.debug   = logging.debug
-    options.info    = logging.info
-
+    options.error   = logger.critical        # function alias
+    options.warn    = logger.warning
+    options.debug   = logger.debug
+    options.info    = logger.info
    
     # input options.argtxt for hmmratac
     options.argtxt = "# Command line: %s\n" % " ".join(sys.argv[1:])
@@ -857,41 +803,41 @@ def opt_validate_hmmratac ( options ):
         options.argtxt += "# EM training not performed on fragment distribution. \n"
     # em_means non-negative
     if sum( [ x < 0 for x in options.em_means ] ):
-        logging.error(" --means should not be negative! ")
+        logger.error(" --means should not be negative! ")
         sys.exit( 1 )
     # em_stddev non-negative
     if sum( [ x < 0 for x in options.em_stddevs ] ):
-        logging.error(" --stddev should not be negative! ")
+        logger.error(" --stddev should not be negative! ")
         sys.exit( 1 )
 
 
     # HMM
     # hmm_states non-negative int, warn if not k=3
     #if options.hmm_states <=0:
-    #    logging.error(" -s, --states must be an integer >= 0.")
+    #    logger.error(" -s, --states must be an integer >= 0.")
     #    sys.exit( 1 )
     #elif options.hmm_states != 3 and options.hmm_states > 0 and options.store_peaks == False:
-    #    logging.warn(" If -s, --states not k=3, recommend NOT calling peaks, use bedgraph.")
+    #    logger.warn(" If -s, --states not k=3, recommend NOT calling peaks, use bedgraph.")
 
     # hmm_binsize > 0
     if options.hmm_binsize <=0:
-        logging.error(" --binsize must be larger than 0.")
+        logger.error(" --binsize must be larger than 0.")
         sys.exit( 1 )
 
     # hmm_lower less than hmm_upper, non-negative 
     if options.hmm_lower <0:
-        logging.error(" -l, --lower should not be negative! ")
+        logger.error(" -l, --lower should not be negative! ")
         sys.exit( 1 )
     if options.hmm_upper <0:
-        logging.error(" -u, --upper should not be negative! ")
+        logger.error(" -u, --upper should not be negative! ")
         sys.exit( 1 )
     if options.hmm_lower > options.hmm_upper:
-        logging.error("Upper limit of fold change range should be greater than lower limit!" % options.mfold)
+        logger.error("Upper limit of fold change range should be greater than lower limit!" % options.mfold)
         sys.exit(1)
     
     # hmm_maxTrain non-negative
     if options.hmm_maxTrain <= 0:
-        logging.error(" --maxTrain should be larger than 0!")
+        logger.error(" --maxTrain should be larger than 0!")
         sys.exit( 1 )
     
     # hmm_training_regions
@@ -900,7 +846,7 @@ def opt_validate_hmmratac ( options ):
     
     # hmm_zscore non-negative
     #if options.hmm_zscore <0:
-    #    logging.error(" -z, --zscore should not be negative!")
+    #    logger.error(" -z, --zscore should not be negative!")
     #    sys.exit( 1 )
     
     # hmm_randomSeed
@@ -909,7 +855,7 @@ def opt_validate_hmmratac ( options ):
     
     # hmm_window non-negative
     #if options.hmm_window <0:
-    #    logging.error(" --window should not be negative! ")
+    #    logger.error(" --window should not be negative! ")
     #    sys.exit( 1 )
 
     # hmm_file
@@ -923,20 +869,20 @@ def opt_validate_hmmratac ( options ):
 
     # Peak Calling
     if options.prescan_cutoff <= 1:
-        logging.error(" In order to use -c or --prescan-cutoff, the cutoff must be larger than 1.")
+        logger.error(" In order to use -c or --prescan-cutoff, the cutoff must be larger than 1.")
         sys.exit( 1 )
     
     if options.openregion_minlen < 0: # and options.store_peaks == True:
-        logging.error(" In order to use --minlen, the length should not be negative.")
+        logger.error(" In order to use --minlen, the length should not be negative.")
         sys.exit( 1 )
 
     #if options.call_score.lower() not in [ 'max', 'ave', 'med', 'fc', 'zscore', 'all']:
-    #    logging.error( " Invalid method: %s" % options.call_score )
+    #    logger.error( " Invalid method: %s" % options.call_score )
     #    sys.exit( 1 )
 
     # call_threshold non-negative
     #if options.call_threshold <0:
-    #    logging.error(" --threshold should not be negative! ")
+    #    logger.error(" --threshold should not be negative! ")
     #    sys.exit( 1 )
     
 
@@ -947,26 +893,17 @@ def opt_validate_hmmratac ( options ):
 
     # misc_trim non-negative
     #if options.misc_trim <0:
-    #    logging.error(" --trim should not be negative! ")
+    #    logger.error(" --trim should not be negative! ")
     #    sys.exit( 1 )
 
     # np # should this be mp? non-negative
     #if options.np <0:
-    #    logging.error(" -m, --multiple-processing should not be negative! ")
+    #    logger.error(" -m, --multiple-processing should not be negative! ")
     #    sys.exit( 1 )
-    
-    # verbose 
-    # logging object
-    logging.basicConfig(level=(4-options.verbose)*10,
-                        format='%(levelname)-5s @ %(asctime)s: %(message)s ',
-                        datefmt='%a, %d %b %Y %H:%M:%S',
-                        stream=sys.stderr,
-                        filemode="w"
-                        )
     
     # min_map_quality non-negative
     #if options.min_map_quality <0:
-    #    logging.error(" -q, --minmapq should not be negative! ")
+    #    logger.error(" -q, --minmapq should not be negative! ")
     #    sys.exit( 1 )
 
     

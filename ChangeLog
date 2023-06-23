@@ -1,10 +1,11 @@
-2022-06-07  Tao Liu  <vladimir.liu@gmail.com>
-	MACS 3.0.0b1
+2023-06-15  Tao Liu  <vladimir.liu@gmail.com>
+	MACS 3.0.0b2
 	* New features in MACS3:
 
 	1) Speed/memory optimization.  Use the cykhash to replace python 
 	dictionary. Use buffer (10MB) to read and parse input file (not 
-	available for BAM file parser). And many optimization tweaks. 
+	available for BAM file parser). And many optimization tweaks. We
+    added memory monitoring to the runtime messages.
 
 	2) Code cleanup. Reorganize source codes. 
 

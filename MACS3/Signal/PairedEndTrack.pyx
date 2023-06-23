@@ -14,11 +14,16 @@ the distribution).
 # ------------------------------------
 import io
 import sys
-from logging import debug, info
 from copy import copy
 from array import array as pyarray
 from collections import Counter
 
+import logging
+import MACS3.Utilities.Logger
+
+logger = logging.getLogger(__name__)
+debug   = logger.debug
+info    = logger.info
 # ------------------------------------
 # MACS3 modules
 # ------------------------------------

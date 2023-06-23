@@ -12,7 +12,6 @@ the distribution).
 # ------------------------------------
 import sys
 import os
-import logging
 
 from MACS3.IO import BedGraphIO
 from MACS3.Utilities.OptValidator import opt_validate_bdgopt
@@ -20,20 +19,11 @@ from MACS3.Utilities.OptValidator import opt_validate_bdgopt
 # ------------------------------------
 # constants
 # ------------------------------------
-logging.basicConfig(level=20,
-                    format='%(levelname)-5s @ %(asctime)s: %(message)s ',
-                    datefmt='%a, %d %b %Y %H:%M:%S',
-                    stream=sys.stderr,
-                    filemode="w"
-                    )
 
 # ------------------------------------
 # Misc functions
 # ------------------------------------
-error   = logging.critical		# function alias
-warn    = logging.warning
-debug   = logging.debug
-info    = logging.info
+
 # ------------------------------------
 # Classes
 # ------------------------------------
@@ -43,6 +33,11 @@ info    = logging.info
 # ------------------------------------
 def run( options ):
     options = opt_validate_bdgopt( options )
+    info = options.info
+    warn = options.warn
+    debug = options.debug
+    error = options.error
+    
     info("Read and build bedGraph...")
     bio = BedGraphIO.bedGraphIO(options.ifile)
     btrack = bio.build_bdgtrack(baseline_value=0)

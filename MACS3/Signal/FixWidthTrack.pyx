@@ -12,7 +12,6 @@ the distribution).
 # ------------------------------------
 # python modules
 # ------------------------------------
-import logging
 import sys
 import io
 from copy import copy

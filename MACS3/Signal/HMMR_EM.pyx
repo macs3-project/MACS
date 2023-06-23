@@ -13,8 +13,11 @@ the distribution).
 # ------------------------------------
 from math import sqrt
 import logging
-debug   = logging.debug
-info    = logging.info
+import MACS3.Utilities.Logger
+
+logger = logging.getLogger(__name__)
+debug   = logger.debug
+info    = logger.info
 # ------------------------------------
 # Other modules
 # ------------------------------------

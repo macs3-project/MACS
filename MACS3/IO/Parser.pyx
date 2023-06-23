@@ -15,8 +15,6 @@ the distribution).
 # ------------------------------------
 # python modules
 # ------------------------------------
-import logging
-from logging import info, debug
 import struct
 from struct import unpack
 from re import findall
@@ -24,6 +22,12 @@ import gzip
 import io
 import sys
 
+import logging
+import MACS3.Utilities.Logger
+
+logger = logging.getLogger(__name__)
+debug   = logger.debug
+info    = logger.info
 # ------------------------------------
 # MACS3 modules
 # ------------------------------------

@@ -1,6 +1,6 @@
 # cython: language_level=3
 # cython: profile=True
-# Time-stamp: <2022-10-04 15:46:00 Tao Liu>
+# Time-stamp: <2023-06-08 10:52:59 Tao Liu>
 
 """Module for BedGraph data class.
 
@@ -12,7 +12,6 @@ the distribution).
 # ------------------------------------
 # python modules
 # ------------------------------------
-import logging
 #from array import array
 from cpython cimport array
 from array import array as pyarray
@@ -402,8 +401,9 @@ cdef class bedGraphTrackI:
         return True
 
     cpdef tuple summary (self):
-        """Calculate the sum, total_length, max, min, mean, and std. Return a tuple for (sum, max, min, mean, std).
+        """Calculate the sum, total_length, max, min, mean, and std. 
 
+        Return a tuple for (sum, total_length, max, min, mean, std).
         """
         cdef:
             int64_tn_v
@@ -1132,33 +1132,63 @@ cdef class bedGraphTrackI:
         return ret
 
     cpdef str cutoff_analysis ( self, int32_t max_gap, int32_t min_length, int32_t steps = 100 ):
+        """
+        Cutoff analysis function for bedGraphTrackI object.
+    
+        This function will try all possible cutoff values on the score column to call peaks. Then 
+        will give a report of a number of metrics (number of peaks, total length of peaks, average
+        length of peak) at varying score cutoffs. For each score cutoff, the function finds the 
+        positions where the score exceeds the cutoff, then groups those positions into "peaks" 
+        based on the maximum allowed gap (max_gap) between consecutive positions. If a peak's length
+        exceeds the minimum length (min_length), the peak is counted.
+
+        Parameters
+        ----------
+        max_gap : int32_t
+        Maximum allowed gap between consecutive positions above cutoff
+        
+        min_length : int32_t
+        Minimum length of peak
+        
+        steps: int32_t
+
+        Returns
+        -------
+        Cutoff analysis report in 'str'
+        
+        """
         cdef:
             set chrs
-            list tmplist, peak_content
+            list peak_content, ret_list, cutoff_list, cutoff_npeaks, cutoff_lpeaks
             bytes  chrom
             str ret
             float32_t cutoff
             int64_t total_l, total_p, i, n, ts, te, lastp, tl, peak_length
-            dict cutoff_npeaks, cutoff_lpeaks
+            #dict cutoff_npeaks, cutoff_lpeaks
             float32_t s, midvalue
 
         chrs = self.get_chr_names()
 
-        midvalue = self.minvalue/2 + self.maxvalue/2
-        s = float(self.minvalue - midvalue)/steps
+        #midvalue = self.minvalue/2 + self.maxvalue/2
+        #s = float(self.minvalue - midvalue)/steps
+        minv = self.minvalue
+        maxv = self.maxvalue
 
-        tmplist = list( np.arange( midvalue, self.minvalue - s, s ) )
+        s = float(maxv - minv)/steps
 
-        cutoff_npeaks = {}
-        cutoff_lpeaks = {}
+        # a list of possible cutoff values from minv to maxv with step of s
+        cutoff_list = [round(value, 3) for value in np.arange(minv, maxv, s)]
+
+        cutoff_npeaks = [0] * len( cutoff_list )
+        cutoff_lpeaks = [0] * len( cutoff_list )
 
         for chrom in sorted(chrs):
             ( pos_array, score_array ) = self.__data[ chrom ]
             pos_array = np.array( self.__data[ chrom ][ 0 ] )
             score_array = np.array( self.__data[ chrom ][ 1 ] )
 
-            for n in range( len( tmplist ) ):
-                cutoff = round( tmplist[ n ], 3 )
+            for n in range( len( cutoff_list ) ):
+                cutoff = cutoff_list[ n ]
                 total_l = 0           # total length of peaks
                 total_p = 0           # total number of peaks
 
@@ -1198,13 +1228,41 @@ cdef class bedGraphTrackI:
                     if peak_length >= min_length: # if the peak is too small, reject it
                         total_l +=  peak_length
                         total_p += 1
-                cutoff_lpeaks[ cutoff ] = cutoff_lpeaks.get( cutoff, 0 ) + total_l
-                cutoff_npeaks[ cutoff ] = cutoff_npeaks.get( cutoff, 0 ) + total_p
-
-        # write pvalue and total length of predicted peaks
-        ret = "pscore\tnpeaks\tlpeaks\tavelpeak\n"
-        for cutoff in sorted(cutoff_lpeaks.keys(), reverse=True):
-            if cutoff_npeaks[ cutoff ] > 0:
-                ret += "%.2f\t%d\t%d\t%.2f\n" % ( cutoff, cutoff_npeaks[ cutoff ], cutoff_lpeaks[ cutoff ], cutoff_lpeaks[ cutoff ]/cutoff_npeaks[ cutoff ] )
+                cutoff_lpeaks[ n ] += total_l
+                cutoff_npeaks[ n ] += total_p
+                
+        # prepare the returnning text
+        ret_list = ["score\tnpeaks\tlpeaks\tavelpeak\n"]
+        for n in range( len( cutoff_list )-1, -1, -1 ):
+            cutoff = cutoff_list[ n ]
+            if cutoff_npeaks[ n ] > 0:
+                ret_list.append("%.2f\t%d\t%d\t%.2f\n" % ( cutoff, cutoff_npeaks[ n ], \
+                                                          cutoff_lpeaks[ n ], \
+                                                          cutoff_lpeaks[ n ]/cutoff_npeaks[ n ] ))
+        ret = ''.join(ret_list)
         return ret
 
+
+cdef np.ndarray calculate_elbows( np.ndarray values, float32_t threshold=0.01):
+    # although this function is supposed to find elbow pts for cutoff analysis, 
+    # however, in reality, it barely works...
+    cdef: 
+        np.ndarray deltas, slopes, delta_slopes, elbows
+        np.float32_t avg_delta_slope
+        
+    # Calculate the difference between each point and the first point
+    deltas = values - values[0]
+    
+    # Calculate the slope between each point and the last point
+    slopes = deltas / (values[-1] - values[0])
+    
+    # Calculate the change in slope
+    delta_slopes = np.diff(slopes)
+    
+    # Calculate the average change in slope
+    avg_delta_slope = np.mean(delta_slopes)
+    
+    # Find all points where the change in slope is significantly larger than the average
+    elbows = np.where(delta_slopes > avg_delta_slope + threshold)[0]
+    
+    return elbows

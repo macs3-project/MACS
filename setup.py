@@ -12,6 +12,7 @@ import sys
 import os
 import re
 from setuptools import setup, Extension
+from Cython.Build import cythonize
 import subprocess
 import sysconfig
 import numpy
@@ -30,13 +31,13 @@ classifiers =[\
               'Operating System :: POSIX',
               'Operating System :: Unix',
               'Topic :: Scientific/Engineering :: Bio-Informatics',
-              'Programming Language :: Python :: 3.8',
               'Programming Language :: Python :: 3.9',
               'Programming Language :: Python :: 3.10',
+              'Programming Language :: Python :: 3.11',
               'Programming Language :: Cython', ]
 
-install_requires = [ "numpy>=1.23",
-                     "hmmlearn>=0.2.8",
+install_requires = [ "numpy>=1.19",
+                     "hmmlearn>=0.3",
                      "cykhash>=2.0",
                      "Cython>=0.29" ]
 
@@ -93,9 +94,8 @@ def main():
     elif new_gcc or clang or sysconfig.get_config_vars()['CC'] == 'clang':
         extra_c_args_for_fermi.extend(['-fopenmp-simd', '-DSIMDE_ENABLE_OPENMP'])
 
-    # extensions, those has to be processed by Cython
+    # extensions, those have to be processed by Cython
     ext_modules = [ \
-                    # Signal
                     Extension("MACS3.Signal.HMMR_EM", ["MACS3/Signal/HMMR_EM.pyx"], libraries=["m"], include_dirs=numpy_include_dir, extra_compile_args=extra_c_args ),
                     Extension("MACS3.Signal.HMMR_Signal_Processing", ["MACS3/Signal/HMMR_Signal_Processing.pyx"], libraries=["m"], include_dirs=numpy_include_dir, extra_compile_args=extra_c_args ),
                     Extension("MACS3.Signal.HMMR_HMM", ["MACS3/Signal/HMMR_HMM.pyx"], libraries=["m"], include_dirs=numpy_include_dir, extra_compile_args=extra_c_args ),
@@ -148,8 +148,9 @@ def main():
            install_requires = install_requires,
            setup_requires = install_requires,
            tests_require = tests_requires,
-           python_requires = '>=3.8',
-           ext_modules = ext_modules )
+           python_requires = '>=3.9',
+           ext_modules=cythonize( ext_modules ) ),
+#                                  compiler_directives={'linetrace': True, 'binding': True}) )
 
 if __name__ == '__main__':
     main()

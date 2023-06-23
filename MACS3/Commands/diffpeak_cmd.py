@@ -13,7 +13,6 @@ the distribution).
 
 import os
 import sys
-import logging
 from time import strftime
 
 # ------------------------------------
@@ -30,20 +29,16 @@ from time import strftime
 # ------------------------------------
 # constants
 # ------------------------------------
-logging.basicConfig(level=20,
-                    format='%(levelname)-5s @ %(asctime)s: %(message)s ',
-                    datefmt='%a, %d %b %Y %H:%M:%S',
-                    stream=sys.stderr,
-                    filemode="w"
-                    )
 
 # ------------------------------------
 # Misc functions
 # ------------------------------------
-error   = logging.critical		# function alias
-warn    = logging.warning
-debug   = logging.debug
-info    = logging.info
+import logging
+import MACS3.Utilities.Logger
+
+logger = logging.getLogger(__name__)
+debug   = logger.debug
+info    = logger.info
 # ------------------------------------
 # Main function
 # ------------------------------------

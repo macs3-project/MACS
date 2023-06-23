@@ -1,8 +1,8 @@
 # Time-stamp: <2022-09-15 17:25:49 Tao Liu>
 
-"""Description: macs call
+"""Description: Call variants directly
 
-Copyright (c) 2017 Tao Liu <tliu4@buffalo.edu>
+Copyright (c) 2017-2023 Tao Liu <vladimir.liu@gmail.com>
 
 This code is free software; you can redistribute it and/or modify it
 under the terms of the BSD License (see the file COPYING included
@@ -11,14 +11,13 @@ with the distribution).
 @status: release candidate
 @version: $Id$
 @author:  Tao Liu
-@contact: tliu4@buffalo.edu
+@contact: vladimir.liu@gmail.com
 """
 
 # ------------------------------------
 # python modules
 # ------------------------------------
 
-import logging
 import datetime
 import sys
 from functools import partial
