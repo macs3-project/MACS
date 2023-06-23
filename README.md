@@ -48,7 +48,7 @@ add more new features in the future.**
     
     2) Memory monitoring in the runtime message
     
-    3) testing for s390x, armv7 and power64le is back
+    3) testing for s390x, armv7 and power64le is back. However, we turned off the function to check if the `hmmratac` results from non-x86 architectures are the same as the standard results, because in order to let the testing run, we need to use old python libraries (scipy and sklearn) through the distribution of Debian/Linux bullseye.
     
 ## Install
 

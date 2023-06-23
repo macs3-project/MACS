@@ -15,7 +15,7 @@ MACS v3.x.x requires Python3. We have tested MACS in Python3.8 to 3.11.
 
 ### NumPy, hmmlearn
 
-MACS requires NumPy>=1.24 and hmmlearn>=0.3 during installation.
+MACS requires NumPy>=1.19 (>=1.24 recommended) and hmmlearn>=0.3 during installation. Note that hmmlearn further requires SciPy and sklearn (aka scikit-learn). 
 
 ### Cython
 
@@ -77,7 +77,7 @@ the folder you specified previously through `python3 -m env` command,
 or to your active conda environment. 
 
 Then under the command line, type `pip install macs3`. PyPI will
-install Numpy automatically if it is absent.
+install dependencies automatically if it is absent.
 
 To upgrade MACS3, type `pip install --upgrade macs3`. It will check
 currently installed MACS3, compare the version with the one on PyPI
@@ -96,7 +96,7 @@ run the install command:
 By default, the script will install python library and executable
 codes according to the environment. When you run the command under
 virtualenv or conda environment, the script will install to the virtual
-environment instead. When you run it without virtual environment, 
+environment instead. When you run the command without virtual environment, 
 you may need to be root or administrator of the machine so as to 
 complete the installation. Please contact the system administrator
 if you want their help. 

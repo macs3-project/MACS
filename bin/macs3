@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# Time-stamp: <2023-06-13 19:30:24 Tao Liu>
+# Time-stamp: <2023-06-23 12:59:17 Tao Liu>
 
 """Description: MACS v3 main executable.
 
@@ -748,12 +748,13 @@ def add_hmmratac_parser( subparsers ):
                                                 help="Dedicated peak calling based on Hidden Markov Model for ATAC-seq data.",
                                                 epilog = """HMMRATAC is a dedicated tool for processing ATAC-seq data
 
-HMMRATAC, first released as a JAVA program in 2018, is a dedicated tool
-specifically designed for processing ATAC-seq data. In MACS3, it has been
-integrated as a subcommand (`hmmratac`). Reimagined and rewritten in Python
-and Cython, this tool's functionality might vary from its JAVA version. The 
-core principle of HMMRATAC involves utilizing the Hidden Markov Model to learn
-the nucleosome structure around open chromatin regions.
+HMMRATAC, first released as a JAVA program in 2019, is a dedicated
+tool specifically designed for processing ATAC-seq data. In MACS3, it
+has been integrated as a subcommand (`hmmratac`). Reimagined and
+rewritten in Python and Cython, this tool's functionality might vary
+from its JAVA version. The core principle of HMMRATAC involves
+utilizing the Hidden Markov Model to learn the nucleosome structure
+around open chromatin regions.
 
 Here's an example of how to run the `hmmratac` command:
 
@@ -772,13 +773,13 @@ crucial parameters we usually need to specify:
    background states, through `-c`.
 
 These three parameters can significantly influence the
-results. Therefore, it's highly recommended to run 
-`macs3 hmmratac --cutoff-analysis-only -b your.bam` first, which will
-help you decide the parameters for `-l`, `-u`, and `-c`. Since there
-isn't an automatic way to determine these parameters, your judgement
-will be vital. Please read the output from 
-`macs3 hmmratac --cutoff-analysis-only -b your.bam` and the following
-section `Choices of cutoff values` for guidance.
+results. Therefore, it's highly recommended to run `macs3 hmmratac
+--cutoff-analysis-only -b your.bam` first, which will help you decide
+the parameters for `-l`, `-u`, and `-c`. Since there isn't an
+automatic way to determine these parameters, your judgement will be
+vital. Please read the output from `macs3 hmmratac
+--cutoff-analysis-only -b your.bam` and the following section `Choices
+of cutoff values` for guidance.
 
 * Choices of cutoff values *
 
@@ -844,16 +845,16 @@ after training. An example is like this:
 #             open:       5.016      17.47      6.897      2.121
 ```
 
-In MACS3, we 'guess' which hidden state is for the open region, which is 
-the nucleosomal region, and which is the background. We compute from the
-HMM Emission matrix to pick the state with the highest sum of mean 
-signals as the open state, the lowest as the backgound state, then the 
-rest is the nucleosomal state. However it may not work in every case. In
-the above example, it may be tricky to call the second row as 'nuc' and 
-the third as 'open'. If the users want to exchange the state assignments 
-of the 'nuc' and 'open', they can modify the state assignment in the HMM
-model file (e.g. test_model.json). For the above example, the model.json
-looks like this (we skipped some detail):
+We will 'guess' which hidden state is for the open region, which is
+the nucleosomal region, and which is the background. We compute from
+the HMM Emission matrix to pick the state with the highest sum of mean
+signals as the open state, the lowest as the backgound state, then the
+rest is the nucleosomal state. However it may not work in every
+case. In the above example, it may be tricky to call the second row as
+'nuc' and the third as 'open'. If the users want to exchange the state
+assignments of the 'nuc' and 'open', they can modify the state
+assignment in the HMM model file (e.g. test_model.json). For the above
+example, the model.json looks like this (we skipped some detail):
 
 ```
 {"startprob": [...], "transmat": [...], "means": [...], "covars": [...], 
@@ -862,21 +863,22 @@ looks like this (we skipped some detail):
 "hmm_binsize": 10}
 ```
 
-We can modify the assignment of:
-`"i_open_region": 2, "i_background_region": 0, "i_nucleosomal_region": 1,`
-by assigning `1` to open, and `2` to nucleosomal as:
-`"i_open_region": 1, "i_background_region": 0, "i_nucleosomal_region": 2,`
-Then save the HMM in a new model file such as `new_model.json`. 
+We can modify the assignment of: `"i_open_region": 2,
+"i_background_region": 0, "i_nucleosomal_region": 1,` by assigning `1`
+to open, and `2` to nucleosomal as: `"i_open_region": 1,
+"i_background_region": 0, "i_nucleosomal_region": 2,` Then save the
+HMM in a new model file such as `new_model.json`.
 
-Then next, we can re-run `macs3 hmmratac` with the same parameters plus an
-extra option for the HMM model file like `macs3 hmmratac --model new_model.json`
+Then next, we can re-run `macs3 hmmratac` with the same parameters
+plus an extra option for the HMM model file like `macs3 hmmratac
+--model new_model.json`
 
 """)
     
     # group for input files
     group_input = argparser_hmmratac.add_argument_group( "Input files arguments" )
     group_input.add_argument( "-b", "--bam", dest = "bam_file", type = str, required = True, nargs = "+",
-                              help = "Sorted BAM files containing the ATAC-seq reads. If multiple files are given as '-t A B C', then they will all be read and pooled together. REQUIRED." )
+                              help = "BAM files containing the aligment results for ATAC-seq paired end reads. If multiple files are given as '-t A B C', then they will all be read and pooled together. The file should be in BAMPE format (aligned in paired end mode). REQUIRED." )
     
     # group for output files
     group_output = argparser_hmmratac.add_argument_group( "Output arguments" )
