@@ -212,6 +212,14 @@ mkdir ${OUTPUTDIR_PREFIX}_run_hmmratac
 
 macs3 hmmratac -b $ATACSEQBAM -n hmmratac_yeast500k --outdir ${OUTPUTDIR_PREFIX}_run_hmmratac &> ${OUTPUTDIR_PREFIX}_run_hmmratac/run_hmmratac.log
 
+echo "15.1 hmmratac save a training regions bed file"
+macs3 hmmratac -b $ATACSEQBAM -n hmmratac_yeast500k --save-training-data --outdir ${OUTPUTDIR_PREFIX}_run_hmmratac &> ${OUTPUTDIR_PREFIX}_run_hmmratac/run_hmmratac.log
+
+TRAINING_REGIONS_BED=${OUTPUTDIR_PREFIX}_run_hmmratac/hmmratac_yeast500k_training_regions.bed
+
+echo "15.2 hmmratac with input training regions"
+macs3 hmmratac -b $ATACSEQBAM -n hmmratac_yeast500k -t ${TRAINING_REGIONS_BED} --outdir ${OUTPUTDIR_PREFIX}_run_hmmratac &> ${OUTPUTDIR_PREFIX}_run_hmmratac/run_hmmratac.log
+
 echo "16. search for errors or warnings in log files"
 flag=0
 for i in `ls ${OUTPUTDIR_PREFIX}_run_*/*.log`;do
