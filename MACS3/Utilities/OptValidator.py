@@ -841,8 +841,8 @@ def opt_validate_hmmratac ( options ):
         sys.exit( 1 )
     
     # hmm_training_regions
-    #if options.hmm_training_regions:
-    #    options.argtxt += "# Using -t, --training input to train HMM instead of using fold change settings to select. \n"
+    if options.hmm_training_regions:
+       options.argtxt += "# Using -t, --training input to train HMM instead of using fold change settings to select. \n"
     
     # hmm_zscore non-negative
     #if options.hmm_zscore <0:
@@ -863,8 +863,8 @@ def opt_validate_hmmratac ( options ):
     #    options.argtxt += "# HMM training will be skipped, --model input used instead. \n"
 
     # hmm_modelonly
-    #if options.hmm_modelonly:
-    #    options.argtxt += "# Program will stop after generating model, which can be later applied with '--model'. \n"
+    if options.hmm_modelonly:
+       options.argtxt += "# Program will stop after generating model, which can be later applied with '--model'. \n"
 
 
     # Peak Calling

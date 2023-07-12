@@ -940,8 +940,8 @@ plus an extra option for the HMM model file like `macs3 hmmratac
     group_hmm.add_argument( "--training-flanking", dest = "hmm_training_flanking", type = int, required = False,
                             help = "Training regions will be expanded to both side with this number of basepairs. The purpose is to include more background regions. Default: 1000",
                             default = 1000 )
-    #group_hmm.add_argument( "-t", "--training", dest = "hmm_training_regions", type = str, required = False, 
-    #                        help = "Filename of training regions (previously was BED_file) to use for training HMM, instead of using foldchange settings to select. Default: NA" )
+    group_hmm.add_argument( "-t", "--training", dest = "hmm_training_regions", type = str, required = False, 
+                           help = "Filename of training regions (previously was BED_file) to use for training HMM, instead of using foldchange settings to select. Default: NA" )
     #group_hmm.add_argument( "-z", "--zscore", dest = "hmm_zscore", type = int,
     #                        help = "Zscored read depth to mask during Viterbi decoding. Default: 100",
     #                        default = 100 )
@@ -950,8 +950,8 @@ plus an extra option for the HMM model file like `macs3 hmmratac
     #                        default = 25000000 )
     group_hmm.add_argument( "--model", dest = "hmm_file", type = str, required = False, 
                             help = "A JSON file generated from previous HMMRATAC run to use instead of creating new one. When provided, HMM training will be skipped. Default: NA" )
-    #group_hmm.add_argument( "--modelonly", dest = "hmm_modelonly", action = "store_true", default = False,
-    #                        help = "Stop the program after generating model. Use this option to generate HMM model ONLY, which can be later applied with `--model`. Default: False")
+    group_hmm.add_argument( "--modelonly", dest = "hmm_modelonly", action = "store_true", default = False,
+                           help = "Stop the program after generating model. Use this option to generate HMM model ONLY, which can be later applied with `--model`. Default: False")
 
     # group for peak calling arguments
     group_call = argparser_hmmratac.add_argument_group( "Peak calling/HMM decoding arguments" )
