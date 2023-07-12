@@ -211,7 +211,7 @@ def run( args ):
         for l in peakio:
             fs = l.rstrip().split()
             peaks.add( chromosome=fs[0], start=int(fs[1]), end=int(fs[2])) #change based on what expected input file should contain
-        peaks.sort()
+        # peaks.sort()
         peakio.close()
         training_regions = Regions()
         training_regions.init_from_PeakIO( peaks )
