@@ -201,6 +201,24 @@ def run( args ):
     if options.hmm_file:
         # skip this step if hmm_file is given
         options.info( f"#3 Skip this step of looking for training set since a Hidden Markov Model file has been provided!")
+    elif options.hmm_training_regions: #if a training region file is provided - need to read in the bedfile and skip the peak calling step
+        options.info(f"#3 Read training regions from BED file: {options.hmm_training_regions}")
+        # add function to read in the bedfile - try using function build_bdgtrack from BEDGraphIO.pyx file or look at refinepeak_cmd.py
+
+        # from refinepeak_cmd.py:
+        peakio = open(options.hmm_training_regions,"rb")
+        peaks = PeakIO()
+        for l in peakio:
+            fs = l.rstrip().split()
+            peaks.add( chrom=fs[0], start=int(fs[1]), end=int(fs[2]), name=fs[3], peak_score=fs[4] ) #change based on what expected input file should contain
+        peaks.sort()
+        peakio.close()
+        training_regions = Regions()
+        training_regions.init_from_PeakIO( peaks )
+
+        #do we want to include training region checks here? (like merge overlap and filtering blacklisted regions as done below)
+
+        options.info("#  Training regions have been read from bedfile")
     else:
         # Find regions with fold change within determined range to use as training sites.
         # Find regions with zscore values above certain cutoff to exclude from viterbi.
@@ -212,6 +230,10 @@ def run( args ):
         peaks = fc_bdg.call_peaks (cutoff=options.hmm_lower, min_length=minlen, max_gap=options.hmm_training_flanking, call_summits=False)
         options.info( f"#  Total training regions called after applying the lower cutoff {options.hmm_lower}: {peaks.total}" )
         peaks.filter_score( options.hmm_lower, options.hmm_upper )
+        # print('CHECK peaks var')
+        # print(dir(peaks))
+        # print(type(peaks))
+        # print(peaks)
         options.info( f"#  Total training regions after filtering with upper cutoff {options.hmm_upper}: {peaks.total}" )
 
         options.info( f"#  **IMPORTANT**")
@@ -299,6 +321,11 @@ def run( args ):
         # write hmm into model file
         options.info( f"#  Write HMM parameters into JSON: {hmm_modelfile}")
         hmm_model_save( hmm_modelfile, hmm_model, options.hmm_binsize, i_open_region, i_nucleosomal_region, i_background_region )
+        
+        # if --modelonly option provided, exit script after hmm model is saved 
+        if options.hmm_modelonly:
+            options.info( f"#  Complete - HMM model was saved, program exited (--modelonly option was provided) ")
+            sys.exit()
 
     # Now tell users the parameters of the HMM
     assignments = [ "", "", "" ]
