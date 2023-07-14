@@ -207,18 +207,20 @@ macs3 pileup -f BED -i $CHIPCONTIGS50K --extsize 200 --outdir ${OUTPUTDIR_PREFIX
 echo "14.4 randsample"
 macs3 randsample -i $CHIPCONTIGS50K -n 100000 --seed 31415926 --outdir ${OUTPUTDIR_PREFIX}_run_50kcontigs -o run_randsample.bed --buffer-size 1000 &> ${OUTPUTDIR_PREFIX}_run_50kcontigs/run_randsample.log
 
-echo "15. hmmratac"
+# echo "15. hmmratac"
+echo "15. hmmratac save training regions bed file and model file" # model file is written by default
 mkdir ${OUTPUTDIR_PREFIX}_run_hmmratac
 
-macs3 hmmratac -b $ATACSEQBAM -n hmmratac_yeast500k --outdir ${OUTPUTDIR_PREFIX}_run_hmmratac &> ${OUTPUTDIR_PREFIX}_run_hmmratac/run_hmmratac.log
-
-echo "15.1 hmmratac save a training regions bed file"
 macs3 hmmratac -b $ATACSEQBAM -n hmmratac_yeast500k --save-training-data --outdir ${OUTPUTDIR_PREFIX}_run_hmmratac &> ${OUTPUTDIR_PREFIX}_run_hmmratac/run_hmmratac.log
 
 TRAINING_REGIONS_BED=${OUTPUTDIR_PREFIX}_run_hmmratac/hmmratac_yeast500k_training_regions.bed
+HMM_MODEL=${OUTPUTDIR_PREFIX}_run_hmmratac/hmmratac_yeast500k_model.json
 
-echo "15.2 hmmratac with input training regions"
-macs3 hmmratac -b $ATACSEQBAM -n hmmratac_yeast500k -t ${TRAINING_REGIONS_BED} --outdir ${OUTPUTDIR_PREFIX}_run_hmmratac &> ${OUTPUTDIR_PREFIX}_run_hmmratac/run_hmmratac.log
+echo "15.1 hmmratac load training regions from bedfile"
+macs3 hmmratac -b $ATACSEQBAM -n hmmratac_yeast500k_load_training_regions -t ${TRAINING_REGIONS_BED} --outdir ${OUTPUTDIR_PREFIX}_run_hmmratac &> ${OUTPUTDIR_PREFIX}_run_hmmratac/run_hmmratac_load_training_regions.log
+
+echo "15.2 hmmratac load hmm model file"
+macs3 hmmratac -b $ATACSEQBAM -n hmmratac_yeast500k_load_hmm_model --model ${HMM_MODEL} --outdir ${OUTPUTDIR_PREFIX}_run_hmmratac &> ${OUTPUTDIR_PREFIX}_run_hmmratac/run_hmmratac_load_hmm_model.log
 
 echo "16. search for errors or warnings in log files"
 flag=0
