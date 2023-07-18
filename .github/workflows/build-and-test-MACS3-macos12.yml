@@ -1,25 +1,19 @@
 # This workflow will install Python dependencies, run tests and lint with a single version of Python
 # For more information see: https://help.github.com/actions/language-and-framework-guides/using-python-with-github-actions
 
-name: CI x64
+name: CI MacOS 12
 
 on: [push, pull_request]
 
 jobs:
   build:
     runs-on: macos-12
-    strategy: 
-    python-version: 3.11
     name: Build on MacOS 12 with Python 3.11
     steps:
       - name: Checkout MACS
         uses: actions/checkout@v3
         with:
           submodules: 'true'
-      - name: Set up Python 3.11
-        uses: actions/setup-python@v3
-        with:
-          python-version: 3.11
       - name: Cache pip
         uses: actions/cache@v3
         with:
