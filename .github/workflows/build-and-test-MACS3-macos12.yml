@@ -7,22 +7,19 @@ on: [push, pull_request]
 
 jobs:
   build:
-    runs-on: ubuntu-20.04
+    runs-on: macos-12
     strategy: 
-      matrix: 
-        python-version: [3.9, 3.10.11, 3.11]
-        arch: ['x64']
-    name: Build on x64 with Python ${{ matrix.python-version }}
+    python-version: 3.11
+    name: Build on MacOS 12 with Python 3.11
     steps:
       - name: Checkout MACS
         uses: actions/checkout@v3
         with:
           submodules: 'true'
-      - name: Set up Python ${{ matrix.python-version }}
+      - name: Set up Python 3.11
         uses: actions/setup-python@v3
         with:
-          python-version: ${{ matrix.python-version }}
-          architecture: ${{ matrix.arch }}
+          python-version: 3.11
       - name: Cache pip
         uses: actions/cache@v3
         with:
@@ -33,6 +30,11 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-pip-
             ${{ runner.os }}-        
+      - name: Setup venv
+        run: |
+          # create venv
+          python3 -m venv macs3venv
+          source macs3venv/bin/activate
       - name: Install dependencies
         run: |
           # make sure pip is the lastest
