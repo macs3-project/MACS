@@ -1,7 +1,7 @@
 ##fileformat=VCFv4.1
-##fileDate=20230718
+##fileDate=20230719
 ##source=MACS_V3.0.0b2
-##Program_Args=callvar -b callvar_testing.narrowPeak -t CTCF_PE_ChIP_chr22_50k.bam -c CTCF_PE_CTRL_chr22_50k.bam -o ../temp/macs3b2_run_callvar/PEsample.vcf -Q 20 -D 1 --max-ar 0.95 --top2alleles-mratio 0.8 --top2allele-count 2 -g 0 -G 0  --fermi auto --fermi-overlap 30
+##Program_Args=callvar -b callvar_testing.narrowPeak -t CTCF_PE_ChIP_chr22_50k.bam -c CTCF_PE_CTRL_chr22_50k.bam -o ../temp/testx64_run_callvar/PEsample.vcf -Q 20 -D 1 --max-ar 0.95 --top2alleles-mratio 0.8 --top2allele-count 2 -g 0 -G 0  --fermi auto --fermi-overlap 30
 ##INFO=<ID=M,Number=.,Type=String,Description="MACS Model with minimum BIC value">
 ##INFO=<ID=MT,Number=.,Type=String,Description="Mutation type: SNV/Insertion/Deletion">
 ##INFO=<ID=DPT,Number=1,Type=Integer,Description="Depth Treatment: Read depth in ChIP-seq data">

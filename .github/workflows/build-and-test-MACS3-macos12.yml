@@ -43,10 +43,7 @@ jobs:
       - name: Test with pytest
         run: |
           source macs3venv/bin/activate
-          pytest --runxfail
-          cd test
-          ./cmdlinetest macs3
-          cd ..
+          pytest --runxfail && cd test && ./cmdlinetest-nohmmratac macs3
       - name: Build sdist
         run: |
           source macs3venv/bin/activate
