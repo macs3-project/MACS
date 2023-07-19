@@ -14,11 +14,11 @@ jobs:
         include:
           - arch: aarch64
             distro: bullseye        
-          - arch: armv7 # scipy installation issue before, let's retest...
+          - arch: armv7
             distro: bullseye
           - arch: ppc64le
             distro: bullseye
-          - arch: s390x # scipy installation issue before, let's retest...
+          - arch: s390x
             distro: bullseye
     steps:
       - name: Checkout MACS
@@ -57,6 +57,7 @@ jobs:
             apt-get update -qq -y
             apt-get install apt-utils
             apt-get install -yq libblas3 liblapack3 libblas-dev liblapack-dev
+            # we rely on Debian/Linux python packages for numpy/scipy/sklearn 
             apt-get install -yq python3 python3-pip python3-virtualenv python3-wheel python3-numpy python3-scipy python3-sklearn cython3 
             apt-get install -yq procps zlib1g zlib1g-dev gfortran
           run: |

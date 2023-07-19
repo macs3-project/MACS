@@ -28,25 +28,28 @@ jobs:
         run: |
           # create venv
           python3 -m venv macs3venv
-          source macs3venv/bin/activate
       - name: Install dependencies
         run: |
           # make sure pip is the lastest
-          python -m pip install --upgrade pip
-          pip install pytest
-          if [ -f requirements.txt ]; then pip install --upgrade -r requirements.txt; fi
+          source macs3venv/bin/activate
+          python3 -m pip install --upgrade pip
+          pip3 install pytest
+          if [ -f requirements.txt ]; then pip3 install --upgrade -r requirements.txt; fi
       - name: Install MACS
         run: |
           # we use pip install instead of old fashion setup.py install
+          source macs3venv/bin/activate
           pip install .
       - name: Test with pytest
         run: |
+          source macs3venv/bin/activate
           pytest --runxfail
           cd test
           ./cmdlinetest macs3
           cd ..
       - name: Build sdist
         run: |
+          source macs3venv/bin/activate
           python setup.py sdist
       - name: Archive sdist
         uses: actions/upload-artifact@v3
