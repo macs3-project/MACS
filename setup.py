@@ -23,7 +23,7 @@ install_requires = [ "numpy>=1.19",
                      "cykhash>=2.0,<3.0",
                      "Cython~=0.29" ]
 
-exec(open("MACS2/Utilities/Constants.py").read())
+exec(open("MACS2/Constants.py").read())
 
 # classifiers
 classifiers =[\
