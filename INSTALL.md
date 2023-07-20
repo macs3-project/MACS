@@ -1,14 +1,14 @@
 # INSTALL Guide For MACS
-Time-stamp: <2019-12-12 13:26:11 taoliu>
+Time-stamp: <2023-07-20 10:26:11 taoliu>
 
 Please check the following instructions to complete your installation.
 
 ## Prerequisites
 
-MACS v2.2.x requires Python3. We have tested MACS in Python3.6, 3.7
-and 3.8. 
+MACS v2.2.x requires Python3. We have tested MACS in Python 3.7 to
+3.11.
 
-MACS also requires [Numpy](http://www.scipy.org/Download) (>=1.17).
+MACS also requires [Numpy](http://www.scipy.org/Download) (>=1.19).
 
 GCC is required to compile `.c` codes in MACS v2 package, and python
 header files are needed. If you are using Mac OSX, I recommend you
@@ -16,10 +16,11 @@ install Xcode; if you are using Linux, you need to make sure
 `python-dev` package is installed -- the actual package name depends
 on the Linux OS distribution, you are using.
 
-[Cython](http://cython.org/) is **NOT** required although most of MACS
-codes are written in Cython. But if you plan to generate `.c` files
-from `.pyx` by yourself, you can install Cython (>=0.29), then use
-`setup.py` script.
+[Cython](http://cython.org/) is required to translate .pyx codes to .c
+code. The version of Cython has to be >=0.29 but lower than 3.0.
+
+If you use `pip` to install MACS2, the installer script will check the
+dependencies and install them when necessary.
 
 ## Prepare a virtual Python environment 
 
@@ -62,37 +63,20 @@ kind of Supper Cow Powers.
 
 ## Install from source
 
-MACS uses Python's [setuptools](https://setuptools.readthedocs.io) for
-source code installations. To install a source distribution of MACS,
-unpack the distribution tarball, or clone Git repository with `git
-clone git@github.com:taoliu/MACS.git`. Go to the directory where you
-unpacked MACS, and simply run the install script:
+MACS uses `pip` for source code installations. To install a source 
+distribution of MACS, unpack the distribution tarball. Go to the 
+directory where you cloned MACS from github, and simply run the
+install command:
 
- `$ python setup.py install`
+ `$ pip install .`
 
 By default, the script will install python library and executable
 codes according to the environment. When you run the command under
-virtualenv, the script will install to the virtual environment
-instead. When you run it without virtual environment, you may need to
-be root or administrator of the machine so as to complete the
-installation. Please contact the system administrator if you want
-their help. If you need to provide a nonstandard install prefix, or
-any other nonstandard options, you can provide many command line
-options to the install script. Use the `--help` option to see a brief
-list of available options:
-
- `$ python setup.py --help`
-
-For example, if I want to install everything under my own HOME
-directory, use this command:
-
- `$ python setup.py install --prefix /home/taoliu/`
-
-As mentioned in *Prerequisites*, you don't need to install Cython in
-order to install MACS. When Cython is available, this setup script
-will regenerate C codes from Pyx codes when necessary. When Cython is
-not available, this setup script will just use the C codes included in
-the release package (or your Github clone) for installation.
+virtualenv or conda environment, the script will install to the virtual
+environment instead. When you run the command without virtual environment, 
+you may need to be root or administrator of the machine so as to 
+complete the installation. Please contact the system administrator
+if you want their help. 
 
 ## Configure environment variables
 

@@ -28,10 +28,25 @@ applied to any "DNA enrichment assays" if the question to be asked is
 simply: *where we can find significant reads coverage than the random
 background*.
 
-## Recent Changes for MACS (2.2.8)
+*Note: new development on MACS has been moved to MACS3 repository,
+we will only fix installation issues on MACS2.*
+
+## Recent Changes for MACS (2.2.9)
+
+### 2.2.9
+    * Bug fix:
+     
+    Cython has a major upgrade to 3.0, and can't work directly with
+    MACS2 codes, so we changed the requirement for Cython to 0.29.*.
+    
+    Python support has been changed to 3.7 to 3.11. Numpy >=0.19.
+    
+    We tested MACS2 on Mac OS12 through Github Actions as well.
+    
+    Thank @jemajet! #569
 
 ### 2.2.8
-   * Bug fix:
+    * Bug fix:
 
 	MACS2 typo in 'setup.py': 'numpy>=>=1.17' -> 'numpy>=1.17'
 	PR #543, issues #535, #541, #544
@@ -131,7 +146,7 @@ Control.bam -f BAM -g hs -n test -B -q 0.01`
 Example for broad peak calling: `macs2 callpeak -t ChIP.bam -c
 Control.bam --broad -g hs --broad-cutoff 0.1`
 
-There are twelve functions available in MAC2S serving as sub-commands.
+There are twelve functions available in MACS2 serving as sub-commands.
 
 Subcommand | Description
 -----------|----------
