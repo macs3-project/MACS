@@ -131,7 +131,10 @@ we will only fix installation issues on MACS2.*
 
 ## Install
 
-Please check the file 'INSTALL.md' in the distribution.
+Please check the file 'INSTALL.md' in the distribution. In general,
+we can install through PyPI as `pip install macs2` in or not in your
+virtual environment, or we can install after unzipping the released
+package downloaded from Github, then use `pip install .` command.
 
 ## Usage
 
