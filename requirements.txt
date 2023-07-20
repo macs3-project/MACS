@@ -1,5 +1,5 @@
 numpy>=1.17
-cython>=0.29.24
+cython>=0.29.24,<3.0
 pytest>=4.6
 pytest-cov>=2.8
 codecov>=2.0
