@@ -41,7 +41,7 @@ jobs:
           if [ -f requirements.txt ]; then pip install --upgrade -r requirements.txt; fi
       - name: Install MACS
         run: |
-          python setup.py install
+          pip install .
       - name: Test with pytest
         run: |
           pytest --runxfail
