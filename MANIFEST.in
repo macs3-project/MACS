@@ -4,4 +4,5 @@ recursive-exclude MACS3 *.c *.h
 include MACS3/Signal/cPosValCalculation.c MACS3/Signal/cPosValCalculation.h MACS3/Signal/swalign.h MACS3/Signal/swalign.c
 recursive-include docs *.md
 recursive-include MACS3/fermi-lite *.c *.h
+global-exclude .ipynb_checkpoints/*
 prune test
