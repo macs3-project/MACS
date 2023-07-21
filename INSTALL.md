@@ -45,7 +45,7 @@ as described before, your `pip` command will install everything under
 the folder you specified previously through `python3 -m env` command.
 
 Then under the command line, type `pip install macs2`. PyPI will
-install Numpy automatically if it is absent.
+install Cython and Numpy automatically when necessary.
 
 To upgrade MACS2, type `pip install --upgrade macs2`. It will check
 currently installed MACS2, compare the version with the one on PyPI

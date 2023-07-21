@@ -31,9 +31,9 @@ background*.
 *Note: new development on MACS has been moved to MACS3 repository,
 we will only fix installation issues on MACS2.*
 
-## Recent Changes for MACS (2.2.9)
+## Recent Changes for MACS (2.2.9.1)
 
-### 2.2.9
+### 2.2.9.1
     * Bug fix:
      
     Cython has a major upgrade to 3.0, and can't work directly with
@@ -132,9 +132,10 @@ we will only fix installation issues on MACS2.*
 ## Install
 
 Please check the file 'INSTALL.md' in the distribution. In general,
-we can install through PyPI as `pip install macs2` in or not in your
-virtual environment, or we can install after unzipping the released
-package downloaded from Github, then use `pip install .` command.
+you can install through PyPI as `pip install macs2`. To use virtual 
+environment is highly recommended. Or you can install after
+unzipping the released package downloaded from Github, then use 
+`pip install .` command.
 
 ## Usage
 
