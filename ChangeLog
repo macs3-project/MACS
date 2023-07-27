@@ -1,5 +1,5 @@
-2023-06-15  Tao Liu  <vladimir.liu@gmail.com>
-	MACS 3.0.0b2
+2023-07-22  Tao Liu  <vladimir.liu@gmail.com>
+	MACS 3.0.0b3
 	* New features in MACS3:
 
 	1) Speed/memory optimization.  Use the cykhash to replace python 
@@ -13,8 +13,9 @@
 
 	4) R wrappers for MACS -- MACSr
 
-	5) Switch to Github Action for CI, support multi-arch testing 
-	including x64, armv7, aarch64, s390x and ppc64le. 
+	5) Switch to Github Action for CI, support multi-arch testing
+	including x64, armv7, aarch64, s390x and ppc64le. We also test on
+	Mac OS 12.
 
 	6) MACS tag-shifting model has been refined. Now it will use a 
 	naive peak calling approach to find ALL possible paired peaks at +
@@ -51,6 +52,8 @@
 	
 	12) Multiple updates regarding dependencies, anaconda built, CI/CD
 	process.
+    
+    13) Cython support to ~0.29. Cython 3 is not supported yet.
 	
 	* Other:
 	1) Missing header line while no peaks can be called #501 #502

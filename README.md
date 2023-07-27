@@ -1,6 +1,6 @@
 # MACS: Model-based Analysis for ChIP-Seq
 
-![Status](https://img.shields.io/pypi/status/macs3.svg) ![License](https://img.shields.io/github/license/macs3-project/MACS) ![Programming languages](https://img.shields.io/github/languages/top/macs3-project/MACS) ![CI x64](https://github.com/macs3-project/MACS/workflows/CI%20x64/badge.svg) ![CI non x64](https://github.com/macs3-project/MACS/workflows/CI%20non%20x64,%20python%203.7/badge.svg)
+![Status](https://img.shields.io/pypi/status/macs3.svg) ![License](https://img.shields.io/github/license/macs3-project/MACS) ![Programming languages](https://img.shields.io/github/languages/top/macs3-project/MACS) ![CI x64](https://github.com/macs3-project/MACS/workflows/CI%20x64/badge.svg) ![CI non x64](https://github.com/macs3-project/MACS/workflows/CI%20non%20x64,%20python%203.7/badge.svg) ![CI MacOS 12](https://github.com/macs3-project/MACS/workflows/CI%20MacOS%2012/badge.svg)
 
 [![PyPI download](https://img.shields.io/pypi/dm/macs3?label=pypi%20downloads)](https://pypistats.org/packages/macs3) [![Bioconda download](https://img.shields.io/conda/dn/bioconda/macs3?label=bioconda%20downloads)](https://anaconda.org/bioconda/macs3)
 
@@ -34,21 +34,21 @@ make sure that the main branch passes unit testing on certain
 functions and subcommands to reproduce the correct outputs. We will
 add more new features in the future.**
 
-## Recent Changes for MACS (3.0.0b2)
+## Recent Changes for MACS (3.0.0b3)
 
-### 3.0.0b2
-    The second beta version of MACS3, with HMMRATAC feature refined.
+### 3.0.0b3
+    The third beta version of MACS3, addressing Cython issue and with
+    two HMMRATAC options added.
 	   
-	* New features from beta1:
+	* New features from beta2:
 
-	1) HMMRATAC module fixes
+	1) HMMRATAC module
     
-       Cutoff analysis function added
-       Description regarding it has been added
+       --modelonly option: only generate HMM model and quit
+       
+       -t or --training: customized training regions can be provided through this option.
     
-    2) Memory monitoring in the runtime message
-    
-    3) testing for s390x, armv7 and power64le is back. However, we turned off the function to check if the `hmmratac` results from non-x86 architectures are the same as the standard results, because in order to let the testing run, we need to use old python libraries (scipy and sklearn) through the distribution of Debian/Linux bullseye.
+    2) testing for Mac OS12 is added. 
     
 ## Install
 
@@ -65,6 +65,11 @@ architectures:
  * armv7
  * ppc64le
  * s390x 
+
+In general, you can install through PyPI as `pip install macs3`. 
+To use virtual environment is highly recommended. Or you can install
+after unzipping the released package downloaded from Github, then
+use `pip install .` command.
 
 ## Usage
 
