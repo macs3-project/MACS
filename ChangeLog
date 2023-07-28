@@ -1,4 +1,4 @@
-2023-07-22  Tao Liu  <vladimir.liu@gmail.com>
+2023-07-28  Tao Liu  <vladimir.liu@gmail.com>
 	MACS 3.0.0b3
 	* New features in MACS3:
 
@@ -7,34 +7,13 @@
 	available for BAM file parser). And many optimization tweaks. We
 	added memory monitoring to the runtime messages.
 
-	2) Code cleanup. Reorganize source codes. 
-
-	3) Unit testing. 
-
-	4) R wrappers for MACS -- MACSr
-
-	5) Switch to Github Action for CI, support multi-arch testing
-	including x64, armv7, aarch64, s390x and ppc64le. We also test on
-	Mac OS 12.
-
-	6) MACS tag-shifting model has been refined. Now it will use a 
-	naive peak calling approach to find ALL possible paired peaks at +
-	and - strand, then use all of them to calculate the 
-	cross-correlation. (a related bug has been fix #442) 
-
-	7) Call variants in peak regions directly from BAM files. The
+	2) Call variants in peak regions directly from BAM files. The
 	function was originally developed under code name SAPPER. Now
 	SAPPER has been merged into MACS. Also, `simde` has been added as
 	a submodule in order to support fermi-lite library under non-x64
 	architectures.
 
-	8) BAI index and random access to BAM file now is supported. #449
-	And user can use original BAM file (instead of the subset of BAM
-	file as in SAPPER) in the `callvar` command.
-
-	9) Support of Python > 3.10 #497 #498 
-
-	10) HMMRATAC module is added. HMMRATAC is a dedicated software to
+	3) HMMRATAC module is added. HMMRATAC is a dedicated software to
 	analyze ATAC-seq data. The basic idea behind HMMRATAC is to digest
 	ATAC-seq data according to the fragment length of read pairs into
 	four signal tracks: short fragments, mononucleosomal fragments,
@@ -45,7 +24,28 @@
 	in JAVA, by Evan Tarbell. We implemented it in Python/Cython and
 	optimize the whole process using existing MACS functions and
 	hmmlearn. Now it can run much faster than the original JAVA
-	version. Note: evaluation of the peak calling results is underway.
+	version. Note: evaluation of the peak calling results is underway.	
+
+	4) Code cleanup. Reorganize source codes. 
+
+	5) Unit testing. 
+
+	6) R wrappers for MACS -- MACSr
+
+	7) Switch to Github Action for CI, support multi-arch testing
+	including x64, armv7, aarch64, s390x and ppc64le. We also test on
+	Mac OS 12.
+
+	8) MACS tag-shifting model has been refined. Now it will use a 
+	naive peak calling approach to find ALL possible paired peaks at +
+	and - strand, then use all of them to calculate the 
+	cross-correlation. (a related bug has been fix #442) 
+
+	9) BAI index and random access to BAM file now is supported. #449
+	And user can use original BAM file (instead of the subset of BAM
+	file as in SAPPER) in the `callvar` command.
+
+	10) Support of Python > 3.10 #497 #498 
 
 	11) The effective genome size parameters have been updated
 	according to deeptools. #508

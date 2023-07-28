@@ -49,7 +49,7 @@ add more new features in the future.**
        -t or --training: customized training regions can be provided
 	   through this option.
 	   
-	   --min-tri-p: exclude fragments with abnormal fragment length while generating four
+	   --min-frag-p: exclude fragments with abnormal fragment length while generating four
        signal tracks. #577 Check `macs3 hmmratac -h`.
     
     2) testing for Mac OS12 is added. 
