@@ -57,6 +57,11 @@
 	
 	* Other:
 	1) Missing header line while no peaks can be called #501 #502
+    
+    2) Note: different numpy, scipy, sklearn may give slightly
+    different results for hmmratac results. The current standard
+    results for automated testing in `/test` directory are from
+    Numpy 1.25.1, Scipy 1.11.1, and sklearn 1.3.0. 
 
 2020-04-11  Tao Liu  <vladimir.liu@gmail.com>
 	MACS version 2.2.7.1
