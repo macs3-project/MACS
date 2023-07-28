@@ -53,7 +53,10 @@ add more new features in the future.**
        signal tracks. #577 Check `macs3 hmmratac -h`.
     
     2) testing for Mac OS12 is added. 
-    
+
+	3) We require Cython 0.29.*. The new Cython3 will break our
+	codes. We will adopt Cython3 later. #574
+
 ## Install
 
 The common way to install MACS is through
