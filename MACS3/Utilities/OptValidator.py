@@ -1,4 +1,4 @@
-# Time-stamp: <2022-06-10 10:24:34 Tao Liu>
+# Time-stamp: <2023-07-28 12:17:28 Tao Liu>
 
 """Module Description
 
@@ -810,6 +810,10 @@ def opt_validate_hmmratac ( options ):
         logger.error(" --stddev should not be negative! ")
         sys.exit( 1 )
 
+    # min_frag_p between 0 and 1
+    if options.min_frag_p <=0 or options.min_frag_p >= 1:
+        logger.error(" --min-frag-p should be larger than 0 and smaller than 1! ")
+        sys.exit( 1 )
 
     # HMM
     # hmm_states non-negative int, warn if not k=3

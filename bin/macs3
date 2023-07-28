@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# Time-stamp: <2023-06-23 12:59:17 Tao Liu>
+# Time-stamp: <2023-07-28 12:14:37 Tao Liu>
 
 """Description: MACS v3 main executable.
 
@@ -920,6 +920,9 @@ plus an extra option for the HMM model file like `macs3 hmmratac
     group_em.add_argument( "--stddevs", dest = "em_stddevs", type = float, nargs = 4,
                             help = "Comma separated list of initial standard deviation values for fragment distribution for short fragments, mono-, di-, and tri-nucleosomal fragments. Default: 20 20 20 20",
                             default = [20, 20, 20, 20] )
+    group_em.add_argument( "--min-frag-p", dest = "min_frag_p", type = float,
+                           help = "We will exclude the abnormal fragments that can't be assigned to any of the four signal tracks. After we use EM to find the means and stddevs of the four distributions, we will calculate the likelihood that a given fragment length fit any of the four using normal distribution. The criteria we will use is that if a fragment length has less than MIN_FRAG_P probability to be like either of short, mono, di, or tri-nuc fragment, we will exclude it while generating the four signal tracks for later HMM training and prediction. The value should be between 0 and 1. Larger the value, more abnormal fragments will be allowed. So if you want to include more 'ideal' fragments, make this value smaller. Default = 0.001",
+                           default = 0.001 )
     # group for HMM
     group_hmm = argparser_hmmratac.add_argument_group( "Hidden Markov Model arguments" )
     #group_hmm.add_argument( "-s", "--states", dest = "hmm_states", type = int,

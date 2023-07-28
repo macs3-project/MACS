@@ -1,4 +1,4 @@
-# Time-stamp: <2023-06-08 11:03:46 Tao Liu>
+# Time-stamp: <2023-07-28 12:10:12 Tao Liu>
 
 """Description: Main HMMR command
 
@@ -143,7 +143,7 @@ def run( args ):
 
     # now we will prepare the weights for each fragment length for
     # each of the four distributions based on the EM results
-    weight_mapping = generate_weight_mapping( fl_list, em_means, em_stddevs )
+    weight_mapping = generate_weight_mapping( fl_list, em_means, em_stddevs, min_frag_p = options.min_frag_p )
     
     options.info( f"#  Generate short, mono-, di-, and tri-nucleosomal signals")
     digested_atac_signals = generate_digested_signals( petrack, weight_mapping )
@@ -189,7 +189,7 @@ def run( args ):
 
         # Let MACS3 do the cutoff analysis to help decide the lower and upper cutoffs
         with open(cutoffanalysis_file, "w") as ofhd_cutoff:
-            ofhd_cutoff.write( fc_bdg.cutoff_analysis( min_length=minlen, max_gap=options.hmm_training_flanking ) )
+            ofhd_cutoff.write( fc_bdg.cutoff_analysis( min_length=minlen, max_gap=options.hmm_training_flanking, max_score = 1000 ) )
         #raise Exception("Cutoff analysis only.")
         sys.exit(1)
         
@@ -236,7 +236,7 @@ def run( args ):
         
         # Let MACS3 do the cutoff analysis to help decide the lower and upper cutoffs
         with open(cutoffanalysis_file, "w") as ofhd_cutoff:
-            ofhd_cutoff.write( fc_bdg.cutoff_analysis( min_length=minlen, max_gap=options.hmm_training_flanking ) )
+            ofhd_cutoff.write( fc_bdg.cutoff_analysis( min_length=minlen, max_gap=options.hmm_training_flanking, max_score = 1000 ) )
             
         # we will check if anything left after filtering
         if peaks.total > options.hmm_maxTrain:

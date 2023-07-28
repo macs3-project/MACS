@@ -2,10 +2,10 @@
 	MACS 3.0.0b3
 	* New features in MACS3:
 
-	1) Speed/memory optimization.  Use the cykhash to replace python 
-	dictionary. Use buffer (10MB) to read and parse input file (not 
+	1) Speed/memory optimization.  Use the cykhash to replace python
+	dictionary. Use buffer (10MB) to read and parse input file (not
 	available for BAM file parser). And many optimization tweaks. We
-    added memory monitoring to the runtime messages.
+	added memory monitoring to the runtime messages.
 
 	2) Code cleanup. Reorganize source codes. 
 
@@ -22,18 +22,18 @@
 	and - strand, then use all of them to calculate the 
 	cross-correlation. (a related bug has been fix #442) 
 
-	7) Call variants in peak regions directly from BAM files. The 
-	function was originally developed under code name SAPPER. Now 
-	SAPPER has been merged into MACS. Also, `simde` has been added as 
-	a submodule in order to support fermi-lite library under non-x64 
-	architectures. 
+	7) Call variants in peak regions directly from BAM files. The
+	function was originally developed under code name SAPPER. Now
+	SAPPER has been merged into MACS. Also, `simde` has been added as
+	a submodule in order to support fermi-lite library under non-x64
+	architectures.
 
-	8) BAI index and random access to BAM file now is supported. #449 
-	And user can use original BAM file (instead of the subset of BAM 
-	file as in SAPPER) in the `callvar` command. 
+	8) BAI index and random access to BAM file now is supported. #449
+	And user can use original BAM file (instead of the subset of BAM
+	file as in SAPPER) in the `callvar` command.
 
 	9) Support of Python > 3.10 #497 #498 
-	
+
 	10) HMMRATAC module is added. HMMRATAC is a dedicated software to
 	analyze ATAC-seq data. The basic idea behind HMMRATAC is to digest
 	ATAC-seq data according to the fragment length of read pairs into
@@ -49,19 +49,19 @@
 
 	11) The effective genome size parameters have been updated
 	according to deeptools. #508
-	
+
 	12) Multiple updates regarding dependencies, anaconda built, CI/CD
 	process.
-    
-    13) Cython support to ~0.29. Cython 3 is not supported yet.
-	
+
+	13) Cython support to ~0.29. Cython 3 is not supported yet.
+
 	* Other:
 	1) Missing header line while no peaks can be called #501 #502
-    
-    2) Note: different numpy, scipy, sklearn may give slightly
-    different results for hmmratac results. The current standard
-    results for automated testing in `/test` directory are from
-    Numpy 1.25.1, Scipy 1.11.1, and sklearn 1.3.0. 
+
+	2) Note: different numpy, scipy, sklearn may give slightly
+	different results for hmmratac results. The current standard
+	results for automated testing in `/test` directory are from Numpy
+	1.25.1, Scipy 1.11.1, and sklearn 1.3.0.
 
 2020-04-11  Tao Liu  <vladimir.liu@gmail.com>
 	MACS version 2.2.7.1
