@@ -65,6 +65,7 @@ architectures:
  * armv7
  * ppc64le
  * s390x 
+ * Apple chips
 
 In general, you can install through PyPI as `pip install macs3`. 
 To use virtual environment is highly recommended. Or you can install
