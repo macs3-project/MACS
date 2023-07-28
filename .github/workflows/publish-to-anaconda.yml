@@ -1,7 +1,7 @@
 # This workflows will upload a Python Package using Twine when a release is created
 # For more information see: https://help.github.com/en/actions/language-and-framework-guides/using-python-with-github-actions#publishing-to-package-registries
 
-name: Publish to Anaconda/macs3
+name: MACS3 Publish to Anaconda/macs3
 
 on:
   release:
@@ -12,7 +12,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy: 
       matrix: 
-        python-version: [3.9, 3.10, 3.11]
+        python-version: ['3.11']
         arch: ['x64']
     name: Build conda package in x64 under Python ${{ matrix.python-version }}
     steps:

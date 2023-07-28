@@ -1,5 +1,5 @@
 {% set name = "macs3" %}
-{% set version = "3.0.0b1" %}
+{% set version = "3.0.0b3" %}
 
 package:
   name: "{{ name|lower }}"
@@ -16,22 +16,22 @@ build:
 requirements:
   build:
     - {{ compiler('c') }}
-    - python >=3.9
-    - numpy >=1.23
+    - python >=3.11
+    - numpy >=1.25
     - cython >=0.29
     - cykhash >=2.0
-    - setuptools >=58.0
-    - hmmlearn >=0.2.8
-    - scikit-learn >=1.0
+    - setuptools >=68.0
+    - hmmlearn >=0.3
+    - scikit-learn >=1.3
   host:
-    - python >=3.9
-    - numpy >=1.23
+    - python >=3.11
+    - numpy >=1.25
     - cykhash >=2.0
   run:
-    - python >=3.9
-    - numpy >=1.23
-    - hmmlearn >=0.2.8
-    - scikit-learn >=1.0
+    - python >=3.11
+    - numpy >=1.25
+    - hmmlearn >=0.3
+    - scikit-learn >=1.3
     - pytest >=7.0
 
 test:
