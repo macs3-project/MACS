@@ -1,7 +1,7 @@
 # This workflow will install Python dependencies, run tests and lint with a single version of Python
 # For more information see: https://help.github.com/actions/language-and-framework-guides/using-python-with-github-actions
 
-name: CI non x64
+name: MACS3 CI non x64
 
 on: [push, pull_request]
 
@@ -14,11 +14,11 @@ jobs:
         include:
           - arch: aarch64
             distro: bullseye        
-          - arch: armv7 # scipy installation issue before, let's retest...
+          - arch: armv7
             distro: bullseye
           - arch: ppc64le
             distro: bullseye
-          - arch: s390x # scipy installation issue before, let's retest...
+          - arch: s390x
             distro: bullseye
     steps:
       - name: Checkout MACS
@@ -57,6 +57,7 @@ jobs:
             apt-get update -qq -y
             apt-get install apt-utils
             apt-get install -yq libblas3 liblapack3 libblas-dev liblapack-dev
+            # we rely on Debian/Linux python packages for numpy/scipy/sklearn 
             apt-get install -yq python3 python3-pip python3-virtualenv python3-wheel python3-numpy python3-scipy python3-sklearn cython3 
             apt-get install -yq procps zlib1g zlib1g-dev gfortran
           run: |

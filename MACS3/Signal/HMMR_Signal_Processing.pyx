@@ -1,6 +1,6 @@
 # cython: language_level=3
 # cython: profile=True
-# Time-stamp: <2023-06-08 00:28:40 Tao Liu>
+# Time-stamp: <2023-07-28 12:14:57 Tao Liu>
 
 """Module description:
 
@@ -55,7 +55,7 @@ cdef inline float get_weighted_density( int x, float m, float v, w ):
 # public functions
 # ------------------------------------
 
-cpdef list generate_weight_mapping( list fraglen_list, list means, list stddevs ):
+cpdef list generate_weight_mapping( list fraglen_list, list means, list stddevs, float min_frag_p = 0.001 ):
     """Generate weights for each fragment length in short, mono, di, and tri-signals track
 
     return: list of four dictionaries, with key as fraglen and value as the weight.
@@ -71,7 +71,6 @@ cpdef list generate_weight_mapping( list fraglen_list, list means, list stddevs 
         float m_s, m_m, m_d, m_t
         float v_s, v_m, v_d, v_t
         float p_s, p_m, p_d, p_t
-        float w_s, w_m, w_d, w_t
         float s
         int i, j
     assert len(means) == 4
@@ -86,14 +85,22 @@ cpdef list generate_weight_mapping( list fraglen_list, list means, list stddevs 
         p_d = pnorm2( float(l), m_d, v_d )
         p_t = pnorm2( float(l), m_t, v_t )
         s = p_s + p_m + p_d + p_t
-        w_s = p_s / s
-        w_m = p_m / s
-        w_d = p_d / s
-        w_t = p_t / s
-        ret_mapping[ 0 ][ l ] = w_s
-        ret_mapping[ 1 ][ l ] = w_m
-        ret_mapping[ 2 ][ l ] = w_d
-        ret_mapping[ 3 ][ l ] = w_t
+        if p_s < min_frag_p and p_m < min_frag_p and p_d < min_frag_p and p_t < min_frag_p:
+            # we exclude the fragment which can't be assigned to
+            # short, mono, di-nuc, and tri-nuc (likelihood <
+            # min_frag_p, default:0.001) Normally this fragment is too
+            # large. We exclude these fragment by setting all weights
+            # to zero.
+            debug(f"The fragment length {l} can't be assigned to either distribution so will be excluded!")
+            ret_mapping[ 0 ][ l ] = 0
+            ret_mapping[ 1 ][ l ] = 0
+            ret_mapping[ 2 ][ l ] = 0
+            ret_mapping[ 3 ][ l ] = 0
+            continue
+        ret_mapping[ 0 ][ l ] = p_s / s
+        ret_mapping[ 1 ][ l ] = p_m / s
+        ret_mapping[ 2 ][ l ] = p_d / s
+        ret_mapping[ 3 ][ l ] = p_t / s
     return ret_mapping
 
 cpdef list generate_digested_signals( object petrack, list weight_mapping ):

@@ -1,6 +1,6 @@
 # cython: language_level=3
 # cython: profile=True
-# Time-stamp: <2023-06-08 10:52:59 Tao Liu>
+# Time-stamp: <2023-07-28 12:06:48 Tao Liu>
 
 """Module for BedGraph data class.
 
@@ -1131,7 +1131,7 @@ cdef class bedGraphTrackI:
         #ret.merge_regions()
         return ret
 
-    cpdef str cutoff_analysis ( self, int32_t max_gap, int32_t min_length, int32_t steps = 100 ):
+    cpdef str cutoff_analysis ( self, int32_t max_gap, int32_t min_length, int32_t steps = 100, float32_t max_score = 1000 ):
         """
         Cutoff analysis function for bedGraphTrackI object.
     
@@ -1171,8 +1171,8 @@ cdef class bedGraphTrackI:
 
         #midvalue = self.minvalue/2 + self.maxvalue/2
         #s = float(self.minvalue - midvalue)/steps
-        minv = self.minvalue
-        maxv = self.maxvalue
+        minv = max( 0, self.minvalue )
+        maxv = min( self.maxvalue, max_score )
 
         s = float(maxv - minv)/steps
 

@@ -1,0 +1,57 @@
+# This workflow will install Python dependencies, run tests and lint with a single version of Python
+# For more information see: https://help.github.com/actions/language-and-framework-guides/using-python-with-github-actions
+
+name: MACS3 CI MacOS 12
+
+on: [push, pull_request]
+
+jobs:
+  build:
+    runs-on: macos-12
+    name: Build on MacOS 12 with Python 3.11
+    steps:
+      - name: Checkout MACS
+        uses: actions/checkout@v3
+        with:
+          submodules: 'true'
+      - name: Cache pip
+        uses: actions/cache@v3
+        with:
+          # This path is specific to Ubuntu
+          path: ~/.cache/pip
+          # Look to see if there is a cache hit for the corresponding requirements file
+          key: ${{ runner.os }}-pip-${{ hashFiles('requirements.txt') }}
+          restore-keys: |
+            ${{ runner.os }}-pip-
+            ${{ runner.os }}-        
+      - name: Setup venv
+        run: |
+          # create venv
+          python3 -m venv macs3venv
+      - name: Install dependencies
+        run: |
+          # make sure pip is the lastest
+          source macs3venv/bin/activate
+          python3 -m pip install --upgrade pip
+          pip3 install pytest
+          if [ -f requirements.txt ]; then pip3 install --upgrade -r requirements.txt; fi
+      - name: Install MACS
+        run: |
+          # we use pip install instead of old fashion setup.py install
+          source macs3venv/bin/activate
+          pip install .
+      - name: Test with pytest
+        run: |
+          source macs3venv/bin/activate
+          pytest --runxfail && cd test && ./cmdlinetest-nohmmratac macs3
+      - name: Build sdist
+        run: |
+          source macs3venv/bin/activate
+          python setup.py sdist
+      - name: Archive sdist
+        uses: actions/upload-artifact@v3
+        with:
+          name: sdist file
+          path: |
+            dist/*.tar.gz
+
