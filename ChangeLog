@@ -1,5 +1,6 @@
 2023-07-28  Tao Liu  <vladimir.liu@gmail.com>
 	MACS 3.0.0b3
+
 	* New features in MACS3:
 
 	1) Speed/memory optimization.  Use the cykhash to replace python
