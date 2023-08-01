@@ -323,8 +323,9 @@ cdef class PeakVariants:
                 if not( ( p-1 ) in self.d_Variants ):
                     if p > self.start: # now add the reference base 
                         self.d_Variants[ p-1 ] = copy(self.d_Variants[ p ])
-                        self.d_Variants[ p-1 ]["ref_allele"] = str(self.refseq)[ p - self.start ] + self.d_Variants[ p-1 ]["ref_allele"]
-                        self.d_Variants[ p-1 ]["alt_allele"] = str(self.refseq)[ p - self.start ]
+                        rs = str(self.refseq)
+                        self.d_Variants[ p-1 ]["ref_allele"] = rs[ p - self.start ] + self.d_Variants[ p-1 ]["ref_allele"]
+                        self.d_Variants[ p-1 ]["alt_allele"] = rs[ p - self.start ]
                         if self.d_Variants[ p ].top1isreference:
                             self.d_Variants[ p-1 ]["top1allele"] = self.d_Variants[ p-1 ]["ref_allele"]
                             self.d_Variants[ p-1 ]["top2allele"] = self.d_Variants[ p-1 ]["alt_allele"]
