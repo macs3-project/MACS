@@ -39,7 +39,7 @@ classifiers =[\
 install_requires = [ "numpy>=1.19",
                      "hmmlearn>=0.3",
                      "cykhash>=2.0,<3.0",
-                     "Cython~=0.29" ]
+                     "Cython~=3" ]
 
 tests_requires = [ 'pytest' ]
 
