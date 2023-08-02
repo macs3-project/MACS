@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# Time-stamp: <2023-07-28 12:14:37 Tao Liu>
+# Time-stamp: <2023-08-02 17:49:12 Tao Liu>
 
 """Description: MACS v3 main executable.
 
@@ -759,7 +759,19 @@ around open chromatin regions.
 Here's an example of how to run the `hmmratac` command:
 
 ```
-$ macs3 hmmratac -b test/yeast_500k_SRR1822137.bam -n hmmratac_yeast500k
+$ macs3 hmmratac -i yeast.bam -n yeast
+```
+
+or with the BEDPE format
+
+```
+$ macs3 hmmratac -i yeast.bedpe.gz -f BEDPE -n yeast
+```
+
+Note: you can convert BAMPE to BEDPE by using
+
+```
+$ macs3 filterdup --keep-dup all -f BAMPE -i yeast.bam -o yeast.bedpe
 ```
 
 Before proceeding, it's essential to carefully read the help messages
@@ -774,11 +786,11 @@ crucial parameters we usually need to specify:
 
 These three parameters can significantly influence the
 results. Therefore, it's highly recommended to run `macs3 hmmratac
---cutoff-analysis-only -b your.bam` first, which will help you decide
+--cutoff-analysis-only -i your.bam` first, which will help you decide
 the parameters for `-l`, `-u`, and `-c`. Since there isn't an
 automatic way to determine these parameters, your judgement will be
 vital. Please read the output from `macs3 hmmratac
---cutoff-analysis-only -b your.bam` and the following section `Choices
+--cutoff-analysis-only -i your.bam` and the following section `Choices
 of cutoff values` for guidance.
 
 * Choices of cutoff values *
@@ -877,8 +889,12 @@ plus an extra option for the HMM model file like `macs3 hmmratac
     
     # group for input files
     group_input = argparser_hmmratac.add_argument_group( "Input files arguments" )
-    group_input.add_argument( "-b", "--bam", dest = "bam_file", type = str, required = True, nargs = "+",
-                              help = "BAM files containing the aligment results for ATAC-seq paired end reads. If multiple files are given as '-t A B C', then they will all be read and pooled together. The file should be in BAMPE format (aligned in paired end mode). REQUIRED." )
+    group_input.add_argument( "-i", "--input", dest = "input_file", type = str, required = True, nargs = "+",
+                              help = "Input files containing the aligment results for ATAC-seq paired end reads. If multiple files are given as '-t A B C', then they will all be read and pooled together. The file should be in BAMPE or BEDPE format (aligned in paired end mode). Files can be gzipped. Note: all files should be in the same format! REQUIRED." )
+    group_input.add_argument( "-f", "--format", dest = "format", type = str,
+                              choices = ("BAMPE", "BEDPE"),
+                              help = "Format of input files, \"BAMPE\" or \"BEDPE\". If there are multiple files, they should be in the same format -- either BAMPE or BEDPE. Please check the definition in README. Also please note that the BEDPE only contains three columns -- chromosome, left position of the whole pair, right position of the whole pair-- and is NOT the same BEDPE format used by BEDTOOLS. To convert BAMPE to BEDPE, you can use this command `macs3 filterdup --keep-dup all -f BAMPE -i input.bam -o output.bedpe`. DEFAULT: \"BAMPE\"",
+                              default = "BAMPE" )
     
     # group for output files
     group_output = argparser_hmmratac.add_argument_group( "Output arguments" )
