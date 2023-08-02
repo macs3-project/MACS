@@ -1,6 +1,6 @@
 # cython: language_level=3
 # cython: profile=True
-# Time-stamp: <2021-02-05 16:31:53 Tao Liu>
+# Time-stamp: <2023-08-02 14:19:28 Tao Liu>
 
 """Module Description: For pileup functions.
 
@@ -18,9 +18,6 @@ from time import time as ttime
 # MACS3 modules
 # ------------------------------------
 from MACS3.Utilities.Constants import *
-from MACS3.Signal.FixWidthTrack import FWTrack
-from MACS3.Signal.PairedEndTrack import PETrackI
-from MACS3.Signal.BedGraph import bedGraphTrackI
 from MACS3.Signal.cPosValCalculation cimport single_end_pileup as c_single_end_pileup
 from MACS3.Signal.cPosValCalculation cimport write_pv_array_to_bedGraph as c_write_pv_array_to_bedGraph
 from MACS3.Signal.cPosValCalculation cimport PosVal
