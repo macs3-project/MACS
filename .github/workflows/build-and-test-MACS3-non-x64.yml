@@ -79,6 +79,7 @@ jobs:
             pip install --progress-bar off --upgrade pip
             
             # install dependencies that are not in Debian/Linux
+            pip install --upgrade-strategy only-if-needed --progress-bar off Cython
             pip install --upgrade-strategy only-if-needed --progress-bar off hmmlearn
             pip install --upgrade-strategy only-if-needed --progress-bar off cykhash
             pip install --upgrade --progress-bar off pytest
