@@ -7,6 +7,8 @@ The `bdgpeakcall` command is part of the MACS3 suite of tools and is used to cal
 
 The `bdgpeakcall` command takes an input bedGraph file and produces an output file with peaks called. It uses an efficient algorithm to detect and call peaks, greatly improving the quality of your data for further analysis.
 
+
+Call peaks from bedGraph output. Note: All regions on the same chromosome in the bedGraph file should be continuous so only bedGraph files from MACS3 are accpetable.
 ## Command Line Options
 
 The command line options for `bdgpeakcall` are defined in `/MACS3/Commands/bdgpeakcall_cmd.py` and `/bin/macs3` files. Here is a brief overview of these options:

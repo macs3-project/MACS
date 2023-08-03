@@ -7,18 +7,21 @@ The `bdgbroadcall` command is part of the MACS3 suite of tools and is used to ca
 
 The `bdgbroadcall` command takes an input bedGraph file and produces an output file with broad peaks called. It uses an efficient algorithm to detect and call broad peaks, greatly improving the quality of your data for further analysis.
 
+Call broad peaks from bedGraph output. Note: All regions on the same chromosome in the bedGraph file should be continuous so only bedGraph files from MACS3 are accpetable
 ## Command Line Options
 
 The command line options for `bdgbroadcall` are defined in `/MACS3/Commands/bdgbroadcall_cmd.py` and `/bin/macs3` files. Here is a brief overview of these options:
 
 - `-i` or `--ifile`: The input file. This should be in bedGraph format. This option is required.
-- `-o` or `--ofile`: The output file. This will be in the same format as the input file. This option is required.
 - `-c` or `--cutoff`: The cutoff value for calling peaks. This is a float value.
 - `-l` or `--minlen`: The minimum length of peaks. This is an integer value.
 - `-g` or `--maxgap`: The maximum gap between peaks. This is an integer value.
 - `-C` or `--cutofflink`: The cutoff value for linking peaks. This is a float value.
 - `-L` or `--maxgaplink`: The maximum gap for linking peaks. This is an integer value.
 
+
+- `-o` or `--ofile`: The output file. This will be in the same format as the input file. This option is required.
+- `--o-prefix`: The output file. This will be in the same format as the input file. This option is required.
 ## Example Usage
 
 Here is an example of how to use the `bdgbroadcall` command:

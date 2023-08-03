@@ -7,6 +7,8 @@ The `bdgcmp` command is part of the MACS3 suite of tools and is used to compare 
 
 The `bdgcmp` command takes two input bedGraph files and produces an output file with comparison scores. It uses an efficient algorithm to compare the bedGraph files, greatly improving the quality of your data for further analysis.
 
+
+Deduct noise by comparing two signal tracks in bedGraph. Note: All regions on the same chromosome in the bedGraph file should be continuous so only bedGraph files from MACS3 are acceptable.
 ## Command Line Options
 
 The command line options for `bdgcmp` are defined in `/MACS3/Commands/bdgcmp_cmd.py` and `/bin/macs3` files. Here is a brief overview of these options:

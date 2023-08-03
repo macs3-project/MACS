@@ -7,6 +7,7 @@ The `bdgopt` command is part of the MACS3 suite of tools and is used to modify b
 
 The `bdgopt` command takes an input bedGraph file and produces an output file with modified scores. It uses various methods to modify the scores in the bedGraph files, greatly improving the flexibility of your data for further analysis.
 
+Operations on score column of bedGraph file. Note: All regions on the same chromosome in the bedGraph file should be continuous so only bedGraph files from MACS3 are accpetable
 ## Command Line Options
 
 The command line options for `bdgopt` are defined in `/MACS3/Commands/bdgopt_cmd.py` and `/bin/macs3` files. Here is a brief overview of these options:
