@@ -1,7 +1,7 @@
 # cython: language_level=3
 # cython: profile=True
 # cython: linetrace=True
-# Time-stamp: <2022-02-02 13:24:26 Tao Liu>
+# Time-stamp: <2023-08-02 14:49:59 Tao Liu>
 
 """Module for all MACS Parser classes for input. Please note that the
 parsers are for reading the alignment files ONLY.
@@ -93,7 +93,7 @@ cpdef guess_parser ( fname, int64_t buffer_size = 100000 ):
             t_parser.close()
     raise Exception( "Can't detect format!" )
 
-cdef tuple __bam_fw_binary_parse_le ( const unsigned char * data ):
+cdef tuple bam_fw_binary_parse_le ( const unsigned char * data ):
     """Parse a BAM SE entry in little endian system
     """
     cdef:
@@ -141,7 +141,7 @@ cdef tuple __bam_fw_binary_parse_le ( const unsigned char * data ):
 
     return ( thisref, thisstart, thisstrand )
 
-cdef tuple __bam_fw_binary_parse_be ( const unsigned char * data ):
+cdef tuple bam_fw_binary_parse_be ( const unsigned char * data ):
     """Big endian version. We need byte swap.
     """
     cdef:
@@ -197,7 +197,7 @@ cdef tuple __bam_fw_binary_parse_be ( const unsigned char * data ):
 
     return ( thisref, thisstart, thisstrand )
 
-cdef tuple __bampe_pe_binary_parse_le (const unsigned char * data):
+cdef tuple bampe_pe_binary_parse_le (const unsigned char * data):
     """Parse a BAMPE record in little-endian system.
     """
     cdef:
@@ -240,7 +240,7 @@ cdef tuple __bampe_pe_binary_parse_le (const unsigned char * data):
 
     return ( thisref, thisstart, thistlen )
 
-cdef tuple __bampe_pe_binary_parse_be (const unsigned char * data):
+cdef tuple bampe_pe_binary_parse_be (const unsigned char * data):
     """Parse a BAMPE record in big-endian system. And we need byte swap.
     """
     cdef:
@@ -287,16 +287,16 @@ cdef tuple __bampe_pe_binary_parse_be (const unsigned char * data):
 
 # choose a parser according to endian
 if is_le:
-    bam_se_entry_parser = __bam_fw_binary_parse_le
-    bampe_pe_entry_parser = __bampe_pe_binary_parse_le
+    bam_se_entry_parser = bam_fw_binary_parse_le
+    bampe_pe_entry_parser = bampe_pe_binary_parse_le
 else:
-    bam_se_entry_parser = __bam_fw_binary_parse_be
-    bampe_pe_entry_parser = __bampe_pe_binary_parse_be
+    bam_se_entry_parser = bam_fw_binary_parse_be
+    bampe_pe_entry_parser = bampe_pe_binary_parse_be
 
 # ------------------------------------
 # Classes
 # ------------------------------------
-class StrandFormatError( Exception ):
+class StrandFormatError( BaseException ):
     """Exception about strand format error.
 
     Example:
@@ -314,8 +314,8 @@ cdef class GenericParser:
 
     Inherit this class to write your own parser. In most cases, you need to override:
 
-    1. __tlen_parse_line which returns tag length of a line
-    2.  __fw_parse_line which returns tuple of ( chromosome, 5'position, strand )
+    1. tlen_parse_line which returns tag length of a line
+    2.  fw_parse_line which returns tuple of ( chromosome, 5'position, strand )
     """
     cdef:
         str filename
@@ -352,9 +352,9 @@ cdef class GenericParser:
             self.fhd = io.BufferedReader( gzip.open( filename, mode='rb' ), buffer_size = READ_BUFFER_SIZE ) # buffersize set to 10M
         else:
             self.fhd = io.open( filename, mode='rb' ) # binary mode! I don't expect unicode here!
-        self.__skip_first_commentlines()
+        self.skip_first_commentlines()
 
-    cdef void __skip_first_commentlines ( self ):
+    cdef void skip_first_commentlines ( self ):
         """Some parser needs to skip the first several comment lines.
 
         Redefine this if it's necessary!
@@ -382,7 +382,7 @@ cdef class GenericParser:
         while n < 10 and m < 10000:
             m += 1
             thisline = self.fhd.readline()
-            this_taglength = self.__tlen_parse_line( thisline )
+            this_taglength = self.tlen_parse_line( thisline )
             if this_taglength > 0:
                 # this_taglength == 0 means this line doesn't contain
                 # successful alignment.
@@ -390,16 +390,16 @@ cdef class GenericParser:
                 n += 1
         # done
         self.fhd.seek( 0 )
-        self.__skip_first_commentlines()
+        self.skip_first_commentlines()
         if n != 0:              # else tsize = -1
             self.tag_size = <int32_t>(s/n)
         return self.tag_size
 
-    cdef int32_t __tlen_parse_line ( self, bytes thisline ):
+    cdef int32_t tlen_parse_line ( self, bytes thisline ):
         """Abstract function to detect tag length.
 
         """
-        raise NotImplemented
+        raise NotImplementedError
 
     cpdef build_fwtrack ( self ):
         """Generic function to build FWTrack object. Create a new
@@ -423,9 +423,9 @@ cdef class GenericParser:
             lines = tmp.split(b"\n")
             tmp = lines[ -1 ]
             for thisline in lines[ :-1 ]:
-                ( chromosome, fpos, strand ) = self.__fw_parse_line( thisline )
+                ( chromosome, fpos, strand ) = self.fw_parse_line( thisline )
                 if fpos < 0 or not chromosome:
-                    # normally __fw_parse_line will return -1 if the line
+                    # normally fw_parse_line will return -1 if the line
                     # contains no successful alignment.
                     continue
                 i += 1
@@ -434,7 +434,7 @@ cdef class GenericParser:
                 fwtrack.add_loc( chromosome, fpos, strand )
         # last one
         if tmp:
-            ( chromosome, fpos, strand ) = self.__fw_parse_line( tmp )
+            ( chromosome, fpos, strand ) = self.fw_parse_line( tmp )
             if fpos >= 0 and chromosome:
                 i += 1
                 fwtrack.add_loc( chromosome, fpos, strand )
@@ -459,9 +459,9 @@ cdef class GenericParser:
             lines = tmp.split(b"\n")
             tmp = lines[ -1 ]
             for thisline in lines[ :-1 ]:
-                ( chromosome, fpos, strand ) = self.__fw_parse_line( thisline )
+                ( chromosome, fpos, strand ) = self.fw_parse_line( thisline )
                 if fpos < 0 or not chromosome:
-                    # normally __fw_parse_line will return -1 if the line
+                    # normally fw_parse_line will return -1 if the line
                     # contains no successful alignment.
                     continue
                 i += 1
@@ -471,7 +471,7 @@ cdef class GenericParser:
 
         # last one
         if tmp:
-            ( chromosome, fpos, strand ) = self.__fw_parse_line( tmp )
+            ( chromosome, fpos, strand ) = self.fw_parse_line( tmp )
             if fpos >= 0 and chromosome:
                 i += 1
                 fwtrack.add_loc( chromosome, fpos, strand )
@@ -479,7 +479,7 @@ cdef class GenericParser:
         self.close()
         return fwtrack
 
-    cdef tuple __fw_parse_line ( self, bytes thisline ):
+    cdef tuple fw_parse_line ( self, bytes thisline ):
         """Abstract function to parse chromosome, 5' end position and
         strand.
 
@@ -506,7 +506,7 @@ cdef class GenericParser:
             return False
         else:
             self.fhd.seek( 0 )
-            self.__skip_first_commentlines()
+            self.skip_first_commentlines()
             return True
 
     cpdef close ( self ):
@@ -523,7 +523,7 @@ cdef class BEDParser( GenericParser ):
     """File Parser Class for BED File.
 
     """
-    cdef void __skip_first_commentlines ( self ):
+    cdef void skip_first_commentlines ( self ):
         """BEDParser needs to skip the first several comment lines.
         """
         cdef:
@@ -540,7 +540,7 @@ cdef class BEDParser( GenericParser ):
         self.fhd.seek( -l_line, 1 )
         return
 
-    cdef int32_t __tlen_parse_line ( self, bytes thisline ):
+    cdef int32_t tlen_parse_line ( self, bytes thisline ):
         """Parse 5' and 3' position, then calculate frag length.
 
         """
@@ -551,7 +551,7 @@ cdef class BEDParser( GenericParser ):
         thisfields = thisline.split( b'\t' )
         return atoi( thisfields[ 2 ] )-atoi( thisfields[ 1 ] )
 
-    cdef tuple __fw_parse_line ( self, bytes thisline ):
+    cdef tuple fw_parse_line ( self, bytes thisline ):
         #cdef list thisfields
         cdef:
             bytes chromname
@@ -596,7 +596,7 @@ cdef class BEDPEParser(GenericParser):
     cdef public int32_t n
     cdef public float32_t d
 
-    cdef void __skip_first_commentlines ( self ):
+    cdef void skip_first_commentlines ( self ):
         """BEDPEParser needs to skip the first several comment lines.
         """
         cdef:
@@ -613,7 +613,7 @@ cdef class BEDPEParser(GenericParser):
         self.fhd.seek( -l_line, 1 )
         return
 
-    cdef __pe_parse_line ( self, bytes thisline ):
+    cdef pe_parse_line ( self, bytes thisline ):
         """ Parse each line, and return chromosome, left and right positions
 
         """
@@ -654,7 +654,7 @@ cdef class BEDPEParser(GenericParser):
             lines = tmp.split(b"\n")
             tmp = lines[ -1 ]
             for thisline in lines[ :-1 ]:
-                ( chromosome, left_pos, right_pos ) = self.__pe_parse_line( thisline )
+                ( chromosome, left_pos, right_pos ) = self.pe_parse_line( thisline )
                 if left_pos < 0 or not chromosome:
                     continue
                 assert right_pos > left_pos, "Right position must be larger than left position, check your BED file at line: %s" % thisline
@@ -665,7 +665,7 @@ cdef class BEDPEParser(GenericParser):
                 add_loc( chromosome, left_pos, right_pos )
         # last one
         if tmp:
-            ( chromosome, left_pos, right_pos ) = self.__pe_parse_line( thisline )
+            ( chromosome, left_pos, right_pos ) = self.pe_parse_line( thisline )
             if left_pos >= 0 and chromosome:
                 assert right_pos > left_pos, "Right position must be larger than left position, check your BED file at line: %s" % thisline
                 i += 1
@@ -700,7 +700,7 @@ cdef class BEDPEParser(GenericParser):
             lines = tmp.split(b"\n")
             tmp = lines[ -1 ]
             for thisline in lines[ :-1 ]:
-                ( chromosome, left_pos, right_pos ) = self.__pe_parse_line( thisline )
+                ( chromosome, left_pos, right_pos ) = self.pe_parse_line( thisline )
                 if left_pos < 0 or not chromosome:
                     continue
                 assert right_pos > left_pos, "Right position must be larger than left position, check your BED file at line: %s" % thisline
@@ -711,7 +711,7 @@ cdef class BEDPEParser(GenericParser):
                 add_loc( chromosome, left_pos, right_pos )
         # last one
         if tmp:
-            ( chromosome, left_pos, right_pos ) = self.__pe_parse_line( thisline )
+            ( chromosome, left_pos, right_pos ) = self.pe_parse_line( thisline )
             if left_pos >= 0 and chromosome:
                 assert right_pos > left_pos, "Right position must be larger than left position, check your BED file at line: %s" % thisline
                 i += 1
@@ -730,7 +730,7 @@ cdef class ELANDResultParser( GenericParser ):
     """File Parser Class for tabular File.
 
     """
-    cdef void __skip_first_commentlines ( self ):
+    cdef void skip_first_commentlines ( self ):
         """ELANDResultParser needs to skip the first several comment lines.
         """
         cdef:
@@ -745,7 +745,7 @@ cdef class ELANDResultParser( GenericParser ):
         self.fhd.seek( -l_line, 1 )
         return
 
-    cdef int32_t __tlen_parse_line ( self, bytes thisline ):
+    cdef int32_t tlen_parse_line ( self, bytes thisline ):
         """Parse tag sequence, then tag length.
 
         """
@@ -757,7 +757,7 @@ cdef class ELANDResultParser( GenericParser ):
         else:
             return len( thisfields[ 1 ] )
 
-    cdef tuple __fw_parse_line ( self, bytes thisline ):
+    cdef tuple fw_parse_line ( self, bytes thisline ):
         cdef:
             bytes chromname, strand
             int32_t thistaglength
@@ -809,7 +809,7 @@ cdef class ELANDMultiParser( GenericParser ):
     starting at position 160322 with one error, one in the forward direction starting at
     position 170128 with two errors. There is also a single-error match to E_coli.fa.
     """
-    cdef void __skip_first_commentlines ( self ):
+    cdef void skip_first_commentlines ( self ):
         """ELANDResultParser needs to skip the first several comment lines.
         """
         cdef:
@@ -824,7 +824,7 @@ cdef class ELANDMultiParser( GenericParser ):
         self.fhd.seek( -l_line, 1 )
         return
 
-    cdef int32_t __tlen_parse_line ( self, bytes thisline ):
+    cdef int32_t tlen_parse_line ( self, bytes thisline ):
         """Parse tag sequence, then tag length.
 
         """
@@ -836,7 +836,7 @@ cdef class ELANDMultiParser( GenericParser ):
         else:
             return len( thisfields[ 1 ] )
 
-    cdef tuple __fw_parse_line ( self, bytes thisline ):
+    cdef tuple fw_parse_line ( self, bytes thisline ):
         cdef:
             list thisfields
             bytes thistagname, pos, strand
@@ -882,7 +882,7 @@ cdef class ELANDExportParser( GenericParser ):
     """File Parser Class for ELAND Export File.
 
     """
-    cdef void __skip_first_commentlines ( self ):
+    cdef void skip_first_commentlines ( self ):
         """ELANDResultParser needs to skip the first several comment lines.
         """
         cdef:
@@ -897,7 +897,7 @@ cdef class ELANDExportParser( GenericParser ):
         self.fhd.seek( -l_line, 1 )
         return
 
-    cdef int32_t __tlen_parse_line ( self, bytes thisline ):
+    cdef int32_t tlen_parse_line ( self, bytes thisline ):
         """Parse tag sequence, then tag length.
 
         """
@@ -910,7 +910,7 @@ cdef class ELANDExportParser( GenericParser ):
         else:
             return 0
 
-    cdef tuple __fw_parse_line ( self, bytes thisline ):
+    cdef tuple fw_parse_line ( self, bytes thisline ):
         cdef:
             list thisfields
             bytes thisname, strand
@@ -968,7 +968,7 @@ cdef class SAMParser( GenericParser ):
     2048	supplementary alignment
     """
 
-    cdef void __skip_first_commentlines ( self ):
+    cdef void skip_first_commentlines ( self ):
         """SAMParser needs to skip the first several comment lines.
         """
         cdef:
@@ -983,7 +983,7 @@ cdef class SAMParser( GenericParser ):
         self.fhd.seek( -l_line, 1 )
         return
 
-    cdef int32_t __tlen_parse_line ( self, bytes thisline ):
+    cdef int32_t tlen_parse_line ( self, bytes thisline ):
         """Parse tag sequence, then tag length.
 
         """
@@ -1010,7 +1010,7 @@ cdef class SAMParser( GenericParser ):
                 return 0
         return len( thisfields[ 9 ] )
 
-    cdef tuple __fw_parse_line ( self, bytes thisline ):
+    cdef tuple fw_parse_line ( self, bytes thisline ):
         cdef:
             list thisfields
             bytes thistagname, thisref
@@ -1400,7 +1400,7 @@ cdef class BowtieParser( GenericParser ):
     program.
 
     """
-    cdef int32_t __tlen_parse_line ( self, bytes thisline ):
+    cdef int32_t tlen_parse_line ( self, bytes thisline ):
         """Parse tag sequence, then tag length.
 
         """
@@ -1412,7 +1412,7 @@ cdef class BowtieParser( GenericParser ):
         thisfields = thisline.split( b'\t' ) # I hope it will never bring me more trouble
         return len( thisfields[ 4 ] )
 
-    cdef tuple __fw_parse_line (self, bytes thisline ):
+    cdef tuple fw_parse_line (self, bytes thisline ):
         """
         The following definition comes from bowtie website:
 
