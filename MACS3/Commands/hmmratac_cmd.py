@@ -1,4 +1,4 @@
-# Time-stamp: <2023-07-28 12:10:12 Tao Liu>
+# Time-stamp: <2023-08-02 17:32:47 Tao Liu>
 
 """Description: Main HMMR command
 
@@ -26,7 +26,7 @@ from MACS3.Utilities.Constants import *
 from MACS3.Utilities.OptValidator import opt_validate_hmmratac
 from MACS3.IO.PeakIO import PeakIO
 from MACS3.IO.PeakIO import BroadPeakIO
-from MACS3.IO.Parser import BAMPEParser #BAMaccessor
+from MACS3.IO.Parser import BAMPEParser, BEDPEParser #BAMaccessor
 from MACS3.Signal.HMMR_EM import HMMR_EM
 from MACS3.Signal.HMMR_Signal_Processing import generate_weight_mapping, generate_digested_signals, extract_signals_from_regions
 from MACS3.Signal.HMMR_HMM import hmm_training, hmm_predict, hmm_model_init, hmm_model_save
@@ -71,20 +71,26 @@ def run( args ):
     cutoffanalysis_file = os.path.join( options.outdir, options.name+"_cutoff_analysis.tsv" )
     
     #############################################
-    # 1. Read the input BAM files
+    # 1. Read the input files
     #############################################
     options.info("\n" + options.argtxt)
-    #options.info("Some important parameters for this run")
-    #options.info(f" binsize for HMM: {options.binsize} ()")
-    options.info("#1 Read fragments from BAM file...")
 
-    bam = BAMPEParser(options.bam_file[0], buffer_size=options.buffer_size)
-    petrack = bam.build_petrack()
-    if len( options.bam_file ) > 1:
+    if options.format == "BAMPE":
+        options.info("#1 Read fragments from BAMPE file...")
+        parser = BAMPEParser
+    elif options.format == "BEDPE":
+        options.info("#1 Read fragments from BEDPE file...")
+        parser = BEDPEParser
+    else:
+        raise Exception("wrong format")
+
+    alignment = parser(options.input_file[0], buffer_size=options.buffer_size)
+    petrack = alignment.build_petrack()
+    if len( options.input_file ) > 1:
         # multiple input
-        for bamfile in options.bam_file[1:]:
-            bam = BAMPEParser(bamfile, buffer_size=options.buffer_size)
-            petrack = bam.append_petrack( petrack )
+        for inputfile in options.input_file[1:]:
+            alignment = parser(inputfile, buffer_size=options.buffer_size)
+            petrack = alignment.append_petrack( petrack )
     # remember to finalize the petrack
     petrack.finalize()
 
