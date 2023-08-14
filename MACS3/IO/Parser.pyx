@@ -1,7 +1,7 @@
 # cython: language_level=3
 # cython: profile=True
 # cython: linetrace=True
-# Time-stamp: <2023-08-02 14:49:59 Tao Liu>
+# Time-stamp: <2023-08-14 11:06:50 Tao Liu>
 
 """Module for all MACS Parser classes for input. Please note that the
 parsers are for reading the alignment files ONLY.
@@ -1344,7 +1344,7 @@ cdef class BAMPEParser(BAMParser):
         info( "%d fragments have been read." % i )
         #debug( f" {e1} Can't identify the length of entry, it may be the end of file, stop looping..." )
         #debug( f" {e2} Chromosome name can't be found which means this entry is skipped ..." )
-        #assert i > 0, "Something went wrong, no fragment has been read! Check input file!"
+        assert i > 0, "Something went wrong, no fragment has been read! Check your input files!"
         self.d = m / i
         self.n = i
         #assert self.d >= 0, "Something went wrong (mean fragment size was negative: %d = %d / %d)" % (self.d, m, i)
