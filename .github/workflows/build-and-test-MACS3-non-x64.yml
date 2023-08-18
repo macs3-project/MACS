@@ -26,8 +26,8 @@ jobs:
         with:
           submodules: 'true'
 
-      if: "!startsWith(github.ref, 'refs/heads/docs')"
-      
+      if: "startsWith(github.ref, 'refs/heads/docs') == false"
+
       - name: Set up arch and run (bullseye Python 3.9)
         uses: uraimo/run-on-arch-action@v2
         id: build
