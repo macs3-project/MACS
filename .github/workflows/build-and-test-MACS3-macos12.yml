@@ -4,14 +4,14 @@
 name: MACS3 CI MacOS 12
 
 on: [push, pull_request]
+  branches-ignore:
+    - 'docs/**'
 
 jobs:
   build:
     runs-on: macos-12
     name: Build on MacOS 12 with Python 3.11
 
-    if: "!startsWith(github.ref, 'refs/heads/docs')"
-    
     steps:
       - name: Checkout MACS
         uses: actions/checkout@v3

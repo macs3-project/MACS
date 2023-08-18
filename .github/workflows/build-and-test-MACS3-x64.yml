@@ -4,7 +4,9 @@
 name: MACS3 CI x64
 
 on: [push, pull_request]
-
+  branches-ignore:
+    - 'docs/**'
+    
 jobs:
   build:
     runs-on: ubuntu-20.04
@@ -13,9 +15,6 @@ jobs:
         python-version: [3.9, 3.10.11, 3.11]
         arch: ['x64']
     name: Build on x64 with Python ${{ matrix.python-version }}
-
-    if: "!startsWith(github.ref, 'refs/heads/docs')"
-
     steps:
       - name: Checkout MACS
         uses: actions/checkout@v3

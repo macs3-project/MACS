@@ -4,6 +4,8 @@
 name: MACS3 CI non x64
 
 on: [push, pull_request]
+  branches-ignore:
+    - 'docs/**'
 
 jobs:
   build_job:
@@ -25,8 +27,6 @@ jobs:
         uses: actions/checkout@v3
         with:
           submodules: 'true'
-
-      if: "startsWith(github.ref, 'refs/heads/docs') == false"
 
       - name: Set up arch and run (bullseye Python 3.9)
         uses: uraimo/run-on-arch-action@v2
