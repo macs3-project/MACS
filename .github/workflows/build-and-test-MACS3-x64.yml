@@ -3,9 +3,13 @@
 
 name: MACS3 CI x64
 
-on: [push, pull_request]
-  paths-ignore:
-    - 'docs/**'
+on: 
+  push:
+    paths-ignore:
+      - 'docs/**'
+  pull_request:
+    paths-ignore:
+      - 'docs/**'
 
 jobs:
   build:
