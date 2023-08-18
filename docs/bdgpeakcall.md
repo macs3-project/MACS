@@ -8,17 +8,25 @@ The `bdgpeakcall` command is part of the MACS3 suite of tools and is used to cal
 The `bdgpeakcall` command takes an input bedGraph file and produces an output file with peaks called. It uses an efficient algorithm to detect and call peaks, greatly improving the quality of your data for further analysis.
 
 
-Call peaks from bedGraph output. Note: All regions on the same chromosome in the bedGraph file should be continuous so only bedGraph files from MACS3 are accpetable.
+
+Call peaks from bedGraph output. Note: All regions on the same chromosome in the bedGraph file should be continuous so only
+                        bedGraph files from MACS3 are accpetable.
+
 ## Command Line Options
 
 The command line options for `bdgpeakcall` are defined in `/MACS3/Commands/bdgpeakcall_cmd.py` and `/bin/macs3` files. Here is a brief overview of these options:
 
-- `-i` or `--ifile`: The input file. This should be in bedGraph format. This option is required.
-- `-o` or `--ofile`: The output file. This will be in narrowPeak format.
-- `-c` or `--cutoff`: The cutoff for calling peaks. This is a float value.
-- `-l` or `--minlen`: The minimum length of peaks. This is an integer value.
-- `-g` or `--maxgap`: The maximum gap between peaks. This is an integer value.
-- `--cutoff-analysis`: An option to analyze cutoff versus the number of peaks, total length of peaks, and average length of peak.
+- `-i` or `--ifile`: MACS score in bedGraph. REQUIRED
+- `-c` or `--cutoff`: Cutoff depends on which method you used for the score track. If the file contains p-value scores from MACS3, score 5 means pvalue 1e-5. Regions with signals lower than the cutoff will not be considered as enriched regions. DEFAULT: 5
+- `-l` or `--min-length`: Minimum length of peak, better to set it as d value. DEFAULT: 200
+- `-g` or `--max-gap`: Maximum gap between significant points in a peak, better to set it as the tag size. DEFAULT: 30
+- `--cutoff-analysis`: While set, bdgpeakcall will analyze the number or total length of peaks that can be called by different cutoff then output a summary table to help the user decide a better cutoff. Note, minlen and maxgap may affect the results. DEFAULT: False
+- `--no-trackline`: Tells MACS not to include a trackline with bedGraph files. The trackline is required by UCSC.
+- `--verbose`: Set the verbose level of runtime messages. 0: only show critical messages, 1: show additional warning messages, 2: show process information, 3: show debug messages. DEFAULT: 2
+- `--outdir`: If specified, all output files will be written to that directory. Default: the current working directory
+- `-o` or `--ofile`: Output file name. Mutually exclusive with --o-prefix.
+- `--o-prefix`: Output file prefix. Mutually exclusive with -o/--ofile.
+
 
 ## Example Usage
 
@@ -29,22 +37,3 @@ macs3 bdgpeakcall -i input.bedGraph -o output.narrowPeak --cutoff 1.0 --minlen 5
 ```
 
 In this example, the program will call peaks from the `input.bedGraph` file and write the result to `output.narrowPeak`. The cutoff for calling peaks is set to 1.0, the minimum length of peaks is set to 500, the maximum gap between peaks is set to 1000, and the cutoff-analysis option is enabled.
-
-## FAQs about `bdgpeakcall`
-
-Q: What does `bdgpeakcall` do?
-A: `bdgpeakcall` is a tool in the MACS3 suite that calls peaks from a single bedGraph track for scores. It is useful in ChIP-Seq analysis for identifying peaks in the data.
-
-Q: How do I use `bdgpeakcall`?
-A: You can use `bdgpeakcall` by providing it with an input file, an output file, and optional parameters that control its behavior. See the [Example Usage](#example-usage) section above for an example of how to use `bdgpeakcall`.
-
-## Troubleshooting `bdgpeakcall`
-
-If you're having trouble using `bdgpeakcall`, here are some things to try:
-
-- Make sure your input file is in the correct format. `bdgpeakcall` requires a bedGraph format file.
-- Make sure the values you provide for cutoff, minlen, and maxgap are appropriate for your data. If the values are too small or too large, you may get inaccurate results.
-
-## Known issues or limitations of `bdgpeakcall`
-
-As of now, there are no known issues or limitations with `bdgpeakcall`. If you encounter a problem, please submit an issue on the MACS3 GitHub page.

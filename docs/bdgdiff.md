@@ -7,20 +7,27 @@ The `bdgdiff` command is part of the MACS3 suite of tools and is used to call di
 
 The `bdgdiff` command takes four input bedGraph files (two treatment and two control files) and produces three output files with differential peaks called. It uses an efficient algorithm to detect and call differential peaks, greatly improving the quality of your data for further analysis.
 
+Differential peak detection based on paired four bedgraph files. Note: All regions on the same chromosome in the bedGraph file
+                        should be continuous so only bedGraph files from MACS3 are accpetable.
+
 ## Command Line Options
 
 The command line options for `bdgdiff` are defined in `/MACS3/Commands/bdgdiff_cmd.py` and `/bin/macs3` files. Here is a brief overview of these options:
 
-- `-t1` or `--t1bdg`: The first treatment file. This should be in bedGraph format. This option is required.
-- `-c1` or `--c1bdg`: The first control file. This should be in bedGraph format. This option is required.
-- `-t2` or `--t2bdg`: The second treatment file. This should be in bedGraph format. This option is required.
-- `-c2` or `--c2bdg`: The second control file. This should be in bedGraph format. This option is required.
-- `-d1` or `--depth1`: The depth of the first condition. This is a float value.
-- `-d2` or `--depth2`: The depth of the second condition. This is a float value.
-- `-o` or `--ofile`: The output file. This will be in bedGraph format.
-- `-m` or `--minlen`: The minimum length of differential peaks. This is an integer value.
-- `-g` or `--maxgap`: The maximum gap between differential peaks. This is an integer value.
-- `-c` or `--cutoff`: The cutoff for LLR to call differential peaks. This is a float value.
+- `--t1`: MACS pileup bedGraph for condition 1. Incompatible with callpeak --SPMR output. REQUIRED
+- `--t2`: MACS pileup bedGraph for condition 2. Incompatible with callpeak --SPMR output. REQUIRED
+- `--c1`: MACS control lambda bedGraph for condition 1. Incompatible with callpeak --SPMR output. REQUIRED
+- `--c2`: MACS control lambda bedGraph for condition 2. Incompatible with callpeak --SPMR output. REQUIRED
+- `-C` or `--cutoff`: logLR cutoff. Regions with signals lower than the cutoff will not be considered as enriched regions. DEFAULT: 3 (likelihood ratio=1000)
+- `-l` or `--min-len`: Minimum length of the differential region. Try a bigger value to remove small regions. DEFAULT: 200
+- `-g` or `--max-gap`: Maximum gap to merge nearby differential regions. Consider a wider gap for broad marks. The maximum gap should be smaller than the minimum length (-g). DEFAULT: 100
+- `--d1` or `--depth1`: Sequencing depth (# of non-redundant reads in million) for condition 1. It will be used together with --d2. See the description for --d2 below for how to assign them. Default: 1
+- `--d2` or `--depth2`: Sequencing depth (# of non-redundant reads in million) for condition 2. It will be used together with --d1. DEPTH1 and DEPTH2 will be used to calculate the scaling factor for each sample, to down-scale the larger sample to the level of the smaller one. For example, while comparing 10 million condition 1 and 20 million condition 2, use --d1 10 --d2 20, then the pileup value in bedGraph for condition 2 will be divided by 2. Default: 1
+- `--verbose`: Set the verbose level of runtime messages. 0: only show critical messages, 1: show additional warning messages, 2: show process information, 3: show debug messages. DEFAULT: 2
+- `--outdir`: If specified, all output files will be written to that directory. Default: the current working directory
+- `--o-prefix`: Output file prefix. Actual files will be named as PREFIX_cond1.bed, PREFIX_cond2.bed, and PREFIX_common.bed. Mutually exclusive with -o/--ofile.
+- `-o` or `--ofile`: Output filenames. Must give three arguments in order: 1. file for unique regions in condition 1; 2. file for unique regions in condition 2; 3. file for common regions in both conditions. Note: mutually exclusive with --o-prefix.
+
 
 ## Example Usage
 
@@ -32,21 +39,3 @@ macs3 bdgdiff -t1 treatment1.bedGraph -c1 control1.bedGraph -t2 treatment2.bedGr
 
 In this example, the program will call differential peaks from the two pairs of treatment and control bedGraph files and write the result to `output.bedGraph`. The depth of the first and second condition is set to 1.0, the minimum length of differential peaks is set to 500, the maximum gap between differential peaks is set to 1000, and the cutoff for LLR to call differential peaks is set to 1.0.
 
-## FAQs about `bdgdiff`
-
-Q: What does `bdgdiff` do?
-A: `bdgdiff` is a tool in the MACS3 suite that calls differential peaks from four bedGraph tracks for scores. It is useful in ChIP-Seq analysis for identifying differential peaks in the data.
-
-Q: How do I use `bdgdiff`?
-A: You can use `bdgdiff` by providing it with four input files (two treatment and two control), an output file, and optional parameters that control its behavior. See the [Example Usage](#example-usage) section above for an example of how to use `bdgdiff`.
-
-## Troubleshooting `bdgdiff`
-
-If you're having trouble using `bdgdiff`, here are some things to try:
-
-- Make sure your input files are in the correct format. `bdgdiff` requires four bedGraph format files.
-- Make sure the values you provide for depth, minlen, maxgap, and cutoff are appropriate for your data. If the values are too small or too large, you may get inaccurate results.
-
-## Known issues or limitations of `bdgdiff`
-
-As of now, there are no known issues or limitations with `bdgdiff`. If you encounter a problem, please submit an issue on the MACS3 GitHub page.

@@ -7,15 +7,25 @@ The `bdgopt` command is part of the MACS3 suite of tools and is used to modify b
 
 The `bdgopt` command takes an input bedGraph file and produces an output file with modified scores. It uses various methods to modify the scores in the bedGraph files, greatly improving the flexibility of your data for further analysis.
 
-Operations on score column of bedGraph file. Note: All regions on the same chromosome in the bedGraph file should be continuous so only bedGraph files from MACS3 are accpetable
+Operations on score column of bedGraph file. Note: All regions on the same chromosome in the bedGraph file should be continuous
+                        so only bedGraph files from MACS3 are accpetable.
+
 ## Command Line Options
 
 The command line options for `bdgopt` are defined in `/MACS3/Commands/bdgopt_cmd.py` and `/bin/macs3` files. Here is a brief overview of these options:
 
-- `-i` or `--ifile`: The input file. This should be in bedGraph format. This option is required.
-- `-o` or `--ofile`: The output file. This will be in bedGraph format.
-- `-m` or `--method`: The method to use for modification. This can be one of the following: `p2q`, `multiply`, `add`, `max`, `min`.
-- `-p` or `--extraparam`: The extra parameter for modification. This can be a float value, and its usage depends on the modification method.
+- `-i` or `--ifile`: MACS score in bedGraph. Note: this must be a bedGraph file covering the ENTIRE genome. REQUIRED
+- `-m` or `--method`: Method to modify the score column of the bedGraph file. Available choices are: multiply, add, max, min, or p2q.
+    - `multiply`: The EXTRAPARAM is required and will be multiplied to the score column. If you intend to divide the score column by X, use the value of 1/X as EXTRAPARAM.
+    - `add`: The EXTRAPARAM is required and will be added to the score column. If you intend to subtract the score column by X, use the value of -X as EXTRAPARAM.
+    - `max`: The EXTRAPARAM is required and will take the maximum value between the score and the EXTRAPARAM.
+    - `min`: The EXTRAPARAM is required and will take the minimum value between the score and the EXTRAPARAM.
+    - `p2q`: This will convert p-value scores to q-value scores using the Benjamini-Hochberg process. The EXTRAPARAM is not required. This method assumes the scores are -log10 p-value from MACS3. Any other types of scores will cause unexpected errors.
+- `-p` or `--extra-param`: The extra parameter for METHOD. Check the detail of the -m option.
+- `--outdir`: If specified, all output files will be written to that directory. Default: the current working directory
+- `-o` or `--ofile`: Output BEDGraph filename.
+- `--verbose`: Set the verbose level of runtime messages. 0: only show critical messages, 1: show additional warning messages, 2: show process information, 3: show debug messages. DEFAULT: 2
+
 
 ## Example Usage
 
@@ -27,21 +37,3 @@ macs3 bdgopt -i input.bedGraph -o output.bedGraph --method multiply --extraparam
 
 In this example, the program will modify the scores in the `input.bedGraph` file and write the result to `output.bedGraph`. The method used for modification is `multiply`, and the extra parameter is set to 2.0, meaning that all scores will be multiplied by 2.0.
 
-## FAQs about `bdgopt`
-
-Q: What does `bdgopt` do?
-A: `bdgopt` is a tool in the MACS3 suite that modifies bedGraph files. It is useful in ChIP-Seq analysis for making specific modifications to the data in bedGraph files.
-
-Q: How do I use `bdgopt`?
-A: You can use `bdgopt` by providing it with an input file, an output file, a modification method, and an extra parameter for modification. See the [Example Usage](#example-usage) section above for an example of how to use `bdgopt`.
-
-## Troubleshooting `bdgopt`
-
-If you're having trouble using `bdgopt`, here are some things to try:
-
-- Make sure your input file is in the correct format. `bdgopt` requires a bedGraph format file.
-- Make sure the values you provide for the method and extra parameter are appropriate for your data. If the values are not suitable, you may get inaccurate results.
-
-## Known issues or limitations of `bdgopt`
-
-As of now, there are no known issues or limitations with `bdgopt`. If you encounter a problem, please submit an issue on the MACS3 GitHub page.
