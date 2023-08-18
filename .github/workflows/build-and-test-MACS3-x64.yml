@@ -4,9 +4,9 @@
 name: MACS3 CI x64
 
 on: [push, pull_request]
-  branches-ignore:
+  paths-ignore:
     - 'docs/**'
-    
+
 jobs:
   build:
     runs-on: ubuntu-20.04
