@@ -20,7 +20,7 @@ A clear and concise description of what you expected to happen.
 If applicable, add screenshots to help explain your problem.
 
 **System (please complete the following information):**
- - OS: [e.g. Linux, Mac OSX]
+ - OS: [e.g. Linux, Mac OSX] [note: Windows NOT supported]
  - Python version [e.g. 3.7.1]
  - Numpy version [e.g. 1.17.0]
  - MACS Version [e.g. 2.2.4]
