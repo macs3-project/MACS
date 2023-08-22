@@ -38,15 +38,6 @@ If specified all output files will be written to that directory. Default: the cu
 ### `-n NAME`/ `--name NAME`
 Name for this experiment, which will be used as a prefix to generate output file names. DEFAULT: "NA"
 
-### `--cutoff-analysis-only`
-
- Only run the cutoff analysis and output a report. After generating
- the report, the process will stop. The report will help user decide
- the three crucial parameters for `-l`, `-u`, and `-c`. So it's highly
- recommanded to run this first! Please read the report and
- instructions in `Choices of cutoff values` on how to decide the three
- crucial parameters
-
 ### `--modelonly`
  This option will only generate the HMM model as a JSON file and quit. This model can then be applied using the `--model` option. Default: False
 
@@ -58,6 +49,15 @@ Name for this experiment, which will be used as a prefix to generate output file
 
 ### `--min-frag-p MIN_FRAG_P`
  We will exclude the abnormal fragments that can't be assigned to any of the four signal tracks. After we use EM to find the means and stddevs of the four distributions, we will calculate the likelihood that a given fragment length fit any of the four using normal distribution. The criteria we will use is that if a fragment length has less than MIN_FRAG_P probability to be like either of short, mono, di, or tri-nuc fragment, we will exclude it while generating the four signal tracks for later HMM training and prediction. The value should be between 0 and 1. Larger the value, more abnormal fragments will be allowed. So if you want to include more 'ideal' fragments, make this value smaller. Default = 0.001
+
+### `--cutoff-analysis-only`
+
+ Only run the cutoff analysis and output a report. After generating
+ the report, the process will stop. The report will help user decide
+ the three crucial parameters for `-l`, `-u`, and `-c`. So it's highly
+ recommanded to run this first! Please read the report and
+ instructions in `Choices of cutoff values` on how to decide the three
+ crucial parameters
 
 ### `-u HMM_UPPER` / `--upper HMM_UPPER`
 
