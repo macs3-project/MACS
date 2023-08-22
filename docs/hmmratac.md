@@ -47,6 +47,18 @@ Name for this experiment, which will be used as a prefix to generate output file
  instructions in `Choices of cutoff values` on how to decide the three
  crucial parameters
 
+### `--modelonly`
+ This option will only generate the HMM model as a JSON file and quit. This model can then be applied using the `--model` option. Default: False
+
+### `--model`
+ If provided, HMM training will be skipped and a JSON file generated from a previous HMMRATAC run will be used instead of creating new one. Default: NA
+   
+### `-t HMM_TRAINING_REGIONS` / `--training HMM_TRAINING_REGIONS`
+ Customized training regions can be provided through this option. `-t` takes the filename of training regions (previously was BED_file) to use for training HMM, instead of using foldchange settings to select. Default: NA
+
+### `--min-frag-p MIN_FRAG_P`
+ We will exclude the abnormal fragments that can't be assigned to any of the four signal tracks. After we use EM to find the means and stddevs of the four distributions, we will calculate the likelihood that a given fragment length fit any of the four using normal distribution. The criteria we will use is that if a fragment length has less than MIN_FRAG_P probability to be like either of short, mono, di, or tri-nuc fragment, we will exclude it while generating the four signal tracks for later HMM training and prediction. The value should be between 0 and 1. Larger the value, more abnormal fragments will be allowed. So if you want to include more 'ideal' fragments, make this value smaller. Default = 0.001
+
 ### `-u HMM_UPPER` / `--upper HMM_UPPER`
 
 Upper limit on fold change range for choosing training sites. This is
