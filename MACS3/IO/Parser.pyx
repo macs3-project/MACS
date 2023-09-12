@@ -1,7 +1,7 @@
 # cython: language_level=3
 # cython: profile=True
 # cython: linetrace=True
-# Time-stamp: <2023-08-14 11:06:50 Tao Liu>
+# Time-stamp: <2023-09-12 14:06:24 Tao Liu>
 
 """Module for all MACS Parser classes for input. Please note that the
 parsers are for reading the alignment files ONLY.
@@ -312,16 +312,88 @@ class StrandFormatError( BaseException ):
 cdef class GenericParser:
     """Generic Parser class.
 
-    Inherit this class to write your own parser. In most cases, you need to override:
+    The GenericParser contains the following attributes:
+
+    1. filename, a str object, contains the input filename
+
+    2. gzipped, a bool variable, indicates if the input file is
+    gzipped. If gzipped, the __init__ function will use gzi p.open
+    instead os.open to initialize the self.fhd object
+
+    3. fhd, a file object. If the file is not compressed with gzip,
+    it's a binary I/O from io.open; if the file is in g zip format,
+    it's a BufferedReader wrapped around a file object from gzip.open
+    function.
+
+    4. tag_size, a 32bit integer, stores the average read length
+
+    5. buffer_size, a 64 bit integer, stores the buffer size while
+    building FWTrack or PETrack. This value will control the step to
+    increase the length of FWTrack or PETrack. Larger the value, fewer
+    times we need to increase the length, but more memory we will
+    waste.
+
+    This GenericParser class contains the following functions:
+
+    1. __init__: It will set the value of filename and buffer_size. It
+    will set tag_size to -1. Then check if the file is gzipped, and
+    set the gzipped value. And at last, open the file depending on
+    whether it is gzipped, and save the file I/O in self.fhd. In the
+    end, it will call 'skip_first_commentlines' to skip the first
+    comment lines in the input file.
+
+    2. skip_first_commentlines: In GenericParser, it will do
+    nothing. But we may need to implement it for other formats. For
+    example, to skip the first few lines in the SAM format (the
+    header), or to skip the first couple of lines starting with "#" in
+    BED format.
+
+    3. tsize: this is a function to call the function tlen_parse_line
+    to decide the read length, then set the self.tsize value.
+    
+    4. tlen_parse_line: The function will read a entry (a line of text
+    or a block of text) and return the read length for that entry. In
+    GenericParser, it is Not Implemented. So call it in GenericParser
+    will trigger an error. It needs to be implemented if self.tsize
+    and self.tlen_parse_line are needed.
+
+    5. sniff: This function will try to call self.tsize(), then if the
+    self.tag_size is too small (by default 10) or too big (by default
+    10000), the format may be wrong. We do this to guess if the format
+    is right.
+
+    6. is_gzipped: return self.gzipped. Don't know if I should keep it.
+
+    7. close: Close the self.fhd. Call this function when the parser
+    will never be used again.
+
+    8. rewind: Rewind to the beginning of the input file then skip the
+    first comment lines by calling skip_first_commentlines.
+
+    9. build_fwtrack:
+
+    10. append_fwtrack:
+
+    11. fw_parse_line:
+
+
+    Inherit this class to write your own parser. In most cases, you
+    need to override:
 
     1. tlen_parse_line which returns tag length of a line
-    2.  fw_parse_line which returns tuple of ( chromosome, 5'position, strand )
+
+    2. fw_parse_line which returns tuple of ( chromosome, 5'position,
+    strand )
+
+    3. In the case of reading paired-end input file, such as BEDPE and
+    BAMPE, we need to write pe_parse_line, and build_petrack functions
     """
+
     cdef:
         str filename
         bool gzipped
-        int32_t tag_size
         object fhd
+        int32_t tag_size
         int64_t buffer_size
 
     def __init__ ( self, str filename, int64_t buffer_size = 100000 ):
@@ -378,7 +450,7 @@ cdef class GenericParser:
             # if we have already calculated tag size (!= -1),  return it.
             return self.tag_size
 
-        # try 10k times or retrieve 10 successfule alignments
+        # try 10k times or retrieve 10 successful alignments
         while n < 10 and m < 10000:
             m += 1
             thisline = self.fhd.readline()
@@ -489,7 +561,7 @@ cdef class GenericParser:
         cdef int32_t strand = -1
         return ( chromosome, fpos, strand )
 
-    cpdef sniff ( self ):
+    cpdef sniff ( self, min_tsize = 10, max_tsize = 10000 ):
         """Detect whether this parser is the correct parser for input
         file.
 
@@ -501,7 +573,7 @@ cdef class GenericParser:
         cdef int32_t t
 
         t = self.tsize()
-        if t <= 10 or t >= 10000: # tsize too small or too big
+        if t <= min_tsize or t >= max_tsize: # tsize too small or too big
             self.fhd.seek( 0 )
             return False
         else:
@@ -515,6 +587,15 @@ cdef class GenericParser:
         Close file I/O stream.
         """
         self.fhd.close()
+
+    cpdef rewind ( self ):
+        """Rewind to the beginning of the file, and skip the first
+        comment lines.
+
+        """
+        self.fhd.seek( 0 )
+        self.skip_first_commentlines()
+        return
 
     cpdef bool is_gzipped ( self ):
         return self.gzipped
@@ -1110,7 +1191,7 @@ cdef class BAMParser( GenericParser ):
         else:
             self.fhd = io.open( filename, mode='rb' ) # binary mode! I don't expect unicode here!
 
-    cpdef sniff( self ):
+    cpdef sniff( self, min_tsize = 10, max_tsize = 10000 ):
         """Check the first 3 bytes of BAM file. If it's 'BAM', check
         is success.
 
@@ -1118,12 +1199,13 @@ cdef class BAMParser( GenericParser ):
         magic_header = self.fhd.read( 3 )
         if magic_header == b"BAM":
             tsize  = self.tsize()
-            if tsize > 0:
+            if tsize <= min_tsize or tsize >= max_tsize: # tsize too small or too big
                 self.fhd.seek( 0 )
-                return True
+                info( f"Odd average fragment size ${tsize} found in this file with BAM header!" )
+                return False
             else:
                 self.fhd.seek( 0 )
-                raise Exception( "File is not of a valid BAM format! %d" % tsize )
+                return True
         else:
             self.fhd.seek( 0 )
             return False
@@ -1340,7 +1422,6 @@ cdef class BAMPEParser(BAMParser):
             if i % 1000000 == 0:
                 info( " %d fragments parsed" % i )
 
-        #print( f"{references[chrid]:},{fpos:},{tlen:}" )
         info( "%d fragments have been read." % i )
         #debug( f" {e1} Can't identify the length of entry, it may be the end of file, stop looping..." )
         #debug( f" {e2} Chromosome name can't be found which means this entry is skipped ..." )
@@ -1386,12 +1467,11 @@ cdef class BAMPEParser(BAMParser):
                 info(" %d fragments parsed" % i)
 
         info( "%d fragments have been read." % i )
+        assert i > 0, "Something went wrong, no fragment has been read! Check your input files!"
         self.d = ( self.d * self.n + m ) / ( self.n + i )
         self.n += i
         #assert self.d >= 0, "Something went wrong (mean fragment size was negative: %d = %d / %d)" % (self.d, m, i)
         self.fhd.close()
-        # this is the problematic part. If fwtrack is finalized, then it's impossible to increase the length of it in a step of buffer_size for multiple input files.
-        # petrack.finalize()
         petrack.set_rlengths( rlengths )
         return petrack
 
