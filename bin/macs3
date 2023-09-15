@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# Time-stamp: <2023-08-02 17:49:12 Tao Liu>
+# Time-stamp: <2023-09-15 16:04:14 Tao Liu>
 
 """Description: MACS v3 main executable.
 
@@ -471,7 +471,7 @@ def add_bdgcmp_parser( subparsers ):
 
     argparser_bdgcmp.add_argument( "-m", "--method", dest = "method", type = str, nargs = "+",
                                    choices = ( "ppois", "qpois", "subtract", "logFE", "FE", "logLR", "slogLR", "max" ),
-                                   help = "Method to use while calculating a score in any bin by comparing treatment value and control value. Available choices are: ppois, qpois, subtract, logFE, logLR, and slogLR. They represent Poisson Pvalue (-log10(pvalue) form) using control as lambda and treatment as observation, q-value through a BH process for poisson pvalues, subtraction from treatment, linear scale fold enrichment, log10 fold enrichment(need to set pseudocount), log10 likelihood between ChIP-enriched model and open chromatin model(need to set pseudocount), symmetric log10 likelihood between two ChIP-enrichment models, or maximum value between the two tracks. Default option is ppois.",default="ppois")
+                                   help = "Method to use while calculating a score in any bin by comparing treatment value and control value. Available choices are: ppois, qpois, subtract, logFE, FE, logLR, slogLR, and max. They represent Poisson Pvalue (-log10(pvalue) form) using control as lambda and treatment as observation, q-value through a BH process for poisson pvalues, subtraction from treatment, linear scale fold enrichment, log10 fold enrichment(need to set pseudocount), log10 likelihood between ChIP-enriched model and open chromatin model(need to set pseudocount), symmetric log10 likelihood between two ChIP-enrichment models, or maximum value between the two tracks. Default option is ppois.",default="ppois")
     argparser_bdgcmp.add_argument( "--verbose", dest = "verbose", type = int, default = 2,
                                    help = "Set verbose level of runtime message. 0: only show critical message, 1: show additional warning message, 2: show process information, 3: show debug messages. DEFAULT:2" )
 
