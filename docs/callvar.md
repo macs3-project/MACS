@@ -35,13 +35,13 @@ The command line options for `callvar` are defined in `/MACS3/Commands/callvar_c
 ### Output arguments:
 - `--outdir`: The directory for all output files to be written to. Default: writes output files to the current working directory.
 - `-o` or `--ofile`: The output VCF file name.
-- `--verbose`: The directory for all output files to be written to. Default: writes output files to the current working directory.
+- `--verbose`: Set the verbose level of runtime messages. 0: only show critical messages, 1: show additional warning messages, 2: show process information, 3: show debug messages. DEFAULT: 2
 
 ### Variant calling arguments: 
 - `-g` or `--gq-hetero`: The Genotype Quality score (-10log10((L00+L11)/(L01+L00+L11))) cutoff for Heterozygous allele type. Default is 0, or there is no cutoff on GQ.
 - `-G` or `--gq-homo`: The Genotype Quality score (-10log10((L00+L01)/(L01+L00+L11))) cutoff for Homozygous allele (not the same as reference) type. Default is 0, or there is no cutoff on GQ.
 - `-Q`: The cutoff for the quality score. Only consider bases with quality score greater than this value. Default is 20, which means Q20 or 0.01 error rate.
-- `-F` or `--fermi`: The option to control when to apply local assembly through Fermi. By default (set as 'auto'), while SAPPER detects any INDEL variant in a peak region, it will utilize Fermi to recover the actual DNA sequences to refine the read alignments. If set as 'on', Fermi will be always invoked. It can increase specificity however sensivity and speed will be significantly lower. If set as 'off', Fermi won't be invoked at all. If so, speed and sensitivity can be higher but specificity will be significantly lower.
+- `-F` or `--fermi`: The option to control when to apply local assembly through Fermi. By default (set as 'auto'), while SAPPER detects any INDEL variant in a peak region, it will utilize Fermi to recover the actual DNA sequences to refine the read alignments. If set as 'on', Fermi will always be invoked. It can increase specificity, however sensivity and speed will be significantly lower. If set as 'off', Fermi won't be invoked at all. If so, speed and sensitivity can be higher but specificity will be significantly lower.
 - `--fermi-overlap`: The minimal overlap for fermi to initially assemble two reads. Must be between 1 and read length. A longer fermiMinOverlap is needed while read length is small (e.g. 30 for 36bp read, but 33 for 100bp read may work). Default is 30.
 - `--top2alleles-mratio`: The reads for the top 2 most frequent alleles (e.g. a ref allele and an alternative allele) at a loci shouldn't be too few comparing to total reads mapped. The minimum ratio is set by this optoin. Must be a float between 0.5 and 1. Default:0.8 which means at least 80% of reads contain the top 2 alleles.
 - `--altallele-count`: The count of the alternative (non-reference) allele at a loci shouldn't be too few. By default, we require at least two reads support the alternative allele. Default:2
