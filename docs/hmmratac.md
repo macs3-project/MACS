@@ -1,4 +1,4 @@
-# Hidden Markov Model peak caller for ATAC-seq -- HMMRATAC
+# hmmratac
 
 HMMRATAC (`macs3 hmmratac`) is a dedicated peak calling algorithm
 based on Hidden Markov Model for ATAC-seq data. The basic idea behind

@@ -1,4 +1,4 @@
-# Call peaks
+# callpeak
 
 This is the main function in MACS3. It can be invoked by `macs3
 callpeak` . If you type this command with `-h`, you will see a full

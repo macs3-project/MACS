@@ -1,24 +1,24 @@
-# Bdgcmp
+docs/bdgcmp.md# bdgcmp
 
 ## Overview
-The `bdgcmp` command is part of the MACS3 suite of tools and is used to compare bedGraph files. It is particularly useful for comparing two bedGraph files. The typical usage is to calculate pvalue or qvalue using poisson model for each basepair given a treatment pileup signal file in bedGraph format and a control lambda bedGraph file. But we provides more functions rather than pvalue and qvalue, including subtract, division (FE) and more. 
+The `bdgcmp` command is part of the MACS3 suite of tools and is used to compare two bedGraph files in each basepair that are commonly covered by the two files. The typical use case is to calculate pvalue or qvalue using Poisson model for each basepair given a treatment pileup signal file in bedGraph format and a control lambda bedGraph file. But we provides more functions rather than pvalue and qvalue, including subtract, division (FE) and more.
 
 ## Detailed Description
 
-The `bdgcmp` command takes two input bedGraph files (e.g. a control and a treatment bedgraph) and produces an output bedGraph of comparison scores for each genomic position involved in the bedGraph files. The `bdgcmp` command normally is used to deduct noise by comparing two signal tracks in bedGraph. Note: All regions on the same chromosome in the bedGraph file should be continuous so we recommand you use the bedGraph files from MACS3. We provide the following function to 'compare two tracks':
+The `bdgcmp` command takes two input bedGraph files (e.g. a control and a treatment bedgraph) and produces an output bedGraph of comparison scores for each genomic position involved in the bedGraph files. The `bdgcmp` command normally is used to deduct noise from a signal track in bedGraph (e.g. ChIP treatment) over another signal track in bedGraph (e.g. control). Note: All regions on the same chromosome in the bedGraph file should be continuous so we recommand you use the bedGraph files from MACS3. We provide the following function to 'compare two tracks':
 
-- ppois Poisson p-value (-log10(pvalue) form) using control as lambda and treatment as observation
+- ppois Poisson p-value (-log10(pvalue) form) using the second file (-c) as lambda and treatment (-t) as observation
 - qpois Q-value through a BH process for poisson pvalues
 - subtract Subtraction from treatment
 - FE linear scale fold enrichment, or the score from file A divided by the score from file B
 - logFE log10 fold enrichment(need to set pseudocount)
-- logLR log10 likelihood between ChIP-enriched model and open chromatin model(need to set pseudocount)
-- symmetric log10 likelihood between two ChIP-enrichment models using Poison distribution
+- logLR log10 likelihood between ChIP-enriched model and open chromatin model (need to set pseudocount)
+- symmetric log10 likelihood between two ChIP-enrichment models using Poison distribution, and this can be used to compare ChIP signals from two differen conditions (differential binding)
 - max Maximum value between the two tracks.
 
 ## Command Line Options
 
-The command line options for `bdgcmp` are defined in `/MACS3/Commands/bdgcmp_cmd.py` and `/bin/macs3` files. Here is a brief overview of these options:
+Here is a brief description of the command line options for `bdgcmp` :
 
 - `-t` or `--tfile`: Treatment bedGraph file, e.g. *_treat_pileup.bdg from MACS. REQUIRED
 - `-c` or `--cfile`: Control bedGraph file, e.g. *_control_lambda.bdg from MACS. REQUIRED
