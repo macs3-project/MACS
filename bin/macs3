@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# Time-stamp: <2023-09-15 16:04:14 Tao Liu>
+# Time-stamp: <2023-11-02 13:57:24 Tao Liu>
 
 """Description: MACS v3 main executable.
 
@@ -419,8 +419,10 @@ def add_bdgpeakcall_parser( subparsers ):
 #                         help="If set, MACS will use a more sophisticated approach to find all summits in each enriched peak region. DEFAULT: False",default=False)
     argparser_bdgpeakcall.add_argument( "--cutoff-analysis", dest="cutoff_analysis", action="store_true",
                                         help = "While set, bdgpeakcall will analyze number or total length of peaks that can be called by different cutoff then output a summary table to help user decide a better cutoff. Note, minlen and maxgap may affect the results. DEFAULT: False", default = False )
+    argparser_bdgpeakcall.add_argument( "--cutoff-analysis-steps", dest="cutoff_analysis_steps", type = int,
+                                        help = "Steps for performing cutoff analysis. It will be used to decide which cutoff value should be included in the final report. Larger the value, higher resolution the cutoff analysis can be. But please note, the final report won't necessarily include the same number of cutoff values as specified here since we won't output the cutoff that yield zero peak. DEFAULT: 100", default = 100 )    
     argparser_bdgpeakcall.add_argument("--no-trackline", dest="trackline", action="store_false", default=True,
-                         help="Tells MACS not to include trackline with bedGraph files. The trackline is required by UCSC.")
+                                        help="Tells MACS not to include trackline with bedGraph files. The trackline is used by UCSC for the options for display.")
     argparser_bdgpeakcall.add_argument( "--verbose", dest = "verbose", type = int, default = 2,
                                         help = "Set verbose level of runtime message. 0: only show critical message, 1: show additional warning message, 2: show process information, 3: show debug messages. DEFAULT:2" )
 
