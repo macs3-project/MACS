@@ -66,6 +66,7 @@ An easy solution is to use the average of two 'fragment size' predicted in `call
 
 Pay attention to runtime message, or extract the "tags after filtering in treatment" and "tags after filtering in control" lines from xls to see the effective sequencing depths for both conditions. In our previous command lines, '--to-large' is not used, so the effective sequencing depth is the smaller number of treatment and control. For example:
 
+```
  $ egrep "tags after filtering in treatment|tags after filtering in control" cond1_peaks.xls
  # tags after filtering in treatment: 19291269
  # tags after filtering in control: 12914669
@@ -73,6 +74,7 @@ Pay attention to runtime message, or extract the "tags after filtering in treatm
  $ egrep "tags after filtering in treatment|tags after filtering in control" cond2_peaks.xls
  # tags after filtering in treatment: 19962431
  # tags after filtering in control: 14444786
+```
 
 Then actual effective depths of condition 1 and 2 are: 12914669 and 14444786. Keep record of these two numbers and we will use them later. After successfully running '''callpeak''', you will have ''cond1_treat_pileup.bdg'', ''cond1_control_lambda.bdg'', ''cond2_treat_pileup.bdg'', and ''cond2_control_lambda.bdg'' in the working directory.
 

@@ -1,4 +1,4 @@
-docs/bdgcmp.md# bdgcmp
+# bdgcmp
 
 ## Overview
 The `bdgcmp` command is part of the MACS3 suite of tools and is used to compare two bedGraph files in each basepair that are commonly covered by the two files. The typical use case is to calculate pvalue or qvalue using Poisson model for each basepair given a treatment pileup signal file in bedGraph format and a control lambda bedGraph file. But we provides more functions rather than pvalue and qvalue, including subtract, division (FE) and more.
