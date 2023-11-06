@@ -172,9 +172,9 @@ is from a Bernoulli trial from $`r_c`$ with the allele ratio
 $\omega$. The probability of observing the ChIP-Seq data at a certain
 position under a given type is as follows:
 
-$$ Pr(D_c|g_c,\omega) = Pr(D_c|g_c) =
+$$` Pr(D_c|g_c,\omega) = Pr(D_c|g_c) =
  \sum^{r_{c,A}}_{j=1}\left((1-\epsilon_j)g_c/r_c+\epsilon_j(1-g_c/r_c)\right)\sum_{j=1}^{r_{c,B}}\left((1-\epsilon_j)(1-g_c/r_c)+\epsilon_j
- g_c/r_c\right) $$
+ g_c/r_c\right) `$$
 
 where ϵ_j represents the sequencing error of the base showing
 difference with reference genome in case of mismatch (corresponding to
