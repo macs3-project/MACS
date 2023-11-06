@@ -22,7 +22,7 @@ can find in MACS3 github repository.
 *Note, currently this tutorial is for single-end datasets. Please
 modify the instructions for paired-end data by yourself.*
 
-### Step 1: Filter duplicates {#step_1_filter_duplicates}
+## Step 1: Filter duplicates
 
 In the first step of ChIP-Seq analysis by `callpeak`, ChIP and control
 data need to be read and the redundant reads at each genomic loci have
@@ -45,7 +45,7 @@ ChIP and control signals to the same depth. In this case, the number
 is 199583 for ChIP and 199867 for control, and the ratio between them
 is 199583/199867=.99858
 
-### Step 2: Decide the fragment length `d` {#step_2_decide_the_fragment_length_d}
+## Step 2: Decide the fragment length `d`
 
 This is an important step for MACS3 to analyze ChIP-Seq and also for
 other types of data since the location of sequenced read may only tell
@@ -59,7 +59,9 @@ terminology, using cross-correlation. In fact, you can also do this
 using `predictd` module. Normally, we only need to do this for ChIP
 data:
 
-    $ macs3 predictd -i CTCF_ChIP_200K_filterdup.bed -g hs -m 5 50
+`
+$ macs3 predictd -i CTCF_ChIP_200K_filterdup.bed -g hs -m 5 50
+`
 
 Here the `-g` (the genome size) need to be set according to your sample,
 and the mfold parameters have to be set reasonably. To simulate the
@@ -70,7 +72,7 @@ notebook since we will need it in the next step. Of course, if you do
 not want to extend the reads or you have a better estimation on fragment
 length, you can simply skip this step.
 
-### Step 3: Extend ChIP sample to get ChIP coverage track {#step_3_extend_chip_sample_to_get_chip_coverage_track}
+## Step 3: Extend ChIP sample to get ChIP coverage track
 
 Now you have estimated the fragment length, next, we can use MACS3
 `pileup` subcommand to generate a pileup track in BEDGRAPH format for
@@ -82,12 +84,14 @@ sequencing, is just in the `middle` of the fragment you are interested
 in, you need to use `-B` option to extend the read in both direction.
 Here is the command to simulate `callpeak` behavior:
 
-    $ macs3 pileup -i CTCF_ChIP_200K_filterdup.bed -o CTCF_ChIP_200K_filterdup.pileup.bdg --extsize 254
+`
+$ macs3 pileup -i CTCF_ChIP_200K_filterdup.bed -o CTCF_ChIP_200K_filterdup.pileup.bdg --extsize 254
+`
 
 The file `CTCF_ChIP_200K_filterdup.pileup.bdg` now contains the
 fragment pileup signals for ChIP sample.
 
-### Step 4: Build local bias track from control {#step_4_build_local_bias_track_from_control}
+## Step 4: Build local bias track from control
 
 By default, MACS3 `callpeak` function computes the local bias by taking
 the maximum bias from surrounding 1kb (set by `--slocal`), 10kb (set by
@@ -96,7 +100,7 @@ from `predictd`), and the whole genome background. Here I show you how
 each of the bias is calculated and how they can be combined using the
 subcommands.
 
-#### The `d` background {#the_d_background}
+### The `d` background
 
 Basically, to create the background noise track, you need to extend the
 control read to both sides (-B option) using `pileup` function. The idea
@@ -104,47 +108,57 @@ is that the cutting site from control sample contains the noise
 representing a region surrounding it. To do this, take half of `d` you
 got from `predictd`, 127 (1/2 of 254) for our example, then:
 
-    $ macs3 pileup -i CTCF_Control_200K_filterdup.bed -B --extsize 127 -o d_bg.bdg
+`
+$ macs3 pileup -i CTCF_Control_200K_filterdup.bed -B --extsize 127 -o d_bg.bdg
+`
 
 The file `d_bg.bdg` contains the `d` background from control.
 
-#### The slocal background {#the_slocal_background}
+### The slocal background
 
 Next, you can create a background noise track of slocal local window, or
 1kb window by default. Simply imagine that each cutting site (sequenced
 read) represent a 1kb (default, you can tweak it) surrounding noise. So:
 
-    $ macs3 pileup -i CTCF_Control_200K_filterdup.bed -B --extsize 500 -o 1k_bg.bdg
+`
+$ macs3 pileup -i CTCF_Control_200K_filterdup.bed -B --extsize 500 -o 1k_bg.bdg
+`
 
 Note, here 500 is the 1/2 of 1k. Because the ChIP signal track was built
 by extending reads into `d` size fragments, we have to normalize the 1kb
 noise by multiplying the values by `d/slocal`, which is 254/1000=0.254
 in our example. To do so, use the `bdgopt` subcommand:
 
-    $ macs3 bdgopt -i 1k_bg.bdg -m multiply -p 0.254 -o 1k_bg_norm.bdg
+`
+$ macs3 bdgopt -i 1k_bg.bdg -m multiply -p 0.254 -o 1k_bg_norm.bdg
+`
 
 The file`1k_bg_norm.bdg` contains the slocal background from control.
 Note, we don\'t have to do this for `d` background because the
 multiplier is simply 1.
 
-#### The llocal background {#the_llocal_background}
+### The llocal background
 
 The background noise from larger region can be generated in the same way
 as slocal backgound. The only difference is the size for extension.
 MACS3 `callpeak` by default asks for 10kb (you can change this value)
 surrounding window, so:
 
-    $ macs3 pileup -i CTCF_Control_200K_filterdup.bed -B --extsize 5000 -o 10k_bg.bdg
+`
+$ macs3 pileup -i CTCF_Control_200K_filterdup.bed -B --extsize 5000 -o 10k_bg.bdg
+`
 
 The extsize has to be set as 1/2 of llocal. Then, the multiplier now is
 `d/llocal`, or 0.0254 in our example.
 
-    $ macs3 bdgopt -i 10k_bg.bdg -m multiply -p 0.0254 -o 10k_bg_norm.bdg
+`
+$ macs3 bdgopt -i 10k_bg.bdg -m multiply -p 0.0254 -o 10k_bg_norm.bdg
+`
 
 The file `10k_bg_norm.bdg` now contains the slocal background from
 control.
 
-#### The genome background {#the_genome_background}
+### The genome background
 
 The whole genome background can be calculated as
 `the_number_of_control_reads\fragment_length/genome_size`, and in our
@@ -152,7 +166,7 @@ example, it is $`199867*254/2700000000 ~= .0188023`$. You don\'t need to
 run subcommands to build a genome background track since it\'s just a
 single value.
 
-#### Combine and generate the maximum background noise {#combine_and_generate_the_maximum_background_noise}
+### Combine and generate the maximum background noise
 
 Now all the above background noises have to be combined and the maximum
 bias for each genomic location need be computed. This is the default
@@ -163,21 +177,27 @@ the maximum bias.
 
 Take the maximum between slocal (1k) and llocal (10k) background:
 
-    macs3 bdgcmp -m max -t 1k_bg_norm.bdg -c 10k_bg_norm.bdg -o 1k_10k_bg_norm.bdg
+`
+macs3 bdgcmp -m max -t 1k_bg_norm.bdg -c 10k_bg_norm.bdg -o 1k_10k_bg_norm.bdg
+`
 
 Then, take the maximum then by comparing with `d` background:
 
-    macs3 bdgcmp -m max -t 1k_10k_bg_norm.bdg -c d_bg.bdg -o d_1k_10k_bg_norm.bdg
+`
+macs3 bdgcmp -m max -t 1k_10k_bg_norm.bdg -c d_bg.bdg -o d_1k_10k_bg_norm.bdg
+`
 
 Finally, combine with the genome wide background using `bdgopt`
 subcommand
 
-    macs3 bdgopt -i d_1k_10k_bg_norm.bdg -m max -p .0188023 -o local_bias_raw.bdg
+`
+macs3 bdgopt -i d_1k_10k_bg_norm.bdg -m max -p .0188023 -o local_bias_raw.bdg
+`
 
 Now the file `local_bias_raw.bdg` is a BEDGRAPH file containing the
 raw local bias from control data.
 
-### Step 5: Scale the ChIP and control to the same sequencing depth {#step_5_scale_the_chip_and_control_to_the_same_sequencing_depth}
+## Step 5: Scale the ChIP and control to the same sequencing depth
 
 In order to compare ChIP and control signals, the ChIP pileup and
 control lambda have to be scaled to the same sequencing depth. The
@@ -189,13 +209,15 @@ example, the final number of reads for ChIP and control are 199583 and
 down by multiplying with the ratio between ChIP and control which is
 199583/199867=.99858. To do so:
 
-    $ macs3 bdgopt -i local_bias_raw.bdg -m multiply -p .99858 -o local_lambda.bdg
+`
+$ macs3 bdgopt -i local_bias_raw.bdg -m multiply -p .99858 -o local_lambda.bdg
+`
 
 Now, I name the output file as `local_lambda.bdg` since the values in
 the file can be regarded as the lambda (or expected value) and can be
 compared with ChIP signals using the local Poisson test.
 
-### Step 6: Compare ChIP and local lambda to get the scores in pvalue or qvalue {#step_6_compare_chip_and_local_lambda_to_get_the_scores_in_pvalue_or_qvalue}
+## Step 6: Compare ChIP and local lambda to get the scores in pvalue or qvalue
 
 Next, to find enriched regions and predict the so-called \'peaks\',
 the ChIP signals and local lambda stored in BEDGRAPH file have to be
@@ -208,14 +230,17 @@ theoratically, the size of the output file for scores depends on the
 complexity of your data, and the maximum number of data points, if
 `d`, `slocal`, and `llocal` background are all used, is the minimum
 value of the genome size and approximately
-$`(#read_ChIP+#reads_control\*3)\*2`$, in our case about 1.6 million.
+`(#read_ChIP+#reads_control\*3)\*2`, in our case about 1.6 million.
 The command to generate score tracks is
 
-    $ macs3 bdgcmp -t CTCF_ChIP_200K_filterdup.pileup.bdg -c local_lambda.bdg -m qpois -o CTCF_ChIP_200K_qvalue.bdg
-
+`
+$ macs3 bdgcmp -t CTCF_ChIP_200K_filterdup.pileup.bdg -c local_lambda.bdg -m qpois -o CTCF_ChIP_200K_qvalue.bdg
+`
 or
 
-    $ macs3 bdgcmp -t CTCF_ChIP_200K_filterdup.pileup.bdg -c local_bias.bdg -m ppois -o CTCF_ChIP_200K_pvalue.bdg
+`
+$ macs3 bdgcmp -t CTCF_ChIP_200K_filterdup.pileup.bdg -c local_bias.bdg -m ppois -o CTCF_ChIP_200K_pvalue.bdg
+`
 
 The `CTCF_ChIP_200K_pvalue.bdg` or `CTCF_ChIP_200K_qvalue.bdg` file
 contains the -log10(p-value)s or -log10(q-value)s for each basepair
@@ -232,7 +257,7 @@ choice of pseudocount is mainly arbitrary and you can search on the web
 to see some discussion. But in general, higher the pseudocount, higher
 the specificity and lower the sensitivity.
 
-### Step 7: Call peaks on score track using a cutoff {#step_7_call_peaks_on_score_track_using_a_cutoff}
+## Step 7: Call peaks on score track using a cutoff
 
 The final task of peak calling is to just take the scores and call those
 regions higher than certain cutoff. We can use the `bdgpeakcall`
@@ -253,12 +278,11 @@ minimum length of peak, and as for `bdgpeakcall`, you need to set the
 `-l` option as the `d` you got from Step 2. Last, you have to set the
 cutoff value. Remember the scores in the output from `bdgcmp` are in
 -log10 form, so if you need the cutoff as 0.05, the -log10 value is
-about 1.3. If you need to convert values between -log10 scale and linear
-scale, you can ask google, for example, searching `-log10(0.05)` will
-give you \[<https://www.google.com/#q=-log10(0.05>) 1.30102999566\]. The
-final command is like:
+about 1.3. The final command is like:
 
-    $ macs3 bdgpeakcall -i CTCF_ChIP_200K_qvalue.bdg -c 1.301 -l 245 -g 100 -o CTCF_ChIP_200K_peaks.bed
+`
+$ macs3 bdgpeakcall -i CTCF_ChIP_200K_qvalue.bdg -c 1.301 -l 245 -g 100 -o CTCF_ChIP_200K_peaks.bed
+`
 
 The output is in fact a narrowPeak format file (a type of BED file)
 which contains locations of peaks and the summit location in the last
