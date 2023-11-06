@@ -58,7 +58,8 @@ Here is a brief overview of these options:
 ### Output Options:
 - `--outdir`: The directory for all output files to be written
   to. Default: writes output files to the current working directory. 
-- `-o` or `--ofile`: The output VCF file name. 
+- `-o` or `--ofile`: The output VCF file name. Please check the
+  section *Customized fields in VCF* section for detail. 
 - `--verbose`: Set the verbose level of runtime messages. 0: only show
   critical messages, 1: show additional warning messages, 2: show
   process information, 3: show debug messages. DEFAULT: 2 
@@ -202,3 +203,29 @@ available, such as in ATAC-Seq assay, our model can still
 work. Furthermore, in case a good quality WGS is available, it can be
 regarded as the control sample and be inserted into our calculation to
 further increase the sensitivity.
+
+## Customized fields in the Output VCF file
+
+The result VCF file from MACS3 `callvar` will have the following
+customized fields in VCF flavor:
+
+```
+##INFO=<ID=M,Number=.,Type=String,Description="MACS Model with minimum BIC value">
+##INFO=<ID=MT,Number=.,Type=String,Description="Mutation type: SNV/Insertion/Deletion">
+##INFO=<ID=DPT,Number=1,Type=Integer,Description="Depth Treatment: Read depth in ChIP-seq data">
+##INFO=<ID=DPC,Number=1,Type=Integer,Description="Depth Control: Read depth in control data">
+##INFO=<ID=DP1T,Number=.,Type=String,Description="Read depth of top1 allele in ChIP-seq data">
+##INFO=<ID=DP2T,Number=.,Type=String,Description="Read depth of top2 allele in ChIP-seq data">
+##INFO=<ID=DP1C,Number=.,Type=String,Description="Read depth of top1 allele in control data">
+##INFO=<ID=DP2C,Number=.,Type=String,Description="Read depth of top2 allele in control data">
+##INFO=<ID=DBIC,Number=.,Type=Float,Description="Difference of BIC of selected model vs second best alternative model">
+##INFO=<ID=BICHOMOMAJOR,Number=1,Type=Integer,Description="BIC of homozygous with major allele model">
+##INFO=<ID=BICHOMOMINOR,Number=1,Type=Integer,Description="BIC of homozygous with minor allele model">
+##INFO=<ID=BICHETERNOAS,Number=1,Type=Integer,Description="BIC of heterozygous with no allele-specific model">
+##INFO=<ID=BICHETERAS,Number=1,Type=Integer,Description="BIC of heterozygous with allele-specific model">
+##INFO=<ID=AR,Number=1,Type=Float,Description="Estimated allele ratio of heterozygous with allele-specific model">
+##FORMAT=<ID=GT,Number=1,Type=String,Description="Genotype">
+##FORMAT=<ID=DP,Number=1,Type=Integer,Description="Read depth after filtering bad reads">
+##FORMAT=<ID=GQ,Number=1,Type=Integer,Description="Genotype Quality score">
+##FORMAT=<ID=PL,Number=3,Type=Integer,Description="Normalized, Phred-scaled genotype likelihoods for 00, 01, 11 genotype">
+```
