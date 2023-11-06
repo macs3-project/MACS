@@ -36,8 +36,6 @@ add more new features in the future.**
 
 ## Recent Changes for MACS (3.0.0)
 
-### 3.0.0
-
 1) Speed/memory optimization.  Use the cykhash to replace python
 	dictionary. Use buffer (10MB) to read and parse input file (not
 	available for BAM file parser). And many optimization tweaks. We
@@ -91,7 +89,7 @@ add more new features in the future.**
 
 13) Cython support to ~0.29. Cython 3 is not supported yet.
 
-* Other*
+*Other*
 
 1) Missing header line while no peaks can be called #501 #502
 
