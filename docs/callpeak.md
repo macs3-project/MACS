@@ -94,12 +94,19 @@ the essentials.
     Paired-end sequencing. Please note, this is NOT the same format
     used by `bedtools`, and the `bedtools` version of `BEDPE` is
     actually not in a standard `BED` format. You can use MACS3
-    subcommand `randsample` to convert a `BAMPE` file containing
+    subcommand [`randsample`](./randsample.md) or
+    [`filterdup`](./filterdup.md) to convert a `BAMPE` file containing
     paired-end information to a `BEDPE` format file:
     
     ```
     macs3 randsample -i the_BAMPE_file.bam -f BAMPE -p 100 -o the_BEDPE_file.bed
     ```
+	or
+	
+	```
+    macs3 filterdup -i the_BAMPE_file.bam -f BAMPE --keep-dup all -o the_BEDPE_file.bed
+    ```
+	  
 
 - `--outdir`
 
