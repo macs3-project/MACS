@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# Time-stamp: <2023-11-02 13:57:24 Tao Liu>
+# Time-stamp: <2023-11-03 11:55:39 Tao Liu>
 
 """Description: MACS v3 main executable.
 
@@ -673,7 +673,7 @@ def add_pileup_parser( subparsers ):
     return
 
 def add_callvar_parser( subparsers ):
-    """Add function 'variant calling' argument parsers. From SAPPER package
+    """Add function 'variant calling' argument parsers.
     """
     argparser_callvar = subparsers.add_parser("callvar",
                                               formatter_class = ap.RawDescriptionHelpFormatter,
@@ -727,7 +727,7 @@ To call variants:
     group_para.add_argument( "-D", dest = "maxDuplicate", type = int, default = 1,
                              help = "Maximum duplicated reads allowed per mapping position, mapping strand and the same CIGAR code. Default: 1. When sequencing depth is high, to set a higher value might help evaluate the correct allele ratio.")
     group_para.add_argument( "-F", "--fermi", dest = "fermi", type = str, default = "auto",
-                             help = "Option to control when to apply local assembly through Fermi. By default (set as 'auto'), while SAPPER detects any INDEL variant in a peak region, it will utilize Fermi to recover the actual DNA sequences to refine the read alignments. If set as 'on', Fermi will be always invoked. It can increase specificity however sensivity and speed will be significantly lower. If set as 'off', Fermi won't be invoked at all. If so, speed and sensitivity can be higher but specificity will be significantly lower. Default: auto" )
+                             help = "Option to control when to apply local assembly through Fermi. By default (set as 'auto'), while callvar detects any INDEL variant in a peak region, it will utilize Fermi to recover the actual DNA sequences to refine the read alignments. If set as 'on', Fermi will be always invoked. It can increase specificity however sensivity and speed will be significantly lower. If set as 'off', Fermi won't be invoked at all. If so, speed and sensitivity can be higher but specificity will be significantly lower. Default: auto" )
     group_para.add_argument( "--fermi-overlap", dest = "fermiMinOverlap", type = int,
                              help = "The minimal overlap for fermi to initially assemble two reads. Must be between 1 and read length. A longer fermiMinOverlap is needed while read length is small (e.g. 30 for 36bp read, but 33 for 100bp read may work). Default:30", default = 30 )
     group_para.add_argument( "--top2alleles-mratio", dest = "top2allelesMinRatio", type = float,
@@ -743,7 +743,7 @@ To call variants:
     return
 
 def add_hmmratac_parser( subparsers ):
-    """Add function 'HMMRATAC' argument parsers. From SAPPER package
+    """Add function 'HMMRATAC' argument parsers.
     """
     argparser_hmmratac = subparsers.add_parser("hmmratac",
                                                 formatter_class = ap.RawDescriptionHelpFormatter,
