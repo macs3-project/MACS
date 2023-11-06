@@ -34,28 +34,71 @@ make sure that the main branch passes unit testing on certain
 functions and subcommands to reproduce the correct outputs. We will
 add more new features in the future.**
 
-## Recent Changes for MACS (3.0.0b3)
+## Recent Changes for MACS (3.0.0)
 
-### 3.0.0b3
-    The third beta version of MACS3, addressing Cython issue and with
-    two HMMRATAC options added.
-	   
-	* New features from beta2:
+### 3.0.0
 
-	1) HMMRATAC module
-    
-       --modelonly option: only generate HMM model and quit
-       
-       -t or --training: customized training regions can be provided
-	   through this option.
-	   
-	   --min-frag-p: exclude fragments with abnormal fragment length while generating four
-       signal tracks. #577 Check `macs3 hmmratac -h`.
-    
-    2) testing for Mac OS12 is added. 
+1) Speed/memory optimization.  Use the cykhash to replace python
+	dictionary. Use buffer (10MB) to read and parse input file (not
+	available for BAM file parser). And many optimization tweaks. We
+	added memory monitoring to the runtime messages.
 
-	3) We require Cython 0.29.*. The new Cython3 will break our
-	codes. We will adopt Cython3 later. #574
+2) Call variants in peak regions directly from BAM files. The
+	function was originally developed under code name SAPPER. Now
+	SAPPER has been merged into MACS. Also, `simde` has been added as
+	a submodule in order to support fermi-lite library under non-x64
+	architectures.
+
+3) HMMRATAC module is added. HMMRATAC is a dedicated software to
+	analyze ATAC-seq data. The basic idea behind HMMRATAC is to digest
+	ATAC-seq data according to the fragment length of read pairs into
+	four signal tracks: short fragments, mononucleosomal fragments,
+	di-nucleosomal fragments and tri-nucleosomal fragments. Then
+	integrate the four tracks again using Hidden Markov Model to
+	consider three hidden states: open region, nucleosomal region, and
+	background region. The orginal paper was published in 2019 written
+	in JAVA, by Evan Tarbell. We implemented it in Python/Cython and
+	optimize the whole process using existing MACS functions and
+	hmmlearn. Now it can run much faster than the original JAVA
+	version. Note: evaluation of the peak calling results is underway.	
+
+4) Code cleanup. Reorganize source codes. 
+
+5) Unit testing. 
+
+6) R wrappers for MACS -- MACSr
+
+7) Switch to Github Action for CI, support multi-arch testing
+	including x64, armv7, aarch64, s390x and ppc64le. We also test on
+	Mac OS 12.
+
+8) MACS tag-shifting model has been refined. Now it will use a 
+	naive peak calling approach to find ALL possible paired peaks at +
+	and - strand, then use all of them to calculate the 
+	cross-correlation. (a related bug has been fix #442) 
+
+9) BAI index and random access to BAM file now is supported. #449
+	And user can use original BAM file (instead of the subset of BAM
+	file as in SAPPER) in the `callvar` command.
+
+10) Support of Python > 3.10 #497 #498 
+
+11) The effective genome size parameters have been updated
+	according to deeptools. #508
+
+12) Multiple updates regarding dependencies, anaconda built, CI/CD
+	process.
+
+13) Cython support to ~0.29. Cython 3 is not supported yet.
+
+* Other*
+
+1) Missing header line while no peaks can be called #501 #502
+
+2) Note: different numpy, scipy, sklearn may give slightly
+	different results for hmmratac results. The current standard
+	results for automated testing in `/test` directory are from Numpy
+	1.25.1, Scipy 1.11.1, and sklearn 1.3.0.
 
 ## Install
 
@@ -106,16 +149,16 @@ Subcommand | Description
 [`bdgopt`](./docs/bdgopt.md) | Operate the score column of bedGraph file.
 [`cmbreps`](./docs/cmbreps.md) | Combine BEDGraphs of scores from replicates.
 [`bdgdiff`](./docs/bdgdiff.md) | Differential peak detection based on paired four bedGraph files.
-[`filterdup`](./docs/filterdup.md) | Remove duplicate reads, then save in BED/BEDPE format.
+[`filterdup`](./docs/filterdup.md) | Remove duplicate reads, then save in BED/BEDPE format file.
 [`predictd`](./docs/predictd.md) | Predict d or fragment size from alignment results.
 [`pileup`](./docs/pileup.md) | Pileup aligned reads (single-end) or fragments (paired-end)
-[`randsample`](./docs/randsample.md) | Randomly choose a number/percentage of total reads.
+[`randsample`](./docs/randsample.md) | Randomly choose a number/percentage of total reads, then save in BED/BEDPE format file.
 [`refinepeak`](./docs/refinepeak.md) | Take raw reads alignment, refine peak summits.
 [`callvar`](./docs/callvar.md) | Call variants in given peak regions from the alignment BAM files.
 [`hmmratac`](./docs/hmmratac.md) | Dedicated peak calling based on Hidden Markov Model for ATAC-seq data.
 
 For advanced usage, for example, to run `macs3` in a modular way,
-please read the [advanced usage](./docs/advanced_usage.md). There is a
+please read the [advanced usage](./docs/Advanced_Step-by-step_Peak_Calling.md). There is a
 [Q&A](./docs/qa.md) document where we collected some common questions
 from users.
 
