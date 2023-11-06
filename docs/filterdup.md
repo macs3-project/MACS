@@ -1,4 +1,4 @@
-# Filterdup
+# filterdup
 
 ## Overview
 The `filterdup` command is part of the MACS3 suite of tools and is
