@@ -87,7 +87,7 @@ add more new features in the future.**
 12) Multiple updates regarding dependencies, anaconda built, CI/CD
 	process.
 
-13) Cython support to ~0.29. Cython 3 is not supported yet.
+13) Cython 3 is supported yet.
 
 *Other*
 
