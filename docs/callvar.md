@@ -156,23 +156,25 @@ ChIP and control data:
 
 $$L(\omega,\phi,g\_c,g\_i:D)=L(\omega,g\_c:D\_c)L(\phi,g\_i:D\_i)$$
 
-where $`D\_c`$ and $`D\_i`$ represent the ChIP-Seq and control (e.g.,
+where $`D_c`$ and $`D_i`$ represent the ChIP-Seq and control (e.g.,
 genomic input) data observed at the position including base coverage
 and base qualities. The parameter $\omega$ stands for the allele ratio
 of allele A (chosen as the more abundant or stronger allele compared
 with the others) from the ChIP-Seq data and $\phi$ represents the
-allele ratio in the control. The parameter $`g\_c`$ represents the
+allele ratio in the control. The parameter $`g_c`$ represents the
 actual number of ChIPed DNA fragments containing allele A, which could
-differ from the observed count $`r\_(c,A)`$ considering that some
-observations could be due to sequencing errors. The symbol $`g\_i`$
-represents the control analogously to $`g\_c`$. We used $`r\_c`$ to
-denote the total number of observed allele A ($`r\_(c,A)`$) and allele
-B ($`r\_(c,B)`$). We assumed the occurrence of the allele A ($`g\_c`$)
-is from a Bernoulli trial from $`r\_c`$ with the allele ratio
+differ from the observed count $`r_(c,A)`$ considering that some
+observations could be due to sequencing errors. The symbol $`g_i`$
+represents the control analogously to $`g_c`$. We used $`r_c`$ to
+denote the total number of observed allele A ($`r_(c,A)`$) and allele
+B ($`r_(c,B)`$). We assumed the occurrence of the allele A ($`g_c`$)
+is from a Bernoulli trial from $`r_c`$ with the allele ratio
 $\omega$. The probability of observing the ChIP-Seq data at a certain
 position under a given type is as follows:
 
-$$ Pr(D\_c|g\_c,\omega) = Pr(D\_c|g\_c)  = \sum^{r\_{c,A}}\_{j=1} $$
+$$ Pr(D_c|g_c,\omega) = Pr(D_c|g_c) =
+ \sum^{r_{c,A}}_{j=1}\left((1-\epsilon_j)g_c/r_c+\epsilon_j(1-g_c/r_c)\right)\sum_{j=1}^{r_{c,B}}\left((1-\epsilon_j)(1-g_c/r_c)+\epsilon_j
+ g_c/r_c\right) $$
 
 where ϵ_j represents the sequencing error of the base showing
 difference with reference genome in case of mismatch (corresponding to
