@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# Time-stamp: <2023-11-03 11:55:39 Tao Liu>
+# Time-stamp: <2023-11-07 14:37:18 Tao Liu>
 
 """Description: MACS v3 main executable.
 
@@ -652,7 +652,7 @@ def add_pileup_parser( subparsers ):
     argparser_pileup = subparsers.add_parser( "pileup",
                                               help = "Pileup aligned reads with a given extension size (fragment size or d in MACS language). Note there will be no step for duplicate reads filtering or sequencing depth scaling, so you may need to do certain pre/post-processing." )
     argparser_pileup.add_argument( "-i", "--ifile", dest = "ifile", type = str, required = True, nargs = "+",
-                                   help = "Alignment file. If multiple files are given as '-t A B C', then they will all be read and combined. Note that pair-end data is not supposed to work with this command. REQUIRED." )
+                                   help = "Alignment file. If multiple files are given as '-t A B C', then they will all be read and combined. REQUIRED." )
     argparser_pileup.add_argument( "-o", "--ofile", dest = "outputfile", type = str, required = True,
                                    help = "Output bedGraph file name. If not specified, will write to standard output. REQUIRED." )
     add_outdir_option( argparser_pileup )

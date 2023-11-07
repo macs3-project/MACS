@@ -84,3 +84,10 @@ genome size is set to `hs` (Homo Sapiens), the format of the input
 file is determined automatically, and the program keeps only one
 duplicate.
 
+Here is an example to convert BAMPE file into BEDPE. Please note that
+`-f BAMPE` and `--keep-dup all` are both necessary for format
+conversion:
+
+```bash
+macs3 filterdup -i input.bam -o output.bedpe -f BAMPE --keep-dup all
+```
