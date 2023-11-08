@@ -16,6 +16,10 @@ The `filteredup` command can also be used to convert any acceptable
 format of MACS3 to BED or BEDPE (in case of `-f BAMPE`) format, if you
 use `--keep-dup all` option.
 
+Please note that, when writing BED format output for single-end
+dataset, MACS3 assume all the reads having the same length either from
+`-s` setting or from auto-detection.
+
 ## Command Line Options
 
 Here is a brief overview of the command line options:

@@ -17,7 +17,8 @@ efficient algorithm to pile up the alignments.
 Pileup aligned reads with a given extension size (fragment size or d
 in MACS language). Note there will be no step for duplicate reads
 filtering or sequencing depth scaling, so you may need to do certain
-pre/post-processing. 
+pre/post-processing, such as using `filterdup` or `randsample`
+command. 
 
 ## Command Line Options
 
