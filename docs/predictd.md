@@ -42,10 +42,8 @@ Here is a brief overview of the `predictd` options:
     automatically recognize these two formats with -f AUTO. Please be
     aware that in PE mode, -g, -s, --bw, --d-min, -m, and --rfile have
     NO effect. DEFAULT: "AUTO" 
-- `-g` or `--gsizeE`: Effective genome size. It can be 1.0e+9 or
-  1000000000, or shortcuts: 'hs' for human (2.7e9), 'mm' for mouse
-  (1.87e9), 'ce' for C. elegans (9e7), and 'dm' for fruit fly
-  (1.2e8). Default: hs 
+- `-g` or `--gsizeE`: Please check [`callpeak`](./callpeak.md) for
+  detail. DEFAULT:hs
 - `-s` or `--tsize`: Tag size. This will override the auto-detected
   tag size. DEFAULT: Not set 
 - `--bw`: Bandwidth for picking regions to compute the fragment

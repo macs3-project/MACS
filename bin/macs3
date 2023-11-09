@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# Time-stamp: <2023-11-08 12:13:47 Tao Liu>
+# Time-stamp: <2023-11-09 14:47:18 taoliu>
 
 """Description: MACS v3 main executable.
 
@@ -212,7 +212,7 @@ def add_callpeak_parser( subparsers ):
                               help = "Format of tag file, \"AUTO\", \"BED\" or \"ELAND\" or \"ELANDMULTI\" or \"ELANDEXPORT\" or \"SAM\" or \"BAM\" or \"BOWTIE\" or \"BAMPE\" or \"BEDPE\". The default AUTO option will let MACS decide which format (except for BAMPE and BEDPE which should be implicitly set) the file is. Please check the definition in README. Please note that if the format is set as BAMPE or BEDPE, MACS3 will call its special Paired-end mode to call peaks by piling up the actual ChIPed fragments defined by both aligned ends, instead of predicting the fragment size first and extending reads. Also please note that the BEDPE only contains three columns, and is NOT the same BEDPE format used by BEDTOOLS. DEFAULT: \"AUTO\"",
                               default = "AUTO" )
     group_input.add_argument( "-g", "--gsize", dest = "gsize", type = str, default = "hs",
-                              help = "Effective genome size. It can be 1.0e+9 or 1000000000, or shortcuts:'hs' for human (2.9e9), 'mm' for mouse (2.6e9), 'ce' for C. elegans (1e8) and 'dm' for fruitfly (1.4e8), Default:hs. The effective genome size numbers are collected from Deeptools https://deeptools.readthedocs.io/en/develop/content/feature/effectiveGenomeSize.html Please refer to deeptools to define the best genome size you plan to use." )
+                              help = "Effective genome size. It can be 1.0e+9 or 1000000000, or shortcuts:'hs' for human (2,913,022,398), 'mm' for mouse (2,652,783,500), 'ce' for C. elegans (100,286,401) and 'dm' for fruitfly (142,573,017), Default:hs. The effective genome size numbers for the above four species are collected from Deeptools https://deeptools.readthedocs.io/en/develop/content/feature/effectiveGenomeSize.html Please refer to deeptools to define the best genome size you plan to use." )
     group_input.add_argument( "-s", "--tsize",  dest = "tsize", type = int, default = None,
                                     help = "Tag size/read length. This will override the auto detected tag size. DEFAULT: Not set")
     group_input.add_argument( "--keep-dup", dest = "keepduplicates", type = str, default = "1",
@@ -382,7 +382,7 @@ def add_filterdup_parser( subparsers ):
                                       help = "Format of tag file, \"AUTO\", \"BED\" or \"ELAND\" or \"ELANDMULTI\" or \"ELANDEXPORT\" or \"SAM\" or \"BAM\" or \"BOWTIE\" or \"BAMPE\" or \"BEDPE\". The default AUTO option will let '%(prog)s' decide which format the file is. Please check the definition in README file if you choose ELAND/ELANDMULTI/ELANDEXPORT/SAM/BAM/BOWTIE or BAMPE/BEDPE. DEFAULT: \"AUTO\"",
                                       default = "AUTO" )
     argparser_filterdup.add_argument( "-g", "--gsize", dest = "gsize", type = str, default = "hs",
-                                      help = "Effective genome size. It can be 1.0e+9 or 1000000000, or shortcuts:'hs' for human (2.7e9), 'mm' for mouse (1.87e9), 'ce' for C. elegans (9e7) and 'dm' for fruitfly (1.2e8), DEFAULT:hs" )
+                                      help = "Effective genome size. It can be 1.0e+9 or 1000000000, or shortcuts:'hs' for human (2,913,022,398), 'mm' for mouse (2,652,783,500), 'ce' for C. elegans (100,286,401) and 'dm' for fruitfly (142,573,017), Default:hs. The effective genome size numbers for the above four species are collected from Deeptools https://deeptools.readthedocs.io/en/develop/content/feature/effectiveGenomeSize.html Please refer to deeptools to define the best genome size you plan to use.")
     argparser_filterdup.add_argument( "-s", "--tsize", dest = "tsize", type = int,
                                       help = "Tag size. This will override the auto detected tag size. DEFAULT: Not set" )
     argparser_filterdup.add_argument( "-p", "--pvalue", dest = "pvalue", type = float,
@@ -565,7 +565,7 @@ def add_bdgdiff_parser( subparsers ):
     argparser_bdgdiff.add_argument( "--c2", dest="c2bdg", type = str, required = True,
                                     help = "MACS control lambda bedGraph for condition 2. Incompatible with callpeak --SPMR output. REQUIRED" )
     argparser_bdgdiff.add_argument( "-C", "--cutoff", dest = "cutoff", type = float,
-                                    help = "logLR cutoff. Regions with signals lower than cutoff will not be considerred as enriched regions. DEFAULT: 3 (likelihood ratio=1000)", default = 3 )
+                                    help = "log10LR cutoff. Regions with signals lower than cutoff will not be considerred as enriched regions. DEFAULT: 3 (likelihood ratio=1000)", default = 3 )
     argparser_bdgdiff.add_argument( "-l", "--min-len", dest = "minlen", type = int,
                                     help = "Minimum length of differential region. Try bigger value to remove small regions. DEFAULT: 200", default = 200 )
     argparser_bdgdiff.add_argument( "-g", "--max-gap", dest = "maxgap", type = int,
@@ -627,7 +627,7 @@ def add_predictd_parser( subparsers ):
                                      help = "Format of tag file, \"AUTO\", \"BED\" or \"ELAND\" or \"ELANDMULTI\" or \"ELANDEXPORT\" or \"SAM\" or \"BAM\" or \"BOWTIE\" or \"BAMPE\" or \"BEDPE\". The default AUTO option will let MACS decide which format the file is. However, if you want to decide the average insertion size/fragment size from PE data such as BEDPE or BAMPE, please specify the format as BAMPE or BEDPE since MACS3 won't automatically recognize three two formats with -f AUTO. Please be aware that in PE mode, -g, -s, --bw, --d-min, -m, and --rfile have NO effect. DEFAULT: \"AUTO\"",
                                      default = "AUTO" )
     argparser_predictd.add_argument( "-g", "--gsize", dest = "gsize", type = str, default = "hs",
-                                     help = "Effective genome size. It can be 1.0e+9 or 1000000000, or shortcuts:'hs' for human (2.7e9), 'mm' for mouse (1.87e9), 'ce' for C. elegans (9e7) and 'dm' for fruitfly (1.2e8), Default:hs" )
+                                     help = "Effective genome size. It can be 1.0e+9 or 1000000000, or shortcuts:'hs' for human (2,913,022,398), 'mm' for mouse (2,652,783,500), 'ce' for C. elegans (100,286,401) and 'dm' for fruitfly (142,573,017), Default:hs. The effective genome size numbers for the above four species are collected from Deeptools https://deeptools.readthedocs.io/en/develop/content/feature/effectiveGenomeSize.html Please refer to deeptools to define the best genome size you plan to use.")
     argparser_predictd.add_argument( "-s", "--tsize",  dest = "tsize", type = int, default = None,
                                      help = "Tag size. This will override the auto detected tag size. DEFAULT: Not set")
     argparser_predictd.add_argument( "--bw", dest = "bw", type = int, default = 300,

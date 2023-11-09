@@ -3,20 +3,7 @@
 ## Overview
 The `bdgbroadcall` subcommand of the MACS3 suite identifies 'nested'
 broad peaks from a single bedGraph track for scores, a function
-essential in certain ChIP-Seq analyses. Unlike narrow peak calling
-performed using `bdgpeakcall` or `callpeak` without the `--broad`
-option, this command, along with the `--broad` option in `callpeak`,
-facilitates broad peak calling, producing results in the UCSC
-gappedPeak format which encapsulates a nested structure of peaks. To
-conceptualize 'nested' peaks, picture a gene structure housing regions
-analogous to exons (strong peaks) and introns coupled with UTRs (weak
-peaks). The broad peak calling process utilizes two distinct cutoffs
-to discern broader, weaker peaks and narrower, stronger peaks, which
-are subsequently nested to provide a detailed peak landscape. 
-
-Please note that, if you only want to call 'broader' peak and not
-interested in the nested peak structure, please simply use
-`bdgpeakcall` with weaker cutoff. 
+essential in certain ChIP-Seq analyses. 
 
 ## Detailed Description
 
@@ -25,6 +12,21 @@ an output file with broad peaks called. It is important to note: only
 bedGraph files from MACS3 are acceptable to use in the `bdgbroadcall`
 command, as All regions on the same chromosome in the bedGraph file
 should be continuous. 
+
+Unlike narrow peak calling performed using `bdgpeakcall` or `callpeak`
+without the `--broad` option, this command, along with the `--broad`
+option in `callpeak`, facilitates broad peak calling, producing
+results in the UCSC gappedPeak format which encapsulates a nested
+structure of peaks. To conceptualize 'nested' peaks, picture a gene
+structure housing regions analogous to exons (strong peaks) and
+introns coupled with UTRs (weak peaks). The broad peak calling process
+utilizes two distinct cutoffs to discern broader, weaker peaks and
+narrower, stronger peaks, which are subsequently nested to provide a
+detailed peak landscape.
+
+Please note that, if you only want to call 'broader' peak and not
+interested in the nested peak structure, please simply use
+`bdgpeakcall` with weaker cutoff. 
 
 ## Command Line Options
 

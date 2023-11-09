@@ -20,7 +20,7 @@ files `CTCF_ChIP_200K.bed.gz` and `CTCF_Control_200K.bed.gz`, that you
 can find in MACS3 github repository. 
 
 *Note, currently this tutorial is for single-end datasets. Please
-modify the instructions for paired-end data by yourself.*
+modify the command line for paired-end data by yourself.*
 
 ## Step 1: Filter duplicates
 
