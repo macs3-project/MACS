@@ -105,7 +105,7 @@ The common way to install MACS is through
 MACS3 has been tested using GitHub Actions for every push and PR in
 the following architectures:
 
- * x86_64 (Python 3.9, 3.10, 3.11)
+ * x86_64 (Python 3.9, 3.10, 3.11, 3.12)
  * aarch64 (Python 3.9)
  * armv7 (Python 3.9)
  * ppc64le (Python 3.9)

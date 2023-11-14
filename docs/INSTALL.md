@@ -1,5 +1,5 @@
 # INSTALL Guide For MACS3
-Time-stamp: <2023-11-14 11:26:14 Tao Liu>
+Time-stamp: <2023-11-14 15:16:17 Tao Liu>
 
 Please check the following instructions to complete your installation.
 
@@ -11,7 +11,7 @@ dependencies and install them if necessary.
 
 ### Python3
 
-MACS v3.x.x requires Python3. We have tested MACS in Python3.8 to 3.11. 
+MACS v3.x.x requires Python3. We have tested MACS in Python3.9 to 3.12. 
 
 ### NumPy, hmmlearn
 
