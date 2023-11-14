@@ -2,13 +2,12 @@
 
 ![Status](https://img.shields.io/pypi/status/macs3.svg) ![License](https://img.shields.io/github/license/macs3-project/MACS) ![Programming languages](https://img.shields.io/github/languages/top/macs3-project/MACS) ![CI x64](https://github.com/macs3-project/MACS/workflows/CI%20x64/badge.svg) ![CI non x64](https://github.com/macs3-project/MACS/workflows/CI%20non%20x64,%20python%203.7/badge.svg) ![CI MacOS 12](https://github.com/macs3-project/MACS/workflows/CI%20MacOS%2012/badge.svg)
 
-[![PyPI download](https://img.shields.io/pypi/dm/macs3?label=pypi%20downloads)](https://pypistats.org/packages/macs3) [![Bioconda download](https://img.shields.io/conda/dn/bioconda/macs3?label=bioconda%20downloads)](https://anaconda.org/bioconda/macs3)
+[![PyPI
+download](https://img.shields.io/pypi/dm/macs3?label=pypi%20downloads)](https://pypistats.org/packages/macs3)
 
 Latest Release:
 * Github: [![Github Release](https://img.shields.io/github/v/release/macs3-project/MACS)](https://github.com/macs3-project/MACS/releases)
 * PyPI: [![PyPI Release](https://img.shields.io/pypi/v/macs3.svg) ![PyPI Python Version](https://img.shields.io/pypi/pyversions/MACS3) ![PyPI Format](https://img.shields.io/pypi/format/macs3)](https://pypi.org/project/macs3/)
-* Bioconda: [![Bioconda Release](https://img.shields.io/conda/v/bioconda/macs3) ![Bioconda Platform](https://img.shields.io/conda/pn/bioconda/macs3)](https://anaconda.org/bioconda/macs3)
-* Debian Med: [![Debian Stable](https://img.shields.io/debian/v/macs/stable?label=debian%20stable)](https://packages.debian.org/stable/macs) [![Debian Unstable](https://img.shields.io/debian/v/macs/sid?label=debian%20sid)](https://packages.debian.org/sid/macs)
 
 ## Introduction
 
@@ -27,12 +26,6 @@ specificity. Moreover, as a general peak-caller, MACS can also be
 applied to any "DNA enrichment assays" if the question to be asked is
 simply: *where we can find significant reads coverage than the random
 background*.
-
-**Please note that current MACS3 is still in beta stage. However, we
-utilize Github Action to implement the CI (Continous Integration) to
-make sure that the main branch passes unit testing on certain
-functions and subcommands to reproduce the correct outputs. We will
-add more new features in the future.**
 
 ## Recent Changes for MACS (3.0.0)
 
@@ -106,18 +99,18 @@ add more new features in the future.**
 
 The common way to install MACS is through
 [PYPI](https://pypi.org/project/macs3/)) or
-[conda](https://anaconda.org/bioconda/macs3). Please check the
+[conda](https://anaconda.org/macs3/macs3). Please check the
 [INSTALL](./docs/INSTALL.md) document for detail.
 
-MACS3 has been tested in CI for every push and PR in the following
-architectures:
+MACS3 has been tested using GitHub Actions for every push and PR in
+the following architectures:
 
- * x86_64
- * aarch64
- * armv7
- * ppc64le
- * s390x 
- * Apple chips
+ * x86_64 (Python 3.9, 3.10, 3.11)
+ * aarch64 (Python 3.9)
+ * armv7 (Python 3.9)
+ * ppc64le (Python 3.9)
+ * s390x (Python 3.9)
+ * Apple chips (Python 3.11)
 
 In general, you can install through PyPI as `pip install macs3`. 
 To use virtual environment is highly recommended. Or you can install
@@ -180,6 +173,11 @@ MACS3 project is sponsored by
 [CZI EOSS](https://chanzuckerberg.com/eoss/). And we particularly want
 to thank the user community for their supports, feedbacks and
 contributions over the years.
+
+## Citation
+
+2008: [Model-based Analysis of ChIP-Seq
+(MACS)](https://genomebiology.biomedcentral.com/articles/10.1186/gb-2008-9-9-r137)
 
 ## Other useful links
 
