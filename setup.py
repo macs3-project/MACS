@@ -34,9 +34,10 @@ classifiers =[\
               'Programming Language :: Python :: 3.9',
               'Programming Language :: Python :: 3.10',
               'Programming Language :: Python :: 3.11',
+              'Programming Language :: Python :: 3.12',
               'Programming Language :: Cython', ]
 
-install_requires = [ "numpy>=1.19",
+install_requires = [ "numpy>=1.26",
                      "hmmlearn>=0.3",
                      "cykhash>=2.0,<3.0",
                      "Cython~=3.0" ]
