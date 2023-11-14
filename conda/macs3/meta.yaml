@@ -1,5 +1,5 @@
 {% set name = "macs3" %}
-{% set version = "3.0.0b3" %}
+{% set version = "3.0.0" %}
 
 package:
   name: "{{ name|lower }}"
