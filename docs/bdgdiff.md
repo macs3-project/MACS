@@ -117,7 +117,7 @@ and cond2_Control.bam for condition 2.
 ### Step 1: Generate pileup tracks using callpeak module
 
 Purpose of this step is to use `callpeak` with -B option to generate
-bedGraph files for both conditions. There are several things to be
+bedGraph files for both conditions. There are several things to
 remember: 1. `--SPMR` is not compatible with `bdgdiff`, so avoid using
 it; 2. prepare a pen to write down the number of non-redundant reads
 of both conditions -- you will find such information in runtime
@@ -192,8 +192,8 @@ You will get the following three files in working directory:
  highly enriched in condition 1 comparing to condition 2. The last
  column in the file represent the log10 likelihood ratio to show how
  likely the observed signal in condition 1 in this region is from
- condition 1 comparing to condition 2. Higher the value, bigger the
- difference.
+ condition 1 comparing to condition 2. The higher the value, the
+ greater the difference.
 
  2. `diff_c1_vs_c2_c3.0_cond2.bed` This file stores regions that are
  highly enriched in condition 2 comparing to condition 1. The last

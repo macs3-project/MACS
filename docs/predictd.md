@@ -8,12 +8,13 @@ the cutting ends on plus and minus strands.
 
 ## Detailed Description
 
-The `predictd` command takes an input bedGraph file and predict *d* or
-fragment size from alignment results. In case of paired-end data, it
-will report the average insertion/fragment size from all pairs. Note
-there will be no step for duplicate reads filtering or sequencing
-depth scaling, so you may need to do certain pre/post-processing, such
-as using `filterdup` or `randsample` command. 
+The `predictd` command takes an input bedGraph file and predicts *d*
+or fragment size from alignment results. In case of paired-end data,
+it will report the average insertion/fragment size from all
+pairs. Note there will be no step for duplicate reads filtering or
+sequencing depth scaling, so you may need to do certain
+pre/post-processing, such as using `filterdup` or `randsample`
+command.
 
 If the alignment file is a single-end file, a model file (from
 `--rfile`) will be saved which can be used to visualize the model in
@@ -30,9 +31,9 @@ insertion length of all pairs is`.
 
 Here is a brief overview of the `predictd` options:
 
-- `-i IFILE [IFILE ...]` or `--ifile IFILE [IFILE ...]`: ChIP-seq
-  alignment file. If multiple files are given as '-t A B C', then they
-  will all be read and combined. REQUIRED. 
+- `-i` or `--ifile`: ChIP-seq alignment file. If multiple files are
+  given as '-t A B C', then they will all be read and
+  combined. REQUIRED.
 - `-f` or `--format`: Format of the tag file.
   - `AUTO`: MACS3 will pick a format from "AUTO", "BED", "ELAND",
     "ELANDMULTI", "ELANDEXPORT", "SAM", "BAM", "BOWTIE", "BAMPE", and

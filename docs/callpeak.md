@@ -50,7 +50,7 @@ the essentials.
   file can be directly used without being uncompressed with `--format
   BED`.
 
-  Here are detailed explanation of the recommanded formats:
+  Here are detailed explanation of the recommended formats:
 
   - `BED`
 

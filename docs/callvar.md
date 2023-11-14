@@ -130,9 +130,9 @@ Functional sequencing assays which targeted at particular sequences,
 such as ChIP-Seq, were thought to be unsuitable for *de novo*
 variation predictions because their genome-wide sequencing coverage is
 not as uniform as Whole Genome Sequencing (WGS). However, if we aim at
-discover the variations and allele usage at the targeted genomic
+discovering the variations and allele usage at the targeted genomic
 regions, the coverage should be much higher and sufficient. We
-therefore proposed a noval method to call the variants directly at the
+therefore proposed a novel method to call the variants directly at the
 called peaks by MACS3.
 
 At each peak region, we extracted the reads and assembled the DNA
@@ -148,12 +148,12 @@ predict the most likely genotype using Bayesian Information Criterion
 (BIC) among four allele types: homozygous loci (genotype 1/1),
 heterozygous loci (genotype 0/1 or 1/2) with allele bias, and
 heterozygous loci without allele bias. The detailed explanation of our
-statistical model is as the following.  We retrieved the base quality
-scores $\epsilon$, which represents sequencing errors, then we
-calculated the likelihoods of each of the four types. We assumed the
-independence of ChIP and control experiments so that the generalized
-likelihood function was the product of the likelihood functions of
-ChIP and control data:
+statistical model is as follows: we retrieved the base quality scores
+$\epsilon$, which represents sequencing errors, then we calculated the
+likelihoods of each of the four types. We assumed the independence of
+ChIP and control experiments so that the generalized likelihood
+function was the product of the likelihood functions of ChIP and
+control data:
 
 ```math
 L(\omega,\phi,g_c,g_i:D)=L(\omega,g_c:D_c)L(\phi,g_i:D_i)$$

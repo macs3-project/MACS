@@ -11,9 +11,9 @@ results.
 The `refinepeak` command takes in a BED file containing peaks and raw
 reads alignment, then produces an output BED file with refined peak
 summits.  It will refine peak summits and give scores measuring the
-balance of waston/crick tags, inspired by SPP. Basically, we assume
-that a good summit in a peak region should have balanced watson and
-crick tags around.
+balance of Watson/Crick tags, inspired by SPP. Basically, we assume
+that a good summit in a peak region should have balanced Watson/Crick
+tags around.
 
 ## Command Line Options
 

@@ -44,7 +44,7 @@ Here is a brief overview of the command line options:
   same location -- the same coordination and the same strand. If the
   value is `auto`, `filterdup` will calculate the maximum tags at the
   exact same location based on a binomal distribution using given `-p`
-  as pvalue cutoff; and the `all` value will keeps every tags (useful
+  as pvalue cutoff; and the `all` value will keep every tags (useful
   if you only want to convert formats). If an integer is given, at
   most this number of tags will be kept at the same location. Note,
   MACS3 `callpeak` function uses `--keep-dup=1` as default. Note, if

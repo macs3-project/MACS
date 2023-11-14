@@ -75,6 +75,6 @@ Some use cases for `bdgopt`:
 2. If you want to cap the score in the bedGraph, you can use `-m max`
    with the upper limit score you want to use in `-p`. If you want to
    set the minimum score in the bedGraph, for example to set the whole
-   genome background signal in the MACS contral lambda track, you can
+   genome background signal in the MACS control lambda track, you can
    use `-m min` with the value in `-p`.
 

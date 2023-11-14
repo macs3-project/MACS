@@ -71,8 +71,8 @@ calling peaks is set to 1.0, the minimum length of peaks is set to
 The cutoff analysis function is provided by `--cutoff-analysis` option
 in `callpeak`, `bdgpeakcall`, and `hmmratac`. However, the function is
 `bdgpeakcall` is more flexible and can be applied on any scoring
-scheme. We will sperate this function into a dedicated subcommand in
-the future. 
+scheme. We will separate this function into a dedicated subcommand in
+the future.
 
 Please note that if this `--cutoff-anlaysis` option is on, the
 `bdgpeakcall` won't write any results of the peaks into narrowPeak

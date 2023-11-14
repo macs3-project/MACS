@@ -21,19 +21,19 @@ chromosome in the bedGraph file should be continuous so we recommand
 you use the bedGraph files from MACS3. We provide the following
 function to 'compare two tracks':
 
-- ppois Poisson p-value (-log10(pvalue) form) using the second file
+- `ppois` Poisson p-value (-log10(pvalue) form) using the second file
   (-c) as lambda and treatment (-t) as observation
-- qpois Q-value through a BH process for poisson pvalues
-- subtract Subtraction from treatment
-- FE linear scale fold enrichment, or the score from file A divided by
-  the score from file B
-- logFE log10 fold enrichment(need to set pseudocount)
-- logLR log10 likelihood between ChIP-enriched model and open
+- `qpoi`s The q-value through a BH process for poisson pvalues
+- `subtract` Subtraction from treatment
+- `FE` linear scale fold enrichment, or the score from file A divided
+  by the score from file B
+- `logFE` log10 fold enrichment(need to set pseudocount)
+- `logLR` log10 likelihood between ChIP-enriched model and open
   chromatin model (need to set pseudocount)
-- symmetric log10 likelihood between two ChIP-enrichment models using
-  Poison distribution, and this can be used to compare ChIP signals
-  from two differen conditions (differential binding)
-- max Maximum value between the two tracks.
+- `slogLR` symmetric log10 likelihood between two ChIP-enrichment
+  models using Poison distribution, and this can be used to compare
+  ChIP signals from two differen conditions (differential binding)
+- `max` Maximum value between the two tracks.
 
 ## Command Line Options
 
@@ -57,15 +57,15 @@ Here is a brief description of the command line options for `bdgcmp` :
   sequencing depth. DEFAULT: 0.0, no pseudocount is applied.
 - `-m` or `--method`: Method to use while calculating a score in any
   bin by comparing the treatment value and control value. Available
-  choices are: ppois, qpois, subtract, logFE, logLR, and slogLR. They
-  represent Poisson P-value (-log10(pvalue) form) using control as
-  lambda and treatment as observation, q-value through a BH process
-  for Poisson p-values, subtraction from treatment, linear scale fold
-  enrichment, log10 fold enrichment (need to set pseudocount), log10
-  likelihood between ChIP-enriched model and open chromatin model
-  (need to set pseudocount), symmetric log10 likelihood between two
-  ChIP-enrichment models, or the maximum value between the two
-  tracks. The default option is ppois.
+  choices are: `ppois`, `qpois`, `subtract`, `logFE`,` logLR`,
+  `slogLR`, and `max`. They represent Poisson P-value (-log10(pvalue)
+  form) using control as lambda and treatment as observation, q-value
+  through a BH process for Poisson p-values, subtraction from
+  treatment, linear scale fold enrichment, log10 fold enrichment (need
+  to set pseudocount), log10 likelihood between ChIP-enriched model
+  and open chromatin model (need to set pseudocount), symmetric log10
+  likelihood between two ChIP-enrichment models, or the maximum value
+  between the two tracks. The default option is ppois.
 - `--verbose`: Set the verbose level of runtime messages. 0: only show
   critical messages, 1: show additional warning messages, 2: show
   process information, 3: show debug messages. DEFAULT: 2

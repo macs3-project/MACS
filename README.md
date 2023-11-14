@@ -70,19 +70,21 @@ add more new features in the future.**
 	including x64, armv7, aarch64, s390x and ppc64le. We also test on
 	Mac OS 12.
 
-8) MACS tag-shifting model has been refined. Now it will use a 
-	naive peak calling approach to find ALL possible paired peaks at +
-	and - strand, then use all of them to calculate the 
-	cross-correlation. (a related bug has been fix #442) 
+8) MACS tag-shifting model has been refined. Now it will use a naive
+	peak calling approach to find ALL possible paired peaks at + and -
+	strand, then use all of them to calculate the
+	cross-correlation. (a related bug has been fix
+	[#442](https://github.com/macs3-project/MACS/issues/442))
 
-9) BAI index and random access to BAM file now is supported. #449
+9) BAI index and random access to BAM file now is
+	supported. [#449](https://github.com/macs3-project/MACS/issues/449)
 	And user can use original BAM file (instead of the subset of BAM
 	file as in SAPPER) in the `callvar` command.
 
-10) Support of Python > 3.10 #497 #498 
+10) Support of Python > 3.10 [#498](https://github.com/macs3-project/MACS/issues/498)
 
 11) The effective genome size parameters have been updated
-	according to deeptools. #508
+	according to deeptools. [#508](https://github.com/macs3-project/MACS/issues/508)
 
 12) Multiple updates regarding dependencies, anaconda built, CI/CD
 	process.
@@ -91,7 +93,9 @@ add more new features in the future.**
 
 *Other*
 
-1) Missing header line while no peaks can be called #501 #502
+1) Missing header line while no peaks can be called
+[#501](https://github.com/macs3-project/MACS/issues/501)
+[#502](https://github.com/macs3-project/MACS/issues/502)
 
 2) Note: different numpy, scipy, sklearn may give slightly
 	different results for hmmratac results. The current standard
