@@ -115,7 +115,9 @@ the following architectures:
 In general, you can install through PyPI as `pip install macs3`. 
 To use virtual environment is highly recommended. Or you can install
 after unzipping the released package downloaded from Github, then
-use `pip install .` command.
+use `pip install .` command. Please note that, we haven't tested
+installation on any Windows OS, so currently only Linux and Mac OS
+systems are supported.
 
 ## Usage
 

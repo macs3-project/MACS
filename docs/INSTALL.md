@@ -1,5 +1,5 @@
 # INSTALL Guide For MACS3
-Time-stamp: <2023-11-14 15:16:17 Tao Liu>
+Time-stamp: <2023-11-14 16:43:54 Tao Liu>
 
 Please check the following instructions to complete your installation.
 
@@ -7,7 +7,9 @@ Please check the following instructions to complete your installation.
 
 Here we list some prerequisites for installing and running MACS3. But
 if you are using conda or pip to install, the installer will check the
-dependencies and install them if necessary.
+dependencies and install them if necessary. Please note that, we
+haven't tested installation on any Windows OS, so currently only Linux
+and Mac OS systems are supported.
 
 ### Python3
 
