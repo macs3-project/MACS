@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# Time-stamp: <2023-11-09 14:47:18 taoliu>
+# Time-stamp: <2023-11-15 10:41:42 Tao Liu>
 
 """Description: MACS v3 main executable.
 
@@ -374,7 +374,7 @@ def add_diffpeak_parser( subparsers ):
 
 def add_filterdup_parser( subparsers ):
     argparser_filterdup = subparsers.add_parser( "filterdup",
-                                                 help = "Remove duplicate reads at the same position, then save the rest alignments to BED or BEDPE file. If you use '--keep-dup all option', this script can be utilized to convert any acceptable format into BED or BEDPE format." )
+                                                 help = "Remove duplicate reads, then save in BED/BEDPE format file." )
     argparser_filterdup.add_argument( "-i", "--ifile", dest = "ifile", type = str, required = True, nargs = "+",
                                       help = "Alignment file. If multiple files are given as '-t A B C', then they will all be read and combined. REQUIRED." )
     argparser_filterdup.add_argument( "-f", "--format", dest = "format", type = str,
@@ -406,7 +406,7 @@ def add_bdgpeakcall_parser( subparsers ):
     """Add function 'peak calling on bedGraph' argument parsers.
     """
     argparser_bdgpeakcall = subparsers.add_parser( "bdgpeakcall",
-                                                   help = "Call peaks from bedGraph output. Note: All regions on the same chromosome in the bedGraph file should be continuous so only bedGraph files from MACS3 are accpetable." )
+                                                   help = "Call peaks from bedGraph file." )
     argparser_bdgpeakcall.add_argument( "-i", "--ifile", dest = "ifile", type = str, required = True,
                                         help = "MACS score in bedGraph. REQUIRED" )
     argparser_bdgpeakcall.add_argument( "-c", "--cutoff" , dest = "cutoff", type = float,
@@ -435,7 +435,7 @@ def add_bdgbroadcall_parser( subparsers ):
     """Add function 'broad peak calling on bedGraph' argument parsers.
     """
     argparser_bdgbroadcall = subparsers.add_parser( "bdgbroadcall",
-                                                    help = "Call broad peaks from bedGraph output. Note: All regions on the same chromosome in the bedGraph file should be continuous so only bedGraph files from MACS3 are accpetable." )
+                                                    help = "Call nested broad peaks from bedGraph file." )
     argparser_bdgbroadcall.add_argument( "-i", "--ifile", dest = "ifile" , type = str, required = True,
                                          help = "MACS score in bedGraph. REQUIRED" )
     argparser_bdgbroadcall.add_argument( "-c", "--cutoff-peak", dest = "cutoffpeak", type = float,
@@ -461,7 +461,7 @@ def add_bdgcmp_parser( subparsers ):
     """Add function 'peak calling on bedGraph' argument parsers.
     """
     argparser_bdgcmp = subparsers.add_parser( "bdgcmp",
-                                              help = "Deduct noise by comparing two signal tracks in bedGraph. Note: All regions on the same chromosome in the bedGraph file should be continuous so only bedGraph files from MACS3 are accpetable." )
+                                              help = "Comparing two signal tracks in bedGraph format." )
     argparser_bdgcmp.add_argument( "-t", "--tfile", dest = "tfile", type = str, required = True,
                                    help = "Treatment bedGraph file, e.g. *_treat_pileup.bdg from MACSv2. REQUIRED")
     argparser_bdgcmp.add_argument( "-c", "--cfile", dest = "cfile", type = str, required = True,
@@ -489,7 +489,7 @@ def add_bdgopt_parser( subparsers ):
     """Add function 'operations on score column of bedGraph' argument parsers.
     """
     argparser_bdgopt = subparsers.add_parser( "bdgopt",
-                                              help = "Operations on score column of bedGraph file. Note: All regions on the same chromosome in the bedGraph file should be continuous so only bedGraph files from MACS3 are accpetable." )
+                                              help = "Operate the score column of bedGraph file." )
     argparser_bdgopt.add_argument( "-i", "--ifile", dest = "ifile", type = str, required = True,
                                    help = "MACS score in bedGraph. Note: this must be a bedGraph file covering the ENTIRE genome. REQUIRED" )
     argparser_bdgopt.add_argument( "-m", "--method", dest = "method", type = str,
@@ -508,7 +508,7 @@ def add_cmbreps_parser( subparsers ):
     """Add function 'combine replicates' argument parsers.
     """
     argparser_cmbreps = subparsers.add_parser( "cmbreps",
-                                               help = "Combine BEDGraphs of scores from replicates. Note: All regions on the same chromosome in the bedGraph file should be continuous so only bedGraph files from MACS3 are accpetable." )
+                                               help = "Combine bedGraph files of scores from replicates." )
     argparser_cmbreps.add_argument( "-i", dest = "ifile", type = str, required = True, nargs = "+",
                                     help = "MACS score in bedGraph for each replicate. Require at least 2 files such as '-i A B C D'. REQUIRED" )
     # argparser_cmbreps.add_argument( "-w", dest = "weights", type = float, nargs = "*",
@@ -525,7 +525,7 @@ def add_cmbreps_parser( subparsers ):
 
 def add_randsample_parser( subparsers ):
     argparser_randsample = subparsers.add_parser( "randsample",
-                                                  help = "Randomly sample number/percentage of total reads." )
+                                                  help = "Randomly choose a number/percentage of total reads, then save in BED/BEDPE format file." )
     argparser_randsample.add_argument( "-i", "--ifile", dest = "ifile", type = str, required = True, nargs = "+",
                                       help = "Alignment file. If multiple files are given as '-t A B C', then they will all be read and combined. REQUIRED." )
 
@@ -555,7 +555,7 @@ def add_randsample_parser( subparsers ):
 
 def add_bdgdiff_parser( subparsers ):
     argparser_bdgdiff = subparsers.add_parser( "bdgdiff",
-                                               help = "Differential peak detection based on paired four bedgraph files. Note: All regions on the same chromosome in the bedGraph file should be continuous so only bedGraph files from MACS3 are accpetable." )
+                                               help = "Differential peak detection based on paired four bedGraph files." )
     argparser_bdgdiff.add_argument( "--t1", dest = "t1bdg", type = str, required = True,
                                     help = "MACS pileup bedGraph for condition 1. Incompatible with callpeak --SPMR output. REQUIRED" )
     argparser_bdgdiff.add_argument( "--t2", dest="t2bdg", type = str, required = True,
@@ -588,7 +588,7 @@ def add_bdgdiff_parser( subparsers ):
 
 def add_refinepeak_parser( subparsers ):
     argparser_refinepeak = subparsers.add_parser( "refinepeak",
-                                                 help = "(Experimental) Take raw reads alignment, refine peak summits and give scores measuring balance of waston/crick tags. Inspired by SPP." )
+                                                 help = "Take raw reads alignment, refine peak summits. Inspired by SPP." )
     argparser_refinepeak.add_argument( "-b", dest = "bedfile", type = str, required = True,
                                       help = "Candidate peak file in BED format. REQUIRED." )
     argparser_refinepeak.add_argument( "-i", "--ifile", dest = "ifile", type = str, required = True, nargs = "+",
@@ -615,7 +615,7 @@ def add_refinepeak_parser( subparsers ):
 def add_predictd_parser( subparsers ):
     """Add main function 'predictd' argument parsers.
     """
-    argparser_predictd = subparsers.add_parser("predictd", help="Predict d or fragment size from alignment results. In case of PE data, report the average insertion/fragment size from all pairs. *Will NOT filter duplicates*")
+    argparser_predictd = subparsers.add_parser("predictd", help="Predict d or fragment size from alignment results. In case of PE data, report the average insertion/fragment size from all pairs.")
 
     # group for input files
     argparser_predictd.add_argument( "-i", "--ifile", dest = "ifile", type = str, required = True, nargs = "+",
@@ -650,7 +650,7 @@ def add_predictd_parser( subparsers ):
 
 def add_pileup_parser( subparsers ):
     argparser_pileup = subparsers.add_parser( "pileup",
-                                              help = "Pileup aligned reads with a given extension size (fragment size or d in MACS language). Note there will be no step for duplicate reads filtering or sequencing depth scaling, so you may need to do certain pre/post-processing." )
+                                              help = "Pileup aligned reads (single-end) or fragments (paired-end)." )
     argparser_pileup.add_argument( "-i", "--ifile", dest = "ifile", type = str, required = True, nargs = "+",
                                    help = "Alignment file. If multiple files are given as '-t A B C', then they will all be read and combined. REQUIRED." )
     argparser_pileup.add_argument( "-o", "--ofile", dest = "outputfile", type = str, required = True,
@@ -727,7 +727,7 @@ To call variants:
     group_para.add_argument( "-D", dest = "maxDuplicate", type = int, default = 1,
                              help = "Maximum duplicated reads allowed per mapping position, mapping strand and the same CIGAR code. Default: 1. When sequencing depth is high, to set a higher value might help evaluate the correct allele ratio.")
     group_para.add_argument( "-F", "--fermi", dest = "fermi", type = str, default = "auto",
-                             help = "Option to control when to apply local assembly through Fermi. By default (set as 'auto'), while callvar detects any INDEL variant in a peak region, it will utilize Fermi to recover the actual DNA sequences to refine the read alignments. If set as 'on', Fermi will be always invoked. It can increase specificity however sensivity and speed will be significantly lower. If set as 'off', Fermi won't be invoked at all. If so, speed and sensitivity can be higher but specificity will be significantly lower. Default: auto" )
+                             help = "Option to control when to apply local assembly through fermi-lite. By default (set as 'auto'), while callvar detects any INDEL variant in a peak region, it will utilize fermi-lite to recover the actual DNA sequences to refine the read alignments. If set as 'on', fermi-lite will be always invoked. It can increase specificity however sensivity and speed will be significantly lower. If set as 'off', Fermi won't be invoked at all. If so, speed and sensitivity can be higher but specificity will be significantly lower. Default: auto" )
     group_para.add_argument( "--fermi-overlap", dest = "fermiMinOverlap", type = int,
                              help = "The minimal overlap for fermi to initially assemble two reads. Must be between 1 and read length. A longer fermiMinOverlap is needed while read length is small (e.g. 30 for 36bp read, but 33 for 100bp read may work). Default:30", default = 30 )
     group_para.add_argument( "--top2alleles-mratio", dest = "top2allelesMinRatio", type = float,

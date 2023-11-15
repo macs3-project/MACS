@@ -27,37 +27,42 @@ applied to any "DNA enrichment assays" if the question to be asked is
 simply: *where we can find significant reads coverage than the random
 background*.
 
-## Recent Changes for MACS (3.0.0)
+##  Changes for MACS (3.0.0)
 
-1) Speed/memory optimization.  Use the cykhash to replace python
+1) Call variants in peak regions directly from BAM files. The
+	function was originally developed under code name SAPPER. Now
+	SAPPER has been merged into MACS as the `callvar` command. It can
+	be used to call SNVs and small INDELs directly from alignment
+	files for ChIP-seq or ATAC-seq. We call `fermi-lite` to assemble
+	the DNA sequence at the enriched genomic regions (binding sites or
+	accessible DNA) and to refine the alignment when necessary. We
+	added `simde` as	a submodule in order to support fermi-lite
+	library under non-x64 architectures.
+
+2) HMMRATAC module is added as subcommand `hmmratac`. HMMRATAC is a
+	dedicated software to analyze ATAC-seq data. The basic idea behind
+	HMMRATAC is to digest ATAC-seq data according to the fragment
+	length of read pairs into four signal tracks: short fragments,
+	mono-nucleosomal fragments, di-nucleosomal fragments and
+	tri-nucleosomal fragments. Then integrate the four tracks again
+	using Hidden Markov Model to consider three hidden states: open
+	region, nucleosomal region, and background region. The orginal
+	paper was published in 2019 written in JAVA, by Evan Tarbell. We
+	implemented it in Python/Cython and optimize the whole process
+	using existing MACS functions and hmmlearn. Now it can run much
+	faster than the original JAVA version. Note: evaluation of the
+	peak calling results is still underway.
+
+3) Speed/memory optimization.  Use the cykhash to replace python
 	dictionary. Use buffer (10MB) to read and parse input file (not
 	available for BAM file parser). And many optimization tweaks. We
 	added memory monitoring to the runtime messages.
 
-2) Call variants in peak regions directly from BAM files. The
-	function was originally developed under code name SAPPER. Now
-	SAPPER has been merged into MACS. Also, `simde` has been added as
-	a submodule in order to support fermi-lite library under non-x64
-	architectures.
+4) R wrappers for MACS -- MACSr for bioconductor.
 
-3) HMMRATAC module is added. HMMRATAC is a dedicated software to
-	analyze ATAC-seq data. The basic idea behind HMMRATAC is to digest
-	ATAC-seq data according to the fragment length of read pairs into
-	four signal tracks: short fragments, mononucleosomal fragments,
-	di-nucleosomal fragments and tri-nucleosomal fragments. Then
-	integrate the four tracks again using Hidden Markov Model to
-	consider three hidden states: open region, nucleosomal region, and
-	background region. The orginal paper was published in 2019 written
-	in JAVA, by Evan Tarbell. We implemented it in Python/Cython and
-	optimize the whole process using existing MACS functions and
-	hmmlearn. Now it can run much faster than the original JAVA
-	version. Note: evaluation of the peak calling results is underway.	
+5) Code cleanup. Reorganize source codes. 
 
-4) Code cleanup. Reorganize source codes. 
-
-5) Unit testing. 
-
-6) R wrappers for MACS -- MACSr
+6) Unit testing. 
 
 7) Switch to Github Action for CI, support multi-arch testing
 	including x64, armv7, aarch64, s390x and ppc64le. We also test on
@@ -70,9 +75,7 @@ background*.
 	[#442](https://github.com/macs3-project/MACS/issues/442))
 
 9) BAI index and random access to BAM file now is
-	supported. [#449](https://github.com/macs3-project/MACS/issues/449)
-	And user can use original BAM file (instead of the subset of BAM
-	file as in SAPPER) in the `callvar` command.
+	supported. [#449](https://github.com/macs3-project/MACS/issues/449).
 
 10) Support of Python > 3.10 [#498](https://github.com/macs3-project/MACS/issues/498)
 
@@ -82,7 +85,9 @@ background*.
 12) Multiple updates regarding dependencies, anaconda built, CI/CD
 	process.
 
-13) Cython 3 is supported yet.
+13) Cython 3 is supported.
+
+14) Documentations for each subcommand can be found under /docs
 
 *Other*
 
@@ -140,14 +145,14 @@ of the subcommands.
 Subcommand | Description
 -----------|----------
 [`callpeak`](./docs/callpeak.md) | Main MACS3 Function to call peaks from alignment results.
-[`bdgpeakcall`](./docs/bdgpeakcall.md) | Call peaks from bedGraph output.
-[`bdgbroadcall`](./docs/bdgbroadcall.md) | Call broad peaks from bedGraph output.
+[`bdgpeakcall`](./docs/bdgpeakcall.md) | Call peaks from bedGraph file.
+[`bdgbroadcall`](./docs/bdgbroadcall.md) | Call nested broad peaks from bedGraph file.
 [`bdgcmp`](./docs/bdgcmp.md) | Comparing two signal tracks in bedGraph format.
 [`bdgopt`](./docs/bdgopt.md) | Operate the score column of bedGraph file.
-[`cmbreps`](./docs/cmbreps.md) | Combine BEDGraphs of scores from replicates.
+[`cmbreps`](./docs/cmbreps.md) | Combine bedGraph files of scores from replicates.
 [`bdgdiff`](./docs/bdgdiff.md) | Differential peak detection based on paired four bedGraph files.
 [`filterdup`](./docs/filterdup.md) | Remove duplicate reads, then save in BED/BEDPE format file.
-[`predictd`](./docs/predictd.md) | Predict d or fragment size from alignment results.
+[`predictd`](./docs/predictd.md) | Predict d or fragment size from alignment results. In case of PE data, report the average insertion/fragment size from all pairs.
 [`pileup`](./docs/pileup.md) | Pileup aligned reads (single-end) or fragments (paired-end)
 [`randsample`](./docs/randsample.md) | Randomly choose a number/percentage of total reads, then save in BED/BEDPE format file.
 [`refinepeak`](./docs/refinepeak.md) | Take raw reads alignment, refine peak summits.
@@ -161,11 +166,11 @@ from users.
 
 ## Contribute
 
-Please read our [CODE OF CONDUCT](./CODE_OF_CONDUCT.md) and
-[How to contribute](./CONTRIBUTING.md) documents. If you have any
-questions, suggestion/ideas, or just want to have conversions with
-developers and other users in the community, we recommand you use the
-[MACS Discussions](https://github.com/macs3-project/MACS/discussions)
+Please read our [CODE OF CONDUCT](./CODE_OF_CONDUCT.md) and [How to
+contribute](./CONTRIBUTING.md) documents. If you have any questions,
+suggestion/ideas, or just want to have conversions with developers and
+other users in the community, we recommend using the [MACS
+Discussions](https://github.com/macs3-project/MACS/discussions)
 instead of posting to our
 [Issues](https://github.com/macs3-project/MACS/issues) page.
 

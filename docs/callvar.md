@@ -2,9 +2,8 @@
 
 ## Overview
 The `callvar` command is part of the MACS3 suite of tools and is used
-to call variants in giveqn peak regions from the alignment BAM
-files. It is particularly useful in ChIP-Seq analysis where the
-identification of genomic variants is required. 
+to call variants (SNVs and small INDELs) in given peak regions from
+the alignment BAM files.
 
 ## Detailed Description of usage
 
@@ -23,7 +22,7 @@ the second type, called `CTRL` for control, is from genomic assay in
 which the DNA enrichment is less biased in multiploid chromosomes and
 more uniform across the whole genome (the later one is optional). In
 order to run `callvar`, please sort (by coordinates) and index the BAM
-files. 
+files.
 
 Example:
 
@@ -76,14 +75,14 @@ Here is a brief overview of these options:
   quality score greater than this value. Default is 20, which means
   Q20 or 0.01 error rate. 
 - `-F` or `--fermi`: The option to control when to apply local
-  assembly through Fermi. By default (set as 'auto'), while `callvar`
-  detects any INDEL variant in a peak region, it will utilize Fermi to
-  recover the actual DNA sequences to refine the read alignments. If
-  set as 'on', Fermi will always be invoked. It can increase
-  specificity, however sensivity and speed will be significantly
-  lower. If set as 'off', Fermi won't be invoked at all. If so, speed
-  and sensitivity can be higher but specificity will be significantly
-  lower. 
+  assembly through fermi-lite. By default (set as 'auto'), while
+  `callvar` detects any INDEL variant in a peak region, it will
+  utilize fermi-lite to recover the actual DNA sequences to refine the
+  read alignments. If set as 'on', fermi-lite will always be
+  invoked. It can increase specificity, however sensivity and speed
+  will be significantly lower. If set as 'off', fermi-lite won't be
+  invoked at all. If so, speed and sensitivity can be higher but
+  specificity will be significantly lower.
 - `--fermi-overlap`: The minimal overlap for fermi to initially
   assemble two reads. Must be between 1 and read length. A longer
   fermiMinOverlap is needed while read length is small (e.g. 30 for
@@ -135,25 +134,26 @@ regions, the coverage should be much higher and sufficient. We
 therefore proposed a novel method to call the variants directly at the
 called peaks by MACS3.
 
-At each peak region, we extracted the reads and assembled the DNA
-sequences using [fermi-lite](https://github.com/lh3/fermi-lite) , a
+At each peak region, we extract the reads and assembled the DNA
+sequences using [fermi-lite](https://github.com/lh3/fermi-lite), a
 unitig graph based assembly algorithm developed by Heng Li. Then, we
-aligned the unitigs (i.e., assembled short DNA sequences) to the
+align the unitigs (i.e., assembled short DNA sequences) to the
 reference genome sequence using Smith-Waterman algorithm. Differences
-between the reference sequence and the unitigs revealed possible SNVs
-and INDELs. For each possible SNV or INDEL, we built a statistical
-model incorporating the sequences and sequencing errors (base
-qualities) from both treatment (ChIP) and control (genomic input) to
-predict the most likely genotype using Bayesian Information Criterion
-(BIC) among four allele types: homozygous loci (genotype 1/1),
-heterozygous loci (genotype 0/1 or 1/2) with allele bias, and
-heterozygous loci without allele bias. The detailed explanation of our
-statistical model is as follows: we retrieved the base quality scores
-$\epsilon$, which represents sequencing errors, then we calculated the
-likelihoods of each of the four types. We assumed the independence of
-ChIP and control experiments so that the generalized likelihood
-function was the product of the likelihood functions of ChIP and
-control data:
+between the reference sequence and the unitigs reveal possible SNVs
+and INDELs. Please note that, by default, we only peform the *de novo*
+assembly using fermi-lite for detecting INDELs to save time. For each
+possible SNV or INDEL, we build a statistical model incorporating the
+sequences and sequencing errors (base qualities) from both treatment
+(ChIP) and control (genomic input) to predict the most likely genotype
+using Bayesian Information Criterion (BIC) among four allele types:
+homozygous loci (genotype 1/1), heterozygous loci (genotype 0/1 or
+1/2) with allele bias, and heterozygous loci without allele bias. The
+detailed explanation of our statistical model is as follows: we
+retrieve the base quality scores $\epsilon$, which represents
+sequencing errors, then we calculate the likelihoods of each of the
+four types. We assume the independence of ChIP and control experiments
+so that the generalized likelihood function is the product of the
+likelihood functions of ChIP and control data:
 
 ```math
 L(\omega,\phi,g_c,g_i:D)=L(\omega,g_c:D_c)L(\phi,g_i:D_i)$$
@@ -167,9 +167,9 @@ allele ratio in the control. The parameter $`g_c`$ represents the
 actual number of ChIPed DNA fragments containing allele A, which could
 differ from the observed count $`r_{c,A}`$ considering that some
 observations could be due to sequencing errors. The symbol $`g_i`$
-represents the control analogously to $`g_c`$. We used $`r_c`$ to
+represents the control analogously to $`g_c`$. We use $`r_c`$ to
 denote the total number of observed allele A ($`r_{c,A}`$) and allele
-B ($`r_{c,B}`$). We assumed the occurrence of the allele A ($`g_c`$)
+B ($`r_{c,B}`$). We assume the occurrence of the allele A ($`g_c`$)
 is from a Bernoulli trial from $`r_c`$ with the allele ratio
 $\omega$. The probability of observing the ChIP-Seq data at a certain
 position under a given type is as follows:
@@ -184,25 +184,24 @@ where $`\epsilon_j`$ represents the sequencing error of the base
 showing difference with reference genome in case of mismatch
 (corresponding to SNV) and insertion. In case of deletion, the
 sequencing errors from the two bases on sequenced read surrounding the
-deletion would be considered. We modeled the control data in the
-similar way. We assessed the likelihood functions of the 4 major type
-using the following parameters:
-$`\omega=1,\phi=1,g_c=r_{c,0},g_i=r_{i,0}`$ for A/A genotype;
-$`\omega=0,\phi=0,g_c=0,g_i=0`$ for B/B genotype,
+deletion would be considered. We model the control data in the similar
+way. We assess the likelihood functions of the 4 major type using the
+following parameters: $`\omega=1,\phi=1,g_c=r_{c,0},g_i=r_{i,0}`$ for
+A/A genotype; $`\omega=0,\phi=0,g_c=0,g_i=0`$ for B/B genotype,
 $`\omega=0.5,\phi=0.5`$ and $`g_c,g_i`$ as free variables for A/B
 genotype with unbiased binding; $`\phi=0.5`$ and $`\omega,g_c,g_i`$ as
 free variables for A/B genotype with biased binding or allele
-usage. Next, we applied the Bayesian Information Criterion (BIC) to
+usage. Next, we apply the Bayesian Information Criterion (BIC) to
 select the best type as our prediction with the minimal BIC value
-among the 4 models. If the best type was either “A/B, noAS” or “A/B,
-AS”, we concluded that the genotype was heterozygous (A/B). We
-consider two types of data from the same assay independently: ChIP
-sample that can have biased allele usage, and control sample that
-won’t have biased allele usage. So that in case control is not
-available, such as in ATAC-Seq assay, our model can still
-work. Furthermore, in case a good quality WGS is available, it can be
-regarded as the control sample and be inserted into our calculation to
-further increase the sensitivity.
+among the 4 models. If the best type is either “A/B, noAS” or “A/B,
+AS”, we conclude that the genotype is heterozygous (A/B). We consider
+two types of data from the same assay independently: ChIP sample that
+can have biased allele usage, and control sample that won’t have
+biased allele usage. So that in case control is not available, such as
+in ATAC-Seq assay, our model can still work. Furthermore, in case a
+good quality WGS is available, it can be regarded as the control
+sample and be inserted into our calculation to further increase the
+sensitivity.
 
 ## Customized fields in the Output VCF file
 
