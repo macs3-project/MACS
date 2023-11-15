@@ -1,4 +1,6 @@
-# Hidden Markov Model peak caller for ATAC-seq -- HMMRATAC
+# hmmratac
+
+## Description
 
 HMMRATAC (`macs3 hmmratac`) is a dedicated peak calling algorithm
 based on Hidden Markov Model for ATAC-seq data. The basic idea behind
@@ -14,10 +16,22 @@ the then PhD student Evan Tarbell, a mohawk bioinformatician. In MACS3
 project, we implemented HMMRATAC idea in Python/Cython and optimize
 the whole process using existing MACS functions and hmmlearn.
 
-Here's an example of runing the `hmmratac` command:
+Here's an example of how to run the `hmmratac` command:
 
 ```
-$ macs3 hmmratac -b test.bam -n test_result
+$ macs3 hmmratac -i yeast.bam -n yeast
+```
+
+or with the BEDPE format
+
+```
+$ macs3 hmmratac -i yeast.bedpe.gz -f BEDPE -n yeast
+```
+
+Note: you can convert BAMPE to BEDPE by using
+
+```
+$ macs3 filterdup --keep-dup all -f BAMPE -i yeast.bam -o yeast.bedpe
 ```
 
 Please use `macs3 hmmratac --help` to see all the options. Here we
@@ -25,18 +39,63 @@ list the essential ones.
 
 ## Essential Options
 
-### `-b BAM_FILE [BAM_FILE ...]` / `--bam BAM_FILE [BAM_FILE ...]`
+### `-i INPUT_FILE [INPUT_FILE ...]` / `--input INPUT_FILE [INPUT_FILE ...]`
 
-This is the only REQUIRED parameter for `hmmratac`. The file can
-should be in BAMPE format. If multiple files are given as '-b A B C',
-then they will all be read and pooled together. REQUIRED.
+This is the only REQUIRED parameter for `hmmratac`. Input files
+containing the aligment results for ATAC-seq paired end reads. If
+multiple files are given as '-t A B C', then they will all be read and
+pooled together. The file should be in BAMPE or BEDPE format (aligned
+in paired end mode). Files can be gzipped. Note: all files should be
+in the same format. REQUIRED. 
+
+### `-f {BAMPE,BEDPE}` / `--format {BAMPE,BEDPE}`
+
+Format of input files, "BAMPE" or "BEDPE". If there are multiple
+files, they should be in the same format -- either BAMPE or
+BEDPE. Please note that the BEDPE only contains three columns --
+chromosome, left position of the whole pair, right position of the
+whole pair-- and is NOT the same BEDPE format used by BEDTOOLS. To
+convert BAMPE to BEDPE,  you can use this command `macs3 filterdup
+--keep-dup all -f BAMPE -i input.bam -o output.bedpe`. DEFAULT:
+"BAMPE".
 
 ### `--outdir OUTDIR`
 
-If specified all output files will be written to that directory. Default: the current working directory
+If specified all output files will be written to that
+directory. Default: the current working directory 
 
 ### `-n NAME`/ `--name NAME`
-Name for this experiment, which will be used as a prefix to generate output file names. DEFAULT: "NA"
+Name for this experiment, which will be used as a prefix to generate
+output file names. DEFAULT: "NA" 
+
+### `--modelonly`
+ This option will only generate the HMM model as a JSON file and
+ quit. This model can then be applied using the `--model`
+ option. Default: False 
+
+### `--model`
+ If provided, HMM training will be skipped and a JSON file generated
+ from a previous HMMRATAC run will be used instead of creating new
+ one. Default: NA 
+   
+### `-t HMM_TRAINING_REGIONS` / `--training HMM_TRAINING_REGIONS`
+ Customized training regions can be provided through this option. `-t`
+ takes the filename of training regions (previously was BED_file) to
+ use for training HMM, instead of using foldchange settings to
+ select. Default: NA 
+
+### `--min-frag-p MIN_FRAG_P`
+ We will exclude the abnormal fragments that can't be assigned to any
+ of the four signal tracks. After we use EM to find the means and
+ stddevs of the four distributions, we will calculate the likelihood
+ that a given fragment length fit any of the four using normal
+ distribution. The criteria we will use is that if a fragment length
+ has less than MIN_FRAG_P probability to be like either of short,
+ mono, di, or tri-nuc fragment, we will exclude it while generating
+ the four signal tracks for later HMM training and prediction. The
+ value should be between 0 and 1. Larger the value, more abnormal
+ fragments will be allowed. So if you want to include more 'ideal'
+ fragments, make this value smaller. Default = 0.001 
 
 ### `--cutoff-analysis-only`
 
@@ -44,8 +103,8 @@ Name for this experiment, which will be used as a prefix to generate output file
  the report, the process will stop. The report will help user decide
  the three crucial parameters for `-l`, `-u`, and `-c`. So it's highly
  recommanded to run this first! Please read the report and
- instructions in `Choices of cutoff values` on how to decide the three
- crucial parameters
+ instructions in [Choices of cutoff values](#choices-of-cutoff-values)
+ on how to decide the three crucial parameters.
 
 ### `-u HMM_UPPER` / `--upper HMM_UPPER`
 
@@ -75,17 +134,17 @@ length 500-1000bps long). Default: 10
 
 The fold change cutoff for prescanning candidate regions in the whole
 dataset. Then we will use HMM to predict/decode states on these
-candidate regions. Higher the prescan cutoff, fewer regions will be
-considered. Must > 1. This is an important parameter for decoding so
-please read. The purpose of this parameter is to EXCLUDE those
-chromatin regions having noises/random enrichment so we can have a
-large number of possible regions to predict the HMM states. It's
+candidate regions. The higher the prescan cutoff, the fewer regions
+will be considered. Must be > 1. This is an important parameter for
+decoding so please read. The purpose of this parameter is to EXCLUDE
+those chromatin regions having noises/random enrichment so we can have
+a large number of possible regions to predict the HMM states. It's
 highly recommended to run the `--cutoff-analysis-only` first to decide
 the lower cutoff `-l`, the upper cutoff `-u`, and the pre-scanning
 cutoff `-c`. The pre-scanning cutoff should be the cutoff close to the
-BOTTOM of the cutoff analysis result that can capture large number of
-possible peaks with normal length (average length 500-1000bps). In
-most cases, please do not pick a cutoff too low that capture almost
+BOTTOM of the cutoff analysis result that can capture a large number
+of possible peaks with normal length (average length 500-1000bps). In
+most cases, please do not pick a cutoff too low that captures almost
 all the background noises from the data. Default: 1.2
 
 

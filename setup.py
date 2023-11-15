@@ -22,7 +22,7 @@ exec(open("MACS3/Utilities/Constants.py").read())
 
 # classifiers
 classifiers =[\
-              'Development Status :: 4 - Beta',
+              'Development Status :: 5 - Production/Stable',
               'Environment :: Console',
               'Intended Audience :: Developers',
               'Intended Audience :: Science/Research',
@@ -34,6 +34,7 @@ classifiers =[\
               'Programming Language :: Python :: 3.9',
               'Programming Language :: Python :: 3.10',
               'Programming Language :: Python :: 3.11',
+              'Programming Language :: Python :: 3.12',
               'Programming Language :: Cython', ]
 
 install_requires = [ "numpy>=1.19",

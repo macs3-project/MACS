@@ -1,5 +1,5 @@
 # INSTALL Guide For MACS3
-Time-stamp: <2023-06-16 11:46:32 Tao Liu>
+Time-stamp: <2023-11-14 16:43:54 Tao Liu>
 
 Please check the following instructions to complete your installation.
 
@@ -7,15 +7,19 @@ Please check the following instructions to complete your installation.
 
 Here we list some prerequisites for installing and running MACS3. But
 if you are using conda or pip to install, the installer will check the
-dependencies and install them if necessary.
+dependencies and install them if necessary. Please note that, we
+haven't tested installation on any Windows OS, so currently only Linux
+and Mac OS systems are supported.
 
 ### Python3
 
-MACS v3.x.x requires Python3. We have tested MACS in Python3.8 to 3.11. 
+MACS v3.x.x requires Python3. We have tested MACS in Python3.9 to 3.12. 
 
 ### NumPy, hmmlearn
 
-MACS requires NumPy>=1.19 (>=1.24 recommended) and hmmlearn>=0.3 during installation. Note that hmmlearn further requires SciPy and sklearn (aka scikit-learn). 
+MACS requires NumPy>=1.19 (>=1.24 recommended) and hmmlearn>=0.3
+during installation. Note that hmmlearn further requires SciPy and
+sklearn (aka scikit-learn).
 
 ### Cython
 
@@ -49,7 +53,6 @@ install Xcode; if you are using Linux, you need to make sure
 `python-dev` package is installed -- the actual package name depends 
 on the Linux OS distribution, you are using. 
 
-
 ## Prepare a virtual Python environment 
 
 We strongly recommend installing your MACS program in a virtual
@@ -65,8 +68,10 @@ Then activate it by
 
 `$ source MyPythonEnv/bin/activate`
 
-If you use 'conda', it will also provide virtual environment. Please 
-read: [conda](https://docs.conda.io/projects/conda/en/latest/user-guide/getting-started.html) or [miniconda](https://docs.conda.io/en/latest/miniconda.html)
+If you use 'conda', it will also provide virtual environment. Please
+read:
+[conda](https://docs.conda.io/projects/conda/en/latest/user-guide/getting-started.html)
+or [miniconda](https://docs.conda.io/en/latest/miniconda.html)
 
 ## Install through PyPI
 

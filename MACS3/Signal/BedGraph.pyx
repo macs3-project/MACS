@@ -1,6 +1,6 @@
 # cython: language_level=3
 # cython: profile=True
-# Time-stamp: <2023-07-28 12:06:48 Tao Liu>
+# Time-stamp: <2023-11-02 11:40:47 Tao Liu>
 
 """Module for BedGraph data class.
 
@@ -96,9 +96,9 @@ cdef class bedGraphTrackI:
     """
     cdef:
         dict __data
-        float32_t maxvalue
-        float32_t minvalue
-        float32_t baseline_value
+        public float32_t maxvalue
+        public float32_t minvalue
+        public float32_t baseline_value
 
     def __init__ (self, float32_t baseline_value=0 ):
         """
@@ -194,7 +194,7 @@ cdef class bedGraphTrackI:
         if value > self.maxvalue:
             self.maxvalue = value
         if value < self.minvalue:
-            self.minvalue = value        
+            self.minvalue = value
 
     cpdef add_chrom_data( self, bytes chromosome, object p, object v ):
         """Add a pv data to a chromosome. Replace the previous data.
@@ -1131,30 +1131,57 @@ cdef class bedGraphTrackI:
         #ret.merge_regions()
         return ret
 
-    cpdef str cutoff_analysis ( self, int32_t max_gap, int32_t min_length, int32_t steps = 100, float32_t max_score = 1000 ):
+    cpdef str cutoff_analysis ( self, int32_t max_gap, int32_t min_length, int32_t steps = 100, float32_t min_score = 0, float32_t max_score = 1000 ):
         """
         Cutoff analysis function for bedGraphTrackI object.
     
-        This function will try all possible cutoff values on the score column to call peaks. Then 
-        will give a report of a number of metrics (number of peaks, total length of peaks, average
-        length of peak) at varying score cutoffs. For each score cutoff, the function finds the 
-        positions where the score exceeds the cutoff, then groups those positions into "peaks" 
-        based on the maximum allowed gap (max_gap) between consecutive positions. If a peak's length
-        exceeds the minimum length (min_length), the peak is counted.
+        This function will try all possible cutoff values on the score
+        column to call peaks. Then will give a report of a number of
+        metrics (number of peaks, total length of peaks, average
+        length of peak) at varying score cutoffs. For each score
+        cutoff, the function finds the positions where the score
+        exceeds the cutoff, then groups those positions into "peaks"
+        based on the maximum allowed gap (max_gap) between consecutive
+        positions. If a peak's length exceeds the minimum length
+        (min_length), the peak is counted.
 
         Parameters
         ----------
+
         max_gap : int32_t
         Maximum allowed gap between consecutive positions above cutoff
         
-        min_length : int32_t
-        Minimum length of peak
-        
+        min_length : int32_t Minimum length of peak
         steps: int32_t
+        It will be used to calculate 'step' to increase from min_v to
+        max_v (see below).
+
+        min_score: float32_t
+        Minimum score for cutoff analysis. Note1: we will take the
+        larger value between the actual minimum value in the BedGraph
+        and min_score as min_v. Note2: the min_v won't be included in
+        the final result. We will try to output the smallest cutoff as
+        min_v+step.
+
+        max_score: float32_t
+        Maximum score for cutoff analysis. Note1: we will take the
+        smaller value between the actual maximum value in the BedGraph
+        and max_score as max_v. Note2: the max_v may not be included
+        in the final result. We will only output the cutoff that can
+        generate at least 1 peak.
 
         Returns
         -------
-        Cutoff analysis report in 'str'
+
+        Cutoff analysis report in str object.
+
+        Todos
+        -----
+
+        May need to seperate this function out as a class so that we
+        can add more ways to analyze the result. Also, we can let this
+        function return a list of dictionary or data.frame in that
+        way, instead of str object.
         
         """
         cdef:
@@ -1171,7 +1198,7 @@ cdef class bedGraphTrackI:
 
         #midvalue = self.minvalue/2 + self.maxvalue/2
         #s = float(self.minvalue - midvalue)/steps
-        minv = max( 0, self.minvalue )
+        minv = max( min_score, self.minvalue )
         maxv = min( self.maxvalue, max_score )
 
         s = float(maxv - minv)/steps
