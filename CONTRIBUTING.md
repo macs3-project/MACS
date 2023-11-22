@@ -19,7 +19,7 @@ The following is a set of guidelines for contributing to MACS, which is hosted i
   * [Pull Requests](#pull-requests)
 
 [Styleguides](#styleguides)
-  * [Git Commit Messages](#git-commit-messages)
+  <!-- * [Git Commit Messages](#git-commit-messages) this doesnt link anywhere -->
   * [Python Styleguide](#python-styleguide)
   * [Documentation Styleguide](#documentation-styleguide)
 
@@ -38,10 +38,10 @@ This project and everyone participating in it is governed by the [Code of Conduc
 
 We have an official tutorial and a detailed FAQ compiled from the community. 
 
-* [MACS documentations](https://macs3.github.io)
-  * [MACS tutorial](https://macs3.github.io)
-  * [MACS FAQ](https://macs3.github.io)
-  * [MACS API](https://macs3.github.io)
+* [MACS documentations](https://macs3-project.github.io/MACS/)
+  * [MACS tutorial](https://macs3.github.io) <!-- change link? -->
+  * [MACS FAQ](https://macs3.github.io) <!-- change link? -->
+  * [MACS API](https://macs3.github.io) <!-- change link? -->
 
 ### MACS Slack Community
 
@@ -65,7 +65,8 @@ Before creating bug reports, please check [this list](#before-submitting-a-bug-r
 
 #### Before Submitting A Bug Report
 
-...
+* Search [previous bugs](https://github.com/macs3-project/MACS/issues) that other people have submitted. Your issue may have been addressed, someone else may have had a similar experience, or a solution may have been implemented. Consider searching for issues that are closed or are tagged with the label "Bug Report".
+* Similarly, search through the [discussion page](https://github.com/macs3-project/MACS/discussions). There may be a discussion already started about your issue.
 
 #### How Do I Submit A (Good) Bug Report?
 
