@@ -27,6 +27,8 @@ jobs:
           mkdir site_source
           cp -r docs/ site_source/
           cp *.md site_source/
+          cp _config.yml site_source/
+          cp -r _layouts/ site_source/
       - name: Setup Pages
         uses: actions/configure-pages@v3
       - name: Build Website

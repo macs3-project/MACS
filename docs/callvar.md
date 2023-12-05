@@ -170,8 +170,7 @@ control analogously to $g_c$. We use $r_c$ to denote the total number
 of observed allele A ($r_{c,A}$) and allele B ($r_{c,B}$). We assume
 the occurrence of the allele A ($g_c$) is from a Bernoulli trial from
 $r_c$ with the allele ratio $\omega$. The probability of observing the
-ChIP-Seq data at a certain position under a certain binding type is as
-follows:
+ChIP-Seq data at a certain position is as follows:
 
 
 $$Pr(D_c|g_c) = \sum^{r_{c,A}}_{j=1}\left((1-\epsilon_j)g_c/r_c+\epsilon_j(1-g_c/r_c)\right)\sum_{j=1}^{r_{c,B}}\left((1-\epsilon_j)(1-g_c/r_c)+\epsilon_j g_c/r_c\right)$$
