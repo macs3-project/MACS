@@ -7,15 +7,9 @@ on:
   push:
     paths:
       - 'docs/**'
-      - '*.md'
+      - '**.md'
     branches: 
-      - 'doc/macs3/*'
-  pull_request:
-    paths:
-      - 'docs/**'
-      - '*.md'
-    branches: 
-      - 'doc/macs3/*'
+      - 'doc/macs3/**'
 jobs:
   build:
     runs-on: ubuntu-20.04

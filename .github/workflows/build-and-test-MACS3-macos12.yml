@@ -7,15 +7,15 @@ on:
   push:
     paths-ignore:
       - 'docs/**'
-      - '*.md'
+      - '**.md'
     branches-ignore: 
-      - 'doc/macs3/*'
+      - 'doc/macs3/**'
   pull_request:
     paths-ignore:
       - 'docs/**'
-      - '*.md'
+      - '**.md'
     branches-ignore: 
-      - 'doc/macs3/*'
+      - 'doc/macs3/**'
 jobs:
   build:
     runs-on: macos-12
