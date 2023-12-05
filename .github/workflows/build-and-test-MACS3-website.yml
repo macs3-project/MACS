@@ -22,11 +22,17 @@ jobs:
         uses: actions/checkout@v4
         #with: # we don't need submodules for building docs
         #  submodules: 'true'
+      - name: Copy md and images over
+        run: |
+          mkdir site_source
+          cp -r docs/ site_source/
+          cp *.md site_source/
       - name: Setup Pages
         uses: actions/configure-pages@v3
       - name: Build Website
         uses: actions/jekyll-build-pages@v1
         with:
+          source: "./site_source"
           destination: "./site_output"
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v1
