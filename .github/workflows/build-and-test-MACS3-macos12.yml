@@ -8,13 +8,12 @@ on:
     paths-ignore:
       - 'docs/**'
       - '*.md'
-      - '.github/*'
+      - '.github/workflows/*'
   pull_request:
     paths-ignore:
       - 'docs/**'
       - '*.md'
-      - '.github/*'
-
+      - '.github/workflows/*'
 jobs:
   build:
     runs-on: macos-12

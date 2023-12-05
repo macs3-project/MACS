@@ -8,12 +8,12 @@ on:
     paths-ignore:
       - 'docs/**'
       - '*.md'
-      - '.github/*'
+      - '.github/workflows/*'
   pull_request:
     paths-ignore:
       - 'docs/**'
       - '*.md'
-      - '.github/*'
+      - '.github/workflows/*'
 jobs:
   build_job:
     runs-on: ubuntu-20.04

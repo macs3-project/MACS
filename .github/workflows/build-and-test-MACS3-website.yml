@@ -34,7 +34,7 @@ jobs:
           gem install github-pages
       - name: Build the site in Jekyll
         run: |
-          jekyll build
+          jekyll build --source docs --destination _site
       - name: Archive HTML files
         run: |
           zip -r site.zip ./_site
