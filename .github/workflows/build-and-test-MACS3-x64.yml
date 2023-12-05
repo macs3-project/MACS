@@ -8,14 +8,13 @@ on:
     paths-ignore:
       - 'docs/**'
       - '**.md'
-    branches-ignore:
-      - 'doc/macs3/**'
+      - '.github/workflows/**'
   pull_request:
     paths-ignore:
       - 'docs/**'
       - '**.md'
-    branches-ignore:
-      - 'doc/macs3/**'
+      - '.github/workflows/**'
+
 jobs:
   build:
     runs-on: ubuntu-20.04

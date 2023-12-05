@@ -8,8 +8,7 @@ on:
     paths:
       - 'docs/**'
       - '**.md'
-    branches: 
-      - 'doc/macs3/**'
+
 jobs:
   build:
     runs-on: ubuntu-20.04
