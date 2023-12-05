@@ -1,0 +1,42 @@
+# This workflow will install Python dependencies, run tests and lint with a single version of Python
+# For more information see: https://help.github.com/actions/language-and-framework-guides/using-python-with-github-actions
+
+name: MACS3 website using Jekyll
+
+on: 
+  push:
+    paths:
+      - 'docs/**'
+      - '**.md'
+
+jobs:
+  build:
+    runs-on: ubuntu-20.04
+    strategy: 
+      matrix: 
+        python-version: [3.12]
+        arch: ['x64']
+    name: Build MACS3 website on x64 with Python ${{ matrix.python-version }}
+    steps:
+      - name: Checkout MACS
+        uses: actions/checkout@v4
+        #with: # we don't need submodules for building docs
+        #  submodules: 'true'
+      - name: Copy md and images over
+        run: |
+          mkdir site_source
+          cp -r docs/ site_source/
+          cp *.md site_source/
+          cp _config.yml site_source/
+          cp -r _layouts/ site_source/
+      - name: Setup Pages
+        uses: actions/configure-pages@v3
+      - name: Build Website
+        uses: actions/jekyll-build-pages@v1
+        with:
+          source: "./site_source"
+          destination: "./site_output"
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v1
+        with:
+          path: "./site_output"

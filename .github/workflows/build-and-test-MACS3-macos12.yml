@@ -7,12 +7,14 @@ on:
   push:
     paths-ignore:
       - 'docs/**'
-      - '*.md'
+      - '**.md'
+      - '.github/workflows/**'
   pull_request:
     paths-ignore:
       - 'docs/**'
-      - '*.md'
-      
+      - '**.md'
+      - '.github/workflows/**'
+
 jobs:
   build:
     runs-on: macos-12
@@ -32,7 +34,7 @@ jobs:
           key: ${{ runner.os }}-pip-${{ hashFiles('requirements.txt') }}
           restore-keys: |
             ${{ runner.os }}-pip-
-            ${{ runner.os }}-        
+            ${{ runner.os }}-
       - name: Setup venv
         run: |
           # create venv

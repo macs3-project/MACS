@@ -162,7 +162,7 @@ control.
 
 The whole genome background can be calculated as
 `the_number_of_control_reads\fragment_length/genome_size`, and in our
-example, it is $`199867*254/2700000000 ~= .0188023`$. You don\'t need to
+example, it is $199867*254/2700000000 ~= .0188023$. You don\'t need to
 run subcommands to build a genome background track since it\'s just a
 single value.
 

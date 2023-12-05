@@ -155,53 +155,47 @@ four types. We assume the independence of ChIP and control experiments
 so that the generalized likelihood function is the product of the
 likelihood functions of ChIP and control data:
 
-```math
-L(\omega,\phi,g_c,g_i:D)=L(\omega,g_c:D_c)L(\phi,g_i:D_i)$$
-```
-where $`D_c`$ and $`D_i`$ represent the ChIP-Seq and control (e.g.,
+$$L(\omega,\phi,g_c,g_i:D)=L(\omega,g_c:D_c)L(\phi,g_i:D_i)$$
+
+where $D_c$ and $D_i$ represent the ChIP-Seq and control (e.g.,
 genomic input) data observed at the position including base coverage
 and base qualities. The parameter $\omega$ stands for the allele ratio
 of allele A (chosen as the more abundant or stronger allele compared
 with the others) from the ChIP-Seq data and $\phi$ represents the
-allele ratio in the control. The parameter $`g_c`$ represents the
-actual number of ChIPed DNA fragments containing allele A, which could
-differ from the observed count $`r_{c,A}`$ considering that some
-observations could be due to sequencing errors. The symbol $`g_i`$
-represents the control analogously to $`g_c`$. We use $`r_c`$ to
-denote the total number of observed allele A ($`r_{c,A}`$) and allele
-B ($`r_{c,B}`$). We assume the occurrence of the allele A ($`g_c`$)
-is from a Bernoulli trial from $`r_c`$ with the allele ratio
-$\omega$. The probability of observing the ChIP-Seq data at a certain
-position under a given type is as follows:
+allele ratio in the control. The parameter $g_c$ represents the actual
+number of ChIPed DNA fragments containing allele A, which could differ
+from the observed count $r_{c,A}$ considering that some observations
+could be due to sequencing errors. The symbol $g_i$ represents the
+control analogously to $g_c$. We use $r_c$ to denote the total number
+of observed allele A ($r_{c,A}$) and allele B ($r_{c,B}$). We assume
+the occurrence of the allele A ($g_c$) is from a Bernoulli trial from
+$r_c$ with the allele ratio $\omega$. The probability of observing the
+ChIP-Seq data at a certain position is as follows:
 
-```math
-Pr(D_c|g_c,\omega) = Pr(D_c|g_c) =
- \sum^{r_{c,A}}_{j=1}\left((1-\epsilon_j)g_c/r_c+\epsilon_j(1-g_c/r_c)\right)\sum_{j=1}^{r_{c,B}}\left((1-\epsilon_j)(1-g_c/r_c)+\epsilon_j
- g_c/r_c\right)
- ```
 
-where $`\epsilon_j`$ represents the sequencing error of the base
-showing difference with reference genome in case of mismatch
-(corresponding to SNV) and insertion. In case of deletion, the
-sequencing errors from the two bases on sequenced read surrounding the
-deletion would be considered. We model the control data in the similar
-way. We assess the likelihood functions of the 4 major type using the
-following parameters: $`\omega=1,\phi=1,g_c=r_{c,0},g_i=r_{i,0}`$ for
-A/A genotype; $`\omega=0,\phi=0,g_c=0,g_i=0`$ for B/B genotype,
-$`\omega=0.5,\phi=0.5`$ and $`g_c,g_i`$ as free variables for A/B
-genotype with unbiased binding; $`\phi=0.5`$ and $`\omega,g_c,g_i`$ as
-free variables for A/B genotype with biased binding or allele
-usage. Next, we apply the Bayesian Information Criterion (BIC) to
-select the best type as our prediction with the minimal BIC value
-among the 4 models. If the best type is either “A/B, noAS” or “A/B,
-AS”, we conclude that the genotype is heterozygous (A/B). We consider
-two types of data from the same assay independently: ChIP sample that
-can have biased allele usage, and control sample that won’t have
-biased allele usage. So that in case control is not available, such as
-in ATAC-Seq assay, our model can still work. Furthermore, in case a
-good quality WGS is available, it can be regarded as the control
-sample and be inserted into our calculation to further increase the
-sensitivity.
+$$Pr(D_c|g_c) = \sum^{r_{c,A}}_{j=1}\left((1-\epsilon_j)g_c/r_c+\epsilon_j(1-g_c/r_c)\right)\sum_{j=1}^{r_{c,B}}\left((1-\epsilon_j)(1-g_c/r_c)+\epsilon_j g_c/r_c\right)$$
+
+where $\epsilon_j$ represents the sequencing error of the base showing
+difference with reference genome in case of mismatch (corresponding to
+SNV) and insertion. In case of deletion, the sequencing errors from
+the two bases on sequenced read surrounding the deletion would be
+considered. We model the control data in the similar way. We assess
+the likelihood functions of the 4 major type using the following
+parameters: $\omega=1,\phi=1,g_c=r_{c,0},g_i=r_{i,0}$ for A/A
+genotype; $\omega=0,\phi=0,g_c=0,g_i=0$ for B/B genotype,
+$\omega=0.5,\phi=0.5$ and $g_c,g_i$ as free variables for A/B genotype
+with unbiased binding; $\phi=0.5$ and $\omega,g_c,g_i$ as free
+variables for A/B genotype with biased binding or allele usage. Next,
+we apply the Bayesian Information Criterion (BIC) to select the best
+type as our prediction with the minimal BIC value among the 4
+models. If the best type is either “A/B, noAS” or “A/B, AS”, we
+conclude that the genotype is heterozygous (A/B). We consider two
+types of data from the same assay independently: ChIP sample that can
+have biased allele usage, and control sample that won’t have biased
+allele usage. So that in case control is not available, such as in
+ATAC-Seq assay, our model can still work. Furthermore, in case a good
+quality WGS is available, it can be regarded as the control sample and
+be inserted into our calculation to further increase the sensitivity.
 
 ## Customized fields in the Output VCF file
 

@@ -7,11 +7,14 @@ on:
   push:
     paths-ignore:
       - 'docs/**'
-      - '*.md'
+      - '**.md'
+      - '.github/workflows/**'
   pull_request:
     paths-ignore:
       - 'docs/**'
-      - '*.md'
+      - '**.md'
+      - '.github/workflows/**'
+
 jobs:
   build_job:
     runs-on: ubuntu-20.04
@@ -20,7 +23,7 @@ jobs:
       matrix:
         include:
           - arch: aarch64
-            distro: bullseye        
+            distro: bullseye
           - arch: armv7
             distro: bullseye
           - arch: ppc64le
@@ -83,7 +86,7 @@ jobs:
             # let's make sure this file is gone...
             rm -f no-global-site-packages.txt
             
-            # upgrade pip            
+            # upgrade pip
             pip install --progress-bar off --upgrade pip
             
             # install dependencies that are not in Debian/Linux

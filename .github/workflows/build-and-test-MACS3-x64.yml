@@ -7,11 +7,14 @@ on:
   push:
     paths-ignore:
       - 'docs/**'
-      - '*.md'
+      - '**.md'
+      - '.github/workflows/**'
   pull_request:
     paths-ignore:
       - 'docs/**'
-      - '*.md'
+      - '**.md'
+      - '.github/workflows/**'
+
 jobs:
   build:
     runs-on: ubuntu-20.04
