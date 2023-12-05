@@ -29,13 +29,12 @@ jobs:
         uses: ruby/setup-ruby@v1
         with:
           ruby-version: '3.1'
-      - name: Install dependencies
+      - name: Install github-pages
         run: |
-          gem install bundler
-          bundle install
+          gem install github-pages
       - name: Build the site in Jekyll
         run: |
-          bundle exec jekyll build
+          jekyll build
       - name: Archive HTML files
         run: |
           zip -r site.zip ./_site
