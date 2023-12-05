@@ -8,10 +8,14 @@ on:
     paths:
       - 'docs/**'
       - '*.md'
+    branches: 
+      - 'doc/macs3/*'
   pull_request:
     paths:
       - 'docs/**'
       - '*.md'
+    branches: 
+      - 'doc/macs3/*'
 jobs:
   build:
     runs-on: ubuntu-20.04
@@ -25,21 +29,9 @@ jobs:
         uses: actions/checkout@v4
         #with: # we don't need submodules for building docs
         #  submodules: 'true'
-      - name: Set up Ruby
-        uses: ruby/setup-ruby@v1
-        with:
-          ruby-version: '3.1'
-      - name: Install github-pages
-        run: |
-          gem install github-pages
-      - name: Build the site in Jekyll
-        run: |
-          jekyll build --source docs --destination _site
-      - name: Archive HTML files
-        run: |
-          zip -r site.zip ./_site
-      - name: Upload Artifact
-        uses: actions/upload-artifact@v3
-        with:
-          name: jekyll-site
-          path: site.zip
+      - name: Setup Pages
+        uses: actions/configure-pages@v3
+      - name: Build
+        uses: actions/jekyll-build-pages@v1
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v1
