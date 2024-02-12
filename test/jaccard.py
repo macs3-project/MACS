@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# Time-stamp: <2024-02-12 15:21:42 Tao Liu>
+# Time-stamp: <2024-02-12 16:19:12 Tao Liu>
 
 import sys
 
@@ -18,6 +18,8 @@ def main():
     peak1 = open( sys.argv[1] )
     regions1 = Regions()
     for l in peak1:
+        if l.startswith("track"):
+            continue
         fs = l.rstrip().split()
         regions1.add_loc( fs[0].encode(), int(fs[1]), int(fs[2]) )
     regions1.sort()
@@ -26,6 +28,8 @@ def main():
     peak2 = open( sys.argv[2] )
     regions2 = Regions()
     for l in peak2:
+        if l.startswith("track"):
+            continue
         fs = l.rstrip().split()
         regions2.add_loc( fs[0].encode(), int(fs[1]), int(fs[2]) )
     regions2.sort()
@@ -35,6 +39,9 @@ def main():
     inter = regions1.intersect(regions2)
     tl_inter = inter.total_length()
 
+    if (tl1 + tl2 - tl_inter) == 0:
+        # this means both of the files are empty
+        print (1.0)
     jaccard_index = tl_inter / (tl1 + tl2 - tl_inter)
     print (jaccard_index)
 

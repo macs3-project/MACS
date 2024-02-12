@@ -1,10 +1,12 @@
 #!/bin/bash
-# Time-stamp: <2024-02-12 15:49:21 Tao Liu>
+# Time-stamp: <2024-02-12 16:08:01 Tao Liu>
 
 # integrative subcmds testing
 
 if [ $# -lt 1 ];then
-    echo "Run all tests for subcommands of MACS3. Need >=1 parameter for a tag name! A unique string combining date, time and MACS3 version is recommended. ./test.sh <TAG> [UPDATE]\n If UPDATE is set with anything, aka, this command sees a second parameter, the standard output results will be replaced."
+    echo "Run all tests for subcommands of MACS3. Need >=1 parameter for a tag name! A unique string combining date, time and MACS3 version is recommended. ./cmdlinetest <TAG> [UPDATE]"
+    echo ""
+    echo "If UPDATE is set with anything, aka, this command sees a second parameter, the standard output results will be replaced."
     exit
 fi
 
@@ -262,6 +264,7 @@ for i in ${subfolders[@]};do
 	echo "16.${m}.${n} checking $i $k ..."
 	fq=${OUTPUTDIR_PREFIX}_run_${i}/${k}
 	fs=standard_results_${i}/${k}
+	echo "  checking the files: $fq vs $fs"
 	if [ "${REPLACE}" = "Y" ]; then
 	    cp $fq $fs
 	    echo " ... replaced!"
