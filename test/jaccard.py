@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# Time-stamp: <2024-02-12 16:19:12 Tao Liu>
+# Time-stamp: <2024-02-12 16:46:59 Tao Liu>
 
 import sys
 
@@ -41,9 +41,10 @@ def main():
 
     if (tl1 + tl2 - tl_inter) == 0:
         # this means both of the files are empty
-        print (1.0)
-    jaccard_index = tl_inter / (tl1 + tl2 - tl_inter)
-    print (jaccard_index)
+        print ( 1.0 )
+    else:
+        jaccard_index = tl_inter / (tl1 + tl2 - tl_inter)
+        print ( jaccard_index )
 
 if __name__ == '__main__':
     main()
