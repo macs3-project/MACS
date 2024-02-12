@@ -1,5 +1,5 @@
 #!/bin/bash
-# Time-stamp: <2023-08-02 17:59:43 Tao Liu>
+# Time-stamp: <2024-02-12 15:49:21 Tao Liu>
 
 # integrative subcmds testing
 
@@ -266,15 +266,28 @@ for i in ${subfolders[@]};do
 	    cp $fq $fs
 	    echo " ... replaced!"
 	else
-	    sort $fq| grep -v ^# > tmp_fq.txt
-	    sort $fs| grep -v ^# > tmp_fs.txt
-	    d=`diff tmp_fq.txt tmp_fs.txt`
-	    if [ -z "$d" ]; then
-		echo " ... success!"
+	    # here we will check if the files are the same/similar
+	    if [[ "$fq" == *.bed || "$fq" == *.gappedPeak || "$fq" == *.narrowPeak || "$fq" == *.bed12 ]]; then
+		# for peaks, we will use our jaccard index script to check
+		ji=$(python ./jaccard.py "$fq" "$fs")
+		# Compare the output value
+		if (( $(echo "$ji > 0.99" | bc -l) )); then
+		    echo " ... success!"
+		else
+		    echo " ... failed! jaccard index = $ji"
+		    let "flag=1"
+		fi
 	    else
-		echo " ... failed! Difference:"
-		diff tmp_fq.txt tmp_fs.txt | head -10
-		let "flag=1";
+		sort $fq| grep -v ^# > tmp_fq.txt
+		sort $fs| grep -v ^# > tmp_fs.txt
+		d=`diff tmp_fq.txt tmp_fs.txt`
+		if [ -z "$d" ]; then
+		    echo " ... success!"
+		else
+		    echo " ... failed! Difference:"
+		    diff tmp_fq.txt tmp_fs.txt | head -10
+		    let "flag=1";
+		fi
 	    fi
 	fi
     done

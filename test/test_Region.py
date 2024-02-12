@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# Time-stamp: <2022-09-14 14:32:12 Tao Liu>
+# Time-stamp: <2024-02-12 15:23:48 Tao Liu>
 
 import unittest
 import sys
@@ -18,6 +18,8 @@ class Test_Regions(unittest.TestCase):
                               (b"chrY",600,800),
                               (b"chrY",1200,1300),
                               ]
+        # when we add test_regions1 and test_region2 into the same
+        # Regions, we should get this from 'merge_overlaps'
         self.merge_result_regions = [ (b"chrY",0,200),
                                       (b"chrY",300,500),
                                       (b"chrY",600,900),
@@ -38,6 +40,26 @@ class Test_Regions(unittest.TestCase):
                                 "chr1\t1000\t1200\nchrY\t100\t200\nchrY\t300\t400\n",
                                 "chrY\t600\t800\nchrY\t1200\t1300\n"]
 
+        # test_regions4 and test_regions5 are used to test the intersection
+        self.test_regions4 = [(b"chrY",0,100),
+                              (b"chrY",300,500),
+                              (b"chrY",700,900),
+                              (b"chrY",1000,1200)
+                              ]
+        self.test_regions5 = [(b"chrY",100,200),
+                              (b"chrY",300,400),
+                              (b"chrY",600,800),
+                              (b"chrY",1100,1150),
+                              (b"chrY",1175,1300)
+                              ]
+        # After we add test_regions4 and test_region5 into two Regions
+        # objects, we should get this from 'intersect'
+        self.intersect_regions_4_vs_5 = { b"chrY": [ (300, 400),
+                                                     (700, 800),
+                                                     (1100,1150),
+                                                     (1175,1200) ] }
+
+        
     def test_add_loc1( self ):
         # make sure the shuffled sequence does not lose any elements
         self.r1 = Regions()
@@ -68,3 +90,15 @@ class Test_Regions(unittest.TestCase):
         while self.r.total != 0:
             ret_list_regions.append( str( self.r.pop( 3 ) ) )
         self.assertEqual( ret_list_regions, self.popped_regions )
+
+    def test_intersect( self ):
+        self.r4 = Regions()
+        for a in self.test_regions4:
+            self.r4.add_loc(a[0],a[1],a[2])        
+        self.r5 = Regions()
+        for a in self.test_regions5:
+            self.r5.add_loc(a[0],a[1],a[2])
+        self.intersect_4_vs_5 = self.r4.intersect( self.r5 )
+        self.assertEqual( self.intersect_4_vs_5.regions, self.intersect_regions_4_vs_5 )
+        self.intersect_4_vs_5 = self.r5.intersect( self.r4 )
+        self.assertEqual( self.intersect_4_vs_5.regions, self.intersect_regions_4_vs_5 )        
