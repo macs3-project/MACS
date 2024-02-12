@@ -1,2 +1,2 @@
 [build-system]
-requires=['setuptools>=60.0', 'numpy>=1.19', 'cykhash>=2.0,<3.0', 'Cython~=3.0', 'hmmlearn>=0.3']
+requires=['setuptools>=60.0', 'numpy==1.24', 'cykhash>=2.0,<3.0', 'Cython~=3.0', 'hmmlearn>=0.3']
