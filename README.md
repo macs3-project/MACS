@@ -27,7 +27,30 @@ applied to any "DNA enrichment assays" if the question to be asked is
 simply: *where we can find significant reads coverage than the random
 background*.
 
-##  Changes for MACS (3.0.0)
+## Changes for MACS (3.0.1)
+
+*Bugs fixed*
+
+1) Fixed a bug that the `hmmatac` can't correctly save the
+	digested signal files. #605 #611
+
+2) Applied a patch to remove cython requirement from the installed
+	system. (it's needed for building the package). #606 #612
+
+3) Relax the testing script while comparing the peaks called from
+	current codes and the standard peaks. #615. To implement this, we
+	added 'intersection' function to 'Regions' class to find the
+	intersecting regions of two Regions object (similar to PeakIO but
+	only recording chromosome, start and end positions). And we
+	updated the unit test 'test_Region.py' then implemented a script
+	'jaccard.py' to compute the Jaccard Index of two peak files. If
+	the JI > 0.99 we would think the peaks called and the standard
+	peaks are similar. This is to avoid the problem caused by
+	different Numpy libraries, when the certain peak coordinates may
+	have 1bp difference.
+
+
+## Changes for MACS (3.0.0)
 
 1) Call variants in peak regions directly from BAM files. The
 	function was originally developed under code name SAPPER. Now
@@ -105,7 +128,7 @@ background*.
 The common way to install MACS is through
 [PYPI](https://pypi.org/project/macs3/)) or
 [conda](https://anaconda.org/macs3/macs3). Please check the
-[INSTALL](./docs/INSTALL.md) document for detail.
+[INSTALL](docs/INSTALL.md) document for detail.
 
 MACS3 has been tested using GitHub Actions for every push and PR in
 the following architectures:
@@ -144,30 +167,30 @@ of the subcommands.
 
 Subcommand | Description
 -----------|----------
-[`callpeak`](./docs/callpeak.md) | Main MACS3 Function to call peaks from alignment results.
-[`bdgpeakcall`](./docs/bdgpeakcall.md) | Call peaks from bedGraph file.
-[`bdgbroadcall`](./docs/bdgbroadcall.md) | Call nested broad peaks from bedGraph file.
-[`bdgcmp`](./docs/bdgcmp.md) | Comparing two signal tracks in bedGraph format.
-[`bdgopt`](./docs/bdgopt.md) | Operate the score column of bedGraph file.
-[`cmbreps`](./docs/cmbreps.md) | Combine bedGraph files of scores from replicates.
-[`bdgdiff`](./docs/bdgdiff.md) | Differential peak detection based on paired four bedGraph files.
-[`filterdup`](./docs/filterdup.md) | Remove duplicate reads, then save in BED/BEDPE format file.
-[`predictd`](./docs/predictd.md) | Predict d or fragment size from alignment results. In case of PE data, report the average insertion/fragment size from all pairs.
-[`pileup`](./docs/pileup.md) | Pileup aligned reads (single-end) or fragments (paired-end)
-[`randsample`](./docs/randsample.md) | Randomly choose a number/percentage of total reads, then save in BED/BEDPE format file.
-[`refinepeak`](./docs/refinepeak.md) | Take raw reads alignment, refine peak summits.
-[`callvar`](./docs/callvar.md) | Call variants in given peak regions from the alignment BAM files.
-[`hmmratac`](./docs/hmmratac.md) | Dedicated peak calling based on Hidden Markov Model for ATAC-seq data.
+[`callpeak`](docs/callpeak.md) | Main MACS3 Function to call peaks from alignment results.
+[`bdgpeakcall`](docs/bdgpeakcall.md) | Call peaks from bedGraph file.
+[`bdgbroadcall`](docs/bdgbroadcall.md) | Call nested broad peaks from bedGraph file.
+[`bdgcmp`](docs/bdgcmp.md) | Comparing two signal tracks in bedGraph format.
+[`bdgopt`](docs/bdgopt.md) | Operate the score column of bedGraph file.
+[`cmbreps`](docs/cmbreps.md) | Combine bedGraph files of scores from replicates.
+[`bdgdiff`](docs/bdgdiff.md) | Differential peak detection based on paired four bedGraph files.
+[`filterdup`](docs/filterdup.md) | Remove duplicate reads, then save in BED/BEDPE format file.
+[`predictd`](docs/predictd.md) | Predict d or fragment size from alignment results. In case of PE data, report the average insertion/fragment size from all pairs.
+[`pileup`](docs/pileup.md) | Pileup aligned reads (single-end) or fragments (paired-end)
+[`randsample`](docs/randsample.md) | Randomly choose a number/percentage of total reads, then save in BED/BEDPE format file.
+[`refinepeak`](docs/refinepeak.md) | Take raw reads alignment, refine peak summits.
+[`callvar`](docs/callvar.md) | Call variants in given peak regions from the alignment BAM files.
+[`hmmratac`](docs/hmmratac.md) | Dedicated peak calling based on Hidden Markov Model for ATAC-seq data.
 
 For advanced usage, for example, to run `macs3` in a modular way,
-please read the [advanced usage](./docs/Advanced_Step-by-step_Peak_Calling.md). There is a
-[Q&A](./docs/qa.md) document where we collected some common questions
+please read the [advanced usage](docs/Advanced_Step-by-step_Peak_Calling.md). There is a
+[Q&A](docs/qa.md) document where we collected some common questions
 from users.
 
 ## Contribute
 
-Please read our [CODE OF CONDUCT](./CODE_OF_CONDUCT.md) and [How to
-contribute](./CONTRIBUTING.md) documents. If you have any questions,
+Please read our [CODE OF CONDUCT](CODE_OF_CONDUCT.md) and [How to
+contribute](CONTRIBUTING.md) documents. If you have any questions,
 suggestion/ideas, or just want to have conversions with developers and
 other users in the community, we recommend using the [MACS
 Discussions](https://github.com/macs3-project/MACS/discussions)
@@ -193,3 +216,15 @@ contributions over the years.
  * [UCSC toolkits](http://hgdownload.cse.ucsc.edu/admin/exe/)
  * [deepTools](https://github.com/deeptools/deepTools/)
 
+
+```{toctree}
+:maxdepth: 2
+:hidden:
+
+docs/INSTALL.md
+docs/index.md
+docs/Advanced_Step-by-step_Peak_Calling.md
+docs/qa.md
+docs/tutorial.md
+CODE_OF_CONDUCT.md
+CONTRIBUTING.md
