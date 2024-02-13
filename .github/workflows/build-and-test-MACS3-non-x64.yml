@@ -88,15 +88,17 @@ jobs:
             pip install --progress-bar off --upgrade pip
             
             # install dependencies that are not in Debian/Linux
-            pip install --upgrade-strategy only-if-needed --progress-bar off Cython
-            pip install --upgrade-strategy only-if-needed --progress-bar off hmmlearn
-            pip install --upgrade-strategy only-if-needed --progress-bar off cykhash
-            pip install --upgrade --progress-bar off pytest
+            pip install pytest
+            if [ -f requirements.txt ]; then pip install --upgrade -r requirements.txt; fi
+            # pip install --upgrade-strategy only-if-needed --progress-bar off Cython
+            # pip install --upgrade-strategy only-if-needed --progress-bar off hmmlearn
+            # pip install --upgrade-strategy only-if-needed --progress-bar off cykhash
+            # pip install --upgrade --progress-bar off pytest
 
             
             # install MACS3; only-if-needed won't try to upgrade Debian/Linux python3 libs
-            pip install --upgrade-strategy only-if-needed --no-build-isolation --progress-bar off . 
-            
+            # pip install --upgrade-strategy only-if-needed --no-build-isolation --progress-bar off . 
+            pip install .
             # run test
             pytest --runxfail && cd test && ./cmdlinetest-nohmmratac macs3
 
