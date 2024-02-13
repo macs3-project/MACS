@@ -73,8 +73,8 @@ jobs:
             cd /home/macs3/
             
             # let's create virtualenv
-            # virtualenv --system-site-packages macsenv
-            python3.11 -m venv macsenv
+            virtualenv --system-site-packages macsenv
+            # python3.11 -m venv macsenv
             # virtualenv --python=python3.11 --system-site-packages macsenv
             source macsenv/bin/activate
             
@@ -86,7 +86,7 @@ jobs:
 
             # let's make sure this file is gone...
             rm -f no-global-site-packages.txt
-            
+
             python3 -m pip install --upgrade pip
             pip3 install pytest
             if [ -f requirements.txt ]; then pip3 install --upgrade -r requirements.txt; fi
