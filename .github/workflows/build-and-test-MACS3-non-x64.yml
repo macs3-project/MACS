@@ -38,7 +38,7 @@ jobs:
         id: build
         with:
           arch: ${{ matrix.arch }}
-          distro: bookworm
+          distro: ubuntu22.04
 
           githubToken: ${{ github.token }}
 
