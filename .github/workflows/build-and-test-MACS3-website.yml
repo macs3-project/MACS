@@ -1,42 +1,38 @@
-# This workflow will install Python dependencies, run tests and lint with a single version of Python
-# For more information see: https://help.github.com/actions/language-and-framework-guides/using-python-with-github-actions
-
-name: MACS3 website using Jekyll
+name: Build and Test MACS3 website using Sphinx
 
 on: 
-  push:
-    paths:
+  push: 
+    paths: 
       - 'docs/**'
       - '**.md'
+  # Allows you to run this workflow manually from the Actions tab
+  workflow_dispatch:
 
 jobs:
-  build:
-    runs-on: ubuntu-20.04
-    strategy: 
-      matrix: 
-        python-version: [3.12]
-        arch: ['x64']
-    name: Build MACS3 website on x64 with Python ${{ matrix.python-version }}
+  build-and-publish:
+    runs-on: ubuntu-latest
     steps:
-      - name: Checkout MACS
-        uses: actions/checkout@v4
-        #with: # we don't need submodules for building docs
-        #  submodules: 'true'
-      - name: Copy md and images over
-        run: |
-          mkdir site_source
-          cp -r docs/ site_source/
-          cp *.md site_source/
-          cp _config.yml site_source/
-          cp -r _layouts/ site_source/
-      - name: Setup Pages
-        uses: actions/configure-pages@v3
-      - name: Build Website
-        uses: actions/jekyll-build-pages@v1
-        with:
-          source: "./site_source"
-          destination: "./site_output"
-      - name: Upload artifact
-        uses: actions/upload-pages-artifact@v1
-        with:
-          path: "./site_output"
+    - uses: actions/checkout@v4  # Checks-out your repository under $GITHUB_WORKSPACE
+
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.11'  # Set up the Python version you need
+
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install sphinx myst-parser  # Add other dependencies you might have
+
+    - name: Build Sphinx Documentation
+      run: |
+        cd docs  # Change to your documentation directory if needed
+        make html
+        cd ..
+
+    - name: Upload artifact
+      uses: actions/upload-pages-artifact@v3
+      with:
+        # Upload entire repository
+        path: './docs/build/html'
+
