@@ -73,9 +73,16 @@ jobs:
             cd /home/macs3/
             
             # let's create virtualenv
-            virtualenv --system-site-packages macsenv
+            # virtualenv --system-site-packages macsenv
+            python3.11 -m venv macsenv
             # virtualenv --python=python3.11 --system-site-packages macsenv
             source macsenv/bin/activate
+            
+            python3 -m pip install --upgrade pip
+            pip3 install pytest
+            if [ -f requirements.txt ]; then pip3 install --upgrade -r requirements.txt; fi
+
+
             
             # copy source code over
             cp -r /MACS3 .
@@ -88,8 +95,6 @@ jobs:
             pip install --progress-bar off --upgrade pip
             
             # install dependencies that are not in Debian/Linux
-            pip install pytest
-            if [ -f requirements.txt ]; then pip install --upgrade -r requirements.txt; fi
             # pip install --upgrade-strategy only-if-needed --progress-bar off Cython
             # pip install --upgrade-strategy only-if-needed --progress-bar off hmmlearn
             # pip install --upgrade-strategy only-if-needed --progress-bar off cykhash
