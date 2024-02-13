@@ -76,7 +76,8 @@ jobs:
             cd /home/macs3/
             
             # let's create virtualenv
-            virtualenv --system-site-packages macsenv
+            # virtualenv --system-site-packages macsenv
+            virtualenv --python=python3.11 --system-site-packages macsenv
             source macsenv/bin/activate
             
             # copy source code over

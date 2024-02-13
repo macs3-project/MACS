@@ -38,7 +38,7 @@ jobs:
       - name: Setup venv
         run: |
           # create venv
-          python3 -m venv macs3venv
+          python3.11 -m venv macs3venv
       - name: Install dependencies
         run: |
           # make sure pip is the lastest
