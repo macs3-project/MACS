@@ -123,7 +123,7 @@ will be stored in a BAM file.
 
 ## `callvar` Algorithm
 
-![Callvar Algorithm](./callvar_algorithm.jpeg)
+![Callvar Algorithm](callvar_algorithm.jpeg)
 
 Functional sequencing assays which targeted at particular sequences,
 such as ChIP-Seq, were thought to be unsuitable for *de novo*
