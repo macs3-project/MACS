@@ -23,25 +23,22 @@ jobs:
       matrix:
         include:
           - arch: aarch64
-            distro: bullseye
           - arch: armv7
-            distro: bullseye
           - arch: ppc64le
-            distro: bullseye
           - arch: s390x
-            distro: bullseye
+
     steps:
       - name: Checkout MACS
         uses: actions/checkout@v3
         with:
           submodules: 'true'
 
-      - name: Set up arch and run (bullseye Python 3.9)
+      - name: Set up arch and run
         uses: uraimo/run-on-arch-action@v2
         id: build
         with:
           arch: ${{ matrix.arch }}
-          distro: ${{ matrix.distro }}
+          distro: ubuntu-20.04
 
           githubToken: ${{ github.token }}
 
@@ -69,7 +66,7 @@ jobs:
             apt-get install apt-utils
             apt-get install -yq libblas3 liblapack3 libblas-dev liblapack-dev
             # we rely on Debian/Linux python packages for numpy/scipy/sklearn 
-            apt-get install -yq python3 python3-pip python3-virtualenv python3-wheel python3-numpy python3-scipy python3-sklearn cython3 
+            apt-get install -yq python3.11 python3-pip python3-virtualenv python3-wheel python3-numpy python3-scipy python3-sklearn cython3 
             apt-get install -yq procps zlib1g zlib1g-dev gfortran
           run: |
             echo `uname -a`
