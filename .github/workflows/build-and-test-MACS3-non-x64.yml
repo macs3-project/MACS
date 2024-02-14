@@ -65,7 +65,13 @@ jobs:
             apt-get update -qq -y
             apt-get install apt-utils
             apt-get install -yq libblas3 liblapack3 libblas-dev liblapack-dev
-            # we rely on Debian/Linux python packages for numpy/scipy/sklearn 
+            # we rely on Debian/Ubuntu/Linux python packages for
+            # numpy/scipy/sklearn
+            # in Ubuntu 22
+            #  numpy: 1.21.5
+            #  scipy: 1.8.0
+            #  sklearn: 0.23.2
+            #  cython: 0.29.28
             apt-get install -yq python3 python3-pip python3-venv python3-wheel python3-numpy python3-scipy python3-sklearn cython3 
             apt-get install -yq procps zlib1g zlib1g-dev gfortran
           run: |
@@ -75,7 +81,7 @@ jobs:
             # let's create virtualenv
             python3 -m venv --system-site-packages macsenv
 
-            # virtualenv --python=python3.11 --system-site-packages macsenv
+            # activate macsenv
             source macsenv/bin/activate
             
             # copy source code over
@@ -85,25 +91,26 @@ jobs:
             # let's make sure this file is gone...
             rm -f no-global-site-packages.txt
 
+            # pip will be upgraded
             python3 -m pip install --upgrade pip
 
+            # since we require Cython3, cython will be upgraded to
+            # version > 3.0
+            # --upgrade-strategy only-if-needed flag is used so that
+            # we only upgrade libs if necessary. In this case, Cython,
+            # Numpy, setuptools will be upgraded.
             if [ -f requirements.txt ]; then
               pip3 install --upgrade-strategy only-if-needed -r requirements.txt;
             fi
 
-            # upgrade pip
-            # pip install --progress-bar off --upgrade pip
-            
-            # install dependencies that are not in Debian/Linux
-            # pip install --upgrade-strategy only-if-needed --progress-bar off Cython
-            # pip install --upgrade-strategy only-if-needed --progress-bar off hmmlearn
-            # pip install --upgrade-strategy only-if-needed --progress-bar off cykhash
-            # pip install --upgrade --progress-bar off pytest
-
-            
             # install MACS3; only-if-needed won't try to upgrade Debian/Linux python3 libs
-            # pip install --upgrade-strategy only-if-needed --no-build-isolation --progress-bar off . 
-            pip install --upgrade-strategy only-if-needed .
+            # pip install --upgrade-strategy only-if-needed
+            # --no-build-isolation --progress-bar off .
+
+            # Because we already upgraded the libraries in previous
+            # step, I don't expect to see any dependencies will be
+            # upgraded here.
+            pip3 install --upgrade-strategy only-if-needed .
             # run test
             pytest --runxfail && cd test && ./cmdlinetest-nohmmratac macs3
 
