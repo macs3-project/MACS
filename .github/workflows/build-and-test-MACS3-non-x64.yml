@@ -49,7 +49,7 @@ jobs:
 
           # Mount the current working directory (with checked-out codes) as /MACS3 in the container
           dockerRunArgs: |
-            -v "${PWD}:/MACS3" -u macs3
+            -v "${PWD}:/MACS3:rw" -u macs3
 
           # Create an artifacts directory on runner
 
