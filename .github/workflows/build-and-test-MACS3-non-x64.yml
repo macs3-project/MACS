@@ -49,7 +49,7 @@ jobs:
 
           # Mount the current working directory (with checked-out codes) as /MACS3 in the container
           dockerRunArgs: |
-            --mount "source=${PWD},target=/MACS3" -u ubuntu
+            -v "${PWD}:/MACS3" -u macs3
 
           # Create an artifacts directory on runner
 
@@ -63,6 +63,7 @@ jobs:
             useradd -m macs3
             mkdir -p /MACS3
             chown -R macs3:macs3 /MACS3
+            chmod -R a+rw /MACS3
             # install dependencies
             apt-get update -qq -y
             apt-get install apt-utils
