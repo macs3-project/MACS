@@ -116,3 +116,12 @@ jobs:
             # run test
             pytest --runxfail && cd test && ./cmdlinetest macs3
 
+            # copy testing results from cmdlinetest over
+            cp -r ../temp /MACS3/
+
+      - name: Archive cmdlinetest results
+        uses: actions/upload-artifact@v3
+        with:
+          name: cmdlinetest results
+          path: |
+            temp/
