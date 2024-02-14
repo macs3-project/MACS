@@ -8,7 +8,8 @@ on:
     paths-ignore:
       - 'docs/**'
       - '**.md'
-      # - '.github/workflows/**'
+      - '.github/workflows/**'
+      - '!.github/workflows/build-and-test-MACS3-non-x64.yml'
   pull_request:
     paths-ignore:
       - 'docs/**'
@@ -112,5 +113,5 @@ jobs:
             # upgraded here.
             pip3 install --upgrade-strategy only-if-needed --no-build-isolation .
             # run test
-            pytest --runxfail && cd test && ./cmdlinetest-nohmmratac macs3
+            pytest --runxfail && cd test && ./cmdlinetest macs3
 
