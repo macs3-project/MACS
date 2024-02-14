@@ -110,7 +110,7 @@ jobs:
             # Because we already upgraded the libraries in previous
             # step, I don't expect to see any dependencies will be
             # upgraded here.
-            pip3 install --upgrade-strategy only-if-needed .
+            pip3 install --upgrade-strategy only-if-needed --no-build-isolation .
             # run test
             pytest --runxfail && cd test && ./cmdlinetest-nohmmratac macs3
 
