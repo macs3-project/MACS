@@ -4,7 +4,7 @@ on:
   push: 
     paths: 
       - 'docs/**'
-      - '**.md'
+
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
 

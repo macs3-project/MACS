@@ -9,12 +9,14 @@ on:
       - 'docs/**'
       - '**.md'
       - '.github/workflows/**'
+      - '!.github/workflows/build-and-test-MACS3-macos12.yml'
   pull_request:
     paths-ignore:
       - 'docs/**'
       - '**.md'
       - '.github/workflows/**'
-
+      - '!.github/workflows/build-and-test-MACS3-macos12.yml'
+      
 jobs:
   build:
     runs-on: macos-12

@@ -15,6 +15,7 @@ on:
       - 'docs/**'
       - '**.md'
       - '.github/workflows/**'
+      - '!.github/workflows/build-and-test-MACS3-non-x64.yml'
 
 jobs:
   build_job:
@@ -65,7 +66,7 @@ jobs:
             # install dependencies
             apt-get update -qq -y
             apt-get install apt-utils
-            apt-get install -yq libblas3 liblapack3 libblas-dev liblapack-dev
+            apt-get install -yq bc libblas3 liblapack3 libblas-dev liblapack-dev
             # we rely on Debian/Ubuntu/Linux python packages for
             # numpy/scipy/sklearn
             # in Ubuntu 22
