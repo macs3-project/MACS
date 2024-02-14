@@ -29,7 +29,7 @@ jobs:
 
     steps:
       - name: Checkout MACS
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           submodules: 'true'
 
@@ -73,13 +73,11 @@ jobs:
             cd /home/macs3/
             
             # let's create virtualenv
-            virtualenv --system-site-packages macsenv
-            # python3.11 -m venv macsenv
+            python3 -m venv --system-site-packages macsenv
+
             # virtualenv --python=python3.11 --system-site-packages macsenv
             source macsenv/bin/activate
             
-
-
             # copy source code over
             cp -r /MACS3 .
             cd MACS3
@@ -88,13 +86,11 @@ jobs:
             rm -f no-global-site-packages.txt
 
             python3 -m pip install --upgrade pip
-            pip3 install pytest
-            if [ -f requirements.txt ]; then pip3 install --upgrade -r requirements.txt; fi
 
+            if [ -f requirements.txt ]; then
+              pip3 install --upgrade-strategy only-if-needed -r requirements.txt;
+            fi
 
-            
-
-            
             # upgrade pip
             # pip install --progress-bar off --upgrade pip
             
@@ -107,7 +103,7 @@ jobs:
             
             # install MACS3; only-if-needed won't try to upgrade Debian/Linux python3 libs
             # pip install --upgrade-strategy only-if-needed --no-build-isolation --progress-bar off . 
-            pip install .
+            pip install --upgrade-strategy only-if-needed .
             # run test
             pytest --runxfail && cd test && ./cmdlinetest-nohmmratac macs3
 
