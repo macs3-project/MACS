@@ -86,9 +86,8 @@ jobs:
             # activate macsenv
             source macsenv/bin/activate
             
-            # copy source code over
-            cp -r /MACS3 .
-            cd MACS3
+            # cd to source code directory
+            cd /MACS3
 
             # let's make sure this file is gone...
             rm -f no-global-site-packages.txt
@@ -116,12 +115,9 @@ jobs:
             # run test
             pytest --runxfail && cd test && ./cmdlinetest macs3
 
-            # copy testing results from cmdlinetest over
-            cp -r ../temp /MACS3/
-
       - name: Archive cmdlinetest results
+        if: always()
         uses: actions/upload-artifact@v3
         with:
-          name: cmdlinetest results
-          path: |
-            temp/
+          name: cmdlinetest-results
+          path: temp/
