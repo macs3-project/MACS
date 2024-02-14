@@ -47,9 +47,13 @@ jobs:
           # The shell to run commands with in the container
           shell: /bin/bash
 
+          # Create an artifacts directory
+          setup: |
+            chmod a+rw ${PWD}
+        
           # Mount the current working directory (with checked-out codes) as /MACS3 in the container
           dockerRunArgs: |
-            -v "${PWD}:/MACS3" -u macs3
+            -v "${PWD}:/MACS3"
 
           # Create an artifacts directory on runner
 
@@ -60,10 +64,6 @@ jobs:
           # publicly in your project's package repository, so it is vital that
           # no secrets are present in the container state or logs.
           install: |
-            useradd -m macs3
-            mkdir -p /MACS3
-            chown -R macs3:macs3 /MACS3
-            chmod -R a+rw /MACS3
             # install dependencies
             apt-get update -qq -y
             apt-get install apt-utils
@@ -79,7 +79,7 @@ jobs:
             apt-get install -yq procps zlib1g zlib1g-dev gfortran
           run: |
             echo `uname -a`
-            cd /home/macs3/
+            cd ~
             
             # let's create virtualenv
             python3 -m venv --system-site-packages macsenv
