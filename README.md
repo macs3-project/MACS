@@ -215,16 +215,3 @@ contributions over the years.
  * [bedTools](http://code.google.com/p/bedtools/)
  * [UCSC toolkits](http://hgdownload.cse.ucsc.edu/admin/exe/)
  * [deepTools](https://github.com/deeptools/deepTools/)
-
-
-```{toctree}
-:maxdepth: 2
-:hidden:
-
-docs/INSTALL.md
-docs/index.md
-docs/Advanced_Step-by-step_Peak_Calling.md
-docs/qa.md
-docs/tutorial.md
-CODE_OF_CONDUCT.md
-CONTRIBUTING.md
