@@ -28,11 +28,11 @@ jobs:
 
     steps:
       - name: Checkout MACS
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           submodules: 'true'
       - name: Cache pip
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         with:
           # This path is specific to Ubuntu
           path: ~/.cache/pip
@@ -66,7 +66,7 @@ jobs:
           source macs3venv/bin/activate
           python setup.py sdist
       - name: Archive sdist
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: sdist file
           path: |
