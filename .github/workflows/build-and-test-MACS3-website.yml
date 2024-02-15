@@ -31,7 +31,7 @@ jobs:
         cd ..
 
     - name: Upload artifact
-      uses: actions/upload-pages-artifact@v4
+      uses: actions/upload-pages-artifact@v3
       with:
         # Archive and upload entire website
         path: './docs/build/html'
