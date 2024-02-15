@@ -18,6 +18,7 @@ requirements:
     - {{ compiler('c') }}
     - python >=3.11
     - numpy >=1.25
+    - scipy>=1.10
     - Cython ~=3.0
     - cykhash >=2.0
     - setuptools >=68.0
@@ -26,11 +27,13 @@ requirements:
   host:
     - python >=3.11
     - numpy >=1.25
+    - scipy>=1.10
     - Cython ~=3.0    
     - cykhash >=2.0
   run:
     - python >=3.11
     - numpy >=1.25
+    - scipy>=1.10
     - hmmlearn >=0.3
 
 test:
