@@ -1,5 +1,5 @@
 #!/bin/bash
-# Time-stamp: <2024-02-15 11:13:29 Tao Liu>
+# Time-stamp: <2024-02-15 11:22:26 Tao Liu>
 
 # integrative subcmds testing
 
@@ -247,7 +247,7 @@ for i in ${subfolders[@]};do
     for j in `ls standard_results_${i}/*`; do
 	k=`basename $j`
 	let "n+=1"
-	echo "16.${m}.${n} checking $i $k ..."
+	echo "17.${m}.${n} checking $i $k ..."
 	fq=${OUTPUTDIR_PREFIX}_run_${i}/${k}
 	fs=standard_results_${i}/${k}
 	if [ "${REPLACE}" = "Y" ]; then
@@ -274,7 +274,7 @@ if [ $flag -eq 1 ];then
     exit $flag;
 fi
 
-echo "17. brief speed test"
+echo "18. brief speed test"
 
 mkdir ${OUTPUTDIR_PREFIX}_speedtest
 macs3 callpeak -t CTCF_12878_5M.bed.gz -c Input_12878_5M.bed.gz -n speedtest -B --outdir ${OUTPUTDIR_PREFIX}_speedtest &> ${OUTPUTDIR_PREFIX}_speedtest/speedtest.log &

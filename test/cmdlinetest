@@ -1,5 +1,5 @@
 #!/bin/bash
-# Time-stamp: <2024-02-14 19:56:03 Tao Liu>
+# Time-stamp: <2024-02-15 11:22:36 Tao Liu>
 
 # integrative subcmds testing
 
@@ -305,7 +305,7 @@ if [ $flag -eq 1 ];then
     exit $flag;
 fi
 
-echo "17. brief speed test"
+echo "18. brief speed test"
 
 mkdir ${OUTPUTDIR_PREFIX}_speedtest
 macs3 callpeak -t CTCF_12878_5M.bed.gz -c Input_12878_5M.bed.gz -n speedtest -B --outdir ${OUTPUTDIR_PREFIX}_speedtest &> ${OUTPUTDIR_PREFIX}_speedtest/speedtest.log &
