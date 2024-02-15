@@ -118,9 +118,9 @@ jobs:
             # run test
             pytest --runxfail && cd test && ./cmdlinetest-nohmmratac macs3
 
-      #- name: Archive cmdlinetest results
-      #  if: always()
-      #  uses: actions/upload-artifact@v4
-      #  with:
-      #    name: cmdlinetest-results
-      #    path: temp/
+      - name: Archive cmdlinetest results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: cmdlinetest-results
+          path: temp/macs3-_run_hmmratac/

@@ -1,5 +1,5 @@
 #!/bin/bash
-# Time-stamp: <2022-06-06 12:13:43 Tao Liu>
+# Time-stamp: <2024-02-15 11:13:29 Tao Liu>
 
 # integrative subcmds testing
 
@@ -207,10 +207,10 @@ macs3 pileup -f BED -i $CHIPCONTIGS50K --extsize 200 --outdir ${OUTPUTDIR_PREFIX
 echo "14.4 randsample"
 macs3 randsample -i $CHIPCONTIGS50K -n 100000 --seed 31415926 --outdir ${OUTPUTDIR_PREFIX}_run_50kcontigs -o run_randsample.bed --buffer-size 1000 &> ${OUTPUTDIR_PREFIX}_run_50kcontigs/run_randsample.log
 
-echo "15. skip hmmratac"
-#mkdir ${OUTPUTDIR_PREFIX}_run_hmmratac
+echo "15. hmmratac (but won't check the consistency)"
+mkdir ${OUTPUTDIR_PREFIX}_run_hmmratac
 
-#macs3 hmmratac -b $ATACSEQBAM -n hmmratac_yeast500k --outdir ${OUTPUTDIR_PREFIX}_run_hmmratac &> ${OUTPUTDIR_PREFIX}_run_hmmratac/run_hmmratac.log
+macs3 hmmratac -b $ATACSEQBAM -n hmmratac_yeast500k --outdir ${OUTPUTDIR_PREFIX}_run_hmmratac &> ${OUTPUTDIR_PREFIX}_run_hmmratac/run_hmmratac.log
 
 echo "16. search for errors or warnings in log files"
 flag=0
@@ -235,7 +235,8 @@ fi
 echo "17. compare with standard outputs"
 
 flag=0
-# we do not check the consistency of random subsampling results and hmmratac on non-x86 arch
+
+# we do not check the consistency of hmmratac results on non-x86 arch
 subfolders=(50kcontigs bdgbroadcall bdgcmp bdgdiff bdgpeakcall callpeak_broad callpeak_narrow callpeak_narrow_revert callpeak_pe_broad callpeak_pe_narrow cmbreps filterdup pileup refinepeak bdgopt predictd callvar)  # hmmratac)
 
 m=0
