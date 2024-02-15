@@ -4,6 +4,7 @@ on:
   push: 
     paths: 
       - 'docs/**'
+      - '.github/workflows/build-and-test-MACS3-website.yml'
 
   workflow_dispatch:
 
