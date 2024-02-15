@@ -78,7 +78,7 @@ jobs:
             apt-get install -yq python3 python3-pip python3-venv python3-wheel python3-numpy python3-scipy python3-sklearn cython3
             # we need ninja-build since if we want to upgrade numpy, scipy,
             # ninja and meson may be needed!
-            apt-get install -yq meson ninja-build procps zlib1g zlib1g-dev gfortran
+            apt-get install -yq meson ninja-build cmake procps zlib1g zlib1g-dev gfortran
           run: |
             echo `uname -a`
             cd ~
