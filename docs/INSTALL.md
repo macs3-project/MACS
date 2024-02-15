@@ -1,5 +1,4 @@
 # INSTALL Guide For MACS3
-Time-stamp: <2024-02-15 12:07:37 Tao Liu>
 
 Please check the following instructions to complete your installation.
 
