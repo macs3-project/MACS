@@ -1,5 +1,5 @@
 #!/bin/bash
-# Time-stamp: <2024-02-12 16:08:01 Tao Liu>
+# Time-stamp: <2024-02-14 19:56:03 Tao Liu>
 
 # integrative subcmds testing
 
@@ -269,25 +269,28 @@ for i in ${subfolders[@]};do
 	    cp $fq $fs
 	    echo " ... replaced!"
 	else
-	    # here we will check if the files are the same/similar
-	    if [[ "$fq" == *.bed || "$fq" == *.gappedPeak || "$fq" == *.narrowPeak || "$fq" == *.bed12 ]]; then
-		# for peaks, we will use our jaccard index script to check
-		ji=$(python ./jaccard.py "$fq" "$fs")
-		# Compare the output value
-		if (( $(echo "$ji > 0.99" | bc -l) )); then
-		    echo " ... success!"
-		else
-		    echo " ... failed! jaccard index = $ji"
-		    let "flag=1"
-		fi
+	    sort $fq| grep -v ^# > tmp_fq.txt
+	    sort $fs| grep -v ^# > tmp_fs.txt
+	    d=`diff tmp_fq.txt tmp_fs.txt`
+	    if [ -z "$d" ]; then
+		# the two files are the same
+		echo " ... success! Results are the same!"
 	    else
-		sort $fq| grep -v ^# > tmp_fq.txt
-		sort $fs| grep -v ^# > tmp_fs.txt
-		d=`diff tmp_fq.txt tmp_fs.txt`
-		if [ -z "$d" ]; then
-		    echo " ... success!"
+		# if the two files are not the same, and if the file
+		# is a peak file, here we will check if the files are
+		# the similar using jaccard index
+		if [[ "$fq" == *.bed || "$fq" == *.gappedPeak || "$fq" == *.narrowPeak || "$fq" == *.bed12 ]]; then
+		    # for peaks, we will use our jaccard index script to check
+		    ji=$(python ./jaccard.py "$fq" "$fs")
+		    # Compare the output value
+		    if (( $(echo "$ji > 0.99" | bc -l) )); then
+			echo " ... success! Results are different but Jaccard Index is $ji (>0.99)"
+		    else
+			echo " ... failed! Results are different and Jaccard Index is $ji (<0.99)"
+			let "flag=1"
+		    fi
 		else
-		    echo " ... failed! Difference:"
+		    echo " ... failed! Results are different (top10 lines of difference):"
 		    diff tmp_fq.txt tmp_fs.txt | head -10
 		    let "flag=1";
 		fi
