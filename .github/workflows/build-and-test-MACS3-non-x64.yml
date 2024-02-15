@@ -20,7 +20,7 @@ on:
 jobs:
   build_job:
     runs-on: ubuntu-22.04
-    name: Build on ${{ matrix.arch }}
+    name: Build on ${{ matrix.arch }} with Python 3.10
     strategy:
       matrix:
         include:
@@ -122,5 +122,5 @@ jobs:
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: cmdlinetest-results
-          path: temp/macs3-_run_hmmratac/
+          name: cmdlinetest-hmmratac-results-${{ matrix.arch }}
+          path: temp/macs3_run_hmmratac/
