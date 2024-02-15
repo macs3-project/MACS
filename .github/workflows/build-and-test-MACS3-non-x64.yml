@@ -114,7 +114,7 @@ jobs:
             # upgraded here.
             pip3 install --upgrade-strategy only-if-needed --no-build-isolation .
             # run test
-            pytest --runxfail && cd test && ./cmdlinetest macs3
+            pytest --runxfail && cd test && ./cmdlinetest-nohmmratac macs3
 
       - name: Archive cmdlinetest results
         if: always()

@@ -46,8 +46,14 @@ background*.
 	'jaccard.py' to compute the Jaccard Index of two peak files. If
 	the JI > 0.99 we would think the peaks called and the standard
 	peaks are similar. This is to avoid the problem caused by
-	different Numpy libraries, when the certain peak coordinates may
-	have 1bp difference.
+	different Numpy libraries, when certain peak coordinates may have
+	1bp difference. Please note that, this fix is to address the
+	trivial differences caused by different versions dependencies
+	under Ubuntu x86 or Mac OS Apple Chips platform. `hmmratac`
+	subcommand may generate inconsistent results under other
+	architecture such as Ubuntu under aarch64, armv7, s390x, or
+	ppc64le. And currently, we only enable the integrative test for
+	`hmmratac` under Ubuntu for x86 and Mac OS.
 
 
 ## Changes for MACS (3.0.0)
@@ -133,19 +139,24 @@ The common way to install MACS is through
 MACS3 has been tested using GitHub Actions for every push and PR in
 the following architectures:
 
- * x86_64 (Python 3.9, 3.10, 3.11, 3.12)
- * aarch64 (Python 3.9)
- * armv7 (Python 3.9)
- * ppc64le (Python 3.9)
- * s390x (Python 3.9)
- * Apple chips (Python 3.11)
+ * x86_64 (Ubuntu 22, Python 3.9, 3.10, 3.11)
+ * aarch64 (Ubuntu 22, Python 3.10)
+ * armv7 (Ubuntu 22, Python 3.10)
+ * ppc64le (Ubuntu 22, Python 3.10)
+ * s390x (Ubuntu 22, Python 3.10)
+ * Apple chips (Mac OS 13, Python 3.11)
 
-In general, you can install through PyPI as `pip install macs3`. 
-To use virtual environment is highly recommended. Or you can install
-after unzipping the released package downloaded from Github, then
-use `pip install .` command. Please note that, we haven't tested
+In general, you can install through PyPI as `pip install macs3`.  To
+use virtual environment is highly recommended. Or you can install
+after unzipping the released package downloaded from Github, then use
+`pip install .` command. Please note that, we haven't tested
 installation on any Windows OS, so currently only Linux and Mac OS
-systems are supported.
+systems are supported. Also, for aarch64, armv7, ppc64le and s390x,
+due to some unknown reason potentially related to the scientific
+calculation libraries MACS3 depends on, such as Numpy, Scipy,
+hmm-learn, scikit-learn, the results from `hmmratac` subcommand may
+not be consistent with the results from x86 or Apple chips. Please be
+aware.
 
 ## Usage
 

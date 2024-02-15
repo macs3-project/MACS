@@ -133,19 +133,24 @@ The common way to install MACS is through
 MACS3 has been tested using GitHub Actions for every push and PR in
 the following architectures:
 
- * x86_64 (Python 3.9, 3.10, 3.11, 3.12)
- * aarch64 (Python 3.9)
- * armv7 (Python 3.9)
- * ppc64le (Python 3.9)
- * s390x (Python 3.9)
- * Apple chips (Python 3.11)
+ * x86_64 (Ubuntu 22, Python 3.9, 3.10, 3.11)
+ * aarch64 (Ubuntu 22, Python 3.10)
+ * armv7 (Ubuntu 22, Python 3.10)
+ * ppc64le (Ubuntu 22, Python 3.10)
+ * s390x (Ubuntu 22, Python 3.10)
+ * Apple chips (Mac OS 13, Python 3.11)
 
-In general, you can install through PyPI as `pip install macs3`. 
-To use virtual environment is highly recommended. Or you can install
-after unzipping the released package downloaded from Github, then
-use `pip install .` command. Please note that, we haven't tested
+In general, you can install through PyPI as `pip install macs3`.  To
+use virtual environment is highly recommended. Or you can install
+after unzipping the released package downloaded from Github, then use
+`pip install .` command. Please note that, we haven't tested
 installation on any Windows OS, so currently only Linux and Mac OS
-systems are supported.
+systems are supported. Also, for aarch64, armv7, ppc64le and s390x,
+due to some unknown reason potentially related to the scientific
+calculation libraries MACS3 depends on, such as Numpy, Scipy,
+hmm-learn, scikit-learn, the results from `hmmratac` subcommand may
+not be consistent with the results from x86 or Apple chips. Please be
+aware.
 
 ## Usage
 
