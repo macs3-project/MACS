@@ -1,5 +1,5 @@
 Cython~=3.0
-numpy==1.24
+numpy>=1.24
 scikit-learn<1.4
 hmmlearn>=0.3
 cykhash>=2.0,<3.0 
