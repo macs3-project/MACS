@@ -4,8 +4,9 @@
 name: MACS3 Publish to Anaconda/macs3
 
 on:
+  workflow_dispatch:
   release:
-    types: [created]
+    types: [published]
 
 jobs:
   deploy:

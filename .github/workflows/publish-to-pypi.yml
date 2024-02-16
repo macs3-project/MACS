@@ -4,8 +4,9 @@
 name: MACS3 Upload to PYPI
 
 on:
+  workflow_dispatch:
   release:
-    types: [created]
+    types: [published]
 
 jobs:
   deploy:
