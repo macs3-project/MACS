@@ -75,7 +75,7 @@ jobs:
             #  scipy: 1.8.0
             #  sklearn: 0.23.2
             #  cython: 0.29.28
-            apt-get install -yq python3 python3-pip python3-venv python3-wheel python3-numpy python3-scipy python3-sklearn cython3
+            apt-get install -yq python3 python3-pip python3-venv python3-wheel # python3-numpy python3-scipy python3-sklearn cython3
             # we need ninja-build since if we want to upgrade numpy, scipy,
             # ninja and meson may be needed!
             apt-get install -yq meson ninja-build cmake procps zlib1g zlib1g-dev gfortran
@@ -84,7 +84,7 @@ jobs:
             cd ~
             
             # let's create virtualenv
-            python3 -m venv --system-site-packages macsenv
+            python3 -m venv macsenv #--system-site-packages macsenv
 
             # activate macsenv
             source macsenv/bin/activate
@@ -93,7 +93,7 @@ jobs:
             cd /MACS3
 
             # let's make sure this file is gone...
-            rm -f no-global-site-packages.txt
+            #rm -f no-global-site-packages.txt
 
             # pip will be upgraded
             python3 -m pip install --upgrade pip
