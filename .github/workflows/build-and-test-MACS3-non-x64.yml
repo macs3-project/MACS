@@ -114,7 +114,7 @@ jobs:
             # Because we already upgraded the libraries in previous
             # step, I don't expect to see any dependencies will be
             # upgraded here.
-            pip3 instal .
+            pip3 install .
             # run test
             pytest --runxfail && cd test && ./cmdlinetest-nohmmratac macs3
 
