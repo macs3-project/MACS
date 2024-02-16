@@ -1,4 +1,4 @@
-2024-02-12  Tao Liu  <vladimir.liu@gmail.com>
+2024-02-16  Tao Liu  <vladimir.liu@gmail.com>
 	MACS 3.0.1
 
 	* Bugs fixed
@@ -20,6 +20,17 @@
 	peaks are similar. This is to avoid the problem caused by
 	different Numpy libraries, when the certain peak coordinates may
 	have 1bp difference.
+
+	* Other
+	
+	1) We added some dependencies to MACS3. `hmmratc` subcommand needs
+	`hmmlearn` library, `hmmlearn` needs `scikit-learn` and
+	`scikit-learn` needs `scipy`. Since major releases have happened
+	for both`scipy` and `scikit-learn`, we have to set specific
+	version requirements for them in order to make sure the output
+	results from `hmmratac` are consistent.
+
+	2) We updated our documentation website using Sphinx.
 
 2023-11-15  Tao Liu  <vladimir.liu@gmail.com>
 	MACS 3.0.0

@@ -6,7 +6,9 @@ Please check the following instructions to complete your installation.
 
 Here we list some prerequisites for installing and running MACS3. But
 if you are using conda or pip to install, the installer will check the
-dependencies and install them if necessary. Please note that, we
+dependencies and install them if necessary. Therefore, this section is
+for reference purpose, and if you are looking for steps to build and
+install MACS3, please go to the next section. Please note that, we
 haven't tested installation on any Windows OS, so currently only Linux
 and Mac OS systems are supported.
 
@@ -14,26 +16,34 @@ and Mac OS systems are supported.
 
 MACS v3 requires Python3. We have tested MACS in Python3.9 to 3.12. 
 
-### NumPy, hmmlearn
+### NumPy, hmmlearn, Scipy, scikit-learn
 
-MACS requires [NumPy](https://numpy.org/)>=1.19 (>=1.24 recommended)
-and [hmmlearn](https://hmmlearn.readthedocs.io/)>=0.3 during
-installation. Note that hmmlearn further requires
-[SciPy](https://scipy.org/) and
-[scikit-learn](https://scikit-learn.org/).
+MACS calls functions from [NumPy](https://numpy.org/) and
+[hmmlearn](https://hmmlearn.readthedocs.io/). Since hmmlearn further
+requires [scikit-learn](https://scikit-learn.org/) which requires
+[SciPy](https://scipy.org/), and these libraries are crucial for
+reproducing your results, we also add them into the requirement list
+with specific version numbers. So here is the list of the required
+python libraries that will impact the numerical calculation in MACS3:
+
+ - numpy>=1.24 
+ - hmmlearn>=0.3
+ - scikit-learn>=1.2,<1.4
+ - scipy>=1.10
 
 ### Cython
 
 [Cython](http://cython.org/) is required to translate .pyx codes to .c
-code. The version of Cython has to be >=0.29. We recommend Cython
-version >= 3.
+code. The version of Cython has to be >=3.0. 
 
 ### cykhash
 
 [cykhash](https://github.com/realead/cykhash) is a fast and efficient
-hash implementation in Cython. It is used to replace python dictionary
-in MACS3 codes. Since it requires Cython, make sure you install Cython
-first, then install cykhash. 
+hash implementation in Cython. It can be seen as the cython
+implementation of
+[khash](https://github.com/attractivechaos/klib/blob/master/khash.h). It
+is used to replace python dictionary in MACS3 codes. We require
+cykhash version 2.
 
 ### fermi-lite and simde
 
@@ -47,13 +57,15 @@ solve the compatibility issues on non-x86 architectures. Note that, we
 may remove this submodule and add simde in *dependencies* of MACS3
 later.
 
-### GCC and Python-dev 
+### GCC, Python-dev, meson ... 
 
-GCC is required to compile `.c` codes in MACS v3 package, and python 
-header files are needed. If you are using Mac OSX, we recommend you 
-install Xcode; if you are using Linux, you need to make sure 
-`python-dev` package is installed -- the actual package name depends 
-on the Linux OS distribution, you are using. 
+GCC is required to compile `.c` codes in MACS v3 package, and python
+header files are needed. If you are using Mac OSX, we recommend you
+install Xcode; if you are using Linux, you need to make sure
+`python-dev` package is installed -- the actual package name depends
+on the Linux OS distribution, you are using. Also, since the most
+recent Numpy/Scipy use [meson](https://mesonbuild.com/) to build the
+libraries, make sure they have been installed.
 
 ## Prepare a virtual Python environment 
 
@@ -70,16 +82,15 @@ Then activate it by
 
 `$ source MACS3env/bin/activate`
 
-You can also let the virtual enviroment access system-wide libraries,
-the Python libraries globally installed in your operating system, so
-that you may not need to install certain dependencies later. 
-
-`$ python3 -m venv --system-site-packages`
-
 If you use 'conda', it will also provide virtual environment. Please
 read:
 [conda](https://docs.conda.io/projects/conda/en/latest/user-guide/getting-started.html)
 or [miniconda](https://docs.conda.io/en/latest/miniconda.html)
+
+There is another solution, [pipx](https://pipx.pypa.io/), to make a
+clean isolated python environment to run python tools such as
+MACS3. We won't explore it here but if you are insterested in it,
+please click the link above and read the tutorial.
 
 ## Install through PyPI
 
@@ -107,11 +118,25 @@ MACS uses `pip` for source code installations. To install a source
 distribution of MACS, unpack the distribution tarball, or clone Git
 repository with `git clone --recurse-submodules
 git@github.com:macs3-project/MACS.git`.  Go to the directory where you
-cloned MACS from github, and simply run the install command:
+cloned MACS from github or unpacked from tarball, and simply run the
+install command:
 
  `$ pip install .`
 
 The command will treat the current working directory as the 'package'
 to be installed. The behavior will be the same as `pip install macs3`
 as described in the previous section "Install through PyPI".
+
+You can also install MACS3 from source code in a "modern" two-steps
+way. First, use the build system to make a wheel (in this case, you
+need to install `build` first by `pip install build`):
+
+`$ python -m build --wheel`
+
+This will make a '.whl' file under 'dist' directory. Then you can
+install the wheel through `pip`:
+
+`$ pip install dist/MACS3-3.x.x-x-x-x.whl`
+
+Please use the real filename in the 'dist' directory.
 

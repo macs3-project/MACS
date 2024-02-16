@@ -46,15 +46,19 @@ background*.
 	'jaccard.py' to compute the Jaccard Index of two peak files. If
 	the JI > 0.99 we would think the peaks called and the standard
 	peaks are similar. This is to avoid the problem caused by
-	different Numpy libraries, when certain peak coordinates may have
-	1bp difference. Please note that, this fix is to address the
-	trivial differences caused by different versions dependencies
-	under Ubuntu x86 or Mac OS Apple Chips platform. `hmmratac`
-	subcommand may generate inconsistent results under other
-	architecture such as Ubuntu under aarch64, armv7, s390x, or
-	ppc64le. And currently, we only enable the integrative test for
-	`hmmratac` under Ubuntu for x86 and Mac OS.
+	different Numpy libraries, when the certain peak coordinates may
+	have 1bp difference.
 
+*Other*
+	
+1) We added some dependencies to MACS3. `hmmratc` subcommand needs
+	`hmmlearn` library, `hmmlearn` needs `scikit-learn` and
+	`scikit-learn` needs `scipy`. Since major releases have happened
+	for both`scipy` and `scikit-learn`, we have to set specific
+	version requirements for them in order to make sure the output
+	results from `hmmratac` are consistent.
+
+2) We updated our documentation website using Sphinx.
 
 ## Changes for MACS (3.0.0)
 
