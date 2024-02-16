@@ -67,7 +67,7 @@ jobs:
             # install dependencies
             apt-get update -qq -y
             apt-get install apt-utils
-            apt-get install -yq bc libblas3 liblapack3 libblas-dev liblapack-dev libopenblas-dev
+            apt-get install -yq bc libblas3 liblapack3 libblas-dev liblapack-dev libopenblas-dev pkg-config
             # we rely on Debian/Ubuntu/Linux python packages for
             # numpy/scipy/sklearn
             # in Ubuntu 22
