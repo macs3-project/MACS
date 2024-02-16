@@ -1,3 +1,37 @@
+2024-02-16  Tao Liu  <vladimir.liu@gmail.com>
+	MACS 3.0.1
+
+	* Bugs fixed
+
+	1) Fixed a bug that the `hmmatac` can't correctly save the
+	digested signal files. #605 #611
+
+	2) Applied a patch to remove cython requirement from the installed
+	system. (it's needed for building the package). #606 #612
+
+	3) Relax the testing script while comparing the peaks called from
+	current codes and the standard peaks. #615. To implement this, we
+	added 'intersection' function to 'Regions' class to find the
+	intersecting regions of two Regions object (similar to PeakIO but
+	only recording chromosome, start and end positions). And we
+	updated the unit test 'test_Region.py' then implemented a script
+	'jaccard.py' to compute the Jaccard Index of two peak files. If
+	the JI > 0.99 we would think the peaks called and the standard
+	peaks are similar. This is to avoid the problem caused by
+	different Numpy libraries, when the certain peak coordinates may
+	have 1bp difference.
+
+	* Other
+	
+	1) We added some dependencies to MACS3. `hmmratc` subcommand needs
+	`hmmlearn` library, `hmmlearn` needs `scikit-learn` and
+	`scikit-learn` needs `scipy`. Since major releases have happened
+	for both`scipy` and `scikit-learn`, we have to set specific
+	version requirements for them in order to make sure the output
+	results from `hmmratac` are consistent.
+
+	2) We updated our documentation website using Sphinx.
+
 2023-11-15  Tao Liu  <vladimir.liu@gmail.com>
 	MACS 3.0.0
 

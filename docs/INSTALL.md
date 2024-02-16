@@ -1,5 +1,4 @@
 # INSTALL Guide For MACS3
-Time-stamp: <2023-11-14 16:43:54 Tao Liu>
 
 Please check the following instructions to complete your installation.
 
@@ -7,31 +6,44 @@ Please check the following instructions to complete your installation.
 
 Here we list some prerequisites for installing and running MACS3. But
 if you are using conda or pip to install, the installer will check the
-dependencies and install them if necessary. Please note that, we
+dependencies and install them if necessary. Therefore, this section is
+for reference purpose, and if you are looking for steps to build and
+install MACS3, please go to the next section. Please note that, we
 haven't tested installation on any Windows OS, so currently only Linux
 and Mac OS systems are supported.
 
 ### Python3
 
-MACS v3.x.x requires Python3. We have tested MACS in Python3.9 to 3.12. 
+MACS v3 requires Python3. We have tested MACS in Python3.9 to 3.12. 
 
-### NumPy, hmmlearn
+### NumPy, hmmlearn, Scipy, scikit-learn
 
-MACS requires NumPy>=1.19 (>=1.24 recommended) and hmmlearn>=0.3
-during installation. Note that hmmlearn further requires SciPy and
-sklearn (aka scikit-learn).
+MACS calls functions from [NumPy](https://numpy.org/) and
+[hmmlearn](https://hmmlearn.readthedocs.io/). Since hmmlearn further
+requires [scikit-learn](https://scikit-learn.org/) which requires
+[SciPy](https://scipy.org/), and these libraries are crucial for
+reproducing your results, we also add them into the requirement list
+with specific version numbers. So here is the list of the required
+python libraries that will impact the numerical calculation in MACS3:
+
+ - numpy>=1.24 
+ - hmmlearn>=0.3
+ - scikit-learn>=1.2,<1.4
+ - scipy>=1.10
 
 ### Cython
 
 [Cython](http://cython.org/) is required to translate .pyx codes to .c
-code. The version of Cython has to be >=0.29.
+code. The version of Cython has to be >=3.0. 
 
 ### cykhash
 
 [cykhash](https://github.com/realead/cykhash) is a fast and efficient
-hash implementation in Cython. It is used to replace python dictionary
-in MACS3 codes. Since it requires Cython, make sure you install Cython
-first, then install cykhash. 
+hash implementation in Cython. It can be seen as the cython
+implementation of
+[khash](https://github.com/attractivechaos/klib/blob/master/khash.h). It
+is used to replace python dictionary in MACS3 codes. We require
+cykhash version 2.
 
 ### fermi-lite and simde
 
@@ -45,13 +57,15 @@ solve the compatibility issues on non-x86 architectures. Note that, we
 may remove this submodule and add simde in *dependencies* of MACS3
 later.
 
-### GCC and Python-dev 
+### GCC, Python-dev, meson ... 
 
-GCC is required to compile `.c` codes in MACS v3 package, and python 
-header files are needed. If you are using Mac OSX, I recommend you 
-install Xcode; if you are using Linux, you need to make sure 
-`python-dev` package is installed -- the actual package name depends 
-on the Linux OS distribution, you are using. 
+GCC is required to compile `.c` codes in MACS v3 package, and python
+header files are needed. If you are using Mac OSX, we recommend you
+install Xcode; if you are using Linux, you need to make sure
+`python-dev` package is installed -- the actual package name depends
+on the Linux OS distribution, you are using. Also, since the most
+recent Numpy/Scipy use [meson](https://mesonbuild.com/) to build the
+libraries, make sure they have been installed.
 
 ## Prepare a virtual Python environment 
 
@@ -62,16 +76,21 @@ environment, read [this
 article](https://docs.python.org/3/library/venv.html). A simple way to
 create a virtual environment of Python3 is
 
-`$ python3 -m venv MyPythonEnv/`
+`$ python3 -m venv MACS3env/`
 
 Then activate it by
 
-`$ source MyPythonEnv/bin/activate`
+`$ source MACS3env/bin/activate`
 
 If you use 'conda', it will also provide virtual environment. Please
 read:
 [conda](https://docs.conda.io/projects/conda/en/latest/user-guide/getting-started.html)
 or [miniconda](https://docs.conda.io/en/latest/miniconda.html)
+
+There is another solution, [pipx](https://pipx.pypa.io/), to make a
+clean isolated python environment to run python tools such as
+MACS3. We won't explore it here but if you are insterested in it,
+please click the link above and read the tutorial.
 
 ## Install through PyPI
 
@@ -82,71 +101,42 @@ the folder you specified previously through `python3 -m env` command,
 or to your active conda environment. 
 
 Then under the command line, type `pip install macs3`. PyPI will
-install dependencies automatically if it is absent.
+install dependencies automatically if it is absent. By default, `pip`
+will install the newest version of dependencies that satisfy the
+requirements of MACS3. When you run the command without virtual
+environment, you may need to be the root user or system administrator
+so as to complete the installation. Please contact the system
+administrator if you want their help.
 
 To upgrade MACS3, type `pip install --upgrade macs3`. It will check
 currently installed MACS3, compare the version with the one on PyPI
 repository, download and install a newer version while necessary.
 
-## Install from source
+## Install from source through pip
 
-MACS uses `pip` for source code installations. To install a source 
-distribution of MACS, unpack the distribution tarball, or clone Git 
-repository with `git clone --recurse-submodules git@github.com:taoliu/MACS.git`. 
-Go to the directory where you cloned MACS from github, and simply
-run the install command:
+MACS uses `pip` for source code installations. To install a source
+distribution of MACS, unpack the distribution tarball, or clone Git
+repository with `git clone --recurse-submodules
+git@github.com:macs3-project/MACS.git`.  Go to the directory where you
+cloned MACS from github or unpacked from tarball, and simply run the
+install command:
 
  `$ pip install .`
 
-By default, the script will install python library and executable
-codes according to the environment. When you run the command under
-virtualenv or conda environment, the script will install to the virtual
-environment instead. When you run the command without virtual environment, 
-you may need to be root or administrator of the machine so as to 
-complete the installation. Please contact the system administrator
-if you want their help. 
+The command will treat the current working directory as the 'package'
+to be installed. The behavior will be the same as `pip install macs3`
+as described in the previous section "Install through PyPI".
 
-## Configure environment variables
+You can also install MACS3 from source code in a "modern" two-steps
+way. First, use the build system to make a wheel (in this case, you
+need to install `build` first by `pip install build`):
 
-*Note*, if you are using a virtual environment, you should skip this
-section since all the corresponding environment variables have been
-correctly set while you `activate` the environment.
+`$ python -m build --wheel`
 
-After running the setup script, you might need to add the install
-location to your `PYTHONPATH` and `PATH` environment variables. The
-process for doing this varies on each platform, but the general
-concept is the same across platforms.
+This will make a '.whl' file under 'dist' directory. Then you can
+install the wheel through `pip`:
 
-### PYTHONPATH
+`$ pip install dist/MACS3-3.x.x-x-x-x.whl`
 
-To set up your `PYTHONPATH` environment variable, you'll need to add
-the value `PREFIX/lib/pythonX.Y/site-packages` to your existing
-`PYTHONPATH`. In this value, X.Y stands for the major–minor version of
-Python you are using (such as 3.7; you can find this with
-`sys.version[:3]` from a Python command line). `PREFIX` is the install
-prefix where you installed MACS. If you did not specify a prefix on
-the command line, MACS will be installed using Python's sys.prefix
-value.
-
-On Linux, using bash, I include the new value in my `PYTHONPATH` by
-adding this line to my `~/.bashrc`::
-
- `$ export
- PYTHONPATH=/home/taoliu/lib/python3.7/site-packages:$PYTHONPATH`
-
-Using Windows, you need to open up the system properties dialog and
-locate the tab labeled Environment. Add your value to the `PYTHONPATH`
-variable, or create a new `PYTHONPATH` variable if there isn't one
-already.
-
-### PATH
-
-Just like your `PYTHONPATH`, you'll also need to add a new value to
-your PATH environment variable so that you can use the MACS command
-line directly. Unlike the `PYTHONPATH` value, however, this time
-you'll need to add `PREFIX/bin` to your PATH environment variable. The
-process for updating this is the same as described above for the
-`PYTHONPATH` variable::
-
- `$ export PATH=/home/myaccount/bin:$PATH`
+Please use the real filename in the 'dist' directory.
 

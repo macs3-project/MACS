@@ -1,21 +1,10 @@
 # This workflow will install Python dependencies, run tests and lint with a single version of Python
 # For more information see: https://help.github.com/actions/language-and-framework-guides/using-python-with-github-actions
 
-name: MACS3 CI non x64
+name: MACS3 CI non x64 other (on demmand)
 
-on: 
-  push:
-    paths-ignore:
-      - 'docs/**'
-      - '**.md'
-      - '.github/workflows/**'
-      - '!.github/workflows/build-and-test-MACS3-non-x64.yml'
-  pull_request:
-    paths-ignore:
-      - 'docs/**'
-      - '**.md'
-      - '.github/workflows/**'
-      - '!.github/workflows/build-and-test-MACS3-non-x64.yml'
+on:
+  workflow_dispatch:
 
 jobs:
   build_job:
@@ -24,7 +13,9 @@ jobs:
     strategy:
       matrix:
         include:
-          - arch: aarch64
+          - arch: armv7
+          - arch: ppc64le
+          - arch: s390x
 
     steps:
       - name: Checkout MACS

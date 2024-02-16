@@ -4,8 +4,9 @@
 name: MACS3 Publish to Anaconda/macs3
 
 on:
+  workflow_dispatch:
   release:
-    types: [created]
+    types: [published]
 
 jobs:
   deploy:
@@ -17,11 +18,11 @@ jobs:
     name: Build conda package in x64 under Python ${{ matrix.python-version }}
     steps:
     - name: Check out MACS3 with submodules
-      uses: actions/checkout@v3
+      uses: actions/checkout@v4
       with:
         submodules: 'true'
     - name: Set up Python ${{ matrix.python-version }}
-      uses: actions/setup-python@v3
+      uses: actions/setup-python@v5
       with:
         python-version: ${{ matrix.python-version }}
     - name: Add conda to system path

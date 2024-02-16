@@ -12,7 +12,7 @@ The `pileup` command takes in one or multiple input files and produces
 an output file with the piled-up genomic coverage. It uses an
 efficient algorithm to pile up the alignments.
 
-![Pileup Algorithm](./pileup.png)
+![Pileup Algorithm](pileup.png)
 
 Pileup aligned reads with a given extension size (fragment size or d
 in MACS language). Note there will be no step for duplicate reads

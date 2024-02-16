@@ -1,6 +1,6 @@
 # cython: language_level=3
 # cython: profile=True
-# Time-stamp: <2022-09-15 16:13:48 Tao Liu>
+# Time-stamp: <2024-02-12 15:26:24 Tao Liu>
 
 """Module for Region classe.
 
@@ -48,11 +48,13 @@ cdef class Regions:
     cdef:
         public dict regions
         public int total
-        bool __flag_sorted
+        bool __sorted
+        bool __merged
 
     def __init__ (self):
         self.regions= {}
-        self.__flag_sorted = False
+        self.__sorted = False
+        self.__merged =  False
         self.total = 0
 
     def __getitem__ (self, chrom):
@@ -119,23 +121,43 @@ cdef class Regions:
         else:
             self.regions[chrom] = [ (start,end), ]
         self.total += 1
-        self.__flag_sorted = False
+        self.__sorted = False
+        self.__merged = False
         return
 
     cpdef sort (self):
         cdef:
             bytes chrom
 
-        if self.__flag_sorted:
+        if self.__sorted:
             return
         for chrom in sorted(self.regions.keys()):
             self.regions[chrom].sort()
-        self.__flag_sorted = True
+        self.__sorted = True
+
+    cpdef long total_length ( self ):
+        """ Return the total length of the Regions object.
+        """
+        cdef:
+            bytes chrom
+            list ps
+            int i
+            int tl, s, e
+        self.merge_overlap()
+        tl = 0
+        for chrom in sorted(self.regions.keys()):
+            ps = self.regions[chrom]
+            for i in range( len(ps) ):
+                s, e = ps[i]
+                tl +=  e - s
+        return tl
 
     cpdef set get_chr_names (self):
         return set( sorted(self.regions.keys()) )
 
     cpdef expand ( self, int flanking ):
+        """ Expand regions to both directions with 'flanking' bps.
+        """
         cdef:
             bytes chrom
             list ps
@@ -148,10 +170,11 @@ cdef class Regions:
                 ps[i] = ( max(0, ps[i][0] - flanking), ps[i][1] + flanking )
             ps.sort()
             self.regions[chrom] = ps
+        self.__merged = False
     
     cpdef merge_overlap ( self ):
         """
-        merge overlapping regions
+        Merge overlapping regions of itself.
         """
         cdef:
             bytes chrom
@@ -161,6 +184,8 @@ cdef class Regions:
             list regions_chr
             tuple prev_region
 
+        if self.__merged:
+            return
         self.sort()
         regions = self.regions
         new_regions = {}
@@ -191,6 +216,7 @@ cdef class Regions:
             self.total += len( new_regions[chrom] )
         self.regions = new_regions
         self.sort()
+        self.__merged = True
         return True
 
     cpdef write_to_bed (self, fhd ):
@@ -243,18 +269,20 @@ cdef class Regions:
     #     for p in all_pc:
     #         ret_peakio.add_PeakContent ( p["chrom"], p )
     #     return ret_peakio
-    
 
-    cpdef void exclude (self, object regionio2):
-        """ Remove overlapping regions in regionio2, another Region
-        object.
 
+    cpdef object intersect (self, object regions_object2):
+        """ Get the only intersecting regions comparing with
+        regions_object2, another Regions object. Then return a new
+        Regions object.
+        
         """
         cdef:
+            object ret_regions_object
             dict regions1, regions2
-            list chrs1, chrs2
+            list chrs1, chrs2, four_coords
             bytes k
-            dict ret_regionss
+            dict ret_regions
             bool overlap_found
             tuple r1, r2
             long n_rl1, n_rl2
@@ -262,9 +290,81 @@ cdef class Regions:
         self.sort()
         regions1 = self.regions
         self.total = 0
-        assert isinstance(regionio2,Regions)
-        regionio2.sort()
-        regions2 = regionio2.regions
+        assert isinstance(regions_object2, Regions)
+        
+        regions_object2.sort()
+        regions2 = regions_object2.regions
+
+        ret_regions_object = Regions()
+        ret_regions = dict()
+        chrs1 = list(regions1.keys())
+        chrs2 = list(regions2.keys())
+        for k in chrs1:
+            #print(f"chromosome {k}")
+            if not chrs2.count(k):
+                # no such chromosome in peaks1, then don't touch the peaks in this chromosome
+                ret_regions[ k ] = regions1[ k ]
+                self.total += len( ret_regions[ k ] )
+                continue
+            ret_regions[ k ] = []
+            n_rl1 = len( regions1[k] )    # number of remaining elements in regions1[k]
+            n_rl2 = len( regions2[k] )    # number of remaining elements in regions2[k]
+            rl1_k = iter( regions1[k] ).__next__
+            rl2_k = iter( regions2[k] ).__next__
+            r1 = rl1_k()
+            n_rl1 -= 1
+            r2 = rl2_k()
+            n_rl2 -= 1
+            while ( True ):
+                # we do this until there is no r1 or r2 left.
+                if r2[0] < r1[1] and r1[0] < r2[1]:
+                    # We found an overlap, now get the intersecting
+                    # region.
+                    four_coords = sorted([r1[0], r1[1], r2[0], r2[1]])
+                    ret_regions[ k ].append( (four_coords[1], four_coords[2]) )
+                if r1[1] < r2[1]:
+                    # in this case, we need to move to the next r1,
+                    if n_rl1:
+                        r1 = rl1_k()
+                        n_rl1 -= 1
+                    else:
+                        # no more r1 left
+                        break
+                else:
+                    # in this case, we need to move the next r2
+                    if n_rl2:
+                        r2 = rl2_k()
+                        n_rl2 -= 1
+                    else:
+                        # no more r2 left
+                        break
+            self.total += len( ret_regions[ k ] )
+
+        ret_regions_object.regions = ret_regions
+        ret_regions_object.sort()
+        return ret_regions_object
+    
+
+    cpdef void exclude (self, object regions_object2):
+        """ Remove overlapping regions in regions_object2, another Regions
+        object.
+
+        """
+        cdef:
+            dict regions1, regions2
+            list chrs1, chrs2
+            bytes k
+            dict ret_regions
+            bool overlap_found
+            tuple r1, r2
+            long n_rl1, n_rl2
+
+        self.sort()
+        regions1 = self.regions
+        self.total = 0
+        assert isinstance(regions_object2,Regions)
+        regions_object2.sort()
+        regions2 = regions_object2.regions
 
         ret_regions = dict()
         chrs1 = list(regions1.keys())
@@ -324,6 +424,6 @@ cdef class Regions:
             self.total += len( ret_regions[ k ] )
 
         self.regions = ret_regions
-        self.__flag_sorted = False
+        self.__sorted = False
         self.sort()
         return

@@ -1,10 +1,12 @@
 #!/bin/bash
-# Time-stamp: <2023-08-02 17:59:43 Tao Liu>
+# Time-stamp: <2024-02-15 12:30:51 Tao Liu>
 
 # integrative subcmds testing
 
 if [ $# -lt 1 ];then
-    echo "Run all tests for subcommands of MACS3. Need >=1 parameter for a tag name! A unique string combining date, time and MACS3 version is recommended. ./test.sh <TAG> [UPDATE]\n If UPDATE is set with anything, aka, this command sees a second parameter, the standard output results will be replaced."
+    echo "Run all tests for subcommands of MACS3. Need >=1 parameter for a tag name! A unique string combining date, time and MACS3 version is recommended. ./cmdlinetest <TAG> [UPDATE]"
+    echo ""
+    echo "If UPDATE is set with anything, aka, this command sees a second parameter, the standard output results will be replaced."
     exit
 fi
 
@@ -208,8 +210,7 @@ macs3 pileup -f BED -i $CHIPCONTIGS50K --extsize 200 --outdir ${OUTPUTDIR_PREFIX
 echo "14.4 randsample"
 macs3 randsample -i $CHIPCONTIGS50K -n 100000 --seed 31415926 --outdir ${OUTPUTDIR_PREFIX}_run_50kcontigs -o run_randsample.bed --buffer-size 1000 &> ${OUTPUTDIR_PREFIX}_run_50kcontigs/run_randsample.log
 
-# echo "15. hmmratac"
-echo "15. hmmratac save training regions bed file and model file" # model file is written by default
+echo "15. hmmratac"
 mkdir ${OUTPUTDIR_PREFIX}_run_hmmratac
 
 macs3 hmmratac -i $ATACSEQBAM -n hmmratac_yeast500k --save-training-data --outdir ${OUTPUTDIR_PREFIX}_run_hmmratac &> ${OUTPUTDIR_PREFIX}_run_hmmratac/run_hmmratac.log
@@ -262,6 +263,7 @@ for i in ${subfolders[@]};do
 	echo "16.${m}.${n} checking $i $k ..."
 	fq=${OUTPUTDIR_PREFIX}_run_${i}/${k}
 	fs=standard_results_${i}/${k}
+	echo "  checking the files: $fq vs $fs"
 	if [ "${REPLACE}" = "Y" ]; then
 	    cp $fq $fs
 	    echo " ... replaced!"
@@ -270,11 +272,27 @@ for i in ${subfolders[@]};do
 	    sort $fs| grep -v ^# > tmp_fs.txt
 	    d=`diff tmp_fq.txt tmp_fs.txt`
 	    if [ -z "$d" ]; then
-		echo " ... success!"
+		# the two files are the same
+		echo " ... success! Results are the same!"
 	    else
-		echo " ... failed! Difference:"
-		diff tmp_fq.txt tmp_fs.txt | head -10
-		let "flag=1";
+		# if the two files are not the same, and if the file
+		# is a peak file, here we will check if the files are
+		# the similar using jaccard index
+		if [[ "$fq" == *.bed || "$fq" == *.gappedPeak || "$fq" == *.narrowPeak || "$fq" == *.bed12 ]]; then
+		    # for peaks, we will use our jaccard index script to check
+		    ji=$(python ./jaccard.py "$fq" "$fs")
+		    # Compare the output value
+		    if (( $(echo "$ji > 0.99" | bc -l) )); then
+			echo " ... success! Results are different but Jaccard Index is $ji (>0.99)"
+		    else
+			echo " ... failed! Results are different and Jaccard Index is $ji (<0.99)"
+			let "flag=1"
+		    fi
+		else
+		    echo " ... failed! Results are different (top10 lines of difference):"
+		    diff tmp_fq.txt tmp_fs.txt | head -10
+		    let "flag=1";
+		fi
 	    fi
 	fi
     done
@@ -286,7 +304,7 @@ if [ $flag -eq 1 ];then
     exit $flag;
 fi
 
-echo "17. brief speed test"
+echo "18. brief speed test"
 
 mkdir ${OUTPUTDIR_PREFIX}_speedtest
 macs3 callpeak -t CTCF_12878_5M.bed.gz -c Input_12878_5M.bed.gz -n speedtest -B --outdir ${OUTPUTDIR_PREFIX}_speedtest &> ${OUTPUTDIR_PREFIX}_speedtest/speedtest.log &

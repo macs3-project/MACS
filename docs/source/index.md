@@ -136,18 +136,19 @@ background*.
 ## Install
 
 The common way to install MACS is through
-[PYPI](https://pypi.org/project/macs3/)). Please check the
+[PYPI](https://pypi.org/project/macs3/)) or
+[conda](https://anaconda.org/macs3/macs3). Please check the
 [INSTALL](docs/INSTALL.md) document for detail.
 
 MACS3 has been tested using GitHub Actions for every push and PR in
 the following architectures:
 
- * x86_64 (Ubuntu 22, Python 3.9, 3.10, 3.11, 3.12)
+ * x86_64 (Ubuntu 22, Python 3.9, 3.10, 3.11)
  * aarch64 (Ubuntu 22, Python 3.10)
  * armv7 (Ubuntu 22, Python 3.10)
  * ppc64le (Ubuntu 22, Python 3.10)
  * s390x (Ubuntu 22, Python 3.10)
- * Apple chips (Mac OS 13, Python 3.9, 3.10, 3.11, 3.12)
+ * Apple chips (Mac OS 13, Python 3.11)
 
 In general, you can install through PyPI as `pip install macs3`.  To
 use virtual environment is highly recommended. Or you can install
@@ -229,3 +230,16 @@ contributions over the years.
  * [bedTools](http://code.google.com/p/bedtools/)
  * [UCSC toolkits](http://hgdownload.cse.ucsc.edu/admin/exe/)
  * [deepTools](https://github.com/deeptools/deepTools/)
+
+
+```{toctree}
+:maxdepth: 2
+:hidden:
+
+docs/INSTALL.md
+docs/index.md
+docs/Advanced_Step-by-step_Peak_Calling.md
+docs/qa.md
+docs/tutorial.md
+CODE_OF_CONDUCT.md
+CONTRIBUTING.md
