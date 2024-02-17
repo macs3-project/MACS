@@ -69,7 +69,12 @@ class Test_HMM_train(unittest.TestCase):
         hmm_model.covars_ = np.array(self.covars)
         hmm_model.covariance_type = 'full'
         hmm_model.n_features = self.n_features
-
         predictions = hmm_predict( self.prediction_data, self.prediction_data_lengths, hmm_model )
+
+        ## This is to write the prediction results into a file for 'correct' answer 
+        #with open("test/small_prediction_results.txt","w") as f:
+        #    for x,y,z in predictions:
+        #        f.write( str(x)+"\t"+str(y)+"\t"+str(z)+"\n")
+        
         npt.assert_allclose( predictions, self.predictions )
 
