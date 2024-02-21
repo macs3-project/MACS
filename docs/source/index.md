@@ -31,33 +31,41 @@ background*.
 
 *Bugs fixed*
 
-1) Fixed a bug that the `hmmatac` can't correctly save the 
-	digested signal files. #605 #611 
+1) Fixed a bug that the `hmmatac` can't correctly save the digested
+	signal
+	files. [#605](https://github.com/macs3-project/MACS/issues/605)
+	[#611](https://github.com/macs3-project/MACS/pull/611)
 
-2) Applied a patch to remove cython requirement from the installed 
-	system. (it's needed for building the package). #606 #612 
+2) Applied a patch to remove cython requirement from the installed
+	system. (it's needed for building the
+	package). [#606](https://github.com/macs3-project/MACS/issues/606)
+	[#612](https://github.com/macs3-project/MACS/pull/612)
 
-3) Relax the testing script while comparing the peaks called from 
-	current codes and the standard peaks. #615. To implement this, we 
-	added 'intersection' function to 'Regions' class to find the 
-	intersecting regions of two Regions object (similar to PeakIO but 
-	only recording chromosome, start and end positions). And we 
-	updated the unit test 'test_Region.py' then implemented a script 
-	'jaccard.py' to compute the Jaccard Index of two peak files. If 
-	the JI > 0.99 we would think the peaks called and the standard 
-	peaks are similar. This is to avoid the problem caused by 
-	different Numpy/SciPy/sci-kit learn libraries, when certain peak 
-	coordinates may have 10bps difference. #619 
+3) Relax the testing script while comparing the peaks called from
+	current codes and the standard peaks. To implement this, we added
+	'intersection' function to 'Regions' class to find the
+	intersecting regions of two Regions object (similar to PeakIO but
+	only recording chromosome, start and end positions). And we
+	updated the unit test 'test_Region.py' then implemented a script
+	'jaccard.py' to compute the Jaccard Index of two peak files. If
+	the JI > 0.99 we would think the peaks called and the standard
+	peaks are similar. This is to avoid the problem caused by
+	different Numpy/SciPy/sci-kit learn libraries, when certain peak
+	coordinates may have 10bps
+	difference. [#615](https://github.com/macs3-project/MACS/issues/615)
+	[#619](https://github.com/macs3-project/MACS/pull/619)
 	
-4) Due to the changes in scikit-learn 1.3.0: 
-	https://scikit-learn.org/1.3/whats_new/v1.3.html: The way hmmlearn 
-	0.3 uses Kmeans will end up with inconsistent results between 
-	sklearn <1.3 and sklearn >=1.3. Therefore, we patched the class 
-	hmm.GaussianHMM and adjusted the standard output from `hmmratac`
-	subcommand. The change is based on 
-	https://github.com/hmmlearn/hmmlearn/pull/545. The idea is to do 
-	the random seeding of KMeans 10 times. Now the `hmmratac` results 
-	should be more consistent (at least JI>0.99). #615 #620 
+4) Due to [the changes in scikit-learn
+	1.3.0](https://scikit-learn.org/1.3/whats_new/v1.3.html), the way
+	hmmlearn 0.3 uses Kmeans will end up with inconsistent results
+	between sklearn <1.3 and sklearn >=1.3. Therefore, we patched the
+	class hmm.GaussianHMM and adjusted the standard output from
+	`hmmratac` subcommand. The change is based on [hmmlearn
+	PR#545](https://github.com/hmmlearn/hmmlearn/pull/545). The idea
+	is to do the random seeding of KMeans 10 times. Now the `hmmratac`
+	results should be more consistent (at least
+	JI>0.99). [#615](https://github.com/macs3-project/MACS/issues/615)
+	[#620](https://github.com/macs3-project/MACS/pull/620)
 
 *Other*
 	
