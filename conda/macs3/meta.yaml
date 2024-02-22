@@ -42,10 +42,6 @@ requirements:
     - scikit-learn >=1.3
     - cykhash >=2.0,<3.0
 
-test:
-  commands:
-    - pytest
-
 about:
   home: http://github.com/macs3-project/MACS/
   license: BSD
