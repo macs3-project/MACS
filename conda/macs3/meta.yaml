@@ -44,7 +44,6 @@ requirements:
 
 test:
   commands:
-    - macs3 -h
     - pytest
 
 about:
