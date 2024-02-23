@@ -1,5 +1,0 @@
-theme: jekyll-theme-slate
-mathjax:
-  enable: true
-  combine: false
-  tags: "ams"
