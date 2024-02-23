@@ -280,7 +280,7 @@ for i in ${subfolders[@]};do
 		# the similar using jaccard index
 		if [[ "$fq" == *.bed || "$fq" == *.gappedPeak || "$fq" == *.narrowPeak || "$fq" == *.bed12 ]]; then
 		    # for peaks, we will use our jaccard index script to check
-		    ji=$(python ./jaccard.py "$fq" "$fs")
+		    ji=$(python3 ./jaccard.py "$fq" "$fs")
 		    # Compare the output value
 		    if (( $(echo "$ji > 0.99" | bc -l) )); then
 			echo " ... success! Results are different but Jaccard Index is $ji (>0.99)"
