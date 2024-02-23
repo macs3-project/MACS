@@ -8,6 +8,7 @@ download](https://img.shields.io/pypi/dm/macs3?label=pypi%20downloads)](https://
 Latest Release:
 * Github: [![Github Release](https://img.shields.io/github/v/release/macs3-project/MACS)](https://github.com/macs3-project/MACS/releases)
 * PyPI: [![PyPI Release](https://img.shields.io/pypi/v/macs3.svg) ![PyPI Python Version](https://img.shields.io/pypi/pyversions/MACS3) ![PyPI Format](https://img.shields.io/pypi/format/macs3)](https://pypi.org/project/macs3/)
+* Anaconda:[![Anaconda-Server Badge](https://anaconda.org/macs3/macs3/badges/version.svg)](https://anaconda.org/macs3/macs3)
 
 ## Introduction
 
