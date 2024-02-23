@@ -62,6 +62,7 @@ jobs:
       run: |
         source /usr/share/miniconda/etc/profile.d/conda.sh
         conda activate MACS3
+        conda install -q pytest
         pytest --runxfail
         cd test
         ./cmdlinetest macs3
