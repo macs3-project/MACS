@@ -75,7 +75,7 @@ def main():
                 clang = True
             else:
                 gcc_version_check = gcc_version_check.split('\n')[0] # get the first line
-                m = re.search( "\s+(\d+\.\d+)\.\d+", gcc_version_check )
+                m = re.search(r"\s+(\d+\.\d+)\.\d+", gcc_version_check )
                 if m:
                     gcc_version = float( m[1] )
                     if gcc_version > 4.8:
