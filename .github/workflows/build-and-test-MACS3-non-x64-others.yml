@@ -38,7 +38,7 @@ jobs:
           # Create an artifacts directory
           setup: |
             chmod a+rw ${PWD}
-        
+
           # Mount the current working directory (with checked-out codes) as /MACS3 in the container
           dockerRunArgs: |
             -v "${PWD}:/MACS3"
@@ -75,11 +75,15 @@ jobs:
 
             # install dependencies
             if [ -f requirements.txt ]; then
-              pip3 install -r requirements.txt;
+              python3 -m pip install -r requirements.txt;
             fi
 
             # install MACS3
-            pip3 install .
+            python3 -m pip install .
+
+            # output versions of installed libraries
+            python3 -m pip freeze
+
             # run test
             pytest --runxfail && cd test && ./cmdlinetest macs3
 

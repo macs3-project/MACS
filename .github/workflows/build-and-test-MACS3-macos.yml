@@ -48,19 +48,22 @@ jobs:
       - name: Setup venv
         run: |
           # create venv
-          python -m venv macs3venv
+          python3 -m venv macs3venv
       - name: Install dependencies
         run: |
           # make sure pip is the lastest
           source macs3venv/bin/activate
-          python -m pip install --upgrade pip
-          pip install pytest
-          if [ -f requirements.txt ]; then pip install --upgrade -r requirements.txt; fi
+          python3 -m pip install --upgrade pip
+          python3 -m pip install pytest
+          if [ -f requirements.txt ]; then python3 -m pip install --upgrade -r requirements.txt; fi
       - name: Install MACS
         run: |
           # we use pip install instead of old fashion setup.py install
           source macs3venv/bin/activate
-          pip install .
+          python3 -m pip install .
+      - name: Output versions of installed libraries
+        run: |
+          python3 -m pip freeze
       - name: Test with pytest
         run: |
           source macs3venv/bin/activate
@@ -68,7 +71,7 @@ jobs:
       - name: Build sdist
         run: |
           source macs3venv/bin/activate
-          python setup.py sdist
+          python3 setup.py sdist
       - name: Archive sdist
         uses: actions/upload-artifact@v4
         with:

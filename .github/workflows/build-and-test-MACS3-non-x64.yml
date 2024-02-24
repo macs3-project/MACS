@@ -84,11 +84,15 @@ jobs:
 
             # install dependencies
             if [ -f requirements.txt ]; then
-              pip3 install -r requirements.txt;
+                python3 -m pip install -r requirements.txt;
             fi
 
             # install MACS3
-            pip3 install .
+            python3 -m pip install .
+
+            # output versions of installed libraries
+            python3 -m pip freeze
+
             # run test
             pytest --runxfail && cd test && ./cmdlinetest macs3
 
