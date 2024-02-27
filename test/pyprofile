@@ -21,7 +21,7 @@ CMD=( $@ )
 CMD=${CMD[@]: 1}
 
 # run CMD with cProfile
-python -m cProfile -o $PROF $CMD
+python3 -m cProfile -o $PROF $CMD
 
 # brief the profile
 ./pyprofile_stat $PROF tottime > ${PROF/.prof/}.tottime

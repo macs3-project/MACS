@@ -37,10 +37,10 @@ classifiers =[\
               'Programming Language :: Python :: 3.12',
               'Programming Language :: Cython', ]
 
-install_requires = [ "numpy>=1.24",
-                     "scipy>=1.10",
-                     "hmmlearn>=0.3",
-                     "scikit-learn>=1.2,<1.4",
+install_requires = [ "numpy>=1.24.2",
+                     "scipy>=1.11.4",
+                     "hmmlearn==0.3.0",
+                     "scikit-learn>=1.2.1",
                      "cykhash>=2.0,<3.0"]
 
 
@@ -75,7 +75,7 @@ def main():
                 clang = True
             else:
                 gcc_version_check = gcc_version_check.split('\n')[0] # get the first line
-                m = re.search( "\s+(\d+\.\d+)\.\d+", gcc_version_check )
+                m = re.search(r"\s+(\d+\.\d+)\.\d+", gcc_version_check )
                 if m:
                     gcc_version = float( m[1] )
                     if gcc_version > 4.8:

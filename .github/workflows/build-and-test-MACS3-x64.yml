@@ -20,8 +20,8 @@ on:
 jobs:
   build:
     runs-on: ubuntu-22.04
-    strategy: 
-      matrix: 
+    strategy:
+      matrix:
         python-version: ["3.9", "3.10", "3.11", "3.12"]
         arch: ['x64']
     name: Build on x64 with Python ${{ matrix.python-version }}
@@ -44,17 +44,20 @@ jobs:
           key: ${{ runner.os }}-pip-${{ hashFiles('requirements.txt') }}
           restore-keys: |
             ${{ runner.os }}-pip-
-            ${{ runner.os }}-        
+            ${{ runner.os }}-
       - name: Install dependencies
         run: |
           # make sure pip is the lastest
-          python -m pip install --upgrade pip
-          pip install pytest
-          if [ -f requirements.txt ]; then pip install --upgrade -r requirements.txt; fi
+          python3 -m pip install --upgrade pip
+          python3 -m pip install pytest
+          if [ -f requirements.txt ]; then python3 -m pip install --upgrade -r requirements.txt; fi
       - name: Install MACS
         run: |
           # we use pip install instead of old fashion setup.py install
-          pip install .
+          python3 -m pip install .
+      - name: Output versions of installed libraries 
+        run: |
+          python3 -m pip freeze
       - name: Test with pytest
         run: |
           pytest --runxfail
@@ -63,7 +66,7 @@ jobs:
           cd ..
       - name: Build sdist
         run: |
-          python setup.py sdist
+          python3 setup.py sdist
       - name: Archive sdist
         uses: actions/upload-artifact@v4
         with:

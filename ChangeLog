@@ -1,4 +1,4 @@
-2024-02-16  Tao Liu  <vladimir.liu@gmail.com>
+2024-02-19  Tao Liu  <vladimir.liu@gmail.com>
 	MACS 3.0.1
 
 	* Bugs fixed
@@ -10,19 +10,29 @@
 	system. (it's needed for building the package). #606 #612
 
 	3) Relax the testing script while comparing the peaks called from
-	current codes and the standard peaks. #615. To implement this, we
-	added 'intersection' function to 'Regions' class to find the
+	current codes and the standard peaks. To implement this, we added
+	'intersection' function to 'Regions' class to find the
 	intersecting regions of two Regions object (similar to PeakIO but
 	only recording chromosome, start and end positions). And we
 	updated the unit test 'test_Region.py' then implemented a script
 	'jaccard.py' to compute the Jaccard Index of two peak files. If
 	the JI > 0.99 we would think the peaks called and the standard
 	peaks are similar. This is to avoid the problem caused by
-	different Numpy libraries, when the certain peak coordinates may
-	have 1bp difference.
+	different Numpy/SciPy/sci-kit learn libraries, when certain peak
+	coordinates may have 10bps difference. #615 #619
+
+	4) Due to the changes in scikit-learn 1.3.0:
+	https://scikit-learn.org/1.3/whats_new/v1.3.html: The way hmmlearn
+	0.3 uses Kmeans will end up with inconsistent results between
+	sklearn <1.3 and sklearn >=1.3. Therefore, we patched the class
+	hmm.GaussianHMM and adjusted the standard output from `hmmratac`
+	subcommand. The change is based on
+	https://github.com/hmmlearn/hmmlearn/pull/545. The idea is to do
+	the random seeding of KMeans 10 times. Now the `hmmratac` results
+	should be more consistent (at least JI>0.99). #615 #620
 
 	* Other
-	
+
 	1) We added some dependencies to MACS3. `hmmratc` subcommand needs
 	`hmmlearn` library, `hmmlearn` needs `scikit-learn` and
 	`scikit-learn` needs `scipy`. Since major releases have happened
@@ -30,7 +40,8 @@
 	version requirements for them in order to make sure the output
 	results from `hmmratac` are consistent.
 
-	2) We updated our documentation website using Sphinx.
+	2) We updated our documentation website using
+	Sphinx. https://macs3-project.github.io/MACS/
 
 2023-11-15  Tao Liu  <vladimir.liu@gmail.com>
 	MACS 3.0.0
