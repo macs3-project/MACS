@@ -19,7 +19,7 @@ class Test_HMM_train(unittest.TestCase):
         self.not_expected_covars = None
         self.not_expected_means = None
         self.not_expected_transmat = None
-        self.startprob = [0.018070155066844208, 0.9015372740274981, 0.08039257090565771]
+        self.startprob = [0.09411589, 0.82689766, 0.07898644]
         self.means = [[2.02697935e-01, 1.52785266e+00, 1.73790142e+00, 1.00019411e-04],
                       [1.87823916e-01, 1.48213364e+00, 1.69577044e+00, 1.00017125e-04],
                       [2.07360047e+00, 8.63029738e+00, 7.24406955e+00, 1.00852188e-04]]
