@@ -4,8 +4,9 @@
 name: MACS3 Upload to PYPI
 
 on:
+  workflow_dispatch:
   release:
-    types: [created]
+    types: [published]
 
 jobs:
   deploy:
@@ -13,11 +14,11 @@ jobs:
 
     steps:
     - name: Check out MACS3 with submodules
-      uses: actions/checkout@v3
+      uses: actions/checkout@v4
       with:
         submodules: 'true'
     - name: Set up Python
-      uses: actions/setup-python@v3
+      uses: actions/setup-python@v5
       with:
         python-version: '3.11'
     - name: Install dependencies

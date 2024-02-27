@@ -37,16 +37,17 @@ classifiers =[\
               'Programming Language :: Python :: 3.12',
               'Programming Language :: Cython', ]
 
-install_requires = [ "numpy>=1.19",
+install_requires = [ "numpy>=1.24",
+                     "scipy>=1.10",
                      "hmmlearn>=0.3",
+                     "scikit-learn>=1.2,<1.4",
                      "cykhash>=2.0,<3.0"]
 
-tests_requires = [ 'pytest' ]
 
 
 def main():
-    if sys.version_info < (3,8):
-        sys.stderr.write("CRITICAL: Python version must >= 3.8!\n")
+    if sys.version_info < (3,9):
+        sys.stderr.write("CRITICAL: Python version must >= 3.9!\n")
         sys.exit(1)
 
     # NumPy include dir
@@ -146,8 +147,6 @@ def main():
            scripts = ['bin/macs3', ],
            classifiers = classifiers,
            install_requires = install_requires,
-           setup_requires = install_requires,
-           tests_require = tests_requires,
            python_requires = '>=3.9',
            ext_modules=cythonize( ext_modules ) ),
 #                                  compiler_directives={'linetrace': True, 'binding': True}) )

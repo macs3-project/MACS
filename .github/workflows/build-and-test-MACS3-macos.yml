@@ -1,7 +1,7 @@
 # This workflow will install Python dependencies, run tests and lint with a single version of Python
 # For more information see: https://help.github.com/actions/language-and-framework-guides/using-python-with-github-actions
 
-name: MACS3 CI MacOS 12
+name: MACS3 CI Mac OS
 
 on: 
   push:
@@ -9,24 +9,34 @@ on:
       - 'docs/**'
       - '**.md'
       - '.github/workflows/**'
+      - '!.github/workflows/build-and-test-MACS3-macos.yml'
   pull_request:
     paths-ignore:
       - 'docs/**'
       - '**.md'
       - '.github/workflows/**'
-
+      - '!.github/workflows/build-and-test-MACS3-macos.yml'
+      
 jobs:
   build:
-    runs-on: macos-12
-    name: Build on MacOS 12 with Python 3.11
+    strategy:
+      matrix:
+        os: [macos-13]
+        python-version: ["3.9", "3.10", "3.11", "3.12"]
+    runs-on: ${{ matrix.os }}
+    name: Build on ${{ matrix.os }} with Python ${{ matrix.python-version }}
 
     steps:
       - name: Checkout MACS
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           submodules: 'true'
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
       - name: Cache pip
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         with:
           # This path is specific to Ubuntu
           path: ~/.cache/pip
@@ -38,14 +48,14 @@ jobs:
       - name: Setup venv
         run: |
           # create venv
-          python3 -m venv macs3venv
+          python -m venv macs3venv
       - name: Install dependencies
         run: |
           # make sure pip is the lastest
           source macs3venv/bin/activate
-          python3 -m pip install --upgrade pip
-          pip3 install pytest
-          if [ -f requirements.txt ]; then pip3 install --upgrade -r requirements.txt; fi
+          python -m pip install --upgrade pip
+          pip install pytest
+          if [ -f requirements.txt ]; then pip install --upgrade -r requirements.txt; fi
       - name: Install MACS
         run: |
           # we use pip install instead of old fashion setup.py install
@@ -54,15 +64,15 @@ jobs:
       - name: Test with pytest
         run: |
           source macs3venv/bin/activate
-          pytest --runxfail && cd test && ./cmdlinetest-nohmmratac macs3
+          pytest --runxfail && cd test && ./cmdlinetest macs3
       - name: Build sdist
         run: |
           source macs3venv/bin/activate
           python setup.py sdist
       - name: Archive sdist
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
-          name: sdist file
+          name: sdist-${{ matrix.os }}-${{ matrix.python-version }}
           path: |
             dist/*.tar.gz
 
