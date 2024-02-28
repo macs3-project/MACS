@@ -1178,7 +1178,7 @@ cdef class bedGraphTrackI:
         Todos
         -----
 
-        May need to seperate this function out as a class so that we
+        May need to separate this function out as a class so that we
         can add more ways to analyze the result. Also, we can let this
         function return a list of dictionary or data.frame in that
         way, instead of str object.

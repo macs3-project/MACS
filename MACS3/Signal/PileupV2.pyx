@@ -7,7 +7,7 @@ idea. It's modified from original algorithm in MACS2 proposed by Jie
 Wang. Now we allow different weights for different genomic ranges, and
 simplify the approach.
 
-For a genomic range r_i covering genomic postions from s_i to e_i to
+For a genomic range r_i covering genomic positions from s_i to e_i to
 be piled up, we assign the start position a value w_i, and the end
 -w_i, so we will have (s_i, w_i) and (e_i, -w_i). Then all N ranges
 will be made into an array (2D) of position and weights as:
