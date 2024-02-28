@@ -225,6 +225,6 @@ cdef _make_bdg_of_bins_from_regions ( object regions, int binsize ):
                 tmp_p = tmp_e
             # end of region, we change the mark_bin
             mark_bin += 1
-    # we do not merge regions in regionsbdg object so each bin will be seperated.
+    # we do not merge regions in regionsbdg object so each bin will be separated.
     debug( f"added {n} bins" )
     return regionsbdg
