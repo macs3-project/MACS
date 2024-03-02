@@ -9,28 +9,33 @@ on:
     types: [published]
 
 jobs:
-  deploy:
+  pypi-publish:
+    name: Upload release to PyPI
     runs-on: ubuntu-latest
-
+    environment:
+      name: release
+      url: https://pypi.org/p/macs3
+    permissions:
+      id-token: write  # IMPORTANT: this permission is mandatory for trusted publishing
     steps:
-    - name: Check out MACS3 with submodules
-      uses: actions/checkout@v4
-      with:
-        submodules: 'true'
-    - name: Set up Python
-      uses: actions/setup-python@v5
-      with:
-        python-version: '3.11'
-    - name: Install dependencies
-      run: |
-        python3 -m pip install --upgrade pip
-        if [ -f requirements.txt ]; then python3 -m pip install --upgrade -r requirements.txt; fi
-        # setuptools, wheel and twine are needed to upload to pypi
-        python3 -m pip install setuptools wheel twine
-    - name: Build and publish
-      env:
-        TWINE_USERNAME: ${{ secrets.PYPI_USERNAME }}
-        TWINE_PASSWORD: ${{ secrets.PYPI_PASSWORD }}
-      run: |
-        python3 setup.py sdist
-        python3 -m twine upload dist/*
+    # retrieve your distributions here
+      - name: Check out MACS3 with submodules 
+        uses: actions/checkout@v4 
+        with: 
+          submodules: 'true'
+
+      - name: Set up Python 
+        uses: actions/setup-python@v5 
+        with: 
+          python-version: '3.11'
+
+      - name: Install dependencies 
+        run: |
+          python3 -m pip install --upgrade pip
+          # install build system
+          python3 -m pip install build
+          # make source distribution
+          python3 -m build --sdist
+          
+    - name: Publish package distributions to PyPI
+      uses: pypa/gh-action-pypi-publish@release/v1
