@@ -29,7 +29,10 @@ jobs:
         with: 
           python-version: '3.11'
 
-      - name: Install dependencies 
+      # Here we build sdist in this job. If we plan to build wheels
+      # and upload to PyPI, we need another job to build wheels, and
+      # collect artifacts in this step... 
+      - name: Build sdist
         run: |
           python3 -m pip install --upgrade pip
           # install build system
