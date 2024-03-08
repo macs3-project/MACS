@@ -6,9 +6,11 @@
 download](https://img.shields.io/pypi/dm/macs3?label=pypi%20downloads)](https://pypistats.org/packages/macs3)
 
 Latest Release:
-* Github: [![Github Release](https://img.shields.io/github/v/release/macs3-project/MACS)](https://github.com/macs3-project/MACS/releases)
-* PyPI: [![PyPI Release](https://img.shields.io/pypi/v/macs3.svg) ![PyPI Python Version](https://img.shields.io/pypi/pyversions/MACS3) ![PyPI Format](https://img.shields.io/pypi/format/macs3)](https://pypi.org/project/macs3/)
-* Anaconda:[![Anaconda-Server Badge](https://anaconda.org/macs3/macs3/badges/version.svg)](https://anaconda.org/macs3/macs3)
+
+* Github: [![Github Release](https://img.shields.io/github/v/release/macs3-project/MACS)](https://github.com/macs3-project/MACS/releases) 
+* PyPI: [![PyPI Release](https://img.shields.io/pypi/v/macs3.svg)![PyPI Python Version](https://img.shields.io/pypi/pyversions/MACS3)![PyPI Format](https://img.shields.io/pypi/format/macs3)](https://pypi.org/project/macs3/) 
+* Anaconda: [![Anaconda-Server Badge](https://anaconda.org/macs3/macs3/badges/version.svg)](https://anaconda.org/macs3/macs3) 
+* Debian Med: [![Debian Stable](https://img.shields.io/debian/v/macs/stable?label=debian%20stable)](https://packages.debian.org/stable/macs)[![Debian Unstable](https://img.shields.io/debian/v/macs/sid?label=debian%20sid)](https://packages.debian.org/sid/macs)
 
 ## Introduction
 
