@@ -171,10 +171,10 @@ cpdef list extract_signals_from_regions( list signals, object regions, int binsi
     for i in range( nn ):
         ret_training_bins.append( extracted_positions[0][i] )
         ret_training_data.append(
-            [ max( 0.0001, extracted_data[0][i] ),
-              max( 0.0001, extracted_data[1][i] ),
-              max( 0.0001, extracted_data[2][i] ),
-              max( 0.0001, extracted_data[3][i] ) ] )
+            [ int(max( 0.0001, extracted_data[0][i] )),
+              int(max( 0.0001, extracted_data[1][i] )),
+              int(max( 0.0001, extracted_data[2][i] )),
+              int(max( 0.0001, extracted_data[3][i] )) ] )
         c = extracted_len[0][i]
         if counter != 0 and c != prev_c:
             ret_training_lengths.append( counter )

@@ -29,7 +29,8 @@ from MACS3.IO.PeakIO import BroadPeakIO
 from MACS3.IO.Parser import BAMPEParser, BEDPEParser #BAMaccessor
 from MACS3.Signal.HMMR_EM import HMMR_EM
 from MACS3.Signal.HMMR_Signal_Processing import generate_weight_mapping, generate_digested_signals, extract_signals_from_regions
-from MACS3.Signal.HMMR_HMM import hmm_training, hmm_predict, hmm_model_init, hmm_model_save
+# from MACS3.Signal.HMMR_HMM import hmm_model_init, hmm_model_save
+# from MACS3.Signal.HMMR_HMM import hmm_training, hmm_predict, hmm_model_init, hmm_model_save
 from MACS3.Signal.Region import Regions
 from MACS3.Signal.BedGraph import bedGraphTrackI
 
@@ -42,7 +43,38 @@ from MACS3.Signal.BedGraph import bedGraphTrackI
 # ------------------------------------
 # Misc functions
 # ------------------------------------
+import hmmlearn
+from hmmlearn.hmm import PoissonHMM
+def hmm_training (training_data, training_data_lengths, n_states = 3, random_seed = 12345):
+    rs = np.random.RandomState(np.random.MT19937(np.random.SeedSequence(random_seed)))
+    hmm_model = PoissonHMM( n_components= n_states, random_state = rs, verbose = False )
+    hmm_model = hmm_model.fit( training_data, training_data_lengths )
+    assert hmm_model.n_features == 4
+    return hmm_model
 
+def hmm_predict( signals, lens, hmm_model ):
+    predictions = hmm_model.predict_proba( signals, lens )
+    return predictions
+
+def hmm_model_save( model_file, hmm_model, hmm_binsize, i_open_region, i_nucleosomal_region, i_background_region  ):
+    with open( model_file, "w" ) as f:
+        json.dump( {"startprob":hmm_model.startprob_.tolist(),
+                    "transmat":hmm_model.transmat_.tolist(),
+                    "lambdas":hmm_model.lambdas_.tolist(),
+                    "n_features":int(hmm_model.n_features),
+                    "i_open_region":int(i_open_region),
+                    "i_background_region":int(i_background_region),
+                    "i_nucleosomal_region":int(i_nucleosomal_region),
+                    "hmm_binsize":int(hmm_binsize)}, f )
+
+def hmm_model_init( model_file ):
+    with open( model_file ) as f:
+        m = json.load( f )
+        hmm_model = PoissonHMM( n_components=3)
+        hmm_model.startprob_ = np.array(m["startprob"])
+        hmm_model.transmat_ = np.array(m["transmat"])
+        hmm_model.n_features = m["n_features"]
+        return [ hmm_model, m["i_open_region"], m["i_background_region"], m["i_nucleosomal_region"], m["hmm_binsize"] ]
 # ------------------------------------
 # Main function
 # ------------------------------------
@@ -299,18 +331,18 @@ def run( args ):
 
         options.info( f"#  Use Baum-Welch algorithm to train the HMM")
 
-        hmm_model = hmm_training( training_data, training_data_lengths, random_seed = options.hmm_randomSeed, covar="full" )
+        hmm_model = hmm_training( training_data, training_data_lengths, random_seed = options.hmm_randomSeed, )
 
         options.info( f"#   HMM converged: {hmm_model.monitor_.converged}")
 
         # label hidden states
-        means_sum = np.sum( hmm_model.means_, axis=1 )
+        lambdas_sum = np.sum( hmm_model.lambdas_, axis=1 )
 
         # first, the state with the highest overall emission is the open state
-        i_open_region = np.where( means_sum == max(means_sum) )[0][0]
+        i_open_region = np.where( lambdas_sum == max(lambdas_sum) )[0][0]
 
         # second, the state with lowest overall emission is the bg state 
-        i_background_region = np.where( means_sum == min(means_sum) )[0][0]
+        i_background_region = np.where( lambdas_sum == min(lambdas_sum) )[0][0]
 
         # last one is the nuc state (note it may not be accurate though
         i_nucleosomal_region = list(set([0, 1, 2]) - set([i_open_region, i_background_region]))[0]
@@ -342,11 +374,11 @@ def run( args ):
     options.info(  "#       {0:>10s}-> {1[0]:>10.4g} {1[1]:>10.4g} {1[2]:>10.4g}".format(assignments[0], hmm_model.transmat_[0]) )
     options.info(  "#       {0:>10s}-> {1[0]:>10.4g} {1[1]:>10.4g} {1[2]:>10.4g}".format(assignments[1], hmm_model.transmat_[1]) )
     options.info(  "#       {0:>10s}-> {1[0]:>10.4g} {1[1]:>10.4g} {1[2]:>10.4g}".format(assignments[2], hmm_model.transmat_[2]) )
-    options.info( f"#   HMM Emissions (mean): ")
+    options.info( f"#   HMM Emissions (lambdas): ")
     options.info(  "#                    {0[0]:>10s} {0[1]:>10s} {0[2]:>10s} {0[3]:>10s}".format( ["short", "mono", "di", "tri"] ) )
-    options.info(  "#       {0:>10s}:  {1[0]:>10.4g} {1[1]:>10.4g} {1[2]:>10.4g} {1[3]:>10.4g}".format(assignments[0], hmm_model.means_[0]) )
-    options.info(  "#       {0:>10s}:  {1[0]:>10.4g} {1[1]:>10.4g} {1[2]:>10.4g} {1[3]:>10.4g}".format(assignments[1], hmm_model.means_[1]) )
-    options.info(  "#       {0:>10s}:  {1[0]:>10.4g} {1[1]:>10.4g} {1[2]:>10.4g} {1[3]:>10.4g}".format(assignments[2], hmm_model.means_[2]) )
+    options.info(  "#       {0:>10s}:  {1[0]:>10.4g} {1[1]:>10.4g} {1[2]:>10.4g} {1[3]:>10.4g}".format(assignments[0], hmm_model.lambdas_[0]) )
+    options.info(  "#       {0:>10s}:  {1[0]:>10.4g} {1[1]:>10.4g} {1[2]:>10.4g} {1[3]:>10.4g}".format(assignments[1], hmm_model.lambdas_[1]) )
+    options.info(  "#       {0:>10s}:  {1[0]:>10.4g} {1[1]:>10.4g} {1[2]:>10.4g} {1[3]:>10.4g}".format(assignments[2], hmm_model.lambdas_[2]) )
     
 
 #############################################
