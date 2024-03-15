@@ -870,6 +870,10 @@ def opt_validate_hmmratac ( options ):
     if options.hmm_modelonly:
        options.argtxt += "# Program will stop after generating model, which can be later applied with '--model'. \n"
 
+    # hmm_modelType
+    if options.hmm_type:
+       options.argtxt += "# Use --hmm-type to select a Gaussian ('gaussian') or Poisson ('poisson') model for the hidden markov model in HMMRATAC. Default: 'gaussian'. \n"
+
 
     # Peak Calling
     if options.prescan_cutoff <= 1:

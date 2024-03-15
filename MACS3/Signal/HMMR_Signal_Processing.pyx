@@ -130,7 +130,7 @@ cpdef list generate_digested_signals( object petrack, list weight_mapping ):
         ret_bedgraphs.append( bdg )
     return ret_bedgraphs
 
-cpdef list extract_signals_from_regions( list signals, object regions, int binsize = 10  ):
+cpdef list extract_signals_from_regions( list signals, object regions, int binsize = 10, hmm_type = 'gaussian'  ):
     # we will take regions in peaks, create a bedGraphTrackI with
     # binned regions in peaks, then let them overlap with signals to
     # create a list (4) of value arrays.
@@ -168,19 +168,35 @@ cpdef list extract_signals_from_regions( list signals, object regions, int binsi
     counter = 0
     prev_c = extracted_len[0][0]
     c = 0
-    for i in range( nn ):
-        ret_training_bins.append( extracted_positions[0][i] )
-        ret_training_data.append(
-            [ int(max( 0.0001, extracted_data[0][i] )),
-              int(max( 0.0001, extracted_data[1][i] )),
-              int(max( 0.0001, extracted_data[2][i] )),
-              int(max( 0.0001, extracted_data[3][i] )) ] )
-        c = extracted_len[0][i]
-        if counter != 0 and c != prev_c:
-            ret_training_lengths.append( counter )
-            counter = 0
-        prev_c = c
-        counter +=  1
+    if hmm_type == "gaussian":
+        for i in range( nn ):
+            ret_training_bins.append( extracted_positions[0][i] )
+            ret_training_data.append(
+                [max( 0.0001, extracted_data[0][i] ),
+                 max( 0.0001, extracted_data[1][i] ),
+                 max( 0.0001, extracted_data[2][i] ),
+                 max( 0.0001, extracted_data[3][i] ) ] )
+            c = extracted_len[0][i]
+            if counter != 0 and c != prev_c:
+                ret_training_lengths.append( counter )
+                counter = 0
+            prev_c = c
+            counter +=  1
+    #poisson can only take int values as input
+    if hmm_type == "poisson":
+        for i in range( nn ):
+            ret_training_bins.append( extracted_positions[0][i] )
+            ret_training_data.append(
+                [ int(max( 0.0001, extracted_data[0][i] )),
+                int(max( 0.0001, extracted_data[1][i] )),
+                int(max( 0.0001, extracted_data[2][i] )),
+                int(max( 0.0001, extracted_data[3][i] )) ] )
+            c = extracted_len[0][i]
+            if counter != 0 and c != prev_c:
+                ret_training_lengths.append( counter )
+                counter = 0
+            prev_c = c
+            counter +=  1
     # last region
     ret_training_lengths.append( counter )
     assert sum(ret_training_lengths) == len(ret_training_data)
