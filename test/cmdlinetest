@@ -213,18 +213,29 @@ macs3 randsample -i $CHIPCONTIGS50K -n 100000 --seed 31415926 --outdir ${OUTPUTD
 echo "15. hmmratac"
 mkdir ${OUTPUTDIR_PREFIX}_run_hmmratac
 
-macs3 hmmratac -i $ATACSEQBAM -n hmmratac_yeast500k --save-training-data --outdir ${OUTPUTDIR_PREFIX}_run_hmmratac &> ${OUTPUTDIR_PREFIX}_run_hmmratac/run_hmmratac.log
+# check default (no hmm-type specified) this is technically the same as --hmm-type gaussian (can include if preferred)
+# macs3 hmmratac -i $ATACSEQBAM -n hmmratac_yeast500k --outdir ${OUTPUTDIR_PREFIX}_run_hmmratac &> ${OUTPUTDIR_PREFIX}_run_hmmratac/run_hmmratac.log
 
+# check both gaussian and poisson hmm models, save training data
+macs3 hmmratac -i $ATACSEQBAM --hmm-type gaussian -n hmmratac_yeast500k --save-training-data --outdir ${OUTPUTDIR_PREFIX}_run_hmmratac &> ${OUTPUTDIR_PREFIX}_run_hmmratac/run_hmmratac.log
+macs3 hmmratac -i $ATACSEQBAM --hmm-type poisson -n hmmratac_yeast500k_poisson --save-training-data --outdir ${OUTPUTDIR_PREFIX}_run_hmmratac &> ${OUTPUTDIR_PREFIX}_run_hmmratac/run_hmmratac_poisson.log
+
+# check bedpe for both gaussian, poisson
 macs3 hmmratac -i $ATACSEQBED -n hmmratac_yeast500k_bedpe -f BEDPE --outdir ${OUTPUTDIR_PREFIX}_run_hmmratac &> ${OUTPUTDIR_PREFIX}_run_hmmratac/run_hmmratac_bedpe.log
+macs3 hmmratac -i $ATACSEQBED --hmm-type poisson -n hmmratac_yeast500k_bedpe_poisson -f BEDPE --outdir ${OUTPUTDIR_PREFIX}_run_hmmratac &> ${OUTPUTDIR_PREFIX}_run_hmmratac/run_hmmratac_bedpe_poisson.log
 
 TRAINING_REGIONS_BED=${OUTPUTDIR_PREFIX}_run_hmmratac/hmmratac_yeast500k_training_regions.bed
 HMM_MODEL=${OUTPUTDIR_PREFIX}_run_hmmratac/hmmratac_yeast500k_model.json
+TRAINING_REGIONS_BED_POISSON=${OUTPUTDIR_PREFIX}_run_hmmratac/hmmratac_yeast500k_poisson_training_regions.bed
+HMM_MODEL_POISSON=${OUTPUTDIR_PREFIX}_run_hmmratac/hmmratac_yeast500k_poisson_model.json
 
 echo "15.1 hmmratac load training regions from bedfile"
 macs3 hmmratac -i $ATACSEQBAM -n hmmratac_yeast500k_load_training_regions -t ${TRAINING_REGIONS_BED} --outdir ${OUTPUTDIR_PREFIX}_run_hmmratac &> ${OUTPUTDIR_PREFIX}_run_hmmratac/run_hmmratac_load_training_regions.log
+macs3 hmmratac -i $ATACSEQBAM --hmm-type poisson -n hmmratac_yeast500k_poisson_load_training_regions -t ${TRAINING_REGIONS_BED_POISSON} --outdir ${OUTPUTDIR_PREFIX}_run_hmmratac &> ${OUTPUTDIR_PREFIX}_run_hmmratac/run_hmmratac_load_training_regions_poisson.log
 
-echo "15.2 hmmratac load hmm model file"
+# echo "15.2 hmmratac load hmm model file"
 macs3 hmmratac -i $ATACSEQBAM -n hmmratac_yeast500k_load_hmm_model --model ${HMM_MODEL} --outdir ${OUTPUTDIR_PREFIX}_run_hmmratac &> ${OUTPUTDIR_PREFIX}_run_hmmratac/run_hmmratac_load_hmm_model.log
+macs3 hmmratac -i $ATACSEQBAM --hmm-type poisson -n hmmratac_yeast500k_poisson_load_hmm_model --model ${HMM_MODEL_POISSON} --outdir ${OUTPUTDIR_PREFIX}_run_hmmratac &> ${OUTPUTDIR_PREFIX}_run_hmmratac/run_hmmratac_load_hmm_model_poisson.log
 
 echo "16. search for errors or warnings in log files"
 flag=0
