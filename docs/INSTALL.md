@@ -7,7 +7,7 @@ Please check the following instructions to complete your installation.
 Here we list some prerequisites for installing and running MACS3. But
 if you are using conda or pip to install, the installer will check the
 dependencies and install them if necessary. Therefore, this section is
-for reference purpose, and if you are looking for steps to build and
+for reference purpose, and if you are just looking for steps to
 install MACS3, please go to the next section. Please note that, we
 haven't tested installation on any Windows OS, so currently only Linux
 and Mac OS systems are supported.
@@ -85,7 +85,10 @@ Then activate it by
 If you use 'conda', it will also provide virtual environment. Please
 read:
 [conda](https://docs.conda.io/projects/conda/en/latest/user-guide/getting-started.html)
-or [miniconda](https://docs.conda.io/en/latest/miniconda.html)
+or [miniconda](https://docs.conda.io/en/latest/miniconda.html) For
+example, after installing 'conda', you can use `conda create -n MACS3`
+to create a new environment called 'MACS3' then switch to this
+environment with `conda activate MACS3`.
 
 There is another solution, [pipx](https://pipx.pypa.io/), to make a
 clean isolated python environment to run python tools such as
@@ -111,6 +114,14 @@ administrator if you want their help.
 To upgrade MACS3, type `pip install --upgrade macs3`. It will check
 currently installed MACS3, compare the version with the one on PyPI
 repository, download and install a newer version while necessary.
+
+## Install through conda
+
+To install MACS3 using 'conda', simply execute `conda install -c
+bioconda macs3` in your conda environment. This command installs MACS3
+along with its dependencies from the Bioconda channel. Please ensure
+conda is installed and a dedicated conda environment has been created
+and activated beforehand for a smooth installation process.
 
 ## Install from source through pip
 
