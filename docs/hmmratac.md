@@ -106,6 +106,16 @@ output file names. DEFAULT: "NA"
  instructions in [Choices of cutoff values](#choices-of-cutoff-values)
  on how to decide the three crucial parameters.
 
+### `--hmm-type`
+
+We provide two types of emissions for the Hidden Markov Model -- the
+Gaussian model and the Poisson model. By default, the Gaussian
+emission will be used (as `--hmm-type gaussian`). To choose Poisson
+emission, use `--hmm-type poisson`. The Gaussian emission can be
+described by mean and variance for each state, while the simpler
+Poisson only needs the lambda value. The difference can be found in
+the saved json file for HMM.
+
 ### `-u HMM_UPPER` / `--upper HMM_UPPER`
 
 Upper limit on fold change range for choosing training sites. This is
