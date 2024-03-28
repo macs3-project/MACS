@@ -973,6 +973,8 @@ plus an extra option for the HMM model file like `macs3 hmmratac
                             help = "A JSON file generated from previous HMMRATAC run to use instead of creating new one. When provided, HMM training will be skipped. Default: NA" )
     group_hmm.add_argument( "--modelonly", dest = "hmm_modelonly", action = "store_true", default = False,
                            help = "Stop the program after generating model. Use this option to generate HMM model ONLY, which can be later applied with `--model`. Default: False")
+    group_hmm.add_argument( "--hmm-type", dest = "hmm_type", type = str, choices = ("gaussian", "poisson"), default = "gaussian",
+                           help = "Use --hmm-type to select a Gaussian ('gaussian') or Poisson ('poisson') model for the hidden markov model in HMMRATAC. Default: 'gaussian'.")
 
     # group for peak calling arguments
     group_call = argparser_hmmratac.add_argument_group( "Peak calling/HMM decoding arguments" )

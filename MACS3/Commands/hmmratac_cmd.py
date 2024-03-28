@@ -274,15 +274,16 @@ def run( args ):
     # 4. Train HMM
     #############################################
     # if model file is provided, we skip this step
+    # include options.hmm_type and make it backwards compatible, if no hmm_type default is gaussian
     if options.hmm_file:
         options.info( f"#4 Load Hidden Markov Model from given model file")
-        hmm_model, i_open_region, i_background_region, i_nucleosomal_region, options.hmm_binsize = hmm_model_init( options.hmm_file )
+        hmm_model, i_open_region, i_background_region, i_nucleosomal_region, options.hmm_binsize, options.hmm_type = hmm_model_init( options.hmm_file )
     else:
         options.info( f"#4 Train Hidden Markov Model with Multivariate Gaussian Emission" )
 
         # extract signals within peak using the given binsize
         options.info( f"#  Extract signals in training regions with bin size of {options.hmm_binsize}")
-        [ training_bins, training_data, training_data_lengths ] = extract_signals_from_regions( digested_atac_signals, training_regions, binsize = options.hmm_binsize )
+        [ training_bins, training_data, training_data_lengths ] = extract_signals_from_regions( digested_atac_signals, training_regions, binsize = options.hmm_binsize, hmm_type = options.hmm_type )
 
         if options.save_train:
             f = open( training_datafile, "w" )
@@ -299,12 +300,15 @@ def run( args ):
 
         options.info( f"#  Use Baum-Welch algorithm to train the HMM")
 
-        hmm_model = hmm_training( training_data, training_data_lengths, random_seed = options.hmm_randomSeed, covar="full" )
+        hmm_model = hmm_training( training_data, training_data_lengths, random_seed = options.hmm_randomSeed, hmm_type = options.hmm_type )
 
         options.info( f"#   HMM converged: {hmm_model.monitor_.converged}")
 
         # label hidden states
-        means_sum = np.sum( hmm_model.means_, axis=1 )
+        if options.hmm_type == "gaussian":
+            means_sum = np.sum( hmm_model.means_, axis=1 )
+        if options.hmm_type == "poisson":
+            means_sum = np.sum( hmm_model.lambdas_, axis=1 )
 
         # first, the state with the highest overall emission is the open state
         i_open_region = np.where( means_sum == max(means_sum) )[0][0]
@@ -317,7 +321,7 @@ def run( args ):
 
         # write hmm into model file
         options.info( f"#  Write HMM parameters into JSON: {hmm_modelfile}")
-        hmm_model_save( hmm_modelfile, hmm_model, options.hmm_binsize, i_open_region, i_nucleosomal_region, i_background_region )
+        hmm_model_save( hmm_modelfile, hmm_model, options.hmm_binsize, i_open_region, i_nucleosomal_region, i_background_region, options.hmm_type )
         
         # if --modelonly option provided, exit script after hmm model is saved 
         if options.hmm_modelonly:
@@ -342,11 +346,19 @@ def run( args ):
     options.info(  "#       {0:>10s}-> {1[0]:>10.4g} {1[1]:>10.4g} {1[2]:>10.4g}".format(assignments[0], hmm_model.transmat_[0]) )
     options.info(  "#       {0:>10s}-> {1[0]:>10.4g} {1[1]:>10.4g} {1[2]:>10.4g}".format(assignments[1], hmm_model.transmat_[1]) )
     options.info(  "#       {0:>10s}-> {1[0]:>10.4g} {1[1]:>10.4g} {1[2]:>10.4g}".format(assignments[2], hmm_model.transmat_[2]) )
-    options.info( f"#   HMM Emissions (mean): ")
-    options.info(  "#                    {0[0]:>10s} {0[1]:>10s} {0[2]:>10s} {0[3]:>10s}".format( ["short", "mono", "di", "tri"] ) )
-    options.info(  "#       {0:>10s}:  {1[0]:>10.4g} {1[1]:>10.4g} {1[2]:>10.4g} {1[3]:>10.4g}".format(assignments[0], hmm_model.means_[0]) )
-    options.info(  "#       {0:>10s}:  {1[0]:>10.4g} {1[1]:>10.4g} {1[2]:>10.4g} {1[3]:>10.4g}".format(assignments[1], hmm_model.means_[1]) )
-    options.info(  "#       {0:>10s}:  {1[0]:>10.4g} {1[1]:>10.4g} {1[2]:>10.4g} {1[3]:>10.4g}".format(assignments[2], hmm_model.means_[2]) )
+    
+    if options.hmm_type == 'gaussian':
+        options.info( f"#   HMM Emissions (means): ")
+        options.info(  "#                    {0[0]:>10s} {0[1]:>10s} {0[2]:>10s} {0[3]:>10s}".format( ["short", "mono", "di", "tri"] ) )
+        options.info(  "#       {0:>10s}:  {1[0]:>10.4g} {1[1]:>10.4g} {1[2]:>10.4g} {1[3]:>10.4g}".format(assignments[0], hmm_model.means_[0]) )
+        options.info(  "#       {0:>10s}:  {1[0]:>10.4g} {1[1]:>10.4g} {1[2]:>10.4g} {1[3]:>10.4g}".format(assignments[1], hmm_model.means_[1]) )
+        options.info(  "#       {0:>10s}:  {1[0]:>10.4g} {1[1]:>10.4g} {1[2]:>10.4g} {1[3]:>10.4g}".format(assignments[2], hmm_model.means_[2]) )
+    if options.hmm_type == 'poisson':
+        options.info( f"#   HMM Emissions (lambdas): ")
+        options.info(  "#                    {0[0]:>10s} {0[1]:>10s} {0[2]:>10s} {0[3]:>10s}".format( ["short", "mono", "di", "tri"] ) )
+        options.info(  "#       {0:>10s}:  {1[0]:>10.4g} {1[1]:>10.4g} {1[2]:>10.4g} {1[3]:>10.4g}".format(assignments[0], hmm_model.lambdas_[0]) )
+        options.info(  "#       {0:>10s}:  {1[0]:>10.4g} {1[1]:>10.4g} {1[2]:>10.4g} {1[3]:>10.4g}".format(assignments[1], hmm_model.lambdas_[1]) )
+        options.info(  "#       {0:>10s}:  {1[0]:>10.4g} {1[1]:>10.4g} {1[2]:>10.4g} {1[3]:>10.4g}".format(assignments[2], hmm_model.lambdas_[2]) )
     
 
 #############################################
@@ -386,7 +398,7 @@ def run( args ):
         n += 1
         cr = candidate_regions.pop( options.decoding_steps )
         options.info( "#    decoding %d..." % ( n*options.decoding_steps ) )        
-        [ cr_bins, cr_data, cr_data_lengths ] = extract_signals_from_regions( digested_atac_signals, cr, binsize = options.hmm_binsize )
+        [ cr_bins, cr_data, cr_data_lengths ] = extract_signals_from_regions( digested_atac_signals, cr, binsize = options.hmm_binsize, hmm_type = options.hmm_type )
         #options.info( "#     extracted signals in the candidate regions")
         candidate_bins.extend( cr_bins )
         #options.info( "#     saving information regarding the candidate regions")        
