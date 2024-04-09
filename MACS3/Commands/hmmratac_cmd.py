@@ -1,4 +1,4 @@
-# Time-stamp: <2024-04-26 11:47:02 Tao Liu>
+# Time-stamp: <2024-04-26 15:38:54 Tao Liu>
 
 """Description: Main HMMR command
 
@@ -177,18 +177,13 @@ def run( args ):
     if options.pileup_short:
         options.info( f"#  Pile up ONLY short fragments" )
         fc_bdg = digested_atac_signals[ 0 ]
-        (sum_v, n_v, max_v, min_v, mean_v, std_v) = fc_bdg.summary()
-        #print(sum_v, n_v, max_v, min_v, mean_v, std_v)
-        options.info( f"#  Convert pileup to fold-change over average signal" )
-        fc_bdg.apply_func(lambda x: x/mean_v)
     else:
         options.info( f"#  Pile up all fragments" )
         fc_bdg = petrack.pileup_bdg( [1.0,], baseline_value = 0 )
-        (sum_v, n_v, max_v, min_v, mean_v, std_v) = fc_bdg.summary()
-        options.info( f"#  Convert pileup to fold-change over average signal" )
-        fc_bdg.apply_func(lambda x: x/mean_v)
-       
-        
+    (sum_v, n_v, max_v, min_v, mean_v, std_v) = fc_bdg.summary()
+    options.info( f"#  Convert pileup to fold-change over average signal" )
+    fc_bdg.apply_func(lambda x: x/mean_v)
+
     # if cutoff_analysis only, generate and save the report and quit
     if options.cutoff_analysis_only:
         # we will run cutoff analysis only and quit
@@ -197,11 +192,10 @@ def run( args ):
 
         # Let MACS3 do the cutoff analysis to help decide the lower and upper cutoffs
         with open(cutoffanalysis_file, "w") as ofhd_cutoff:
-            ofhd_cutoff.write( fc_bdg.cutoff_analysis( min_length=minlen, max_gap=options.hmm_training_flanking, max_score = 100 ) )
+            ofhd_cutoff.write( fc_bdg.cutoff_analysis( min_length=minlen, max_gap=options.hmm_training_flanking, max_score = 100, steps=options.cutoff_analysis_steps ) )
         #raise Exception("Cutoff analysis only.")
         sys.exit(1)
-        
-        
+
     #############################################
     # 3. Define training set by peak calling
     #############################################

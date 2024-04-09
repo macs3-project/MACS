@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# Time-stamp: <2023-11-15 10:41:42 Tao Liu>
+# Time-stamp: <2024-04-09 17:23:02 Tao Liu>
 
 """Description: MACS v3 main executable.
 
@@ -908,6 +908,8 @@ plus an extra option for the HMM model file like `macs3 hmmratac
     group_output.add_argument( "--cutoff-analysis-only", dest = "cutoff_analysis_only", action = "store_true",
                                 help = "Only run the cutoff analysis and output a report. After generating the report, the process will stop. The report will help user decide the three crucial parameters for `-l`, `-u`, and `-c`. So it's highly recommanded to run this first! Please read the report and instructions in `Choices of cutoff values` on how to decide the three crucial parameters",
                                 default = False )
+    group_output.add_argument( "--cutoff-analysis-steps", dest="cutoff_analysis_steps", type = int,
+                                help = "Steps for performing cutoff analysis. It will be used to decide which cutoff value should be included in the final report. Larger the value, higher resolution the cutoff analysis can be. But please note, the final report won't necessarily include the same number of cutoff values as specified here since we won't output the cutoff that yield zero peak. DEFAULT: 100", default = 100 )
     group_output.add_argument( "--save-digested", dest = "save_digested", action = "store_true",
                                help = "Save the digested ATAC signals of short-, mono-, di-, and tri- signals in three BedGraph files with the names NAME_short.bdg, NAME_mono.bdg, NAME_di.bdg, and NAME_tri.bdg. DEFAULT: False",
                                default = False )    
