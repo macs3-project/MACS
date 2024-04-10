@@ -106,6 +106,21 @@ output file names. DEFAULT: "NA"
  instructions in [Choices of cutoff values](#choices-of-cutoff-values)
  on how to decide the three crucial parameters.
 
+### `--cutoff-analysis-steps`
+
+Steps for performing cutoff analysis. It will be used to decide which
+cutoff value should be included in the final report. Larger the value,
+higher resolution the cutoff analysis can be. The cutoff analysis
+function will first find the smallest and the largest foldchange score
+in the data, then break the range of foldchange score into
+`CUTOFF_ANALYSIS_STEPS` intervals. It will then use each foldchange
+score as cutoff to call peaks and calculate the total number of
+candidate peaks, the total basepairs of peaks, and the average length
+of peak in basepair. Please note that the final report ideally should
+include `CUTOFF_ANALYSIS_STEPS` rows, but in practice, if the
+foldchange cutoff yield zero peak, the row for that foldchange value
+won't be included.  DEFAULT: 100
+
 ### `--hmm-type`
 
 We provide two types of emissions for the Hidden Markov Model -- the

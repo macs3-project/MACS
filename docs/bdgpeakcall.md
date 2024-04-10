@@ -39,9 +39,22 @@ Here is a brief overview of the command line options for `bdgpeakcall`:
    this option is on, `bdgpeakcall` will analyze the outcome of
    different cutoff values and then quit without calling any peaks.
    DEFAULT: False
+- `--cutoff-analysis-steps`: Steps for performing cutoff analysis. It
+   will be used to decide which cutoff value should be included in the
+   final report. Larger the value, higher resolution the cutoff
+   analysis can be. The cutoff analysis function will first find the
+   smallest (at least 0) and the largest (at most 1,000) score in the
+   bedGraph, then break the range of score into
+   `CUTOFF_ANALYSIS_STEPS` intervals. It will then use each score as
+   cutoff to call peaks and calculate the total number of candidate
+   peaks, the total basepairs of peaks, and the average length of peak
+   in basepair. Please note that the final report ideally should
+   include `CUTOFF_ANALYSIS_STEPS` rows, but in practice, if the
+   cutoff yield zero peak, the row for that value won't be included.
+   DEFAULT: 100", default = 100 )
 - `--no-trackline`: Tells MACS not to include a trackline with
    bedGraph files. The trackline is used by UCSC for the options for
-   display.  
+   display.
 - `--verbose`: Set the verbose level of runtime messages. 0: only show
    critical messages, 1: show additional warning messages, 2: show
    process information, 3: show debug messages. DEFAULT: 2
