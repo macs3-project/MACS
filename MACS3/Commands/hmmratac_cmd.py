@@ -399,11 +399,14 @@ def run( args ):
         cr = candidate_regions.pop( options.decoding_steps )
         options.info( "#    decoding %d..." % ( n*options.decoding_steps ) )        
         [ cr_bins, cr_data, cr_data_lengths ] = extract_signals_from_regions( digested_atac_signals, cr, binsize = options.hmm_binsize, hmm_type = options.hmm_type )
-        #options.info( "#     extracted signals in the candidate regions")
+        # options.info( "#     extract_signals_from_regions() complete")
         candidate_bins.extend( cr_bins )
-        #options.info( "#     saving information regarding the candidate regions")        
+        # options.info( "#     candidate_bins.extend() complete")        
         predicted_proba.extend( hmm_predict( cr_data, cr_data_lengths, hmm_model ) )
-        #options.info( "#     prediction done")
+        # options.info( "#     hmm_predict, predicted_probab.extend() complete")
+        cr_data_lengths = []
+        cr_data = []
+        cr_bins = []
         gc.collect()
 
         
