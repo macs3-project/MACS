@@ -441,40 +441,40 @@ def run( args ):
 #############################################
 # 6. Output - add to OutputWriter
 #############################################
-#     options.info( f"# Write the output...")
-#     # Now taken the candidate_bins and predicted_proba, we can generate various
-#     # outputs
+    options.info( f"# Write the output...")
+    # Now taken the candidate_bins and predicted_proba, we can generate various
+    # outputs
     
-#     # One thing to remember about candidate_bins is that the position
-#     # in this array is the 'end' of the bin, the actual region is the
-#     # 'end'-'binsize' to the 'end'.
+    # One thing to remember about candidate_bins is that the position
+    # in this array is the 'end' of the bin, the actual region is the
+    # 'end'-'binsize' to the 'end'.
     
-#     # First, the likelihoods for each of the three states in a bedGraph
-#     if options.save_likelihoods:
-#         options.info( f"# Write the likelihoods for each states into three bedGraph files {options.name}_open.bdg, {options.name}_nuc.bdg, and {options.name}_bg.bdg")
-#         open_state_bdg_fhd = open( open_state_bdgfile, "w" )
-#         nuc_state_bdg_fhd = open( nuc_state_bdgfile, "w" )
-#         bg_state_bdg_fhd = open( bg_state_bdgfile, "w" )
-#         save_proba_to_bedGraph( candidate_bins, predicted_proba, options.hmm_binsize, open_state_bdg_fhd, nuc_state_bdg_fhd, bg_state_bdg_fhd, i_open_region, i_nucleosomal_region, i_background_region )
-#         open_state_bdg_fhd.close()
-#         nuc_state_bdg_fhd.close()
-#         bg_state_bdg_fhd.close()
+    # First, the likelihoods for each of the three states in a bedGraph
+    if options.save_likelihoods:
+        options.info( f"# Write the likelihoods for each states into three bedGraph files {options.name}_open.bdg, {options.name}_nuc.bdg, and {options.name}_bg.bdg")
+        open_state_bdg_fhd = open( open_state_bdgfile, "w" )
+        nuc_state_bdg_fhd = open( nuc_state_bdgfile, "w" )
+        bg_state_bdg_fhd = open( bg_state_bdgfile, "w" )
+        save_proba_to_bedGraph( candidate_bins_file, predicted_proba_file, options.hmm_binsize, open_state_bdg_fhd, nuc_state_bdg_fhd, bg_state_bdg_fhd, i_open_region, i_nucleosomal_region, i_background_region )
+        open_state_bdg_fhd.close()
+        nuc_state_bdg_fhd.close()
+        bg_state_bdg_fhd.close()
     
-#     # Generate states path:
-#     states_path = generate_states_path( candidate_bins, predicted_proba, options.hmm_binsize, i_open_region, i_nucleosomal_region, i_background_region )
+    # # Generate states path:
+    # states_path = generate_states_path( candidate_bins, predicted_proba, options.hmm_binsize, i_open_region, i_nucleosomal_region, i_background_region )
     
-#     # Save states path if needed
-#     # PS: we need to implement extra feature to include those regions NOT in candidate_bins and assign them as 'background state'.
-#     if options.save_states:
-#         options.info( f"# Write states assignments in a BED file: {options.name}_states.bed" )
-#         f = open( states_file, "w" )
-#         save_states_bed( states_path, f )
-#         f.close()
+    # # Save states path if needed
+    # # PS: we need to implement extra feature to include those regions NOT in candidate_bins and assign them as 'background state'.
+    # if options.save_states:
+    #     options.info( f"# Write states assignments in a BED file: {options.name}_states.bed" )
+    #     f = open( states_file, "w" )
+    #     save_states_bed( states_path, f )
+    #     f.close()
 
-#     options.info( f"# Write accessible regions in a gappedPeak file: {options.name}_accessible_regions.gappedPeak")
-#     ofhd = open( accessible_file, "w" )
-#     save_accessible_regions( states_path, ofhd, options.openregion_minlen )
-#     ofhd.close()
+    # options.info( f"# Write accessible regions in a gappedPeak file: {options.name}_accessible_regions.gappedPeak")
+    # ofhd = open( accessible_file, "w" )
+    # save_accessible_regions( states_path, ofhd, options.openregion_minlen )
+    # ofhd.close()
 
 # def save_proba_to_bedGraph( candidate_bins, predicted_proba, binsize, open_state_bdg_file, nuc_state_bdg_file, bg_state_bdg_file, i_open, i_nuc, i_bg ):
 #     open_state_bdg = bedGraphTrackI( baseline_value = 0 )
@@ -515,6 +515,48 @@ def run( args ):
 #     nuc_state_bdg.write_bedGraph( nuc_state_bdg_file, "Nucleosomal States", "Likelihoods of being Nucleosomal States" )
 #     bg_state_bdg.write_bedGraph( bg_state_bdg_file, "Background States", "Likelihoods of being Background States" )
 #     return
+def save_proba_to_bedGraph(candidate_bins_file, predicted_proba_file, binsize, open_state_bdg_file, nuc_state_bdg_file, bg_state_bdg_file, i_open, i_nuc, i_bg):
+    open_state_bdg = bedGraphTrackI(baseline_value=0)
+    nuc_state_bdg = bedGraphTrackI(baseline_value=0)
+    bg_state_bdg = bedGraphTrackI(baseline_value=0)
+
+    prev_chrom_name = None
+    prev_bin_end = None
+
+    with open(candidate_bins_file, 'r') as cb_file, open(predicted_proba_file, 'r') as pp_file:
+        for cb_line, pp_line in zip(cb_file, pp_file):
+            cb_data = cb_line.strip().split('\t')
+            pp_data = pp_line.strip().split('\t')
+
+            chrname = cb_data[0]
+            end_pos = int(cb_data[1])
+            start_pos = end_pos - binsize
+
+            if chrname != prev_chrom_name:
+                prev_chrom_name = chrname
+                if start_pos > 0:
+                    open_state_bdg.add_loc(chrname, 0, start_pos, 0.0)
+                    nuc_state_bdg.add_loc(chrname, 0, start_pos, 0.0)
+                    bg_state_bdg.add_loc(chrname, 0, start_pos, 1.0)
+                    prev_bin_end = start_pos
+                elif start_pos == 0:
+                    prev_bin_end = 0
+
+            if prev_bin_end < start_pos:
+                open_state_bdg.add_loc(chrname, prev_bin_end, start_pos, 0.0)
+                nuc_state_bdg.add_loc(chrname, prev_bin_end, start_pos, 0.0)
+                bg_state_bdg.add_loc(chrname, prev_bin_end, start_pos, 1.0)
+
+            open_state_bdg.add_loc(chrname, start_pos, end_pos, float(pp_data[i_open]))
+            nuc_state_bdg.add_loc(chrname, start_pos, end_pos, float(pp_data[i_nuc]))
+            bg_state_bdg.add_loc(chrname, start_pos, end_pos, float(pp_data[i_bg]))
+
+            prev_bin_end = start_pos
+
+    open_state_bdg.write_bedGraph(open_state_bdg_file, "Open States", "Likelihoods of being Open States")
+    nuc_state_bdg.write_bedGraph(nuc_state_bdg_file, "Nucleosomal States", "Likelihoods of being Nucleosomal States")
+    bg_state_bdg.write_bedGraph(bg_state_bdg_file, "Background States", "Likelihoods of being Background States")
+    return
 
 # def save_states_bed( states_path, states_bedfile ):
 #     # we do not need to output background state. 
