@@ -392,28 +392,11 @@ def run( args ):
     # Note: we implement in a way that we will decode the candidate regions 10000 regions at a time so 1. we can make it running in parallel in the future; 2. we can reduce the memory usage.
     options.info( f"#  Use HMM to predict states")
     n = 0
-    # predicted_proba = []
-    # candidate_bins = []
-    # while candidate_regions.total != 0:
-    #     n += 1
-    #     cr = candidate_regions.pop( options.decoding_steps )
-    #     options.info( "#    decoding %d..." % ( n*options.decoding_steps ) )        
-    #     [ cr_bins, cr_data, cr_data_lengths ] = extract_signals_from_regions( digested_atac_signals, cr, binsize = options.hmm_binsize, hmm_type = options.hmm_type )
-    #     # options.info( "#     extract_signals_from_regions() complete")
-    #     candidate_bins.extend( cr_bins )
-    #     # options.info( "#     candidate_bins.extend() complete")        
-    #     predicted_proba.extend( hmm_predict( cr_data, cr_data_lengths, hmm_model ) )
-    #     # options.info( "#     hmm_predict, predicted_probab.extend() complete")
-    #     cr_data_lengths = []
-    #     cr_data = []
-    #     cr_bins = []
-    #     gc.collect()
     candidate_bins_file_name = "candidate_bins.txt"
     predicted_proba_file_name = "predicted_probab.txt"
     candidate_bins_file = open(candidate_bins_file_name, "w")
     predicted_proba_file = open(predicted_proba_file_name, "w")
 
-    # try:
     while candidate_regions.total != 0:
         n += 1
         cr = candidate_regions.pop(options.decoding_steps)
@@ -434,7 +417,6 @@ def run( args ):
         options.info( "#     clean up complete")
         gc.collect()
 
-    # finally:
     candidate_bins_file.close()
     predicted_proba_file.close()
     options.info( f"# candidate_bins, predicted_proba files written...")
@@ -463,61 +445,25 @@ def run( args ):
         options.info( f"# finished writing proba_to_bedgraph")
     
     # # Generate states path:
-    # states_path = generate_states_path( candidate_bins, predicted_proba, options.hmm_binsize, i_open_region, i_nucleosomal_region, i_background_region )
+    states_path = generate_states_path( candidate_bins_file_name, predicted_proba_file_name, options.hmm_binsize, i_open_region, i_nucleosomal_region, i_background_region )
+    # print(states_path)
+    options.info( f"# finished generating states path")
     
     # # Save states path if needed
     # # PS: we need to implement extra feature to include those regions NOT in candidate_bins and assign them as 'background state'.
-    # if options.save_states:
-    #     options.info( f"# Write states assignments in a BED file: {options.name}_states.bed" )
-    #     f = open( states_file, "w" )
-    #     save_states_bed( states_path, f )
-    #     f.close()
+    if options.save_states:
+        options.info( f"# Write states assignments in a BED file: {options.name}_states.bed" )
+        f = open( states_file, "w" )
+        save_states_bed( states_path, f )
+        f.close()
 
-    # options.info( f"# Write accessible regions in a gappedPeak file: {options.name}_accessible_regions.gappedPeak")
-    # ofhd = open( accessible_file, "w" )
-    # save_accessible_regions( states_path, ofhd, options.openregion_minlen )
-    # ofhd.close()
+    options.info( f"# Write accessible regions in a gappedPeak file: {options.name}_accessible_regions.gappedPeak")
+    ofhd = open( accessible_file, "w" )
+    save_accessible_regions( states_path, ofhd, options.openregion_minlen )
+    ofhd.close()
+    options.info( f"# Finished")
 
-# def save_proba_to_bedGraph( candidate_bins, predicted_proba, binsize, open_state_bdg_file, nuc_state_bdg_file, bg_state_bdg_file, i_open, i_nuc, i_bg ):
-#     open_state_bdg = bedGraphTrackI( baseline_value = 0 )
-#     nuc_state_bdg = bedGraphTrackI( baseline_value = 0 )
-#     bg_state_bdg = bedGraphTrackI( baseline_value = 0 )
-
-#     prev_chrom_name = None
-#     prev_bin_end = None
-#     for l in range(len(predicted_proba)):
-#         # note that any region not in the candidate bins will be
-#         # treated as absolutely the background
-#         chrname = candidate_bins[l][0]
-#         end_pos = candidate_bins[l][1]
-#         start_pos = end_pos - binsize
-#         if chrname != prev_chrom_name:
-#             prev_chrom_name = chrname
-#             # add the first region as background
-#             if start_pos > 0:
-#                 open_state_bdg.add_loc( chrname, 0, start_pos, 0.0 )
-#                 nuc_state_bdg.add_loc( chrname, 0, start_pos, 0.0 )
-#                 bg_state_bdg.add_loc( chrname, 0, start_pos, 1.0 )
-#                 prev_bin_end = start_pos
-#             elif start_pos == 0:
-#                 # if start_pos == 0, then the first bin has to be assigned, we set prev_bin_end as 0 
-#                 prev_bin_end = 0
-#         # now check if the prev_bin_end is start_pos, if not, add a gap of background
-#         if prev_bin_end < start_pos:
-#             open_state_bdg.add_loc( chrname, prev_bin_end, start_pos, 0.0 )
-#             nuc_state_bdg.add_loc( chrname, prev_bin_end, start_pos, 0.0 )
-#             bg_state_bdg.add_loc( chrname, prev_bin_end, start_pos, 1.0 )
-
-#         open_state_bdg.add_loc( chrname, start_pos, end_pos, predicted_proba[l][ i_open ] )
-#         nuc_state_bdg.add_loc( chrname, start_pos, end_pos, predicted_proba[l][ i_nuc ] )
-#         bg_state_bdg.add_loc( chrname, start_pos, end_pos, predicted_proba[l][ i_bg ] )
-#         prev_bin_end = start_pos
-
-#     open_state_bdg.write_bedGraph( open_state_bdg_file, "Open States", "Likelihoods of being Open States" )
-#     nuc_state_bdg.write_bedGraph( nuc_state_bdg_file, "Nucleosomal States", "Likelihoods of being Nucleosomal States" )
-#     bg_state_bdg.write_bedGraph( bg_state_bdg_file, "Background States", "Likelihoods of being Background States" )
-#     return
-def save_proba_to_bedGraph(candidate_bins_file_name, predicted_proba_file_name, binsize, open_state_bdg_file, nuc_state_bdg_file, bg_state_bdg_file, i_open, i_nuc, i_bg):
+def save_proba_to_bedGraph(candidate_bins_file, predicted_proba_file, binsize, open_state_bdg_file, nuc_state_bdg_file, bg_state_bdg_file, i_open, i_nuc, i_bg):
     open_state_bdg = bedGraphTrackI(baseline_value=0)
     nuc_state_bdg = bedGraphTrackI(baseline_value=0)
     bg_state_bdg = bedGraphTrackI(baseline_value=0)
@@ -525,12 +471,12 @@ def save_proba_to_bedGraph(candidate_bins_file_name, predicted_proba_file_name, 
     prev_chrom_name = None
     prev_bin_end = None
 
-    with open(candidate_bins_file_name, 'r') as cb_file, open(predicted_proba_file_name, 'r') as pp_file:
+    with open(candidate_bins_file, 'r') as cb_file, open(predicted_proba_file, 'r') as pp_file:
         for cb_line, pp_line in zip(cb_file, pp_file):
-            cb_data = cb_line.strip().split(b',')
-            pp_data = pp_line.strip().split(b'\t')
+            cb_data = cb_line.strip().split(',')
+            pp_data = pp_line.strip().split(',')
 
-            chrname = cb_data[0].decode('utf-8')  # Decode byte string to regular string
+            chrname = cb_data[0].strip("b'").encode('utf-8') # Convert str to bytes
             end_pos = int(cb_data[1])
             start_pos = end_pos - binsize
 
@@ -554,82 +500,95 @@ def save_proba_to_bedGraph(candidate_bins_file_name, predicted_proba_file_name, 
             bg_state_bdg.add_loc(chrname, start_pos, end_pos, float(pp_data[i_bg]))
 
             prev_bin_end = start_pos
-
     open_state_bdg.write_bedGraph(open_state_bdg_file, "Open States", "Likelihoods of being Open States")
     nuc_state_bdg.write_bedGraph(nuc_state_bdg_file, "Nucleosomal States", "Likelihoods of being Nucleosomal States")
     bg_state_bdg.write_bedGraph(bg_state_bdg_file, "Background States", "Likelihoods of being Background States")
     return
 
-# def save_states_bed( states_path, states_bedfile ):
-#     # we do not need to output background state. 
-#     for l in range( len( states_path ) ):
-#         if states_path[l][3] != "bg":
-#             states_bedfile.write( "%s\t%s\t%s\t%s\n" % states_path[l] )
-#     return
+def save_states_bed( states_path, states_bedfile ):
+    # we do not need to output background state. 
+    for l in range( len( states_path ) ):
+        if states_path[l][3] != "bg":
+            states_bedfile.write( "%s\t%s\t%s\t%s\n" % states_path[l] )
+    return
 
-# def generate_states_path(candidate_bins, predicted_proba, binsize, i_open_region, i_nucleosomal_region, i_background_region):
-#     ret_states_path = []
-#     labels_list = ["open", "nuc", "bg"]
-#     start_pos = candidate_bins[0][1] - binsize
-#     for l in range(1, len(predicted_proba)):
-#         chromosome = candidate_bins[l][0].decode()
-#         prev_open, prev_nuc, prev_bg = predicted_proba[l-1][i_open_region], predicted_proba[l-1][i_nucleosomal_region], predicted_proba[l-1][i_background_region]
-#         curr_open, curr_nuc, curr_bg = predicted_proba[l][i_open_region], predicted_proba[l][i_nucleosomal_region], predicted_proba[l][i_background_region]
-        
-#         label_prev = labels_list[max((prev_open, 0), (prev_nuc, 1), (prev_bg, 2), key=lambda x: x[0])[1]]
-#         label_curr = labels_list[max((curr_open, 0), (curr_nuc, 1), (curr_bg, 2), key=lambda x: x[0])[1]]
+def generate_states_path(candidate_bins_file, predicted_proba_file, binsize, i_open_region, i_nucleosomal_region, i_background_region):
+    ret_states_path = []
+    labels_list = ["open", "nuc", "bg"]
+    start_of_file = True
+ 
+    with open(candidate_bins_file, 'r') as cb_file, open(predicted_proba_file, 'r') as pp_file:
+        for cb_line, pp_line in zip(cb_file, pp_file):
+            cb_data = cb_line.strip().split(',')
+            pp_data = pp_line.strip().split(',')
+            final_pos = int(cb_data[1])
+            if start_of_file == True:
+                prev_chromosome = cb_data[0].strip("b'")
+                start_pos = int(cb_data[1])-binsize
+                prev_end_pos = int(cb_data[1])
+                prev_open, prev_nuc, prev_bg = pp_data[i_open_region], pp_data[i_nucleosomal_region], pp_data[i_background_region]
+                label_prev = labels_list[max((prev_open, 0), (prev_nuc, 1), (prev_bg, 2), key=lambda x: x[0])[1]]
+                start_of_file = False
+            else:
+                chromosome = cb_data[0].strip("b'")
+                curr_open, curr_nuc, curr_bg = pp_data[i_open_region], pp_data[i_nucleosomal_region], pp_data[i_background_region]
+                label_curr = labels_list[max((curr_open, 0), (curr_nuc, 1), (curr_bg, 2), key=lambda x: x[0])[1]]
+                
+                if chromosome == prev_chromosome:
+                    if label_prev != label_curr: #otherwise continue.. 
+                        end_pos = prev_end_pos
+                        ret_states_path.append((chromosome, start_pos, end_pos, label_prev))
+                        start_pos = int(cb_data[1])-binsize
 
-#         if candidate_bins[l-1][0] == candidate_bins[l][0]:  # if we are looking at the same chromosome ...
-#             if label_prev != label_curr:
-#                 end_pos = candidate_bins[l-1][1]
-#                 ret_states_path.append((chromosome, start_pos, end_pos, label_prev))
-#                 start_pos = candidate_bins[l][1] - binsize
-#             elif l == len(predicted_proba) - 1:
-#                 end_pos = candidate_bins[l][1]
-#                 ret_states_path.append((chromosome, start_pos, end_pos, label_prev))
-#         else:
-#             start_pos = candidate_bins[l][1] - binsize
-#     return ret_states_path
+                elif chromosome != prev_chromosome: # if looking at 2 different chrms, write end of prev, and then restart
+                    end_pos = prev_end_pos
+                    ret_states_path.append((prev_chromosome, start_pos, end_pos, label_prev))
+                    start_pos = int(cb_data[1])-binsize
 
-# def save_accessible_regions(states_path, accessible_region_file, openregion_minlen):
-#     # Function to add regions to the list
-#     def add_regions(i, regions):
-#         for j in range(i, i+3):
-#             if not regions or states_path[j][2] != regions[-1][2]:
-#                 regions.append((states_path[j][0], int(states_path[j][1]), int(states_path[j][2]), states_path[j][3]))
-#         return regions
+                label_prev = label_curr
+                prev_chromosome = chromosome
+                prev_end_pos = int(cb_data[1])
+    ret_states_path.append((chromosome, start_pos, final_pos, label_curr))
+    return ret_states_path
 
-#     # Select only accessible regions from _states.bed, look for nuc-open-nuc pattern
-#     # This by default is the only final output from HMMRATAC
-#     accessible_regions = []
-#     for i in range(len(states_path)-2):
-#         if (states_path[i][3] == 'nuc' and states_path[i+1][3] == 'open' and states_path[i+2][3] == 'nuc' and 
-#             states_path[i][2] == states_path[i+1][1] and states_path[i+1][2] == states_path[i+2][1] and 
-#             states_path[i+1][2] - states_path[i+1][1] > openregion_minlen):
-#             accessible_regions = add_regions(i, accessible_regions)
+def save_accessible_regions(states_path, accessible_region_file, openregion_minlen):
+    # Function to add regions to the list
+    def add_regions(i, regions):
+        for j in range(i, i+3):
+            if not regions or states_path[j][2] != regions[-1][2]:
+                regions.append((states_path[j][0], int(states_path[j][1]), int(states_path[j][2]), states_path[j][3]))
+        return regions
 
-#     # Group states by region
-#     list_of_groups = []
-#     one_group = [accessible_regions[0]]
-#     for j in range(1, len(accessible_regions)):
-#         if accessible_regions[j][1] == accessible_regions[j-1][2]:
-#             one_group.append(accessible_regions[j])
-#         else:
-#             list_of_groups.append(one_group)
-#             one_group = [accessible_regions[j]]
-#     accessible_regions = list_of_groups
+    # Select only accessible regions from _states.bed, look for nuc-open-nuc pattern
+    # This by default is the only final output from HMMRATAC
+    accessible_regions = []
+    for i in range(len(states_path)-2):
+        if (states_path[i][3] == 'nuc' and states_path[i+1][3] == 'open' and states_path[i+2][3] == 'nuc' and 
+            states_path[i][2] == states_path[i+1][1] and states_path[i+1][2] == states_path[i+2][1] and 
+            states_path[i+1][2] - states_path[i+1][1] > openregion_minlen):
+            accessible_regions = add_regions(i, accessible_regions)
+    # Group states by region
+    list_of_groups = []
+    one_group = [accessible_regions[0]]
+    for j in range(1, len(accessible_regions)):
+        if accessible_regions[j][1] == accessible_regions[j-1][2]:
+            one_group.append(accessible_regions[j])
+        else:
+            list_of_groups.append(one_group)
+            one_group = [accessible_regions[j]]
+    accessible_regions = list_of_groups
 
-#     # Generate broadpeak object
-#     broadpeak = BroadPeakIO()
-#     for region in accessible_regions[:-1]:
-#         block_num = sum('open' in tup for tup in region)
-#         block_sizes = ','.join(str(region[j][2] - region[j][1]) for j in range(1, len(region) - 1, 2))
-#         block_starts = ','.join(str(region[j][1] - region[0][1]) for j in range(1, len(region) - 1, 2))
-#         broadpeak.add(bytes(region[1][0], encoding="raw_unicode_escape"), region[0][1], region[-1][2],
-#                       thickStart=bytes(str(region[1][1]), encoding="raw_unicode_escape"),
-#                       thickEnd=bytes(str(region[-2][2]), encoding="raw_unicode_escape"),
-#                       blockNum=block_num,
-#                       blockSizes=bytes(block_sizes, encoding="raw_unicode_escape"),
-#                       blockStarts=bytes(block_starts, encoding="raw_unicode_escape"))
-#     broadpeak.write_to_gappedPeak(accessible_region_file)
-#     return
+    # Generate broadpeak object
+    broadpeak = BroadPeakIO()
+    for region in accessible_regions[:-1]:
+        block_num = sum('open' in tup for tup in region)
+        block_sizes = ','.join(str(region[j][2] - region[j][1]) for j in range(1, len(region) - 1, 2))
+        block_starts = ','.join(str(region[j][1] - region[0][1]) for j in range(1, len(region) - 1, 2))
+        broadpeak.add(bytes(region[1][0], encoding="raw_unicode_escape"), region[0][1], region[-1][2],
+                      thickStart=bytes(str(region[1][1]), encoding="raw_unicode_escape"),
+                      thickEnd=bytes(str(region[-2][2]), encoding="raw_unicode_escape"),
+                      blockNum=block_num,
+                      blockSizes=bytes(block_sizes, encoding="raw_unicode_escape"),
+                      blockStarts=bytes(block_starts, encoding="raw_unicode_escape"))
+    broadpeak.write_to_gappedPeak(accessible_region_file)
+    return
