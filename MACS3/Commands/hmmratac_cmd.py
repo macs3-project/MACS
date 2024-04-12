@@ -408,9 +408,10 @@ def run( args ):
     #     cr_data = []
     #     cr_bins = []
     #     gc.collect()
-
-    candidate_bins_file = open("candidate_bins.txt", "w")
-    predicted_proba_file = open("predicted_proba.txt", "w")
+    candidate_bins_file_name = "candidate_bins.txt"
+    predicted_proba_file_name = "predicted_probab.txt"
+    candidate_bins_file = open(candidate_bins_file_name, "w")
+    predicted_proba_file = open(predicted_proba_file_name, "w")
 
     # try:
     while candidate_regions.total != 0:
@@ -455,10 +456,11 @@ def run( args ):
         open_state_bdg_fhd = open( open_state_bdgfile, "w" )
         nuc_state_bdg_fhd = open( nuc_state_bdgfile, "w" )
         bg_state_bdg_fhd = open( bg_state_bdgfile, "w" )
-        save_proba_to_bedGraph( candidate_bins_file, predicted_proba_file, options.hmm_binsize, open_state_bdg_fhd, nuc_state_bdg_fhd, bg_state_bdg_fhd, i_open_region, i_nucleosomal_region, i_background_region )
+        save_proba_to_bedGraph( candidate_bins_file_name, predicted_proba_file_name, options.hmm_binsize, open_state_bdg_fhd, nuc_state_bdg_fhd, bg_state_bdg_fhd, i_open_region, i_nucleosomal_region, i_background_region )
         open_state_bdg_fhd.close()
         nuc_state_bdg_fhd.close()
         bg_state_bdg_fhd.close()
+        options.info( f"# finished writing proba_to_bedgraph")
     
     # # Generate states path:
     # states_path = generate_states_path( candidate_bins, predicted_proba, options.hmm_binsize, i_open_region, i_nucleosomal_region, i_background_region )
@@ -515,7 +517,7 @@ def run( args ):
 #     nuc_state_bdg.write_bedGraph( nuc_state_bdg_file, "Nucleosomal States", "Likelihoods of being Nucleosomal States" )
 #     bg_state_bdg.write_bedGraph( bg_state_bdg_file, "Background States", "Likelihoods of being Background States" )
 #     return
-def save_proba_to_bedGraph(candidate_bins_file, predicted_proba_file, binsize, open_state_bdg_file, nuc_state_bdg_file, bg_state_bdg_file, i_open, i_nuc, i_bg):
+def save_proba_to_bedGraph(candidate_bins_file_name, predicted_proba_file_name, binsize, open_state_bdg_file, nuc_state_bdg_file, bg_state_bdg_file, i_open, i_nuc, i_bg):
     open_state_bdg = bedGraphTrackI(baseline_value=0)
     nuc_state_bdg = bedGraphTrackI(baseline_value=0)
     bg_state_bdg = bedGraphTrackI(baseline_value=0)
@@ -523,7 +525,7 @@ def save_proba_to_bedGraph(candidate_bins_file, predicted_proba_file, binsize, o
     prev_chrom_name = None
     prev_bin_end = None
 
-    with open(candidate_bins_file, 'r') as cb_file, open(predicted_proba_file, 'r') as pp_file:
+    with open(candidate_bins_file_name, 'r') as cb_file, open(predicted_proba_file_name, 'r') as pp_file:
         for cb_line, pp_line in zip(cb_file, pp_file):
             cb_data = cb_line.strip().split(b',')
             pp_data = pp_line.strip().split(b'\t')
