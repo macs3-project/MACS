@@ -541,8 +541,8 @@ def generate_states_path(candidate_bins_file, predicted_proba_file, binsize, i_o
                         start_pos = int(cb_data[1])-binsize
 
                 elif chromosome != prev_chromosome: # if looking at 2 different chrms, write end of prev, and then restart
-                    end_pos = prev_end_pos
-                    ret_states_path.append((prev_chromosome, start_pos, end_pos, label_prev))
+                    # end_pos = prev_end_pos
+                    # ret_states_path.append((prev_chromosome, start_pos, end_pos, label_prev))
                     start_pos = int(cb_data[1])-binsize
 
                 label_prev = label_curr
