@@ -525,10 +525,10 @@ def save_proba_to_bedGraph(candidate_bins_file, predicted_proba_file, binsize, o
 
     with open(candidate_bins_file, 'r') as cb_file, open(predicted_proba_file, 'r') as pp_file:
         for cb_line, pp_line in zip(cb_file, pp_file):
-            cb_data = cb_line.strip().split('\t')
-            pp_data = pp_line.strip().split('\t')
+            cb_data = cb_line.strip().split(b',')
+            pp_data = pp_line.strip().split(b'\t')
 
-            chrname = cb_data[0]
+            chrname = cb_data[0].decode('utf-8')  # Decode byte string to regular string
             end_pos = int(cb_data[1])
             start_pos = end_pos - binsize
 
