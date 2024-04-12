@@ -446,11 +446,10 @@ def run( args ):
     
     # # Generate states path:
     states_path = generate_states_path( candidate_bins_file_name, predicted_proba_file_name, options.hmm_binsize, i_open_region, i_nucleosomal_region, i_background_region )
-    # print(states_path)
     options.info( f"# finished generating states path")
     
-    # # Save states path if needed
-    # # PS: we need to implement extra feature to include those regions NOT in candidate_bins and assign them as 'background state'.
+    # Save states path if needed
+    # PS: we need to implement extra feature to include those regions NOT in candidate_bins and assign them as 'background state'.
     if options.save_states:
         options.info( f"# Write states assignments in a BED file: {options.name}_states.bed" )
         f = open( states_file, "w" )
@@ -463,10 +462,10 @@ def run( args ):
     ofhd.close()
     options.info( f"# Finished")
 
-def save_proba_to_bedGraph(candidate_bins_file, predicted_proba_file, binsize, open_state_bdg_file, nuc_state_bdg_file, bg_state_bdg_file, i_open, i_nuc, i_bg):
-    open_state_bdg = bedGraphTrackI(baseline_value=0)
-    nuc_state_bdg = bedGraphTrackI(baseline_value=0)
-    bg_state_bdg = bedGraphTrackI(baseline_value=0)
+def save_proba_to_bedGraph( candidate_bins_file, predicted_proba_file, binsize, open_state_bdg_file, nuc_state_bdg_file, bg_state_bdg_file, i_open, i_nuc, i_bg ):
+    open_state_bdg = bedGraphTrackI( baseline_value = 0 )
+    nuc_state_bdg = bedGraphTrackI( baseline_value = 0 )
+    bg_state_bdg = bedGraphTrackI( baseline_value = 0 )
 
     prev_chrom_name = None
     prev_bin_end = None
@@ -482,27 +481,29 @@ def save_proba_to_bedGraph(candidate_bins_file, predicted_proba_file, binsize, o
 
             if chrname != prev_chrom_name:
                 prev_chrom_name = chrname
+                # add the first region as background
                 if start_pos > 0:
-                    open_state_bdg.add_loc(chrname, 0, start_pos, 0.0)
-                    nuc_state_bdg.add_loc(chrname, 0, start_pos, 0.0)
-                    bg_state_bdg.add_loc(chrname, 0, start_pos, 1.0)
+                    open_state_bdg.add_loc( chrname, 0, start_pos, 0.0 )
+                    nuc_state_bdg.add_loc( chrname, 0, start_pos, 0.0 )
+                    bg_state_bdg.add_loc( chrname, 0, start_pos, 1.0 )
                     prev_bin_end = start_pos
                 elif start_pos == 0:
+                    # if start_pos == 0, then the first bin has to be assigned, we set prev_bin_end as 0 
                     prev_bin_end = 0
-
+            # now check if the prev_bin_end is start_pos, if not, add a gap of background
             if prev_bin_end < start_pos:
-                open_state_bdg.add_loc(chrname, prev_bin_end, start_pos, 0.0)
-                nuc_state_bdg.add_loc(chrname, prev_bin_end, start_pos, 0.0)
-                bg_state_bdg.add_loc(chrname, prev_bin_end, start_pos, 1.0)
+                open_state_bdg.add_loc( chrname, prev_bin_end, start_pos, 0.0 )
+                nuc_state_bdg.add_loc( chrname, prev_bin_end, start_pos, 0.0 )
+                bg_state_bdg.add_loc( chrname, prev_bin_end, start_pos, 1.0 )
 
-            open_state_bdg.add_loc(chrname, start_pos, end_pos, float(pp_data[i_open]))
-            nuc_state_bdg.add_loc(chrname, start_pos, end_pos, float(pp_data[i_nuc]))
-            bg_state_bdg.add_loc(chrname, start_pos, end_pos, float(pp_data[i_bg]))
+            open_state_bdg.add_loc( chrname, start_pos, end_pos, float(pp_data[i_open]) )
+            nuc_state_bdg.add_loc( chrname, start_pos, end_pos, float(pp_data[i_nuc]) )
+            bg_state_bdg.add_loc( chrname, start_pos, end_pos, float(pp_data[i_bg]) )
 
             prev_bin_end = start_pos
-    open_state_bdg.write_bedGraph(open_state_bdg_file, "Open States", "Likelihoods of being Open States")
-    nuc_state_bdg.write_bedGraph(nuc_state_bdg_file, "Nucleosomal States", "Likelihoods of being Nucleosomal States")
-    bg_state_bdg.write_bedGraph(bg_state_bdg_file, "Background States", "Likelihoods of being Background States")
+    open_state_bdg.write_bedGraph( open_state_bdg_file, "Open States", "Likelihoods of being Open States" )
+    nuc_state_bdg.write_bedGraph( nuc_state_bdg_file, "Nucleosomal States", "Likelihoods of being Nucleosomal States" )
+    bg_state_bdg.write_bedGraph( bg_state_bdg_file, "Background States", "Likelihoods of being Background States" )
     return
 
 def save_states_bed( states_path, states_bedfile ):
@@ -521,7 +522,6 @@ def generate_states_path(candidate_bins_file, predicted_proba_file, binsize, i_o
         for cb_line, pp_line in zip(cb_file, pp_file):
             cb_data = cb_line.strip().split(',')
             pp_data = pp_line.strip().split(',')
-            final_pos = int(cb_data[1])
             if start_of_file == True:
                 prev_chromosome = cb_data[0].strip("b'")
                 start_pos = int(cb_data[1])-binsize
@@ -540,15 +540,15 @@ def generate_states_path(candidate_bins_file, predicted_proba_file, binsize, i_o
                         ret_states_path.append((chromosome, start_pos, end_pos, label_prev))
                         start_pos = int(cb_data[1])-binsize
 
-                elif chromosome != prev_chromosome: # if looking at 2 different chrms, write end of prev, and then restart
-                    # end_pos = prev_end_pos
-                    # ret_states_path.append((prev_chromosome, start_pos, end_pos, label_prev))
+                elif chromosome != prev_chromosome: # if looking at 2 different chrms, write end of previous and then restart
+                    end_pos = prev_end_pos
+                    ret_states_path.append((prev_chromosome, start_pos, end_pos, label_prev))
                     start_pos = int(cb_data[1])-binsize
 
                 label_prev = label_curr
                 prev_chromosome = chromosome
                 prev_end_pos = int(cb_data[1])
-    ret_states_path.append((chromosome, start_pos, final_pos, label_curr))
+    ret_states_path.append((chromosome, start_pos, prev_end_pos, label_curr))
     return ret_states_path
 
 def save_accessible_regions(states_path, accessible_region_file, openregion_minlen):
