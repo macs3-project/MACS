@@ -1,1 +1,1 @@
-../../../docs/qa.md
+# Common Q & A
