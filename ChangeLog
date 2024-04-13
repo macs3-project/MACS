@@ -11,6 +11,19 @@
 	file from previous version, if there is no hmm-type information in
 	the model file, the hmm-type will be assigned as gaussian. #635
 
+	2) Add `--cutoff-analysis-steps` for `hmmratac` so that we can
+	have finer resolution of the cutoff analysis report. #636
+
+	* Bugs fixed
+	
+	1) Use `-O3` instead of `-Ofast` for compatibility. #637
+
+	* Documentation
+
+	1) Update instruction to install macs3 through conda/bioconda
+
+	2) 
+
 2024-02-19  Tao Liu  <vladimir.liu@gmail.com>
 	MACS 3.0.1 
 
