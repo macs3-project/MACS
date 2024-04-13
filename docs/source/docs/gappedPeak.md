@@ -1,0 +1,1 @@
+# gappedPeak format
