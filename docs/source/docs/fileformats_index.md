@@ -9,7 +9,7 @@ files used in MACS3.
 callpeakxls.md
 SAMBAMBAMPE.md
 BED.md
-BEDPE.md 
+BEDPE.md
 bedGraph.md
 cutoffanalysis.md
 narrowPeak.md
