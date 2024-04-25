@@ -1,4 +1,4 @@
-# Time-stamp: <2024-04-25 14:43:20 Tao Liu>
+# Time-stamp: <2024-04-25 15:55:04 Tao Liu>
 
 """Description: Main HMMR command
 
@@ -486,27 +486,25 @@ def save_proba_to_bedGraph( candidate_bins_file, predicted_proba_file, binsize, 
             start_pos = end_pos - binsize
 
             if chrname != prev_chrom_name:
-                prev_chrom_name = chrname
-                # add the first region as background
+                # we start a new chromosome
                 if start_pos > 0:
+                # add the first unannotated region as background
                     open_state_bdg.add_loc( chrname, 0, start_pos, 0.0 )
                     nuc_state_bdg.add_loc( chrname, 0, start_pos, 0.0 )
                     bg_state_bdg.add_loc( chrname, 0, start_pos, 1.0 )
-                    prev_bin_end = start_pos
-                elif start_pos == 0:
-                    # if start_pos == 0, then the first bin has to be assigned, we set prev_bin_end as 0 
-                    prev_bin_end = 0
-            # now check if the prev_bin_end is start_pos, if not, add a gap of background
-            if prev_bin_end < start_pos:
-                open_state_bdg.add_loc( chrname, prev_bin_end, start_pos, 0.0 )
-                nuc_state_bdg.add_loc( chrname, prev_bin_end, start_pos, 0.0 )
-                bg_state_bdg.add_loc( chrname, prev_bin_end, start_pos, 1.0 )
+                prev_chrom_name = chrname
+            else:
+                # now check if the prev_bin_end is start_pos, if not, add a gap of background
+                if prev_bin_end < start_pos:
+                    open_state_bdg.add_loc( chrname, prev_bin_end, start_pos, 0.0 )
+                    nuc_state_bdg.add_loc( chrname, prev_bin_end, start_pos, 0.0 )
+                    bg_state_bdg.add_loc( chrname, prev_bin_end, start_pos, 1.0 )
 
             open_state_bdg.add_loc( chrname, start_pos, end_pos, float(pp_data[i_open]) )
             nuc_state_bdg.add_loc( chrname, start_pos, end_pos, float(pp_data[i_nuc]) )
             bg_state_bdg.add_loc( chrname, start_pos, end_pos, float(pp_data[i_bg]) )
-
             prev_bin_end = end_pos
+            
     open_state_bdg.write_bedGraph( open_state_bdg_file, "Open States", "Likelihoods of being Open States" )
     nuc_state_bdg.write_bedGraph( nuc_state_bdg_file, "Nucleosomal States", "Likelihoods of being Nucleosomal States" )
     bg_state_bdg.write_bedGraph( bg_state_bdg_file, "Background States", "Likelihoods of being Background States" )
@@ -536,31 +534,30 @@ def generate_states_path(candidate_bins_file, predicted_proba_file, binsize, i_o
             chrname = cb_data[0].strip("b'").encode('utf-8') # Convert str to bytes
             end_pos = int(cb_data[1])
             start_pos = end_pos - binsize
-
-            if chrname != prev_chrom_name:
-                prev_chrom_name = chrname
-                # add the first region as background
-                if start_pos > 0:
-                    ret_states_path.append((prev_chrom_name, 0, start_pos, "bg"))
-                    prev_bin_end = start_pos
-                    prev_label = "bg"
-                elif start_pos == 0:
-                    # if start_pos == 0, then the first bin has to be assigned, we set prev_bin_end as 0 
-                    prev_bin_end = 0
-            # now check if the prev_bin_end is start_pos, if not, add a gap of background
-            if prev_bin_end < start_pos:
-                ret_states_path.append((chrname, prev_bin_end, start_pos, "bg"))
-                prev_label = "bg"
-
+            
+            # find the best state as label
             o_p, nuc_p, bg_p = float(pp_data[i_open_region]), float(pp_data[i_nucleosomal_region]), float(pp_data[i_background_region])
             label = labels_list[max((o_p, 0), (nuc_p, 1), (bg_p, 2), key=lambda x: x[0])[1]]
-            #print(f"{chrname} {start_pos} {end_pos} {label} o:{o_p} nc:{nuc_p} bg:{bg_p}")
-            if label == prev_label:
-                #ret_states_path[-1][2] = end_pos
-                ret_states_path[-1] = (ret_states_path[-1][0], ret_states_path[-1][1], end_pos, label)
-            else:
+            
+            if chrname != prev_chrom_name:
+                # we start a new chromosome
+                if start_pos > 0:
+                    # add the first unannotated region as background
+                    ret_states_path.append((chrname, 0, start_pos, "bg"))
                 ret_states_path.append((chrname, start_pos, end_pos, label))
                 prev_label = label
+                prev_chrom_name = chrname
+            else:
+                # now check if the prev_bin_end is start_pos, if not, add a gap of background
+                if prev_bin_end < start_pos:
+                    ret_states_path.append((chrname, prev_bin_end, start_pos, "bg"))
+                    prev_label = "bg"
+                # same label, just extend
+                if label == prev_label:
+                    ret_states_path[-1] = (ret_states_path[-1][0], ret_states_path[-1][1], end_pos, label)
+                else:
+                    ret_states_path.append((chrname, start_pos, end_pos, label))
+                    prev_label = label
 
             prev_bin_end = end_pos
     return ret_states_path
