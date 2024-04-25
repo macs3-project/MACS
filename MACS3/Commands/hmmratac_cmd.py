@@ -1,4 +1,4 @@
-# Time-stamp: <2024-04-25 14:41:14 Tao Liu>
+# Time-stamp: <2024-04-25 14:43:20 Tao Liu>
 
 """Description: Main HMMR command
 
@@ -516,7 +516,7 @@ def save_states_bed( states_path, states_bedfile ):
     # we do not need to output background state. 
     for l in range( len( states_path ) ):
         if states_path[l][3] != "bg":
-            print(states_path[l])
+            #print(states_path[l])
             states_bedfile.write( "%s\t%s\t%s\t%s\n" % states_path[l] )
     return
 
