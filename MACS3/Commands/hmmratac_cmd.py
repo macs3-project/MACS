@@ -1,4 +1,4 @@
-# Time-stamp: <2023-08-02 17:32:47 Tao Liu>
+# Time-stamp: <2024-04-25 14:41:14 Tao Liu>
 
 """Description: Main HMMR command
 
@@ -176,7 +176,7 @@ def run( args ):
         options.info( f"#  Pile up ONLY short fragments" )
         fc_bdg = digested_atac_signals[ 0 ]
         (sum_v, n_v, max_v, min_v, mean_v, std_v) = fc_bdg.summary()
-        print(sum_v, n_v, max_v, min_v, mean_v, std_v)
+        #print(sum_v, n_v, max_v, min_v, mean_v, std_v)
         options.info( f"#  Convert pileup to fold-change over average signal" )
         fc_bdg.apply_func(lambda x: x/mean_v)
     else:
@@ -393,34 +393,40 @@ def run( args ):
     options.info( f"#  Use HMM to predict states")
     n = 0
     candidate_bins_file_name = "candidate_bins.txt"
-    predicted_proba_file_name = "predicted_probab.txt"
+    predicted_proba_file_name = "predicted_proba.txt"
     candidate_bins_file = open(candidate_bins_file_name, "w")
     predicted_proba_file = open(predicted_proba_file_name, "w")
 
     while candidate_regions.total != 0:
         n += 1
+        # we get DECODING_STEPS number of candidate regions first
         cr = candidate_regions.pop(options.decoding_steps)
         options.info("#    decoding %d..." % (n * options.decoding_steps))
+
+        # then extrac data from digested signals, create cr_bins, cr_data, and cr_data_lengths
         [cr_bins, cr_data, cr_data_lengths] = extract_signals_from_regions( digested_atac_signals, cr, binsize = options.hmm_binsize, hmm_type = options.hmm_type )
         options.info( "#     extract_signals_from_regions complete")
 
-        for bin_data in cr_bins:
-            candidate_bins_file.write(",".join(map(str, bin_data)) + "\n")
+        for each_bin_data in cr_bins:
+            candidate_bins_file.write(",".join(map(str, each_bin_data)) + "\n")
 
-        for prob_data in hmm_predict(cr_data, cr_data_lengths, hmm_model):
-            predicted_proba_file.write(",".join(map(str, prob_data)) + "\n")
-        cr_data_lengths = []
+        prob_data = hmm_predict(cr_data, cr_data_lengths, hmm_model)
+        for each_prob_data in prob_data:
+            predicted_proba_file.write(",".join(map(str, each_prob_data)) + "\n")
+
         cr_data = []
+        cr_data_lengths = []
+
         cr_bins = []
-        bin_data = []
         prob_data = []
+
         options.info( "#     clean up complete")
         gc.collect()
 
     candidate_bins_file.close()
     predicted_proba_file.close()
     options.info( f"# candidate_bins, predicted_proba files written...")
-        
+
 #############################################
 # 6. Output - add to OutputWriter
 #############################################
@@ -500,7 +506,7 @@ def save_proba_to_bedGraph( candidate_bins_file, predicted_proba_file, binsize, 
             nuc_state_bdg.add_loc( chrname, start_pos, end_pos, float(pp_data[i_nuc]) )
             bg_state_bdg.add_loc( chrname, start_pos, end_pos, float(pp_data[i_bg]) )
 
-            prev_bin_end = start_pos
+            prev_bin_end = end_pos
     open_state_bdg.write_bedGraph( open_state_bdg_file, "Open States", "Likelihoods of being Open States" )
     nuc_state_bdg.write_bedGraph( nuc_state_bdg_file, "Nucleosomal States", "Likelihoods of being Nucleosomal States" )
     bg_state_bdg.write_bedGraph( bg_state_bdg_file, "Background States", "Likelihoods of being Background States" )
@@ -510,45 +516,53 @@ def save_states_bed( states_path, states_bedfile ):
     # we do not need to output background state. 
     for l in range( len( states_path ) ):
         if states_path[l][3] != "bg":
+            print(states_path[l])
             states_bedfile.write( "%s\t%s\t%s\t%s\n" % states_path[l] )
     return
 
 def generate_states_path(candidate_bins_file, predicted_proba_file, binsize, i_open_region, i_nucleosomal_region, i_background_region):
     ret_states_path = []
     labels_list = ["open", "nuc", "bg"]
-    start_of_file = True
- 
+
+    prev_chrom_name = None
+    prev_bin_end = None
+    prev_label = None
+    
     with open(candidate_bins_file, 'r') as cb_file, open(predicted_proba_file, 'r') as pp_file:
         for cb_line, pp_line in zip(cb_file, pp_file):
             cb_data = cb_line.strip().split(',')
             pp_data = pp_line.strip().split(',')
-            if start_of_file == True:
-                prev_chromosome = cb_data[0].strip("b'")
-                start_pos = int(cb_data[1])-binsize
-                prev_end_pos = int(cb_data[1])
-                prev_open, prev_nuc, prev_bg = pp_data[i_open_region], pp_data[i_nucleosomal_region], pp_data[i_background_region]
-                label_prev = labels_list[max((prev_open, 0), (prev_nuc, 1), (prev_bg, 2), key=lambda x: x[0])[1]]
-                start_of_file = False
+
+            chrname = cb_data[0].strip("b'").encode('utf-8') # Convert str to bytes
+            end_pos = int(cb_data[1])
+            start_pos = end_pos - binsize
+
+            if chrname != prev_chrom_name:
+                prev_chrom_name = chrname
+                # add the first region as background
+                if start_pos > 0:
+                    ret_states_path.append((prev_chrom_name, 0, start_pos, "bg"))
+                    prev_bin_end = start_pos
+                    prev_label = "bg"
+                elif start_pos == 0:
+                    # if start_pos == 0, then the first bin has to be assigned, we set prev_bin_end as 0 
+                    prev_bin_end = 0
+            # now check if the prev_bin_end is start_pos, if not, add a gap of background
+            if prev_bin_end < start_pos:
+                ret_states_path.append((chrname, prev_bin_end, start_pos, "bg"))
+                prev_label = "bg"
+
+            o_p, nuc_p, bg_p = float(pp_data[i_open_region]), float(pp_data[i_nucleosomal_region]), float(pp_data[i_background_region])
+            label = labels_list[max((o_p, 0), (nuc_p, 1), (bg_p, 2), key=lambda x: x[0])[1]]
+            #print(f"{chrname} {start_pos} {end_pos} {label} o:{o_p} nc:{nuc_p} bg:{bg_p}")
+            if label == prev_label:
+                #ret_states_path[-1][2] = end_pos
+                ret_states_path[-1] = (ret_states_path[-1][0], ret_states_path[-1][1], end_pos, label)
             else:
-                chromosome = cb_data[0].strip("b'")
-                curr_open, curr_nuc, curr_bg = pp_data[i_open_region], pp_data[i_nucleosomal_region], pp_data[i_background_region]
-                label_curr = labels_list[max((curr_open, 0), (curr_nuc, 1), (curr_bg, 2), key=lambda x: x[0])[1]]
-                
-                if chromosome == prev_chromosome:
-                    if label_prev != label_curr: #otherwise continue.. 
-                        end_pos = prev_end_pos
-                        ret_states_path.append((chromosome, start_pos, end_pos, label_prev))
-                        start_pos = int(cb_data[1])-binsize
+                ret_states_path.append((chrname, start_pos, end_pos, label))
+                prev_label = label
 
-                elif chromosome != prev_chromosome: # if looking at 2 different chrms, write end of previous and then restart
-                    end_pos = prev_end_pos
-                    ret_states_path.append((prev_chromosome, start_pos, end_pos, label_prev))
-                    start_pos = int(cb_data[1])-binsize
-
-                label_prev = label_curr
-                prev_chromosome = chromosome
-                prev_end_pos = int(cb_data[1])
-    ret_states_path.append((chromosome, start_pos, prev_end_pos, label_curr))
+            prev_bin_end = end_pos
     return ret_states_path
 
 def save_accessible_regions(states_path, accessible_region_file, openregion_minlen):
@@ -584,7 +598,8 @@ def save_accessible_regions(states_path, accessible_region_file, openregion_minl
         block_num = sum('open' in tup for tup in region)
         block_sizes = ','.join(str(region[j][2] - region[j][1]) for j in range(1, len(region) - 1, 2))
         block_starts = ','.join(str(region[j][1] - region[0][1]) for j in range(1, len(region) - 1, 2))
-        broadpeak.add(bytes(region[1][0], encoding="raw_unicode_escape"), region[0][1], region[-1][2],
+        broadpeak.add(region[1][0], region[0][1], region[-1][2],
+            #bytes(region[1][0], encoding="raw_unicode_escape"), region[0][1], region[-1][2],
                       thickStart=bytes(str(region[1][1]), encoding="raw_unicode_escape"),
                       thickEnd=bytes(str(region[-2][2]), encoding="raw_unicode_escape"),
                       blockNum=block_num,
