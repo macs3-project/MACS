@@ -1,1 +1,0 @@
-# narrowPeak format

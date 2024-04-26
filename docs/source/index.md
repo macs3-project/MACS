@@ -258,8 +258,7 @@ contributions over the years.
 :hidden:
 
 docs/INSTALL.md
-docs/subcommands_index.md
-docs/fileformats_index.md
+docs/index.md
 docs/Advanced_Step-by-step_Peak_Calling.md
 docs/qa.md
 docs/tutorial.md

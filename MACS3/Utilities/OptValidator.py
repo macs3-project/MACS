@@ -1,4 +1,4 @@
-# Time-stamp: <2024-04-19 15:11:59 Tao Liu>
+# Time-stamp: <2023-07-28 12:17:28 Tao Liu>
 
 """Module Description
 
@@ -32,6 +32,8 @@ from MACS3.Utilities.Constants import EFFECTIVEGS as efgsize
 
 import logging
 import MACS3.Utilities.Logger
+logger = logging.getLogger(__name__)
+
 # ------------------------------------
 # Misc functions
 # ------------------------------------

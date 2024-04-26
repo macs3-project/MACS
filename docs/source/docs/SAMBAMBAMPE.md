@@ -1,2 +1,0 @@
-# SAM/BAM/BAMPE format
-
