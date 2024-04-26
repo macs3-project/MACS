@@ -8,12 +8,14 @@ on:
     paths-ignore:
       - 'docs/**'
       - '**.md'
+      - 'ChangeLog'
       - '.github/workflows/**'
       - '!.github/workflows/build-and-test-MACS3-non-x64.yml'
   pull_request:
     paths-ignore:
       - 'docs/**'
       - '**.md'
+      - 'ChangeLog'
       - '.github/workflows/**'
       - '!.github/workflows/build-and-test-MACS3-non-x64.yml'
 
