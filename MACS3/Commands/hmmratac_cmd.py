@@ -1,4 +1,4 @@
-# Time-stamp: <2024-04-25 20:24:57 Tao Liu>
+# Time-stamp: <2024-04-26 11:47:02 Tao Liu>
 
 """Description: Main HMMR command
 
@@ -197,7 +197,7 @@ def run( args ):
 
         # Let MACS3 do the cutoff analysis to help decide the lower and upper cutoffs
         with open(cutoffanalysis_file, "w") as ofhd_cutoff:
-            ofhd_cutoff.write( fc_bdg.cutoff_analysis( min_length=minlen, max_gap=options.hmm_training_flanking, max_score = 1000 ) )
+            ofhd_cutoff.write( fc_bdg.cutoff_analysis( min_length=minlen, max_gap=options.hmm_training_flanking, max_score = 100 ) )
         #raise Exception("Cutoff analysis only.")
         sys.exit(1)
         
@@ -244,7 +244,7 @@ def run( args ):
         
         # Let MACS3 do the cutoff analysis to help decide the lower and upper cutoffs
         with open(cutoffanalysis_file, "w") as ofhd_cutoff:
-            ofhd_cutoff.write( fc_bdg.cutoff_analysis( min_length=minlen, max_gap=options.hmm_training_flanking, max_score = 1000 ) )
+            ofhd_cutoff.write( fc_bdg.cutoff_analysis( min_length=minlen, max_gap=options.hmm_training_flanking, max_score = 100 ) )
             
         # we will check if anything left after filtering
         if peaks.total > options.hmm_maxTrain:
@@ -379,11 +379,12 @@ def run( args ):
     options.info( f"#  We expand the candidate regions with {options.hmm_training_flanking} and merge overlap" )
     candidate_regions.expand( options.hmm_training_flanking )
     candidate_regions.merge_overlap()
+    options.info( f"#   after expanding and merging, we have {candidate_regions.total} candidate regions" )
     
     # remove peaks overlapping with blacklisted regions
     if options.blacklist:
         candidate_regions.exclude( blacklist_regions )
-        options.info( f"#  after removing those overlapping with provided blacklisted regions, we have {candidate_regions.total} left" )
+        options.info( f"#   after removing those overlapping with provided blacklisted regions, we have {candidate_regions.total} left" )
 
     # extract signals
     options.info( f"#  Extract signals in candidate regions and decode with HMM")
@@ -407,7 +408,7 @@ def run( args ):
 
         # then extrac data from digested signals, create cr_bins, cr_data, and cr_data_lengths
         [cr_bins, cr_data, cr_data_lengths] = extract_signals_from_regions( digested_atac_signals, cr, binsize = options.hmm_binsize, hmm_type = options.hmm_type )
-        options.debug( "#     extract_signals_from_regions complete")
+        #options.debug( "#     extract_signals_from_regions complete")
 
         prob_data = hmm_predict(cr_data, cr_data_lengths, hmm_model)
         assert len(prob_data) == len(cr_bins)
@@ -420,7 +421,7 @@ def run( args ):
         cr_bins = []
         prob_data = []
 
-        options.debug( "#     clean up complete")
+        #options.debug( "#     clean up complete")
         gc.collect()
 
     #predicted_proba_file.close()
@@ -459,14 +460,13 @@ def run( args ):
     # PS: we need to implement extra feature to include those regions NOT in candidate_bins and assign them as 'background state'.
     if options.save_states:
         options.info( f"# Write states assignments in a BED file: {options.name}_states.bed" )
-        f = open( states_file, "w" )
-        save_states_bed( states_path, f )
-        f.close()
+        with open( states_file, "w" ) as f:
+            save_states_bed( states_path, f )
 
     options.info( f"# Write accessible regions in a gappedPeak file: {options.name}_accessible_regions.gappedPeak")
-    ofhd = open( accessible_file, "w" )
-    save_accessible_regions( states_path, ofhd, options.openregion_minlen )
-    ofhd.close()
+    with open( accessible_file, "w" ) as ofhd:
+        save_accessible_regions( states_path, ofhd, options.openregion_minlen )
+
     options.info( f"# Finished")
 
 def save_proba_to_bedGraph( predicted_proba_file, binsize, open_state_bdg_file, nuc_state_bdg_file, bg_state_bdg_file, i_open, i_nuc, i_bg ):
@@ -516,8 +516,8 @@ def save_states_bed( states_path, states_bedfile ):
     # we do not need to output background state. 
     for l in range( len( states_path ) ):
         if states_path[l][3] != "bg":
-            #print(states_path[l])
-            states_bedfile.write( "%s\t%s\t%s\t%s\n" % states_path[l] )
+            states_bedfile.write( "%s\t" % states_path[l][0].decode() )
+            states_bedfile.write( "%d\t%d\t%s\n" % states_path[l][1:] )
     return
 
 def generate_states_path(predicted_proba_file, binsize, i_open, i_nuc, i_bg):

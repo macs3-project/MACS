@@ -1,6 +1,6 @@
 # cython: language_level=3
 # cython: profile=True
-# Time-stamp: <2023-07-28 12:14:57 Tao Liu>
+# Time-stamp: <2024-04-26 10:40:41 Tao Liu>
 
 """Module description:
 
@@ -146,7 +146,7 @@ cpdef list extract_signals_from_regions( list signals, object regions, int binsi
         list ret_training_data, ret_training_lengths, ret_training_bins
 
     regionsbdg = _make_bdg_of_bins_from_regions( regions, binsize )
-    info('#      extract_signals_from_regions: regionsbdg completed')
+    debug('#      extract_signals_from_regions: regionsbdg completed')
     # now, let's overlap
     extracted_positions = []
     extracted_data = []
@@ -160,7 +160,7 @@ cpdef list extract_signals_from_regions( list signals, object regions, int binsi
     positions = []
     values = []
     lengths = []
-    info('#      extract_signals_from_regions: extracted positions, data, len')
+    debug('#      extract_signals_from_regions: extracted positions, data, len')
     ret_training_bins = []
     ret_training_data = []
     ret_training_lengths = []
@@ -187,7 +187,7 @@ cpdef list extract_signals_from_regions( list signals, object regions, int binsi
                 counter = 0
             prev_c = c
             counter +=  1
-        info('#      extract_signals_from_regions: ret_training bins, data, lengths - gaussian')
+        debug('#      extract_signals_from_regions: ret_training bins, data, lengths - gaussian')
     #poisson can only take int values as input
     if hmm_type == "poisson":
         for i in range( nn ):
@@ -203,7 +203,7 @@ cpdef list extract_signals_from_regions( list signals, object regions, int binsi
                 counter = 0
             prev_c = c
             counter +=  1
-        info('#      extract_signals_from_regions: ret_training bins, data, lengths - poisson')
+        debug('#      extract_signals_from_regions: ret_training bins, data, lengths - poisson')
     # last region
     ret_training_lengths.append( counter )
     assert sum(ret_training_lengths) == len(ret_training_data)
