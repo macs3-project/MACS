@@ -16,8 +16,8 @@ release = '3.0.1'
 
 extensions = [
     'myst_parser',
-    #'sphinx.ext.autodoc',
-    #'sphinx.ext.viewcode',
+    'sphinx.ext.autodoc',
+    'sphinx.ext.viewcode',
     'sphinx.ext.mathjax',
     'sphinx.ext.githubpages'
     ]
