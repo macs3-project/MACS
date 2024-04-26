@@ -1,4 +1,4 @@
-# Time-stamp: <2024-04-25 15:55:04 Tao Liu>
+# Time-stamp: <2024-04-25 20:24:57 Tao Liu>
 
 """Description: Main HMMR command
 
@@ -16,6 +16,8 @@ import sys
 import gc
 import numpy as np
 import json
+import csv
+import tempfile
 from hmmlearn import hmm
 #from typing import Sized
 
@@ -392,10 +394,9 @@ def run( args ):
     # Note: we implement in a way that we will decode the candidate regions 10000 regions at a time so 1. we can make it running in parallel in the future; 2. we can reduce the memory usage.
     options.info( f"#  Use HMM to predict states")
     n = 0
-    candidate_bins_file_name = "candidate_bins.txt"
-    predicted_proba_file_name = "predicted_proba.txt"
-    candidate_bins_file = open(candidate_bins_file_name, "w")
-    predicted_proba_file = open(predicted_proba_file_name, "w")
+    #predicted_proba_file_name = "predicted_proba.csv"
+    #predicted_proba_file = open(predicted_proba_file_name, "wb")
+    predicted_proba_file = tempfile.TemporaryFile(mode="w+b")
 
     while candidate_regions.total != 0:
         n += 1
@@ -405,27 +406,25 @@ def run( args ):
 
         # then extrac data from digested signals, create cr_bins, cr_data, and cr_data_lengths
         [cr_bins, cr_data, cr_data_lengths] = extract_signals_from_regions( digested_atac_signals, cr, binsize = options.hmm_binsize, hmm_type = options.hmm_type )
-        options.info( "#     extract_signals_from_regions complete")
-
-        for each_bin_data in cr_bins:
-            candidate_bins_file.write(",".join(map(str, each_bin_data)) + "\n")
+        options.debug( "#     extract_signals_from_regions complete")
 
         prob_data = hmm_predict(cr_data, cr_data_lengths, hmm_model)
-        for each_prob_data in prob_data:
-            predicted_proba_file.write(",".join(map(str, each_prob_data)) + "\n")
+        assert len(prob_data) == len(cr_bins)
+        for i in range(len(prob_data)):
+            predicted_proba_file.write(b"%s,%d" % cr_bins[i])
+            predicted_proba_file.write(b",%f,%f,%f\n" % tuple(prob_data[i]))
 
         cr_data = []
         cr_data_lengths = []
-
         cr_bins = []
         prob_data = []
 
-        options.info( "#     clean up complete")
+        options.debug( "#     clean up complete")
         gc.collect()
 
-    candidate_bins_file.close()
-    predicted_proba_file.close()
-    options.info( f"# candidate_bins, predicted_proba files written...")
+    #predicted_proba_file.close()
+    predicted_proba_file.seek(0) # reset
+    options.info( f"# predicted_proba files written...")
 
 #############################################
 # 6. Output - add to OutputWriter
@@ -444,16 +443,17 @@ def run( args ):
         open_state_bdg_fhd = open( open_state_bdgfile, "w" )
         nuc_state_bdg_fhd = open( nuc_state_bdgfile, "w" )
         bg_state_bdg_fhd = open( bg_state_bdgfile, "w" )
-        save_proba_to_bedGraph( candidate_bins_file_name, predicted_proba_file_name, options.hmm_binsize, open_state_bdg_fhd, nuc_state_bdg_fhd, bg_state_bdg_fhd, i_open_region, i_nucleosomal_region, i_background_region )
+        save_proba_to_bedGraph( predicted_proba_file, options.hmm_binsize, open_state_bdg_fhd, nuc_state_bdg_fhd, bg_state_bdg_fhd, i_open_region, i_nucleosomal_region, i_background_region )
+        predicted_proba_file.seek(0) # reset
         open_state_bdg_fhd.close()
         nuc_state_bdg_fhd.close()
         bg_state_bdg_fhd.close()
         options.info( f"# finished writing proba_to_bedgraph")
     
     # # Generate states path:
-    states_path = generate_states_path( candidate_bins_file_name, predicted_proba_file_name, options.hmm_binsize, i_open_region, i_nucleosomal_region, i_background_region )
+    states_path = generate_states_path( predicted_proba_file, options.hmm_binsize, i_open_region, i_nucleosomal_region, i_background_region )
     options.info( f"# finished generating states path")
-    
+    predicted_proba_file.close()          #kill the tempfile
     # Save states path if needed
     # PS: we need to implement extra feature to include those regions NOT in candidate_bins and assign them as 'background state'.
     if options.save_states:
@@ -468,7 +468,7 @@ def run( args ):
     ofhd.close()
     options.info( f"# Finished")
 
-def save_proba_to_bedGraph( candidate_bins_file, predicted_proba_file, binsize, open_state_bdg_file, nuc_state_bdg_file, bg_state_bdg_file, i_open, i_nuc, i_bg ):
+def save_proba_to_bedGraph( predicted_proba_file, binsize, open_state_bdg_file, nuc_state_bdg_file, bg_state_bdg_file, i_open, i_nuc, i_bg ):
     open_state_bdg = bedGraphTrackI( baseline_value = 0 )
     nuc_state_bdg = bedGraphTrackI( baseline_value = 0 )
     bg_state_bdg = bedGraphTrackI( baseline_value = 0 )
@@ -476,35 +476,36 @@ def save_proba_to_bedGraph( candidate_bins_file, predicted_proba_file, binsize, 
     prev_chrom_name = None
     prev_bin_end = None
 
-    with open(candidate_bins_file, 'r') as cb_file, open(predicted_proba_file, 'r') as pp_file:
-        for cb_line, pp_line in zip(cb_file, pp_file):
-            cb_data = cb_line.strip().split(',')
-            pp_data = pp_line.strip().split(',')
+    for pp_line in predicted_proba_file:
+        pp_data = pp_line.strip().split(b',')
 
-            chrname = cb_data[0].strip("b'").encode('utf-8') # Convert str to bytes
-            end_pos = int(cb_data[1])
-            start_pos = end_pos - binsize
+        chrname = pp_data[0]
+        end_pos = int(pp_data[1])
+        start_pos = end_pos - binsize
+        pp_open = float(pp_data[i_open+2])
+        pp_nuc = float(pp_data[i_nuc+2])
+        pp_bg = float(pp_data[i_bg+2])
 
-            if chrname != prev_chrom_name:
-                # we start a new chromosome
-                if start_pos > 0:
+        if chrname != prev_chrom_name:
+            # we start a new chromosome
+            if start_pos > 0:
                 # add the first unannotated region as background
-                    open_state_bdg.add_loc( chrname, 0, start_pos, 0.0 )
-                    nuc_state_bdg.add_loc( chrname, 0, start_pos, 0.0 )
-                    bg_state_bdg.add_loc( chrname, 0, start_pos, 1.0 )
-                prev_chrom_name = chrname
-            else:
-                # now check if the prev_bin_end is start_pos, if not, add a gap of background
-                if prev_bin_end < start_pos:
-                    open_state_bdg.add_loc( chrname, prev_bin_end, start_pos, 0.0 )
-                    nuc_state_bdg.add_loc( chrname, prev_bin_end, start_pos, 0.0 )
-                    bg_state_bdg.add_loc( chrname, prev_bin_end, start_pos, 1.0 )
+                open_state_bdg.add_loc( chrname, 0, start_pos, 0.0 )
+                nuc_state_bdg.add_loc( chrname, 0, start_pos, 0.0 )
+                bg_state_bdg.add_loc( chrname, 0, start_pos, 1.0 )
+            prev_chrom_name = chrname
+        else:
+            # now check if the prev_bin_end is start_pos, if not, add a gap of background
+            if prev_bin_end < start_pos:
+                open_state_bdg.add_loc( chrname, prev_bin_end, start_pos, 0.0 )
+                nuc_state_bdg.add_loc( chrname, prev_bin_end, start_pos, 0.0 )
+                bg_state_bdg.add_loc( chrname, prev_bin_end, start_pos, 1.0 )
 
-            open_state_bdg.add_loc( chrname, start_pos, end_pos, float(pp_data[i_open]) )
-            nuc_state_bdg.add_loc( chrname, start_pos, end_pos, float(pp_data[i_nuc]) )
-            bg_state_bdg.add_loc( chrname, start_pos, end_pos, float(pp_data[i_bg]) )
-            prev_bin_end = end_pos
-            
+        open_state_bdg.add_loc( chrname, start_pos, end_pos, pp_open )
+        nuc_state_bdg.add_loc( chrname, start_pos, end_pos, pp_nuc )
+        bg_state_bdg.add_loc( chrname, start_pos, end_pos, pp_bg )
+        prev_bin_end = end_pos
+        
     open_state_bdg.write_bedGraph( open_state_bdg_file, "Open States", "Likelihoods of being Open States" )
     nuc_state_bdg.write_bedGraph( nuc_state_bdg_file, "Nucleosomal States", "Likelihoods of being Nucleosomal States" )
     bg_state_bdg.write_bedGraph( bg_state_bdg_file, "Background States", "Likelihoods of being Background States" )
@@ -518,7 +519,7 @@ def save_states_bed( states_path, states_bedfile ):
             states_bedfile.write( "%s\t%s\t%s\t%s\n" % states_path[l] )
     return
 
-def generate_states_path(candidate_bins_file, predicted_proba_file, binsize, i_open_region, i_nucleosomal_region, i_background_region):
+def generate_states_path(predicted_proba_file, binsize, i_open, i_nuc, i_bg):
     ret_states_path = []
     labels_list = ["open", "nuc", "bg"]
 
@@ -526,40 +527,40 @@ def generate_states_path(candidate_bins_file, predicted_proba_file, binsize, i_o
     prev_bin_end = None
     prev_label = None
     
-    with open(candidate_bins_file, 'r') as cb_file, open(predicted_proba_file, 'r') as pp_file:
-        for cb_line, pp_line in zip(cb_file, pp_file):
-            cb_data = cb_line.strip().split(',')
-            pp_data = pp_line.strip().split(',')
+    for pp_line in predicted_proba_file:
+        pp_data = pp_line.strip().split(b',')
 
-            chrname = cb_data[0].strip("b'").encode('utf-8') # Convert str to bytes
-            end_pos = int(cb_data[1])
-            start_pos = end_pos - binsize
-            
-            # find the best state as label
-            o_p, nuc_p, bg_p = float(pp_data[i_open_region]), float(pp_data[i_nucleosomal_region]), float(pp_data[i_background_region])
-            label = labels_list[max((o_p, 0), (nuc_p, 1), (bg_p, 2), key=lambda x: x[0])[1]]
-            
-            if chrname != prev_chrom_name:
-                # we start a new chromosome
-                if start_pos > 0:
-                    # add the first unannotated region as background
-                    ret_states_path.append((chrname, 0, start_pos, "bg"))
+        chrname = pp_data[0]
+        end_pos = int(pp_data[1])
+        start_pos = end_pos - binsize
+        pp_open = float(pp_data[i_open+2])
+        pp_nuc = float(pp_data[i_nuc+2])
+        pp_bg = float(pp_data[i_bg+2])
+
+        # find the best state as label
+        label = labels_list[max((pp_open, 0), (pp_nuc, 1), (pp_bg, 2), key=lambda x: x[0])[1]]
+        
+        if chrname != prev_chrom_name:
+            # we start a new chromosome
+            if start_pos > 0:
+                # add the first unannotated region as background
+                ret_states_path.append((chrname, 0, start_pos, "bg"))
+            ret_states_path.append((chrname, start_pos, end_pos, label))
+            prev_label = label
+            prev_chrom_name = chrname
+        else:
+            # now check if the prev_bin_end is start_pos, if not, add a gap of background
+            if prev_bin_end < start_pos:
+                ret_states_path.append((chrname, prev_bin_end, start_pos, "bg"))
+                prev_label = "bg"
+            # same label, just extend
+            if label == prev_label:
+                ret_states_path[-1] = (ret_states_path[-1][0], ret_states_path[-1][1], end_pos, label)
+            else:
                 ret_states_path.append((chrname, start_pos, end_pos, label))
                 prev_label = label
-                prev_chrom_name = chrname
-            else:
-                # now check if the prev_bin_end is start_pos, if not, add a gap of background
-                if prev_bin_end < start_pos:
-                    ret_states_path.append((chrname, prev_bin_end, start_pos, "bg"))
-                    prev_label = "bg"
-                # same label, just extend
-                if label == prev_label:
-                    ret_states_path[-1] = (ret_states_path[-1][0], ret_states_path[-1][1], end_pos, label)
-                else:
-                    ret_states_path.append((chrname, start_pos, end_pos, label))
-                    prev_label = label
 
-            prev_bin_end = end_pos
+        prev_bin_end = end_pos
     return ret_states_path
 
 def save_accessible_regions(states_path, accessible_region_file, openregion_minlen):
