@@ -396,7 +396,8 @@ def run( args ):
     n = 0
     #predicted_proba_file_name = "predicted_proba.csv"
     #predicted_proba_file = open(predicted_proba_file_name, "wb")
-    predicted_proba_file = tempfile.TemporaryFile(mode="w+b")
+    # predicted_proba_file = tempfile.TemporaryFile(mode="w+b")
+    predicted_proba_file = open("predicted_proba.csv", "w+b")
 
     while candidate_regions.total != 0:
         n += 1
