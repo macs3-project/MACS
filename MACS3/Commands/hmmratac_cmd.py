@@ -1,4 +1,4 @@
-# Time-stamp: <2024-04-25 20:24:57 Tao Liu>
+# Time-stamp: <2024-04-26 09:47:25 Tao Liu>
 
 """Description: Main HMMR command
 
@@ -458,14 +458,13 @@ def run( args ):
     # PS: we need to implement extra feature to include those regions NOT in candidate_bins and assign them as 'background state'.
     if options.save_states:
         options.info( f"# Write states assignments in a BED file: {options.name}_states.bed" )
-        f = open( states_file, "w" )
-        save_states_bed( states_path, f )
-        f.close()
+        with open( states_file, "w" ) as f:
+            save_states_bed( states_path, f )
 
     options.info( f"# Write accessible regions in a gappedPeak file: {options.name}_accessible_regions.gappedPeak")
-    ofhd = open( accessible_file, "w" )
-    save_accessible_regions( states_path, ofhd, options.openregion_minlen )
-    ofhd.close()
+    with open( accessible_file, "w" ) as ofhd:
+        save_accessible_regions( states_path, ofhd, options.openregion_minlen )
+
     options.info( f"# Finished")
 
 def save_proba_to_bedGraph( predicted_proba_file, binsize, open_state_bdg_file, nuc_state_bdg_file, bg_state_bdg_file, i_open, i_nuc, i_bg ):
@@ -515,8 +514,8 @@ def save_states_bed( states_path, states_bedfile ):
     # we do not need to output background state. 
     for l in range( len( states_path ) ):
         if states_path[l][3] != "bg":
-            #print(states_path[l])
-            states_bedfile.write( "%s\t%s\t%s\t%s\n" % states_path[l] )
+            states_bedfile.write( "%s\t" % states_path[l][0].decode() )
+            states_bedfile.write( "%d\t%d\t%s\n" % states_path[l][1:] )
     return
 
 def generate_states_path(predicted_proba_file, binsize, i_open, i_nuc, i_bg):
