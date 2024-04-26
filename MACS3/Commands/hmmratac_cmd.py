@@ -1,4 +1,4 @@
-# Time-stamp: <2024-04-26 15:38:54 Tao Liu>
+# Time-stamp: <2024-04-26 15:46:03 Tao Liu>
 
 """Description: Main HMMR command
 
@@ -192,7 +192,7 @@ def run( args ):
 
         # Let MACS3 do the cutoff analysis to help decide the lower and upper cutoffs
         with open(cutoffanalysis_file, "w") as ofhd_cutoff:
-            ofhd_cutoff.write( fc_bdg.cutoff_analysis( min_length=minlen, max_gap=options.hmm_training_flanking, max_score = 100, steps=options.cutoff_analysis_steps ) )
+            ofhd_cutoff.write( fc_bdg.cutoff_analysis( min_length=minlen, max_gap=options.hmm_training_flanking, max_score = options.cutoff_analysis_max, steps=options.cutoff_analysis_steps ) )
         #raise Exception("Cutoff analysis only.")
         sys.exit(1)
 
@@ -238,7 +238,7 @@ def run( args ):
         
         # Let MACS3 do the cutoff analysis to help decide the lower and upper cutoffs
         with open(cutoffanalysis_file, "w") as ofhd_cutoff:
-            ofhd_cutoff.write( fc_bdg.cutoff_analysis( min_length=minlen, max_gap=options.hmm_training_flanking, max_score = 100 ) )
+            ofhd_cutoff.write( fc_bdg.cutoff_analysis( min_length=minlen, max_gap=options.hmm_training_flanking, max_score = options.cutoff_analysis_max ) )
             
         # we will check if anything left after filtering
         if peaks.total > options.hmm_maxTrain:

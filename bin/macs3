@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# Time-stamp: <2024-04-10 01:08:20 Tao Liu>
+# Time-stamp: <2024-04-26 15:55:13 Tao Liu>
 
 """Description: MACS v3 main executable.
 
@@ -906,10 +906,13 @@ plus an extra option for the HMM model file like `macs3 hmmratac
                                help = "Name for this experiment, which will be used as a prefix to generate output file names. DEFAULT: \"NA\"",
                                default = "NA" )
     group_output.add_argument( "--cutoff-analysis-only", dest = "cutoff_analysis_only", action = "store_true",
-                                help = "Only run the cutoff analysis and output a report. After generating the report, the process will stop. The report will help user decide the three crucial parameters for `-l`, `-u`, and `-c`. So it's highly recommanded to run this first! Please read the report and instructions in `Choices of cutoff values` on how to decide the three crucial parameters",
+                                help = "Only run the cutoff analysis and output a report. After generating the report, the process will stop. By default, the cutoff analysis will be included in the whole process, but won't quit after the report is generated. The report will help user decide the three crucial parameters for `-l`, `-u`, and `-c`. So it's highly recommanded to run this first! Please read the report and instructions in `Choices of cutoff values` on how to decide the three crucial parameters. The resolution of cutoff analysis can be controlled by --cutoff-analysis-max and --cutoff-analysis-steps options.",
                                 default = False )
+    group_output.add_argument( "--cutoff-analysis-max", dest="cutoff_analysis_max", type = int,
+                                help = "The maximum cutoff score for performing cutoff analysis. Together with --cutoff-analysis-steps, the resolution in the final report can be controlled. Please check the description in --cutoff-analysis-steps for detail. DEFAULT: 100",
+                                default = 100 )
     group_output.add_argument( "--cutoff-analysis-steps", dest="cutoff_analysis_steps", type = int,
-                                help = "Steps for performing cutoff analysis. It will be used to decide which cutoff value should be included in the final report. Larger the value, higher resolution the cutoff analysis can be. The cutoff analysis function will first find the smallest (at least 0) and the largest (at most 1,000) foldchange score in the data, then break the range of foldchange score into `CUTOFF_ANALYSIS_STEPS` intervals. It will then use each foldchange score as cutoff to call peaks and calculate the total number of candidate peaks, the total basepairs of peaks, and the average length of peak in basepair. Please note that the final report ideally should include `CUTOFF_ANALYSIS_STEPS` rows, but in practice, if the foldchange cutoff yield zero peak, the row for that foldchange value won't be included.  DEFAULT: 100",
+                                help = "Steps for performing cutoff analysis. It will be used to decide which cutoff value should be included in the final report. Larger the value, higher resolution the cutoff analysis can be. The cutoff analysis function will first find the smallest (at least 0) and the largest (at most 100, and controlled by --cutoff-analysis-max) foldchange score in the data, then break the range of foldchange score into `CUTOFF_ANALYSIS_STEPS` intervals. It will then use each foldchange score as cutoff to call peaks and calculate the total number of candidate peaks, the total basepairs of peaks, and the average length of peak in basepair. Please note that the final report ideally should include `CUTOFF_ANALYSIS_STEPS` rows, but in practice, if the foldchange cutoff yield zero peak, the row for that foldchange value won't be included.  DEFAULT: 100",
                                 default = 100 )
     group_output.add_argument( "--save-digested", dest = "save_digested", action = "store_true",
                                help = "Save the digested ATAC signals of short-, mono-, di-, and tri- signals in three BedGraph files with the names NAME_short.bdg, NAME_mono.bdg, NAME_di.bdg, and NAME_tri.bdg. DEFAULT: False",

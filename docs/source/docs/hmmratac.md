@@ -22,17 +22,24 @@ Here's an example of how to run the `hmmratac` command:
 $ macs3 hmmratac -i yeast.bam -n yeast
 ```
 
-or with the BEDPE format
+or with the BEDPE format of a much smaller size:
 
 ```
 $ macs3 hmmratac -i yeast.bedpe.gz -f BEDPE -n yeast
 ```
 
-Note: you can convert BAMPE to BEDPE by using
+You can convert BAMPE to BEDPE by using
 
 ```
 $ macs3 filterdup --keep-dup all -f BAMPE -i yeast.bam -o yeast.bedpe
 ```
+
+Please note that in order to save memory usage and fasten the process,
+`hmmratac` will save intermediate temporary file to the disk. The file
+size can range from megabytes to gigabytes, depending on how many
+candidate regions `hmmratac` needs to decode. The temporary file will
+be removed after the job is done. So please make sure there is enough
+space in the 'tmp' directory of your system. 
 
 Please use `macs3 hmmratac --help` to see all the options. Here we
 list the essential ones.
@@ -98,28 +105,37 @@ output file names. DEFAULT: "NA"
  fragments, make this value smaller. Default = 0.001 
 
 ### `--cutoff-analysis-only`
+Only run the cutoff analysis and output a report. After generating the
+report, the whole process will stop. By default, the cutoff analysis
+will be included in the whole process, but won't quit after the report
+is generated. The report will help user decide the three crucial
+parameters for `-l`, `-u`, and `-c`. So it's highly recommanded to run
+this first!  Please read the report and instructions in [Choices of
+cutoff values](#choices-of-cutoff-values) on how to decide the three
+crucial parameters. The resolution of cutoff analysis can be
+controlled by `--cutoff-analysis-max` and `--cutoff-analysis-steps`
+options.
 
- Only run the cutoff analysis and output a report. After generating
- the report, the process will stop. The report will help user decide
- the three crucial parameters for `-l`, `-u`, and `-c`. So it's highly
- recommanded to run this first! Please read the report and
- instructions in [Choices of cutoff values](#choices-of-cutoff-values)
- on how to decide the three crucial parameters.
+### `--cutoff-analysis-max`
+The maximum cutoff score for performing cutoff analysis. Together with
+`--cutoff-analysis-steps`, the resolution in the final report can be
+controlled. Please check the description in `--cutoff-analysis-steps`
+for detail. The default value is 100.
 
 ### `--cutoff-analysis-steps`
-
 Steps for performing cutoff analysis. It will be used to decide which
 cutoff value should be included in the final report. Larger the value,
 higher resolution the cutoff analysis can be. The cutoff analysis
-function will first find the smallest and the largest foldchange score
-in the data, then break the range of foldchange score into
+function will first find the smallest (at least 0) and the largest (at
+most 100, and controlled by --cutoff-analysis-max) foldchange score in
+the data, then break the range of foldchange score into
 `CUTOFF_ANALYSIS_STEPS` intervals. It will then use each foldchange
 score as cutoff to call peaks and calculate the total number of
 candidate peaks, the total basepairs of peaks, and the average length
 of peak in basepair. Please note that the final report ideally should
 include `CUTOFF_ANALYSIS_STEPS` rows, but in practice, if the
 foldchange cutoff yield zero peak, the row for that foldchange value
-won't be included.  DEFAULT: 100
+won't be included.  The default is 100.
 
 ### `--hmm-type`
 
