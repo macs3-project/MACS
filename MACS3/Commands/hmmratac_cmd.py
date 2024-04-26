@@ -1,4 +1,4 @@
-# Time-stamp: <2024-04-26 10:39:26 Tao Liu>
+# Time-stamp: <2024-04-26 11:47:02 Tao Liu>
 
 """Description: Main HMMR command
 
@@ -379,11 +379,12 @@ def run( args ):
     options.info( f"#  We expand the candidate regions with {options.hmm_training_flanking} and merge overlap" )
     candidate_regions.expand( options.hmm_training_flanking )
     candidate_regions.merge_overlap()
+    options.info( f"#   after expanding and merging, we have {candidate_regions.total} candidate regions" )
     
     # remove peaks overlapping with blacklisted regions
     if options.blacklist:
         candidate_regions.exclude( blacklist_regions )
-        options.info( f"#  after removing those overlapping with provided blacklisted regions, we have {candidate_regions.total} left" )
+        options.info( f"#   after removing those overlapping with provided blacklisted regions, we have {candidate_regions.total} left" )
 
     # extract signals
     options.info( f"#  Extract signals in candidate regions and decode with HMM")
