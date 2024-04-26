@@ -1,4 +1,4 @@
-# Time-stamp: <2024-04-26 09:47:25 Tao Liu>
+# Time-stamp: <2024-04-26 10:39:26 Tao Liu>
 
 """Description: Main HMMR command
 
@@ -197,7 +197,7 @@ def run( args ):
 
         # Let MACS3 do the cutoff analysis to help decide the lower and upper cutoffs
         with open(cutoffanalysis_file, "w") as ofhd_cutoff:
-            ofhd_cutoff.write( fc_bdg.cutoff_analysis( min_length=minlen, max_gap=options.hmm_training_flanking, max_score = 1000 ) )
+            ofhd_cutoff.write( fc_bdg.cutoff_analysis( min_length=minlen, max_gap=options.hmm_training_flanking, max_score = 100 ) )
         #raise Exception("Cutoff analysis only.")
         sys.exit(1)
         
@@ -244,7 +244,7 @@ def run( args ):
         
         # Let MACS3 do the cutoff analysis to help decide the lower and upper cutoffs
         with open(cutoffanalysis_file, "w") as ofhd_cutoff:
-            ofhd_cutoff.write( fc_bdg.cutoff_analysis( min_length=minlen, max_gap=options.hmm_training_flanking, max_score = 1000 ) )
+            ofhd_cutoff.write( fc_bdg.cutoff_analysis( min_length=minlen, max_gap=options.hmm_training_flanking, max_score = 100 ) )
             
         # we will check if anything left after filtering
         if peaks.total > options.hmm_maxTrain:
@@ -406,7 +406,7 @@ def run( args ):
 
         # then extrac data from digested signals, create cr_bins, cr_data, and cr_data_lengths
         [cr_bins, cr_data, cr_data_lengths] = extract_signals_from_regions( digested_atac_signals, cr, binsize = options.hmm_binsize, hmm_type = options.hmm_type )
-        options.debug( "#     extract_signals_from_regions complete")
+        #options.debug( "#     extract_signals_from_regions complete")
 
         prob_data = hmm_predict(cr_data, cr_data_lengths, hmm_model)
         assert len(prob_data) == len(cr_bins)
@@ -419,7 +419,7 @@ def run( args ):
         cr_bins = []
         prob_data = []
 
-        options.debug( "#     clean up complete")
+        #options.debug( "#     clean up complete")
         gc.collect()
 
     #predicted_proba_file.close()
