@@ -29,130 +29,40 @@ applied to any "DNA enrichment assays" if the question to be asked is
 simply: *where we can find significant reads coverage than the random
 background*.
 
-## Changes for MACS (3.0.1) 
+## Changes for MACS (3.0.2) 
 
-*Bugs fixed*
+### Features added
 
-1) Fixed a bug that the `hmmatac` can't correctly save the digested
-	signal
-	files. [#605](https://github.com/macs3-project/MACS/issues/605)
-	[#611](https://github.com/macs3-project/MACS/pull/611)
+1) Introduce a new emission model for the `hmmratac` function. Now
+	users can choose the simpler Poisson emission `--hmm-type poisson`
+	instead of the default Gaussian emission. As a consequence, the
+	saved HMM model file in json will include the hmm-type information
+	as well. Note that in order to be compatible with the HMM model
+	file from previous version, if there is no hmm-type information in
+	the model file, the hmm-type will be assigned as gaussian. #635
 
-2) Applied a patch to remove cython requirement from the installed
-	system. (it's needed for building the
-	package). [#606](https://github.com/macs3-project/MACS/issues/606)
-	[#612](https://github.com/macs3-project/MACS/pull/612)
+2) Add `--cutoff-analysis-steps` and `--cutoff-analysis-max` for
+	`callpeak`, `bdgpeakcall`, and `hmmratac` so that we can
+	have finer resolution of the cutoff analysis report. #636  #642
 
-3) Relax the testing script while comparing the peaks called from
-	current codes and the standard peaks. To implement this, we added
-	'intersection' function to 'Regions' class to find the
-	intersecting regions of two Regions object (similar to PeakIO but
-	only recording chromosome, start and end positions). And we
-	updated the unit test 'test_Region.py' then implemented a script
-	'jaccard.py' to compute the Jaccard Index of two peak files. If
-	the JI > 0.99 we would think the peaks called and the standard
-	peaks are similar. This is to avoid the problem caused by
-	different Numpy/SciPy/sci-kit learn libraries, when certain peak
-	coordinates may have 10bps
-	difference. [#615](https://github.com/macs3-project/MACS/issues/615)
-	[#619](https://github.com/macs3-project/MACS/pull/619)
+3) Reduce memory usage of `hmmratac` during decoding step, by
+	writing decoding results to a temporary file on disk (file
+	location depends on the environmental TEMP setting), then loading
+	it back while identifying state pathes. This change will decrease
+	the memory usage dramatically. #628 #640
+
+### Bugs fixed
 	
-4) Due to [the changes in scikit-learn
-	1.3.0](https://scikit-learn.org/1.3/whats_new/v1.3.html), the way
-	hmmlearn 0.3 uses Kmeans will end up with inconsistent results
-	between sklearn <1.3 and sklearn >=1.3. Therefore, we patched the
-	class hmm.GaussianHMM and adjusted the standard output from
-	`hmmratac` subcommand. The change is based on [hmmlearn
-	PR#545](https://github.com/hmmlearn/hmmlearn/pull/545). The idea
-	is to do the random seeding of KMeans 10 times. Now the `hmmratac`
-	results should be more consistent (at least
-	JI>0.99). [#615](https://github.com/macs3-project/MACS/issues/615)
-	[#620](https://github.com/macs3-project/MACS/pull/620)
+1) Use `-O3` instead of `-Ofast` for compatibility. #637
 
-*Other*
-	
-1) We added some dependencies to MACS3. `hmmratc` subcommand needs 
-	`hmmlearn` library, `hmmlearn` needs `scikit-learn` and 
-	`scikit-learn` needs `scipy`. Since major releases have happened 
-	for both`scipy` and `scikit-learn`, we have to set specific 
-	version requirements for them in order to make sure the output 
-	results from `hmmratac` are consistent. 
+*Documentation*
 
-2) We updated our documentation website using 
-    Sphinx. https://macs3-project.github.io/MACS/
+1) Update instruction to install macs3 through conda/bioconda
 
-## Changes for MACS (3.0.0)
+2) Reorganize MACS3 docs and publish through
+	https://macs3-project.github.io/MACS
 
-1) Call variants in peak regions directly from BAM files. The
-	function was originally developed under code name SAPPER. Now
-	SAPPER has been merged into MACS as the `callvar` command. It can
-	be used to call SNVs and small INDELs directly from alignment
-	files for ChIP-seq or ATAC-seq. We call `fermi-lite` to assemble
-	the DNA sequence at the enriched genomic regions (binding sites or
-	accessible DNA) and to refine the alignment when necessary. We
-	added `simde` as	a submodule in order to support fermi-lite
-	library under non-x64 architectures.
-
-2) HMMRATAC module is added as subcommand `hmmratac`. HMMRATAC is a
-	dedicated software to analyze ATAC-seq data. The basic idea behind
-	HMMRATAC is to digest ATAC-seq data according to the fragment
-	length of read pairs into four signal tracks: short fragments,
-	mono-nucleosomal fragments, di-nucleosomal fragments and
-	tri-nucleosomal fragments. Then integrate the four tracks again
-	using Hidden Markov Model to consider three hidden states: open
-	region, nucleosomal region, and background region. The orginal
-	paper was published in 2019 written in JAVA, by Evan Tarbell. We
-	implemented it in Python/Cython and optimize the whole process
-	using existing MACS functions and hmmlearn. Now it can run much
-	faster than the original JAVA version. Note: evaluation of the
-	peak calling results is still underway.
-
-3) Speed/memory optimization.  Use the cykhash to replace python
-	dictionary. Use buffer (10MB) to read and parse input file (not
-	available for BAM file parser). And many optimization tweaks. We
-	added memory monitoring to the runtime messages.
-
-4) R wrappers for MACS -- MACSr for bioconductor.
-
-5) Code cleanup. Reorganize source codes. 
-
-6) Unit testing. 
-
-7) Switch to Github Action for CI, support multi-arch testing
-	including x64, armv7, aarch64, s390x and ppc64le. We also test on
-	Mac OS 12.
-
-8) MACS tag-shifting model has been refined. Now it will use a naive
-	peak calling approach to find ALL possible paired peaks at + and -
-	strand, then use all of them to calculate the
-	cross-correlation. (a related bug has been fix
-	[#442](https://github.com/macs3-project/MACS/issues/442))
-
-9) BAI index and random access to BAM file now is
-	supported. [#449](https://github.com/macs3-project/MACS/issues/449).
-
-10) Support of Python > 3.10 [#498](https://github.com/macs3-project/MACS/issues/498)
-
-11) The effective genome size parameters have been updated
-	according to deeptools. [#508](https://github.com/macs3-project/MACS/issues/508)
-
-12) Multiple updates regarding dependencies, anaconda built, CI/CD
-	process.
-
-13) Cython 3 is supported.
-
-14) Documentations for each subcommand can be found under /docs
-
-*Other*
-
-1) Missing header line while no peaks can be called
-[#501](https://github.com/macs3-project/MACS/issues/501)
-[#502](https://github.com/macs3-project/MACS/issues/502)
-
-2) Note: different numpy, scipy, sklearn may give slightly
-	different results for hmmratac results. The current standard
-	results for automated testing in `/test` directory are from Numpy
-	1.25.1, Scipy 1.11.1, and sklearn 1.3.0.
+3) Description on various file formats used in MACS3.
 
 ## Install
 
