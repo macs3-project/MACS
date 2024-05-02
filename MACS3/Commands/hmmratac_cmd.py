@@ -69,7 +69,7 @@ def run( args ):
     nuc_state_bdgfile = os.path.join( options.outdir, options.name+"_nuc.bdg" )
     bg_state_bdgfile = os.path.join( options.outdir, options.name+"_bg.bdg" )
     states_file = os.path.join( options.outdir, options.name+"_states.bed" )
-    accessible_file = os.path.join( options.outdir, options.name+"_accessible_regions.gappedPeak" )
+    accessible_file = os.path.join( options.outdir, options.name+"_accessible_regions.narrowPeak" )
     cutoffanalysis_file = os.path.join( options.outdir, options.name+"_cutoff_analysis.tsv" )
     
     #############################################
@@ -463,7 +463,7 @@ def run( args ):
         with open( states_file, "w" ) as f:
             save_states_bed( states_path, f )
 
-    options.info( f"# Write accessible regions in a gappedPeak file: {options.name}_accessible_regions.gappedPeak")
+    options.info( f"# Write accessible regions in a narrowPeak file: {options.name}_accessible_regions.narrowPeak")
     with open( accessible_file, "w" ) as ofhd:
         save_accessible_regions( states_path, ofhd, options.openregion_minlen )
 
@@ -592,17 +592,18 @@ def save_accessible_regions(states_path, accessible_region_file, openregion_minl
     accessible_regions = list_of_groups
 
     # Generate broadpeak object
-    broadpeak = BroadPeakIO()
+    broadpeak = PeakIO()
     for region in accessible_regions[:-1]:
         block_num = sum('open' in tup for tup in region)
         block_sizes = ','.join(str(region[j][2] - region[j][1]) for j in range(1, len(region) - 1, 2))
         block_starts = ','.join(str(region[j][1] - region[0][1]) for j in range(1, len(region) - 1, 2))
-        broadpeak.add(region[1][0], region[0][1], region[-1][2],
+        broadpeak.add(chromosome=region[1][0], start=region[0][1], end=region[-1][2],
             #bytes(region[1][0], encoding="raw_unicode_escape"), region[0][1], region[-1][2],
-                      thickStart=bytes(str(region[1][1]), encoding="raw_unicode_escape"),
-                      thickEnd=bytes(str(region[-2][2]), encoding="raw_unicode_escape"),
-                      blockNum=block_num,
-                      blockSizes=bytes(block_sizes, encoding="raw_unicode_escape"),
-                      blockStarts=bytes(block_starts, encoding="raw_unicode_escape"))
-    broadpeak.write_to_gappedPeak(accessible_region_file)
+                    #   thickStart=bytes(str(region[1][1]), encoding="raw_unicode_escape"),
+                    #   thickEnd=bytes(str(region[-2][2]), encoding="raw_unicode_escape"),
+                    #   blockNum=block_num,
+                    #   blockSizes=bytes(block_sizes, encoding="raw_unicode_escape"),
+                    #   blockStarts=bytes(block_starts, encoding="raw_unicode_escape")
+                      summit=(region[0][1]+region[-1][2])//2) # use middle point for summit for now
+    broadpeak.write_to_narrowPeak(accessible_region_file)
     return
