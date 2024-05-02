@@ -580,30 +580,14 @@ def save_accessible_regions(states_path, accessible_region_file, openregion_minl
             states_path[i][2] == states_path[i+1][1] and states_path[i+1][2] == states_path[i+2][1] and 
             states_path[i+1][2] - states_path[i+1][1] > openregion_minlen):
             accessible_regions = add_regions(i, accessible_regions)
-    # Group states by region
-    list_of_groups = []
-    one_group = [accessible_regions[0]]
-    for j in range(1, len(accessible_regions)):
-        if accessible_regions[j][1] == accessible_regions[j-1][2]:
-            one_group.append(accessible_regions[j])
-        else:
-            list_of_groups.append(one_group)
-            one_group = [accessible_regions[j]]
-    accessible_regions = list_of_groups
+    
+    # remove 'nuc' regions: 
+    accessible_regions = [tup for tup in accessible_regions if tup[3] != 'nuc']
 
     # Generate broadpeak object
-    broadpeak = PeakIO()
+    openpeak = PeakIO()
     for region in accessible_regions[:-1]:
-        block_num = sum('open' in tup for tup in region)
-        block_sizes = ','.join(str(region[j][2] - region[j][1]) for j in range(1, len(region) - 1, 2))
-        block_starts = ','.join(str(region[j][1] - region[0][1]) for j in range(1, len(region) - 1, 2))
-        broadpeak.add(chromosome=region[1][0], start=region[0][2], end=region[-1][1],
-            #bytes(region[1][0], encoding="raw_unicode_escape"), region[0][1], region[-1][2],
-                    #   thickStart=bytes(str(region[1][1]), encoding="raw_unicode_escape"),
-                    #   thickEnd=bytes(str(region[-2][2]), encoding="raw_unicode_escape"),
-                    #   blockNum=block_num,
-                    #   blockSizes=bytes(block_sizes, encoding="raw_unicode_escape"),
-                    #   blockStarts=bytes(block_starts, encoding="raw_unicode_escape")
-                      summit=(region[0][1]+region[-1][2])//2) # use middle point for summit for now
-    broadpeak.write_to_narrowPeak(accessible_region_file)
+        openpeak.add(chromosome=region[0], start=region[1], end=region[2],
+                      summit=(region[1]+region[2])//2) # use middle point for summit for now
+    openpeak.write_to_narrowPeak(accessible_region_file)
     return
