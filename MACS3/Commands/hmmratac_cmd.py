@@ -597,7 +597,7 @@ def save_accessible_regions(states_path, accessible_region_file, openregion_minl
         block_num = sum('open' in tup for tup in region)
         block_sizes = ','.join(str(region[j][2] - region[j][1]) for j in range(1, len(region) - 1, 2))
         block_starts = ','.join(str(region[j][1] - region[0][1]) for j in range(1, len(region) - 1, 2))
-        broadpeak.add(chromosome=region[1][0], start=region[0][1], end=region[-1][2],
+        broadpeak.add(chromosome=region[1][0], start=region[0][2], end=region[-1][1],
             #bytes(region[1][0], encoding="raw_unicode_escape"), region[0][1], region[-1][2],
                     #   thickStart=bytes(str(region[1][1]), encoding="raw_unicode_escape"),
                     #   thickEnd=bytes(str(region[-2][2]), encoding="raw_unicode_escape"),
