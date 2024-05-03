@@ -171,6 +171,7 @@ docs/INSTALL.md
 docs/subcommands_index.md
 docs/fileformats_index.md
 docs/Advanced_Step-by-step_Peak_Calling.md
+docs/cutoffanalysis.md
 docs/qa.md
 docs/tutorial.md
 CODE_OF_CONDUCT.md
