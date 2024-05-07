@@ -54,9 +54,7 @@ def main():
     numpy_include_dir = [ numpy.get_include() ]
 
     # CFLAG
-    # I intend to use -Ofast, however if gcc version < 4.6, this option is unavailable so...
-    # should I care about old gcc compiler?...
-    extra_c_args = ["-w","-Ofast", "-g0"] # for C, -Ofast implies -O3 and -ffast-math
+    extra_c_args = ["-w","-O3", "-g0"]
 
     # CFLAG for fermi-lite related codes
     clang = False

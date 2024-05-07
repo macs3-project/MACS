@@ -1,5 +1,41 @@
+2024-04-27  Tao Liu  <vladimir.liu@gmail.com>
+	MACS 3.0.2 (pending)
+
+	* Features added
+
+	1) Introduce a new emission model for the `hmmratac` function. Now
+	users can choose the simpler Poisson emission `--hmm-type poisson`
+	instead of the default Gaussian emission. As a consequence, the
+	saved HMM model file in json will include the hmm-type information
+	as well. Note that in order to be compatible with the HMM model
+	file from previous version, if there is no hmm-type information in
+	the model file, the hmm-type will be assigned as gaussian. #635
+
+	2) Add `--cutoff-analysis-steps` and `--cutoff-analysis-max` for
+	`callpeak`, `bdgpeakcall`, and `hmmratac` so that we can
+	have finer resolution of the cutoff analysis report. #636  #642
+
+	3) Reduce memory usage of `hmmratac` during decoding step, by
+	writing decoding results to a temporary file on disk (file
+	location depends on the environmental TEMP setting), then loading
+	it back while identifying state pathes. This change will decrease
+	the memory usage dramatically. #628 #640
+
+	* Bugs fixed
+	
+	1) Use `-O3` instead of `-Ofast` for compatibility. #637
+
+	* Documentation
+
+	1) Update instruction to install macs3 through conda/bioconda
+
+	2) Reorganize MACS3 docs and publish through
+	https://macs3-project.github.io/MACS
+
+	3) Description on various file formats used in MACS3.
+
 2024-02-19  Tao Liu  <vladimir.liu@gmail.com>
-	MACS 3.0.1
+	MACS 3.0.1 
 
 	* Bugs fixed
 
