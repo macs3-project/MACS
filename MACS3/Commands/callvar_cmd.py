@@ -1,4 +1,4 @@
-# Time-stamp: <2022-09-15 17:25:49 Tao Liu>
+# Time-stamp: <2024-05-07 11:47:04 Tao Liu>
 
 """Description: Call variants directly
 
@@ -194,7 +194,7 @@ def run( args ):
                 else:
                     ra_collection = RACollection( chrom, peak, tbam.get_reads_in_region( chrom, peak["start"], peak["end"], maxDuplicate=maxDuplicate ) )
             except:
-                info ("No reads found in peak: ", chrom.decode(), peak["start"], peak["end"], ". Skipped!")
+                info ("No reads found in this peak. Skipped" )
                 # while there is no reads in peak region, simply skip it.
                 continue
             
