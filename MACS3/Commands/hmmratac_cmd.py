@@ -578,7 +578,7 @@ def save_accessible_regions(states_path, accessible_region_file, openregion_minl
     for i in range(len(states_path)-2):
         if (states_path[i][3] == 'nuc' and states_path[i+1][3] == 'open' and states_path[i+2][3] == 'nuc' and 
             states_path[i][2] == states_path[i+1][1] and states_path[i+1][2] == states_path[i+2][1] and 
-            states_path[i+1][2] - states_path[i+1][1] > openregion_minlen):
+            states_path[i+2][2] - states_path[i][1] > openregion_minlen): # require nuc-open-nuc entire region start/endpos > openregion_minlen
             accessible_regions = add_regions(i, accessible_regions)
     
     # remove 'nuc' regions: 
