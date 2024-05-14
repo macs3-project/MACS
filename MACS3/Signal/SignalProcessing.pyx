@@ -1,6 +1,6 @@
 # cython: language_level=3
 # cython: profile=True
-# Time-stamp: <2020-12-03 20:00:30 Tao Liu>
+# Time-stamp: <2024-05-14 11:43:45 Tao Liu>
 
 """Module Description: functions to find maxima minima or smooth the
 signal tracks.
@@ -76,8 +76,8 @@ cpdef enforce_peakyness(np.ndarray[float32_t, ndim=1] signal,
                 plus the sqrt of that value
             subtract the threshold from the region bounded by those minima
             clip that region if negative values occur inside it
-            require it be > 50 bp in width
-            require that it not be too flat (< 6 unique values)
+            require it be > 50 bp in width -- controlled by is_valied_peak()
+            require that it not be too flat (< 6 unique values) -- controlled by is_valid_peak()
     """
     cdef:
         np.ndarray[int32_t, ndim=1] minima = internal_minima(signal, maxima)
