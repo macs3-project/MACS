@@ -1,6 +1,6 @@
 # cython: language_level=3
 # cython: profile=True
-# Time-stamp: <2023-11-02 11:40:47 Tao Liu>
+# Time-stamp: <2024-05-14 13:10:16 Tao Liu>
 
 """Module for BedGraph data class.
 
@@ -890,7 +890,7 @@ cdef class bedGraphTrackI:
 
     cpdef object extract_value ( self, object bdgTrack2 ):
         """Extract values from regions defined in bedGraphTrackI class object
-        `regions`.
+        `bdgTrack2`.
 
         """
         cdef:
@@ -967,7 +967,7 @@ cdef class bedGraphTrackI:
 
     cpdef object extract_value_hmmr ( self, object bdgTrack2 ):
         """Extract values from regions defined in bedGraphTrackI class object
-        `regions`.
+        `bdgTrack2`.
 
         I will try to tweak this function to output only the values of
         bdgTrack1 (self) in the regions in bdgTrack2
@@ -1268,7 +1268,6 @@ cdef class bedGraphTrackI:
                                                           cutoff_lpeaks[ n ]/cutoff_npeaks[ n ] ))
         ret = ''.join(ret_list)
         return ret
-
 
 cdef np.ndarray calculate_elbows( np.ndarray values, float32_t threshold=0.01):
     # although this function is supposed to find elbow pts for cutoff analysis, 
