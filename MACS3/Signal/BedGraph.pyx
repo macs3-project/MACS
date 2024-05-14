@@ -1,6 +1,6 @@
 # cython: language_level=3
 # cython: profile=True
-# Time-stamp: <2024-05-14 13:44:21 Tao Liu>
+# Time-stamp: <2024-05-14 14:06:41 Tao Liu>
 
 """Module for BedGraph data class.
 
@@ -1262,10 +1262,10 @@ cdef class bedGraphTrackI:
         ret_list = ["score\tnpeaks\tlpeaks\tavelpeak\n"]
         for n in range( len( cutoff_list )-1, -1, -1 ):
             cutoff = cutoff_list[ n ]
-            #if cutoff_npeaks[ n ] > 0:
-            ret_list.append("%.2f\t%d\t%d\t%.2f\n" % ( cutoff, cutoff_npeaks[ n ], \
-                                                       cutoff_lpeaks[ n ], \
-                                                       cutoff_lpeaks[ n ]/cutoff_npeaks[ n ] ))
+            if cutoff_npeaks[ n ] > 0:
+                ret_list.append("%.2f\t%d\t%d\t%.2f\n" % ( cutoff, cutoff_npeaks[ n ], \
+                                                           cutoff_lpeaks[ n ], \
+                                                           cutoff_lpeaks[ n ]/cutoff_npeaks[ n ] ))
         ret = ''.join(ret_list)
         return ret
 
