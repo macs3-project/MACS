@@ -1,6 +1,6 @@
 # cython: language_level=3
 # cython: profile=True
-# Time-stamp: <2024-05-14 11:50:54 Tao Liu>
+# Time-stamp: <2024-05-14 12:00:25 Tao Liu>
 
 """Module for Feature IO classes.
 
@@ -742,7 +742,7 @@ cdef class ScoreTrackII:
                 else:
                     # close
                     if call_summits:
-                        self.__close_peak2(peak_content, peaks, min_length, chrom, max_gap//2 )
+                        self.__close_peak2(peak_content, peaks, min_length, chrom )
                     else:
                         self.__close_peak(peak_content, peaks, min_length, chrom, max_gap//2 )
                     peak_content = [(above_cutoff_startpos[i], above_cutoff_endpos[i], above_cutoff_v[i], above_cutoff_sv[i], above_cutoff[i]),]
@@ -752,7 +752,7 @@ cdef class ScoreTrackII:
                 continue
             else:
                 if call_summits:
-                    self.__close_peak2(peak_content, peaks, min_length, chrom, max_gap//2 )
+                    self.__close_peak2(peak_content, peaks, min_length, chrom )
                 else:
                     self.__close_peak(peak_content, peaks, min_length, chrom, max_gap//2 )
 
