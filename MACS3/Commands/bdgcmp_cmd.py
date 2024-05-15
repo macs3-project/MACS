@@ -1,4 +1,4 @@
-# Time-stamp: <2020-11-30 13:49:34 Tao Liu>
+# Time-stamp: <2024-05-15 10:13:23 Tao Liu>
 
 """Description: compare bdg files
 
@@ -39,11 +39,11 @@ def run( options ):
 
     info("Read and build treatment bedGraph...")
     tbio = BedGraphIO.bedGraphIO(options.tfile)
-    tbtrack = tbio.build_bdgtrack()
+    tbtrack = tbio.read_bedGraph()
 
     info("Read and build control bedGraph...")
     cbio = BedGraphIO.bedGraphIO(options.cfile)
-    cbtrack = cbio.build_bdgtrack()
+    cbtrack = cbio.read_bedGraph()
 
     info("Build ScoreTrackII...")
     sbtrack = tbtrack.make_ScoreTrackII_for_macs( cbtrack, depth1 = pseudo_depth, depth2 = pseudo_depth )
@@ -86,6 +86,7 @@ def run( options ):
             raise Exception("Can't reach here!")
 
         info("Write bedGraph of scores...")
-        ofhd = open(ofile,"w")
+        ofhd = open( ofile, "w" )
+        # write_bedGraph function for ScoreTrack
         sbtrack.write_bedGraph(ofhd,name="%s_Scores" % (method.upper()),description="Scores calculated by %s" % (method.upper()), column = 3)
         info("Finished '%s'! Please check '%s'!" % (method, ofile))

@@ -1,4 +1,4 @@
-# Time-stamp: <2024-04-26 15:46:03 Tao Liu>
+# Time-stamp: <2024-05-15 10:18:27 Tao Liu>
 
 """Description: Main HMMR command
 
@@ -27,13 +27,13 @@ from hmmlearn import hmm
 from MACS3.Utilities.Constants import *
 from MACS3.Utilities.OptValidator import opt_validate_hmmratac
 from MACS3.IO.PeakIO import PeakIO
-from MACS3.IO.PeakIO import BroadPeakIO
 from MACS3.IO.Parser import BAMPEParser, BEDPEParser #BAMaccessor
 from MACS3.Signal.HMMR_EM import HMMR_EM
 from MACS3.Signal.HMMR_Signal_Processing import generate_weight_mapping, generate_digested_signals, extract_signals_from_regions
 from MACS3.Signal.HMMR_HMM import hmm_training, hmm_predict, hmm_model_init, hmm_model_save
 from MACS3.Signal.Region import Regions
 from MACS3.Signal.BedGraph import bedGraphTrackI
+from MACS3.IO.BedGraphIO import bedGraphIO
 
 #from MACS3.IO.BED import BEDreader # this hasn't been implemented yet.
 
@@ -61,15 +61,21 @@ def run( args ):
     mono_bdgfile = os.path.join( options.outdir, options.name+"_digested_mono.bdg" )
     di_bdgfile = os.path.join( options.outdir, options.name+"_digested_di.bdg" )
     tri_bdgfile = os.path.join( options.outdir, options.name+"_digested_tri.bdg" )
+    
     training_region_bedfile = os.path.join( options.outdir, options.name+"_training_regions.bed" )
     training_datafile = os.path.join( options.outdir, options.name+"_training_data.txt" )
     training_datalengthfile = os.path.join( options.outdir, options.name+"_training_lengths.txt" )
+
     hmm_modelfile = os.path.join( options.outdir, options.name+"_model.json" )
+
     open_state_bdgfile = os.path.join( options.outdir, options.name+"_open.bdg" )
     nuc_state_bdgfile = os.path.join( options.outdir, options.name+"_nuc.bdg" )
     bg_state_bdgfile = os.path.join( options.outdir, options.name+"_bg.bdg" )
+
     states_file = os.path.join( options.outdir, options.name+"_states.bed" )
+
     accessible_file = os.path.join( options.outdir, options.name+"_accessible_regions.narrowPeak" )
+
     cutoffanalysis_file = os.path.join( options.outdir, options.name+"_cutoff_analysis.tsv" )
     
     #############################################
@@ -158,18 +164,17 @@ def run( args ):
 
     # save three types of signals if needed
     if options.save_digested:
-        fhd = open(short_bdgfile,"w")
-        digested_atac_signals[ 0 ].write_bedGraph(fhd, "short","short")
-        fhd.close()
-        fhd = open(mono_bdgfile,"w")
-        digested_atac_signals[ 1 ].write_bedGraph(fhd, "mono","mono")
-        fhd.close()
-        fhd = open(di_bdgfile,"w")
-        digested_atac_signals[ 2 ].write_bedGraph(fhd, "di","di")
-        fhd.close()
-        fhd = open(tri_bdgfile,"w")
-        digested_atac_signals[ 3 ].write_bedGraph(fhd, "tri","tri")
-        fhd.close()        
+        bdgshort = BedGraphIO( short_bdgfile, data = digested_atac_signals[ 0 ] )
+        bdgshort.write_bedGraph("short","short")
+
+        bdgmono = BedGraphIO( mono_bdgfile, data = digested_atac_signals[ 1 ] )
+        bdgmono.write_bedGraph("mono", "mono")
+
+        bdgdi = BedGraphIO( di_bdgfile, data = digested_atac_signals[ 2 ] )
+        bdgdi.write_bedGraph("di", "di")
+
+        bdgtri = BedGraphIO( tri_bdgfile, data = digested_atac_signals[ 3 ] )
+        bdgtri.write_bedGraph("tri", "tri")
 
     minlen = int(petrack.average_template_length)
     # if options.pileup_short is on, we pile up only the short fragments to identify training 
@@ -389,10 +394,9 @@ def run( args ):
     # Note: we implement in a way that we will decode the candidate regions 10000 regions at a time so 1. we can make it running in parallel in the future; 2. we can reduce the memory usage.
     options.info( f"#  Use HMM to predict states")
     n = 0
-    #predicted_proba_file_name = "predicted_proba.csv"
-    #predicted_proba_file = open(predicted_proba_file_name, "wb")
+
+    # we create a temporary file to save the proba predicted from hmm
     predicted_proba_file = tempfile.TemporaryFile(mode="w+b")
-    # predicted_proba_file = open("predicted_proba.csv", "w+b")
 
     while candidate_regions.total != 0:
         n += 1
@@ -414,11 +418,8 @@ def run( args ):
         cr_data_lengths = []
         cr_bins = []
         prob_data = []
-
-        #options.debug( "#     clean up complete")
         gc.collect()
 
-    #predicted_proba_file.close()
     predicted_proba_file.seek(0) # reset
     options.info( f"# predicted_proba files written...")
 
@@ -449,7 +450,7 @@ def run( args ):
     # # Generate states path:
     states_path = generate_states_path( predicted_proba_file, options.hmm_binsize, i_open_region, i_nucleosomal_region, i_background_region )
     options.info( f"# finished generating states path")
-    predicted_proba_file.close()          #kill the tempfile
+    predicted_proba_file.close()          #kill the temp file
     # Save states path if needed
     # PS: we need to implement extra feature to include those regions NOT in candidate_bins and assign them as 'background state'.
     if options.save_states:
@@ -464,10 +465,15 @@ def run( args ):
     options.info( f"# Finished")
 
 def save_proba_to_bedGraph( predicted_proba_file, binsize, open_state_bdg_file, nuc_state_bdg_file, bg_state_bdg_file, i_open, i_nuc, i_bg ):
-    open_state_bdg = bedGraphTrackI( baseline_value = 0 )
-    nuc_state_bdg = bedGraphTrackI( baseline_value = 0 )
-    bg_state_bdg = bedGraphTrackI( baseline_value = 0 )
 
+    open_state_bdg_file = bedGraphIO( open_state_bdg_file )
+    nuc_state_bdg_file = bedGraphIO( nuc_state_bdg_file )
+    bg_state_bdg_file = bedGraphIO( bg_state_bdg_file )
+
+    open_state_bdg = open_state_bdg_file.data
+    nuc_state_bdg = nuc_state_bdg_file.data
+    bg_state_bdg = bg_state_bdg_file.data
+    
     prev_chrom_name = None
     prev_bin_end = None
 
@@ -501,9 +507,9 @@ def save_proba_to_bedGraph( predicted_proba_file, binsize, open_state_bdg_file, 
         bg_state_bdg.add_loc( chrname, start_pos, end_pos, pp_bg )
         prev_bin_end = end_pos
         
-    open_state_bdg.write_bedGraph( open_state_bdg_file, "Open States", "Likelihoods of being Open States" )
-    nuc_state_bdg.write_bedGraph( nuc_state_bdg_file, "Nucleosomal States", "Likelihoods of being Nucleosomal States" )
-    bg_state_bdg.write_bedGraph( bg_state_bdg_file, "Background States", "Likelihoods of being Background States" )
+    open_state_bdg_file.write_bedGraph( "Open States", "Likelihoods of being Open States", trackline = False )
+    nuc_state_bdg_file.write_bedGraph( "Nucleosomal States", "Likelihoods of being Nucleosomal States", trackline = False )
+    bg_state_bdg_file.write_bedGraph( "Background States", "Likelihoods of being Background States", trackline = False )
     return
 
 def save_states_bed( states_path, states_bedfile ):
@@ -515,6 +521,7 @@ def save_states_bed( states_path, states_bedfile ):
     return
 
 def generate_states_path(predicted_proba_file, binsize, i_open, i_nuc, i_bg):
+    # predicted_proba_file is a temporary file
     ret_states_path = []
     labels_list = ["open", "nuc", "bg"]
 

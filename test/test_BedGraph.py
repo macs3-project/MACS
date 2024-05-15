@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# Time-stamp: <2023-05-18 16:15:59 Tao Liu>
+# Time-stamp: <2024-05-15 10:59:09 Tao Liu>
 
 import pytest
 
@@ -48,7 +48,7 @@ def define_regions():
         bdg2.add_loc(a[0],a[1],a[2],a[3])
 
     for a in test_regions3:
-        bdg3.add_loc(a[0],a[1],a[2],a[3])    
+        bdg3.add_loc(a[0],a[1],a[2],a[3])
 
     return (bdg1, bdg2, bdg3)
 

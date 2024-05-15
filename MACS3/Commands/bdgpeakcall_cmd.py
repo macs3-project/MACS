@@ -1,4 +1,4 @@
-# Time-stamp: <2024-05-14 13:39:13 Tao Liu>
+# Time-stamp: <2024-05-15 10:43:03 Tao Liu>
 
 """Description: Naive call peaks from a single bedGraph track for
 scores.
@@ -39,7 +39,7 @@ warn    = logger.warning
 def run( options ):
     info("Read and build bedGraph...")
     bio = BedGraphIO.bedGraphIO(options.ifile)
-    btrack = bio.build_bdgtrack(baseline_value=0)
+    btrack = bio.read_bedGraph(baseline_value=0)
 
     if options.cutoff_analysis:
         info("Analyze cutoff vs number of peaks/total length of peaks/average length of peak")

@@ -1,6 +1,6 @@
 # cython: language_level=3
 # cython: profile=True
-# Time-stamp: <2022-09-15 17:05:09 Tao Liu>
+# Time-stamp: <2024-05-15 10:53:50 Tao Liu>
 
 """Module for PeakIO IO classes.
 
@@ -772,7 +772,7 @@ cdef class RegionIO:
         self.regions= {}
         self.__flag_sorted = False
 
-    def add_loc ( self, bytes chrom, int start, int end ):
+    cpdef void add_loc ( self, bytes chrom, int start, int end ):
         if self.regions.has_key(chrom):
             self.regions[chrom].append( (start,end) )
         else:
@@ -780,7 +780,7 @@ cdef class RegionIO:
         self.__flag_sorted = False
         return
 
-    def sort (self):
+    cpdef void sort (self):
         cdef bytes chrom
 
         for chrom in sorted(list(self.regions.keys())):
@@ -790,19 +790,23 @@ cdef class RegionIO:
     cpdef set get_chr_names (self):
         return set(sorted(self.regions.keys()))
 
-    def merge_overlap ( self ):
+    cpdef void merge_overlap ( self ):
         """
         merge overlapping regions
         """
-        cdef bytes chrom
-        cdef int s_new_region, e_new_region, i, j
+        cdef:
+            bytes chrom
+            int s_new_region, e_new_region, i, j
+            dict regions, new_regions
+            list chrs, regions_chr
+            tuple prev_region
 
         if not self.__flag_sorted:
             self.sort()
         regions = self.regions
         new_regions = {}
-        chrs = sorted(list(regions.keys()))
-        for i in range(len(chrs)):
+        chrs = sorted( list( regions.keys() ) )
+        for i in range( len( chrs ) ):
             chrom = chrs[i]
             new_regions[chrom]=[]
             n_append = new_regions[chrom].append
@@ -824,11 +828,14 @@ cdef class RegionIO:
                 n_append(prev_region)
         self.regions = new_regions
         self.sort()
-        return True
+        return
 
-    def write_to_bed (self, fhd ):
-        cdef int i
-        cdef bytes chrom
+    cpdef write_to_bed (self, fhd ):
+        cdef:
+            int i
+            bytes chrom
+            list chrs
+            tuple region
 
         chrs = sorted(list(self.regions.keys()))
         for i in range( len(chrs) ):

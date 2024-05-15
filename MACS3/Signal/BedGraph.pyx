@@ -1,6 +1,6 @@
 # cython: language_level=3
 # cython: profile=True
-# Time-stamp: <2024-05-14 14:06:41 Tao Liu>
+# Time-stamp: <2024-05-15 11:01:29 Tao Liu>
 
 """Module for BedGraph data class.
 
@@ -20,7 +20,7 @@ from math import prod
 # MACS3 modules
 # ------------------------------------
 from MACS3.Signal.ScoreTrack import ScoreTrackII
-from MACS3.IO.PeakIO import PeakIO, BroadPeakIO, RegionIO
+from MACS3.IO.PeakIO import PeakIO, BroadPeakIO
 from MACS3.Signal.Prob import chisq_logp_e
 
 # ------------------------------------
@@ -119,10 +119,9 @@ cdef class bedGraphTrackI:
     cpdef add_loc ( self, bytes chromosome, int32_t startpos, int32_t endpos, float32_t value):
         """Add a chr-start-end-value block into __data dictionary.
 
-        Difference between safe_add_loc: no check, but faster. Save
-        time while being called purely within MACS, so that regions
-        are continuous without gaps. Note: I forgot that I removed
-        safe_add_loc :P
+        Note, we don't check if the add_loc is called continuously on
+        sorted regions without any gap. So we only suggest calling
+        this function within MACS.
 
         """
         cdef float32_t pre_v
@@ -165,10 +164,9 @@ cdef class bedGraphTrackI:
     cpdef add_loc_wo_merge ( self, bytes chromosome, int32_t startpos, int32_t endpos, float32_t value):
         """Add a chr-start-end-value block into __data dictionary.
 
-        Difference between safe_add_loc: no check, but faster. Save
-        time while being called purely within MACS, so that regions
-        are continuous without gaps. Note: I forgot that I removed
-        safe_add_loc :P
+        Note, we don't check if the add_loc is called continuously on
+        sorted regions without any gap. So we only suggest calling
+        this function within MACS.
 
         This one won't merge nearby ranges with the same value
         """
@@ -268,39 +266,6 @@ cdef class bedGraphTrackI:
 
         """
         return set(sorted(self.__data.keys()))
-
-    cpdef void write_bedGraph (self, fhd, str name, str description, bool trackline=True):
-        """Write all data to fhd in Wiggle Format.
-
-        fhd: a filehandler to save bedGraph.
-        name/description: the name and description in track line.
-
-        shift will be used to shift the coordinates. default: 0
-        """
-        cdef:
-            int32_t pre, pos, i
-            float32_t value
-            bytes chrom
-            set chrs
-
-        if trackline:
-            trackcontents = (name.replace("\"", "\\\""), description.replace("\"", "\\\""))
-            fhd.write("track type=bedGraph name=\"%s\" description=\"%s\" visibility=2 alwaysZero=on\n" % trackcontents)
-        chrs = self.get_chr_names()
-        for chrom in sorted(chrs):
-            (p,v) = self.__data[chrom]
-            pnext = iter(p).__next__
-            vnext = iter(v).__next__
-            pre = 0
-
-            for i in range(len(p)):
-                pos = pnext()
-                value = vnext()
-                #if value != self.baseline_value:
-                # never write baseline_value
-                fhd.write("%s\t%d\t%d\t%.5f\n" % (chrom.decode(),pre,pos,value))
-                pre = pos
-        return
 
     cpdef void reset_baseline (self, float32_t baseline_value):
         """Reset baseline value to baseline_value.
