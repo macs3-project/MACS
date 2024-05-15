@@ -1,6 +1,6 @@
 # cython: language_level=3
 # cython: profile=True
-# Time-stamp: <2024-05-15 10:53:50 Tao Liu>
+# Time-stamp: <2024-05-15 19:21:00 Tao Liu>
 
 """Module for PeakIO IO classes.
 
@@ -303,7 +303,7 @@ cdef class PeakIO:
         self.sort()
 
     def __str__ (self):
-        """convert to text -- BED format
+        """convert to text -- for debug
         """
         cdef:
             list chrs
@@ -318,10 +318,11 @@ cdef class PeakIO:
                 peaks = list(group)
                 if len(peaks) > 1:
                     for i, peak in enumerate(peaks):
-                        ret += "%s\t%d\t%d\tpeak_%d%s\t%.6g\n" % (chrom.decode(),peak['start'],peak['end'],n_peak,subpeak_letters(i),peak["score"])
+                        ret += "chrom:%s\tstart:%d\tend:%d\tname:peak_%d%s\tscore:%.6g\tsummit:%d\n" % (chrom.decode(),peak['start'],peak['end'],n_peak,subpeak_letters(i),peak["score"],peak["summit"])
                 else:
                     peak = peaks[0]
-                    ret += "%s\t%d\t%d\tpeak_%d\t%.6g\n" % (chrom.decode(),peak['start'],peak['end'],n_peak,peak["score"])
+                    ret += "chrom:%s\tstart:%d\tend:%d\tname:peak_%d\tscore:%.6g\tsummit:%d\n" % (chrom.decode(),peak['start'],peak['end'],n_peak,peak["score"],peak["summit"])                    
+                    
         return ret
 
     cdef void _to_bed(self, bytes name_prefix=b"%s_peak_", bytes name=b"MACS",

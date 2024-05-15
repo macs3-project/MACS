@@ -1,6 +1,6 @@
 # cython: language_level=3
 # cython: profile=True
-# Time-stamp: <2024-05-15 11:01:29 Tao Liu>
+# Time-stamp: <2024-05-15 19:27:06 Tao Liu>
 
 """Module for BedGraph data class.
 
@@ -620,7 +620,88 @@ cdef class bedGraphTrackI:
                    qscore = lvl2peak["qscore"] )
         return bpeaks
 
+    cpdef object refine_peaks (self, object peaks):
+        """This function try to based on given peaks, re-evaluate the
+        peak region, call the summit.
 
+        peaks: PeakIO object
+        
+        return: a new PeakIO object
+
+        """
+        cdef:
+            int32_t peak_length, x, pre_p, p, i, peak_s, peak_e
+            float32_t v
+            bytes chrom
+            set chrs
+            object new_peaks
+
+        peaks.sort()
+        new_peaks = PeakIO()
+        chrs = self.get_chr_names()
+        assert isinstance(peaks, PeakIO)
+        chrs = chrs.intersection(set(peaks.get_chr_names()))
+        
+        for chrom in sorted(chrs):
+            peaks_chr = peaks.get_data_from_chrom(chrom)
+            peak_content = []
+            (ps,vs) = self.get_data_by_chr(chrom) # arrays for position and values
+            psn = iter(ps).__next__         # assign the next function to a viable to speed up
+            vsn = iter(vs).__next__
+            peakn = iter(peaks_chr).__next__
+
+            pre_p = 0                   # remember previous position in bedgraph/self
+            p = psn()
+            v = vsn()
+            peak = peakn()
+            peak_s = peak["start"]
+            peak_e = peak["end"]
+            
+            while True:
+                # look for overlap
+                if p > peak_s and peak_e > pre_p:
+                    # now put four coordinates together and pick the middle two
+                    s, e = sorted([p, peak_s, peak_e, pre_p])[1:3]
+                    # add this content
+                    peak_content.append( (s, e, v) )
+                    # move self/bedGraph
+                    try:
+                        pre_p = p
+                        p = psn()
+                        v = vsn()
+                    except:
+                        # no more value chunk in bedGraph
+                        break
+                elif pre_p >= peak_e:
+                    # close peak
+                    self.__close_peak(peak_content, new_peaks, 0, chrom)
+                    peak_content = []
+                    # move peak
+                    try:
+                        peak = peakn()
+                        peak_s = peak["start"]
+                        peak_e = peak["end"]
+                    except:
+                        # no more peak
+                        break
+                elif peak_s >= p:
+                    # move self/bedgraph
+                    try:
+                        pre_p = p
+                        p = psn()
+                        v = vsn()
+                    except:
+                        # no more value chunk in bedGraph
+                        break
+                else:
+                    raise Exception(f"no way here! prev position:{pre_p}; position:{p}; value:{v}; peak start:{peak_s}; peak end:{peak_e}")
+
+            # save the last peak
+            if peak_content:
+                self.__close_peak(peak_content, new_peaks, 0, chrom)
+        return new_peaks
+
+    
     cpdef int32_t total (self):
         """Return the number of regions in this object.
 
