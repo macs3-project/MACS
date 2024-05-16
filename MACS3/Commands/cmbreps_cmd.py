@@ -1,4 +1,4 @@
-# Time-stamp: <2020-11-24 16:47:11 Tao Liu>
+# Time-stamp: <2024-05-15 11:16:04 Tao Liu>
 
 """Description: combine replicates
 
@@ -38,16 +38,16 @@ def run( options ):
     i = 1
     for ifile in options.ifile:
         info("Read file #%d" % i)
-        reps.append( BedGraphIO.bedGraphIO( ifile ).build_bdgtrack( ) )
+        reps.append( BedGraphIO.bedGraphIO( ifile ).read_bedGraph() )
         i += 1
 
     # first two reps
-
     info("combining tracks 1-%i with method '%s'" % (i - 1, options.method))
     cmbtrack = reps[ 0 ].overlie( [reps[ j ] for j in range(1, i - 1)], func=options.method )
-    ofile = os.path.join( options.outdir, options.ofile )
+
+    # now output
+    ofile = BedGraphIO.bedGraphIO( os.path.join( options.outdir, options.ofile ), data = cmbtrack )
     info("Write bedGraph of combined scores...")
-    ofhd = open(ofile,"w")
-    cmbtrack.write_bedGraph(ofhd,name="%s_combined_scores" % (options.method.upper()),description="Scores calculated by %s" % (options.method.upper()))
-    info("Finished '%s'! Please check '%s'!" % (options.method, ofile))
+    ofile.write_bedGraph(name="%s_combined_scores" % (options.method.upper()),description="Scores calculated by %s" % (options.method.upper()))
+    info("Finished '%s'! Please check '%s'!" % (options.method, ofile.bedGraph_filename))
 

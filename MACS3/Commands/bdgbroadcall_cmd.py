@@ -1,4 +1,4 @@
-# Time-stamp: <2020-12-03 14:26:29 Tao Liu>
+# Time-stamp: <2024-05-15 10:41:43 Tao Liu>
 
 """Description: Fine-tuning script to call broad peaks from a single
 bedGraph track for scores.
@@ -41,7 +41,7 @@ warn    = logger.warning
 def run( options ):
     info("Read and build bedGraph...")
     bio = BedGraphIO.bedGraphIO(options.ifile)
-    btrack = bio.build_bdgtrack(baseline_value=0)
+    btrack = bio.read_bedGraph(baseline_value=0)
 
     info("Call peaks from bedGraph...")
 

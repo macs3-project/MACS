@@ -1,6 +1,6 @@
 # cython: language_level=3
 # cython: profile=True
-# Time-stamp: <2022-09-15 17:24:53 Tao Liu>
+# Time-stamp: <2024-05-14 12:06:19 Tao Liu>
 
 """Module for Feature IO classes.
 
@@ -697,8 +697,8 @@ cdef class ScoreTrackII:
 
         cutoff:  cutoff of value, default 5. For -log10pvalue, it means 10^-5.
         min_length :  minimum peak length, default 200.
-        gap   :  maximum gap to merge nearby peaks, default 50.
-        ptrack:  an optional track for pileup heights. If it's not None, use it to find summits. Otherwise, use self/scoreTrack.
+        max_gap   :  maximum gap to merge nearby peaks, default 50.
+        acll_summits: 
         """
         cdef:
             int32_t i
@@ -744,7 +744,7 @@ cdef class ScoreTrackII:
                     if call_summits:
                         self.__close_peak2(peak_content, peaks, min_length, chrom, max_gap//2 )
                     else:
-                        self.__close_peak(peak_content, peaks, min_length, chrom, max_gap//2 )
+                        self.__close_peak(peak_content, peaks, min_length, chrom )
                     peak_content = [(above_cutoff_startpos[i], above_cutoff_endpos[i], above_cutoff_v[i], above_cutoff_sv[i], above_cutoff[i]),]
 
             # save the last peak
@@ -754,14 +754,28 @@ cdef class ScoreTrackII:
                 if call_summits:
                     self.__close_peak2(peak_content, peaks, min_length, chrom, max_gap//2 )
                 else:
-                    self.__close_peak(peak_content, peaks, min_length, chrom, max_gap//2 )
+                    self.__close_peak(peak_content, peaks, min_length, chrom )
 
         return peaks
 
-    cdef bool __close_peak (self, list peak_content, peaks, int32_t min_length,
-                            bytes chrom, int32_t smoothlen=0):
+    cdef bool __close_peak (self, list peak_content, object peaks, int32_t min_length,
+                            bytes chrom):
         """Close the peak region, output peak boundaries, peak summit
         and scores, then add the peak to peakIO object.
+
+        In this function, we define the peak summit as the middle
+        point of the region with the highest score, in this peak. For
+        example, if the region of the highest score is from 100 to
+        200, the summit is 150. If there are several regions of the
+        same 'highest score', we will first calculate the possible
+        summit for each such region, then pick a position close to the
+        middle index ( = (len(highest_regions) + 1) / 2 ) of these
+        summits. For example, if there are three regions with the same
+        highest scores, [100,200], [300,400], [600,700], we will first
+        find the possible summits as 150, 350, and 650, and then pick
+        the middle index, the 2nd, of the three positions -- 350 as
+        the final summit. If there are four regions, we pick the 2nd
+        as well.
 
         peaks: a PeakIO object
 
@@ -809,9 +823,22 @@ cdef class ScoreTrackII:
             # start a new peak
             return True
 
-    cdef bool __close_peak2 (self, list peak_content, peaks, int32_t min_length,
+    cdef bool __close_peak2 (self, list peak_content, object peaks, int32_t min_length,
                              bytes chrom, int32_t smoothlen=51,
                              float32_t min_valley = 0.9):
+        """Close the peak region, output peak boundaries, peak summit
+        and scores, then add the peak to peakIO object.
+
+        In this function, we use signal processing methods to smooth
+        the scores in the peak region, find the maxima and enforce the
+        peaky shape, and to define the best maxima as the peak
+        summit. The functions used for signal processing is 'maxima'
+        (with 2nd order polynomial filter) and 'enfoce_peakyness'
+        functions in SignalProcessing.pyx.
+
+        peaks: a PeakIO object
+
+        """    
         cdef:
             int32_t summit_pos, tstart, tend, tmpindex, summit_index, summit_offset
             int32_t start, end, i, j, start_boundary

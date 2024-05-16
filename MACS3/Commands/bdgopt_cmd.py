@@ -1,4 +1,4 @@
-# Time-stamp: <2020-11-24 16:46:33 Tao Liu>
+# Time-stamp: <2024-05-15 11:15:48 Tao Liu>
 
 """Description: Modify bedGraph file
 
@@ -40,7 +40,7 @@ def run( options ):
     
     info("Read and build bedGraph...")
     bio = BedGraphIO.bedGraphIO(options.ifile)
-    btrack = bio.build_bdgtrack(baseline_value=0)
+    btrack = bio.read_bedGraph(baseline_value=0)
 
     info("Modify bedGraph...")
     if options.method.lower() == "p2q":
@@ -57,11 +57,10 @@ def run( options ):
         elif options.method.lower() == "min":
             btrack.apply_func( lambda x: x if x< extraparam else extraparam )
 
-    ofile = os.path.join( options.outdir, options.ofile )
+    ofile = BedGraphIO.bedGraphIO( os.path.join( options.outdir, options.ofile ), data = btrack )
     info("Write bedGraph of modified scores...")
-    ofhd = open(ofile,"w")
-    btrack.write_bedGraph(ofhd,name="%s_modified_scores" % (options.method.upper()),description="Scores calculated by %s" % (options.method.upper()))
-    info("Finished '%s'! Please check '%s'!" % (options.method, ofile))
+    ofile.write_bedGraph(name="%s_modified_scores" % (options.method.upper()),description="Scores calculated by %s" % (options.method.upper()))
+    info("Finished '%s'! Please check '%s'!" % (options.method, ofile.bedGraph_filename))
 
 
 

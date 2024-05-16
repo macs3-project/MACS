@@ -1,9 +1,10 @@
 #!/usr/bin/env python
-# Time-stamp: <2023-05-18 16:15:59 Tao Liu>
+# Time-stamp: <2024-05-15 19:31:36 Tao Liu>
 
 import pytest
 
 from MACS3.Signal.BedGraph import *
+from MACS3.IO.PeakIO import PeakIO
 
 test_regions1 = [(b"chrY",0,10593155,0.0),
                  (b"chrY",10593155,10597655,0.0066254580149)]
@@ -27,6 +28,9 @@ overlie_fisher = [(b"chrY",  0, 70, (0,0,20), 92.10340371976183, 1.1074313239555
                     (b"chrY", 90,150, (0,0,10), 46.051701859880914, 2.8912075645386016e-08, 7.5389),
                     (b"chrY",150,155, (0,0,0), 0, 1.0, 0.0)]
 
+some_peak = [(b"chrY", 50, 80),
+             (b"chrY", 95, 152)]
+
 @pytest.fixture
 def define_regions():
     test_regions1 = [(b"chrY",0,70,0.00),
@@ -48,7 +52,7 @@ def define_regions():
         bdg2.add_loc(a[0],a[1],a[2],a[3])
 
     for a in test_regions3:
-        bdg3.add_loc(a[0],a[1],a[2],a[3])    
+        bdg3.add_loc(a[0],a[1],a[2],a[3])
 
     return (bdg1, bdg2, bdg3)
 
@@ -71,6 +75,18 @@ def test_overlie_max( define_regions ):
         assert pos == pytest.approx( overlie_max[i][2] )
         assert value == pytest.approx( overlie_max[i][3] )
         pre = pos
+
+def test_refine_peak():
+    bdg = bedGraphTrackI()
+    for a in overlie_mean:
+        bdg.add_loc(a[0], a[1], a[2], a[3])
+    peak = PeakIO()
+    for a in some_peak:
+        peak.add( a[0], a[1], a[2])
+    new_peak = bdg.refine_peaks( peak )
+    out = str(new_peak)
+    std = "chrom:chrY\tstart:50\tend:80\tname:peak_1\tscore:14\tsummit:77\nchrom:chrY\tstart:95\tend:152\tname:peak_2\tscore:3.33333\tsummit:122\n"
+    assert out == std
 
     # def test_overlie_mean(self):
     #     bdgb = self.bdg1.overlie([self.bdg2,self.bdg3], func="mean")

@@ -1,6 +1,6 @@
 # cython: language_level=3
 # cython: profile=True
-# Time-stamp: <2023-11-02 11:40:47 Tao Liu>
+# Time-stamp: <2024-05-15 19:27:06 Tao Liu>
 
 """Module for BedGraph data class.
 
@@ -20,7 +20,7 @@ from math import prod
 # MACS3 modules
 # ------------------------------------
 from MACS3.Signal.ScoreTrack import ScoreTrackII
-from MACS3.IO.PeakIO import PeakIO, BroadPeakIO, RegionIO
+from MACS3.IO.PeakIO import PeakIO, BroadPeakIO
 from MACS3.Signal.Prob import chisq_logp_e
 
 # ------------------------------------
@@ -119,10 +119,9 @@ cdef class bedGraphTrackI:
     cpdef add_loc ( self, bytes chromosome, int32_t startpos, int32_t endpos, float32_t value):
         """Add a chr-start-end-value block into __data dictionary.
 
-        Difference between safe_add_loc: no check, but faster. Save
-        time while being called purely within MACS, so that regions
-        are continuous without gaps. Note: I forgot that I removed
-        safe_add_loc :P
+        Note, we don't check if the add_loc is called continuously on
+        sorted regions without any gap. So we only suggest calling
+        this function within MACS.
 
         """
         cdef float32_t pre_v
@@ -165,10 +164,9 @@ cdef class bedGraphTrackI:
     cpdef add_loc_wo_merge ( self, bytes chromosome, int32_t startpos, int32_t endpos, float32_t value):
         """Add a chr-start-end-value block into __data dictionary.
 
-        Difference between safe_add_loc: no check, but faster. Save
-        time while being called purely within MACS, so that regions
-        are continuous without gaps. Note: I forgot that I removed
-        safe_add_loc :P
+        Note, we don't check if the add_loc is called continuously on
+        sorted regions without any gap. So we only suggest calling
+        this function within MACS.
 
         This one won't merge nearby ranges with the same value
         """
@@ -268,39 +266,6 @@ cdef class bedGraphTrackI:
 
         """
         return set(sorted(self.__data.keys()))
-
-    cpdef void write_bedGraph (self, fhd, str name, str description, bool trackline=True):
-        """Write all data to fhd in Wiggle Format.
-
-        fhd: a filehandler to save bedGraph.
-        name/description: the name and description in track line.
-
-        shift will be used to shift the coordinates. default: 0
-        """
-        cdef:
-            int32_t pre, pos, i
-            float32_t value
-            bytes chrom
-            set chrs
-
-        if trackline:
-            trackcontents = (name.replace("\"", "\\\""), description.replace("\"", "\\\""))
-            fhd.write("track type=bedGraph name=\"%s\" description=\"%s\" visibility=2 alwaysZero=on\n" % trackcontents)
-        chrs = self.get_chr_names()
-        for chrom in sorted(chrs):
-            (p,v) = self.__data[chrom]
-            pnext = iter(p).__next__
-            vnext = iter(v).__next__
-            pre = 0
-
-            for i in range(len(p)):
-                pos = pnext()
-                value = vnext()
-                #if value != self.baseline_value:
-                # never write baseline_value
-                fhd.write("%s\t%d\t%d\t%.5f\n" % (chrom.decode(),pre,pos,value))
-                pre = pos
-        return
 
     cpdef void reset_baseline (self, float32_t baseline_value):
         """Reset baseline value to baseline_value.
@@ -655,7 +620,88 @@ cdef class bedGraphTrackI:
                    qscore = lvl2peak["qscore"] )
         return bpeaks
 
+    cpdef object refine_peaks (self, object peaks):
+        """This function try to based on given peaks, re-evaluate the
+        peak region, call the summit.
 
+        peaks: PeakIO object
+        
+        return: a new PeakIO object
+
+        """
+        cdef:
+            int32_t peak_length, x, pre_p, p, i, peak_s, peak_e
+            float32_t v
+            bytes chrom
+            set chrs
+            object new_peaks
+
+        peaks.sort()
+        new_peaks = PeakIO()
+        chrs = self.get_chr_names()
+        assert isinstance(peaks, PeakIO)
+        chrs = chrs.intersection(set(peaks.get_chr_names()))
+        
+        for chrom in sorted(chrs):
+            peaks_chr = peaks.get_data_from_chrom(chrom)
+            peak_content = []
+            (ps,vs) = self.get_data_by_chr(chrom) # arrays for position and values
+            psn = iter(ps).__next__         # assign the next function to a viable to speed up
+            vsn = iter(vs).__next__
+            peakn = iter(peaks_chr).__next__
+
+            pre_p = 0                   # remember previous position in bedgraph/self
+            p = psn()
+            v = vsn()
+            peak = peakn()
+            peak_s = peak["start"]
+            peak_e = peak["end"]
+            
+            while True:
+                # look for overlap
+                if p > peak_s and peak_e > pre_p:
+                    # now put four coordinates together and pick the middle two
+                    s, e = sorted([p, peak_s, peak_e, pre_p])[1:3]
+                    # add this content
+                    peak_content.append( (s, e, v) )
+                    # move self/bedGraph
+                    try:
+                        pre_p = p
+                        p = psn()
+                        v = vsn()
+                    except:
+                        # no more value chunk in bedGraph
+                        break
+                elif pre_p >= peak_e:
+                    # close peak
+                    self.__close_peak(peak_content, new_peaks, 0, chrom)
+                    peak_content = []
+                    # move peak
+                    try:
+                        peak = peakn()
+                        peak_s = peak["start"]
+                        peak_e = peak["end"]
+                    except:
+                        # no more peak
+                        break
+                elif peak_s >= p:
+                    # move self/bedgraph
+                    try:
+                        pre_p = p
+                        p = psn()
+                        v = vsn()
+                    except:
+                        # no more value chunk in bedGraph
+                        break
+                else:
+                    raise Exception(f"no way here! prev position:{pre_p}; position:{p}; value:{v}; peak start:{peak_s}; peak end:{peak_e}")
+
+            # save the last peak
+            if peak_content:
+                self.__close_peak(peak_content, new_peaks, 0, chrom)
+        return new_peaks
+
+    
     cpdef int32_t total (self):
         """Return the number of regions in this object.
 
@@ -890,7 +936,7 @@ cdef class bedGraphTrackI:
 
     cpdef object extract_value ( self, object bdgTrack2 ):
         """Extract values from regions defined in bedGraphTrackI class object
-        `regions`.
+        `bdgTrack2`.
 
         """
         cdef:
@@ -967,7 +1013,7 @@ cdef class bedGraphTrackI:
 
     cpdef object extract_value_hmmr ( self, object bdgTrack2 ):
         """Extract values from regions defined in bedGraphTrackI class object
-        `regions`.
+        `bdgTrack2`.
 
         I will try to tweak this function to output only the values of
         bdgTrack1 (self) in the regions in bdgTrack2
@@ -1264,11 +1310,10 @@ cdef class bedGraphTrackI:
             cutoff = cutoff_list[ n ]
             if cutoff_npeaks[ n ] > 0:
                 ret_list.append("%.2f\t%d\t%d\t%.2f\n" % ( cutoff, cutoff_npeaks[ n ], \
-                                                          cutoff_lpeaks[ n ], \
-                                                          cutoff_lpeaks[ n ]/cutoff_npeaks[ n ] ))
+                                                           cutoff_lpeaks[ n ], \
+                                                           cutoff_lpeaks[ n ]/cutoff_npeaks[ n ] ))
         ret = ''.join(ret_list)
         return ret
-
 
 cdef np.ndarray calculate_elbows( np.ndarray values, float32_t threshold=0.01):
     # although this function is supposed to find elbow pts for cutoff analysis, 

@@ -1,4 +1,4 @@
-# Time-stamp: <2020-11-26 17:04:26 Tao Liu>
+# Time-stamp: <2024-05-15 10:42:27 Tao Liu>
 
 """Description: Naive call differential peaks from 4 bedGraph tracks for scores.
 
@@ -47,19 +47,19 @@ def run( options ):
 
     info("Read and build treatment 1 bedGraph...")
     t1bio = BedGraphIO.bedGraphIO(options.t1bdg)
-    t1btrack = t1bio.build_bdgtrack()
+    t1btrack = t1bio.read_bedGraph()
 
     info("Read and build control 1 bedGraph...")
     c1bio = BedGraphIO.bedGraphIO(options.c1bdg)
-    c1btrack = c1bio.build_bdgtrack()
+    c1btrack = c1bio.read_bedGraph()
 
     info("Read and build treatment 2 bedGraph...")
     t2bio = BedGraphIO.bedGraphIO(options.t2bdg)
-    t2btrack = t2bio.build_bdgtrack()
+    t2btrack = t2bio.read_bedGraph()
 
     info("Read and build control 2 bedGraph...")
     c2bio = BedGraphIO.bedGraphIO(options.c2bdg)
-    c2btrack = c2bio.build_bdgtrack()
+    c2btrack = c2bio.read_bedGraph()
 
     depth1 = options.depth1
     depth2 = options.depth2
