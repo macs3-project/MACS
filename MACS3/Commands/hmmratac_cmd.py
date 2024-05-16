@@ -1,4 +1,4 @@
-# Time-stamp: <2024-05-15 10:18:27 Tao Liu>
+# Time-stamp: <2024-05-15 19:40:45 Tao Liu>
 
 """Description: Main HMMR command
 
@@ -460,7 +460,7 @@ def run( args ):
 
     options.info( f"# Write accessible regions in a narrowPeak file: {options.name}_accessible_regions.narrowPeak")
     with open( accessible_file, "w" ) as ofhd:
-        save_accessible_regions( states_path, ofhd, options.openregion_minlen )
+        save_accessible_regions( states_path, ofhd, options.openregion_minlen, fc_bdg )
 
     options.info( f"# Finished")
 
@@ -565,7 +565,7 @@ def generate_states_path(predicted_proba_file, binsize, i_open, i_nuc, i_bg):
         prev_bin_end = end_pos
     return ret_states_path
 
-def save_accessible_regions(states_path, accessible_region_file, openregion_minlen):
+def save_accessible_regions(states_path, accessible_region_file, openregion_minlen, bdgscore):
     # Function to add regions to the list
     def add_regions(i, regions):
         for j in range(i, i+3):
@@ -588,7 +588,9 @@ def save_accessible_regions(states_path, accessible_region_file, openregion_minl
     # Generate broadpeak object
     openpeak = PeakIO()
     for region in accessible_regions[:-1]:
-        openpeak.add(chromosome=region[0], start=region[1], end=region[2],
-                      summit=(region[1]+region[2])//2) # use middle point for summit for now
+        openpeak.add(chromosome=region[0], start=region[1], end=region[2]) 
+
+    # refine peak summit and score using bedGraphTrackI with scores
+    openpeak = bdgscore.refine_peaks( openpeak )
     openpeak.write_to_narrowPeak(accessible_region_file)
     return

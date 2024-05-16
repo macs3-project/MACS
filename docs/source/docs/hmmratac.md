@@ -44,6 +44,27 @@ space in the 'tmp' directory of your system.
 Please use `macs3 hmmratac --help` to see all the options. Here we
 list the essential ones.
 
+## Output
+
+The final output file from `hmmratac` is in narrowPeak format
+containing the accessible regions (open state in `hmmratac` HMM). The
+columns are:
+
+ 1. chromosome name
+ 2. start position of the accessible region
+ 3. end position of the accesssible region
+ 4. peak name
+ 5. peak score. The score is the maximum foldchange (signal/average
+    signal) within the peak. By default, the signal is the total
+    pileup of all types of fragments from short to tri-nuc size
+    fragments.
+ 6. Not used
+ 7. Not used
+ 8. Not used
+ 9. peak summit position. It's the relative position from the start
+    position to the peak summit which is defined as the position with
+    the maximum foldchange score.
+
 ## Essential Options
 
 ### `-i INPUT_FILE [INPUT_FILE ...]` / `--input INPUT_FILE [INPUT_FILE ...]`
