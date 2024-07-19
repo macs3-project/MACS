@@ -167,6 +167,7 @@ contributions over the years.
 :maxdepth: 2
 :hidden:
 
+index.md
 docs/INSTALL.md
 docs/subcommands_index.md
 docs/fileformats_index.md

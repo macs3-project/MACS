@@ -1,5 +1,5 @@
-2024-04-27  Tao Liu  <vladimir.liu@gmail.com>
-	MACS 3.0.2 (pending)
+2024-05-16  Tao Liu  <vladimir.liu@gmail.com>
+	MACS 3.0.2
 
 	* Features added
 
@@ -11,11 +11,16 @@
 	file from previous version, if there is no hmm-type information in
 	the model file, the hmm-type will be assigned as gaussian. #635
 
-	2) Add `--cutoff-analysis-steps` and `--cutoff-analysis-max` for
+	2) `hmmratac` now output narrowPeak format output. The summit
+	position and the peak score columns reported in the narrowPeak
+	output represents the position with highest foldchange value
+	(pileup vs average background).
+
+	3) Add `--cutoff-analysis-steps` and `--cutoff-analysis-max` for
 	`callpeak`, `bdgpeakcall`, and `hmmratac` so that we can
 	have finer resolution of the cutoff analysis report. #636  #642
 
-	3) Reduce memory usage of `hmmratac` during decoding step, by
+	4) Reduce memory usage of `hmmratac` during decoding step, by
 	writing decoding results to a temporary file on disk (file
 	location depends on the environmental TEMP setting), then loading
 	it back while identifying state pathes. This change will decrease
