@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# Time-stamp: <2024-07-19 10:59:31 Tao Liu>
+# Time-stamp: <2024-07-19 13:14:53 Tao Liu>
 
 """Description: MACS v3 main executable.
 
@@ -216,7 +216,7 @@ def add_callpeak_parser( subparsers ):
     group_output.add_argument( "--verbose", dest = "verbose", type = int, default = 2,
                                help = "Set verbose level of runtime message. 0: only show critical message, 1: show additional warning message, 2: show process information, 3: show debug messages. DEFAULT:2" )
     group_output.add_argument( "--trackline", dest="trackline", action="store_true", default = False,
-                                help = "Instruct MACS to include trackline in the header of output files, including the bedGraph, narrowPeak, gappedPeak, BED format files. To include this trackline is necessary while uploading them to the UCSC genome browser. You can also mannually add these trackline to corresponding output files. For example, in order to upload narrowPeak file to UCSC browser, add this to as the first line -- `track type=narrowPeak name=`"my_peaks`" description=\"my peaks\"`. Default: Not to include trackline." )
+                                help = "Instruct MACS to include trackline in the header of output files, including the bedGraph, narrowPeak, gappedPeak, BED format files. To include this trackline is necessary while uploading them to the UCSC genome browser. You can also mannually add these trackline to corresponding output files. For example, in order to upload narrowPeak file to UCSC browser, add this to as the first line -- `track type=narrowPeak name=\"my_peaks\" description=\"my peaks\"`. Default: Not to include trackline." )
 
     group_output.add_argument( "--SPMR", dest = "do_SPMR", action = "store_true", default = False,
                                help = "If True, MACS will SAVE signal per million reads for fragment pileup profiles. It won't interfere with computing pvalue/qvalue during peak calling, since internally MACS3 keeps using the raw pileup and scaling factors between larger and smaller dataset to calculate statistics measurements. If you plan to use the signal output in bedGraph to call peaks using bdgcmp and bdgpeakcall, you shouldn't use this option because you will end up with different results. However, this option is recommended for displaying normalized pileup tracks across many datasets. Require -B to be set. Default: False" )
