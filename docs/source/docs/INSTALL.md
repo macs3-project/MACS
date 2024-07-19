@@ -26,7 +26,7 @@ reproducing your results, we also add them into the requirement list
 with specific version numbers. So here is the list of the required
 python libraries that will impact the numerical calculation in MACS3:
 
- - numpy>=1.25 
+ - numpy>=1.25 <2.0.0
  - hmmlearn>=0.3.2
  - scikit-learn>=1.3
  - scipy>=1.12
