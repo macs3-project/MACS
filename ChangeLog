@@ -1,4 +1,4 @@
-2024-05-16  Tao Liu  <vladimir.liu@gmail.com>
+2024-09-5  Tao Liu  <vladimir.liu@gmail.com>
 	MACS 3.0.2
 
 	* Features added
@@ -26,6 +26,12 @@
 	it back while identifying state pathes. This change will decrease
 	the memory usage dramatically. #628 #640
 
+	5) Fix instructions for preparing narrowPeak files for uploading
+	to UCSC browser, with the `--trackline` option in `callpeak`. #653
+
+	6) For gappedPeak output, set thickStart and thickEnd columns as
+	0, according to UCSC definition.
+	
 	* Bugs fixed
 	
 	1) Use `-O3` instead of `-Ofast` for compatibility. #637

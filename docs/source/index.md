@@ -1,6 +1,6 @@
 # MACS: Model-based Analysis for ChIP-Seq
 
-![Status](https://img.shields.io/pypi/status/macs3.svg) ![License](https://img.shields.io/github/license/macs3-project/MACS) ![Programming languages](https://img.shields.io/github/languages/top/macs3-project/MACS) ![CI x64](https://github.com/macs3-project/MACS/workflows/MACS3%20CI%20x64/badge.svg?branch=master) ![CI non x64](https://github.com/macs3-project/MACS/workflows/MACS3%20CI%20non%20x64/badge.svg?branch=master) ![CI Mac OS](https://github.com/macs3-project/MACS/actions/workflows/build-and-test-MACS3-macos.yml/badge.svg?branch=master)
+![Status](https://img.shields.io/pypi/status/macs3.svg) ![License](https://img.shields.io/github/license/macs3-project/MACS) ![Programming languages](https://img.shields.io/github/languages/top/macs3-project/MACS) ![CI x64](https://github.com/macs3-project/MACS/workflows/MACS3%20CI%20x64/badge.svg?branch=master) ![CI non x64](https://github.com/macs3-project/MACS/workflows/MACS3%20CI%20non%20x64/badge.svg?branch=master) ![CI Mac OS](https://github.com/macs3-project/MACS/actions/workflows/build-and-test-MACS3-macos.yml/badge.svg?branch=master) [![CZI's Essential Open Source Software for Science](https://chanzuckerberg.github.io/open-science/badges/CZI-EOSS.svg)](https://czi.co/EOSS)
 
 [![PyPI
 download](https://img.shields.io/pypi/dm/macs3?label=pypi%20downloads)](https://pypistats.org/packages/macs3)
@@ -41,21 +41,32 @@ background*.
 	file from previous version, if there is no hmm-type information in
 	the model file, the hmm-type will be assigned as gaussian. #635
 
-2) Add `--cutoff-analysis-steps` and `--cutoff-analysis-max` for
+2) `hmmratac` now output narrowPeak format output. The summit
+	position and the peak score columns reported in the narrowPeak
+	output represents the position with highest foldchange value
+	(pileup vs average background).
+
+3) Add `--cutoff-analysis-steps` and `--cutoff-analysis-max` for
 	`callpeak`, `bdgpeakcall`, and `hmmratac` so that we can
 	have finer resolution of the cutoff analysis report. #636  #642
 
-3) Reduce memory usage of `hmmratac` during decoding step, by
+4) Reduce memory usage of `hmmratac` during decoding step, by
 	writing decoding results to a temporary file on disk (file
 	location depends on the environmental TEMP setting), then loading
 	it back while identifying state pathes. This change will decrease
 	the memory usage dramatically. #628 #640
 
+5) Fix instructions for preparing narrowPeak files for uploading
+	to UCSC browser, with the `--trackline` option in `callpeak`. #653
+
+6) For gappedPeak output, set thickStart and thickEnd columns as
+	0, according to UCSC definition.
+
 ### Bugs fixed
-	
+
 1) Use `-O3` instead of `-Ofast` for compatibility. #637
 
-*Documentation*
+### Documentation
 
 1) Update instruction to install macs3 through conda/bioconda
 
@@ -63,7 +74,7 @@ background*.
 	https://macs3-project.github.io/MACS
 
 3) Description on various file formats used in MACS3.
-
+	
 ## Install
 
 The common way to install MACS is through

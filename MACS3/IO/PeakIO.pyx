@@ -1,6 +1,6 @@
 # cython: language_level=3
 # cython: profile=True
-# Time-stamp: <2024-05-15 19:21:00 Tao Liu>
+# Time-stamp: <2024-09-06 14:56:51 Tao Liu>
 
 """Module for PeakIO IO classes.
 
@@ -1064,12 +1064,13 @@ cdef class BroadPeakIO:
         +--------------+------+----------------------------------------+
         |thickStart    |int   | The starting position at which the     |
         |              |      |feature is drawn thickly. Mark the start|
-        |              |      |of highly enriched regions.             |
-        |              |      |                                        |
+        |              |      |of highly enriched regions. Not used in |
+        |              |      |gappedPeak, so set to 0                 |
         +--------------+------+----------------------------------------+
         |thickEnd      |int   | The ending position at which the       |
         |              |      |feature is drawn thickly. Mark the end  |
-        |              |      |of highly enriched regions.             |
+        |              |      |of highly enriched regions. Not used, so|
+        |              |      |set as 0.                               |
         +--------------+------+----------------------------------------+
         |itemRGB       |string| Not used. Set it as 0.                 |
         +--------------+------+----------------------------------------+
@@ -1106,10 +1107,9 @@ cdef class BroadPeakIO:
             for peak in self.peaks[chrom]:
                 n_peak += 1
                 if peak["thickStart"] != b".":
-                    fhd.write( "%s\t%d\t%d\t%s%d\t%d\t.\t%s\t%s\t0\t%d\t%s\t%s\t%.6g\t%.6g\t%.6g\n"
+                    fhd.write( "%s\t%d\t%d\t%s%d\t%d\t.\t0\t0\t0\t%d\t%s\t%s\t%.6g\t%.6g\t%.6g\n"
                                %
                                (chrom.decode(),peak["start"],peak["end"],peakprefix.decode(),n_peak,int(10*peak[score_column]),
-                                peak["thickStart"].decode(),peak["thickEnd"].decode(),
                                 peak["blockNum"],peak["blockSizes"].decode(),peak["blockStarts"].decode(), peak['fc'], peak['pscore'], peak['qscore'] ) )
 
     def write_to_Bed12 (self, fhd, bytes name_prefix=b"peak_", bytes name=b'peak', bytes description=b"%s", str score_column="score", trackline=True):
