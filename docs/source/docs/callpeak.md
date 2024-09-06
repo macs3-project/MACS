@@ -350,7 +350,7 @@ the essentials.
 ## Output files
 
 1. `NAME_peaks.xls` is a tabular file which contains information about
-   called peaks. You can open it in excel and sort/filter using excel
+   called peaks. You can open it in Excel and sort/filter using excel
    functions. Information include:
    
    - chromosome name

@@ -1,6 +1,7 @@
 # MACS: Model-based Analysis for ChIP-Seq
 
-![Status](https://img.shields.io/pypi/status/macs3.svg) ![License](https://img.shields.io/github/license/macs3-project/MACS) ![Programming languages](https://img.shields.io/github/languages/top/macs3-project/MACS) ![CI x64](https://github.com/macs3-project/MACS/workflows/MACS3%20CI%20x64/badge.svg?branch=master) ![CI non x64](https://github.com/macs3-project/MACS/workflows/MACS3%20CI%20non%20x64/badge.svg?branch=master) ![CI Mac OS](https://github.com/macs3-project/MACS/actions/workflows/build-and-test-MACS3-macos.yml/badge.svg?branch=master)
+![Status](https://img.shields.io/pypi/status/macs3.svg) ![License](https://img.shields.io/github/license/macs3-project/MACS) ![Programming languages](https://img.shields.io/github/languages/top/macs3-project/MACS) ![CI x64](https://github.com/macs3-project/MACS/workflows/MACS3%20CI%20x64/badge.svg?branch=master) ![CI non x64](https://github.com/macs3-project/MACS/workflows/MACS3%20CI%20non%20x64/badge.svg?branch=master) ![CI Mac OS](https://github.com/macs3-project/MACS/actions/workflows/build-and-test-MACS3-macos.yml/badge.svg?branch=master) [![CZI's Essential Open Source Software for Science](https://chanzuckerberg.github.io/open-science/badges/CZI-EOSS.svg)](https://czi.co/EOSS)
+
 
 [![PyPI
 download](https://img.shields.io/pypi/dm/macs3?label=pypi%20downloads)](https://pypistats.org/packages/macs3)
