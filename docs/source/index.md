@@ -179,7 +179,7 @@ index.md
 docs/INSTALL.md
 docs/subcommands_index.md
 docs/fileformats_index.md
-docs/tutorial.md 
+docs/tutorial.md
 docs/qa.md
 CODE_OF_CONDUCT.md
 CONTRIBUTING.md
