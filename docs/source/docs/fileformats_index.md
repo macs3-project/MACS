@@ -1,4 +1,4 @@
-# Formats of Input and Output files
+# File Formats
 
 This document the formats and examples of all the input and output
 files used in MACS3.

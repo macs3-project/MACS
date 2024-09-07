@@ -26,7 +26,7 @@ reproducing your results, we also add them into the requirement list
 with specific version numbers. So here is the list of the required
 python libraries that will impact the numerical calculation in MACS3:
 
- - numpy>=1.25 
+ - numpy>=1.25 <2.0.0
  - hmmlearn>=0.3.2
  - scikit-learn>=1.3
  - scipy>=1.12
@@ -82,12 +82,11 @@ Then activate it by
 
 `$ source MACS3env/bin/activate`
 
-If you use 'conda', it will also provide virtual environment. Please
-read:
-[conda](https://docs.conda.io/projects/conda/en/latest/user-guide/getting-started.html)
-or [miniconda](https://docs.conda.io/en/latest/miniconda.html) For
-example, after installing 'conda', you can use `conda create -n MACS3`
-to create a new environment called 'MACS3' then switch to this
+If you use 'conda' through 'miniforge' project, it will also provide
+virtual environment. Please read:
+[miniforge](https://github.com/conda-forge/miniforge). For example,
+after installing 'conda', you can use `conda create -n MACS3` to
+create a new environment called 'MACS3' then switch to this
 environment with `conda activate MACS3`.
 
 There is another solution, [pipx](https://pipx.pypa.io/), to make a

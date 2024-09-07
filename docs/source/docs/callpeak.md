@@ -120,6 +120,17 @@ the essentials.
   current directory named `NAME_treat_pileup.bdg` for treatment data,
   `NAME_control_lambda.bdg` for local lambda values from control.
 
+- `--trackline`
+
+  MACS3 will include the trackline in the header of output files,
+  including the bedGraph, narrowPeak, gappedPeak, BED format files. To
+  include this trackline in the header is necessary while uploading
+  them to the UCSC genome browser. You can also mannually add these
+  trackline to corresponding output files. For example, in order to
+  upload narrowPeak file to UCSC browser, add this to as the first
+  line -- `track type=narrowPeak name=`"my_peaks`" description=\"my
+  peaks\"`. Default: Not to include any trackline.
+
 ### Options controling peak calling behaviors
 
 - `-g`/`--gsize`
@@ -339,7 +350,7 @@ the essentials.
 ## Output files
 
 1. `NAME_peaks.xls` is a tabular file which contains information about
-   called peaks. You can open it in excel and sort/filter using excel
+   called peaks. You can open it in Excel and sort/filter using excel
    functions. Information include:
    
    - chromosome name
@@ -361,8 +372,9 @@ the essentials.
    won't be called in broad peak calling mode.
 
 2. `NAME_peaks.narrowPeak` is BED6+4 format file which contains the
-   peak locations together with peak summit, p-value, and q-value. You
-   can load it to the UCSC genome browser. Definition of some specific
+   peak locations together with peak summit, p-value, and q-value. If you
+   plan to load it to the UCSC genome browser, please make sure that
+   you turn on `--trackline` option. Definition of some specific
    columns are:
    
    - 5th: integer score for display. It's calculated as
@@ -379,15 +391,16 @@ the essentials.
    - 9th: -log10qvalue at peak summit
    - 10th: relative summit position to peak start
    
-   The file can be loaded directly to the UCSC genome browser. Remove
-   the beginning track line if you want to analyze it by other tools.
+   Remove the beginning track line if you want to analyze it by other
+   tools.
 
 3. `NAME_summits.bed` is in BED format, which contains the peak
    summits locations for every peak. The 5th column in this file is
    the same as what is in the `narrowPeak` file. If you want to find
    the motifs at the binding sites, this file is recommended. The file
-   can be loaded directly to the UCSC genome browser. Remove the
-   beginning track line if you want to analyze it by other tools.
+   can be loaded directly to the UCSC genome browser with
+   `--trackline` option on. Remove the beginning track line if you
+   want to analyze it by other tools.
 
 4. `NAME_peaks.broadPeak` is in BED6+3 format which is similar to
    `narrowPeak` file, except for missing the 10th column for
@@ -396,7 +409,8 @@ the essentials.
    peak calling mode, the peak summit won't be called, the values in
    the 5th, and 7-9th columns are the mean value across all positions
    in the peak region. Refer to `narrowPeak` if you want to fix the
-   value issue in the 5th column.
+   value issue in the 5th column. The file can be loaded directly to
+   the UCSC genome browser with `--trackline` option on.
 
 5. `NAME_peaks.gappedPeak` is in BED12+3 format which contains both
    the broad region and narrow peaks. The 5th column is the score for
@@ -407,9 +421,11 @@ the essentials.
    want. The 10th column tells how many blocks including the starting
    1bp and ending 1bp of broad regions. The 11th column shows the
    length of each block and 12th for the start of each block. 13th:
-   fold-change, 14th: *-log10pvalue*, 15th: *-log10qvalue*. The file can
-   be loaded directly to the UCSC genome browser. Refer to
-   `narrowPeak` if you want to fix the value issue in the 5th column.
+   fold-change, 14th: *-log10pvalue*, 15th: *-log10qvalue*. The file
+   can be loaded directly to the UCSC genome browser. Refer to
+   `narrowPeak` if you want to fix the value issue in the 5th
+   column. The file can be loaded directly to the UCSC genome browser
+   with `--trackline` option on.
 
 6. `NAME_model.r` is an R script which you can use to produce a PDF
    image of the model based on your data. Load it to R by:

@@ -45,10 +45,7 @@ instead of posting to our
 
 ## Ackowledgement
 
-MACS3 project is sponsored by
-[CZI EOSS](https://chanzuckerberg.com/eoss/). And we particularly want
-to thank the user community for their supports, feedbacks and
-contributions over the years.
+MACS3 project is sponsored by [![CZI's Essential Open Source Software for Science](https://chanzuckerberg.github.io/open-science/badges/CZI-EOSS.svg)](https://czi.co/EOSS). And we particularly want to thank the user community for their supports, feedbacks and contributions over the years.
 
 ## Citation
 
