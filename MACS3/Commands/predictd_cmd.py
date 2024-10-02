@@ -1,4 +1,4 @@
-# Time-stamp: <2020-11-24 16:59:33 Tao Liu>
+# Time-stamp: <2024-10-02 16:53:35 Tao Liu>
 
 """Description: predict fragment size.
 
@@ -11,49 +11,48 @@ the distribution).
 # python modules
 # ------------------------------------
 
-import os
-import sys
-
 # ------------------------------------
 # own python modules
 # ------------------------------------
-from MACS3.Utilities.Constants import *
+from MACS3.Utilities.Constants import MAX_PAIRNUM
 from MACS3.Utilities.OptValidator import opt_validate_predictd
-from MACS3.Signal.PeakModel import PeakModel,NotEnoughPairsException
-from MACS3.Signal.Prob import binomial_cdf_inv
+from MACS3.Signal.PeakModel import PeakModel, NotEnoughPairsException
+# from MACS3.Signal.Prob import binomial_cdf_inv
 from MACS3.IO.OutputWriter import model2r_script
 # ------------------------------------
 # Main function
 # ------------------------------------
-def run( o_options ):
+
+
+def run(o_options):
     """The Main function/pipeline for duplication filter.
 
     """
     # Parse options...
-    options = opt_validate_predictd( o_options )
+    options = opt_validate_predictd(o_options)
     # end of parsing commandline options
     info = options.info
     warn = options.warn
     debug = options.debug
-    error = options.error
-    #0 output arguments
-    options.PE_MODE = options.format in ('BAMPE','BEDPE')
+    # error = options.error
+    # 0 output arguments
+    options.PE_MODE = options.format in ('BAMPE', 'BEDPE')
 
-    #1 Read tag files
+    # 1 Read tag files
     if options.PE_MODE:
         info("# read input file in Paired-end mode.")
-        treat = load_frag_files_options ( options ) # return PETrackI object
+        treat = load_frag_files_options(options)  # return PETrackI object
         t0 = treat.total
-        info("# total fragments/pairs in alignment file: %d" % (t0) )
+        info("# total fragments/pairs in alignment file: %d" % (t0))
     else:
         info("# read alignment files...")
-        treat = load_tag_files_options  (options)
+        treat = load_tag_files_options(options)
         t0 = treat.total
         info("# tag size = %d" % options.tsize)
         treat.fw = options.tsize
         info("# total tags in alignment file: %d", t0)
 
-    #2 Build Model
+    # 2 Build Model
     info("# Build Peak Model...")
     if options.PE_MODE:
         d = treat.average_template_length
@@ -61,9 +60,9 @@ def run( o_options ):
         return
 
     try:
-        peakmodel = PeakModel(treatment = treat,
-                              max_pairnum = MAX_PAIRNUM,
-                              opt = options
+        peakmodel = PeakModel(treatment=treat,
+                              max_pairnum=MAX_PAIRNUM,
+                              opt=options
                               )
         peakmodel.build()
         info("# finished!")
@@ -71,15 +70,16 @@ def run( o_options ):
         debug("#   min_tags: %d" % (peakmodel.min_tags))
         debug("#   d: %d" % (peakmodel.d))
         info("# predicted fragment length is %d bps" % peakmodel.d)
-        info("# alternative fragment length(s) may be %s bps" % ','.join(map(str,peakmodel.alternative_d)))
+        info("# alternative fragment length(s) may be %s bps" % ','.join(map(str, peakmodel.alternative_d)))
         info("# Generate R script for model : %s" % (options.modelR))
-        model2r_script(peakmodel,options.modelR, options.rfile )
+        model2r_script(peakmodel, options.modelR, options.rfile)
         options.d = peakmodel.d
 
     except NotEnoughPairsException:
         warn("# Can't find enough pairs of symmetric peaks to build model!")
 
-def load_tag_files_options ( options ):
+
+def load_tag_files_options(options):
     """From the options, load alignment tags.
 
     """
@@ -89,19 +89,20 @@ def load_tag_files_options ( options ):
         ttsize = tp.tsize()
         options.tsize = ttsize
     treat = tp.build_fwtrack()
-    #treat.sort()
+    # treat.sort()
     if len(options.ifile) > 1:
         # multiple input
         for tfile in options.ifile[1:]:
             tp = options.parser(tfile, buffer_size=options.buffer_size)
-            treat = tp.append_fwtrack( treat )
-            #treat.sort()
+            treat = tp.append_fwtrack(treat)
+            # treat.sort()
     treat.finalize()
 
     options.info("tag size is determined as %d bps" % options.tsize)
     return treat
 
-def load_frag_files_options ( options ):
+
+def load_frag_files_options(options):
     """From the options, load treatment fragments and control fragments (if available).
 
     """
@@ -112,7 +113,7 @@ def load_frag_files_options ( options ):
     if len(options.ifile) > 1:
         # multiple input
         for tfile in options.ifile[1:]:
-            tp = options.parser(ifile, buffer_size=options.buffer_size)
-            treat = tp.append_petrack( treat )
+            tp = options.parser(tfile, buffer_size=options.buffer_size)
+            treat = tp.append_petrack(treat)
     treat.finalize()
     return treat
