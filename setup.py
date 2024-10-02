@@ -20,12 +20,6 @@ import numpy
 # get MACS version
 exec(open("MACS3/Utilities/Constants.py").read())
 
-install_requires = ["numpy>=1.25,<2.0.0",
-                    "scipy>=1.12",
-                    "hmmlearn>=0.3.2",
-                    "scikit-learn>=1.3",
-                    "cykhash>=2.0,<3.0"]
-
 
 def main():
     if sys.version_info < (3, 9):
@@ -124,7 +118,6 @@ def main():
           packages=['MACS3', 'MACS3.IO', 'MACS3.Signal', 'MACS3.Commands', 'MACS3.Utilities'],
           package_data={'MACS3': ['*.pxd']},
           scripts=['bin/macs3', ],
-          install_requires=install_requires,
           ext_modules=cythonize(ext_modules))
 
 
