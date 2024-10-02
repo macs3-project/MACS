@@ -38,10 +38,10 @@ classifiers =[\
               'Programming Language :: Cython', ]
 
 install_requires = [ "numpy>=1.25,<2.0.0",
-                     "scipy>=1.12",
+                     "scipy>=1.11.1",
                      "hmmlearn>=0.3.2",
                      "scikit-learn>=1.3",
-                     "cykhash>=2.0,<3.0"]
+                     "cykhash>=0.29.37"]
 
 
 
