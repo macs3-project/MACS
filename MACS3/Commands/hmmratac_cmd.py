@@ -1,4 +1,4 @@
-# Time-stamp: <2024-10-02 17:20:22 Tao Liu>
+# Time-stamp: <2024-10-02 17:41:10 Tao Liu>
 
 
 """Description: Main HMMR command
@@ -62,7 +62,6 @@ def run(args):
     mono_bdgfile = os.path.join(options.outdir, options.name+"_digested_mono.bdg")
     di_bdgfile = os.path.join(options.outdir, options.name+"_digested_di.bdg")
     tri_bdgfile = os.path.join(options.outdir, options.name+"_digested_tri.bdg")
-    
     training_region_bedfile = os.path.join(options.outdir, options.name+"_training_regions.bed")
     training_datafile = os.path.join(options.outdir, options.name+"_training_data.txt")
     training_datalengthfile = os.path.join(options.outdir, options.name+"_training_lengths.txt")
@@ -158,9 +157,9 @@ def run(args):
 
     # now we will prepare the weights for each fragment length for
     # each of the four distributions based on the EM results
-    weight_mapping = generate_weight_mapping(fl_list, em_means, em_stddevs, min_frag_p = options.min_frag_p)
-    
-    options.info(f"#  Generate short, mono-, di-, and tri-nucleosomal signals")
+    weight_mapping = generate_weight_mapping(fl_list, em_means, em_stddevs, min_frag_p=options.min_frag_p)
+
+    options.info("#  Generate short, mono-, di-, and tri-nucleosomal signals")
     digested_atac_signals = generate_digested_signals(petrack, weight_mapping)
 
     # save three types of signals if needed
@@ -281,7 +280,7 @@ def run(args):
         options.info("#4 Load Hidden Markov Model from given model file")
         hmm_model, i_open_region, i_background_region, i_nucleosomal_region, options.hmm_binsize, options.hmm_type = hmm_model_init(options.hmm_file)
     else:
-        options.info(f"#4 Train Hidden Markov Model with Multivariate Gaussian Emission")
+        options.info("#4 Train Hidden Markov Model with Multivariate Gaussian Emission")
 
         # extract signals within peak using the given binsize
         options.info(f"#  Extract signals in training regions with bin size of {options.hmm_binsize}")
@@ -348,9 +347,9 @@ def run(args):
     options.info( "#       {0:>10s}-> {1[0]:>10.4g} {1[1]:>10.4g} {1[2]:>10.4g}".format(assignments[0], hmm_model.transmat_[0]))
     options.info( "#       {0:>10s}-> {1[0]:>10.4g} {1[1]:>10.4g} {1[2]:>10.4g}".format(assignments[1], hmm_model.transmat_[1]))
     options.info( "#       {0:>10s}-> {1[0]:>10.4g} {1[1]:>10.4g} {1[2]:>10.4g}".format(assignments[2], hmm_model.transmat_[2]))
-    
+
     if options.hmm_type == 'gaussian':
-        options.info(f"#   HMM Emissions (means): ")
+        options.info("#   HMM Emissions (means): ")
         options.info( "#                    {0[0]:>10s} {0[1]:>10s} {0[2]:>10s} {0[3]:>10s}".format(["short", "mono", "di", "tri"]))
         options.info( "#       {0:>10s}:  {1[0]:>10.4g} {1[1]:>10.4g} {1[2]:>10.4g} {1[3]:>10.4g}".format(assignments[0], hmm_model.means_[0]))
         options.info( "#       {0:>10s}:  {1[0]:>10.4g} {1[1]:>10.4g} {1[2]:>10.4g} {1[3]:>10.4g}".format(assignments[1], hmm_model.means_[1]))

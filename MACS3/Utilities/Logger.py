@@ -8,10 +8,12 @@ import sys
 class MemoryLogger(logging.Logger):
     def __init__(self, name, level=logging.NOTSET):
         super().__init__(name, level)
-  
-    def _log(self, level, msg, args, exc_info=None, extra=None, stack_info=False):
+
+    def _log(self, level, msg, args, exc_info=None,
+             extra=None, stack_info=False):
         mem_usage = self.get_memory_usage()
-        super()._log(level, f"[{mem_usage} MB] {msg}", args, exc_info, extra, stack_info)
+        super()._log(level, f"[{mem_usage} MB] {msg}",
+                     args, exc_info, extra, stack_info)
 
     @staticmethod
     def get_memory_usage():
@@ -19,7 +21,7 @@ class MemoryLogger(logging.Logger):
         if os.name == 'posix' and os.uname().sysname == 'Darwin':
             # macOS
             mem_usage = mem_usage / 1024  # Convert to kilobytes
-        return int(mem_usage / 1024) # Convert to MB
+        return int(mem_usage / 1024)      # Convert to MB
 
 
 logging.basicConfig(level=20,
