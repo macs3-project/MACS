@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# Time-stamp: <2024-07-19 13:14:53 Tao Liu>
+# Time-stamp: <2024-10-02 12:29:58 Tao Liu>
 
 """Description: MACS v3 main executable.
 
@@ -20,11 +20,13 @@ import tempfile
 # ------------------------------------
 # own python modules
 # ------------------------------------
-from MACS3.Utilities.Constants import *
+from MACS3.Utilities.Constants import MACS_VERSION
 
 # ------------------------------------
 # Main function
 # ------------------------------------
+
+
 def main():
     """The Main function/pipeline for MACS.
 
@@ -33,75 +35,79 @@ def main():
     argparser = prepare_argparser()
     args = argparser.parse_args()
 
-    subcommand  = args.subcommand
+    subcommand = args.subcommand
 
     if args.outdir:
         # use a output directory to store MACS output
-        if not os.path.exists( args.outdir ):
+        if not os.path.exists(args.outdir):
             try:
-                os.makedirs( args.outdir )
-            except:
-                sys.exit( "Output directory (%s) could not be created. Terminating program." % args.outdir )
+                os.makedirs(args.outdir)
+            except FileExistsError:
+                sys.exit("Output directory (%s) could not be created since it already exists. Terminate program." % args.outdir)
+            except PermissionError:
+                sys.exit("Output directory (%s) could not be created due to permission. Terminate program." % args.outdir)
+            except Exception:
+                sys.exit("Output directory (%s) could not be created. Terminate program." % args.outdir)
 
     if subcommand == "callpeak":
         # General call peak
         from MACS3.Commands.callpeak_cmd import run
-        run( args )
+        run(args)
     elif subcommand == "bdgpeakcall":
         # call peak from bedGraph
         from MACS3.Commands.bdgpeakcall_cmd import run
-        run( args )
+        run(args)
     elif subcommand == "bdgbroadcall":
         # call broad peak from bedGraph
         from MACS3.Commands.bdgbroadcall_cmd import run
-        run( args )
+        run(args)
     elif subcommand == "bdgcmp":
         # compare treatment and control to make enrichment scores
         from MACS3.Commands.bdgcmp_cmd import run
-        run( args )
+        run(args)
     elif subcommand == "bdgopt":
         # operations on the score column of bedGraph file
         from MACS3.Commands.bdgopt_cmd import run
-        run( args )
+        run(args)
     elif subcommand == "cmbreps":
         # combine replicates
         from MACS3.Commands.cmbreps_cmd import run
-        run( args )
+        run(args)
     elif subcommand == "randsample":
         # randomly sample sequencing reads, and save as bed file
         from MACS3.Commands.randsample_cmd import run
-        run( args )
+        run(args)
     elif subcommand == "filterdup":
         # filter out duplicate reads, and save as bed file
         from MACS3.Commands.filterdup_cmd import run
-        run( args )
+        run(args)
     elif subcommand == "bdgdiff":
         # differential calling
         from MACS3.Commands.bdgdiff_cmd import run
-        run( args )
+        run(args)
     elif subcommand == "refinepeak":
         # refine peak summits
         from MACS3.Commands.refinepeak_cmd import run
-        run( args )
+        run(args)
     elif subcommand == "predictd":
         # predict d or fragment size
         from MACS3.Commands.predictd_cmd import run
-        run( args )
+        run(args)
     elif subcommand == "pileup":
         # pileup alignment results with a given extension method
         from MACS3.Commands.pileup_cmd import run
-        run( args )
+        run(args)
     elif subcommand == "hmmratac":
-        # pileup alignment results with a given extension method
+        # use HMMRATAC algorithm to call ATAC-seq peaks
         from MACS3.Commands.hmmratac_cmd import run
-        run( args )
+        run(args)
     elif subcommand == "callvar":
         # assemble reads in peak region and call variants
         from MACS3.Commands.callvar_cmd import run
-        run( args )
+        run(args)
 
 
-def prepare_argparser ():
+def prepare_argparser():
     """Prepare optparser object. New options will be added in this
     function first.
 
@@ -109,504 +115,513 @@ def prepare_argparser ():
     description = "%(prog)s -- Model-based Analysis for ChIP-Sequencing"
     epilog = "For command line options of each command, type: %(prog)s COMMAND -h"
     # top-level parser
-    argparser = ap.ArgumentParser( description = description, epilog = epilog ) #, usage = usage )
-    argparser.add_argument("--version", action="version", version="%(prog)s "+MACS_VERSION)
-    subparsers = argparser.add_subparsers( dest = 'subcommand' )
+    argparser = ap.ArgumentParser(description=description, epilog=epilog)
+    argparser.add_argument("--version", action="version", version="%(prog)s " + MACS_VERSION)
+    subparsers = argparser.add_subparsers(dest='subcommand')
     subparsers.required = True
 
     # command for 'callpeak'
-    add_callpeak_parser( subparsers )
+    add_callpeak_parser(subparsers)
 
     # command for 'bdgpeakcall'
-    add_bdgpeakcall_parser( subparsers )
+    add_bdgpeakcall_parser(subparsers)
 
     # command for 'bdgbroadcall'
-    add_bdgbroadcall_parser( subparsers )
+    add_bdgbroadcall_parser(subparsers)
 
     # command for 'bdgcmp'
-    add_bdgcmp_parser( subparsers )
+    add_bdgcmp_parser(subparsers)
 
     # command for 'bdgopt'
-    add_bdgopt_parser( subparsers )
+    add_bdgopt_parser(subparsers)
 
     # command for 'cmbreps'
-    add_cmbreps_parser( subparsers )
+    add_cmbreps_parser(subparsers)
 
     # command for 'bdgdiff'
-    add_bdgdiff_parser( subparsers )
+    add_bdgdiff_parser(subparsers)
 
     # command for 'filterdup'
-    add_filterdup_parser( subparsers )
+    add_filterdup_parser(subparsers)
 
     # command for 'predictd'
-    add_predictd_parser( subparsers )
+    add_predictd_parser(subparsers)
 
     # command for 'pileup'
-    add_pileup_parser( subparsers )
+    add_pileup_parser(subparsers)
 
     # command for 'randsample'
-    add_randsample_parser( subparsers )
+    add_randsample_parser(subparsers)
 
     # command for 'refinepeak'
-    add_refinepeak_parser( subparsers )
+    add_refinepeak_parser(subparsers)
 
     # command for 'callvar'
-    add_callvar_parser( subparsers )
+    add_callvar_parser(subparsers)
 
     # command for 'hmmratac'
-    add_hmmratac_parser( subparsers )
+    add_hmmratac_parser(subparsers)
 
     return argparser
 
-def add_outdir_option ( parser ):
-    parser.add_argument("--outdir", dest = "outdir", type = str, default = '',
-                        help = "If specified all output files will be written to that directory. Default: the current working directory")
 
-def add_output_group ( parser, required = True ):
-    output_group = parser.add_mutually_exclusive_group( required = required )
-    output_group.add_argument( "-o", "--ofile", dest = "ofile", type = str,
-                               help = "Output file name. Mutually exclusive with --o-prefix." )
-    output_group.add_argument( "--o-prefix", dest = "oprefix", type = str,
-                               help = "Output file prefix. Mutually exclusive with -o/--ofile." )
+def add_outdir_option(parser):
+    parser.add_argument("--outdir", dest="outdir", type=str, default='',
+                        help="If specified all output files will be written to that directory. Default: the current working directory")
 
-def add_callpeak_parser( subparsers ):
+
+def add_output_group(parser, required=True):
+    output_group = parser.add_mutually_exclusive_group(required=required)
+    output_group.add_argument("-o", "--ofile", dest="ofile", type=str,
+                              help="Output file name. Mutually exclusive with --o-prefix.")
+    output_group.add_argument("--o-prefix", dest="oprefix", type=str,
+                              help="Output file prefix. Mutually exclusive with -o/--ofile.")
+
+
+def add_callpeak_parser(subparsers):
     """Add main function 'peak calling' argument parsers.
     """
     argparser_callpeak = subparsers.add_parser("callpeak", help="Main MACS3 Function: Call peaks from alignment results.",
-                                               formatter_class = ap.RawDescriptionHelpFormatter,
-                                               epilog = """Examples:
+                                               formatter_class=ap.RawDescriptionHelpFormatter,
+                                               epilog="""Examples:
 1. Peak calling for regular TF ChIP-seq:
     $ macs3 callpeak -t ChIP.bam -c Control.bam -f BAM -g hs -n test -B -q 0.01
 2. Broad peak calling on Histone Mark ChIP-seq:
     $ macs3 callpeak -t ChIP.bam -c Control.bam --broad -g hs --broad-cutoff 0.1
 3. Peak calling on ATAC-seq (paired-end mode):
     $ macs3 callpeak -f BAMPE -t ATAC.bam -g hs -n test -B -q 0.01
-4. Peak calling on ATAC-seq ( focusing on insertion sites, and using single-end mode):
+4. Peak calling on ATAC-seq (focusing on insertion sites, and using single-end mode):
     $ macs3 callpeak -f BAM -t ATAC.bam -g hs -n test -B -q 0.01 --shift -50 --extension 100
 """)
 
     # group for input files
-    group_input = argparser_callpeak.add_argument_group( "Input files arguments" )
-    group_input.add_argument( "-t", "--treatment", dest = "tfile", type = str, required = True, nargs = "+",
-                              help = "ChIP-seq treatment file. If multiple files are given as '-t A B C', then they will all be read and pooled together. REQUIRED." )
-    group_input.add_argument( "-c", "--control", dest = "cfile", type = str, nargs = "*",
-                                    help = "Control file. If multiple files are given as '-c A B C', they will be pooled to estimate ChIP-seq background noise.")
-    group_input.add_argument( "-f", "--format", dest = "format", type = str,
-                              choices = ("AUTO", "BAM", "SAM", "BED", "ELAND",
-                                         "ELANDMULTI", "ELANDEXPORT", "BOWTIE",
-                                          "BAMPE", "BEDPE"),
-                              help = "Format of tag file, \"AUTO\", \"BED\" or \"ELAND\" or \"ELANDMULTI\" or \"ELANDEXPORT\" or \"SAM\" or \"BAM\" or \"BOWTIE\" or \"BAMPE\" or \"BEDPE\". The default AUTO option will let MACS decide which format (except for BAMPE and BEDPE which should be implicitly set) the file is. Please check the definition in README. Please note that if the format is set as BAMPE or BEDPE, MACS3 will call its special Paired-end mode to call peaks by piling up the actual ChIPed fragments defined by both aligned ends, instead of predicting the fragment size first and extending reads. Also please note that the BEDPE only contains three columns, and is NOT the same BEDPE format used by BEDTOOLS. DEFAULT: \"AUTO\"",
-                              default = "AUTO" )
-    group_input.add_argument( "-g", "--gsize", dest = "gsize", type = str, default = "hs",
-                              help = "Effective genome size. It can be 1.0e+9 or 1000000000, or shortcuts:'hs' for human (2,913,022,398), 'mm' for mouse (2,652,783,500), 'ce' for C. elegans (100,286,401) and 'dm' for fruitfly (142,573,017), Default:hs. The effective genome size numbers for the above four species are collected from Deeptools https://deeptools.readthedocs.io/en/develop/content/feature/effectiveGenomeSize.html Please refer to deeptools to define the best genome size you plan to use." )
-    group_input.add_argument( "-s", "--tsize",  dest = "tsize", type = int, default = None,
-                                    help = "Tag size/read length. This will override the auto detected tag size. DEFAULT: Not set")
-    group_input.add_argument( "--keep-dup", dest = "keepduplicates", type = str, default = "1",
-                              help = "It controls the  behavior towards duplicate tags at the exact same location -- the same coordination and the same strand. The 'auto' option makes MACS calculate the maximum tags at the exact same location based on binomal distribution using 1e-5 as pvalue cutoff; and the 'all' option keeps every tags. If an integer is given, at most this number of tags will be kept at the same location. Note, if you've used samtools or picard to flag reads as 'PCR/Optical duplicate' in bit 1024, MACS3 will still read them although the reads may be decided by MACS3 as duplicate later. If you plan to rely on samtools/picard/any other tool to filter duplicates, please remove those duplicate reads and save a new alignment file then ask MACS3 to keep all by '--keep-dup all'. The default is to keep one tag at the same location. Default: 1" )
+    group_input = argparser_callpeak.add_argument_group("Input files arguments")
+    group_input.add_argument("-t", "--treatment", dest="tfile", type=str, required=True, nargs="+",
+                             help="ChIP-seq treatment file. If multiple files are given as '-t A B C', then they will all be read and pooled together. REQUIRED.")
+    group_input.add_argument("-c", "--control", dest="cfile", type=str, nargs="*",
+                             help="Control file. If multiple files are given as '-c A B C', they will be pooled to estimate ChIP-seq background noise.")
+    group_input.add_argument("-f", "--format", dest="format", type=str,
+                             choices=("AUTO", "BAM", "SAM", "BED", "ELAND",
+                                      "ELANDMULTI", "ELANDEXPORT", "BOWTIE",
+                                      "BAMPE", "BEDPE"),
+                             help="Format of tag file, \"AUTO\", \"BED\" or \"ELAND\" or \"ELANDMULTI\" or \"ELANDEXPORT\" or \"SAM\" or \"BAM\" or \"BOWTIE\" or \"BAMPE\" or \"BEDPE\". The default AUTO option will let MACS decide which format (except for BAMPE and BEDPE which should be implicitly set) the file is. Please check the definition in README. Please note that if the format is set as BAMPE or BEDPE, MACS3 will call its special Paired-end mode to call peaks by piling up the actual ChIPed fragments defined by both aligned ends, instead of predicting the fragment size first and extending reads. Also please note that the BEDPE only contains three columns, and is NOT the same BEDPE format used by BEDTOOLS. DEFAULT: \"AUTO\"",
+                             default="AUTO")
+    group_input.add_argument("-g", "--gsize", dest="gsize", type=str, default="hs",
+                             help="Effective genome size. It can be 1.0e+9 or 1000000000, or shortcuts:'hs' for human (2,913,022,398), 'mm' for mouse (2,652,783,500), 'ce' for C. elegans (100,286,401) and 'dm' for fruitfly (142,573,017), Default:hs. The effective genome size numbers for the above four species are collected from Deeptools https://deeptools.readthedocs.io/en/develop/content/feature/effectiveGenomeSize.html Please refer to deeptools to define the best genome size you plan to use.")
+    group_input.add_argument("-s", "--tsize",  dest="tsize", type=int, default=None,
+                             help="Tag size/read length. This will override the auto detected tag size. DEFAULT: Not set")
+    group_input.add_argument("--keep-dup", dest="keepduplicates", type=str, default="1",
+                             help="It controls the  behavior towards duplicate tags at the exact same location -- the same coordination and the same strand. The 'auto' option makes MACS calculate the maximum tags at the exact same location based on binomal distribution using 1e-5 as pvalue cutoff; and the 'all' option keeps every tags. If an integer is given, at most this number of tags will be kept at the same location. Note, if you've used samtools or picard to flag reads as 'PCR/Optical duplicate' in bit 1024, MACS3 will still read them although the reads may be decided by MACS3 as duplicate later. If you plan to rely on samtools/picard/any other tool to filter duplicates, please remove those duplicate reads and save a new alignment file then ask MACS3 to keep all by '--keep-dup all'. The default is to keep one tag at the same location. Default: 1")
 
     # group for output files
-    group_output = argparser_callpeak.add_argument_group( "Output arguments" )
-    add_outdir_option( group_output )
-    group_output.add_argument( "-n", "--name", dest = "name", type = str,
-                               help = "Experiment name, which will be used to generate output file names. DEFAULT: \"NA\"",
-                               default = "NA" )
-    group_output.add_argument( "-B", "--bdg", dest = "store_bdg", action = "store_true",
-                               help = "Whether or not to save extended fragment pileup, and local lambda tracks (two files) at every bp into a bedGraph file. DEFAULT: False",
-                               default = False )
-    group_output.add_argument( "--verbose", dest = "verbose", type = int, default = 2,
-                               help = "Set verbose level of runtime message. 0: only show critical message, 1: show additional warning message, 2: show process information, 3: show debug messages. DEFAULT:2" )
-    group_output.add_argument( "--trackline", dest="trackline", action="store_true", default = False,
-                                help = "Instruct MACS to include trackline in the header of output files, including the bedGraph, narrowPeak, gappedPeak, BED format files. To include this trackline is necessary while uploading them to the UCSC genome browser. You can also mannually add these trackline to corresponding output files. For example, in order to upload narrowPeak file to UCSC browser, add this to as the first line -- `track type=narrowPeak name=\"my_peaks\" description=\"my peaks\"`. Default: Not to include trackline." )
+    group_output = argparser_callpeak.add_argument_group("Output arguments")
+    add_outdir_option(group_output)
+    group_output.add_argument("-n", "--name", dest="name", type=str,
+                              help="Experiment name, which will be used to generate output file names. DEFAULT: \"NA\"",
+                              default="NA")
+    group_output.add_argument("-B", "--bdg", dest="store_bdg", action="store_true",
+                              help="Whether or not to save extended fragment pileup, and local lambda tracks (two files) at every bp into a bedGraph file. DEFAULT: False",
+                              default=False)
+    group_output.add_argument("--verbose", dest="verbose", type=int, default=2,
+                              help="Set verbose level of runtime message. 0: only show critical message, 1: show additional warning message, 2: show process information, 3: show debug messages. DEFAULT:2")
+    group_output.add_argument("--trackline", dest="trackline", action="store_true", default=False,
+                              help="Instruct MACS to include trackline in the header of output files, including the bedGraph, narrowPeak, gappedPeak, BED format files. To include this trackline is necessary while uploading them to the UCSC genome browser. You can also mannually add these trackline to corresponding output files. For example, in order to upload narrowPeak file to UCSC browser, add this to as the first line -- `track type=narrowPeak name=\"my_peaks\" description=\"my peaks\"`. Default: Not to include trackline.")
 
-    group_output.add_argument( "--SPMR", dest = "do_SPMR", action = "store_true", default = False,
-                               help = "If True, MACS will SAVE signal per million reads for fragment pileup profiles. It won't interfere with computing pvalue/qvalue during peak calling, since internally MACS3 keeps using the raw pileup and scaling factors between larger and smaller dataset to calculate statistics measurements. If you plan to use the signal output in bedGraph to call peaks using bdgcmp and bdgpeakcall, you shouldn't use this option because you will end up with different results. However, this option is recommended for displaying normalized pileup tracks across many datasets. Require -B to be set. Default: False" )
+    group_output.add_argument("--SPMR", dest="do_SPMR", action="store_true", default=False,
+                              help="If True, MACS will SAVE signal per million reads for fragment pileup profiles. It won't interfere with computing pvalue/qvalue during peak calling, since internally MACS3 keeps using the raw pileup and scaling factors between larger and smaller dataset to calculate statistics measurements. If you plan to use the signal output in bedGraph to call peaks using bdgcmp and bdgpeakcall, you shouldn't use this option because you will end up with different results. However, this option is recommended for displaying normalized pileup tracks across many datasets. Require -B to be set. Default: False")
     # group for bimodal
-    group_bimodal = argparser_callpeak.add_argument_group( "Shifting model arguments" )
-    group_bimodal.add_argument( "--nomodel", dest = "nomodel", action = "store_true", default = False,
-                                help = "Whether or not to build the shifting model. If True, MACS will not build model. by default it means shifting size = 100, try to set extsize to change it. It's highly recommended that while you have many datasets to process and you plan to compare different conditions, aka differential calling, use both 'nomodel' and 'extsize' to make signal files from different datasets comparable. DEFAULT: False" )
-    group_bimodal.add_argument( "--shift", dest = "shift", type = int, default = 0,
-                                help = "(NOT the legacy --shiftsize option!) The arbitrary shift in bp. Use discretion while setting it other than default value. When NOMODEL is set, MACS will use this value to move cutting ends (5') towards 5'->3' direction then apply EXTSIZE to extend them to fragments. When this value is negative, ends will be moved toward 3'->5' direction. Recommended to keep it as default 0 for ChIP-Seq datasets, or -1 * half of EXTSIZE together with EXTSIZE option for detecting enriched cutting loci such as certain DNAseI-Seq datasets. Note, you can't set values other than 0 if format is BAMPE or BEDPE for paired-end data. DEFAULT: 0. " )
-    group_bimodal.add_argument( "--extsize", dest = "extsize", type = int, default = 200,
-                                help = "The arbitrary extension size in bp. When nomodel is true, MACS will use this value as fragment size to extend each read towards 3' end, then pile them up. It's exactly twice the number of obsolete SHIFTSIZE. In previous language, each read is moved 5'->3' direction to middle of fragment by 1/2 d, then extended to both direction with 1/2 d. This is equivalent to say each read is extended towards 5'->3' into a d size fragment. DEFAULT: 200. EXTSIZE and SHIFT can be combined when necessary. Check SHIFT option." )
-    group_bimodal.add_argument( "--bw", dest = "bw", type = int, default = 300,
-                                help = "Band width for picking regions to compute fragment size. This value is only used while building the shifting model. Tweaking this is not recommended. DEFAULT: 300")
-    group_bimodal.add_argument( "--d-min", dest = "d_min", type = int, default = 20,
-                                help = "Minimum fragment size in basepair. Any predicted fragment size less than this will be excluded. DEFAULT: 20")
-    group_bimodal.add_argument( "-m", "--mfold", dest = "mfold", type = int, default = [5,50], nargs = 2,
-                                help = "Select the regions within MFOLD range of high-confidence enrichment ratio against background to build model. Fold-enrichment in regions must be lower than upper limit, and higher than the lower limit. Use as \"-m 10 30\". This setting is only used while building the shifting model. Tweaking it is not recommended. DEFAULT:5 50" )
+    group_bimodal = argparser_callpeak.add_argument_group("Shifting model arguments")
+    group_bimodal.add_argument("--nomodel", dest="nomodel", action="store_true", default=False,
+                               help="Whether or not to build the shifting model. If True, MACS will not build model. by default it means shifting size = 100, try to set extsize to change it. It's highly recommended that while you have many datasets to process and you plan to compare different conditions, aka differential calling, use both 'nomodel' and 'extsize' to make signal files from different datasets comparable. DEFAULT: False")
+    group_bimodal.add_argument("--shift", dest="shift", type=int, default=0,
+                               help="(NOT the legacy --shiftsize option!) The arbitrary shift in bp. Use discretion while setting it other than default value. When NOMODEL is set, MACS will use this value to move cutting ends (5') towards 5'->3' direction then apply EXTSIZE to extend them to fragments. When this value is negative, ends will be moved toward 3'->5' direction. Recommended to keep it as default 0 for ChIP-Seq datasets, or -1 * half of EXTSIZE together with EXTSIZE option for detecting enriched cutting loci such as certain DNAseI-Seq datasets. Note, you can't set values other than 0 if format is BAMPE or BEDPE for paired-end data. DEFAULT: 0. ")
+    group_bimodal.add_argument("--extsize", dest="extsize", type=int, default=200,
+                               help="The arbitrary extension size in bp. When nomodel is true, MACS will use this value as fragment size to extend each read towards 3' end, then pile them up. It's exactly twice the number of obsolete SHIFTSIZE. In previous language, each read is moved 5'->3' direction to middle of fragment by 1/2 d, then extended to both direction with 1/2 d. This is equivalent to say each read is extended towards 5'->3' into a d size fragment. DEFAULT: 200. EXTSIZE and SHIFT can be combined when necessary. Check SHIFT option.")
+    group_bimodal.add_argument("--bw", dest="bw", type=int, default=300,
+                               help="Band width for picking regions to compute fragment size. This value is only used while building the shifting model. Tweaking this is not recommended. DEFAULT: 300")
+    group_bimodal.add_argument("--d-min", dest="d_min", type=int, default=20,
+                               help="Minimum fragment size in basepair. Any predicted fragment size less than this will be excluded. DEFAULT: 20")
+    group_bimodal.add_argument("-m", "--mfold", dest="mfold", type=int, default=[5, 50], nargs=2,
+                               help="Select the regions within MFOLD range of high-confidence enrichment ratio against background to build model. Fold-enrichment in regions must be lower than upper limit, and higher than the lower limit. Use as \"-m 10 30\". This setting is only used while building the shifting model. Tweaking it is not recommended. DEFAULT:5 50")
 
-    group_bimodal.add_argument( "--fix-bimodal", dest = "onauto", action = "store_true",
-                                help = "Whether turn on the auto pair model process. If set, when MACS failed to build paired model, it will use the nomodel settings, the --exsize parameter to extend each tags towards 3' direction. Not to use this automate fixation is a default behavior now. DEFAULT: False",
-                                default = False )
+    group_bimodal.add_argument("--fix-bimodal", dest="onauto", action="store_true",
+                               help="Whether turn on the auto pair model process. If set, when MACS failed to build paired model, it will use the nomodel settings, the --exsize parameter to extend each tags towards 3' direction. Not to use this automate fixation is a default behavior now. DEFAULT: False",
+                               default=False)
 
     # General options.
-    group_callpeak = argparser_callpeak.add_argument_group( "Peak calling arguments" )
+    group_callpeak = argparser_callpeak.add_argument_group("Peak calling arguments")
     p_or_q_group = group_callpeak.add_mutually_exclusive_group()
-    p_or_q_group.add_argument( "-q", "--qvalue", dest = "qvalue", type = float, default = 0.05,
-                               help = "Minimum FDR (q-value) cutoff for peak detection. DEFAULT: 0.05. -q, and -p are mutually exclusive." )
-    p_or_q_group.add_argument( "-p", "--pvalue", dest = "pvalue", type = float,
-                               help = "Pvalue cutoff for peak detection. DEFAULT: not set. -q, and -p are mutually exclusive. If pvalue cutoff is set, qvalue will not be calculated and reported as -1 in the final .xls file." )
+    p_or_q_group.add_argument("-q", "--qvalue", dest="qvalue", type=float, default=0.05,
+                              help="Minimum FDR (q-value) cutoff for peak detection. DEFAULT: 0.05. -q, and -p are mutually exclusive.")
+    p_or_q_group.add_argument("-p", "--pvalue", dest="pvalue", type=float,
+                              help="Pvalue cutoff for peak detection. DEFAULT: not set. -q, and -p are mutually exclusive. If pvalue cutoff is set, qvalue will not be calculated and reported as -1 in the final .xls file.")
 
     # about scaling
-    group_callpeak.add_argument( "--scale-to", dest = "scaleto", type = str, choices = ("large", "small"),
-                                help = "When set to 'small', scale the larger sample up to the smaller sample. When set to 'larger', scale the smaller sample up to the bigger sample. By default, scale to 'small'. This option replaces the obsolete '--to-large' option. The default behavior is recommended since it will lead to less significant p/q-values in general but more specific results. Keep in mind that scaling down will influence control/input sample more. DEFAULT: 'small', the choice is either 'small' or 'large'." )
-    group_callpeak.add_argument( "--down-sample", dest = "downsample", action = "store_true", default = False,
-                                 help = "When set, random sampling method will scale down the bigger sample. By default, MACS uses linear scaling. Warning: This option will make your result unstable and irreproducible since each time, random reads would be selected. Consider to use 'randsample' script instead. <not implmented>If used together with --SPMR, 1 million unique reads will be randomly picked.</not implemented> Caution: due to the implementation, the final number of selected reads may not be as you expected! DEFAULT: False" )
-    group_callpeak.add_argument( "--seed", dest = "seed", type = int, default = -1,
-                                 help = "Set the random seed while down sampling data. Must be a non-negative integer in order to be effective. DEFAULT: not set" )
-    group_callpeak.add_argument( "--tempdir", dest="tempdir", default=tempfile.gettempdir(),
-                                help = "Optional directory to store temp files. DEFAULT: %(default)s")
-    group_callpeak.add_argument( "--nolambda", dest = "nolambda", action = "store_true",
-                                 help = "If True, MACS will use fixed background lambda as local lambda for every peak region. Normally, MACS calculates a dynamic local lambda to reflect the local bias due to the potential chromatin accessibility. ",
-                                 default = False )
-    group_callpeak.add_argument( "--slocal", dest = "smalllocal", type = int, default = 1000,
-                                 help = "The small nearby region in basepairs to calculate dynamic lambda. This is used to capture the bias near the peak summit region. Invalid if there is no control data. If you set this to 0, MACS will skip slocal lambda calculation. *Note* that MACS will always perform a d-size local lambda calculation while the control data is available. The final local bias would be the maximum of the lambda value from d, slocal, and llocal size windows. While control is not available, d and slocal lambda won't be considered. DEFAULT: 1000 " )
-    group_callpeak.add_argument( "--llocal", dest = "largelocal", type = int, default = 10000,
-                                 help = "The large nearby region in basepairs to calculate dynamic lambda. This is used to capture the surround bias. If you set this to 0, MACS will skip llocal lambda calculation. *Note* that MACS will always perform a d-size local lambda calculation while the control data is available. The final local bias would be the maximum of the lambda value from d, slocal, and llocal size windows. While control is not available, d and slocal lambda won't be considered. DEFAULT: 10000." )
-    group_callpeak.add_argument( "--max-gap", dest = "maxgap", type = int,
-                                 help = "Maximum gap between significant sites to cluster them together. The DEFAULT value is the detected read length/tag size." )
-    group_callpeak.add_argument( "--min-length", dest = "minlen", type = int,
-                                 help = "Minimum length of a peak. The DEFAULT value is the predicted fragment size d. Note, if you set a value smaller than the fragment size, it may have NO effect on the result. For BROAD peak calling, try to set a large value such as 500bps. You can also use '--cutoff-analysis' option with default setting, and  check the column 'avelpeak' under different cutoff values to decide a reasonable minlen value." )
-    group_callpeak.add_argument( "--broad", dest = "broad", action = "store_true",
-                                 help = "If set, MACS will try to call broad peaks using the --broad-cutoff setting. Please tweak '--broad-cutoff' setting to control the peak calling behavior. At the meantime, either -q or -p cutoff will be used to define regions with 'stronger enrichment' inside of broad peaks. The maximum gap is expanded to 4 * MAXGAP (--max-gap parameter). As a result, MACS will output a 'gappedPeak' and a 'broadPeak' file instead of 'narrowPeak' file. Note, a broad peak will be reported even if there is no 'stronger enrichment' inside. DEFAULT: False", default = False )
-    group_callpeak.add_argument( "--broad-cutoff", dest = "broadcutoff", type = float, default = 0.1,
-                                 help = "Cutoff for broad region. This option is not available unless --broad is set. If -p is set, this is a pvalue cutoff, otherwise, it's a qvalue cutoff. Please note that in broad peakcalling mode, MACS3 uses this setting to control the overall peak calling behavior, then uses -q or -p setting to define regions inside broad region as 'stronger' enrichment. DEFAULT: 0.1 " )
-    group_callpeak.add_argument( "--cutoff-analysis", dest="cutoff_analysis", action="store_true",
-                                 help = "While set, MACS3 will analyze number or total length of peaks that can be called by different p-value cutoff then output a summary table to help user decide a better cutoff. The table will be saved in NAME_cutoff_analysis.txt file. Note, minlen and maxgap may affect the results. WARNING: May take  ~30 folds longer time to finish. The result can be useful for users to decide a reasonable cutoff value. DEFAULT: False", default = False )
+    group_callpeak.add_argument("--scale-to", dest="scaleto", type=str, choices=("large", "small"),
+                                help="When set to 'small', scale the larger sample up to the smaller sample. When set to 'larger', scale the smaller sample up to the bigger sample. By default, scale to 'small'. This option replaces the obsolete '--to-large' option. The default behavior is recommended since it will lead to less significant p/q-values in general but more specific results. Keep in mind that scaling down will influence control/input sample more. DEFAULT: 'small', the choice is either 'small' or 'large'.")
+    group_callpeak.add_argument("--down-sample", dest="downsample", action="store_true", default=False,
+                                help="When set, random sampling method will scale down the bigger sample. By default, MACS uses linear scaling. Warning: This option will make your result unstable and irreproducible since each time, random reads would be selected. Consider to use 'randsample' script instead. <not implmented>If used together with --SPMR, 1 million unique reads will be randomly picked.</not implemented> Caution: due to the implementation, the final number of selected reads may not be as you expected! DEFAULT: False")
+    group_callpeak.add_argument("--seed", dest="seed", type=int, default=-1,
+                                help="Set the random seed while down sampling data. Must be a non-negative integer in order to be effective. DEFAULT: not set")
+    group_callpeak.add_argument("--tempdir", dest="tempdir", default=tempfile.gettempdir(),
+                                help="Optional directory to store temp files. DEFAULT: %(default)s")
+    group_callpeak.add_argument("--nolambda", dest="nolambda", action="store_true",
+                                help="If True, MACS will use fixed background lambda as local lambda for every peak region. Normally, MACS calculates a dynamic local lambda to reflect the local bias due to the potential chromatin accessibility. ",
+                                default=False)
+    group_callpeak.add_argument("--slocal", dest="smalllocal", type=int, default=1000,
+                                help="The small nearby region in basepairs to calculate dynamic lambda. This is used to capture the bias near the peak summit region. Invalid if there is no control data. If you set this to 0, MACS will skip slocal lambda calculation. *Note* that MACS will always perform a d-size local lambda calculation while the control data is available. The final local bias would be the maximum of the lambda value from d, slocal, and llocal size windows. While control is not available, d and slocal lambda won't be considered. DEFAULT: 1000 ")
+    group_callpeak.add_argument("--llocal", dest="largelocal", type=int, default=10000,
+                                help="The large nearby region in basepairs to calculate dynamic lambda. This is used to capture the surround bias. If you set this to 0, MACS will skip llocal lambda calculation. *Note* that MACS will always perform a d-size local lambda calculation while the control data is available. The final local bias would be the maximum of the lambda value from d, slocal, and llocal size windows. While control is not available, d and slocal lambda won't be considered. DEFAULT: 10000.")
+    group_callpeak.add_argument("--max-gap", dest="maxgap", type=int,
+                                help="Maximum gap between significant sites to cluster them together. The DEFAULT value is the detected read length/tag size.")
+    group_callpeak.add_argument("--min-length", dest="minlen", type=int,
+                                help="Minimum length of a peak. The DEFAULT value is the predicted fragment size d. Note, if you set a value smaller than the fragment size, it may have NO effect on the result. For BROAD peak calling, try to set a large value such as 500bps. You can also use '--cutoff-analysis' option with default setting, and  check the column 'avelpeak' under different cutoff values to decide a reasonable minlen value.")
+    group_callpeak.add_argument("--broad", dest="broad", action="store_true",
+                                help="If set, MACS will try to call broad peaks using the --broad-cutoff setting. Please tweak '--broad-cutoff' setting to control the peak calling behavior. At the meantime, either -q or -p cutoff will be used to define regions with 'stronger enrichment' inside of broad peaks. The maximum gap is expanded to 4 * MAXGAP (--max-gap parameter). As a result, MACS will output a 'gappedPeak' and a 'broadPeak' file instead of 'narrowPeak' file. Note, a broad peak will be reported even if there is no 'stronger enrichment' inside. DEFAULT: False", default=False)
+    group_callpeak.add_argument("--broad-cutoff", dest="broadcutoff", type=float, default=0.1,
+                                help="Cutoff for broad region. This option is not available unless --broad is set. If -p is set, this is a pvalue cutoff, otherwise, it's a qvalue cutoff. Please note that in broad peakcalling mode, MACS3 uses this setting to control the overall peak calling behavior, then uses -q or -p setting to define regions inside broad region as 'stronger' enrichment. DEFAULT: 0.1 ")
+    group_callpeak.add_argument("--cutoff-analysis", dest="cutoff_analysis", action="store_true",
+                                help="While set, MACS3 will analyze number or total length of peaks that can be called by different p-value cutoff then output a summary table to help user decide a better cutoff. The table will be saved in NAME_cutoff_analysis.txt file. Note, minlen and maxgap may affect the results. WARNING: May take  ~30 folds longer time to finish. The result can be useful for users to decide a reasonable cutoff value. DEFAULT: False", default=False)
 
     # post-processing options
-    group_postprocessing = argparser_callpeak.add_argument_group( "Post-processing options" )
+    group_postprocessing = argparser_callpeak.add_argument_group("Post-processing options")
     postprocess_group = group_postprocessing.add_mutually_exclusive_group()
 
-    postprocess_group.add_argument( "--call-summits", dest="call_summits", action="store_true",
-                                    help="If set, MACS will use a more sophisticated signal processing approach to find subpeak summits in each enriched peak region. DEFAULT: False",default=False)
-    group_postprocessing.add_argument( "--fe-cutoff", dest="fecutoff", type=float, default = 1.0,
-                                       help = "When set, the value will be used as the minimum requirement to filter out peaks with low fold-enrichment. Note, MACS3 adds one as pseudocount while calculating fold-enrichment. By default, it is set as 1 so there is no filtering. DEFAULT: 1.0")
+    postprocess_group.add_argument("--call-summits", dest="call_summits", action="store_true",
+                                   help="If set, MACS will use a more sophisticated signal processing approach to find subpeak summits in each enriched peak region. DEFAULT: False", default=False)
+    group_postprocessing.add_argument("--fe-cutoff", dest="fecutoff", type=float, default=1.0,
+                                      help="When set, the value will be used as the minimum requirement to filter out peaks with low fold-enrichment. Note, MACS3 adds one as pseudocount while calculating fold-enrichment. By default, it is set as 1 so there is no filtering. DEFAULT: 1.0")
 
     # obsolete options
-    group_obsolete = argparser_callpeak.add_argument_group( "Obsolete options" )
-    group_obsolete.add_argument( "--to-large", dest = "tolarge", action = "store_true", default = False,
-                                 help = "Obsolete option. Please use '--scale-to large' instead." )
-    group_obsolete.add_argument( "--ratio", dest = "ratio", type = float, default = 1.0,
-                                 help = "Obsolete option. Originally designed to normalize treatment and control with customized ratio, now it won't have any effect." )
+    group_obsolete = argparser_callpeak.add_argument_group("Obsolete options")
+    group_obsolete.add_argument("--to-large", dest="tolarge", action="store_true", default=False,
+                                help="Obsolete option. Please use '--scale-to large' instead.")
+    group_obsolete.add_argument("--ratio", dest="ratio", type=float, default=1.0,
+                                help="Obsolete option. Originally designed to normalize treatment and control with customized ratio, now it won't have any effect.")
 
     # other options
-    group_other = argparser_callpeak.add_argument_group( "Other options" )
-    group_other.add_argument( "--buffer-size", dest = "buffer_size", type = int, default = "100000",
-                                  help = "Buffer size for incrementally increasing internal array size to store reads alignment information. In most cases, you don't have to change this parameter. However, if there are large number of chromosomes/contigs/scaffolds in your alignment, it's recommended to specify a smaller buffer size in order to decrease memory usage (but it will take longer time to read alignment files). Minimum memory requested for reading an alignment file is about # of CHROMOSOME * BUFFER_SIZE * 8 Bytes. DEFAULT: 100000 " )
+    group_other = argparser_callpeak.add_argument_group("Other options")
+    group_other.add_argument("--buffer-size", dest="buffer_size", type=int, default="100000",
+                             help="Buffer size for incrementally increasing internal array size to store reads alignment information. In most cases, you don't have to change this parameter. However, if there are large number of chromosomes/contigs/scaffolds in your alignment, it's recommended to specify a smaller buffer size in order to decrease memory usage (but it will take longer time to read alignment files). Minimum memory requested for reading an alignment file is about # of CHROMOSOME * BUFFER_SIZE * 8 Bytes. DEFAULT: 100000 ")
 
     return
 
-def add_filterdup_parser( subparsers ):
-    argparser_filterdup = subparsers.add_parser( "filterdup",
-                                                 help = "Remove duplicate reads, then save in BED/BEDPE format file." )
-    argparser_filterdup.add_argument( "-i", "--ifile", dest = "ifile", type = str, required = True, nargs = "+",
-                                      help = "Alignment file. If multiple files are given as '-t A B C', then they will all be read and combined. REQUIRED." )
-    argparser_filterdup.add_argument( "-f", "--format", dest = "format", type = str,
-                                      choices=("AUTO","BAM","SAM","BED","ELAND","ELANDMULTI","ELANDEXPORT","BOWTIE","BAMPE","BEDPE"),
-                                      help = "Format of tag file, \"AUTO\", \"BED\" or \"ELAND\" or \"ELANDMULTI\" or \"ELANDEXPORT\" or \"SAM\" or \"BAM\" or \"BOWTIE\" or \"BAMPE\" or \"BEDPE\". The default AUTO option will let '%(prog)s' decide which format the file is. Please check the definition in README file if you choose ELAND/ELANDMULTI/ELANDEXPORT/SAM/BAM/BOWTIE or BAMPE/BEDPE. DEFAULT: \"AUTO\"",
-                                      default = "AUTO" )
-    argparser_filterdup.add_argument( "-g", "--gsize", dest = "gsize", type = str, default = "hs",
-                                      help = "Effective genome size. It can be 1.0e+9 or 1000000000, or shortcuts:'hs' for human (2,913,022,398), 'mm' for mouse (2,652,783,500), 'ce' for C. elegans (100,286,401) and 'dm' for fruitfly (142,573,017), Default:hs. The effective genome size numbers for the above four species are collected from Deeptools https://deeptools.readthedocs.io/en/develop/content/feature/effectiveGenomeSize.html Please refer to deeptools to define the best genome size you plan to use.")
-    argparser_filterdup.add_argument( "-s", "--tsize", dest = "tsize", type = int,
-                                      help = "Tag size. This will override the auto detected tag size. DEFAULT: Not set" )
-    argparser_filterdup.add_argument( "-p", "--pvalue", dest = "pvalue", type = float,
-                                      help = "Pvalue cutoff for binomial distribution test. DEFAULT:1e-5" )
-    argparser_filterdup.add_argument( "--keep-dup", dest = "keepduplicates", type = str, default = "auto",
-                                      help = "It controls the '%(prog)s' behavior towards duplicate tags/pairs at the exact same location -- the same coordination and the same strand. The 'auto' option makes '%(prog)s' calculate the maximum tags at the exact same location based on binomal distribution using given -p as pvalue cutoff; and the 'all' option keeps every tags (useful if you only want to convert formats). If an integer is given, at most this number of tags will be kept at the same location. Note, MACS3 callpeak function uses KEEPDUPLICATES=1 as default. Note, if you've used samtools or picard to flag reads as 'PCR/Optical duplicate' in bit 1024, MACS3 will still read them although the reads may be decided by MACS3 as duplicate later. Default: auto" )
-    argparser_filterdup.add_argument( "--buffer-size", dest = "buffer_size", type = int, default = "100000",
-                                      help = "Buffer size for incrementally increasing internal array size to store reads alignment information. In most cases, you don't have to change this parameter. However, if there are large number of chromosomes/contigs/scaffolds in your alignment, it's recommended to specify a smaller buffer size in order to decrease memory usage (but it will take longer time to read alignment files). Minimum memory requested for reading an alignment file is about # of CHROMOSOME * BUFFER_SIZE * 8 Bytes. DEFAULT: 100000 " )
 
-    argparser_filterdup.add_argument( "--verbose", dest = "verbose", type = int, default = 2,
-                                      help = "Set verbose level. 0: only show critical message, 1: show additional warning message, 2: show process information, 3: show debug messages. If you want to know where are the duplicate reads, use 3. DEFAULT:2" )
-    add_outdir_option( argparser_filterdup )
-    argparser_filterdup.add_argument( "-o", "--ofile", dest = "outputfile", type = str,
-                                      help = "Output BED file name. If not specified, will write to standard output. Note, if the input format is BAMPE or BEDPE, the output will be in BEDPE format. DEFAULT: stdout",
-                                      default = "stdout" )
-    argparser_filterdup.add_argument( "-d", "--dry-run", dest="dryrun", action="store_true", default=False,
-                                      help = "When set, filterdup will only output numbers instead of writing output files, including maximum allowable duplicates, total number of reads before filtering, total number of reads after filtering, and redundant rate. Default: not set" )
+def add_filterdup_parser(subparsers):
+    argparser_filterdup = subparsers.add_parser("filterdup",
+                                                help="Remove duplicate reads, then save in BED/BEDPE format file.")
+    argparser_filterdup.add_argument("-i", "--ifile", dest="ifile", type=str, required=True, nargs="+",
+                                     help="Alignment file. If multiple files are given as '-t A B C', then they will all be read and combined. REQUIRED.")
+    argparser_filterdup.add_argument("-f", "--format", dest="format", type=str,
+                                     choices=("AUTO", "BAM", "SAM", "BED", "ELAND", "ELANDMULTI", "ELANDEXPORT", "BOWTIE", "BAMPE", "BEDPE"),
+                                     help="Format of tag file, \"AUTO\", \"BED\" or \"ELAND\" or \"ELANDMULTI\" or \"ELANDEXPORT\" or \"SAM\" or \"BAM\" or \"BOWTIE\" or \"BAMPE\" or \"BEDPE\". The default AUTO option will let '%(prog)s' decide which format the file is. Please check the definition in README file if you choose ELAND/ELANDMULTI/ELANDEXPORT/SAM/BAM/BOWTIE or BAMPE/BEDPE. DEFAULT: \"AUTO\"",
+                                     default="AUTO")
+    argparser_filterdup.add_argument("-g", "--gsize", dest="gsize", type=str, default="hs",
+                                     help="Effective genome size. It can be 1.0e+9 or 1000000000, or shortcuts:'hs' for human (2,913,022,398), 'mm' for mouse (2,652,783,500), 'ce' for C. elegans (100,286,401) and 'dm' for fruitfly (142,573,017), Default:hs. The effective genome size numbers for the above four species are collected from Deeptools https://deeptools.readthedocs.io/en/develop/content/feature/effectiveGenomeSize.html Please refer to deeptools to define the best genome size you plan to use.")
+    argparser_filterdup.add_argument("-s", "--tsize", dest="tsize", type=int,
+                                     help="Tag size. This will override the auto detected tag size. DEFAULT: Not set")
+    argparser_filterdup.add_argument("-p", "--pvalue", dest="pvalue", type=float,
+                                     help="Pvalue cutoff for binomial distribution test. DEFAULT:1e-5")
+    argparser_filterdup.add_argument("--keep-dup", dest="keepduplicates", type=str, default="auto",
+                                     help="It controls the '%(prog)s' behavior towards duplicate tags/pairs at the exact same location -- the same coordination and the same strand. The 'auto' option makes '%(prog)s' calculate the maximum tags at the exact same location based on binomal distribution using given -p as pvalue cutoff; and the 'all' option keeps every tags (useful if you only want to convert formats). If an integer is given, at most this number of tags will be kept at the same location. Note, MACS3 callpeak function uses KEEPDUPLICATES=1 as default. Note, if you've used samtools or picard to flag reads as 'PCR/Optical duplicate' in bit 1024, MACS3 will still read them although the reads may be decided by MACS3 as duplicate later. Default: auto")
+    argparser_filterdup.add_argument("--buffer-size", dest="buffer_size", type=int, default="100000",
+                                     help="Buffer size for incrementally increasing internal array size to store reads alignment information. In most cases, you don't have to change this parameter. However, if there are large number of chromosomes/contigs/scaffolds in your alignment, it's recommended to specify a smaller buffer size in order to decrease memory usage (but it will take longer time to read alignment files). Minimum memory requested for reading an alignment file is about # of CHROMOSOME * BUFFER_SIZE * 8 Bytes. DEFAULT: 100000 ")
+    argparser_filterdup.add_argument("--verbose", dest="verbose", type=int, default=2,
+                                     help="Set verbose level. 0: only show critical message, 1: show additional warning message, 2: show process information, 3: show debug messages. If you want to know where are the duplicate reads, use 3. DEFAULT:2")
+    add_outdir_option(argparser_filterdup)
+    argparser_filterdup.add_argument("-o", "--ofile", dest="outputfile", type=str,
+                                     help="Output BED file name. If not specified, will write to standard output. Note, if the input format is BAMPE or BEDPE, the output will be in BEDPE format. DEFAULT: stdout",
+                                     default="stdout")
+    argparser_filterdup.add_argument("-d", "--dry-run", dest="dryrun", action="store_true", default=False,
+                                     help="When set, filterdup will only output numbers instead of writing output files, including maximum allowable duplicates, total number of reads before filtering, total number of reads after filtering, and redundant rate. Default: not set")
     return
 
-def add_bdgpeakcall_parser( subparsers ):
+def add_bdgpeakcall_parser(subparsers):
     """Add function 'peak calling on bedGraph' argument parsers.
     """
-    argparser_bdgpeakcall = subparsers.add_parser( "bdgpeakcall",
-                                                   help = "Call peaks from bedGraph file." )
-    argparser_bdgpeakcall.add_argument( "-i", "--ifile", dest = "ifile", type = str, required = True,
-                                        help = "MACS score in bedGraph. REQUIRED" )
-    argparser_bdgpeakcall.add_argument( "-c", "--cutoff" , dest = "cutoff", type = float,
-                                        help = "Cutoff depends on which method you used for score track. If the file contains pvalue scores from MACS3, score 5 means pvalue 1e-5. Regions with signals lower than cutoff will not be considerred as enriched regions. DEFAULT: 5", default = 5 )
-    argparser_bdgpeakcall.add_argument( "-l", "--min-length", dest = "minlen", type = int,
-                                       help = "minimum length of peak, better to set it as d value. DEFAULT: 200", default = 200 )
-    argparser_bdgpeakcall.add_argument( "-g", "--max-gap", dest = "maxgap", type = int,
-                                       help = "maximum gap between significant points in a peak, better to set it as tag size. DEFAULT: 30", default = 30 )
-    argparser_bdgpeakcall.add_argument( "--call-summits", dest="call_summits", action="store_true", help=ap.SUPPRESS, default=False)
-#                         help="If set, MACS will use a more sophisticated approach to find all summits in each enriched peak region. DEFAULT: False",default=False)
-    argparser_bdgpeakcall.add_argument( "--cutoff-analysis", dest="cutoff_analysis", action="store_true",
-                                        help = "While set, bdgpeakcall will analyze number or total length of peaks that can be called by different cutoff then output a summary table to help user decide a better cutoff. Note, minlen and maxgap may affect the results. DEFAULT: False", default = False )
-    argparser_bdgpeakcall.add_argument( "--cutoff-analysis-max", dest="cutoff_analysis_max", type = int,
-                                help = "The maximum cutoff score for performing cutoff analysis. Together with --cutoff-analysis-steps, the resolution in the final report can be controlled. Please check the description in --cutoff-analysis-steps for detail. DEFAULT: 100",
-                                default = 100 )
-    argparser_bdgpeakcall.add_argument( "--cutoff-analysis-steps", dest="cutoff_analysis_steps", type = int,
-                                        help = "Steps for performing cutoff analysis. It will be used to decide which cutoff value should be included in the final report. Larger the value, higher resolution the cutoff analysis can be. The cutoff analysis function will first find the smallest (at least 0) and the largest (controlled by --cutoff-analysis-max) score in the data, then break the range of score into `CUTOFF_ANALYSIS_STEPS` intervals. It will then use each score as cutoff to call peaks and calculate the total number of candidate peaks, the total basepairs of peaks, and the average length of peak in basepair. Please note that the final report ideally should include `CUTOFF_ANALYSIS_STEPS` rows, but in practice, if the cutoff yield zero peak, the row for that value won't be included.  DEFAULT: 100", default = 100 )
+    argparser_bdgpeakcall = subparsers.add_parser("bdgpeakcall",
+                                                  help="Call peaks from bedGraph file.")
+    argparser_bdgpeakcall.add_argument("-i", "--ifile", dest="ifile", type=str, required=True,
+                                       help="MACS score in bedGraph. REQUIRED")
+    argparser_bdgpeakcall.add_argument("-c", "--cutoff", dest="cutoff", type=float,
+                                       help="Cutoff depends on which method you used for score track. If the file contains pvalue scores from MACS3, score 5 means pvalue 1e-5. Regions with signals lower than cutoff will not be considerred as enriched regions. DEFAULT: 5", default=5)
+    argparser_bdgpeakcall.add_argument("-l", "--min-length", dest="minlen", type=int,
+                                       help="minimum length of peak, better to set it as d value. DEFAULT: 200", default=200)
+    argparser_bdgpeakcall.add_argument("-g", "--max-gap", dest="maxgap", type=int,
+                                       help="maximum gap between significant points in a peak, better to set it as tag size. DEFAULT: 30", default=30)
+    argparser_bdgpeakcall.add_argument("--call-summits", dest="call_summits", action="store_true", help=ap.SUPPRESS, default=False)
+    #                         help="If set, MACS will use a more sophisticated approach to find all summits in each enriched peak region. DEFAULT: False",default=False)
+    argparser_bdgpeakcall.add_argument("--cutoff-analysis", dest="cutoff_analysis", action="store_true",
+                                       help="While set, bdgpeakcall will analyze number or total length of peaks that can be called by different cutoff then output a summary table to help user decide a better cutoff. Note, minlen and maxgap may affect the results. DEFAULT: False", default=False)
+    argparser_bdgpeakcall.add_argument("--cutoff-analysis-max", dest="cutoff_analysis_max", type=int,
+                                       help="The maximum cutoff score for performing cutoff analysis. Together with --cutoff-analysis-steps, the resolution in the final report can be controlled. Please check the description in --cutoff-analysis-steps for detail. DEFAULT: 100",
+                                       default=100)
+    argparser_bdgpeakcall.add_argument("--cutoff-analysis-steps", dest="cutoff_analysis_steps", type=int,
+                                       help="Steps for performing cutoff analysis. It will be used to decide which cutoff value should be included in the final report. Larger the value, higher resolution the cutoff analysis can be. The cutoff analysis function will first find the smallest (at least 0) and the largest (controlled by --cutoff-analysis-max) score in the data, then break the range of score into `CUTOFF_ANALYSIS_STEPS` intervals. It will then use each score as cutoff to call peaks and calculate the total number of candidate peaks, the total basepairs of peaks, and the average length of peak in basepair. Please note that the final report ideally should include `CUTOFF_ANALYSIS_STEPS` rows, but in practice, if the cutoff yield zero peak, the row for that value won't be included.  DEFAULT: 100", default=100)
     argparser_bdgpeakcall.add_argument("--no-trackline", dest="trackline", action="store_false", default=True,
-                                        help="Tells MACS not to include trackline with bedGraph files. The trackline is used by UCSC for the options for display.")
-    argparser_bdgpeakcall.add_argument( "--verbose", dest = "verbose", type = int, default = 2,
-                                        help = "Set verbose level of runtime message. 0: only show critical message, 1: show additional warning message, 2: show process information, 3: show debug messages. DEFAULT:2" )
+                                       help="Tells MACS not to include trackline with bedGraph files. The trackline is used by UCSC for the options for display.")
+    argparser_bdgpeakcall.add_argument("--verbose", dest="verbose", type=int, default=2,
+                                       help="Set verbose level of runtime message. 0: only show critical message, 1: show additional warning message, 2: show process information, 3: show debug messages. DEFAULT:2")
 
-    add_outdir_option( argparser_bdgpeakcall )
-    add_output_group( argparser_bdgpeakcall )
+    add_outdir_option(argparser_bdgpeakcall)
+    add_output_group(argparser_bdgpeakcall)
 
     return
 
-def add_bdgbroadcall_parser( subparsers ):
+def add_bdgbroadcall_parser(subparsers):
     """Add function 'broad peak calling on bedGraph' argument parsers.
     """
-    argparser_bdgbroadcall = subparsers.add_parser( "bdgbroadcall",
-                                                    help = "Call nested broad peaks from bedGraph file." )
-    argparser_bdgbroadcall.add_argument( "-i", "--ifile", dest = "ifile" , type = str, required = True,
-                                         help = "MACS score in bedGraph. REQUIRED" )
-    argparser_bdgbroadcall.add_argument( "-c", "--cutoff-peak", dest = "cutoffpeak", type = float,
-                                         help = "Cutoff for peaks depending on which method you used for score track. If the file contains qvalue scores from MACS3, score 2 means qvalue 0.01. Regions with signals lower than cutoff will not be considerred as enriched regions. DEFAULT: 2",
-                                         default = 2 )
-    argparser_bdgbroadcall.add_argument( "-C", "--cutoff-link", dest = "cutofflink", type = float,
-                                         help = "Cutoff for linking regions/low abundance regions depending on which method you used for score track. If the file contains qvalue scores from MACS3, score 1 means qvalue 0.1, and score 0.3 means qvalue 0.5. DEFAULT: 1", default = 1 )
-    argparser_bdgbroadcall.add_argument( "-l", "--min-length", dest = "minlen", type = int,
-                                         help = "minimum length of peak, better to set it as d value. DEFAULT: 200", default = 200 )
-    argparser_bdgbroadcall.add_argument( "-g", "--lvl1-max-gap", dest = "lvl1maxgap", type = int,
-                                         help = "maximum gap between significant peaks, better to set it as tag size. DEFAULT: 30", default = 30 )
-    argparser_bdgbroadcall.add_argument( "-G", "--lvl2-max-gap", dest = "lvl2maxgap", type = int,
-                                         help = "maximum linking between significant peaks, better to set it as 4 times of d value. DEFAULT: 800", default = 800)
+    argparser_bdgbroadcall = subparsers.add_parser("bdgbroadcall",
+                                                   help="Call nested broad peaks from bedGraph file.")
+    argparser_bdgbroadcall.add_argument("-i", "--ifile", dest="ifile", type=str, required=True,
+                                        help="MACS score in bedGraph. REQUIRED")
+    argparser_bdgbroadcall.add_argument("-c", "--cutoff-peak", dest="cutoffpeak", type=float,
+                                        help="Cutoff for peaks depending on which method you used for score track. If the file contains qvalue scores from MACS3, score 2 means qvalue 0.01. Regions with signals lower than cutoff will not be considerred as enriched regions. DEFAULT: 2",
+                                        default=2)
+    argparser_bdgbroadcall.add_argument("-C", "--cutoff-link", dest="cutofflink", type=float,
+                                        help="Cutoff for linking regions/low abundance regions depending on which method you used for score track. If the file contains qvalue scores from MACS3, score 1 means qvalue 0.1, and score 0.3 means qvalue 0.5. DEFAULT: 1", default=1)
+    argparser_bdgbroadcall.add_argument("-l", "--min-length", dest="minlen", type=int,
+                                        help="minimum length of peak, better to set it as d value. DEFAULT: 200", default=200)
+    argparser_bdgbroadcall.add_argument("-g", "--lvl1-max-gap", dest="lvl1maxgap", type=int,
+                                        help="maximum gap between significant peaks, better to set it as tag size. DEFAULT: 30", default=30)
+    argparser_bdgbroadcall.add_argument("-G", "--lvl2-max-gap", dest="lvl2maxgap", type=int,
+                                        help="maximum linking between significant peaks, better to set it as 4 times of d value. DEFAULT: 800", default=800)
     argparser_bdgbroadcall.add_argument("--no-trackline", dest="trackline", action="store_false", default=True,
-                                         help="Tells MACS not to include trackline with bedGraph files. The trackline is required by UCSC.")
-    argparser_bdgbroadcall.add_argument( "--verbose", dest = "verbose", type = int, default = 2,
-                                         help = "Set verbose level of runtime message. 0: only show critical message, 1: show additional warning message, 2: show process information, 3: show debug messages. DEFAULT:2" )
-    add_outdir_option( argparser_bdgbroadcall )
-    add_output_group( argparser_bdgbroadcall )
+                                        help="Tells MACS not to include trackline with bedGraph files. The trackline is required by UCSC.")
+    argparser_bdgbroadcall.add_argument("--verbose", dest="verbose", type=int, default=2,
+                                        help="Set verbose level of runtime message. 0: only show critical message, 1: show additional warning message, 2: show process information, 3: show debug messages. DEFAULT:2")
+    add_outdir_option(argparser_bdgbroadcall)
+    add_output_group(argparser_bdgbroadcall)
     return
 
-def add_bdgcmp_parser( subparsers ):
+def add_bdgcmp_parser(subparsers):
     """Add function 'peak calling on bedGraph' argument parsers.
     """
-    argparser_bdgcmp = subparsers.add_parser( "bdgcmp",
-                                              help = "Comparing two signal tracks in bedGraph format." )
-    argparser_bdgcmp.add_argument( "-t", "--tfile", dest = "tfile", type = str, required = True,
-                                   help = "Treatment bedGraph file, e.g. *_treat_pileup.bdg from MACSv2. REQUIRED")
-    argparser_bdgcmp.add_argument( "-c", "--cfile", dest = "cfile", type = str, required = True,
-                                   help = "Control bedGraph file, e.g. *_control_lambda.bdg from MACSv2. REQUIRED")
-    argparser_bdgcmp.add_argument( "-S", "--scaling-factor", dest = "sfactor", type = float, default = 1.0,
-                                   help = "Scaling factor for treatment and control track. Keep it as 1.0 or default in most cases. Set it ONLY while you have SPMR output from MACS3 callpeak, and plan to calculate scores as MACS3 callpeak module. If you want to simulate 'callpeak' w/o '--to-large', calculate effective smaller sample size after filtering redudant reads in million (e.g., put 31.415926 if effective reads are 31,415,926) and input it for '-S'; for 'callpeak --to-large', calculate effective reads in larger sample. DEFAULT: 1.0")
-    argparser_bdgcmp.add_argument( "-p", "--pseudocount", dest = "pseudocount", type = float, default = 0.0,
-                                   help = "The pseudocount used for calculating logLR, logFE or FE. The count will be applied after normalization of sequencing depth. DEFAULT: 0.0, no pseudocount is applied.")
+    argparser_bdgcmp = subparsers.add_parser("bdgcmp",
+                                             help="Comparing two signal tracks in bedGraph format.")
+    argparser_bdgcmp.add_argument("-t", "--tfile", dest="tfile", type=str, required=True,
+                                  help="Treatment bedGraph file, e.g. *_treat_pileup.bdg from MACSv2. REQUIRED")
+    argparser_bdgcmp.add_argument("-c", "--cfile", dest="cfile", type=str, required=True,
+                                  help="Control bedGraph file, e.g. *_control_lambda.bdg from MACSv2. REQUIRED")
+    argparser_bdgcmp.add_argument("-S", "--scaling-factor", dest="sfactor", type=float, default=1.0,
+                                  help="Scaling factor for treatment and control track. Keep it as 1.0 or default in most cases. Set it ONLY while you have SPMR output from MACS3 callpeak, and plan to calculate scores as MACS3 callpeak module. If you want to simulate 'callpeak' w/o '--to-large', calculate effective smaller sample size after filtering redudant reads in million (e.g., put 31.415926 if effective reads are 31,415,926) and input it for '-S'; for 'callpeak --to-large', calculate effective reads in larger sample. DEFAULT: 1.0")
+    argparser_bdgcmp.add_argument("-p", "--pseudocount", dest="pseudocount", type=float, default=0.0,
+                                  help="The pseudocount used for calculating logLR, logFE or FE. The count will be applied after normalization of sequencing depth. DEFAULT: 0.0, no pseudocount is applied.")
 
-    argparser_bdgcmp.add_argument( "-m", "--method", dest = "method", type = str, nargs = "+",
-                                   choices = ( "ppois", "qpois", "subtract", "logFE", "FE", "logLR", "slogLR", "max" ),
-                                   help = "Method to use while calculating a score in any bin by comparing treatment value and control value. Available choices are: ppois, qpois, subtract, logFE, FE, logLR, slogLR, and max. They represent Poisson Pvalue (-log10(pvalue) form) using control as lambda and treatment as observation, q-value through a BH process for poisson pvalues, subtraction from treatment, linear scale fold enrichment, log10 fold enrichment(need to set pseudocount), log10 likelihood between ChIP-enriched model and open chromatin model(need to set pseudocount), symmetric log10 likelihood between two ChIP-enrichment models, or maximum value between the two tracks. Default option is ppois.",default="ppois")
-    argparser_bdgcmp.add_argument( "--verbose", dest = "verbose", type = int, default = 2,
-                                   help = "Set verbose level of runtime message. 0: only show critical message, 1: show additional warning message, 2: show process information, 3: show debug messages. DEFAULT:2" )
+    argparser_bdgcmp.add_argument("-m", "--method", dest="method", type=str, nargs="+",
+                                  choices=("ppois", "qpois", "subtract", "logFE", "FE", "logLR", "slogLR", "max"),
+                                  help="Method to use while calculating a score in any bin by comparing treatment value and control value. Available choices are: ppois, qpois, subtract, logFE, FE, logLR, slogLR, and max. They represent Poisson Pvalue (-log10(pvalue) form) using control as lambda and treatment as observation, q-value through a BH process for poisson pvalues, subtraction from treatment, linear scale fold enrichment, log10 fold enrichment(need to set pseudocount), log10 likelihood between ChIP-enriched model and open chromatin model(need to set pseudocount), symmetric log10 likelihood between two ChIP-enrichment models, or maximum value between the two tracks. Default option is ppois.",default="ppois")
+    argparser_bdgcmp.add_argument("--verbose", dest="verbose", type=int, default=2,
+                                  help="Set verbose level of runtime message. 0: only show critical message, 1: show additional warning message, 2: show process information, 3: show debug messages. DEFAULT:2")
 
-    add_outdir_option( argparser_bdgcmp )
-    output_group = argparser_bdgcmp.add_mutually_exclusive_group( required = True )
-    output_group.add_argument( "--o-prefix", dest = "oprefix", type = str,
-                               help = "The PREFIX of output bedGraph file to write scores. If it is given as A, and method is 'ppois', output file will be A_ppois.bdg. Mutually exclusive with -o/--ofile." )
-    output_group.add_argument( "-o", "--ofile", dest = "ofile", type = str, nargs = "+",
-                               help = "Output filename. Mutually exclusive with --o-prefix. The number and the order of arguments for --ofile must be the same as for -m." )
+    add_outdir_option(argparser_bdgcmp)
+    output_group = argparser_bdgcmp.add_mutually_exclusive_group(required=True)
+    output_group.add_argument("--o-prefix", dest="oprefix", type=str,
+                              help="The PREFIX of output bedGraph file to write scores. If it is given as A, and method is 'ppois', output file will be A_ppois.bdg. Mutually exclusive with -o/--ofile.")
+    output_group.add_argument("-o", "--ofile", dest="ofile", type=str, nargs="+",
+                              help="Output filename. Mutually exclusive with --o-prefix. The number and the order of arguments for --ofile must be the same as for -m.")
     return
 
-def add_bdgopt_parser( subparsers ):
+def add_bdgopt_parser(subparsers):
     """Add function 'operations on score column of bedGraph' argument parsers.
     """
-    argparser_bdgopt = subparsers.add_parser( "bdgopt",
-                                              help = "Operate the score column of bedGraph file." )
-    argparser_bdgopt.add_argument( "-i", "--ifile", dest = "ifile", type = str, required = True,
-                                   help = "MACS score in bedGraph. Note: this must be a bedGraph file covering the ENTIRE genome. REQUIRED" )
-    argparser_bdgopt.add_argument( "-m", "--method", dest = "method", type = str,
-                                   choices = ( "multiply", "add", "p2q", "max", "min" ),
-                                   help = "Method to modify the score column of bedGraph file. Available choices are: multiply, add, max, min, or p2q. 1) multiply, the EXTRAPARAM is required and will be multiplied to the score column. If you intend to divide the score column by X, use value of 1/X as EXTRAPARAM. 2) add, the EXTRAPARAM is required and will be added to the score column. If you intend to subtract the score column by X, use value of -X as EXTRAPARAM. 3) max, the EXTRAPARAM is required and will take the maximum value between score and the EXTRAPARAM. 4) min, the EXTRAPARAM is required and will take the minimum value between score and the EXTRAPARAM. 5) p2q, this will convert p-value scores to q-value scores using Benjamini-Hochberg process. The EXTRAPARAM is not required. This method assumes the scores are -log10 p-value from MACS3. Any other types of score will cause unexpected errors.", default="p2q")
-    argparser_bdgopt.add_argument( "-p", "--extra-param", dest = "extraparam", type = float, nargs = "*",
-                                   help = "The extra parameter for METHOD. Check the detail of -m option.")
-    add_outdir_option( argparser_bdgopt )
-    argparser_bdgopt.add_argument( "-o", "--ofile", dest = "ofile", type = str,
-                                   help = "Output BEDGraph filename.", required = True )
-    argparser_bdgopt.add_argument( "--verbose", dest = "verbose", type = int, default = 2,
-                                   help = "Set verbose level of runtime message. 0: only show critical message, 1: show additional warning message, 2: show process information, 3: show debug messages. DEFAULT:2" )
+    argparser_bdgopt = subparsers.add_parser("bdgopt",
+                                             help="Operate the score column of bedGraph file.")
+    argparser_bdgopt.add_argument("-i", "--ifile", dest="ifile", type=str, required=True,
+                                  help="MACS score in bedGraph. Note: this must be a bedGraph file covering the ENTIRE genome. REQUIRED")
+    argparser_bdgopt.add_argument("-m", "--method", dest="method", type=str,
+                                  choices=("multiply", "add", "p2q", "max", "min"),
+                                  help="Method to modify the score column of bedGraph file. Available choices are: multiply, add, max, min, or p2q. 1) multiply, the EXTRAPARAM is required and will be multiplied to the score column. If you intend to divide the score column by X, use value of 1/X as EXTRAPARAM. 2) add, the EXTRAPARAM is required and will be added to the score column. If you intend to subtract the score column by X, use value of -X as EXTRAPARAM. 3) max, the EXTRAPARAM is required and will take the maximum value between score and the EXTRAPARAM. 4) min, the EXTRAPARAM is required and will take the minimum value between score and the EXTRAPARAM. 5) p2q, this will convert p-value scores to q-value scores using Benjamini-Hochberg process. The EXTRAPARAM is not required. This method assumes the scores are -log10 p-value from MACS3. Any other types of score will cause unexpected errors.", default="p2q")
+    argparser_bdgopt.add_argument("-p", "--extra-param", dest="extraparam", type=float, nargs="*",
+                                  help="The extra parameter for METHOD. Check the detail of -m option.")
+    add_outdir_option(argparser_bdgopt)
+    argparser_bdgopt.add_argument("-o", "--ofile", dest="ofile", type=str,
+                                  help="Output BEDGraph filename.", required=True)
+    argparser_bdgopt.add_argument("--verbose", dest="verbose", type=int, default=2,
+                                  help="Set verbose level of runtime message. 0: only show critical message, 1: show additional warning message, 2: show process information, 3: show debug messages. DEFAULT:2")
     return
 
-def add_cmbreps_parser( subparsers ):
+
+def add_cmbreps_parser(subparsers):
     """Add function 'combine replicates' argument parsers.
     """
-    argparser_cmbreps = subparsers.add_parser( "cmbreps",
-                                               help = "Combine bedGraph files of scores from replicates." )
-    argparser_cmbreps.add_argument( "-i", dest = "ifile", type = str, required = True, nargs = "+",
-                                    help = "MACS score in bedGraph for each replicate. Require at least 2 files such as '-i A B C D'. REQUIRED" )
-    # argparser_cmbreps.add_argument( "-w", dest = "weights", type = float, nargs = "*",
-    #                                 help = "Weight for each replicate. Default is 1.0 for each. When given, require same number of parameters as IFILE." )
-    argparser_cmbreps.add_argument( "-m", "--method", dest = "method", type = str,
-                                    choices = ( "fisher", "max", "mean" ),
-                                    help = "Method to use while combining scores from replicates. 1) fisher: Fisher's combined probability test. It requires scores in ppois form (-log10 pvalues) from bdgcmp. Other types of scores for this method may cause cmbreps unexpected errors. 2) max: take the maximum value from replicates for each genomic position. 3) mean: take the average value. Note, except for Fisher's method, max or mean will take scores AS IS which means they won't convert scores from log scale to linear scale or vice versa.", default="fisher")
-    add_outdir_option( argparser_cmbreps )
-    argparser_cmbreps.add_argument( "-o", "--ofile", dest = "ofile", type = str, required = True,
-                                    help = "Output BEDGraph filename for combined scores." )
-    argparser_cmbreps.add_argument( "--verbose", dest = "verbose", type = int, default = 2,
-                                    help = "Set verbose level of runtime message. 0: only show critical message, 1: show additional warning message, 2: show process information, 3: show debug messages. DEFAULT:2" )
+    argparser_cmbreps = subparsers.add_parser("cmbreps",
+                                              help="Combine bedGraph files of scores from replicates.")
+    argparser_cmbreps.add_argument("-i", dest="ifile", type=str, required=True, nargs="+",
+                                   help="MACS score in bedGraph for each replicate. Require at least 2 files such as '-i A B C D'. REQUIRED")
+    # argparser_cmbreps.add_argument("-w", dest="weights", type=float, nargs="*",
+    #                                help="Weight for each replicate. Default is 1.0 for each. When given, require same number of parameters as IFILE.")
+    argparser_cmbreps.add_argument("-m", "--method", dest="method", type=str,
+                                   choices=("fisher", "max", "mean"),
+                                   help="Method to use while combining scores from replicates. 1) fisher: Fisher's combined probability test. It requires scores in ppois form (-log10 pvalues) from bdgcmp. Other types of scores for this method may cause cmbreps unexpected errors. 2) max: take the maximum value from replicates for each genomic position. 3) mean: take the average value. Note, except for Fisher's method, max or mean will take scores AS IS which means they won't convert scores from log scale to linear scale or vice versa.", default="fisher")
+    add_outdir_option(argparser_cmbreps)
+    argparser_cmbreps.add_argument("-o", "--ofile", dest="ofile", type=str, required=True,
+                                   help="Output BEDGraph filename for combined scores.")
+    argparser_cmbreps.add_argument("--verbose", dest="verbose", type=int, default=2,
+                                   help="Set verbose level of runtime message. 0: only show critical message, 1: show additional warning message, 2: show process information, 3: show debug messages. DEFAULT:2")
     return
 
-def add_randsample_parser( subparsers ):
-    argparser_randsample = subparsers.add_parser( "randsample",
-                                                  help = "Randomly choose a number/percentage of total reads, then save in BED/BEDPE format file." )
-    argparser_randsample.add_argument( "-i", "--ifile", dest = "ifile", type = str, required = True, nargs = "+",
-                                      help = "Alignment file. If multiple files are given as '-t A B C', then they will all be read and combined. REQUIRED." )
 
-    p_or_n_group = argparser_randsample.add_mutually_exclusive_group( required = True )
-    p_or_n_group.add_argument( "-p", "--percentage", dest = "percentage", type = float,
-                               help = "Percentage of tags you want to keep. Input 80.0 for 80%%. This option can't be used at the same time with -n/--num. If the setting is 100, it will keep all the reads and convert any format that MACS3 supports into BED or BEDPE (if input is BAMPE) format. REQUIRED")
-    p_or_n_group.add_argument( "-n", "--number", dest = "number", type = float,
-                               help = "Number of tags you want to keep. Input 8000000 or 8e+6 for 8 million. This option can't be used at the same time with -p/--percent. Note that the number of tags in output is approximate as the number specified here. REQUIRED" )
-    argparser_randsample.add_argument( "--seed", dest = "seed", type = int, default = -1,
-                                       help = "Set the random seed while down sampling data. Must be a non-negative integer in order to be effective. If you want more reproducible results, please specify a random seed and record it.DEFAULT: not set" )
-    argparser_randsample.add_argument( "-o", "--ofile", dest = "outputfile", type = str,
-                                      help = "Output BED file name. If not specified, will write to standard output. Note, if the input format is BAMPE or BEDPE, the output will be in BEDPE format. DEFAULT: stdout",
-                                      default = None)
-    add_outdir_option( argparser_randsample )
-    argparser_randsample.add_argument( "-s", "--tsize", dest = "tsize", type = int, default = None,
-                                       help = "Tag size. This will override the auto detected tag size. DEFAULT: Not set")
-    argparser_randsample.add_argument( "-f", "--format", dest = "format", type = str,
-                                       choices=("AUTO","BAM","SAM","BED","ELAND","ELANDMULTI","ELANDEXPORT","BOWTIE","BAMPE","BEDPE"),
-                                       help = "Format of tag file, \"AUTO\", \"BED\" or \"ELAND\" or \"ELANDMULTI\" or \"ELANDEXPORT\" or \"SAM\" or \"BAM\" or \"BOWTIE\" or \"BAMPE\" or \"BEDPE\". The default AUTO option will %(prog)s decide which format the file is. Please check the definition in README file if you choose ELAND/ELANDMULTI/ELANDEXPORT/SAM/BAM/BOWTIE or BAMPE/BEDPE. DEFAULT: \"AUTO\"",
-                                       default = "AUTO" )
-    argparser_randsample.add_argument( "--buffer-size", dest = "buffer_size", type = int, default = "100000",
-                                       help = "Buffer size for incrementally increasing internal array size to store reads alignment information. In most cases, you don't have to change this parameter. However, if there are large number of chromosomes/contigs/scaffolds in your alignment, it's recommended to specify a smaller buffer size in order to decrease memory usage (but it will take longer time to read alignment files). Minimum memory requested for reading an alignment file is about # of CHROMOSOME * BUFFER_SIZE * 8 Bytes. DEFAULT: 100000 " )
+def add_randsample_parser(subparsers):
+    argparser_randsample = subparsers.add_parser("randsample",
+                                                 help="Randomly choose a number/percentage of total reads, then save in BED/BEDPE format file.")
+    argparser_randsample.add_argument("-i", "--ifile", dest="ifile", type=str, required=True, nargs="+",
+                                      help="Alignment file. If multiple files are given as '-t A B C', then they will all be read and combined. REQUIRED.")
 
-    argparser_randsample.add_argument( "--verbose", dest = "verbose", type = int, default = 2,
-                                       help = "Set verbose level. 0: only show critical message, 1: show additional warning message, 2: show process information, 3: show debug messages. If you want to know where are the duplicate reads, use 3. DEFAULT:2" )
+    p_or_n_group = argparser_randsample.add_mutually_exclusive_group(required=True)
+    p_or_n_group.add_argument("-p", "--percentage", dest="percentage", type=float,
+                              help="Percentage of tags you want to keep. Input 80.0 for 80%%. This option can't be used at the same time with -n/--num. If the setting is 100, it will keep all the reads and convert any format that MACS3 supports into BED or BEDPE (if input is BAMPE) format. REQUIRED")
+    p_or_n_group.add_argument("-n", "--number", dest="number", type=float,
+                              help="Number of tags you want to keep. Input 8000000 or 8e+6 for 8 million. This option can't be used at the same time with -p/--percent. Note that the number of tags in output is approximate as the number specified here. REQUIRED")
+    argparser_randsample.add_argument("--seed", dest="seed", type=int, default=-1,
+                                      help="Set the random seed while down sampling data. Must be a non-negative integer in order to be effective. If you want more reproducible results, please specify a random seed and record it.DEFAULT: not set")
+    argparser_randsample.add_argument("-o", "--ofile", dest="outputfile", type=str,
+                                      help="Output BED file name. If not specified, will write to standard output. Note, if the input format is BAMPE or BEDPE, the output will be in BEDPE format. DEFAULT: stdout",
+                                      default=None)
+    add_outdir_option(argparser_randsample)
+    argparser_randsample.add_argument("-s", "--tsize", dest="tsize", type=int, default=None,
+                                      help="Tag size. This will override the auto detected tag size. DEFAULT: Not set")
+    argparser_randsample.add_argument("-f", "--format", dest="format", type=str,
+                                      choices=("AUTO", "BAM", "SAM", "BED", "ELAND", "ELANDMULTI", "ELANDEXPORT", "BOWTIE", "BAMPE", "BEDPE"),
+                                      help="Format of tag file, \"AUTO\", \"BED\" or \"ELAND\" or \"ELANDMULTI\" or \"ELANDEXPORT\" or \"SAM\" or \"BAM\" or \"BOWTIE\" or \"BAMPE\" or \"BEDPE\". The default AUTO option will %(prog)s decide which format the file is. Please check the definition in README file if you choose ELAND/ELANDMULTI/ELANDEXPORT/SAM/BAM/BOWTIE or BAMPE/BEDPE. DEFAULT: \"AUTO\"",
+                                      default="AUTO")
+    argparser_randsample.add_argument("--buffer-size", dest="buffer_size", type=int, default="100000",
+                                      help="Buffer size for incrementally increasing internal array size to store reads alignment information. In most cases, you don't have to change this parameter. However, if there are large number of chromosomes/contigs/scaffolds in your alignment, it's recommended to specify a smaller buffer size in order to decrease memory usage (but it will take longer time to read alignment files). Minimum memory requested for reading an alignment file is about # of CHROMOSOME * BUFFER_SIZE * 8 Bytes. DEFAULT: 100000 ")
+
+    argparser_randsample.add_argument("--verbose", dest="verbose", type=int, default=2,
+                                      help="Set verbose level. 0: only show critical message, 1: show additional warning message, 2: show process information, 3: show debug messages. If you want to know where are the duplicate reads, use 3. DEFAULT:2")
     return
 
-def add_bdgdiff_parser( subparsers ):
-    argparser_bdgdiff = subparsers.add_parser( "bdgdiff",
-                                               help = "Differential peak detection based on paired four bedGraph files." )
-    argparser_bdgdiff.add_argument( "--t1", dest = "t1bdg", type = str, required = True,
-                                    help = "MACS pileup bedGraph for condition 1. Incompatible with callpeak --SPMR output. REQUIRED" )
-    argparser_bdgdiff.add_argument( "--t2", dest="t2bdg", type = str, required = True,
-                                    help = "MACS pileup bedGraph for condition 2. Incompatible with callpeak --SPMR output. REQUIRED" )
-    argparser_bdgdiff.add_argument( "--c1", dest = "c1bdg", type = str, required = True,
-                                    help = "MACS control lambda bedGraph for condition 1. Incompatible with callpeak --SPMR output. REQUIRED" )
-    argparser_bdgdiff.add_argument( "--c2", dest="c2bdg", type = str, required = True,
-                                    help = "MACS control lambda bedGraph for condition 2. Incompatible with callpeak --SPMR output. REQUIRED" )
-    argparser_bdgdiff.add_argument( "-C", "--cutoff", dest = "cutoff", type = float,
-                                    help = "log10LR cutoff. Regions with signals lower than cutoff will not be considerred as enriched regions. DEFAULT: 3 (likelihood ratio=1000)", default = 3 )
-    argparser_bdgdiff.add_argument( "-l", "--min-len", dest = "minlen", type = int,
-                                    help = "Minimum length of differential region. Try bigger value to remove small regions. DEFAULT: 200", default = 200 )
-    argparser_bdgdiff.add_argument( "-g", "--max-gap", dest = "maxgap", type = int,
-                                    help = "Maximum gap to merge nearby differential regions. Consider a wider gap for broad marks. Maximum gap should be smaller than minimum length (-g). DEFAULT: 100", default = 100 )
-    argparser_bdgdiff.add_argument( "--d1", "--depth1", dest = "depth1", type = float, default = 1.0,
-                                    help = "Sequencing depth (# of non-redundant reads in million) for condition 1. It will be used together with --d2. See description for --d2 below for how to assign them. Default: 1" )
-    argparser_bdgdiff.add_argument( "--d2", "--depth2", dest = "depth2", type = float, default = 1.0,
-                                    help = "Sequencing depth (# of non-redundant reads in million) for condition 2. It will be used together with --d1. DEPTH1 and DEPTH2 will be used to calculate scaling factor for each sample, to down-scale larger sample to the level of smaller one. For example, while comparing 10 million condition 1 and 20 million condition 2, use --d1 10 --d2 20, then pileup value in bedGraph for condition 2 will be divided by 2. Default: 1" )
-    argparser_bdgdiff.add_argument( "--verbose", dest = "verbose", type = int, default = 2,
-                                    help = "Set verbose level of runtime message. 0: only show critical message, 1: show additional warning message, 2: show process information, 3: show debug messages. DEFAULT:2" )
-    
-    add_outdir_option( argparser_bdgdiff )
-    output_group = argparser_bdgdiff.add_mutually_exclusive_group( required = True )
-    output_group.add_argument( "--o-prefix", dest = "oprefix", type = str,
-                               help = "Output file prefix. Actual files will be named as PREFIX_cond1.bed, PREFIX_cond2.bed and PREFIX_common.bed. Mutually exclusive with -o/--ofile." )
-    output_group.add_argument( "-o", "--ofile", dest = "ofile", type = str, nargs = 3,
-                               help = "Output filenames. Must give three arguments in order: 1. file for unique regions in condition 1; 2. file for unique regions in condition 2; 3. file for common regions in both conditions. Note: mutually exclusive with --o-prefix." )
 
-    return
+def add_bdgdiff_parser(subparsers):
+    argparser_bdgdiff = subparsers.add_parser("bdgdiff",
+                                              help="Differential peak detection based on paired four bedGraph files.")
+    argparser_bdgdiff.add_argument("--t1", dest="t1bdg", type=str, required=True,
+                                   help="MACS pileup bedGraph for condition 1. Incompatible with callpeak --SPMR output. REQUIRED")
+    argparser_bdgdiff.add_argument("--t2", dest="t2bdg", type=str, required=True,
+                                   help="MACS pileup bedGraph for condition 2. Incompatible with callpeak --SPMR output. REQUIRED")
+    argparser_bdgdiff.add_argument("--c1", dest="c1bdg", type=str, required=True,
+                                   help="MACS control lambda bedGraph for condition 1. Incompatible with callpeak --SPMR output. REQUIRED")
+    argparser_bdgdiff.add_argument("--c2", dest="c2bdg", type=str, required=True,
+                                   help="MACS control lambda bedGraph for condition 2. Incompatible with callpeak --SPMR output. REQUIRED")
+    argparser_bdgdiff.add_argument("-C", "--cutoff", dest="cutoff", type=float,
+                                   help="log10LR cutoff. Regions with signals lower than cutoff will not be considerred as enriched regions. DEFAULT: 3 (likelihood ratio=1000)", default=3)
+    argparser_bdgdiff.add_argument("-l", "--min-len", dest="minlen", type=int,
+                                   help="Minimum length of differential region. Try bigger value to remove small regions. DEFAULT: 200", default=200)
+    argparser_bdgdiff.add_argument("-g", "--max-gap", dest="maxgap", type=int,
+                                   help="Maximum gap to merge nearby differential regions. Consider a wider gap for broad marks. Maximum gap should be smaller than minimum length (-g). DEFAULT: 100", default=100)
+    argparser_bdgdiff.add_argument("--d1", "--depth1", dest="depth1", type=float, default=1.0,
+                                   help="Sequencing depth (# of non-redundant reads in million) for condition 1. It will be used together with --d2. See description for --d2 below for how to assign them. Default: 1")
+    argparser_bdgdiff.add_argument("--d2", "--depth2", dest="depth2", type=float, default=1.0,
+                                   help="Sequencing depth (# of non-redundant reads in million) for condition 2. It will be used together with --d1. DEPTH1 and DEPTH2 will be used to calculate scaling factor for each sample, to down-scale larger sample to the level of smaller one. For example, while comparing 10 million condition 1 and 20 million condition 2, use --d1 10 --d2 20, then pileup value in bedGraph for condition 2 will be divided by 2. Default: 1")
+    argparser_bdgdiff.add_argument("--verbose", dest="verbose", type=int, default=2,
+                                   help="Set verbose level of runtime message. 0: only show critical message, 1: show additional warning message, 2: show process information, 3: show debug messages. DEFAULT:2")
 
-def add_refinepeak_parser( subparsers ):
-    argparser_refinepeak = subparsers.add_parser( "refinepeak",
-                                                 help = "Take raw reads alignment, refine peak summits. Inspired by SPP." )
-    argparser_refinepeak.add_argument( "-b", dest = "bedfile", type = str, required = True,
-                                      help = "Candidate peak file in BED format. REQUIRED." )
-    argparser_refinepeak.add_argument( "-i", "--ifile", dest = "ifile", type = str, required = True, nargs = "+",
-                                      help = "ChIP-seq alignment file. If multiple files are given as '-t A B C', then they will all be read and combined. Note that pair-end data is not supposed to work with this command. REQUIRED." )
-    argparser_refinepeak.add_argument( "-f", "--format", dest = "format", type = str,
-                                      choices=("AUTO","BAM","SAM","BED","ELAND","ELANDMULTI","ELANDEXPORT","BOWTIE"),
-                                      help = "Format of tag file, \"AUTO\", \"BED\" or \"ELAND\" or \"ELANDMULTI\" or \"ELANDEXPORT\" or \"SAM\" or \"BAM\" or \"BOWTIE\". The default AUTO option will let '%(prog)s' decide which format the file is. Please check the definition in README file if you choose ELAND/ELANDMULTI/ELANDEXPORT/SAM/BAM/BOWTIE. DEFAULT: \"AUTO\"",
-                                      default = "AUTO" )
-    argparser_refinepeak.add_argument( "-c", "--cutoff" , dest = "cutoff", type = float,
-                                        help = "Cutoff. Regions with SPP wtd score lower than cutoff will not be considerred.  DEFAULT: 5", default = 5 )
-    argparser_refinepeak.add_argument( "-w", "--window-size", dest= "windowsize", help = 'Scan window size on both side of the summit (default: 100bp)',
-                                        type = int, default = 200)
-    argparser_refinepeak.add_argument( "--buffer-size", dest = "buffer_size", type = int, default = "100000",
-                                       help = "Buffer size for incrementally increasing internal array size to store reads alignment information. In most cases, you don't have to change this parameter. However, if there are large number of chromosomes/contigs/scaffolds in your alignment, it's recommended to specify a smaller buffer size in order to decrease memory usage (but it will take longer time to read alignment files). Minimum memory requested for reading an alignment file is about # of CHROMOSOME * BUFFER_SIZE * 8 Bytes. DEFAULT: 100000 " )
-
-    argparser_refinepeak.add_argument( "--verbose", dest = "verbose", type = int, default = 2,
-                                       help = "Set verbose level. 0: only show critical message, 1: show additional warning message, 2: show process information, 3: show debug messages. If you want to know where are the duplicate reads, use 3. DEFAULT:2" )
-
-    add_outdir_option( argparser_refinepeak )
-    add_output_group( argparser_refinepeak )
+    add_outdir_option(argparser_bdgdiff)
+    output_group = argparser_bdgdiff.add_mutually_exclusive_group(required=True)
+    output_group.add_argument("--o-prefix", dest="oprefix", type=str,
+                              help="Output file prefix. Actual files will be named as PREFIX_cond1.bed, PREFIX_cond2.bed and PREFIX_common.bed. Mutually exclusive with -o/--ofile.")
+    output_group.add_argument("-o", "--ofile", dest="ofile", type=str, nargs=3,
+                              help="Output filenames. Must give three arguments in order: 1. file for unique regions in condition 1; 2. file for unique regions in condition 2; 3. file for common regions in both conditions. Note: mutually exclusive with --o-prefix.")
 
     return
 
-def add_predictd_parser( subparsers ):
+def add_refinepeak_parser(subparsers):
+    argparser_refinepeak = subparsers.add_parser("refinepeak",
+                                                 help="Take raw reads alignment, refine peak summits. Inspired by SPP.")
+    argparser_refinepeak.add_argument("-b", dest="bedfile", type=str, required=True,
+                                      help="Candidate peak file in BED format. REQUIRED.")
+    argparser_refinepeak.add_argument("-i", "--ifile", dest="ifile", type=str, required=True, nargs="+",
+                                      help="ChIP-seq alignment file. If multiple files are given as '-t A B C', then they will all be read and combined. Note that pair-end data is not supposed to work with this command. REQUIRED.")
+    argparser_refinepeak.add_argument("-f", "--format", dest="format", type=str,
+                                      choices=("AUTO", "BAM", "SAM", "BED", "ELAND", "ELANDMULTI", "ELANDEXPORT", "BOWTIE"),
+                                      help="Format of tag file, \"AUTO\", \"BED\" or \"ELAND\" or \"ELANDMULTI\" or \"ELANDEXPORT\" or \"SAM\" or \"BAM\" or \"BOWTIE\". The default AUTO option will let '%(prog)s' decide which format the file is. Please check the definition in README file if you choose ELAND/ELANDMULTI/ELANDEXPORT/SAM/BAM/BOWTIE. DEFAULT: \"AUTO\"",
+                                      default="AUTO")
+    argparser_refinepeak.add_argument("-c", "--cutoff", dest="cutoff", type=float,
+                                      help="Cutoff. Regions with SPP wtd score lower than cutoff will not be considerred.  DEFAULT: 5", default=5)
+    argparser_refinepeak.add_argument("-w", "--window-size", dest="windowsize", help='Scan window size on both side of the summit (default: 100bp)',
+                                      type=int, default=200)
+    argparser_refinepeak.add_argument("--buffer-size", dest="buffer_size", type=int, default="100000",
+                                      help="Buffer size for incrementally increasing internal array size to store reads alignment information. In most cases, you don't have to change this parameter. However, if there are large number of chromosomes/contigs/scaffolds in your alignment, it's recommended to specify a smaller buffer size in order to decrease memory usage (but it will take longer time to read alignment files). Minimum memory requested for reading an alignment file is about # of CHROMOSOME * BUFFER_SIZE * 8 Bytes. DEFAULT: 100000 ")
+
+    argparser_refinepeak.add_argument("--verbose", dest="verbose", type=int, default=2,
+                                      help="Set verbose level. 0: only show critical message, 1: show additional warning message, 2: show process information, 3: show debug messages. If you want to know where are the duplicate reads, use 3. DEFAULT:2")
+
+    add_outdir_option(argparser_refinepeak)
+    add_output_group(argparser_refinepeak)
+
+    return
+
+
+def add_predictd_parser(subparsers):
     """Add main function 'predictd' argument parsers.
     """
     argparser_predictd = subparsers.add_parser("predictd", help="Predict d or fragment size from alignment results. In case of PE data, report the average insertion/fragment size from all pairs.")
 
     # group for input files
-    argparser_predictd.add_argument( "-i", "--ifile", dest = "ifile", type = str, required = True, nargs = "+",
-                                     help = "ChIP-seq alignment file. If multiple files are given as '-t A B C', then they will all be read and combined. REQUIRED." )
-    argparser_predictd.add_argument( "-f", "--format", dest = "format", type = str,
-                                     choices = ("AUTO", "BAM", "SAM", "BED", "ELAND",
-                                                "ELANDMULTI", "ELANDEXPORT", "BOWTIE",
-                                                "BAMPE", "BEDPE"),
-                                     help = "Format of tag file, \"AUTO\", \"BED\" or \"ELAND\" or \"ELANDMULTI\" or \"ELANDEXPORT\" or \"SAM\" or \"BAM\" or \"BOWTIE\" or \"BAMPE\" or \"BEDPE\". The default AUTO option will let MACS decide which format the file is. However, if you want to decide the average insertion size/fragment size from PE data such as BEDPE or BAMPE, please specify the format as BAMPE or BEDPE since MACS3 won't automatically recognize three two formats with -f AUTO. Please be aware that in PE mode, -g, -s, --bw, --d-min, -m, and --rfile have NO effect. DEFAULT: \"AUTO\"",
-                                     default = "AUTO" )
-    argparser_predictd.add_argument( "-g", "--gsize", dest = "gsize", type = str, default = "hs",
-                                     help = "Effective genome size. It can be 1.0e+9 or 1000000000, or shortcuts:'hs' for human (2,913,022,398), 'mm' for mouse (2,652,783,500), 'ce' for C. elegans (100,286,401) and 'dm' for fruitfly (142,573,017), Default:hs. The effective genome size numbers for the above four species are collected from Deeptools https://deeptools.readthedocs.io/en/develop/content/feature/effectiveGenomeSize.html Please refer to deeptools to define the best genome size you plan to use.")
-    argparser_predictd.add_argument( "-s", "--tsize",  dest = "tsize", type = int, default = None,
-                                     help = "Tag size. This will override the auto detected tag size. DEFAULT: Not set")
-    argparser_predictd.add_argument( "--bw", dest = "bw", type = int, default = 300,
-                                     help = "Band width for picking regions to compute fragment size. This value is only used while building the shifting model. DEFAULT: 300")
-    argparser_predictd.add_argument( "--d-min", dest = "d_min", type = int, default = 20,
-                                     help = "Minimum fragment size in basepair. Any predicted fragment size less than this will be excluded. DEFAULT: 20")
-    argparser_predictd.add_argument( "-m", "--mfold", dest = "mfold", type = int, default = [5,50], nargs = 2,
-                                     help = "Select the regions within MFOLD range of high-confidence enrichment ratio against background to build model. Fold-enrichment in regions must be lower than upper limit, and higher than the lower limit. Use as \"-m 10 30\". DEFAULT:5 50" )
+    argparser_predictd.add_argument("-i", "--ifile", dest="ifile", type=str, required=True, nargs="+",
+                                    help="ChIP-seq alignment file. If multiple files are given as '-t A B C', then they will all be read and combined. REQUIRED.")
+    argparser_predictd.add_argument("-f", "--format", dest="format", type=str,
+                                    choices=("AUTO", "BAM", "SAM", "BED", "ELAND",
+                                             "ELANDMULTI", "ELANDEXPORT", "BOWTIE",
+                                             "BAMPE", "BEDPE"),
+                                    help="Format of tag file, \"AUTO\", \"BED\" or \"ELAND\" or \"ELANDMULTI\" or \"ELANDEXPORT\" or \"SAM\" or \"BAM\" or \"BOWTIE\" or \"BAMPE\" or \"BEDPE\". The default AUTO option will let MACS decide which format the file is. However, if you want to decide the average insertion size/fragment size from PE data such as BEDPE or BAMPE, please specify the format as BAMPE or BEDPE since MACS3 won't automatically recognize three two formats with -f AUTO. Please be aware that in PE mode, -g, -s, --bw, --d-min, -m, and --rfile have NO effect. DEFAULT: \"AUTO\"",
+                                    default="AUTO")
+    argparser_predictd.add_argument("-g", "--gsize", dest="gsize", type=str, default="hs",
+                                    help="Effective genome size. It can be 1.0e+9 or 1000000000, or shortcuts:'hs' for human (2,913,022,398), 'mm' for mouse (2,652,783,500), 'ce' for C. elegans (100,286,401) and 'dm' for fruitfly (142,573,017), Default:hs. The effective genome size numbers for the above four species are collected from Deeptools https://deeptools.readthedocs.io/en/develop/content/feature/effectiveGenomeSize.html Please refer to deeptools to define the best genome size you plan to use.")
+    argparser_predictd.add_argument("-s", "--tsize",  dest="tsize", type=int, default=None,
+                                    help="Tag size. This will override the auto detected tag size. DEFAULT: Not set")
+    argparser_predictd.add_argument("--bw", dest="bw", type=int, default=300,
+                                    help="Band width for picking regions to compute fragment size. This value is only used while building the shifting model. DEFAULT: 300")
+    argparser_predictd.add_argument("--d-min", dest="d_min", type=int, default=20,
+                                    help="Minimum fragment size in basepair. Any predicted fragment size less than this will be excluded. DEFAULT: 20")
+    argparser_predictd.add_argument("-m", "--mfold", dest="mfold", type=int, default=[5,50], nargs=2,
+                                    help="Select the regions within MFOLD range of high-confidence enrichment ratio against background to build model. Fold-enrichment in regions must be lower than upper limit, and higher than the lower limit. Use as \"-m 10 30\". DEFAULT:5 50")
 
-    add_outdir_option( argparser_predictd )
-    argparser_predictd.add_argument( "--rfile", dest = "rfile", type = str, default = "predictd_model.R",
-                                     help = "PREFIX of filename of R script for drawing X-correlation figure. DEFAULT:'predictd_model.R' and R file will be predicted_model.R" )
-    argparser_predictd.add_argument( "--buffer-size", dest = "buffer_size", type = int, default = "100000",
-                                     help = "Buffer size for incrementally increasing internal array size to store reads alignment information. In most cases, you don't have to change this parameter. However, if there are large number of chromosomes/contigs/scaffolds in your alignment, it's recommended to specify a smaller buffer size in order to decrease memory usage (but it will take longer time to read alignment files). Minimum memory requested for reading an alignment file is about # of CHROMOSOME * BUFFER_SIZE * 8 Bytes. DEFAULT: 100000 " )
+    add_outdir_option(argparser_predictd)
+    argparser_predictd.add_argument("--rfile", dest="rfile", type=str, default="predictd_model.R",
+                                    help="PREFIX of filename of R script for drawing X-correlation figure. DEFAULT:'predictd_model.R' and R file will be predicted_model.R")
+    argparser_predictd.add_argument("--buffer-size", dest="buffer_size", type=int, default="100000",
+                                    help="Buffer size for incrementally increasing internal array size to store reads alignment information. In most cases, you don't have to change this parameter. However, if there are large number of chromosomes/contigs/scaffolds in your alignment, it's recommended to specify a smaller buffer size in order to decrease memory usage (but it will take longer time to read alignment files). Minimum memory requested for reading an alignment file is about # of CHROMOSOME * BUFFER_SIZE * 8 Bytes. DEFAULT: 100000 ")
 
-    argparser_predictd.add_argument( "--verbose", dest = "verbose", type = int, default = 2,
-                                     help = "Set verbose level of runtime message. 0: only show critical message, 1: show additional warning message, 2: show process information, 3: show debug messages. DEFAULT:2" )
+    argparser_predictd.add_argument("--verbose", dest="verbose", type=int, default=2,
+                                    help="Set verbose level of runtime message. 0: only show critical message, 1: show additional warning message, 2: show process information, 3: show debug messages. DEFAULT:2")
 
     return
 
-def add_pileup_parser( subparsers ):
-    argparser_pileup = subparsers.add_parser( "pileup",
-                                              help = "Pileup aligned reads (single-end) or fragments (paired-end)." )
-    argparser_pileup.add_argument( "-i", "--ifile", dest = "ifile", type = str, required = True, nargs = "+",
-                                   help = "Alignment file. If multiple files are given as '-t A B C', then they will all be read and combined. REQUIRED." )
-    argparser_pileup.add_argument( "-o", "--ofile", dest = "outputfile", type = str, required = True,
-                                   help = "Output bedGraph file name. If not specified, will write to standard output. REQUIRED." )
-    add_outdir_option( argparser_pileup )
-    argparser_pileup.add_argument( "-f", "--format", dest = "format", type = str,
-                                   choices=("AUTO","BAM","SAM","BED","ELAND","ELANDMULTI","ELANDEXPORT","BOWTIE","BAMPE","BEDPE"),
-                                   help = "Format of tag file, \"AUTO\", \"BED\", \"ELAND\", \"ELANDMULTI\", \"ELANDEXPORT\", \"SAM\", \"BAM\", \"BOWTIE\", \"BAMPE\", or \"BEDPE\". The default AUTO option will let '%(prog)s' decide which format the file is. DEFAULT: \"AUTO\", MACS3 will pick a format from \"AUTO\", \"BED\", \"ELAND\", \"ELANDMULTI\", \"ELANDEXPORT\", \"SAM\", \"BAM\" and \"BOWTIE\". If the format is BAMPE or BEDPE, please specify it explicitly. Please note that when the format is BAMPE or BEDPE, the -B and --extsize options would be ignored.",
-                                   default = "AUTO" )
-    argparser_pileup.add_argument( "-B", "--both-direction", dest = "bothdirection", action = "store_true", default = False,
-                                   help = "By default, any read will be extended towards downstream direction by extension size. So it's [0,size-1] (1-based index system) for plus strand read and [-size+1,0] for minus strand read where position 0 is 5' end of the aligned read. Default behavior can simulate MACS3 way of piling up ChIP sample reads where extension size is set as fragment size/d. If this option is set as on, aligned reads will be extended in both upstream and downstream directions by extension size. It means [-size,size] where 0 is the 5' end of a aligned read. It can partially simulate MACS3 way of piling up control reads. However MACS3 local bias is calculated by maximizing the expected pileup over a ChIP fragment size/d estimated from 10kb, 1kb, d and whole genome background. This option will be ignored when the format is set as BAMPE or BEDPE. DEFAULT: False" )
 
-    argparser_pileup.add_argument( "--extsize", dest = "extsize", type = int, default = 200,
-                                   help = "The extension size in bps. Each alignment read will become a EXTSIZE of fragment, then be piled up. Check description for -B for detail. It's twice the `shiftsize` in old MACSv1 language. This option will be ignored when the format is set as BAMPE or BEDPE. DEFAULT: 200 " )
-    argparser_pileup.add_argument( "--buffer-size", dest = "buffer_size", type = int, default = "100000",
-                                   help = "Buffer size for incrementally increasing internal array size to store reads alignment information. In most cases, you don't have to change this parameter. However, if there are large number of chromosomes/contigs/scaffolds in your alignment, it's recommended to specify a smaller buffer size in order to decrease memory usage (but it will take longer time to read alignment files). Minimum memory requested for reading an alignment file is about # of CHROMOSOME * BUFFER_SIZE * 8 Bytes. DEFAULT: 100000 " )
+def add_pileup_parser(subparsers):
+    argparser_pileup = subparsers.add_parser("pileup",
+                                             help="Pileup aligned reads (single-end) or fragments (paired-end).")
+    argparser_pileup.add_argument("-i", "--ifile", dest="ifile", type=str, required=True, nargs="+",
+                                  help="Alignment file. If multiple files are given as '-t A B C', then they will all be read and combined. REQUIRED.")
+    argparser_pileup.add_argument("-o", "--ofile", dest="outputfile", type=str, required=True,
+                                  help="Output bedGraph file name. If not specified, will write to standard output. REQUIRED.")
+    add_outdir_option(argparser_pileup)
+    argparser_pileup.add_argument("-f", "--format", dest="format", type=str,
+                                  choices=("AUTO", "BAM", "SAM", "BED", "ELAND", "ELANDMULTI", "ELANDEXPORT", "BOWTIE", "BAMPE", "BEDPE"),
+                                  help="Format of tag file, \"AUTO\", \"BED\", \"ELAND\", \"ELANDMULTI\", \"ELANDEXPORT\", \"SAM\", \"BAM\", \"BOWTIE\", \"BAMPE\", or \"BEDPE\". The default AUTO option will let '%(prog)s' decide which format the file is. DEFAULT: \"AUTO\", MACS3 will pick a format from \"AUTO\", \"BED\", \"ELAND\", \"ELANDMULTI\", \"ELANDEXPORT\", \"SAM\", \"BAM\" and \"BOWTIE\". If the format is BAMPE or BEDPE, please specify it explicitly. Please note that when the format is BAMPE or BEDPE, the -B and --extsize options would be ignored.",
+                                  default="AUTO")
+    argparser_pileup.add_argument("-B", "--both-direction", dest="bothdirection", action="store_true", default=False,
+                                  help="By default, any read will be extended towards downstream direction by extension size. So it's [0,size-1] (1-based index system) for plus strand read and [-size+1,0] for minus strand read where position 0 is 5' end of the aligned read. Default behavior can simulate MACS3 way of piling up ChIP sample reads where extension size is set as fragment size/d. If this option is set as on, aligned reads will be extended in both upstream and downstream directions by extension size. It means [-size,size] where 0 is the 5' end of a aligned read. It can partially simulate MACS3 way of piling up control reads. However MACS3 local bias is calculated by maximizing the expected pileup over a ChIP fragment size/d estimated from 10kb, 1kb, d and whole genome background. This option will be ignored when the format is set as BAMPE or BEDPE. DEFAULT: False")
 
-    argparser_pileup.add_argument( "--verbose", dest = "verbose", type = int, default = 2,
-                                   help = "Set verbose level. 0: only show critical message, 1: show additional warning message, 2: show process information, 3: show debug messages. If you want to know where are the duplicate reads, use 3. DEFAULT:2" )
+    argparser_pileup.add_argument("--extsize", dest="extsize", type=int, default=200,
+                                  help="The extension size in bps. Each alignment read will become a EXTSIZE of fragment, then be piled up. Check description for -B for detail. It's twice the `shiftsize` in old MACSv1 language. This option will be ignored when the format is set as BAMPE or BEDPE. DEFAULT: 200 ")
+    argparser_pileup.add_argument("--buffer-size", dest="buffer_size", type=int, default="100000",
+                                  help="Buffer size for incrementally increasing internal array size to store reads alignment information. In most cases, you don't have to change this parameter. However, if there are large number of chromosomes/contigs/scaffolds in your alignment, it's recommended to specify a smaller buffer size in order to decrease memory usage (but it will take longer time to read alignment files). Minimum memory requested for reading an alignment file is about # of CHROMOSOME * BUFFER_SIZE * 8 Bytes. DEFAULT: 100000 ")
+
+    argparser_pileup.add_argument("--verbose", dest="verbose", type=int, default=2,
+                                  help="Set verbose level. 0: only show critical message, 1: show additional warning message, 2: show process information, 3: show debug messages. If you want to know where are the duplicate reads, use 3. DEFAULT:2")
     return
 
-def add_callvar_parser( subparsers ):
+
+def add_callvar_parser(subparsers):
     """Add function 'variant calling' argument parsers.
     """
     argparser_callvar = subparsers.add_parser("callvar",
-                                              formatter_class = ap.RawDescriptionHelpFormatter,
+                                              formatter_class=ap.RawDescriptionHelpFormatter,
                                               help="Call variants in given peak regions from the alignment BAM files.",
-                                              epilog = """ Assuming you have two types of BAM files. The first type, what we
+                                              epilog=""" Assuming you have two types of BAM files. The first type, what we
 call `TREAT`, is from DNA enrichment assay such as ChIP-seq or
 ATAC-seq where the DNA fragments in the sequencing library are
 enriched in certain genomics regions with potential allele biases; the
@@ -630,53 +645,54 @@ To call variants:
     $ macs3 callvar -b peaks.bed -t TREAT_sorted.bam -c CTRL_sorted.bam -o peaks.vcf
 """)
     # group for input files
-    group_input = argparser_callvar.add_argument_group( "Input files arguments" )
-    group_input.add_argument( "-b", "--peak", dest = "peakbed", type = str, required =True,
-                              help = "Peak regions in BED format, sorted by coordinates. REQUIRED." )
-    group_input.add_argument( "-t", "--treatment", dest = "tfile", type = str, required = True, 
-                              help = "ChIP-seq/ATAC-seq treatment file in BAM format, sorted by coordinates. Make sure the .bai file is avaiable in the same directory. REQUIRED." )
-    group_input.add_argument( "-c", "--control", dest = "cfile", type = str, required = False, 
-                              help = "Optional control file in BAM format, sorted by coordinates. Make sure the .bai file is avaiable in the same directory.")
+    group_input = argparser_callvar.add_argument_group("Input files arguments")
+    group_input.add_argument("-b", "--peak", dest="peakbed", type=str, required =True,
+                             help="Peak regions in BED format, sorted by coordinates. REQUIRED.")
+    group_input.add_argument("-t", "--treatment", dest="tfile", type=str, required=True,
+                             help="ChIP-seq/ATAC-seq treatment file in BAM format, sorted by coordinates. Make sure the .bai file is avaiable in the same directory. REQUIRED.")
+    group_input.add_argument("-c", "--control", dest="cfile", type=str, required=False,
+                             help="Optional control file in BAM format, sorted by coordinates. Make sure the .bai file is avaiable in the same directory.")
     # group for output files
-    group_output = argparser_callvar.add_argument_group( "Output arguments" )
-    add_outdir_option( group_output )
-    group_output.add_argument( "-o", "--ofile", dest = "ofile", type = str, required = True,
-                               help = "Output VCF file name." )    
-    group_output.add_argument( "--verbose", dest = "verbose", type = int, default = 2,
-                               help = "Set verbose level of runtime message. 0: only show critical message, 1: show additional warning message, 2: show process information, 3: show debug messages. DEFAULT:2" )
+    group_output = argparser_callvar.add_argument_group("Output arguments")
+    add_outdir_option(group_output)
+    group_output.add_argument("-o", "--ofile", dest="ofile", type=str, required=True,
+                              help="Output VCF file name.")
+    group_output.add_argument("--verbose", dest="verbose", type=int, default=2,
+                              help="Set verbose level of runtime message. 0: only show critical message, 1: show additional warning message, 2: show process information, 3: show debug messages. DEFAULT:2")
     # group for parameters
-    group_para = argparser_callvar.add_argument_group( "Variant calling arguments" )
-    group_para.add_argument( "-g", "--gq-hetero", dest = "GQCutoffHetero", type = float,
-                             help = "Genotype Quality score (-10log10((L00+L11)/(L01+L00+L11))) cutoff for Heterozygous allele type. Default:0, or there is no cutoff on GQ.", default = 0 )
-    group_para.add_argument( "-G", "--gq-homo", dest = "GQCutoffHomo", type = float,
-                             help = "Genotype Quality score (-10log10((L00+L01)/(L01+L00+L11))) cutoff for Homozygous allele (not the same as reference) type. Default:0, or ther is no cutoff on GQ.", default = 0 )
-    group_para.add_argument( "-Q", dest = "Q", type = int, default = 20,
-                             help = "Only consider bases with quality score greater than this value. Default: 20, which means Q20 or 0.01 error rate." )
-    group_para.add_argument( "-D", dest = "maxDuplicate", type = int, default = 1,
-                             help = "Maximum duplicated reads allowed per mapping position, mapping strand and the same CIGAR code. Default: 1. When sequencing depth is high, to set a higher value might help evaluate the correct allele ratio.")
-    group_para.add_argument( "-F", "--fermi", dest = "fermi", type = str, default = "auto",
-                             help = "Option to control when to apply local assembly through fermi-lite. By default (set as 'auto'), while callvar detects any INDEL variant in a peak region, it will utilize fermi-lite to recover the actual DNA sequences to refine the read alignments. If set as 'on', fermi-lite will be always invoked. It can increase specificity however sensivity and speed will be significantly lower. If set as 'off', Fermi won't be invoked at all. If so, speed and sensitivity can be higher but specificity will be significantly lower. Default: auto" )
-    group_para.add_argument( "--fermi-overlap", dest = "fermiMinOverlap", type = int,
-                             help = "The minimal overlap for fermi to initially assemble two reads. Must be between 1 and read length. A longer fermiMinOverlap is needed while read length is small (e.g. 30 for 36bp read, but 33 for 100bp read may work). Default:30", default = 30 )
-    group_para.add_argument( "--top2alleles-mratio", dest = "top2allelesMinRatio", type = float,
-                             help = "The reads for the top 2 most frequent alleles (e.g. a ref allele and an alternative allele) at a loci shouldn't be too few comparing to total reads mapped. The minimum ratio is set by this optoin. Must be a float between 0.5 and 1.  Default:0.8 which means at least 80%% of reads contain the top 2 alleles.", default = 0.8 )
-    group_para.add_argument( "--altallele-count", dest = "altalleleMinCount", type = int,
-                             help = "The count of the alternative (non-reference) allele at a loci shouldn't be too few. By default, we require at least two reads support the alternative allele. Default:2", default = 2 )
-    group_para.add_argument( "--max-ar", dest = "maxAR", type = float,
-                             help = "The maximum Allele-Ratio allowed while calculating likelihood for allele-specific binding. If we allow higher maxAR, we may mistakenly assign some homozygous loci as heterozygous. Default:0.95", default = 0.95 )
+    group_para = argparser_callvar.add_argument_group("Variant calling arguments")
+    group_para.add_argument("-g", "--gq-hetero", dest="GQCutoffHetero", type=float,
+                            help="Genotype Quality score (-10log10((L00+L11)/(L01+L00+L11))) cutoff for Heterozygous allele type. Default:0, or there is no cutoff on GQ.", default=0)
+    group_para.add_argument("-G", "--gq-homo", dest="GQCutoffHomo", type=float,
+                            help="Genotype Quality score (-10log10((L00+L01)/(L01+L00+L11))) cutoff for Homozygous allele (not the same as reference) type. Default:0, or ther is no cutoff on GQ.", default=0)
+    group_para.add_argument("-Q", dest="Q", type=int, default=20,
+                            help="Only consider bases with quality score greater than this value. Default: 20, which means Q20 or 0.01 error rate.")
+    group_para.add_argument("-D", dest="maxDuplicate", type=int, default=1,
+                            help="Maximum duplicated reads allowed per mapping position, mapping strand and the same CIGAR code. Default: 1. When sequencing depth is high, to set a higher value might help evaluate the correct allele ratio.")
+    group_para.add_argument("-F", "--fermi", dest="fermi", type=str, default="auto",
+                            help="Option to control when to apply local assembly through fermi-lite. By default (set as 'auto'), while callvar detects any INDEL variant in a peak region, it will utilize fermi-lite to recover the actual DNA sequences to refine the read alignments. If set as 'on', fermi-lite will be always invoked. It can increase specificity however sensivity and speed will be significantly lower. If set as 'off', Fermi won't be invoked at all. If so, speed and sensitivity can be higher but specificity will be significantly lower. Default: auto")
+    group_para.add_argument("--fermi-overlap", dest="fermiMinOverlap", type=int,
+                            help="The minimal overlap for fermi to initially assemble two reads. Must be between 1 and read length. A longer fermiMinOverlap is needed while read length is small (e.g. 30 for 36bp read, but 33 for 100bp read may work). Default:30", default=30)
+    group_para.add_argument("--top2alleles-mratio", dest="top2allelesMinRatio", type=float,
+                            help="The reads for the top 2 most frequent alleles (e.g. a ref allele and an alternative allele) at a loci shouldn't be too few comparing to total reads mapped. The minimum ratio is set by this optoin. Must be a float between 0.5 and 1.  Default:0.8 which means at least 80%% of reads contain the top 2 alleles.", default=0.8)
+    group_para.add_argument("--altallele-count", dest="altalleleMinCount", type=int,
+                            help="The count of the alternative (non-reference) allele at a loci shouldn't be too few. By default, we require at least two reads support the alternative allele. Default:2", default=2)
+    group_para.add_argument("--max-ar", dest="maxAR", type=float,
+                            help="The maximum Allele-Ratio allowed while calculating likelihood for allele-specific binding. If we allow higher maxAR, we may mistakenly assign some homozygous loci as heterozygous. Default:0.95", default=0.95)
     # group for misc
-    group_misc = argparser_callvar.add_argument_group( "Misc arguments" )
-    group_misc.add_argument( "-m", "--multiple-processing", dest = "np", type = int, default = 1,
-                             help = "CPU used for mutliple processing. Please note that, assigning more CPUs does not guarantee the process being faster. Creating too many parrallel processes need memory operations and  may negate benefit from multi processing. Default: 1" )
+    group_misc = argparser_callvar.add_argument_group("Misc arguments")
+    group_misc.add_argument("-m", "--multiple-processing", dest="np", type=int, default=1,
+                            help="CPU used for mutliple processing. Please note that, assigning more CPUs does not guarantee the process being faster. Creating too many parrallel processes need memory operations and  may negate benefit from multi processing. Default: 1")
     return
 
-def add_hmmratac_parser( subparsers ):
+
+def add_hmmratac_parser(subparsers):
     """Add function 'HMMRATAC' argument parsers.
     """
     argparser_hmmratac = subparsers.add_parser("hmmratac",
-                                                formatter_class = ap.RawDescriptionHelpFormatter,
-                                                help="Dedicated peak calling based on Hidden Markov Model for ATAC-seq data.",
-                                                epilog = """HMMRATAC is a dedicated tool for processing ATAC-seq data
+                                               formatter_class=ap.RawDescriptionHelpFormatter,
+                                               help="Dedicated peak calling based on Hidden Markov Model for ATAC-seq data.",
+                                               epilog="""HMMRATAC is a dedicated tool for processing ATAC-seq data
 
 HMMRATAC, first released as a JAVA program in 2019, is a dedicated
 tool specifically designed for processing ATAC-seq data. In MACS3, it
@@ -775,7 +791,7 @@ While there's no universal rule, here are a few suggestions:
   normal length (average length 500-1000bps). However, it's
   recommended not to use the lowest cutoff value in the report as this
   may include too much noise from the genome.
-  
+
 * Tune the HMM model *
 
 It's highly recommended to check the runtime message of the HMM model
@@ -818,8 +834,8 @@ assignment in the HMM model file (e.g. test_model.json). For the above
 example, the model.json looks like this (we skipped some detail):
 
 ```
-{"startprob": [...], "transmat": [...], "means": [...], "covars": [...], 
-"covariance_type": "full", "n_features": 4, 
+{"startprob": [...], "transmat": [...], "means": [...], "covars": [...],
+"covariance_type": "full", "n_features": 4,
 "i_open_region": 2, "i_background_region": 0, "i_nucleosomal_region": 1,
 "hmm_binsize": 10}
 ```
@@ -835,145 +851,145 @@ plus an extra option for the HMM model file like `macs3 hmmratac
 --model new_model.json`
 
 """)
-    
-    # group for input files
-    group_input = argparser_hmmratac.add_argument_group( "Input files arguments" )
-    group_input.add_argument( "-i", "--input", dest = "input_file", type = str, required = True, nargs = "+",
-                              help = "Input files containing the aligment results for ATAC-seq paired end reads. If multiple files are given as '-t A B C', then they will all be read and pooled together. The file should be in BAMPE or BEDPE format (aligned in paired end mode). Files can be gzipped. Note: all files should be in the same format! REQUIRED." )
-    group_input.add_argument( "-f", "--format", dest = "format", type = str,
-                              choices = ("BAMPE", "BEDPE"),
-                              help = "Format of input files, \"BAMPE\" or \"BEDPE\". If there are multiple files, they should be in the same format -- either BAMPE or BEDPE. Please check the definition in README. Also please note that the BEDPE only contains three columns -- chromosome, left position of the whole pair, right position of the whole pair-- and is NOT the same BEDPE format used by BEDTOOLS. To convert BAMPE to BEDPE, you can use this command `macs3 filterdup --keep-dup all -f BAMPE -i input.bam -o output.bedpe`. DEFAULT: \"BAMPE\"",
-                              default = "BAMPE" )
-    
-    # group for output files
-    group_output = argparser_hmmratac.add_argument_group( "Output arguments" )
 
-    add_outdir_option( group_output )
-    group_output.add_argument( "-n", "--name", dest = "name", type = str,
-                               help = "Name for this experiment, which will be used as a prefix to generate output file names. DEFAULT: \"NA\"",
-                               default = "NA" )
-    group_output.add_argument( "--cutoff-analysis-only", dest = "cutoff_analysis_only", action = "store_true",
-                                help = "Only run the cutoff analysis and output a report. After generating the report, the process will stop. By default, the cutoff analysis will be included in the whole process, but won't quit after the report is generated. The report will help user decide the three crucial parameters for `-l`, `-u`, and `-c`. So it's highly recommanded to run this first! Please read the report and instructions in `Choices of cutoff values` on how to decide the three crucial parameters. The resolution of cutoff analysis can be controlled by --cutoff-analysis-max and --cutoff-analysis-steps options.",
-                                default = False )
-    group_output.add_argument( "--cutoff-analysis-max", dest="cutoff_analysis_max", type = int,
-                                help = "The maximum cutoff score for performing cutoff analysis. Together with --cutoff-analysis-steps, the resolution in the final report can be controlled. Please check the description in --cutoff-analysis-steps for detail. DEFAULT: 100",
-                                default = 100 )
-    group_output.add_argument( "--cutoff-analysis-steps", dest="cutoff_analysis_steps", type = int,
-                                help = "Steps for performing cutoff analysis. It will be used to decide which cutoff value should be included in the final report. Larger the value, higher resolution the cutoff analysis can be. The cutoff analysis function will first find the smallest (at least 0) and the largest (controlled by --cutoff-analysis-max) foldchange score in the data, then break the range of foldchange score into `CUTOFF_ANALYSIS_STEPS` intervals. It will then use each foldchange score as cutoff to call peaks and calculate the total number of candidate peaks, the total basepairs of peaks, and the average length of peak in basepair. Please note that the final report ideally should include `CUTOFF_ANALYSIS_STEPS` rows, but in practice, if the foldchange cutoff yield zero peak, the row for that foldchange value won't be included.  DEFAULT: 100",
-                                default = 100 )
-    group_output.add_argument( "--save-digested", dest = "save_digested", action = "store_true",
-                               help = "Save the digested ATAC signals of short-, mono-, di-, and tri- signals in three BedGraph files with the names NAME_short.bdg, NAME_mono.bdg, NAME_di.bdg, and NAME_tri.bdg. DEFAULT: False",
-                               default = False )    
-    group_output.add_argument( "--save-states", dest = "save_states", action = "store_true",
-                               help = "Save all open and nucleosomal state annotations into a BED file with the name NAME_states.bed. DEFAULT: False",
-                               default = False )
-    group_output.add_argument( "--save-likelihoods", dest = "save_likelihoods", action = "store_true",
-                               help = "Save the likelihoods to each state annotation in three BedGraph files, named with NAME_open.bdg for open states, NAME_nuc.bdg for nucleosomal states, and NAME_bg.bdg for the background states. DEFAULT: False",
-                               default = False )
-    #group_output.add_argument( "--no-peaks", dest = "store_peaks", action = "store_true",
-    #                           help = "Do not report peaks in bed format. Default: false",
-    #                           default = False )
-    #group_output.add_argument( "--printExclude", dest = "print_exclude", action = "store_true",
-    #                           help = "Output excluded regions into Output_exclude.bed. Default: False",
-    #                           default = False )
-    group_output.add_argument( "--save-training-data", dest = "save_train", action = "store_true",
-                               help = "Save the training regions and training data into NAME_training_regions.bed and NAME_training_data.txt. Default: False",
-                               default = False )
-                       
+    # group for input files
+    group_input = argparser_hmmratac.add_argument_group("Input files arguments")
+    group_input.add_argument("-i", "--input", dest="input_file", type=str, required=True, nargs="+",
+                             help="Input files containing the aligment results for ATAC-seq paired end reads. If multiple files are given as '-t A B C', then they will all be read and pooled together. The file should be in BAMPE or BEDPE format (aligned in paired end mode). Files can be gzipped. Note: all files should be in the same format! REQUIRED.")
+    group_input.add_argument("-f", "--format", dest="format", type=str,
+                             choices=("BAMPE", "BEDPE"),
+                             help="Format of input files, \"BAMPE\" or \"BEDPE\". If there are multiple files, they should be in the same format -- either BAMPE or BEDPE. Please check the definition in README. Also please note that the BEDPE only contains three columns -- chromosome, left position of the whole pair, right position of the whole pair-- and is NOT the same BEDPE format used by BEDTOOLS. To convert BAMPE to BEDPE, you can use this command `macs3 filterdup --keep-dup all -f BAMPE -i input.bam -o output.bedpe`. DEFAULT: \"BAMPE\"",
+                             default="BAMPE")
+
+    # group for output files
+    group_output = argparser_hmmratac.add_argument_group("Output arguments")
+
+    add_outdir_option(group_output)
+    group_output.add_argument("-n", "--name", dest="name", type=str,
+                              help="Name for this experiment, which will be used as a prefix to generate output file names. DEFAULT: \"NA\"",
+                              default="NA")
+    group_output.add_argument("--cutoff-analysis-only", dest="cutoff_analysis_only", action="store_true",
+                              help="Only run the cutoff analysis and output a report. After generating the report, the process will stop. By default, the cutoff analysis will be included in the whole process, but won't quit after the report is generated. The report will help user decide the three crucial parameters for `-l`, `-u`, and `-c`. So it's highly recommanded to run this first! Please read the report and instructions in `Choices of cutoff values` on how to decide the three crucial parameters. The resolution of cutoff analysis can be controlled by --cutoff-analysis-max and --cutoff-analysis-steps options.",
+                              default=False)
+    group_output.add_argument("--cutoff-analysis-max", dest="cutoff_analysis_max", type=int,
+                              help="The maximum cutoff score for performing cutoff analysis. Together with --cutoff-analysis-steps, the resolution in the final report can be controlled. Please check the description in --cutoff-analysis-steps for detail. DEFAULT: 100",
+                              default=100)
+    group_output.add_argument("--cutoff-analysis-steps", dest="cutoff_analysis_steps", type=int,
+                              help="Steps for performing cutoff analysis. It will be used to decide which cutoff value should be included in the final report. Larger the value, higher resolution the cutoff analysis can be. The cutoff analysis function will first find the smallest (at least 0) and the largest (controlled by --cutoff-analysis-max) foldchange score in the data, then break the range of foldchange score into `CUTOFF_ANALYSIS_STEPS` intervals. It will then use each foldchange score as cutoff to call peaks and calculate the total number of candidate peaks, the total basepairs of peaks, and the average length of peak in basepair. Please note that the final report ideally should include `CUTOFF_ANALYSIS_STEPS` rows, but in practice, if the foldchange cutoff yield zero peak, the row for that foldchange value won't be included.  DEFAULT: 100",
+                              default=100)
+    group_output.add_argument("--save-digested", dest="save_digested", action="store_true",
+                              help="Save the digested ATAC signals of short-, mono-, di-, and tri- signals in three BedGraph files with the names NAME_short.bdg, NAME_mono.bdg, NAME_di.bdg, and NAME_tri.bdg. DEFAULT: False",
+                              default=False)
+    group_output.add_argument("--save-states", dest="save_states", action="store_true",
+                              help="Save all open and nucleosomal state annotations into a BED file with the name NAME_states.bed. DEFAULT: False",
+                              default=False)
+    group_output.add_argument("--save-likelihoods", dest="save_likelihoods", action="store_true",
+                              help="Save the likelihoods to each state annotation in three BedGraph files, named with NAME_open.bdg for open states, NAME_nuc.bdg for nucleosomal states, and NAME_bg.bdg for the background states. DEFAULT: False",
+                              default=False)
+    # group_output.add_argument("--no-peaks", dest="store_peaks", action="store_true",
+    #                           help="Do not report peaks in bed format. Default: false",
+    #                           default=False)
+    # group_output.add_argument("--printExclude", dest="print_exclude", action="store_true",
+    #                           help="Output excluded regions into Output_exclude.bed. Default: False",
+    #                           default=False)
+    group_output.add_argument("--save-training-data", dest="save_train", action="store_true",
+                              help="Save the training regions and training data into NAME_training_regions.bed and NAME_training_data.txt. Default: False",
+                              default=False)
+
     # group for EM
-    group_em = argparser_hmmratac.add_argument_group( "EM algorithm arguments" )
-    group_em.add_argument( "--no-fragem", dest = "em_skip", action = "store_true",
-                           help = "Do not perform EM training on the fragment distribution. If set, EM_MEANS and EM.STDDEVS will be used instead. Default: False",
-                           default = False )
-    group_em.add_argument( "--means", dest = "em_means", type = float, nargs = 4,
-                            help = "Comma separated list of initial mean values for the fragment distribution for short fragments, mono-, di-, and tri-nucleosomal fragments. Default: 50 200 400 600",
-                            default = [50, 200, 400, 600] )
-    group_em.add_argument( "--stddevs", dest = "em_stddevs", type = float, nargs = 4,
-                            help = "Comma separated list of initial standard deviation values for fragment distribution for short fragments, mono-, di-, and tri-nucleosomal fragments. Default: 20 20 20 20",
-                            default = [20, 20, 20, 20] )
-    group_em.add_argument( "--min-frag-p", dest = "min_frag_p", type = float,
-                           help = "We will exclude the abnormal fragments that can't be assigned to any of the four signal tracks. After we use EM to find the means and stddevs of the four distributions, we will calculate the likelihood that a given fragment length fit any of the four using normal distribution. The criteria we will use is that if a fragment length has less than MIN_FRAG_P probability to be like either of short, mono, di, or tri-nuc fragment, we will exclude it while generating the four signal tracks for later HMM training and prediction. The value should be between 0 and 1. Larger the value, more abnormal fragments will be allowed. So if you want to include more 'ideal' fragments, make this value smaller. Default = 0.001",
-                           default = 0.001 )
+    group_em = argparser_hmmratac.add_argument_group("EM algorithm arguments")
+    group_em.add_argument("--no-fragem", dest="em_skip", action="store_true",
+                          help="Do not perform EM training on the fragment distribution. If set, EM_MEANS and EM.STDDEVS will be used instead. Default: False",
+                          default=False)
+    group_em.add_argument("--means", dest="em_means", type=float, nargs=4,
+                          help="Comma separated list of initial mean values for the fragment distribution for short fragments, mono-, di-, and tri-nucleosomal fragments. Default: 50 200 400 600",
+                          default=[50, 200, 400, 600])
+    group_em.add_argument("--stddevs", dest="em_stddevs", type=float, nargs=4,
+                          help="Comma separated list of initial standard deviation values for fragment distribution for short fragments, mono-, di-, and tri-nucleosomal fragments. Default: 20 20 20 20",
+                          default=[20, 20, 20, 20])
+    group_em.add_argument("--min-frag-p", dest="min_frag_p", type=float,
+                          help="We will exclude the abnormal fragments that can't be assigned to any of the four signal tracks. After we use EM to find the means and stddevs of the four distributions, we will calculate the likelihood that a given fragment length fit any of the four using normal distribution. The criteria we will use is that if a fragment length has less than MIN_FRAG_P probability to be like either of short, mono, di, or tri-nuc fragment, we will exclude it while generating the four signal tracks for later HMM training and prediction. The value should be between 0 and 1. Larger the value, more abnormal fragments will be allowed. So if you want to include more 'ideal' fragments, make this value smaller. Default=0.001",
+                          default=0.001)
     # group for HMM
-    group_hmm = argparser_hmmratac.add_argument_group( "Hidden Markov Model arguments" )
-    #group_hmm.add_argument( "-s", "--states", dest = "hmm_states", type = int,
-    #                        help = "Number of States in the model. Default = 3. If not k=3, recommend NOT calling peaks, use bedgraph. This option is named as `--kmeans` in HMMRATAC since it will also control the number of clusters in the k-means clustering process to decide the initial emissions for HMM training.",
-    #                        default = 3 )
-    group_hmm.add_argument( "--binsize", dest = "hmm_binsize", type = int,
-                            help = "Size of the bins to split the pileup signals for training and decoding with Hidden Markov Model. Must >= 1. Smaller the binsize, higher the resolution of the results, slower the process. Default = 10",
-                            default = 10 )    
-    group_hmm.add_argument( "-u", "--upper", dest = "hmm_upper", type = int,
-                            help = "Upper limit on fold change range for choosing training sites. This is an important parameter for training so please read. The purpose of this parameter is to EXCLUDE those unusually highly enriched chromatin regions so we can get training samples in 'ordinary' regions instead. It's highly recommended to run the `--cutoff-analysis-only` first to decide the lower cutoff `-l`, the upper cutoff `-u`, and the pre-scanning cutoff `-c`. The upper cutoff should be the cutoff in the cutoff analysis result that can capture some (typically hundreds of) extremely high enrichment and unusually wide peaks. Default: 20",
-                            default = 20 )
-    group_hmm.add_argument( "-l", "--lower", dest = "hmm_lower", type = int,
-                            help = "Lower limit on fold change range for choosing training sites. This is an important parameter for training so please read. The purpose of this parameter is to ONLY INCLUDE those chromatin regions having ordinary enrichment so we can get training samples to learn the common features through HMM. It's highly recommended to run the `--cutoff-analysis-only` first to decide the lower cutoff `-l`, the upper cutoff `-u`, and the pre-scanning cutoff `-c`. The lower cutoff should be the cutoff in the cutoff analysis result that can capture moderate number ( about 10k ) of peaks with normal width ( average length 500-1000bps long). Default: 10",
-                            default = 10 )
-    group_hmm.add_argument( "--maxTrain", dest = "hmm_maxTrain", type = int,
-                            help = "Maximum number of training regions to use. After we identify the training regions between `-l` and `-u`, the lower and upper cutoffs, we will randomly pick this number of regions for training. Default: 1000",
-                            default = 1000 )
-    group_hmm.add_argument( "--training-flanking", dest = "hmm_training_flanking", type = int, required = False,
-                            help = "Training regions will be expanded to both side with this number of basepairs. The purpose is to include more background regions. Default: 1000",
-                            default = 1000 )
-    group_hmm.add_argument( "-t", "--training", dest = "hmm_training_regions", type = str, required = False, 
-                           help = "Filename of training regions (previously was BED_file) to use for training HMM, instead of using foldchange settings to select. Default: NA" )
-    #group_hmm.add_argument( "-z", "--zscore", dest = "hmm_zscore", type = int,
-    #                        help = "Zscored read depth to mask during Viterbi decoding. Default: 100",
-    #                        default = 100 )
-    #group_hmm.add_argument( "--window", dest = "hmm_window", type = int,
-    #                        help = "Size of the bins to split the genome into for Viterbi decoding. To save memory, the genome is split into WINDOW long bins and viterbi decoding occurs across each bin. Default = 25000000. Note: For machines with limited memory, it is recommended to reduce the size of the bins.",
-    #                        default = 25000000 )
-    group_hmm.add_argument( "--model", dest = "hmm_file", type = str, required = False, 
-                            help = "A JSON file generated from previous HMMRATAC run to use instead of creating new one. When provided, HMM training will be skipped. Default: NA" )
-    group_hmm.add_argument( "--modelonly", dest = "hmm_modelonly", action = "store_true", default = False,
-                           help = "Stop the program after generating model. Use this option to generate HMM model ONLY, which can be later applied with `--model`. Default: False")
-    group_hmm.add_argument( "--hmm-type", dest = "hmm_type", type = str, choices = ("gaussian", "poisson"), default = "gaussian",
-                           help = "Use --hmm-type to select a Gaussian ('gaussian') or Poisson ('poisson') model for the hidden markov model in HMMRATAC. Default: 'gaussian'.")
+    group_hmm = argparser_hmmratac.add_argument_group("Hidden Markov Model arguments")
+    #group_hmm.add_argument("-s", "--states", dest="hmm_states", type=int,
+    #                        help="Number of States in the model. Default=3. If not k=3, recommend NOT calling peaks, use bedgraph. This option is named as `--kmeans` in HMMRATAC since it will also control the number of clusters in the k-means clustering process to decide the initial emissions for HMM training.",
+    #                        default=3)
+    group_hmm.add_argument("--binsize", dest="hmm_binsize", type=int,
+                           help="Size of the bins to split the pileup signals for training and decoding with Hidden Markov Model. Must >= 1. Smaller the binsize, higher the resolution of the results, slower the process. Default=10",
+                           default=10)
+    group_hmm.add_argument("-u", "--upper", dest="hmm_upper", type=int,
+                           help="Upper limit on fold change range for choosing training sites. This is an important parameter for training so please read. The purpose of this parameter is to EXCLUDE those unusually highly enriched chromatin regions so we can get training samples in 'ordinary' regions instead. It's highly recommended to run the `--cutoff-analysis-only` first to decide the lower cutoff `-l`, the upper cutoff `-u`, and the pre-scanning cutoff `-c`. The upper cutoff should be the cutoff in the cutoff analysis result that can capture some (typically hundreds of) extremely high enrichment and unusually wide peaks. Default: 20",
+                           default=20)
+    group_hmm.add_argument("-l", "--lower", dest="hmm_lower", type=int,
+                           help="Lower limit on fold change range for choosing training sites. This is an important parameter for training so please read. The purpose of this parameter is to ONLY INCLUDE those chromatin regions having ordinary enrichment so we can get training samples to learn the common features through HMM. It's highly recommended to run the `--cutoff-analysis-only` first to decide the lower cutoff `-l`, the upper cutoff `-u`, and the pre-scanning cutoff `-c`. The lower cutoff should be the cutoff in the cutoff analysis result that can capture moderate number ( about 10k) of peaks with normal width ( average length 500-1000bps long). Default: 10",
+                           default=10)
+    group_hmm.add_argument("--maxTrain", dest="hmm_maxTrain", type=int,
+                           help="Maximum number of training regions to use. After we identify the training regions between `-l` and `-u`, the lower and upper cutoffs, we will randomly pick this number of regions for training. Default: 1000",
+                           default=1000)
+    group_hmm.add_argument("--training-flanking", dest="hmm_training_flanking", type=int, required=False,
+                           help="Training regions will be expanded to both side with this number of basepairs. The purpose is to include more background regions. Default: 1000",
+                           default=1000)
+    group_hmm.add_argument("-t", "--training", dest="hmm_training_regions", type=str, required=False,
+                           help="Filename of training regions (previously was BED_file) to use for training HMM, instead of using foldchange settings to select. Default: NA")
+    #group_hmm.add_argument("-z", "--zscore", dest="hmm_zscore", type=int,
+    #                        help="Zscored read depth to mask during Viterbi decoding. Default: 100",
+    #                        default=100)
+    #group_hmm.add_argument("--window", dest="hmm_window", type=int,
+    #                        help="Size of the bins to split the genome into for Viterbi decoding. To save memory, the genome is split into WINDOW long bins and viterbi decoding occurs across each bin. Default=25000000. Note: For machines with limited memory, it is recommended to reduce the size of the bins.",
+    #                        default=25000000)
+    group_hmm.add_argument("--model", dest="hmm_file", type=str, required=False,
+                           help="A JSON file generated from previous HMMRATAC run to use instead of creating new one. When provided, HMM training will be skipped. Default: NA")
+    group_hmm.add_argument("--modelonly", dest="hmm_modelonly", action="store_true", default=False,
+                           help="Stop the program after generating model. Use this option to generate HMM model ONLY, which can be later applied with `--model`. Default: False")
+    group_hmm.add_argument("--hmm-type", dest="hmm_type", type=str, choices=("gaussian", "poisson"), default="gaussian",
+                           help="Use --hmm-type to select a Gaussian ('gaussian') or Poisson ('poisson') model for the hidden markov model in HMMRATAC. Default: 'gaussian'.")
 
     # group for peak calling arguments
-    group_call = argparser_hmmratac.add_argument_group( "Peak calling/HMM decoding arguments" )
-    group_call.add_argument( "-c", "--prescan-cutoff", dest = "prescan_cutoff", type = float,
-                             help = "The fold change cutoff for prescanning candidate regions in the whole dataset. Then we will use HMM to predict/decode states on these candidate regions. Higher the prescan cutoff, fewer regions will be considered. Must > 1. This is an important parameter for decoding so please read. The purpose of this parameter is to EXCLUDE those chromatin regions having noises/random enrichment so we can have a large number of possible regions to predict the HMM states. It's highly recommended to run the `--cutoff-analysis-only` first to decide the lower cutoff `-l`, the upper cutoff `-u`, and the pre-scanning cutoff `-c`. The pre-scanning cutoff should be the cutoff close to the BOTTOM of the cutoff analysis result that can capture large number of possible peaks with normal length (average length 500-1000bps). In most cases, please do not pick a cutoff too low that capture almost all the background noises from the data. Default: 1.2",
-                             default = 1.2 )
-    
-    group_call.add_argument( "--minlen", dest = "openregion_minlen", type = int,
-                             help = "Minimum length of open region to call accessible regions. Must be larger than 0. If it is set as 0, it means no filtering on the length of the open regions called. Please note that, when bin size is small, setting a too small OPENREGION_MINLEN will bring a lot of false positives. Default: 100",
-                             default = 100 )
-    #group_call.add_argument( "--score", dest = "call_score", type = str, choices = ("max", "ave", "med", "fc", "zscore", "all"),
-    #                         help = "What type of score system to use for peaks. Can be used for ranking peaks. Default: max",
-    #                         default = "max" )
-    #group_call.add_argument( "--threshold", dest = "call_threshold", type = float,
-    #                         help = "Threshold for reporting peaks. Only peaks who's score is >= this value will be reported. Default: 100",
-    #                         default = 100 )
+    group_call = argparser_hmmratac.add_argument_group("Peak calling/HMM decoding arguments")
+    group_call.add_argument("-c", "--prescan-cutoff", dest="prescan_cutoff", type=float,
+                            help="The fold change cutoff for prescanning candidate regions in the whole dataset. Then we will use HMM to predict/decode states on these candidate regions. Higher the prescan cutoff, fewer regions will be considered. Must > 1. This is an important parameter for decoding so please read. The purpose of this parameter is to EXCLUDE those chromatin regions having noises/random enrichment so we can have a large number of possible regions to predict the HMM states. It's highly recommended to run the `--cutoff-analysis-only` first to decide the lower cutoff `-l`, the upper cutoff `-u`, and the pre-scanning cutoff `-c`. The pre-scanning cutoff should be the cutoff close to the BOTTOM of the cutoff analysis result that can capture large number of possible peaks with normal length (average length 500-1000bps). In most cases, please do not pick a cutoff too low that capture almost all the background noises from the data. Default: 1.2",
+                            default=1.2)
+
+    group_call.add_argument("--minlen", dest="openregion_minlen", type=int,
+                            help="Minimum length of open region to call accessible regions. Must be larger than 0. If it is set as 0, it means no filtering on the length of the open regions called. Please note that, when bin size is small, setting a too small OPENREGION_MINLEN will bring a lot of false positives. Default: 100",
+                            default=100)
+    # group_call.add_argument("--score", dest="call_score", type=str, choices=("max", "ave", "med", "fc", "zscore", "all"),
+    #                         help="What type of score system to use for peaks. Can be used for ranking peaks. Default: max",
+    #                         default="max")
+    # group_call.add_argument("--threshold", dest="call_threshold", type=float,
+    #                         help="Threshold for reporting peaks. Only peaks who's score is >= this value will be reported. Default: 100",
+    #                         default=100)
     # group for misc
-    group_misc = argparser_hmmratac.add_argument_group( "Misc arguments" )
-    group_misc.add_argument( "--pileup-short", dest = "pileup_short", action = "store_true",
-                             help = "By default, HMMRATAC will pileup all fragments in order to identify regions for training and candidate regions for decoding. When this option is on, it will pileup only the short fragments to do so. Although it sounds a good idea since we assume that open region should have a lot of short fragments, it may be possible that the overall short fragments are too few to be useful. Default: False",
-                             default = False )
-    group_misc.add_argument( "--randomSeed", dest = "hmm_randomSeed", type = int,
-                             help = "Seed to set for random sampling of training regions. Default: 10151",
-                             default = 10151 )
-    group_misc.add_argument( "--decoding-steps", dest = "decoding_steps", type = int, default = 1000, 
-                             help = "Number of candidate regions to be decoded at a time. The HMM model will be applied with Viterbi to find the optimal state path in each region. bigger the number, 'possibly' faster the decoding process, 'definitely' larger the memory usage. Default: 1000.")
-    group_misc.add_argument( "-e", "--blacklist", dest = "blacklist", type = str, required = False, 
-                             help = "Filename of blacklisted regions to exclude (previously was BED_file). Examples are those from ENCODE. Default: NA" )
-    group_misc.add_argument( "--keep-duplicates", dest = "misc_keep_duplicates", action = "store_true",
-                             help = "Keep duplicate reads from analysis. By default, duplicate reads will be removed. Default: False",
-                             default = False )
-    #group_misc.add_argument( "--trim", dest = "misc_trim", type = int,
-    #                         help = "How many signals from the end to trim off (ie starting with tri signal then di etc). This may be useful if your data doesn't contain many large fragments. Default: 0",
-    #                         default = 0 )
-    #group_misc.add_argument( "-m", "--multiple-processing", dest = "np", type = int,
-    #                         help = "CPU used for mutliple processing. Please note that, assigning more CPUs does not guarantee the process being faster. Creating too many parrallel processes need memory operations and  may negate benefit from multi processing. Default: 1",
-    #                         default = 1 )
-    group_misc.add_argument( "--verbose", dest = "verbose", type = int,
-                             help = "Set verbose level of runtime message. 0: only show critical message, 1: show additional warning message, 2: show process information, 3: show debug messages. DEFAULT:2",
-                             default = 2 )
-    #group_misc.add_argument( "-q", "--minmapq", dest = "min_map_quality", type = int,
-    #                           help = "Minimum mapping quality of reads to keep. Default: 30",
-    #                           default = 30 )
-    group_misc.add_argument( "--buffer-size", dest = "buffer_size", type = int, default = "100000",
-                               help = "Buffer size for incrementally increasing internal array size to store reads alignment information. In most cases, you don't have to change this parameter. However, if there are large number of chromosomes/contigs/scaffolds in your alignment, it's recommended to specify a smaller buffer size in order to decrease memory usage (but it will take longer time to read alignment files). Minimum memory requested for reading an alignment file is about # of CHROMOSOME * BUFFER_SIZE * 8 Bytes. DEFAULT: 100000 " )
-    
+    group_misc = argparser_hmmratac.add_argument_group("Misc arguments")
+    group_misc.add_argument("--pileup-short", dest="pileup_short", action="store_true",
+                            help="By default, HMMRATAC will pileup all fragments in order to identify regions for training and candidate regions for decoding. When this option is on, it will pileup only the short fragments to do so. Although it sounds a good idea since we assume that open region should have a lot of short fragments, it may be possible that the overall short fragments are too few to be useful. Default: False",
+                            default=False)
+    group_misc.add_argument("--randomSeed", dest="hmm_randomSeed", type=int,
+                            help="Seed to set for random sampling of training regions. Default: 10151",
+                            default=10151)
+    group_misc.add_argument("--decoding-steps", dest="decoding_steps", type=int, default=1000, 
+                            help="Number of candidate regions to be decoded at a time. The HMM model will be applied with Viterbi to find the optimal state path in each region. bigger the number, 'possibly' faster the decoding process, 'definitely' larger the memory usage. Default: 1000.")
+    group_misc.add_argument("-e", "--blacklist", dest="blacklist", type=str, required=False, 
+                            help="Filename of blacklisted regions to exclude (previously was BED_file). Examples are those from ENCODE. Default: NA")
+    group_misc.add_argument("--keep-duplicates", dest="misc_keep_duplicates", action="store_true",
+                            help="Keep duplicate reads from analysis. By default, duplicate reads will be removed. Default: False",
+                            default=False)
+    # group_misc.add_argument("--trim", dest="misc_trim", type=int,
+    #                         help="How many signals from the end to trim off (ie starting with tri signal then di etc). This may be useful if your data doesn't contain many large fragments. Default: 0",
+    #                         default=0)
+    # group_misc.add_argument("-m", "--multiple-processing", dest="np", type=int,
+    #                         help="CPU used for mutliple processing. Please note that, assigning more CPUs does not guarantee the process being faster. Creating too many parrallel processes need memory operations and  may negate benefit from multi processing. Default: 1",
+    #                         default=1)
+    group_misc.add_argument("--verbose", dest="verbose", type=int,
+                            help="Set verbose level of runtime message. 0: only show critical message, 1: show additional warning message, 2: show process information, 3: show debug messages. DEFAULT:2",
+                            default=2)
+    # group_misc.add_argument("-q", "--minmapq", dest="min_map_quality", type=int,
+    #                           help="Minimum mapping quality of reads to keep. Default: 30",
+    #                           default=30)
+    group_misc.add_argument("--buffer-size", dest="buffer_size", type=int, default="100000",
+                            help="Buffer size for incrementally increasing internal array size to store reads alignment information. In most cases, you don't have to change this parameter. However, if there are large number of chromosomes/contigs/scaffolds in your alignment, it's recommended to specify a smaller buffer size in order to decrease memory usage (but it will take longer time to read alignment files). Minimum memory requested for reading an alignment file is about # of CHROMOSOME * BUFFER_SIZE * 8 Bytes. DEFAULT: 100000 ")
+
     return
 
 
@@ -984,4 +1000,4 @@ if __name__ == '__main__':
     except KeyboardInterrupt:
         sys.stderr.write("User interrupted me! ;-) Bye!\n")
     except MemoryError:
-        sys.stderr.write( "MemoryError occurred. If your input file has a large number of contigs/chromosomes, decrease the buffer_size value by setting --buffer-size option." )
+        sys.stderr.write("MemoryError occurred. If your input file has a large number of contigs/chromosomes, decrease the buffer_size value by setting --buffer-size option.")

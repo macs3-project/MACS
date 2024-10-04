@@ -1,5 +1,4 @@
-# Time-stamp: <2024-04-19 15:11:59 Tao Liu>
-
+# Time-stamp: <2024-10-02 19:47:03 Tao Liu>
 """Module Description
 
 This code is free software; you can redistribute it and/or modify it
@@ -12,33 +11,31 @@ the distribution).
 # ------------------------------------
 import sys
 import os
-import re
-import resource # we turn on memory monitoring inside of logging
-from argparse import ArgumentError
-from subprocess import Popen, PIPE
 from math import log
 
 # ------------------------------------
 # MACS3 modules
 # ------------------------------------
-from MACS3.IO.Parser import BEDParser, ELANDResultParser, ELANDMultiParser, \
-    ELANDExportParser, SAMParser, BAMParser, BAMPEParser,\
-    BEDPEParser, BowtieParser,  guess_parser
+from MACS3.IO.Parser import (BEDParser, ELANDResultParser,
+                             ELANDMultiParser, ELANDExportParser,
+                             SAMParser, BAMParser, BAMPEParser,
+                             BEDPEParser, BowtieParser,  guess_parser)
 
 from MACS3.Utilities.Constants import EFFECTIVEGS as efgsize
+
 # ------------------------------------
 # constants
 # ------------------------------------
 
-import logging
-import MACS3.Utilities.Logger
+from MACS3.Utilities.Logger import logging
 # ------------------------------------
 # Misc functions
 # ------------------------------------
 
 logger = logging.getLogger(__name__)
 
-def opt_validate_callpeak ( options ):
+
+def opt_validate_callpeak(options):
     """Validate options from a OptParser object.
 
     Ret: Validated options object.
@@ -46,18 +43,18 @@ def opt_validate_callpeak ( options ):
     # logging object
     logger.setLevel((4-options.verbose)*10)
 
-    options.error   = logger.critical        # function alias
-    options.warn    = logger.warning
-    options.debug   = logger.debug
-    options.info    = logger.info
-    
+    options.error = logger.critical        # function alias
+    options.warn = logger.warning
+    options.debug = logger.debug
+    options.info = logger.info
+
     # gsize
     try:
         options.gsize = efgsize[options.gsize]
-    except:
+    except KeyError:
         try:
             options.gsize = float(options.gsize)
-        except:
+        except ValueError:
             logger.error("Error when interpreting --gsize option: %s" % options.gsize)
             logger.error("Available shortcuts of effective genome sizes are %s" % ",".join(list(efgsize.keys())))
             sys.exit(1)
@@ -100,17 +97,12 @@ def opt_validate_callpeak ( options ):
             logger.error("--keep-dup should be 'auto', 'all' or an integer!")
             sys.exit(1)
 
-    # shiftsize>0
-    #if options.shiftsize:               # only if --shiftsize is set, it's true
-    #    options.extsize = 2 * options.shiftsize
-    #else:                               # if --shiftsize is not set
-    #    options.shiftsize = options.extsize / 2
-    if options.extsize < 1 :
+    if options.extsize < 1:
         logger.error("--extsize must >= 1!")
         sys.exit(1)
 
     # refine_peaks, call_summits can't be combined with --broad
-    #if options.broad and (options.refine_peaks or options.call_summits):
+    # if options.broad and (options.refine_peaks or options.call_summits):
     #    logger.error("--broad can't be combined with --refine-peaks or --call-summits!")
     #    sys.exit(1)
 
@@ -121,12 +113,12 @@ def opt_validate_callpeak ( options ):
     if options.pvalue:
         # if set, ignore qvalue cutoff
         options.log_qvalue = None
-        options.log_pvalue = log(options.pvalue,10)*-1
+        options.log_pvalue = log(options.pvalue, 10) * -1
     else:
-        options.log_qvalue = log(options.qvalue,10)*-1
+        options.log_qvalue = log(options.qvalue, 10) * -1
         options.log_pvalue = None
     if options.broad:
-        options.log_broadcutoff = log(options.broadcutoff,10)*-1
+        options.log_broadcutoff = log(options.broadcutoff, 10) * -1
 
     # uppercase the format string
     options.format = options.format.upper()
@@ -144,50 +136,56 @@ def opt_validate_callpeak ( options ):
         sys.exit(1)
 
     # output filenames
-    options.peakxls = os.path.join( options.outdir, options.name+"_peaks.xls" )
-    options.peakbed = os.path.join( options.outdir, options.name+"_peaks.bed" )
-    options.peakNarrowPeak = os.path.join( options.outdir, options.name+"_peaks.narrowPeak" )
-    options.peakBroadPeak = os.path.join( options.outdir, options.name+"_peaks.broadPeak" )
-    options.peakGappedPeak = os.path.join( options.outdir, options.name+"_peaks.gappedPeak" )
-    options.summitbed = os.path.join( options.outdir, options.name+"_summits.bed" )
-    options.bdg_treat = os.path.join( options.outdir, options.name+"_treat_pileup.bdg" )
-    options.bdg_control= os.path.join( options.outdir, options.name+"_control_lambda.bdg" )
+    options.peakxls = os.path.join(options.outdir, options.name
+                                   + "_peaks.xls")
+    options.peakbed = os.path.join(options.outdir, options.name
+                                   + "_peaks.bed")
+    options.peakNarrowPeak = os.path.join(options.outdir, options.name
+                                          + "_peaks.narrowPeak")
+    options.peakBroadPeak = os.path.join(options.outdir, options.name
+                                         + "_peaks.broadPeak")
+    options.peakGappedPeak = os.path.join(options.outdir, options.name
+                                          + "_peaks.gappedPeak")
+    options.summitbed = os.path.join(options.outdir, options.name
+                                     + "_summits.bed")
+    options.bdg_treat = os.path.join(options.outdir, options.name
+                                     + "_treat_pileup.bdg")
+    options.bdg_control = os.path.join(options.outdir, options.name
+                                       + "_control_lambda.bdg")
     if options.cutoff_analysis:
-        options.cutoff_analysis_file = os.path.join( options.outdir, options.name+"_cutoff_analysis.txt" )
+        options.cutoff_analysis_file = os.path.join(options.outdir, options.name
+                                                    + "_cutoff_analysis.txt")
     else:
         options.cutoff_analysis_file = "None"
-    #options.negxls  = os.path.join( options.name+"_negative_peaks.xls" )
-    #options.diagxls = os.path.join( options.name+"_diag.xls" )
-    options.modelR  = os.path.join( options.outdir, options.name+"_model.r" )
-    #options.pqtable  = os.path.join( options.outdir, options.name+"_pq_table.txt" )
+    options.modelR = os.path.join(options.outdir, options.name+"_model.r")
 
     options.argtxt = "\n".join((
-        "# Command line: %s" % " ".join(sys.argv[1:]),\
-        "# ARGUMENTS LIST:",\
-        "# name = %s" % (options.name),\
-        "# format = %s" % (options.format),\
-        "# ChIP-seq file = %s" % (options.tfile),\
-        "# control file = %s" % (options.cfile),\
-        "# effective genome size = %.2e" % (options.gsize),\
-        #"# tag size = %d" % (options.tsize),\
-        "# band width = %d" % (options.bw),\
-        "# model fold = %s\n" % (options.mfold),\
-        ))
+        "# Command line: %s" % " ".join(sys.argv[1:]),
+        "# ARGUMENTS LIST:",
+        "# name = %s" % (options.name),
+        "# format = %s" % (options.format),
+        "# ChIP-seq file = %s" % (options.tfile),
+        "# control file = %s" % (options.cfile),
+        "# effective genome size = %.2e" % (options.gsize),
+        # "# tag size = %d" % (options.tsize),
+        "# band width = %d" % (options.bw),
+        "# model fold = %s\n" % (options.mfold),
+       ))
 
     if options.pvalue:
         if options.broad:
-            options.argtxt +=  "# pvalue cutoff for narrow/strong regions = %.2e\n" % (options.pvalue)
-            options.argtxt +=  "# pvalue cutoff for broad/weak regions = %.2e\n" % (options.broadcutoff)
-            options.argtxt +=  "# qvalue will not be calculated and reported as -1 in the final output.\n"
+            options.argtxt += "# pvalue cutoff for narrow/strong regions = %.2e\n" % (options.pvalue)
+            options.argtxt += "# pvalue cutoff for broad/weak regions = %.2e\n" % (options.broadcutoff)
+            options.argtxt += "# qvalue will not be calculated and reported as -1 in the final output.\n"
         else:
-            options.argtxt +=  "# pvalue cutoff = %.2e\n" % (options.pvalue)
-            options.argtxt +=  "# qvalue will not be calculated and reported as -1 in the final output.\n"
+            options.argtxt += "# pvalue cutoff = %.2e\n" % (options.pvalue)
+            options.argtxt += "# qvalue will not be calculated and reported as -1 in the final output.\n"
     else:
         if options.broad:
-            options.argtxt +=  "# qvalue cutoff for narrow/strong regions = %.2e\n" % (options.qvalue)
-            options.argtxt +=  "# qvalue cutoff for broad/weak regions = %.2e\n" % (options.broadcutoff)
+            options.argtxt += "# qvalue cutoff for narrow/strong regions = %.2e\n" % (options.qvalue)
+            options.argtxt += "# qvalue cutoff for broad/weak regions = %.2e\n" % (options.broadcutoff)
         else:
-            options.argtxt +=  "# qvalue cutoff = %.2e\n" % (options.qvalue)
+            options.argtxt += "# qvalue cutoff = %.2e\n" % (options.qvalue)
 
     if options.maxgap:
         options.argtxt += "# The maximum gap between significant sites = %d\n" % options.maxgap
@@ -231,7 +229,7 @@ def opt_validate_callpeak ( options ):
     else:
         options.argtxt += "# Paired-End mode is off\n"
 
-    #if options.refine_peaks:
+    # if options.refine_peaks:
     #    options.argtxt += "# Refining peak for read balance is on\n"
     if options.call_summits:
         options.argtxt += "# Searching for subpeak summits is on\n"
@@ -241,7 +239,8 @@ def opt_validate_callpeak ( options ):
 
     return options
 
-def opt_validate_diffpeak ( options ):
+
+def opt_validate_filterdup(options):
     """Validate options from a OptParser object.
 
     Ret: Validated options object.
@@ -249,117 +248,18 @@ def opt_validate_diffpeak ( options ):
     # logging object
     logger.setLevel((4-options.verbose)*10)
 
-    options.error   = logger.critical        # function alias
-    options.warn    = logger.warning
-    options.debug   = logger.debug
-    options.info    = logger.info
-    
-    # format
-    options.gzip_flag = False           # if the input is gzip file
+    options.error = logger.critical        # function alias
+    options.warn = logger.warning
+    options.debug = logger.debug
+    options.info = logger.info
 
-#    options.format = options.format.upper()
-    # fox this stuff
-#    if True: pass
-#    elif options.format == "AUTO":
-#        options.parser = guess_parser
-#    else:
-#        logger.error("Format \"%s\" cannot be recognized!" % (options.format))
-#        sys.exit(1)
-
-    if options.peaks_pvalue:
-        # if set, ignore qvalue cutoff
-        options.peaks_log_qvalue = None
-        options.peaks_log_pvalue = log(options.peaks_pvalue,10)*-1
-        options.track_score_method = 'p'
-    else:
-        options.peaks_log_qvalue = log(options.peaks_qvalue,10)*-1
-        options.peaks_log_pvalue = None
-        options.track_score_method = 'q'
-
-    if options.diff_pvalue:
-        # if set, ignore qvalue cutoff
-        options.log_qvalue = None
-        options.log_pvalue = log(options.diff_pvalue,10)*-1
-        options.score_method = 'p'
-    else:
-        options.log_qvalue = log(options.diff_qvalue,10)*-1
-        options.log_pvalue = None
-        options.score_method = 'q'
-
-    # output filenames
-    options.peakxls = options.name+"_diffpeaks.xls"
-    options.peakbed = options.name+"_diffpeaks.bed"
-    options.peak1xls = options.name+"_diffpeaks_by_peaks1.xls"
-    options.peak2xls = options.name+"_diffpeaks_by_peaks2.xls"
-    options.bdglogLR = options.name+"_logLR.bdg"
-    options.bdgpvalue = options.name+"_logLR.bdg"
-    options.bdglogFC = options.name+"_logLR.bdg"
-
-    options.call_peaks = True
-    if not (options.peaks1 == '' or options.peaks2 == ''):
-        if options.peaks1 == '':
-            raise ArgumentError('peaks1', 'Must specify both peaks1 and peaks2, or neither (to call peaks again)')
-        elif options.peaks2 == '':
-            raise ArgumentError('peaks2', 'Must specify both peaks1 and peaks2, or neither (to call peaks again)')
-        options.call_peaks = False
-        options.argtxt = "\n".join((
-            "# ARGUMENTS LIST:",\
-            "# name = %s" % (options.name),\
-#            "# format = %s" % (options.format),\
-            "# ChIP-seq file 1 = %s" % (options.t1bdg),\
-            "# control file 1 = %s" % (options.c1bdg),\
-            "# ChIP-seq file 2 = %s" % (options.t2bdg),\
-            "# control file 2 = %s" % (options.c2bdg),\
-            "# Peaks, condition 1 = %s" % (options.peaks1),\
-            "# Peaks, condition 2 = %s" % (options.peaks2),\
-            ""
-            ))
-    else:
-        options.argtxt = "\n".join((
-            "# ARGUMENTS LIST:",\
-            "# name = %s" % (options.name),\
-#            "# format = %s" % (options.format),\
-            "# ChIP-seq file 1 = %s" % (options.t1bdg),\
-            "# control file 1 = %s" % (options.c1bdg),\
-            "# ChIP-seq file 2 = %s" % (options.t2bdg),\
-            "# control file 2 = %s" % (options.c2bdg),\
-            ""
-            ))
-
-        if options.peaks_pvalue:
-            options.argtxt +=  "# treat/control -log10(pvalue) cutoff = %.2e\n" % (options.peaks_log_pvalue)
-            options.argtxt +=  "# treat/control -log10(qvalue) will not be calculated and reported as -1 in the final output.\n"
-        else:
-            options.argtxt +=  "# treat/control -log10(qvalue) cutoff = %.2e\n" % (options.peaks_log_qvalue)
-
-    if options.diff_pvalue:
-        options.argtxt +=  "# differential pvalue cutoff = %.2e\n" % (options.log_pvalue)
-        options.argtxt +=  "# differential qvalue will not be calculated and reported as -1 in the final output.\n"
-    else:
-        options.argtxt +=  "# differential qvalue cutoff = %.2e\n" % (options.log_qvalue)
-
-    return options
-
-def opt_validate_filterdup ( options ):
-    """Validate options from a OptParser object.
-
-    Ret: Validated options object.
-    """
-    # logging object
-    logger.setLevel((4-options.verbose)*10)
-
-    options.error   = logger.critical        # function alias
-    options.warn    = logger.warning
-    options.debug   = logger.debug
-    options.info    = logger.info
-    
     # gsize
     try:
         options.gsize = efgsize[options.gsize]
-    except:
+    except KeyError:
         try:
             options.gsize = float(options.gsize)
-        except:
+        except ValueError:
             logger.error("Error when interpreting --gsize option: %s" % options.gsize)
             logger.error("Available shortcuts of effective genome sizes are %s" % ",".join(list(efgsize.keys())))
             sys.exit(1)
@@ -408,7 +308,8 @@ def opt_validate_filterdup ( options ):
 
     return options
 
-def opt_validate_randsample ( options ):
+
+def opt_validate_randsample(options):
     """Validate options from a OptParser object.
 
     Ret: Validated options object.
@@ -416,11 +317,11 @@ def opt_validate_randsample ( options ):
     # logging object
     logger.setLevel((4-options.verbose)*10)
 
-    options.error   = logger.critical        # function alias
-    options.warn    = logger.warning
-    options.debug   = logger.debug
-    options.info    = logger.info
-    
+    options.error = logger.critical        # function alias
+    options.warn = logger.warning
+    options.debug = logger.debug
+    options.info = logger.info
+
     # format
 
     options.gzip_flag = False           # if the input is gzip file
@@ -467,7 +368,8 @@ def opt_validate_randsample ( options ):
 
     return options
 
-def opt_validate_refinepeak ( options ):
+
+def opt_validate_refinepeak(options):
     """Validate options from a OptParser object.
 
     Ret: Validated options object.
@@ -475,11 +377,11 @@ def opt_validate_refinepeak ( options ):
     # logging object
     logger.setLevel((4-options.verbose)*10)
 
-    options.error   = logger.critical        # function alias
-    options.warn    = logger.warning
-    options.debug   = logger.debug
-    options.info    = logger.info
-    
+    options.error = logger.critical        # function alias
+    options.warn = logger.warning
+    options.debug = logger.debug
+    options.info = logger.info
+
     # format
 
     options.gzip_flag = False           # if the input is gzip file
@@ -511,7 +413,8 @@ def opt_validate_refinepeak ( options ):
 
     return options
 
-def opt_validate_predictd ( options ):
+
+def opt_validate_predictd(options):
     """Validate options from a OptParser object.
 
     Ret: Validated options object.
@@ -519,18 +422,18 @@ def opt_validate_predictd ( options ):
     # logging object
     logger.setLevel((4-options.verbose)*10)
 
-    options.error   = logger.critical        # function alias
-    options.warn    = logger.warning
-    options.debug   = logger.debug
-    options.info    = logger.info
-    
+    options.error = logger.critical        # function alias
+    options.warn = logger.warning
+    options.debug = logger.debug
+    options.info = logger.info
+
     # gsize
     try:
         options.gsize = efgsize[options.gsize]
-    except:
+    except KeyError:
         try:
             options.gsize = float(options.gsize)
-        except:
+        except ValueError:
             logger.error("Error when interpreting --gsize option: %s" % options.gsize)
             logger.error("Available shortcuts of effective genome sizes are %s" % ",".join(list(efgsize.keys())))
             sys.exit(1)
@@ -582,12 +485,12 @@ def opt_validate_predictd ( options ):
         logger.error("Upper limit of mfold should be greater than lower limit!" % options.mfold)
         sys.exit(1)
 
-    options.modelR  = os.path.join( options.outdir, options.rfile )
+    options.modelR = os.path.join(options.outdir, options.rfile)
 
     return options
 
 
-def opt_validate_pileup ( options ):
+def opt_validate_pileup(options):
     """Validate options from a OptParser object.
 
     Ret: Validated options object.
@@ -595,11 +498,11 @@ def opt_validate_pileup ( options ):
     # logging object
     logger.setLevel((4-options.verbose)*10)
 
-    options.error   = logger.critical        # function alias
-    options.warn    = logger.warning
-    options.debug   = logger.debug
-    options.info    = logger.info
-    
+    options.error = logger.critical        # function alias
+    options.warn = logger.warning
+    options.debug = logger.debug
+    options.info = logger.info
+
     # format
 
     options.gzip_flag = False           # if the input is gzip file
@@ -633,13 +536,14 @@ def opt_validate_pileup ( options ):
     options.format = options.format.upper()
 
     # extsize
-    if options.extsize <= 0 :
+    if options.extsize <= 0:
         logger.error("--extsize must > 0!")
         sys.exit(1)
 
     return options
 
-def opt_validate_bdgcmp ( options ):
+
+def opt_validate_bdgcmp(options):
     """Validate options from a OptParser object.
 
     Ret: Validated options object.
@@ -647,17 +551,18 @@ def opt_validate_bdgcmp ( options ):
     # logging object
     logger.setLevel((4-options.verbose)*10)
 
-    options.error   = logger.critical        # function alias
-    options.warn    = logger.warning
-    options.debug   = logger.debug
-    options.info    = logger.info
+    options.error = logger.critical        # function alias
+    options.warn = logger.warning
+    options.debug = logger.debug
+    options.info = logger.info
 
     # methods should be valid:
 
     for method in set(options.method):
-        if method not in [ 'ppois', 'qpois', 'subtract', 'logFE', 'FE', 'logLR', 'slogLR', 'max' ]:
-            logger.error( "Invalid method: %s" % method )
-            sys.exit( 1 )
+        if method not in ['ppois', 'qpois', 'subtract', 'logFE', 'FE',
+                          'logLR', 'slogLR', 'max']:
+            logger.error("Invalid method: %s" % method)
+            sys.exit(1)
 
     # # of --ofile must == # of -m
 
@@ -669,7 +574,7 @@ def opt_validate_bdgcmp ( options ):
     return options
 
 
-def opt_validate_cmbreps ( options ):
+def opt_validate_cmbreps(options):
     """Validate options from a OptParser object.
 
     Ret: Validated options object.
@@ -677,39 +582,37 @@ def opt_validate_cmbreps ( options ):
     # logging object
     logger.setLevel((4-options.verbose)*10)
 
-    options.error   = logger.critical        # function alias
-    options.warn    = logger.warning
-    options.debug   = logger.debug
-    options.info    = logger.info
+    options.error = logger.critical        # function alias
+    options.warn = logger.warning
+    options.debug = logger.debug
+    options.info = logger.info
 
     # methods should be valid:
 
+    if options.method not in ['fisher', 'max', 'mean']:
+        logger.error("Invalid method: %s" % options.method)
+        sys.exit(1)
 
-    if options.method not in [ 'fisher', 'max', 'mean']:
-        logger.error( "Invalid method: %s" % options.method )
-        sys.exit( 1 )
-
-    if len( options.ifile ) < 2:
+    if len(options.ifile) < 2:
         logger.error("Combining replicates needs at least two replicates!")
-        sys.exit( 1 )
+        sys.exit(1)
 
     # # of -i must == # of -w
 
     # if not options.weights:
-    #     options.weights = [ 1.0 ] * len( options.ifile )
+    #     options.weights = [ 1.0 ] * len(options.ifile)
 
-    # if len( options.ifile ) != len( options.weights ):
+    # if len(options.ifile) != len(options.weights):
     #     logger.error("Must provide same number of weights as number of input files.")
-    #     sys.exit( 1 )
+    #     sys.exit(1)
 
-    # if options.method == "fisher" and len( options.ifile ) > 3:
+    # if options.method == "fisher" and len(options.ifile) > 3:
     #     logger.error("NOT IMPLEMENTED! Can't combine more than 3 replicates using Fisher's method.")
-    #     sys.exit( 1 )
-
+    #     sys.exit(1)
     return options
 
 
-def opt_validate_bdgopt ( options ):
+def opt_validate_bdgopt(options):
     """Validate options from a OptParser object.
 
     Ret: Validated options object.
@@ -717,24 +620,25 @@ def opt_validate_bdgopt ( options ):
     # logging object
     logger.setLevel((4-options.verbose)*10)
 
-    options.error   = logger.critical        # function alias
-    options.warn    = logger.warning
-    options.debug   = logger.debug
-    options.info    = logger.info
+    options.error = logger.critical        # function alias
+    options.warn = logger.warning
+    options.debug = logger.debug
+    options.info = logger.info
 
     # methods should be valid:
 
-    if options.method.lower() not in [ 'multiply', 'add', 'p2q', 'max', 'min']:
-        logger.error( "Invalid method: %s" % options.method )
-        sys.exit( 1 )
+    if options.method.lower() not in ['multiply', 'add', 'p2q', 'max', 'min']:
+        logger.error("Invalid method: %s" % options.method)
+        sys.exit(1)
 
-    if options.method.lower() in [ 'multiply', 'add' ] and not options.extraparam:
-        logger.error( "Need EXTRAPARAM for method multiply or add!")
-        sys.exit( 1 )
+    if options.method.lower() in ['multiply', 'add'] and not options.extraparam:
+        logger.error("Need EXTRAPARAM for method multiply or add!")
+        sys.exit(1)
 
     return options
 
-def opt_validate_callvar ( options ):
+
+def opt_validate_callvar(options):
     """Validate options from a OptParser object.
 
     Ret: Validated options object.
@@ -742,10 +646,10 @@ def opt_validate_callvar ( options ):
     # logging object
     logger.setLevel((4-options.verbose)*10)
 
-    options.error   = logger.critical        # function alias
-    options.warn    = logger.warning
-    options.debug   = logger.debug
-    options.info    = logger.info
+    options.error = logger.critical        # function alias
+    options.warn = logger.warning
+    options.debug = logger.debug
+    options.info = logger.info
 
     # methods should be valid:
 
@@ -754,7 +658,7 @@ def opt_validate_callvar ( options ):
     return options
 
 
-def opt_validate_hmmratac ( options ):
+def opt_validate_hmmratac(options):
     """Validate options from a OptParser object.
 
     Ret: Validated options object.
@@ -762,11 +666,11 @@ def opt_validate_hmmratac ( options ):
     # logging object
     logger.setLevel((4-options.verbose)*10)
 
-    options.error   = logger.critical        # function alias
-    options.warn    = logger.warning
-    options.debug   = logger.debug
-    options.info    = logger.info
-   
+    options.error = logger.critical        # function alias
+    options.warn = logger.warning
+    options.debug = logger.debug
+    options.info = logger.info
+
     # input options.argtxt for hmmratac
     options.argtxt = "# Command line: %s\n" % " ".join(sys.argv[1:])
     #        "# ARGUMENTS LIST:",\
@@ -777,7 +681,7 @@ def opt_validate_hmmratac ( options ):
     # Output options
     #if options.store_bdg:
     #    options.argtxt += "# HMMRATAC will report whole genome bedgraph of all state annotations. \n"
-    
+
     #if options.store_bgscore:
     #    options.argtxt += "# HMMRATAC score will be added to each state annotation in bedgraph. \n"
 
@@ -788,77 +692,76 @@ def opt_validate_hmmratac ( options ):
     #    options.print_exclude = os.path.join(options.outdir, options.ofile+"Output_exclude.bed")
     #else:
     #    options.print_exclude = "None"
-    
+
     #if options.print_train:
     #    options.print_train = os.path.join(options.outdir, options.ofile+"Output_training.bed")
     #else:
     #    options.print_train = "None"
-
 
     # EM
     # em_skip
     if options.em_skip:
         options.argtxt += "# EM training not performed on fragment distribution. \n"
     # em_means non-negative
-    if sum( [ x < 0 for x in options.em_means ] ):
-        logger.error(" --means should not be negative! ")
-        sys.exit( 1 )
+    if sum([x < 0 for x in options.em_means]):
+        logger.error(" `--means` should not be negative! ")
+        sys.exit(1)
     # em_stddev non-negative
-    if sum( [ x < 0 for x in options.em_stddevs ] ):
-        logger.error(" --stddev should not be negative! ")
-        sys.exit( 1 )
+    if sum([x < 0 for x in options.em_stddevs]):
+        logger.error(" `--stddev` should not be negative! ")
+        sys.exit(1)
 
     # min_frag_p between 0 and 1
-    if options.min_frag_p <=0 or options.min_frag_p >= 1:
-        logger.error(" --min-frag-p should be larger than 0 and smaller than 1! ")
-        sys.exit( 1 )
+    if options.min_frag_p <= 0 or options.min_frag_p >= 1:
+        logger.error(" `--min-frag-p` should be larger than 0 and smaller than 1!")
+        sys.exit(1)
 
     # HMM
     # hmm_states non-negative int, warn if not k=3
-    #if options.hmm_states <=0:
+    # if options.hmm_states <=0:
     #    logger.error(" -s, --states must be an integer >= 0.")
-    #    sys.exit( 1 )
+    #    sys.exit(1)
     #elif options.hmm_states != 3 and options.hmm_states > 0 and options.store_peaks == False:
     #    logger.warn(" If -s, --states not k=3, recommend NOT calling peaks, use bedgraph.")
 
     # hmm_binsize > 0
-    if options.hmm_binsize <=0:
-        logger.error(" --binsize must be larger than 0.")
-        sys.exit( 1 )
+    if options.hmm_binsize <= 0:
+        logger.error(" `--binsize` must be larger than 0.")
+        sys.exit(1)
 
-    # hmm_lower less than hmm_upper, non-negative 
-    if options.hmm_lower <0:
-        logger.error(" -l, --lower should not be negative! ")
-        sys.exit( 1 )
-    if options.hmm_upper <0:
-        logger.error(" -u, --upper should not be negative! ")
-        sys.exit( 1 )
+    # hmm_lower less than hmm_upper, non-negative
+    if options.hmm_lower < 0:
+        logger.error(" `-l` or `--lower` should not be negative! ")
+        sys.exit(1)
+    if options.hmm_upper < 0:
+        logger.error(" `-u` or `--upper` should not be negative! ")
+        sys.exit(1)
     if options.hmm_lower > options.hmm_upper:
         logger.error("Upper limit of fold change range should be greater than lower limit!" % options.mfold)
         sys.exit(1)
-    
+
     # hmm_maxTrain non-negative
     if options.hmm_maxTrain <= 0:
-        logger.error(" --maxTrain should be larger than 0!")
-        sys.exit( 1 )
-    
+        logger.error(" `--maxTrain` should be larger than 0!")
+        sys.exit(1)
+
     # hmm_training_regions
     if options.hmm_training_regions:
-       options.argtxt += "# Using -t, --training input to train HMM instead of using fold change settings to select. \n"
-    
+        options.argtxt += "# Using -t, --training input to train HMM instead of using fold change settings to select. \n"
+
     # hmm_zscore non-negative
-    #if options.hmm_zscore <0:
+    # if options.hmm_zscore <0:
     #    logger.error(" -z, --zscore should not be negative!")
-    #    sys.exit( 1 )
-    
+    #    sys.exit(1)
+
     # hmm_randomSeed
     if options.hmm_randomSeed:
         options.argtxt += "# Random seed selected as: %d\n" % options.hmm_randomSeed
-    
+
     # hmm_window non-negative
     #if options.hmm_window <0:
     #    logger.error(" --window should not be negative! ")
-    #    sys.exit( 1 )
+    #    sys.exit(1)
 
     # hmm_file
     #if options.hmm_file:
@@ -866,53 +769,47 @@ def opt_validate_hmmratac ( options ):
 
     # hmm_modelonly
     if options.hmm_modelonly:
-       options.argtxt += "# Program will stop after generating model, which can be later applied with '--model'. \n"
+        options.argtxt += "# Program will stop after generating model, which can be later applied with '--model'. \n"
 
     # hmm_modelType
     if options.hmm_type:
-       options.argtxt += "# Use --hmm-type to select a Gaussian ('gaussian') or Poisson ('poisson') model for the hidden markov model in HMMRATAC. Default: 'gaussian'. \n"
-
+        options.argtxt += "# Use --hmm-type to select a Gaussian ('gaussian') or Poisson ('poisson') model for the hidden markov model in HMMRATAC. Default: 'gaussian'. \n"
 
     # Peak Calling
     if options.prescan_cutoff <= 1:
         logger.error(" In order to use -c or --prescan-cutoff, the cutoff must be larger than 1.")
-        sys.exit( 1 )
-    
+        sys.exit(1)
+
     if options.openregion_minlen < 0: # and options.store_peaks == True:
         logger.error(" In order to use --minlen, the length should not be negative.")
-        sys.exit( 1 )
+        sys.exit(1)
 
     #if options.call_score.lower() not in [ 'max', 'ave', 'med', 'fc', 'zscore', 'all']:
-    #    logger.error( " Invalid method: %s" % options.call_score )
-    #    sys.exit( 1 )
+    #    logger.error(" Invalid method: %s" % options.call_score)
+    #    sys.exit(1)
 
     # call_threshold non-negative
     #if options.call_threshold <0:
     #    logger.error(" --threshold should not be negative! ")
-    #    sys.exit( 1 )
-    
+    #    sys.exit(1)
 
     # Misc
-    # misc_blacklist 
+    # misc_blacklist
     #if options.misc_keep_duplicates:
     #    options.argtxt += "# Duplicate reads from analysis will be stored. \n"
 
     # misc_trim non-negative
     #if options.misc_trim <0:
     #    logger.error(" --trim should not be negative! ")
-    #    sys.exit( 1 )
+    #    sys.exit(1)
 
     # np # should this be mp? non-negative
     #if options.np <0:
     #    logger.error(" -m, --multiple-processing should not be negative! ")
-    #    sys.exit( 1 )
-    
+    #    sys.exit(1)
+
     # min_map_quality non-negative
     #if options.min_map_quality <0:
     #    logger.error(" -q, --minmapq should not be negative! ")
-    #    sys.exit( 1 )
-
-    
+    #    sys.exit(1)
     return options
-
-

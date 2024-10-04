@@ -1,4 +1,4 @@
-# Time-stamp: <2020-11-24 16:49:34 Tao Liu>
+# Time-stamp: <2024-10-02 16:48:17 Tao Liu>
 
 """Description: Filter duplicate reads depending on sequencing depth.
 
@@ -17,40 +17,42 @@ import sys
 # ------------------------------------
 # own python modules
 # ------------------------------------
-from MACS3.Utilities.Constants import *
+# from MACS3.Utilities.Constants import *
 from MACS3.Utilities.OptValidator import opt_validate_filterdup
 from MACS3.Signal.Prob import binomial_cdf_inv
 # ------------------------------------
 # Main function
 # ------------------------------------
-def run( o_options ):
+
+
+def run(o_options):
     """The Main function/pipeline for duplication filter.
 
     """
     # Parse options...
-    options = opt_validate_filterdup( o_options )
+    options = opt_validate_filterdup(o_options)
     # end of parsing commandline options
     info = options.info
-    warn = options.warn
-    debug = options.debug
-    error = options.error
+    # warn = options.warn
+    # debug = options.debug
+    # error = options.error
 
-    options.PE_MODE = options.format in ('BAMPE','BEDPE')
+    options.PE_MODE = options.format in ('BAMPE', 'BEDPE')
 
     if options.outputfile != "stdout":
-        outfhd = open( os.path.join( options.outdir, options.outputfile ) ,"w" )
+        outfhd = open(os.path.join(options.outdir, options.outputfile), "w")
     else:
         outfhd = sys.stdout
 
-    #1 Read tag files
+    # 1 Read tag files
     if options.PE_MODE:
         info("# read input file in Paired-end mode.")
-        inputtrack = load_frag_files_options ( options ) # return PETrackI object
-        t0 = inputtrack.total # total fragments
-        info("# total fragments/pairs in alignment file: %d" % (t0) )
+        inputtrack = load_frag_files_options(options)  # return PETrackI object
+        t0 = inputtrack.total   # total fragments
+        info("# total fragments/pairs in alignment file: %d" % (t0))
     else:
         info("# read tag files...")
-        inputtrack = load_tag_files_options (options)
+        inputtrack = load_tag_files_options(options)
 
         info("# tag size = %d" % options.tsize)
         inputtrack.fw = options.tsize
@@ -69,29 +71,30 @@ def run( o_options ):
             max_dup_tags = int(options.keepduplicates)
             info("filter out redundant tags at the same location and the same strand by allowing at most %d tag(s)" % (max_dup_tags))
 
-        inputtrack.filter_dup( max_dup_tags )
+        inputtrack.filter_dup(max_dup_tags)
         t1 = inputtrack.total
 
         info(" tags after filtering in alignment file: %d" % (t1))
         info(" Redundant rate of alignment file: %.2f" % (float(t0-t1)/t0))
 
     if not options.dryrun:
-        info( "Write to BED file" )
-        inputtrack.print_to_bed( fhd=outfhd )
-        info( "finished! Check %s." % options.outputfile )
+        info("Write to BED file")
+        inputtrack.print_to_bed(fhd=outfhd)
+        info("finished! Check %s." % options.outputfile)
     else:
-        info( "Dry-run is finished!" )
+        info("Dry-run is finished!")
 
-def cal_max_dup_tags ( genome_size, tags_number, p=1e-5 ):
+def cal_max_dup_tags(genome_size, tags_number, p=1e-5):
     """Calculate the maximum duplicated tag number based on genome
     size, total tag number and a p-value based on binomial
     distribution. Brute force algorithm to calculate reverse CDF no
     more than MAX_LAMBDA(100000).
 
     """
-    return binomial_cdf_inv(1-p,tags_number,1.0/genome_size)
+    return binomial_cdf_inv(1-p, tags_number, 1.0/genome_size)
 
-def load_tag_files_options ( options ):
+
+def load_tag_files_options(options):
     """From the options, load alignment tags.
 
     """
@@ -106,12 +109,13 @@ def load_tag_files_options ( options ):
         # multiple input
         for tfile in options.ifile[1:]:
             tp = options.parser(tfile, buffer_size=options.buffer_size)
-            treat = tp.append_fwtrack( treat )
-            #treat.sort()
+            treat = tp.append_fwtrack(treat)
+            # treat.sort()
     treat.finalize()
     return treat
 
-def load_frag_files_options ( options ):
+
+def load_frag_files_options(options):
     """From the options, load treatment fragments and control fragments (if available).
 
     """
@@ -122,7 +126,7 @@ def load_frag_files_options ( options ):
     if len(options.ifile) > 1:
         # multiple input
         for tfile in options.ifile[1:]:
-            tp = options.parser(ifile, buffer_size=options.buffer_size)
-            treat = tp.append_petrack( treat )
+            tp = options.parser(tfile, buffer_size=options.buffer_size)
+            treat = tp.append_petrack(treat)
     treat.finalize()
     return treat

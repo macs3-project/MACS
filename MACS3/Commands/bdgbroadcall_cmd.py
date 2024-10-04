@@ -1,4 +1,4 @@
-# Time-stamp: <2024-05-15 10:41:43 Tao Liu>
+# Time-stamp: <2024-10-02 15:55:43 Tao Liu>
 
 """Description: Fine-tuning script to call broad peaks from a single
 bedGraph track for scores.
@@ -13,7 +13,6 @@ the distribution).
 # python modules
 # ------------------------------------
 
-import sys
 import os
 from MACS3.IO import BedGraphIO
 # ------------------------------------
@@ -23,14 +22,14 @@ from MACS3.IO import BedGraphIO
 # ------------------------------------
 # Misc functions
 # ------------------------------------
-import logging
-import MACS3.Utilities.Logger
+from MACS3.Utilities.Logger import logging
 
 logger = logging.getLogger(__name__)
-debug   = logger.debug
-info    = logger.info
-error   = logger.critical
-warn    = logger.warning
+debug = logger.debug
+info = logger.info
+error = logger.critical
+warn = logger.warning
+
 # ------------------------------------
 # Classes
 # ------------------------------------
@@ -38,21 +37,23 @@ warn    = logger.warning
 # ------------------------------------
 # Main function
 # ------------------------------------
-def run( options ):
+
+
+def run(options):
     info("Read and build bedGraph...")
     bio = BedGraphIO.bedGraphIO(options.ifile)
     btrack = bio.read_bedGraph(baseline_value=0)
 
     info("Call peaks from bedGraph...")
 
-    bpeaks = btrack.call_broadpeaks (options.cutoffpeak, options.cutofflink, options.minlen, options.lvl1maxgap, options.lvl2maxgap)
+    bpeaks = btrack.call_broadpeaks(options.cutoffpeak, options.cutofflink, options.minlen, options.lvl1maxgap, options.lvl2maxgap)
 
     info("Write peaks...")
 
     if options.ofile:
-        bf = open( os.path.join( options.outdir, options.ofile ), "w" )
+        bf = open(os.path.join(options.outdir, options.ofile), "w")
         options.oprefix = options.ofile
     else:
-        bf = open ( os.path.join( options.outdir, "%s_c%.1f_C%.2f_l%d_g%d_G%d_broad.bed12" % (options.oprefix,options.cutoffpeak,options.cutofflink,options.minlen,options.lvl1maxgap,options.lvl2maxgap)), "w" )
+        bf = open(os.path.join(options.outdir, "%s_c%.1f_C%.2f_l%d_g%d_G%d_broad.bed12" % (options.oprefix,options.cutoffpeak, options.cutofflink, options.minlen, options.lvl1maxgap, options.lvl2maxgap)), "w")
     bpeaks.write_to_gappedPeak(bf, name_prefix=(options.oprefix+"_broadRegion").encode(), score_column="score", trackline=options.trackline)
     info("Done")
