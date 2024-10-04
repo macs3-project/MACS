@@ -98,7 +98,7 @@ def main():
                              #include_dirs=numpy_include_dir,
                              extra_compile_args=extra_c_args),
                    Extension("MACS3.Signal.Pileup",
-                             ["MACS3/Signal/Pileup.pyx",
+                             ["MACS3/Signal/Pileup.py",
                               "MACS3/Signal/cPosValCalculation.c"],
                              include_dirs=numpy_include_dir,
                              extra_compile_args=extra_c_args),
