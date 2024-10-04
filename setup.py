@@ -31,7 +31,6 @@ def main():
 
     # CFLAG
     extra_c_args = ["-w", "-O3", "-g0"]
-
     # CFLAG for fermi-lite related codes
     clang = False
     icc = False
@@ -75,22 +74,22 @@ def main():
 
     # extensions, those have to be processed by Cython
     ext_modules = [Extension("MACS3.Signal.HMMR_EM",
-                             ["MACS3/Signal/HMMR_EM.pyx"],
+                             ["MACS3/Signal/HMMR_EM.py"],
                              libraries=["m"],
                              include_dirs=numpy_include_dir,
                              extra_compile_args=extra_c_args),
                    Extension("MACS3.Signal.HMMR_Signal_Processing",
-                             ["MACS3/Signal/HMMR_Signal_Processing.pyx"],
+                             ["MACS3/Signal/HMMR_Signal_Processing.py"],
                              libraries=["m"],
-                             include_dirs=numpy_include_dir,
+                             # include_dirs=numpy_include_dir,
                              extra_compile_args=extra_c_args),
                    Extension("MACS3.Signal.HMMR_HMM",
-                             ["MACS3/Signal/HMMR_HMM.pyx"],
+                             ["MACS3/Signal/HMMR_HMM.py"],
                              libraries=["m"],
                              include_dirs=numpy_include_dir,
                              extra_compile_args=extra_c_args),
                    Extension("MACS3.Signal.Prob",
-                             ["MACS3/Signal/Prob.pyx"],
+                             ["MACS3/Signal/Prob.py"],
                              libraries=["m"],
                              include_dirs=numpy_include_dir,
                              extra_compile_args=extra_c_args),
