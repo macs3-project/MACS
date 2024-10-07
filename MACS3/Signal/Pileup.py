@@ -1,6 +1,6 @@
 # cython: language_level=3
 # cython: profile=True
-# Time-stamp: <2024-10-04 23:57:29 Tao Liu>
+# Time-stamp: <2024-10-06 20:51:44 Tao Liu>
 
 """Module Description: For pileup functions.
 
@@ -30,7 +30,7 @@ from cython.cimports.cpython import bool
 # ------------------------------------
 # C lib
 # ------------------------------------
-from cython.cimports.libc.stdlib import malloc, free, qsort
+from cython.cimports.libc.stdlib import free
 
 # ------------------------------------
 # utility internal functions
