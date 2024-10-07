@@ -194,8 +194,7 @@ def main():
                              ["MACS3/IO/BedGraphIO.pyx"],
                              extra_compile_args=extra_c_args),
                    Extension("MACS3.IO.BAM",
-                             ["MACS3/IO/BAM.pyx",], libraries=["m"],
-                             include_dirs=numpy_include_dir,
+                             ["MACS3/IO/BAM.py",], libraries=["m"],
                              extra_compile_args=extra_c_args)]
 
     setup(version=MACS_VERSION,

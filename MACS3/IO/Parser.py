@@ -1,7 +1,7 @@
 # cython: language_level=3
 # cython: profile=True
 # cython: linetrace=True
-# Time-stamp: <2024-10-07 12:21:37 Tao Liu>
+# Time-stamp: <2024-10-07 16:08:43 Tao Liu>
 
 """Module for all MACS Parser classes for input. Please note that the
 parsers are for reading the alignment files ONLY.
@@ -39,7 +39,6 @@ info = logger.info
 # Other modules
 # ------------------------------------
 
-is_le = sys.byteorder == "little"
 if sys.byteorder == "little":
     endian_prefix = "<"
 elif sys.byteorder == "big":
@@ -129,7 +128,8 @@ def bam_fw_binary_parse(data: cython.pointer[cython.const[cython.uchar]],
 
         # need to decipher CIGAR string
         i = 32 + l_read_name
-        cigar_op = unpack(endian_prefix+'%dI' % (n_cigar_op), data[i: i + n_cigar_op*4])
+        cigar_op = unpack(endian_prefix+'%dI' % (n_cigar_op),
+                          data[i: i + n_cigar_op*4])
 
         for cigar_code in cigar_op:
             if cigar_code & 15 in [0, 2, 3, 7, 8]:
@@ -244,10 +244,12 @@ class GenericParser:
         f.close()
         if self.gzipped:
             # open with gzip.open, then wrap it with BufferedReader!
+            # buffersize set to 10M by default.
             self.fhd = io.BufferedReader(gzip.open(filename, mode='rb'),
-                                         buffer_size=READ_BUFFER_SIZE)  # buffersize set to 10M
+                                         buffer_size=READ_BUFFER_SIZE)
         else:
-            self.fhd = io.open(filename, mode='rb')  # binary mode! I don't expect unicode here!
+            # binary mode! I don't expect unicode here!            
+            self.fhd = io.open(filename, mode='rb')
         self.skip_first_commentlines()
 
     @cython.cfunc
@@ -266,8 +268,8 @@ class GenericParser:
           rewritten by BAMParser!
         """
         s: cython.int = 0
-        n: cython.int = 0    # number of successful/valid read alignments
-        m: cython.int = 0          # number of trials
+        n: cython.int = 0  # number of successful/valid read alignments
+        m: cython.int = 0  # number of trials
         this_taglength: cython.int
         thisline: bytes
 
