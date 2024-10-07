@@ -24,3 +24,19 @@ The only exception is that the `callvar` command in MACS3 will need to
 read the actual sequences and mapping information such as the
 mismatch, insertion, deletion, etc from BAM. Also, please make sure
 that the BAM file for `callvar` has to be sorted and indexed.
+
+## Filtering Criteria
+
+MACS3 will apply the following rule to throw away bad alignments while
+scanning the 'flag' field in SAM/BAM/BAMPE. A record will be
+discarded:
+
+1. If a record is an unmapped read, not a primary alignment, or for a
+   read that fails QC, or a supplementary alignment
+2. If this is for paired reads:
+    1. this read is not paired
+    2. the mate of this read (the other read in the pair) is not
+       mapped
+    3. this read is the second read in the pair (NOTE: the first read
+       in the pair is already enough for MACS to get enough
+       information)
