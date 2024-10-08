@@ -31,7 +31,6 @@ def main():
 
     # CFLAG
     extra_c_args = ["-w", "-O3", "-g0"]
-
     # CFLAG for fermi-lite related codes
     clang = False
     icc = False
@@ -75,36 +74,34 @@ def main():
 
     # extensions, those have to be processed by Cython
     ext_modules = [Extension("MACS3.Signal.HMMR_EM",
-                             ["MACS3/Signal/HMMR_EM.pyx"],
+                             ["MACS3/Signal/HMMR_EM.py"],
                              libraries=["m"],
                              include_dirs=numpy_include_dir,
                              extra_compile_args=extra_c_args),
                    Extension("MACS3.Signal.HMMR_Signal_Processing",
-                             ["MACS3/Signal/HMMR_Signal_Processing.pyx"],
+                             ["MACS3/Signal/HMMR_Signal_Processing.py"],
                              libraries=["m"],
-                             include_dirs=numpy_include_dir,
                              extra_compile_args=extra_c_args),
                    Extension("MACS3.Signal.HMMR_HMM",
-                             ["MACS3/Signal/HMMR_HMM.pyx"],
+                             ["MACS3/Signal/HMMR_HMM.py"],
                              libraries=["m"],
                              include_dirs=numpy_include_dir,
                              extra_compile_args=extra_c_args),
                    Extension("MACS3.Signal.Prob",
-                             ["MACS3/Signal/Prob.pyx"],
+                             ["MACS3/Signal/Prob.py"],
                              libraries=["m"],
                              include_dirs=numpy_include_dir,
                              extra_compile_args=extra_c_args),
                    Extension("MACS3.Signal.Region",
-                             ["MACS3/Signal/Region.pyx"],
-                             include_dirs=numpy_include_dir,
+                             ["MACS3/Signal/Region.py"],
                              extra_compile_args=extra_c_args),
                    Extension("MACS3.Signal.Pileup",
-                             ["MACS3/Signal/Pileup.pyx",
+                             ["MACS3/Signal/Pileup.py",
                               "MACS3/Signal/cPosValCalculation.c"],
                              include_dirs=numpy_include_dir,
                              extra_compile_args=extra_c_args),
                    Extension("MACS3.Signal.PileupV2",
-                             ["MACS3/Signal/PileupV2.pyx"],
+                             ["MACS3/Signal/PileupV2.py"],
                              include_dirs=numpy_include_dir,
                              extra_compile_args=extra_c_args),
                    Extension("MACS3.Signal.PeakModel",
@@ -188,18 +185,16 @@ def main():
                              include_dirs=numpy_include_dir,
                              extra_compile_args=extra_c_args),
                    Extension("MACS3.IO.Parser",
-                             ["MACS3/IO/Parser.pyx"],
-                             include_dirs=numpy_include_dir,
+                             ["MACS3/IO/Parser.py"],
                              extra_compile_args=extra_c_args),
                    Extension("MACS3.IO.PeakIO",
                              ["MACS3/IO/PeakIO.pyx"],
                              extra_compile_args=extra_c_args),
                    Extension("MACS3.IO.BedGraphIO",
-                             ["MACS3/IO/BedGraphIO.pyx"],
+                             ["MACS3/IO/BedGraphIO.py"],
                              extra_compile_args=extra_c_args),
                    Extension("MACS3.IO.BAM",
-                             ["MACS3/IO/BAM.pyx",], libraries=["m"],
-                             include_dirs=numpy_include_dir,
+                             ["MACS3/IO/BAM.py",], libraries=["m"],
                              extra_compile_args=extra_c_args)]
 
     setup(version=MACS_VERSION,

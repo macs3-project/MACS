@@ -1,6 +1,6 @@
 # cython: language_level=3
 # cython: profile=True
-# Time-stamp: <2024-05-15 11:10:27 Tao Liu>
+# Time-stamp: <2024-10-08 10:07:47 Tao Liu>
 
 """Module Description:  IO Module for bedGraph file
 
@@ -12,13 +12,12 @@ the distribution).
 # ------------------------------------
 # python modules
 # ------------------------------------
-import io
+from array import array
 
 from MACS3.Signal.BedGraph import bedGraphTrackI
-from cpython cimport bool
-#import numpy as np
-#cimport numpy as np
-#from numpy cimport uint8_t, uint16_t, uint32_t, uint64_t, int8_t, int16_t, int32_t, int64_t, float32_t, float64_t
+import cython
+from cython.cimports.cpython import bool
+
 # ------------------------------------
 # constants
 # ------------------------------------
@@ -26,9 +25,7 @@ from cpython cimport bool
 # ------------------------------------
 # C lib
 # ------------------------------------
-
-from libc.stdio cimport *
-from libc.stdlib cimport *
+from cython.cimports.libc.stdlib import atoi, atof
 
 # ------------------------------------
 # Misc functions
@@ -38,7 +35,9 @@ from libc.stdlib cimport *
 # Classes
 # ------------------------------------
 
-cdef class bedGraphIO:
+
+@cython.cclass
+class bedGraphIO:
     """File IO Class for bedGraph File.
 
     two publicly available member variables:
@@ -57,22 +56,22 @@ cdef class bedGraphIO:
 
     If any of the above two criteria is violated, parsering will fail.
     """
-    cdef:
-        public str bedGraph_filename
-        public object data
+    bedGraph_filename = cython.declare(str, visibility='public')
+    data = cython.declare(object, visibility='public')
 
-    def __init__ ( self, str bedGraph_filename, object data = None):
+    def __init__(self, bedGraph_filename: str, data=None):
         """f must be a filename or a file handler.
 
         """
         self.bedGraph_filename = bedGraph_filename
         if data:
-            assert isinstance( data, bedGraphTrackI )
+            assert isinstance(data, bedGraphTrackI)
             self.data = data
         else:
             self.data = bedGraphTrackI()
 
-    cpdef object read_bedGraph (self, double baseline_value=0):
+    @cython.ccall
+    def read_bedGraph(self, baseline_value: cython.double = 0):
         """Use this function to return a bedGraphTrackI object.
 
         baseline_value is the value to fill in the regions not defined
@@ -84,12 +83,12 @@ cdef class bedGraphIO:
         Then the region chr1:200..250 should be filled with
         baseline_value. Default of baseline_value is 0.
         """
-        cdef bytes i
+        i: bytes
 
-        self.data.reset_baseline( baseline_value )
+        self.data.reset_baseline(baseline_value)
         add_func = self.data.add_loc
         # python open file
-        bedGraph_file = open( self.bedGraph_filename, "rb" )
+        bedGraph_file = open(self.bedGraph_filename, "rb")
 
         for i in bedGraph_file:
             if i.startswith(b"track"):
@@ -100,30 +99,36 @@ cdef class bedGraphIO:
                 continue
             else:
                 fs = i.split()
-                add_func(fs[0],atoi(fs[1]),atoi(fs[2]),atof(fs[3]))
+                add_func(fs[0], atoi(fs[1]), atoi(fs[2]), atof(fs[3]))
 
         bedGraph_file.close()
         return self.data
 
-    cpdef void write_bedGraph (self, str name = "", str description = "", bool trackline = True):
+    @cython.ccall
+    def write_bedGraph(self, name: str = "", description: str = "",
+                       trackline: bool = True):
         """Write all data to self.bedGraph_filename in bedGraph Format.
 
         name/description: the name and description in track line.
         """
-        cdef:
-            int pre, pos, i
-            double value
-            bytes chrom
-            set chrs
-            tuple trackcontents
+        pre: cython.int
+        pos: cython.int
+        i: cython.int
+        value: cython.double
+        chrom: bytes
+        chrs: set
+        trackcontents: tuple
+        p: array
+        v: array
 
-        fhd = open( self.bedGraph_filename, "w" )
+        fhd = open(self.bedGraph_filename, "w")
         if trackline:
-            trackcontents = (name.replace("\"", "\\\""), description.replace("\"", "\\\""))
+            trackcontents = (name.replace("\"", "\\\""),
+                             description.replace("\"", "\\\""))
             fhd.write("track type=bedGraph name=\"%s\" description=\"%s\" visibility=2 alwaysZero=on\n" % trackcontents)
         chrs = self.data.get_chr_names()
         for chrom in sorted(chrs):
-            (p,v) = self.data.get_data_by_chr(chrom)
+            (p, v) = self.data.get_data_by_chr(chrom)
             pnext = iter(p).__next__
             vnext = iter(v).__next__
             pre = 0
@@ -131,8 +136,8 @@ cdef class bedGraphIO:
             for i in range(len(p)):
                 pos = pnext()
                 value = vnext()
-                fhd.write("%s\t%d\t%d\t%.5f\n" % (chrom.decode(),pre,pos,value))
+                fhd.write("%s\t%d\t%d\t%.5f\n" %
+                          (chrom.decode(), pre, pos, value))
                 pre = pos
         fhd.close()
         return
-

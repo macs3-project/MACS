@@ -1,3 +1,27 @@
+2024-10-08  Tao Liu  <vladimir.liu@gmail.com>
+	MACS 3.0.3b
+
+	* Features added
+
+	1) We extensively rewrote the `pyx` codes into `py` codes. In
+	another words, we now apply the 'pure python style' with PEP-484
+	type annotations to our previous Cython style codes. So that, the
+	source codes can be more compatible to Python programming tools
+	such as `flake8`. During rewritting, we cleaned the source codes
+	even more, and removed unnecessary dependencies during
+	compilation.
+
+	* Bug fixed
+
+	1) Fix issues in big-endian system in `Parser.py` codes. Enable
+	big-endian support in `BAM.py` codes for accessig certain
+	alignment records that overlap with givin genomic
+	coordinates using BAM/BAI files.
+
+	* Doc
+
+	1) Explanation on the filtering criteria on SAM/BAM/BAMPE files.
+
 2024-09-06  Tao Liu  <vladimir.liu@gmail.com>
 	MACS 3.0.2
 
@@ -31,9 +55,9 @@
 
 	6) For gappedPeak output, set thickStart and thickEnd columns as
 	0, according to UCSC definition.
-	
+
 	* Bugs fixed
-	
+
 	1) Use `-O3` instead of `-Ofast` for compatibility. #637
 
 	* Documentation
@@ -46,7 +70,7 @@
 	3) Description on various file formats used in MACS3.
 
 2024-02-19  Tao Liu  <vladimir.liu@gmail.com>
-	MACS 3.0.1 
+	MACS 3.0.1
 
 	* Bugs fixed
 

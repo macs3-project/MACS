@@ -1,6 +1,6 @@
 # cython: language_level=3
 # cython: profile=True
-# Time-stamp: <2022-04-14 17:47:31 Tao Liu>
+# Time-stamp: <2024-10-04 15:09:10 Tao Liu>
 
 """Module Description: statistics functions to calculate p-values
 
@@ -13,47 +13,61 @@ the distribution).
 # python modules
 # ------------------------------------
 from math import fabs
-from math import log1p #as py_log1p
+from math import log1p          # as py_log1p
 from math import sqrt
 import sys
 # ------------------------------------
 # Other modules
 # ------------------------------------
-import numpy as np
-cimport numpy as np
-from numpy cimport uint8_t, uint16_t, uint32_t, uint64_t, int8_t, int16_t, int32_t, int64_t, float32_t, float64_t
-from cpython cimport bool
+# import numpy as np
+import cython
+from cython.cimports import numpy as cnp
+from cython.cimports.numpy import (uint32_t, uint64_t, int32_t,
+                                   int64_t, float32_t, float64_t)
+from cython.cimports.cpython import bool
 
 # ------------------------------------
 # C lib
 # ------------------------------------
-from libc.math cimport exp,log,log10, M_LN10 #,fabs,log1p
+from cython.cimports.libc.math import exp, log, M_LN10  # ,fabs,log1p
 
 # ------------------------------------
 # constants
 # ------------------------------------
-cdef int32_t LSTEP = 200
-cdef float64_t EXPTHRES = exp(LSTEP)
-cdef float64_t EXPSTEP  = exp(-1*LSTEP)
-cdef float64_t bigx = 20
+LSTEP: int32_t = 200
+EXPTHRES: float64_t = exp(LSTEP)
+EXPSTEP: float64_t = exp(-1*LSTEP)
+bigx: float64_t = 20
 
 # ------------------------------------
 # Normal distribution functions
 # ------------------------------------
 # x is the value, u is the mean, v is the variance
-cpdef pnorm(int32_t x, int32_t u, int32_t v):
-    """The probability of X=x when X=Norm(u,v)
-    """
-    return 1.0/sqrt(2.0 * 3.141592653589793 * <float32_t>(v)) * exp(-<float32_t>(x-u)**2 / (2.0 * <float32_t>(v)))
 
-cpdef float32_t pnorm2(float32_t x, float32_t u, float32_t v):
-    """The probability of X=x when X=Norm(u,v)
-    """
-    cdef:
-        float32_t ret
 
+@cython.ccall
+def pnorm(x: int32_t, u: int32_t, v: int32_t):
+    """The probability of X=x when X=Norm(u,v)
+
+    v is int32_t
+    """
+    i: float32_t = cython.cast(float32_t, v)
+    m: float32_t = cython.cast(float32_t, (x-u))
+    n: float32_t = cython.cast(float32_t, v)
+    # 6.283185307179586 is 2 * pi
+    return 1.0/sqrt(6.283185307179586 * i) * exp(-m**2 / (2.0 * n))
+
+
+@cython.ccall
+def pnorm2(x: float32_t, u: float32_t, v: float32_t) -> float32_t:
+    """The probability of X=x when X=Norm(u,v)
+
+    v is float32_t
+    """
+    ret: float32_t
     try:
-        ret =1.0/sqrt(2.0 * 3.141592653589793 * v) * exp(-(x-u)**2 / (2.0 * v))
+        # 6.283185307179586 is 2 * pi
+        ret = 1.0/sqrt(6.283185307179586 * v) * exp(-(x-u)**2 / (2.0 * v))
     except ValueError:
         sys.exit(1)
     return ret
@@ -62,26 +76,32 @@ cpdef float32_t pnorm2(float32_t x, float32_t u, float32_t v):
 # Misc functions
 # ------------------------------------
 
-cpdef factorial ( uint32_t n ):
+
+@cython.ccall
+def factorial(n: uint32_t) -> float64_t:
     """Calculate N!.
 
     """
-    cdef float64_t fact = 1
-    cdef uint64_t i
+    fact: float64_t = 1
+    i: uint64_t
     if n < 0:
         return 0
-    for i in range( 2,n+1 ):
+    for i in range(2, n+1):
         fact = fact * i
     return fact
 
-cdef float64_t poz(float64_t z):
+
+@cython.cfunc
+def poz(z: float64_t) -> float64_t:
     """ probability of normal z value
     """
-    cdef:
-        float64_t y, x, w
-        float64_t Z_MAX = 6.0 # Maximum meaningful z value
+    y: float64_t
+    x: float64_t
+    w: float64_t
+    Z_MAX: float64_t = 6.0      # Maximum meaningful z value
+
     if z == 0.0:
-        x = 0.0;
+        x = 0.0
     else:
         y = 0.5 * fabs(z)
         if y >= (Z_MAX * 0.5):
@@ -90,25 +110,27 @@ cdef float64_t poz(float64_t z):
             w = y * y
             x = ((((((((0.000124818987 * w
                         - 0.001075204047) * w + 0.005198775019) * w
-                        - 0.019198292004) * w + 0.059054035642) * w
-                        - 0.151968751364) * w + 0.319152932694) * w
-                        - 0.531923007300) * w + 0.797884560593) * y * 2.0
+                      - 0.019198292004) * w + 0.059054035642) * w
+                    - 0.151968751364) * w + 0.319152932694) * w
+                  - 0.531923007300) * w + 0.797884560593) * y * 2.0
         else:
             y -= 2.0
             x = (((((((((((((-0.000045255659 * y
                              + 0.000152529290) * y - 0.000019538132) * y
-                             - 0.000676904986) * y + 0.001390604284) * y
-                             - 0.000794620820) * y - 0.002034254874) * y
-                             + 0.006549791214) * y - 0.010557625006) * y
-                             + 0.011630447319) * y - 0.009279453341) * y
-                             + 0.005353579108) * y - 0.002141268741) * y
-                             + 0.000535310849) * y + 0.999936657524
+                           - 0.000676904986) * y + 0.001390604284) * y
+                         - 0.000794620820) * y - 0.002034254874) * y
+                       + 0.006549791214) * y - 0.010557625006) * y
+                     + 0.011630447319) * y - 0.009279453341) * y
+                   + 0.005353579108) * y - 0.002141268741) * y
+                 + 0.000535310849) * y + 0.999936657524
     if z > 0.0:
         return ((x + 1.0) * 0.5)
     else:
         return ((1.0 - x) * 0.5)
 
-cdef float64_t ex20 ( float64_t x ):
+
+@cython.cfunc
+def ex20(x: float64_t) -> float64_t:
     """Wrapper on exp function. It will return 0 if x is smaller than -20.
     """
     if x < -20.0:
@@ -116,7 +138,14 @@ cdef float64_t ex20 ( float64_t x ):
     else:
         return exp(x)
 
-cpdef float64_t chisq_pvalue_e ( float64_t x, uint32_t df ):
+
+# ------------------------------------
+# chi-square distribution functions
+# ------------------------------------
+
+
+@cython.ccall
+def chisq_pvalue_e(x: float64_t, df: uint32_t) -> float64_t:
     """Chisq CDF function for upper tail and even degree of freedom.
     Good for p-value calculation and designed for combining pvalues.
 
@@ -126,15 +155,18 @@ cpdef float64_t chisq_pvalue_e ( float64_t x, uint32_t df ):
     df has to be even number! if df is odd, result will be wrong!
 
     """
-    cdef:
-        float64_t  a, y, s
-        float64_t  e, c, z
+    a: float64_t
+    y: float64_t
+    s: float64_t
+    e: float64_t
+    c: float64_t
+    z: float64_t
 
     if x <= 0.0:
         return 1.0
 
     a = 0.5 * x
-    even = ((2*(df/2)) == df)
+    # even = ((2*(df/2)) == df)
     y = ex20(-a)
     s = y
     if df > 2:
@@ -142,9 +174,9 @@ cpdef float64_t chisq_pvalue_e ( float64_t x, uint32_t df ):
         z = 1.0
         if a > bigx:            # approximation for big number
             e = 0.0
-            c = log (a)
+            c = log(a)
             while z <= x:
-                e = log (z) + e
+                e = log(z) + e
                 s += ex20(c*z-a-e)
                 z += 1.0
             return s
@@ -159,9 +191,12 @@ cpdef float64_t chisq_pvalue_e ( float64_t x, uint32_t df ):
     else:
         return s
 
-cpdef float64_t chisq_logp_e ( float64_t x, uint32_t df, bool log10 = False ):
-    """Chisq CDF function in log space for upper tail and even degree of freedom
-    Good for p-value calculation and designed for combining pvalues.
+
+@cython.ccall
+def chisq_logp_e(x: float64_t, df: uint32_t, log10: bool = False) -> float64_t:
+    """Chisq CDF function in log space for upper tail and even degree
+    of freedom Good for p-value calculation and designed for combining
+    pvalues.
 
     Note: we assume df to be an even number larger than 1! Do not
     violate this assumption and there is no checking.
@@ -170,10 +205,12 @@ cpdef float64_t chisq_logp_e ( float64_t x, uint32_t df, bool log10 = False ):
     instead.
 
     """
-    cdef:
-        float64_t a, y
-        float64_t s                # s is the return value
-        float64_t e, c, z
+    a: float64_t
+    y: float64_t
+    s: float64_t
+    e: float64_t
+    c: float64_t
+    z: float64_t
 
     if x <= 0.0:
         return 0.0
@@ -187,7 +224,7 @@ cpdef float64_t chisq_logp_e ( float64_t x, uint32_t df, bool log10 = False ):
         z = 1.0             # variable for iteration
         if a > bigx:            # approximation for big number
             e = 0.0         # constant
-            c = log (a)         # constant
+            c = log(a)         # constant
             while z <= x:       # iterations
                 e += log(z)
                 s = logspace_add(s, c*z-a-e)
@@ -199,14 +236,22 @@ cpdef float64_t chisq_logp_e ( float64_t x, uint32_t df, bool log10 = False ):
                 e = e * (a / z)
                 c = c + e
                 z += 1.0
-            s = log(y+c*y) #logspace_add( s, log(c) ) - a
+            s = log(y+c*y)      # logspace_add( s, log(c) ) - a
     # return
     if log10:
         return -s/log(10)
     else:
         return -s
 
-cpdef float64_t poisson_cdf ( uint32_t n, float64_t lam, bool lower=False, bool log10=False ):
+
+# ------------------------------------
+# Poisson distribution functions
+# ------------------------------------ 
+
+
+@cython.ccall
+def poisson_cdf(n: uint32_t, lam: float64_t,
+                lower: bool = False, log10: bool = False) -> float64_t:
     """Poisson CDF evaluater.
 
     This is a more stable CDF function. It can tolerate large lambda
@@ -216,8 +261,10 @@ cpdef float64_t poisson_cdf ( uint32_t n, float64_t lam, bool lower=False, bool 
     Parameters:
     n     : your observation
     lam   : lambda of poisson distribution
-    lower : if lower is False, calculate the upper tail CDF, otherwise, to calculate lower tail; Default is False.
-    log10 : if log10 is True, calculation will be in log space. Default is False.
+    lower : if lower is False, calculate the upper tail CDF, otherwise, to
+            calculate lower tail; Default is False.
+    log10 : if log10 is True, calculation will be in log space. Default is
+            False.
     """
     assert lam > 0.0, "Lambda must > 0, however we got %d" % lam
 
@@ -230,18 +277,21 @@ cpdef float64_t poisson_cdf ( uint32_t n, float64_t lam, bool lower=False, bool 
             return log10_poisson_cdf_Q_large_lambda(n, lam)
 
     if lower:
-        if lam > 700: # may be problematic
-            return __poisson_cdf_large_lambda (n, lam)
+        if lam > 700:           # may be problematic
+            return __poisson_cdf_large_lambda(n, lam)
         else:
-            return __poisson_cdf(n,lam)
+            return __poisson_cdf(n, lam)
     else:
         # upper tail
         if lam > 700: # may be problematic
-            return __poisson_cdf_Q_large_lambda (n, lam)
+            return __poisson_cdf_Q_large_lambda(n, lam)
         else:
-            return __poisson_cdf_Q(n,lam)
+            return __poisson_cdf_Q(n, lam)
 
-cdef inline float64_t __poisson_cdf ( uint32_t k, float64_t a ):
+
+@cython.cfunc
+@cython.inline
+def __poisson_cdf(k: uint32_t, a: float64_t) -> float64_t:
     """Poisson CDF For small lambda. If a > 745, this will return
     incorrect result.
 
@@ -249,19 +299,18 @@ cdef inline float64_t __poisson_cdf ( uint32_t k, float64_t a ):
     k	: observation
     a	: lambda
     """
-    cdef:
-        float64_t nextcdf
-        float64_t cdf
-        uint32_t i
-        float64_t lastcdf
+    nextcdf: float64_t
+    cdf: float64_t
+    i: uint32_t
+    lastcdf: float64_t
 
     if k < 0:
         return 0.0                        # special cases
 
-    nextcdf = exp( -1 * a )
+    nextcdf = exp(-1 * a)
     cdf = nextcdf
 
-    for i in range( 1, k + 1 ):
+    for i in range(1, k + 1):
         lastcdf = nextcdf
         nextcdf = lastcdf * a / i
         cdf = cdf + nextcdf
@@ -270,50 +319,55 @@ cdef inline float64_t __poisson_cdf ( uint32_t k, float64_t a ):
     else:
         return cdf
 
-cdef inline float64_t __poisson_cdf_large_lambda ( uint32_t k, float64_t a ):
+
+@cython.cfunc
+@cython.inline
+def __poisson_cdf_large_lambda(k: uint32_t, a: float64_t) -> float64_t:
     """Slower poisson cdf for large lambda ( > 700 )
 
     Parameters:
     k	: observation
     a	: lambda
     """
-    cdef:
-        int32_t num_parts
-        float64_t lastexp
-        float64_t nextcdf
-        float64_t cdf
-        uint32_t i
-        float64_t lastcdf
+    num_parts: int32_t
+    lastexp: float64_t
+    nextcdf: float64_t
+    cdf: float64_t = 0
+    i: uint32_t
+    lastcdf: float64_t
 
     assert a > 700
     if k < 0:
         return 0.0                        # special cases
 
-    num_parts = <int32_t>( a / LSTEP )
-    lastexp = exp( -1 * ( a % LSTEP ) )
+    num_parts = cython.cast(int32_t, (a / LSTEP))
+    lastexp = exp(-1 * (a % LSTEP))
     nextcdf = EXPSTEP
 
     num_parts -= 1
 
-    for i in range( 1 , k + 1 ):
+    for i in range(1, k + 1):
         lastcdf = nextcdf
         nextcdf = lastcdf * a / i
-        cdf = cdf + nextcdf
+        cdf += nextcdf
         if nextcdf > EXPTHRES or cdf > EXPTHRES:
-           if num_parts>=1:
-               cdf *= EXPSTEP
-               nextcdf *= EXPSTEP
-               num_parts -= 1
-           else:
-               cdf *= lastexp
-               lastexp = 1
+            if num_parts >= 1:
+                cdf *= EXPSTEP
+                nextcdf *= EXPSTEP
+                num_parts -= 1
+            else:
+                cdf *= lastexp
+                lastexp = 1
 
-    for i in range( num_parts ):
+    for i in range(num_parts):
         cdf *= EXPSTEP
     cdf *= lastexp
     return cdf
 
-cdef inline float64_t __poisson_cdf_Q ( uint32_t k, float64_t a ):
+
+@cython.cfunc
+@cython.inline
+def __poisson_cdf_Q(k: uint32_t, a: float64_t) -> float64_t:
     """internal Poisson CDF evaluater for upper tail with small
     lambda.
 
@@ -321,28 +375,31 @@ cdef inline float64_t __poisson_cdf_Q ( uint32_t k, float64_t a ):
     k	: observation
     a	: lambda
     """
-    cdef uint32_t i
+    i: uint32_t
+    nextcdf: float64_t
+    lastcdf: float64_t
+    cdf: float64_t = 0.0
 
     if k < 0:
         return 1.0                        # special cases
-    cdef float64_t nextcdf
-    nextcdf = exp( -1 * a )
-    cdef float64_t lastcdf
+    nextcdf = exp(-1 * a)
 
-    for i in range(1,k+1):
+    for i in range(1, k+1):
         lastcdf = nextcdf
         nextcdf = lastcdf * a / i
 
-    cdef float64_t cdf = 0.0
     i = k+1
-    while nextcdf >0.0:
+    while nextcdf > 0.0:
         lastcdf = nextcdf
         nextcdf = lastcdf * a / i
         cdf += nextcdf
-        i+=1
+        i += 1
     return cdf
 
-cdef inline float64_t __poisson_cdf_Q_large_lambda ( uint32_t k, float64_t a ):
+
+@cython.cfunc
+@cython.inline
+def __poisson_cdf_Q_large_lambda(k: uint32_t, a: float64_t) -> float64_t:
     """Slower internal Poisson CDF evaluater for upper tail with large
     lambda.
 
@@ -350,50 +407,56 @@ cdef inline float64_t __poisson_cdf_Q_large_lambda ( uint32_t k, float64_t a ):
     k	: observation
     a	: lambda
     """
+    num_parts: uint32_t = cython.cast(int32_t, (a/LSTEP))
+    lastexp: float64_t = exp(-1 * (a % LSTEP))
+    nextcdf: float64_t = EXPSTEP
+    i: uint32_t
+    lastcdf: float64_t
+    cdf: float64_t = 0.0
+
     assert a > 700
-    if k < 0: return 1.0                        # special cases
-    cdef uint32_t num_parts = <int32_t>(a/LSTEP)
-    cdef float64_t lastexp = exp(-1 * (a % LSTEP) )
-    cdef float64_t nextcdf = EXPSTEP
-    cdef uint32_t i
-    cdef float64_t lastcdf
+    if k < 0:
+        return 1.0                        # special cases
 
     num_parts -= 1
 
-    for i in range(1,k+1):
+    for i in range(1, k+1):
         lastcdf = nextcdf
         nextcdf = lastcdf * a / i
         if nextcdf > EXPTHRES:
-           if num_parts>=1:
-               nextcdf *= EXPSTEP
-               num_parts -= 1
-           else:
-               # simply raise an error
-               raise Exception("Unexpected error")
-               #cdf *= lastexp
-               #lastexp = 1
-    cdef float64_t cdf = 0.0
+            if num_parts >= 1:
+                nextcdf *= EXPSTEP
+                num_parts -= 1
+            else:
+                # simply raise an error
+                raise Exception("Unexpected error")
+                # cdf *= lastexp
+                # lastexp = 1
+
     i = k+1
-    while nextcdf >0.0:
+    while nextcdf > 0.0:
         lastcdf = nextcdf
         nextcdf = lastcdf * a / i
         cdf += nextcdf
-        i+=1
+        i += 1
         if nextcdf > EXPTHRES or cdf > EXPTHRES:
-           if num_parts>=1:
-               cdf *= EXPSTEP
-               nextcdf *= EXPSTEP
-               num_parts -= 1
-           else:
-               cdf *= lastexp
-               lastexp = 1
+            if num_parts >= 1:
+                cdf *= EXPSTEP
+                nextcdf *= EXPSTEP
+                num_parts -= 1
+            else:
+                cdf *= lastexp
+                lastexp = 1
 
     for i in range(num_parts):
         cdf *= EXPSTEP
     cdf *= lastexp
     return cdf
 
-cdef inline float64_t log10_poisson_cdf_P_large_lambda ( uint32_t k, float64_t lbd ):
+
+@cython.cfunc
+@cython.inline
+def log10_poisson_cdf_P_large_lambda(k: uint32_t, lbd: float64_t) -> float64_t:
     """Slower Poisson CDF evaluater for lower tail which allow
     calculation in log space. Better for the pvalue < 10^-310.
 
@@ -401,21 +464,20 @@ cdef inline float64_t log10_poisson_cdf_P_large_lambda ( uint32_t k, float64_t l
     k	: observation
     lbd	: lambda
 
-    ret = -lambda + \ln( \sum_{i=k+1}^{\inf} {lambda^i/i!} = -lambda + \ln( sum{ exp{ln(F)} } ), where F=lambda^m/m!
-    \ln{F(m)} = m*ln{lambda} - \sum_{x=1}^{m}\ln(x)
-    Calculate \ln( sum{exp{N} ) by logspace_add function
+    ret = -lambda + \\ln( \\sum_{i=k+1}^{\\inf} {lambda^i/i!} = -lambda + \\ln(sum{ exp{ln(F)} }), where F=lambda^m/m!
+    \\ln{F(m)} = m*ln{lambda} - \\sum_{x=1}^{m}\\ln(x)
+    Calculate \\ln( sum{exp{N} ) by logspace_add function
 
     Return the log10(pvalue)
     """
-    cdef float64_t residue = 0
-    cdef float64_t logx = 0
-    cdef float64_t ln_lbd = log(lbd)
+    residue: float64_t = 0
+    logx: float64_t = 0
+    ln_lbd: float64_t = log(lbd)
+    m: int32_t = k
+    sum_ln_m: float64_t = 0
+    i: int32_t = 0
 
-    # first residue
-    cdef int32_t m = k
-    cdef float64_t sum_ln_m = 0
-    cdef int32_t i = 0
-    for i in range(1,m+1):
+    for i in range(1, m+1):
         sum_ln_m += log(i)
     logx = m*ln_lbd - sum_ln_m
     residue = logx
@@ -424,14 +486,17 @@ cdef inline float64_t log10_poisson_cdf_P_large_lambda ( uint32_t k, float64_t l
         m -= 1
         logy = logx-ln_lbd+log(m)
         pre_residue = residue
-        residue = logspace_add(pre_residue,logy)
+        residue = logspace_add(pre_residue, logy)
         if fabs(pre_residue-residue) < 1e-10:
             break
         logx = logy
 
-    return round((residue-lbd)/M_LN10,5)
+    return round((residue-lbd)/M_LN10, 5)
 
-cdef inline float64_t log10_poisson_cdf_Q_large_lambda ( uint32_t k, float64_t lbd ):
+
+@cython.cfunc
+@cython.inline
+def log10_poisson_cdf_Q_large_lambda(k: uint32_t, lbd: float64_t) -> float64_t:
     """Slower Poisson CDF evaluater for upper tail which allow
     calculation in log space. Better for the pvalue < 10^-310.
 
@@ -439,21 +504,20 @@ cdef inline float64_t log10_poisson_cdf_Q_large_lambda ( uint32_t k, float64_t l
     k	: observation
     lbd	: lambda
 
-    ret = -lambda + \ln( \sum_{i=k+1}^{\inf} {lambda^i/i!} = -lambda + \ln( sum{ exp{ln(F)} } ), where F=lambda^m/m!
-    \ln{F(m)} = m*ln{lambda} - \sum_{x=1}^{m}\ln(x)
-    Calculate \ln( sum{exp{N} ) by logspace_add function
+    ret = -lambda + \\ln( \\sum_{i=k+1}^{\\inf} {lambda^i/i!} = -lambda + \\ln( sum{ exp{ln(F)} } ), where F=lambda^m/m!
+    \\ln{F(m)} = m*ln{lambda} - \\sum_{x=1}^{m}\\ln(x)
+    Calculate \\ln( sum{exp{N} ) by logspace_add function
 
     Return the log10(pvalue)
     """
-    cdef float64_t residue = 0
-    cdef float64_t logx = 0
-    cdef float64_t ln_lbd = log(lbd)
+    residue: float64_t = 0
+    logx: float64_t = 0
+    ln_lbd: float64_t = log(lbd)
+    m: int32_t = k+1
+    sum_ln_m: float64_t = 0
+    i: int32_t = 0
 
-    # first residue
-    cdef int32_t m = k+1
-    cdef float64_t sum_ln_m = 0
-    cdef int32_t i = 0
-    for i in range(1,m+1):
+    for i in range(1, m+1):
         sum_ln_m += log(i)
     logx = m*ln_lbd - sum_ln_m
     residue = logx
@@ -462,14 +526,17 @@ cdef inline float64_t log10_poisson_cdf_Q_large_lambda ( uint32_t k, float64_t l
         m += 1
         logy = logx+ln_lbd-log(m)
         pre_residue = residue
-        residue = logspace_add(pre_residue,logy)
+        residue = logspace_add(pre_residue, logy)
         if fabs(pre_residue-residue) < 1e-5:
             break
         logx = logy
 
-    return round((residue-lbd)/log(10),5)
+    return round((residue-lbd)/log(10), 5)
 
-cdef inline float64_t logspace_add ( float64_t logx, float64_t logy ):
+
+@cython.cfunc
+@cython.inline
+def logspace_add(logx: float64_t, logy: float64_t) -> float64_t:
     """addition in log space.
 
     Given two log values, such as logx and logy, return
@@ -481,7 +548,9 @@ cdef inline float64_t logspace_add ( float64_t logx, float64_t logy ):
     else:
         return logy + log1p( exp ( logx - logy ) )
 
-cpdef poisson_cdf_inv ( float64_t cdf, float64_t lam, int32_t maximum=1000 ):
+
+@cython.ccall
+def poisson_cdf_inv ( cdf: float64_t, lam: float64_t, maximum: int32_t = 1000 ) -> int32_t:
     """inverse poisson distribution.
 
     cdf : the CDF
@@ -490,18 +559,19 @@ cpdef poisson_cdf_inv ( float64_t cdf, float64_t lam, int32_t maximum=1000 ):
     note: maxmimum return value is 1000
     and lambda must be smaller than 740.
     """
+    sum2: float64_t = 0
+    newval: float64_t = exp( -1*lam )
+    i: int32_t
+    sumold: float64_t 
+    lastval: float64_t 
+
     assert lam < 740
     if cdf < 0 or cdf > 1:
         raise Exception ("CDF must >= 0 and <= 1")
     elif cdf == 0:
         return 0
-    cdef float64_t sum2 = 0
-    cdef float64_t newval = exp( -1*lam )
-    sum2 = newval
 
-    cdef int32_t i
-    cdef float64_t sumold
-    cdef float64_t lastval
+    sum2 = newval
 
     for i in range(1,maximum+1):
         sumold = sum2
@@ -513,7 +583,9 @@ cpdef poisson_cdf_inv ( float64_t cdf, float64_t lam, int32_t maximum=1000 ):
 
     return maximum
 
-cpdef poisson_cdf_Q_inv ( float64_t cdf, float64_t lam, int32_t maximum=1000 ):
+
+@cython.ccall
+def poisson_cdf_Q_inv(cdf: float64_t, lam: float64_t, maximum: int32_t = 1000) -> int32_t:
     """inverse poisson distribution.
 
     cdf : the CDF
@@ -522,20 +594,20 @@ cpdef poisson_cdf_Q_inv ( float64_t cdf, float64_t lam, int32_t maximum=1000 ):
     note: maxmimum return value is 1000
     and lambda must be smaller than 740.
     """
+    sum2: float64_t = 0
+    newval: float64_t = exp(-1 * lam)
+    i: int32_t
+    sumold: float64_t
+    lastval: float64_t
+
     assert lam < 740
     if cdf < 0 or cdf > 1:
-        raise Exception ("CDF must >= 0 and <= 1")
+        raise Exception("CDF must >= 0 and <= 1")
     elif cdf == 0:
         return 0
-    cdef float64_t sum2 = 0
-    cdef float64_t newval = exp( -1 * lam )
     sum2 = newval
 
-    cdef int32_t i
-    cdef float64_t lastval
-    cdef float64_t sumold
-
-    for i in range(1,maximum+1):
+    for i in range(1, maximum+1):
         sumold = sum2
         lastval = newval
         newval = lastval * lam / i
@@ -545,7 +617,9 @@ cpdef poisson_cdf_Q_inv ( float64_t cdf, float64_t lam, int32_t maximum=1000 ):
 
     return maximum
 
-cpdef poisson_pdf ( uint32_t k, float64_t a ):
+
+@cython.ccall
+def poisson_pdf(k: uint32_t, a: float64_t) -> float64_t:
     """Poisson PDF.
 
     PDF(K,A) is the probability that the number of events observed in
@@ -554,71 +628,86 @@ cpdef poisson_pdf ( uint32_t k, float64_t a ):
     """
     if a <= 0:
         return 0
-    return exp(-a) * pow (a, k, None) / factorial (k)
+    return exp(-a) * pow(a, k, None) / factorial(k)
 
 
-cdef binomial_coef ( int64_t n, int64_t k ):
+# ------------------------------------
+# binomial distribution functions
+# ------------------------------------
+
+
+@cython.cfunc
+def binomial_coef(n: int64_t, k: int64_t) -> float64_t:
     """BINOMIAL_COEF computes the Binomial coefficient C(N,K)
 
     n,k are integers.
     """
-    cdef int64_t mn = min (k, n-k)
-    cdef int64_t mx
-    cdef float64_t cnk
-    cdef int64_t i
+    mn: int64_t = min(k, n-k)
+    mx: int64_t
+    cnk: float64_t
+    i: int64_t
     if mn < 0:
         return 0
     elif mn == 0:
         return 1
     else:
-        mx = max(k,n-k)
-        cnk = <float32_t>(mx+1)
-        for i in range(2,mn+1):
+        mx = max(k, n-k)
+        cnk = cython.cast(float32_t, (mx+1))
+        for i in range(2, mn+1):
             cnk = cnk * (mx+i) / i
     return cnk
 
-cpdef binomial_cdf ( int64_t x, int64_t a, float64_t b, bool lower=True ):
+
+@cython.ccall
+def binomial_cdf(x: int64_t, a: int64_t, b: float64_t, lower: bool = True) -> float64_t:
     """ BINOMIAL_CDF compute the binomial CDF.
 
     CDF(x)(A,B) is the probability of at most X successes in A trials,
     given that the probability of success on a single trial is B.
     """
     if lower:
-        return _binomial_cdf_f (x,a,b)
+        return _binomial_cdf_f(x, a, b)
     else:
-        return _binomial_cdf_r (x,a,b)
+        return _binomial_cdf_r(x, a, b)
 
-cpdef binomial_sf ( int64_t x, int64_t a, float64_t b, bool lower=True ):
+
+@cython.ccall
+def binomial_sf(x: int64_t, a: int64_t, b: float64_t, lower: bool = True) -> float64_t:
     """ BINOMIAL_SF compute the binomial survival function (1-CDF)
 
     SF(x)(A,B) is the probability of more than X successes in A trials,
     given that the probability of success on a single trial is B.
     """
     if lower:
-        return 1.0 - _binomial_cdf_f (x,a,b)
+        return 1.0 - _binomial_cdf_f(x, a, b)
     else:
-        return 1.0 - _binomial_cdf_r (x,a,b)
+        return 1.0 - _binomial_cdf_r(x, a, b)
 
-cpdef pduplication (np.ndarray[np.float64_t] pmf, int32_t N_obs):
+
+@cython.ccall
+def pduplication(pmf: cnp.ndarray, N_obs: int32_t) -> float32_t:
     """return the probability of a duplicate fragment given a pmf
     and a number of observed fragments N_obs
     """
-    cdef:
-        n = pmf.shape[0]
-        float32_t p, sf = 0.0
+    n: int32_t = pmf.shape[0]
+    p: float32_t
+    sf: float32_t = 0.0
+
     for p in pmf:
         sf += binomial_sf(2, N_obs, p)
-    return sf / <float32_t>n
+    return sf / cython.cast(float32_t, n)
 
-cdef _binomial_cdf_r ( int64_t x, int64_t a, float64_t b ):
+
+@cython.cfunc
+def _binomial_cdf_r(x: int64_t, a: int64_t, b: float64_t) -> float64_t:
     """ Binomial CDF for upper tail.
 
     """
-    cdef int64_t argmax=<int32_t>(a*b)
-    cdef float64_t seedpdf
-    cdef float64_t cdf
-    cdef float64_t pdf
-    cdef int64_t i
+    argmax: int64_t = cython.cast(int32_t, (a*b))
+    seedpdf: float64_t
+    cdf: float64_t
+    pdf: float64_t
+    i: int64_t
 
     if x < 0:
         return 1
@@ -629,48 +718,52 @@ cdef _binomial_cdf_r ( int64_t x, int64_t a, float64_t b ):
     elif b == 1:
         return 1
 
-    if x<argmax:
-        seedpdf=binomial_pdf(argmax,a,b)
-        pdf=seedpdf
+    if x < argmax:
+        seedpdf = binomial_pdf(argmax, a, b)
+        pdf = seedpdf
         cdf = pdf
-        for i in range(argmax-1,x,-1):
-            pdf/=(a-i)*b/(1-b)/(i+1)
-            if pdf==0.0: break
+        for i in range(argmax-1, x, -1):
+            pdf /= (a-i)*b/(1-b)/(i+1)
+            if pdf == 0.0:
+                break
             cdf += pdf
 
         pdf = seedpdf
         i = argmax
         while True:
-            pdf*=(a-i)*b/(1-b)/(i+1)
-            if pdf==0.0: break
-            cdf+=pdf
-            i+=1
-        cdf = min(1,cdf)
-        #cdf = float("%.10e" %cdf)
+            pdf *= (a-i)*b/(1-b)/(i+1)
+            if pdf == 0.0:
+                break
+            cdf += pdf
+            i += 1
+        cdf = min(1, cdf)
+        # cdf = float("%.10e" %cdf)
         return cdf
     else:
-        pdf=binomial_pdf(x+1,a,b)
+        pdf = binomial_pdf(x+1, a, b)
         cdf = pdf
         i = x+1
         while True:
-            pdf*=(a-i)*b/(1-b)/(i+1)
-            if pdf==0.0: break
+            pdf *= (a-i)*b/(1-b)/(i+1)
+            if pdf == 0.0:
+                break
             cdf += pdf
-            i+=1
-        cdf = min(1,cdf)
-        #cdf = float("%.10e" %cdf)
+            i += 1
+        cdf = min(1, cdf)
+        # cdf = float("%.10e" %cdf)
         return cdf
 
 
-cdef _binomial_cdf_f ( int64_t x, int64_t a, float64_t b ):
+@cython.cfunc
+def _binomial_cdf_f(x: int64_t, a: int64_t, b: float64_t) -> float64_t:
     """ Binomial CDF for lower tail.
 
     """
-    cdef int64_t argmax=<int32_t>(a*b)
-    cdef float64_t seedpdf
-    cdef float64_t cdf
-    cdef float64_t pdf
-    cdef int64_t i
+    argmax: int64_t = cython.cast(int32_t, (a*b))
+    seedpdf: float64_t
+    cdf: float64_t
+    pdf: float64_t
+    i: int64_t
 
     if x < 0:
         return 0
@@ -681,106 +774,112 @@ cdef _binomial_cdf_f ( int64_t x, int64_t a, float64_t b ):
     elif b == 1:
         return 0
 
-    if x>argmax:
-        seedpdf=binomial_pdf(argmax,a,b)
-        pdf=seedpdf
+    if x > argmax:
+        seedpdf = binomial_pdf(argmax, a, b)
+        pdf = seedpdf
         cdf = pdf
-        for i in range(argmax-1,-1,-1):
-            pdf/=(a-i)*b/(1-b)/(i+1)
-            if pdf==0.0: break
+        for i in range(argmax-1, -1, -1):
+            pdf /= (a-i)*b/(1-b)/(i+1)
+            if pdf == 0.0:
+                break
             cdf += pdf
 
         pdf = seedpdf
-        for i in range(argmax,x):
-            pdf*=(a-i)*b/(1-b)/(i+1)
-            if pdf==0.0: break
-            cdf+=pdf
-        cdf=min(1,cdf)
-        #cdf = float("%.10e" %cdf)
+        for i in range(argmax, x):
+            pdf *= (a-i)*b/(1-b)/(i+1)
+            if pdf == 0.0:
+                break
+            cdf += pdf
+        cdf = min(1, cdf)
+        # cdf = float("%.10e" %cdf)
         return cdf
     else:
-        pdf=binomial_pdf(x,a,b)
+        pdf = binomial_pdf(x, a, b)
         cdf = pdf
-        for i in range(x-1,-1,-1):
-            pdf/=(a-i)*b/(1-b)/(i+1)
-            if pdf==0.0: break
+        for i in range(x-1, -1, -1):
+            pdf /= (a-i)*b/(1-b)/(i+1)
+            if pdf == 0.0:
+                break
             cdf += pdf
-        cdf=min(1,cdf)
-        #cdf = float("%.10e" %cdf)
+        cdf = min(1, cdf)
+        # cdf = float("%.10e" %cdf)
         return cdf
 
-cpdef binomial_cdf_inv ( float64_t cdf, int64_t a, float64_t b ):
+
+@cython.ccall
+def binomial_cdf_inv(cdf: float64_t, a: int64_t, b: float64_t) -> int64_t:
     """BINOMIAL_CDF_INV inverts the binomial CDF. For lower tail only!
 
     """
-    if cdf < 0 or cdf >1:
+    cdf2: float64_t = 0.0
+    x: int64_t
+
+    if cdf < 0 or cdf > 1:
         raise Exception("CDF must >= 0 or <= 1")
 
-    cdef float64_t cdf2 = 0
-    cdef int64_t x
-
-    for x in range(0,a+1):
-        pdf = binomial_pdf (x,a,b)
+    for x in range(0, a+1):
+        pdf = binomial_pdf(x, a, b)
         cdf2 = cdf2 + pdf
         if cdf < cdf2:
             return x
     return a
 
-cpdef binomial_pdf( int64_t x, int64_t a, float64_t b ):
+
+@cython.ccall
+def binomial_pdf(x: int64_t, a: int64_t, b: float64_t) -> float64_t:
     """binomial PDF by H. Gene Shin
 
     """
+    p: float64_t
+    mn: int64_t
+    mx: int64_t
+    pdf: float64_t
+    t: int64_t
+    q: int64_t
 
-    if a<1:
-        return 0
-    elif x<0 or a<x:
-        return 0
-    elif b==0:
-        if x==0:
-            return 1
+    if a < 1:
+        return 0.0
+    elif x < 0 or a < x:
+        return 0.0
+    elif b == 0:
+        if x == 0:
+            return 1.0
         else:
-            return 0
-    elif b==1:
-        if x==a:
-            return 1
+            return 0.0
+    elif b == 1:
+        if x == a:
+            return 1.0
         else:
-            return 0
+            return 0.0
 
-    cdef float64_t p
-    cdef int64_t mn
-    cdef int64_t mx
-    cdef float64_t pdf
-    cdef int64_t t
-    cdef int64_t q
-
-    if x>a-x:
-        p=1-b
-        mn=a-x
-        mx=x
+    if x > a-x:
+        p = 1-b
+        mn = a-x
+        mx = x
     else:
-        p=b
-        mn=x
-        mx=a-x
-    pdf=1
+        p = b
+        mn = x
+        mx = a-x
+    pdf = 1
     t = 0
-    for q in range(1,mn+1):
-        pdf*=(a-q+1)*p/(mn-q+1)
+    for q in range(1, mn+1):
+        pdf *= (a-q+1)*p/(mn-q+1)
         if pdf < 1e-100:
             while pdf < 1e-3:
                 pdf /= 1-p
-                t-=1
+                t -= 1
         if pdf > 1e+100:
-            while pdf > 1e+3 and t<mx:
+            while pdf > 1e+3 and t < mx:
                 pdf *= 1-p
-                t+=1
+                t += 1
 
     for i in range(mx-t):
         pdf *= 1-p
 
-    #pdf=float("%.10e" % pdf)
+    # pdf=float("%.10e" % pdf)
     return pdf
 
-# cdef normal_01_cdf ( float64_t x ):
+# cdef normal_01_cdf (float64_t x ):
 #     """NORMAL_01_CDF evaluates the Normal 01 CDF.
 #     """
 #     cdef float64_t a1 = 0.398942280444

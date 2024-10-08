@@ -1,6 +1,6 @@
 # cython: language_level=3
 # cython: profile=True
-# Time-stamp: <2020-11-24 17:37:21 Tao Liu>
+# Time-stamp: <2024-10-04 18:10:08 Tao Liu>
 """Module Description: Build shifting model
 
 This code is free software; you can redistribute it and/or modify it
@@ -186,7 +186,7 @@ Summary of Peak Model:
         if taglist.shape[0] < 2: # less than 2 tags, no need to call peaks, return []
             return peak_info
 
-        pileup_array = naive_quick_pileup( taglist, self.peaksize/2 ) # build pileup by extending both side to half peak size
+        pileup_array = naive_quick_pileup( taglist, int(self.peaksize/2) ) # build pileup by extending both side to half peak size
         peak_info = naive_call_peaks( pileup_array, self.min_tags, self.max_tags )
 
         return peak_info
