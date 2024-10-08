@@ -1,4 +1,4 @@
-# Time-stamp: <2024-10-02 17:41:10 Tao Liu>
+# Time-stamp: <2024-10-08 10:53:48 Tao Liu>
 
 
 """Description: Main HMMR command
@@ -58,25 +58,39 @@ def run(args):
     #############################################
     # 0. Names of output files
     #############################################
-    short_bdgfile = os.path.join(options.outdir, options.name+"_digested_short.bdg")
-    mono_bdgfile = os.path.join(options.outdir, options.name+"_digested_mono.bdg")
-    di_bdgfile = os.path.join(options.outdir, options.name+"_digested_di.bdg")
-    tri_bdgfile = os.path.join(options.outdir, options.name+"_digested_tri.bdg")
-    training_region_bedfile = os.path.join(options.outdir, options.name+"_training_regions.bed")
-    training_datafile = os.path.join(options.outdir, options.name+"_training_data.txt")
-    training_datalengthfile = os.path.join(options.outdir, options.name+"_training_lengths.txt")
+    short_bdgfile = os.path.join(options.outdir,
+                                 options.name+"_digested_short.bdg")
+    mono_bdgfile = os.path.join(options.outdir,
+                                options.name+"_digested_mono.bdg")
+    di_bdgfile = os.path.join(options.outdir,
+                              options.name+"_digested_di.bdg")
+    tri_bdgfile = os.path.join(options.outdir,
+                               options.name+"_digested_tri.bdg")
+    training_region_bedfile = os.path.join(options.outdir,
+                                           options.name+"_training_regions.bed")
+    training_datafile = os.path.join(options.outdir,
+                                     options.name+"_training_data.txt")
+    training_datalengthfile = os.path.join(options.outdir,
+                                           options.name+"_training_lengths.txt")
 
-    hmm_modelfile = os.path.join(options.outdir, options.name+"_model.json")
+    hmm_modelfile = os.path.join(options.outdir,
+                                 options.name+"_model.json")
 
-    open_state_bdgfile = os.path.join(options.outdir, options.name+"_open.bdg")
-    nuc_state_bdgfile = os.path.join(options.outdir, options.name+"_nuc.bdg")
-    bg_state_bdgfile = os.path.join(options.outdir, options.name+"_bg.bdg")
+    open_state_bdgfile = os.path.join(options.outdir,
+                                      options.name+"_open.bdg")
+    nuc_state_bdgfile = os.path.join(options.outdir,
+                                     options.name+"_nuc.bdg")
+    bg_state_bdgfile = os.path.join(options.outdir,
+                                    options.name+"_bg.bdg")
 
-    states_file = os.path.join(options.outdir, options.name+"_states.bed")
+    states_file = os.path.join(options.outdir,
+                               options.name+"_states.bed")
 
-    accessible_file = os.path.join(options.outdir, options.name+"_accessible_regions.narrowPeak")
+    accessible_file = os.path.join(options.outdir,
+                                   options.name+"_accessible_regions.narrowPeak")
 
-    cutoffanalysis_file = os.path.join(options.outdir, options.name+"_cutoff_analysis.tsv")
+    cutoffanalysis_file = os.path.join(options.outdir,
+                                       options.name+"_cutoff_analysis.tsv")
 
     #############################################
     # 1. Read the input files
@@ -115,7 +129,10 @@ def run(args):
         for l_p in peakio:
             fs = l_p.rstrip().split()
             i += 1
-            blacklist.add(fs[0].encode(), int(fs[1]), int(fs[2]), name=b"%d" % i)
+            blacklist.add(fs[0].encode(),
+                          int(fs[1]),
+                          int(fs[2]),
+                          name=b"%d" % i)
             blacklist.sort()
         blacklist_regions = Regions()
         blacklist_regions.init_from_PeakIO(blacklist)
@@ -131,8 +148,9 @@ def run(args):
     else:
         # we will use EM to get the best means/stddevs for the mono-, di- and tri- modes of fragment sizes
         options.info("#2 Use EM algorithm to estimate means and stddevs of fragment lengths")
-        options.info("#  for mono-, di-, and tri-nucleosomal signals...") 
-        em_trainer = HMMR_EM(petrack, options.em_means[1:4], options.em_stddevs[1:4], seed=options.hmm_randomSeed)
+        options.info("#  for mono-, di-, and tri-nucleosomal signals...")
+        em_trainer = HMMR_EM(petrack, options.em_means[1:4],
+                             options.em_stddevs[1:4], seed=options.hmm_randomSeed)
         # the mean and stddev after EM training
         em_means = [options.em_means[0],]
         em_means.extend(em_trainer.fragMeans)
@@ -143,21 +161,22 @@ def run(args):
             em_means[i] = round(em_means[i], 1)
         for i in range(len(em_stddevs)):
             em_stddevs[i] = round(em_stddevs[i], 1)
-        options.info(f"#  The means and stddevs after EM:")
+        options.info("#  The means and stddevs after EM:")
 
-    options.info( "#                    {0[0]:>10s} {0[1]:>10s} {0[2]:>10s} {0[3]:>10s}".format(["short", "mono", "di", "tri"]))
-    options.info( "#             means: {0[0]:>10.4g} {0[1]:>10.4g} {0[2]:>10.4g} {0[3]:>10.4g}".format(em_means))
-    options.info( "#           stddevs: {0[0]:>10.4g} {0[1]:>10.4g} {0[2]:>10.4g} {0[3]:>10.4g}".format(em_stddevs))    
+    options.info("#                    {0[0]:>10s} {0[1]:>10s} {0[2]:>10s} {0[3]:>10s}".format(["short", "mono", "di", "tri"]))
+    options.info("#             means: {0[0]:>10.4g} {0[1]:>10.4g} {0[2]:>10.4g} {0[3]:>10.4g}".format(em_means))
+    options.info("#           stddevs: {0[0]:>10.4g} {0[1]:>10.4g} {0[2]:>10.4g} {0[3]:>10.4g}".format(em_stddevs))
 
     # to finalize the EM training, we will decompose ATAC-seq into four signal tracks
-    options.info(f"#  Compute the weights for each fragment length for each of the four signal types")
+    options.info("#  Compute the weights for each fragment length for each of the four signal types")
     fl_dict = petrack.count_fraglengths()
     fl_list = list(fl_dict.keys())
     fl_list.sort()
 
     # now we will prepare the weights for each fragment length for
     # each of the four distributions based on the EM results
-    weight_mapping = generate_weight_mapping(fl_list, em_means, em_stddevs, min_frag_p=options.min_frag_p)
+    weight_mapping = generate_weight_mapping(fl_list, em_means, em_stddevs,
+                                             min_frag_p=options.min_frag_p)
 
     options.info("#  Generate short, mono-, di-, and tri-nucleosomal signals")
     digested_atac_signals = generate_digested_signals(petrack, weight_mapping)
@@ -165,7 +184,7 @@ def run(args):
     # save three types of signals if needed
     if options.save_digested:
         bdgshort = bedGraphIO(short_bdgfile, data=digested_atac_signals[0])
-        bdgshort.write_bedGraph("short","short")
+        bdgshort.write_bedGraph("short", "short")
 
         bdgmono = bedGraphIO(mono_bdgfile, data=digested_atac_signals[1])
         bdgmono.write_bedGraph("mono", "mono")
@@ -177,8 +196,9 @@ def run(args):
         bdgtri.write_bedGraph("tri", "tri")
 
     minlen = int(petrack.average_template_length)
-    # if options.pileup_short is on, we pile up only the short fragments to identify training
-    #  regions and to prescan for candidate regions for decoding.
+    # if options.pileup_short is on, we pile up only the short
+    #  fragments to identify training regions and to prescan for
+    #  candidate regions for decoding.
     if options.pileup_short:
         options.info("#  Pile up ONLY short fragments")
         fc_bdg = digested_atac_signals[0]
@@ -195,9 +215,13 @@ def run(args):
         options.info(f"#3 Generate cutoff analysis report from {petrack.total} fragments")
         options.info(f"#   Please review the cutoff analysis result in {cutoffanalysis_file}")
 
-        # Let MACS3 do the cutoff analysis to help decide the lower and upper cutoffs
+        # Let MACS3 do the cutoff analysis to help decide the lower
+        # and upper cutoffs
         with open(cutoffanalysis_file, "w") as ofhd_cutoff:
-            ofhd_cutoff.write(fc_bdg.cutoff_analysis(min_length=minlen, max_gap=options.hmm_training_flanking, max_score=options.cutoff_analysis_max, steps=options.cutoff_analysis_steps))
+            ofhd_cutoff.write(fc_bdg.cutoff_analysis(min_length=minlen,
+                                                     max_gap=options.hmm_training_flanking,
+                                                     max_score=options.cutoff_analysis_max,
+                                                     steps=options.cutoff_analysis_steps))
         # raise Exception("Cutoff analysis only.")
         sys.exit(1)
 
@@ -216,7 +240,7 @@ def run(args):
         peaks = PeakIO()
         for l_p in peakio:
             fs = l_p.rstrip().split()
-            peaks.add(chromosome=fs[0], start=int(fs[1]), end=int(fs[2]))  #change based on what expected input file should contain
+            peaks.add(chromosome=fs[0], start=int(fs[1]), end=int(fs[2]))  # change based on what expected input file should contain
         peakio.close()
         training_regions = Regions()
         training_regions.init_from_PeakIO(peaks)
@@ -228,7 +252,7 @@ def run(args):
         options.info(f"#3 Look for training set from {petrack.total} fragments")
         options.info(f"#  Call peak above within fold-change range of {options.hmm_lower} and {options.hmm_upper}.")
         options.info(f"#   The minimum length of the region is set as the average template/fragment length in the dataset: {minlen}")
-        options.info(f"#   The maximum gap to merge nearby significant regions is set as the flanking size to extend training regions: {options.hmm_training_flanking}")    
+        options.info(f"#   The maximum gap to merge nearby significant regions is set as the flanking size to extend training regions: {options.hmm_training_flanking}")
         peaks = fc_bdg.call_peaks(cutoff=options.hmm_lower, min_length=minlen, max_gap=options.hmm_training_flanking, call_summits=False)
         options.info(f"#  Total training regions called after applying the lower cutoff {options.hmm_lower}: {peaks.total}")
         peaks.filter_score(options.hmm_lower, options.hmm_upper)
@@ -301,7 +325,10 @@ def run(args):
 
         options.info("#  Use Baum-Welch algorithm to train the HMM")
 
-        hmm_model = hmm_training(training_data, training_data_lengths, random_seed=options.hmm_randomSeed, hmm_type=options.hmm_type)
+        hmm_model = hmm_training(training_data,
+                                 training_data_lengths,
+                                 random_seed=options.hmm_randomSeed,
+                                 hmm_type=options.hmm_type)
 
         options.info(f"#   HMM converged: {hmm_model.monitor_.converged}")
 
@@ -334,7 +361,7 @@ def run(args):
     assignments[i_open_region] = "open"
     assignments[i_nucleosomal_region] = "nuc"
     assignments[i_background_region] = "bg"
-    
+
     options.info(f"#  The Hidden Markov Model for signals of binsize of {options.hmm_binsize} basepairs:")
     options.info(f"#   open state index: state{i_open_region}")
     options.info(f"#   nucleosomal state index: state{i_nucleosomal_region}")
@@ -360,7 +387,7 @@ def run(args):
         options.info( "#       {0:>10s}:  {1[0]:>10.4g} {1[1]:>10.4g} {1[2]:>10.4g} {1[3]:>10.4g}".format(assignments[0], hmm_model.lambdas_[0]))
         options.info( "#       {0:>10s}:  {1[0]:>10.4g} {1[1]:>10.4g} {1[2]:>10.4g} {1[3]:>10.4g}".format(assignments[1], hmm_model.lambdas_[1]))
         options.info( "#       {0:>10s}:  {1[0]:>10.4g} {1[1]:>10.4g} {1[2]:>10.4g} {1[3]:>10.4g}".format(assignments[2], hmm_model.lambdas_[2]))
-    
+
 
 #############################################
 # 5. Predict
@@ -450,7 +477,7 @@ def run(args):
     # # Generate states path:
     states_path = generate_states_path(predicted_proba_file, options.hmm_binsize, i_open_region, i_nucleosomal_region, i_background_region)
     options.info("# finished generating states path")
-    predicted_proba_file.close()          #kill the temp file
+    predicted_proba_file.close()          # kill the temp file
     # Save states path if needed
     # PS: we need to implement extra feature to include those regions NOT in candidate_bins and assign them as 'background state'.
     if options.save_states:
@@ -581,8 +608,11 @@ def save_accessible_regions(states_path, accessible_region_file, openregion_minl
     # This by default is the only final output from HMMRATAC
     accessible_regions = []
     for i in range(len(states_path)-2):
-        if (states_path[i][3] == 'nuc' and states_path[i+1][3] == 'open' and states_path[i+2][3] == 'nuc' and 
-            states_path[i][2] == states_path[i+1][1] and states_path[i+1][2] == states_path[i+2][1] and 
+        if (states_path[i][3] == 'nuc' and
+            states_path[i+1][3] == 'open' and
+            states_path[i+2][3] == 'nuc' and
+            states_path[i][2] == states_path[i+1][1] and
+            states_path[i+1][2] == states_path[i+2][1] and
             states_path[i+2][2] - states_path[i][1] > openregion_minlen):  # require nuc-open-nuc entire region start/endpos > openregion_minlen
             accessible_regions = add_regions(i, accessible_regions)
 
