@@ -191,7 +191,7 @@ def main():
                              ["MACS3/IO/PeakIO.pyx"],
                              extra_compile_args=extra_c_args),
                    Extension("MACS3.IO.BedGraphIO",
-                             ["MACS3/IO/BedGraphIO.pyx"],
+                             ["MACS3/IO/BedGraphIO.py"],
                              extra_compile_args=extra_c_args),
                    Extension("MACS3.IO.BAM",
                              ["MACS3/IO/BAM.py",], libraries=["m"],
