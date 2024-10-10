@@ -1,6 +1,6 @@
 # cython: language_level=3
 # cython: profile=True
-# Time-stamp: <2024-05-14 12:06:19 Tao Liu>
+# Time-stamp: <2024-10-10 16:45:13 Tao Liu>
 
 """Module for Feature IO classes.
 
@@ -20,7 +20,7 @@ from functools import reduce
 # ------------------------------------
 from MACS3.Signal.SignalProcessing import maxima, enforce_valleys, enforce_peakyness
 from MACS3.Signal.Prob import poisson_cdf
-from MACS3.IO.PeakIO import PeakIO, BroadPeakIO, parse_peakname
+from MACS3.IO.PeakIO import PeakIO, BroadPeakIO
 
 # ------------------------------------
 # Other modules

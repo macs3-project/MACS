@@ -1,7 +1,7 @@
 # cython: language_level=3
 # cython: profile=True
 # cython: linetrace=True
-# Time-stamp: <2022-09-15 17:06:17 Tao Liu>
+# Time-stamp: <2024-10-10 16:45:01 Tao Liu>
 
 """Module for Calculate Scores.
 
@@ -46,7 +46,7 @@ from libc.math cimport exp,log,log10, M_LN10, log1p, erf, sqrt, floor, ceil
 # MACS3 modules
 # ------------------------------------
 from MACS3.Signal.SignalProcessing import maxima, enforce_valleys, enforce_peakyness
-from MACS3.IO.PeakIO import PeakIO, BroadPeakIO, parse_peakname
+from MACS3.IO.PeakIO import PeakIO, BroadPeakIO
 from MACS3.Signal.FixWidthTrack import FWTrack
 from MACS3.Signal.PairedEndTrack import PETrackI
 from MACS3.Signal.Prob import poisson_cdf
