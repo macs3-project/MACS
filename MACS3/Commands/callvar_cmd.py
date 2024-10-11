@@ -1,4 +1,4 @@
-# Time-stamp: <2024-10-02 16:34:23 Tao Liu>
+# Time-stamp: <2024-10-11 10:28:07 Tao Liu>
 
 """Description: Call variants directly
 
@@ -137,11 +137,11 @@ def run(args):
 
     peakio = open(peakbedfile)
     peaks = PeakIO()
-    i = 0
+    #i = 0
     for t_peak in peakio:
         fs = t_peak.rstrip().split()
-        i += 1
-        peaks.add(fs[0].encode(), int(fs[1]), int(fs[2]), name=b"%d" % i)
+        # i += 1
+        peaks.add(fs[0].encode(), int(fs[1]), int(fs[2]))  # , name=b"%d" % i)
     peaks.sort()
 
     # chrs = peaks.get_chr_names()

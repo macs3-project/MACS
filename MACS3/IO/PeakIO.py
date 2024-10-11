@@ -1,6 +1,6 @@
 # cython: language_level=3
 # cython: profile=True
-# Time-stamp: <2024-10-10 17:00:18 Tao Liu>
+# Time-stamp: <2024-10-11 11:13:11 Tao Liu>
 
 """Module for PeakIO IO classes.
 
@@ -15,7 +15,6 @@ the distribution).
 from itertools import groupby
 from operator import itemgetter
 import random
-import re
 import sys
 
 # ------------------------------------
@@ -75,7 +74,7 @@ class PeakContent:
                  pscore: cython.float,
                  fold_change: cython.float,
                  qscore: cython.float,
-                 name: bytes = b"NA"):
+                 name: bytes = b""):
         self.chrom = chrom
         self.start = start
         self.end = end
@@ -163,26 +162,15 @@ class PeakIO:
     @cython.ccall
     def add(self,
             chromosome: bytes,
-            start: cython.int,
-            end: cython.int,
-            summit: cython.int = 0,
-            peak_score: cython.float = 0,
-            pileup: cython.float = 0,
-            pscore: cython.float = 0,
-            fold_change: cython.float = 0,
-            qscore: cython.float = 0,
-            name: bytes = b"NA"):
-        """items:
-        start:start
-        end:end,
-        length:end-start,
-        summit:summit,
-        score:peak_score,
-        pileup:pileup,
-        pscore:pscore,
-        fc:fold_change,
-        qscore:qscore
-        """
+            start: cython.int,  # leftmost position
+            end: cython.int,    # rightmost position
+            summit: cython.int = 0,  # summit position
+            peak_score: cython.float = 0,  # score
+            pileup: cython.float = 0,      # pileup value
+            pscore: cython.float = 0,      # -log10 pvalue
+            fold_change: cython.float = 0,  # fold change
+            qscore: cython.float = 0,      # -log10 qvalue
+            name: bytes = b""):            # peak name
         if not self.peaks.has_key(chromosome):
             self.peaks[chromosome] = []
         self.peaks[chromosome].append(PeakContent(chromosome,
@@ -215,7 +203,7 @@ class PeakIO:
         return self.peaks[chrom]
 
     def get_chr_names(self) -> set:
-        return set(sorted(self.peaks.keys()))
+        return set(self.peaks.keys())
 
     def sort(self):
         chrs: list
@@ -342,6 +330,8 @@ class PeakIO:
         chrs: list
         n_peak: cython.int
         ret: str
+        chrom: bytes
+        peaks: list
 
         ret = ""
         chrs = list(self.peaks.keys())
@@ -448,7 +438,7 @@ class PeakIO:
                     print_func("%s\t%d\t%d\t%s%d\t%.6g\n" % (chrom.decode(), summit_p, summit_p+1, peakprefix.decode(), n_peak, peak[score_column]))
 
     def tobed(self):
-        """Print out peaks in BED5 format.
+        """Print out (stdout) peaks in BED5 format.
 
         Five columns are chromosome, peak start, peak end, peak name, and peak height.
 
@@ -462,19 +452,19 @@ class PeakIO:
         fc:fold_change,
         qscore:qvalue
         """
-        return self._to_bed(name_prefix=b"peak_", score_column="score", name=b"", description=b"")
+        return self._to_bed(name_prefix=b"%s_peak_", score_column="score", name=self.name, description=b"")
 
     def to_summits_bed(self):
-        """Print out peak summits in BED5 format.
+        """Print out (stdout) peak summits in BED5 format.
 
         Five columns are chromosome, summit start, summit end, peak name, and peak height.
 
         """
-        return self._to_summits_bed(name_prefix=b"peak_", score_column="score", name=b"", description=b"")
+        return self._to_summits_bed(name_prefix=b"%s_peak_", score_column="score", name=self.name, description=b"")
 
     # these methods are very fast, specifying types is unnecessary
     def write_to_bed(self, fhd,
-                     name_prefix: bytes = b"peak_",
+                     name_prefix: bytes = b"%s_peak_",
                      name: bytes = b"MACS",
                      description: bytes = b"%s",
                      score_column: str = "score",
@@ -538,7 +528,7 @@ class PeakIO:
 
     def write_to_narrowPeak(self, fhd,
                             name_prefix: bytes = b"%s_peak_",
-                            name: bytes = b"peak",
+                            name: bytes = b"MACS",
                             score_column: str = "score",
                             trackline: bool = False):
         """Print out peaks in narrowPeak format.

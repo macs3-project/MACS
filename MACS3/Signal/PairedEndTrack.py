@@ -1,6 +1,6 @@
 # cython: language_level=3
 # cython: profile=True
-# Time-stamp: <2024-10-10 17:03:45 Tao Liu>
+# Time-stamp: <2024-10-11 11:21:30 Tao Liu>
 
 """Module for filter duplicate tags from paired-end data
 
@@ -684,6 +684,7 @@ class PEtrackII(PETrackI):
         if chromosome not in self.__locations:
             self.__buf_size[chromosome] = self.buffer_size
             # note: ['l'] is the leftmost end, ['r'] is the rightmost end of fragment.
+            # ['c'] is the count number of this fragment
             self.__locations[chromosome] = np.zeros(shape=self.buffer_size,
                                                     dtype=[('l', 'i4'), ('r', 'i4'), ('c', 'u1')])
             self.__barcodes[chromosome] = np.zeros(shape=self.buffer_size,

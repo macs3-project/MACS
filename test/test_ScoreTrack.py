@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# Time-stamp: <2020-11-30 14:12:58 Tao Liu>
+# Time-stamp: <2024-10-11 10:17:53 Tao Liu>
 
 import io
 import unittest
@@ -96,11 +96,11 @@ chrY	110	160	0.00006
 chrY	160	210	6.40804
 """
         # for peak calls
-        self.peak1 = """chrY	0	60	peak_1	60.4891
-chrY	160	210	peak_2	6.40804
+        self.peak1 = """chrY	0	60	MACS_peak_1	60.4891
+chrY	160	210	MACS_peak_2	6.40804
 """
-        self.summit1 = """chrY	5	6	peak_1	60.4891
-chrY	185	186	peak_2	6.40804
+        self.summit1 = """chrY	5	6	MACS_peak_1	60.4891
+chrY	185	186	MACS_peak_2	6.40804
 """
         self.xls1    ="""chr	start	end	length	abs_summit	pileup	-log10(pvalue)	fold_enrichment	-log10(qvalue)	name
 chrY	1	60	60	6	100	63.2725	9.18182	-1	MACS_peak_1
