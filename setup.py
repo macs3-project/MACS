@@ -116,7 +116,7 @@ def main():
                              include_dirs=numpy_include_dir,
                              extra_compile_args=extra_c_args),
                    Extension("MACS3.Signal.FixWidthTrack",
-                             ["MACS3/Signal/FixWidthTrack.pyx"],
+                             ["MACS3/Signal/FixWidthTrack.py"],
                              include_dirs=numpy_include_dir,
                              extra_compile_args=extra_c_args),
                    Extension("MACS3.Signal.PairedEndTrack",
