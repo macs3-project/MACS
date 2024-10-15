@@ -124,7 +124,7 @@ def main():
                              include_dirs=numpy_include_dir,
                              extra_compile_args=extra_c_args),
                    Extension("MACS3.Signal.BedGraph",
-                             ["MACS3/Signal/BedGraph.pyx"],
+                             ["MACS3/Signal/BedGraph.py"],
                              libraries=["m"],
                              include_dirs=numpy_include_dir,
                              extra_compile_args=extra_c_args),

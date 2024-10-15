@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# Time-stamp: <2022-09-14 13:33:37 Tao Liu>
+# Time-stamp: <2024-10-14 21:32:21 Tao Liu>
 
 import unittest
 import sys
@@ -49,7 +49,7 @@ class Test_PeakIO(unittest.TestCase):
         r1.exclude(r2)
         result = str(r1)
         expected = str(self.exclude2from1)
-        print( "result:\n",result )
-        print( "expected:\n", expected )
+        # print( "result:\n",result )
+        # print( "expected:\n", expected )
         self.assertEqual( result, expected )
 

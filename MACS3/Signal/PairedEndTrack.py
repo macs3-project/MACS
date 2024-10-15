@@ -1,6 +1,6 @@
 # cython: language_level=3
 # cython: profile=True
-# Time-stamp: <2024-10-14 13:15:32 Tao Liu>
+# Time-stamp: <2024-10-14 21:13:35 Tao Liu>
 
 """Module for filter duplicate tags from paired-end data
 
@@ -24,7 +24,8 @@ from MACS3.Signal.Pileup import (quick_pileup,
                                  over_two_pv_array,
                                  se_all_in_one_pileup)
 from MACS3.Signal.BedGraph import bedGraphTrackI
-from MACS3.Signal.PileupV2 import pileup_from_LR_hmmratac
+from MACS3.Signal.PileupV2 import (pileup_from_LR_hmmratac,
+                                   pileup_from_LRC)
 # ------------------------------------
 # Other modules
 # ------------------------------------
@@ -56,7 +57,7 @@ class PETrackI:
     locations = cython.declare(dict, visibility="public")
     size = cython.declare(dict, visibility="public")
     buf_size = cython.declare(dict, visibility="public")
-    sorted = cython.declare(bool, visibility="public")
+    is_sorted = cython.declare(bool, visibility="public")
     total = cython.declare(cython.ulong, visibility="public")
     annotation = cython.declare(str, visibility="public")
     # rlengths: reference chromosome lengths dictionary
@@ -64,27 +65,28 @@ class PETrackI:
     buffer_size = cython.declare(cython.long, visibility="public")
     length = cython.declare(cython.long, visibility="public")
     average_template_length = cython.declare(cython.float, visibility="public")
-    destroyed: bool
+    is_destroyed: bool
 
     def __init__(self, anno: str = "", buffer_size: cython.long = 100000):
         """fw is the fixed-width for all locations.
 
         """
         # dictionary with chrname as key, nparray with
-        # [('l','int32'),('r','int32')] as value
+        # [('l','i4'),('r','i4')] as value
         self.locations = {}
         # dictionary with chrname as key, size of the above nparray as value
         # size is to remember the size of the fragments added to this chromosome
         self.size = {}
         # dictionary with chrname as key, size of the above nparray as value
         self.buf_size = {}
-        self.sorted = False
+        self.is_sorted = False
         self.total = 0           # total fragments
         self.annotation = anno   # need to be figured out
         self.rlengths = {}
         self.buffer_size = buffer_size
         self.length = 0
         self.average_template_length = 0.0
+        self.is_destroyed = False
 
     @cython.ccall
     def add_loc(self, chromosome: bytes,
@@ -130,7 +132,7 @@ class PETrackI:
                                                   refcheck=False)
                 self.locations[chromosome] = None
                 self.locations.pop(chromosome)
-        self.destroyed = True
+        self.is_destroyed = True
         return
 
     @cython.ccall
@@ -187,7 +189,7 @@ class PETrackI:
             self.locations[c].sort(order=['l', 'r'])
             self.total += self.size[c]
 
-        self.sorted = True
+        self.is_sorted = True
         self.average_template_length = cython.cast(cython.float, self.length) / self.total
         return
 
@@ -219,7 +221,7 @@ class PETrackI:
 
         for c in chrnames:
             self.locations[c].sort(order=['l', 'r'])  # sort by the leftmost location
-        self.sorted = True
+        self.is_sorted = True
         return
 
     @cython.ccall
@@ -286,7 +288,7 @@ class PETrackI:
         if maxnum < 0:
             return              # condition to return if not filtering
 
-        if not self.sorted:
+        if not self.is_sorted:
             self.sort()
 
         self.total = 0
@@ -539,7 +541,7 @@ class PETrackI:
         three_shift: cython.long
         rlength: cython.long = self.get_rlengths()[chrom]
 
-        if not self.sorted:
+        if not self.is_sorted:
             self.sort()
 
         assert len(ds) == len(scale_factor_s), "ds and scale_factor_s must have the same length!"
@@ -619,10 +621,12 @@ class PETrackI:
     def pileup_bdg_hmmr(self,
                         mapping: list,
                         baseline_value: cython.float = 0.0) -> list:
-        """pileup all chromosomes, and return a list of four
-        bedGraphTrackI objects: short, mono, di, and tri nucleosomal
-        signals.
+        """pileup all chromosomes, and return a list of four p-v
+        ndarray objects: short, mono, di, and tri nucleosomal signals.
 
+        This is specifically designed for hmmratac
+        HMM_SignalProcessing.py. Not a general function.
+        
         The idea is that for each fragment length, we generate four
         bdg using four weights from four distributions. Then we add
         all sets of four bdgs together.
@@ -650,40 +654,66 @@ class PETrackI:
 
 
 @cython.cclass
-class PETrackII(PETrackI):
-    """Documentation for PEtrac
+class PETrackII:
+    """Paired-end track class for fragment files from single-cell
+    ATAC-seq experiments. We will store data of start, end, barcode,
+    and count from the fragment files.
+
+    * I choose not to inherit PETrackI because there would be a lot of
+      differences.
 
     """
+    locations = cython.declare(dict, visibility="public")
     # add another dict for storing barcode for each fragment we will
     # first convert barcode into integer and remember them in the
-    # barcode_dict, which will map key:barcode -> value:integer
+    # barcode_dict, which will map the rule to numerize
+    # key:bytes as value:4bytes_integer
     barcodes = cython.declare(dict, visibility="public")
     barcode_dict = cython.declare(dict, visibility="public")
-    # the last number for barcodes, used to map barcode into integer
+    # the last number for barcodes, used to map barcode to integer
     barcode_last_n: cython.int
 
-    def __init__(self):
-        super().__init__()
+    size = cython.declare(dict, visibility="public")
+    buf_size = cython.declare(dict, visibility="public")
+    is_sorted = cython.declare(bool, visibility="public")
+    total = cython.declare(cython.ulong, visibility="public")
+    annotation = cython.declare(str, visibility="public")
+    # rlengths: reference chromosome lengths dictionary
+    rlengths = cython.declare(dict, visibility="public")
+    buffer_size = cython.declare(cython.long, visibility="public")
+    length = cython.declare(cython.long, visibility="public")
+    average_template_length = cython.declare(cython.float, visibility="public")
+    is_destroyed: bool
+
+    def __init__(self, anno: str = "", buffer_size: cython.long = 100000):
+        # dictionary with chrname as key, nparray with
+        # [('l','i4'),('r','i4'),('c','u1')] as value
+        self.locations = {}
+        # dictionary with chrname as key, size of the above nparray as value
+        # size is to remember the size of the fragments added to this chromosome
+        self.size = {}
+        # dictionary with chrname as key, size of the above nparray as value
+        self.buf_size = {}
+        self.is_sorted = False
+        self.total = 0           # total fragments
+        self.annotation = anno   # need to be figured out
+        self.rlengths = {}
+        self.buffer_size = buffer_size
+        self.length = 0
+        self.average_template_length = 0.0
+        self.is_destroyed = False
+
         self.barcodes = {}
         self.barcode_dict = {}
         self.barcode_last_n = 0
 
     @cython.ccall
-    def add_loc(self, chromosome: bytes,
-                start: cython.int, end: cython.int):
-        raise NotImplementedError("This function is disabled PETrackII")
-
-    @cython.ccall
-    def filter_dup(self, maxnum: cython.int = -1):
-        raise NotImplementedError("This function is disabled PETrackII")
-
-    @cython.ccall
-    def add_frag(self,
-                 chromosome: bytes,
-                 start: cython.int,
-                 end: cython.int,
-                 barcode: bytes,
-                 count: cython.uchar):
+    def add_loc(self,
+                chromosome: bytes,
+                start: cython.int,
+                end: cython.int,
+                barcode: bytes,
+                count: cython.uchar):
         """Add a location to the list according to the sequence name.
 
         chromosome: mostly the chromosome name
@@ -747,8 +777,41 @@ class PETrackII(PETrackI):
                 self.barcodes[chromosome] = None
                 self.barcodes.pop(chromosome)
         self.barcode_dict = {}
-        self.destroyed = True
+        self.is_destroyed = True
         return
+
+    @cython.ccall
+    def set_rlengths(self, rlengths: dict) -> bool:
+        """Set reference chromosome lengths dictionary.
+
+        Only the chromosome existing in this petrack object will be updated.
+
+        If a chromosome in this petrack is not covered by given
+        rlengths, and it has no associated length, it will be set as
+        maximum integer.
+        """
+        valid_chroms: set
+        missed_chroms: set
+        chrom: bytes
+
+        valid_chroms = set(self.locations.keys()).intersection(rlengths.keys())
+        for chrom in sorted(valid_chroms):
+            self.rlengths[chrom] = rlengths[chrom]
+        missed_chroms = set(self.locations.keys()).difference(rlengths.keys())
+        for chrom in sorted(missed_chroms):
+            self.rlengths[chrom] = INT_MAX
+        return True
+
+    @cython.ccall
+    def get_rlengths(self) -> dict:
+        """Get reference chromosome lengths dictionary.
+
+        If self.rlengths is empty, create a new dict where the length of
+        chromosome will be set as the maximum integer.
+        """
+        if not self.rlengths:
+            self.rlengths = dict([(k, INT_MAX) for k in self.locations.keys()])
+        return self.rlengths
 
     @cython.ccall
     def finalize(self):
@@ -774,10 +837,28 @@ class PETrackII(PETrackI):
             self.barcodes[c] = self.barcodes[c][indices]
             self.total += np.sum(self.locations[c]['c'])  # self.size[c]
 
-        self.sorted = True
+        self.is_sorted = True
         self.average_template_length = cython.cast(cython.float,
                                                    self.length) / self.total
         return
+
+    @cython.ccall
+    def get_locations_by_chr(self, chromosome: bytes):
+        """Return a np array of left/right/count for certain chromosome.
+
+        """
+        if chromosome in self.locations:
+            return self.locations[chromosome]
+        else:
+            raise Exception("No such chromosome name (%s) in TrackI object!\n" % (chromosome))
+
+    @cython.ccall
+    def get_chr_names(self) -> set:
+        """Return all the chromosome names in this track object as a
+        python set.
+
+        """
+        return set(self.locations.keys())
 
     @cython.ccall
     def sort(self):
@@ -794,7 +875,7 @@ class PETrackII(PETrackI):
             indices = np.argsort(self.locations[c], order=['l', 'r'])
             self.locations[c] = self.locations[c][indices]
             self.barcodes[c] = self.barcodes[c][indices]
-        self.sorted = True
+        self.is_sorted = True
         return
 
     @cython.ccall
@@ -849,7 +930,7 @@ class PETrackII(PETrackI):
         """Make a subset of PETrackII with only the given barcodes.
 
         Note: the selected_barcodes is a set of barcodes in python
-        bytes. For example, b"ATCTGCTAGTCTACAT"
+        bytes. For example, {b"ATCTGCTAGTCTACAT", b"ATTCTCGATGCAGTCA"}
 
         """
         indices: cnp.ndarray
@@ -875,23 +956,20 @@ class PETrackII(PETrackI):
 
         # pass some values from self to ret
         ret.annotation = self.annotation
-        ret.sorted = self.sorted
+        ret.is_sorted = self.is_sorted
         ret.rlengths = self.rlengths
         ret.buffer_size = self.buffer_size
         ret.total = 0
         ret.length = 0
         ret.average_template_length = 0
-        ret.destroyed = True
+        ret.is_destroyed = True
 
         for chromosome in sorted(chrs):
-            indices = np.where(np.isin(self.barcodes[chromosome], list(selected_barcodes_n)))[0]
-            print(chrs, indices)
+            indices = np.where(np.isin(self.barcodes[chromosome],
+                                       list(selected_barcodes_n)))[0]
             ret.barcodes[chromosome] = self.barcodes[chromosome][indices]
-            print(ret.barcodes)
             ret.locations[chromosome] = self.locations[chromosome][indices]
-            print(ret.locations)
             ret.size[chromosome] = len(ret.locations[chromosome])
-            print(ret.size)
             ret.buf_size[chromosome] = ret.size[chromosome]
             ret.total += np.sum(ret.locations[chromosome]['c'])
             ret.length += np.sum((ret.locations[chromosome]['r'] -
@@ -901,57 +979,23 @@ class PETrackII(PETrackI):
         return ret
 
     @cython.ccall
-    def sample_percent(self, percent: cython.float, seed: cython.int = -1):
-        raise NotImplementedError("This function is disabled PETrackII")
-
-    @cython.ccall
-    def sample_percent_copy(self, percent: cython.float, seed: cython.int = -1):
-        raise NotImplementedError("This function is disabled PETrackII")
-
-    @cython.ccall
-    def sample_num(self, samplesize: cython.ulong, seed: cython.int = -1):
-        raise NotImplementedError("This function is disabled PETrackII")
-
-    @cython.ccall
-    def sample_num_copy(self, samplesize: cython.ulong, seed: cython.int = -1):
-        raise NotImplementedError("This function is disabled PETrackII")
-
-    @cython.ccall
     def pileup_a_chromosome(self,
-                            chrom: bytes,
-                            scale_factor_s: list,
-                            baseline_value: cython.float = 0.0) -> list:
-        """pileup a certain chromosome, return [p,v] (end position and
-        pileup value) list.
-
-        scale_factor_s : linearly scale the pileup value applied to
-                         each d in ds. The list should have the same
-                         length as ds.
-
-        baseline_value : a value to be filled for missing values, and
-                         will be the minimum pileup.
-
+                            chrom: bytes) -> cnp.ndarray:
+        """pileup a certain chromosome, return p-v ndarray (end
+        position and pileup value).
         """
-        tmp_pileup: list
-        prev_pileup: list
-        scale_factor: cython.float
+        return pileup_from_LRC(self.locations[chrom])
 
-        prev_pileup = None
+    @cython.ccall
+    def pileup_bdg(self):
+        """Pileup all chromosome and return a bdg object.
+        """
+        bdg: bedGraphTrackI
+        pv: cnp.ndarray
 
-        for i in range(len(scale_factor_s)):
-            scale_factor = scale_factor_s[i]
+        bdg = bedGraphTrackI()
+        for chrom in self.get_chr_names():
+            pv = pileup_from_LRC(self.locations[chrom])
+            bdg.add_chrom_data_PV(chrom, pv)
 
-            # Can't directly pass partial nparray there since that will mess up with pointer calculation.
-            tmp_pileup = quick_pileup(np.sort(self.locations[chrom]['l']),
-                                      np.sort(self.locations[chrom]['r']),
-                                      scale_factor, baseline_value)
-
-            if prev_pileup:
-                prev_pileup = over_two_pv_array(prev_pileup,
-                                                tmp_pileup,
-                                                func="max")
-            else:
-                prev_pileup = tmp_pileup
-
-        return prev_pileup
-
+        return bdg

@@ -1,6 +1,6 @@
 # cython: language_level=3
 # cython: profile=True
-# Time-stamp: <2024-10-14 13:42:18 Tao Liu>
+# Time-stamp: <2024-10-14 20:08:53 Tao Liu>
 
 """Module Description: For pileup functions.
 
@@ -24,7 +24,6 @@ from cython.cimports.MACS3.Signal.cPosValCalculation import quick_pileup as c_qu
 # ------------------------------------
 import numpy as np
 import cython.cimports.numpy as cnp
-from cython.cimports.numpy import int32_t, float32_t
 from cython.cimports.cpython import bool
 
 # ------------------------------------
@@ -60,7 +59,7 @@ def fix_coordinates(poss: cnp.ndarray, rlength: cython.int) -> cnp.ndarray:
     """Fix the coordinates.
     """
     i: cython.long
-    ptr: cython.pointer(int32_t) = cython.cast(cython.pointer(int32_t), poss.data)  # pointer
+    ptr: cython.pointer(cython.int) = cython.cast(cython.pointer(cython.int), poss.data)  # pointer
 
     #ptr = <int32_t *> poss.data
 
@@ -276,10 +275,10 @@ def se_all_in_one_pileup(plus_tags: cnp.ndarray,
     ret_v: cnp.ndarray
 
     # pointers are used for numpy arrays
-    start_poss_ptr: cython.pointer(int32_t)
-    end_poss_ptr: cython.pointer(int32_t)
-    ret_p_ptr: cython.pointer(int32_t)
-    ret_v_ptr: cython.pointer(float32_t)
+    start_poss_ptr: cython.pointer(cython.int)
+    end_poss_ptr: cython.pointer(cython.int)
+    ret_p_ptr: cython.pointer(cython.int)
+    ret_v_ptr: cython.pointer(cython.float)
 
     start_poss = np.concatenate((plus_tags-five_shift, minus_tags-three_shift))
     end_poss = np.concatenate((plus_tags+three_shift, minus_tags+five_shift))
@@ -294,14 +293,14 @@ def se_all_in_one_pileup(plus_tags: cnp.ndarray,
 
     lx = start_poss.shape[0]
 
-    start_poss_ptr = cython.cast(cython.pointer(int32_t), start_poss.data)  # <int32_t *> start_poss.data
-    end_poss_ptr = cython.cast(cython.pointer(int32_t), end_poss.data)  # <int32_t *> end_poss.data
+    start_poss_ptr = cython.cast(cython.pointer(cython.int), start_poss.data)  # <int32_t *> start_poss.data
+    end_poss_ptr = cython.cast(cython.pointer(cython.int), end_poss.data)  # <int32_t *> end_poss.data
 
     ret_p = np.zeros(2 * lx, dtype="i4")
     ret_v = np.zeros(2 * lx, dtype="f4")
 
-    ret_p_ptr = cython.cast(cython.pointer(int32_t), ret_p.data)
-    ret_v_ptr = cython.cast(cython.pointer(float32_t), ret_v.data)
+    ret_p_ptr = cython.cast(cython.pointer(cython.int), ret_p.data)
+    ret_v_ptr = cython.cast(cython.pointer(cython.float), ret_v.data)
 
     tmp = [ret_p, ret_v]        # for (endpos,value)
 
@@ -421,19 +420,19 @@ def quick_pileup(start_poss: cnp.ndarray,
     tmp: list
 
     # pointers are used for numpy arrays
-    start_poss_ptr: cython.pointer(int32_t)
-    end_poss_ptr: cython.pointer(int32_t)
-    ret_p_ptr: cython.pointer(int32_t)
-    ret_v_ptr: cython.pointer(float32_t)
+    start_poss_ptr: cython.pointer(cython.int)
+    end_poss_ptr: cython.pointer(cython.int)
+    ret_p_ptr: cython.pointer(cython.int)
+    ret_v_ptr: cython.pointer(cython.float)
 
-    start_poss_ptr = cython.cast(cython.pointer(int32_t), start_poss.data)  # <int32_t *> start_poss.data
-    end_poss_ptr = cython.cast(cython.pointer(int32_t), end_poss.data)  # <int32_t *> end_poss.data
+    start_poss_ptr = cython.cast(cython.pointer(cython.int), start_poss.data)  # <int32_t *> start_poss.data
+    end_poss_ptr = cython.cast(cython.pointer(cython.int), end_poss.data)  # <int32_t *> end_poss.data
 
     ret_p = np.zeros(l, dtype="i4")
     ret_v = np.zeros(l, dtype="f4")
 
-    ret_p_ptr = cython.cast(cython.pointer(int32_t), ret_p.data)
-    ret_v_ptr = cython.cast(cython.pointer(float32_t), ret_v.data)
+    ret_p_ptr = cython.cast(cython.pointer(cython.int), ret_p.data)
+    ret_v_ptr = cython.cast(cython.pointer(cython.float), ret_v.data)
 
     tmp = [ret_p, ret_v]        # for (endpos,value)
 
@@ -530,23 +529,23 @@ def naive_quick_pileup(sorted_poss: cnp.ndarray, extension: int) -> list:
     ret_v: cnp.ndarray
 
     # pointers are used for numpy arrays
-    start_poss_ptr: cython.pointer(int32_t)
-    end_poss_ptr: cython.pointer(int32_t)
-    ret_p_ptr: cython.pointer(int32_t)
-    ret_v_ptr: cython.pointer(float32_t)
+    start_poss_ptr: cython.pointer(cython.int)
+    end_poss_ptr: cython.pointer(cython.int)
+    ret_p_ptr: cython.pointer(cython.int)
+    ret_v_ptr: cython.pointer(cython.float)
 
     start_poss = sorted_poss - extension
     start_poss[start_poss < 0] = 0
     end_poss = sorted_poss + extension
 
-    start_poss_ptr = cython.cast(cython.pointer(int32_t), start_poss.data)  # <int32_t *> start_poss.data
-    end_poss_ptr = cython.cast(cython.pointer(int32_t), end_poss.data)  # <int32_t *> end_poss.data
+    start_poss_ptr = cython.cast(cython.pointer(cython.int), start_poss.data)  # <int32_t *> start_poss.data
+    end_poss_ptr = cython.cast(cython.pointer(cython.int), end_poss.data)  # <int32_t *> end_poss.data
 
     ret_p = np.zeros(2*l, dtype="i4")
     ret_v = np.zeros(2*l, dtype="f4")
 
-    ret_p_ptr = cython.cast(cython.pointer(int32_t), ret_p.data)
-    ret_v_ptr = cython.cast(cython.pointer(float32_t), ret_v.data)
+    ret_p_ptr = cython.cast(cython.pointer(cython.int), ret_p.data)
+    ret_v_ptr = cython.cast(cython.pointer(cython.float), ret_v.data)
 
     if l == 0:
         raise Exception("length is 0")
@@ -627,7 +626,7 @@ def over_two_pv_array(pv_array1: list, pv_array2: list, func: str = "max") -> li
 
     available operations are 'max', 'min', and 'mean'
     """
-    #pre_p: cython.int
+    # pre_p: cython.int
 
     l1: cython.long
     l2: cython.long
@@ -643,12 +642,12 @@ def over_two_pv_array(pv_array1: list, pv_array2: list, func: str = "max") -> li
     ret_v: cnp.ndarray
 
     # pointers are used for numpy arrays
-    a1_pos_ptr: cython.pointer(int32_t)
-    a2_pos_ptr: cython.pointer(int32_t)
-    ret_pos_ptr: cython.pointer(int32_t)
-    a1_v_ptr: cython.pointer(float32_t)
-    a2_v_ptr: cython.pointer(float32_t)
-    ret_v_ptr: cython.pointer(float32_t)
+    a1_pos_ptr: cython.pointer(cython.int)
+    a2_pos_ptr: cython.pointer(cython.int)
+    ret_pos_ptr: cython.pointer(cython.int)
+    a1_v_ptr: cython.pointer(cython.float)
+    a2_v_ptr: cython.pointer(cython.float)
+    ret_v_ptr: cython.pointer(cython.float)
 
     if func == "max":
         f = max
@@ -661,15 +660,15 @@ def over_two_pv_array(pv_array1: list, pv_array2: list, func: str = "max") -> li
 
     [a1_pos, a1_v] = pv_array1
     [a2_pos, a2_v] = pv_array2
-    ret_pos = np.zeros(a1_pos.shape[0] + a2_pos.shape[0], dtype="int32")
-    ret_v = np.zeros(a1_pos.shape[0] + a2_pos.shape[0], dtype="float32")
+    ret_pos = np.zeros(a1_pos.shape[0] + a2_pos.shape[0], dtype="i4")
+    ret_v = np.zeros(a1_pos.shape[0] + a2_pos.shape[0], dtype="f4")
 
-    a1_pos_ptr = cython.cast(cython.pointer(int32_t), a1_pos.data)
-    a1_v_ptr = cython.cast(cython.pointer(float32_t), a1_v.data)
-    a2_pos_ptr = cython.cast(cython.pointer(int32_t), a2_pos.data)
-    a2_v_ptr = cython.cast(cython.pointer(float32_t), a2_v.data)
-    ret_pos_ptr = cython.cast(cython.pointer(int32_t), ret_pos.data)
-    ret_v_ptr = cython.cast(cython.pointer(float32_t), ret_v.data)
+    a1_pos_ptr = cython.cast(cython.pointer(cython.int), a1_pos.data)
+    a1_v_ptr = cython.cast(cython.pointer(cython.float), a1_v.data)
+    a2_pos_ptr = cython.cast(cython.pointer(cython.int), a2_pos.data)
+    a2_v_ptr = cython.cast(cython.pointer(cython.float), a2_v.data)
+    ret_pos_ptr = cython.cast(cython.pointer(cython.int), ret_pos.data)
+    ret_v_ptr = cython.cast(cython.pointer(cython.float), ret_v.data)
 
     l1 = a1_pos.shape[0]
     l2 = a2_pos.shape[0]

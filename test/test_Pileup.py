@@ -155,7 +155,7 @@ class Test_Naive_Pileup(unittest.TestCase):
                                       self.param_1["extension"] )
         result = []
         (p,v) = pileup
-        print(p, v)
+        # print(p, v)
         pnext = iter(p).__next__
         vnext = iter(v).__next__
         pre = 0
@@ -217,7 +217,7 @@ class Test_Over_Two_PV_Array(unittest.TestCase):
         pileup = over_two_pv_array ( self.pv1, self.pv2, func="max" )
         result = []
         (p,v) = pileup
-        print(p, v)
+        # print(p, v)
         pnext = iter(p).__next__
         vnext = iter(v).__next__
         pre = 0
@@ -233,7 +233,7 @@ class Test_Over_Two_PV_Array(unittest.TestCase):
         pileup = over_two_pv_array ( self.pv1, self.pv2, func="min" )
         result = []
         (p,v) = pileup
-        print(p, v)
+        # print(p, v)
         pnext = iter(p).__next__
         vnext = iter(v).__next__
         pre = 0
@@ -249,7 +249,7 @@ class Test_Over_Two_PV_Array(unittest.TestCase):
         pileup = over_two_pv_array ( self.pv1, self.pv2, func="mean" )
         result = []
         (p,v) = pileup
-        print(p, v)
+        # print(p, v)
         pnext = iter(p).__next__
         vnext = iter(v).__next__
         pre = 0
