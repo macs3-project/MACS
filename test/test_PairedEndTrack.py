@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# Time-stamp: <2024-10-14 21:55:05 Tao Liu>
+# Time-stamp: <2024-10-15 09:23:38 Tao Liu>
 
 import unittest
 from MACS3.Signal.PairedEndTrack import PETrackI, PETrackII
@@ -93,6 +93,7 @@ class Test_PETrackII(unittest.TestCase):
                               ]
         self.pileup_p = np.array([10, 50, 70, 80, 85, 100, 110, 160, 170, 180, 190], dtype="i4")
         self.pileup_v = np.array([3.0, 4.0, 6.0, 9.0, 11.0, 15.0, 19.0, 18.0, 16.0, 10.0, 6.0], dtype="f4")
+        self.subset_barcodes = {b'0w#AAACGAACAAGTAACA', b"0w#AAACGAACAAGTAAGA"}
         self.subset_pileup_p = np.array([10, 50, 70, 80, 85, 100, 110, 160, 170, 180, 190], dtype="i4")
         self.subset_pileup_v = np.array([1.0, 2.0, 4.0, 6.0, 7.0, 8.0, 13.0, 12.0, 10.0, 5.0, 4.0], dtype="f4")
         self.t = sum([(x[2]-x[1]) * x[4] for x in self.input_regions])
@@ -107,7 +108,7 @@ class Test_PETrackII(unittest.TestCase):
         self.assertEqual(pe.length, self.t)
 
         # subset
-        pe_subset = pe.subset({b'0w#AAACGAACAAGTAACA', b"0w#AAACGAACAAGTAAGA"})
+        pe_subset = pe.subset(self.subset_barcodes)
         # roughly check the numbers...
         self.assertEqual(pe_subset.total, 14)
         self.assertEqual(pe_subset.length, 1305)
@@ -122,7 +123,7 @@ class Test_PETrackII(unittest.TestCase):
         np.testing.assert_array_equal(d[0], self.pileup_p)
         np.testing.assert_array_equal(d[1], self.pileup_v)
 
-        pe_subset = pe.subset({b'0w#AAACGAACAAGTAACA', b"0w#AAACGAACAAGTAAGA"})
+        pe_subset = pe.subset(self.subset_barcodes)
         bdg = pe_subset.pileup_bdg()
         d = bdg.get_data_by_chr(b'chrY')  # (p, v) of ndarray
         np.testing.assert_array_equal(d[0], self.subset_pileup_p)
