@@ -129,7 +129,7 @@ def main():
                              include_dirs=numpy_include_dir,
                              extra_compile_args=extra_c_args),
                    Extension("MACS3.Signal.ScoreTrack",
-                             ["MACS3/Signal/ScoreTrack.pyx"],
+                             ["MACS3/Signal/ScoreTrack.py"],
                              libraries=["m"],
                              include_dirs=numpy_include_dir,
                              extra_compile_args=extra_c_args),

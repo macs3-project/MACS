@@ -1,6 +1,6 @@
 # cython: language_level=3
 # cython: profile=True
-# Time-stamp: <2024-10-11 11:13:11 Tao Liu>
+# Time-stamp: <2024-10-15 11:48:33 Tao Liu>
 
 """Module for PeakIO IO classes.
 
@@ -140,6 +140,24 @@ class PeakContent:
                                                       self.start,
                                                       self.end,
                                                       self.score)
+
+    def __getstate__(self):
+        return (self.chrom,
+                self.start,
+                self.end,
+                self.length,
+                self.summit,
+                self.score,
+                self.pileup,
+                self.pscore,
+                self.fc,
+                self.qscore,
+                self.name)
+
+    def __setstate__(self, state):
+        (self.chrom, self.start, self.end, self.length, self.summit,
+         self.score, self.pileup, self.pscore, self.fc,
+         self.qscore, self.name) = state
 
 
 @cython.cclass

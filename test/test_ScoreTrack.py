@@ -1,12 +1,14 @@
 #!/usr/bin/env python
-# Time-stamp: <2024-10-11 10:17:53 Tao Liu>
+# Time-stamp: <2024-10-18 15:30:21 Tao Liu>
 
 import io
 import unittest
-from numpy.testing import assert_equal,  assert_almost_equal, assert_array_equal
+from numpy.testing import assert_array_equal  # assert_equal, assert_almost_equal
 
-from MACS3.Signal.ScoreTrack import *
+import numpy as np
+from MACS3.Signal.ScoreTrack import ScoreTrackII, TwoConditionScores
 from MACS3.Signal.BedGraph import bedGraphTrackI
+
 
 class Test_TwoConditionScores(unittest.TestCase):
     def setUp(self):
@@ -14,46 +16,47 @@ class Test_TwoConditionScores(unittest.TestCase):
         self.t2bdg = bedGraphTrackI()
         self.c1bdg = bedGraphTrackI()
         self.c2bdg = bedGraphTrackI()
-        self.test_regions1 = [(b"chrY",0,70,0.00,0.01),
-                              (b"chrY",70,80,7.00,0.5),
-                              (b"chrY",80,150,0.00,0.02)]
-        self.test_regions2 = [(b"chrY",0,75,20.0,4.00),
-                              (b"chrY",75,90,35.0,6.00),
-                              (b"chrY",90,150,10.0,15.00)]
+        self.test_regions1 = [(b"chrY", 0, 70, 0.00, 0.01),
+                              (b"chrY", 70, 80, 7.00, 0.5),
+                              (b"chrY", 80, 150, 0.00, 0.02)]
+        self.test_regions2 = [(b"chrY", 0, 75, 20.0, 4.00),
+                              (b"chrY", 75, 90, 35.0, 6.00),
+                              (b"chrY", 90, 150, 10.0, 15.00)]
         for a in self.test_regions1:
-            self.t1bdg.safe_add_loc(a[0],a[1],a[2],a[3])
-            self.c1bdg.safe_add_loc(a[0],a[1],a[2],a[4])
+            self.t1bdg.safe_add_loc(a[0], a[1], a[2], a[3])
+            self.c1bdg.safe_add_loc(a[0], a[1], a[2], a[4])
 
         for a in self.test_regions2:
-            self.t2bdg.safe_add_loc(a[0],a[1],a[2],a[3])
-            self.c2bdg.safe_add_loc(a[0],a[1],a[2],a[4])
+            self.t2bdg.safe_add_loc(a[0], a[1], a[2], a[3])
+            self.c2bdg.safe_add_loc(a[0], a[1], a[2], a[4])
 
-        self.twoconditionscore = TwoConditionScores( self.t1bdg,
-                                                     self.c1bdg,
-                                                     self.t2bdg,
-                                                     self.c2bdg,
-                                                     1.0,
-                                                     1.0 )
+        self.twoconditionscore = TwoConditionScores(self.t1bdg,
+                                                    self.c1bdg,
+                                                    self.t2bdg,
+                                                    self.c2bdg,
+                                                    1.0,
+                                                    1.0)
         self.twoconditionscore.build()
         self.twoconditionscore.finalize()
-        (self.cat1,self.cat2,self.cat3) = self.twoconditionscore.call_peaks(min_length=10, max_gap=10, cutoff=3)
+        (self.cat1, self.cat2, self.cat3) = self.twoconditionscore.call_peaks(min_length=10, max_gap=10, cutoff=3)
+
 
 class Test_ScoreTrackII(unittest.TestCase):
 
     def setUp(self):
         # for initiate scoretrack
-        self.test_regions1 = [(b"chrY",10,100,10),
-                              (b"chrY",60,10,10),
-                              (b"chrY",110,15,20),
-                              (b"chrY",160,5,20),
-                              (b"chrY",210,20,5)]
+        self.test_regions1 = [(b"chrY", 10, 100, 10),
+                              (b"chrY", 60, 10, 10),
+                              (b"chrY", 110, 15, 20),
+                              (b"chrY", 160, 5, 20),
+                              (b"chrY", 210, 20, 5)]
         self.treat_edm = 10
         self.ctrl_edm = 5
         # for different scoring method
-        self.p_result = [60.49, 0.38, 0.08, 0.0, 6.41] # -log10(p-value), pseudo count 1 added
-        self.q_result = [58.17, 0.0, 0.0, 0.0, 5.13] # -log10(q-value) from BH, pseudo count 1 added
-        self.l_result = [58.17, 0.0, -0.28, -3.25, 4.91] # log10 likelihood ratio, pseudo count 1 added
-        self.f_result = [0.96, 0.00, -0.12, -0.54, 0.54] # note, pseudo count 1 would be introduced.
+        self.p_result = [60.49, 0.38, 0.08, 0.0, 6.41]  # -log10(p-value), pseudo count 1 added
+        self.q_result = [58.17, 0.0, 0.0, 0.0, 5.13]  # -log10(q-value) from BH, pseudo count 1 added
+        self.l_result = [58.17, 0.0, -0.28, -3.25, 4.91]  # log10 likelihood ratio, pseudo count 1 added
+        self.f_result = [0.96, 0.00, -0.12, -0.54, 0.54]  # note, pseudo count 1 would be introduced.
         self.d_result = [90.00, 0, -5.00, -15.00, 15.00]
         self.m_result = [10.00, 1.00, 1.50, 0.50, 2.00]
         # for norm
@@ -107,98 +110,97 @@ chrY	1	60	60	6	100	63.2725	9.18182	-1	MACS_peak_1
 chrY	161	210	50	186	20	7.09102	3.5	-1	MACS_peak_2
 """
 
-    def assertListAlmostEqual ( self, a, b, places =2 ):
-        return all( [self.assertAlmostEqual(x, y, places=places) for (x, y) in zip( a, b)] )
+    def assertListAlmostEqual(self, a, b, places=2):
+        return all([self.assertAlmostEqual(x, y, places=places) for (x, y) in zip(a, b)])
 
     def test_compute_scores(self):
-        s1 = ScoreTrackII( self.treat_edm, self.ctrl_edm )
-        s1.add_chromosome( b"chrY", 5 )
+        s1 = ScoreTrackII(self.treat_edm, self.ctrl_edm)
+        s1.add_chromosome(b"chrY", 5)
         for a in self.test_regions1:
-            s1.add( a[0],a[1],a[2],a[3] )
+            s1.add(a[0], a[1], a[2], a[3])
 
-        s1.set_pseudocount ( 1.0 )
+        s1.set_pseudocount(1.0)
 
-        s1.change_score_method( ord('p') )
+        s1.change_score_method(ord('p'))
         r = s1.get_data_by_chr(b"chrY")
-        self.assertListAlmostEqual( [round(x,2) for x in r[3]], self.p_result )
+        self.assertListAlmostEqual([round(x, 2) for x in r[3]], self.p_result)
 
-        s1.change_score_method( ord('q') )
+        s1.change_score_method(ord('q'))
         r = s1.get_data_by_chr(b"chrY")
-        self.assertListAlmostEqual( [round(x,2) for x in list(r[3])], self.q_result )
+        self.assertListAlmostEqual([round(x, 2) for x in list(r[3])], self.q_result)
 
-        s1.change_score_method( ord('l') )
+        s1.change_score_method(ord('l'))
         r = s1.get_data_by_chr(b"chrY")
-        self.assertListAlmostEqual( [round(x,2) for x in list(r[3])], self.l_result )
+        self.assertListAlmostEqual([round(x, 2) for x in list(r[3])], self.l_result)
 
-        s1.change_score_method( ord('f') )
+        s1.change_score_method(ord('f'))
         r = s1.get_data_by_chr(b"chrY")
-        self.assertListAlmostEqual( [round(x,2) for x in list(r[3])], self.f_result )
+        self.assertListAlmostEqual([round(x, 2) for x in list(r[3])], self.f_result)
 
-        s1.change_score_method( ord('d') )
+        s1.change_score_method(ord('d'))
         r = s1.get_data_by_chr(b"chrY")
-        self.assertListAlmostEqual( [round(x,2) for x in list(r[3])], self.d_result )
+        self.assertListAlmostEqual([round(x, 2) for x in list(r[3])], self.d_result)
 
-        s1.change_score_method( ord('m') )
+        s1.change_score_method(ord('m'))
         r = s1.get_data_by_chr(b"chrY")
-        self.assertListAlmostEqual( [round(x,2) for x in list(r[3])], self.m_result )
+        self.assertListAlmostEqual([round(x, 2) for x in list(r[3])], self.m_result)
 
     def test_normalize(self):
-        s1 = ScoreTrackII( self.treat_edm, self.ctrl_edm )
-        s1.add_chromosome( b"chrY", 5 )
+        s1 = ScoreTrackII(self.treat_edm, self.ctrl_edm)
+        s1.add_chromosome(b"chrY", 5)
         for a in self.test_regions1:
-            s1.add( a[0],a[1],a[2],a[3] )
+            s1.add(a[0], a[1], a[2], a[3])
 
-        s1.change_normalization_method( ord('T') )
+        s1.change_normalization_method(ord('T'))
         r = s1.get_data_by_chr(b"chrY")
-        assert_array_equal( r, self.norm_T )
+        assert_array_equal(r, self.norm_T)
 
-        s1.change_normalization_method( ord('C') )
+        s1.change_normalization_method(ord('C'))
         r = s1.get_data_by_chr(b"chrY")
-        assert_array_equal( r, self.norm_C )
+        assert_array_equal(r, self.norm_C)
 
-        s1.change_normalization_method( ord('M') )
+        s1.change_normalization_method(ord('M'))
         r = s1.get_data_by_chr(b"chrY")
-        assert_array_equal( r, self.norm_M )
+        assert_array_equal(r, self.norm_M)
 
-        s1.change_normalization_method( ord('N') )
+        s1.change_normalization_method(ord('N'))
         r = s1.get_data_by_chr(b"chrY")
-        assert_array_equal( r, self.norm_N )
+        assert_array_equal(r, self.norm_N)
 
-    def test_writebedgraph ( self ):
-        s1 = ScoreTrackII( self.treat_edm, self.ctrl_edm )
-        s1.add_chromosome( b"chrY", 5 )
+    def test_writebedgraph(self):
+        s1 = ScoreTrackII(self.treat_edm, self.ctrl_edm)
+        s1.add_chromosome(b"chrY", 5)
         for a in self.test_regions1:
-            s1.add( a[0],a[1],a[2],a[3] )
+            s1.add(a[0], a[1], a[2], a[3])
 
-        s1.change_score_method( ord('p') )
+        s1.change_score_method(ord('p'))
 
         strio = io.StringIO()
-        s1.write_bedGraph( strio, "NAME", "DESC", 1 )
-        self.assertEqual( strio.getvalue(), self.bdg1 )
+        s1.write_bedGraph(strio, "NAME", "DESC", 1)
+        self.assertEqual(strio.getvalue(), self.bdg1)
         strio = io.StringIO()
-        s1.write_bedGraph( strio, "NAME", "DESC", 2 )
-        self.assertEqual( strio.getvalue(), self.bdg2 )
+        s1.write_bedGraph(strio, "NAME", "DESC", 2)
+        self.assertEqual(strio.getvalue(), self.bdg2)
         strio = io.StringIO()
-        s1.write_bedGraph( strio, "NAME", "DESC", 3 )
-        self.assertEqual( strio.getvalue(), self.bdg3 )
+        s1.write_bedGraph(strio, "NAME", "DESC", 3)
+        self.assertEqual(strio.getvalue(), self.bdg3)
 
-    def test_callpeak ( self ):
-        s1 = ScoreTrackII( self.treat_edm, self.ctrl_edm )
-        s1.add_chromosome( b"chrY", 5 )
+    def test_callpeak(self):
+        s1 = ScoreTrackII(self.treat_edm, self.ctrl_edm)
+        s1.add_chromosome(b"chrY", 5)
         for a in self.test_regions1:
-            s1.add( a[0],a[1],a[2],a[3] )
+            s1.add(a[0], a[1], a[2], a[3])
 
-        s1.change_score_method( ord('p') )
-        p = s1.call_peaks( cutoff = 0.10, min_length=10, max_gap=10 )
+        s1.change_score_method(ord('p'))
+        p = s1.call_peaks(cutoff=0.10, min_length=10, max_gap=10)
         strio = io.StringIO()
-        p.write_to_bed( strio, trackline = False )
-        self.assertEqual( strio.getvalue(), self.peak1 )
-
-        strio = io.StringIO()
-        p.write_to_summit_bed( strio, trackline = False )
-        self.assertEqual( strio.getvalue(), self.summit1 )
+        p.write_to_bed(strio, trackline=False)
+        self.assertEqual(strio.getvalue(), self.peak1)
 
         strio = io.StringIO()
-        p.write_to_xls( strio )
-        self.assertEqual( strio.getvalue(), self.xls1 )
+        p.write_to_summit_bed(strio, trackline=False)
+        self.assertEqual(strio.getvalue(), self.summit1)
 
+        strio = io.StringIO()
+        p.write_to_xls(strio)
+        self.assertEqual(strio.getvalue(), self.xls1)

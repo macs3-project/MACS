@@ -1,6 +1,6 @@
 # cython: language_level=3
 # cython: profile=True
-# Time-stamp: <2024-10-14 21:13:35 Tao Liu>
+# Time-stamp: <2024-10-15 15:56:00 Tao Liu>
 
 """Module for filter duplicate tags from paired-end data
 
@@ -23,7 +23,8 @@ from collections import Counter
 from MACS3.Signal.Pileup import (quick_pileup,
                                  over_two_pv_array,
                                  se_all_in_one_pileup)
-from MACS3.Signal.BedGraph import bedGraphTrackI
+from MACS3.Signal.BedGraph import (bedGraphTrackI,
+                                   bedGraphTrackII)
 from MACS3.Signal.PileupV2 import (pileup_from_LR_hmmratac,
                                    pileup_from_LRC)
 # ------------------------------------
@@ -997,5 +998,19 @@ class PETrackII:
         for chrom in self.get_chr_names():
             pv = pileup_from_LRC(self.locations[chrom])
             bdg.add_chrom_data_PV(chrom, pv)
+        return bdg
 
+    @cython.ccall
+    def pileup_bdg2(self):
+        """Pileup all chromosome and return a bdg object.
+        """
+        bdg: bedGraphTrackII
+        pv: cnp.ndarray
+
+        bdg = bedGraphTrackII()
+        for chrom in self.get_chr_names():
+            pv = pileup_from_LRC(self.locations[chrom])
+            bdg.add_chrom_data(chrom, pv)
+        # bedGraphTrackII needs to be 'finalized'.
+        bdg.finalize()
         return bdg
