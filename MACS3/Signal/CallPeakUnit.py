@@ -1,7 +1,7 @@
 # cython: language_level=3
 # cython: profile=True
 # cython: linetrace=True
-# Time-stamp: <2024-10-21 17:49:36 Tao Liu>
+# Time-stamp: <2024-10-21 22:36:05 Tao Liu>
 
 """Module for Calculate Scores.
 
@@ -388,7 +388,8 @@ class CallerFromAlignments:
     # data needed to be pre-computed before peak calling
     # remember pvalue->qvalue convertion; saved in cykhash Float32to32Map
     pqtable: Float32to32Map
-    # whether the pvalue of whole genome is all calculated. If yes, it's OK to calculate q-value.
+    # whether the pvalue of whole genome is all calculated. If yes,
+    # it's OK to calculate q-value.
     pvalue_all_done: bool
     # record for each pvalue cutoff, how many peaks can be called
     pvalue_npeaks: dict
@@ -399,7 +400,8 @@ class CallerFromAlignments:
     optimal_p_cutoff: cython.float
     # file to save the pvalue-npeaks-totallength table
     cutoff_analysis_filename: bytes
-    # Record the names of temporary files for storing pileup values of each chromosome
+    # Record the names of temporary files for storing pileup values of
+    # each chromosome
     pileup_data_files: dict
 
     def __init__(self,
@@ -490,7 +492,9 @@ class CallerFromAlignments:
         self.pileup_data_files = {}
         self.pvalue_length = {}
         self.pvalue_npeaks = {}
-        for p in np.arange(0.3, 10, 0.3):  # step for optimal cutoff is 0.3 in -log10pvalue, we try from pvalue 1E-10 (-10logp=10) to 0.5 (-10logp=0.3)
+        # step for optimal cutoff is 0.3 in -log10pvalue, we try from
+        # pvalue 1E-10 (-10logp=10) to 0.5 (-10logp=0.3)
+        for p in np.arange(0.3, 10, 0.3):
             self.pvalue_length[p] = 0
             self.pvalue_npeaks[p] = 0
         self.optimal_p_cutoff = 0
@@ -587,10 +591,12 @@ class CallerFromAlignments:
                                                         baseline_value=self.lambda_bg,
                                                         directional=False)
         else:
+            # a: set global lambda
             ctrl_pv = [treat_pv[0][-1:], np.array([self.lambda_bg,],
-                                                  dtype="f4")]  # a: set global lambda
+                                                  dtype="f4")]
 
-        self.chr_pos_treat_ctrl = self.__chrom_pair_treat_ctrl(treat_pv, ctrl_pv)
+        self.chr_pos_treat_ctrl = self.__chrom_pair_treat_ctrl(treat_pv,
+                                                               ctrl_pv)
 
         # clean treat_pv and ctrl_pv
         treat_pv = []
@@ -626,13 +632,14 @@ class CallerFromAlignments:
         c_v: cnp.ndarray(cython.float, ndim=1)
         ret_t: cnp.ndarray(cython.float, ndim=1)
         ret_c: cnp.ndarray(cython.float, ndim=1)
-        t_p_ptr: cython.pointer[cython.int]
-        c_p_ptr: cython.pointer[cython.int]
-        ret_p_ptr: cython.pointer[cython.int]
-        t_v_ptr: cython.pointer[cython.float]
-        c_v_ptr: cython.pointer[cython.float]
-        ret_t_ptr: cython.pointer[cython.float]
-        ret_c_ptr: cython.pointer[cython.float]
+        t_p_view: cython.int [:]
+        # cython.pointer[cython.int]
+        c_p_view: cython.int [:]
+        ret_p_view: cython.int [:]
+        t_v_view: cython.float [:]  # cython.pointer[cython.float]
+        c_v_view: cython.float [:] # cython.pointer[cython.float]
+        ret_t_view: cython.float [:] # cython.pointer[cython.float]
+        ret_c_view: cython.float [:] # cython.pointer[cython.float]
 
         [t_p, t_v] = treat_pv
         [c_p, c_v] = ctrl_pv
@@ -646,61 +653,61 @@ class CallerFromAlignments:
         ret_t = np.zeros(chrom_max_len, dtype="f4")  # value from treatment
         ret_c = np.zeros(chrom_max_len, dtype="f4")  # value from control
 
-        t_p_ptr = cython.cast(cython.pointer[cython.int], t_p.data)
-        t_v_ptr = cython.cast(cython.pointer[cython.float], t_v.data)
-        c_p_ptr = cython.cast(cython.pointer[cython.int], c_p.data)
-        c_v_ptr = cython.cast(cython.pointer[cython.float], c_v.data)
-        ret_p_ptr = cython.cast(cython.pointer[cython.int], ret_p.data)
-        ret_t_ptr = cython.cast(cython.pointer[cython.float], ret_t.data)
-        ret_c_ptr = cython.cast(cython.pointer[cython.float], ret_c.data)
+        t_p_view = t_p #cython.cast(cython.pointer[cython.int], t_p.data)
+        t_v_view = t_v #cython.cast(cython.pointer[cython.float], t_v.data)
+        c_p_view = c_p #cython.cast(cython.pointer[cython.int], c_p.data)
+        c_v_view = c_v #cython.cast(cython.pointer[cython.float], c_v.data)
+        ret_p_view = ret_p #cython.cast(cython.pointer[cython.int], ret_p.data)
+        ret_t_view = ret_t #cython.cast(cython.pointer[cython.float], ret_t.data)
+        ret_c_view = ret_c #cython.cast(cython.pointer[cython.float], ret_c.data)
 
         index_ret = 0
         it = 0
         ic = 0
 
         while it < lt and ic < lc:
-            if t_p_ptr[0] < c_p_ptr[0]:
+            if t_p_view[0] < c_p_view[0]:
                 # clip a region from pre_p to p1, then pre_p: set as p1.
-                ret_p_ptr[0] = t_p_ptr[0]
-                ret_t_ptr[0] = t_v_ptr[0]
-                ret_c_ptr[0] = c_v_ptr[0]
-                ret_p_ptr += 1
-                ret_t_ptr += 1
-                ret_c_ptr += 1
+                ret_p_view[0] = t_p_view[0]
+                ret_t_view[0] = t_v_view[0]
+                ret_c_view[0] = c_v_view[0]
+                ret_p_view += 1
+                ret_t_view += 1
+                ret_c_view += 1
                 index_ret += 1
                 # call for the next p1 and v1
                 it += 1
-                t_p_ptr += 1
-                t_v_ptr += 1
-            elif t_p_ptr[0] > c_p_ptr[0]:
+                t_p_view += 1
+                t_v_view += 1
+            elif t_p_view[0] > c_p_view[0]:
                 # clip a region from pre_p to p2, then pre_p: set as p2.
-                ret_p_ptr[0] = c_p_ptr[0]
-                ret_t_ptr[0] = t_v_ptr[0]
-                ret_c_ptr[0] = c_v_ptr[0]
-                ret_p_ptr += 1
-                ret_t_ptr += 1
-                ret_c_ptr += 1
+                ret_p_view[0] = c_p_view[0]
+                ret_t_view[0] = t_v_view[0]
+                ret_c_view[0] = c_v_view[0]
+                ret_p_view += 1
+                ret_t_view += 1
+                ret_c_view += 1
                 index_ret += 1
                 # call for the next p2 and v2
                 ic += 1
-                c_p_ptr += 1
-                c_v_ptr += 1
+                c_p_view += 1
+                c_v_view += 1
             else:
                 # from pre_p to p1 or p2, then pre_p: set as p1 or p2.
-                ret_p_ptr[0] = t_p_ptr[0]
-                ret_t_ptr[0] = t_v_ptr[0]
-                ret_c_ptr[0] = c_v_ptr[0]
-                ret_p_ptr += 1
-                ret_t_ptr += 1
-                ret_c_ptr += 1
+                ret_p_view[0] = t_p_view[0]
+                ret_t_view[0] = t_v_view[0]
+                ret_c_view[0] = c_v_view[0]
+                ret_p_view += 1
+                ret_t_view += 1
+                ret_c_view += 1
                 index_ret += 1
                 # call for the next p1, v1, p2, v2.
                 it += 1
                 ic += 1
-                t_p_ptr += 1
-                t_v_ptr += 1
-                c_p_ptr += 1
-                c_v_ptr += 1
+                t_p_view += 1
+                t_v_view += 1
+                c_p_view += 1
+                c_v_view += 1
 
         ret_p.resize(index_ret, refcheck=False)
         ret_t.resize(index_ret, refcheck=False)
@@ -747,9 +754,9 @@ class CallerFromAlignments:
         this_l: cython.long
         f: cython.float
         unique_values: list
-        pos_ptr: cython.pointer[cython.int]
-        treat_value_ptr: cython.pointer[cython.float]
-        ctrl_value_ptr: cython.pointer[cython.float]
+        pos_view: cython.int [:]  # cython.pointer[cython.int]
+        treat_value_view: cython.float [:]  # cython.pointer[cython.float]
+        ctrl_value_view: cython.float [:]  # cython.pointer[cython.float]
 
         debug("Start to calculate pvalue stat...")
 
@@ -761,26 +768,23 @@ class CallerFromAlignments:
             self.pileup_treat_ctrl_a_chromosome(chrom)
             [pos_array, treat_array, ctrl_array] = self.chr_pos_treat_ctrl
 
-            pos_ptr = cython.cast(cython.pointer(cython.int),
-                                  pos_array.data)
-            treat_value_ptr = cython.cast(cython.pointer(cython.float),
-                                          treat_array.data)
-            ctrl_value_ptr = cython.cast(cython.pointer(cython.float),
-                                         ctrl_array.data)
+            pos_view = pos_array
+            treat_value_view = treat_array
+            ctrl_value_view = ctr_array
 
             for j in range(pos_array.shape[0]):
                 this_v = get_pscore((cython.cast(cython.int,
-                                                 treat_value_ptr[0]),
-                                     ctrl_value_ptr[0]))
-                this_l = pos_ptr[0] - pre_p
+                                                 treat_value_view[0]),
+                                     ctrl_value_view[0]))
+                this_l = pos_view[0] - pre_p
                 if this_v in pscore_stat:
                     pscore_stat[this_v] += this_l
                 else:
                     pscore_stat[this_v] = this_l
-                pre_p = pos_ptr[0]
-                pos_ptr += 1
-                treat_value_ptr += 1
-                ctrl_value_ptr += 1
+                pre_p = pos_view[0]
+                pos_view += 1
+                treat_value_view += 1
+                ctrl_value_view += 1
 
         N = sum(pscore_stat.values())  # total length
         k = 1                          # rank

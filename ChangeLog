@@ -3,7 +3,16 @@
 
 	* Features added
 
-	1) We extensively rewrote the `pyx` codes into `py` codes. In
+	1) We implemented the IO module for reading the fragment files
+	usually used in single-cell ATAC-seq experiment
+	`Parser.FragParser`. And we implemented a new
+	`PairedEndTrack.PETrackII` to store the data in fragment file,
+	including the barcodes and counts information. In the `PETrackII`
+	class, we are able to extract a subset using a list of barcodes,
+	which enables us to call peaks only on a pool (pseudo-bulk) of
+	cells.
+
+	2) We extensively rewrote the `pyx` codes into `py` codes. In
 	another words, we now apply the 'pure python style' with PEP-484
 	type annotations to our previous Cython style codes. So that, the
 	source codes can be more compatible to Python programming tools
