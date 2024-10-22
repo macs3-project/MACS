@@ -1,7 +1,7 @@
 # cython: language_level=3
 # cython: profile=True
 # cython: linetrace=True
-# Time-stamp: <2024-10-16 00:09:32 Tao Liu>
+# Time-stamp: <2024-10-22 10:25:23 Tao Liu>
 
 """Module for all MACS Parser classes for input. Please note that the
 parsers are for reading the alignment files ONLY.
@@ -199,7 +199,8 @@ class StrandFormatError(BaseException):
         self.string = string
 
     def __str__(self):
-        return repr("Strand information can not be recognized in this line: \"%s\",\"%s\"" % (self.string, self.strand))
+        return repr("Strand information can not be recognized in this line: \"%s\",\"%s\"" %
+                    (self.string, self.strand))
 
 
 @cython.cclass
@@ -544,7 +545,8 @@ class BEDPEParser(GenericParser):
                     atoi(thisfields[1]),
                     atoi(thisfields[2]))
         except IndexError:
-            raise Exception("Less than 3 columns found at this line: %s\n" % thisline)
+            raise Exception("Less than 3 columns found at this line: %s\n" %
+                            thisline)
 
     @cython.ccall
     def build_petrack(self):
@@ -950,7 +952,9 @@ class SAMParser(GenericParser):
         thisfields = thisline.split(b'\t')
         bwflag = atoi(thisfields[1])
         if bwflag & 4 or bwflag & 512 or bwflag & 256 or bwflag & 2048:
-            return 0       #unmapped sequence or bad sequence or 2nd or sup alignment
+            # unmapped sequence or bad sequence or 2nd or sup alignment
+            return 0
+
         if bwflag & 1:
             # paired read. We should only keep sequence if the mate is mapped
             # and if this is the left mate, all is within  the flag!
@@ -1068,9 +1072,11 @@ class BAMParser(GenericParser):
         f.close()
         if self.gzipped:
             # open with gzip.open, then wrap it with BufferedReader!
-            self.fhd = io.BufferedReader(gzip.open(filename, mode='rb'), buffer_size=READ_BUFFER_SIZE)  # buffersize set to 1M
+            self.fhd = io.BufferedReader(gzip.open(filename, mode='rb'),
+                                         buffer_size=READ_BUFFER_SIZE)
         else:
-            self.fhd = io.open(filename, mode='rb')  # binary mode! I don't expect unicode here!
+            # binary mode! I don't expect unicode here!
+            self.fhd = io.open(filename, mode='rb')
 
     @cython.ccall
     def sniff(self):
@@ -1089,7 +1095,8 @@ class BAMParser(GenericParser):
                 return True
             else:
                 self.fhd.seek(0)
-                raise Exception("File is not of a valid BAM format! %d" % tsize)
+                raise Exception("File is not of a valid BAM format! %d" %
+                                tsize)
         else:
             self.fhd.seek(0)
             return False
@@ -1189,7 +1196,8 @@ class BAMParser(GenericParser):
         rlengths: dict
 
         fwtrack = FWTrack(buffer_size=self.buffer_size)
-        references, rlengths = self.get_references()  # after this, ptr at list of alignments
+        # after this, ptr at list of alignments
+        references, rlengths = self.get_references()  
         # fseek = self.fhd.seek
         fread = self.fhd.read
         # ftell = self.fhd.tell
@@ -1248,7 +1256,9 @@ class BAMParser(GenericParser):
         info("%d reads have been read." % i)
         self.fhd.close()
         # fwtrack.finalize()
-        # this is the problematic part. If fwtrack is finalized, then it's impossible to increase the length of it in a step of buffer_size for multiple input files.
+        # this is the problematic part. If fwtrack is finalized, then
+        # it's impossible to increase the length of it in a step of
+        # buffer_size for multiple input files.
         fwtrack.set_rlengths(rlengths)
         return fwtrack
 
@@ -1323,14 +1333,9 @@ class BAMPEParser(BAMParser):
             if i % 1000000 == 0:
                 info(" %d fragments parsed" % i)
 
-        # print(f"{references[chrid]:},{fpos:},{tlen:}")
         info("%d fragments have been read." % i)
-        # debug(f" {e1} Can't identify the length of entry, it may be the end of file, stop looping...")
-        # debug(f" {e2} Chromosome name can't be found which means this entry is skipped ...")
-        # assert i > 0, "Something went wrong, no fragment has been read! Check input file!"
         self.d = m / i
         self.n = i
-        # assert self.d >= 0, "Something went wrong (mean fragment size was negative: %d = %d / %d)" % (self.d, m, i)
         self.fhd.close()
         petrack.set_rlengths(rlengths)
         return petrack
@@ -1349,9 +1354,7 @@ class BAMPEParser(BAMParser):
         rlengths: dict
 
         references, rlengths = self.get_references()
-        # fseek = self.fhd.seek
         fread = self.fhd.read
-        # ftell = self.fhd.tell
 
         # for convenience, only count valid pairs
         add_loc = petrack.add_loc
@@ -1374,10 +1377,7 @@ class BAMPEParser(BAMParser):
         info("%d fragments have been read." % i)
         self.d = (self.d * self.n + m) / (self.n + i)
         self.n += i
-        # assert self.d >= 0, "Something went wrong (mean fragment size was negative: %d = %d / %d)" % (self.d, m, i)
         self.fhd.close()
-        # this is the problematic part. If fwtrack is finalized, then it's impossible to increase the length of it in a step of buffer_size for multiple input files.
-        # petrack.finalize()
         petrack.set_rlengths(rlengths)
         return petrack
 
@@ -1525,7 +1525,8 @@ class FragParser(GenericParser):
                     thisfields[3],
                     atoi(thisfields[4]))
         except IndexError:
-            raise Exception("Less than 5 columns found at this line: %s\n" % thisline)
+            raise Exception("Less than 5 columns found at this line: %s\n" %
+                            thisline)
 
     @cython.ccall
     def build_petrack2(self):

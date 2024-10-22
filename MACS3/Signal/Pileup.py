@@ -1,6 +1,6 @@
 # cython: language_level=3
 # cython: profile=True
-# Time-stamp: <2024-10-14 20:08:53 Tao Liu>
+# Time-stamp: <2024-10-22 10:35:32 Tao Liu>
 
 """Module Description: For pileup functions.
 
@@ -60,8 +60,6 @@ def fix_coordinates(poss: cnp.ndarray, rlength: cython.int) -> cnp.ndarray:
     """
     i: cython.long
     ptr: cython.pointer(cython.int) = cython.cast(cython.pointer(cython.int), poss.data)  # pointer
-
-    #ptr = <int32_t *> poss.data
 
     # fix those negative coordinates
     for i in range(poss.shape[0]):

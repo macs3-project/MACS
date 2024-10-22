@@ -134,7 +134,7 @@ def main():
                              include_dirs=numpy_include_dir,
                              extra_compile_args=extra_c_args),
                    Extension("MACS3.Signal.CallPeakUnit",
-                             ["MACS3/Signal/CallPeakUnit.pyx"],
+                             ["MACS3/Signal/CallPeakUnit.py"],
                              libraries=["m"],
                              include_dirs=numpy_include_dir,
                              extra_compile_args=extra_c_args),
