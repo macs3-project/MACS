@@ -1,6 +1,6 @@
 # cython: language_level=3
 # cython: profile=True
-# Time-stamp: <2024-09-06 14:56:51 Tao Liu>
+# Time-stamp: <2024-10-15 11:48:33 Tao Liu>
 
 """Module for PeakIO IO classes.
 
@@ -15,32 +15,31 @@ the distribution).
 from itertools import groupby
 from operator import itemgetter
 import random
-import re
 import sys
 
 # ------------------------------------
 # MACS3 modules
 # ------------------------------------
 
-from MACS3.Utilities.Constants import *
+# from MACS3.Utilities.Constants import *
 
 # ------------------------------------
 # Other modules
 # ------------------------------------
-
-from cpython cimport bool
+import cython
+from cython.cimports.cpython import bool
 
 # ------------------------------------
 # constants
 # ------------------------------------
-__version__ = "PeakIO $Revision$"
-__author__ = "Tao Liu <taoliu@jimmy.harvard.edu>"
-__doc__ = "PeakIO class"
 
 # ------------------------------------
 # Misc functions
 # ------------------------------------
-cdef str subpeak_letters( int i):
+
+
+@cython.cfunc
+def subpeak_letters(i: cython.int) -> str:
     if i < 26:
         return chr(97+i)
     else:
@@ -50,24 +49,32 @@ cdef str subpeak_letters( int i):
 # Classes
 # ------------------------------------
 
-cdef class PeakContent:
-    cdef:
-        bytes chrom
-        int start
-        int end
-        int length
-        int summit
-        float score
-        float pileup
-        float pscore
-        float fc
-        float qscore
-        bytes name
 
-    def __init__ ( self, bytes chrom, int start, int end, int summit,
-                   float peak_score, float pileup,
-                   float pscore, float fold_change, float qscore,
-                   bytes name= b"NA" ):
+@cython.cclass
+class PeakContent:
+    chrom: bytes
+    start: cython.int
+    end: cython.int
+    length: cython.int
+    summit: cython.int
+    score: cython.float
+    pileup: cython.float
+    pscore: cython.float
+    fc: cython.float
+    qscore: cython.float
+    name: bytes
+
+    def __init__(self,
+                 chrom: bytes,
+                 start: cython.int,
+                 end: cython.int,
+                 summit: cython.int,
+                 peak_score: cython.float,
+                 pileup: cython.float,
+                 pscore: cython.float,
+                 fold_change: cython.float,
+                 qscore: cython.float,
+                 name: bytes = b""):
         self.chrom = chrom
         self.start = start
         self.end = end
@@ -80,7 +87,7 @@ cdef class PeakContent:
         self.qscore = qscore
         self.name = name
 
-    def __getitem__ ( self, a ):
+    def __getitem__(self, a: str):
         if a == "chrom":
             return self.chrom
         elif a == "start":
@@ -104,7 +111,7 @@ cdef class PeakContent:
         elif a == "name":
             return self.name
 
-    def __setitem__ ( self, a, v ):
+    def __setitem__(self, a: str, v):
         if a == "chrom":
             self.chrom = v
         elif a == "start":
@@ -128,187 +135,222 @@ cdef class PeakContent:
         elif a == "name":
             self.name = v
 
-    def __str__ (self):
-        return "chrom:%s;start:%d;end:%d;score:%f" % ( self.chrom, self.start, self.end, self.score )
+    def __str__(self):
+        return "chrom:%s;start:%d;end:%d;score:%f" % (self.chrom,
+                                                      self.start,
+                                                      self.end,
+                                                      self.score)
 
-cdef class PeakIO:
+    def __getstate__(self):
+        return (self.chrom,
+                self.start,
+                self.end,
+                self.length,
+                self.summit,
+                self.score,
+                self.pileup,
+                self.pscore,
+                self.fc,
+                self.qscore,
+                self.name)
+
+    def __setstate__(self, state):
+        (self.chrom, self.start, self.end, self.length, self.summit,
+         self.score, self.pileup, self.pscore, self.fc,
+         self.qscore, self.name) = state
+
+
+@cython.cclass
+class PeakIO:
     """IO for peak information.
 
     """
-    cdef:
-        public dict peaks       # dictionary storing peak contents
-        public bool CO_sorted   # whether peaks have been sorted by coordinations
-        public long total       # total number of peaks
+    # dictionary storing peak contents
+    peaks = cython.declare(dict, visibility="public")
+    # whether peaks have been sorted by coordinations
+    CO_sorted = cython.declare(bool, visibility="public")
+    # total number of peaks
+    total = cython.declare(cython.long, visibility="public")
 
-    def __init__ (self):
+    def __init__(self):
         self.peaks = {}
         self.CO_sorted = False
         self.total = 0
 
-    cpdef add (self, bytes chromosome, int start, int end, int summit = 0,
-               float peak_score = 0, float pileup = 0,
-               float pscore = 0, float fold_change = 0, float qscore = 0,
-               bytes name = b"NA"):
-        """items:
-        start:start
-        end:end,
-        length:end-start,
-        summit:summit,
-        score:peak_score,
-        pileup:pileup,
-        pscore:pscore,
-        fc:fold_change,
-        qscore:qscore
-        """
+    @cython.ccall
+    def add(self,
+            chromosome: bytes,
+            start: cython.int,  # leftmost position
+            end: cython.int,    # rightmost position
+            summit: cython.int = 0,  # summit position
+            peak_score: cython.float = 0,  # score
+            pileup: cython.float = 0,      # pileup value
+            pscore: cython.float = 0,      # -log10 pvalue
+            fold_change: cython.float = 0,  # fold change
+            qscore: cython.float = 0,      # -log10 qvalue
+            name: bytes = b""):            # peak name
         if not self.peaks.has_key(chromosome):
-            self.peaks[chromosome]=[]
-        self.peaks[chromosome].append(PeakContent( chromosome, start, end, summit, peak_score, pileup, pscore, fold_change, qscore, name))
+            self.peaks[chromosome] = []
+        self.peaks[chromosome].append(PeakContent(chromosome,
+                                                  start,
+                                                  end,
+                                                  summit,
+                                                  peak_score,
+                                                  pileup,
+                                                  pscore,
+                                                  fold_change,
+                                                  qscore,
+                                                  name))
         self.total += 1
         self.CO_sorted = False
 
-    cpdef add_PeakContent ( self, bytes chromosome, object peakcontent ):
+    @cython.ccall
+    def add_PeakContent(self,
+                        chromosome: bytes,
+                        peakcontent: PeakContent):
         if not self.peaks.has_key(chromosome):
-            self.peaks[chromosome]=[]
+            self.peaks[chromosome] = []
         self.peaks[chromosome].append(peakcontent)
         self.total += 1
         self.CO_sorted = False
 
-    cpdef list get_data_from_chrom (self, bytes chrom):
-        if not self.peaks.has_key( chrom ):
-            self.peaks[chrom]= []
+    @cython.ccall
+    def get_data_from_chrom(self, chrom: bytes) -> list:
+        if not self.peaks.has_key(chrom):
+            self.peaks[chrom] = []
         return self.peaks[chrom]
 
-    cpdef set get_chr_names (self):
-        return set(sorted(self.peaks.keys()))
+    def get_chr_names(self) -> set:
+        return set(self.peaks.keys())
 
-    def sort ( self ):
-        cdef:
-            list chrs
-            bytes chrom
+    def sort(self):
+        chrs: list
+        chrom: bytes
+
         # sort by position
         if self.CO_sorted:
             # if already sorted, quit
             return
         chrs = sorted(list(self.peaks.keys()))
         for chrom in sorted(chrs):
-            self.peaks[chrom].sort(key=lambda x:x['start'])
+            self.peaks[chrom].sort(key=lambda x: x['start'])
         self.CO_sorted = True
         return
 
-    cpdef object randomly_pick ( self, int n, int seed = 12345 ):
+    @cython.ccall
+    def randomly_pick(self, n: cython.int, seed: cython.int = 12345):
         """Shuffle the peaks and get n peaks out of it. Return a new
         PeakIO object.
         """
-        cdef:
-            list all_pc
-            list chrs
-            bytes chrom
-            object ret_peakio, p
+        all_pc: list
+        chrs: list
+        chrom: bytes
+        ret_peakio: PeakIO
+        p: PeakContent
+
         assert n > 0
         chrs = sorted(list(self.peaks.keys()))
         all_pc = []
         for chrom in sorted(chrs):
             all_pc.extend(self.peaks[chrom])
-        random.seed( seed )
-        random.shuffle( all_pc )
+        random.seed(seed)
+        random.shuffle(all_pc)
         all_pc = all_pc[:n]
         ret_peakio = PeakIO()
         for p in all_pc:
-            ret_peakio.add_PeakContent ( p["chrom"], p )
+            ret_peakio.add_PeakContent(p["chrom"], p)
         return ret_peakio
-    
-    cpdef void filter_pscore (self, double pscore_cut ):
-        cdef:
-            bytes chrom
-            dict new_peaks
-            list chrs
-            object p
-        new_peaks = {}
-        chrs = sorted(list(self.peaks.keys()))
-        self.total = 0
-        for chrom in sorted(chrs):
-            new_peaks[chrom]=[p for p in self.peaks[chrom] if p['pscore'] >= pscore_cut]
-            self.total +=  len( new_peaks[chrom] )
-        self.peaks = new_peaks
-        self.CO_sorted = True
-        self.sort()
 
-    cpdef void filter_qscore (self, double qscore_cut ):
-        cdef:
-            bytes chrom
-            dict new_peaks
-            list chrs
-            object p
+    @cython.ccall
+    def filter_pscore(self, pscore_cut: cython.double):
+        chrom: bytes
+        new_peaks: dict
+        chrs: list
 
         new_peaks = {}
         chrs = sorted(list(self.peaks.keys()))
         self.total = 0
         for chrom in sorted(chrs):
-            new_peaks[chrom]=[p for p in self.peaks[chrom] if p['qscore'] >= qscore_cut]
-            self.total +=  len( new_peaks[chrom] )
+            new_peaks[chrom] = [p for p in self.peaks[chrom] if p['pscore'] >= pscore_cut]
+            self.total += len(new_peaks[chrom])
         self.peaks = new_peaks
         self.CO_sorted = True
         self.sort()
 
-    cpdef void filter_fc (self, float fc_low, float fc_up = 0 ):
+    @cython.ccall
+    def filter_qscore(self, qscore_cut: cython.double):
+        chrom: bytes
+        new_peaks: dict
+        chrs: list
+
+        new_peaks = {}
+        chrs = sorted(list(self.peaks.keys()))
+        self.total = 0
+        for chrom in sorted(chrs):
+            new_peaks[chrom] = [p for p in self.peaks[chrom] if p['qscore'] >= qscore_cut]
+            self.total += len(new_peaks[chrom])
+        self.peaks = new_peaks
+        self.CO_sorted = True
+        self.sort()
+
+    @cython.ccall
+    def filter_fc(self, fc_low: cython.float, fc_up: cython.float = 0):
         """Filter peaks in a given fc range.
 
         If fc_low and fc_up is assigned, the peaks with fc in [fc_low,fc_up)
 
         """
-        cdef:
-            bytes chrom
-            dict new_peaks
-            list chrs
-            object p
+        chrom: bytes
+        new_peaks: dict
+        chrs: list
 
         new_peaks = {}
         chrs = list(self.peaks.keys())
         self.total = 0
         if fc_up > 0 and fc_up > fc_low:
             for chrom in sorted(chrs):
-                new_peaks[chrom]=[p for p in self.peaks[chrom] if p['fc'] >= fc_low and p['fc']<fc_up]
-                self.total +=  len( new_peaks[chrom] )
+                new_peaks[chrom] = [p for p in self.peaks[chrom] if p['fc'] >= fc_low and p['fc'] < fc_up]
+                self.total += len(new_peaks[chrom])
         else:
             for chrom in sorted(chrs):
-                new_peaks[chrom]=[p for p in self.peaks[chrom] if p['fc'] >= fc_low]
-                self.total +=  len( new_peaks[chrom] )
+                new_peaks[chrom] = [p for p in self.peaks[chrom] if p['fc'] >= fc_low]
+                self.total += len(new_peaks[chrom])
         self.peaks = new_peaks
         self.CO_sorted = True
         self.sort()
 
-    cpdef void filter_score (self, float lower_score, float upper_score = 0 ):
+    def filter_score(self, lower_score: cython.float, upper_score: cython.float = 0):
         """Filter peaks in a given score range.
 
         """
-        cdef:
-            bytes chrom
-            dict new_peaks
-            list chrs
-            object p
+        chrom: bytes
+        new_peaks: dict
+        chrs: list
 
         new_peaks = {}
         chrs = list(self.peaks.keys())
         self.total = 0
         if upper_score > 0 and upper_score > lower_score:
             for chrom in sorted(chrs):
-                new_peaks[chrom]=[p for p in self.peaks[chrom] if p['score'] >= lower_score and p['score']<upper_score]
-                self.total +=  len( new_peaks[chrom] )
+                new_peaks[chrom] = [p for p in self.peaks[chrom] if p['score'] >= lower_score and p['score'] < upper_score]
+                self.total += len(new_peaks[chrom])
         else:
             for chrom in sorted(chrs):
-                new_peaks[chrom]=[p for p in self.peaks[chrom] if p['score'] >= lower_score]
-                self.total +=  len( new_peaks[chrom] )
+                new_peaks[chrom] = [p for p in self.peaks[chrom] if p['score'] >= lower_score]
+                self.total += len(new_peaks[chrom])
         self.peaks = new_peaks
         self.CO_sorted = True
         self.sort()
 
-    def __str__ (self):
+    def __str__(self):
         """convert to text -- for debug
         """
-        cdef:
-            list chrs
-            int n_peak
-            str ret            
+        chrs: list
+        n_peak: cython.int
+        ret: str
+        chrom: bytes
+        peaks: list
+
         ret = ""
         chrs = list(self.peaks.keys())
         n_peak = 0
@@ -318,38 +360,44 @@ cdef class PeakIO:
                 peaks = list(group)
                 if len(peaks) > 1:
                     for i, peak in enumerate(peaks):
-                        ret += "chrom:%s\tstart:%d\tend:%d\tname:peak_%d%s\tscore:%.6g\tsummit:%d\n" % (chrom.decode(),peak['start'],peak['end'],n_peak,subpeak_letters(i),peak["score"],peak["summit"])
+                        ret += "chrom:%s\tstart:%d\tend:%d\tname:peak_%d%s\tscore:%.6g\tsummit:%d\n" % (chrom.decode(), peak['start'], peak['end'], n_peak, subpeak_letters(i), peak["score"], peak["summit"])
                 else:
                     peak = peaks[0]
-                    ret += "chrom:%s\tstart:%d\tend:%d\tname:peak_%d\tscore:%.6g\tsummit:%d\n" % (chrom.decode(),peak['start'],peak['end'],n_peak,peak["score"],peak["summit"])                    
-                    
+                    ret += "chrom:%s\tstart:%d\tend:%d\tname:peak_%d\tscore:%.6g\tsummit:%d\n" % (chrom.decode(), peak['start'], peak['end'], n_peak, peak["score"], peak["summit"])
         return ret
 
-    cdef void _to_bed(self, bytes name_prefix=b"%s_peak_", bytes name=b"MACS",
-                      bytes description=b"%s", str score_column="score",
-                      bool trackline=False, print_func=sys.stdout.write):
+    @cython.cfunc
+    def _to_bed(self,
+                name_prefix: bytes = b"%s_peak_",
+                name: bytes = b"MACS",
+                description: bytes = b"%s",
+                score_column: str = "score",
+                trackline: bool = False,
+                print_func=sys.stdout.write):
         """
         generalization of tobed and write_to_bed
         """
-        cdef:
-            list chrs
-            int n_peak
-            bytes peakprefix, desc
+        chrs: list
+        n_peak: cython.int
+        peakprefix: bytes
+        desc: bytes
+
         chrs = list(self.peaks.keys())
         n_peak = 0
         try:
             peakprefix = name_prefix % name
-        except:
+        except Exception:
             peakprefix = name_prefix
         try:
             desc = description % name
-        except:
+        except Exception:
             desc = description
+
         if trackline:
             try:
-                print_func('track name="%s (peaks)" description="%s" visibility=1\n' % ( name.replace(b"\"", b"\\\"").decode(),
-                                                                                         desc.replace(b"\"", b"\\\"").decode() ) )
-            except:
+                print_func('track name="%s (peaks)" description="%s" visibility=1\n' % (name.replace(b"\"", b"\\\"").decode(),
+                                                                                        desc.replace(b"\"", b"\\\"").decode()))
+            except Exception:
                 print_func('track name=MACS description=Unknown\n')
         for chrom in sorted(chrs):
             for end, group in groupby(self.peaks[chrom], key=itemgetter("end")):
@@ -357,27 +405,43 @@ cdef class PeakIO:
                 peaks = list(group)
                 if len(peaks) > 1:
                     for i, peak in enumerate(peaks):
-                        print_func("%s\t%d\t%d\t%s%d%s\t%.6g\n" % (chrom.decode(),peak['start'],peak['end'],peakprefix.decode(),n_peak,subpeak_letters(i),peak[score_column]))
+                        print_func("%s\t%d\t%d\t%s%d%s\t%.6g\n" % (chrom.decode(), peak['start'], peak['end'], peakprefix.decode(), n_peak, subpeak_letters(i), peak[score_column]))
                 else:
                     peak = peaks[0]
-                    print_func("%s\t%d\t%d\t%s%d\t%.6g\n" % (chrom.decode(),peak['start'],peak['end'],peakprefix.decode(),n_peak,peak[score_column]))
+                    print_func("%s\t%d\t%d\t%s%d\t%.6g\n" % (chrom.decode(), peak['start'], peak['end'], peakprefix.decode(), n_peak, peak[score_column]))
 
-    cdef _to_summits_bed(self, bytes name_prefix=b"%s_peak_", bytes name=b"MACS",
-                        bytes description = b"%s", str score_column="score",
-                        bool trackline=False, print_func=sys.stdout.write):
+    @cython.cfunc
+    def _to_summits_bed(self,
+                        name_prefix: bytes = b"%s_peak_",
+                        name: bytes = b"MACS",
+                        description: bytes = b"%s",
+                        score_column: str = "score",
+                        trackline: bool = False,
+                        print_func=sys.stdout.write):
         """
         generalization of to_summits_bed and write_to_summit_bed
         """
+        chrs: list
+        n_peak: cython.int
+        peakprefix: bytes
+        desc: bytes
+
         chrs = list(self.peaks.keys())
         n_peak = 0
-        try: peakprefix = name_prefix % name
-        except: peakprefix = name_prefix
-        try: desc = description % name
-        except: desc = description
+        try:
+            peakprefix = name_prefix % name
+        except Exception:
+            peakprefix = name_prefix
+        try:
+            desc = description % name
+        except Exception:
+            desc = description
         if trackline:
-            try: print_func('track name="%s (summits)" description="%s" visibility=1\n' % ( name.replace(b"\"", b"\\\"").decode(),\
-                                                                                            desc.replace(b"\"", b"\\\"").decode() ) )
-            except: print_func('track name=MACS description=Unknown')
+            try:
+                print_func('track name="%s (summits)" description="%s" visibility=1\n' % (name.replace(b"\"", b"\\\"").decode(),
+                                                                                          desc.replace(b"\"", b"\\\"").decode()))
+            except Exception:
+                print_func('track name=MACS description=Unknown')
         for chrom in sorted(chrs):
             for end, group in groupby(self.peaks[chrom], key=itemgetter("end")):
                 n_peak += 1
@@ -385,14 +449,14 @@ cdef class PeakIO:
                 if len(peaks) > 1:
                     for i, peak in enumerate(peaks):
                         summit_p = peak['summit']
-                        print_func("%s\t%d\t%d\t%s%d%s\t%.6g\n" % (chrom.decode(),summit_p,summit_p+1,peakprefix.decode(),n_peak,subpeak_letters(i),peak[score_column]))
+                        print_func("%s\t%d\t%d\t%s%d%s\t%.6g\n" % (chrom.decode(), summit_p, summit_p+1, peakprefix.decode(), n_peak, subpeak_letters(i), peak[score_column]))
                 else:
                     peak = peaks[0]
                     summit_p = peak['summit']
-                    print_func("%s\t%d\t%d\t%s%d\t%.6g\n" % (chrom.decode(),summit_p,summit_p+1,peakprefix.decode(),n_peak,peak[score_column]))
+                    print_func("%s\t%d\t%d\t%s%d\t%.6g\n" % (chrom.decode(), summit_p, summit_p+1, peakprefix.decode(), n_peak, peak[score_column]))
 
-    def tobed (self):
-        """Print out peaks in BED5 format.
+    def tobed(self):
+        """Print out (stdout) peaks in BED5 format.
 
         Five columns are chromosome, peak start, peak end, peak name, and peak height.
 
@@ -406,19 +470,23 @@ cdef class PeakIO:
         fc:fold_change,
         qscore:qvalue
         """
-        return self._to_bed(name_prefix=b"peak_", score_column="score", name=b"", description=b"")
+        return self._to_bed(name_prefix=b"%s_peak_", score_column="score", name=self.name, description=b"")
 
-    def to_summits_bed (self):
-        """Print out peak summits in BED5 format.
+    def to_summits_bed(self):
+        """Print out (stdout) peak summits in BED5 format.
 
         Five columns are chromosome, summit start, summit end, peak name, and peak height.
 
         """
-        return self._to_summits_bed(name_prefix=b"peak_", score_column="score", name=b"", description=b"")
+        return self._to_summits_bed(name_prefix=b"%s_peak_", score_column="score", name=self.name, description=b"")
 
     # these methods are very fast, specifying types is unnecessary
-    def write_to_bed (self, fhd, bytes name_prefix=b"peak_", bytes name=b"MACS",
-                        bytes description = b"%s", str score_column="score", trackline=True):
+    def write_to_bed(self, fhd,
+                     name_prefix: bytes = b"%s_peak_",
+                     name: bytes = b"MACS",
+                     description: bytes = b"%s",
+                     score_column: str = "score",
+                     trackline: bool = True):
         """Write peaks in BED5 format in a file handler. Score (5th
         column) is decided by score_column setting. Check the
         following list. Name column ( 4th column) is made by putting
@@ -439,13 +507,20 @@ cdef class PeakIO:
         fc:fold_change,
         qscore:qvalue
         """
-        #print(description)
-        return self._to_bed(name_prefix=name_prefix, name=name,
-                            description=description, score_column=score_column,
-                            print_func=fhd.write, trackline=trackline)
+        # print(description)
+        return self._to_bed(name_prefix=name_prefix,
+                            name=name,
+                            description=description,
+                            score_column=score_column,
+                            print_func=fhd.write,
+                            trackline=trackline)
 
-    def write_to_summit_bed (self, fhd, bytes name_prefix = b"peak_", bytes name = b"MACS",
-                             bytes description = b"%s", str score_column ="score", trackline=True):
+    def write_to_summit_bed(self, fhd,
+                            name_prefix: bytes = b"%s_peak_",
+                            name: bytes = b"MACS",
+                            description: bytes = b"%s",
+                            score_column: str = "score",
+                            trackline: bool = False):
         """Write peak summits in BED5 format in a file handler. Score
         (5th column) is decided by score_column setting. Check the
         following list. Name column ( 4th column) is made by putting
@@ -469,7 +544,11 @@ cdef class PeakIO:
                                     description=description, score_column=score_column,
                                     print_func=fhd.write, trackline=trackline)
 
-    def write_to_narrowPeak (self, fhd, bytes name_prefix = b"peak_", bytes name = b"peak", str score_column="score", trackline=True):
+    def write_to_narrowPeak(self, fhd,
+                            name_prefix: bytes = b"%s_peak_",
+                            name: bytes = b"MACS",
+                            score_column: str = "score",
+                            trackline: bool = False):
         """Print out peaks in narrowPeak format.
 
         This format is designed for ENCODE project, and basically a
@@ -523,33 +602,41 @@ cdef class PeakIO:
         +-----------+------+----------------------------------------+
 
         """
-        cdef int n_peak
-        cdef bytes chrom
-        cdef long s
-        cdef str peakname
+        n_peak: cython.int
+        chrom: bytes
+        s: cython.long
+        peakname: str
 
         chrs = list(self.peaks.keys())
         n_peak = 0
         write = fhd.write
-        try: peakprefix = name_prefix % name
-        except: peakprefix = name_prefix
+        try:
+            peakprefix = name_prefix % name
+        except Exception:
+            peakprefix = name_prefix
         if trackline:
             write("track type=narrowPeak name=\"%s\" description=\"%s\" nextItemButton=on\n" % (name.decode(), name.decode()))
         for chrom in sorted(chrs):
             for end, group in groupby(self.peaks[chrom], key=itemgetter("end")):
                 n_peak += 1
                 these_peaks = list(group)
-                if len(these_peaks) > 1: # from call-summits
+                if len(these_peaks) > 1:  # from call-summits
                     for i, peak in enumerate(these_peaks):
                         peakname = "%s%d%s" % (peakprefix.decode(), n_peak, subpeak_letters(i))
                         if peak['summit'] == -1:
                             s = -1
                         else:
                             s = peak['summit'] - peak['start']
-                        fhd.write( "%s\t%d\t%d\t%s\t%d\t.\t%.6g\t%.6g\t%.6g\t%d\n"
-                                   %
-                                   (chrom.decode(),peak['start'],peak['end'],peakname,int(10*peak[score_column]),
-                                    peak['fc'],peak['pscore'],peak['qscore'],s) )
+                        fhd.write("%s\t%d\t%d\t%s\t%d\t.\t%.6g\t%.6g\t%.6g\t%d\n" %
+                                  (chrom.decode(),
+                                   peak['start'],
+                                   peak['end'],
+                                   peakname,
+                                   int(10*peak[score_column]),
+                                   peak['fc'],
+                                   peak['pscore'],
+                                   peak['qscore'],
+                                   s))
                 else:
                     peak = these_peaks[0]
                     peakname = "%s%d" % (peakprefix.decode(), n_peak)
@@ -557,13 +644,22 @@ cdef class PeakIO:
                         s = -1
                     else:
                         s = peak['summit'] - peak['start']
-                    fhd.write( "%s\t%d\t%d\t%s\t%d\t.\t%.6g\t%.6g\t%.6g\t%d\n"
-                               %
-                               (chrom.decode(),peak['start'],peak['end'],peakname,int(10*peak[score_column]),
-                                peak['fc'],peak['pscore'],peak['qscore'],s) )
+                    fhd.write("%s\t%d\t%d\t%s\t%d\t.\t%.6g\t%.6g\t%.6g\t%d\n" %
+                              (chrom.decode(),
+                               peak['start'],
+                               peak['end'],
+                               peakname,
+                               int(10*peak[score_column]),
+                               peak['fc'],
+                               peak['pscore'],
+                               peak['qscore'],
+                               s))
         return
 
-    def write_to_xls (self, ofhd, bytes name_prefix = b"%s_peak_", bytes name = b"MACS"):
+    @cython.ccall
+    def write_to_xls(self, ofhd,
+                     name_prefix: bytes = b"%s_peak_",
+                     name: bytes = b"MACS"):
         """Save the peak results in a tab-delimited plain text file
         with suffix .xls.
 
@@ -571,11 +667,19 @@ cdef class PeakIO:
         wait... why I have two write_to_xls in this class?
 
         """
-        write = ofhd.write
-        write("\t".join(("chr","start", "end",  "length",  "abs_summit", "pileup", "-log10(pvalue)", "fold_enrichment", "-log10(qvalue)", "name"))+"\n")
+        peakprefix: bytes
+        chrs: list
+        these_peaks: list
+        n_peak: cython.int
+        i: cython.int
 
-        try: peakprefix = name_prefix % name
-        except: peakprefix = name_prefix
+        write = ofhd.write
+        write("\t".join(("chr", "start", "end",  "length",  "abs_summit", "pileup", "-log10(pvalue)", "fold_enrichment", "-log10(qvalue)", "name"))+"\n")
+
+        try:
+            peakprefix = name_prefix % name
+        except Exception:
+            peakprefix = name_prefix
 
         peaks = self.peaks
         chrs = list(peaks.keys())
@@ -587,47 +691,56 @@ cdef class PeakIO:
                 if len(these_peaks) > 1:
                     for i, peak in enumerate(these_peaks):
                         peakname = "%s%d%s" % (peakprefix.decode(), n_peak, subpeak_letters(i))
-                        #[start,end,end-start,summit,peak_height,number_tags,pvalue,fold_change,qvalue]
-                        write("%s\t%d\t%d\t%d" % (chrom.decode(),peak['start']+1,peak['end'],peak['length']))
-                        write("\t%d" % (peak['summit']+1)) # summit position
-                        write("\t%.6g" % (round(peak['pileup'],2))) # pileup height at summit
-                        write("\t%.6g" % (peak['pscore'])) # -log10pvalue at summit
-                        write("\t%.6g" % (peak['fc'])) # fold change at summit
-                        write("\t%.6g" % (peak['qscore'])) # -log10qvalue at summit
+                        # [start,end,end-start,summit,peak_height,number_tags,pvalue,fold_change,qvalue]
+                        write("%s\t%d\t%d\t%d" % (chrom.decode(),
+                                                  peak['start']+1,
+                                                  peak['end'],
+                                                  peak['length']))
+                        write("\t%d" % (peak['summit']+1))  # summit position
+                        write("\t%.6g" % (round(peak['pileup'], 2)))  # pileup height at summit
+                        write("\t%.6g" % (peak['pscore']))  # -log10pvalue at summit
+                        write("\t%.6g" % (peak['fc']))  # fold change at summit
+                        write("\t%.6g" % (peak['qscore']))  # -log10qvalue at summit
                         write("\t%s" % peakname)
                         write("\n")
                 else:
                     peak = these_peaks[0]
                     peakname = "%s%d" % (peakprefix.decode(), n_peak)
-                    #[start,end,end-start,summit,peak_height,number_tags,pvalue,fold_change,qvalue]
-                    write("%s\t%d\t%d\t%d" % (chrom.decode(),peak['start']+1,peak['end'],peak['length']))
-                    write("\t%d" % (peak['summit']+1)) # summit position
-                    write("\t%.6g" % (round(peak['pileup'],2))) # pileup height at summit
-                    write("\t%.6g" % (peak['pscore'])) # -log10pvalue at summit
-                    write("\t%.6g" % (peak['fc'])) # fold change at summit
-                    write("\t%.6g" % (peak['qscore'])) # -log10qvalue at summit
+                    # [start,end,end-start,summit,peak_height,number_tags,pvalue,fold_change,qvalue]
+                    write("%s\t%d\t%d\t%d" % (chrom.decode(),
+                                              peak['start']+1,
+                                              peak['end'],
+                                              peak['length']))
+                    write("\t%d" % (peak['summit']+1))  # summit position
+                    write("\t%.6g" % (round(peak['pileup'], 2)))  # pileup height at summit
+                    write("\t%.6g" % (peak['pscore']))  # -log10pvalue at summit
+                    write("\t%.6g" % (peak['fc']))  # fold change at summit
+                    write("\t%.6g" % (peak['qscore']))  # -log10qvalue at summit
                     write("\t%s" % peakname)
                     write("\n")
         return
 
-
-    cpdef void exclude (self, object peaksio2):
+    @cython.ccall
+    def exclude(self, peaksio2: object):
         """ Remove overlapping peaks in peaksio2, another PeakIO object.
 
         """
-        cdef:
-            dict peaks1, peaks2
-            list chrs1, chrs2
-            bytes k
-            dict ret_peaks
-            bool overlap_found
-            object r1, r2       # PeakContent objects
-            long n_rl1, n_rl2
+        peaks1: dict
+        peaks2: dict
+        chrs1: list
+        chrs2: list
+        k: bytes
+        ret_peaks: dict
+        overlap_found: bool
+        r1: PeakContent
+        r2: PeakContent
+        n_rl1: cython.long
+        n_rl2: cython.long
 
         self.sort()
         peaks1 = self.peaks
         self.total = 0
-        assert isinstance(peaksio2,PeakIO)
+        assert isinstance(peaksio2, PeakIO)
         peaksio2.sort()
         peaks2 = peaksio2.peaks
 
@@ -638,44 +751,44 @@ cdef class PeakIO:
             #print(f"chromosome {k}")
             if not chrs2.count(k):
                 # no such chromosome in peaks1, then don't touch the peaks in this chromosome
-                ret_peaks[ k ] = peaks1[ k ]
+                ret_peaks[k] = peaks1[k]
                 continue
-            ret_peaks[ k ] = []
-            n_rl1 = len( peaks1[k] )
-            n_rl2 = len( peaks2[k] )
-            rl1_k = iter( peaks1[k] ).__next__
-            rl2_k = iter( peaks2[k] ).__next__
+            ret_peaks[k] = []
+            n_rl1 = len(peaks1[k])
+            n_rl2 = len(peaks2[k])
+            rl1_k = iter(peaks1[k]).__next__
+            rl2_k = iter(peaks2[k]).__next__
             overlap_found = False
             r1 = rl1_k()
             n_rl1 -= 1
             r2 = rl2_k()
             n_rl2 -= 1
-            while ( True ):
+            while (True):
                 # we do this until there is no r1 or r2 left.
                 if r2["start"] < r1["end"] and r1["start"] < r2["end"]:
                     # since we found an overlap, r1 will be skipped/excluded
                     # and move to the next r1
                     overlap_found = True
-                    #print(f"found overlap of {r1['start']} {r1['end']} and {r2['start']} {r2['end']}, move to the next r1")
+                    # print(f"found overlap of {r1['start']} {r1['end']} and {r2['start']} {r2['end']}, move to the next r1")
                     n_rl1 -= 1
                     if n_rl1 >= 0:
                         r1 = rl1_k()
-                        #print(f"move to next r1 {r1['start']} {r1['end']}")
+                        # print(f"move to next r1 {r1['start']} {r1['end']}")
                         overlap_found = False
                         continue
                     else:
                         break
                 if r1["end"] < r2["end"]:
-                    #print(f"now we need to move r1 {r1['start']} {r1['end']}")
+                    # print(f"now we need to move r1 {r1['start']} {r1['end']}")
                     # in this case, we need to move to the next r1,
                     # we will check if overlap_found is true, if not, we put r1 in a new dict
                     if not overlap_found:
-                        #print(f"we add this r1 {r1['start']} {r1['end']} to list")
-                        ret_peaks[ k ].append( r1 )
+                        # print(f"we add this r1 {r1['start']} {r1['end']} to list")
+                        ret_peaks[k].append(r1)
                     n_rl1 -= 1
                     if n_rl1 >= 0:
                         r1 = rl1_k()
-                        #print(f"move to next r1 {r1['start']} {r1['end']}")
+                        # print(f"move to next r1 {r1['start']} {r1['end']}")
                         overlap_found = False
                     else:
                         # no more r1 left
@@ -685,54 +798,61 @@ cdef class PeakIO:
                     if n_rl2:
                         r2 = rl2_k()
                         n_rl2 -= 1
-                        #print(f"move to next r2 {r2['start']} {r2['end']}")                      
+                        # print(f"move to next r2 {r2['start']} {r2['end']}")
                     else:
                         # no more r2 left
                         break
             # add the rest of r1
-            #print( f"n_rl1: {n_rl1} n_rl2:{n_rl2} last overlap_found is {overlap_found}" )
-            #if overlap_found:
+            # print( f"n_rl1: {n_rl1} n_rl2:{n_rl2} last overlap_found is {overlap_found}" )
+            # if overlap_found:
             #    n_rl1 -= 1
             if n_rl1 >= 0:
-                ret_peaks[ k ].extend( peaks1[ k ][-n_rl1-1:] )
+                ret_peaks[k].extend(peaks1[k][-n_rl1-1:])
 
         for k in ret_peaks.keys():
-            self.total += len( ret_peaks[ k ] )
+            self.total += len(ret_peaks[k])
 
         self.peaks = ret_peaks
         self.CO_sorted = True
-        self.sort()        
+        self.sort()
         return
 
-    def read_from_xls (self, ofhd):
+    @cython.ccall
+    def read_from_xls(self, ofhd):
         """Save the peak results in a tab-delimited plain text file
         with suffix .xls.
 
         """
-        cdef:
-            bytes line = b''
-            bytes chrom = b''
-            int n_peak = 0
-            int start, end, length, summit
-            float pileup, pscore, fc, qscore
-            list fields
+        line: bytes = b''
+        chrom: bytes = b''
+        start: cython.int
+        end: cython.int
+        length: cython.int
+        summit: cython.int
+        pileup: cython.float
+        pscore: cython.float
+        fc: cython.float
+        qscore: cython.float
+        fields: list
+
         while True:
-            if not (line.startswith('#') or line.strip() == ''): break
+            if not (line.startswith('#') or line.strip() == ''):
+                break
             line = ofhd.readline()
 
         # sanity check
         columns = line.rstrip().split('\t')
-        for a,b in zip(columns, ("chr","start", "end",  "length", "abs_summit",
-                                 "pileup", "-log10(pvalue)", "fold_enrichment",
-                                 "-log10(qvalue)", "name")):
-            if not a==b: raise NotImplementedError('column %s not recognized', a)
+        for a, b in zip(columns, ("chr", "start", "end",  "length", "abs_summit",
+                                  "pileup", "-log10(pvalue)", "fold_enrichment",
+                                  "-log10(qvalue)", "name")):
+            if not a == b:
+                raise NotImplementedError('column %s not recognized', a)
 
         add = self.add
         split = str.split
         rstrip = str.rstrip
         for i, line in enumerate(ofhd.readlines()):
             fields = split(line, '\t')
-            peak = {}
             chrom = fields[0].encode()
             start = int(fields[1]) - 1
             end = int(fields[2])
@@ -748,68 +868,62 @@ cdef class PeakIO:
             add(chrom, start, end, summit, qscore, pileup, pscore, fc, qscore,
                 peakname)
 
-cpdef parse_peakname(peakname):
-    """returns peaknumber, subpeak
-    """
-    cdef:
-        bytes peak_id, peaknumber, subpeak
-    peak_id = peakname.split(b'_')[-1]
-    x = re.split('(\D.*)', peak_id)
-    peaknumber = int(x[0])
-    try:
-        subpeak = x[1]
-    except IndexError:
-        subpeak = b''
-    return (peaknumber, subpeak)
 
-cdef class RegionIO:
+@cython.cclass
+class RegionIO:
     """For plain region of chrom, start and end
     """
-    cdef:
-        dict regions
-        bool __flag_sorted
+    regions: dict
+    __flag_sorted: bool
 
-    def __init__ (self):
-        self.regions= {}
+    def __init__(self):
+        self.regions = {}
         self.__flag_sorted = False
 
-    cpdef void add_loc ( self, bytes chrom, int start, int end ):
+    @cython.ccall
+    def add_loc(self, chrom: bytes, start: cython.int, end: cython.int):
         if self.regions.has_key(chrom):
-            self.regions[chrom].append( (start,end) )
+            self.regions[chrom].append((start, end))
         else:
-            self.regions[chrom] = [(start,end), ]
+            self.regions[chrom] = [(start, end), ]
         self.__flag_sorted = False
         return
 
-    cpdef void sort (self):
-        cdef bytes chrom
+    @cython.ccall
+    def sort(self):
+        chrom: bytes
 
         for chrom in sorted(list(self.regions.keys())):
             self.regions[chrom].sort()
         self.__flag_sorted = True
 
-    cpdef set get_chr_names (self):
+    @cython.ccall
+    def get_chr_names(self) -> set:
         return set(sorted(self.regions.keys()))
 
-    cpdef void merge_overlap ( self ):
+    @cython.ccall
+    def merge_overlap(self):
         """
         merge overlapping regions
         """
-        cdef:
-            bytes chrom
-            int s_new_region, e_new_region, i, j
-            dict regions, new_regions
-            list chrs, regions_chr
-            tuple prev_region
+        chrom: bytes
+        s_new_region: cython.int
+        e_new_region: cython.int
+        i: cython.int
+        regions: dict
+        new_regions: dict
+        chrs: list
+        regions_chr: list
+        prev_region: tuple
 
         if not self.__flag_sorted:
             self.sort()
         regions = self.regions
         new_regions = {}
-        chrs = sorted( list( regions.keys() ) )
-        for i in range( len( chrs ) ):
+        chrs = sorted(list(regions.keys()))
+        for i in range(len(chrs)):
             chrom = chrs[i]
-            new_regions[chrom]=[]
+            new_regions[chrom] = []
             n_append = new_regions[chrom].append
             prev_region = None
             regions_chr = regions[chrom]
@@ -821,7 +935,7 @@ cdef class RegionIO:
                     if regions_chr[i][0] <= prev_region[1]:
                         s_new_region = prev_region[0]
                         e_new_region = regions_chr[i][1]
-                        prev_region = (s_new_region,e_new_region)
+                        prev_region = (s_new_region, e_new_region)
                     else:
                         n_append(prev_region)
                         prev_region = regions_chr[i]
@@ -831,43 +945,53 @@ cdef class RegionIO:
         self.sort()
         return
 
-    cpdef write_to_bed (self, fhd ):
-        cdef:
-            int i
-            bytes chrom
-            list chrs
-            tuple region
+    @cython.ccall
+    def write_to_bed(self, fhd):
+        i: cython.int
+        chrom: bytes
+        chrs: list
+        region: tuple
 
         chrs = sorted(list(self.regions.keys()))
-        for i in range( len(chrs) ):
+        for i in range(len(chrs)):
             chrom = chrs[i]
             for region in self.regions[chrom]:
-                fhd.write( "%s\t%d\t%d\n" % (chrom.decode(),region[0],region[1] ) )
+                fhd.write("%s\t%d\t%d\n" % (chrom.decode(),
+                                            region[0],
+                                            region[1]))
 
 
-cdef class BroadPeakContent:
-    cdef:
-        long start
-        long end
-        long length
-        float score
-        bytes thickStart
-        bytes thickEnd
-        long blockNum
-        bytes  blockSizes
-        bytes  blockStarts
-        float pileup
-        float pscore
-        float fc
-        float qscore
-        bytes name
+@cython.cclass
+class BroadPeakContent:
+    start: cython.int
+    end: cython.int
+    length: cython.int
+    score: cython.float
+    thickStart: bytes
+    thickEnd: bytes
+    blockNum: cython.int
+    blockSizes: bytes
+    blockStarts: bytes
+    pileup: cython.float
+    pscore: cython.float
+    fc: cython.float
+    qscore: cython.float
+    name: bytes
 
-    def __init__ ( self, long start, long end, float score,
-                   bytes thickStart, bytes thickEnd,
-                   long blockNum, bytes blockSizes,
-                   bytes blockStarts, float pileup,
-                   float pscore, float fold_change,
-                   float qscore, bytes name = b"NA" ):
+    def __init__(self,
+                 start: cython.int,
+                 end: cython.int,
+                 score: cython.float,
+                 thickStart: bytes,
+                 thickEnd: bytes,
+                 blockNum: cython.int,
+                 blockSizes: bytes,
+                 blockStarts: bytes,
+                 pileup: cython.float,
+                 pscore: cython.float,
+                 fold_change: cython.float,
+                 qscore: cython.float,
+                 name: bytes = b"NA"):
         self.start = start
         self.end = end
         self.score = score
@@ -876,7 +1000,6 @@ cdef class BroadPeakContent:
         self.blockNum = blockNum
         self.blockSizes = blockSizes
         self.blockStarts = blockStarts
-
         self.length = end - start
         self.pileup = pileup
         self.pscore = pscore
@@ -884,7 +1007,7 @@ cdef class BroadPeakContent:
         self.qscore = qscore
         self.name = name
 
-    def __getitem__ ( self, a ):
+    def __getitem__(self, a):
         if a == "start":
             return self.start
         elif a == "end":
@@ -914,26 +1037,36 @@ cdef class BroadPeakContent:
         elif a == "name":
             return self.name
 
-    def __str__ (self):
-        return "start:%d;end:%d;score:%f" % ( self.start, self.end, self.score )
+    def __str__(self):
+        return "start:%d;end:%d;score:%f" % (self.start, self.end, self.score)
 
 
-cdef class BroadPeakIO:
+@cython.cclass
+class BroadPeakIO:
     """IO for broad peak information.
 
     """
-    cdef:
-        dict peaks
+    peaks: dict
 
-    def __init__ (self):
+    def __init__(self):
         self.peaks = {}
 
-    def add (self, char * chromosome, long start, long end, long score = 0,
-             bytes thickStart=b".", bytes thickEnd=b".",
-             long blockNum=0, bytes blockSizes=b".",
-             bytes blockStarts=b".", float pileup = 0,
-             float pscore = 0, float fold_change = 0,
-             float qscore = 0, bytes name = b"NA" ):
+    @cython.ccall
+    def add(self,
+            chromosome: bytes,
+            start: cython.int,
+            end: cython.int,
+            score: cython.float = 0.0,
+            thickStart: bytes = b".",
+            thickEnd: bytes = b".",
+            blockNum: cython.int = 0,
+            blockSizes: bytes = b".",
+            blockStarts: bytes = b".",
+            pileup: cython.float = 0,
+            pscore: cython.float = 0,
+            fold_change: cython.float = 0,
+            qscore: cython.float = 0,
+            name: bytes = b"NA"):
         """items
         chromosome : chromosome name,
         start      : broad region start,
@@ -952,81 +1085,97 @@ cdef class BroadPeakIO:
         """
         if not self.peaks.has_key(chromosome):
             self.peaks[chromosome] = []
-        self.peaks[chromosome].append( BroadPeakContent( start, end, score, thickStart, thickEnd,
-                                                         blockNum, blockSizes, blockStarts,
-                                                         pileup, pscore, fold_change, qscore, name ) )
+        self.peaks[chromosome].append(BroadPeakContent(start,
+                                                       end,
+                                                       score,
+                                                       thickStart,
+                                                       thickEnd,
+                                                       blockNum,
+                                                       blockSizes,
+                                                       blockStarts,
+                                                       pileup,
+                                                       pscore,
+                                                       fold_change,
+                                                       qscore,
+                                                       name))
 
-    def filter_pscore (self, double pscore_cut ):
-        cdef:
-            bytes chrom
-            dict peaks
-            dict new_peaks
-            list chrs
-            BroadPeakContent p
-
-        peaks = self.peaks
-        new_peaks = {}
-        chrs = list(peaks.keys())
-
-        for chrom in sorted(chrs):
-            new_peaks[chrom]=[p for p in peaks[chrom] if p['pscore'] >= pscore_cut]
-        self.peaks = new_peaks
-
-    def filter_qscore (self, double qscore_cut ):
-        cdef:
-            bytes chrom
-            dict peaks
-            dict new_peaks
-            list chrs
-            BroadPeakContent p
+    @cython.ccall
+    def filter_pscore(self, pscore_cut: cython.float):
+        chrom: bytes
+        peaks: dict
+        new_peaks: dict
+        chrs: list
 
         peaks = self.peaks
         new_peaks = {}
         chrs = list(peaks.keys())
 
         for chrom in sorted(chrs):
-            new_peaks[chrom]=[p for p in peaks[chrom] if p['qscore'] >= qscore_cut]
+            new_peaks[chrom] = [p for p in peaks[chrom] if p['pscore'] >= pscore_cut]
         self.peaks = new_peaks
 
-    def filter_fc (self, fc_low, fc_up=None ):
+    @cython.ccall
+    def filter_qscore(self, qscore_cut: cython.float):
+        chrom: bytes
+        peaks: dict
+        new_peaks: dict
+        chrs: list
+
+        peaks = self.peaks
+        new_peaks = {}
+        chrs = list(peaks.keys())
+
+        for chrom in sorted(chrs):
+            new_peaks[chrom] = [p for p in peaks[chrom] if p['qscore'] >= qscore_cut]
+        self.peaks = new_peaks
+
+    @cython.ccall
+    def filter_fc(self, fc_low: float, fc_up: float = -1):
         """Filter peaks in a given fc range.
 
-        If fc_low and fc_up is assigned, the peaks with fc in [fc_low,fc_up)
+        If fc_low and fc_up is assigned, the peaks with fc in
+        [fc_low,fc_up)
+
+        fc_up has to be a positive number, otherwise it won't be
+        applied.
 
         """
-        cdef:
-            bytes chrom
-            dict peaks
-            dict new_peaks
-            list chrs
-            BroadPeakContent p
+        chrom: bytes
+        peaks: dict
+        new_peaks: dict
+        chrs: list
 
         peaks = self.peaks
         new_peaks = {}
         chrs = list(peaks.keys())
-        if fc_up:
+        if fc_up >= 0:
             for chrom in sorted(chrs):
-                new_peaks[chrom]=[p for p in peaks[chrom] if p['fc'] >= fc_low and p['fc']<fc_up]
+                new_peaks[chrom] = [p for p in peaks[chrom] if p['fc'] >= fc_low and p['fc'] < fc_up]
         else:
             for chrom in sorted(chrs):
-                new_peaks[chrom]=[p for p in peaks[chrom] if p['fc'] >= fc_low]
+                new_peaks[chrom] = [p for p in peaks[chrom] if p['fc'] >= fc_low]
         self.peaks = new_peaks
 
-    def total (self):
-        cdef:
-            bytes chrom
-            dict peaks
-            list chrs
-            long x
+    @cython.ccall
+    def total(self):
+        chrom: bytes
+        peaks: dict
+        chrs: list
+        x: cython.long = 0
 
         peaks = self.peaks
         chrs = list(peaks.keys())
-        x = 0
         for chrom in sorted(chrs):
             x += len(peaks[chrom])
         return x
 
-    def write_to_gappedPeak (self, fhd, bytes name_prefix=b"peak_", bytes name=b'peak', bytes description=b"%s", str score_column="score", trackline=True):
+    @cython.ccall
+    def write_to_gappedPeak(self, fhd,
+                            name_prefix: bytes = b"peak_",
+                            name: bytes = b'peak',
+                            description: bytes = b"%s",
+                            score_column: str = "score",
+                            trackline: bool = True):
         """Print out peaks in gappedBed format. Only those with stronger enrichment regions are saved.
 
         This format is basically a BED12+3 format.
@@ -1095,24 +1244,49 @@ cdef class BroadPeakIO:
         +--------------+------+----------------------------------------+
 
         """
+        chrs: list
+        n_peak: cython.int = 0
+        peak: BroadPeakContent
+        desc: bytes
+        peakprefix: bytes
+        chrom: bytes
+
         chrs = list(self.peaks.keys())
-        n_peak = 0
-        try: peakprefix = name_prefix % name
-        except: peakprefix = name_prefix
-        try: desc = description % name
-        except: desc = description
+        try:
+            peakprefix = name_prefix % name
+        except Exception:
+            peakprefix = name_prefix
+        try:
+            desc = description % name
+        except Exception:
+            desc = description
         if trackline:
-            fhd.write("track name=\"%s\" description=\"%s\" type=gappedPeak nextItemButton=on\n" % (name.decode(), desc.decode()) )
+            fhd.write("track name=\"%s\" description=\"%s\" type=gappedPeak nextItemButton=on\n" % (name.decode(), desc.decode()))
         for chrom in sorted(chrs):
             for peak in self.peaks[chrom]:
                 n_peak += 1
                 if peak["thickStart"] != b".":
-                    fhd.write( "%s\t%d\t%d\t%s%d\t%d\t.\t0\t0\t0\t%d\t%s\t%s\t%.6g\t%.6g\t%.6g\n"
-                               %
-                               (chrom.decode(),peak["start"],peak["end"],peakprefix.decode(),n_peak,int(10*peak[score_column]),
-                                peak["blockNum"],peak["blockSizes"].decode(),peak["blockStarts"].decode(), peak['fc'], peak['pscore'], peak['qscore'] ) )
+                    fhd.write("%s\t%d\t%d\t%s%d\t%d\t.\t0\t0\t0\t%d\t%s\t%s\t%.6g\t%.6g\t%.6g\n" %
+                              (chrom.decode(),
+                               peak["start"],
+                               peak["end"],
+                               peakprefix.decode(),
+                               n_peak,
+                               int(10*peak[score_column]),
+                               peak["blockNum"],
+                               peak["blockSizes"].decode(),
+                               peak["blockStarts"].decode(),
+                               peak['fc'],
+                               peak['pscore'],
+                               peak['qscore']))
 
-    def write_to_Bed12 (self, fhd, bytes name_prefix=b"peak_", bytes name=b'peak', bytes description=b"%s", str score_column="score", trackline=True):
+    @cython.ccall
+    def write_to_Bed12(self, fhd,
+                       name_prefix: bytes = b"peak_",
+                       name: bytes = b'peak',
+                       description: bytes = b"%s",
+                       score_column: str = "score",
+                       trackline: bool = True):
         """Print out peaks in Bed12 format.
 
         +--------------+------+----------------------------------------+
@@ -1167,31 +1341,58 @@ cdef class BroadPeakIO:
         +--------------+------+----------------------------------------+
 
         """
+        chrs: list
+        n_peak: cython.int = 0
+        peakprefix: bytes
+        peak: BroadPeakContent
+        desc: bytes
+        peakprefix: bytes
+        chrom: bytes
+
         chrs = list(self.peaks.keys())
-        n_peak = 0
-        try: peakprefix = name_prefix % name
-        except: peakprefix = name_prefix
-        try: desc = description % name
-        except: desc = description
+        try:
+            peakprefix = name_prefix % name
+        except Exception:
+            peakprefix = name_prefix
+        try:
+            desc = description % name
+        except Exception:
+            desc = description
         if trackline:
-            fhd.write("track name=\"%s\" description=\"%s\" type=bed nextItemButton=on\n" % (name.decode(), desc.decode()) )
+            fhd.write("track name=\"%s\" description=\"%s\" type=bed nextItemButton=on\n" % (name.decode(), desc.decode()))
         for chrom in sorted(chrs):
             for peak in self.peaks[chrom]:
                 n_peak += 1
                 if peak["thickStart"] == b".":
                     # this will violate gappedPeak format, since it's a complement like broadPeak line.
-                    fhd.write( "%s\t%d\t%d\t%s%d\t%d\t.\n"
-                               %
-                               (chrom.decode(),peak["start"],peak["end"],peakprefix.decode(),n_peak,int(10*peak[score_column]) ) )
+                    fhd.write("%s\t%d\t%d\t%s%d\t%d\t.\n" %
+                              (chrom.decode(),
+                               peak["start"],
+                               peak["end"],
+                               peakprefix.decode(),
+                               n_peak,
+                               int(10*peak[score_column])))
                 else:
-                    fhd.write( "%s\t%d\t%d\t%s%d\t%d\t.\t%s\t%s\t0\t%d\t%s\t%s\n"
-                               %
-                               (chrom.decode(), peak["start"], peak["end"], peakprefix.decode(), n_peak, int(10*peak[score_column]),
-                                peak["thickStart"].decode(), peak["thickEnd"].decode(),
-                                peak["blockNum"], peak["blockSizes"].decode(), peak["blockStarts"].decode() ))
+                    fhd.write("%s\t%d\t%d\t%s%d\t%d\t.\t%s\t%s\t0\t%d\t%s\t%s\n" %
+                              (chrom.decode(),
+                               peak["start"],
+                               peak["end"],
+                               peakprefix.decode(),
+                               n_peak,
+                               int(10*peak[score_column]),
+                               peak["thickStart"].decode(),
+                               peak["thickEnd"].decode(),
+                               peak["blockNum"],
+                               peak["blockSizes"].decode(),
+                               peak["blockStarts"].decode()))
 
-
-    def write_to_broadPeak (self, fhd, bytes name_prefix=b"peak_", bytes name=b'peak', bytes description=b"%s", str score_column="score", trackline=True):
+    @cython.ccall
+    def write_to_broadPeak(self, fhd,
+                           name_prefix: bytes = b"peak_",
+                           name: bytes = b'peak',
+                           description: bytes = b"%s",
+                           score_column: str = "score",
+                           trackline: bool = True):
         """Print out peaks in broadPeak format.
 
         This format is designed for ENCODE project, and basically a
@@ -1241,16 +1442,20 @@ cdef class BroadPeakIO:
         +-----------+------+----------------------------------------+
 
         """
-        cdef int n_peak
-        cdef bytes chrom
-        cdef long s
-        cdef str peakname
+        chrs: list
+        n_peak: cython.int = 0
+        peakprefix: bytes
+        peak: BroadPeakContent
+        peakprefix: bytes
+        chrom: bytes
+        peakname: str
 
         chrs = list(self.peaks.keys())
-        n_peak = 0
         write = fhd.write
-        try: peakprefix = name_prefix % name
-        except: peakprefix = name_prefix
+        try:
+            peakprefix = name_prefix % name
+        except Exception:
+            peakprefix = name_prefix
         if trackline:
             write("track type=broadPeak name=\"%s\" description=\"%s\" nextItemButton=on\n" % (name.decode(), name.decode()))
         for chrom in sorted(chrs):
@@ -1259,13 +1464,21 @@ cdef class BroadPeakIO:
                 these_peaks = list(group)
                 peak = these_peaks[0]
                 peakname = "%s%d" % (peakprefix.decode(), n_peak)
-                fhd.write( "%s\t%d\t%d\t%s\t%d\t.\t%.6g\t%.6g\t%.6g\n" %
-                           (chrom.decode(),peak['start'],peak['end'],peakname,int(10*peak[score_column]),
-                            peak['fc'],peak['pscore'],peak['qscore'] ) )
+                fhd.write("%s\t%d\t%d\t%s\t%d\t.\t%.6g\t%.6g\t%.6g\n" %
+                          (chrom.decode(),
+                           peak['start'],
+                           peak['end'],
+                           peakname,
+                           int(10*peak[score_column]),
+                           peak['fc'],
+                           peak['pscore'],
+                           peak['qscore']))
         return
 
-
-    def write_to_xls (self, ofhd, bytes name_prefix=b"%s_peak_", bytes name=b"MACS"):
+    @cython.ccall
+    def write_to_xls(self, ofhd,
+                     name_prefix: bytes = b"%s_peak_",
+                     name: bytes = b"MACS"):
         """Save the peak results in a tab-delimited plain text file
         with suffix .xls.
 
@@ -1273,11 +1486,21 @@ cdef class BroadPeakIO:
         wait... why I have two write_to_xls in this class?
 
         """
-        write = ofhd.write
-        write("\t".join(("chr","start", "end",  "length",  "pileup", "-log10(pvalue)", "fold_enrichment", "-log10(qvalue)", "name"))+"\n")
+        chrom: bytes
+        chrs: list
+        peakprefix: bytes
+        peaks: dict
+        these_peaks: list
+        peak: BroadPeakContent
+        peakname: str
 
-        try: peakprefix = name_prefix % name
-        except: peakprefix = name_prefix
+        write = ofhd.write
+        write("\t".join(("chr", "start", "end",  "length",  "pileup", "-log10(pvalue)", "fold_enrichment", "-log10(qvalue)", "name"))+"\n")
+
+        try:
+            peakprefix = name_prefix % name
+        except Exception:
+            peakprefix = name_prefix
 
         peaks = self.peaks
         chrs = list(peaks.keys())
@@ -1288,11 +1511,14 @@ cdef class BroadPeakIO:
                 these_peaks = list(group)
                 peak = these_peaks[0]
                 peakname = "%s%d" % (peakprefix.decode(), n_peak)
-                write("%s\t%d\t%d\t%d" % (chrom.decode(),peak['start']+1,peak['end'],peak['length']))
-                write("\t%.6g" % (round(peak['pileup'],2))) # pileup height at summit
-                write("\t%.6g" % (peak['pscore'])) # -log10pvalue at summit
-                write("\t%.6g" % (peak['fc'])) # fold change at summit
-                write("\t%.6g" % (peak['qscore'])) # -log10qvalue at summit
+                write("%s\t%d\t%d\t%d" % (chrom.decode(),
+                                          peak['start']+1,
+                                          peak['end'],
+                                          peak['length']))
+                write("\t%.6g" % (round(peak['pileup'], 2)))  # pileup height at summit
+                write("\t%.6g" % (peak['pscore']))  # -log10pvalue at summit
+                write("\t%.6g" % (peak['fc']))  # fold change at summit
+                write("\t%.6g" % (peak['qscore']))  # -log10qvalue at summit
                 write("\t%s" % peakname)
                 write("\n")
         return

@@ -18,6 +18,7 @@ other_test/
 MACS3/IO/BedGraphIO.c
 MACS3/IO/Parser.c
 MACS3/IO/PeakIO.c
+MACS3/IO/BAM.c
 MACS3/Signal/BedGraph.c
 MACS3/Signal/CallPeakUnit.c
 MACS3/Signal/FixWidthTrack.c
@@ -28,6 +29,7 @@ MACS3/Signal/PairedEndTrack.c
 MACS3/Signal/PeakDetect.c
 MACS3/Signal/PeakModel.c
 MACS3/Signal/Pileup.c
+MACS3/Signal/PileupV2.c
 MACS3/Signal/Prob.c
 MACS3/Signal/RACollection.c
 MACS3/Signal/ReadAlignment.c
@@ -37,6 +39,8 @@ MACS3/Signal/Signal.c
 MACS3/Signal/SignalProcessing.c
 MACS3/Signal/UnitigRACollection.c
 MACS3/Signal/VariantStat.c
+MACS3/Signal/PeakVariants.c
+MACS3/Signal/PosReadsInfo.c
 
 # MacOSX temp
 .DS_Store

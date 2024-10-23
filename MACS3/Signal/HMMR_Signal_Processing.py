@@ -1,6 +1,6 @@
 # cython: language_level=3
 # cython: profile=True
-# Time-stamp: <2024-10-04 10:25:29 Tao Liu>
+# Time-stamp: <2024-10-14 17:04:27 Tao Liu>
 
 """Module description:
 
@@ -137,7 +137,7 @@ def generate_digested_signals(petrack, weight_mapping: list) -> list:
         certain_signals = ret_digested_signals[i]
         bdg = bedGraphTrackI()
         for chrom in sorted(certain_signals.keys()):
-            bdg.add_chrom_data_hmmr_PV(chrom, certain_signals[chrom])
+            bdg.add_chrom_data_PV(chrom, certain_signals[chrom])
         ret_bedgraphs.append(bdg)
     return ret_bedgraphs
 

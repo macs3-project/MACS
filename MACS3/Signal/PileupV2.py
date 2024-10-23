@@ -1,6 +1,6 @@
 # cython: language_level=3
 # cython: profile=True
-# Time-stamp: <2024-10-04 23:59:48 Tao Liu>
+# Time-stamp: <2024-10-14 21:19:00 Tao Liu>
 
 """Module Description:
 
@@ -34,33 +34,19 @@ as 0, and an end position e as not-defined.
 for i from 0 to 2N in PV_sorted:
     1: z = z + v_i
     2: e = p_i
-    3: save the pileup from position s to e is z --  in bedGraph style is to only save (e, z)
+    3: save the pileup from position s to e is z,
+       in bedGraph style is to only save (e, z)
     4: s = e
 
 This code is free software; you can redistribute it and/or modify it
 under the terms of the BSD License (see the file LICENSE included with
 the distribution).
-
 """
-
-# ------------------------------------
-# python modules
-# ------------------------------------
-
-# ------------------------------------
-# MACS3 modules
-# ------------------------------------
-
-# ------------------------------------
-# Other modules
 # ------------------------------------
 import numpy as np
 import cython
 import cython.cimports.numpy as cnp
-from cython.cimports.numpy import int32_t, float32_t, uint64_t
 
-# ------------------------------------
-# C lib
 # ------------------------------------
 # from cython.cimports.libc.stdlib import malloc, free, qsort
 
@@ -70,7 +56,7 @@ from cython.cimports.numpy import int32_t, float32_t, uint64_t
 
 
 @cython.ccall
-def mapping_function_always_1(L: int32_t, R: int32_t) -> float32_t:
+def mapping_function_always_1(L: cython.int, R: cython.int) -> cython.float:
     # always return 1, useful while the weight is already 1, or in
     # case of simply piling up fragments for coverage.
     return 1.0
@@ -86,81 +72,6 @@ def clean_up_ndarray(x: cnp.ndarray):
     x.resize(0, refcheck=False)
     return
 
-# ------------------------------------
-# public python functions
-# ------------------------------------
-
-
-@cython.ccall
-def pileup_from_LR_hmmratac(LR_array: cnp.ndarray,
-                            mapping_dict: dict) -> cnp.ndarray:
-    # this function is specifically designed for piling up fragments
-    # for `hmmratac`.
-    #
-    # As for `hmmratac`, the weight depends on the length of the
-    # fragment, aka, value of R-L. Therefore, we need a mapping_dict
-    # for mapping length to weight.
-    l_LR: uint64_t
-    l_PV: uint64_t
-    i: uint64_t
-    L: int32_t
-    R: int32_t
-    PV: cnp.ndarray
-    pileup: cnp.ndarray
-
-    l_LR = LR_array.shape[0]
-    l_PV = 2 * l_LR
-    PV = np.zeros(shape=l_PV, dtype=[('p', 'uint32'), ('v', 'float32')])
-    for i in range(l_LR):
-        (L, R) = LR_array[i]
-        PV[i*2] = (L, mapping_dict[R - L])
-        PV[i*2 + 1] = (R, -1 * mapping_dict[R - L])
-    PV.sort(order='p')
-    pileup = pileup_PV(PV)
-    clean_up_ndarray(PV)
-    return pileup
-
-
-@cython.ccall
-def pileup_from_LR(LR_array: cnp.ndarray,
-                   mapping_func=mapping_function_always_1) -> cnp.ndarray:
-    """This function will pile up the ndarray containing left and
-    right positions, which is typically from PETrackI object. It's
-    useful when generating the pileup of a single chromosome is
-    needed.
-
-    User needs to provide a numpy array of left and right positions,
-    with dtype=[('l','int32'),('r','int32')]. User also needs to
-    provide a mapping function to map the left and right position to
-    certain weight.
-
-    """
-    PV_array: cnp.ndarray
-    pileup: cnp.ndarray
-
-    PV_array = make_PV_from_LR(LR_array, mapping_func=mapping_func)
-    pileup = pileup_PV(PV_array)
-    clean_up_ndarray(PV_array)
-    return pileup
-
-
-@cython.ccall
-def pileup_from_PN(P_array: cnp.ndarray, N_array: cnp.ndarray,
-                   extsize: cython.int) -> cnp.ndarray:
-    """This function will pile up the ndarray containing plus
-    (positive) and minus (negative) positions of all reads, which is
-    typically from FWTrackI object. It's useful when generating the
-    pileup of a single chromosome is needed.
-
-    """
-    PV_array: cnp.ndarray
-    pileup: cnp.ndarray
-
-    PV_array = make_PV_from_PN(P_array, N_array, extsize)
-    pileup = pileup_PV(PV_array)
-    clean_up_ndarray(PV_array)
-    return pileup
-
 
 @cython.cfunc
 def make_PV_from_LR(LR_array: cnp.ndarray,
@@ -170,16 +81,16 @@ def make_PV_from_LR(LR_array: cnp.ndarray,
     `mapping_func( L, R )` or simply 1 if mapping_func is the default.
 
     LR array is an np.ndarray as with dtype
-    [('l','int32'),('r','int32')] with length of N
+    [('l','i4'),('r','i4')] with length of N
 
     PV array is an np.ndarray with
-    dtype=[('p','uint32'),('v','float32')] with length of 2N
+    dtype=[('p','u4'),('v','f4')] with length of 2N
     """
-    l_LR: uint64_t
-    l_PV: uint64_t
-    i: uint64_t
-    L: int32_t
-    R: int32_t
+    l_LR: cython.ulong
+    l_PV: cython.ulong
+    i: cython.ulong
+    L: cython.int
+    R: cython.int
     PV: cnp.ndarray
 
     l_LR = LR_array.shape[0]
@@ -194,6 +105,38 @@ def make_PV_from_LR(LR_array: cnp.ndarray,
 
 
 @cython.cfunc
+def make_PV_from_LRC(LRC_array: cnp.ndarray,
+                     mapping_func=mapping_function_always_1) -> cnp.ndarray:
+    """Make sorted PV array from a LR array for certain chromosome in a
+    PETrackII object. The V/weight will be assigned as
+    `mapping_func( L, R )` or simply 1 if mapping_func is the default.
+
+    LRC array is an np.ndarray as with dtype
+    [('l','i4'),('r','i4'),('c','u1')] with length of N
+
+    PV array is an np.ndarray with
+    dtype=[('p','u4'),('v','f4')] with length of 2N
+    """
+    l_LRC: cython.ulong
+    l_PV: cython.ulong
+    i: cython.ulong
+    L: cython.int
+    R: cython.int
+    C: cython.uchar
+    PV: cnp.ndarray
+
+    l_LRC = LRC_array.shape[0]
+    l_PV = 2 * l_LRC
+    PV = np.zeros(shape=l_PV, dtype=[('p', 'u4'), ('v', 'f4')])
+    for i in range(l_LRC):
+        (L, R, C) = LRC_array[i]
+        PV[i*2] = (L, C*mapping_func(L, R))
+        PV[i*2 + 1] = (R, -1.0 * C * mapping_func(L, R))
+    PV.sort(order='p')
+    return PV
+
+
+@cython.cfunc
 def make_PV_from_PN(P_array: cnp.ndarray, N_array: cnp.ndarray,
                     extsize: cython.int) -> cnp.ndarray:
     """Make sorted PV array from two arrays for certain chromosome in
@@ -202,22 +145,22 @@ def make_PV_from_PN(P_array: cnp.ndarray, N_array: cnp.ndarray,
     in this case since all positions should be extended with a fixed
     'extsize'.
 
-    P_array or N_array is an np.ndarray with dtype='int32'
+    P_array or N_array is an np.ndarray with dtype='i4'
 
     PV array is an np.ndarray with
-    dtype=[('p','uint32'),('v','float32')] with length of 2N
+    dtype=[('p','u4'),('v','f4')] with length of 2N
     """
-    l_PN: uint64_t
-    l_PV: uint64_t
-    i: uint64_t
-    L: int32_t
-    R: int32_t
+    l_PN: cython.ulong
+    l_PV: cython.ulong
+    i: cython.ulong
+    L: cython.int
+    R: cython.int
     PV: cnp.ndarray
 
     l_PN = P_array.shape[0]
     assert l_PN == N_array.shape[0]
     l_PV = 4 * l_PN
-    PV = np.zeros(shape=l_PV, dtype=[('p', 'uint32'), ('v', 'float32')])
+    PV = np.zeros(shape=l_PV, dtype=[('p', 'u4'), ('v', 'f4')])
     for i in range(l_PN):
         L = P_array[i]
         R = L + extsize
@@ -246,24 +189,29 @@ def pileup_PV(PV_array: cnp.ndarray) -> cnp.ndarray:
         save the pileup from position s to e is z --  in bedGraph style is to only save (e, z)
         s = e
     """
-    z: float32_t
-    v: float32_t
-    pre_z: float32_t
-    s: uint64_t
-    e: uint64_t
-    i: uint64_t
-    c: uint64_t
-    pileup_PV: cnp.ndarray  # this is in bedGraph style as in Pileup.pyx, p is the end of a region, and v is the pileup value
+    z: cython.float
+    v: cython.float
+    pre_z: cython.float
+    s: cython.ulong
+    e: cython.ulong
+    i: cython.ulong
+    c: cython.ulong
+    # this is in bedGraph style as in Pileup.pyx, p is the end of a
+    # region, and v is the pileup value. It's 
+    pileup_PV: cnp.ndarray
     z = 0
     pre_z = -10000
     s = 0
-    pileup_PV = np.zeros(shape=PV_array.shape[0], dtype=[('p', 'uint32'), ('v', 'float32')])
+    pileup_PV = np.zeros(shape=PV_array.shape[0], dtype=[('p', 'u4'),
+                                                         ('v', 'f4')])
     c = 0
     for i in range(PV_array.shape[0]):
         e = PV_array[i]['p']
         v = PV_array[i]['v']
-        if e != s:              # make sure only to record the final value for the same position
-            if z == pre_z:      # merge the p-v pair with the previous pair if the same v is found
+        # make sure only to record the final value for the same position
+        if e != s:
+            # merge the p-v pair with the previous pair if the same v is found
+            if z == pre_z:
                 pileup_PV[c-1]['p'] = e
             else:
                 pileup_PV[c] = (e, z)
@@ -274,3 +222,102 @@ def pileup_PV(PV_array: cnp.ndarray) -> cnp.ndarray:
     pileup_PV.resize(c, refcheck=False)
     # assert z == 0
     return pileup_PV
+
+# ------------------------------------
+# public python functions
+# ------------------------------------
+
+
+@cython.ccall
+def pileup_from_LR_hmmratac(LR_array: cnp.ndarray,
+                            mapping_dict: dict) -> cnp.ndarray:
+    # this function is specifically designed for piling up fragments
+    # for `hmmratac`.
+    #
+    # As for `hmmratac`, the weight depends on the length of the
+    # fragment, aka, value of R-L. Therefore, we need a mapping_dict
+    # for mapping length to weight.
+    l_LR: cython.ulong
+    l_PV: cython.ulong
+    i: cython.ulong
+    L: cython.int
+    R: cython.int
+    PV: cnp.ndarray
+    pileup: cnp.ndarray
+
+    l_LR = LR_array.shape[0]
+    l_PV = 2 * l_LR
+    PV = np.zeros(shape=l_PV, dtype=[('p', 'u4'), ('v', 'f4')])
+    for i in range(l_LR):
+        (L, R) = LR_array[i]
+        PV[i*2] = (L, mapping_dict[R - L])
+        PV[i*2 + 1] = (R, -1 * mapping_dict[R - L])
+    PV.sort(order='p')
+    pileup = pileup_PV(PV)
+    clean_up_ndarray(PV)
+    return pileup
+
+
+@cython.ccall
+def pileup_from_LR(LR_array: cnp.ndarray,
+                   mapping_func=mapping_function_always_1) -> cnp.ndarray:
+    """This function will pile up the ndarray containing left and
+    right positions, which is typically from PETrackI object. It's
+    useful when generating the pileup of a single chromosome is
+    needed.
+
+    User needs to provide a numpy array of left and right positions,
+    with dtype=[('l','i4'),('r','i4')]. User also needs to
+    provide a mapping function to map the left and right position to
+    certain weight.
+
+    """
+    PV_array: cnp.ndarray
+    pileup: cnp.ndarray
+
+    PV_array = make_PV_from_LR(LR_array, mapping_func=mapping_func)
+    pileup = pileup_PV(PV_array)
+    clean_up_ndarray(PV_array)
+    return pileup
+
+
+@cython.ccall
+def pileup_from_LRC(LRC_array: cnp.ndarray,
+                    mapping_func=mapping_function_always_1) -> cnp.ndarray:
+    """This function will pile up the ndarray containing left and
+    right positions and the counts, which is typically from PETrackII
+    object. It's useful when generating the pileup of a single
+    chromosome is needed.
+
+    User needs to provide a numpy array of left and right positions
+    and the counts, with
+    dtype=[('l','i4'),('r','i4'),('c','u1')]. User also needs to
+    provide a mapping function to map the left and right position to
+    certain weight.
+
+    """
+    PV_array: cnp.ndarray
+    pileup: cnp.ndarray
+
+    PV_array = make_PV_from_LRC(LRC_array, mapping_func=mapping_func)
+    pileup = pileup_PV(PV_array)
+    clean_up_ndarray(PV_array)
+    return pileup
+
+
+@cython.ccall
+def pileup_from_PN(P_array: cnp.ndarray, N_array: cnp.ndarray,
+                   extsize: cython.int) -> cnp.ndarray:
+    """This function will pile up the ndarray containing plus
+    (positive) and minus (negative) positions of all reads, which is
+    typically from FWTrackI object. It's useful when generating the
+    pileup of a single chromosome is needed.
+
+    """
+    PV_array: cnp.ndarray
+    pileup: cnp.ndarray
+
+    PV_array = make_PV_from_PN(P_array, N_array, extsize)
+    pileup = pileup_PV(PV_array)
+    clean_up_ndarray(PV_array)
+    return pileup

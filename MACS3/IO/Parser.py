@@ -1,7 +1,7 @@
 # cython: language_level=3
 # cython: profile=True
 # cython: linetrace=True
-# Time-stamp: <2024-10-07 16:08:43 Tao Liu>
+# Time-stamp: <2024-10-22 10:25:23 Tao Liu>
 
 """Module for all MACS Parser classes for input. Please note that the
 parsers are for reading the alignment files ONLY.
@@ -28,7 +28,7 @@ from cython.cimports.libc.stdlib import atoi
 
 from MACS3.Utilities.Constants import READ_BUFFER_SIZE
 from MACS3.Signal.FixWidthTrack import FWTrack
-from MACS3.Signal.PairedEndTrack import PETrackI
+from MACS3.Signal.PairedEndTrack import PETrackI, PETrackII
 from MACS3.Utilities.Logger import logging
 
 logger = logging.getLogger(__name__)
@@ -199,7 +199,8 @@ class StrandFormatError(BaseException):
         self.string = string
 
     def __str__(self):
-        return repr("Strand information can not be recognized in this line: \"%s\",\"%s\"" % (self.string, self.strand))
+        return repr("Strand information can not be recognized in this line: \"%s\",\"%s\"" %
+                    (self.string, self.strand))
 
 
 @cython.cclass
@@ -544,7 +545,8 @@ class BEDPEParser(GenericParser):
                     atoi(thisfields[1]),
                     atoi(thisfields[2]))
         except IndexError:
-            raise Exception("Less than 3 columns found at this line: %s\n" % thisline)
+            raise Exception("Less than 3 columns found at this line: %s\n" %
+                            thisline)
 
     @cython.ccall
     def build_petrack(self):
@@ -950,7 +952,9 @@ class SAMParser(GenericParser):
         thisfields = thisline.split(b'\t')
         bwflag = atoi(thisfields[1])
         if bwflag & 4 or bwflag & 512 or bwflag & 256 or bwflag & 2048:
-            return 0       #unmapped sequence or bad sequence or 2nd or sup alignment
+            # unmapped sequence or bad sequence or 2nd or sup alignment
+            return 0
+
         if bwflag & 1:
             # paired read. We should only keep sequence if the mate is mapped
             # and if this is the left mate, all is within  the flag!
@@ -1068,9 +1072,11 @@ class BAMParser(GenericParser):
         f.close()
         if self.gzipped:
             # open with gzip.open, then wrap it with BufferedReader!
-            self.fhd = io.BufferedReader(gzip.open(filename, mode='rb'), buffer_size=READ_BUFFER_SIZE)  # buffersize set to 1M
+            self.fhd = io.BufferedReader(gzip.open(filename, mode='rb'),
+                                         buffer_size=READ_BUFFER_SIZE)
         else:
-            self.fhd = io.open(filename, mode='rb')  # binary mode! I don't expect unicode here!
+            # binary mode! I don't expect unicode here!
+            self.fhd = io.open(filename, mode='rb')
 
     @cython.ccall
     def sniff(self):
@@ -1089,7 +1095,8 @@ class BAMParser(GenericParser):
                 return True
             else:
                 self.fhd.seek(0)
-                raise Exception("File is not of a valid BAM format! %d" % tsize)
+                raise Exception("File is not of a valid BAM format! %d" %
+                                tsize)
         else:
             self.fhd.seek(0)
             return False
@@ -1189,7 +1196,8 @@ class BAMParser(GenericParser):
         rlengths: dict
 
         fwtrack = FWTrack(buffer_size=self.buffer_size)
-        references, rlengths = self.get_references()  # after this, ptr at list of alignments
+        # after this, ptr at list of alignments
+        references, rlengths = self.get_references()  
         # fseek = self.fhd.seek
         fread = self.fhd.read
         # ftell = self.fhd.tell
@@ -1248,7 +1256,9 @@ class BAMParser(GenericParser):
         info("%d reads have been read." % i)
         self.fhd.close()
         # fwtrack.finalize()
-        # this is the problematic part. If fwtrack is finalized, then it's impossible to increase the length of it in a step of buffer_size for multiple input files.
+        # this is the problematic part. If fwtrack is finalized, then
+        # it's impossible to increase the length of it in a step of
+        # buffer_size for multiple input files.
         fwtrack.set_rlengths(rlengths)
         return fwtrack
 
@@ -1323,14 +1333,9 @@ class BAMPEParser(BAMParser):
             if i % 1000000 == 0:
                 info(" %d fragments parsed" % i)
 
-        # print(f"{references[chrid]:},{fpos:},{tlen:}")
         info("%d fragments have been read." % i)
-        # debug(f" {e1} Can't identify the length of entry, it may be the end of file, stop looping...")
-        # debug(f" {e2} Chromosome name can't be found which means this entry is skipped ...")
-        # assert i > 0, "Something went wrong, no fragment has been read! Check input file!"
         self.d = m / i
         self.n = i
-        # assert self.d >= 0, "Something went wrong (mean fragment size was negative: %d = %d / %d)" % (self.d, m, i)
         self.fhd.close()
         petrack.set_rlengths(rlengths)
         return petrack
@@ -1349,9 +1354,7 @@ class BAMPEParser(BAMParser):
         rlengths: dict
 
         references, rlengths = self.get_references()
-        # fseek = self.fhd.seek
         fread = self.fhd.read
-        # ftell = self.fhd.tell
 
         # for convenience, only count valid pairs
         add_loc = petrack.add_loc
@@ -1374,10 +1377,7 @@ class BAMPEParser(BAMParser):
         info("%d fragments have been read." % i)
         self.d = (self.d * self.n + m) / (self.n + i)
         self.n += i
-        # assert self.d >= 0, "Something went wrong (mean fragment size was negative: %d = %d / %d)" % (self.d, m, i)
         self.fhd.close()
-        # this is the problematic part. If fwtrack is finalized, then it's impossible to increase the length of it in a step of buffer_size for multiple input files.
-        # petrack.finalize()
         petrack.set_rlengths(rlengths)
         return petrack
 
@@ -1472,3 +1472,157 @@ class BowtieParser(GenericParser):
                         1)
             else:
                 raise StrandFormatError(thisline, thisfields[1])
+
+
+@cython.cclass
+class FragParser(GenericParser):
+    """Parser for Fragment file containing scATAC-seq information.
+
+    Format:
+
+    chromosome frag_leftend frag_rightend barcode count
+
+    Note: Only the first five columns are used!
+
+    """
+    n = cython.declare(cython.int, visibility='public')
+    d = cython.declare(cython.float, visibility='public')
+
+    @cython.cfunc
+    def skip_first_commentlines(self):
+        """BEDPEParser needs to skip the first several comment lines.
+        """
+        l_line: cython.int
+        thisline: bytes
+
+        for thisline in self.fhd:
+            l_line = len(thisline)
+            if thisline and (thisline[:5] != b"track") \
+               and (thisline[:7] != b"browser") \
+               and (thisline[0] != 35):  # 35 is b"#"
+                break
+
+        # rewind from SEEK_CUR
+        self.fhd.seek(-l_line, 1)
+        return
+
+    @cython.cfunc
+    def pe_parse_line(self, thisline: bytes):
+        """Parse each line, and return chromosome, left and right
+        positions, barcode and count.
+
+        """
+        thisfields: list
+
+        thisline = thisline.rstrip()
+
+        # still only support tabular as delimiter.
+        thisfields = thisline.split(b'\t')
+        try:
+            return (thisfields[0],
+                    atoi(thisfields[1]),
+                    atoi(thisfields[2]),
+                    thisfields[3],
+                    atoi(thisfields[4]))
+        except IndexError:
+            raise Exception("Less than 5 columns found at this line: %s\n" %
+                            thisline)
+
+    @cython.ccall
+    def build_petrack2(self):
+        """Build PETrackII from all lines.
+
+        """
+        chromosome: bytes
+        left_pos: cython.int
+        right_pos: cython.int
+        barcode: bytes
+        count: cython.uchar
+        i: cython.long = 0          # number of fragments
+        m: cython.long = 0          # sum of fragment lengths
+        tmp: bytes = b""
+
+        petrack = PETrackII(buffer_size=self.buffer_size)
+        add_loc = petrack.add_loc
+
+        while True:
+            # for each block of input
+            tmp += self.fhd.read(READ_BUFFER_SIZE)
+            if not tmp:
+                break
+            lines = tmp.split(b"\n")
+            tmp = lines[-1]
+            for thisline in lines[:-1]:
+                (chromosome, left_pos, right_pos, barcode, count) = self.pe_parse_line(thisline)
+                if left_pos < 0 or not chromosome:
+                    continue
+                assert right_pos > left_pos, "Right position must be larger than left position, check your BED file at line: %s" % thisline
+                m += right_pos - left_pos
+                i += 1
+                if i % 1000000 == 0:
+                    info(" %d fragments parsed" % i)
+                add_loc(chromosome, left_pos, right_pos, barcode, count)
+        # last one
+        if tmp:
+            (chromosome, left_pos, right_pos, barcode, count) = self.pe_parse_line(thisline)
+            if left_pos >= 0 and chromosome:
+                assert right_pos > left_pos, "Right position must be larger than left position, check your BED file at line: %s" % thisline
+                i += 1
+                m += right_pos - left_pos
+                add_loc(chromosome, left_pos, right_pos, barcode, count)
+
+        self.d = cython.cast(cython.float, m) / i
+        self.n = i
+        assert self.d >= 0, "Something went wrong (mean fragment size was negative)"
+
+        self.close()
+        petrack.set_rlengths({"DUMMYCHROM": 0})
+        return petrack
+
+    @cython.ccall
+    def append_petrack(self, petrack):
+        """Build PETrackI from all lines, return a PETrackI object.
+        """
+        chromosome: bytes
+        left_pos: cython.int
+        right_pos: cython.int
+        barcode: bytes
+        count: cython.uchar
+        i: cython.long = 0          # number of fragments
+        m: cython.long = 0          # sum of fragment lengths
+        tmp: bytes = b""
+
+        add_loc = petrack.add_loc
+        while True:
+            # for each block of input
+            tmp += self.fhd.read(READ_BUFFER_SIZE)
+            if not tmp:
+                break
+            lines = tmp.split(b"\n")
+            tmp = lines[-1]
+            for thisline in lines[:-1]:
+                (chromosome, left_pos, right_pos, barcode, count) = self.pe_parse_line(thisline)
+                if left_pos < 0 or not chromosome:
+                    continue
+                assert right_pos > left_pos, "Right position must be larger than left position, check your BED file at line: %s" % thisline
+                m += right_pos - left_pos
+                i += 1
+                if i % 1000000 == 0:
+                    info(" %d fragments parsed" % i)
+                add_loc(chromosome, left_pos, right_pos, barcode, count)
+        # last one
+        if tmp:
+            (chromosome, left_pos, right_pos, barcode, count) = self.pe_parse_line(thisline)
+            if left_pos >= 0 and chromosome:
+                assert right_pos > left_pos, "Right position must be larger than left position, check your BED file at line: %s" % thisline
+                i += 1
+                m += right_pos - left_pos
+                add_loc(chromosome, left_pos, right_pos, barcode, count)
+
+        self.d = (self.d * self.n + m) / (self.n + i)
+        self.n += i
+
+        assert self.d >= 0, "Something went wrong (mean fragment size was negative)"
+        self.close()
+        petrack.set_rlengths({"DUMMYCHROM": 0})
+        return petrack
