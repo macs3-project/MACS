@@ -54,14 +54,14 @@ columns are:
  2. start position of the accessible region
  3. end position of the accesssible region
  4. peak name
- 5. peak score. The score is the maximum foldchange (signal/average
-    signal) within the peak. By default, the signal is the total
-    pileup of all types of fragments from short to tri-nuc size
-    fragments.
- 6. Not used
+ 5. peak score. The score is the 10times the maximum foldchange 
+    (signal/average signal) within the peak. By default, the 'signal'
+    used to calculate foldchange is the total pileup of all types of
+    fragments from short to tri-nuc size fragments.
  7. Not used
  8. Not used
- 9. peak summit position. It's the relative position from the start
+ 9. Not used
+ 10. peak summit position. It's the relative position from the start
     position to the peak summit which is defined as the position with
     the maximum foldchange score.
 
