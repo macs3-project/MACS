@@ -126,8 +126,8 @@ and activated beforehand for a smooth installation process.
 
 MACS uses `pip` for source code installations. To install a source
 distribution of MACS, unpack the distribution tarball, or clone Git
-repository with `git clone --recurse-submodules
-git@github.com:macs3-project/MACS.git`.  Go to the directory where you
+repository with `git clone --recurse-submodules 
+https://github.com/macs3-project/MACS.git`.  Go to the directory where you
 cloned MACS from github or unpacked from tarball, and simply run the
 install command:
 
