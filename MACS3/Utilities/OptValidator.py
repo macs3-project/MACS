@@ -1,4 +1,4 @@
-# Time-stamp: <2024-11-29 22:11:31 Tao Liu>
+# Time-stamp: <2024-11-29 23:48:10 Tao Liu>
 """Module Description
 
 This code is free software; you can redistribute it and/or modify it
@@ -104,6 +104,7 @@ def opt_validate_callpeak(options):
     # setting it as 'all'
     if options.format == 'FRAG' and options.keepduplicates != "all":
         logger.warning("Since the format is 'FRAG', `--keep-dup` will be set as 'all'.")
+        options.keepduplicates = "all"
 
     if options.extsize < 1:
         logger.error("--extsize must >= 1!")
@@ -537,7 +538,7 @@ def opt_validate_pileup(options):
     elif options.format == "BEDPE":
         options.parser = BEDPEParser
     elif options.format == "FRAG":
-        options.parser = FragParser        
+        options.parser = FragParser
     else:
         logger.error("Format \"%s\" cannot be recognized!" % (options.format))
         sys.exit(1)

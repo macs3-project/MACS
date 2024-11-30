@@ -4,7 +4,7 @@ This code is free software; you can redistribute it and/or modify it
 under the terms of the BSD License (see the file LICENSE included with
 the distribution).
 """
-# Time-stamp: <2024-10-02 16:51:15 Tao Liu>
+# Time-stamp: <2024-11-30 00:04:48 Tao Liu>
 # ------------------------------------
 # python modules
 # ------------------------------------
@@ -16,7 +16,8 @@ import os
 # ------------------------------------
 # from MACS3.Utilities.Constants import *
 from MACS3.Utilities.OptValidator import opt_validate_pileup
-from MACS3.Signal.Pileup import pileup_and_write_se, pileup_and_write_pe
+from MACS3.Signal.Pileup import pileup_and_write_se
+from MACS3.IO.BedGraphIO import bedGraphIO
 # ------------------------------------
 # Main function
 # ------------------------------------
@@ -35,7 +36,7 @@ def run(o_options):
     # error = options.error
 
     # 0 output arguments
-    options.PE_MODE = options.format in ('BAMPE', 'BEDPE')
+    options.PE_MODE = options.format in ('BAMPE', 'BEDPE', 'FRAG')
 
     # 0 prepare output file
     outfile = os.path.join(options.outdir, options.outputfile).encode()
@@ -51,8 +52,9 @@ def run(o_options):
         t0 = treat.total                          # total fragments
         info("# total fragments/pairs in alignment file: %d" % (t0))
         info("# Pileup paired-end alignment file.")
-        pileup_and_write_pe(treat, outfile)
-
+        bdg = treat.pileup_bdg()
+        bdgio = bedGraphIO(outfile, data=bdg)
+        bdgio.write_bedGraph(trackline=False)
     else:
         (tsize, treat) = load_tag_files_options(options)
 

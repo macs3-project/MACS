@@ -1,6 +1,6 @@
 # cython: language_level=3
 # cython: profile=True
-# Time-stamp: <2024-10-08 10:07:47 Tao Liu>
+# Time-stamp: <2024-11-30 00:04:35 Tao Liu>
 
 """Module Description:  IO Module for bedGraph file
 
@@ -56,10 +56,10 @@ class bedGraphIO:
 
     If any of the above two criteria is violated, parsering will fail.
     """
-    bedGraph_filename = cython.declare(str, visibility='public')
+    bedGraph_filename = cython.declare(bytes, visibility='public')
     data = cython.declare(object, visibility='public')
 
-    def __init__(self, bedGraph_filename: str, data=None):
+    def __init__(self, bedGraph_filename: bytes, data=None):
         """f must be a filename or a file handler.
 
         """

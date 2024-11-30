@@ -1,6 +1,6 @@
 # cython: language_level=3
 # cython: profile=True
-# Time-stamp: <2024-10-15 15:56:00 Tao Liu>
+# Time-stamp: <2024-11-29 23:37:25 Tao Liu>
 
 """Module for filter duplicate tags from paired-end data
 
@@ -749,6 +749,8 @@ class PETrackII:
                 self.buf_size[chromosome] += self.buffer_size
                 self.locations[chromosome].resize((self.buf_size[chromosome]),
                                                   refcheck=False)
+                self.barcodes[chromosome].resize((self.buf_size[chromosome]),
+                                                 refcheck=False)                
             self.locations[chromosome][i] = (start, end, count)
             self.barcodes[chromosome][i] = bn
             self.size[chromosome] = i + 1
