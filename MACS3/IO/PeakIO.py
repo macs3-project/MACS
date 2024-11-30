@@ -1046,7 +1046,7 @@ class BroadPeakIO:
     """IO for broad peak information.
 
     """
-    peaks: dict
+    peaks = cython.declare(dict, visibility="public")
 
     def __init__(self):
         self.peaks = {}
