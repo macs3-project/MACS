@@ -93,39 +93,52 @@ If specified all output files will be written to that
 directory. Default: the current working directory 
 
 ### `-n NAME`/ `--name NAME`
+
 Name for this experiment, which will be used as a prefix to generate
 output file names. DEFAULT: "NA" 
 
+### `-e BLACKLIST`/`--blacklist BLACKLIST`
+
+Filename of blacklisted regions to exclude from training and peak
+detection. An example of such file can be found from [ENCODE
+project](https://github.com/Boyle-Lab/Blacklist/). By default, there
+is no blacklist file.
+
 ### `--modelonly`
- This option will only generate the HMM model as a JSON file and
- quit. This model can then be applied using the `--model`
- option. Default: False 
+
+This option will only generate the HMM model as a JSON file and
+quit. This model can then be applied using the `--model`
+option. Default: False
 
 ### `--model`
- If provided, HMM training will be skipped and a JSON file generated
- from a previous HMMRATAC run will be used instead of creating new
- one. Default: NA 
+
+If provided, HMM training will be skipped and a JSON file generated
+from a previous HMMRATAC run will be used instead of creating new
+one. Default: NA 
    
 ### `-t HMM_TRAINING_REGIONS` / `--training HMM_TRAINING_REGIONS`
- Customized training regions can be provided through this option. `-t`
- takes the filename of training regions (previously was BED_file) to
- use for training HMM, instead of using foldchange settings to
- select. Default: NA 
+
+Customized training regions can be provided through this option. `-t`
+takes the filename of training regions (previously was BED_file) to
+use for training HMM, instead of using foldchange settings to
+select. Default: NA 
 
 ### `--min-frag-p MIN_FRAG_P`
- We will exclude the abnormal fragments that can't be assigned to any
- of the four signal tracks. After we use EM to find the means and
- stddevs of the four distributions, we will calculate the likelihood
- that a given fragment length fit any of the four using normal
- distribution. The criteria we will use is that if a fragment length
- has less than MIN_FRAG_P probability to be like either of short,
- mono, di, or tri-nuc fragment, we will exclude it while generating
- the four signal tracks for later HMM training and prediction. The
- value should be between 0 and 1. Larger the value, more abnormal
- fragments will be allowed. So if you want to include more 'ideal'
- fragments, make this value smaller. Default = 0.001 
+
+We will exclude the abnormal fragments that can't be assigned to any
+of the four signal tracks. After we use EM to find the means and
+stddevs of the four distributions, we will calculate the likelihood
+that a given fragment length fit any of the four using normal
+distribution. The criteria we will use is that if a fragment length
+has less than MIN_FRAG_P probability to be like either of short, mono,
+di, or tri-nuc fragment, we will exclude it while generating the four
+signal tracks for later HMM training and prediction. The value should
+be between 0 and 1. Larger the value, more abnormal fragments will be
+allowed. So if you want to include more 'ideal' fragments, make this
+value smaller. Default = 0.001
 
 ### `--cutoff-analysis-only`
+
 Only run the cutoff analysis and output a report. After generating the
 report, the whole process will stop. By default, the cutoff analysis
 will be included in the whole process, but won't quit after the report
@@ -138,12 +151,14 @@ controlled by `--cutoff-analysis-max` and `--cutoff-analysis-steps`
 options.
 
 ### `--cutoff-analysis-max`
+
 The maximum cutoff score for performing cutoff analysis. Together with
 `--cutoff-analysis-steps`, the resolution in the final report can be
 controlled. Please check the description in `--cutoff-analysis-steps`
 for detail. The default value is 100.
 
 ### `--cutoff-analysis-steps`
+
 Steps for performing cutoff analysis. It will be used to decide which
 cutoff value should be included in the final report. Larger the value,
 higher resolution the cutoff analysis can be. The cutoff analysis
@@ -181,6 +196,7 @@ cutoff analysis result that can capture some (typically hundreds of)
 extremely high enrichment and unusually wide peaks. Default: 20
 
 ### `-l HMM_LOWER` / `--lower HMM_LOWER`
+
 Lower limit on fold change range for choosing training sites. This is
 an important parameter for training so please read. The purpose of
 this parameter is to ONLY INCLUDE those chromatin regions having

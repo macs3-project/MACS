@@ -1,6 +1,6 @@
 # cython: language_level=3
 # cython: profile=True
-# Time-stamp: <2024-10-15 10:38:40 Tao Liu>
+# Time-stamp: <2024-10-24 15:20:26 Tao Liu>
 
 """Module Description: Detect peaks, main module
 
@@ -31,10 +31,6 @@ def subpeak_letters(i: cython.short) -> bytes:
 class PeakDetect:
     """Class to do the peak calling.
 
-    e.g
-    >>> from MACS3.cPeakDetect import cPeakDetect
-    >>> pd = PeakDetect(treat=treatdata, control=controldata, pvalue=pvalue_cutoff, d=100, gsize=3000000000)
-    >>> pd.call_peaks()
     """
     def __init__(self,
                  opt=None,
