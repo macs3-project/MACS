@@ -1,4 +1,4 @@
-# Time-stamp: <2024-10-02 15:58:36 Tao Liu>
+# Time-stamp: <2024-11-29 21:43:31 Tao Liu>
 
 """Description: MACS 3 call peak main executable
 
@@ -57,7 +57,7 @@ def run(args):
 
     # 0 output arguments
     info("\n"+options.argtxt)
-    options.PE_MODE = options.format in ('BAMPE', 'BEDPE')
+    options.PE_MODE = options.format in ('BAMPE', 'BEDPE', 'FRAG')
     if options.PE_MODE:
         tag = 'fragment'        # call things fragments not tags
     else:

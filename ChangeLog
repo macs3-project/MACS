@@ -1,5 +1,5 @@
-2024-10-08  Tao Liu  <vladimir.liu@gmail.com>
-	MACS 3.0.3b
+2024-11-30  Tao Liu  <vladimir.liu@gmail.com>
+	MACS 3.0.3b1
 
 	* Features added
 
@@ -26,6 +26,12 @@
 	big-endian support in `BAM.py` codes for accessig certain
 	alignment records that overlap with givin genomic
 	coordinates using BAM/BAI files.
+
+	2) `hmmratac`: wrong class name used while saving digested signals
+	in BedGraph files.
+
+	3) `predictd` and `filterdup`: wrong variable name used while
+	reading multiple pe/frag files.
 
 	* Doc
 

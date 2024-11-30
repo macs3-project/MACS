@@ -1,4 +1,4 @@
-# Time-stamp: <2024-10-08 10:53:48 Tao Liu>
+# Time-stamp: <2024-11-29 23:19:38 Tao Liu>
 
 
 """Description: Main HMMR command
@@ -24,7 +24,7 @@ import tempfile
 # from MACS3.Utilities.Constants import *
 from MACS3.Utilities.OptValidator import opt_validate_hmmratac
 from MACS3.IO.PeakIO import PeakIO
-from MACS3.IO.Parser import BAMPEParser, BEDPEParser  # BAMaccessor
+from MACS3.IO.Parser import BAMPEParser, BEDPEParser, FragParser  # BAMaccessor
 from MACS3.Signal.HMMR_EM import HMMR_EM
 from MACS3.Signal.HMMR_Signal_Processing import (generate_weight_mapping,
                                                  generate_digested_signals,
@@ -103,6 +103,9 @@ def run(args):
     elif options.format == "BEDPE":
         options.info("#1 Read fragments from BEDPE file...")
         parser = BEDPEParser
+    elif options.format == "FRAG":
+        options.info("#1 Read fragments from FRAG file...")
+        parser = FragParser
     else:
         raise Exception("wrong format")
 
