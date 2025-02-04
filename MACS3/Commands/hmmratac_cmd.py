@@ -1,4 +1,4 @@
-# Time-stamp: <2024-11-29 23:19:38 Tao Liu>
+# Time-stamp: <2025-02-04 16:47:43 Tao Liu>
 
 
 """Description: Main HMMR command
@@ -467,14 +467,8 @@ def run(args):
     # First, the likelihoods for each of the three states in a bedGraph
     if options.save_likelihoods:
         options.info(f"# Write the likelihoods for each states into three bedGraph files {options.name}_open.bdg, {options.name}_nuc.bdg, and {options.name}_bg.bdg")
-        open_state_bdg_fhd = open(open_state_bdgfile, "w")
-        nuc_state_bdg_fhd = open(nuc_state_bdgfile, "w")
-        bg_state_bdg_fhd = open(bg_state_bdgfile, "w")
-        save_proba_to_bedGraph(predicted_proba_file, options.hmm_binsize, open_state_bdg_fhd, nuc_state_bdg_fhd, bg_state_bdg_fhd, i_open_region, i_nucleosomal_region, i_background_region)
+        save_proba_to_bedGraph(predicted_proba_file, options.hmm_binsize, open_state_bdgfile, nuc_state_bdgfile, bg_state_bdgfile, i_open_region, i_nucleosomal_region, i_background_region)
         predicted_proba_file.seek(0)  # reset
-        open_state_bdg_fhd.close()
-        nuc_state_bdg_fhd.close()
-        bg_state_bdg_fhd.close()
         options.info("# finished writing proba_to_bedgraph")
 
     # # Generate states path:
