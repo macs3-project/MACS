@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# Time-stamp: <2024-10-15 16:07:27 Tao Liu>
+# Time-stamp: <2025-02-05 09:28:39 Tao Liu>
 
 import unittest
 from MACS3.Signal.PairedEndTrack import PETrackI, PETrackII
@@ -74,6 +74,12 @@ class Test_PETrackI(unittest.TestCase):
         pe.sample_percent(0.5)
         self.assertEqual(pe.total, 8)
 
+    def test_pileupbdg(self):
+        pe = PETrackI()
+        for (c, l, r) in self.input_regions:
+            pe.add_loc(c, l, r)
+        pe.finalize()
+        pe.pileup_bdg()
 
 class Test_PETrackII(unittest.TestCase):
     def setUp(self):

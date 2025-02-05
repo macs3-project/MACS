@@ -1,6 +1,6 @@
 # cython: language_level=3
 # cython: profile=True
-# Time-stamp: <2024-10-14 14:53:06 Tao Liu>
+# Time-stamp: <2025-02-05 10:23:13 Tao Liu>
 
 """Module for FWTrack classes.
 
@@ -587,13 +587,72 @@ class FWTrack:
         return retval
 
     @cython.ccall
-    def pileup_a_chromosome(self, chrom: bytes, ds: list,
-                            scale_factor_s: list,
+    def pileup_a_chromosome(self, chrom: bytes,
+                            d: cython.long,
+                            scale_factor: cython.float = 1.0,
                             baseline_value: cython.float = 0.0,
                             directional: bool = True,
                             end_shift: cython.int = 0) -> list:
         """pileup a certain chromosome, return [p,v] (end position and
         value) list.
+
+        d : tag will be extended to this value to 3' direction,
+            unless directional is False.
+
+        scale_factor : linearly scale the pileup value.
+
+        baseline_value : a value to be filled for missing values, and
+                         will be the minimum pileup.
+
+        directional : if False, the strand or direction of tag will be
+                      ignored, so that extension will be both sides
+                      with d/2.
+
+        end_shift : move cutting ends towards 5->3 direction if value
+                    is positive, or towards 3->5 direction if
+                    negative. Default is 0 -- no shift at all.
+
+        p and v are numpy.ndarray objects.
+        """
+        five_shift: cython.long
+        # adjustment to 5' end and 3' end positions to make a fragment
+        three_shift: cython.long
+        rlength: cython.long
+        chrlengths: dict
+        tmp_pileup: list
+
+        chrlengths = self.get_rlengths()
+        rlength = chrlengths[chrom]
+
+        # adjust extension length according to 'directional' and
+        # 'halfextension' setting.
+        if directional:
+            # only extend to 3' side
+            five_shift = - end_shift
+            three_shift = end_shift + d
+        else:
+            # both sides
+            five_shift = d//2 - end_shift
+            three_shift = end_shift + d - d//2
+
+        tmp_pileup = se_all_in_one_pileup(self.locations[chrom][0],
+                                          self.locations[chrom][1],
+                                          five_shift,
+                                          three_shift,
+                                          rlength,
+                                          scale_factor,
+                                          baseline_value)
+        return tmp_pileup
+
+    @cython.ccall
+    def pileup_a_chromosome_c(self, chrom: bytes, ds: list,
+                              scale_factor_s: list,
+                              baseline_value: cython.float = 0.0,
+                              directional: bool = True,
+                              end_shift: cython.int = 0) -> list:
+        """pileup a certain chromosome, return [p,v] (end position and
+        value) list. This is for control data for which we have
+        multiple different `d` and `scale_factor`.
 
         ds : tag will be extended to this value to 3' direction,
              unless directional is False. Can contain multiple
@@ -615,6 +674,7 @@ class FWTrack:
                     negative. Default is 0 -- no shift at all.
 
         p and v are numpy.ndarray objects.
+
         """
         d: cython.long
         five_shift: cython.long

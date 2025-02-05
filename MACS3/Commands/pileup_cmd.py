@@ -4,7 +4,7 @@ This code is free software; you can redistribute it and/or modify it
 under the terms of the BSD License (see the file LICENSE included with
 the distribution).
 """
-# Time-stamp: <2024-11-30 00:04:48 Tao Liu>
+# Time-stamp: <2025-02-05 09:55:28 Tao Liu>
 # ------------------------------------
 # python modules
 # ------------------------------------
@@ -39,7 +39,7 @@ def run(o_options):
     options.PE_MODE = options.format in ('BAMPE', 'BEDPE', 'FRAG')
 
     # 0 prepare output file
-    outfile = os.path.join(options.outdir, options.outputfile).encode()
+    outfile = os.path.join(options.outdir, options.outputfile)
     if os.path.isfile(outfile):
         info("# Existing file %s will be replaced!" % outfile)
         os.unlink(outfile)
@@ -65,10 +65,10 @@ def run(o_options):
 
         if options.bothdirection:
             info("# Pileup alignment file, extend each read towards up/downstream direction with %d bps" % options.extsize)
-            pileup_and_write_se(treat, outfile, options.extsize * 2, 1, directional=False, halfextension=False)
+            pileup_and_write_se(treat, outfile.encode(), options.extsize * 2, 1, directional=False, halfextension=False)
         else:
             info("# Pileup alignment file, extend each read towards downstream direction with %d bps" % options.extsize)
-            pileup_and_write_se(treat, outfile, options.extsize, 1, directional=True, halfextension=False)
+            pileup_and_write_se(treat, outfile.encode(), options.extsize, 1, directional=True, halfextension=False)
 
     info("# Done! Check %s" % options.outputfile)
 

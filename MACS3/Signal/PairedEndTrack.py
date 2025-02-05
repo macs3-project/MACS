@@ -1,6 +1,6 @@
 # cython: language_level=3
 # cython: profile=True
-# Time-stamp: <2024-11-29 23:37:25 Tao Liu>
+# Time-stamp: <2025-02-05 10:07:02 Tao Liu>
 
 """Module for filter duplicate tags from paired-end data
 
@@ -475,41 +475,24 @@ class PETrackI:
     @cython.ccall
     def pileup_a_chromosome(self,
                             chrom: bytes,
-                            scale_factor_s: list,
+                            scale_factor: cython.float = 1.0,
                             baseline_value: cython.float = 0.0) -> list:
         """pileup a certain chromosome, return [p,v] (end position and
         value) list.
 
-        scale_factor_s : linearly scale the pileup value applied to
-                         each d in ds. The list should have the same
-                         length as ds.
+        scale_factor : linearly scale the pileup value.
 
         baseline_value : a value to be filled for missing values, and
                          will be the minimum pileup.
 
         """
         tmp_pileup: list
-        prev_pileup: list
-        scale_factor: cython.float
 
-        prev_pileup = None
+        tmp_pileup = quick_pileup(np.sort(self.locations[chrom]['l']),
+                                  np.sort(self.locations[chrom]['r']),
+                                  scale_factor, baseline_value)
 
-        for i in range(len(scale_factor_s)):
-            scale_factor = scale_factor_s[i]
-
-            # Can't directly pass partial nparray there since that will mess up with pointer calculation.
-            tmp_pileup = quick_pileup(np.sort(self.locations[chrom]['l']),
-                                      np.sort(self.locations[chrom]['r']),
-                                      scale_factor, baseline_value)
-
-            if prev_pileup:
-                prev_pileup = over_two_pv_array(prev_pileup,
-                                                tmp_pileup,
-                                                func="max")
-            else:
-                prev_pileup = tmp_pileup
-
-        return prev_pileup
+        return tmp_pileup
 
     @cython.ccall
     def pileup_a_chromosome_c(self,
@@ -574,48 +557,31 @@ class PETrackI:
 
     @cython.ccall
     def pileup_bdg(self,
-                   scale_factor_s: list,
+                   scale_factor: cython.float = 1.0,
                    baseline_value: cython.float = 0.0):
         """pileup all chromosomes, and return a bedGraphTrackI object.
 
-        scale_factor_s : linearly scale the pileup value applied to
-                         each d in ds. The list should have the same
-                         length as ds.
-
+        scale_factor : a value to scale the pileup values.
         baseline_value : a value to be filled for missing values, and
                          will be the minimum pileup.
 
         """
         tmp_pileup: list
-        prev_pileup: list
-        scale_factor: cython.float
         chrom: bytes
         bdg: bedGraphTrackI
 
         bdg = bedGraphTrackI(baseline_value=baseline_value)
 
         for chrom in sorted(self.get_chr_names()):
-            prev_pileup = None
-            for i in range(len(scale_factor_s)):
-                scale_factor = scale_factor_s[i]
+            tmp_pileup = quick_pileup(np.sort(self.locations[chrom]['l']),
+                                      np.sort(self.locations[chrom]['r']),
+                                      scale_factor,
+                                      baseline_value)
 
-                # Can't directly pass partial nparray there since that
-                # will mess up with pointer calculation.
-                tmp_pileup = quick_pileup(np.sort(self.locations[chrom]['l']),
-                                          np.sort(self.locations[chrom]['r']),
-                                          scale_factor,
-                                          baseline_value)
-
-                if prev_pileup:
-                    prev_pileup = over_two_pv_array(prev_pileup,
-                                                    tmp_pileup,
-                                                    func="max")
-                else:
-                    prev_pileup = tmp_pileup
             # save to bedGraph
             bdg.add_chrom_data(chrom,
-                               pyarray('i', prev_pileup[0]),
-                               pyarray('f', prev_pileup[1]))
+                               pyarray('i', tmp_pileup[0]),
+                               pyarray('f', tmp_pileup[1]))
         return bdg
 
     @cython.ccall

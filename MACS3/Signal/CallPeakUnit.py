@@ -1,7 +1,7 @@
 # cython: language_level=3
 # cython: profile=True
 # cython: linetrace=True
-# Time-stamp: <2024-10-22 11:42:37 Tao Liu>
+# Time-stamp: <2025-02-05 10:15:46 Tao Liu>
 
 """Module for Calculate Scores.
 
@@ -565,12 +565,12 @@ class CallerFromAlignments:
 
         if self.PE_mode:
             treat_pv = self.treat.pileup_a_chromosome(chrom,
-                                                      [self.treat_scaling_factor,],
+                                                      self.treat_scaling_factor,
                                                       baseline_value=0.0)
         else:
             treat_pv = self.treat.pileup_a_chromosome(chrom,
-                                                      [self.d,],
-                                                      [self.treat_scaling_factor,],
+                                                      self.d,
+                                                      self.treat_scaling_factor,
                                                       baseline_value=0.0,
                                                       directional=True,
                                                       end_shift=self.end_shift)
@@ -585,11 +585,11 @@ class CallerFromAlignments:
                                                           self.ctrl_scaling_factor_s,
                                                           baseline_value=self.lambda_bg)
             else:
-                ctrl_pv = self.ctrl.pileup_a_chromosome(chrom,
-                                                        self.ctrl_d_s,
-                                                        self.ctrl_scaling_factor_s,
-                                                        baseline_value=self.lambda_bg,
-                                                        directional=False)
+                ctrl_pv = self.ctrl.pileup_a_chromosome_c(chrom,
+                                                          self.ctrl_d_s,
+                                                          self.ctrl_scaling_factor_s,
+                                                          baseline_value=self.lambda_bg,
+                                                          directional=False)
         else:
             # a: set global lambda
             ctrl_pv = [treat_pv[0][-1:], np.array([self.lambda_bg,],

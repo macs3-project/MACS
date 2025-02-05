@@ -1,4 +1,4 @@
-# Time-stamp: <2025-02-04 16:47:43 Tao Liu>
+# Time-stamp: <2025-02-05 09:31:12 Tao Liu>
 
 
 """Description: Main HMMR command
@@ -207,7 +207,7 @@ def run(args):
         fc_bdg = digested_atac_signals[0]
     else:
         options.info("#  Pile up all fragments")
-        fc_bdg = petrack.pileup_bdg([1.0, ], baseline_value=0)
+        fc_bdg = petrack.pileup_bdg(baseline_value=0)
     (sum_v, n_v, max_v, min_v, mean_v, std_v) = fc_bdg.summary()
     options.info("#  Convert pileup to fold-change over average signal")
     fc_bdg.apply_func(lambda x: x/mean_v)
