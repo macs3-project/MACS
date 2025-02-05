@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# Time-stamp: <2025-02-05 11:32:10 Tao Liu>
+# Time-stamp: <2025-02-05 12:23:48 Tao Liu>
 
 """Description: MACS v3 main executable.
 
@@ -214,17 +214,10 @@ def add_callpeak_parser(subparsers):
                                       "ELANDMULTI", "ELANDEXPORT", "BOWTIE",
                                       "BAMPE", "BEDPE"),
                              help="Format of tag file, \"AUTO\", \"BED\" or \"ELAND\" or \"ELANDMULTI\" or \"ELANDEXPORT\" or \"SAM\" or \"BAM\" or \"BOWTIE\" or \"BAMPE\" or \"BEDPE\". The default AUTO option will let MACS decide which format (except for BAMPE and BEDPEwhich should be implicitly set) the file is. Please check the definition in README. Please note that if the format is set as BAMPE, or BEDPE, MACS3 will call its special Paired-end mode to call peaks by piling up the actual ChIPed fragments defined by both aligned ends, instead of predicting the fragment size first and extending reads. Also please note that the BEDPE only contains three columns, and is NOT the same BEDPE format used by BEDTOOLS. DEFAULT: \"AUTO\"",                             
-                             default="AUTO")
-    group_input.add_argument("-g", "--gsize", dest="gsize", type=str, default="hs",
-                             help="Effective genome size. It can be 1.0e+9 or 1000000000, or shortcuts:'hs' for human (2,913,022,398), 'mm' for mouse (2,652,783,500), 'ce' for C. elegans (100,286,401) and 'dm' for fruitfly (142,573,017), Default:hs. The effective genome size numbers for the above four species are collected from Deeptools https://deeptools.readthedocs.io/en/develop/content/feature/effectiveGenomeSize.html Please refer to deeptools to define the best genome size you plan to use.")
-    group_input.add_argument("-s", "--tsize",  dest="tsize", type=int, default=None,
-                             help="Tag size/read length. This will override the auto detected tag size. DEFAULT: Not set")
-    group_input.add_argument("--keep-dup", dest="keepduplicates", type=str, default="1",
                              #help="It controls the  behavior towards duplicate tags at the exact same location -- the same coordination and the same strand. The 'auto' option makes MACS calculate the maximum tags at the exact same location based on binomal distribution using 1e-5 as pvalue cutoff; and the 'all' option keeps every tags. If an integer is given, at most this number of tags will be kept at the same location. Note, if you've used samtools or picard to flag reads as 'PCR/Optical duplicate' in bit 1024, MACS3 will still read them although the reads may be decided by MACS3 as duplicate later. If you plan to rely on samtools/picard/any other tool to filter duplicates, please remove those duplicate reads and save a new alignment file then ask MACS3 to keep all by '--keep-dup all'. If the format is FRAG, this option will be ignored and MACS3 will behave like '--keep-dup all'. The default is to keep one tag at the same location. Default: 1")
                              help="It controls the  behavior towards duplicate tags at the exact same location -- the same coordination and the same strand. The 'auto' option makes MACS calculate the maximum tags at the exact same location based on binomal distribution using 1e-5 as pvalue cutoff; and the 'all' option keeps every tags. If an integer is given, at most this number of tags will be kept at the same location. Note, if you've used samtools or picard to flag reads as 'PCR/Optical duplicate' in bit 1024, MACS3 will still read them although the reads may be decided by MACS3 as duplicate later. If you plan to rely on samtools/picard/any other tool to filter duplicates, please remove those duplicate reads and save a new alignment file then ask MACS3 to keep all by '--keep-dup all'. The default is to keep one tag at the same location. Default: 1")
     #group_input.add_argument("--barcodes", dest="barcodefile", type=str, default="",
     #                         help="A plain text file containing the barcodes for the fragment file while the format is 'FRAG'. Won't have any effect if the fromat is not 'FRAG'. Each row in the file should only have the barcode string. MACS3 will extract only the fragments for the specified barcodes.")
-
     # group for output files
     group_output = argparser_callpeak.add_argument_group("Output arguments")
     add_outdir_option(group_output)
