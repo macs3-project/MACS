@@ -1,4 +1,4 @@
-# Time-stamp: <2024-11-29 23:48:10 Tao Liu>
+# Time-stamp: <2025-02-05 11:03:42 Tao Liu>
 """Module Description
 
 This code is free software; you can redistribute it and/or modify it
@@ -78,6 +78,8 @@ def opt_validate_callpeak(options):
     elif options.format == "BAM":
         options.parser = BAMParser
         options.gzip_flag = True
+    elif options.format == "BOWTIE":
+        options.parser = BowtieParser
     elif options.format == "BAMPE":
         options.parser = BAMPEParser
         options.gzip_flag = True
@@ -85,10 +87,9 @@ def opt_validate_callpeak(options):
     elif options.format == "BEDPE":
         options.parser = BEDPEParser
         options.nomodel = True
-    elif options.format == "BOWTIE":
-        options.parser = BowtieParser
     elif options.format == "FRAG":
         options.parser = FragParser
+        options.nomodel = True        
     elif options.format == "AUTO":
         options.parser = guess_parser
     else:
@@ -231,7 +232,7 @@ def opt_validate_callpeak(options):
     if options.fecutoff != 1.0:
         options.argtxt += "# Additional cutoff on fold-enrichment is: %.2f\n" % (options.fecutoff)
 
-    if options.format in ["BAMPE", "BEDPE"]:
+    if options.format in ["BAMPE", "BEDPE", "FRAG"]:
         # neutralize SHIFT
         options.shift = 0
         options.argtxt += "# Paired-End mode is on\n"

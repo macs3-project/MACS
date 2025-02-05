@@ -13,7 +13,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy: 
       matrix: 
-        python-version: ['3.11']
+        python-version: ['3.12']
         arch: ['x64']
     name: Build conda package in x64 under Python ${{ matrix.python-version }}
     steps:

@@ -1,7 +1,7 @@
 # cython: language_level=3
 # cython: profile=True
 # cython: linetrace=True
-# Time-stamp: <2025-02-05 10:15:46 Tao Liu>
+# Time-stamp: <2025-02-05 12:06:42 Tao Liu>
 
 """Module for Calculate Scores.
 
@@ -40,7 +40,7 @@ from cython.cimports.libc.math import exp, log10, log1p, erf, sqrt
 from MACS3.Signal.SignalProcessing import maxima, enforce_peakyness
 from MACS3.IO.PeakIO import PeakIO, BroadPeakIO
 from MACS3.Signal.FixWidthTrack import FWTrack
-from MACS3.Signal.PairedEndTrack import PETrackI
+from MACS3.Signal.PairedEndTrack import PETrackI, PETrackII
 from MACS3.Signal.Prob import poisson_cdf
 from MACS3.Utilities.Logger import logging
 
@@ -346,8 +346,8 @@ class CallerFromAlignments:
     It will compute for each chromosome separately in order to save
     memory usage.
     """
-    treat: object            # FWTrack or PETrackI object for ChIP
-    ctrl: object             # FWTrack or PETrackI object for Control
+    treat: object            # FWTrack or PETrackI/II object for ChIP
+    ctrl: object             # FWTrack or PETrackI/II object for Control
 
     d: cython.int                           # extension size for ChIP
     # extension sizes for Control. Can be multiple values
@@ -458,8 +458,10 @@ class CallerFromAlignments:
             self.PE_mode = False
         elif isinstance(treat, PETrackI):
             self.PE_mode = True
+        elif isinstance(treat, PETrackII):
+            self.PE_mode = True
         else:
-            raise Exception("Should be FWTrack or PETrackI object!")
+            raise Exception("Should be FWTrack or PETrackI/II object!")
         # decide if there is control
         self.treat = treat
         if ctrl:
@@ -814,7 +816,7 @@ class CallerFromAlignments:
             if q <= 0:
                 q = 0
                 break
-            #q = max(0,min(pre_q,q))           # make q-score monotonic
+            # q = max(0,min(pre_q,q))           # make q-score monotonic
             self.pqtable[v] = q
             pre_q = q
             k += l
@@ -828,8 +830,9 @@ class CallerFromAlignments:
     def __pre_computes(self,
                        max_gap: cython.int = 50,
                        min_length: cython.int = 200):
-        """After this function is called, self.pqtable and self.pvalue_length is built. All
-        chromosomes will be iterated. So it will take some time.
+        """After this function is called, self.pqtable and
+        self.pvalue_length is built. All chromosomes will be
+        iterated. So it will take some time.
 
         """
         chrom: bytes
@@ -1048,7 +1051,6 @@ class CallerFromAlignments:
                 self.__pre_computes(max_gap=max_gap, min_length=min_length)
             else:
                 self.__cal_pvalue_qvalue_table()
-
 
         # prepare bedGraph file
         if self.save_bedGraph:

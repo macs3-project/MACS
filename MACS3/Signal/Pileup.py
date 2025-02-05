@@ -1,6 +1,6 @@
 # cython: language_level=3
 # cython: profile=True
-# Time-stamp: <2025-02-05 09:54:56 Tao Liu>
+# Time-stamp: <2025-02-05 12:02:37 Tao Liu>
 
 """Module Description: For pileup functions.
 
@@ -59,7 +59,8 @@ def fix_coordinates(poss: cnp.ndarray, rlength: cython.int) -> cnp.ndarray:
     """Fix the coordinates.
     """
     i: cython.long
-    ptr: cython.pointer(cython.int) = cython.cast(cython.pointer(cython.int), poss.data)  # pointer
+    ptr: cython.pointer(cython.int) = cython.cast(cython.pointer(cython.int),
+                                                  poss.data)  # pointer
 
     # fix those negative coordinates
     for i in range(poss.shape[0]):
@@ -106,7 +107,7 @@ def pileup_and_write_se(trackI,
     three_shift: cython.long
     i: cython.long
     rlength: cython.long
-    l_data: cython.long
+    l_data: cython.long = 0
     chroms: list
     n_chroms: cython.int
     chrom: bytes
@@ -152,12 +153,26 @@ def pileup_and_write_se(trackI,
         plus_tags_pos = cython.cast(cython.p_int, plus_tags.data)
         minus_tags_pos = cython.cast(cython.p_int, minus_tags.data)
 
-        _data = c_single_end_pileup(plus_tags_pos, plus_tags.shape[0], minus_tags_pos, minus_tags.shape[0], five_shift, three_shift, 0, rlength, scale_factor, baseline_value, cython.address(l_data))
+        _data = c_single_end_pileup(plus_tags_pos,
+                                    plus_tags.shape[0],
+                                    minus_tags_pos,
+                                    minus_tags.shape[0],
+                                    five_shift,
+                                    three_shift,
+                                    0,
+                                    rlength,
+                                    scale_factor,
+                                    baseline_value,
+                                    cython.address(l_data))
 
         # write
         py_bytes = chrom
         chrom_char = py_bytes
-        c_write_pv_array_to_bedGraph(_data, l_data, chrom_char, output_filename, 1)
+        c_write_pv_array_to_bedGraph(_data,
+                                     l_data,
+                                     chrom_char,
+                                     output_filename,
+                                     1)
 
         # clean
         free(_data)
@@ -192,7 +207,7 @@ def pileup_and_write_pe(petrackI,
     py_bytes: bytes
     chrom_char: cython.pointer(cython.char)
     _data: cython.pointer(PosVal)
-    l_data: cython.long
+    l_data: cython.long = 0
 
     chroms = list(chrlengths.keys())
     n_chroms = len(chroms)
@@ -201,7 +216,7 @@ def pileup_and_write_pe(petrackI,
     fh.write("")
     fh.close()
 
-    for i in range( n_chroms ):
+    for i in range(n_chroms):
         chrom = chroms[i]
         locs = petrackI.get_locations_by_chr(chrom)
 
@@ -210,12 +225,21 @@ def pileup_and_write_pe(petrackI,
         start_pos = cython.cast(cython.p_int, locs0.data)  # <int *> locs0.data
         end_pos = cython.cast(cython.p_int, locs1.data)  # <int *> locs1.data
 
-        _data = c_quick_pileup(start_pos, end_pos, locs0.shape[0], scale_factor, baseline_value, cython.address(l_data))
+        _data = c_quick_pileup(start_pos,
+                               end_pos,
+                               locs0.shape[0],
+                               scale_factor,
+                               baseline_value,
+                               cython.address(l_data))
 
         # write
         py_bytes = chrom
         chrom_char = py_bytes
-        c_write_pv_array_to_bedGraph(_data, l_data, chrom_char, output_filename, 1)
+        c_write_pv_array_to_bedGraph(_data,
+                                     l_data,
+                                     chrom_char,
+                                     output_filename,
+                                     1)
 
         # clean
         free(_data)
@@ -235,7 +259,7 @@ def se_all_in_one_pileup(plus_tags: cnp.ndarray,
                          three_shift: cython.long,
                          rlength: cython.int,
                          scale_factor: cython.float,
-                         baseline_value: cython.float ) -> list:
+                         baseline_value: cython.float) -> list:
     """Return pileup given 5' end of fragment at plus or minus strand
     separately, and given shift at both direction to recover a
     fragment. This function is for single end sequencing library
@@ -291,8 +315,10 @@ def se_all_in_one_pileup(plus_tags: cnp.ndarray,
 
     lx = start_poss.shape[0]
 
-    start_poss_ptr = cython.cast(cython.pointer(cython.int), start_poss.data)  # <int32_t *> start_poss.data
-    end_poss_ptr = cython.cast(cython.pointer(cython.int), end_poss.data)  # <int32_t *> end_poss.data
+    start_poss_ptr = cython.cast(cython.pointer(cython.int),
+                                 start_poss.data)  # <int32_t *> start_poss.data
+    end_poss_ptr = cython.cast(cython.pointer(cython.int),
+                               end_poss.data)  # <int32_t *> end_poss.data
 
     ret_p = np.zeros(2 * lx, dtype="i4")
     ret_v = np.zeros(2 * lx, dtype="f4")
@@ -423,8 +449,10 @@ def quick_pileup(start_poss: cnp.ndarray,
     ret_p_ptr: cython.pointer(cython.int)
     ret_v_ptr: cython.pointer(cython.float)
 
-    start_poss_ptr = cython.cast(cython.pointer(cython.int), start_poss.data)  # <int32_t *> start_poss.data
-    end_poss_ptr = cython.cast(cython.pointer(cython.int), end_poss.data)  # <int32_t *> end_poss.data
+    start_poss_ptr = cython.cast(cython.pointer(cython.int),
+                                 start_poss.data)  # <int32_t *> start_poss.data
+    end_poss_ptr = cython.cast(cython.pointer(cython.int),
+                               end_poss.data)  # <int32_t *> end_poss.data
 
     ret_p = np.zeros(l, dtype="i4")
     ret_v = np.zeros(l, dtype="f4")
@@ -506,10 +534,12 @@ def quick_pileup(start_poss: cnp.ndarray,
 
 @cython.ccall
 def naive_quick_pileup(sorted_poss: cnp.ndarray, extension: int) -> list:
-    """Simple pileup, every tag will be extended left and right with length `extension`.
+    """Simple pileup, every tag will be extended left and right with
+    length `extension`.
 
     Note: Assumption is that `poss` has to be pre-sorted! There is no
     check on whether it's sorted.
+
     """
     p: cython.int
     pre_p: cython.int
@@ -536,8 +566,10 @@ def naive_quick_pileup(sorted_poss: cnp.ndarray, extension: int) -> list:
     start_poss[start_poss < 0] = 0
     end_poss = sorted_poss + extension
 
-    start_poss_ptr = cython.cast(cython.pointer(cython.int), start_poss.data)  # <int32_t *> start_poss.data
-    end_poss_ptr = cython.cast(cython.pointer(cython.int), end_poss.data)  # <int32_t *> end_poss.data
+    start_poss_ptr = cython.cast(cython.pointer(cython.int),
+                                 start_poss.data)  # <int32_t *> start_poss.data
+    end_poss_ptr = cython.cast(cython.pointer(cython.int),
+                               end_poss.data)  # <int32_t *> end_poss.data
 
     ret_p = np.zeros(2*l, dtype="i4")
     ret_v = np.zeros(2*l, dtype="f4")
@@ -614,7 +646,9 @@ def naive_quick_pileup(sorted_poss: cnp.ndarray, extension: int) -> list:
 
 
 @cython.ccall
-def over_two_pv_array(pv_array1: list, pv_array2: list, func: str = "max") -> list:
+def over_two_pv_array(pv_array1: list,
+                      pv_array2: list,
+                      func: str = "max") -> list:
     """Merge two position-value arrays. For intersection regions, take
     the maximum value within region.
 
@@ -671,7 +705,8 @@ def over_two_pv_array(pv_array1: list, pv_array2: list, func: str = "max") -> li
     l1 = a1_pos.shape[0]
     l2 = a2_pos.shape[0]
 
-    # pre_p = 0                   # remember the previous position in the new bedGraphTrackI object ret
+    # pre_p = 0
+    # remember the previous position in the new bedGraphTrackI object ret
 
     while i1 < l1 and i2 < l2:
         ret_v_ptr[0] = f(a1_v_ptr[0], a2_v_ptr[0])
@@ -717,7 +752,8 @@ def over_two_pv_array(pv_array1: list, pv_array2: list, func: str = "max") -> li
 
 @cython.ccall
 def naive_call_peaks(pv_array: list, min_v: cython.float,
-                     max_v: cython.float = 1e30, max_gap: cython.int = 50,
+                     max_v: cython.float = 1e30,
+                     max_gap: cython.int = 50,
                      min_length: cython.int = 200):
 
     pre_p: cython.int
@@ -730,20 +766,20 @@ def naive_call_peaks(pv_array: list, min_v: cython.float,
 
     peak_content = []
     (ps, vs) = pv_array
-    psn = iter(ps).__next__         # assign the next function to a viable to speed up
+    psn = iter(ps).__next__  # assign the next function to a viable to speed up
     vsn = iter(vs).__next__
     x = 0
     pre_p = 0                   # remember previous position
     while True:
         # find the first region above min_v
-        try:                    # try to read the first data range for this chrom
+        try:         # try to read the first data range for this chrom
             p = psn()
             v = vsn()
         except Exception:
             break
         x += 1                  # index for the next point
         if v > min_v:
-            peak_content = [(pre_p , p, v),]
+            peak_content = [(pre_p, p, v),]
             pre_p = p
             break               # found the first range above min_v
         else:
@@ -771,13 +807,16 @@ def naive_call_peaks(pv_array: list, min_v: cython.float,
 
     # save the last peak
     if peak_content:
-        if peak_content[-1][1] - peak_content[0][0] >= min_length:       
+        if peak_content[-1][1] - peak_content[0][0] >= min_length:
             __close_peak(peak_content, ret_peaks, max_v, min_length)
     return ret_peaks
 
 
 @cython.cfunc
-def __close_peak(peak_content, peaks, max_v: cython.float, min_length: cython.int):
+def __close_peak(peak_content,
+                 peaks,
+                 max_v: cython.float,
+                 min_length: cython.int):
     """Internal function to find the summit and height
 
     If the height is larger than max_v, skip

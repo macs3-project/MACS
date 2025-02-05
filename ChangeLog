@@ -10,7 +10,8 @@
 	including the barcodes and counts information. In the `PETrackII`
 	class, we are able to extract a subset using a list of barcodes,
 	which enables us to call peaks only on a pool (pseudo-bulk) of
-	cells.
+	cells. Functions such as `callpeak`, `pileup` and `hmmratac` will
+	support this FRAG format in the future.
 
 	2) We extensively rewrote the `pyx` codes into `py` codes. In
 	another words, we now apply the 'pure python style' with PEP-484
@@ -28,7 +29,8 @@
 	coordinates using BAM/BAI files.
 
 	2) `hmmratac`: wrong class name used while saving digested signals
-	in BedGraph files.
+	in BedGraph files. Multiple other issues related to output
+	filenames. #682
 
 	3) `predictd` and `filterdup`: wrong variable name used while
 	reading multiple pe/frag files.
