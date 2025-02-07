@@ -1,6 +1,6 @@
 # cython: language_level=3
 # cython: profile=True
-# Time-stamp: <2024-10-08 10:07:47 Tao Liu>
+# Time-stamp: <2025-02-05 12:38:24 Tao Liu>
 
 """Module Description:  IO Module for bedGraph file
 

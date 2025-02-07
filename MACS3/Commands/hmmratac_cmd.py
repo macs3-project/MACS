@@ -1,5 +1,4 @@
-# Time-stamp: <2024-10-08 10:53:48 Tao Liu>
-
+# Time-stamp: <2025-02-05 12:38:55 Tao Liu>
 
 """Description: Main HMMR command
 
@@ -24,7 +23,7 @@ import tempfile
 # from MACS3.Utilities.Constants import *
 from MACS3.Utilities.OptValidator import opt_validate_hmmratac
 from MACS3.IO.PeakIO import PeakIO
-from MACS3.IO.Parser import BAMPEParser, BEDPEParser  # BAMaccessor
+from MACS3.IO.Parser import BAMPEParser, BEDPEParser, FragParser  # BAMaccessor
 from MACS3.Signal.HMMR_EM import HMMR_EM
 from MACS3.Signal.HMMR_Signal_Processing import (generate_weight_mapping,
                                                  generate_digested_signals,
@@ -103,6 +102,9 @@ def run(args):
     elif options.format == "BEDPE":
         options.info("#1 Read fragments from BEDPE file...")
         parser = BEDPEParser
+    elif options.format == "FRAG":
+        options.info("#1 Read fragments from FRAG file...")
+        parser = FragParser
     else:
         raise Exception("wrong format")
 
@@ -204,7 +206,7 @@ def run(args):
         fc_bdg = digested_atac_signals[0]
     else:
         options.info("#  Pile up all fragments")
-        fc_bdg = petrack.pileup_bdg([1.0, ], baseline_value=0)
+        fc_bdg = petrack.pileup_bdg(baseline_value=0)
     (sum_v, n_v, max_v, min_v, mean_v, std_v) = fc_bdg.summary()
     options.info("#  Convert pileup to fold-change over average signal")
     fc_bdg.apply_func(lambda x: x/mean_v)
@@ -464,14 +466,8 @@ def run(args):
     # First, the likelihoods for each of the three states in a bedGraph
     if options.save_likelihoods:
         options.info(f"# Write the likelihoods for each states into three bedGraph files {options.name}_open.bdg, {options.name}_nuc.bdg, and {options.name}_bg.bdg")
-        open_state_bdg_fhd = open(open_state_bdgfile, "w")
-        nuc_state_bdg_fhd = open(nuc_state_bdgfile, "w")
-        bg_state_bdg_fhd = open(bg_state_bdgfile, "w")
-        save_proba_to_bedGraph(predicted_proba_file, options.hmm_binsize, open_state_bdg_fhd, nuc_state_bdg_fhd, bg_state_bdg_fhd, i_open_region, i_nucleosomal_region, i_background_region)
+        save_proba_to_bedGraph(predicted_proba_file, options.hmm_binsize, open_state_bdgfile, nuc_state_bdgfile, bg_state_bdgfile, i_open_region, i_nucleosomal_region, i_background_region)
         predicted_proba_file.seek(0)  # reset
-        open_state_bdg_fhd.close()
-        nuc_state_bdg_fhd.close()
-        bg_state_bdg_fhd.close()
         options.info("# finished writing proba_to_bedgraph")
 
     # # Generate states path:

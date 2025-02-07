@@ -1,4 +1,4 @@
-# Time-stamp: <2024-10-02 19:47:03 Tao Liu>
+# Time-stamp: <2025-02-05 12:41:15 Tao Liu>
 """Module Description
 
 This code is free software; you can redistribute it and/or modify it
@@ -19,7 +19,9 @@ from math import log
 from MACS3.IO.Parser import (BEDParser, ELANDResultParser,
                              ELANDMultiParser, ELANDExportParser,
                              SAMParser, BAMParser, BAMPEParser,
-                             BEDPEParser, BowtieParser,  guess_parser)
+                             BEDPEParser, BowtieParser,
+                             FragParser,
+                             guess_parser)
 
 from MACS3.Utilities.Constants import EFFECTIVEGS as efgsize
 
@@ -76,6 +78,8 @@ def opt_validate_callpeak(options):
     elif options.format == "BAM":
         options.parser = BAMParser
         options.gzip_flag = True
+    elif options.format == "BOWTIE":
+        options.parser = BowtieParser
     elif options.format == "BAMPE":
         options.parser = BAMPEParser
         options.gzip_flag = True
@@ -83,8 +87,9 @@ def opt_validate_callpeak(options):
     elif options.format == "BEDPE":
         options.parser = BEDPEParser
         options.nomodel = True
-    elif options.format == "BOWTIE":
-        options.parser = BowtieParser
+    elif options.format == "FRAG":
+        options.parser = FragParser
+        options.nomodel = True        
     elif options.format == "AUTO":
         options.parser = guess_parser
     else:
@@ -96,6 +101,11 @@ def opt_validate_callpeak(options):
         if not options.keepduplicates.isdigit():
             logger.error("--keep-dup should be 'auto', 'all' or an integer!")
             sys.exit(1)
+    # for duplicate reads filter, if format is FRAG, we turn it off by
+    # setting it as 'all'
+    if options.format == 'FRAG' and options.keepduplicates != "all":
+        logger.warning("Since the format is 'FRAG', `--keep-dup` will be set as 'all'.")
+        options.keepduplicates = "all"
 
     if options.extsize < 1:
         logger.error("--extsize must >= 1!")
@@ -222,7 +232,7 @@ def opt_validate_callpeak(options):
     if options.fecutoff != 1.0:
         options.argtxt += "# Additional cutoff on fold-enrichment is: %.2f\n" % (options.fecutoff)
 
-    if options.format in ["BAMPE", "BEDPE"]:
+    if options.format in ["BAMPE", "BEDPE", "FRAG"]:
         # neutralize SHIFT
         options.shift = 0
         options.argtxt += "# Paired-End mode is on\n"
@@ -528,6 +538,8 @@ def opt_validate_pileup(options):
         options.gzip_flag = True
     elif options.format == "BEDPE":
         options.parser = BEDPEParser
+    elif options.format == "FRAG":
+        options.parser = FragParser
     else:
         logger.error("Format \"%s\" cannot be recognized!" % (options.format))
         sys.exit(1)

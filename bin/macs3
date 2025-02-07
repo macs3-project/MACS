@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# Time-stamp: <2024-10-02 12:29:58 Tao Liu>
+# Time-stamp: <2025-02-05 12:43:00 Tao Liu>
 
 """Description: MACS v3 main executable.
 
@@ -192,7 +192,12 @@ def add_callpeak_parser(subparsers):
     $ macs3 callpeak -f BAMPE -t ATAC.bam -g hs -n test -B -q 0.01
 4. Peak calling on ATAC-seq (focusing on insertion sites, and using single-end mode):
     $ macs3 callpeak -f BAM -t ATAC.bam -g hs -n test -B -q 0.01 --shift -50 --extension 100
+5. Peak calling on scATAC-seq (paired-end mode):
+    $ macs3 callpeak -f BEDPE -t scATAC.fragments.tsv.gz -g hs -n test -B -q 0.01 -n test
 """)
+
+#6. Peak calling on scATAC-seq (paired-end mode) and only for given barcodes:
+#    $ macs3 callpeak -f FRAG -t scATAC.fragments.tsv.gz -g hs -n test -B -q 0.01 -n test --barcodes barcodes.txt
 
     # group for input files
     group_input = argparser_callpeak.add_argument_group("Input files arguments")
@@ -201,17 +206,24 @@ def add_callpeak_parser(subparsers):
     group_input.add_argument("-c", "--control", dest="cfile", type=str, nargs="*",
                              help="Control file. If multiple files are given as '-c A B C', they will be pooled to estimate ChIP-seq background noise.")
     group_input.add_argument("-f", "--format", dest="format", type=str,
+                             #choices=("AUTO", "BAM", "SAM", "BED", "ELAND",
+                             #         "ELANDMULTI", "ELANDEXPORT", "BOWTIE",
+                             #         "BAMPE", "BEDPE", "FRAG"),
+                             #help="Format of tag file, \"AUTO\", \"BED\" or \"ELAND\" or \"ELANDMULTI\" or \"ELANDEXPORT\" or \"SAM\" or \"BAM\" or \"BOWTIE\" or \"BAMPE\" or \"BEDPE\" or \"FRAG\". The default AUTO option will let MACS decide which format (except for BAMPE, BEDPE, and FRAG which should be implicitly set) the file is. Please check the definition in README. Please note that if the format is set as BAMPE, BEDPE or FRAG, MACS3 will call its special Paired-end mode to call peaks by piling up the actual ChIPed fragments defined by both aligned ends, instead of predicting the fragment size first and extending reads. Also please note that the BEDPE only contains three columns, and is NOT the same BEDPE format used by BEDTOOLS. The FRAG format is for single-cell ATAC-seq fragment file which is a five columns BEDPE file with extra barcode and fragment count column. DEFAULT: \"AUTO\"",
                              choices=("AUTO", "BAM", "SAM", "BED", "ELAND",
                                       "ELANDMULTI", "ELANDEXPORT", "BOWTIE",
                                       "BAMPE", "BEDPE"),
-                             help="Format of tag file, \"AUTO\", \"BED\" or \"ELAND\" or \"ELANDMULTI\" or \"ELANDEXPORT\" or \"SAM\" or \"BAM\" or \"BOWTIE\" or \"BAMPE\" or \"BEDPE\". The default AUTO option will let MACS decide which format (except for BAMPE and BEDPE which should be implicitly set) the file is. Please check the definition in README. Please note that if the format is set as BAMPE or BEDPE, MACS3 will call its special Paired-end mode to call peaks by piling up the actual ChIPed fragments defined by both aligned ends, instead of predicting the fragment size first and extending reads. Also please note that the BEDPE only contains three columns, and is NOT the same BEDPE format used by BEDTOOLS. DEFAULT: \"AUTO\"",
+                             help="Format of tag file, \"AUTO\", \"BED\" or \"ELAND\" or \"ELANDMULTI\" or \"ELANDEXPORT\" or \"SAM\" or \"BAM\" or \"BOWTIE\" or \"BAMPE\" or \"BEDPE\". The default AUTO option will let MACS decide which format (except for BAMPE and BEDPEwhich should be implicitly set) the file is. Please check the definition in README. Please note that if the format is set as BAMPE, or BEDPE, MACS3 will call its special Paired-end mode to call peaks by piling up the actual ChIPed fragments defined by both aligned ends, instead of predicting the fragment size first and extending reads. Also please note that the BEDPE only contains three columns, and is NOT the same BEDPE format used by BEDTOOLS. DEFAULT: \"AUTO\"",                             
                              default="AUTO")
     group_input.add_argument("-g", "--gsize", dest="gsize", type=str, default="hs",
                              help="Effective genome size. It can be 1.0e+9 or 1000000000, or shortcuts:'hs' for human (2,913,022,398), 'mm' for mouse (2,652,783,500), 'ce' for C. elegans (100,286,401) and 'dm' for fruitfly (142,573,017), Default:hs. The effective genome size numbers for the above four species are collected from Deeptools https://deeptools.readthedocs.io/en/develop/content/feature/effectiveGenomeSize.html Please refer to deeptools to define the best genome size you plan to use.")
     group_input.add_argument("-s", "--tsize",  dest="tsize", type=int, default=None,
                              help="Tag size/read length. This will override the auto detected tag size. DEFAULT: Not set")
     group_input.add_argument("--keep-dup", dest="keepduplicates", type=str, default="1",
+                             #help="It controls the  behavior towards duplicate tags at the exact same location -- the same coordination and the same strand. The 'auto' option makes MACS calculate the maximum tags at the exact same location based on binomal distribution using 1e-5 as pvalue cutoff; and the 'all' option keeps every tags. If an integer is given, at most this number of tags will be kept at the same location. Note, if you've used samtools or picard to flag reads as 'PCR/Optical duplicate' in bit 1024, MACS3 will still read them although the reads may be decided by MACS3 as duplicate later. If you plan to rely on samtools/picard/any other tool to filter duplicates, please remove those duplicate reads and save a new alignment file then ask MACS3 to keep all by '--keep-dup all'. If the format is FRAG, this option will be ignored and MACS3 will behave like '--keep-dup all'. The default is to keep one tag at the same location. Default: 1")
                              help="It controls the  behavior towards duplicate tags at the exact same location -- the same coordination and the same strand. The 'auto' option makes MACS calculate the maximum tags at the exact same location based on binomal distribution using 1e-5 as pvalue cutoff; and the 'all' option keeps every tags. If an integer is given, at most this number of tags will be kept at the same location. Note, if you've used samtools or picard to flag reads as 'PCR/Optical duplicate' in bit 1024, MACS3 will still read them although the reads may be decided by MACS3 as duplicate later. If you plan to rely on samtools/picard/any other tool to filter duplicates, please remove those duplicate reads and save a new alignment file then ask MACS3 to keep all by '--keep-dup all'. The default is to keep one tag at the same location. Default: 1")
+    #group_input.add_argument("--barcodes", dest="barcodefile", type=str, default="",
+    #                         help="A plain text file containing the barcodes for the fragment file while the format is 'FRAG'. Won't have any effect if the fromat is not 'FRAG'. Each row in the file should only have the barcode string. MACS3 will extract only the fragments for the specified barcodes.")
 
     # group for output files
     group_output = argparser_callpeak.add_argument_group("Output arguments")
@@ -314,7 +326,7 @@ def add_filterdup_parser(subparsers):
                                      help="Alignment file. If multiple files are given as '-t A B C', then they will all be read and combined. REQUIRED.")
     argparser_filterdup.add_argument("-f", "--format", dest="format", type=str,
                                      choices=("AUTO", "BAM", "SAM", "BED", "ELAND", "ELANDMULTI", "ELANDEXPORT", "BOWTIE", "BAMPE", "BEDPE"),
-                                     help="Format of tag file, \"AUTO\", \"BED\" or \"ELAND\" or \"ELANDMULTI\" or \"ELANDEXPORT\" or \"SAM\" or \"BAM\" or \"BOWTIE\" or \"BAMPE\" or \"BEDPE\". The default AUTO option will let '%(prog)s' decide which format the file is. Please check the definition in README file if you choose ELAND/ELANDMULTI/ELANDEXPORT/SAM/BAM/BOWTIE or BAMPE/BEDPE. DEFAULT: \"AUTO\"",
+                                     help="Format of tag file, \"AUTO\", \"BED\", \"ELAND\", \"ELANDMULTI\", \"ELANDEXPORT\", \"SAM\", \"BAM\", \"BOWTIE\", \"BAMPE\", or \"BEDPE\". The default AUTO option will let MACS3 guess which format the file is. Please check the definition in README file for each specific format. DEFAULT: \"AUTO\"",
                                      default="AUTO")
     argparser_filterdup.add_argument("-g", "--gsize", dest="gsize", type=str, default="hs",
                                      help="Effective genome size. It can be 1.0e+9 or 1000000000, or shortcuts:'hs' for human (2,913,022,398), 'mm' for mouse (2,652,783,500), 'ce' for C. elegans (100,286,401) and 'dm' for fruitfly (142,573,017), Default:hs. The effective genome size numbers for the above four species are collected from Deeptools https://deeptools.readthedocs.io/en/develop/content/feature/effectiveGenomeSize.html Please refer to deeptools to define the best genome size you plan to use.")
@@ -335,6 +347,7 @@ def add_filterdup_parser(subparsers):
     argparser_filterdup.add_argument("-d", "--dry-run", dest="dryrun", action="store_true", default=False,
                                      help="When set, filterdup will only output numbers instead of writing output files, including maximum allowable duplicates, total number of reads before filtering, total number of reads after filtering, and redundant rate. Default: not set")
     return
+
 
 def add_bdgpeakcall_parser(subparsers):
     """Add function 'peak calling on bedGraph' argument parsers.
@@ -368,6 +381,7 @@ def add_bdgpeakcall_parser(subparsers):
 
     return
 
+
 def add_bdgbroadcall_parser(subparsers):
     """Add function 'broad peak calling on bedGraph' argument parsers.
     """
@@ -393,6 +407,7 @@ def add_bdgbroadcall_parser(subparsers):
     add_outdir_option(argparser_bdgbroadcall)
     add_output_group(argparser_bdgbroadcall)
     return
+
 
 def add_bdgcmp_parser(subparsers):
     """Add function 'peak calling on bedGraph' argument parsers.
@@ -421,6 +436,7 @@ def add_bdgcmp_parser(subparsers):
     output_group.add_argument("-o", "--ofile", dest="ofile", type=str, nargs="+",
                               help="Output filename. Mutually exclusive with --o-prefix. The number and the order of arguments for --ofile must be the same as for -m.")
     return
+
 
 def add_bdgopt_parser(subparsers):
     """Add function 'operations on score column of bedGraph' argument parsers.
@@ -526,6 +542,7 @@ def add_bdgdiff_parser(subparsers):
 
     return
 
+
 def add_refinepeak_parser(subparsers):
     argparser_refinepeak = subparsers.add_parser("refinepeak",
                                                  help="Take raw reads alignment, refine peak summits. Inspired by SPP.")
@@ -549,7 +566,6 @@ def add_refinepeak_parser(subparsers):
 
     add_outdir_option(argparser_refinepeak)
     add_output_group(argparser_refinepeak)
-
     return
 
 
@@ -586,7 +602,6 @@ def add_predictd_parser(subparsers):
 
     argparser_predictd.add_argument("--verbose", dest="verbose", type=int, default=2,
                                     help="Set verbose level of runtime message. 0: only show critical message, 1: show additional warning message, 2: show process information, 3: show debug messages. DEFAULT:2")
-
     return
 
 
@@ -599,8 +614,10 @@ def add_pileup_parser(subparsers):
                                   help="Output bedGraph file name. If not specified, will write to standard output. REQUIRED.")
     add_outdir_option(argparser_pileup)
     argparser_pileup.add_argument("-f", "--format", dest="format", type=str,
+                                  #choices=("AUTO", "BAM", "SAM", "BED", "ELAND", "ELANDMULTI", "ELANDEXPORT", "BOWTIE", "BAMPE", "BEDPE", "FRAG"),
+                                  #help="Format of tag file, \"AUTO\", \"BED\", \"ELAND\", \"ELANDMULTI\", \"ELANDEXPORT\", \"SAM\", \"BAM\", \"BOWTIE\", \"BAMPE\", \"BEDPE\", or \"FRAG\". The default AUTO option will let '%(prog)s' decide which format the file is. DEFAULT: \"AUTO\", MACS3 will pick a format from \"AUTO\", \"BED\", \"ELAND\", \"ELANDMULTI\", \"ELANDEXPORT\", \"SAM\", \"BAM\" and \"BOWTIE\". If the format is BAMPE, BEDPE or FRAG, please specify it explicitly. Please note that when the format is BAMPE, BEDPE or FRAG, the -B and --extsize options would be ignored, and MACS3 will process the input in Paired-End mode.",
                                   choices=("AUTO", "BAM", "SAM", "BED", "ELAND", "ELANDMULTI", "ELANDEXPORT", "BOWTIE", "BAMPE", "BEDPE"),
-                                  help="Format of tag file, \"AUTO\", \"BED\", \"ELAND\", \"ELANDMULTI\", \"ELANDEXPORT\", \"SAM\", \"BAM\", \"BOWTIE\", \"BAMPE\", or \"BEDPE\". The default AUTO option will let '%(prog)s' decide which format the file is. DEFAULT: \"AUTO\", MACS3 will pick a format from \"AUTO\", \"BED\", \"ELAND\", \"ELANDMULTI\", \"ELANDEXPORT\", \"SAM\", \"BAM\" and \"BOWTIE\". If the format is BAMPE or BEDPE, please specify it explicitly. Please note that when the format is BAMPE or BEDPE, the -B and --extsize options would be ignored.",
+                                  help="Format of tag file, \"AUTO\", \"BED\", \"ELAND\", \"ELANDMULTI\", \"ELANDEXPORT\", \"SAM\", \"BAM\", \"BOWTIE\", \"BAMPE\", or \"BEDPE\". The default AUTO option will let '%(prog)s' decide which format the file is. DEFAULT: \"AUTO\", MACS3 will pick a format from \"AUTO\", \"BED\", \"ELAND\", \"ELANDMULTI\", \"ELANDEXPORT\", \"SAM\", \"BAM\" and \"BOWTIE\". If the format is BAMPE or BEDPE, please specify it explicitly. Please note that when the format is BAMPE or BEDPE, the -B and --extsize options would be ignored, and MACS3 will process the input in Paired-End mode.",                                  
                                   default="AUTO")
     argparser_pileup.add_argument("-B", "--both-direction", dest="bothdirection", action="store_true", default=False,
                                   help="By default, any read will be extended towards downstream direction by extension size. So it's [0,size-1] (1-based index system) for plus strand read and [-size+1,0] for minus strand read where position 0 is 5' end of the aligned read. Default behavior can simulate MACS3 way of piling up ChIP sample reads where extension size is set as fragment size/d. If this option is set as on, aligned reads will be extended in both upstream and downstream directions by extension size. It means [-size,size] where 0 is the 5' end of a aligned read. It can partially simulate MACS3 way of piling up control reads. However MACS3 local bias is calculated by maximizing the expected pileup over a ChIP fragment size/d estimated from 10kb, 1kb, d and whole genome background. This option will be ignored when the format is set as BAMPE or BEDPE. DEFAULT: False")
@@ -857,6 +874,8 @@ plus an extra option for the HMM model file like `macs3 hmmratac
     group_input.add_argument("-i", "--input", dest="input_file", type=str, required=True, nargs="+",
                              help="Input files containing the aligment results for ATAC-seq paired end reads. If multiple files are given as '-t A B C', then they will all be read and pooled together. The file should be in BAMPE or BEDPE format (aligned in paired end mode). Files can be gzipped. Note: all files should be in the same format! REQUIRED.")
     group_input.add_argument("-f", "--format", dest="format", type=str,
+                             #choices=("BAMPE", "BEDPE", "FRAG"),
+                             #help="Format of input files, \"BAMPE\", \"BEDPE\", or \"FRAG\". If there are multiple files, they should be in the same format -- either BAMPE, BEDPE or FRAG. Please check the definition in README. Also please note that the BEDPE only contains three columns -- chromosome, left position of the whole pair, right position of the whole pair-- and is NOT the same BEDPE format used by BEDTOOLS. To convert BAMPE to BEDPE, you can use this command `macs3 filterdup --keep-dup all -f BAMPE -i input.bam -o output.bedpe`. And the FRAG format is a five columns BEDPE with extra barcode and fragment count columns. DEFAULT: \"BAMPE\"",
                              choices=("BAMPE", "BEDPE"),
                              help="Format of input files, \"BAMPE\" or \"BEDPE\". If there are multiple files, they should be in the same format -- either BAMPE or BEDPE. Please check the definition in README. Also please note that the BEDPE only contains three columns -- chromosome, left position of the whole pair, right position of the whole pair-- and is NOT the same BEDPE format used by BEDTOOLS. To convert BAMPE to BEDPE, you can use this command `macs3 filterdup --keep-dup all -f BAMPE -i input.bam -o output.bedpe`. DEFAULT: \"BAMPE\"",
                              default="BAMPE")

@@ -1,7 +1,7 @@
 # cython: language_level=3
 # cython: profile=True
 # cython: linetrace=True
-# Time-stamp: <2024-10-22 10:25:23 Tao Liu>
+# Time-stamp: <2024-11-29 23:30:03 Tao Liu>
 
 """Module for all MACS Parser classes for input. Please note that the
 parsers are for reading the alignment files ONLY.
@@ -1527,6 +1527,10 @@ class FragParser(GenericParser):
         except IndexError:
             raise Exception("Less than 5 columns found at this line: %s\n" %
                             thisline)
+
+    @cython.ccall
+    def build_petrack(self):
+        return self.build_petrack2()
 
     @cython.ccall
     def build_petrack2(self):

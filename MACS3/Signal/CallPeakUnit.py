@@ -1,7 +1,7 @@
 # cython: language_level=3
 # cython: profile=True
 # cython: linetrace=True
-# Time-stamp: <2024-10-22 11:42:37 Tao Liu>
+# Time-stamp: <2025-02-05 12:40:36 Tao Liu>
 
 """Module for Calculate Scores.
 
@@ -40,7 +40,7 @@ from cython.cimports.libc.math import exp, log10, log1p, erf, sqrt
 from MACS3.Signal.SignalProcessing import maxima, enforce_peakyness
 from MACS3.IO.PeakIO import PeakIO, BroadPeakIO
 from MACS3.Signal.FixWidthTrack import FWTrack
-from MACS3.Signal.PairedEndTrack import PETrackI
+from MACS3.Signal.PairedEndTrack import PETrackI, PETrackII
 from MACS3.Signal.Prob import poisson_cdf
 from MACS3.Utilities.Logger import logging
 
@@ -346,8 +346,8 @@ class CallerFromAlignments:
     It will compute for each chromosome separately in order to save
     memory usage.
     """
-    treat: object            # FWTrack or PETrackI object for ChIP
-    ctrl: object             # FWTrack or PETrackI object for Control
+    treat: object            # FWTrack or PETrackI/II object for ChIP
+    ctrl: object             # FWTrack or PETrackI/II object for Control
 
     d: cython.int                           # extension size for ChIP
     # extension sizes for Control. Can be multiple values
@@ -458,8 +458,10 @@ class CallerFromAlignments:
             self.PE_mode = False
         elif isinstance(treat, PETrackI):
             self.PE_mode = True
+        elif isinstance(treat, PETrackII):
+            self.PE_mode = True
         else:
-            raise Exception("Should be FWTrack or PETrackI object!")
+            raise Exception("Should be FWTrack or PETrackI/II object!")
         # decide if there is control
         self.treat = treat
         if ctrl:
@@ -565,12 +567,12 @@ class CallerFromAlignments:
 
         if self.PE_mode:
             treat_pv = self.treat.pileup_a_chromosome(chrom,
-                                                      [self.treat_scaling_factor,],
+                                                      self.treat_scaling_factor,
                                                       baseline_value=0.0)
         else:
             treat_pv = self.treat.pileup_a_chromosome(chrom,
-                                                      [self.d,],
-                                                      [self.treat_scaling_factor,],
+                                                      self.d,
+                                                      self.treat_scaling_factor,
                                                       baseline_value=0.0,
                                                       directional=True,
                                                       end_shift=self.end_shift)
@@ -585,11 +587,11 @@ class CallerFromAlignments:
                                                           self.ctrl_scaling_factor_s,
                                                           baseline_value=self.lambda_bg)
             else:
-                ctrl_pv = self.ctrl.pileup_a_chromosome(chrom,
-                                                        self.ctrl_d_s,
-                                                        self.ctrl_scaling_factor_s,
-                                                        baseline_value=self.lambda_bg,
-                                                        directional=False)
+                ctrl_pv = self.ctrl.pileup_a_chromosome_c(chrom,
+                                                          self.ctrl_d_s,
+                                                          self.ctrl_scaling_factor_s,
+                                                          baseline_value=self.lambda_bg,
+                                                          directional=False)
         else:
             # a: set global lambda
             ctrl_pv = [treat_pv[0][-1:], np.array([self.lambda_bg,],
@@ -814,7 +816,7 @@ class CallerFromAlignments:
             if q <= 0:
                 q = 0
                 break
-            #q = max(0,min(pre_q,q))           # make q-score monotonic
+            # q = max(0,min(pre_q,q))           # make q-score monotonic
             self.pqtable[v] = q
             pre_q = q
             k += l
@@ -828,8 +830,9 @@ class CallerFromAlignments:
     def __pre_computes(self,
                        max_gap: cython.int = 50,
                        min_length: cython.int = 200):
-        """After this function is called, self.pqtable and self.pvalue_length is built. All
-        chromosomes will be iterated. So it will take some time.
+        """After this function is called, self.pqtable and
+        self.pvalue_length is built. All chromosomes will be
+        iterated. So it will take some time.
 
         """
         chrom: bytes
@@ -1048,7 +1051,6 @@ class CallerFromAlignments:
                 self.__pre_computes(max_gap=max_gap, min_length=min_length)
             else:
                 self.__cal_pvalue_qvalue_table()
-
 
         # prepare bedGraph file
         if self.save_bedGraph:
