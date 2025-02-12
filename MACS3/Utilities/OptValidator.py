@@ -1,4 +1,4 @@
-# Time-stamp: <2025-02-05 12:41:15 Tao Liu>
+# Time-stamp: <2025-02-12 14:12:21 Tao Liu>
 """Module Description
 
 This code is free software; you can redistribute it and/or modify it
@@ -792,36 +792,8 @@ def opt_validate_hmmratac(options):
         logger.error(" In order to use -c or --prescan-cutoff, the cutoff must be larger than 1.")
         sys.exit(1)
 
-    if options.openregion_minlen < 0: # and options.store_peaks == True:
+    if options.openregion_minlen < 0:  # and options.store_peaks == True:
         logger.error(" In order to use --minlen, the length should not be negative.")
         sys.exit(1)
 
-    #if options.call_score.lower() not in [ 'max', 'ave', 'med', 'fc', 'zscore', 'all']:
-    #    logger.error(" Invalid method: %s" % options.call_score)
-    #    sys.exit(1)
-
-    # call_threshold non-negative
-    #if options.call_threshold <0:
-    #    logger.error(" --threshold should not be negative! ")
-    #    sys.exit(1)
-
-    # Misc
-    # misc_blacklist
-    #if options.misc_keep_duplicates:
-    #    options.argtxt += "# Duplicate reads from analysis will be stored. \n"
-
-    # misc_trim non-negative
-    #if options.misc_trim <0:
-    #    logger.error(" --trim should not be negative! ")
-    #    sys.exit(1)
-
-    # np # should this be mp? non-negative
-    #if options.np <0:
-    #    logger.error(" -m, --multiple-processing should not be negative! ")
-    #    sys.exit(1)
-
-    # min_map_quality non-negative
-    #if options.min_map_quality <0:
-    #    logger.error(" -q, --minmapq should not be negative! ")
-    #    sys.exit(1)
     return options
