@@ -1,4 +1,4 @@
-# Time-stamp: <2025-02-05 12:38:55 Tao Liu>
+# Time-stamp: <2025-02-12 14:30:02 Tao Liu>
 
 """Description: Main HMMR command
 
@@ -118,9 +118,17 @@ def run(args):
     # remember to finalize the petrack
     petrack.finalize()
 
+    options.info(f"#  Read {petrack.total} fragments.")
+
     # filter duplicates if needed
-    if options.misc_keep_duplicates:
+    if options.misc_remove_duplicates:
+        options.info("#  Removing duplicated fragments...")
+        # by default, we keep all duplicates
+        before_total = petrack.total
         petrack.filter_dup(maxnum=1)
+        removed_n = before_total - petrack.total
+        options.info(f"#  We removed {removed_n} duplicated fragments.")
+        options.info(f"#  There are {petrack.total} fragments left.")
 
     # read in blacklisted if option entered
     if options.blacklist:
@@ -138,6 +146,14 @@ def run(args):
             blacklist.sort()
         blacklist_regions = Regions()
         blacklist_regions.init_from_PeakIO(blacklist)
+
+        # remove fragments aligned in the blacklisted regions
+
+        before_total = petrack.total
+        petrack.exclude(blacklist_regions)
+        removed_n = before_total - petrack.total
+        options.info(f"#  We removed {removed_n} fragments overlapping with blacklisted regions.")
+        options.info(f"#  There are {petrack.total} fragments left.")
 
     #############################################
     # 2. EM
@@ -287,10 +303,6 @@ def run(args):
         training_regions.expand(options.hmm_training_flanking)
         training_regions.merge_overlap()
 
-        # remove peaks overlapping with blacklisted regions
-        if options.blacklist:
-            training_regions.exclude(blacklist_regions)
-            options.info(f"#  after removing those overlapping with provided blacklisted regions, we have {training_regions.total} left")
         if options.save_train:
             fhd = open(training_region_bedfile, "w")
             training_regions.write_to_bed(fhd)
@@ -408,11 +420,6 @@ def run(args):
     candidate_regions.expand(options.hmm_training_flanking)
     candidate_regions.merge_overlap()
     options.info(f"#   after expanding and merging, we have {candidate_regions.total} candidate regions")
-
-    # remove peaks overlapping with blacklisted regions
-    if options.blacklist:
-        candidate_regions.exclude(blacklist_regions)
-        options.info(f"#   after removing those overlapping with provided blacklisted regions, we have {candidate_regions.total} left")
 
     # extract signals
     options.info("#  Extract signals in candidate regions and decode with HMM")

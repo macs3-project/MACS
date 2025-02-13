@@ -1,5 +1,5 @@
-2024-11-30  Tao Liu  <vladimir.liu@gmail.com>
-	MACS 3.0.3b1
+2025-02-12  Tao Liu  <vladimir.liu@gmail.com>
+	MACS 3.0.3
 
 	* Features added
 
@@ -19,20 +19,35 @@
 	source codes can be more compatible to Python programming tools
 	such as `flake8`. During rewritting, we cleaned the source codes
 	even more, and removed unnecessary dependencies during
-	compilation.
+	compilation. We will continue to do more code cleaning in the
+	future.
+
+	3) We changed the behavior on the usage of 'blacklist' regions in
+	`hmmratac`. We will remove the aligned fragments located in the
+	'blacklist' regions before the EM step to estimate fragment
+	lengths distributions and HMM step to learn and predict nucleosome
+	states. The reason is discussed in #680. To implement this
+	feature, we added the `exclude` functions to PETrackI and
+	PETrackII.
 
 	* Bug fixed
 
-	1) Fix issues in big-endian system in `Parser.py` codes. Enable
-	big-endian support in `BAM.py` codes for accessig certain
-	alignment records that overlap with givin genomic
-	coordinates using BAM/BAI files.
+	1) `hmmratac` option `--keep-duplicate` had opposite effect
+	previously as indicated by the name and description. It has been
+	renamed as `--remove-dup` to reflect the actual
+	behavior. `hmmratac` will not remove duplicated fragments unless
+	this option is set.
 
 	2) `hmmratac`: wrong class name used while saving digested signals
 	in BedGraph files. Multiple other issues related to output
 	filenames. #682
 
-	3) `predictd` and `filterdup`: wrong variable name used while
+	3) Fix issues in big-endian system in `Parser.py` codes. Enable
+	big-endian support in `BAM.py` codes for accessig certain
+	alignment records that overlap with givin genomic
+	coordinates using BAM/BAI files.
+
+	4) `predictd` and `filterdup`: wrong variable name used while
 	reading multiple pe/frag files.
 
 	* Doc

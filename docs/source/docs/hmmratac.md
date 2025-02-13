@@ -99,10 +99,13 @@ output file names. DEFAULT: "NA"
 
 ### `-e BLACKLIST`/`--blacklist BLACKLIST`
 
-Filename of blacklisted regions to exclude from training and peak
-detection. An example of such file can be found from [ENCODE
-project](https://github.com/Boyle-Lab/Blacklist/). By default, there
-is no blacklist file.
+Filename of the file containing the blacklisted regions to exclude
+from the process. Any fragments overlapping with blacklisted regions
+are excluded. An example of such file can be found from the ENCODE
+project at: https://github.com/Boyle-Lab/Blacklist/. Alternatively, if
+you wish to exclude centromeres and telomeres, you can find their
+genomic coordinates and write them to a BED format file. By default,
+there is no blacklist file in use.
 
 ### `--modelonly`
 

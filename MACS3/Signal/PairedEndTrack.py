@@ -1,6 +1,6 @@
 # cython: language_level=3
 # cython: profile=True
-# Time-stamp: <2025-02-05 12:40:47 Tao Liu>
+# Time-stamp: <2025-02-12 13:03:49 Tao Liu>
 
 """Module for filter duplicate tags from paired-end data
 
@@ -27,6 +27,7 @@ from MACS3.Signal.BedGraph import (bedGraphTrackI,
                                    bedGraphTrackII)
 from MACS3.Signal.PileupV2 import (pileup_from_LR_hmmratac,
                                    pileup_from_LRC)
+from MACS3.Signal.Region import Regions
 # ------------------------------------
 # Other modules
 # ------------------------------------
@@ -76,7 +77,7 @@ class PETrackI:
         # [('l','i4'),('r','i4')] as value
         self.locations = {}
         # dictionary with chrname as key, size of the above nparray as value
-        # size is to remember the size of the fragments added to this chromosome
+        # size is to remember the number of the fragments added to this chromosome
         self.size = {}
         # dictionary with chrname as key, size of the above nparray as value
         self.buf_size = {}
@@ -269,6 +270,104 @@ class PETrackI:
 
     @cython.boundscheck(False)  # do not check that np indices are valid
     @cython.ccall
+    def exclude(self, regions):
+        """Exclude reads overlapping with anything in the regions.
+
+        Run it right after you add all data into this object.
+        """
+        i: cython.ulong
+        k: bytes
+        locs: cnp.ndarray
+        locs_size: cython.ulong
+        chrnames: set
+        regions_c: list
+        selected_idx: cnp.ndarray
+        regions_chrs: list
+        r1: cnp.void            # this is the location in numpy.void -- like a tuple
+        r2: tuple               # this is the region
+        n_rl1: cython.long
+        n_rl2: cython.long
+
+        if not self.is_sorted:
+            self.sort()
+
+        assert isinstance(regions, Regions)
+        regions.sort()
+        regions_chrs = list(regions.regions.keys())
+
+        chrnames = self.get_chr_names()
+
+        for k in chrnames:      # for each chromosome
+            locs = self.locations[k]
+            locs_size = self.size[k]
+            # let's check if k is in regions_chr
+            if k not in regions_chrs:
+                # do nothing and continue
+                self.total += locs_size
+                continue
+
+            # discard overlapping reads and make a new locations[k]
+            # initialize boolean array as all TRUE, or all being kept
+            selected_idx = np.ones(locs_size, dtype=bool)
+
+            regions_c = regions.regions[k]
+
+            i = 0
+            n_rl1 = locs_size   # the number of locations left
+            n_rl2 = len(regions_c)  # the number of regions left
+            rl1_k = iter(locs).__next__
+            rl2_k = iter(regions_c).__next__
+            r1 = rl1_k()        # take the first value
+            n_rl1 -= 1          # remaining rl1
+            r2 = rl2_k()
+            n_rl2 -= 1          # remaining rl2
+            while (True):
+                # we do this until there is no r1 or r2 left.
+                if r2[0] < r1[1] and r1[0] < r2[1]:
+                    # since we found an overlap, r1 will be skipped/excluded
+                    # and move to the next r1
+                    # get rid of this one
+                    n_rl1 -= 1
+                    self.length -= r1[1] - r1[0]
+                    selected_idx[i] = False
+
+                    if n_rl1 > 0:
+                        r1 = rl1_k()  # take the next location
+                        i += 1
+                        continue
+                    else:
+                        break
+                if r1[1] < r2[1]:
+                    # in this case, we need to move to the next r1,
+                    n_rl1 -= 1
+                    if n_rl1 > 0:
+                        r1 = rl1_k()  # take the next location
+                        i += 1
+                    else:
+                        # no more r1 left
+                        break
+                else:
+                    # in this case, we need to move the next r2
+                    if n_rl2:
+                        r2 = rl2_k()  # take the next region
+                        n_rl2 -= 1
+                    else:
+                        # no more r2 left
+                        break
+
+            self.locations[k] = locs[selected_idx]
+            self.size[k] = self.locations[k].shape[0]
+            # free memory?
+            # I know I should shrink it to 0 size directly,
+            # however, on Mac OSX, it seems directly assigning 0
+            # doesn't do a thing.
+            selected_idx.resize(self.buffer_size, refcheck=False)
+            selected_idx.resize(0, refcheck=False)
+        self.finalize()         # use length to set average_template_length and total
+        return
+
+    @cython.boundscheck(False)  # do not check that np indices are valid
+    @cython.ccall
     def filter_dup(self, maxnum: cython.int = -1):
         """Filter the duplicated reads.
 
@@ -300,9 +399,10 @@ class PETrackI:
 
         for k in chrnames:      # for each chromosome
             locs = self.locations[k]
-            locs_size = locs.shape[0]
+            locs_size = self.size[k]
             if locs_size == 1:
                 # do nothing and continue
+                self.total += locs_size
                 continue
             # discard duplicate reads and make a new locations[k]
             # initialize boolean array as all TRUE, or all being kept
@@ -340,8 +440,13 @@ class PETrackI:
         return
 
     @cython.ccall
-    def sample_percent(self, percent: cython.float, seed: cython.int = -1):
+    def sample_percent(self,
+                       percent: cython.float,
+                       seed: cython.int = -1):
         """Sample the tags for a given percentage.
+
+        Note that the sampling is on each chromosome using the given
+        percentage.
 
         Warning: the current object is changed! If a new PETrackI is
         wanted, use sample_percent_copy instead.
@@ -381,8 +486,14 @@ class PETrackI:
         return
 
     @cython.ccall
-    def sample_percent_copy(self, percent: cython.float, seed: cython.int = -1):
-        """Sample the tags for a given percentage. Return a new PETrackI object
+    def sample_percent_copy(self,
+                            percent: cython.float,
+                            seed: cython.int = -1):
+        """Sample the tags for a given percentage. Return a new
+        PETrackI object
+
+        Note that the sampling is on each chromosome using the given
+        percentage.
 
         """
         # num: number of reads allowed on a certain chromosome
@@ -392,7 +503,8 @@ class PETrackI:
         ret_petrackI: PETrackI
         loc: cnp.ndarray
 
-        ret_petrackI = PETrackI(anno=self.annotation, buffer_size=self.buffer_size)
+        ret_petrackI = PETrackI(anno=self.annotation,
+                                buffer_size=self.buffer_size)
         chrnames = self.get_chr_names()
 
         if seed >= 0:
@@ -421,8 +533,13 @@ class PETrackI:
         return ret_petrackI
 
     @cython.ccall
-    def sample_num(self, samplesize: cython.ulong, seed: cython.int = -1):
+    def sample_num(self,
+                   samplesize: cython.ulong,
+                   seed: cython.int = -1):
         """Sample the tags for a given number.
+
+        Note that the sampling is on each chromosome using the the
+        percentage calculated from the given number.
 
         Warning: the current object is changed!
         """
@@ -433,8 +550,13 @@ class PETrackI:
         return
 
     @cython.ccall
-    def sample_num_copy(self, samplesize: cython.ulong, seed: cython.int = -1):
+    def sample_num_copy(self,
+                        samplesize: cython.ulong,
+                        seed: cython.int = -1):
         """Sample the tags for a given number.
+
+        Note that the sampling is on each chromosome using the the
+        percentage calculated from the given number.
 
         Warning: the current object is changed!
         """
@@ -593,7 +715,7 @@ class PETrackI:
 
         This is specifically designed for hmmratac
         HMM_SignalProcessing.py. Not a general function.
-        
+
         The idea is that for each fragment length, we generate four
         bdg using four weights from four distributions. Then we add
         all sets of four bdgs together.
@@ -928,9 +1050,9 @@ class PETrackII:
         ret.is_sorted = self.is_sorted
         ret.rlengths = self.rlengths
         ret.buffer_size = self.buffer_size
-        ret.total = 0
+        # ret.total = 0
         ret.length = 0
-        ret.average_template_length = 0
+        # ret.average_template_length = 0
         ret.is_destroyed = True
 
         for chromosome in sorted(chrs):
@@ -940,11 +1062,12 @@ class PETrackII:
             ret.locations[chromosome] = self.locations[chromosome][indices]
             ret.size[chromosome] = len(ret.locations[chromosome])
             ret.buf_size[chromosome] = ret.size[chromosome]
-            ret.total += np.sum(ret.locations[chromosome]['c'])
+            # ret.total += np.sum(ret.locations[chromosome]['c'])
             ret.length += np.sum((ret.locations[chromosome]['r'] -
                                   ret.locations[chromosome]['l']) *
                                  ret.locations[chromosome]['c'])
-        ret.average_template_length = ret.length / ret.total
+        ret.finalize()
+        # ret.average_template_length = ret.length / ret.total
         return ret
 
     @cython.ccall
@@ -982,3 +1105,101 @@ class PETrackII:
         # bedGraphTrackII needs to be 'finalized'.
         bdg.finalize()
         return bdg
+
+    @cython.boundscheck(False)  # do not check that np indices are valid
+    @cython.ccall
+    def exclude(self, regions):
+        """Exclude reads overlapping with anything in the regions.
+
+        Run it right after you add all data into this object.
+        """
+        i: cython.ulong
+        k: bytes
+        locs: cnp.ndarray
+        locs_size: cython.ulong
+        chrnames: set
+        regions_c: list
+        selected_idx: cnp.ndarray
+        regions_chrs: list
+        r1: cnp.void
+        r2: tuple
+        n_rl1: cython.long
+        n_rl2: cython.long
+
+        if not self.is_sorted:
+            self.sort()
+
+        assert isinstance(regions, Regions)
+        regions.sort()
+        regions_chrs = list(regions.regions.keys())
+
+        chrnames = self.get_chr_names()
+
+        for k in chrnames:      # for each chromosome
+            locs = self.locations[k]
+            locs_size = self.size[k]
+            # let's check if k is in regions_chr
+            if k not in regions_chrs:
+                # do nothing and continue
+                continue
+
+            # discard overlapping reads and make a new locations[k]
+            # initialize boolean array as all TRUE, or all being kept
+            selected_idx = np.ones(locs_size, dtype=bool)
+
+            regions_c = regions.regions[k]
+
+            i = 0
+            n_rl1 = len(locs)
+            n_rl2 = len(regions_c)
+            rl1_k = iter(locs).__next__
+            rl2_k = iter(regions_c).__next__
+            r1 = rl1_k()
+            n_rl1 -= 1          # remaining rl1
+            r2 = rl2_k()
+            n_rl2 -= 1          # remaining rl2
+            while (True):
+                # we do this until there is no r1 or r2 left.
+                if r2[0] < r1[1] and r1[0] < r2[1]:
+                    # since we found an overlap, r1 will be skipped/excluded
+                    # and move to the next r1
+                    # get rid of this one
+                    n_rl1 -= 1
+                    self.length -= (r1[1] - r1[0])*r1[2]
+                    selected_idx[i] = False
+
+                    if n_rl1 >= 0:
+                        r1 = rl1_k()
+                        i += 1
+                        continue
+                    else:
+                        break
+                if r1[1] < r2[1]:
+                    # in this case, we need to move to the next r1,
+                    n_rl1 -= 1
+                    if n_rl1 >= 0:
+                        r1 = rl1_k()
+                        i += 1
+                    else:
+                        # no more r1 left
+                        break
+                else:
+                    # in this case, we need to move the next r2
+                    if n_rl2:
+                        r2 = rl2_k()
+                        n_rl2 -= 1
+                    else:
+                        # no more r2 left
+                        break
+
+            self.locations[k] = locs[selected_idx]
+            self.barcodes[k] = self.barcodes[k][selected_idx]
+            self.size[k] = self.locations[k].shape[0]
+            # free memory?
+            # I know I should shrink it to 0 size directly,
+            # however, on Mac OSX, it seems directly assigning 0
+            # doesn't do a thing.
+            selected_idx.resize(self.buffer_size, refcheck=False)
+            selected_idx.resize(0, refcheck=False)
+        self.finalize()
+        return

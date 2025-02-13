@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# Time-stamp: <2024-10-16 00:13:01 Tao Liu>
+# Time-stamp: <2025-02-12 11:38:00 Tao Liu>
 
 import unittest
 
@@ -50,5 +50,5 @@ class Test_parsing(unittest.TestCase):
         bdg2 = petrack.pileup_bdg2()
         peaks = bdg.call_peaks(cutoff=10, min_length=200, max_gap=100)
         peaks2 = bdg2.call_peaks(cutoff=10, min_length=200, max_gap=100)
-        print(peaks)
-        print(peaks2)
+        # print(peaks)
+        # print(peaks2)
