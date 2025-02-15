@@ -1,7 +1,7 @@
 # cython: language_level=3
 # cython: profile=True
 # cython: linetrace=True
-# Time-stamp: <2024-11-29 23:30:03 Tao Liu>
+# Time-stamp: <2025-02-15 08:24:53 Tao Liu>
 
 """Module for all MACS Parser classes for input. Please note that the
 parsers are for reading the alignment files ONLY.
@@ -249,7 +249,7 @@ class GenericParser:
             self.fhd = io.BufferedReader(gzip.open(filename, mode='rb'),
                                          buffer_size=READ_BUFFER_SIZE)
         else:
-            # binary mode! I don't expect unicode here!            
+            # binary mode! I don't expect unicode here!
             self.fhd = io.open(filename, mode='rb')
         self.skip_first_commentlines()
 
@@ -1529,11 +1529,7 @@ class FragParser(GenericParser):
                             thisline)
 
     @cython.ccall
-    def build_petrack(self):
-        return self.build_petrack2()
-
-    @cython.ccall
-    def build_petrack2(self):
+    def build_petrack(self, max_count=0):
         """Build PETrackII from all lines.
 
         """
@@ -1565,6 +1561,8 @@ class FragParser(GenericParser):
                 i += 1
                 if i % 1000000 == 0:
                     info(" %d fragments parsed" % i)
+                if max_count:
+                    count = min(count, max_count)
                 add_loc(chromosome, left_pos, right_pos, barcode, count)
         # last one
         if tmp:
@@ -1573,6 +1571,8 @@ class FragParser(GenericParser):
                 assert right_pos > left_pos, "Right position must be larger than left position, check your BED file at line: %s" % thisline
                 i += 1
                 m += right_pos - left_pos
+                if max_count:
+                    count = min(count, max_count)                
                 add_loc(chromosome, left_pos, right_pos, barcode, count)
 
         self.d = cython.cast(cython.float, m) / i
@@ -1584,7 +1584,7 @@ class FragParser(GenericParser):
         return petrack
 
     @cython.ccall
-    def append_petrack(self, petrack):
+    def append_petrack(self, petrack, max_count=0):
         """Build PETrackI from all lines, return a PETrackI object.
         """
         chromosome: bytes
@@ -1613,6 +1613,8 @@ class FragParser(GenericParser):
                 i += 1
                 if i % 1000000 == 0:
                     info(" %d fragments parsed" % i)
+                if max_count:
+                    count = min(count, max_count)                    
                 add_loc(chromosome, left_pos, right_pos, barcode, count)
         # last one
         if tmp:
@@ -1621,6 +1623,8 @@ class FragParser(GenericParser):
                 assert right_pos > left_pos, "Right position must be larger than left position, check your BED file at line: %s" % thisline
                 i += 1
                 m += right_pos - left_pos
+                if max_count:
+                    count = min(count, max_count)                
                 add_loc(chromosome, left_pos, right_pos, barcode, count)
 
         self.d = (self.d * self.n + m) / (self.n + i)

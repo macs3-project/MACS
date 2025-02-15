@@ -31,21 +31,37 @@ Here is a brief overview of the command line options for `pileup`:
 - `--outdir`: If specified, all output files will be written to that
   directory. Default: the current working directory 
 - `-f ` or `--format`: Format of the tag file.
-  - `AUTO`: MACS3 will pick a format from "AUTO", "BED", "ELAND",
-    "ELANDMULTI", "ELANDEXPORT", "SAM", "BAM", and "BOWTIE". If the
-    format is BAMPE or BEDPE, please specify it explicitly. 
-  - `BAMPE` or `BEDPE`: When the format is BAMPE or BEDPE, the -B and
-    --extsize options would be ignored. 
-  - Other options correspond to specific formats. 
+  - `AUTO`: MACS3 will pick a format from `AUTO`, `BED`, `ELAND`,
+    `ELANDMULTI`, `ELANDEXPORT`, `SAM`, `BAM`, and `BOWTIE`. If the
+    format is `BAMPE`, `BEDPE` or `FRAG`, please specify it
+    explicitly.
+  - `BAMPE`, `BEDPE` or `FRAG`: When the format is `BAMPE`, `BEDPE` or
+    `FRAG`, the -B and --extsize options would be ignored.
+- `--max-count`: By default, the fragment in fragment file will be
+  counted as many as the count column indicates. For example, it will
+  be counted twice if the count is 2. If this is not what you want,
+  you can specify the `--max-count` option, such as 1, to set a
+  maximum count. Only usable with `-f FRAG`.
+- `--barcodes`: Only usable with `-f FRAG`. This option can be used to
+  pileup fragments only from a subset of barcodes, such as those
+  representing a particular cluster of cells. You can provide a plain
+  text file in which each row represents a unique barcode such as:
+	
+  ```
+  AAACGAAAGACTCGGA
+  AAACGAAAGTTTCGGA
+  ...
+  ```
 - `-B` or `--both-direction`: By default, any read will be extended
   towards the downstream direction by the extension size. If this
   option is set, aligned reads will be extended in both upstream and
   downstream directions by the extension size. This option will be
-  ignored when the format is set as BAMPE or BEDPE. DEFAULT: False 
+  ignored when the format is set as `BAMPE`, `BEDPE` or
+  `FRAG`. DEFAULT: False
 - `--extsize`: The extension size in bps. Each alignment read will
   become an EXTSIZE of the fragment, then be piled up. Check
-  description for -B for details. This option will be ignored when the
-  format is set as BAMPE or BEDPE. DEFAULT: 200 
+  description for `-B` for details. This option will be ignored when the
+  format is set as `BAMPE`, `BEDPE` or `FRAG`. DEFAULT: 200 
 - `--buffer-size`: Buffer size for incrementally increasing the
   internal array size to store read alignment information. In most
   cases, you don't have to change this parameter. However, if there

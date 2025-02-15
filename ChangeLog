@@ -1,17 +1,24 @@
-2025-02-12  Tao Liu  <vladimir.liu@gmail.com>
+2025-02-14  Tao Liu  <vladimir.liu@gmail.com>
 	MACS 3.0.3
 
 	* Features added
 
-	1) We implemented the IO module for reading the fragment files
-	usually used in single-cell ATAC-seq experiment
-	`Parser.FragParser`. And we implemented a new
+	1) FRAG format introduced. FRAG format is for fragment files
+	defined by 10x genomics to store the alignments from single-cell
+	ATAC-seq experiment. It can be regarded as the BEDPE format with
+	two extra columns -- the barcode information and the counts of the
+	fragments aligned to the same location with the same
+	barcode. Currently, `callpeak` and `pileup` both support the new
+	format. We will add support for other functions such as `hmmratac`
+	in the future.
+
+	We implemented the IO module for reading the fragment files in
+	`Parser.FragParser`. And we then implemented a new
 	`PairedEndTrack.PETrackII` to store the data in fragment file,
 	including the barcodes and counts information. In the `PETrackII`
 	class, we are able to extract a subset using a list of barcodes,
 	which enables us to call peaks only on a pool (pseudo-bulk) of
-	cells. Functions such as `callpeak`, `pileup` and `hmmratac` will
-	support this FRAG format in the future.
+	cells.
 
 	2) We extensively rewrote the `pyx` codes into `py` codes. In
 	another words, we now apply the 'pure python style' with PEP-484

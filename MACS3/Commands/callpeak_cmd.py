@@ -1,4 +1,4 @@
-# Time-stamp: <2024-11-29 21:43:31 Tao Liu>
+# Time-stamp: <2025-02-15 14:31:26 Tao Liu>
 
 """Description: MACS 3 call peak main executable
 
@@ -81,6 +81,19 @@ def run(args):
     t0 = treat.total
     tagsinfo += "# total %ss in treatment: %d\n" % (tag, t0)
     info("#1  total %ss in treatment: %d", tag, t0)
+
+    # subset of fragments for FRAG format and given barcodes
+    if options.format == "FRAG" and options.barcodefile:
+        info("#1 extract fragments with given barcodes")
+        barcodes_set = set()
+        with open(options.barcodefile, "r") as bfhd:
+            for l in bfhd:
+                barcodes_set.add(l.rstrip().encode())
+        treat = treat.subset(barcodes_set)
+        info("#   extracted %d fragments in treatment", treat.total)
+        if control is not None:
+            control = control.subset(barcodes_set)
+            info("#   extracted %d fragments in control", treat.total)
 
     # handle duplicates
     if options.keepduplicates != "all":
@@ -332,30 +345,41 @@ def load_frag_files_options(options):
     options.info("#1 read treatment fragments...")
 
     tp = options.parser(options.tfile[0], buffer_size=options.buffer_size)
-    treat = tp.build_petrack()
+    if options.format == "FRAG" and options.maxcount:
+        treat = tp.build_petrack(max_count=options.maxcount)
+    else:
+        treat = tp.build_petrack()
     if len(options.tfile) > 1:
         # multiple input
         for tfile in options.tfile[1:]:
             tp = options.parser(tfile, buffer_size=options.buffer_size)
-            treat = tp.append_petrack(treat)
+            if options.format == "FRAG" and options.maxcount:
+                treat = tp.append_petrack(treat, max_count=options.maxcount)
+            else:
+                treat = tp.append_petrack(treat)
     treat.finalize()
 
     options.tsize = tp.d
     if options.cfile:
         options.info("#1.2 read input fragments...")
         cp = options.parser(options.cfile[0], buffer_size=options.buffer_size)
-        control = cp.build_petrack()
+        if options.format == "FRAG" and options.maxcount:
+            control = cp.build_petrack(max_count=options.maxcount)
+        else:
+            control = cp.build_petrack()
         control_d = cp.d
         if len(options.cfile) > 1:
             # multiple input
             for cfile in options.cfile[1:]:
                 cp = options.parser(cfile, buffer_size=options.buffer_size)
-                control = cp.append_petrack(control)
+                if options.format == "FRAG" and options.maxcount:
+                    control = cp.append_petrack(control, max_count=options.maxcount)
+                else:
+                    control = cp.append_petrack(control)
         control.finalize()
     else:
         control = None
     options.info("#1 mean fragment size is determined as %.1f bp from treatment" % options.tsize)
-    # options.info("#1 fragment size variance is determined as %d bp from treatment" % tp.variance)
     if control is not None:
         options.info("#1 note: mean fragment size in control is %.1f bp -- value ignored" % control_d)
     return (treat, control)

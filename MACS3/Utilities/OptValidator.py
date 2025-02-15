@@ -1,4 +1,4 @@
-# Time-stamp: <2025-02-12 14:12:21 Tao Liu>
+# Time-stamp: <2025-02-15 14:28:29 Tao Liu>
 """Module Description
 
 This code is free software; you can redistribute it and/or modify it
@@ -89,7 +89,11 @@ def opt_validate_callpeak(options):
         options.nomodel = True
     elif options.format == "FRAG":
         options.parser = FragParser
-        options.nomodel = True        
+        options.nomodel = True
+        if options.maxcount:
+            if options.maxcount < 0:
+                logger.error("--max-count can't be a negative value")
+                sys.exit(1)
     elif options.format == "AUTO":
         options.parser = guess_parser
     else:
@@ -182,6 +186,8 @@ def opt_validate_callpeak(options):
         "# model fold = %s\n" % (options.mfold),
        ))
 
+    if options.format == "FRAG" and options.maxcount:
+        options.argtxt += "# Maximum count in fragment file is set as %d\n" % (options.maxcount)
     if options.pvalue:
         if options.broad:
             options.argtxt += "# pvalue cutoff for narrow/strong regions = %.2e\n" % (options.pvalue)
@@ -540,6 +546,10 @@ def opt_validate_pileup(options):
         options.parser = BEDPEParser
     elif options.format == "FRAG":
         options.parser = FragParser
+        if options.maxcount:
+            if options.maxcount < 0:
+                logger.error("--max-count can't be a negative value")
+                sys.exit(1)
     else:
         logger.error("Format \"%s\" cannot be recognized!" % (options.format))
         sys.exit(1)

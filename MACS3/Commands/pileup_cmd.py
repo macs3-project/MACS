@@ -4,7 +4,7 @@ This code is free software; you can redistribute it and/or modify it
 under the terms of the BSD License (see the file LICENSE included with
 the distribution).
 """
-# Time-stamp: <2025-02-05 12:39:14 Tao Liu>
+# Time-stamp: <2025-02-15 14:33:43 Tao Liu>
 
 # ------------------------------------
 # python modules
@@ -52,6 +52,17 @@ def run(o_options):
         treat = load_frag_files_options(options)  # return PETrackI object
         t0 = treat.total                          # total fragments
         info("# total fragments/pairs in alignment file: %d" % (t0))
+
+        # subset of fragments for FRAG format and given barcodes
+        if options.format == "FRAG" and options.barcodefile:
+            info("# extract fragments with given barcodes")
+            barcodes_set = set()
+            with open(options.barcodefile, "r") as bfhd:
+                for l in bfhd:
+                    barcodes_set.add(l.rstrip().encode())
+            treat = treat.subset(barcodes_set)
+            info("#   extracted %d fragments", treat.total)
+            
         info("# Pileup paired-end alignment file.")
         bdg = treat.pileup_bdg()
         bdgio = bedGraphIO(outfile, data=bdg)
@@ -78,7 +89,7 @@ def load_tag_files_options(options):
     """From the options, load alignment tags.
 
     """
-    options.info("# read treatment tags...")
+    options.info("# read tags...")
     tp = options.parser(options.ifile[0], buffer_size=options.buffer_size)
     tsize = tp.tsize()
     treat = tp.build_fwtrack()
@@ -99,16 +110,22 @@ def load_frag_files_options(options):
     """From the options, load treatment fragments and control fragments (if available).
 
     """
-    options.info("# read treatment fragments...")
+    options.info("# read fragments...")
 
     tp = options.parser(options.ifile[0], buffer_size=options.buffer_size)
-    treat = tp.build_petrack()
+    if options.format == "FRAG" and options.maxcount:
+        treat = tp.build_petrack(max_count=options.maxcount)
+    else:
+        treat = tp.build_petrack()
     # treat.sort()
     if len(options.ifile) > 1:
         # multiple input
         for tfile in options.ifile[1:]:
             tp = options.parser(tfile, buffer_size=options.buffer_size)
-            treat = tp.append_petrack(treat)
+            if options.format == "FRAG" and options.maxcount:
+                treat = tp.append_petrack(treat, max_count=options.maxcount)
+            else:
+                treat = tp.append_petrack(treat)
             # treat.sort()
     treat.finalize()
     return treat

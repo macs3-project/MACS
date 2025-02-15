@@ -35,20 +35,20 @@ the essentials.
 - `-f`/`--format FORMAT`
 
   Format of tag file can be `ELAND`, `BED`, `ELANDMULTI`,
-  `ELANDEXPORT`, `SAM`, `BAM`, `BOWTIE`, `BAMPE`, or `BEDPE`. Default
-  is `AUTO` which will allow MACS3 to decide the format
-  automatically. `AUTO` is also useful when you combine different
-  formats of files. Note that MACS3 can't detect `BAMPE` or `BEDPE`
-  format with `AUTO`, and you have to implicitly specify the format
-  for `BAMPE` and `BEDPE`.
+  `ELANDEXPORT`, `SAM`, `BAM`, `BOWTIE`, `BAMPE`, `BEDPE`, or
+  `FRAG`. Default is `AUTO` which will allow MACS3 to decide the
+  format automatically. `AUTO` is also useful when you combine
+  different formats of files. Note that MACS3 can't detect `BAMPE`,
+  `BEDPE` or `FRAG` format with `AUTO`, and you have to implicitly
+  specify the format for `BAMPE`, `BEDPE` or `FRAG`.
 
   Nowadays, the most common formats are `BED` or `BAM` (including
   `BEDPE` and `BAMPE`). Our recommendation is to convert your data to
   `BED` or `BAM` first.
 
-  Also, MACS3 can detect and read gzipped file. For example, `.bed.gz`
-  file can be directly used without being uncompressed with `--format
-  BED`.
+  Also, MACS3 can detect and read gzipped file for most of the plain
+  text format. For example, `.bed.gz` file can be directly used
+  without being uncompressed with `--format BED`.
 
   Here are detailed explanation of the recommended formats:
 
@@ -106,7 +106,53 @@ the essentials.
 	```
     macs3 filterdup -i the_BAMPE_file.bam -f BAMPE --keep-dup all -o the_BEDPE_file.bed
     ```
-	  
+	 
+  - `FRAG`
+  
+    This is an format for the fragment files defined by 10x genomics
+	to store the alignments from single-cell ATAC-seq experiment. It
+	can be regarded as the `BEDPE` format with two extra columns --
+	the barcode information and the counts of the fragments aligned to
+	the same location with the same barcode. It is usually generated
+	by the `cellranger-atac` or `cellranger-arc` pipeline. But this is
+	a fairly straightforward format so one can easily convert other
+	alignment results into this format. An example of the fragment
+	file is like:
+	
+	```
+	chr22   10768839        10769063        AAACGAAAGACTCGGA     2
+    chr22   11333072        11333249        AAACGAAAGACTCGGA     1
+    chr22   11363891        11364010        AAACGAAAGACTCGGA     1
+	...
+	```
+	
+	When `-f FRAG` is used, MACS3 will use the `FragParser` to read
+    this file, keeping the barcode and count information. Also, when
+    `FRAG` is used, MACS3 will enter Pair-end mode and will NOT remove
+    any duplicates. By default, in the above example, the fragment on
+    chr22 from 10768839 to 10769063 of barcode `AAACGAAAGACTCGGA` will
+    be counted twice -- be regarded as two fragments in the same
+    location. If this is not what you want, you can specify the
+    `--max-count` option, such as 1, to set a maximum count.
+	
+	Another feature when `-f FRAG` is used is to call peak on a subset
+    of barcodes, such as those representing a particular cluster of
+    cells. You can provide a plain text file in which each row
+    represents a unique barcode such as:
+	
+	```
+	AAACGAAAGACTCGGA
+	AAACGAAAGTTTCGGA
+	...
+	```
+	
+    Use `--barcodes the_barcode_list.txt` with `-f FRAG`. MACS3 will
+    call peaks based on only the fragments for specified barcodes.
+
+- `--max-count` and `--barcodes`
+
+  Only available when `-f FRAG` is used. Please read the description
+  above in the `FRAG` format section.
 
 - `--outdir`
 
@@ -274,7 +320,8 @@ the essentials.
   based on binomial distribution using 1e-5 as p-value cutoff; and the
   `all` option keeps every tag.  If an integer is given, at most this
   number of tags will be kept at the same location. The default is to
-  keep one tag at the same location. Default: 1
+  keep one tag at the same location. This option will be ignored when
+  format is `FRAG`. Default: 1
 
 - `--broad`
   

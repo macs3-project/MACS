@@ -10,6 +10,7 @@ callpeakxls.md
 SAMBAMBAMPE.md
 BED.md
 BEDPE.md
+FRAG.md
 bedGraph.md
 narrowPeak.md
 broadPeak.md

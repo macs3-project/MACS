@@ -1,7 +1,7 @@
 # cython: language_level=3
 # cython: profile=True
 # cython: linetrace=True
-# Time-stamp: <2025-02-05 12:40:36 Tao Liu>
+# Time-stamp: <2025-02-14 12:08:53 Tao Liu>
 
 """Module for Calculate Scores.
 
@@ -622,9 +622,9 @@ class CallerFromAlignments:
 
         return [p, t, c] list, each element is a numpy array.
         """
-        index_ret: cython.long
-        it: cython.long
-        ic: cython.long
+        ir: cython.long         # index of ret_p/t/c
+        it: cython.long         # index of t_p/v
+        ic: cython.long         # index of c_p/v
         lt: cython.long
         lc: cython.long
         t_p: cnp.ndarray
@@ -634,13 +634,6 @@ class CallerFromAlignments:
         c_v: cnp.ndarray
         ret_t: cnp.ndarray
         ret_c: cnp.ndarray
-        t_p_view: cython.pointer(cython.int)
-        c_p_view: cython.pointer(cython.int)
-        ret_p_view: cython.pointer(cython.int)
-        t_v_view: cython.pointer(cython.float)
-        c_v_view: cython.pointer(cython.float)
-        ret_t_view: cython.pointer(cython.float)
-        ret_c_view: cython.pointer(cython.float)
 
         [t_p, t_v] = treat_pv
         [c_p, c_v] = ctrl_pv
@@ -654,73 +647,40 @@ class CallerFromAlignments:
         ret_t = np.zeros(chrom_max_len, dtype="f4")  # value from treatment
         ret_c = np.zeros(chrom_max_len, dtype="f4")  # value from control
 
-        # t_p_view = t_p #cython.cast(cython.pointer[cython.int], t_p.data)
-        # t_v_view = t_v #cython.cast(cython.pointer[cython.float], t_v.data)
-        # c_p_view = c_p #cython.cast(cython.pointer[cython.int], c_p.data)
-        # c_v_view = c_v #cython.cast(cython.pointer[cython.float], c_v.data)
-        # ret_p_view = ret_p #cython.cast(cython.pointer[cython.int], ret_p.data)
-        # ret_t_view = ret_t #cython.cast(cython.pointer[cython.float], ret_t.data)
-        # ret_c_view = ret_c #cython.cast(cython.pointer[cython.float], ret_c.data)
-
-        t_p_view = cython.cast(cython.pointer(cython.int), t_p.data)
-        t_v_view = cython.cast(cython.pointer(cython.float), t_v.data)
-        c_p_view = cython.cast(cython.pointer(cython.int), c_p.data)
-        c_v_view = cython.cast(cython.pointer(cython.float), c_v.data)
-        ret_p_view = cython.cast(cython.pointer(cython.int), ret_p.data)
-        ret_t_view = cython.cast(cython.pointer(cython.float), ret_t.data)
-        ret_c_view = cython.cast(cython.pointer(cython.float), ret_c.data)
-
-        index_ret = 0
+        ir = 0
         it = 0
         ic = 0
 
         while it < lt and ic < lc:
-            if t_p_view[0] < c_p_view[0]:
+            if t_p[it] < c_p[ic]:
                 # clip a region from pre_p to p1, then pre_p: set as p1.
-                ret_p_view[0] = t_p_view[0]
-                ret_t_view[0] = t_v_view[0]
-                ret_c_view[0] = c_v_view[0]
-                ret_p_view += 1
-                ret_t_view += 1
-                ret_c_view += 1
-                index_ret += 1
+                ret_p[ir] = t_p[it]
+                ret_t[ir] = t_v[it]
+                ret_c[ir] = c_v[ic]
+                ir += 1
                 # call for the next p1 and v1
                 it += 1
-                t_p_view += 1
-                t_v_view += 1
-            elif t_p_view[0] > c_p_view[0]:
+            elif t_p[it] > c_p[ic]:
                 # clip a region from pre_p to p2, then pre_p: set as p2.
-                ret_p_view[0] = c_p_view[0]
-                ret_t_view[0] = t_v_view[0]
-                ret_c_view[0] = c_v_view[0]
-                ret_p_view += 1
-                ret_t_view += 1
-                ret_c_view += 1
-                index_ret += 1
+                ret_p[ir] = c_p[ic]
+                ret_t[ir] = t_v[it]
+                ret_c[ir] = c_v[ic]
+                ir += 1
                 # call for the next p2 and v2
                 ic += 1
-                c_p_view += 1
-                c_v_view += 1
             else:
                 # from pre_p to p1 or p2, then pre_p: set as p1 or p2.
-                ret_p_view[0] = t_p_view[0]
-                ret_t_view[0] = t_v_view[0]
-                ret_c_view[0] = c_v_view[0]
-                ret_p_view += 1
-                ret_t_view += 1
-                ret_c_view += 1
-                index_ret += 1
+                ret_p[ir] = t_p[it]
+                ret_t[ir] = t_v[it]
+                ret_c[ir] = c_v[ic]
+                ir += 1
                 # call for the next p1, v1, p2, v2.
                 it += 1
                 ic += 1
-                t_p_view += 1
-                t_v_view += 1
-                c_p_view += 1
-                c_v_view += 1
 
-        ret_p.resize(index_ret, refcheck=False)
-        ret_t.resize(index_ret, refcheck=False)
-        ret_c.resize(index_ret, refcheck=False)
+        ret_p.resize(ir, refcheck=False)
+        ret_t.resize(ir, refcheck=False)
+        ret_c.resize(ir, refcheck=False)
         return [ret_p, ret_t, ret_c]
 
     @cython.cfunc
