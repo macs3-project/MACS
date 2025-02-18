@@ -1,79 +1,91 @@
 # MACS: Model-based Analysis for ChIP-Seq
 
-![Status](https://img.shields.io/pypi/status/macs3.svg) ![License](https://img.shields.io/github/license/macs3-project/MACS) ![Programming languages](https://img.shields.io/github/languages/top/macs3-project/MACS) ![CI x64](https://github.com/macs3-project/MACS/workflows/MACS3%20CI%20x64/badge.svg?branch=master) ![CI non x64](https://github.com/macs3-project/MACS/workflows/MACS3%20CI%20non%20x64/badge.svg?branch=master) ![CI Mac OS](https://github.com/macs3-project/MACS/actions/workflows/build-and-test-MACS3-macos.yml/badge.svg?branch=master)
-
-[![PyPI
-download](https://img.shields.io/pypi/dm/macs3?label=pypi%20downloads)](https://pypistats.org/packages/macs3)
+![Status](https://img.shields.io/pypi/status/macs3.svg) ![License](https://img.shields.io/github/license/macs3-project/MACS) ![Programming languages](https://img.shields.io/github/languages/top/macs3-project/MACS) [![CI x64](https://github.com/macs3-project/MACS/actions/workflows/build-and-test-MACS3-x64.yml/badge.svg)](https://github.com/macs3-project/MACS/actions/workflows/build-and-test-MACS3-x64.yml) [![CI non x64](https://github.com/macs3-project/MACS/actions/workflows/build-and-test-MACS3-non-x64.yml/badge.svg)](https://github.com/macs3-project/MACS/actions/workflows/build-and-test-MACS3-non-x64.yml) [![CI Mac OS](https://github.com/macs3-project/MACS/actions/workflows/build-and-test-MACS3-macos.yml/badge.svg)](https://github.com/macs3-project/MACS/actions/workflows/build-and-test-MACS3-macos.yml) [![PyPI download](https://img.shields.io/pypi/dm/macs3?label=pypi%20downloads)](https://pypistats.org/packages/macs3)
 
 Latest Release:
 * Github: [![Github Release](https://img.shields.io/github/v/release/macs3-project/MACS)](https://github.com/macs3-project/MACS/releases)
 * PyPI: [![PyPI Release](https://img.shields.io/pypi/v/macs3.svg)](https://pypi.org/project/MACS3/)
 * Bioconda:[![Bioconda Badge](https://anaconda.org/bioconda/macs3/badges/version.svg)](https://anaconda.org/bioconda/macs3)
-* Debian Med: [![Debian Stable](https://img.shields.io/debian/v/macs/stable?label=debian%20stable)](https://packages.debian.org/stable/macs)[![Debian Unstable](https://img.shields.io/debian/v/macs/sid?label=debian%20sid)](https://packages.debian.org/sid/macs)
+* Debian Med: [![Debian Stable](https://img.shields.io/debian/v/macs/stable?label=debian%20stable)](https://packages.debian.org/stable/macs)[![Debian Unstable](https://img.shields.io/debian/v/macs/sid?label=debian%20sid)](https://packages.debian.org/sid/macs3)
 
 ## Introduction
 
-With the improvement of sequencing techniques, chromatin
-immunoprecipitation followed by high throughput sequencing (ChIP-Seq)
-is getting popular to study genome-wide protein-DNA interactions. To
-address the lack of powerful ChIP-Seq analysis method, we presented
-the **M**odel-based **A**nalysis of **C**hIP-**S**eq (MACS), for
-identifying transcript factor binding sites. MACS captures the
-influence of genome complexity to evaluate the significance of
-enriched ChIP regions and MACS improves the spatial resolution of
-binding sites through combining the information of both sequencing tag
-position and orientation. MACS can be easily used for ChIP-Seq data
-alone, or with a control sample with the increase of
-specificity. Moreover, as a general peak-caller, MACS can also be
-applied to any "DNA enrichment assays" if the question to be asked is
-simply: *where we can find significant reads coverage than the random
-background*.
+With the advancement of sequencing technologies, Chromatin
+Immunoprecipitation followed by high-throughput sequencing (ChIP-Seq)
+has become a popular method for studying genome-wide protein-DNA
+interactions. With the purpose of addressing the need for a robust
+ChIP-Seq analysis tool, we introduce **M**odel-based **A**nalysis of
+**C**hIP-**S**eq (MACS), a powerful tool for identifying transcription
+factor binding sites. MACS accounts for the complexity of the genome
+to assess the significance of enriched ChIP regions and enhances the
+spatial resolution of binding sites by integrating both sequencing tag
+position and orientation. MACS can be readily applied to ChIP-Seq data
+alone, or in conjunction with a control sample, thus enhancing
+specificity. Furthermore, as a versatile peak-caller, MACS can be
+employed in any "DNA enrichment assay" to answer the fundamental
+question: *Where are the regions with significant read coverage
+compared to random background?*
 
-## Changes for MACS (3.0.2) 
+## Changes for MACS (3.0.3) 
 
 ### Features added
 
-1) Introduce a new emission model for the `hmmratac` function. Now
-	users can choose the simpler Poisson emission `--hmm-type poisson`
-	instead of the default Gaussian emission. As a consequence, the
-	saved HMM model file in json will include the hmm-type information
-	as well. Note that in order to be compatible with the HMM model
-	file from previous version, if there is no hmm-type information in
-	the model file, the hmm-type will be assigned as gaussian. #635
+1) Now support FRAG format for single-cell ATAC-seq in `callpeak` and
+`pileup`. FRAG format is used by 10x Genomics to store alignments from
+the single-cell ATAC-seq pipeline `cellranger-atac` or the multi-omics
+pipeline `cellranger-arc`. The format is essentially BEDPE with two
+additional columns: the barcode and the count of fragments aligned to
+the same location with the same barcode. Support for FRAG in other
+tools is coming soon, as well as for `hmmratac` calls.
 
-2) `hmmratac` now output narrowPeak format output. The summit
-	position and the peak score columns reported in the narrowPeak
-	output represents the position with highest foldchange value
-	(pileup vs average background).
+If you specify FRAG as your input format:
 
-3) Add `--cutoff-analysis-steps` and `--cutoff-analysis-max` for
-	`callpeak`, `bdgpeakcall`, and `hmmratac` so that we can
-	have finer resolution of the cutoff analysis report. #636  #642
+ - Use a barcode list for a subset of cells and `callpeak` will
+   identify peaks using these fragments.
+ - Duplicates will not get removed as we'll assume all fragments are
+   valid. Optionally, an option can be applied to set the maximum
+   count.
 
-4) Reduce memory usage of `hmmratac` during decoding step, by
-	writing decoding results to a temporary file on disk (file
-	location depends on the environmental TEMP setting), then loading
-	it back while identifying state pathes. This change will decrease
-	the memory usage dramatically. #628 #640
+2) We transitioned our `pyx` codes to `py` codes, adopting a 'pure
+Python style' with PEP-484 type annotations. This change has made our
+source codes more compatible with Python programming tools such as
+`flake8`. During this process, we performed further code cleaning and
+eliminated unnecessary dependencies. We intend to continue improving
+our code quality in the future.
 
-5) Fix instructions for preparing narrowPeak files for uploading
-	to UCSC browser, with the `--trackline` option in `callpeak`. #653
+3) We have modified the handling of 'blacklist' regions in the
+`hmmratac` tool. This change impacts both the Expectation-Maximization
+(EM) step that estimates fragment length distributions, and the Hidden
+Markov Model (HMM) step that learns and predicts nucleosome states. We
+now exclude aligned fragments located in the 'blocklist' regions
+before both steps. We implemented the `exclude` functions in both
+PETrackI and PETrackII to support this feature. For more detailed
+information and the reasoning behind it, refer to issue #680.
 
-6) For gappedPeak output, set thickStart and thickEnd columns as
-	0, according to UCSC definition.
+### Bug fixed
 
-### Bugs fixed
+1) The `hmmratagc` option `--keep-duplicate` previously had the
+opposite effect of what its name and description suggested. Therefore,
+it was renamed to `--remove-dup` to more accurately describe the
+actual behavior. Duplicate fragments will not be removed by `hmmratac`
+unless this option is explicitly set up.
 
-1) Use `-O3` instead of `-Ofast` for compatibility. #637
+2) `hmmratac`: wrong class name was used while saving digested signals
+in BedGraph files. Fixed multiple other issues related to output
+filenames. #682
 
-### Documentation
+3) Fix issues in big-endian system in `Parser.py` codes. Enable
+big-endian support in `BAM.py` codes for accessig certain alignment
+records that overlap with given genomic coordinates using BAM/BAI
+files.
 
-1) Update instruction to install macs3 through conda/bioconda
+4) `predictd` and `filterdup`: wrong variable name used while
+reading multiple pe/frag files.
 
-2) Reorganize MACS3 docs and publish through
-	https://macs3-project.github.io/MACS
+### Doc
 
-3) Description on various file formats used in MACS3.
+1) Explanation on the filtering criteria on SAM/BAM/BAMPE files.
+
 	
 ## Install
 
@@ -85,12 +97,12 @@ The common way to install MACS is through
 MACS3 has been tested using GitHub Actions for every push and PR in
 the following architectures:
 
- * x86_64 (Ubuntu 22, Python 3.9, 3.10, 3.11)
+ * x86_64 (Ubuntu 22, Python 3.9, 3.10, 3.11, 3.12, 3.13)
  * aarch64 (Ubuntu 22, Python 3.10)
  * armv7 (Ubuntu 22, Python 3.10)
  * ppc64le (Ubuntu 22, Python 3.10)
  * s390x (Ubuntu 22, Python 3.10)
- * Apple chips (Mac OS 13, Python 3.11)
+ * Apple chips (Mac OS 13, Python 3.9, 3.10, 3.11, 3.12, 3.13)
 
 In general, you can install through PyPI as `pip install macs3`.  To
 use virtual environment is highly recommended. Or you can install
@@ -117,6 +129,10 @@ Example for broad peak calling on Histone Mark ChIP-seq:
 Example for peak calling on ATAC-seq (paired-end mode):
 
 `macs3 callpeak -f BAMPE -t ATAC.bam -g hs -n test -B -q 0.01`
+
+Example for peak calling on ATAC-seq with HMMATAC:
+
+`macs3 hmmratac -i ATAC.bam -f BAMPE -n test`
 
 There are currently 14 functions available in MACS3 serving as
 sub-commands. Please click on the link to see the detail description

@@ -1,6 +1,6 @@
 # cython: language_level=3
 # cython: profile=True
-# Time-stamp: <2025-02-05 12:41:01 Tao Liu>
+# Time-stamp: <2025-02-12 18:14:41 Tao Liu>
 
 """Module Description: For pileup functions.
 
@@ -415,7 +415,7 @@ def quick_pileup(start_poss: cnp.ndarray,
     values.
 
     It will return a pileup result in similar structure as
-    bedGraph. There are two python arrays:
+    bedGraph. There are two numpy arrays:
 
     [end positions, values] or [p,v]
 

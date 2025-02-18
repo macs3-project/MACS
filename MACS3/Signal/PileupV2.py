@@ -1,6 +1,6 @@
 # cython: language_level=3
 # cython: profile=True
-# Time-stamp: <2025-02-05 11:55:08 Tao Liu>
+# Time-stamp: <2025-02-14 11:56:44 Tao Liu>
 
 """Module Description:
 
@@ -84,7 +84,7 @@ def make_PV_from_LR(LR_array: cnp.ndarray,
     [('l','i4'),('r','i4')] with length of N
 
     PV array is an np.ndarray with
-    dtype=[('p','u4'),('v','f4')] with length of 2N
+    dtype=[('p','i4'),('v','f4')] with length of 2N
     """
     l_LR: cython.ulong
     l_PV: cython.ulong
@@ -95,7 +95,7 @@ def make_PV_from_LR(LR_array: cnp.ndarray,
 
     l_LR = LR_array.shape[0]
     l_PV = 2 * l_LR
-    PV = np.zeros(shape=l_PV, dtype=[('p', 'u4'), ('v', 'f4')])
+    PV = np.zeros(shape=l_PV, dtype=[('p', 'i4'), ('v', 'f4')])
     for i in range(l_LR):
         (L, R) = LR_array[i]
         PV[i*2] = (L, mapping_func(L, R))
@@ -115,7 +115,7 @@ def make_PV_from_LRC(LRC_array: cnp.ndarray,
     [('l','i4'),('r','i4'),('c','u1')] with length of N
 
     PV array is an np.ndarray with
-    dtype=[('p','u4'),('v','f4')] with length of 2N
+    dtype=[('p','i4'),('v','f4')] with length of 2N
     """
     l_LRC: cython.ulong
     l_PV: cython.ulong
@@ -127,7 +127,7 @@ def make_PV_from_LRC(LRC_array: cnp.ndarray,
 
     l_LRC = LRC_array.shape[0]
     l_PV = 2 * l_LRC
-    PV = np.zeros(shape=l_PV, dtype=[('p', 'u4'), ('v', 'f4')])
+    PV = np.zeros(shape=l_PV, dtype=[('p', 'i4'), ('v', 'f4')])
     for i in range(l_LRC):
         (L, R, C) = LRC_array[i]
         PV[i*2] = (L, C*mapping_func(L, R))
@@ -148,7 +148,7 @@ def make_PV_from_PN(P_array: cnp.ndarray, N_array: cnp.ndarray,
     P_array or N_array is an np.ndarray with dtype='i4'
 
     PV array is an np.ndarray with
-    dtype=[('p','u4'),('v','f4')] with length of 2N
+    dtype=[('p','i4'),('v','f4')] with length of 2N
     """
     l_PN: cython.ulong
     l_PV: cython.ulong
@@ -160,7 +160,7 @@ def make_PV_from_PN(P_array: cnp.ndarray, N_array: cnp.ndarray,
     l_PN = P_array.shape[0]
     assert l_PN == N_array.shape[0]
     l_PV = 4 * l_PN
-    PV = np.zeros(shape=l_PV, dtype=[('p', 'u4'), ('v', 'f4')])
+    PV = np.zeros(shape=l_PV, dtype=[('p', 'i4'), ('v', 'f4')])
     for i in range(l_PN):
         L = P_array[i]
         R = L + extsize
@@ -190,19 +190,20 @@ def pileup_PV(PV_array: cnp.ndarray) -> cnp.ndarray:
         s = e
     """
     z: cython.float
+    e: cython.int
+    s: cython.int
+    c: cython.int
     v: cython.float
-    pre_z: cython.float
-    s: cython.ulong
-    e: cython.ulong
     i: cython.ulong
-    c: cython.ulong
+    pre_z: cython.float
+
     # this is in bedGraph style as in Pileup.pyx, p is the end of a
     # region, and v is the pileup value.
     pileup_PV: cnp.ndarray
     z = 0
     pre_z = -10000
     s = 0
-    pileup_PV = np.zeros(shape=PV_array.shape[0], dtype=[('p', 'u4'),
+    pileup_PV = np.zeros(shape=PV_array.shape[0], dtype=[('p', 'i4'),
                                                          ('v', 'f4')])
     c = 0
     for i in range(PV_array.shape[0]):
@@ -247,7 +248,7 @@ def pileup_from_LR_hmmratac(LR_array: cnp.ndarray,
 
     l_LR = LR_array.shape[0]
     l_PV = 2 * l_LR
-    PV = np.zeros(shape=l_PV, dtype=[('p', 'u4'), ('v', 'f4')])
+    PV = np.zeros(shape=l_PV, dtype=[('p', 'i4'), ('v', 'f4')])
     for i in range(l_LR):
         (L, R) = LR_array[i]
         PV[i*2] = (L, mapping_dict[R - L])

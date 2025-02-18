@@ -1,6 +1,6 @@
 # cython: language_level=3
 # cython: profile=True
-# Time-stamp: <2025-02-12 13:03:49 Tao Liu>
+# Time-stamp: <2025-02-15 08:49:30 Tao Liu>
 
 """Module for filter duplicate tags from paired-end data
 
@@ -613,7 +613,6 @@ class PETrackI:
         tmp_pileup = quick_pileup(np.sort(self.locations[chrom]['l']),
                                   np.sort(self.locations[chrom]['r']),
                                   scale_factor, baseline_value)
-
         return tmp_pileup
 
     @cython.ccall
@@ -674,6 +673,10 @@ class PETrackI:
                                                 func="max")
             else:
                 prev_pileup = tmp_pileup
+
+        with open("tmp_b_c.txt", "w") as f:
+            for i in range(len(prev_pileup[0])):
+                f.write(f"{prev_pileup[0][i]}\t{prev_pileup[1][i]}\n")
 
         return prev_pileup
 
@@ -928,6 +931,8 @@ class PETrackII:
             self.barcodes[c] = self.barcodes[c][indices]
             self.total += np.sum(self.locations[c]['c'])  # self.size[c]
 
+        assert self.total > 0, "Error: no fragments in PETrackII"
+
         self.is_sorted = True
         self.average_template_length = cython.cast(cython.float,
                                                    self.length) / self.total
@@ -1072,11 +1077,83 @@ class PETrackII:
 
     @cython.ccall
     def pileup_a_chromosome(self,
-                            chrom: bytes) -> cnp.ndarray:
+                            chrom: bytes,
+                            scale_factor: cython.float = 1.0,
+                            baseline_value: cython.float = 0.0) -> list:
         """pileup a certain chromosome, return p-v ndarray (end
         position and pileup value).
         """
-        return pileup_from_LRC(self.locations[chrom])
+        pv: cnp.ndarray
+        v: cnp.ndarray
+
+        pv = pileup_from_LRC(self.locations[chrom])
+        v = pv['v']
+        v = v * scale_factor
+        v[v < baseline_value] = baseline_value
+
+        return [pv['p'], v]
+
+    @cython.ccall
+    def pileup_a_chromosome_c(self,
+                              chrom: bytes,
+                              ds: list,
+                              scale_factor_s: list,
+                              baseline_value: cython.float = 0.0) -> list:
+        """We will mimic the PETrackI way to pileup PE data as SE to
+        build the control signal track.
+
+        """
+        prev_pileup: list
+        scale_factor: cython.float
+        d: cython.long
+        five_shift: cython.long
+
+        pv: cnp.ndarray
+        v: cnp.ndarray
+        tmp_arr_l: cnp.ndarray
+        tmp_arr_r: cnp.ndarray
+        tmp_arr: cnp.ndarray
+
+        ####
+        if not self.is_sorted:
+            self.sort()
+
+        assert len(ds) == len(scale_factor_s), "ds and scale_factor_s must have the same length!"
+
+        prev_pileup = None
+
+        for i in range(len(scale_factor_s)):
+            d = ds[i]
+            scale_factor = scale_factor_s[i]
+            five_shift = d//2
+
+            # note, we have to pileup left ends and right ends separately
+            tmp_arr_l = self.locations[chrom].copy()
+            tmp_arr_l['l'] = tmp_arr_l['l'] - five_shift
+            tmp_arr_l['r'] = tmp_arr_l['l'] + d
+
+            tmp_arr_r = self.locations[chrom].copy()
+            tmp_arr_r['l'] = tmp_arr_r['r'] - five_shift
+            tmp_arr_r['r'] = tmp_arr_r['l'] + d
+
+            tmp_arr = np.concatenate([tmp_arr_l, tmp_arr_r])
+            del tmp_arr_l
+            del tmp_arr_r
+
+            pv = pileup_from_LRC(tmp_arr)
+
+            v = pv['v']
+            v = v * scale_factor
+            v[v < baseline_value] = baseline_value
+
+            if prev_pileup:
+                prev_pileup = over_two_pv_array(prev_pileup,
+                                                [pv['p'], v],
+                                                func="max")
+            else:
+                prev_pileup = [pv['p'], v]
+
+        return prev_pileup
 
     @cython.ccall
     def pileup_bdg(self):

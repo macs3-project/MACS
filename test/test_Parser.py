@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# Time-stamp: <2025-02-12 11:38:00 Tao Liu>
+# Time-stamp: <2025-02-15 08:23:55 Tao Liu>
 
 import unittest
 
@@ -44,7 +44,7 @@ class Test_parsing(unittest.TestCase):
 
     def test_fragment_file(self):
         p = FragParser(self.fragfile)
-        petrack = p.build_petrack2()
+        petrack = p.build_petrack()
         petrack.finalize()
         bdg = petrack.pileup_bdg()
         bdg2 = petrack.pileup_bdg2()
