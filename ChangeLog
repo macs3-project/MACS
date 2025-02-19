@@ -1,53 +1,59 @@
-2025-02-14  Tao Liu  <vladimir.liu@gmail.com>
+2025-02-19  Tao Liu  <vladimir.liu@gmail.com>
 	MACS 3.0.3
 
 	* Features added
 
-	1) FRAG format introduced. FRAG format is for fragment files
-	defined by 10x genomics to store the alignments from single-cell
-	ATAC-seq experiment. It can be regarded as the BEDPE format with
-	two extra columns -- the barcode information and the counts of the
-	fragments aligned to the same location with the same
-	barcode. Currently, `callpeak` and `pileup` both support the new
-	format. We will add support for other functions such as `hmmratac`
-	in the future.
+	1) Now support FRAG format for single-cell ATAC-seq in `callpeak`
+	and `pileup`. FRAG format is used by 10x Genomics to store
+	alignments from the single-cell ATAC-seq pipeline
+	`cellranger-atac` or the multiomics pipeline `cellranger-arc`. The
+	format is essentially BEDPE with two additional columns: the
+	barcode and the count of fragments aligned to the same location
+	with the same barcode. Support for FRAG in other tools is coming
+	soon, as well as for `hmmratac` calls.
 
-	We implemented the IO module for reading the fragment files in
-	`Parser.FragParser`. And we then implemented a new
-	`PairedEndTrack.PETrackII` to store the data in fragment file,
-	including the barcodes and counts information. In the `PETrackII`
-	class, we are able to extract a subset using a list of barcodes,
-	which enables us to call peaks only on a pool (pseudo-bulk) of
-	cells.
+	If you specify `-f FRAG` as your input format:
 
-	2) We extensively rewrote the `pyx` codes into `py` codes. In
-	another words, we now apply the 'pure python style' with PEP-484
-	type annotations to our previous Cython style codes. So that, the
-	source codes can be more compatible to Python programming tools
-	such as `flake8`. During rewritting, we cleaned the source codes
-	even more, and removed unnecessary dependencies during
-	compilation. We will continue to do more code cleaning in the
-	future.
+        - You can use a barcode list for a subset of cells with
+	`--barcodes`, then `callpeak` will identify peaks and `pileup`
+	will build pileup track for the fragments of this subset of cells.
 
-	3) We changed the behavior on the usage of 'blacklist' regions in
-	`hmmratac`. We will remove the aligned fragments located in the
-	'blacklist' regions before the EM step to estimate fragment
-	lengths distributions and HMM step to learn and predict nucleosome
-	states. The reason is discussed in #680. To implement this
-	feature, we added the `exclude` functions to PETrackI and
-	PETrackII.
+	- Duplicates will not get removed as we'll assume all fragments
+	are valid. Optionally, an option, `--max-count`, can be applied to
+	set the maximum count.
+
+	2) We transitioned our `pyx` codes to `py` codes, adopting a 'pure
+	Python style' with PEP-484 type annotations. This change has made
+	oursource codes more compatible with Python programming tools such
+	as `flake8`. During this process, we performed further code
+	cleaning and eliminated unnecessary dependencies. We intend to
+	continue improving our code quality in the future.
+
+	3) We have modified the handling of 'blacklist' regions in the
+	`hmmratac` tool. This change impacts both the
+	Expectation-Maximization (EM) step that estimates fragment length
+	distributions, and the Hidden Markov Model (HMM) step that learns
+	and predicts nucleosome states. We now exclude aligned fragments
+	located in the 'blocklist' regions before both steps. We
+	implemented the `exclude` functions in both PETrackI and PETrackII
+	to support this feature. For more detailed information and the
+	reasoning behind it, refer to issue #680.
+
+	4) We have tested Numpy>=2. Now MACS3 can be run on all Numpy >=
+	1.25.
 
 	* Bug fixed
 
-	1) `hmmratac` option `--keep-duplicate` had opposite effect
-	previously as indicated by the name and description. It has been
-	renamed as `--remove-dup` to reflect the actual
-	behavior. `hmmratac` will not remove duplicated fragments unless
-	this option is set.
+	1) The `hmmratagc` option `--keep-duplicate` previously had the
+	opposite effect of what its name and description
+	suggested. Therefore, it was renamed to `--remove-dup` to more
+	accurately describe the actual behavior. Duplicate fragments will
+	not be removed by `hmmratac` unless this option is explicitly set
+	up.
 
-	2) `hmmratac`: wrong class name used while saving digested signals
-	in BedGraph files. Multiple other issues related to output
-	filenames. #682
+	2) `hmmratac`: wrong class name was used while saving digested
+	signals in BedGraph files. Fixed multiple other issues related to
+	output filenames. #682
 
 	3) Fix issues in big-endian system in `Parser.py` codes. Enable
 	big-endian support in `BAM.py` codes for accessig certain

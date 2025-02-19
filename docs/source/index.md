@@ -40,12 +40,13 @@ tools is coming soon, as well as for `hmmratac` calls.
 
 If you specify FRAG as your input format:
 
- - Use a barcode list for a subset of cells and `callpeak` will
-   identify peaks using these fragments.
+ - You can use a barcode list for a subset of cells with `--barcodes`,
+   then `callpeak` will identify peaks and `pileup` will build pileup
+   track for the fragments of this subset of cells.
  - Duplicates will not get removed as we'll assume all fragments are
-   valid. Optionally, an option can be applied to set the maximum
-   count.
-
+   valid. Optionally, an option, `--max-count`, can be applied to set
+   the maximum count.
+ 
 2) We transitioned our `pyx` codes to `py` codes, adopting a 'pure
 Python style' with PEP-484 type annotations. This change has made our
 source codes more compatible with Python programming tools such as
@@ -61,6 +62,8 @@ now exclude aligned fragments located in the 'blocklist' regions
 before both steps. We implemented the `exclude` functions in both
 PETrackI and PETrackII to support this feature. For more detailed
 information and the reasoning behind it, refer to issue #680.
+
+4) We have tested Numpy>=2. Now MACS3 can be run on all Numpy >= 1.25.
 
 ### Bug fixed
 
