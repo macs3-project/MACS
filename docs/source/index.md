@@ -30,7 +30,7 @@ compared to random background?*
 
 ### Features added
 
-1) Now support FRAG format for single-cell ATAC-seq in `callpeak` and
+1) Now support FRAG format for **single-cell ATAC-seq** in `callpeak` and
 `pileup`. FRAG format is used by 10x Genomics to store alignments from
 the single-cell ATAC-seq pipeline `cellranger-atac` or the multi-omics
 pipeline `cellranger-arc`. The format is essentially BEDPE with two
@@ -38,12 +38,12 @@ additional columns: the barcode and the count of fragments aligned to
 the same location with the same barcode. Support for FRAG in other
 tools is coming soon, as well as for `hmmratac` calls.
 
-If you specify FRAG as your input format:
+   If you specify FRAG as your input format:
 
- - You can use a barcode list for a subset of cells with `--barcodes`,
+   - You can use a barcode list for a subset of cells with `--barcodes`,
    then `callpeak` will identify peaks and `pileup` will build pileup
    track for the fragments of this subset of cells.
- - Duplicates will not get removed as we'll assume all fragments are
+   - Duplicates will not get removed as we'll assume all fragments are
    valid. Optionally, an option, `--max-count`, can be applied to set
    the maximum count.
  
@@ -63,7 +63,8 @@ before both steps. We implemented the `exclude` functions in both
 PETrackI and PETrackII to support this feature. For more detailed
 information and the reasoning behind it, refer to issue #680.
 
-4) We have tested Numpy>=2. Now MACS3 can be run on all Numpy >= 1.25.
+4) We have tested Numpy>=2. Now MACS3 can be run on Numpy version 1 and
+version 2.
 
 ### Bug fixed
 
