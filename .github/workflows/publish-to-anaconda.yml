@@ -70,6 +70,6 @@ jobs:
         ANACONDA_API_TOKEN: ${{ secrets.ANACONDA_TOKEN }}
       run: |
         conda install anaconda-client
-        anaconda upload bld-dir/**/macs3-*.tar.bz2
+        anaconda upload bld-dir/**/macs3-*
 
 
