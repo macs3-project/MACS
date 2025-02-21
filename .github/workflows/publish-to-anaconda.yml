@@ -13,7 +13,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy: 
       matrix: 
-        python-version: ['3.12']
+        python-version: ['3.13']
         arch: ['x64']
     name: Build conda package in x64 under Python ${{ matrix.python-version }}
     steps:
@@ -39,10 +39,8 @@ jobs:
         # Useful for debugging any issues with conda
         conda info -a
         # configure the channels
-        conda config --add channels defaults
         conda config --add channels conda-forge
         conda config --add channels macs3
-        conda install -q mamba -c conda-forge
     - name: Build conda package
       run: |
         mkdir bld-dir
@@ -52,7 +50,7 @@ jobs:
         # Now add this folder as a highest priority channel
         conda config --add channels "file://`pwd`/bld-dir"
         # install MACS3 from local repo
-        mamba create -q -n MACS3 macs3
+        conda create -q -n MACS3 macs3
         # Activate this environment
         source /usr/share/miniconda/etc/profile.d/conda.sh
         conda activate MACS3
@@ -71,7 +69,7 @@ jobs:
       env:
         ANACONDA_API_TOKEN: ${{ secrets.ANACONDA_TOKEN }}
       run: |
-        mamba install anaconda-client
+        conda install anaconda-client
         anaconda upload bld-dir/**/macs3-*.tar.bz2
 
 
