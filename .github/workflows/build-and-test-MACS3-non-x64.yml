@@ -10,12 +10,14 @@ on:
       - '**.md'
       - 'ChangeLog'
       - '.github/workflows/**'
+      - 'conda/**'
       - '!.github/workflows/build-and-test-MACS3-non-x64.yml'
   pull_request:
     paths-ignore:
       - 'docs/**'
       - '**.md'
       - 'ChangeLog'
+      - 'conda/**'
       - '.github/workflows/**'
       - '!.github/workflows/build-and-test-MACS3-non-x64.yml'
 
