@@ -1,6 +1,6 @@
 # cython: language_level=3
 # cython: profile=True
-# Time-stamp: <2025-02-15 08:49:30 Tao Liu>
+# Time-stamp: <2025-04-11 13:24:36 Tao Liu>
 
 """Module for filter duplicate tags from paired-end data
 
@@ -779,7 +779,7 @@ class PETrackII:
 
     def __init__(self, anno: str = "", buffer_size: cython.long = 100000):
         # dictionary with chrname as key, nparray with
-        # [('l','i4'),('r','i4'),('c','u1')] as value
+        # [('l','i4'),('r','i4'),('c','u2')] as value
         self.locations = {}
         # dictionary with chrname as key, size of the above nparray as value
         # size is to remember the size of the fragments added to this chromosome
@@ -805,7 +805,7 @@ class PETrackII:
                 start: cython.int,
                 end: cython.int,
                 barcode: bytes,
-                count: cython.uchar):
+                count: cython.ushort):
         """Add a location to the list according to the sequence name.
 
         chromosome: mostly the chromosome name
@@ -828,7 +828,7 @@ class PETrackII:
             # note: ['l'] is the leftmost end, ['r'] is the rightmost end of fragment.
             # ['c'] is the count number of this fragment
             self.locations[chromosome] = np.zeros(shape=self.buffer_size,
-                                                  dtype=[('l', 'i4'), ('r', 'i4'), ('c', 'u1')])
+                                                  dtype=[('l', 'i4'), ('r', 'i4'), ('c', 'u2')])
             self.barcodes[chromosome] = np.zeros(shape=self.buffer_size,
                                                  dtype='i4')
             self.locations[chromosome][0] = (start, end, count)

@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# Time-stamp: <2025-02-12 13:44:51 Tao Liu>
+# Time-stamp: <2025-04-11 13:42:39 Tao Liu>
 
 import unittest
 from MACS3.Signal.PairedEndTrack import PETrackI, PETrackII
@@ -96,7 +96,6 @@ class Test_PETrackII(unittest.TestCase):
                               (b"chrY", 50, 160, b"0w#AAACGAACAAGTAAGA", 2),  # will be excluded
                               (b"chrY", 100, 170, b"0w#AAACGAACAAGTAAGA", 3)
                               ]
-
         self.exclude_regions = [(b"chrY", 10, 75)]
         self.x_regions = Regions()
         for r in self.exclude_regions:

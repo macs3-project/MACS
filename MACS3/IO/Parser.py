@@ -1,7 +1,7 @@
 # cython: language_level=3
 # cython: profile=True
 # cython: linetrace=True
-# Time-stamp: <2025-02-15 08:24:53 Tao Liu>
+# Time-stamp: <2025-04-11 13:41:46 Tao Liu>
 
 """Module for all MACS Parser classes for input. Please note that the
 parsers are for reading the alignment files ONLY.
@@ -34,7 +34,7 @@ from MACS3.Utilities.Logger import logging
 logger = logging.getLogger(__name__)
 debug = logger.debug
 info = logger.info
-
+warn = logger.warn
 # ------------------------------------
 # Other modules
 # ------------------------------------
@@ -1513,17 +1513,23 @@ class FragParser(GenericParser):
 
         """
         thisfields: list
+        thiscount: cython.ushort
 
         thisline = thisline.rstrip()
 
         # still only support tabular as delimiter.
         thisfields = thisline.split(b'\t')
         try:
+            try:
+                thiscount = atoi(thisfields[4])
+            except OverflowError:
+                thiscount = 65535
+                warn(f"The count in this line is over 65535, and will be capped at 65535: {thisline}")
             return (thisfields[0],
                     atoi(thisfields[1]),
                     atoi(thisfields[2]),
                     thisfields[3],
-                    atoi(thisfields[4]))
+                    thiscount)
         except IndexError:
             raise Exception("Less than 5 columns found at this line: %s\n" %
                             thisline)
@@ -1537,7 +1543,7 @@ class FragParser(GenericParser):
         left_pos: cython.int
         right_pos: cython.int
         barcode: bytes
-        count: cython.uchar
+        count: cython.ushort
         i: cython.long = 0          # number of fragments
         m: cython.long = 0          # sum of fragment lengths
         tmp: bytes = b""
@@ -1591,7 +1597,7 @@ class FragParser(GenericParser):
         left_pos: cython.int
         right_pos: cython.int
         barcode: bytes
-        count: cython.uchar
+        count: cython.ushort
         i: cython.long = 0          # number of fragments
         m: cython.long = 0          # sum of fragment lengths
         tmp: bytes = b""

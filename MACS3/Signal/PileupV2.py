@@ -1,6 +1,6 @@
 # cython: language_level=3
 # cython: profile=True
-# Time-stamp: <2025-02-14 11:56:44 Tao Liu>
+# Time-stamp: <2025-04-11 13:26:28 Tao Liu>
 
 """Module Description:
 
@@ -112,7 +112,7 @@ def make_PV_from_LRC(LRC_array: cnp.ndarray,
     `mapping_func( L, R )` or simply 1 if mapping_func is the default.
 
     LRC array is an np.ndarray as with dtype
-    [('l','i4'),('r','i4'),('c','u1')] with length of N
+    [('l','i4'),('r','i4'),('c','u2')] with length of N
 
     PV array is an np.ndarray with
     dtype=[('p','i4'),('v','f4')] with length of 2N
@@ -122,7 +122,7 @@ def make_PV_from_LRC(LRC_array: cnp.ndarray,
     i: cython.ulong
     L: cython.int
     R: cython.int
-    C: cython.uchar
+    C: cython.ushort
     PV: cnp.ndarray
 
     l_LRC = LRC_array.shape[0]
@@ -292,7 +292,7 @@ def pileup_from_LRC(LRC_array: cnp.ndarray,
 
     User needs to provide a numpy array of left and right positions
     and the counts, with
-    dtype=[('l','i4'),('r','i4'),('c','u1')]. User also needs to
+    dtype=[('l','i4'),('r','i4'),('c','u2')]. User also needs to
     provide a mapping function to map the left and right position to
     certain weight.
 

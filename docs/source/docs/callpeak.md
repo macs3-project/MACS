@@ -8,6 +8,24 @@ invoked by `macs3 callpeak` . If you type this command with `-h`, you
 will see a full description of command-line options. Here we only list
 the essentials.
 
+## Examples of Commandline Usage
+1. Peak calling for regular TF ChIP-seq:
+    $ macs3 callpeak -t ChIP.bam -c Control.bam -f BAM -g hs -n test -B -q 0.01
+2. Broad peak calling on Histone Mark ChIP-seq:
+    $ macs3 callpeak -t ChIP.bam -c Control.bam --broad -g hs --broad-cutoff 0.1
+3. Peak calling on ATAC-seq (paired-end mode):
+    $ macs3 callpeak -f BAMPE -t ATAC.bam -g hs -n test -B -q 0.01
+4. Peak calling on ATAC-seq (focusing on insertion sites, and using single-end mode):
+    $ macs3 callpeak -f BAM -t ATAC.bam -g hs -n test -B -q 0.01 --shift -50 --extension 100
+5. Peak calling on scATAC-seq (paired-end mode):
+    $ macs3 callpeak -f BEDPE -t scATAC.fragments.tsv.gz -g hs -n test -B -q 0.01 -n test
+6. Peak calling on scATAC-seq (paired-end mode):
+    $ macs3 callpeak -f FRAG -t scATAC.fragments.tsv.gz -g hs -n test -B -q 0.01 -n test
+7. Peak calling on scATAC-seq (paired-end mode) and only for given barcodes:
+    $ macs3 callpeak -f FRAG -t scATAC.fragments.tsv.gz -g hs -n test -B -q 0.01 -n test --barcodes barcodes.txt
+
+
+
 ## Essential Commandline Options
 
 ### Input and Output
