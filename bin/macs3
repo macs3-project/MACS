@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# Time-stamp: <2025-02-15 14:22:43 Tao Liu>
+# Time-stamp: <2025-07-23 15:58:12 Tao Liu>
 
 """Description: MACS v3 main executable.
 
@@ -873,10 +873,10 @@ plus an extra option for the HMM model file like `macs3 hmmratac
     group_input.add_argument("-i", "--input", dest="input_file", type=str, required=True, nargs="+",
                              help="Input files containing the aligment results for ATAC-seq paired end reads. If multiple files are given as '-t A B C', then they will all be read and pooled together. The file should be in BAMPE or BEDPE format (aligned in paired end mode). Files can be gzipped. Note: all files should be in the same format! REQUIRED.")
     group_input.add_argument("-f", "--format", dest="format", type=str,
-                             # choices=("BAMPE", "BEDPE", "FRAG"),
-                             # help="Format of input files, \"BAMPE\", \"BEDPE\", or \"FRAG\". If there are multiple files, they should be in the same format -- either BAMPE, BEDPE or FRAG. Please check the definition in README. Also please note that the BEDPE only contains three columns -- chromosome, left position of the whole pair, right position of the whole pair-- and is NOT the same BEDPE format used by BEDTOOLS. To convert BAMPE to BEDPE, you can use this command `macs3 filterdup --keep-dup all -f BAMPE -i input.bam -o output.bedpe`. And the FRAG format is a five columns BEDPE with extra barcode and fragment count columns. DEFAULT: \"BAMPE\"",
-                             choices=("BAMPE", "BEDPE"),
-                             help="Format of input files, \"BAMPE\" or \"BEDPE\". If there are multiple files, they should be in the same format -- either BAMPE or BEDPE. Please check the definition in README. Also please note that the BEDPE only contains three columns -- chromosome, left position of the whole pair, right position of the whole pair-- and is NOT the same BEDPE format used by BEDTOOLS. To convert BAMPE to BEDPE, you can use this command `macs3 filterdup --keep-dup all -f BAMPE -i input.bam -o output.bedpe`. DEFAULT: \"BAMPE\"",
+                             choices=("BAMPE", "BEDPE", "FRAG"),
+                             help="Format of input files, \"BAMPE\", \"BEDPE\", or \"FRAG\". If there are multiple files, they should be in the same format -- either BAMPE, BEDPE or FRAG. Please check the definition in README. Also please note that the BEDPE only contains three columns -- chromosome, left position of the whole pair, right position of the whole pair-- and is NOT the same BEDPE format used by BEDTOOLS. To convert BAMPE to BEDPE, you can use this command `macs3 filterdup --keep-dup all -f BAMPE -i input.bam -o output.bedpe`. And the FRAG format is a five columns BEDPE with extra barcode and fragment count columns. DEFAULT: \"BAMPE\"",
+                             #choices=("BAMPE", "BEDPE"),
+                             #help="Format of input files, \"BAMPE\" or \"BEDPE\". If there are multiple files, they should be in the same format -- either BAMPE or BEDPE. Please check the definition in README. Also please note that the BEDPE only contains three columns -- chromosome, left position of the whole pair, right position of the whole pair-- and is NOT the same BEDPE format used by BEDTOOLS. To convert BAMPE to BEDPE, you can use this command `macs3 filterdup --keep-dup all -f BAMPE -i input.bam -o output.bedpe`. DEFAULT: \"BAMPE\"",
                              default="BAMPE")
 
     # group for output files

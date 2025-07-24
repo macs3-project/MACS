@@ -1,4 +1,4 @@
-# Time-stamp: <2025-02-12 14:30:02 Tao Liu>
+# Time-stamp: <2025-07-24 10:19:52 Tao Liu>
 
 """Description: Main HMMR command
 
@@ -20,7 +20,6 @@ import tempfile
 # ------------------------------------
 # own python modules
 # ------------------------------------
-# from MACS3.Utilities.Constants import *
 from MACS3.Utilities.OptValidator import opt_validate_hmmratac
 from MACS3.IO.PeakIO import PeakIO
 from MACS3.IO.Parser import BAMPEParser, BEDPEParser, FragParser  # BAMaccessor

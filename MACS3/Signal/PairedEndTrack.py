@@ -1,6 +1,6 @@
 # cython: language_level=3
 # cython: profile=True
-# Time-stamp: <2025-04-11 13:24:36 Tao Liu>
+# Time-stamp: <2025-07-24 10:17:48 Tao Liu>
 
 """Module for filter duplicate tags from paired-end data
 
@@ -749,7 +749,7 @@ class PETrackI:
 class PETrackII:
     """Paired-end track class for fragment files from single-cell
     ATAC-seq experiments. We will store data of start, end, barcode,
-    and count from the fragment files.
+    and count from the FRAGMENT files.
 
     * I choose not to inherit PETrackI because there would be a lot of
       differences.
@@ -987,39 +987,37 @@ class PETrackII:
         locs: cnp.ndarray
         chrnames: list
         i: cython.int
+        j: cython.int
 
         counter = Counter()
         chrnames = list(self.get_chr_names())
         for i in range(len(chrnames)):
             locs = self.locations[chrnames[i]]
             sizes = locs['r'] - locs['l']
-            for s in sizes:
-                counter[s] += locs['c']
+            for j in range(len(sizes)):
+                s = sizes[j]
+                counter[s] += locs['c'][j]
         return dict(counter)
 
     @cython.ccall
     def fraglengths(self) -> cnp.ndarray:
-        """Return the sizes/fragment lengths of each pair.
-
-        This function is for HMMRATAC EM training.
-        """
+        """Return the sizes/fragment lengths of each pair (count-weighted)."""
         sizes: cnp.ndarray(np.int32_t, ndim=1)
-        t_sizes: cnp.ndarray(np.int32_t, ndim=1)
-        locs: cnp.ndarray
         chrnames: list
-        i: cython.int
+        out: list
+        chrom: bytes
 
         chrnames = list(self.get_chr_names())
-        locs = self.locations[chrnames[0]]
-        sizes = locs['r'] - locs['l']
-        sizes = [x for x, count in zip(sizes, locs['c']) for _ in range(count)]
-
-        for i in range(1, len(chrnames)):
-            locs = self.locations[chrnames[i]]
-            t_sizes = locs['r'] - locs['l']
-            t_sizes = [x for x, count in zip(t_sizes, locs['c']) for _ in range(count)]
-            sizes = np.concatenate((sizes, t_sizes))
-        return sizes
+        out = []
+        for chrom in chrnames:
+            locs = self.locations[chrom]
+            sizes = locs['r'] - locs['l']
+            counts = locs['c']
+            out.append(np.repeat(sizes, counts))
+        if out:
+            return np.concatenate(out).astype(np.int32)
+        else:
+            return np.array([], dtype=np.int32)
 
     @cython.ccall
     def subset(self, selected_barcodes: set):
@@ -1156,16 +1154,28 @@ class PETrackII:
         return prev_pileup
 
     @cython.ccall
-    def pileup_bdg(self):
-        """Pileup all chromosome and return a bdg object.
+    def pileup_bdg(self,
+                   scale_factor: cython.float = 1.0,
+                   baseline_value: cython.float = 0.0):
+        """Pileup all chromosomes and return a bedGraphTrackI object.
+
+        scale_factor : value to scale the pileup values.
+
+        baseline_value : a value to be filled for missing values, and
+                         will be the minimum pileup.
+
         """
         bdg: bedGraphTrackI
         pv: cnp.ndarray
+        chrom: bytes
 
-        bdg = bedGraphTrackI()
-        for chrom in self.get_chr_names():
+        bdg = bedGraphTrackI(baseline_value=baseline_value)
+        for chrom in sorted(self.get_chr_names()):
             pv = pileup_from_LRC(self.locations[chrom])
-            bdg.add_chrom_data_PV(chrom, pv)
+            v = pv['v']
+            v = v * scale_factor
+            v[v < baseline_value] = baseline_value
+            bdg.add_chrom_data(chrom, pv['p'], v)
         return bdg
 
     @cython.ccall
@@ -1280,3 +1290,298 @@ class PETrackII:
             selected_idx.resize(0, refcheck=False)
         self.finalize()
         return
+
+    @cython.ccall
+    def sample_frag_percent_copy(self,
+                                 percent: cython.float,
+                                 seed: cython.int = -1):
+        """Sample the fragments for a given percentage, return a new
+        PETrackII object.
+
+        Sampling is performed per chromosome, preserving the barcode
+        associations.
+
+        """
+        num: cython.uint
+        k: bytes
+        chrnames: set
+        indices: cnp.ndarray
+        n_frags: cython.int
+
+        ret_petrackII = PETrackII(anno=self.annotation,
+                                  buffer_size=self.buffer_size)
+        # Copy barcode_dict and barcode_last_n, as barcodes remain valid
+        ret_petrackII.barcode_dict = dict(self.barcode_dict)
+        ret_petrackII.barcode_last_n = self.barcode_last_n
+
+        chrnames = self.get_chr_names()
+
+        if seed >= 0:
+            info(f"#   A random seed {seed} has been used in the sampling function")
+            rs = np.random.default_rng(seed)
+        else:
+            rs = np.random.default_rng()
+        rs_shuffle = rs.shuffle
+
+        for k in sorted(chrnames):
+            loc = self.locations[k]
+            bar = self.barcodes[k]
+            n_frags = loc.shape[0]
+            if n_frags == 0:
+                continue
+            num = cython.cast(cython.uint, round(n_frags * percent, 5))
+            indices = np.arange(n_frags)
+            rs_shuffle(indices)
+            indices = indices[:num]
+            indices.sort()
+            ret_petrackII.locations[k] = np.copy(loc[indices])
+            ret_petrackII.barcodes[k] = np.copy(bar[indices])
+            ret_petrackII.size[k] = ret_petrackII.locations[k].shape[0]
+            ret_petrackII.buf_size[k] = ret_petrackII.size[k]
+            ret_petrackII.length += np.sum((ret_petrackII.locations[k]['r'] - ret_petrackII.locations[k]['l']) * ret_petrackII.locations[k]['c'])
+            ret_petrackII.total += np.sum(ret_petrackII.locations[k]['c'])
+
+        if ret_petrackII.total > 0:
+            ret_petrackII.average_template_length = cython.cast(cython.float, ret_petrackII.length) / ret_petrackII.total
+        else:
+            ret_petrackII.average_template_length = 0.0
+
+        ret_petrackII.set_rlengths(self.get_rlengths())
+        ret_petrackII.is_sorted = False  # Shuffling breaks sorting!
+        return ret_petrackII
+
+    @cython.ccall
+    def sample_num(self,
+                   samplesize: cython.ulong,
+                   seed: cython.int = -1):
+        """Downsample the object in-place so that the sum of all
+        counts is samplesize.
+
+        Sampling is performed proportionally to each fragment's count.
+
+        """
+        k: bytes
+        chrnames: set
+        n_total: cython.ulong
+        probs: cnp.ndarray
+        new_counts: cnp.ndarray
+        mask: cnp.ndarray
+
+        self.length = 0
+        self.total = 0
+        self.average_template_length = 0.0
+
+        chrnames = self.get_chr_names()
+        # Compute the current total counts
+        n_total = 0
+        chr_totals = {}
+        for k in chrnames:
+            chr_totals[k] = self.locations[k]['c'].sum()
+            n_total += chr_totals[k]
+
+        if n_total == 0 or samplesize == 0:
+            # Just clear everything
+            for k in chrnames:
+                self.locations[k] = self.locations[k][:0]
+                self.barcodes[k] = self.barcodes[k][:0]
+                self.size[k] = 0
+            self.length = 0
+            self.total = 0
+            self.average_template_length = 0.0
+            return
+
+        if seed >= 0:
+            info(f"# A random seed {seed} has been used in the sampling function")            
+            rs = np.random.default_rng(seed)
+        else:
+            rs = np.random.default_rng()
+
+        for k in sorted(chrnames):
+            loc = self.locations[k]
+            bar = self.barcodes[k]
+            n_chr = chr_totals[k]
+            if n_chr == 0:
+                # No data in this chromosome
+                self.locations[k] = loc[:0]
+                self.barcodes[k] = bar[:0]
+                self.size[k] = 0
+                continue
+            # Number of counts to sample for this chromosome (proportional)
+            chr_target = int(round(samplesize * n_chr / n_total))
+            if chr_target == 0:
+                self.locations[k] = loc[:0]
+                self.barcodes[k] = bar[:0]
+                self.size[k] = 0
+                continue
+
+            counts = loc['c']
+            probs = counts / counts.sum()
+            # Sample how many counts each fragment keeps (multinomial)
+            new_counts = rs.multinomial(chr_target, probs)
+            # Mask: keep fragments with >0 counts
+            mask = new_counts > 0
+            self.locations[k] = loc[mask].copy()
+            self.locations[k]['c'] = new_counts[mask]
+            self.barcodes[k] = bar[mask].copy()
+            self.size[k] = self.locations[k].shape[0]
+            self.length += np.sum((self.locations[k]['r'] - self.locations[k]['l']) * self.locations[k]['c'])
+            self.total += np.sum(self.locations[k]['c'])
+        if self.total > 0:
+            self.average_template_length = float(self.length) / self.total
+        else:
+            self.average_template_length = 0.0
+        self.is_sorted = False  # shuffling breaks sort
+        return
+
+    @cython.ccall
+    def sample_num_copy(self,
+                        samplesize: cython.ulong,
+                        seed: cython.int = -1):
+        """Downsample to a new PETrackII so that the sum of all counts
+        is samplesize.
+
+        Sampling is performed proportionally to each fragment's count.
+
+        """
+        import numpy as np
+        k: bytes
+        chrnames: set
+        n_total: cython.ulong
+        probs: cnp.ndarray
+        new_counts: cnp.ndarray
+        mask: cnp.ndarray
+
+        ret = PETrackII(anno=self.annotation, buffer_size=self.buffer_size)
+        ret.barcode_dict = dict(self.barcode_dict)
+        ret.barcode_last_n = self.barcode_last_n
+
+        chrnames = self.get_chr_names()
+        n_total = 0
+        chr_totals = {}
+        for k in chrnames:
+            chr_totals[k] = self.locations[k]['c'].sum()
+            n_total += chr_totals[k]
+
+        if n_total == 0 or samplesize == 0:
+            for k in chrnames:
+                ret.locations[k] = self.locations[k][:0]
+                ret.barcodes[k] = self.barcodes[k][:0]
+                ret.size[k] = 0
+                ret.buf_size[k] = 0
+            ret.length = 0
+            ret.total = 0
+            ret.average_template_length = 0.0
+            return ret
+
+        if seed >= 0:
+            info(f"# A random seed {seed} has been used in the sampling function")
+            rs = np.random.default_rng(seed)
+        else:
+            rs = np.random.default_rng()
+
+        for k in sorted(chrnames):
+            loc = self.locations[k]
+            bar = self.barcodes[k]
+            n_chr = chr_totals[k]
+            if n_chr == 0:
+                ret.locations[k] = loc[:0]
+                ret.barcodes[k] = bar[:0]
+                ret.size[k] = 0
+                ret.buf_size[k] = 0
+                continue
+            chr_target = int(round(samplesize * n_chr / n_total))
+            if chr_target == 0:
+                ret.locations[k] = loc[:0]
+                ret.barcodes[k] = bar[:0]
+                ret.size[k] = 0
+                ret.buf_size[k] = 0
+                continue
+            counts = loc['c']
+            probs = counts / counts.sum()
+            new_counts = rs.multinomial(chr_target, probs)
+            mask = new_counts > 0
+            ret.locations[k] = loc[mask].copy()
+            ret.locations[k]['c'] = new_counts[mask]
+            ret.barcodes[k] = bar[mask].copy()
+            ret.size[k] = ret.locations[k].shape[0]
+            ret.buf_size[k] = ret.size[k]
+            ret.length += np.sum((ret.locations[k]['r'] - ret.locations[k]['l']) * ret.locations[k]['c'])
+            ret.total += np.sum(ret.locations[k]['c'])
+        if ret.total > 0:
+            ret.average_template_length = float(ret.length) / ret.total
+        else:
+            ret.average_template_length = 0.0
+        ret.set_rlengths(self.get_rlengths())
+        ret.is_sorted = False
+        return ret
+
+    @cython.ccall
+    def sample_percent(self,
+                       percent: cython.float,
+                       seed: cython.int = -1):
+        """Downsample total counts to a specified percent of the
+        current total (in-place).
+
+        E.g., percent=0.5 keeps about half of all fragment counts in the object.
+
+        """
+        samplesize: cython.ulong
+        assert 0.0 < percent <= 1.0, "percent must be in (0, 1]"
+        current_total = 0
+        for k in self.get_chr_names():
+            current_total += self.locations[k]['c'].sum()
+        samplesize = cython.cast(cython.ulong, round(current_total * percent, 5))
+        self.sample_num(samplesize, seed)
+        return
+
+    @cython.ccall
+    def sample_percent_copy(self,
+                            percent: cython.float,
+                            seed: cython.int = -1):
+        """Downsample total counts to a specified percent of the
+        current total (returns new object).
+
+        E.g., percent=0.5 returns a new PETrackII with half the total counts.
+
+        """
+        samplesize: cython.ulong
+        assert 0.0 < percent <= 1.0, "percent must be in (0, 1]"
+        current_total = 0
+        for k in self.get_chr_names():
+            current_total += self.locations[k]['c'].sum()
+        samplesize = cython.cast(cython.ulong, round(current_total * percent, 5))
+        return self.sample_num_copy(samplesize, seed)
+
+    @cython.ccall
+    def pileup_bdg_hmmr(self,
+                        mapping: list,
+                        baseline_value: cython.float = 0.0) -> list:
+        """Pileup all chromosomes and return a list of dictionaries.
+
+        Each dictionary corresponds to one mapping entry (short, mono,
+        di, tri).
+
+        Each dictionary is chrom: np.ndarray of [p,v] pileup.
+
+        """
+        ret_pileup = []
+        for i in range(len(mapping)):
+            ret_pileup.append({})
+
+        chroms = self.get_chr_names()
+        for i in range(len(mapping)):
+            for chrom in sorted(chroms):
+                locs = self.locations[chrom]
+                counts = locs['c']
+                # Efficient numpy "explode"
+                if locs.shape[0] == 0 or counts.sum() == 0:
+                    LR_expanded = np.zeros((0,),
+                                           dtype=[('l', 'i4'), ('r', 'i4')])
+                else:
+                    idx = np.repeat(np.arange(locs.shape[0]), counts)
+                    LR_expanded = np.empty((len(idx),),
+                                           dtype=[('l', 'i4'), ('r', 'i4')])
+                    LR_expanded['l'] = locs['l'][idx]
+                    LR_expanded['r'] = locs['r'][idx]
+                ret_pileup[i][chrom] = pileup_from_LR_hmmratac(LR_expanded, mapping[i])
+        return ret_pileup
