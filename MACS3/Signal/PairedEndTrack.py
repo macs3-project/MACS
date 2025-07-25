@@ -1,6 +1,6 @@
 # cython: language_level=3
 # cython: profile=True
-# Time-stamp: <2025-07-24 11:37:58 Tao Liu>
+# Time-stamp: <2025-07-24 16:41:34 Tao Liu>
 
 """Module for filter duplicate tags from paired-end data
 
@@ -1291,11 +1291,25 @@ class PETrackII:
         return
 
     @cython.ccall
-    def sample_percent(self, percent: cython.float, seed: cython.int = -1):
+    def sample_percent(self,
+                       percent: cython.float,
+                       seed: cython.int = -1):
         """
         Downsample all counts to a specified percent, in-place.
         Shuffle and sample per chromosome.
         """
+        k: bytes
+        loc: cnp.ndarray
+        bar: cnp.ndarray
+        counts: cnp.ndarray
+        n: cython.uint
+        n_sample: cython.uint
+        idx_flat: cnp.ndarray
+        unique_idx: cnp.ndarray
+        new_counts: cnp.ndarray
+        new_locs: cnp.ndarray
+        new_bars: cnp.ndarray
+
         assert 0.0 < percent <= 1.0, "percent must be in (0, 1]"
         chrnames = sorted(self.get_chr_names())
 
@@ -1348,14 +1362,31 @@ class PETrackII:
         return
 
     @cython.ccall
-    def sample_percent_copy(self, percent: cython.float, seed: cython.int = -1):
+    def sample_percent_copy(self,
+                            percent: cython.float,
+                            seed: cython.int = -1):
         """
-        Downsample all counts to a specified percent, returning a new PETrackII object.
+        Downsample all counts to a specified percent, returning a
+        new PETrackII object.
+
         Shuffle and sample per chromosome.
+
         """
+        k: bytes
+        loc: cnp.ndarray
+        bar: cnp.ndarray
+        counts: cnp.ndarray
+        n: cython.uint
+        n_sample: cython.uint
+        idx_flat: cnp.ndarray
+        unique_idx: cnp.ndarray
+        new_counts: cnp.ndarray
+        new_locs: cnp.ndarray
+        new_bars: cnp.ndarray
+
         assert 0.0 < percent <= 1.0, "percent must be in (0, 1]"
         chrnames = sorted(self.get_chr_names())
-        
+
         # Setup shuffling logic like PETrackI
         if seed >= 0:
             info(f"#   A random seed {seed} has been used")
@@ -1413,6 +1444,12 @@ class PETrackII:
         """
         Downsample in-place so that the sum of all counts is samplesize.
         """
+        chrnames: set
+        n_total: cython.uint
+        chr_totals: dict
+        k: bytes
+        percent: cython.float
+
         chrnames = self.get_chr_names()
         n_total = 0
         chr_totals = {}
@@ -1431,6 +1468,12 @@ class PETrackII:
         counts is samplesize.
 
         """
+        chrnames: set
+        n_total: cython.uint
+        chr_totals: dict
+        k: bytes
+        percent: cython.float
+
         chrnames = self.get_chr_names()
         n_total = 0
         chr_totals = {}
@@ -1452,6 +1495,15 @@ class PETrackII:
         Each dictionary is chrom: np.ndarray of [p,v] pileup.
 
         """
+        ret_pileup: list
+        i: cython.uint
+        chroms: set
+        chrom: bytes
+        locs: cnp.ndarray
+        counts: cnp.ndarray
+        LR_expanded: cnp.ndarray
+        idx: cnp.ndarray
+
         ret_pileup = []
         for i in range(len(mapping)):
             ret_pileup.append({})

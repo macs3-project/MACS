@@ -26,71 +26,26 @@ employed in any "DNA enrichment assay" to answer the fundamental
 question: *Where are the regions with significant read coverage
 compared to random background?*
 
-## Changes for MACS (3.0.3) 
+## Changes for MACS (3.0.4) 
 
 ### Features added
 
-1) Now support FRAG format for **single-cell ATAC-seq** in `callpeak` and
-`pileup`. FRAG format is used by 10x Genomics to store alignments from
-the single-cell ATAC-seq pipeline `cellranger-atac` or the multi-omics
-pipeline `cellranger-arc`. The format is essentially BEDPE with two
-additional columns: the barcode and the count of fragments aligned to
-the same location with the same barcode. Support for FRAG in other
-tools is coming soon, as well as for `hmmratac` calls.
+1) Now `-f FRAG` is supported in `hmmratac`. Please note that since
+the difference in implementing the subsampling function for the new
+class for holding fragment file, the result from `hmmratac` can be
+slightly different between using the common `BEDPE` or `BAMPE` input
+and using the collapsed `FRAG` input file.
 
-   If you specify FRAG as your input format:
+2) `--barcodes` and `--max-count` options are available in
+`hmmratac`. Now we can limit the `hmmratac` peak calling in a subset
+of barcodes and/or with a maximum count cutoff. For example, if we try
+to call accessible regions from a subset of cells in scATAC-seq
+dataset, we can use `--barcodes celltype1_barcodes.txt --max-count 2`
+where the `celltype1_barcodes.txt` contains the barcodes of the cells
+assigned to celltype1 (each row is an unique barcode), and we assume
+that any genomics position of a single cell can only be cut twice (in
+case of haplotype).
 
-   - You can use a barcode list for a subset of cells with `--barcodes`,
-   then `callpeak` will identify peaks and `pileup` will build pileup
-   track for the fragments of this subset of cells.
-   - Duplicates will not get removed as we'll assume all fragments are
-   valid. Optionally, an option, `--max-count`, can be applied to set
-   the maximum count.
- 
-2) We transitioned our `pyx` codes to `py` codes, adopting a 'pure
-Python style' with PEP-484 type annotations. This change has made our
-source codes more compatible with Python programming tools such as
-`flake8`. During this process, we performed further code cleaning and
-eliminated unnecessary dependencies. We intend to continue improving
-our code quality in the future.
-
-3) We have modified the handling of 'blacklist' regions in the
-`hmmratac` tool. This change impacts both the Expectation-Maximization
-(EM) step that estimates fragment length distributions, and the Hidden
-Markov Model (HMM) step that learns and predicts nucleosome states. We
-now exclude aligned fragments located in the 'blocklist' regions
-before both steps. We implemented the `exclude` functions in both
-PETrackI and PETrackII to support this feature. For more detailed
-information and the reasoning behind it, refer to issue #680.
-
-4) We have tested Numpy>=2. Now MACS3 can be run on Numpy version 1 and
-version 2.
-
-### Bug fixed
-
-1) The `hmmratagc` option `--keep-duplicate` previously had the
-opposite effect of what its name and description suggested. Therefore,
-it was renamed to `--remove-dup` to more accurately describe the
-actual behavior. Duplicate fragments will not be removed by `hmmratac`
-unless this option is explicitly set up.
-
-2) `hmmratac`: wrong class name was used while saving digested signals
-in BedGraph files. Fixed multiple other issues related to output
-filenames. #682
-
-3) Fix issues in big-endian system in `Parser.py` codes. Enable
-big-endian support in `BAM.py` codes for accessig certain alignment
-records that overlap with given genomic coordinates using BAM/BAI
-files.
-
-4) `predictd` and `filterdup`: wrong variable name used while
-reading multiple pe/frag files.
-
-### Doc
-
-1) Explanation on the filtering criteria on SAM/BAM/BAMPE files.
-
-	
 ## Install
 
 The common way to install MACS is through

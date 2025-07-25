@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# Time-stamp: <2025-07-23 15:58:12 Tao Liu>
+# Time-stamp: <2025-07-24 12:05:58 Tao Liu>
 
 """Description: MACS v3 main executable.
 
@@ -878,6 +878,10 @@ plus an extra option for the HMM model file like `macs3 hmmratac
                              #choices=("BAMPE", "BEDPE"),
                              #help="Format of input files, \"BAMPE\" or \"BEDPE\". If there are multiple files, they should be in the same format -- either BAMPE or BEDPE. Please check the definition in README. Also please note that the BEDPE only contains three columns -- chromosome, left position of the whole pair, right position of the whole pair-- and is NOT the same BEDPE format used by BEDTOOLS. To convert BAMPE to BEDPE, you can use this command `macs3 filterdup --keep-dup all -f BAMPE -i input.bam -o output.bedpe`. DEFAULT: \"BAMPE\"",
                              default="BAMPE")
+    group_input.add_argument("--barcodes", dest="barcodefile", type=str, default="",
+                             help="A plain text file containing the barcodes for the fragment file while the format is 'FRAG'. Won't have any effect if the fromat is not 'FRAG'. Each row in the file should only have the barcode string. MACS3 will extract only the fragments for the specified barcodes.")
+    group_input.add_argument("--max-count", dest="maxcount", type=int,
+                             help="In the FRAG format file, the fifth column indicates the count of fragments found at the exact same location from the same barcode. By default, MACS3 treats each fragment count as indicated in this column. However, if this option is enabled and set as a positive integer, MACS3 will not count more than the specified number. If this is set as 0, MACS3 will behave as the default setting to keep all counts. This option will be ignored if the format is not FRAG.")
 
     # group for output files
     group_output = argparser_hmmratac.add_argument_group("Output arguments")

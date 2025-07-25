@@ -1,4 +1,4 @@
-# Time-stamp: <2025-07-24 10:19:52 Tao Liu>
+# Time-stamp: <2025-07-24 12:46:43 Tao Liu>
 
 """Description: Main HMMR command
 
@@ -107,13 +107,33 @@ def run(args):
     else:
         raise Exception("wrong format")
 
+    if options.format == "FRAG" and options.barcodefile:
+        options.info("#1 extract fragments with given barcodes")
+        barcodes_set = set()
+        with open(options.barcodefile, "r") as bfhd:
+            for ltxt in bfhd:
+                barcodes_set.add(ltxt.rstrip().encode())
+
     alignment = parser(options.input_file[0], buffer_size=options.buffer_size)
-    petrack = alignment.build_petrack()
+    if options.format == "FRAG" and options.maxcount:
+        petrack = alignment.build_petrack(max_count=options.maxcount)
+    else:
+        petrack = alignment.build_petrack()
+
     if len(options.input_file) > 1:
         # multiple input
         for inputfile in options.input_file[1:]:
             alignment = parser(inputfile, buffer_size=options.buffer_size)
-            petrack = alignment.append_petrack(petrack)
+            if options.format == "FRAG" and options.maxcount:
+                petrack = alignment.append_petrack(petrack, max_count=options.maxcount)
+            else:
+                petrack = alignment.append_petrack(petrack)
+
+    if options.format == "FRAG" and options.barcodefile:
+        petrack = petrack.subset(barcodes_set)
+        options.info("#   extracted %d fragments in treatment",
+                     petrack.total)
+
     # remember to finalize the petrack
     petrack.finalize()
 
