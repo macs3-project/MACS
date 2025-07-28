@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# Time-stamp: <2025-04-11 13:42:39 Tao Liu>
+# Time-stamp: <2025-07-28 16:09:17 Tao Liu>
 
 import unittest
 from MACS3.Signal.PairedEndTrack import PETrackI, PETrackII
@@ -180,3 +180,77 @@ class Test_PETrackII(unittest.TestCase):
         self.assertEqual(self.pe.total, 13)
         self.assertEqual(self.pe.length, 1170)
         self.assertAlmostEqual(self.pe.average_template_length, 90, 0)
+
+
+class TestPETrackIISampling(unittest.TestCase):
+
+    def setUp(self):
+        # Create a PETrackII with two chromosomes, three fragments each, and known counts
+        # Suppose: locs dtype = [('l', 'i4'), ('r', 'i4'), ('c', 'u2')]
+        self.petrack = PETrackII()
+        self.petrack.locations = {}
+        self.petrack.barcodes = {}
+        self.petrack.size = {}
+        self.petrack.buf_size = {}
+        chroms = [b'chr1', b'chr2']
+        for chrom in chroms:
+            locs = np.array([(0, 10, 5), (10, 20, 3), (20, 30, 2)],
+                            dtype=[('l', 'i4'), ('r', 'i4'), ('c', 'u2')])
+            bars = np.array([1, 2, 3], dtype='i4')
+            self.petrack.locations[chrom] = locs.copy()
+            self.petrack.barcodes[chrom] = bars.copy()
+            self.petrack.size[chrom] = 3
+            self.petrack.buf_size[chrom] = 3
+
+    def test_sample_percent(self):
+        # In-place, 50% downsampling
+        total = sum(self.petrack.locations[k]['c'].sum() for k in self.petrack.get_chr_names())
+        self.petrack.sample_percent(0.5, seed=42)
+        new_total = sum(self.petrack.locations[k]['c'].sum() for k in self.petrack.get_chr_names())
+        self.assertAlmostEqual(new_total, round(total * 0.5), delta=2)  # allow rounding error
+        # Should not have counts greater than the originals for any fragment
+        for k in self.petrack.get_chr_names():
+            orig = np.array([5, 3, 2])
+            new = np.zeros_like(orig)
+            for i, loc in enumerate(self.petrack.locations[k]):
+                new[i] = loc['c']
+            self.assertTrue(np.all(new <= orig))
+
+    def test_sample_percent_copy(self):
+        # Copy, 30% downsampling
+        total = sum(self.petrack.locations[k]['c'].sum() for k in self.petrack.get_chr_names())
+        petrack2 = self.petrack.sample_percent_copy(0.3, seed=123)
+        new_total = sum(petrack2.locations[k]['c'].sum() for k in petrack2.get_chr_names())
+        self.assertAlmostEqual(new_total, round(total * 0.3), delta=2)
+        # Originals should remain unchanged
+        orig_total = sum(self.petrack.locations[k]['c'].sum() for k in self.petrack.get_chr_names())
+        self.assertEqual(orig_total, total)
+
+    def test_sample_num(self):
+        # In-place, absolute downsampling
+        total = sum(self.petrack.locations[k]['c'].sum() for k in self.petrack.get_chr_names())
+        target = 4
+        self.petrack.sample_num(target, seed=1)
+        new_total = sum(self.petrack.locations[k]['c'].sum() for k in self.petrack.get_chr_names())
+        self.assertAlmostEqual(new_total, target, delta=1)
+        # Should not have more than original in any fragment
+        for k in self.petrack.get_chr_names():
+            orig = np.array([5, 3, 2])
+            new = np.zeros_like(orig)
+            for i, loc in enumerate(self.petrack.locations[k]):
+                new[i] = loc['c']
+            self.assertTrue(np.all(new <= orig))
+
+    def test_sample_num_copy(self):
+        # Copy, absolute downsampling
+        total = sum(self.petrack.locations[k]['c'].sum() for k in self.petrack.get_chr_names())
+        target = 7
+        petrack2 = self.petrack.sample_num_copy(target, seed=99)
+        new_total = sum(petrack2.locations[k]['c'].sum() for k in petrack2.get_chr_names())
+        self.assertAlmostEqual(new_total, target, delta=1)
+        # Originals should remain unchanged
+        orig_total = sum(self.petrack.locations[k]['c'].sum() for k in self.petrack.get_chr_names())
+        self.assertEqual(orig_total, total)
+
+if __name__ == '__main__':
+    unittest.main()
