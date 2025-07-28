@@ -14,7 +14,9 @@ paper](https://academic.oup.com/nar/article/47/16/e91/5519166) was
 published in 2019, and the original software was written in JAVA, by
 the then PhD student Evan Tarbell, a mohawk bioinformatician. In MACS3
 project, we implemented HMMRATAC idea in Python/Cython and optimize
-the whole process using existing MACS functions and hmmlearn.
+the whole process using existing MACS functions and hmmlearn, and
+integrate HMMRATAC with all other modules in MACS3 such as the support
+for single-cell assay (FRAG format support).
 
 Here's an example of how to run the `hmmratac` command:
 
@@ -100,10 +102,10 @@ ignored. DEFAULT: "BAMPE".
 
 ### `--barcodes` and `--max-count`
 
-These two options are for `-f FRAG` format only. You can limit the
-`hmmratac` peak calling on a selected set of barcodes by specifying
-`--barcodes barcode.txt`. The `barcode.txt` should contain a specific
-barcode for each row like:
+These two options are for `-f FRAG` format only. You can let
+`hmmratac` work on a selected set of barcodes by specifying
+`--barcodes barcode.txt`. The `barcode.txt` should contain list of
+selected barcodes and each row represents a specific barcode, like:
 
 ```
 ATCGATCGATCGATCG
@@ -112,7 +114,7 @@ GCTAGCTAGCTAGCTA
 ```
 
 The `--max-count` option is recommended for scATAC-seq since for each
-single cell, Tn5 only cut the same location once for each DNA
+single cell, Tn5 can only cut the same location once for each DNA
 molecule. So theoratically, if you are studying a haploid genome, the
 maximum count of the same fragment can't be larger than 2 (i.e. should
 use `--max-count 1` or `--max-count 2`).

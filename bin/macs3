@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# Time-stamp: <2025-07-24 12:05:58 Tao Liu>
+# Time-stamp: <2025-07-28 16:02:20 Tao Liu>
 
 """Description: MACS v3 main executable.
 
@@ -707,8 +707,8 @@ def add_hmmratac_parser(subparsers):
     """
     argparser_hmmratac = subparsers.add_parser("hmmratac",
                                                formatter_class=ap.RawDescriptionHelpFormatter,
-                                               help="Dedicated peak calling based on Hidden Markov Model for ATAC-seq data.",
-                                               epilog="""HMMRATAC is a dedicated tool for processing ATAC-seq data
+                                               help="Dedicated peak calling based on Hidden Markov Model for ATAC-seq or scATAC-seq data.",
+                                               epilog="""HMMRATAC is a dedicated tool for processing ATAC-seq or scATAC-seq data
 
 HMMRATAC, first released as a JAVA program in 2019, is a dedicated
 tool specifically designed for processing ATAC-seq data. In MACS3, it
@@ -734,6 +734,13 @@ Note: you can convert BAMPE to BEDPE by using
 
 ```
 $ macs3 filterdup --keep-dup all -f BAMPE -i yeast.bam -o yeast.bedpe
+```
+
+`hmmratac` can call accessible regions directly on the fragment files
+from scATAC-seq analysis:
+
+```
+$ macs3 hmmratac -i yeast.scATAC.frag.gz -f FRAG --barcodes selected_barcodes.txt --max-count 1
 ```
 
 The final output from `hmmratac` is in narrowPeak format containing
@@ -871,12 +878,10 @@ plus an extra option for the HMM model file like `macs3 hmmratac
     # group for input files
     group_input = argparser_hmmratac.add_argument_group("Input files arguments")
     group_input.add_argument("-i", "--input", dest="input_file", type=str, required=True, nargs="+",
-                             help="Input files containing the aligment results for ATAC-seq paired end reads. If multiple files are given as '-t A B C', then they will all be read and pooled together. The file should be in BAMPE or BEDPE format (aligned in paired end mode). Files can be gzipped. Note: all files should be in the same format! REQUIRED.")
+                             help="Input files containing the aligment results for ATAC-seq paired end reads. If multiple files are given as '-t A B C', then they will all be read and pooled together. The file should be in BAMPE, BEDPE format (aligned in paired end mode) or FRAG format (from scATAC analysis). Files can be gzipped. Note: all files should be in the same format! REQUIRED.")
     group_input.add_argument("-f", "--format", dest="format", type=str,
                              choices=("BAMPE", "BEDPE", "FRAG"),
                              help="Format of input files, \"BAMPE\", \"BEDPE\", or \"FRAG\". If there are multiple files, they should be in the same format -- either BAMPE, BEDPE or FRAG. Please check the definition in README. Also please note that the BEDPE only contains three columns -- chromosome, left position of the whole pair, right position of the whole pair-- and is NOT the same BEDPE format used by BEDTOOLS. To convert BAMPE to BEDPE, you can use this command `macs3 filterdup --keep-dup all -f BAMPE -i input.bam -o output.bedpe`. And the FRAG format is a five columns BEDPE with extra barcode and fragment count columns. DEFAULT: \"BAMPE\"",
-                             #choices=("BAMPE", "BEDPE"),
-                             #help="Format of input files, \"BAMPE\" or \"BEDPE\". If there are multiple files, they should be in the same format -- either BAMPE or BEDPE. Please check the definition in README. Also please note that the BEDPE only contains three columns -- chromosome, left position of the whole pair, right position of the whole pair-- and is NOT the same BEDPE format used by BEDTOOLS. To convert BAMPE to BEDPE, you can use this command `macs3 filterdup --keep-dup all -f BAMPE -i input.bam -o output.bedpe`. DEFAULT: \"BAMPE\"",
                              default="BAMPE")
     group_input.add_argument("--barcodes", dest="barcodefile", type=str, default="",
                              help="A plain text file containing the barcodes for the fragment file while the format is 'FRAG'. Won't have any effect if the fromat is not 'FRAG'. Each row in the file should only have the barcode string. MACS3 will extract only the fragments for the specified barcodes.")

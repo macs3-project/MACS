@@ -112,7 +112,7 @@ Subcommand | Description
 [`randsample`](docs/randsample.md) | Randomly choose a number/percentage of total reads, then save in BED/BEDPE format file.
 [`refinepeak`](docs/refinepeak.md) | Take raw reads alignment, refine peak summits.
 [`callvar`](docs/callvar.md) | Call variants in given peak regions from the alignment BAM files.
-[`hmmratac`](docs/hmmratac.md) | Dedicated peak calling based on Hidden Markov Model for ATAC-seq data.
+[`hmmratac`](docs/hmmratac.md) | Dedicated peak calling based on Hidden Markov Model for ATAC-seq or scATAC-seq data.
 
 For advanced usage, for example, to run `macs3` in a modular way,
 please read the [advanced usage](docs/Advanced_Step-by-step_Peak_Calling.md). There is a
