@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# Time-stamp: <2025-07-28 16:09:17 Tao Liu>
+# Time-stamp: <2025-09-29 14:57:48 Tao Liu>
 
 import unittest
 from MACS3.Signal.PairedEndTrack import PETrackI, PETrackII
@@ -251,6 +251,7 @@ class TestPETrackIISampling(unittest.TestCase):
         # Originals should remain unchanged
         orig_total = sum(self.petrack.locations[k]['c'].sum() for k in self.petrack.get_chr_names())
         self.assertEqual(orig_total, total)
+
 
 if __name__ == '__main__':
     unittest.main()
