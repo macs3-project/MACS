@@ -1174,7 +1174,9 @@ class PETrackII:
             v = pv['v']
             v = v * scale_factor
             v[v < baseline_value] = baseline_value
-            bdg.add_chrom_data(chrom, pv['p'], v)
+            bdg.add_chrom_data(chrom,
+                               pyarray('i', pv['p']),
+                               pyarray('f', v))
         return bdg
 
     @cython.ccall
@@ -1310,7 +1312,7 @@ class PETrackII:
         new_locs: cnp.ndarray
         new_bars: cnp.ndarray
 
-        assert 0.0 < percent <= 1.0, "percent must be in (0, 1]"
+        assert 0.0 <= percent <= 1.0, "percent must be in [0, 1]"
         chrnames = sorted(self.get_chr_names())
 
         # Setup shuffling logic like PETrackI
@@ -1384,7 +1386,7 @@ class PETrackII:
         new_locs: cnp.ndarray
         new_bars: cnp.ndarray
 
-        assert 0.0 < percent <= 1.0, "percent must be in (0, 1]"
+        assert 0.0 <= percent <= 1.0, "percent must be in [0, 1]"
         chrnames = sorted(self.get_chr_names())
 
         # Setup shuffling logic like PETrackI
