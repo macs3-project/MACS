@@ -2,6 +2,11 @@ import sys
 import types
 import pytest
 
+from MACS3.Signal.FixWidthTrack import FWTrack
+from MACS3.Signal.CallPeakUnit import CallerFromAlignments
+from MACS3.IO.PeakIO import PeakIO
+
+
 # ---------------------------------------------------------------------------
 # Provide tiny Cython/cykhash stubs so the Python sources import cleanly.
 # ---------------------------------------------------------------------------
@@ -63,10 +68,6 @@ if "cykhash" not in sys.modules:
     cykhash_stub.PyObjectMap = _Map
     cykhash_stub.Float32to32Map = _Map
     sys.modules["cykhash"] = cykhash_stub
-
-from MACS3.Signal.FixWidthTrack import FWTrack
-from MACS3.Signal.CallPeakUnit import CallerFromAlignments
-from MACS3.IO.PeakIO import PeakIO
 
 
 def make_fwtrack(layout, fw=50):

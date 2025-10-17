@@ -4,6 +4,10 @@ import types
 import numpy as np
 import pytest
 
+from MACS3.IO.BedGraphIO import bedGraphIO
+from MACS3.Signal.BedGraph import bedGraphTrackI
+
+
 # Provide lightweight Cython stubs so the module imports without compiled extensions.
 cython_stub = sys.modules.get("cython")
 if cython_stub is None:
@@ -52,9 +56,6 @@ if numpy_mod is None:
     numpy_mod.ndarray = np.ndarray
     sys.modules["cython.cimports.numpy"] = numpy_mod
 cimports_mod.numpy = numpy_mod
-
-from MACS3.IO.BedGraphIO import bedGraphIO
-from MACS3.Signal.BedGraph import bedGraphTrackI
 
 
 def to_python_arrays(track, chrom):
