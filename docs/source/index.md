@@ -46,6 +46,17 @@ assigned to celltype1 (each row is an unique barcode), and we assume
 that any genomics position of a single cell can only be cut twice (in
 case of haplotype).
 
+### Bug fixes
+
+1) Ensure `PETrackII.pileup_bdg` wraps pileup outputs with
+`array.array` objects before passing them to `bedGraphTrackI`,
+preventing runtime type errors when emitting bedGraph tracks from FRAG
+inputs.
+
+2) Allow zero-percent downsampling in `PETrackII.sample_percent*`,
+preserving existing CLI behaviour for scenarios where a balance target
+contains no fragments.
+
 ## Install
 
 The common way to install MACS is through

@@ -21,6 +21,17 @@
 	assume that any genomics position of a single cell can only be cut
 	twice (in case of haplotype).
 
+	* Bug fixed
+
+	1) Ensure `PETrackII.pileup_bdg` wraps pileup outputs with
+	`array.array` objects before passing them to `bedGraphTrackI`,
+	preventing runtime type errors when emitting bedGraph tracks from
+	FRAG inputs.
+
+	2) Allow zero-percent downsampling in
+	`PETrackII.sample_percent*`, preserving existing CLI behaviour for
+	scenarios where a balance target contains no fragments.
+
 2025-02-19  Tao Liu  <vladimir.liu@gmail.com>
 	MACS 3.0.3
 
@@ -2671,4 +2682,3 @@
 	* setup.py
 	Check the version of python. If the version is lower than 2.4,
 	refuse to install with warning.
-
