@@ -30,6 +30,8 @@ condition B while comparing treatment B over control B, and also the
 likelihood test while comparing treatment A and treatment B can't
 decide which condition is stronger.
 
+
+
 The likelihood function we used while comparing two conditions: ChIP
 (enrichment) or control (chromatin bias) is:
 
@@ -37,7 +39,7 @@ $$ln(LR) = x*(ln(x)-ln(y)) + y - x$$
 
 Here $LR$ is the likelihood ratio, x is the signal (fragment pileup)
 we observed in condition 1, and y is the signal in condition
-2. And $ln$ is the natural logarithm.
+2. And $ln$ is the natural logarithm. 
 
 Note: All regions on the same chromosome in the bedGraph file should
 be continuous so only bedGraph files from MACS3 are acceptable.

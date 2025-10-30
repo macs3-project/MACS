@@ -14,7 +14,9 @@ paper](https://academic.oup.com/nar/article/47/16/e91/5519166) was
 published in 2019, and the original software was written in JAVA, by
 the then PhD student Evan Tarbell, a mohawk bioinformatician. In MACS3
 project, we implemented HMMRATAC idea in Python/Cython and optimize
-the whole process using existing MACS functions and hmmlearn.
+the whole process using existing MACS functions and hmmlearn, and
+integrate HMMRATAC with all other modules in MACS3 such as the support
+for single-cell assay (FRAG format support).
 
 Here's an example of how to run the `hmmratac` command:
 
@@ -32,6 +34,13 @@ You can convert BAMPE to BEDPE by using
 
 ```
 $ macs3 filterdup --keep-dup all -f BAMPE -i yeast.bam -o yeast.bedpe
+```
+
+You can also call accessible regions on the fragment files from
+scATAC-seq analysis:
+
+```
+$ macs3 hmmratac -i yeast.scATAC.frag.gz -f FRAG --barcodes selected_barcodes.txt --max-count 1
 ```
 
 Please note that in order to save memory usage and fasten the process,
@@ -72,20 +81,43 @@ columns are:
 This is the only REQUIRED parameter for `hmmratac`. Input files
 containing the aligment results for ATAC-seq paired end reads. If
 multiple files are given as '-t A B C', then they will all be read and
-pooled together. The file should be in BAMPE or BEDPE format (aligned
-in paired end mode). Files can be gzipped. Note: all files should be
-in the same format. REQUIRED. 
+pooled together. The file should be in BAMPE, BEDPE format (aligned in
+paired end mode) or FRAG format (from scATAC analysis). Files can be
+gzipped. Note: all files should be in the same format. REQUIRED.
 
-### `-f {BAMPE,BEDPE}` / `--format {BAMPE,BEDPE}`
+### `-f {BAMPE,BEDPE,FRAG}` / `--format {BAMPE,BEDPE,FRAG}`
 
-Format of input files, "BAMPE" or "BEDPE". If there are multiple
-files, they should be in the same format -- either BAMPE or
-BEDPE. Please note that the BEDPE only contains three columns --
-chromosome, left position of the whole pair, right position of the
+Format of input files, "BAMPE", "BEDPE", or "FRAG". If there are
+multiple files, they should be in the same format -- either BAMPE,
+BEDPE, or FRAG. Please note that the BEDPE only contains three columns
+-- chromosome, left position of the whole pair, right position of the
 whole pair-- and is NOT the same BEDPE format used by BEDTOOLS. To
-convert BAMPE to BEDPE,  you can use this command `macs3 filterdup
---keep-dup all -f BAMPE -i input.bam -o output.bedpe`. DEFAULT:
-"BAMPE".
+convert BAMPE to BEDPE, you can use this command `macs3 filterdup
+--keep-dup all -f BAMPE -i input.bam -o output.bedpe`. And the FRAG
+format is like BEDPE but with two extra columns -- barcode and count
+of the fragment. Please note that if you plan to analyze single-cell
+ATAC-seq data on a specific list of barcodes, you can only use FRAG
+format. For other formats, the barcode information will be
+ignored. DEFAULT: "BAMPE".
+
+### `--barcodes` and `--max-count`
+
+These two options are for `-f FRAG` format only. You can let
+`hmmratac` work on a selected set of barcodes by specifying
+`--barcodes barcode.txt`. The `barcode.txt` should contain list of
+selected barcodes and each row represents a specific barcode, like:
+
+```
+ATCGATCGATCGATCG
+GCTAGCTAGCTAGCTA
+...
+```
+
+The `--max-count` option is recommended for scATAC-seq since for each
+single cell, Tn5 can only cut the same location once for each DNA
+molecule. So theoratically, if you are studying a haploid genome, the
+maximum count of the same fragment can't be larger than 2 (i.e. should
+use `--max-count 1` or `--max-count 2`).
 
 ### `--outdir OUTDIR`
 

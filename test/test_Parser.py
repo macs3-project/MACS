@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# Time-stamp: <2025-02-15 08:23:55 Tao Liu>
+# Time-stamp: <2025-04-11 13:46:05 Tao Liu>
 
 import unittest
 
@@ -40,15 +40,9 @@ class Test_parsing(unittest.TestCase):
         self.bedpefile = "test/tiny.bedpe.gz"
         self.samfile = "test/tiny.sam.gz"
         self.bamfile = "test/tiny.bam"
-        self.fragfile = "test/test.fragments.tsv.gz"
-
+        self.fragfile = "test/tiny.frag.tsv.gz"
+        
     def test_fragment_file(self):
         p = FragParser(self.fragfile)
         petrack = p.build_petrack()
         petrack.finalize()
-        bdg = petrack.pileup_bdg()
-        bdg2 = petrack.pileup_bdg2()
-        peaks = bdg.call_peaks(cutoff=10, min_length=200, max_gap=100)
-        peaks2 = bdg2.call_peaks(cutoff=10, min_length=200, max_gap=100)
-        # print(peaks)
-        # print(peaks2)

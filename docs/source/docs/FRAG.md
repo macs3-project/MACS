@@ -17,5 +17,3 @@ chr22   11333072        11333249        AAACGAAAGACTCGGA     1
 chr22   11363891        11364010        AAACGAAAGACTCGGA     1
 ...
 ```
-
-

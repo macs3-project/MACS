@@ -1,6 +1,6 @@
 # cython: language_level=3
 # cython: profile=True
-# Time-stamp: <2025-02-15 08:49:30 Tao Liu>
+# Time-stamp: <2025-07-24 16:41:34 Tao Liu>
 
 """Module for filter duplicate tags from paired-end data
 
@@ -15,8 +15,7 @@ the distribution).
 import io
 import sys
 from array import array as pyarray
-from collections import Counter
-
+from collections import Counter,defaultdict
 # ------------------------------------
 # MACS3 modules
 # ------------------------------------
@@ -749,7 +748,7 @@ class PETrackI:
 class PETrackII:
     """Paired-end track class for fragment files from single-cell
     ATAC-seq experiments. We will store data of start, end, barcode,
-    and count from the fragment files.
+    and count from the FRAGMENT files.
 
     * I choose not to inherit PETrackI because there would be a lot of
       differences.
@@ -779,7 +778,7 @@ class PETrackII:
 
     def __init__(self, anno: str = "", buffer_size: cython.long = 100000):
         # dictionary with chrname as key, nparray with
-        # [('l','i4'),('r','i4'),('c','u1')] as value
+        # [('l','i4'),('r','i4'),('c','u2')] as value
         self.locations = {}
         # dictionary with chrname as key, size of the above nparray as value
         # size is to remember the size of the fragments added to this chromosome
@@ -805,7 +804,7 @@ class PETrackII:
                 start: cython.int,
                 end: cython.int,
                 barcode: bytes,
-                count: cython.uchar):
+                count: cython.ushort):
         """Add a location to the list according to the sequence name.
 
         chromosome: mostly the chromosome name
@@ -828,7 +827,7 @@ class PETrackII:
             # note: ['l'] is the leftmost end, ['r'] is the rightmost end of fragment.
             # ['c'] is the count number of this fragment
             self.locations[chromosome] = np.zeros(shape=self.buffer_size,
-                                                  dtype=[('l', 'i4'), ('r', 'i4'), ('c', 'u1')])
+                                                  dtype=[('l', 'i4'), ('r', 'i4'), ('c', 'u2')])
             self.barcodes[chromosome] = np.zeros(shape=self.buffer_size,
                                                  dtype='i4')
             self.locations[chromosome][0] = (start, end, count)
@@ -987,39 +986,37 @@ class PETrackII:
         locs: cnp.ndarray
         chrnames: list
         i: cython.int
+        j: cython.int
 
         counter = Counter()
         chrnames = list(self.get_chr_names())
         for i in range(len(chrnames)):
             locs = self.locations[chrnames[i]]
             sizes = locs['r'] - locs['l']
-            for s in sizes:
-                counter[s] += locs['c']
+            for j in range(len(sizes)):
+                s = sizes[j]
+                counter[s] += locs['c'][j]
         return dict(counter)
 
     @cython.ccall
     def fraglengths(self) -> cnp.ndarray:
-        """Return the sizes/fragment lengths of each pair.
-
-        This function is for HMMRATAC EM training.
-        """
+        """Return the sizes/fragment lengths of each pair (count-weighted)."""
         sizes: cnp.ndarray(np.int32_t, ndim=1)
-        t_sizes: cnp.ndarray(np.int32_t, ndim=1)
-        locs: cnp.ndarray
         chrnames: list
-        i: cython.int
+        out: list
+        chrom: bytes
 
         chrnames = list(self.get_chr_names())
-        locs = self.locations[chrnames[0]]
-        sizes = locs['r'] - locs['l']
-        sizes = [x for x, count in zip(sizes, locs['c']) for _ in range(count)]
-
-        for i in range(1, len(chrnames)):
-            locs = self.locations[chrnames[i]]
-            t_sizes = locs['r'] - locs['l']
-            t_sizes = [x for x, count in zip(t_sizes, locs['c']) for _ in range(count)]
-            sizes = np.concatenate((sizes, t_sizes))
-        return sizes
+        out = []
+        for chrom in chrnames:
+            locs = self.locations[chrom]
+            sizes = locs['r'] - locs['l']
+            counts = locs['c']
+            out.append(np.repeat(sizes, counts))
+        if out:
+            return np.concatenate(out).astype(np.int32)
+        else:
+            return np.array([], dtype=np.int32)
 
     @cython.ccall
     def subset(self, selected_barcodes: set):
@@ -1156,16 +1153,30 @@ class PETrackII:
         return prev_pileup
 
     @cython.ccall
-    def pileup_bdg(self):
-        """Pileup all chromosome and return a bdg object.
+    def pileup_bdg(self,
+                   scale_factor: cython.float = 1.0,
+                   baseline_value: cython.float = 0.0):
+        """Pileup all chromosomes and return a bedGraphTrackI object.
+
+        scale_factor : value to scale the pileup values.
+
+        baseline_value : a value to be filled for missing values, and
+                         will be the minimum pileup.
+
         """
         bdg: bedGraphTrackI
         pv: cnp.ndarray
+        chrom: bytes
 
-        bdg = bedGraphTrackI()
-        for chrom in self.get_chr_names():
+        bdg = bedGraphTrackI(baseline_value=baseline_value)
+        for chrom in sorted(self.get_chr_names()):
             pv = pileup_from_LRC(self.locations[chrom])
-            bdg.add_chrom_data_PV(chrom, pv)
+            v = pv['v']
+            v = v * scale_factor
+            v[v < baseline_value] = baseline_value
+            bdg.add_chrom_data(chrom,
+                               pyarray('i', pv['p']),
+                               pyarray('f', v))
         return bdg
 
     @cython.ccall
@@ -1280,3 +1291,239 @@ class PETrackII:
             selected_idx.resize(0, refcheck=False)
         self.finalize()
         return
+
+    @cython.ccall
+    def sample_percent(self,
+                       percent: cython.float,
+                       seed: cython.int = -1):
+        """
+        Downsample all counts to a specified percent, in-place.
+        Shuffle and sample per chromosome.
+        """
+        k: bytes
+        loc: cnp.ndarray
+        bar: cnp.ndarray
+        counts: cnp.ndarray
+        n: cython.uint
+        n_sample: cython.uint
+        idx_flat: cnp.ndarray
+        unique_idx: cnp.ndarray
+        new_counts: cnp.ndarray
+        new_locs: cnp.ndarray
+        new_bars: cnp.ndarray
+
+        assert 0.0 <= percent <= 1.0, "percent must be in [0, 1]"
+        chrnames = sorted(self.get_chr_names())
+
+        # Setup shuffling logic like PETrackI
+        if seed >= 0:
+            info(f"#   A random seed {seed} has been used")
+            rs = np.random.RandomState(np.random.MT19937(np.random.SeedSequence(seed)))
+            rs_shuffle = rs.shuffle
+        else:
+            rs_shuffle = np.random.shuffle
+
+        self.length = 0
+        self.total = 0
+        self.average_template_length = 0.0
+
+        for k in chrnames:
+            loc = self.locations[k]
+            bar = self.barcodes[k]
+            counts = loc['c']
+            n = int(counts.sum())
+            n_sample = int(round(n * percent))
+            if n == 0 or n_sample == 0:
+                self.locations[k] = loc[:0]
+                self.barcodes[k] = bar[:0]
+                self.size[k] = 0
+                continue
+
+            # Flatten: build an array of indices into loc, repeated by count
+            idx_flat = np.repeat(np.arange(len(loc)), counts)
+            rs_shuffle(idx_flat)
+            idx_flat = idx_flat[:n_sample]
+
+            # Recount: count how many times each index is chosen
+            unique_idx, new_counts = np.unique(idx_flat, return_counts=True)
+            # Compose new arrays
+            new_locs = loc[unique_idx].copy()
+            new_locs['c'] = new_counts
+            new_bars = bar[unique_idx].copy()
+            self.locations[k] = new_locs
+            self.barcodes[k] = new_bars
+            self.size[k] = len(new_locs)
+            self.length += np.sum((new_locs['r'] - new_locs['l']) * new_locs['c'])
+            self.total += np.sum(new_locs['c'])
+
+        if self.total > 0:
+            self.average_template_length = float(self.length) / self.total
+        else:
+            self.average_template_length = 0.0
+        self.sort()
+        return
+
+    @cython.ccall
+    def sample_percent_copy(self,
+                            percent: cython.float,
+                            seed: cython.int = -1):
+        """
+        Downsample all counts to a specified percent, returning a
+        new PETrackII object.
+
+        Shuffle and sample per chromosome.
+
+        """
+        k: bytes
+        loc: cnp.ndarray
+        bar: cnp.ndarray
+        counts: cnp.ndarray
+        n: cython.uint
+        n_sample: cython.uint
+        idx_flat: cnp.ndarray
+        unique_idx: cnp.ndarray
+        new_counts: cnp.ndarray
+        new_locs: cnp.ndarray
+        new_bars: cnp.ndarray
+
+        assert 0.0 <= percent <= 1.0, "percent must be in [0, 1]"
+        chrnames = sorted(self.get_chr_names())
+
+        # Setup shuffling logic like PETrackI
+        if seed >= 0:
+            info(f"#   A random seed {seed} has been used")
+            rs = np.random.RandomState(np.random.MT19937(np.random.SeedSequence(seed)))
+            rs_shuffle = rs.shuffle
+        else:
+            rs_shuffle = np.random.shuffle
+
+        ret = PETrackII(anno=self.annotation, buffer_size=self.buffer_size)
+        ret.barcode_dict = dict(self.barcode_dict)
+        ret.barcode_last_n = self.barcode_last_n
+
+        ret.length = 0
+        ret.total = 0
+
+        for k in chrnames:
+            loc = self.locations[k]
+            bar = self.barcodes[k]
+            counts = loc['c']
+            n = int(counts.sum())
+            n_sample = int(round(n * percent))
+            if n == 0 or n_sample == 0:
+                ret.locations[k] = loc[:0]
+                ret.barcodes[k] = bar[:0]
+                ret.size[k] = 0
+                ret.buf_size[k] = 0
+                continue
+
+            idx_flat = np.repeat(np.arange(len(loc)), counts)
+            rs_shuffle(idx_flat)
+            idx_flat = idx_flat[:n_sample]
+            unique_idx, new_counts = np.unique(idx_flat, return_counts=True)
+            new_locs = loc[unique_idx].copy()
+            new_locs['c'] = new_counts
+            new_bars = bar[unique_idx].copy()
+            ret.locations[k] = new_locs
+            ret.barcodes[k] = new_bars
+            ret.size[k] = len(new_locs)
+            ret.buf_size[k] = len(new_locs)
+            ret.length += np.sum((new_locs['r'] - new_locs['l']) * new_locs['c'])
+            ret.total += np.sum(new_locs['c'])
+
+        if ret.total > 0:
+            ret.average_template_length = float(ret.length) / ret.total
+        else:
+            ret.average_template_length = 0.0
+        ret.set_rlengths(self.get_rlengths())
+        ret.sort()
+        return ret
+
+    @cython.ccall
+    def sample_num(self,
+                   samplesize: cython.ulong,
+                   seed: cython.int = -1):
+        """
+        Downsample in-place so that the sum of all counts is samplesize.
+        """
+        chrnames: set
+        n_total: cython.uint
+        chr_totals: dict
+        k: bytes
+        percent: cython.float
+
+        chrnames = self.get_chr_names()
+        n_total = 0
+        chr_totals = {}
+        for k in chrnames:
+            chr_totals[k] = self.locations[k]['c'].sum()
+            n_total += chr_totals[k]
+        percent = 0.0 if n_total == 0 else min(samplesize / n_total, 1.0)
+        self.sample_percent(percent, seed)
+        return
+
+    @cython.ccall
+    def sample_num_copy(self,
+                        samplesize: cython.ulong,
+                        seed: cython.int = -1):
+        """Downsample to a new PETrackII so that the sum of all
+        counts is samplesize.
+
+        """
+        chrnames: set
+        n_total: cython.uint
+        chr_totals: dict
+        k: bytes
+        percent: cython.float
+
+        chrnames = self.get_chr_names()
+        n_total = 0
+        chr_totals = {}
+        for k in chrnames:
+            chr_totals[k] = self.locations[k]['c'].sum()
+            n_total += chr_totals[k]
+        percent = 0.0 if n_total == 0 else min(samplesize / n_total, 1.0)
+        return self.sample_percent_copy(percent, seed)
+
+    @cython.ccall
+    def pileup_bdg_hmmr(self,
+                        mapping: list,
+                        baseline_value: cython.float = 0.0) -> list:
+        """Pileup all chromosomes and return a list of dictionaries.
+
+        Each dictionary corresponds to one mapping entry (short, mono,
+        di, tri).
+
+        Each dictionary is chrom: np.ndarray of [p,v] pileup.
+
+        """
+        ret_pileup: list
+        i: cython.uint
+        chroms: set
+        chrom: bytes
+        locs: cnp.ndarray
+        counts: cnp.ndarray
+        LR_expanded: cnp.ndarray
+        idx: cnp.ndarray
+
+        ret_pileup = []
+        for i in range(len(mapping)):
+            ret_pileup.append({})
+
+        chroms = self.get_chr_names()
+        for i in range(len(mapping)):
+            for chrom in sorted(chroms):
+                locs = self.locations[chrom]
+                counts = locs['c']
+                # Efficient numpy "explode"
+                if locs.shape[0] == 0 or counts.sum() == 0:
+                    LR_expanded = np.zeros((0,),
+                                           dtype=[('l', 'i4'), ('r', 'i4')])
+                else:
+                    idx = np.repeat(np.arange(locs.shape[0]), counts)
+                    LR_expanded = np.empty((len(idx),),
+                                           dtype=[('l', 'i4'), ('r', 'i4')])
+                    LR_expanded['l'] = locs['l'][idx]
+                    LR_expanded['r'] = locs['r'][idx]
+                ret_pileup[i][chrom] = pileup_from_LR_hmmratac(LR_expanded, mapping[i])
+        return ret_pileup

@@ -1,6 +1,6 @@
 # cython: language_level=3
 # cython: profile=True
-# Time-stamp: <2024-10-04 11:58:45 Tao Liu>
+# Time-stamp: <2025-07-24 15:46:59 Tao Liu>
 
 """Module description:
 
@@ -280,6 +280,6 @@ class HMMR_EM:
                 self.fragStddevs[j] = sqrt(self.fragVars[j])
                 self.__weights[j] = c[j] / total
         except ValueError:
-            print(' ValueError:  Adjust --means and --stddev options and re-run command')
+            print(' ValueError:  Adjust --means and --stddevs options and re-run command')
         debug(f"After this iteration, {total} fragments have been assigned with either of the three modes")
         return

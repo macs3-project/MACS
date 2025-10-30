@@ -10,11 +10,11 @@ authors = [{name = "Tao Liu", email = "vladimir.liu@gmail.com"},
 	   {name = "Philippa Doherty", email = "Philippa.Doherty@RoswellPark.org"}]
 readme = "README.md"
 requires-python = ">=3.9"
+license = "BSD-3-Clause"
 classifiers =['Development Status :: 5 - Production/Stable',
               'Environment :: Console',
               'Intended Audience :: Developers',
               'Intended Audience :: Science/Research',
-              'License :: OSI Approved :: BSD License',
               'Operating System :: MacOS :: MacOS X',
               'Operating System :: POSIX',
               'Operating System :: Unix',

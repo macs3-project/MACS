@@ -1,3 +1,37 @@
+2025-07-25  Tao Liu  <vladimir.liu@gmail.com>
+	MACS 3.0.4
+
+	* Features added
+
+	1) Now `-f FRAG` is supported in `hmmratac`. Please note that
+	since the difference in implementing the subsampling function for
+	the new class for holding fragment file, the result from
+	`hmmratac` can be slightly different between using the common
+	`BEDPE` or `BAMPE` input and using the collapsed `FRAG` input
+	file.
+
+	2) `--barcodes` and `--max-count` options are available in
+	`hmmratac`. Now we can limit the `hmmratac` peak calling in a
+	subset of barcodes and/or with a maximum count cutoff. For
+	example, if we try to call accessible regions from a subset of
+	cells in scATAC-seq dataset, we can use `--barcodes
+	celltype1_barcodes.txt --max-count 2` where the
+	`celltype1_barcodes.txt` contains the barcodes of the cells
+	assigned to celltype1 (each row is an unique barcode), and we
+	assume that any genomics position of a single cell can only be cut
+	twice (in case of haplotype).
+
+	* Bug fixed
+
+	1) Ensure `PETrackII.pileup_bdg` wraps pileup outputs with
+	`array.array` objects before passing them to `bedGraphTrackI`,
+	preventing runtime type errors when emitting bedGraph tracks from
+	FRAG inputs.
+
+	2) Allow zero-percent downsampling in
+	`PETrackII.sample_percent*`, preserving existing CLI behaviour for
+	scenarios where a balance target contains no fragments.
+
 2025-02-19  Tao Liu  <vladimir.liu@gmail.com>
 	MACS 3.0.3
 
@@ -2648,4 +2682,3 @@
 	* setup.py
 	Check the version of python. If the version is lower than 2.4,
 	refuse to install with warning.
-

@@ -1,7 +1,7 @@
 # cython: language_level=3
 # cython: profile=True
 # cython: linetrace=True
-# Time-stamp: <2025-02-14 12:08:53 Tao Liu>
+# Time-stamp: <2025-10-16 17:09:16 Tao Liu>
 
 """Module for Calculate Scores.
 
@@ -245,7 +245,7 @@ def right_forward(data,
 
 
 @cython.cfunc
-def median_from_value_length(value: cnp.ndarray(cython.float, ndim=1),
+def median_from_value_length(value: cnp.ndarray,
                              length: list) -> cython.float:
     """
     """
@@ -265,7 +265,7 @@ def median_from_value_length(value: cnp.ndarray(cython.float, ndim=1),
 
 
 @cython.cfunc
-def mean_from_value_length(value: cnp.ndarray(cython.float, ndim=1),
+def mean_from_value_length(value: cnp.ndarray,
                            length: list) -> cython.float:
     """take of: list values and of: list corresponding lengths,
     calculate the mean.  An important function for bedGraph type of
