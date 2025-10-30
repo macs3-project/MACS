@@ -3,7 +3,7 @@
 # cython: linetrace=True
 # Time-stamp: <2025-10-16 17:09:16 Tao Liu>
 
-"""Module for Calculate Scores.
+"""Compute MACS3 peak-calling scores and helper statistics.
 
 This code is free software; you can redistribute it and/or modify it
 under the terms of the BSD License (see the file LICENSE included with
@@ -56,8 +56,7 @@ logLR_dict = PyObjectMap()
 
 @cython.cfunc
 def get_pscore(t: tuple) -> cython.float:
-    """t: tuple of (lambda, observation)
-    """
+    """Return cached ``-log10`` Poisson tail probability for ``t``."""
     val: cython.float
 
     if t in pscore_dict:
@@ -71,9 +70,7 @@ def get_pscore(t: tuple) -> cython.float:
 
 @cython.cfunc
 def get_logLR_asym(t: tuple) -> cython.float:
-    """Calculate log10 Likelihood between H1 (enriched) and H0 (
-    chromatin bias). Set minus sign for depletion.
-    """
+    """Return asymmetric ``log10`` likelihood ratio for parameters ``t``."""
     val: cython.float
     x: cython.float
     y: cython.float
@@ -107,6 +104,7 @@ LOG10_E: cython.float = 0.43429448190325176
 
 @cython.cfunc
 def clean_up_ndarray(x: cnp.ndarray):
+    """Resize ``x`` to zero length, releasing its underlying buffer."""
     # clean numpy ndarray in two steps
     i: cython.long
 
@@ -119,36 +117,42 @@ def clean_up_ndarray(x: cnp.ndarray):
 @cython.cfunc
 @cython.inline
 def chi2_k1_cdf(x: cython.float) -> cython.float:
+    """Return CDF of chi-square(1) evaluated at ``x``."""
     return erf(sqrt(x/2))
 
 
 @cython.cfunc
 @cython.inline
 def log10_chi2_k1_cdf(x: cython.float) -> cython.float:
+    """Return log10 CDF of chi-square(1) evaluated at ``x``."""
     return log10(erf(sqrt(x/2)))
 
 
 @cython.cfunc
 @cython.inline
 def chi2_k2_cdf(x: cython.float) -> cython.float:
+    """Return CDF of chi-square(2) evaluated at ``x``."""
     return 1 - exp(-x/2)
 
 
 @cython.cfunc
 @cython.inline
 def log10_chi2_k2_cdf(x: cython.float) -> cython.float:
+    """Return log10 CDF of chi-square(2) evaluated at ``x``."""
     return log1p(- exp(-x/2)) * LOG10_E
 
 
 @cython.cfunc
 @cython.inline
 def chi2_k4_cdf(x: cython.float) -> cython.float:
+    """Return CDF of chi-square(4) evaluated at ``x``."""
     return 1 - exp(-x/2) * (1 + x/2)
 
 
 @cython.cfunc
 @cython.inline
 def log10_chi2_k4_CDF(x: cython.float) -> cython.float:
+    """Return log10 CDF of chi-square(4) evaluated at ``x``."""
     return log1p(- exp(-x/2) * (1 + x/2)) * LOG10_E
 
 
@@ -156,6 +160,7 @@ def log10_chi2_k4_CDF(x: cython.float) -> cython.float:
 @cython.inline
 def apply_multiple_cutoffs(multiple_score_arrays: list,
                            multiple_cutoffs: list) -> cnp.ndarray:
+    """Count how many scores exceed their corresponding cutoffs."""
     i: cython.int
     ret: cnp.ndarray
 
@@ -171,6 +176,7 @@ def apply_multiple_cutoffs(multiple_score_arrays: list,
 @cython.inline
 def get_from_multiple_scores(multiple_score_arrays: list,
                              index: cython.int) -> list:
+    """Return scores at ``index`` from each array in ``multiple_score_arrays``."""
     ret: list = []
     i: cython.int
 
@@ -183,8 +189,7 @@ def get_from_multiple_scores(multiple_score_arrays: list,
 @cython.inline
 def get_logFE(x: cython.float,
               y: cython.float) -> cython.float:
-    """ return 100* log10 fold enrichment with +1 pseudocount.
-    """
+    """Return ``log10`` fold enrichment for ``x`` over ``y``."""
     return log10(x/y)
 
 
@@ -192,8 +197,7 @@ def get_logFE(x: cython.float,
 @cython.inline
 def get_subtraction(x: cython.float,
                     y: cython.float) -> cython.float:
-    """ return subtraction.
-    """
+    """Return the difference ``x - y``."""
     return x - y
 
 
@@ -201,6 +205,7 @@ def get_subtraction(x: cython.float,
 @cython.inline
 def getitem_then_subtract(peakset: list,
                           start: cython.int) -> list:
+    """Return peak starts relative to ``start`` for axillary metrics."""
     a: list
 
     a = [x["start"] for x in peakset]
@@ -213,8 +218,7 @@ def getitem_then_subtract(peakset: list,
 @cython.inline
 def left_sum(data, pos: cython.int,
              width: cython.int) -> cython.int:
-    """
-    """
+    """Return cumulative sum within ``width`` bases to the left of ``pos``."""
     return sum([data[x] for x in data if x <= pos and x >= pos - width])
 
 
@@ -223,8 +227,7 @@ def left_sum(data, pos: cython.int,
 def right_sum(data,
               pos: cython.int,
               width: cython.int) -> cython.int:
-    """
-    """
+    """Return cumulative sum within ``width`` bases to the right of ``pos``."""
     return sum([data[x] for x in data if x >= pos and x <= pos + width])
 
 
@@ -233,6 +236,7 @@ def right_sum(data,
 def left_forward(data,
                  pos: cython.int,
                  window_size: cython.int) -> cython.int:
+    """Return incremental count entering ``pos`` from the left window."""
     return data.get(pos, 0) - data.get(pos-window_size, 0)
 
 
@@ -241,6 +245,7 @@ def left_forward(data,
 def right_forward(data,
                   pos: cython.int,
                   window_size: cython.int) -> cython.int:
+    """Return incremental count exiting ``pos`` toward the right window."""
     return data.get(pos + window_size, 0) - data.get(pos, 0)
 
 
@@ -340,12 +345,7 @@ def find_optimal_cutoff(x: list, y: list) -> tuple:
 # ------------------------------------
 @cython.cclass
 class CallerFromAlignments:
-    """A unit to calculate scores and call peaks from alignments --
-    FWTrack or PETrack objects.
-
-    It will compute for each chromosome separately in order to save
-    memory usage.
-    """
+    """Compute pileups, scores, and peaks from FWTrack/PETrack alignments."""
     treat: object            # FWTrack or PETrackI/II object for ChIP
     ctrl: object             # FWTrack or PETrackI/II object for Control
 
@@ -504,12 +504,7 @@ class CallerFromAlignments:
 
     @cython.ccall
     def destroy(self):
-        """Remove temporary files for pileup values of each chromosome.
-
-        Note: This function MUST be called if the class won: object't
-        be used anymore.
-
-        """
+        """Remove temporary pileup files created during peak calling."""
         f: bytes
 
         for f in self.pileup_data_files.values():
@@ -519,12 +514,12 @@ class CallerFromAlignments:
 
     @cython.ccall
     def set_pseudocount(self, pseudocount: cython.float):
+        """Update the pseudocount used in scoring."""
         self.pseudocount = pseudocount
 
     @cython.ccall
     def enable_trackline(self):
-        """Turn on trackline with bedgraph output
-        """
+        """Enable UCSC track line output when writing bedGraphs."""
         self.trackline = True
 
     @cython.cfunc
@@ -688,6 +683,7 @@ class CallerFromAlignments:
                     array1: cnp.ndarray(cython.float, ndim=1),
                     array2: cnp.ndarray(cython.float, ndim=1),
                     cal_func) -> cnp.ndarray:
+        """Apply ``cal_func`` element-wise across two equally sized arrays."""
         i: cython.long
         s: cnp.ndarray(cython.float, ndim=1)
 
@@ -699,10 +695,7 @@ class CallerFromAlignments:
 
     @cython.cfunc
     def __cal_pvalue_qvalue_table(self):
-        """After this function is called, self.pqtable is built. All
-        chromosomes will be iterated. So it will take some time.
-
-        """
+        """Populate ``self.pqtable`` by scanning all chromosomes."""
         chrom: bytes
         pos_array: cnp.ndarray
         treat_array: cnp.ndarray
