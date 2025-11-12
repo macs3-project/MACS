@@ -158,7 +158,7 @@ MACS3 project is sponsored by [![CZI's Essential Open Source Software for Scienc
 
 
 ```{toctree}
-:maxdepth: 2
+:maxdepth: 3
 :hidden:
 
 index.md
@@ -169,3 +169,4 @@ docs/tutorial.md
 docs/qa.md
 CODE_OF_CONDUCT.md
 CONTRIBUTING.md
+docs/api/index

@@ -1,4 +1,4 @@
-2025-07-25  Tao Liu  <vladimir.liu@gmail.com>
+2025-10-30  Tao Liu  <vladimir.liu@gmail.com>
 	MACS 3.0.4
 
 	* Features added
@@ -31,6 +31,14 @@
 	2) Allow zero-percent downsampling in
 	`PETrackII.sample_percent*`, preserving existing CLI behaviour for
 	scenarios where a balance target contains no fragments.
+
+	3) In some cases, overflow error may be triggered in PETrackI
+	while chaning the total length of the track. Now we explicitly
+	`cast` the int32 value to ulonglong to avoid such error.
+
+	* Other
+
+	1) Cleanup of docstrings in source code and provide API documents.
 
 2025-02-19  Tao Liu  <vladimir.liu@gmail.com>
 	MACS 3.0.3

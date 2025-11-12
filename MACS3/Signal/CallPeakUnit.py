@@ -1458,6 +1458,7 @@ class CallerFromAlignments:
     def __cal_pscore(self,
                      array1: cnp.ndarray,
                      array2: cnp.ndarray) -> cnp.ndarray:
+        """Compute ``-log10`` Poisson p-scores element-wise for two arrays."""
 
         i: cython.long
         array1_size: cython.long
@@ -1488,6 +1489,7 @@ class CallerFromAlignments:
     def __cal_qscore(self,
                      array1: cnp.ndarray,
                      array2: cnp.ndarray) -> cnp.ndarray:
+        """Map p-scores to q-scores using the precomputed ``pqtable``."""
         i: cython.long
         s: cnp.ndarray
         a1_ptr: cython.pointer(cython.float)
@@ -1514,6 +1516,7 @@ class CallerFromAlignments:
     def __cal_logLR(self,
                     array1: cnp.ndarray,
                     array2: cnp.ndarray) -> cnp.ndarray:
+        """Compute asymmetric log-likelihood ratios element-wise."""
         i: cython.long
         s: cnp.ndarray
         a1_ptr: cython.pointer(cython.float)
@@ -1539,6 +1542,7 @@ class CallerFromAlignments:
     def __cal_logFE(self,
                     array1: cnp.ndarray,
                     array2: cnp.ndarray) -> cnp.ndarray:
+        """Compute log fold enrichment with the configured pseudocount."""
         i: cython.long
         s: cnp.ndarray
         a1_ptr: cython.pointer(cython.float)
@@ -1564,6 +1568,7 @@ class CallerFromAlignments:
     def __cal_FE(self,
                  array1: cnp.ndarray,
                  array2: cnp.ndarray) -> cnp.ndarray:
+        """Compute linear fold enrichment with the configured pseudocount."""
         i: cython.long
         s: cnp.ndarray
         a1_ptr: cython.pointer(cython.float)
@@ -1588,6 +1593,7 @@ class CallerFromAlignments:
     def __cal_subtraction(self,
                           array1: cnp.ndarray,
                           array2: cnp.ndarray) -> cnp.ndarray:
+        """Compute treatment-control subtraction element-wise."""
         i: cython.long
         s: cnp.ndarray
         a1_ptr: cython.pointer(cython.float)

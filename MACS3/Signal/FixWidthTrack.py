@@ -1,6 +1,6 @@
 # cython: language_level=3
 # cython: profile=True
-# Time-stamp: <2025-02-05 10:23:13 Tao Liu>
+# Time-stamp: <2025-11-10 15:24:27 Tao Liu>
 
 """Module for FWTrack classes.
 
@@ -46,12 +46,10 @@ from cython.cimports.libc.stdint import INT32_MAX as INT_MAX
 
 @cython.cclass
 class FWTrack:
-    """Fixed Width Locations Track class  along the whole genome
-    (commonly with the same annotation type), which are stored in a
-    dict.
-
-    Locations are stored and organized by sequence names (chr names) in a
-    dict. They can be sorted by calling self.sort() function.
+    """Fixed-width fragment track grouped by chromosome.
+    
+    Stores plus- and minus-strand 5' cut positions in numpy arrays and exposes
+    utilities for sorting, filtering, sampling, and pileup generation.
     """
     locations: dict
     pointer: dict
@@ -62,15 +60,23 @@ class FWTrack:
     total = cython.declare(cython.ulong, visibility="public")
     annotation = cython.declare(str, visibility="public")
     buffer_size = cython.declare(cython.long, visibility="public")
-    length = cython.declare(cython.long, visibility="public")
+    length = cython.declare(cython.ulonglong, visibility="public")
     fw = cython.declare(cython.int, visibility="public")
 
     def __init__(self,
                  fw: cython.int = 0,
                  anno: str = "",
                  buffer_size: cython.long = 100000):
-        """fw is the fixed-width for all locations.
-
+        """Initialize an empty fixed-width track.
+        
+        Parameters
+        ----------
+        fw : int, optional
+            Fixed fragment width (bp) used when estimating coverage and region length.
+        anno : str, optional
+            Annotation label retained with the track metadata.
+        buffer_size : int, optional
+            Number of positions allocated per growth chunk for each strand array.
         """
         self.fw = fw
         self.locations = {}    # location pairs: two strands
@@ -87,7 +93,10 @@ class FWTrack:
 
     @cython.ccall
     def destroy(self):
-        """Destroy this object and release mem.
+        """Release numpy buffers held by the track.
+        
+        All per-chromosome arrays are resized to zero so the memory footprint returns
+        to the allocator, and the track is marked as destroyed.
         """
         chrs: set
         chromosome: bytes
@@ -113,11 +122,21 @@ class FWTrack:
                 chromosome: bytes,
                 fiveendpos: cython.int,
                 strand: cython.int):
-        """Add a location to the list according to the sequence name.
-
-        chromosome -- mostly the chromosome name
-        fiveendpos -- 5' end pos, left for plus strand, right for minus strand
-        strand     -- 0: plus, 1: minus
+        """Append a 5' cut position to the track.
+        
+        Parameters
+        ----------
+        chromosome : bytes
+            Chromosome name (as bytes) that owns the cut.
+        fiveendpos : int
+            Zero-based 5' coordinate of the cut site.
+        strand : int
+            Strand flag where ``0`` denotes plus and ``1`` denotes minus.
+        
+        Notes
+        -----
+        Positions are stored in strand-specific numpy arrays keyed by chromosome, and
+        the strand pointer is advanced as new positions are appended.
         """
         i: cython.int
         b: cython.int
@@ -144,9 +163,11 @@ class FWTrack:
 
     @cython.ccall
     def finalize(self):
-        """ Resize np arrays for 5' positions and sort them in place
-
-        Note: If this function is called, it's impossible to append more files to this FWTrack object. So remember to call it after all the files are read!
+        """Shrink arrays and sort per-strand coordinates in place.
+        
+        Each chromosome's plus- and minus-strand arrays are resized to the observed
+        counts, sorted ascending, and aggregate counters such as ``total`` and
+        ``length`` are refreshed. Call this after loading data.
         """
         c: bytes
         chrnames: set
@@ -168,14 +189,22 @@ class FWTrack:
 
     @cython.ccall
     def set_rlengths(self, rlengths: dict) -> bool:
-        """Set reference chromosome lengths dictionary.
-
-        Only the chromosome existing in this fwtrack object will be updated.
-
-        If chromosome in this fwtrack is not covered by given
-        rlengths, and it has no associated length, it will be set as
-        maximum integer.
-
+        """Attach reference chromosome lengths to the track.
+        
+        Parameters
+        ----------
+        rlengths : dict
+            Mapping from chromosome name (bytes) to reference length.
+        
+        Returns
+        -------
+        bool
+            True when the length mapping has been updated.
+        
+        Notes
+        -----
+        Any chromosome stored in the track but missing from ``rlengths`` is assigned
+        ``INT_MAX`` so downstream bounds checks can succeed.
         """
         valid_chroms: set
         missed_chroms: set
@@ -191,10 +220,13 @@ class FWTrack:
 
     @cython.ccall
     def get_rlengths(self) -> dict:
-        """Get reference chromosome lengths dictionary.
-
-        If self.rlength is empty, create a new dict where the length of
-        chromosome will be set as the maximum integer.
+        """Return the reference chromosome lengths associated with the track.
+        
+        Returns
+        -------
+        dict
+            Mapping from chromosome name (bytes) to reference length. Chromosomes
+            without a recorded length default to ``INT_MAX``.
         """
         if not self.rlengths:
             self.rlengths = dict([(k, INT_MAX) for k in self.locations.keys()])
@@ -202,8 +234,22 @@ class FWTrack:
 
     @cython.ccall
     def get_locations_by_chr(self, chromosome: bytes):
-        """Return a tuple of two lists of locations for certain chromosome.
-
+        """Return the strand-specific arrays for a chromosome.
+        
+        Parameters
+        ----------
+        chromosome : bytes
+            Chromosome name, provided as bytes.
+        
+        Returns
+        -------
+        tuple[numpy.ndarray, numpy.ndarray]
+            Pair of numpy arrays ``(plus, minus)`` containing 5' positions.
+        
+        Raises
+        ------
+        Exception
+            If the chromosome is not present in the track.
         """
         if chromosome in self.locations:
             return self.locations[chromosome]
@@ -212,14 +258,21 @@ class FWTrack:
 
     @cython.ccall
     def get_chr_names(self) -> set:
-        """Return all the chromosome names stored in this track object.
+        """Return a sorted set of chromosome names stored in the track.
+        
+        Returns
+        -------
+        set
+            Sorted chromosome names (bytes) that currently have positions.
         """
         return set(sorted(self.locations.keys()))
 
     @cython.ccall
     def sort(self):
-        """Naive sorting for locations.
-
+        """Sort per-strand coordinate arrays for every chromosome.
+        
+        Positions are ordered ascending on each strand and the ``is_sorted`` flag is
+        set to ``True`` once sorting completes.
         """
         c: bytes
         chrnames: set
@@ -236,13 +289,23 @@ class FWTrack:
     @cython.boundscheck(False)  # do not check that np indices are valid
     @cython.ccall
     def filter_dup(self, maxnum: cython.int = -1) -> cython.ulong:
-        """Filter the duplicated reads.
-
-        Run it right after you add all data into this object.
-
-        Note, this function will *throw out* duplicates
-        permenantly. If you want to keep them, use separate_dups
-        instead.
+        """Limit duplicate 5' positions to a maximum count per strand.
+        
+        Parameters
+        ----------
+        maxnum : int, optional
+            Maximum number of occurrences allowed per coordinate. A negative value
+            disables duplicate filtering.
+        
+        Returns
+        -------
+        int
+            Total number of retained positions across both strands after filtering.
+        
+        Notes
+        -----
+        The track must be sorted before filtering. Coordinates exceeding ``maxnum``
+        are discarded, pointers are updated, and ``total``/``length`` are recomputed.
         """
         p: cython.int
         n: cython.int
@@ -349,9 +412,20 @@ class FWTrack:
 
     @cython.ccall
     def sample_percent(self, percent: cython.float, seed: cython.int = -1):
-        """Sample the tags for a given percentage.
-
-        Warning: the current object is changed!
+        """Down-sample positions in place by a fixed percentage.
+        
+        Parameters
+        ----------
+        percent : float
+            Fraction of positions to keep per strand between 0 and 1 (inclusive).
+        seed : int, optional
+            Seed forwarded to NumPy's RNG; a negative value uses global state.
+        
+        Notes
+        -----
+        Sampling is performed independently for plus and minus strands by shuffling
+        each array, resizing to the requested fraction, and restoring sort order.
+        Aggregate counters ``total`` and ``length`` are refreshed.
         """
         num: cython.int  # num: number of reads allowed on a certain chromosome
         k: bytes
@@ -390,9 +464,19 @@ class FWTrack:
 
     @cython.ccall
     def sample_num(self, samplesize: cython.ulong, seed: cython.int = -1):
-        """Sample the tags for a given percentage.
-
-        Warning: the current object is changed!
+        """Down-sample positions in place so the total approximates ``samplesize``.
+        
+        Parameters
+        ----------
+        samplesize : int
+            Target number of positions across both strands.
+        seed : int, optional
+            Seed forwarded to :meth:`sample_percent`.
+        
+        Notes
+        -----
+        The method converts ``samplesize`` into a sampling fraction using the current
+        ``total`` and reuses :meth:`sample_percent`.
         """
         percent: cython.float
 
@@ -402,9 +486,17 @@ class FWTrack:
 
     @cython.ccall
     def print_to_bed(self, fhd=None):
-        """Output FWTrack to BED format files. If fhd is given,
-        write to a file, otherwise, output to standard output.
-
+        """Stream the track as BED records.
+        
+        Parameters
+        ----------
+        fhd : io.IOBase, optional
+            Writable file-like object. Defaults to ``sys.stdout``.
+        
+        Notes
+        -----
+        Emits one record per stored position with fixed-width intervals derived from
+        ``fw`` and strand-specific orientation.
         """
         i: cython.int
         p: cython.int
@@ -444,6 +536,27 @@ class FWTrack:
     @cython.ccall
     def extract_region_tags(self, chromosome: bytes,
                             startpos: cython.int, endpos: cython.int) -> tuple:
+        """Collect positions within a genomic window for both strands.
+        
+        Parameters
+        ----------
+        chromosome : bytes
+            Chromosome identifier to query.
+        startpos : int
+            Inclusive start coordinate of the window.
+        endpos : int
+            Inclusive end coordinate of the window.
+        
+        Returns
+        -------
+        tuple[numpy.ndarray, numpy.ndarray]
+            Pair of numpy arrays ``(plus, minus)`` containing positions inside the
+            requested window.
+        
+        Notes
+        -----
+        The track is sorted on demand before performing the windowed lookup.
+        """
         i: cython.int
         pos: cython.int
         rt_plus: np.ndarray(cython.int, ndim=1)
@@ -487,20 +600,30 @@ class FWTrack:
                                        func,
                                        window_size: cython.int = 100,
                                        cutoff: cython.float = 5.0) -> list:
-        """Extract tags in peak, then apply func on extracted tags.
-
-        peaks: redefined regions to extract raw tags in PeakIO type: check cPeakIO.pyx.
-
-        func:  a function to compute *something* from tags found in a predefined region
-
-        window_size: this will be passed to func.
-
-        cutoff: this will be passed to func.
-
-        func needs the fixed number of parameters, so it's not flexible. Here is an example:
-
-        wtd_find_summit(chrom, plus, minus, peak_start, peak_end, name , window_size, cutoff):
-
+        """Apply a summary function to tags collected around peak regions.
+        
+        Parameters
+        ----------
+        peaks : MACS3.IO.PeakIO.PeakIO
+            Peak container providing genomic intervals and metadata.
+        func : callable
+            Callback invoked as ``func(chrom, plus, minus, startpos, endpos, ...)``
+            for each peak. The callable must accept ``window_size`` and ``cutoff``
+            keyword arguments.
+        window_size : int, optional
+            Half-window size added on each side of every peak when collecting tags.
+        cutoff : float, optional
+            Additional threshold passed to ``func``.
+        
+        Returns
+        -------
+        list
+            Results returned by ``func`` for each processed peak.
+        
+        Notes
+        -----
+        Both the track and the ``peaks`` object are sorted before iteration, and
+        per-chromosome state is reused to avoid rescanning arrays.
         """
         m: cython.int
         i: cython.int
@@ -593,26 +716,30 @@ class FWTrack:
                             baseline_value: cython.float = 0.0,
                             directional: bool = True,
                             end_shift: cython.int = 0) -> list:
-        """pileup a certain chromosome, return [p,v] (end position and
-        value) list.
-
-        d : tag will be extended to this value to 3' direction,
-            unless directional is False.
-
-        scale_factor : linearly scale the pileup value.
-
-        baseline_value : a value to be filled for missing values, and
-                         will be the minimum pileup.
-
-        directional : if False, the strand or direction of tag will be
-                      ignored, so that extension will be both sides
-                      with d/2.
-
-        end_shift : move cutting ends towards 5->3 direction if value
-                    is positive, or towards 3->5 direction if
-                    negative. Default is 0 -- no shift at all.
-
-        p and v are numpy.ndarray objects.
+        """Compute a coverage pileup for a single chromosome.
+        
+        Parameters
+        ----------
+        chrom : bytes
+            Chromosome name to pile up.
+        d : int
+            Extension length applied in the 3' direction unless ``directional`` is
+            ``False``.
+        scale_factor : float, optional
+            Value used to scale the resulting coverage.
+        baseline_value : float, optional
+            Minimum value enforced on the coverage array.
+        directional : bool, optional
+            If ``False``, extend cuts symmetrically to both sides by ``d / 2``.
+        end_shift : int, optional
+            Shift applied to the 5' cuts before extension; positive values move
+            toward the 3' direction.
+        
+        Returns
+        -------
+        list
+            Two-element list ``[positions, values]`` with numpy arrays describing
+            the pileup breakpoints and scaled coverage.
         """
         five_shift: cython.long
         # adjustment to 5' end and 3' end positions to make a fragment
@@ -650,31 +777,29 @@ class FWTrack:
                               baseline_value: cython.float = 0.0,
                               directional: bool = True,
                               end_shift: cython.int = 0) -> list:
-        """pileup a certain chromosome, return [p,v] (end position and
-        value) list. This is for control data for which we have
-        multiple different `d` and `scale_factor`.
-
-        ds : tag will be extended to this value to 3' direction,
-             unless directional is False. Can contain multiple
-             extension values. Final pileup will the maximum.
-
-        scale_factor_s : linearly scale the pileup value applied to
-                         each d in ds. The list should have the same
-                         length as ds.
-
-        baseline_value : a value to be filled for missing values, and
-                         will be the minimum pileup.
-
-        directional : if False, the strand or direction of tag will be
-                      ignored, so that extension will be both sides
-                      with d/2.
-
-        end_shift : move cutting ends towards 5->3 direction if value
-                    is positive, or towards 3->5 direction if
-                    negative. Default is 0 -- no shift at all.
-
-        p and v are numpy.ndarray objects.
-
+        """Compute a control pileup using multiple extension lengths.
+        
+        Parameters
+        ----------
+        chrom : bytes
+            Chromosome name to pile up.
+        ds : list[int]
+            Extension lengths used to build individual pileups.
+        scale_factor_s : list[float]
+            Scale factors paired with each entry in ``ds``.
+        baseline_value : float, optional
+            Minimum value enforced on the coverage array.
+        directional : bool, optional
+            If ``False``, extend cuts symmetrically to both sides by ``d / 2``.
+        end_shift : int, optional
+            Shift applied to the 5' cuts before extension; positive values move
+            toward the 3' direction.
+        
+        Returns
+        -------
+        list
+            Two-element list ``[positions, values]`` representing the merged pileup
+            where the maximum value is taken across the supplied extensions.
         """
         d: cython.long
         five_shift: cython.long
