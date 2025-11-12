@@ -1,6 +1,6 @@
 # cython: language_level=3
 # cython: profile=True
-# Time-stamp: <2025-11-11 18:52:04 Tao Liu>
+# Time-stamp: <2025-11-12 17:20:17 Tao Liu>
 
 """Module for filter duplicate tags from paired-end data
 
@@ -498,7 +498,7 @@ class PETrackI:
                         # change the flag to False
                         selected_idx[i] = False
                         # subtract current_loc_l from self.length
-                        self.length -= cython.cast(current_loc_end - current_loc_start)
+                        self.length -= cython.cast(cython.ulonglong, current_loc_end - current_loc_start)
             self.locations[k] = locs[selected_idx]
             self.size[k] = self.locations[k].shape[0]
             self.total += self.size[k]
@@ -1484,7 +1484,7 @@ class PETrackII:
                     # and move to the next r1
                     # get rid of this one
                     n_rl1 -= 1
-                    self.length -= cython.cast((r1[1] - r1[0])*r1[2])
+                    self.length -= cython.cast(cython.ulonglong, (r1[1] - r1[0])*r1[2])
                     selected_idx[i] = False
 
                     if n_rl1 >= 0:
