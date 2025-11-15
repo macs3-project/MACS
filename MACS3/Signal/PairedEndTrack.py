@@ -1,6 +1,6 @@
 # cython: language_level=3
 # cython: profile=True
-# Time-stamp: <2025-11-12 17:20:17 Tao Liu>
+# Time-stamp: <2025-11-14 19:08:47 Tao Liu>
 
 """Module for filter duplicate tags from paired-end data
 
@@ -216,6 +216,14 @@ class PETrackI:
 
         for c in chrnames:
             self.locations[c].resize((self.size[c]), refcheck=False)
+            if self.size[c] == 0:
+                if c in self.size:
+                    del self.size[c]
+                if c in self.locations:
+                    del self.locations[c]
+                if c in self.rlengths:
+                    del self.rlengths[c]
+                continue
             self.locations[c].sort(order=['l', 'r'])
             self.total += self.size[c]
 
@@ -1074,6 +1082,16 @@ class PETrackII:
 
         for c in chrnames:
             self.locations[c].resize((self.size[c]), refcheck=False)
+            if self.size[c] == 0:
+                if c in self.size:
+                    del self.size[c]
+                if c in self.locations:
+                    del self.locations[c]
+                if c in self.barcodes:
+                    del self.barcodes[c]
+                if c in self.rlengths:
+                    del self.rlengths[c]
+                continue
             indices = np.argsort(self.locations[c], order=['l', 'r'])
             self.locations[c] = self.locations[c][indices]
             self.barcodes[c] = self.barcodes[c][indices]
