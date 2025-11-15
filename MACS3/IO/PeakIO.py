@@ -1,6 +1,6 @@
 # cython: language_level=3
 # cython: profile=True
-# Time-stamp: <2024-10-15 11:48:33 Tao Liu>
+# Time-stamp: <2025-11-14 16:52:15 Tao Liu>
 
 """Module for PeakIO IO classes.
 
@@ -217,12 +217,15 @@ class PeakIO:
     CO_sorted = cython.declare(bool, visibility="public")
     # total number of peaks
     total = cython.declare(cython.long, visibility="public")
+    # name
+    name = cython.declare(bytes, visibility="public")
 
-    def __init__(self):
+    def __init__(self, name: bytes = b"MACS3"):
         """Initialise an empty peak collection."""
         self.peaks = {}
         self.CO_sorted = False
         self.total = 0
+        self.name = name
 
     @cython.ccall
     def add(self,
@@ -1037,7 +1040,7 @@ class BroadPeakContent:
                  pscore: cython.float,
                  fold_change: cython.float,
                  qscore: cython.float,
-                 name: bytes = b"NA"):
+                 name: bytes = b"MACS3"):
         """Initialise a broad peak record with block structure and scores."""
         self.start = start
         self.end = end
