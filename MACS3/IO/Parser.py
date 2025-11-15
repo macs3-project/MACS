@@ -1,7 +1,7 @@
 # cython: language_level=3
 # cython: profile=True
 # cython: linetrace=True
-# Time-stamp: <2025-04-11 13:41:46 Tao Liu>
+# Time-stamp: <2025-11-12 22:14:22 Tao Liu>
 
 """Input parsers used across MACS3 for reading alignment-like formats.
 
@@ -937,7 +937,7 @@ class SAMParser(GenericParser):
         if bwflag & 16:
             # minus strand, we have to decipher CIGAR string
             thisstrand = 1
-            thisstart = atoi(thisfields[3]) - 1 + sum([cython.cast(cython.int, x) for x in findall(b"(\d+)[MDNX=]", CIGAR)])  #reverse strand should be shifted alen bp
+            thisstart = atoi(thisfields[3]) - 1 + sum([cython.cast(cython.int, x) for x in findall(b"(\\d+)[MDNX=]", CIGAR)])  #reverse strand should be shifted alen bp
         else:
             thisstrand = 0
             thisstart = atoi(thisfields[3]) - 1
