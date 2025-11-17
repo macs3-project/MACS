@@ -2,7 +2,7 @@
 # cython: profile=True
 # Time-stamp: <2025-02-05 12:38:24 Tao Liu>
 
-"""Module Description:  IO Module for bedGraph file
+"""Utilities for reading and writing MACS3 bedGraph files.
 
 This code is free software; you can redistribute it and/or modify it
 under the terms of the BSD License (see the file LICENSE included with
@@ -38,30 +38,16 @@ from cython.cimports.libc.stdlib import atoi, atof
 
 @cython.cclass
 class bedGraphIO:
-    """File IO Class for bedGraph File.
-
-    two publicly available member variables:
-
-    1. bedGraph_filename: the filename for the bedGraph file
-
-    2. data: a bedGraphTrackI class object
-
-    There are two assumptions in the bedGraphTrackI class:
-
-    1. Continuous: the next region should be after the previous one
-    unless they are on different chromosomes;
-
-    2. Non-overlapping: the next region should never have overlaps
-    with preceding region.
-
-    If any of the above two criteria is violated, parsering will fail.
-    """
+    """Helper for loading and writing bedGraph tracks."""
     bedGraph_filename = cython.declare(str, visibility='public')
     data = cython.declare(object, visibility='public')
 
     def __init__(self, bedGraph_filename: str, data=None):
-        """f must be a filename or a file handler.
+        """Initialise the IO wrapper for ``bedGraph_filename``.
 
+        Args:
+            bedGraph_filename: Path to the bedGraph file.
+            data: Optional existing :class:`bedGraphTrackI` to populate.
         """
         self.bedGraph_filename = bedGraph_filename
         if data:
@@ -72,16 +58,13 @@ class bedGraphIO:
 
     @cython.ccall
     def read_bedGraph(self, baseline_value: cython.double = 0):
-        """Use this function to return a bedGraphTrackI object.
+        """Load bedGraph intervals into the internal :class:`bedGraphTrackI`.
 
-        baseline_value is the value to fill in the regions not defined
-        in bedGraph. For example, if the bedGraph is like:
+        Args:
+            baseline_value: Value used to fill gaps between defined intervals.
 
-        chr1  100 200  1
-        chr1  250 350  2
-
-        Then the region chr1:200..250 should be filled with
-        baseline_value. Default of baseline_value is 0.
+        Returns:
+            bedGraphTrackI: Populated track instance.
         """
         i: bytes
 
@@ -107,9 +90,12 @@ class bedGraphIO:
     @cython.ccall
     def write_bedGraph(self, name: str = "", description: str = "",
                        trackline: bool = True):
-        """Write all data to self.bedGraph_filename in bedGraph Format.
+        """Persist the current track to ``self.bedGraph_filename``.
 
-        name/description: the name and description in track line.
+        Args:
+            name: Track name used in the optional header line.
+            description: Track description used in the optional header line.
+            trackline: Whether to emit a UCSC ``track`` header.
         """
         pre: cython.int
         pos: cython.int

@@ -1,10 +1,9 @@
 # cython: language_level=3
 # cython: profile=True
 # cython: linetrace=True
-# Time-stamp: <2025-04-11 13:41:46 Tao Liu>
+# Time-stamp: <2025-11-12 22:14:22 Tao Liu>
 
-"""Module for all MACS Parser classes for input. Please note that the
-parsers are for reading the alignment files ONLY.
+"""Input parsers used across MACS3 for reading alignment-like formats.
 
 This code is free software; you can redistribute it and/or modify it
 under the terms of the BSD License (see the file LICENSE included with
@@ -53,6 +52,18 @@ else:
 
 @cython.ccall
 def guess_parser(fname, buffer_size: cython.long = 100000):
+    """Return the first parser that recognises ``fname`` as a supported format.
+
+    Args:
+        fname: Path to inspect.
+        buffer_size: Buffer size handed to candidate parser constructors.
+
+    Returns:
+        Parser instance configured for the detected format.
+
+    Raises:
+        Exception: If no parser can identify the file structure.
+    """
     # Note: BAMPE and BEDPE can't be automatically detected.
     ordered_parser_dict = {"BAM": BAMParser,
                            "BED": BEDParser,
@@ -189,31 +200,21 @@ def bampe_pe_binary_parse(data: cython.pointer[cython.const[cython.uchar]],
 
 
 class StrandFormatError(BaseException):
-    """Exception about strand format error.
-
-    Example:
-    raise StrandFormatError('Must be F or R','X')
-    """
+    """Exception raised when strand annotations cannot be interpreted."""
     def __init__(self, string, strand):
+        """Capture the offending line and strand token."""
         self.strand = strand
         self.string = string
 
     def __str__(self):
+        """Return a descriptive error message for the malformed strand."""
         return repr("Strand information can not be recognized in this line: \"%s\",\"%s\"" %
                     (self.string, self.strand))
 
 
 @cython.cclass
 class GenericParser:
-    """Generic Parser class.
-
-    Inherit this class to write your own parser. In most cases, you
-    need to override:
-
-    1. tlen_parse_line which returns tag length of a line
-    2.  fw_parse_line which returns tuple of (chromosome, 5'position, strand)
-
-    """
+    """Base parser with helpers for streaming alignment-like text files."""
     filename: str
     gzipped: bool
     tag_size: cython.int
@@ -221,15 +222,11 @@ class GenericParser:
     buffer_size: cython.long
 
     def __init__(self, filename: str, buffer_size: cython.long = 100000):
-        """Open input file. Determine whether it's a gzipped file.
+        """Prepare the parser and open the target file.
 
-        'filename' must be a string object.
-
-        This function initialize the following attributes:
-
-        1. self.filename: the filename for input file.
-        2. self.gzipped: a boolean indicating whether input file is gzipped.
-        3. self.fhd: buffered I/O stream of input file
+        Args:
+            filename: Path to the input alignment file.
+            buffer_size: Chunk size used when reading the stream.
         """
         self.filename = filename
         self.gzipped = True
@@ -255,19 +252,12 @@ class GenericParser:
 
     @cython.cfunc
     def skip_first_commentlines(self):
-        """Some parser needs to skip the first several comment lines.
-
-        Redefine this if it's necessary!
-        """
+        """Advance the stream past any leading comment or header lines."""
         return
 
     @cython.ccall
     def tsize(self) -> cython.int:
-        """General function to detect tag size.
-
-        * Although it can be used by most parsers, it must be
-          rewritten by BAMParser!
-        """
+        """Estimate tag length from a sample of valid alignments."""
         s: cython.int = 0
         n: cython.int = 0  # number of successful/valid read alignments
         m: cython.int = 0  # number of trials
@@ -297,19 +287,12 @@ class GenericParser:
 
     @cython.cfunc
     def tlen_parse_line(self, thisline: bytes) -> cython.int:
-        """Abstract function to detect tag length.
-
-        """
+        """Return the inferred tag length for ``thisline`` or ``0`` if invalid."""
         raise NotImplementedError
 
     @cython.ccall
     def build_fwtrack(self):
-        """Generic function to build FWTrack object. Create a new
-        FWTrack object. If you want to append new records to an
-        existing FWTrack object, try append_fwtrack function.
-
-        * BAMParser for binary BAM format should have a different one.
-        """
+        """Create a new ``FWTrack`` populated from the underlying stream."""
         i: cython.long
         fpos: cython.long
         strand: cython.long
@@ -347,9 +330,7 @@ class GenericParser:
 
     @cython.ccall
     def append_fwtrack(self, fwtrack):
-        """Add more records to an existing FWTrack object.
-
-        """
+        """Append parsed locations to an existing ``FWTrack``."""
         i: cython.long
         fpos: cython.long
         strand: cython.long
@@ -387,10 +368,7 @@ class GenericParser:
 
     @cython.cfunc
     def fw_parse_line(self, thisline: bytes) -> tuple:
-        """Abstract function to parse chromosome, 5' end position and
-        strand.
-
-        """
+        """Return ``(chromosome, position, strand)`` parsed from ``thisline``."""
         chromosome: bytes = b""
         fpos: cython.int = -1
         strand: cython.int = -1
@@ -398,14 +376,7 @@ class GenericParser:
 
     @cython.ccall
     def sniff(self):
-        """Detect whether this parser is the correct parser for input
-        file.
-
-        Rule: try to find the tag size using this parser, if error
-        occurs or tag size is too small or too big, check is failed.
-
-        * BAMParser has a different sniff function.
-        """
+        """Return ``True`` when the input appears compatible with this parser."""
         t: cython.int
 
         t = self.tsize()
@@ -419,27 +390,22 @@ class GenericParser:
 
     @cython.ccall
     def close(self):
-        """Run this when this Parser will be never used.
-
-        Close file I/O stream.
-        """
+        """Close the underlying file handle."""
         self.fhd.close()
 
     @cython.ccall
     def is_gzipped(self) -> bool:
+        """Report whether the underlying input stream is gzip compressed."""
         return self.gzipped
 
 
 @cython.cclass
 class BEDParser(GenericParser):
-    """File Parser Class for BED File.
-
-    """
+    """Parser for standard BED records with optional strand column."""
 
     @cython.cfunc
     def skip_first_commentlines(self):
-        """BEDParser needs to skip the first several comment lines.
-        """
+        """Skip ``track``/``browser``/``#`` lines at the top of BED files."""
         l_line: cython.int
         thisline: bytes
 
@@ -456,9 +422,7 @@ class BEDParser(GenericParser):
 
     @cython.cfunc
     def tlen_parse_line(self, thisline: bytes) -> cython.int:
-        """Parse 5' and 3' position, then calculate frag length.
-
-        """
+        """Return fragment length encoded in a BED line or ``0`` if invalid."""
         thisline = thisline.rstrip()
         if not thisline:
             return 0
@@ -468,6 +432,15 @@ class BEDParser(GenericParser):
 
     @cython.cfunc
     def fw_parse_line(self, thisline: bytes) -> tuple:
+        """Parse a BED entry into ``(chromosome, position, strand)``.
+
+        Args:
+            thisline: Raw line from the BED file.
+
+        Returns:
+            Tuple containing the chromosome name, 5' coordinate for the
+            strand, and strand flag (0 for ``+``, 1 for ``-``).
+        """
         # cdef list thisfields
         chromname: bytes
         thisfields: list
@@ -496,25 +469,13 @@ class BEDParser(GenericParser):
 
 @cython.cclass
 class BEDPEParser(GenericParser):
-    """Parser for BED format file containing PE information, and also
-    can be used for the cases when users predefine the fragment
-    locations by shifting/extending by themselves.
-
-    Format:
-
-    chromosome_name	frag_leftend	frag_rightend
-
-
-    Note: Only the first columns are used!
-
-    """
+    """Parser for three-column BEDPE-style fragments (chrom, left, right)."""
     n = cython.declare(cython.int, visibility='public')
     d = cython.declare(cython.float, visibility='public')
 
     @cython.cfunc
     def skip_first_commentlines(self):
-        """BEDPEParser needs to skip the first several comment lines.
-        """
+        """Skip ``track``/``browser``/``#`` lines at the top of BEDPE files."""
         l_line: cython.int
         thisline: bytes
 
@@ -531,9 +492,7 @@ class BEDPEParser(GenericParser):
 
     @cython.cfunc
     def pe_parse_line(self, thisline: bytes):
-        """ Parse each line, and return chromosome, left and right positions
-
-        """
+        """Parse a fragment line into ``(chrom, left, right)`` integers."""
         thisfields: list
 
         thisline = thisline.rstrip()
@@ -550,9 +509,7 @@ class BEDPEParser(GenericParser):
 
     @cython.ccall
     def build_petrack(self):
-        """Build PETrackI from all lines.
-
-        """
+        """Return a ``PETrackI`` constructed from the entire stream."""
         chromosome: bytes
         left_pos: cython.int
         right_pos: cython.int
@@ -599,8 +556,7 @@ class BEDPEParser(GenericParser):
 
     @cython.ccall
     def append_petrack(self, petrack):
-        """Build PETrackI from all lines, return a PETrackI object.
-        """
+        """Append fragments from the stream to an existing ``PETrackI``."""
         chromosome: bytes
         left_pos: cython.int
         right_pos: cython.int
@@ -646,14 +602,11 @@ class BEDPEParser(GenericParser):
 
 @cython.cclass
 class ELANDResultParser(GenericParser):
-    """File Parser Class for tabular File.
-
-    """
+    """Parser for single-end ELAND result tables."""
 
     @cython.cfunc
     def skip_first_commentlines(self):
-        """ELANDResultParser needs to skip the first several comment lines.
-        """
+        """Skip lines beginning with ``#`` before data rows."""
         l_line: cython.int
         thisline: bytes
 
@@ -668,9 +621,7 @@ class ELANDResultParser(GenericParser):
 
     @cython.cfunc
     def tlen_parse_line(self, thisline: bytes) -> cython.int:
-        """Parse tag sequence, then tag length.
-
-        """
+        """Return tag length for ELAND single-end entries or ``0`` if invalid."""
         thisfields: list
 
         thisline = thisline.rstrip()
@@ -684,6 +635,15 @@ class ELANDResultParser(GenericParser):
 
     @cython.cfunc
     def fw_parse_line(self, thisline: bytes) -> tuple:
+        """Parse an ELAND result line into location and strand tuple.
+
+        Args:
+            thisline: Raw ELAND text line.
+
+        Returns:
+            ``(chromosome, position, strand)`` with ``position`` set to
+            ``-1`` when the line does not encode a valid alignment.
+        """
         chromname: bytes
         strand: bytes
         thistaglength: cython.int
@@ -724,32 +684,11 @@ class ELANDResultParser(GenericParser):
 
 @cython.cclass
 class ELANDMultiParser(GenericParser):
-    """File Parser Class for ELAND multi File.
-
-    Note this parser can only work for s_N_eland_multi.txt format.
-
-    Each line of the output file contains the following fields:
-    1. Sequence name
-    2. Sequence
-    3. Either NM, QC, RM (as described above) or the following:
-    4. x:y:z where x, y, and z are the number of exact, single-error, and
-    2-error matches found
-    5. Blank, if no matches found or if too many matches found, or the
-    following:
-
-    BAC_plus_vector.fa:163022R1,170128F2,E_coli.fa:3909847R1
-
-    This says there are two matches to BAC_plus_vector.fa: one in the
-    reverse direction starting at position 160322 with one error, one
-    in the forward direction starting at position 170128 with two
-    errors. There is also a single-error match to E_coli.fa.
-
-    """
+    """Parser for ELAND multi-hit reports (``s_N_eland_multi`` format)."""
 
     @cython.cfunc
     def skip_first_commentlines(self):
-        """ELANDResultParser needs to skip the first several comment lines.
-        """
+        """Skip lines beginning with ``#`` before data rows."""
         l_line: cython.int
         thisline: bytes
 
@@ -764,9 +703,7 @@ class ELANDMultiParser(GenericParser):
 
     @cython.cfunc
     def tlen_parse_line(self, thisline: bytes) -> cython.int:
-        """Parse tag sequence, then tag length.
-
-        """
+        """Return tag length for ELAND multi entries or ``0`` if ambiguous."""
         thisline = thisline.rstrip()
         if not thisline:
             return 0
@@ -778,6 +715,15 @@ class ELANDMultiParser(GenericParser):
 
     @cython.cfunc
     def fw_parse_line(self, thisline: bytes) -> tuple:
+        """Parse ELAND multi-format line into a single-hit location tuple.
+
+        Args:
+            thisline: Raw ELAND multi line.
+
+        Returns:
+            ``(chromosome, position, strand)`` or ``(b"", -1, -1)`` if the
+            entry is not uniquely mappable.
+        """
         # thistagname: bytes
         pos: bytes
         strand: bytes
@@ -825,13 +771,10 @@ class ELANDMultiParser(GenericParser):
 
 @cython.cclass
 class ELANDExportParser(GenericParser):
-    """File Parser Class for ELAND Export File.
-
-    """
+    """Parser for ELAND export tab-delimited files."""
     @cython.cfunc
     def skip_first_commentlines(self):
-        """ELANDResultParser needs to skip the first several comment lines.
-        """
+        """Skip lines beginning with ``#`` before data rows."""
         l_line: cython.int
         thisline: bytes
 
@@ -846,9 +789,7 @@ class ELANDExportParser(GenericParser):
 
     @cython.cfunc
     def tlen_parse_line(self, thisline: bytes) -> cython.int:
-        """Parse tag sequence, then tag length.
-
-        """
+        """Return tag length for ELAND export entries or ``0`` if invalid."""
         thisline = thisline.rstrip()
         if not thisline:
             return 0
@@ -861,6 +802,15 @@ class ELANDExportParser(GenericParser):
 
     @cython.cfunc
     def fw_parse_line(self, thisline: bytes) -> tuple:
+        """Parse an ELAND export entry to ``(chromosome, position, strand)``.
+
+        Args:
+            thisline: Raw ELAND export line.
+
+        Returns:
+            Location tuple when the line contains a successful alignment;
+            otherwise ``(b"", -1, -1)``.
+        """
         # thisname: bytes
         strand: bytes
         thistaglength: cython.int
@@ -890,42 +840,11 @@ class ELANDExportParser(GenericParser):
 
 @cython.cclass
 class SAMParser(GenericParser):
-    """File Parser Class for SAM File.
-
-    Each line of the output file contains at least:
-    1. Sequence name
-    2. Bitwise flag
-    3. Reference name
-    4. 1-based leftmost position fo clipped alignment
-    5. Mapping quality
-    6. CIGAR string
-    7. Mate Reference Name
-    8. 1-based leftmost Mate Position
-    9. Inferred insert size
-    10. Query sequence on the same strand as the reference
-    11. Query quality
-
-    The bitwise flag is made like this:
-    dec	meaning
-    ---	-------
-    1	paired read
-    2	proper pair
-    4	query unmapped
-    8	mate unmapped
-    16	strand of the query (1 -> reverse)
-    32	strand of the mate
-    64	first read in pair
-    128	second read in pair
-    256	alignment is not primary
-    512	does not pass quality check
-    1024	PCR or optical duplicate
-    2048	supplementary alignment
-    """
+    """Parser for SAM alignment text files with standard SAM flags."""
 
     @cython.cfunc
     def skip_first_commentlines(self):
-        """SAMParser needs to skip the first several comment lines.
-        """
+        """Skip SAM header lines beginning with ``@``."""
         l_line: cython.int
         thisline: bytes
 
@@ -940,9 +859,7 @@ class SAMParser(GenericParser):
 
     @cython.cfunc
     def tlen_parse_line(self, thisline: bytes) -> cython.int:
-        """Parse tag sequence, then tag length.
-
-        """
+        """Return read length for valid SAM records or ``0`` if filtered."""
         thisfields: list
         bwflag: cython.int
 
@@ -970,6 +887,16 @@ class SAMParser(GenericParser):
 
     @cython.cfunc
     def fw_parse_line(self, thisline: bytes) -> tuple:
+        """Parse a SAM alignment into ``(chromosome, position, strand)``.
+
+        Args:
+            thisline: Raw SAM alignment line.
+
+        Returns:
+            Tuple identifying the leftmost coordinate for forward strands or
+            the rightmost coordinate for reverse strands. Returns
+            ``(b"", -1, -1)`` for reads that do not satisfy mapping filters.
+        """
         # thistagname: bytes
         thisref: bytes
         thisfields: list
@@ -1010,7 +937,7 @@ class SAMParser(GenericParser):
         if bwflag & 16:
             # minus strand, we have to decipher CIGAR string
             thisstrand = 1
-            thisstart = atoi(thisfields[3]) - 1 + sum([cython.cast(cython.int, x) for x in findall(b"(\d+)[MDNX=]", CIGAR)])  #reverse strand should be shifted alen bp
+            thisstart = atoi(thisfields[3]) - 1 + sum([cython.cast(cython.int, x) for x in findall(b"(\\d+)[MDNX=]", CIGAR)])  #reverse strand should be shifted alen bp
         else:
             thisstrand = 0
             thisstart = atoi(thisfields[3]) - 1
@@ -1025,38 +952,14 @@ class SAMParser(GenericParser):
 
 @cython.cclass
 class BAMParser(GenericParser):
-    """File Parser Class for BAM File.
-
-    File is gzip-compatible and binary.
-    Information available is the same that is in SAM format.
-
-    The bitwise flag is made like this:
-    dec	meaning
-    ---	-------
-    1	paired read
-    2	proper pair
-    4	query unmapped
-    8	mate unmapped
-    16	strand of the query (1 -> reverse)
-    32	strand of the mate
-    64	first read in pair
-    128	second read in pair
-    256	alignment is not primary
-    512	does not pass quality check
-    1024	PCR or optical duplicate
-    2048	supplementary alignment
-    """
+    """Parser for BAM binary alignment files."""
     def __init__(self, filename: str,
                  buffer_size: cython.long = 100000):
-        """Open input file. Determine whether it's a gzipped file.
+        """Prepare the parser and open the BAM file.
 
-        'filename' must be a string object.
-
-        This function initialize the following attributes:
-
-        1. self.filename: the filename for input file.
-        2. self.gzipped: a boolean indicating whether input file is gzipped.
-        3. self.fhd: buffered I/O stream of input file
+        Args:
+            filename: Path to the BAM file.
+            buffer_size: Chunk size used when reading BGZF blocks.
         """
         self.filename = filename
         self.gzipped = True
@@ -1080,10 +983,7 @@ class BAMParser(GenericParser):
 
     @cython.ccall
     def sniff(self):
-        """Check the first 3 bytes of BAM file. If it's 'BAM', check
-        is success.
-
-        """
+        """Return ``True`` if the file begins with the BAM magic string."""
         magic_header: bytes
         tsize: cython.int
 
@@ -1148,12 +1048,7 @@ class BAMParser(GenericParser):
 
     @cython.ccall
     def get_references(self) -> tuple:
-        """
-        read in references from BAM header
-
-        return a tuple (references (list of names),
-                        rlengths (dict of lengths)
-        """
+        """Return ``(references, lengths)`` extracted from the BAM header."""
         header_len: cython.int
         x: cython.int
         nc: cython.int
@@ -1183,10 +1078,7 @@ class BAMParser(GenericParser):
 
     @cython.ccall
     def build_fwtrack(self):
-        """Build FWTrack from all lines, return a FWTrack object.
-
-        Note only the unique match for a tag is kept.
-        """
+        """Append uniquely mapped reads to an existing ``FWTrack``."""
         i: cython.long = 0          # number of reads kept
         entrylength: cython.int
         fpos: cython.int
@@ -1223,10 +1115,7 @@ class BAMParser(GenericParser):
 
     @cython.ccall
     def append_fwtrack(self, fwtrack):
-        """Build FWTrack from all lines, return a FWTrack object.
-
-        Note only the unique match for a tag is kept.
-        """
+        """Append uniquely mapped reads to an existing ``FWTrack``."""
         i: cython.long = 0          # number of reads kept
         entrylength: cython.int
         fpos: cython.int
@@ -1265,30 +1154,7 @@ class BAMParser(GenericParser):
 
 @cython.cclass
 class BAMPEParser(BAMParser):
-    """File Parser Class for BAM File containing paired-end reads
-    Only counts valid pairs, discards everything else
-    Uses the midpoint of every read and calculates the average fragment size
-    on the fly instead of modeling it
-
-    File is gzip-compatible and binary.
-    Information available is the same that is in SAM format.
-
-    The bitwise flag is made like this:
-    dec    meaning
-    ---    -------
-    1    paired read
-    2    proper pair
-    4    query unmapped
-    8    mate unmapped
-    16    strand of the query (1 -> reverse)
-    32    strand of the mate
-    64    first read in pair
-    128    second read in pair
-    256    alignment is not primary
-    512    does not pass quality check
-    1024    PCR or optical duplicate
-    2048    supplementary alignment
-    """
+    """Parser for paired-end BAM files that yields fragment spans."""
     # total number of fragments
     n = cython.declare(cython.int, visibility='public')
     # the average length of fragments
@@ -1296,8 +1162,7 @@ class BAMPEParser(BAMParser):
 
     @cython.ccall
     def build_petrack(self):
-        """Build PETrackI from all lines, return a FWTrack object.
-        """
+        """Return a ``PETrackI`` populated with inferred fragments."""
         i: cython.long = 0          # number of fragments kept
         m: cython.long = 0          # sum of fragment lengths
         entrylength: cython.int
@@ -1342,8 +1207,7 @@ class BAMPEParser(BAMParser):
 
     @cython.ccall
     def append_petrack(self, petrack):
-        """Build PETrackI from all lines, return a PETrackI object.
-        """
+        """Append inferred fragments to an existing ``PETrackI``."""
         i: cython.long = 0          # number of fragments
         m: cython.long = 0          # sum of fragment lengths
         entrylength: cython.int
@@ -1384,15 +1248,10 @@ class BAMPEParser(BAMParser):
 
 @cython.cclass
 class BowtieParser(GenericParser):
-    """File Parser Class for map files from Bowtie or MAQ's maqview
-    program.
-
-    """
+    """Parser for Bowtie or Maqview single-end map files."""
     @cython.cfunc
     def tlen_parse_line(self, thisline: bytes) -> cython.int:
-        """Parse tag sequence, then tag length.
-
-        """
+        """Return read length for Bowtie map entries or ``0`` if invalid."""
         thisfields: list
 
         thisline = thisline.rstrip()
@@ -1476,22 +1335,13 @@ class BowtieParser(GenericParser):
 
 @cython.cclass
 class FragParser(GenericParser):
-    """Parser for Fragment file containing scATAC-seq information.
-
-    Format:
-
-    chromosome frag_leftend frag_rightend barcode count
-
-    Note: Only the first five columns are used!
-
-    """
+    """Parser for scATAC fragment TSV files with barcode counts."""
     n = cython.declare(cython.int, visibility='public')
     d = cython.declare(cython.float, visibility='public')
 
     @cython.cfunc
     def skip_first_commentlines(self):
-        """BEDPEParser needs to skip the first several comment lines.
-        """
+        """Skip ``track``/``browser``/``#`` lines at the top of fragment files."""
         l_line: cython.int
         thisline: bytes
 
@@ -1508,10 +1358,7 @@ class FragParser(GenericParser):
 
     @cython.cfunc
     def pe_parse_line(self, thisline: bytes):
-        """Parse each line, and return chromosome, left and right
-        positions, barcode and count.
-
-        """
+        """Parse a fragment line into ``(chrom, left, right, barcode, count)``."""
         thisfields: list
         thiscount: cython.ushort
 
@@ -1536,9 +1383,7 @@ class FragParser(GenericParser):
 
     @cython.ccall
     def build_petrack(self, max_count=0):
-        """Build PETrackII from all lines.
-
-        """
+        """Return a ``PETrackII`` populated with fragments and barcodes."""
         chromosome: bytes
         left_pos: cython.int
         right_pos: cython.int
@@ -1591,8 +1436,7 @@ class FragParser(GenericParser):
 
     @cython.ccall
     def append_petrack(self, petrack, max_count=0):
-        """Build PETrackI from all lines, return a PETrackI object.
-        """
+        """Append barcode-aware fragments to an existing ``PETrackI``."""
         chromosome: bytes
         left_pos: cython.int
         right_pos: cython.int

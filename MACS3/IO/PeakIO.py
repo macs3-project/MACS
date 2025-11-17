@@ -1,6 +1,6 @@
 # cython: language_level=3
 # cython: profile=True
-# Time-stamp: <2024-10-15 11:48:33 Tao Liu>
+# Time-stamp: <2025-11-14 16:52:15 Tao Liu>
 
 """Module for PeakIO IO classes.
 
@@ -40,6 +40,14 @@ from cython.cimports.cpython import bool
 
 @cython.cfunc
 def subpeak_letters(i: cython.int) -> str:
+    """Return the alphabetical label for a zero-based subpeak index.
+
+    Args:
+        i: Zero-based subpeak index.
+
+    Returns:
+        str: Alphabetical label sequence (``a``, ``b``, ..., ``aa``).
+    """
     if i < 26:
         return chr(97+i)
     else:
@@ -52,6 +60,7 @@ def subpeak_letters(i: cython.int) -> str:
 
 @cython.cclass
 class PeakContent:
+    """Represent a narrow peak and its derived statistics."""
     chrom: bytes
     start: cython.int
     end: cython.int
@@ -75,6 +84,20 @@ class PeakContent:
                  fold_change: cython.float,
                  qscore: cython.float,
                  name: bytes = b""):
+        """Initialise a peak record with positional and score metrics.
+
+        Args:
+            chrom: Chromosome name encoded as bytes.
+            start: 0-based inclusive start coordinate.
+            end: 0-based exclusive end coordinate.
+            summit: 0-based summit position.
+            peak_score: Peak score reported by MACS3.
+            pileup: Tag pileup at the summit.
+            pscore: ``-log10(pvalue)`` at the summit.
+            fold_change: Fold enrichment at the summit.
+            qscore: ``-log10(qvalue)`` at the summit.
+            name: Optional peak identifier.
+        """
         self.chrom = chrom
         self.start = start
         self.end = end
@@ -88,6 +111,14 @@ class PeakContent:
         self.name = name
 
     def __getitem__(self, a: str):
+        """Return a peak attribute by symbolic key.
+
+        Args:
+            a: Attribute name (for example ``"chrom"`` or ``"score"``).
+
+        Returns:
+            Any: Value associated with the requested attribute.
+        """
         if a == "chrom":
             return self.chrom
         elif a == "start":
@@ -112,6 +143,12 @@ class PeakContent:
             return self.name
 
     def __setitem__(self, a: str, v):
+        """Assign a new value to a peak attribute.
+
+        Args:
+            a: Attribute name to set.
+            v: Replacement value.
+        """
         if a == "chrom":
             self.chrom = v
         elif a == "start":
@@ -136,12 +173,18 @@ class PeakContent:
             self.name = v
 
     def __str__(self):
+        """Return a concise textual description of the peak."""
         return "chrom:%s;start:%d;end:%d;score:%f" % (self.chrom,
                                                       self.start,
                                                       self.end,
                                                       self.score)
 
     def __getstate__(self):
+        """Serialise the peak content for pickling.
+
+        Returns:
+            tuple: Ordered tuple representing the peak state.
+        """
         return (self.chrom,
                 self.start,
                 self.end,
@@ -155,6 +198,11 @@ class PeakContent:
                 self.name)
 
     def __setstate__(self, state):
+        """Restore the peak content from a previously serialised tuple.
+
+        Args:
+            state: Tuple produced by :meth:`__getstate__`.
+        """
         (self.chrom, self.start, self.end, self.length, self.summit,
          self.score, self.pileup, self.pscore, self.fc,
          self.qscore, self.name) = state
@@ -162,33 +210,49 @@ class PeakContent:
 
 @cython.cclass
 class PeakIO:
-    """IO for peak information.
-
-    """
+    """Manage in-memory collections of narrow peak intervals."""
     # dictionary storing peak contents
     peaks = cython.declare(dict, visibility="public")
     # whether peaks have been sorted by coordinations
     CO_sorted = cython.declare(bool, visibility="public")
     # total number of peaks
     total = cython.declare(cython.long, visibility="public")
+    # name
+    name = cython.declare(bytes, visibility="public")
 
-    def __init__(self):
+    def __init__(self, name: bytes = b"MACS3"):
+        """Initialise an empty peak collection."""
         self.peaks = {}
         self.CO_sorted = False
         self.total = 0
+        self.name = name
 
     @cython.ccall
     def add(self,
             chromosome: bytes,
-            start: cython.int,  # leftmost position
-            end: cython.int,    # rightmost position
-            summit: cython.int = 0,  # summit position
-            peak_score: cython.float = 0,  # score
-            pileup: cython.float = 0,      # pileup value
-            pscore: cython.float = 0,      # -log10 pvalue
-            fold_change: cython.float = 0,  # fold change
-            qscore: cython.float = 0,      # -log10 qvalue
-            name: bytes = b""):            # peak name
+            start: cython.int,
+            end: cython.int,
+            summit: cython.int = 0,
+            peak_score: cython.float = 0,
+            pileup: cython.float = 0,
+            pscore: cython.float = 0,
+            fold_change: cython.float = 0,
+            qscore: cython.float = 0,
+            name: bytes = b""):
+        """Add a peak described by raw coordinates and scores.
+
+        Args:
+            chromosome: Chromosome name for the peak.
+            start: 0-based inclusive start coordinate.
+            end: 0-based exclusive end coordinate.
+            summit: 0-based summit position.
+            peak_score: Reported peak score.
+            pileup: Tag pileup at the summit.
+            pscore: ``-log10(pvalue)`` score.
+            fold_change: Fold enrichment relative to control.
+            qscore: ``-log10(qvalue)`` score.
+            name: Optional peak identifier.
+        """
         if not self.peaks.has_key(chromosome):
             self.peaks[chromosome] = []
         self.peaks[chromosome].append(PeakContent(chromosome,
@@ -208,6 +272,12 @@ class PeakIO:
     def add_PeakContent(self,
                         chromosome: bytes,
                         peakcontent: PeakContent):
+        """Extend the collection with an existing :class:`PeakContent`.
+
+        Args:
+            chromosome: Chromosome name under which to store the peak.
+            peakcontent: Peak record to append.
+        """
         if not self.peaks.has_key(chromosome):
             self.peaks[chromosome] = []
         self.peaks[chromosome].append(peakcontent)
@@ -216,14 +286,28 @@ class PeakIO:
 
     @cython.ccall
     def get_data_from_chrom(self, chrom: bytes) -> list:
+        """Return peaks for ``chrom``, initialising storage if needed.
+
+        Args:
+            chrom: Chromosome name to query.
+
+        Returns:
+            list: Peaks associated with ``chrom``.
+        """
         if not self.peaks.has_key(chrom):
             self.peaks[chrom] = []
         return self.peaks[chrom]
 
     def get_chr_names(self) -> set:
+        """Return the chromosome names represented in the collection.
+
+        Returns:
+            set: Unique chromosome names.
+        """
         return set(self.peaks.keys())
 
     def sort(self):
+        """Sort peaks on each chromosome by ascending start position."""
         chrs: list
         chrom: bytes
 
@@ -239,8 +323,14 @@ class PeakIO:
 
     @cython.ccall
     def randomly_pick(self, n: cython.int, seed: cython.int = 12345):
-        """Shuffle the peaks and get n peaks out of it. Return a new
-        PeakIO object.
+        """Return a new ``PeakIO`` containing ``n`` randomly sampled peaks.
+
+        Args:
+            n: Number of peaks to sample.
+            seed: RNG seed to ensure reproducibility.
+
+        Returns:
+            PeakIO: Fresh instance populated with sampled peaks.
         """
         all_pc: list
         chrs: list
@@ -263,6 +353,11 @@ class PeakIO:
 
     @cython.ccall
     def filter_pscore(self, pscore_cut: cython.double):
+        """Filter peaks by minimum ``-log10(pvalue)``.
+
+        Args:
+            pscore_cut: Lower bound (inclusive) for ``-log10(pvalue)``.
+        """
         chrom: bytes
         new_peaks: dict
         chrs: list
@@ -279,6 +374,11 @@ class PeakIO:
 
     @cython.ccall
     def filter_qscore(self, qscore_cut: cython.double):
+        """Filter peaks by minimum ``-log10(qvalue)``.
+
+        Args:
+            qscore_cut: Lower bound (inclusive) for ``-log10(qvalue)``.
+        """
         chrom: bytes
         new_peaks: dict
         chrs: list
@@ -295,10 +395,11 @@ class PeakIO:
 
     @cython.ccall
     def filter_fc(self, fc_low: cython.float, fc_up: cython.float = 0):
-        """Filter peaks in a given fc range.
+        """Filter peaks by fold-change range.
 
-        If fc_low and fc_up is assigned, the peaks with fc in [fc_low,fc_up)
-
+        Args:
+            fc_low: Inclusive lower bound on fold change.
+            fc_up: Exclusive upper bound; ignored if ``<= 0``.
         """
         chrom: bytes
         new_peaks: dict
@@ -320,8 +421,11 @@ class PeakIO:
         self.sort()
 
     def filter_score(self, lower_score: cython.float, upper_score: cython.float = 0):
-        """Filter peaks in a given score range.
+        """Filter peaks by their primary score range.
 
+        Args:
+            lower_score: Inclusive lower bound on score.
+            upper_score: Exclusive upper bound; if ``<= 0`` the bound is ignored.
         """
         chrom: bytes
         new_peaks: dict
@@ -343,8 +447,7 @@ class PeakIO:
         self.sort()
 
     def __str__(self):
-        """convert to text -- for debug
-        """
+        """Return a debug-friendly representation of all stored peaks."""
         chrs: list
         n_peak: cython.int
         ret: str
@@ -374,8 +477,15 @@ class PeakIO:
                 score_column: str = "score",
                 trackline: bool = False,
                 print_func=sys.stdout.write):
-        """
-        generalization of tobed and write_to_bed
+        """Render peaks in BED5-compatible format via a callback.
+
+        Args:
+            name_prefix: Template used to build peak names.
+            name: Dataset label interpolated into ``name_prefix``.
+            description: Track description for optional header line.
+            score_column: Peak attribute to emit as the score field.
+            trackline: Whether to emit a UCSC ``track`` header line.
+            print_func: Callable accepting pre-formatted lines.
         """
         chrs: list
         n_peak: cython.int
@@ -418,8 +528,15 @@ class PeakIO:
                         score_column: str = "score",
                         trackline: bool = False,
                         print_func=sys.stdout.write):
-        """
-        generalization of to_summits_bed and write_to_summit_bed
+        """Render peak summits in BED5 format via a callback.
+
+        Args:
+            name_prefix: Template used to build summit names.
+            name: Dataset label interpolated into ``name_prefix``.
+            description: Track description for optional header line.
+            score_column: Peak attribute to emit as the score field.
+            trackline: Whether to emit a UCSC ``track`` header line.
+            print_func: Callable accepting pre-formatted lines.
         """
         chrs: list
         n_peak: cython.int
@@ -456,27 +573,17 @@ class PeakIO:
                     print_func("%s\t%d\t%d\t%s%d\t%.6g\n" % (chrom.decode(), summit_p, summit_p+1, peakprefix.decode(), n_peak, peak[score_column]))
 
     def tobed(self):
-        """Print out (stdout) peaks in BED5 format.
+        """Write peaks in BED5 format to ``stdout``.
 
-        Five columns are chromosome, peak start, peak end, peak name, and peak height.
-
-        start:start
-        end:end,
-        length:end-start,
-        summit:summit,
-        score:peak_score,
-        pileup:pileup,
-        pscore:pvalue,
-        fc:fold_change,
-        qscore:qvalue
+        The five columns correspond to chromosome, start, end, name, and
+        the attribute selected by ``score_column``.
         """
         return self._to_bed(name_prefix=b"%s_peak_", score_column="score", name=self.name, description=b"")
 
     def to_summits_bed(self):
-        """Print out (stdout) peak summits in BED5 format.
+        """Write peak summits in BED5 format to ``stdout``.
 
-        Five columns are chromosome, summit start, summit end, peak name, and peak height.
-
+        Each summit is emitted as a one-base interval with the selected score column.
         """
         return self._to_summits_bed(name_prefix=b"%s_peak_", score_column="score", name=self.name, description=b"")
 
@@ -487,27 +594,16 @@ class PeakIO:
                      description: bytes = b"%s",
                      score_column: str = "score",
                      trackline: bool = True):
-        """Write peaks in BED5 format in a file handler. Score (5th
-        column) is decided by score_column setting. Check the
-        following list. Name column ( 4th column) is made by putting
-        name_prefix together with an ascending number.
+        """Write peaks to a file handle in BED5 format.
 
-        Five columns are chromosome, peak start, peak end, peak name,
-        and peak score.
-
-        items in peak hash object:
-
-        start:start
-        end:end,
-        length:end-start,
-        summit:summit,
-        score:peak_score,
-        pileup:pileup,
-        pscore:pvalue,
-        fc:fold_change,
-        qscore:qvalue
+        Args:
+            fhd: Writable file-like object.
+            name_prefix: Template used to build peak names.
+            name: Dataset label interpolated into ``name_prefix``.
+            description: Track description for optional header line.
+            score_column: Peak attribute to emit as the score field.
+            trackline: Whether to emit a UCSC ``track`` header line.
         """
-        # print(description)
         return self._to_bed(name_prefix=name_prefix,
                             name=name,
                             description=description,
@@ -521,24 +617,15 @@ class PeakIO:
                             description: bytes = b"%s",
                             score_column: str = "score",
                             trackline: bool = False):
-        """Write peak summits in BED5 format in a file handler. Score
-        (5th column) is decided by score_column setting. Check the
-        following list. Name column ( 4th column) is made by putting
-        name_prefix together with an ascending number.
+        """Write peak summits to a file handle in BED5 format.
 
-        Five columns are chromosome, summit start, summit end, peak name, and peak score.
-
-        items in peak object:
-
-        start:start
-        end:end,
-        length:end-start,
-        summit:summit,
-        score:peak_score,
-        pileup:pileup,
-        pscore:pvalue,
-        fc:fold_change,
-        qscore:qvalue
+        Args:
+            fhd: Writable file-like object.
+            name_prefix: Template used to build summit names.
+            name: Dataset label interpolated into ``name_prefix``.
+            description: Track description for optional header line.
+            score_column: Peak attribute to emit as the score field.
+            trackline: Whether to emit a UCSC ``track`` header line.
         """
         return self._to_summits_bed(name_prefix=name_prefix, name=name,
                                     description=description, score_column=score_column,
@@ -549,58 +636,14 @@ class PeakIO:
                             name: bytes = b"MACS",
                             score_column: str = "score",
                             trackline: bool = False):
-        """Print out peaks in narrowPeak format.
+        """Write peaks in the ENCODE narrowPeak (BED6+4) format.
 
-        This format is designed for ENCODE project, and basically a
-        BED6+4 format.
-
-        +-----------+------+----------------------------------------+
-        |field      |type  |description                             |
-        +-----------+------+----------------------------------------+
-        |chrom      |string|Name of the chromosome                  |
-        +-----------+------+----------------------------------------+
-        |chromStart |int   |The starting position of the feature in |
-        |           |      |the chromosome. The first base in a     |
-        |           |      |chromosome is numbered 0.               |
-        +-----------+------+----------------------------------------+
-        |chromEnd   |int   |The ending position of the feature in   |
-        |           |      |the chromosome or scaffold. The chromEnd|
-        |           |      |base is not included in the display of  |
-        |           |      |the feature.  For example, the first 100|
-        |           |      |bases of a chromosome are defined as    |
-        |           |      |chromStart=0, chromEnd=100, and span the|
-        |           |      |bases numbered 0-99.                    |
-        +-----------+------+----------------------------------------+
-        |name       |string|Name given to a region (preferably      |
-        |           |      |unique). Use '.' if no name is assigned.|
-        +-----------+------+----------------------------------------+
-        |score      |int   |Indicates how dark the peak will be     |
-        |(-logpvalue|      |displayed in the browser (1-1000). If   |
-        |in MACS3 * |      |'0', the DCC will assign this based on  |
-        |10)        |      |signal value. Ideally average           |
-        |           |      |signalValue per base spread between     |
-        |           |      |100-1000.                               |
-        +-----------+------+----------------------------------------+
-        |strand     |char  |+/- to denote strand or orientation     |
-        |(always .) |      |(whenever applicable). Use '.' if no    |
-        |           |      |orientation is assigned.                |
-        +-----------+------+----------------------------------------+
-        |signalValue|float |Measurement of overall (usually,        |
-        |(fc)       |      |average) enrichment for the region.     |
-        +-----------+------+----------------------------------------+
-        |pValue     |float |Measurement of statistical signficance  |
-        |           |      |(-log10). Use -1 if no pValue is        |
-        |           |      |assigned.                               |
-        +-----------+------+----------------------------------------+
-        |qValue     |float |Measurement of statistical significance |
-        |           |      |using false discovery rate. Use -1 if no|
-        |           |      |qValue is assigned.                     |
-        +-----------+------+----------------------------------------+
-        |peak       |int   |Point-source called for this peak;      |
-        |           |      |0-based offset from chromStart. Use -1  |
-        |           |      |if no point-source called.              |
-        +-----------+------+----------------------------------------+
-
+        Args:
+            fhd: Writable file-like object.
+            name_prefix: Template used to construct peak identifiers.
+            name: Dataset label interpolated into ``name_prefix``.
+            score_column: Peak attribute mapped to the narrowPeak score field.
+            trackline: Whether to emit a UCSC ``track`` header.
         """
         n_peak: cython.int
         chrom: bytes
@@ -660,12 +703,12 @@ class PeakIO:
     def write_to_xls(self, ofhd,
                      name_prefix: bytes = b"%s_peak_",
                      name: bytes = b"MACS"):
-        """Save the peak results in a tab-delimited plain text file
-        with suffix .xls.
+        """Export narrow peaks to a tab-delimited ``.xls`` text file.
 
-
-        wait... why I have two write_to_xls in this class?
-
+        Args:
+            ofhd: Writable file-like object.
+            name_prefix: Template used to build peak identifiers.
+            name: Dataset label interpolated into ``name_prefix``.
         """
         peakprefix: bytes
         chrs: list
@@ -722,8 +765,10 @@ class PeakIO:
 
     @cython.ccall
     def exclude(self, peaksio2: object):
-        """ Remove overlapping peaks in peaksio2, another PeakIO object.
+        """Remove peaks that overlap any entry in ``peaksio2``.
 
+        Args:
+            peaksio2: Another :class:`PeakIO` instance providing exclusion regions.
         """
         peaks1: dict
         peaks2: dict
@@ -819,9 +864,10 @@ class PeakIO:
 
     @cython.ccall
     def read_from_xls(self, ofhd):
-        """Save the peak results in a tab-delimited plain text file
-        with suffix .xls.
+        """Load peak records from a MACS3 ``.xls`` tab-delimited report.
 
+        Args:
+            ofhd: Readable file-like object positioned at the beginning of the report.
         """
         line: bytes = b''
         chrom: bytes = b''
@@ -871,17 +917,18 @@ class PeakIO:
 
 @cython.cclass
 class RegionIO:
-    """For plain region of chrom, start and end
-    """
+    """Helper for storing and manipulating simple genomic regions."""
     regions: dict
     __flag_sorted: bool
 
     def __init__(self):
+        """Initialise an empty region collection."""
         self.regions = {}
         self.__flag_sorted = False
 
     @cython.ccall
     def add_loc(self, chrom: bytes, start: cython.int, end: cython.int):
+        """Append a new ``(start, end)`` interval for ``chrom``."""
         if self.regions.has_key(chrom):
             self.regions[chrom].append((start, end))
         else:
@@ -891,6 +938,7 @@ class RegionIO:
 
     @cython.ccall
     def sort(self):
+        """Sort regions for each chromosome by their start coordinate."""
         chrom: bytes
 
         for chrom in sorted(list(self.regions.keys())):
@@ -899,13 +947,12 @@ class RegionIO:
 
     @cython.ccall
     def get_chr_names(self) -> set:
+        """Return chromosome names present in the region set."""
         return set(sorted(self.regions.keys()))
 
     @cython.ccall
     def merge_overlap(self):
-        """
-        merge overlapping regions
-        """
+        """Merge overlapping intervals within each chromosome."""
         chrom: bytes
         s_new_region: cython.int
         e_new_region: cython.int
@@ -947,6 +994,7 @@ class RegionIO:
 
     @cython.ccall
     def write_to_bed(self, fhd):
+        """Emit regions in BED format to the provided file-like object."""
         i: cython.int
         chrom: bytes
         chrs: list
@@ -963,6 +1011,7 @@ class RegionIO:
 
 @cython.cclass
 class BroadPeakContent:
+    """Container for broad peak metadata used in broadPeak format."""
     start: cython.int
     end: cython.int
     length: cython.int
@@ -991,7 +1040,8 @@ class BroadPeakContent:
                  pscore: cython.float,
                  fold_change: cython.float,
                  qscore: cython.float,
-                 name: bytes = b"NA"):
+                 name: bytes = b"MACS3"):
+        """Initialise a broad peak record with block structure and scores."""
         self.start = start
         self.end = end
         self.score = score
@@ -1008,6 +1058,7 @@ class BroadPeakContent:
         self.name = name
 
     def __getitem__(self, a):
+        """Provide dict-like read access to stored attributes."""
         if a == "start":
             return self.start
         elif a == "end":
@@ -1038,6 +1089,7 @@ class BroadPeakContent:
             return self.name
 
     def __str__(self):
+        """Return a compact summary describing the broad peak."""
         return "start:%d;end:%d;score:%f" % (self.start, self.end, self.score)
 
 
@@ -1049,6 +1101,7 @@ class BroadPeakIO:
     peaks = cython.declare(dict, visibility="public")
 
     def __init__(self):
+        """Create an empty container for :class:`BroadPeakContent` objects."""
         self.peaks = {}
 
     @cython.ccall
@@ -1067,21 +1120,23 @@ class BroadPeakIO:
             fold_change: cython.float = 0,
             qscore: cython.float = 0,
             name: bytes = b"NA"):
-        """items
-        chromosome : chromosome name,
-        start      : broad region start,
-        end        : broad region end,
-        score      : average score in all blocks,
-        thickStart : start of highly enriched region, # could be b'.'
-        thickEnd   : end of highly enriched region,   # could be b'.'
-        blockNum   : number of blocks,                # could be 0
-        blockSizes : sizes of blocks,                 # could be b'.'
-        blockStarts: starts of blocks                 # could be b'.'
-        pileup     : median pileup in region          # could be 0
-        pscore     : median pvalue score in region    # could be 0
-        fold_change: median fold change in region     # could be 0
-        qscore     : median pvalue score in region    # could be 0
-        name       : peak name                        # could be b'NA'
+        """Append a :class:`BroadPeakContent` record.
+
+        Args:
+            chromosome: Chromosome name for the region.
+            start: 0-based inclusive start coordinate.
+            end: 0-based exclusive end coordinate.
+            score: Average score across blocks.
+            thickStart: Start of the high-enrichment segment or ``b'.'``.
+            thickEnd: End of the high-enrichment segment or ``b'.'``.
+            blockNum: Number of sub-blocks composing the region.
+            blockSizes: Comma-separated block sizes as bytes.
+            blockStarts: Comma-separated block starts as bytes.
+            pileup: Median pileup within the region.
+            pscore: Median ``-log10(pvalue)``.
+            fold_change: Median fold-change value.
+            qscore: Median ``-log10(qvalue)``.
+            name: Optional region identifier.
         """
         if not self.peaks.has_key(chromosome):
             self.peaks[chromosome] = []
@@ -1101,6 +1156,7 @@ class BroadPeakIO:
 
     @cython.ccall
     def filter_pscore(self, pscore_cut: cython.float):
+        """Retain broad peaks with ``-log10(pvalue)`` ≥ ``pscore_cut``."""
         chrom: bytes
         peaks: dict
         new_peaks: dict
@@ -1116,6 +1172,7 @@ class BroadPeakIO:
 
     @cython.ccall
     def filter_qscore(self, qscore_cut: cython.float):
+        """Retain broad peaks with ``-log10(qvalue)`` ≥ ``qscore_cut``."""
         chrom: bytes
         peaks: dict
         new_peaks: dict
@@ -1131,14 +1188,11 @@ class BroadPeakIO:
 
     @cython.ccall
     def filter_fc(self, fc_low: float, fc_up: float = -1):
-        """Filter peaks in a given fc range.
+        """Filter broad peaks by fold-change range.
 
-        If fc_low and fc_up is assigned, the peaks with fc in
-        [fc_low,fc_up)
-
-        fc_up has to be a positive number, otherwise it won't be
-        applied.
-
+        Args:
+            fc_low: Inclusive lower bound on fold change.
+            fc_up: Exclusive upper bound; ignored when negative.
         """
         chrom: bytes
         peaks: dict
@@ -1158,6 +1212,7 @@ class BroadPeakIO:
 
     @cython.ccall
     def total(self):
+        """Return the total number of broad peaks currently stored."""
         chrom: bytes
         peaks: dict
         chrs: list
@@ -1176,73 +1231,15 @@ class BroadPeakIO:
                             description: bytes = b"%s",
                             score_column: str = "score",
                             trackline: bool = True):
-        """Print out peaks in gappedBed format. Only those with stronger enrichment regions are saved.
+        """Write broad peaks in gappedPeak (BED12+3) format.
 
-        This format is basically a BED12+3 format.
-
-        +--------------+------+----------------------------------------+
-        |field         |type  |description                             |
-        +--------------+------+----------------------------------------+
-        |chrom         |string|Name of the chromosome                  |
-        +--------------+------+----------------------------------------+
-        |chromStart    |int   |The starting position of the feature in |
-        |              |      |the chromosome. The first base in a     |
-        |              |      |chromosome is numbered 0.               |
-        +--------------+------+----------------------------------------+
-        |chromEnd      |int   |The ending position of the feature in   |
-        |              |      |the chromosome or scaffold. The chromEnd|
-        |              |      |base is not included in the display of  |
-        |              |      |the feature.  For example, the first 100|
-        |              |      |bases of a chromosome are defined as    |
-        |              |      |chromStart=0, chromEnd=100, and span the|
-        |              |      |bases numbered 0-99.                    |
-        +--------------+------+----------------------------------------+
-        |name          |string|Name given to a region (preferably      |
-        |              |      |unique). Use '.' if no name is assigned.|
-        +--------------+------+----------------------------------------+
-        |score         |int   |Indicates how dark the peak will be     |
-        |(always use   |      |displayed in the browser (1-1000). If   |
-        |1000 for      |      |'0', the DCC will assign this based on  |
-        |the           |      |signal value. Ideally average           |
-        |thickest      |      |signalValue per base spread between     |
-        |color)        |      |100-1000.                               |
-        +--------------+------+----------------------------------------+
-        |strand        |char  |+/- to denote strand or orientation     |
-        |(always .)    |      |(whenever applicable). Use '.' if no    |
-        |              |      |orientation is assigned.                |
-        +--------------+------+----------------------------------------+
-        |thickStart    |int   | The starting position at which the     |
-        |              |      |feature is drawn thickly. Mark the start|
-        |              |      |of highly enriched regions. Not used in |
-        |              |      |gappedPeak, so set to 0                 |
-        +--------------+------+----------------------------------------+
-        |thickEnd      |int   | The ending position at which the       |
-        |              |      |feature is drawn thickly. Mark the end  |
-        |              |      |of highly enriched regions. Not used, so|
-        |              |      |set as 0.                               |
-        +--------------+------+----------------------------------------+
-        |itemRGB       |string| Not used. Set it as 0.                 |
-        +--------------+------+----------------------------------------+
-        |blockCounts   |int   | The number of blocks (exons) in the BED|
-        |              |      |line.                                   |
-        +--------------+------+----------------------------------------+
-        |blockSizes    |string| A comma-separated list of the block    |
-        |              |      |sizes.                                  |
-        +--------------+------+----------------------------------------+
-        |blockStarts   |string| A comma-separated list of block starts.|
-        +--------------+------+----------------------------------------+
-        |signalValue   |float |Measurement of overall (usually,        |
-        |(fc)          |      |average) enrichment for the region.     |
-        +--------------+------+----------------------------------------+
-        |pValue        |float |Measurement of statistical signficance  |
-        |              |      |(-log10). Use -1 if no pValue is        |
-        |              |      |assigned.                               |
-        +--------------+------+----------------------------------------+
-        |qValue        |float |Measurement of statistical significance |
-        |              |      |using false discovery rate. Use -1 if no|
-        |              |      |qValue is assigned.                     |
-        +--------------+------+----------------------------------------+
-
+        Args:
+            fhd: Writable file-like object.
+            name_prefix: Template used to construct peak identifiers.
+            name: Dataset label interpolated into ``name_prefix``.
+            description: Track description for the optional header.
+            score_column: Peak attribute mapped to the score column.
+            trackline: Whether to emit a UCSC ``track`` header.
         """
         chrs: list
         n_peak: cython.int = 0
@@ -1287,59 +1284,15 @@ class BroadPeakIO:
                        description: bytes = b"%s",
                        score_column: str = "score",
                        trackline: bool = True):
-        """Print out peaks in Bed12 format.
+        """Write broad peaks in BED12 format.
 
-        +--------------+------+----------------------------------------+
-        |field         |type  |description                             |
-        +--------------+------+----------------------------------------+
-        |chrom         |string|Name of the chromosome                  |
-        +--------------+------+----------------------------------------+
-        |chromStart    |int   |The starting position of the feature in |
-        |              |      |the chromosome. The first base in a     |
-        |              |      |chromosome is numbered 0.               |
-        +--------------+------+----------------------------------------+
-        |chromEnd      |int   |The ending position of the feature in   |
-        |              |      |the chromosome or scaffold. The chromEnd|
-        |              |      |base is not included in the display of  |
-        |              |      |the feature.  For example, the first 100|
-        |              |      |bases of a chromosome are defined as    |
-        |              |      |chromStart=0, chromEnd=100, and span the|
-        |              |      |bases numbered 0-99.                    |
-        +--------------+------+----------------------------------------+
-        |name          |string|Name given to a region (preferably      |
-        |              |      |unique). Use '.' if no name is assigned.|
-        +--------------+------+----------------------------------------+
-        |score         |int   |Indicates how dark the peak will be     |
-        |(always use   |      |displayed in the browser (1-1000). If   |
-        |1000 for      |      |'0', the DCC will assign this based on  |
-        |the           |      |signal value. Ideally average           |
-        |thickest      |      |signalValue per base spread between     |
-        |color)        |      |100-1000.                               |
-        +--------------+------+----------------------------------------+
-        |strand        |char  |+/- to denote strand or orientation     |
-        |(always .)    |      |(whenever applicable). Use '.' if no    |
-        |              |      |orientation is assigned.                |
-        +--------------+------+----------------------------------------+
-        |thickStart    |int   | The starting position at which the     |
-        |              |      |feature is drawn thickly. Mark the start|
-        |              |      |of highly enriched regions.             |
-        |              |      |                                        |
-        +--------------+------+----------------------------------------+
-        |thickEnd      |int   | The ending position at which the       |
-        |              |      |feature is drawn thickly. Mark the end  |
-        |              |      |of highly enriched regions.             |
-        +--------------+------+----------------------------------------+
-        |itemRGB       |string| Not used. Set it as 0.                 |
-        +--------------+------+----------------------------------------+
-        |blockCounts   |int   | The number of blocks (exons) in the BED|
-        |              |      |line.                                   |
-        +--------------+------+----------------------------------------+
-        |blockSizes    |string| A comma-separated list of the block    |
-        |              |      |sizes.                                  |
-        +--------------+------+----------------------------------------+
-        |blockStarts   |string| A comma-separated list of block starts.|
-        +--------------+------+----------------------------------------+
-
+        Args:
+            fhd: Writable file-like object.
+            name_prefix: Template used to construct peak identifiers.
+            name: Dataset label interpolated into ``name_prefix``.
+            description: Track description for the optional header.
+            score_column: Peak attribute mapped to the score column.
+            trackline: Whether to emit a UCSC ``track`` header.
         """
         chrs: list
         n_peak: cython.int = 0
@@ -1393,54 +1346,15 @@ class BroadPeakIO:
                            description: bytes = b"%s",
                            score_column: str = "score",
                            trackline: bool = True):
-        """Print out peaks in broadPeak format.
+        """Write broad peaks in the ENCODE broadPeak (BED6+3) format.
 
-        This format is designed for ENCODE project, and basically a
-        BED6+3 format.
-
-        +-----------+------+----------------------------------------+
-        |field      |type  |description                             |
-        +-----------+------+----------------------------------------+
-        |chrom      |string|Name of the chromosome                  |
-        +-----------+------+----------------------------------------+
-        |chromStart |int   |The starting position of the feature in |
-        |           |      |the chromosome. The first base in a     |
-        |           |      |chromosome is numbered 0.               |
-        +-----------+------+----------------------------------------+
-        |chromEnd   |int   |The ending position of the feature in   |
-        |           |      |the chromosome or scaffold. The chromEnd|
-        |           |      |base is not included in the display of  |
-        |           |      |the feature.  For example, the first 100|
-        |           |      |bases of a chromosome are defined as    |
-        |           |      |chromStart=0, chromEnd=100, and span the|
-        |           |      |bases numbered 0-99.                    |
-        +-----------+------+----------------------------------------+
-        |name       |string|Name given to a region (preferably      |
-        |           |      |unique). Use '.' if no name is assigned.|
-        +-----------+------+----------------------------------------+
-        |score      |int   |Indicates how dark the peak will be     |
-        |(-logqvalue|      |displayed in the browser (1-1000). If   |
-        |in MACS3 * |      |'0', the DCC will assign this based on  |
-        |10)        |      |signal value. Ideally average           |
-        |           |      |signalValue per base spread between     |
-        |           |      |100-1000.                               |
-        +-----------+------+----------------------------------------+
-        |strand     |char  |+/- to denote strand or orientation     |
-        |(always .) |      |(whenever applicable). Use '.' if no    |
-        |           |      |orientation is assigned.                |
-        +-----------+------+----------------------------------------+
-        |signalValue|float |Measurement of overall (usually,        |
-        |(fc)       |      |average) enrichment for the region.     |
-        +-----------+------+----------------------------------------+
-        |pValue     |float |Measurement of statistical signficance  |
-        |           |      |(-log10). Use -1 if no pValue is        |
-        |           |      |assigned.                               |
-        +-----------+------+----------------------------------------+
-        |qValue     |float |Measurement of statistical significance |
-        |           |      |using false discovery rate. Use -1 if no|
-        |           |      |qValue is assigned.                     |
-        +-----------+------+----------------------------------------+
-
+        Args:
+            fhd: Writable file-like object.
+            name_prefix: Template used to construct peak identifiers.
+            name: Dataset label interpolated into ``name_prefix``.
+            description: Track description for the optional header.
+            score_column: Peak attribute mapped to the score column.
+            trackline: Whether to emit a UCSC ``track`` header.
         """
         chrs: list
         n_peak: cython.int = 0
@@ -1479,12 +1393,12 @@ class BroadPeakIO:
     def write_to_xls(self, ofhd,
                      name_prefix: bytes = b"%s_peak_",
                      name: bytes = b"MACS"):
-        """Save the peak results in a tab-delimited plain text file
-        with suffix .xls.
+        """Export broad peaks to a tab-delimited ``.xls`` text file.
 
-
-        wait... why I have two write_to_xls in this class?
-
+        Args:
+            ofhd: Writable file-like object.
+            name_prefix: Template used to build peak identifiers.
+            name: Dataset label interpolated into ``name_prefix``.
         """
         chrom: bytes
         chrs: list

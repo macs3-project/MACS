@@ -32,7 +32,7 @@ jobs:
     - name: Install dependencies
       run: |
         python3 -m pip install --upgrade pip
-        python3 -m pip install sphinx myst-parser sphinx-rtd-theme # Add other dependencies you might have
+        python3 -m pip install sphinx myst-parser sphinx-rtd-theme sphinx-rtd-theme  sphinx-autodoc-typehints # Add other dependencies you might have
 
     - name: Build Sphinx Documentation
       run: |

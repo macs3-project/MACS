@@ -1,6 +1,6 @@
 # cython: language_level=3
 # cython: profile=True
-# Time-stamp: <2025-02-05 18:11:50 Tao Liu>
+# Time-stamp: <2025-11-14 16:55:58 Tao Liu>
 
 """Module for Region classe.
 
@@ -303,7 +303,6 @@ class Regions:
 
         self.sort()
         regions1 = self.regions
-        self.total = 0
         assert isinstance(regions_object2, Regions)
 
         regions_object2.sort()
@@ -311,6 +310,7 @@ class Regions:
 
         ret_regions_object = Regions()
         ret_regions = dict()
+        ret_regions_object.total = 0
         chrs1 = list(regions1.keys())
         chrs2 = list(regions2.keys())
         for k in chrs1:
@@ -319,7 +319,7 @@ class Regions:
                 # no such chromosome in peaks1, then don't touch the
                 # peaks in this chromosome
                 ret_regions[k] = regions1[k]
-                self.total += len(ret_regions[k])
+                ret_regions_object.total += len(ret_regions[k])
                 continue
             ret_regions[k] = []
             n_rl1 = len(regions1[k])    # number of remaining elements in regions1[k]
@@ -353,7 +353,7 @@ class Regions:
                     else:
                         # no more r2 left
                         break
-            self.total += len(ret_regions[k])
+            ret_regions_object.total += len(ret_regions[k])
 
         ret_regions_object.regions = ret_regions
         ret_regions_object.sort()
@@ -362,7 +362,7 @@ class Regions:
     @cython.ccall
     def exclude(self, regions_object2):
         """ Remove overlapping regions in regions_object2, another Regions
-        object.
+        object. This regions object will be altered.
 
         """
         regions1: dict

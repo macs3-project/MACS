@@ -49,12 +49,14 @@ LOG10_E = 0.43429448190325176
 @cython.inline
 @cython.cfunc
 def mean_func(x):
+    """Return the arithmetic mean of ``x``."""
     return sum(x)/len(x)
 
 
 @cython.inline
 @cython.cfunc
 def fisher_func(x):
+    """Combine ``-log10`` p-values in ``x`` using Fisher's method."""
     # combine -log10pvalues
     return chisq_logp_e(2*sum(x)/LOG10_E, 2*len(x), log10=True)
 
@@ -62,6 +64,7 @@ def fisher_func(x):
 @cython.inline
 @cython.cfunc
 def subtract_func(x):
+    """Return the difference ``x[1] - x[0]``."""
     # subtraction of two items list
     return x[1] - x[0]
 
@@ -69,6 +72,7 @@ def subtract_func(x):
 @cython.inline
 @cython.cfunc
 def divide_func(x):
+    """Return the ratio ``x[1] / x[2]``."""
     # division of two items list
     return x[1] / x[2]
 
@@ -76,6 +80,7 @@ def divide_func(x):
 @cython.inline
 @cython.cfunc
 def product_func(x):
+    """Return the product of all values in ``x``."""
     # production of a list of values
     # only python 3.8 or above
     return prod(x)
@@ -87,25 +92,11 @@ def product_func(x):
 
 @cython.cclass
 class bedGraphTrackI:
-    """Class for bedGraph type data.
+    """Sparse representation of a bedGraph signal track.
 
-    In bedGraph, data are represented as continuous non-overlapping
-    regions in the whole genome. I keep this assumption in all the
-    functions. If data has overlaps, some functions will definitely
-    give incorrect results.
-
-    1. Continuous: the next region should be after the previous one
-    unless they are on different chromosomes;
-
-    2. Non-overlapping: the next region should never have overlaps
-    with preceding region.
-
-    The way to memorize bedGraph data is to remember the transition
-    points together with values of their preceding regions. The last
-    data point may exceed chromosome end, unless a chromosome
-    dictionary is given. Remember the coordinations in bedGraph and
-    this class is 0-indexed and right-open.
-
+    The implementation assumes regions are continuous and non-overlapping
+    within each chromosome. Coordinates are stored as 0-based, right-open
+    transition points paired with the preceding value.
     """
     __data: dict
     maxvalue = cython.declare(cython.float, visibility="public")
@@ -113,15 +104,11 @@ class bedGraphTrackI:
     baseline_value = cython.declare(cython.float, visibility="public")
 
     def __init__(self, baseline_value: cython.float = 0):
-        """
-        baseline_value is the value to fill in the regions not defined
-        in bedGraph. For example, if the bedGraph is like:
+        """Initialise an empty track with a default baseline value.
 
-        chr1  100 200  1
-        chr1  250 350  2
-
-        Then the region chr1:200..250 should be filled with baseline_value.
-
+        Args:
+            baseline_value: Score used to fill uncovered bases when new
+                segments are appended.
         """
         self.__data = {}
         self.maxvalue = -10000000  # initial maximum value is tiny since I want safe_add_loc to update it
@@ -133,12 +120,10 @@ class bedGraphTrackI:
                 startpos: cython.int,
                 endpos: cython.int,
                 value: cython.float):
-        """Add a chr-start-end-value block into __data dictionary.
+        """Append ``[startpos, endpos)`` with ``value`` on ``chromosome``.
 
-        Note, we don't check if the add_loc is called continuously on
-        sorted regions without any gap. So we only suggest calling
-        this function within MACS.
-
+        The caller is responsible for providing non-overlapping, sorted
+        regions. Adjacent regions with identical values are merged.
         """
         pre_v: cython.float
 
@@ -184,14 +169,7 @@ class bedGraphTrackI:
                          startpos: cython.int,
                          endpos: cython.int,
                          value: cython.float):
-        """Add a chr-start-end-value block into __data dictionary.
-
-        Note, we don't check if the add_loc is called continuously on
-        sorted regions without any gap. So we only suggest calling
-        this function within MACS.
-
-        This one won't merge nearby ranges with the same value
-        """
+        """Append ``[startpos, endpos)`` without merging identical neighbours."""
         if endpos <= 0:
             return
         if startpos < 0:
@@ -222,13 +200,7 @@ class bedGraphTrackI:
                        chromosome: bytes,
                        p: pyarray,
                        v: pyarray):
-        """Add a pv data to a chromosome. Replace the previous data.
-
-        p: a pyarray object 'i' for positions
-        v: a pyarray object 'f' for values
-
-        Note: no checks for error, use with caution
-        """
+        """Replace ``chromosome`` data using position and value arrays."""
         maxv: cython.float
         minv: cython.float
 
@@ -245,14 +217,7 @@ class bedGraphTrackI:
     def add_chrom_data_PV(self,
                           chromosome: bytes,
                           pv: cnp.ndarray):
-        """Add a pv data to a chromosome. Replace the previous data.
-
-        This is a kinda silly function to waste time and convert a PV
-        array (2-d named numpy array) into two python arrays for this
-        BedGraph class. May have better function later.
-
-        Note: no checks for error, use with caution
-        """
+        """Replace ``chromosome`` data from a structured numpy array ``pv``."""
         maxv: cython.float
         minv: cython.float
 
@@ -268,8 +233,7 @@ class bedGraphTrackI:
 
     @cython.ccall
     def destroy(self) -> bool:
-        """ destroy content, free memory.
-        """
+        """Release stored chromosome data and reset caches."""
         chrs: set
         chrom: bytes
 
@@ -282,11 +246,7 @@ class bedGraphTrackI:
 
     @cython.ccall
     def get_data_by_chr(self, chromosome: bytes) -> list:
-        """Return array of counts by chromosome.
-
-        The return value is a tuple:
-        ([end pos],[value])
-        """
+        """Return ``(positions, values)`` arrays for ``chromosome``."""
         if chromosome in self.__data:
             return self.__data[chromosome]
         else:
@@ -294,19 +254,12 @@ class bedGraphTrackI:
 
     @cython.ccall
     def get_chr_names(self) -> set:
-        """Return all the chromosome names stored.
-
-        """
+        """Return the set of chromosomes currently stored."""
         return set(sorted(self.__data.keys()))
 
     @cython.ccall
     def reset_baseline(self, baseline_value: cython.float):
-        """Reset baseline value to baseline_value.
-
-        So any region between self.baseline_value and baseline_value
-        will be set to baseline_value.
-
-        """
+        """Reset ``baseline_value`` and clamp regions below the new baseline."""
         self.baseline_value = baseline_value
         self.filter_score(cutoff=baseline_value)
         self.merge_regions()
@@ -314,9 +267,7 @@ class bedGraphTrackI:
 
     @cython.cfunc
     def merge_regions(self):
-        """Merge nearby regions with the same value.
-
-        """
+        """Coalesce adjacent segments that share the same value."""
         # new_pre_pos: cython.int
         pos: cython.int
         i: cython.int
@@ -357,11 +308,7 @@ class bedGraphTrackI:
 
     @cython.ccall
     def filter_score(self, cutoff: cython.float = 0) -> bool:
-        """Filter using a score cutoff. Any region lower than score
-        cutoff will be set to self.baseline_value.
-
-        Self will be modified.
-        """
+        """Clamp regions below ``cutoff`` to ``self.baseline_value``."""
         # new_pre_pos: cython.int
         pos: cython.int
         i: cython.int
@@ -406,10 +353,11 @@ class bedGraphTrackI:
 
     @cython.ccall
     def summary(self) -> tuple:
-        """Calculate the sum, total_length, max, min, mean, and std.
+        """Return global summary statistics for the track.
 
-        Return a tuple for (sum, total_length, max, min, mean, std).
-
+        Returns:
+            tuple: ``(sum, length, max, min, mean, std_dev)`` evaluated
+            across all chromosomes.
         """
         n_v: cython.long
         sum_v: cython.float
@@ -459,27 +407,19 @@ class bedGraphTrackI:
                    min_length: cython.int = 200,
                    max_gap: cython.int = 50,
                    call_summits: bool = False):
-        """This function try to find regions within which, scores
-        are continuously higher than a given cutoff.
+        """Return narrow peaks where signal stays above ``cutoff``.
 
-        This function is NOT using sliding-windows. Instead, any
-        regions in bedGraph above certain cutoff will be detected,
-        then merged if the gap between nearby two regions are below
-        max_gap. After this, peak is reported if its length is above
-        min_length.
+        Segments above the cutoff are merged when separated by gaps no larger
+        than ``max_gap``. Peaks shorter than ``min_length`` are discarded.
 
-        cutoff:  cutoff of value, default 1.
-        min_length :  minimum peak length, default 200.
-        gap   :  maximum gap to merge nearby peaks, default 50.
+        Args:
+            cutoff: Minimum signal value for inclusion.
+            min_length: Minimum peak length (in bases) to report.
+            max_gap: Maximum distance between adjacent segments to merge.
+            call_summits: Reserved flag; summits are always computed.
 
-        Removed option:
-
-        up_limit: the highest acceptable value. Default 10^{310}
-          * so only allow peak with value >=cutoff and <=up_limit
-
-        This does not work. The region above upper limit may still be
-        included as `gap` .
-
+        Returns:
+            PeakIO: Discrete peak intervals with summit annotations.
         """
         # peak_length: cython.int
         x: cython.int
@@ -551,6 +491,7 @@ class bedGraphTrackI:
                      peaks,
                      min_length: cython.int,
                      chrom: bytes) -> bool:
+        """Convert buffered segments into a peak entry if length permits."""
         tsummit: list           # list for temporary summits
         peak_length: cython.int
         summit: cython.int
@@ -589,20 +530,17 @@ class bedGraphTrackI:
                         min_length: cython.int = 200,
                         lvl1_max_gap: cython.int = 50,
                         lvl2_max_gap: cython.int = 400):
-        """This function try to find enriched regions within which,
-        scores are continuously higher than a given cutoff for level
-        1, and link them using the gap above level 2 cutoff with a
-        maximum length of lvl2_max_gap.
+        """Return broad peaks built from high- and low-stringency thresholds.
 
-        lvl1_cutoff:  cutoff of value at enriched regions, default 500.
-        lvl2_cutoff:  cutoff of value at linkage regions, default 100.
-        min_length :  minimum peak length, default 200.
-        lvl1_max_gap   :  maximum gap to merge nearby enriched peaks, default 50.
-        lvl2_max_gap   :  maximum length of linkage regions, default 400.
-        colname: can be 'sample','control','-100logp','-100logq'. Cutoff will be applied to the specified column.
+        Args:
+            lvl1_cutoff: Signal threshold for core enriched segments.
+            lvl2_cutoff: Lower threshold for linking segments.
+            min_length: Minimum length for reported peaks.
+            lvl1_max_gap: Maximum gap size when merging level-1 segments.
+            lvl2_max_gap: Maximum allowed length for linking segments.
 
-        Return both general PeakIO object for highly enriched regions
-        and gapped broad regions in BroadPeakIO.
+        Returns:
+            BroadPeakIO: Broad peaks constructed from level-1/level-2 segments.
         """
         chrom: bytes
         i: cython.int
@@ -664,8 +602,7 @@ class bedGraphTrackI:
                         chrom: bytes,
                         lvl2peak: PeakContent,
                         lvl1peakset: list):
-        """Internal function to create broad peak.
-        """
+        """Append a broad peak assembled from a core peak set."""
         start: cython.int
         end: cython.int
         blockNum: cython.int
@@ -730,13 +667,7 @@ class bedGraphTrackI:
 
     @cython.ccall
     def refine_peaks(self, peaks):
-        """This function try to based on given peaks, re-evaluate the
-        peak region, call the summit.
-
-        peaks: PeakIO object
-        return: a new PeakIO object
-
-        """
+        """Recalculate peak bounds and summits from an initial ``PeakIO``."""
         pre_p: cython.int
         p: cython.int
         peak_s: cython.int
@@ -1333,56 +1264,18 @@ class bedGraphTrackI:
                         steps: cython.int = 100,
                         min_score: cython.float = 0,
                         max_score: cython.float = 1000) -> str:
-        """
-        Cutoff analysis function for bedGraphTrackI object.
+        """Summarise peak metrics across a range of score thresholds.
 
-        This function will try all possible cutoff values on the score
-        column to call peaks. Then will give a report of a number of
-        metrics (number of peaks, total length of peaks, average
-        length of peak) at varying score cutoffs. For each score
-        cutoff, the function finds the positions where the score
-        exceeds the cutoff, then groups those positions into "peaks"
-        based on the maximum allowed gap (max_gap) between consecutive
-        positions. If a peak's length exceeds the minimum length
-        (min_length), the peak is counted.
+        Args:
+            max_gap: Maximum distance between merged regions.
+            min_length: Minimum peak length to keep.
+            steps: Number of cutoff increments between the observed
+                minimum and maximum scores.
+            min_score: Lower bound for the cutoff sweep.
+            max_score: Upper bound for the cutoff sweep.
 
-        Parameters
-        ----------
-
-        max_gap : int32_t
-        Maximum allowed gap between consecutive positions above cutoff
-
-        min_length : int32_t Minimum length of peak
-        steps: int32_t
-        It will be used to calculate 'step' to increase from min_v to
-        max_v (see below).
-
-        min_score: float32_t
-        Minimum score for cutoff analysis. Note1: we will take the
-        larger value between the actual minimum value in the BedGraph
-        and min_score as min_v. Note2: the min_v won't be included in
-        the final result. We will try to output the smallest cutoff as
-        min_v+step.
-
-        max_score: float32_t
-        Maximum score for cutoff analysis. Note1: we will take the
-        smaller value between the actual maximum value in the BedGraph
-        and max_score as max_v. Note2: the max_v may not be included
-        in the final result. We will only output the cutoff that can
-        generate at least 1 peak.
-
-        Returns
-        -------
-
-        Cutoff analysis report in str object.
-
-        Todos
-        -----
-
-        May need to separate this function out as a class so that we
-        can add more ways to analyze the result. Also, we can let this
-        function return a list of dictionary or data.frame in that
-        way, instead of str object.
+        Returns:
+            str: Tab-delimited report of peak counts and lengths per cutoff.
         """
         chrs: set
         peak_content: list
@@ -1490,29 +1383,7 @@ class bedGraphTrackI:
 
 @cython.cclass
 class bedGraphTrackII:
-    """Class for bedGraph type data.
-
-    In bedGraph, data are represented as continuous non-overlapping
-    regions in the whole genome. I keep this assumption in all the
-    functions. If data has overlaps, some functions will definitely
-    give incorrect results.
-
-    1. Continuous: the next region should be after the previous one
-    unless they are on different chromosomes;
-
-    2. Non-overlapping: the next region should never have overlaps
-    with preceding region.
-
-    The way to memorize bedGraph data is to remember the transition
-    points together with values of their preceding regions. The last
-    data point may exceed chromosome end, unless a chromosome
-    dictionary is given. Remember the coordinations in bedGraph and
-    this class is 0-indexed and right-open.
-
-    Different with bedGraphTrackI, we use numpy array to store the
-    (end) positions and values.
-
-    """
+    """NumPy-backed variant of :class:`bedGraphTrackI`."""
     __data: dict
     maxvalue = cython.declare(cython.float, visibility="public")
     minvalue = cython.declare(cython.float, visibility="public")
@@ -1523,15 +1394,11 @@ class bedGraphTrackII:
     def __init__(self,
                  baseline_value: cython.float = 0,
                  buffer_size: cython.int = 100000):
-        """
-        baseline_value is the value to fill in the regions not defined
-        in bedGraph. For example, if the bedGraph is like:
+        """Initialise an empty track backed by NumPy arrays.
 
-        chr1  100 200  1
-        chr1  250 350  2
-
-        Then the region chr1:200..250 should be filled with baseline_value.
-
+        Args:
+            baseline_value: Score used to fill uncovered bases.
+            buffer_size: Initial allocation size for per-chromosome arrays.
         """
         self.__data = {}
         self.__size = {}
@@ -1545,13 +1412,7 @@ class bedGraphTrackII:
                 startpos: cython.int,
                 endpos: cython.int,
                 value: cython.float):
-        """Add a chr-start-end-value block into __data dictionary.
-
-        Note, we don't check if the add_loc is called continuously on
-        sorted regions without any gap. So we only suggest calling
-        this function within MACS.
-
-        """
+        """Append ``[startpos, endpos)`` with ``value`` on ``chromosome``."""
         pre_v: cython.float
         c: cnp.ndarray
         i: cython.int
@@ -1601,14 +1462,7 @@ class bedGraphTrackII:
                          startpos: cython.int,
                          endpos: cython.int,
                          value: cython.float):
-        """Add a chr-start-end-value block into __data dictionary.
-
-        Note, we don't check if the add_loc is called continuously on
-        sorted regions without any gap. So we only suggest calling
-        this function within MACS.
-
-        This one won't merge nearby ranges with the same value
-        """
+        """Append ``[startpos, endpos)`` without merging adjacent values."""
         c: cnp.ndarray
         i: cython.int
 
@@ -1649,14 +1503,7 @@ class bedGraphTrackII:
     def add_chrom_data(self,
                        chromosome: bytes,
                        pv: cnp.ndarray):
-        """Add a pv data to a chromosome. Replace the previous data.
-
-        This is a kinda silly function to waste time and convert a PV
-        array (2-d named numpy array) into two python arrays for this
-        BedGraph class. May have better function later.
-
-        Note: no checks for error, use with caution
-        """
+        """Replace ``chromosome`` data with the structured numpy array ``pv``."""
         self.__data[chromosome] = pv
         self.__size[chromosome] = len(pv)
 
@@ -1664,8 +1511,7 @@ class bedGraphTrackII:
 
     @cython.ccall
     def destroy(self) -> bool:
-        """ destroy content, free memory.
-        """
+        """Release allocated arrays and reset chromosome metadata."""
         chrs: set
         chrom: bytes
 
@@ -1683,12 +1529,7 @@ class bedGraphTrackII:
 
     @cython.ccall
     def finalize(self):
-        """Resize np arrays.
-
-        Note: If this function is called, please do not add any more
-        data. remember to call it after all the files are read!
-
-        """
+        """Trim underlying arrays to size and update cached min/max values."""
         c: bytes
         chrnames: set
         maxv: cython.float
@@ -1710,11 +1551,7 @@ class bedGraphTrackII:
 
     @cython.ccall
     def get_data_by_chr(self, chromosome: bytes) -> cnp.ndarray:
-        """Return array of counts by chromosome.
-
-        The return value is a tuple:
-        ([end pos],[value])
-        """
+        """Return the structured array for ``chromosome`` or ``None``."""
         if chromosome in self.__data:
             return self.__data[chromosome]
         else:
@@ -1722,18 +1559,12 @@ class bedGraphTrackII:
 
     @cython.ccall
     def get_chr_names(self) -> set:
-        """Return all the chromosome names stored.
-
-        """
+        """Return the set of chromosomes currently stored."""
         return set(sorted(self.__data.keys()))
 
     @cython.ccall
     def filter_score(self, cutoff: cython.float = 0) -> bool:
-        """Filter using a score cutoff. Any region lower than score
-        cutoff will be set to self.baseline_value.
-
-        Self will be modified.
-        """
+        """Retain only segments with values greater than ``cutoff``."""
         # new_pre_pos: cython.int
         chrom: bytes
         chrs: set
@@ -1757,11 +1588,7 @@ class bedGraphTrackII:
 
     @cython.ccall
     def summary(self) -> tuple:
-        """Calculate the sum, total_length, max, min, mean, and std.
-
-        Return a tuple for (sum, total_length, max, min, mean, std).
-
-        """
+        """Return ``(sum, length, max, min, mean, std_dev)`` across the track."""
         d: cnp.ndarray
         n_v: cython.long
         sum_v: cython.float
@@ -1811,10 +1638,7 @@ class bedGraphTrackII:
                    min_length: cython.int = 200,
                    max_gap: cython.int = 50,
                    call_summits: bool = False):
-        """This function try to find regions within which, scores
-        are continuously higher than a given cutoff.
-
-        """
+        """Return narrow peaks where signal stays above ``cutoff``."""
         i: cython.int
         chrom: bytes
         pos: cnp.ndarray
@@ -1918,21 +1742,7 @@ class bedGraphTrackII:
                         min_length: cython.int = 200,
                         lvl1_max_gap: cython.int = 50,
                         lvl2_max_gap: cython.int = 400):
-        """This function try to find enriched regions within which,
-        scores are continuously higher than a given cutoff for level
-        1, and link them using the gap above level 2 cutoff with a
-        maximum length of lvl2_max_gap.
-
-        lvl1_cutoff:  cutoff of value at enriched regions, default 500.
-        lvl2_cutoff:  cutoff of value at linkage regions, default 100.
-        min_length :  minimum peak length, default 200.
-        lvl1_max_gap   :  maximum gap to merge nearby enriched peaks, default 50.
-        lvl2_max_gap   :  maximum length of linkage regions, default 400.
-        colname: can be 'sample','control','-100logp','-100logq'. Cutoff will be applied to the specified column.
-
-        Return both general PeakIO object for highly enriched regions
-        and gapped broad regions in BroadPeakIO.
-        """
+        """Return broad peaks built from high- and low-stringency thresholds."""
         chrom: bytes
         i: cython.int
         j: cython.int
@@ -1993,8 +1803,7 @@ class bedGraphTrackII:
                         chrom: bytes,
                         lvl2peak: PeakContent,
                         lvl1peakset: list):
-        """Internal function to create broad peak.
-        """
+        """Append a broad peak assembled from a core peak set."""
         start: cython.int
         end: cython.int
         blockNum: cython.int
@@ -2059,13 +1868,7 @@ class bedGraphTrackII:
 
     @cython.ccall
     def refine_peaks(self, peaks):
-        """This function try to based on given peaks, re-evaluate the
-        peak region, call the summit.
-
-        peaks: PeakIO object
-        return: a new PeakIO object
-
-        """
+        """Recalculate peak bounds and summits from an initial ``PeakIO``."""
         pre_p: cython.int
         p: cython.int
         peak_s: cython.int

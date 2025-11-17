@@ -1,8 +1,8 @@
 # cython: language_level=3
 # cython: profile=True
-# Time-stamp: <2024-10-18 15:22:06 Tao Liu>
+# Time-stamp: <2025-11-16 13:00:03 Tao Liu>
 
-"""Module for Feature IO classes.
+"""Scoring utilities for MACS3 signal tracks and peak callers.
 
 This code is free software; you can redistribute it and/or modify it
 under the terms of the BSD License (see the file LICENSE included with
@@ -48,12 +48,14 @@ from cython.cimports.libc.math import (log10,
 @cython.inline
 @cython.cfunc
 def int_max(a: cython.int, b: cython.int) -> cython.int:
+    """Return the larger of ``a`` and ``b``."""
     return a if a >= b else b
 
 
 @cython.inline
 @cython.cfunc
 def int_min(a: cython.int, b: cython.int) -> cython.int:
+    """Return the smaller of ``a`` and ``b``."""
     return a if a <= b else b
 
 
@@ -65,11 +67,7 @@ pscore_dict = PyObjectMap()
 @cython.cfunc
 def get_pscore(observed: cython.int,
                expectation: cython.float) -> cython.float:
-    """Get p-value score from Poisson test. First check existing
-    table, if failed, call poisson_cdf function, then store the result
-    in table.
-
-    """
+    """Return cached ``-log10`` Poisson tail probability for ``observed``."""
     score: cython.double
 
     try:
@@ -89,12 +87,7 @@ asym_logLR_dict = PyObjectMap()
 @cython.cfunc
 def logLR_asym(x: cython.float,
                y: cython.float) -> cython.float:
-    """Calculate log10 Likelihood between H1 (enriched) and H0 (
-    chromatin bias). Set minus sign for depletion.
-
-    *asymmetric version*
-
-    """
+    """Return asymmetric ``log10`` likelihood ratio between ``x`` and ``y``."""
     s: cython.float
 
     if (x, y) in asym_logLR_dict:
@@ -115,12 +108,7 @@ sym_logLR_dict = PyObjectMap()
 
 @cython.cfunc
 def logLR_sym(x: cython.float, y: cython.float) -> cython.float:
-    """Calculate log10 Likelihood between H1 (enriched) and H0 (
-    another enriched). Set minus sign for H0>H1.
-
-    * symmetric version *
-
-    """
+    """Return symmetric ``log10`` likelihood ratio between ``x`` and ``y``."""
     s: cython.float
 
     if (x, y) in sym_logLR_dict:
@@ -139,15 +127,13 @@ def logLR_sym(x: cython.float, y: cython.float) -> cython.float:
 @cython.inline
 @cython.cfunc
 def get_logFE(x: cython.float, y: cython.float) -> cython.float:
-    """ return 100* log10 fold enrichment with +1 pseudocount.
-    """
+    """Return ``log10`` fold enrichment (base-10) for ``x`` over ``y``."""
     return log10(x/y)
 
 
 @cython.cfunc
 def get_subtraction(x: cython.float, y: cython.float) -> cython.float:
-    """ return subtraction.
-    """
+    """Return the difference ``x - y``."""
     return x - y
 
 # ------------------------------------
@@ -157,11 +143,7 @@ def get_subtraction(x: cython.float, y: cython.float) -> cython.float:
 
 @cython.cclass
 class ScoreTrackII:
-    """Class for a container to keep signals of each genomic position,
-    including 1. score, 2. treatment and 2. control pileup.
-
-    It also contains scoring methods and call_peak functions.
-    """
+    """Container for treatment/control pileups and derived score tracks."""
     # dictionary for data of each chromosome
     data: dict
     # length of data array of each chromosome
@@ -187,23 +169,12 @@ class ScoreTrackII:
                  treat_depth: cython.float,
                  ctrl_depth: cython.float,
                  pseudocount: cython.float = 1.0):
-        """Initialize.
+        """Initialise score containers with effective library depths.
 
-        treat_depth and ctrl_depth are effective depth in million:
-                                    sequencing depth in million after
-                                    duplicates being filtered. If
-                                    treatment is scaled down to
-                                    control sample size, then this
-                                    should be control sample size in
-                                    million. And vice versa.
-
-        pseudocount: a pseudocount used to calculate logLR, FE or
-                     logFE. Please note this value will not be changed
-                     with normalization method. So if you really want
-                     to set pseudocount 1 per million reads, set it
-                     after you normalize treat and control by million
-                     reads by `change_normalizetion_method(ord('M'))`.
-
+        Args:
+            treat_depth: Effective treatment depth (millions of filtered reads).
+            ctrl_depth: Effective control depth (millions of filtered reads).
+            pseudocount: Pseudocount added when computing score metrics.
         """
         # for each chromosome, there is a l*4 matrix. First column:
         # end position of a region; Second: treatment pileup; third:
@@ -237,23 +208,19 @@ class ScoreTrackII:
 
     @cython.ccall
     def set_pseudocount(self, pseudocount: cython.float):
+        """Update the pseudocount used when computing score metrics."""
         self.pseudocount = pseudocount
 
     @cython.ccall
     def enable_trackline(self):
-        """Turn on trackline with bedgraph output
-        """
+        """Enable UCSC track line output when exporting bedGraphs."""
         self.trackline = True
 
     @cython.ccall
     def add_chromosome(self,
                        chrom: bytes,
                        chrom_max_len: cython.int):
-        """
-        chrom: chromosome name
-        chrom_max_len: maximum number of data points in this chromosome
-
-        """
+        """Allocate arrays for ``chrom`` with capacity ``chrom_max_len``."""
         if chrom not in self.data:
             self.data[chrom] = [np.zeros(chrom_max_len, dtype="int32"),  # pos
                                 # pileup at each interval, in float32 format
@@ -270,16 +237,7 @@ class ScoreTrackII:
             endpos: cython.int,
             chip: cython.float,
             control: cython.float):
-        """Add a chr-endpos-sample-control block into data
-        dictionary.
-
-        chromosome: chromosome name in string
-        endpos    : end position of each interval in integer
-        chip      : ChIP pileup value of each interval in float
-        control   : Control pileup value of each interval in float
-
-        *Warning* Need to add regions continuously.
-        """
+        """Append treatment/control pileup ending at ``endpos`` for ``chromosome``."""
         i: cython.int
 
         i = self.datalength[chromosome]
@@ -291,10 +249,7 @@ class ScoreTrackII:
 
     @cython.ccall
     def finalize(self):
-        """
-        Adjust array size of each chromosome.
-
-        """
+        """Trim per-chromosome arrays to their populated length."""
         chrom: bytes
         ln: cython.int
 
@@ -310,11 +265,7 @@ class ScoreTrackII:
     @cython.ccall
     def get_data_by_chr(self,
                         chromosome: bytes):
-        """Return array of counts by chromosome.
-
-        The return value is a tuple:
-        ([end pos],[value])
-        """
+        """Return ``(positions, treatment, control, score)`` arrays for ``chromosome``."""
         if chromosome in self.data:
             return self.data[chromosome]
         else:
@@ -400,6 +351,7 @@ class ScoreTrackII:
     def normalize(self,
                   treat_scale: cython.float,
                   control_scale: cython.float):
+        """Scale treatment and control pileups in-place by the given factors."""
         p: cnp.ndarray
         c: cnp.ndarray
         ln: cython.long
@@ -672,6 +624,7 @@ class ScoreTrackII:
 
     @cython.cfunc
     def compute_subtraction(self):
+        """Populate scores with treatment minus control pileup."""
         p: cnp.ndarray
         c: cnp.ndarray
         v: cnp.ndarray
@@ -690,6 +643,7 @@ class ScoreTrackII:
 
     @cython.cfunc
     def compute_SPMR(self):
+        """Populate scores with treatment pileup per million reads."""
         p: cnp.ndarray
         v: cnp.ndarray
         ln: cython.long
@@ -714,6 +668,7 @@ class ScoreTrackII:
 
     @cython.cfunc
     def compute_max(self):
+        """Populate scores with the element-wise maximum of treatment and control."""
         p: cnp.ndarray
         c: cnp.ndarray
         v: cnp.ndarray
@@ -790,24 +745,168 @@ class ScoreTrackII:
         return True
 
     @cython.ccall
+    def cutoff_analysis(self,
+                        max_gap: cython.int = 50,
+                        min_length: cython.int = 200,
+                        steps: cython.int = 100,
+                        min_score: cython.float = 0,
+                        max_score: cython.float = 1000) -> str:
+        """Summarise peak metrics across a range of score thresholds.
+
+        Args:
+            max_gap: Maximum distance between merged regions.
+            min_length: Minimum peak length to keep.
+            steps: Number of cutoff increments between the observed
+                minimum and maximum scores.
+            min_score: Lower bound for the cutoff sweep.
+            max_score: Upper bound for the cutoff sweep.
+
+        Returns:
+            str: Tab-delimited report of peak counts and lengths per cutoff.
+        """
+        chrs: set
+        peak_content: list
+        ret_list: list
+        cutoff_list: list
+        cutoff_npeaks: list
+        cutoff_lpeaks: list
+        chrom: bytes
+        ret: str
+        cutoff: cython.float
+        total_l: cython.long
+        total_p: cython.long
+        i: cython.long
+        n: cython.long
+        ts: cython.long
+        te: cython.long
+        lastp: cython.long
+        tl: cython.long
+        peak_length: cython.long
+        s: cython.float
+        ln: cython.long
+        chrom_min: cython.float
+        chrom_max: cython.float
+        obs_min: cython.float
+        obs_max: cython.float
+        minv: cython.float
+        maxv: cython.float
+
+        chrs = self.get_chr_names()
+
+        obs_min = 10000000.0
+        obs_max = -10000000.0
+        for chrom in chrs:
+            ln = self.datalength[chrom]
+            if ln == 0:
+                continue
+            chrom_scores = self.data[chrom][3][:ln]
+            if chrom_scores.size == 0:
+                continue
+            chrom_min = float(np.min(chrom_scores))
+            chrom_max = float(np.max(chrom_scores))
+            if chrom_min < obs_min:
+                obs_min = chrom_min
+            if chrom_max > obs_max:
+                obs_max = chrom_max
+
+        minv = max(min_score, obs_min)
+        maxv = min(obs_max, max_score)
+        if steps <= 0 or maxv <= minv:
+            return "score\tnpeaks\tlpeaks\tavelpeak\n"
+
+        s = float(maxv - minv)/steps
+        if s <= 0:
+            return "score\tnpeaks\tlpeaks\tavelpeak\n"
+
+        cutoff_list = [round(value, 3) for value in np.arange(minv, maxv, s)]
+        if not cutoff_list:
+            return "score\tnpeaks\tlpeaks\tavelpeak\n"
+
+        cutoff_npeaks = [0] * len(cutoff_list)
+        cutoff_lpeaks = [0] * len(cutoff_list)
+
+        for chrom in sorted(chrs):
+            ln = self.datalength[chrom]
+            if ln == 0:
+                continue
+            pos_array = self.data[chrom][0][:ln]
+            score_array = self.data[chrom][3][:ln]
+
+            for n in range(len(cutoff_list)):
+                cutoff = cutoff_list[n]
+                total_l = 0           # total length of peaks
+                total_p = 0           # total number of peaks
+
+                # get the regions with scores above cutoffs. This is
+                # not an optimized method. It would be better to store
+                # score array in a 2-D ndarray?
+                above_cutoff = np.nonzero(score_array > cutoff)[0]
+                # end positions of regions where score is above cutoff
+                above_cutoff_endpos = pos_array[above_cutoff]
+                # start positions of regions where score is above cutoff
+                above_cutoff_startpos = pos_array[above_cutoff-1]
+
+                if above_cutoff_endpos.size == 0:
+                    continue
+
+                # first bit of region above cutoff
+                acs_next = iter(above_cutoff_startpos).__next__
+                ace_next = iter(above_cutoff_endpos).__next__
+
+                ts = acs_next()
+                te = ace_next()
+                peak_content = [(ts, te),]
+                lastp = te
+
+                for i in range(1, above_cutoff_startpos.size):
+                    ts = acs_next()
+                    te = ace_next()
+                    tl = ts - lastp
+                    if tl <= max_gap:
+                        peak_content.append((ts, te))
+                    else:
+                        peak_length = peak_content[-1][1] - peak_content[0][0]
+                        # if the peak is too small, reject it
+                        if peak_length >= min_length:
+                            total_l += peak_length
+                            total_p += 1
+                        peak_content = [(ts, te),]
+                    lastp = te
+
+                if peak_content:
+                    peak_length = peak_content[-1][1] - peak_content[0][0]
+                    # if the peak is too small, reject it
+                    if peak_length >= min_length:
+                        total_l += peak_length
+                        total_p += 1
+                cutoff_lpeaks[n] += total_l
+                cutoff_npeaks[n] += total_p
+
+        # prepare the returnning text
+        ret_list = ["score\tnpeaks\tlpeaks\tavelpeak\n"]
+        for n in range(len(cutoff_list)-1, -1, -1):
+            cutoff = cutoff_list[n]
+            if cutoff_npeaks[n] > 0:
+                ret_list.append("%.2f\t%d\t%d\t%.2f\n" % (cutoff,
+                                                          cutoff_npeaks[n],
+                                                          cutoff_lpeaks[n],
+                                                          cutoff_lpeaks[n]/cutoff_npeaks[n]))
+        ret = ''.join(ret_list)
+        return ret
+
+    @cython.ccall
     def call_peaks(self,
                    cutoff: cython.float = 5.0,
                    min_length: cython.int = 200,
                    max_gap: cython.int = 50,
                    call_summits: bool = False):
-        """This function try to find regions within which, scores
-        are continuously higher than a given cutoff.
+        """Return peaks where scores remain above ``cutoff``.
 
-        This function is NOT using sliding-windows. Instead, any
-        regions in bedGraph above certain cutoff will be detected,
-        then merged if the gap between nearby two regions are below
-        max_gap. After this, peak is reported if its length is above
-        min_length.
-
-        cutoff:  cutoff of value, default 5. For -log10pvalue, it means 10^-5.
-        min_length :  minimum peak length, default 200.
-        max_gap   :  maximum gap to merge nearby peaks, default 50.
-        call_summits: whether or not to call all summits (local maxima).
+        Args:
+            cutoff: Minimum score threshold (e.g., ``-log10 p``).
+            min_length: Minimum peak length in bases.
+            max_gap: Maximum distance between merged segments.
+            call_summits: Whether to report all local maxima within peaks.
         """
         i: cython.int
         chrom: bytes
@@ -1106,19 +1205,14 @@ class ScoreTrackII:
                         min_length: cython.int = 200,
                         lvl1_max_gap: cython.int = 50,
                         lvl2_max_gap: cython.int = 400):
-        """This function try to find enriched regions within which,
-        scores are continuously higher than a given cutoff for level
-        1, and link them using the gap above level 2 cutoff with a
-        maximum length of lvl2_max_gap.
+        """Return broad peaks constructed from high- and low-cutoff segments.
 
-        lvl1_cutoff:  cutoff of value at enriched regions, default 5.0.
-        lvl2_cutoff:  cutoff of value at linkage regions, default 1.0.
-        min_length :  minimum peak length, default 200.
-        lvl1_max_gap   :  maximum gap to merge nearby enriched peaks, default 50.
-        lvl2_max_gap   :  maximum length of linkage regions, default 400.
-
-        Return both general PeakIO object for highly enriched regions
-        and gapped broad regions in BroadPeakIO.
+        Args:
+            lvl1_cutoff: Threshold for core enriched segments.
+            lvl2_cutoff: Threshold for linking segments.
+            min_length: Minimum peak length to report.
+            lvl1_max_gap: Maximum gap when merging level-1 segments.
+            lvl2_max_gap: Maximum allowed length for linking segments.
         """
         i: cython.int
         chrom: bytes
@@ -1281,19 +1375,18 @@ class TwoConditionScores:
                  cond2_factor: cython.float = 1.0,
                  pseudocount: cython.float = 0.01,
                  proportion_background_empirical_distribution: cython.float = 0.99999):
-        """t1bdg: a bedGraphTrackI object for treat 1
-        c1bdg: a bedGraphTrackI object for control 1
-        t2bdg: a bedGraphTrackI object for treat 2
-        c2bdg: a bedGraphTrackI object for control 2
+        """Initialise a differential score track from paired bedGraphs.
 
-        cond1_factor: this will be multiplied to values in t1bdg and c1bdg
-        cond2_factor: this will be multiplied to values in t2bdg and c2bdg
-
-        pseudocount: pseudocount, by default 0.01.
-
-        proportion_background_empirical_distribution: proportion of
-        genome as the background to build empirical distribution
-
+        Args:
+            t1bdg: Treatment bedGraph for condition 1.
+            c1bdg: Control bedGraph for condition 1.
+            t2bdg: Treatment bedGraph for condition 2.
+            c2bdg: Control bedGraph for condition 2.
+            cond1_factor: Scaling factor applied to condition 1 tracks.
+            cond2_factor: Scaling factor applied to condition 2 tracks.
+            pseudocount: Pseudocount added when comparing conditions.
+            proportion_background_empirical_distribution: Fraction of bases
+                treated as background when building empirical distributions.
         """
         # for each chromosome, there is a l*4 matrix. First column: end
         # position of a region; Second: treatment pileup; third:
@@ -1314,6 +1407,7 @@ class TwoConditionScores:
 
     @cython.ccall
     def set_pseudocount(self, pseudocount: cython.float):
+        """Update the pseudocount used for differential scoring."""
         self.pseudocount = pseudocount
 
     @cython.ccall
@@ -1412,6 +1506,7 @@ class TwoConditionScores:
 
     @cython.cfunc
     def get_common_chrs(self) -> set:
+        """Return chromosome names shared across all input bedGraphs."""
         t1chrs: set
         c1chrs: set
         t2chrs: set
@@ -1429,11 +1524,7 @@ class TwoConditionScores:
     def add_chromosome(self,
                        chrom: bytes,
                        chrom_max_len: cython.int):
-        """
-        chrom: chromosome name
-        chrom_max_len: maximum number of data points in this chromosome
-
-        """
+        """Allocate storage for ``chrom`` with capacity ``chrom_max_len``."""
         if chrom not in self.data:
             self.data[chrom] = [np.zeros(chrom_max_len, dtype="i4"),  # pos
                                 np.zeros(chrom_max_len, dtype="f4"),  # LLR t1 vs c1

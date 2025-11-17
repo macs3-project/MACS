@@ -3,7 +3,7 @@
 # cython: linetrace=True
 # Time-stamp: <2024-10-07 16:09:06 Tao Liu>
 
-"""
+"""Utilities for reading BAM files and their BAI indexes in MACS3.
 
 This code is free software; you can redistribute it and/or modify it
 under the terms of the BSD License (see the file LICENSE included with
@@ -49,7 +49,14 @@ else:
 
 @cython.cfunc
 def get_bins_by_region(beg: cython.uint, end: cython.uint) -> list:
-    """ Get the possible bins by given a region
+    """Return BAI bin IDs that overlap ``[beg, end)``.
+
+    Args:
+        beg: 0-based inclusive start coordinate.
+        end: 0-based exclusive end coordinate.
+
+    Returns:
+        list: All bin indices covering the requested interval.
     """
     bins: list = [0]
     k: cython.uint
@@ -70,14 +77,17 @@ def get_bins_by_region(beg: cython.uint, end: cython.uint) -> list:
 
 @cython.cfunc
 def reg2bins(rbeg, rend) -> list:
-    """Generates bin ids which overlap the specified region.
+    """Return BAI bin IDs intersecting ``[rbeg, rend)``.
+
     Args:
-        rbeg (int): inclusive beginning position of region
-        rend (int): exclusive end position of region
-    Yields:
-        (int): bin IDs for overlapping bins of region
+        rbeg (int): 0-based inclusive start coordinate.
+        rend (int): 0-based exclusive end coordinate.
+
+    Returns:
+        list: Bin identifiers overlapping the interval.
+
     Raises:
-        AssertionError (Exception): if the range is malformed or invalid
+        AssertionError: If the interval falls outside the supported range.
     """
     l_bins: list
 
@@ -109,45 +119,32 @@ def reg2bins(rbeg, rend) -> list:
 
 
 class StrandFormatError(Exception):
-    """Exception about strand format error.
-
-    Example:
-    raise StrandFormatError('Must be F or R','X')
-    """
+    """Raised when a strand annotation cannot be interpreted."""
     def __init__(self, string, strand):
+        """Store the offending line and strand token."""
         self.strand = strand
         self.string = string
 
     def __str__(self):
+        """Return a user-friendly representation of the formatting error."""
         return repr("Strand information can not be recognized in this line: \"%s\",\"%s\"" % (self.string, self.strand))
 
 
 class MDTagMissingError(Exception):
-    """Exception about missing MD tag
-
-    Example:
-    raise MDTagMissingError(name, aux)
-
-    aux is the auxiliary data part.
-    """
+    """Raised when an alignment entry is missing the MD auxiliary tag."""
     def __init__(self, name, aux):
+        """Capture the read name and auxiliary tag payload."""
         self.name = name
         self.aux = aux
 
     def __str__(self):
+        """Explain how to regenerate the missing MD tag."""
         return repr("MD tag is missing! Please use \"samtools calmd\" command to add MD tags!\nName of sequence:%s\nCurrent auxiliary data section: %s" % (self.name.decode(), self.aux.decode()))
 
 
 @cython.cclass
 class BAIFile:
-    """BAI File Class for BAI (index of BAM) File.
-
-    While initiating the object, BAI file will be loaded and the
-    information of bins and chunks will be saved in the class object.
-
-    Please refer to https://samtools.github.io/hts-specs/SAMv1.pdf for
-    detail definition of BAI file.
-    """
+    """In-memory representation of a BAM index (BAI) file."""
     filename: str               # filename
     fhd: object                 # file handler
     magic: bytes                # magic code for this file
@@ -160,16 +157,7 @@ class BAIFile:
     bins: list
 
     def __init__(self, filename: str):
-        """Open input file. Determine whether it's a gzipped file.
-
-        'filename' must be a string object.
-
-        This function initialize the following attributes:
-
-        1. self.filename: the filename for input file.
-        2. self.gzipped: a boolean indicating whether input file is gzipped.
-        3. self.fhd: buffered I/O stream of input file
-        """
+        """Load index metadata from ``filename`` into memory."""
         self.filename = filename
         self.fhd = io.open(filename, mode='rb')  # binary mode! I don't expect unicode here!
         self.magic = self.fhd.read(4)
@@ -183,6 +171,7 @@ class BAIFile:
         return
 
     def __cinit__(self):
+        """Initialise counters for statistics accumulated during parsing."""
         self.n_ref = 0
         self.n_bins = 0
         self.n_chunks = 0
@@ -190,6 +179,7 @@ class BAIFile:
         self.n_unmapped = 0
 
     def __str__(self):
+        """Summarise key properties of the loaded BAI index."""
         tmp = list(self.bins[0].keys())[:10]
         return f"""
 Summary of BAI File:
@@ -206,6 +196,7 @@ Example of metadata: ref 0, {self.metadata[0]}
 
     @cython.cfunc
     def __read_n_ref(self) -> cython.uint:
+        """Read the number of reference sequences recorded in the file."""
         ret_val: cython.uint
 
         self.fhd.seek(4)      # skip magic
@@ -214,6 +205,12 @@ Example of metadata: ref 0, {self.metadata[0]}
 
     @cython.cfunc
     def __load_bins(self):
+        """Populate bin metadata for every reference sequence.
+
+        The method iterates over all references in the index file,
+        caching chunk offsets and pseudo-bin metadata needed for
+        random access queries.
+        """
         i: cython.uint
         j: cython.uint
         m: cython.uint
@@ -269,23 +266,12 @@ Example of metadata: ref 0, {self.metadata[0]}
 
     @cython.ccall
     def get_chunks_by_bin(self, ref_n: cython.uint, bin_n: cython.uint) -> list:
-        """Get the chunks by bin number, for a given ref seq (not the name,
-        but the index).
-
-        The chunks will be sorted using default python sorted
-        function. Therefore the result will be the order of the offset
-        of beginning of each chunks.
-
-        """
+        """Return sorted BGZF chunks for ``bin_n`` on reference ``ref_n``."""
         return sorted(self.bins[ref_n].get(bin_n, []))
 
     @cython.ccall
     def get_chunks_by_list_of_bins(self, ref_n: cython.uint, bins: list) -> list:
-        """Similar to get_chunks_by_bin, but accept a list of bins.
-
-        Note: The redudant bins in the list will be removed.
-
-        """
+        """Return sorted chunks for the unique set of bins provided."""
         bin_n: cython.uint
         chunks: list = []
         bin_set: set
@@ -297,14 +283,12 @@ Example of metadata: ref 0, {self.metadata[0]}
 
     @cython.ccall
     def get_metadata_by_refseq(self, ref_n: cython.uint) -> dict:
+        """Return pseudo-bin metadata for reference ``ref_n``."""
         return self.metadata[ref_n]
 
     @cython.ccall
     def get_chunks_by_region(self, ref_n: cython.uint, beg: cython.uint, end: cython.uint) -> list:
-        """Get the chunks by given a region in a given refseq (not the name,
-        but the index).
-
-        """
+        """Return BGZF chunks overlapping ``[beg, end)`` on reference ``ref_n``."""
         bins: list
         chunks: list
 
@@ -314,8 +298,7 @@ Example of metadata: ref 0, {self.metadata[0]}
 
     @cython.ccall
     def get_chunks_by_list_of_regions(self, ref_n: cython.uint, regions: list) -> list:
-        """ Similar to get_chunks_by_region, but accept a list of regions
-        """
+        """Return BGZF chunks overlapping any region in ``regions``."""
         i: int
         temp_bins: list
         bins: list = []
@@ -331,9 +314,7 @@ Example of metadata: ref 0, {self.metadata[0]}
 
     @cython.ccall
     def get_coffset_by_region(self, ref_n: cython.uint, beg: cython.uint, end: cython.uint) -> cython.ulong:
-        """Find the offset to access the BGZF block which contains the
-        leftmost reads overlapping with the given genomic region.
-        """
+        """Return the BGZF compressed offset for the leftmost overlapping block."""
         voffset_tmp: cython.ulong
         coffset_tmp: cython.ulong
         chunks: list
@@ -353,9 +334,7 @@ Example of metadata: ref 0, {self.metadata[0]}
 
     @cython.ccall
     def get_coffsets_by_list_of_regions(self, ref_n: cython.uint, regions: list) -> cython.ulong:
-        """Find the offset to access the BGZF block which contains the
-        leftmost reads overlapping with the given genomic region.
-        """
+        """Return compressed offsets for the leftmost block of each region."""
         beg: cython.uint
         end: cython.uint
         i: cython.int
@@ -373,19 +352,11 @@ Example of metadata: ref 0, {self.metadata[0]}
 
 @cython.cclass
 class BAMaccessor:
-    """This BAM file reader is designed to access certain alignment
-    records that overlap with givin genomic coordinates.
+    """Random-access BAM reader backed by a matching BAI index.
 
-    The BAMaccessor needs a matching BAM index file (.bai) for fast
-    access. Please refer to SAM format specification:
-
-    https://samtools.github.io/hts-specs/SAMv1.pdf
-
-    Note, the header of BAM will still be read through 'traditional'
-    way -- using gzip to read through. But for accessing specific
-    alignments, we will read BAM as binary, access the compressed
-    chunk then use zlib.decompress.
-
+    The accessor reads headers via gzip for compatibility, but seeks
+    directly to BGZF blocks when fetching alignments for specific
+    regions.
     """
     # all private
     bam_filename: str           # BAM filename
@@ -401,15 +372,7 @@ class BAMaccessor:
     noffset_cache: cython.ulong
 
     def __init__(self, BAM_filename: str):
-        """Open input file. Determine whether it's a gzipped file.
-
-        'filename' must be a string object.
-
-        It will call __parse_header to check if the file is BAM format
-        (through magic string); check if it's sorted by coordinates
-        (SO). It will then check if BAI is available.
-
-        """
+        """Open ``BAM_filename`` and load the companion ``.bai`` index."""
         self.bam_filename = BAM_filename
         # parse the header
         self.__parse_header()
@@ -429,26 +392,12 @@ class BAMaccessor:
 
     @cython.ccall
     def close(self):
-        """Run this when this Parser will be never used.
-
-        Close file I/O stream.
-        """
+        """Close the underlying BAM stream."""
         self.bamfile.close()
 
     @cython.cfunc
     def __parse_header(self):
-        """Parse the HEADER of BAM. It will do the following thing:
-
-        1. read in references from BAM header, and save in
-        self.references, and self.rlengths.
-
-        2. invoke self.check_sorted to see if BAM is sorted by
-        coordinates, and set self.sorted.
-
-        3. remember the file pointer at the end of HEADER or the start
-        of the alignment blocks, and set self.SOA.
-
-        """
+        """Populate reference metadata from the BAM header and confirm sorting."""
         fhd: object          # file handler from gzip.open; temporary use
         header_len: cython.int
         x: cython.int
@@ -491,8 +440,7 @@ class BAMaccessor:
 
     @cython.cfunc
     def __check_sorted(self, header: bytes) -> bool:
-        """Check if the BAM is sorted by looking at the HEADER text
-        """
+        """Return ``True`` when the header indicates coordinate sorting."""
         tl: bytes
         i: cython.int
 
@@ -509,21 +457,24 @@ class BAMaccessor:
 
     @cython.ccall
     def get_chromosomes(self) -> list:
-        """Get chromosomes in order of their appearance in BAM HEADER.
-
-        """
+        """Return reference names in header order."""
         return self.references
 
     @cython.ccall
     def get_rlengths(self) -> dict:
-        """Get chromosomes in order of their appearance in BAM HEADER.
-
-        """
+        """Return reference lengths keyed by reference name."""
         return self.rlengths
 
     @cython.ccall
     def __decode_voffset(self, voffset: cython.ulong) -> tuple:
-        """
+        """Split a virtual file offset into compressed and uncompressed parts.
+
+        Args:
+            voffset: 64-bit virtual offset as stored in the BAM index.
+
+        Returns:
+            Tuple ``(coffset, uoffset)`` with the BGZF block pointer and
+            byte offset inside the uncompressed block.
         """
         coffset: cython.ulong
         uoffset: cython.uint
@@ -534,15 +485,13 @@ class BAMaccessor:
 
     @cython.ccall
     def __seek(self, offset: cython.ulong) -> bool:
-        """Move to given position
-        """
+        """Seek to a compressed BGZF block offset within the BAM file."""
         self.bamfile.seek(offset, 0)
         return True
 
     @cython.ccall
     def __retrieve_cdata_from_bgzf_block(self) -> bool:
-        """Retrieve uncompressed CDATA from BGZF block
-        """
+        """Decompress the next BGZF block and cache the uncompressed payload."""
         xlen: cython.ushort
         bsize: cython.ushort
         extra: bytes
@@ -562,9 +511,16 @@ class BAMaccessor:
     @cython.ccall
     def get_reads_in_region(self, chrom: bytes, left: cython.int,
                             right: cython.int, maxDuplicate: cython.int = 1) -> list:
-        """Get reads in a given region.
+        """Return alignments overlapping ``[left, right)`` on ``chrom``.
 
-        Return: list of ReadAlignment
+        Args:
+            chrom: Chromosome name matching the BAM header.
+            left: 0-based inclusive start coordinate.
+            right: 0-based exclusive end coordinate.
+            maxDuplicate: Maximum number of identical alignments to retain.
+
+        Returns:
+            list: :class:`MACS3.Signal.ReadAlignment.ReadAlignment` objects.
         """
         entrylength: cython.int
         chrom_index: cython.int
@@ -630,14 +586,17 @@ class BAMaccessor:
 
     @cython.ccall
     def __fw_binary_parse(self, data, min_MAPQ=1):
-        """ Read information from an alignment block. Discard
-        alignment below a minimum MAPQ score, default: 1.
+        """Parse a BAM alignment block into a ``ReadAlignment`` instance.
 
-        Return: ReadAlignment object with only selected information,
-        including refname (chromosome), leftmost alignment location,
-        strand information, sequence, quality, CIGAR and MD tag.
+        Args:
+            data: Raw bytes for a single BAM alignment.
+            min_MAPQ: Minimum mapping quality; alignments below are ignored.
 
-        Note: We do require MD tag exists in BAM file.
+        Returns:
+            ReadAlignment | None: Parsed alignment or ``None`` if filtered.
+
+        Raises:
+            MDTagMissingError: If the MD auxiliary tag is absent.
         """
         ref: cython.int
         leftmost: cython.int
