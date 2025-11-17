@@ -1,6 +1,6 @@
 # cython: language_level=3
 # cython: profile=True
-# Time-stamp: <2024-10-18 15:22:06 Tao Liu>
+# Time-stamp: <2025-11-16 13:00:03 Tao Liu>
 
 """Scoring utilities for MACS3 signal tracks and peak callers.
 
@@ -743,6 +743,156 @@ class ScoreTrackII:
                   (chrom.decode(), pre, p, pre_v))
 
         return True
+
+    @cython.ccall
+    def cutoff_analysis(self,
+                        max_gap: cython.int = 50,
+                        min_length: cython.int = 200,
+                        steps: cython.int = 100,
+                        min_score: cython.float = 0,
+                        max_score: cython.float = 1000) -> str:
+        """Summarise peak metrics across a range of score thresholds.
+
+        Args:
+            max_gap: Maximum distance between merged regions.
+            min_length: Minimum peak length to keep.
+            steps: Number of cutoff increments between the observed
+                minimum and maximum scores.
+            min_score: Lower bound for the cutoff sweep.
+            max_score: Upper bound for the cutoff sweep.
+
+        Returns:
+            str: Tab-delimited report of peak counts and lengths per cutoff.
+        """
+        chrs: set
+        peak_content: list
+        ret_list: list
+        cutoff_list: list
+        cutoff_npeaks: list
+        cutoff_lpeaks: list
+        chrom: bytes
+        ret: str
+        cutoff: cython.float
+        total_l: cython.long
+        total_p: cython.long
+        i: cython.long
+        n: cython.long
+        ts: cython.long
+        te: cython.long
+        lastp: cython.long
+        tl: cython.long
+        peak_length: cython.long
+        s: cython.float
+        ln: cython.long
+        chrom_min: cython.float
+        chrom_max: cython.float
+        obs_min: cython.float
+        obs_max: cython.float
+        minv: cython.float
+        maxv: cython.float
+
+        chrs = self.get_chr_names()
+
+        obs_min = 10000000.0
+        obs_max = -10000000.0
+        for chrom in chrs:
+            ln = self.datalength[chrom]
+            if ln == 0:
+                continue
+            chrom_scores = self.data[chrom][3][:ln]
+            if chrom_scores.size == 0:
+                continue
+            chrom_min = float(np.min(chrom_scores))
+            chrom_max = float(np.max(chrom_scores))
+            if chrom_min < obs_min:
+                obs_min = chrom_min
+            if chrom_max > obs_max:
+                obs_max = chrom_max
+
+        minv = max(min_score, obs_min)
+        maxv = min(obs_max, max_score)
+        if steps <= 0 or maxv <= minv:
+            return "score\tnpeaks\tlpeaks\tavelpeak\n"
+
+        s = float(maxv - minv)/steps
+        if s <= 0:
+            return "score\tnpeaks\tlpeaks\tavelpeak\n"
+
+        cutoff_list = [round(value, 3) for value in np.arange(minv, maxv, s)]
+        if not cutoff_list:
+            return "score\tnpeaks\tlpeaks\tavelpeak\n"
+
+        cutoff_npeaks = [0] * len(cutoff_list)
+        cutoff_lpeaks = [0] * len(cutoff_list)
+
+        for chrom in sorted(chrs):
+            ln = self.datalength[chrom]
+            if ln == 0:
+                continue
+            pos_array = self.data[chrom][0][:ln]
+            score_array = self.data[chrom][3][:ln]
+
+            for n in range(len(cutoff_list)):
+                cutoff = cutoff_list[n]
+                total_l = 0           # total length of peaks
+                total_p = 0           # total number of peaks
+
+                # get the regions with scores above cutoffs. This is
+                # not an optimized method. It would be better to store
+                # score array in a 2-D ndarray?
+                above_cutoff = np.nonzero(score_array > cutoff)[0]
+                # end positions of regions where score is above cutoff
+                above_cutoff_endpos = pos_array[above_cutoff]
+                # start positions of regions where score is above cutoff
+                above_cutoff_startpos = pos_array[above_cutoff-1]
+
+                if above_cutoff_endpos.size == 0:
+                    continue
+
+                # first bit of region above cutoff
+                acs_next = iter(above_cutoff_startpos).__next__
+                ace_next = iter(above_cutoff_endpos).__next__
+
+                ts = acs_next()
+                te = ace_next()
+                peak_content = [(ts, te),]
+                lastp = te
+
+                for i in range(1, above_cutoff_startpos.size):
+                    ts = acs_next()
+                    te = ace_next()
+                    tl = ts - lastp
+                    if tl <= max_gap:
+                        peak_content.append((ts, te))
+                    else:
+                        peak_length = peak_content[-1][1] - peak_content[0][0]
+                        # if the peak is too small, reject it
+                        if peak_length >= min_length:
+                            total_l += peak_length
+                            total_p += 1
+                        peak_content = [(ts, te),]
+                    lastp = te
+
+                if peak_content:
+                    peak_length = peak_content[-1][1] - peak_content[0][0]
+                    # if the peak is too small, reject it
+                    if peak_length >= min_length:
+                        total_l += peak_length
+                        total_p += 1
+                cutoff_lpeaks[n] += total_l
+                cutoff_npeaks[n] += total_p
+
+        # prepare the returnning text
+        ret_list = ["score\tnpeaks\tlpeaks\tavelpeak\n"]
+        for n in range(len(cutoff_list)-1, -1, -1):
+            cutoff = cutoff_list[n]
+            if cutoff_npeaks[n] > 0:
+                ret_list.append("%.2f\t%d\t%d\t%.2f\n" % (cutoff,
+                                                          cutoff_npeaks[n],
+                                                          cutoff_lpeaks[n],
+                                                          cutoff_lpeaks[n]/cutoff_npeaks[n]))
+        ret = ''.join(ret_list)
+        return ret
 
     @cython.ccall
     def call_peaks(self,
