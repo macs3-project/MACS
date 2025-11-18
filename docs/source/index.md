@@ -161,7 +161,6 @@ MACS3 project is sponsored by [![CZI's Essential Open Source Software for Scienc
 :maxdepth: 3
 :hidden:
 
-index.md
 docs/INSTALL.md
 docs/subcommands_index.md
 docs/fileformats_index.md
