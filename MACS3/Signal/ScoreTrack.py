@@ -1,6 +1,6 @@
 # cython: language_level=3
 # cython: profile=True
-# Time-stamp: <2025-11-16 13:00:03 Tao Liu>
+# Time-stamp: <2025-11-19 16:13:48 Tao Liu>
 
 """Scoring utilities for MACS3 signal tracks and peak callers.
 
@@ -414,6 +414,7 @@ class ScoreTrackII:
         v: cnp.ndarray
         pos: cnp.ndarray
         ln: cython.long
+        tmp_l: cython.long
         i: cython.long
         prev_pos: cython.long
         chrom: bytes
@@ -429,10 +430,11 @@ class ScoreTrackII:
                 v[i] = get_pscore(cython.cast(cython.int,
                                               (p[i] + self.pseudocount)),
                                   c[i] + self.pseudocount)
+                tmp_l = pos[i] - prev_pos
                 try:
-                    self.pvalue_stat[v[i]] += pos[i] - prev_pos
+                    self.pvalue_stat[v[i]] += tmp_l
                 except Exception:
-                    self.pvalue_stat[v[i]] = pos[i] - prev_pos
+                    self.pvalue_stat[v[i]] = tmp_l
                 prev_pos = pos[i]
 
         self.scoring_method = ord('p')
