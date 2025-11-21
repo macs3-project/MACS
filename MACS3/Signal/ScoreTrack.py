@@ -1351,6 +1351,12 @@ try:  # pragma: no cover - optional dependency bridge
 except Exception:  # pragma: no cover - ignore when MLX is unavailable
     ScoreTrackMLX = None
 
+# Torch-backed implementation (optional import)
+try:  # pragma: no cover - optional dependency bridge
+    from MACS3.Signal.ScoreTrackTorch import ScoreTrackTorch  # type: ignore # noqa: E402,F401
+except Exception:  # pragma: no cover
+    ScoreTrackTorch = None
+
 @cython.cclass
 class TwoConditionScores:
     """Class for saving two condition comparison scores.
