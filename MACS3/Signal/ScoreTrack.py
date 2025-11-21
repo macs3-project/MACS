@@ -1,6 +1,6 @@
 # cython: language_level=3
 # cython: profile=True
-# Time-stamp: <2025-11-20 10:58:03 Tao Liu>
+# Time-stamp: <2025-11-20 16:57:24 Tao Liu>
 
 """Scoring utilities for MACS3 signal tracks and peak callers.
 
@@ -219,7 +219,7 @@ class ScoreTrackII:
     @cython.ccall
     def add_chromosome(self,
                        chrom: bytes,
-                       chrom_max_len: cython.int):
+                       chrom_max_len: cython.int = 200000000):
         """Allocate arrays for ``chrom`` with capacity ``chrom_max_len``."""
         if chrom not in self.data:
             self.data[chrom] = [np.zeros(chrom_max_len, dtype="int32"),  # pos
@@ -1345,6 +1345,12 @@ class ScoreTrackII:
                    qscore=lvl2peak["qscore"])
         return bpeaks
 
+# MLX-backed implementation (optional import)
+try:  # pragma: no cover - optional dependency bridge
+    from MACS3.Signal.ScoreTrackMLX import ScoreTrackMLX  # type: ignore # noqa: E402,F401
+except Exception:  # pragma: no cover - ignore when MLX is unavailable
+    ScoreTrackMLX = None
+
 @cython.cclass
 class TwoConditionScores:
     """Class for saving two condition comparison scores.
@@ -1525,7 +1531,7 @@ class TwoConditionScores:
     @cython.cfunc
     def add_chromosome(self,
                        chrom: bytes,
-                       chrom_max_len: cython.int):
+                       chrom_max_len: cython.int = 200000000):
         """Allocate storage for ``chrom`` with capacity ``chrom_max_len``."""
         if chrom not in self.data:
             self.data[chrom] = [np.zeros(chrom_max_len, dtype="i4"),  # pos
