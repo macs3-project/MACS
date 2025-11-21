@@ -60,13 +60,11 @@ class ScoreTrackMLX:
                  treat_depth: float,
                  ctrl_depth: float,
                  pseudocount: float = 1.0,
-                 approx_pvalue: bool = True,
-                 approx_small_threshold: float = 10.0):
+                 approx_pvalue: bool = True):
         self.treat_edm = float(treat_depth)
         self.ctrl_edm = float(ctrl_depth)
         self.pseudocount = float(pseudocount)
         self.approx_pvalue = bool(approx_pvalue)
-        self.approx_small_threshold = float(approx_small_threshold)
         self.trackline = False
         self.normalization_method = ord("N")
         self.scoring_method = ord("N")
@@ -194,17 +192,8 @@ class ScoreTrackMLX:
                 tail = mx.maximum(tail, mx.array(1e-30, dtype=FLOAT32_MX))
                 score_backend = -_log10(tail)
                 score_np = _to_numpy(score_backend)
-                if self.approx_small_threshold > 0:
-                    lam_np = _to_numpy(lam)
-                    k_np = _to_numpy(k)
-                    small_mask = lam_np < self.approx_small_threshold
-                    if np.any(small_mask):
-                        exact_vals = np.array(
-                            [-poisson_cdf(int(t), float(c), False, True)
-                             for t, c in zip(k_np[small_mask], lam_np[small_mask])],
-                            dtype=np.float32,
-                        )
-                        score_np[small_mask] = exact_vals
+                lam_np = _to_numpy(lam)
+                k_np = _to_numpy(k)
                 score = mx.array(score_np, dtype=FLOAT32_MX)
             else:
                 # exact Poisson on CPU
