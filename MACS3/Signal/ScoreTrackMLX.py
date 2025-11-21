@@ -186,14 +186,24 @@ class ScoreTrackMLX:
             if self.approx_pvalue:
                 lam = ctrl + pc
                 k = treat + pc
+                tiny = mx.array(np.finfo(np.float32).tiny, dtype=FLOAT32_MX)
+                log2 = mx.log(mx.array(2.0, dtype=FLOAT32_MX))
+                log10_const = mx.log(mx.array(10.0, dtype=FLOAT32_MX))
                 sqrt2 = mx.sqrt(mx.array(2.0, dtype=FLOAT32_MX))
                 z = (k + 0.5 - lam) / mx.sqrt(lam + 1e-9)
-                tail = 0.5 * (1.0 - mx.erf(z / sqrt2))
-                tail = mx.maximum(tail, mx.array(1e-30, dtype=FLOAT32_MX))
-                score_backend = -_log10(tail)
+                erfc_arg = z / sqrt2
+                erf_val = mx.erf(erfc_arg)
+                # Clamp away from 1 to keep log1p well-defined for extreme tails.
+                erf_clamped = mx.minimum(
+                    erf_val,
+                    mx.array(1.0 - np.finfo(np.float32).eps, dtype=FLOAT32_MX),
+                )
+                # Compute -log10(tail) in log space to preserve precision for tiny tails.
+                log_tail = mx.log1p(-erf_clamped)
+                log_tail = mx.where(mx.isfinite(log_tail), log_tail, mx.log(tiny))
+                log_tail = log_tail - log2
+                score_backend = -(log_tail / log10_const)
                 score_np = _to_numpy(score_backend)
-                lam_np = _to_numpy(lam)
-                k_np = _to_numpy(k)
                 score = mx.array(score_np, dtype=FLOAT32_MX)
             else:
                 # exact Poisson on CPU
