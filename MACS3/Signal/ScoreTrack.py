@@ -1,6 +1,6 @@
 # cython: language_level=3
 # cython: profile=True
-# Time-stamp: <2025-11-20 16:57:24 Tao Liu>
+# Time-stamp: <2025-11-21 09:10:42 Tao Liu>
 
 """Scoring utilities for MACS3 signal tracks and peak callers.
 
@@ -1350,12 +1350,6 @@ try:  # pragma: no cover - optional dependency bridge
     from MACS3.Signal.ScoreTrackMLX import ScoreTrackMLX  # type: ignore # noqa: E402,F401
 except Exception:  # pragma: no cover - ignore when MLX is unavailable
     ScoreTrackMLX = None
-
-# Torch-backed implementation (optional import)
-try:  # pragma: no cover - optional dependency bridge
-    from MACS3.Signal.ScoreTrackTorch import ScoreTrackTorch  # type: ignore # noqa: E402,F401
-except Exception:  # pragma: no cover
-    ScoreTrackTorch = None
 
 @cython.cclass
 class TwoConditionScores:
