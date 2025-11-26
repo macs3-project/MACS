@@ -230,7 +230,7 @@ def summarize_score_differences(cpu_scores, mlx_scores, label: str, cutoff: Opti
     }
 
 
-def benchmark(num_bins: int, bin_size: int, cutoff: float, approx_pvalue: bool):
+def benchmark(num_bins: int, bin_size: int, cutoff: float):
     chrom = b"chr1"
     pos, chip, control = build_synthetic_data(num_bins, bin_size)
     # CPU path
@@ -248,7 +248,7 @@ def benchmark(num_bins: int, bin_size: int, cutoff: float, approx_pvalue: bool):
     cpu_peak_time = time.perf_counter() - start
 
     # MLX path
-    gpu_track = populate_scoretrack(ScoreTrackMLX(30.0, 30.0, approx_pvalue=approx_pvalue), pos, chip, control, chrom)
+    gpu_track = populate_scoretrack(ScoreTrackMLX(30.0, 30.0), pos, chip, control, chrom)
     start = time.perf_counter()
     gpu_track.compute_pvalue()
     gpu_p_time = time.perf_counter() - start
@@ -292,12 +292,6 @@ def main():
         help="Use MLX tensors (auto) or force the MLX implementation to run on NumPy/CPU.",
     )
     parser.add_argument(
-        "--mlx-pvalue",
-        choices=["approx", "exact"],
-        default="approx",
-        help="Use approximate normal-tail p-values on MLX (fast, default) or exact Poisson on CPU fallback.",
-    )
-    parser.add_argument(
         "--top-diffs",
         type=int,
         default=3,
@@ -312,8 +306,7 @@ def main():
     if ScoreTrackMLX is None:
         raise SystemExit("ScoreTrackMLX is unavailable; ensure MACS3.Signal.ScoreTrackMLX can be imported.")
 
-    approx_pvalue = args.mlx_pvalue == "approx"
-    results = benchmark(args.bins, args.bin_size, args.cutoff, approx_pvalue=approx_pvalue)
+    results = benchmark(args.bins, args.bin_size, args.cutoff)
     device_label = "MLX tensor" if mx is not None else "NumPy fallback"
     print(f"CPU p-value: {results['cpu_p']:.3f}s | q-value: {results['cpu_q']:.3f}s | call_peaks: {results['cpu_call']:.3f}s")
     print(f"{device_label} p-value: {results['gpu_p']:.3f}s | q-value: {results['gpu_q']:.3f}s | call_peaks: {results['gpu_call']:.3f}s")
@@ -352,7 +345,7 @@ def main():
         print(f"  Largest p-score diffs: {preview}")
     if p_diff["mismatched"] or q_diff["mismatched"]:
         print("  Position mismatches found:", "; ".join(p_diff["mismatched"] + q_diff["mismatched"]))
-    if args.top_diffs > 0 and args.mlx_pvalue == "approx":
+    if args.top_diffs > 0:
         pos = results["pos"]
         chip = results["chip"]
         control = results["control"]

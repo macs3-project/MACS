@@ -93,12 +93,10 @@ class ScoreTrackMLX:
     def __init__(self,
                  treat_depth: float,
                  ctrl_depth: float,
-                 pseudocount: float = 1.0,
-                 approx_pvalue: bool = True):
+                 pseudocount: float = 1.0):
         self.treat_edm = float(treat_depth)
         self.ctrl_edm = float(ctrl_depth)
         self.pseudocount = float(pseudocount)
-        self.approx_pvalue = bool(approx_pvalue)
         self.trackline = False
         self.normalization_method = ord("N")
         self.scoring_method = ord("N")
@@ -217,20 +215,10 @@ class ScoreTrackMLX:
     def compute_pvalue(self):
         pc = self.pseudocount
         for chrom, (pos, treat, ctrl, _) in self._data.items():
-            if self.approx_pvalue:
-                lam = ctrl + pc
-                k = treat + pc
-                score_backend = -_poisson_log10_sf_logspace(lam, k)
-                score = mx.array(score_backend, dtype=FLOAT32_MX)
-            else:
-                # exact Poisson on CPU
-                t_np = _to_numpy(treat)
-                c_np = _to_numpy(ctrl)
-                score = np.array(
-                    [-poisson_cdf(int(t + pc), float(c + pc), False, True)
-                     for t, c in zip(t_np, c_np)],
-                    dtype=np.float32,
-                )
+            lam = ctrl + pc
+            k = treat + pc
+            score_backend = -_poisson_log10_sf_logspace(lam, k)
+            score = mx.array(score_backend, dtype=FLOAT32_MX)
             self._data[chrom] = (pos, treat, ctrl, score)
         self.scoring_method = ord('p')
 
