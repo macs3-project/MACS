@@ -20,6 +20,7 @@ from MACS3.IO.PeakIO import PeakIO
 from MACS3.Signal.Prob import poisson_cdf
 
 FLOAT32_MX = mx.float32
+LOG10_MX = mx.log(mx.array(10.0, dtype=FLOAT32_MX))
 
 
 def _is_mlx(x) -> bool:
@@ -44,6 +45,39 @@ def _log10(x):
     if _is_mlx(x):
         return mx.log(x) / mx.log(mx.array(10.0, dtype=FLOAT32_MX))
     return np.log10(x)
+
+
+def _poisson_log10_sf_logspace(lam, k, tol: float = 1e-5, max_iter: int = 512):
+    """Return log10 upper-tail probability for Poisson(k | lam) using log-space summation."""
+    lam = mx.maximum(lam, mx.array(1e-9, dtype=FLOAT32_MX))
+    m = mx.array(mx.floor(k) + 1, dtype=mx.int64)
+    max_m = int(mx.max(m).item()) if m.size else 0
+    if max_m == 0:
+        return mx.zeros_like(lam, dtype=FLOAT32_MX)
+
+    # log-factorial lookup: log_fact[n] = log(n!)
+    log_fact_tail = mx.cumsum(mx.log(mx.arange(1, max_m + 1, dtype=FLOAT32_MX)))
+    log_fact = mx.concatenate([mx.zeros((1,), dtype=FLOAT32_MX), log_fact_tail])
+
+    log_lam = mx.log(lam)
+    m_f = m.astype(FLOAT32_MX)
+    logx = m_f * log_lam - log_fact[m]
+    residue = logx
+    tol_arr = mx.array(tol, dtype=FLOAT32_MX)
+
+    for _ in range(max_iter):
+        m = m + 1
+        m_f = m.astype(FLOAT32_MX)
+        logy = logx + log_lam - mx.log(m_f)
+        new_residue = mx.logaddexp(residue, logy)
+        delta = mx.abs(new_residue - residue)
+        active = delta >= tol_arr
+        residue = mx.where(active, new_residue, residue)
+        logx = logy
+        if not bool(mx.any(active)):
+            break
+
+    return (residue - lam) / LOG10_MX
 
 
 @dataclass
@@ -186,15 +220,8 @@ class ScoreTrackMLX:
             if self.approx_pvalue:
                 lam = ctrl + pc
                 k = treat + pc
-                sqrt2 = mx.sqrt(mx.array(2.0, dtype=FLOAT32_MX))
-                z = (k + 0.5 - lam) / mx.sqrt(lam + 1e-9)
-                tail = 0.5 * (1.0 - mx.erf(z / sqrt2))
-                tail = mx.maximum(tail, mx.array(1e-30, dtype=FLOAT32_MX))
-                score_backend = -_log10(tail)
-                score_np = _to_numpy(score_backend)
-                lam_np = _to_numpy(lam)
-                k_np = _to_numpy(k)
-                score = mx.array(score_np, dtype=FLOAT32_MX)
+                score_backend = -_poisson_log10_sf_logspace(lam, k)
+                score = mx.array(score_backend, dtype=FLOAT32_MX)
             else:
                 # exact Poisson on CPU
                 t_np = _to_numpy(treat)
