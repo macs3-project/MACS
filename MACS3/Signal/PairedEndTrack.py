@@ -24,6 +24,7 @@ from MACS3.Signal.Pileup import (quick_pileup,
                                  se_all_in_one_pileup)
 from MACS3.Signal.BedGraph import (bedGraphTrackI,
                                    bedGraphTrackII)
+from MACS3.Signal.BedGraphMLX import BedGraphTrackMLX
 from MACS3.Signal.PileupV2 import (pileup_from_LR_hmmratac,
                                    pileup_from_LRC)
 from MACS3.Signal.Region import Regions
@@ -1405,6 +1406,26 @@ class PETrackII:
         chrom: bytes
 
         bdg = bedGraphTrackI(baseline_value=baseline_value)
+        for chrom in sorted(self.get_chr_names()):
+            pv = pileup_from_LRC(self.locations[chrom])
+            v = pv['v']
+            v = v * scale_factor
+            v[v < baseline_value] = baseline_value
+            bdg.add_chrom_data(chrom,
+                               pyarray('i', pv['p']),
+                               pyarray('f', v))
+        return bdg
+
+    @cython.ccall
+    def pileup_bdgmlx(self,
+                      scale_factor: cython.float = 1.0,
+                      baseline_value: cython.float = 0.0):
+        """Build a ``BedGraphTrackMLX`` with pileups for every chromosome."""
+        bdg: BedGraphTrackMLX
+        pv: cnp.ndarray
+        chrom: bytes
+
+        bdg = BedGraphTrackMLX(baseline_value=baseline_value)
         for chrom in sorted(self.get_chr_names()):
             pv = pileup_from_LRC(self.locations[chrom])
             v = pv['v']

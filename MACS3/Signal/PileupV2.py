@@ -309,8 +309,8 @@ def pileup_from_LRC(LRC_array: cnp.ndarray,
 @cython.ccall
 def pileup_from_PN(P_array: cnp.ndarray, N_array: cnp.ndarray,
                    extsize: cython.int) -> cnp.ndarray:
-    """This function will pile up the ndarray containing plus
-    (positive) and minus (negative) positions of all reads, which is
+    """This function will pile up the ndarray containing plus strand
+    (positive) and minus (negative) strand positions of all reads, which is
     typically from FWTrackI object. It's useful when generating the
     pileup of a single chromosome is needed.
 

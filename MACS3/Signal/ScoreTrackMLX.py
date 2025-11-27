@@ -18,6 +18,7 @@ except Exception as exc:  # pragma: no cover - mlx is required here
 
 from MACS3.IO.PeakIO import PeakIO
 from MACS3.Signal.Prob import poisson_cdf
+from MACS3.IO.PeakIO import PeakIO, BroadPeakIO
 
 FLOAT32_MX = mx.float32
 LOG10_MX = mx.log(mx.array(10.0, dtype=FLOAT32_MX))
@@ -310,6 +311,179 @@ class ScoreTrackMLX:
                           fold_change=0.0,
                           qscore=-1.0)
         return peaks
+
+    def __add_broadpeak(self,
+                        bpeaks: BroadPeakIO,
+                        chrom: bytes,
+                        lvl2peak: dict,
+                        lvl1peakset: list):
+        """Helper to build a broad peak entry."""
+        start = lvl2peak["start"]
+        end = lvl2peak["end"]
+
+        if not lvl1peakset:
+            bpeaks.add(chrom,
+                       start,
+                       end,
+                       score=lvl2peak["score"],
+                       thickStart=(b"%d" % start),
+                       thickEnd=(b"%d" % end),
+                       blockNum=2,
+                       blockSizes=b"1,1",
+                       blockStarts=(b"0,%d" % (end - start - 1)),
+                       pileup=lvl2peak["pileup"],
+                       pscore=lvl2peak["pscore"],
+                       fold_change=lvl2peak["fc"],
+                       qscore=lvl2peak["qscore"])
+            return bpeaks
+
+        thickStart = b"%d" % lvl1peakset[0]["start"]
+        thickEnd = b"%d" % lvl1peakset[-1]["end"]
+        blockNum = int(len(lvl1peakset))
+        blockSizes = b",".join([b"%d" % x["length"] for x in lvl1peakset])
+        blockStarts = b",".join([b"%d" % (x["start"] - start) for x in lvl1peakset])
+
+        if lvl2peak["start"] != thickStart:
+            thickStart = b"%d" % start
+            blockNum += 1
+            blockSizes = b"1," + blockSizes
+            blockStarts = b"0," + blockStarts
+        if lvl2peak["end"] != thickEnd:
+            thickEnd = b"%d" % end
+            blockNum += 1
+            blockSizes = blockSizes + b",1"
+            blockStarts = blockStarts + b"," + (b"%d" % (end - start - 1))
+
+        bpeaks.add(chrom,
+                   start,
+                   end,
+                   score=lvl2peak["score"],
+                   thickStart=thickStart,
+                   thickEnd=thickEnd,
+                   blockNum=blockNum,
+                   blockSizes=blockSizes,
+                   blockStarts=blockStarts,
+                   pileup=lvl2peak["pileup"],
+                   pscore=lvl2peak["pscore"],
+                   fold_change=lvl2peak["fc"],
+                   qscore=lvl2peak["qscore"])
+        return bpeaks
+
+    def call_broadpeaks(self,
+                        lvl1_cutoff: float = 5.0,
+                        lvl2_cutoff: float = 1.0,
+                        min_length: int = 200,
+                        lvl1_max_gap: int = 50,
+                        lvl2_max_gap: int = 400):
+        """Return broad peaks constructed from high- and low-cutoff segments."""
+        assert lvl1_cutoff > lvl2_cutoff, "level 1 cutoff should be larger than level 2."
+        assert lvl1_max_gap < lvl2_max_gap, "level 2 maximum gap should be larger than level 1."
+
+        lvl1_peaks = self.call_peaks(cutoff=lvl1_cutoff,
+                                     min_length=min_length,
+                                     max_gap=lvl1_max_gap)
+        lvl2_peaks = self.call_peaks(cutoff=lvl2_cutoff,
+                                     min_length=min_length,
+                                     max_gap=lvl2_max_gap)
+        chrs = lvl1_peaks.peaks.keys()
+        broadpeaks = BroadPeakIO()
+        for chrom in sorted(chrs):
+            lvl1peakschrom = lvl1_peaks.peaks[chrom]
+            lvl2peakschrom = lvl2_peaks.peaks[chrom]
+            lvl1peakschrom_next = iter(lvl1peakschrom).__next__
+            tmppeakset = []
+            i = -1
+            try:
+                lvl1 = lvl1peakschrom_next()
+                for i in range(len(lvl2peakschrom)):
+                    lvl2 = lvl2peakschrom[i]
+                    while True:
+                        if lvl2["start"] <= lvl1["start"] and lvl1["end"] <= lvl2["end"]:
+                            tmppeakset.append(lvl1)
+                            lvl1 = lvl1peakschrom_next()
+                        else:
+                            self.__add_broadpeak(broadpeaks,
+                                                 chrom,
+                                                 lvl2,
+                                                 tmppeakset)
+                            tmppeakset = []
+                            break
+            except StopIteration:
+                if i >= 0:
+                    self.__add_broadpeak(broadpeaks,
+                                         chrom,
+                                         lvl2,
+                                         tmppeakset)
+                    tmppeakset = []
+                    for j in range(i + 1, len(lvl2peakschrom)):
+                        self.__add_broadpeak(broadpeaks,
+                                             chrom,
+                                             lvl2peakschrom[j],
+                                             tmppeakset)
+
+        return broadpeaks
+
+    def cutoff_analysis(self,
+                        max_gap: int,
+                        min_length: int,
+                        steps: int = 100,
+                        min_score: float = 0.0,
+                        max_score: float = 1000.0) -> str:
+        """Summarise peak metrics across a range of score thresholds."""
+        chrs = self.get_chr_names()
+        if not chrs:
+            return "score\tnpeaks\tlpeaks\tavelpeak\n"
+
+        # determine score range
+        observed_min = float("inf")
+        observed_max = float("-inf")
+        for chrom in chrs:
+            _, _, _, score = self._data[chrom]
+            s_np = _to_numpy(score)
+            if s_np.size:
+                observed_min = min(observed_min, float(s_np.min()))
+                observed_max = max(observed_max, float(s_np.max()))
+        minv = max(min_score, observed_min if observed_min != float("inf") else 0.0)
+        maxv = min(max_score, observed_max if observed_max != float("-inf") else 0.0)
+        step = (maxv - minv) / steps if steps > 0 else 1.0
+        cutoff_list = [round(v, 3) for v in np.arange(minv, maxv, step)] if step > 0 else [minv]
+        cutoff_npeaks = [0] * len(cutoff_list)
+        cutoff_lpeaks = [0] * len(cutoff_list)
+
+        for chrom in sorted(chrs):
+            pos, _, _, score = self._data[chrom]
+            pos_np = _to_numpy(pos)
+            score_np = _to_numpy(score)
+            for n, cutoff in enumerate(cutoff_list):
+                total_l = 0
+                total_p = 0
+                above = np.nonzero(score_np > cutoff)[0]
+                if above.size == 0:
+                    continue
+                endpos = pos_np[above]
+                startpos = pos_np[above - 1]
+                if above[0] == 0:
+                    startpos[0] = 0
+                gaps = startpos[1:] - endpos[:-1]
+                breakpoints = np.nonzero(gaps > max_gap)[0] + 1
+                segments = np.split(np.arange(above.size), breakpoints)
+                for seg in segments:
+                    seg_start = int(startpos[seg[0]])
+                    seg_end = int(endpos[seg[-1]])
+                    seg_len = seg_end - seg_start
+                    if seg_len >= min_length:
+                        total_l += seg_len
+                        total_p += 1
+                cutoff_lpeaks[n] += total_l
+                cutoff_npeaks[n] += total_p
+
+        ret_list = ["score\tnpeaks\tlpeaks\tavelpeak\n"]
+        for n in range(len(cutoff_list) - 1, -1, -1):
+            cutoff = cutoff_list[n]
+            if cutoff_npeaks[n] > 0:
+                ret_list.append(f"{cutoff:.2f}\t{cutoff_npeaks[n]}\t{cutoff_lpeaks[n]}\t{cutoff_lpeaks[n]/cutoff_npeaks[n]:.2f}\n")
+        return "".join(ret_list)
+
 
     # ------------------------------------------------------------------
     def total(self) -> int:
