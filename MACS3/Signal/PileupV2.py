@@ -38,11 +38,16 @@ for i from 0 to 2N in PV_sorted:
        in bedGraph style is to only save (e, z)
     4: s = e
 
+The pileup result is in bedGraph style as in Pileup.py, where p is the
+end of a region, and v is the pileup value. The result is stored in a NumPy array with dtype=[('p','i4'),('v','f4')]. Note that this is different from the Pilup.py where the pileup is stored in a list as [np.ndarray(dtype="i4"), np.ndarray(dtype="f4")].
+
 This code is free software; you can redistribute it and/or modify it
 under the terms of the BSD License (see the file LICENSE included with
 the distribution).
 """
 # ------------------------------------
+from turtle import mode
+from weakref import ref
 import numpy as np
 import cython
 import cython.cimports.numpy as cnp
@@ -53,6 +58,11 @@ import cython.cimports.numpy as cnp
 # ------------------------------------
 # utility internal functions
 # ------------------------------------
+
+@cython.cfunc
+@cython.inline
+def mean(a: float, b: float) -> float:
+    return (a + b) / 2
 
 
 @cython.ccall
@@ -287,7 +297,7 @@ def pileup_from_LRC(LRC_array: cnp.ndarray,
                     mapping_func=mapping_function_always_1) -> cnp.ndarray:
     """This function will pile up the ndarray containing left and
     right positions and the counts, which is typically from PETrackII
-    object. It's useful when generating the pileup of a single
+    object which . It's useful when generating the pileup of a single
     chromosome is needed.
 
     User needs to provide a numpy array of left and right positions
@@ -322,3 +332,496 @@ def pileup_from_PN(P_array: cnp.ndarray, N_array: cnp.ndarray,
     pileup = pileup_PV(PV_array)
     clean_up_ndarray(PV_array)
     return pileup
+
+
+@cython.cfunc
+def _merge_sorted_arrays(arr1: cnp.ndarray, arr2: cnp.ndarray) -> cnp.ndarray:
+    """Merge two individually sorted int32 arrays into one sorted array."""
+    l1: cython.long = arr1.shape[0]
+    l2: cython.long = arr2.shape[0]
+    l: cython.long = l1 + l2
+    i1: cython.long = 0
+    i2: cython.long = 0
+    I: cython.long = 0
+    ret: cnp.ndarray = np.empty(l, dtype="i4")
+
+    arr1_ptr: cython.pointer(cython.int) = cython.cast(cython.pointer(cython.int), arr1.data)
+    arr2_ptr: cython.pointer(cython.int) = cython.cast(cython.pointer(cython.int), arr2.data)
+    ret_ptr: cython.pointer(cython.int) = cython.cast(cython.pointer(cython.int), ret.data)
+
+    while i1 < l1 and i2 < l2:
+        if arr1_ptr[0] <= arr2_ptr[0]:
+            ret_ptr[0] = arr1_ptr[0]
+            arr1_ptr += 1
+            i1 += 1
+        else:
+            ret_ptr[0] = arr2_ptr[0]
+            arr2_ptr += 1
+            i2 += 1
+        ret_ptr += 1
+        I += 1
+
+    while i1 < l1:
+        ret_ptr[0] = arr1_ptr[0]
+        ret_ptr += 1
+        arr1_ptr += 1
+        i1 += 1
+        I += 1
+
+    while i2 < l2:
+        ret_ptr[0] = arr2_ptr[0]
+        ret_ptr += 1
+        arr2_ptr += 1
+        i2 += 1
+        I += 1
+
+    ret.resize(I, refcheck=False)
+    return ret
+
+
+@cython.cfunc
+def _pileup_sorted_bounds(start_poss: cnp.ndarray,
+                          end_poss: cnp.ndarray,
+                          scale_factor: cython.float,
+                          baseline_value: cython.float) -> cnp.ndarray:
+    """Pileup using already-sorted start/end bounds (two-pointer walk)."""
+    p: cython.int
+    pre_p: cython.int
+    pileup: cython.int = 0
+    i_s: cython.long = 0
+    i_e: cython.long = 0
+    I: cython.long = 0
+    ls: cython.long = start_poss.shape[0]
+    le: cython.long = end_poss.shape[0]
+    l: cython.long = ls + le
+
+    if ls == 0:
+        return np.zeros(shape=0, dtype=[('p', 'i4'), ('v', 'f4')])
+
+    start_view: cnp.ndarray = start_poss
+    end_view: cnp.ndarray = end_poss
+    start_ptr: cython.pointer(cython.int) = cython.cast(cython.pointer(cython.int), start_view.data)
+    end_ptr: cython.pointer(cython.int) = cython.cast(cython.pointer(cython.int), end_view.data)
+
+    ret_p = np.zeros(l, dtype="i4")
+    ret_v = np.zeros(l, dtype="f4")
+    ret_p_view: cnp.ndarray = ret_p
+    ret_v_view: cnp.ndarray = ret_v
+    ret_p_ptr: cython.pointer(cython.int) = cython.cast(cython.pointer(cython.int), ret_p_view.data)
+    ret_v_ptr: cython.pointer(cython.float) = cython.cast(cython.pointer(cython.float), ret_v_view.data)
+
+    pre_p = start_ptr[0] if start_ptr[0] < end_ptr[0] else end_ptr[0]
+    if pre_p != 0:
+        ret_p_ptr[0] = pre_p
+        ret_v_ptr[0] = max(0, baseline_value)
+        ret_p_ptr += 1
+        ret_v_ptr += 1
+        I += 1
+
+    while i_s < ls and i_e < le:
+        if start_ptr[0] < end_ptr[0]:
+            p = start_ptr[0]
+            if p != pre_p:
+                ret_p_ptr[0] = p
+                ret_v_ptr[0] = max(pileup * scale_factor, baseline_value)
+                ret_p_ptr += 1
+                ret_v_ptr += 1
+                I += 1
+                pre_p = p
+            pileup += 1
+            i_s += 1
+            start_ptr += 1
+        elif start_ptr[0] > end_ptr[0]:
+            p = end_ptr[0]
+            if p != pre_p:
+                ret_p_ptr[0] = p
+                ret_v_ptr[0] = max(pileup * scale_factor, baseline_value)
+                ret_p_ptr += 1
+                ret_v_ptr += 1
+                I += 1
+                pre_p = p
+            pileup -= 1
+            i_e += 1
+            end_ptr += 1
+        else:
+            i_s += 1
+            i_e += 1
+            start_ptr += 1
+            end_ptr += 1
+
+    if i_e < le:
+        for _ in range(i_e, le):
+            p = end_ptr[0]
+            if p != pre_p:
+                ret_p_ptr[0] = p
+                ret_v_ptr[0] = max(pileup * scale_factor, baseline_value)
+                ret_p_ptr += 1
+                ret_v_ptr += 1
+                I += 1
+                pre_p = p
+            pileup -= 1
+            end_ptr += 1
+
+    ret_p.resize(I, refcheck=False)
+    ret_v.resize(I, refcheck=False)
+    ret = np.empty(I, dtype=[('p', 'i4'), ('v', 'f4')])
+    ret['p'] = ret_p
+    ret['v'] = ret_v
+    return ret
+
+
+@cython.ccall
+def quick_pileup(start_poss: cnp.ndarray,
+                 end_poss: cnp.ndarray,
+                 scale_factor: cython.float,
+                 baseline_value: cython.float) -> cnp.ndarray:
+    """Return pileup given plus strand and minus strand positions of fragments.
+
+    The output is a NumPy array with dtype=[('p','i4'),('v','f4')].
+    """
+    return _pileup_sorted_bounds(start_poss, end_poss, scale_factor, baseline_value)
+
+
+@cython.ccall
+def se_all_in_one_pileup(plus_tags: cnp.ndarray,
+                         minus_tags: cnp.ndarray,
+                         five_shift: cython.long,
+                         three_shift: cython.long,
+                         rlength: cython.int,
+                         scale_factor: cython.float,
+                         baseline_value: cython.float) -> cnp.ndarray:
+    """Pileup single-end tags into a PV array with dtype=[('p','i4'),('v','f4')]."""
+    start_poss: cnp.ndarray
+    end_poss: cnp.ndarray
+    pileup: cnp.ndarray
+    start_plus = plus_tags - five_shift
+    start_minus = minus_tags - three_shift
+    np.clip(start_plus, 0, rlength, out=start_plus)
+    np.clip(start_minus, 0, rlength, out=start_minus)
+    end_plus = plus_tags + three_shift
+    end_minus = minus_tags + five_shift
+    np.clip(end_plus, 0, rlength, out=end_plus)
+    np.clip(end_minus, 0, rlength, out=end_minus)
+
+    start_poss = _merge_sorted_arrays(start_plus, start_minus)
+    end_poss = _merge_sorted_arrays(end_plus, end_minus)
+
+    pileup = _pileup_sorted_bounds(start_poss,
+                                   end_poss,
+                                   scale_factor,
+                                   baseline_value)
+    clean_up_ndarray(start_poss)
+    clean_up_ndarray(end_poss)
+
+    if pileup.shape[0] == 0:
+        return pileup
+    if scale_factor != 1:
+        pileup['v'] *= scale_factor
+    if baseline_value != 0:
+        pileup['v'] = np.maximum(pileup['v'], baseline_value)
+    return pileup
+
+
+@cython.ccall
+def naive_quick_pileup(sorted_poss: cnp.ndarray, extension: int) -> cnp.ndarray:
+    """Simple pileup, every tag will be extended left and right with
+    length `extension`.
+
+    Note: Assumption is that `sorted_poss` has to be pre-sorted!
+    """
+    start_poss: cnp.ndarray
+    end_poss: cnp.ndarray
+
+    if sorted_poss.shape[0] == 0:
+        raise Exception("length is 0")
+
+    start_poss = sorted_poss - extension
+    np.clip(start_poss, 0, None, out=start_poss)
+    end_poss = sorted_poss + extension
+    # arrays remain sorted after constant shift
+    return _pileup_sorted_bounds(start_poss, end_poss, 1.0, 0.0)
+
+
+@cython.ccall
+def over_two_pv_array(pv_array1: cnp.ndarray,
+                      pv_array2: cnp.ndarray,
+                      func: str = "max") -> cnp.ndarray:
+    """Merge two position-value arrays, keeping dtype=[('p','i4'),('v','f4')]."""
+    l1: cython.long
+    l2: cython.long
+    i1: cython.long = 0
+    i2: cython.long = 0
+    I: cython.long = 0
+    ret: cnp.ndarray
+    ret_p: cnp.ndarray
+    ret_v: cnp.ndarray
+
+    if func == "max":
+        call_func = max
+    elif func == "min":
+        call_func = min
+    elif func == "mean":
+        call_func = mean
+    else:
+        raise Exception("Invalid function")
+
+    l1 = pv_array1.shape[0]
+    l2 = pv_array2.shape[0]
+    if l1 == 0:
+        return pv_array2.copy()
+    if l2 == 0:
+        return pv_array1.copy()
+
+    a1_p: cnp.ndarray = np.asarray(pv_array1['p'], dtype="i4", order="C")
+    a2_p: cnp.ndarray = np.asarray(pv_array2['p'], dtype="i4", order="C")
+    a1_v: cnp.ndarray = np.asarray(pv_array1['v'], dtype="f4", order="C")
+    a2_v: cnp.ndarray = np.asarray(pv_array2['v'], dtype="f4", order="C")
+
+    ret_p = np.empty(l1 + l2, dtype="i4")
+    ret_v = np.empty(l1 + l2, dtype="f4")
+
+    a1_p_ptr: cython.pointer(cython.int) = cython.cast(cython.pointer(cython.int), a1_p.data)
+    a2_p_ptr: cython.pointer(cython.int) = cython.cast(cython.pointer(cython.int), a2_p.data)
+    a1_v_ptr: cython.pointer(cython.float) = cython.cast(cython.pointer(cython.float), a1_v.data)
+    a2_v_ptr: cython.pointer(cython.float) = cython.cast(cython.pointer(cython.float), a2_v.data)
+    ret_p_ptr: cython.pointer(cython.int) = cython.cast(cython.pointer(cython.int), ret_p.data)
+    ret_v_ptr: cython.pointer(cython.float) = cython.cast(cython.pointer(cython.float), ret_v.data)
+
+    while i1 < l1 and i2 < l2:
+        p1 = a1_p_ptr[0]
+        p2 = a2_p_ptr[0]
+        ret_v_ptr[0] = call_func(a1_v_ptr[0], a2_v_ptr[0])
+        if p1 < p2:
+            ret_p_ptr[0] = p1
+            i1 += 1
+            a1_p_ptr += 1
+            a1_v_ptr += 1
+        elif p1 > p2:
+            ret_p_ptr[0] = p2
+            i2 += 1
+            a2_p_ptr += 1
+            a2_v_ptr += 1
+        else:
+            ret_p_ptr[0] = p1
+            i1 += 1
+            a1_p_ptr += 1
+            a1_v_ptr += 1
+            i2 += 1
+            a2_p_ptr += 1
+            a2_v_ptr += 1
+        I += 1
+        ret_p_ptr += 1
+        ret_v_ptr += 1
+
+    # while i1 < l1:
+    #     ret_p[I] = a1_p[i1]
+    #     ret_v[I] = a1_v[i1]
+    #     i1 += 1
+    #     I += 1
+    #     a1_p_ptr += 1
+    #     a1_v_ptr += 1
+    #     ret_p_ptr += 1
+    #     ret_v_ptr += 1
+
+    # while i2 < l2:
+    #     ret_p[I] = a2_p[i2]
+    #     ret_v[I] = a2_v[i2]
+    #     i2 += 1
+    #     I += 1
+    #     a2_p_ptr += 1
+    #     a2_v_ptr += 1
+    #     ret_p_ptr += 1
+    #     ret_v_ptr += 1
+
+    ret_p.resize(I, refcheck=False)
+    ret_v.resize(I, refcheck=False)
+    ret = np.empty(I, dtype=[('p', 'i4'), ('v', 'f4')])
+    ret['p'] = ret_p
+    ret['v'] = ret_v
+    return ret
+
+
+@cython.cfunc
+def __close_peak(peak_content,
+                 peaks,
+                 max_v: cython.float,
+                 min_length: cython.int):
+    """Internal function to find the summit and height."""
+    tsummit: list = []
+    summit: cython.int = 0
+    summit_value: cython.float = 0
+    tstart: cython.int
+    tend: cython.int
+    tvalue: cython.float
+
+    for (tstart, tend, tvalue) in peak_content:
+        if not summit_value or summit_value < tvalue:
+            tsummit = [int((tend + tstart) / 2), ]
+            summit_value = tvalue
+        elif summit_value == tvalue:
+            tsummit.append(int((tend + tstart) / 2))
+    summit = tsummit[int((len(tsummit) + 1) / 2) - 1]
+    if summit_value < max_v:
+        peaks.append((summit, summit_value))
+    return
+
+
+@cython.ccall
+def naive_call_peaks(pv_array: cnp.ndarray, min_v: cython.float,
+                     max_v: cython.float = 1e30,
+                     max_gap: cython.int = 50,
+                     min_length: cython.int = 200):
+    pre_p: cython.int
+    p: cython.int
+    i: cython.int
+    x: cython.long
+    v: cython.double
+    peak_content: list
+    ret_peaks: list = []
+
+    peak_content = []
+    psn = iter(pv_array['p']).__next__
+    vsn = iter(pv_array['v']).__next__
+    x = 0
+    pre_p = 0
+    while True:
+        try:
+            p = psn()
+            v = vsn()
+        except Exception:
+            break
+        x += 1
+        if v > min_v:
+            peak_content = [(pre_p, p, v), ]
+            pre_p = p
+            break
+        else:
+            pre_p = p
+
+    for i in range(x, len(pv_array)):
+        p = psn()
+        v = vsn()
+        if v <= min_v:
+            pre_p = p
+            continue
+        if pre_p - peak_content[-1][1] <= max_gap:
+            peak_content.append((pre_p, p, v))
+        else:
+            if peak_content[-1][1] - peak_content[0][0] >= min_length:
+                __close_peak(peak_content, ret_peaks, max_v, min_length)
+            peak_content = [(pre_p, p, v), ]
+        pre_p = p
+
+    if peak_content:
+        if peak_content[-1][1] - peak_content[0][0] >= min_length:
+            __close_peak(peak_content, ret_peaks, max_v, min_length)
+    return ret_peaks
+
+
+@cython.cfunc
+def _write_pv_array_to_bedgraph(pv_array: cnp.ndarray,
+                                chrom,
+                                output_filename: bytes):
+    chrom_str: str
+    pre_p: cython.int = 0
+    p: cython.int
+    v: cython.float
+
+    chrom_str = chrom.decode() if isinstance(chrom, (bytes, bytearray)) else str(chrom)
+    with open(output_filename, "a") as fh:
+        for (p, v) in pv_array:
+            if p > pre_p:
+                fh.write(f"{chrom_str}\t{pre_p}\t{int(p)}\t{float(v)}\n")
+            pre_p = p
+    return
+
+
+@cython.ccall
+def pileup_and_write_se(trackI,
+                        output_filename: bytes,
+                        d: cython.int,
+                        scale_factor: cython.float,
+                        baseline_value: float = 0.0,
+                        directional: bool = True,
+                        halfextension: bool = True):
+    """Pileup a FWTrackI object and write the pileup result into a bedGraph file."""
+    five_shift: cython.long
+    three_shift: cython.long
+    i: cython.long
+    rlength: cython.long
+    chroms: list
+    n_chroms: cython.int
+    chrom: bytes
+    plus_tags: cnp.ndarray
+    minus_tags: cnp.ndarray
+    chrlengths: dict = trackI.get_rlengths()
+
+    if directional:
+        if halfextension:
+            five_shift = d//-4
+            three_shift = d*3//4
+        else:
+            five_shift = 0
+            three_shift = d
+    else:
+        if halfextension:
+            five_shift = d//4
+            three_shift = five_shift
+        else:
+            five_shift = d//2
+            three_shift = d - five_shift
+
+    chroms = list(chrlengths.keys())
+    n_chroms = len(chroms)
+
+    fh = open(output_filename, "w")
+    fh.write("")
+    fh.close()
+
+    for i in range(n_chroms):
+        chrom = chroms[i]
+        (plus_tags, minus_tags) = trackI.get_locations_by_chr(chrom)
+        rlength = cython.cast(cython.long, chrlengths[chrom])
+        pileup = se_all_in_one_pileup(plus_tags,
+                                      minus_tags,
+                                      five_shift,
+                                      three_shift,
+                                      rlength,
+                                      scale_factor,
+                                      baseline_value)
+        _write_pv_array_to_bedgraph(pileup, chrom, output_filename)
+    return
+
+
+@cython.ccall
+def pileup_and_write_pe(petrackI,
+                        output_filename: bytes,
+                        scale_factor: float = 1,
+                        baseline_value: float = 0.0):
+    """Pileup a PETrackI object and write the pileup result into a bedGraph file."""
+    chrlengths: dict = petrackI.get_rlengths()
+    chroms: list
+    n_chroms: cython.int
+    i: cython.long
+    chrom: bytes
+    locs: cnp.ndarray
+    pileup: cnp.ndarray
+
+    chroms = list(chrlengths.keys())
+    n_chroms = len(chroms)
+
+    fh = open(output_filename, "w")
+    fh.write("")
+    fh.close()
+
+    for i in range(n_chroms):
+        chrom = chroms[i]
+        locs = petrackI.get_locations_by_chr(chrom)
+        pileup = pileup_from_LR(locs)
+        if pileup.shape[0] > 0:
+            if scale_factor != 1:
+                pileup['v'] *= scale_factor
+            if baseline_value != 0:
+                pileup['v'] = np.maximum(pileup['v'], baseline_value)
+        _write_pv_array_to_bedgraph(pileup, chrom, output_filename)
+    return
