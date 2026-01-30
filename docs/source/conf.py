@@ -17,9 +17,11 @@ try:
 except ImportError:  # pragma: no cover - only used in docs builds
     cython = ModuleType("cython")
     sys.modules['cython'] = cython
-    cython.cclass = cython.ccall = cython.locals = cython.returns = (
-        lambda *args, **kwargs: (lambda obj: obj)
-    )
+    _decorator = lambda *args, **kwargs: (lambda obj: obj)
+    for _name in ("cclass", "ccall", "cfunc", "locals", "returns"):
+        setattr(cython, _name, _decorator)
+    for _name in ("pointer", "const", "uchar", "ushort", "int", "long"):
+        setattr(cython, _name, object())
     cython.declare = lambda *args, **kwargs: None
 
 if not hasattr(cython, 'bytes'):
