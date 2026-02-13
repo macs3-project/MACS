@@ -30,7 +30,8 @@ if not hasattr(cython, 'tuple'):
     cython.tuple = tuple
 if not hasattr(cython, 'list'):
     cython.list = list
-
+if not hasattr(cython, 'const'):
+    cython.const = object()
 
 class _CImportStub(ModuleType):
     def __getattr__(self, name):
