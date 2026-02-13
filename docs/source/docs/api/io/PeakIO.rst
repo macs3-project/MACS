@@ -5,3 +5,4 @@ MACS3.IO.PeakIO module
    :members:
    :undoc-members:
    :show-inheritance:
+   :exclude-members: bool

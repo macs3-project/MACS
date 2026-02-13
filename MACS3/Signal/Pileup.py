@@ -96,12 +96,37 @@ def pileup_and_write_se(trackI,
                         baseline_value: float = 0.0,
                         directional: bool = True,
                         halfextension: bool = True):
-    """ Pileup a FWTrackI object and write the pileup result into a
-    bedGraph file.
+    """Pile up a single-end track and write a bedGraph file.
 
-    This function calls pure C functions from cPosValCalculation.
+    This is a thin Cython wrapper that computes pileup using the
+    C-accelerated routines in ``cPosValCalculation``.
 
-    This function is currently only used `macs3 pileup` cmd.
+    Parameters
+    ----------
+    trackI
+        Single-end track object (FWTrackI).
+    output_filename
+        Output bedGraph path.
+    d
+        Fragment length estimate.
+    scale_factor
+        Scalar applied to pileup values.
+    baseline_value
+        Minimum output value per bin. Default is ``0.0``.
+    directional
+        If ``True``, extend reads only to 3' direction. If ``False``,
+        extend to both sides. Default is ``True``.
+    halfextension
+        If ``True``, compute shift values from ``d`` using the half-
+        extension scheme. Default is ``True``.
+
+    Returns
+    -------
+    None
+
+    Notes
+    -----
+    This function is currently only used by the ``macs3 pileup`` command.
     """
     five_shift: cython.long
     three_shift: cython.long
@@ -187,12 +212,41 @@ def pileup_and_write_pe(petrackI,
                         output_filename: bytes,
                         scale_factor: float = 1,
                         baseline_value: float = 0.0):
-    """ Pileup a PETrackI object and write the pileup result into a
-    bedGraph file.
+    """Pile up a paired-end track and write a bedGraph file.
 
-    This function calls pure C functions from cPosValCalculation.
+    This is a thin Cython wrapper that computes pileup using the
+    C-accelerated routines in ``cPosValCalculation``.
 
-    This function is currently only used `macs3 pileup` cmd.
+    Parameters
+    ----------
+    petrackI
+        Paired-end track object (PETrackI). Must provide
+        ``get_rlengths()`` and ``get_locations_by_chr(chrom)``.
+    output_filename
+        Output bedGraph path as ``bytes``.
+    scale_factor
+        Scalar applied to pileup values. Default is ``1``.
+    baseline_value
+        Minimum output value per bin. Default is ``0.0``.
+
+    Returns
+    -------
+    None
+
+    Notes
+    -----
+    This function is currently only used by the ``macs3 pileup`` command.
+
+    Examples
+    --------
+    .. code-block:: python
+
+        pileup_and_write_pe(
+            petrackI,
+            b"out.bedGraph",
+            scale_factor=1.0,
+            baseline_value=0.0,
+        )
     """
     chrlengths: dict = petrackI.get_rlengths()
     chroms: list
@@ -279,6 +333,44 @@ def se_all_in_one_pileup(plus_tags: cnp.ndarray,
     Two arrays have the same length and can be matched by index. End
     position at index x (p[x]) record continuous value of v[x] from
     p[x-1] to p[x].
+    Parameters
+    ----------
+    plus_tags
+        Sorted 5' end positions on the plus strand.
+    minus_tags
+        Sorted 5' end positions on the minus strand.
+    five_shift
+        Shift applied toward the 5' direction.
+    three_shift
+        Shift applied toward the 3' direction.
+    rlength
+        Chromosome length; coordinates are clipped to ``[0, rlength]``.
+    scale_factor
+        Scalar applied to pileup values.
+    baseline_value
+        Minimum output value per bin.
+
+    Returns
+    -------
+    list
+        ``[p, v]`` where ``p`` is an ``int32`` numpy array of end
+        positions and ``v`` is a ``float32`` numpy array of values.
+
+    Examples
+    --------
+    .. code-block:: python
+
+        plus = np.array([10, 50, 100], dtype="i4")
+        minus = np.array([30, 80], dtype="i4")
+        p, v = se_all_in_one_pileup(
+            plus,
+        minus,
+        five_shift=-25,
+        three_shift=75,
+        rlength=1000,
+        scale_factor=1.0,
+        baseline_value=0.0,
+        )
 
     """
     p: cython.int
@@ -408,21 +500,36 @@ def quick_pileup(start_poss: cnp.ndarray,
                  end_poss: cnp.ndarray,
                  scale_factor: cython.float,
                  baseline_value: cython.float) -> list:
-    """Return pileup given plus strand and minus strand positions of fragments.
+    """Compute pileup from fragment start/end positions.
 
-    A super-fast and simple algorithm proposed by Jie Wang. It will
-    take sorted start positions and end positions, then compute pileup
-    values.
+    The algorithm is a fast sweep over sorted start and end positions
+    (Jie Wang). It returns a [p, v] array compatible with bedGraph
+    semantics.
 
-    It will return a pileup result in similar structure as
-    bedGraph. There are two numpy arrays:
+    Parameters
+    ----------
+    start_poss
+        Sorted fragment start positions.
+    end_poss
+        Sorted fragment end positions.
+    scale_factor
+        Scalar applied to pileup values.
+    baseline_value
+        Minimum output value per bin.
 
-    [end positions, values] or [p,v]
+    Returns
+    -------
+    list
+        ``[p, v]`` where ``p`` is an ``int32`` numpy array of end
+        positions and ``v`` is a ``float32`` numpy array of values.
 
-    Two arrays have the same length and can be matched by index. End
-    position at index x (p[x]) record continuous value of v[x] from
-    p[x-1] to p[x].
-
+    Examples
+    --------
+    .. code-block:: python
+    
+        starts = np.array([10, 50, 100], dtype="i4")
+        ends = np.array([40, 90, 140], dtype="i4")
+        p, v = quick_pileup(starts, ends, scale_factor=1.0, baseline_value=0.0)
     """
     p: cython.int
     pre_p: cython.int
@@ -534,12 +641,23 @@ def quick_pileup(start_poss: cnp.ndarray,
 
 @cython.ccall
 def naive_quick_pileup(sorted_poss: cnp.ndarray, extension: int) -> list:
-    """Simple pileup, every tag will be extended left and right with
-    length `extension`.
+    """Simple pileup by extending each tag symmetrically.
 
-    Note: Assumption is that `poss` has to be pre-sorted! There is no
-    check on whether it's sorted.
+    Each input position is extended left and right by ``extension``.
+    The input must be sorted; no sorting or validation is performed.
 
+    Parameters
+    ----------
+    sorted_poss
+        Sorted tag positions.
+    extension
+        Extension size applied to both sides.
+
+    Returns
+    -------
+    list
+        ``[p, v]`` where ``p`` is an ``int32`` numpy array of end
+        positions and ``v`` is a ``float32`` numpy array of values.
     """
     p: cython.int
     pre_p: cython.int
@@ -649,14 +767,24 @@ def naive_quick_pileup(sorted_poss: cnp.ndarray, extension: int) -> list:
 def over_two_pv_array(pv_array1: list,
                       pv_array2: list,
                       func: str = "max") -> list:
-    """Merge two position-value arrays. For intersection regions, take
-    the maximum value within region.
+    """Merge two [p, v] arrays with a pointwise reducer.
 
-    pv_array1 and pv_array2 are [p,v] type lists, same as the output
-    from quick_pileup function. 'p' and 'v' are numpy arrays of int32
-    and float32.
+    Parameters
+    ----------
+    pv_array1
+        First ``[p, v]`` array, same as output from quick_pileup function.
+    pv_array2
+        Second ``[p, v]`` array, same as output from quick_pileup function.
+    func
+        Reducer for overlapping regions. One of ``"max"``, ``"min"``,
+        or ``"mean"``. Default is ``"max"``.
 
-    available operations are 'max', 'min', and 'mean'
+    Returns
+    -------
+    list
+        Merged ``[p, v]`` array with the reducer applied to overlap
+        regions.
+
     """
     # pre_p: cython.int
 
@@ -755,6 +883,29 @@ def naive_call_peaks(pv_array: list, min_v: cython.float,
                      max_v: cython.float = 1e30,
                      max_gap: cython.int = 50,
                      min_length: cython.int = 200):
+    """Identify peak summits from a [p, v] array.
+
+    Parameters
+    ----------
+    pv_array
+        ``[p, v]`` array as produced by pileup functions.
+    min_v
+        Minimum value to be considered part of a peak.
+    max_v
+        Maximum allowed summit height.
+        Default is ``1e30``.
+    max_gap
+        Maximum gap (in bp) allowed between adjacent peak segments to
+        be merged. Default is ``50``.
+    min_length
+        Minimum peak length (in bp). Default is ``200``.
+
+    Returns
+    -------
+    list
+        List of ``(summit, height)`` tuples.
+
+    """
 
     pre_p: cython.int
     p: cython.int

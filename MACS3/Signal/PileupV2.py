@@ -232,6 +232,8 @@ def pileup_PV(PV_array: cnp.ndarray) -> cnp.ndarray:
 @cython.ccall
 def pileup_from_LR_hmmratac(LR_array: cnp.ndarray,
                             mapping_dict: dict) -> cnp.ndarray:
+    """Pile up LR fragments using HMMRATAC
+    """
     # this function is specifically designed for piling up fragments
     # for `hmmratac`.
     #
