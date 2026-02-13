@@ -525,7 +525,6 @@ class BEDPEParser(GenericParser):
         Examples:
             .. code-block:: python
 
-                from MACS3.IO.Parser import BEDPEParser
                 parser = BEDPEParser("fragments.bedpe")
                 petrack = parser.build_petrack()
         """
@@ -1195,7 +1194,6 @@ class BAMPEParser(BAMParser):
         Examples:
             .. code-block:: python
 
-                from MACS3.IO.Parser import BAMPEParser
                 parser = BAMPEParser("reads.bam")
                 petrack = parser.build_petrack()
         """
@@ -1254,7 +1252,6 @@ class BAMPEParser(BAMParser):
         Examples:
             .. code-block:: python
 
-                from MACS3.IO.Parser import BAMPEParser
                 parser = BAMPEParser("reads.bam")
                 petrack = parser.build_petrack()
                 # Later, append more fragments from another file:
@@ -1447,7 +1444,6 @@ class FragParser(GenericParser):
         Examples:
             .. code-block:: python
 
-                from MACS3.IO.Parser import FragParser
                 parser = FragParser("fragments.tsv.gz")
                 petrack = parser.build_petrack(max_count=10)
         """
@@ -1515,7 +1511,6 @@ class FragParser(GenericParser):
         Examples:
             .. code-block:: python
 
-                from MACS3.IO.Parser import FragParser
                 parser = FragParser("fragments.tsv.gz")
                 petrack = parser.build_petrack()
                 parser2 = FragParser("more_fragments.tsv.gz")
