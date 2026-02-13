@@ -65,6 +65,13 @@ class bedGraphIO:
 
         Returns:
             bedGraphTrackI: Populated track instance.
+
+        Example:
+            .. code-block:: python
+            
+                from MACS3.IO.BedGraphIO import bedGraphIO
+                bio = bedGraphIO("signal.bdg")
+                track = bio.read_bedGraph(baseline_value=0)
         """
         i: bytes
 
@@ -96,6 +103,13 @@ class bedGraphIO:
             name: Track name used in the optional header line.
             description: Track description used in the optional header line.
             trackline: Whether to emit a UCSC ``track`` header.
+
+        Examples:
+            .. code-block:: python
+
+                from MACS3.IO.BedGraphIO import bedGraphIO
+                bio = bedGraphIO("signal_out.bdg")
+                bio.write_bedGraph(name="Example", description="Demo track")
         """
         pre: cython.int
         pos: cython.int

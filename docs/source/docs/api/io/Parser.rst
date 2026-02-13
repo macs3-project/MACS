@@ -5,3 +5,4 @@ MACS3.IO.Parser module
    :members:
    :undoc-members:
    :show-inheritance:
+   :exclude-members: d, n, StrandFormatError, atoi, bool,bam_fw_binary_parse, bampe_pe_binary_parse, tlen_parse_line

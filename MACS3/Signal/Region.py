@@ -46,7 +46,18 @@ __doc__ = "Region class"
 
 @cython.cclass
 class Regions:
-    """For plain region of chrom, start and end
+    """Container for genomic regions organized by chromosome.
+    
+    This class stores genomic regions (intervals) organized by chromosome
+    and provides operations for region manipulation including sorting,
+    merging overlaps, expanding, and set operations like intersection
+    and exclusion.
+    
+    Attributes:
+        regions (dict): Dictionary mapping chromosome names (bytes) to 
+            lists of region tuples (start, end). Regions are 0-based,
+            half-open intervals [start, end).
+        total (int): Total count of regions across all chromosomes.
     """
     regions = cython.declare(dict, visibility='public')
     total = cython.declare(cython.int, visibility='public')
@@ -64,6 +75,29 @@ class Regions:
 
     @cython.ccall
     def pop(self, n: cython.int):
+        """Remove and return the first n regions.
+        
+        Removes the first n regions from the Regions object across 
+        chromosomes in sorted order and returns them as a new Regions 
+        object. The current object is modified.
+        
+        Args:
+            n (int): Number of regions to pop.
+            
+        Returns:
+            Regions: New Regions object containing the first n regions.
+            
+        Examples:
+            .. code-block:: python
+
+                regions.add_loc(b'chr1', 1000, 2000)
+                regions.add_loc(b'chr1', 3000, 4000)
+                regions.add_loc(b'chr2', 5000, 6000)
+                regions.sort()
+                first_two = regions.pop(2)
+                print(first_two.total)  # Output: 2
+                print(regions.total)    # Output: 1
+        """
         # when called, pop the first n regions in Regions class. Self
         # will be modified.
         clist: list             # for chromosomes
@@ -120,6 +154,20 @@ class Regions:
 
     @cython.ccall
     def add_loc(self, chrom: bytes, start: int, end: int):
+        """Add a region to a specific chromosome.
+        
+        Adds a single region interval to the specified chromosome. The 
+        region is added without immediate sorting. Call sort() to 
+        maintain order.
+        
+        Args:
+            chrom (bytes): Chromosome name.
+            start (int): Start position (0-based, inclusive).
+            end (int): End position (0-based, exclusive).
+            
+        Returns:
+            None
+        """
         if self.regions.has_key(chrom):
             self.regions[chrom].append((start, end))
         else:
@@ -131,6 +179,14 @@ class Regions:
 
     @cython.ccall
     def sort(self):
+        """Sort all regions within each chromosome by start position.
+        
+        Sorts regions for each chromosome. This method is idempotent—
+        calling it multiple times has the same effect as calling once.
+        
+        Returns:
+            None
+        """
         chrom: bytes
 
         if self.__sorted:
@@ -141,7 +197,14 @@ class Regions:
 
     @cython.ccall
     def total_length(self) -> cython.long:
-        """ Return the total length of the Regions object.
+        """Calculate the total length covered by all regions.
+        
+        Returns the sum of lengths of all regions across all chromosomes.
+        Overlapping regions are first merged to avoid double-counting.
+        
+        Returns:
+            int: Total nucleotide length covered by all regions.
+            
         """
         chrom: bytes
         ps: list
@@ -160,11 +223,50 @@ class Regions:
 
     @cython.ccall
     def get_chr_names(self) -> set:
+        """Get all chromosome names present in the Regions object.
+        
+        Returns:
+            set: Set of chromosome names (bytes) present in regions.
+            
+        Examples:
+            .. code-block:: python
+
+                from MACS3.Signal.Region import Regions
+                regions = Regions()
+                regions.add_loc(b'chr1', 1000, 2000)
+                regions.add_loc(b'chr1', 3000, 4000)
+                regions.add_loc(b'chr2', 5000, 6000)
+                print(regions.get_chr_names())
+                # Output: {b'chr1', b'chr2'}
+        """
         return set(sorted(self.regions.keys()))
 
     @cython.ccall
     def expand(self, flanking: int):
-        """ Expand regions to both directions with 'flanking' bps.
+        """Expand all regions by a fixed distance in both directions.
+        
+        Extends the start and end positions of each region by 'flanking'
+        base pairs. Start positions are expanded leftward but capped at 0.
+        The regions are automatically re-sorted after expansion.
+        
+        Args:
+            flanking (int): Number of base pairs to expand in each direction.
+            
+        Returns:
+            None: Modifies the object in place.
+            
+        Examples:
+            .. code-block:: python
+
+                regions.expand(100)
+                print(regions.regions[b'chr1'])  # Output: [(900, 2100)]
+                
+                # With capping at 0 for start positions
+                regions2 = Regions()
+                regions2.add_loc(b'chr1', 50, 150)
+                regions2.expand(100)
+                print(regions2.regions[b'chr1'])
+                # Output: [(0, 250)]  # Start capped at 0
         """
         chrom: bytes
         ps: list
@@ -181,8 +283,23 @@ class Regions:
 
     @cython.ccall
     def merge_overlap(self):
-        """
-        Merge overlapping regions of itself.
+        """Merge overlapping or adjacent regions within each chromosome.
+        
+        Combines regions that overlap or are adjacent. After merging,
+        regions are re-sorted. This operation is idempotent and modifies
+        the object in place. The total count is updated.
+        
+        Returns:
+            bool: True if merge was performed, False if already merged.
+            
+        Examples:
+            .. code-block:: python
+            
+                regions = Regions()
+                regions.add_loc(b'chr1', 1000, 2000)
+                regions.add_loc(b'chr1', 1500, 3000)  # Overlaps with first
+                result = regions.merge_overlap()
+                print(regions.regions[b'chr1'])  # Output: [(1000, 3000)]
         """
         chrom: bytes
         s_new_region: cython.int
@@ -231,6 +348,17 @@ class Regions:
 
     @cython.ccall
     def write_to_bed(self, fhd):
+        """Write regions to a BED format file.
+        
+        Args:
+            fhd: File handle opened for writing.
+            
+        Examples:
+            .. code-block:: python
+            
+                with open('output.bed', 'w') as f:
+                    regions.write_to_bed(f)
+        """
         i: cython.int
         chrom: bytes
         region: tuple
@@ -283,10 +411,29 @@ class Regions:
 
     @cython.ccall
     def intersect(self, regions_object2):
-        """ Get the only intersecting regions comparing with
-        regions_object2, another Regions object. Then return a new
-        Regions object.
-
+        """Get the intersection with another Regions object.
+        
+        Returns a new Regions object containing only the regions that
+        overlap between this object and regions_object2. For chromosomes
+        present only in this object, all regions are included unchanged.
+        
+        Args:
+            regions_object2 (Regions): Another Regions object to intersect with.
+            
+        Returns:
+            Regions: New object containing intersecting regions.
+            
+        Examples:
+            .. code-block:: python
+            
+                r1 = Regions()
+                r1.add_loc(b'chr1', 1000, 3000)
+                
+                r2 = Regions()
+                r2.add_loc(b'chr1', 2000, 4000)
+                
+                result = r1.intersect(r2)
+                print(result.regions[b'chr1'])  # Output: [(2000, 3000)]
         """
         ret_regions_object: object
         regions1: dict
@@ -361,9 +508,33 @@ class Regions:
 
     @cython.ccall
     def exclude(self, regions_object2):
-        """ Remove overlapping regions in regions_object2, another Regions
-        object. This regions object will be altered.
-
+        """Remove regions that overlap with another Regions object.
+        
+        Removes all regions from this object that overlap with regions
+        in regions_object2. Regions present only in this object are kept.
+        The object is modified in place.
+        
+        Args:
+            regions_object2 (Regions): Another Regions object defining
+                regions to exclude.
+            
+        Returns:
+            None: Modifies the object in place.
+            
+        Examples:
+            .. code-block:: python
+                
+                from MACS3.Signal.Region import Regions
+                r1 = Regions()
+                r1.add_loc(b'chr1', 1000, 3000)
+                r1.add_loc(b'chr1', 5000, 7000)
+                
+                r2 = Regions()
+                r2.add_loc(b'chr1', 2000, 6000)  # Overlaps both regions
+                
+                r1.exclude(r2)
+                print(r1.regions[b'chr1'])
+                # Output: [(1000, 2000), (6000, 7000)]
         """
         regions1: dict
         regions2: dict

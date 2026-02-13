@@ -214,7 +214,15 @@ class StrandFormatError(BaseException):
 
 @cython.cclass
 class GenericParser:
-    """Base parser with helpers for streaming alignment-like text files."""
+    """Base parser with helpers for streaming alignment-like text files.
+
+    Attributes:
+        filename: Path to the input file.
+        gzipped: Whether the input stream is gzipped. (bool)
+        tag_size: tag size.
+        fhd: Open file handle for the input stream.
+        buffer_size: Buffer size for streaming reads.
+    """
     filename: str
     gzipped: bool
     tag_size: cython.int
@@ -509,7 +517,18 @@ class BEDPEParser(GenericParser):
 
     @cython.ccall
     def build_petrack(self):
-        """Return a ``PETrackI`` constructed from the entire stream."""
+        """Return a ``PETrackI`` constructed from the entire stream.
+
+        Returns:
+            PETrackI: Paired-end track populated from the input stream.
+
+        Examples:
+            .. code-block:: python
+
+                from MACS3.IO.Parser import BEDPEParser
+                parser = BEDPEParser("fragments.bedpe")
+                petrack = parser.build_petrack()
+        """
         chromosome: bytes
         left_pos: cython.int
         right_pos: cython.int
@@ -1154,7 +1173,13 @@ class BAMParser(GenericParser):
 
 @cython.cclass
 class BAMPEParser(BAMParser):
-    """Parser for paired-end BAM files that yields fragment spans."""
+    """Parser for paired-end BAM files that yields fragment spans.
+
+    Attributes:
+        n: Total number of fragments.
+        d: Average fragment length.
+        
+    """
     # total number of fragments
     n = cython.declare(cython.int, visibility='public')
     # the average length of fragments
@@ -1162,7 +1187,18 @@ class BAMPEParser(BAMParser):
 
     @cython.ccall
     def build_petrack(self):
-        """Return a ``PETrackI`` populated with inferred fragments."""
+        """Return a ``PETrackI`` populated with inferred fragments.
+
+        Returns:
+            PETrackI: Paired-end track populated from BAM pairs.
+
+        Examples:
+            .. code-block:: python
+
+                from MACS3.IO.Parser import BAMPEParser
+                parser = BAMPEParser("reads.bam")
+                petrack = parser.build_petrack()
+        """
         i: cython.long = 0          # number of fragments kept
         m: cython.long = 0          # sum of fragment lengths
         entrylength: cython.int
@@ -1207,7 +1243,24 @@ class BAMPEParser(BAMParser):
 
     @cython.ccall
     def append_petrack(self, petrack):
-        """Append inferred fragments to an existing ``PETrackI``."""
+        """Append inferred fragments to an existing ``PETrackI``.
+
+        Args:
+            petrack: Existing paired-end track to append to.
+
+        Returns:
+            PETrackI: The updated track instance.
+
+        Examples:
+            .. code-block:: python
+
+                from MACS3.IO.Parser import BAMPEParser
+                parser = BAMPEParser("reads.bam")
+                petrack = parser.build_petrack()
+                # Later, append more fragments from another file:
+                parser2 = BAMPEParser("more_reads.bam")
+                petrack = parser2.append_petrack(petrack)
+        """
         i: cython.long = 0          # number of fragments
         m: cython.long = 0          # sum of fragment lengths
         entrylength: cython.int
@@ -1383,7 +1436,21 @@ class FragParser(GenericParser):
 
     @cython.ccall
     def build_petrack(self, max_count=0):
-        """Return a ``PETrackII`` populated with fragments and barcodes."""
+        """Return a ``PETrackII`` populated with fragments and barcodes.
+
+        Args:
+            max_count: Optional cap applied to per-fragment count values.
+
+        Returns:
+            PETrackII: Paired-end track with barcode and count metadata.
+
+        Examples:
+            .. code-block:: python
+
+                from MACS3.IO.Parser import FragParser
+                parser = FragParser("fragments.tsv.gz")
+                petrack = parser.build_petrack(max_count=10)
+        """
         chromosome: bytes
         left_pos: cython.int
         right_pos: cython.int
@@ -1436,7 +1503,24 @@ class FragParser(GenericParser):
 
     @cython.ccall
     def append_petrack(self, petrack, max_count=0):
-        """Append barcode-aware fragments to an existing ``PETrackI``."""
+        """Append barcode-aware fragments to an existing ``PETrackI``.
+
+        Args:
+            petrack: Existing paired-end track to append to.
+            max_count: Optional cap applied to per-fragment count values.
+
+        Returns:
+            PETrackII: The updated track instance.
+
+        Examples:
+            .. code-block:: python
+
+                from MACS3.IO.Parser import FragParser
+                parser = FragParser("fragments.tsv.gz")
+                petrack = parser.build_petrack()
+                parser2 = FragParser("more_fragments.tsv.gz")
+                petrack = parser2.append_petrack(petrack, max_count=10)
+        """
         chromosome: bytes
         left_pos: cython.int
         right_pos: cython.int

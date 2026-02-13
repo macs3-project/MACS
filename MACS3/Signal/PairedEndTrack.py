@@ -111,6 +111,16 @@ class PETrackI:
         -----
         Fragments are stored in structured numpy arrays keyed by chromosome, and
         the running fragment count and total template length are updated in place.
+
+        Examples
+        --------
+        .. code-block:: python
+
+            from MACS3.Signal.PairedEndTrack import PETrackI
+
+            pe = PETrackI()
+            pe.add_loc(b"chr1", 10, 40)
+            pe.add_loc(b"chr1", 50, 90)
         """
         i: cython.int
 
@@ -452,6 +462,18 @@ class PETrackI:
         -----
         Fragments exceeding ``maxnum`` for the same coordinates are dropped and the
         aggregate template length is adjusted accordingly.
+
+        Examples
+        --------
+        .. code-block:: python
+
+            from MACS3.Signal.PairedEndTrack import PETrackI
+
+            pe = PETrackI()
+            pe.add_loc(b"chr1", 10, 40)
+            pe.add_loc(b"chr1", 10, 40)
+            pe.finalize()
+            pe.filter_dup(maxnum=1)
         """
         n: cython.int
         loc_start: cython.int
@@ -536,6 +558,18 @@ class PETrackI:
         -----
         Sampling is performed independently for each chromosome by shuffling the
         fragments, resizing the arrays, and restoring coordinate order.
+
+        Examples
+        --------
+        .. code-block:: python
+
+            from MACS3.Signal.PairedEndTrack import PETrackI
+
+            pe = PETrackI()
+            pe.add_loc(b"chr1", 10, 40)
+            pe.add_loc(b"chr1", 50, 90)
+            pe.finalize()
+            pe.sample_percent(0.5, seed=123)
         """
         # num: number of reads allowed on a certain chromosome
         num: cython.uint
@@ -587,6 +621,18 @@ class PETrackI:
         -------
         PETrackI
             New track containing the sampled fragments with metadata copied over.
+
+        Examples
+        --------
+        .. code-block:: python
+
+            from MACS3.Signal.PairedEndTrack import PETrackI
+
+            pe = PETrackI()
+            pe.add_loc(b"chr1", 10, 40)
+            pe.add_loc(b"chr1", 50, 90)
+            pe.finalize()
+            pe_subset = pe.sample_percent_copy(0.5, seed=123)
         """
         # num: number of reads allowed on a certain chromosome
         num: cython.uint
@@ -665,6 +711,18 @@ class PETrackI:
         -------
         PETrackI
             New track containing the sampled fragments.
+
+        Examples
+        --------
+        .. code-block:: python
+
+            from MACS3.Signal.PairedEndTrack import PETrackI
+
+            pe = PETrackI()
+            pe.add_loc(b"chr1", 10, 40)
+            pe.add_loc(b"chr1", 50, 90)
+            pe.finalize()
+            pe_subset = pe.sample_num_copy(samplesize=1, seed=123)
         """
         percent: cython.float
 
@@ -684,6 +742,19 @@ class PETrackI:
         -----
         Each fragment is emitted as ``chrom	start	end`` using decoded chromosome
         names and the stored integer coordinates.
+
+        Examples
+        --------
+        .. code-block:: python
+
+            import io
+            from MACS3.Signal.PairedEndTrack import PETrackI
+
+            pe = PETrackI()
+            pe.add_loc(b"chr1", 10, 40)
+            pe.finalize()
+            buf = io.StringIO()
+            pe.print_to_bed(buf)
         """
         i: cython.int
         s: cython.int
@@ -729,6 +800,18 @@ class PETrackI:
         list
             Two-element list ``[positions, values]`` with numpy arrays describing
             the pileup breakpoints and scaled coverage.
+
+        Examples
+        --------
+        .. code-block:: python
+
+            from MACS3.Signal.PairedEndTrack import PETrackI
+
+            pe = PETrackI()
+            pe.add_loc(b"chr1", 10, 40)
+            pe.add_loc(b"chr1", 50, 90)
+            pe.finalize()
+            p, v = pe.pileup_a_chromosome(b"chr1")
         """
         tmp_pileup: list
 
@@ -817,6 +900,17 @@ class PETrackI:
         -------
         bedGraphTrackI
             BedGraph track populated with per-chromosome pileup data.
+
+        Examples
+        --------
+        .. code-block:: python
+
+            from MACS3.Signal.PairedEndTrack import PETrackI
+
+            pe = PETrackI()
+            pe.add_loc(b"chr1", 10, 40)
+            pe.finalize()
+            bdg = pe.pileup_bdg()
         """
         tmp_pileup: list
         chrom: bytes
@@ -856,6 +950,18 @@ class PETrackI:
             List of dictionaries mirroring ``mapping`` where each dictionary maps
             chromosome names to pileup arrays returned by
             :func:`pileup_from_LR_hmmratac`.
+
+        Examples
+        --------
+        .. code-block:: python
+
+            from MACS3.Signal.PairedEndTrack import PETrackI
+
+            pe = PETrackI()
+            pe.add_loc(b"chr1", 10, 40)
+            pe.finalize()
+            mapping = [{"short": 1.0, "mono": 0.0, "di": 0.0, "tri": 0.0}]
+            pileups = pe.pileup_bdg_hmmr(mapping)
         """
         ret_pileup: list
         chroms: set
@@ -878,6 +984,18 @@ class PETrackII:
     
     Each chromosome stores a structured array of fragment coordinates and counts
     alongside an integer-encoded barcode array to support barcode-aware analyses.
+
+    Examples
+    --------
+    .. code-block:: python
+
+        from MACS3.Signal.PairedEndTrack import PETrackII
+
+        pe = PETrackII(anno="scatac")
+        pe.add_loc(b"chr1", 10, 40, barcode=b"BC01", count=1)
+        pe.add_loc(b"chr1", 50, 90, barcode=b"BC02", count=2)
+        pe.finalize()
+        pe.set_rlengths({b"chr1": 1000})
     """
     locations = cython.declare(dict, visibility="public")
     # add another dict for storing barcode for each fragment we will
@@ -949,6 +1067,16 @@ class PETrackII:
         -----
         Barcodes are interned into integers via ``barcode_dict`` for compact storage
         and the accumulated template length is weighted by ``count``.
+
+        Examples
+        --------
+        .. code-block:: python
+
+            from MACS3.Signal.PairedEndTrack import PETrackII
+
+            pe = PETrackII()
+            pe.add_loc(b"chr1", 10, 40, barcode=b"BC01", count=1)
+            pe.add_loc(b"chr1", 50, 90, barcode=b"BC02", count=2)
         """
         i: cython.int
         # bn: the integer in barcode_dict for this barcode
@@ -1071,6 +1199,16 @@ class PETrackII:
         ------
         AssertionError
             If no fragments are present when finalizing.
+
+        Examples
+        --------
+        .. code-block:: python
+
+            from MACS3.Signal.PairedEndTrack import PETrackII
+
+            pe = PETrackII()
+            pe.add_loc(b"chr1", 10, 40, barcode=b"BC01", count=1)
+            pe.finalize()
         """
         c: bytes
         chrnames: set
@@ -1226,6 +1364,18 @@ class PETrackII:
         -------
         PETrackII
             New track restricted to the provided barcodes with metadata preserved.
+
+        Examples
+        --------
+        .. code-block:: python
+
+            from MACS3.Signal.PairedEndTrack import PETrackII
+
+            pe = PETrackII()
+            pe.add_loc(b"chr1", 10, 40, barcode=b"BC01", count=1)
+            pe.add_loc(b"chr1", 50, 90, barcode=b"BC02", count=1)
+            pe.finalize()
+            subset = pe.subset({b"BC01"})
         """
         indices: cnp.ndarray
         chrs: set

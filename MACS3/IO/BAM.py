@@ -144,7 +144,19 @@ class MDTagMissingError(Exception):
 
 @cython.cclass
 class BAIFile:
-    """In-memory representation of a BAM index (BAI) file."""
+    """In-memory representation of a BAM index (BAI) file.
+
+    Attributes:
+        filename: Path to the ``.bai`` file.
+        magic: File magic header (should be ``b"BAI\\1"``).
+        n_ref: Number of reference sequences.
+        metadata: metadata for reference sequences.
+        n_bins: Total number of bins across references.
+        n_chunks: Total number of chunks across references.
+        n_mapped: Total mapped reads.
+        n_unmapped: Total unmapped reads.
+        bins: list of bin Ids.
+    """
     filename: str               # filename
     fhd: object                 # file handler
     magic: bytes                # magic code for this file
@@ -266,12 +278,47 @@ Example of metadata: ref 0, {self.metadata[0]}
 
     @cython.ccall
     def get_chunks_by_bin(self, ref_n: cython.uint, bin_n: cython.uint) -> list:
-        """Return sorted BGZF chunks for ``bin_n`` on reference ``ref_n``."""
+        """Return sorted BGZF chunks for ``bin_n`` on reference ``ref_n``.
+
+        Args:
+            ref_n: Reference index in the BAI.
+            bin_n: Bin identifier.
+
+        Returns:
+            list: Sorted list of BGZF chunks for the bin.
+
+        Examples:
+            .. code-block:: python
+
+                from MACS3.IO.BAM import BAIFile
+                bai = BAIFile("example.bam.bai")
+                bai.open()
+                bai.read()
+                chunks = bai.get_chunks_by_bin(ref_n=0, bin_n=4681)
+        """
         return sorted(self.bins[ref_n].get(bin_n, []))
 
     @cython.ccall
     def get_chunks_by_list_of_bins(self, ref_n: cython.uint, bins: list) -> list:
-        """Return sorted chunks for the unique set of bins provided."""
+        """Return sorted chunks for the unique set of bins provided.
+
+        Args:
+            ref_n: Reference index in the BAI.
+            bins: list of bin identifiers.
+
+        Returns:
+            list: sorted list of BGZF chunks for the bins.
+
+        Examples:
+            .. code-block:: python
+
+                from MACS3.IO.BAM import BAIFile
+                bai = BAIFile("example.bam.bai")
+                bai.open()
+                bai.read()
+                bins = [4681, 4682, 585]
+                chunks = bai.get_chunks_by_list_of_bins(ref_n=0, bins=bins)
+        """
         bin_n: cython.uint
         chunks: list = []
         bin_set: set
@@ -283,12 +330,46 @@ Example of metadata: ref 0, {self.metadata[0]}
 
     @cython.ccall
     def get_metadata_by_refseq(self, ref_n: cython.uint) -> dict:
-        """Return pseudo-bin metadata for reference ``ref_n``."""
+        """Return pseudo-bin metadata for reference ``ref_n``.
+
+        Args:
+            ref_n: Reference index in the BAI.
+
+        Returns:
+            dict: Metadata for the reference.
+
+        Examples:
+            .. code-block:: python
+
+                from MACS3.IO.BAM import BAIFile
+                bai = BAIFile("example.bam.bai")
+                bai.open()
+                bai.read()
+                meta = bai.get_metadata_by_refseq(ref_n=0)
+        """
         return self.metadata[ref_n]
 
     @cython.ccall
     def get_chunks_by_region(self, ref_n: cython.uint, beg: cython.uint, end: cython.uint) -> list:
-        """Return BGZF chunks overlapping ``[beg, end)`` on reference ``ref_n``."""
+        """Return BGZF chunks overlapping ``[beg, end)`` on reference ``ref_n``.
+
+        Args:
+            ref_n: Reference index in the BAI.
+            beg: start coordinate.
+            end: end coordinate.
+
+        Returns:
+            list: Sorted list of BGZF chunks covering the region.
+
+        Examples:
+            .. code-block:: python
+
+                from MACS3.IO.BAM import BAIFile
+                bai = BAIFile("example.bam.bai")
+                bai.open()
+                bai.read()
+                chunks = bai.get_chunks_by_region(ref_n=0, beg=1_000_000, end=1_010_000)
+        """
         bins: list
         chunks: list
 
@@ -298,7 +379,25 @@ Example of metadata: ref 0, {self.metadata[0]}
 
     @cython.ccall
     def get_chunks_by_list_of_regions(self, ref_n: cython.uint, regions: list) -> list:
-        """Return BGZF chunks overlapping any region in ``regions``."""
+        """Return BGZF chunks overlapping any region in ``regions``.
+
+        Args:
+            ref_n: Reference index in the BAI.
+            regions: Iterable of ``(beg, end)`` tuples.
+
+        Returns:
+            list: Sorted list of BGZF chunk tuples covering the regions.
+
+        Examples:
+            .. code-block:: python
+
+                from MACS3.IO.BAM import BAIFile
+                bai = BAIFile("example.bam.bai")
+                bai.open()
+                bai.read()
+                regions = [(1_000, 2_000), (50_000, 55_000)]
+                chunks = bai.get_chunks_by_list_of_regions(ref_n=0, regions=regions)
+        """
         i: int
         temp_bins: list
         bins: list = []
@@ -314,7 +413,25 @@ Example of metadata: ref 0, {self.metadata[0]}
 
     @cython.ccall
     def get_coffset_by_region(self, ref_n: cython.uint, beg: cython.uint, end: cython.uint) -> cython.ulong:
-        """Return the BGZF compressed offset for the leftmost overlapping block."""
+        """Return the BGZF compressed offset for the leftmost overlapping block.
+
+        Args:
+            ref_n: Reference index in the BAI.
+            beg: start coordinate.
+            end: end coordinate.
+
+        Returns:
+            int: Compressed BGZF block offset, or 0 if no chunks overlap.
+
+        Examples:
+            .. code-block:: python
+
+                from MACS3.IO.BAM import BAIFile
+                bai = BAIFile("example.bam.bai")
+                bai.open()
+                bai.read()
+                coffset = bai.get_coffset_by_region(ref_n=0, beg=1_000_000, end=1_010_000)
+        """
         voffset_tmp: cython.ulong
         coffset_tmp: cython.ulong
         chunks: list
@@ -334,7 +451,25 @@ Example of metadata: ref 0, {self.metadata[0]}
 
     @cython.ccall
     def get_coffsets_by_list_of_regions(self, ref_n: cython.uint, regions: list) -> cython.ulong:
-        """Return compressed offsets for the leftmost block of each region."""
+        """Return compressed offsets for the leftmost block of each region.
+
+        Args:
+            ref_n: Reference index in the BAI.
+            regions: list of regions.
+
+        Returns:
+            list: Compressed offsets for each region, in input order.
+
+        Examples:
+            .. code-block:: python
+
+                from MACS3.IO.BAM import BAIFile
+                bai = BAIFile("example.bam.bai")
+                bai.open()
+                bai.read()
+                regions = [(1_000, 2_000), (50_000, 55_000)]
+                coffsets = bai.get_coffsets_by_list_of_regions(ref_n=0, regions=regions)
+        """
         beg: cython.uint
         end: cython.uint
         i: cython.int
@@ -357,6 +492,17 @@ class BAMaccessor:
     The accessor reads headers via gzip for compatibility, but seeks
     directly to BGZF blocks when fetching alignments for specific
     regions.
+
+    Attributes:
+        bam_filename: Path to the BAM file.
+        bai_filename: Path to ``.bai`` file.
+        bamfile: BAM file handler "rb" mode.
+        baifile: BAI file handler.
+        references: Reference/chromosome names in BAM order.
+        rlengths: Lengths of reference/chromosomes.
+        bgzf_block_cache: Cache of decompressed bgzf_block.
+        coffset_cache: coffset of the cached bgzf_block.
+        noffset_cache: coffset of the next block of the cached bgzf_block.
     """
     # all private
     bam_filename: str           # BAM filename
@@ -392,7 +538,11 @@ class BAMaccessor:
 
     @cython.ccall
     def close(self):
-        """Close the underlying BAM stream."""
+        """Close the underlying BAM stream.
+
+        Returns:
+            None
+        """
         self.bamfile.close()
 
     @cython.cfunc
@@ -457,12 +607,20 @@ class BAMaccessor:
 
     @cython.ccall
     def get_chromosomes(self) -> list:
-        """Return reference names in header order."""
+        """Return reference names in header order.
+
+        Returns:
+            list: Reference/chromosome.
+        """
         return self.references
 
     @cython.ccall
     def get_rlengths(self) -> dict:
-        """Return reference lengths keyed by reference name."""
+        """Return reference lengths keyed by reference name.
+
+        Returns:
+            dict: Mapping of reference name to length.
+        """
         return self.rlengths
 
     @cython.ccall
@@ -485,13 +643,24 @@ class BAMaccessor:
 
     @cython.ccall
     def __seek(self, offset: cython.ulong) -> bool:
-        """Seek to a compressed BGZF block offset within the BAM file."""
+        """Seek to a compressed BGZF block offset within the BAM file.
+
+        Args:
+            offset: Compressed BGZF block offset.
+
+        Returns:
+            bool: ``True`` after seeking.
+        """
         self.bamfile.seek(offset, 0)
         return True
 
     @cython.ccall
     def __retrieve_cdata_from_bgzf_block(self) -> bool:
-        """Decompress the next BGZF block and cache the uncompressed payload."""
+        """Decompress the next BGZF block and cache the uncompressed payload.
+
+        Returns:
+            bool: ``True`` after updating the cache.
+        """
         xlen: cython.ushort
         bsize: cython.ushort
         extra: bytes

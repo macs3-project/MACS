@@ -60,7 +60,21 @@ def subpeak_letters(i: cython.int) -> str:
 
 @cython.cclass
 class PeakContent:
-    """Represent a narrow peak and its derived statistics."""
+    """Represent a narrow peak and its derived statistics.
+
+    Attributes:
+        chrom: Chromosome name (bytes).
+        start: 0-based inclusive start coordinate.
+        end: 0-based exclusive end coordinate.
+        length: Peak length in base pairs.
+        summit: 0-based summit position.
+        score: Peak score reported by MACS3.
+        pileup: Tag pileup at the summit.
+        pscore: ``-log10(pvalue)`` at the summit.
+        fc: Fold enrichment at the summit.
+        qscore: ``-log10(qvalue)`` at the summit.
+        name: Optional peak identifier.
+    """
     chrom: bytes
     start: cython.int
     end: cython.int
@@ -210,7 +224,14 @@ class PeakContent:
 
 @cython.cclass
 class PeakIO:
-    """Manage in-memory collections of narrow peak intervals."""
+    """Manage in-memory collections of narrow peak intervals.
+
+    Attributes:
+        peaks: Dictionary storing peak contents.
+        CO_sorted: Whether peaks have been coordinate-sorted.
+        total: Total number of peaks.
+        name: Collection name used in output.
+    """
     # dictionary storing peak contents
     peaks = cython.declare(dict, visibility="public")
     # whether peaks have been sorted by coordinations
@@ -252,6 +273,13 @@ class PeakIO:
             fold_change: Fold enrichment relative to control.
             qscore: ``-log10(qvalue)`` score.
             name: Optional peak identifier.
+
+        Examples:
+            .. code-block:: python
+
+                from MACS3.IO.PeakIO import PeakIO
+                peaks = PeakIO()
+                peaks.add(b"chr1", 100, 200, summit=150, peak_score=10.0)
         """
         if not self.peaks.has_key(chromosome):
             self.peaks[chromosome] = []
@@ -277,6 +305,14 @@ class PeakIO:
         Args:
             chromosome: Chromosome name under which to store the peak.
             peakcontent: Peak record to append.
+
+        Examples:
+            .. code-block:: python
+
+                from MACS3.IO.PeakIO import PeakIO, PeakContent
+                peaks = PeakIO()
+                peak = PeakContent(b"chr1", 100, 200, 150, 10.0, 5.0, 3.0, 2.0, 1.0)
+                peaks.add_PeakContent(b"chr1", peak)
         """
         if not self.peaks.has_key(chromosome):
             self.peaks[chromosome] = []
@@ -293,6 +329,12 @@ class PeakIO:
 
         Returns:
             list: Peaks associated with ``chrom``.
+
+        Examples:
+            .. code-block:: python
+
+                peaks = PeakIO()
+                chrom_peaks = peaks.get_data_from_chrom(b"chr1")
         """
         if not self.peaks.has_key(chrom):
             self.peaks[chrom] = []
@@ -303,6 +345,12 @@ class PeakIO:
 
         Returns:
             set: Unique chromosome names.
+
+        Examples:
+            .. code-block:: python
+
+                peaks = PeakIO()
+                names = peaks.get_chr_names()
         """
         return set(self.peaks.keys())
 
@@ -331,6 +379,11 @@ class PeakIO:
 
         Returns:
             PeakIO: Fresh instance populated with sampled peaks.
+
+        Examples:
+            .. code-block:: python
+
+                sampled = peaks.randomly_pick(100, seed=42)
         """
         all_pc: list
         chrs: list
@@ -603,6 +656,12 @@ class PeakIO:
             description: Track description for optional header line.
             score_column: Peak attribute to emit as the score field.
             trackline: Whether to emit a UCSC ``track`` header line.
+
+        Examples:
+            .. code-block:: python
+
+                with open("peaks.bed", "w") as f:
+                    peaks.write_to_bed(f)
         """
         return self._to_bed(name_prefix=name_prefix,
                             name=name,
@@ -626,6 +685,12 @@ class PeakIO:
             description: Track description for optional header line.
             score_column: Peak attribute to emit as the score field.
             trackline: Whether to emit a UCSC ``track`` header line.
+
+        Examples:
+            .. code-block:: python
+
+                with open("summits.bed", "w") as f:
+                    peaks.write_to_summit_bed(f)
         """
         return self._to_summits_bed(name_prefix=name_prefix, name=name,
                                     description=description, score_column=score_column,
@@ -644,6 +709,12 @@ class PeakIO:
             name: Dataset label interpolated into ``name_prefix``.
             score_column: Peak attribute mapped to the narrowPeak score field.
             trackline: Whether to emit a UCSC ``track`` header.
+
+        Examples:
+            .. code-block:: python
+
+                with open("peaks.narrowPeak", "w") as f:
+                    peaks.write_to_narrowPeak(f)
         """
         n_peak: cython.int
         chrom: bytes
@@ -709,6 +780,12 @@ class PeakIO:
             ofhd: Writable file-like object.
             name_prefix: Template used to build peak identifiers.
             name: Dataset label interpolated into ``name_prefix``.
+
+        Examples:
+            .. code-block:: python
+
+                with open("peaks.xls", "w") as f:
+                    peaks.write_to_xls(f)
         """
         peakprefix: bytes
         chrs: list
@@ -917,7 +994,12 @@ class PeakIO:
 
 @cython.cclass
 class RegionIO:
-    """Helper for storing and manipulating simple genomic regions."""
+    """Helper for storing and manipulating simple genomic regions.
+
+    Attributes:
+        regions: Mapping of chromosome name to a list of ``(start, end)`` tuples.
+        __flag_sorted: Whether per-chromosome regions are sorted.
+    """
     regions: dict
     __flag_sorted: bool
 
@@ -928,7 +1010,14 @@ class RegionIO:
 
     @cython.ccall
     def add_loc(self, chrom: bytes, start: cython.int, end: cython.int):
-        """Append a new ``(start, end)`` interval for ``chrom``."""
+        """Append a new ``(start, end)`` interval for ``chrom``.
+
+        Examples:
+            .. code-block:: python
+
+                regions = RegionIO()
+                regions.add_loc(b"chr1", 100, 200)
+        """
         if self.regions.has_key(chrom):
             self.regions[chrom].append((start, end))
         else:
@@ -938,7 +1027,7 @@ class RegionIO:
 
     @cython.ccall
     def sort(self):
-        """Sort regions for each chromosome by their start coordinate."""
+        """Sort regions for each chromosome by their start coordinate. """
         chrom: bytes
 
         for chrom in sorted(list(self.regions.keys())):
@@ -994,7 +1083,14 @@ class RegionIO:
 
     @cython.ccall
     def write_to_bed(self, fhd):
-        """Emit regions in BED format to the provided file-like object."""
+        """Emit regions in BED format to the provided file-like object.
+
+        Examples:
+            .. code-block:: python
+
+                with open("regions.bed", "w") as f:
+                    regions.write_to_bed(f)
+        """
         i: cython.int
         chrom: bytes
         chrs: list
@@ -1097,6 +1193,8 @@ class BroadPeakContent:
 class BroadPeakIO:
     """IO for broad peak information.
 
+    Attributes:
+        peaks: Mapping of chromosome name to :class:`BroadPeakContent` list.
     """
     peaks = cython.declare(dict, visibility="public")
 
@@ -1137,6 +1235,14 @@ class BroadPeakIO:
             fold_change: Median fold-change value.
             qscore: Median ``-log10(qvalue)``.
             name: Optional region identifier.
+
+        Examples:
+            .. code-block:: python
+
+                from MACS3.IO.PeakIO import BroadPeakIO
+                peaks = BroadPeakIO()
+                peaks.add(b"chr1", 100, 500, score=10.0, blockNum=1,
+                          blockSizes=b"400", blockStarts=b"0",...)
         """
         if not self.peaks.has_key(chromosome):
             self.peaks[chromosome] = []
@@ -1156,7 +1262,10 @@ class BroadPeakIO:
 
     @cython.ccall
     def filter_pscore(self, pscore_cut: cython.float):
-        """Retain broad peaks with ``-log10(pvalue)`` ≥ ``pscore_cut``."""
+        """Retain broad peaks with ``-log10(pvalue)`` ≥ ``pscore_cut``.
+
+        Args:
+            pscore_cut: Inclusive lower bound for ``-log10(pvalue)``."""
         chrom: bytes
         peaks: dict
         new_peaks: dict
@@ -1172,7 +1281,10 @@ class BroadPeakIO:
 
     @cython.ccall
     def filter_qscore(self, qscore_cut: cython.float):
-        """Retain broad peaks with ``-log10(qvalue)`` ≥ ``qscore_cut``."""
+        """Retain broad peaks with ``-log10(qvalue)`` ≥ ``qscore_cut``.
+
+        Args:
+            qscore_cut: Inclusive lower bound for ``-log10(qvalue)``."""
         chrom: bytes
         peaks: dict
         new_peaks: dict
@@ -1212,7 +1324,10 @@ class BroadPeakIO:
 
     @cython.ccall
     def total(self):
-        """Return the total number of broad peaks currently stored."""
+        """Return the total number of broad peaks currently stored.
+
+        Returns:
+            int: Number of broad peaks."""
         chrom: bytes
         peaks: dict
         chrs: list
@@ -1240,6 +1355,12 @@ class BroadPeakIO:
             description: Track description for the optional header.
             score_column: Peak attribute mapped to the score column.
             trackline: Whether to emit a UCSC ``track`` header.
+
+        Examples:
+            .. code-block:: python
+
+                with open("broad.gappedPeak", "w") as f:
+                    peaks.write_to_gappedPeak(f)
         """
         chrs: list
         n_peak: cython.int = 0
@@ -1293,6 +1414,12 @@ class BroadPeakIO:
             description: Track description for the optional header.
             score_column: Peak attribute mapped to the score column.
             trackline: Whether to emit a UCSC ``track`` header.
+
+        Examples:
+            .. code-block:: python
+
+                with open("broad.bed12", "w") as f:
+                    peaks.write_to_Bed12(f)
         """
         chrs: list
         n_peak: cython.int = 0
@@ -1355,6 +1482,12 @@ class BroadPeakIO:
             description: Track description for the optional header.
             score_column: Peak attribute mapped to the score column.
             trackline: Whether to emit a UCSC ``track`` header.
+
+        Examples:
+            .. code-block:: python
+
+                with open("broad.broadPeak", "w") as f:
+                    peaks.write_to_broadPeak(f)
         """
         chrs: list
         n_peak: cython.int = 0
@@ -1399,6 +1532,12 @@ class BroadPeakIO:
             ofhd: Writable file-like object.
             name_prefix: Template used to build peak identifiers.
             name: Dataset label interpolated into ``name_prefix``.
+
+        Examples:
+            .. code-block:: python
+
+                with open("broad.xls", "w") as f:
+                    peaks.write_to_xls(f)
         """
         chrom: bytes
         chrs: list

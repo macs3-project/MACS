@@ -345,7 +345,26 @@ def find_optimal_cutoff(x: list, y: list) -> tuple:
 # ------------------------------------
 @cython.cclass
 class CallerFromAlignments:
-    """Compute pileups, scores, and peaks from FWTrack/PETrack alignments."""
+    """Compute pileups, scores, and peaks from FWTrack/PETrack alignments.
+
+    Attributes:
+        treat: Treatment track (FWTrack or PETrackI/PETrackII).
+        ctrl: Control track (FWTrack or PETrackI/PETrackII).
+        d: Fragment extension size for treatment (unused in PE mode).
+        ctrl_d_s: Fragment extension size for control.
+        treat_scaling_factor: Scaling factor for treatment.
+        ctrl_scaling_factor_s: Scaling factors for control.
+        lambda_bg: Minimum local bias to fill missing values.
+        chromosomes: Common chromosome names in treat/control.
+        pseudocount: Pseudocount used for logLR/FE/logFE calculations.
+        bedGraph_filename_prefix: Prefix for pileup/lambda bedGraph outputs.
+        end_shift: Shift applied to read ends before extension.
+        trackline: Whether to emit UCSC track lines in bedGraph outputs.
+        save_bedGraph: Whether to save pileup/lambda bedGraph files.
+        save_SPMR: Whether to save pileup normalized per million reads.
+        no_lambda_flag: Whether to ignore local lambda (use global only).
+        PE_mode: Whether treatment is paired-end.
+    """
     treat: object            # FWTrack or PETrackI/II object for ChIP
     ctrl: object             # FWTrack or PETrackI/II object for Control
 
@@ -447,7 +466,12 @@ class CallerFromAlignments:
                      to pseudocount: set 1 per million reads, it: set
                      after you normalize treat and control by million
                      reads by `change_normalizetion_method(ord('M'))`.
+        
+        Examples:
+        .. code-block:: python
 
+            from MACS3.Signal.CallPeakUnit import CallerFromAlignments
+            caller = CallerFromAlignments(treat, ctrl, d=200)
         """
         chr1: set
         chr2: set
@@ -982,14 +1006,25 @@ class CallerFromAlignments:
                    max_gap: cython.int = 50,
                    call_summits: bool = False,
                    cutoff_analysis: bool = False):
-        """Call peaks for all chromosomes. Return a PeakIO object.
+        """Call narrow peaks for all chromosomes.
 
-        scoring_function_s: symbols of functions to calculate score. 'p' for pscore, 'q' for qscore, 'f' for fold change, 's' for subtraction. for example: ['p', 'q']
-        score_cutoff_s    : cutoff values corresponding to scoring functions
-        min_length        : minimum length of peak
-        max_gap           : maximum gap of 'insignificant' regions within a peak. Note, for PE_mode, max_gap and max_length are both as: set fragment length.
-        call_summits      : boolean. Whether or not call sub-peaks.
-        save_bedGraph     : whether or not to save pileup and control into a bedGraph file
+        Args:
+            scoring_function_symbols: Symbols for score functions.
+                Use ``'p'`` (pscore), ``'q'`` (qscore), ``'f'`` (fold change),
+                or ``'s'`` (subtraction). Example: ``['p', 'q']``.
+            score_cutoff_s: Cutoff values corresponding to ``scoring_function_symbols``.
+            min_length: Minimum peak length.
+            max_gap: Maximum gap of insignificant regions within a peak.
+            call_summits: Whether to call sub-peaks (summits).
+            cutoff_analysis: Whether to compute cutoff-vs-peak metrics.
+
+        Returns:
+            PeakIO: Collection of called peaks.
+
+        Examples:
+            .. code-block:: python
+
+                peaks = caller.call_peaks(['p'], [5.0], min_length=200)
         """
         chrom: bytes
         tmp_bytes: bytes
@@ -1719,26 +1754,24 @@ class CallerFromAlignments:
         1, and link them using the gap above level 2 cutoff with a
         maximum length of lvl2_max_gap.
 
-        scoring_function_s: symbols of functions to calculate
-        score. 'p' for pscore, 'q' for qscore, 'f' for fold change,
-        's' for subtraction. for example: ['p', 'q']
+        Args:
+            scoring_function_symbols: Symbols for score functions.
+                Use ``'p'`` (pscore), ``'q'`` (qscore), ``'f'`` (fold change),
+                or ``'s'`` (subtraction). Example: ``['p', 'q']``.
+            lvl1_cutoff_s: Cutoffs for highly enriched regions.
+            lvl2_cutoff_s: Cutoffs for linkage regions.
+            min_length: Minimum peak length.
+            lvl1_max_gap: Maximum gap to merge nearby peaks.
+            lvl2_max_gap: Maximum length of linkage regions.
+            cutoff_analysis: Whether to compute cutoff-vs-peak metrics.
 
-        lvl1_cutoff_s: of: list cutoffs at highly enriched regions,
-        corresponding to scoring functions.
+        Returns:
+            tuple: ``(PeakIO, BroadPeakIO)`` for level-1 peaks and broad regions.
 
-        lvl2_cutoff_s: of: list cutoffs at less enriched regions,
-        corresponding to scoring functions.
+        Examples:
+            .. code-block:: python
 
-        min_length :    minimum peak length, default 200.
-
-        lvl1_max_gap : maximum gap to merge nearby enriched peaks,
-        default 50.
-
-        lvl2_max_gap   :  maximum length of linkage regions, default 400.
-
-        Return both general PeakIO for: object highly enriched regions
-        and gapped broad regions in BroadPeakIO.
-
+                lvl1, broad = caller.call_broadpeaks(['p'], [5.0], [2.0])
         """
         i: cython.int
         j: cython.int

@@ -5,3 +5,4 @@ MACS3.IO.BedGraphIO module
    :members:
    :undoc-members:
    :show-inheritance:
+   :exclude-members: bool, atof, atoi, bedGraph_filename, data
