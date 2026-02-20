@@ -12,6 +12,16 @@ from unittest.mock import MagicMock
 # a source checkout instead of an installed wheel.
 sys.path.insert(0, os.path.abspath('../..'))
 
+class _CythonType:
+    """Minimal stub that behaves like a Cython type at runtime."""
+
+    def __getitem__(self, _):
+        return self
+
+    def __call__(self, *args, **kwargs):
+        return None
+
+
 try:
     import cython  # noqa: F401
 except ImportError:  # pragma: no cover - only used in docs builds
@@ -21,7 +31,7 @@ except ImportError:  # pragma: no cover - only used in docs builds
     for _name in ("cclass", "ccall", "cfunc", "locals", "returns"):
         setattr(cython, _name, _decorator)
     for _name in ("pointer", "const", "uchar", "ushort", "int", "long"):
-        setattr(cython, _name, object())
+        setattr(cython, _name, _CythonType())
     cython.declare = lambda *args, **kwargs: None
 
 if not hasattr(cython, 'bytes'):
@@ -30,8 +40,10 @@ if not hasattr(cython, 'tuple'):
     cython.tuple = tuple
 if not hasattr(cython, 'list'):
     cython.list = list
-if not hasattr(cython, 'const'):
-    cython.const = object()
+_cython_type_attrs = ("pointer", "const", "uchar", "ushort", "int", "long")
+for _name in _cython_type_attrs:
+    if not hasattr(cython, _name):
+        setattr(cython, _name, _CythonType())
 
 class _CImportStub(ModuleType):
     def __getattr__(self, name):
