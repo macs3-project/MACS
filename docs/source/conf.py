@@ -109,7 +109,7 @@ extensions = [
 autosummary_generate = True
 
 autodoc_mock_imports = ["scipy", "cykhash", "scikit-learn", "hmmlearn"]
-
+autodoc_typehints = "None"
 myst_enable_extensions = [
     "dollarmath",
     "amsmath",
