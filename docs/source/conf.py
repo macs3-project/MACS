@@ -97,10 +97,10 @@ release = '3.0.4'
 
 extensions = [
     'myst_parser',
-    'sphinx.ext.autodoc',
+ #   'sphinx.ext.autodoc',
     "sphinx.ext.autosummary",
     "sphinx.ext.napoleon",
-    "sphinx_autodoc_typehints",
+  #  "sphinx_autodoc_typehints",
     #'sphinx.ext.viewcode',
     'sphinx.ext.mathjax',
     'sphinx.ext.githubpages'
@@ -109,7 +109,8 @@ extensions = [
 autosummary_generate = True
 
 autodoc_mock_imports = ["scipy", "cykhash", "scikit-learn", "hmmlearn"]
-autodoc_typehints = "None"
+autodoc_typehints = "none"
+
 myst_enable_extensions = [
     "dollarmath",
     "amsmath",
