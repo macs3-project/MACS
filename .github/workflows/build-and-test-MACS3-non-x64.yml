@@ -39,7 +39,7 @@ jobs:
         id: build
         with:
           arch: ${{ matrix.arch }}
-          distro: ubuntu-24.04
+          distro: ubuntu24.04
 
           githubToken: ${{ github.token }}
 
