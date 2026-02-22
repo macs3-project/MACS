@@ -77,10 +77,19 @@ def run(o_options):
 
         if options.bothdirection:
             info("# Pileup alignment file, extend each read towards up/downstream direction with %d bps" % options.extsize)
-            pileup_and_write_se(treat, outfile.encode(), options.extsize * 2, 1, directional=False, halfextension=False)
+            pileup_and_write_se(treat, outfile.encode(), 
+                                options.extsize * 2, 
+                                1, 
+                                directional=False, 
+                                halfextension=False)
         else:
             info("# Pileup alignment file, extend each read towards downstream direction with %d bps" % options.extsize)
-            pileup_and_write_se(treat, outfile.encode(), options.extsize, 1, directional=True, halfextension=False)
+            pileup_and_write_se(treat, 
+                                outfile.encode(), 
+                                options.extsize, 
+                                1, 
+                                directional=True, 
+                                halfextension=False)
 
     info("# Done! Check %s" % options.outputfile)
 

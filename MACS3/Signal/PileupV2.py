@@ -46,11 +46,10 @@ under the terms of the BSD License (see the file LICENSE included with
 the distribution).
 """
 # ------------------------------------
-from turtle import mode
-from weakref import ref
-import numpy as np
 import cython
 import cython.cimports.numpy as cnp
+import numpy as np
+from typing import Callable
 
 # ------------------------------------
 # from cython.cimports.libc.stdlib import malloc, free, qsort
@@ -72,8 +71,107 @@ def mapping_function_always_1(L: cython.int, R: cython.int) -> cython.float:
     return 1.0
 
 
+@cython.boundscheck(False)
+@cython.wraparound(False)
 @cython.cfunc
-def clean_up_ndarray(x: cnp.ndarray):
+def _is_sorted_int32(arr: cnp.ndarray) -> cython.bint:
+    """Return True if 1D int32 array is non-decreasing."""
+    if arr.ndim != 1 or arr.dtype != np.int32:
+        return False
+    i: cython.Py_ssize_t
+    n: cython.Py_ssize_t = arr.shape[0] - 1
+    p: cython.pointer(cython.int) = cython.cast(cython.pointer(cython.int), arr.data)
+    for i in range(n):
+        if p[0] > p[1]:
+            return False
+        p += 1
+    return True
+
+@cython.cfunc
+def _pileup_from_pv_numpy(positions_np: cnp.ndarray,
+                          deltas_np: cnp.ndarray,
+                          assume_sorted: cython.bint = False) -> cnp.ndarray:
+    """Pure NumPy pileup helper."""
+    if isinstance(positions_np, np.ndarray) and positions_np.dtype == np.int32 and positions_np.ndim == 1:
+        positions_np_array: np.ndarray = positions_np
+    else:
+        positions_np_array = np.asarray(positions_np, dtype=np.int32)
+
+    if isinstance(deltas_np, np.ndarray) and deltas_np.dtype == np.float32 and deltas_np.ndim == 1:
+        deltas_np_array: np.ndarray = deltas_np
+    else:
+        deltas_np_array = np.asarray(deltas_np, dtype=np.float32)
+    if positions_np_array.size == 0:
+        return np.zeros(shape=0, dtype=[("p", "i4"), ("v", "f4")])
+
+    if assume_sorted:
+        p_sorted: np.ndarray = positions_np_array
+        d_sorted: np.ndarray = deltas_np_array.astype(np.float64, copy=False)
+    else:
+        order: np.ndarray = np.argsort(positions_np_array, kind="quicksort")
+        p_sorted = positions_np_array[order]
+        d_sorted = deltas_np_array[order].astype(np.float64, copy=False)
+
+    uniq_pos: np.ndarray
+    idx: np.ndarray
+    uniq_pos, idx = np.unique(p_sorted, return_index=True)
+    summed: np.ndarray = np.add.reduceat(d_sorted, idx)  # float64 accumulation
+    if summed.size:
+        exclusive: np.ndarray = np.empty_like(summed, dtype=np.float64)
+        exclusive[0] = 0.0
+        np.cumsum(summed[:-1], dtype=np.float64, out=exclusive[1:])
+    else:
+        exclusive = summed
+
+    pos_np: np.ndarray = uniq_pos.astype(np.int32, copy=False)
+    val_np: np.ndarray = exclusive
+
+    if pos_np.size > 1:
+        changes: np.ndarray = np.empty_like(val_np, dtype=bool)
+        changes[0] = False
+        changes[1:] = val_np[1:] != val_np[:-1]
+        run_ends: np.ndarray = np.nonzero(changes)[0]
+        run_ends = np.concatenate((run_ends, np.array([val_np.size], dtype=run_ends.dtype)))
+        last_idx: np.ndarray = run_ends - 1
+        pos_np = pos_np[last_idx]
+        val_np = val_np[last_idx]
+
+    if pos_np.size and pos_np[0] == 0 and val_np[0] == 0:
+        pos_np = pos_np[1:]
+        val_np = val_np[1:]
+
+    ret: np.ndarray = np.empty(pos_np.shape[0], dtype=[("p", "i4"), ("v", "f4")])
+    ret["p"] = pos_np
+    ret["v"] = val_np.astype(np.float32, copy=False)
+    return ret
+
+@cython.cfunc
+def _pileup_from_pv(positions: cnp.ndarray,
+                    deltas: cnp.ndarray,
+                    assume_sorted: cython.bint = False) -> cnp.ndarray:
+    """Wrapper to run pileup in NumPy."""
+    local_assume_sorted: cython.bint = assume_sorted
+    if not local_assume_sorted:
+        local_assume_sorted = _is_sorted_int32(positions)
+    return _pileup_from_pv_numpy(positions, deltas, local_assume_sorted)
+
+@cython.cfunc
+def _weights_from_mapping(L: np.ndarray,
+                          R: np.ndarray,
+                          mapping_func = None) -> cnp.ndarray:
+    weights: np.ndarray
+    if mapping_func is None:
+        mapping_func = mapping_function_always_1
+    if mapping_func is mapping_function_always_1:
+        return np.ones(L.shape[0], dtype=np.float32)
+    weights = np.empty(L.shape[0], dtype=np.float32)
+    for i in range(L.shape[0]):
+        weights[i] = mapping_func(int(L[i]), int(R[i]))
+    return weights
+
+
+@cython.cfunc
+def clean_up_ndarray(x: cnp.ndarray) -> cython.void:
     """ Clean up numpy array in two steps
     """
     i: cython.long
@@ -85,7 +183,7 @@ def clean_up_ndarray(x: cnp.ndarray):
 
 @cython.cfunc
 def make_PV_from_LR(LR_array: cnp.ndarray,
-                    mapping_func=mapping_function_always_1) -> cnp.ndarray:
+                    mapping_func = mapping_function_always_1) -> cnp.ndarray:
     """Make sorted PV array from a LR array for certain chromosome in a
     PETrackI object. The V/weight will be assigned as
     `mapping_func( L, R )` or simply 1 if mapping_func is the default.
@@ -116,7 +214,7 @@ def make_PV_from_LR(LR_array: cnp.ndarray,
 
 @cython.cfunc
 def make_PV_from_LRC(LRC_array: cnp.ndarray,
-                     mapping_func=mapping_function_always_1) -> cnp.ndarray:
+                     mapping_func = mapping_function_always_1) -> cnp.ndarray:
     """Make sorted PV array from a LR array for certain chromosome in a
     PETrackII object. The V/weight will be assigned as
     `mapping_func( L, R )` or simply 1 if mapping_func is the default.
@@ -147,7 +245,8 @@ def make_PV_from_LRC(LRC_array: cnp.ndarray,
 
 
 @cython.cfunc
-def make_PV_from_PN(P_array: cnp.ndarray, N_array: cnp.ndarray,
+def make_PV_from_PN(P_array: cnp.ndarray,
+                    N_array: cnp.ndarray,
                     extsize: cython.int) -> cnp.ndarray:
     """Make sorted PV array from two arrays for certain chromosome in
     a FWTrack object. P_array is for the 5' end positions in plus
@@ -242,98 +341,79 @@ def pileup_PV(PV_array: cnp.ndarray) -> cnp.ndarray:
 @cython.ccall
 def pileup_from_LR_hmmratac(LR_array: cnp.ndarray,
                             mapping_dict: dict) -> cnp.ndarray:
-    # this function is specifically designed for piling up fragments
-    # for `hmmratac`.
-    #
-    # As for `hmmratac`, the weight depends on the length of the
-    # fragment, aka, value of R-L. Therefore, we need a mapping_dict
-    # for mapping length to weight.
-    l_LR: cython.ulong
-    l_PV: cython.ulong
-    i: cython.ulong
-    L: cython.int
-    R: cython.int
-    PV: cnp.ndarray
-    pileup: cnp.ndarray
+    L: np.ndarray = np.asarray(LR_array["l"], dtype=np.int32)
+    R: np.ndarray = np.asarray(LR_array["r"], dtype=np.int32)
+    length: np.ndarray = R - L
+    weights: np.ndarray = np.asarray([mapping_dict[int(x)] for x in length], dtype=np.float32)
 
-    l_LR = LR_array.shape[0]
-    l_PV = 2 * l_LR
-    PV = np.zeros(shape=l_PV, dtype=[('p', 'i4'), ('v', 'f4')])
-    for i in range(l_LR):
-        (L, R) = LR_array[i]
-        PV[i*2] = (L, mapping_dict[R - L])
-        PV[i*2 + 1] = (R, -1 * mapping_dict[R - L])
-    PV.sort(order='p')
-    pileup = pileup_PV(PV)
-    clean_up_ndarray(PV)
-    return pileup
+    positions: np.ndarray = np.empty(L.shape[0] * 2, dtype=np.int32)
+    deltas: np.ndarray = np.empty(L.shape[0] * 2, dtype=np.float32)
+    positions[0::2] = L
+    positions[1::2] = R
+    deltas[0::2] = weights
+    deltas[1::2] = -weights
+    return _pileup_from_pv(positions, deltas)
 
 
 @cython.ccall
 def pileup_from_LR(LR_array: cnp.ndarray,
-                   mapping_func=mapping_function_always_1) -> cnp.ndarray:
-    """This function will pile up the ndarray containing left and
-    right positions, which is typically from PETrackI object. It's
-    useful when generating the pileup of a single chromosome is
-    needed.
+                   mapping_func = mapping_function_always_1) -> cnp.ndarray:
+    L: np.ndarray = np.asarray(LR_array["l"], dtype=np.int32)
+    R: np.ndarray = np.asarray(LR_array["r"], dtype=np.int32)
+    weights: np.ndarray = _weights_from_mapping(L, R, mapping_func)
 
-    User needs to provide a numpy array of left and right positions,
-    with dtype=[('l','i4'),('r','i4')]. User also needs to
-    provide a mapping function to map the left and right position to
-    certain weight.
-
-    """
-    PV_array: cnp.ndarray
-    pileup: cnp.ndarray
-
-    PV_array = make_PV_from_LR(LR_array, mapping_func=mapping_func)
-    pileup = pileup_PV(PV_array)
-    clean_up_ndarray(PV_array)
-    return pileup
+    positions: np.ndarray = np.empty(L.shape[0] * 2, dtype=np.int32)
+    deltas: np.ndarray = np.empty(L.shape[0] * 2, dtype=np.float32)
+    positions[0::2] = L
+    positions[1::2] = R
+    deltas[0::2] = weights
+    deltas[1::2] = -weights
+    return _pileup_from_pv(positions, deltas)
 
 
 @cython.ccall
 def pileup_from_LRC(LRC_array: cnp.ndarray,
-                    mapping_func=mapping_function_always_1) -> cnp.ndarray:
-    """This function will pile up the ndarray containing left and
-    right positions and the counts, which is typically from PETrackII
-    object which . It's useful when generating the pileup of a single
-    chromosome is needed.
+                    mapping_func = mapping_function_always_1) -> cnp.ndarray:
+    L: np.ndarray = np.asarray(LRC_array["l"], dtype=np.int32)
+    R: np.ndarray = np.asarray(LRC_array["r"], dtype=np.int32)
+    C: np.ndarray = np.asarray(LRC_array["c"], dtype=np.float32)
+    weights: np.ndarray = _weights_from_mapping(L, R, mapping_func) * C
 
-    User needs to provide a numpy array of left and right positions
-    and the counts, with
-    dtype=[('l','i4'),('r','i4'),('c','u2')]. User also needs to
-    provide a mapping function to map the left and right position to
-    certain weight.
-
-    """
-    PV_array: cnp.ndarray
-    pileup: cnp.ndarray
-
-    PV_array = make_PV_from_LRC(LRC_array, mapping_func=mapping_func)
-    pileup = pileup_PV(PV_array)
-    clean_up_ndarray(PV_array)
-    return pileup
+    positions: np.ndarray = np.empty(L.shape[0] * 2, dtype=np.int32)
+    deltas: np.ndarray = np.empty(L.shape[0] * 2, dtype=np.float32)
+    positions[0::2] = L
+    positions[1::2] = R
+    deltas[0::2] = weights
+    deltas[1::2] = -weights
+    return _pileup_from_pv(positions, deltas)
 
 
 @cython.ccall
-def pileup_from_PN(P_array: cnp.ndarray, N_array: cnp.ndarray,
+def pileup_from_PN(P_array: cnp.ndarray,
+                   N_array: cnp.ndarray,
                    extsize: cython.int) -> cnp.ndarray:
-    """This function will pile up the ndarray containing plus strand
-    (positive) and minus (negative) strand positions of all reads, which is
-    typically from FWTrackI object. It's useful when generating the
-    pileup of a single chromosome is needed.
+    P: np.ndarray = np.asarray(P_array, dtype=np.int32)
+    N: np.ndarray = np.asarray(N_array, dtype=np.int32)
+    if P.shape[0] != N.shape[0]:
+        raise ValueError("P_array and N_array must share the same length")
 
-    """
-    PV_array: cnp.ndarray
-    pileup: cnp.ndarray
+    plus_start: np.ndarray = P
+    plus_end: np.ndarray = P + extsize
+    minus_end: np.ndarray = N
+    minus_start: np.ndarray = N - extsize
 
-    PV_array = make_PV_from_PN(P_array, N_array, extsize)
-    pileup = pileup_PV(PV_array)
-    clean_up_ndarray(PV_array)
-    return pileup
+    positions: np.ndarray = np.concatenate([plus_start, plus_end, minus_start, minus_end]).astype(np.int32, copy=False)
+    deltas: np.ndarray = np.concatenate([
+        np.ones_like(plus_start, dtype=np.float32),
+        -np.ones_like(plus_end, dtype=np.float32),
+        np.ones_like(minus_start, dtype=np.float32),
+        -np.ones_like(minus_end, dtype=np.float32),
+    ])
+    return _pileup_from_pv(positions, deltas)
 
 
+@cython.boundscheck(False)
+@cython.wraparound(False)
 @cython.cfunc
 def _merge_sorted_arrays(arr1: cnp.ndarray, arr2: cnp.ndarray) -> cnp.ndarray:
     """Merge two individually sorted int32 arrays into one sorted array."""
@@ -379,6 +459,8 @@ def _merge_sorted_arrays(arr1: cnp.ndarray, arr2: cnp.ndarray) -> cnp.ndarray:
     return ret
 
 
+@cython.boundscheck(False)
+@cython.wraparound(False)
 @cython.cfunc
 def _pileup_sorted_bounds(start_poss: cnp.ndarray,
                           end_poss: cnp.ndarray,
@@ -403,8 +485,8 @@ def _pileup_sorted_bounds(start_poss: cnp.ndarray,
     start_ptr: cython.pointer(cython.int) = cython.cast(cython.pointer(cython.int), start_view.data)
     end_ptr: cython.pointer(cython.int) = cython.cast(cython.pointer(cython.int), end_view.data)
 
-    ret_p = np.zeros(l, dtype="i4")
-    ret_v = np.zeros(l, dtype="f4")
+    ret_p: np.ndarray = np.zeros(l, dtype="i4")
+    ret_v: np.ndarray = np.zeros(l, dtype="f4")
     ret_p_view: cnp.ndarray = ret_p
     ret_v_view: cnp.ndarray = ret_v
     ret_p_ptr: cython.pointer(cython.int) = cython.cast(cython.pointer(cython.int), ret_p_view.data)
@@ -464,7 +546,7 @@ def _pileup_sorted_bounds(start_poss: cnp.ndarray,
 
     ret_p.resize(I, refcheck=False)
     ret_v.resize(I, refcheck=False)
-    ret = np.empty(I, dtype=[('p', 'i4'), ('v', 'f4')])
+    ret: np.ndarray = np.empty(I, dtype=[('p', 'i4'), ('v', 'f4')])
     ret['p'] = ret_p
     ret['v'] = ret_v
     return ret
@@ -494,12 +576,12 @@ def se_all_in_one_pileup(plus_tags: cnp.ndarray,
     start_poss: cnp.ndarray
     end_poss: cnp.ndarray
     pileup: cnp.ndarray
-    start_plus = plus_tags - five_shift
-    start_minus = minus_tags - three_shift
+    start_plus: np.ndarray = plus_tags - five_shift
+    start_minus: np.ndarray = minus_tags - three_shift
     np.clip(start_plus, 0, rlength, out=start_plus)
     np.clip(start_minus, 0, rlength, out=start_minus)
-    end_plus = plus_tags + three_shift
-    end_minus = minus_tags + five_shift
+    end_plus: np.ndarray = plus_tags + three_shift
+    end_minus: np.ndarray = minus_tags + five_shift
     np.clip(end_plus, 0, rlength, out=end_plus)
     np.clip(end_minus, 0, rlength, out=end_minus)
 
@@ -542,6 +624,8 @@ def naive_quick_pileup(sorted_poss: cnp.ndarray, extension: int) -> cnp.ndarray:
     return _pileup_sorted_bounds(start_poss, end_poss, 1.0, 0.0)
 
 
+@cython.boundscheck(False)
+@cython.wraparound(False)
 @cython.ccall
 def over_two_pv_array(pv_array1: cnp.ndarray,
                       pv_array2: cnp.ndarray,
@@ -556,6 +640,7 @@ def over_two_pv_array(pv_array1: cnp.ndarray,
     ret_p: cnp.ndarray
     ret_v: cnp.ndarray
 
+    call_func: cython.object
     if func == "max":
         call_func = max
     elif func == "min":
@@ -642,10 +727,10 @@ def over_two_pv_array(pv_array1: cnp.ndarray,
 
 
 @cython.cfunc
-def __close_peak(peak_content,
-                 peaks,
+def __close_peak(peak_content: list,
+                 peaks: list,
                  max_v: cython.float,
-                 min_length: cython.int):
+                 min_length: cython.int) -> cython.void:
     """Internal function to find the summit and height."""
     tsummit: list = []
     summit: cython.int = 0
@@ -667,10 +752,11 @@ def __close_peak(peak_content,
 
 
 @cython.ccall
-def naive_call_peaks(pv_array: cnp.ndarray, min_v: cython.float,
+def naive_call_peaks(pv_array: cnp.ndarray,
+                     min_v: cython.float,
                      max_v: cython.float = 1e30,
                      max_gap: cython.int = 50,
-                     min_length: cython.int = 200):
+                     min_length: cython.int = 200) -> list:
     pre_p: cython.int
     p: cython.int
     i: cython.int
@@ -721,7 +807,7 @@ def naive_call_peaks(pv_array: cnp.ndarray, min_v: cython.float,
 @cython.cfunc
 def _write_pv_array_to_bedgraph(pv_array: cnp.ndarray,
                                 chrom,
-                                output_filename: bytes):
+                                output_filename: bytes) -> cython.void:
     chrom_str: str
     pre_p: cython.int = 0
     p: cython.int
@@ -731,7 +817,7 @@ def _write_pv_array_to_bedgraph(pv_array: cnp.ndarray,
     with open(output_filename, "a") as fh:
         for (p, v) in pv_array:
             if p > pre_p:
-                fh.write(f"{chrom_str}\t{pre_p}\t{int(p)}\t{float(v)}\n")
+                fh.write(f"{chrom_str}\t{pre_p}\t{p}\t{v}\n")
             pre_p = p
     return
 
@@ -743,7 +829,7 @@ def pileup_and_write_se(trackI,
                         scale_factor: cython.float,
                         baseline_value: float = 0.0,
                         directional: bool = True,
-                        halfextension: bool = True):
+                        halfextension: bool = True) -> cython.void:
     """Pileup a FWTrackI object and write the pileup result into a bedGraph file."""
     five_shift: cython.long
     three_shift: cython.long
@@ -797,7 +883,7 @@ def pileup_and_write_se(trackI,
 def pileup_and_write_pe(petrackI,
                         output_filename: bytes,
                         scale_factor: float = 1,
-                        baseline_value: float = 0.0):
+                        baseline_value: float = 0.0) -> cython.void:
     """Pileup a PETrackI object and write the pileup result into a bedGraph file."""
     chrlengths: dict = petrackI.get_rlengths()
     chroms: list
@@ -817,7 +903,7 @@ def pileup_and_write_pe(petrackI,
     for i in range(n_chroms):
         chrom = chroms[i]
         locs = petrackI.get_locations_by_chr(chrom)
-        pileup = pileup_from_LR(locs)
+        pileup = pileup_from_LR(locs, mapping_func=mapping_function_always_1)
         if pileup.shape[0] > 0:
             if scale_factor != 1:
                 pileup['v'] *= scale_factor
