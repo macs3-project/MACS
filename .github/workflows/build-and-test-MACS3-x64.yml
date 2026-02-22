@@ -21,24 +21,24 @@ on:
 
 jobs:
   build:
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-latest
     strategy:
       matrix:
-        python-version: ["3.9", "3.10", "3.11", "3.12", "3.13"]
+        python-version: ["3.12", "3.13", "3.14"]
         arch: ['x64']
     name: Build on x64 with Python ${{ matrix.python-version }}
     steps:
       - name: Checkout MACS
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         with:
           submodules: 'true'
       - name: Set up Python ${{ matrix.python-version }}
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@v6
         with:
           python-version: ${{ matrix.python-version }}
           architecture: ${{ matrix.arch }}
       - name: Cache pip
-        uses: actions/cache@v4
+        uses: actions/cache@v5
         with:
           # This path is specific to Ubuntu
           path: ~/.cache/pip
@@ -70,7 +70,7 @@ jobs:
         run: |
           python3 setup.py sdist
       - name: Archive sdist
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         with:
           name: sdist-${{ matrix.arch }}-${{ matrix.python-version }}
           path: |

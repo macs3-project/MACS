@@ -23,22 +23,22 @@ jobs:
   build:
     strategy:
       matrix:
-        os: [macos-13]
-        python-version: ["3.9", "3.10", "3.11", "3.12", "3.13"]
+        os: [macos-latest]
+        python-version: ["3.12", "3.13", "3.14"]
     runs-on: ${{ matrix.os }}
     name: Build on ${{ matrix.os }} with Python ${{ matrix.python-version }}
 
     steps:
       - name: Checkout MACS
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         with:
           submodules: 'true'
       - name: Set up Python ${{ matrix.python-version }}
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@v6
         with:
           python-version: ${{ matrix.python-version }}
       - name: Cache pip
-        uses: actions/cache@v4
+        uses: actions/cache@v5
         with:
           # This path is specific to Ubuntu
           path: ~/.cache/pip
@@ -76,7 +76,7 @@ jobs:
           source macs3venv/bin/activate
           python3 setup.py sdist
       - name: Archive sdist
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         with:
           name: sdist-${{ matrix.os }}-${{ matrix.python-version }}
           path: |

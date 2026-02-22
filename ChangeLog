@@ -1,44 +1,46 @@
-2025-10-30  Tao Liu  <vladimir.liu@gmail.com>
+2026-02-22  Tao Liu  <vladimir.liu@gmail.com>
 	MACS 3.0.4
 
 	* Features added
 
-	1) Now `-f FRAG` is supported in `hmmratac`. Please note that
-	since the difference in implementing the subsampling function for
-	the new class for holding fragment file, the result from
-	`hmmratac` can be slightly different between using the common
-	`BEDPE` or `BAMPE` input and using the collapsed `FRAG` input
-	file.
+	1) `hmmratac` now supports `-f FRAG`, enabling direct processing of
+	single-cell fragment files.
 
-	2) `--barcodes` and `--max-count` options are available in
-	`hmmratac`. Now we can limit the `hmmratac` peak calling in a
-	subset of barcodes and/or with a maximum count cutoff. For
-	example, if we try to call accessible regions from a subset of
-	cells in scATAC-seq dataset, we can use `--barcodes
-	celltype1_barcodes.txt --max-count 2` where the
-	`celltype1_barcodes.txt` contains the barcodes of the cells
-	assigned to celltype1 (each row is an unique barcode), and we
-	assume that any genomics position of a single cell can only be cut
-	twice (in case of haplotype).
+	Note: because FRAG uses a different internal subsampling
+	implementation from `BEDPE`/`BAMPE`, results can differ slightly
+	between collapsed `FRAG` input and standard paired-end inputs.
 
-	* Bug fixed
+	2) Added `--barcodes` and `--max-count` to `hmmratac` so peak
+	calling can be restricted to a barcode subset and/or capped by
+	fragment count.
 
-	1) Ensure `PETrackII.pileup_bdg` wraps pileup outputs with
-	`array.array` objects before passing them to `bedGraphTrackI`,
-	preventing runtime type errors when emitting bedGraph tracks from
-	FRAG inputs.
+	For example, to call accessible regions for one cell type in an
+	scATAC-seq dataset: `--barcodes celltype1_barcodes.txt --max-count
+	2`.
 
-	2) Allow zero-percent downsampling in
-	`PETrackII.sample_percent*`, preserving existing CLI behaviour for
-	scenarios where a balance target contains no fragments.
+	* Bugs fixed
 
-	3) In some cases, overflow error may be triggered in PETrackI
-	while chaning the total length of the track. Now we explicitly
-	`cast` the int32 value to ulonglong to avoid such error.
+	1) `PETrackII.pileup_bdg` now wraps pileup outputs in
+	`array.array` before passing them to `bedGraphTrackI`, preventing
+	runtime type errors when writing bedGraph tracks from FRAG inputs.
 
-	* Other
+	2) `PETrackII.sample_percent*` now correctly allows zero-percent
+	downsampling, preserving expected CLI behavior when the balance
+	target contains no fragments.
 
-	1) Cleanup of docstrings in source code and provide API documents.
+	3) Fixed an overflow path in `PETrackI` when updating total track
+	length by explicitly casting `int32` values to `ulonglong`.
+
+	4) Fixed a `pvalue_stat` issue that could yield `nan` when a
+	region with the same p-value exceeded 2e9 bp (int32 limit).
+
+	* Documentation
+
+	1) Cleaned up source-code docstrings and expanded API docs for key
+	Signal and IO modules.
+
+	2) Added a Jupyter notebook demo showing single-cell ATAC-seq
+	processing with the MACS3 API.
 
 2025-02-19  Tao Liu  <vladimir.liu@gmail.com>
 	MACS 3.0.3

@@ -22,12 +22,13 @@ jobs:
   build-and-publish:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v4  # Checks-out your repository under $GITHUB_WORKSPACE
+    - name: Checkout
+      uses: actions/checkout@v6  # Checks-out your repository under $GITHUB_WORKSPACE
       with:
         submodules: 'true'
 
     - name: Set up Python
-      uses: actions/setup-python@v5
+      uses: actions/setup-python@v6
       with:
         python-version: '3.12'  # Set up the Python version you need
         architecture: 'x64'
@@ -43,15 +44,15 @@ jobs:
 
     - name: Build Sphinx Documentation
       run: |
-        cd docs  # Change to your documentation directory if needed
+        cd docs
         make html
         cd ..
 
     - name: Setup Pages
-      uses: actions/configure-pages@v4
+      uses: actions/configure-pages@v5
 
     - name: Upload artifact
-      uses: actions/upload-pages-artifact@v3
+      uses: actions/upload-pages-artifact@v4
       with:
         # Upload entire repository
         path: './docs/build/html'

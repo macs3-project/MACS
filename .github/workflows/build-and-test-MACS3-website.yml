@@ -1,5 +1,7 @@
 name: Build and Test MACS3 website using Sphinx
 
+# This action is to test document building
+
 on: 
   push: 
     paths: 
@@ -13,18 +15,21 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - name: Checkout
-      uses: actions/checkout@v4
-
-    - name: Set up Python 3.11
-      uses: actions/setup-python@v5
+      uses: actions/checkout@v6
       with:
-        python-version: "3.11"
+        submodules: 'true'
+
+    - name: Set up Python 3.12
+      uses: actions/setup-python@v6
+      with:
+        python-version: "3.12"
           
     - name: Install dependencies
       run: |
         python3 -m pip install --upgrade pip
         python3 -m pip install sphinx myst-parser sphinx-rtd-theme sphinx-autodoc-typehints
         python3 -m pip install -r requirements.txt
+        python3 -m pip install -e .
 
     - name: Build Sphinx Documentation
       run: |
@@ -33,7 +38,7 @@ jobs:
         cd ..
 
     - name: Upload artifact
-      uses: actions/upload-pages-artifact@v3
+      uses: actions/upload-pages-artifact@v4
       with:
         # Archive and upload entire website
         path: './docs/build/html'
