@@ -34,6 +34,9 @@ jobs:
         python3 -m pip install --upgrade pip
         python3 -m pip install sphinx myst-parser sphinx-rtd-theme sphinx-autodoc-typehints
         python3 -m pip install -r requirements.txt
+        # Build/install MACS3 in editable mode so Cython extensions are
+        # available to autodoc (e.g. MACS3.IO.Parser).
+        python3 -m pip install -e .
 
     - name: Build Sphinx Documentation
       run: |
@@ -53,4 +56,3 @@ jobs:
     - name: Deploy to GitHub Pages
       id: deployment
       uses: actions/deploy-pages@v4
-
