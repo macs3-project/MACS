@@ -103,7 +103,7 @@ class HMMR_EM:
     max_fraglen: cython.int
     epsilon: cython.float  # maximum difference to call the value is converged
     maxIter: cython.int  # maximum iteration
-    jump: cython.float
+    jump: cython.float # to amplify the difference for faster convergence
     seed: cython.int            # random seed for downsampling
     converged: cython.bint      # wheter the EM is converged
     sample_percentage: cython.float
@@ -118,7 +118,7 @@ class HMMR_EM:
                  sample_percentage: cython.float = 10,
                  epsilon: cython.float = 0.05,
                  maxIter: cython.int = 20,
-                 jump: cython.float = 1.5, seed: cython.int = 12345):
+                 jump: cython.float = 0.5, seed: cython.int = 12345):
         """Initialize HMMR_EM object. The first three parameters are required.
 
         parameters:

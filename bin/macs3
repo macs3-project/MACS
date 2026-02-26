@@ -937,6 +937,10 @@ plus an extra option for the HMM model file like `macs3 hmmratac
     group_em.add_argument("--min-frag-p", dest="min_frag_p", type=float,
                           help="We will exclude the abnormal fragments that can't be assigned to any of the four signal tracks. After we use EM to find the means and stddevs of the four distributions, we will calculate the likelihood that a given fragment length fit any of the four using normal distribution. If a fragment length is not like ('not like' means the probability is lower than MIN_FRAG_P) any of short, mono, di, or tri-nuc fragment, we will exclude it while generating the four signal tracks for later HMM training and prediction. The value should be between 0 and 1. Smaller the value, more 'abnormal' fragments will be allowed. So if you want to include more fragments, make this value smaller. Default=0.001",
                           default=0.001)
+    # To amplify the difference for faster convergence
+    group_em.add_argument("--jump", dest="em_jump", type=float,
+                          help="This option will control the factor to amplify the difference between the observed and expected mean and variance values of the four distributions, then decide the expected mean and variance in the next EM step. Larger jump will lead to faster convergence but may be less stable. Default=0.5",
+                          default=0.5)
     # group for HMM
     group_hmm = argparser_hmmratac.add_argument_group("Hidden Markov Model arguments")
     #group_hmm.add_argument("-s", "--states", dest="hmm_states", type=int,
