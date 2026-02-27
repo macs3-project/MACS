@@ -34,6 +34,15 @@ jobs:
         with:
           submodules: 'true'
 
+      - name: Cache pip downloads for aarch64 job
+        uses: actions/cache@v5
+        with:
+          path: .pip-cache
+          key: ${{ runner.os }}-aarch64-pip-${{ hashFiles('requirements.txt', 'pyproject.toml') }}
+          restore-keys: |
+            ${{ runner.os }}-aarch64-pip-
+            ${{ runner.os }}-pip-
+
       - name: Set up arch and run
         uses: uraimo/run-on-arch-action@v3
         id: build
@@ -49,6 +58,8 @@ jobs:
           # Create an artifacts directory
           setup: |
             chmod a+rw ${PWD}
+            mkdir -p ${PWD}/.pip-cache
+            chmod -R a+rw ${PWD}/.pip-cache
         
           # Mount the current working directory (with checked-out codes) as /MACS3 in the container
           dockerRunArgs: |
@@ -82,15 +93,16 @@ jobs:
             cd /MACS3
 
             # pip will be upgraded
+            export PIP_CACHE_DIR=/MACS3/.pip-cache
             python3 -m pip install --upgrade pip
 
             # install dependencies
             if [ -f requirements.txt ]; then
-                python3 -m pip install -r requirements.txt;
+                python3 -m pip install --prefer-binary -r requirements.txt;
             fi
 
-            # install MACS3
-            python3 -m pip install .
+            # install MACS3 without re-installing isolated build dependencies
+            python3 -m pip install --no-build-isolation --no-deps .
 
             # output versions of installed libraries
             python3 -m pip freeze

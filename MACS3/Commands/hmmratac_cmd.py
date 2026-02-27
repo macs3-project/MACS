@@ -187,7 +187,7 @@ def run(args):
         options.info("#2 Use EM algorithm to estimate means and stddevs of fragment lengths")
         options.info("#  for mono-, di-, and tri-nucleosomal signals...")
         em_trainer = HMMR_EM(petrack, options.em_means[1:4],
-                             options.em_stddevs[1:4], seed=options.hmm_randomSeed)
+                             options.em_stddevs[1:4], seed=options.hmm_randomSeed, jump=options.em_jump)
         # the mean and stddev after EM training
         em_means = [options.em_means[0],]
         em_means.extend(em_trainer.fragMeans)
