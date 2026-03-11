@@ -38,6 +38,11 @@ from cython.cimports.libc.stdint import INT32_MAX as INT_MAX
 
 from MACS3.Utilities.Logger import logging
 
+import pandas as pd
+from scipy import sparse
+import anndata as ad
+from ncls import NCLS
+
 logger = logging.getLogger(__name__)
 debug = logger.debug
 info = logger.info
@@ -1690,7 +1695,267 @@ class PETrackII:
             selected_idx.resize(0, refcheck=False)
         self.finalize()
         return
+    
+    def _np_sort_search(self,regions):
+        # barcode mapping
+        barcode_items = sorted(self.barcode_dict.items(), key=lambda x: x[1])
+        barcodes = [b.decode() if isinstance(b, (bytes, bytearray)) else str(b) for b, _ in barcode_items]
+        barcode_id_to_row = {barcode_id: i for i, (_, barcode_id) in enumerate(barcode_items)}
+        n_cells = len(barcodes)
 
+        peak_names = []
+        peak_data = []
+        rows = []
+        columns = []
+        data = []
+
+        regions.sort()
+        peak_counter = 0
+
+        for chrom in sorted(regions.regions.keys()):
+            if chrom not in self.locations:
+                continue
+
+            regions_c = regions.regions[chrom]
+            if not regions_c:
+                continue
+
+            local_peak_indices = []
+            for (start, end) in regions_c:
+                peak_counter += 1
+                peak_names.append(f"peak_{peak_counter}")
+                local_peak_indices.append(peak_counter - 1)
+
+            peak_starts = np.array([p[0] for p in regions_c], dtype=np.int64)
+            peak_ends = np.array([p[1] for p in regions_c], dtype=np.int64)
+            local_peak_indices = np.array(local_peak_indices, dtype=np.int64)
+
+            fragment_locs = self.locations[chrom]
+            fragment_barcodes = self.barcodes[chrom]
+            if len(fragment_locs) == 0:
+                continue
+
+            for frag_idx, frag in enumerate(fragment_locs):
+                frag_start = frag[0]
+                frag_end = frag[1]
+                bc_id = int(fragment_barcodes[frag_idx])
+                row_id = barcode_id_to_row.get(bc_id, -1)
+                if row_id < 0:
+                    continue
+
+                j = np.searchsorted(peak_starts, frag_start, side='left')
+                while j < peak_starts.size and peak_starts[j] <= frag_end:
+                    if peak_ends[j] <= frag_end:
+                        rows.append(row_id)
+                        columns.append(int(local_peak_indices[j]))
+                        data.append(int(frag[2]))
+                    j += 1
+        X = sparse.coo_matrix((data, (rows, columns)), shape=(n_cells, peak_counter), dtype=np.int32).tocsr()
+        obs = pd.DataFrame(index=barcodes)
+        var = pd.DataFrame(peak_data, columns=['chrom', 'start', 'end'], index=peak_names)
+        adata = ad.AnnData(X, obs=obs, var=var)
+        return adata
+    
+    def _anndata_ncls(self, regions):
+        regions.sort()
+
+        # Barcode mapping
+        barcode_items = sorted(self.barcode_dict.items(), key=lambda x: x[1])
+        barcodes = [b.decode() if isinstance(b, (bytes, bytearray)) else str(b) for b, _ in barcode_items]
+        barcode_ids = np.array([i for _, i in barcode_items], dtype=np.int64)
+
+        n_cells = len(barcodes)
+        if n_cells == 0:
+            return ad.AnnData(X=sparse.csr_matrix((0, 0), dtype=np.int32))
+
+        id_map = np.full(barcode_ids.max() + 1, -1, dtype=np.int64)
+        id_map[barcode_ids] = np.arange(n_cells, dtype=np.int64)
+
+        # Outputs
+        peak_names = []
+        peak_data = []
+        rows = []
+        cols = []
+        data = []
+        peak_counter = 0
+
+        for chrom in sorted(regions.regions.keys()):
+            if chrom not in self.locations:
+                continue
+
+            regions_c = regions.regions[chrom]
+            if not regions_c:
+                continue
+
+            # register peaks (global)
+            local_peak_indices = []
+            chrom_str = chrom.decode() if isinstance(chrom, (bytes, bytearray)) else str(chrom)
+            for (start, end) in regions_c:
+                peak_counter += 1
+                peak_names.append(f"peak_{peak_counter}")
+                local_peak_indices.append(peak_counter - 1)
+
+            # fragments on this chromosome
+            fragment_locs = self.locations[chrom]
+            fragment_barcodes = self.barcodes[chrom]
+            if len(fragment_locs) == 0:
+                continue
+
+            frag_starts = fragment_locs['l'].astype(np.int64)
+            frag_ends = fragment_locs['r'].astype(np.int64)
+            frag_counts = fragment_locs['c'].astype(np.int64)
+            frag_bc_ids = fragment_barcodes.astype(np.int64)
+
+            frag_rows = id_map[frag_bc_ids]  # barcode -> row index
+
+            idx = np.arange(len(frag_starts), dtype=np.int64)
+            ncls = NCLS(frag_starts, frag_ends, idx)
+
+            # Query peaks: peak must be inside fragment
+            for peak_idx, (peak_start, peak_end) in enumerate(regions_c):
+                for frag_start, frag_end, frag_i in ncls.find_overlap(peak_start, peak_end):
+            # enforce peak inside fragment
+                    if frag_start <= peak_start and peak_end <= frag_end:
+                        row_id = frag_rows[frag_i]
+                        if row_id >= 0:
+                            rows.append(row_id)
+                            cols.append(local_peak_indices[peak_idx])
+                            data.append(int(frag_counts[frag_i]))
+                            
+        X = sparse.coo_matrix((data, (rows, cols)),
+                            shape=(n_cells, peak_counter),
+                            dtype=np.int32).tocsr()
+
+        obs = pd.DataFrame(index=barcodes)
+        var = pd.DataFrame(peak_data, columns=["chrom", "start", "end"], index=peak_names)
+        adata = ad.AnnData(X=X, obs=obs, var=var)
+        return adata
+
+    def _two_pointer_sweep(self,regions):
+
+        # # array of locataions and counts
+        # fragment_locs = self.locations[chrom][:self.size[chrom]]
+        # # arrray of barcodes
+        # fragment_barcodes = self.barcodes[chrom][:self.size[chrom]]
+
+        peak_names = []
+        peak_data = []
+
+        rows = [] #barcodes index
+        columns = [] #peaks index
+        data = [] # count data int
+
+        barcode_items = sorted(self.barcode_dict.items(), key=lambda x: x[1])
+        barcodes = [b.decode() if isinstance(b, (bytes, bytearray)) else str(b) for b, _ in barcode_items]
+        barcode_id_to_row = {barcode_id: i for i, (_, barcode_id) in enumerate(barcode_items)}
+        n_cells = len(barcodes)
+
+        regions.sort()
+        peak_counter = 0
+        for chrom in regions.regions.keys():
+            size = self.size[chrom]
+            locs = self.locations[chrom]
+            #barcodes = self.barcodes
+            regions_c = regions.regions[chrom]
+            local_peak = []
+            ### regions empty skip
+            for (start, end) in regions_c:
+                peak_counter += 1
+                peak_names.append(f"peak_{peak_counter}")
+                peak_data.append((chrom.decode(),start,end))
+                local_peak.append(peak_counter - 1)
+
+            fragment_locs = self.locations[chrom][:self.size[chrom]]
+            fragment_barcodes = self.barcodes[chrom][:self.size[chrom]]
+
+            if len(fragment_locs) == 0:
+                continue
+
+            frag_idx = 0
+            local_peak_idx = 0
+            frag_iter = iter(fragment_locs).__next__ # fragment
+            peak_iter = iter(regions_c).__next__    # peaks
+            frag_len = len(fragment_locs)
+            peak_len = len(regions_c)
+            frag = frag_iter() # (l,r,c)
+            remaining_frag_len = frag_len - 1
+            peak = peak_iter() # (start, end)
+            remaining_peak_len = peak_len - 1
+
+            # inside two_pointer_sweep, replace only the while-loop block with this
+
+            while True:
+                frag_start, frag_end = frag[0], frag[1]
+                peak_start, peak_end = peak[0], peak[1]
+
+                # peak inside fragment
+                if frag_start <= peak_start and peak_end <= frag_end:
+                    bc_id = int(fragment_barcodes[frag_idx])
+                    row_id = barcode_id_to_row.get(bc_id, -1)
+                    if row_id >= 0:
+                        rows.append(int(row_id))
+                        columns.append(local_peak[local_peak_idx])
+                        data.append(int(frag[2]))
+
+                    # move to next peak (same fragment may contain multiple peaks)
+                    if remaining_peak_len > 0:
+                        peak = peak_iter()
+                        remaining_peak_len -= 1
+                        local_peak_idx += 1
+                        continue
+                    else:
+                        break
+
+                # if fragment ends before peak starts -> advance fragment
+                if frag_end < peak_start:
+                    remaining_frag_len -= 1
+                    if remaining_frag_len >= 0:
+                        frag = frag_iter()
+                        frag_idx += 1
+                    else:
+                        break
+                else:
+                    # peak starts before fragment ends but not contained -> advance peak
+                    if remaining_peak_len:
+                        peak = peak_iter()
+                        remaining_peak_len -= 1
+                        local_peak_idx += 1
+                    else:
+                        break
+
+        n_peaks = peak_counter
+        x = sparse.coo_matrix((data,(rows,columns)),shape=(n_cells,n_peaks)).tocsr()
+        obs = pd.DataFrame(index=barcodes)
+        #obs['n_fragments_in_peaks'] = np.asarray(x.sum(axis=1)).ravel()
+        var = pd.DataFrame(peak_data, columns=['chrom', 'start', 'end'], index=peak_names)
+        adata = ad.AnnData(X=x, obs=obs, var=var)
+        return adata
+    
+    def return_anndata(self, regions, method = "ncls"):
+        """
+        Build barcode × peak AnnData using the selected method.
+
+        Parameters
+        ----------
+        regions : MACS3.Signal.Region.Regions
+            Sorted region collection whose intervals should be excluded.
+        method : Method to use
+        - "ncls"          
+        - "np_sort_search"
+        - "two_pointer" 
+        
+        """
+        if method == "ncls":
+            print("using ncls")
+            adata = self._anndata_ncls(regions)
+        elif method == 'numpy' :
+            adata = self._np_sort_search(regions)
+        elif method == 'two_pointer':
+            adata = self._two_pointer_sweep(regions)
+        else:
+            raise ValueError(f"Unknown method : {method}\n should be one of ncls, numpy, two_pointer")
+        return adata
+        
     @cython.ccall
     def sample_percent(self,
                        percent: cython.float,

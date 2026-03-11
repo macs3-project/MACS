@@ -6,3 +6,6 @@ hmmlearn>=0.3.2
 cykhash>=2.0,<3.0 
 pytest>=7.0
 setuptools>=68.0
+pandas
+anndata
+ncls
