@@ -1832,11 +1832,18 @@ class PETrackII:
         return adata
 
     def _two_pointer_sweep(self,regions):
+        barcode_items = list(self.barcode_dict.items())
+        barcodes = [b.decode() if isinstance(b, (bytes, bytearray)) else str(b) for b, _ in barcode_items]
+        barcode_ids = np.array([i for _, i in barcode_items], dtype=np.int64)
+
+        id_map = np.full(barcode_ids.max() + 1, -1, dtype=np.int64)
+        id_map[barcode_ids] = np.arange(len(barcode_ids), dtype=np.int64)
+        n_cells = len(barcodes)
 
         # # array of locataions and counts
-        # fragment_locs = self.locations[chrom][:self.size[chrom]]
+        # fragment_locs = petrack.locations[chrom][:petrack.size[chrom]]
         # # arrray of barcodes
-        # fragment_barcodes = self.barcodes[chrom][:self.size[chrom]]
+        # fragment_barcodes = petrack.barcodes[chrom][:petrack.size[chrom]]
 
         peak_names = []
         peak_data = []
@@ -1853,9 +1860,7 @@ class PETrackII:
         regions.sort()
         peak_counter = 0
         for chrom in regions.regions.keys():
-            size = self.size[chrom]
-            locs = self.locations[chrom]
-            #barcodes = self.barcodes
+            #barcodes = petrack.barcodes
             regions_c = regions.regions[chrom]
             local_peak = []
             ### regions empty skip
@@ -1865,31 +1870,29 @@ class PETrackII:
                 peak_data.append((chrom.decode(),start,end))
                 local_peak.append(peak_counter - 1)
 
-            fragment_locs = self.locations[chrom][:self.size[chrom]]
-            fragment_barcodes = self.barcodes[chrom][:self.size[chrom]]
+            fragment_locs = self.locations[chrom]
+            fragment_barcodes = self.barcodes[chrom]
 
             if len(fragment_locs) == 0:
                 continue
 
             frag_idx = 0
             local_peak_idx = 0
-            frag_iter = iter(fragment_locs).__next__ # fragment
-            peak_iter = iter(regions_c).__next__    # peaks
             frag_len = len(fragment_locs)
             peak_len = len(regions_c)
-            frag = frag_iter() # (l,r,c)
+            frag = fragment_locs[frag_idx]
             remaining_frag_len = frag_len - 1
-            peak = peak_iter() # (start, end)
+            peak = regions_c[local_peak_idx] # (start, end)
             remaining_peak_len = peak_len - 1
 
             # inside two_pointer_sweep, replace only the while-loop block with this
-
+            back_trace_frag = 0
             while True:
                 frag_start, frag_end = frag[0], frag[1]
                 peak_start, peak_end = peak[0], peak[1]
 
-                # peak inside fragment
-                if frag_start <= peak_start and peak_end <= frag_end:
+                # peak overlap fragment
+                if frag_start <= peak_end and peak_start <= frag_end:
                     bc_id = int(fragment_barcodes[frag_idx])
                     row_id = barcode_id_to_row.get(bc_id, -1)
                     if row_id >= 0:
@@ -1897,29 +1900,37 @@ class PETrackII:
                         columns.append(local_peak[local_peak_idx])
                         data.append(int(frag[2]))
 
-                    # move to next peak (same fragment may contain multiple peaks)
-                    if remaining_peak_len > 0:
-                        peak = peak_iter()
-                        remaining_peak_len -= 1
-                        local_peak_idx += 1
+                    if frag_end > peak_end:
+                        # overhang case, perhaps the frag can still contain next peak(s)
+                        back_trace_frag += 1
+                    remaining_frag_len -= 1
+                    if remaining_frag_len >= 0:
+                        frag_idx += 1
+                        frag = fragment_locs[frag_idx]
                         continue
                     else:
                         break
 
-                # if fragment ends before peak starts -> advance fragment
-                if frag_end < peak_start:
+                # if fragment ends before peak ends -> advance fragment
+                if frag_end < peak_end:
                     remaining_frag_len -= 1
                     if remaining_frag_len >= 0:
-                        frag = frag_iter()
                         frag_idx += 1
+                        frag = fragment_locs[frag_idx]
                     else:
                         break
                 else:
-                    # peak starts before fragment ends but not contained -> advance peak
-                    if remaining_peak_len:
-                        peak = peak_iter()
-                        remaining_peak_len -= 1
+                    # advance peak
+                    remaining_peak_len -= 1
+                    if remaining_peak_len >= 0:
                         local_peak_idx += 1
+                        peak = regions_c[local_peak_idx]
+                        # we will also check if backtrace > 0 or not, if so, we need to move back the fragment pointer to check those peaks that were skipped due to overhang
+                        if back_trace_frag > 0:
+                            frag_idx -= back_trace_frag
+                            remaining_frag_len += back_trace_frag
+                            frag = fragment_locs[frag_idx]
+                        back_trace_frag = 0
                     else:
                         break
 
@@ -1928,8 +1939,11 @@ class PETrackII:
         obs = pd.DataFrame(index=barcodes)
         #obs['n_fragments_in_peaks'] = np.asarray(x.sum(axis=1)).ravel()
         var = pd.DataFrame(peak_data, columns=['chrom', 'start', 'end'], index=peak_names)
-        adata = ad.AnnData(X=x, obs=obs, var=var)
-        return adata
+
+        adata_peaks_loop = ad.AnnData(X=x, obs=obs, var=var)
+        return adata_peaks_loop
+
+
     
     def return_anndata(self, regions, method = "ncls"):
         """
