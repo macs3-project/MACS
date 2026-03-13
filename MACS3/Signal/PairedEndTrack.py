@@ -1745,7 +1745,7 @@ class PETrackII:
 
                 j = np.searchsorted(peak_starts, frag_start, side='left')
                 while j < peak_starts.size and peak_starts[j] <= frag_end:
-                    if peak_ends[j] <= frag_end:
+                    if peak_ends[j] > frag_start:
                         rows.append(row_id)
                         columns.append(int(local_peak_indices[j]))
                         data.append(int(frag[2]))
@@ -1814,13 +1814,12 @@ class PETrackII:
             # Query peaks: peak must be inside fragment
             for peak_idx, (peak_start, peak_end) in enumerate(regions_c):
                 for frag_start, frag_end, frag_i in ncls.find_overlap(peak_start, peak_end):
-            # enforce peak inside fragment
-                    if frag_start <= peak_start and peak_end <= frag_end:
-                        row_id = frag_rows[frag_i]
-                        if row_id >= 0:
-                            rows.append(row_id)
-                            cols.append(local_peak_indices[peak_idx])
-                            data.append(int(frag_counts[frag_i]))
+                   # if frag_start <= peak_start and peak_end <= frag_end:
+                    row_id = frag_rows[frag_i]
+                    if row_id >= 0:
+                        rows.append(row_id)
+                        cols.append(local_peak_indices[peak_idx])
+                        data.append(int(frag_counts[frag_i]))
                             
         X = sparse.coo_matrix((data, (rows, cols)),
                             shape=(n_cells, peak_counter),
