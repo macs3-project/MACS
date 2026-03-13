@@ -16,6 +16,7 @@ import io
 import sys
 from array import array as pyarray
 from collections import Counter,defaultdict
+from operator import itemgetter
 # ------------------------------------
 # MACS3 modules
 # ------------------------------------
@@ -362,6 +363,7 @@ class PETrackI:
         :meth:`finalize` to refresh cached statistics.
         """
         i: cython.ulong
+        j: cython.ulong
         k: bytes
         locs: cnp.ndarray
         locs_size: cython.ulong
@@ -1606,6 +1608,7 @@ class PETrackII:
         and finishes by calling :meth:`finalize`.
         """
         i: cython.ulong
+        j: cython.ulong
         k: bytes
         locs: cnp.ndarray
         locs_size: cython.ulong
@@ -1613,8 +1616,11 @@ class PETrackII:
         regions_c: list
         selected_idx: cnp.ndarray
         regions_chrs: list
-        r1: cnp.void
-        r2: tuple
+        r1_start: cython.int
+        r1_end: cython.int
+        r1_count: cython.ushort
+        r2_start: cython.int
+        r2_end: cython.int
         n_rl1: cython.long
         n_rl2: cython.long
 
@@ -1640,45 +1646,58 @@ class PETrackII:
             selected_idx = np.ones(locs_size, dtype=bool)
 
             regions_c = regions.regions[k]
+            loc_starts = locs['l']
+            loc_ends = locs['r']
+            loc_counts = locs['c']
+            region_starts = [r[0] for r in regions_c]
+            region_ends = [r[1] for r in regions_c]
 
             i = 0
+            j = 0
             n_rl1 = len(locs)
             n_rl2 = len(regions_c)
-            rl1_k = iter(locs).__next__
-            rl2_k = iter(regions_c).__next__
-            r1 = rl1_k()
+            r1_start = loc_starts[i]
+            r1_end = loc_ends[i]
+            r1_count = loc_counts[i]
             n_rl1 -= 1          # remaining rl1
-            r2 = rl2_k()
+            r2_start = region_starts[j]
+            r2_end = region_ends[j]
             n_rl2 -= 1          # remaining rl2
             while (True):
                 # we do this until there is no r1 or r2 left.
-                if r2[0] < r1[1] and r1[0] < r2[1]:
+                if r2_start < r1_end and r1_start < r2_end:
                     # since we found an overlap, r1 will be skipped/excluded
                     # and move to the next r1
                     # get rid of this one
                     n_rl1 -= 1
-                    self.length -= cython.cast(cython.ulonglong, (r1[1] - r1[0])*r1[2])
+                    self.length -= cython.cast(cython.ulonglong, (r1_end - r1_start) * r1_count)
                     selected_idx[i] = False
 
                     if n_rl1 >= 0:
-                        r1 = rl1_k()
                         i += 1
+                        r1_start = loc_starts[i]
+                        r1_end = loc_ends[i]
+                        r1_count = loc_counts[i]
                         continue
                     else:
                         break
-                if r1[1] < r2[1]:
+                if r1_end < r2_end:
                     # in this case, we need to move to the next r1,
                     n_rl1 -= 1
                     if n_rl1 >= 0:
-                        r1 = rl1_k()
                         i += 1
+                        r1_start = loc_starts[i]
+                        r1_end = loc_ends[i]
+                        r1_count = loc_counts[i]
                     else:
                         # no more r1 left
                         break
                 else:
                     # in this case, we need to move the next r2
                     if n_rl2:
-                        r2 = rl2_k()
+                        j += 1
+                        r2_start = region_starts[j]
+                        r2_end = region_ends[j]
                         n_rl2 -= 1
                     else:
                         # no more r2 left
@@ -1830,120 +1849,143 @@ class PETrackII:
         adata = ad.AnnData(X=X, obs=obs, var=var)
         return adata
 
-    def _two_pointer_sweep(self,regions):
-        barcode_items = list(self.barcode_dict.items())
-        barcodes = [b.decode() if isinstance(b, (bytes, bytearray)) else str(b) for b, _ in barcode_items]
-        barcode_ids = np.array([i for _, i in barcode_items], dtype=np.int64)
-
-        id_map = np.full(barcode_ids.max() + 1, -1, dtype=np.int64)
-        id_map[barcode_ids] = np.arange(len(barcode_ids), dtype=np.int64)
-        n_cells = len(barcodes)
-
-        # # array of locataions and counts
-        # fragment_locs = petrack.locations[chrom][:petrack.size[chrom]]
-        # # arrray of barcodes
-        # fragment_barcodes = petrack.barcodes[chrom][:petrack.size[chrom]]
+    @cython.boundscheck(False)  # do not check that np indices are valid
+    @cython.cfunc
+    def _two_pointer_sweep(self, regions):
+        frag_idx: cython.int
+        local_peak_idx: cython.int
+        n_frags: cython.int
+        remaining_frag_len: cython.int
+        remaining_peak_len: cython.int
+        back_trace_frag: cython.int
+        row_id: cython.int
+        peak_start: cython.int
+        peak_end: cython.int
+        frag_start: cython.int
+        frag_end: cython.int
+        barcode_items: list
+        barcode_ids: object
+        barcode_id_to_row: object
+        rows: list
+        columns: list
+        data: list
 
         peak_names = []
         peak_data = []
 
-        rows = [] #barcodes index
+        rows = [] #barcode index
         columns = [] #peaks index
-        data = [] # count data int
+        data = [] #count data
 
-        barcode_items = sorted(self.barcode_dict.items(), key=lambda x: x[1])
+        barcode_items = sorted(self.barcode_dict.items(), key=itemgetter(1))
         barcodes = [b.decode() if isinstance(b, (bytes, bytearray)) else str(b) for b, _ in barcode_items]
-        barcode_id_to_row = {barcode_id: i for i, (_, barcode_id) in enumerate(barcode_items)}
         n_cells = len(barcodes)
+        if n_cells:
+            barcode_ids = np.fromiter((barcode_id for _, barcode_id in barcode_items),
+                                      dtype=np.int64,
+                                      count=n_cells)
+            barcode_id_to_row = np.full(int(barcode_ids[-1]) + 1, -1, dtype=np.int64)
+            barcode_id_to_row[barcode_ids] = np.arange(n_cells, dtype=np.int64)
+        else:
+            barcode_id_to_row = np.zeros(0, dtype=np.int64)
 
         regions.sort()
         peak_counter = 0
+
         for chrom in regions.regions.keys():
-            #barcodes = petrack.barcodes
+            if chrom not in self.locations:
+                continue
+
             regions_c = regions.regions[chrom]
+            if not regions_c:
+                continue
+
             local_peak = []
+            peak_starts = []
+            peak_ends = []
+            chrom_str = chrom.decode() if isinstance(chrom, (bytes, bytearray)) else str(chrom)
             ### regions empty skip
             for (start, end) in regions_c:
                 peak_counter += 1
                 peak_names.append(f"peak_{peak_counter}")
-                peak_data.append((chrom.decode(),start,end))
+                peak_data.append((chrom_str, start, end))
                 local_peak.append(peak_counter - 1)
+                peak_starts.append(start)
+                peak_ends.append(end)
 
             fragment_locs = self.locations[chrom]
-            fragment_barcodes = self.barcodes[chrom]
 
             if len(fragment_locs) == 0:
                 continue
 
+            fragment_barcodes = self.barcodes[chrom]
+            frag_starts = fragment_locs['l']
+            frag_ends = fragment_locs['r']
+            frag_counts = fragment_locs['c']
+            frag_rows = barcode_id_to_row[fragment_barcodes]
+            n_frags = len(fragment_locs)
+
             frag_idx = 0
             local_peak_idx = 0
-            frag_len = len(fragment_locs)
-            peak_len = len(regions_c)
-            frag = fragment_locs[frag_idx]
-            remaining_frag_len = frag_len - 1
-            peak = regions_c[local_peak_idx] # (start, end)
-            remaining_peak_len = peak_len - 1
-
-            # inside two_pointer_sweep, replace only the while-loop block with this
+            frag_start = frag_starts[frag_idx]
+            frag_end = frag_ends[frag_idx]
+            peak_start = peak_starts[local_peak_idx]
+            peak_end = peak_ends[local_peak_idx]
+            remaining_frag_len = n_frags - 1
+            remaining_peak_len = len(regions_c) - 1
             back_trace_frag = 0
-            while True:
-                frag_start, frag_end = frag[0], frag[1]
-                peak_start, peak_end = peak[0], peak[1]
 
-                # peak overlap fragment
+            while True:
                 if frag_start <= peak_end and peak_start <= frag_end:
-                    bc_id = int(fragment_barcodes[frag_idx])
-                    row_id = barcode_id_to_row.get(bc_id, -1)
+                    row_id = frag_rows[frag_idx]
                     if row_id >= 0:
                         rows.append(int(row_id))
                         columns.append(local_peak[local_peak_idx])
-                        data.append(int(frag[2]))
+                        data.append(int(frag_counts[frag_idx]))
 
                     if frag_end > peak_end:
-                        # overhang case, perhaps the frag can still contain next peak(s)
                         back_trace_frag += 1
-                    remaining_frag_len -= 1
-                    if remaining_frag_len >= 0:
+
+                    if remaining_frag_len:
+                        remaining_frag_len -= 1
                         frag_idx += 1
-                        frag = fragment_locs[frag_idx]
+                        frag_start = frag_starts[frag_idx]
+                        frag_end = frag_ends[frag_idx]
                         continue
                     else:
                         break
 
-                # if fragment ends before peak ends -> advance fragment
                 if frag_end < peak_end:
-                    remaining_frag_len -= 1
-                    if remaining_frag_len >= 0:
+                    if remaining_frag_len:
+                        remaining_frag_len -= 1
                         frag_idx += 1
-                        frag = fragment_locs[frag_idx]
+                        frag_start = frag_starts[frag_idx]
+                        frag_end = frag_ends[frag_idx]
                     else:
                         break
                 else:
-                    # advance peak
-                    remaining_peak_len -= 1
-                    if remaining_peak_len >= 0:
+                    if remaining_peak_len:
+                        remaining_peak_len -= 1
                         local_peak_idx += 1
-                        peak = regions_c[local_peak_idx]
-                        # we will also check if backtrace > 0 or not, if so, we need to move back the fragment pointer to check those peaks that were skipped due to overhang
-                        if back_trace_frag > 0:
+                        peak_start = peak_starts[local_peak_idx]
+                        peak_end = peak_ends[local_peak_idx]
+                        if back_trace_frag:
                             frag_idx -= back_trace_frag
                             remaining_frag_len += back_trace_frag
-                            frag = fragment_locs[frag_idx]
-                        back_trace_frag = 0
+                            frag_start = frag_starts[frag_idx]
+                            frag_end = frag_ends[frag_idx]
+                            back_trace_frag = 0
                     else:
                         break
 
         n_peaks = peak_counter
-        x = sparse.coo_matrix((data,(rows,columns)),shape=(n_cells,n_peaks)).tocsr()
         obs = pd.DataFrame(index=barcodes)
-        #obs['n_fragments_in_peaks'] = np.asarray(x.sum(axis=1)).ravel()
         var = pd.DataFrame(peak_data, columns=['chrom', 'start', 'end'], index=peak_names)
 
+        x = sparse.csr_matrix((data,(rows,columns)),shape=(n_cells,n_peaks))
         adata_peaks_loop = ad.AnnData(X=x, obs=obs, var=var)
         return adata_peaks_loop
 
-
-    
     def return_anndata(self, regions, method = "ncls"):
         """
         Build barcode × peak AnnData using the selected method.
