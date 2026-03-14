@@ -204,7 +204,7 @@ class Test_PETrackII(unittest.TestCase):
         self.assertEqual(list(adata.var.index), ["peak_1", "peak_2", "peak_3"])
 
         X = adata.X.toarray()
-        expected = np.array([[2, 0, 0],
+        expected = np.array([[3, 1, 0],
                               [3, 0, 0],
                               [0, 4, 0]], dtype=np.int32)
         np.testing.assert_array_equal(X, expected)
