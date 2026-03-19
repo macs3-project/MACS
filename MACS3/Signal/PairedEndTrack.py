@@ -1745,9 +1745,9 @@ class PETrackII:
                 peak_names.append(f"peak_{peak_counter}")
                 local_peak_indices.append(peak_counter - 1)
 
-            peak_starts = np.array([p[0] for p in regions_c], dtype=np.int64)
-            peak_ends = np.array([p[1] for p in regions_c], dtype=np.int64)
-            local_peak_indices = np.array(local_peak_indices, dtype=np.int64)
+            peak_starts = np.array([p[0] for p in regions_c], dtype=np.int32)
+            peak_ends = np.array([p[1] for p in regions_c], dtype=np.int32)
+            local_peak_indices = np.array(local_peak_indices, dtype=np.int32)
 
             fragment_locs = self.locations[chrom]
             fragment_barcodes = self.barcodes[chrom]
@@ -1781,14 +1781,14 @@ class PETrackII:
         # Barcode mapping
         barcode_items = sorted(self.barcode_dict.items(), key=lambda x: x[1])
         barcodes = [b.decode() if isinstance(b, (bytes, bytearray)) else str(b) for b, _ in barcode_items]
-        barcode_ids = np.array([i for _, i in barcode_items], dtype=np.int64)
+        barcode_ids = np.array([i for _, i in barcode_items], dtype=np.int32)
 
         n_cells = len(barcodes)
         if n_cells == 0:
             return ad.AnnData(X=sparse.csr_matrix((0, 0), dtype=np.int32))
 
-        id_map = np.full(barcode_ids.max() + 1, -1, dtype=np.int64)
-        id_map[barcode_ids] = np.arange(n_cells, dtype=np.int64)
+        id_map = np.full(barcode_ids.max() + 1, -1, dtype=np.int32)
+        id_map[barcode_ids] = np.arange(n_cells, dtype=np.int32)
 
         # Outputs
         peak_names = []
@@ -1813,21 +1813,21 @@ class PETrackII:
                 peak_counter += 1
                 peak_names.append(f"peak_{peak_counter}")
                 local_peak_indices.append(peak_counter - 1)
-
+                peak_data.append((chrom_str, int(start), int(end)))
             # fragments on this chromosome
             fragment_locs = self.locations[chrom]
             fragment_barcodes = self.barcodes[chrom]
             if len(fragment_locs) == 0:
                 continue
 
-            frag_starts = fragment_locs['l'].astype(np.int64)
-            frag_ends = fragment_locs['r'].astype(np.int64)
-            frag_counts = fragment_locs['c'].astype(np.int64)
-            frag_bc_ids = fragment_barcodes.astype(np.int64)
+            frag_starts = fragment_locs['l'].astype(np.int32)
+            frag_ends = fragment_locs['r'].astype(np.int32)
+            frag_counts = fragment_locs['c'].astype(np.int32)
+            frag_bc_ids = fragment_barcodes.astype(np.int32)
 
             frag_rows = id_map[frag_bc_ids]  # barcode -> row index
 
-            idx = np.arange(len(frag_starts), dtype=np.int64)
+            idx = np.arange(len(frag_starts), dtype=np.int32)
             ncls = NCLS(frag_starts, frag_ends, idx)
 
             # Query peaks: peak must be inside fragment
@@ -1882,12 +1882,12 @@ class PETrackII:
         n_cells = len(barcodes)
         if n_cells:
             barcode_ids = np.fromiter((barcode_id for _, barcode_id in barcode_items),
-                                      dtype=np.int64,
+                                      dtype=np.int32,
                                       count=n_cells)
-            barcode_id_to_row = np.full(int(barcode_ids[-1]) + 1, -1, dtype=np.int64)
-            barcode_id_to_row[barcode_ids] = np.arange(n_cells, dtype=np.int64)
+            barcode_id_to_row = np.full(int(barcode_ids[-1]) + 1, -1, dtype=np.int32)
+            barcode_id_to_row[barcode_ids] = np.arange(n_cells, dtype=np.int32)
         else:
-            barcode_id_to_row = np.zeros(0, dtype=np.int64)
+            barcode_id_to_row = np.zeros(0, dtype=np.int32)
 
         regions.sort()
         peak_counter = 0
