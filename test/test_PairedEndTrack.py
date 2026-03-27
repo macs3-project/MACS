@@ -229,6 +229,51 @@ class Test_PETrackII(unittest.TestCase):
                               [0, 4]], dtype=np.int32)
         np.testing.assert_array_equal(X, expected)
 
+    def test_return_anndata_merges_overlapping_regions(self):
+        petrack = PETrackII()
+        petrack.add_loc(b"chr1", 0, 150, barcode=b"A", count=2)
+        petrack.add_loc(b"chr1", 190, 260, barcode=b"B", count=3)
+        petrack.finalize()
+
+        regions = Regions()
+        regions.add_loc(b"chr1", 10, 90)
+        regions.add_loc(b"chr1", 80, 120)
+        regions.add_loc(b"chr1", 200, 240)
+
+        adata = petrack.return_anndata(regions)
+
+        self.assertEqual(adata.shape, (2, 2))
+        self.assertEqual(list(adata.obs.index), ["A", "B"])
+        self.assertEqual(list(adata.var.index), ["peak_1", "peak_2"])
+        self.assertEqual(regions.regions[b"chr1"], [(10, 90), (80, 120), (200, 240)])
+
+        X = adata.X.toarray()
+        expected = np.array([[2, 0],
+                              [0, 3]], dtype=np.int32)
+        np.testing.assert_array_equal(X, expected)
+
+    def test_return_anndata_merges_adjacent_regions(self):
+        petrack = PETrackII()
+        petrack.add_loc(b"chr1", 20, 90, barcode=b"A", count=2)
+        petrack.add_loc(b"chr1", 100, 170, barcode=b"B", count=5)
+        petrack.finalize()
+
+        regions = Regions()
+        regions.add_loc(b"chr1", 10, 50)
+        regions.add_loc(b"chr1", 50, 80)
+        regions.add_loc(b"chr1", 120, 160)
+
+        adata = petrack.return_anndata(regions)
+        self.assertEqual(adata.shape, (2, 2))
+        self.assertEqual(list(adata.obs.index), ["A", "B"])
+        self.assertEqual(list(adata.var.index), ["peak_1", "peak_2"])
+        self.assertEqual(regions.regions[b"chr1"], [(10, 50), (50, 80), (120, 160)])
+
+        X = adata.X.toarray()
+        expected = np.array([[2, 0],
+                              [0, 5]], dtype=np.int32)
+        np.testing.assert_array_equal(X, expected)
+
 class TestPETrackIISampling(unittest.TestCase):
 
     def setUp(self):

@@ -22,8 +22,8 @@ exec(open("MACS3/Utilities/Constants.py").read())
 
 
 def main():
-    if sys.version_info < (3, 9):
-        sys.stderr.write("CRITICAL: Python version must >= 3.9!\n")
+    if sys.version_info < (3, 12):
+        sys.stderr.write("CRITICAL: Python version must >= 3.12!\n")
         sys.exit(1)
 
     # NumPy include dir
