@@ -5,6 +5,9 @@ import unittest
 from MACS3.Signal.PairedEndTrack import PETrackI, PETrackII
 from MACS3.Signal.Region import Regions
 import numpy as np
+import anndata  # noqa: F401
+import pandas  # noqa: F401
+import scipy  # noqa: F401
 
 
 class Test_PETrackI(unittest.TestCase):
@@ -181,6 +184,95 @@ class Test_PETrackII(unittest.TestCase):
         self.assertEqual(self.pe.length, 1170)
         self.assertAlmostEqual(self.pe.average_template_length, 90, 0)
 
+    def test_return_anndata(self):
+        petrack = PETrackII()
+        petrack.add_loc(b"chr1", 0, 100, barcode=b"A", count=2)   # peak_1
+        petrack.add_loc(b"chr1", 70, 270, barcode=b"A", count=1)   # peak_2
+        petrack.add_loc(b"chr1", 0, 100, barcode=b"B", count=3)   # peak_2
+        petrack.add_loc(b"chr1", 175, 325, barcode=b"C", count=4)   # peak_2
+        petrack.finalize()
+
+        regions = Regions()
+        regions.add_loc(b"chr1", 0, 100)    # peak_1
+        regions.add_loc(b"chr1", 200, 300)  # peak_2
+        regions.add_loc(b"chr1", 500, 600)  # peak_3
+
+
+        adata = petrack.return_anndata(regions)
+        self.assertEqual(adata.shape, (3, 3))
+        self.assertEqual(list(adata.obs.index), ["A", "B", "C"])
+        self.assertEqual(list(adata.var.index), ["peak_1", "peak_2", "peak_3"])
+
+        X = adata.X.toarray()
+        expected = np.array([[3, 1, 0],
+                              [3, 0, 0],
+                              [0, 4, 0]], dtype=np.int32)
+        np.testing.assert_array_equal(X, expected)
+
+        # Explicit peak-inside-fragment check with simpler labels
+        petrack = PETrackII()
+        petrack.add_loc(b"chr1", 0, 100, barcode=b"A", count=1)   # contains peak_1
+        petrack.add_loc(b"chr1", 175, 325, barcode=b"B", count=4)  # contains peak_2
+        petrack.finalize()
+
+        regions = Regions()
+        regions.add_loc(b"chr1", 10, 90)    # peak_1
+        regions.add_loc(b"chr1", 200, 300)  # peak_2
+
+        adata = petrack.return_anndata(regions)
+        self.assertEqual(adata.shape, (2, 2))
+        self.assertEqual(list(adata.obs.index), ["A", "B"])
+        self.assertEqual(list(adata.var.index), ["peak_1", "peak_2"])
+
+        X = adata.X.toarray()
+        expected = np.array([[1, 0],
+                              [0, 4]], dtype=np.int32)
+        np.testing.assert_array_equal(X, expected)
+
+    def test_return_anndata_merges_overlapping_regions(self):
+        petrack = PETrackII()
+        petrack.add_loc(b"chr1", 0, 150, barcode=b"A", count=2)
+        petrack.add_loc(b"chr1", 190, 260, barcode=b"B", count=3)
+        petrack.finalize()
+
+        regions = Regions()
+        regions.add_loc(b"chr1", 10, 90)
+        regions.add_loc(b"chr1", 80, 120)
+        regions.add_loc(b"chr1", 200, 240)
+
+        adata = petrack.return_anndata(regions)
+
+        self.assertEqual(adata.shape, (2, 2))
+        self.assertEqual(list(adata.obs.index), ["A", "B"])
+        self.assertEqual(list(adata.var.index), ["peak_1", "peak_2"])
+        self.assertEqual(regions.regions[b"chr1"], [(10, 90), (80, 120), (200, 240)])
+
+        X = adata.X.toarray()
+        expected = np.array([[2, 0],
+                              [0, 3]], dtype=np.int32)
+        np.testing.assert_array_equal(X, expected)
+
+    def test_return_anndata_merges_adjacent_regions(self):
+        petrack = PETrackII()
+        petrack.add_loc(b"chr1", 20, 90, barcode=b"A", count=2)
+        petrack.add_loc(b"chr1", 100, 170, barcode=b"B", count=5)
+        petrack.finalize()
+
+        regions = Regions()
+        regions.add_loc(b"chr1", 10, 50)
+        regions.add_loc(b"chr1", 50, 80)
+        regions.add_loc(b"chr1", 120, 160)
+
+        adata = petrack.return_anndata(regions)
+        self.assertEqual(adata.shape, (2, 2))
+        self.assertEqual(list(adata.obs.index), ["A", "B"])
+        self.assertEqual(list(adata.var.index), ["peak_1", "peak_2"])
+        self.assertEqual(regions.regions[b"chr1"], [(10, 50), (50, 80), (120, 160)])
+
+        X = adata.X.toarray()
+        expected = np.array([[2, 0],
+                              [0, 5]], dtype=np.int32)
+        np.testing.assert_array_equal(X, expected)
 
 class TestPETrackIISampling(unittest.TestCase):
 

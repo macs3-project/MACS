@@ -52,3 +52,13 @@ MACS3 project is sponsored by [![CZI's Essential Open Source Software for Scienc
 2008: [Model-based Analysis of ChIP-Seq
 (MACS)](https://genomebiology.biomedcentral.com/articles/10.1186/gb-2008-9-9-r137)
 
+## Note
+
+Now the default branch of MACS3 has been renamed to 'main'. If you are still using old 'master' branch in your cloned Git repository for MACS3, please use the following command to rename it:
+
+```
+git branch -m master main
+git fetch origin
+git branch -u origin/main main
+git remote set-head origin -a
+```

@@ -91,15 +91,28 @@ def make_PV_from_LR(LR_array: cnp.ndarray,
     i: cython.ulong
     L: cython.int
     R: cython.int
+    weight: cython.float
     PV: cnp.ndarray
+    LR_l: cnp.ndarray
+    LR_r: cnp.ndarray
+    PV_p: cnp.ndarray
+    PV_v: cnp.ndarray
 
     l_LR = LR_array.shape[0]
     l_PV = 2 * l_LR
     PV = np.zeros(shape=l_PV, dtype=[('p', 'i4'), ('v', 'f4')])
+    LR_l = LR_array['l']
+    LR_r = LR_array['r']
+    PV_p = PV['p']
+    PV_v = PV['v']
     for i in range(l_LR):
-        (L, R) = LR_array[i]
-        PV[i*2] = (L, mapping_func(L, R))
-        PV[i*2 + 1] = (R, -1.0 * mapping_func(L, R))
+        L = LR_l[i]
+        R = LR_r[i]
+        weight = mapping_func(L, R)
+        PV_p[i*2] = L
+        PV_v[i*2] = weight
+        PV_p[i*2 + 1] = R
+        PV_v[i*2 + 1] = -1.0 * weight
     PV.sort(order='p')
     return PV
 
@@ -123,15 +136,31 @@ def make_PV_from_LRC(LRC_array: cnp.ndarray,
     L: cython.int
     R: cython.int
     C: cython.ushort
+    weight: cython.float
     PV: cnp.ndarray
+    LRC_l: cnp.ndarray
+    LRC_r: cnp.ndarray
+    LRC_c: cnp.ndarray
+    PV_p: cnp.ndarray
+    PV_v: cnp.ndarray
 
     l_LRC = LRC_array.shape[0]
     l_PV = 2 * l_LRC
     PV = np.zeros(shape=l_PV, dtype=[('p', 'i4'), ('v', 'f4')])
+    LRC_l = LRC_array['l']
+    LRC_r = LRC_array['r']
+    LRC_c = LRC_array['c']
+    PV_p = PV['p']
+    PV_v = PV['v']
     for i in range(l_LRC):
-        (L, R, C) = LRC_array[i]
-        PV[i*2] = (L, C*mapping_func(L, R))
-        PV[i*2 + 1] = (R, -1.0 * C * mapping_func(L, R))
+        L = LRC_l[i]
+        R = LRC_r[i]
+        C = LRC_c[i]
+        weight = C * mapping_func(L, R)
+        PV_p[i*2] = L
+        PV_v[i*2] = weight
+        PV_p[i*2 + 1] = R
+        PV_v[i*2 + 1] = -1.0 * weight
     PV.sort(order='p')
     return PV
 
@@ -156,21 +185,29 @@ def make_PV_from_PN(P_array: cnp.ndarray, N_array: cnp.ndarray,
     L: cython.int
     R: cython.int
     PV: cnp.ndarray
+    PV_p: cnp.ndarray
+    PV_v: cnp.ndarray
 
     l_PN = P_array.shape[0]
     assert l_PN == N_array.shape[0]
     l_PV = 4 * l_PN
     PV = np.zeros(shape=l_PV, dtype=[('p', 'i4'), ('v', 'f4')])
+    PV_p = PV['p']
+    PV_v = PV['v']
     for i in range(l_PN):
         L = P_array[i]
         R = L + extsize
-        PV[i*2] = (L, 1)
-        PV[i*2 + 1] = (R, -1)
+        PV_p[i*2] = L
+        PV_v[i*2] = 1
+        PV_p[i*2 + 1] = R
+        PV_v[i*2 + 1] = -1
     for i in range(l_PN):
         R = N_array[i]
         L = R - extsize
-        PV[(l_PN + i)*2] = (L, 1)
-        PV[(l_PN + i)*2 + 1] = (R, -1)
+        PV_p[(l_PN + i)*2] = L
+        PV_v[(l_PN + i)*2] = 1
+        PV_p[(l_PN + i)*2 + 1] = R
+        PV_v[(l_PN + i)*2 + 1] = -1
     PV.sort(order='p')
     return PV
 
