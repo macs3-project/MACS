@@ -32,7 +32,7 @@ function to 'compare two tracks':
   chromatin model (need to set pseudocount)
 - `slogLR` symmetric log10 likelihood between two ChIP-enrichment
   models using Poison distribution, and this can be used to compare
-  ChIP signals from two differen conditions (differential binding)
+  ChIP signals from two different conditions (differential binding)
 - `max` Maximum value between the two tracks.
 
 ## Command Line Options
