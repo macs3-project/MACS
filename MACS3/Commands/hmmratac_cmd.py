@@ -260,7 +260,7 @@ def run(args):
                                                      max_score=options.cutoff_analysis_max,
                                                      steps=options.cutoff_analysis_steps))
         # raise Exception("Cutoff analysis only.")
-        sys.exit(1)
+        sys.exit(0)
 
     #############################################
     # 3. Define training set by peak calling
