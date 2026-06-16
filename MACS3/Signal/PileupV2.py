@@ -46,6 +46,7 @@ the distribution).
 import numpy as np
 import cython
 import cython.cimports.numpy as cnp
+from cython.cimports.libc.stdio import FILE, fopen, fclose, fprintf
 
 # ------------------------------------
 # from cython.cimports.libc.stdlib import malloc, free, qsort
@@ -70,6 +71,225 @@ def clean_up_ndarray(x: cnp.ndarray):
     i = x.shape[0] // 2
     x.resize(100000 if i > 100000 else i, refcheck=False)
     x.resize(0, refcheck=False)
+    return
+
+
+@cython.cfunc
+def fix_coordinates(poss: cnp.ndarray, rlength: cython.int) -> cnp.ndarray:
+    """Clip a sorted coordinate array to [0, rlength]."""
+    i: cython.long
+    ptr: cython.pointer(cython.int) = cython.cast(cython.pointer(cython.int),
+                                                  poss.data)
+
+    for i in range(poss.shape[0]):
+        if ptr[i] < 0:
+            ptr[i] = 0
+        else:
+            break
+
+    for i in range(poss.shape[0]-1, -1, -1):
+        if ptr[i] > rlength:
+            ptr[i] = rlength
+        else:
+            break
+    return poss
+
+
+@cython.cfunc
+def _pileup_sorted_unit(start_poss: cnp.ndarray,
+                        end_poss: cnp.ndarray) -> cnp.ndarray:
+    """Fast sweep for unit-weight sorted start/end positions."""
+    p: cython.int
+    pre_p: cython.int = 0
+    z: cython.float = 0
+    pre_z: cython.float = -10000
+    i_s: cython.long = 0
+    i_e: cython.long = 0
+    c: cython.long = 0
+    ls: cython.long = start_poss.shape[0]
+    le: cython.long = end_poss.shape[0]
+    ret: cnp.ndarray
+    ret_p: cnp.ndarray
+    ret_v: cnp.ndarray
+    start_ptr: cython.pointer(cython.int)
+    end_ptr: cython.pointer(cython.int)
+    ret_p_ptr: cython.pointer(cython.int)
+    ret_v_ptr: cython.pointer(cython.float)
+
+    if ls + le == 0:
+        return np.zeros(shape=0, dtype=[('p', 'i4'), ('v', 'f4')])
+
+    ret_p = np.zeros(shape=ls + le, dtype="i4")
+    ret_v = np.zeros(shape=ls + le, dtype="f4")
+    start_ptr = cython.cast(cython.pointer(cython.int), start_poss.data)
+    end_ptr = cython.cast(cython.pointer(cython.int), end_poss.data)
+    ret_p_ptr = cython.cast(cython.pointer(cython.int), ret_p.data)
+    ret_v_ptr = cython.cast(cython.pointer(cython.float), ret_v.data)
+
+    while i_s < ls or i_e < le:
+        if i_s < ls and (i_e >= le or start_ptr[i_s] < end_ptr[i_e]):
+            p = start_ptr[i_s]
+        elif i_e < le and (i_s >= ls or end_ptr[i_e] < start_ptr[i_s]):
+            p = end_ptr[i_e]
+        else:
+            p = start_ptr[i_s]
+
+        if p != pre_p:
+            if z == pre_z:
+                ret_p_ptr[c-1] = p
+            else:
+                ret_p_ptr[c] = p
+                ret_v_ptr[c] = z
+                c += 1
+                pre_z = z
+            pre_p = p
+
+        while i_s < ls and start_ptr[i_s] == p:
+            z += 1
+            i_s += 1
+        while i_e < le and end_ptr[i_e] == p:
+            z -= 1
+            i_e += 1
+
+    ret_p.resize(c, refcheck=False)
+    ret_v.resize(c, refcheck=False)
+    ret = np.zeros(shape=c, dtype=[('p', 'i4'), ('v', 'f4')])
+    ret['p'] = ret_p
+    ret['v'] = ret_v
+    clean_up_ndarray(ret_p)
+    clean_up_ndarray(ret_v)
+    return ret
+
+
+@cython.cfunc
+def _pileup_sorted_weighted(start_poss: cnp.ndarray,
+                            start_weights: cnp.ndarray,
+                            end_poss: cnp.ndarray,
+                            end_weights: cnp.ndarray) -> cnp.ndarray:
+    """Fast sweep for weighted sorted start/end positions."""
+    p: cython.int
+    pre_p: cython.int = 0
+    z: cython.float = 0
+    pre_z: cython.float = -10000
+    i_s: cython.long = 0
+    i_e: cython.long = 0
+    c: cython.long = 0
+    ls: cython.long = start_poss.shape[0]
+    le: cython.long = end_poss.shape[0]
+    ret: cnp.ndarray
+    ret_p: cnp.ndarray
+    ret_v: cnp.ndarray
+    start_ptr: cython.pointer(cython.int)
+    end_ptr: cython.pointer(cython.int)
+    start_w_ptr: cython.pointer(cython.float)
+    end_w_ptr: cython.pointer(cython.float)
+    ret_p_ptr: cython.pointer(cython.int)
+    ret_v_ptr: cython.pointer(cython.float)
+
+    if ls + le == 0:
+        return np.zeros(shape=0, dtype=[('p', 'i4'), ('v', 'f4')])
+
+    ret_p = np.zeros(shape=ls + le, dtype="i4")
+    ret_v = np.zeros(shape=ls + le, dtype="f4")
+    start_ptr = cython.cast(cython.pointer(cython.int), start_poss.data)
+    end_ptr = cython.cast(cython.pointer(cython.int), end_poss.data)
+    start_w_ptr = cython.cast(cython.pointer(cython.float),
+                              start_weights.data)
+    end_w_ptr = cython.cast(cython.pointer(cython.float), end_weights.data)
+    ret_p_ptr = cython.cast(cython.pointer(cython.int), ret_p.data)
+    ret_v_ptr = cython.cast(cython.pointer(cython.float), ret_v.data)
+
+    while i_s < ls or i_e < le:
+        if i_s < ls and (i_e >= le or start_ptr[i_s] < end_ptr[i_e]):
+            p = start_ptr[i_s]
+        elif i_e < le and (i_s >= ls or end_ptr[i_e] < start_ptr[i_s]):
+            p = end_ptr[i_e]
+        else:
+            p = start_ptr[i_s]
+
+        if p != pre_p:
+            if z == pre_z:
+                ret_p_ptr[c-1] = p
+            else:
+                ret_p_ptr[c] = p
+                ret_v_ptr[c] = z
+                c += 1
+                pre_z = z
+            pre_p = p
+
+        while i_s < ls and start_ptr[i_s] == p:
+            z += start_w_ptr[i_s]
+            i_s += 1
+        while i_e < le and end_ptr[i_e] == p:
+            z -= end_w_ptr[i_e]
+            i_e += 1
+
+    ret_p.resize(c, refcheck=False)
+    ret_v.resize(c, refcheck=False)
+    ret = np.zeros(shape=c, dtype=[('p', 'i4'), ('v', 'f4')])
+    ret['p'] = ret_p
+    ret['v'] = ret_v
+    clean_up_ndarray(ret_p)
+    clean_up_ndarray(ret_v)
+    return ret
+
+
+@cython.cfunc
+def _pileup_from_PN_shifted(P_array: cnp.ndarray,
+                            N_array: cnp.ndarray,
+                            five_shift: cython.long,
+                            three_shift: cython.long,
+                            rlength: cython.int) -> cnp.ndarray:
+    """Pile up plus/minus read ends using V1-compatible shifts."""
+    start_poss: cnp.ndarray
+    end_poss: cnp.ndarray
+
+    start_poss = np.concatenate((P_array-five_shift, N_array-three_shift))
+    end_poss = np.concatenate((P_array+three_shift, N_array+five_shift))
+    start_poss.sort()
+    end_poss.sort()
+    start_poss = fix_coordinates(start_poss, rlength)
+    end_poss = fix_coordinates(end_poss, rlength)
+    return _pileup_sorted_unit(start_poss, end_poss)
+
+
+@cython.cfunc
+def _write_pv_to_bedGraph(pv: cnp.ndarray,
+                          chrom: bytes,
+                          output_filename: bytes,
+                          scale_factor: cython.float,
+                          baseline_value: cython.float):
+    """Append one chromosome PV array to a bedGraph file."""
+    fh: cython.pointer(FILE)
+    p: cnp.ndarray
+    v: cnp.ndarray
+    p_ptr: cython.pointer(cython.int)
+    v_ptr: cython.pointer(cython.float)
+    i: cython.long
+    l_pv: cython.long = pv.shape[0]
+    pre: cython.int = 0
+    pos: cython.int
+    value: cython.float
+    py_bytes: bytes = chrom
+    chrom_char: cython.pointer(cython.char) = py_bytes
+
+    fh = fopen(output_filename, b"a")
+    if fh == cython.NULL:
+        raise OSError("Unable to open bedGraph output file")
+
+    p = np.ascontiguousarray(pv['p'])
+    v = np.ascontiguousarray(pv['v'])
+    p_ptr = cython.cast(cython.pointer(cython.int), p.data)
+    v_ptr = cython.cast(cython.pointer(cython.float), v.data)
+
+    for i in range(l_pv):
+        pos = p_ptr[i]
+        value = v_ptr[i] * scale_factor
+        if value < baseline_value:
+            value = baseline_value
+        fprintf(fh, b"%s\t%d\t%d\t%.5f\n", chrom_char, pre, pos, value)
+        pre = pos
+    fclose(fh)
     return
 
 
@@ -314,6 +534,16 @@ def pileup_from_LR(LR_array: cnp.ndarray,
     """
     PV_array: cnp.ndarray
     pileup: cnp.ndarray
+    start_poss: cnp.ndarray
+    end_poss: cnp.ndarray
+
+    if mapping_func is mapping_function_always_1:
+        start_poss = np.sort(LR_array['l'])
+        end_poss = np.sort(LR_array['r'])
+        pileup = _pileup_sorted_unit(start_poss, end_poss)
+        clean_up_ndarray(start_poss)
+        clean_up_ndarray(end_poss)
+        return pileup
 
     PV_array = make_PV_from_LR(LR_array, mapping_func=mapping_func)
     pileup = pileup_PV(PV_array)
@@ -338,6 +568,29 @@ def pileup_from_LRC(LRC_array: cnp.ndarray,
     """
     PV_array: cnp.ndarray
     pileup: cnp.ndarray
+    start_poss: cnp.ndarray
+    end_poss: cnp.ndarray
+    start_weights: cnp.ndarray
+    end_weights: cnp.ndarray
+    indices: cnp.ndarray
+    start_indices: cnp.ndarray
+
+    if mapping_func is mapping_function_always_1:
+        start_indices = np.argsort(LRC_array['l'])
+        start_poss = LRC_array['l'][start_indices]
+        start_weights = LRC_array['c'][start_indices].astype("f4", copy=False)
+        indices = np.argsort(LRC_array['r'])
+        end_poss = LRC_array['r'][indices]
+        end_weights = LRC_array['c'][indices].astype("f4", copy=False)
+        pileup = _pileup_sorted_weighted(start_poss,
+                                         start_weights,
+                                         end_poss,
+                                         end_weights)
+        clean_up_ndarray(start_poss)
+        clean_up_ndarray(start_weights)
+        clean_up_ndarray(end_poss)
+        clean_up_ndarray(end_weights)
+        return pileup
 
     PV_array = make_PV_from_LRC(LRC_array, mapping_func=mapping_func)
     pileup = pileup_PV(PV_array)
@@ -354,10 +607,103 @@ def pileup_from_PN(P_array: cnp.ndarray, N_array: cnp.ndarray,
     pileup of a single chromosome is needed.
 
     """
-    PV_array: cnp.ndarray
     pileup: cnp.ndarray
+    start_poss: cnp.ndarray
+    end_poss: cnp.ndarray
 
-    PV_array = make_PV_from_PN(P_array, N_array, extsize)
-    pileup = pileup_PV(PV_array)
-    clean_up_ndarray(PV_array)
+    start_poss = np.concatenate((P_array, N_array-extsize))
+    end_poss = np.concatenate((P_array+extsize, N_array))
+    start_poss.sort()
+    end_poss.sort()
+    pileup = _pileup_sorted_unit(start_poss, end_poss)
+    clean_up_ndarray(start_poss)
+    clean_up_ndarray(end_poss)
     return pileup
+
+
+@cython.ccall
+def pileup_and_write_se(trackI,
+                        output_filename: bytes,
+                        d: cython.int,
+                        scale_factor: cython.float,
+                        baseline_value: cython.float = 0.0,
+                        directional: cython.bint = True,
+                        halfextension: cython.bint = True):
+    """Pile up a single-end track and write a bedGraph file."""
+    five_shift: cython.long
+    three_shift: cython.long
+    rlength: cython.long
+    chrom: bytes
+    plus_tags: cnp.ndarray
+    minus_tags: cnp.ndarray
+    chrlengths: dict = trackI.get_rlengths()
+    pv: cnp.ndarray
+    fh: cython.pointer(FILE)
+
+    if directional:
+        if halfextension:
+            five_shift = d//-4
+            three_shift = d*3//4
+        else:
+            five_shift = 0
+            three_shift = d
+    else:
+        if halfextension:
+            five_shift = d//4
+            three_shift = five_shift
+        else:
+            five_shift = d//2
+            three_shift = d - five_shift
+
+    fh = fopen(output_filename, b"w")
+    if fh == cython.NULL:
+        raise OSError("Unable to open bedGraph output file")
+    fclose(fh)
+
+    for chrom in list(chrlengths.keys()):
+        (plus_tags, minus_tags) = trackI.get_locations_by_chr(chrom)
+        rlength = cython.cast(cython.long, chrlengths[chrom])
+        pv = _pileup_from_PN_shifted(plus_tags,
+                                     minus_tags,
+                                     five_shift,
+                                     three_shift,
+                                     rlength)
+        _write_pv_to_bedGraph(pv,
+                              chrom,
+                              output_filename,
+                              scale_factor,
+                              baseline_value)
+        clean_up_ndarray(pv)
+    return
+
+
+@cython.ccall
+def pileup_and_write_pe(petrackI,
+                        output_filename: bytes,
+                        scale_factor: cython.float = 1.0,
+                        baseline_value: cython.float = 0.0):
+    """Pile up a paired-end track and write a bedGraph file."""
+    chrom: bytes
+    locs: cnp.ndarray
+    pv: cnp.ndarray
+    chrlengths: dict = petrackI.get_rlengths()
+    fh: cython.pointer(FILE)
+
+    fh = fopen(output_filename, b"w")
+    if fh == cython.NULL:
+        raise OSError("Unable to open bedGraph output file")
+    fclose(fh)
+
+    for chrom in sorted(chrlengths.keys()):
+        locs = petrackI.get_locations_by_chr(chrom)
+        if locs.dtype.names is not None and "c" in locs.dtype.names:
+            pv = pileup_from_LRC(locs)
+        else:
+            pv = pileup_from_LR(locs)
+        _write_pv_to_bedGraph(pv,
+                              chrom,
+                              output_filename,
+                              scale_factor,
+                              baseline_value)
+        clean_up_ndarray(pv)
+    return
