@@ -1607,112 +1607,100 @@ class PETrackII:
         The operation mutates the track in place, adjusts fragment counts and lengths,
         and finishes by calling :meth:`finalize`.
         """
-        i: cython.ulong
-        j: cython.ulong
         k: bytes
         locs: cnp.ndarray
         locs_size: cython.ulong
         chrnames: set
+        merged_regions: Regions
         regions_c: list
         selected_idx: cnp.ndarray
-        regions_chrs: list
-        r1_start: cython.int
-        r1_end: cython.int
-        r1_count: cython.ushort
-        r2_start: cython.int
-        r2_end: cython.int
-        n_rl1: cython.long
-        n_rl2: cython.long
+        regions_chrs: set
+        loc_starts: cnp.ndarray(cnp.int32_t, ndim=1)
+        loc_ends: cnp.ndarray(cnp.int32_t, ndim=1)
+        loc_counts: cnp.ndarray(cnp.uint16_t, ndim=1)
+        region_starts: cnp.ndarray(cnp.int32_t, ndim=1)
+        region_ends: cnp.ndarray(cnp.int32_t, ndim=1)
+        region_idx: cnp.ndarray(cnp.int32_t, ndim=1)
+        valid_mask: cnp.ndarray
+        overlap_mask: cnp.ndarray
+        removed_sizes: cnp.ndarray
+        kept_counts: cnp.ndarray
+        i: cython.int
+        n_regions_c: cython.int
+        total_counts: cython.ulonglong
+        chrom_total: cython.ulonglong
 
         if not self.is_sorted:
             self.sort()
 
         assert isinstance(regions, Regions)
-        regions.sort()
-        regions_chrs = list(regions.regions.keys())
+        merged_regions = Regions()
+        for k in sorted(regions.regions.keys()):
+            merged_regions.regions[k] = regions.regions[k][:]
+            merged_regions.total += len(merged_regions.regions[k])
+        merged_regions.merge_overlap()
+        regions_chrs = set(merged_regions.regions.keys())
 
         chrnames = self.get_chr_names()
+        total_counts = 0
 
         for k in chrnames:      # for each chromosome
             locs = self.locations[k]
             locs_size = self.size[k]
             # let's check if k is in regions_chr
             if k not in regions_chrs:
-                # do nothing and continue
+                total_counts += cython.cast(cython.ulonglong, np.sum(locs['c']))
                 continue
 
             # discard overlapping reads and make a new locations[k]
             # initialize boolean array as all TRUE, or all being kept
-            selected_idx = np.ones(locs_size, dtype=bool)
-
-            regions_c = regions.regions[k]
+            regions_c = merged_regions.regions[k]
             loc_starts = locs['l']
             loc_ends = locs['r']
             loc_counts = locs['c']
-            region_starts = [r[0] for r in regions_c]
-            region_ends = [r[1] for r in regions_c]
+            n_regions_c = len(regions_c)
+            region_starts = np.empty(n_regions_c, dtype=np.int32)
+            region_ends = np.empty(n_regions_c, dtype=np.int32)
+            for i in range(n_regions_c):
+                region_starts[i] = regions_c[i][0]
+                region_ends[i] = regions_c[i][1]
 
-            i = 0
-            j = 0
-            n_rl1 = len(locs)
-            n_rl2 = len(regions_c)
-            r1_start = loc_starts[i]
-            r1_end = loc_ends[i]
-            r1_count = loc_counts[i]
-            n_rl1 -= 1          # remaining rl1
-            r2_start = region_starts[j]
-            r2_end = region_ends[j]
-            n_rl2 -= 1          # remaining rl2
-            while (True):
-                # we do this until there is no r1 or r2 left.
-                if r2_start < r1_end and r1_start < r2_end:
-                    # since we found an overlap, r1 will be skipped/excluded
-                    # and move to the next r1
-                    # get rid of this one
-                    n_rl1 -= 1
-                    self.length -= cython.cast(cython.ulonglong, (r1_end - r1_start) * r1_count)
-                    selected_idx[i] = False
+            region_idx = np.searchsorted(region_ends, loc_starts, side='right').astype(np.int32, copy=False)
+            valid_mask = region_idx < n_regions_c
+            overlap_mask = np.zeros(locs_size, dtype=bool)
+            overlap_mask[valid_mask] = region_starts[region_idx[valid_mask]] < loc_ends[valid_mask]
+            selected_idx = np.logical_not(overlap_mask)
 
-                    if n_rl1 >= 0:
-                        i += 1
-                        r1_start = loc_starts[i]
-                        r1_end = loc_ends[i]
-                        r1_count = loc_counts[i]
-                        continue
-                    else:
-                        break
-                if r1_end < r2_end:
-                    # in this case, we need to move to the next r1,
-                    n_rl1 -= 1
-                    if n_rl1 >= 0:
-                        i += 1
-                        r1_start = loc_starts[i]
-                        r1_end = loc_ends[i]
-                        r1_count = loc_counts[i]
-                    else:
-                        # no more r1 left
-                        break
-                else:
-                    # in this case, we need to move the next r2
-                    if n_rl2:
-                        j += 1
-                        r2_start = region_starts[j]
-                        r2_end = region_ends[j]
-                        n_rl2 -= 1
-                    else:
-                        # no more r2 left
-                        break
+            if np.any(overlap_mask):
+                removed_sizes = (loc_ends[overlap_mask] - loc_starts[overlap_mask]).astype(np.uint64, copy=False)
+                self.length -= cython.cast(cython.ulonglong,
+                                           np.sum(removed_sizes * loc_counts[overlap_mask].astype(np.uint64, copy=False)))
+
+            if np.all(selected_idx):
+                total_counts += cython.cast(cython.ulonglong, np.sum(loc_counts))
+                continue
 
             self.locations[k] = locs[selected_idx]
             self.barcodes[k] = self.barcodes[k][selected_idx]
             self.size[k] = self.locations[k].shape[0]
-            # free memory?
-            # I know I should shrink it to 0 size directly,
-            # however, on Mac OSX, it seems directly assigning 0
-            # doesn't do a thing.
-            selected_idx.resize(self.buffer_size, refcheck=False)
-            selected_idx.resize(0, refcheck=False)
-        self.finalize()
+
+            if self.size[k] == 0:
+                del self.size[k]
+                del self.locations[k]
+                del self.barcodes[k]
+                if k in self.rlengths:
+                    del self.rlengths[k]
+                continue
+
+            kept_counts = self.locations[k]['c']
+            chrom_total = cython.cast(cython.ulonglong, np.sum(kept_counts))
+            total_counts += chrom_total
+
+        self.total = total_counts
+        assert self.total > 0, "Error: no fragments in PETrackII"
+        self.is_sorted = True
+        self.average_template_length = cython.cast(cython.float,
+                                                   self.length) / self.total
         return
     
     @cython.boundscheck(False)  # do not check that np indices are valid

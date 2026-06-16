@@ -8,12 +8,22 @@ the distribution).
 
 import unittest
 import numpy as np
+from pathlib import Path
+from tempfile import TemporaryDirectory
 from math import log2
 from MACS3.Signal.Pileup import (se_all_in_one_pileup,
                                  quick_pileup,
                                  naive_quick_pileup,
-                                 over_two_pv_array)
-from MACS3.Signal.PileupV2 import pileup_from_LR, pileup_from_PN
+                                 over_two_pv_array,
+                                 pileup_and_write_se as pileup_and_write_se_v1)
+from MACS3.Signal.PileupV2 import (pileup_from_LR,
+                                   pileup_from_LRC,
+                                   pileup_from_PN,
+                                   pileup_and_write_pe as pileup_and_write_pe_v2,
+                                   pileup_and_write_se as pileup_and_write_se_v2)
+from MACS3.Signal.FixWidthTrack import FWTrack
+from MACS3.Signal.PairedEndTrack import PETrackI
+from MACS3.IO.BedGraphIO import bedGraphIO
 
 # ------------------------------------
 # Main function
@@ -310,6 +320,27 @@ class Test_PileupV2_PE(unittest.TestCase):
         np.testing.assert_equal(pileup, self.expect_pileup_2)
 
 
+class Test_PileupV2_LRC(unittest.TestCase):
+    """Unittest for count-weighted PileupV2 pileup."""
+
+    def test_count_weighted_unsorted_right_endpoints(self):
+        lrc = np.array([(5, 9, 2),
+                        (1, 4, 1),
+                        (2, 6, 3),
+                        (2, 6, 2)],
+                       dtype=[('l', 'int32'), ('r', 'int32'), ('c', 'uint16')])
+        expect = np.array([(1, 0.0),
+                           (2, 1.0),
+                           (4, 6.0),
+                           (5, 5.0),
+                           (6, 7.0),
+                           (9, 2.0)],
+                          dtype=[('p', 'uint32'), ('v', 'float32')])
+
+        pileup = pileup_from_LRC(lrc)
+        np.testing.assert_equal(pileup, expect)
+
+
 class Test_PileupV2_SE(unittest.TestCase):
     """Unittest for pileup functions in PileupV2.pyx.
 
@@ -334,3 +365,42 @@ class Test_PileupV2_SE(unittest.TestCase):
     def test_pileup_1(self):
         pileup = pileup_from_PN(self.P, self.N, self.extsize)
         np.testing.assert_equal(pileup, self.expect_pileup_1)
+
+
+class Test_PileupV2_Writers(unittest.TestCase):
+    """Unittest for direct V2 bedGraph writer entrypoints."""
+
+    def test_se_writer_matches_v1(self):
+        track = FWTrack()
+        for pos in (0, 1, 3, 3, 4, 5):
+            track.add_loc(b"chr1", pos, 0)
+        for pos in (5, 6, 8, 8, 9, 10):
+            track.add_loc(b"chr1", pos, 1)
+        track.finalize()
+        track.set_rlengths({b"chr1": 100})
+
+        with TemporaryDirectory() as tmpdir:
+            v1_path = Path(tmpdir) / "v1.bdg"
+            v2_path = Path(tmpdir) / "v2.bdg"
+            pileup_and_write_se_v1(track, str(v1_path).encode(), 2, 1,
+                                   directional=True, halfextension=False)
+            pileup_and_write_se_v2(track, str(v2_path).encode(), 2, 1,
+                                   directional=True, halfextension=False)
+
+            self.assertEqual(v2_path.read_text(), v1_path.read_text())
+
+    def test_pe_writer_matches_track_bedgraph(self):
+        track = PETrackI()
+        for start, end in ((1, 5), (2, 6), (4, 8), (4, 8), (5, 9)):
+            track.add_loc(b"chr1", start, end)
+        track.finalize()
+        track.set_rlengths({b"chr1": 100})
+
+        with TemporaryDirectory() as tmpdir:
+            expected_path = Path(tmpdir) / "expected.bdg"
+            v2_path = Path(tmpdir) / "v2.bdg"
+            bdg = track.pileup_bdg()
+            bedGraphIO(str(expected_path), data=bdg).write_bedGraph(trackline=False)
+            pileup_and_write_pe_v2(track, str(v2_path).encode())
+
+            self.assertEqual(v2_path.read_text(), expected_path.read_text())

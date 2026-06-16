@@ -184,6 +184,28 @@ class Test_PETrackII(unittest.TestCase):
         self.assertEqual(self.pe.length, 1170)
         self.assertAlmostEqual(self.pe.average_template_length, 90, 0)
 
+    def test_exclude_merges_overlapping_regions(self):
+        pe = PETrackII()
+        pe.add_loc(b"chr1", 0, 10, b"A", 1)
+        pe.add_loc(b"chr1", 12, 18, b"B", 2)
+        pe.add_loc(b"chr1", 26, 30, b"C", 3)
+        pe.finalize()
+
+        regions = Regions()
+        regions.add_loc(b"chr1", 5, 15)
+        regions.add_loc(b"chr1", 14, 25)
+
+        pe.exclude(regions)
+
+        self.assertEqual(regions.regions[b"chr1"], [(5, 15), (14, 25)])
+        self.assertEqual(pe.total, 3)
+        self.assertEqual(pe.length, 12)
+        remaining = pe.get_locations_by_chr(b"chr1")
+        self.assertEqual(remaining.shape[0], 1)
+        self.assertEqual(int(remaining[0]['l']), 26)
+        self.assertEqual(int(remaining[0]['r']), 30)
+        self.assertEqual(int(remaining[0]['c']), 3)
+
     def test_return_anndata(self):
         petrack = PETrackII()
         petrack.add_loc(b"chr1", 0, 100, barcode=b"A", count=2)   # peak_1

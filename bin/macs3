@@ -97,6 +97,10 @@ def main():
         # pileup alignment results with a given extension method
         from MACS3.Commands.pileup_cmd import run
         run(args)
+    elif subcommand == "pileupv2":
+        # pileup alignment results using PileupV2
+        from MACS3.Commands.pileup_v2_cmd import run
+        run(args)
     elif subcommand == "hmmratac":
         # use HMMRATAC algorithm to call ATAC-seq peaks
         from MACS3.Commands.hmmratac_cmd import run
@@ -149,6 +153,11 @@ def prepare_argparser():
 
     # command for 'pileup'
     add_pileup_parser(subparsers)
+
+    # command for 'pileupv2'
+    add_pileup_parser(subparsers,
+                      name="pileupv2",
+                      help_text="Pileup aligned reads or fragments using PileupV2.")
 
     # command for 'randsample'
     add_randsample_parser(subparsers)
@@ -602,9 +611,10 @@ def add_predictd_parser(subparsers):
     return
 
 
-def add_pileup_parser(subparsers):
-    argparser_pileup = subparsers.add_parser("pileup",
-                                             help="Pileup aligned reads (single-end) or fragments (paired-end).")
+def add_pileup_parser(subparsers,
+                      name="pileup",
+                      help_text="Pileup aligned reads (single-end) or fragments (paired-end)."):
+    argparser_pileup = subparsers.add_parser(name, help=help_text)
     argparser_pileup.add_argument("-i", "--ifile", dest="ifile", type=str, required=True, nargs="+",
                                   help="Alignment file. If multiple files are given as '-t A B C', then they will all be read and combined. REQUIRED.")
     argparser_pileup.add_argument("-o", "--ofile", dest="outputfile", type=str, required=True,
