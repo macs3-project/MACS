@@ -94,10 +94,6 @@ def main():
         from MACS3.Commands.predictd_cmd import run
         run(args)
     elif subcommand == "pileup":
-        # pileup alignment results with a given extension method
-        from MACS3.Commands.pileup_cmd import run
-        run(args)
-    elif subcommand == "pileupv2":
         # pileup alignment results using PileupV2
         from MACS3.Commands.pileup_v2_cmd import run
         run(args)
@@ -153,11 +149,6 @@ def prepare_argparser():
 
     # command for 'pileup'
     add_pileup_parser(subparsers)
-
-    # command for 'pileupv2'
-    add_pileup_parser(subparsers,
-                      name="pileupv2",
-                      help_text="Pileup aligned reads or fragments using PileupV2.")
 
     # command for 'randsample'
     add_randsample_parser(subparsers)
