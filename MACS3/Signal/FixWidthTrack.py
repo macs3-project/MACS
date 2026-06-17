@@ -20,7 +20,7 @@ import io
 # ------------------------------------
 
 from MACS3.IO.PeakIO import PeakIO
-from MACS3.Signal.Pileup import se_all_in_one_pileup, over_two_pv_array
+from MACS3.Signal.PileupV2 import pileup_from_PN_shifted, over_two_pv_array
 
 # ------------------------------------
 # Other modules
@@ -762,13 +762,13 @@ class FWTrack:
             five_shift = d//2 - end_shift
             three_shift = end_shift + d - d//2
 
-        tmp_pileup = se_all_in_one_pileup(self.locations[chrom][0],
-                                          self.locations[chrom][1],
-                                          five_shift,
-                                          three_shift,
-                                          rlength,
-                                          scale_factor,
-                                          baseline_value)
+        tmp_pileup = pileup_from_PN_shifted(self.locations[chrom][0],
+                                            self.locations[chrom][1],
+                                            five_shift,
+                                            three_shift,
+                                            rlength,
+                                            scale_factor,
+                                            baseline_value)
         return tmp_pileup
 
     @cython.ccall
@@ -834,13 +834,13 @@ class FWTrack:
             five_shift = five_shift_s[i]
             three_shift = three_shift_s[i]
             scale_factor = scale_factor_s[i]
-            tmp_pileup = se_all_in_one_pileup(self.locations[chrom][0],
-                                              self.locations[chrom][1],
-                                              five_shift,
-                                              three_shift,
-                                              rlength,
-                                              scale_factor,
-                                              baseline_value)
+            tmp_pileup = pileup_from_PN_shifted(self.locations[chrom][0],
+                                                self.locations[chrom][1],
+                                                five_shift,
+                                                three_shift,
+                                                rlength,
+                                                scale_factor,
+                                                baseline_value)
 
             if prev_pileup:
                 prev_pileup = over_two_pv_array(prev_pileup,

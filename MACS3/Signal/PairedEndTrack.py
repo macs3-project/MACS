@@ -20,13 +20,13 @@ from operator import itemgetter
 # ------------------------------------
 # MACS3 modules
 # ------------------------------------
-from MACS3.Signal.Pileup import (quick_pileup,
-                                 over_two_pv_array,
-                                 se_all_in_one_pileup)
 from MACS3.Signal.BedGraph import (bedGraphTrackI,
                                    bedGraphTrackII)
 from MACS3.Signal.PileupV2 import (pileup_from_LR_hmmratac,
-                                   pileup_from_LRC)
+                                   pileup_from_LRC,
+                                   pileup_from_LR_as_list,
+                                   pileup_from_PN_shifted,
+                                   over_two_pv_array)
 from MACS3.Signal.Region import Regions
 # ------------------------------------
 # Other modules
@@ -822,9 +822,9 @@ class PETrackI:
         """
         tmp_pileup: list
 
-        tmp_pileup = quick_pileup(np.sort(self.locations[chrom]['l']),
-                                  np.sort(self.locations[chrom]['r']),
-                                  scale_factor, baseline_value)
+        tmp_pileup = pileup_from_LR_as_list(self.locations[chrom],
+                                            scale_factor,
+                                            baseline_value)
         return tmp_pileup
 
     @cython.ccall
@@ -873,13 +873,13 @@ class PETrackI:
             five_shift = d//2
             three_shift = d//2
 
-            tmp_pileup = se_all_in_one_pileup(self.locations[chrom]['l'],
-                                              self.locations[chrom]['r'],
-                                              five_shift,
-                                              three_shift,
-                                              rlength,
-                                              scale_factor,
-                                              baseline_value)
+            tmp_pileup = pileup_from_PN_shifted(self.locations[chrom]['l'],
+                                                self.locations[chrom]['r'],
+                                                five_shift,
+                                                three_shift,
+                                                rlength,
+                                                scale_factor,
+                                                baseline_value)
 
             if prev_pileup:
                 prev_pileup = over_two_pv_array(prev_pileup,
@@ -926,10 +926,9 @@ class PETrackI:
         bdg = bedGraphTrackI(baseline_value=baseline_value)
 
         for chrom in sorted(self.get_chr_names()):
-            tmp_pileup = quick_pileup(np.sort(self.locations[chrom]['l']),
-                                      np.sort(self.locations[chrom]['r']),
-                                      scale_factor,
-                                      baseline_value)
+            tmp_pileup = pileup_from_LR_as_list(self.locations[chrom],
+                                                scale_factor,
+                                                baseline_value)
 
             # save to bedGraph
             bdg.add_chrom_data(chrom,

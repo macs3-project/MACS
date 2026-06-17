@@ -254,6 +254,122 @@ def _pileup_from_PN_shifted(P_array: cnp.ndarray,
 
 
 @cython.cfunc
+def _pv_to_scaled_list(pv: cnp.ndarray,
+                       scale_factor: cython.float,
+                       baseline_value: cython.float) -> list:
+    """Convert structured PV to the legacy [p, v] shape."""
+    v: cnp.ndarray
+
+    v = pv['v'] * scale_factor
+    v = v.astype("f4", copy=False)
+    v[v < baseline_value] = baseline_value
+    return [pv['p'], v]
+
+
+@cython.cfunc
+def _pileup_sorted_unit_as_list(start_poss: cnp.ndarray,
+                                end_poss: cnp.ndarray,
+                                scale_factor: cython.float,
+                                baseline_value: cython.float) -> list:
+    """Fast V1-compatible sweep returning every legacy breakpoint."""
+    p: cython.int
+    pre_p: cython.int
+    pileup: cython.int = 0
+    i_s: cython.long = 0
+    i_e: cython.long = 0
+    i: cython.long
+    I: cython.long = 0
+    ls: cython.long = start_poss.shape[0]
+    le: cython.long = end_poss.shape[0]
+    value: cython.float
+    ret_p: cnp.ndarray
+    ret_v: cnp.ndarray
+    start_ptr: cython.pointer(cython.int)
+    end_ptr: cython.pointer(cython.int)
+    ret_p_ptr: cython.pointer(cython.int)
+    ret_v_ptr: cython.pointer(cython.float)
+
+    if ls == 0 or le == 0:
+        raise Exception("length is 0")
+
+    start_ptr = cython.cast(cython.pointer(cython.int), start_poss.data)
+    end_ptr = cython.cast(cython.pointer(cython.int), end_poss.data)
+
+    ret_p = np.zeros(ls + le, dtype="i4")
+    ret_v = np.zeros(ls + le, dtype="f4")
+    ret_p_ptr = cython.cast(cython.pointer(cython.int), ret_p.data)
+    ret_v_ptr = cython.cast(cython.pointer(cython.float), ret_v.data)
+
+    pre_p = start_ptr[0] if start_ptr[0] < end_ptr[0] else end_ptr[0]
+    if pre_p != 0:
+        ret_p_ptr[0] = pre_p
+        value = 0.0
+        if value < baseline_value:
+            value = baseline_value
+        ret_v_ptr[0] = value
+        ret_p_ptr += 1
+        ret_v_ptr += 1
+        I += 1
+
+    while i_s < ls and i_e < le:
+        if start_ptr[0] < end_ptr[0]:
+            p = start_ptr[0]
+            if p != pre_p:
+                ret_p_ptr[0] = p
+                value = pileup * scale_factor
+                if value < baseline_value:
+                    value = baseline_value
+                ret_v_ptr[0] = value
+                ret_p_ptr += 1
+                ret_v_ptr += 1
+                I += 1
+                pre_p = p
+            pileup += 1
+            i_s += 1
+            start_ptr += 1
+        elif start_ptr[0] > end_ptr[0]:
+            p = end_ptr[0]
+            if p != pre_p:
+                ret_p_ptr[0] = p
+                value = pileup * scale_factor
+                if value < baseline_value:
+                    value = baseline_value
+                ret_v_ptr[0] = value
+                ret_p_ptr += 1
+                ret_v_ptr += 1
+                I += 1
+                pre_p = p
+            pileup -= 1
+            i_e += 1
+            end_ptr += 1
+        else:
+            i_s += 1
+            i_e += 1
+            start_ptr += 1
+            end_ptr += 1
+
+    if i_e < le:
+        for i in range(i_e, le):
+            p = end_ptr[0]
+            if p != pre_p:
+                ret_p_ptr[0] = p
+                value = pileup * scale_factor
+                if value < baseline_value:
+                    value = baseline_value
+                ret_v_ptr[0] = value
+                ret_p_ptr += 1
+                ret_v_ptr += 1
+                I += 1
+                pre_p = p
+            pileup -= 1
+            end_ptr += 1
+
+    ret_p.resize(I, refcheck=False)
+    ret_v.resize(I, refcheck=False)
+    return [ret_p, ret_v]
+
+
+@cython.cfunc
 def _write_pv_to_bedGraph(pv: cnp.ndarray,
                           chrom: bytes,
                           output_filename: bytes,
@@ -619,6 +735,237 @@ def pileup_from_PN(P_array: cnp.ndarray, N_array: cnp.ndarray,
     clean_up_ndarray(start_poss)
     clean_up_ndarray(end_poss)
     return pileup
+
+
+@cython.ccall
+def pileup_from_PN_shifted(P_array: cnp.ndarray,
+                           N_array: cnp.ndarray,
+                           five_shift: cython.long,
+                           three_shift: cython.long,
+                           rlength: cython.int,
+                           scale_factor: cython.float = 1.0,
+                           baseline_value: cython.float = 0.0) -> list:
+    """Pile up plus/minus read ends using V1-compatible shifts.
+
+    Returns the legacy ``[positions, values]`` shape used by track methods.
+    """
+    ret: list
+    start_poss: cnp.ndarray
+    end_poss: cnp.ndarray
+
+    start_poss = np.concatenate((P_array-five_shift, N_array-three_shift))
+    end_poss = np.concatenate((P_array+three_shift, N_array+five_shift))
+    start_poss.sort()
+    end_poss.sort()
+    start_poss = fix_coordinates(start_poss, rlength)
+    end_poss = fix_coordinates(end_poss, rlength)
+    ret = _pileup_sorted_unit_as_list(start_poss,
+                                      end_poss,
+                                      scale_factor,
+                                      baseline_value)
+    clean_up_ndarray(start_poss)
+    clean_up_ndarray(end_poss)
+    return ret
+
+
+@cython.ccall
+def pileup_from_LR_as_list(LR_array: cnp.ndarray,
+                           scale_factor: cython.float = 1.0,
+                           baseline_value: cython.float = 0.0) -> list:
+    """Pile up LR fragments and return the legacy ``[p, v]`` shape."""
+    ret: list
+    start_poss: cnp.ndarray
+    end_poss: cnp.ndarray
+
+    start_poss = np.sort(LR_array['l'])
+    end_poss = np.sort(LR_array['r'])
+    ret = _pileup_sorted_unit_as_list(start_poss,
+                                      end_poss,
+                                      scale_factor,
+                                      baseline_value)
+    clean_up_ndarray(start_poss)
+    clean_up_ndarray(end_poss)
+    return ret
+
+
+@cython.ccall
+def over_two_pv_array(pv_array1: list,
+                      pv_array2: list,
+                      func: str = "max") -> list:
+    """Merge two legacy [p, v] arrays with a pointwise reducer."""
+    l1: cython.long
+    l2: cython.long
+    i1: cython.long = 0
+    i2: cython.long = 0
+    I: cython.long = 0
+    value: cython.float
+    a1_pos: cnp.ndarray
+    a2_pos: cnp.ndarray
+    ret_pos: cnp.ndarray
+    a1_v: cnp.ndarray
+    a2_v: cnp.ndarray
+    ret_v: cnp.ndarray
+    a1_pos_ptr: cython.pointer(cython.int)
+    a2_pos_ptr: cython.pointer(cython.int)
+    ret_pos_ptr: cython.pointer(cython.int)
+    a1_v_ptr: cython.pointer(cython.float)
+    a2_v_ptr: cython.pointer(cython.float)
+    ret_v_ptr: cython.pointer(cython.float)
+
+    [a1_pos, a1_v] = pv_array1
+    [a2_pos, a2_v] = pv_array2
+    ret_pos = np.zeros(a1_pos.shape[0] + a2_pos.shape[0], dtype="i4")
+    ret_v = np.zeros(a1_pos.shape[0] + a2_pos.shape[0], dtype="f4")
+
+    a1_pos_ptr = cython.cast(cython.pointer(cython.int), a1_pos.data)
+    a1_v_ptr = cython.cast(cython.pointer(cython.float), a1_v.data)
+    a2_pos_ptr = cython.cast(cython.pointer(cython.int), a2_pos.data)
+    a2_v_ptr = cython.cast(cython.pointer(cython.float), a2_v.data)
+    ret_pos_ptr = cython.cast(cython.pointer(cython.int), ret_pos.data)
+    ret_v_ptr = cython.cast(cython.pointer(cython.float), ret_v.data)
+
+    l1 = a1_pos.shape[0]
+    l2 = a2_pos.shape[0]
+
+    if func not in ("max", "min", "mean"):
+        raise Exception("Invalid function")
+
+    while i1 < l1 and i2 < l2:
+        if func == "max":
+            value = a1_v_ptr[0] if a1_v_ptr[0] > a2_v_ptr[0] else a2_v_ptr[0]
+        elif func == "min":
+            value = a1_v_ptr[0] if a1_v_ptr[0] < a2_v_ptr[0] else a2_v_ptr[0]
+        else:
+            value = (a1_v_ptr[0] + a2_v_ptr[0]) / 2.0
+
+        ret_v_ptr[0] = value
+        I += 1
+        if a1_pos_ptr[0] < a2_pos_ptr[0]:
+            ret_pos_ptr[0] = a1_pos_ptr[0]
+            ret_pos_ptr += 1
+            ret_v_ptr += 1
+            a1_pos_ptr += 1
+            a1_v_ptr += 1
+            i1 += 1
+        elif a1_pos_ptr[0] > a2_pos_ptr[0]:
+            ret_pos_ptr[0] = a2_pos_ptr[0]
+            ret_pos_ptr += 1
+            ret_v_ptr += 1
+            a2_pos_ptr += 1
+            a2_v_ptr += 1
+            i2 += 1
+        else:
+            ret_pos_ptr[0] = a1_pos_ptr[0]
+            ret_pos_ptr += 1
+            ret_v_ptr += 1
+            a1_pos_ptr += 1
+            a1_v_ptr += 1
+            i1 += 1
+            a2_pos_ptr += 1
+            a2_v_ptr += 1
+            i2 += 1
+
+    ret_pos.resize(I, refcheck=False)
+    ret_v.resize(I, refcheck=False)
+    return [ret_pos, ret_v]
+
+
+@cython.ccall
+def naive_quick_pileup(sorted_poss: cnp.ndarray, extension: int) -> list:
+    """Simple pileup by extending each sorted tag symmetrically."""
+    start_poss: cnp.ndarray
+    end_poss: cnp.ndarray
+    ret: list
+
+    if sorted_poss.shape[0] == 0:
+        raise Exception("length is 0")
+
+    start_poss = sorted_poss - extension
+    start_poss[start_poss < 0] = 0
+    end_poss = sorted_poss + extension
+    ret = _pileup_sorted_unit_as_list(start_poss, end_poss, 1.0, 0.0)
+    clean_up_ndarray(start_poss)
+    clean_up_ndarray(end_poss)
+    return ret
+
+
+@cython.cfunc
+def __close_peak(peak_content,
+                 peaks,
+                 max_v: cython.float,
+                 min_length: cython.int):
+    """Internal function to find the summit and height."""
+    tsummit: list = []
+    summit: cython.int = 0
+    summit_value: cython.float = 0
+    tstart: cython.int
+    tend: cython.int
+    tvalue: cython.float
+
+    for (tstart, tend, tvalue) in peak_content:
+        if not summit_value or summit_value < tvalue:
+            tsummit = [int((tend+tstart)/2),]
+            summit_value = tvalue
+        elif summit_value == tvalue:
+            tsummit.append(int((tend+tstart)/2))
+    summit = tsummit[int((len(tsummit)+1)/2)-1]
+    if summit_value < max_v:
+        peaks.append((summit, summit_value))
+    return
+
+
+@cython.ccall
+def naive_call_peaks(pv_array: list, min_v: cython.float,
+                     max_v: cython.float = 1e30,
+                     max_gap: cython.int = 50,
+                     min_length: cython.int = 200):
+    """Identify peak summits from a legacy [p, v] pileup array."""
+    pre_p: cython.int
+    p: cython.int
+    i: cython.int
+    x: cython.long
+    v: cython.double
+    peak_content: list
+    ret_peaks: list = []
+
+    peak_content = []
+    (ps, vs) = pv_array
+    psn = iter(ps).__next__
+    vsn = iter(vs).__next__
+    x = 0
+    pre_p = 0
+    while True:
+        try:
+            p = psn()
+            v = vsn()
+        except Exception:
+            break
+        x += 1
+        if v > min_v:
+            peak_content = [(pre_p, p, v),]
+            pre_p = p
+            break
+        else:
+            pre_p = p
+
+    for i in range(x, len(ps)):
+        p = psn()
+        v = vsn()
+        if v <= min_v:
+            pre_p = p
+            continue
+        if pre_p - peak_content[-1][1] <= max_gap:
+            peak_content.append((pre_p, p, v))
+        else:
+            if peak_content[-1][1] - peak_content[0][0] >= min_length:
+                __close_peak(peak_content, ret_peaks, max_v, min_length)
+            peak_content = [(pre_p, p, v),]
+        pre_p = p
+
+    if peak_content:
+        if peak_content[-1][1] - peak_content[0][0] >= min_length:
+            __close_peak(peak_content, ret_peaks, max_v, min_length)
+    return ret_peaks
 
 
 @cython.ccall
