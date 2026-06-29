@@ -3,6 +3,9 @@
 
 import unittest
 from MACS3.Signal.PairedEndTrack import PETrackI, PETrackII
+from MACS3.Signal.PileupV2 import (pileup_from_LRC,
+                                   pileup_from_LRC_centers_as_list,
+                                   over_two_pv_array)
 from MACS3.Signal.Region import Regions
 import numpy as np
 import anndata  # noqa: F401
@@ -177,6 +180,72 @@ class Test_PETrackII(unittest.TestCase):
         bdg = pe_subset.pileup_bdg2()
         peaks = bdg.call_peaks(cutoff=10, min_length=20, max_gap=10)
         self.assertEqual(str(peaks), self.subset_peak_str)
+
+    def test_control_pileup_matches_legacy_temp_arrays(self):
+        locs = np.array([(10, 90, 2),
+                         (10, 90, 1),
+                         (25, 70, 3),
+                         (40, 100, 2),
+                         (60, 80, 4)],
+                        dtype=[("l", "i4"), ("r", "i4"), ("c", "u2")])
+        ds = [20, 45]
+        scales = [1.5, 0.25]
+        baseline = 0.5
+        expected = None
+
+        for d, scale in zip(ds, scales):
+            half_d = d // 2
+            tmp_arr_l = locs.copy()
+            tmp_arr_l["l"] = tmp_arr_l["l"] - half_d
+            tmp_arr_l["r"] = tmp_arr_l["l"] + d
+
+            tmp_arr_r = locs.copy()
+            tmp_arr_r["l"] = tmp_arr_r["r"] - half_d
+            tmp_arr_r["r"] = tmp_arr_r["l"] + d
+
+            tmp_arr = np.concatenate([tmp_arr_l, tmp_arr_r])
+            pv = pileup_from_LRC(tmp_arr)
+            v = pv["v"] * scale
+            v[v < baseline] = baseline
+            current = [pv["p"], v]
+
+            if expected:
+                expected = over_two_pv_array(expected, current, func="max")
+            else:
+                expected = current
+
+        pe = PETrackII()
+        for i, (left, right, count) in enumerate(locs):
+            pe.add_loc(b"chr1", int(left), int(right), b"BC%d" % i, int(count))
+        pe.finalize()
+        observed = pe.pileup_a_chromosome_c(b"chr1", ds, scales, baseline)
+
+        np.testing.assert_array_equal(observed[0], expected[0])
+        np.testing.assert_allclose(observed[1], expected[1])
+
+    def test_lrc_center_helper_handles_unsorted_right_endpoints(self):
+        locs = np.array([(1, 100, 2),
+                         (2, 20, 3),
+                         (2, 10, 1),
+                         (5, 30, 4)],
+                        dtype=[("l", "i4"), ("r", "i4"), ("c", "u2")])
+        d = 10
+        scale = 0.75
+        baseline = 0.25
+        half_d = d // 2
+        tmp_arr_l = locs.copy()
+        tmp_arr_l["l"] = tmp_arr_l["l"] - half_d
+        tmp_arr_l["r"] = tmp_arr_l["l"] + d
+        tmp_arr_r = locs.copy()
+        tmp_arr_r["l"] = tmp_arr_r["r"] - half_d
+        tmp_arr_r["r"] = tmp_arr_r["l"] + d
+        pv = pileup_from_LRC(np.concatenate([tmp_arr_l, tmp_arr_r]))
+        expected_v = pv["v"] * scale
+        expected_v[expected_v < baseline] = baseline
+
+        observed = pileup_from_LRC_centers_as_list(locs, d, scale, baseline)
+        np.testing.assert_array_equal(observed[0], pv["p"])
+        np.testing.assert_allclose(observed[1], expected_v)
 
     def test_exclude(self):
         self.pe.exclude(self.x_regions)

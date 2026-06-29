@@ -24,6 +24,8 @@ from MACS3.Signal.BedGraph import (bedGraphTrackI,
                                    bedGraphTrackII)
 from MACS3.Signal.PileupV2 import (pileup_from_LR_hmmratac,
                                    pileup_from_LRC,
+                                   pileup_from_LRC_as_list,
+                                   pileup_from_LRC_centers_as_list,
                                    pileup_from_LR_as_list,
                                    pileup_from_PN_shifted,
                                    over_two_pv_array)
@@ -1451,15 +1453,10 @@ class PETrackII:
             Two-element list ``[positions, values]`` with numpy arrays describing
             the pileup breakpoints and scaled coverage.
         """
-        pv: cnp.ndarray
-        v: cnp.ndarray
-
-        pv = pileup_from_LRC(self.locations[chrom])
-        v = pv['v']
-        v = v * scale_factor
-        v[v < baseline_value] = baseline_value
-
-        return [pv['p'], v]
+        return pileup_from_LRC_as_list(self.locations[chrom],
+                                       scale_factor,
+                                       baseline_value,
+                                       left_sorted=self.is_sorted)
 
     @cython.ccall
     def pileup_a_chromosome_c(self,
@@ -1487,15 +1484,9 @@ class PETrackII:
             with the maximum value taken across projections.
         """
         prev_pileup: list
+        tmp_pileup: list
         scale_factor: cython.float
         d: cython.long
-        five_shift: cython.long
-
-        pv: cnp.ndarray
-        v: cnp.ndarray
-        tmp_arr_l: cnp.ndarray
-        tmp_arr_r: cnp.ndarray
-        tmp_arr: cnp.ndarray
 
         ####
         if not self.is_sorted:
@@ -1508,33 +1499,17 @@ class PETrackII:
         for i in range(len(scale_factor_s)):
             d = ds[i]
             scale_factor = scale_factor_s[i]
-            five_shift = d//2
-
-            # note, we have to pileup left ends and right ends separately
-            tmp_arr_l = self.locations[chrom].copy()
-            tmp_arr_l['l'] = tmp_arr_l['l'] - five_shift
-            tmp_arr_l['r'] = tmp_arr_l['l'] + d
-
-            tmp_arr_r = self.locations[chrom].copy()
-            tmp_arr_r['l'] = tmp_arr_r['r'] - five_shift
-            tmp_arr_r['r'] = tmp_arr_r['l'] + d
-
-            tmp_arr = np.concatenate([tmp_arr_l, tmp_arr_r])
-            del tmp_arr_l
-            del tmp_arr_r
-
-            pv = pileup_from_LRC(tmp_arr)
-
-            v = pv['v']
-            v = v * scale_factor
-            v[v < baseline_value] = baseline_value
+            tmp_pileup = pileup_from_LRC_centers_as_list(self.locations[chrom],
+                                                         d,
+                                                         scale_factor,
+                                                         baseline_value)
 
             if prev_pileup:
                 prev_pileup = over_two_pv_array(prev_pileup,
-                                                [pv['p'], v],
+                                                tmp_pileup,
                                                 func="max")
             else:
-                prev_pileup = [pv['p'], v]
+                prev_pileup = tmp_pileup
 
         return prev_pileup
 
@@ -1557,18 +1532,18 @@ class PETrackII:
             BedGraph track populated with per-chromosome pileup data.
         """
         bdg: bedGraphTrackI
-        pv: cnp.ndarray
+        tmp_pileup: list
         chrom: bytes
 
         bdg = bedGraphTrackI(baseline_value=baseline_value)
         for chrom in sorted(self.get_chr_names()):
-            pv = pileup_from_LRC(self.locations[chrom])
-            v = pv['v']
-            v = v * scale_factor
-            v[v < baseline_value] = baseline_value
+            tmp_pileup = pileup_from_LRC_as_list(self.locations[chrom],
+                                                 scale_factor,
+                                                 baseline_value,
+                                                 left_sorted=self.is_sorted)
             bdg.add_chrom_data(chrom,
-                               pyarray('i', pv['p']),
-                               pyarray('f', v))
+                               pyarray('i', tmp_pileup[0]),
+                               pyarray('f', tmp_pileup[1]))
         return bdg
 
     @cython.ccall
