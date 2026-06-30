@@ -70,3 +70,31 @@ def test_refine_peak():
     out = str(new_peak)
     std = "chrom:chrY\tstart:50\tend:80\tname:peak_1\tscore:14\tsummit:77\nchrom:chrY\tstart:95\tend:152\tname:peak_2\tscore:3.33333\tsummit:122\n"
     assert out == std
+
+
+def test_refine_peak_nested_input_peaks():
+    # regression test: IndexError raised from __close_peak() when
+    # refine_peaks() is given two input peaks where the second peak's
+    # end has already been passed by the bedGraph cursor by the time
+    # the cursor would otherwise overlap it (e.g. two closely-spaced
+    # HMMRATAC "open" peaks against a coarse fold-change bedGraph track).
+    bdg_regions = [(b"chrY", 0, 15, 1.0),
+                   (b"chrY", 15, 60, 2.0),
+                   (b"chrY", 60, 100, 3.0)]
+    nested_peaks = [(b"chrY", 10, 50),
+                    (b"chrY", 20, 30)]
+    bdg = bedGraphTrackI()
+    for a in bdg_regions:
+        bdg.add_loc(a[0], a[1], a[2], a[3])
+    peak = PeakIO()
+    for a in nested_peaks:
+        peak.add(a[0], a[1], a[2])
+
+    # this used to raise IndexError: list index out of range
+    new_peak = bdg.refine_peaks(peak)
+
+    result = new_peak.get_data_from_chrom(b"chrY")
+    assert len(result) == 1
+    assert result[0]["start"] == 10
+    assert result[0]["end"] == 50
+
