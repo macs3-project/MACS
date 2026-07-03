@@ -716,7 +716,8 @@ class bedGraphTrackI:
                         break
                 elif pre_p >= peak_e:
                     # close peak
-                    self.__close_peak(peak_content, new_peaks, 0, chrom)
+                    if peak_content:
+                        self.__close_peak(peak_content, new_peaks, 0, chrom)
                     peak_content = []
                     # move peak
                     try:
@@ -1917,7 +1918,8 @@ class bedGraphTrackII:
                         break
                 elif pre_p >= peak_e:
                     # close peak
-                    self.__close_peak(peak_content, new_peaks, 0, chrom)
+                    if peak_content:
+                        self.__close_peak(peak_content, new_peaks, 0, chrom)
                     peak_content = []
                     # move peak
                     try:
