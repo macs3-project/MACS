@@ -1,0 +1,118 @@
+name: MACS Version Benchmark
+
+on:
+  workflow_dispatch:
+    inputs:
+      repeats:
+        description: Number of measured repeats per MACS version
+        required: true
+        default: "3"
+      benchmark_root:
+        description: Benchmark workspace path on the runner
+        required: true
+        default: macs-version-survey
+
+jobs:
+  benchmark:
+    name: Benchmark MACS v1/v2/v3 on x86_64 Linux
+    runs-on: ubuntu-22.04
+    timeout-minutes: 120
+
+    defaults:
+      run:
+        shell: bash -el {0}
+
+    steps:
+      - name: Checkout MACS
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+
+      - name: Install GNU time
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y time
+
+      - name: Set up Miniforge
+        uses: conda-incubator/setup-miniconda@v3
+        with:
+          miniforge-version: latest
+          use-mamba: true
+          channels: conda-forge,bioconda
+          channel-priority: strict
+          auto-activate-base: false
+
+      - name: Create isolated conda environments
+        run: |
+          mamba create -y -n macs-v1-py2 python=2.7 'numpy<1.17'
+          mamba create -y -n macs-v2-survey python=3.9 numpy cython=0.29 cykhash pip setuptools wheel
+          mamba create -y -n macs-v3-survey python=3.11 numpy scipy cython scikit-learn hmmlearn cykhash pip setuptools wheel
+
+      - name: Prepare version worktrees
+        env:
+          ROOT: ${{ github.workspace }}/${{ inputs.benchmark_root }}
+        run: |
+          mkdir -p "${ROOT}/src"
+          git clone https://github.com/macs3-project/MACS.git "${ROOT}/src/MACS"
+          git -C "${ROOT}/src/MACS" fetch --all --tags --prune
+          git -C "${ROOT}/src/MACS" worktree add "${ROOT}/src/MACS-v1" origin/macs_v1
+          git -C "${ROOT}/src/MACS" worktree add "${ROOT}/src/MACS-v2" origin/macs_v2
+          git -C "${ROOT}/src/MACS" worktree add "${ROOT}/src/MACS-v3.0.4" v3.0.4
+
+      - name: Install MACS v1
+        env:
+          ROOT: ${{ github.workspace }}/${{ inputs.benchmark_root }}
+        run: |
+          cd "${ROOT}/src/MACS-v1"
+          conda run -n macs-v1-py2 python setup.py build
+          conda run -n macs-v1-py2 python setup.py install
+          conda run -n macs-v1-py2 macs --help | head -5
+
+      - name: Install MACS2
+        env:
+          ROOT: ${{ github.workspace }}/${{ inputs.benchmark_root }}
+        run: |
+          cd "${ROOT}/src/MACS-v2"
+          conda run -n macs-v2-survey python -m pip install -e .
+          conda run -n macs-v2-survey macs2 --version
+
+      - name: Install MACS3
+        env:
+          ROOT: ${{ github.workspace }}/${{ inputs.benchmark_root }}
+        run: |
+          cd "${ROOT}/src/MACS-v3.0.4"
+          conda run -n macs-v3-survey python -m pip install -e .
+          conda run -n macs-v3-survey macs3 --version
+
+      - name: Run benchmark
+        env:
+          ROOT: ${{ github.workspace }}/${{ inputs.benchmark_root }}
+          REPEATS: ${{ inputs.repeats }}
+          TIME_MODE: linux
+          MACS1_CMD: conda run -n macs-v1-py2 macs
+          MACS2_CMD: conda run -n macs-v2-survey macs2
+          MACS3_CMD: conda run -n macs-v3-survey macs3
+        run: |
+          bash scripts/run_macs_version_survey.sh
+
+      - name: Show summary
+        env:
+          ROOT: ${{ github.workspace }}/${{ inputs.benchmark_root }}
+        run: |
+          column -t -s $'\t' "${ROOT}/results/summary.tsv"
+          echo
+          column -t -s $'\t' "${ROOT}/results/benchmark_runs.tsv"
+
+      - name: Upload benchmark artifacts
+        uses: actions/upload-artifact@v6
+        with:
+          name: macs-version-benchmark-results
+          path: |
+            ${{ github.workspace }}/${{ inputs.benchmark_root }}/results/benchmark_runs.tsv
+            ${{ github.workspace }}/${{ inputs.benchmark_root }}/results/summary.tsv
+            ${{ github.workspace }}/${{ inputs.benchmark_root }}/results/output_peak_counts.tsv
+            ${{ github.workspace }}/${{ inputs.benchmark_root }}/logs/git_revisions.txt
+            ${{ github.workspace }}/${{ inputs.benchmark_root }}/logs/input_sha256.txt
+            ${{ github.workspace }}/${{ inputs.benchmark_root }}/logs/version_checks.txt
+            ${{ github.workspace }}/${{ inputs.benchmark_root }}/logs/*.stdout.txt
+            ${{ github.workspace }}/${{ inputs.benchmark_root }}/logs/*.time_stderr.txt
