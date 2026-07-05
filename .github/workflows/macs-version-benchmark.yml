@@ -26,7 +26,6 @@ jobs:
       - name: Checkout MACS
         uses: actions/checkout@v6
         with:
-          fetch-depth: 0
           submodules: 'true'
 
       - name: Install GNU time
