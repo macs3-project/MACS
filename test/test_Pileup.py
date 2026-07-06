@@ -15,10 +15,16 @@ from MACS3.Signal.Pileup import (se_all_in_one_pileup,
                                  quick_pileup,
                                  naive_quick_pileup,
                                  over_two_pv_array,
+                                 naive_call_peaks as naive_call_peaks_v1,
                                  pileup_and_write_se as pileup_and_write_se_v1)
 from MACS3.Signal.PileupV2 import (pileup_from_LR,
                                    pileup_from_LRC,
                                    pileup_from_PN,
+                                   pileup_from_LR_as_list,
+                                   pileup_from_PN_shifted,
+                                   over_two_pv_array as over_two_pv_array_v2,
+                                   naive_quick_pileup as naive_quick_pileup_v2,
+                                   naive_call_peaks as naive_call_peaks_v2,
                                    pileup_and_write_pe as pileup_and_write_pe_v2,
                                    pileup_and_write_se as pileup_and_write_se_v2)
 from MACS3.Signal.FixWidthTrack import FWTrack
@@ -365,6 +371,46 @@ class Test_PileupV2_SE(unittest.TestCase):
     def test_pileup_1(self):
         pileup = pileup_from_PN(self.P, self.N, self.extsize)
         np.testing.assert_equal(pileup, self.expect_pileup_1)
+
+
+class Test_PileupV2_Compatibility_Helpers(unittest.TestCase):
+    """V2 wrappers that preserve legacy [p, v] helper behavior."""
+
+    def test_lr_as_list_matches_quick_pileup(self):
+        lr = np.array([(3, 7), (1, 4), (6, 8), (6, 10)],
+                      dtype=[("l", "i4"), ("r", "i4")])
+        expected = quick_pileup(np.sort(lr["l"]), np.sort(lr["r"]), 1.25, 0.5)
+        observed = pileup_from_LR_as_list(lr, 1.25, 0.5)
+        np.testing.assert_array_equal(observed[0], expected[0])
+        np.testing.assert_allclose(observed[1], expected[1])
+
+    def test_shifted_pn_matches_se_all_in_one(self):
+        plus = np.array([0, 3, 3, 8], dtype="i4")
+        minus = np.array([5, 6, 9, 10], dtype="i4")
+        expected = se_all_in_one_pileup(plus, minus, 2, 6, 20, 0.75, 0.25)
+        observed = pileup_from_PN_shifted(plus, minus, 2, 6, 20, 0.75, 0.25)
+        np.testing.assert_array_equal(observed[0], expected[0])
+        np.testing.assert_allclose(observed[1], expected[1])
+
+    def test_over_two_pv_array_matches_v1(self):
+        pv1 = [np.array([1, 3, 5, 8], dtype="i4"),
+               np.array([0, 2, 1, 3], dtype="f4")]
+        pv2 = [np.array([2, 4, 5, 9], dtype="i4"),
+               np.array([1, 1, 4, 0], dtype="f4")]
+        for func in ("max", "min", "mean"):
+            expected = over_two_pv_array(pv1, pv2, func=func)
+            observed = over_two_pv_array_v2(pv1, pv2, func=func)
+            np.testing.assert_array_equal(observed[0], expected[0])
+            np.testing.assert_allclose(observed[1], expected[1])
+
+    def test_naive_helpers_match_v1(self):
+        tags = np.array([1, 3, 5, 8, 13, 21], dtype="i4")
+        expected = naive_quick_pileup(tags, 3)
+        observed = naive_quick_pileup_v2(tags, 3)
+        np.testing.assert_array_equal(observed[0], expected[0])
+        np.testing.assert_allclose(observed[1], expected[1])
+        self.assertEqual(naive_call_peaks_v2(observed, 1, min_length=1),
+                         naive_call_peaks_v1(expected, 1, min_length=1))
 
 
 class Test_PileupV2_Writers(unittest.TestCase):

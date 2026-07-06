@@ -17,8 +17,7 @@ import os
 # ------------------------------------
 # from MACS3.Utilities.Constants import *
 from MACS3.Utilities.OptValidator import opt_validate_pileup
-from MACS3.Signal.Pileup import pileup_and_write_se
-from MACS3.IO.BedGraphIO import bedGraphIO
+from MACS3.Signal import PileupV2
 # ------------------------------------
 # Main function
 # ------------------------------------
@@ -64,9 +63,10 @@ def run(o_options):
             info("#   extracted %d fragments", treat.total)
             
         info("# Pileup paired-end alignment file.")
-        bdg = treat.pileup_bdg()
-        bdgio = bedGraphIO(outfile, data=bdg)
-        bdgio.write_bedGraph(trackline=False)
+        PileupV2.pileup_and_write_pe(treat,
+                                     outfile.encode(),
+                                     scale_factor=1,
+                                     baseline_value=0.0)
     else:
         (tsize, treat) = load_tag_files_options(options)
 
@@ -77,10 +77,10 @@ def run(o_options):
 
         if options.bothdirection:
             info("# Pileup alignment file, extend each read towards up/downstream direction with %d bps" % options.extsize)
-            pileup_and_write_se(treat, outfile.encode(), options.extsize * 2, 1, directional=False, halfextension=False)
+            PileupV2.pileup_and_write_se(treat, outfile.encode(), options.extsize * 2, 1, directional=False, halfextension=False)
         else:
             info("# Pileup alignment file, extend each read towards downstream direction with %d bps" % options.extsize)
-            pileup_and_write_se(treat, outfile.encode(), options.extsize, 1, directional=True, halfextension=False)
+            PileupV2.pileup_and_write_se(treat, outfile.encode(), options.extsize, 1, directional=True, halfextension=False)
 
     info("# Done! Check %s" % options.outputfile)
 

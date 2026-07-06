@@ -16,7 +16,7 @@ the distribution).
 # MACS3 modules
 # ------------------------------------
 # from MACS3.Utilities.Constants import *
-from MACS3.Signal.Pileup import naive_quick_pileup, naive_call_peaks
+from MACS3.Signal.PileupV2 import naive_quick_pileup, naive_call_peaks
 
 # ------------------------------------
 # Other modules
