@@ -41,10 +41,6 @@ from cython.cimports.libc.stdint import INT32_MAX as INT_MAX
 
 from MACS3.Utilities.Logger import logging
 
-import pandas as pd
-from scipy import sparse
-import anndata as ad
-
 logger = logging.getLogger(__name__)
 debug = logger.debug
 info = logger.info
@@ -1727,6 +1723,10 @@ class PETrackII:
         peak_data: list
         peak_names_append: object
         peak_data_append: object
+
+        import pandas as pd
+        from scipy import sparse
+        import anndata as ad
 
         peak_names = []
         peak_data = []

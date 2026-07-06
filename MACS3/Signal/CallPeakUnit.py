@@ -26,13 +26,13 @@ import cython
 import cython.cimports.numpy as cnp
 # from numpy cimport int32_t, int64_t, float32_t, float64_t
 from cython.cimports.cpython import bool
-from cykhash import PyObjectMap, Float32to32Map
 
 # ------------------------------------
 # C lib
 # ------------------------------------
 from cython.cimports.libc.stdio import FILE, fopen, fprintf, fclose
 from cython.cimports.libc.math import exp, log10, log1p, erf, sqrt
+from cython.cimports.libc.string import memcpy
 
 # ------------------------------------
 # MACS3 modules
@@ -50,21 +50,26 @@ info = logger.info
 # --------------------------------------------
 # cached pscore function and LR_asym functions
 # --------------------------------------------
-pscore_dict = PyObjectMap()
-logLR_dict = PyObjectMap()
+pscore_dict = {}
+logLR_dict = {}
 
 
 @cython.cfunc
-def get_pscore(t: tuple) -> cython.float:
-    """Return cached ``-log10`` Poisson tail probability for ``t``."""
+def get_pscore(x: cython.int, y: cython.float) -> cython.float:
+    """Return cached ``-log10`` Poisson tail probability for ``x`` and ``y``."""
     val: cython.float
+    y_bits: cython.uint
+    key: cython.longlong
 
-    if t in pscore_dict:
-        return pscore_dict[t]
+    memcpy(cython.address(y_bits), cython.address(y), cython.sizeof(y))
+    key = (cython.cast(cython.longlong, cython.cast(cython.uint, x)) << 32) | y_bits
+
+    if key in pscore_dict:
+        return pscore_dict[key]
     else:
         # calculate and cache
-        val = -1.0 * poisson_cdf(t[0], t[1], False, True)
-        pscore_dict[t] = val
+        val = -1.0 * poisson_cdf(x, y, False, True)
+        pscore_dict[key] = val
         return val
 
 
@@ -405,8 +410,8 @@ class CallerFromAlignments:
     bedGraph_ctrl_f: cython.pointer(FILE)
 
     # data needed to be pre-computed before peak calling
-    # remember pvalue->qvalue convertion; saved in cykhash Float32to32Map
-    pqtable: Float32to32Map
+    # remember pvalue->qvalue conversion
+    pqtable: dict
     # whether the pvalue of whole genome is all calculated. If yes,
     # it's OK to calculate q-value.
     pvalue_all_done: bool
@@ -499,7 +504,7 @@ class CallerFromAlignments:
         self.ctrl_scaling_factor_s = ctrl_scaling_factor_s
         self.end_shift = end_shift
         self.lambda_bg = lambda_bg
-        self.pqtable = Float32to32Map(for_int=False)  # Float32 -> Float32 map
+        self.pqtable = {}
         self.save_bedGraph = save_bedGraph
         self.save_SPMR = save_SPMR
         self.bedGraph_filename_prefix = bedGraph_filename_prefix.encode()
@@ -653,6 +658,13 @@ class CallerFromAlignments:
         c_v: cnp.ndarray
         ret_t: cnp.ndarray
         ret_c: cnp.ndarray
+        t_p_ptr: cython.pointer(cython.int)
+        c_p_ptr: cython.pointer(cython.int)
+        ret_p_ptr: cython.pointer(cython.int)
+        t_v_ptr: cython.pointer(cython.float)
+        c_v_ptr: cython.pointer(cython.float)
+        ret_t_ptr: cython.pointer(cython.float)
+        ret_c_ptr: cython.pointer(cython.float)
 
         [t_p, t_v] = treat_pv
         [c_p, c_v] = ctrl_pv
@@ -666,36 +678,55 @@ class CallerFromAlignments:
         ret_t = np.zeros(chrom_max_len, dtype="f4")  # value from treatment
         ret_c = np.zeros(chrom_max_len, dtype="f4")  # value from control
 
+        t_p_ptr = cython.cast(cython.pointer(cython.int), t_p.data)
+        c_p_ptr = cython.cast(cython.pointer(cython.int), c_p.data)
+        ret_p_ptr = cython.cast(cython.pointer(cython.int), ret_p.data)
+        t_v_ptr = cython.cast(cython.pointer(cython.float), t_v.data)
+        c_v_ptr = cython.cast(cython.pointer(cython.float), c_v.data)
+        ret_t_ptr = cython.cast(cython.pointer(cython.float), ret_t.data)
+        ret_c_ptr = cython.cast(cython.pointer(cython.float), ret_c.data)
+
         ir = 0
         it = 0
         ic = 0
 
         while it < lt and ic < lc:
-            if t_p[it] < c_p[ic]:
+            if t_p_ptr[0] < c_p_ptr[0]:
                 # clip a region from pre_p to p1, then pre_p: set as p1.
-                ret_p[ir] = t_p[it]
-                ret_t[ir] = t_v[it]
-                ret_c[ir] = c_v[ic]
+                ret_p_ptr[0] = t_p_ptr[0]
+                ret_t_ptr[0] = t_v_ptr[0]
+                ret_c_ptr[0] = c_v_ptr[0]
                 ir += 1
                 # call for the next p1 and v1
                 it += 1
-            elif t_p[it] > c_p[ic]:
+                t_p_ptr += 1
+                t_v_ptr += 1
+            elif t_p_ptr[0] > c_p_ptr[0]:
                 # clip a region from pre_p to p2, then pre_p: set as p2.
-                ret_p[ir] = c_p[ic]
-                ret_t[ir] = t_v[it]
-                ret_c[ir] = c_v[ic]
+                ret_p_ptr[0] = c_p_ptr[0]
+                ret_t_ptr[0] = t_v_ptr[0]
+                ret_c_ptr[0] = c_v_ptr[0]
                 ir += 1
                 # call for the next p2 and v2
                 ic += 1
+                c_p_ptr += 1
+                c_v_ptr += 1
             else:
                 # from pre_p to p1 or p2, then pre_p: set as p1 or p2.
-                ret_p[ir] = t_p[it]
-                ret_t[ir] = t_v[it]
-                ret_c[ir] = c_v[ic]
+                ret_p_ptr[0] = t_p_ptr[0]
+                ret_t_ptr[0] = t_v_ptr[0]
+                ret_c_ptr[0] = c_v_ptr[0]
                 ir += 1
                 # call for the next p1, v1, p2, v2.
                 it += 1
                 ic += 1
+                t_p_ptr += 1
+                t_v_ptr += 1
+                c_p_ptr += 1
+                c_v_ptr += 1
+            ret_p_ptr += 1
+            ret_t_ptr += 1
+            ret_c_ptr += 1
 
         ret_p.resize(ir, refcheck=False)
         ret_t.resize(ir, refcheck=False)
@@ -762,9 +793,9 @@ class CallerFromAlignments:
                                           ctrl_array.data)
 
             for j in range(pos_array.shape[0]):
-                this_v = get_pscore((cython.cast(cython.int,
-                                                 treat_value_view[0]),
-                                     ctrl_value_view[0]))
+                this_v = get_pscore(cython.cast(cython.int,
+                                                treat_value_view[0]),
+                                    ctrl_value_view[0])
                 this_l = pos_view[0] - pre_p
                 if this_v in pscore_stat:
                     pscore_stat[this_v] += this_l
@@ -782,7 +813,7 @@ class CallerFromAlignments:
         # pre_l = 0
         pre_q = 2147483647      # save the previous q-value
 
-        self.pqtable = Float32to32Map(for_int=False)
+        self.pqtable = {}
         unique_values = sorted(list(pscore_stat.keys()), reverse=True)
         for i in range(len(unique_values)):
             v = unique_values[i]
@@ -953,7 +984,7 @@ class CallerFromAlignments:
         f = -log10(N)
         pre_q = 2147483647              # save the previous q-value
 
-        self.pqtable = Float32to32Map(for_int=False)  # {}
+        self.pqtable = {}
         # sorted(unique_values,reverse=True)
         unique_values = sorted(list(pscore_stat.keys()), reverse=True)
         for i in range(len(unique_values)):
@@ -1339,9 +1370,9 @@ class CallerFromAlignments:
                 if score_cutoff_s[i] > score_array_s[i][peak_content[summit_index][4]]:
                     return False  # not passed, then disgard this peak.
 
-            summit_p_score = pscore_dict[(cython.cast(cython.int,
-                                                      summit_treat),
-                                          summit_ctrl)]
+            summit_p_score = get_pscore(cython.cast(cython.int,
+                                                    summit_treat),
+                                        summit_ctrl)
             summit_q_score = self.pqtable[summit_p_score]
 
             peaks.add(chrom,           # chromosome
@@ -1467,9 +1498,9 @@ class CallerFromAlignments:
             summit_treat = peak_content[summit_index][2]
             summit_ctrl = peak_content[summit_index][3]
 
-            summit_p_score = pscore_dict[(cython.cast(cython.int,
-                                                      summit_treat),
-                                          summit_ctrl)]
+            summit_p_score = get_pscore(cython.cast(cython.int,
+                                                    summit_treat),
+                                        summit_ctrl)
             summit_q_score = self.pqtable[summit_p_score]
 
             for i in range(len(score_cutoff_s)):
@@ -1512,9 +1543,9 @@ class CallerFromAlignments:
         array1_size = array1.shape[0]
 
         for i in range(array1_size):
-            s_ptr[0] = get_pscore((cython.cast(cython.int,
-                                               a1_ptr[0]),
-                                   a2_ptr[0]))
+            s_ptr[0] = get_pscore(cython.cast(cython.int,
+                                             a1_ptr[0]),
+                                  a2_ptr[0])
             s_ptr += 1
             a1_ptr += 1
             a2_ptr += 1
@@ -1539,9 +1570,9 @@ class CallerFromAlignments:
         s_ptr = cython.cast(cython.pointer(cython.float), s.data)
 
         for i in range(array1.shape[0]):
-            s_ptr[0] = self.pqtable[get_pscore((cython.cast(cython.int,
-                                                            a1_ptr[0]),
-                                                a2_ptr[0]))]
+            s_ptr[0] = self.pqtable[get_pscore(cython.cast(cython.int,
+                                                          a1_ptr[0]),
+                                               a2_ptr[0])]
             s_ptr += 1
             a1_ptr += 1
             a2_ptr += 1
