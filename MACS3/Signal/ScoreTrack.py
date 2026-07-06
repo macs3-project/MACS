@@ -28,13 +28,13 @@ import cython
 import numpy as np
 import cython.cimports.numpy as cnp
 from cython.cimports.cpython import bool
-from cykhash import PyObjectMap, Float32to32Map
 
 # ------------------------------------
 # C lib
 # ------------------------------------
 from cython.cimports.libc.math import (log10,
                                        log)
+from cython.cimports.libc.string import memcpy
 
 # ------------------------------------
 # constants
@@ -61,7 +61,7 @@ def int_min(a: cython.int, b: cython.int) -> cython.int:
 
 LOG10_E: cython.float = 0.43429448190325176
 
-pscore_dict = PyObjectMap()
+pscore_dict = {}
 
 
 @cython.cfunc
@@ -69,19 +69,38 @@ def get_pscore(observed: cython.int,
                expectation: cython.float) -> cython.float:
     """Return cached ``-log10`` Poisson tail probability for ``observed``."""
     score: cython.double
+    expectation_bits: cython.uint
+    key: cython.longlong
 
+    memcpy(cython.address(expectation_bits), cython.address(expectation),
+           cython.sizeof(expectation))
+    key = ((cython.cast(cython.longlong,
+                        cython.cast(cython.uint, observed)) << 32)
+           | expectation_bits)
     try:
-        return pscore_dict[(observed, expectation)]
+        return pscore_dict[key]
     except KeyError:
         score = -1 * poisson_cdf(observed,
                                  expectation,
                                  False,
                                  True)
-        pscore_dict[(observed, expectation)] = score
+        pscore_dict[key] = score
         return score
 
 
-asym_logLR_dict = PyObjectMap()
+asym_logLR_dict = {}
+
+
+@cython.inline
+@cython.cfunc
+def float_pair_key(x: cython.float, y: cython.float) -> cython.longlong:
+    """Pack two exact float32 bit patterns into one integer cache key."""
+    x_bits: cython.uint
+    y_bits: cython.uint
+
+    memcpy(cython.address(x_bits), cython.address(x), cython.sizeof(x))
+    memcpy(cython.address(y_bits), cython.address(y), cython.sizeof(y))
+    return (cython.cast(cython.longlong, x_bits) << 32) | y_bits
 
 
 @cython.cfunc
@@ -89,38 +108,40 @@ def logLR_asym(x: cython.float,
                y: cython.float) -> cython.float:
     """Return asymmetric ``log10`` likelihood ratio between ``x`` and ``y``."""
     s: cython.float
+    key: cython.longlong = float_pair_key(x, y)
 
-    if (x, y) in asym_logLR_dict:
-        return asym_logLR_dict[(x, y)]
-    else:
+    try:
+        return asym_logLR_dict[key]
+    except KeyError:
         if x > y:
             s = (x*(log(x)-log(y))+y-x)*LOG10_E
         elif x < y:
             s = (x*(-log(x)+log(y))-y+x)*LOG10_E
         else:
             s = 0
-        asym_logLR_dict[(x, y)] = s
+        asym_logLR_dict[key] = s
         return s
 
 
-sym_logLR_dict = PyObjectMap()
+sym_logLR_dict = {}
 
 
 @cython.cfunc
 def logLR_sym(x: cython.float, y: cython.float) -> cython.float:
     """Return symmetric ``log10`` likelihood ratio between ``x`` and ``y``."""
     s: cython.float
+    key: cython.longlong = float_pair_key(x, y)
 
-    if (x, y) in sym_logLR_dict:
-        return sym_logLR_dict[(x, y)]
-    else:
+    try:
+        return sym_logLR_dict[key]
+    except KeyError:
         if x > y:
             s = (x*(log(x)-log(y))+y-x)*LOG10_E
         elif y > x:
             s = (y*(log(x)-log(y))+y-x)*LOG10_E
         else:
             s = 0
-        sym_logLR_dict[(x, y)] = s
+        sym_logLR_dict[key] = s
         return s
 
 
@@ -500,7 +521,7 @@ class ScoreTrackII:
         f = -log10(N)
         pre_q = 2147483647              # save the previous q-value
 
-        pvalue2qvalue = Float32to32Map(for_int=False)
+        pvalue2qvalue = {}
         unique_values = sorted(list(pvalue_stat.keys()), reverse=True)
         for i in range(len(unique_values)):
             v = unique_values[i]

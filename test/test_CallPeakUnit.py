@@ -8,7 +8,7 @@ from MACS3.IO.PeakIO import PeakIO
 
 
 # ---------------------------------------------------------------------------
-# Provide tiny Cython/cykhash stubs so the Python sources import cleanly.
+# Provide tiny Cython stubs so the Python sources import cleanly.
 # ---------------------------------------------------------------------------
 cython_stub = sys.modules.get("cython")
 if cython_stub is None:
@@ -57,18 +57,6 @@ if "cython.cimports.numpy" not in sys.modules:
     numpy_mod.ndarray = lambda *args, **kwargs: None
     sys.modules["cython.cimports.numpy"] = numpy_mod
     cimports_mod.numpy = numpy_mod
-
-if "cykhash" not in sys.modules:
-    cykhash_stub = types.ModuleType("cykhash")
-
-    class _Map(dict):
-        def __init__(self, for_int=False):
-            super().__init__()
-
-    cykhash_stub.PyObjectMap = _Map
-    cykhash_stub.Float32to32Map = _Map
-    sys.modules["cykhash"] = cykhash_stub
-
 
 def make_fwtrack(layout, fw=50):
     track = FWTrack(fw=fw)
