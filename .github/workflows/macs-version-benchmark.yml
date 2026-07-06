@@ -26,6 +26,7 @@ jobs:
       - name: Checkout MACS
         uses: actions/checkout@v6
         with:
+          fetch-depth: 0
           submodules: 'true'
 
       - name: Install GNU time
@@ -53,17 +54,17 @@ jobs:
           ROOT: ${{ github.workspace }}/${{ inputs.benchmark_root }}
         run: |
           mkdir -p "${ROOT}/src"
-          git clone --recurse-submodules https://github.com/macs3-project/MACS.git "${ROOT}/src/MACS"
-          git -C "${ROOT}/src/MACS" fetch --all --tags --prune
-          git -C "${ROOT}/src/MACS" worktree add "${ROOT}/src/MACS-v1" origin/macs_v1
-          git -C "${ROOT}/src/MACS" worktree add "${ROOT}/src/MACS-v2" origin/macs_v2
-          git -C "${ROOT}/src/MACS" worktree add "${ROOT}/src/MACS-v3.0.4" v3.0.4
-          for tree in "${ROOT}/src/MACS-v1" "${ROOT}/src/MACS-v2" "${ROOT}/src/MACS-v3.0.4"; do
+          ln -s "${GITHUB_WORKSPACE}" "${ROOT}/src/MACS"
+          git fetch --all --tags --prune
+          git worktree add "${ROOT}/src/MACS-v1" origin/macs_v1
+          git worktree add "${ROOT}/src/MACS-v2" origin/macs_v2
+          ln -s "${GITHUB_WORKSPACE}" "${ROOT}/src/MACS-current"
+          for tree in "${ROOT}/src/MACS-v1" "${ROOT}/src/MACS-v2" "${ROOT}/src/MACS-current"; do
             if [ -f "${tree}/.gitmodules" ]; then
               git -C "${tree}" submodule update --init --recursive
             fi
           done
-          test -f "${ROOT}/src/MACS-v3.0.4/MACS3/fermi-lite/lib/x86/sse2.h"
+          test -f "${ROOT}/src/MACS-current/MACS3/fermi-lite/lib/x86/sse2.h"
 
       - name: Install MACS v1
         env:
@@ -86,7 +87,7 @@ jobs:
         env:
           ROOT: ${{ github.workspace }}/${{ inputs.benchmark_root }}
         run: |
-          cd "${ROOT}/src/MACS-v3.0.4"
+          cd "${ROOT}/src/MACS-current"
           conda run -n macs-v3-survey python -m pip install -e .
           conda run -n macs-v3-survey macs3 --version
 
@@ -95,6 +96,8 @@ jobs:
           ROOT: ${{ github.workspace }}/${{ inputs.benchmark_root }}
           REPEATS: ${{ inputs.repeats }}
           TIME_MODE: linux
+          MACS_REPO_URL: ${{ github.workspace }}
+          MACS3_TREE: ${{ github.workspace }}/${{ inputs.benchmark_root }}/src/MACS-current
           MACS1_CMD: conda run -n macs-v1-py2 macs
           MACS2_CMD: conda run -n macs-v2-survey macs2
           MACS3_CMD: conda run -n macs-v3-survey macs3

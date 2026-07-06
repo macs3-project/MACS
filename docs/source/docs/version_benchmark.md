@@ -13,7 +13,7 @@ The benchmark uses these refs by default:
 
 - MACS v1: `origin/macs_v1`
 - MACS2: `origin/macs_v2`
-- MACS3: `v3.0.4`
+- MACS3: the current workflow checkout, usually the current branch or PR head
 
 The primary task is:
 
@@ -99,7 +99,7 @@ Use a table like this when reporting results:
 | --- | --- | --- | --- | ---: | ---: | ---: | --- |
 | MACS v1 | `origin/macs_v1` commit | Python 2.7 | `macs ...` | 3 | TBD | TBD | GitHub Actions x86_64 |
 | MACS2 | `origin/macs_v2` commit | Python 3.9 | `macs2 callpeak ...` | 3 | TBD | TBD | GitHub Actions x86_64 |
-| MACS3 | `v3.0.4` | Python 3.11 | `macs3 callpeak ...` | 3 | TBD | TBD | GitHub Actions x86_64 |
+| MACS3 | current branch/PR head | Python 3.11 | `macs3 callpeak ...` | 3 | TBD | TBD | GitHub Actions x86_64 |
 
 Do not require identical peak counts across MACS v1, MACS2, and MACS3. Defaults
 and algorithms differ across major versions; this survey targets computational
