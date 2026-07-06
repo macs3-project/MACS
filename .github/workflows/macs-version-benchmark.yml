@@ -53,11 +53,17 @@ jobs:
           ROOT: ${{ github.workspace }}/${{ inputs.benchmark_root }}
         run: |
           mkdir -p "${ROOT}/src"
-          git clone https://github.com/macs3-project/MACS.git "${ROOT}/src/MACS"
+          git clone --recurse-submodules https://github.com/macs3-project/MACS.git "${ROOT}/src/MACS"
           git -C "${ROOT}/src/MACS" fetch --all --tags --prune
           git -C "${ROOT}/src/MACS" worktree add "${ROOT}/src/MACS-v1" origin/macs_v1
           git -C "${ROOT}/src/MACS" worktree add "${ROOT}/src/MACS-v2" origin/macs_v2
           git -C "${ROOT}/src/MACS" worktree add "${ROOT}/src/MACS-v3.0.4" v3.0.4
+          for tree in "${ROOT}/src/MACS-v1" "${ROOT}/src/MACS-v2" "${ROOT}/src/MACS-v3.0.4"; do
+            if [ -f "${tree}/.gitmodules" ]; then
+              git -C "${tree}" submodule update --init --recursive
+            fi
+          done
+          test -f "${ROOT}/src/MACS-v3.0.4/MACS3/fermi-lite/lib/x86/sse2.h"
 
       - name: Install MACS v1
         env:

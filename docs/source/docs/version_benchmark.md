@@ -34,7 +34,8 @@ The workflow:
 - runs on `ubuntu-22.04` x86_64
 - installs GNU `time`
 - creates isolated conda environments for MACS v1, MACS2, and MACS3
-- installs each version from its matching worktree
+- installs each version from its matching worktree, including required
+  submodules for MACS3's bundled fermi-lite/SIMDe code
 - runs `scripts/run_macs_version_survey.sh` with `TIME_MODE=linux`
 - uploads a `macs-version-benchmark-results` artifact
 
