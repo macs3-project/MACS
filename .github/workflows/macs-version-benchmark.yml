@@ -47,7 +47,7 @@ jobs:
         run: |
           mamba create -y -n macs-v1-py2 python=2.7 'numpy<1.17'
           mamba create -y -n macs-v2-survey python=3.9 numpy cython=0.29 cykhash pip setuptools wheel
-          mamba create -y -n macs-v3-survey python=3.11 numpy scipy cython scikit-learn hmmlearn cykhash pip setuptools wheel
+          mamba create -y -n macs-v3-survey python=3.12 numpy scipy cython scikit-learn hmmlearn cykhash pip setuptools wheel
 
       - name: Prepare version worktrees
         env:
