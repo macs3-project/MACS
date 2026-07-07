@@ -11,6 +11,14 @@ on:
         description: Benchmark workspace path on the runner
         required: true
         default: macs-version-survey
+      profile_macs3:
+        description: Run one extra MACS3 callpeak under cProfile
+        required: true
+        default: "false"
+        type: choice
+        options:
+          - "false"
+          - "true"
 
 jobs:
   benchmark:
@@ -104,6 +112,32 @@ jobs:
         run: |
           bash scripts/run_macs_version_survey.sh
 
+      - name: Profile MACS3 callpeak
+        if: ${{ inputs.profile_macs3 == 'true' }}
+        env:
+          ROOT: ${{ github.workspace }}/${{ inputs.benchmark_root }}
+        run: |
+          mkdir -p "${ROOT}/results/macs3_profile" "${ROOT}/logs"
+          conda run -n macs-v3-survey python -m cProfile \
+            -o "${ROOT}/results/macs3_callpeak.cprofile" \
+            "${ROOT}/src/MACS-current/bin/macs3" callpeak \
+            -t "${ROOT}/data/CTCF_12878_5M.bed.gz" \
+            -c "${ROOT}/data/Input_12878_5M.bed.gz" \
+            -f BED -g hs -n macs3_ctcf_5m_profile \
+            --outdir "${ROOT}/results/macs3_profile" \
+            -q 0.01 \
+            > "${ROOT}/logs/macs3_profile.stdout.txt" \
+            2> "${ROOT}/logs/macs3_profile.stderr.txt"
+          conda run -n macs-v3-survey python -m pstats \
+            "${ROOT}/results/macs3_callpeak.cprofile" \
+            > "${ROOT}/results/macs3_callpeak.pstats.txt" <<'PSTATS'
+          sort cumulative
+          stats 80
+          sort time
+          stats 80
+          quit
+          PSTATS
+
       - name: Show summary
         env:
           ROOT: ${{ github.workspace }}/${{ inputs.benchmark_root }}
@@ -125,3 +159,6 @@ jobs:
             ${{ github.workspace }}/${{ inputs.benchmark_root }}/logs/version_checks.txt
             ${{ github.workspace }}/${{ inputs.benchmark_root }}/logs/*.stdout.txt
             ${{ github.workspace }}/${{ inputs.benchmark_root }}/logs/*.time_stderr.txt
+            ${{ github.workspace }}/${{ inputs.benchmark_root }}/logs/macs3_profile.stderr.txt
+            ${{ github.workspace }}/${{ inputs.benchmark_root }}/results/macs3_callpeak.cprofile
+            ${{ github.workspace }}/${{ inputs.benchmark_root }}/results/macs3_callpeak.pstats.txt
