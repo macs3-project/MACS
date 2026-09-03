@@ -1935,8 +1935,8 @@ class TwoConditionScores:
         tmp_s: cython.int
         tmp_e: cython.int
         ln: cython.int
-        tmp_v: cython.long
-        sum_v: cython.long      # for better precision
+        tmp_v: cython.double
+        sum_v: cython.double    # for better precision
         r: cython.float
         i: cython.int
 

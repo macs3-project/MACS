@@ -23,12 +23,12 @@ class Test_TwoConditionScores(unittest.TestCase):
                               (b"chrY", 75, 90, 35.0, 6.00),
                               (b"chrY", 90, 150, 10.0, 15.00)]
         for a in self.test_regions1:
-            self.t1bdg.safe_add_loc(a[0], a[1], a[2], a[3])
-            self.c1bdg.safe_add_loc(a[0], a[1], a[2], a[4])
+            self.t1bdg.add_loc(a[0], a[1], a[2], a[3])
+            self.c1bdg.add_loc(a[0], a[1], a[2], a[4])
 
         for a in self.test_regions2:
-            self.t2bdg.safe_add_loc(a[0], a[1], a[2], a[3])
-            self.c2bdg.safe_add_loc(a[0], a[1], a[2], a[4])
+            self.t2bdg.add_loc(a[0], a[1], a[2], a[3])
+            self.c2bdg.add_loc(a[0], a[1], a[2], a[4])
 
         self.twoconditionscore = TwoConditionScores(self.t1bdg,
                                                     self.c1bdg,
@@ -39,6 +39,31 @@ class Test_TwoConditionScores(unittest.TestCase):
         self.twoconditionscore.build()
         self.twoconditionscore.finalize()
         (self.cat1, self.cat2, self.cat3) = self.twoconditionscore.call_peaks(min_length=10, max_gap=10, cutoff=3)
+
+    def test_call_peaks_score_is_mean_logLR(self):
+        # Regression test for issue #715: the score of a bdgdiff region
+        # must be the length-weighted mean of the log10 likelihood
+        # ratios of its intervals, not the mean of their integer parts.
+        # Two adjacent cond1 intervals of equal length with
+        # log10LR(t1 vs t2) = 0.3271 and 6.1784 (pseudocount 0.01)
+        # must give (0.3271 + 6.1784) / 2 = 3.2527, whereas truncating
+        # each value to an integer gives (0 + 6) / 2 = 3.0.
+        regions = [(0, 1000, 20.0, 2.0, 18.0, 2.0),
+                   (1000, 2000, 20.0, 2.0, 15.0, 2.0),
+                   (2000, 3000, 40.0, 2.0, 15.0, 2.0),
+                   (3000, 4000, 2.0, 2.0, 2.0, 2.0)]
+        bdgs = [bedGraphTrackI() for i in range(4)]
+        for (s, e, t1, c1, t2, c2) in regions:
+            for (bdg, v) in zip(bdgs, (t1, c1, t2, c2)):
+                bdg.add_loc(b"chr1", s, e, v)
+        tcs = TwoConditionScores(bdgs[0], bdgs[1], bdgs[2], bdgs[3], 1.0, 1.0)
+        tcs.build()
+        tcs.finalize()
+        (cat1, cat2, _cat3) = tcs.call_peaks(min_length=200, max_gap=100, cutoff=0.2)
+        self.assertEqual(cat1.total, 1)
+        self.assertEqual(cat2.total, 0)
+        peaks = cat1.get_data_from_chrom(b"chr1")
+        self.assertAlmostEqual(peaks[0]["score"], 3.2527, places=3)
 
 
 class Test_ScoreTrackII(unittest.TestCase):
