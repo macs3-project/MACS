@@ -231,6 +231,9 @@ def add_callpeak_parser(subparsers):
     group_output.add_argument("-B", "--bdg", dest="store_bdg", action="store_true",
                               help="Whether or not to save extended fragment pileup, and local lambda tracks (two files) at every bp into a bedGraph file. DEFAULT: False",
                               default=False)
+    group_output.add_argument("--score-bdg", dest="store_score_bdg", action="store_true",
+                              help="Whether or not to save score values at every bp into a bedGraph file. DEFAULT: False",
+                              default=False)
     group_output.add_argument("--verbose", dest="verbose", type=int, default=2,
                               help="Set verbose level of runtime message. 0: only show critical message, 1: show additional warning message, 2: show process information, 3: show debug messages. DEFAULT:2")
     group_output.add_argument("--trackline", dest="trackline", action="store_true", default=False,
