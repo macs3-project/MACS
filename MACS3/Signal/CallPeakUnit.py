@@ -389,6 +389,7 @@ class CallerFromAlignments:
     trackline: bool
     # whether to save pileup and local bias in bedGraph files
     save_bedGraph: bool
+    save_score_bedGraph: bool
     # whether to save pileup normalized by sequencing depth in million reads
     save_SPMR: bool
     # whether ignore local bias, and to use global bias instead
@@ -403,6 +404,8 @@ class CallerFromAlignments:
     bedGraph_control_filename: bytes
     bedGraph_treat_f: cython.pointer(FILE)
     bedGraph_ctrl_f: cython.pointer(FILE)
+
+    bedGraph_score_files: list
 
     # data needed to be pre-computed before peak calling
     # remember pvalue->qvalue convertion; saved in cykhash Float32to32Map
@@ -435,6 +438,7 @@ class CallerFromAlignments:
                  end_shift: cython.int = 0,
                  lambda_bg: cython.float = 0,
                  save_bedGraph: bool = False,
+                 save_score_bedGraph: bool = False,
                  bedGraph_filename_prefix: str = "PREFIX",
                  bedGraph_treat_filename: str = "TREAT.bdg",
                  bedGraph_control_filename: str = "CTRL.bdg",
@@ -501,10 +505,12 @@ class CallerFromAlignments:
         self.lambda_bg = lambda_bg
         self.pqtable = Float32to32Map(for_int=False)  # Float32 -> Float32 map
         self.save_bedGraph = save_bedGraph
+        self.save_score_bedGraph = save_score_bedGraph
         self.save_SPMR = save_SPMR
         self.bedGraph_filename_prefix = bedGraph_filename_prefix.encode()
         self.bedGraph_treat_filename = bedGraph_treat_filename.encode()
         self.bedGraph_control_filename = bedGraph_control_filename.encode()
+        self.bedGraph_score_files = []
         if not self.ctrl_d_s or not self.ctrl_scaling_factor_s:
             self.no_lambda_flag = True
         else:
@@ -1028,6 +1034,8 @@ class CallerFromAlignments:
         """
         chrom: bytes
         tmp_bytes: bytes
+        s: str
+        f: cython.pointer(FILE)
 
         peaks = PeakIO()
 
@@ -1065,6 +1073,13 @@ class CallerFromAlignments:
                 tmp_bytes = ("track type=bedGraph name=\"control lambda\" description=\"control lambda after possible scaling for \'%s\'\"\n" % self.bedGraph_filename_prefix).encode()
                 fprintf(self.bedGraph_ctrl_f, tmp_bytes)
 
+        if self.save_score_bedGraph:
+            for i in range(len(scoring_function_symbols)):
+                s = "score_%s.bedGraph" % scoring_function_symbols[i]
+                self.bedGraph_score_files.append(s)
+                f = fopen(s.encode(), "w")
+                fclose(f)
+
         info("#3 Call peaks for each chromosome...")
         for chrom in self.chromosomes:
             # treat/control bedGraph will be saved if requested by user.
@@ -1075,7 +1090,8 @@ class CallerFromAlignments:
                                                           min_length,
                                                           max_gap,
                                                           call_summits,
-                                                          self.save_bedGraph)
+                                                          self.save_bedGraph,
+                                                          self.save_score_bedGraph)
 
         # close bedGraph file
         if self.save_bedGraph:
@@ -1094,7 +1110,8 @@ class CallerFromAlignments:
                                                  min_length: cython.int,
                                                  max_gap: cython.int,
                                                  call_summits: bool,
-                                                 save_bedGraph: bool):
+                                                 save_bedGraph: bool,
+                                                 save_score_bedGraph: bool):
         """ Call peaks for a chromosome.
 
         Combination of criteria is allowed here.
@@ -1164,6 +1181,10 @@ class CallerFromAlignments:
             elif s == 's':
                 score_array_s.append(self.__cal_subtraction(treat_array,
                                                             ctrl_array))
+
+
+        if save_score_bedGraph:
+            self.__write_score_for_a_chromosome(chrom, score_array_s);
 
         # get the regions with scores above cutoffs. this is not an
         # optimized method. It would be better to store score array in
@@ -1649,6 +1670,54 @@ class CallerFromAlignments:
             a2_ptr += 1
         return s
 
+
+    def __write_score_for_a_chromosome(self, chrom: bytes, score_array_s: list) -> bool:
+        """Write pvalue/qvalue values for a certain chromosome into a
+        specified file handler.
+
+        """
+        score_array: cnp.ndarray
+        s: str
+        outFile: cython.pointer(FILE)
+        pos_array: cnp.ndarray
+        array_ptr: cython.pointer(cython.float)
+        pos_array_ptr: cython.pointer(cython.int)
+        value: cython.float
+        p: cython.int
+        p_next: cython.int
+        l: cython.int
+
+        pos_array = self.chr_pos_treat_ctrl[0]
+        l = pos_array.shape[0]
+        pos_array_ptr = cython.cast(cython.pointer(cython.int),
+                                    pos_array.data)
+
+        for i in range(0, len(score_array_s)):
+            score_array = score_array_s[i]
+            array_ptr = cython.cast(cython.pointer(cython.float), score_array.data)
+            s = self.bedGraph_score_files[i]
+            outFile = fopen(s.encode(), "a")
+
+            pre_p_t = 0
+            pre_v_t = array_ptr[0]
+            array_ptr += 1
+            for i in range(1, l):
+                v_t = array_ptr[0]
+                p = pos_array_ptr[0]
+                pos_array_ptr += 1
+                array_ptr += 1
+            
+                if pre_v_t != v_t:
+                    fprintf(outFile, b"%s\t%d\t%d\t%e\n", chrom, pre_p_t, p , pre_v_t)
+                    pre_v_t = v_t
+                    pre_p_t = p
+            p = pos_array_ptr[0]
+            # last one
+            fprintf(outFile, b"%s\t%d\t%d\t%e\n", chrom, pre_p_t, p , pre_v_t)
+            fclose(outFile)
+
+        return True
+   
     @cython.cfunc
     def __write_bedGraph_for_a_chromosome(self, chrom: bytes) -> bool:
         """Write treat/control values for a certain chromosome into a
@@ -1785,6 +1854,8 @@ class CallerFromAlignments:
         broadpeaks: object
         chrs: set
         tmppeakset: list
+        s: str
+        f: cython.pointer(FILE)
 
         lvl1peaks = PeakIO()
         lvl2peaks = PeakIO()
@@ -1814,6 +1885,13 @@ class CallerFromAlignments:
                 tmp_bytes = ("track type=bedGraph name=\"control lambda\" description=\"control lambda after possible scaling for \'%s\'\"\n" % self.bedGraph_filename_prefix).encode()
                 fprintf(self.bedGraph_ctrl_f, tmp_bytes)
 
+        if self.save_score_bedGraph:
+            for i in range(len(scoring_function_symbols)):
+                s = "score_%s.bedGraph" % scoring_function_symbols[i]
+                self.bedGraph_score_files.append(s)
+                f = fopen(s.encode(), "w")
+                fclose(f)
+
         info("#3 Call peaks for each chromosome...")
         for chrom in self.chromosomes:
             self.__chrom_call_broadpeak_using_certain_criteria(lvl1peaks,
@@ -1825,7 +1903,8 @@ class CallerFromAlignments:
                                                                min_length,
                                                                lvl1_max_gap,
                                                                lvl2_max_gap,
-                                                               self.save_bedGraph)
+                                                               self.save_bedGraph,
+                                                               self.save_score_bedGraph)
 
         # close bedGraph file
         if self.save_bedGraph:
@@ -1891,7 +1970,8 @@ class CallerFromAlignments:
                                                       min_length: cython.int,
                                                       lvl1_max_gap: cython.int,
                                                       lvl2_max_gap: cython.int,
-                                                      save_bedGraph: bool):
+                                                      save_bedGraph: bool,
+                                                      save_score_bedGraph: bool):
         """Call peaks for a chromosome.
 
         Combination of criteria is allowed here.
@@ -1950,6 +2030,9 @@ class CallerFromAlignments:
             elif s == 's':
                 score_array_s.append(self.__cal_subtraction(treat_array,
                                                             ctrl_array))
+
+        if save_score_bedGraph:
+            self.__write_score_for_a_chromosome(chrom, score_array_s);
 
         # lvl1 : strong peaks
         peak_content = []           # to store points above cutoff
