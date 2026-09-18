@@ -235,6 +235,80 @@ def _pileup_sorted_weighted(start_poss: cnp.ndarray,
 
 
 @cython.cfunc
+def _pileup_sorted_weighted_as_list(start_poss: cnp.ndarray,
+                                    start_weights: cnp.ndarray,
+                                    end_poss: cnp.ndarray,
+                                    end_weights: cnp.ndarray,
+                                    scale_factor: cython.float,
+                                    baseline_value: cython.float) -> list:
+    """Fast weighted sweep returning compact legacy [p, v] arrays."""
+    p: cython.int
+    pre_p: cython.int = 0
+    z: cython.float = 0
+    pre_z: cython.float = -10000
+    scaled_z: cython.float
+    i_s: cython.long = 0
+    i_e: cython.long = 0
+    c: cython.long = 0
+    ls: cython.long = start_poss.shape[0]
+    le: cython.long = end_poss.shape[0]
+    ret_p: cnp.ndarray
+    ret_v: cnp.ndarray
+    start_ptr: cython.pointer(cython.int)
+    end_ptr: cython.pointer(cython.int)
+    start_w_ptr: cython.pointer(cython.float)
+    end_w_ptr: cython.pointer(cython.float)
+    ret_p_ptr: cython.pointer(cython.int)
+    ret_v_ptr: cython.pointer(cython.float)
+
+    if ls + le == 0:
+        return [np.zeros(shape=0, dtype="i4"),
+                np.zeros(shape=0, dtype="f4")]
+
+    ret_p = np.zeros(shape=ls + le, dtype="i4")
+    ret_v = np.zeros(shape=ls + le, dtype="f4")
+    start_ptr = cython.cast(cython.pointer(cython.int), start_poss.data)
+    end_ptr = cython.cast(cython.pointer(cython.int), end_poss.data)
+    start_w_ptr = cython.cast(cython.pointer(cython.float),
+                              start_weights.data)
+    end_w_ptr = cython.cast(cython.pointer(cython.float), end_weights.data)
+    ret_p_ptr = cython.cast(cython.pointer(cython.int), ret_p.data)
+    ret_v_ptr = cython.cast(cython.pointer(cython.float), ret_v.data)
+
+    while i_s < ls or i_e < le:
+        if i_s < ls and (i_e >= le or start_ptr[i_s] < end_ptr[i_e]):
+            p = start_ptr[i_s]
+        elif i_e < le and (i_s >= ls or end_ptr[i_e] < start_ptr[i_s]):
+            p = end_ptr[i_e]
+        else:
+            p = start_ptr[i_s]
+
+        if p != pre_p:
+            scaled_z = z * scale_factor
+            if scaled_z < baseline_value:
+                scaled_z = baseline_value
+            if scaled_z == pre_z:
+                ret_p_ptr[c-1] = p
+            else:
+                ret_p_ptr[c] = p
+                ret_v_ptr[c] = scaled_z
+                c += 1
+                pre_z = scaled_z
+            pre_p = p
+
+        while i_s < ls and start_ptr[i_s] == p:
+            z += start_w_ptr[i_s]
+            i_s += 1
+        while i_e < le and end_ptr[i_e] == p:
+            z -= end_w_ptr[i_e]
+            i_e += 1
+
+    ret_p.resize(c, refcheck=False)
+    ret_v.resize(c, refcheck=False)
+    return [ret_p, ret_v]
+
+
+@cython.cfunc
 def _pileup_from_PN_shifted(P_array: cnp.ndarray,
                             N_array: cnp.ndarray,
                             five_shift: cython.long,
@@ -789,6 +863,90 @@ def pileup_from_LR_as_list(LR_array: cnp.ndarray,
 
 
 @cython.ccall
+def pileup_from_LRC_as_list(LRC_array: cnp.ndarray,
+                            scale_factor: cython.float = 1.0,
+                            baseline_value: cython.float = 0.0,
+                            left_sorted: cython.bint = False) -> list:
+    """Pile up count-weighted fragments and return compact ``[p, v]`` arrays."""
+    ret: list
+    start_poss: cnp.ndarray
+    end_poss: cnp.ndarray
+    start_weights: cnp.ndarray
+    end_weights: cnp.ndarray
+    indices: cnp.ndarray
+    start_indices: cnp.ndarray
+
+    if left_sorted:
+        start_poss = np.ascontiguousarray(LRC_array['l'])
+        start_weights = np.ascontiguousarray(LRC_array['c'],
+                                             dtype="f4")
+    else:
+        start_indices = np.argsort(LRC_array['l'])
+        start_poss = LRC_array['l'][start_indices]
+        start_weights = LRC_array['c'][start_indices].astype("f4",
+                                                             copy=False)
+
+    indices = np.argsort(LRC_array['r'])
+    end_poss = LRC_array['r'][indices]
+    end_weights = LRC_array['c'][indices].astype("f4", copy=False)
+    ret = _pileup_sorted_weighted_as_list(start_poss,
+                                          start_weights,
+                                          end_poss,
+                                          end_weights,
+                                          scale_factor,
+                                          baseline_value)
+    clean_up_ndarray(start_poss)
+    clean_up_ndarray(start_weights)
+    clean_up_ndarray(end_poss)
+    clean_up_ndarray(end_weights)
+    return ret
+
+
+@cython.ccall
+def pileup_from_LRC_centers_as_list(LRC_array: cnp.ndarray,
+                                    d: cython.long,
+                                    scale_factor: cython.float = 1.0,
+                                    baseline_value: cython.float = 0.0) -> list:
+    """Pile up count-weighted intervals centered on left and right ends."""
+    half_d: cython.long = d // 2
+    l: cython.long = LRC_array.shape[0]
+    start_poss: cnp.ndarray
+    end_poss: cnp.ndarray
+    weights: cnp.ndarray
+    start_weights: cnp.ndarray
+    end_weights: cnp.ndarray
+    indices: cnp.ndarray
+    ret: list
+
+    start_poss = np.concatenate((LRC_array['l'] - half_d,
+                                 LRC_array['r'] - half_d))
+    end_poss = start_poss + d
+    weights = np.concatenate((LRC_array['c'], LRC_array['c'])).astype("f4",
+                                                                     copy=False)
+
+    indices = np.argsort(start_poss)
+    start_poss = start_poss[indices]
+    start_weights = weights[indices]
+
+    indices = np.argsort(end_poss)
+    end_poss = end_poss[indices]
+    end_weights = weights[indices]
+
+    ret = _pileup_sorted_weighted_as_list(start_poss,
+                                          start_weights,
+                                          end_poss,
+                                          end_weights,
+                                          scale_factor,
+                                          baseline_value)
+    clean_up_ndarray(start_poss)
+    clean_up_ndarray(start_weights)
+    clean_up_ndarray(end_poss)
+    clean_up_ndarray(end_weights)
+    clean_up_ndarray(weights)
+    return ret
+
+
+@cython.ccall
 def over_two_pv_array(pv_array1: list,
                       pv_array2: list,
                       func: str = "max") -> list:
@@ -814,6 +972,10 @@ def over_two_pv_array(pv_array1: list,
 
     [a1_pos, a1_v] = pv_array1
     [a2_pos, a2_v] = pv_array2
+    a1_pos = np.ascontiguousarray(a1_pos)
+    a1_v = np.ascontiguousarray(a1_v, dtype="f4")
+    a2_pos = np.ascontiguousarray(a2_pos)
+    a2_v = np.ascontiguousarray(a2_v, dtype="f4")
     ret_pos = np.zeros(a1_pos.shape[0] + a2_pos.shape[0], dtype="i4")
     ret_v = np.zeros(a1_pos.shape[0] + a2_pos.shape[0], dtype="f4")
 
