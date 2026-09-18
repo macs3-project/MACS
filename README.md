@@ -49,7 +49,9 @@ MACS3 project is sponsored by [![CZI's Essential Open Source Software for Scienc
 
 ## Citation
 
-2008: [Model-based Analysis of ChIP-Seq
+For MACS version 2 and 3, please cite our 2026 paper [MACS3: A Peak-calling Platform for Bulk and Single-cell Regulatory Genomics](https://academic.oup.com/gpb/advance-article/doi/10.1093/gpbjnl/qzag097/8802115)
+
+If you are using MACS version 1, please cite our 2008 paper [Model-based Analysis of ChIP-Seq
 (MACS)](https://genomebiology.biomedcentral.com/articles/10.1186/gb-2008-9-9-r137)
 
 ## Note
