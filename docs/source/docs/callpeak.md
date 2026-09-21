@@ -521,30 +521,30 @@ provide a simple way to do the cutoff analysis. The cutoff analysis
 function is provided by `--cutoff-analysis` option in `callpeak`,
 `bdgpeakcall`, and `hmmratac`. Among them, the function in
 `bdgpeakcall` is more flexible and can be applied on any scoring
-scheme. We will sperate this function into a dedicated subcommand in
+scheme. We will separate this function into a dedicated subcommand in
 the future.
 
-Please note that if this `--cutoff-anlaysis` option is on, the report
+Please note that if this `--cutoff-analysis` option is on, the report
 will be written into a file named `NAME_cutoff_analysis.txt`.
 
-When the option is on, we will generate a list of possible pvalue
-cutoffs to check from pscore cutoff from 0.3 to 10, with a step of
-0.3. When -log10(pvalue) is 0.3, it represents an extremely loose
-cutoff pvalue 0.5; and when it's 10, it represents an extremely
-strigent cutoff pvalue 1e-10. Please note that the is different with
-`bdgpeakcall` where users can control how the cutoff should be
-calculated.
+When the option is on, we generate a list of possible p-value score
+cutoffs from 0.3 to 10, with a step of 0.3. A p-score is
+`-log10(p-value)`, so a p-score of 0.3 represents an extremely loose
+p-value cutoff of approximately 0.5, while a p-score of 10 represents
+a stringent p-value cutoff of 1e-10. This differs from `bdgpeakcall`,
+where users can control the cutoff range and number of steps.
 
 Then for each cutoff we plan to investigate, we will check the number
 of peaks that can be called, their average peak length, and their
 total length.
 
-The report consists of four columns:
+The report consists of five columns:
 
-1. score: the possible fold change cutoff value.
-2. npeaks: the number of peaks under this cutoff.
-3. lpeaks: the total length of all peaks.
-4. avelpeak: the average length of peaks.
+1. pscore: the possible `-log10(p-value)` cutoff.
+2. qscore: the corresponding `-log10(q-value)` cutoff.
+3. npeaks: the number of peaks called at this cutoff.
+4. lpeaks: the total length of all peaks.
+5. avelpeak: the average length of peaks.
 
 While there's no universal rule to suggest the best cutoff, here are a
 few suggestions:
