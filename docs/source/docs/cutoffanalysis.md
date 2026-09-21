@@ -20,14 +20,24 @@ for each step.
 
 Then for each cutoff we plan to investigate, we will check the number
 of peaks that can be called, their average peak length, and their
-total length.
+total length. The exact report format depends on the subcommand.
 
-The report consists of four columns:
+The `bdgpeakcall` report used in this example consists of four columns:
 
-1. score: the possible fold change cutoff value.
-2. npeaks: the number of peaks under this cutoff.
+1. score: the possible cutoff value for the scores in the input bedGraph.
+2. npeaks: the number of peaks called at this cutoff.
 3. lpeaks: the total length of all peaks.
 4. avelpeak: the average length of peaks.
+
+The `hmmratac` report uses the same four columns, with `score`
+representing a fold-change cutoff. The `callpeak` report instead
+contains five columns:
+
+1. pscore: the possible `-log10(p-value)` cutoff.
+2. qscore: the corresponding `-log10(q-value)` cutoff.
+3. npeaks: the number of peaks called at this cutoff.
+4. lpeaks: the total length of all peaks.
+5. avelpeak: the average length of peaks.
 
 While there's no universal rule to suggest the best cutoff, here are a
 few suggestions:

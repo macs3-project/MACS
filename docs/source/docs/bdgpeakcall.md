@@ -81,13 +81,13 @@ calling peaks is set to 1.0, the minimum length of peaks is set to
 
 ## Cutoff Analysis
 
-The cutoff analysis function is provided by `--cutoff-analysis` option
-in `callpeak`, `bdgpeakcall`, and `hmmratac`. However, the function is
-`bdgpeakcall` is more flexible and can be applied on any scoring
+The cutoff analysis function is provided by the `--cutoff-analysis` option
+in `callpeak`, `bdgpeakcall`, and `hmmratac`. The function in
+`bdgpeakcall` is more flexible and can be applied to any scoring
 scheme. We will separate this function into a dedicated subcommand in
 the future.
 
-Please note that if this `--cutoff-anlaysis` option is on, the
+Please note that if this `--cutoff-analysis` option is on, the
 `bdgpeakcall` won't write any results of the peaks into narrowPeak
 format file, ignoring `-c` you specified. Instead, it will write a
 cutoff analysis report (`-o`) and quit.
@@ -105,8 +105,8 @@ that can't lead to any peak will be excluded in the final report.
 
 The report consists of four columns:
 
-1. score: the possible fold change cutoff value.
-2. npeaks: the number of peaks under this cutoff.
+1. score: the possible cutoff value for the scores in the input bedGraph.
+2. npeaks: the number of peaks called at this cutoff.
 3. lpeaks: the total length of all peaks.
 4. avelpeak: the average length of peaks.
 
