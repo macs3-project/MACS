@@ -229,3 +229,25 @@ chrY	161	210	50	186	20	7.09102	3.5	-1	MACS_peak_2
         strio = io.StringIO()
         p.write_to_xls(strio)
         self.assertEqual(strio.getvalue(), self.xls1)
+
+    def test_call_summits_rejects_maximum_in_below_cutoff_gap(self):
+        signal = np.rint(np.interp(np.arange(123),
+                                   np.linspace(0, 122, 8),
+                                   [27, 1, 27, 8,
+                                    14, 10, 27, 12])).astype(int)
+        score_track = ScoreTrackII(1, 1)
+        score_track.add_chromosome(b"chrSynthetic", len(signal) + 1)
+        score_track.add(b"chrSynthetic", 1000, 0, 1)
+        for offset, value in enumerate(signal, 1):
+            score_track.add(b"chrSynthetic", 1000 + offset, value, 1)
+        score_track.finalize()
+        score_track.change_score_method(ord("F"))
+
+        peaks = score_track.call_peaks(cutoff=9, min_length=75,
+                                       max_gap=150, call_summits=True)
+
+        peak = peaks.peaks[b"chrSynthetic"][0]
+        actual_pileup = signal[peak["summit"] - 1000]
+        self.assertEqual(peak["summit"], 1035)
+        self.assertEqual(peak["pileup"], actual_pileup)
+        self.assertEqual(actual_pileup, 27)

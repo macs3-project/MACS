@@ -1423,6 +1423,7 @@ class CallerFromAlignments:
         peakdata: cnp.ndarray(cython.float, ndim=1)
         peakindices: cnp.ndarray(cython.int, ndim=1)
         summit_offsets: cnp.ndarray(cython.int, ndim=1)
+        mapped_summits: cnp.ndarray
         tlist_scores_p: cython.int
 
         peak_length = peak_content[-1][1] - peak_content[0][0]
@@ -1444,7 +1445,10 @@ class CallerFromAlignments:
         # save the scores (qscore) for each position in this region
         peakdata = np.zeros(end - start, dtype='f4')
         # save the indices for each position in this region
-        peakindices = np.zeros(end - start, dtype='i4')
+        # Use -1 for positions that do not belong to an above-cutoff chunk.
+        # Smoothing may place a maximum inside a gap between such chunks, and
+        # zero would incorrectly associate that maximum with peak_content[0].
+        peakindices = np.full(end - start, -1, dtype='i4')
         for i in range(len(peak_content)):
             (tstart, tend, ttreat_p, tctrl_p, tlist_scores_p) = peak_content[i]
             tscore = ttreat_p  # use pileup as general score to find summit
@@ -1489,6 +1493,20 @@ class CallerFromAlignments:
 
         # indices are those point to peak_content
         summit_indices = peakindices[summit_offsets]
+        mapped_summits = summit_indices >= 0
+        summit_offsets = summit_offsets[mapped_summits]
+        summit_indices = summit_indices[mapped_summits]
+
+        if summit_offsets.shape[0] == 0:
+            # Smoothed maxima can occur in below-cutoff gaps. Fall back to a
+            # summit selected directly from the supported peak chunks.
+            return self.__close_peak_wo_subpeaks(peak_content,
+                                                 peaks,
+                                                 min_length,
+                                                 chrom,
+                                                 smoothlen,
+                                                 score_array_s,
+                                                 score_cutoff_s)
 
         summit_offsets -= start_boundary
 
