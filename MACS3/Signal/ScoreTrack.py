@@ -1141,6 +1141,7 @@ class ScoreTrackII:
         peakdata: cnp.ndarray(cython.float, ndim=1)
         peakindices: cnp.ndarray(cython.int, ndim=1)
         summit_offsets: cnp.ndarray(cython.int, ndim=1)
+        mapped_summits: cnp.ndarray
 
         # Add 10 bp padding to peak region so that we can get true minima
         end = peak_content[-1][1] + 10
@@ -1155,7 +1156,10 @@ class ScoreTrackII:
             return             # if the region is too small, reject it
 
         peakdata = np.zeros(end - start, dtype='f4')
-        peakindices = np.zeros(end - start, dtype='i4')
+        # Use -1 for positions that do not belong to an above-cutoff chunk.
+        # Smoothing may place a maximum inside a gap between such chunks, and
+        # zero would incorrectly associate that maximum with data index 0.
+        peakindices = np.full(end - start, -1, dtype='i4')
         for (tstart, tend, tvalue, tsvalue, tmpindex) in peak_content:
             i = tstart - start + start_boundary
             j = tend - start + start_boundary
@@ -1180,6 +1184,13 @@ class ScoreTrackII:
             return self.__close_peak(peak_content, peaks, min_length, chrom)
 
         summit_indices = peakindices[summit_offsets]
+        mapped_summits = summit_indices >= 0
+        summit_offsets = summit_offsets[mapped_summits]
+        summit_indices = summit_indices[mapped_summits]
+
+        if summit_offsets.shape[0] == 0:
+            return self.__close_peak(peak_content, peaks, min_length, chrom)
+
         summit_offsets -= start_boundary
 
         peak_scores = self.data[chrom][3][summit_indices]

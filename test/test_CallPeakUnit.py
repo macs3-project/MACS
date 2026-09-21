@@ -1,9 +1,12 @@
 import sys
+import tempfile
 import types
 import pytest
+import numpy as np
 
 from MACS3.Signal.FixWidthTrack import FWTrack
 from MACS3.Signal.CallPeakUnit import CallerFromAlignments
+from MACS3.Signal.PairedEndTrack import PETrackI
 from MACS3.IO.PeakIO import PeakIO
 
 
@@ -112,3 +115,36 @@ def test_call_peaks_with_no_chromosomes_returns_peakio():
     calc.pqtable[0.0] = 0.0
     peaks = calc.call_peaks(['p'], [1.0], min_length=10, max_gap=5, call_summits=False, cutoff_analysis=False)
     assert isinstance(peaks, PeakIO)
+
+
+def test_call_summits_rejects_maximum_in_below_cutoff_gap(tmp_path,
+                                                           monkeypatch):
+    """A smoothed summit must map to an above-cutoff signal chunk."""
+    signal = np.rint(np.interp(np.arange(123),
+                               np.linspace(0, 122, 8),
+                               [27, 1, 27, 8, 14, 10, 27, 12])).astype(int)
+    track = PETrackI(buffer_size=10000)
+
+    for level in range(1, int(signal.max()) + 1):
+        edges = np.diff(np.r_[False, signal >= level, False].astype(int))
+        starts = np.flatnonzero(edges == 1)
+        ends = np.flatnonzero(edges == -1)
+        for start, end in zip(starts, ends):
+            track.add_loc(b"chrSynthetic", 1000 + int(start),
+                          1000 + int(end))
+    track.finalize()
+
+    monkeypatch.setattr(tempfile, "tempdir", str(tmp_path))
+    caller = CallerFromAlignments(track, None, ctrl_d_s=[],
+                                  ctrl_scaling_factor_s=[], lambda_bg=1.0)
+    try:
+        peaks = caller.call_peaks(["f"], [9.0], min_length=75,
+                                  max_gap=100, call_summits=True)
+    finally:
+        caller.destroy()
+
+    peak = peaks.peaks[b"chrSynthetic"][0]
+    actual_pileup = signal[peak["summit"] - 1000]
+    assert peak["summit"] == 1035
+    assert peak["pileup"] == actual_pileup == 27
+    assert peak["fc"] == pytest.approx((actual_pileup + 1) / 2)

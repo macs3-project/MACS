@@ -78,7 +78,7 @@ chr22	20925937	20925938	run_callpeak_bampe_narrow_peak_76	45.6392
 chr22	20938106	20938107	run_callpeak_bampe_narrow_peak_77	2.81962
 chr22	20960697	20960698	run_callpeak_bampe_narrow_peak_78	56.6109
 chr22	21051973	21051974	run_callpeak_bampe_narrow_peak_79	183.455
-chr22	21057945	21057946	run_callpeak_bampe_narrow_peak_80	1.63667
+chr22	21058119	21058120	run_callpeak_bampe_narrow_peak_80	1.70752
 chr22	21096233	21096234	run_callpeak_bampe_narrow_peak_81	40.5188
 chr22	21138702	21138703	run_callpeak_bampe_narrow_peak_82	31.4979
 chr22	21158435	21158436	run_callpeak_bampe_narrow_peak_83	25.605
@@ -285,7 +285,7 @@ chr22	29436845	29436846	run_callpeak_bampe_narrow_peak_280	54.6835
 chr22	29550597	29550598	run_callpeak_bampe_narrow_peak_281	73.4742
 chr22	29552724	29552725	run_callpeak_bampe_narrow_peak_282	13.6641
 chr22	29598820	29598821	run_callpeak_bampe_narrow_peak_283	7.84934
-chr22	29601811	29601812	run_callpeak_bampe_narrow_peak_284	1.39873
+chr22	29602059	29602060	run_callpeak_bampe_narrow_peak_284	2.29232
 chr22	29641703	29641704	run_callpeak_bampe_narrow_peak_285	64.8576
 chr22	29709276	29709277	run_callpeak_bampe_narrow_peak_286	14.3525
 chr22	29791161	29791162	run_callpeak_bampe_narrow_peak_287	114.239
@@ -472,7 +472,7 @@ chr22	38003228	38003229	run_callpeak_bampe_narrow_peak_465	87.6566
 chr22	38019727	38019728	run_callpeak_bampe_narrow_peak_466	95.3854
 chr22	38029788	38029789	run_callpeak_bampe_narrow_peak_467	5.252
 chr22	38030790	38030791	run_callpeak_bampe_narrow_peak_468	7.24051
-chr22	38032661	38032662	run_callpeak_bampe_narrow_peak_469	1.94215
+chr22	38032607	38032608	run_callpeak_bampe_narrow_peak_469	1.94215
 chr22	38039515	38039516	run_callpeak_bampe_narrow_peak_470	57.0032
 chr22	38077752	38077753	run_callpeak_bampe_narrow_peak_471	71.8516
 chr22	38092754	38092755	run_callpeak_bampe_narrow_peak_472	9.03812
@@ -707,7 +707,7 @@ chr22	50765556	50765557	run_callpeak_bampe_narrow_peak_698	61.3222
 chr22	50780890	50780891	run_callpeak_bampe_narrow_peak_699	112.921
 chr22	50838257	50838258	run_callpeak_bampe_narrow_peak_700	16.8246
 chr22	50895397	50895398	run_callpeak_bampe_narrow_peak_701	3.78014
-chr22	50898198	50898199	run_callpeak_bampe_narrow_peak_702	1.63667
+chr22	50898164	50898165	run_callpeak_bampe_narrow_peak_702	1.63667
 chr22	50911796	50911797	run_callpeak_bampe_narrow_peak_703	20.3871
 chr22	50936786	50936787	run_callpeak_bampe_narrow_peak_704	26.6289
 chr22	50964271	50964272	run_callpeak_bampe_narrow_peak_705a	8.93923
