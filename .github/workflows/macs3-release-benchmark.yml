@@ -1,0 +1,133 @@
+name: MACS3 Release Benchmark
+
+on:
+  workflow_dispatch:
+    inputs:
+      baseline_ref:
+        description: Previous MACS3 tag or ref to compare against
+        required: true
+        default: v3.0.4
+      repeats:
+        description: Number of measured repeats per revision
+        required: true
+        default: "3"
+      benchmark_root:
+        description: Benchmark workspace path on the runner
+        required: true
+        default: macs3-release-benchmark
+
+permissions:
+  contents: read
+
+jobs:
+  benchmark:
+    name: Compare current checkout with ${{ inputs.baseline_ref }}
+    runs-on: ubuntu-22.04
+    timeout-minutes: 90
+
+    defaults:
+      run:
+        shell: bash -el {0}
+
+    steps:
+      - name: Checkout current MACS3 revision
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+          submodules: recursive
+
+      - name: Install GNU time
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y time
+
+      - name: Set up Miniforge
+        uses: conda-incubator/setup-miniconda@v3
+        with:
+          miniforge-version: latest
+          use-mamba: true
+          channels: conda-forge,bioconda
+          channel-priority: strict
+          auto-activate-base: false
+
+      - name: Create matched benchmark environments
+        run: |
+          mamba create -y -n macs3-release-base \
+            python=3.12 'numpy>=1.25' 'scipy>=1.12' \
+            'pandas>=2.0' 'anndata>=0.10' \
+            'hmmlearn>=0.3.2' 'scikit-learn>=1.3' \
+            'cykhash>=2,<3' 'Cython>=3.0' \
+            pip 'setuptools>=80.0' wheel
+          conda create -y -n macs3-release-baseline \
+            --clone macs3-release-base
+          conda create -y -n macs3-release-current \
+            --clone macs3-release-base
+
+      - name: Prepare current and baseline worktrees
+        env:
+          ROOT: ${{ github.workspace }}/${{ inputs.benchmark_root }}
+          BASELINE_REF: ${{ inputs.baseline_ref }}
+        run: |
+          mkdir -p "${ROOT}/src"
+          git fetch --tags --force
+          git worktree add --detach "${ROOT}/src/MACS-baseline" "${BASELINE_REF}"
+          ln -s "${GITHUB_WORKSPACE}" "${ROOT}/src/MACS-current"
+          if [ -f "${ROOT}/src/MACS-baseline/.gitmodules" ]; then
+            git -C "${ROOT}/src/MACS-baseline" submodule update --init --recursive
+          fi
+
+      - name: Install both MACS3 revisions
+        env:
+          ROOT: ${{ github.workspace }}/${{ inputs.benchmark_root }}
+        run: |
+          conda run -n macs3-release-baseline python -m pip install \
+            --no-build-isolation --no-deps -e "${ROOT}/src/MACS-baseline"
+          conda run -n macs3-release-current python -m pip install \
+            --no-build-isolation --no-deps -e "${ROOT}/src/MACS-current"
+          conda run -n macs3-release-baseline macs3 --version
+          conda run -n macs3-release-current macs3 --version
+
+      - name: Run release comparison
+        env:
+          ROOT: ${{ github.workspace }}/${{ inputs.benchmark_root }}
+          REPEATS: ${{ inputs.repeats }}
+          TIME_MODE: linux
+          BASELINE_REF: ${{ inputs.baseline_ref }}
+          BASELINE_TREE: ${{ github.workspace }}/${{ inputs.benchmark_root }}/src/MACS-baseline
+          CURRENT_TREE: ${{ github.workspace }}/${{ inputs.benchmark_root }}/src/MACS-current
+          BASELINE_CMD: conda run -n macs3-release-baseline macs3
+          CURRENT_CMD: conda run -n macs3-release-current macs3
+        run: |
+          bash scripts/run_macs3_release_benchmark.sh
+
+      - name: Publish benchmark summary
+        if: always()
+        env:
+          ROOT: ${{ github.workspace }}/${{ inputs.benchmark_root }}
+        run: |
+          if [ -f "${ROOT}/results/comparison.md" ]; then
+            cat "${ROOT}/results/comparison.md" >> "${GITHUB_STEP_SUMMARY}"
+          fi
+          if [ -f "${ROOT}/results/summary.tsv" ]; then
+            column -t -s $'\t' "${ROOT}/results/summary.tsv"
+          fi
+          if [ -f "${ROOT}/results/comparison.tsv" ]; then
+            column -t -s $'\t' "${ROOT}/results/comparison.tsv"
+          fi
+
+      - name: Upload benchmark artifacts
+        if: always()
+        uses: actions/upload-artifact@v6
+        with:
+          name: macs3-release-benchmark-results
+          path: |
+            ${{ github.workspace }}/${{ inputs.benchmark_root }}/results/benchmark_runs.tsv
+            ${{ github.workspace }}/${{ inputs.benchmark_root }}/results/summary.tsv
+            ${{ github.workspace }}/${{ inputs.benchmark_root }}/results/comparison.tsv
+            ${{ github.workspace }}/${{ inputs.benchmark_root }}/results/comparison.md
+            ${{ github.workspace }}/${{ inputs.benchmark_root }}/results/output_peak_counts.tsv
+            ${{ github.workspace }}/${{ inputs.benchmark_root }}/logs/git_revisions.txt
+            ${{ github.workspace }}/${{ inputs.benchmark_root }}/logs/input_sha256.txt
+            ${{ github.workspace }}/${{ inputs.benchmark_root }}/logs/version_checks.txt
+            ${{ github.workspace }}/${{ inputs.benchmark_root }}/logs/*.stdout.txt
+            ${{ github.workspace }}/${{ inputs.benchmark_root }}/logs/*.time_stderr.txt

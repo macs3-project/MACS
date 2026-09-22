@@ -33,6 +33,24 @@ background*.
 Please find MACS3 documentations through [MACS3
 website](https://macs3-project.github.io/MACS/).
 
+## What's new in MACS 3.0.5
+
+- Added `PETrackII.return_anndata` for efficient creation of sparse
+  barcode-by-peak AnnData matrices from single-cell fragment data.
+- Switched peak calling, pileup output, and peak-model construction to
+  faster NumPy-backed `PileupV2` routines, and optimized fragment
+  exclusion and score caches.
+- Added `hmmratac --jump` to control fragment-length EM updates.
+- Fixed decimal-score truncation in `bdgdiff` (#715), incorrect summit
+  scores for maxima in below-cutoff gaps (#741), and an `IndexError`
+  during `hmmratac` peak refinement (#735).
+- Made successful `hmmratac --cutoff-analysis-only` runs exit with
+  status 0 (#704).
+- MACS3 now requires Python 3.12 or later. The `cykhash` dependency was
+  removed, while `pandas` and `anndata` were added for AnnData export.
+
+See the [ChangeLog](ChangeLog) for the complete release notes.
+
 ## Contribute
 
 Please read our [CODE OF CONDUCT](CODE_OF_CONDUCT.md) and [How to

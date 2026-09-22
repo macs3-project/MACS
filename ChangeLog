@@ -1,3 +1,60 @@
+2026-09-21  Tao Liu  <vladimir.liu@gmail.com>
+	MACS 3.0.5
+
+	* Features added
+
+	1) Added `PETrackII.return_anndata` to build a sparse barcode-by-peak
+	`AnnData` count matrix directly from single-cell fragment data. The
+	method preserves fragment counts and merges overlapping or adjacent
+	input regions before constructing the matrix.
+
+	2) Added the `hmmratac --jump` option to control the update factor
+	used by the fragment-length EM algorithm. The default is 0.5.
+
+	* Performance improvements
+
+	1) Reworked and vectorized the NumPy-backed `PileupV2`
+	implementation. `callpeak`, `pileup`, peak-model construction, and
+	the single-end and paired-end track classes now use the optimized
+	pileup routines by default.
+
+	2) Improved the performance of `PETrackII.exclude` and sparse
+	barcode-by-peak matrix construction for single-cell fragment data.
+
+	3) Replaced `cykhash` caches with Python dictionaries and removed
+	the `cykhash` dependency.
+
+	* Bugs fixed
+
+	1) Fixed `bdgdiff` region scores being truncated to integers before
+	the length-weighted mean was calculated. Decimal scores are now
+	preserved, including when cutoffs below 1 are used. #715
+
+	2) Fixed `callpeak --call-summits` assigning the first above-cutoff
+	chunk's score to a smoothed maximum located in a below-cutoff gap.
+	Gap maxima are now discarded, with the standard single-summit
+	result used when no valid summit remains. #741
+
+	3) Fixed an `IndexError` in `bedGraphTrackI.refine_peaks` and
+	`bedGraphTrackII.refine_peaks` when a peak has no overlapping
+	bedGraph content, as encountered in `hmmratac`. #735
+
+	4) `hmmratac --cutoff-analysis-only` now exits with status 0 after
+	successfully writing its report. #704
+
+	* Compatibility and documentation
+
+	1) MACS3 now requires Python 3.12 or later and declares support for
+	Python 3.12, 3.13, and 3.14. `pandas` and `anndata` are now runtime
+	dependencies for the AnnData export API.
+
+	2) Added automated major-version and release-to-release performance
+	benchmarking and their documentation.
+
+	3) Corrected the cutoff-analysis documentation for `callpeak`,
+	`bdgpeakcall`, and `hmmratac`, and updated the recommended MACS3
+	citation.
+
 2026-02-22  Tao Liu  <vladimir.liu@gmail.com>
 	MACS 3.0.4
 
