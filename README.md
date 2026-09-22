@@ -47,7 +47,7 @@ instead of posting to our
 
 I maintain MACS3 in my spare time. If you find the project useful and
 would like to support its continued development, you can
-[buy me a coffee](https://buymeacoffee.com/taoliu). Your contribution
+[![Buy Me a Coffee](https://img.shields.io/badge/Buy_Me_a_Coffee-support-FFDD00?style=for-the-badge&logo=buy-me-a-coffee&logoColor=000000)](https://buymeacoffee.com/taoliu). Your contribution
 will help cover coffee and token usage.
 
 ## Ackowledgement
