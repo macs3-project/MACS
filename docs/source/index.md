@@ -26,46 +26,63 @@ employed in any "DNA enrichment assay" to answer the fundamental
 question: *Where are the regions with significant read coverage
 compared to random background?*
 
-## Changes for MACS (3.0.4) 
+## Changes for MACS 3.0.5
 
 ### Features added
 
-1) `hmmratac` now supports `-f FRAG`, enabling direct processing of
-single-cell fragment files.
+1. Added `PETrackII.return_anndata` to build a sparse barcode-by-peak
+   AnnData count matrix directly from single-cell fragment data. The
+   method preserves fragment counts and merges overlapping or adjacent
+   input regions.
 
-Note: because FRAG uses a different internal subsampling
-implementation from `BEDPE`/`BAMPE`, results can differ slightly
-between collapsed `FRAG` input and standard paired-end inputs.
+2. Added `hmmratac --jump` to control the update factor used by the
+   fragment-length EM algorithm. The default is 0.5.
 
-2) Added `--barcodes` and `--max-count` to `hmmratac` so peak calling
-can be restricted to a barcode subset and/or capped by fragment count.
+### Performance improvements
 
-For example, to call accessible regions for one cell type in an
-scATAC-seq dataset: `--barcodes celltype1_barcodes.txt --max-count 2`.
+1. Reworked and vectorized the NumPy-backed `PileupV2` implementation.
+   `callpeak`, `pileup`, peak-model construction, and the single-end
+   and paired-end track classes now use the optimized routines by
+   default.
+
+2. Improved the performance of `PETrackII.exclude` and sparse
+   barcode-by-peak matrix construction.
+
+3. Replaced `cykhash` caches with Python dictionaries and removed the
+   `cykhash` dependency.
 
 ### Bugs fixed
 
-1) `PETrackII.pileup_bdg` now wraps pileup outputs in `array.array`
-before passing them to `bedGraphTrackI`, preventing runtime type
-errors when writing bedGraph tracks from FRAG inputs.
+1. Fixed `bdgdiff` region scores being truncated to integers before
+   calculating their length-weighted mean. Decimal scores are now
+   preserved, including with cutoffs below 1 (#715).
 
-2) `PETrackII.sample_percent*` now correctly allows zero-percent
-downsampling, preserving expected CLI behavior when the balance target
-contains no fragments.
+2. Fixed `callpeak --call-summits` assigning the first above-cutoff
+   chunk's score to a smoothed maximum in a below-cutoff gap. Invalid
+   gap maxima are now discarded (#741).
 
-3) Fixed an overflow path in `PETrackI` when updating total track
-length by explicitly casting `int32` values to `ulonglong`.
+3. Fixed an `IndexError` in bedGraph peak refinement when a peak has no
+   overlapping bedGraph content, as encountered in `hmmratac` (#735).
 
-4) Fixed a `pvalue_stat` issue that could yield `nan` when a region
-with the same p-value exceeded 2e9 bp (int32 limit).
+4. `hmmratac --cutoff-analysis-only` now exits with status 0 after
+   successfully writing its report (#704).
+
+### Compatibility changes
+
+1. MACS3 now requires Python 3.12 or later and declares support for
+   Python 3.12, 3.13, and 3.14.
+
+2. `pandas` and `anndata` are now runtime dependencies for the AnnData
+   export API.
 
 ### Documentation
 
-1) Cleaned up source-code docstrings and expanded API docs for key
-Signal and IO modules.
+1. Added automated major-version and release-to-release performance
+   benchmarking and their documentation.
 
-2) Added a Jupyter notebook demo showing single-cell ATAC-seq
-processing with the MACS3 API.
+2. Corrected the cutoff-analysis documentation for `callpeak`,
+   `bdgpeakcall`, and `hmmratac`, and updated the recommended MACS3
+   citation.
 	
 ## Install
 

@@ -1,5 +1,46 @@
 # MACS Version Speed and Memory Survey
 
+## Current MACS3 versus previous release
+
+For release-to-release comparisons, use the manual **MACS3 Release
+Benchmark** workflow. By default it compares the workflow's current checkout
+with tag `v3.0.4`; the baseline ref and number of repeats can be changed when
+dispatching the workflow.
+
+The release workflow creates two cloned Conda environments so both revisions
+use identical Python and dependency versions. It installs each checkout into
+its own environment, alternates execution order between repeats, and runs the
+same 5M-read CTCF `callpeak` workload. Its artifact contains raw timing logs,
+peak counts, revision metadata, and these reports:
+
+- `summary.tsv`: median/minimum/maximum wall time and median peak RSS for each
+  revision
+- `comparison.tsv`: current-to-baseline time and memory ratios, percentage
+  changes, and speedup
+- `comparison.md`: the same comparison rendered in the GitHub Actions job
+  summary
+
+A current-to-baseline wall-time ratio below 1 means the current checkout is
+faster. A peak-RSS ratio below 1 means it used less memory. For the MACS 3.0.5
+release, dispatch the workflow from the 3.0.5 branch and retain the default
+baseline ref, `v3.0.4`.
+
+The underlying harness can also be run locally when both checkouts and their
+commands have already been prepared:
+
+```bash
+ROOT=/path/to/macs3-release-benchmark \
+BASELINE_REF=v3.0.4 \
+BASELINE_TREE=/path/to/MACS-v3.0.4 \
+CURRENT_TREE=/path/to/MACS-current \
+BASELINE_CMD="conda run -n macs3-release-baseline macs3" \
+CURRENT_CMD="conda run -n macs3-release-current macs3" \
+REPEATS=3 \
+bash scripts/run_macs3_release_benchmark.sh
+```
+
+## Major-version survey
+
 This developer benchmark compares MACS v1, MACS2, and MACS3 on the same
 5M-read CTCF BED dataset. It is a pragmatic software-performance survey, not a
 formal methods benchmark and not a claim that biological outputs should be
