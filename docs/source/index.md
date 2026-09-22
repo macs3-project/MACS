@@ -43,7 +43,7 @@ compared to random background?*
 1. Reworked and vectorized the NumPy-backed `PileupV2` implementation.
    `callpeak`, `pileup`, peak-model construction, and the single-end
    and paired-end track classes now use the optimized routines by
-   default.
+   default. Now it has 1.5x speedup over 3.0.4.
 
 2. Improved the performance of `PETrackII.exclude` and sparse
    barcode-by-peak matrix construction.
