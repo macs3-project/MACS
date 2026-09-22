@@ -39,7 +39,7 @@ website](https://macs3-project.github.io/MACS/).
   barcode-by-peak AnnData matrices from single-cell fragment data.
 - Switched peak calling, pileup output, and peak-model construction to
   faster NumPy-backed `PileupV2` routines, and optimized fragment
-  exclusion and score caches.
+  exclusion and score caches. Now it has 1.5x speedup over 3.0.4.
 - Added `hmmratac --jump` to control fragment-length EM updates.
 - Fixed decimal-score truncation in `bdgdiff` (#715), incorrect summit
   scores for maxima in below-cutoff gaps (#741), and an `IndexError`
