@@ -154,12 +154,12 @@ instead of posting to our
 
 I maintain MACS3 in my spare time. If you find the project useful and
 would like to support its continued development, you can
-[buy me a coffee](https://buymeacoffee.com/taoliu). Your contribution
-will help cover my ever-growingconsumption of coffee and tokens.
+[![Buy Me a Coffee](https://img.shields.io/badge/Buy_Me_a_Coffee-support-FFDD00?style=for-the-badge&logo=buy-me-a-coffee&logoColor=000000)](https://buymeacoffee.com/taoliu). Your contribution
+will help cover my ever-growing consumption of coffee and tokens.
 
 ## Ackowledgement
 
-MACS3 project is sponsored by [![CZI's Essential Open Source Software for Science](https://chanzuckerberg.github.io/open-science/badges/CZI-EOSS.svg)](https://czi.co/EOSS)through EOSS2 (2020-2022) and EOSS4 (2021-2025). And we particularly want to thank the user community for their supports, feedbacks and contributions over the years.
+MACS3 project is sponsored by [![CZI's Essential Open Source Software for Science](https://chanzuckerberg.github.io/open-science/badges/CZI-EOSS.svg)](https://czi.co/EOSS) through EOSS2 (2020-2022) and EOSS4 (2021-2025). And we particularly want to thank the user community for their supports, feedbacks and contributions over the years.
 
 ## Citation
 
