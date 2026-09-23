@@ -76,6 +76,32 @@ def make_tracks():
     return treat, ctrl
 
 
+def make_two_summit_profile(length=260, right_apex_distance=15):
+    """Return a peak profile with a summit close to the right boundary."""
+    signal = np.full(length, 10.0)
+    for center in (60, length - right_apex_distance):
+        positions = np.arange(max(center - 18, 0),
+                              min(center + 19, length))
+        signal[positions] = np.maximum(
+            signal[positions],
+            10 + 30 * (1 - np.abs(positions - center) / 19),
+        )
+    return np.rint(signal).astype(int)
+
+
+def make_petrack_from_profile(signal, start):
+    """Encode an integer coverage profile as a paired-end track."""
+    track = PETrackI(buffer_size=200000)
+    for level in range(1, int(signal.max()) + 1):
+        edges = np.diff(np.r_[False, signal >= level, False].astype(int))
+        for left, right in zip(np.flatnonzero(edges == 1),
+                               np.flatnonzero(edges == -1)):
+            track.add_loc(b"chrSynthetic", start + int(left),
+                          start + int(right))
+    track.finalize()
+    return track
+
+
 def test_constructor_rejects_unknown_track_type():
     with pytest.raises(Exception):
         CallerFromAlignments(object(), object())
@@ -148,3 +174,26 @@ def test_call_summits_rejects_maximum_in_below_cutoff_gap(tmp_path,
     assert peak["summit"] == 1035
     assert peak["pileup"] == actual_pileup == 27
     assert peak["fc"] == pytest.approx((actual_pileup + 1) / 2)
+
+
+@pytest.mark.parametrize("start", [0, 1, 5, 9, 10, 1000])
+def test_call_summits_keeps_right_edge_candidate(tmp_path, monkeypatch,
+                                                  start):
+    """Regression test for the padding-coordinate mismatch in issue #747."""
+    signal = make_two_summit_profile()
+    track = make_petrack_from_profile(signal, start)
+
+    monkeypatch.setattr(tempfile, "tempdir", str(tmp_path))
+    caller = CallerFromAlignments(track, None, ctrl_d_s=[],
+                                  ctrl_scaling_factor_s=[], lambda_bg=1.0)
+    try:
+        peaks = caller.call_peaks(["f"], [2.0], min_length=50,
+                                  max_gap=100, call_summits=True)
+    finally:
+        caller.destroy()
+
+    rows = peaks.peaks[b"chrSynthetic"]
+    assert [row["summit"] - start for row in rows] == [59, 241]
+    assert all(row["start"] == start for row in rows)
+    assert all(row["end"] == start + len(signal) for row in rows)
+    assert all(row["start"] <= row["summit"] < row["end"] for row in rows)

@@ -10,6 +10,31 @@ from MACS3.Signal.ScoreTrack import ScoreTrackII, TwoConditionScores
 from MACS3.Signal.BedGraph import bedGraphTrackI
 
 
+def make_two_summit_profile(length=260, right_apex_distance=15):
+    """Return a peak profile with a summit close to the right boundary."""
+    signal = np.full(length, 10.0)
+    for center in (60, length - right_apex_distance):
+        positions = np.arange(max(center - 18, 0),
+                              min(center + 19, length))
+        signal[positions] = np.maximum(
+            signal[positions],
+            10 + 30 * (1 - np.abs(positions - center) / 19),
+        )
+    return np.rint(signal).astype(int)
+
+
+def make_score_track_from_profile(signal, start):
+    """Encode a coverage profile as a finalized fold-enrichment track."""
+    score_track = ScoreTrackII(1, 1)
+    score_track.add_chromosome(b"chrSynthetic", len(signal) + 1)
+    score_track.add(b"chrSynthetic", start, 0, 1)
+    for offset, value in enumerate(signal, 1):
+        score_track.add(b"chrSynthetic", start + offset, value, 1)
+    score_track.finalize()
+    score_track.change_score_method(ord("F"))
+    return score_track
+
+
 class Test_TwoConditionScores(unittest.TestCase):
     def setUp(self):
         self.t1bdg = bedGraphTrackI()
@@ -251,3 +276,22 @@ chrY	161	210	50	186	20	7.09102	3.5	-1	MACS_peak_2
         self.assertEqual(peak["summit"], 1035)
         self.assertEqual(peak["pileup"], actual_pileup)
         self.assertEqual(actual_pileup, 27)
+
+    def test_call_summits_keeps_right_edge_candidate(self):
+        """ScoreTrackII uses the same corrected coordinates as callpeak."""
+        signal = make_two_summit_profile()
+
+        for start in (0, 1, 5, 9, 10, 1000):
+            score_track = make_score_track_from_profile(signal, start)
+            peaks = score_track.call_peaks(cutoff=2, min_length=50,
+                                           max_gap=100,
+                                           call_summits=True)
+            rows = peaks.peaks[b"chrSynthetic"]
+
+            self.assertEqual([row["summit"] - start for row in rows],
+                             [59, 241])
+            self.assertTrue(all(row["start"] == start for row in rows))
+            self.assertTrue(all(row["end"] == start + len(signal)
+                                for row in rows))
+            self.assertTrue(all(row["start"] <= row["summit"] < row["end"]
+                                for row in rows))
