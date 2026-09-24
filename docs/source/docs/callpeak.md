@@ -377,12 +377,14 @@ the essentials.
 
 - `--call-summits`
 
-  MACS3 will now reanalyze the shape of signal profile (p or q-score
-  depending on the cutoff setting) to deconvolve subpeaks within each
-  peak called from the general procedure. It's highly recommended to
-  detect adjacent binding events. While used, the output subpeaks of a
-  big peak region will have the same peak boundaries, and different
-  scores and peak summit positions.
+  MACS3 reanalyzes the treatment pileup profile to find subpeaks within
+  each peak called by the general procedure. This can help detect
+  adjacent binding events. Subpeaks from the same region share its
+  boundaries but have different scores and summit positions. Temporary
+  padding used for the shape analysis is excluded from reported peak
+  boundaries. A candidate summit must have at least 50 bp of
+  nonnegative supporting signal after thresholding and pass the shape
+  filter.
 
 ### Other options
 
