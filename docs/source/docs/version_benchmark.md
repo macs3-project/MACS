@@ -1,147 +1,66 @@
-# MACS Version Speed and Memory Survey
+# MACS performance benchmarks
 
-## Current MACS3 versus previous release
+This page reports measured `callpeak` performance on one reference dataset.
+These results describe this workload on GitHub-hosted Linux runners; they are
+not a guarantee of the same speed or memory use on other datasets or machines.
 
-For release-to-release comparisons, use the manual **MACS3 Release
-Benchmark** workflow. By default it compares the workflow's current checkout
-with tag `v3.0.4`; the baseline ref and number of repeats can be changed when
-dispatching the workflow.
+## MACS 3.0.5 versus 3.0.4
 
-The release workflow creates two cloned Conda environments so both revisions
-use identical Python and dependency versions. It installs each checkout into
-its own environment, alternates execution order between repeats, and runs the
-same 5M-read CTCF `callpeak` workload. Its artifact contains raw timing logs,
-peak counts, revision metadata, and these reports:
+The [September 24, 2026 release benchmark](https://github.com/macs3-project/MACS/actions/runs/35957533788)
+compared the `v3.0.4` tag (`e8ff040`) with the 3.0.5 release candidate on
+`main` (`e0810f7`). Both revisions report their expected version strings.
 
-- `summary.tsv`: median/minimum/maximum wall time and median peak RSS for each
-  revision
-- `comparison.tsv`: current-to-baseline time and memory ratios, percentage
-  changes, and speedup
-- `comparison.md`: the same comparison rendered in the GitHub Actions job
-  summary
+| Revision | Median wall time | Range | Median peak memory | Repeats |
+| --- | ---: | ---: | ---: | ---: |
+| MACS 3.0.4 (`v3.0.4`) | 24.59 s | 24.20–24.73 s | 288.9 MB | 3 |
+| MACS 3.0.5 (`e0810f7`) | 17.75 s | 17.62–17.95 s | 292.8 MB | 3 |
 
-A current-to-baseline wall-time ratio below 1 means the current checkout is
-faster. A peak-RSS ratio below 1 means it used less memory. For the MACS 3.0.5
-release, dispatch the workflow from the 3.0.5 branch and retain the default
-baseline ref, `v3.0.4`.
+For this dataset, MACS 3.0.5 took **27.8% less wall time**
+(**1.385× speedup**) and used similar peak memory (+1.4%). All
+six runs produced 36,411 `narrowPeak` rows; matching row counts do not imply
+identical peak calls. The [run artifact](https://github.com/macs3-project/MACS/actions/runs/35957533788)
+contains the individual timings, output counts, input checksums, revision IDs,
+and command logs.
 
-The underlying harness can also be run locally when both checkouts and their
-commands have already been prepared:
+The benchmark runs `macs3 callpeak` on the 5M-read CTCF treatment and input
+BED files in `test/`, with `-f BED -g hs -q 0.01`, on an Ubuntu 22.04 x86-64
+runner. Each revision is installed in a separate, cloned Conda environment
+with Python 3.12 and matched dependencies. Execution order alternates between
+repeats; wall time and maximum resident memory come from GNU `time`.
 
-```bash
-ROOT=/path/to/macs3-release-benchmark \
-BASELINE_REF=v3.0.4 \
-BASELINE_TREE=/path/to/MACS-v3.0.4 \
-CURRENT_TREE=/path/to/MACS-current \
-BASELINE_CMD="conda run -n macs3-release-baseline macs3" \
-CURRENT_CMD="conda run -n macs3-release-current macs3" \
-REPEATS=3 \
-bash scripts/run_macs3_release_benchmark.sh
-```
+Because GitHub-hosted runner performance can vary, the speedup compares the
+two revisions **within this run**; timings from separate runs should not be
+compared directly.
 
-## Major-version survey
+## MACS v1, MACS2, and MACS3 survey
 
-This developer benchmark compares MACS v1, MACS2, and MACS3 on the same
-5M-read CTCF BED dataset. It is a pragmatic software-performance survey, not a
-formal methods benchmark and not a claim that biological outputs should be
-identical across major versions.
+The [September 24, 2026 major-version benchmark](https://github.com/macs3-project/MACS/actions/runs/35957562638)
+ran MACS v1, MACS2, and the 3.0.5 release candidate on the same CTCF and
+input files. Each version ran three times on one Ubuntu 22.04 x86-64 runner.
 
-Use the manual GitHub Actions workflow for the recommended run. It benchmarks
-all versions on one GitHub-hosted x86_64 Ubuntu runner, avoiding Apple Silicon
-Rosetta overhead and avoiding Docker.
+| Version and source commit | Median wall time | Range | Median peak memory | Repeats |
+| --- | ---: | ---: | ---: | ---: |
+| MACS v1 (`a662072`) | 67.34 s | 65.77–68.06 s | 367.8 MB | 3 |
+| MACS2 (`b18703b`) | 31.87 s | 31.74–31.99 s | 298.1 MB | 3 |
+| MACS3 3.0.5 (`e0810f7`) | 32.12 s | 32.02–32.37 s | 298.2 MB | 3 |
 
-The benchmark uses these refs by default:
+MACS v1 used Python 2.7, MACS2 used Python 3.9, and MACS3 used Python 3.12.
+The major versions also differ in dependencies, defaults, and peak-calling
+behavior. They produced different peak-output row counts in this run, so the
+timings are a software-performance survey rather than a
+like-for-like algorithmic speedup. In particular, MACS2 and MACS3 had similar
+wall time and peak memory on this runner; no major-version speedup is claimed.
 
-- MACS v1: `origin/macs_v1`
-- MACS2: `origin/macs_v2`
-- MACS3: the current workflow checkout, usually the current branch or PR head
+This survey used a different runner from the release comparison above; its
+32.12 s MACS3 time should not be compared with the 17.75 s figure from that
+separate run. The [survey artifact](https://github.com/macs3-project/MACS/actions/runs/35957562638)
+contains the exact commands, revision IDs, raw timing logs, and output counts.
 
-The primary task is:
+## Reproducing the reports
 
-- treatment: `test/CTCF_12878_5M.bed.gz`
-- control: `test/Input_12878_5M.bed.gz`
-- format: `BED`
-- genome: `hs`
-- repeats: `3` by default
-
-## GitHub Actions Run
-
-Open the repository's **Actions** tab, choose **MACS Version Benchmark**, and
-run the workflow manually. For a first smoke test, use `repeats=1`. For the
-reported survey, use `repeats=3` or higher.
-
-The workflow:
-
-- runs on `ubuntu-22.04` x86_64
-- installs GNU `time`
-- creates isolated conda environments for MACS v1, MACS2, and MACS3
-- installs each version from its matching worktree, including required
-  submodules for MACS3's bundled fermi-lite/SIMDe code
-- runs `scripts/run_macs_version_survey.sh` with `TIME_MODE=linux`
-- uploads a `macs-version-benchmark-results` artifact
-
-The workflow uses:
-
-```bash
-MACS1_CMD="conda run -n macs-v1-py2 macs"
-MACS2_CMD="conda run -n macs-v2-survey macs2"
-MACS3_CMD="conda run -n macs-v3-survey macs3"
-```
-
-MACS v1 installs the historical command as `macs`, not `macs14`, on the
-`origin/macs_v1` branch.
-
-## Outputs
-
-The uploaded artifact contains:
-
-- `results/benchmark_runs.tsv`: one row per version and repeat
-- `results/summary.tsv`: median/min/max wall time and median peak RSS
-- `results/output_peak_counts.tsv`: row counts for generated peak files
-- `logs/git_revisions.txt`: exact commit and describe output for each ref
-- `logs/input_sha256.txt`: input checksums
-- `logs/version_checks.txt`: command/version checks
-- `logs/*.stdout.txt` and `logs/*.time_stderr.txt`: per-run command logs
-
-On Linux, peak resident memory is parsed from `/usr/bin/time -v` as `Maximum
-resident set size (kbytes)` and converted to bytes. On macOS, the same harness
-can parse `/usr/bin/time -l` as `maximum resident set size`, already in bytes.
-
-To regenerate summaries from an artifact or local result directory:
-
-```bash
-python scripts/summarize_macs_version_survey.py /path/to/macs-version-survey
-```
-
-## Local Caveat
-
-Do not use an Apple Silicon local run for the main comparison if MACS v1 must
-run under Rosetta. Native `osx-arm64` conda does not provide Python 2.7 from the
-usual channels, while Rosetta x86_64 would add translation overhead and make the
-comparison less fair. The GitHub Actions x86_64 workflow avoids that problem.
-
-Local macOS runs remain possible for harness debugging:
-
-```bash
-ROOT=/path/to/benchmark/root \
-REPEATS=1 \
-TIME_MODE=macos \
-MACS1_CMD="macs" \
-MACS2_CMD="macs2" \
-MACS3_CMD="macs3" \
-bash scripts/run_macs_version_survey.sh
-```
-
-## Reporting
-
-Use a table like this when reporting results:
-
-| Version | Source ref | Python | Command | Repeats | Median wall time (s) | Median peak RSS (MB) | Notes |
-| --- | --- | --- | --- | ---: | ---: | ---: | --- |
-| MACS v1 | `origin/macs_v1` commit | Python 2.7 | `macs ...` | 3 | TBD | TBD | GitHub Actions x86_64 |
-| MACS2 | `origin/macs_v2` commit | Python 3.9 | `macs2 callpeak ...` | 3 | TBD | TBD | GitHub Actions x86_64 |
-| MACS3 | current branch/PR head | Python 3.12 | `macs3 callpeak ...` | 3 | TBD | TBD | GitHub Actions x86_64 |
-
-Do not require identical peak counts across MACS v1, MACS2, and MACS3. Defaults
-and algorithms differ across major versions; this survey targets computational
-behavior on the same input files.
+The two manual GitHub Actions workflows are [MACS3 Release Benchmark](https://github.com/macs3-project/MACS/actions/workflows/macs3-release-benchmark.yml)
+and [MACS Version Benchmark](https://github.com/macs3-project/MACS/actions/workflows/macs-version-benchmark.yml).
+Run them from the revision of interest with three measured repeats. The release
+comparison defaults to `v3.0.4` as its baseline. Both workflows publish their
+raw results as downloadable artifacts; the release workflow also displays its
+comparison in the run summary.

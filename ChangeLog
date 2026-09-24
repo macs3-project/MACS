@@ -11,7 +11,7 @@
 	2) Added the `hmmratac --jump` option to control the update factor
 	used by the fragment-length EM algorithm. The default is 0.5.
 
-	* Performance improvements (1.5x speedup)
+	* Performance improvements (1.4x speedup)
 
 	1) Reworked and vectorized the NumPy-backed `PileupV2`
 	implementation. `callpeak`, `pileup`, peak-model construction, and
