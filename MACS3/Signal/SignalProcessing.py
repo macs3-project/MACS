@@ -88,7 +88,8 @@ def enforce_peakyness(signal: cnp.ndarray(cython.float, ndim=1),
 
             clip that region if negative values occur inside it
 
-            require it be > 50 bp in width -- controlled by is_valied_peak()
+            require it be at least 50 bp in width -- controlled by
+            is_valid_peak()
 
             require that it not be too flat (< 6 unique values) --
             controlled by is_valid_peak()
@@ -106,7 +107,7 @@ def enforce_peakyness(signal: cnp.ndarray(cython.float, ndim=1),
 
     threshold = signal[minima[0]]
     threshold += sqrt(threshold)
-    new_signal = signal[0:minima[0]] - threshold - sqrt(threshold)
+    new_signal = signal[0:minima[0]] - threshold
 
     if is_valid_peak(new_signal, maxima[0]):
         peaky_maxima[0] = maxima[0]
@@ -158,22 +159,18 @@ def too_flat(signal: cnp.ndarray(cython.float, ndim=1)) -> bool:
 @cython.cfunc
 def hard_clip(signal: cnp.ndarray(cython.float, ndim=1),
               maximum: cython.int) -> cnp.ndarray:
-    """clip the signal in both directions at the nearest values <= 0
-    to position maximum
-    """
-    i: cython.int
-    left: cython.int = 0
-    right: cython.int = signal.shape[0]
+    """Return the contiguous nonnegative region containing ``maximum``.
 
-    # clip left
-    for i in range(right - maximum, 0):
-        if signal[-i] < 0:
-            left = i
-            break
-    for i in range(maximum, right):
-        if signal[i] < 0:
-            right = i
-            break
+    Negative boundary values are excluded. Values exactly at zero remain part
+    of the region.
+    """
+    left: cython.int = maximum
+    right: cython.int = maximum + 1
+
+    while left > 0 and signal[left - 1] >= 0:
+        left -= 1
+    while right < signal.shape[0] and signal[right] >= 0:
+        right += 1
     return signal[left:right]
 
 

@@ -13,12 +13,13 @@ from MACS3.Signal.BedGraph import bedGraphTrackI
 def make_two_summit_profile(length=260, right_apex_distance=15):
     """Return a peak profile with a summit close to the right boundary."""
     signal = np.full(length, 10.0)
+    half_width = 70
     for center in (60, length - right_apex_distance):
-        positions = np.arange(max(center - 18, 0),
-                              min(center + 19, length))
+        positions = np.arange(max(center - half_width + 1, 0),
+                              min(center + half_width, length))
         signal[positions] = np.maximum(
             signal[positions],
-            10 + 30 * (1 - np.abs(positions - center) / 19),
+            10 + 30 * (1 - np.abs(positions - center) / half_width),
         )
     return np.rint(signal).astype(int)
 
@@ -291,7 +292,7 @@ chrY	161	210	50	186	20	7.09102	3.5	-1	MACS_peak_2
             relative_summits = [row["summit"] - start for row in rows]
             self.assertEqual(len(relative_summits), 2)
             self.assertLessEqual(abs(relative_summits[0] - 60), 1)
-            self.assertLessEqual(abs(relative_summits[1] - 241), 1)
+            self.assertLessEqual(abs(relative_summits[1] - 236), 1)
             self.assertTrue(all(row["start"] == start for row in rows))
             self.assertTrue(all(row["end"] == start + len(signal)
                                 for row in rows))

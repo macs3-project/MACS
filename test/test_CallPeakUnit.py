@@ -79,12 +79,13 @@ def make_tracks():
 def make_two_summit_profile(length=260, right_apex_distance=15):
     """Return a peak profile with a summit close to the right boundary."""
     signal = np.full(length, 10.0)
+    half_width = 70
     for center in (60, length - right_apex_distance):
-        positions = np.arange(max(center - 18, 0),
-                              min(center + 19, length))
+        positions = np.arange(max(center - half_width + 1, 0),
+                              min(center + half_width, length))
         signal[positions] = np.maximum(
             signal[positions],
-            10 + 30 * (1 - np.abs(positions - center) / 19),
+            10 + 30 * (1 - np.abs(positions - center) / half_width),
         )
     return np.rint(signal).astype(int)
 
@@ -196,7 +197,7 @@ def test_call_summits_keeps_right_edge_candidate(tmp_path, monkeypatch,
     relative_summits = [row["summit"] - start for row in rows]
     assert len(relative_summits) == 2
     assert abs(relative_summits[0] - 60) <= 1
-    assert abs(relative_summits[1] - 241) <= 1
+    assert abs(relative_summits[1] - 236) <= 1
     assert all(row["start"] == start for row in rows)
     assert all(row["end"] == start + len(signal) for row in rows)
     assert all(row["start"] <= row["summit"] < row["end"] for row in rows)
