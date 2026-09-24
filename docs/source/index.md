@@ -162,8 +162,8 @@ from users.
 
 ## Contribute
 
-Please read our [CODE OF CONDUCT](CODE_OF_CONDUCT.md) and [How to
-contribute](CONTRIBUTING.md) documents. If you have any questions,
+Please read our {doc}`Code of Conduct </CODE_OF_CONDUCT>` and
+{doc}`Contributing guide </CONTRIBUTING>`. If you have any questions,
 suggestion/ideas, or just want to have conversions with developers and
 other users in the community, we recommend using the [MACS
 Discussions](https://github.com/macs3-project/MACS/discussions)
