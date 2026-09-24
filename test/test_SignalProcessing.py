@@ -12,7 +12,7 @@ import unittest
 import pytest
 
 import numpy as np
-from MACS3.Signal.SignalProcessing import maxima
+from MACS3.Signal.SignalProcessing import enforce_peakyness, maxima
 
 # ------------------------------------
 # Main function
@@ -76,3 +76,61 @@ class Test_maxima(unittest.TestCase):
         l = a.shape[0]
         for i in range(l):
             self.assertAlmostEqual(a[i], b[i], places=places, msg=f"Not equal at {i} {a[i]} {b[i]}")
+
+
+def test_enforce_peakyness_clips_both_sides():
+    """Regression test for the inactive left scan in issue #748."""
+    signal = np.zeros(400, dtype="f4")
+    signal[:100] = np.linspace(30, 1, 100)
+    signal[100:200] = 1
+    signal[200:220] = 1 + np.arange(20) * 1.5
+    signal[220:240] = 1 + np.arange(20)[::-1] * 1.5
+    signal[240:300] = 1
+    signal[300:] = np.linspace(1, 30, 100)
+    candidates = np.array([0, 219, 399], dtype="i4")
+
+    np.testing.assert_array_equal(
+        enforce_peakyness(signal, candidates),
+        np.array([0, 399], dtype="i4"),
+    )
+
+
+def _make_width_boundary_signal(width):
+    """Return three candidates with center support of exactly ``width``."""
+    signal = np.ones(300, dtype="f4")
+    signal[:40] = np.linspace(20, 3, 40)
+    signal[260:] = np.linspace(3, 20, 40)
+    start = 150 - width // 2
+    support = 2 + np.minimum(np.arange(width), np.arange(width)[::-1])
+    signal[start:start + width] = support
+    center = start + int(np.argmax(support))
+    return signal, np.array([0, center, 299], dtype="i4"), center
+
+
+@pytest.mark.parametrize(("width", "expected"), [(49, False), (50, True)])
+def test_enforce_peakyness_minimum_width(width, expected):
+    """Fifty nonnegative bases, including zero boundaries, are required."""
+    signal, candidates, center = _make_width_boundary_signal(width)
+
+    retained = enforce_peakyness(signal, candidates)
+
+    assert (center in retained) is expected
+
+
+def test_enforce_peakyness_is_reverse_symmetric():
+    """Candidate filtering should not depend on signal orientation."""
+    signal = np.zeros(300, dtype="f4")
+    signal[:120] = 6 + np.arange(120) * 0.02
+    signal[120:180] = 5
+    signal[180:] = 6 + np.arange(120) * 0.02
+    candidates = np.array([119, 299], dtype="i4")
+    reverse_candidates = (
+        len(signal) - 1 - candidates[::-1]
+    ).astype("i4")
+
+    forward = enforce_peakyness(signal, candidates)
+    reverse = enforce_peakyness(signal[::-1].copy(), reverse_candidates)
+    reverse_mapped = len(signal) - 1 - reverse[::-1]
+
+    np.testing.assert_array_equal(forward, candidates)
+    np.testing.assert_array_equal(forward, reverse_mapped)
