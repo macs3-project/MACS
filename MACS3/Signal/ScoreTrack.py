@@ -1132,6 +1132,8 @@ class ScoreTrackII:
         tmpindex: cython.int
         summit_index: cython.int
         summit_offset: cython.int
+        peak_start: cython.int
+        peak_end: cython.int
         start: cython.int
         end: cython.int
         i: cython.int
@@ -1143,15 +1145,13 @@ class ScoreTrackII:
         summit_offsets: cnp.ndarray(cython.int, ndim=1)
         mapped_summits: cnp.ndarray
 
+        peak_start = peak_content[0][0]
+        peak_end = peak_content[-1][1]
         # Add 10 bp padding to peak region so that we can get true minima
-        end = peak_content[-1][1] + 10
-        start = peak_content[0][0] - 10
-        if start < 0:
-            start_boundary = 10 + start
-            start = 0
-        else:
-            start_boundary = 10
-        peak_length = end - start
+        start = max(peak_start - 10, 0)
+        end = peak_end + 10
+        start_boundary = peak_start - start
+        peak_length = peak_end - peak_start
         if end - start < min_length:
             return             # if the region is too small, reject it
 
@@ -1161,8 +1161,8 @@ class ScoreTrackII:
         # zero would incorrectly associate that maximum with data index 0.
         peakindices = np.full(end - start, -1, dtype='i4')
         for (tstart, tend, tvalue, tsvalue, tmpindex) in peak_content:
-            i = tstart - start + start_boundary
-            j = tend - start + start_boundary
+            i = tstart - start
+            j = tend - start
             peakdata[i:j] = tsvalue
             peakindices[i:j] = tmpindex
         summit_offsets = maxima(peakdata, smoothlen)
@@ -1174,8 +1174,7 @@ class ScoreTrackII:
             i = np.searchsorted(summit_offsets,
                                 start_boundary)
             j = np.searchsorted(summit_offsets,
-                                peak_length + start_boundary,
-                                'right')
+                                peak_length + start_boundary)
             summit_offsets = summit_offsets[i:j]
 
         summit_offsets = enforce_peakyness(peakdata, summit_offsets)
@@ -1191,8 +1190,6 @@ class ScoreTrackII:
         if summit_offsets.shape[0] == 0:
             return self.__close_peak(peak_content, peaks, min_length, chrom)
 
-        summit_offsets -= start_boundary
-
         peak_scores = self.data[chrom][3][summit_indices]
         if not (peak_scores > self.cutoff).all():
             return self.__close_peak(peak_content, peaks, min_length, chrom)
@@ -1203,8 +1200,8 @@ class ScoreTrackII:
                 # if q value is not computed, use -1
                 qscore = -1
             peaks.add(chrom,
-                      start,
-                      end,
+                      peak_start,
+                      peak_end,
                       summit=start + summit_offset,
                       peak_score=self.data[chrom][3][summit_index],
                       # should be the same as summit_value

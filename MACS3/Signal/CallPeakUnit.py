@@ -1407,6 +1407,8 @@ class CallerFromAlignments:
         tend: cython.int
         summit_index: cython.int
         summit_offset: cython.int
+        peak_start: cython.int
+        peak_end: cython.int
         start: cython.int
         end: cython.int
         i: cython.int
@@ -1426,21 +1428,17 @@ class CallerFromAlignments:
         mapped_summits: cnp.ndarray
         tlist_scores_p: cython.int
 
-        peak_length = peak_content[-1][1] - peak_content[0][0]
+        peak_start = peak_content[0][0]
+        peak_end = peak_content[-1][1]
+        peak_length = peak_end - peak_start
 
         if peak_length < min_length:
             return  # if the region is too small, reject it
 
         # Add 10 bp padding to peak region so that we can get true minima
-        end = peak_content[-1][1] + 10
-        start = peak_content[0][0] - 10
-        if start < 0:
-            # this is the offof: set original peak boundary in peakdata list.
-            start_boundary = 10 + start
-            start = 0
-        else:
-            # this is the offof: set original peak boundary in peakdata list.
-            start_boundary = 10
+        start = max(peak_start - 10, 0)
+        end = peak_end + 10
+        start_boundary = peak_start - start
 
         # save the scores (qscore) for each position in this region
         peakdata = np.zeros(end - start, dtype='f4')
@@ -1452,8 +1450,8 @@ class CallerFromAlignments:
         for i in range(len(peak_content)):
             (tstart, tend, ttreat_p, tctrl_p, tlist_scores_p) = peak_content[i]
             tscore = ttreat_p  # use pileup as general score to find summit
-            m = tstart - start + start_boundary
-            n = tend - start + start_boundary
+            m = tstart - start
+            n = tend - start
             peakdata[m:n] = tscore
             peakindices[m:n] = i
 
@@ -1474,8 +1472,7 @@ class CallerFromAlignments:
             m = np.searchsorted(summit_offsets,
                                 start_boundary)
             n = np.searchsorted(summit_offsets,
-                                peak_length + start_boundary,
-                                'right')
+                                peak_length + start_boundary)
             summit_offsets = summit_offsets[m:n]
 
         summit_offsets = enforce_peakyness(peakdata, summit_offsets)
@@ -1507,8 +1504,6 @@ class CallerFromAlignments:
                                                  smoothlen,
                                                  score_array_s,
                                                  score_cutoff_s)
-
-        summit_offsets -= start_boundary
 
         for summit_offset, summit_index in list(zip(summit_offsets,
                                                     summit_indices)):
