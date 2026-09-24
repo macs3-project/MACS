@@ -67,6 +67,14 @@ compared to random background?*
 4. `hmmratac --cutoff-analysis-only` now exits with status 0 after
    successfully writing its report (#704).
 
+5. Fixed the summit-search padding coordinate mismatch. Summits near
+   peak edges are retained at their correct genomic positions, and
+   reported peak boundaries exclude the temporary padding (#747).
+
+6. Fixed summit shape filtering so negative values delimit the
+   candidate's supporting signal on both sides. The 50 bp
+   minimum-width and shape checks now use that region (#748).
+
 ### Compatibility changes
 
 1. MACS3 now requires Python 3.12 or later and declares support for
@@ -91,15 +99,10 @@ The common way to install MACS is through
 [conda](https://anaconda.org/macs3/macs3). Please check the
 [INSTALL](docs/INSTALL.md) document for detail.
 
-MACS3 has been tested using GitHub Actions for every push and PR in
-the following architectures:
-
- * x86_64 (Ubuntu 22, Python 3.9, 3.10, 3.11, 3.12, 3.13)
- * aarch64 (Ubuntu 22, Python 3.10)
- * armv7 (Ubuntu 22, Python 3.10)
- * ppc64le (Ubuntu 22, Python 3.10)
- * s390x (Ubuntu 22, Python 3.10)
- * Apple chips (Mac OS 13, Python 3.9, 3.10, 3.11, 3.12, 3.13)
+GitHub Actions tests each code change on x86_64 Linux and macOS with
+Python 3.12, 3.13, and 3.14, and on aarch64 Ubuntu 24.04 with Python
+3.12. The armv7, ppc64le, and s390x Ubuntu 24.04 tests use Python
+3.12 and run through a separate manually triggered workflow.
 
 In general, you can install through PyPI as `pip install macs3`.  To
 use virtual environment is highly recommended. Or you can install

@@ -44,6 +44,9 @@ website](https://macs3-project.github.io/MACS/).
 - Fixed decimal-score truncation in `bdgdiff` (#715), incorrect summit
   scores for maxima in below-cutoff gaps (#741), and an `IndexError`
   during `hmmratac` peak refinement (#735).
+- Corrected summit coordinates and peak boundaries around the temporary
+  search padding (#747), and fixed shape filtering of summit candidates
+  on both sides of a local maximum (#748).
 - Made successful `hmmratac --cutoff-analysis-only` runs exit with
   status 0 (#704).
 - MACS3 now requires Python 3.12 or later. The `cykhash` dependency was
