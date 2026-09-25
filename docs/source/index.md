@@ -94,27 +94,22 @@ compared to random background?*
 	
 ## Install
 
-The common way to install MACS is through
-[PYPI](https://pypi.org/project/macs3/)) or
-[conda](https://anaconda.org/macs3/macs3). Please check the
-[INSTALL](docs/INSTALL.md) document for detail.
+Install MACS3 from [PyPI](https://pypi.org/project/macs3/) or, when the
+desired version is available, [Bioconda](https://bioconda.github.io/recipes/macs3/README.html).
+MACS3 3.0.5 requires Python 3.12 or later. See the
+[installation guide](docs/INSTALL.md) for supported environments, build
+requirements, and source-install instructions.
 
 GitHub Actions tests each code change on x86_64 Linux and macOS with
 Python 3.12, 3.13, and 3.14, and on aarch64 Ubuntu 24.04 with Python
 3.12. The armv7, ppc64le, and s390x Ubuntu 24.04 tests use Python
 3.12 and run through a separate manually triggered workflow.
 
-In general, you can install through PyPI as `pip install macs3`.  To
-use virtual environment is highly recommended. Or you can install
-after unzipping the released package downloaded from Github, then use
-`pip install .` command. Please note that, we haven't tested
-installation on any Windows OS, so currently only Linux and Mac OS
-systems are supported. Also, for aarch64, armv7, ppc64le and s390x,
-due to some unknown reason potentially related to the scientific
-calculation libraries MACS3 depends on, such as Numpy, Scipy,
-hmm-learn, scikit-learn, the results from `hmmratac` subcommand may
-not be consistent with the results from x86 or Apple chips. Please be
-aware.
+We recommend a virtual environment. Install from PyPI with
+`python -m pip install macs3`, or install from an unpacked source distribution
+with `python -m pip install .`. Windows is not currently supported. On
+aarch64, armv7, ppc64le, and s390x, `hmmratac` results may differ from
+results on x86 or Apple Silicon; validate cross-architecture comparisons.
 
 ## Usage
 
