@@ -136,19 +136,19 @@ def run(args):
                 info("#1 user defined the maximum %ss...", tag)
                 control_max_dup_tags = int(options.keepduplicates)
             if options.PE_MODE:
-                info("#1 filter out redundant fragments by allowing at most %d identical fragment(s)", treatment_max_dup_tags)
+                info("#1 filter out redundant fragments by allowing at most %d identical fragment(s)", control_max_dup_tags)
             else:
-                info("#1 filter out redundant tags at the same location and the same strand by allowing at most %d tag(s)", treatment_max_dup_tags)
-            control.filter_dup(treatment_max_dup_tags)
+                info("#1 filter out redundant tags at the same location and the same strand by allowing at most %d tag(s)", control_max_dup_tags)
+            control.filter_dup(control_max_dup_tags)
             #control.separate_dups(treatment_max_dup_tags) # changed 5-29; changed back since we don't need to call addbackdup+refinepeak anymore
             c1 = control.total
 
             info("#1  %ss after filtering in control: %d", tag, c1)
             tagsinfo += "# %ss after filtering in control: %d\n" % (tag, c1)
             if options.PE_MODE:
-                tagsinfo += "# maximum duplicate fragments in control = %d\n" % (treatment_max_dup_tags)
+                tagsinfo += "# maximum duplicate fragments in control = %d\n" % (control_max_dup_tags)
             else:
-                tagsinfo += "# maximum duplicate tags at the same position in control = %d\n" % (treatment_max_dup_tags)
+                tagsinfo += "# maximum duplicate tags at the same position in control = %d\n" % (control_max_dup_tags)
 
             info("#1  Redundant rate of control: %.2f" % (float(c0-c1)/c0))
             tagsinfo += "# Redundant rate in control: %.2f\n" % (float(c0-c1)/c0)
