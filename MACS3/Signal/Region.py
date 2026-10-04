@@ -1,5 +1,4 @@
 # cython: language_level=3
-# cython: profile=True
 # Time-stamp: <2025-11-14 16:55:58 Tao Liu>
 
 """Module for Region classe.

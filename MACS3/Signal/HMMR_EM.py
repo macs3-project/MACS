@@ -1,5 +1,4 @@
 # cython: language_level=3
-# cython: profile=True
 # Time-stamp: <2025-07-24 15:46:59 Tao Liu>
 
 """Module description:

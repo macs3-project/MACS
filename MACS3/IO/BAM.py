@@ -1,6 +1,4 @@
 # cython: language_level=3
-# cython: profile=True
-# cython: linetrace=True
 # Time-stamp: <2024-10-07 16:09:06 Tao Liu>
 
 """Utilities for reading BAM files and their BAI indexes in MACS3.

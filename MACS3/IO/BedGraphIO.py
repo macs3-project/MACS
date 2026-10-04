@@ -1,5 +1,4 @@
 # cython: language_level=3
-# cython: profile=True
 # Time-stamp: <2025-02-05 12:38:24 Tao Liu>
 
 """Utilities for reading and writing MACS3 bedGraph files.
