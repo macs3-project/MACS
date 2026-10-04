@@ -203,11 +203,18 @@ def test_extra_and_stack_info_pass_through(memlogger, fake_memory):
 # MemoryLogger.get_memory_usage
 # ------------------------------------
 
+def _maxrss_mib():
+    # ru_maxrss is in KiB on Linux and in bytes on macOS
+    rss = resource.getrusage(resource.RUSAGE_SELF).ru_maxrss
+    if os.uname().sysname == "Darwin":
+        rss = rss / 1024
+    return int(rss / 1024)
+
+
 def test_get_memory_usage_is_int_megabytes_of_maxrss():
-    # Linux reports ru_maxrss in KiB
-    before = int(resource.getrusage(resource.RUSAGE_SELF).ru_maxrss / 1024)
+    before = _maxrss_mib()
     mb = MemoryLogger.get_memory_usage()
-    after = int(resource.getrusage(resource.RUSAGE_SELF).ru_maxrss / 1024)
+    after = _maxrss_mib()
     assert type(mb) is int
     assert before <= mb <= after
     assert mb > 0
@@ -256,6 +263,7 @@ def test_get_memory_usage_asks_for_this_process(monkeypatch):
         seen.append(who)
         return FakeUsage(4096)
     monkeypatch.setattr(resource, "getrusage", fake)
+    monkeypatch.setattr(os, "uname", lambda: FakeUname("Linux"))
     assert MemoryLogger.get_memory_usage() == 4
     assert seen == [resource.RUSAGE_SELF]
 

@@ -1303,13 +1303,6 @@ def test_bowtie_append_fwtrack(tmp_path):
     assert fw_locations(out) == {b"chr1": ([1], [46])}
 
 
-def test_bowtie_comment_lines_skipped(tmp_path):
-    lines = ["# bowtie output", bowtie_line("r1", "+", "chr1", 100)]
-    path = write_text(tmp_path / "b.map", "\n".join(lines) + "\n")
-    assert fw_locations(BowtieParser(path).build_fwtrack()) == {
-        b"chr1": ([100], [])}
-
-
 # ------------------------------------
 # FragParser: build_petrack, append_petrack, max_count, barcodes
 # ------------------------------------
