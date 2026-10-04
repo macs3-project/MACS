@@ -52,7 +52,7 @@ But please also note that, by default, we don't include a header line
 line will be necessary while uploading the broadPeak file to UCSC for
 display. Therefore, if you plan to upload the broadPeak file, either
 you turn on `--trackline` option in corresponding MACS3 subcommands,
-or add the trackline mannually to the beginning of the file. A minimal
+or add the trackline manually to the beginning of the file. A minimal
 trackline is like:
 
 `track type=broadPeak name="track name" description="track description"`
