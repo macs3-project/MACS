@@ -189,7 +189,7 @@ the essentials.
   MACS3 will include the trackline in the header of output files,
   including the bedGraph, narrowPeak, gappedPeak, BED format files. To
   include this trackline in the header is necessary while uploading
-  them to the UCSC genome browser. You can also mannually add these
+  them to the UCSC genome browser. You can also manually add these
   trackline to corresponding output files. For example, in order to
   upload narrowPeak file to UCSC browser, add this to as the first
   line -- `track type=narrowPeak name=`"my_peaks`" description=\"my
