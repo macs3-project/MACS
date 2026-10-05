@@ -1,3 +1,4 @@
+import gzip
 import sys
 import types
 
@@ -111,3 +112,276 @@ def test_write_bedgraph_emits_trackline_and_sorted_regions(tmp_path):
     assert lines[1] == "chr1\t0\t3\t1.23456"
     assert lines[2] == "chr1\t3\t7\t0.78900"
     assert lines[3] == "chr2\t0\t4\t5.00000"
+
+
+# ------------------------------------
+# Helpers for the tests below
+# ------------------------------------
+
+def _f32(x):
+    """``x`` after a round trip through a C float (bedGraph values are float32)."""
+    return float(np.float32(x))
+
+
+def _read(tmp_path, text, baseline=0.0, name="in.bdg"):
+    path = tmp_path / name
+    path.write_text(text)
+    return bedGraphIO(str(path)).read_bedGraph(baseline_value=baseline)
+
+
+def _write(tmp_path, track, fname="out.bdg", **kwargs):
+    path = tmp_path / fname
+    bedGraphIO(str(path), data=track).write_bedGraph(**kwargs)
+    return path.read_text()
+
+
+def _roundtrip(tmp_path, text, baseline=0.0):
+    """Read ``text`` as a bedGraph and write it back without a trackline."""
+    return _write(tmp_path, _read(tmp_path, text, baseline), trackline=False)
+
+
+EMPTY_TRACKLINE = ('track type=bedGraph name="" description="" '
+                   'visibility=2 alwaysZero=on\n')
+
+
+# ------------------------------------
+# bedGraphIO.__init__
+# ------------------------------------
+
+def test_init_defaults(tmp_path):
+    bio = bedGraphIO(str(tmp_path / "x.bdg"))
+    assert bio.bedGraph_filename == str(tmp_path / "x.bdg")
+    assert isinstance(bio.data, bedGraphTrackI)
+    assert bio.data.get_chr_names() == set()
+
+
+def test_init_uses_given_track(tmp_path):
+    track = bedGraphTrackI()
+    assert bedGraphIO(str(tmp_path / "x.bdg"), data=track).data is track
+
+
+def test_init_rejects_other_data(tmp_path):
+    with pytest.raises(AssertionError):
+        bedGraphIO(str(tmp_path / "x.bdg"), data={"chr1": []})
+
+
+# ------------------------------------
+# bedGraphIO.read_bedGraph
+# ------------------------------------
+
+def test_read_contiguous_round_trip_exact(tmp_path):
+    text = "chr1\t0\t10\t1.5\nchr1\t10\t25\t2.25\nchr2\t0\t5\t-3\n"
+    assert _roundtrip(tmp_path, text) == (
+        "chr1\t0\t10\t1.50000\nchr1\t10\t25\t2.25000\nchr2\t0\t5\t-3.00000\n")
+
+
+def test_read_track_content(tmp_path):
+    track = _read(tmp_path, "chr1\t0\t10\t0.1\nchr1\t10\t30\t2\n")
+    p, v = track.get_data_by_chr(b"chr1")
+    assert list(p) == [10, 30]
+    assert list(v) == [_f32(0.1), 2.0]
+    assert track.get_chr_names() == {b"chr1"}
+    assert track.get_data_by_chr(b"chr2") == []
+
+
+def test_read_space_separated_columns(tmp_path):
+    assert _roundtrip(tmp_path, "chr1 0 10 1.5\nchr1  10 20\t2\n") == \
+        "chr1\t0\t10\t1.50000\nchr1\t10\t20\t2.00000\n"
+
+
+@pytest.mark.parametrize("header", [
+    "track type=bedGraph name=x",
+    "#comment",
+    "# comment with space",
+    "browser position chr1:1-100",
+    "browse hide all",
+])
+def test_read_skips_header_lines_anywhere(tmp_path, header):
+    text = (header + "\nchr1\t0\t10\t1\n" + header + "\nchr1\t10\t20\t2\n")
+    assert _roundtrip(tmp_path, text) == \
+        "chr1\t0\t10\t1.00000\nchr1\t10\t20\t2.00000\n"
+
+
+@pytest.mark.parametrize("baseline,text", [
+    (0.0, "0.00000"),
+    (-1.5, "-1.50000"),
+    (2.5, "2.50000"),
+])
+def test_read_leading_gap_gets_baseline(tmp_path, baseline, text):
+    assert _roundtrip(tmp_path, "chr1\t10\t20\t1\n", baseline=baseline) == \
+        "chr1\t0\t10\t%s\nchr1\t10\t20\t1.00000\n" % text
+
+
+def test_read_merges_equal_adjacent_values(tmp_path):
+    text = ("chr1\t0\t10\t1\nchr1\t10\t20\t1\nchr1\t20\t30\t2\n"
+            "chr1\t30\t40\t1\n")
+    assert _roundtrip(tmp_path, text) == (
+        "chr1\t0\t20\t1.00000\nchr1\t20\t30\t2.00000\nchr1\t30\t40\t1.00000\n")
+
+
+def test_read_unsorted_input_is_stored_in_file_order(tmp_path):
+    # Unsorted input is outside the documented contract: add_loc says "The
+    # caller is responsible for providing non-overlapping, sorted regions"
+    # and the bdgcmp/bdgpeakcall docs say regions on a chromosome should be
+    # continuous. read_bedGraph neither sorts nor rejects, so each end is
+    # appended in file order (writing this track back gives start > end).
+    # By hand: (20,30,2) -> leading block [0,20)=0 then end 30 value 2;
+    # (0,10,1) -> end 10 value 1; (10,20,3) -> end 20 value 3.
+    shuffled = "chr1\t20\t30\t2\nchr1\t0\t10\t1\nchr1\t10\t20\t3\n"
+    track = _read(tmp_path, shuffled)
+    assert to_python_arrays(track, b"chr1") == ([20, 30, 10, 20],
+                                                [0.0, 2.0, 1.0, 3.0])
+
+
+def test_read_many_chromosomes_written_in_bytes_order(tmp_path):
+    text = "chr2\t0\t5\t2\nchr10\t0\t5\t10\nchr1\t0\t5\t1\nchrX\t0\t5\t3\n"
+    track = _read(tmp_path, text)
+    assert track.get_chr_names() == {b"chr1", b"chr2", b"chr10", b"chrX"}
+    out = _write(tmp_path, track, trackline=False)
+    assert out == ("chr1\t0\t5\t1.00000\nchr10\t0\t5\t10.00000\n"
+                   "chr2\t0\t5\t2.00000\nchrX\t0\t5\t3.00000\n")
+
+
+@pytest.mark.parametrize("value,text", [
+    ("1e-3", "0.00100"),
+    ("-0.5", "-0.50000"),
+    ("7", "7.00000"),
+    ("+2.5", "2.50000"),
+    ("0.1", "0.10000"),
+])
+def test_read_value_parsing(tmp_path, value, text):
+    assert _roundtrip(tmp_path, "chr1\t0\t10\t%s\n" % value) == \
+        "chr1\t0\t10\t%s\n" % text
+
+
+def test_read_negative_start_clipped_and_empty_interval_skipped(tmp_path):
+    # add_loc clips start < 0 to 0 and ignores intervals ending at <= 0
+    text = "chr1\t0\t0\t9\nchr1\t-5\t10\t1\n"
+    assert _roundtrip(tmp_path, text) == "chr1\t0\t10\t1.00000\n"
+
+
+def test_read_int32_max_end(tmp_path):
+    assert _roundtrip(tmp_path, "chr1\t0\t2147483647\t1\n") == \
+        "chr1\t0\t2147483647\t1.00000\n"
+
+
+def test_read_float32_max_value(tmp_path):
+    fmax = float(np.finfo(np.float32).max)
+    out = _roundtrip(tmp_path, "chr1\t0\t10\t%r\n" % fmax)
+    assert out == "chr1\t0\t10\t%.5f\n" % fmax
+
+
+def test_read_too_few_columns_raises(tmp_path):
+    with pytest.raises(IndexError):
+        _read(tmp_path, "chr1\t0\t10\n")
+
+
+def test_read_gzipped_bedgraph_is_not_decompressed(tmp_path):
+    """Pins the current output.
+
+    read_bedGraph opens the file with open(..., "rb") and has no gzip
+    detection; gzip input is documented only for callpeak's tag files, not
+    for bedGraph inputs, so the compressed bytes are parsed as text. With
+    a fixed gzip header (mtime=0, no file name) the whole file is one
+    whitespace-free token, so the column lookup raises IndexError. No
+    specification says what reading compressed bytes should give.
+    """
+    path = tmp_path / "x.bdg.gz"
+    with open(path, "wb") as raw:
+        with gzip.GzipFile(fileobj=raw, mode="wb", filename="",
+                           mtime=0) as fh:
+            fh.write(b"chr1\t0\t10\t1.5\nchr1\t10\t20\t2\n")
+    assert len(path.read_bytes().split()) == 1
+    with pytest.raises(IndexError, match="list index out of range"):
+        bedGraphIO(str(path)).read_bedGraph()
+
+
+def test_read_missing_file_raises(tmp_path):
+    with pytest.raises(FileNotFoundError):
+        bedGraphIO(str(tmp_path / "missing.bdg")).read_bedGraph()
+
+
+def test_read_empty_file(tmp_path):
+    track = _read(tmp_path, "")
+    assert track.get_chr_names() == set()
+    assert _write(tmp_path, track, trackline=False) == ""
+
+
+# ------------------------------------
+# bedGraphIO.write_bedGraph
+# ------------------------------------
+
+def _track(*rows, baseline=0.0):
+    t = bedGraphTrackI(baseline_value=baseline)
+    for chrom, s, e, v in rows:
+        t.add_loc(chrom, s, e, v)
+    return t
+
+
+def test_write_default_trackline(tmp_path):
+    out = _write(tmp_path, _track((b"chr1", 0, 10, 1.0)))
+    assert out == EMPTY_TRACKLINE + "chr1\t0\t10\t1.00000\n"
+
+
+def test_write_trackline_name_description(tmp_path):
+    out = _write(tmp_path, _track((b"chr1", 0, 10, 1.0)), name="treat",
+                 description='a "b" c')
+    assert out.splitlines()[0] == ('track type=bedGraph name="treat" '
+                                   'description="a \\"b\\" c" visibility=2 '
+                                   'alwaysZero=on')
+
+
+def test_write_without_trackline(tmp_path):
+    out = _write(tmp_path, _track((b"chr1", 0, 10, 1.0)), name="x",
+                 trackline=False)
+    assert out == "chr1\t0\t10\t1.00000\n"
+
+
+def test_write_empty_track(tmp_path):
+    assert _write(tmp_path, bedGraphTrackI(), trackline=False) == ""
+    assert _write(tmp_path, bedGraphTrackI(), fname="e2.bdg") == EMPTY_TRACKLINE
+
+
+@pytest.mark.parametrize("value,text", [
+    pytest.param(1.0 / 3.0, "0.33333", id="third"),
+    pytest.param(1e-6, "0.00000", id="tiny"),
+    pytest.param(5e-6, "0.00000", id="float32_below_half"),  # 4.99999987e-06
+    pytest.param(-2.5, "-2.50000", id="negative"),
+    pytest.param(123456.789, "123456.78906", id="float32_large"),  # .7890625
+    pytest.param(0.0, "0.00000", id="zero"),
+])
+def test_write_value_format(tmp_path, value, text):
+    out = _write(tmp_path, _track((b"chr1", 0, 10, value)), trackline=False)
+    assert out == "chr1\t0\t10\t%s\n" % text
+
+
+def test_write_leading_gap_uses_track_baseline(tmp_path):
+    out = _write(tmp_path, _track((b"chr1", 5, 10, 1.0), baseline=0.5),
+                 trackline=False)
+    assert out == "chr1\t0\t5\t0.50000\nchr1\t5\t10\t1.00000\n"
+
+
+def test_write_does_not_merge_unmerged_track(tmp_path):
+    t = bedGraphTrackI()
+    t.add_loc_wo_merge(b"chr1", 0, 10, 1.0)
+    t.add_loc_wo_merge(b"chr1", 10, 20, 1.0)
+    assert _write(tmp_path, t, trackline=False) == \
+        "chr1\t0\t10\t1.00000\nchr1\t10\t20\t1.00000\n"
+
+
+def test_write_overwrites_existing_file(tmp_path):
+    path = tmp_path / "out.bdg"
+    path.write_text("old content\n" * 5)
+    bedGraphIO(str(path), data=_track((b"chr1", 0, 3, 2.0))).write_bedGraph(
+        trackline=False)
+    assert path.read_text() == "chr1\t0\t3\t2.00000\n"
+
+
+def test_write_read_write_is_stable(tmp_path):
+    t = _track((b"chr2", 0, 7, 0.25), (b"chr1", 3, 9, 1.75), (b"chr1", 9, 12, 4.0))
+    first = _write(tmp_path, t, fname="a.bdg")
+    again = _write(tmp_path, bedGraphIO(str(tmp_path / "a.bdg")).read_bedGraph(),
+                   fname="b.bdg")
+    assert first == again == EMPTY_TRACKLINE + (
+        "chr1\t0\t3\t0.00000\nchr1\t3\t9\t1.75000\nchr1\t9\t12\t4.00000\n"
+        "chr2\t0\t7\t0.25000\n")
