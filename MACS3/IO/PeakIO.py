@@ -1,5 +1,4 @@
 # cython: language_level=3
-# cython: profile=True
 # Time-stamp: <2025-11-14 16:52:15 Tao Liu>
 
 """Module for PeakIO IO classes.
@@ -28,6 +27,14 @@ import sys
 # ------------------------------------
 import cython
 from cython.cimports.cpython import bool
+from cython.cimports.cpython.conversion import PyOS_double_to_string
+from cython.cimports.cpython.mem import PyMem_Free, PyMem_Realloc
+from cython.cimports.cpython.unicode import (PyUnicode_AsUTF8AndSize,
+                                             PyUnicode_DecodeUTF8)
+from cython.cimports.libc.string import memcpy
+from cython.cimports.MACS3.IO.cpeakfmt import (m3_put_i64, m3_put_letters,
+                                               m3_g6_f32, m3_r2g6_f32,
+                                               const_char_p)
 
 # ------------------------------------
 # constants
@@ -52,6 +59,123 @@ def subpeak_letters(i: cython.int) -> str:
         return chr(97+i)
     else:
         return subpeak_letters(i // 26) + chr(97 + (i % 26))
+
+@cython.cfunc
+def _g6(x: cython.double) -> str:
+    """Return ``"%.6g" % x``.
+
+    The '%' operator formats a float with exactly this call
+    (PyOS_double_to_string with type 'g', precision 6, no flags), so the
+    text is the same; this skips the format-string parsing.
+    """
+    p: cython.p_char
+    p = PyOS_double_to_string(x, 103, 6, 0, cython.NULL)  # 103 == ord('g')
+    try:
+        return p.decode('ascii')
+    finally:
+        PyMem_Free(p)
+
+
+# The narrow-peak writers below build each chromosome's lines in a C
+# buffer, with the C formatting in cpeakfmt.pxd, and hand them to write()
+# as one str, decoded from UTF-8: the same text, and the same one write
+# per chromosome, as the f-strings joined before. A value the C
+# formatting refuses goes through the Python formatting it replaces.
+
+# A line holds the chromosome and name prefix plus at most 256 bytes:
+# six integers of up to 20 characters, four "%.6g" texts of up to 13,
+# an int(10 * score) of up to 41, subpeak letters, tabs.
+LINE_SLACK = cython.declare(cython.Py_ssize_t, 256)
+
+
+@cython.cfunc
+def _float_field(a) -> cython.int:
+    """Which float field ``peak[a]`` returns: 0 score, 1 pileup, 2 pscore,
+    3 fc, 4 qscore, or -1 for anything else. The comparisons run in the
+    order PeakContent.__getitem__ runs them."""
+    if a == "chrom" or a == "start" or a == "end" or a == "length" or a == "summit":
+        return -1
+    if a == "score":
+        return 0
+    if a == "pileup":
+        return 1
+    if a == "pscore":
+        return 2
+    if a == "fc":
+        return 3
+    if a == "qscore":
+        return 4
+    return -1
+
+
+@cython.cfunc
+@cython.exceptval(-1)
+def _put_str(q: cython.p_char, s: str) -> cython.Py_ssize_t:
+    """Copy the UTF-8 text of ``s`` to ``q``; return its length."""
+    n: cython.Py_ssize_t
+    p: const_char_p
+    p = PyUnicode_AsUTF8AndSize(s, cython.address(n))
+    memcpy(q, p, n)
+    return n
+
+
+@cython.cfunc
+@cython.inline
+@cython.exceptval(-1)
+def _put_g6(q: cython.p_char, x: cython.float) -> cython.Py_ssize_t:
+    """Write ``"%.6g" % x`` at ``q``; return its length."""
+    n: cython.int
+    n = m3_g6_f32(x, q)
+    if n >= 0:
+        return n
+    return _put_str(q, _g6(x))
+
+
+@cython.final
+@cython.cclass
+class _TextBuf:
+    """Text built in C, kept up to the last complete line."""
+    buf: cython.p_char
+    cap: cython.Py_ssize_t
+    used: cython.Py_ssize_t
+
+    def __cinit__(self):
+        self.buf = cython.NULL
+        self.cap = 0
+        self.used = 0
+
+    def __dealloc__(self):
+        PyMem_Free(self.buf)
+
+    @cython.cfunc
+    @cython.exceptval(-1)
+    def reserve(self, need: cython.Py_ssize_t) -> cython.int:
+        """Make room for ``need`` bytes after the kept ones."""
+        cap: cython.Py_ssize_t
+        p: cython.p_char
+        if self.cap - self.used >= need:
+            return 0
+        cap = 2 * self.cap
+        if cap < self.used + need:
+            cap = self.used + need
+        if cap < 65536:
+            cap = 65536
+        p = cython.cast(cython.p_char, PyMem_Realloc(self.buf, cap))
+        if p == cython.NULL:
+            raise MemoryError()
+        self.buf = p
+        self.cap = cap
+        return 0
+
+    @cython.cfunc
+    def flush(self, write):
+        """Pass the kept lines to ``write`` as one str, and drop them."""
+        n: cython.Py_ssize_t
+        n = self.used
+        if n:
+            self.used = 0
+            write(PyUnicode_DecodeUTF8(self.buf, n, cython.NULL))
+
 
 # ------------------------------------
 # Classes
@@ -220,6 +344,22 @@ class PeakContent:
         (self.chrom, self.start, self.end, self.length, self.summit,
          self.score, self.pileup, self.pscore, self.fc,
          self.qscore, self.name) = state
+
+
+@cython.cfunc
+@cython.inline
+@cython.exceptval(check=False)
+def _field(peak: PeakContent, c: cython.int) -> cython.float:
+    """The float field ``_float_field`` numbered ``c``."""
+    if c == 4:
+        return peak.qscore
+    if c == 2:
+        return peak.pscore
+    if c == 0:
+        return peak.score
+    if c == 3:
+        return peak.fc
+    return peak.pileup
 
 
 @cython.cclass
@@ -595,6 +735,24 @@ class PeakIO:
         n_peak: cython.int
         peakprefix: bytes
         desc: bytes
+        plist: list
+        peak: PeakContent
+        chrom_s: str
+        prefix_s: str
+        n: cython.Py_ssize_t
+        i: cython.Py_ssize_t
+        j: cython.Py_ssize_t
+        k: cython.Py_ssize_t
+        end: cython.int
+        summit_p: cython.long
+        fcol: cython.int
+        tb: _TextBuf
+        q: cython.p_char
+        cp: const_char_p
+        pp: const_char_p
+        clen: cython.Py_ssize_t
+        plen: cython.Py_ssize_t
+        sc: str
 
         chrs = list(self.peaks.keys())
         n_peak = 0
@@ -612,18 +770,66 @@ class PeakIO:
                                                                                           desc.replace(b"\"", b"\\\"").decode()))
             except Exception:
                 print_func('track name=MACS description=Unknown')
+        # One print_func call per chromosome. Each line holds the text the
+        # '%' formats produced before; peaks are grouped by equal
+        # consecutive ends, as groupby did, and the names are decoded in
+        # the order the old per-peak code decoded them.
+        fcol = _float_field(score_column)
+        tb = _TextBuf()
+        prefix_s = None
+        pp = cython.NULL
+        plen = 0
+        sc = None
         for chrom in sorted(chrs):
-            for end, group in groupby(self.peaks[chrom], key=itemgetter("end")):
-                n_peak += 1
-                peaks = list(group)
-                if len(peaks) > 1:
-                    for i, peak in enumerate(peaks):
-                        summit_p = peak['summit']
-                        print_func("%s\t%d\t%d\t%s%d%s\t%.6g\n" % (chrom.decode(), summit_p, summit_p+1, peakprefix.decode(), n_peak, subpeak_letters(i), peak[score_column]))
-                else:
-                    peak = peaks[0]
-                    summit_p = peak['summit']
-                    print_func("%s\t%d\t%d\t%s%d\t%.6g\n" % (chrom.decode(), summit_p, summit_p+1, peakprefix.decode(), n_peak, peak[score_column]))
+            plist = self.peaks[chrom]
+            n = len(plist)
+            if n == 0:
+                continue
+            chrom_s = chrom.decode()
+            if prefix_s is None:
+                prefix_s = peakprefix.decode()
+                pp = PyUnicode_AsUTF8AndSize(prefix_s, cython.address(plen))
+            cp = PyUnicode_AsUTF8AndSize(chrom_s, cython.address(clen))
+            try:
+                i = 0
+                while i < n:
+                    n_peak += 1
+                    peak = plist[i]
+                    end = peak.end
+                    j = i + 1
+                    while j < n and cython.cast(PeakContent, plist[j], typecheck=True).end == end:
+                        j += 1
+                    for k in range(i, j):
+                        peak = plist[k]
+                        summit_p = peak.summit
+                        if fcol < 0:
+                            sc = _g6(peak[score_column])
+                        tb.reserve(clen + plen + LINE_SLACK + (0 if sc is None else len(sc)))
+                        q = tb.buf + tb.used
+                        memcpy(q, cp, clen)
+                        q += clen
+                        q[0] = 9  # '\t'
+                        q = m3_put_i64(q + 1, summit_p)
+                        q[0] = 9
+                        q = m3_put_i64(q + 1, summit_p + 1)
+                        q[0] = 9
+                        q += 1
+                        memcpy(q, pp, plen)
+                        q = m3_put_i64(q + plen, n_peak)
+                        if j - i > 1:
+                            q = m3_put_letters(q, k - i)
+                        q[0] = 9
+                        q += 1
+                        if sc is None:
+                            q += _put_g6(q, _field(peak, fcol))
+                        else:
+                            q += _put_str(q, sc)
+                            sc = None
+                        q[0] = 10  # '\n'
+                        tb.used = (q + 1) - tb.buf
+                    i = j
+            finally:
+                tb.flush(print_func)
 
     def tobed(self):
         """Write peaks in BED5 format to ``stdout``.
@@ -719,7 +925,24 @@ class PeakIO:
         n_peak: cython.int
         chrom: bytes
         s: cython.long
-        peakname: str
+        plist: list
+        peak: PeakContent
+        chrom_s: str
+        prefix_s: str
+        n: cython.Py_ssize_t
+        i: cython.Py_ssize_t
+        j: cython.Py_ssize_t
+        k: cython.Py_ssize_t
+        end: cython.int
+        fcol: cython.int
+        tb: _TextBuf
+        q: cython.p_char
+        cp: const_char_p
+        pp: const_char_p
+        clen: cython.Py_ssize_t
+        plen: cython.Py_ssize_t
+        t: cython.double
+        sc: str
 
         chrs = list(self.peaks.keys())
         n_peak = 0
@@ -730,44 +953,88 @@ class PeakIO:
             peakprefix = name_prefix
         if trackline:
             write("track type=narrowPeak name=\"%s\" description=\"%s\" nextItemButton=on\n" % (name.decode(), name.decode()))
+        # One write per chromosome. Each line holds the text the '%'
+        # formats produced before; peaks are grouped by equal consecutive
+        # ends, as groupby did, and the names are decoded in the order the
+        # old per-peak code decoded them.
+        fcol = _float_field(score_column)
+        tb = _TextBuf()
+        prefix_s = None
+        pp = cython.NULL
+        plen = 0
+        sc = None
         for chrom in sorted(chrs):
-            for end, group in groupby(self.peaks[chrom], key=itemgetter("end")):
-                n_peak += 1
-                these_peaks = list(group)
-                if len(these_peaks) > 1:  # from call-summits
-                    for i, peak in enumerate(these_peaks):
-                        peakname = "%s%d%s" % (peakprefix.decode(), n_peak, subpeak_letters(i))
-                        if peak['summit'] == -1:
+            plist = self.peaks[chrom]
+            n = len(plist)
+            if n == 0:
+                continue
+            if prefix_s is None:
+                prefix_s = peakprefix.decode()
+                pp = PyUnicode_AsUTF8AndSize(prefix_s, cython.address(plen))
+            chrom_s = chrom.decode()
+            cp = PyUnicode_AsUTF8AndSize(chrom_s, cython.address(clen))
+            try:
+                i = 0
+                while i < n:
+                    n_peak += 1
+                    peak = plist[i]
+                    end = peak.end
+                    j = i + 1
+                    while j < n and cython.cast(PeakContent, plist[j], typecheck=True).end == end:
+                        j += 1
+                    for k in range(i, j):  # j - i > 1 from call-summits
+                        peak = plist[k]
+                        if peak.summit == -1:
                             s = -1
                         else:
-                            s = peak['summit'] - peak['start']
-                        fhd.write("%s\t%d\t%d\t%s\t%d\t.\t%.6g\t%.6g\t%.6g\t%d\n" %
-                                  (chrom.decode(),
-                                   peak['start'],
-                                   peak['end'],
-                                   peakname,
-                                   int(10*peak[score_column]),
-                                   peak['fc'],
-                                   peak['pscore'],
-                                   peak['qscore'],
-                                   s))
-                else:
-                    peak = these_peaks[0]
-                    peakname = "%s%d" % (peakprefix.decode(), n_peak)
-                    if peak['summit'] == -1:
-                        s = -1
-                    else:
-                        s = peak['summit'] - peak['start']
-                    fhd.write("%s\t%d\t%d\t%s\t%d\t.\t%.6g\t%.6g\t%.6g\t%d\n" %
-                              (chrom.decode(),
-                               peak['start'],
-                               peak['end'],
-                               peakname,
-                               int(10*peak[score_column]),
-                               peak['fc'],
-                               peak['pscore'],
-                               peak['qscore'],
-                               s))
+                            s = cython.cast(cython.long, peak.summit) - peak.start
+                        # int(10*peak[score_column]): a double product,
+                        # truncated toward zero
+                        if fcol >= 0:
+                            t = 10.0 * cython.cast(cython.double, _field(peak, fcol))
+                            if not (t > -9.0e18 and t < 9.0e18):
+                                sc = str(int(10*peak[score_column]))
+                        else:
+                            sc = str(int(10*peak[score_column]))
+                        tb.reserve(clen + plen + LINE_SLACK + (0 if sc is None else len(sc)))
+                        q = tb.buf + tb.used
+                        memcpy(q, cp, clen)
+                        q += clen
+                        q[0] = 9  # '\t'
+                        q = m3_put_i64(q + 1, peak.start)
+                        q[0] = 9
+                        q = m3_put_i64(q + 1, peak.end)
+                        q[0] = 9
+                        q += 1
+                        memcpy(q, pp, plen)
+                        q = m3_put_i64(q + plen, n_peak)
+                        if j - i > 1:
+                            q = m3_put_letters(q, k - i)
+                        q[0] = 9
+                        q += 1
+                        if sc is None:
+                            q = m3_put_i64(q, cython.cast(cython.longlong, t))
+                        else:
+                            q += _put_str(q, sc)
+                            sc = None
+                        q[0] = 9
+                        q[1] = 46  # '.'
+                        q[2] = 9
+                        q += 3
+                        q += _put_g6(q, peak.fc)
+                        q[0] = 9
+                        q += 1
+                        q += _put_g6(q, peak.pscore)
+                        q[0] = 9
+                        q += 1
+                        q += _put_g6(q, peak.qscore)
+                        q[0] = 9
+                        q = m3_put_i64(q + 1, s)
+                        q[0] = 10  # '\n'
+                        tb.used = (q + 1) - tb.buf
+                    i = j
+            finally:
+                tb.flush(write)
         return
 
     @cython.ccall
@@ -789,9 +1056,24 @@ class PeakIO:
         """
         peakprefix: bytes
         chrs: list
-        these_peaks: list
+        plist: list
+        peak: PeakContent
+        chrom_s: str
+        prefix_s: str
         n_peak: cython.int
-        i: cython.int
+        n: cython.Py_ssize_t
+        i: cython.Py_ssize_t
+        j: cython.Py_ssize_t
+        k: cython.Py_ssize_t
+        end: cython.int
+        pileup: object
+        tb: _TextBuf
+        q: cython.p_char
+        cp: const_char_p
+        pp: const_char_p
+        clen: cython.Py_ssize_t
+        plen: cython.Py_ssize_t
+        r: cython.int
 
         write = ofhd.write
         write("\t".join(("chr", "start", "end",  "length",  "abs_summit", "pileup", "-log10(pvalue)", "fold_enrichment", "-log10(qvalue)", "name"))+"\n")
@@ -804,40 +1086,78 @@ class PeakIO:
         peaks = self.peaks
         chrs = list(peaks.keys())
         n_peak = 0
+        # One write per chromosome. Each line holds the text the '%'
+        # formats produced before; peaks are grouped by equal consecutive
+        # ends, as groupby did, and the names are decoded in the order the
+        # old per-peak code decoded them. Columns: chr, start (1-based),
+        # end, length, summit (1-based), pileup at the summit rounded to 2
+        # digits, -log10 pvalue, fold change, -log10 qvalue, name.
+        tb = _TextBuf()
+        prefix_s = None
+        pp = cython.NULL
+        plen = 0
         for chrom in sorted(chrs):
-            for end, group in groupby(peaks[chrom], key=itemgetter("end")):
-                n_peak += 1
-                these_peaks = list(group)
-                if len(these_peaks) > 1:
-                    for i, peak in enumerate(these_peaks):
-                        peakname = "%s%d%s" % (peakprefix.decode(), n_peak, subpeak_letters(i))
-                        # [start,end,end-start,summit,peak_height,number_tags,pvalue,fold_change,qvalue]
-                        write("%s\t%d\t%d\t%d" % (chrom.decode(),
-                                                  peak['start']+1,
-                                                  peak['end'],
-                                                  peak['length']))
-                        write("\t%d" % (peak['summit']+1))  # summit position
-                        write("\t%.6g" % (round(peak['pileup'], 2)))  # pileup height at summit
-                        write("\t%.6g" % (peak['pscore']))  # -log10pvalue at summit
-                        write("\t%.6g" % (peak['fc']))  # fold change at summit
-                        write("\t%.6g" % (peak['qscore']))  # -log10qvalue at summit
-                        write("\t%s" % peakname)
-                        write("\n")
-                else:
-                    peak = these_peaks[0]
-                    peakname = "%s%d" % (peakprefix.decode(), n_peak)
-                    # [start,end,end-start,summit,peak_height,number_tags,pvalue,fold_change,qvalue]
-                    write("%s\t%d\t%d\t%d" % (chrom.decode(),
-                                              peak['start']+1,
-                                              peak['end'],
-                                              peak['length']))
-                    write("\t%d" % (peak['summit']+1))  # summit position
-                    write("\t%.6g" % (round(peak['pileup'], 2)))  # pileup height at summit
-                    write("\t%.6g" % (peak['pscore']))  # -log10pvalue at summit
-                    write("\t%.6g" % (peak['fc']))  # fold change at summit
-                    write("\t%.6g" % (peak['qscore']))  # -log10qvalue at summit
-                    write("\t%s" % peakname)
-                    write("\n")
+            plist = peaks[chrom]
+            n = len(plist)
+            if n == 0:
+                continue
+            if prefix_s is None:
+                prefix_s = peakprefix.decode()
+                pp = PyUnicode_AsUTF8AndSize(prefix_s, cython.address(plen))
+            chrom_s = chrom.decode()
+            cp = PyUnicode_AsUTF8AndSize(chrom_s, cython.address(clen))
+            try:
+                i = 0
+                while i < n:
+                    n_peak += 1
+                    peak = plist[i]
+                    end = peak.end
+                    j = i + 1
+                    while j < n and cython.cast(PeakContent, plist[j], typecheck=True).end == end:
+                        j += 1
+                    for k in range(i, j):
+                        peak = plist[k]
+                        tb.reserve(clen + plen + LINE_SLACK)
+                        q = tb.buf + tb.used
+                        memcpy(q, cp, clen)
+                        q += clen
+                        q[0] = 9  # '\t'
+                        q = m3_put_i64(q + 1, cython.cast(cython.long, peak.start) + 1)
+                        q[0] = 9
+                        q = m3_put_i64(q + 1, peak.end)
+                        q[0] = 9
+                        q = m3_put_i64(q + 1, peak.length)
+                        q[0] = 9
+                        q = m3_put_i64(q + 1, cython.cast(cython.long, peak.summit) + 1)
+                        q[0] = 9
+                        q += 1
+                        # "%.6g" % round(pileup, 2)
+                        r = m3_r2g6_f32(peak.pileup, q)
+                        if r >= 0:
+                            q += r
+                        else:
+                            pileup = peak.pileup
+                            q += _put_str(q, _g6(round(pileup, 2)))
+                        q[0] = 9
+                        q += 1
+                        q += _put_g6(q, peak.pscore)
+                        q[0] = 9
+                        q += 1
+                        q += _put_g6(q, peak.fc)
+                        q[0] = 9
+                        q += 1
+                        q += _put_g6(q, peak.qscore)
+                        q[0] = 9
+                        q += 1
+                        memcpy(q, pp, plen)
+                        q = m3_put_i64(q + plen, n_peak)
+                        if j - i > 1:
+                            q = m3_put_letters(q, k - i)
+                        q[0] = 10  # '\n'
+                        tb.used = (q + 1) - tb.buf
+                    i = j
+            finally:
+                tb.flush(write)
         return
 
     @cython.ccall

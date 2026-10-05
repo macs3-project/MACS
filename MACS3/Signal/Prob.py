@@ -1,5 +1,4 @@
 # cython: language_level=3
-# cython: profile=True
 # Time-stamp: <2024-10-04 15:09:10 Tao Liu>
 
 """Module Description: statistics functions to calculate p-values
@@ -30,6 +29,9 @@ from cython.cimports.cpython import bool
 # C lib
 # ------------------------------------
 from cython.cimports.libc.math import exp, log, M_LN10  # ,fabs,log1p
+from cython.cimports.libc.math import fabs as c_fabs, log1p as c_log1p
+from cython.cimports.libc.math import fma, nearbyint, copysign, fmod
+from cython.cimports.libc.stdlib import realloc
 
 # ------------------------------------
 # constants
@@ -456,6 +458,52 @@ def __poisson_cdf_Q_large_lambda(k: uint32_t, a: float64_t) -> float64_t:
 
 @cython.cfunc
 @cython.inline
+@cython.nogil
+def round5(x: float64_t) -> float64_t:
+    """Return round(x, 5), the float Python's round gives, without a
+    Python call.
+
+    Python rounds x itself, exactly, to the nearest multiple of 1e-5
+    (ties to the even multiple), and returns the double nearest to
+    that decimal. Here n = x * 10**5 rounded to the nearest integer,
+    ties to even, is found exactly: nearbyint(x * 1e5) is within one of
+    it, and the sign of fma(x, 1e5, -(r +/- 0.5)), which rounds the
+    exact x * 10**5 - (r +/- 0.5) once, says which side of each
+    half-way point x * 10**5 lies on, or that it lies on it. r +/- 0.5
+    is exact while |r| < 2**52, which |x| < 1e10 ensures. n / 1e5,
+    correctly rounded, is then the double nearest to n * 10**-5, and a
+    zero keeps the sign of x, as in Python. NaN, inf and |x| >= 1e10
+    go to Python's round, which takes the GIL.
+    """
+    r: float64_t
+    d: float64_t
+
+    if not c_fabs(x) < 1e10:
+        with cython.gil:
+            return round(x, 5)
+    r = nearbyint(x * 1e5)
+    d = fma(x, 1e5, -(r + 0.5))
+    if d > 0:
+        r += 1.0
+    elif d == 0:
+        # half-way between r and r + 1
+        if fmod(r, 2.0) != 0:
+            r += 1.0
+    else:
+        d = fma(x, 1e5, -(r - 0.5))
+        if d < 0:
+            r -= 1.0
+        elif d == 0:
+            # half-way between r - 1 and r
+            if fmod(r, 2.0) != 0:
+                r -= 1.0
+    if r == 0:
+        return copysign(0.0, x)
+    return r / 1e5
+
+
+@cython.cfunc
+@cython.inline
 def log10_poisson_cdf_P_large_lambda(k: uint32_t, lbd: float64_t) -> float64_t:
     """Slower Poisson CDF evaluater for lower tail which allow
     calculation in log space. Better for the pvalue < 10^-310.
@@ -491,7 +539,7 @@ def log10_poisson_cdf_P_large_lambda(k: uint32_t, lbd: float64_t) -> float64_t:
             break
         logx = logy
 
-    return round((residue-lbd)/M_LN10, 5)
+    return round5((residue-lbd)/M_LN10)
 
 
 @cython.cfunc
@@ -512,30 +560,97 @@ def log10_poisson_cdf_Q_large_lambda(k: uint32_t, lbd: float64_t) -> float64_t:
     """
     residue: float64_t = 0
     logx: float64_t = 0
+    logy: float64_t
+    pre_residue: float64_t
     ln_lbd: float64_t = log(lbd)
-    m: int32_t = k+1
+    # m is 64-bit: for lambda past 2**31 the tail loop runs m past
+    # 2**31, where a 32-bit m wrapped negative and indexed LN_ONE out
+    # of bounds. k+1 is still taken modulo 2**32, as before.
+    m: int64_t = cython.cast(uint32_t, k+1)
     sum_ln_m: float64_t = 0
-    i: int32_t = 0
 
-    for i in range(1, m+1):
-        sum_ln_m += log(i)
+    sum_ln_m = sum_of_logs(m)
     logx = m*ln_lbd - sum_ln_m
     residue = logx
 
     while True:
         m += 1
-        logy = logx+ln_lbd-log(m)
+        # LN_ONE[m] is log(m)
+        if m < LN_SUM_SIZE:
+            logy = logx+ln_lbd-LN_ONE[m]
+        else:
+            logy = logx+ln_lbd-log(m)
         pre_residue = residue
         residue = logspace_add(pre_residue, logy)
-        if fabs(pre_residue-residue) < 1e-5:
+        if c_fabs(pre_residue-residue) < 1e-5:
             break
         logx = logy
 
-    return round((residue-lbd)/log(10), 5)
+    return round5((residue-lbd)/log(10))
+
+
+# LN_SUM[m] is log(1) + log(2) + ... + log(m), each term added to the
+# previous entry, which is what the loop
+#     s = 0.0
+#     for i in range(1, m + 1): s += log(i)
+# computes, so an entry equals that loop's result bit for bit. LN_ONE[m]
+# is log(m) itself, the term LN_SUM[m] adds. Both are filled on demand,
+# together, up to LN_SUM_MAX entries; LN_SUM_SIZE is the size of each.
+# Every index into them is 64-bit (see log10_poisson_cdf_Q_large_lambda).
+LN_SUM_MAX = cython.declare(int32_t, 1 << 22)
+LN_SUM = cython.declare(cython.pointer(float64_t), cython.NULL)
+LN_ONE = cython.declare(cython.pointer(float64_t), cython.NULL)
+LN_SUM_SIZE = cython.declare(int32_t, 0)
+
+
+@cython.cfunc
+@cython.nogil
+@cython.exceptval(check=False)
+def sum_of_logs(m: int64_t) -> float64_t:
+    """Return log(1) + log(2) + ... + log(m), added in that order
+    starting from 0.0 (0.0 when m < 1)."""
+    global LN_SUM, LN_ONE, LN_SUM_SIZE
+    i: int64_t
+    n: int64_t
+    s: float64_t = 0.0
+    t: cython.pointer(float64_t)
+    u: cython.pointer(float64_t)
+
+    if m < 1:
+        return 0.0
+    if m < LN_SUM_SIZE:
+        return LN_SUM[m]
+    if m < LN_SUM_MAX:
+        n = max(m + 1, 2 * LN_SUM_SIZE, 1024)
+        if n > LN_SUM_MAX:
+            n = LN_SUM_MAX
+        t = cython.cast(cython.pointer(float64_t),
+                        realloc(LN_SUM, n * cython.sizeof(float64_t)))
+        if t != cython.NULL:
+            LN_SUM = t
+            u = cython.cast(cython.pointer(float64_t),
+                            realloc(LN_ONE, n * cython.sizeof(float64_t)))
+            if u != cython.NULL:
+                LN_ONE = u
+                if LN_SUM_SIZE == 0:
+                    t[0] = 0.0
+                    u[0] = 0.0
+                    LN_SUM_SIZE = 1
+                for i in range(LN_SUM_SIZE, n):
+                    u[i] = log(i)
+                    t[i] = t[i - 1] + u[i]
+                LN_SUM_SIZE = n
+                return t[m]
+    # too large for the table, or out of memory: the loop itself
+    for i in range(1, m + 1):
+        s += log(i)
+    return s
 
 
 @cython.cfunc
 @cython.inline
+@cython.nogil
+@cython.exceptval(check=False)
 def logspace_add(logx: float64_t, logy: float64_t) -> float64_t:
     """addition in log space.
 
@@ -543,10 +658,144 @@ def logspace_add(logx: float64_t, logy: float64_t) -> float64_t:
     log(exp(logx)+exp(logy)).
 
     """
+    # C's log1p and the addition give the values math.log1p and
+    # Python float addition give, which this function used before
     if logx > logy:
-        return logx + log1p( exp ( logy - logx ) )
+        return logx + c_log1p( exp ( logy - logx ) )
     else:
-        return logy + log1p( exp ( logx - logy ) )
+        return logy + c_log1p( exp ( logx - logy ) )
+
+
+@cython.cfunc
+@cython.nogil
+@cython.exceptval(-1, check=True)
+def log10_poisson_cdf_Q_large_lambda_4(k: cython.pointer(uint32_t),
+                                       lbd: cython.pointer(float64_t),
+                                       out: cython.pointer(float64_t),
+                                       n: cython.Py_ssize_t) -> cython.int:
+    """Set out[i] to log10_poisson_cdf_Q_large_lambda(k[i], lbd[i]) for
+    each i < n, bit for bit.
+
+    Each value comes from the same operations in the same order as in
+    that function. A value's tail loop is one chain of exp and log1p
+    calls, each waiting for the last, so here four values are carried
+    in one loop, in four lanes, and their chains overlap; a lane whose
+    value is done takes the next one.
+    """
+    idx: cython.Py_ssize_t[4]
+    m: int64_t[4]
+    logx: float64_t[4]
+    residue: float64_t[4]
+    ln_lbd: float64_t[4]
+    lam: float64_t[4]
+    active: cython.int[4]
+    nxt: cython.Py_ssize_t = 0
+    n_active: cython.int = 0
+    l: cython.int
+    logy: float64_t
+    pre_residue: float64_t
+    sum_ln_m: float64_t
+
+    for l in range(4):
+        active[l] = 0
+        if nxt < n:
+            idx[l] = nxt
+            lam[l] = lbd[nxt]
+            ln_lbd[l] = log(lam[l])
+            m[l] = cython.cast(uint32_t, k[nxt]+1)
+            sum_ln_m = sum_of_logs(m[l])
+            logx[l] = m[l]*ln_lbd[l] - sum_ln_m
+            residue[l] = logx[l]
+            active[l] = 1
+            n_active += 1
+            nxt += 1
+    while n_active > 0:
+        for l in range(4):
+            if not active[l]:
+                continue
+            m[l] += 1
+            # LN_ONE[m] is log(m)
+            if m[l] < LN_SUM_SIZE:
+                logy = logx[l]+ln_lbd[l]-LN_ONE[m[l]]
+            else:
+                logy = logx[l]+ln_lbd[l]-log(m[l])
+            pre_residue = residue[l]
+            residue[l] = logspace_add(pre_residue, logy)
+            if c_fabs(pre_residue-residue[l]) < 1e-5:
+                out[idx[l]] = round5((residue[l]-lam[l])/log(10))
+                if nxt < n:
+                    idx[l] = nxt
+                    lam[l] = lbd[nxt]
+                    ln_lbd[l] = log(lam[l])
+                    m[l] = cython.cast(uint32_t, k[nxt]+1)
+                    sum_ln_m = sum_of_logs(m[l])
+                    logx[l] = m[l]*ln_lbd[l] - sum_ln_m
+                    residue[l] = logx[l]
+                    nxt += 1
+                else:
+                    active[l] = 0
+                    n_active -= 1
+            else:
+                logx[l] = logy
+    return 0
+
+
+@cython.ccall
+def poisson_cdf_Q_log10_many(n: uint32_t[::1], lam: float64_t[::1],
+                             out: float64_t[::1]):
+    """Set out[i] to poisson_cdf(n[i], lam[i], False, True), the log10
+    upper-tail probability, for every i, as that call gives it.
+    """
+    i: cython.Py_ssize_t
+
+    assert lam.shape[0] == n.shape[0] and out.shape[0] == n.shape[0]
+    for i in range(n.shape[0]):
+        assert lam[i] > 0.0, "Lambda must > 0, however we got %d" % lam[i]
+    if n.shape[0] > 0:
+        log10_poisson_cdf_Q_large_lambda_4(cython.address(n[0]),
+                                           cython.address(lam[0]),
+                                           cython.address(out[0]),
+                                           n.shape[0])
+
+
+@cython.ccall
+def poisson_cdf_Q_log10_prepare(max_n: uint32_t) -> bool:
+    """Fill the tables sum_of_logs reads for every count up to
+    ``max_n``, and return whether poisson_cdf_Q_log10_range calls for
+    counts up to ``max_n`` then leave them as they are, so that such
+    calls may run on several threads at once.
+    """
+    m: int64_t
+
+    # sum_of_logs(m) resizes the tables only for
+    # LN_SUM_SIZE <= m < LN_SUM_MAX; a value takes m = n + 1
+    if max_n >= cython.cast(uint32_t, LN_SUM_MAX - 1):
+        m = LN_SUM_MAX - 1
+    else:
+        m = cython.cast(int64_t, max_n) + 1
+    sum_of_logs(m)
+    return LN_SUM_SIZE > m
+
+
+@cython.ccall
+def poisson_cdf_Q_log10_range(n: uint32_t[::1], lam: float64_t[::1],
+                              out: float64_t[::1],
+                              start: cython.Py_ssize_t,
+                              end: cython.Py_ssize_t):
+    """Set out[i] to poisson_cdf(n[i], lam[i], False, True) for
+    start <= i < end, as poisson_cdf_Q_log10_many does, without the
+    GIL. Every lam[i] must be > 0, and poisson_cdf_Q_log10_prepare
+    must have returned True for a count at least as large as every
+    n[i] when calls run on several threads at once.
+    """
+    assert 0 <= start <= end <= n.shape[0]
+    assert lam.shape[0] == n.shape[0] and out.shape[0] == n.shape[0]
+    if end > start:
+        with cython.nogil:
+            log10_poisson_cdf_Q_large_lambda_4(cython.address(n[start]),
+                                               cython.address(lam[start]),
+                                               cython.address(out[start]),
+                                               end - start)
 
 
 @cython.ccall

@@ -1,5 +1,4 @@
 # cython: language_level=3
-# cython: profile=True
 # Time-stamp: <2024-10-24 15:20:26 Tao Liu>
 
 """Module Description: Detect peaks, main module
