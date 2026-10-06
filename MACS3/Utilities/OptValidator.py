@@ -253,6 +253,9 @@ def opt_validate_callpeak(options):
     if options.do_SPMR and options.store_bdg:
         options.argtxt += "# MACS will save fragment pileup signal per million reads\n"
 
+    if options.store_score_bdg:
+        options.argtxt += "# MACS will save per base score to bedGraph file\n"
+
     return options
 
 
