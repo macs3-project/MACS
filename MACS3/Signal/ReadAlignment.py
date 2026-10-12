@@ -1,5 +1,4 @@
 # cython: language_level=3
-# cython: profile=True
 # Time-stamp: <2024-10-22 15:19:55 Tao Liu>
 
 """Module for SAPPER ReadAlignment class

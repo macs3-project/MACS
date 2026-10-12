@@ -2,6 +2,8 @@ include README.md LICENSE ChangeLog MANIFEST.in setup.py bin/macs3 requirements.
 recursive-include MACS3 *.py *.pyx *.pxd
 recursive-exclude MACS3 *.c *.h
 include MACS3/Signal/cPosValCalculation.c MACS3/Signal/cPosValCalculation.h MACS3/Signal/swalign.h MACS3/Signal/swalign.c
+include MACS3/IO/bgzf_mt.c MACS3/IO/bgzf_mt.h
+recursive-include MACS3/IO/libdeflate *.c *.h COPYING
 recursive-include docs *.md
 recursive-include MACS3/fermi-lite *.c *.h
 global-exclude .ipynb_checkpoints/*

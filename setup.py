@@ -177,7 +177,16 @@ def main():
                              ["MACS3/Signal/PeakVariants.py"],
                              extra_compile_args=extra_c_args),
                    Extension("MACS3.IO.Parser",
-                             ["MACS3/IO/Parser.py"],
+                             ["MACS3/IO/Parser.py",
+                              "MACS3/IO/bgzf_mt.c",
+                              # libdeflate v1.26, vendored: decompression
+                              # and CRC32 only
+                              "MACS3/IO/libdeflate/lib/deflate_decompress.c",
+                              "MACS3/IO/libdeflate/lib/crc32.c",
+                              "MACS3/IO/libdeflate/lib/utils.c",
+                              "MACS3/IO/libdeflate/lib/x86/cpu_features.c",
+                              "MACS3/IO/libdeflate/lib/arm/cpu_features.c"],
+                             libraries=["z", "pthread"],
                              extra_compile_args=extra_c_args),
                    Extension("MACS3.IO.PeakIO",
                              ["MACS3/IO/PeakIO.py"],

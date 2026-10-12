@@ -1,5 +1,4 @@
 # cython: language_level=3
-# cython: profile=True
 # Time-stamp: <2025-04-11 13:26:28 Tao Liu>
 
 """Module Description:
@@ -50,6 +49,12 @@ from cython.cimports.libc.stdio import FILE, fopen, fclose, fprintf
 
 # ------------------------------------
 # from cython.cimports.libc.stdlib import malloc, free, qsort
+
+# The record layouts of the LR and LRC arrays the functions below pile
+# up: the locations of one PETrackI chromosome (LR) and of one PETrackII
+# chromosome (LRC). PairedEndTrack imports both from here.
+LR_DTYPE = np.dtype([('l', 'i4'), ('r', 'i4')])
+LRC_DTYPE = np.dtype([('l', 'i4'), ('r', 'i4'), ('c', 'u2')])
 
 # ------------------------------------
 # utility internal functions
@@ -575,6 +580,206 @@ def make_PV_from_LRC(LRC_array: cnp.ndarray,
     return PV
 
 
+# the largest magnitude up to which a float32 holds every integer
+F32_EXACT = cython.declare(cython.longlong, 16777216)
+
+
+@cython.cfunc
+@cython.boundscheck(False)
+@cython.wraparound(False)
+@cython.exceptval(check=False)
+def sweep_equal_weights_as_list(s_ptr: cython.pointer(cython.int),
+                                ls: cython.Py_ssize_t,
+                                e_ptr: cython.pointer(cython.int),
+                                le: cython.Py_ssize_t,
+                                w: cython.longlong,
+                                scale_factor: cython.float,
+                                baseline_value: cython.float,
+                                ret_p_ptr: cython.pointer(cython.int),
+                                ret_v_ptr: cython.pointer(cython.float)) -> cython.Py_ssize_t:
+    """`_pileup_sorted_weighted_as_list` for ranges that all have the
+    weight ``w``: the same walk over the starts ``s_ptr[0:ls]`` and
+    ends ``e_ptr[0:le]``, writing the same (p, v) points to
+    ``ret_p_ptr`` and ``ret_v_ptr`` and returning their number.
+
+    The running sum is kept as an integer. The caller makes sure that
+    (ls + le) * w is at most 2^24, so every float32 sum
+    `_pileup_sorted_weighted_as_list` makes on the way is exact, and
+    the float32 of the integer sum is the value it holds.
+    """
+    p: cython.int
+    pre_p: cython.int = 0
+    z: cython.longlong = 0
+    zf: cython.float
+    pre_z: cython.float = -10000
+    scaled_z: cython.float
+    i_s: cython.Py_ssize_t = 0
+    i_e: cython.Py_ssize_t = 0
+    c: cython.Py_ssize_t = 0
+
+    while i_s < ls or i_e < le:
+        if i_s < ls and (i_e >= le or s_ptr[i_s] < e_ptr[i_e]):
+            p = s_ptr[i_s]
+        elif i_e < le and (i_s >= ls or e_ptr[i_e] < s_ptr[i_s]):
+            p = e_ptr[i_e]
+        else:
+            p = s_ptr[i_s]
+
+        if p != pre_p:
+            zf = cython.cast(cython.float, z)
+            scaled_z = zf * scale_factor
+            if scaled_z < baseline_value:
+                scaled_z = baseline_value
+            if scaled_z == pre_z:
+                ret_p_ptr[c-1] = p
+            else:
+                ret_p_ptr[c] = p
+                ret_v_ptr[c] = scaled_z
+                c += 1
+                pre_z = scaled_z
+            pre_p = p
+
+        while i_s < ls and s_ptr[i_s] == p:
+            z += w
+            i_s += 1
+        while i_e < le and e_ptr[i_e] == p:
+            z -= w
+            i_e += 1
+    return c
+
+
+@cython.cfunc
+def equal_count(LRC_array: cnp.ndarray) -> cython.long:
+    """The count of every range of an LRC array when they all have the
+    same one and it is not 0, else -1 (also for an empty array)."""
+    n: cython.Py_ssize_t
+    i: cython.Py_ssize_t
+    c0: cython.ushort
+    Cs: cnp.ndarray
+    c_ptr: cython.pointer(cython.ushort)
+
+    Cs = np.ascontiguousarray(LRC_array['c'])
+    n = Cs.shape[0]
+    if n == 0:
+        return -1
+    c_ptr = cython.cast(cython.pointer(cython.ushort), Cs.data)
+    c0 = c_ptr[0]
+    if c0 == 0:
+        return -1
+    for i in range(1, n):
+        if c_ptr[i] != c0:
+            return -1
+    return c0
+
+
+@cython.cfunc
+def sweep_to_list(starts: cnp.ndarray, ends: cnp.ndarray,
+                  w: cython.long, scale_factor: cython.float,
+                  baseline_value: cython.float) -> list:
+    """[p, v] from sweep_equal_weights_as_list over the contiguous int32
+    arrays ``starts`` and ``ends``, as `_pileup_sorted_weighted_as_list`
+    returns them."""
+    ret_p: cnp.ndarray
+    ret_v: cnp.ndarray
+    ls: cython.Py_ssize_t = starts.shape[0]
+    le: cython.Py_ssize_t = ends.shape[0]
+    c: cython.Py_ssize_t
+
+    ret_p = np.zeros(shape=ls + le, dtype="i4")
+    ret_v = np.zeros(shape=ls + le, dtype="f4")
+    c = sweep_equal_weights_as_list(
+        cython.cast(cython.pointer(cython.int), starts.data), ls,
+        cython.cast(cython.pointer(cython.int), ends.data), le,
+        w, scale_factor, baseline_value,
+        cython.cast(cython.pointer(cython.int), ret_p.data),
+        cython.cast(cython.pointer(cython.float), ret_v.data))
+    ret_p.resize(c, refcheck=False)
+    ret_v.resize(c, refcheck=False)
+    return [ret_p, ret_v]
+
+
+@cython.ccall
+def pileup_LRC_as_list_equal(LRC_array: cnp.ndarray,
+                             scale_factor: cython.float,
+                             baseline_value: cython.float,
+                             left_sorted: cython.bint):
+    """What `pileup_from_LRC_as_list` returns, for an LRC array whose
+    ranges all have one count, from int32 sorts instead of argsorts
+    and float32 weight arrays. With one weight only the sorted
+    positions matter: the starts are taken as they are when
+    ``left_sorted`` (as `pileup_from_LRC_as_list` takes them) and
+    sorted otherwise, and the ends are sorted. Returns None when the
+    array is empty or not one of LRC_DTYPE, its counts differ, its
+    total weight is above 2^24, or `pileup_from_LRC_as_list` would
+    raise; the caller then runs `pileup_from_LRC_as_list`."""
+    n: cython.Py_ssize_t
+    w: cython.long
+    starts: cnp.ndarray
+    ends: cnp.ndarray
+
+    if LRC_array.dtype != LRC_DTYPE:
+        return None
+    n = LRC_array.shape[0]
+    w = equal_count(LRC_array)
+    if w < 0 or n * w > F32_EXACT:
+        return None
+    starts = np.ascontiguousarray(LRC_array['l'])
+    if left_sorted and not starts.flags.owndata:
+        # the field of a one-range array is contiguous, so
+        # `pileup_from_LRC_as_list` takes it without a copy and then
+        # fails to resize it: let it raise that error
+        return None
+    if not left_sorted:
+        starts = np.sort(starts)
+    ends = np.sort(LRC_array['r'])
+    return sweep_to_list(starts, ends, w, scale_factor, baseline_value)
+
+
+@cython.ccall
+def pileup_LRC_centers_as_list_equal(LRC_array: cnp.ndarray,
+                                     d: cython.long,
+                                     scale_factor: cython.float,
+                                     baseline_value: cython.float):
+    """What `pileup_from_LRC_centers_as_list` returns, for an LRC array
+    whose ranges all have one count, from int32 sorts instead of
+    argsorts and float32 weight arrays. The starts are the left and
+    right ends minus d // 2, sorted; the ends are the sorted starts
+    plus d, which are the sorted ends unless one of them wraps around
+    int32 (then they are sorted on their own). Returns None when the
+    array is empty or not one of LRC_DTYPE, its counts differ, ``d`` is
+    not an int32, or its total weight, twice the counts, is above
+    2^24; the caller then runs `pileup_from_LRC_centers_as_list`."""
+    n: cython.Py_ssize_t
+    n2: cython.Py_ssize_t
+    w: cython.long
+    half_d: cython.long
+    starts: cnp.ndarray
+    ends: cnp.ndarray
+
+    if LRC_array.dtype != LRC_DTYPE:
+        return None
+    if not (-2147483648 <= d <= 2147483647):
+        return None
+    n = LRC_array.shape[0]
+    w = equal_count(LRC_array)
+    if w < 0 or 2 * n * w > F32_EXACT:
+        return None
+    half_d = d // 2
+    n2 = 2 * n
+    starts = np.empty(n2, dtype="i4")
+    np.subtract(LRC_array['l'], half_d, out=starts[:n], casting="unsafe")
+    np.subtract(LRC_array['r'], half_d, out=starts[n:], casting="unsafe")
+    starts.sort()
+    if (cython.cast(cython.long, starts[0]) + d >= -2147483648 and
+            cython.cast(cython.long, starts[n2 - 1]) + d <= 2147483647):
+        ends = starts + d
+    else:
+        ends = np.concatenate((LRC_array['l'] - half_d,
+                               LRC_array['r'] - half_d)) + d
+        ends.sort()
+    return sweep_to_list(starts, ends, w, scale_factor, baseline_value)
+
+
 @cython.cfunc
 def make_PV_from_PN(P_array: cnp.ndarray, N_array: cnp.ndarray,
                     extsize: cython.int) -> cnp.ndarray:
@@ -826,11 +1031,26 @@ def pileup_from_PN_shifted(P_array: cnp.ndarray,
     ret: list
     start_poss: cnp.ndarray
     end_poss: cnp.ndarray
+    w: cython.long
+    lx: cython.long
 
     start_poss = np.concatenate((P_array-five_shift, N_array-three_shift))
-    end_poss = np.concatenate((P_array+three_shift, N_array+five_shift))
     start_poss.sort()
-    end_poss.sort()
+
+    # A tag's end is its start plus w = five_shift + three_shift, so
+    # the sorted ends are the sorted starts plus w: the same int32
+    # values, in order unless one of them overflows.
+    w = five_shift + three_shift
+    lx = start_poss.shape[0]
+    if (start_poss.dtype == np.int32 and
+            -2147483648 <= w <= 2147483647 and
+            (lx == 0 or
+             (cython.cast(cython.long, start_poss[0]) + w >= -2147483648 and
+              cython.cast(cython.long, start_poss[lx - 1]) + w <= 2147483647))):
+        end_poss = start_poss + w
+    else:
+        end_poss = np.concatenate((P_array+three_shift, N_array+five_shift))
+        end_poss.sort()
     start_poss = fix_coordinates(start_poss, rlength)
     end_poss = fix_coordinates(end_poss, rlength)
     ret = _pileup_sorted_unit_as_list(start_poss,

@@ -1,5 +1,4 @@
 # cython: language_level=3
-# cython: profile=True
 # Time-stamp: <2025-11-20 10:58:03 Tao Liu>
 
 """Scoring utilities for MACS3 signal tracks and peak callers.

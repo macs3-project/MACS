@@ -1,5 +1,4 @@
 # cython: language_level=3
-# cython: profile=True
 # Time-stamp: <2024-10-15 10:20:32 Tao Liu>
 """Module Description: Build shifting model
 
@@ -11,6 +10,8 @@ the distribution).
 # ------------------------------------
 # Python modules
 # ------------------------------------
+import os
+import threading
 
 # ------------------------------------
 # MACS3 modules
@@ -29,6 +30,615 @@ import cython.cimports.numpy as cnp
 # ------------------------------------
 # C lib
 # ------------------------------------
+from cython.cimports.libc.stdlib import malloc, realloc, free
+from cython.cimports.libc.string import memcpy
+
+# ------------------------------------
+# Peak finding on one strand in C
+# ------------------------------------
+# naive_call_peaks(naive_quick_pileup(tags, extension), min_v, max_v)
+# for a C-contiguous int32 tag array, with the [p, v] points fed to the
+# scan as they are made instead of being stored, and the peak content
+# kept as C values instead of (pre_p, p, v) tuples. Every step and every
+# C type is the one those two functions and __close_peak use, so the
+# peaks are the same; it runs without the GIL, so strands can run on
+# threads.
+
+# at most this many threads find the peaks, and no more than the cores
+# this process may run on
+_MODEL_MAX_THREADS = cython.declare(cython.int, 8)
+
+_PeakScan = cython.struct(
+    min_v=cython.float,
+    max_v=cython.float,
+    max_gap=cython.int,
+    min_length=cython.int,
+    found=cython.bint,          # a point above min_v has been seen
+    pre_p=cython.int,           # the previous point's p (0 before the first)
+    first_start=cython.int,     # peak_content[0][0]
+    last_end=cython.int,        # peak_content[-1][1]
+    summit_value=cython.float,  # __close_peak's summit_value so far
+    mids=cython.p_int,          # __close_peak's tsummit so far
+    n_mids=cython.Py_ssize_t,
+    cap_mids=cython.Py_ssize_t,
+    summits=cython.p_int,       # the returned (summit, height) pairs
+    heights=cython.p_float,
+    n_peaks=cython.Py_ssize_t,
+    cap_peaks=cython.Py_ssize_t,
+    failed=cython.bint)         # an allocation failed
+
+
+@cython.cfunc
+@cython.inline
+@cython.nogil
+@cython.exceptval(check=False)
+def _scan_push_mid(st: cython.pointer(_PeakScan), mid: cython.int) -> cython.void:
+    new_cap: cython.Py_ssize_t
+    new_mids: cython.p_int
+
+    if st.n_mids == st.cap_mids:
+        new_cap = 2 * st.cap_mids if st.cap_mids > 0 else 64
+        new_mids = cython.cast(cython.p_int,
+                               realloc(st.mids, new_cap * cython.sizeof(cython.int)))
+        if new_mids == cython.NULL:
+            st.failed = True
+            return
+        st.mids = new_mids
+        st.cap_mids = new_cap
+    st.mids[st.n_mids] = mid
+    st.n_mids += 1
+
+
+@cython.cfunc
+@cython.inline
+@cython.nogil
+@cython.exceptval(check=False)
+def _scan_add(st: cython.pointer(_PeakScan), tstart: cython.int,
+              tend: cython.int, tvalue: cython.float) -> cython.void:
+    """One pass of __close_peak's summit loop, for the entry
+    (tstart, tend, tvalue) appended to the peak content."""
+    # int((tend+tstart)/2): C int sum, true division as a double,
+    # truncated toward zero
+    mid: cython.int = cython.cast(cython.int,
+                                  cython.cast(cython.double, tend + tstart) / 2.0)
+
+    if not st.summit_value or st.summit_value < tvalue:
+        st.n_mids = 0
+        _scan_push_mid(st, mid)
+        st.summit_value = tvalue
+    elif st.summit_value == tvalue:
+        _scan_push_mid(st, mid)
+
+
+@cython.cfunc
+@cython.inline
+@cython.nogil
+@cython.exceptval(check=False)
+def _scan_start(st: cython.pointer(_PeakScan), tstart: cython.int,
+                tend: cython.int, tvalue: cython.float) -> cython.void:
+    """peak_content = [(tstart, tend, tvalue),]"""
+    st.first_start = tstart
+    st.last_end = tend
+    st.summit_value = 0
+    st.n_mids = 0
+    _scan_add(st, tstart, tend, tvalue)
+
+
+@cython.cfunc
+@cython.nogil
+@cython.exceptval(check=False)
+def _scan_close(st: cython.pointer(_PeakScan)) -> cython.void:
+    """The end of __close_peak: pick the summit and keep the peak if
+    its height is below max_v."""
+    summit: cython.int
+    new_cap: cython.Py_ssize_t
+    new_summits: cython.p_int
+    new_heights: cython.p_float
+
+    # tsummit[int((len(tsummit)+1)/2)-1], len(tsummit) >= 1
+    summit = st.mids[(st.n_mids + 1) // 2 - 1]
+    if st.summit_value < st.max_v:
+        if st.n_peaks == st.cap_peaks:
+            new_cap = 2 * st.cap_peaks if st.cap_peaks > 0 else 256
+            new_summits = cython.cast(cython.p_int,
+                                      realloc(st.summits, new_cap * cython.sizeof(cython.int)))
+            if new_summits == cython.NULL:
+                st.failed = True
+                return
+            st.summits = new_summits
+            new_heights = cython.cast(cython.p_float,
+                                      realloc(st.heights, new_cap * cython.sizeof(cython.float)))
+            if new_heights == cython.NULL:
+                st.failed = True
+                return
+            st.heights = new_heights
+            st.cap_peaks = new_cap
+        st.summits[st.n_peaks] = summit
+        st.heights[st.n_peaks] = st.summit_value
+        st.n_peaks += 1
+
+
+@cython.cfunc
+@cython.inline
+@cython.nogil
+@cython.exceptval(check=False)
+def _scan_point(st: cython.pointer(_PeakScan), p: cython.int,
+                vf: cython.float) -> cython.void:
+    """naive_call_peaks' scan, for the next [p, v] point."""
+    # naive_call_peaks reads the float32 value into a double
+    v: cython.double = vf
+
+    if not st.found:
+        # looking for the first region above min_v
+        if v > st.min_v:
+            st.found = True
+            _scan_start(st, st.pre_p, p, vf)
+        st.pre_p = p
+        return
+    if v <= st.min_v:           # not be detected as 'peak'
+        st.pre_p = p
+        return
+    # the gap and length tests were on Python ints, so no overflow
+    if cython.cast(cython.longlong, st.pre_p) - st.last_end <= st.max_gap:
+        st.last_end = p
+        _scan_add(st, st.pre_p, p, vf)
+    else:
+        if cython.cast(cython.longlong, st.last_end) - st.first_start >= st.min_length:
+            _scan_close(st)
+        _scan_start(st, st.pre_p, p, vf)
+    st.pre_p = p
+
+
+@cython.cfunc
+@cython.nogil
+@cython.exceptval(check=False)
+def _pileup_scan(tags: cython.p_int, l: cython.Py_ssize_t,
+                 ext: cython.int, st: cython.pointer(_PeakScan)) -> cython.void:
+    """naive_quick_pileup's merge of the start (tag - ext, clipped at 0)
+    and end (tag + ext) positions, each [p, v] point passed to
+    _scan_point, then the last peak closed. The int32 arithmetic wraps
+    as numpy's does."""
+    i_s: cython.Py_ssize_t = 0
+    i_e: cython.Py_ssize_t = 0
+    i: cython.Py_ssize_t
+    pileup: cython.int = 0
+    p: cython.int
+    pre_p: cython.int
+    sp: cython.int
+    ep: cython.int
+    uext: cython.uint = cython.cast(cython.uint, ext)
+
+    sp = cython.cast(cython.int, cython.cast(cython.uint, tags[0]) - uext)
+    if sp < 0:
+        sp = 0
+    ep = cython.cast(cython.int, cython.cast(cython.uint, tags[0]) + uext)
+    pre_p = min(sp, ep)
+
+    if pre_p != 0:
+        # the first chunk of 0
+        _scan_point(st, pre_p, 0)
+
+    while i_s < l and i_e < l:
+        sp = cython.cast(cython.int, cython.cast(cython.uint, tags[i_s]) - uext)
+        if sp < 0:
+            sp = 0
+        ep = cython.cast(cython.int, cython.cast(cython.uint, tags[i_e]) + uext)
+        if sp < ep:
+            p = sp
+            if p != pre_p:
+                _scan_point(st, p, cython.cast(cython.float, pileup))
+                pre_p = p
+            pileup += 1
+            i_s += 1
+        elif sp > ep:
+            p = ep
+            if p != pre_p:
+                _scan_point(st, p, cython.cast(cython.float, pileup))
+                pre_p = p
+            pileup -= 1
+            i_e += 1
+        else:
+            i_s += 1
+            i_e += 1
+
+    # add rest of end positions
+    for i in range(i_e, l):
+        p = cython.cast(cython.int, cython.cast(cython.uint, tags[i]) + uext)
+        if p != pre_p:
+            _scan_point(st, p, cython.cast(cython.float, pileup))
+            pre_p = p
+        pileup -= 1
+
+    # save the last peak
+    if st.found:
+        if cython.cast(cython.longlong, st.last_end) - st.first_start >= st.min_length:
+            _scan_close(st)
+
+
+@cython.cfunc
+def _c_scan_takes(taglist, extension) -> cython.bint:
+    """True when _naive_find_peaks_c gives this tag list's peaks: a 1-d
+    C-contiguous native int32 array of at least 2 tags, and an extension
+    numpy's int32 arithmetic takes."""
+    if not isinstance(taglist, np.ndarray):
+        return False
+    return (taglist.ndim == 1 and taglist.dtype == np.int32 and
+            taglist.flags.c_contiguous and taglist.shape[0] >= 2 and
+            -2147483648 <= extension <= 2147483647)
+
+
+@cython.cfunc
+@cython.exceptval(check=False)
+def _scan_init(st: cython.pointer(_PeakScan), min_v: cython.float,
+               max_v: cython.float) -> cython.void:
+    """The scan state before the first point, with the default max_gap
+    and min_length."""
+    st.min_v = min_v
+    st.max_v = max_v
+    st.max_gap = 50
+    st.min_length = 200
+    st.found = False
+    st.pre_p = 0
+    st.first_start = 0
+    st.last_end = 0
+    st.summit_value = 0
+    st.mids = cython.NULL
+    st.n_mids = 0
+    st.cap_mids = 0
+    st.summits = cython.NULL
+    st.heights = cython.NULL
+    st.n_peaks = 0
+    st.cap_peaks = 0
+    st.failed = False
+
+
+@cython.ccall
+def _naive_find_peaks_c(taglist: cnp.ndarray, extension: cython.int,
+                        min_v: cython.float, max_v: cython.float) -> list:
+    """naive_call_peaks(naive_quick_pileup(taglist, extension), min_v,
+    max_v) with the default max_gap and min_length, for a tag list
+    _c_scan_takes accepts. The scan runs without the GIL."""
+    st: _PeakScan
+    tags: cython.p_int = cython.cast(cython.p_int, taglist.data)
+    l: cython.Py_ssize_t = taglist.shape[0]
+    k: cython.Py_ssize_t
+    ret: list
+
+    _scan_init(cython.address(st), min_v, max_v)
+    try:
+        with cython.nogil:
+            _pileup_scan(tags, l, extension, cython.address(st))
+        if st.failed:
+            raise MemoryError()
+        ret = []
+        for k in range(st.n_peaks):
+            ret.append((st.summits[k], st.heights[k]))
+    finally:
+        free(st.mids)
+        free(st.summits)
+        free(st.heights)
+    return ret
+
+
+@cython.ccall
+def _find_peaks_np(taglist: cnp.ndarray, extension: cython.int,
+                   min_v: cython.float, max_v: cython.float) -> tuple:
+    """The peaks _naive_find_peaks_c gives, as (summits, heights): an
+    int32 and a float32 array holding the same C values its tuples
+    are made of, so that no Python object is made per peak."""
+    st: _PeakScan
+    tags: cython.p_int = cython.cast(cython.p_int, taglist.data)
+    l: cython.Py_ssize_t = taglist.shape[0]
+    summits: cnp.ndarray
+    heights: cnp.ndarray
+
+    _scan_init(cython.address(st), min_v, max_v)
+    try:
+        with cython.nogil:
+            _pileup_scan(tags, l, extension, cython.address(st))
+        if st.failed:
+            raise MemoryError()
+        summits = np.empty(st.n_peaks, dtype=np.int32)
+        heights = np.empty(st.n_peaks, dtype=np.float32)
+        if st.n_peaks > 0:
+            memcpy(summits.data, st.summits,
+                   st.n_peaks * cython.sizeof(cython.int))
+            memcpy(heights.data, st.heights,
+                   st.n_peaks * cython.sizeof(cython.float))
+    finally:
+        free(st.mids)
+        free(st.summits)
+        free(st.heights)
+    return (summits, heights)
+
+
+def _peaks_as_list(peaks) -> list:
+    """A strand's peaks as the [(summit, height)] list
+    __naive_find_peaks returns: peaks itself when it is that list, or
+    the list _naive_find_peaks_c would have made from the arrays of
+    _find_peaks_np: Python ints from the C ints, Python floats from
+    the C floats."""
+    if isinstance(peaks, list):
+        return peaks
+    (summits, heights) = peaks
+    return list(zip(summits.tolist(), heights.tolist()))
+
+
+def _n_peaks(peaks) -> int:
+    """The number of peaks in a list or an arrays pair."""
+    if isinstance(peaks, list):
+        return len(peaks)
+    return peaks[0].shape[0]
+
+
+def _peak_at(peaks, k: int) -> tuple:
+    """Peak k as the (summit, height) tuple of the list form."""
+    if isinstance(peaks, list):
+        return peaks[k]
+    return (int(peaks[0][k]), float(peaks[1][k]))
+
+
+@cython.cfunc
+@cython.nogil
+@cython.exceptval(check=False)
+def _pair_centers_c(ps: cython.p_int, ph: cython.p_float,
+                    ip_max: cython.long,
+                    ms: cython.p_int, mh: cython.p_float,
+                    im_max: cython.long,
+                    peaksize: cython.int,
+                    out: cython.pointer(cython.p_int),
+                    cap: cython.pointer(cython.Py_ssize_t)) -> cython.Py_ssize_t:
+    """PeakModel.__find_pair_center on C arrays: the same loop, the
+    same C types and the same expressions, the centers written to
+    *out (grown with realloc, *cap its capacity). Returns the number of
+    centers, -1 when a minus peak of height 0 meets the ratio test
+    (where __find_pair_center raises ZeroDivisionError), or -2 when an
+    allocation fails."""
+    ip: cython.long = 0
+    im: cython.long = 0
+    im_prev: cython.long = 0
+    flag_find_overlap: cython.bint = False
+    pp: cython.int
+    mp: cython.int
+    pn: cython.float
+    mn: cython.float
+    n: cython.Py_ssize_t = 0
+    new_cap: cython.Py_ssize_t
+    new_out: cython.p_int
+
+    while ip < ip_max and im < im_max:
+        pp = ps[ip]
+        pn = ph[ip]
+        mp = ms[im]
+        mn = mh[im]
+        if pp-peaksize > mp:
+            # move minus
+            im += 1
+        elif pp+peaksize < mp:
+            # move plus
+            ip += 1
+            im = im_prev    # search minus peaks from previous index
+            flag_find_overlap = False
+        else:               # overlap!
+            if not flag_find_overlap:
+                flag_find_overlap = True
+                # only the first index is recorded
+                im_prev = im
+            if mn == 0:
+                return -1
+            # number tags in plus and minus peak region are comparable...
+            if pn/mn < 2 and pn/mn > 0.5:
+                if pp < mp:
+                    if n == cap[0]:
+                        new_cap = 2 * cap[0] if cap[0] > 0 else 1024
+                        new_out = cython.cast(cython.p_int,
+                                              realloc(out[0], new_cap * cython.sizeof(cython.int)))
+                        if new_out == cython.NULL:
+                            return -2
+                        out[0] = new_out
+                        cap[0] = new_cap
+                    out[0][n] = (pp+mp)//2
+                    n += 1
+            im += 1
+    return n
+
+
+@cython.cfunc
+def _pair_centers_np(plus: tuple, minus: tuple, peaksize: cython.int):
+    """The paired centers __find_pair_center gives for the peaks of two
+    strands in the arrays form of _find_peaks_np, as an int32 array
+    (the values its Python ints have), or None where it would raise."""
+    ps_a: cnp.ndarray = plus[0]
+    ph_a: cnp.ndarray = plus[1]
+    ms_a: cnp.ndarray = minus[0]
+    mh_a: cnp.ndarray = minus[1]
+    ps: cython.p_int = cython.cast(cython.p_int, ps_a.data)
+    ph: cython.p_float = cython.cast(cython.p_float, ph_a.data)
+    ms: cython.p_int = cython.cast(cython.p_int, ms_a.data)
+    mh: cython.p_float = cython.cast(cython.p_float, mh_a.data)
+    ip_max: cython.long = ps_a.shape[0]
+    im_max: cython.long = ms_a.shape[0]
+    out: cython.p_int = cython.NULL
+    cap: cython.Py_ssize_t = 0
+    n: cython.Py_ssize_t
+    centers: cnp.ndarray
+
+    try:
+        with cython.nogil:
+            n = _pair_centers_c(ps, ph, ip_max, ms, mh, im_max, peaksize,
+                                cython.address(out), cython.address(cap))
+        if n == -2:
+            raise MemoryError()
+        if n == -1:
+            return None
+        centers = np.empty(n, dtype=np.int32)
+        if n > 0:
+            memcpy(centers.data, out, n * cython.sizeof(cython.int))
+    finally:
+        free(out)
+    return centers
+
+
+@cython.cfunc
+@cython.nogil
+@cython.exceptval(check=False)
+def _add_line_c(pos1_ptr: cython.p_int, i1_max: cython.int,
+                pos2_ptr: cython.p_int, i2_max: cython.int,
+                start_ptr: cython.p_int, end_ptr: cython.p_int,
+                max_index: cython.int, psize_adjusted1: cython.int,
+                half_expansion: cython.double) -> cython.void:
+    """The model's line projection, as PeakModel.__model_add_line
+    did it: project each tag in pos2 within psize_adjusted1 of a center
+    in pos1 onto start and end."""
+    i1: cython.int = 0          # index for pos1
+    i2: cython.int = 0          # index for pos2
+    # index for pos2 in previous pos1
+    # [pos1-self.peaksize,pos1+self.peaksize] region
+    i2_prev: cython.int = 0
+    p1: cython.int
+    p2: cython.int
+    s: cython.int
+    e: cython.int
+    flag_find_overlap: cython.bint = False
+
+    while i1 < i1_max and i2 < i2_max:
+        p1 = pos1_ptr[i1]
+        p2 = pos2_ptr[i2]
+
+        if p1-psize_adjusted1 > p2:
+            # move pos2
+            i2 += 1
+        elif p1+psize_adjusted1 < p2:
+            # move pos1
+            i1 += 1
+            i2 = i2_prev    # search minus peaks from previous index
+            flag_find_overlap = False
+        else:               # overlap!
+            if not flag_find_overlap:
+                flag_find_overlap = True
+                # only the first index is recorded
+                i2_prev = i2
+            # project; p1-psize_adjusted1 <= p2 <= p1+psize_adjusted1
+            # keeps 0 <= s and e <= max_index after the clamps
+            s = cython.cast(cython.int, p2-half_expansion-p1+psize_adjusted1)
+            if s < 0:
+                s = 0
+            start_ptr[s] += 1
+            e = cython.cast(cython.int, p2+half_expansion-p1+psize_adjusted1)
+            if e > max_index:
+                e = max_index
+            end_ptr[e] -= 1
+            i2 += 1
+
+
+@cython.cfunc
+def _add_line_arrays(pos1_a: cnp.ndarray, pos2_a: cnp.ndarray,
+                     start_a: cnp.ndarray, end_a: cnp.ndarray,
+                     psize_adjusted1: cython.int,
+                     half_expansion: cython.double):
+    """_add_line_c on int32 C-contiguous arrays, without the GIL."""
+    pos1_ptr: cython.p_int = cython.cast(cython.p_int, pos1_a.data)
+    pos2_ptr: cython.p_int = cython.cast(cython.p_int, pos2_a.data)
+    start_ptr: cython.p_int = cython.cast(cython.p_int, start_a.data)
+    end_ptr: cython.p_int = cython.cast(cython.p_int, end_a.data)
+    i1_max: cython.int = pos1_a.shape[0]
+    i2_max: cython.int = pos2_a.shape[0]
+    max_index: cython.int = start_a.shape[0] - 1
+
+    with cython.nogil:
+        _add_line_c(pos1_ptr, i1_max, pos2_ptr, i2_max, start_ptr, end_ptr,
+                    max_index, psize_adjusted1, half_expansion)
+
+
+def _model_threads() -> int:
+    """min(_MODEL_MAX_THREADS, the cores this process may run on)."""
+    if hasattr(os, "sched_getaffinity"):
+        return min(_MODEL_MAX_THREADS, len(os.sched_getaffinity(0)))
+    return min(_MODEL_MAX_THREADS, os.cpu_count() or 1)
+
+
+def _run_on_threads(order: list, func, make_state=None) -> list:
+    """func(task, state) for each task in order, taken in that order by
+    up to _model_threads() threads (the calling one included), all
+    joined before returning. Each thread's state is make_state() (None
+    without it); returns the states of the threads that ran. func is
+    expected to release the GIL for its work."""
+    n_threads = min(_model_threads(), len(order))
+    lock = threading.Lock()
+    next_task = iter(order)
+    errors = []
+    states = []
+
+    def work():
+        try:
+            state = make_state() if make_state is not None else None
+        except BaseException as e:
+            with lock:
+                errors.append(e)
+            return
+        with lock:
+            states.append(state)
+        while True:
+            with lock:
+                if errors:
+                    return
+                task = next(next_task, None)
+            if task is None:
+                return
+            try:
+                func(task, state)
+            except BaseException as e:
+                with lock:
+                    errors.append(e)
+                return
+
+    threads = [threading.Thread(target=work) for _ in range(n_threads - 1)]
+    for t in threads:
+        t.start()
+    try:
+        work()
+    finally:
+        for t in threads:
+            t.join()
+    if errors:
+        raise errors[0]
+    return states
+
+
+def _find_peaks_on_threads(tasks: list, found: list, extension,
+                           min_v, max_v):
+    """found[k] = _find_peaks_np(tags, ...) for each (k, tags) in
+    tasks, the largest first, on up to _model_threads() threads."""
+    def scan(task, state):
+        found[task[0]] = _find_peaks_np(task[1], extension, min_v, max_v)
+
+    _run_on_threads(sorted(tasks, key=lambda t: -t[1].shape[0]), scan)
+
+
+def _add_lines_on_threads(tasks: list, lines: list, psize_adjusted1,
+                          half_expansion):
+    """For each (centers, tags, k) in tasks, _add_line_c's
+    projection of the tags around the centers onto the (start, end)
+    arrays lines[k], the largest tag arrays first, on up to
+    _model_threads() threads. Each thread projects onto zeroed arrays
+    of its own, which are added to lines once all are joined: every
+    projection adds 1 to a start and -1 to an end entry, so the sums
+    are those of the serial loop, in any order."""
+    def make_state():
+        return [(np.zeros_like(start), np.zeros_like(end))
+                for (start, end) in lines]
+
+    def project(task, state):
+        (start, end) = state[task[2]]
+        _add_line_arrays(task[0], task[1], start, end, psize_adjusted1,
+                         half_expansion)
+
+    states = _run_on_threads(sorted(tasks, key=lambda t: -t[1].shape[0]),
+                             project, make_state)
+    for state in states:
+        for k in range(len(lines)):
+            np.add(lines[k][0], state[k][0], out=lines[k][0])
+            np.add(lines[k][1], state[k][1], out=lines[k][1])
 
 
 class NotEnoughPairsException(Exception):
@@ -160,12 +770,18 @@ Summary of Peak Model:
         chrom: bytes
         plus_tags: cnp.ndarray(cython.int, ndim=1)
         minus_tags: cnp.ndarray(cython.int, ndim=1)
-        plus_peaksinfo: list
-        minus_peaksinfo: list
+        plus_peaksinfo: object  # a list, or the arrays of _find_peaks_np
+        minus_peaksinfo: object
+        n_plus: cython.long
+        n_minus: cython.long
+        centers: object
         paired_peaks_pos: dict  # return
+        found: list
 
         chrs = list(self.treatment.get_chr_names())
         chrs.sort()
+        # the peaks of every strand the C scan takes, found up front
+        found = self.__find_peaks_c(chrs)
         paired_peaks_pos = {}
         for i in range(len(chrs)):
             chrom = chrs[i]
@@ -173,24 +789,67 @@ Summary of Peak Model:
             # extract tag positions
             [plus_tags, minus_tags] = self.treatment.get_locations_by_chr(chrom)
             # look for + strand peaks
-            plus_peaksinfo = self.__naive_find_peaks(plus_tags)
+            plus_peaksinfo = found[2*i]
+            if plus_peaksinfo is None:
+                plus_peaksinfo = self.__naive_find_peaks(plus_tags)
+            n_plus = _n_peaks(plus_peaksinfo)
             self.debug("Number of unique tags on + strand: %d" % (plus_tags.shape[0]))
-            self.debug("Number of peaks in + strand: %d" % (len(plus_peaksinfo)))
-            if plus_peaksinfo:
-                self.debug(f"plus peaks: first - {plus_peaksinfo[0]} ... last - {plus_peaksinfo[-1]}")
+            self.debug("Number of peaks in + strand: %d" % (n_plus))
+            if n_plus:
+                self.debug(f"plus peaks: first - {_peak_at(plus_peaksinfo, 0)} ... last - {_peak_at(plus_peaksinfo, n_plus-1)}")
             # look for - strand peaks
-            minus_peaksinfo = self.__naive_find_peaks(minus_tags)
+            minus_peaksinfo = found[2*i+1]
+            if minus_peaksinfo is None:
+                minus_peaksinfo = self.__naive_find_peaks(minus_tags)
+            n_minus = _n_peaks(minus_peaksinfo)
             self.debug("Number of unique tags on - strand: %d" % (minus_tags.shape[0]))
-            self.debug("Number of peaks in - strand: %d" % (len(minus_peaksinfo)))
-            if minus_peaksinfo:
-                self.debug(f"minus peaks: first - {minus_peaksinfo[0]} ... last - {minus_peaksinfo[-1]}")
-            if not plus_peaksinfo or not minus_peaksinfo:
+            self.debug("Number of peaks in - strand: %d" % (n_minus))
+            if n_minus:
+                self.debug(f"minus peaks: first - {_peak_at(minus_peaksinfo, 0)} ... last - {_peak_at(minus_peaksinfo, n_minus-1)}")
+            if not n_plus or not n_minus:
                 self.debug("Chrom %s is discarded!" % (chrom))
                 continue
             else:
-                paired_peaks_pos[chrom] = self.__find_pair_center(plus_peaksinfo, minus_peaksinfo)
+                # both strands from the C scan: pair them in C
+                centers = None
+                if not isinstance(plus_peaksinfo, list) and not isinstance(minus_peaksinfo, list):
+                    centers = _pair_centers_np(plus_peaksinfo, minus_peaksinfo, self.peaksize)
+                if centers is None:
+                    paired_peaks_pos[chrom] = self.__find_pair_center(_peaks_as_list(plus_peaksinfo),
+                                                                      _peaks_as_list(minus_peaksinfo))
+                else:
+                    # __find_pair_center's messages
+                    self.debug(f"ip_max: {n_plus}; im_max: {n_minus}")
+                    if centers.shape[0]:
+                        self.debug(f"Paired centers: first - {int(centers[0])} ... second - {int(centers[-1])} ")
+                    paired_peaks_pos[chrom] = centers
                 self.debug("Number of paired peaks in this chromosome: %d" % (len(paired_peaks_pos[chrom])))
         return paired_peaks_pos
+
+    @cython.cfunc
+    def __find_peaks_c(self, chrs: list) -> list:
+        """__naive_find_peaks of both strands of every chromosome in
+        chrs, at [2*i] (+) and [2*i+1] (-) for chrs[i], for the tag
+        lists the C scan takes, on up to min(8, cores) threads, as the
+        arrays of _find_peaks_np; None for the others.
+        """
+        i: cython.int
+        found: list
+        tasks: list
+
+        extension = int(self.peaksize/2)
+        found = [None] * (2 * len(chrs))
+        tasks = []
+        for i in range(len(chrs)):
+            [plus_tags, minus_tags] = self.treatment.get_locations_by_chr(chrs[i])
+            if _c_scan_takes(plus_tags, extension):
+                tasks.append((2*i, plus_tags))
+            if _c_scan_takes(minus_tags, extension):
+                tasks.append((2*i+1, minus_tags))
+        if tasks:
+            _find_peaks_on_threads(tasks, found, extension,
+                                   self.min_tags, self.max_tags)
+        return found
 
     @cython.cfunc
     def __naive_find_peaks(self,
@@ -230,7 +889,8 @@ Summary of Peak Model:
         window_size: cython.int
         i: cython.int
         chroms: list
-        paired_peakpos_chrom: object
+        tasks: list
+        centers: cnp.ndarray
 
         tags_plus: cnp.ndarray(cython.int, ndim=1)
         tags_minus: cnp.ndarray(cython.int, ndim=1)
@@ -263,18 +923,19 @@ Summary of Peak Model:
         self.debug("start model_add_line...")
         chroms = list(paired_peakpos.keys())
 
+        # every paired peak has plus line and minus line
+        tasks = []
         for i in range(len(chroms)):
-            paired_peakpos_chrom = paired_peakpos[chroms[i]]
+            # paired centers come from C ints, so int32 holds them exactly
+            centers = np.array(paired_peakpos[chroms[i]], dtype="i4")
             (tags_plus, tags_minus) = self.treatment.get_locations_by_chr(chroms[i])
-            # every paired peak has plus line and minus line
-            self.__model_add_line(paired_peakpos_chrom,
-                                  tags_plus,
-                                  plus_start,
-                                  plus_end)
-            self.__model_add_line(paired_peakpos_chrom,
-                                  tags_minus,
-                                  minus_start,
-                                  minus_end)
+            tasks.append((centers, np.ascontiguousarray(tags_plus, dtype="i4"), 0))
+            tasks.append((centers, np.ascontiguousarray(tags_minus, dtype="i4"), 1))
+        # the half window, and half the expansion as a double
+        _add_lines_on_threads(tasks,
+                              [(plus_start, plus_end), (minus_start, minus_end)],
+                              self.peaksize + self.tag_expansion_size // 2,
+                              self.tag_expansion_size / 2)
 
         self.__count(plus_start, plus_end, self.plus_line)
         self.__count(minus_start, minus_end, self.minus_line)
@@ -315,71 +976,6 @@ Summary of Peak Model:
         self.info("#2 Model building with cross-correlation: Done")
 
         return True
-
-    @cython.cfunc
-    def __model_add_line(self,
-                         pos1: list,
-                         pos2: cnp.ndarray(cython.int, ndim=1),
-                         start: cnp.ndarray(cython.int, ndim=1),
-                         end: cnp.ndarray(cython.int, ndim=1)):
-        """Project each pos in pos2 which is included in
-        [pos1-self.peaksize,pos1+self.peaksize] to the line.
-
-        pos1: paired centers -- list of coordinates
-        pos2: tags of certain strand -- a numpy.array object
-        line: numpy array object where we pileup tags
-
-        """
-        i1: cython.int
-        i2: cython.int
-        i2_prev: cython.int
-        i1_max: cython.int
-        i2_max: cython.int
-        last_p2: cython.int
-        psize_adjusted1: cython.int
-        p1: cython.int
-        p2: cython.int
-        max_index: cython.int
-        s: cython.int
-        e: cython.int
-
-        i1 = 0                  # index for pos1
-        i2 = 0                  # index for pos2 index for pos2 in
-        # previous pos1 [pos1-self.peaksize,pos1+self.peaksize] region
-        i2_prev = 0
-        i1_max = len(pos1)
-        i2_max = pos2.shape[0]
-        flag_find_overlap = False
-
-        max_index = start.shape[0] - 1
-
-        # half window
-        psize_adjusted1 = self.peaksize + self.tag_expansion_size // 2
-
-        while i1 < i1_max and i2 < i2_max:
-            p1 = pos1[i1]
-            p2 = pos2[i2]
-
-            if p1-psize_adjusted1 > p2:
-                # move pos2
-                i2 += 1
-            elif p1+psize_adjusted1 < p2:
-                # move pos1
-                i1 += 1
-                i2 = i2_prev    # search minus peaks from previous index
-                flag_find_overlap = False
-            else:               # overlap!
-                if not flag_find_overlap:
-                    flag_find_overlap = True
-                    # only the first index is recorded
-                    i2_prev = i2
-                # project
-                s = max(int(p2-self.tag_expansion_size/2-p1+psize_adjusted1), 0)
-                start[s] += 1
-                e = min(int(p2+self.tag_expansion_size/2-p1+psize_adjusted1), max_index)
-                end[e] -= 1
-                i2 += 1
-        return
 
     @cython.cfunc
     def __count(self,

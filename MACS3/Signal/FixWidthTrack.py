@@ -1,5 +1,4 @@
 # cython: language_level=3
-# cython: profile=True
 # Time-stamp: <2025-11-10 15:24:27 Tao Liu>
 
 """Module for FWTrack classes.
@@ -21,6 +20,8 @@ import io
 
 from MACS3.IO.PeakIO import PeakIO
 from MACS3.Signal.PileupV2 import pileup_from_PN_shifted, over_two_pv_array
+from MACS3.Signal.Pileup import se_all_in_one_pileup_max3
+from MACS3.Utilities.Threads import MIN_THREADED_SIZE, map_chromosomes
 
 # ------------------------------------
 # Other modules
@@ -30,14 +31,112 @@ import numpy as np
 from cython.cimports.cpython import bool
 import cython.cimports.numpy as cnp
 from cython.cimports.libc.stdint import INT32_MAX as INT_MAX
+from cython.cimports.MACS3.Signal.crefcount import Py_REFCNT
 
 # ------------------------------------
 # constants
 # ------------------------------------
+# finalize and filter_dup hand a chromosome of at least this many
+# positions to map_chromosomes, and run any other on the spot
+_MIN_THREADED_SIZE = cython.declare(cython.long, MIN_THREADED_SIZE)
 
 # ------------------------------------
 # Misc functions
 # ------------------------------------
+
+# The C fast path of FWTrack.filter_dup. FWTrack._filter_dup_strand runs
+# it through filter_dup_plain on a plain array (is_plain_i4_array), in
+# place when the array owns its data (owns_buffer) and nothing else
+# holds it, and otherwise runs the original loop, so any other array
+# gives the original result or exception.
+
+@cython.cfunc
+@cython.inline
+def is_plain_i4_array(a: cnp.ndarray) -> cython.bint:
+    """Whether `a` is a one-dimensional, C-contiguous, aligned array of
+    native int32, the layout filter_dup_i4 reads through a pointer."""
+    return (cnp.PyArray_TYPE(a) == cnp.NPY_INT32 and
+            cnp.PyArray_NDIM(a) == 1 and cnp.PyArray_ISCARRAY_RO(a))
+
+
+@cython.cfunc
+@cython.nogil
+@cython.boundscheck(False)
+@cython.wraparound(False)
+@cython.exceptval(check=False)
+def filter_dup_i4(src: cython.pointer(cython.int), size: cython.Py_ssize_t,
+                  dst: cython.pointer(cython.int),
+                  maxnum: cython.int) -> cython.Py_ssize_t:
+    """Copy src[0:size] to dst, keeping at most `maxnum` positions of
+    each run of equal values, and return how many were written.
+
+    The loop of FWTrack.filter_dup, in C: the first position is always
+    kept, even at `maxnum` 0, and the same comparisons are made on the
+    same int32 values. `size` must be at least 1 and `dst` must have
+    room for `size` values.
+    """
+    i_old: cython.Py_ssize_t
+    i_new: cython.Py_ssize_t = 1
+    n: cython.int = 1
+    p: cython.int
+    current_loc: cython.int = src[0]
+
+    dst[0] = current_loc
+    for i_old in range(1, size):
+        p = src[i_old]
+        if p == current_loc:
+            n += 1
+        else:
+            current_loc = p
+            n = 1
+        if n <= maxnum:
+            dst[i_new] = p
+            i_new += 1
+    return i_new
+
+
+@cython.cfunc
+def filter_dup_plain(src, dst, maxnum: cython.int) -> cython.Py_ssize_t:
+    """Run filter_dup_i4 from array `src` into array `dst`, without
+    the GIL, and return how many positions it wrote. Returns -1,
+    touching nothing, unless both are plain int32 arrays
+    (is_plain_i4_array), `dst` is writable and `src` is not empty and
+    not longer than `dst`; the caller then runs its own loop."""
+    a: cnp.ndarray
+    b: cnp.ndarray
+    src_p: cython.pointer(cython.int)
+    dst_p: cython.pointer(cython.int)
+    size: cython.Py_ssize_t
+    kept: cython.Py_ssize_t
+
+    if not isinstance(src, cnp.ndarray) or not isinstance(dst, cnp.ndarray):
+        return -1
+    a = src
+    b = dst
+    if not (is_plain_i4_array(a) and is_plain_i4_array(b) and
+            cnp.PyArray_ISWRITEABLE(b)):
+        return -1
+    if a.shape[0] < 1 or a.shape[0] > b.shape[0]:
+        return -1
+    src_p = cython.cast(cython.pointer(cython.int), a.data)
+    dst_p = cython.cast(cython.pointer(cython.int), b.data)
+    size = a.shape[0]
+    with cython.nogil:
+        kept = filter_dup_i4(src_p, size, dst_p, maxnum)
+    return kept
+
+
+@cython.cfunc
+def owns_buffer(a) -> cython.bint:
+    """Whether `a` is an array that owns its data and is no view of
+    another object, as `a.resize(..., refcheck=False)` requires."""
+    b: cnp.ndarray
+
+    if not isinstance(a, cnp.ndarray):
+        return False
+    b = a
+    return (cnp.PyArray_CHKFLAGS(b, cnp.NPY_ARRAY_OWNDATA) and
+            cnp.PyArray_BASE(b) == cython.NULL)
 
 # ------------------------------------
 # Classes
@@ -162,6 +261,64 @@ class FWTrack:
         return
 
     @cython.ccall
+    def add_loc_arrays(self, chromosome: bytes, plus, minus):
+        """Append many 5' cut positions of one chromosome to the track.
+
+        Parameters
+        ----------
+        chromosome : bytes
+            Chromosome name (as bytes) that owns the cuts.
+        plus : numpy.ndarray
+            int32 positions of plus-strand cuts, in the order to append.
+        minus : numpy.ndarray
+            int32 positions of minus-strand cuts, in the order to append.
+
+        Notes
+        -----
+        Leaves the track exactly as calling ``add_loc`` for each element
+        of ``plus`` with strand 0 and each element of ``minus`` with
+        strand 1 would: the same arrays, pointers and buffer sizes.
+        """
+        strand: cython.int
+        i: cython.long
+        n: cython.long
+        b: cython.long
+        arr: cnp.ndarray
+
+        if len(plus) == 0 and len(minus) == 0:
+            return
+        if self.buffer_size <= 0:
+            # add_loc's own behaviour, errors included
+            for x in plus:
+                self.add_loc(chromosome, x, 0)
+            for x in minus:
+                self.add_loc(chromosome, x, 1)
+            return
+
+        if chromosome not in self.locations:
+            self.buf_size[chromosome] = [self.buffer_size, self.buffer_size]
+            self.locations[chromosome] = [np.zeros(self.buffer_size, dtype='i4'),
+                                          np.zeros(self.buffer_size, dtype='i4')]
+            self.pointer[chromosome] = [0, 0]
+        for strand in range(2):
+            positions = minus if strand else plus
+            n = len(positions)
+            if n == 0:
+                continue
+            i = self.pointer[chromosome][strand]
+            b = self.buf_size[chromosome][strand]
+            arr = self.locations[chromosome][strand]
+            if i + n > b:
+                # grow in steps of buffer_size, as add_loc does
+                while b < i + n:
+                    b += self.buffer_size
+                arr.resize(b, refcheck=False)
+                self.buf_size[chromosome][strand] = b
+            arr[i:i + n] = positions
+            self.pointer[chromosome][strand] = i + n
+        return
+
+    @cython.ccall
     def finalize(self):
         """Shrink arrays and sort per-strand coordinates in place.
         
@@ -170,22 +327,42 @@ class FWTrack:
         ``length`` are refreshed. Call this after loading data.
         """
         c: bytes
-        chrnames: set
+        size: cython.long
+        big: list
+        sizes: list
+        kept: cython.ulong
 
         self.total = 0
 
-        chrnames = self.get_chr_names()
-
-        for c in chrnames:
-            self.locations[c][0].resize(self.pointer[c][0], refcheck=False)
-            self.locations[c][0].sort()
-            self.locations[c][1].resize(self.pointer[c][1], refcheck=False)
-            self.locations[c][1].sort()
-            self.total += self.locations[c][0].size + self.locations[c][1].size
+        # each chromosome on its own: the large ones on threads
+        # (map_chromosomes), any other here and now
+        big = []
+        sizes = []
+        for c in self.get_chr_names():
+            size = self.pointer[c][0] + self.pointer[c][1]
+            if size >= _MIN_THREADED_SIZE:
+                big.append(c)
+                sizes.append(size)
+            else:
+                self.total += self._finalize_chrom(c)
+        for kept in map_chromosomes(self._finalize_chrom, big, sizes):
+            self.total += kept
 
         self.is_sorted = True
         self.length = self.fw * self.total
         return
+
+    @cython.ccall
+    def _finalize_chrom(self, c: bytes) -> cython.ulong:
+        """finalize's work on chromosome `c`: shrink each strand's
+        array to its count and sort it, and return the two sizes'
+        sum for the caller to add to total. Touches nothing shared, so
+        chromosomes can run on separate threads."""
+        self.locations[c][0].resize(self.pointer[c][0], refcheck=False)
+        self.locations[c][0].sort()
+        self.locations[c][1].resize(self.pointer[c][1], refcheck=False)
+        self.locations[c][1].sort()
+        return self.locations[c][0].size + self.locations[c][1].size
 
     @cython.ccall
     def set_rlengths(self, rlengths: dict) -> bool:
@@ -287,6 +464,82 @@ class FWTrack:
         return
 
     @cython.boundscheck(False)  # do not check that np indices are valid
+    @cython.cfunc
+    def _filter_dup_strand(self, k: bytes, strand: cython.int,
+                           maxnum: cython.int,
+                           kept_total: cython.pointer(cython.ulong)):
+        """filter_dup for one strand of chromosome `k`.
+
+        Returns locations[k][strand] itself when it holds at most one
+        position. Otherwise returns an array of the positions kept,
+        sets pointer[k][strand] to their number and adds it to
+        kept_total[0]. A plain int32 array (filter_dup_plain) that owns
+        its data, is held by nothing but locations[k], and holds at
+        most pointer[k][strand] + 1 positions, the room the original's
+        new array had, is filtered in place and shrunk, and returned;
+        any other gets a new array and the old one is released.
+        """
+        p: cython.int
+        n: cython.int
+        current_loc: cython.int
+        # index for old array, and index for new one
+        i_old: cython.ulong
+        i_new: cython.ulong
+        size: cython.ulong
+        kept: cython.Py_ssize_t
+        locs: cnp.ndarray(cython.int, ndim=1)
+        new_locs: cnp.ndarray(cython.int, ndim=1)
+
+        i_new = 0
+        locs = self.locations[k][strand]
+        size = locs.shape[0]
+        if len(locs) <= 1:
+            return locs         # do nothing
+        # in place: filter_dup_i4 allows src == dst, since each write
+        # trails its read. Only when the references to locs are
+        # locations[k]'s and this function's, so that no view or other
+        # holder of the array sees it change
+        if (size <= self.pointer[k][strand] + 1 and
+                Py_REFCNT(locs) == 2 and owns_buffer(locs)):
+            kept = filter_dup_plain(locs, locs, maxnum)
+            if kept >= 0:
+                locs.resize(kept, refcheck=False)
+                kept_total[0] += kept
+                self.pointer[k][strand] = kept
+                return locs
+        new_locs = np.zeros(self.pointer[k][strand] + 1, dtype='i4')
+        # the loop below, in C, when both arrays are plain int32
+        kept = filter_dup_plain(locs, new_locs, maxnum)
+        if kept >= 0:
+            i_new = kept
+        else:
+            new_locs[i_new] = locs[i_new]  # first item
+            i_new += 1
+            # the number of tags in the current location
+            n = 1
+            current_loc = locs[0]
+            for i_old in range(1, size):
+                p = locs[i_old]
+                if p == current_loc:
+                    n += 1
+                else:
+                    current_loc = p
+                    n = 1
+                if n <= maxnum:
+                    new_locs[i_new] = p
+                    i_new += 1
+        new_locs.resize(i_new, refcheck=False)
+        kept_total[0] += i_new
+        self.pointer[k][strand] = i_new
+        # free memory?
+        # I know I should shrink it to 0 size directly,
+        # however, on Mac OSX, it seems directly assigning 0
+        # doesn't do a thing.
+        locs.resize(self.buffer_size, refcheck=False)
+        locs.resize(0, refcheck=False)
+        # hope there would be no mem leak...
+        return new_locs
+
     @cython.ccall
     def filter_dup(self, maxnum: cython.int = -1) -> cython.ulong:
         """Limit duplicate 5' positions to a maximum count per strand.
@@ -307,19 +560,11 @@ class FWTrack:
         The track must be sorted before filtering. Coordinates exceeding ``maxnum``
         are discarded, pointers are updated, and ``total``/``length`` are recomputed.
         """
-        p: cython.int
-        n: cython.int
-        current_loc: cython.int
-        # index for old array, and index for new one
-        i_old: cython.ulong
-        i_new: cython.ulong
-        size: cython.ulong
         k: bytes
-        plus: cnp.ndarray(cython.int, ndim=1)
-        new_plus: cnp.ndarray(cython.int, ndim=1)
-        minus: cnp.ndarray(cython.int, ndim=1)
-        new_minus: cnp.ndarray(cython.int, ndim=1)
-        chrnames: set
+        size: cython.long
+        big: list
+        sizes: list
+        kept: cython.ulong
 
         if maxnum < 0:
             return self.total         # do nothing
@@ -330,85 +575,38 @@ class FWTrack:
         self.total = 0
         self.length = 0
 
-        chrnames = self.get_chr_names()
-
-        for k in chrnames:
-            # for each chromosome.
-            # This loop body is too big, I may need to split code later...
-
-            # + strand
-            i_new = 0
-            plus = self.locations[k][0]
-            size = plus.shape[0]
-            if len(plus) <= 1:
-                new_plus = plus         # do nothing
+        # each chromosome on its own: the large ones on threads
+        # (map_chromosomes), any other here and now
+        big = []
+        sizes = []
+        for k in self.get_chr_names():
+            size = len(self.locations[k][0]) + len(self.locations[k][1])
+            if size >= _MIN_THREADED_SIZE:
+                big.append(k)
+                sizes.append(size)
             else:
-                new_plus = np.zeros(self.pointer[k][0] + 1, dtype='i4')
-                new_plus[i_new] = plus[i_new]  # first item
-                i_new += 1
-                # the number of tags in the current location
-                n = 1
-                current_loc = plus[0]
-                for i_old in range(1, size):
-                    p = plus[i_old]
-                    if p == current_loc:
-                        n += 1
-                    else:
-                        current_loc = p
-                        n = 1
-                    if n <= maxnum:
-                        new_plus[i_new] = p
-                        i_new += 1
-                new_plus.resize(i_new, refcheck=False)
-                self.total += i_new
-                self.pointer[k][0] = i_new
-                # free memory?
-                # I know I should shrink it to 0 size directly,
-                # however, on Mac OSX, it seems directly assigning 0
-                # doesn't do a thing.
-                plus.resize(self.buffer_size, refcheck=False)
-                plus.resize(0, refcheck=False)
-                # hope there would be no mem leak...
-
-            # - strand
-            i_new = 0
-            minus = self.locations[k][1]
-            size = minus.shape[0]
-            if len(minus) <= 1:
-                new_minus = minus         # do nothing
-            else:
-                new_minus = np.zeros(self.pointer[k][1] + 1,
-                                     dtype='i4')
-                new_minus[i_new] = minus[i_new]  # first item
-                i_new += 1
-                # the number of tags in the current location
-                n = 1
-                current_loc = minus[0]
-                for i_old in range(1, size):
-                    p = minus[i_old]
-                    if p == current_loc:
-                        n += 1
-                    else:
-                        current_loc = p
-                        n = 1
-                    if n <= maxnum:
-                        new_minus[i_new] = p
-                        i_new += 1
-                new_minus.resize(i_new, refcheck=False)
-                self.total += i_new
-                self.pointer[k][1] = i_new
-                # free memory ?
-                # I know I should shrink it to 0 size directly,
-                # however, on Mac OSX, it seems directly assigning 0
-                # doesn't do a thing.
-                minus.resize(self.buffer_size, refcheck=False)
-                minus.resize(0, refcheck=False)
-                # hope there would be no mem leak...
-
-            self.locations[k] = [new_plus, new_minus]
+                self.total += self._filter_dup_chrom(k, maxnum)
+        for kept in map_chromosomes(self._filter_dup_chrom, big, sizes,
+                                    maxnum):
+            self.total += kept
 
         self.length = self.fw * self.total
         return self.total
+
+    @cython.ccall
+    def _filter_dup_chrom(self, k: bytes, maxnum: cython.int) -> cython.ulong:
+        """filter_dup's work on chromosome `k`, + strand and then -
+        strand: returns what it adds to total. Touches nothing shared
+        but the existing key k of locations, so chromosomes can run on
+        separate threads."""
+        kept: cython.ulong = 0
+        new_plus: cnp.ndarray(cython.int, ndim=1)
+        new_minus: cnp.ndarray(cython.int, ndim=1)
+
+        new_plus = self._filter_dup_strand(k, 0, maxnum, cython.address(kept))
+        new_minus = self._filter_dup_strand(k, 1, maxnum, cython.address(kept))
+        self.locations[k] = [new_plus, new_minus]
+        return kept
 
     @cython.ccall
     def sample_percent(self, percent: cython.float, seed: cython.int = -1):
@@ -827,6 +1025,19 @@ class FWTrack:
                 # both sides
                 five_shift_s.append(d//2 - end_shift)
                 three_shift_s.append(end_shift + d - d//2)
+
+        # three windows (d, slocal and llocal): their pileups and the
+        # maximum in one sweep, the same arrays as the loop below
+        if len(ds) == 3:
+            prev_pileup = se_all_in_one_pileup_max3(self.locations[chrom][0],
+                                                    self.locations[chrom][1],
+                                                    five_shift_s,
+                                                    three_shift_s,
+                                                    rlength,
+                                                    scale_factor_s,
+                                                    baseline_value)
+            if prev_pileup is not None:
+                return prev_pileup
 
         prev_pileup = None
 

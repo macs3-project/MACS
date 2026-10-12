@@ -1,5 +1,4 @@
 # cython: language_level=3
-# cython: profile=True
 # Time-stamp: <2024-10-22 17:12:29 Tao Liu>
 
 """Module for SAPPER PeakVariants class.

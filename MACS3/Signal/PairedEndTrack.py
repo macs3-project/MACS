@@ -1,5 +1,4 @@
 # cython: language_level=3
-# cython: profile=True
 # Time-stamp: <2025-11-14 19:08:47 Tao Liu>
 
 """Module for filter duplicate tags from paired-end data
@@ -20,14 +19,19 @@ from operator import itemgetter
 # ------------------------------------
 # MACS3 modules
 # ------------------------------------
+from MACS3.Signal.Pileup import se_all_in_one_pileup_max3
 from MACS3.Signal.BedGraph import (bedGraphTrackI,
                                    bedGraphTrackII)
-from MACS3.Signal.PileupV2 import (pileup_from_LR_hmmratac,
+from MACS3.Signal.PileupV2 import (LR_DTYPE,
+                                   LRC_DTYPE,
+                                   pileup_from_LR_hmmratac,
                                    pileup_from_LRC,
                                    pileup_from_LRC_as_list,
                                    pileup_from_LRC_centers_as_list,
                                    pileup_from_LR_as_list,
                                    pileup_from_PN_shifted,
+                                   pileup_LRC_as_list_equal,
+                                   pileup_LRC_centers_as_list_equal,
                                    over_two_pv_array)
 from MACS3.Signal.Region import Regions
 # ------------------------------------
@@ -38,15 +42,616 @@ import numpy as np
 import cython.cimports.numpy as cnp
 from cython.cimports.cpython import bool
 from cython.cimports.libc.stdint import INT32_MAX as INT_MAX
+from cython.cimports.libc.stdint import UINT32_MAX
+from cython.cimports.libc.string import memcpy
+from cython.cimports.MACS3.Signal.crefcount import Py_REFCNT
+from cython.cimports.MACS3.Signal.chugepages import (macs3_hp_available,
+                                                     macs3_hp_capsule)
 
 from MACS3.Utilities.Logger import logging
+from MACS3.Utilities.Threads import MIN_THREADED_SIZE, map_chromosomes
 
 logger = logging.getLogger(__name__)
 debug = logger.debug
 info = logger.info
 
+# finalize and filter_dup hand a chromosome of at least this many
+# fragments to map_chromosomes, and run any other on the spot
+_MIN_THREADED_SIZE = cython.declare(cython.long, MIN_THREADED_SIZE)
+# the numpy memory handler of the per-chromosome arrays
+# (chugepages.pxd): one that reaches a huge page moves into memory of
+# its own advised to use huge pages; None, and numpy's own, where
+# transparent huge pages are not available
+_TRACK_MEMORY = macs3_hp_capsule() if macs3_hp_available() else None
+
 # Let numpy enforce PE-ness using ndarray, gives bonus speedup when sorting
 # PE data doesn't have strandedness
+
+# ------------------------------------
+# C fast paths for the track methods
+# ------------------------------------
+# Each runs only on a plain array, one whose layout a C loop can read
+# through a pointer (is_plain_lr_array, is_plain_lrc_array). sort_lr_array
+# and argsort_lrc check that themselves and PETrackI.filter_dup checks it,
+# and that the array owns its data and nothing else holds it, before
+# calling filter_dup_lr, which filters in place; any other array takes
+# the original numpy
+# or Python code, so it gives the original result or the original
+# exception. LR_DTYPE and LRC_DTYPE, the record layouts of PETrackI and
+# PETrackII chromosomes, come from PileupV2.
+
+
+@cython.cfunc
+def is_plain_lr_array(locs: cnp.ndarray) -> cython.bint:
+    """Whether `locs` is a writable C-contiguous array of LR_DTYPE, the
+    layout sort_lr_array and filter_dup_lr read and write through a
+    pointer."""
+    return (locs.dtype == LR_DTYPE and locs.flags.c_contiguous and
+            locs.flags.writeable)
+
+
+@cython.cfunc
+@cython.nogil
+@cython.inline
+@cython.exceptval(check=False)
+def lr_key(l: cython.int, r: cython.int) -> cython.ulonglong:
+    """(l, r) as one uint64 key, (l ^ 2^31) * 2^32 + (r ^ 2^31) with l
+    and r taken as uint32. Flipping the sign bit maps the signed int32
+    order onto the unsigned order, so the keys of two records compare
+    as the records do: by l, then by r, both ascending."""
+    sign: cython.uint = 0x80000000
+    return ((cython.cast(cython.ulonglong,
+                         cython.cast(cython.uint, l) ^ sign) << 32) |
+            (cython.cast(cython.uint, r) ^ sign))
+
+
+@cython.cfunc
+@cython.nogil
+@cython.inline
+@cython.exceptval(check=False)
+def lr_key_l(key: cython.ulonglong) -> cython.int:
+    """The l of an lr_key."""
+    sign: cython.uint = 0x80000000
+    return cython.cast(cython.int, cython.cast(cython.uint, key >> 32) ^ sign)
+
+
+@cython.cfunc
+@cython.nogil
+@cython.inline
+@cython.exceptval(check=False)
+def lr_key_r(key: cython.ulonglong) -> cython.int:
+    """The r of an lr_key."""
+    sign: cython.uint = 0x80000000
+    return cython.cast(cython.int, cython.cast(cython.uint, key) ^ sign)
+
+
+@cython.cfunc
+@cython.nogil
+@cython.boundscheck(False)
+@cython.wraparound(False)
+@cython.exceptval(check=False)
+def lr_records_to_keys(q: cython.pointer(cython.char),
+                       n: cython.Py_ssize_t) -> cython.void:
+    """Overwrite each of the n 8-byte (l, r) records at q with its
+    lr_key, read and written through memcpy, so q needs no alignment
+    and no access aliases another type."""
+    i: cython.Py_ssize_t
+    lr: cython.int[2]
+    key: cython.ulonglong
+
+    for i in range(n):
+        memcpy(lr, q + 8 * i, 8)
+        key = lr_key(lr[0], lr[1])
+        memcpy(q + 8 * i, cython.address(key), 8)
+
+
+@cython.cfunc
+@cython.nogil
+@cython.boundscheck(False)
+@cython.wraparound(False)
+@cython.exceptval(check=False)
+def lr_keys_to_records(q: cython.pointer(cython.char),
+                       n: cython.Py_ssize_t) -> cython.void:
+    """The inverse of lr_records_to_keys: overwrite each of the n
+    lr_keys at q with its (l, r) record."""
+    i: cython.Py_ssize_t
+    lr: cython.int[2]
+    key: cython.ulonglong
+
+    for i in range(n):
+        memcpy(cython.address(key), q + 8 * i, 8)
+        lr[0] = lr_key_l(key)
+        lr[1] = lr_key_r(key)
+        memcpy(q + 8 * i, lr, 8)
+
+
+@cython.cfunc
+@cython.boundscheck(False)
+@cython.wraparound(False)
+def sort_lr_array(locs: cnp.ndarray):
+    """Sort a PETrackI location array in place, as
+    `locs.sort(order=['l', 'r'])` does, but through an integer sort of
+    the records' lr_keys.
+
+    A record holds nothing but (l, r), so records with equal keys are
+    identical, and any sort of the keys gives the same bytes as the
+    structured sort. An array that is not plain (is_plain_lr_array)
+    takes the structured sort itself. A one-dimensional plain array
+    is turned into its keys in place, an LR record being 8 bytes, and
+    sorted as a uint64 view of itself, so nothing is allocated; any
+    other plain array sorts a separate array of keys. The plain path
+    runs without the GIL but for the view or the allocation.
+    """
+    n: cython.long
+    i: cython.long
+    keys: cnp.ndarray
+    p: cython.pointer(cython.int)
+    k: cython.pointer(cython.ulonglong)
+    q: cython.pointer(cython.char)
+
+    if not is_plain_lr_array(locs):
+        locs.sort(order=['l', 'r'])
+        return
+    n = locs.shape[0]
+    if n < 2:
+        return
+    if locs.ndim == 1:
+        keys = locs.view(dtype=np.uint64, type=np.ndarray)
+        q = locs.data
+        with cython.nogil:
+            lr_records_to_keys(q, n)
+        try:
+            keys.sort()
+        finally:
+            # back to records, whether or not the sort raised
+            with cython.nogil:
+                lr_keys_to_records(q, n)
+        return
+    p = cython.cast(cython.pointer(cython.int), locs.data)
+    keys = np.empty(n, dtype=np.uint64)
+    k = cython.cast(cython.pointer(cython.ulonglong), keys.data)
+    with cython.nogil:
+        for i in range(n):
+            k[i] = lr_key(p[2 * i], p[2 * i + 1])
+    keys.sort()
+    with cython.nogil:
+        for i in range(n):
+            p[2 * i] = lr_key_l(k[i])
+            p[2 * i + 1] = lr_key_r(k[i])
+    return
+
+
+@cython.cfunc
+@cython.nogil
+@cython.boundscheck(False)
+@cython.wraparound(False)
+@cython.exceptval(check=False)
+def filter_dup_lr(p: cython.pointer(cython.int), size: cython.Py_ssize_t,
+                  maxnum: cython.int,
+                  kept: cython.pointer(cython.Py_ssize_t)) -> cython.ulonglong:
+    """The loop of PETrackI.filter_dup, in C and in place, over the
+    `size` sorted (l, r) records at `p`: drop each record after the
+    first `maxnum` of a run of equal records, moving the kept ones
+    forward in their order, set kept[0] to how many were kept, and
+    return the sum of the dropped records' r - l, each taken as uint64.
+
+    The first record of a run is always kept, even at `maxnum` 0, and
+    the comparisons are the original loop's, on the same int32 values.
+    Each write lands at or before the record just read, so no record is
+    overwritten before it is read. The caller subtracts the sum from
+    the unsigned `length`, which wraps exactly as subtracting the
+    lengths one by one does. `size` must be at least 2.
+    """
+    i: cython.Py_ssize_t
+    j: cython.Py_ssize_t = 1
+    n: cython.int = 1
+    loc_start: cython.int
+    loc_end: cython.int
+    current_loc_start: cython.int = p[0]
+    current_loc_end: cython.int = p[1]
+    removed_length: cython.ulonglong = 0
+
+    for i in range(1, size):
+        loc_start = p[2 * i]
+        loc_end = p[2 * i + 1]
+        if loc_start != current_loc_start or loc_end != current_loc_end:
+            current_loc_start = loc_start
+            current_loc_end = loc_end
+            n = 1
+        else:
+            n += 1
+            if n > maxnum:
+                removed_length += cython.cast(cython.ulonglong, current_loc_end - current_loc_start)
+                continue
+        p[2 * j] = loc_start
+        p[2 * j + 1] = loc_end
+        j += 1
+    kept[0] = j
+    return removed_length
+
+
+@cython.cfunc
+def is_plain_lrc_array(locs: cnp.ndarray) -> cython.bint:
+    """Whether `locs` is a one-dimensional C-contiguous array of
+    LRC_DTYPE, the layout argsort_lrc reads through a pointer."""
+    return (locs.ndim == 1 and locs.dtype == LRC_DTYPE and
+            locs.flags.c_contiguous)
+
+
+# One element of argsort_lrc's work array: the record's lr_key, its
+# count, and its index in the array being sorted.
+LRCItem = cython.struct(k=cython.ulonglong, c=cython.uint, i=cython.uint)
+
+
+@cython.cfunc
+@cython.nogil
+@cython.inline
+@cython.exceptval(check=False)
+def lrc_lt(a: LRCItem, b: LRCItem) -> cython.bint:
+    """Whether a's record compares below b's: by l, then r, then c.
+
+    This is the comparison numpy's structured argsort makes for
+    `order=['l', 'r']` on LRC_DTYPE, since numpy breaks ties on the
+    fields left out of `order` in dtype order, here c.
+    """
+    return a.k < b.k or (a.k == b.k and a.c < b.c)
+
+
+# lrc_aheapsort and lrc_aquicksort below are translations of NumPy's
+# generic heapsort and introsort (numpy/_core/src/npysort/heapsort.cpp
+# and quicksort_generic.cpp), used under NumPy's licence:
+#
+# Copyright (c) 2005-2025, NumPy Developers.
+# All rights reserved.
+#
+# Redistribution and use in source and binary forms, with or without
+# modification, are permitted provided that the following conditions are
+# met:
+#
+#     * Redistributions of source code must retain the above copyright
+#        notice, this list of conditions and the following disclaimer.
+#
+#     * Redistributions in binary form must reproduce the above
+#        copyright notice, this list of conditions and the following
+#        disclaimer in the documentation and/or other materials provided
+#        with the distribution.
+#
+#     * Neither the name of the NumPy Developers nor the names of any
+#        contributors may be used to endorse or promote products derived
+#        from this software without specific prior written permission.
+#
+# THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+# "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+# LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
+# A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
+# OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+# SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
+# LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+# DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+# THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+# (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+# OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+@cython.cfunc
+@cython.nogil
+@cython.boundscheck(False)
+@cython.wraparound(False)
+@cython.exceptval(check=False)
+def lrc_aheapsort(a: cython.pointer(LRCItem), n: cython.Py_ssize_t) -> cython.void:
+    """numpy's generic `npy_aheapsort` (numpy/_core/src/npysort/
+    heapsort.cpp, numpy 2.5.3) on the n items at a, with numpy's
+    1-based a[x] written as a[x - 1]. numpy moves indices into the
+    data; this moves the items, which carry their index along.
+    """
+    i: cython.Py_ssize_t
+    j: cython.Py_ssize_t
+    l: cython.Py_ssize_t
+    tmp: LRCItem
+
+    l = n >> 1
+    while l > 0:
+        tmp = a[l - 1]
+        i = l
+        j = l << 1
+        while j <= n:
+            if j < n and lrc_lt(a[j - 1], a[j]):
+                j += 1
+            if lrc_lt(tmp, a[j - 1]):
+                a[i - 1] = a[j - 1]
+                i = j
+                j += j
+            else:
+                break
+        a[i - 1] = tmp
+        l -= 1
+
+    while n > 1:
+        tmp = a[n - 1]
+        a[n - 1] = a[0]
+        n -= 1
+        i = 1
+        j = 2
+        while j <= n:
+            if j < n and lrc_lt(a[j - 1], a[j]):
+                j += 1
+            if lrc_lt(tmp, a[j - 1]):
+                a[i - 1] = a[j - 1]
+                i = j
+                j += j
+            else:
+                break
+        a[i - 1] = tmp
+    return
+
+
+@cython.cfunc
+@cython.nogil
+@cython.boundscheck(False)
+@cython.wraparound(False)
+@cython.exceptval(check=False)
+def lrc_aquicksort(v: cython.pointer(LRCItem), num: cython.Py_ssize_t) -> cython.void:
+    """numpy's generic `npy_aquicksort_impl` (numpy/_core/src/npysort/
+    quicksort_generic.cpp, numpy 2.5.3), the introsort numpy runs for
+    an argsort of a structured array: median-of-three pivot, insertion
+    sort below 16 items, heapsort past a depth of 2 * floor(log2(num)).
+
+    numpy permutes an index array and compares the records the indices
+    point to; this permutes the items, which carry the index along, so
+    every comparison sees the same two records and the same branch is
+    taken at every step. The indices end in numpy's order, ties
+    included.
+    """
+    pl: cython.Py_ssize_t = 0
+    pr: cython.Py_ssize_t = num - 1
+    pm: cython.Py_ssize_t
+    pi: cython.Py_ssize_t
+    pj: cython.Py_ssize_t
+    pk: cython.Py_ssize_t
+    stack: cython.Py_ssize_t[128]
+    sptr: cython.int = 0
+    depth: cython.int[128]
+    psdepth: cython.int = 0
+    cdepth: cython.int = 0
+    u: cython.size_t
+    vp: LRCItem
+    tmp: LRCItem
+
+    # npy_get_msb(num) * 2
+    u = cython.cast(cython.size_t, num) >> 1
+    while u:
+        cdepth += 1
+        u >>= 1
+    cdepth *= 2
+
+    while True:
+        if cdepth < 0:
+            lrc_aheapsort(v + pl, pr - pl + 1)
+        else:
+            while pr - pl > 15:
+                # quicksort partition
+                pm = pl + ((pr - pl) >> 1)
+                if lrc_lt(v[pm], v[pl]):
+                    tmp = v[pm]
+                    v[pm] = v[pl]
+                    v[pl] = tmp
+                if lrc_lt(v[pr], v[pm]):
+                    tmp = v[pr]
+                    v[pr] = v[pm]
+                    v[pm] = tmp
+                if lrc_lt(v[pm], v[pl]):
+                    tmp = v[pm]
+                    v[pm] = v[pl]
+                    v[pl] = tmp
+                vp = v[pm]
+                pi = pl
+                pj = pr - 1
+                tmp = v[pm]
+                v[pm] = v[pj]
+                v[pj] = tmp
+                while True:
+                    pi += 1
+                    while lrc_lt(v[pi], vp) and pi < pj:
+                        pi += 1
+                    pj -= 1
+                    while lrc_lt(vp, v[pj]) and pi < pj:
+                        pj -= 1
+                    if pi >= pj:
+                        break
+                    tmp = v[pi]
+                    v[pi] = v[pj]
+                    v[pj] = tmp
+                pk = pr - 1
+                tmp = v[pi]
+                v[pi] = v[pk]
+                v[pk] = tmp
+                # push largest partition on stack
+                if pi - pl < pr - pi:
+                    stack[sptr] = pi + 1
+                    stack[sptr + 1] = pr
+                    sptr += 2
+                    pr = pi - 1
+                else:
+                    stack[sptr] = pl
+                    stack[sptr + 1] = pi - 1
+                    sptr += 2
+                    pl = pi + 1
+                cdepth -= 1
+                depth[psdepth] = cdepth
+                psdepth += 1
+
+            # insertion sort
+            pi = pl + 1
+            while pi <= pr:
+                vp = v[pi]
+                pj = pi
+                pk = pi - 1
+                while pj > pl and lrc_lt(vp, v[pk]):
+                    v[pj] = v[pk]
+                    pj -= 1
+                    pk -= 1
+                v[pj] = vp
+                pi += 1
+        # stack_pop
+        if sptr == 0:
+            break
+        sptr -= 2
+        pl = stack[sptr]
+        pr = stack[sptr + 1]
+        psdepth -= 1
+        cdepth = depth[psdepth]
+    return
+
+
+@cython.cfunc
+@cython.boundscheck(False)
+@cython.wraparound(False)
+def argsort_lrc(locs: cnp.ndarray) -> cnp.ndarray:
+    """Return `np.argsort(locs, order=['l', 'r'])` for a PETrackII
+    location array, the same indices in the same order, through a typed
+    comparison instead of numpy's per-field structured one.
+
+    Records equal in l, r and c are ties, and numpy's default argsort
+    is not stable, so their order is whatever its introsort leaves;
+    their barcodes can differ. lrc_aquicksort makes the comparisons
+    numpy makes, in the same sequence, so it leaves them in the same
+    order. A plain array (is_plain_lrc_array) of 2 to 2^32 - 1 records
+    takes this path, without the GIL but for its allocations; anything
+    else goes to numpy's argsort itself.
+    """
+    n: cython.Py_ssize_t
+    i: cython.Py_ssize_t
+    work: cnp.ndarray
+    out: cnp.ndarray
+    v: cython.pointer(LRCItem)
+    o: cython.pointer(cnp.npy_intp)
+    rec: cython.pointer(cython.char)
+    l: cython.int
+    r: cython.int
+    c: cython.ushort
+
+    if not (is_plain_lrc_array(locs) and
+            2 <= locs.shape[0] <= UINT32_MAX):
+        return np.argsort(locs, order=['l', 'r'])
+    n = locs.shape[0]
+
+    work = np.empty((n, 2), dtype=np.uint64)
+    v = cython.cast(cython.pointer(LRCItem), work.data)
+    rec = cython.cast(cython.pointer(cython.char), locs.data)
+    with cython.nogil:
+        for i in range(n):
+            # records are 10 bytes, so the fields are read unaligned
+            memcpy(cython.address(l), rec, 4)
+            memcpy(cython.address(r), rec + 4, 4)
+            memcpy(cython.address(c), rec + 8, 2)
+            rec += 10
+            v[i].k = lr_key(l, r)
+            v[i].c = c
+            v[i].i = cython.cast(cython.uint, i)
+
+        lrc_aquicksort(v, n)
+
+    out = np.empty(n, dtype=np.intp)
+    o = cython.cast(cython.pointer(cnp.npy_intp), out.data)
+    with cython.nogil:
+        for i in range(n):
+            o[i] = v[i].i
+    return out
+
+
+@cython.cfunc
+@cython.boundscheck(False)
+@cython.wraparound(False)
+@cython.initializedcheck(False)
+def _lrc_append(locs, bcs, i: cython.Py_ssize_t, n: cython.Py_ssize_t,
+                starts, ends, counts, barcode_ids,
+                dlength: cython.pointer(cython.longlong)) -> cython.int:
+    """Write the n fragments of the arrays into records i to i + n - 1
+    of the PETrackII location array ``locs`` and its barcode array
+    ``bcs`` in one C loop, putting the sum of their C-int ``(end -
+    start) * count`` (each wrapped as C int arithmetic wraps it) in
+    ``dlength[0]``, and return 1. This is what add_loc_arrays' numpy
+    assignments and sum give. Returns 0, writing nothing, unless every
+    array is 1-D and C-contiguous with the dtypes FragParser passes:
+    locs LRC_DTYPE, bcs, starts, ends and barcode_ids int32, counts
+    uint16, each of n elements, and locs and bcs hold at least i + n
+    records."""
+    k: cython.Py_ssize_t
+    sv: cython.int[::1]
+    ev: cython.int[::1]
+    cv: cython.ushort[::1]
+    bv: cython.int[::1]
+    ov: cython.int[::1]
+    la: cnp.ndarray
+    rec: cython.pointer(cython.char)
+    s: cython.int
+    e: cython.int
+    c: cython.ushort
+    dl: cython.longlong = 0
+
+    if not (type(locs) is np.ndarray and type(bcs) is np.ndarray and
+            type(starts) is np.ndarray and type(ends) is np.ndarray and
+            type(counts) is np.ndarray and type(barcode_ids) is np.ndarray):
+        return 0
+    if not (locs.ndim == 1 and locs.dtype == LRC_DTYPE and
+            locs.flags.c_contiguous and locs.shape[0] >= i + n and
+            bcs.ndim == 1 and bcs.dtype == np.int32 and
+            bcs.flags.c_contiguous and bcs.shape[0] >= i + n and
+            starts.ndim == 1 and starts.dtype == np.int32 and
+            starts.flags.c_contiguous and starts.shape[0] == n and
+            ends.ndim == 1 and ends.dtype == np.int32 and
+            ends.flags.c_contiguous and ends.shape[0] == n and
+            counts.ndim == 1 and counts.dtype == np.uint16 and
+            counts.flags.c_contiguous and counts.shape[0] == n and
+            barcode_ids.ndim == 1 and barcode_ids.dtype == np.int32 and
+            barcode_ids.flags.c_contiguous and barcode_ids.shape[0] == n):
+        return 0
+    sv = starts
+    ev = ends
+    cv = counts
+    bv = barcode_ids
+    ov = bcs
+    la = locs
+    # records are 10 bytes, so the fields are written unaligned
+    rec = cython.cast(cython.pointer(cython.char), la.data) + 10 * i
+    for k in range(n):
+        s = sv[k]
+        e = ev[k]
+        c = cv[k]
+        memcpy(rec, cython.address(s), 4)
+        memcpy(rec + 4, cython.address(e), 4)
+        memcpy(rec + 8, cython.address(c), 2)
+        rec += 10
+        ov[i + k] = bv[k]
+        dl += cython.cast(cython.int,
+                          (cython.cast(cython.uint, e) -
+                           cython.cast(cython.uint, s)) *
+                          cython.cast(cython.uint, c))
+    dlength[0] = dl
+    return 1
+
+
+@cython.cfunc
+def new_track_array(n, dtype) -> cnp.ndarray:
+    """np.zeros(n, dtype=dtype), with its memory, and that of every
+    resize of it, from _TRACK_MEMORY where there is one. Such an array
+    owns its data like any other.
+
+    The callpeak pools fork their workers from the process holding
+    the track, and fork() copies a page-table entry for each 4 KB page
+    of it but one for each huge page.
+
+    PETrackI's arrays only: PETrackII's are replaced by sorted copies
+    in finalize, so the arrays it reads into are gone before any
+    fork, and its reserve already over-allocates (4x), to which the
+    handler's reservation would add a quarter more address space."""
+    if _TRACK_MEMORY is None:
+        return np.zeros(n, dtype=dtype)
+    old = cnp.PyDataMem_SetHandler(_TRACK_MEMORY)
+    try:
+        a = np.zeros(n, dtype=dtype)
+    finally:
+        cnp.PyDataMem_SetHandler(old)
+    return a
 
 
 @cython.cclass
@@ -130,8 +735,8 @@ class PETrackI:
         if chromosome not in self.locations:
             self.buf_size[chromosome] = self.buffer_size
             # note: ['l'] is the leftmost end, ['r'] is the rightmost end of fragment.
-            self.locations[chromosome] = np.zeros(shape=self.buffer_size,
-                                                  dtype=[('l', 'i4'), ('r', 'i4')])
+            self.locations[chromosome] = new_track_array(self.buffer_size,
+                                                         [('l', 'i4'), ('r', 'i4')])
             self.locations[chromosome][0] = (start, end)
             self.size[chromosome] = 1
         else:
@@ -143,6 +748,61 @@ class PETrackI:
             self.locations[chromosome][i] = (start, end)
             self.size[chromosome] = i + 1
         self.length += end - start
+        return
+
+    @cython.ccall
+    def add_loc_arrays(self, chromosome: bytes, starts, ends):
+        """Append many paired-end fragments of one chromosome to the track.
+
+        Parameters
+        ----------
+        chromosome : bytes
+            Chromosome name (as bytes) that owns the fragments.
+        starts : numpy.ndarray
+            int32 leftmost ends of the fragments, in the order to append.
+        ends : numpy.ndarray
+            int32 rightmost ends of the fragments, same length as ``starts``.
+
+        Notes
+        -----
+        Leaves the track exactly as calling ``add_loc(chromosome,
+        starts[k], ends[k])`` for each ``k`` in turn would: the same array,
+        size, buffer size and total ``length``.
+        """
+        i: cython.long
+        n: cython.long
+        b: cython.long
+        dlength: cython.longlong
+
+        n = len(starts)
+        if n == 0:
+            return
+        if self.buffer_size <= 0:
+            # add_loc's own behaviour, errors included
+            for k in range(n):
+                self.add_loc(chromosome, starts[k], ends[k])
+            return
+
+        if chromosome not in self.locations:
+            self.buf_size[chromosome] = self.buffer_size
+            # note: ['l'] is the leftmost end, ['r'] is the rightmost end of fragment.
+            self.locations[chromosome] = new_track_array(self.buffer_size,
+                                                         [('l', 'i4'), ('r', 'i4')])
+            self.size[chromosome] = 0
+        i = self.size[chromosome]
+        b = self.buf_size[chromosome]
+        if i + n > b:
+            # grow in steps of buffer_size, as add_loc does
+            while b < i + n:
+                b += self.buffer_size
+            self.locations[chromosome].resize((b), refcheck=False)
+            self.buf_size[chromosome] = b
+        self.locations[chromosome]['l'][i:i + n] = starts
+        self.locations[chromosome]['r'][i:i + n] = ends
+        self.size[chromosome] = i + n
+        # add_loc adds each int32 difference end - start to length
+        dlength = np.subtract(ends, starts, dtype=np.int32).sum(dtype=np.int64)
+        self.length += dlength
         return
 
     @cython.ccall
@@ -222,11 +882,17 @@ class PETrackI:
         """
         c: bytes
         chrnames: set
+        big: list
+        sizes: list
 
         self.total = 0
 
         chrnames = self.get_chr_names()
 
+        # the sorts, each chromosome on its own: the large ones on
+        # threads (map_chromosomes), any other here and now
+        big = []
+        sizes = []
         for c in chrnames:
             self.locations[c].resize((self.size[c]), refcheck=False)
             if self.size[c] == 0:
@@ -237,12 +903,23 @@ class PETrackI:
                 if c in self.rlengths:
                     del self.rlengths[c]
                 continue
-            self.locations[c].sort(order=['l', 'r'])
+            if self.size[c] >= _MIN_THREADED_SIZE:
+                big.append(c)
+                sizes.append(self.size[c])
+            else:
+                self._sort_chrom(c)
             self.total += self.size[c]
+        map_chromosomes(self._sort_chrom, big, sizes)
 
         self.is_sorted = True
         self.average_template_length = cython.cast(cython.float, self.length) / self.total
         return
+
+    @cython.ccall
+    def _sort_chrom(self, c: bytes):
+        """finalize's sort of chromosome `c`, which touches nothing
+        shared, so chromosomes can run on separate threads."""
+        sort_lr_array(self.locations[c])
 
     @cython.ccall
     def get_locations_by_chr(self, chromosome: bytes):
@@ -480,17 +1157,11 @@ class PETrackI:
             pe.finalize()
             pe.filter_dup(maxnum=1)
         """
-        n: cython.int
-        loc_start: cython.int
-        loc_end: cython.int
-        current_loc_start: cython.int
-        current_loc_end: cython.int
-        i: cython.ulong
-        locs_size: cython.ulong
         k: bytes
-        locs: cnp.ndarray
-        chrnames: set
-        selected_idx: cnp.ndarray
+        i: cython.Py_ssize_t
+        big: list
+        sizes: list
+        removed: list
 
         if maxnum < 0:
             return              # condition to return if not filtering
@@ -502,49 +1173,106 @@ class PETrackI:
         # self.length = 0
         self.average_template_length = 0.0
 
-        chrnames = self.get_chr_names()
-
-        for k in chrnames:      # for each chromosome
-            locs = self.locations[k]
-            locs_size = self.size[k]
-            if locs_size == 1:
-                # do nothing and continue
-                self.total += locs_size
-                continue
-            # discard duplicate reads and make a new locations[k]
-            # initialize boolean array as all TRUE, or all being kept
-            selected_idx = np.ones(locs_size, dtype=bool)
-            # get the first loc
-            (current_loc_start, current_loc_end) = locs[0]
-            i = 1               # index of new_locs
-            n = 1  # the number of tags in the current genomic location
-            for i in range(1, locs_size):
-                (loc_start, loc_end) = locs[i]
-                if loc_start != current_loc_start or loc_end != current_loc_end:
-                    # not the same, update currnet_loc_start/end/l, reset n
-                    current_loc_start = loc_start
-                    current_loc_end = loc_end
-                    n = 1
-                    continue
-                else:
-                    # both ends are the same, add 1 to duplicate number n
-                    n += 1
-                    if n > maxnum:
-                        # change the flag to False
-                        selected_idx[i] = False
-                        # subtract current_loc_l from self.length
-                        self.length -= cython.cast(cython.ulonglong, current_loc_end - current_loc_start)
-            self.locations[k] = locs[selected_idx]
-            self.size[k] = self.locations[k].shape[0]
-            self.total += self.size[k]
-            # free memory?
-            # I know I should shrink it to 0 size directly,
-            # however, on Mac OSX, it seems directly assigning 0
-            # doesn't do a thing.
-            selected_idx.resize(self.buffer_size, refcheck=False)
-            selected_idx.resize(0, refcheck=False)
+        # each chromosome on its own: the large ones on threads
+        # (map_chromosomes), any other here and now. length is
+        # unsigned, so subtracting each chromosome's sum wraps as
+        # subtracting each fragment's length does
+        big = []
+        sizes = []
+        for k in self.get_chr_names():
+            if self.size[k] >= _MIN_THREADED_SIZE:
+                big.append(k)
+                sizes.append(self.size[k])
+            else:
+                self.length -= self._filter_dup_chrom(k, maxnum)
+                self.total += self.size[k]
+        removed = map_chromosomes(self._filter_dup_chrom, big, sizes, maxnum)
+        for i in range(len(big)):
+            self.length -= cython.cast(cython.ulonglong, removed[i])
+            self.total += self.size[big[i]]
         self.average_template_length = self.length / self.total
         return
+
+    @cython.ccall
+    def _filter_dup_chrom(self, k: bytes,
+                          maxnum: cython.int) -> cython.ulonglong:
+        """filter_dup's work on chromosome `k`: drop the duplicates
+        past `maxnum` and set locations[k] and size[k], and return the
+        sum of the dropped fragments' lengths, each taken as uint64, for
+        the caller to subtract from length. Touches nothing shared but
+        the existing key k of locations and size, so chromosomes can run
+        on separate threads.
+
+        A plain one-dimensional array that owns its data and is held by
+        nothing but locations[k] is filtered in place (filter_dup_lr)
+        and shrunk, and stays locations[k]; any other takes the
+        original loop and a new array, leaving the old one as it was."""
+        n: cython.int
+        loc_start: cython.int
+        loc_end: cython.int
+        current_loc_start: cython.int
+        current_loc_end: cython.int
+        i: cython.ulong
+        locs_size: cython.ulong
+        locs: cnp.ndarray
+        selected_idx: cnp.ndarray
+        p: cython.pointer(cython.int)
+        kept: cython.Py_ssize_t = 0
+        removed: cython.ulonglong = 0
+
+        locs = self.locations[k]
+        locs_size = self.size[k]
+        if locs_size == 1:
+            # do nothing
+            return removed
+        # the references to locs are locations[k]'s and this
+        # function's, so no view or other holder of the array sees it
+        # change
+        if (locs_size >= 2 and locs.shape[0] == locs_size and
+                Py_REFCNT(locs) == 2 and
+                locs.ndim == 1 and is_plain_lr_array(locs) and
+                cnp.PyArray_CHKFLAGS(locs, cnp.NPY_ARRAY_OWNDATA) and
+                cnp.PyArray_BASE(locs) == cython.NULL):
+            # the loop below, in C, in place and without the GIL
+            p = cython.cast(cython.pointer(cython.int), locs.data)
+            with cython.nogil:
+                removed = filter_dup_lr(p, locs_size, maxnum,
+                                        cython.address(kept))
+            locs.resize(kept, refcheck=False)
+            self.size[k] = locs.shape[0]
+            return removed
+        # discard duplicate reads and make a new locations[k]
+        # initialize boolean array as all TRUE, or all being kept
+        selected_idx = np.ones(locs_size, dtype=bool)
+        # get the first loc
+        (current_loc_start, current_loc_end) = locs[0]
+        i = 1               # index of new_locs
+        n = 1  # the number of tags in the current genomic location
+        for i in range(1, locs_size):
+            (loc_start, loc_end) = locs[i]
+            if loc_start != current_loc_start or loc_end != current_loc_end:
+                # not the same, update currnet_loc_start/end/l, reset n
+                current_loc_start = loc_start
+                current_loc_end = loc_end
+                n = 1
+                continue
+            else:
+                # both ends are the same, add 1 to duplicate number n
+                n += 1
+                if n > maxnum:
+                    # change the flag to False
+                    selected_idx[i] = False
+                    # for the caller to subtract from self.length
+                    removed += cython.cast(cython.ulonglong, current_loc_end - current_loc_start)
+        self.locations[k] = locs[selected_idx]
+        self.size[k] = self.locations[k].shape[0]
+        # free memory?
+        # I know I should shrink it to 0 size directly,
+        # however, on Mac OSX, it seems directly assigning 0
+        # doesn't do a thing.
+        selected_idx.resize(self.buffer_size, refcheck=False)
+        selected_idx.resize(0, refcheck=False)
+        return removed
 
     @cython.ccall
     def sample_percent(self,
@@ -852,6 +1580,7 @@ class PETrackI:
         """
         tmp_pileup: list
         prev_pileup: list
+        five_shift_s: list
         scale_factor: cython.float
         d: cython.long
         five_shift: cython.long
@@ -862,6 +1591,23 @@ class PETrackI:
             self.sort()
 
         assert len(ds) == len(scale_factor_s), "ds and scale_factor_s must have the same length!"
+
+        # three windows (d, slocal and llocal): their pileups and the
+        # maximum in one sweep, the same arrays as the loop below
+        if len(ds) == 3:
+            five_shift_s = []
+            for i in range(3):
+                d = ds[i]
+                five_shift_s.append(d//2)
+            prev_pileup = se_all_in_one_pileup_max3(self.locations[chrom]['l'],
+                                                    self.locations[chrom]['r'],
+                                                    five_shift_s,
+                                                    five_shift_s,
+                                                    rlength,
+                                                    scale_factor_s,
+                                                    baseline_value)
+            if prev_pileup is not None:
+                return prev_pileup
 
         prev_pileup = None
 
@@ -1117,6 +1863,136 @@ class PETrackII:
         return
 
     @cython.ccall
+    def barcode_id(self, barcode: bytes) -> cython.int:
+        """Return the integer that encodes ``barcode`` in ``barcodes``.
+
+        A barcode not seen before is given the next integer, as
+        ``add_loc`` gives it, so ids follow the order of first appearance.
+        """
+        if barcode not in self.barcode_dict:
+            self.barcode_dict[barcode] = self.barcode_last_n
+            self.barcode_last_n += 1
+        return self.barcode_dict[barcode]
+
+    @cython.ccall
+    def add_loc_arrays(self, chromosome: bytes, starts, ends, counts,
+                       barcode_ids):
+        """Append many fragments of one chromosome to the track.
+
+        Parameters
+        ----------
+        chromosome : bytes
+            Chromosome name (as bytes) for the fragments.
+        starts : numpy.ndarray
+            int32 leftmost ends of the fragments, in the order to append.
+        ends : numpy.ndarray
+            int32 rightmost ends, same length as ``starts``.
+        counts : numpy.ndarray
+            uint16 counts, same length.
+        barcode_ids : numpy.ndarray
+            int32 barcode ids from ``barcode_id``, same length.
+
+        Notes
+        -----
+        Leaves the track as calling ``add_loc(chromosome, starts[k],
+        ends[k], barcode, counts[k])`` for each ``k`` in turn would,
+        where ``barcode`` is the barcode whose id is
+        ``barcode_ids[k]``: the same records, sizes, buffer sizes and
+        ``length``. The arrays may be longer than ``buf_size``, with
+        zeros past ``size`` (see ``reserve``); after
+        ``trim_to_buf_size`` they are exactly add_loc's arrays. Needs a
+        positive ``buffer_size``.
+        """
+        i: cython.long
+        n: cython.long
+        b: cython.long
+        dlength: cython.longlong
+
+        n = len(starts)
+        if n == 0:
+            return
+        if self.buffer_size <= 0:
+            raise ValueError("add_loc_arrays needs a positive buffer_size")
+
+        if chromosome not in self.locations:
+            self.buf_size[chromosome] = self.buffer_size
+            self.locations[chromosome] = np.zeros(shape=self.buffer_size,
+                                                  dtype=[('l', 'i4'), ('r', 'i4'), ('c', 'u2')])
+            self.barcodes[chromosome] = np.zeros(shape=self.buffer_size,
+                                                 dtype='i4')
+            self.size[chromosome] = 0
+        i = self.size[chromosome]
+        b = self.buf_size[chromosome]
+        if i + n > b:
+            # buf_size grows in steps of buffer_size, as add_loc's does
+            while b < i + n:
+                b += self.buffer_size
+            self.buf_size[chromosome] = b
+            if (self.locations[chromosome].shape[0] < b or
+                    self.barcodes[chromosome].shape[0] < b):
+                self.reserve(chromosome, b)
+        locs = self.locations[chromosome]
+        bcs = self.barcodes[chromosome]
+        if (_lrc_append(locs, bcs, i, n, starts, ends, counts, barcode_ids,
+                        cython.address(dlength)) == 0):
+            locs['l'][i:i + n] = starts
+            locs['r'][i:i + n] = ends
+            locs['c'][i:i + n] = counts
+            bcs[i:i + n] = barcode_ids
+            self.size[chromosome] = i + n
+            # add_loc adds each C int (end - start) * count, wrapping as C
+            # int arithmetic does, to length
+            dlength = np.multiply(np.subtract(ends, starts, dtype=np.int32),
+                                  counts, dtype=np.int32).sum(dtype=np.int64)
+        else:
+            self.size[chromosome] = i + n
+        self.length += dlength
+        return
+
+    @cython.cfunc
+    def reserve(self, chromosome: bytes, b: cython.long):
+        """Give the arrays of ``chromosome`` room for at least ``b``
+        records and four times their current length: new zeroed
+        arrays (numpy asks for huge pages at 4 MB or more) into which
+        the first ``size`` records are copied.
+
+        Growing in place with ``resize`` in steps of ``buffer_size``,
+        as add_loc does, zero-fills each step and so faults in every
+        page of it on the spot, one 4 kB page at a time; that cost
+        more than these copies. Memory past what is written is never
+        touched, so the larger capacity costs address space only.
+        """
+        i: cython.long
+        cap: cython.long
+
+        locs = self.locations[chromosome]
+        bcs = self.barcodes[chromosome]
+        i = self.size[chromosome]
+        cap = max(b, 4 * cython.cast(cython.long, locs.shape[0]))
+        new_locs = np.zeros(cap, dtype=locs.dtype)
+        new_bcs = np.zeros(cap, dtype=bcs.dtype)
+        new_locs[:i] = locs[:i]
+        new_bcs[:i] = bcs[:i]
+        self.locations[chromosome] = new_locs
+        self.barcodes[chromosome] = new_bcs
+
+    @cython.ccall
+    def trim_to_buf_size(self):
+        """Shorten each chromosome's arrays that ``reserve`` made longer
+        than ``buf_size`` to ``buf_size`` records, the length add_loc
+        gives them. Called by ``set_rlengths``, which FragParser calls
+        once a file is read."""
+        c: bytes
+        b: cython.long
+
+        for c in self.locations:
+            b = self.buf_size[c]
+            if self.locations[c] is not None and self.locations[c].shape[0] > b:
+                self.locations[c].resize((b), refcheck=False)
+            if self.barcodes[c] is not None and self.barcodes[c].shape[0] > b:
+                self.barcodes[c].resize((b), refcheck=False)
+
+    @cython.ccall
     def destroy(self):
         """Release fragment and barcode arrays held by the track.
         
@@ -1163,11 +2039,17 @@ class PETrackII:
         -----
         Any chromosome stored in the track but missing from ``rlengths`` is assigned
         ``INT_MAX`` so downstream bounds checks can succeed.
+
+        FragParser calls this once a file is read, so it is also where
+        arrays that ``add_loc_arrays`` made longer than ``buf_size`` are
+        cut back to add_loc's length (``trim_to_buf_size``); on any other
+        track that is a no-op.
         """
         valid_chroms: set
         missed_chroms: set
         chrom: bytes
 
+        self.trim_to_buf_size()
         valid_chroms = set(self.locations.keys()).intersection(rlengths.keys())
         for chrom in sorted(valid_chroms):
             self.rlengths[chrom] = rlengths[chrom]
@@ -1216,12 +2098,17 @@ class PETrackII:
         """
         c: bytes
         chrnames: set
-        indices: cnp.ndarray
+        big: list
+        sizes: list
 
         self.total = 0
 
         chrnames = self.get_chr_names()
 
+        # the sorts, each chromosome on its own: the large ones on
+        # threads (map_chromosomes), any other here and now
+        big = []
+        sizes = []
         for c in chrnames:
             self.locations[c].resize((self.size[c]), refcheck=False)
             if self.size[c] == 0:
@@ -1234,10 +2121,13 @@ class PETrackII:
                 if c in self.rlengths:
                     del self.rlengths[c]
                 continue
-            indices = np.argsort(self.locations[c], order=['l', 'r'])
-            self.locations[c] = self.locations[c][indices]
-            self.barcodes[c] = self.barcodes[c][indices]
-            self.total += np.sum(self.locations[c]['c'])  # self.size[c]
+            if self.size[c] >= _MIN_THREADED_SIZE:
+                big.append(c)
+                sizes.append(self.size[c])
+            else:
+                self.total += self._sort_chrom(c)  # self.size[c]
+        for count in map_chromosomes(self._sort_chrom, big, sizes):
+            self.total += count  # self.size[c]
 
         assert self.total > 0, "Error: no fragments in PETrackII"
 
@@ -1245,6 +2135,19 @@ class PETrackII:
         self.average_template_length = cython.cast(cython.float,
                                                    self.length) / self.total
         return
+
+    @cython.ccall
+    def _sort_chrom(self, c: bytes):
+        """finalize's sort of chromosome `c`, fragments and barcodes,
+        returning the sum of its counts for the caller to add to total.
+        Touches nothing shared but the existing key c of locations and
+        barcodes, so chromosomes can run on separate threads."""
+        indices: cnp.ndarray
+
+        indices = argsort_lrc(self.locations[c])
+        self.locations[c] = self.locations[c][indices]
+        self.barcodes[c] = self.barcodes[c][indices]
+        return np.sum(self.locations[c]['c'])
 
     @cython.ccall
     def get_locations_by_chr(self, chromosome: bytes):
@@ -1296,7 +2199,7 @@ class PETrackII:
         chrnames = self.get_chr_names()
 
         for c in chrnames:
-            indices = np.argsort(self.locations[c], order=['l', 'r'])
+            indices = argsort_lrc(self.locations[c])
             self.locations[c] = self.locations[c][indices]
             self.barcodes[c] = self.barcodes[c][indices]
         self.is_sorted = True
@@ -1449,6 +2352,15 @@ class PETrackII:
             Two-element list ``[positions, values]`` with numpy arrays describing
             the pileup breakpoints and scaled coverage.
         """
+        ret: list
+
+        # fragments with one count: the same arrays from int32 sorts
+        ret = pileup_LRC_as_list_equal(self.locations[chrom],
+                                       scale_factor,
+                                       baseline_value,
+                                       self.is_sorted)
+        if ret is not None:
+            return ret
         return pileup_from_LRC_as_list(self.locations[chrom],
                                        scale_factor,
                                        baseline_value,
@@ -1495,10 +2407,16 @@ class PETrackII:
         for i in range(len(scale_factor_s)):
             d = ds[i]
             scale_factor = scale_factor_s[i]
-            tmp_pileup = pileup_from_LRC_centers_as_list(self.locations[chrom],
-                                                         d,
-                                                         scale_factor,
-                                                         baseline_value)
+            # fragments with one count: the same arrays from int32 sorts
+            tmp_pileup = pileup_LRC_centers_as_list_equal(self.locations[chrom],
+                                                          d,
+                                                          scale_factor,
+                                                          baseline_value)
+            if tmp_pileup is None:
+                tmp_pileup = pileup_from_LRC_centers_as_list(self.locations[chrom],
+                                                             d,
+                                                             scale_factor,
+                                                             baseline_value)
 
             if prev_pileup:
                 prev_pileup = over_two_pv_array(prev_pileup,
