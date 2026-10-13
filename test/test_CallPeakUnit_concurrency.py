@@ -133,14 +133,20 @@ else:
 @pytest.mark.parametrize('scenario', ['parallel', 'serial', 'failure'])
 def test_independent_callers(tmp_path, same_names, broad, scenario):
     import multiprocessing
+    import MACS3
     if scenario != 'serial' and 'fork' not in multiprocessing.get_all_start_methods():
         pytest.skip('fork backend is unavailable')
     env = os.environ.copy()
     env['TMPDIR'] = str(tmp_path)
+    # Match the package pytest imported, including non-editable wheel installs.
+    # Running -c from the checkout would put Cython source ahead of that build.
+    package_root = str(Path(MACS3.__file__).resolve().parent.parent)
+    env['PYTHONPATH'] = package_root + (
+        os.pathsep + env['PYTHONPATH'] if env.get('PYTHONPATH') else '')
     process = subprocess.Popen(
         [sys.executable, '-c', SCRIPT, str(int(same_names)), str(int(broad)),
          str(int(scenario == 'failure')), str(int(scenario == 'parallel'))],
-        cwd=Path(__file__).resolve().parents[1], env=env,
+        cwd=tmp_path, env=env,
         stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True,
         start_new_session=True)
     try:
