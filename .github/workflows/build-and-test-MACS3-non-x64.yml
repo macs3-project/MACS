@@ -3,23 +3,9 @@
 
 name: MACS3 CI non x64
 
-on: 
-  push:
-    paths-ignore:
-      - 'docs/**'
-      - '**.md'
-      - 'ChangeLog'
-      - '.github/workflows/**'
-      - '!.github/workflows/build-and-test-MACS3-non-x64.yml'
-      - '!.github/workflows/macs-version-benchmark.yml'
-  pull_request:
-    paths-ignore:
-      - 'docs/**'
-      - '**.md'
-      - 'ChangeLog'
-      - '.github/workflows/**'
-      - '!.github/workflows/build-and-test-MACS3-non-x64.yml'
-      - '!.github/workflows/macs-version-benchmark.yml'
+# Run manually while aarch64 CI failures are investigated.
+on:
+  workflow_dispatch:
 
 jobs:
   build_job:

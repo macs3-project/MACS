@@ -728,22 +728,21 @@ def score_pending_chunks(cache: PScoreCache,
                 state[2] = e
         return
 
-pscore_cache = cython.declare(PScoreCache, PScoreCache())
-
 
 @cython.cfunc
 @cython.inline
 @cython.profile(False)
 @cython.linetrace(False)
-def get_pscore(observed: cython.int,
+def get_pscore(cache: PScoreCache,
+               observed: cython.int,
                expectation: cython.float) -> cython.float:
     """Return cached ``-log10`` Poisson tail probability for
     (``observed``, ``expectation``)."""
     i: cython.Py_ssize_t
 
     # index() may grow the table, so read slots only after it returns
-    i = pscore_cache.index(observed, expectation)
-    return pscore_cache.slots[i].pscore
+    i = cache.index(observed, expectation)
+    return cache.slots[i].pscore
 
 
 # Sort keys of pscore_order: the high 32 bits order the p-scores from
@@ -1308,41 +1307,16 @@ def find_optimal_cutoff(x: list, y: list) -> tuple:
 
 # the most worker processes one call uses
 MAX_WORKERS: cython.int = 8
-# the caller whose p-score table is being built, read by forked workers
+# Set only in child processes by the pool initializer; never in the parent.
 _caller_for_workers = None
-# the threads shutting down pools whose results are all in
-_pool_shutdowns = []
+# Forked pools must not inherit descriptors from another live caller pool.
+_worker_pool_lock = threading.Lock()
 
 
-def shut_down_later(pool):
-    """Shut ``pool`` down, waiting for its workers to exit, on a thread
-    of its own, so that this process goes on meanwhile; a worker takes
-    milliseconds to exit. join_pool_shutdowns waits for the thread."""
-    try:
-        thread = threading.Thread(target=pool.shutdown)
-        thread.start()
-    except RuntimeError:
-        # no thread to be had: wait here
-        pool.shutdown()
-        return
-    _pool_shutdowns.append(thread)
-
-
-def join_pool_shutdowns():
-    """Wait until every pool given to shut_down_later is shut down.
-
-    Each pool step calls this before it forks, so that no thread of a
-    finished pool runs when this process forks, and the p-score table
-    step calls it when it is done. The call-peaks step does not: its
-    workers exit while this process writes the peaks (the threads that
-    shut a pool down run only when this process releases the GIL, which
-    adding the peaks does not do), and the interpreter waits for the
-    thread, not a daemon, at its exit."""
-    global _pool_shutdowns
-    threads = _pool_shutdowns
-    _pool_shutdowns = []
-    for thread in threads:
-        thread.join()
+def initialize_peak_worker(caller):
+    """Bind a forked worker to this pool's caller."""
+    global _caller_for_workers
+    _caller_for_workers = caller
 
 
 def n_available_workers() -> int:
@@ -1435,27 +1409,24 @@ class SlotQScores:
         free(self.entries)
 
 
-slot_qscores = cython.declare(SlotQScores, None)
-
-
 @cython.cfunc
-def slot_qscores_for(qtable: QScoreTable) -> SlotQScores:
-    """The SlotQScores of ``qtable`` for the slots ``pscore_cache``
+def slot_qscores_for(caller: CallerFromAlignments,
+                     qtable: QScoreTable) -> SlotQScores:
+    """The SlotQScores of ``qtable`` for the slots ``caller.pscore_cache``
     has now, kept from one call to the next while both stay the
     same."""
-    global slot_qscores
 
-    if (slot_qscores is None or slot_qscores.qtable is not qtable or
-            slot_qscores.mask != pscore_cache.mask):
-        slot_qscores = SlotQScores(qtable, pscore_cache.mask)
-    return slot_qscores
+    if (caller.slot_qscores is None or caller.slot_qscores.qtable is not qtable or
+            caller.slot_qscores.mask != caller.pscore_cache.mask):
+        caller.slot_qscores = SlotQScores(qtable, caller.pscore_cache.mask)
+    return caller.slot_qscores
 
 
 @cython.final
 @cython.cclass
 class SlotAboveCutoff:
     """Whether the q-score of the p-score in each slot of
-    ``pscore_cache`` is above ``threshold``, looked up in ``qtable``
+    ``caller.pscore_cache`` is above ``threshold``, looked up in ``qtable``
     the first time this process meets the slot: 0 for a slot not
     looked up yet, 1 for a q-score at or below the threshold (or a
     NaN), 2 for one above it. Like SlotQScores, the flags are for the
@@ -1480,22 +1451,19 @@ class SlotAboveCutoff:
         free(self.flags)
 
 
-slot_above = cython.declare(SlotAboveCutoff, None)
-
-
 @cython.cfunc
-def slot_above_for(qtable: QScoreTable,
+def slot_above_for(caller: CallerFromAlignments,
+                   qtable: QScoreTable,
                    threshold: cython.float) -> SlotAboveCutoff:
     """The SlotAboveCutoff of ``qtable`` and ``threshold`` for the
-    slots ``pscore_cache`` has now, kept from one call to the next
+    slots ``caller.pscore_cache`` has now, kept from one call to the next
     while all three stay the same."""
-    global slot_above
 
-    if (slot_above is None or slot_above.qtable is not qtable or
-            slot_above.mask != pscore_cache.mask or
-            slot_above.threshold != threshold):
-        slot_above = SlotAboveCutoff(qtable, pscore_cache.mask, threshold)
-    return slot_above
+    if (caller.slot_above is None or caller.slot_above.qtable is not qtable or
+            caller.slot_above.mask != caller.pscore_cache.mask or
+            caller.slot_above.threshold != threshold):
+        caller.slot_above = SlotAboveCutoff(qtable, caller.pscore_cache.mask, threshold)
+    return caller.slot_above
 
 
 def float32_threshold(cutoff):
@@ -1525,7 +1493,8 @@ def float32_threshold(cutoff):
 @cython.cfunc
 @cython.boundscheck(False)
 @cython.wraparound(False)
-def qscore_above_indices(qtable: QScoreTable,
+def qscore_above_indices(caller: CallerFromAlignments,
+                         qtable: QScoreTable,
                          array1: cnp.ndarray,
                          array2: cnp.ndarray,
                          threshold: cython.float) -> cnp.ndarray:
@@ -1559,17 +1528,17 @@ def qscore_above_indices(qtable: QScoreTable,
     a2_ptr = cython.cast(cython.pointer(cython.float), array2.data)
     o_ptr = cython.cast(cython.pointer(cython.int), out.data)
 
-    sa = slot_above_for(qtable, threshold)
+    sa = slot_above_for(caller, qtable, threshold)
     count = 0
     for i in range(n):
-        slot = pscore_cache.index(cython.cast(cython.int, a1_ptr[i]),
+        slot = caller.pscore_cache.index(cython.cast(cython.int, a1_ptr[i]),
                                   a2_ptr[i])
-        if pscore_cache.mask != sa.mask:
+        if caller.pscore_cache.mask != sa.mask:
             # the cache grew on a miss, which moved its slots
-            sa = slot_above_for(qtable, threshold)
+            sa = slot_above_for(caller, qtable, threshold)
         f = sa.flags[slot]
         if f == 0:
-            q = qtable.get(pscore_cache.slots[slot].pscore)
+            q = qtable.get(caller.pscore_cache.slots[slot].pscore)
             f = 2 if q > threshold else 1
             sa.flags[slot] = f
         if f == 2:
@@ -1691,6 +1660,12 @@ def prefetch_qscore_slot(table: QScoreTable,
 class CallerFromAlignments:
     """Compute pileups, scores, and peaks from FWTrack/PETrack alignments.
 
+    Scoring caches belong to this instance and live until it is released.
+    Independent instances may overlap; do not call one instance concurrently.
+    Forked pools are serialized from creation through shutdown so one pool
+    cannot inherit another pool's descriptors. Pools finish before an
+    operation returns, including on failure.
+
     Attributes:
         treat: Treatment track (FWTrack or PETrackI/PETrackII).
         ctrl: Control track (FWTrack or PETrackI/PETrackII).
@@ -1752,6 +1727,9 @@ class CallerFromAlignments:
     # remember pvalue->qvalue convertion, for lookups from C; empty
     # until the table is computed
     qtable: QScoreTable
+    pscore_cache: PScoreCache
+    slot_qscores: SlotQScores
+    slot_above: SlotAboveCutoff
     # the same mapping in a dict, filled only by __pre_computes
     # (--cutoff-analysis), which reads it back
     pqtable: dict
@@ -1849,6 +1827,9 @@ class CallerFromAlignments:
         self.lambda_bg = lambda_bg
         self.pqtable = {}
         self.qtable = QScoreTable()
+        self.pscore_cache = PScoreCache()
+        self.slot_qscores = None
+        self.slot_above = None
         self.save_bedGraph = save_bedGraph
         self.save_SPMR = save_SPMR
         self.bedGraph_filename_prefix = bedGraph_filename_prefix.encode()
@@ -2166,7 +2147,7 @@ class CallerFromAlignments:
         s: cython.Py_ssize_t
         n_seg: cython.longlong
 
-        cache = pscore_cache
+        cache = self.pscore_cache
         pre_p = 0
         # segments are numbered in the serial order, by chromosome and
         # then by position; positions are 32-bit, so a chromosome has
@@ -2271,15 +2252,15 @@ class CallerFromAlignments:
         ``first`` numbers the segments in the serial loop's order
         across all chromosomes, so each slot's is the serial pass's.
 
-        Once every task is in, the p-score of each distinct new key is
-        computed once, on up to n_workers threads, and stored in
+        Once every task is in and the pool has shut down, the p-score
+        of each distinct new key is computed once, on up to n_workers
+        threads, and stored in
         the cache, so that the call-peaks step's workers, forked
         later, start with them. Returns the p-score, first segment and
         summed length of every slot used, as take_histogram does; they
         sort by p-score and then ``first`` exactly as the serial
         pass's do.
         """
-        global _caller_for_workers
         batches: list
         files: dict
         all_new: cython.bint
@@ -2288,46 +2269,35 @@ class CallerFromAlignments:
         batches = self._chromosome_batches(n_workers)
         files = {}
         # every worker's copy of the cache starts with no slot used
-        pscore_cache.reset_histogram()
+        self.pscore_cache.reset_histogram()
         # with no key held before the pass, every slot it uses is new
-        all_new = pscore_cache.n == 0
+        all_new = self.pscore_cache.n == 0
         # the workers need not inherit the heap's free memory
         macs3_release_free_heap()
-        join_pool_shutdowns()
-        _caller_for_workers = self
-        try:
+        with _worker_pool_lock:
             pool = ProcessPoolExecutor(max_workers=min(n_workers, len(batches)),
-                                       mp_context=multiprocessing.get_context("fork"))
+                                       mp_context=multiprocessing.get_context("fork"),
+                                       initializer=initialize_peak_worker,
+                                       initargs=(self,))
             try:
                 futures = {pool.submit(pscore_stat_worker, batches[k]): k
                            for k in range(len(batches))}
-                try:
-                    for future in as_completed(futures):
-                        (chrom_files, keys, firsts, lengths) = future.result()
-                        for (chrom, temp_filename) in chrom_files:
-                            files[chrom] = temp_filename
-                        pscore_cache.merge_histogram(keys, firsts, lengths)
-                except BaseException:
-                    pool.shutdown(cancel_futures=True)
-                    raise
-            except BaseException:
-                pool.shutdown()
-                raise
-        finally:
-            _caller_for_workers = None
-        # every result is in: the workers exit while this process
-        # merges the histograms; __cal_pvalue_qvalue_table waits for
-        # them when it is done
-        shut_down_later(pool)
+                for future in as_completed(futures):
+                    (chrom_files, keys, firsts, lengths) = future.result()
+                    for (chrom, temp_filename) in chrom_files:
+                        files[chrom] = temp_filename
+                    self.pscore_cache.merge_histogram(keys, firsts, lengths)
+            finally:
+                pool.shutdown(wait=True, cancel_futures=True)
 
         for chrom in self.chromosomes:
             temp_filename = files[chrom]
             if temp_filename is not None:
                 self.pileup_data_files[chrom] = temp_filename
         if all_new:
-            return pscore_cache.score_pending(n_workers, True)
-        pscore_cache.score_pending(n_workers, False)
-        return pscore_cache.take_histogram()
+            return self.pscore_cache.score_pending(n_workers, True)
+        self.pscore_cache.score_pending(n_workers, False)
+        return self.pscore_cache.take_histogram()
 
     @cython.cfunc
     def __cal_pvalue_qvalue_table(self):
@@ -2372,10 +2342,10 @@ class CallerFromAlignments:
             # below starts from when there are no p-scores at all
             i = len(self.chromosomes) - 1
         else:
-            pscore_cache.reset_histogram()
+            self.pscore_cache.reset_histogram()
             for i in range(len(self.chromosomes)):
                 self._pscore_stat_a_chromosome(i, True)
-            (pscores, firsts, lengths) = pscore_cache.take_histogram()
+            (pscores, firsts, lengths) = self.pscore_cache.take_histogram()
 
         # the slots used in this pass: p-score, first segment, length
         n_used = pscores.shape[0]
@@ -2439,8 +2409,6 @@ class CallerFromAlignments:
                 prefetch_qscore_slot(qtable, uv_ptr[j + QTABLE_PREFETCH_AHEAD])
             v = uv_ptr[j]
             qtable.put(v, 0)
-        # wait for the pool's workers, which exit while this step runs
-        join_pool_shutdowns()
         return
 
     @cython.cfunc
@@ -2793,7 +2761,6 @@ class CallerFromAlignments:
         Each worker returns, for each of its chromosomes, the name of
         the file holding the pileup and the chromosome's peaks.
         """
-        global _caller_for_workers
         batches: list
         tasks: list
         results: dict
@@ -2808,24 +2775,17 @@ class CallerFromAlignments:
         results = {}
         # the workers need not inherit the heap's free memory
         macs3_release_free_heap()
-        join_pool_shutdowns()
-        _caller_for_workers = self
-        try:
+        with _worker_pool_lock:
             pool = ProcessPoolExecutor(max_workers=min(n_workers, len(batches)),
-                                       mp_context=multiprocessing.get_context("fork"))
+                                       mp_context=multiprocessing.get_context("fork"),
+                                       initializer=initialize_peak_worker,
+                                       initargs=(self,))
             try:
                 for part in pool.map(call_peaks_worker, tasks):
                     for (chrom, temp_filename, chrom_peaks) in part:
                         results[chrom] = (temp_filename, chrom_peaks)
-            except BaseException:
-                pool.shutdown()
-                raise
-        finally:
-            _caller_for_workers = None
-        # every result is in: the workers exit while this process goes
-        # on to write the peaks; the next pool's fork, or the
-        # interpreter's exit, waits for them
-        shut_down_later(pool)
+            finally:
+                pool.shutdown(wait=True, cancel_futures=True)
 
         for chrom in self.chromosomes:
             (temp_filename, chrom_peaks) = results[chrom]
@@ -2901,7 +2861,7 @@ class CallerFromAlignments:
                 scoring_function_s[0] == 'q'):
             threshold = float32_threshold(score_cutoff_s[0])
         if threshold is not None:
-            above_cutoff_index_array = qscore_above_indices(self.qtable,
+            above_cutoff_index_array = qscore_above_indices(self, self.qtable,
                                                             treat_array,
                                                             ctrl_array,
                                                             threshold)
@@ -3076,7 +3036,7 @@ class CallerFromAlignments:
                 if score_cutoff_s[i] > score_array_s[i][ti]:
                     return  # not passed, then disgard this peak.
 
-        summit_p_score = get_pscore(cython.cast(cython.int,
+        summit_p_score = get_pscore(self.pscore_cache, cython.cast(cython.int,
                                                 summit_treat),
                                     summit_ctrl)
         summit_q_score = self.qtable.get(summit_p_score)
@@ -3159,7 +3119,7 @@ class CallerFromAlignments:
                 if score_cutoff_s[i] > score_array_s[i][peak_content[summit_index][4]]:
                     return False  # not passed, then disgard this peak.
 
-            summit_p_score = get_pscore(cython.cast(cython.int,
+            summit_p_score = get_pscore(self.pscore_cache, cython.cast(cython.int,
                                                     summit_treat),
                                         summit_ctrl)
             summit_q_score = self.qtable.get(summit_p_score)
@@ -3300,7 +3260,7 @@ class CallerFromAlignments:
             summit_treat = peak_content[summit_index][2]
             summit_ctrl = peak_content[summit_index][3]
 
-            summit_p_score = get_pscore(cython.cast(cython.int,
+            summit_p_score = get_pscore(self.pscore_cache, cython.cast(cython.int,
                                                     summit_treat),
                                         summit_ctrl)
             summit_q_score = self.qtable.get(summit_p_score)
@@ -3345,7 +3305,7 @@ class CallerFromAlignments:
         array1_size = array1.shape[0]
 
         for i in range(array1_size):
-            s_ptr[0] = get_pscore(cython.cast(cython.int,
+            s_ptr[0] = get_pscore(self.pscore_cache, cython.cast(cython.int,
                                               a1_ptr[0]),
                                   a2_ptr[0])
             s_ptr += 1
@@ -3379,16 +3339,16 @@ class CallerFromAlignments:
         a2_ptr = cython.cast(cython.pointer(cython.float), array2.data)
         s_ptr = cython.cast(cython.pointer(cython.float), s.data)
 
-        sq = slot_qscores_for(qtable)
+        sq = slot_qscores_for(self, qtable)
         for i in range(array1.shape[0]):
-            slot = pscore_cache.index(cython.cast(cython.int, a1_ptr[0]),
+            slot = self.pscore_cache.index(cython.cast(cython.int, a1_ptr[0]),
                                       a2_ptr[0])
-            if pscore_cache.mask != sq.mask:
+            if self.pscore_cache.mask != sq.mask:
                 # the cache grew on a miss, which moved its slots
-                sq = slot_qscores_for(qtable)
+                sq = slot_qscores_for(self, qtable)
             e = sq.entries[slot]
             if e == 0:
-                q = qtable.get(pscore_cache.slots[slot].pscore)
+                q = qtable.get(self.pscore_cache.slots[slot].pscore)
                 memcpy(cython.address(e), cython.address(q), 4)
                 sq.entries[slot] = ~e
                 s_ptr[0] = q
@@ -4122,7 +4082,7 @@ def pscore_stat_worker(chroms: list) -> tuple:
         caller._pscore_stat_a_chromosome(i, False)
         chrom = caller.chromosomes[i]
         files.append((chrom, caller.pileup_data_files.get(chrom)))
-    (keys, firsts, lengths) = pscore_cache.take_histogram(True)
+    (keys, firsts, lengths) = caller.pscore_cache.take_histogram(True)
     return (files, keys, firsts, lengths)
 
 
