@@ -72,7 +72,7 @@ _PeakScan = cython.struct(
 @cython.inline
 @cython.nogil
 @cython.exceptval(check=False)
-def _scan_push_mid(st: cython.pointer(_PeakScan), mid: cython.int) -> cython.void:
+def _scan_push_mid(st: cython.pointer(_PeakScan), mid: cython.int) -> cython.bint:
     new_cap: cython.Py_ssize_t
     new_mids: cython.p_int
 
@@ -82,11 +82,12 @@ def _scan_push_mid(st: cython.pointer(_PeakScan), mid: cython.int) -> cython.voi
                                realloc(st.mids, new_cap * cython.sizeof(cython.int)))
         if new_mids == cython.NULL:
             st.failed = True
-            return
+            return False
         st.mids = new_mids
         st.cap_mids = new_cap
     st.mids[st.n_mids] = mid
     st.n_mids += 1
+    return True
 
 
 @cython.cfunc
@@ -94,7 +95,7 @@ def _scan_push_mid(st: cython.pointer(_PeakScan), mid: cython.int) -> cython.voi
 @cython.nogil
 @cython.exceptval(check=False)
 def _scan_add(st: cython.pointer(_PeakScan), tstart: cython.int,
-              tend: cython.int, tvalue: cython.float) -> cython.void:
+              tend: cython.int, tvalue: cython.float) -> cython.bint:
     """One pass of __close_peak's summit loop, for the entry
     (tstart, tend, tvalue) appended to the peak content."""
     # int((tend+tstart)/2): C int sum, true division as a double,
@@ -104,10 +105,12 @@ def _scan_add(st: cython.pointer(_PeakScan), tstart: cython.int,
 
     if not st.summit_value or st.summit_value < tvalue:
         st.n_mids = 0
-        _scan_push_mid(st, mid)
+        if not _scan_push_mid(st, mid):
+            return False
         st.summit_value = tvalue
     elif st.summit_value == tvalue:
-        _scan_push_mid(st, mid)
+        return _scan_push_mid(st, mid)
+    return True
 
 
 @cython.cfunc
@@ -115,19 +118,19 @@ def _scan_add(st: cython.pointer(_PeakScan), tstart: cython.int,
 @cython.nogil
 @cython.exceptval(check=False)
 def _scan_start(st: cython.pointer(_PeakScan), tstart: cython.int,
-                tend: cython.int, tvalue: cython.float) -> cython.void:
+                tend: cython.int, tvalue: cython.float) -> cython.bint:
     """peak_content = [(tstart, tend, tvalue),]"""
     st.first_start = tstart
     st.last_end = tend
     st.summit_value = 0
     st.n_mids = 0
-    _scan_add(st, tstart, tend, tvalue)
+    return _scan_add(st, tstart, tend, tvalue)
 
 
 @cython.cfunc
 @cython.nogil
 @cython.exceptval(check=False)
-def _scan_close(st: cython.pointer(_PeakScan)) -> cython.void:
+def _scan_close(st: cython.pointer(_PeakScan)) -> cython.bint:
     """The end of __close_peak: pick the summit and keep the peak if
     its height is below max_v."""
     summit: cython.int
@@ -135,6 +138,10 @@ def _scan_close(st: cython.pointer(_PeakScan)) -> cython.void:
     new_summits: cython.p_int
     new_heights: cython.p_float
 
+    # A failed/empty scan must never dereference the midpoint buffer.
+    if st.failed or st.mids == cython.NULL or st.n_mids <= 0:
+        st.failed = True
+        return False
     # tsummit[int((len(tsummit)+1)/2)-1], len(tsummit) >= 1
     summit = st.mids[(st.n_mids + 1) // 2 - 1]
     if st.summit_value < st.max_v:
@@ -144,18 +151,21 @@ def _scan_close(st: cython.pointer(_PeakScan)) -> cython.void:
                                       realloc(st.summits, new_cap * cython.sizeof(cython.int)))
             if new_summits == cython.NULL:
                 st.failed = True
-                return
+                return False
+            # Own the new buffer even if the following height growth fails;
+            # the wrapper's finally block frees both pointers in that case.
             st.summits = new_summits
             new_heights = cython.cast(cython.p_float,
                                       realloc(st.heights, new_cap * cython.sizeof(cython.float)))
             if new_heights == cython.NULL:
                 st.failed = True
-                return
+                return False
             st.heights = new_heights
             st.cap_peaks = new_cap
         st.summits[st.n_peaks] = summit
         st.heights[st.n_peaks] = st.summit_value
         st.n_peaks += 1
+    return True
 
 
 @cython.cfunc
@@ -163,30 +173,37 @@ def _scan_close(st: cython.pointer(_PeakScan)) -> cython.void:
 @cython.nogil
 @cython.exceptval(check=False)
 def _scan_point(st: cython.pointer(_PeakScan), p: cython.int,
-                vf: cython.float) -> cython.void:
+                vf: cython.float) -> cython.bint:
     """naive_call_peaks' scan, for the next [p, v] point."""
     # naive_call_peaks reads the float32 value into a double
     v: cython.double = vf
 
+    if st.failed:
+        return False
     if not st.found:
         # looking for the first region above min_v
         if v > st.min_v:
             st.found = True
-            _scan_start(st, st.pre_p, p, vf)
+            if not _scan_start(st, st.pre_p, p, vf):
+                return False
         st.pre_p = p
-        return
+        return True
     if v <= st.min_v:           # not be detected as 'peak'
         st.pre_p = p
-        return
+        return True
     # the gap and length tests were on Python ints, so no overflow
     if cython.cast(cython.longlong, st.pre_p) - st.last_end <= st.max_gap:
         st.last_end = p
-        _scan_add(st, st.pre_p, p, vf)
+        if not _scan_add(st, st.pre_p, p, vf):
+            return False
     else:
         if cython.cast(cython.longlong, st.last_end) - st.first_start >= st.min_length:
-            _scan_close(st)
-        _scan_start(st, st.pre_p, p, vf)
+            if not _scan_close(st):
+                return False
+        if not _scan_start(st, st.pre_p, p, vf):
+            return False
     st.pre_p = p
+    return True
 
 
 @cython.cfunc
@@ -216,7 +233,8 @@ def _pileup_scan(tags: cython.p_int, l: cython.Py_ssize_t,
 
     if pre_p != 0:
         # the first chunk of 0
-        _scan_point(st, pre_p, 0)
+        if not _scan_point(st, pre_p, 0):
+            return
 
     while i_s < l and i_e < l:
         sp = cython.cast(cython.int, cython.cast(cython.uint, tags[i_s]) - uext)
@@ -226,14 +244,16 @@ def _pileup_scan(tags: cython.p_int, l: cython.Py_ssize_t,
         if sp < ep:
             p = sp
             if p != pre_p:
-                _scan_point(st, p, cython.cast(cython.float, pileup))
+                if not _scan_point(st, p, cython.cast(cython.float, pileup)):
+                    return
                 pre_p = p
             pileup += 1
             i_s += 1
         elif sp > ep:
             p = ep
             if p != pre_p:
-                _scan_point(st, p, cython.cast(cython.float, pileup))
+                if not _scan_point(st, p, cython.cast(cython.float, pileup)):
+                    return
                 pre_p = p
             pileup -= 1
             i_e += 1
@@ -245,14 +265,16 @@ def _pileup_scan(tags: cython.p_int, l: cython.Py_ssize_t,
     for i in range(i_e, l):
         p = cython.cast(cython.int, cython.cast(cython.uint, tags[i]) + uext)
         if p != pre_p:
-            _scan_point(st, p, cython.cast(cython.float, pileup))
+            if not _scan_point(st, p, cython.cast(cython.float, pileup)):
+                return
             pre_p = p
         pileup -= 1
 
     # save the last peak
     if st.found:
         if cython.cast(cython.longlong, st.last_end) - st.first_start >= st.min_length:
-            _scan_close(st)
+            if not _scan_close(st):
+                return
 
 
 @cython.cfunc
