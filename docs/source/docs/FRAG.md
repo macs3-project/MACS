@@ -17,3 +17,18 @@ chr22   11333072        11333249        AAACGAAAGACTCGGA     1
 chr22   11363891        11364010        AAACGAAAGACTCGGA     1
 ...
 ```
+
+Fields must be separated by tabs. Plain, gzip and BGZF files are supported;
+the final record does not require a trailing newline. It receives the same
+validation and count cap as every other record. Malformed final records
+raise the usual parser error (for example, fewer than five columns or an
+end coordinate that does not follow the start).
+
+Leading `#`, `track` and `browser` header lines are skipped, including when
+the file contains only headers. The Python `FragParser` API raises
+`ValueError: No valid fragments found in FRAG input` if a build has no
+accepted fragments. An append with no accepted fragments raises the same
+error when the parser has no prior fragments; otherwise it preserves that
+parser's statistics. Statistics belong to the parser instance, rather than
+the supplied track. Records with a negative start or an empty chromosome
+are skipped as before.
