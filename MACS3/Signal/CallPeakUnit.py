@@ -18,6 +18,7 @@ import os
 import sys
 from stat import S_ISREG
 import threading
+from MACS3.Utilities.Threads import run_on_threads
 import multiprocessing
 from concurrent.futures import ProcessPoolExecutor, as_completed
 
@@ -628,7 +629,6 @@ class PScoreCache:
         lengths: cnp.ndarray = None
         n: cython.Py_ssize_t
         chunk: cython.Py_ssize_t
-        threads: list
         state: list
 
         n = self.n_pending
@@ -648,19 +648,17 @@ class PScoreCache:
         # the next pending key not handed out, a lock, and the first
         # exception a thread raised
         state = [0, threading.Lock(), None]
-        threads = [threading.Thread(target=score_pending_chunks,
-                                    args=(self, observed, lams, values,
-                                          pscores, firsts, lengths,
-                                          chunk, state))
-                   for _ in range(min(n_threads, (n + chunk - 1) // chunk) - 1)]
-        for t in threads:
-            t.start()
-        try:
-            score_pending_chunks(self, observed, lams, values,
-                                 pscores, firsts, lengths, chunk, state)
-        finally:
-            for t in threads:
-                t.join()
+        def stop(error):
+            with state[1]:
+                if state[2] is None:
+                    state[2] = error
+
+        run_on_threads(
+            score_pending_chunks,
+            min(n_threads, (n + chunk - 1) // chunk) - 1,
+            stop,
+            (self, observed, lams, values, pscores, firsts, lengths,
+             chunk, state))
         if state[2] is not None:
             raise state[2]
         self.n_pending = 0

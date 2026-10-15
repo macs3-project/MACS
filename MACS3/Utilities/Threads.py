@@ -28,6 +28,28 @@ def n_threads() -> int:
     return min(MAX_THREADS, os.cpu_count() or 1)
 
 
+def run_on_threads(work, n_workers, on_error, args=()):
+    """Run work on the caller and n_workers additional threads.
+
+    Report startup/caller failures through on_error before joining every
+    successfully started worker, then propagate the original exception.
+    on_error must stop further task dispatch and must not raise.
+    """
+    started = []
+    try:
+        for _ in range(n_workers):
+            thread = threading.Thread(target=work, args=args)
+            thread.start()
+            started.append(thread)
+        work(*args)
+    except BaseException as error:
+        on_error(error)
+        raise
+    finally:
+        for thread in started:
+            thread.join()
+
+
 def map_chromosomes(fn, chroms: list, sizes: list, *args) -> list:
     """Return [fn(c, *args) for c in chroms], calling fn once per
     chromosome.
@@ -66,14 +88,11 @@ def map_chromosomes(fn, chroms: list, sizes: list, *args) -> list:
                     errors.append(e)
                 return
 
-    threads = [threading.Thread(target=work) for _ in range(n - 1)]
-    for t in threads:
-        t.start()
-    try:
-        work()
-    finally:
-        for t in threads:
-            t.join()
+    def stop(error):
+        with lock:
+            errors.append(error)
+
+    run_on_threads(work, n - 1, stop)
     if errors:
         raise errors[0]
     return results
