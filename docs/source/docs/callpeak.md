@@ -26,6 +26,43 @@ the essentials.
 
 
 
+## Peak-calling process policy
+
+Peak calling defaults to the `auto` process backend. It uses Linux `fork`
+only from the main Python thread, with no other detected Python threads,
+outside daemon processes, and when fork is available. macOS and other
+unsupported host contexts use the serial chromosome loops. The policy is
+checked again immediately before each process pool is created. Eligible
+calls use up to eight workers, bounded by available CPUs and chromosome
+batches; single-chromosome calls run serially. Broad peak scans are serial,
+but their p/q-score preparation can use a process pool. Saving bedGraph
+keeps the narrow peak scan serial as well.
+
+Library callers can explicitly disable both peak-calling process pools:
+
+```python
+from MACS3.Signal.CallPeakUnit import CallerFromAlignments
+
+caller = CallerFromAlignments(treatment, control, process_backend="serial")
+try:
+    peaks = caller.call_peaks(["q"], [2.0])
+finally:
+    caller.destroy()
+```
+
+The only accepted policies are `auto` and `serial`. Serial execution preserves
+peak results but can take longer on multiple chromosomes. This setting controls
+peak process pools, rather than a global CPU budget: other MACS3 operations and
+native numerical libraries may still use threads. CLI-wide serial control is
+planned separately.
+
+Python thread detection cannot identify all native library threads or prevent
+another thread from starting after a check. Embedded applications and notebooks
+should select `serial` when they cannot establish that their host is safe to
+fork. Neither spawn nor forkserver is supported by these pools: workers use
+inherited tracks and an explicit per-pool caller initializer, which avoids
+serializing the tracks and preserves copy-on-write sharing.
+
 ## Essential Commandline Options
 
 ### Input and Output
